@@ -1,0 +1,294 @@
+:: Deadwood Reblooms Widgets [widget]
+
+<!-- 模组设置 -->
+<<widget 'Deadwood-Reblooms-Options'>>
+  <details open>
+    <summary class='settingsHeader options'><span class='gold'><<= maplebirch.auto('Deadwood Reblooms')>></span></summary>
+    <div class='settingsGrid'>
+      <div class='settingsToggleItem'>
+        <span class='gold'><<lanSwitch 'Sidebar Control Position Selection' '侧边栏控件位置选择'>></span>
+        <<lanListbox '$options.maplebirch.DeadwoodReblooms.modHint' autoselect>><<option 'mobile client' 'mobile'>><<option 'desktop client' 'desktop'>><<option 'disable' 'disable'>><</lanListbox>>
+        <span class='tooltip-anchor linkBlue' tooltip="<span class='teal'><<lanSwitch 'Update next time the interface is opened' '在下次打开界面时更新'>></span>">(?)</span>
+      </div>
+      <div class='settingsToggleItem'>
+        <label><<checkbox '$options.maplebirch.DeadwoodReblooms.bodywriting' false true autocheck>><<lanSwitch 'Custom Bodywriting' '定制涂鸦'>></label>
+        <span class='tooltip-anchor linkBlue' tooltip="<span class='teal'><<lanSwitch 'Customized bodywriting can be created at the mirror after activation.' '启用后在镜子处可定制涂鸦。'>></span>">(?)</span>
+      </div>
+      <div class='settingsToggleItem'>
+        <span class='gold'><<lanSwitch 'Enable Celestial Events' '启用特殊天象'>></span>
+        <label><<checkbox '$options.maplebirch.DeadwoodReblooms.solarEclipse' false true autocheck>><<lanSwitch 'Solar Eclipse' '日蚀'>></label>
+        <span class='tooltip-anchor linkBlue' tooltip="<span class='teal'><<lanSwitch 'When enabled, a solar eclipse will occur in the specified month.' '启用后将在指定月份出现日蚀。'>></span>">(?)</span>
+      </div>
+    </div>
+  </details><hr>
+<</widget>>
+
+<!-- 模组提示 -->
+<<widget 'DeadwoodRebloomsHint'>>
+  <<if !$DeadwoodReblooms.hintlocation>><<set $DeadwoodReblooms.hintlocation to 'Hint'>><</if>>
+  <<switch $DeadwoodReblooms.hintlocation>>
+    <<case 'Hint'>><<DeadwoodRebloomsHintContent>>
+    <<case 'Content'>><<DeadwoodRebloomsContent>>
+    <<case 'Panel'>><<DeadwoodRebloomsPanel>>
+    <<default>><<DeadwoodRebloomsHintContent>>
+  <</switch>>
+<</widget>>
+
+<<widget 'titleDeadwoodRebloomsHint'>>
+  <<if !$DeadwoodReblooms.hintlocation>><<set $DeadwoodReblooms.hintlocation to 'Hint'>><</if>>
+  <<switch $DeadwoodReblooms.hintlocation>>
+    <<case 'Hint'>><<setupTabs 0>>
+    <<case 'Content'>><<setupTabs 1>>
+    <<case 'Panel'>><<setupTabs 2>>
+    <<default>><<setupTabs 0>>
+  <</switch>>
+  <div id='overlayTabs' class='tab'>
+    <<closeButtonMobile>>
+    <<lanButton 'mods introduction' 'title'>>
+      <<toggleTab>><<set $DeadwoodReblooms.hintlocation to 'Hint'>>
+      <<replace #customOverlayContent>><<DeadwoodRebloomsHint>><</replace>>
+      <<run maplebirch.trigger(':modhint')>>
+    <</lanButton>>
+    <<lanButton 'mods contents' 'title'>>
+      <<toggleTab>><<set $DeadwoodReblooms.hintlocation to 'Content'>>
+      <<replace #customOverlayContent>><<DeadwoodRebloomsHint>><</replace>>
+      <<run maplebirch.trigger(':modhint')>>
+    <</lanButton>>
+    <<lanButton 'character panel' 'title'>>
+      <<toggleTab>><<set $DeadwoodReblooms.hintlocation to 'Panel'>>
+      <<replace #customOverlayContent>><<DeadwoodRebloomsHint>><</replace>>
+      <<run maplebirch.trigger(':modhint')>>
+    <</lanButton>>
+  </div>
+  <<closeButton>>
+<</widget>>
+
+<<widget 'DeadwoodRebloomsHintMobile'>>
+  <<if $options.maplebirch.DeadwoodReblooms?.modHint is 'mobile' && $options.sidebarStats isnot 'disabled'>>
+    <input type='button' class='saveMenuButton DeadwoodRebloomsHintMobile' value='' onclick='maplebirch.rebloom.modhint.hintClicked()'>
+  <</if>>
+<</widget>>
+
+<<widget 'DeadwoodRebloomsHintDesktop'>>
+  <<if $options.maplebirch.DeadwoodReblooms?.modHint is 'desktop'>>
+    <<lanButton 'Deadwood Reblooms' 'upper'>>
+      <<maplebirchReplace 'DeadwoodRebloomsHint' 'title'>>
+      <<run maplebirch.trigger(':modhint')>>
+    <</lanButton>>
+  <</if>>
+<</widget>>
+
+<<widget 'DeadwoodRebloomsHintContent'>>
+  <span class='searchButtons' style='display:flex'>
+    <<textbox '_DeadwoodRebloomsHintTextbox' ''>>
+    <<lanButton 'search' 'capitalize'>><<run maplebirch.rebloom.modhint.searchButtonClicked()>><</lanButton>>
+    <<lanButton 'clear' 'capitalize'>><<run maplebirch.rebloom.modhint.clearButtonClicked()>><</lanButton>>
+  </span>
+  <div id='DeadwoodRebloomsHintContent'><<= setup.maplebirch.hint.play>></div>
+<</widget>>
+
+<<widget 'DeadwoodRebloomsContent'>><<= setup.maplebirch.content.play>><</widget>>
+
+<<widget 'DeadwoodRebloomsPanel'>>
+  <div class='maplebirch-inventory-panel'>
+    <!-- 角色状态区域 -->
+    <div class='maplebirch-character-section'>
+      <!-- 角色画布容器 -->
+      <div id='maplebirch-character-container'>
+        <div id='maplebirch-character'></div>
+        <div id='maplebirch-character-overlay'></div>
+      </div>
+      <!-- 角色身体携带信息区域 -->
+      <div class='maplebirch-body-carries'>
+        <!-- 这里可以放置身体携带信息的格子或列表 -->
+      </div>
+    </div>
+    <!-- 物品栏区域 -->
+    <div class='maplebirch-inventory-section'>
+      <!-- 这里可以放置物品栏网格 -->
+    </div>
+  </div>
+<</widget>>
+
+<!-- 定制涂鸦 -->
+<<widget 'DeadwoodRebloomsBodyWriting'>>
+  <<if Object.keys(_bodyPartOptions).length gt 0 && $options.maplebirch.DeadwoodReblooms.bodywriting is true>><div class='settingsToggleItemWide'>
+    <<set _bodywriting to {}>>
+    <<set _bodywritingSpecialList to [...new Set(['none',...new Set(Object.values(setup.bodywriting).map(item => item.special).filter(Boolean)),'loveInterest'])].filter(special => !setup.loveInterestNpc?.includes(special))>>
+    <<set _bodywritingSpecialTranslations to {none:{cn:'无',en:'None'},rape:{cn:'强奸',en:'Rape'},slave:{cn:'奴隶',en:'Slave'},violence:{cn:'暴力',en:'Violence'},sex:{cn:'性爱',en:'Sex'},bestiality:{cn:'兽交',en:'Bestiality'},prostitution:{cn:'卖淫',en:'Prostitution'},exhibitionism:{cn:'暴露癖',en:'Exhibitionism'},combat:{cn:'战斗',en:'Combat'},holy:{cn:'神圣',en:'Holy'},cattle:{cn:'牲畜',en:'Cattle'},criminal:{cn:'罪犯',en:'Criminal'},pregnancy:{cn:'怀孕',en:'Pregnancy'},impreg:{cn:'受孕',en:'Impregnation'},islander:{cn:'岛民',en:'Islander'},esoteric:{cn:'隐秘',en:'Esoteric'},loveInterest:{cn:'恋爱对象',en:'Love Interest'}}>>
+    <<set _textColorNames to [
+      ['red'         , ['<span class="red">Red</span>'              , '<span class="red">红色</span>']],
+      ['pink'        , ['<span class="pink">Pink</span>'            , '<span class="pink">粉色</span>']],
+      ['light-pink'  , ['<span class="light-pink">Light Pink</span>', '<span class="light-pink">浅粉色</span>']],
+      ['rose-gold'   , ['<span class="rose-gold">Rose Gold</span>'  , '<span class="rose-gold">玫瑰金</span>']],
+      ['hospital-pink', ['<span class="hospital-pink">Hospital Pink</span>', '<span class="hospital-pink">医院粉</span>']],
+      ['purple'      , ['<span class="purple">Purple</span>'        , '<span class="purple">紫色</span>']],
+      ['lilac'       , ['<span class="lilac">Lilac</span>'          , '<span class="lilac">淡紫色</span>']],
+      ['blue'        , ['<span class="blue">Blue</span>'            , '<span class="blue">蓝色</span>']],
+      ['lblue'       , ['<span class="lblue">Light Blue</span>'     , '<span class="lblue">浅蓝色</span>']],
+      ['light-blue'  , ['<span class="light-blue">Bright Blue</span>', '<span class="light-blue">亮蓝色</span>']],
+      ['teal'        , ['<span class="teal">Teal</span>'            , '<span class="teal">青绿色</span>']],
+      ['green'       , ['<span class="green">Green</span>'          , '<span class="green">绿色</span>']],
+      ['lime-green'  , ['<span class="lime-green">Lime Green</span>' , '<span class="lime-green">酸橙绿</span>']],
+      ['light-green' , ['<span class="light-green">Light Green</span>', '<span class="light-green">浅绿色</span>']],
+      ['brown'       , ['<span class="brown">Brown</span>'          , '<span class="brown">棕色</span>']],
+      ['gold'        , ['<span class="gold">Gold</span>'           , '<span class="gold">金色</span>']],
+      ['silver'      , ['<span class="silver">Silver</span>'       , '<span class="silver">银色</span>']],
+      ['bronze'      , ['<span class="bronze">Bronze</span>'       , '<span class="bronze">青铜色</span>']],
+      ['steel'       , ['<span class="steel">Steel</span>'         , '<span class="steel">钢色</span>']],
+      ['blue-steel'  , ['<span class="blue-steel">Blue Steel</span>', '<span class="blue-steel">蓝钢色</span>']],
+      ['yellow'      , ['<span class="yellow">Yellow</span>'        , '<span class="yellow">黄色</span>']],
+      ['pale-yellow' , ['<span class="pale-yellow">Pale Yellow</span>', '<span class="pale-yellow">淡黄色</span>']],
+      ['orange'      , ['<span class="orange">Orange</span>'        , '<span class="orange">橙色</span>']],
+      ['tangerine'   , ['<span class="tangerine">Tangerine</span>'  , '<span class="tangerine">橘色</span>']],
+      ['pale-tangerine', ['<span class="pale-tangerine">Pale Tangerine</span>', '<span class="pale-tangerine">淡橘色</span>']],
+      ['black'       , ['<span class="black">Black</span>'          , '<span class="black">黑色</span>']],
+      ['softbrown'   , ['<span class="softbrown">Soft Brown</span>'  , '<span class="softbrown">软棕色</span>']],
+      ['lightbrown'  , ['<span class="lightbrown">Light Brown</span>', '<span class="lightbrown">浅棕色</span>']],
+      ['burntorange' , ['<span class="burntorange">Burnt Orange</span>', '<span class="burntorange">焦橙色</span>']],
+      ['bloodorange' , ['<span class="bloodorange">Blood Orange</span>', '<span class="bloodorange">血橙色</span>']],
+      ['bluehair'    , ['<span class="bluehair">Blue Hair</span>'  , '<span class="bluehair">蓝发色</span>']],
+      ['deepblue'    , ['<span class="deepblue">Deep Blue</span>'  , '<span class="deepblue">深蓝色</span>']],
+      ['neonblue'    , ['<span class="neonblue">Neon Blue</span>'  , '<span class="neonblue">霓虹蓝</span>']],
+      ['greenhair'   , ['<span class="greenhair">Green Hair</span>' , '<span class="greenhair">绿发色</span>']],
+      ['darklime'    , ['<span class="darklime">Dark Lime</span>'  , '<span class="darklime">深柠檬绿</span>']],
+      ['toxicgreen'  , ['<span class="toxicgreen">Toxic Green</span>', '<span class="toxicgreen">毒绿色</span>']],
+      ['tealhair'    , ['<span class="tealhair">Teal Hair</span>'  , '<span class="tealhair">青绿发色</span>']],
+      ['pinkhair'    , ['<span class="pinkhair">Pink Hair</span>'  , '<span class="pinkhair">粉发色</span>']],
+      ['brightpink'  , ['<span class="brightpink">Bright Pink</span>', '<span class="brightpink">亮粉色</span>']],
+      ['hotpink'     , ['<span class="hotpink">Hot Pink</span>'     , '<span class="hotpink">热粉色</span>']],
+      ['softpink'    , ['<span class="softpink">Soft Pink</span>'   , '<span class="softpink">柔粉色</span>']],
+      ['crimson'     , ['<span class="crimson">Crimson</span>'      , '<span class="crimson">深红色</span>']],
+      ['purplehair'  , ['<span class="purplehair">Purple Hair</span>', '<span class="purplehair">紫发色</span>']],
+      ['mediumpurple', ['<span class="mediumpurple">Medium Purple</span>', '<span class="mediumpurple">中紫色</span>']],
+      ['brightpurple', ['<span class="brightpurple">Bright Purple</span>', '<span class="brightpurple">亮紫色</span>']],
+      ['whitehair'   , ['<span class="whitehair">White Hair</span>' , '<span class="whitehair">白发色</span>']],
+      ['snowwhitehair', ['<span class="snowwhitehair">Snow White</span>', '<span class="snowwhitehair">雪白色</span>']],
+      ['softblond'   , ['<span class="softblond">Soft Blond</span>' , '<span class="softblond">软金色</span>']],
+      ['platinum'    , ['<span class="platinum">Platinum</span>'    , '<span class="platinum">铂金色</span>']],
+      ['ashy'        , ['<span class="ashy">Ashy</span>'            , '<span class="ashy">灰金色</span>']],
+      ['strawberry'  , ['<span class="strawberry">Strawberry</span>', '<span class="strawberry">草莓色</span>']],
+      ['lewd'        , ['<span class="lewd">Lewd</span>'            , '<span class="lewd">淫荡色</span>']],
+      ['grey'        , ['<span class="grey">Grey</span>'            , '<span class="grey">灰色</span>']],
+      ['light-grey'  , ['<span class="light-grey">Light Grey</span>', '<span class="light-grey">浅灰色</span>']],
+      ['tan'         , ['<span class="tan">Tan</span>'              , '<span class="tan">棕褐色</span>']],
+      ['sand'        , ['<span class="sand">Sand</span>'            , '<span class="sand">沙色</span>']],
+      ['olive'       , ['<span class="olive">Olive</span>'           , '<span class="olive">橄榄色</span>']],
+      ['navy'        , ['<span class="navy">Navy Blue</span>'       , '<span class="navy">海军蓝</span>']],
+      ['wine'        , ['<span class="wine">Wine Red</span>'        , '<span class="wine">酒红色</span>']],
+      ['russet'      , ['<span class="russet">Russet</span>'        , '<span class="russet">赤褐色</span>']],
+      ['fleshy'      , ['<span class="fleshy">Fleshy</span>'        , '<span class="fleshy">肉色</span>']],
+      ['brat'        , ['<span class="brat">Brat</span>'            , '<span class="brat">叛逆色</span>']],
+      ['meek'        , ['<span class="meek">Meek</span>'            , '<span class="meek">温顺色</span>']],
+      ['def'         , ['<span class="def">Defiant</span>'          , '<span class="def">反抗色</span>']],
+      ['sub'         , ['<span class="sub">Submissive</span>'       , '<span class="sub">顺从色</span>']],
+      ['relaxed'     , ['<span class="relaxed">Relaxed</span>'      , '<span class="relaxed">放松色</span>']],
+      ['anxious'     , ['<span class="anxious">Anxious</span>'      , '<span class="anxious">焦虑色</span>']],
+      ['veteran'     , ['<span class="veteran">Veteran</span>'      , '<span class="veteran">老兵色</span>']],
+      ['methodical'  , ['<span class="methodical">Methodical</span>', '<span class="methodical">有条不紊色</span>']],
+      ['scarred'     , ['<span class="scarred">Scarred</span>'      , '<span class="scarred">伤疤色</span>']],
+      ['tattooed'    , ['<span class="tattooed">Tattooed</span>'    , '<span class="tattooed">纹身色</span>']],
+      ['manager'     , ['<span class="manager">Manager</span>'      , '<span class="manager">经理色</span>']],
+      ['lustful'     , ['<span class="lustful">Lustful</span>'      , '<span class="lustful">欲望色</span>']],
+      ['wraith'      , ['<span class="wraith">Wraith</span>'        , '<span class="wraith">幽灵色</span>']],
+      ['witch'       , ['<span class="witch">Witch</span>'          , '<span class="witch">巫女色</span>']],
+      ['custom'      , ['Custom'                                    , '自选']]
+    ]>>
+    <<language>>
+      <<option 'CN'>><<set _bodywritingSpecialNames to {}>><<run _bodywritingSpecialList.forEach(special => _bodywritingSpecialNames[_bodywritingSpecialTranslations[special].cn] = special)>>
+      <<option 'EN'>><<set _bodywritingSpecialNames to {}>><<run _bodywritingSpecialList.forEach(special => _bodywritingSpecialNames[_bodywritingSpecialTranslations[special].en] = special)>>
+    <</language>>
+    <span class="gold bold"><<lanSwitch 'Custom Bodywriting' '定制涂鸦'>></span><br>
+    <<lanSwitch 'The characteristics of this bodywriting are' '这幅涂鸦的所具有的特定'>>：
+    <br><<lanSwitch 'Color: ' '颜色：'>><br><<radiobuttonsfrom '_bodywriting.color' _textColorNames>><</radiobuttonsfrom>>
+    <div id='DeadwoodRebloomsBodyWriting' style='display:inline'></div><br><<lanSwitch 'Gender: ' '性别：'>>
+    <<lanListbox '_bodywriting.gender'>><<option 'asexual' 'n'>><<option 'male' 'm'>><<option 'famale' 'f'>><<option 'hermaphrodite' 'h'>><</lanListbox>>
+    <br><<lanSwitch 'Category: ' '类别：'>><<lanListbox '_bodywriting.special' autoselect>><<optionsfrom _bodywritingSpecialNames>><</lanListbox>>
+    <br><<lanSwitch 'Related to the Love Interest?' '与恋爱对象有关?'>>
+    <span class='tooltip-anchor linkBlue' tooltip="<span class='teal'><<lanSwitch 'This option will only take effect when the category is selected as &quot;Love Interest&quot;' '仅在类别选用&quot;恋爱对象&quot;时，此选项才会生效'>></span>">(?)</span>
+    <<set $_bodywritingloveInterestNames = ['None', ...setup.loveInterestNpc.filter(name => isPossibleLoveInterest(name))]>>
+    <br><<lanListbox '_bodywriting.loveInterest' autoselect>><<optionsfrom $_bodywritingloveInterestNames>><</lanListbox>>
+    <br><<lanSwitch 'A directional arrow?' '带有指向性的箭头?'>><br><<set _bodywriting.arrow to 0>>
+    <label><<lanSwitch 'YES' '是'>> <<radiobutton '_bodywriting.arrow' 1 autocheck>></label>|<label><<lanSwitch 'NO' '否'>> <<radiobutton '_bodywriting.arrow' 0 autocheck>></label>
+    <br><<lanSwitch 'Does it imply lewd?' '具有淫秽暗示?'>><br><<set _bodywriting.lewd to 0>>
+    <label><<lanSwitch 'YES' '是'>> <<radiobutton '_bodywriting.lewd' 1 autocheck>></label>|<label><<lanSwitch 'NO' '否'>> <<radiobutton '_bodywriting.lewd' 0 autocheck>></label>
+    <br><<set _bodywritingPenNames to maplebirch.Language is 'CN' ? {普通笔: 'pen', 耐久笔: 'marker', 口红: 'lipstick', 泥巴: 'mud'} : {Pen: 'pen', Marker: 'marker', Lipstick: 'lipstick', Mud: 'mud'}>>
+    <<language>>
+    <<option 'CN'>>把 <<textbox '_bodywriting.text' ''>> 用 <<lanListbox '_bodywriting.pen'>><<optionsfrom _bodywritingPenNames>><</lanListbox>> 写在你的 <<listbox '_bodywriting.bodyPart'>><<optionsfrom _bodyPartOptions>><</listbox>> 上
+    <<option 'EN'>>Write <<textbox '_bodywriting.text' ''>> on your <<listbox '_bodywriting.bodyPart'>><<optionsfrom _bodyPartOptions>><</listbox>> with a <<lanListbox '_bodywriting.pen'>><<optionsfrom _bodywritingPenNames>><</lanListbox>>
+    <</language>>
+    <<lanLink 'confirm' 'capitalize' 'class:no-numberify'>>
+      <<set _bodywriting.skin to {
+        writing: _bodywriting.color === 'custom' ? `<span style='color:${_bodywriting.custom}'>${_bodywriting.text}</span>` : `<span class='${_bodywriting.color}'>${_bodywriting.text}</span>`,
+        writ_cn: _bodywriting.color === 'custom' ? `<span style='color:${_bodywriting.custom}'>${_bodywriting.text}</span>` : `<span class='${_bodywriting.color}'>${_bodywriting.text}</span>`,
+        type   : 'text',
+        arrow  : _bodywriting.arrow,
+        lewd   : _bodywriting.lewd,
+        special: _bodywriting.special === 'loveInterest' ? _bodywriting.loveInterest : _bodywriting.special,
+        gender : _bodywriting.gender,
+        degree : 0
+      }>>
+      <<add_bodywriting _bodywriting.bodyPart _bodywriting.skin _bodywriting.pen>>
+    <</lanLink>>
+  </div><</if>>
+<</widget>>
+
+<!-- 音频播放器 -->
+<<widget 'DeadwoodRebloomsPlayback'>>
+  <<set $_playlist to maplebirch.audio.playlist(_args[0])>>
+  <div class='deadwood-reblooms-playback-left'>
+    <<for _track range $_playlist.tracks>>
+      <div class='deadwood-reblooms-playback-track'>
+        <<link _track.title>><<run maplebirch.audio.playFromMod(_args[0], _track.audioName).then((modName) => $.wiki(`<<replace '#deadwood-reblooms-playback'>><<DeadwoodRebloomsPlayback ${modName}>><</replace>>`))>><</link>>
+        <span class='deadwood-reblooms-playback-format'><<= _track.format>></span>
+      </div>
+    <</for>>
+    <div class='deadwood-reblooms-playback-import-head'>
+      <span class='deadwood-reblooms-playback-import-label'><<lanSwitch 'Import Audio' '导入音频'>></span>
+      <span class='deadwood-reblooms-playback-clear'><<lanLink 'clear cache' 'title'>><<run maplebirch.audio.clearAudio(_args[0]).then((modName) => $.wiki(`<<replace '#deadwood-reblooms-playback'>><<DeadwoodRebloomsPlayback ${modName}>><</replace>>`))>><</lanLink>></span>
+    </div>
+    <div class='deadwood-reblooms-playback-import-file'><input type='file' accept='audio/*' onchange='maplebirch.audio.addFile(this.files[0], "deadwood-reblooms").then((modName) => $.wiki(`<<replace "#deadwood-reblooms-playback">><<DeadwoodRebloomsPlayback "${modName}">><</replace>>`))'></div>
+  </div>
+  <div id='deadwood-reblooms-playback-controls' class='deadwood-reblooms-playback-right'><<DeadwoodRebloomsPlaybackControls _args[0]>></div>
+<</widget>>
+
+<<widget 'DeadwoodRebloomsPlaybackControls'>>
+  <<if maplebirch.audio.CurrentTrack>>
+    <<set _snap to maplebirch.audio.snapshot>>
+    <div class='deadwood-reblooms-playback-now'>
+      <span><<lanSwitch 'Now Playing: ' '当前播放：'>></span>
+      <strong><span class='gold'><<= _snap.track.title>></span></strong>
+      <span><<= _snap.index + 1>> / <<= _snap.length>></span>
+      <span class='deadwood-reblooms-playback-mode'>
+        <<switch _snap.mode>>
+          <<case 'sequential'>><<lanSwitch 'Sequential' '顺序播放'>>
+          <<case 'loop_all'>><<lanSwitch 'Loop All' '列表循环'>>
+          <<case 'loop_one'>><<lanSwitch 'Loop One' '单曲循环'>>
+          <<default>><<lanSwitch 'Shuffle' '随机播放'>>
+        <</switch>>
+      </span>
+    </div>
+    <div class='deadwood-reblooms-playback-progress-row'>
+      <input id='deadwood-reblooms-playback-progress' type='range' min='0' max='100' step='0.1' value='<<= _snap.progress.percent>>'>
+      <span id='deadwood-reblooms-playback-time'><<= maplebirch.audio.formatTime(_snap.progress.currentTime)>> / <<= maplebirch.audio.formatTime(_snap.progress.duration)>></span>
+    </div>
+    <div class='deadwood-reblooms-playback-button-row'>
+      <<lanLink 'previous' 'title'>><<run maplebirch.audio.previous().then(() => $.wiki(`<<replace "#deadwood-reblooms-playback">><<DeadwoodRebloomsPlayback ${_args[0]}>><</replace>>`))>><</lanLink>>
+      <<if _snap.state is 'playing'>>
+        <<lanLink 'pause' 'title'>><<run maplebirch.audio.pause()>><<replace '#deadwood-reblooms-playback-controls'>><<DeadwoodRebloomsPlaybackControls _args[0]>><</replace>><</lanLink>>
+      <<else>>
+        <<lanLink 'resume' 'title'>><<run maplebirch.audio.resume()>><<replace '#deadwood-reblooms-playback-controls'>><<DeadwoodRebloomsPlaybackControls _args[0]>><</replace>><</lanLink>>
+      <</if>>
+      <<lanLink 'stop' 'title'>><<run maplebirch.audio.stop()>><<replace '#deadwood-reblooms-playback-controls'>><<DeadwoodRebloomsPlaybackControls _args[0]>><</replace>><</lanLink>>
+      <<lanLink 'next' 'title'>><<run maplebirch.audio.next().then(() => $.wiki(`<<replace "#deadwood-reblooms-playback">><<DeadwoodRebloomsPlayback ${_args[0]}>><</replace>>`))>><</lanLink>>
+      <<lanLink 'loop mode' 'title'>><<run maplebirch.audio.cyclePlayMode()>><<replace '#deadwood-reblooms-playback-controls'>><<DeadwoodRebloomsPlaybackControls _args[0]>><</replace>><</lanLink>>
+    </div>
+    <div class='deadwood-reblooms-playback-volume'><<numberslider '_snap.volume' _snap.volume 0 1 0.01 { value: v => lanSwitch('Volume: ', '音量：') + Math.round(v * 100) + '%', onInputChange: value => { maplebirch.audio.Volume = value; } }>></div>
+    <<run maplebirch.audio.bindProgress('deadwood-reblooms-playback-progress', 'deadwood-reblooms-playback-time')>>
+  <<else>>
+    <div class='deadwood-reblooms-playback-empty'>
+      <div class='deadwood-reblooms-playback-empty-title'><<lanSwitch 'No audio selected' '未选择音频'>></div>
+      <div class='deadwood-reblooms-playback-empty-text'><<lanSwitch 'Choose a track from the left list, or import an audio file first.' '请从左侧列表选择音频，或先导入音频文件。'>></div>
+    </div>
+  <</if>>
+<</widget>>
