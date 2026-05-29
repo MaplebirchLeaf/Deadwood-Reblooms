@@ -51,7 +51,7 @@ class DeadwoodReblooms {
     this.optionsCheck();
   }
 
-  preInit() {
+  public preInit() {
     this.solarEclipse.apply();
   }
 }

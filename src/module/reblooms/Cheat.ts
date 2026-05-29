@@ -42,11 +42,13 @@ class Cheat {
     const name = JSON.stringify(item.name);
     const favoriteClass = item.favorite ? 'gold' : 'blue';
     const favoriteMark = item.favorite ? '★' : '☆';
+    const deleteLink = item.favorite ? '' : ` | <<lanLink 'delete' 'capitalize' 'class:red'>><<run maplebirch.rebloom.cheat.deleteForm(${name})>><</lanLink>>`;
     return `
-          <span style='float:right'><<lanLink '${favoriteMark}' 'class:${favoriteClass}'>><<run maplebirch.rebloom.cheat.toggleFavorite(${name})>><</lanLink>></span>
-          <<lanLink ${name} 'class:strawberry'>><<run maplebirch.rebloom.cheat.updateForm(${name})>><</lanLink>><br>
-          <span class='cheat-code' data-type="${item.type === 'javascript' ? 'JS' : 'Twine'}">${this.briefCode(item.code)}</span>
-          <<lanLink 'execute' 'capitalize' 'class:teal'>><<run maplebirch.rebloom.cheat.executeForm(${name})>><</lanLink>> | <<lanLink 'delete' 'capitalize' 'class:red'>><<run maplebirch.rebloom.cheat.deleteForm(${name})>><</lanLink>>`;
+      <span style='float:right'><<lanLink '${favoriteMark}' 'class:${favoriteClass}'>><<run maplebirch.rebloom.cheat.toggleFavorite(${name})>><</lanLink>></span>
+      <<lanLink ${name} 'class:strawberry'>><<run maplebirch.rebloom.cheat.updateForm(${name})>><</lanLink>><br>
+      <span class='cheat-code' data-type="${item.type === 'javascript' ? 'JS' : 'Twine'}">${this.briefCode(item.code)}</span>
+      <<lanLink 'execute' 'capitalize' 'class:teal'>><<run maplebirch.rebloom.cheat.executeForm(${name})>><</lanLink>>${deleteLink}
+    `;
   }
 
   private renderItem(item: CheatItem): string {
@@ -213,7 +215,7 @@ class Cheat {
 
   public deleteForm(name: string): void {
     const item: CheatItem | undefined = this.cache.find(c => c.name === name);
-    if (!item) return;
+    if (!item || item.favorite) return;
     const itemId: string = `cheat-item-${this.stringDJB2Hash(item.name)}`;
     const escapedCode: string = this.briefCode(item.code);
     const nameArg = JSON.stringify(item.name);
@@ -227,7 +229,7 @@ class Cheat {
 
   public async removeForm(name: string): Promise<boolean> {
     const item: CheatItem | undefined = this.cache.find(c => c.name === name);
-    if (!item) return false;
+    if (!item || item.favorite) return false;
     await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
       const store = tx.objectStore('cheats');
       await store.delete(name);
@@ -266,7 +268,8 @@ class Cheat {
   }
 
   public clearForm(action?: string): void {
-    if (this.cache.length === 0 && !action) return;
+    const removableCount = this.cache.filter(item => !item.favorite).length;
+    if (removableCount === 0 && !action) return;
     if (action === 'confirm') {
       void this.confirmClear();
     } else if (action === 'cancel') {
@@ -274,7 +277,7 @@ class Cheat {
     } else {
       const confirmHtml: string = `
         <div class='settingsToggleItem'>
-          <span class='red'><<lanSwitch 'Are you sure to clear' '确认清空'>> ${this.cache.length} <<lanSwitch 'codes' '个命令'>>?</span><br>
+          <span class='red'><<lanSwitch 'Are you sure to clear' '确认清空'>> ${removableCount} <<lanSwitch 'codes' '个命令'>>?</span><br>
           <<lanLink 'confirm' 'capitalize' 'class:teal'>><<run maplebirch.rebloom.cheat.clearForm('confirm')>>
           <</lanLink>>|<<lanLink 'cancel' 'capitalize' 'class:blue'>><<run maplebirch.rebloom.cheat.clearForm('cancel')>><</lanLink>>
         </div>`;
@@ -283,11 +286,17 @@ class Cheat {
   }
 
   private async confirmClear(): Promise<void> {
-    await this.core.idb.clearStore('cheats');
-    this.cache = [];
-    T.DeadwoodRebloomsCheatNamebox = T.DeadwoodRebloomsCheatCodebox = '';
+    const removableItems = this.cache.filter(item => !item.favorite);
+    await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
+      const store = tx.objectStore('cheats');
+      for (const item of removableItems) await store.delete(item.name);
+    });
+    await this.refreshCache();
+    if (!this.cache.find(item => item.name === T.DeadwoodRebloomsCheatNamebox)) {
+      T.DeadwoodRebloomsCheatNamebox = T.DeadwoodRebloomsCheatCodebox = '';
+      this.editingName = null;
+    }
     T.DeadwoodRebloomsCheatSearch = '';
-    this.editingName = null;
     this.updateContainer('maplebirch-cheat-panel', this.panel);
     this.updateContainer('maplebirch-cheat-search', this.search);
     this.updateContainer('maplebirch-cheat-content', this.content);

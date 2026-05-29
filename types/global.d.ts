@@ -1,6 +1,8 @@
 declare global {
   interface Window {}
 
+  function wearingCondom(npcNumber: number): boolean;
+
   const Time: {
     readonly date: DateTime;
     readonly holidayMonths: number[];

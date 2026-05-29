@@ -18,11 +18,6 @@ interface EclipseState {
   stored: StoredEclipse[];
 }
 
-type CurrentEclipse = {
-  phase: number;
-  stageIndex: EclipseStageIndex;
-};
-
 type SkyColors = {
   colorMin: { close: string; far: string };
   colorMed: { close: string; far: string };

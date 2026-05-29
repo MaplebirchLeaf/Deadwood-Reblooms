@@ -3,7 +3,14 @@
 export const options: Record<string, any> = {
   modHint: 'disable',
   bodywriting: false,
-  solarEclipse: true
+  solarEclipse: true,
+  LongerCombat: {
+    turnSeconds: 10,
+    maxRounds: 3,
+    rounds: 0,
+    againChance: 50,
+    endCombat: null
+  }
 };
 
 export const defaults = {
