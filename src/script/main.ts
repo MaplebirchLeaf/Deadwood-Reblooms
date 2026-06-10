@@ -1,4 +1,4 @@
-import './solarEclipse';
+//import './solarEclipse';
 
 (function (maplebirch) {
   'use strict';

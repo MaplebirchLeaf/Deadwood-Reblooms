@@ -12,7 +12,7 @@ function createSpanStatusPatch(suffixMacro: string, duplicateMarker: string): st
 }
 
 class UnlockCheatAndCombatStatusDisplay {
-  constructor(readonly core: MaplebirchCore) {}
+  public constructor(readonly core: MaplebirchCore) {}
 
   public preInit() {
     const healthSuffix = ' <<print "(" + Math.round($enemyhealth) + "/" + $enemyhealthmax + ")">>';

@@ -34,7 +34,7 @@ function npcAgain(npc: { [x: string]: any; teen?: any; pronouns?: { his: string;
   }
   const state = npcState(npc);
   if (lines.length === 0) return npcHis(npc.pronouns) + state;
-  const line = either(...(lines as [string, ...string[]]));
+  const line = lines.either();
   return npcHis(npc.pronouns) + state + '"' + line + '"' + npc.pronouns.he + maplebirch.t(`${NPC_KEY}.says`);
 }
 
@@ -130,9 +130,7 @@ maplebirch.once(
 
     maplebirch.dynamic.regTimeEvent('onBefore', 'LongerCombat', {
       cond: () => V.combat === 1 && !V.stalk,
-      action: data => {
-        data.passed = V.options.maplebirch.DeadwoodReblooms.LongerCombat.turnSeconds;
-      }
+      action: data => (data.passed = V.options.maplebirch.DeadwoodReblooms.LongerCombat.turnSeconds)
     });
   },
   'LongerCombat'

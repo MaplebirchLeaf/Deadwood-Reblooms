@@ -1,5 +1,5 @@
 // ./src/script/solarEclipseDescriptions.ts
-
+/*
 type WeatherType = 'clear' | 'lightClouds' | 'heavyClouds' | 'lightPrecipitation' | 'heavyPrecipitation' | 'storm' | 'thunderstorm';
 type Variant = 'default' | 'rain' | 'snow';
 const keyPrefix = 'deadwoodReblooms.SolarEclipse';
@@ -26,4 +26,4 @@ export function solarEclipseDescriptions(): void {
     if (!target) return;
     target.solarEclipse = (): string => solarEclipseText(weather);
   });
-}
+}*/

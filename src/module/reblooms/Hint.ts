@@ -7,12 +7,12 @@ class Hint {
     this.log = logger;
   }
 
-  hintClicked() {
+  public hintClicked() {
     $.wiki('<<maplebirchReplace "DeadwoodRebloomsHint" "title">>');
     void maplebirch.trigger('characterRender');
   }
 
-  searchButtonClicked() {
+  public searchButtonClicked() {
     this.clearButtonClicked();
 
     const value = T.DeadwoodRebloomsHintTextbox;
@@ -41,7 +41,7 @@ class Hint {
     }
   }
 
-  clearButtonClicked() {
+  public clearButtonClicked() {
     const noResultEl = document.getElementById('noSearchResult');
     if (noResultEl) noResultEl.remove();
 

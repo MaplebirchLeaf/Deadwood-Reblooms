@@ -6,20 +6,20 @@ import Cheat from './reblooms/Cheat';
 import EclipseSystem from './reblooms/solarEclipse';
 
 class DeadwoodReblooms {
-  readonly exposed: boolean = true;
-  readonly version: string = '1.0.0';
+  public readonly exposed: boolean = true;
+  public readonly version: string = '1.0.0';
   private readonly optionsKey = 'DeadwoodReblooms';
-  readonly migration: ReturnType<typeof maplebirch.tool.migration.create>;
+  public readonly migration: ReturnType<typeof maplebirch.tool.migration.create>;
 
-  readonly modhint: Hint;
-  readonly cheat: Cheat;
-  readonly solarEclipse: EclipseSystem;
+  public readonly modhint: Hint;
+  public readonly cheat: Cheat;
+  //public readonly solarEclipse: EclipseSystem;
 
-  constructor(readonly core: typeof maplebirch) {
+  public constructor(readonly core: typeof maplebirch) {
     this.migration = this.core.tool.migration.create();
     this.modhint = new Hint(this.core.tool.createlog('modhint'));
     this.cheat = new Cheat(this.core);
-    this.solarEclipse = new EclipseSystem(this.core);
+    //this.solarEclipse = new EclipseSystem(this.core);
     dataUpdate(this.migration);
     this.core.once(':variable', () => this.variableInit());
     this.core.once(':passageend', () => this.optionsCheck());
@@ -42,7 +42,7 @@ class DeadwoodReblooms {
     V.options ??= {};
     if (!this.core.lodash.isPlainObject(V.options.maplebirch)) V.options.maplebirch = {};
     const current = V.options.maplebirch[this.optionsKey];
-    V.options.maplebirch[this.optionsKey] = this.core.lodash.isPlainObject(current) ? merge({}, options, current, { mode: 'merge' }) : clone(options);
+    V.options.maplebirch[this.optionsKey] = this.core.lodash.isPlainObject(current) ? Object.merge(options, current ?? {}) : options.clone();
   }
 
   private variableInit() {
@@ -52,7 +52,7 @@ class DeadwoodReblooms {
   }
 
   public preInit() {
-    this.solarEclipse.apply();
+    //this.solarEclipse.apply();
   }
 }
 
