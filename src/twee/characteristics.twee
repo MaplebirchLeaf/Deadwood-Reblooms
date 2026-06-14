@@ -1,0 +1,142 @@
+:: Deadwood Reblooms Characteristics Widgets [widget]
+
+<<widget 'deadwood-reblooms-characteristics-degrees-display'>>
+  <<set _purityConfig.states[0]['color'] to 'blood'>>
+  <<set _awarenessConfig.states[7]['color'] to 'blood'>>
+
+  <<set $_display_text to lanSwitch(
+    `Your body is ${$player.bodyshape === 'soft' ? 'powerful' : 'perfectly conditioned'} and at its peak.`,
+    `你的身体${$player.bodyshape === 'soft' ? '强壮' : '健美'}且已臻巅峰。`
+  )>>
+
+  <<set _physiqueConfig.maxValue to Math.floor($physiquesize * 1.25)>>
+  <<run _physiqueConfig.states.push({
+    requiredValue: $physiquesize,
+    level: 7,
+    color: 'gold',
+    description: $_display_text
+  })>>
+
+  <<set $_display_text to lanSwitch(
+    'Your will is unshakable.',
+    '你坚毅不可撼动。'
+  )>>
+
+  <<set _willpowerConfig.maxValue to Math.floor($willpowermax * 1.25)>>
+  <<run _willpowerConfig.states.push({
+    requiredValue: $willpowermax,
+    level: 7,
+    color: 'gold',
+    description: $_display_text
+  })>>
+
+  <<set $_display_text to lanSwitch(
+    'Your beauty is transcendent.',
+    '你的容貌超凡脱俗。'
+  )>>
+
+  <<set _beautyConfig.maxValue to Math.floor($beautymax * 1.25)>>
+  <<run _beautyConfig.states.push({
+    requiredValue: $beautymax,
+    level: 7,
+    color: 'gold',
+    description: $_display_text
+  })>>
+
+  <<set $_display_text to lanSwitch(
+    'You are consumed by your lust.',
+    '你已被欲望吞噬。'
+  )>>
+
+  <<set _promiscuityConfig.maxValue to 150>>
+  <<run _promiscuityConfig.states.push({
+    requiredValue: 120,
+    level: 7,
+    color: 'lustful',
+    description: $_display_text
+  })>>
+
+  <<set $_display_text to lanSwitch(
+    'The pleasure of nakedness drives you to rapture.',
+    '赤裸之欢愉教你神魂颠倒。'
+  )>>
+
+  <<set _exhibitionismConfig.maxValue to 150>>
+  <<run _exhibitionismConfig.states.push({
+    requiredValue: 120,
+    level: 7,
+    color: 'lustful',
+    description: $_display_text
+  })>>
+
+  <<set $_display_text to lanSwitch(
+    'Taboo instincts now rule you.',
+    '禁忌本能正在主宰你。'
+  )>>
+
+  <<set _deviancyConfig.maxValue to 150>>
+  <<run _deviancyConfig.states.push({
+    requiredValue: 120,
+    level: 7,
+    color: 'lustful',
+    description: $_display_text
+  })>>
+<!--
+  <<set $_sanity_states to {
+    EN: [
+      { requiredValue: -500,	level: 0, color: 'blood' ,	description: 'You have glimpsed beyond the veil.'  },
+      { requiredValue: -200,	level: 1, color: 'red'   ,  description: 'The other side whispers to you.'     },
+      { requiredValue: -100,	level: 2, color: 'pink'  ,	description: 'You can read the twisted signs.'     },
+      { requiredValue: 0   ,  level: 3, color: 'purple',	description: 'Your reason begins to fracture.'     },
+      { requiredValue: 150 ,  level: 4, color: 'blue'  ,	description: 'Your thoughts remain bound by order.'},
+      { requiredValue: 350 ,  level: 5, color: 'lblue' ,	description: 'Your mind remains clear.'            },
+      { requiredValue: 600 ,  level: 6, color: 'teal'  ,	description: 'Your mind is firmly grounded.'       },
+      { requiredValue: 1000,	level: 7, color: 'green' ,	description: 'You dwell within the world.'         }
+    ],
+    CN: [
+      { requiredValue: -500,	level: 0, color: 'blood' ,	description: '你窥见了帷幕之外。'    },
+      { requiredValue: -200,	level: 1, color: 'red'   ,	description: '彼岸在向你低语。'      },
+      { requiredValue: -100,	level: 2, color: 'pink'  ,	description: '你读懂了扭曲的符号。'  },
+      { requiredValue: 0   ,	level: 3, color: 'purple',	description: '你的理性开始破裂。'    },
+      { requiredValue: 150 ,	level: 4, color: 'blue'  ,	description: '你的思绪仍被秩序束缚。'},
+      { requiredValue: 350 ,	level: 5, color: 'lblue' ,	description: '你的理智保持清醒。'    },
+      { requiredValue: 600 ,	level: 6, color: 'teal'  ,	description: '你的心智十分稳固。'    },
+      { requiredValue: 1000,	level: 7, color: 'green' ,	description: '你安居于世界之中。'    }
+    ]
+  }>>
+
+  <<set $_display_text to $_sanity_states[maplebirch.Language] ?? $_sanity_states.EN>>
+  <<set _sanityConfig = { name : 'Sanity',cn_name:'理智', icon : 'ui/sym_sanity', displayType : 'level', currentValue : $maplebirchEx.sanity, modifier: 100, modTypes: { good: [], bad: [] }, states : $_display_text }>>
+
+  <<set $_spirituality_states to {
+    EN: [
+      { requiredValue: 0   ,  level: 0, color: 'red'   ,	description: 'Your soul has yet to bear the light.'           },
+      { requiredValue: 150 ,	level: 1, color: 'pink'  ,	description: 'The spark still sleeps in dust.'                },
+      { requiredValue: 300 ,	level: 2, color: 'purple',	description: 'You have yet to hear the echo of the true name.'},
+      { requiredValue: 400 ,	level: 3, color: 'blue'  ,	description: 'A faint light passes through the veil.'         },
+      { requiredValue: 500 ,	level: 4, color: 'lblue' ,	description: 'You begin to walk the path of revelation.'      },
+      { requiredValue: 600 ,	level: 5, color: 'teal'  ,	description: 'The radiance of emanation slowly enters you.'   },
+      { requiredValue: 750 ,	level: 6, color: 'green' ,	description: 'Your vessel is fit to bear the light.'          },
+      { requiredValue: 1000,	level: 7, color: 'silver',	description: 'The highest crown rests upon your soul.'        }
+    ],
+    CN: [
+      { requiredValue: 0   ,	level: 0, color: 'red'   ,	description: '你的魂灵尚未承光。'     },
+      { requiredValue: 150 ,	level: 1, color: 'pink'  ,	description: '火种仍沉睡于尘土。'     },
+      { requiredValue: 300 ,	level: 2, color: 'purple',	description: '你尚未听见真名的回响。' },
+      { requiredValue: 400 ,	level: 3, color: 'blue'  ,	description: '微光掠过帷幕之内。'     },
+      { requiredValue: 500 ,	level: 4, color: 'lblue' ,	description: '你开始行于启示之路。'   },
+      { requiredValue: 600 ,	level: 5, color: 'teal'  ,	description: '流溢之辉缓缓注入你。'   },
+      { requiredValue: 750 ,	level: 6, color: 'green' ,	description: '你的器皿足以盛光。'     },
+      { requiredValue: 1000,	level: 7, color: 'silver',	description: '至高之冠临于你魂。'     }
+    ]
+  }>>
+
+  <<set $_display_text to $_spirituality_states[maplebirch.Language] ?? $_spirituality_states.EN>>
+  <<set _spiritualityConfig = { name : 'Spirituality', cn_name:'灵性', icon : 'ui/sym_spirituality', displayType : 'level', currentValue : $maplebirchEx.spirituality, modifier: 100, modTypes: { good: [], bad: [] }, states : $_display_text }>>
+-->
+<</widget>>
+
+<<widget 'deadwood-reblooms-characteristics-degrees'>>
+  <<characteristic-box _sanityConfig>>
+  <<characteristic-box _spiritualityConfig>>
+<</widget>>

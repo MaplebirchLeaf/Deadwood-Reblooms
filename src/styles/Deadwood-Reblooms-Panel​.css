@@ -1,0 +1,537 @@
+﻿.deadwood-reblooms-panel,
+.deadwood-reblooms-panel * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+}
+
+#customOverlayContent:has(.deadwood-reblooms-panel) {
+  padding-inline: 0.75rem;
+  overflow-x: hidden;
+}
+
+.deadwood-reblooms-panel {
+/* 格子尺寸 */
+  --deadwood-reblooms-slot-size: 44px;
+  --deadwood-reblooms-slot-gap: 7px;
+
+  --deadwood-reblooms-slot-hover-bg: var(--800);
+  --deadwood-reblooms-slot-hover-line: var(--150);
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  width: min(980px, 100%);
+  max-width: 100%;
+  margin-inline: auto;
+  padding: 1.25rem;
+  overflow: hidden;
+
+  background-color: var(--850);
+  border: 1px solid var(--300);
+  border-radius: 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* 上半部分：角色 + 身体携具 */
+.deadwood-reblooms-character-area {
+  display: grid;
+  grid-template-columns: minmax(0, 48%) minmax(0, 1fr);
+  align-items: stretch;
+  column-gap: 2.5%;
+  width: 100%;
+  min-width: 0;
+}
+
+/* 方形角色画布容器 */
+#deadwood-reblooms-character-container {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+
+  border: 1px solid var(--300);
+  border-radius: 0;
+  background-color: var(--850);
+  overflow: hidden;
+}
+
+#deadwood-reblooms-character {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#deadwood-reblooms-character .deadwood-reblooms-canvas {
+  object-fit: contain;
+}
+
+#deadwood-reblooms-character .deadwood-reblooms-lighting {
+  opacity: 0.6;
+}
+
+/* 角色覆盖层 */
+#deadwood-reblooms-character-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 100%;
+  height: 20%;
+  padding: 0 10px;
+
+  background-color: var(--850);
+  border-top: 1px solid var(--300);
+  border-radius: 0;
+}
+
+#deadwood-reblooms-character-overlay .deadwood-reblooms-overlay-left,
+#deadwood-reblooms-character-overlay .deadwood-reblooms-overlay-right {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+#deadwood-reblooms-character-overlay .deadwood-reblooms-condom-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: help;
+}
+
+#deadwood-reblooms-character-overlay .deadwood-reblooms-pepper-display {
+  display: flex;
+  align-items: center;
+  cursor: help;
+}
+
+#deadwood-reblooms-character-overlay .deadwood-reblooms-pepper-multiple {
+  display: flex;
+  gap: 4px;
+}
+
+#deadwood-reblooms-character-overlay .deadwood-reblooms-pepper-single {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 覆盖层图标 */
+#deadwood-reblooms-character-overlay .deadwood-reblooms-condom-icon,
+#deadwood-reblooms-character-overlay .deadwood-reblooms-pepper-icon {
+  height: 80%;
+  width: auto;
+  object-fit: contain;
+}
+
+#deadwood-reblooms-character-overlay .deadwood-reblooms-pepper-multiple .deadwood-reblooms-pepper-icon {
+  margin-left: 0;
+}
+
+/* 覆盖层数量文字 */
+#deadwood-reblooms-character-overlay .deadwood-reblooms-condom-count,
+#deadwood-reblooms-character-overlay .deadwood-reblooms-pepper-count {
+  font-size: clamp(9px, 1.2vw, 12px);
+  color: white;
+  text-shadow: 0 0 3px black;
+  margin-right: 0;
+  font-family: 'Consolas', monospace;
+  font-weight: bold;
+  padding-right: 2px;
+}
+
+/* 右侧身体携具区域 */
+.deadwood-reblooms-body-carries {
+  min-width: 0;
+  min-height: 0;
+  padding: 4%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  background-color: var(--850);
+  border: 1px solid var(--300);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.deadwood-reblooms-body-carries-list,
+#deadwood-reblooms-body-carries-list {
+  display: grid;
+  grid-auto-rows: min-content;
+  align-items: stretch;
+  row-gap: 8%;
+  width: min(100%, 280px);
+  min-width: 0;
+}
+
+/* 每一行：左侧文字 + 右侧两个格子 */
+.deadwood-reblooms-slot {
+  display: grid;
+  grid-template-columns: 34% 66%;
+  align-items: center;
+  column-gap: 4%;
+}
+
+.deadwood-reblooms-slot-label {
+  color: var(--gold);
+  font-size: 0.86rem;
+  line-height: 1;
+  text-align: left;
+  white-space: nowrap;
+  opacity: 0.95;
+}
+
+.deadwood-reblooms-slot[data-slot-type='container'] {
+  display: none;
+}
+
+.deadwood-reblooms-panel.has-waist-bag .deadwood-reblooms-slot[data-slot-type='container'] {
+  display: grid;
+}
+
+/* 每行右侧格子：固定两列 */
+.deadwood-reblooms-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, var(--deadwood-reblooms-slot-size));
+  column-gap: 12%;
+  row-gap: 12%;
+  justify-content: start;
+}
+
+.deadwood-reblooms-body-slot,
+.deadwood-reblooms-carry-item-slot {
+  position: relative;
+  display: block;
+
+  width: var(--deadwood-reblooms-slot-size);
+  height: var(--deadwood-reblooms-slot-size);
+  min-width: var(--deadwood-reblooms-slot-size);
+  min-height: var(--deadwood-reblooms-slot-size);
+
+  appearance: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  outline: 0;
+
+  background: transparent;
+  color: inherit;
+  font-size: 0;
+  line-height: 0;
+
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* 避免被原版 button:hover / button:active 样式污染 */
+.deadwood-reblooms-body-slot:hover,
+.deadwood-reblooms-carry-item-slot:hover,
+.deadwood-reblooms-body-slot:focus,
+.deadwood-reblooms-carry-item-slot:focus,
+.deadwood-reblooms-body-slot:active,
+.deadwood-reblooms-carry-item-slot:active {
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+
+/* 格子内容图：空槽虚影图 / 真实物品图 */
+.deadwood-reblooms-slot-content {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  display: block;
+  width: var(--deadwood-reblooms-slot-size);
+  height: var(--deadwood-reblooms-slot-size);
+
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* hover 层：平时透明，hover 时轻微变亮 */
+.deadwood-reblooms-slot-hover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  display: block;
+  width: var(--deadwood-reblooms-slot-size);
+  height: var(--deadwood-reblooms-slot-size);
+
+  background-color: transparent;
+  box-shadow: none;
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+/* 格子边框图：永远浮在最上方 */
+.deadwood-reblooms-slot-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+
+  display: block;
+  width: var(--deadwood-reblooms-slot-size);
+  height: var(--deadwood-reblooms-slot-size);
+
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 简单 hover：不换图，只加主题背景和内描边 */
+.deadwood-reblooms-body-slot:hover .deadwood-reblooms-slot-hover,
+.deadwood-reblooms-carry-item-slot:hover .deadwood-reblooms-slot-hover {
+  background-color: var(--deadwood-reblooms-slot-hover-bg);
+  box-shadow: inset 0 0 0 1px var(--deadwood-reblooms-slot-hover-line);
+  opacity: 0.35;
+}
+
+/* 有物品时保持同样尺寸，不做额外缩放 */
+.deadwood-reblooms-body-slot.has-item .deadwood-reblooms-slot-content,
+.deadwood-reblooms-carry-item-slot.has-item .deadwood-reblooms-slot-content {
+  width: var(--deadwood-reblooms-slot-size);
+  height: var(--deadwood-reblooms-slot-size);
+  opacity: 1;
+}
+
+/* 空槽略淡一点 */
+.deadwood-reblooms-body-slot.is-empty .deadwood-reblooms-slot-content,
+.deadwood-reblooms-carry-item-slot.is-empty .deadwood-reblooms-slot-content {
+  opacity: 0.85;
+}
+
+
+/* 携带物品区域 */
+.deadwood-reblooms-carry-items {
+  width: 100%;
+  min-width: 0;
+  padding: 0.75rem;
+  overflow: hidden;
+
+  background-color: var(--850);
+  border: 1px solid var(--300);
+  border-radius: 0;
+}
+
+.deadwood-reblooms-carry-items.is-empty-carry-items {
+  display: none;
+}
+
+/* 携带物品顶部信息：只显示容量 */
+.deadwood-reblooms-carry-items-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 1rem;
+  margin-bottom: 0.45rem;
+}
+
+.deadwood-reblooms-carry-items-info,
+#deadwood-reblooms-carry-items-info {
+  color: var(--gold);
+  font-size: 0.85rem;
+  line-height: 1;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* 携带物品格子列表 */
+.deadwood-reblooms-carry-items-grid,
+#deadwood-reblooms-carry-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--deadwood-reblooms-slot-size));
+  gap: var(--deadwood-reblooms-slot-gap);
+  justify-content: center;
+  align-items: start;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.deadwood-reblooms-slot-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  background: transparent;
+  pointer-events: none;
+}
+
+.deadwood-reblooms-carry-label-food .deadwood-reblooms-slot-hint {
+  background-color: rgba(210, 159, 66, 0.22);
+}
+
+.deadwood-reblooms-carry-label-water .deadwood-reblooms-slot-hint {
+  background-color: rgba(72, 155, 198, 0.22);
+}
+
+.deadwood-reblooms-carry-label-medical .deadwood-reblooms-slot-hint {
+  background-color: rgba(92, 180, 126, 0.22);
+}
+
+.deadwood-reblooms-slot-count {
+  position: absolute;
+  right: 2px;
+  bottom: 1px;
+  z-index: 2;
+  color: white;
+  font:
+    bold 9px/1 'Consolas',
+    monospace;
+  text-shadow:
+    0 0 2px black,
+    0 0 2px black;
+  pointer-events: none;
+}
+
+.deadwood-reblooms-carry-item-slot.is-dragging {
+  opacity: 0.45;
+}
+
+.deadwood-reblooms-carry-item-slot.is-drop-target .deadwood-reblooms-slot-hover {
+  background-color: var(--deadwood-reblooms-slot-hover-bg);
+  box-shadow: inset 0 0 0 2px var(--gold);
+  opacity: 0.45;
+}
+
+.deadwood-reblooms-carry-item-detail {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: calc(var(--deadwood-reblooms-slot-size) + 0.5rem);
+  padding: 0.5rem;
+  border: 1px solid var(--300);
+  background: rgba(20, 20, 20, 0.55);
+}
+
+.deadwood-reblooms-carry-item-detail-icon {
+  width: var(--deadwood-reblooms-slot-size);
+  height: var(--deadwood-reblooms-slot-size);
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  flex: 0 0 auto;
+}
+
+.deadwood-reblooms-carry-item-detail-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.deadwood-reblooms-carry-item-detail-name {
+  color: var(--gold);
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.deadwood-reblooms-carry-item-detail-meta,
+.deadwood-reblooms-carry-item-detail-desc {
+  color: var(--150);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  opacity: 0.9;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .deadwood-reblooms-panel {
+    --deadwood-reblooms-slot-size: 42px;
+    --deadwood-reblooms-slot-gap: 6px;
+    width: 100%;
+    padding: 0.75rem;
+  }
+
+  .deadwood-reblooms-character-area {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #deadwood-reblooms-character-container {
+    width: 100%;
+  }
+
+  .deadwood-reblooms-body-carries {
+    width: 100%;
+    padding: 4%;
+    overflow: visible;
+  }
+
+  .deadwood-reblooms-body-carries-list,
+  #deadwood-reblooms-body-carries-list {
+    width: 100%;
+    row-gap: 0.75rem;
+  }
+
+  .deadwood-reblooms-slot {
+    grid-template-columns: 4.2rem minmax(0, 1fr);
+    column-gap: 4%;
+  }
+
+  #deadwood-reblooms-character-overlay .deadwood-reblooms-condom-count,
+  #deadwood-reblooms-character-overlay .deadwood-reblooms-pepper-count {
+    font-size: clamp(8px, 1.5vw, 10px);
+  }
+
+  .deadwood-reblooms-carry-items {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .deadwood-reblooms-panel {
+    --deadwood-reblooms-slot-size: 40px;
+    --deadwood-reblooms-slot-gap: 5px;
+    width: 100%;
+    padding: 0.5rem;
+  }
+
+  #deadwood-reblooms-character-container {
+    width: 100%;
+  }
+
+  #deadwood-reblooms-character-overlay {
+    padding: 0 5px;
+  }
+
+  #deadwood-reblooms-character-overlay .deadwood-reblooms-condom-count,
+  #deadwood-reblooms-character-overlay .deadwood-reblooms-pepper-count {
+    font-size: clamp(7px, 2vw, 9px);
+  }
+
+  #deadwood-reblooms-character-overlay .deadwood-reblooms-pepper-multiple {
+    gap: 1px;
+  }
+
+  .deadwood-reblooms-slot {
+    grid-template-columns: 3.8rem minmax(0, 1fr);
+    column-gap: 4%;
+  }
+
+  .deadwood-reblooms-slot-label {
+    font-size: 0.8rem;
+  }
+}

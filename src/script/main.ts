@@ -1,4 +1,5 @@
-//import './solarEclipse';
+import type { CarryItemConfig } from '../module/reblooms/CarryShared';
+import './solarEclipse';
 
 (function (maplebirch) {
   'use strict';
@@ -38,6 +39,9 @@
         <div id='deadwood-reblooms-playback' class='deadwood-reblooms-playback-content'><<DeadwoodRebloomsPlayback 'deadwood-reblooms'>></div>
       </details>
     `);
+
+    setup.DeadwoodReblooms ??= {};
+    setup.DeadwoodReblooms.items ??= {} as Record<string, CarryItemConfig>;
   });
 
   $(document).on('change', 'input[name="radiobutton--bodywritingcolor"]', function () {

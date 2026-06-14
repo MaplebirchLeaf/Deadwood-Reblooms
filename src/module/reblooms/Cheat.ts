@@ -31,7 +31,7 @@ class Cheat {
 
   private updateContainer(containerId: string, content: string): void {
     if (!containerId) return;
-    new this.core.SugarCube.Wikifier(null, `<<replace "#${containerId}">>${content}<</replace>>`);
+    this.core.SugarCube.Wikifier.wikifyEval(`<<replace "#${containerId}">>${content}<</replace>>`);
   }
 
   private briefCode(code: string): string {
@@ -74,9 +74,9 @@ class Cheat {
     });
   }
 
-  private showStatus(isSuccess: boolean): void {
+  private showStatus(isSuccess: boolean, english: string, chinese: string): void {
     const statusClass: string = isSuccess ? 'success' : 'error';
-    const statusText: string = isSuccess ? '<<lanSwitch "Execution successful" "执行成功">>' : '<<lanSwitch "Execution failed" "执行失败">>';
+    const statusText: string = `<<lanSwitch ${JSON.stringify(english)} ${JSON.stringify(chinese)}>>`;
     this.updateContainer('maplebirch-cheat-status', `<div class="cheat-status ${statusClass} visible">${statusText}</div>`);
     setTimeout(() => this.updateContainer('maplebirch-cheat-status', ''), 3000);
   }
@@ -84,26 +84,38 @@ class Cheat {
   public get panel(): string {
     T.DeadwoodRebloomsCheatNamebox ??= '';
     T.DeadwoodRebloomsCheatCodebox ??= '';
-    let html: string = `<div class='input-row'>`;
-    html += `<span class='gold'><<lanSwitch 'NAME' '命名'>></span><<textbox '_DeadwoodRebloomsCheatNamebox' _DeadwoodRebloomsCheatNamebox>>`;
-    html += `<span class='gold'><<lanSwitch 'CODE' '编码'>></span><<textbox '_DeadwoodRebloomsCheatCodebox' _DeadwoodRebloomsCheatCodebox>>`;
+    let html: string = `<div class='input-row cheat-main-row'>`;
+    html += `<span class='gold cheat-label'><<lanSwitch 'NAME' '命名'>></span>`;
+    html += `<<textbox '_DeadwoodRebloomsCheatNamebox' _DeadwoodRebloomsCheatNamebox>>`;
+    html += `<span class='gold cheat-label'><<lanSwitch 'CODE' '编码'>></span>`;
+    html += `<<textbox '_DeadwoodRebloomsCheatCodebox' _DeadwoodRebloomsCheatCodebox>>`;
+    html += `<span class='cheat-action-row'>`;
     const isExisting: CheatItem | undefined = this.cache.find(item => item.name === T.DeadwoodRebloomsCheatNamebox);
     if (isExisting) {
       html += `<<lanButton 'modify' 'capitalize'>><<run maplebirch.rebloom.cheat.modifyForm(_DeadwoodRebloomsCheatNamebox, _DeadwoodRebloomsCheatCodebox)>><</lanButton>>`;
     } else {
       html += `<<lanButton 'create' 'capitalize'>><<run maplebirch.rebloom.cheat.createForm(_DeadwoodRebloomsCheatNamebox, _DeadwoodRebloomsCheatCodebox)>><</lanButton>>`;
     }
+    html += `<<lanButton 'clear' 'capitalize' 'class:red'>><<run maplebirch.rebloom.cheat.clearForm()>><</lanButton>>`;
+    html += `</span>`;
     html += `</div>`;
     return html;
   }
 
   public get search(): string {
     T.DeadwoodRebloomsCheatSearch ??= '';
-    let html: string = `<div class='input-row'><<textbox '_DeadwoodRebloomsCheatSearch' _DeadwoodRebloomsCheatSearch>>`;
+    let html: string = `<div class='input-row cheat-search-row'>`;
+    html += `<<textbox '_DeadwoodRebloomsCheatSearch' _DeadwoodRebloomsCheatSearch>>`;
+    html += `<span class='cheat-search-action-row'>`;
     html += `<<lanButton 'search' 'capitalize'>><<run maplebirch.rebloom.cheat.searchForm(_DeadwoodRebloomsCheatSearch)>><</lanButton>>`;
     html += `<<lanButton 'sort' 'capitalize'>><<run maplebirch.rebloom.cheat.sortForm()>><</lanButton>>`;
-    html += `<<lanButton 'clear' 'capitalize' 'class:red'>><<run maplebirch.rebloom.cheat.clearForm()>><</lanButton>>`;
+    html += `</span>`;
+    html += `<span class='cheat-transfer-row'>`;
+    html += `<<lanButton 'export' 'capitalize' 'class:blue'>><<run maplebirch.rebloom.cheat.exportForm()>><</lanButton>>`;
+    html += `<<lanButton 'import' 'capitalize' 'class:teal'>><<run (() => { const input = document.getElementById('cheat-import-file'); if (input) input.click(); })()>><</lanButton>>`;
+    html += `</span>`;
     html += `</div>`;
+    html += `<input id='cheat-import-file' class='cheat-import-file' type='file' accept='.cheat' hidden onchange='void maplebirch.rebloom.cheat.importFromFileInput(this)'>`;
     return html;
   }
 
@@ -188,7 +200,7 @@ class Cheat {
     if (!item) return false;
     const result: any = this.core.tool.console.execute(item.type, item.code);
     const isSuccess: boolean = result?.success ?? false;
-    this.showStatus(isSuccess);
+    this.showStatus(isSuccess, isSuccess ? 'Execution successful' : 'Execution failed', isSuccess ? '执行成功' : '执行失败');
     if (isSuccess) {
       try {
         await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
@@ -264,6 +276,127 @@ class Cheat {
     } else if (this.sortOrder === 4) {
       this.cache.sort((a, b) => b.type.localeCompare(a.type));
       this.updateDisplay();
+    }
+  }
+
+  public async exportForm(): Promise<boolean> {
+    try {
+      await this.refreshCache();
+
+      const items: CheatItem[] = this.cache.map(item => ({
+        name: item.name,
+        code: item.code,
+        type: item.type,
+        favorite: Boolean(item.favorite)
+      }));
+
+      const now: Date = new Date();
+      const MM: string = String(now.getMonth() + 1).padStart(2, '0');
+      const DD: string = String(now.getDate()).padStart(2, '0');
+      const hh: string = String(now.getHours()).padStart(2, '0');
+      const mm: string = String(now.getMinutes()).padStart(2, '0');
+      const ss: string = String(now.getSeconds()).padStart(2, '0');
+
+      const datestamp: string = `${now.getFullYear()}${MM}${DD}-${hh}${mm}${ss}`;
+      const data: string = (window as any).LZString.compressToBase64(JSON.stringify(items));
+      const saveName: string = `DeadwoodReblooms-${datestamp}.cheat`;
+      (window as any).saveAs(new Blob([data], { type: 'text/plain;charset=UTF-8' }), saveName);
+      this.showStatus(true, 'Export successful', '导出成功');
+      return true;
+    } catch (err) {
+      console.error(err);
+      this.showStatus(false, 'Export failed', '导出失败');
+      return false;
+    }
+  }
+
+  public async importFromFileInput(input: HTMLInputElement): Promise<boolean> {
+    const file: File | undefined = input.files?.[0];
+    input.value = '';
+
+    if (!file || !file.name.toLowerCase().endsWith('.cheat')) return false;
+
+    let importedItems: CheatItem[] = [];
+
+    try {
+      const text: string = await file.text();
+      const json: string | null = (window as any).LZString.decompressFromBase64(text.trim());
+
+      if (!json) {
+        this.showStatus(false, 'Invalid import file', '导入文件格式错误');
+        return false;
+      }
+
+      const rawItems: unknown = JSON.parse(json);
+
+      if (!Array.isArray(rawItems)) {
+        this.showStatus(false, 'Invalid import file', '导入文件格式错误');
+        return false;
+      }
+
+      const namesInFile: Set<string> = new Set();
+
+      for (const rawItem of rawItems) {
+        const item = rawItem as Record<string, unknown>;
+        const name: string = String(item.name ?? '').trim();
+        const code: string = String(item.code ?? '').trim();
+
+        if (!name || !code) continue;
+        if (namesInFile.has(name)) continue;
+
+        const rawType = item.type;
+        const type: 'twine' | 'javascript' = rawType === 'twine' || rawType === 'javascript' ? rawType : code.startsWith('<<') ? 'twine' : 'javascript';
+
+        importedItems.push({
+          name,
+          code,
+          type,
+          favorite: Boolean(item.favorite)
+        });
+
+        namesInFile.add(name);
+      }
+    } catch (err) {
+      console.error(err);
+      this.showStatus(false, 'Invalid import file', '导入文件格式错误');
+      return false;
+    }
+
+    try {
+      await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
+        const store = tx.objectStore('cheats');
+
+        await store.clear();
+
+        for (const item of importedItems) {
+          await store.put({
+            name: item.name,
+            code: item.code,
+            type: item.type,
+            favorite: Boolean(item.favorite)
+          });
+        }
+      });
+
+      await this.refreshCache();
+
+      if (!this.cache.find(item => item.name === T.DeadwoodRebloomsCheatNamebox)) {
+        T.DeadwoodRebloomsCheatNamebox = T.DeadwoodRebloomsCheatCodebox = '';
+        this.editingName = null;
+      }
+
+      T.DeadwoodRebloomsCheatSearch = '';
+
+      this.updateContainer('maplebirch-cheat-panel', this.panel);
+      this.updateContainer('maplebirch-cheat-search', this.search);
+      this.updateContainer('maplebirch-cheat-content', this.content);
+
+      this.showStatus(true, `Imported ${importedItems.length} codes`, `已导入 ${importedItems.length} 个命令`);
+      return true;
+    } catch (err) {
+      console.error(err);
+      this.showStatus(false, 'Import failed', '导入失败');
+      return false;
     }
   }
 

@@ -1,5 +1,5 @@
 // ./src/script/solarEclipse.ts
-/*
+
 import { solarEclipseDescriptions } from './solarEclipseDescriptions';
 
 function patchWeather(): void {
@@ -30,4 +30,3 @@ function patchWeather(): void {
     solarEclipseDescriptions();
   });
 })(maplebirch);
-*/

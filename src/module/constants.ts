@@ -19,6 +19,18 @@ export const defaults = {
     seed: 0,
     stored: []
   },
+  carries: {
+    body: {
+      hand: [null, null],
+      bag: [null, null],
+      accessory: [null, null],
+      container: [null, null],
+      special: [null, null]
+    },
+    items: {
+      stacks: []
+    }
+  },
   wardrobeSearch: '',
   hintlocation: 'Hint'
 };
