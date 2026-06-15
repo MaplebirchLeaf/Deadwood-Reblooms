@@ -2,7 +2,7 @@
 
 import type { MaplebirchCore } from '@scml-maplebirch/types';
 
-function createSpanStatusPatch(suffixMacro: string, duplicateMarker: string): string {
+function spanStatusPatch(suffixMacro: string, duplicateMarker: string): string {
   return ((matchedBlock: string) => {
     return matchedBlock.replace(/(<span\b[^>]*>[\s\S]*?)(<\/span>)/g, (span, body, close) => {
       if (span.includes(duplicateMarker)) return span;
@@ -34,19 +34,19 @@ class UnlockCheatAndCombatStatusDisplay {
         'Widgets State Man': [
           {
             srcmatch: /<<if\s+\$loveDrunk\b[\s\S]*?(?=\n\s*<<if\s+\$enemyarousal\b)/,
-            to: createSpanStatusPatch(healthSuffix, 'Math.round($enemyhealth)')
+            to: spanStatusPatch(healthSuffix, 'Math.round($enemyhealth)')
           },
           {
             srcmatch: /<<if\s+\$enemyarousal\b[\s\S]*?(?=\n\s*<<if\s+\$enemyanger\b)/,
-            to: createSpanStatusPatch(arousalSuffix, 'Math.round($enemyarousal)')
+            to: spanStatusPatch(arousalSuffix, 'Math.round($enemyarousal)')
           },
           {
             srcmatch: /<<if\s+\$enemyanger\b[\s\S]*?(?=\n\s*<<if\s+\$enemytrust\b)/,
-            to: createSpanStatusPatch(angerSuffix, 'Math.round($enemyanger)')
+            to: spanStatusPatch(angerSuffix, 'Math.round($enemyanger)')
           },
           {
             srcmatch: /<<if\s+\$enemytrust\b[\s\S]*?(?=\n\s*<<if\s+\$panicviolence\b)/,
-            to: createSpanStatusPatch(trustSuffix, 'Math.round($enemytrust)')
+            to: spanStatusPatch(trustSuffix, 'Math.round($enemytrust)')
           }
         ]
       }

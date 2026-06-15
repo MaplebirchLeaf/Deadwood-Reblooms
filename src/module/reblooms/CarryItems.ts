@@ -1,4 +1,4 @@
-// ./src/module/reblooms/CarryItems.ts
+﻿// ./src/module/reblooms/CarryItems.ts
 
 import type DeadwoodReblooms from '../DeadwoodReblooms';
 import BodyCarries from './BodyCarries';
@@ -8,7 +8,7 @@ export type { CarryItemConfig } from './CarryShared';
 
 interface CarrySlotSource {
   readonly itemId?: string;
-  readonly label?: string;
+  readonly className?: string;
 }
 
 export interface CarryItemsState {
@@ -36,7 +36,7 @@ class CarryItems {
 
   public constructor(private readonly manager: DeadwoodReblooms) {}
 
-  /** 返回全物品配置表，统一放在 setup.DeadwoodReblooms.items。 */
+  /** 返回全物品配置表，统一存放在 setup.DeadwoodReblooms.items。 */
   private get items(): Record<string, CarryItemConfig> {
     setup.DeadwoodReblooms ??= {};
     if (!isRecord(setup.DeadwoodReblooms.items)) setup.DeadwoodReblooms.items = {};
@@ -59,11 +59,7 @@ class CarryItems {
     section?.classList.toggle('has-carry-item-slots', capacity > 0);
     section?.classList.toggle('is-empty-carry-items', capacity === 0);
 
-    if (info) {
-      info.textContent = capacity > 0 ? `${used} / ${capacity}` : '';
-      info.title = this.manager.core.t('deadwoodReblooms.CarryItems.capacityTitle');
-      info.setAttribute('aria-label', info.title);
-    }
+    if (info) info.textContent = capacity > 0 ? `${used} / ${capacity}` : '';
 
     if (!grid) return;
     grid.innerHTML = '';
@@ -84,11 +80,6 @@ class CarryItems {
       if (!config?.id) continue;
       this.items[config.id] = { ...this.items[config.id], ...config };
     }
-  }
-
-  /** 返回完整物品配置表。 */
-  public all(): Record<string, CarryItemConfig> {
-    return this.items;
   }
 
   /** 读取单个物品配置。 */
@@ -120,19 +111,22 @@ class CarryItems {
 
   /** 返回装备物品能提供的额外物品栏格数。 */
   public carrySlots(itemId: string): number {
-    const slots = Number(this.config(itemId)?.slots);
+    const config = this.config(itemId);
+    if (!config?.type?.some(type => type === 'bag' || type === 'special')) return 0;
+    const slots = Number(config.slots);
     return Number.isFinite(slots) ? Math.max(0, Math.floor(slots)) : 0;
   }
 
-  /** 返回物品的提示色标签。 */
-  public label(itemId: string): string | undefined {
-    const label = this.config(itemId)?.label;
-    return typeof label === 'string' && /^[a-zA-Z0-9_-]+$/.test(label) ? label : undefined;
+  /** 返回物品栏格子的提示样式 class。 */
+  public itemClass(itemId: string): string | undefined {
+    const className = this.config(itemId)?.class;
+    return typeof className === 'string' && /^[a-zA-Z0-9_-]+$/.test(className) ? className : undefined;
   }
 
-  /** 返回物品详情描述。 */
+  /** 返回当前语言下的物品详情描述。 */
   public desc(itemId: string): string {
-    const desc = this.config(itemId)?.desc;
+    const config = this.config(itemId);
+    const desc = maplebirch.Language === 'CN' && config?.cn_desc ? config.cn_desc : config?.desc;
     return typeof desc === 'string' ? desc : '';
   }
 
@@ -142,7 +136,6 @@ class CarryItems {
     const capacity = this.slotSources().length;
     this.normalizeStacks(state, capacity);
     if (!this.isIndex(capacity, index)) return false;
-
     state.stacks[index] = new CarryItemStack(itemId, Math.max(1, Math.min(this.max(itemId), Math.floor(count))));
     return true;
   }
@@ -153,13 +146,12 @@ class CarryItems {
     const capacity = this.slotSources().length;
     this.normalizeStacks(state, capacity);
     if (!this.isIndex(capacity, index)) return false;
-
     state.stacks[index] = new CarryItemStack();
     if (state.selectedIndex === index) state.selectedIndex = null;
     return true;
   }
 
-  /** 添加物品，优先堆叠到已有同类物品，再放入空格。 */
+  /** 添加物品；优先堆叠到已有同类物品，再放入空格。 */
   public addItem(itemId: string, count = 1): boolean {
     const state = this.state();
     const capacity = this.slotSources().length;
@@ -202,7 +194,7 @@ class CarryItems {
     slot.dataset.slotIndex = String(index);
     slot.draggable = true;
     if (source?.itemId) slot.dataset.sourceItem = source.itemId;
-    if (source?.label) slot.classList.add(`deadwood-reblooms-carry-label-${source.label}`);
+    if (source?.className) slot.classList.add(`deadwood-reblooms-carry-class-${source.className}`);
 
     const hint = document.createElement('span');
     hint.className = 'deadwood-reblooms-slot-hint';
@@ -217,15 +209,9 @@ class CarryItems {
     frame.src = resolveImagePath(['img/deadwood-reblooms/ui/slot-frame.png', 'img/deadwood-reblooms/slot-frame.png']) ?? '';
 
     const hasItem = Boolean(stack?.id && stack.count > 0);
-    const label = `${this.manager.core.t('deadwoodReblooms.CarryItems.slot.label')} ${index + 1}`;
-    const separator = this.manager.core.t('deadwoodReblooms.separator');
-    const ariaLabel = hasItem ? `${label}${separator}${this.name(stack!.id)} x${stack!.count}` : `${label}${separator}${this.manager.core.t('deadwoodReblooms.empty')}`;
-
     slot.classList.add(hasItem ? 'has-item' : 'is-empty');
-    content.src = hasItem ? (this.iconPath(stack!.id) ?? '') : (resolveImagePath(['img/deadwood-reblooms/empty-carry-item.png']) ?? '');
+    content.src = hasItem ? (resolveImagePath(this.icons(stack!.id)) ?? '') : (resolveImagePath(['img/deadwood-reblooms/empty-carry-item.png']) ?? '');
     count.textContent = hasItem && stack!.count > 1 ? String(stack!.count) : '';
-    slot.title = ariaLabel;
-    slot.setAttribute('aria-label', ariaLabel);
     slot.append(hint, content, count, hover, frame);
 
     slot.addEventListener('click', () => this.selectSlot(index));
@@ -252,7 +238,7 @@ class CarryItems {
     if (!stack?.id || stack.count <= 0) return detail;
 
     const icon = slotImage('deadwood-reblooms-carry-item-detail-icon');
-    icon.src = this.iconPath(stack.id) ?? '';
+    icon.src = resolveImagePath(this.icons(stack.id)) ?? '';
     const text = document.createElement('div');
     text.className = 'deadwood-reblooms-carry-item-detail-text';
     const name = document.createElement('div');
@@ -303,13 +289,7 @@ class CarryItems {
     const hasWaistBag = Boolean(carries.bag[1]);
     const equipped = [...carries.bag, ...(hasWaistBag ? carries.container : []), ...carries.special].filter((itemId): itemId is string => typeof itemId === 'string' && itemId !== '');
     const sources: CarrySlotSource[] = Array.from({ length: this.baseSlots }, () => ({}));
-
-    for (const itemId of equipped) {
-      for (let index = 0; index < this.carrySlots(itemId); index++) {
-        sources.push({ itemId, label: this.label(itemId) });
-      }
-    }
-
+    for (const itemId of equipped) for (let index = 0; index < this.carrySlots(itemId); index++) sources.push({ itemId, className: this.itemClass(itemId) });
     return sources;
   }
 
@@ -329,11 +309,6 @@ class CarryItems {
       const stack = CarryItemStack.from(state.stacks[index]);
       state.stacks[index] = stack.id ? new CarryItemStack(stack.id, Math.min(this.max(stack.id), stack.count)) : new CarryItemStack();
     }
-  }
-
-  /** 取物品第一张可用 icon，并交给 loadImage 解析。 */
-  private iconPath(itemId: string): string | undefined {
-    return resolveImagePath(this.icons(itemId));
   }
 
   /** 根据 grid 宽度估算每行格子数，用于把详情插到正确行下面。 */

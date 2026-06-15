@@ -62,10 +62,7 @@ class DeadwoodReblooms {
   }
 
   private variableInit() {
-    if (!V.DeadwoodReblooms || typeof V.DeadwoodReblooms !== 'object' || Array.isArray(V.DeadwoodReblooms)) {
-      V.DeadwoodReblooms = { version: '0.0.0' };
-    }
-
+    if (!V.DeadwoodReblooms || typeof V.DeadwoodReblooms !== 'object' || Array.isArray(V.DeadwoodReblooms)) V.DeadwoodReblooms = { version: '0.0.0' };
     this.migration.run(V.DeadwoodReblooms, this.version);
     this.optionsCheck();
   }
@@ -79,7 +76,7 @@ class DeadwoodReblooms {
     void this.core.on(
       ':modhint',
       async () => {
-        await BodyModel.render(this);
+        BodyModel.render(this);
         BodyCarries.render(this);
         this.carryItems.render();
       },

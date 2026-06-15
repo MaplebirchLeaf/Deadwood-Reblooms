@@ -32,7 +32,17 @@ export const defaults = {
     }
   },
   wardrobeSearch: '',
-  hintlocation: 'Hint'
+  hintlocation: 'Hint',
+  // Core Characteristics Breakthrough
+  CCB: {
+    physique: false,
+    willpower: false,
+    beauty: false,
+    promiscuity: false,
+    exhibitionism: false,
+    deviancy: false
+  },
+  sanity: 1000
 };
 
 export function dataUpdate(migration: ReturnType<typeof maplebirch.tool.migration.create>): void {

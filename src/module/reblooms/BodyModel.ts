@@ -2,7 +2,7 @@ import type DeadwoodReblooms from '../DeadwoodReblooms';
 
 class BodyModel {
   /** 渲染角色面板：先渲染光照层，再渲染主体层。 */
-  private static async renderBodyModel(manager: DeadwoodReblooms) {
+  private static renderBodyModel(manager: DeadwoodReblooms) {
     const container = document.getElementById('deadwood-reblooms-character');
     if (!container) return;
 
@@ -35,7 +35,7 @@ class BodyModel {
   }
 
   /** 渲染角色底部覆盖层：避孕套数量和防狼喷雾数量。 */
-  private static async renderOverlay() {
+  private static renderOverlay() {
     const overlay = document.getElementById('deadwood-reblooms-character-overlay');
     if (!overlay) return;
 
@@ -136,9 +136,9 @@ class BodyModel {
   }
 
   /** 面板入口：渲染角色模型和覆盖层。 */
-  public static async render(manager: DeadwoodReblooms) {
-    await BodyModel.renderBodyModel(manager);
-    await BodyModel.renderOverlay();
+  public static render(manager: DeadwoodReblooms) {
+    BodyModel.renderBodyModel(manager);
+    BodyModel.renderOverlay();
   }
 }
 

@@ -6,10 +6,7 @@ const keyPrefix = 'deadwoodReblooms.SolarEclipse';
 const weatherTypes: WeatherType[] = ['clear', 'lightClouds', 'heavyClouds', 'lightPrecipitation', 'heavyPrecipitation', 'storm', 'thunderstorm'];
 
 function variant(weather: WeatherType): Variant {
-  if (weather !== 'lightPrecipitation' && weather !== 'heavyPrecipitation') {
-    return 'default';
-  }
-
+  if (weather !== 'lightPrecipitation' && weather !== 'heavyPrecipitation') return 'default';
   if (Weather.precipitation === 'rain') return 'rain';
   if (Weather.precipitation === 'snow') return 'snow';
   return 'default';

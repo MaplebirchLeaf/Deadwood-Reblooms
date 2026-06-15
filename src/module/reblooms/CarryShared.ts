@@ -16,11 +16,22 @@ export interface CarryItemConfig {
   readonly id: string;
   readonly name: string;
   readonly cn_name?: string;
-  readonly label?: string;
+  /** 可装备或放置到哪些身体区块。 */
+  readonly type?: readonly BodySlotType[];
+  /** 物品类别，例如 tool、medical、food、water。 */
+  readonly kind?: readonly string[];
+  /** 格子的提示样式 class。 */
+  readonly class?: string;
   readonly desc?: string;
+  readonly cn_desc?: string;
+  /** 图像路径；数组用于空/满、开/关等特殊状态。 */
   readonly icon?: string | readonly string[];
+  /** 单格最大堆叠数。 */
   readonly max?: number;
+  /** 仅 bag / special 类型物品有效：装备后提供物品栏格子。 */
   readonly slots?: number;
+  /** 容器允许存放哪些 kind。 */
+  readonly accepts?: readonly string[];
 }
 
 export type AnyRecord = Record<string, any>;
@@ -30,7 +41,7 @@ export function isRecord(value: unknown): value is AnyRecord {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
-/** 创建格子里的图片层，所有格子都用 img 而不是 CSS background。 */
+/** 创建格子里的图片层，所有格子都使用 img，避免 CSS 背景图路径变复杂。 */
 export function slotImage(className: string): HTMLImageElement {
   const image = new Image();
   image.className = className;
@@ -39,7 +50,6 @@ export function slotImage(className: string): HTMLImageElement {
   return image;
 }
 
-/** 通过 MapleBirch 的 loadImage 解析图片路径。 */
 export function resolveImagePath(candidates: readonly string[]): string | undefined {
   for (const path of candidates) {
     if (typeof path !== 'string' || path.trim() === '') continue;

@@ -1,5 +1,7 @@
 import type { CarryItemConfig } from '../module/reblooms/CarryShared';
 import './solarEclipse';
+import './traits';
+import './Transformation/horse';
 
 (function (maplebirch) {
   'use strict';

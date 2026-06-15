@@ -1,5 +1,5 @@
 import type DeadwoodReblooms from '../DeadwoodReblooms';
-import { isRecord, resolveImagePath, slotImage, type BodyCarriesState, type BodyCarryItemId, type BodySlotIndex, type BodySlotType } from './CarryShared';
+import { isRecord, resolveImagePath, slotImage, type BodyCarriesState, type BodyCarryItemId, type BodySlotIndex, type BodySlotType, type CarryItemConfig } from './CarryShared';
 
 export type { BodyCarriesState, BodyCarryItemId, BodySlotIndex, BodySlotType } from './CarryShared';
 
@@ -98,10 +98,11 @@ class BodyCarries {
     return BodyCarries.state()[type][index] ?? null;
   }
 
-  /** 写入指定身体格子的 itemId，F12 调试装备时也走这里。 */
+  /** 写入指定身体格子的 itemId；F12 调试装备时也走这里。 */
   public static setSlot(type: BodySlotType, index: BodySlotIndex, itemId: BodyCarryItemId): boolean {
     const state = BodyCarries.state();
     if (!Array.isArray(state[type]) || index < 0 || index > 1) return false;
+    if (itemId && !BodyCarries.canPlace(type, itemId)) return false;
     state[type][index] = itemId;
     return true;
   }
@@ -126,12 +127,8 @@ class BodyCarries {
     const frame = slotImage('deadwood-reblooms-slot-frame');
     frame.src = resolveImagePath(['img/deadwood-reblooms/slot-frame.png']) ?? '';
 
-    const slotLabel = manager.core.t(config.labelKey);
-    const ariaLabel = itemId ? `${slotLabel}${manager.carryItems.name(itemId)}` : `${slotLabel}${manager.core.t('deadwoodReblooms.empty')}`;
     slot.classList.add(itemId ? 'has-item' : 'is-empty');
     content.src = itemId ? (resolveImagePath(manager.carryItems.icons(itemId)) ?? '') : (resolveImagePath([`img/deadwood-reblooms/empty-${config.type}-${config.index}.png`]) ?? '');
-    slot.title = ariaLabel;
-    slot.setAttribute('aria-label', ariaLabel);
     slot.append(content, hover, frame);
 
     return slot;
@@ -150,6 +147,15 @@ class BodyCarries {
     if (!Array.isArray(root[type])) root[type] = [];
     root[type].length = 2;
     for (let index = 0; index < 2; index++) if (typeof root[type][index] !== 'string') root[type][index] = null;
+  }
+
+  /** 校验物品配置里的 type；未填写 type 时暂时视为不限制位置。 */
+  private static canPlace(type: BodySlotType, itemId: string): boolean {
+    const items = setup.DeadwoodReblooms?.items;
+    if (!isRecord(items)) return true;
+    const table = items as Record<string, CarryItemConfig>;
+    const config = table[itemId];
+    return !Array.isArray(config?.type) || config.type.includes(type);
   }
 }
 
