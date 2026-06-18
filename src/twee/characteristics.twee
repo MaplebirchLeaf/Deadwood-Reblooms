@@ -102,10 +102,118 @@
     { requiredValue: 1000, level: 7, color: 'green', description: $_sanity_states_desc[7] }
   ]>>
 
-  <<set _sanityConfig = { name : 'Sanity',cn_name:'理智', icon : 'ui/sym_sanity', displayType : 'level', currentValue : $DeadwoodReblooms.sanity, modifier: 100, modTypes: { good: [], bad: [] }, states : $_sanity_states }>>
+  <<set _sanityConfig = { name : 'Sanity',cn_name:'理智', icon : 'ui/sym-sanity', displayType : 'level', currentValue : $DeadwoodReblooms.sanity, modifier: 100, modTypes: { good: [], bad: [] }, states : $_sanity_states }>>
 <</widget>>
 
 <<widget 'deadwood-reblooms-characteristics-degrees'>>
   <<characteristic-box _sanityConfig>>
-  <<characteristic-box _spiritualityConfig>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-characteristics-status-bar'>>
+  <<if $DeadwoodReblooms and Number.isFinite($DeadwoodReblooms.satiety)>>
+    <<set $_name to lanSwitch('Satiety', '饱腹')>>
+    <div id='satietycaption' @title='$_name + ": " + $DeadwoodReblooms.satiety.toFixed(2)'>
+      <div @class='($options.showCaptionText is true ? "" : "rightMeterText")'>
+        $_name:
+        <<if $options.showCaptionText is true>>
+          <<if $DeadwoodReblooms.satiety gte 8000>><span class='green'><<= maplebirch.t('deadwoodReblooms.StatusBar.satiety5')>></span>
+            <<elseif $DeadwoodReblooms.satiety gte 6000>><span class='teal'><<= maplebirch.t('deadwoodReblooms.StatusBar.satiety4')>></span>
+            <<elseif $DeadwoodReblooms.satiety gte 4000>><span class='lblue'><<= maplebirch.t('deadwoodReblooms.StatusBar.satiety3')>></span>
+            <<elseif $DeadwoodReblooms.satiety gte 2000>><span class='blue'><<= maplebirch.t('deadwoodReblooms.StatusBar.satiety2')>></span>
+            <<elseif $DeadwoodReblooms.satiety gte 1>><span class='pink'><<= maplebirch.t('deadwoodReblooms.StatusBar.satiety1')>></span>
+            <<else>><span class='red'><<= maplebirch.t('deadwoodReblooms.StatusBar.satiety0')>></span>
+            <</if>>
+        <</if>>
+      </div>
+      <div @class='($options.showCaptionText is true ? "meter" : "rightMeter")'>
+        <<set _percent to Math.floor(($DeadwoodReblooms.satiety / 10000) * 100)>>
+        <<if $DeadwoodReblooms.satiety gte 8000>>
+          <<set _statColor to 'greenbar'>>
+        <<elseif $DeadwoodReblooms.satiety gte 6000>>
+          <<set _statColor to 'tealbar'>>
+        <<elseif $DeadwoodReblooms.satiety gte 4000>>
+          <<set _statColor to 'lbluebar'>>
+        <<elseif $DeadwoodReblooms.satiety gte 2000>>
+          <<set _statColor to 'bluebar'>>
+        <<elseif $DeadwoodReblooms.satiety gte 1>>
+          <<set _statColor to 'pinkbar'>>
+        <<else>>
+          <<set _statColor to 'redbar'>>
+        <</if>>
+        <div @class='_statColor' @style='"width:" + _percent + "%"'></div>
+      </div>
+    </div>
+  <</if>>
+
+  <<if $DeadwoodReblooms and Number.isFinite($DeadwoodReblooms.hydration)>>
+    <<set $_name to lanSwitch('Hydration', '饮水')>>
+    <div id='hydrationcaption' @title='$_name + ": " + $DeadwoodReblooms.hydration.toFixed(2)'>
+      <div @class='($options.showCaptionText is true ? "" : "rightMeterText")'>
+        $_name:
+        <<if $options.showCaptionText is true>>
+          <<if $DeadwoodReblooms.hydration gte 3200>><span class='green'><<= maplebirch.t('deadwoodReblooms.StatusBar.hydration5')>></span>
+          <<elseif $DeadwoodReblooms.hydration gte 2400>><span class='teal'><<= maplebirch.t('deadwoodReblooms.StatusBar.hydration4')>></span>
+          <<elseif $DeadwoodReblooms.hydration gte 1600>><span class='lblue'><<= maplebirch.t('deadwoodReblooms.StatusBar.hydration3')>></span>
+          <<elseif $DeadwoodReblooms.hydration gte 800>><span class='blue'><<= maplebirch.t('deadwoodReblooms.StatusBar.hydration2')>></span>
+          <<elseif $DeadwoodReblooms.hydration gte 1>><span class='pink'><<= maplebirch.t('deadwoodReblooms.StatusBar.hydration1')>></span>
+          <<else>><span class='red'><<= maplebirch.t('deadwoodReblooms.StatusBar.hydration0')>></span>
+          <</if>>
+        <</if>>
+      </div>
+      <div @class='($options.showCaptionText is true ? "meter" : "rightMeter")'>
+        <<set _percent to Math.floor(($DeadwoodReblooms.hydration / 4000) * 100)>>
+        <<if $DeadwoodReblooms.hydration gte 3200>>
+          <<set _statColor to 'greenbar'>>
+        <<elseif $DeadwoodReblooms.hydration gte 2400>>
+          <<set _statColor to 'tealbar'>>
+        <<elseif $DeadwoodReblooms.hydration gte 1600>>
+          <<set _statColor to 'lbluebar'>>
+        <<elseif $DeadwoodReblooms.hydration gte 800>>
+          <<set _statColor to 'bluebar'>>
+        <<elseif $DeadwoodReblooms.hydration gte 1>>
+          <<set _statColor to 'pinkbar'>>
+        <<else>>
+          <<set _statColor to 'redbar'>>
+        <</if>>
+        <div @class='_statColor' @style='"width:" + _percent + "%"'></div>
+      </div>
+    </div>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-characteristics-mobile-status-color'>>
+	<<set _percent to Math.floor((_args[0] / _args[1]) * 10)>>
+	<<switch _percent>>
+		<<case 8 9 10>>
+			<<set _mobileColor to "green">>
+		<<case 6 7>>
+			<<set _mobileColor to "teal">>
+		<<case 4 5>>
+			<<set _mobileColor to "lblue">>
+		<<case 2 3>>
+			<<set _mobileColor to "blue">>
+		<<case 1>>
+			<<set _mobileColor to "pink">>
+		<<case 0>>
+			<<set _mobileColor to "red">>
+		<<default>>
+			<<set _mobileColor to "green">>
+	<</switch>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-characteristics-mobile-status'>>
+	<<if $DeadwoodReblooms and Number.isFinite($DeadwoodReblooms.satiety) and ($options.sidebarStats is 'all' or $DeadwoodReblooms.satiety lt 5000)>>
+    <<deadwood-reblooms-characteristics-mobile-status-color $DeadwoodReblooms.satiety 10000>>
+    <<set $_name_satiety to lanSwitch('Satiety', '饱腹')>>
+		<div @class='"stat " + _mobileColor'>
+			<mouse class='tooltip-centertop'><<lanSwitch 'Sa' '饱'>><span>$_name_satiety: <<print $DeadwoodReblooms.satiety.toFixed(2)>></span></mouse>
+		</div>
+	<</if>>
+	<<if $DeadwoodReblooms and Number.isFinite($DeadwoodReblooms.hydration) and ($options.sidebarStats is 'all' or $DeadwoodReblooms.hydration lt 2000)>>
+    <<deadwood-reblooms-characteristics-mobile-status-color $DeadwoodReblooms.hydration 4000>>
+    <<set $_name_hydration to lanSwitch('Hydration', '饮水')>>
+		<div @class='"stat " + _mobileColor'>
+			<mouse class='tooltip-centertop'><<lanSwitch 'Hy' '饮'>><span>$_name_hydration: <<print $DeadwoodReblooms.hydration.toFixed(2)>></span></mouse>
+		</div>
+	<</if>>
 <</widget>>

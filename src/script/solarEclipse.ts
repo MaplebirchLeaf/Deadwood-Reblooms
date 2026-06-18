@@ -26,6 +26,7 @@ function patchWeather(): void {
   'use strict';
 
   maplebirch.tool.onInit(() => {
+    if (!maplebirch.get('rebloom')) return;
     patchWeather();
     solarEclipseDescriptions();
   });

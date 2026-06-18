@@ -1,13 +1,19 @@
 import type { CarryItemConfig } from '../module/reblooms/CarryShared';
 import './solarEclipse';
 import './traits';
+import './combat';
 import './Transformation/horse';
+import './characteristics';
 
 (function (maplebirch) {
   'use strict';
   maplebirch.tool.addTo('HintMobile', 'DeadwoodRebloomsHintMobile');
   maplebirch.tool.addTo('MenuBig', 'DeadwoodRebloomsHintDesktop');
   maplebirch.tool.addTo('Options', 'Deadwood-Reblooms-Options');
+  maplebirch.tool.addTo('DegreesBonusDisplay', 'deadwood-reblooms-characteristics-degrees-display');
+  maplebirch.tool.addTo('DegreesBox', 'deadwood-reblooms-characteristics-degrees');
+  maplebirch.tool.addTo('StatusBar', 'deadwood-reblooms-characteristics-status-bar');
+  maplebirch.tool.addTo('MobileStats', 'deadwood-reblooms-characteristics-mobile-status');
 
   // prettier-ignore
   maplebirch.tool.zone.inject({

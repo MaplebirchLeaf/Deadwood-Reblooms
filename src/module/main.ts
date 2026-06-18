@@ -1,6 +1,7 @@
 import DeadwoodReblooms from './DeadwoodReblooms';
 import UnLockCheatAndCombatStatusDisplay from './UnLockCheatAndCombatStatusDisplay';
 import './LongerCombat';
+import './StatChange';
 
 (function (maplebirch): void {
   'use strict';

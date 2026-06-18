@@ -14,7 +14,11 @@ export const options: Record<string, any> = {
 };
 
 export const defaults = {
-  rand: {},
+  rand: {
+    seed: null,
+    history: [],
+    index: 0
+  },
   solarEclipse: {
     seed: 0,
     stored: []
@@ -42,7 +46,35 @@ export const defaults = {
     exhibitionism: false,
     deviancy: false
   },
-  sanity: 1000
+  status: {
+    sanity: 1000,
+    satiety: 10000,
+    hydration: 4000
+  },
+
+  get sanity() {
+    this.status['sanity'] = Math.clamp(this.status['sanity'], -500, 1000);
+    return this.status['sanity'];
+  },
+  set sanity(value) {
+    if (Number.isFinite(value)) this.status['sanity'] = Math.clamp(this.status['sanity'] + value, -500, 1000);
+  },
+
+  get satiety() {
+    this.status['satiety'] = Math.clamp(this.status['satiety'], 0, 10000);
+    return this.status['satiety'];
+  },
+  set satiety(value) {
+    if (Number.isFinite(value)) this.status['satiety'] = Math.clamp(this.status['satiety'] + value, 0, 10000);
+  },
+
+  get hydration() {
+    this.status['hydration'] = Math.clamp(this.status['hydration'], 0, 4000);
+    return this.status['hydration'];
+  },
+  set hydration(value) {
+    if (Number.isFinite(value)) this.status['hydration'] = Math.clamp(this.status['hydration'] + value, 0, 4000);
+  }
 };
 
 export function dataUpdate(migration: ReturnType<typeof maplebirch.tool.migration.create>): void {

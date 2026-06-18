@@ -1,22 +1,5 @@
 import type { CarryItemConfig } from '../src/module/reblooms/CarryItems';
 
-declare module 'twine-sugarcube/userdata' {
-  export interface SugarCubeSetupObject {
-    DeadwoodReblooms?: DeadwoodRebloomsSetupConfig;
-    deadwoodReblooms?: DeadwoodRebloomsSetupConfig;
-    maplebirch: {
-      DeadwoodReblooms?: DeadwoodRebloomsSetupConfig;
-      deadwoodReblooms?: DeadwoodRebloomsSetupConfig;
-      [key: string]: any;
-    };
-  }
-}
-
-interface DeadwoodRebloomsSetupConfig {
-  items?: Record<string, CarryItemConfig> | CarryItemConfig[];
-  itemFiles?: string[];
-}
-
 declare global {
   interface Window {}
 
@@ -28,6 +11,9 @@ declare global {
   function wikifier(widget: string, ...args: any): DocumentFragment;
   const Weather: any;
   const ColourUtils: any;
+
+  function lanSwitch(this: void, ...lanObj: any[]): string;
+  function lanSwitch(this: MacroContext, ...lanObj: any[]): HTMLElement;
 }
 
 export {};

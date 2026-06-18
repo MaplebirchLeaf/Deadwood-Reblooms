@@ -14,6 +14,7 @@ class DeadwoodReblooms {
   public readonly migration: ReturnType<typeof maplebirch.tool.migration.create>;
   public readonly log: ReturnType<typeof maplebirch.tool.createlog>;
   private readonly optionsKey: string = 'DeadwoodReblooms';
+  private random?: ReturnType<typeof maplebirch.tool.rand.create>;
 
   public readonly modhint: Hint;
   public readonly cheat: Cheat;
@@ -45,19 +46,21 @@ class DeadwoodReblooms {
     return V.options.maplebirch[this.optionsKey];
   }
 
+  public get rng(): number {
+    return this.rand.percent();
+  }
+
   public get rand(): ReturnType<typeof maplebirch.tool.rand.create> {
-    return this.core.tool.rand.create(V.DeadwoodReblooms.rand);
+    const state = (V.DeadwoodReblooms.rand ??= { seed: null, history: [], index: 0 });
+    if (!Number.isInteger(state.index)) state.index = 0;
+    if (this.random && this.random.state === state) return this.random;
+    return (this.random = this.core.tool.rand.create(state));
   }
 
   private optionsCheck() {
     V.options ??= {};
-
-    if (!V.options.maplebirch || typeof V.options.maplebirch !== 'object' || Array.isArray(V.options.maplebirch)) {
-      V.options.maplebirch = {};
-    }
-
+    if (!V.options.maplebirch || typeof V.options.maplebirch !== 'object' || Array.isArray(V.options.maplebirch)) V.options.maplebirch = {};
     const current = V.options.maplebirch[this.optionsKey];
-
     V.options.maplebirch[this.optionsKey] = current && typeof current === 'object' && !Array.isArray(current) ? Object.merge(options, current) : options.clone();
   }
 

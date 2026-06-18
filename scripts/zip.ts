@@ -42,7 +42,7 @@ interface ScanOptions {
   excludes?: string[];
 }
 
-interface TweeRule {
+interface TweePatcherRule {
   passage: string;
   findString: string;
   replace?: string;
@@ -104,10 +104,6 @@ async function scan(dir: string, { base = '', prefix = '', excludes = [] }: Scan
   return out;
 }
 
-async function readOptionalText(filePath: string): Promise<string> {
-  return await readFile(filePath, 'utf8').catch(() => '');
-}
-
 function upsertPlugin(plugins: ScmlPlugin[], match: (plugin: ScmlPlugin) => boolean, next: ScmlPlugin | null, toFront = false): void {
   const index = plugins.findIndex(match);
   if (index === -1) {
@@ -139,26 +135,32 @@ function parseYamlList<T>(content: string, normalize: (item: Record<string, unkn
   }
 }
 
-function buildTweeRules(content: string): TweeRule[] {
+function buildRules(content: string, type: 'twee'): TweePatcherRule[];
+function buildRules(content: string, type: 'patcher'): ReplacePatcherRule[];
+function buildRules(content: string, type: 'twee' | 'patcher'): Array<TweePatcherRule | ReplacePatcherRule> {
   return parseYamlList(content, item => {
-    const rule: TweeRule = {
+    const source = String(item[type === 'twee' ? 'findString' : 'from'] ?? '');
+    const before = typeof item.before === 'string' ? item.before : '';
+    const after = typeof item.after === 'string' ? item.after : '';
+    const relative = before || after ? `${before}${source}${after}` : undefined;
+
+    if (type === 'patcher') {
+      const rule: ReplacePatcherRule = {
+        from: source,
+        to: typeof item.to === 'string' ? item.to : (relative ?? ''),
+        fileName: String(item.fileName ?? '')
+      };
+      return rule.from && rule.to && rule.fileName ? rule : null;
+    }
+
+    const rule: TweePatcherRule = {
       passage: String(item.passage ?? ''),
-      findString: String(item.findString ?? '')
+      findString: source
     };
     if (typeof item.replace === 'string') rule.replace = item.replace;
-    if (typeof item.replaceFile === 'string') rule.replaceFile = item.replaceFile;
+    else if (typeof item.replaceFile === 'string') rule.replaceFile = item.replaceFile;
+    else if (relative != null) rule.replace = relative;
     return rule.passage && rule.findString ? rule : null;
-  });
-}
-
-function buildReplacePatcherRules(content: string): ReplacePatcherRule[] {
-  return parseYamlList(content, item => {
-    const rule = {
-      from: String(item.from ?? ''),
-      to: String(item.to ?? ''),
-      fileName: String(item.fileName ?? '')
-    };
-    return rule.from && rule.to && rule.fileName ? rule : null;
   });
 }
 
@@ -216,7 +218,7 @@ function filterExistingFiles(fileSet: Set<string>, fileList: readonly string[]):
   return fileList.filter(filePath => fileSet.has(filePath));
 }
 
-function buildMaplebirchPlugin(distFileSet: Set<string>): ScmlPlugin | null {
+function buildFrameworkPlugin(distFileSet: Set<string>): ScmlPlugin | null {
   const params: { language: string[]; module?: string[]; script?: string[] } = { language: ['CN', 'EN'] };
   if (distFileSet.has('dist/module.js')) params.module = ['dist/module.js'];
   if (distFileSet.has('dist/script.js')) params.script = ['dist/script.js'];
@@ -224,7 +226,7 @@ function buildMaplebirchPlugin(distFileSet: Set<string>): ScmlPlugin | null {
   return {
     modName: 'maplebirch',
     addonName: 'maplebirchAddon',
-    modVersion: '^3.1.0',
+    modVersion: '^4.1.0',
     params
   };
 }
@@ -233,10 +235,10 @@ function buildAddonPlugins(
   addonPlugin: ScmlPlugin[],
   distFileSet: Set<string>,
   beautySelectorParams: BeautySelectorParams | null,
-  tweeRules: TweeRule[],
+  tweePatcherRules: TweePatcherRule[],
   replacePatcherRules: ReplacePatcherRule[]
 ): ScmlPlugin[] {
-  upsertPlugin(addonPlugin, plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon', buildMaplebirchPlugin(distFileSet), true);
+  upsertPlugin(addonPlugin, plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon', buildFrameworkPlugin(distFileSet), true);
 
   upsertPlugin(
     addonPlugin,
@@ -254,12 +256,12 @@ function buildAddonPlugins(
   upsertPlugin(
     addonPlugin,
     plugin => plugin.modName === 'TweeReplacer' && plugin.addonName === 'TweeReplacerAddon',
-    tweeRules.length
+    tweePatcherRules.length
       ? {
           modName: 'TweeReplacer',
           addonName: 'TweeReplacerAddon',
           modVersion: '1.0.0',
-          params: tweeRules
+          params: tweePatcherRules
         }
       : null
   );
@@ -314,13 +316,13 @@ export async function createZip(rootDir: string): Promise<Buffer> {
     copyFile(path.join(rootDir, 'node_modules', 'spectrum-colorpicker', 'spectrum.css'), path.join(distDir, 'spectrum.css'))
   ]);
 
-  const [publicFiles, sourceTweeFiles, sourceStyleFiles, distFiles, tweeRulesRaw, replacePatcherRaw] = await Promise.all([
+  const [publicFiles, sourceTweeFiles, sourceStyleFiles, distFiles, tweePatcherRulesRaw, replacePatcherRaw] = await Promise.all([
     scan(publicDir),
     scan(path.join(rootDir, 'src', 'twee')),
     scan(path.join(rootDir, 'src', 'styles')),
     scan(distDir, { prefix: 'dist', excludes: ['/types/', '\\types\\'] }),
-    readOptionalText(path.join(rootDir, 'src', 'TweeReplacer.yaml')),
-    readOptionalText(path.join(rootDir, 'src', 'ReplacePatcher.yaml'))
+    readFile(path.join(rootDir, 'src', 'TweeReplacer.yaml'), 'utf8').catch(() => ''),
+    readFile(path.join(rootDir, 'src', 'ReplacePatcher.yaml'), 'utf8').catch(() => '')
   ]);
 
   const zip = new AdmZip();
@@ -335,13 +337,13 @@ export async function createZip(rootDir: string): Promise<Buffer> {
   const beautySelectorImageFiles = BeautySelectorImageFiles(allFiles);
   const beautySelectorParams = BeautySelectorParams(beautySelectorImageFiles);
   const additionDirs = AdditionDirs(beautySelectorImageFiles);
-  const tweeRules = buildTweeRules(tweeRulesRaw);
-  const replacePatcherRules = buildReplacePatcherRules(replacePatcherRaw);
+  const tweePatcherRules = buildRules(tweePatcherRulesRaw, 'twee');
+  const replacePatcherRules = buildRules(replacePatcherRaw, 'patcher');
   const addonPlugin = buildAddonPlugins(
     Array.isArray(pkg.scml.addonPlugin) ? pkg.scml.addonPlugin.map(plugin => ({ ...plugin })) : [],
     distFileSet,
     beautySelectorParams,
-    tweeRules,
+    tweePatcherRules,
     replacePatcherRules
   );
 

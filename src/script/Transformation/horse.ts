@@ -1,7 +1,5 @@
 // ./src/script/Transformation/horse.ts
 
-import { options } from '../../module/constants';
-
 function hairLikeFilter(colour: string) {
   const record = setup.colours.hair_map[colour];
   if (!record) return Renderer.emptyLayerFilter();
@@ -69,6 +67,7 @@ function hairLikeFilter(colour: string) {
     suppressConditions: [sourceName => sourceName !== 'horse', () => V.worn.head.name !== 'mane_ribbon', () => V.worn.neck.name !== 'golden_carrot_pendant'],
 
     pre: options => {
+      options.maplebirchTransformation = V.maplebirch.transformation ?? false;
       options.horse_ears_type = V.transformationParts?.horse?.ears;
       options.horse_tail_type = V.transformationParts?.horse?.tail;
     },
@@ -76,7 +75,7 @@ function hairLikeFilter(colour: string) {
     layers: {
       horse_ears: {
         src: 'img/transformations/horse/ears/default.png',
-        showfn: options => options.show_tf && isPartEnabled(options['horse_ears_type']) && !options.hide_all,
+        showfn: options => options.show_tf && isPartEnabled(options['horse_ears_type']) && !options.hide_all && options.maplebirchTransformation,
         filters: ['hair'],
         masksrcfn: options => {
           if (!V.transformationParts?.horse?.ears) return options.headMask;
@@ -92,7 +91,8 @@ function hairLikeFilter(colour: string) {
           const tail = demon ? `tail-${options.demon_tail_state}` : 'tail-idle';
           return `img/transformations/horse/${tail}/${options['horse_tail_type']}.png`;
         },
-        showfn: options => options.show_tf && isPartEnabled(options['horse_tail_type']) && !options.hide_all,
+        filters: ['hair'],
+        showfn: options => options.show_tf && isPartEnabled(options['horse_tail_type']) && !options.hide_all && options.maplebirchTransformation,
         zfn: options => {
           const cover = ['cover', 'flaunt'].includes(options.demon_tail_state) && isChimeraEnabled('demonhorse', 'tail');
           if (cover) return maplebirch.char.ZIndices.tailPenisCover;
@@ -108,16 +108,16 @@ function hairLikeFilter(colour: string) {
   });
 
   function pre(options: any) {
+    options.maplebirchTransformation = V.maplebirch.transformation ?? false;
     options.filters.horseHair = hairLikeFilter(V.haircolour);
-    maplebirch.log('test', 'WARN', options);
   }
 
   const layers = {
     horseEarsFront: {
       srcfn: (options: any) => `${options.src}body/transformations/horse/ears/front-default.png`,
-      showfn: () => {
+      showfn: (options: any) => {
         const ears = V.transformationParts?.horse?.ears;
-        return !(ears === 'disabled' || ears === 'hidden');
+        return !(ears === 'disabled' || ears === 'hidden') && options.maplebirchTransformation;
       },
       animationfn: (options: any) => options.animKey,
       filters: ['horseHair'],
@@ -129,9 +129,9 @@ function hairLikeFilter(colour: string) {
     },
     horseEarsBack: {
       srcfn: (options: any) => `${options.src}body/transformations/horse/ears/back-default.png`,
-      showfn: () => {
+      showfn: (options: any) => {
         const ears = V.transformationParts?.horse?.ears;
-        return !(ears === 'disabled' || ears === 'hidden');
+        return !(ears === 'disabled' || ears === 'hidden') && options.maplebirchTransformation;
       },
       animationfn: (options: any) => options.animKey,
       filters: ['horseHair'],
