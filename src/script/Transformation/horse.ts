@@ -67,7 +67,7 @@ function hairLikeFilter(colour: string) {
     suppressConditions: [sourceName => sourceName !== 'horse', () => V.worn.head.name !== 'mane_ribbon', () => V.worn.neck.name !== 'golden_carrot_pendant'],
 
     pre: options => {
-      options.maplebirchTransformation = V.maplebirch.transformation ?? false;
+      options.maplebirchTransformation = V.maplebirch?.transformation ?? false;
       options.horse_ears_type = V.transformationParts?.horse?.ears;
       options.horse_tail_type = V.transformationParts?.horse?.tail;
     },
@@ -108,7 +108,7 @@ function hairLikeFilter(colour: string) {
   });
 
   function pre(options: any) {
-    options.maplebirchTransformation = V.maplebirch.transformation ?? false;
+    options.maplebirchTransformation = V.maplebirch?.transformation ?? false;
     options.filters.horseHair = hairLikeFilter(V.haircolour);
   }
 

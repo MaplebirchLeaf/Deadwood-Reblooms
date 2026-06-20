@@ -206,7 +206,7 @@ class CarryItems {
     hover.className = 'deadwood-reblooms-slot-hover';
     hover.setAttribute('aria-hidden', 'true');
     const frame = slotImage('deadwood-reblooms-slot-frame');
-    frame.src = resolveImagePath(['img/deadwood-reblooms/ui/slot-frame.png', 'img/deadwood-reblooms/slot-frame.png']) ?? '';
+    frame.src = resolveImagePath(['img/deadwood-reblooms/slot-frame.png']) ?? '';
 
     const hasItem = Boolean(stack?.id && stack.count > 0);
     slot.classList.add(hasItem ? 'has-item' : 'is-empty');

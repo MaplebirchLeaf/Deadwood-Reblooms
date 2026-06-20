@@ -32,7 +32,7 @@ class DeadwoodReblooms {
 
     dataUpdate(this.migration);
 
-    this.core.once(':variable', () => this.variableInit());
+    this.core.on(':variable', () => this.variableInit());
     this.core.once(':passageend', () => this.optionsCheck());
     this.core.on(':rest-options', () => this.optionsCheck());
 

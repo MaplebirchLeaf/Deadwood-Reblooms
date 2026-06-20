@@ -1,7 +1,10 @@
 import type { CarryItemConfig } from '../src/module/reblooms/CarryItems';
 
 declare global {
-  interface Window {}
+  interface Window {
+    isLoveInterest(name: string): boolean;
+    isPossibleLoveInterest(name: string): boolean;
+  }
 
   function wearingCondom(npcNumber: number): boolean;
   const Renderer: { CanvasModels: { main: any }; [key: string]: any };
