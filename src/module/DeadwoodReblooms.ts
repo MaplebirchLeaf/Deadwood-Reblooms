@@ -1,6 +1,6 @@
 // ./src/module/DeadwoodReblooms.ts
 
-import { dataUpdate, options } from './constants';
+import { dataUpdate, options, bindStatus } from './constants';
 import Hint from './reblooms/Hint';
 import Cheat from './reblooms/Cheat';
 import EclipseSystem from './reblooms/solarEclipse';
@@ -67,6 +67,8 @@ class DeadwoodReblooms {
   private variableInit() {
     if (!V.DeadwoodReblooms || typeof V.DeadwoodReblooms !== 'object' || Array.isArray(V.DeadwoodReblooms)) V.DeadwoodReblooms = { version: '0.0.0' };
     this.migration.run(V.DeadwoodReblooms, this.version);
+    C.DeadwoodReblooms ??= {};
+    bindStatus();
     this.optionsCheck();
   }
 
@@ -75,7 +77,7 @@ class DeadwoodReblooms {
   }
 
   public Init() {
-    //void this.carryItems.loadFiles('deadwood-reblooms', );
+    void this.carryItems.loadFiles('deadwood-reblooms', ['items/Food.yaml']);
     void this.core.on(
       ':modhint',
       async () => {

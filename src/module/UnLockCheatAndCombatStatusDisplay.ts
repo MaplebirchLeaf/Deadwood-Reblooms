@@ -1,7 +1,5 @@
 // ./src/module/UnlockCheatAndCombatStatusDisplay.ts
 
-import type { MaplebirchCore } from '@scml-maplebirch/types';
-
 function spanStatusPatch(suffixMacro: string, duplicateMarker: string): string {
   return ((matchedBlock: string) => {
     return matchedBlock.replace(/(<span\b[^>]*>[\s\S]*?)(<\/span>)/g, (span, body, close) => {
@@ -12,7 +10,7 @@ function spanStatusPatch(suffixMacro: string, duplicateMarker: string): string {
 }
 
 class UnlockCheatAndCombatStatusDisplay {
-  public constructor(readonly core: MaplebirchCore) {}
+  public constructor(readonly core: typeof maplebirch) {}
 
   public preInit() {
     const healthSuffix = ' <<print "(" + Math.round($enemyhealth) + "/" + $enemyhealthmax + ")">>';

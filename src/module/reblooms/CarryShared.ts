@@ -12,6 +12,13 @@ export interface BodyCarriesState {
   special: BodyCarryItemId[];
 }
 
+/** 使用物品后对玩家状态产生的数值变化。 */
+export interface CarryItemEffects {
+  readonly [key: string]: number | undefined;
+  readonly satiety?: number;
+  readonly hydration?: number;
+}
+
 export interface CarryItemConfig {
   readonly id: string;
   readonly name: string;
@@ -32,6 +39,8 @@ export interface CarryItemConfig {
   readonly slots?: number;
   /** 容器允许存放哪些 kind。 */
   readonly accepts?: readonly string[];
+  /** 使用物品后恢复或扣除的玩家状态。 */
+  readonly effects?: CarryItemEffects;
 }
 
 export type AnyRecord = Record<string, any>;

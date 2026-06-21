@@ -13,6 +13,12 @@ export const options: Record<string, any> = {
   }
 };
 
+const statusLimits = {
+  sanity: [-500, 1000, 1000],
+  satiety: [0, 10000, 10000],
+  hydration: [0, 4000, 4000]
+} as const;
+
 export const defaults = {
   rand: {
     seed: null,
@@ -46,36 +52,25 @@ export const defaults = {
     exhibitionism: false,
     deviancy: false
   },
-  status: {
-    sanity: 1000,
-    satiety: 10000,
-    hydration: 4000
-  },
-
-  get sanity() {
-    this.status['sanity'] = Math.clamp(this.status['sanity'], -500, 1000);
-    return this.status['sanity'];
-  },
-  set sanity(value) {
-    if (Number.isFinite(value)) this.status['sanity'] = Math.clamp(this.status['sanity'] + value, -500, 1000);
-  },
-
-  get satiety() {
-    this.status['satiety'] = Math.clamp(this.status['satiety'], 0, 10000);
-    return this.status['satiety'];
-  },
-  set satiety(value) {
-    if (Number.isFinite(value)) this.status['satiety'] = Math.clamp(this.status['satiety'] + value, 0, 10000);
-  },
-
-  get hydration() {
-    this.status['hydration'] = Math.clamp(this.status['hydration'], 0, 4000);
-    return this.status['hydration'];
-  },
-  set hydration(value) {
-    if (Number.isFinite(value)) this.status['hydration'] = Math.clamp(this.status['hydration'] + value, 0, 4000);
-  }
+  status: Object.fromEntries(Object.entries(statusLimits).map(([key, [, , initial]]) => [key, initial]))
 };
+
+export function bindStatus(): void {
+  for (const [key, [min, max, initial]] of Object.entries(statusLimits)) {
+    Object.defineProperty(C.DeadwoodReblooms, key, {
+      configurable: true,
+      enumerable: true,
+      get() {
+        if (!Number.isFinite(V.DeadwoodReblooms.status[key])) V.DeadwoodReblooms.status[key] = initial;
+        V.DeadwoodReblooms.status[key] = Math.clamp(V.DeadwoodReblooms.status[key], min, max);
+        return V.DeadwoodReblooms.status[key];
+      },
+      set(value) {
+        if (Number.isFinite(value)) V.DeadwoodReblooms.status[key] = Math.clamp(value, min, max);
+      }
+    });
+  }
+}
 
 export function dataUpdate(migration: ReturnType<typeof maplebirch.tool.migration.create>): void {
   migration.add('0.0.0', '1.0.0', (data, utils) => {

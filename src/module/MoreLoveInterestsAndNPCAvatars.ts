@@ -71,13 +71,15 @@ function sydneyLayers(npc: NPCData): AvatarLayers {
   else if (romance && (npc.purity ?? 0) > 80) {
     if ((npc.lust ?? 0) >= 60) {
       state = 'anything';
-      if (V.sydney?.hair === 'ponytail') foreground = `${appearance.hairColor}_po_${V.sydney?.glasses === 'contacts' ? 'co' : V.sydney?.glasses === 'broken' || V.sydney?.glasses === 'playerbroken' ? 'br' : 'gl'}_a`;
+      if (V.sydney?.hair === 'ponytail')
+        foreground = `${appearance.hairColor}_po_${V.sydney?.glasses === 'contacts' ? 'co' : V.sydney?.glasses === 'broken' || V.sydney?.glasses === 'playerbroken' ? 'br' : 'gl'}_a`;
     } else state = 'beyondp';
   } else if (romance && (npc.purity ?? 0) >= 40) state = 'beyondp';
   else if (romance && (npc.corruption ?? 0) >= 40) state = (npc.lust ?? 0) >= 20 ? 'deflowered' : 'beyondc';
   else if (romance && (npc.corruption ?? 0) >= 10) state = 'influenced';
   else if (romance) state = 'beyondp';
-  else if ((npc.love ?? 0) >= 30 && (npc.purity ?? 0) >= 50) state = V.purity <= 500 || V.demon >= 6 ? 'misguided' : ['monk', 'priest', 'initiate'].includes(V.temple_rank) || V.angel >= 6 ? 'equal' : 'fond';
+  else if ((npc.love ?? 0) >= 30 && (npc.purity ?? 0) >= 50)
+    state = V.purity <= 500 || V.demon >= 6 ? 'misguided' : ['monk', 'priest', 'initiate'].includes(V.temple_rank) || V.angel >= 6 ? 'equal' : 'fond';
   else if ((npc.love ?? 0) >= 60 && (npc.corruption ?? 0) >= 10) state = 'influenced';
   else if ((npc.love ?? 0) >= 30 && (npc.corruption ?? 0) >= 10) state = 'know';
   else if ((npc.love ?? 0) >= 30) state = 'conflicted';
@@ -90,7 +92,7 @@ function sydneyLayers(npc: NPCData): AvatarLayers {
   };
 }
 
-/** 解析悉尼被象牙幽灵模仿时的双层资源。 */
+/** 解析悉尼被象牙怨灵模仿时的双层资源。 */
 function sydneyMimicLayers(npc: NPCData, state: 'iwr' | 'iwb'): AvatarLayers {
   const appearance = sydneyAppearance(npc);
   return {
@@ -159,7 +161,7 @@ const avatarProfiles: Record<string, AvatarProfile> = {
   Whitney     : { folder: 'whitney' , gendered: true , states: { default: 'fun'    , loved: undefined   , disliked: undefined   , dominant: undefined  , submissive: undefined  , lustful: undefined } },
   // 格威岚：固定头像，无性别后缀。
   Gwylan      : { folder: 'gwylan'  , gendered: false, states: { default: ''       , loved: undefined   , disliked: undefined   , dominant: undefined  , submissive: undefined  , lustful: undefined } },
-  // 象牙幽灵：由专用规则处理幽灵形态，无性别后缀。
+  // 象牙怨灵：由专用规则处理怨灵形态，无性别后缀。
   'Ivory Wraith': { folder: 'iw'    , gendered: false, states: { default: 'life'   , loved: undefined   , disliked: undefined   , dominant: undefined  , submissive: undefined  , lustful: undefined } },
   // 泽菲尔：爱意、厌恶状态。
   Zephyr      : { folder: 'zephyr'  , gendered: true , states: { default: 'default', loved: 'delightful', disliked: 'terrible'  , dominant: undefined  , submissive: undefined  , lustful: undefined } }
@@ -203,7 +205,7 @@ const specialStates: Record<string, (npc: NPCData) => string> = {
     }
     return (npc.dom ?? 0) <= 8 ? 'threat' : 'fun';
   },
-  // 象牙幽灵：直接对应当前幽灵形态。
+  // 象牙怨灵：直接对应当前怨灵形态。
   'Ivory Wraith': () => (['active', 'despair', 'haunt'].includes(V.wraith?.state) ? V.wraith.state : 'life')
 };
 
@@ -219,6 +221,20 @@ const mimicProfiles: Record<string, string> = {
   Morgan: 'morgan'
 };
 
+// prettier-ignore
+const posterAliases: Record<string, readonly string[]> = {
+  // 游戏项目发起者 Vrelnir。
+  vrel   : ['vrel', 'vrelnir'],
+  // 游戏前开发者 PurityGuy。
+  puri   : ['puri', 'purityguy'],
+  // 游戏角色 Nona。
+  nona   : ['nona', '诺娜'],
+  // 游戏角色 Fayne。
+  fayne  : ['fayne', '费恩'],
+  // 游戏角色 Seabird。
+  seabird: ['seabird', '海鸟']
+};
+
 export const npcAvatarConfig = {
   basePath: avatarBasePath,
   thresholds: { loved: 50, lustful: 60 },
@@ -226,19 +242,41 @@ export const npcAvatarConfig = {
 };
 
 class NPCAvatars {
-  public constructor(readonly core: typeof maplebirch) {}
+  public constructor(readonly core: typeof maplebirch) {
+    this.core.once(':sugarcube', () => {
+      this.core.tool.macro.defineS('relationshipicon', () => this.avatar());
+      this.core.tool.macro.defineS('mimicicon', () => this.mimic());
+    });
+  }
 
   public preInit(): void {
     this.core.tool.zone.inject({
+      locationPassage: {
+        Bedroom: [
+          {
+            src: '<<set _poster to _premadePoster ? "poster_" + _furniture.poster.name : [\'dol\', \'degrees of lewdity\'].some(e => _furniture.poster.name.toLowerCase().includes(e)) ? "poster_dol" : "poster">>',
+            to: '<<set _poster to maplebirch.MLIANPCA.avatars.posterIcon(_furniture.poster.name, _premadePoster)>>'
+          }
+        ]
+      },
       widgetPassage: {
         'Widgets Named Npcs': [{ src: '<<relationshiptext>>', applyafter: '<<relationshipicon>>' }],
         Widgets: [{ src: '<<npcrelationship "Ivory Wraith">>', applyafter: '<<mimicicon>>' }]
       }
     });
-    this.core.once(':sugarcube', () => {
-      this.core.tool.macro.defineS('relationshipicon', () => this.avatar());
-      this.core.tool.macro.defineS('mimicicon', () => this.mimic());
-    });
+  }
+
+  /** 将卧室自定义海报名解析为彩蛋家具图标。 */
+  public posterIcon(name: string, premade: boolean): string {
+    if (premade) return `poster_${name}`;
+    const normalized = String(name ?? '')
+      .trim()
+      .toLowerCase();
+    if (normalized.includes('vrel') && normalized.includes('puri')) return 'poster_purivrel';
+    for (const [icon, aliases] of Object.entries(posterAliases)) if (aliases.some(alias => normalized === alias.toLowerCase())) return `poster_${icon}`;
+    // 游戏角色象牙怨灵，根据当前形态选择海报。
+    if (['象牙怨灵', 'ivory wraith'].some(alias => normalized.includes(alias))) return this.core.rebloom.rng > 96 ? 'poster_iwlife' : `poster_iw${V.wraith.state}`;
+    return ['dol', 'degrees of lewdity'].some(alias => normalized.includes(alias)) ? 'poster_dol' : 'poster';
   }
 
   /** 创建指定 NPC 的社交栏头像。 */
@@ -266,7 +304,7 @@ class NPCAvatars {
     return this.layers(`${npcAvatarConfig.basePath}/${profile.folder}/${profile.prefix ?? profile.folder}${separator}${state}${suffix}.png`);
   }
 
-  /** 创建象牙幽灵模仿指定角色时使用的头像层。 */
+  /** 创建象牙怨灵模仿指定角色时使用的头像层。 */
   private mimic(): DocumentFragment | undefined {
     const name = String(V.wraith?.mimic ?? '');
     if (!name) return undefined;
@@ -312,7 +350,9 @@ class MoreLoveInterests {
   public constructor(
     readonly core: typeof maplebirch,
     readonly avatars: NPCAvatars
-  ) {}
+  ) {
+    this.core.once(':sugarcube', () => this.core.tool.macro.defineS('moreLoveInterest', () => this.loveInterestPanel()));
+  }
 
   public preInit(): void {
     this.core.once(':variable', () => this.syncLoveInterests());
@@ -331,14 +371,10 @@ class MoreLoveInterests {
           },
           {
             src: '<<widget "loveInterestRemove">>',
-            applyafter: '\n\t<<run maplebirch.npcAvatars.loveInterests.removeLoveInterest(_args[0])>><<exit>>'
+            applyafter: '\n\t<<run maplebirch.MLIANPCA.loveInterests.removeLoveInterest(_args[0])>><<exit>>'
           }
         ]
       }
-    });
-
-    this.core.once(':sugarcube', () => {
-      this.core.tool.macro.defineS('moreLoveInterest', () => this.loveInterestPanel());
     });
   }
 
@@ -377,7 +413,7 @@ class MoreLoveInterests {
     return panel;
   }
 
-  /** 创建恋人或候选人分组，并绑定点击与拖拽操作。 */
+  /** 创建恋人或非恋人分组，并绑定选择、拖拽与移动操作。 */
   private loveInterestGroup(labelKey: string, names: string[], selected: boolean): HTMLElement {
     const group = document.createElement('div');
     group.className = 'deadwood-love-interests-group';
@@ -388,24 +424,62 @@ class MoreLoveInterests {
     list.className = 'deadwood-love-interests-list';
     list.dataset.selected = String(selected);
 
-    for (const name of names) {
-      const item = document.createElement('button');
-      item.type = 'button';
-      item.className = 'deadwood-love-interest';
+    if (!selected && names.length === 0) {
+      const complete = document.createElement('div');
+      complete.className = 'deadwood-love-interests-complete';
+      complete.textContent = this.core.t('deadwoodReblooms.loveInterests.allSelected');
+      group.append(label, complete);
+      return group;
+    }
+
+    names.forEach((name, index) => {
+      const item = document.createElement('div');
+      item.className = `deadwood-love-interest ${selected ? 'is-selected lewd' : 'green'}`;
       item.dataset.name = name;
       item.draggable = selected;
+
+      const main = document.createElement('button');
+      main.type = 'button';
+      main.className = 'deadwood-love-interest-main';
       const icon = this.avatars.avatar(name);
-      if (icon) item.append(icon);
+      if (icon) main.append(icon);
       const text = document.createElement('span');
       text.textContent = this.core.auto(name);
-      item.append(text);
-      item.addEventListener('click', () => {
+      main.append(text);
+      main.addEventListener('click', () => {
         if (selected) V.loveInterestList.delete(name);
         else V.loveInterestList.push(name);
         this.syncLoveInterests();
         group.closest('.deadwood-love-interests')?.replaceWith(this.loveInterestPanel());
       });
-      item.addEventListener('dragstart', event => event.dataTransfer?.setData('text/plain', name));
+      item.append(main);
+
+      if (selected) {
+        const controls = document.createElement('div');
+        controls.className = 'deadwood-love-interest-controls';
+        for (const [offset, symbol] of [
+          [-1, '←'],
+          [1, '→']
+        ] as const) {
+          const move = document.createElement('button');
+          move.type = 'button';
+          move.textContent = symbol;
+          move.disabled = index + offset < 0 || index + offset >= names.length;
+          move.addEventListener('click', () => {
+            [V.loveInterestList[index], V.loveInterestList[index + offset]] = [V.loveInterestList[index + offset], V.loveInterestList[index]];
+            this.syncLoveInterests();
+            group.closest('.deadwood-love-interests')?.replaceWith(this.loveInterestPanel());
+          });
+          controls.append(move);
+        }
+        item.append(controls);
+      }
+
+      item.addEventListener('dragstart', event => {
+        event.dataTransfer?.setData('text/plain', name);
+        item.classList.add('is-dragging');
+      });
+      item.addEventListener('dragend', () => item.classList.remove('is-dragging'));
       item.addEventListener('dragover', event => selected && event.preventDefault());
       item.addEventListener('drop', event => {
         event.preventDefault();
@@ -417,12 +491,11 @@ class MoreLoveInterests {
         group.closest('.deadwood-love-interests')?.replaceWith(this.loveInterestPanel());
       });
       list.append(item);
-    }
+    });
     group.append(label, list);
     return group;
   }
 
-  /** 归一化不限量列表，并向游戏本体映射前三名。 */
   private syncLoveInterests(): void {
     const stored = Array.isArray(V.loveInterestList) ? V.loveInterestList : Object.values(V.loveInterest ?? {});
     V.loveInterestList = [...new Set(stored.filter((name): name is string => typeof name === 'string' && name !== 'None'))];
@@ -436,6 +509,7 @@ class MoreLoveInterests {
 }
 
 class MoreLoveInterestsAndNPCAvatars {
+  public readonly exposed: boolean = true;
   public readonly avatars: NPCAvatars;
   public readonly loveInterests: MoreLoveInterests;
 

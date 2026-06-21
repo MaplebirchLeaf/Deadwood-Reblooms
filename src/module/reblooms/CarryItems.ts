@@ -4,7 +4,7 @@ import type DeadwoodReblooms from '../DeadwoodReblooms';
 import BodyCarries from './BodyCarries';
 import { isRecord, resolveImagePath, slotImage, type CarryItemConfig } from './CarryShared';
 
-export type { CarryItemConfig } from './CarryShared';
+export type { CarryItemConfig, CarryItemEffects } from './CarryShared';
 
 interface CarrySlotSource {
   readonly itemId?: string;
@@ -13,7 +13,6 @@ interface CarrySlotSource {
 
 export interface CarryItemsState {
   stacks: CarryItemStack[];
-  selectedIndex?: number | null;
 }
 
 export class CarryItemStack {
@@ -33,6 +32,7 @@ export class CarryItemStack {
 
 class CarryItems {
   private readonly baseSlots = 5;
+  private selected: number | null = null;
 
   public constructor(private readonly manager: DeadwoodReblooms) {}
 
@@ -66,11 +66,13 @@ class CarryItems {
 
     const columns = this.gridColumns(grid);
     const selected = this.selectedIndex(state, capacity);
+    const selectedRowEnd = selected == null ? null : Math.min(capacity - 1, (Math.floor(selected / columns) + 1) * columns - 1);
 
     for (let index = 0; index < capacity; index++) {
-      grid.appendChild(this.slotElement(index, state.stacks[index], sources[index]));
-      const rowEnd = Math.min(capacity - 1, Math.ceil((index + 1) / columns) * columns - 1);
-      if (selected != null && index === rowEnd) grid.appendChild(this.detailElement(state.stacks[selected], selected));
+      const slot = this.slotElement(index, state.stacks[index], sources[index]);
+      if (index === selected) slot.classList.add('is-selected');
+      grid.appendChild(slot);
+      if (selected != null && index === selectedRowEnd) grid.appendChild(this.detailElement(state.stacks[selected], selected));
     }
   }
 
@@ -79,6 +81,28 @@ class CarryItems {
     for (const config of Array.isArray(configs) ? configs : [configs]) {
       if (!config?.id) continue;
       this.items[config.id] = { ...this.items[config.id], ...config };
+    }
+  }
+
+  /** 从指定模组压缩包读取 JSON/YAML，并注册到 setup.DeadwoodReblooms.items。 */
+  public async loadFiles(modName: string, paths: readonly string[]): Promise<void> {
+    const zip = this.manager.core.modUtils.getModZip(modName)?.zip;
+    if (!zip) return this.manager.log(`找不到物品配置模组：${modName}`, 'ERROR');
+    for (const path of paths) {
+      try {
+        const file = zip.file(path);
+        if (!file) continue;
+        const parsed = this.manager.core.yaml.load(await file.async('string'));
+        const values = Array.isArray(parsed) ? parsed : isRecord(parsed) ? Object.entries(parsed).map(([id, config]) => (isRecord(config) ? { id, ...config } : config)) : [];
+        const configs: CarryItemConfig[] = [];
+        for (const config of values) {
+          if (!isRecord(config) || typeof config.id !== 'string' || typeof config.name !== 'string') continue;
+          configs.push({ ...config, id: config.id, name: config.name });
+        }
+        this.add(configs);
+      } catch (error) {
+        this.manager.log(`物品配置读取失败：${modName}/${path}`, 'ERROR', error);
+      }
     }
   }
 
@@ -147,7 +171,7 @@ class CarryItems {
     this.normalizeStacks(state, capacity);
     if (!this.isIndex(capacity, index)) return false;
     state.stacks[index] = new CarryItemStack();
-    if (state.selectedIndex === index) state.selectedIndex = null;
+    if (this.selected === index) this.selected = null;
     return true;
   }
 
@@ -244,25 +268,97 @@ class CarryItems {
     const name = document.createElement('div');
     name.className = 'deadwood-reblooms-carry-item-detail-name';
     name.textContent = this.name(stack.id);
+    const effects = this.config(stack.id)?.effects;
+    const effectList = document.createElement('div');
+    effectList.className = 'deadwood-reblooms-carry-item-detail-effects';
+    for (const [key, value] of Object.entries(effects ?? {})) {
+      if (!Number.isFinite(value)) continue;
+      const effect = document.createElement('span');
+      effect.className = Number(value) > 0 ? 'green' : Number(value) < 0 ? 'red' : 'meek';
+      effect.textContent = `${this.manager.core.t(`deadwoodReblooms.CarryItems.detail.${key}`)}: ${Number(value) > 0 ? '+' : ''}${value}`;
+      effectList.append(effect);
+    }
     const meta = document.createElement('div');
     meta.className = 'deadwood-reblooms-carry-item-detail-meta';
-    meta.textContent = `${this.manager.core.t('deadwoodReblooms.CarryItems.detail.count')}${this.manager.core.t('deadwoodReblooms.separator')}${stack.count} / ${this.max(stack.id)}`;
+    meta.textContent = `${this.manager.core.t('deadwoodReblooms.CarryItems.detail.count')}: ${stack.count} / ${this.max(stack.id)}`;
     const desc = document.createElement('div');
     desc.className = 'deadwood-reblooms-carry-item-detail-desc';
     desc.textContent = this.desc(stack.id);
 
-    text.append(name, meta);
+    text.append(name);
+    if (effectList.childElementCount > 0) text.append(effectList);
     if (desc.textContent) text.appendChild(desc);
-    detail.append(icon, text);
+    const actions = document.createElement('div');
+    actions.className = 'deadwood-reblooms-carry-item-detail-actions';
+    actions.append(meta);
+    if (effects && Object.values(effects).some(value => Number.isFinite(value))) {
+      const use = document.createElement('a');
+      use.href = '#';
+      use.className = 'link-internal deadwood-reblooms-carry-item-use';
+      use.textContent = this.manager.core.t('deadwoodReblooms.CarryItems.detail.use');
+      use.addEventListener('click', event => {
+        event.preventDefault();
+        this.useItem(index);
+      });
+      actions.append(use);
+    }
+    detail.append(icon, text, actions);
     return detail;
   }
 
   /** 点击格子时切换详情显示。 */
   private selectSlot(index: number) {
-    const state = this.state();
     const stack = this.getStack(index);
-    state.selectedIndex = stack?.id ? (state.selectedIndex === index ? null : index) : null;
-    this.render();
+    const grid = document.getElementById('deadwood-reblooms-carry-items-grid');
+    if (!grid) return;
+
+    const selected = this.selected;
+    grid.querySelector('.deadwood-reblooms-carry-item-detail')?.remove();
+    grid.querySelector('.deadwood-reblooms-carry-item-slot.is-selected')?.classList.remove('is-selected');
+    if (!stack?.id || selected === index) {
+      this.selected = null;
+      return;
+    }
+
+    this.selected = index;
+    const slots = Array.from(grid.querySelectorAll<HTMLElement>(':scope > .deadwood-reblooms-carry-item-slot'));
+    const slot = slots[index];
+    if (!slot) return;
+    slot.classList.add('is-selected');
+    const columns = this.gridColumns(grid);
+    const rowEnd = Math.min(slots.length - 1, (Math.floor(index / columns) + 1) * columns - 1);
+    slots[rowEnd].after(this.detailElement(stack, index));
+  }
+
+  /** 使用物品效果并消耗当前格中的一个物品。 */
+  private useItem(index: number) {
+    const stack = this.getStack(index);
+    if (!stack?.id) return;
+    const effects = this.config(stack.id)?.effects;
+    if (!effects) return;
+
+    for (const [key, value] of Object.entries(effects)) if (Number.isFinite(value) && Number.isFinite(C.DeadwoodReblooms[key])) C.DeadwoodReblooms[key] += Number(value);
+    const status = wikifier('deadwood-reblooms-characteristics-status-bar');
+    for (const id of ['satietycaption', 'hydrationcaption']) {
+      const current = document.getElementById(id);
+      const updated = status.querySelector(`#${id}`);
+      if (current && updated) current.replaceWith(updated);
+    }
+    stack.count -= 1;
+
+    const grid = document.getElementById('deadwood-reblooms-carry-items-grid');
+    const slot = grid?.querySelector<HTMLElement>(`.deadwood-reblooms-carry-item-slot[data-slot-index='${index}']`);
+    const detail = grid?.querySelector<HTMLElement>('.deadwood-reblooms-carry-item-detail');
+    if (stack.count <= 0) {
+      this.clearStack(index);
+      slot?.replaceWith(this.slotElement(index, this.getStack(index) ?? undefined, this.slotSources()[index]));
+      detail?.remove();
+      return;
+    }
+
+    const count = slot?.querySelector<HTMLElement>('.deadwood-reblooms-slot-count');
+    if (count) count.textContent = stack.count > 1 ? String(stack.count) : '';
+    detail?.replaceWith(this.detailElement(stack, index));
   }
 
   /** 处理拖拽放下时的格子交换。 */
@@ -278,8 +374,8 @@ class CarryItems {
     if (!this.isIndex(capacity, fromIndex) || !this.isIndex(capacity, toIndex)) return;
 
     [state.stacks[fromIndex], state.stacks[toIndex]] = [state.stacks[toIndex], state.stacks[fromIndex]];
-    if (state.selectedIndex === fromIndex) state.selectedIndex = toIndex;
-    else if (state.selectedIndex === toIndex) state.selectedIndex = fromIndex;
+    if (this.selected === fromIndex) this.selected = toIndex;
+    else if (this.selected === toIndex) this.selected = fromIndex;
     this.render();
   }
 
@@ -299,6 +395,7 @@ class CarryItems {
     if (!isRecord(root.carries)) root.carries = {};
     if (!isRecord(root.carries.items)) root.carries.items = {};
     if (!Array.isArray(root.carries.items.stacks)) root.carries.items.stacks = [];
+    delete root.carries.items.selectedIndex;
     return root.carries.items as CarryItemsState;
   }
 
@@ -321,7 +418,8 @@ class CarryItems {
 
   /** 返回当前有效选中格；空格或越界时不显示详情。 */
   private selectedIndex(state: CarryItemsState, capacity: number): number | null {
-    const index = Number(state.selectedIndex);
+    if (this.selected == null) return null;
+    const index = this.selected;
     if (!this.isIndex(capacity, index)) return null;
     const stack = state.stacks[index];
     return stack?.id && stack.count > 0 ? index : null;
