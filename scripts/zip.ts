@@ -67,6 +67,7 @@ interface BeautySelectorParams {
 }
 
 const BEAUTY_SELECTOR_TYPE = 'Deadwood-Reblooms-Images';
+const SIDEBAR_CLOTHES_FILES = ['NamedNPCClothes.yaml'];
 
 const scriptFileLists = {
   scriptFileList: ['dist/game.js'],
@@ -183,7 +184,9 @@ function AdditionDirs(imgFileList: string[]): string[] {
     if (!dir || dir === '.' || dir.startsWith('dist/')) continue;
     dirs.add(dir.split('/')[0]);
   }
-  return [...dirs].sort();
+  const result: string[] = [];
+  dirs.forEach(dir => result.push(dir));
+  return result.sort();
 }
 
 function BeautySelectorParams(imgFileList: string[]): BeautySelectorParams | null {
@@ -218,8 +221,21 @@ function filterExistingFiles(fileSet: Set<string>, fileList: readonly string[]):
   return fileList.filter(filePath => fileSet.has(filePath));
 }
 
-function buildFrameworkPlugin(distFileSet: Set<string>): ScmlPlugin | null {
-  const params: { language: string[]; module?: string[]; script?: string[] } = { language: ['CN', 'EN'] };
+function buildFrameworkPlugin(distFileSet: Set<string>, current?: ScmlPlugin): ScmlPlugin | null {
+  const params = {
+    ...((current?.params && typeof current.params === 'object' && !Array.isArray(current.params) ? current.params : {}) as Record<string, unknown>),
+    language: ['CN', 'EN']
+  } as Record<string, unknown> & { module?: string[]; script?: string[] };
+  const npc = ((params.npc && typeof params.npc === 'object' && !Array.isArray(params.npc) ? params.npc : {}) as Record<string, unknown>) ?? {};
+  const sidebar = ((npc.Sidebar && typeof npc.Sidebar === 'object' && !Array.isArray(npc.Sidebar) ? npc.Sidebar : {}) as Record<string, unknown>) ?? {};
+  const clothes = Array.isArray(sidebar.clothes) ? sidebar.clothes.filter((file): file is string => typeof file === 'string') : [];
+
+  const sidebarClothes = clothes.slice();
+  for (const file of SIDEBAR_CLOTHES_FILES) if (!sidebarClothes.includes(file)) sidebarClothes.push(file);
+  sidebar.clothes = sidebarClothes;
+  npc.Sidebar = sidebar;
+  params.npc = npc;
+
   if (distFileSet.has('dist/module.js')) params.module = ['dist/module.js'];
   if (distFileSet.has('dist/script.js')) params.script = ['dist/script.js'];
   if (!params.module && !params.script) return null;
@@ -238,7 +254,8 @@ function buildAddonPlugins(
   tweePatcherRules: TweePatcherRule[],
   replacePatcherRules: ReplacePatcherRule[]
 ): ScmlPlugin[] {
-  upsertPlugin(addonPlugin, plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon', buildFrameworkPlugin(distFileSet), true);
+  const FrameworkPlugin = addonPlugin.find(plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon');
+  upsertPlugin(addonPlugin, plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon', buildFrameworkPlugin(distFileSet, FrameworkPlugin), true);
 
   upsertPlugin(
     addonPlugin,
@@ -331,8 +348,15 @@ export async function createZip(rootDir: string): Promise<Buffer> {
   sourceStyleFiles.forEach((buffer, filePath) => zip.addFile(filePath, buffer));
   distFiles.forEach((buffer, filePath) => zip.addFile(filePath, buffer));
 
-  const allFiles = [...publicFiles.keys(), ...sourceTweeFiles.keys(), ...sourceStyleFiles.keys(), ...distFiles.keys()].sort();
-  const distFileSet = new Set(distFiles.keys());
+  const allFiles: string[] = [];
+  publicFiles.forEach((_, filePath) => allFiles.push(filePath));
+  sourceTweeFiles.forEach((_, filePath) => allFiles.push(filePath));
+  sourceStyleFiles.forEach((_, filePath) => allFiles.push(filePath));
+  distFiles.forEach((_, filePath) => allFiles.push(filePath));
+  allFiles.sort();
+
+  const distFileSet = new Set<string>();
+  distFiles.forEach((_, filePath) => distFileSet.add(filePath));
   const bootFileLists = BootFileLists(allFiles);
   const beautySelectorImageFiles = BeautySelectorImageFiles(allFiles);
   const beautySelectorParams = BeautySelectorParams(beautySelectorImageFiles);

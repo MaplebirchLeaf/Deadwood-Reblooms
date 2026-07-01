@@ -4,6 +4,14 @@ import './traits';
 import './combat';
 import './Transformation/horse';
 import './characteristics';
+import './NamedNPC/Avery';
+import './NamedNPC/Doren';
+import './NamedNPC/Gwylan';
+import './NamedNPC/Kylar';
+import './NamedNPC/Robin';
+import './NamedNPC/Sam';
+import './NamedNPC/Sydney';
+import './NamedNPC/Whitney';
 
 (function (maplebirch) {
   'use strict';
@@ -87,5 +95,3 @@ import './characteristics';
     if (preview && /^#[0-9A-F]{3,6}$/i.test(color)) preview.style.backgroundColor = color;
   });
 })(maplebirch);
-
-export {};

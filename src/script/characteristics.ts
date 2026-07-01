@@ -36,7 +36,7 @@
 
   function pre(options: any) {
     options.DeadwoodReblooms ??= {};
-    options.DeadwoodReblooms['hunger&thirst'] = V.DeadwoodReblooms?.satiety <= 2000 || V.DeadwoodReblooms?.hydration <= 800;
+    options.DeadwoodReblooms['hunger&thirst'] = C.DeadwoodReblooms?.satiety <= 2000 || C.DeadwoodReblooms?.hydration <= 800;
     if (options.DeadwoodReblooms['hunger&thirst']) {
       options.mouth = 'frown';
       options.eyes_half = true;
