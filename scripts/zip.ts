@@ -67,7 +67,7 @@ interface BeautySelectorParams {
 }
 
 const BEAUTY_SELECTOR_TYPE = 'Deadwood-Reblooms-Images';
-const SIDEBAR_CLOTHES_FILES = ['NamedNPCClothes.yaml'];
+//const SIDEBAR_CLOTHES_FILES = ['NamedNPCClothes.yaml'];
 
 const scriptFileLists = {
   scriptFileList: ['dist/game.js'],
@@ -231,7 +231,7 @@ function buildFrameworkPlugin(distFileSet: Set<string>, current?: ScmlPlugin): S
   const clothes = Array.isArray(sidebar.clothes) ? sidebar.clothes.filter((file): file is string => typeof file === 'string') : [];
 
   const sidebarClothes = clothes.slice();
-  for (const file of SIDEBAR_CLOTHES_FILES) if (!sidebarClothes.includes(file)) sidebarClothes.push(file);
+  // for (const file of SIDEBAR_CLOTHES_FILES) if (!sidebarClothes.includes(file)) sidebarClothes.push(file);
   sidebar.clothes = sidebarClothes;
   npc.Sidebar = sidebar;
   params.npc = npc;

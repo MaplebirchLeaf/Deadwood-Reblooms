@@ -26,7 +26,8 @@ const rootDir = __dirname;
 export default (_env: unknown, argv: { mode?: string }): Configuration => {
   const isProduction = argv.mode === 'production';
   const entry = resolveEntries(rootDir);
-  if (Object.keys(entry).length === 0) throw new Error('No rspack entries found. Add one of src/module/main.ts, src/script/main.ts, src/game/main.ts, src/preload/main.ts, src/earlyload/main.ts, or src/inject_early/main.ts.');
+  if (Object.keys(entry).length === 0)
+    throw new Error('No rspack entries found. Add one of src/module/main.ts, src/script/main.ts, src/game/main.ts, src/preload/main.ts, src/earlyload/main.ts, or src/inject_early/main.ts.');
 
   const config: Configuration = {
     entry,
@@ -45,8 +46,7 @@ export default (_env: unknown, argv: { mode?: string }): Configuration => {
     module: {
       rules: [
         {
-          test: /\.(css|twee)$/,
-          resourceQuery: /raw/,
+          test: /\.(css|twee|ya?ml)$/,
           type: 'asset/source'
         },
         {
