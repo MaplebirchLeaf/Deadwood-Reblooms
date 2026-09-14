@@ -7,6 +7,7 @@ class LongerCombat {
   static readonly LINE_COUNT = 10;
   static readonly options = {
     seconds: 10,
+    unlimited: false,
     max: 3,
     rounds: 0,
     again: 50,
@@ -84,6 +85,7 @@ class LongerCombat {
 
   get shouldEndCombat(): boolean {
     const options = this.options;
+    if (options.unlimited) return false;
     if (typeof options.end === 'boolean') return options.end;
     const chance = Math.clamp(options.again, 0, 100);
     options.end = Number(options.rounds || 0) + 1 >= Math.max(1, Number(options.max) || 1) || Math.random() * 100 >= chance;
@@ -119,8 +121,9 @@ class LongerCombat {
 
     this.ejaculation(sWikifier);
 
-    options.rounds = Number(options.rounds || 0) + 1;
-    options.end = null;
+    const current = this.options;
+    current.rounds = Number(current.rounds || 0) + 1;
+    current.end = null;
     V.enemyarousal = Math.floor(V.enemyarousalmax * (0.15 + Math.random() * 0.1));
 
     sWikifier(`<br><br><<lanLink 'deadwood-reblooms.LongerCombat.next' ${JSON.stringify(this.passageTitle)} 'capitalize'>><<set _combatend to false>><</lanLink>>`);
