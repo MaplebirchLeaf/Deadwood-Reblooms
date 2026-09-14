@@ -345,13 +345,13 @@ class MoreLoveInterests {
       this.core.dynamic.regStateEvent('gate', 'MoreLoveInterest', {
         output: 'moreLoveInterestMessage',
         action: () => {
-          if (this.level >= 4) V.moreLoveInterest_message = true;
+          if (this.level >= 4) {
+            V.moreLoveInterest_message = true;
+            return;
+          }
           V.loveInterestList = V.loveInterestList.slice(0, Math.max(1, this.level));
         },
-        cond: () => {
-          if (this.level >= 4 && !V.moreLoveInterest_message) return true;
-          return V.loveInterestList?.length > Math.max(1, this.level);
-        }
+        cond: () => V.loveInterestList?.length > Math.max(1, this.level)
       });
     });
     this.core.once(':variable', () => this.sync());
