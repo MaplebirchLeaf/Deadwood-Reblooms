@@ -82,7 +82,7 @@ class DeadwoodReblooms {
   }
 }
 
-declare module '@scml-maplebirch/types/maplebirch' {
+declare module '@scml-dol-maplebirch/types' {
   interface Extensions {
     readonly DR: DeadwoodReblooms;
   }

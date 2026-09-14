@@ -1,6 +1,6 @@
 // ./src/script/SolarEclipse.ts
 
-import type { MaplebirchCore } from '@scml-maplebirch/types';
+import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 type WeatherType = 'clear' | 'lightClouds' | 'heavyClouds' | 'lightPrecipitation' | 'heavyPrecipitation' | 'storm' | 'thunderstorm';
 type Variant = 'default' | 'rain' | 'snow';

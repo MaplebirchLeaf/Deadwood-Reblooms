@@ -1,8 +1,10 @@
 // ./src/script/MoreLoveInterestsAndNPCAvatars.ts
 
-import type { MaplebirchCore } from '@scml-maplebirch/types';
+import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 export default function (maplebirch: MaplebirchCore) {
+  'use strict';
+
   maplebirch.tool.zone.inject({
     locationPassage: {
       Bedroom: [

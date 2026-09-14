@@ -1,6 +1,6 @@
 // ./src/module/MoreTransformations/Transformation.ts
 
-import type { MaplebirchCore } from '@scml-maplebirch/types';
+import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 export type TransformationOption = Parameters<MaplebirchCore['char']['transformation']['add']>[2];
 

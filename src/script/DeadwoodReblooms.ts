@@ -1,8 +1,10 @@
 // ./src/script/DeadwoodReblooms.ts
 
-import type { MaplebirchCore } from '@scml-maplebirch/types';
+import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 export default function (maplebirch: MaplebirchCore) {
+  'use strict';
+
   maplebirch.tool.addTo('Options', 'Deadwood-Reblooms-Options');
   maplebirch.tool.addTo('HintMobile', () =>
     V.options.maplebirch.modhint === 'mobile' && V.options.sidebarStats !== 'disabled' ? "<input type='button' class='saveMenuButton DeadwoodRebloomsHintMobile' onclick='maplebirch.DR.open()'>" : ''

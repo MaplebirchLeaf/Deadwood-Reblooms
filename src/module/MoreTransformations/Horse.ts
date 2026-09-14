@@ -2,7 +2,7 @@
 
 import message from '@/assets/transformations/horse.yaml';
 import Transformation, { TransformationOption } from './Transformation';
-import { MaplebirchCore } from '@scml-maplebirch/types';
+import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 class Horse extends Transformation {
   private static hairLikeFilter(colour: string) {
