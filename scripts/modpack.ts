@@ -1,7 +1,7 @@
 import AdmZip from 'adm-zip';
 import path from 'node:path';
 import { mkdir } from 'node:fs/promises';
-import { createZip, resolvePackageInfo, type PackageAsset } from './zip';
+import { createZip, modPackageInfo, type PackageAsset } from './zip';
 
 const MAGIC_NUMBER = new Uint8Array([0x4a, 0x65, 0x72, 0x65, 0x6d, 0x69, 0x65, 0x4d, 0x6f, 0x64, 0x4c, 0x6f, 0x61, 0x64, 0x65, 0x72]);
 const MOD_META_PROTOCOL_VERSION = 1;
@@ -218,7 +218,7 @@ export function createModPackFromZip(modName: string, zipBuffer: Buffer): Buffer
 }
 
 export async function createModPackPackage(rootDir: string, zipBuffer?: Buffer): Promise<PackageAsset> {
-  const info = await resolvePackageInfo(rootDir);
+  const info = await modPackageInfo(rootDir);
   return {
     fileName: `${info.baseName}.modpack`,
     buffer: createModPackFromZip(info.name, zipBuffer ?? (await createZip(rootDir)))
@@ -292,7 +292,14 @@ function createMeta(modName: string, boot: BlockData, files: FileBlock[], tree: 
 }
 
 function buildModPack(parts: Parts): Buffer {
-  const size = parts.magic.paddedDataLength + BLOCK_SIZE + parts.meta.paddedDataLength + parts.boot.paddedDataLength + parts.files.reduce((sum, file) => sum + file.paddedDataLength, 0) + parts.tree.paddedDataLength + 8;
+  const size =
+    parts.magic.paddedDataLength +
+    BLOCK_SIZE +
+    parts.meta.paddedDataLength +
+    parts.boot.paddedDataLength +
+    parts.files.reduce((sum, file) => sum + file.paddedDataLength, 0) +
+    parts.tree.paddedDataLength +
+    8;
   const buffer = new Uint8Array(size);
   const view = new DataView(buffer.buffer);
   let offset = 0;

@@ -67,7 +67,7 @@ interface BeautySelectorParams {
 }
 
 const BEAUTY_SELECTOR_TYPE = 'Deadwood-Reblooms-Images';
-//const SIDEBAR_CLOTHES_FILES = ['NamedNPCClothes.yaml'];
+const SIDEBAR_CLOTHES_DIR = 'named-npc-clothes';
 
 const scriptFileLists = {
   scriptFileList: ['dist/game.js'],
@@ -91,10 +91,12 @@ async function scan(dir: string, { base = '', prefix = '', excludes = [] }: Scan
       const fullPath = path.join(dir, entry.name);
       const normalizedFullPath = normalizePath(fullPath);
       if (excludes.some(exclude => entry.name === exclude || normalizedFullPath.includes(exclude))) continue;
-
       const relPath = normalizePath(path.join(prefix, base, entry.name));
       if (entry.isDirectory()) {
-        const subFiles = await scan(fullPath, { base: relPath, excludes });
+        const subFiles = await scan(fullPath, {
+          base: relPath,
+          excludes
+        });
         subFiles.forEach((buffer, filePath) => out.set(filePath, buffer));
         continue;
       }
@@ -109,8 +111,13 @@ function upsertPlugin(plugins: ScmlPlugin[], match: (plugin: ScmlPlugin) => bool
   const index = plugins.findIndex(match);
   if (index === -1) {
     if (!next) return;
-    if (toFront) plugins.unshift(next);
-    else plugins.push(next);
+
+    if (toFront) {
+      plugins.unshift(next);
+    } else {
+      plugins.push(next);
+    }
+
     return;
   }
 
@@ -158,9 +165,14 @@ function buildRules(content: string, type: 'twee' | 'patcher'): Array<TweePatche
       passage: String(item.passage ?? ''),
       findString: source
     };
-    if (typeof item.replace === 'string') rule.replace = item.replace;
-    else if (typeof item.replaceFile === 'string') rule.replaceFile = item.replaceFile;
-    else if (relative != null) rule.replace = relative;
+    if (typeof item.replace === 'string') {
+      rule.replace = item.replace;
+    } else if (typeof item.replaceFile === 'string') {
+      rule.replaceFile = item.replaceFile;
+    } else if (relative != null) {
+      rule.replace = relative;
+    }
+
     return rule.passage && rule.findString ? rule : null;
   });
 }
@@ -175,6 +187,17 @@ function BeautySelectorImageFiles(files: string[]): string[] {
     if (normalized.startsWith('dist/')) return false;
     return normalized.split('/')[0] === 'img';
   });
+}
+
+function SidebarClothesFiles(files: string[]): string[] {
+  const prefix = `${SIDEBAR_CLOTHES_DIR}/`;
+  return files
+    .filter(filePath => {
+      const normalized = normalizePath(filePath);
+      const ext = path.extname(normalized).toLowerCase();
+      return normalized.startsWith(prefix) && ADDITION_EXTENSIONS.has(ext) && ext !== '.json';
+    })
+    .sort();
 }
 
 function AdditionDirs(imgFileList: string[]): string[] {
@@ -205,9 +228,13 @@ function BootFileLists(files: string[]): BootFileLists {
   for (const filePath of files) {
     const ext = path.extname(filePath).toLowerCase();
     if (IMAGE_EXTENSIONS.has(ext)) continue;
-    if (ext === '.css') styleFileList.push(filePath);
-    else if (ext === '.twee') tweeFileList.push(filePath);
-    else if (ADDITION_EXTENSIONS.has(ext)) additionFile.push(filePath);
+    if (ext === '.css') {
+      styleFileList.push(filePath);
+    } else if (ext === '.twee') {
+      tweeFileList.push(filePath);
+    } else if (ADDITION_EXTENSIONS.has(ext)) {
+      additionFile.push(filePath);
+    }
   }
 
   return {
@@ -221,18 +248,17 @@ function filterExistingFiles(fileSet: Set<string>, fileList: readonly string[]):
   return fileList.filter(filePath => fileSet.has(filePath));
 }
 
-function buildFrameworkPlugin(distFileSet: Set<string>, current?: ScmlPlugin): ScmlPlugin | null {
+function buildFrameworkPlugin(distFileSet: Set<string>, sidebarClothesFiles: string[], current?: ScmlPlugin): ScmlPlugin | null {
   const params = {
     ...((current?.params && typeof current.params === 'object' && !Array.isArray(current.params) ? current.params : {}) as Record<string, unknown>),
     language: ['CN', 'EN']
-  } as Record<string, unknown> & { module?: string[]; script?: string[] };
-  const npc = ((params.npc && typeof params.npc === 'object' && !Array.isArray(params.npc) ? params.npc : {}) as Record<string, unknown>) ?? {};
-  const sidebar = ((npc.Sidebar && typeof npc.Sidebar === 'object' && !Array.isArray(npc.Sidebar) ? npc.Sidebar : {}) as Record<string, unknown>) ?? {};
-  const clothes = Array.isArray(sidebar.clothes) ? sidebar.clothes.filter((file): file is string => typeof file === 'string') : [];
-
-  const sidebarClothes = clothes.slice();
-  // for (const file of SIDEBAR_CLOTHES_FILES) if (!sidebarClothes.includes(file)) sidebarClothes.push(file);
-  sidebar.clothes = sidebarClothes;
+  } as Record<string, unknown> & {
+    module?: string[];
+    script?: string[];
+  };
+  const npc = (params.npc && typeof params.npc === 'object' && !Array.isArray(params.npc) ? params.npc : {}) as Record<string, unknown>;
+  const sidebar = (npc.Sidebar && typeof npc.Sidebar === 'object' && !Array.isArray(npc.Sidebar) ? npc.Sidebar : {}) as Record<string, unknown>;
+  sidebar.clothes = sidebarClothesFiles;
   npc.Sidebar = sidebar;
   params.npc = npc;
 
@@ -250,12 +276,13 @@ function buildFrameworkPlugin(distFileSet: Set<string>, current?: ScmlPlugin): S
 function buildAddonPlugins(
   addonPlugin: ScmlPlugin[],
   distFileSet: Set<string>,
+  sidebarClothesFiles: string[],
   beautySelectorParams: BeautySelectorParams | null,
   tweePatcherRules: TweePatcherRule[],
   replacePatcherRules: ReplacePatcherRule[]
 ): ScmlPlugin[] {
   const FrameworkPlugin = addonPlugin.find(plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon');
-  upsertPlugin(addonPlugin, plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon', buildFrameworkPlugin(distFileSet, FrameworkPlugin), true);
+  upsertPlugin(addonPlugin, plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon', buildFrameworkPlugin(distFileSet, sidebarClothesFiles, FrameworkPlugin), true);
 
   upsertPlugin(
     addonPlugin,
@@ -301,7 +328,7 @@ function buildAddonPlugins(
   return addonPlugin;
 }
 
-export async function resolvePackageInfo(rootDir: string): Promise<PackageInfo> {
+export async function modPackageInfo(rootDir: string): Promise<PackageInfo> {
   const pkg = (await readPackageJSON(rootDir)) as RootPackage;
   if (!pkg?.name) throw new Error('package.json missing name');
   if (!pkg?.version) throw new Error('package.json missing version');
@@ -337,7 +364,10 @@ export async function createZip(rootDir: string): Promise<Buffer> {
     scan(publicDir),
     scan(path.join(rootDir, 'src', 'twee')),
     scan(path.join(rootDir, 'src', 'styles')),
-    scan(distDir, { prefix: 'dist', excludes: ['/types/', '\\types\\'] }),
+    scan(distDir, {
+      prefix: 'dist',
+      excludes: ['/types/', '\\types\\']
+    }),
     readFile(path.join(rootDir, 'src', 'TweeReplacer.yaml'), 'utf8').catch(() => ''),
     readFile(path.join(rootDir, 'src', 'ReplacePatcher.yaml'), 'utf8').catch(() => '')
   ]);
@@ -358,14 +388,20 @@ export async function createZip(rootDir: string): Promise<Buffer> {
   const distFileSet = new Set<string>();
   distFiles.forEach((_, filePath) => distFileSet.add(filePath));
   const bootFileLists = BootFileLists(allFiles);
+  const sidebarClothesFiles = SidebarClothesFiles(allFiles);
   const beautySelectorImageFiles = BeautySelectorImageFiles(allFiles);
   const beautySelectorParams = BeautySelectorParams(beautySelectorImageFiles);
   const additionDirs = AdditionDirs(beautySelectorImageFiles);
   const tweePatcherRules = buildRules(tweePatcherRulesRaw, 'twee');
   const replacePatcherRules = buildRules(replacePatcherRaw, 'patcher');
   const addonPlugin = buildAddonPlugins(
-    Array.isArray(pkg.scml.addonPlugin) ? pkg.scml.addonPlugin.map(plugin => ({ ...plugin })) : [],
+    Array.isArray(pkg.scml.addonPlugin)
+      ? pkg.scml.addonPlugin.map(plugin => ({
+          ...plugin
+        }))
+      : [],
     distFileSet,
+    sidebarClothesFiles,
     beautySelectorParams,
     tweePatcherRules,
     replacePatcherRules
@@ -399,7 +435,7 @@ export async function createZip(rootDir: string): Promise<Buffer> {
 }
 
 export async function createZipPackage(rootDir: string): Promise<PackageAsset> {
-  const info = await resolvePackageInfo(rootDir);
+  const info = await modPackageInfo(rootDir);
   return {
     fileName: `${info.baseName}.mod.zip`,
     buffer: await createZip(rootDir)
