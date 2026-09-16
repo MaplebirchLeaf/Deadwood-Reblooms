@@ -3,6 +3,7 @@
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
+import { preferColours } from './Preference';
 import schoolUniforms from './SchoolUniform';
 
 export default function (
@@ -68,7 +69,7 @@ export default function (
     });
 
     // 日常服装
-    wardrobe.wear('Kylar', ['manor_bedroom', 'park', 'arcade', 'abduction'], 'hoodie_legwarmers');
+    wardrobe.wear('Kylar', ['manor_bedroom', 'park', 'arcade', 'abduction', 'basement'], 'hoodie_legwarmers');
     wardrobe.modify('Kylar', (clothes, context) => {
       if (context.key !== 'hoodie_legwarmers') return;
       const is_male = C.npc?.Kylar?.pronoun === 'm';
@@ -93,7 +94,7 @@ export default function (
         if (!options.length) continue;
         let colour = colours.clothes.get(group.key);
         if (!colour || !options.includes(colour)) {
-          colour = sidebar.randomColour(options, group.weights);
+          colour = sidebar.randomColour(options, preferColours('Kylar', group.weights, !is_male));
           colours.clothes.set(group.key, colour);
         }
         for (const item of items) item.colour = colour;
@@ -105,12 +106,28 @@ export default function (
     wardrobe.wear('Kylar', ['englishPlay', 'rehearsal'], 'english_play_taylor', () => V.englishPlayRoles?.Kylar === 'Taylor');
 
     // 绑架剧情服装
-    wardrobe.wear('Kylar', 'abduction_formal', 'vintage_pantsuit_formal', () => C.npc?.Kylar?.pronoun === 'm');
-    wardrobe.wear('Kylar', 'abduction_formal', 'vintage_skirtsuit_formal', () => C.npc?.Kylar?.pronoun !== 'm');
+    wardrobe.wear('Kylar', 'abduction_formal', 'rose_wedding_suit', () => C.npc?.Kylar?.pronoun === 'm');
+    wardrobe.wear('Kylar', 'abduction_formal', 'rose_wedding_dress', () => C.npc?.Kylar?.pronoun !== 'm');
     wardrobe.wear('Kylar', 'abduction_goth', 'gothic_formal_suit', () => C.npc?.Kylar?.pronoun === 'm');
     wardrobe.wear('Kylar', 'abduction_goth', 'gothic_rose_gown', () => C.npc?.Kylar?.pronoun !== 'm');
     wardrobe.wear('Kylar', 'abduction_swim', 'beach_shorts', () => C.npc?.Kylar?.pronoun === 'm');
     wardrobe.wear('Kylar', 'abduction_swim', 'bikini', () => C.npc?.Kylar?.pronoun !== 'm');
+    wardrobe.modify('Kylar', (clothes, context) => {
+      if (context.key !== 'gothic_rose_gown') return;
+      const items = [clothes.upper, clothes.lower].filter(item => item?.index !== undefined);
+      if (items.length !== 2) return;
+      const optionSets = items.map(item => setup.clothes[item.slot]?.[item.index]?.colour_options as string[] | undefined);
+      if (optionSets.some(options => !Array.isArray(options) || !options.length)) return;
+      const options = optionSets[0]!.filter(colour => optionSets.every(set => set!.includes(colour)));
+      if (!options.length) return;
+      const cacheKey = 'gothic_rose_gown.upper.lower';
+      let colour = colours.clothes.get(cacheKey);
+      if (!colour || !options.includes(colour)) {
+        colour = options.includes('green') ? 'green' : sidebar.randomColour(options, preferColours('Kylar'));
+        colours.clothes.set(cacheKey, colour);
+      }
+      for (const item of items) item.colour = colour;
+    });
 
     // 地下室婚礼
     wardrobe.wear('Kylar', 'wedding', 'rose_wedding_suit', () => C.npc?.Kylar?.pronoun === 'm');
@@ -131,6 +148,38 @@ export default function (
         if (!colours.christmas.has('female')) colours.christmas.set('female', femaleChristmas[Math.floor(Math.random() * femaleChristmas.length)]);
         return colours.christmas.get('female') === key;
       });
+    }
+    wardrobe.modify('Kylar', (clothes, context) => {
+      const title = maplebirch.passage.title;
+
+      // 圣诞服被烟囱撕掉后只剩下身内衣；重新穿上时衣料仍破得遮不住身体。
+      if (context.location === 'christmas') {
+        if (/^Kylar Christmas (?:3|4|5)$/.test(title)) {
+          for (const slot of ['over_head', 'over_upper', 'over_lower', 'upper', 'lower', 'under_upper', 'head', 'face', 'neck', 'hands', 'legs', 'feet', 'handheld']) delete clothes[slot];
+          return;
+        }
+
+        if (/^Kylar Christmas (?:6|7|8|9|10|11)$/.test(title)) {
+          damage(clothes.upper, 0.2);
+          damage(clothes.lower, 0.2);
+          delete clothes.under_upper;
+          if (/^Kylar Christmas (?:10|11)$/.test(title)) delete clothes.under_lower;
+        }
+      }
+
+      // 地下室强暴结束时普通衣物已经残破，下一段婚礼再换成完整礼服。
+      if (context.location === 'basement' && title === 'Kylar Basement Rape Finish') {
+        damage(clothes.upper, 0.4);
+        damage(clothes.lower, 0.4);
+      }
+    });
+
+    function damage(item: Record<string, any> | undefined, ratio: number): void {
+      if (!item) return;
+      const maximum = item.integrity_max ?? item.integrity;
+      if (!Number.isFinite(maximum)) return;
+      item.integrity_max = maximum;
+      item.integrity = Math.max(1, Math.floor(maximum * ratio));
     }
 
     // 监狱服装
@@ -163,14 +212,16 @@ export default function (
 
     // 节日剧情
     if (title.startsWith('Kylar Halloween')) return 'halloween';
-    if (/^Kylar Christmas (?:3|4|5)(?:\b|$)/.test(title)) return 'naked';
     if (title.startsWith('Kylar Christmas')) return 'christmas';
 
     // 地下室婚礼
     if (['Kylar Basement 4', 'Kylar Basement Protest', 'Kylar Basement Silent', 'Kylar Basement Police'].some(prefix => title.startsWith(prefix))) return 'wedding';
 
-    // 换装前的剧情过渡
-    if (title.startsWith('Kylar Bath') || title.startsWith('Kylar Basement')) return '';
+    // 换装前的地下室剧情沿用日常服，破损由衣柜逻辑处理。
+    if (title.startsWith('Kylar Basement')) return 'basement';
+
+    // 浴室其它过渡段落不指定新套装。
+    if (title.startsWith('Kylar Bath')) return '';
 
     // 非活动状态
     if (C.npc?.Kylar?.state !== 'active') return C.npc?.Kylar?.state === '' ? 'inactive' : '';

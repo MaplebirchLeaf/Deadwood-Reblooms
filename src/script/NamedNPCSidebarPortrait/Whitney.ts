@@ -1,7 +1,8 @@
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
-import schoolUniforms from './SchoolUniform';
+import { preferColours } from './Preference';
+import schoolUniforms, { schoolUniformKeys } from './SchoolUniform';
 
 export default function (maplebirch: MaplebirchCore, colours: { school: Map<string, string>; schoolOutfit: Map<string, string>; outfit: Map<string, string>; clothes: Map<string, string> }): void {
   maplebirch.npc.addSchedule('Whitney', schedule =>
@@ -30,7 +31,8 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
 
     // 基层内衣
     wardrobe.base('Whitney', (clothes, context) => {
-      if (context.key === 'naked') return;
+      // 万圣节破布下面明确没有其它衣物。
+      if (context.key === 'naked' || context.location === 'halloween') return;
       const is_male = C.npc?.Whitney?.pronoun === 'm';
       for (const item of Object.values(is_male ? male : female)) {
         if (context.location === 'topless' && item.slot === 'under_upper') continue;
@@ -55,8 +57,37 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     wardrobe.wear('Whitney', casualLocations, 'tshirt_shorts', () => Time.season !== 'winter' && (Time.season === 'summer' || Weather.temperature > 24));
     wardrobe.wear('Whitney', casualLocations, 'hoodie_legwarmers', () => Time.season === 'winter');
 
+    // T恤短裤：男性款 T 恤和中性牛仔短裤按日选择
+    wardrobe.modify('Whitney', (clothes, context) => {
+      if (context.key !== 'tshirt_shorts') return;
+      const upperOptions = C.npc?.Whitney?.pronoun === 'm' ? ['standard', 'band_t_shirt', 'boxy_t_shirt'] : ['standard'];
+      let upper = colours.outfit.get('tshirt_shorts.upper');
+      if (!upper || !upperOptions.includes(upper)) {
+        upper = upperOptions[Math.floor(Math.random() * upperOptions.length)];
+        colours.outfit.set('tshirt_shorts.upper', upper);
+      }
+      if (upper === 'band_t_shirt') sidebar.apply(clothes, Clothing.band_t_shirt);
+      if (upper === 'boxy_t_shirt') sidebar.apply(clothes, Clothing.boxy_t_shirt);
+
+      const lowerOptions = ['standard', 'denim_shorts'];
+      let lower = colours.outfit.get('tshirt_shorts.lower');
+      if (!lower || !lowerOptions.includes(lower)) {
+        lower = lowerOptions[Math.floor(Math.random() * lowerOptions.length)];
+        colours.outfit.set('tshirt_shorts.lower', lower);
+      }
+      if (lower === 'denim_shorts') sidebar.apply(clothes, Clothing.denim_shorts);
+    });
+
     // 学校制服
     schoolUniforms(maplebirch, sidebar, 'Whitney', 'school', colours);
+
+    // 仅校服使用卷袖素材；上衣塞入仍由 tucked[0] 控制
+    wardrobe.modify('Whitney', (clothes, context) => {
+      if (!(schoolUniformKeys as readonly string[]).includes(context.key)) return;
+      const upper = clothes.upper;
+      if (upper?.index === undefined || setup.clothes.upper?.[upper.index]?.altsleeve === undefined) return;
+      upper.altsleeve = 'alt';
+    });
 
     // 基础校服配色
     wardrobe.modify('Whitney', (clothes, context) => {
@@ -160,7 +191,7 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
         const cacheKey = `${context.key}.${rule.slots.join('.')}`;
         let colour = colours.clothes.get(cacheKey);
         if (!colour || !options.includes(colour)) {
-          colour = sidebar.randomColour(options, rule.weights());
+          colour = sidebar.randomColour(options, preferColours('Whitney', rule.weights(), C.npc?.Whitney?.pronoun !== 'm'));
           colours.clothes.set(cacheKey, colour);
         }
         for (const item of items) item.colour = colour;

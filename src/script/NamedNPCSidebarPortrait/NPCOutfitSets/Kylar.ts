@@ -6,8 +6,6 @@ const wardrobeKeys = [
   'hoodie_legwarmers',
   'english_play_sterling',
   'english_play_taylor',
-  'vintage_pantsuit_formal',
-  'vintage_skirtsuit_formal',
   'gothic_formal_suit',
   'gothic_rose_gown',
   'rose_wedding_suit',
@@ -68,7 +66,7 @@ export default function (maplebirch: MaplebirchCore): void {
         ['lower', lower]
       ] as const) {
         set.clothes[slot].name = item.name;
-        set.clothes[slot].integrity_max = item.integrity ?? item.integrity_max ?? 100;
+        set.clothes[slot].integrity_max = item.integrity_max ?? item.integrity ?? 100;
         set.clothes[slot].desc = item.cn_name_cap ?? item.name;
       }
       set.desc = `${upper.cn_name_cap ?? upper.name}和${lower.cn_name_cap ?? lower.name}`;

@@ -6,6 +6,7 @@ const wardrobeKeys = [
   ...schoolUniformKeys,
   'nun_habit',
   'monk_habit',
+  'novice_nun_habit',
   'initiate_robes',
   'sexy_nun_habit',
   'english_play_sterling',
@@ -34,7 +35,11 @@ export default function (maplebirch: MaplebirchCore): void {
       outfitNames.push(name);
       maplebirch.npc.addClothes({
         name,
-        type: ['nun_habit', 'monk_habit', 'initiate_robes', 'sexy_nun_habit'].includes(key) ? 'temple' : upper.type?.includes('school') || lower.type?.includes('school') ? 'school' : 'custom',
+        type: ['nun_habit', 'monk_habit', 'novice_nun_habit', 'initiate_robes', 'sexy_nun_habit'].includes(key)
+          ? 'temple'
+          : upper.type?.includes('school') || lower.type?.includes('school')
+            ? 'school'
+            : 'custom',
         gender: upper.gender === lower.gender ? upper.gender : 'n',
         upper: {
           name: upper.name,

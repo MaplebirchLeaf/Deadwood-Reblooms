@@ -3,6 +3,7 @@
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
+import { preferColours } from './Preference';
 import schoolUniforms from './SchoolUniform';
 
 export default function (
@@ -68,11 +69,48 @@ export default function (
     wardrobe.wear('Robin', 'garden', 'tshirt_shorts', () => C.npc?.Robin?.pronoun === 'm' && Time.season !== 'winter');
     wardrobe.wear('Robin', 'garden', 'summer_sundress', () => C.npc?.Robin?.pronoun !== 'm' && Time.season !== 'winter');
 
+    // 夏日连衣裙：普通、碎花、荷叶边与露背款按日选择
+    const sundressVariants = {
+      floral: [Clothing.floral_sundress_upper, Clothing.floral_sundress_lower],
+      frilled: [Clothing.frilled_sundress_upper, Clothing.frilled_sundress_lower],
+      halter: [Clothing.halter_sundress_upper, Clothing.halter_sundress_lower]
+    } as const;
+    wardrobe.modify('Robin', (clothes, context) => {
+      if (context.key !== 'summer_sundress') return;
+      const options = ['standard', ...Object.keys(sundressVariants)];
+      colours.outfit.set('sundress', colours.outfit.get('sundress') ?? options.either() ?? 'standard');
+      const variant = sundressVariants[colours.outfit.get('sundress') as keyof typeof sundressVariants];
+      if (!variant) return;
+      for (const item of variant) sidebar.apply(clothes, item);
+    });
+
+    // T恤短裤：男性款 T 恤和中性牛仔短裤按日选择
+    wardrobe.modify('Robin', (clothes, context) => {
+      if (context.key !== 'tshirt_shorts') return;
+      const upperOptions = C.npc?.Robin?.pronoun === 'm' ? ['standard', 'band_t_shirt', 'boxy_t_shirt'] : ['standard'];
+      let upper = colours.outfit.get('tshirt_shorts.upper');
+      if (!upper || !upperOptions.includes(upper)) {
+        upper = upperOptions[Math.floor(Math.random() * upperOptions.length)];
+        colours.outfit.set('tshirt_shorts.upper', upper);
+      }
+      if (upper === 'band_t_shirt') sidebar.apply(clothes, Clothing.band_t_shirt);
+      if (upper === 'boxy_t_shirt') sidebar.apply(clothes, Clothing.boxy_t_shirt);
+
+      const lowerOptions = ['standard', 'denim_shorts'];
+      let lower = colours.outfit.get('tshirt_shorts.lower');
+      if (!lower || !lowerOptions.includes(lower)) {
+        lower = lowerOptions[Math.floor(Math.random() * lowerOptions.length)];
+        colours.outfit.set('tshirt_shorts.lower', lower);
+      }
+      if (lower === 'denim_shorts') sidebar.apply(clothes, Clothing.denim_shorts);
+    });
+
     // 浴室服装
     wardrobe.wear('Robin', 'bath', 'towel_wrap');
 
     // 剧情服装
     wardrobe.wear('Robin', ['naked', 'docks', 'dinner', 'underground'], 'naked');
+    wardrobe.wear('Robin', 'mist', 'rags');
     wardrobe.wear('Robin', 'giftWrap', 'gift_wrap');
 
     // 寒冷服装
@@ -172,7 +210,7 @@ export default function (
         const cacheKey = `${context.key}.${rule.slots.join('.')}`;
         let colour = colours.clothes.get(cacheKey);
         if (!colour) {
-          colour = sidebar.randomColour(options, typeof rule.weights === 'function' ? rule.weights() : rule.weights);
+          colour = sidebar.randomColour(options, preferColours('Robin', typeof rule.weights === 'function' ? rule.weights() : rule.weights, C.npc?.Robin?.pronoun !== 'm'));
           colours.clothes.set(cacheKey, colour);
         }
         for (const item of items) item.colour = colour;
@@ -233,12 +271,16 @@ export default function (
     // 强制位置覆盖（剧情回放等）
     if (V.robinlocationoverride && V.robinlocationoverride.during.includes(Time.hour)) return V.robinlocationoverride.location;
 
+    // 迷雾营救：Rescue 2 中途从垃圾堆找到破衣，后续返程继续穿着。
+    if (['Robin Mist Rescue 2', 'Robin Mist Walk', 'Robin Mist Abandon'].includes(title)) return 'mist';
+    if (['Robin Mist Intro', 'Robin Mist Fight', 'Robin Mist Fight Finish', 'Robin Mist Rescue', 'Robin Mist Forgive', 'Robin Mist Silence'].includes(title)) return 'naked';
+
     // 剧情裸体
     if (
       ['Robin Hospital Watch', 'Robin Hospital 2', 'Docks_Robin', 'Underground Robin Hunt Intro'].some(prefix => title.startsWith(prefix)) ||
       (title.startsWith('Robin Unwrap') && !title.startsWith('Robin Unwrap No')) ||
       title.startsWith('Canteen Robin Sex') ||
-      ['Robin Forest Vore Comfort 2', 'Robin Forest Vore Tasty 2', 'Robin Forest Vore Tasty 3', 'Robin Mist Rescue'].some(prefix => title.startsWith(prefix))
+      ['Robin Forest Vore Comfort 2', 'Robin Forest Vore Tasty 2', 'Robin Forest Vore Tasty 3'].some(prefix => title.startsWith(prefix))
     )
       return 'naked';
 

@@ -3,7 +3,8 @@
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
-import schoolUniforms from './SchoolUniform';
+import { preferColours } from './Preference';
+import schoolUniforms, { schoolUniformKeys } from './SchoolUniform';
 
 export default function (maplebirch: MaplebirchCore, colours: { school: Map<string, string>; schoolOutfit: Map<string, string>; swim: Map<string, string>; cow?: string }) {
   'use strict';
@@ -68,6 +69,14 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     const school = ['library', 'science', 'class', 'canteen', 'late'];
     schoolUniforms(maplebirch, sidebar, 'Sydney', school, colours);
 
+    // 仅校服使用卷袖素材，神殿和其他剧情服装保持原始袖型
+    wardrobe.modify('Sydney', (clothes, context) => {
+      if (!(schoolUniformKeys as readonly string[]).includes(context.key)) return;
+      const upper = clothes.upper;
+      if (upper?.index === undefined || setup.clothes.upper?.[upper.index]?.altsleeve === undefined) return;
+      upper.altsleeve = 'alt';
+    });
+
     // 校服裙
     wardrobe.modify('Sydney', (clothes, context) => {
       if (!['school_uniform_skirt', 'classic_serafuku_short_skirt'].includes(context.key)) return;
@@ -81,16 +90,20 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
       const options = setup.clothes.hands?.[clothes.hands?.index]?.accessory_colour_options as string[] | undefined;
       if (!options) return;
       const weights = Object.fromEntries(options.filter(colour => colour !== 'custom').map(colour => [colour, 1]));
-      colours.cow ??= sidebar.randomColour(options, weights);
+      colours.cow ??= sidebar.randomColour(options, preferColours('Sydney', weights));
       for (const slot of ['upper', 'lower', 'under_upper', 'under_lower', 'head', 'hands', 'legs']) {
         if (clothes[slot]) clothes[slot].accessory_colour = colours.cow;
       }
     });
 
-    // 神殿基础服装：男性穿修士服，其他性别穿修女服，见习教徒穿见习长袍
+    // 神殿基础服装：男性穿修士服，其他性别穿修女服，女性见习教徒穿见习修女服
     wardrobe.wear('Sydney', 'temple', 'nun_habit', () => C.npc?.Sydney?.pronoun !== 'm' && V.sydney?.rank === 'monk');
     wardrobe.wear('Sydney', 'temple', 'monk_habit', () => C.npc?.Sydney?.pronoun === 'm' && V.sydney?.rank === 'monk');
-    wardrobe.wear('Sydney', 'temple', 'initiate_robes', () => ['initiate', '见习教徒'].includes(V.sydney?.rank));
+    wardrobe.wear('Sydney', 'temple', 'novice_nun_habit', () => C.npc?.Sydney?.pronoun !== 'm' && ['initiate', '见习教徒'].includes(V.sydney?.rank));
+    wardrobe.wear('Sydney', 'temple', 'initiate_robes', () => C.npc?.Sydney?.pronoun === 'm' && ['initiate', '见习教徒'].includes(V.sydney?.rank));
+
+    // 承诺仪式评估：女性换上宣誓修女服；正式仪式阶段仍按原剧情脱光
+    wardrobe.wear('Sydney', 'promise', 'avowed_nun_habit', () => C.npc?.Sydney?.pronoun !== 'm');
 
     // 特殊修女服：满足恋爱、腐化和欲望条件时覆盖普通修女服
     wardrobe.wear(
@@ -147,7 +160,8 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
       }
       let colour = colours.swim.get(context.key);
       if (!colour) {
-        colour = sidebar.randomColour(options, weights);
+        const femaleStyle = ['school_swimsuit', 'bikini', 'microkini'].includes(context.key);
+        colour = sidebar.randomColour(options, preferColours('Sydney', weights, femaleStyle));
         colours.swim.set(context.key, colour);
       }
       if (clothes.under_upper) clothes.under_upper.colour = colour;
@@ -220,6 +234,9 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     // 英语剧排练
     if (title.startsWith('English Play Rehearse') && (title.includes('Sydney') || title.includes('Both'))) return 'rehearsal';
 
+    // 腐化噩梦以神殿服装开始，后段由剧情脱衣规则清空
+    if (title.startsWith('Nightmare Corrupt Sydney')) return 'temple';
+
     // 海滨长廊保留原服装
     if (title.startsWith('Sydney Beach Promenade') || title === 'Sydney Beach Start') return '';
 
@@ -246,6 +263,9 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
         return '';
       return 'shopOpening';
     }
+
+    // 承诺仪式评估服装优先于普通神殿服装
+    if (title.startsWith('Sydney Temple Pure')) return 'promise';
 
     // 明确剧情地点
     if (title.startsWith('Sydney Temple') || title.startsWith('Temple Sydney')) return 'temple';

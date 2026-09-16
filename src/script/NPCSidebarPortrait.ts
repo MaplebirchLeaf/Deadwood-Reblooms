@@ -2,11 +2,16 @@
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type SidebarPortrait from '../module/NPCSidebarPortrait';
+import AlexSidebar from './NamedNPCSidebarPortrait/Alex';
+import AverySidebar from './NamedNPCSidebarPortrait/Avery';
+import EdenSidebar from './NamedNPCSidebarPortrait/Eden';
 import KylarSidebar from './NamedNPCSidebarPortrait/Kylar';
+import GwylanSidebar from './NamedNPCSidebarPortrait/Gwylan';
 import NPCOutfitSets from './NamedNPCSidebarPortrait/NPCOutfitSets';
 import RobinSidebar from './NamedNPCSidebarPortrait/Robin';
 import SydneySidebar from './NamedNPCSidebarPortrait/Sydney';
 import WhitneySidebar from './NamedNPCSidebarPortrait/Whitney';
+import { preferColours } from './NamedNPCSidebarPortrait/Preference';
 
 export default function (maplebirch: MaplebirchCore) {
   const sidebar = maplebirch.get('NPCSidebarPortrait') as SidebarPortrait;
@@ -38,16 +43,30 @@ export default function (maplebirch: MaplebirchCore) {
     outfit: new Map<string, string>(),
     clothes: new Map<string, string>()
   };
+  const gwylanColours = {
+    outfit: new Map<string, string>()
+  };
+  const averyColours = {
+    outfit: new Map<string, string>()
+  };
+  const alexColours = {
+    outfit: new Map<string, string>()
+  };
 
   RobinSidebar(maplebirch, robinColours);
   SydneySidebar(maplebirch, sydneyColours);
   KylarSidebar(maplebirch, kylarColours);
   WhitneySidebar(maplebirch, whitneyColours);
+  GwylanSidebar(maplebirch, gwylanColours);
+  AverySidebar(maplebirch, averyColours);
+  AlexSidebar(maplebirch, alexColours);
+  EdenSidebar(maplebirch);
   NPCOutfitSets(maplebirch);
 
   function pyjamaColour(npcName: string): string {
-    const weights: Record<string, number> =
-      C.npc?.[npcName]?.pronoun === 'm' ? { blue: 6, teal: 3, white: 3, black: 2, purple: 1, red: 1 } : { pink: 6, purple: 4, white: 4, blue: 2, teal: 2, red: 1, black: 1 };
+    const isMale = C.npc?.[npcName]?.pronoun === 'm';
+    const genderWeights: Record<string, number> = isMale ? { blue: 6, teal: 3, white: 3, black: 2, purple: 1, red: 1 } : { pink: 6, purple: 4, white: 4, blue: 2, teal: 2, red: 1, black: 1 };
+    const weights = npcName === 'Robin' || npcName === 'Sydney' ? preferColours(npcName, genderWeights, !isMale) : genderWeights;
     return sidebar.randomColour(setup.clothes.upper[2].colour_options as string[], weights);
   }
 
@@ -68,6 +87,9 @@ export default function (maplebirch: MaplebirchCore) {
       kylarColours.roseEyepatch = undefined;
       whitneyColours.outfit.clear();
       whitneyColours.clothes.clear();
+      gwylanColours.outfit.clear();
+      averyColours.outfit.clear();
+      alexColours.outfit.clear();
     },
     exact: true
   });
