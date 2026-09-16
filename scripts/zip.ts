@@ -121,7 +121,10 @@ function upsertPlugin(plugins: ScmlPlugin[], match: (plugin: ScmlPlugin) => bool
     return;
   }
 
-  if (!next) return;
+  if (!next) {
+    plugins.splice(index, 1);
+    return;
+  }
   plugins[index] = next;
 
   if (toFront && index > 0) {
@@ -258,13 +261,18 @@ function buildFrameworkPlugin(distFileSet: Set<string>, sidebarClothesFiles: str
   };
   const npc = (params.npc && typeof params.npc === 'object' && !Array.isArray(params.npc) ? params.npc : {}) as Record<string, unknown>;
   const sidebar = (npc.Sidebar && typeof npc.Sidebar === 'object' && !Array.isArray(npc.Sidebar) ? npc.Sidebar : {}) as Record<string, unknown>;
-  sidebar.clothes = sidebarClothesFiles;
-  npc.Sidebar = sidebar;
-  params.npc = npc;
+  if (sidebarClothesFiles.length) sidebar.clothes = sidebarClothesFiles;
+  else delete sidebar.clothes;
+  if (Object.keys(sidebar).length) npc.Sidebar = sidebar;
+  else delete npc.Sidebar;
+  if (Object.keys(npc).length) params.npc = npc;
+  else delete params.npc;
 
+  delete params.module;
+  delete params.script;
   if (distFileSet.has('dist/module.js')) params.module = ['dist/module.js'];
   if (distFileSet.has('dist/script.js')) params.script = ['dist/script.js'];
-  if (!params.module && !params.script) return null;
+  if (!params.module && !params.script && Object.keys(params).every(key => key === 'language')) return null;
   return {
     modName: 'maplebirch',
     addonName: 'maplebirchAddon',
@@ -275,12 +283,15 @@ function buildFrameworkPlugin(distFileSet: Set<string>, sidebarClothesFiles: str
 
 function buildAddonPlugins(
   addonPlugin: ScmlPlugin[],
+  dependencies: ScmlConfig['dependenceInfo'],
+  clothes: Array<{ key: string; filePath: string }>,
   distFileSet: Set<string>,
   sidebarClothesFiles: string[],
   beautySelectorParams: BeautySelectorParams | null,
   tweePatcherRules: TweePatcherRule[],
   replacePatcherRules: ReplacePatcherRule[]
 ): ScmlPlugin[] {
+  const versions = new Map(dependencies.map(dep => [dep.modName, dep.version]));
   const FrameworkPlugin = addonPlugin.find(plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon');
   upsertPlugin(addonPlugin, plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon', buildFrameworkPlugin(distFileSet, sidebarClothesFiles, FrameworkPlugin), true);
 
@@ -325,7 +336,42 @@ function buildAddonPlugins(
       : null
   );
 
-  return addonPlugin;
+  upsertPlugin(
+    addonPlugin,
+    plugin => plugin.modName === 'ModdedClothesAddon' && plugin.addonName === 'ModdedClothesAddon',
+    clothes.length ? { modName: 'ModdedClothesAddon', addonName: 'ModdedClothesAddon', modVersion: '^1.1.0', params: { clothes } } : null
+  );
+
+  return addonPlugin.filter(plugin => versions.has(plugin.modName) && hasContent(plugin.params)).map(plugin => ({ ...plugin, modVersion: versions.get(plugin.modName)! }));
+}
+
+function hasContent(value: unknown): boolean {
+  if (value == null) return false;
+  if (Array.isArray(value)) return value.some(hasContent);
+  if (typeof value === 'object') return Object.values(value).some(hasContent);
+  if (typeof value === 'string') return value.trim().length > 0;
+  return true;
+}
+
+function ClothesFiles(files: Map<string, Buffer>): Array<{ key: string; filePath: string }> {
+  const slots = new Set(['head', 'face', 'neck', 'upper', 'lower', 'under_upper', 'under_lower', 'over_upper', 'over_lower', 'legs', 'feet', 'hands', 'genitals']);
+  const clothes: Array<{ key: string; filePath: string }> = [];
+  for (const [filePath, buffer] of files) {
+    if (!/^clothes\/[^/]+\.json$/.test(filePath)) continue;
+    const key = path.basename(filePath, '.json');
+    if (!slots.has(key)) continue;
+    const content = buffer.toString('utf8').trim();
+    if (!content) continue;
+    let data: unknown;
+    try {
+      data = JSON.parse(content);
+    } catch {
+      throw new Error(`Invalid clothing JSON: ${filePath}`);
+    }
+    if (!Array.isArray(data) || data.some(item => !item || typeof item !== 'object' || Array.isArray(item))) throw new Error(`Clothing file must contain an array of objects: ${filePath}`);
+    if (data.length) clothes.push({ key, filePath });
+  }
+  return clothes;
 }
 
 export async function modPackageInfo(rootDir: string): Promise<PackageInfo> {
@@ -400,6 +446,8 @@ export async function createZip(rootDir: string): Promise<Buffer> {
           ...plugin
         }))
       : [],
+    pkg.scml.dependenceInfo,
+    ClothesFiles(publicFiles),
     distFileSet,
     sidebarClothesFiles,
     beautySelectorParams,
