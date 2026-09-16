@@ -15,7 +15,7 @@ class SolarEclipse {
   }
 
   public static text(weather: WeatherType): string {
-    const index = maplebirch.CA.StageIndex ?? 0;
+    const index = maplebirch.CA.SolarEclipseStageIndex ?? 0;
     return maplebirch.t(`deadwood-reblooms.SolarEclipse.${weather === 'storm' ? 'thunderstorm' : weather}.${SolarEclipse.variant(weather)}.${index}`);
   }
 
@@ -33,14 +33,14 @@ class SolarEclipse {
       solarEclipse: {
         configurable: true,
         get(): boolean {
-          return maplebirch.CA.Active;
+          return maplebirch.CA.SolarEclipseActive;
         }
       },
 
       meteorShower: {
         configurable: true,
         get(): boolean {
-          return maplebirch.CA.MeteorActive;
+          return maplebirch.CA.MeteorShowerActive;
         }
       },
 

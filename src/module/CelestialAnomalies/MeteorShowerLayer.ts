@@ -7,7 +7,7 @@ function meteorEffect(rate: number) {
     params: { rate },
     bindings: {
       strength(): number {
-        return maplebirch.CA.MeteorStrength;
+        return maplebirch.CA.MeteorShowerStrength;
       },
       visibility(): number {
         return Math.min(1, Math.max(0.05, 1 - Weather.overcast * 0.8 - Math.max(0, Weather.precipitationIntensity - 1) * 0.15));

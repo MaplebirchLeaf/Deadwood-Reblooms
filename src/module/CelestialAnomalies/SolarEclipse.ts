@@ -4,7 +4,7 @@ import apply from './SolarEclipseLayer';
 
 type StageIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-export function solarEclipseProgress(current: number, start: number, end: number): number {
+function progress(current: number, start: number, end: number): number {
   return Math.min(1, Math.max(0, (current - start) / (end - start)));
 }
 
@@ -115,7 +115,7 @@ class SolarEclipse {
     if (!eclipse) return null;
     const seconds = date.hour * 3600 + date.minute * 60 + date.second;
     if (seconds < eclipse.start || seconds > eclipse.end) return null;
-    const phase = solarEclipseProgress(seconds, eclipse.start, eclipse.end);
+    const phase = progress(seconds, eclipse.start, eclipse.end);
     return {
       phase,
       stageIndex: this.stage(phase)
