@@ -4,6 +4,10 @@ import apply from './SolarEclipseLayer';
 
 type StageIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
+export function solarEclipseProgress(current: number, start: number, end: number): number {
+  return Math.min(1, Math.max(0, (current - start) / (end - start)));
+}
+
 export interface SolarEclipseStored {
   year: number;
   month: number;
@@ -28,11 +32,7 @@ class SolarEclipse {
 
   private cache = {
     date: '',
-    eclipse: null as SolarEclipseStored | null,
-    current: null as {
-      phase: number;
-      stageIndex: StageIndex;
-    } | null
+    eclipse: null as SolarEclipseStored | null
   };
 
   constructor(readonly core: typeof maplebirch) {
@@ -106,7 +106,6 @@ class SolarEclipse {
     if (this.cache.date === key) return this.cache.eclipse;
     this.cache.date = key;
     this.cache.eclipse = this.build(date.midnight);
-    this.cache.current = null;
     return this.cache.eclipse;
   }
 
@@ -116,13 +115,11 @@ class SolarEclipse {
     if (!eclipse) return null;
     const seconds = date.hour * 3600 + date.minute * 60 + date.second;
     if (seconds < eclipse.start || seconds > eclipse.end) return null;
-    if (this.cache.current) return this.cache.current;
-    const phase = (seconds - eclipse.start) / (eclipse.end - eclipse.start);
-    this.cache.current = {
+    const phase = solarEclipseProgress(seconds, eclipse.start, eclipse.end);
+    return {
       phase,
       stageIndex: this.stage(phase)
     };
-    return this.cache.current;
   }
 
   private stage(phase: number): StageIndex {

@@ -24,6 +24,7 @@ class SolarEclipse {
       const target = setup.WeatherDescriptions.type[weather];
       if (!target) return;
       target.solarEclipse = (): string => SolarEclipse.text(weather);
+      target.meteorShower = (): string => maplebirch.t(`deadwood-reblooms.MeteorShower.${weather}`);
     });
   }
 
@@ -36,10 +37,18 @@ class SolarEclipse {
         }
       },
 
+      meteorShower: {
+        configurable: true,
+        get(): boolean {
+          return maplebirch.CA.MeteorActive;
+        }
+      },
+
       skyState: {
         configurable: true,
         get(this: any): string {
           if (Weather.solarEclipse) return 'solarEclipse';
+          if (Weather.meteorShower) return 'meteorShower';
           if (Weather.bloodMoon) return 'bloodMoon';
           return this.dayState;
         }
