@@ -6,7 +6,8 @@ declare global {
     isPossibleLoveInterest(name: string): boolean;
   }
 
-  function wearingCondom(npcNumber: number): boolean;
+  function wearingCondom(who: number | 'player'): boolean;
+  function playerHasStrapon(): boolean;
   const Renderer: { CanvasModels: { main: any }; [key: string]: any };
   function isPartEnabled(type: string): boolean;
   function playerNormalPregnancyType(): string;
