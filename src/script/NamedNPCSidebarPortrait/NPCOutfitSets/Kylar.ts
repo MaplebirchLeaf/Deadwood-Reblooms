@@ -1,9 +1,15 @@
+// ./src/script/NamedNPCSidebarPortrait/NPCOutfitSets/Kylar.ts
+
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
-import { schoolUniformKeys } from '../SchoolUniform';
+import { schoolUniformKeys } from '../Common/SchoolUniform';
+import inject from './Inject';
+import { addSet, sync } from './Clothes';
 
 const wardrobeKeys = [
   ...schoolUniformKeys,
   'hoodie_legwarmers',
+  'male_underwear',
+  'female_underwear',
   'english_play_sterling',
   'english_play_taylor',
   'gothic_formal_suit',
@@ -22,78 +28,25 @@ const wardrobeKeys = [
 export default function (maplebirch: MaplebirchCore): void {
   maplebirch.tool.onInit(() => {
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const naked = { name: 'naked', integrity_max: 100, word: 'n', action: 'none', desc: '裸体' };
     const outfitNames: string[] = [];
     for (const key of wardrobeKeys) {
       const template = wardrobe.get(key);
-      if (!template) continue;
-      const upper = template.upper ?? template.under_upper ?? naked;
-      const lower = template.lower ?? template.under_lower ?? naked;
-      const name = `kylar_${key}`;
-      outfitNames.push(name);
-      maplebirch.npc.addClothes({
-        name,
-        type: key === 'prison_jumpsuit' ? 'prison' : upper.type?.includes('school') || lower.type?.includes('school') ? 'school' : 'custom',
-        gender: upper.gender === lower.gender ? upper.gender : 'n',
-        upper: {
-          name: upper.name,
-          integrity_max: upper.integrity,
-          action: upper.name === 'naked' ? 'none' : 'lift',
-          word: upper.plural ? 'n' : 'a',
-          desc: upper.cn_name_cap ?? upper.name
-        },
-        lower: {
-          name: lower.name,
-          integrity_max: lower.integrity,
-          action: lower.name === 'naked' ? 'none' : lower.skirt_down ? 'lift' : 'pull',
-          word: lower.plural ? 'n' : 'a',
-          desc: lower.cn_name_cap ?? lower.name
-        },
-        desc: `${upper.cn_name_cap ?? upper.name}和${lower.cn_name_cap ?? lower.name}`
-      });
+      if (template) addSet(maplebirch, outfitNames, `kylar_${key}`, template, { type: key === 'prison_jumpsuit' ? 'prison' : undefined });
     }
 
-    function sync(worn: Record<string, any>, key: string): void {
-      const npc = C.npc?.Kylar;
-      if (!npc) return;
-      const setName = key === 'naked' ? 'naked' : `kylar_${key}`;
-      const set = setup.npcClothesSets?.find((item: any) => item.name === setName);
-      if (!set) return;
-      const upper = key === 'naked' ? naked : (worn.upper ?? worn.under_upper ?? naked);
-      const lower = key === 'naked' ? naked : (worn.lower ?? worn.under_lower ?? naked);
-      for (const [slot, item] of [
-        ['upper', upper],
-        ['lower', lower]
-      ] as const) {
-        set.clothes[slot].name = item.name;
-        set.clothes[slot].integrity_max = item.integrity_max ?? item.integrity ?? 100;
-        set.clothes[slot].desc = item.cn_name_cap ?? item.name;
-      }
-      set.desc = `${upper.cn_name_cap ?? upper.name}和${lower.cn_name_cap ?? lower.name}`;
-      npc.clothes = {
-        set: setName,
-        upper: { name: upper.name, integrity: upper.integrity ?? upper.integrity_max ?? 100 },
-        lower: { name: lower.name, integrity: lower.integrity ?? lower.integrity_max ?? 100 }
-      };
-      if (npc.penis !== 'none') npc.penis = lower.name === 'naked' ? 0 : 'clothed';
-      if (npc.vagina !== 'none') npc.vagina = lower.name === 'naked' ? 0 : 'clothed';
-      npc.chest = upper.name === 'naked' ? 0 : 'clothed';
-    }
-
-    wardrobe.modify('Kylar', (clothes, context) => sync(clothes, context.key));
-    const refresh = () => void wardrobe.worn('Kylar');
+    wardrobe.modify('Kylar', (clothes, context) => sync('Kylar', context.key === 'naked' ? 'naked' : `kylar_${context.key}`, clothes));
 
     maplebirch.on(
-      ':npcInit',
-      (npcName: string) => {
+      ':npcInject',
+      (npcName: string, npcno: number) => {
         if (npcName !== 'Kylar') return;
         const npc = C.npc?.Kylar;
         if (!npc) return;
         npc.outfits = ['naked', ...outfitNames];
-        refresh();
+        wardrobe.worn('Kylar');
+        inject(npcName, npcno, npc.clothes, npc);
       },
       'Kylar outfit sets'
     );
-    maplebirch.on(':passageinit', refresh, 'Kylar current clothes');
   });
 }

@@ -1,17 +1,38 @@
-// ./src/script/SidebarPortrait.ts
+// ./src/script/NPCSidebarPortrait.ts
 
-import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type SidebarPortrait from '../module/NPCSidebarPortrait';
+import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import AlexSidebar from './NamedNPCSidebarPortrait/Alex';
 import AverySidebar from './NamedNPCSidebarPortrait/Avery';
+import BaileySidebar from './NamedNPCSidebarPortrait/Bailey';
+import BriarSidebar from './NamedNPCSidebarPortrait/Briar';
+import CharlieSidebar from './NamedNPCSidebarPortrait/Charlie';
+import { preferColours } from './NamedNPCSidebarPortrait/Common/Preference';
+import DarrylSidebar from './NamedNPCSidebarPortrait/Darryl';
+import DorenSidebar from './NamedNPCSidebarPortrait/Doren';
 import EdenSidebar from './NamedNPCSidebarPortrait/Eden';
-import KylarSidebar from './NamedNPCSidebarPortrait/Kylar';
 import GwylanSidebar from './NamedNPCSidebarPortrait/Gwylan';
+import HarperSidebar from './NamedNPCSidebarPortrait/Harper';
+import IvoryWraithSidebar from './NamedNPCSidebarPortrait/IvoryWraith';
+import JordanSidebar from './NamedNPCSidebarPortrait/Jordan';
+import KylarSidebar from './NamedNPCSidebarPortrait/Kylar';
+import LandrySidebar from './NamedNPCSidebarPortrait/Landry';
+import LeightonSidebar from './NamedNPCSidebarPortrait/Leighton';
+import MasonSidebar from './NamedNPCSidebarPortrait/Mason';
+import MorganSidebar from './NamedNPCSidebarPortrait/Morgan';
 import NPCOutfitSets from './NamedNPCSidebarPortrait/NPCOutfitSets';
+import NikiSidebar from './NamedNPCSidebarPortrait/Niki';
+import QuinnSidebar from './NamedNPCSidebarPortrait/Quinn';
+import RemySidebar from './NamedNPCSidebarPortrait/Remy';
+import RiverSidebar from './NamedNPCSidebarPortrait/River';
 import RobinSidebar from './NamedNPCSidebarPortrait/Robin';
+import SamSidebar from './NamedNPCSidebarPortrait/Sam';
+import SirrisSidebar from './NamedNPCSidebarPortrait/Sirris';
 import SydneySidebar from './NamedNPCSidebarPortrait/Sydney';
 import WhitneySidebar from './NamedNPCSidebarPortrait/Whitney';
-import { preferColours } from './NamedNPCSidebarPortrait/Preference';
+import WinterSidebar from './NamedNPCSidebarPortrait/Winter';
+import WrenSidebar from './NamedNPCSidebarPortrait/Wren';
+import ZephyrSidebar from './NamedNPCSidebarPortrait/Zephyr';
 
 export default function (maplebirch: MaplebirchCore) {
   const sidebar = maplebirch.get('NPCSidebarPortrait') as SidebarPortrait;
@@ -49,6 +70,13 @@ export default function (maplebirch: MaplebirchCore) {
   const averyColours = {
     outfit: new Map<string, string>()
   };
+  const darrylColours = { outfit: new Map<string, string>() };
+  const charlieColours = { outfit: new Map<string, string>() };
+  const landryColours = { outfit: new Map<string, string>() };
+  const nikiColours = { outfit: new Map<string, string>() };
+  const masonColours = { outfit: new Map<string, string>() };
+  const dorenColours = { outfit: new Map<string, string>() };
+  const sirrisColours = { outfit: new Map<string, string>() };
   const alexColours = {
     outfit: new Map<string, string>()
   };
@@ -59,8 +87,29 @@ export default function (maplebirch: MaplebirchCore) {
   WhitneySidebar(maplebirch, whitneyColours);
   GwylanSidebar(maplebirch, gwylanColours);
   AverySidebar(maplebirch, averyColours);
+  BaileySidebar(maplebirch);
+  BriarSidebar(maplebirch);
+  CharlieSidebar(maplebirch, charlieColours);
+  DarrylSidebar(maplebirch, darrylColours);
+  HarperSidebar(maplebirch);
+  JordanSidebar(maplebirch);
+  SamSidebar(maplebirch);
+  SirrisSidebar(maplebirch, sirrisColours);
+  RiverSidebar(maplebirch);
+  DorenSidebar(maplebirch, dorenColours);
+  WinterSidebar(maplebirch);
+  MasonSidebar(maplebirch, masonColours);
+  MorganSidebar(maplebirch);
+  NikiSidebar(maplebirch, nikiColours);
+  RemySidebar(maplebirch);
+  WrenSidebar(maplebirch);
+  ZephyrSidebar(maplebirch);
+  QuinnSidebar(maplebirch);
+  LandrySidebar(maplebirch, landryColours);
+  LeightonSidebar(maplebirch);
   AlexSidebar(maplebirch, alexColours);
   EdenSidebar(maplebirch);
+  IvoryWraithSidebar(maplebirch);
   NPCOutfitSets(maplebirch);
 
   function pyjamaColour(npcName: string): string {
@@ -90,6 +139,13 @@ export default function (maplebirch: MaplebirchCore) {
       gwylanColours.outfit.clear();
       averyColours.outfit.clear();
       alexColours.outfit.clear();
+      charlieColours.outfit.clear();
+      darrylColours.outfit.clear();
+      landryColours.outfit.clear();
+      sirrisColours.outfit.clear();
+      dorenColours.outfit.clear();
+      masonColours.outfit.clear();
+      nikiColours.outfit.clear();
     },
     exact: true
   });

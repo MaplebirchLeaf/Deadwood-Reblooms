@@ -1,3 +1,5 @@
+// ./src/script/NamedNPCSidebarPortrait/Gwylan.ts
+
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
@@ -24,7 +26,13 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       if (!npc) return;
       npc.hair_fringe_type = 'ruffled';
       npc.hair_side_type = 'ruffled';
-      npc.hairlength = 600;
+      if (npc.gender !== 'm') {
+        npc.hair_sides_length = 800;
+        npc.hair_fringe_length = 400;
+      } else {
+        npc.hair_sides_length = 400;
+        npc.hair_fringe_length = 200;
+      }
     }
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
@@ -34,6 +42,11 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     const hatlessLocations = new Set(['sleep', 'formal']);
 
     function applySignatureAccessories(clothes: Record<string, any>, location: string): void {
+      if (location === 'brown_fox' || location === 'brown_fox_unmasked') {
+        delete clothes.neck;
+        delete clothes.handheld;
+        return;
+      }
       if (!hatlessLocations.has(location)) sidebar.apply(clothes, Clothing.sage_witch_hat);
       sidebar.apply(clothes, Clothing.jasper_pendant);
       delete clothes.handheld;
@@ -76,6 +89,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     wardrobe.wear('Gwylan', townLocations, 'jacket_trousers', () => Time.season === 'winter');
 
     // 特殊剧情服装：复古正装、仪式长袍（暂用驱魔师套素材）与裸体状态
+    wardrobe.wear('Gwylan', ['brown_fox', 'brown_fox_unmasked'], 'brown_fox');
     wardrobe.wear('Gwylan', 'formal', 'vintage_pantsuit_formal', () => C.npc?.Gwylan?.pronoun === 'm');
     wardrobe.wear('Gwylan', 'formal', 'vintage_skirtsuit_formal', () => C.npc?.Gwylan?.pronoun !== 'm');
     wardrobe.wear('Gwylan', 'ritual', 'exorcist_cassock', () => C.npc?.Gwylan?.pronoun === 'm');
@@ -109,6 +123,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       }
 
       applySignatureAccessories(clothes, context.location);
+      if (context.location === 'brown_fox_unmasked') delete clothes.face;
     });
   });
 
@@ -116,6 +131,12 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     const title = maplebirch.passage.title;
     const gwylan = C.npc?.Gwylan;
     if (gwylan?.init !== 1) return '';
+
+    // summon_brown_fox 生成的仍是 Gwylan；酒吧、庄园行动和救援明写绿色兜帽斗篷与狐狸面具。
+    // Mansion Piano Fox 2 的面具放在旁边座位上，身份已揭露也不等于自动摘面具。
+    if (title === 'Mansion Piano Fox 2') return 'brown_fox_unmasked';
+    if (/^(?:Pub Brown Fox(?: |$)|Mansion Brown Fox(?: |$)|Mansion Fox Heist(?: |$)|Mansion Piano Fox$|Mansion Party Remy Brown Fox(?: |$))/.test(title)) return 'brown_fox';
+    if (['Mansion Mickey Interrupt', 'Skyscraper Save Rescue', 'Skyscraper Save Rescue 3', 'Skyscraper Run Rescue'].includes(title)) return 'brown_fox';
 
     // 仪式脱衣阶段优先于普通仪式服装：仪式开始、性爱与诱饵收尾时仅保留贤者巫师帽
     if (title === 'Gwylan Ritual Start Garden' || title.startsWith('Gwylan Ritual Sex') || title.startsWith('Gwylan Ritual Bait End')) return 'ritual_naked';
@@ -131,43 +152,29 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     // 厨师开场与渴望剧情的非性爱阶段穿复古正装
     if (title.startsWith('Chef Opening Gwylan') || title.startsWith('Gwylan Yearning')) return 'formal';
 
-    // 剧情指定地点：酒吧消沉、海风散步、森林追逐分别覆盖接下来的时间表判断
-    if (title.startsWith('Gwylan Pub Sulking')) return 'pub';
-    if (title.startsWith('Gwylan Ocean Breeze') || title.startsWith('Gwylan Promenade')) return 'town';
-    if (title.startsWith('Gwylan Forest Run')) return 'forest';
-
-    // 森林商店内的特殊 passage：狗床使用睡衣，其余商店、委托、礼物、催眠与贞操剧情穿商店常服
+    // 实际地点优先于日程；狗床睡眠是原版未写入持续服装状态的例外。
     if (title === 'Forest Shop Dog Bed Sleep') return 'sleep';
-    if (title.startsWith('Forest Shop') || title.startsWith('Gwylan Request') || title.startsWith('Gwylan Gifts') || title.startsWith('Gwylan Hypnosis') || title.startsWith('Gwylan Chastity'))
-      return 'shop';
+    const places: Record<string, string> = { pub: 'pub', promenade: 'town', park: 'town', forest: 'forest', forest_shop: 'shop', forest_shop_garden: 'shop' };
+    if (places[V.location]) return places[V.location];
 
-    // 暂时离场状态最高于常规日程，计时结束前不显示 Gwylan
+    // 无人计时和被冷落状态优先于普通日程，不影响原版在场名单。
     if ((V.gwylan?.timer?.nobody ?? -1) >= Time.date.timeStamp) return 'nowhere';
-
-    // 被冷落后不再执行商店日程：满足渴望剧情条件的 17:00–23:59 前往酒吧，否则保持独自消沉
     if (gwylan.state === 'scorned') {
       if (Time.hour >= 17 && Time.hour <= 23 && !V.gwylanSeen?.includes('yearning_pub') && !V.yearningLetter && !V.daily.gwylan.preventProgress) return 'pub';
       return 'sulking';
     }
-
-    // Robin 留在森林商店时，Gwylan 也固定显示在商店
     if (V.robin_in_forest_shop) return 'shop';
 
-    // 每日清晨 05:00–06:44 在花园照料植物
+    // 05:00–06:44 照料花园；07:00–09:20 前往咖啡馆并停留，厨师剧情改去悬崖。
     if (Time.hour === 5 || (Time.hour === 6 && Time.minute < 45)) return 'garden';
-
-    // 未跳过咖啡馆行程时，07:00–07:19 在路上；厨师剧情 7–8 阶段改去悬崖
-    if (!V.daily.gwylan.cafeSkip && Time.hour === 7 && Time.minute < 20 && !V.daily.gwylan.cafe) return V.chef_state >= 7 && V.chef_state <= 8 && V.chef_rework <= 30 ? 'cliff' : 'walking_to_cafe';
-
-    // 07:20–09:20 留在咖啡馆；若当天已抵达则 07:00 起直接显示，厨师剧情期间同样改为悬崖
-    if (!V.daily.gwylan.cafeSkip && ((Time.hour === 7 && (Time.minute >= 20 || V.daily.gwylan.cafe)) || Time.hour === 8 || (Time.hour === 9 && Time.minute <= 20))) {
-      return V.chef_state >= 7 && V.chef_state <= 8 && V.chef_rework <= 30 ? 'cliff' : 'cafe';
+    if (!V.daily.gwylan.cafeSkip) {
+      const cliff = V.chef_state >= 7 && V.chef_state <= 8 && V.chef_rework <= 30;
+      if (Time.hour === 7 && Time.minute < 20 && !V.daily.gwylan.cafe) return cliff ? 'cliff' : 'walking_to_cafe';
+      if (Time.hour === 7 || Time.hour === 8 || (Time.hour === 9 && Time.minute <= 20)) return cliff ? 'cliff' : 'cafe';
     }
 
-    // 非血月的 23:00–05:59 属于睡眠时段，但 05:00–05:59 已由上方花园日程优先覆盖；狩猎中仅当玩家回到森林商店时显示睡眠状态
+    // 非血月 23:00–05:59 睡眠；清晨花园已优先处理，狩猎期间仅在商店选择睡衣。
     if (!Time.isBloodMoon() && (Time.hour >= 23 || Time.hour <= 5) && (!V.gwylan?.hunting || V.location === 'forest_shop')) return 'sleep';
-
-    // 其余时间默认在森林商店，Gwylan 没有学校日程或校服分支
     return 'shop';
   }
 }

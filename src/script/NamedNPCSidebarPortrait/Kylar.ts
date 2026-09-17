@@ -3,8 +3,10 @@
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
-import { preferColours } from './Preference';
-import schoolUniforms from './SchoolUniform';
+import hoodie from './Common/Hoodie';
+import trainers from './Common/Trainers';
+import { preferColours } from './Common/Preference';
+import schoolUniforms from './Common/SchoolUniform';
 
 export default function (
   maplebirch: MaplebirchCore,
@@ -27,9 +29,11 @@ export default function (
       npc.hair_fringe_type = 'framed';
       npc.hair_side_type = 'ruffled';
       if (npc.gender !== 'm') {
-        npc.hairlength = 800;
+        npc.hair_sides_length = 800;
+        npc.hair_fringe_length = 400;
       } else {
-        npc.hairlength = 400;
+        npc.hair_sides_length = 400;
+        npc.hair_fringe_length = 200;
       }
     }
 
@@ -69,6 +73,7 @@ export default function (
     });
 
     // 日常服装
+    hoodie(maplebirch, 'Kylar', colours.clothes);
     wardrobe.wear('Kylar', ['manor_bedroom', 'park', 'arcade', 'abduction', 'basement'], 'hoodie_legwarmers');
     wardrobe.modify('Kylar', (clothes, context) => {
       if (context.key !== 'hoodie_legwarmers') return;
@@ -86,8 +91,9 @@ export default function (
         }
       ];
       for (const group of groups) {
-        const items = group.slots.map(slot => clothes[slot]).filter(item => item?.index !== undefined);
-        if (items.length !== group.slots.length) continue;
+        const slots = group.slots.filter(slot => slot !== 'lower' || clothes.upper?.name !== 'oversized hoodie');
+        const items = slots.map(slot => clothes[slot]).filter(item => item?.index !== undefined);
+        if (items.length !== slots.length) continue;
         const optionSets = items.map(item => setup.clothes[item.slot]?.[item.index]?.colour_options as string[] | undefined);
         if (optionSets.some(options => !Array.isArray(options) || !options.length)) continue;
         const options = optionSets[0]!.filter(colour => optionSets.every(set => set!.includes(colour)));
@@ -184,6 +190,7 @@ export default function (
 
     // 监狱服装
     wardrobe.wear('Kylar', 'prison', 'prison_jumpsuit');
+    trainers(maplebirch, 'Kylar', colours.clothes);
   });
 
   function location(): string {
@@ -193,7 +200,7 @@ export default function (
     if (title.startsWith('English Play Rehearse') && (title.includes('Kylar') || title.includes('Both'))) return 'rehearsal';
 
     // 监狱剧情
-    if (title.startsWith('Prison Kylar') || C.npc?.Kylar?.state === 'prison') return 'prison';
+    if (C.npc?.Kylar?.state === 'prison' || title.startsWith('Prison Kylar Escape')) return 'prison';
 
     // 绑架剧情
     if (title.startsWith('Kylar Abduction')) {

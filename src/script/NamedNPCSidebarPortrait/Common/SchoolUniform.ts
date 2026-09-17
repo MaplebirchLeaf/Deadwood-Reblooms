@@ -1,5 +1,7 @@
+// ./src/script/NamedNPCSidebarPortrait/Common/SchoolUniform.ts
+
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
-import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
+import type NPCSidebarPortrait from '../../../module/NPCSidebarPortrait';
 import { preferColours } from './Preference';
 
 // prettier-ignore

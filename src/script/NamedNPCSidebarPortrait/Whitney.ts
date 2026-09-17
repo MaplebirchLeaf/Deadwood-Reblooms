@@ -1,8 +1,13 @@
+// ./src/script/NamedNPCSidebarPortrait/Whitney.ts
+
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
-import { preferColours } from './Preference';
-import schoolUniforms, { schoolUniformKeys } from './SchoolUniform';
+import schoolSwim from './Common/SchoolSwim';
+import hoodie from './Common/Hoodie';
+import trainers from './Common/Trainers';
+import { preferColours } from './Common/Preference';
+import schoolUniforms, { schoolUniformKeys } from './Common/SchoolUniform';
 
 export default function (maplebirch: MaplebirchCore, colours: { school: Map<string, string>; schoolOutfit: Map<string, string>; outfit: Map<string, string>; clothes: Map<string, string> }): void {
   maplebirch.npc.addSchedule('Whitney', schedule =>
@@ -21,7 +26,8 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
       if (!npc) return;
       npc.hair_side_type = 'straight bob';
       npc.hair_fringe_type = 'emo left';
-      npc.hairlength = 600;
+      npc.hair_sides_length = 600;
+      npc.hair_fringe_length = 400;
     }
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
@@ -120,6 +126,9 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     });
 
     // 日常与泳装配色
+    hoodie(maplebirch, 'Whitney', colours.outfit);
+
+    schoolSwim(maplebirch, 'Whitney', colours.outfit);
     const colourRules: Record<string, { slots: string[]; weights: () => Record<string, number> }[]> = {
       leather_jacket_jeans: [
         {
@@ -182,8 +191,9 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
       const rules = colourRules[context.key];
       if (!rules) return;
       for (const rule of rules) {
-        const items = rule.slots.map(slot => clothes[slot]).filter(item => item?.index !== undefined);
-        if (items.length !== rule.slots.length) continue;
+        const slots = rule.slots.filter(slot => slot !== 'lower' || clothes.upper?.name !== 'oversized hoodie');
+        const items = slots.map(slot => clothes[slot]).filter(item => item?.index !== undefined);
+        if (items.length !== slots.length) continue;
         const optionSets = items.map(item => setup.clothes[item.slot]?.[item.index]?.colour_options as string[] | undefined);
         if (optionSets.some(options => !Array.isArray(options) || !options.length)) continue;
         const options = optionSets[0]!.filter(colour => optionSets.every(set => set!.includes(colour)));
@@ -197,6 +207,7 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
         for (const item of items) item.colour = colour;
       }
     });
+    trainers(maplebirch, 'Whitney', colours.outfit);
   });
 
   function location(): string {
@@ -211,7 +222,7 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     if (title.startsWith('Bully Rob Reversal') || title.startsWith('Bully Alley Rob') || title.startsWith('Bully Alley Sex') || title.startsWith('Bully No Alley Sex')) return 'naked';
 
     // 游泳剧情
-    if (title.startsWith('School Pool')) return 'school_swim';
+    if (V.location === 'pool') return 'school_swim';
     if (title.startsWith('Whitney Beach')) return 'beach';
 
     // 万圣节剧情
@@ -225,10 +236,10 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     }
 
     // 临时剧情地点
-    if (title.startsWith('Adult Shop Whitney') || title.startsWith('Adult Shop Dildo Thief')) return 'adult_shop';
-    if (title.startsWith('Forest Shop Familiar Whitney')) return 'forest_shop';
+    if (V.location === 'adult_shop') return 'adult_shop';
+    if (V.location === 'forest_shop') return 'forest_shop';
     if (title.startsWith('Skyscraper Whitney')) return 'skyscraper';
-    if (title.startsWith('Whitney Pub')) return 'pub';
+    if (V.location === 'pub') return 'pub';
     if (title.startsWith('Whitney Abduction')) return 'abduction';
 
     // 非活动状态

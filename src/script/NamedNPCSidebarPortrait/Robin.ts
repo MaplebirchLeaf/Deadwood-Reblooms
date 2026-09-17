@@ -3,8 +3,11 @@
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
-import { preferColours } from './Preference';
-import schoolUniforms from './SchoolUniform';
+import schoolSwim from './Common/SchoolSwim';
+import hoodie from './Common/Hoodie';
+import trainers from './Common/Trainers';
+import { preferColours } from './Common/Preference';
+import schoolUniforms from './Common/SchoolUniform';
 
 export default function (
   maplebirch: MaplebirchCore,
@@ -27,10 +30,12 @@ export default function (
       npc.hair_fringe_type = 'framed';
       if (npc.gender !== 'm') {
         npc.hair_side_type = 'ruffled';
-        npc.hairlength = 600;
+        npc.hair_sides_length = 600;
+        npc.hair_fringe_length = 600;
       } else {
         npc.hair_side_type = 'messy';
-        npc.hairlength = 200;
+        npc.hair_sides_length = 200;
+        npc.hair_fringe_length = 0;
       }
     }
 
@@ -146,7 +151,10 @@ export default function (
       });
     }
 
+    hoodie(maplebirch, 'Robin', colours.outfit);
+
     // 日常服装配色
+    schoolSwim(maplebirch, 'Robin', colours.outfit);
     const colourRules: Record<string, { slots: string[]; weights: Record<string, number> | (() => Record<string, number>) }[]> = {
       tshirt_shorts: [
         { slots: ['upper'], weights: { blue: 6, teal: 4, white: 3, green: 2, black: 1 } },
@@ -209,7 +217,7 @@ export default function (
         if (!options.length) continue;
         const cacheKey = `${context.key}.${rule.slots.join('.')}`;
         let colour = colours.clothes.get(cacheKey);
-        if (!colour) {
+        if (!colour || !options.includes(colour)) {
           colour = sidebar.randomColour(options, preferColours('Robin', typeof rule.weights === 'function' ? rule.weights() : rule.weights, C.npc?.Robin?.pronoun !== 'm'));
           colours.clothes.set(cacheKey, colour);
         }
@@ -261,6 +269,7 @@ export default function (
       if (!colours.christmas.has('head')) colours.christmas.set('head', ['christmas_hat', 'mini_snowman'].either() ?? 'christmas_hat');
       if (colours.christmas.get('head') === 'mini_snowman') sidebar.apply(clothes, Clothing.mini_snowman);
     });
+    trainers(maplebirch, 'Robin', colours.outfit);
   });
 
   function location(): string {

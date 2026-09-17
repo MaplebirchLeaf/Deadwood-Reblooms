@@ -1,12 +1,35 @@
+// ./src/script/NamedNPCSidebarPortrait/NPCOutfitSets/index.ts
+
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import Alex from './Alex';
 import Avery from './Avery';
+import Bailey from './Bailey';
+import Briar from './Briar';
+import Charlie from './Charlie';
+import Darryl from './Darryl';
+import Doren from './Doren';
 import Eden from './Eden';
-import Kylar from './Kylar';
 import Gwylan from './Gwylan';
+import Harper from './Harper';
+import IvoryWraith from './IvoryWraith';
+import Jordan from './Jordan';
+import Kylar from './Kylar';
+import Landry from './Landry';
+import Leighton from './Leighton';
+import Mason from './Mason';
+import Morgan from './Morgan';
+import Niki from './Niki';
+import Quinn from './Quinn';
+import Remy from './Remy';
+import River from './River';
 import Robin from './Robin';
+import Sam from './Sam';
+import Sirris from './Sirris';
 import Sydney from './Sydney';
 import Whitney from './Whitney';
+import Winter from './Winter';
+import Wren from './Wren';
+import Zephyr from './Zephyr';
 
 export default function (maplebirch: MaplebirchCore): void {
   Sydney(maplebirch);
@@ -15,6 +38,27 @@ export default function (maplebirch: MaplebirchCore): void {
   Whitney(maplebirch);
   Gwylan(maplebirch);
   Avery(maplebirch);
+  Bailey(maplebirch);
+  Briar(maplebirch);
+  Charlie(maplebirch);
+  Darryl(maplebirch);
+  Doren(maplebirch);
+  Harper(maplebirch);
+  Jordan(maplebirch);
+  Sam(maplebirch);
+  Sirris(maplebirch);
+  River(maplebirch);
+  Winter(maplebirch);
+  Mason(maplebirch);
+  Morgan(maplebirch);
+  Niki(maplebirch);
+  Remy(maplebirch);
+  Wren(maplebirch);
+  Zephyr(maplebirch);
+  Quinn(maplebirch);
+  Landry(maplebirch);
+  Leighton(maplebirch);
   Alex(maplebirch);
   Eden(maplebirch);
+  IvoryWraith(maplebirch);
 }

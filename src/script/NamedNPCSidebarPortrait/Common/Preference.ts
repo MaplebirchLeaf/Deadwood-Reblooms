@@ -1,3 +1,5 @@
+// ./src/script/NamedNPCSidebarPortrait/Common/Preference.ts
+
 export type PaletteNPC = 'Kylar' | 'Robin' | 'Whitney' | 'Sydney';
 
 // prettier-ignore

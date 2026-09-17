@@ -3,8 +3,9 @@
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
-import { preferColours } from './Preference';
-import schoolUniforms, { schoolUniformKeys } from './SchoolUniform';
+import schoolSwim from './Common/SchoolSwim';
+import { preferColours } from './Common/Preference';
+import schoolUniforms, { schoolUniformKeys } from './Common/SchoolUniform';
 
 export default function (maplebirch: MaplebirchCore, colours: { school: Map<string, string>; schoolOutfit: Map<string, string>; swim: Map<string, string>; cow?: string }) {
   'use strict';
@@ -27,9 +28,11 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
       npc.hair_side_type = loose ? 'loose' : 'ponytail';
       npc.hair_fringe_type = loose ? 'loose' : 'straight tails';
       if (npc.gender !== 'm') {
-        npc.hairlength = 800;
+        npc.hair_sides_length = 800;
+        npc.hair_fringe_length = 400;
       } else {
-        npc.hairlength = 400;
+        npc.hair_sides_length = 400;
+        npc.hair_fringe_length = 200;
       }
     }
 
@@ -135,6 +138,7 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     wardrobe.wear('Sydney', 'swim', 'beach_shorts', () => C.npc?.Sydney?.pronoun !== 'm' && V.sydney?.swim === 'crossdress');
 
     // 泳装配色
+    schoolSwim(maplebirch, 'Sydney', colours.swim);
     wardrobe.modify('Sydney', (clothes, context) => {
       if (!['school_swim_shorts', 'school_swimsuit', 'beach_shorts', 'bikini', 'speedo', 'microkini'].includes(context.key)) return;
       const items = [clothes.under_upper, clothes.under_lower].filter(item => item?.index);
@@ -268,10 +272,10 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     if (title.startsWith('Sydney Temple Pure')) return 'promise';
 
     // 明确剧情地点
-    if (title.startsWith('Sydney Temple') || title.startsWith('Temple Sydney')) return 'temple';
+    if (V.location === 'temple') return 'temple';
     if (title.startsWith('Sydney Library')) return 'library';
     if (title.startsWith('Sydney Canteen')) return 'canteen';
-    if (title.startsWith('Sydney Backroom')) return 'shop';
+    if (V.location === 'adult_shop') return 'shop';
 
     // Sydney 泳装时刻
     if (title === 'Sydney Shopping Swim Enter' || title === 'Sydney Shopping Lock') return '';

@@ -1,3 +1,5 @@
+// ./src/script/NamedNPCSidebarPortrait/Avery.ts
+
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
@@ -22,16 +24,17 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       npc.hair_fringe_type = 'swept back';
       if (npc.gender !== 'm') {
         npc.hair_side_type = 'princess wave';
-        npc.hairlength = 600;
+        npc.hair_sides_length = 600;
+        npc.hair_fringe_length = 400;
       } else {
         npc.hair_side_type = 'neat';
-        npc.hairlength = 0;
+        npc.hair_sides_length = 0;
+        npc.hair_fringe_length = 0;
       }
     }
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const maleBusiness = wardrobe.get('business_suit_male') ?? {};
     const femaleBusiness = wardrobe.get('business_suit_female') ?? {};
     const noUnderwear = new Set(['naked', 'towel', 'bathrobe']);
 
@@ -49,7 +52,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     // 日常商务、正式场合和庄园生活服装；艾弗里没有学生或校服分支
     wardrobe.wear('Avery', 'business', 'business_suit_male', () => C.npc?.Avery?.pronoun === 'm');
     wardrobe.wear('Avery', 'business', 'business_suit_female', () => C.npc?.Avery?.pronoun !== 'm');
-    wardrobe.wear('Avery', 'formal', 'formal_suit', () => C.npc?.Avery?.pronoun === 'm');
+    wardrobe.wear('Avery', 'formal', 'tuxedo_formal', () => C.npc?.Avery?.pronoun === 'm');
     wardrobe.wear('Avery', 'formal', 'evening_gown', () => C.npc?.Avery?.pronoun !== 'm');
     wardrobe.wear('Avery', 'sleep', 'pyjama');
     wardrobe.wear('Avery', 'towel', 'towel_wrap');
@@ -58,12 +61,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     wardrobe.wear('Avery', 'naked', 'naked');
 
     wardrobe.modify('Avery', (clothes, context) => {
-      if (context.key === 'formal_suit') {
-        const variants = ['single', 'double'] as const;
-        colours.outfit.set('formal.variant', colours.outfit.get('formal.variant') ?? variants[Math.floor(Math.random() * variants.length)]);
-        if (colours.outfit.get('formal.variant') === 'double') sidebar.apply(clothes, Clothing.double_breasted_jacket);
-        if (maleBusiness.feet) sidebar.apply(clothes, maleBusiness.feet);
-      } else if (context.key === 'evening_gown' && femaleBusiness.feet) {
+      if (context.key === 'evening_gown' && femaleBusiness.feet) {
         sidebar.apply(clothes, femaleBusiness.feet);
       }
     });
@@ -88,8 +86,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     // 酒店热水池全裸；过夜前艾弗里只穿内衣，性爱阶段不保留内衣
     if (title.startsWith('Avery Hotel Bath') || title === 'Avery Hotel 4' || title === 'Avery Hotel 5' || title.startsWith('Avery Hotel Sex')) return 'naked';
     if (title === 'Avery Hotel Stay' || title === 'Avery Hotel Pajamas' || title === 'Avery Hotel Lingerie' || title.startsWith('Avery Hotel No ')) return 'underwear';
-    if (title === 'Avery Hotel Morning') return 'formal';
-    if (title.startsWith('Avery Hotel')) return 'formal';
+    if (V.location === 'hotel') return 'formal';
 
     // 情人节先穿正式服，进卧室后显示内衣，实际性交与共同洗澡时全裸
     if (title === 'Avery Valentines Sex' || title === 'Avery Valentines Sex 2') return 'underwear';
@@ -107,6 +104,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       if (Time.weekDay === 7 && Time.hour === 20 && V.averydate === 1) return 'formal';
       const workHours = Time.weekDay !== 7 && Time.hour > 6 && Time.hour <= (Time.weekDay === 1 ? 16 : 20);
       if (workHours && V.averySeen?.includes('office') && !V.avery_injury) return 'business';
+      // 没有明确日程衣装时保留上一套；此值不控制侧边栏在场判断。
       return 'nowhere';
     }
 

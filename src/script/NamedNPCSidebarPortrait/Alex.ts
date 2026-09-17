@@ -1,3 +1,5 @@
+// ./src/script/NamedNPCSidebarPortrait/Alex.ts
+
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
@@ -22,10 +24,12 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       npc.hair_fringe_type = 'sweep';
       if (npc.gender !== 'm') {
         npc.hair_side_type = 'fluffy ponytail';
-        npc.hairlength = 600;
+        npc.hair_sides_length = 600;
+        npc.hair_fringe_length = 400;
       } else {
         npc.hair_side_type = 'ruffled';
-        npc.hairlength = 200;
+        npc.hair_sides_length = 400;
+        npc.hair_fringe_length = 200;
       }
     }
 
@@ -127,8 +131,8 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     // 夏季劳作会解开法兰绒衬衫的纽扣
     if (title.startsWith('Farm Tending Alex Summer')) return 'summer';
 
-    // 随机进城采购/咖啡馆剧情不是固定日程，仅作 passage 覆盖
-    if (title.startsWith('Street Alex')) return 'town';
+    // 临时进城以当前实际地点覆盖农场时间表，不凭标题识别人物。
+    if (['town', 'cafe', 'park', 'shopping_centre'].includes(V.location)) return 'town';
 
     if (Time.hour >= 21 || Time.hour <= 4) return 'sleep';
     if (Time.hour === 5) return 'breakfast';

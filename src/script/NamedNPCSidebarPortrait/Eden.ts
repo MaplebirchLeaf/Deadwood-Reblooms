@@ -1,3 +1,5 @@
+// ./src/script/NamedNPCSidebarPortrait/Eden.ts
+
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
@@ -22,7 +24,8 @@ export default function (maplebirch: MaplebirchCore): void {
       if (!npc) return;
       npc.hair_fringe_type = 'bedhead';
       npc.hair_side_type = 'bedhead';
-      npc.hairlength = npc.gender === 'm' ? 400 : 600;
+      npc.hair_sides_length = npc.gender === 'm' ? 400 : 600;
+      npc.hair_fringe_length = npc.gender === 'm' ? 200 : 400;
     }
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
@@ -92,7 +95,7 @@ export default function (maplebirch: MaplebirchCore): void {
     if (title.startsWith('Forest Eden Snare Oral')) return 'lower_removed';
 
     // 临时进城、购物和公园剧情没有新增衣装描述，继续穿狩猎服。
-    if (title.startsWith('Town Eden') || title.startsWith('Street Eden') || title.startsWith('Shop Eden')) return 'town';
+    if (['town', 'park', 'cafe', 'shopping_centre', 'adult_shop'].includes(V.location)) return 'town';
 
     // 00:00–06:59 睡觉；07:00–08:59 在小屋；09:00–10:59 照料庄稼。
     if (Time.hour <= 6) return 'sleep';
