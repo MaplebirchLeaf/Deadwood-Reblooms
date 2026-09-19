@@ -32,12 +32,12 @@ class Horse extends Transformation {
 
         decayConditions: [
           () => V.maplebirch.transformation.horse.build >= 1,
-          () => V.worn.head.name !== 'mane_ribbon',
-          () => V.worn.neck.name !== 'golden_carrot_pendant',
+          () => V.worn.head.name !== 'mane ribbon',
+          () => V.worn.neck.name !== 'golden carrot pendant',
           () => playerNormalPregnancyType() !== 'horse'
         ],
 
-        suppressConditions: [sourceName => sourceName !== 'horse', () => V.worn.head.name !== 'mane_ribbon', () => V.worn.neck.name !== 'golden_carrot_pendant'],
+        suppressConditions: [sourceName => sourceName !== 'horse', () => V.worn.head.name !== 'mane ribbon', () => V.worn.neck.name !== 'golden carrot pendant'],
 
         pre: options => {
           options.maplebirchTransformation = V.maplebirch?.transformation ?? false;
@@ -151,6 +151,18 @@ class Horse extends Transformation {
   };
 
   protected override extend(maplebirch: MaplebirchCore): void {
+    const descriptions = () => {
+      for (const [slot, variable] of [
+        ['head', 'mane_ribbon'],
+        ['neck', 'golden_carrot_pendant']
+      ] as const) {
+        const item = setup.clothes[slot].find((item: Record<string, string>) => item.variable === variable);
+        if (item) item.description = maplebirch.t(`deadwood-reblooms.clothes.${variable}.description`);
+      }
+    };
+    maplebirch.tool.onInit(descriptions);
+    maplebirch.on(':language', descriptions);
+
     maplebirch.tool.patch.addTraits(
       {
         title: 'General Traits',
@@ -190,9 +202,50 @@ class Horse extends Transformation {
       };
     });
 
-    // 五倍踢击
     maplebirch.tool.zone.inject({
+      locationPassage: {
+        'Riding School Lesson Grab': [
+          {
+            srcmatch: /<<link \[\[[^\n]*?\|Riding School Lesson Eat\]\]>><[\s\S]*?<<\/link>>/,
+            applyafter: '<<transform-hint "horse" "softbrown">>'
+          }
+        ],
+        'Farm Horses Brush': [
+          {
+            srcmatch: /<<link \[\[[^\n]*?\|Farm Horses Chase\]\]>>[\s\S]*?<<\/link>>/,
+            applyafter: '<<if $maplebirch.transformation.horse.level > 0>><<transform-hint "horse" "softbrown">><</if>>'
+          }
+        ],
+        'Riding School Lesson Eat': [
+          {
+            srcmatch: /<<canvas-model-override "clear">>/,
+            applyafter: '<<transform "horse" 5>>'
+          }
+        ],
+        'Moor Horse Riding': [
+          {
+            srcmatch: /<<link \[\[[^\n]*?\|Moor\]\]>><<set \$eventskip to 1>>[\s\S]*?<<bird_pass 5>>[\s\S]*?<<\/link>>/,
+            applyafter: '<<if $maplebirch.transformation.horse.level > 0>><<transform-hint "horse" "softbrown">><</if>>'
+          },
+          {
+            srcmatch: /<<bird_pass 5>>/,
+            applybefore: '<<if $maplebirch.transformation.horse.level > 0 and $rng <= 30>><<transform "horse" 1>><</if>>'
+          }
+        ]
+      },
       widgetPassage: {
+        'Farm Widgets': [
+          {
+            srcmatchgroup: /(?<=<<widget "farm_brush">>(?:(?!<<\/widget>>)[\s\S])*?)<<link \[\[[^\n]*?\]\]>>/g,
+            applyafter: '<<if passage() is "Farm Horses Chase" and $maplebirch.transformation.horse.level > 0>><<transform "horse" 1>><</if>>'
+          }
+        ],
+        'Widgets BeastEjaculation': [
+          {
+            srcmatchgroup: /<<if _npcisFoxType>><<transform fox 1>><<\/if>>/g,
+            applyafter: '<<if ["horse", "horseboy", "horsegirl"].includes($NPCList[_jj].type)>><<transform "horse" 1>><</if>>'
+          }
+        ],
         'Widgets Effects Man': [
           {
             srcmatchgroup: /<<actionskick \$feettarget>><<defiance 5 \$feettarget>>/g,

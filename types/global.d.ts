@@ -7,6 +7,7 @@ declare global {
   }
 
   function wearingCondom(who: number | 'player'): boolean;
+  function currentSkillValue(skill: string, disableModifiers: number): number;
   function playerHasStrapon(): boolean;
   const Renderer: { CanvasModels: { main: any }; [key: string]: any };
   function isPartEnabled(type: string): boolean;
