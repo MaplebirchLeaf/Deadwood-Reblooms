@@ -22,14 +22,14 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       const npc = V.NPCName?.find((data: any) => data?.nam === 'Avery');
       if (!npc) return;
       npc.hair_fringe_type = 'swept back';
-      if (npc.gender !== 'm') {
-        npc.hair_side_type = 'princess wave';
-        npc.hair_sides_length = 600;
-        npc.hair_fringe_length = 400;
-      } else {
+      if (npc.gender === 'm') {
         npc.hair_side_type = 'neat';
         npc.hair_sides_length = 0;
         npc.hair_fringe_length = 0;
+      } else {
+        npc.hair_side_type = 'princess wave';
+        npc.hair_sides_length = 600;
+        npc.hair_fringe_length = 400;
       }
     }
 

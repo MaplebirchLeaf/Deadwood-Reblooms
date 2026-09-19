@@ -16,12 +16,12 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
       if (!npc) return;
       npc.hair_fringe_type = 'thin flaps';
       npc.hair_side_type = 'short';
-      if (npc.gender !== 'm') {
-        npc.hair_sides_length = 600;
-        npc.hair_fringe_length = 400;
-      } else {
+      if (npc.gender === 'm') {
         npc.hair_sides_length = 400;
         npc.hair_fringe_length = 200;
+      } else {
+        npc.hair_sides_length = 600;
+        npc.hair_fringe_length = 400;
       }
     }
 

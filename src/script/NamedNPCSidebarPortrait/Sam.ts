@@ -14,12 +14,12 @@ export default function (maplebirch: MaplebirchCore): void {
       if (!npc) return;
       npc.hair_fringe_type = 'loose';
       npc.hair_fringe_length = 200;
-      if (npc.gender !== 'm') {
-        npc.hair_side_type = 'messy bun';
-        npc.hair_sides_length = 400;
-      } else {
+      if (npc.gender === 'm') {
         npc.hair_side_type = 'short';
         npc.hair_sides_length = 200;
+      } else {
+        npc.hair_side_type = 'messy bun';
+        npc.hair_sides_length = 400;
       }
     }
 

@@ -27,12 +27,12 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
       const loose = V.sydney?.hair === 'loose';
       npc.hair_side_type = loose ? 'loose' : 'ponytail';
       npc.hair_fringe_type = loose ? 'loose' : 'straight tails';
-      if (npc.gender !== 'm') {
-        npc.hair_sides_length = 800;
-        npc.hair_fringe_length = 400;
-      } else {
+      if (npc.gender === 'm') {
         npc.hair_sides_length = 400;
         npc.hair_fringe_length = 200;
+      } else {
+        npc.hair_sides_length = 800;
+        npc.hair_fringe_length = 400;
       }
     }
 

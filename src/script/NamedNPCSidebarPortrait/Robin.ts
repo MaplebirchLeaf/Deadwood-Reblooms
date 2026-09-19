@@ -28,14 +28,14 @@ export default function (
       const npc = V.NPCName?.find((data: any) => data?.nam === 'Robin');
       if (!npc) return;
       npc.hair_fringe_type = 'framed';
-      if (npc.gender !== 'm') {
-        npc.hair_side_type = 'ruffled';
-        npc.hair_sides_length = 600;
-        npc.hair_fringe_length = 600;
-      } else {
+      if (npc.gender === 'm') {
         npc.hair_side_type = 'messy';
         npc.hair_sides_length = 200;
         npc.hair_fringe_length = 0;
+      } else {
+        npc.hair_side_type = 'ruffled';
+        npc.hair_sides_length = 600;
+        npc.hair_fringe_length = 600;
       }
     }
 

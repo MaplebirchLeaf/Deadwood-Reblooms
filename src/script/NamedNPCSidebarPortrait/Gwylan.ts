@@ -26,12 +26,12 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       if (!npc) return;
       npc.hair_fringe_type = 'ruffled';
       npc.hair_side_type = 'ruffled';
-      if (npc.gender !== 'm') {
-        npc.hair_sides_length = 800;
-        npc.hair_fringe_length = 400;
-      } else {
+      if (npc.gender === 'm') {
         npc.hair_sides_length = 400;
         npc.hair_fringe_length = 200;
+      } else {
+        npc.hair_sides_length = 800;
+        npc.hair_fringe_length = 400;
       }
     }
 
