@@ -2,6 +2,7 @@ import DeadwoodReblooms from './DeadwoodReblooms';
 import MoreLoveInterestsAndNPCAvatars from './MoreLoveInterestsAndNPCAvatars';
 import CelestialAnomalies from './CelestialAnomalies';
 import NPCSidebarPortrait from './NPCSidebarPortrait';
+import VanillaPlus from './VanillaPlus';
 
 (function (maplebirch): void {
   'use strict';
@@ -11,4 +12,5 @@ import NPCSidebarPortrait from './NPCSidebarPortrait';
   if (maplebirch.get('LongerCombat')) maplebirch.tool.addTo('Options', 'Deadwood-Reblooms-LongerCombat-Options');
   if (maplebirch.get('CA')) CelestialAnomalies(maplebirch);
   if (maplebirch.get('NPCSidebarPortrait')) NPCSidebarPortrait(maplebirch);
+  if (maplebirch.get('VP')) VanillaPlus(maplebirch);
 })(maplebirch);

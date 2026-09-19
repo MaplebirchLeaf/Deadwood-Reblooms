@@ -3,3 +3,59 @@
   from: 'if (source === "pass") {'
   before: |
     if (amount > 0 && V.maplebirch?.transformation?.horse?.level >= 6) fatigueMod *= 0.75;
+- comment: '启用贝利欠租累积后，将躲过的每周租金加入下次应付金额。'
+  fileName: 'time.js'
+  from: 'V.baileyRefusedToPayTotalStat += V.rentmoney + (V.babyRent || 0);'
+  after: |
+    maplebirch.DR.accrueBaileyRent();
+- comment: '意志突破后允许正常增益继续填充扩展后的六级上限。'
+  fileName: 'stat-changes.js'
+  from: 'V.willpower = Math.clamp(V.willpower + amount * 2, 0, V.willpowermax);'
+  to: |
+    V.willpower = Math.clamp(V.willpower + amount * 2, maplebirch.get('VP')?.minimum('willpower') ?? 0, maplebirch.get('VP') && V.VanillaPlus?.lock?.willpower ? Math.floor(V.willpowermax * 1.25) : V.willpowermax);
+- comment: '容貌突破后允许原版美容增益继续填充扩展后的六级上限。'
+  fileName: 'stat-changes.js'
+  from: 'maxValue = V.beautymax; // Special-case for the $beautymax value'
+  to: |
+    maxValue = maplebirch.get('VP') && V.VanillaPlus?.lock?.beauty ? Math.floor(V.beautymax * 1.25) : V.beautymax; // Special-case for the $beautymax value
+- comment: '六项属性全满后，原版美容变化不能令容貌从突破后的峰值降低。'
+  fileName: 'stat-changes.js'
+  from: 'V[type] = Math.clamp(V[type] + amount, 0, maxValue);'
+  to: |
+    V[type] = Math.clamp(V[type] + amount, type === 'beauty' ? (maplebirch.get('VP')?.minimum('beauty') ?? 0) : 0, maxValue);
+
+- comment: '六项属性全满后，创伤溢出不能令容貌从突破后的峰值降低。'
+  fileName: 'stat-changes.js'
+  from: 'V.beauty -= overflow * 0.2;'
+  to: |
+    V.beauty = Math.max(maplebirch.get('VP')?.minimum('beauty') ?? 0, V.beauty - overflow * 0.2);
+
+- comment: '六项属性全满后，每日衰减不能令暴露癖从突破后的峰值降低。'
+  fileName: 'time.js'
+  from: 'V.exhibitionism = Math.max(V.exhibitionism - 1, 0);'
+  to: |
+    V.exhibitionism = Math.max(V.exhibitionism - 1, maplebirch.get('VP')?.minimum('exhibitionism') ?? 0);
+
+- comment: '六项属性全满后，每日衰减不能令淫乱从突破后的峰值降低。'
+  fileName: 'time.js'
+  from: 'V.promiscuity = Math.max(V.promiscuity - 1, 0);'
+  to: |
+    V.promiscuity = Math.max(V.promiscuity - 1, maplebirch.get('VP')?.minimum('promiscuity') ?? 0);
+
+- comment: '六项属性全满后，每日衰减不能令异种癖从突破后的峰值降低。'
+  fileName: 'time.js'
+  from: 'V.deviancy = Math.max(V.deviancy - 1, 0);'
+  to: |
+    V.deviancy = Math.max(V.deviancy - 1, maplebirch.get('VP')?.minimum('deviancy') ?? 0);
+
+- comment: '六项属性全满后，农场日常衰减不能令体格从突破后的峰值降低。'
+  fileName: 'time.js'
+  from: 'if (V.farm_stage >= 6) V.physique = V.physique - V.physique / 3000;'
+  to: |
+    if (V.farm_stage >= 6) V.physique = Math.max(maplebirch.get('VP')?.minimum('physique') ?? 0, V.physique - V.physique / 3000);
+
+- comment: '六项属性全满后，农场日常衰减不能令体格从突破后的峰值降低。'
+  fileName: 'time.js'
+  from: 'else V.physique = V.physique - V.physique / 2500;'
+  to: |
+    else V.physique = Math.max(maplebirch.get('VP')?.minimum('physique') ?? 0, V.physique - V.physique / 2500);

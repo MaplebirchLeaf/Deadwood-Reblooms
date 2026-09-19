@@ -6,6 +6,7 @@ import IncantationCheatCollection from './IncantationCheatCollection';
 import CelestialAnomalies from './CelestialAnomalies';
 import MoreTransformations from './MoreTransformations';
 import NPCSidebarPortrait from './NPCSidebarPortrait';
+import VanillaPlus from './VanillaPlus';
 
 (function (maplebirch): void {
   'use strict';
@@ -17,4 +18,5 @@ import NPCSidebarPortrait from './NPCSidebarPortrait';
   maplebirch.register('CA', Object.seal(new CelestialAnomalies(maplebirch)), ['var']);
   maplebirch.register('MoreTransformations', Object.seal(new MoreTransformations(maplebirch)), ['char']);
   maplebirch.register('NPCSidebarPortrait', Object.freeze(new NPCSidebarPortrait(maplebirch)), ['npc']);
+  maplebirch.register('VP', Object.seal(new VanillaPlus(maplebirch)), ['var']);
 })(maplebirch);

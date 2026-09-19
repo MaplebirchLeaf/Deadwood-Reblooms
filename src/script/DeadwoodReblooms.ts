@@ -2,6 +2,29 @@
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
+const accrueBaileyRent = '<<run maplebirch.DR.accrueBaileyRent()>>';
+
+export const baileyRentPassages: Record<string, { src?: string; srcmatch?: RegExp; applyafter: string }[]> = {
+  'Widgets Rent': [
+    {
+      srcmatch: /(<<widget "rentnopay">>[\s\S]*?<<set \$baileyRefusedToPayTotalStat \+= \$rentmoney \+ \(\$babyRent \|\| 0\)>>)/,
+      applyafter: `\n\t${accrueBaileyRent}`
+    },
+    {
+      src: '<<else>>\n\t\t<<set $baileypaychain to 0>>',
+      applyafter: `\n\t\t${accrueBaileyRent}`
+    },
+    {
+      src: '<<set $rentmoney to [10000,30000,50000,70000,100000,150000,200000][Math.clamp($rentstage,1,6)]>> <!-- note: clamping to 1 is intentional -->\n\t<<rentmod>>',
+      applyafter: '\n\t<<run maplebirch.DR.settleBaileyRent()>>'
+    }
+  ],
+  'Rent Refuse Robin': [{ src: '<<set $baileyRefusedToPayTotalStat += $rentmoney + ($babyRent || 0)>>', applyafter: `\n${accrueBaileyRent}` }],
+  'Farm Cottage Bailey Refuse 2': [{ src: '<<set $baileyRefusedToPayTotalStat += $rentmoney + ($babyRent || 0)>>', applyafter: `\n${accrueBaileyRent}` }],
+  'Temple Bailey Refuse': [{ src: '<<set $baileyRefusedToPayTotalStat += $rentmoney + ($babyRent || 0)>>', applyafter: `\n${accrueBaileyRent}` }],
+  'Widgets Temple': [{ src: '<<set $baileyRefusedToPayTotalStat += $rentmoney + ($babyRent || 0)>>', applyafter: `\n\t\t${accrueBaileyRent}` }]
+};
+
 export default function (maplebirch: MaplebirchCore) {
   'use strict';
 
@@ -12,6 +35,7 @@ export default function (maplebirch: MaplebirchCore) {
   maplebirch.tool.addTo('MenuBig', () => (V.options.maplebirch.modhint === 'desktop' ? "<<lanButton 'Deadwood Reblooms' 'upper'>><<run maplebirch.DR.open()>><</lanButton>>" : ''));
   maplebirch.tool.zone.inject({
     widgetPassage: {
+      ...baileyRentPassages,
       'Widgets Wardrobe': [
         {
           src: ')<</if>>\n\t\t<br>',

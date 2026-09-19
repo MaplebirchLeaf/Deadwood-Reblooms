@@ -8,6 +8,7 @@ export const defaults: {
     history: never[];
     index: number;
   };
+  baileyRentDebt: number;
   wardrobeSearch: string;
   activeTab: string;
 } = {
@@ -16,6 +17,7 @@ export const defaults: {
     history: [],
     index: 0
   },
+  baileyRentDebt: 0,
   wardrobeSearch: '',
   activeTab: 'Hint'
 };

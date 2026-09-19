@@ -10,7 +10,7 @@ function meteorEffect(rate: number) {
         return maplebirch.CA.MeteorShowerStrength;
       },
       visibility(): number {
-        return Math.min(1, Math.max(0.05, 1 - Weather.overcast * 0.8 - Math.max(0, Weather.precipitationIntensity - 1) * 0.15));
+        return Math.min(1, Math.max(0.35, 1 - Weather.overcast * 0.4 - Math.max(0, Weather.precipitationIntensity - 1) * 0.1));
       }
     }
   };
@@ -29,70 +29,60 @@ export default function applyMeteorShowerLayer(): void {
       },
 
       init(this: any): void {
-        const frameDuration = 50;
+        this.emitter?.destroy();
+        this.emitter = null;
 
         this.stop = (): void => {
-          if (this.frame != null) cancelAnimationFrame(this.frame);
-          this.frame = null;
           this.emitter?.destroy();
           this.emitter = null;
         };
 
         this.start = (): void => {
-          if (this.frame != null) return;
+          if (this.emitter || !this.drawCondition()) return;
 
           const width = this.canvas.element.width;
           const height = this.canvas.element.height;
+          const scale = Math.min(2, Math.max(1, Math.sqrt(width / 256)));
           this.emitter = new Weather.Renderer.ParticleEmitter(this.canvas.ctx, {
             origin: { x: 0, y: 0 },
-            maxParticles: Math.max(8, Math.ceil(this.rate * 4)),
-            spawnRate: 0,
+            maxParticles: Math.min(32, Math.max(8, Math.ceil(this.rate * 4))),
+            spawnRate: this.rate * this.strength * this.visibility,
+            animationGroup: this.parentLayer.animationGroup,
             initialSettings: {
               shape: 'line',
-              size: { w: 18, h: 1 },
+              size: { w: 24 * scale, h: 1 },
               color: '#e7edff',
-              alpha: 0.9,
+              alpha: 1,
               lifetime: 2,
               fade: true,
-              fadeStart: 0.15,
+              fadeStart: 0.35,
               fadeTime: 0.65,
               shrinkDuration: 0.5
             },
             generator: () => {
               const speed = 90 + Math.random() * 60;
               const angle = 0.42 + Math.random() * 0.18;
-              const fromTop = Math.random() < width / (width + height);
               return {
-                position: fromTop ? { x: Math.random() * width, y: -4 } : { x: -4, y: Math.random() * height * 0.55 },
+                position: { x: Math.random() * width * 0.95, y: Math.random() * height * 0.5 },
                 velocity: {
                   x: Math.cos(angle) * speed,
                   y: Math.sin(angle) * speed
                 },
                 size: {
-                  w: 14 + Math.random() * 18,
+                  w: (24 + Math.random() * 24) * scale,
                   h: Math.random() < 0.2 ? 2 : 1
                 },
                 color: Math.random() < 0.25 ? '#b9d8ff' : '#f4f1df',
-                lifetime: 1.2 + Math.random() * 1.1,
-                fadeStart: 0.1 + Math.random() * 0.25
+                lifetime: 1.4 + Math.random() * 0.8,
+                fadeStart: 0.35 + Math.random() * 0.25
               };
             }
           });
 
-          let previous = performance.now();
-          const tick = (now: number): void => {
-            this.frame = requestAnimationFrame(tick);
-            const elapsed = now - previous;
-            if (elapsed < frameDuration || document.hidden) return;
-            previous = now;
-            this.emitter.spawnRate = this.rate * this.strength * this.visibility;
-            this.emitter.update(Math.min(elapsed / 1000, 0.1));
-            void this.parentLayer.renderInstance.drawLayers(this.parentLayer.name);
-          };
-          this.frame = requestAnimationFrame(tick);
+          for (let step = 0; step < 12; step++) this.emitter.update(0.1);
         };
 
-        if (Weather.meteorShower) this.start();
+        this.start();
       },
 
       onEnable(this: any): void {
@@ -105,11 +95,12 @@ export default function applyMeteorShowerLayer(): void {
 
       draw(this: any): void {
         this.canvas.clear();
+        if (this.emitter) this.emitter.spawnRate = this.rate * this.strength * this.visibility;
         this.emitter?.draw();
       }
     });
   });
 
-  weather.addLayer('starField', { effects: [meteorEffect(2.5)] }, 'concat');
-  weather.addLayer('bannerStarField', { effects: [meteorEffect(7)] }, 'concat');
+  weather.addLayer('starField', { animation: { updateRate: 50 }, effects: [meteorEffect(3.5)] }, 'concat');
+  weather.addLayer('bannerStarField', { animation: { updateRate: 50 }, effects: [meteorEffect(9)] }, 'concat');
 }

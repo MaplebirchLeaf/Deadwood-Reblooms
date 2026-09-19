@@ -1,0 +1,686 @@
+:: Deadwood Reblooms Vanilla Plus Widgets [widget]
+
+<<widget 'deadwood-reblooms-exhibitionism-trait-effects'>>
+  <<if $VanillaPlus.traits.exhibitionism and !$desperateaction>>
+    <<set $_exhibitionismLevel to _args[0]>>
+    <<if $control lt $controlmax>><<control $controlmax>><<gggcontrol>><</if>>
+    <<stress $_exhibitionismLevel -300>><<combattrauma `$_exhibitionismLevel * -30`>><<lstress>><<ltrauma>><<arousal `$_exhibitionismLevel * 100`>><<garousal>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-physique-break-bindings'>>
+  <<if breakableSoftBinding()>>
+    <<undobindingsicon>><<link `lanSwitch('Break your bindings', '挣断束缚')` $passage>>
+      <<if pcAreArmsBound('any')>>
+        <<if pcAreArmsBound('right') and $worn.handheld.name isnot 'naked'>><<handheldruined>><</if>>
+        <<arm_unbind>>
+      <</if>>
+      <<set $_legsBound to ['ropes', 'vines'].includes($worn.feet.name)>>
+      <<set $_legsBound to $_legsBound or [$feetuse, $leftleg, $rightleg].includes('bound')>>
+      <<if $_legsBound and !['ankle cuffs', 'ball and chain'].includes($worn.feet.name)>>
+        <<leg_unbind>>
+      <</if>>
+      <<if $head is 'bound'>><<set $head to 0>><</if>>
+    <</link>> <<note `lanSwitch('Physique', '体格')` 'gold'>>
+    <br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-physique-combat-break'>>
+  <<run maplebirch.VP.physique.use()>>
+  <<switch _args[0]>>
+    <<case 'arms'>>
+      <<arm_unbind>>
+      <span class="teal"><<lanSwitch 'You flex hard. The bindings bite into your skin, then snap.' '你猛然发力。束缚勒进皮肤，随后应声断裂。'>></span>
+    <<case 'legs'>>
+      <<leg_unbind>>
+      <<set $_breakFreeText to lanSwitch(
+        'You spread your legs with all your strength. The bindings strain, then tear apart.',
+        '你用尽力气分开双腿。束缚被拉紧，随即撕裂。'
+      )>>
+      <span class="teal"><<= $_breakFreeText>></span>
+    <<case 'head'>>
+      <<set $head to 0>>
+      <span class="teal"><<lanSwitch 'You wrench your head back and rip yourself free.' '你猛地向后仰头，从束缚中挣脱出来。'>></span>
+  <</switch>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-deviancy-mirror-enter-link'>>
+  <<set $_mirror to _args[0]>>
+  <<if maplebirch.VP.deviancy.mirrorOpen and maplebirch.VP.deviancy.discovered($_mirror)>>
+    <<mirroricon 'blood'>><<link
+      `lanSwitch('Step through the eerie mirror', '穿过诡异镜面')`
+      'Deadwood Reblooms Deviancy Mirror Enter'
+    >>
+      <<set $VanillaPlus.deviancy.mirrorOrigin to $_mirror>>
+    <</link>>
+      <<note `lanSwitch('Deviancy', '异种癖')` 'red'>>
+    <br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-deviancy-mirror-exits'>>
+  <<if $tentacleEntrance is 'vanillaPlusMirror'>>
+    <<if $tentnorth is 0 and $tenteast is 0 and maplebirch.VP.deviancy.discovered('home')>>
+      <<mirroricon 'blood'>><<link `lanSwitch('Climb through the bedroom mirror', '从卧室镜子爬出去')` 'Deadwood Reblooms Deviancy Mirror Home'>><</link>>
+      <br><br>
+    <</if>>
+    <<if $tentnorth is 3 and $tenteast is -3 and maplebirch.VP.deviancy.discovered('farm')>>
+      <<mirroricon 'blood'>><<link `lanSwitch('Climb through the farm mirror', '从农场镜子爬出去')` 'Deadwood Reblooms Deviancy Mirror Farm'>><</link>>
+      <br><br>
+    <</if>>
+    <<if $tentnorth is -3 and $tenteast is 3 and maplebirch.VP.deviancy.discovered('tower')>>
+      <<mirroricon 'blood'>><<link `lanSwitch('Climb through the tower mirror', '从高塔镜子爬出去')` 'Deadwood Reblooms Deviancy Mirror Tower'>><</link>>
+      <br><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Deviancy Mirror Enter []
+<<location 'tentworld'>><<set $outside to 0>><<effects>><<tentacleworldintro>><<set $tentacleEntrance to 'vanillaPlusMirror'>>
+<<switch $VanillaPlus.deviancy.mirrorOrigin>>
+  <<case 'farm'>><<set $tentnorth to 3>><<set $tenteast to -3>>
+  <<case 'tower'>><<set $tentnorth to -3>><<set $tenteast to 3>>
+<</switch>>
+<<if !$daily.vanillaPlusMirror>><<set $daily.vanillaPlusMirror to true>><<deviancy6>><</if>>
+<<language>>
+  <<option 'EN'>>The glass clings to your skin like a wet membrane. You force your body through and spill out beneath the alien sky of the tentacle
+    plains.
+  <<option 'CN'>>镜面如湿润的薄膜般贴紧你的皮肤。你迫使身体穿过其中，跌入触手平原陌生的天空之下。
+<</language>>
+<br><br>
+<<link [[Next|Tentacle Plains]]>><</link>>
+
+:: Deadwood Reblooms Deviancy Mirror Home []
+<<set $location to 'home'>><<set $outside to 0>><<effects>><<tentacleworldend>>
+<<language>><<option 'EN'>>You force yourself through the rippling surface and tumble back into your bedroom.<<option 'CN'>>你挤过荡漾的镜面，
+  跌回自己的卧室。
+  <</language>>
+<br><br><<link [[Next|Bedroom]]>><</link>>
+
+:: Deadwood Reblooms Deviancy Mirror Farm []
+<<set $location to 'farm'>><<set $outside to 0>><<effects>><<tentacleworldend>>
+<<language>><<option 'EN'>>You force yourself through the rippling surface and stumble into your room at the farm.<<option 'CN'>>你挤过荡漾的镜面，
+  踉跄着落进农场的房间。
+  <</language>>
+<br><br><<link [[Next|Farm Bedroom]]>><</link>>
+
+:: Deadwood Reblooms Deviancy Mirror Tower []
+<<set $location to 'tower'>><<set $outside to 0>><<effects>><<tentacleworldend>>
+<<language>><<option 'EN'>>You force yourself through the rippling surface and spill onto the tower floor.<<option 'CN'>>你挤过荡漾的镜面，
+  摔落在高塔的地面上。
+  <</language>>
+<br><br><<link [[Next|Bird Tower]]>><</link>>
+<<widget 'deadwood-reblooms-promiscuity-unlock'>>
+  <<set $VanillaPlus.lock.promiscuity to true>>
+  <<language>>
+    <<option 'EN'>>Your hands, mouth, thighs and every willing opening have learned what they want. You no longer wait for someone else to use you.
+      You guide every touch and offer every part of yourself by choice.
+    <br><br>
+    <span class="gold">Your promiscuity has broken through its former limits.</span>
+    <<option 'CN'>>你的手、嘴、双腿与每一处甘愿敞开的入口，都已学会索取自己想要的东西。你不再等待别人享用，而是主动引导每一次触碰，
+      亲自献上身体的每一处。
+    <br><br>
+    <span class="gold">你的淫乱突破了原本的极限。</span>
+  <</language>>
+  <br><br>
+<</widget>>
+
+<<widget 'deadwood-reblooms-beauty-breakthrough-link'>>
+  <<if maplebirch.VP.beauty.unlock>>
+    <<language>>
+      <<option 'EN'>>A light behind the diffuser flickers, then bursts with a sharp pop.
+      <br><<link [[Check the failed light|Deadwood Reblooms Beauty Breakthrough]]>><</link>> <<note 'Beauty' 'gold'>>
+      <<option 'CN'>>柔光板后的灯闪烁几下，随即砰然炸裂。
+      <br><<link [[查看坏掉的灯|Deadwood Reblooms Beauty Breakthrough]]>><</link>> <<note '容貌' 'gold'>>
+    <</language>>
+    <br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Beauty Breakthrough []
+<<effects>>
+<<language>>
+  <<option 'EN'>>Niki catches the diffuser before it falls, then crouches beside the dead lamp. Only a hard strip of daylight from the high window
+    remains across the white screen.
+  <br><br>
+  "Could wait for a replacement," Niki says, turning the camera towards the window. "Or use that. No makeup. No filter. Just every mark on your bare
+    face."
+  <br><br>
+  <<link [[Stand in the light|Deadwood Reblooms Beauty Breakthrough Finish]]>><</link>> <<note 'Beauty' 'gold'>>
+  <br>
+  <<link [[Return to the ordinary shoot|Photo Model 4]]>><<set $phase to 0>><</link>>
+  <<option 'CN'>>尼奇赶在柔光板倒下前扶住它，随后蹲到熄灭的灯旁。只有高窗投下的一道生硬日光留在白色幕布前。
+  <br><br>
+  “可以等人送替换灯过来，”尼奇一边说，一边将相机转向窗户，“也可以就用这束光。不化妆，不加滤镜。你素净脸庞上的每一处痕迹都会被拍下来。”
+  <br><br>
+  <<link [[站进光里|Deadwood Reblooms Beauty Breakthrough Finish]]>><</link>> <<note '容貌' 'gold'>>
+  <br>
+  <<link [[回到普通拍摄|Photo Model 4]]>><<set $phase to 0>><</link>>
+<</language>>
+
+:: Deadwood Reblooms Beauty Breakthrough Finish []
+<<effects>><<set $photo.time += 30>><<run maplebirch.VP.beauty.complete()>>
+<<language>>
+  <<option 'EN'>>You step into the strip of daylight. It catches every pore, every blemish and every nervous twitch of your bare face. Niki takes one
+    picture, checks it, then raises the camera again without offering powder or softer light.
+  <br><br>
+  The shutter clicks again and again. When Niki finally lowers the camera, the unedited pictures leave you nowhere to hide. You cannot stop looking
+    at them.
+  <br><br>
+  "Keep them like this," Niki says, saving the set. "They look like you."
+  <br><br>
+  <span class="gold">Your beauty has broken through its former limits.</span>
+  <<option 'CN'>>你站进那道日光。毫无遮掩的光线照亮你素净脸庞上的每一处毛孔、瑕疵与紧张的抽动。尼奇拍下一张，低头查看，随后再次举起相机，
+    没有递来脂粉，也没有调柔光线。
+  <br><br>
+  快门一次又一次响起。尼奇终于放下相机时，一张张未经修改的照片令你无处遮掩。你却无法把目光移开。
+  <br><br>
+  “就保持这样。”尼奇保存了整组照片，“这才像你。”
+  <br><br>
+  <span class="gold">你的容貌突破了原本的极限。</span>
+<</language>>
+<br><br>
+<<link [[Next|Photo Model 5]]>><</link>>
+
+<<widget 'deadwood-reblooms-promiscuity-request-options'>>
+  <<if $VanillaPlus.lock.promiscuity and $enemytype is 'man' and !$npcSub>>
+    <<set $_promiscuityLowerExposed to $worn.lower.vagina_exposed gte 1>>
+    <<set $_promiscuityLowerExposed to $_promiscuityLowerExposed or setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt gte 1>>
+    <<set $_promiscuityGenitalsExposed to $worn.over_lower.vagina_exposed gte 1>>
+    <<set $_promiscuityGenitalsExposed to $_promiscuityGenitalsExposed and $_promiscuityLowerExposed>>
+    <<set $_promiscuityGenitalsExposed to $_promiscuityGenitalsExposed and $worn.under_lower.vagina_exposed gte 1>>
+    <<set $_promiscuityGenitalsExposed to $_promiscuityGenitalsExposed and $worn.genitals.vagina_exposed gte 1>>
+    <<set $_promiscuityFreeHand to $NPCList[$mouthtarget].lefthand is 0 or $NPCList[$mouthtarget].righthand is 0>>
+    <<set $_promiscuityFreeMouth to $NPCList[$mouthtarget].mouth is 0>>
+    <<set $_promiscuityHis to $NPCList[$mouthtarget].pronouns.his>>
+    <<set $_promiscuityFrontAccessible to $position isnot 'wall' or $walltype is 'front'>>
+    <<set $_promiscuityBehindAccessible to $walltype isnot 'front'>>
+    <<set $_promiscuityPenisAvailable to !['none', 'clothed'].includes($NPCList[$mouthtarget].penis)>>
+    <<if $_promiscuityFreeHand and $walltype isnot 'front'>>
+      <<if $_promiscuityGenitalsExposed and $player.vaginaExist and !$vaginause and !playerChastity('vagina')>>
+        <<set _askActions[lanSwitch('to use '+$_promiscuityHis+' hands on your pussy', '用手玩弄你的小穴')] to 'promiscuity-hand-vagina'>>
+      <</if>>
+      <<if $_promiscuityGenitalsExposed and $player.penisExist and !$penisuse and !playerChastity('penis')>>
+        <<set _askActions[lanSwitch('to use '+$_promiscuityHis+' hands on your penis', '用手玩弄你的肉棒')] to 'promiscuity-hand-penis'>>
+      <</if>>
+      <<if $_promiscuityGenitalsExposed and !$anususe and !playerChastity('anus')>>
+        <<set _askActions[lanSwitch('to use '+$_promiscuityHis+' hands on your anus', '用手玩弄你的菊穴')] to 'promiscuity-hand-anus'>>
+      <</if>>
+    <</if>>
+    <<if $_promiscuityFreeMouth>>
+      <<set $_promiscuityCanKiss to $_promiscuityFrontAccessible and !$gloryhole and $head isnot 'bound'>>
+      <<set $_promiscuityCanKiss to $_promiscuityCanKiss and !$worn.face.type.includes('covered')>>
+      <<set $_promiscuityCanKiss to $_promiscuityCanKiss and !$worn.face.type.includes('gag') and !$mouthuse>>
+      <<if $_promiscuityCanKiss>>
+        <<set _askActions[lanSwitch('to kiss you', '亲吻你')] to 'promiscuity-mouth-kiss'>>
+      <</if>>
+      <<if $_promiscuityFrontAccessible and !$gloryhole and !$chestuse>>
+        <<set _askActions[lanSwitch('to use '+$_promiscuityHis+' mouth on your chest', '亲吻你的胸部')] to 'promiscuity-mouth-chest'>>
+      <</if>>
+      <<if $_promiscuityBehindAccessible and !$thighuse>>
+        <<set _askActions[lanSwitch('to use '+$_promiscuityHis+' mouth on your thighs', '亲吻你的大腿')] to 'promiscuity-mouth-thigh'>>
+      <</if>>
+      <<if $_promiscuityBehindAccessible and !$bottomuse>>
+        <<set _askActions[lanSwitch('to use '+$_promiscuityHis+' mouth on your bottom', '亲吻你的屁股')] to 'promiscuity-mouth-bottom'>>
+      <</if>>
+      <<if $_promiscuityGenitalsExposed and $_promiscuityBehindAccessible>>
+        <<if $player.vaginaExist and !$vaginause and !playerChastity('vagina')>>
+          <<set _askActions[lanSwitch('to use '+$_promiscuityHis+' mouth on your pussy', '舔你的小穴')] to 'promiscuity-mouth-vagina'>>
+        <</if>>
+        <<if $player.penisExist and !$penisuse and !playerChastity('penis')>>
+          <<set _askActions[lanSwitch('to use '+$_promiscuityHis+' mouth on your penis', '舔你的肉棒')] to 'promiscuity-mouth-penis'>>
+        <</if>>
+        <<if !$anususe and !playerChastity('anus')>>
+          <<set _askActions[lanSwitch('to use '+$_promiscuityHis+' mouth on your anus', '舔你的菊穴')] to 'promiscuity-mouth-anus'>>
+        <</if>>
+      <</if>>
+    <</if>>
+    <<if $_promiscuityGenitalsExposed and $_promiscuityBehindAccessible and $_promiscuityPenisAvailable>>
+      <<if $player.vaginaExist and !$vaginause and !playerChastity('vagina')>>
+        <<set _askActions[lanSwitch('to enter your pussy', '插入你的小穴')] to 'promiscuity-penetrate-vagina'>>
+      <</if>>
+      <<if !$anususe and !playerChastity('anus')>>
+        <<set _askActions[lanSwitch('to enter your anus', '插入你的菊穴')] to 'promiscuity-penetrate-anus'>>
+      <</if>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-promiscuity-request'>>
+  <<if $mouthaction is 'ask' and $askAction.startsWith('promiscuity-')>>
+    <<set $_promiscuityChoice to $askAction>>
+    <<set $_promiscuityTarget to $mouthtarget>>
+    <<set $mouthaction to 0>>
+    <<set $mouthactiondefault to 'rest'>>
+    <<unset $askAction>>
+    <<personselect $_promiscuityTarget>>
+    <<set $_promiscuitySuccess to $VanillaPlus.traits.promiscuity or $gamemode is 'soft' or $gloryhole>>
+    <<set $_promiscuitySuccess to $_promiscuitySuccess or combatSkillCheck(
+      'seduction',
+      $_promiscuityTarget,
+      $NPCList[$_promiscuityTarget].fullDescription
+    )>>
+    <<language>>
+      <<option 'EN'>>You tell <<him>> exactly how you want <<him>> to use your body.
+      <<option 'CN'>>你明确告诉<<him>>，自己想让<<him>>如何享用你的身体。
+    <</language>>
+    <<if $_promiscuitySuccess>>
+      <span class="green">
+        <<language>>
+          <<option 'EN'>><<He_Short>> looks over your body, then obeys.
+          <<option 'CN'>><<He_Short>>打量着你的身体，随后顺从了你的要求。
+        <</language>>
+      </span>
+      <<switch $_promiscuityChoice>>
+        <<case 'promiscuity-hand-vagina' 'promiscuity-hand-penis' 'promiscuity-hand-anus'>>
+          <<set $_promiscuityHand to $NPCList[$_promiscuityTarget].lefthand is 0 ? 'lefthand' : 'righthand'>>
+          <<if $_promiscuityChoice is 'promiscuity-hand-vagina'>>
+            <<set $NPCList[$_promiscuityTarget][$_promiscuityHand] to 'vaginaentrance'>>
+            <<set $vaginause to 1>>
+            <<set $vaginastate to 'otherhandentrance'>>
+            <<set $vaginatarget to $_promiscuityTarget>>
+          <<elseif $_promiscuityChoice is 'promiscuity-hand-penis'>>
+            <<set $NPCList[$_promiscuityTarget][$_promiscuityHand] to 'penisentrance'>>
+            <<set $penisuse to 1>>
+            <<set $penisstate to 'otherhandentrance'>>
+            <<set $penistarget to $_promiscuityTarget>>
+          <<else>>
+            <<set $NPCList[$_promiscuityTarget][$_promiscuityHand] to 'anusentrance'>>
+            <<set $anususe to 'handentrance'>>
+            <<set $anusstate to 'handentrance'>>
+            <<set $anustarget to $_promiscuityTarget>>
+          <</if>>
+        <<case 'promiscuity-mouth-vagina' 'promiscuity-mouth-penis' 'promiscuity-mouth-anus'>>
+          <<if $_promiscuityChoice is 'promiscuity-mouth-vagina'>>
+            <<set $NPCList[$_promiscuityTarget].mouth to 'vaginaentrance'>>
+            <<set $vaginause to 'othermouth'>>
+            <<set $vaginastate to 'othermouthentrance'>>
+            <<set $vaginatarget to $_promiscuityTarget>>
+          <<elseif $_promiscuityChoice is 'promiscuity-mouth-penis'>>
+            <<set $NPCList[$_promiscuityTarget].mouth to 'penisentrance'>>
+            <<set $penisuse to 'othermouth'>>
+            <<set $penisstate to 'othermouthentrance'>>
+            <<set $penistarget to $_promiscuityTarget>>
+          <<else>>
+            <<set $NPCList[$_promiscuityTarget].mouth to 'anusentrance'>>
+            <<set $anususe to 'othermouth'>>
+            <<set $anusstate to 'othermouthentrance'>>
+            <<set $anustarget to $_promiscuityTarget>>
+          <</if>>
+        <<case 'promiscuity-mouth-kiss'>>
+          <<set $NPCList[$_promiscuityTarget].mouth to 'kissentrance'>>
+          <<set $mouthuse to 'kiss'>>
+          <<set $mouthstate to 'kissentrance'>>
+          <<set $mouthtarget to $_promiscuityTarget>>
+        <<case 'promiscuity-mouth-chest'>>
+          <<set $NPCList[$_promiscuityTarget].mouth to 'chestentrance'>>
+          <<set $chestuse to 'mouth'>>
+          <<set $cheststate to 'mouthentrance'>>
+          <<set $chesttarget to $_promiscuityTarget>>
+        <<case 'promiscuity-mouth-thigh'>>
+          <<set $NPCList[$_promiscuityTarget].mouth to 'thigh'>>
+          <<set $thighuse to 'mouth'>>
+          <<set $thightarget to $_promiscuityTarget>>
+        <<case 'promiscuity-mouth-bottom'>>
+          <<set $NPCList[$_promiscuityTarget].mouth to 'bottom'>>
+          <<set $bottomuse to 'mouth'>>
+          <<set $bottomtarget to $_promiscuityTarget>>
+        <<case 'promiscuity-penetrate-vagina'>>
+          <<deadwood-reblooms-promiscuity-request-penetration 'vagina' $_promiscuityTarget>>
+        <<case 'promiscuity-penetrate-anus'>>
+          <<deadwood-reblooms-promiscuity-request-penetration 'anus' $_promiscuityTarget>>
+      <</switch>>
+      <<combatpromiscuity6>>
+    <<else>>
+      <span class="red">
+        <<language>>
+          <<option 'EN'>><<He_Short>> smirks and ignores your request.
+          <<option 'CN'>><<He_Short>>嗤笑一声，无视了你的要求。
+        <</language>>
+      </span>
+      <<if $consensual is 1>>
+        <<set $consensual to 0>>
+        <<molested>><<controlloss>>
+      <</if>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-promiscuity-request-penetration'>>
+  <<set $_promiscuityPart to _args[0]>>
+  <<set $_promiscuityTarget to _args[1]>>
+  <<personselect $_promiscuityTarget>>
+  <<if $_promiscuityPart is 'vagina'>>
+    <<set $vaginause to 'penis'>>
+    <<set $vaginastate to 'entrance'>>
+    <<set $vaginatarget to $_promiscuityTarget>>
+    <<set $NPCList[$_promiscuityTarget].penis to 'vaginaentrance'>>
+    <<language>><<option 'EN'>><<He_Short>> lines up <<his>> penis and presses the tip against your
+      <<pussy>>.<<option 'CN'>><<He_Short>>对准位置，将<<his>>肉棒龟头抵在你的<<pussy>>上。<</language>>
+  <<else>>
+    <<set $anususe to 'penis'>>
+    <<set $anusstate to 'entrance'>>
+    <<set $anustarget to $_promiscuityTarget>>
+    <<set $NPCList[$_promiscuityTarget].penis to 'anusentrance'>>
+    <<language>><<option 'EN'>><<He_Short>> lines up <<his>> penis and presses the tip against your
+      anus.<<option 'CN'>><<He_Short>>对准位置，将<<his>>肉棒龟头抵在你的菊穴上。<</language>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-promiscuity-direct-result'>>
+  <<if _vanillaPlusPromiscuityTarget isnot undefined>>
+    <<set $_promiscuityDirectSuccess to false>>
+    <<switch _args[0]>>
+      <<case 'vagina'>>
+        <<set $_promiscuityDirectSuccess to $vaginause is 'penis'>>
+        <<set $_promiscuityDirectSuccess to $_promiscuityDirectSuccess and $NPCList[_vanillaPlusPromiscuityTarget].penis is 'vaginaentrance'>>
+      <<case 'anus'>>
+        <<set $_promiscuityDirectSuccess to $anususe is 'penis'>>
+        <<set $_promiscuityDirectSuccess to $_promiscuityDirectSuccess and $NPCList[_vanillaPlusPromiscuityTarget].penis is 'anusentrance'>>
+      <<case 'penis-vagina'>>
+        <<set $_promiscuityDirectSuccess to $penisuse is 'othervagina'>>
+        <<set $_promiscuityDirectSuccess to $_promiscuityDirectSuccess and $NPCList[_vanillaPlusPromiscuityTarget].vagina is 'penisentrance'>>
+      <<case 'penis-anus'>>
+        <<set $_promiscuityDirectSuccess to $penisuse is 'otheranus'>>
+        <<set $_promiscuityDirectSuccess to $_promiscuityDirectSuccess and [
+          $NPCList[_vanillaPlusPromiscuityTarget].vagina,
+          $NPCList[_vanillaPlusPromiscuityTarget].penis
+        ].includes('otheranusentrance')>>
+    <</switch>>
+    <<set $promiscuityIgnore to _vanillaPlusPromiscuityIgnore>>
+    <<if $_promiscuityDirectSuccess>>
+      <<combatpromiscuity6>>
+    <</if>>
+    <<unset _vanillaPlusPromiscuity>>
+    <<unset _vanillaPlusPromiscuityIgnore>>
+    <<unset _vanillaPlusPromiscuityTarget>>
+    <<unset $_promiscuityDirectSuccess>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-characteristics-degrees-display'>>
+  <<if $VanillaPlus.lock.physique>>
+    <<language>>
+      <<option 'EN'>><<set $_display_text to `Your body is ${$player.bodyshape === 'soft' ? 'powerful' : 'perfectly conditioned'} and at its peak.`>>
+      <<option 'CN'>><<set $_display_text to `你的身体${$player.bodyshape === 'soft' ? '强壮' : '健美'}且已臻巅峰。`>>
+    <</language>>
+    <<set _physiqueConfig.maxValue to Math.floor($physiquesize * 1.25)>>
+    <<run Object.assign(_physiqueConfig.states[_physiqueConfig.states.length - 1], { color: 'gold', description: $_display_text })>>
+  <</if>>
+
+  <<if $VanillaPlus.lock.willpower>>
+    <<language>>
+      <<option 'EN'>><<set $_display_text to 'Your will is unshakable.'>>
+      <<option 'CN'>><<set $_display_text to '你坚毅不可撼动。'>>
+    <</language>>
+    <<set _willpowerConfig.maxValue to Math.floor($willpowermax * 1.25)>>
+    <<run Object.assign(_willpowerConfig.states[_willpowerConfig.states.length - 1], { color: 'gold', description: $_display_text })>>
+  <</if>>
+
+  <<if $VanillaPlus.lock.beauty>>
+    <<language>>
+      <<option 'EN'>><<set $_display_text to 'Your beauty is transcendent.'>>
+      <<option 'CN'>><<set $_display_text to '你的容貌超凡脱俗。'>>
+    <</language>>
+    <<set _beautyConfig.maxValue to Math.floor($beautymax * 1.25)>>
+    <<run Object.assign(_beautyConfig.states[_beautyConfig.states.length - 1], { color: 'gold', description: $_display_text })>>
+  <</if>>
+
+  <<if $VanillaPlus.lock.promiscuity>>
+    <<language>>
+      <<option 'EN'>><<set $_display_text to 'You are consumed by your lust.'>>
+      <<option 'CN'>><<set $_display_text to '你已被欲望吞噬。'>>
+    <</language>>
+
+    <<set _promiscuityConfig.maxValue to 150>>
+    <<run Object.assign(_promiscuityConfig.states[_promiscuityConfig.states.length - 1], { color: 'lustful', description: $_display_text })>>
+  <</if>>
+
+  <<if $VanillaPlus.lock.exhibitionism>>
+    <<language>>
+      <<option 'EN'>><<set $_display_text to 'The pleasure of nakedness drives you to rapture.'>>
+      <<option 'CN'>><<set $_display_text to '赤裸之欢愉教你神魂颠倒。'>>
+    <</language>>
+    <<set _exhibitionismConfig.maxValue to 150>>
+    <<run Object.assign(_exhibitionismConfig.states[_exhibitionismConfig.states.length - 1], { color: 'lustful', description: $_display_text })>>
+  <</if>>
+
+  <<if $VanillaPlus.lock.deviancy>>
+    <<language>>
+      <<option 'EN'>><<set $_display_text to 'Taboo instincts now rule you.'>>
+      <<option 'CN'>><<set $_display_text to '禁忌本能正在主宰你。'>>
+    <</language>>
+    <<set _deviancyConfig.maxValue to 150>>
+    <<run Object.assign(_deviancyConfig.states[_deviancyConfig.states.length - 1], { color: 'lustful', description: $_display_text })>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-deviancy-conduct-link'>>
+  <<set $_canConductDeviancy to maplebirch.VP.deviancy.canConduct and $phase isnot 'no'>>
+  <<set $_canConductDeviancy to $_canConductDeviancy and !_gwylanStatus.includes('cautious')>>
+  <<set $_canConductDeviancy to $_canConductDeviancy and $settings.tentaclesEnabled and $settings.hypnosisEnabled>>
+  <<if $_canConductDeviancy and !playerChastity()>>
+    <<language>>
+      <<option 'EN'>><<ind>><<link [[Offer to lead the next cleansing|Deadwood Reblooms Deviancy Conduct]]>><</link>> <<note 'Deviancy' 'red'>>
+      <<option 'CN'>><<ind>><<link [[提出主持下一场净化仪式|Deadwood Reblooms Deviancy Conduct]]>><</link>> <<note '异种癖' 'red'>>
+    <</language>>
+    <br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Deviancy Conduct []
+<<set $outside to 0>><<set $location to 'forest_shop'>><<effects>><<run statusCheck('Gwylan')>>
+<<language>>
+  <<option 'EN'>>You tell Gwylan that you want to lead the next cleansing. You have felt the forest's poison squirm through your body often enough.
+    This time, you want it to follow your rhythm.
+  <br><br>
+  <<He>> stops arranging the bottles behind the counter. <<His>> gaze lingers on you. "You've learned how it moves through you," <<he>> says. "And
+    the forest answers when you open yourself to it. That doesn't mean it belongs to you."
+  <br><br>
+  <<He>> selects several bottles and places them in a case. "You may set the pace and guide the current. I'll prepare the reagents and hold the seal.
+    If I tell you to stop, you stop. It doesn't matter how good it feels if the poison escapes back into the world."
+  <br><br>
+  A familiar heat stirs inside you. Gwylan notices, and smiles. "Very well. Show me what your body has learned."
+  <br><br>
+  <<link [[Begin the cleansing|Gwylan Ritual Start]]>><<run maplebirch.VP.deviancy.begin()>><</link>>
+  <br>
+  <<link [[Not today|Forest Shop Entrance]]>><</link>>
+  <<option 'CN'>>你告诉格威岚，下一场净化仪式想由自己主持。森林的毒素已经在你的身体里蠕动过太多次。这一次，你想让它顺从你的节奏。
+  <br><br>
+  <<He>>停下整理柜台后方瓶罐的动作，目光在你身上停留片刻。“你已经学会毒素如何在体内游走，”<<he>>说道，“当你主动向森林敞开身体，它也会回应你。
+    但这不代表它属于你。”
+  <br><br>
+  <<He>>挑出几只瓶子，放进箱中。“你可以控制节奏，引导毒素的流向。药剂和封印仍由我负责。我让你停下时，你就必须停下。无论过程多么舒服，
+    毒素若重新逃回这个世界，净化就不算成功。”
+  <br><br>
+  熟悉的热意在你体内浮现。格威岚注意到了，露出微笑。“很好。让我看看你的身体都学会了什么。”
+  <br><br>
+  <<link [[开始净化仪式|Gwylan Ritual Start]]>><<run maplebirch.VP.deviancy.begin()>><</link>>
+  <br>
+  <<link [[今天还是算了|Forest Shop Entrance]]>><</link>>
+<</language>>
+
+<<widget 'deadwood-reblooms-deviancy-unlock'>>
+  <<set $VanillaPlus.lock.deviancy to true>>
+  <<language>>
+    <<option 'EN'>>The last of the poison writhes through your body, following the rhythm you set. The seal closes around it. Gwylan mixed the
+      reagents, but the forest moved to your command, through the body you offered it.
+    <br><br>
+    <span class="gold">Your deviancy has broken through its former limits.</span>
+    <<option 'CN'>>最后的毒素沿着你定下的节奏，在体内扭动前行。封印随之合拢。格威岚调配了药剂，森林却听从了你的号令，穿行于你主动献上的身体。
+    <br><br>
+    <span class="gold">你的异种癖突破了原本的极限。</span>
+  <</language>>
+  <br><br>
+<</widget>>
+
+<<widget 'deadwood-reblooms-exhibitionism-unlock'>>
+  <<set $VanillaPlus.lock.exhibitionism to true>>
+  <<language>>
+    <<option 'EN'>>You remember pool water against your bare skin, the ballroom lights upon your naked dance, and strangers staring in the crowded
+      high street. The memories send a pleasant heat through you. Shame had every chance to stop you. You showed them more instead.
+    <br><br>
+    <span class="gold">Your exhibitionism has broken through its former limits.</span>
+    <<option 'CN'>>你想起池水抚过赤裸皮肤的触感、舞厅灯光下的裸体舞姿，以及商业街上陌生人投来的目光。回忆令热意在体内升起。羞耻本可以阻止你，
+      你却选择向他们展示更多。
+    <br><br>
+    <span class="gold">你的暴露癖突破了原本的极限。</span>
+  <</language>>
+  <br><br>
+<</widget>>
+
+<<widget 'deadwood-reblooms-physique-unlock'>>
+  <<set $VanillaPlus.lock.physique to true>>
+  <<language>>
+    <<option 'EN'>>Only after the danger has passed do your muscles begin to tremble. You remember shutters, raiders, fences and cages, all trying to
+      keep your body where someone else wanted it. The thought of being held helpless still sends a thrill through you. It no longer feels possible.
+    <br><br>
+    <span class="gold">Your physique has broken through its former limits.</span>
+    <<option 'CN'>>直到危险过去，你的肌肉才开始颤抖。你想起卷帘门、袭击者、围墙与牢笼，它们都曾试图把你的身体困在别人指定的位置。
+      任人摆布的念头仍会令你战栗，如今却已不再可能。
+    <br><br>
+    <span class="gold">你的体格突破了原本的极限。</span>
+  <</language>>
+  <br><br>
+<</widget>>
+
+<<widget 'deadwood-reblooms-willpower-unlock'>>
+  <<if maplebirch.VP.willpower.unlock>>
+    <<language>>
+      <<option 'EN'>><<link [[Dive towards the rune again|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
+      <<option 'CN'>><<link [[再次潜向符文|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
+    <</language>>
+    <br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Willpower Unlock 1 []
+<<set $outside to 0>><<set $location to "lake_ruin">><<set $bus to "lake_ruin_prison">><<underwater>><<effects>><<set $oxygen -= 80>>
+<<language>>
+  <<option 'EN'>>You take a deep breath and dive. It is a long way down.<<loxygen>>
+  <br><br>
+  <<water>><<effectswater "water">>
+  <<waterbr 2>>
+
+  When you finally reach the end again, you see the same glowing rune, cold as a gravestone. You stare at its light.
+  <br><br>
+  <span class="green">You could try holding the rune again.</span>
+  <br><br>
+  <<link [[Swim back|Lake Ruin Prison]]>><<wraith_pass 2>><</link>>
+  <br>
+  <<link [[Hold the rune again|Deadwood Reblooms Willpower Unlock 2]]>><<set $oxygen -= 60>><</link>>
+  <<option 'CN'>>你深呼吸，潜下水去。这是一段漫长的距离。<<loxygen>>
+  <br><br>
+  <<water>><<effectswater "water">>
+  <<waterbr 2>>
+
+  当你再次到达尽头时，你看到了同样的发光符文，它冰冷得像一块墓碑。你望向那发光符文。
+  <br><br>
+  <span class="green">你可以再次尝试按住符文。</span>
+  <br><br>
+  <<link [[游回去|Lake Ruin Prison]]>><<wraith_pass 2>><</link>>
+  <br>
+  <<link [[再次按住符文|Deadwood Reblooms Willpower Unlock 2]]>><<set $oxygen -= 60>><</link>>
+<</language>>
+<br>
+
+:: Deadwood Reblooms Willpower Unlock 2 []
+<<underwater>><<effects>>
+<<language>>
+  <<option 'EN'>>You press your palm against the rune. Its chill sinks through your skin, followed by a faint pulse from deep within the stone.
+  <br><br>
+  The ear slimes writhe inside you. Warmth runs down your spine as <span class="lewd">they order you to take your hand away, spread yourself and give
+    your body to the pale figure.</span> Your fingers twitch, trying to obey.
+  <br><br>
+  <<link [[Obey and swim back|Lake Ruin Prison]]>><<wraith_pass 2>><<sub 1>><</link>><<lwillpower>>
+  <br>
+  <<link [[Defy them and keep hold|Deadwood Reblooms Willpower Unlock 3]]>><<set $oxygen -= 60>><<def 1>><</link>><<gwillpower>>
+  <<option 'CN'>>你把手掌按在符文上。寒意透过皮肤渗入，紧接着，石头深处传来微弱的搏动。
+  <br><br>
+  两团史莱姆同时在你的耳中蠕动。热意沿脊背向下蔓延，<span class="lewd">它们命令你把手拿开，敞开身体，将自己献给苍白的身影。</span>你的手指自行抽动，
+    试图服从。
+  <br><br>
+  <<link [[服从并游回去|Lake Ruin Prison]]>><<wraith_pass 2>><<sub 1>><</link>><<lwillpower>>
+  <br>
+  <<link [[违抗命令，继续按住|Deadwood Reblooms Willpower Unlock 3]]>><<set $oxygen -= 60>><<def 1>><</link>><<gwillpower>>
+<</language>>
+<br>
+
+:: Deadwood Reblooms Willpower Unlock 3 []
+<<underwater>><<effects>>
+<<language>>
+  <<option 'EN'>>You force your fingers flat against the stone. The slimes fill your thoughts with pale hands spreading and using your helpless body,
+    but the pulse beneath your palm grows stronger.
+  <br><br>
+  The water behind you turns deathly cold. Pale fingers close around your wrist. The pale figure draws close, its voice sounding from inside your
+    skull. "<span class="wraith">You will bend. Or you will break.</span>"
+  <<option 'CN'>>你强迫手指平贴在石头上。史莱姆在你的脑中塞满苍白双手摆弄、享用你无力身体的画面，掌下的搏动却愈发强烈。
+  <br><br>
+  身后的湖水变得刺骨。苍白的手指扣住你的手腕，苍白的身影贴近过来，声音直接在你的颅内响起。“<span class="wraith">向我屈服。除非你想就此崩溃。</span>”
+<</language>>
+<<generateWraith 1>><<initWraith "abomination">><<startWraith>>
+<br><br>
+<<language>>
+  <<option 'EN'>><<link [[Resist|Deadwood Reblooms Willpower Unlock Fight]]>><</link>>
+  <<option 'CN'>><<link [[反抗|Deadwood Reblooms Willpower Unlock Fight]]>><</link>>
+<</language>>
+<br>
+
+:: Deadwood Reblooms Willpower Unlock Fight []
+<<effects>>
+<<if $molestationstart is 1>>
+  <<set $molestationstart to 0>><<controlloss>><<violence 1>><<neutral 1>><<molested>><<set $enemytype to $wraith.type>>
+<</if>>
+<<underwater>><<effectsWraith>>
+<<if _combatend>>
+  <<language>>
+    <<option 'EN'>><span id="next"><<link [[Next|Deadwood Reblooms Willpower Unlock End]]>><</link>></span><<nexttext>>
+    <<option 'CN'>><span id="next"><<link [[继续|Deadwood Reblooms Willpower Unlock End]]>><</link>></span><<nexttext>>
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>><span id="next"><<link [[Next|Deadwood Reblooms Willpower Unlock Fight]]>><</link>></span><<nexttext>>
+    <<option 'CN'>><span id="next"><<link [[继续|Deadwood Reblooms Willpower Unlock Fight]]>><</link>></span><<nexttext>>
+  <</language>>
+<</if>>
+<br>
+
+:: Deadwood Reblooms Willpower Unlock End []
+<<underwater>><<effects>>
+<<if $enemyhealth lte 0>>
+  <<set $VanillaPlus.lock.willpower to true>><<set $wraith.defeated++>>
+  <<language>>
+    <<option 'EN'>>The figure looks down at you in shock as it staggers backwards. The pale tentacles drop lifelessly into the darkness, and
+      sublimate into pink mist. Both slimes pulse furiously, ordering you to kneel, spread yourself and submit. <span class="green">Your body answers
+      only to you.</span>
+    <br><br>
+    The rune flares scarlet beneath your palm. Its pulse travels through your arm and settles behind your eyes. The pale figure's shriek fades into
+      the water, but its presence remains beyond the dark.
+    <br><br>
+    <span class="gold">Your will has broken through its former limits.</span>
+    <<option 'CN'>>苍白的身影踉跄着后退，震惊地低头看着你。苍白的触手无力地落入黑暗，化作粉色薄雾。两团史莱姆愤怒地鼓动，命令你跪下、敞开身体并服从。
+      <span class="green">你的身体却只听从你自己。</span>
+    <br><br>
+    符文从你的掌心下亮起猩红的光。那阵搏动沿着手臂上行，最终沉入双眼之后。苍白身影的尖啸消散在水中，但祂的存在仍停留在黑暗彼端。
+    <br><br>
+    <span class="gold">你的意志突破了原本的极限。</span>
+    <br><br>
+  <</language>>
+  <<set $wraithPrison.timer to 120>><<set $wraithPrison.state to "recovering">>
+<<else>>
+  <<ejacW>>
+  <<language>>
+    <<option 'EN'>>Your grip slips from the rune. The slimes throb in approval as the pale figure's laughter fills the water. A current hurls you
+      back towards the stairs.
+    <<option 'CN'>>你的手从符文上滑落。史莱姆赞许地在耳中鼓动，苍白身影的笑声灌满湖水。一股激流将你抛回楼梯。
+  <</language>>
+  <<set $wraithPrison.timer to 60>><<set $wraithPrison.state to "recovering">>
+<</if>>
+<<clotheson>><<endcombat>><<endWraith>>
+<br><br>
+<<language>>
+  <<option 'EN'>><<link [[Swim back|Lake Ruin Prison]]>><<wraith_pass 2>><</link>>
+  <<option 'CN'>><<link [[游回去|Lake Ruin Prison]]>><<wraith_pass 2>><</link>>
+<</language>>
+<br>

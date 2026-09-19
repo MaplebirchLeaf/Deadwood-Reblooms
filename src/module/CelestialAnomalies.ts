@@ -1,11 +1,17 @@
 // ./src/module/CelestialAnomalies.ts
 
-import { version } from './constants';
+import Module from './Module';
 import SolarEclipse from './CelestialAnomalies/SolarEclipse';
 import MeteorShower from './CelestialAnomalies/MeteorShower';
 import { MacroDefinition } from 'twine-sugarcube';
 
-class CelestialAnomalies {
+function formatTime(timestamp: number): string {
+  const date = new DateTime(timestamp);
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${String(date.year).padStart(4, '0')}-${pad(date.month)}-${pad(date.day)} ${pad(date.hour)}:${pad(date.minute)}`;
+}
+
+class CelestialAnomalies extends Module {
   static readonly options = {
     SolarEclipse: true,
     MeteorShower: true
@@ -23,25 +29,24 @@ class CelestialAnomalies {
   };
 
   public readonly exposed = true;
-  private readonly migration: ReturnType<typeof maplebirch.tool.migration.create>;
   private readonly solarEclipse: SolarEclipse;
   private readonly meteorShower: MeteorShower;
 
-  public constructor(readonly core: typeof maplebirch) {
+  public constructor(core: typeof maplebirch) {
+    super(core, 'CelestialAnomalies', CelestialAnomalies.variables);
     this.solarEclipse = new SolarEclipse(core);
     this.meteorShower = new MeteorShower(core);
-    this.migration = this.core.tool.migration.create();
-    this.migration.add('*', version, (data, utils) => utils.fill(data, clone(CelestialAnomalies.variables)));
     this.core.once(':storyready', () => {
       const macro = this.core.SugarCube.Macro.get('weatherIcon') as MacroDefinition | undefined;
       if (!macro) return;
       this.core.tool.macro.define('weatherIcon', function (this: any) {
-        if (!Weather.solarEclipse) {
+        if (!Weather.solarEclipse && !Weather.meteorShower) {
           macro.handler.call(this);
           return;
         }
         const weatherState = typeof Weather.current.iconType === 'function' ? Weather.current.iconType() : (Weather.current.iconType ?? 'clear');
-        const path = `img/ui/weather/solar-eclipse-${weatherState}.png`;
+        const anomaly = Weather.solarEclipse ? 'solar-eclipse' : 'meteor-shower';
+        const path = `img/ui/weather/${anomaly}-${weatherState}.png`;
         const iconDiv = $('<div />', { id: 'weatherIcon' });
         const iconImg = $('<img />');
         iconImg.attr('src', path);
@@ -65,6 +70,13 @@ class CelestialAnomalies {
     return this.solarEclipse.active;
   }
 
+  get SolarEclipseStored() {
+    return this.solarEclipse.stored.map(event => {
+      const midnight = new DateTime(event.year, event.month, event.day).timeStamp;
+      return { start: formatTime(midnight + event.start), end: formatTime(midnight + event.end) };
+    });
+  }
+
   get MeteorShowerActive() {
     return this.meteorShower.active;
   }
@@ -78,11 +90,12 @@ class CelestialAnomalies {
   }
 
   get MeteorShowerStored() {
-    return this.meteorShower.stored;
+    return this.meteorShower.stored.map(event => ({ start: formatTime(event.start), end: formatTime(event.end) }));
   }
 
   public preInit(): void {
     this.core.var.options.define('CelestialAnomalies', CelestialAnomalies.options);
+    super.preInit();
     this.solarEclipse.apply();
     this.meteorShower.apply();
   }

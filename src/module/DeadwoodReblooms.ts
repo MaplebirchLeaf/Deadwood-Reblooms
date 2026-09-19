@@ -1,5 +1,6 @@
 // ./src/module/DeadwoodReblooms.ts
-import { defaults, version } from './constants';
+import { defaults } from './constants';
+import Module from './Module';
 
 class Hint {
   constructor(
@@ -30,22 +31,20 @@ class Hint {
   }
 }
 
-class DeadwoodReblooms {
+class DeadwoodReblooms extends Module {
   static readonly options = {
     modhint: 'disabled' as 'disabled' | 'mobile' | 'desktop',
-    bodywriting: false as boolean
+    bodywriting: false as boolean,
+    baileyRent: false as boolean
   };
 
   public readonly exposed = true;
-  public readonly version = version;
   public hint?: Hint;
   public readonly log = maplebirch.tool.createlog('DeadwoodReblooms');
-  private readonly migration: ReturnType<typeof maplebirch.tool.migration.create>;
   private random?: ReturnType<typeof maplebirch.tool.rand.create>;
 
-  public constructor(readonly core: typeof maplebirch) {
-    this.migration = this.core.tool.migration.create();
-    this.migration.add('*', version, (data, utils) => utils.fill(data, clone(defaults)));
+  public constructor(core: typeof maplebirch) {
+    super(core, 'DeadwoodReblooms', defaults);
     this.core.once(':storyready', () => {
       $('#history-backward').ariaClick(() => this.rand.back(1));
       $('#history-forward').ariaClick(() => this.rand.forward(1));
@@ -63,6 +62,20 @@ class DeadwoodReblooms {
     return (this.random = this.core.tool.rand.create(state));
   }
 
+  public accrueBaileyRent(): void {
+    if (V.options?.maplebirch?.baileyRent !== true || !Number.isFinite(V.rentmoney)) return;
+    const debt = Number.isFinite(V.DeadwoodReblooms.baileyRentDebt) ? Math.max(0, Math.floor(V.DeadwoodReblooms.baileyRentDebt)) : 0;
+    const rent = Math.max(0, Math.floor(V.rentmoney));
+    const babyRent = Number.isFinite(V.babyRent) ? Math.max(0, Math.floor(V.babyRent)) : 0;
+    const baseRent = Math.max(0, rent - debt);
+    V.DeadwoodReblooms.baileyRentDebt = debt + baseRent + babyRent;
+    V.rentmoney = baseRent + V.DeadwoodReblooms.baileyRentDebt;
+  }
+
+  public settleBaileyRent(): void {
+    V.DeadwoodReblooms.baileyRentDebt = 0;
+  }
+
   public open(): void {
     $.wiki("<<maplebirchReplace 'DeadwoodRebloomsHint' 'title'>>");
     const textbox = document.querySelector<HTMLInputElement>('#textbox--deadwoodrebloomshinttextbox');
@@ -74,11 +87,8 @@ class DeadwoodReblooms {
   public preInit(): void {
     this.core.var.options.define('modhint', DeadwoodReblooms.options);
     this.core.var.options.define('bodywriting', DeadwoodReblooms.options);
-    this.core.on(':variable', () => {
-      V.DeadwoodReblooms ??= {};
-      if (this.core.passage?.title === 'Start2') V.DeadwoodReblooms = clone({ ...defaults, version: this.version });
-      this.migration.run(V.DeadwoodReblooms, this.version);
-    });
+    this.core.var.options.define('baileyRent', DeadwoodReblooms.options);
+    super.preInit();
   }
 }
 

@@ -44,6 +44,7 @@ interface ScanOptions {
 
 interface TweePatcherRule {
   passage: string;
+  all?: boolean;
   findString: string;
   replace?: string;
   replaceFile?: string;
@@ -62,11 +63,21 @@ interface BootFileLists {
 }
 
 interface BeautySelectorParams {
-  type: string;
-  imgFileList: string[];
+  types: Array<{
+    type: string;
+    imgFileListFile: string;
+  }>;
 }
 
-const BEAUTY_SELECTOR_TYPE = 'Deadwood-Reblooms-Images';
+const BEAUTY_SELECTOR_TYPES = [
+  { type: 'Deadwood-Reblooms-Images', sourceDir: '', imgFileListFile: 'Deadwood-Reblooms-Images.json' },
+  {
+    type: 'Deadwood-Reblooms-Fem-Goose-Compilation',
+    sourceDir: 'Fem Goose Compilation/',
+    imgFileListFile: 'Fem Goose Compilation/Deadwood-Reblooms-Fem-Goose-Compilation.json'
+  },
+  { type: 'Deadwood-Reblooms-Mysterious', sourceDir: 'Mysterious/', imgFileListFile: 'Mysterious/Deadwood-Reblooms-Mysterious.json' }
+] as const;
 const SIDEBAR_CLOTHES_DIR = 'named-npc-clothes';
 
 const scriptFileLists = {
@@ -168,6 +179,7 @@ function buildRules(content: string, type: 'twee' | 'patcher'): Array<TweePatche
       passage: String(item.passage ?? ''),
       findString: source
     };
+    if (item.all === true) rule.all = true;
     if (typeof item.replace === 'string') {
       rule.replace = item.replace;
     } else if (typeof item.replaceFile === 'string') {
@@ -188,7 +200,7 @@ function BeautySelectorImageFiles(files: string[]): string[] {
   return collectImageFiles(files).filter(filePath => {
     const normalized = normalizePath(filePath);
     if (normalized.startsWith('dist/')) return false;
-    return normalized.split('/')[0] === 'img';
+    return BEAUTY_SELECTOR_TYPES.some(({ sourceDir }) => normalized.startsWith(`${sourceDir}img/`));
   });
 }
 
@@ -215,12 +227,19 @@ function AdditionDirs(imgFileList: string[]): string[] {
   return result.sort();
 }
 
-function BeautySelectorParams(imgFileList: string[]): BeautySelectorParams | null {
-  if (!imgFileList.length) return null;
-  return {
-    type: BEAUTY_SELECTOR_TYPE,
-    imgFileList: [...imgFileList].sort()
-  };
+function BeautySelectorParams(imgFileList: string[]): { params: BeautySelectorParams; lists: Map<string, string[]> } | null {
+  const lists = new Map<string, string[]>();
+  const types: BeautySelectorParams['types'] = [];
+  for (const { type, sourceDir, imgFileListFile } of BEAUTY_SELECTOR_TYPES) {
+    const images = imgFileList
+      .filter(filePath => normalizePath(filePath).startsWith(`${sourceDir}img/`))
+      .map(filePath => normalizePath(filePath).slice(sourceDir.length))
+      .sort();
+    if (!images.length) continue;
+    types.push({ type, imgFileListFile });
+    lists.set(imgFileListFile, images);
+  }
+  return types.length ? { params: { types }, lists } : null;
 }
 
 function BootFileLists(files: string[]): BootFileLists {
@@ -436,7 +455,8 @@ export async function createZip(rootDir: string): Promise<Buffer> {
   const bootFileLists = BootFileLists(allFiles);
   const sidebarClothesFiles = SidebarClothesFiles(allFiles);
   const beautySelectorImageFiles = BeautySelectorImageFiles(allFiles);
-  const beautySelectorParams = BeautySelectorParams(beautySelectorImageFiles);
+  const beautySelector = BeautySelectorParams(beautySelectorImageFiles);
+  beautySelector?.lists.forEach((files, filePath) => zip.addFile(filePath, Buffer.from(JSON.stringify(files, null, 2))));
   const additionDirs = AdditionDirs(beautySelectorImageFiles);
   const tweePatcherRules = buildRules(tweePatcherRulesRaw, 'twee');
   const replacePatcherRules = buildRules(replacePatcherRaw, 'patcher');
@@ -450,7 +470,7 @@ export async function createZip(rootDir: string): Promise<Buffer> {
     ClothesFiles(publicFiles),
     distFileSet,
     sidebarClothesFiles,
-    beautySelectorParams,
+    beautySelector?.params ?? null,
     tweePatcherRules,
     replacePatcherRules
   );
