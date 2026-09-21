@@ -89,6 +89,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     }
   );
 
+  // 扩展战斗性行为选项，并接入淫乱突破与数值上限。
   maplebirch.tool.zone.inject({
     widgetPassage: {
       Cheats: [

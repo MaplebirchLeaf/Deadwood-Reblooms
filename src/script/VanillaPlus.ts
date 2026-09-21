@@ -1,10 +1,15 @@
 // ./src/script/VanillaPlus.ts
 
+import AcademicHonours from './VanillaPlus/AcademicHonours';
 import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
+import HistoryProject from './VanillaPlus/HistoryProject';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
+import SydneyConfession from './VanillaPlus/SydneyConfession';
+import SydneyScience from './VanillaPlus/SydneyScience';
+import VirginityRestoration from './VanillaPlus/VirginityRestoration';
 import Willpower from './VanillaPlus/Willpower';
 
 export default function (maplebirch: typeof window.maplebirch) {
@@ -18,14 +23,19 @@ export default function (maplebirch: typeof window.maplebirch) {
   });
 
   maplebirch.tool.addTo('DegreesBonusDisplay', 'deadwood-reblooms-characteristics-degrees-display');
+  AcademicHonours(maplebirch);
   Beauty(maplebirch);
   Deviancy(maplebirch);
   Exhibitionism(maplebirch);
+  HistoryProject(maplebirch);
   Physique(maplebirch);
   Promiscuity(maplebirch);
   Willpower(maplebirch);
+  SydneyConfession(maplebirch);
+  SydneyScience(maplebirch);
+  VirginityRestoration(maplebirch);
 
-  maplebirch.tool.patch.addTraits(
+  maplebirch.tool.patch.traits.add(
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.willpower.name'),

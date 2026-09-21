@@ -29,12 +29,15 @@ export default function (maplebirch: MaplebirchCore): void {
       if (title === 'Temple Jordan Apologise' || title === 'Temple Jordan Flirt' || (title === 'Temple Jordan Run' && !V.athleticsSuccess)) return 'towel';
       return '';
     }
+    const confessor = () => maplebirch.passage.title.startsWith('Temple Confess Self') && V.attendant === 'Jordan';
     // Widgets Named Npcs 固定 temple 服装，男女分别使用修士袍和修女袍。
     // 原版 V.npc 决定在场；这些条件只选择当前衣物，不创建人物或校服日程。
     wardrobe.wear('Jordan', '*', 'monk_habit', () => !bathing() && C.npc?.Jordan?.pronoun === 'm');
     wardrobe.wear('Jordan', '*', 'nun_habit', () => !bathing() && C.npc?.Jordan?.pronoun !== 'm');
     wardrobe.wear('Jordan', '*', 'naked', () => bathing() === 'naked');
     wardrobe.wear('Jordan', '*', 'towel_wrap', () => bathing() === 'towel');
+    wardrobe.wear('Jordan', '*', 'confessor_robe', () => confessor() && C.npc?.Jordan?.pronoun === 'm');
+    wardrobe.wear('Jordan', '*', 'confessor_habit', () => confessor() && C.npc?.Jordan?.pronoun !== 'm');
     wardrobe.modify('Jordan', (clothes, context) => {
       if (context.key === 'monk_habit' || context.key === 'nun_habit') sidebar.apply(clothes, Clothing.sandals);
     });

@@ -53,7 +53,9 @@ class MeteorShower {
     searchDays: 400
   };
 
-  public constructor(readonly core: typeof maplebirch) {
+  public constructor(readonly core: typeof maplebirch) {}
+
+  public preInit(): void {
     this.core.once(':variable', () => this.refresh());
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-meteor-shower', {
       action: () => this.refresh(),

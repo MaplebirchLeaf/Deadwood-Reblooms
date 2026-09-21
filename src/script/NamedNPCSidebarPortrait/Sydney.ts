@@ -105,6 +105,10 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     wardrobe.wear('Sydney', 'temple', 'novice_nun_habit', () => C.npc?.Sydney?.pronoun !== 'm' && ['initiate', '见习教徒'].includes(V.sydney?.rank));
     wardrobe.wear('Sydney', 'temple', 'initiate_robes', () => C.npc?.Sydney?.pronoun === 'm' && ['initiate', '见习教徒'].includes(V.sydney?.rank));
 
+    // 告解室：只在原版选中 Sydney 告解事件后换上对应性别的告解员服装
+    wardrobe.wear('Sydney', 'confessional', 'confessor_robe', () => C.npc?.Sydney?.pronoun === 'm');
+    wardrobe.wear('Sydney', 'confessional', 'confessor_habit', () => C.npc?.Sydney?.pronoun !== 'm');
+
     // 承诺仪式评估：女性换上宣誓修女服；正式仪式阶段仍按原剧情脱光
     wardrobe.wear('Sydney', 'promise', 'avowed_nun_habit', () => C.npc?.Sydney?.pronoun !== 'm');
 
@@ -270,6 +274,12 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
 
     // 承诺仪式评估服装优先于普通神殿服装
     if (title.startsWith('Sydney Temple Pure')) return 'promise';
+
+    // PC 作为忏悔者时，原版会在 Temple Confess Self 中把 $attendant 设为 Sydney。
+    if (title.startsWith('Temple Confess Self') && V.attendant === 'Sydney') return 'confessional';
+
+    // VanillaPlus 课堂互动始终使用科学教室状态；换班与神殿叫醒场景保留各自地点。
+    if (['Deadwood Reblooms Sydney Science Study', 'Deadwood Reblooms Sydney Science Chat', 'Deadwood Reblooms Sydney Science Tease'].includes(title)) return 'science';
 
     // 明确剧情地点
     if (V.location === 'temple') return 'temple';

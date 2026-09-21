@@ -24,15 +24,10 @@ export default function (maplebirch: typeof window.maplebirch) {
     cond: () => maplebirch.VP.beauty.alluring && !V.VanillaPlus.beauty.alluring
   });
 
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-beauty-breakthrough-link', passage: 'Photo Model 3' });
+
+  // 放宽原版美貌上限与钳制范围。
   maplebirch.tool.zone.inject({
-    locationPassage: {
-      'Photo Model 3': [
-        {
-          src: '<<if hasSexStat("exhibitionism", 2)>>',
-          applybefore: '<<deadwood-reblooms-beauty-breakthrough-link>>\n'
-        }
-      ]
-    },
     widgetPassage: {
       Cheats: [
         {

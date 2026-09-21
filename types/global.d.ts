@@ -1,6 +1,8 @@
 import type { CarryItemConfig } from '../src/module/reblooms/CarryItems';
 
 declare global {
+  const Links: { enabled: boolean };
+
   interface Window {
     isLoveInterest(name: string): boolean;
     isPossibleLoveInterest(name: string): boolean;

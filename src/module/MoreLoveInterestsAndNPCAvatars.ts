@@ -240,7 +240,9 @@ class NPCAvatars {
     seabird: ['seabird', '海鸟']
   };
 
-  public constructor(readonly core: typeof maplebirch) {
+  public constructor(readonly core: typeof maplebirch) {}
+
+  public preInit(): void {
     this.core.once(':sugarcube', () => {
       this.core.tool.macro.defineS('relationshipicon', () => this.avatar());
       this.core.tool.macro.defineS('mimicicon', () => this.mimic());
@@ -338,7 +340,9 @@ class MoreLoveInterests {
   public constructor(
     readonly core: typeof maplebirch,
     readonly avatars: NPCAvatars
-  ) {
+  ) {}
+
+  public preInit(): void {
     this.core.once(':sugarcube', () => {
       this.core.tool.macro.defineS('moreLoveInterest', () => this.panel);
       this.core.tool.macro.defineS('moreLoveInterestMessage', () => this.message);
@@ -523,6 +527,11 @@ class MoreLoveInterestsAndNPCAvatars {
   public constructor(readonly core: typeof maplebirch) {
     this.avatars = new NPCAvatars(core);
     this.loveInterests = new MoreLoveInterests(core, this.avatars);
+  }
+
+  public preInit(): void {
+    this.avatars.preInit();
+    this.loveInterests.preInit();
   }
 
   public icon(name: string, premade: boolean): string {

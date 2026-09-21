@@ -24,6 +24,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     cond: () => maplebirch.VP.exhibitionism.max && !V.feats.currentSave['Beyond Shame']
   });
 
+  // 记录原版裸露挑战结果，并扩展暴露癖上限。
   maplebirch.tool.zone.inject({
     locationPassage: {
       'Photo High Start': [

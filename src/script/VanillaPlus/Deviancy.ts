@@ -26,6 +26,13 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   const discover = (mirror: 'home' | 'farm' | 'tower') => `<<run maplebirch.VP.deviancy.discover('${mirror}')>>`;
 
+  maplebirch.tool.addTo(
+    'BeforeLinkZone',
+    { widget: 'deadwood-reblooms-deviancy-mirror-exits', passage: 'Tentacle Plains' },
+    { widget: 'deadwood-reblooms-deviancy-conduct-link', passage: 'Gwylan Ritual Select' }
+  );
+
+  // 记录镜面探索与仪式结算，并扩展异种癖上限。
   maplebirch.tool.zone.inject({
     locationPassage: {
       Mirror: [{ src: '<<effects>>', applyafter: discover('home') }],
@@ -42,18 +49,6 @@ export default function (maplebirch: typeof window.maplebirch) {
         {
           src: '<<crimeicon "mark">>',
           applybefore: '<<deadwood-reblooms-deviancy-mirror-enter-link "home">>\n'
-        }
-      ],
-      'Tentacle Plains': [
-        {
-          src: '<<if $tentnorth lt 5>>',
-          applybefore: '<<deadwood-reblooms-deviancy-mirror-exits>>\n'
-        }
-      ],
-      'Gwylan Ritual Select': [
-        {
-          src: '\t<<gwylanOptions>>\n<</if>>',
-          applybefore: '\t<<deadwood-reblooms-deviancy-conduct-link>>\n'
         }
       ]
     },

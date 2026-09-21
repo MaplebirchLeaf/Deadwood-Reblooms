@@ -1,6 +1,7 @@
 import DeadwoodReblooms from './DeadwoodReblooms';
 import MoreLoveInterestsAndNPCAvatars from './MoreLoveInterestsAndNPCAvatars';
 import CelestialAnomalies from './CelestialAnomalies';
+import DynamicMusic from './DynamicMusic';
 import NPCSidebarPortrait from './NPCSidebarPortrait';
 import VanillaPlus from './VanillaPlus';
 
@@ -11,6 +12,7 @@ import VanillaPlus from './VanillaPlus';
   if (maplebirch.get('MLIANPCA')) MoreLoveInterestsAndNPCAvatars(maplebirch);
   if (maplebirch.get('LongerCombat')) maplebirch.tool.addTo('Options', 'Deadwood-Reblooms-LongerCombat-Options');
   if (maplebirch.get('CA')) CelestialAnomalies(maplebirch);
+  if (maplebirch.get('DM')) DynamicMusic(maplebirch);
   if (maplebirch.get('NPCSidebarPortrait')) NPCSidebarPortrait(maplebirch);
   if (maplebirch.get('VP')) VanillaPlus(maplebirch);
 })(maplebirch);

@@ -16,6 +16,7 @@ const wardrobeKeys = [
   'leather_jacket_jeans',
   'school_swim_shorts',
   'school_swimsuit',
+  'diving_suit',
   'pyjama',
   'towel_wrap',
   'witch',

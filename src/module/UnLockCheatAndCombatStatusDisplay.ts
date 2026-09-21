@@ -18,6 +18,7 @@ class UnlockCheatAndCombatStatusDisplay {
     const anger = ' <<print "(" + Math.round($enemyanger) + "/" + $enemyangermax + ")">>';
     const trust = ' <<print "(" + Math.round($enemytrust) + ")">>';
 
+    // 解锁原版作弊入口，并在战斗状态旁显示精确数值。
     this.core.tool.zone.inject({
       locationPassage: {
         StoryCaption: [

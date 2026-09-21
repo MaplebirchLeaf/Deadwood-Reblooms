@@ -4,12 +4,28 @@
 
 > 当前仍处于 `1.0.0` 前的开发阶段，README、功能和存档结构尚未定稿。
 
-## 模组来源
+## 模块管理
+
+本模组使用秋枫白桦框架的模块管理。`DR` 是根模块，关闭后会同时停用本模组提供的全部子模块；其余模块可以按功能单独关闭，重载后生效：
+
+- `UCACSD`：作弊按钮解锁与战斗状态显示
+- `LongerCombat`：更长遭遇战
+- `MLIANPCA`：更多恋人与 NPC 社交栏小头像
+- `ICC`：言灵作弊集
+- `CA`：日蚀与流星雨等天体异象
+- `MoreTransformations`：更多转化
+- `NPCSidebarPortrait`：NPC 侧边栏立绘扩展
+- `VP`：原版增强
+- `DM`：随白天、夜晚、血月与遭遇战切换的动态音乐（功能选项默认关闭）
+
+静态脚本补丁会在运行时再次确认对应模块处于启用状态，因此关闭模块后不会仅因旧存档仍保留相关数据而继续生效。
+
+## 友情支持与致谢
 
 本项目对以下模组的功能与内容进行了重构整合：
 
 - **更多恋人系统**：苯环的 [Nephthelana/DoL-More-Love-Interests-Mod](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod)
-- **NPC 社交栏头像**：Eudemonism00 的 [Eudemonism00/DOL-NPC-Avatars-Mod](https://github.com/Eudemonism00/DOL-NPC-Avatars-Mod)
+- <img src="public/img/misc/icon/bonus/wip.png" alt="WIP" width="30" height="30"> **NPC 社交栏头像**：Eudemonism00 的 [Eudemonism00/DOL-NPC-Avatars-Mod](https://github.com/Eudemonism00/DOL-NPC-Avatars-Mod)
 
 NPC 头像为原模组作者创作的同人形象，并非游戏官方设定，请勿将其视为角色的官方形象。
 

@@ -13,10 +13,7 @@ class IncantationCheatCollection {
   private editingName: string | null = null;
   private sortOrder: number = 0;
 
-  public constructor(readonly core: typeof maplebirch) {
-    this.core.once(':indexedDB', () => this.core.idb.register('cheats', { keyPath: 'name' }));
-    this.core.once(':idbReady', async () => await this.refreshCache());
-  }
+  public constructor(readonly core: typeof maplebirch) {}
 
   private escapeCode(code: string): string {
     return code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\$/g, '&#36;').replace(/\\\$/g, '&#36;');
@@ -413,7 +410,9 @@ class IncantationCheatCollection {
     return (hash >>> 0).toString(16);
   }
 
-  preInit(): void {
+  public preInit(): void {
+    this.core.once(':indexedDB', () => this.core.idb.register('cheats', { keyPath: 'name' }));
+    this.core.once(':idbReady', async () => await this.refreshCache());
     this.core.tool.onInit(() => {
       setup.maplebirch.content.push(`
         <div id='ConsoleCheat'>

@@ -63,6 +63,7 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   const flag = (name: string) => `<<set $VanillaPlus.physique.${name} to true>>`;
 
+  // 记录原版挣脱挑战结果，并扩展体格上限。
   maplebirch.tool.zone.inject({
     locationPassage: {
       'Flats Sneak Physique': [{ src: '<<if $physiqueSuccess>>', applyafter: flag('panic') }],

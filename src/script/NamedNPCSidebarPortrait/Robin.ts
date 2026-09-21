@@ -117,6 +117,7 @@ export default function (
     wardrobe.wear('Robin', ['naked', 'docks', 'dinner', 'underground'], 'naked');
     wardrobe.wear('Robin', 'mist', 'rags');
     wardrobe.wear('Robin', 'giftWrap', 'gift_wrap');
+    wardrobe.wear('Robin', 'historyDive', 'diving_suit');
 
     // 寒冷服装
     const coldOutfits = [
@@ -276,6 +277,9 @@ export default function (
     const title = maplebirch.passage.title;
     // 未解锁 Robin，不参与日程
     if (C.npc?.Robin?.init !== 1) return '';
+
+    // 历史项目湖底勘察
+    if (title.startsWith('Deadwood Reblooms History Project Lake') && V.VanillaPlus?.historyProject?.assistant) return 'historyDive';
 
     // 强制位置覆盖（剧情回放等）
     if (V.robinlocationoverride && V.robinlocationoverride.during.includes(Time.hour)) return V.robinlocationoverride.location;

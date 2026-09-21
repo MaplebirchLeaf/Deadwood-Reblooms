@@ -46,7 +46,7 @@ export default (_env: unknown, argv: { mode?: string }): Configuration => {
     module: {
       rules: [
         {
-          test: /\.(css|twee|ya?ml)$/,
+          test: /\.(css|md|twee|ya?ml)$/,
           type: 'asset/source'
         },
         {

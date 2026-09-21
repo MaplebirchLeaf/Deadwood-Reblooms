@@ -119,7 +119,7 @@ class Fish extends Transformation {
     maplebirch.tool.onInit(descriptions);
     maplebirch.on(':language', descriptions);
 
-    maplebirch.tool.patch.addTraits(
+    maplebirch.tool.patch.traits.add(
       {
         title: 'General Traits',
         name: () => maplebirch.t('deadwood-reblooms.Traits.gills.name'),
@@ -164,14 +164,14 @@ class Fish extends Transformation {
       <</if>>`
     );
 
-    // 鱼鳃与完整鱼转化特质
+    // 把鱼转化效果接入原版游泳、潜水和烹饪流程。
     maplebirch.tool.zone.inject({
       locationPassage: {
         'Rocks Pool': [
           {
             srcmatch: /<<swimicon "dive">><<link \[\[[^\n]*?\|Rocks Dive\]\]>>/,
             applybefore:
-              '<<icon "fish.png">><<link `maplebirch.t("deadwood-reblooms.fish.rockPool")` $passage>><<pass 10>><<stress -3>><<transform "fish" 1>><</link>><<lstress>><<transform-hint "fish" "lblue">><br>'
+              '<<icon "fish.png">><<link `lanSwitch(\'Lounge in the water like a fish (0:10)\', \'像鱼一样泡着 (0:10)\')` $passage>><<pass 10>><<stress -3>><<transform "fish" 1>><</link>><<lstress>><<transform-hint "fish" "lblue">><br>'
           }
         ]
       },

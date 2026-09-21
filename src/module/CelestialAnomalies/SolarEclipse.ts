@@ -35,9 +35,10 @@ class SolarEclipse {
     eclipse: null as SolarEclipseStored | null
   };
 
-  constructor(readonly core: typeof maplebirch) {
-    this.core.once(':variable', () => this.refresh());
+  constructor(readonly core: typeof maplebirch) {}
 
+  public preInit(): void {
+    this.core.once(':variable', () => this.refresh());
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-solar-eclipse', {
       action: () => this.refresh(),
       cond: () => this.enabled,

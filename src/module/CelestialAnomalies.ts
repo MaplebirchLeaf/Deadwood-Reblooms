@@ -36,26 +36,6 @@ class CelestialAnomalies extends Module {
     super(core, 'CelestialAnomalies', CelestialAnomalies.variables);
     this.solarEclipse = new SolarEclipse(core);
     this.meteorShower = new MeteorShower(core);
-    this.core.once(':storyready', () => {
-      const macro = this.core.SugarCube.Macro.get('weatherIcon') as MacroDefinition | undefined;
-      if (!macro) return;
-      this.core.tool.macro.define('weatherIcon', function (this: any) {
-        if (!Weather.solarEclipse && !Weather.meteorShower) {
-          macro.handler.call(this);
-          return;
-        }
-        const weatherState = typeof Weather.current.iconType === 'function' ? Weather.current.iconType() : (Weather.current.iconType ?? 'clear');
-        const anomaly = Weather.solarEclipse ? 'solar-eclipse' : 'meteor-shower';
-        const path = `img/ui/weather/${anomaly}-${weatherState}.png`;
-        const iconDiv = $('<div />', { id: 'weatherIcon' });
-        const iconImg = $('<img />');
-        iconImg.attr('src', path);
-        Weather.Tooltips.skybox(iconImg);
-        iconDiv.append(iconImg);
-        iconDiv.appendTo(this.output);
-      });
-      $('#weatherIcon').replaceWith(this.core.SugarCube.Wikifier.wikifyEval('<<weatherIcon>>'));
-    });
   }
 
   get SolarEclipsePhase() {
@@ -94,6 +74,28 @@ class CelestialAnomalies extends Module {
   }
 
   public preInit(): void {
+    this.solarEclipse.preInit();
+    this.meteorShower.preInit();
+    this.core.once(':storyready', () => {
+      const macro = this.core.SugarCube.Macro.get('weatherIcon') as MacroDefinition | undefined;
+      if (!macro) return;
+      this.core.tool.macro.define('weatherIcon', function (this: any) {
+        if (!Weather.solarEclipse && !Weather.meteorShower) {
+          macro.handler.call(this);
+          return;
+        }
+        const weatherState = typeof Weather.current.iconType === 'function' ? Weather.current.iconType() : (Weather.current.iconType ?? 'clear');
+        const anomaly = Weather.solarEclipse ? 'solar-eclipse' : 'meteor-shower';
+        const path = `img/ui/weather/${anomaly}-${weatherState}.png`;
+        const iconDiv = $('<div />', { id: 'weatherIcon' });
+        const iconImg = $('<img />');
+        iconImg.attr('src', path);
+        Weather.Tooltips.skybox(iconImg);
+        iconDiv.append(iconImg);
+        iconDiv.appendTo(this.output);
+      });
+      $('#weatherIcon').replaceWith(this.core.SugarCube.Wikifier.wikifyEval('<<weatherIcon>>'));
+    });
     this.core.var.options.define('CelestialAnomalies', CelestialAnomalies.options);
     super.preInit();
     this.solarEclipse.apply();

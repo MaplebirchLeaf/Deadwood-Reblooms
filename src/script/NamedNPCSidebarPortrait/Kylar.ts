@@ -196,6 +196,9 @@ export default function (
   function location(): string {
     const title = maplebirch.passage.title;
 
+    // 历史项目街头事件
+    if (title.startsWith('Deadwood Reblooms History Project Kylar')) return 'park';
+
     // 英语剧排练
     if (title.startsWith('English Play Rehearse') && (title.includes('Kylar') || title.includes('Both'))) return 'rehearsal';
 

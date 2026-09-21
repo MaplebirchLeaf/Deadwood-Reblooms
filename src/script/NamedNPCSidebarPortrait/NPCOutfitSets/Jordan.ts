@@ -11,6 +11,8 @@ export default function (maplebirch: MaplebirchCore): void {
     const outfits = {
       monk_habit: { name: 'jordan_monk', options: { type: 'temple', gender: 'm', outfit: 1 } },
       nun_habit: { name: 'jordan_nun', options: { type: 'temple', gender: 'f', outfit: 1 } },
+      confessor_robe: { name: 'jordan_confessor_robe', options: { type: 'temple', gender: 'm', outfit: 1 } },
+      confessor_habit: { name: 'jordan_confessor_habit', options: { type: 'temple', gender: 'f', outfit: 1 } },
       towel_wrap: { name: 'jordan_towel', options: { type: 'temple', gender: 'n', outfit: 0 } }
     };
     for (const [key, outfit] of Object.entries(outfits)) {

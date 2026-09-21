@@ -7,6 +7,11 @@ declare module '*.css' {
   export default content;
 }
 
+declare module '*.md' {
+  const content: string;
+  export default content;
+}
+
 declare module '*.twee' {
   const content: string;
   export default content;

@@ -163,7 +163,7 @@ class Horse extends Transformation {
     maplebirch.tool.onInit(descriptions);
     maplebirch.on(':language', descriptions);
 
-    maplebirch.tool.patch.addTraits(
+    maplebirch.tool.patch.traits.add(
       {
         title: 'General Traits',
         name: () => maplebirch.t('deadwood-reblooms.Traits.hooves.name'),
@@ -202,6 +202,7 @@ class Horse extends Transformation {
       };
     });
 
+    // 把马转化成长接入原版骑术、刷马和战斗动作。
     maplebirch.tool.zone.inject({
       locationPassage: {
         'Riding School Lesson Grab': [

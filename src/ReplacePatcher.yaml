@@ -2,12 +2,8 @@
   fileName: 'stat-changes.js'
   from: 'if (source === "pass") {'
   before: |
-    if (amount > 0 && V.maplebirch?.transformation?.horse?.level >= 6) fatigueMod *= 0.75;
-- comment: '启用贝利欠租累积后，将躲过的每周租金加入下次应付金额。'
-  fileName: 'time.js'
-  from: 'V.baileyRefusedToPayTotalStat += V.rentmoney + (V.babyRent || 0);'
-  after: |
-    maplebirch.DR.accrueBaileyRent();
+    if (maplebirch.get('MoreTransformations') && amount > 0 && V.maplebirch?.transformation?.horse?.level >= 6) fatigueMod *= 0.75;
+
 - comment: '意志突破后允许正常增益继续填充扩展后的六级上限。'
   fileName: 'stat-changes.js'
   from: 'V.willpower = Math.clamp(V.willpower + amount * 2, 0, V.willpowermax);'
@@ -59,3 +55,27 @@
   from: 'else V.physique = V.physique - V.physique / 2500;'
   to: |
     else V.physique = Math.max(maplebirch.get('VP')?.minimum('physique') ?? 0, V.physique - V.physique / 2500);
+
+- comment: '赢得科学博览会后，科学成绩不再自然衰减。'
+  fileName: 'time.js'
+  from: 'V.science_exam = Math.clamp(V.science_exam - 7, -107, 200);'
+  to: |
+    if (!maplebirch.get('VP')?.academicHonours.has('science')) V.science_exam = Math.clamp(V.science_exam - 7, -107, 200);
+
+- comment: '赢得数学竞赛后，数学成绩不再自然衰减。'
+  fileName: 'time.js'
+  from: 'V.maths_exam = Math.clamp(V.maths_exam - 7, -107, 200);'
+  to: |
+    if (!maplebirch.get('VP')?.academicHonours.has('maths')) V.maths_exam = Math.clamp(V.maths_exam - 7, -107, 200);
+
+- comment: '获得舞台剧表演者特质后，语文成绩不再自然衰减。'
+  fileName: 'time.js'
+  from: 'V.english_exam = Math.clamp(V.english_exam - 7, -107, 200);'
+  to: |
+    if (!maplebirch.get('VP')?.academicHonours.has('english')) V.english_exam = Math.clamp(V.english_exam - 7, -107, 200);
+
+- comment: '以最高评价完成本地历史展览后，历史成绩不再自然衰减。'
+  fileName: 'time.js'
+  from: 'V.history_exam = Math.clamp(V.history_exam - 7, -107, 200);'
+  to: |
+    if (!maplebirch.get('VP')?.academicHonours.has('history')) V.history_exam = Math.clamp(V.history_exam - 7, -107, 200);

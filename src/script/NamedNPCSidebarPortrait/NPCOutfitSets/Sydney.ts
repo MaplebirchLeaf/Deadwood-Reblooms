@@ -14,6 +14,8 @@ const wardrobeKeys = [
   'initiate_robes',
   'sexy_nun_habit',
   'avowed_nun_habit',
+  'confessor_robe',
+  'confessor_habit',
   'waist_apron',
   'english_play_sterling',
   'english_play_cass',
@@ -35,7 +37,7 @@ export default function (maplebirch: MaplebirchCore): void {
       const template = wardrobe.get(key);
       if (template)
         addSet(maplebirch, outfitNames, `sydney_${key}`, template, {
-          type: ['nun_habit', 'monk_habit', 'novice_nun_habit', 'initiate_robes', 'sexy_nun_habit', 'avowed_nun_habit'].includes(key) ? 'temple' : undefined
+          type: ['nun_habit', 'monk_habit', 'novice_nun_habit', 'initiate_robes', 'sexy_nun_habit', 'avowed_nun_habit', 'confessor_robe', 'confessor_habit'].includes(key) ? 'temple' : undefined
         });
     }
 

@@ -89,6 +89,7 @@ const scriptFileLists = {
 
 const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg']);
 const ADDITION_EXTENSIONS = new Set(['.json', '.yaml', '.yml']);
+const AUDIO_EXTENSIONS = new Set(['.mp3', '.wav', '.ogg', '.m4a', '.flac', '.webm']);
 
 function normalizePath(filePath: string): string {
   return filePath.replace(/\\/g, '/');
@@ -254,7 +255,7 @@ function BootFileLists(files: string[]): BootFileLists {
       styleFileList.push(filePath);
     } else if (ext === '.twee') {
       tweeFileList.push(filePath);
-    } else if (ADDITION_EXTENSIONS.has(ext)) {
+    } else if (ADDITION_EXTENSIONS.has(ext) || AUDIO_EXTENSIONS.has(ext)) {
       additionFile.push(filePath);
     }
   }
@@ -266,17 +267,28 @@ function BootFileLists(files: string[]): BootFileLists {
   };
 }
 
+function AudioFolders(files: string[]): string[] {
+  const folders = new Set<string>();
+  for (const filePath of files) {
+    if (!AUDIO_EXTENSIONS.has(path.extname(filePath).toLowerCase())) continue;
+    const [folder] = normalizePath(filePath).split('/');
+    if (folder && folder !== filePath) folders.add(folder);
+  }
+  return [...folders].sort();
+}
+
 function filterExistingFiles(fileSet: Set<string>, fileList: readonly string[]): string[] {
   return fileList.filter(filePath => fileSet.has(filePath));
 }
 
-function buildFrameworkPlugin(distFileSet: Set<string>, sidebarClothesFiles: string[], current?: ScmlPlugin): ScmlPlugin | null {
+function buildFrameworkPlugin(distFileSet: Set<string>, sidebarClothesFiles: string[], audioFolders: string[], current?: ScmlPlugin): ScmlPlugin | null {
   const params = {
     ...((current?.params && typeof current.params === 'object' && !Array.isArray(current.params) ? current.params : {}) as Record<string, unknown>),
     language: ['CN', 'EN']
   } as Record<string, unknown> & {
     module?: string[];
     script?: string[];
+    audio?: string[];
   };
   const npc = (params.npc && typeof params.npc === 'object' && !Array.isArray(params.npc) ? params.npc : {}) as Record<string, unknown>;
   const sidebar = (npc.Sidebar && typeof npc.Sidebar === 'object' && !Array.isArray(npc.Sidebar) ? npc.Sidebar : {}) as Record<string, unknown>;
@@ -289,8 +301,10 @@ function buildFrameworkPlugin(distFileSet: Set<string>, sidebarClothesFiles: str
 
   delete params.module;
   delete params.script;
+  delete params.audio;
   if (distFileSet.has('dist/module.js')) params.module = ['dist/module.js'];
   if (distFileSet.has('dist/script.js')) params.script = ['dist/script.js'];
+  if (audioFolders.length) params.audio = audioFolders;
   if (!params.module && !params.script && Object.keys(params).every(key => key === 'language')) return null;
   return {
     modName: 'maplebirch',
@@ -306,13 +320,19 @@ function buildAddonPlugins(
   clothes: Array<{ key: string; filePath: string }>,
   distFileSet: Set<string>,
   sidebarClothesFiles: string[],
+  audioFolders: string[],
   beautySelectorParams: BeautySelectorParams | null,
   tweePatcherRules: TweePatcherRule[],
   replacePatcherRules: ReplacePatcherRule[]
 ): ScmlPlugin[] {
   const versions = new Map(dependencies.map(dep => [dep.modName, dep.version]));
   const FrameworkPlugin = addonPlugin.find(plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon');
-  upsertPlugin(addonPlugin, plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon', buildFrameworkPlugin(distFileSet, sidebarClothesFiles, FrameworkPlugin), true);
+  upsertPlugin(
+    addonPlugin,
+    plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon',
+    buildFrameworkPlugin(distFileSet, sidebarClothesFiles, audioFolders, FrameworkPlugin),
+    true
+  );
 
   upsertPlugin(
     addonPlugin,
@@ -453,6 +473,7 @@ export async function createZip(rootDir: string): Promise<Buffer> {
   const distFileSet = new Set<string>();
   distFiles.forEach((_, filePath) => distFileSet.add(filePath));
   const bootFileLists = BootFileLists(allFiles);
+  const audioFolders = AudioFolders(allFiles);
   const sidebarClothesFiles = SidebarClothesFiles(allFiles);
   const beautySelectorImageFiles = BeautySelectorImageFiles(allFiles);
   const beautySelector = BeautySelectorParams(beautySelectorImageFiles);
@@ -470,6 +491,7 @@ export async function createZip(rootDir: string): Promise<Buffer> {
     ClothesFiles(publicFiles),
     distFileSet,
     sidebarClothesFiles,
+    audioFolders,
     beautySelector?.params ?? null,
     tweePatcherRules,
     replacePatcherRules

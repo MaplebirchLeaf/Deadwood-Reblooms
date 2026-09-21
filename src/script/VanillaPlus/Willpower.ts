@@ -59,6 +59,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     ])
   );
 
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-willpower-unlock', passage: 'Lake Ruin Prison' });
+
+  // 记录原版抗拒成功点，并扩展意志上限与耳液抵抗。
   maplebirch.tool.zone.inject({
     locationPassage: {
       ...slimeDefy,
@@ -84,12 +87,6 @@ export default function (maplebirch: typeof window.maplebirch) {
         {
           src: '<<pass 60>>',
           applyafter: '<<set $VanillaPlus.willpower.vigil to true>>'
-        }
-      ],
-      'Lake Ruin Prison': [
-        {
-          src: '<<if $wraithPrison.search gte 2>>',
-          applybefore: '<<deadwood-reblooms-willpower-unlock>>'
         }
       ]
     },
