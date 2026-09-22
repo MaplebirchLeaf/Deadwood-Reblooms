@@ -162,7 +162,8 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 在原版汇总请求选项前注册扩展请求，确保新增选项进入同一 _askValues 列表。
         {
           src: '<<set _askValues to Object.values(_askActions)>>',
-          applybefore: '<<deadwood-reblooms-promiscuity-request-options>>\n\t\t'
+          applybefore: '<<deadwood-reblooms-promiscuity-request-options>>\n\t\t',
+          expected: 1
         }
       ],
       'Widgets Promiscuity': [

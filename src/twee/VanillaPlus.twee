@@ -11,7 +11,7 @@
 
 <!-- 主动请求选项：在遭遇战中按当前姿势列出可提出的性行为。 -->
 <<widget 'deadwood-reblooms-promiscuity-request-options'>>
-  <<if $VanillaPlus.lock.promiscuity and $enemytype is 'man' and !$npcSub>>
+  <<if $VanillaPlus.lock.promiscuity and $enemytype is 'man' and $NPCList[$mouthtarget]>>
     <<set $_promiscuityLowerExposed to $worn.lower.vagina_exposed gte 1>>
     <<set $_promiscuityLowerExposed to $_promiscuityLowerExposed or setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt gte 1>>
     <<set $_promiscuityGenitalsExposed to $worn.over_lower.vagina_exposed gte 1>>
@@ -23,7 +23,7 @@
     <<set $_promiscuityHis to $NPCList[$mouthtarget].pronouns.his>>
     <<set $_promiscuityFrontAccessible to $position isnot 'wall' or $walltype is 'front'>>
     <<set $_promiscuityBehindAccessible to $walltype isnot 'front'>>
-    <<set $_promiscuityPenisAvailable to !['none', 'clothed'].includes($NPCList[$mouthtarget].penis)>>
+    <<set $_promiscuityPenisAvailable to $NPCList[$mouthtarget].penis is 0>>
     <<if $_promiscuityFreeHand and $walltype isnot 'front'>>
       <<if $_promiscuityGenitalsExposed and $player.vaginaExist and !$vaginause and !playerChastity('vagina')>>
         <<set _askActions[lanSwitch('to use '+$_promiscuityHis+' hands on your pussy', '用手玩弄你的小穴')] to 'promiscuity-hand-vagina'>>
@@ -76,7 +76,7 @@
 
 <!-- 主动请求结算：检定请求是否成功并设置对应战斗动作。 -->
 <<widget 'deadwood-reblooms-promiscuity-request'>>
-  <<if $mouthaction is 'ask' and $askAction.startsWith('promiscuity-')>>
+  <<if $mouthaction is 'ask' and typeof $askAction is 'string' and $askAction.startsWith('promiscuity-')>>
     <<set $_promiscuityChoice to $askAction>>
     <<set $_promiscuityTarget to $mouthtarget>>
     <<set $mouthaction to 0>>
@@ -243,7 +243,7 @@
   <</if>>
 <</widget>>
 
-<!-- 属性面板扩展：为突破上限的属性替换最高等级说明。 -->
+<!-- 属性面板扩展：突破后追加第七档，拉满时统一显示 7/7。 -->
 <<widget 'deadwood-reblooms-characteristics-degrees-display'>>
   <<if $VanillaPlus.lock.physique>>
     <<language>>
@@ -253,7 +253,8 @@
         <<set $_display_text to `你的身体${$player.bodyshape === 'soft' ? '强壮' : '健美'}且已臻巅峰。`>>
     <</language>>
     <<set _physiqueConfig.maxValue to Math.floor($physiquesize * 1.25)>>
-    <<run Object.assign(_physiqueConfig.states[_physiqueConfig.states.length - 1], { color: 'gold', description: $_display_text })>>
+    <<run _physiqueConfig.states.push({ requiredValue: _physiqueConfig.maxValue, level: 7, color: 'gold', description: $_display_text })>>
+    <<if $physique gte _physiqueConfig.maxValue>><<set _physiqueConfig.percent to 100>><</if>>
   <</if>>
 
   <<if $VanillaPlus.lock.willpower>>
@@ -264,7 +265,8 @@
         <<set $_display_text to '你坚毅不可撼动。'>>
     <</language>>
     <<set _willpowerConfig.maxValue to Math.floor($willpowermax * 1.25)>>
-    <<run Object.assign(_willpowerConfig.states[_willpowerConfig.states.length - 1], { color: 'gold', description: $_display_text })>>
+    <<run _willpowerConfig.states.push({ requiredValue: _willpowerConfig.maxValue, level: 7, color: 'gold', description: $_display_text })>>
+    <<if $willpower gte _willpowerConfig.maxValue>><<set _willpowerConfig.percent to 100>><</if>>
   <</if>>
 
   <<if $VanillaPlus.lock.beauty>>
@@ -275,7 +277,8 @@
         <<set $_display_text to '你的容貌超凡脱俗。'>>
     <</language>>
     <<set _beautyConfig.maxValue to Math.floor($beautymax * 1.25)>>
-    <<run Object.assign(_beautyConfig.states[_beautyConfig.states.length - 1], { color: 'gold', description: $_display_text })>>
+    <<run _beautyConfig.states.push({ requiredValue: _beautyConfig.maxValue, level: 7, color: 'gold', description: $_display_text })>>
+    <<if $beauty gte _beautyConfig.maxValue>><<set _beautyConfig.percent to 100>><</if>>
   <</if>>
 
   <<if $VanillaPlus.lock.promiscuity>>
@@ -287,7 +290,8 @@
     <</language>>
 
     <<set _promiscuityConfig.maxValue to 150>>
-    <<run Object.assign(_promiscuityConfig.states[_promiscuityConfig.states.length - 1], { color: 'lustful', description: $_display_text })>>
+    <<run _promiscuityConfig.states.push({ requiredValue: _promiscuityConfig.maxValue, level: 7, color: 'lustful', description: $_display_text })>>
+    <<if $promiscuity gte _promiscuityConfig.maxValue>><<set _promiscuityConfig.percent to 100>><</if>>
   <</if>>
 
   <<if $VanillaPlus.lock.exhibitionism>>
@@ -298,7 +302,8 @@
         <<set $_display_text to '赤裸之欢愉教你神魂颠倒。'>>
     <</language>>
     <<set _exhibitionismConfig.maxValue to 150>>
-    <<run Object.assign(_exhibitionismConfig.states[_exhibitionismConfig.states.length - 1], { color: 'lustful', description: $_display_text })>>
+    <<run _exhibitionismConfig.states.push({ requiredValue: _exhibitionismConfig.maxValue, level: 7, color: 'lustful', description: $_display_text })>>
+    <<if $exhibitionism gte _exhibitionismConfig.maxValue>><<set _exhibitionismConfig.percent to 100>><</if>>
   <</if>>
 
   <<if $VanillaPlus.lock.deviancy>>
@@ -309,7 +314,8 @@
         <<set $_display_text to '禁忌本能正在主宰你。'>>
     <</language>>
     <<set _deviancyConfig.maxValue to 150>>
-    <<run Object.assign(_deviancyConfig.states[_deviancyConfig.states.length - 1], { color: 'lustful', description: $_display_text })>>
+    <<run _deviancyConfig.states.push({ requiredValue: _deviancyConfig.maxValue, level: 7, color: 'lustful', description: $_display_text })>>
+    <<if $deviancy gte _deviancyConfig.maxValue>><<set _deviancyConfig.percent to 100>><</if>>
   <</if>>
 <</widget>>
 
@@ -564,20 +570,20 @@
 <<if ($phase is 'vaginal' and playerChastity('vagina')) or ($phase is 'penile' and playerChastity('penis'))>>
   <<language>>
     <<option 'EN'>>
-      Harper taps <<his>> pen against the clipboard. "I can't operate while that remains in place."
+      Harper taps <<his>> pen against the clipboard. <span class="red">"I can't operate while that remains in place."</span>
     <<option 'CN'>>
-      哈珀用笔轻点写字板。“那东西还戴着，我没法做手术。”
+      哈珀用笔轻点写字板。<span class="red">“那东西还戴着，我没法做手术。”</span>
   <</language>>
   <br><br>
-<<elseif $money gte 100000 and (($phase is 'vaginal' and $player.vaginaExist and $player.virginity.vaginal isnot true) or ($phase is 'penile' and $player.penisExist and $player.virginity.penile isnot true))>>
+<<elseif maplebirch.VP.finance.canPay(100000, 'hospitalVirginityRestoration') and (($phase is 'vaginal' and $player.vaginaExist and $player.virginity.vaginal isnot true) or ($phase is 'penile' and $player.penisExist and $player.virginity.penile isnot true))>>
   <<ind>><<lanLink 'Accept (1:00)' 'Deadwood Reblooms Virginity Restoration Surgery'>><<pass 1 hours>><</lanLink>>
   <br>
 <<else>>
   <<language>>
     <<option 'EN'>>
-      You can't afford it.
+      <span class="red">You can't afford it.</span>
     <<option 'CN'>>
-      你的钱不够。
+      <span class="red">你的钱不够。</span>
   <</language>>
   <br><br>
 <</if>>
@@ -592,12 +598,12 @@
     Harper accepts the payment. "Please undress," <<he>> says, standing to leave the room.
     <br><br>
     You strip and wait. <<He>> soon returns with a medical gown and leads you to a small room. You lie on the bed as instructed. Harper presses a mask
-    over your face. Your thoughts blur. Just before everything goes dark, you see <<him>> reach into <<his>> pocket.
+    over your face. Your thoughts blur. <span class="red">Just before everything goes dark, you see <<him>> reach into <<his>> pocket.</span>
   <<option 'CN'>>
     哈珀收下钱。“请脱掉衣服。”<<he>>说着起身离开房间。
     <br><br>
     你脱光衣服等候。<<He>>很快拿着一件手术服回来，将你领进一间摆着小床的房间。你依言躺下。哈珀把面罩压在你脸上，你的思绪渐渐模糊。
-    在一切陷入黑暗前，你看见<<him>>把手伸进口袋。
+    <span class="red">在一切陷入黑暗前，你看见<<him>>把手伸进口袋。</span>
 <</language>>
 <br><br>
 <<fameexhibitionism 10 'pic'>>
@@ -620,13 +626,13 @@
   <<option 'EN'>>
     You wake in the same room, sore between your legs. Harper enters and consults <<his>> clipboard.
     <br><br>
-    "The operation was successful," <<he>> says. <<His>> eyes linger between your thighs. "Physically, you're a virgin again."
+    <span class="green">"The operation was successful," <<he>> says.</span> <<His>> eyes linger between your thighs. "Physically, you're a virgin again."
     <br><br>
     <<He>> turns a page. "You can leave straight away. Be well." <<He>> leaves you to dress.
   <<option 'CN'>>
     你在同一间房里醒来，双腿之间隐隐作痛。哈珀走进来，查看<<his>>写字板。
     <br><br>
-    “手术很成功。”<<he>>说。<<His>>目光在你双腿之间停留片刻。“从身体上说，你又是童贞了。”
+    <span class="green">“手术很成功。”<<he>>说。</span><<His>>目光在你双腿之间停留片刻。“从身体上说，你又是童贞了。”
     <br><br>
     <<He>>翻过一页。“你现在就可以走了。保重。”<<He>>留下你独自穿衣。
 <</language>>
@@ -738,7 +744,7 @@
 <<lanLink 'Next' 'Photo Model 5'>><</lanLink>>
 
 :: Deadwood Reblooms Deviancy Conduct []
-<<set $outside to 0>><<set $location to 'forest_shop'>><<effects>><<run statusCheck('Gwylan')>>
+<<set $outside to 0>><<set $location to 'forest_shop'>><<effects>><<npc Gwylan>><<person1>><<run statusCheck('Gwylan')>>
 <<language>>
   <<option 'EN'>>
     You tell Gwylan that you want to lead the next cleansing. You have felt the forest's poison squirm through your body often enough.
@@ -748,9 +754,9 @@
     the forest answers when you open yourself to it. That doesn't mean it belongs to you."
   <br><br>
   <<He>> selects several bottles and places them in a case. "You may set the pace and guide the current. I'll prepare the reagents and hold the seal.
-    If I tell you to stop, you stop. It doesn't matter how good it feels if the poison escapes back into the world."
+    <span class="red">If I tell you to stop, you stop.</span> It doesn't matter how good it feels if the poison escapes back into the world."
   <br><br>
-  A familiar heat stirs inside you. Gwylan notices, and smiles. "Very well. Show me what your body has learned."
+  <span class="lewd">A familiar heat stirs inside you.</span> Gwylan notices, and smiles. "Very well. Show me what your body has learned."
   <br><br>
   <<link [[Begin the cleansing|Gwylan Ritual Start]]>><<run maplebirch.VP.deviancy.begin()>><</link>>
   <br>
@@ -761,10 +767,10 @@
   <<He>>停下整理柜台后方瓶罐的动作，目光在你身上停留片刻。“你已经学会毒素如何在体内游走，”<<he>>说道，“当你主动向森林敞开身体，它也会回应你。
     但这不代表它属于你。”
   <br><br>
-  <<He>>挑出几只瓶子，放进箱中。“你可以控制节奏，引导毒素的流向。药剂和封印仍由我负责。我让你停下时，你就必须停下。无论过程多么舒服，
-    毒素若重新逃回这个世界，净化就不算成功。”
+  <<He>>挑出几只瓶子，放进箱中。“你可以控制节奏，引导毒素的流向。药剂和封印仍由我负责。<span class="red">我让你停下时，你就必须停下。</span>
+    无论过程多么舒服，毒素若重新逃回这个世界，净化就不算成功。”
   <br><br>
-  熟悉的热意在你体内浮现。格威岚注意到了，露出微笑。“很好。让我看看你的身体都学会了什么。”
+  <span class="lewd">熟悉的热意在你体内浮现。</span>格威岚注意到了，露出微笑。“很好。让我看看你的身体都学会了什么。”
   <br><br>
   <<link [[开始净化仪式|Gwylan Ritual Start]]>><<run maplebirch.VP.deviancy.begin()>><</link>>
   <br>
@@ -885,7 +891,6 @@
     符文从你的掌心下亮起猩红的光。那阵搏动沿着手臂上行，最终沉入双眼之后。苍白身影的尖啸消散在水中，但祂的存在仍停留在黑暗彼端。
     <br><br>
     <span class="gold">你的意志突破了原本的极限。</span>
-    <br><br>
   <</language>>
   <<set $wraithPrison.timer to 120>><<set $wraithPrison.state to "recovering">>
 <<else>>

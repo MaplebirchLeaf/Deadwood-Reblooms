@@ -63,7 +63,7 @@
         $VanillaPlus.historyProject.archive gt 0 and
         $VanillaPlus.historyProject.museum gt 0
       >>
-        <<historyicon>><<lanLink 'Prepare the local-history exhibition (1:00)' 'Deadwood Reblooms History Project Draft'
+        <<historyicon>><<lanLink 'Prepare the exhibition (1:00)' 'Deadwood Reblooms History Project Draft'
         >><<pass 60>><</lanLink>><br>
     <</if>>
     <</if>>
@@ -77,7 +77,7 @@
     Time.days lt $VanillaPlus.historyProject.deadline and
     $VanillaPlus.historyProject.archive is 0
   >>
-    <<historyicon>><<lanLink 'Research the painting\'s history (1:00)' 'Deadwood Reblooms History Project Archive'
+    <<historyicon>><<lanLink 'Research the painting (1:00)' 'Deadwood Reblooms History Project Archive'
     >><<pass 60>><</lanLink>><br>
   <</if>>
 <</widget>>
@@ -93,7 +93,7 @@
       <<museumicon>><<lanLink 'Examine the returned painting (1:00)' 'Deadwood Reblooms History Project Museum'
       >><<pass 60>><</lanLink>><br>
   <<elseif Time.days gte $VanillaPlus.historyProject.deadline>>
-      <<historyicon>><<lanLink 'Present your local-history exhibition (2:00)' 'Deadwood Reblooms History Project Exhibition'
+      <<historyicon>><<lanLink 'Present the exhibition (2:00)' 'Deadwood Reblooms History Project Exhibition'
       >><<pass 2 hours>><</lanLink>><br>
   <</if>>
   <</if>>
@@ -112,7 +112,7 @@
     Time.hour lte 18
   >>
     <<if $VanillaPlus.historyProject.assistant>>
-      <<antiqueicon 'disc'>><<lanLink 'Survey the lake ruin with Robin (2:00)' 'Deadwood Reblooms History Project Lake Preparation'
+      <<antiqueicon 'disc'>><<lanLink 'Survey the ruin with Robin (2:00)' 'Deadwood Reblooms History Project Lake Preparation'
       >><<pass 2 hours>><</lanLink>><br>
     <<else>>
       <<antiqueicon 'disc'>><<lanLink 'Survey the lake ruin (2:00)' 'Deadwood Reblooms History Project Lake Preparation'
@@ -175,7 +175,7 @@
           <</if>>
       <</language>>
       <br><br>
-      <<historyicon>><<lanLink 'Check the sheet against your numbered notes' 'Deadwood Reblooms History Project Kylar Check'
+      <<historyicon>><<lanLink 'Check your numbered notes' 'Deadwood Reblooms History Project Kylar Check'
       >><</lanLink>><<ghistory>><br>
       <<loveicon>><<lanLink 'Take Kylar at their word' 'Deadwood Reblooms History Project Kylar Trust'
       >><</lanLink>><br>
@@ -341,7 +341,7 @@
 <<lanLink 'Continue the lesson' 'History Lesson'>><<endevent>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Kylar Check []
-<<set $outside to 1>><<set $location to 'town'>><<effects>><<run statusCheck('Kylar')>>
+<<set $outside to 1>><<set $location to 'town'>><<effects>><<npc Kylar>><<person1>><<run statusCheck('Kylar')>>
 <<set $VanillaPlus.historyProject.kylarStreet to true>>
 <<set $VanillaPlus.historyProject.kylarPrepared to true>>
 <<language>>
@@ -391,7 +391,7 @@
 <</lanLink>><br>
 
 :: Deadwood Reblooms History Project Kylar Trust []
-<<set $outside to 1>><<set $location to 'town'>><<effects>><<run statusCheck('Kylar')>>
+<<set $outside to 1>><<set $location to 'town'>><<effects>><<npc Kylar>><<person1>><<run statusCheck('Kylar')>>
 <<set $VanillaPlus.historyProject.kylarStreet to true>>
 <<set $VanillaPlus.historyProject.kylarPrepared to
   $VanillaPlus.historyProject.kylar is 'help'
@@ -452,6 +452,7 @@
       The stories agree on little beyond a persecuted wise woman, a gaoler and the temple's hostility.
     <</if>>
     <<if $VanillaPlus.historyProject.assistant>>
+      <br><br>
       Robin sorts the accounts by date and copies each citation onto a separate slip.
         "These three all repeat the same book," <<he>> says.
         "They look like different sources, but they aren't."
@@ -469,6 +470,7 @@
       至于遭受迫害的智者、狱卒与神殿的敌意，各版故事除此之外几乎没有共识。
     <</if>>
     <<if $VanillaPlus.historyProject.assistant>>
+      <br><br>
       罗宾按年代整理记载，又把每条引文分别抄到纸条上。
         “这三份其实都在转述同一本书，”<<he>>说道，
         “看起来像不同来源，其实不是。”
@@ -476,12 +478,12 @@
 <</language>>
 <br><br>
 <<if $historytrait gte 4>>
-  <<historyicon>><<lanLink 'Trace each claim back to its earliest source' 'Deadwood Reblooms History Project Archive Finish'
+  <<historyicon>><<lanLink 'Verify the earliest source' 'Deadwood Reblooms History Project Archive Finish'
   >><<set $phase to 0>><</lanLink>><<ghistory>><br>
 <</if>>
-<<historyicon>><<lanLink 'Use the museum catalogue as your main source' 'Deadwood Reblooms History Project Archive Finish'
+<<historyicon>><<lanLink 'Trust the museum catalogue' 'Deadwood Reblooms History Project Archive Finish'
 >><<set $phase to 1>><</lanLink>><br>
-<<crimeicon 'documents'>><<lanLink 'Combine the accounts into a cleaner story' 'Deadwood Reblooms History Project Archive Finish'
+<<crimeicon 'documents'>><<lanLink 'Reconcile the accounts' 'Deadwood Reblooms History Project Archive Finish'
 >><<set $phase to 2>><</lanLink>><<skulduggerydifficulty>><br>
 
 :: Deadwood Reblooms History Project Archive Finish []
@@ -497,14 +499,17 @@
         The catalogues establish the painting's age and titles.
         The changing tale records how people interpreted it, not what literally happened.
       <</if>>
+      <br><br>
       <span class="green">Your written record distinguishes evidence from repetition.</span>
     <<elseif $phase is 1>>
       You copy the museum catalogue.
       Its summary is useful, but several confident statements lack a cited source.
+      <br><br>
       <span class="teal">You have a usable source record.</span>
     <<else>>
       You smooth away the contradictions and turn several versions into one convincing narrative.
       It reads well, but some of its certainty comes from your own wording.
+      <br><br>
       <span class="teal">You have a usable source record.</span><<delinquency 10>><<gdelinquency>>
     <</if>>
   <<option 'CN'>>
@@ -517,14 +522,17 @@
         目录可以证实画作的年代与题名。
         不断变化的故事记录的是后人的理解，而非事件原貌。
       <</if>>
+      <br><br>
       <span class="green">你的文献记录清楚区分了证据与重复转述。</span>
     <<elseif $phase is 1>>
       你抄下博物馆目录的概要。
       内容足够使用，其中几句笃定的判断却没有注明出处。
+      <br><br>
       <span class="teal">你整理出了一份可用的史料记录。</span>
     <<else>>
       你抹平彼此矛盾的部分，把不同版本拼成了一条颇具说服力的叙述。
       文章读起来很顺畅，只是其中一部分确定语气来自你自己的改写。
+      <br><br>
       <span class="teal">你整理出了一份可用的史料记录。</span><<delinquency 10>><<gdelinquency>>
     <</if>>
 <</language>>
@@ -549,6 +557,7 @@
       Burns, water damage and a silver-lined cut scar the canvas.
     <</if>>
     <<if $VanillaPlus.historyProject.assistant>>
+      <br><br>
       Robin arranges the cards by date, careful not to lean across the painting.
         "This description was copied from a later one," <<he>> says.
         "They changed a few words, but not the mistake."
@@ -564,6 +573,7 @@
       火烧、水浸，以及一道残留银屑的割痕共同留在画布上。
     <</if>>
     <<if $VanillaPlus.historyProject.assistant>>
+      <br><br>
       罗宾按日期排好卡片，小心地避开画作。
         “这段说明抄自更晚的一份。”<<he>>说道，
         “他们改了几个词，连错误也一起抄了下来。”
@@ -571,13 +581,13 @@
 <</language>>
 <br><br>
 <<if $historytrait gte 4>>
-  <<historyicon>><<lanLink 'Match each claim to the object and its records' 'Deadwood Reblooms History Project Museum Finish'
+  <<historyicon>><<lanLink 'Match records to the object' 'Deadwood Reblooms History Project Museum Finish'
   >><<set $phase to 0>><</lanLink>><<ghistory>><br>
 <</if>>
-<<museumicon>><<lanLink 'Trust the most detailed catalogue card' 'Deadwood Reblooms History Project Museum Finish'
+<<museumicon>><<lanLink 'Trust the catalogue card' 'Deadwood Reblooms History Project Museum Finish'
 >><<set $phase to 1>><</lanLink>><br>
 <<if hasSexStat('exhibitionism', 2)>>
-  <<icon 'clothes/tuxedo-jacket.png'>><<lanLink 'Try on the proposed display costume' 'Deadwood Reblooms History Project Museum Finish'
+  <<icon 'clothes/tuxedo-jacket.png'>><<lanLink 'Try on the display costume' 'Deadwood Reblooms History Project Museum Finish'
   >><<set $phase to 2>><</lanLink>><<exhibitionist2>><br>
 <</if>>
 
@@ -596,22 +606,26 @@
         The frame inscription and physical wear support the painting's age.
         The silver in the cut is damage, not proof of any version of the tale.
       <</if>>
+      <br><br>
       <span class="green">You separate the painting from the claims attached to it.</span>
     <<elseif $phase is 1>>
       You copy the most detailed card.
       Its confident wording hides how much was added after the painting entered the collection.
+      <br><br>
       <span class="teal">Your object notes are usable, though some claims remain weak.</span>
     <<else>>
       The proposed costume is an unfinished reconstruction held together with pins and narrow ties.
       You remove your outer clothes before stepping into it.
+      <br><br>
       <<if $VanillaPlus.historyProject.assistant>>
         Robin holds a folding screen around you and compares each loose panel with the painted figure.
         When a curator approaches, <<he>> abandons the notes and presses the screen closed,
-        trapping <<himself>> inside with you. "It still needs work," <<he>> whispers, bright red.
+        <span class="lewd">trapping <<himself>> inside with you. "It still needs work," <<he>> whispers, bright red.</span>
       <<else>>
         You compare the loose drapery with the painted figure in the reflection of the conservation glass.
         Anyone entering the store would receive a much clearer view than the future display intended.
       <</if>>
+      <br><br>
       The attempt exposes how much of the costume exists only in the curator's interpretation.
       <span class="teal">Your demonstration is memorable, though it adds little to the provenance.</span>
       <<exhibitionism1>><<stress 6>><<gstress>>
@@ -631,22 +645,26 @@
         画框题名与实物磨损能够支持画作的年代判断。
         割痕里的银屑只是损伤，不能证明任何一个故事版本。
       <</if>>
+      <br><br>
       <span class="green">你把画作本身与后来附会的说法区分开来。</span>
     <<elseif $phase is 1>>
       你抄下内容最详细的目录卡。
       笃定的语气掩盖了一个事实：其中不少说法都是画作入藏后才添上的。
+      <br><br>
       <span class="teal">你的实物记录可以使用，只是部分说法依据薄弱。</span>
     <<else>>
       拟用于展览的复原服装尚未完工，只靠别针和细带固定。
       你脱去外衣，随后钻了进去。
+      <br><br>
       <<if $VanillaPlus.historyProject.assistant>>
         罗宾把折叠屏风围在你身边，对照画中人物检查每一片松散的布料。
         馆员的脚步声接近时，<<he>>扔下笔记，匆忙合拢屏风，
-        结果把<<himself>>也关在了里面。“还得再改改。”<<he>>满脸通红地低声说道。
+        <span class="lewd">结果把<<himself>>也关在了里面。“还得再改改。”<<he>>满脸通红地低声说道。</span>
       <<else>>
         你借修复玻璃的倒影，把松散垂下的布料与画中人物逐一比较。
         若有人走进库房，看到的内容会比未来展览原本打算呈现的清楚得多。
       <</if>>
+      <br><br>
       这次试穿只证明，服装的大部分细节都来自馆员的解释，而不是画面本身。
       <span class="teal">你的演示令人难忘，对画作来历却帮助不大。</span>
       <<exhibitionism1>><<stress 6>><<gstress>>
@@ -668,6 +686,7 @@
     At the lake shore, you spread your copied bearings across a dry rock.
     You mark the planned route on a slate, knot the guide rope at measured intervals
     and fasten a padded recovery pouch to your diving suit.
+    <br><br>
     <<if $VanillaPlus.historyProject.assistant>>
       Robin copies the route onto a second slate while you test both tethers.
         "I'm not a great swimmer," <<person1>><<he>> admits,
@@ -680,6 +699,7 @@
     你在湖岸找了块干燥的岩石，将抄录的方位数据摊在上面。
     你把预定路线画在记录板上，按固定间距给导向绳打结，
     又将内衬软垫的回收袋系在潜水服外。
+    <br><br>
     <<if $VanillaPlus.historyProject.assistant>>
       你测试两根安全绳时，罗宾把路线誊写到第二块记录板上。
         “我不太会游泳，”<<person1>><<he>>承认道，
@@ -762,9 +782,9 @@
       小巧的女祭司像跪在底座上，周围环绕着一圈古文字。
 <</language>>
 <br><br>
-<<historyicon>><<lanLink 'Record its position before lifting the tile' 'Deadwood Reblooms History Project Lake Statuette'
+<<historyicon>><<lanLink 'Record the find' 'Deadwood Reblooms History Project Lake Statuette'
 >><<set $VanillaPlus.historyProject.recovery to 'recorded'>><</lanLink>><<ghistory>><br>
-<<antiqueicon 'golden-priestess'>><<lanLink 'Pull the statuette free before the silt buries it' 'Deadwood Reblooms History Project Lake Statuette'
+<<antiqueicon 'golden-priestess'>><<lanLink 'Free the statuette' 'Deadwood Reblooms History Project Lake Statuette'
 >><<set $VanillaPlus.historyProject.recovery to 'rushed'>><</lanLink>><<stress 6>><<gstress>><br>
 
 :: Deadwood Reblooms History Project Lake Statuette []
@@ -815,16 +835,16 @@
 <<hallucinogen 120>><<gghallucinogens>>
 <br><br>
 <<if $VanillaPlus.historyProject.assistant>>
-  <<loveicon>><<lanLink 'Trust Robin and follow the original knots' 'Deadwood Reblooms History Project Lake Robin'
+  <<loveicon>><<lanLink 'Follow Robin' 'Deadwood Reblooms History Project Lake Robin'
   >><</lanLink>><<glove 'Robin'>><br>
   <<if $robinromance is 1>>
-    <<getinicon>><<lanLink 'Pull Robin into the air pocket' 'Deadwood Reblooms History Project Lake Robin Hallucination'
-    >><</lanLink>><<promiscuous1>><br>
+    <<getinicon>><<lanLink 'Enter the air pocket with Robin' 'Deadwood Reblooms History Project Lake Robin Hallucination'
+    >><</lanLink>><<promiscuous2>><br>
   <</if>>
 <<else>>
-  <<historyicon>><<lanLink 'Count the knots and pull yourself towards the surface' 'Deadwood Reblooms History Project Lake Solo'
+  <<historyicon>><<lanLink 'Follow the knots upward' 'Deadwood Reblooms History Project Lake Solo'
   >><<willpower 1>><</lanLink>><<gwillpower>><br>
-  <<getinicon>><<lanLink 'Force your way through the phantom prison' 'Deadwood Reblooms History Project Lake Solo'
+  <<getinicon>><<lanLink 'Break through the phantom prison' 'Deadwood Reblooms History Project Lake Solo'
   >><<set $phase to 2>><</lanLink>><<trauma 12>><<ggtrauma>><br>
 <</if>>
 
@@ -869,7 +889,7 @@
     Robin splits into three wavering figures before your eyes.
       <<He>> stares past your shoulder, then touches your cheek.
       "There are two of you," <<he>> says with a breathless laugh. "This one feels real."
-      Your skin burns beneath <<his>> fingers. <<His>> pupils are as wide as yours.
+      <span class="lewd">Your skin burns beneath <<his>> fingers. <<His>> pupils are as wide as yours.</span>
     <<if $awareness gte 200>>
       The spores carry a hallucinogen and something powerfully arousing.
       <span class="red">Both of you breathed them in.</span>
@@ -888,9 +908,9 @@
       You say <<his>> name, and <<he>> focuses on you until its bars dissolve.
     <</if>>
     <br><br>
-    You kiss. The ruined chamber blooms into purple light behind your closed eyes.
+    <span class="lewd">You kiss. The ruined chamber blooms into purple light behind your closed eyes.
       Robin's hands tremble against you, but each touch is answered by one of your own.
-      The guide rope remains looped around both your wrists, the last solid line in the shifting room.
+      The guide rope remains looped around both your wrists, the last solid line in the shifting room.</span>
   <<option 'CN'>>
     罗宾的呼吸变得急促。你把<<him>>拉进废弃石室上方的气穴，
     与<<him>>一同扯下面镜。两只潮湿的密封圈都沾着紫色粉末，
@@ -899,7 +919,7 @@
     罗宾在你眼中分裂成三道摇晃的人影。
       <<He>>越过你的肩膀望了一眼，随后触碰你的脸颊。
       “我看见了两个你。”<<he>>气息凌乱地笑道，“这个摸起来是真的。”
-      <<His>>指尖下，你的皮肤滚烫。<<His>>瞳孔也像你一样扩散开来。
+      <span class="lewd"><<His>>指尖下，你的皮肤滚烫。<<His>>瞳孔也像你一样扩散开来。</span>
     <<if $awareness gte 200>>
       孢子中既有致幻成分，也有某种强烈的催情成分。
       <span class="red">你们两人都吸进去了。</span>
@@ -918,14 +938,14 @@
       你唤出<<his>>名字，<<he>>专注地望着你，直到栏杆逐渐消散。
     <</if>>
     <br><br>
-    你们吻在一起。闭上双眼后，整座废弃石室都绽放出紫色光芒。
+    <span class="lewd">你们吻在一起。闭上双眼后，整座废弃石室都绽放出紫色光芒。
       罗宾贴在你身上的双手仍在颤抖，你却用自己的触碰回应<<him>>的每一下动作。
-      导向绳仍缠在你们的手腕上，是这间不断变形的石室中最后一条坚实的线。
+      导向绳仍缠在你们的手腕上，是这间不断变形的石室中最后一条坚实的线。</span>
 <</language>>
 <br><br>
 <<loveicon>><<lanLink 'Pull Robin closer' 'Deadwood Reblooms History Project Lake Robin Sex'
->><<set $sexstart to 1>><<npcincr Robin love 1>><</lanLink>><<promiscuous1>><<glove 'Robin'>><br>
-<<swimicon 'up'>><<lanLink 'Break the kiss and follow the guide rope' 'Deadwood Reblooms History Project Lake Robin'
+>><<set $sexstart to 1>><<npcincr Robin love 1>><</lanLink>><<promiscuous3>><<glove 'Robin'>><br>
+<<swimicon 'up'>><<lanLink 'Follow the guide rope' 'Deadwood Reblooms History Project Lake Robin'
 >><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Lake Robin Sex []
@@ -937,8 +957,16 @@
   <<neutral 1>>
   <<maninit>>
   <<set $enemytrust += 500>>
+  <<strip>>
   <<npcexpose>>
   <<set $enemyarousalmax to 600>>
+  <<language>>
+    <<option 'EN'>>
+      <span class="lewd">You loosen each other's wet diving suits and peel them away, leaving both your bodies bare in the warm, spore-filled air.</span>
+    <<option 'CN'>>
+      <span class="lewd">你们解开彼此湿透的潜水服，将紧贴皮肤的衣料剥下，在温暖而充满孢子的空气中赤裸相对。</span>
+  <</language>>
+  <br><br>
 <</if>>
 <<set $enemyanger to 0>>
 <<effects>>
@@ -1083,40 +1111,50 @@
   <<option 'EN'>>
     Back on the shore, you seal the golden statuette inside its padded pouch
     and lay the wet slates out beneath the trees.
+    <br><br>
     <<if $VanillaPlus.historyProject.recovery is 'recorded' and !$_historyKylarCompromised>>
       Your position sketch,
       measurements and recovery notes remain legible.
+      <br><br>
       <span class="green">The golden priestess statuette has a documented context.</span>
     <<elseif $_historyKylarCompromised>>
       Robin corrected the altered route,
       but the detour disturbed the entrance before you could record it.
+      <br><br>
       <span class="teal">The statuette is genuine, though part of its context has been lost.</span>
     <<else>>
       The statuette survived, but the disturbed silt makes its original position difficult to prove.
+      <br><br>
       <span class="teal">The recovery record remains incomplete.</span>
     <</if>>
     <<if $VanillaPlus.historyProject.assistant>>
+      <br><br>
       Robin copies the fading measurements onto dry paper while you redraw the chamber.
         When <<person1>><<his>> hand begins to shake, <<he>> presses it against yours until both are steady.
     <</if>>
   <<option 'CN'>>
     回到湖岸后，你把金制女祭司像封进内衬软垫的回收袋，
     又将湿透的记录板摊在树下。
+    <br><br>
     <<if
       $VanillaPlus.historyProject.recovery is 'recorded' and
       !$_historyKylarCompromised
     >>你的位置草图、测量数据
       和回收记录仍然清晰可辨。
+      <br><br>
       <span class="green">金制女祭司像拥有完整记录的出土环境。</span>
     <<elseif $_historyKylarCompromised>>
       罗宾修正了被篡改的路线，
       绕路却在记录前搅乱了入口处的淤泥。
+      <br><br>
       <span class="teal">女祭司像本身确为真品，部分出土环境却已经丢失。</span>
     <<else>>
       女祭司像完好无损，但被搅动的淤泥使原本位置难以证实。
+      <br><br>
       <span class="teal">这份回收记录仍不完整。</span>
     <</if>>
     <<if $VanillaPlus.historyProject.assistant>>
+      <br><br>
       你重画石室时，罗宾趁测量数据消退前，把它们誊写到干纸上。
         <<person1>><<his>>手指开始发抖时，<<he>>把手压在你的手上，直到两人都稳定下来。
     <</if>>
@@ -1144,6 +1182,7 @@
       The object is centuries old. The tale attached to it changes from one telling to the next.
       Nothing you found turns one of those versions into an eyewitness account.
     <</if>>
+    <br><br>
     <<if $VanillaPlus.historyProject.assistant>>
       Robin trims labels and pins them beside each piece of evidence.
         "This one says what the record shows," <<he>> says, passing you a card.
@@ -1168,6 +1207,7 @@
       实物确有数百年历史，附着其上的故事却在每次讲述中变化。
       你找到的东西中，没有一样能把某个版本变成亲历记录。
     <</if>>
+    <br><br>
     <<if $VanillaPlus.historyProject.assistant>>
       罗宾裁好标签，把它们钉在每份证据旁。
         “这张写记录能证明什么，”<<he>>说道，把一张卡递给你，
@@ -1183,9 +1223,9 @@
     <</if>>
 <</language>>
 <br><br>
-<<historyicon>><<lanLink 'Mark where the evidence ends' 'Deadwood Reblooms History Project Draft Finish'
+<<historyicon>><<lanLink 'Mark the evidence limits' 'Deadwood Reblooms History Project Draft Finish'
 >><<set $phase to 0>><</lanLink>><<ghistory>><br>
-<<historyicon>><<lanLink 'Present the best story as the missing truth' 'Deadwood Reblooms History Project Draft Finish'
+<<historyicon>><<lanLink 'Fill the gaps with a story' 'Deadwood Reblooms History Project Draft Finish'
 >><<set $phase to 1>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Draft Finish []
@@ -1201,11 +1241,13 @@
         Your first panels establish the painting's age, title and damage.
         The last traces how incompatible versions gathered around the same image.
       <</if>>
+      <br><br>
       <span class="green">Your exhibition is ready.</span>
     <<else>>
       You join the gaps with the most dramatic version available.
       The display flows cleanly, so long as nobody asks which labels describe records
       and which describe your preferred story.
+      <br><br>
       <span class="teal">Your exhibition is ready.</span><<famesocial 1>>
     <</if>>
   <<option 'CN'>>
@@ -1217,11 +1259,13 @@
         前几块展板说明画作的年代、题名与损伤，
         最后一块则追踪彼此冲突的故事如何逐渐汇聚到同一幅画上。
       <</if>>
+      <br><br>
       <span class="green">你的展览已经准备完成。</span>
     <<else>>
       你用最富戏剧性的版本填平了所有空缺。
       整场展览显得十分流畅，前提是没人追问哪些标签来自记录，
       哪些只是你最中意的故事。
+      <br><br>
       <span class="teal">你的展览已经准备完成。</span><<famesocial 1>>
     <</if>>
 <</language>>
@@ -1292,12 +1336,12 @@
     <<set $VanillaPlus.historyProject.status to 'done'>>
   <</if>>
 <</link>><<ghistory>><br>
-<<museumicon>><<lanLink 'The painting is old, so its story must be true' 'Deadwood Reblooms History Project Result'
+<<museumicon>><<lanLink 'Trust the painting\'s age' 'Deadwood Reblooms History Project Result'
 >>
   <<set $VanillaPlus.historyProject.final to 0>>
   <<set $VanillaPlus.historyProject.status to 'done'>>
 <</lanLink>><br>
-<<historyicon>><<lanLink 'The most repeated version is the original account' 'Deadwood Reblooms History Project Result'
+<<historyicon>><<lanLink 'Trust the repeated account' 'Deadwood Reblooms History Project Result'
 >>
   <<set $VanillaPlus.historyProject.final to 0>>
   <<set $VanillaPlus.historyProject.status to 'done'>>
@@ -1326,19 +1370,21 @@
       <<He>> turns to the visitors.
         "This conclusion stands precisely because the exhibit does not claim more than its evidence."
         The questions that follow are directed to you rather than Winter.
-        You answer each one without needing to look at your notes.
+        <span class="green">You answer each one without needing to look at your notes.</span>
     <<elseif $_historyScore gte 75>>
       Winter studies your display before nodding.
-        "Good work. Your conclusion is sound, though parts of the chain rely too heavily on assumption."
+        <span class="green">"Good work. Your conclusion is sound, though parts of the chain rely too heavily on assumption."</span>
+        <br><br>
         The visitors remain to examine your reconstruction.
     <<elseif $_historyScore gte 50>>
-      "You found a plausible story," Winter says.
-        "Next time, prove it before you present it as fact."
+      <span class="teal">"You found a plausible story," Winter says.
+        "Next time, prove it before you present it as fact."</span>
+        <br><br>
         <<He>> leaves your display open for the afternoon.
     <<else>>
       Winter corrects several labels while the visitors move on.
-        "Research is not decoration," <<he>> says quietly.
-        "You need evidence before confidence."
+        <span class="red">"Research is not decoration," <<he>> says quietly.
+        "You need evidence before confidence."</span>
     <</if>>
   <<option 'CN'>>
     <<if $VanillaPlus.historyProject.status is 'won'>>
@@ -1353,18 +1399,20 @@
       <br><br>
       <<He>>转向参观者。
         “这个结论之所以站得住，正是因为这场展览没有声称证据之外的事。”
-        接下来的问题全都抛向你，而非温特。你不必查看笔记，便逐一作出回答。
+        接下来的问题全都抛向你，而非温特。<span class="green">你不必查看笔记，便逐一作出回答。</span>
     <<elseif $_historyScore gte 75>>
       温特审视展板片刻，随后点了点头。
-        “做得不错。结论是可靠的，只是论证中的几处环节太依赖推测。”
+        <span class="green">“做得不错。结论是可靠的，只是论证中的几处环节太依赖推测。”</span>
+      <br><br>
       参观者仍留在原地，继续查看你的复原图。
     <<elseif $_historyScore gte 50>>
-      “你找到了一个说得通的故事。”温特说道，
-        “下次，在把它当成事实展示之前，先证明它。”
+      <span class="teal">“你找到了一个说得通的故事。”温特说道，
+        “下次，在把它当成事实展示之前，先证明它。”</span>
+      <br><br>
       <<He>>仍允许你的展览开放到下午。
     <<else>>
       参观者逐渐离开，温特则亲手修正了几张标签。
-        “研究不是装饰。”<<he>>低声说道，“先拿出证据，再表现得胸有成竹。”
+        <span class="red">“研究不是装饰。”<<he>>低声说道，“先拿出证据，再表现得胸有成竹。”</span>
     <</if>>
 <</language>>
 <br><br><<museumicon>><<lanLink 'Return to the museum' 'Museum'>><</lanLink>><br>

@@ -127,6 +127,51 @@ class VanillaPlus extends Module {
     return this.attributes.some(attribute => this[attribute].max && !V.VanillaPlus.traits[attribute]) || (this.allMax && !V.VanillaPlus.traits.incorrigible);
   }
 
+  public ceiling(attribute: VanillaPlusAttribute): number {
+    switch (attribute) {
+      case 'willpower':
+        return Math.floor(V.willpowermax * 1.25);
+      case 'physique':
+        return Math.floor(V.physiquesize * 1.25);
+      case 'beauty':
+        return Math.floor(V.beautymax * 1.25);
+      default:
+        return 150;
+    }
+  }
+
+  // 开发准备只补齐该属性的突破条件，便于测试正常触发流程。
+  public prepare(attribute: VanillaPlusAttribute): void {
+    this[attribute].developer();
+  }
+
+  // 作弊完成会解锁扩展上限并将属性推至上限，后续特质仍可单独控制。
+  public complete(attribute: VanillaPlusAttribute): void {
+    this.prepare(attribute);
+    V.VanillaPlus.lock[attribute] = true;
+    V[attribute] = this.ceiling(attribute);
+  }
+
+  public setTrait(attribute: VanillaPlusAttribute, enabled: boolean): void {
+    V.VanillaPlus.traits[attribute] = enabled;
+    if (!enabled) V.VanillaPlus.traits.incorrigible = false;
+  }
+
+  public prepareAll(): void {
+    for (const attribute of this.attributes) this.prepare(attribute);
+  }
+
+  public completeAll(): void {
+    for (const attribute of this.attributes) this.complete(attribute);
+  }
+
+  public setAllTraits(enabled: boolean): void {
+    if (enabled) this.completeAll();
+    for (const attribute of this.attributes) V.VanillaPlus.traits[attribute] = enabled;
+    V.VanillaPlus.traits.incorrigible = enabled;
+    if (enabled) this.preserve();
+  }
+
   public unlockTraits(): void {
     for (const attribute of this.attributes) {
       if (this[attribute].max) V.VanillaPlus.traits[attribute] = true;
@@ -138,18 +183,7 @@ class VanillaPlus extends Module {
   }
 
   public minimum(attribute: VanillaPlusAttribute): number {
-    if (V.VanillaPlus.traits.incorrigible) {
-      switch (attribute) {
-        case 'willpower':
-          return Math.floor(V.willpowermax * 1.25);
-        case 'physique':
-          return Math.floor(V.physiquesize * 1.25);
-        case 'beauty':
-          return Math.floor(V.beautymax * 1.25);
-        default:
-          return 150;
-      }
-    }
+    if (V.VanillaPlus.traits.incorrigible) return this.ceiling(attribute);
     return attribute === 'beauty' && V.VanillaPlus.traits.beauty ? V.beautymax : 0;
   }
 

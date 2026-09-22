@@ -91,7 +91,33 @@ const ACCOUNT_TIERS = [
   { id: 'preferred', days: 7, balance: 5000, credit: 5000, loan: 20000, atm: 5000 },
   { id: 'premier', days: 30, balance: 25000, credit: 15000, loan: 50000, atm: 10000 }
 ] as const;
-const MERCHANT_SOURCES = new Set(['adultShop', 'clothes', 'cosmetics', 'furniture', 'hairdressers', 'petShop', 'pharmacy', 'shopping', 'spa', 'supermarket', 'tailor']);
+const MERCHANT_SOURCES = new Set([
+  'adultShop',
+  'arcade',
+  'brothelCondoms',
+  'cafe',
+  'clothes',
+  'cosmetics',
+  'danceStudioLessons',
+  'fishing',
+  'furniture',
+  'hairdressers',
+  'lube',
+  'petShop',
+  'pharmacy',
+  'pub',
+  'pubAlcohol',
+  'pubPepperSpray',
+  'ridingLessons',
+  'schoolCondoms',
+  'shopping',
+  'spa',
+  'supermarket',
+  'tailor',
+  'tattoo',
+  'toyShop'
+]);
+const MERCHANT_LOCATIONS = new Set(['hospital', 'shopping_centre']);
 const CREDIT_FEE_PERCENT = 5;
 const DEPOSIT_DAILY_RATE = 0.0002;
 const CREDIT_DAILY_RATE = 0.003;
@@ -166,7 +192,7 @@ class Finance {
   public preInit(): void {
     this.core.tool.onInit(() => void this.securities);
     this.core.on(':variable', () => this.advanceDay(), 'Vanilla Plus Finance');
-    this.core.once(':storyready', () => this.registerMoneyPayment());
+    this.core.once(':storyready', () => this.moneyPayment());
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-finance-market', {
       action: () => this.advanceDay(),
       exact: true
@@ -338,17 +364,12 @@ class Finance {
     return result;
   }
 
-  // 普通商户可选择现金、借记卡或信用卡；剧情付款仍沿用原版现金逻辑。
+  // 商户先汇总三种可用支付方式，避免页面只按随身现金隐藏商品。
   public canPay(amount: unknown, source?: unknown): boolean {
     const value = Math.floor(Number(amount));
     if (!Number.isSafeInteger(value) || value < 0) return false;
-    const bank = this.state.bank;
     if (source != null && !Finance.isMerchantSource(source)) return Finance.cashOnHand() >= value;
-    if (bank.paymentMethod === 'debit') return bank.debitCard && bank.balance >= value;
-    if (bank.paymentMethod === 'credit') {
-      return bank.creditCard && bank.creditMissedPayments === 0 && bank.creditDebt + value <= bank.creditLimit;
-    }
-    return Finance.cashOnHand() >= value;
+    return this.purchaseMethod(value) != null;
   }
 
   public setPaymentMethod(method: unknown): FinanceResult {
@@ -360,28 +381,42 @@ class Finance {
     return 'ok';
   }
 
-  private payPurchase(amount: unknown, source: unknown): boolean {
+  private purchaseMethod(value: number): PaymentMethod | null {
+    const bank = this.state.bank;
+    const available: Record<PaymentMethod, boolean> = {
+      cash: Finance.cashOnHand() >= value,
+      debit: bank.debitCard && bank.balance >= value,
+      credit: bank.creditCard && bank.creditMissedPayments === 0 && bank.creditDebt + value <= bank.creditLimit
+    };
+    const methods: PaymentMethod[] = [bank.paymentMethod, 'cash', 'debit', 'credit'];
+    return methods.find((method, index) => methods.indexOf(method) === index && available[method]) ?? null;
+  }
+
+  private purchase(amount: unknown, source: unknown): boolean {
     const value = Math.floor(Number(amount));
     const bank = this.state.bank;
-    if (!Number.isSafeInteger(value) || value <= 0 || !Finance.isMerchantSource(source) || !this.canPay(value, source)) return false;
-    if (bank.paymentMethod === 'debit') bank.balance -= value;
-    else if (bank.paymentMethod === 'credit') Finance.addCreditDebt(bank, value);
+    if (!Number.isSafeInteger(value) || value <= 0 || !Finance.isMerchantSource(source)) return false;
+    const method = this.purchaseMethod(value);
+    if (method) bank.paymentMethod = method;
+    if (method === 'debit') bank.balance -= value;
+    else if (method === 'credit') Finance.addCreditDebt(bank, value);
     else return false;
     return true;
   }
 
   // 包装原版 money 宏：银行卡负责扣款，原宏以 recordOnly 保留消费统计。
-  private registerMoneyPayment(): void {
+  private moneyPayment(): void {
     const original = this.core.SugarCube.Macro.get('money') as MacroDefinition | undefined;
     if (!original) return;
-    const payPurchase = (amount: unknown, source: unknown) => this.payPurchase(amount, source);
-    this.core.tool.macro.define('money', function (this: any) {
-      const amount = Number(this.args[0]);
-      if (amount >= 0 || !payPurchase(-amount, this.args[1])) {
+    const purchase = (amount: unknown, source: unknown) => this.purchase(amount, source);
+    const refresh = () => this.refreshMoney();
+    this.core.tool.macro.define('money', function (this: any, amountArg: unknown, sourceArg: unknown, optionalArg?: unknown) {
+      const amount = Number(amountArg);
+      if (amount >= 0 || !purchase(-amount, sourceArg)) {
         original.handler.call(this);
         return;
       }
-      const optional = this.args[2];
+      const optional = optionalArg;
       this.args[2] = { ...(typeof optional === 'object' && optional !== null ? optional : {}), recordOnly: true };
       try {
         original.handler.call(this);
@@ -389,7 +424,13 @@ class Finance {
         if (optional === undefined) this.args.length = 2;
         else this.args[2] = optional;
       }
+      refresh();
     });
+  }
+
+  private refreshMoney(): void {
+    $.wiki('<<updatesidebarmoney>>');
+    if (document.getElementById('dr-finance-caption')) $.wiki('<<replace "#dr-finance-caption">><<deadwood-reblooms-finance-caption-content>><</replace>>');
   }
 
   public buy(symbol: unknown, amount: unknown): FinanceResult {
@@ -517,7 +558,10 @@ class Finance {
   }
 
   private static isMerchantSource(source: unknown): boolean {
-    return typeof source === 'string' && MERCHANT_SOURCES.has(source);
+    if (MERCHANT_LOCATIONS.has(String(V.location))) return true;
+    if (!(typeof source === 'string' || source instanceof String)) return false;
+    const name = String(source);
+    return MERCHANT_SOURCES.has(name) || name.startsWith('hospital') || name.startsWith('pharmacy');
   }
 
   private static refreshAccountTier(bank: BankState): void {

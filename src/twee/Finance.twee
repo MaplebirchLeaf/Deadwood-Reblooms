@@ -1,5 +1,15 @@
 :: Deadwood Reblooms Finance Common Widgets [widget]
 
+<!-- 金融金额：复用原版格式，小额有便士时显示小数，大额省略便士。 -->
+<<widget 'deadwood-reblooms-finance-money'>>
+	<<set _financeMoneyAmount to Number(_args[0])>>
+	<<if Number.isFinite(_financeMoneyAmount)>>
+		<span @class='_args[1] ? _args[1] : "gold"'><<= formatMoney(_financeMoneyAmount)>></span>
+	<<else>>
+		<span class='red'>finance money error</span>
+	<</if>>
+<</widget>>
+
 <!-- High Street 只增加一个金融中心地点，内部业务不再重复消耗时间。 -->
 <<widget 'deadwood-reblooms-finance-high-street'>>
 	<br>
@@ -17,8 +27,7 @@
 
 <!-- 全局地点说明：常驻显示账户概要，并只在下方留出间距。 -->
 <<widget 'deadwood-reblooms-finance-caption'>>
-	<span id='dr-finance-caption' class='dr-finance-caption'><<deadwood-reblooms-finance-caption-content>></span>
-	<br><br>
+	<span id='dr-finance-caption' class='dr-finance-caption'><<deadwood-reblooms-finance-caption-content>></span><br>
 <</widget>>
 
 <!-- 账户概要内容：集中渲染银行、信用与证券账户数据。 -->
@@ -34,10 +43,10 @@
 				<</switch>>
 			</span>
 			<span class='gold'><<lanSwitch 'Bank account' '银行账户'>></span>
-			<span><<printmoney $VanillaPlus.finance.bank.balance>></span>
+			<span><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.balance>></span>
 		<<if $VanillaPlus.finance.bank.creditDebt gt 0>>
 			<span class='red'><<lanSwitch 'Credit balance' '信用卡欠款'>></span>
-			<span class='red'><<printmoney $VanillaPlus.finance.bank.creditDebt>></span>
+			<span class='red'><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.creditDebt>></span>
 			<<if $VanillaPlus.finance.bank.creditMissedPayments gt 0>>
 				<span class='red'><<lanSwitch 'Credit payments missed' '信用卡逾期次数'>></span>
 				<span class='red'><<= $VanillaPlus.finance.bank.creditMissedPayments>></span>
@@ -45,20 +54,20 @@
 		<</if>>
 		<<if $VanillaPlus.finance.brokerage.opened>>
 			<span class='gold'><<lanSwitch 'Securities account' '证券账户'>></span>
-			<span><<printmoney $VanillaPlus.finance.brokerage.cash>></span>
+			<span><<deadwood-reblooms-finance-money $VanillaPlus.finance.brokerage.cash>></span>
 			<<for _financeCaptionSecurity range maplebirch.VP.finance.securities>>
 				<<set _financeCaptionSymbol to _financeCaptionSecurity.symbol>>
 				<<set _financeCaptionOwned to $VanillaPlus.finance.brokerage.holdings[_financeCaptionSymbol]>>
 				<<if _financeCaptionOwned gt 0>>
 					<<set _financeCaptionValue to _financeCaptionOwned * $VanillaPlus.finance.market.prices[_financeCaptionSymbol]>>
 					<span><<= _financeCaptionSecurity.name[maplebirch.Language] || _financeCaptionSecurity.name.EN>> × <<= _financeCaptionOwned>></span>
-					<span><<printmoney _financeCaptionValue>></span>
+					<span><<deadwood-reblooms-finance-money _financeCaptionValue>></span>
 				<</if>>
 			<</for>>
 		<</if>>
 		<<if $VanillaPlus.finance.bank.loanDebt gt 0>>
 			<span class='red'><<lanSwitch 'Loan balance' '贷款余额'>></span>
-			<span class='red'><<printmoney $VanillaPlus.finance.bank.loanDebt>></span>
+			<span class='red'><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.loanDebt>></span>
 			<<if $VanillaPlus.finance.bank.loanMissedPayments gt 0>>
 				<span class='red'><<lanSwitch 'Loan payments missed' '贷款漏还次数'>></span>
 				<span class='red'><<= $VanillaPlus.finance.bank.loanMissedPayments>></span>
@@ -112,9 +121,9 @@
 			<</switch>>
 		</span>
 		<span><<lanSwitch 'Cash on hand' '随身现金'>></span>
-		<span><<printmoney $money>></span>
+		<span><<deadwood-reblooms-finance-money $money>></span>
 		<span class='gold'><<lanSwitch 'Bank balance' '银行余额'>></span>
-		<span><<printmoney $VanillaPlus.finance.bank.balance>></span>
+		<span><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.balance>></span>
 	</span>
 <</widget>>
 
@@ -127,11 +136,11 @@
 	<</for>>
 	<span class='dr-finance-summary'>
 		<span><<lanSwitch 'Bank balance' '银行余额'>></span>
-		<span><<printmoney $VanillaPlus.finance.bank.balance>></span>
+		<span><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.balance>></span>
 		<span class='gold'><<lanSwitch 'Available funds' '可用资金'>></span>
-		<span><<printmoney $VanillaPlus.finance.brokerage.cash>></span>
+		<span><<deadwood-reblooms-finance-money $VanillaPlus.finance.brokerage.cash>></span>
 		<span><<lanSwitch 'Holdings value' '持仓市值'>></span>
-		<span><<printmoney _financePortfolioValue>></span>
+		<span><<deadwood-reblooms-finance-money _financePortfolioValue>></span>
 	</span>
 <</widget>>
 
@@ -396,18 +405,18 @@
 			<<else>>
 				<<set _financeAvailableCredit to Math.max(0, $VanillaPlus.finance.bank.creditLimit - $VanillaPlus.finance.bank.creditDebt)>>
 				<span class='dr-finance-summary'>
-					<span><<lanSwitch 'Credit limit' '信用额度'>></span><span><<printmoney $VanillaPlus.finance.bank.creditLimit>></span>
-					<span><<lanSwitch 'Available credit' '可用额度'>></span><span><<printmoney _financeAvailableCredit>></span>
-					<span class='red'><<lanSwitch 'Credit balance' '信用卡欠款'>></span><span class='red'><<printmoney $VanillaPlus.finance.bank.creditDebt>></span>
+					<span><<lanSwitch 'Credit limit' '信用额度'>></span><span><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.creditLimit>></span>
+					<span><<lanSwitch 'Available credit' '可用额度'>></span><span><<deadwood-reblooms-finance-money _financeAvailableCredit>></span>
+					<span class='red'><<lanSwitch 'Credit balance' '信用卡欠款'>></span><span class='red'><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.creditDebt>></span>
 				</span><br>
 				<<if $VanillaPlus.finance.bank.creditDebt gt 0>>
-					<<lanSwitch 'Next minimum payment' '下次最低还款'>>：<<printmoney $VanillaPlus.finance.bank.creditMinimumPayment>><br>
+					<<lanSwitch 'Next minimum payment' '下次最低还款'>>：<<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.creditMinimumPayment>><br>
 					<<lanSwitch 'Days until payment' '距还款日'>>：<<= Math.max(0, $VanillaPlus.finance.bank.creditDueDay - Time.days)>><br>
 				<</if>>
 				<<if $VanillaPlus.finance.bank.creditMissedPayments gt 0>>
 					<span class='red'><<lanSwitch 'The card is suspended until the balance is repaid in full.' '还清全部欠款前，这张卡已被暂停使用。'>></span><br>
 				<</if>>
-				<span class='blue'><<lanSwitch 'Cash advances add a 5% fee. Debt accrues 0.30% interest each day. A 10% minimum payment, or £10 if greater, is collected every 7 days; a missed payment adds a' '信用卡取现收取 5% 手续费，欠款每日计息 0.30%。每 7 天自动扣除 10% 最低还款，不足 £10 时按 £10 计；扣款不足会加收'>> <<printmoney 1000>> <<lanSwitch 'late fee and suspends further advances.' '滞纳金，并暂停继续取现。'>></span>
+				<span class='blue'><<lanSwitch 'Cash advances add a 5% fee. Debt accrues 0.30% interest each day. A 10% minimum payment, or £10 if greater, is collected every 7 days; a missed payment adds a' '信用卡取现收取 5% 手续费，欠款每日计息 0.30%。每 7 天自动扣除 10% 最低还款，不足 £10 时按 £10 计；扣款不足会加收'>> <<deadwood-reblooms-finance-money 1000>> <<lanSwitch 'late fee and suspends further advances.' '滞纳金，并暂停继续取现。'>></span>
 				<<deadwood-reblooms-finance-quick-transfers 'credit' 100 500 900>>
 				<div class='dr-finance-form'><label><<lanSwitch 'Amount (£)' '金额(£)'>>：<<textbox '_financeCreditAmount' _financeCreditAmount>></label></div>
 				<div class='dr-finance-actions'>
@@ -445,15 +454,15 @@
 			<<lanSwitch 'Open a bank account before applying for a loan.' '申请贷款前需要先开立银行账户。'>>
 		<<else>>
 			<span class='dr-finance-summary'>
-				<span><<lanSwitch 'Bank balance' '银行余额'>></span><span><<printmoney $VanillaPlus.finance.bank.balance>></span>
-				<span><<lanSwitch 'Borrowing limit' '贷款额度'>></span><span><<printmoney $VanillaPlus.finance.bank.loanLimit>></span>
-				<span class='red'><<lanSwitch 'Outstanding balance' '未偿余额'>></span><span class='red'><<printmoney $VanillaPlus.finance.bank.loanDebt>></span>
+				<span><<lanSwitch 'Bank balance' '银行余额'>></span><span><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.balance>></span>
+				<span><<lanSwitch 'Borrowing limit' '贷款额度'>></span><span><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.loanLimit>></span>
+				<span class='red'><<lanSwitch 'Outstanding balance' '未偿余额'>></span><span class='red'><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.loanDebt>></span>
 			</span><br>
 			<<if $VanillaPlus.finance.bank.loanDebt gt 0>>
 				<<lanSwitch 'Loan term' '贷款期限'>>：<<= $VanillaPlus.finance.bank.loanTerm>> <<lanSwitch 'days' '天'>><br>
 				<<set _financeLoanDailyRate to $VanillaPlus.finance.bank.loanRate * (Time.days gt $VanillaPlus.finance.bank.loanDueDay ? 200 : 100)>>
 				<<lanSwitch 'Daily interest rate' '每日利率'>>：<<= _financeLoanDailyRate.toFixed(2)>>%<br>
-				<<lanSwitch 'Scheduled daily payment' '每日计划还款'>>：<<printmoney $VanillaPlus.finance.bank.loanPayment>><br>
+				<<lanSwitch 'Scheduled daily payment' '每日计划还款'>>：<<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.loanPayment>><br>
 				<<lanSwitch 'Days until due' '距到期日'>>：<<= Math.max(0, $VanillaPlus.finance.bank.loanDueDay - Time.days)>><br>
 				<<lanSwitch 'Missed payments' '未足额还款次数'>>：<<= $VanillaPlus.finance.bank.loanMissedPayments>><br>
 			<</if>>
@@ -506,7 +515,7 @@
 			<span class='red'><<lanSwitch 'Insert a debit card to use the ATM.' '使用 ATM 前需要插入借记卡。'>></span>
 		<<else>>
 			<<set _financeAtmRemaining to Math.max(0, $VanillaPlus.finance.bank.atmWithdrawalLimit - $VanillaPlus.finance.bank.atmWithdrawn)>>
-			<span class='blue'><<lanSwitch 'Weekly withdrawal limit' '每周取款限额'>>：<<printmoney $VanillaPlus.finance.bank.atmWithdrawalLimit>> · <<lanSwitch 'Remaining' '剩余'>>：<<printmoney _financeAtmRemaining>></span><br>
+			<span class='blue'><<lanSwitch 'Weekly withdrawal limit' '每周取款限额'>>：<<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.atmWithdrawalLimit>> · <<lanSwitch 'Remaining' '剩余'>>：<<deadwood-reblooms-finance-money _financeAtmRemaining>></span><br>
 			<<deadwood-reblooms-finance-quick-transfers 'atm' 100 500 2000>>
 			<div class='dr-finance-form'><label><<lanSwitch 'Custom amount (£)' '自定义金额(£)'>>：<<textbox '_financeAtmAmount' _financeAtmAmount>></label></div>
 			<div class='dr-finance-actions'>
@@ -627,7 +636,7 @@
 						<tr>
 							<td><<= _financeSymbol>></td>
 							<td><<= _financeSecurity.name[maplebirch.Language] || _financeSecurity.name.EN>></td>
-							<td><<printmoney _financePrice>></td>
+							<td><<deadwood-reblooms-finance-money _financePrice>></td>
 							<td>
 								<<if _financeChange gt 0>>
 									<span class='red'>+<<= _financeChangePercent.toFixed(2)>>%</span>
@@ -656,7 +665,7 @@
 						<<if _financeOwned gt 0>>
 							<<set _financeHasHoldings to true>>
 							<<set _financeHoldingValue to _financeOwned * $VanillaPlus.finance.market.prices[_financeSymbol]>>
-							<tr><td><<= _financeSymbol>></td><td><<= _financeOwned>></td><td><<printmoney _financeHoldingValue>></td></tr>
+							<tr><td><<= _financeSymbol>></td><td><<= _financeOwned>></td><td><<deadwood-reblooms-finance-money _financeHoldingValue>></td></tr>
 						<</if>>
 					<</for>>
 					<<if !_financeHasHoldings>>
@@ -874,9 +883,9 @@
 <<npc Bailey>><<person1>>
 <<language>>
 	<<option 'EN'>>
-		You sign the form. Bailey checks it, then files it away. "Good. That removes one excuse."
+		You sign the form. Bailey checks it, then files it away. <span class="red">"Good. That removes one excuse."</span>
 	<<option 'CN'>>
-		你在表格上签了字。贝利检查一遍，把它收进文件里。“很好。这下你又少了一个借口。”
+		你在表格上签了字。贝利检查一遍，把它收进文件里。<span class="red">“很好。这下你又少了一个借口。”</span>
 <</language>>
 <br><br>
 <<lanLink 'Return' 'Orphanage'>><</lanLink>><br>

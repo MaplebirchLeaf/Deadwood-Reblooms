@@ -1,0 +1,295 @@
+:: Deadwood Reblooms Developer Widgets [widget]
+
+<!-- 场景回放准备：为历史课题场景建立完整的最小状态，原版 Scene Viewer 会在退出时还原存档。 -->
+<<widget 'deadwood-reblooms-history-replay-state'>>
+  <<set $VanillaPlus.historyProject to {
+    status: 'ongoing',
+    source: 'paintingward',
+    availableDay: 0,
+    deadline: Time.days + 25,
+    assistant: _args[0] is true,
+    kylar: 'help',
+    kylarStreet: true,
+    kylarPrepared: true,
+    archive: 30,
+    museum: 30,
+    recovery: 'recorded',
+    ruin: 2,
+    draft: 25,
+    final: 0
+  }>>
+  <<set $phase to 0>>
+<</widget>>
+
+<!-- 场景回放配置：setupReplayScene 先冻结存档，再由此处补齐场景所需状态；离开回放时原版会统一还原。 -->
+<<widget 'deadwood-reblooms-replay-state'>>
+  <<switch _args[0]>>
+    <<case 'sydney'>>
+      <<if !Array.isArray($sydneySeen)>><<set $sydneySeen to []>><</if>>
+      <<if !$sydney>><<set $sydney to {}>><</if>>
+      <<set $sydney.sexTotal to Number($sydney.sexTotal) || 0>>
+      <<if !$daily.sydney>><<set $daily.sydney to {}>><</if>>
+      <<set $daily.sydney.sex to Number($daily.sydney.sex) || 0>>
+    <<case 'sydney-science'>>
+      <<set $sydneyScience to 0>>
+      <<set $phase to 2>>
+    <<case 'virginity-restoration'>>
+      <<set $money to Math.max(100000, Number($money) || 0)>>
+      <<if $player.vaginaExist>>
+        <<set $player.virginity.vaginal to false>>
+      <<elseif $player.penisExist>>
+        <<set $player.virginity.penile to false>>
+      <</if>>
+    <<case 'beauty'>>
+      <<if !$photo>><<set $photo to {}>><</if>>
+      <<set $photo.time to Number($photo.time) || 0>>
+      <<run maplebirch.VP.prepare('beauty')>>
+      <<set $outside to 1>>
+      <<facestrip>>
+    <<case 'physique'>>
+      <<run maplebirch.VP.prepare('physique')>>
+    <<case 'willpower'>>
+      <<run maplebirch.VP.prepare('willpower')>>
+      <<set $oxygen to Math.max(1000, Number($oxygen) || 0)>>
+      <<if !$wraith>><<set $wraith to {}>><</if>>
+      <<set $wraith.defeated to Number($wraith.defeated) || 0>>
+      <<if !$wraithPrison>><<set $wraithPrison to {}>><</if>>
+      <<set $wraithPrison.timer to 0>>
+      <<set $wraithPrison.timePassed to 0>>
+      <<set $wraithPrison.search to Number($wraithPrison.search) || 0>>
+      <<set $wraithPrison.state to 'present'>>
+      <<set $wraithPrison.possession to false>>
+      <<set $wraithPrison.masturbation to false>>
+      <<if !$lakeRuin>><<set $lakeRuin to {}>><</if>>
+      <<set $lakeRuin.rune to true>>
+    <<case 'exhibitionism'>>
+      <<run maplebirch.VP.prepare('exhibitionism')>>
+    <<case 'deviancy'>>
+      <<set $VanillaPlus.lock.deviancy to false>>
+      <<set $VanillaPlus.deviancy.wildsong to true>>
+      <<set $VanillaPlus.deviancy.conducted to false>>
+      <<set $VanillaPlus.deviancy.conducting to false>>
+      <<set $deviancy to Math.max(100, Number($deviancy) || 0)>>
+      <<if !$gwylan>><<set $gwylan to {}>><</if>>
+      <<set $gwylan.purged to Math.max(20, Number($gwylan.purged) || 0)>>
+      <<if !$dateCount>><<set $dateCount to {}>><</if>>
+      <<set $dateCount.GwylanSex to Math.max(3, Number($dateCount.GwylanSex) || 0)>>
+      <<set $dateCount.GwylanBeast to Math.max(3, Number($dateCount.GwylanBeast) || 0)>>
+      <<if !Array.isArray($gwylanSeen)>><<set $gwylanSeen to []>><</if>>
+      <<run $gwylanSeen.pushUnique('ritual_sex', 'ritual_beast')>>
+    <<case 'promiscuity'>>
+      <<run maplebirch.VP.prepare('promiscuity')>>
+    <<case 'finance'>>
+      <<run maplebirch.VP.finance.openBankAccount()>>
+      <<set $VanillaPlus.finance.bank.debitCard to true>>
+      <<set $VanillaPlus.finance.bank.baileyKnowsAccount to false>>
+  <</switch>>
+<</widget>>
+
+<!-- 无独立剧情入口的属性突破：通过原版回放保护展示实际结算文本。 -->
+:: Deadwood Reblooms Developer Attribute Breakthrough [nosave]
+<<switch $phase>>
+  <<case 'physique'>><<deadwood-reblooms-physique-unlock>>
+  <<case 'exhibitionism'>><<deadwood-reblooms-exhibitionism-unlock>>
+  <<case 'promiscuity'>><<deadwood-reblooms-promiscuity-unlock>>
+  <<default>>
+    <span class='red'><<lanSwitch 'No attribute test was selected.' '未选择属性测试。'>></span><br><br>
+<</switch>>
+<<lanLink 'Finish the test' 'Scene Viewer End'>><</lanLink>><br>
+
+:: Deadwood Reblooms Developer Scene Viewer [nosave]
+<<if $debug isnot 1>>
+  <<goto 'Start'>><<exit>>
+<</if>>
+<<if !$VanillaPlus>>
+  <span class='red'><<lanSwitch 'Vanilla Plus is disabled for this save.' '当前存档未启用原版增强。'>></span><br><br>
+  <<lanLink 'Return' 'Scene Viewer'>><</lanLink>>
+  <<exit>>
+<</if>>
+
+<<set _historyPassages to [
+  'Deadwood Reblooms History Project Begin',
+  'Deadwood Reblooms History Project Kylar Check',
+  'Deadwood Reblooms History Project Kylar Trust',
+  'Deadwood Reblooms History Project Archive',
+  'Deadwood Reblooms History Project Archive Finish',
+  'Deadwood Reblooms History Project Museum',
+  'Deadwood Reblooms History Project Museum Finish',
+  'Deadwood Reblooms History Project Lake Preparation',
+  'Deadwood Reblooms History Project Lake Descent',
+  'Deadwood Reblooms History Project Lake Statuette',
+  'Deadwood Reblooms History Project Lake Robin',
+  'Deadwood Reblooms History Project Lake Robin Hallucination',
+  'Deadwood Reblooms History Project Lake Robin Sex',
+  'Deadwood Reblooms History Project Lake Robin Sex Finish',
+  'Deadwood Reblooms History Project Lake Solo',
+  'Deadwood Reblooms History Project Lake Return',
+  'Deadwood Reblooms History Project Draft',
+  'Deadwood Reblooms History Project Draft Finish',
+  'Deadwood Reblooms History Project Exhibition',
+  'Deadwood Reblooms History Project Result',
+  'Scene Viewer End'
+]>>
+<<set _sydneyChastityPassages to [
+  'Deadwood Reblooms Sydney Chastity Refit',
+  'Deadwood Reblooms Sydney Chastity Fitting',
+  'Scene Viewer End'
+]>>
+<<set _sydneyConfessionPassages to [
+  'Temple Confess Self Sydney Cross',
+  'Temple Confess Self Sydney Sex',
+  'Temple Confess Self Sydney Interrupted',
+  'Temple Confess Self Sydney Interrupted Wait',
+  'Temple Confess Self Sydney Interrupted Tease',
+  'Temple Confess Self Sydney Sex Finish',
+  'Scene Viewer End'
+]>>
+<<set _sydneySciencePassages to [
+  'Deadwood Reblooms Sydney Science Transfer',
+  'Deadwood Reblooms Sydney Science Late Wake',
+  'Deadwood Reblooms Sydney Science Study',
+  'Deadwood Reblooms Sydney Science Chat',
+  'Deadwood Reblooms Sydney Science Tease',
+  'Scene Viewer End'
+]>>
+<<set _restorationPassages to [
+  'Deadwood Reblooms Virginity Restoration',
+  'Deadwood Reblooms Virginity Restoration Confirm',
+  'Deadwood Reblooms Virginity Restoration Surgery',
+  'Deadwood Reblooms Virginity Restoration Done',
+  'Scene Viewer End'
+]>>
+<<set _beautyPassages to [
+  'Deadwood Reblooms Beauty Breakthrough',
+  'Deadwood Reblooms Beauty Breakthrough Finish',
+  'Scene Viewer End'
+]>>
+<<set _willpowerPassages to [
+  'Deadwood Reblooms Willpower Unlock 1',
+  'Deadwood Reblooms Willpower Unlock 2',
+  'Deadwood Reblooms Willpower Unlock 3',
+  'Deadwood Reblooms Willpower Unlock Fight',
+  'Deadwood Reblooms Willpower Unlock End',
+  'Scene Viewer End'
+]>>
+<<set _deviancyPassages to ['Deadwood Reblooms Deviancy Conduct', 'Scene Viewer End']>>
+<<set _attributePassages to ['Deadwood Reblooms Developer Attribute Breakthrough', 'Scene Viewer End']>>
+<<set _financePassages to [
+  'Deadwood Reblooms Financial Centre',
+  'Deadwood Reblooms Financial Centre Bank',
+  'Deadwood Reblooms Financial Centre Bank Debit',
+  'Deadwood Reblooms Financial Centre Bank Credit',
+  'Deadwood Reblooms Financial Centre Bank Loan',
+  'Deadwood Reblooms Financial Centre ATM',
+  'Deadwood Reblooms Financial Centre Securities',
+  'Deadwood Reblooms Financial Centre Securities Account',
+  'Deadwood Reblooms Financial Centre Securities Trading',
+  'Deadwood Reblooms Bailey Bank Account',
+  'Deadwood Reblooms Bailey Bank Account Authorised',
+  'Scene Viewer End'
+]>>
+
+<div class='settingsGrid'>
+  <div class='settingsHeader options'><<lanSwitch 'Deadwood Reblooms scene viewer' '枯木逢春场景查看器'>></div>
+  <div class='settingsToggleItemWide'><span class='red'><<lanSwitch
+    'Scenes use the original replay protection. Leave through Scene Viewer End so the current save can be restored.'
+    '场景使用原版回放保护。请从场景查看器结尾退出，以便还原当前存档。'
+  >></span></div>
+</div>
+
+<!-- 场景入口按剧情线分类；所有入口都先冻结存档，再补齐最小测试状态。 -->
+<div class='settingsGrid'>
+  <div class='settingsToggleItemWide'>
+  <span class='gold'><<lanSwitch 'History project' '历史课题'>></span><br>
+  <<lanLink 'Project acceptance' 'Deadwood Reblooms History Project Begin'>>
+    <<setupReplayScene 'Deadwood Reblooms - History project acceptance' 'Deadwood Reblooms History Project Begin' _historyPassages>>
+    <<deadwood-reblooms-history-replay-state false>>
+  <</lanLink>><br>
+  <<lanLink 'Archive research' 'Deadwood Reblooms History Project Archive'>>
+    <<setupReplayScene 'Deadwood Reblooms - Archive research' 'Deadwood Reblooms History Project Archive' _historyPassages>>
+    <<deadwood-reblooms-history-replay-state false>>
+  <</lanLink>><br>
+  <<lanLink 'Museum research' 'Deadwood Reblooms History Project Museum'>>
+    <<setupReplayScene 'Deadwood Reblooms - Museum research' 'Deadwood Reblooms History Project Museum' _historyPassages>>
+    <<deadwood-reblooms-history-replay-state false>>
+  <</lanLink>><br>
+  <<lanLink 'Lake survey with Robin' 'Deadwood Reblooms History Project Lake Preparation'>>
+    <<setupReplayScene 'Deadwood Reblooms - Lake survey with Robin' 'Deadwood Reblooms History Project Lake Preparation' _historyPassages>>
+    <<deadwood-reblooms-history-replay-state true>>
+  <</lanLink>><br>
+  <<lanLink 'Lake survey alone' 'Deadwood Reblooms History Project Lake Preparation'>>
+    <<setupReplayScene 'Deadwood Reblooms - Lake survey alone' 'Deadwood Reblooms History Project Lake Preparation' _historyPassages>>
+    <<deadwood-reblooms-history-replay-state false>>
+  <</lanLink>><br>
+  <<lanLink 'Draft the exhibition' 'Deadwood Reblooms History Project Draft'>>
+    <<setupReplayScene 'Deadwood Reblooms - Exhibition draft' 'Deadwood Reblooms History Project Draft' _historyPassages>>
+    <<deadwood-reblooms-history-replay-state true>>
+  <</lanLink>><br>
+  <<lanLink 'Present the exhibition' 'Deadwood Reblooms History Project Exhibition'>>
+    <<setupReplayScene 'Deadwood Reblooms - Exhibition presentation' 'Deadwood Reblooms History Project Exhibition' _historyPassages>>
+    <<deadwood-reblooms-history-replay-state true>>
+  <</lanLink>>
+  </div>
+  <div class='settingsToggleItemWide'>
+  <span class='gold'><<lanSwitch 'Attribute breakthroughs' '属性突破'>></span><br>
+  <<lanLink 'Willpower breakthrough' 'Deadwood Reblooms Willpower Unlock 1'>>
+    <<setupReplayScene 'Deadwood Reblooms - Willpower breakthrough' 'Deadwood Reblooms Willpower Unlock 1' _willpowerPassages>>
+    <<deadwood-reblooms-replay-state 'willpower'>>
+  <</lanLink>><br>
+  <<lanLink 'Physique breakthrough' 'Deadwood Reblooms Developer Attribute Breakthrough'>>
+    <<setupReplayScene 'Deadwood Reblooms - Physique breakthrough' 'Deadwood Reblooms Developer Attribute Breakthrough' _attributePassages>>
+    <<set $phase to 'physique'>><<deadwood-reblooms-replay-state 'physique'>>
+  <</lanLink>><br>
+  <<lanLink 'Beauty breakthrough' 'Deadwood Reblooms Beauty Breakthrough'>>
+    <<setupReplayScene 'Deadwood Reblooms - Beauty breakthrough' 'Deadwood Reblooms Beauty Breakthrough' _beautyPassages>>
+    <<deadwood-reblooms-replay-state 'beauty'>>
+  <</lanLink>><br>
+  <<lanLink 'Exhibitionism breakthrough' 'Deadwood Reblooms Developer Attribute Breakthrough'>>
+    <<setupReplayScene 'Deadwood Reblooms - Exhibitionism breakthrough' 'Deadwood Reblooms Developer Attribute Breakthrough' _attributePassages>>
+    <<set $phase to 'exhibitionism'>><<deadwood-reblooms-replay-state 'exhibitionism'>>
+  <</lanLink>><br>
+  <<lanLink 'Deviancy ritual' 'Deadwood Reblooms Deviancy Conduct'>>
+    <<setupReplayScene 'Deadwood Reblooms - Deviancy ritual' 'Deadwood Reblooms Deviancy Conduct' _deviancyPassages>>
+    <<deadwood-reblooms-replay-state 'deviancy'>>
+  <</lanLink>><br>
+  <<lanLink 'Promiscuity breakthrough' 'Deadwood Reblooms Developer Attribute Breakthrough'>>
+    <<setupReplayScene 'Deadwood Reblooms - Promiscuity breakthrough' 'Deadwood Reblooms Developer Attribute Breakthrough' _attributePassages>>
+    <<set $phase to 'promiscuity'>><<deadwood-reblooms-replay-state 'promiscuity'>>
+  <</lanLink>>
+  </div>
+  <div class='settingsToggleItem'>
+  <span class='gold'><<lanSwitch 'Sydney scenes' '悉尼场景'>></span><br>
+  <<lanLink 'Sydney chooses a new chastity belt' 'Deadwood Reblooms Sydney Chastity Refit'>>
+    <<setupReplayScene 'Deadwood Reblooms - Sydney chastity refit' 'Deadwood Reblooms Sydney Chastity Refit' _sydneyChastityPassages>>
+    <<deadwood-reblooms-replay-state 'sydney'>>
+  <</lanLink>><br>
+  <<lanLink 'Sydney in the confessional' 'Temple Confess Self Sydney Cross'>>
+    <<setupReplayScene 'Deadwood Reblooms - Sydney confession' 'Temple Confess Self Sydney Cross' _sydneyConfessionPassages>>
+    <<deadwood-reblooms-replay-state 'sydney'>>
+  <</lanLink>><br>
+  <<lanLink 'Sydney joins science class' 'Deadwood Reblooms Sydney Science Transfer'>>
+    <<setupReplayScene 'Deadwood Reblooms - Sydney science transfer' 'Deadwood Reblooms Sydney Science Transfer' _sydneySciencePassages>>
+    <<deadwood-reblooms-replay-state 'sydney'>>
+    <<deadwood-reblooms-replay-state 'sydney-science'>>
+  <</lanLink>>
+  </div>
+  <div class='settingsToggleItem'>
+  <span class='gold'><<lanSwitch 'Other scenes' '其他场景'>></span><br>
+  <<lanLink 'Virginity restoration' 'Deadwood Reblooms Virginity Restoration'>>
+    <<setupReplayScene 'Deadwood Reblooms - Virginity restoration' 'Deadwood Reblooms Virginity Restoration' _restorationPassages>>
+    <<deadwood-reblooms-replay-state 'virginity-restoration'>>
+  <</lanLink>><br>
+  <<lanLink 'Financial centre' 'Deadwood Reblooms Financial Centre'>>
+    <<setupReplayScene 'Deadwood Reblooms - Financial centre' 'Deadwood Reblooms Financial Centre' _financePassages>>
+    <<deadwood-reblooms-replay-state 'finance'>>
+  <</lanLink>><br>
+  <<lanLink 'Tell Bailey about the bank account' 'Deadwood Reblooms Bailey Bank Account'>>
+    <<setupReplayScene 'Deadwood Reblooms - Bailey bank account' 'Deadwood Reblooms Bailey Bank Account' _financePassages>>
+    <<deadwood-reblooms-replay-state 'finance'>>
+  <</lanLink>>
+  </div>
+</div>
+
+<div class='settingsGrid'>
+  <div class='settingsToggleItemWide'><<lanLink 'Return' 'Scene Viewer'>><</lanLink>></div>
+</div>

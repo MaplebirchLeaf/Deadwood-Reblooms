@@ -53,6 +53,265 @@
   </details><hr>
 <</widget>>
 
+<!-- 模组作弊：由框架 Cheats zone 调用，只修改枯木逢春自己的进度与金融数据。 -->
+<<widget 'deadwood-reblooms-cheats'>>
+  <details open>
+    <summary class='settingsHeader options'><span class='gold'><<lanSwitch 'Deadwood Reblooms cheats' '枯木逢春作弊'>></span></summary>
+    <div id='deadwood-reblooms-cheats-content'>
+      <<deadwood-reblooms-cheats-content>>
+    </div>
+  </details>
+<</widget>>
+
+<!-- 作弊面板刷新：每次操作后重绘状态，避免关闭并重新打开菜单。 -->
+<<widget 'deadwood-reblooms-cheats-refresh'>>
+  <<replace '#deadwood-reblooms-cheats-content'>><<deadwood-reblooms-cheats-content>><</replace>>
+<</widget>>
+
+<!-- 六属性作弊卡：分别显示数值、突破条件和特质，并提供可重复的测试操作。 -->
+<<widget 'deadwood-reblooms-attribute-cheat'>>
+  <<set _attribute to _args[0]>>
+  <<switch _attribute>>
+    <<case 'willpower'>><<set _attributeName to lanSwitch('Willpower', '意志')>>
+    <<case 'physique'>><<set _attributeName to lanSwitch('Physique', '体格')>>
+    <<case 'beauty'>><<set _attributeName to lanSwitch('Beauty', '容貌')>>
+    <<case 'exhibitionism'>><<set _attributeName to lanSwitch('Exhibitionism', '暴露癖')>>
+    <<case 'deviancy'>><<set _attributeName to lanSwitch('Deviancy', '异种癖')>>
+    <<case 'promiscuity'>><<set _attributeName to lanSwitch('Promiscuity', '淫乱')>>
+  <</switch>>
+  <<set _attributeUnlocked to $VanillaPlus.lock[_attribute]>>
+  <<set _attributeReady to maplebirch.VP[_attribute].unlock>>
+  <<set _attributeTrait to $VanillaPlus.traits[_attribute]>>
+  <div class='settingsToggleItem'>
+    <span @class='["exhibitionism", "deviancy", "promiscuity"].includes(_attribute) ? "lustful" : "gold"'><strong><<= _attributeName>></strong></span><br>
+    <<lanSwitch 'Value' '数值'>>：<<= State.variables[_attribute]>> / <<= maplebirch.VP.ceiling(_attribute)>><br>
+    <<lanSwitch 'Breakthrough' '突破'>>：
+    <<if _attributeUnlocked>>
+      <span class='green'><<lanSwitch 'Complete' '已完成'>></span>
+    <<elseif _attributeReady>>
+      <span class='gold'><<lanSwitch 'Ready' '可触发'>></span>
+    <<else>>
+      <span class='red'><<lanSwitch 'Requirements incomplete' '条件未完成'>></span>
+    <</if>><br>
+    <<lanSwitch 'Trait' '特质'>>：
+    <<if _attributeTrait>>
+      <span class='green'><<lanSwitch 'Granted' '已获得'>></span>
+    <<else>>
+      <span class='red'><<lanSwitch 'Not granted' '未获得'>></span>
+    <</if>><br><br>
+    <<capture _attribute>>
+      <<lanLink 'Prepare breakthrough'>>
+        <<run maplebirch.VP.prepare(_attribute)>>
+        <<deadwood-reblooms-cheats-refresh>>
+      <</lanLink>><br>
+      <<lanLink 'Complete and maximise'>>
+        <<run maplebirch.VP.complete(_attribute)>>
+        <<deadwood-reblooms-cheats-refresh>>
+      <</lanLink>><br>
+      <<if _attributeTrait>>
+        <<lanLink 'Remove trait'>>
+          <<run maplebirch.VP.setTrait(_attribute, false)>>
+          <<deadwood-reblooms-cheats-refresh>>
+        <</lanLink>>
+      <<else>>
+        <<lanLink 'Grant trait'>>
+          <<run maplebirch.VP.setTrait(_attribute, true)>>
+          <<deadwood-reblooms-cheats-refresh>>
+        <</lanLink>>
+      <</if>><br>
+    <</capture>>
+  </div>
+<</widget>>
+
+<!-- 模组作弊内容：操作完成后局部刷新，便于立即核对当前状态。 -->
+<<widget 'deadwood-reblooms-cheats-content'>>
+  <<if !$VanillaPlus>>
+    <span class='red'><<lanSwitch 'Vanilla Plus is disabled for this save.' '当前存档未启用原版增强。'>></span>
+  <<else>>
+  <div class='settingsGrid'>
+  <<deadwood-reblooms-attribute-cheat 'willpower'>>
+  <<deadwood-reblooms-attribute-cheat 'physique'>>
+  <<deadwood-reblooms-attribute-cheat 'beauty'>>
+  <<deadwood-reblooms-attribute-cheat 'exhibitionism'>>
+  <<deadwood-reblooms-attribute-cheat 'deviancy'>>
+  <<deadwood-reblooms-attribute-cheat 'promiscuity'>>
+  <div class='settingsToggleItemWide'>
+  <span class='silver'><strong><<lanSwitch 'All six attributes' '全部六项属性'>></strong></span><br>
+  <<lanLink 'Prepare all six breakthroughs'>>
+    <<run maplebirch.VP.prepareAll()>>
+    <<deadwood-reblooms-cheats-refresh>>
+  <</lanLink>><br>
+  <<lanLink 'Complete all six breakthroughs'>>
+    <<run maplebirch.VP.completeAll()>>
+    <<deadwood-reblooms-cheats-refresh>>
+  <</lanLink>><br>
+  <<if $VanillaPlus.traits.incorrigible>>
+    <<lanLink 'Remove all Vanilla Plus traits'>>
+      <<run maplebirch.VP.setAllTraits(false)>>
+      <<deadwood-reblooms-cheats-refresh>>
+    <</lanLink>>
+  <<else>>
+    <<lanLink 'Unlock all Vanilla Plus traits'>>
+      <<run maplebirch.VP.setAllTraits(true)>>
+      <<deadwood-reblooms-cheats-refresh>>
+    <</lanLink>>
+  <</if>><br>
+  </div>
+  <div class='settingsToggleItem'>
+  <<lanLink 'Open all financial services'>>
+    <<run maplebirch.VP.finance.canPay(0)>>
+    <<set $VanillaPlus.finance.bank.opened to true>>
+    <<set $VanillaPlus.finance.bank.openedDay to Math.max(0, Number(Time.days) || 0)>>
+    <<set $VanillaPlus.finance.bank.bankInterestLastDay to Math.max(0, Number(Time.days) || 0)>>
+    <<set $VanillaPlus.finance.bank.debitCard to true>>
+    <<set $VanillaPlus.finance.bank.creditCard to true>>
+    <<set $VanillaPlus.finance.brokerage.opened to true>>
+    <<replace '#deadwood-reblooms-cheats-content'>><<deadwood-reblooms-cheats-content>><</replace>>
+  <</lanLink>>
+  </div>
+  <div class='settingsToggleItem'>
+  <<lanLink 'Add £1,000 to the bank account'>>
+    <<run maplebirch.VP.finance.openBankAccount()>>
+    <<set $VanillaPlus.finance.bank.balance += 100000>>
+    <<replace '#deadwood-reblooms-cheats-content'>><<deadwood-reblooms-cheats-content>><</replace>>
+  <</lanLink>>
+  </div>
+  <div class='settingsToggleItem'>
+  <<lanLink 'Add £10,000 to the bank account'>>
+    <<run maplebirch.VP.finance.openBankAccount()>>
+    <<set $VanillaPlus.finance.bank.balance += 1000000>>
+    <<replace '#deadwood-reblooms-cheats-content'>><<deadwood-reblooms-cheats-content>><</replace>>
+  <</lanLink>>
+  </div>
+  <div class='settingsToggleItem'>
+  <<lanLink 'Grant premier account status'>>
+    <<run maplebirch.VP.finance.canPay(0)>>
+    <<set $VanillaPlus.finance.bank.opened to true>>
+    <<set $VanillaPlus.finance.bank.openedDay to Math.max(0, (Number(Time.days) || 0) - 30)>>
+    <<set $VanillaPlus.finance.bank.peakBalance to Math.max($VanillaPlus.finance.bank.peakBalance, 2500000)>>
+    <<set $VanillaPlus.finance.bank.creditMissedPayments to 0>>
+    <<set $VanillaPlus.finance.bank.loanMissedPayments to 0>>
+    <<run maplebirch.VP.finance.canPay(0)>>
+    <<replace '#deadwood-reblooms-cheats-content'>><<deadwood-reblooms-cheats-content>><</replace>>
+  <</lanLink>>
+  </div>
+  <div class='settingsToggleItem'>
+  <<lanLink 'Clear credit card and loan debt'>>
+    <<run maplebirch.VP.finance.canPay(0)>>
+    <<set $VanillaPlus.finance.bank.creditDebt to 0>>
+    <<set $VanillaPlus.finance.bank.creditMinimumPayment to 0>>
+    <<set $VanillaPlus.finance.bank.creditDueDay to 0>>
+    <<set $VanillaPlus.finance.bank.creditLastDay to -1>>
+    <<set $VanillaPlus.finance.bank.creditMissedPayments to 0>>
+    <<set $VanillaPlus.finance.bank.loanDebt to 0>>
+    <<set $VanillaPlus.finance.bank.loanPayment to 0>>
+    <<set $VanillaPlus.finance.bank.loanRate to 0>>
+    <<set $VanillaPlus.finance.bank.loanTerm to 0>>
+    <<set $VanillaPlus.finance.bank.loanDueDay to 0>>
+    <<set $VanillaPlus.finance.bank.loanLastDay to -1>>
+    <<set $VanillaPlus.finance.bank.loanMissedPayments to 0>>
+    <<replace '#deadwood-reblooms-cheats-content'>><<deadwood-reblooms-cheats-content>><</replace>>
+  <</lanLink>>
+  </div>
+  <<if $VanillaPlus.finance?.bank?.opened>>
+    <div class='settingsToggleItemWide'>
+    <span class='gold'><<lanSwitch 'Bank balance' '银行余额'>></span>: <<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.balance>><br>
+    </div>
+  <</if>>
+  </div>
+
+  <!-- 开发测试通道：跟随原版 $debug 开关，不向普通玩家显示内部状态与测试操作。 -->
+  <<if $debug is 1>>
+    <br><details>
+      <summary class='settingsHeader options'><span class='red'><<lanSwitch 'DEBUG developer tests' 'DEBUG 开发者测试'>></span></summary>
+      <div class='settingsGrid'>
+        <div class='settingsToggleItem'>
+          <span class='gold'><strong><<lanSwitch 'Runtime state' '运行状态'>></strong></span><br>
+          <<lanSwitch 'Passage' '段落'>>：<<= passage()>><br>
+          <<lanSwitch 'Location' '地点'>>：<<= $location ?? 'undefined'>><br>
+          <<lanSwitch 'Day and time' '日期与时间'>>：<<= Time.days>> / <<= Time.hour>>:<<= String(Time.minute).padStart(2, '0')>><br>
+          <<lanSwitch 'Combat state' '战斗状态'>>：<<= $combat ?? 0>><br>
+          <<lanSwitch 'Market day and seed' '行情日期与种子'>>：<<= $VanillaPlus.finance?.market?.day ?? 'undefined'>> / <<= $VanillaPlus.finance?.market?.seed ?? 'undefined'>><br>
+        </div>
+        <div class='settingsToggleItem'>
+          <span class='gold'><strong><<lanSwitch 'Attribute tests' '属性测试'>></strong></span><br>
+          <<set _developerReadyCount to Number(maplebirch.VP.willpower.unlock) + Number(maplebirch.VP.physique.unlock) + Number(maplebirch.VP.beauty.unlock) + Number(maplebirch.VP.exhibitionism.unlock) + Number(maplebirch.VP.deviancy.unlock) + Number(maplebirch.VP.promiscuity.unlock)>>
+          <<set _developerCompleteCount to Object.values($VanillaPlus.lock).filter(Boolean).length>>
+          <<set _developerTraitCount to Number($VanillaPlus.traits.willpower) + Number($VanillaPlus.traits.physique) + Number($VanillaPlus.traits.beauty) + Number($VanillaPlus.traits.exhibitionism) + Number($VanillaPlus.traits.deviancy) + Number($VanillaPlus.traits.promiscuity)>>
+          <<lanSwitch 'Breakthroughs ready' '可触发突破'>>：<<= _developerReadyCount>> / 6<br>
+          <<lanSwitch 'Breakthroughs complete' '已完成突破'>>：<<= _developerCompleteCount>> / 6<br>
+          <<lanSwitch 'Traits granted' '已获得特质'>>：<<= _developerTraitCount>> / 6<br><br>
+          <<lanLink 'Prepare all six breakthroughs'>>
+            <<run maplebirch.VP.prepareAll()>><<deadwood-reblooms-cheats-refresh>>
+          <</lanLink>><br>
+          <<lanLink 'Complete all six breakthroughs'>>
+            <<run maplebirch.VP.completeAll()>><<deadwood-reblooms-cheats-refresh>>
+          <</lanLink>><br>
+          <<lanLink 'Open the Deadwood Reblooms scene viewer' 'Deadwood Reblooms Developer Scene Viewer'>><</lanLink>><br>
+        </div>
+        <div class='settingsToggleItemWide'>
+          <span class='gold'><strong><<lanSwitch 'System tests' '系统测试'>></strong></span><br>
+          <<lanSwitch 'History project state' '历史课题状态'>>：<<= $VanillaPlus.historyProject.status>><br>
+          <<lanSwitch 'Bank account state' '银行账户状态'>>：<<= $VanillaPlus.finance.bank.opened ? lanSwitch('Open', '已开户') : lanSwitch('Closed', '未开户')>><br><br>
+          <<lanLink 'Open the financial centre' 'Deadwood Reblooms Financial Centre'>><</lanLink>><br>
+          <<lanLink 'Prepare a perfect history exhibition'>>
+            <<set $VanillaPlus.historyProject to {
+              status: 'ongoing',
+              source: 'paintingward',
+              availableDay: 0,
+              deadline: Time.days,
+              assistant: true,
+              kylar: 'help',
+              kylarStreet: true,
+              kylarPrepared: true,
+              archive: 30,
+              museum: 30,
+              recovery: 'recorded',
+              ruin: 2,
+              draft: 25,
+              final: 0
+            }>>
+            <<deadwood-reblooms-cheats-refresh>>
+          <</lanLink>><br>
+          <<lanLink 'Reset the history project'>>
+            <<set $VanillaPlus.historyProject to {
+              status: 'none',
+              source: 'none',
+              availableDay: 0,
+              deadline: 0,
+              assistant: false,
+              kylar: 'none',
+              kylarStreet: false,
+              kylarPrepared: false,
+              archive: 0,
+              museum: 0,
+              recovery: 'none',
+              ruin: 0,
+              draft: 0,
+              final: 0
+            }>>
+            <<deadwood-reblooms-cheats-refresh>>
+          <</lanLink>><br>
+          <<lanLink 'Reset the weekly ATM allowance'>>
+            <<set $VanillaPlus.finance.bank.atmWeek to -1>>
+            <<set $VanillaPlus.finance.bank.atmWithdrawn to 0>>
+            <<deadwood-reblooms-cheats-refresh>>
+          <</lanLink>><br>
+          <<lanLink 'Reroll the market on the next daily update'>>
+            <<set $VanillaPlus.finance.market.seed to random(1, 2147483646)>>
+            <<set $VanillaPlus.finance.market.day to -1>>
+            <<deadwood-reblooms-cheats-refresh>>
+          <</lanLink>><br>
+          <<lanLink 'Refresh dynamic music'>>
+            <<run maplebirch.DM?.refresh()>>
+          <</lanLink>><br>
+        </div>
+      </div>
+    </details>
+  <</if>>
+  <</if>>
+<</widget>>
+
 <!-- 模组提示 -->
 <<widget 'DeadwoodRebloomsHint'>>
   <<if !$DeadwoodReblooms.activeTab>>

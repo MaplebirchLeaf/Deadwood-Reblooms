@@ -27,6 +27,7 @@
   <<option 'EN'>>
     You leave your own compartment and quietly close its heavy door. After checking that the corridor is empty, you open the other door
     and enter the confessor's side where Sydney is waiting.
+    <br><br>
     <<if _sydneyStatus.includes('corrupt')>>
       Sydney locks the door behind you, then pulls you down onto the narrow bench. "You came all the way around just to tempt your confessor?" <<He>>
         grins, slipping a hand beneath your clothes. "Go on, beloved. Lay the rest of your sins bare."
@@ -39,6 +40,7 @@
     <</if>>
   <<option 'CN'>>
     你离开自己的隔间，悄悄关上沉重的门。确认走廊里没有人后，你打开另一扇门，进入悉尼所在的告解员一侧。
+    <br><br>
     <<if _sydneyStatus.includes('corrupt')>>
       悉尼在你身后锁上门，随即把你拉到狭窄的长椅上。“你特意绕过来，就是为了诱惑自己的告解员？”<<He>>咧嘴一笑，将手探进你的衣服里。“继续吧，挚爱。
         把剩下的罪也全都袒露出来。”
@@ -60,9 +62,11 @@
 <<if $sexstart is 1>>
   <<set $daily.sydney.sex = ($daily.sydney.sex || 0) + 1>>
   <<set $sydney.sexTotal += 1>>
+  <<set $sydneyConfessionIntrusion to 0>>
   <<set $sexstart to 0>>
   <<consensual>>
   <<set $consensual to 1>>
+  <<set $speechdisable to 1>>
   <<neutral 1>>
   <<maninit>>
   <<set $enemytrust += 500>>
@@ -86,11 +90,122 @@
 <br><br>
 <<actionsman>>
 
-<<if _combatend>>
+<!-- 告解室中断：亲密行为进行一段时间后，把下一步转入可选择的忏悔者事件。 -->
+<<if $sydneyConfessionIntrusion is 0 and $enemyarousal gte 150 and !_combatend>>
+  <<set $sydneyConfessionIntrusion to 1>>
+<</if>>
+
+<<if $sydneyConfessionIntrusion is 1>>
+  <span id="next"><<lanLink 'Next' 'Temple Confess Self Sydney Interrupted'>><</lanLink>></span><<nexttext>>
+<<elseif _combatend>>
   <span id="next"><<lanLink 'Next' 'Temple Confess Self Sydney Sex Finish'>><</lanLink>></span><<nexttext>>
 <<else>>
   <span id="next"><<lanLink 'Next' 'Temple Confess Self Sydney Sex'>><</lanLink>></span><<nexttext>>
 <</if>>
+
+:: Temple Confess Self Sydney Interrupted []
+<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>><<person1>><<run statusCheck('Sydney')>>
+<<language>>
+  <<option 'EN'>>
+    The penitent's door opens before either of you can move. Someone enters the other compartment, closes the heavy door and settles onto the bench.
+    <span class="red">Only the carved screen separates them from you.</span>
+    <br><br>
+    Sydney clamps a hand over your mouth. <<His>> other arm remains locked around your waist as the stranger whispers, "Forgive me. I need to confess."
+    <br><br>
+    <<if _sydneyStatus.includes('corrupt')>>
+      A reckless smile flickers across Sydney's face. <<He>> leans close enough for <<his>> lips to brush your ear. "Be quiet, beloved. I have a duty to perform."
+    <<elseif _sydneyStatus.includes('pure')>>
+      Sydney's face drains of colour. <<He>> looks from you to the screen, torn between panic and the person asking for help.
+    <<else>>
+      Sydney shuts <<his>> eyes for one breath, then straightens as much as the cramped space allows.
+    <</if>>
+  <<option 'CN'>>
+    你们还没来得及分开，忏悔者一侧的门便被推开。有人走进另一间隔室，关上沉重的门，在长凳上坐下。
+    <span class="red">你们之间只隔着一道雕花木板。</span>
+    <br><br>
+    悉尼一只手捂住你的嘴，另一条手臂仍紧扣着你的腰。陌生人隔着木板低声说道：“请宽恕我。我需要忏悔。”
+    <br><br>
+    <<if _sydneyStatus.includes('corrupt')>>
+      悉尼脸上掠过一丝冒险的笑意。<<He>>贴近你的耳边，嘴唇几乎擦过皮肤。“安静些，挚爱。我还有职责要履行。”
+    <<elseif _sydneyStatus.includes('pure')>>
+      悉尼脸上的血色迅速褪去。<<He>>在你与隔板之间来回看着，既惊慌，又无法忽视那个前来求助的人。
+    <<else>>
+      悉尼闭眼稳住一次呼吸，随后在狭窄空间里尽力坐直身体。
+    <</if>>
+<</language>>
+<<stress 3>><<gstress>>
+<br><br>
+<<templeicon 'confession'>><<lanLink 'Let Sydney hear the confession' 'Temple Confess Self Sydney Interrupted Wait'>><</lanLink>><<glove 'Sydney'>><br>
+<<if hasSexStat('promiscuity', 3)>>
+  <<loveicon>><<lanLink 'Keep teasing Sydney' 'Temple Confess Self Sydney Interrupted Tease'>><</lanLink>><<promiscuous3>><<garousal>><br>
+<</if>>
+<<getouticon>><<lanLink 'Stop before you are discovered' 'Temple Confess Self Sydney Sex Finish'>><<set $sydneyConfessionIntrusion to 3>><</lanLink>><<lstress>><br>
+
+:: Temple Confess Self Sydney Interrupted Wait []
+<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>><<person1>><<run statusCheck('Sydney')>>
+<<language>>
+  <<option 'EN'>>
+    You hold still beneath Sydney's hand. The penitent admits to stealing from a collection plate and spending the money before guilt brought them here.
+    <br><br>
+    <<if _sydneyStatus.includes('pure')>>
+      Sydney's trembling eases as <<he>> listens. <<He>> asks the penitent to return what they can and repair the harm with honest work. The answer is gentle, but not empty. By the time the stranger thanks <<him>>, Sydney sounds like a confessor again.
+    <<elseif _sydneyStatus.includes('corrupt')>>
+      Sydney keeps you pinned against <<him>> while calmly prescribing restitution. The contrast between <<his>> solemn voice and heated body makes <<his>> final blessing shake.
+    <<else>>
+      Sydney gives practical counsel in a careful whisper. The stranger's breathing steadies, unaware that Sydney is holding you as tightly as the wooden screen.
+    <</if>>
+    <br><br>
+    The penitent thanks Sydney and leaves. You remain silent until the outer footsteps fade.
+  <<option 'CN'>>
+    你在悉尼手掌下保持不动。那名忏悔者承认自己从捐款盘里偷了钱，又在愧疚驱使其来到这里前把钱花掉了。
+    <br><br>
+    <<if _sydneyStatus.includes('pure')>>
+      悉尼听着对方的话，身体渐渐不再发抖。<<He>>劝对方尽力归还钱财，并用诚实劳动弥补造成的伤害。回答温和，却并不空洞。陌生人向<<him>>道谢时，悉尼听起来又像一名真正的告解者了。
+    <<elseif _sydneyStatus.includes('corrupt')>>
+      悉尼仍把你紧按在<<him>>身上，语气却平静地要求对方偿还损失。庄重的声音与滚烫的身体形成鲜明反差，令<<his>>最后一句祝祷微微发颤。
+    <<else>>
+      悉尼以谨慎的低语给出实际建议。陌生人的呼吸逐渐平稳，完全不知道悉尼抱你抱得和那道木板一样紧。
+    <</if>>
+    <br><br>
+    忏悔者向悉尼道谢后离开。你们保持安静，直到门外的脚步彻底远去。
+<</language>>
+<<set $sydneyConfessionIntrusion to 2>><<npcincr Sydney love 1>><<glove 'Sydney'>><<stress -3>><<lstress>>
+<br><br>
+<<loveicon>><<lanLink 'Turn back to Sydney' 'Temple Confess Self Sydney Sex'>><</lanLink>><br>
+
+:: Temple Confess Self Sydney Interrupted Tease []
+<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>><<person1>><<run statusCheck('Sydney')>>
+<<language>>
+  <<option 'EN'>>
+    Sydney begins asking the penitent what happened. You slide your hands over <<his>> body whenever the stranger speaks, forcing <<him>> to hide each broken breath inside a thoughtful pause.
+    <br><br>
+    <<if _sydneyStatus.includes('corrupt')>>
+      Sydney turns the risk into a game. <<He>> gives measured advice while guiding your hand where <<he>> wants it, only tightening <<his>> grip when the penitent says something that demands a serious answer.
+    <<elseif _sydneyStatus.includes('pure')>>
+      Sydney struggles to keep <<his>> voice steady. Even so, <<he>> listens carefully and offers sincere counsel between your touches, refusing to make the stranger's trust part of the joke.
+    <<else>>
+      Sydney catches your wrist in warning, but does not push it away. <<His>> replies remain sensible, though every sentence ends a little too quickly.
+    <</if>>
+    <br><br>
+    The penitent finally thanks Sydney and leaves. The door closes. Sydney waits for the footsteps to fade before turning a flushed, accusing look on you.
+    <span class="lewd">"You did that on purpose," <<he>> whispers, pulling you close again.</span>
+  <<option 'CN'>>
+    悉尼开始询问那名忏悔者发生了什么。每当陌生人开口，你的双手便在<<his>>身上游走，逼得<<him>>把每一次破碎的呼吸都藏进思考般的停顿里。
+    <br><br>
+    <<if _sydneyStatus.includes('corrupt')>>
+      悉尼把暴露的风险变成一场游戏。<<He>>给出从容的建议，同时引导你的手移向<<he>>想要的位置，只有忏悔者说出必须认真回答的话时，<<his>>手指才骤然收紧。
+    <<elseif _sydneyStatus.includes('pure')>>
+      悉尼竭力维持平稳的声音。即使被你的触碰扰乱，<<he>>仍认真倾听，在间隙给出诚恳建议，不肯把陌生人的信任也变成玩笑的一部分。
+    <<else>>
+      悉尼抓住你的手腕以示警告，却没有把它推开。<<His>>回答依然合理，只是每句话都结束得略显仓促。
+    <</if>>
+    <br><br>
+    忏悔者终于向悉尼道谢后离开。门扉合拢，悉尼等脚步声远去，才满脸通红地责怪般看向你。
+    <span class="lewd">“你绝对是故意的。”<<he>>低声说道，再次把你拉近。</span>
+<</language>>
+<<set $sydneyConfessionIntrusion to 2>><<npcincr Sydney love 1>><<npcincr Sydney purity -2>><<glove 'Sydney'>><<lspurity>><<arousal 300>><<garousal>>
+<br><br>
+<<loveicon>><<lanLink 'Continue with Sydney' 'Temple Confess Self Sydney Sex'>><</lanLink>><br>
 
 :: Temple Confess Self Sydney Sex Finish []
 <<temple_effects>>
@@ -150,12 +265,13 @@
 <br><br>
 <<language>>
   <<option 'EN'>>
-    <<tearful>> you straighten your clothes while Sydney listens at the door for footsteps. <<He>> wipes the evidence of your shared
-    "confession" from <<his>> lips. When the corridor is quiet, you slip back into your own compartment.
+    <<tearful>> you straighten your clothes while Sydney listens at the door.
+    <<He>> wipes the evidence of your shared "confession" from <<his>> lips. When the corridor is quiet, you slip back into your own compartment.
   <<option 'CN'>>
-    <<tearful>>你整理好衣服，悉尼则贴在门边听着外面的脚步声。<<He>>擦去唇边那场共同“忏悔”留下的痕迹。等走廊恢复安静后，
-    你溜回了自己的隔间。
+    <<tearful>>你整理好衣服，悉尼则贴在门边倾听。
+    <<He>>擦去唇边那场共同“忏悔”留下的痕迹。等走廊恢复安静后，你溜回了自己的隔间。
 <</language>>
+<<unset $sydneyConfessionIntrusion>>
 <<clotheson>>
 <<endcombat>>
 <<npc Sydney>>
