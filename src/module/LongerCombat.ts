@@ -269,6 +269,7 @@ class LongerCombat {
 
   public preInit() {
     this.core.var.options.define('LongerCombat', LongerCombat.options);
+    this.core.on(':variable', () => this.lastLines.clear(), 'Longer Combat');
     const main = this.main.bind(this);
 
     this.core.once(

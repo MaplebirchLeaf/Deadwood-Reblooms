@@ -168,6 +168,7 @@ class Fish extends Transformation {
     maplebirch.tool.zone.inject({
       locationPassage: {
         'Rocks Pool': [
+          // 在礁石泳池的原版潜水链接前加入鱼化休憩选项；正则只依赖目标 Passage，不匹配英汉链接文本。
           {
             srcmatch: /<<swimicon "dive">><<link \[\[[^\n]*?\|Rocks Dive\]\]>>/,
             applybefore:
@@ -177,24 +178,29 @@ class Fish extends Transformation {
       },
       widgetPassage: {
         'Widgets Kitchen': [
+          // 在厨房完成最近食谱分组计算后追加吃生米组件，让鱼化的特殊饮食入口能复用原版食谱状态。
           {
             src: '<<set $_group to _recipeKeys.find((obj) => obj.key is $lastRecipeViewed).group>>',
             applyafter: '<<deadwood-reblooms-eat-rice>>'
           }
         ],
         Widgets: [
+          // 在原版游泳动作耗时计算后应用高等级鱼化减时，保留原本由游泳技能决定的基础耗时。
           {
             src: '<<set _waterActionTime to [18, 15, 12, 10, 8, 8, 7, 7, 6, 6, 5, 4][$_swimLevel] || 3>>',
             applyafter: '<<if $maplebirch.transformation.fish.level >= 6>><<set _waterActionTime to Math.max(1, Math.ceil(_waterActionTime / 2))>><</if>>'
           },
+          // 将原版水下耗氧公式替换为带鳃减耗版本；没有有效鱼鳃时乘数仍为 1。
           {
             src: '<<set $oxygen -= _waterActionTime * 10>>',
             to: '<<set $oxygen -= _waterActionTime * 10 * ($transformationParts.traits.gills && isPartEnabled($transformationParts.traits.gills) ? 0.25 : 1)>>'
           },
+          // 在游泳技能结算完成后追加概率鱼化成长，不改变原版技能上限与增长流程。
           {
             src: '<<set $swimmingskill to Math.clamp($swimmingskill, 0, 1000)>>',
             applyafter: '<<if $rng <= 30>><<transform "fish" 1>><</if>>'
           },
+          // 在水下动作实际推进时间后追加概率鱼化成长，确保只有完成动作才触发。
           {
             src: '<<pass _waterActionTime sec>>',
             applyafter: '<<if $rng <= 20>><<transform "fish" 1>><</if>>'

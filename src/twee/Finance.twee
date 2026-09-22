@@ -1,0 +1,882 @@
+:: Deadwood Reblooms Finance Common Widgets [widget]
+
+<!-- High Street 只增加一个金融中心地点，内部业务不再重复消耗时间。 -->
+<<widget 'deadwood-reblooms-finance-high-street'>>
+	<br>
+	<<icon 'financial-centre.png'>><<lanLink 'Financial centre (0:02)' 'Deadwood Reblooms Financial Centre'>><<pass 2>><</lanLink>>
+	<br>
+<</widget>>
+
+<!-- 贝利银行授权入口：只有玩家开立账户后，才能主动向贝利提出。 -->
+<<widget 'deadwood-reblooms-finance-bailey-bank-option'>>
+	<<if _options is 1 && $VanillaPlus.finance.bank.opened && !$VanillaPlus.finance.bank.baileyKnowsAccount>>
+		<<socialiseicon 'ask'>><<lanLink 'Tell Bailey about your bank account' 'Deadwood Reblooms Bailey Bank Account'>><</lanLink>>
+		<br>
+	<</if>>
+<</widget>>
+
+<!-- 全局地点说明：常驻显示账户概要，并只在下方留出间距。 -->
+<<widget 'deadwood-reblooms-finance-caption'>>
+	<span id='dr-finance-caption' class='dr-finance-caption'><<deadwood-reblooms-finance-caption-content>></span>
+	<br><br>
+<</widget>>
+
+<!-- 账户概要内容：集中渲染银行、信用与证券账户数据。 -->
+<<widget 'deadwood-reblooms-finance-caption-content'>>
+	<<if $VanillaPlus.finance.bank.opened>>
+		<span class='dr-finance-caption-grid'>
+			<span class='gold'><<lanSwitch 'Account tier' '账户档位'>></span>
+			<span>
+				<<switch $VanillaPlus.finance.bank.accountTier>>
+					<<case 'premier'>><<lanSwitch 'Premier' '尊享'>>
+					<<case 'preferred'>><<lanSwitch 'Preferred' '优选'>>
+					<<default>><<lanSwitch 'Current' '普通'>>
+				<</switch>>
+			</span>
+			<span class='gold'><<lanSwitch 'Bank account' '银行账户'>></span>
+			<span><<printmoney $VanillaPlus.finance.bank.balance>></span>
+		<<if $VanillaPlus.finance.bank.creditDebt gt 0>>
+			<span class='red'><<lanSwitch 'Credit balance' '信用卡欠款'>></span>
+			<span class='red'><<printmoney $VanillaPlus.finance.bank.creditDebt>></span>
+			<<if $VanillaPlus.finance.bank.creditMissedPayments gt 0>>
+				<span class='red'><<lanSwitch 'Credit payments missed' '信用卡逾期次数'>></span>
+				<span class='red'><<= $VanillaPlus.finance.bank.creditMissedPayments>></span>
+			<</if>>
+		<</if>>
+		<<if $VanillaPlus.finance.brokerage.opened>>
+			<span class='gold'><<lanSwitch 'Securities account' '证券账户'>></span>
+			<span><<printmoney $VanillaPlus.finance.brokerage.cash>></span>
+			<<for _financeCaptionSecurity range maplebirch.VP.finance.securities>>
+				<<set _financeCaptionSymbol to _financeCaptionSecurity.symbol>>
+				<<set _financeCaptionOwned to $VanillaPlus.finance.brokerage.holdings[_financeCaptionSymbol]>>
+				<<if _financeCaptionOwned gt 0>>
+					<<set _financeCaptionValue to _financeCaptionOwned * $VanillaPlus.finance.market.prices[_financeCaptionSymbol]>>
+					<span><<= _financeCaptionSecurity.name[maplebirch.Language] || _financeCaptionSecurity.name.EN>> × <<= _financeCaptionOwned>></span>
+					<span><<printmoney _financeCaptionValue>></span>
+				<</if>>
+			<</for>>
+		<</if>>
+		<<if $VanillaPlus.finance.bank.loanDebt gt 0>>
+			<span class='red'><<lanSwitch 'Loan balance' '贷款余额'>></span>
+			<span class='red'><<printmoney $VanillaPlus.finance.bank.loanDebt>></span>
+			<<if $VanillaPlus.finance.bank.loanMissedPayments gt 0>>
+				<span class='red'><<lanSwitch 'Loan payments missed' '贷款漏还次数'>></span>
+				<span class='red'><<= $VanillaPlus.finance.bank.loanMissedPayments>></span>
+			<</if>>
+		<</if>>
+		</span>
+		<br>
+		<<deadwood-reblooms-finance-payment-method>>
+	<<else>>
+		<span class='blue'><<lanSwitch 'You have no financial accounts.' '你还没有开立金融账户。'>></span>
+	<</if>>
+<</widget>>
+
+<!-- 支付方式：只影响有明确商户来源的消费，不接管剧情付款。 -->
+<<widget 'deadwood-reblooms-finance-payment-method'>>
+	<span id='dr-finance-payment-method'>
+		<<lanSwitch 'Payment' '支付方式'>>：
+		<<if $VanillaPlus.finance.bank.paymentMethod is 'cash'>>
+			<span class='gold'><<lanSwitch 'Cash' '现金'>></span>
+		<<else>>
+			<<lanLink 'Cash'>><<run maplebirch.VP.finance.setPaymentMethod('cash')>><<replace '#dr-finance-payment-method'>><<deadwood-reblooms-finance-payment-method>><</replace>><</lanLink>>
+		<</if>>
+		<<if $VanillaPlus.finance.bank.debitCard>>
+			|
+			<<if $VanillaPlus.finance.bank.paymentMethod is 'debit'>>
+				<span class='gold'><<lanSwitch 'Debit card' '借记卡'>></span>
+			<<else>>
+				<<lanLink 'Debit card'>><<run maplebirch.VP.finance.setPaymentMethod('debit')>><<replace '#dr-finance-payment-method'>><<deadwood-reblooms-finance-payment-method>><</replace>><</lanLink>>
+			<</if>>
+		<</if>>
+		<<if $VanillaPlus.finance.bank.creditCard>>
+			|
+			<<if $VanillaPlus.finance.bank.paymentMethod is 'credit'>>
+				<span class='gold'><<lanSwitch 'Credit card' '信用卡'>></span>
+			<<else>>
+				<<lanLink 'Credit card'>><<run maplebirch.VP.finance.setPaymentMethod('credit')>><<replace '#dr-finance-payment-method'>><<deadwood-reblooms-finance-payment-method>><</replace>><</lanLink>>
+			<</if>>
+		<</if>>
+	</span>
+<</widget>>
+
+<!-- 银行概要：供银行业务与 ATM 共用。 -->
+<<widget 'deadwood-reblooms-finance-bank-summary'>>
+	<span class='dr-finance-summary'>
+		<span><<lanSwitch 'Account tier' '账户档位'>></span>
+		<span>
+			<<switch $VanillaPlus.finance.bank.accountTier>>
+				<<case 'premier'>><<lanSwitch 'Premier' '尊享'>>
+				<<case 'preferred'>><<lanSwitch 'Preferred' '优选'>>
+				<<default>><<lanSwitch 'Current' '普通'>>
+			<</switch>>
+		</span>
+		<span><<lanSwitch 'Cash on hand' '随身现金'>></span>
+		<span><<printmoney $money>></span>
+		<span class='gold'><<lanSwitch 'Bank balance' '银行余额'>></span>
+		<span><<printmoney $VanillaPlus.finance.bank.balance>></span>
+	</span>
+<</widget>>
+
+<!-- 证券概要：显示银行资金、可用资金与持仓市值。 -->
+<<widget 'deadwood-reblooms-finance-exchange-summary'>>
+	<<set _financePortfolioValue to 0>>
+	<<for _financeSecurity range maplebirch.VP.finance.securities>>
+		<<set _financeSymbol to _financeSecurity.symbol>>
+		<<set _financePortfolioValue += $VanillaPlus.finance.brokerage.holdings[_financeSymbol] * $VanillaPlus.finance.market.prices[_financeSymbol]>>
+	<</for>>
+	<span class='dr-finance-summary'>
+		<span><<lanSwitch 'Bank balance' '银行余额'>></span>
+		<span><<printmoney $VanillaPlus.finance.bank.balance>></span>
+		<span class='gold'><<lanSwitch 'Available funds' '可用资金'>></span>
+		<span><<printmoney $VanillaPlus.finance.brokerage.cash>></span>
+		<span><<lanSwitch 'Holdings value' '持仓市值'>></span>
+		<span><<printmoney _financePortfolioValue>></span>
+	</span>
+<</widget>>
+
+<!-- 快捷转账结算：正数转入目标账户，负数转回资金来源。 -->
+<<widget 'deadwood-reblooms-finance-quick-transfer-action'>>
+	<<set _financeQuickMode to _args[0]>>
+	<<set _financeQuickAmount to Number(_args[1])>>
+	<<switch _financeQuickMode>>
+		<<case 'bank'>>
+			<<if _financeQuickAmount gt 0>>
+				<<set _financeResult to maplebirch.VP.finance.deposit(_financeQuickAmount)>>
+			<<else>>
+				<<set _financeResult to maplebirch.VP.finance.withdraw(Math.abs(_financeQuickAmount))>>
+			<</if>>
+			<<updatesidebarmoney>>
+			<<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
+		<<case 'atm'>>
+			<<if _financeQuickAmount gt 0>>
+				<<set _financeResult to maplebirch.VP.finance.deposit(_financeQuickAmount, true)>>
+			<<else>>
+				<<set _financeResult to maplebirch.VP.finance.withdraw(Math.abs(_financeQuickAmount), true)>>
+			<</if>>
+			<<updatesidebarmoney>>
+			<<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
+		<<case 'brokerage'>>
+			<<if _financeQuickAmount gt 0>>
+				<<set _financeResult to maplebirch.VP.finance.transferToBrokerage(_financeQuickAmount)>>
+			<<else>>
+				<<set _financeResult to maplebirch.VP.finance.transferFromBrokerage(Math.abs(_financeQuickAmount))>>
+			<</if>>
+			<<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
+		<<case 'credit'>>
+			<<if _financeQuickAmount gt 0>>
+				<<set _financeResult to maplebirch.VP.finance.creditAdvance(_financeQuickAmount)>>
+			<<else>>
+				<<set _financeResult to maplebirch.VP.finance.repayCredit(Math.abs(_financeQuickAmount))>>
+			<</if>>
+			<<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
+		<<case 'loan'>>
+			<<if _financeQuickAmount gt 0>>
+				<<set _financeResult to maplebirch.VP.finance.takeLoan(_financeQuickAmount, _financeLoanTerm)>>
+			<<else>>
+				<<set _financeResult to maplebirch.VP.finance.repayLoan(Math.abs(_financeQuickAmount))>>
+			<</if>>
+			<<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
+	<</switch>>
+	<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+<</widget>>
+
+<!-- 快捷金额：提供三个常用档位，并明确资金的转入与转出方向。 -->
+<<widget 'deadwood-reblooms-finance-quick-transfers'>>
+	<<set _financeQuickMode to _args[0]>>
+	<<set _financeQuickAmounts to _args.length gt 1 ? _args.slice(1) : [100, 1000, 10000]>>
+	<div class='dr-finance-quick-transfer'>
+		<div class='dr-finance-quick-row'>
+			<span class='dr-finance-quick-label'>
+				<<switch _financeQuickMode>>
+					<<case 'brokerage'>><<lanSwitch 'To bank account' '转回银行'>>
+					<<case 'credit'>><<lanSwitch 'Repay credit card' '偿还信用卡'>>
+					<<case 'loan'>><<lanSwitch 'Repay loan' '偿还贷款'>>
+					<<default>><<lanSwitch 'Withdraw' '取款'>>
+				<</switch>>
+			</span>
+			<span class='dr-finance-quick-links'>
+				<<for _financeQuickValue range _financeQuickAmounts>>
+					<<set _financeQuickLabel to '−£' + _financeQuickValue.toLocaleString('en-GB')>>
+					<<capture _financeQuickMode _financeQuickValue _financeQuickLabel>>
+						<<link _financeQuickLabel>><<deadwood-reblooms-finance-quick-transfer-action _financeQuickMode `-_financeQuickValue`>><</link>>
+					<</capture>>
+				<</for>>
+			</span>
+		</div>
+		<div class='dr-finance-quick-row'>
+			<span class='dr-finance-quick-label'>
+				<<switch _financeQuickMode>>
+					<<case 'brokerage'>><<lanSwitch 'To securities account' '转入证券'>>
+					<<case 'credit'>><<lanSwitch 'Cash advance' '信用卡取现'>>
+					<<case 'loan'>><<lanSwitch 'Take out a loan' '申请贷款'>>
+					<<default>><<lanSwitch 'Deposit' '存款'>>
+				<</switch>>
+			</span>
+			<span class='dr-finance-quick-links'>
+				<<for _financeQuickValue range _financeQuickAmounts>>
+					<<set _financeQuickLabel to '+£' + _financeQuickValue.toLocaleString('en-GB')>>
+					<<capture _financeQuickMode _financeQuickValue _financeQuickLabel>>
+						<<link _financeQuickLabel>><<deadwood-reblooms-finance-quick-transfer-action _financeQuickMode _financeQuickValue>><</link>>
+					<</capture>>
+				<</for>>
+			</span>
+		</div>
+	</div>
+<</widget>>
+
+<!-- 所有业务页面共用同一个结果区域。 -->
+<<widget 'deadwood-reblooms-finance-result'>>
+	<<switch _args[0]>>
+		<<case 'ok'>>
+			<span class='green'><<lanSwitch 'Transaction completed.' '交易已完成。'>></span>
+		<<case 'already-open'>>
+			<span class='red'><<lanSwitch 'This account is already open.' '该账户已经开立。'>></span>
+		<<case 'already-owned'>>
+			<span class='red'><<lanSwitch 'You already have this card.' '你已经持有这张卡。'>></span>
+		<<case 'invalid-amount'>>
+			<span class='red'><<lanSwitch 'Enter a valid positive amount.' '请输入有效的正数金额。'>></span>
+		<<case 'invalid-term'>>
+			<span class='red'><<lanSwitch 'Choose a valid loan term.' '请选择有效的贷款期限。'>></span>
+		<<case 'bank-required'>>
+			<span class='red'><<lanSwitch 'A bank account is required.' '需要先开立银行账户。'>></span>
+		<<case 'debit-required'>>
+			<span class='red'><<lanSwitch 'A debit card is required.' '需要持有借记卡。'>></span>
+		<<case 'atm-limit'>>
+			<span class='red'><<lanSwitch 'This withdrawal exceeds your remaining weekly ATM limit.' '本次取款超过了 ATM 本周剩余额度。'>></span>
+		<<case 'credit-required'>>
+			<span class='red'><<lanSwitch 'A credit card is required.' '需要持有信用卡。'>></span>
+		<<case 'brokerage-required'>>
+			<span class='red'><<lanSwitch 'A securities account is required.' '需要先开立证券账户。'>></span>
+		<<case 'insufficient-cash'>>
+			<span class='red'><<lanSwitch 'You do not have enough cash.' '你的随身现金不足。'>></span>
+		<<case 'insufficient-bank'>>
+			<span class='red'><<lanSwitch 'Your bank balance is too low.' '你的银行余额不足。'>></span>
+		<<case 'insufficient-brokerage'>>
+			<span class='red'><<lanSwitch 'Your available securities funds are too low.' '你的证券账户可用资金不足。'>></span>
+		<<case 'credit-limit'>>
+			<span class='red'><<lanSwitch 'This cash advance would exceed your credit limit.' '这笔取现会超过信用额度。'>></span>
+		<<case 'credit-overdue'>>
+			<span class='red'><<lanSwitch 'Your credit card is suspended until the overdue balance is repaid in full.' '逾期欠款还清前，你的信用卡已被暂停使用。'>></span>
+		<<case 'loan-outstanding'>>
+			<span class='red'><<lanSwitch 'Repay your current loan before taking another.' '偿清当前贷款后才能再次借款。'>></span>
+		<<case 'loan-limit'>>
+			<span class='red'><<lanSwitch 'That exceeds your current borrowing limit.' '该金额超过了你当前的贷款额度。'>></span>
+		<<case 'no-debt'>>
+			<span class='red'><<lanSwitch 'There is no outstanding balance to repay.' '当前没有需要偿还的欠款。'>></span>
+		<<case 'unknown-security'>>
+			<span class='red'><<lanSwitch 'The selected security is unavailable.' '所选证券不可交易。'>></span>
+		<<case 'insufficient-shares'>>
+			<span class='red'><<lanSwitch 'You do not own enough shares.' '你的持股数量不足。'>></span>
+	<</switch>>
+	<<if document.getElementById('dr-finance-caption')>>
+		<<replace '#dr-finance-caption'>><<deadwood-reblooms-finance-caption-content>><</replace>>
+	<</if>>
+<</widget>>
+
+<!-- 金融中心导航：柜台按营业时间开放，ATM 全天可用。 -->
+<<widget 'deadwood-reblooms-finance-navigation'>>
+	<<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
+		<<icon 'bank-counter.png'>><<lanLink 'Bank counter' 'Deadwood Reblooms Financial Centre Bank'>><</lanLink>><br>
+		<<icon 'securities-desk.png'>><<lanLink 'Securities desk' 'Deadwood Reblooms Financial Centre Securities'>><</lanLink>><br>
+	<<else>>
+		<span class='blue'><<lanSwitch 'The bank and securities counters are closed.' '银行与证券柜台已经停止营业。'>></span><br>
+	<</if>>
+	<<icon 'atm.png'>><<lanLink 'ATM' 'Deadwood Reblooms Financial Centre ATM'>><</lanLink>><br>
+<</widget>>
+
+<!-- 非营业时间：柜台关闭，只保留全天开放的 ATM。 -->
+<<widget 'deadwood-reblooms-finance-counter-closed'>>
+	<span class='blue'><<lanSwitch 'The counters open from 9:00 am to 5:00 pm, Monday to Friday.' '柜台营业时间为周一至周五 09:00–17:00。'>></span><br><br>
+	<<icon 'atm.png'>><<lanLink 'ATM' 'Deadwood Reblooms Financial Centre ATM'>><</lanLink>><br>
+<</widget>>
+
+:: Deadwood Reblooms Finance Bank Widgets [widget]
+
+<!-- 借记账户业务：开户、申请借记卡与银行柜台存取款。 -->
+<<widget 'deadwood-reblooms-finance-bank-debit-panel'>>
+	<div id='deadwood-reblooms-finance-bank-debit-panel'>
+		<<if _financeBankAmount is undefined>>
+			<<set _financeBankAmount to ''>>
+		<</if>>
+		<<deadwood-reblooms-finance-bank-summary>><br><br>
+		<<if !$VanillaPlus.finance.bank.opened>>
+			<<if $id is 1>>
+				<<language>>
+					<<option 'EN'>>
+						The clerk slides an application form across the counter, then asks for photographic identification. You hand over the card Briar arranged. It passes beneath the scanner; a green light appears without complaint. The clerk studies it for a moment, then begins copying the details onto the form.
+					<<option 'CN'>>
+						柜员把开户表推到你面前，随后要求查看带照片的身份证件。你递上布莱尔替你办好的卡片。卡片从扫描器下划过，绿灯平静地亮起。柜员端详片刻，开始把上面的资料抄到表格里。
+				<</language>>
+				<br><br>
+				<<lanLink 'Open a bank account'>>
+					<<set _financeResult to maplebirch.VP.finance.openBankAccount()>>
+					<<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+			<<else>>
+				<<language>>
+					<<option 'EN'>>
+						The clerk slides an application form across the counter, then asks for photographic identification. Bailey still has your legal papers. When you admit you cannot produce any, the form is drawn back. "I'm afraid we can't open an account without it."
+					<<option 'CN'>>
+						柜员把开户表推到你面前，随后要求查看带照片的身份证件。你的合法证件仍扣在贝利手里。听你承认拿不出证件后，柜员收回了表格。“抱歉，没有证件就不能开户。”
+				<</language>>
+			<</if>>
+		<<else>>
+			<<lanSwitch 'Debit card' '借记卡'>>：
+			<<if $VanillaPlus.finance.bank.debitCard>>
+				<<lanSwitch 'Yes' '有'>>
+			<<else>>
+				<<lanSwitch 'No' '无'>>
+			<</if>><br>
+			<<if !$VanillaPlus.finance.bank.debitCard>>
+				<<lanLink 'Apply for a debit card'>>
+					<<set _financeResult to maplebirch.VP.finance.issueDebitCard()>>
+					<<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>><br>
+			<</if>>
+			<<deadwood-reblooms-finance-quick-transfers 'bank'>>
+			<span class='blue'><<lanSwitch 'Preferred accounts unlock after 7 days with a peak net balance of £5,000. Premier accounts unlock after 30 days at £25,000. Missed card or loan payments pause upgrades.' '开户满 7 天且净余额峰值达到 £5,000 可升级为优选账户；满 30 天且达到 £25,000 可升级为尊享账户。信用卡或贷款逾期会暂停升级。'>></span><br>
+			<span class='blue'><<lanSwitch 'Bank balances earn 0.02% interest each day.' '银行存款每日计息 0.02%。'>></span>
+			<div class='dr-finance-form'>
+				<label><<lanSwitch 'Custom amount (£)' '自定义金额(£)'>>：<<textbox '_financeBankAmount' _financeBankAmount>></label>
+			</div>
+			<div class='dr-finance-actions'>
+				<<lanLink 'Deposit'>>
+					<<set _financeResult to maplebirch.VP.finance.deposit(_financeBankAmount)>>
+					<<updatesidebarmoney>>
+					<<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Withdraw'>>
+					<<set _financeResult to maplebirch.VP.finance.withdraw(_financeBankAmount)>>
+					<<updatesidebarmoney>>
+					<<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Deposit all cash'>>
+					<<set _financeResult to maplebirch.VP.finance.deposit($money / 100)>>
+					<<updatesidebarmoney>>
+					<<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Withdraw all'>>
+					<<set _financeResult to maplebirch.VP.finance.withdraw($VanillaPlus.finance.bank.balance / 100)>>
+					<<updatesidebarmoney>>
+					<<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+			</div>
+		<</if>>
+	</div>
+<</widget>>
+
+<!-- 信用卡业务：申请、取现与还款。 -->
+<<widget 'deadwood-reblooms-finance-bank-credit-panel'>>
+	<div id='deadwood-reblooms-finance-bank-credit-panel'>
+		<<if _financeCreditAmount is undefined>>
+			<<set _financeCreditAmount to ''>>
+		<</if>>
+		<<if !$VanillaPlus.finance.bank.opened>>
+			<<lanSwitch 'Open a bank account before applying for credit.' '申请信用卡前需要先开立银行账户。'>>
+		<<else>>
+			<<lanSwitch 'Credit card' '信用卡'>>：
+			<<if $VanillaPlus.finance.bank.creditCard>>
+				<<lanSwitch 'Yes' '有'>>
+			<<else>>
+				<<lanSwitch 'No' '无'>>
+			<</if>><br>
+			<<if !$VanillaPlus.finance.bank.creditCard>>
+				<<lanLink 'Apply for a credit card'>>
+					<<set _financeResult to maplebirch.VP.finance.issueCreditCard()>>
+					<<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+			<<else>>
+				<<set _financeAvailableCredit to Math.max(0, $VanillaPlus.finance.bank.creditLimit - $VanillaPlus.finance.bank.creditDebt)>>
+				<span class='dr-finance-summary'>
+					<span><<lanSwitch 'Credit limit' '信用额度'>></span><span><<printmoney $VanillaPlus.finance.bank.creditLimit>></span>
+					<span><<lanSwitch 'Available credit' '可用额度'>></span><span><<printmoney _financeAvailableCredit>></span>
+					<span class='red'><<lanSwitch 'Credit balance' '信用卡欠款'>></span><span class='red'><<printmoney $VanillaPlus.finance.bank.creditDebt>></span>
+				</span><br>
+				<<if $VanillaPlus.finance.bank.creditDebt gt 0>>
+					<<lanSwitch 'Next minimum payment' '下次最低还款'>>：<<printmoney $VanillaPlus.finance.bank.creditMinimumPayment>><br>
+					<<lanSwitch 'Days until payment' '距还款日'>>：<<= Math.max(0, $VanillaPlus.finance.bank.creditDueDay - Time.days)>><br>
+				<</if>>
+				<<if $VanillaPlus.finance.bank.creditMissedPayments gt 0>>
+					<span class='red'><<lanSwitch 'The card is suspended until the balance is repaid in full.' '还清全部欠款前，这张卡已被暂停使用。'>></span><br>
+				<</if>>
+				<span class='blue'><<lanSwitch 'Cash advances add a 5% fee. Debt accrues 0.30% interest each day. A 10% minimum payment, or £10 if greater, is collected every 7 days; a missed payment adds a' '信用卡取现收取 5% 手续费，欠款每日计息 0.30%。每 7 天自动扣除 10% 最低还款，不足 £10 时按 £10 计；扣款不足会加收'>> <<printmoney 1000>> <<lanSwitch 'late fee and suspends further advances.' '滞纳金，并暂停继续取现。'>></span>
+				<<deadwood-reblooms-finance-quick-transfers 'credit' 100 500 900>>
+				<div class='dr-finance-form'><label><<lanSwitch 'Amount (£)' '金额(£)'>>：<<textbox '_financeCreditAmount' _financeCreditAmount>></label></div>
+				<div class='dr-finance-actions'>
+					<<lanLink 'Take a cash advance'>>
+						<<set _financeResult to maplebirch.VP.finance.creditAdvance(_financeCreditAmount)>>
+						<<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
+						<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+					<</lanLink>>
+					<<lanLink 'Repay credit card'>>
+						<<set _financeResult to maplebirch.VP.finance.repayCredit(_financeCreditAmount)>>
+						<<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
+						<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+					<</lanLink>>
+					<<lanLink 'Repay credit in full'>>
+						<<set _financeResult to maplebirch.VP.finance.repayCredit($VanillaPlus.finance.bank.creditDebt / 100)>>
+						<<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
+						<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+					<</lanLink>>
+				</div>
+			<</if>>
+		<</if>>
+	</div>
+<</widget>>
+
+<!-- 贷款业务：借款、计划还款信息与主动还款。 -->
+<<widget 'deadwood-reblooms-finance-bank-loan-panel'>>
+	<div id='deadwood-reblooms-finance-bank-loan-panel'>
+		<<if _financeLoanAmount is undefined>>
+			<<set _financeLoanAmount to ''>>
+		<</if>>
+		<<if _financeLoanTerm is undefined>>
+			<<set _financeLoanTerm to 30>>
+		<</if>>
+		<<if !$VanillaPlus.finance.bank.opened>>
+			<<lanSwitch 'Open a bank account before applying for a loan.' '申请贷款前需要先开立银行账户。'>>
+		<<else>>
+			<span class='dr-finance-summary'>
+				<span><<lanSwitch 'Bank balance' '银行余额'>></span><span><<printmoney $VanillaPlus.finance.bank.balance>></span>
+				<span><<lanSwitch 'Borrowing limit' '贷款额度'>></span><span><<printmoney $VanillaPlus.finance.bank.loanLimit>></span>
+				<span class='red'><<lanSwitch 'Outstanding balance' '未偿余额'>></span><span class='red'><<printmoney $VanillaPlus.finance.bank.loanDebt>></span>
+			</span><br>
+			<<if $VanillaPlus.finance.bank.loanDebt gt 0>>
+				<<lanSwitch 'Loan term' '贷款期限'>>：<<= $VanillaPlus.finance.bank.loanTerm>> <<lanSwitch 'days' '天'>><br>
+				<<set _financeLoanDailyRate to $VanillaPlus.finance.bank.loanRate * (Time.days gt $VanillaPlus.finance.bank.loanDueDay ? 200 : 100)>>
+				<<lanSwitch 'Daily interest rate' '每日利率'>>：<<= _financeLoanDailyRate.toFixed(2)>>%<br>
+				<<lanSwitch 'Scheduled daily payment' '每日计划还款'>>：<<printmoney $VanillaPlus.finance.bank.loanPayment>><br>
+				<<lanSwitch 'Days until due' '距到期日'>>：<<= Math.max(0, $VanillaPlus.finance.bank.loanDueDay - Time.days)>><br>
+				<<lanSwitch 'Missed payments' '未足额还款次数'>>：<<= $VanillaPlus.finance.bank.loanMissedPayments>><br>
+			<</if>>
+			<span class='blue'><<lanSwitch 'Scheduled payments are taken from your bank balance. A missed payment adds £5 or 2% of the unpaid instalment, whichever is greater. After the due date, the daily rate doubles.' '计划还款会自动从银行余额中扣除。漏还时加收 £5 或未付当期金额的 2%，取较高者；到期后每日利率翻倍。'>></span><br>
+			<<lanSwitch '7-day bridge loan' '7 天周转贷款'>>：0.15% / <<lanSwitch 'day' '日'>><br>
+			<<lanSwitch '14-day short-term loan' '14 天短期贷款'>>：0.20% / <<lanSwitch 'day' '日'>><br>
+			<<lanSwitch '30-day personal loan' '30 天个人贷款'>>：0.25% / <<lanSwitch 'day' '日'>>
+				<div class='dr-finance-form'>
+					<label><<lanSwitch 'Amount (£)' '金额(£)'>>：<<textbox '_financeLoanAmount' _financeLoanAmount>></label><br>
+					<label><<lanSwitch 'Loan product' '贷款品种'>>：
+					<<lanListbox '_financeLoanTerm' autoselect>>
+						<<option '7-day bridge loan' 7>>
+						<<option '14-day short-term loan' 14>>
+						<<option '30-day personal loan' 30>>
+					<</lanListbox>>
+					</label>
+				</div>
+				<<deadwood-reblooms-finance-quick-transfers 'loan' 100 1000 5000>>
+				<div class='dr-finance-actions'>
+				<<lanLink 'Take out a loan'>>
+					<<set _financeResult to maplebirch.VP.finance.takeLoan(_financeLoanAmount, _financeLoanTerm)>>
+					<<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Repay loan'>>
+					<<set _financeResult to maplebirch.VP.finance.repayLoan(_financeLoanAmount)>>
+					<<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Repay loan in full'>>
+					<<set _financeResult to maplebirch.VP.finance.repayLoan($VanillaPlus.finance.bank.loanDebt / 100)>>
+					<<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+			</div>
+		<</if>>
+	</div>
+<</widget>>
+
+<!-- ATM 业务：持有借记卡后进行存取款。 -->
+<<widget 'deadwood-reblooms-finance-atm-panel'>>
+	<div id='deadwood-reblooms-finance-atm-panel'>
+		<<if _financeAtmAmount is undefined>>
+			<<set _financeAtmAmount to ''>>
+		<</if>>
+		<<deadwood-reblooms-finance-bank-summary>><br><br>
+		<<if !$VanillaPlus.finance.bank.opened>>
+			<<lanSwitch 'The machine cannot find an account for you.' '机器无法找到你的账户。'>>
+		<<elseif !$VanillaPlus.finance.bank.debitCard>>
+			<span class='red'><<lanSwitch 'Insert a debit card to use the ATM.' '使用 ATM 前需要插入借记卡。'>></span>
+		<<else>>
+			<<set _financeAtmRemaining to Math.max(0, $VanillaPlus.finance.bank.atmWithdrawalLimit - $VanillaPlus.finance.bank.atmWithdrawn)>>
+			<span class='blue'><<lanSwitch 'Weekly withdrawal limit' '每周取款限额'>>：<<printmoney $VanillaPlus.finance.bank.atmWithdrawalLimit>> · <<lanSwitch 'Remaining' '剩余'>>：<<printmoney _financeAtmRemaining>></span><br>
+			<<deadwood-reblooms-finance-quick-transfers 'atm' 100 500 2000>>
+			<div class='dr-finance-form'><label><<lanSwitch 'Custom amount (£)' '自定义金额(£)'>>：<<textbox '_financeAtmAmount' _financeAtmAmount>></label></div>
+			<div class='dr-finance-actions'>
+				<<lanLink 'Deposit'>>
+					<<set _financeResult to maplebirch.VP.finance.deposit(_financeAtmAmount, true)>>
+					<<updatesidebarmoney>>
+					<<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Withdraw'>>
+					<<set _financeResult to maplebirch.VP.finance.withdraw(_financeAtmAmount, true)>>
+					<<updatesidebarmoney>>
+					<<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Deposit all cash'>>
+					<<set _financeResult to maplebirch.VP.finance.deposit($money / 100, true)>>
+					<<updatesidebarmoney>>
+					<<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<set _financeAtmMaximum to Math.min($VanillaPlus.finance.bank.balance, _financeAtmRemaining)>>
+				<<if _financeAtmMaximum gt 0>>
+					<<lanLink 'Withdraw maximum'>>
+						<<set _financeResult to maplebirch.VP.finance.withdraw(_financeAtmMaximum / 100, true)>>
+						<<updatesidebarmoney>>
+						<<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
+						<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+					<</lanLink>>
+				<</if>>
+			</div>
+		<</if>>
+	</div>
+<</widget>>
+
+:: Deadwood Reblooms Finance Securities Widgets [widget]
+
+<!-- 股数调整：按常用档位修改委托数量，不直接执行买卖。 -->
+<<widget 'deadwood-reblooms-finance-share-adjust'>>
+	<<set _financeShareDelta to Number(_args[0])>>
+	<<set _financeShareCurrent to Math.max(0, Math.floor(Number(_financeShares) || 0))>>
+	<<set _financeShares to Math.max(0, _financeShareCurrent + _financeShareDelta)>>
+	<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
+<</widget>>
+
+<!-- 证券账户业务：开户及银行账户与证券账户之间的资金划转。 -->
+<<widget 'deadwood-reblooms-finance-exchange-account-panel'>>
+	<div id='deadwood-reblooms-finance-exchange-account-panel'>
+		<<if _financeTransferAmount is undefined>>
+			<<set _financeTransferAmount to ''>>
+		<</if>>
+		<<if !$VanillaPlus.finance.bank.opened>>
+			<<lanSwitch 'You need a bank account before opening a securities account.' '开立证券账户前需要先拥有银行账户。'>>
+		<<elseif !$VanillaPlus.finance.brokerage.opened>>
+			<<lanSwitch 'You do not have a securities account.' '你还没有证券账户。'>><br>
+			<<lanLink 'Open a securities account'>>
+				<<set _financeResult to maplebirch.VP.finance.openBrokerageAccount()>>
+				<<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
+				<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+			<</lanLink>>
+		<<else>>
+			<<deadwood-reblooms-finance-exchange-summary>><br>
+			<<deadwood-reblooms-finance-quick-transfers 'brokerage'>>
+			<div class='dr-finance-form'><label><<lanSwitch 'Custom amount (£)' '自定义金额(£)'>>：<<textbox '_financeTransferAmount' _financeTransferAmount>></label></div>
+			<div class='dr-finance-actions'>
+				<<lanLink 'Transfer to securities account'>>
+					<<set _financeResult to maplebirch.VP.finance.transferToBrokerage(_financeTransferAmount)>>
+					<<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Transfer to bank account'>>
+					<<set _financeResult to maplebirch.VP.finance.transferFromBrokerage(_financeTransferAmount)>>
+					<<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Transfer all from bank'>>
+					<<set _financeResult to maplebirch.VP.finance.transferToBrokerage($VanillaPlus.finance.bank.balance / 100)>>
+					<<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Transfer all to bank'>>
+					<<set _financeResult to maplebirch.VP.finance.transferFromBrokerage($VanillaPlus.finance.brokerage.cash / 100)>>
+					<<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+			</div>
+		<</if>>
+	</div>
+<</widget>>
+
+<!-- 证券交易业务：行情、持仓与委托交易。 -->
+<<widget 'deadwood-reblooms-finance-exchange-trade-panel'>>
+	<div id='deadwood-reblooms-finance-exchange-trade-panel'>
+		<<if _financeShares is undefined>>
+			<<set _financeShares to ''>>
+		<</if>>
+		<<if _financeSymbol is undefined>>
+			<<set _financeSymbol to maplebirch.VP.finance.securities[0].symbol>>
+		<</if>>
+		<<if !$VanillaPlus.finance.brokerage.opened>>
+			<<lanSwitch 'Open a securities account before trading.' '交易前需要先开立证券账户。'>>
+		<<else>>
+			<<deadwood-reblooms-finance-exchange-summary>><br><br>
+			<div class='dr-finance-board'>
+				<table class='dr-finance-quotes' aria-label="<<lanSwitch 'Market quotes' '股票行情'>>">
+					<tr>
+						<th scope='col'><<lanSwitch 'Symbol' '代码'>></th>
+						<th scope='col'><<lanSwitch 'Security' '证券'>></th>
+						<th scope='col'><<lanSwitch 'Price' '价格'>></th>
+						<th scope='col'><<lanSwitch 'Daily change' '日涨跌'>></th>
+					</tr>
+					<<for _financeSecurity range maplebirch.VP.finance.securities>>
+						<<set _financeSymbol to _financeSecurity.symbol>>
+						<<set _financePrice to $VanillaPlus.finance.market.prices[_financeSymbol]>>
+						<<set _financePreviousPrice to $VanillaPlus.finance.market.previousPrices[_financeSymbol]>>
+						<<set _financeChange to _financePrice - _financePreviousPrice>>
+						<<set _financeChangePercent to _financePreviousPrice gt 0 ? (_financeChange / _financePreviousPrice) * 100 : 0>>
+						<tr>
+							<td><<= _financeSymbol>></td>
+							<td><<= _financeSecurity.name[maplebirch.Language] || _financeSecurity.name.EN>></td>
+							<td><<printmoney _financePrice>></td>
+							<td>
+								<<if _financeChange gt 0>>
+									<span class='red'>+<<= _financeChangePercent.toFixed(2)>>%</span>
+								<<elseif _financeChange lt 0>>
+									<span class='green'><<= _financeChangePercent.toFixed(2)>>%</span>
+								<<else>>
+									<span class='blue'>0.00%</span>
+								<</if>>
+							</td>
+						</tr>
+					<</for>>
+				</table>
+			</div>
+			<br>
+			<div class='dr-finance-board'>
+				<table class='dr-finance-quotes' aria-label="<<lanSwitch 'Holdings' '持仓'>>">
+					<tr>
+						<th scope='col'><<lanSwitch 'Symbol' '代码'>></th>
+						<th scope='col'><<lanSwitch 'Shares' '股数'>></th>
+						<th scope='col'><<lanSwitch 'Market value' '市值'>></th>
+					</tr>
+					<<set _financeHasHoldings to false>>
+					<<for _financeSecurity range maplebirch.VP.finance.securities>>
+						<<set _financeSymbol to _financeSecurity.symbol>>
+						<<set _financeOwned to $VanillaPlus.finance.brokerage.holdings[_financeSymbol]>>
+						<<if _financeOwned gt 0>>
+							<<set _financeHasHoldings to true>>
+							<<set _financeHoldingValue to _financeOwned * $VanillaPlus.finance.market.prices[_financeSymbol]>>
+							<tr><td><<= _financeSymbol>></td><td><<= _financeOwned>></td><td><<printmoney _financeHoldingValue>></td></tr>
+						<</if>>
+					<</for>>
+					<<if !_financeHasHoldings>>
+						<tr><td colspan='3' class='blue'><<lanSwitch 'No securities held.' '暂无持仓。'>></td></tr>
+					<</if>>
+				</table>
+			</div>
+			<br>
+			<strong><<lanSwitch 'Place an order' '委托交易'>></strong><br>
+			<<set _financeSecurityOptions to {}>>
+			<<for _financeSecurity range maplebirch.VP.finance.securities>>
+				<<set _financeSecurityLabel to _financeSecurity.name[maplebirch.Language] || _financeSecurity.name.EN>>
+				<<set _financeSecurityOptions[_financeSecurityLabel] to _financeSecurity.symbol>>
+			<</for>>
+			<div class='dr-finance-form'>
+				<label><<lanSwitch 'Security' '证券'>>：
+					<<listbox '_financeSymbol' autoselect>>
+						<<optionsfrom _financeSecurityOptions>>
+					<</listbox>>
+				</label><br>
+				<label><<lanSwitch 'Shares' '股数'>>：<<textbox '_financeShares' _financeShares>></label>
+				<div class='dr-finance-actions'>
+					<<link '−100'>><<deadwood-reblooms-finance-share-adjust -100>><</link>>
+					<<link '−10'>><<deadwood-reblooms-finance-share-adjust -10>><</link>>
+					<<link '−1'>><<deadwood-reblooms-finance-share-adjust -1>><</link>>
+					<<link '+1'>><<deadwood-reblooms-finance-share-adjust 1>><</link>>
+					<<link '+10'>><<deadwood-reblooms-finance-share-adjust 10>><</link>>
+					<<link '+100'>><<deadwood-reblooms-finance-share-adjust 100>><</link>>
+				</div>
+			</div>
+			<div class='dr-finance-actions'>
+				<<lanLink 'Buy'>>
+					<<set _financeResult to maplebirch.VP.finance.buy(_financeSymbol, _financeShares)>>
+					<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Buy maximum'>>
+					<<set _financeMaximumShares to Math.floor($VanillaPlus.finance.brokerage.cash / $VanillaPlus.finance.market.prices[_financeSymbol])>>
+					<<set _financeResult to maplebirch.VP.finance.buy(_financeSymbol, _financeMaximumShares)>>
+					<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Sell'>>
+					<<set _financeResult to maplebirch.VP.finance.sell(_financeSymbol, _financeShares)>>
+					<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+				<<lanLink 'Sell all held'>>
+					<<set _financeHolding to $VanillaPlus.finance.brokerage.holdings[_financeSymbol]>>
+					<<set _financeResult to maplebirch.VP.finance.sell(_financeSymbol, _financeHolding)>>
+					<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
+					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
+				<</lanLink>>
+			</div>
+		<</if>>
+	</div>
+<</widget>>
+
+:: Deadwood Reblooms Financial Centre []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<strong><<lanSwitch 'Financial Centre' '金融中心'>></strong><br>
+<<language>>
+	<<option 'EN'>>
+		Bronze lettering marks the sober stone frontage. Beyond the glass doors, a quiet banking hall opens beneath fluorescent lights. A row of counters occupies one wall, while a smaller securities desk faces a square electronic market board. An ATM hums beside the entrance.
+	<<option 'CN'>>
+		朴素的石砌门面上嵌着青铜字样。玻璃门后，安静的银行大厅笼罩在荧光灯下。一排柜台占据一侧墙面，较小的证券业务台则正对着方形电子行情板。入口旁的 ATM 发出低沉的嗡鸣。
+<</language>>
+<br><br>
+<<deadwood-reblooms-finance-navigation>>
+<br>
+<<highicon>><<lanLink 'Return to High Street' 'High Street'>><</lanLink>><br>
+
+:: Deadwood Reblooms Financial Centre Bank []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
+	<strong><<lanSwitch 'Bank counter' '银行柜台'>></strong><br>
+	<<lanSwitch 'Clerks work behind thick glass, surrounded by forms, card readers and locked cash drawers.' '柜员们在厚玻璃后工作，身旁堆着表格、读卡器与上锁的钱箱。'>><br><br>
+	<<deadwood-reblooms-finance-bank-summary>><br><br>
+	<<lanLink 'Debit card and account' 'Deadwood Reblooms Financial Centre Bank Debit'>><</lanLink>><br>
+	<<lanLink 'Credit card' 'Deadwood Reblooms Financial Centre Bank Credit'>><</lanLink>><br>
+	<<lanLink 'Personal loan' 'Deadwood Reblooms Financial Centre Bank Loan'>><</lanLink>><br>
+	<br>
+<<else>>
+	<<deadwood-reblooms-finance-counter-closed>>
+<</if>>
+<<lanLink 'Return' 'Deadwood Reblooms Financial Centre'>><</lanLink>><br>
+
+:: Deadwood Reblooms Financial Centre Bank Debit []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
+	<strong><<lanSwitch 'Debit card and account' '借记卡与账户'>></strong><br>
+	<div id='deadwood-reblooms-finance-result' role='status' aria-live='polite'></div>
+	<<deadwood-reblooms-finance-bank-debit-panel>>
+	<br><br>
+	<<lanLink 'Return to bank counter' 'Deadwood Reblooms Financial Centre Bank'>><</lanLink>><br>
+<<else>>
+	<<deadwood-reblooms-finance-counter-closed>>
+<</if>>
+
+:: Deadwood Reblooms Financial Centre Bank Credit []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
+	<strong><<lanSwitch 'Credit card' '信用卡'>></strong><br>
+	<div id='deadwood-reblooms-finance-result' role='status' aria-live='polite'></div>
+	<<deadwood-reblooms-finance-bank-credit-panel>>
+	<br><br>
+	<<lanLink 'Return to bank counter' 'Deadwood Reblooms Financial Centre Bank'>><</lanLink>><br>
+<<else>>
+	<<deadwood-reblooms-finance-counter-closed>>
+<</if>>
+
+:: Deadwood Reblooms Financial Centre Bank Loan []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
+	<strong><<lanSwitch 'Personal loan' '个人贷款'>></strong><br>
+	<div id='deadwood-reblooms-finance-result' role='status' aria-live='polite'></div>
+	<<deadwood-reblooms-finance-bank-loan-panel>>
+	<br><br>
+	<<lanLink 'Return to bank counter' 'Deadwood Reblooms Financial Centre Bank'>><</lanLink>><br>
+<<else>>
+	<<deadwood-reblooms-finance-counter-closed>>
+<</if>>
+
+:: Deadwood Reblooms Financial Centre ATM []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<strong><<lanSwitch 'ATM' 'ATM'>></strong><br>
+<<lanSwitch 'The recessed machine waits beneath a small security camera.' '嵌入墙面的机器静候在一枚小型监控摄像头下。'>><br><br>
+<div id='deadwood-reblooms-finance-result' role='status' aria-live='polite'></div>
+<<deadwood-reblooms-finance-atm-panel>>
+<br><br>
+<<lanLink 'Return' 'Deadwood Reblooms Financial Centre'>><</lanLink>><br>
+
+:: Deadwood Reblooms Financial Centre Securities []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
+	<strong><<lanSwitch 'Securities desk' '证券业务台'>></strong><br>
+	<<lanSwitch 'A clerk files account forms beneath the market board while prices crawl across its display.' '行情板下，柜员整理着账户表格，价格在电子屏幕上缓慢滚动。'>><br><br>
+	<<if $VanillaPlus.finance.brokerage.opened>>
+		<<deadwood-reblooms-finance-exchange-summary>><br><br>
+	<</if>>
+	<<lanLink 'Securities account' 'Deadwood Reblooms Financial Centre Securities Account'>><</lanLink>><br>
+	<<lanLink 'Trading' 'Deadwood Reblooms Financial Centre Securities Trading'>><</lanLink>><br>
+	<br>
+<<else>>
+	<<deadwood-reblooms-finance-counter-closed>>
+<</if>>
+<<lanLink 'Return' 'Deadwood Reblooms Financial Centre'>><</lanLink>><br>
+
+:: Deadwood Reblooms Financial Centre Securities Account []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
+	<strong><<lanSwitch 'Securities account' '证券账户'>></strong><br>
+	<div id='deadwood-reblooms-finance-result' role='status' aria-live='polite'></div>
+	<<deadwood-reblooms-finance-exchange-account-panel>>
+	<br><br>
+	<<lanLink 'Return to securities desk' 'Deadwood Reblooms Financial Centre Securities'>><</lanLink>><br>
+<<else>>
+	<<deadwood-reblooms-finance-counter-closed>>
+<</if>>
+
+:: Deadwood Reblooms Financial Centre Securities Trading []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
+	<strong><<lanSwitch 'Trading' '证券交易'>></strong><br>
+	<div id='deadwood-reblooms-finance-result' role='status' aria-live='polite'></div>
+	<<deadwood-reblooms-finance-exchange-trade-panel>>
+	<br><br>
+	<<lanLink 'Return to securities desk' 'Deadwood Reblooms Financial Centre Securities'>><</lanLink>><br>
+<<else>>
+	<<deadwood-reblooms-finance-counter-closed>>
+<</if>>
+
+:: Deadwood Reblooms Bailey Bank Account []
+<<set $outside to 0>>
+<<set $location to 'home'>>
+<<effects>>
+<<npc Bailey>><<person1>>
+<<language>>
+	<<option 'EN'>>
+		You tell Bailey that you have opened a bank account, and offer to use it for the weekly rent.
+		<br><br>
+		Bailey puts down <<his>> pen. "Useful," <<he>> says, pulling a form from a drawer and sliding it towards you. "Sign this. When the rent is due, the account pays first. If it's short, you cover the rest in cash."
+	<<option 'CN'>>
+		你告诉贝利自己开了银行账户，并提出以后用账户支付每周租金。
+		<br><br>
+		贝利放下笔。“有点用。”<<he>>从抽屉里抽出一张表格，推到你面前，“签了。租金到期时先从账户里取，不够的部分你再用现金补上。”
+<</language>>
+<br><br>
+<<lanLink 'Authorise bank payments' 'Deadwood Reblooms Bailey Bank Account Authorised'>><</lanLink>><br>
+<<lanLink 'Keep the account private' 'Orphanage'>><</lanLink>><br>
+
+:: Deadwood Reblooms Bailey Bank Account Authorised []
+<<set $outside to 0>>
+<<set $location to 'home'>>
+<<set $VanillaPlus.finance.bank.baileyKnowsAccount to true>>
+<<effects>>
+<<npc Bailey>><<person1>>
+<<language>>
+	<<option 'EN'>>
+		You sign the form. Bailey checks it, then files it away. "Good. That removes one excuse."
+	<<option 'CN'>>
+		你在表格上签了字。贝利检查一遍，把它收进文件里。“很好。这下你又少了一个借口。”
+<</language>>
+<br><br>
+<<lanLink 'Return' 'Orphanage'>><</lanLink>><br>

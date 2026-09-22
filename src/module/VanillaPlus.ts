@@ -5,6 +5,7 @@ import AcademicHonours from './VanillaPlus/AcademicHonours';
 import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
+import Finance, { DEFAULT_FINANCE_STATE } from './VanillaPlus/Finance';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
 import Willpower from './VanillaPlus/Willpower';
@@ -34,6 +35,7 @@ class VanillaPlus extends Module {
     beauty: {
       alluring: false
     },
+    finance: DEFAULT_FINANCE_STATE,
     historyProject: {
       status: 'none' as 'none' | 'ongoing' | 'done' | 'won',
       source: 'none' as 'none' | 'paintingward' | 'paintingsnake',
@@ -97,6 +99,7 @@ class VanillaPlus extends Module {
   public readonly beauty = new Beauty();
   public readonly deviancy = new Deviancy();
   public readonly exhibitionism = new Exhibitionism();
+  public readonly finance: Finance;
   public readonly physique = new Physique();
   public readonly promiscuity = new Promiscuity();
   public readonly willpower = new Willpower();
@@ -104,6 +107,12 @@ class VanillaPlus extends Module {
 
   public constructor(core: typeof maplebirch) {
     super(core, 'VanillaPlus', VanillaPlus.variables);
+    this.finance = new Finance(core);
+  }
+
+  public override preInit(): void {
+    super.preInit();
+    this.finance.preInit();
   }
 
   public hasTrait(trait: VanillaPlusTrait): boolean {

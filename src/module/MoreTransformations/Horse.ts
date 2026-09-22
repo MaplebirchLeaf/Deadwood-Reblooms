@@ -5,6 +5,11 @@ import Transformation, { TransformationOption } from './Transformation';
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 class Horse extends Transformation {
+  private static demonTailEnabled(): boolean {
+    const parts = V.transformationParts;
+    return [parts?.horse?.tail, parts?.demon?.tail].every(part => typeof part === 'string' && isPartEnabled(part)) && isChimeraEnabled('demonhorse', 'tail');
+  }
+
   private static hairLikeFilter(colour: string) {
     const record = setup.colours.hair_map[colour];
     if (!record) return Renderer.emptyLayerFilter();
@@ -43,6 +48,9 @@ class Horse extends Transformation {
           options.maplebirchTransformation = V.maplebirch?.transformation ?? false;
           options.horse_ears_layer = V.tfearslayer ?? 'back';
           options.horse_tail_layer = V.taillayer ?? 'front';
+          // 只合并当前可见且未被原版其他混合形态接管的恶魔尾，不改动存档里的部件选择。
+          options.horse_demon_tail = !!options.maplebirchTransformation && Horse.demonTailEnabled() && options.demon_tail_type === V.transformationParts.demon.tail;
+          if (options.horse_demon_tail) options.demon_tail_type = 'hidden';
           if (options.worn.head.setup.name === 'sage witch hat' && isPartEnabled(V.transformationParts?.horse?.ears)) options.hideHeadAcc = true;
         },
 
@@ -62,18 +70,22 @@ class Horse extends Transformation {
           },
 
           horse_tail: {
+            animation: 'idle',
             srcfn: options => {
-              const demon = isChimeraEnabled('demonhorse', 'tail');
-              const tail = demon ? `tail-${options.demon_tail_state}` : 'tail-idle';
-              return `img/transformations/horse/${tail}/${V.transformationParts?.horse?.tail}.png`;
+              const state = options.horse_demon_tail && ['cover', 'flaunt'].includes(options.demon_tail_state) ? options.demon_tail_state : 'idle';
+              const style = options.horse_demon_tail ? 'default-demon' : V.transformationParts?.horse?.tail;
+              return `img/transformations/horse/tail-${state}/${style}.png`;
             },
             filters: ['hair'],
-            showfn: options => options.show_tf && isPartEnabled(V.transformationParts?.horse?.tail) && !options.hide_all && options.maplebirchTransformation,
+            showfn: options => {
+              const tail = V.transformationParts?.horse?.tail;
+              return options.show_tf && typeof tail === 'string' && isPartEnabled(tail) && !options.hide_all && options.maplebirchTransformation;
+            },
             masksrcfn: options => {
               if (options.worn.over_upper.setup.name === 'kaiju costume') return `img/clothes/over-upper/kaiju/mask.png`;
             },
             zfn: options => {
-              const cover = ['cover', 'flaunt'].includes(options.demon_tail_state) && isChimeraEnabled('demonhorse', 'tail');
+              const cover = ['cover', 'flaunt'].includes(options.demon_tail_state) && options.horse_demon_tail;
               if (cover) return maplebirch.char.ZIndices.tailPenisCover;
               if (options.horse_tail_layer === 'back') return maplebirch.char.ZIndices.tail;
               return maplebirch.char.ZIndices.back_lower;
@@ -97,6 +109,9 @@ class Horse extends Transformation {
   private static pre(options: any): void {
     options.maplebirchTransformation = V.maplebirch?.transformation ?? false;
     options.filters.horseHair = Horse.hairLikeFilter(V.haircolour);
+    const demonTail = options.transformations?.demon?.tail;
+    options.horse_demon_tail = !!options.maplebirchTransformation && Horse.demonTailEnabled() && demonTail?.show === true && !['cat', 'cow'].includes(demonTail.style);
+    if (options.horse_demon_tail) options.transformations.demon.tail.show = false;
   }
 
   private static readonly layers: CanvasLayerMap = {
@@ -129,20 +144,20 @@ class Horse extends Transformation {
       }
     },
     horseTailFront: {
-      srcfn: (options: any) => `${options.src}body/transformations/horse/tail/front-default.png`,
-      showfn: () => {
+      srcfn: (options: any) => `${options.src}body/transformations/horse/tail/front-${options.horse_demon_tail ? 'default-demon' : 'default'}.png`,
+      showfn: (options: any) => {
         const tail = V.transformationParts?.horse?.tail;
-        return !(tail === 'disabled' || tail === 'hidden');
+        return typeof tail === 'string' && isPartEnabled(tail) && options.maplebirchTransformation;
       },
       animationfn: (options: any) => options.animKey,
       filters: ['horseHair'],
       z: 40
     },
     horseTailBack: {
-      srcfn: (options: any) => `${options.src}body/transformations/horse/tail/back-default.png`,
-      showfn: () => {
+      srcfn: (options: any) => `${options.src}body/transformations/horse/tail/back-${options.horse_demon_tail ? 'default-demon' : 'default'}.png`,
+      showfn: (options: any) => {
         const tail = V.transformationParts?.horse?.tail;
-        return !(tail === 'disabled' || tail === 'hidden');
+        return typeof tail === 'string' && isPartEnabled(tail) && options.maplebirchTransformation;
       },
       animationfn: (options: any) => options.animKey,
       filters: ['horseHair'],
@@ -206,28 +221,33 @@ class Horse extends Transformation {
     maplebirch.tool.zone.inject({
       locationPassage: {
         'Riding School Lesson Grab': [
+          // 在骑术课吃草链接完整结束后显示马化提示，不插入链接内部以免改变原版点击结算顺序。
           {
             srcmatch: /<<link \[\[[^\n]*?\|Riding School Lesson Eat\]\]>><[\s\S]*?<<\/link>>/,
             applyafter: '<<transform-hint "horse" "softbrown">>'
           }
         ],
         'Farm Horses Brush': [
+          // 在农场刷马后续链接结束处追加马化提示，仅对已经开始马化的玩家显示。
           {
             srcmatch: /<<link \[\[[^\n]*?\|Farm Horses Chase\]\]>>[\s\S]*?<<\/link>>/,
             applyafter: '<<if $maplebirch.transformation.horse.level > 0>><<transform-hint "horse" "softbrown">><</if>>'
           }
         ],
         'Riding School Lesson Eat': [
+          // 在吃草场景清空画布模型后增加马化进度，使剧情行为与转化成长直接对应。
           {
             srcmatch: /<<canvas-model-override "clear">>/,
             applyafter: '<<transform "horse" 5>>'
           }
         ],
         'Moor Horse Riding': [
+          // 在荒原骑马离开链接结束后显示马化提示，保留原版事件跳过和时间推进逻辑。
           {
             srcmatch: /<<link \[\[[^\n]*?\|Moor\]\]>><<set \$eventskip to 1>>[\s\S]*?<<bird_pass 5>>[\s\S]*?<<\/link>>/,
             applyafter: '<<if $maplebirch.transformation.horse.level > 0>><<transform-hint "horse" "softbrown">><</if>>'
           },
+          // 在骑马经过五分钟之前按概率增加马化进度，只对已有马化状态的玩家生效。
           {
             srcmatch: /<<bird_pass 5>>/,
             applybefore: '<<if $maplebirch.transformation.horse.level > 0 and $rng <= 30>><<transform "horse" 1>><</if>>'
@@ -235,19 +255,41 @@ class Horse extends Transformation {
         ]
       },
       widgetPassage: {
+        'Transformation Widgets': [
+          {
+            src: '<<set _defaultChimeraConfig to {',
+            applyafter: '\n\t\tdemonhorse: { tail: true },',
+            expected: 1
+          }
+        ],
+        'Widgets Mirror': [
+          {
+            src: '<<set $_chimeraOptions to {',
+            applyafter: '\n\t\t\t\t\t"demonhorse_tail": [$transformationParts.horse?.tail, $transformationParts.demon?.tail].every(part => typeof part === "string" && isPartEnabled(part)),',
+            expected: 1
+          },
+          {
+            src: '<<if $_chimeraOptions.demoncat_tail>>',
+            applybefore: '<<deadwood-reblooms-demon-horse-tail-option>>\n\t\t\t\t\t',
+            expected: 1
+          }
+        ],
         'Farm Widgets': [
+          // 在 farm_brush 组件生成的每个刷毛链接后追加结算，仅在追马场景点击对应链接时增长马化。
           {
             srcmatchgroup: /(?<=<<widget "farm_brush">>(?:(?!<<\/widget>>)[\s\S])*?)<<link \[\[[^\n]*?\]\]>>/g,
             applyafter: '<<if passage() is "Farm Horses Chase" and $maplebirch.transformation.horse.level > 0>><<transform "horse" 1>><</if>>'
           }
         ],
         'Widgets BeastEjaculation': [
+          // 在原版狐狸转化判定后追加马类 NPC 的转化判定，使马、马男和马女共享马化增长。
           {
             srcmatchgroup: /<<if _npcisFoxType>><<transform fox 1>><<\/if>>/g,
             applyafter: '<<if ["horse", "horseboy", "horsegirl"].includes($NPCList[_jj].type)>><<transform "horse" 1>><</if>>'
           }
         ],
         'Widgets Effects Man': [
+          // 用模组踢击组件替换原版踢击结算入口，以便蹄足特质调整效果且不重复执行原版伤害。
           {
             srcmatchgroup: /<<actionskick \$feettarget>><<defiance 5 \$feettarget>>/g,
             to: '<<deadwood-reblooms-action-kick $feettarget>>'

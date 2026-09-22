@@ -4,9 +4,11 @@ import AcademicHonours from './VanillaPlus/AcademicHonours';
 import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
+import Finance from './VanillaPlus/Finance';
 import HistoryProject from './VanillaPlus/HistoryProject';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
+import SydneyChastity from './VanillaPlus/SydneyChastity';
 import SydneyConfession from './VanillaPlus/SydneyConfession';
 import SydneyScience from './VanillaPlus/SydneyScience';
 import VirginityRestoration from './VanillaPlus/VirginityRestoration';
@@ -28,9 +30,11 @@ export default function (maplebirch: typeof window.maplebirch) {
   Deviancy(maplebirch);
   Exhibitionism(maplebirch);
   HistoryProject(maplebirch);
+  Finance(maplebirch);
   Physique(maplebirch);
   Promiscuity(maplebirch);
   Willpower(maplebirch);
+  SydneyChastity(maplebirch);
   SydneyConfession(maplebirch);
   SydneyScience(maplebirch);
   VirginityRestoration(maplebirch);
@@ -89,10 +93,10 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-traits', {
     output: 'run maplebirch.VP.unlockTraits()',
-    cond: () => maplebirch.VP.traitsPending
+    cond: () => V.VanillaPlus != null && maplebirch.VP.traitsPending
   });
   maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-preserve', {
     output: 'run maplebirch.VP.preserve()',
-    cond: () => maplebirch.VP.belowMinimum
+    cond: () => V.VanillaPlus != null && maplebirch.VP.belowMinimum
   });
 }

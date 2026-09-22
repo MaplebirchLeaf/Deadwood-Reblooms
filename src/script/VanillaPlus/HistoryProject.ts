@@ -30,18 +30,21 @@ const schedule = `
 
 export const historyProjectWidgetPassages: Record<string, PassagePatch[]> = {
   'Widgets Events History': [
+    // 在普通历史课事件池清空后追加课题起始检查，让新事件参与当天的历史课抽取。
     {
       srcmatch: /<<widget "eventshistory">>\s*<<cleareventpool>>/,
       applyafter: startCheck,
       expected: 1
     },
+    // 在安全历史课组件内部的清池点后追加同一检查，兼容安全模式的独立事件组件。
     {
-      srcmatch: /<<widget "eventshistorysafe">>\s*<<cleareventpool>>/,
+      srcmatch: /<<widget "eventshistorysafe">>[\s\S]*?<<cleareventpool>>/,
       applyafter: startCheck,
       expected: 1
     }
   ],
   'Widgets Journal': [
+    // 在原版数学课题日志分支前插入历史课题日志，使两个课题可以同时显示。
     {
       src: '<<if $mathsproject is "ongoing">>',
       applybefore: '<<deadwood-reblooms-history-project-journal>>\n\t',
@@ -49,6 +52,7 @@ export const historyProjectWidgetPassages: Record<string, PassagePatch[]> = {
     }
   ],
   'Widgets Events Street': [
+    // 在街道事件池清空后加入 Kylar 历史课题事件，确保它按原版事件池时机注册。
     {
       src: '<<cleareventpool>>',
       applyafter: '\n\t\t<<deadwood-reblooms-history-project-kylar-street-event>>',
@@ -59,6 +63,7 @@ export const historyProjectWidgetPassages: Record<string, PassagePatch[]> = {
 
 export const historyProjectLocationPassages: Record<string, PassagePatch[]> = {
   Museum: [
+    // 在玩家确认讨论博物馆画作后安排历史课题，不因仅浏览画作而提前触发。
     {
       src: '<<set $museumAntiques.paintings[_labelP] to "talk">>',
       applyafter: schedule,

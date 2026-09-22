@@ -30,7 +30,8 @@ class DynamicMusic {
   public constructor(private readonly core: typeof maplebirch) {}
 
   private get options() {
-    return V.options.maplebirch.DynamicMusic;
+    const options = ((V.options ??= {}).maplebirch ??= {});
+    return (options.DynamicMusic ??= { ...DEFAULT_DYNAMIC_MUSIC_OPTIONS });
   }
 
   private get volume(): number {

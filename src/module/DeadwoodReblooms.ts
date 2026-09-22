@@ -70,6 +70,7 @@ class BaileyRent {
   }
 
   public preInit(): void {
+    this.core.on(':variable', () => (this.previous = this.snapshot()), 'Deadwood Reblooms Bailey Rent');
     this.core.dynamic.regTimeEvent('onBefore', 'DeadwoodRebloomsBaileyRentBefore', {
       action: this.sync
     });

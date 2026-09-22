@@ -1,12 +1,14 @@
 :: Deadwood Reblooms Sydney Science Widgets [widget]
 
+<!-- 转班入口：在合适阶段向 Sydney 提出转入科学课。 -->
 <<widget 'deadwood-reblooms-sydney-science-transfer-link'>>
   <<if $phase is 2 and $sydneyScience isnot 1>>
     <br><br>
-    <<schoolicon 'science'>><<link `lanSwitch('Ask about the class transfer', '询问换班的事')` 'Deadwood Reblooms Sydney Science Transfer'>><</link>>
+    <<schoolicon 'science'>><<lanLink 'Ask about the class transfer' 'Deadwood Reblooms Sydney Science Transfer'>><</lanLink>>
   <</if>>
 <</widget>>
 
+<!-- 科学课初见：Sydney 首次到课时按纯洁度播放介绍。 -->
 <<widget 'deadwood-reblooms-sydney-science-intro'>>
   <<sydneySchedule>>
   <<if $sydneyScience is 1 and _sydney_location is 'science' and !$sydneySeen.includes('science')>>
@@ -40,21 +42,19 @@
   <</if>>
 <</widget>>
 
+<!-- 科学课互动：提供核对笔记、聊天等常规行动。 -->
 <<widget 'deadwood-reblooms-sydney-science-actions'>>
   <<if $sydneyScience is 1 and _sydney_location is 'science'>>
-    <<scienceicon>><<link
-      `lanSwitch('Compare notes with Sydney', '和悉尼核对笔记')`
-      'Deadwood Reblooms Sydney Science Study'
-    >><</link>><<gstress>><<gscience>><<glove 'Sydney'>>
+    <<scienceicon>><<lanLink 'Compare notes with Sydney' 'Deadwood Reblooms Sydney Science Study'
+    >><</lanLink>><<gstress>><<gscience>><<glove 'Sydney'>>
     <br>
-    <<socialiseicon>><<link
-      `lanSwitch('Chat with Sydney', '和悉尼聊天')`
-      'Deadwood Reblooms Sydney Science Chat'
-    >><</link>><<gcool>><<lstress>><<glove 'Sydney'>>
+    <<socialiseicon>><<lanLink 'Chat with Sydney' 'Deadwood Reblooms Sydney Science Chat'
+    >><</lanLink>><<gcool>><<lstress>><<glove 'Sydney'>>
     <br>
   <</if>>
 <</widget>>
 
+<!-- 科学课随机事件：注册 Sydney 参与的课堂事件。 -->
 <<widget 'deadwood-reblooms-sydney-science-events'>>
   <<sydneySchedule>><<run statusCheck('Sydney')>>
   <<if $sydneyScience is 1 and _sydney_location is 'science'>>
@@ -103,15 +103,16 @@
             一张折好的纸条滑到你的手下，上面问你课后要不要来一次“实践演示”。悉尼仍看着西里斯，桌下的脚却缓缓蹭过你的脚踝。
         <</language>>
         <br><br>
-        <<link `lanSwitch('Play along', '陪悉尼玩')` 'Deadwood Reblooms Sydney Science Tease'>>
+        <<lanLink 'Play along' 'Deadwood Reblooms Sydney Science Tease'>>
           <<set $phase to 1>><<npcincr Sydney lust 1>>
-        <</link>><<garousal>><<glust>><br>
-        <<link `lanSwitch('Keep working', '继续学习')` 'Deadwood Reblooms Sydney Science Tease'>><<set $phase to 0>><</link>><<gscience>><br>
+        <</lanLink>><<garousal>><<glust>><br>
+        <<lanLink 'Keep working' 'Deadwood Reblooms Sydney Science Tease'>><<set $phase to 0>><</lanLink>><<gscience>><br>
       <</addinlineevent>>
     <</if>>
   <</if>>
 <</widget>>
 
+<!-- 课堂保护事件：让 Sydney 按当前状态制止同学骚扰。 -->
 <<widget 'deadwood-reblooms-sydney-science-protect'>>
   <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
   <<language>>
@@ -146,6 +147,7 @@
   <<schoolicon 'science'>><<lanLink 'Continue the lesson' 'Science Lesson'>><<endevent>><</lanLink>><br>
 <</widget>>
 
+<!-- 迟到补救入口：Sydney 尚未到过科学课时提供叫醒选项。 -->
 <<widget 'deadwood-reblooms-sydney-science-late-intro'>>
   <<if $sydneyScience is 1 and !$sydneySeen.includes('science')>>
     <br>
@@ -203,12 +205,10 @@
 <</language>>
 <br><br>
 <<endevent>>
-<<historyicon>><<link
-  `lanSwitch('Go to your history lesson (0:01)', '去上历史课 (0:01)')`
-  'History Classroom'
->><<set $justEntered to true>><<pass 1>><</link>><br>
-<<schoolicon 'library'>><<link `lanSwitch('Follow Sydney to the library (0:02)', '跟悉尼去图书馆 (0:02)')` 'School Library'>><<pass 2>><</link>><br>
-<<foodicon 'eat'>><<link `lanSwitch('Stay in the canteen', '留在食堂')` 'Canteen'>><</link>>
+<<historyicon>><<lanLink 'Go to your history lesson (0:01)' 'History Classroom'
+>><<set $justEntered to true>><<pass 1>><</lanLink>><br>
+<<schoolicon 'library'>><<lanLink 'Follow Sydney to the library (0:02)' 'School Library'>><<pass 2>><</lanLink>><br>
+<<foodicon 'eat'>><<lanLink 'Stay in the canteen' 'Canteen'>><</lanLink>>
 <br>
 
 :: Deadwood Reblooms Sydney Science Late Wake []
@@ -239,7 +239,7 @@
     <<takeHandholdingVirginity 'Sydney' `($sydneyromance is 1 ? 'romantic' : 'consensual')`>>
 <</language>>
 <br><br>
-<<link `lanSwitch('Run to school with Sydney (0:05)', '和悉尼一起跑去学校 (0:05)')` 'Sydney Walk School'>><<set $phase to 2>><</link>>
+<<lanLink 'Run to school with Sydney (0:05)' 'Sydney Walk School'>><<set $phase to 2>><</lanLink>>
 <br>
 
 :: Deadwood Reblooms Sydney Science Study []

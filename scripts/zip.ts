@@ -119,6 +119,36 @@ async function scan(dir: string, { base = '', prefix = '', excludes = [] }: Scan
   return out;
 }
 
+export function validateTweeWidgets(files: Map<string, Buffer>): void {
+  const widgets = new Map<string, string>();
+  const errors: string[] = [];
+
+  for (const [filePath, buffer] of files) {
+    const lines = buffer.toString('utf8').split(/\r?\n/);
+    let passage = '(before first passage)';
+    let widgetPassage = false;
+
+    lines.forEach((line, index) => {
+      const header = line.match(/^::\s*(.*?)(?:\s+\[([^\]]*)\])?\s*$/);
+      if (header) {
+        passage = header[1];
+        widgetPassage = (header[2] ?? '').split(/\s+/).includes('widget');
+      }
+
+      for (const match of line.matchAll(/<<widget\s+(['"])([^'"]+)\1/g)) {
+        const name = match[2];
+        const location = `${filePath}:${index + 1}`;
+        if (!widgetPassage) errors.push(`${location}: ${name} is defined in passage "${passage}" without the [widget] tag`);
+        const previous = widgets.get(name);
+        if (previous) errors.push(`${location}: duplicate widget ${name}; first defined at ${previous}`);
+        else widgets.set(name, location);
+      }
+    });
+  }
+
+  if (errors.length) throw new Error(`Invalid Twee widget registration:\n${errors.join('\n')}`);
+}
+
 function upsertPlugin(plugins: ScmlPlugin[], match: (plugin: ScmlPlugin) => boolean, next: ScmlPlugin | null, toFront = false): void {
   const index = plugins.findIndex(match);
   if (index === -1) {
@@ -456,6 +486,7 @@ export async function createZip(rootDir: string): Promise<Buffer> {
     readFile(path.join(rootDir, 'src', 'TweeReplacer.yaml'), 'utf8').catch(() => ''),
     readFile(path.join(rootDir, 'src', 'ReplacePatcher.yaml'), 'utf8').catch(() => '')
   ]);
+  validateTweeWidgets(sourceTweeFiles);
 
   const zip = new AdmZip();
   publicFiles.forEach((buffer, filePath) => zip.addFile(filePath, buffer));

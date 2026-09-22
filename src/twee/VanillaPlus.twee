@@ -1,350 +1,15 @@
 :: Deadwood Reblooms Vanilla Plus Widgets [widget]
 
+<!-- 医院入口：符合条件时提供童贞修复手术。 -->
 <<widget 'deadwood-reblooms-virginity-restoration-link'>>
   <<if ($player.vaginaExist and $player.virginity.vaginal isnot true) or ($player.penisExist and $player.virginity.penile isnot true)>>
-    <<hospitalicon>><<link
-      `lanSwitch('Enquire about virginity restoration (0:10)', '咨询童贞修复手术 (0:10)')`
-      'Deadwood Reblooms Virginity Restoration'
-    >><<pass 10>><</link>>
+    <<icon 'virginity-restoration.png'>><<lanLink 'Enquire about virginity restoration (0:10)' 'Deadwood Reblooms Virginity Restoration'
+    >><<pass 10>><</lanLink>>
     <br>
   <</if>>
 <</widget>>
 
-:: Deadwood Reblooms Virginity Restoration []
-<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
-<<generate1>><<person1>>
-<<language>>
-  <<option 'EN'>>
-    The receptionist types something into <<his>> computer and directs you to the waiting room.
-  <<option 'CN'>>
-    接待员在电脑上敲了几下，示意你去候诊室等候。
-<</language>>
-<br><br>
-<<endevent>>
-<<harper_intro>>
-<<language>>
-  <<option 'EN'>>
-    "Virginity restoration," Harper says, glancing down at <<his>> clipboard. "I can repair the physical signs. It won't erase what happened."
-  <<option 'CN'>>
-    “童贞修复。”哈珀垂眼看着写字板，“我可以修复身体上的痕迹。它抹不掉已经发生的事。”
-<</language>>
-<br><br>
-<<if $player.vaginaExist and $player.virginity.vaginal isnot true>>
-  <<hospitalicon>><<link `lanSwitch('Ask about hymen reconstruction', '询问处女膜修复')` 'Deadwood Reblooms Virginity Restoration Confirm'>><<set $phase to 'vaginal'>><</link>>
-  <br>
-<</if>>
-<<if $player.penisExist and $player.virginity.penile isnot true>>
-  <<hospitalicon>><<link `lanSwitch('Ask about foreskin restoration', '询问包皮修复')` 'Deadwood Reblooms Virginity Restoration Confirm'>><<set $phase to 'penile'>><</link>>
-  <br>
-<</if>>
-<<getouticon>><<lanLink 'Leave' 'Hospital Foyer'>><<endevent>><</lanLink>>
-
-:: Deadwood Reblooms Virginity Restoration Confirm []
-<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
-<<harper_intro>>
-<<if $phase is 'vaginal'>>
-  <<language>>
-    <<option 'EN'>>
-      "Hymen reconstruction is a simple operation," Harper says. "It costs £1000 and takes one hour."
-    <<option 'CN'>>
-      “处女膜修复是个简单的手术。”哈珀说，“费用是 £1000，需要一个小时。”
-  <</language>>
-<<elseif $phase is 'penile'>>
-  <<language>>
-    <<option 'EN'>>
-      "I can restore your foreskin to its former condition," Harper says. "It costs £1000 and takes one hour."
-    <<option 'CN'>>
-      “我可以让你的包皮恢复到原来的状态。”哈珀说，“费用是 £1000，需要一个小时。”
-  <</language>>
-<</if>>
-<br><br>
-<<if ($phase is 'vaginal' and playerChastity('vagina')) or ($phase is 'penile' and playerChastity('penis'))>>
-  <<language>>
-    <<option 'EN'>>
-      Harper taps <<his>> pen against the clipboard. "I can't operate while that remains in place."
-    <<option 'CN'>>
-      哈珀用笔轻点写字板。“那东西还戴着，我没法做手术。”
-  <</language>>
-  <br><br>
-<<elseif $money gte 100000 and (($phase is 'vaginal' and $player.vaginaExist and $player.virginity.vaginal isnot true) or ($phase is 'penile' and $player.penisExist and $player.virginity.penile isnot true))>>
-  <<ind>><<link `lanSwitch('Accept (1:00)', '接受 (1:00)')` 'Deadwood Reblooms Virginity Restoration Surgery'>><<pass 1 hours>><</link>>
-  <br>
-<<else>>
-  <<language>>
-    <<option 'EN'>>
-      You can't afford it.
-    <<option 'CN'>>
-      你的钱不够。
-  <</language>>
-  <br><br>
-<</if>>
-<<getouticon>><<lanLink 'Leave' 'Hospital Foyer'>><<endevent>><</lanLink>>
-
-:: Deadwood Reblooms Virginity Restoration Surgery []
-<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
-<<money -100000 'hospitalVirginityRestoration'>>
-<<upperstrip>><<lowerstrip>><<underlowerstrip>><<underupperstrip>>
-<<language>>
-  <<option 'EN'>>
-    Harper accepts the payment. "Please undress," <<he>> says, standing to leave the room.
-    <br><br>
-    You strip and wait. <<He>> soon returns with a medical gown and leads you to a small room. You lie on the bed as instructed. Harper presses a mask
-    over your face. Your thoughts blur. Just before everything goes dark, you see <<him>> reach into <<his>> pocket.
-  <<option 'CN'>>
-    哈珀收下钱。“请脱掉衣服。”<<he>>说着起身离开房间。
-    <br><br>
-    你脱光衣服等候。<<He>>很快拿着一件手术服回来，将你领进一间摆着小床的房间。你依言躺下。哈珀把面罩压在你脸上，你的思绪渐渐模糊。
-    在一切陷入黑暗前，你看见<<him>>把手伸进口袋。
-<</language>>
-<br><br>
-<<fameexhibitionism 10 'pic'>>
-<<lanLink 'Next' 'Deadwood Reblooms Virginity Restoration Done'>><</lanLink>>
-
-:: Deadwood Reblooms Virginity Restoration Done []
-<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
-<<if $phase is 'vaginal'>>
-  <<set $player.virginity.vaginal to true>>
-  <<if $player.virginityDetails?.vaginal>>
-    <<unset $player.virginityDetails.vaginal>>
-  <</if>>
-<<elseif $phase is 'penile'>>
-  <<set $player.virginity.penile to true>>
-  <<if $player.virginityDetails?.penile>>
-    <<unset $player.virginityDetails.penile>>
-  <</if>>
-<</if>>
-<<language>>
-  <<option 'EN'>>
-    You wake in the same room, sore between your legs. Harper enters and consults <<his>> clipboard.
-    <br><br>
-    "The operation was successful," <<he>> says. <<His>> eyes linger between your thighs. "Physically, you're a virgin again."
-    <br><br>
-    <<He>> turns a page. "You can leave straight away. Be well." <<He>> leaves you to dress.
-  <<option 'CN'>>
-    你在同一间房里醒来，双腿之间隐隐作痛。哈珀走进来，查看<<his>>写字板。
-    <br><br>
-    “手术很成功。”<<he>>说。<<His>>目光在你双腿之间停留片刻。“从身体上说，你又是童贞了。”
-    <br><br>
-    <<He>>翻过一页。“你现在就可以走了。保重。”<<He>>留下你独自穿衣。
-<</language>>
-<br><br>
-<<endevent>>
-<<lanLink 'Next' 'Hospital Foyer'>><<clotheson>><</lanLink>>
-
-<<widget 'deadwood-reblooms-exhibitionism-trait-effects'>>
-  <<if $VanillaPlus.traits.exhibitionism and !$desperateaction>>
-    <<set $_exhibitionismLevel to _args[0]>>
-    <<if $control lt $controlmax>>
-      <<control $controlmax>><<gggcontrol>>
-    <</if>>
-    <<stress $_exhibitionismLevel -300>><<combattrauma `$_exhibitionismLevel * -30`>><<lstress>><<ltrauma>><<arousal `$_exhibitionismLevel * 100`>><<garousal>>
-  <</if>>
-<</widget>>
-
-<<widget 'deadwood-reblooms-physique-break-bindings'>>
-  <<if breakableSoftBinding()>>
-    <<undobindingsicon>><<link `lanSwitch('Break your bindings', '挣断束缚')` $passage>>
-      <<if pcAreArmsBound('any')>>
-        <<if pcAreArmsBound('right') and $worn.handheld.name isnot 'naked'>>
-          <<handheldruined>>
-        <</if>>
-        <<arm_unbind>>
-      <</if>>
-      <<set $_legsBound to ['ropes', 'vines'].includes($worn.feet.name)>>
-      <<set $_legsBound to $_legsBound or [$feetuse, $leftleg, $rightleg].includes('bound')>>
-      <<if $_legsBound and !['ankle cuffs', 'ball and chain'].includes($worn.feet.name)>>
-        <<leg_unbind>>
-      <</if>>
-      <<if $head is 'bound'>>
-        <<set $head to 0>>
-      <</if>>
-    <</link>> <<note `lanSwitch('Physique', '体格')` 'gold'>>
-    <br>
-  <</if>>
-<</widget>>
-
-<<widget 'deadwood-reblooms-physique-combat-break'>>
-  <<run maplebirch.VP.physique.use()>>
-  <<switch _args[0]>>
-    <<case 'arms'>>
-      <<arm_unbind>>
-      <span class="teal"><<lanSwitch 'You flex hard. The bindings bite into your skin, then snap.' '你猛然发力。束缚勒进皮肤，随后应声断裂。'>></span>
-    <<case 'legs'>>
-      <<leg_unbind>>
-      <<set $_breakFreeText to lanSwitch(
-        'You spread your legs with all your strength. The bindings strain, then tear apart.',
-        '你用尽力气分开双腿。束缚被拉紧，随即撕裂。'
-      )>>
-      <span class="teal"><<= $_breakFreeText>></span>
-    <<case 'head'>>
-      <<set $head to 0>>
-      <span class="teal"><<lanSwitch 'You wrench your head back and rip yourself free.' '你猛地向后仰头，从束缚中挣脱出来。'>></span>
-  <</switch>>
-<</widget>>
-
-<<widget 'deadwood-reblooms-deviancy-mirror-enter-link'>>
-  <<set $_mirror to _args[0]>>
-  <<if maplebirch.VP.deviancy.mirrorOpen and maplebirch.VP.deviancy.discovered($_mirror)>>
-    <<mirroricon 'blood'>><<link
-      `lanSwitch('Step through the eerie mirror', '穿过诡异镜面')`
-      'Deadwood Reblooms Deviancy Mirror Enter'
-    >>
-      <<set $VanillaPlus.deviancy.mirrorOrigin to $_mirror>>
-    <</link>>
-      <<note `lanSwitch('Deviancy', '异种癖')` 'red'>>
-    <br>
-  <</if>>
-<</widget>>
-
-<<widget 'deadwood-reblooms-deviancy-mirror-exits'>>
-  <<if $tentacleEntrance is 'vanillaPlusMirror'>>
-    <<if $tentnorth is 0 and $tenteast is 0 and maplebirch.VP.deviancy.discovered('home')>>
-      <<mirroricon 'blood'>><<link `lanSwitch('Climb through the bedroom mirror', '从卧室镜子爬出去')` 'Deadwood Reblooms Deviancy Mirror Home'>><</link>>
-      <br><br>
-    <</if>>
-    <<if $tentnorth is 3 and $tenteast is -3 and maplebirch.VP.deviancy.discovered('farm')>>
-      <<mirroricon 'blood'>><<link `lanSwitch('Climb through the farm mirror', '从农场镜子爬出去')` 'Deadwood Reblooms Deviancy Mirror Farm'>><</link>>
-      <br><br>
-    <</if>>
-    <<if $tentnorth is -3 and $tenteast is 3 and maplebirch.VP.deviancy.discovered('tower')>>
-      <<mirroricon 'blood'>><<link `lanSwitch('Climb through the tower mirror', '从高塔镜子爬出去')` 'Deadwood Reblooms Deviancy Mirror Tower'>><</link>>
-      <br><br>
-    <</if>>
-  <</if>>
-<</widget>>
-
-:: Deadwood Reblooms Deviancy Mirror Enter []
-<<location 'tentworld'>><<set $outside to 0>><<effects>><<tentacleworldintro>><<set $tentacleEntrance to 'vanillaPlusMirror'>>
-<<switch $VanillaPlus.deviancy.mirrorOrigin>>
-  <<case 'farm'>>
-    <<set $tentnorth to 3>><<set $tenteast to -3>>
-  <<case 'tower'>>
-    <<set $tentnorth to -3>><<set $tenteast to 3>>
-<</switch>>
-<<if !$daily.vanillaPlusMirror>>
-  <<set $daily.vanillaPlusMirror to true>><<deviancy6>>
-<</if>>
-<<language>>
-  <<option 'EN'>>
-    The glass clings to your skin like a wet membrane. You force your body through and spill out beneath the alien sky of the tentacle
-    plains.
-  <<option 'CN'>>
-    镜面如湿润的薄膜般贴紧你的皮肤。你迫使身体穿过其中，跌入触手平原陌生的天空之下。
-<</language>>
-<br><br>
-<<lanLink 'Next' 'Tentacle Plains'>><</lanLink>>
-
-:: Deadwood Reblooms Deviancy Mirror Home []
-<<set $location to 'home'>><<set $outside to 0>><<effects>><<tentacleworldend>>
-<<language>>
-<<option 'EN'>>
-  You force yourself through the rippling surface and tumble back into your bedroom.
-<<option 'CN'>>
-  你挤过荡漾的镜面，跌回自己的卧室。
-<</language>>
-<br><br>
-<<lanLink 'Next' 'Bedroom'>><</lanLink>>
-
-:: Deadwood Reblooms Deviancy Mirror Farm []
-<<set $location to 'farm'>><<set $outside to 0>><<effects>><<tentacleworldend>>
-<<language>>
-<<option 'EN'>>
-  You force yourself through the rippling surface and stumble into your room at the farm.
-<<option 'CN'>>
-  你挤过荡漾的镜面，踉跄着落进农场的房间。
-<</language>>
-<br><br>
-<<lanLink 'Next' 'Farm Bedroom'>><</lanLink>>
-
-:: Deadwood Reblooms Deviancy Mirror Tower []
-<<set $location to 'tower'>><<set $outside to 0>><<effects>><<tentacleworldend>>
-<<language>>
-  <<option 'EN'>>
-    You force yourself through the rippling surface and spill onto the tower floor.
-  <<option 'CN'>>
-    你挤过荡漾的镜面，摔落在高塔的地面上。
-<</language>>
-<br><br><<lanLink 'Next' 'Bird Tower'>><</lanLink>>
-<<widget 'deadwood-reblooms-promiscuity-unlock'>>
-  <<set $VanillaPlus.lock.promiscuity to true>>
-  <<language>>
-    <<option 'EN'>>
-      Your hands, mouth, thighs and every willing opening have learned what they want. You no longer wait for someone else to use you.
-      You guide every touch and offer every part of yourself by choice.
-    <br><br>
-    <span class="gold">Your promiscuity has broken through its former limits.</span>
-    <<option 'CN'>>
-      你的手、嘴、双腿与每一处甘愿敞开的入口，都已学会索取自己想要的东西。你不再等待别人享用，而是主动引导每一次触碰，
-      亲自献上身体的每一处。
-    <br><br>
-    <span class="gold">你的淫乱突破了原本的极限。</span>
-  <</language>>
-  <br><br>
-<</widget>>
-
-<<widget 'deadwood-reblooms-beauty-breakthrough-link'>>
-  <<if maplebirch.VP.beauty.unlock>>
-    <<language>>
-      <<option 'EN'>>
-        A light behind the diffuser flickers, then bursts with a sharp pop.
-      <br><<link [[Check the failed light|Deadwood Reblooms Beauty Breakthrough]]>><</link>> <<note 'Beauty' 'gold'>>
-      <<option 'CN'>>
-        柔光板后的灯闪烁几下，随即砰然炸裂。
-      <br><<link [[查看坏掉的灯|Deadwood Reblooms Beauty Breakthrough]]>><</link>> <<note '容貌' 'gold'>>
-    <</language>>
-    <br>
-  <</if>>
-<</widget>>
-
-:: Deadwood Reblooms Beauty Breakthrough []
-<<effects>>
-<<language>>
-  <<option 'EN'>>
-    Niki catches the diffuser before it falls, then crouches beside the dead lamp. Only a hard strip of daylight from the high window
-    remains across the white screen.
-  <br><br>
-  "Could wait for a replacement," Niki says, turning the camera towards the window. "Or use that. No makeup. No filter. Just every mark on your bare
-    face."
-  <br><br>
-  <<link [[Stand in the light|Deadwood Reblooms Beauty Breakthrough Finish]]>><</link>> <<note 'Beauty' 'gold'>>
-  <br>
-  <<link [[Return to the ordinary shoot|Photo Model 4]]>><<set $phase to 0>><</link>>
-  <<option 'CN'>>
-    尼奇赶在柔光板倒下前扶住它，随后蹲到熄灭的灯旁。只有高窗投下的一道生硬日光留在白色幕布前。
-  <br><br>
-  “可以等人送替换灯过来，”尼奇一边说，一边将相机转向窗户，“也可以就用这束光。不化妆，不加滤镜。你素净脸庞上的每一处痕迹都会被拍下来。”
-  <br><br>
-  <<link [[站进光里|Deadwood Reblooms Beauty Breakthrough Finish]]>><</link>> <<note '容貌' 'gold'>>
-  <br>
-  <<link [[回到普通拍摄|Photo Model 4]]>><<set $phase to 0>><</link>>
-<</language>>
-
-:: Deadwood Reblooms Beauty Breakthrough Finish []
-<<effects>><<set $photo.time += 30>><<run maplebirch.VP.beauty.complete()>>
-<<language>>
-  <<option 'EN'>>
-    You step into the strip of daylight. It catches every pore, every blemish and every nervous twitch of your bare face. Niki takes one
-    picture, checks it, then raises the camera again without offering powder or softer light.
-  <br><br>
-  The shutter clicks again and again. When Niki finally lowers the camera, the unedited pictures leave you nowhere to hide. You cannot stop looking
-    at them.
-  <br><br>
-  "Keep them like this," Niki says, saving the set. "They look like you."
-  <br><br>
-  <span class="gold">Your beauty has broken through its former limits.</span>
-  <<option 'CN'>>
-    你站进那道日光。毫无遮掩的光线照亮你素净脸庞上的每一处毛孔、瑕疵与紧张的抽动。尼奇拍下一张，低头查看，随后再次举起相机，
-    没有递来脂粉，也没有调柔光线。
-  <br><br>
-  快门一次又一次响起。尼奇终于放下相机时，一张张未经修改的照片令你无处遮掩。你却无法把目光移开。
-  <br><br>
-  “就保持这样。”尼奇保存了整组照片，“这才像你。”
-  <br><br>
-  <span class="gold">你的容貌突破了原本的极限。</span>
-<</language>>
-<br><br>
-<<lanLink 'Next' 'Photo Model 5'>><</lanLink>>
-
+<!-- 主动请求选项：在遭遇战中按当前姿势列出可提出的性行为。 -->
 <<widget 'deadwood-reblooms-promiscuity-request-options'>>
   <<if $VanillaPlus.lock.promiscuity and $enemytype is 'man' and !$npcSub>>
     <<set $_promiscuityLowerExposed to $worn.lower.vagina_exposed gte 1>>
@@ -409,6 +74,7 @@
   <</if>>
 <</widget>>
 
+<!-- 主动请求结算：检定请求是否成功并设置对应战斗动作。 -->
 <<widget 'deadwood-reblooms-promiscuity-request'>>
   <<if $mouthaction is 'ask' and $askAction.startsWith('promiscuity-')>>
     <<set $_promiscuityChoice to $askAction>>
@@ -515,6 +181,7 @@
   <</if>>
 <</widget>>
 
+<!-- 主动插入：将已同意的请求写入原版战斗部位状态。 -->
 <<widget 'deadwood-reblooms-promiscuity-request-penetration'>>
   <<set $_promiscuityPart to _args[0]>>
   <<set $_promiscuityTarget to _args[1]>>
@@ -544,6 +211,7 @@
   <</if>>
 <</widget>>
 
+<!-- 请求结果确认：核对动作是否真正执行并结算熟练度。 -->
 <<widget 'deadwood-reblooms-promiscuity-direct-result'>>
   <<if _vanillaPlusPromiscuityTarget isnot undefined>>
     <<set $_promiscuityDirectSuccess to false>>
@@ -575,6 +243,7 @@
   <</if>>
 <</widget>>
 
+<!-- 属性面板扩展：为突破上限的属性替换最高等级说明。 -->
 <<widget 'deadwood-reblooms-characteristics-degrees-display'>>
   <<if $VanillaPlus.lock.physique>>
     <<language>>
@@ -644,6 +313,7 @@
   <</if>>
 <</widget>>
 
+<!-- 异种癖仪式入口：满足 Gwylan 与仪式条件时显示主持选项。 -->
 <<widget 'deadwood-reblooms-deviancy-conduct-link'>>
   <<set $_canConductDeviancy to maplebirch.VP.deviancy.canConduct and $phase isnot 'no'>>
   <<set $_canConductDeviancy to $_canConductDeviancy and !_gwylanStatus.includes('cautious')>>
@@ -658,6 +328,414 @@
     <br>
   <</if>>
 <</widget>>
+
+<!-- 露出癖战斗效果：达到特质后调整控制、压力、创伤与欲望。 -->
+<<widget 'deadwood-reblooms-exhibitionism-trait-effects'>>
+  <<if $VanillaPlus.traits.exhibitionism and !$desperateaction>>
+    <<set $_exhibitionismLevel to _args[0]>>
+    <<if $control lt $controlmax>>
+      <<control $controlmax>><<gggcontrol>>
+    <</if>>
+    <<stress $_exhibitionismLevel -300>><<combattrauma `$_exhibitionismLevel * -30`>><<lstress>><<ltrauma>><<arousal `$_exhibitionismLevel * 100`>><<garousal>>
+  <</if>>
+<</widget>>
+
+<!-- 日常挣脱入口：体格足够时允许玩家挣断可破坏的束缚。 -->
+<<widget 'deadwood-reblooms-physique-break-bindings'>>
+  <<if breakableSoftBinding()>>
+    <<undobindingsicon>><<lanLink 'Break your bindings' $passage>>
+      <<if pcAreArmsBound('any')>>
+        <<if pcAreArmsBound('right') and $worn.handheld.name isnot 'naked'>>
+          <<handheldruined>>
+        <</if>>
+        <<arm_unbind>>
+      <</if>>
+      <<set $_legsBound to ['ropes', 'vines'].includes($worn.feet.name)>>
+      <<set $_legsBound to $_legsBound or [$feetuse, $leftleg, $rightleg].includes('bound')>>
+      <<if $_legsBound and !['ankle cuffs', 'ball and chain'].includes($worn.feet.name)>>
+        <<leg_unbind>>
+      <</if>>
+      <<if $head is 'bound'>>
+        <<set $head to 0>>
+      <</if>>
+    <</lanLink>> <<note `lanSwitch('Physique', '体格')` 'gold'>>
+    <br>
+  <</if>>
+<</widget>>
+
+<!-- 战斗挣脱结算：消耗体格突破效果并解除指定部位束缚。 -->
+<<widget 'deadwood-reblooms-physique-combat-break'>>
+  <<run maplebirch.VP.physique.use()>>
+  <<switch _args[0]>>
+    <<case 'arms'>>
+      <<arm_unbind>>
+      <span class="teal"><<lanSwitch 'You flex hard. The bindings bite into your skin, then snap.' '你猛然发力。束缚勒进皮肤，随后应声断裂。'>></span>
+    <<case 'legs'>>
+      <<leg_unbind>>
+      <<set $_breakFreeText to lanSwitch(
+        'You spread your legs with all your strength. The bindings strain, then tear apart.',
+        '你用尽力气分开双腿。束缚被拉紧，随即撕裂。'
+      )>>
+      <span class="teal"><<= $_breakFreeText>></span>
+    <<case 'head'>>
+      <<set $head to 0>>
+      <span class="teal"><<lanSwitch 'You wrench your head back and rip yourself free.' '你猛地向后仰头，从束缚中挣脱出来。'>></span>
+  <</switch>>
+<</widget>>
+
+<!-- 诡异镜入口：已发现镜面且通道开放时进入触手平原。 -->
+<<widget 'deadwood-reblooms-deviancy-mirror-enter-link'>>
+  <<set $_mirror to _args[0]>>
+  <<if maplebirch.VP.deviancy.mirrorOpen and maplebirch.VP.deviancy.discovered($_mirror)>>
+    <<mirroricon 'blood'>><<lanLink 'Step through the eerie mirror' 'Deadwood Reblooms Deviancy Mirror Enter'
+    >>
+      <<set $VanillaPlus.deviancy.mirrorOrigin to $_mirror>>
+    <</lanLink>>
+      <<note `lanSwitch('Deviancy', '异种癖')` 'red'>>
+    <br>
+  <</if>>
+<</widget>>
+
+<!-- 诡异镜出口：按触手平原坐标显示已经发现的返回地点。 -->
+<<widget 'deadwood-reblooms-deviancy-mirror-exits'>>
+  <<if $tentacleEntrance is 'vanillaPlusMirror'>>
+    <<if $tentnorth is 0 and $tenteast is 0 and maplebirch.VP.deviancy.discovered('home')>>
+      <<mirroricon 'blood'>><<lanLink 'Climb through the bedroom mirror' 'Deadwood Reblooms Deviancy Mirror Home'>><</lanLink>>
+      <br><br>
+    <</if>>
+    <<if $tentnorth is 3 and $tenteast is -3 and maplebirch.VP.deviancy.discovered('farm')>>
+      <<mirroricon 'blood'>><<lanLink 'Climb through the farm mirror' 'Deadwood Reblooms Deviancy Mirror Farm'>><</lanLink>>
+      <br><br>
+    <</if>>
+    <<if $tentnorth is -3 and $tenteast is 3 and maplebirch.VP.deviancy.discovered('tower')>>
+      <<mirroricon 'blood'>><<lanLink 'Climb through the tower mirror' 'Deadwood Reblooms Deviancy Mirror Tower'>><</lanLink>>
+      <br><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<!-- 淫乱突破结算：解锁上限并展示突破叙述。 -->
+<<widget 'deadwood-reblooms-promiscuity-unlock'>>
+  <<set $VanillaPlus.lock.promiscuity to true>>
+  <<language>>
+    <<option 'EN'>>
+      Your hands, mouth, thighs and every willing opening have learned what they want. You no longer wait for someone else to use you.
+      You guide every touch and offer every part of yourself by choice.
+    <br><br>
+    <span class="gold">Your promiscuity has broken through its former limits.</span>
+    <<option 'CN'>>
+      你的手、嘴、双腿与每一处甘愿敞开的入口，都已学会索取自己想要的东西。你不再等待别人享用，而是主动引导每一次触碰，
+      亲自献上身体的每一处。
+    <br><br>
+    <span class="gold">你的淫乱突破了原本的极限。</span>
+  <</language>>
+  <br><br>
+<</widget>>
+
+<!-- 容貌突破入口：条件满足时从摄影棚故障引出突破事件。 -->
+<<widget 'deadwood-reblooms-beauty-breakthrough-link'>>
+  <<if maplebirch.VP.beauty.unlock>>
+    <<language>>
+      <<option 'EN'>>
+        A light behind the diffuser flickers, then bursts with a sharp pop.
+      <br><<link [[Check the failed light|Deadwood Reblooms Beauty Breakthrough]]>><</link>> <<note 'Beauty' 'gold'>>
+      <<option 'CN'>>
+        柔光板后的灯闪烁几下，随即砰然炸裂。
+      <br><<link [[查看坏掉的灯|Deadwood Reblooms Beauty Breakthrough]]>><</link>> <<note '容貌' 'gold'>>
+    <</language>>
+    <br>
+  <</if>>
+<</widget>>
+
+<!-- 异种癖突破结算：完成仪式后解锁属性上限。 -->
+<<widget 'deadwood-reblooms-deviancy-unlock'>>
+  <<set $VanillaPlus.lock.deviancy to true>>
+  <<language>>
+    <<option 'EN'>>
+      The last of the poison writhes through your body, following the rhythm you set. The seal closes around it. Gwylan mixed the
+      reagents, but the forest moved to your command, through the body you offered it.
+    <br><br>
+    <span class="gold">Your deviancy has broken through its former limits.</span>
+    <<option 'CN'>>
+      最后的毒素沿着你定下的节奏，在体内扭动前行。封印随之合拢。格威岚调配了药剂，森林却听从了你的号令，穿行于你主动献上的身体。
+    <br><br>
+    <span class="gold">你的异种癖突破了原本的极限。</span>
+  <</language>>
+  <br><br>
+<</widget>>
+
+<!-- 露出癖突破结算：汇总关键经历并解锁属性上限。 -->
+<<widget 'deadwood-reblooms-exhibitionism-unlock'>>
+  <<set $VanillaPlus.lock.exhibitionism to true>>
+  <<language>>
+    <<option 'EN'>>
+      You remember pool water against your bare skin, the ballroom lights upon your naked dance, and strangers staring in the crowded
+      high street. The memories send a pleasant heat through you. Shame had every chance to stop you. You showed them more instead.
+    <br><br>
+    <span class="gold">Your exhibitionism has broken through its former limits.</span>
+    <<option 'CN'>>
+      你想起池水抚过赤裸皮肤的触感、舞厅灯光下的裸体舞姿，以及商业街上陌生人投来的目光。回忆令热意在体内升起。羞耻本可以阻止你，
+      你却选择向他们展示更多。
+    <br><br>
+    <span class="gold">你的暴露癖突破了原本的极限。</span>
+  <</language>>
+  <br><br>
+<</widget>>
+
+<!-- 体格突破结算：完成挣脱事件后解锁属性上限。 -->
+<<widget 'deadwood-reblooms-physique-unlock'>>
+  <<set $VanillaPlus.lock.physique to true>>
+  <<language>>
+    <<option 'EN'>>
+      Only after the danger has passed do your muscles begin to tremble. You remember shutters, raiders, fences and cages, all trying to
+      keep your body where someone else wanted it. The thought of being held helpless still sends a thrill through you. It no longer feels possible.
+    <br><br>
+    <span class="gold">Your physique has broken through its former limits.</span>
+    <<option 'CN'>>
+      直到危险过去，你的肌肉才开始颤抖。你想起卷帘门、袭击者、围墙与牢笼，它们都曾试图把你的身体困在别人指定的位置。
+      任人摆布的念头仍会令你战栗，如今却已不再可能。
+    <br><br>
+    <span class="gold">你的体格突破了原本的极限。</span>
+  <</language>>
+  <br><br>
+<</widget>>
+
+<!-- 意志突破入口：条件满足时允许再次潜向符文。 -->
+<<widget 'deadwood-reblooms-willpower-unlock'>>
+  <<if maplebirch.VP.willpower.unlock>>
+    <<language>>
+      <<option 'EN'>>
+        <<link [[Dive towards the rune again|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
+      <<option 'CN'>>
+        <<link [[再次潜向符文|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
+    <</language>>
+    <br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Virginity Restoration []
+<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
+<<generate1>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    The receptionist types something into <<his>> computer and directs you to the waiting room.
+  <<option 'CN'>>
+    接待员在电脑上敲了几下，示意你去候诊室等候。
+<</language>>
+<br><br>
+<<endevent>>
+<<harper_intro>>
+<<language>>
+  <<option 'EN'>>
+    "Virginity restoration," Harper says, glancing down at <<his>> clipboard. "I can repair the physical signs. It won't erase what happened."
+  <<option 'CN'>>
+    “童贞修复。”哈珀垂眼看着写字板，“我可以修复身体上的痕迹。它抹不掉已经发生的事。”
+<</language>>
+<br><br>
+<<if $player.vaginaExist and $player.virginity.vaginal isnot true>>
+  <<hospitalicon>><<lanLink 'Ask about hymen reconstruction' 'Deadwood Reblooms Virginity Restoration Confirm'>><<set $phase to 'vaginal'>><</lanLink>>
+  <br>
+<</if>>
+<<if $player.penisExist and $player.virginity.penile isnot true>>
+  <<hospitalicon>><<lanLink 'Ask about foreskin restoration' 'Deadwood Reblooms Virginity Restoration Confirm'>><<set $phase to 'penile'>><</lanLink>>
+  <br>
+<</if>>
+<<getouticon>><<lanLink 'Leave' 'Hospital Foyer'>><<endevent>><</lanLink>>
+
+:: Deadwood Reblooms Virginity Restoration Confirm []
+<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
+<<harper_intro>>
+<<if $phase is 'vaginal'>>
+  <<language>>
+    <<option 'EN'>>
+      "Hymen reconstruction is a simple operation," Harper says. "It costs £1000 and takes one hour."
+    <<option 'CN'>>
+      “处女膜修复是个简单的手术。”哈珀说，“费用是 £1000，需要一个小时。”
+  <</language>>
+<<elseif $phase is 'penile'>>
+  <<language>>
+    <<option 'EN'>>
+      "I can restore your foreskin to its former condition," Harper says. "It costs £1000 and takes one hour."
+    <<option 'CN'>>
+      “我可以让你的包皮恢复到原来的状态。”哈珀说，“费用是 £1000，需要一个小时。”
+  <</language>>
+<</if>>
+<br><br>
+<<if ($phase is 'vaginal' and playerChastity('vagina')) or ($phase is 'penile' and playerChastity('penis'))>>
+  <<language>>
+    <<option 'EN'>>
+      Harper taps <<his>> pen against the clipboard. "I can't operate while that remains in place."
+    <<option 'CN'>>
+      哈珀用笔轻点写字板。“那东西还戴着，我没法做手术。”
+  <</language>>
+  <br><br>
+<<elseif $money gte 100000 and (($phase is 'vaginal' and $player.vaginaExist and $player.virginity.vaginal isnot true) or ($phase is 'penile' and $player.penisExist and $player.virginity.penile isnot true))>>
+  <<ind>><<lanLink 'Accept (1:00)' 'Deadwood Reblooms Virginity Restoration Surgery'>><<pass 1 hours>><</lanLink>>
+  <br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      You can't afford it.
+    <<option 'CN'>>
+      你的钱不够。
+  <</language>>
+  <br><br>
+<</if>>
+<<getouticon>><<lanLink 'Leave' 'Hospital Foyer'>><<endevent>><</lanLink>>
+
+:: Deadwood Reblooms Virginity Restoration Surgery []
+<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
+<<money -100000 'hospitalVirginityRestoration'>>
+<<upperstrip>><<lowerstrip>><<underlowerstrip>><<underupperstrip>>
+<<language>>
+  <<option 'EN'>>
+    Harper accepts the payment. "Please undress," <<he>> says, standing to leave the room.
+    <br><br>
+    You strip and wait. <<He>> soon returns with a medical gown and leads you to a small room. You lie on the bed as instructed. Harper presses a mask
+    over your face. Your thoughts blur. Just before everything goes dark, you see <<him>> reach into <<his>> pocket.
+  <<option 'CN'>>
+    哈珀收下钱。“请脱掉衣服。”<<he>>说着起身离开房间。
+    <br><br>
+    你脱光衣服等候。<<He>>很快拿着一件手术服回来，将你领进一间摆着小床的房间。你依言躺下。哈珀把面罩压在你脸上，你的思绪渐渐模糊。
+    在一切陷入黑暗前，你看见<<him>>把手伸进口袋。
+<</language>>
+<br><br>
+<<fameexhibitionism 10 'pic'>>
+<<lanLink 'Next' 'Deadwood Reblooms Virginity Restoration Done'>><</lanLink>>
+
+:: Deadwood Reblooms Virginity Restoration Done []
+<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
+<<if $phase is 'vaginal'>>
+  <<set $player.virginity.vaginal to true>>
+  <<if $player.virginityDetails?.vaginal>>
+    <<unset $player.virginityDetails.vaginal>>
+  <</if>>
+<<elseif $phase is 'penile'>>
+  <<set $player.virginity.penile to true>>
+  <<if $player.virginityDetails?.penile>>
+    <<unset $player.virginityDetails.penile>>
+  <</if>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    You wake in the same room, sore between your legs. Harper enters and consults <<his>> clipboard.
+    <br><br>
+    "The operation was successful," <<he>> says. <<His>> eyes linger between your thighs. "Physically, you're a virgin again."
+    <br><br>
+    <<He>> turns a page. "You can leave straight away. Be well." <<He>> leaves you to dress.
+  <<option 'CN'>>
+    你在同一间房里醒来，双腿之间隐隐作痛。哈珀走进来，查看<<his>>写字板。
+    <br><br>
+    “手术很成功。”<<he>>说。<<His>>目光在你双腿之间停留片刻。“从身体上说，你又是童贞了。”
+    <br><br>
+    <<He>>翻过一页。“你现在就可以走了。保重。”<<He>>留下你独自穿衣。
+<</language>>
+<br><br>
+<<endevent>>
+<<lanLink 'Next' 'Hospital Foyer'>><<clotheson>><</lanLink>>
+
+
+:: Deadwood Reblooms Deviancy Mirror Enter []
+<<location 'tentworld'>><<set $outside to 0>><<effects>><<tentacleworldintro>><<set $tentacleEntrance to 'vanillaPlusMirror'>>
+<<switch $VanillaPlus.deviancy.mirrorOrigin>>
+  <<case 'farm'>>
+    <<set $tentnorth to 3>><<set $tenteast to -3>>
+  <<case 'tower'>>
+    <<set $tentnorth to -3>><<set $tenteast to 3>>
+<</switch>>
+<<if !$daily.vanillaPlusMirror>>
+  <<set $daily.vanillaPlusMirror to true>><<deviancy6>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    The glass clings to your skin like a wet membrane. You force your body through and spill out beneath the alien sky of the tentacle
+    plains.
+  <<option 'CN'>>
+    镜面如湿润的薄膜般贴紧你的皮肤。你迫使身体穿过其中，跌入触手平原陌生的天空之下。
+<</language>>
+<br><br>
+<<lanLink 'Next' 'Tentacle Plains'>><</lanLink>>
+
+:: Deadwood Reblooms Deviancy Mirror Home []
+<<set $location to 'home'>><<set $outside to 0>><<effects>><<tentacleworldend>>
+<<language>>
+<<option 'EN'>>
+  You force yourself through the rippling surface and tumble back into your bedroom.
+<<option 'CN'>>
+  你挤过荡漾的镜面，跌回自己的卧室。
+<</language>>
+<br><br>
+<<lanLink 'Next' 'Bedroom'>><</lanLink>>
+
+:: Deadwood Reblooms Deviancy Mirror Farm []
+<<set $location to 'farm'>><<set $outside to 0>><<effects>><<tentacleworldend>>
+<<language>>
+<<option 'EN'>>
+  You force yourself through the rippling surface and stumble into your room at the farm.
+<<option 'CN'>>
+  你挤过荡漾的镜面，踉跄着落进农场的房间。
+<</language>>
+<br><br>
+<<lanLink 'Next' 'Farm Bedroom'>><</lanLink>>
+
+:: Deadwood Reblooms Deviancy Mirror Tower []
+<<set $location to 'tower'>><<set $outside to 0>><<effects>><<tentacleworldend>>
+<<language>>
+  <<option 'EN'>>
+    You force yourself through the rippling surface and spill onto the tower floor.
+  <<option 'CN'>>
+    你挤过荡漾的镜面，摔落在高塔的地面上。
+<</language>>
+<br><br><<lanLink 'Next' 'Bird Tower'>><</lanLink>>
+
+:: Deadwood Reblooms Beauty Breakthrough []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    Niki catches the diffuser before it falls, then crouches beside the dead lamp. Only a hard strip of daylight from the high window
+    remains across the white screen.
+  <br><br>
+  "Could wait for a replacement," Niki says, turning the camera towards the window. "Or use that. No makeup. No filter. Just every mark on your bare
+    face."
+  <br><br>
+  <<link [[Stand in the light|Deadwood Reblooms Beauty Breakthrough Finish]]>><</link>> <<note 'Beauty' 'gold'>>
+  <br>
+  <<link [[Return to the ordinary shoot|Photo Model 4]]>><<set $phase to 0>><</link>>
+  <<option 'CN'>>
+    尼奇赶在柔光板倒下前扶住它，随后蹲到熄灭的灯旁。只有高窗投下的一道生硬日光留在白色幕布前。
+  <br><br>
+  “可以等人送替换灯过来，”尼奇一边说，一边将相机转向窗户，“也可以就用这束光。不化妆，不加滤镜。你素净脸庞上的每一处痕迹都会被拍下来。”
+  <br><br>
+  <<link [[站进光里|Deadwood Reblooms Beauty Breakthrough Finish]]>><</link>> <<note '容貌' 'gold'>>
+  <br>
+  <<link [[回到普通拍摄|Photo Model 4]]>><<set $phase to 0>><</link>>
+<</language>>
+
+:: Deadwood Reblooms Beauty Breakthrough Finish []
+<<effects>><<set $photo.time += 30>><<run maplebirch.VP.beauty.complete()>>
+<<language>>
+  <<option 'EN'>>
+    You step into the strip of daylight. It catches every pore, every blemish and every nervous twitch of your bare face. Niki takes one
+    picture, checks it, then raises the camera again without offering powder or softer light.
+  <br><br>
+  The shutter clicks again and again. When Niki finally lowers the camera, the unedited pictures leave you nowhere to hide. You cannot stop looking
+    at them.
+  <br><br>
+  "Keep them like this," Niki says, saving the set. "They look like you."
+  <br><br>
+  <span class="gold">Your beauty has broken through its former limits.</span>
+  <<option 'CN'>>
+    你站进那道日光。毫无遮掩的光线照亮你素净脸庞上的每一处毛孔、瑕疵与紧张的抽动。尼奇拍下一张，低头查看，随后再次举起相机，
+    没有递来脂粉，也没有调柔光线。
+  <br><br>
+  快门一次又一次响起。尼奇终于放下相机时，一张张未经修改的照片令你无处遮掩。你却无法把目光移开。
+  <br><br>
+  “就保持这样。”尼奇保存了整组照片，“这才像你。”
+  <br><br>
+  <span class="gold">你的容貌突破了原本的极限。</span>
+<</language>>
+<br><br>
+<<lanLink 'Next' 'Photo Model 5'>><</lanLink>>
 
 :: Deadwood Reblooms Deviancy Conduct []
 <<set $outside to 0>><<set $location to 'forest_shop'>><<effects>><<run statusCheck('Gwylan')>>
@@ -692,68 +770,6 @@
   <br>
   <<link [[今天还是算了|Forest Shop Entrance]]>><</link>>
 <</language>>
-
-<<widget 'deadwood-reblooms-deviancy-unlock'>>
-  <<set $VanillaPlus.lock.deviancy to true>>
-  <<language>>
-    <<option 'EN'>>
-      The last of the poison writhes through your body, following the rhythm you set. The seal closes around it. Gwylan mixed the
-      reagents, but the forest moved to your command, through the body you offered it.
-    <br><br>
-    <span class="gold">Your deviancy has broken through its former limits.</span>
-    <<option 'CN'>>
-      最后的毒素沿着你定下的节奏，在体内扭动前行。封印随之合拢。格威岚调配了药剂，森林却听从了你的号令，穿行于你主动献上的身体。
-    <br><br>
-    <span class="gold">你的异种癖突破了原本的极限。</span>
-  <</language>>
-  <br><br>
-<</widget>>
-
-<<widget 'deadwood-reblooms-exhibitionism-unlock'>>
-  <<set $VanillaPlus.lock.exhibitionism to true>>
-  <<language>>
-    <<option 'EN'>>
-      You remember pool water against your bare skin, the ballroom lights upon your naked dance, and strangers staring in the crowded
-      high street. The memories send a pleasant heat through you. Shame had every chance to stop you. You showed them more instead.
-    <br><br>
-    <span class="gold">Your exhibitionism has broken through its former limits.</span>
-    <<option 'CN'>>
-      你想起池水抚过赤裸皮肤的触感、舞厅灯光下的裸体舞姿，以及商业街上陌生人投来的目光。回忆令热意在体内升起。羞耻本可以阻止你，
-      你却选择向他们展示更多。
-    <br><br>
-    <span class="gold">你的暴露癖突破了原本的极限。</span>
-  <</language>>
-  <br><br>
-<</widget>>
-
-<<widget 'deadwood-reblooms-physique-unlock'>>
-  <<set $VanillaPlus.lock.physique to true>>
-  <<language>>
-    <<option 'EN'>>
-      Only after the danger has passed do your muscles begin to tremble. You remember shutters, raiders, fences and cages, all trying to
-      keep your body where someone else wanted it. The thought of being held helpless still sends a thrill through you. It no longer feels possible.
-    <br><br>
-    <span class="gold">Your physique has broken through its former limits.</span>
-    <<option 'CN'>>
-      直到危险过去，你的肌肉才开始颤抖。你想起卷帘门、袭击者、围墙与牢笼，它们都曾试图把你的身体困在别人指定的位置。
-      任人摆布的念头仍会令你战栗，如今却已不再可能。
-    <br><br>
-    <span class="gold">你的体格突破了原本的极限。</span>
-  <</language>>
-  <br><br>
-<</widget>>
-
-<<widget 'deadwood-reblooms-willpower-unlock'>>
-  <<if maplebirch.VP.willpower.unlock>>
-    <<language>>
-      <<option 'EN'>>
-        <<link [[Dive towards the rune again|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
-      <<option 'CN'>>
-        <<link [[再次潜向符文|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
-    <</language>>
-    <br>
-  <</if>>
-<</widget>>
 
 :: Deadwood Reblooms Willpower Unlock 1 []
 <<set $outside to 0>><<set $location to "lake_ruin">><<set $bus to "lake_ruin_prison">><<underwater>><<effects>><<set $oxygen -= 80>>

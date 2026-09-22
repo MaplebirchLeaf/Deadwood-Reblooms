@@ -1,4 +1,15 @@
 import type { CarryItemConfig } from '../src/module/reblooms/CarryItems';
+import type { Security } from '../src/module/VanillaPlus/Finance';
+
+declare module 'twine-sugarcube' {
+  interface SugarCubeSetupObject {
+    DeadwoodReblooms?: {
+      finance?: {
+        securities?: readonly Security[];
+      };
+    };
+  }
+}
 
 declare global {
   const Links: { enabled: boolean };

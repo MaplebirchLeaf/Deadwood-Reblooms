@@ -25,12 +25,14 @@ export default function (maplebirch: MaplebirchCore) {
   maplebirch.tool.zone.inject({
     widgetPassage: {
       'Widgets Wardrobe': [
+        // 在衣柜筛选与物品列表之间插入双语搜索框，搜索确认后仍调用原版 Dynamic.render 刷新列表。
         {
           src: ')<</if>>\n\t\t<br>',
           applyafter:
             '\n\t\t<<lanSwitch "Search: " "搜索：">><<textbox "$DeadwoodReblooms.wardrobeSearch" $DeadwoodReblooms.wardrobeSearch>><<lanButton "confirm" "capitalize" "style:height:36px;padding:0 12px;line-height:1;">><<run Dynamic.render()>><</lanButton>><br>',
           expected: 1
         },
+        // 在每件衣柜物品渲染前加入语言对应的名称过滤，不修改物品数据与后续穿戴操作。
         {
           src: '<</if>>\n\t\t\t<div class="wardrobeItem wardrobe-action no-numberify">',
           to: '<</if>>\n\t\t\t<<if $DeadwoodReblooms.wardrobeSearch isnot "">><<run $DeadwoodReblooms.wardrobeSearch.toLowerCase()>><<language>><<option "CN">><<if !_itemData.cn_name_cap.toLowerCase().includes($DeadwoodReblooms.wardrobeSearch)>><<continue>><</if>><<option "EN">><<if !_itemData.name_cap.toLowerCase().includes($DeadwoodReblooms.wardrobeSearch)>><<continue>><</if>><</language>><</if>>\n\t\t\t<div class="wardrobeItem wardrobe-action no-numberify">',
@@ -38,6 +40,7 @@ export default function (maplebirch: MaplebirchCore) {
         }
       ],
       'Widgets Mirror': [
+        // 在镜子设置的下一项控件前插入身体刻字组件，保持原版设置网格的 HTML 层级不变。
         {
           src: '</div>\n\t\t</div>\n\t\t<div class="settingsToggleItemWide">',
           to: '</div>\n\t\t</div>\n\t\t<<DeadwoodRebloomsBodyWriting>>\n\t\t<div class="settingsToggleItemWide">',

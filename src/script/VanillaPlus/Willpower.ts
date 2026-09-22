@@ -17,7 +17,7 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.dynamic.regStateEvent('gate', 'willpower-max', {
     output: 'earnFeat "Sovereign Will"',
-    cond: () => maplebirch.VP.willpower.max && !V.feats.currentSave['Sovereign Will']
+    cond: () => V.VanillaPlus != null && maplebirch.VP.willpower.max && !V.feats.currentSave['Sovereign Will']
   });
 
   const slimeDefyPassages = [
@@ -51,6 +51,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     slimeDefyPassages.map(passage => [
       passage,
       [
+        // 将每个史莱姆抗拒场景的原版意志值输入包装为耳液抗性值；无特质时返回原值。
         {
           src: "currentSkillValue('willpower')",
           to: "maplebirch.VP.willpower.earSlimeResistance(currentSkillValue('willpower'))"
@@ -66,24 +67,28 @@ export default function (maplebirch: typeof window.maplebirch) {
     locationPassage: {
       ...slimeDefy,
       'Kylar Abduction Hypnosis Resist': [
+        // 在 Kylar 催眠的成功判断入口记录 kylar 抗拒结果，保留原版成功分支内容。
         {
           srcmatch: /<<if [^>]*\$willpowerSuccess[^>]*>>/,
           applyafter: '<<set $VanillaPlus.willpower.kylar to true>>'
         }
       ],
       'Lake Ruin Prison Possession Resist': [
+        // 在湖底监狱附身抗拒的成功判断入口记录 wraith 结果，作为意志突破条件。
         {
           srcmatch: /<<if [^>]*\$willpowerSuccess[^>]*>>/,
           applyafter: '<<set $VanillaPlus.willpower.wraith to true>>'
         }
       ],
       'Schism End': [
+        // 在原版 schismEnd 完成结算后记录 schism 结果，避免中途离开也被计为完成。
         {
           src: '<<schismEnd>>',
           applyafter: '<<set $VanillaPlus.willpower.schism to true>>'
         }
       ],
       'Temple Vigil 14': [
+        // 在守夜最终一小时推进后记录 vigil 结果，确认玩家完成整段神殿守夜。
         {
           src: '<<pass 60>>',
           applyafter: '<<set $VanillaPlus.willpower.vigil to true>>'
@@ -92,12 +97,14 @@ export default function (maplebirch: typeof window.maplebirch) {
     },
     widgetPassage: {
       Cheats: [
+        // 将作弊面板意志滑条上限改为动态 125%，未突破时继续使用原版 $willpowermax。
         {
           src: '$willpower "willpower" {max: 1000}',
           to: '$willpower "willpower" {max: $VanillaPlus.lock.willpower ? Math.floor($willpowermax * 1.25) : $willpowermax}'
         }
       ],
       'Widgets Clamp': [
+        // 替换全局意志钳制公式，同时应用特质保底值与突破后的 125% 上限。
         {
           src: 'Math.clamp($willpower, 0, $willpowermax)',
           to: "Math.clamp($willpower, maplebirch.VP.minimum('willpower'), $VanillaPlus.lock.willpower ? Math.floor($willpowermax * 1.25) : $willpowermax)"
