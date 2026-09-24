@@ -77,10 +77,11 @@ export default function (maplebirch: typeof window.maplebirch) {
           src: '<<unset $desperateaction>>',
           applybefore: '<<deadwood-reblooms-exhibitionism-trait-effects $_n>>'
         },
-        // 替换暴露癖专用结算钳制，加入特质保底值与突破后的 150 上限。
+        // 完整保留原版五级结算后，每四次非绝望行为折算一点六级进度，再应用突破后的 150 上限。
         {
           src: '<<set $exhibitionism to Math.clamp($exhibitionism, 0, 100)>>',
-          to: "<<set $exhibitionism to Math.clamp($exhibitionism, maplebirch.VP.minimum('exhibitionism'), $VanillaPlus.lock.exhibitionism ? 150 : 100)>>"
+          to: '<<if $_n is 5 and $VanillaPlus.lock.exhibitionism and $exhibitionism gte 100 and $exhibitionism lt 150 and $desperateaction isnot 1 and $desperateaction isnot 2 and typeof $desperateaction isnot "string">>\n\t<<set $VanillaPlus.exhibitionism.levelFiveProgress to ($VanillaPlus.exhibitionism.levelFiveProgress || 0) + 1>>\n\t<<if $VanillaPlus.exhibitionism.levelFiveProgress gte 4>>\n\t\t<<set $VanillaPlus.exhibitionism.levelFiveProgress -= 4>>\n\t\t<<set $exhibitionism to Math.clamp($exhibitionism + 1, 100, 150)>>\n\t<</if>>\n<</if>>\n<<set $exhibitionism to Math.clamp($exhibitionism, maplebirch.VP.minimum(\'exhibitionism\'), $VanillaPlus.lock.exhibitionism ? 150 : 100)>>',
+          expected: 1
         }
       ],
       'Widgets Clamp': [

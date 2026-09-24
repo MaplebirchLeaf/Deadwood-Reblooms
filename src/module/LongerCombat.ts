@@ -217,6 +217,24 @@ class LongerCombat {
     this.addFluids(wetTargets, 'goo');
   }
 
+  // 原版会给每个未输出高潮文本的 NPC 仍追加两次换行；多人战时移除这些前导空行，并限制连续换行。
+  private tidyEjaculation(output: ParentNode): void {
+    let hasContent = false;
+    let breaks = 0;
+    for (const node of Array.from(output.childNodes)) {
+      if (node instanceof HTMLBRElement) {
+        if (!hasContent || breaks >= 2) node.remove();
+        else breaks++;
+        continue;
+      }
+      if (node.nodeType === Node.TEXT_NODE && !node.textContent?.trim()) continue;
+      if (node.textContent?.trim() || node instanceof HTMLElement) {
+        hasContent = true;
+        breaks = 0;
+      }
+    }
+  }
+
   get shouldEndCombat(): boolean {
     const options = this.options;
     if (options.unlimited) return false;
@@ -261,8 +279,9 @@ class LongerCombat {
     current.rounds = Number(current.rounds || 0) + 1;
     current.end = null;
     V.enemyarousal = Math.floor(V.enemyarousalmax * (0.15 + Math.random() * 0.1));
+    T.combatend = false;
 
-    sWikifier(`<br><br><<lanLink 'deadwood-reblooms.LongerCombat.next' ${JSON.stringify(this.passageTitle)} 'capitalize'>><<set _combatend to false>><</lanLink>>`);
+    sWikifier(`<br><br><<lanLink 'deadwood-reblooms.LongerCombat.next' ${JSON.stringify(this.passageTitle)} 'capitalize'>><</lanLink>>`);
 
     return fragment;
   }
@@ -282,6 +301,7 @@ class LongerCombat {
 
         maplebirch.dynamic.regStateEvent('gate', 'LongerCombat', {
           output: 'LongerCombat',
+          priority: 100,
           cond: () => V.combat === 1 && !V.stalk,
           forceExit: () => V.enemyarousal >= V.enemyarousalmax && !this.shouldEndCombat
         });
@@ -298,6 +318,7 @@ class LongerCombat {
       ':storyready',
       () => {
         const macros = this.core.SugarCube.Macro;
+        const tidyEjaculation = this.tidyEjaculation.bind(this);
         for (const [name, action] of [
           ['orgasm', this.orgasm.bind(this)],
           ['ejaculation', this.npcOrgasm.bind(this)]
@@ -309,6 +330,7 @@ class LongerCombat {
             ...macro,
             handler(this: any) {
               action(() => macro.handler.call(this));
+              if (name === 'ejaculation') tidyEjaculation(this.output);
             }
           });
         }

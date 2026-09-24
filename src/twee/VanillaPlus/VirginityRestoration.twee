@@ -1,0 +1,120 @@
+:: Deadwood Reblooms Virginity Restoration []
+<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
+<<generate1>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    The receptionist types something into <<his>> computer and directs you to the waiting room.
+  <<option 'CN'>>
+    接待员在电脑上敲了几下，示意你去候诊室等候。
+<</language>>
+<br><br>
+<<endevent>>
+<<harper_intro>>
+<<language>>
+  <<option 'EN'>>
+    "Virginity restoration," Harper says, glancing down at <<his>> clipboard. "I can repair the physical signs. It won't erase what happened."
+  <<option 'CN'>>
+    “童贞修复。”哈珀垂眼看着写字板，“我可以修复身体上的痕迹。它抹不掉已经发生的事。”
+<</language>>
+<br><br>
+<<if $player.vaginaExist and $player.virginity.vaginal isnot true>>
+  <<hospitalicon>><<lanLink 'Ask about hymen reconstruction' 'Deadwood Reblooms Virginity Restoration Confirm'>><<set $phase to 'vaginal'>><</lanLink>>
+  <br>
+<</if>>
+<<if $player.penisExist and $player.virginity.penile isnot true>>
+  <<hospitalicon>><<lanLink 'Ask about foreskin restoration' 'Deadwood Reblooms Virginity Restoration Confirm'>><<set $phase to 'penile'>><</lanLink>>
+  <br>
+<</if>>
+<<getouticon>><<lanLink 'Leave' 'Hospital Foyer'>><<endevent>><</lanLink>>
+
+:: Deadwood Reblooms Virginity Restoration Confirm []
+<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
+<<harper_intro>>
+<<if $phase is 'vaginal'>>
+  <<language>>
+    <<option 'EN'>>
+      "Hymen reconstruction is a simple operation," Harper says. "It costs £1000 and takes one hour."
+    <<option 'CN'>>
+      “处女膜修复是个简单的手术。”哈珀说，“费用是 £1000，需要一个小时。”
+  <</language>>
+<<elseif $phase is 'penile'>>
+  <<language>>
+    <<option 'EN'>>
+      "I can restore your foreskin to its former condition," Harper says. "It costs £1000 and takes one hour."
+    <<option 'CN'>>
+      “我可以让你的包皮恢复到原来的状态。”哈珀说，“费用是 £1000，需要一个小时。”
+  <</language>>
+<</if>>
+<br><br>
+<<if ($phase is 'vaginal' and playerChastity('vagina')) or ($phase is 'penile' and playerChastity('penis'))>>
+  <<language>>
+    <<option 'EN'>>
+      Harper taps <<his>> pen against the clipboard. <span class="red">"I can't operate while that remains in place."</span>
+    <<option 'CN'>>
+      哈珀用笔轻点写字板。<span class="red">“那东西还戴着，我没法做手术。”</span>
+  <</language>>
+  <br><br>
+<<elseif maplebirch.VP.finance.canPay(100000, 'hospitalVirginityRestoration') and (($phase is 'vaginal' and $player.vaginaExist and $player.virginity.vaginal isnot true) or ($phase is 'penile' and $player.penisExist and $player.virginity.penile isnot true))>>
+  <<ind>><<lanLink 'Accept (1:00)' 'Deadwood Reblooms Virginity Restoration Surgery'>><<pass 1 hours>><</lanLink>>
+  <br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <span class="red">You can't afford it.</span>
+    <<option 'CN'>>
+      <span class="red">你的钱不够。</span>
+  <</language>>
+  <br><br>
+<</if>>
+<<getouticon>><<lanLink 'Leave' 'Hospital Foyer'>><<endevent>><</lanLink>>
+
+:: Deadwood Reblooms Virginity Restoration Surgery []
+<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
+<<money -100000 'hospitalVirginityRestoration'>>
+<<upperstrip>><<lowerstrip>><<underlowerstrip>><<underupperstrip>>
+<<language>>
+  <<option 'EN'>>
+    Harper accepts the payment. "Please undress," <<he>> says, standing to leave the room.
+    <br><br>
+    You strip and wait. <<He>> soon returns with a medical gown and leads you to a small room. You lie on the bed as instructed. Harper presses a mask
+    over your face. Your thoughts blur. <span class="red">Just before everything goes dark, you see <<him>> reach into <<his>> pocket.</span>
+  <<option 'CN'>>
+    哈珀收下钱。“请脱掉衣服。”<<he>>说着起身离开房间。
+    <br><br>
+    你脱光衣服等候。<<He>>很快拿着一件手术服回来，将你领进一间摆着小床的房间。你依言躺下。哈珀把面罩压在你脸上，你的思绪渐渐模糊。
+    <span class="red">在一切陷入黑暗前，你看见<<him>>把手伸进口袋。</span>
+<</language>>
+<br><br>
+<<fameexhibitionism 10 'pic'>>
+<<lanLink 'Next' 'Deadwood Reblooms Virginity Restoration Done'>><</lanLink>>
+
+:: Deadwood Reblooms Virginity Restoration Done []
+<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
+<<if $phase is 'vaginal'>>
+  <<set $player.virginity.vaginal to true>>
+  <<if $player.virginityDetails?.vaginal>>
+    <<unset $player.virginityDetails.vaginal>>
+  <</if>>
+<<elseif $phase is 'penile'>>
+  <<set $player.virginity.penile to true>>
+  <<if $player.virginityDetails?.penile>>
+    <<unset $player.virginityDetails.penile>>
+  <</if>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    You wake in the same room, sore between your legs. Harper enters and consults <<his>> clipboard.
+    <br><br>
+    <span class="green">"The operation was successful," <<he>> says.</span> <<His>> eyes linger between your thighs. "Physically, you're a virgin again."
+    <br><br>
+    <<He>> turns a page. "You can leave straight away. Be well." <<He>> leaves you to dress.
+  <<option 'CN'>>
+    你在同一间房里醒来，双腿之间隐隐作痛。哈珀走进来，查看<<his>>写字板。
+    <br><br>
+    <span class="green">“手术很成功。”<<he>>说。</span><<His>>目光在你双腿之间停留片刻。“从身体上说，你又是童贞了。”
+    <br><br>
+    <<He>>翻过一页。“你现在就可以走了。保重。”<<He>>留下你独自穿衣。
+<</language>>
+<br><br>
+<<endevent>>
+<<lanLink 'Next' 'Hospital Foyer'>><<clotheson>><</lanLink>>

@@ -562,3 +562,59 @@ export async function createZipPackage(rootDir: string): Promise<PackageAsset> {
     buffer: await createZip(rootDir)
   };
 }
+
+export async function createAudioPackPackage(rootDir: string): Promise<PackageAsset> {
+  const pkg = (await readPackageJSON(rootDir)) as RootPackage;
+  const info = await modPackageInfo(rootDir);
+  const files = await scan(path.join(rootDir, 'audio-pack'));
+  const additionFile = [...files.keys()].filter(filePath => AUDIO_EXTENSIONS.has(path.extname(filePath).toLowerCase())).sort();
+  if (!additionFile.length) throw new Error('audio-pack does not contain any supported audio files');
+
+  const dependency = (modName: string): { modName: string; version: string } => {
+    const value = pkg.scml.dependenceInfo.find(item => item.modName === modName);
+    if (!value) throw new Error(`package.json scml.dependenceInfo missing ${modName}`);
+    return value;
+  };
+  const audioFolders = AudioFolders(additionFile);
+  const zip = new AdmZip();
+  files.forEach((buffer, filePath) => zip.addFile(filePath, buffer));
+  zip.addFile(
+    'boot.json',
+    Buffer.from(
+      JSON.stringify(
+        {
+          name: `${pkg.name}-audio`,
+          nickName: { en: 'Deadwood Reblooms Audio Pack', cn: '枯木逢春音频包' },
+          alias: [],
+          version: pkg.version,
+          imgFileList: [],
+          styleFileList: [],
+          tweeFileList: [],
+          additionFile,
+          scriptFileList: [],
+          scriptFileList_preload: [],
+          scriptFileList_earlyload: [],
+          scriptFileList_inject_early: [],
+          additionDir: [],
+          additionBinaryFile: [],
+          addonPlugin: [
+            {
+              modName: 'maplebirch',
+              addonName: 'maplebirchAddon',
+              modVersion: dependency('maplebirch').version,
+              params: { audio: audioFolders }
+            }
+          ],
+          dependenceInfo: [{ modName: pkg.name, version: `>=${pkg.version}` }, dependency('maplebirch'), dependency('ModLoader'), dependency('GameVersion')]
+        },
+        null,
+        2
+      )
+    )
+  );
+
+  return {
+    fileName: `${pkg.name}-audio-${info.gameVersion}-v${pkg.version}.mod.zip`,
+    buffer: zip.toBuffer()
+  };
+}

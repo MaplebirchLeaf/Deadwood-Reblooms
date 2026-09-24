@@ -1,0 +1,423 @@
+:: Deadwood Reblooms Vanilla Plus Promiscuity Widgets [widget]
+
+<!-- Ask 请求：由原版口部目标决定对象，只保留需要 NPC 配合的动作。 -->
+<<widget 'deadwood-reblooms-promiscuity-request-options'>>
+  <<set _promiscuityTarget to Number($mouthtarget)>>
+  <<set _promiscuityCommands to _askActions>>
+  <<if $VanillaPlus.lock.promiscuity and $enemytype is 'man' and $NPCList[_promiscuityTarget]>>
+    <<set _promiscuityTargetName to lanSwitch(
+      $NPCList[_promiscuityTarget].fullDescription,
+      $NPCList[_promiscuityTarget].fullDescription_CN || $NPCList[_promiscuityTarget].fullDescription
+    )>>
+    <!-- Ask 沿用原版说服难度；双重插入额外显示六级淫乱评级。 -->
+    <<set _promiscuityDifficulty to _diffText>>
+    <<set _promiscuityLevel6 to _diffText + ($settings.blindStatsEnabled ? '' : lanSwitch(' - Promiscuity 6', ' - 淫乱 6'))>>
+    <<set _promiscuityLowerExposed to $worn.lower.vagina_exposed gte 1>>
+    <<set _promiscuityLowerExposed to _promiscuityLowerExposed or setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt gte 1>>
+    <<set _promiscuityGenitalsExposed to $worn.over_lower.vagina_exposed gte 1>>
+    <<set _promiscuityGenitalsExposed to _promiscuityGenitalsExposed and _promiscuityLowerExposed>>
+    <<set _promiscuityGenitalsExposed to _promiscuityGenitalsExposed and $worn.under_lower.vagina_exposed gte 1>>
+    <<set _promiscuityGenitalsExposed to _promiscuityGenitalsExposed and $worn.genitals.vagina_exposed gte 1>>
+    <<set _promiscuityHis to $NPCList[_promiscuityTarget].pronouns.his>>
+    <<set _promiscuityFrontAccessible to $position isnot 'wall' or $walltype is 'front'>>
+    <<set _promiscuityBehindAccessible to $walltype isnot 'front'>>
+    <<set _promiscuityHasPenis to maplebirch.VP.promiscuity.hasPenis(_promiscuityTarget)>>
+    <<if $walltype isnot 'front'>>
+      <<if _promiscuityGenitalsExposed and maplebirch.VP.promiscuity.canAsk('hand-vagina', _promiscuityTarget) and !playerChastity('vagina')>>
+        <<set _promiscuityCommands[lanSwitch('to use '+_promiscuityHis+' hands on your pussy', '用手玩弄你的小穴')+_promiscuityDifficulty] to 'promiscuity-hand-vagina'>>
+      <</if>>
+      <<if _promiscuityGenitalsExposed and maplebirch.VP.promiscuity.canAsk('hand-penis', _promiscuityTarget) and !playerChastity('penis')>>
+        <<set _promiscuityCommands[lanSwitch('to use '+_promiscuityHis+' hands on your penis', '用手玩弄你的肉棒')+_promiscuityDifficulty] to 'promiscuity-hand-penis'>>
+      <</if>>
+      <<if _promiscuityGenitalsExposed and maplebirch.VP.promiscuity.canAsk('hand-anus', _promiscuityTarget) and !playerChastity('anus')>>
+        <<set _promiscuityCommands[lanSwitch('to use '+_promiscuityHis+' hands on your anus', '用手玩弄你的菊穴')+_promiscuityDifficulty] to 'promiscuity-hand-anus'>>
+      <</if>>
+    <</if>>
+    <!-- NPC 的嘴正在做其他事时仍保留 Ask；检定成功后再把它移到新动作。 -->
+    <<set _promiscuityCanKiss to _promiscuityFrontAccessible and !$gloryhole and $head isnot 'bound'>>
+    <<set _promiscuityCanKiss to _promiscuityCanKiss and !$worn.face.type.includes('face_covering')>>
+    <<set _promiscuityCanKiss to _promiscuityCanKiss and !$worn.face.type.includes('gag')>>
+    <<if _promiscuityCanKiss and maplebirch.VP.promiscuity.canAsk('mouth-kiss', _promiscuityTarget)>>
+      <<set _promiscuityCommands[lanSwitch('to kiss you', '亲吻你')+_promiscuityDifficulty] to 'promiscuity-mouth-kiss'>>
+    <</if>>
+    <<if _promiscuityFrontAccessible and !$gloryhole and maplebirch.VP.promiscuity.canAsk('mouth-chest', _promiscuityTarget)>>
+      <<set _promiscuityCommands[lanSwitch('to use '+_promiscuityHis+' mouth on your chest', '亲吻你的胸部')+_promiscuityDifficulty] to 'promiscuity-mouth-chest'>>
+    <</if>>
+    <<if _promiscuityBehindAccessible and maplebirch.VP.promiscuity.canAsk('mouth-thigh', _promiscuityTarget)>>
+      <<set _promiscuityCommands[lanSwitch('to use '+_promiscuityHis+' mouth on your thighs', '亲吻你的大腿')+_promiscuityDifficulty] to 'promiscuity-mouth-thigh'>>
+    <</if>>
+    <<if _promiscuityBehindAccessible and maplebirch.VP.promiscuity.canAsk('mouth-bottom', _promiscuityTarget)>>
+      <<set _promiscuityCommands[lanSwitch('to use '+_promiscuityHis+' mouth on your bottom', '亲吻你的屁股')+_promiscuityDifficulty] to 'promiscuity-mouth-bottom'>>
+    <</if>>
+    <<if _promiscuityGenitalsExposed and _promiscuityBehindAccessible>>
+      <<if maplebirch.VP.promiscuity.canAsk('mouth-vagina', _promiscuityTarget) and !playerChastity('vagina')>>
+        <<set _promiscuityCommands[lanSwitch('to use '+_promiscuityHis+' mouth on your pussy', '舔你的小穴')+_promiscuityDifficulty] to 'promiscuity-mouth-vagina'>>
+      <</if>>
+      <<if maplebirch.VP.promiscuity.canAsk('mouth-penis', _promiscuityTarget) and !playerChastity('penis')>>
+        <<set _promiscuityCommands[lanSwitch('to use '+_promiscuityHis+' mouth on your penis', '舔你的肉棒')+_promiscuityDifficulty] to 'promiscuity-mouth-penis'>>
+      <</if>>
+      <<if maplebirch.VP.promiscuity.canAsk('mouth-anus', _promiscuityTarget) and !playerChastity('anus')>>
+        <<set _promiscuityCommands[lanSwitch('to use '+_promiscuityHis+' mouth on your anus', '舔你的菊穴')+_promiscuityDifficulty] to 'promiscuity-mouth-anus'>>
+      <</if>>
+    <</if>>
+    <!-- 口部请求：允许当前 NPC 将阴茎、阴部或肛门移到 PC 的嘴边。 -->
+    <<set _promiscuityMouthAvailable to _promiscuityFrontAccessible and !$gloryhole and $head isnot 'bound'>>
+    <<set _promiscuityMouthAvailable to _promiscuityMouthAvailable and !$worn.face.type.includes('face_covering')>>
+    <<set _promiscuityMouthAvailable to _promiscuityMouthAvailable and !$worn.face.type.includes('gag')>>
+    <<if _promiscuityMouthAvailable>>
+      <<if maplebirch.VP.promiscuity.canAsk('offer-penis-to-mouth', _promiscuityTarget) and !$NPCList[_promiscuityTarget].chastity.penis.includes('chastity')>>
+        <<set _promiscuityCommands[lanSwitch('to put '+_promiscuityHis+' penis to your lips', '把肉棒送到你的唇边')+_promiscuityDifficulty] to 'promiscuity-offer-penis-to-mouth'>>
+      <</if>>
+      <<if maplebirch.VP.promiscuity.canAsk('offer-vagina-to-mouth', _promiscuityTarget) and !$NPCList[_promiscuityTarget].chastity.vagina.includes('chastity')>>
+        <<if $settings.facesitEnabled>>
+          <<set _promiscuityCommands[lanSwitch('to lower '+_promiscuityHis+' pussy onto your mouth', '把小穴压到你的嘴上')+_promiscuityDifficulty] to 'promiscuity-offer-vagina-to-mouth'>>
+        <</if>>
+      <</if>>
+      <<if $settings.analingusGivingEnabled and maplebirch.VP.promiscuity.canAsk('offer-anus-to-mouth', _promiscuityTarget)>>
+        <<set _promiscuityCommands[lanSwitch('to lower '+_promiscuityHis+' anus onto your mouth', '把菊穴压到你的嘴上')+_promiscuityDifficulty] to 'promiscuity-offer-anus-to-mouth'>>
+      <</if>>
+    <</if>>
+    <<if _promiscuityGenitalsExposed and _promiscuityBehindAccessible>>
+      <<if _promiscuityHasPenis>>
+        <<if maplebirch.VP.promiscuity.canAsk('penetrate-vagina', _promiscuityTarget) and !playerChastity('vagina')>>
+          <<set _promiscuityCommands[lanSwitch('to enter your pussy', '插入你的小穴')+_promiscuityDifficulty] to 'promiscuity-penetrate-vagina'>>
+        <</if>>
+        <<if maplebirch.VP.promiscuity.canAsk('penetrate-anus', _promiscuityTarget) and !playerChastity('anus')>>
+          <<set _promiscuityCommands[lanSwitch('to enter your anus', '插入你的菊穴')+_promiscuityDifficulty] to 'promiscuity-penetrate-anus'>>
+        <</if>>
+      <</if>>
+    <</if>>
+    <!-- 玩家承受双插直接写入原版阴道/肛门第二目标，因此两组可以同时存在。 -->
+    <<if _promiscuityGenitalsExposed and _promiscuityBehindAccessible and _promiscuityHasPenis>>
+      <<if $settings.vaginalDoubleEnabled and $vaginause is 'penis' and _promiscuityTarget isnot Number($vaginatarget)>>
+        <<set _promiscuityCommands[lanSwitch('to join the penis at your pussy', '与另一根肉棒一起插入你的小穴')+_promiscuityLevel6] to 'promiscuity-penetrate-player-vagina-double'>>
+      <</if>>
+      <<if $settings.analDoubleEnabled and $anususe is 'penis' and _promiscuityTarget isnot Number($anustarget)>>
+        <<set _promiscuityCommands[lanSwitch('to join the penis at your anus', '与另一根肉棒一起插入你的菊穴')+_promiscuityLevel6] to 'promiscuity-penetrate-player-anus-double'>>
+      <</if>>
+    <</if>>
+    <!-- NPC 承受双插取决于 PC 当前插入的目标；第二名插入者可在 Ask 成功后从旧姿势转入。 -->
+    <<set _promiscuityCanDouble to !['legLock', 'legLocked'].includes($feetuse)>>
+    <<if _promiscuityCanDouble and ['othervagina', 'otheranus'].includes($penisuse)>>
+      <<if $NPCList[$penistarget] and _promiscuityTarget isnot Number($penistarget)>>
+        <<set _promiscuityDifferentPartner to !$NPCDoublePenetration or _promiscuityTarget isnot Number($NPCDoublePenetration.partner)>>
+        <<if _promiscuityDifferentPartner and playerPenisSize() gte 2 and $NPCList[_promiscuityTarget].penissize gte 2 and _promiscuityHasPenis>>
+          <<set _promiscuityRecipientName to lanSwitch(
+            $NPCList[$penistarget].fullDescription,
+            $NPCList[$penistarget].fullDescription_CN || $NPCList[$penistarget].fullDescription
+          )>>
+          <<if $settings.vaginalDoubleEnabled and $penisuse is 'othervagina'>>
+            <<if ['entrance', 'imminent', 'penetrated'].includes($penisstate)>>
+              <<set _promiscuityJoinText to lanSwitch('to join you inside '+_promiscuityRecipientName+"'s pussy", '与你一起插入'+_promiscuityRecipientName+'的小穴')>>
+              <<set _promiscuityCommands[_promiscuityJoinText+_promiscuityLevel6] to 'promiscuity-penetrate-npc-vagina-double'>>
+            <</if>>
+          <</if>>
+          <<if $settings.analDoubleEnabled and $penisuse is 'otheranus'>>
+            <<if ['otheranusentrance', 'otheranus'].includes($penisstate)>>
+              <<set _promiscuityJoinText to lanSwitch('to join you inside '+_promiscuityRecipientName+"'s anus", '与你一起插入'+_promiscuityRecipientName+'的菊穴')>>
+              <<set _promiscuityCommands[_promiscuityJoinText+_promiscuityLevel6] to 'promiscuity-penetrate-npc-anus-double'>>
+            <</if>>
+          <</if>>
+        <</if>>
+      <</if>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<!-- Ask 请求结算：锁定当前口部目标，检定后令该 NPC 调整姿势。 -->
+<<widget 'deadwood-reblooms-promiscuity-request'>>
+  <<if $mouthaction is 'ask' and typeof $askAction is 'string' and $askAction.startsWith('promiscuity-')>>
+    <<set $_promiscuityChoice to $askAction>>
+    <<set $_promiscuityTarget to Number($mouthtarget)>>
+    <<set $mouthaction to 0>>
+    <<set $mouthactiondefault to 'rest'>>
+    <<unset $askAction>>
+    <<set $_promiscuityPlayerDouble to $_promiscuityChoice.startsWith('promiscuity-penetrate-player-')>>
+    <<if $_promiscuityPlayerDouble>>
+      <<set $_promiscuityOrifice to $_promiscuityChoice.includes('vagina') ? 'vagina' : 'anus'>>
+      <<set $_promiscuityPrimary to $_promiscuityOrifice is 'vagina' ? $vaginatarget : $anustarget>>
+      <<set $_promiscuityUse to $_promiscuityOrifice is 'vagina' ? $vaginause : $anususe>>
+      <<set $_promiscuityAvailable to $_promiscuityUse is 'penis' and $_promiscuityTarget isnot Number($_promiscuityPrimary)>>
+      <<set $_promiscuityAvailable to $_promiscuityAvailable and maplebirch.VP.promiscuity.hasPenis($_promiscuityTarget)>>
+    <<elseif $_promiscuityChoice.startsWith('promiscuity-penetrate-npc-')>>
+      <<set $_promiscuityAvailable to $_promiscuityTarget isnot Number($penistarget)>>
+      <<set $_promiscuityAvailable to $_promiscuityAvailable and (!$NPCDoublePenetration or $_promiscuityTarget isnot Number($NPCDoublePenetration.partner))>>
+      <<set $_promiscuityAvailable to $_promiscuityAvailable and maplebirch.VP.promiscuity.hasPenis($_promiscuityTarget)>>
+      <<set $_promiscuityAvailable to $_promiscuityAvailable and (
+        ($_promiscuityChoice.includes('vagina') and $penisuse is 'othervagina' and ['entrance', 'imminent', 'penetrated'].includes($penisstate))
+        or ($_promiscuityChoice.includes('anus') and $penisuse is 'otheranus' and ['otheranusentrance', 'otheranus'].includes($penisstate))
+      )>>
+    <<else>>
+      <<set $_promiscuityAction to $_promiscuityChoice.replace('promiscuity-', '')>>
+      <<set $_promiscuityAvailable to maplebirch.VP.promiscuity.canAsk($_promiscuityAction, $_promiscuityTarget)>>
+    <</if>>
+    <<if !$_promiscuityAvailable>>
+      <span class="red"><<lanSwitch
+        'The position is no longer available, so you cannot move them there.'
+        '所需的位置已被占用，你无法把对方移到那里。'
+      >></span>
+    <<else>>
+      <<personselect $_promiscuityTarget>>
+      <<set $_promiscuitySuccess to $VanillaPlus.traits.promiscuity or $gamemode is 'soft' or $gloryhole>>
+      <<set $_promiscuitySuccess to $_promiscuitySuccess or combatSkillCheck('seduction', $_promiscuityTarget, $NPCList[$_promiscuityTarget].fullDescription)>>
+      <<if $_promiscuitySuccess>>
+        <!-- 只在 Ask 成功后解除选定 NPC 的旧动作；检定失败不改变任何姿势。 -->
+        <<if $_promiscuityPlayerDouble>>
+          <<run maplebirch.VP.promiscuity.releasePenis($_promiscuityTarget)>>
+          <<set $_promiscuityReady to maplebirch.VP.NPCDoublePenetration.canJoinPlayer($_promiscuityTarget, $_promiscuityOrifice)>>
+        <<elseif $_promiscuityChoice.startsWith('promiscuity-penetrate-npc-')>>
+          <<run maplebirch.VP.promiscuity.releasePenis($_promiscuityTarget)>>
+          <<set $_promiscuityReady to maplebirch.VP.NPCDoublePenetration.canJoin($_promiscuityTarget)>>
+        <<else>>
+          <<set $_promiscuityReady to maplebirch.VP.promiscuity.move($_promiscuityAction, $_promiscuityTarget)>>
+        <</if>>
+        <<if $_promiscuityReady>>
+          <<if $_promiscuityChoice.startsWith('promiscuity-penetrate-npc-')>>
+            <<set $_promiscuityRecipientName to lanSwitch(
+              $NPCList[$penistarget].fullDescription,
+              $NPCList[$penistarget].fullDescription_CN || $NPCList[$penistarget].fullDescription
+            )>>
+            <<set $_promiscuityRecipientHole to $_promiscuityChoice.includes('vagina') ? 'pussy' : 'anus'>>
+            <<set $_promiscuityRecipientHoleCN to $_promiscuityChoice.includes('vagina') ? '小穴' : '菊穴'>>
+            <<language>>
+              <<option 'EN'>>
+                You tell <<him>> to press <<his>> penis alongside yours inside <<print $_promiscuityRecipientName+"'s "+$_promiscuityRecipientHole>>.
+              <<option 'CN'>>
+                你让<<him>>把肉棒贴向你的肉棒，一起挤进<<print $_promiscuityRecipientName>>的$_promiscuityRecipientHoleCN。
+            <</language>>
+          <<elseif $_promiscuityPlayerDouble>>
+            <<set $_promiscuityRecipientHole to $_promiscuityChoice.includes('vagina') ? 'pussy' : 'anus'>>
+            <<set $_promiscuityRecipientHoleCN to $_promiscuityChoice.includes('vagina') ? '小穴' : '菊穴'>>
+            <<language>>
+              <<option 'EN'>>
+                You tell <<him>> to put <<his>> penis beside the one already waiting at your $_promiscuityRecipientHole.
+              <<option 'CN'>>
+                你让<<him>>把肉棒贴到堵在你$_promiscuityRecipientHoleCN口的另一根肉棒旁。
+            <</language>>
+          <<else>>
+            <<language>>
+              <<option 'EN'>>
+                You meet <<his>> gaze and state exactly what you want <<him>> to do.
+              <<option 'CN'>>
+                你迎上<<his>>的目光，直截了当地说出自己的要求。
+            <</language>>
+          <</if>>
+          <span class="green">
+            <<if $_promiscuityChoice.startsWith('promiscuity-penetrate-npc-')>>
+              <<language>>
+                <<option 'EN'>>
+                  <<He_Short>> watches your penis move against <<print $_promiscuityRecipientName+"'s "+$_promiscuityRecipientHole>>, then eagerly moves in beside you.
+                <<option 'CN'>>
+                  <<He_Short>>盯着你的肉棒抵在<<print $_promiscuityRecipientName>>的$_promiscuityRecipientHoleCN处，迫不及待地贴到你身旁。
+              <</language>>
+            <<elseif $_promiscuityPlayerDouble>>
+              <<language>>
+                <<option 'EN'>>
+                  <<He_Short>> glances at the other penis, then eagerly crowds in beside it.
+                <<option 'CN'>>
+                  <<He_Short>>看了一眼另一根肉棒，迫不及待地挤到它旁边。
+              <</language>>
+            <<else>>
+              <<language>>
+                <<option 'EN'>>
+                  <<He_Short>> studies you for a moment, then shifts into position.
+                <<option 'CN'>>
+                  <<He_Short>>打量你片刻，随后依照你的要求调整姿势。
+              <</language>>
+            <</if>>
+          </span>
+          <<switch $_promiscuityChoice>>
+            <<case 'promiscuity-hand-vagina' 'promiscuity-hand-penis' 'promiscuity-hand-anus'>>
+              <<set $_promiscuityHand to $NPCList[$_promiscuityTarget].lefthand is 0 ? 'lefthand' : 'righthand'>>
+              <<if $_promiscuityChoice is 'promiscuity-hand-vagina'>>
+                <<set $NPCList[$_promiscuityTarget][$_promiscuityHand] to 'vaginaentrance'>>
+                <<set $vaginause to 1>>
+                <<set $vaginastate to 'otherhandentrance'>>
+                <<set $vaginatarget to $_promiscuityTarget>>
+              <<elseif $_promiscuityChoice is 'promiscuity-hand-penis'>>
+                <<set $NPCList[$_promiscuityTarget][$_promiscuityHand] to 'penisentrance'>>
+                <<set $penisuse to 1>>
+                <<set $penisstate to 'otherhandentrance'>>
+                <<set $penistarget to $_promiscuityTarget>>
+              <<else>>
+                <<set $NPCList[$_promiscuityTarget][$_promiscuityHand] to 'anusentrance'>>
+                <<set $anususe to 'handentrance'>>
+                <<set $anusstate to 'handentrance'>>
+                <<set $anustarget to $_promiscuityTarget>>
+              <</if>>
+            <<case 'promiscuity-mouth-vagina' 'promiscuity-mouth-penis' 'promiscuity-mouth-anus'>>
+              <<set $NPCList[$_promiscuityTarget].location.head to 'genitals'>>
+              <<if $_promiscuityChoice is 'promiscuity-mouth-vagina'>>
+                <<set $NPCList[$_promiscuityTarget].mouth to 'vaginaentrance'>>
+                <<set $vaginause to 'othermouth'>>
+                <<set $vaginastate to 'othermouthentrance'>>
+                <<set $vaginatarget to $_promiscuityTarget>>
+              <<elseif $_promiscuityChoice is 'promiscuity-mouth-penis'>>
+                <<set $NPCList[$_promiscuityTarget].mouth to 'penisentrance'>>
+                <<set $penisuse to 'othermouth'>>
+                <<set $penisstate to 'othermouthentrance'>>
+                <<set $penistarget to $_promiscuityTarget>>
+              <<else>>
+                <<set $NPCList[$_promiscuityTarget].mouth to 'anusentrance'>>
+                <<set $anususe to 'othermouth'>>
+                <<set $anusstate to 'othermouthentrance'>>
+                <<set $anustarget to $_promiscuityTarget>>
+              <</if>>
+            <<case 'promiscuity-mouth-kiss'>>
+              <<set $NPCList[$_promiscuityTarget].mouth to 'kissentrance'>>
+              <<set $NPCList[$_promiscuityTarget].location.head to 'head'>>
+              <<set $mouthuse to 'kiss'>>
+              <<set $mouthstate to 'kissentrance'>>
+              <<set $mouthtarget to $_promiscuityTarget>>
+            <<case 'promiscuity-mouth-chest'>>
+              <<set $NPCList[$_promiscuityTarget].mouth to 'chestentrance'>>
+              <<set $NPCList[$_promiscuityTarget].location.head to 'head'>>
+              <<set $chestuse to 'mouth'>>
+              <<set $cheststate to 'mouthentrance'>>
+              <<set $chesttarget to $_promiscuityTarget>>
+            <<case 'promiscuity-mouth-thigh'>>
+              <<set $NPCList[$_promiscuityTarget].mouth to 'thigh'>>
+              <<set $NPCList[$_promiscuityTarget].location.head to 'genitals'>>
+              <<set $thighuse to 'mouth'>>
+              <<set $thightarget to $_promiscuityTarget>>
+            <<case 'promiscuity-mouth-bottom'>>
+              <<set $NPCList[$_promiscuityTarget].mouth to 'bottom'>>
+              <<set $NPCList[$_promiscuityTarget].location.head to 'genitals'>>
+              <<set $bottomuse to 'mouth'>>
+              <<set $bottomtarget to $_promiscuityTarget>>
+            <<case 'promiscuity-penetrate-vagina'>>
+              <<deadwood-reblooms-promiscuity-request-penetration 'vagina' $_promiscuityTarget>>
+            <<case 'promiscuity-penetrate-anus'>>
+              <<deadwood-reblooms-promiscuity-request-penetration 'anus' $_promiscuityTarget>>
+            <<case 'promiscuity-offer-penis-to-mouth'>>
+              <<set $NPCList[$_promiscuityTarget].penis to 'mouthentrance'>>
+              <<if !$NPCList[$_promiscuityTarget].location.genitals>>
+                <<set $NPCList[$_promiscuityTarget].location.genitals to 'head'>>
+              <</if>>
+              <<set $mouthuse to 'penis'>>
+              <<set $mouthstate to 'entrance'>>
+              <<set $mouthtarget to $_promiscuityTarget>>
+            <<case 'promiscuity-offer-vagina-to-mouth'>>
+              <<if $position is 'doggy'>><<set $position to 'missionary'>><</if>>
+              <<set $NPCList[$_promiscuityTarget].vagina to 'facesit'>>
+              <<if !$NPCList[$_promiscuityTarget].location.genitals>>
+                <<set $NPCList[$_promiscuityTarget].location.genitals to 'head'>>
+              <</if>>
+              <<set $mouthuse to 'facesit'>>
+              <<set $mouthstate to 'vagina'>>
+              <<set $mouthtarget to $_promiscuityTarget>>
+            <<case 'promiscuity-offer-anus-to-mouth'>>
+              <<if $position is 'doggy'>><<set $position to 'missionary'>><</if>>
+              <<set $NPCList[$_promiscuityTarget].vagina to 'facesitanal'>>
+              <<if !$NPCList[$_promiscuityTarget].location.genitals>>
+                <<set $NPCList[$_promiscuityTarget].location.genitals to 'head'>>
+              <</if>>
+              <<set $mouthuse to 'facesit'>>
+              <<set $mouthstate to 'anal'>>
+              <<set $mouthtarget to $_promiscuityTarget>>
+            <<case 'promiscuity-penetrate-npc-vagina-double'>>
+              <<deadwood-reblooms-npc-double-begin 'vagina' $_promiscuityTarget>>
+            <<case 'promiscuity-penetrate-npc-anus-double'>>
+              <<deadwood-reblooms-npc-double-begin 'anus' $_promiscuityTarget>>
+            <<case 'promiscuity-penetrate-player-vagina-double'>>
+              <<deadwood-reblooms-player-double-begin 'vagina' $_promiscuityTarget>>
+            <<case 'promiscuity-penetrate-player-anus-double'>>
+              <<deadwood-reblooms-player-double-begin 'anus' $_promiscuityTarget>>
+          <</switch>>
+          <<set $_promiscuityDoubleSuccess to ($_promiscuityChoice.startsWith('promiscuity-penetrate-npc-')
+            and $NPCDoublePenetration
+            and Number($NPCDoublePenetration.partner) is $_promiscuityTarget)>>
+          <<set $_promiscuityDoubleSuccess to ($_promiscuityDoubleSuccess
+            or ($_promiscuityChoice is 'promiscuity-penetrate-player-vagina-double'
+              and $vaginause is 'penisdouble'
+              and Number($vaginadoubletarget) is $_promiscuityTarget))>>
+          <<set $_promiscuityDoubleSuccess to ($_promiscuityDoubleSuccess
+            or ($_promiscuityChoice is 'promiscuity-penetrate-player-anus-double'
+              and $anususe is 'penisdouble'
+              and Number($anusdoubletarget) is $_promiscuityTarget))>>
+          <<if $_promiscuityDoubleSuccess>>
+            <<combatpromiscuity6>>
+          <</if>>
+        <<else>>
+          <span class="red"><<lanSwitch
+            'They cannot reach the position you asked for.'
+            '对方无法调整到你要求的姿势。'
+          >></span>
+        <</if>>
+      <<else>>
+        <span class="red">
+          <<language>>
+            <<option 'EN'>>
+              <<He_Short>> gives you a dismissive look and ignores the request.
+            <<option 'CN'>>
+              <<He_Short>>不以为意地瞥了你一眼，没有理会你的要求。
+          <</language>>
+        </span>
+      <</if>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<!-- 主动插入：将已同意的请求写入原版战斗部位状态。 -->
+<<widget 'deadwood-reblooms-promiscuity-request-penetration'>>
+  <<set $_promiscuityPart to _args[0]>>
+  <<set $_promiscuityTarget to _args[1]>>
+  <<personselect $_promiscuityTarget>>
+  <<if $_promiscuityPart is 'vagina'>>
+    <<set $vaginause to 'penis'>>
+    <<set $vaginastate to 'entrance'>>
+    <<set $vaginatarget to $_promiscuityTarget>>
+    <<set $NPCList[$_promiscuityTarget].penis to 'vaginaentrance'>>
+    <<set $NPCList[$_promiscuityTarget].location.genitals to 'genitals'>>
+    <<language>>
+      <<option 'EN'>>
+        <<He_Short>> lines up <<his>> penis and presses the tip against your <<pussy>>.
+      <<option 'CN'>>
+        <<He_Short>>对准位置，将<<his>>肉棒龟头抵在你的<<pussy>>上。
+    <</language>>
+  <<else>>
+    <<set $anususe to 'penis'>>
+    <<set $anusstate to 'entrance'>>
+    <<set $anustarget to $_promiscuityTarget>>
+    <<set $NPCList[$_promiscuityTarget].penis to 'anusentrance'>>
+    <<set $NPCList[$_promiscuityTarget].location.genitals to 'genitals'>>
+    <<language>>
+      <<option 'EN'>>
+        <<He_Short>> lines up <<his>> penis and presses the tip against your anus.
+      <<option 'CN'>>
+        <<He_Short>>对准位置，将<<his>>肉棒龟头抵在你的菊穴上。
+    <</language>>
+  <</if>>
+<</widget>>
+
+<!-- 框架动作结果：只有原版姿势确实写入后才结算成长，并恢复临时的判定标记。 -->
+<<widget 'deadwood-reblooms-promiscuity-direct-result'>>
+  <<if _vanillaPlusPromiscuityTarget isnot undefined>>
+    <<set $_promiscuityDirectSuccess to false>>
+    <<switch _args[0]>>
+      <<case 'vagina'>>
+        <<set $_promiscuityDirectSuccess to $vaginause is 'penis'>>
+        <<set $_promiscuityDirectSuccess to $_promiscuityDirectSuccess and $NPCList[_vanillaPlusPromiscuityTarget].penis is 'vaginaentrance'>>
+      <<case 'anus'>>
+        <<set $_promiscuityDirectSuccess to $anususe is 'penis'>>
+        <<set $_promiscuityDirectSuccess to $_promiscuityDirectSuccess and $NPCList[_vanillaPlusPromiscuityTarget].penis is 'anusentrance'>>
+      <<case 'penis-vagina'>>
+        <<set $_promiscuityDirectSuccess to $penisuse is 'othervagina'>>
+        <<set $_promiscuityDirectSuccess to $_promiscuityDirectSuccess and $NPCList[_vanillaPlusPromiscuityTarget].vagina is 'penisentrance'>>
+      <<case 'penis-anus'>>
+        <<set $_promiscuityDirectSuccess to $penisuse is 'otheranus'>>
+        <<set $_promiscuityDirectSuccess to $_promiscuityDirectSuccess and [
+          $NPCList[_vanillaPlusPromiscuityTarget].vagina,
+          $NPCList[_vanillaPlusPromiscuityTarget].penis
+        ].includes('otheranusentrance')>>
+    <</switch>>
+    <<set $promiscuityIgnore to _vanillaPlusPromiscuityIgnore>>
+    <<if $_promiscuityDirectSuccess>>
+      <<combatpromiscuity6>>
+    <</if>>
+    <<unset _vanillaPlusPromiscuity>>
+    <<unset _vanillaPlusPromiscuityIgnore>>
+    <<unset _vanillaPlusPromiscuityTarget>>
+    <<unset $_promiscuityDirectSuccess>>
+  <</if>>
+<</widget>>

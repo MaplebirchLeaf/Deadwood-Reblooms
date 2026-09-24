@@ -1,6 +1,6 @@
 :: Deadwood Reblooms Dynamic Music Widgets [widget]
 
-<!-- 动态音乐设置：控制背景音乐开关与播放音量。 -->
+<!-- 动态音乐设置：分别控制音乐和环境声音量。 -->
 <<widget 'Deadwood-Reblooms-DynamicMusic-Options'>>
   <details open>
     <summary class='settingsHeader options'><span class='gold'><<lanSwitch 'Dynamic Music' '动态音乐'>></span></summary>
@@ -10,11 +10,20 @@
           <<checkbox '$options.maplebirch.DynamicMusic.enabled' false true autocheck>>
           <<lanSwitch 'Enable Dynamic Music' '启用动态音乐'>>
         </label>
+        <div class='description'><<lanSwitch 'Requires the optional Deadwood Reblooms Audio Pack.' '需要安装可选的《枯木逢春》音频包。'>></div>
         <div class='numberslider-inline maplebirch-relationcount-slider'>
           <label>
             <<numberslider '$options.maplebirch.DynamicMusic.volume' $options.maplebirch.DynamicMusic.volume 0 1 0.01 {
-              value: v => lanSwitch('Volume: ', '音量：') + Math.round(v * 100) + '%',
+              value: v => lanSwitch('Music: ', '音乐：') + Math.round(v * 100) + '%',
               onInputChange: value => { maplebirch.DM.setVolume(value); }
+            }>>
+          </label>
+        </div>
+        <div class='numberslider-inline maplebirch-relationcount-slider'>
+          <label>
+            <<numberslider '$options.maplebirch.DynamicMusic.ambienceVolume' ($options.maplebirch.DynamicMusic.ambienceVolume ?? 0.25) 0 1 0.01 {
+              value: v => lanSwitch('Ambience: ', '环境声：') + Math.round(v * 100) + '%',
+              onInputChange: value => { maplebirch.DM.setAmbienceVolume(value); }
             }>>
           </label>
         </div>

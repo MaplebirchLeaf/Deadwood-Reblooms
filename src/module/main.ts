@@ -19,6 +19,6 @@ import DynamicMusic from './DynamicMusic';
   maplebirch.register('CA', Object.seal(new CelestialAnomalies(maplebirch)), ['DR', 'var']);
   maplebirch.register('MoreTransformations', Object.seal(new MoreTransformations(maplebirch)), ['DR', 'char']);
   maplebirch.register('NPCSidebarPortrait', Object.freeze(new NPCSidebarPortrait(maplebirch)), ['DR', 'npc']);
-  maplebirch.register('VP', Object.seal(new VanillaPlus(maplebirch)), ['DR', 'var']);
+  maplebirch.register('VP', Object.seal(new VanillaPlus(maplebirch)), ['DR', 'var', 'char']);
   maplebirch.register('DM', Object.seal(new DynamicMusic(maplebirch)), ['DR', 'audio']);
 })(maplebirch);

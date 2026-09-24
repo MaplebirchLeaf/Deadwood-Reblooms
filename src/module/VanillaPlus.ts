@@ -6,6 +6,7 @@ import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
 import Finance, { DEFAULT_FINANCE_STATE } from './VanillaPlus/Finance';
+import NPCDoublePenetration from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
 import Willpower from './VanillaPlus/Willpower';
@@ -63,12 +64,14 @@ class VanillaPlus extends Module {
       swimming: false,
       ballroom: false,
       highStreetRun: false,
-      highStreet: false
+      highStreet: false,
+      levelFiveProgress: 0
     },
     deviancy: {
       wildsong: false,
       conducting: false,
       conducted: false,
+      levelFiveProgress: 0,
       mirrorOrigin: '',
       mirrors: {
         home: false,
@@ -84,7 +87,8 @@ class VanillaPlus extends Module {
       vagina: false,
       anus: false,
       chest: false,
-      thigh: false
+      thigh: false,
+      levelFiveProgress: 0
     },
     willpower: {
       kylar: false,
@@ -100,6 +104,7 @@ class VanillaPlus extends Module {
   public readonly deviancy = new Deviancy();
   public readonly exhibitionism = new Exhibitionism();
   public readonly finance: Finance;
+  public readonly NPCDoublePenetration = new NPCDoublePenetration();
   public readonly physique = new Physique();
   public readonly promiscuity = new Promiscuity();
   public readonly willpower = new Willpower();

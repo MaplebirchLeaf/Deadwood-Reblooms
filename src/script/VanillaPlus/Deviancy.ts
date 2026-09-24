@@ -92,15 +92,17 @@ export default function (maplebirch: typeof window.maplebirch) {
           src: '<<set $_scaledDeviancyMax to 20 * $_n>>',
           to: '<<set $_scaledDeviancyMax to $_n is 6 and $VanillaPlus.lock.deviancy ? 150 : 20 * $_n>>'
         },
-        // 替换第一处异种癖结算钳制，加入特质保底值和突破后的 150 上限。
+        // 非战斗五级行为完整执行原版结算后，每四次折算一点六级进度，再应用突破后的 150 上限。
         {
-          src: '<<set $deviancy to Math.clamp($deviancy, 0, 100)>>',
-          to: "<<set $deviancy to Math.clamp($deviancy, maplebirch.VP.minimum('deviancy'), $VanillaPlus.lock.deviancy ? 150 : 100)>>"
+          src: '<<arousal `$_n * 100`>><<garousal>>\n\t<<set $deviancy to Math.clamp($deviancy, 0, 100)>>',
+          to: "<<arousal `$_n * 100`>><<garousal>>\n\t<<if $_n is 5 and $VanillaPlus.lock.deviancy and $deviancy gte 100 and $deviancy lt 150>>\n\t\t<<set $VanillaPlus.deviancy.levelFiveProgress to ($VanillaPlus.deviancy.levelFiveProgress || 0) + 1>>\n\t\t<<if $VanillaPlus.deviancy.levelFiveProgress gte 4>>\n\t\t\t<<set $VanillaPlus.deviancy.levelFiveProgress -= 4>>\n\t\t\t<<set $deviancy to Math.clamp($deviancy + 1, 100, 150)>>\n\t\t<</if>>\n\t<</if>>\n\t<<set $deviancy to Math.clamp($deviancy, maplebirch.VP.minimum('deviancy'), $VanillaPlus.lock.deviancy ? 150 : 100)>>",
+          expected: 1
         },
-        // 替换同组件第二处异种癖结算钳制，确保另一条更新路径使用相同边界。
+        // 战斗五级行为保留原版结算；仅自愿行为按相同四比一比例折算六级进度。
         {
-          src: '<<set $deviancy to Math.clamp($deviancy, 0, 100)>>',
-          to: "<<set $deviancy to Math.clamp($deviancy, maplebirch.VP.minimum('deviancy'), $VanillaPlus.lock.deviancy ? 150 : 100)>>"
+          src: '<<arousal `$_n * 100`>>\n\t<</if>>\n\t<<set $deviancy to Math.clamp($deviancy, 0, 100)>>',
+          to: "<<arousal `$_n * 100`>>\n\t<</if>>\n\t<<if $_n is 5 and $VanillaPlus.lock.deviancy and $deviancy gte 100 and $deviancy lt 150 and $consensual is 1>>\n\t\t<<set $VanillaPlus.deviancy.levelFiveProgress to ($VanillaPlus.deviancy.levelFiveProgress || 0) + 1>>\n\t\t<<if $VanillaPlus.deviancy.levelFiveProgress gte 4>>\n\t\t\t<<set $VanillaPlus.deviancy.levelFiveProgress -= 4>>\n\t\t\t<<set $deviancy to Math.clamp($deviancy + 1, 100, 150)>>\n\t\t<</if>>\n\t<</if>>\n\t<<set $deviancy to Math.clamp($deviancy, maplebirch.VP.minimum('deviancy'), $VanillaPlus.lock.deviancy ? 150 : 100)>>",
+          expected: 1
         }
       ],
       'Widgets Clamp': [
