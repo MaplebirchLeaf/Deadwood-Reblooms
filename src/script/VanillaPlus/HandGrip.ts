@@ -18,6 +18,13 @@ export default function (maplebirch: typeof window.maplebirch) {
   const canStart = (hand: GripHand) => active() && available(hand) && maplebirch.VP.handGrip.target(hand) == null && maplebirch.VP.handGrip.isPenetrationRecipient(selectedTarget(hand));
   const canKeep = (hand: GripHand) => active() && maplebirch.VP.handGrip.target(hand) != null;
   const difficulty = '<<handdifficulty>> <<if $consensual is 0>><<combatpromiscuous6>><<else>><<combatpromiscuous3>><</if>>';
+  const rememberedValue = (hand: GripHand, ctx: { originalCount?: number }) => {
+    const value = hand === 'left' ? 'VanillaPlusHandGripLeftKeep' : 'VanillaPlusHandGripRightKeep';
+    const combat = V as unknown as Record<string, unknown>;
+    // 原版在框架加入注册动作前分配默认值；动作进入表时恢复保存值，确保单选框和列表继承上回选择。
+    if (typeof ctx.originalCount === 'number' && combat[`${hand}actiondefault`] === value) combat[`${hand}action`] = value;
+    return value;
+  };
 
   // 抓握是原版性交动作的增强，不要求淫乱突破；左右手分别注册，因此可以同时抓住目标。
   maplebirch.combat.CombatAction.reg(
@@ -46,7 +53,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       actionType: 'leftaction',
       cond: () => canKeep('left'),
       display: () => text('action:keep'),
-      value: () => 'VanillaPlusHandGripLeftKeep',
+      value: ctx => rememberedValue('left', ctx),
       color: 'sub',
       difficulty,
       effect: '<<deadwood-reblooms-hand-grip "left" "keep">>'
@@ -56,7 +63,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       actionType: 'rightaction',
       cond: () => canKeep('right'),
       display: () => text('action:keep'),
-      value: () => 'VanillaPlusHandGripRightKeep',
+      value: ctx => rememberedValue('right', ctx),
       color: 'sub',
       difficulty,
       effect: '<<deadwood-reblooms-hand-grip "right" "keep">>'

@@ -93,6 +93,12 @@ export default function (maplebirch: typeof window.maplebirch) {
     return V.combat === 1 && temporary?.feetOptions === 'free' && V.leglocktarget == null && V.feetuse === 0 && legLockAllowed() && doublePenetrators(orifice).includes(Number(V.feettarget));
   };
   const canContinueLegLock = () => V.combat === 1 && V.feetuse === 'legLock' && !!maplebirch.VP.NPCDoublePenetration.playerLegLock;
+  const rememberedPleasureValue = (ctx: { originalCount?: number }) => {
+    const value = 'NPCDoublePleasure';
+    // 原版默认动作分配早于框架动作注册；在选项进入动作表时恢复保存值，使按钮继承上回选择。
+    if (typeof ctx.originalCount === 'number' && V.penisactiondefault === value) V.penisaction = value;
+    return value;
+  };
 
   // PC 双插期间的主动动作由框架注册到原版动作表，并接入对应效果宏。
   maplebirch.combat.CombatAction.reg(
@@ -101,7 +107,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       actionType: 'penisaction',
       cond: () => V.combat === 1 && maplebirch.VP.NPCDoublePenetration.visible && canUsePleasure(),
       display: () => text('action:pleasure'),
-      value: () => 'NPCDoublePleasure',
+      value: rememberedPleasureValue,
       color: 'sub',
       difficulty: '<<combatpromiscuous5>> <<combataware 4>>',
       effect: '<<deadwood-reblooms-npc-double-pleasure>>'
