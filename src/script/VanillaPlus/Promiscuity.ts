@@ -1,15 +1,22 @@
 // ./src/script/VanillaPlus/Promiscuity.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
+  type GuideHand = 'left' | 'right';
+  type GuideDestination = 'player-vagina' | 'player-anus' | 'NPC-vagina' | 'NPC-anus';
+
   const text = (key: string, values: Record<string, string> = {}) => {
     let result = maplebirch.t(`deadwood-reblooms:VanillaPlus:promiscuity:${key}`);
     for (const [name, value] of Object.entries(values)) result = result.replaceAll(`{${name}}`, value);
     return result;
   };
   const target = (index: number) => Number(index);
-  const active = () => V.combat === 1 && V.VanillaPlus.lock.promiscuity && V.enemytype === 'man' && V.walltype !== 'front' && !V.gloryhole;
+  const active = () => V.combat === 1 && maplebirch.VP.promiscuity.expanded && V.enemytype === 'man' && V.walltype !== 'front' && !V.gloryhole;
   const direct = (action: string, targetVariable: string) =>
     `<<set _vanillaPlusPromiscuity to true>><<set _vanillaPlusPromiscuityIgnore to $promiscuityIgnore>><<set _vanillaPlusPromiscuityTarget to Number(${targetVariable})>><<set $promiscuityIgnore to true>><<set $${action}>>`;
+  const switchPenis = (destination: 'vagina' | 'anus') => {
+    const action = destination === 'vagina' ? 'penistovagina' : 'penistoanus';
+    return `<<if maplebirch.VP.promiscuity.preparePenisSwitch("${destination}", Number($penistarget))>>${direct(`penisaction to "${action}"`, '$penistarget')}<</if>>`;
+  };
   const targetName = (index: number) => {
     const npc = V.NPCList?.[target(index)];
     return (maplebirch.Language === 'CN' ? npc?.fullDescription_CN : npc?.fullDescription) || npc?.fullDescription || '';
@@ -18,6 +25,43 @@ export default function (maplebirch: typeof window.maplebirch) {
     const npc = V.NPCList?.[target(index)];
     if (!npc || npc.stance === 'topface') return false;
     return ![0, undefined].includes(npc.location?.genitals) || npc.location?.head === 'genitals';
+  };
+  const handTarget = (hand: GuideHand) => target(hand === 'left' ? V.lefttarget : V.righttarget);
+  const handAvailable = (hand: GuideHand) => (window as any).State?.temporary?.[`${hand}Options`] === 'free';
+  const canGuidePenis = (hand: GuideHand) => {
+    const selected = handTarget(hand);
+    return active() && handAvailable(hand) && maplebirch.VP.promiscuity.hasPenis(selected) && !V.NPCList[selected].chastity.penis.includes('chastity');
+  };
+  const canGuidePlayerDouble = (selected: number, orifice: 'vagina' | 'anus') => {
+    const primary = orifice === 'vagina' ? V.vaginatarget : V.anustarget;
+    const use = orifice === 'vagina' ? V.vaginause : V.anususe;
+    const enabled = orifice === 'vagina' ? V.settings.vaginalDoubleEnabled : V.settings.analDoubleEnabled;
+    return enabled && use === 'penis' && Number(primary) !== selected && maplebirch.VP.promiscuity.hasPenis(selected);
+  };
+  const canGuideToPlayer = (hand: GuideHand, orifice: 'vagina' | 'anus') => {
+    if (!canGuidePenis(hand) || V.walltype === 'front' || (window as any).playerChastity(orifice)) return false;
+    const selected = handTarget(hand);
+    const action = orifice === 'vagina' ? 'penetrate-vagina' : 'penetrate-anus';
+    return maplebirch.VP.promiscuity.canAsk(action, selected) || canGuidePlayerDouble(selected, orifice);
+  };
+  const canGuideToNPC = (hand: GuideHand, orifice: 'vagina' | 'anus') => {
+    if (!canGuidePenis(hand)) return false;
+    const selected = handTarget(hand);
+    const recipient = target(V.penistarget);
+    const enabled = orifice === 'vagina' ? V.settings.vaginalDoubleEnabled : V.settings.analDoubleEnabled;
+    const correctUse =
+      orifice === 'vagina'
+        ? V.penisuse === 'othervagina' && ['entrance', 'imminent', 'penetrated'].includes(V.penisstate)
+        : V.penisuse === 'otheranus' && ['otheranusentrance', 'otheranusimminent', 'otheranus'].includes(V.penisstate);
+    const differentPartner = !V.VanillaPlus.npcDoublePenetration || Number(V.VanillaPlus.npcDoublePenetration.partner) !== selected;
+    return enabled && correctUse && selected !== recipient && differentPartner && (window as any).playerPenisSize() >= 2 && V.NPCList[selected].penissize >= 2;
+  };
+  const guideLabel = (hand: GuideHand, destination: GuideDestination) => {
+    const selected = handTarget(hand);
+    const values = { name: targetName(selected), recipient: targetName(V.penistarget) };
+    if (destination === 'player-vagina') return text(V.vaginause === 'penis' ? 'action:guidePlayerVaginaDouble' : 'action:guidePlayerVagina', values);
+    if (destination === 'player-anus') return text(V.anususe === 'penis' ? 'action:guidePlayerAnusDouble' : 'action:guidePlayerAnus', values);
+    return text(destination === 'NPC-vagina' ? 'action:guideNPCVagina' : 'action:guideNPCAnus', values);
   };
   maplebirch.tool.onInit(() => {
     setup.feats['Every Inch'] ??= {
@@ -48,18 +92,18 @@ export default function (maplebirch: typeof window.maplebirch) {
       id: 'promiscuity-receive-vaginal',
       actionType: 'vaginaaction',
       cond: () => active() && needsExtraAction(V.vaginatarget) && maplebirch.VP.promiscuity.canDirect('penetrate-vagina', target(V.vaginatarget)),
-      display: () => text('action:straddle', { name: targetName(V.vaginatarget) }),
+      display: () => text('action:straddleVaginal', { name: targetName(V.vaginatarget) }),
       value: () => 'VanillaPlusPromiscuityReceiveVaginal',
-      color: 'meek',
+      color: 'lustful',
       effect: direct('vaginaaction to "vaginatopenis"', '$vaginatarget')
     },
     {
       id: 'promiscuity-receive-anal',
       actionType: 'anusaction',
       cond: () => active() && needsExtraAction(V.anustarget) && maplebirch.VP.promiscuity.canDirect('penetrate-anus', target(V.anustarget)),
-      display: () => text('action:straddle', { name: targetName(V.anustarget) }),
+      display: () => text('action:straddleAnal', { name: targetName(V.anustarget) }),
       value: () => 'VanillaPlusPromiscuityReceiveAnal',
-      color: 'meek',
+      color: 'lustful',
       effect: direct('anusaction to "anustopenis"', '$anustarget')
     },
     {
@@ -68,7 +112,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       cond: () => active() && needsExtraAction(V.penistarget) && maplebirch.VP.promiscuity.canDirect('offer-vagina-to-penis', target(V.penistarget)),
       display: () => text('action:pressVagina', { name: targetName(V.penistarget) }),
       value: () => 'VanillaPlusPromiscuityPressVaginal',
-      color: 'meek',
+      color: 'lustful',
       effect: direct('penisaction to "penistovagina"', '$penistarget')
     },
     {
@@ -77,10 +121,50 @@ export default function (maplebirch: typeof window.maplebirch) {
       cond: () => active() && needsExtraAction(V.penistarget) && maplebirch.VP.promiscuity.canDirect('offer-anus-to-penis', target(V.penistarget)),
       display: () => text('action:pressAnus', { name: targetName(V.penistarget) }),
       value: () => 'VanillaPlusPromiscuityPressAnal',
-      color: 'meek',
+      color: 'lustful',
       effect: direct('penisaction to "penistoanus"', '$penistarget')
+    },
+    {
+      id: 'promiscuity-switch-to-vaginal',
+      actionType: 'penisaction',
+      cond: () => active() && maplebirch.VP.promiscuity.canSwitchPenis('vagina', target(V.penistarget)),
+      display: () => text('action:switchVagina', { name: targetName(V.penistarget) }),
+      value: () => 'VanillaPlusPromiscuitySwitchVaginal',
+      color: 'sub',
+      difficulty: '<<peniledifficulty>> <<combatpromiscuous5>>',
+      effect: switchPenis('vagina')
+    },
+    {
+      id: 'promiscuity-switch-to-anal',
+      actionType: 'penisaction',
+      cond: () => active() && maplebirch.VP.promiscuity.canSwitchPenis('anus', target(V.penistarget)),
+      display: () => text('action:switchAnus', { name: targetName(V.penistarget) }),
+      value: () => 'VanillaPlusPromiscuitySwitchAnal',
+      color: 'sub',
+      difficulty: '<<peniledifficulty>> <<combatpromiscuous5>>',
+      effect: switchPenis('anus')
     }
   );
+
+  // 左右手沿用原版目标下拉框，引导所选 NPC 的阴茎；动作结算前会再次检查目标与位置。
+  for (const hand of ['left', 'right'] as const) {
+    const registerGuide = (destination: GuideDestination, cond: () => boolean) => ({
+      id: `promiscuity-guide-${hand}-${destination}`,
+      actionType: hand === 'left' ? ('leftaction' as const) : ('rightaction' as const),
+      cond,
+      display: () => guideLabel(hand, destination),
+      value: () => `VanillaPlusPromiscuityGuide${hand === 'left' ? 'Left' : 'Right'}${destination.replaceAll('-', '')}`,
+      color: 'lustful',
+      difficulty: '<<handdifficulty>> <<combatpromiscuous6>>',
+      effect: `<<deadwood-reblooms-promiscuity-guide "${hand}" "${destination}">>`
+    });
+    maplebirch.combat.CombatAction.reg(
+      registerGuide('player-vagina', () => canGuideToPlayer(hand, 'vagina')),
+      registerGuide('player-anus', () => canGuideToPlayer(hand, 'anus')),
+      registerGuide('NPC-vagina', () => canGuideToNPC(hand, 'vagina')),
+      registerGuide('NPC-anus', () => canGuideToNPC(hand, 'anus'))
+    );
+  }
 
   // 扩展战斗性行为选项，并接入淫乱突破与数值上限。
   maplebirch.tool.inject({
@@ -227,11 +311,11 @@ export default function (maplebirch: typeof window.maplebirch) {
           to: '<<if $vaginaaction is "vaginatopenis">>\n\t\t<<set $vaginatarget to Number($vaginatarget)>><<personselect $vaginatarget>>',
           expected: 1
         },
-        // 骑乘结算再次核对所选 NPC 的阴茎，并把具名 NPC 传给原版检定；淫乱特质沿用此前主动动作的必定成功效果，但不再生成重复按钮。
+        // 骑乘结算再次核对所选 NPC 的阴茎，并把具名 NPC 传给原版检定；只有满级淫乱特质跳过技能检定。
         {
           srcmatch:
             /<<if \$vaginause is 0>>\n\t{3}<<if (\$combatExtended\.reverseRapeStart is 1 or )?combatSkillCheck\("vaginal", \$vaginatarget\)>>\n\t{4}<<if \$NPCList\[\$vaginatarget\]\.penis is 0>>/,
-          to: '<<if $vaginause is 0>>\n\t\t\t<<if $1_vanillaPlusPromiscuity or $VanillaPlus.traits.promiscuity or combatSkillCheck("vaginal", $vaginatarget, $NPCList[$vaginatarget].fullDescription)>>\n\t\t\t\t<<if maplebirch.VP.promiscuity.penisAvailable($vaginatarget)>>',
+          to: '<<if $vaginause is 0>>\n\t\t\t<<if $1$VanillaPlus.traits.promiscuity or combatSkillCheck("vaginal", $vaginatarget, $NPCList[$vaginatarget].fullDescription)>>\n\t\t\t\t<<if maplebirch.VP.promiscuity.penisAvailable($vaginatarget)>>',
           expected: 1
         },
         // PC 成功跨坐第二根阴茎、形成阴道双插时，将原版五级成长提升为六级成长。
@@ -248,10 +332,10 @@ export default function (maplebirch: typeof window.maplebirch) {
         }
       ],
       'Widgets Effects Anus': [
-        // 框架注册的 PC 主动骑乘已经通过条件检查，结算时不再被原版技能检定二次拒绝。
+        // 框架注册的 PC 主动骑乘仍执行原版技能检定；满级淫乱特质使其必定成功。
         {
           srcmatch: /<<if \$anususe is 0 or \$anusstate is "entrance">>\n\t{4}<<if (\$combatExtended\.reverseRapeStart is 1 or )?combatSkillCheck\("anal", \$anustarget\)>>/,
-          to: '<<if $anususe is 0 or $anusstate is "entrance">>\n\t\t\t\t<<if $1_vanillaPlusPromiscuity or combatSkillCheck("anal", $anustarget)>>',
+          to: '<<if $anususe is 0 or $anusstate is "entrance">>\n\t\t\t\t<<if $1$VanillaPlus.traits.promiscuity or combatSkillCheck("anal", $anustarget)>>',
           expected: 1
         },
         // PC 成功跨坐第二根阴茎、形成肛门双插时，将原版五级成长提升为六级成长。
@@ -268,18 +352,29 @@ export default function (maplebirch: typeof window.maplebirch) {
         }
       ],
       'Widgets Effects Penis': [
-        // 框架的 PC 主动阴道插入按钮通过后，直接进入原版占位结算。
+        // NPC 正用阴茎插入 PC 时，其阴部仍可记录肛门受插状态；只占用一个空闲字段，避免覆盖正在进行的动作。
+        {
+          src: '<<if ($NPCList[$penistarget].vagina is 0 or $NPCList[$penistarget].vagina is "none") and ($NPCList[$penistarget].penis is 0 or $NPCList[$penistarget].penis is "none")>>',
+          to: '<<if maplebirch.VP.promiscuity.anusAvailable($penistarget)>>',
+          expected: 1
+        },
+        {
+          src: '<<if $_target.vagina isnot "none">>\n\t\t\t\t\t<<set $_target.vagina to "otheranusentrance">>\n\t\t\t\t<</if>>\n\t\t\t\t<<if $_target.penis isnot "none">>\n\t\t\t\t\t<<set $_target.penis to "otheranusentrance">>\n\t\t\t\t<</if>>',
+          to: '<<if $_target.vagina is 0>>\n\t\t\t\t\t<<set $_target.vagina to "otheranusentrance">>\n\t\t\t\t<<elseif $_target.penis is 0>>\n\t\t\t\t\t<<set $_target.penis to "otheranusentrance">>\n\t\t\t\t<</if>>',
+          expected: 1
+        },
+        // 框架的 PC 主动阴道插入仍执行原版技能检定；满级淫乱特质使其必定成功。
         {
           srcmatch:
             /<<widget "effectspenistovagina">>\n\t<<if \$penisaction is "penistovagina">>\n\t{2}<<personselect \$penistarget>>\n\t{2}<<set \$penisaction to 0>><<submission 10>><<penileskilluse>><<combatpromiscuity5>>\n\t{2}<<if (\$combatExtended\.reverseRapeStart is 1 or )?combatSkillCheck\("penile", \$penistarget\)>>/,
-          to: '<<widget "effectspenistovagina">>\n\t<<if $penisaction is "penistovagina">>\n\t\t<<personselect $penistarget>>\n\t\t<<set $penisaction to 0>><<submission 10>><<penileskilluse>><<combatpromiscuity5>>\n\t\t<<if $1_vanillaPlusPromiscuity or combatSkillCheck("penile", $penistarget)>>',
+          to: '<<widget "effectspenistovagina">>\n\t<<if $penisaction is "penistovagina">>\n\t\t<<personselect $penistarget>>\n\t\t<<set $penisaction to 0>><<submission 10>><<penileskilluse>><<combatpromiscuity5>>\n\t\t<<if $1$VanillaPlus.traits.promiscuity or combatSkillCheck("penile", $penistarget)>>',
           expected: 1
         },
-        // 肛交按钮使用同一临时标记，仅跳过重复检定，占位与文本仍由原版处理。
+        // 主动肛交使用同一成功规则，占位与文本仍由原版处理。
         {
           srcmatch:
             /<<widget "effectspenistoanus">>\n\t<<if \$penisaction is "penistoanus">>\n\t{2}<<personselect \$penistarget>>\n\t{2}<<set \$penisaction to 0>><<submission 10>><<penileskilluse>><<combatpromiscuity5>>\n\t{2}<<if (\$combatExtended\.reverseRapeStart is 1 or )?combatSkillCheck\("penile", \$penistarget\)>>/,
-          to: '<<widget "effectspenistoanus">>\n\t<<if $penisaction is "penistoanus">>\n\t\t<<personselect $penistarget>>\n\t\t<<set $penisaction to 0>><<submission 10>><<penileskilluse>><<combatpromiscuity5>>\n\t\t<<if $1_vanillaPlusPromiscuity or combatSkillCheck("penile", $penistarget)>>',
+          to: '<<widget "effectspenistoanus">>\n\t<<if $penisaction is "penistoanus">>\n\t\t<<personselect $penistarget>>\n\t\t<<set $penisaction to 0>><<submission 10>><<penileskilluse>><<combatpromiscuity5>>\n\t\t<<if $1$VanillaPlus.traits.promiscuity or combatSkillCheck("penile", $penistarget)>>',
           expected: 1
         }
       ],

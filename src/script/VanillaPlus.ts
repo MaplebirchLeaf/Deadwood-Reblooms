@@ -6,6 +6,7 @@ import Deviancy from './VanillaPlus/Deviancy';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
 import Finance from './VanillaPlus/Finance';
 import HistoryProject from './VanillaPlus/HistoryProject';
+import HandGrip from './VanillaPlus/HandGrip';
 import NPCDoublePenetration from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
@@ -31,6 +32,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   Deviancy(maplebirch);
   Exhibitionism(maplebirch);
   HistoryProject(maplebirch);
+  HandGrip(maplebirch);
   NPCDoublePenetration(maplebirch);
   Finance(maplebirch);
   Physique(maplebirch);

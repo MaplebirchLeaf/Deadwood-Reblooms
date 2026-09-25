@@ -6,7 +6,8 @@ import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
 import Finance, { DEFAULT_FINANCE_STATE } from './VanillaPlus/Finance';
-import NPCDoublePenetration, { type NPCDoublePenetrationState } from './VanillaPlus/NPCDoublePenetration';
+import HandGrip from './VanillaPlus/HandGrip';
+import NPCDoublePenetration, { type NPCDoublePenetrationData } from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
 import Willpower from './VanillaPlus/Willpower';
@@ -90,7 +91,11 @@ class VanillaPlus extends Module {
       thigh: false,
       levelFiveProgress: 0
     },
-    npcDoublePenetration: null as NPCDoublePenetrationState | null,
+    handGrip: {
+      left: null as number | null,
+      right: null as number | null
+    },
+    npcDoublePenetration: null as NPCDoublePenetrationData | null,
     willpower: {
       kylar: false,
       wraith: false,
@@ -105,6 +110,7 @@ class VanillaPlus extends Module {
   public readonly deviancy = new Deviancy();
   public readonly exhibitionism = new Exhibitionism();
   public readonly finance: Finance;
+  public readonly handGrip = new HandGrip();
   public readonly NPCDoublePenetration = new NPCDoublePenetration();
   public readonly physique = new Physique();
   public readonly promiscuity = new Promiscuity();

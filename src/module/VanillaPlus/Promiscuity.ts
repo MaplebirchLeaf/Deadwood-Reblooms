@@ -1,6 +1,7 @@
 // ./src/module/VanillaPlus/Promiscuity.ts
 
 type BodyActions = Partial<Record<'hands' | 'feet' | 'mouth' | 'penis' | 'vagina' | 'anus' | 'chest' | 'thigh', unknown>>;
+type PenisDestination = 'vagina' | 'anus';
 
 type PromiscuityAction =
   | 'hand-vagina'
@@ -32,6 +33,14 @@ class Promiscuity {
 
   private hasStrapon(index: number): boolean {
     return (window as typeof window & { npcHasStrapon?: (target: number) => boolean }).npcHasStrapon?.(index) ?? false;
+  }
+
+  public get expanded(): boolean {
+    return V.VanillaPlus.lock.promiscuity && V.promiscuity >= window.maplebirch.VP.normalCeiling('promiscuity');
+  }
+
+  public get mastered(): boolean {
+    return !!V.VanillaPlus.traits.promiscuity;
   }
 
   private isVoluntary(action: unknown): boolean {
@@ -66,7 +75,42 @@ class Promiscuity {
   public vaginaAvailable(index: number): boolean {
     const target = Number(index);
     const npc = this.npc(target);
-    return !!npc && npc.vagina === 0 && ['f', 'h'].includes(npc.gender);
+    // 原版以 vagina === "none" 表示没有阴部；0 则表示确实拥有且当前空闲，不能再由 gender 推断。
+    return !!npc && npc.vagina === 0;
+  }
+
+  public anusAvailable(index: number): boolean {
+    const target = Number(index);
+    const npc = this.npc(target);
+    if (!npc) return false;
+    const occupied = [npc.penis, npc.vagina].some(value => typeof value === 'string' && value.includes('otheranus'));
+    return !occupied && (npc.penis === 0 || npc.vagina === 0);
+  }
+
+  // PC 已对准当前 NPC 的一个穴位时，可以主动移向同一人的另一个穴位。
+  public canSwitchPenis(destination: PenisDestination, index: number): boolean {
+    const target = Number(index);
+    const npc = this.npc(target);
+    if (!npc || Number(V.penistarget) !== target) return false;
+
+    if (destination === 'vagina') {
+      if (V.penisuse !== 'otheranus' || !['otheranusentrance', 'otheranusimminent', 'otheranus'].includes(V.penisstate)) return false;
+      return npc.vagina === 0 || (typeof npc.vagina === 'string' && npc.vagina.includes('otheranus'));
+    }
+
+    if (V.penisuse !== 'othervagina' || !['entrance', 'imminent', 'penetrated'].includes(V.penisstate)) return false;
+    const anusOccupied = [npc.penis, npc.vagina].some(value => typeof value === 'string' && value.includes('otheranus'));
+    const vaginaOccupiedByPlayer = ['penisentrance', 'penisimminent', 'penis'].includes(String(npc.vagina));
+    return !anusOccupied && (npc.penis === 0 || vaginaOccupiedByPlayer);
+  }
+
+  // 先释放旧穴位，再交给原版 penistovagina/penistoanus 效果完成新姿势及技能检定。
+  public preparePenisSwitch(destination: PenisDestination, index: number): boolean {
+    const target = Number(index);
+    if (!this.canSwitchPenis(destination, target)) return false;
+    if (destination === 'vagina') this.releaseAnus(target);
+    else this.releaseVagina(target);
+    return this.canDirect(destination === 'vagina' ? 'offer-vagina-to-penis' : 'offer-anus-to-penis', target);
   }
 
   // 动作栏绘制与回合结算共用占用规则，避免覆盖另一名 NPC 正在使用的部位。
@@ -77,9 +121,6 @@ class Promiscuity {
 
     const handAvailable = npc.lefthand === 0 || npc.righthand === 0;
     const mouthAvailable = npc.mouth === 0;
-    const anusOccupied = [npc.penis, npc.vagina].some(value => typeof value === 'string' && value.includes('otheranus'));
-    const anusAvailable = !anusOccupied && (npc.penis === 0 || npc.vagina === 0);
-
     switch (action) {
       case 'hand-vagina':
         return handAvailable && !!V.player?.vaginaExist && !V.vaginause;
@@ -106,7 +147,7 @@ class Promiscuity {
       case 'offer-vagina-to-mouth':
         return !V.mouthuse && this.vaginaAvailable(target);
       case 'offer-anus-to-mouth':
-        return !V.mouthuse && anusAvailable && npc.vagina === 0;
+        return !V.mouthuse && this.anusAvailable(target) && npc.vagina === 0;
       case 'penetrate-vagina':
         return !!V.player?.vaginaExist && !V.vaginause && this.penisAvailable(target);
       case 'penetrate-anus':
@@ -114,7 +155,7 @@ class Promiscuity {
       case 'offer-vagina-to-penis':
         return !!V.player?.penisExist && !V.penisuse && this.vaginaAvailable(target);
       case 'offer-anus-to-penis':
-        return !!V.player?.penisExist && !V.penisuse && [0, 'none'].includes(npc.penis) && [0, 'none'].includes(npc.vagina);
+        return !!V.player?.penisExist && !V.penisuse && this.anusAvailable(target);
     }
   }
 

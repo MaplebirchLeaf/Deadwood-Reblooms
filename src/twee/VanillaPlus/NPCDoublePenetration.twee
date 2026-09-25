@@ -1,180 +1,323 @@
 :: Deadwood Reblooms NPC Double Penetration Widgets [widget]
 
+<!-- 将原版双插状态中的泛称替换为当前两名 NPC；单插时保留原版措辞。 -->
+<<widget 'deadwood-reblooms-double-penetration-status'>>
+  <<set _NPCDoubleStatusMode to _args[0]>>
+  <<if _NPCDoubleStatusMode.startsWith('player-')>>
+    <<set _NPCDoubleStatusOrifice to _NPCDoubleStatusMode.includes('vagina') ? 'vagina' : 'anus'>>
+    <<set _NPCDoubleStatusFirst to Number(_NPCDoubleStatusOrifice is 'vagina' ? $vaginatarget : $anustarget)>>
+    <<set _NPCDoubleStatusSecond to Number(_NPCDoubleStatusOrifice is 'vagina' ? $vaginadoubletarget : $anusdoubletarget)>>
+    <<language>>
+      <<option 'EN'>>
+        <<personselect _NPCDoubleStatusFirst>><<combatPersons>> and <<personselect _NPCDoubleStatusSecond>><<combatpersons>> penises penetrate your <<if _NPCDoubleStatusOrifice is 'vagina'>><<pussy>><<else>>anus<</if>>.
+      <<option 'CN'>>
+        <<personselect _NPCDoubleStatusFirst>><<combatperson>>与<<personselect _NPCDoubleStatusSecond>><<combatperson>>的阴茎插到你的<<if _NPCDoubleStatusOrifice is 'vagina'>><<pussy>><<else>>菊穴<</if>>里。
+    <</language>>
+    <<personselect _NPCDoubleStatusFirst>>
+  <<else>>
+    <<set _NPCDoubleStatus to maplebirch.VP.NPCDoublePenetration.state>>
+    <<set _NPCDoubleStatusOrifice to _NPCDoubleStatusMode.includes('vagina') ? 'vagina' : 'anus'>>
+    <<if maplebirch.VP.NPCDoublePenetration.visible and _NPCDoubleStatus and _NPCDoubleStatus.recipient is Number($penistarget) and _NPCDoubleStatus.orifice is _NPCDoubleStatusOrifice>>
+      <<language>>
+        <<option 'EN'>>
+          <<personselect _NPCDoubleStatus.recipient>><<combatPersons>> <<if _NPCDoubleStatusOrifice is 'vagina'>>vagina<<else>>ass<</if>> envelops your penis alongside <<personselect _NPCDoubleStatus.partner>><<combatpersons>> penis.
+        <<option 'CN'>>
+          <<personselect _NPCDoubleStatus.recipient>><<combatperson>>的<<if _NPCDoubleStatusOrifice is 'vagina'>>小穴<<else>>屁股<</if>>包裹着你与<<personselect _NPCDoubleStatus.partner>><<combatperson>>的阴茎。
+      <</language>>
+      <<personselect _NPCDoubleStatus.recipient>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>><<combatPersons>> <<if _NPCDoubleStatusOrifice is 'vagina'>>vagina<<else>>ass<</if>> envelops your <<penis>>.
+        <<option 'CN'>><<combatPersons>>的<<if _NPCDoubleStatusOrifice is 'vagina'>>小穴裹住了<<else>>屁股包裹着<</if>>你的<<penis>>。
+      <</language>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<!-- 原版中英文使用相同状态入口；名单同时覆盖阴道与肛门双插。 -->
+<<widget 'deadwood-reblooms-double-leglock-targets'>><<nobr>>
+  <<set _NPCDoubleLegLockTargets to _args[0]>>
+  <<for _NPCDoubleLegLockIndex = 0; _NPCDoubleLegLockIndex lt _NPCDoubleLegLockTargets.length; _NPCDoubleLegLockIndex++>>
+    <<if _NPCDoubleLegLockIndex gt 0>>
+      <<if _NPCDoubleLegLockIndex is _NPCDoubleLegLockTargets.length - 1>><<lanSwitch ' and ' '、'>><<else>><<lanSwitch ', ' '、'>><</if>>
+    <</if>>
+    <<personselect _NPCDoubleLegLockTargets[_NPCDoubleLegLockIndex]>><<combatperson>>
+  <</for>>
+<</nobr>><</widget>>
+
+<<widget 'deadwood-reblooms-double-leglock-status'>>
+  <<set _NPCDoubleLegLockStatus to maplebirch.VP.NPCDoublePenetration.playerLegLock>>
+  <<if _NPCDoubleLegLockStatus>>
+    <span @class="(_args[0] ? 'lewd' : ($lastOptions.feet isnot _feetOptions or _feetGold is true ? 'gold' : ''))">
+      <<if _args[0]>><<lanSwitch 'As you climax, you tighten your legs around ' '高潮时，你用腿更紧地锁住了'>><<else>><<lanSwitch 'Your legs are locked around ' '你用腿锁住了'>><</if>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockStatus.targets>><<lanSwitch '.' '。'>>
+    </span>
+  <</if>>
+<</widget>>
+
+<!-- 双腿锁定、持续和解除操作全部插入者，并沿用原版腿部技能与性行为控制判定。 -->
+<<widget 'deadwood-reblooms-double-leglock-effect'>>
+  <<set _NPCDoubleLegLockAction to _args[0]>>
+  <<if ['NPCDoubleLegLockVagina', 'NPCDoubleLegLockAnus', 'NPCDoubleLegLockKeep'].includes(_NPCDoubleLegLockAction)>>
+    <<set _NPCDoubleLegLockTargets to []>>
+    <<set _NPCDoubleLegLockKeep to _NPCDoubleLegLockAction is 'NPCDoubleLegLockKeep'>>
+    <<thighskilluse>><<set $feetactiondefault to _NPCDoubleLegLockKeep ? 'NPCDoubleLegLockKeep' : _NPCDoubleLegLockAction>>
+    <<if _NPCDoubleLegLockKeep is false>>
+      <<combatpromiscuity6>>
+    <</if>>
+    <<if _NPCDoubleLegLockKeep is false>>
+      <<set _NPCDoubleLegLockTargets to maplebirch.VP.NPCDoublePenetration.playerPenetrators()>>
+    <<elseif $VanillaPlus.npcDoublePenetration and $VanillaPlus.npcDoublePenetration.playerLegLock>>
+      <<set _NPCDoubleLegLockTargets to $VanillaPlus.npcDoublePenetration.playerLegLock.targets>>
+    <</if>>
+    <<set _NPCDoubleLegLockSuccess to _NPCDoubleLegLockTargets.length gte 2 and ($VanillaPlus.traits.promiscuity or $gamemode is 'soft' or $gloryhole)>>
+    <<if !_NPCDoubleLegLockSuccess and _NPCDoubleLegLockTargets.length gte 2>>
+      <<set _NPCDoubleLegLockSuccess to true>>
+      <<for _NPCDoubleLegLockTarget range _NPCDoubleLegLockTargets>>
+        <<set _NPCDoubleLegLockDifficulty to Math.floor((100 - $NPCList[_NPCDoubleLegLockTarget].pregnancyAvoidance) * (_NPCDoubleLegLockKeep ? 10 : 15))>>
+        <<if !combatSkillCheck('thigh', _NPCDoubleLegLockTarget, $NPCList[_NPCDoubleLegLockTarget].fullDescription, _NPCDoubleLegLockDifficulty)>><<set _NPCDoubleLegLockSuccess to false>><</if>>
+      <</for>>
+    <</if>>
+    <<if _NPCDoubleLegLockSuccess>>
+      <<for _NPCDoubleLegLockTarget range _NPCDoubleLegLockTargets>><<sex 5 'genitals' _NPCDoubleLegLockTarget>><</for>>
+      <<if _NPCDoubleLegLockKeep is false>>
+        <<brat 2>><<run maplebirch.VP.NPCDoublePenetration.setPlayerLegLock(_NPCDoubleLegLockTargets)>><<set $leglocktarget to _NPCDoubleLegLockTargets[0]>>
+        <<set $feetuse to 'legLock'>><<set $feetactiondefault to 'NPCDoubleLegLockKeep'>><<set $speechleglock to 1>>
+      <<else>>
+        <<brat 2>><<set $speechleglock to 1>>
+      <</if>>
+      <span @class="(_NPCDoubleLegLockKeep ? 'lewd' : 'lblue')">
+        <<if _NPCDoubleLegLockKeep>>
+          <<lanSwitch 'You keep every penetrator locked against you with your legs, leaving no one room to pull away.' '你继续用腿锁住所有插入者，不让任何人抽身。'>>
+        <<else>>
+          <<lanSwitch 'You lock every penetrator against you with your legs, preventing them from pulling out.' '你用腿锁住所有插入者，使他们无法抽出。'>>
+        <</if>>
+      </span>
+      <<thighstat>>
+    <<elseif $orgasmdown gte 1>>
+      <<for _NPCDoubleLegLockTarget range _NPCDoubleLegLockTargets>><<sex 5 'genitals' _NPCDoubleLegLockTarget>><</for>><<set $speechleglock to 1>>
+      <span class="lewd"><<lanSwitch 'You tighten your legs around all of them as you climax, keeping them from pulling away.' '你高潮时用腿更紧地锁住所有人，不让他们抽身。'>></span>
+    <<else>>
+      <<set $feetactiondefault to _NPCDoubleLegLockAction>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.VP.NPCDoublePenetration.clearPlayerLegLock()>>
+      <<if _NPCDoubleLegLockKeep>>
+        <span class="blue"><<lanSwitch 'You try to keep all of them locked with your legs, but they pull free.' '你试图继续用腿锁住所有人，但他们还是挣脱了。'>></span>
+      <<else>>
+        <<lanSwitch 'You try to lock all of them with your legs, but they pull free.' '你试图用腿锁住所有人，但他们还是挣脱了。'>>
+      <</if>>
+    <</if>>
+  <<elseif _NPCDoubleLegLockAction is 'NPCDoubleLegLockRelease'>>
+    <<set $feetactiondefault to 'NPCDoubleLegLockRelease'>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.VP.NPCDoublePenetration.clearPlayerLegLock()>>
+    <<lanSwitch 'You release all of them from your legs.' '你松开双腿，放开了所有人。'>>
+  <</if>>
+<</widget>>
+
+<!-- PC 主动控制双插同伴和自己一同享受；技能、淫乱与意识门槛显示在动作栏。 -->
+<<widget 'deadwood-reblooms-npc-double-pleasure'>>
+  <<set $_NPCDouble to $VanillaPlus.npcDoublePenetration>>
+  <!-- 人类与非人战斗分别读取淫乱和异种癖等级，再组合意识及自愿条件。 -->
+  <<set $_NPCDoublePleasureStat to $enemytype is 'man' ? 'promiscuity' : 'deviancy'>>
+  <<set $_NPCDoublePleasureStatReady to hasSexStat($_NPCDoublePleasureStat, 5)>>
+  <<set $_NPCDoublePleasureAware to $promiscuityIgnore or ($awareness gte 300 and $_NPCDoublePleasureStatReady)>>
+  <<set $_NPCDoubleCanUsePleasure to $VanillaPlus.traits.promiscuity or ($consensual is 1 and $_NPCDoublePleasureAware)>>
+  <<if maplebirch.VP.NPCDoublePenetration.visible and $_NPCDouble and $_NPCDoubleCanUsePleasure and ($VanillaPlus.traits.promiscuity or currentSkillValue('penileskill') gte 800)>>
+    <<set $penisactiondefault to 'NPCDoublePleasure'>>
+    <<combatpromiscuity5>>
+    <<set $_NPCDoubleRecipient to $NPCList[$_NPCDouble.recipient]>>
+    <<set $_NPCDoublePartner to $NPCList[$_NPCDouble.partner]>>
+    <<set $_NPCDoubleRecipientName to lanSwitch(
+      $_NPCDoubleRecipient.fullDescription,
+      $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription
+    )>>
+    <<set $_NPCDoublePartnerName to lanSwitch(
+      $_NPCDoublePartner.fullDescription,
+      $_NPCDoublePartner.fullDescription_CN || $_NPCDoublePartner.fullDescription
+    )>>
+    <<set $_NPCDoubleHole to $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>
+    <<set $_NPCDoubleHoleCN to $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>
+    <<personselect $_NPCDouble.recipient>>
+    <<language>>
+      <<option 'EN'>>
+        You drive in time with <<print $_NPCDoublePartnerName>>, taking pleasure in the two shafts moving together inside <<print $_NPCDoubleRecipientName+"'s "+$_NPCDoubleHole>>.
+      <<option 'CN'>>
+        你主动挺身，和<<print $_NPCDoublePartnerName>>一同抽插，让两根肉棒在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDoubleHoleCN>>里一同进出。
+    <</language>>
+    <<submission 5>>
+    <<sexControl 5 `currentSkillValue("penileskill")` $_NPCDouble.recipient $_NPCDouble.partner>>
+    <<penileskilluse>>
+  <<else>>
+    <span class="red"><<lanSwitch 'The double penetration is no longer available.' '双插姿势已经无法继续。'>></span>
+    <<set $penisactiondefault to 'cooperate'>>
+  <</if>>
+<</widget>>
+
 <!-- PC 双插开始：指定当前 NPC 作为原版阴道或肛门的第二名插入者。 -->
 <<widget 'deadwood-reblooms-player-double-begin'>>
-  <<set $_npcDoubleOrifice to _args[0]>>
-  <<set $_npcDoublePartner to _args[1]>>
-  <<set $_npcDoubleJoined to maplebirch.VP.NPCDoublePenetration.joinPlayer($_npcDoublePartner, $_npcDoubleOrifice)>>
-  <<if $_npcDoubleJoined>>
-    <<set $_npcDoublePrimary to $_npcDoubleOrifice is 'vagina' ? $vaginatarget : $anustarget>>
-    <<set $_npcDoublePrimaryNPC to $NPCList[$_npcDoublePrimary]>>
-    <<set $_npcDoublePrimaryName to lanSwitch(
-      $_npcDoublePrimaryNPC.fullDescription,
-      $_npcDoublePrimaryNPC.fullDescription_CN || $_npcDoublePrimaryNPC.fullDescription
+  <<set $_NPCDoubleOrifice to _args[0]>>
+  <<set $_NPCDoublePartner to _args[1]>>
+  <<set $_NPCDoubleJoined to maplebirch.VP.NPCDoublePenetration.joinPlayer($_NPCDoublePartner, $_NPCDoubleOrifice)>>
+  <<if $_NPCDoubleJoined>>
+    <<set $_NPCDoublePrimary to $_NPCDoubleOrifice is 'vagina' ? $vaginatarget : $anustarget>>
+    <<set $_NPCDoublePrimaryNPC to $NPCList[$_NPCDoublePrimary]>>
+    <<set $_NPCDoublePrimaryName to lanSwitch(
+      $_NPCDoublePrimaryNPC.fullDescription,
+      $_NPCDoublePrimaryNPC.fullDescription_CN || $_NPCDoublePrimaryNPC.fullDescription
     )>>
-    <<if $NPCList[$_npcDoublePartner].condom and $NPCList[$_npcDoublePartner].condom.willUse is true and $NPCList[$_npcDoublePartner].condom.worn is false and !$NPCList[$_npcDoublePartner].penisdesc.includes('strap-on')>>
-      <<if $NPCList[$_npcDoublePartner].chastity.penis.includes('chastity')>>
+    <<if $NPCList[$_NPCDoublePartner].condom and $NPCList[$_NPCDoublePartner].condom.willUse is true and $NPCList[$_NPCDoublePartner].condom.worn is false and !$NPCList[$_NPCDoublePartner].penisdesc.includes('strap-on')>>
+      <<if $NPCList[$_NPCDoublePartner].chastity.penis.includes('chastity')>>
         <<language>>
           <<option 'EN'>>
-            <<He>> tries to put a condom on, but cannot get it over <<his>> $NPCList[$_npcDoublePartner].chastity.penis. <span class="red"><<He>> quickly gives up.</span>
+            <<He>> tries to put a condom on, but cannot get it over <<his>> $NPCList[$_NPCDoublePartner].chastity.penis. <span class="red"><<He>> quickly gives up.</span>
           <<option 'CN'>>
-            <<He>>试着戴上避孕套，却怎么也套不过<<his>>的$NPCList[$_npcDoublePartner].chastity.penis。<span class="red"><<He>>很快放弃了。</span>
+            <<He>>试着戴上避孕套，却怎么也套不过<<his>>的$NPCList[$_NPCDoublePartner].chastity.penis。<span class="red"><<He>>很快放弃了。</span>
         <</language>>
-        <<set $NPCList[$_npcDoublePartner].condom.willUse to false>>
+        <<set $NPCList[$_NPCDoublePartner].condom.willUse to false>>
       <<else>>
         <span class="green">
           <<language>>
             <<option 'EN'>>
-              <<He>> slips <<condomDesc $_npcDoublePartner>> on <<his>> penis.
+              <<He>> slips <<condomDesc $_NPCDoublePartner>> on <<his>> penis.
             <<option 'CN'>>
-              <<He>>给<<his>>的肉棒戴上<<condomDesc $_npcDoublePartner>>。
+              <<He>>给<<his>>的肉棒戴上<<condomDesc $_NPCDoublePartner>>。
           <</language>>
         </span>
-        <<equipNPCCondom $_npcDoublePartner>>
+        <<equipNPCCondom $_NPCDoublePartner>>
       <</if>>
     <</if>>
-    <span class="lewd">
-      <<if $_npcDoubleOrifice is 'vagina'>>
-        <<language>>
-          <<option 'EN'>>
-            <<He>> moves beside <<print $_npcDoublePrimaryName>> and presses <<his>> penis against your <<pussy>>, crowding the other shaft at your entrance.
-          <<option 'CN'>>
-            <<He>>挤到<<print $_npcDoublePrimaryName>>身旁，将肉棒抵在你的<<pussy>>口，与另一根肉棒一同堵住入口。
-        <</language>>
-      <<else>>
-        <<language>>
-          <<option 'EN'>>
-            <<He>> moves beside <<print $_npcDoublePrimaryName>> and presses <<his>> penis against your anus, crowding the other shaft at your entrance.
-          <<option 'CN'>>
-            <<He>>挤到<<print $_npcDoublePrimaryName>>身旁，将肉棒抵在你的菊穴口，与另一根肉棒一同堵住入口。
-        <</language>>
-      <</if>>
-    </span>
+    <<if $_NPCDoubleOrifice is 'vagina'>>
+      <<language>>
+        <<option 'EN'>>
+          <<He>> moves beside <<print $_NPCDoublePrimaryName>> and <span class="blue">presses <<his>> penis against your <<pussy>></span>, crowding the other shaft at your entrance.
+        <<option 'CN'>>
+          <<He>>挤到<<print $_NPCDoublePrimaryName>>身旁，<span class="blue">将肉棒抵在你的<<pussy>>口</span>，与另一根肉棒一同堵住入口。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<He>> moves beside <<print $_NPCDoublePrimaryName>> and <span class="blue">presses <<his>> penis against your anus</span>, crowding the other shaft at your entrance.
+        <<option 'CN'>>
+          <<He>>挤到<<print $_NPCDoublePrimaryName>>身旁，<span class="blue">将肉棒抵在你的菊穴口</span>，与另一根肉棒一同堵住入口。
+      <</language>>
+    <</if>>
   <</if>>
 <</widget>>
 
 <!-- NPC 双插开始：占用第二名 NPC 的阴茎，并补充进入目标时的动作文本。 -->
 <<widget 'deadwood-reblooms-npc-double-begin'>>
-  <<set $_npcDoubleOrifice to _args[0]>>
-  <<set $_npcDoublePartner to _args[1]>>
-  <<run maplebirch.VP.NPCDoublePenetration.begin($penistarget, $_npcDoublePartner, $_npcDoubleOrifice)>>
-  <<if $VanillaPlus.npcDoublePenetration>>
-    <<set $_npcDoubleRecipient to $NPCList[$VanillaPlus.npcDoublePenetration.recipient]>>
-    <<set $_npcDoubleRecipientName to lanSwitch(
-      $_npcDoubleRecipient.fullDescription,
-      $_npcDoubleRecipient.fullDescription_CN || $_npcDoubleRecipient.fullDescription
+  <<set $_NPCDoubleOrifice to _args[0]>>
+  <<set $_NPCDoublePartner to _args[1]>>
+  <<set $_NPCDoubleStarted to maplebirch.VP.NPCDoublePenetration.begin($penistarget, $_NPCDoublePartner, $_NPCDoubleOrifice)>>
+  <<if $_NPCDoubleStarted>>
+    <<set $_NPCDoubleRecipient to $NPCList[$VanillaPlus.npcDoublePenetration.recipient]>>
+    <<set $_NPCDoubleRecipientName to lanSwitch(
+      $_NPCDoubleRecipient.fullDescription,
+      $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription
     )>>
-    <<if $NPCList[$_npcDoublePartner].condom and $NPCList[$_npcDoublePartner].condom.willUse is true and $NPCList[$_npcDoublePartner].condom.worn is false and !$NPCList[$_npcDoublePartner].penisdesc.includes('strap-on')>>
-      <<if $NPCList[$_npcDoublePartner].chastity.penis.includes('chastity')>>
+    <<if $NPCList[$_NPCDoublePartner].condom and $NPCList[$_NPCDoublePartner].condom.willUse is true and $NPCList[$_NPCDoublePartner].condom.worn is false and !$NPCList[$_NPCDoublePartner].penisdesc.includes('strap-on')>>
+      <<if $NPCList[$_NPCDoublePartner].chastity.penis.includes('chastity')>>
         <<language>>
           <<option 'EN'>>
-            <<He>> tries to put a condom on, but cannot get it over <<his>> $NPCList[$_npcDoublePartner].chastity.penis. <span class="red"><<He>> quickly gives up.</span>
+            <<He>> tries to put a condom on, but cannot get it over <<his>> $NPCList[$_NPCDoublePartner].chastity.penis. <span class="red"><<He>> quickly gives up.</span>
           <<option 'CN'>>
-            <<He>>试着戴上避孕套，却怎么也套不过<<his>>的$NPCList[$_npcDoublePartner].chastity.penis。<span class="red"><<He>>很快放弃了。</span>
+            <<He>>试着戴上避孕套，却怎么也套不过<<his>>的$NPCList[$_NPCDoublePartner].chastity.penis。<span class="red"><<He>>很快放弃了。</span>
         <</language>>
-        <<set $NPCList[$_npcDoublePartner].condom.willUse to false>>
+        <<set $NPCList[$_NPCDoublePartner].condom.willUse to false>>
       <<else>>
         <span class="green">
           <<language>>
             <<option 'EN'>>
-              <<He>> slips <<condomDesc $_npcDoublePartner>> on <<his>> penis.
+              <<He>> slips <<condomDesc $_NPCDoublePartner>> on <<his>> penis.
             <<option 'CN'>>
-              <<He>>给<<his>>的肉棒戴上<<condomDesc $_npcDoublePartner>>。
+              <<He>>给<<his>>的肉棒戴上<<condomDesc $_NPCDoublePartner>>。
           <</language>>
         </span>
-        <<equipNPCCondom $_npcDoublePartner>>
+        <<equipNPCCondom $_NPCDoublePartner>>
       <</if>>
     <</if>>
-    <span class="lewd">
-      <<if $VanillaPlus.npcDoublePenetration.stage is 'penetrated'>>
-        <<if $_npcDoubleOrifice is 'vagina'>>
-          <<language>>
-            <<option 'EN'>>
-              <<He>> pushes <<his>> penis in alongside yours. <<print $_npcDoubleRecipientName+"'s">> pussy stretches around both cocks, squeezing them tightly together as they thrust.
-            <<option 'CN'>>
-              <<He>>将肉棒贴着你的肉棒顶了进去。<<print $_npcDoubleRecipientName>>的小穴被两根肉棒撑开，紧紧夹着你们一同抽插。
-          <</language>>
-        <<else>>
-          <<language>>
-            <<option 'EN'>>
-              <<He>> pushes <<his>> penis in alongside yours. <<print $_npcDoubleRecipientName+"'s">> anus stretches around both cocks, squeezing them tightly together as they thrust.
-            <<option 'CN'>>
-              <<He>>将肉棒贴着你的肉棒顶了进去。<<print $_npcDoubleRecipientName>>的菊穴被两根肉棒撑开，紧紧夹着你们一同抽插。
-          <</language>>
-        <</if>>
+    <<if $VanillaPlus.npcDoublePenetration.stage is 'penetrated'>>
+      <<if $_NPCDoubleOrifice is 'vagina'>>
+        <<language>>
+          <<option 'EN'>>
+            <<He>> pushes <<his>> penis in alongside yours. <<print $_NPCDoubleRecipientName+"'s">> pussy stretches around both cocks, squeezing them tightly together as they thrust.
+          <<option 'CN'>>
+            <<He>>将肉棒贴着你的肉棒顶了进去。<<print $_NPCDoubleRecipientName>>的小穴被两根肉棒撑开，紧紧夹着你们一同抽插。
+        <</language>>
       <<else>>
         <<language>>
           <<option 'EN'>>
-            <<He>> presses the head of <<his>> penis against <<print $_npcDoubleRecipientName+"'s">> <<print $_npcDoubleOrifice is 'vagina' ? 'pussy' : 'anus'>>, rubbing it against yours as <<he>> tries to squeeze in.
+            <<He>> pushes <<his>> penis in alongside yours. <<print $_NPCDoubleRecipientName+"'s">> anus stretches around both cocks, squeezing them tightly together as they thrust.
           <<option 'CN'>>
-            <<He>>将龟头抵在<<print $_npcDoubleRecipientName>>的<<print $_npcDoubleOrifice is 'vagina' ? '小穴' : '菊穴'>>口，贴着你的肉棒来回磨蹭，试图和你一起挤进去。
+            <<He>>将肉棒贴着你的肉棒顶了进去。<<print $_NPCDoubleRecipientName>>的菊穴被两根肉棒撑开，紧紧夹着你们一同抽插。
         <</language>>
       <</if>>
-    </span>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<He>> presses the head of <<his>> penis against <<print $_NPCDoubleRecipientName+"'s">> <<print $_NPCDoubleOrifice is 'vagina' ? 'pussy' : 'anus'>>, rubbing it against yours as <<he>> tries to squeeze in.
+        <<option 'CN'>>
+          <<He>>将龟头抵在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDoubleOrifice is 'vagina' ? '小穴' : '菊穴'>>口，贴着你的肉棒来回磨蹭，试图和你一起挤进去。
+      <</language>>
+    <</if>>
   <</if>>
 <</widget>>
 
 <!-- NPC 双插回合：以明确的同伴和承受者关系取代原版仅面向 PC 的随机动作文本。 -->
 <<widget 'deadwood-reblooms-npc-double-turn'>>
   <<if maplebirch.VP.NPCDoublePenetration.update()>>
-    <<set $_npcDouble to $VanillaPlus.npcDoublePenetration>>
-    <<set $_npcDoubleRecipient to $NPCList[$_npcDouble.recipient]>>
-    <<set $_npcDoubleRecipientName to lanSwitch(
-      $_npcDoubleRecipient.fullDescription,
-      $_npcDoubleRecipient.fullDescription_CN || $_npcDoubleRecipient.fullDescription
+    <<set $_NPCDouble to $VanillaPlus.npcDoublePenetration>>
+    <<set $_NPCDoubleRecipient to $NPCList[$_NPCDouble.recipient]>>
+    <<set $_NPCDoubleRecipientName to lanSwitch(
+      $_NPCDoubleRecipient.fullDescription,
+      $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription
     )>>
-    <span class="lewd">
-      <<if $_npcDouble.stage is 'penetrated'>>
-        <<language>>
-          <<option 'EN'>>
-            <<He_Short>> keeps close beside you, <<his>> hips driving in the same rough rhythm as both cocks grind inside <<print $_npcDoubleRecipientName+"'s">> <<print $_npcDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>.
-          <<option 'CN'>>
-            <<He_Short>>紧贴在你身旁，胯部随着你的动作一同挺动，两根肉棒在<<print $_npcDoubleRecipientName>>的<<print $_npcDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>里挤磨。
-        <</language>>
-      <<elseif $_npcDouble.stage is 'imminent'>>
-        <<language>>
-          <<option 'EN'>>
-            <<He_Short>> crowds against you and pushes harder, <<his>> tip squeezing beside yours at <<print $_npcDoubleRecipientName+"'s">> <<print $_npcDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>.
-          <<option 'CN'>>
-            <<He_Short>>贴着你继续用力，龟头抵着你的肉棒，一同挤向<<print $_npcDoubleRecipientName>>的<<print $_npcDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>。
-        <</language>>
-      <<else>>
-        <<language>>
-          <<option 'EN'>>
-            <<He_Short>> grinds <<his>> tip against yours at <<print $_npcDoubleRecipientName+"'s">> <<print $_npcDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>, searching for room to press in beside you.
-          <<option 'CN'>>
-            <<He_Short>>把龟头贴着你的肉棒，在<<print $_npcDoubleRecipientName>>的<<print $_npcDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>口来回磨蹭，寻找与你一同挤进去的空隙。
-        <</language>>
-      <</if>>
-    </span>
+    <<if $_NPCDouble.stage is 'penetrated'>>
+      <<language>>
+        <<option 'EN'>>
+          <<He_Short>> keeps close beside you, <<his>> hips driving in the same rough rhythm as both cocks grind inside <<print $_NPCDoubleRecipientName+"'s">> <<print $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>.
+        <<option 'CN'>>
+          <<He_Short>>紧贴在你身旁，胯部随着你的动作一同挺动，两根肉棒在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>里挤磨。
+      <</language>>
+    <<elseif $_NPCDouble.stage is 'imminent'>>
+      <<language>>
+        <<option 'EN'>>
+          <<He_Short>> crowds against you and pushes harder, <<his>> tip squeezing beside yours at <<print $_NPCDoubleRecipientName+"'s">> <<print $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>.
+        <<option 'CN'>>
+          <<He_Short>>贴着你继续用力，龟头抵着你的肉棒，一同挤向<<print $_NPCDoubleRecipientName>>的<<print $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<He_Short>> grinds <<his>> tip against yours at <<print $_NPCDoubleRecipientName+"'s">> <<print $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>, searching for room to press in beside you.
+        <<option 'CN'>>
+          <<He_Short>>把龟头贴着你的肉棒，在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>口来回磨蹭，寻找与你一同挤进去的空隙。
+      <</language>>
+    <</if>>
   <</if>>
 <</widget>>
 
 <!-- NPC 双插射精：将第二名 NPC 的精液结算给被 PC 插入的目标，而不是 PC。 -->
 <<widget 'deadwood-reblooms-npc-double-ejaculation'>>
-  <<set $_npcDouble to $VanillaPlus.npcDoublePenetration>>
-  <<set $_npcDoubleRecipient to $NPCList[$_npcDouble.recipient]>>
-  <<set $_npcDoublePartner to $NPCList[$_npcDouble.partner]>>
-  <<set $_npcDoubleRecipientName to lanSwitch(
-    $_npcDoubleRecipient.fullDescription,
-    $_npcDoubleRecipient.fullDescription_CN || $_npcDoubleRecipient.fullDescription
+  <<set $_NPCDouble to $VanillaPlus.npcDoublePenetration>>
+  <<set $_NPCDoubleRecipient to $NPCList[$_NPCDouble.recipient]>>
+  <<set $_NPCDoublePartner to $NPCList[$_NPCDouble.partner]>>
+  <<set $_NPCDoubleRecipientName to lanSwitch(
+    $_NPCDoubleRecipient.fullDescription,
+    $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription
   )>>
-  <<set $_npcDoubleHole to $_npcDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>
-  <<set $_npcDoubleHoleCN to $_npcDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>
-  <<set $_npcDoubleDepth to $_npcDouble.stage is 'penetrated' ? 'deep' : $_npcDouble.stage is 'imminent' ? 'imminent' : 'outside'>>
-  <<if npcHasStrapon($_npcDouble.partner)>>
+  <<set $_NPCDoubleHole to $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>
+  <<set $_NPCDoubleHoleCN to $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>
+  <<set $_NPCDoubleDepth to $_NPCDouble.stage is 'penetrated' ? 'deep' : $_NPCDouble.stage is 'imminent' ? 'imminent' : 'outside'>>
+  <<if npcHasStrapon($_NPCDouble.partner)>>
     <<language>>
       <<option 'EN'>>
-        <<He>> shudders and grinds the strap-on against your penis, forcing both shafts deeper into <<print $_npcDoubleRecipientName+"'s "+$_npcDoubleHole>>.
+        <<He>> shudders and grinds the strap-on against your penis, forcing both shafts deeper into <<print $_NPCDoubleRecipientName+"'s "+$_NPCDoubleHole>>.
       <<option 'CN'>>
-        <<He>>浑身颤抖，绑带阳具紧贴着你的肉棒摩擦，将你们一同顶进<<print $_npcDoubleRecipientName>>的<<print $_npcDoubleHoleCN>>深处。
+        <<He>>浑身颤抖，绑带阳具紧贴着你的肉棒摩擦，将你们一同顶进<<print $_NPCDoubleRecipientName>>的<<print $_NPCDoubleHoleCN>>深处。
     <</language>>
   <<elseif _condomResult is 'contained'>>
     <<language>>
       <<option 'EN'>>
-        <<He>> groans and pounds alongside you inside <<print $_npcDoubleRecipientName+"'s "+$_npcDoubleHole>>, <<his>> condom swelling with every pulse.
+        <<He>> groans and pounds alongside you inside <<print $_NPCDoubleRecipientName+"'s "+$_NPCDoubleHole>>, <<his>> condom swelling with every pulse.
       <<option 'CN'>>
-        <<He>>贴着你的肉棒，在<<print $_npcDoubleRecipientName>>的<<print $_npcDoubleHoleCN>>里用力抽插，低吼着一股股射进避孕套，直至套身鼓胀。
+        <<He>>贴着你的肉棒，在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDoubleHoleCN>>里用力抽插，低吼着一股股射进避孕套，直至套身鼓胀。
     <</language>>
   <<else>>
     <<if _condomResult is 'leaked'>>
@@ -182,31 +325,31 @@
     <<elseif _condomResult is 'burst'>>
       <span class="red"><<lanSwitch 'The tip of the condom bursts open.' '避孕套顶端爆开了。'>></span>
     <</if>>
-    <<if $_npcDouble.stage is 'penetrated'>>
+    <<if $_NPCDouble.stage is 'penetrated'>>
       <<language>>
         <<option 'EN'>>
-          <<He>> rams in beside you and groans, <<his>> penis pulsing against yours as thick semen spills deep into <<print $_npcDoubleRecipientName+"'s "+$_npcDoubleHole>>.
+          <<He>> rams in beside you and groans, <<his>> penis pulsing against yours as thick semen spills deep into <<print $_NPCDoubleRecipientName+"'s "+$_NPCDoubleHole>>.
         <<option 'CN'>>
-          <<He>>贴着你猛顶到底，肉棒抵着你的肉棒一阵抽搐，将浓稠的精液灌进<<print $_npcDoubleRecipientName>>的<<print $_npcDoubleHoleCN>>深处。
+          <<He>>贴着你猛顶到底，肉棒抵着你的肉棒一阵抽搐，将浓稠的精液灌进<<print $_NPCDoubleRecipientName>>的<<print $_NPCDoubleHoleCN>>深处。
       <</language>>
     <<else>>
       <<language>>
         <<option 'EN'>>
-          <<He>> groans and ejaculates before <<he>> can force <<his>> way in, splattering semen across <<print $_npcDoubleRecipientName+"'s "+$_npcDoubleHole>> and your penis.
+          <<He>> groans and ejaculates before <<he>> can force <<his>> way in, splattering semen across <<print $_NPCDoubleRecipientName+"'s "+$_NPCDoubleHole>> and your penis.
         <<option 'CN'>>
-          <<He>>还没能完全挤进去便低吼着射了出来，浓稠的精液溅满<<print $_npcDoubleRecipientName>>的<<print $_npcDoubleHoleCN>>和你的肉棒。
+          <<He>>还没能完全挤进去便低吼着射了出来，浓稠的精液溅满<<print $_NPCDoubleRecipientName>>的<<print $_NPCDoubleHoleCN>>和你的肉棒。
       <</language>>
     <</if>>
     <<npcPregnancyRoll
-      $_npcDoubleRecipient.fullDescription
-      $_npcDoubleRecipient.type
-      $_npcDoublePartner.fullDescription
-      $_npcDoublePartner.type
-      $_npcDouble.orifice
-      $_npcDoubleDepth
+      $_NPCDoubleRecipient.fullDescription
+      $_NPCDoubleRecipient.type
+      $_NPCDoublePartner.fullDescription
+      $_NPCDoublePartner.type
+      $_NPCDouble.orifice
+      $_NPCDoubleDepth
       $location
       1
-      $_npcDouble.recipient
+      $_NPCDouble.recipient
     >>
   <</if>>
 <</widget>>
