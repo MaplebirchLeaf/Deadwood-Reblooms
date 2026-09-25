@@ -96,6 +96,14 @@ export default function (maplebirch: typeof window.maplebirch) {
       ]
     },
     widgetPassage: {
+      Widgets: [
+        // 原版各类战斗共用 willpowerpain；只缩短其入口条件，不复制原版分支和结算。
+        {
+          src: '$pain gte 100 and $willpowerpain is undefined and _willpowerpainchecked isnot true',
+          to: '$pain gte 100 and !$VanillaPlus.traits.willpower and $willpowerpain is undefined and _willpowerpainchecked isnot true',
+          expected: 1
+        }
+      ],
       Cheats: [
         // 将作弊面板意志滑条上限改为动态 125%，未突破时继续使用原版 $willpowermax。
         {
