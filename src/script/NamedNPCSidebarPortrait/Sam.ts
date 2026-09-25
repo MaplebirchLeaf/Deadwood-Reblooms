@@ -39,7 +39,7 @@ export default function (maplebirch: MaplebirchCore): void {
           if (!clothes[slot]) continue;
           clothes[slot].colour = 'red';
           clothes[slot].accessory_colour = 'red';
-          clothes[slot].pattern = 0;
+          clothes[slot].pattern = '';
         }
     });
   });

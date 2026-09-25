@@ -311,10 +311,16 @@ function filterExistingFiles(fileSet: Set<string>, fileList: readonly string[]):
   return fileList.filter(filePath => fileSet.has(filePath));
 }
 
-function buildFrameworkPlugin(distFileSet: Set<string>, sidebarClothesFiles: string[], audioFolders: string[], current?: ScmlPlugin): ScmlPlugin | null {
+function buildFrameworkPlugin(
+  distFileSet: Set<string>,
+  translationFiles: Record<'CN' | 'EN', string[]>,
+  sidebarClothesFiles: string[],
+  audioFolders: string[],
+  current?: ScmlPlugin
+): ScmlPlugin | null {
   const params = {
     ...((current?.params && typeof current.params === 'object' && !Array.isArray(current.params) ? current.params : {}) as Record<string, unknown>),
-    language: ['CN', 'EN']
+    language: translationFiles
   } as Record<string, unknown> & {
     module?: string[];
     script?: string[];
@@ -349,6 +355,7 @@ function buildAddonPlugins(
   dependencies: ScmlConfig['dependenceInfo'],
   clothes: Array<{ key: string; filePath: string }>,
   distFileSet: Set<string>,
+  translationFiles: Record<'CN' | 'EN', string[]>,
   sidebarClothesFiles: string[],
   audioFolders: string[],
   beautySelectorParams: BeautySelectorParams | null,
@@ -360,7 +367,7 @@ function buildAddonPlugins(
   upsertPlugin(
     addonPlugin,
     plugin => plugin.modName === 'maplebirch' && plugin.addonName === 'maplebirchAddon',
-    buildFrameworkPlugin(distFileSet, sidebarClothesFiles, audioFolders, FrameworkPlugin),
+    buildFrameworkPlugin(distFileSet, translationFiles, sidebarClothesFiles, audioFolders, FrameworkPlugin),
     true
   );
 
@@ -503,6 +510,10 @@ export async function createZip(rootDir: string): Promise<Buffer> {
 
   const distFileSet = new Set<string>();
   distFiles.forEach((_, filePath) => distFileSet.add(filePath));
+  const translationFiles = {
+    CN: [...publicFiles.keys()].filter(filePath => filePath.startsWith('translations/CN/') && /\.ya?ml$/i.test(filePath)).sort(),
+    EN: [...publicFiles.keys()].filter(filePath => filePath.startsWith('translations/EN/') && /\.ya?ml$/i.test(filePath)).sort()
+  };
   const bootFileLists = BootFileLists(allFiles);
   const audioFolders = AudioFolders(allFiles);
   const sidebarClothesFiles = SidebarClothesFiles(allFiles);
@@ -521,6 +532,7 @@ export async function createZip(rootDir: string): Promise<Buffer> {
     pkg.scml.dependenceInfo,
     ClothesFiles(publicFiles),
     distFileSet,
+    translationFiles,
     sidebarClothesFiles,
     audioFolders,
     beautySelector?.params ?? null,

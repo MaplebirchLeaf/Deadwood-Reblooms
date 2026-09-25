@@ -21,7 +21,7 @@ class Deviancy {
     return (
       !V.VanillaPlus.lock.deviancy &&
       !V.VanillaPlus.deviancy.conducted &&
-      V.deviancy >= 100 &&
+      V.deviancy >= window.maplebirch.VP.normalCeiling('deviancy') &&
       V.VanillaPlus.deviancy.wildsong &&
       V.gwylan.purged >= 20 &&
       V.dateCount.GwylanSex >= 3 &&
@@ -42,11 +42,11 @@ class Deviancy {
   }
 
   public get unlock(): boolean {
-    return !V.VanillaPlus.lock.deviancy && V.deviancy >= 100 && V.VanillaPlus.deviancy.wildsong && V.VanillaPlus.deviancy.conducted;
+    return !V.VanillaPlus.lock.deviancy && V.deviancy >= window.maplebirch.VP.normalCeiling('deviancy') && V.VanillaPlus.deviancy.wildsong && V.VanillaPlus.deviancy.conducted;
   }
 
   public get max(): boolean {
-    return V.VanillaPlus.lock.deviancy && V.deviancy >= 150;
+    return V.VanillaPlus.lock.deviancy && V.deviancy >= window.maplebirch.VP.ceiling('deviancy');
   }
 
   public developer(): void {
@@ -54,7 +54,7 @@ class Deviancy {
     V.VanillaPlus.deviancy.wildsong = true;
     V.VanillaPlus.deviancy.conducted = true;
     Object.assign(this.mirrors, { home: true, farm: true, tower: true });
-    V.deviancy = 100;
+    V.deviancy = window.maplebirch.VP.normalCeiling('deviancy');
   }
 }
 

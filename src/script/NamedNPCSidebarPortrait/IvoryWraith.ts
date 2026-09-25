@@ -77,7 +77,7 @@ export default function (maplebirch: MaplebirchCore): void {
           const worn = npc.clothes?.[slot];
           const resource = worn && setup.clothes?.[slot]?.find((item: any) => item.name === worn.name);
           if (!resource) continue;
-          clothes[slot] = { ...clone(resource), ...clone(worn), slot };
+          clothes[slot] = { ...clone(resource), ...clone(worn) };
         }
         // 原版暴露标志优先于衣物名字；下身脱除包含袜子，手铐和项链保留。
         if (exposed(npc.chest)) wardrobe.strip(clothes, upper);

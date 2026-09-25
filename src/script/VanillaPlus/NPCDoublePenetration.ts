@@ -154,7 +154,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     'combatXrayPenis'
   );
 
-  maplebirch.tool.zone.inject({
+  maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Combat Man-Combat': [
         // 双插同伴已有明确的 NPC 目标；禁止原版手部 AI 在同一回合又随机转向 PC。
@@ -171,8 +171,8 @@ export default function (maplebirch: typeof window.maplebirch) {
         },
         // 命名 NPC 对白仍默认面向 PC；双插同伴改用明确写出承受者的回合文本，并阻止随后生成泛用对白。
         {
-          src: '<<namedNpcComments $NPCList[_n].fullDescription>>',
-          to: '<<if maplebirch.VP.NPCDoublePenetration.isPartner(_n)>><<deadwood-reblooms-npc-double-turn>><<set _noNameComment to false>><<else>><<namedNpcComments $NPCList[_n].fullDescription>><</if>>',
+          srcmatch: /<<namedNpcComments (\$NPCList\[_n\]\.fullDescription|_n)>>/,
+          to: '<<if maplebirch.VP.NPCDoublePenetration.isPartner(_n)>><<deadwood-reblooms-npc-double-turn>><<set _noNameComment to false>><<else>><<namedNpcComments $1>><</if>>',
           expected: 1
         }
       ],

@@ -1,7 +1,6 @@
 // ./src/script/NamedNPCSidebarPortrait/Winter.ts
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
-import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 
 export default function (maplebirch: MaplebirchCore): void {
   maplebirch.tool.onInit(() => {
@@ -18,11 +17,8 @@ export default function (maplebirch: MaplebirchCore): void {
     }
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
     wardrobe.base('Winter', clothes => {
-      for (const item of Object.values(C.npc?.Winter?.pronoun === 'm' ? male : female)) sidebar.apply(clothes, item);
+      wardrobe.put(clothes, C.npc?.Winter?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
     // 原版注册 teacher；学校、博物馆和 Lake Office 的实际会面均穿复古装，在场由 V.npc 决定。
     wardrobe.wear('Winter', '*', 'vintage_pantsuit_formal', () => C.npc?.Winter?.pronoun === 'm');

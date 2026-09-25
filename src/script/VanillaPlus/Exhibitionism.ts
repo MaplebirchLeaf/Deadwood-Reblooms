@@ -4,10 +4,10 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.onInit(() => {
     setup.feats['Beyond Shame'] ??= {
       get title() {
-        return maplebirch.t('deadwood-reblooms.VanillaPlus.exhibitionism.feat.title');
+        return maplebirch.t('deadwood-reblooms:VanillaPlus:exhibitionism:feat:title');
       },
       get desc() {
-        return maplebirch.t('deadwood-reblooms.VanillaPlus.exhibitionism.feat.description');
+        return maplebirch.t('deadwood-reblooms:VanillaPlus:exhibitionism:feat:description');
       },
       difficulty: 3,
       series: '',
@@ -25,7 +25,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   });
 
   // 记录原版裸露挑战结果，并扩展暴露癖上限。
-  maplebirch.tool.zone.inject({
+  maplebirch.tool.inject({
     locationPassage: {
       'Photo High Start': [
         // 在拍摄初始化后清空商业街裸奔临时标记，防止上一次拍摄结果污染新事件。
@@ -65,10 +65,10 @@ export default function (maplebirch: typeof window.maplebirch) {
     },
     widgetPassage: {
       Cheats: [
-        // 将作弊面板暴露癖滑条上限改为 100/150 动态值，保留原版反向显示。
+        // 将作弊面板暴露癖滑条上限按突破倍率计算，保留原版反向显示。
         {
           src: '$exhibitionism "exhibitionism" {reverse: true}',
-          to: '$exhibitionism "exhibitionism" {max: $VanillaPlus.lock.exhibitionism ? 150 : 100, reverse: true}'
+          to: '$exhibitionism "exhibitionism" {max: $VanillaPlus.lock.exhibitionism ? maplebirch.VP.ceiling("exhibitionism") : maplebirch.VP.normalCeiling("exhibitionism"), reverse: true}'
         }
       ],
       'Widgets Exhibitionism': [
@@ -77,10 +77,10 @@ export default function (maplebirch: typeof window.maplebirch) {
           src: '<<unset $desperateaction>>',
           applybefore: '<<deadwood-reblooms-exhibitionism-trait-effects $_n>>'
         },
-        // 完整保留原版五级结算后，每四次非绝望行为折算一点六级进度，再应用突破后的 150 上限。
+        // 完整保留原版五级结算后，每四次非绝望行为折算一点六级进度，再应用倍率上限。
         {
           src: '<<set $exhibitionism to Math.clamp($exhibitionism, 0, 100)>>',
-          to: '<<if $_n is 5 and $VanillaPlus.lock.exhibitionism and $exhibitionism gte 100 and $exhibitionism lt 150 and $desperateaction isnot 1 and $desperateaction isnot 2 and typeof $desperateaction isnot "string">>\n\t<<set $VanillaPlus.exhibitionism.levelFiveProgress to ($VanillaPlus.exhibitionism.levelFiveProgress || 0) + 1>>\n\t<<if $VanillaPlus.exhibitionism.levelFiveProgress gte 4>>\n\t\t<<set $VanillaPlus.exhibitionism.levelFiveProgress -= 4>>\n\t\t<<set $exhibitionism to Math.clamp($exhibitionism + 1, 100, 150)>>\n\t<</if>>\n<</if>>\n<<set $exhibitionism to Math.clamp($exhibitionism, maplebirch.VP.minimum(\'exhibitionism\'), $VanillaPlus.lock.exhibitionism ? 150 : 100)>>',
+          to: '<<if $_n is 5 and $VanillaPlus.lock.exhibitionism and $exhibitionism gte maplebirch.VP.normalCeiling("exhibitionism") and $exhibitionism lt maplebirch.VP.ceiling("exhibitionism") and $desperateaction isnot 1 and $desperateaction isnot 2 and typeof $desperateaction isnot "string">>\n\t<<set $VanillaPlus.exhibitionism.levelFiveProgress to ($VanillaPlus.exhibitionism.levelFiveProgress || 0) + 1>>\n\t<<if $VanillaPlus.exhibitionism.levelFiveProgress gte 4>>\n\t\t<<set $VanillaPlus.exhibitionism.levelFiveProgress -= 4>>\n\t\t<<set $exhibitionism to Math.clamp($exhibitionism + 1, maplebirch.VP.normalCeiling("exhibitionism"), maplebirch.VP.ceiling("exhibitionism"))>>\n\t<</if>>\n<</if>>\n<<set $exhibitionism to Math.clamp($exhibitionism, maplebirch.VP.minimum(\'exhibitionism\'), $VanillaPlus.lock.exhibitionism ? maplebirch.VP.ceiling("exhibitionism") : maplebirch.VP.normalCeiling("exhibitionism"))>>',
           expected: 1
         }
       ],
@@ -88,7 +88,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 替换全局暴露癖钳制公式，使其他来源的数值变化同样遵守突破边界。
         {
           src: '<<set $exhibitionism to Math.clamp($exhibitionism, 0, 100)>>',
-          to: "<<set $exhibitionism to Math.clamp($exhibitionism, maplebirch.VP.minimum('exhibitionism'), $VanillaPlus.lock.exhibitionism ? 150 : 100)>>"
+          to: "<<set $exhibitionism to Math.clamp($exhibitionism, maplebirch.VP.minimum('exhibitionism'), $VanillaPlus.lock.exhibitionism ? maplebirch.VP.ceiling('exhibitionism') : maplebirch.VP.normalCeiling('exhibitionism'))>>"
         }
       ]
     }

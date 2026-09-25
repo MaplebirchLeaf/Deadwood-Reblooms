@@ -322,7 +322,18 @@ class Promiscuity {
   public get ready(): boolean {
     const progress = V.VanillaPlus.promiscuity;
     const genitals = (!V.player.penisExist || progress.penis) && (!V.player.vaginaExist || progress.vagina);
-    return V.promiscuity >= 100 && V.exhibitionism >= 100 && V.deviancy >= 100 && progress.hands && progress.feet && progress.mouth && progress.anus && progress.chest && progress.thigh && genitals;
+    return (
+      V.promiscuity >= window.maplebirch.VP.normalCeiling('promiscuity') &&
+      V.exhibitionism >= window.maplebirch.VP.normalCeiling('exhibitionism') &&
+      V.deviancy >= window.maplebirch.VP.normalCeiling('deviancy') &&
+      progress.hands &&
+      progress.feet &&
+      progress.mouth &&
+      progress.anus &&
+      progress.chest &&
+      progress.thigh &&
+      genitals
+    );
   }
 
   public get unlock(): boolean {
@@ -330,15 +341,15 @@ class Promiscuity {
   }
 
   public get max(): boolean {
-    return V.VanillaPlus.lock.promiscuity && V.promiscuity >= 150;
+    return V.VanillaPlus.lock.promiscuity && V.promiscuity >= window.maplebirch.VP.ceiling('promiscuity');
   }
 
   public developer(): void {
     V.VanillaPlus.lock.promiscuity = false;
     for (const part of this.bodyParts) V.VanillaPlus.promiscuity[part] = true;
-    V.promiscuity = 100;
-    V.exhibitionism = Math.max(V.exhibitionism, 100);
-    V.deviancy = Math.max(V.deviancy, 100);
+    V.promiscuity = window.maplebirch.VP.normalCeiling('promiscuity');
+    V.exhibitionism = Math.max(V.exhibitionism, window.maplebirch.VP.normalCeiling('exhibitionism'));
+    V.deviancy = Math.max(V.deviancy, window.maplebirch.VP.normalCeiling('deviancy'));
   }
 }
 

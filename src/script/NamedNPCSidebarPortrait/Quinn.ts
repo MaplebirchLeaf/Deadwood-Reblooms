@@ -20,11 +20,9 @@ export default function (maplebirch: MaplebirchCore): void {
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
     const party = () => /^Mansion Party Quinn(?: |$)/.test(maplebirch.passage.title);
     wardrobe.base('Quinn', clothes => {
-      if (!party()) for (const item of Object.values(C.npc?.Quinn?.pronoun === 'm' ? male : female)) sidebar.apply(clothes, item);
+      if (!party()) wardrobe.put(clothes, C.npc?.Quinn?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
     // 市政厅、咖啡馆开幕与艾弗里牌局：在场沿用原版 npc Quinn 写入的 V.npc。
     wardrobe.wear('Quinn', '*', 'business_suit_male', () => !party() && C.npc?.Quinn?.pronoun === 'm');

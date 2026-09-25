@@ -7,8 +7,8 @@ type FluidType = NonNullable<Parameters<typeof maplebirch.npc.fluids.add>[3]>;
 type DialogueHistory = Partial<Record<'m' | 'f', { line: string; namedLine: string }>>;
 
 class LongerCombat {
-  static readonly TEXT_KEY = 'deadwood-reblooms.LongerCombat';
-  static readonly NPC_KEY = `${LongerCombat.TEXT_KEY}.npc`;
+  static readonly TEXT_KEY = 'deadwood-reblooms:LongerCombat';
+  static readonly NPC_KEY = `${LongerCombat.TEXT_KEY}:npc`;
   static readonly STATE_PARTS = ['lefthand', 'righthand', 'mouth', 'penis', 'vagina'] as const;
   private readonly lastLines = new Map<number, { name: string; lines: DialogueHistory }>();
 
@@ -43,7 +43,7 @@ class LongerCombat {
     for (const part of LongerCombat.STATE_PARTS) {
       const state = npc[part];
       if (!state) continue;
-      const key = `${LongerCombat.NPC_KEY}.${part}.${state}`;
+      const key = `${LongerCombat.NPC_KEY}:${part}:${state}`;
       const line = maplebirch.t(key);
       if (line && line !== `[${key}]`) Text += line;
     }
@@ -60,8 +60,8 @@ class LongerCombat {
 
   private npcLine(prefix: string, previous?: string): string {
     const lines: string[] = [];
-    for (let i = 0; this.core.lang.has(`${prefix}.${i}`); i++) {
-      const key = `${prefix}.${i}`;
+    for (let i = 0; this.core.services.translator.has(`${prefix}:${i}`); i++) {
+      const key = `${prefix}:${i}`;
       const line = maplebirch.t(key);
       if (line && line !== `[${key}]`) lines.push(line);
     }
@@ -91,17 +91,17 @@ class LongerCombat {
     const speech: string[] = [];
     for (const value of genders) {
       const previous = lines[value];
-      const line = this.npcLine(`${LongerCombat.NPC_KEY}.${value}.${type}.${group}.${stage}`, previous?.line);
+      const line = this.npcLine(`${LongerCombat.NPC_KEY}:${value}:${type}:${group}:${stage}`, previous?.line);
       if (!line) continue;
-      const prefix = `${LongerCombat.NPC_KEY}.named.${character}.${value}.${type}.${stage}`;
-      const namedLine = this.core.lang.has(`${prefix}.0`) && Math.random() < 0.6 ? this.npcLine(prefix, previous?.namedLine) : '';
+      const prefix = `${LongerCombat.NPC_KEY}:named:${character}:${value}:${type}:${stage}`;
+      const namedLine = this.core.services.translator.has(`${prefix}:0`) && Math.random() < 0.6 ? this.npcLine(prefix, previous?.namedLine) : '';
       lines[value] = { line, namedLine: namedLine || previous?.namedLine || '' };
       speech.push('"' + (namedLine ? namedLine + space + line : line) + '"');
     }
     if (speech.length === 0) return description;
     this.lastLines.set(index, { name, lines });
-    if (speech.length === 1) return description + speech[0] + space + npc.pronouns.he + space + maplebirch.t(`${LongerCombat.NPC_KEY}.says`).trim();
-    const pause = this.npcLine(`${LongerCombat.NPC_KEY}.pause`);
+    if (speech.length === 1) return description + speech[0] + space + npc.pronouns.he + space + maplebirch.t(`${LongerCombat.NPC_KEY}:says`).trim();
+    const pause = this.npcLine(`${LongerCombat.NPC_KEY}:pause`);
     return description + speech[0] + space + npc.pronouns.he + space + pause + space + speech[1];
   }
 
@@ -119,7 +119,7 @@ class LongerCombat {
         const cn = maplebirch.Language === 'CN';
         const name = (cn ? npc.fullDescription_CN : npc.fullDescription) || npc.fullDescription || npc.pronouns?.he || '';
         // 先输出完整的 NPC 段落，再转向下一位；命名角色显示姓名，避免多人代词混淆。
-        const transition = this.npcLine(`${LongerCombat.NPC_KEY}.transition`).replace('{name}', () => name);
+        const transition = this.npcLine(`${LongerCombat.NPC_KEY}:transition`).replace('{name}', () => name);
         sWikifier((cn ? '' : ' ') + transition);
       }
       sWikifier(Text);
@@ -281,7 +281,7 @@ class LongerCombat {
     V.enemyarousal = Math.floor(V.enemyarousalmax * (0.15 + Math.random() * 0.1));
     T.combatend = false;
 
-    sWikifier(`<br><br><<lanLink 'deadwood-reblooms.LongerCombat.next' ${JSON.stringify(this.passageTitle)} 'capitalize'>><</lanLink>>`);
+    sWikifier(`<br><br><<lanLink 'deadwood-reblooms:LongerCombat:next' ${JSON.stringify(this.passageTitle)} 'capitalize'>><</lanLink>>`);
 
     return fragment;
   }

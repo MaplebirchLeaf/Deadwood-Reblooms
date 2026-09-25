@@ -20,10 +20,8 @@ export default function (maplebirch: MaplebirchCore): void {
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
     wardrobe.base('Leighton', clothes => {
-      for (const item of Object.values(C.npc?.Leighton?.pronoun === 'm' ? male : female)) sidebar.apply(clothes, item);
+      wardrobe.put(clothes, C.npc?.Leighton?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
     // Widgets Named Npcs 注册 teacher；办公室、巡查及妓院会面采用商务装，在场沿用原版 V.npc。
     wardrobe.wear('Leighton', '*', 'business_suit_male', () => C.npc?.Leighton?.pronoun === 'm');

@@ -20,10 +20,8 @@ export default function (maplebirch: MaplebirchCore): void {
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
     wardrobe.base('Remy', clothes => {
-      for (const item of Object.values(C.npc?.Remy?.pronoun === 'm' ? male : female)) sidebar.apply(clothes, item);
+      wardrobe.put(clothes, C.npc?.Remy?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
     // 骑术学校、地下农场与庄园的实际出场由原版 npc Remy 写入 V.npc。
     wardrobe.wear('Remy', '*', 'riding_formal');

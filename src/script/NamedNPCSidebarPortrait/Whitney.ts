@@ -32,18 +32,14 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const female = wardrobe.get('female_underwear') ?? {};
-    const male = wardrobe.get('male_underwear') ?? {};
 
     // 基层内衣
     wardrobe.base('Whitney', (clothes, context) => {
       // 万圣节破布下面明确没有其它衣物。
       if (context.key === 'naked' || context.location === 'halloween') return;
       const is_male = C.npc?.Whitney?.pronoun === 'm';
-      for (const item of Object.values(is_male ? male : female)) {
-        if (context.location === 'topless' && item.slot === 'under_upper') continue;
-        sidebar.apply(clothes, item);
-      }
+      const slots = context.location === 'topless' ? (['under_lower'] as const) : (['under_upper', 'under_lower'] as const);
+      wardrobe.put(clothes, is_male ? 'male_underwear' : 'female_underwear', slots);
       if (is_male) delete clothes.under_upper;
     });
 
@@ -192,9 +188,11 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
       if (!rules) return;
       for (const rule of rules) {
         const slots = rule.slots.filter(slot => slot !== 'lower' || clothes.upper?.name !== 'oversized hoodie');
-        const items = slots.map(slot => clothes[slot]).filter(item => item?.index !== undefined);
+        const items = slots.map(slot => ({ slot, item: clothes[slot as keyof typeof clothes] })).filter(entry => entry.item?.index !== undefined);
         if (items.length !== slots.length) continue;
-        const optionSets = items.map(item => setup.clothes[item.slot]?.[item.index]?.colour_options as string[] | undefined);
+        const optionSets = items.map(({ slot, item }) =>
+          item?.index === undefined ? undefined : (setup.clothes[slot as keyof typeof setup.clothes]?.[item.index]?.colour_options as string[] | undefined)
+        );
         if (optionSets.some(options => !Array.isArray(options) || !options.length)) continue;
         const options = optionSets[0]!.filter(colour => optionSets.every(set => set!.includes(colour)));
         if (!options.length) continue;
@@ -204,7 +202,7 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
           colour = sidebar.randomColour(options, preferColours('Whitney', rule.weights(), C.npc?.Whitney?.pronoun !== 'm'));
           colours.clothes.set(cacheKey, colour);
         }
-        for (const item of items) item.colour = colour;
+        for (const { item } of items) if (item) item.colour = colour;
       }
     });
     trainers(maplebirch, 'Whitney', colours.outfit);

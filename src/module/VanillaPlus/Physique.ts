@@ -3,11 +3,11 @@
 class Physique {
   public get unlock(): boolean {
     const physique = V.VanillaPlus.physique;
-    return !V.VanillaPlus.lock.physique && V.physique >= V.physiquesize && physique.panic && physique.heroic && physique.farm && physique.pound;
+    return !V.VanillaPlus.lock.physique && V.physique >= window.maplebirch.VP.normalCeiling('physique') && physique.panic && physique.heroic && physique.farm && physique.pound;
   }
 
   public get max(): boolean {
-    return V.VanillaPlus.lock.physique && V.physique >= Math.floor(V.physiquesize * 1.25);
+    return V.VanillaPlus.lock.physique && V.physique >= window.maplebirch.VP.ceiling('physique');
   }
 
   public get canBreakBindings(): boolean {
@@ -36,7 +36,7 @@ class Physique {
       farm: true,
       pound: true
     });
-    V.physique = V.physiquesize;
+    V.physique = window.maplebirch.VP.normalCeiling('physique');
   }
 }
 

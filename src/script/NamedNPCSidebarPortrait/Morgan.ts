@@ -1,7 +1,6 @@
 // ./src/script/NamedNPCSidebarPortrait/Morgan.ts
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
-import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 
 export default function (maplebirch: MaplebirchCore): void {
   maplebirch.tool.onInit(() => {
@@ -18,16 +17,13 @@ export default function (maplebirch: MaplebirchCore): void {
     }
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
     function naked(): boolean {
       const title = maplebirch.passage.title;
       return title === 'Sewers Sex Ed' || ((title === 'Sewers Rape' || title === 'Sewers Rape Finish') && V.phase === 1);
     }
     wardrobe.base('Morgan', clothes => {
       if (naked()) return;
-      for (const item of Object.values(C.npc?.Morgan?.pronoun === 'm' ? male : female)) sidebar.apply(clothes, item);
+      wardrobe.put(clothes, C.npc?.Morgan?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
     // Sewers Intro 明写破旧西装／礼服；追猎提示不代表在场，仍以 V.npc 为准。
     wardrobe.wear('Morgan', '*', 'tattered_tuxedo', () => !naked() && C.npc?.Morgan?.pronoun === 'm');

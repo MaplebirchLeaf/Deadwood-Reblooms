@@ -114,7 +114,7 @@ class Fish extends Transformation {
   protected override extend(maplebirch: MaplebirchCore): void {
     const descriptions = () => {
       const item = setup.clothes.head.find((item: Record<string, string>) => item.variable === 'pearl_shell_hair_clip');
-      if (item) item.description = maplebirch.t('deadwood-reblooms.clothes.pearl_shell_hair_clip.description');
+      if (item) item.description = maplebirch.t('deadwood-reblooms:clothes:pearl_shell_hair_clip:description');
     };
     maplebirch.tool.onInit(descriptions);
     maplebirch.on(':language', descriptions);
@@ -122,24 +122,24 @@ class Fish extends Transformation {
     maplebirch.tool.patch.traits.add(
       {
         title: 'General Traits',
-        name: () => maplebirch.t('deadwood-reblooms.Traits.gills.name'),
+        name: () => maplebirch.t('deadwood-reblooms:Traits:gills:name'),
         colour: 'lblue',
         has: () => !['disabled', 'hidden'].includes(V.transformationParts.traits.gills),
-        text: () => maplebirch.t('deadwood-reblooms.Traits.gills.text')
+        text: () => maplebirch.t('deadwood-reblooms:Traits:gills:text')
       },
       {
         title: 'General Traits',
-        name: () => maplebirch.t('deadwood-reblooms.Traits.finnedLimbs.name'),
+        name: () => maplebirch.t('deadwood-reblooms:Traits:finnedLimbs:name'),
         colour: 'lblue',
         has: () => !['disabled', 'hidden'].includes(V.transformationParts.traits.finnedLimbs),
-        text: () => maplebirch.t('deadwood-reblooms.Traits.finnedLimbs.text')
+        text: () => maplebirch.t('deadwood-reblooms:Traits:finnedLimbs:text')
       },
       {
         title: 'General Traits',
         name: () => (V.player?.gender === 'n' ? '<<lanSwitch "Fish " "鱼">>' : '<<lanSwitch "Fish " "鱼">><<pcGender>>'),
         colour: 'lblue',
         has: () => V.maplebirch.transformation.fish.level >= 6,
-        text: () => maplebirch.t('deadwood-reblooms.Traits.fish.text')
+        text: () => maplebirch.t('deadwood-reblooms:Traits:fish:text')
       }
     );
 
@@ -160,12 +160,12 @@ class Fish extends Transformation {
       'SkillsBonusDisplay',
       `<<if $transformationParts.traits.finnedLimbs and isPartEnabled($transformationParts.traits.finnedLimbs)>>
         <<set _swimmingConfig.modifier to Math.floor(_swimmingConfig.modifier * 1.1)>>
-        <<run _swimmingConfig.modTypes.good.pushUnique(maplebirch.t("deadwood-reblooms.Traits.finnedLimbs.name"))>>
+        <<run _swimmingConfig.modTypes.good.pushUnique(maplebirch.t("deadwood-reblooms:Traits:finnedLimbs:name"))>>
       <</if>>`
     );
 
     // 把鱼转化效果接入原版游泳、潜水和烹饪流程。
-    maplebirch.tool.zone.inject({
+    maplebirch.tool.inject({
       locationPassage: {
         'Rocks Pool': [
           // 在礁石泳池的原版潜水链接前加入鱼化休憩选项；正则只依赖目标 Passage，不匹配英汉链接文本。

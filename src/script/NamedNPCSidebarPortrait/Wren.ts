@@ -1,7 +1,6 @@
 // ./src/script/NamedNPCSidebarPortrait/Wren.ts
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
-import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 
 export default function (maplebirch: MaplebirchCore): void {
   maplebirch.tool.onInit(() => {
@@ -18,11 +17,8 @@ export default function (maplebirch: MaplebirchCore): void {
     }
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
     wardrobe.base('Wren', clothes => {
-      for (const item of Object.values(C.npc?.Wren?.pronoun === 'm' ? male : female)) sidebar.apply(clothes, item);
+      wardrobe.put(clothes, C.npc?.Wren?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
     // 原版 npc Wren 决定实际在场；监狱交易采用囚服外观，不赋予囚犯作息。
     const heist = () => maplebirch.passage.title.startsWith('Wren Heist');

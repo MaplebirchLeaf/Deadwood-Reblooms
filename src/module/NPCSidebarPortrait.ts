@@ -7,7 +7,7 @@ type Wardrobe = MaplebirchCore['npc']['Clothes']['wardrobe'];
 export type WardrobeItem = ReturnType<Wardrobe['worn']>;
 
 export interface ClothingItem {
-  slot: string;
+  slot?: string;
   [key: string]: unknown;
 }
 
@@ -20,8 +20,12 @@ class NPCSidebarPortrait {
     return available.either(available.map(colour => weights[colour] ?? 0)) ?? available[0];
   }
 
-  public apply(clothes: WardrobeItem, item: ClothingItem): void {
-    clothes[item.slot] = clone(item);
+  public apply(clothes: WardrobeItem, item: object, slot?: string): void {
+    const itemSlot = slot ?? ('slot' in item && typeof item.slot === 'string' ? item.slot : undefined);
+    if (!itemSlot) return;
+    const clothing = { ...item } as Record<string, unknown>;
+    delete clothing.slot;
+    clothes[itemSlot as keyof WardrobeItem] = clone(clothing) as WardrobeItem[keyof WardrobeItem];
   }
 }
 

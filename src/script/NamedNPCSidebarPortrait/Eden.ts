@@ -30,18 +30,12 @@ export default function (maplebirch: MaplebirchCore): void {
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const female = wardrobe.get('female_underwear') ?? {};
-    const male = wardrobe.get('male_underwear') ?? {};
 
     // 原版没有专属内衣描述；日常使用性别对应基础内衣，裸体和剧情脱除状态不补回对应层。
     wardrobe.base('Eden', (clothes, context) => {
       if (context.key === 'naked') return;
-      const underwear = C.npc?.Eden?.pronoun === 'm' ? male : female;
-      for (const item of Object.values(underwear)) {
-        if (context.location === 'upper_removed' && item.slot === 'under_upper') continue;
-        if (context.location === 'lower_removed' && item.slot === 'under_lower') continue;
-        sidebar.apply(clothes, item);
-      }
+      const slots = context.location === 'upper_removed' ? (['under_lower'] as const) : context.location === 'lower_removed' ? (['under_upper'] as const) : (['under_upper', 'under_lower'] as const);
+      wardrobe.put(clothes, C.npc?.Eden?.pronoun === 'm' ? 'male_underwear' : 'female_underwear', slots);
       if (C.npc?.Eden?.pronoun === 'm') delete clothes.under_upper;
     });
 
@@ -52,13 +46,15 @@ export default function (maplebirch: MaplebirchCore): void {
     wardrobe.modify('Eden', (clothes, context) => {
       // 原版旧外套显示磨损，猎裤显示撕裂；礼物狩猎夹克只在出猎时替换旧外套。
       if (context.key === 'eden_hunting') {
-        if (clothes.upper) {
-          clothes.upper.integrity_max ??= clothes.upper.integrity ?? 200;
-          clothes.upper.integrity = context.location === 'hunting' && V.edencoatjacket === 1 ? clothes.upper.integrity_max : Math.floor(clothes.upper.integrity_max * 0.8);
+        const upper = clothes.upper as (typeof clothes.upper & { integrity_max?: number; integrity?: string | number }) | undefined;
+        if (upper) {
+          upper.integrity_max ??= Number(upper.integrity) || 200;
+          upper.integrity = String(context.location === 'hunting' && V.edencoatjacket === 1 ? upper.integrity_max : Math.floor(upper.integrity_max * 0.8));
         }
-        if (clothes.lower) {
-          clothes.lower.integrity_max ??= clothes.lower.integrity ?? 200;
-          clothes.lower.integrity = Math.floor(clothes.lower.integrity_max * 0.5);
+        const lower = clothes.lower as (typeof clothes.lower & { integrity_max?: number; integrity?: string | number }) | undefined;
+        if (lower) {
+          lower.integrity_max ??= Number(lower.integrity) || 200;
+          lower.integrity = String(Math.floor(lower.integrity_max * 0.5));
         }
       }
 

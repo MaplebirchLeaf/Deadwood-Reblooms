@@ -28,7 +28,7 @@ export default function (maplebirch: MaplebirchCore): void {
         clothes[slot].colour = male ? 'blue' : 'red';
         if (!male) {
           clothes[slot].accessory_colour = 'red';
-          clothes[slot].pattern = 0;
+          clothes[slot].pattern = '';
         }
       }
       // 单排扣夹克的衬衫属于 accessory 图层，关闭该图层呈现裸胸。

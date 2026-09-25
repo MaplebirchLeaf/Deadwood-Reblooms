@@ -37,8 +37,6 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const female = wardrobe.get('female_underwear') ?? {};
-    const male = wardrobe.get('male_underwear') ?? {};
     const hatlessLocations = new Set(['sleep', 'formal']);
 
     function applySignatureAccessories(clothes: Record<string, any>, location: string): void {
@@ -61,8 +59,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       if (context.location === 'naked' || context.key === 'naked') return;
 
       if (context.location !== 'shop') {
-        const underwear = C.npc?.Gwylan?.pronoun === 'm' ? male : female;
-        for (const item of Object.values(underwear)) sidebar.apply(clothes, item);
+        wardrobe.put(clothes, C.npc?.Gwylan?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
       }
       if (C.npc?.Gwylan?.pronoun === 'm') delete clothes.under_upper;
       applySignatureAccessories(clothes, context.location);

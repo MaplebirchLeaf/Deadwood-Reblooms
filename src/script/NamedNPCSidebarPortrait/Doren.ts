@@ -22,10 +22,8 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
     wardrobe.base('Doren', clothes => {
-      for (const item of Object.values(C.npc?.Doren?.pronoun === 'm' ? male : female)) sidebar.apply(clothes, item);
+      wardrobe.put(clothes, C.npc?.Doren?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
     // Doren Jog 明确穿跑鞋一起慢跑；只选择服装，在场仍由原版 npc Doren 决定。
     wardrobe.wear('Doren', '*', 'tracksuit', () => maplebirch.passage.title === 'Doren Jog');

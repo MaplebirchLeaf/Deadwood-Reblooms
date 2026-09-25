@@ -17,5 +17,5 @@ export const sydneyChastityWidgetPassages: Record<string, PassagePatch[]> = {
 
 export default function (maplebirch: typeof window.maplebirch) {
   // 补完堕落仪式结尾的重新佩戴提议，并按 Sydney 当前状态处理回应。
-  maplebirch.tool.zone.inject({ widgetPassage: sydneyChastityWidgetPassages });
+  maplebirch.tool.inject({ widgetPassage: sydneyChastityWidgetPassages });
 }

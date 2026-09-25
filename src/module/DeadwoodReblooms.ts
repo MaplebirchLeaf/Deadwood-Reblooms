@@ -119,7 +119,6 @@ class DeadwoodReblooms extends Module {
 
   public readonly exposed = true;
   public hint?: Hint;
-  public readonly log = maplebirch.tool.createlog('DeadwoodReblooms');
   private random?: ReturnType<typeof maplebirch.tool.rand.create>;
   private noticeSaving = false;
   private readonly baileyRent: BaileyRent;
@@ -139,11 +138,11 @@ class DeadwoodReblooms extends Module {
   }
 
   private noticeModuleRows(): string {
-    const enabled = new Set(this.core.gui.enabledModules.map(module => module.name));
+    const enabled = new Set(this.core.services.gui.enabledModules.map(module => module.name));
     T.deadwoodRebloomsNoticeModules = Object.fromEntries(noticeModules.map(name => [name, enabled.has(name)]));
     return noticeModules
       .map(name => {
-        const label = this.core.t(`deadwood-reblooms.notice.module.${name}`);
+        const label = this.core.t(`deadwood-reblooms:notice:module:${name}`);
         return `<label class='settingsToggleItem'><<checkbox '_deadwoodRebloomsNoticeModules.${name}' false true autocheck>><span>${label}</span></label>`;
       })
       .join('');
@@ -154,13 +153,13 @@ class DeadwoodReblooms extends Module {
     $('#story').addClass('gateBlur');
     $('#ui-bar').addClass('gateBlur');
     return `
-      <<dialog ${JSON.stringify(this.core.t('deadwood-reblooms.notice.title'))} 'class' true>>
-        <p>${this.core.t('deadwood-reblooms.notice.description')}</p>
+      <<dialog ${JSON.stringify(this.core.t('deadwood-reblooms:notice:title'))} 'class' true>>
+        <p>${this.core.t('deadwood-reblooms:notice:description')}</p>
         <div class='settingsGrid'>${this.noticeModuleRows()}</div>
-        <p>${this.core.t('deadwood-reblooms.notice.reload')}</p>
+        <p>${this.core.t('deadwood-reblooms:notice:reload')}</p>
         <div class='text-align-center'>
           <div class='m-2'>
-          <<button ${JSON.stringify(this.core.t('deadwood-reblooms.notice.confirm'))}>>
+          <<button ${JSON.stringify(this.core.t('deadwood-reblooms:notice:confirm'))}>>
             <<run maplebirch.DR.applyNoticeModules(_deadwoodRebloomsNoticeModules)>>
           <</button>>
           </div>
@@ -169,26 +168,21 @@ class DeadwoodReblooms extends Module {
     `;
   }
 
-  public applyNoticeModules(selection: Record<string, boolean>): void {
+  public async applyNoticeModules(selection: Record<string, boolean>): Promise<void> {
     if (this.noticeSaving) return;
     this.noticeSaving = true;
-    const selected = new Set<string>(noticeModules.filter(name => selection[name] === true));
-    const managed = new Set<string>(noticeModules);
-    const currentEnabled = new Set(this.core.gui.enabledModules.map(module => module.name));
-    const modules = [...this.core.gui.enabledModules, ...this.core.gui.disabledModules];
-    const enabled = modules.filter(module => (managed.has(module.name) ? selected.has(module.name) : currentEnabled.has(module.name)));
-    const disabled = modules.filter(module => (managed.has(module.name) ? !selected.has(module.name) : !currentEnabled.has(module.name)));
+    const gui = this.core.services.gui;
+    const available = new Set([...gui.enabledModules, ...gui.disabledModules].map(module => module.name));
+    const states = Object.fromEntries(noticeModules.filter(name => available.has(name)).map(name => [name, selection[name] === true]));
 
-    void this.core.gui
-      .saveModules(enabled, disabled)
-      .then(() => {
-        localStorage.setItem('deadwoodRebloomsNotice', 'true');
-        location.reload();
-      })
-      .catch(error => {
-        this.noticeSaving = false;
-        this.log('Module selection failed', 'ERROR', error);
-      });
+    try {
+      await gui.setModuleStates(states);
+      localStorage.setItem('deadwoodRebloomsNotice', 'true');
+      location.reload();
+    } catch (error) {
+      this.log('Failed to apply notice module selection', 'ERROR', error);
+      this.noticeSaving = false;
+    }
   }
 
   public get rng(): number {

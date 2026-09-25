@@ -21,10 +21,8 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
     wardrobe.base('Niki', clothes => {
-      for (const item of Object.values(C.npc?.Niki?.pronoun === 'm' ? male : female)) sidebar.apply(clothes, item);
+      wardrobe.put(clothes, C.npc?.Niki?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
     // Photography Chef、街头拍摄和 Livestock Job 均是摄影工作；实际出场由原版 npc Niki 写入 V.npc。
     wardrobe.wear('Niki', '*', 'turtleneck_jeans');

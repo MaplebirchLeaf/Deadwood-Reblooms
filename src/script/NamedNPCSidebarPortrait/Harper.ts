@@ -32,7 +32,7 @@ export default function (maplebirch: MaplebirchCore): void {
     wardrobe.wear('Harper', '*', 'evening_gown', () => party() && C.npc?.Harper?.pronoun !== 'm');
     wardrobe.modify('Harper', (clothes, context) => {
       if (context.key !== 'evening_gown') return;
-      for (const slot of ['upper', 'lower'] as const) if (clothes[slot]) clothes[slot].pattern = 0;
+      for (const slot of ['upper', 'lower'] as const) if (clothes[slot]) clothes[slot].pattern = '';
     });
   });
 }

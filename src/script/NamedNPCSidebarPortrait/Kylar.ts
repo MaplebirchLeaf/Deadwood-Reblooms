@@ -39,18 +39,14 @@ export default function (
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const female = wardrobe.get('female_underwear') ?? {};
-    const male = wardrobe.get('male_underwear') ?? {};
 
     // 基层内衣：不穿内裤时仅保留女性上身内衣
     wardrobe.base('Kylar', (clothes, context) => {
       if (context.key === 'naked') return;
       const is_male = C.npc?.Kylar?.pronoun === 'm';
       const commando = V.kylarSeen?.includes('commando') || V.daily?.kylar?.undies === true;
-      for (const item of Object.values(is_male ? male : female)) {
-        if (commando && item.slot === 'under_lower') continue;
-        sidebar.apply(clothes, item);
-      }
+      const slots = commando ? (['under_upper'] as const) : (['under_upper', 'under_lower'] as const);
+      wardrobe.put(clothes, is_male ? 'male_underwear' : 'female_underwear', slots);
       if (is_male) delete clothes.under_upper;
       else sidebar.apply(clothes, Clothing.hairpin);
     });
@@ -92,9 +88,11 @@ export default function (
       ];
       for (const group of groups) {
         const slots = group.slots.filter(slot => slot !== 'lower' || clothes.upper?.name !== 'oversized hoodie');
-        const items = slots.map(slot => clothes[slot]).filter(item => item?.index !== undefined);
+        const items = slots.map(slot => ({ slot, item: clothes[slot as keyof typeof clothes] })).filter(entry => entry.item?.index !== undefined);
         if (items.length !== slots.length) continue;
-        const optionSets = items.map(item => setup.clothes[item.slot]?.[item.index]?.colour_options as string[] | undefined);
+        const optionSets = items.map(({ slot, item }) =>
+          item?.index === undefined ? undefined : (setup.clothes[slot as keyof typeof setup.clothes]?.[item.index]?.colour_options as string[] | undefined)
+        );
         if (optionSets.some(options => !Array.isArray(options) || !options.length)) continue;
         const options = optionSets[0]!.filter(colour => optionSets.every(set => set!.includes(colour)));
         if (!options.length) continue;
@@ -103,7 +101,7 @@ export default function (
           colour = sidebar.randomColour(options, preferColours('Kylar', group.weights, !is_male));
           colours.clothes.set(group.key, colour);
         }
-        for (const item of items) item.colour = colour;
+        for (const { item } of items) if (item) item.colour = colour;
       }
     });
 
@@ -120,9 +118,14 @@ export default function (
     wardrobe.wear('Kylar', 'abduction_swim', 'bikini', () => C.npc?.Kylar?.pronoun !== 'm');
     wardrobe.modify('Kylar', (clothes, context) => {
       if (context.key !== 'gothic_rose_gown') return;
-      const items = [clothes.upper, clothes.lower].filter(item => item?.index !== undefined);
+      const items = (
+        [
+          ['upper', clothes.upper],
+          ['lower', clothes.lower]
+        ] as const
+      ).filter((entry): entry is ['upper' | 'lower', NonNullable<(typeof clothes)['upper']>] => entry[1]?.index !== undefined);
       if (items.length !== 2) return;
-      const optionSets = items.map(item => setup.clothes[item.slot]?.[item.index]?.colour_options as string[] | undefined);
+      const optionSets = items.map(([slot, item]) => (item.index === undefined ? undefined : (setup.clothes[slot]?.[item.index]?.colour_options as string[] | undefined)));
       if (optionSets.some(options => !Array.isArray(options) || !options.length)) return;
       const options = optionSets[0]!.filter(colour => optionSets.every(set => set!.includes(colour)));
       if (!options.length) return;
@@ -132,7 +135,7 @@ export default function (
         colour = options.includes('green') ? 'green' : sidebar.randomColour(options, preferColours('Kylar'));
         colours.clothes.set(cacheKey, colour);
       }
-      for (const item of items) item.colour = colour;
+      for (const [, item] of items) item.colour = colour;
     });
 
     // 地下室婚礼
@@ -161,7 +164,7 @@ export default function (
       // 圣诞服被烟囱撕掉后只剩下身内衣；重新穿上时衣料仍破得遮不住身体。
       if (context.location === 'christmas') {
         if (/^Kylar Christmas (?:3|4|5)$/.test(title)) {
-          for (const slot of ['over_head', 'over_upper', 'over_lower', 'upper', 'lower', 'under_upper', 'head', 'face', 'neck', 'hands', 'legs', 'feet', 'handheld']) delete clothes[slot];
+          for (const slot of ['over_head', 'over_upper', 'over_lower', 'upper', 'lower', 'under_upper', 'head', 'face', 'neck', 'hands', 'legs', 'feet', 'handheld'] as const) delete clothes[slot];
           return;
         }
 

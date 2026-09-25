@@ -172,7 +172,7 @@ class Horse extends Transformation {
         ['neck', 'golden_carrot_pendant']
       ] as const) {
         const item = setup.clothes[slot].find((item: Record<string, string>) => item.variable === variable);
-        if (item) item.description = maplebirch.t(`deadwood-reblooms.clothes.${variable}.description`);
+        if (item) item.description = maplebirch.t(`deadwood-reblooms:clothes:${variable}:description`);
       }
     };
     maplebirch.tool.onInit(descriptions);
@@ -181,24 +181,24 @@ class Horse extends Transformation {
     maplebirch.tool.patch.traits.add(
       {
         title: 'General Traits',
-        name: () => maplebirch.t('deadwood-reblooms.Traits.hooves.name'),
+        name: () => maplebirch.t('deadwood-reblooms:Traits:hooves:name'),
         colour: 'def',
         has: () => !['disabled', 'hidden'].includes(V.transformationParts.traits.hooves),
-        text: () => maplebirch.t('deadwood-reblooms.Traits.hooves.text')
+        text: () => maplebirch.t('deadwood-reblooms:Traits:hooves:text')
       },
       {
         title: 'General Traits',
-        name: () => maplebirch.t('deadwood-reblooms.Traits.sweatblood.name'),
+        name: () => maplebirch.t('deadwood-reblooms:Traits:sweatblood:name'),
         colour: 'tealhair',
         has: () => !['disabled', 'hidden'].includes(V.transformationParts.traits.sweatblood),
-        text: () => maplebirch.t('deadwood-reblooms.Traits.sweatblood.text')
+        text: () => maplebirch.t('deadwood-reblooms:Traits:sweatblood:text')
       },
       {
         title: 'General Traits',
         name: () => (V.player?.gender === 'n' ? '<<lanSwitch "Horse " "马">>' : '<<lanSwitch "Horse " "马">><<pcGender>>'),
         colour: 'softbrown',
         has: () => V.maplebirch.transformation.horse.level >= 6,
-        text: () => maplebirch.t('deadwood-reblooms.Traits.horse.text')
+        text: () => maplebirch.t('deadwood-reblooms:Traits:horse:text')
       }
     );
 
@@ -218,7 +218,7 @@ class Horse extends Transformation {
     });
 
     // 把马转化成长接入原版骑术、刷马和战斗动作。
-    maplebirch.tool.zone.inject({
+    maplebirch.tool.inject({
       locationPassage: {
         'Riding School Lesson Grab': [
           // 在骑术课吃草链接完整结束后显示马化提示，不插入链接内部以免改变原版点击结算顺序。

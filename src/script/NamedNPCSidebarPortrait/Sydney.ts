@@ -90,11 +90,12 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     // 奶牛套装配色
     wardrobe.modify('Sydney', (clothes, context) => {
       if (context.key !== 'cow_onesie') return;
-      const options = setup.clothes.hands?.[clothes.hands?.index]?.accessory_colour_options as string[] | undefined;
+      const hands = clothes.hands;
+      const options = hands?.index === undefined ? undefined : (setup.clothes.hands?.[hands.index]?.accessory_colour_options as string[] | undefined);
       if (!options) return;
       const weights = Object.fromEntries(options.filter(colour => colour !== 'custom').map(colour => [colour, 1]));
       colours.cow ??= sidebar.randomColour(options, preferColours('Sydney', weights));
-      for (const slot of ['upper', 'lower', 'under_upper', 'under_lower', 'head', 'hands', 'legs']) {
+      for (const slot of ['upper', 'lower', 'under_upper', 'under_lower', 'head', 'hands', 'legs'] as const) {
         if (clothes[slot]) clothes[slot].accessory_colour = colours.cow;
       }
     });
@@ -145,9 +146,14 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     schoolSwim(maplebirch, 'Sydney', colours.swim);
     wardrobe.modify('Sydney', (clothes, context) => {
       if (!['school_swim_shorts', 'school_swimsuit', 'beach_shorts', 'bikini', 'speedo', 'microkini'].includes(context.key)) return;
-      const items = [clothes.under_upper, clothes.under_lower].filter(item => item?.index);
+      const items = (
+        [
+          ['under_upper', clothes.under_upper],
+          ['under_lower', clothes.under_lower]
+        ] as const
+      ).filter((entry): entry is ['under_upper' | 'under_lower', NonNullable<(typeof clothes)['under_upper']>] => Boolean(entry[1]?.index));
       const optionSets = items
-        .map(item => setup.clothes[item.slot]?.[item.index]?.colour_options as string[] | undefined)
+        .map(([slot, item]) => (item.index === undefined ? undefined : (setup.clothes[slot]?.[item.index]?.colour_options as string[] | undefined)))
         .filter((options): options is string[] => Array.isArray(options) && options.length > 0);
       if (!optionSets.length || optionSets.length !== items.length) return;
       const options = optionSets[0].filter(colour => optionSets.every(set => set.includes(colour)));

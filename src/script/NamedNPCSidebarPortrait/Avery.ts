@@ -62,7 +62,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
 
     wardrobe.modify('Avery', (clothes, context) => {
       if (context.key === 'evening_gown' && femaleBusiness.feet) {
-        sidebar.apply(clothes, femaleBusiness.feet);
+        sidebar.apply(clothes, femaleBusiness.feet, 'feet');
       }
     });
   });

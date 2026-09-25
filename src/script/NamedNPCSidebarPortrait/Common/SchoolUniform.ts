@@ -77,10 +77,10 @@ export default function (maplebirch: MaplebirchCore, sidebar: NPCSidebarPortrait
 
     const weights = accessoryWeights[context.key];
     if (!weights) return;
-    const slots = context.key === 'school_uniform_female' || context.key === 'school_uniform_male' ? ['upper'] : ['upper', 'lower'];
-    const items = slots.map(slot => clothes[slot]).filter(item => item?.index);
+    const slots: Array<keyof typeof clothes> = context.key === 'school_uniform_female' || context.key === 'school_uniform_male' ? ['upper'] : ['upper', 'lower'];
+    const items = slots.map(slot => ({ slot, item: clothes[slot] })).filter(entry => entry.item?.index);
     const optionSets = items
-      .map(item => setup.clothes[item.slot]?.[item.index]?.accessory_colour_options as string[] | undefined)
+      .map(({ slot, item }) => (item?.index === undefined ? undefined : (setup.clothes[slot]?.[item.index]?.accessory_colour_options as string[] | undefined)))
       .filter((options): options is string[] => Array.isArray(options) && options.length > 0);
     if (!optionSets.length || optionSets.length !== items.length) return;
     const options = optionSets[0].filter(colour => optionSets.every(set => set.includes(colour)));
@@ -90,6 +90,6 @@ export default function (maplebirch: MaplebirchCore, sidebar: NPCSidebarPortrait
       colour = sidebar.randomColour(options, preferColours(npcName, weights, C.npc?.[npcName]?.pronoun !== 'm'));
       colours.school.set(context.key, colour);
     }
-    for (const item of items) item.accessory_colour = colour;
+    for (const { item } of items) if (item) item.accessory_colour = colour;
   });
 }

@@ -41,14 +41,12 @@ export default function (
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const female = wardrobe.get('female_underwear') ?? {};
-    const male = wardrobe.get('male_underwear') ?? {};
 
     // 基层内衣：男性使用男性内衣，其他性别使用女性内衣
     wardrobe.base('Robin', (clothes, context) => {
       const is_male = C.npc?.Robin?.pronoun === 'm';
       if (context.key !== 'naked') {
-        for (const item of Object.values(is_male ? male : female)) sidebar.apply(clothes, item);
+        wardrobe.put(clothes, is_male ? 'male_underwear' : 'female_underwear');
         if (is_male) delete clothes.under_upper;
       }
 
@@ -209,9 +207,9 @@ export default function (
       const rules = colourRules[context.key];
       if (!rules) return;
       for (const rule of rules) {
-        const items = rule.slots.map(slot => clothes[slot]).filter(item => item?.index);
+        const items = rule.slots.map(slot => ({ slot, item: clothes[slot as keyof typeof clothes] })).filter(entry => entry.item?.index);
         const optionSets = items
-          .map(item => setup.clothes[item.slot]?.[item.index]?.colour_options as string[] | undefined)
+          .map(({ slot, item }) => (item?.index === undefined ? undefined : (setup.clothes[slot as keyof typeof setup.clothes]?.[item.index]?.colour_options as string[] | undefined)))
           .filter((options): options is string[] => Array.isArray(options) && options.length > 0);
         if (!optionSets.length || optionSets.length !== items.length) continue;
         const options = optionSets[0].filter(colour => optionSets.every(set => set.includes(colour)));
@@ -222,7 +220,7 @@ export default function (
           colour = sidebar.randomColour(options, preferColours('Robin', typeof rule.weights === 'function' ? rule.weights() : rule.weights, C.npc?.Robin?.pronoun !== 'm'));
           colours.clothes.set(cacheKey, colour);
         }
-        for (const item of items) item.colour = colour;
+        for (const { item } of items) if (item) item.colour = colour;
       }
     });
 

@@ -23,7 +23,7 @@ export default function (maplebirch: MaplebirchCore) {
   );
   maplebirch.tool.addTo('MenuBig', () => (V.options.maplebirch.modhint === 'desktop' ? "<<lanButton 'Deadwood Reblooms' 'upper'>><<run maplebirch.DR.open()>><</lanButton>>" : ''));
   // 给原版衣柜加入搜索，并把身体涂写设置嵌入镜子界面。
-  maplebirch.tool.zone.inject({
+  maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Wardrobe': [
         // 在衣柜筛选与物品列表之间插入双语搜索框，搜索确认后仍调用原版 Dynamic.render 刷新列表。
@@ -43,8 +43,8 @@ export default function (maplebirch: MaplebirchCore) {
       'Widgets Mirror': [
         // 在镜子设置的下一项控件前插入身体刻字组件，保持原版设置网格的 HTML 层级不变。
         {
-          src: '</div>\n\t\t</div>\n\t\t<div class="settingsToggleItemWide">',
-          to: '</div>\n\t\t</div>\n\t\t<<DeadwoodRebloomsBodyWriting>>\n\t\t<div class="settingsToggleItemWide">',
+          srcmatch: /<div class="settingsToggleItemWide">\s*<span class="gold bold">(?:Body shape:|身形：)<\/span>/,
+          applybefore: '<<DeadwoodRebloomsBodyWriting>>\n\t\t',
           expected: 1
         }
       ]
@@ -52,7 +52,7 @@ export default function (maplebirch: MaplebirchCore) {
   });
 
   $(document).on('change', 'input[name="radiobutton--bodywritingcolor"]', function () {
-    if (!maplebirch.modules.initPhase.preInitCompleted) return;
+    if (!maplebirch.services.modules.initPhase.preInitCompleted) return;
     if (T.bodywriting.color === 'custom') {
       $.wiki('<<replace "#DeadwoodRebloomsBodyWriting">><br><<lanSwitch "Custom Color" "自定义颜色">>: <<textbox "_bodywriting.custom" "#FFFFFF">><</replace>>');
       const colorInput = $('#textbox--bodywritingcustom') as any;
@@ -78,7 +78,7 @@ export default function (maplebirch: MaplebirchCore) {
   });
 
   $(document).on('input', 'input[name="textbox--bodywritingcustom"]', function () {
-    if (!maplebirch.modules.initPhase.preInitCompleted) return;
+    if (!maplebirch.services.modules.initPhase.preInitCompleted) return;
     let color = this.value;
     if (!color.startsWith('#')) color = '#' + color;
     const preview = document.getElementById('colorPreviewBox');

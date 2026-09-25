@@ -20,10 +20,8 @@ export default function (maplebirch: MaplebirchCore): void {
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
     wardrobe.base('River', clothes => {
-      for (const item of Object.values(C.npc?.River?.pronoun === 'm' ? male : female)) sidebar.apply(clothes, item);
+      wardrobe.put(clothes, C.npc?.River?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
     // 数学与家务课采用男女商务装；在场由原版 npc River 写入 V.npc。
     wardrobe.wear('River', '*', 'business_suit_male', () => V.location === 'school' && C.npc?.River?.pronoun === 'm');

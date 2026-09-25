@@ -13,14 +13,17 @@ class IncantationCheatCollection {
   private editingName: string | null = null;
   private sortOrder: number = 0;
 
-  public constructor(readonly core: typeof maplebirch) {}
+  public constructor(readonly core: typeof maplebirch) {
+    this.core.once(':indexedDB', () => this.core.idb('cheats', { keyPath: 'name' }));
+    this.core.once(':idbReady', async () => await this.refreshCache());
+  }
 
   private escapeCode(code: string): string {
     return code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\$/g, '&#36;').replace(/\\\$/g, '&#36;');
   }
 
   private async refreshCache(): Promise<void> {
-    this.cache = await this.core.idb.withTransaction(['cheats'], 'readonly', async (tx: any) => {
+    this.cache = await this.core.with('cheats', 'readonly', async tx => {
       const store = tx.objectStore('cheats');
       const items = await store.getAll();
       return items.map((item: CheatItem) => ({ ...item, favorite: Boolean(item.favorite) }));
@@ -140,7 +143,7 @@ class IncantationCheatCollection {
     if (!name || !code) return false;
     if (this.cache.find(c => c.name === name)) return false;
     const type: 'twine' | 'javascript' = code.startsWith('<<') ? 'twine' : 'javascript';
-    await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
+    await this.core.with('cheats', 'readwrite', async tx => {
       const store = tx.objectStore('cheats');
       await store.put({ name: name, code: code, type: type, favorite: false });
     });
@@ -161,7 +164,7 @@ class IncantationCheatCollection {
     const oldName: string = oldItem.name;
     if (oldName !== newName && this.cache.find(item => item.name === newName)) return false;
     const type: 'twine' | 'javascript' = newCode.startsWith('<<') ? 'twine' : 'javascript';
-    await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
+    await this.core.with('cheats', 'readwrite', async tx => {
       const store = tx.objectStore('cheats');
       await store.delete(oldName);
       await store.put({ name: newName, code: newCode, type: type, favorite: Boolean(oldItem.favorite) });
@@ -196,7 +199,7 @@ class IncantationCheatCollection {
     this.showStatus(isSuccess, isSuccess ? 'Execution successful' : 'Execution failed', isSuccess ? '执行成功' : '执行失败');
     if (isSuccess) {
       try {
-        await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
+        await this.core.with('cheats', 'readwrite', async tx => {
           const store = tx.objectStore('cheats');
           await store.put(item);
         });
@@ -209,7 +212,7 @@ class IncantationCheatCollection {
     const item: CheatItem | undefined = this.cache.find(c => c.name === name);
     if (!item) return false;
     item.favorite = !item.favorite;
-    await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
+    await this.core.with('cheats', 'readwrite', async tx => {
       const store = tx.objectStore('cheats');
       await store.put(item);
     });
@@ -235,7 +238,7 @@ class IncantationCheatCollection {
   public async removeForm(name: string): Promise<boolean> {
     const item: CheatItem | undefined = this.cache.find(c => c.name === name);
     if (!item || item.favorite) return false;
-    await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
+    await this.core.with('cheats', 'readwrite', async tx => {
       const store = tx.objectStore('cheats');
       await store.delete(name);
     });
@@ -330,7 +333,7 @@ class IncantationCheatCollection {
       return false;
     }
     try {
-      await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
+      await this.core.with('cheats', 'readwrite', async tx => {
         const store = tx.objectStore('cheats');
         await store.clear();
         for (const item of importedItems) {
@@ -381,7 +384,7 @@ class IncantationCheatCollection {
 
   private async confirmClear(): Promise<void> {
     const removableItems = this.cache.filter(item => !item.favorite);
-    await this.core.idb.withTransaction(['cheats'], 'readwrite', async (tx: any) => {
+    await this.core.with('cheats', 'readwrite', async tx => {
       const store = tx.objectStore('cheats');
       for (const item of removableItems) await store.delete(item.name);
     });
@@ -411,8 +414,6 @@ class IncantationCheatCollection {
   }
 
   public preInit(): void {
-    this.core.once(':indexedDB', () => this.core.idb.register('cheats', { keyPath: 'name' }));
-    this.core.once(':idbReady', async () => await this.refreshCache());
     this.core.tool.onInit(() => {
       setup.maplebirch.content.push(`
         <div id='ConsoleCheat'>

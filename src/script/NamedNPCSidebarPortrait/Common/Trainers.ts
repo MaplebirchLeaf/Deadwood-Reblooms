@@ -7,8 +7,9 @@ import { Clothing } from '../Clothing';
 export default function (maplebirch: MaplebirchCore, name: string, variants: Map<string, string>): void {
   const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
   maplebirch.npc.Clothes.wardrobe.modify(name, (clothes, context) => {
-    if (C.npc?.[name]?.pronoun === 'm' || !clothes.feet) return;
-    if (!['trainers', 'ankle trainers', 'high top trainers', 'basketball sneakers'].includes(clothes.feet.name)) return;
+    const feet = clothes.feet;
+    if (C.npc?.[name]?.pronoun === 'm' || !feet?.name) return;
+    if (!['trainers', 'ankle trainers', 'high top trainers', 'basketball sneakers'].includes(feet.name)) return;
     if (name === 'Doren' && context.key === 'tracksuit') {
       if (clothes.lower?.name === 'open-side skort') sidebar.apply(clothes, Clothing.floral_ribbon_trainers);
       return;

@@ -4,10 +4,10 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.onInit(() => {
     setup.feats['Sovereign Will'] ??= {
       get title() {
-        return maplebirch.t('deadwood-reblooms.VanillaPlus.willpower.feat.title');
+        return maplebirch.t('deadwood-reblooms:VanillaPlus:willpower:feat:title');
       },
       get desc() {
-        return maplebirch.t('deadwood-reblooms.VanillaPlus.willpower.feat.description');
+        return maplebirch.t('deadwood-reblooms:VanillaPlus:willpower:feat:description');
       },
       difficulty: 3,
       series: '',
@@ -63,7 +63,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-willpower-unlock', passage: 'Lake Ruin Prison' });
 
   // 记录原版抗拒成功点，并扩展意志上限与耳液抵抗。
-  maplebirch.tool.zone.inject({
+  maplebirch.tool.inject({
     locationPassage: {
       ...slimeDefy,
       'Kylar Abduction Hypnosis Resist': [
@@ -99,15 +99,15 @@ export default function (maplebirch: typeof window.maplebirch) {
       Cheats: [
         // 将作弊面板意志滑条上限改为动态 125%，未突破时继续使用原版 $willpowermax。
         {
-          src: '$willpower "willpower" {max: 1000}',
-          to: '$willpower "willpower" {max: $VanillaPlus.lock.willpower ? Math.floor($willpowermax * 1.25) : $willpowermax}'
+          srcmatch: /\$willpower "willpower" \{max: (1000)( \* \$AMCTraits\.willpower)?(, percentage: false)?\}/,
+          to: '$willpower "willpower" {max: $VanillaPlus.lock.willpower ? maplebirch.VP.ceiling("willpower") : $1$2$3}'
         }
       ],
       'Widgets Clamp': [
         // 替换全局意志钳制公式，同时应用特质保底值与突破后的 125% 上限。
         {
-          src: 'Math.clamp($willpower, 0, $willpowermax)',
-          to: "Math.clamp($willpower, maplebirch.VP.minimum('willpower'), $VanillaPlus.lock.willpower ? Math.floor($willpowermax * 1.25) : $willpowermax)"
+          srcmatch: /Math\.clamp\(\$willpower, 0, \$willpowermax( \* \$AMCTraits\.willpower)?\)/,
+          to: "Math.clamp($willpower, maplebirch.VP.minimum('willpower'), $VanillaPlus.lock.willpower ? maplebirch.VP.ceiling('willpower') : $willpowermax$1)"
         }
       ]
     }

@@ -370,16 +370,16 @@ class MoreLoveInterests {
     let text = '';
     let color = '';
     if (this.level > 3) {
-      text = this.core.t('deadwood-reblooms.loveInterests.attitude.quaternary');
+      text = this.core.t('deadwood-reblooms:loveInterests:attitude:quaternary');
       color = 'lustful';
     } else if (this.level > 2) {
-      text = this.core.t('deadwood-reblooms.loveInterests.attitude.tertiary');
+      text = this.core.t('deadwood-reblooms:loveInterests:attitude:tertiary');
       color = 'lewd';
     } else if (this.level > 1) {
-      text = this.core.t('deadwood-reblooms.loveInterests.attitude.secondary');
+      text = this.core.t('deadwood-reblooms:loveInterests:attitude:secondary');
       color = 'pink';
     } else {
-      text = this.core.t('deadwood-reblooms.loveInterests.attitude.primary');
+      text = this.core.t('deadwood-reblooms:loveInterests:attitude:primary');
       color = 'blue';
     }
     return `<i class='${color}'>${text}</i><br>`;
@@ -402,14 +402,14 @@ class MoreLoveInterests {
 
     const title = document.createElement('div');
     title.className = 'gold bold love-interests-title';
-    title.textContent = this.core.t('deadwood-reblooms.loveInterests.title');
+    title.textContent = this.core.t('deadwood-reblooms:loveInterests:title');
     panel.append(title);
 
     const candidates = setup.loveInterestNpc.filter((name: string) => window.isPossibleLoveInterest(name));
-    panel.append(this.group('deadwood-reblooms.loveInterests.selected', V.loveInterestList, true));
+    panel.append(this.group('deadwood-reblooms:loveInterests:selected', V.loveInterestList, true));
     panel.append(
       this.group(
-        'deadwood-reblooms.loveInterests.available',
+        'deadwood-reblooms:loveInterests:available',
         candidates.filter((name: string) => !V.loveInterestList.includes(name)),
         false,
         V.loveInterestList.length
@@ -430,7 +430,7 @@ class MoreLoveInterests {
     if (!selected && names.length === 0 && count > 0) {
       const complete = document.createElement('div');
       complete.className = 'love-interests-complete';
-      complete.textContent = this.core.t('deadwood-reblooms.loveInterests.allSelected');
+      complete.textContent = this.core.t('deadwood-reblooms:loveInterests:allSelected');
       group.append(complete);
       return group;
     }

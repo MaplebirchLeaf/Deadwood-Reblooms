@@ -58,8 +58,8 @@
   <<set $_npcDoubleOrifice to _args[0]>>
   <<set $_npcDoublePartner to _args[1]>>
   <<run maplebirch.VP.NPCDoublePenetration.begin($penistarget, $_npcDoublePartner, $_npcDoubleOrifice)>>
-  <<if $NPCDoublePenetration>>
-    <<set $_npcDoubleRecipient to $NPCList[$NPCDoublePenetration.recipient]>>
+  <<if $VanillaPlus.npcDoublePenetration>>
+    <<set $_npcDoubleRecipient to $NPCList[$VanillaPlus.npcDoublePenetration.recipient]>>
     <<set $_npcDoubleRecipientName to lanSwitch(
       $_npcDoubleRecipient.fullDescription,
       $_npcDoubleRecipient.fullDescription_CN || $_npcDoubleRecipient.fullDescription
@@ -86,7 +86,7 @@
       <</if>>
     <</if>>
     <span class="lewd">
-      <<if $NPCDoublePenetration.stage is 'penetrated'>>
+      <<if $VanillaPlus.npcDoublePenetration.stage is 'penetrated'>>
         <<if $_npcDoubleOrifice is 'vagina'>>
           <<language>>
             <<option 'EN'>>
@@ -116,42 +116,43 @@
 
 <!-- NPC 双插回合：以明确的同伴和承受者关系取代原版仅面向 PC 的随机动作文本。 -->
 <<widget 'deadwood-reblooms-npc-double-turn'>>
-  <<run maplebirch.VP.NPCDoublePenetration.update()>>
-  <<set $_npcDouble to $NPCDoublePenetration>>
-  <<set $_npcDoubleRecipient to $NPCList[$_npcDouble.recipient]>>
-  <<set $_npcDoubleRecipientName to lanSwitch(
-    $_npcDoubleRecipient.fullDescription,
-    $_npcDoubleRecipient.fullDescription_CN || $_npcDoubleRecipient.fullDescription
-  )>>
-  <span class="lewd">
-    <<if $_npcDouble.stage is 'penetrated'>>
-      <<language>>
-        <<option 'EN'>>
-          <<He_Short>> keeps close beside you, <<his>> hips driving in the same rough rhythm as both cocks grind inside <<print $_npcDoubleRecipientName+"'s">> <<print $_npcDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>.
-        <<option 'CN'>>
-          <<He_Short>>紧贴在你身旁，胯部随着你的动作一同挺动，两根肉棒在<<print $_npcDoubleRecipientName>>的<<print $_npcDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>里挤磨。
-      <</language>>
-    <<elseif $_npcDouble.stage is 'imminent'>>
-      <<language>>
-        <<option 'EN'>>
-          <<He_Short>> crowds against you and pushes harder, <<his>> tip squeezing beside yours at <<print $_npcDoubleRecipientName+"'s">> <<print $_npcDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>.
-        <<option 'CN'>>
-          <<He_Short>>贴着你继续用力，龟头抵着你的肉棒，一同挤向<<print $_npcDoubleRecipientName>>的<<print $_npcDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>。
-      <</language>>
-    <<else>>
-      <<language>>
-        <<option 'EN'>>
-          <<He_Short>> grinds <<his>> tip against yours at <<print $_npcDoubleRecipientName+"'s">> <<print $_npcDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>, searching for room to press in beside you.
-        <<option 'CN'>>
-          <<He_Short>>把龟头贴着你的肉棒，在<<print $_npcDoubleRecipientName>>的<<print $_npcDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>口来回磨蹭，寻找与你一同挤进去的空隙。
-      <</language>>
-    <</if>>
-  </span>
+  <<if maplebirch.VP.NPCDoublePenetration.update()>>
+    <<set $_npcDouble to $VanillaPlus.npcDoublePenetration>>
+    <<set $_npcDoubleRecipient to $NPCList[$_npcDouble.recipient]>>
+    <<set $_npcDoubleRecipientName to lanSwitch(
+      $_npcDoubleRecipient.fullDescription,
+      $_npcDoubleRecipient.fullDescription_CN || $_npcDoubleRecipient.fullDescription
+    )>>
+    <span class="lewd">
+      <<if $_npcDouble.stage is 'penetrated'>>
+        <<language>>
+          <<option 'EN'>>
+            <<He_Short>> keeps close beside you, <<his>> hips driving in the same rough rhythm as both cocks grind inside <<print $_npcDoubleRecipientName+"'s">> <<print $_npcDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>.
+          <<option 'CN'>>
+            <<He_Short>>紧贴在你身旁，胯部随着你的动作一同挺动，两根肉棒在<<print $_npcDoubleRecipientName>>的<<print $_npcDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>里挤磨。
+        <</language>>
+      <<elseif $_npcDouble.stage is 'imminent'>>
+        <<language>>
+          <<option 'EN'>>
+            <<He_Short>> crowds against you and pushes harder, <<his>> tip squeezing beside yours at <<print $_npcDoubleRecipientName+"'s">> <<print $_npcDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>.
+          <<option 'CN'>>
+            <<He_Short>>贴着你继续用力，龟头抵着你的肉棒，一同挤向<<print $_npcDoubleRecipientName>>的<<print $_npcDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>。
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<He_Short>> grinds <<his>> tip against yours at <<print $_npcDoubleRecipientName+"'s">> <<print $_npcDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>, searching for room to press in beside you.
+          <<option 'CN'>>
+            <<He_Short>>把龟头贴着你的肉棒，在<<print $_npcDoubleRecipientName>>的<<print $_npcDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>口来回磨蹭，寻找与你一同挤进去的空隙。
+        <</language>>
+      <</if>>
+    </span>
+  <</if>>
 <</widget>>
 
 <!-- NPC 双插射精：将第二名 NPC 的精液结算给被 PC 插入的目标，而不是 PC。 -->
 <<widget 'deadwood-reblooms-npc-double-ejaculation'>>
-  <<set $_npcDouble to $NPCDoublePenetration>>
+  <<set $_npcDouble to $VanillaPlus.npcDoublePenetration>>
   <<set $_npcDoubleRecipient to $NPCList[$_npcDouble.recipient]>>
   <<set $_npcDoublePartner to $NPCList[$_npcDouble.partner]>>
   <<set $_npcDoubleRecipientName to lanSwitch(

@@ -22,7 +22,7 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
   );
 
   // 在 High Street 的常规地点列表中插入金融地点；锚点只有原版宏，不依赖中英文文本。
-  maplebirch.tool.zone.inject({
+  maplebirch.tool.inject({
     locationPassage: {
       'High Street': [
         // 在原版 Avery 分支判断前插入金融中心入口；锚点是稳定宏语句，不依赖英汉显示文本。
@@ -64,11 +64,10 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         }
       ],
       Spa: [
-        // 将日光浴服务的现金门槛改为支付方式检查；夜间潜入等其他 Spa 分支不受影响。
+        // 原版只有日光浴，DoLP 还提供美白服务；两处价格判断都交给支付方式检查。
         {
-          src: '<<if $money gte _price>>',
-          to: '<<if maplebirch.VP.finance.canPay(_price, "spa")>>',
-          expected: 1
+          srcmatchgroup: /<<if \$money gte _price>>/g,
+          to: '<<if maplebirch.VP.finance.canPay(_price, "spa")>>'
         }
       ],
       'Shopping Centre': [
@@ -220,11 +219,10 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         }
       ],
       'Ocean Breeze': [
-        // 咖啡馆菜单的十三个固定价格选项统一检查现金、借记卡和信用卡。
+        // 咖啡馆的固定价格判断统一检查现金、借记卡和信用卡；DoLP 另有耳黏液请求分支。
         {
           srcmatchgroup: /\$money gte (200|300|500|600|700|1000|5000)\b/g,
-          to: 'maplebirch.VP.finance.canPay($1, "cafe")',
-          expected: 13
+          to: 'maplebirch.VP.finance.canPay($1, "cafe")'
         }
       ],
       'Gwylan Ocean Breeze Watch': [
@@ -326,11 +324,10 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
     },
     widgetPassage: {
       'Gwylan Widgets': [
-        // Gwylan 共用咖啡馆菜单的七个价格选项支持现金与银行卡。
+        // Gwylan 的菜单价格判断支持现金与银行卡；DoLP 还加入蜂蜜面包。
         {
           srcmatchgroup: /\$money gte (200|300|500|600|700|1000|5000)\b/g,
-          to: 'maplebirch.VP.finance.canPay($1, "cafe")',
-          expected: 7
+          to: 'maplebirch.VP.finance.canPay($1, "cafe")'
         }
       ],
       'Widgets Arcade': [

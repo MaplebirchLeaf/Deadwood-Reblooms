@@ -16,7 +16,7 @@ class SolarEclipse {
 
   public static text(weather: WeatherType): string {
     const index = maplebirch.CA.SolarEclipseStageIndex ?? 0;
-    return maplebirch.t(`deadwood-reblooms.SolarEclipse.${weather === 'storm' ? 'thunderstorm' : weather}.${SolarEclipse.variant(weather)}.${index}`);
+    return maplebirch.t(`deadwood-reblooms:SolarEclipse:${weather === 'storm' ? 'thunderstorm' : weather}:${SolarEclipse.variant(weather)}:${index}`);
   }
 
   public static descriptions(): void {
@@ -24,7 +24,7 @@ class SolarEclipse {
       const target = setup.WeatherDescriptions.type[weather];
       if (!target) return;
       target.solarEclipse = (): string => SolarEclipse.text(weather);
-      target.meteorShower = (): string => maplebirch.t(`deadwood-reblooms.MeteorShower.${weather}`);
+      target.meteorShower = (): string => maplebirch.t(`deadwood-reblooms:MeteorShower:${weather}`);
     });
   }
 

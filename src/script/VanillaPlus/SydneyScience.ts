@@ -49,7 +49,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   );
 
   // 接入科学课事件池、首次同桌剧情和悉尼保护分支。
-  maplebirch.tool.zone.inject({
+  maplebirch.tool.inject({
     locationPassage: sydneyScienceLocationPassages,
     widgetPassage: sydneyScienceWidgetPassages
   });

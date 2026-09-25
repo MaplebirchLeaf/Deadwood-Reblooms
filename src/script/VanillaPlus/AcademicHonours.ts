@@ -1,5 +1,5 @@
 export default function (maplebirch: typeof window.maplebirch) {
-  const text = (subject: string, key: 'name' | 'text') => maplebirch.t(`deadwood-reblooms.VanillaPlus.academic.${subject}.${key}`);
+  const text = (subject: string, key: 'name' | 'text') => maplebirch.t(`deadwood-reblooms:VanillaPlus:academic:${subject}:${key}`);
 
   const honours = [
     { subject: 'science', colour: 'green' },

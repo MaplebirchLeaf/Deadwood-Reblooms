@@ -44,52 +44,52 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.patch.traits.add(
     {
       title: 'Special Traits',
-      name: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.willpower.name'),
+      name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:willpower:name'),
       colour: 'gold',
       has: () => maplebirch.VP.hasTrait('willpower'),
-      text: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.willpower.text')
+      text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:willpower:text')
     },
     {
       title: 'Special Traits',
-      name: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.physique.name'),
+      name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:physique:name'),
       colour: 'gold',
       has: () => maplebirch.VP.hasTrait('physique'),
-      text: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.physique.text')
+      text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:physique:text')
     },
     {
       title: 'Special Traits',
-      name: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.beauty.name'),
+      name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:beauty:name'),
       colour: 'gold',
       has: () => maplebirch.VP.hasTrait('beauty'),
-      text: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.beauty.text')
+      text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:beauty:text')
     },
     {
       title: 'Special Traits',
-      name: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.exhibitionism.name'),
+      name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:exhibitionism:name'),
       colour: 'lustful',
       has: () => maplebirch.VP.hasTrait('exhibitionism'),
-      text: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.exhibitionism.text')
+      text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:exhibitionism:text')
     },
     {
       title: 'Special Traits',
-      name: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.deviancy.name'),
+      name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:deviancy:name'),
       colour: 'lustful',
       has: () => maplebirch.VP.hasTrait('deviancy'),
-      text: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.deviancy.text')
+      text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:deviancy:text')
     },
     {
       title: 'Special Traits',
-      name: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.promiscuity.name'),
+      name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:promiscuity:name'),
       colour: 'lustful',
       has: () => maplebirch.VP.hasTrait('promiscuity'),
-      text: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.promiscuity.text')
+      text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:promiscuity:text')
     },
     {
       title: 'Special Traits',
-      name: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.incorrigible.name'),
+      name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:incorrigible:name'),
       colour: 'silver',
       has: () => maplebirch.VP.hasTrait('incorrigible'),
-      text: () => maplebirch.t('deadwood-reblooms.VanillaPlus.traits.incorrigible.text')
+      text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:incorrigible:text')
     }
   );
 

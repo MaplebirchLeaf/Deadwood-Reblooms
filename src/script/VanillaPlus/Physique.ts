@@ -1,15 +1,15 @@
 // ./src/script/VanillaPlus/Physique.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  const text = (key: string) => maplebirch.t(`deadwood-reblooms.VanillaPlus.physique.${key}`);
+  const text = (key: string) => maplebirch.t(`deadwood-reblooms:VanillaPlus:physique:${key}`);
 
   maplebirch.tool.onInit(() => {
     setup.feats.Unbreakable ??= {
       get title() {
-        return maplebirch.t('deadwood-reblooms.VanillaPlus.physique.feat.title');
+        return maplebirch.t('deadwood-reblooms:VanillaPlus:physique:feat:title');
       },
       get desc() {
-        return maplebirch.t('deadwood-reblooms.VanillaPlus.physique.feat.description');
+        return maplebirch.t('deadwood-reblooms:VanillaPlus:physique:feat:description');
       },
       difficulty: 3,
       series: '',
@@ -36,7 +36,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       id: 'physique-break-arms',
       actionType: 'leftaction',
       cond: () => available() && (V.leftarm === 'bound' || V.rightarm === 'bound'),
-      display: () => text('action.breakArms'),
+      display: () => text('action:breakArms'),
       value: () => 'VanillaPlusPhysiqueBreakArms',
       color: 'def',
       effect: '<<deadwood-reblooms-physique-combat-break "arms">>'
@@ -45,7 +45,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       id: 'physique-break-legs',
       actionType: 'feetaction',
       cond: () => available() && (V.feetuse === 'bound' || V.leftleg === 'bound' || V.rightleg === 'bound'),
-      display: () => text('action.breakLegs'),
+      display: () => text('action:breakLegs'),
       value: () => 'VanillaPlusPhysiqueBreakLegs',
       color: 'def',
       effect: '<<deadwood-reblooms-physique-combat-break "legs">>'
@@ -54,7 +54,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       id: 'physique-break-head',
       actionType: 'mouthaction',
       cond: () => available() && V.head === 'bound',
-      display: () => text('action.breakHead'),
+      display: () => text('action:breakHead'),
       value: () => 'VanillaPlusPhysiqueBreakHead',
       color: 'def',
       effect: '<<deadwood-reblooms-physique-combat-break "head">>'
@@ -64,7 +64,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   const flag = (name: string) => `<<set $VanillaPlus.physique.${name} to true>>`;
 
   // 记录原版挣脱挑战结果，并扩展体格上限。
-  maplebirch.tool.zone.inject({
+  maplebirch.tool.inject({
     locationPassage: {
       'Flats Sneak Physique': [
         // 在公寓潜入的体格成功判断后记录 panic 挑战结果，仅成功分支会保留该标记。
@@ -109,27 +109,27 @@ export default function (maplebirch: typeof window.maplebirch) {
       Cheats: [
         // 将作弊面板体格滑条上限改为动态 125%，未突破时继续使用原版 $physiquesize。
         {
-          src: '$physique "physique" {max: $physiquesize}',
-          to: '$physique "physique" {max: $VanillaPlus.lock.physique ? Math.floor($physiquesize * 1.25) : $physiquesize}'
+          srcmatch: /\$physique "physique" \{max: (\$physiquesize)( \* \$AMCTraits\.physique)?(, percentage: false)?\}/,
+          to: '$physique "physique" {max: $VanillaPlus.lock.physique ? maplebirch.VP.ceiling("physique") : $1$2$3}'
         }
       ],
       Widgets: [
         // 替换通用组件第一处体格钳制，加入特质保底值和突破后的 125% 上限。
         {
-          src: 'Math.clamp($physique, 0, $physiquesize)',
-          to: "Math.clamp($physique, maplebirch.VP.minimum('physique'), $VanillaPlus.lock.physique ? Math.floor($physiquesize * 1.25) : $physiquesize)"
+          srcmatch: /Math\.clamp\(\$physique, 0, \$physiquesize( \* \$AMCTraits\.physique)?\)/,
+          to: "Math.clamp($physique, maplebirch.VP.minimum('physique'), $VanillaPlus.lock.physique ? maplebirch.VP.ceiling('physique') : $physiquesize$1)"
         },
         // 替换通用组件第二处体格钳制，覆盖另一条原版体格更新路径。
         {
-          src: 'Math.clamp($physique, 0, $physiquesize)',
-          to: "Math.clamp($physique, maplebirch.VP.minimum('physique'), $VanillaPlus.lock.physique ? Math.floor($physiquesize * 1.25) : $physiquesize)"
+          srcmatch: /Math\.clamp\(\$physique, 0, \$physiquesize( \* \$AMCTraits\.physique)?\)/,
+          to: "Math.clamp($physique, maplebirch.VP.minimum('physique'), $VanillaPlus.lock.physique ? maplebirch.VP.ceiling('physique') : $physiquesize$1)"
         }
       ],
       'Widgets Clamp': [
         // 替换全局体格钳制公式，使所有非专用变化同样遵守突破后的上下限。
         {
-          src: 'Math.clamp($physique, 0, $physiquesize)',
-          to: "Math.clamp($physique, maplebirch.VP.minimum('physique'), $VanillaPlus.lock.physique ? Math.floor($physiquesize * 1.25) : $physiquesize)"
+          srcmatch: /Math\.clamp\(\$physique, 0, \$physiquesize( \* \$AMCTraits\.physique)?\)/,
+          to: "Math.clamp($physique, maplebirch.VP.minimum('physique'), $VanillaPlus.lock.physique ? maplebirch.VP.ceiling('physique') : $physiquesize$1)"
         }
       ]
     }

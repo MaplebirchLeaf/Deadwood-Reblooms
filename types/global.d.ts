@@ -12,6 +12,14 @@ declare module 'twine-sugarcube' {
 }
 
 declare global {
+  interface Array<T> {
+    either(weights?: readonly number[], allowNull?: boolean): T | null | undefined;
+  }
+
+  interface ReadonlyArray<T> {
+    either(weights?: readonly number[], allowNull?: boolean): T | null | undefined;
+  }
+
   const Links: { enabled: boolean };
 
   interface Window {

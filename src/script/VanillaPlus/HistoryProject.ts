@@ -29,6 +29,13 @@ const schedule = `
         <</if>>`;
 
 export const historyProjectWidgetPassages: Record<string, PassagePatch[]> = {
+  'Widgets School Projects': [
+    {
+      src: '<</widget>>\n\n<<widget "scienceprojectchance">>',
+      applybefore: '\t<<deadwood-reblooms-history-project-home-option>>\n',
+      expected: 1
+    }
+  ],
   'Widgets Events History': [
     // 在普通历史课事件池清空后追加课题起始检查，让新事件参与当天的历史课抽取。
     {
@@ -75,12 +82,12 @@ export const historyProjectLocationPassages: Record<string, PassagePatch[]> = {
 export default function (maplebirch: typeof window.maplebirch) {
   const registerAntique = () => {
     maplebirch.tool.patch.antiques.add('antiquegoldpriestess', {
-      hint: maplebirch.t('deadwood-reblooms.VanillaPlus.history.antique.hint'),
-      museum: maplebirch.t('deadwood-reblooms.VanillaPlus.history.antique.museum'),
+      hint: maplebirch.t('deadwood-reblooms:VanillaPlus:history:antique:hint'),
+      museum: maplebirch.t('deadwood-reblooms:VanillaPlus:history:antique:museum'),
       name: 'Golden Priestess Statuette',
       cn_name: '金制女祭司像',
-      journal: maplebirch.t('deadwood-reblooms.VanillaPlus.history.antique.journal'),
-      journalName: maplebirch.t('deadwood-reblooms.VanillaPlus.history.antique.journalName'),
+      journal: maplebirch.t('deadwood-reblooms:VanillaPlus:history:antique:journal'),
+      journalName: maplebirch.t('deadwood-reblooms:VanillaPlus:history:antique:journalName'),
       icon: 'antiques/antique-golden-priestess.png'
     });
   };
@@ -88,12 +95,6 @@ export default function (maplebirch: typeof window.maplebirch) {
   registerAntique();
   maplebirch.on(':language', registerAntique);
 
-  // 在项目选项 widget 渲染后追加历史项目入口，避免改写 widget 源码。
-  maplebirch.addon.wikify('deadwood-reblooms:history-project-options', {
-    afterWidget(_text, name, _passageTitle, _passage, node) {
-      if (name === 'projectoptions') new maplebirch.SugarCube.Wikifier(node, '<<deadwood-reblooms-history-project-home-option>>');
-    }
-  });
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-history-project-museum-options', passage: 'Museum' });
   maplebirch.tool.addTo(
     'AfterLinkZone',
@@ -102,7 +103,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   );
 
   // 在原版事件池、日志和画作归还结算点接入历史项目状态。
-  maplebirch.tool.zone.inject({
+  maplebirch.tool.inject({
     locationPassage: historyProjectLocationPassages,
     widgetPassage: historyProjectWidgetPassages
   });

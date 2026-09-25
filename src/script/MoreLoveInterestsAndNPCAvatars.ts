@@ -6,7 +6,7 @@ export default function (maplebirch: MaplebirchCore) {
   'use strict';
 
   // 扩展海报头像、恋人列表和恋人移除逻辑。
-  maplebirch.tool.zone.inject({
+  maplebirch.tool.inject({
     locationPassage: {
       Bedroom: [
         // 用模块图标解析器替换卧室海报文件名判断，使自定义人物海报与原版预制海报共用入口。

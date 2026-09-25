@@ -6,7 +6,7 @@ import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
 import Finance, { DEFAULT_FINANCE_STATE } from './VanillaPlus/Finance';
-import NPCDoublePenetration from './VanillaPlus/NPCDoublePenetration';
+import NPCDoublePenetration, { type NPCDoublePenetrationState } from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
 import Willpower from './VanillaPlus/Willpower';
@@ -90,6 +90,7 @@ class VanillaPlus extends Module {
       thigh: false,
       levelFiveProgress: 0
     },
+    npcDoublePenetration: null as NPCDoublePenetrationState | null,
     willpower: {
       kylar: false,
       wraith: false,
@@ -132,17 +133,25 @@ class VanillaPlus extends Module {
     return this.attributes.some(attribute => this[attribute].max && !V.VanillaPlus.traits[attribute]) || (this.allMax && !V.VanillaPlus.traits.incorrigible);
   }
 
-  public ceiling(attribute: VanillaPlusAttribute): number {
+  public normalCeiling(attribute: VanillaPlusAttribute): number {
+    const traits = (V as typeof V & { AMCTraits?: Partial<Record<VanillaPlusAttribute, number>> }).AMCTraits;
+    const factor = traits?.[attribute];
+    const multiplier = typeof factor === 'number' && Number.isFinite(factor) && factor > 0 ? factor : 1;
     switch (attribute) {
       case 'willpower':
-        return Math.floor(V.willpowermax * 1.25);
+        return V.willpowermax * multiplier;
       case 'physique':
-        return Math.floor(V.physiquesize * 1.25);
+        return V.physiquesize * multiplier;
       case 'beauty':
-        return Math.floor(V.beautymax * 1.25);
+        return V.beautymax * multiplier;
       default:
-        return 150;
+        return 100;
     }
+  }
+
+  public ceiling(attribute: VanillaPlusAttribute): number {
+    const ratio = attribute === 'willpower' || attribute === 'physique' || attribute === 'beauty' ? 1.25 : 1.5;
+    return Math.floor(this.normalCeiling(attribute) * ratio);
   }
 
   // 开发准备只补齐该属性的突破条件，便于测试正常触发流程。
@@ -189,7 +198,7 @@ class VanillaPlus extends Module {
 
   public minimum(attribute: VanillaPlusAttribute): number {
     if (V.VanillaPlus.traits.incorrigible) return this.ceiling(attribute);
-    return attribute === 'beauty' && V.VanillaPlus.traits.beauty ? V.beautymax : 0;
+    return attribute === 'beauty' && V.VanillaPlus.traits.beauty ? this.normalCeiling('beauty') : 0;
   }
 
   public get belowMinimum(): boolean {

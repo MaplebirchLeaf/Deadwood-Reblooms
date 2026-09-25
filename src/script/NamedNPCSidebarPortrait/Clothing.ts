@@ -186,7 +186,7 @@ export const Clothing = {
     accessory: 1,
     accessory_colour: 'white',
     accessory_colour_sidebar: 1,
-    pattern: 0,
+    pattern: '',
     pattern_options: ['detail'],
     pattern_caption: true,
     pattern_layer: 'tertiary',

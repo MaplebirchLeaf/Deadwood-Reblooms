@@ -26,13 +26,10 @@ export default function (maplebirch: MaplebirchCore): void {
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
 
     // 内衣沿用现有基础套装；剧情战斗暴露由框架使用原版当前对象处理。
     wardrobe.base('Bailey', clothes => {
-      const underwear = C.npc?.Bailey?.pronoun === 'm' ? male : female;
-      for (const item of Object.values(underwear)) sidebar.apply(clothes, item);
+      wardrobe.put(clothes, C.npc?.Bailey?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
     wardrobe.wear('Bailey', '*', 'formal_suit');
     wardrobe.modify('Bailey', clothes => {

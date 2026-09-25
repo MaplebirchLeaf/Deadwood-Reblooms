@@ -16,5 +16,5 @@ export const sydneyConfessionPassages: Record<string, PassagePatch[]> = {
 
 export default function (maplebirch: typeof window.maplebirch) {
   // 扩展悉尼告解分支，同时保留原版恋爱条件作为回退。
-  maplebirch.tool.zone.inject({ locationPassage: sydneyConfessionPassages });
+  maplebirch.tool.inject({ locationPassage: sydneyConfessionPassages });
 }

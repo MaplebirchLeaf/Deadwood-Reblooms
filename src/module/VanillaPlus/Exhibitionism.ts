@@ -3,11 +3,11 @@
 class Exhibitionism {
   public get unlock(): boolean {
     const exhibitionism = V.VanillaPlus.exhibitionism;
-    return !V.VanillaPlus.lock.exhibitionism && V.exhibitionism >= 100 && exhibitionism.swimming && exhibitionism.ballroom && exhibitionism.highStreet;
+    return !V.VanillaPlus.lock.exhibitionism && V.exhibitionism >= window.maplebirch.VP.normalCeiling('exhibitionism') && exhibitionism.swimming && exhibitionism.ballroom && exhibitionism.highStreet;
   }
 
   public get max(): boolean {
-    return V.VanillaPlus.lock.exhibitionism && V.exhibitionism >= 150;
+    return V.VanillaPlus.lock.exhibitionism && V.exhibitionism >= window.maplebirch.VP.ceiling('exhibitionism');
   }
 
   public developer(): void {
@@ -17,7 +17,7 @@ class Exhibitionism {
       ballroom: true,
       highStreet: true
     });
-    V.exhibitionism = 100;
+    V.exhibitionism = window.maplebirch.VP.normalCeiling('exhibitionism');
   }
 }
 

@@ -23,10 +23,8 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const male = wardrobe.get('male_underwear') ?? {};
-    const female = wardrobe.get('female_underwear') ?? {};
     wardrobe.base('Darryl', clothes => {
-      for (const item of Object.values(C.npc?.Darryl?.pronoun === 'm' ? male : female)) sidebar.apply(clothes, item);
+      wardrobe.put(clothes, C.npc?.Darryl?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
 
     // Widgets Named Npcs 固定选择 formal；办公室、吧台和救援均沿用该正装。
@@ -44,7 +42,7 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
       const colour = colours.outfit.get('gown');
       for (const slot of ['upper', 'lower'] as const) {
         if (!clothes[slot]) continue;
-        clothes[slot].pattern = 0;
+        clothes[slot].pattern = '';
         if (colour) clothes[slot].colour = clothes[slot].accessory_colour = colour;
       }
       const feet = clothes.feet;

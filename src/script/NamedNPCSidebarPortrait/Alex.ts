@@ -40,7 +40,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     // 日常保留女性胸罩和红黑条纹内裤；睡衣明确不穿胸罩
     wardrobe.base('Alex', (clothes, context) => {
       if (context.location === 'naked' || context.location === 'sleep_shirt_only') return;
-      if (context.location !== 'sleep' && C.npc?.Alex?.pronoun !== 'm' && female.under_upper) sidebar.apply(clothes, female.under_upper);
+      if (context.location !== 'sleep' && C.npc?.Alex?.pronoun !== 'm' && female.under_upper) sidebar.apply(clothes, female.under_upper, 'under_upper');
       sidebar.apply(clothes, Clothing.striped_panties);
     });
 

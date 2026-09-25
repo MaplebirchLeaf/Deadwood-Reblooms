@@ -7,7 +7,7 @@ class Willpower {
 
     return (
       !V.VanillaPlus.lock.willpower &&
-      V.willpower >= V.willpowermax &&
+      V.willpower >= window.maplebirch.VP.normalCeiling('willpower') &&
       earSlimes >= 2 &&
       V.VanillaPlus.willpower.kylar &&
       V.VanillaPlus.willpower.wraith &&
@@ -21,7 +21,7 @@ class Willpower {
   }
 
   public get max(): boolean {
-    return V.VanillaPlus?.lock?.willpower && V.willpower >= Math.floor(V.willpowermax * 1.25);
+    return V.VanillaPlus?.lock?.willpower && V.willpower >= window.maplebirch.VP.ceiling('willpower');
   }
 
   public earSlimeResistance(value: number): number {
@@ -36,7 +36,7 @@ class Willpower {
       schism: true,
       vigil: true
     });
-    V.willpower = V.willpowermax;
+    V.willpower = window.maplebirch.VP.normalCeiling('willpower');
     V.temple_confessor_intro = true;
     V.torturesurvivor = 1;
     V.parasite ??= {};

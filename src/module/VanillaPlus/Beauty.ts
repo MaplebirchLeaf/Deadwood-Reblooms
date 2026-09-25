@@ -15,7 +15,14 @@ class Beauty {
   }
 
   public get unlock(): boolean {
-    return !V.VanillaPlus.lock.beauty && V.beauty >= V.beautymax && V.VanillaPlus.beauty.alluring && V.fame.model >= 1000 && this.unadorned && !V.worn.face.type.includes('mask');
+    return (
+      !V.VanillaPlus.lock.beauty &&
+      V.beauty >= window.maplebirch.VP.normalCeiling('beauty') &&
+      V.VanillaPlus.beauty.alluring &&
+      V.fame.model >= 1000 &&
+      this.unadorned &&
+      !V.worn.face.type.includes('mask')
+    );
   }
 
   public complete(): void {
@@ -23,18 +30,18 @@ class Beauty {
   }
 
   public get max(): boolean {
-    return V.VanillaPlus.lock.beauty && V.beauty >= Math.floor(V.beautymax * 1.25);
+    return V.VanillaPlus.lock.beauty && V.beauty >= window.maplebirch.VP.ceiling('beauty');
   }
 
   public get floor(): number {
-    if (V.VanillaPlus.traits.incorrigible) return Math.floor(V.beautymax * 1.25);
-    return V.VanillaPlus.traits.beauty ? V.beautymax : 0;
+    if (V.VanillaPlus.traits.incorrigible) return window.maplebirch.VP.ceiling('beauty');
+    return V.VanillaPlus.traits.beauty ? window.maplebirch.VP.normalCeiling('beauty') : 0;
   }
 
   public developer(): void {
     V.VanillaPlus.lock.beauty = false;
     V.VanillaPlus.beauty.alluring = true;
-    V.beauty = V.beautymax;
+    V.beauty = window.maplebirch.VP.normalCeiling('beauty');
     V.fame.model = Math.max(V.fame.model, 1000);
     V.makeup ??= {};
     Object.assign(V.makeup, {

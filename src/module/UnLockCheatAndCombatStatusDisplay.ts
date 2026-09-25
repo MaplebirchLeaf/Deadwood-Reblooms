@@ -19,7 +19,7 @@ class UnlockCheatAndCombatStatusDisplay {
     const trust = ' <<print "(" + Math.round($enemytrust) + ")">>';
 
     // 解锁原版作弊入口，并在战斗状态旁显示精确数值。
-    this.core.tool.zone.inject({
+    this.core.tool.inject({
       locationPassage: {
         StoryCaption: [
           // 删除作弊菜单入口对 $cheatsEnabled 的额外限制，让本模块启用时入口始终可见。

@@ -25,7 +25,7 @@ class NPCDoublePenetration {
   }
 
   public get state(): NPCDoublePenetrationState | undefined {
-    return V.NPCDoublePenetration;
+    return V.VanillaPlus?.npcDoublePenetration ?? undefined;
   }
 
   public get visible(): boolean {
@@ -103,14 +103,14 @@ class NPCDoublePenetration {
 
   // 记录目标和第二名插入者；PC 仍沿用原版 $penis* 状态。
   public begin(recipient: number, partner: number, orifice: NPCDoubleOrifice): boolean {
-    this.clear();
     const recipientTarget = Number(recipient);
     const partnerTarget = Number(partner);
     if (!Number.isInteger(recipientTarget) || !Number.isInteger(partnerTarget) || recipientTarget === partnerTarget || !this.validNpc(recipientTarget) || !this.validNpc(partnerTarget)) return false;
     const partnerNpc = V.NPCList[partnerTarget];
     if (!this.canJoin(partnerTarget)) return false;
+    this.clear();
 
-    V.NPCDoublePenetration = {
+    V.VanillaPlus.npcDoublePenetration = {
       recipient: recipientTarget,
       partner: partnerTarget,
       partnerLocation: partnerNpc.location?.genitals ?? 0,
@@ -120,7 +120,8 @@ class NPCDoublePenetration {
     };
     partnerNpc.location ??= {};
     partnerNpc.location.genitals = 'genitals';
-    partnerNpc.penis = this.partnerState(V.NPCDoublePenetration.stage);
+    partnerNpc.penis = this.partnerState(V.VanillaPlus.npcDoublePenetration.stage);
+    this.markRecipient(V.VanillaPlus.npcDoublePenetration);
     // 双性 NPC 的空闲阴部会触发原版 vaginainit，造成其一边插入目标、一边随机转向 PC。
     if (partnerNpc.vagina === 0) partnerNpc.vagina = PARTNER_BODY;
     return this.update();
@@ -138,6 +139,7 @@ class NPCDoublePenetration {
     const partner = V.NPCList[state.partner];
     partner.penis = this.partnerState(state.stage);
     if (state.partnerVagina === 0) partner.vagina = PARTNER_BODY;
+    this.markRecipient(state);
     return true;
   }
 
@@ -150,7 +152,12 @@ class NPCDoublePenetration {
       partner.location.genitals = state?.partnerLocation ?? 0;
     }
     if (partner?.vagina === PARTNER_BODY) partner.vagina = state?.partnerVagina ?? 0;
-    delete V.NPCDoublePenetration;
+    const recipient = state && V.NPCList?.[state.recipient];
+    if (state && recipient?.VanillaPlus?.npcDoublePenetration?.partner === state.partner) {
+      delete recipient.VanillaPlus.npcDoublePenetration;
+      if (Object.keys(recipient.VanillaPlus).length === 0) delete recipient.VanillaPlus;
+    }
+    if (V.VanillaPlus) V.VanillaPlus.npcDoublePenetration = null;
   }
 
   private valid(): boolean {
@@ -166,6 +173,12 @@ class NPCDoublePenetration {
   private validNpc(index: number): boolean {
     const npc = V.NPCList?.[index];
     return npc?.active === 'active' && npc.stance !== 'defeated';
+  }
+
+  private markRecipient(state: NPCDoublePenetrationState): void {
+    const recipient = V.NPCList[state.recipient];
+    recipient.VanillaPlus ??= {};
+    recipient.VanillaPlus.npcDoublePenetration = { partner: state.partner, orifice: state.orifice, stage: state.stage };
   }
 
   private pcStage(orifice: NPCDoubleOrifice): NPCDoubleStage {
