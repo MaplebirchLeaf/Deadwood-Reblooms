@@ -260,11 +260,13 @@ export default function (
       return Weather.precipitation === 'none' ? 'rear_courtyard' : 'library';
     }
 
+    // 凌晨仍在卧室；上学日的校服日程不能覆盖休息时段。
+    if (Time.hour < 7) return 'manor_bedroom';
+
     // 上学日沿用校服
     if (Time.schoolDay) return 'school';
 
     // 私人日程
-    if (Time.hour < 7) return 'manor_bedroom';
     if (Time.hour >= 9 && Time.hour < 18) return Weather.precipitation === 'none' ? 'park' : 'arcade';
     return '';
   }

@@ -61,9 +61,9 @@ interface RealEstateState {
 
 interface ResidentProfile {
   id: string;
-  minimumLove?: number;
+  cohabits?: boolean;
   welcome?: LocalizedText;
-  decline: LocalizedText;
+  decline?: LocalizedText;
   evening?: LocalizedText;
   together?: LocalizedText;
 }
@@ -233,9 +233,7 @@ class RealEstate {
       if (
         !profile?.id ||
         ids.has(profile.id) ||
-        !localized(profile.decline) ||
-        (profile.minimumLove !== undefined &&
-          (!Number.isFinite(profile.minimumLove) || profile.minimumLove < 0 || !localized(profile.welcome) || !localized(profile.evening) || !localized(profile.together)))
+        (profile.cohabits === true ? !localized(profile.welcome) || !localized(profile.evening) || !localized(profile.together) : !localized(profile.decline))
       ) {
         throw new Error(`Real estate resident #${index + 1} is incomplete or duplicated.`);
       }
@@ -305,7 +303,7 @@ class RealEstate {
   private reconcileResidents(): void {
     const residents = (this.state.residents ??= {});
     for (const [id, names] of Object.entries(residents)) {
-      residents[id] = names.filter(name => this.owns(id) && window.isLoveInterest(name) && this.residentProfiles.some(profile => profile.id === name && profile.minimumLove !== undefined));
+      residents[id] = names.filter(name => this.owns(id) && window.isLoveInterest(name) && this.residentProfiles.some(profile => profile.id === name && profile.cohabits));
     }
   }
 
@@ -318,8 +316,24 @@ class RealEstate {
   }
 
   public residentsHome(id: PropertyId): ResidentProfile[] {
-    // 当前只给玩家住所提供夜间互动；原版其他地点的 NPC 日程尚未接入同住状态。
-    return this.state.active === id && (Time.hour >= 20 || Time.hour < 7) ? this.residentsAt(id) : [];
+    if (this.state.active !== id) return [];
+    // 只借用原有日程的休息时段。四人的地点名不同，且 Sydney 的 home 与 Whitney 的 topless
+    // 也会在清晨使用，所以后两者还需限定夜间时间。特殊剧情地点保持优先，不强行迁到住宅。
+    return this.residentsAt(id).filter(profile => {
+      const location = this.core.npc.Schedule.get(profile.id).location;
+      switch (profile.id) {
+        case 'Robin':
+          return location === 'sleep';
+        case 'Whitney':
+          return location === 'topless' && Time.hour < 7;
+        case 'Kylar':
+          return location === 'manor_bedroom' && Time.hour < 7;
+        case 'Sydney':
+          return location === 'home' && (Time.hour >= 23 || Time.hour < 6);
+        default:
+          return false;
+      }
+    });
   }
 
   public inviteResident(name: string, id: PropertyId): boolean {
@@ -330,9 +344,8 @@ class RealEstate {
     if (!profile || !window.isLoveInterest(name)) return false;
     const residents = (this.state.residents[id] ??= []);
     if (residents.includes(name)) return false;
-    const love = Number((C.npc as Record<string, { love?: number } | undefined>)[name]?.love ?? 0);
     let result: 'joined' | 'declined' | 'full' | 'bed';
-    if (profile.minimumLove === undefined || love < profile.minimumLove) result = 'declined';
+    if (!profile.cohabits) result = 'declined';
     else if (residents.length >= property.residentCapacity) result = 'full';
     else if (!this.canShareBed(id)) result = 'bed';
     else {
@@ -364,7 +377,8 @@ class RealEstate {
 
   public get currentCompanion(): ResidentProfile | undefined {
     const name = this.state.meetingResident;
-    return name && this.current && this.residentsAt(this.current.id).some(profile => profile.id === name) ? this.residentProfiles.find(profile => profile.id === name) : undefined;
+    // 互动开始时已检查夜间日程。对话或遭遇战跨过日程边界后，仍要认得本次选中的同住者。
+    return name && this.current ? this.residentsAt(this.current.id).find(profile => profile.id === name) : undefined;
   }
 
   public buy(id: PropertyId): string {

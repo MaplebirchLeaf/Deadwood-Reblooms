@@ -84,16 +84,28 @@ V.robinromance = 1;
 V.robinmissing = 0;
 V.loveInterestList = ['Robin'];
 V.loveInterest = { primary: 'Robin', secondary: 'None', tertiary: 'None' };
-C.npc.Robin.love = 80;
 maplebirch.VP.realEstate.buy('barb');
 maplebirch.VP.realEstate.moveIn('barb');
 Time.setTime(23, 0);
 SugarCube.Engine.play('Deadwood Reblooms Property Household');
 ```
 
-未升级单人床时，邀请应提示需要双人床。在卧室购买大床，再回同住页面邀请。20:00 后回起居室与卧室，应出现罗宾的夜间文字和互动；白天不显示在家。可在独立测试存档替换为惠特尼、凯拉尔、悉尼，并把 `V.loveInterestList`、`V.loveInterest`、`C.npc.角色.love` 改为同一角色。是否为当前恋人由 `window.isLoveInterest('角色名')` 检查；取消恋人选择后才删除同住记录。
+未升级单人床时，邀请应提示需要双人床。在卧室购买大床，再回同住页面邀请。好感数值不作为邀请门槛；是否为当前恋人由 `window.isLoveInterest('角色名')` 检查。可在独立测试存档替换为惠特尼、凯拉尔、悉尼，并把 `V.loveInterestList`、`V.loveInterest` 改为同一角色。取消恋人选择后才删除同住记录。
 
-目前的同住仅在自住房展示夜间互动，原版其他地点仍有其自身的 NPC 日程。尤其悉尼的神殿夜间活动会与自住房文字重叠；角色暂时失踪或被囚禁时，也尚未根据原版行程隐藏住宅夜间互动。这些是尚需继续接入的剧情边界，不能把此项判作完整通过。
+夜间场景以 `NPCSidebarPortrait` 的现有日程地点为准，请启用该模块后分别检查：Robin 在 21:00 至 06:59 的 `sleep`；Whitney 在 00:00 至 06:59 的 `topless`；Kylar 在 00:00 至 06:59 的 `manor_bedroom`；Sydney 在通常 23:00 至 05:59 的 `home`。可在住宅页面用 `maplebirch.npc.Schedule.get('Robin').location` 等命令核对地点。地点不匹配时，起居室、卧室和床边都不应出现该角色；入住记录仍保留。每人再切换较高和较低的创伤、支配、好感或腐化数值，检查不同文本分支。
+
+邀请成功后，在各角色休息时段从起居室选择“一起待一会儿”，或进入卧室。两处的“一起上床”都应进入双人遭遇战，且选择的是页面上那一位同住恋人。检验继续回合、对方高潮、主动结束及打倒对方的不同收尾，再返回自住房卧室。可在准备好入住和日程后，用下列命令直接打开遭遇战首回合：
+
+```js
+maplebirch.VP.realEstate.visit('barb');
+maplebirch.VP.realEstate.meetResident('Robin', 'barb');
+V.sexstart = 1;
+SugarCube.Engine.play('Deadwood Reblooms Property Intimacy');
+```
+
+把 `Robin` 换成另外三位时，先将当前恋人及同住记录准备为该角色，并把时间设在对应休息时段。再把时间推过早晨的日程边界，检查已经开始的对话和遭遇战不会突然丢失所选伴侣；离开场景后，新互动仍按即时日程出现或消失。新链接的英文标签应在中文界面显示为“一起上床”和“返回卧室”。
+
+目前的同住只在上述休息日程于自住房展示互动，不会接管原版其他地点的 Passage。仍需在游戏里确认这些 Passage 的 NPC 出现条件，例如悉尼神殿场景是否会与住宅场景重叠；不能仅凭住宅内的文本判定原版日程已经整体迁移。
 
 ## 自住房镜子与异种癖通道
 

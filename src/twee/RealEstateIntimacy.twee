@@ -1,0 +1,138 @@
+:: Deadwood Reblooms Property Intimacy []
+<!-- 入口已从当晚在家的同住者中选人；战斗回合跨过起床时间后，继续使用当前存档里选中的同一人。 -->
+<<set _property to maplebirch.VP.realEstate.current>>
+<<set _partner to maplebirch.VP.realEstate.currentCompanion>>
+<<if !_property || !_partner || $VanillaPlus.realEstate.active isnot _property.id>>
+	<<set $sexstart to 0>>
+	<<lanLink 'Return to the bedroom' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>>
+	<<if $sexstart is 1>>
+		<<set $sexstart to 0>>
+		<<clearnpc>>
+		<<npc _partner.id>><<person1>>
+		<<consensual>>
+		<<set $consensual to 1>>
+		<<neutral 1>>
+		<<maninit>>
+		<<set $enemytrust += 500>>
+		<<set $enemyarousalmax to 600>>
+		<<npckiss>>
+		<<language>>
+			<<option 'EN'>>You close the bedroom door and turn to <<him>>.
+			<<option 'CN'>>你关上卧室门，转身看向<<him>>。
+		<</language>>
+		<br><br>
+		<<switch _partner.id>>
+			<<case 'Robin'>>
+				<<if C.npc.Robin.trauma gte 20>>
+					<<language>>
+						<<option 'EN'>>"We can take our time," Robin says. <<He>> waits for you to come closer before kissing you.
+						<<option 'CN'>>“我们可以慢慢来。”罗宾等你靠近，才吻了你。
+					<</language>>
+				<<else>>
+					<<language>>
+						<<option 'EN'>>Robin smiles and pulls you down beside <<him>>. "I've been waiting for you."
+						<<option 'CN'>>罗宾笑着把你拉到身边。“我一直在等你。”
+					<</language>>
+				<</if>>
+			<<case 'Whitney'>>
+				<<if C.npc.Whitney.dom gte 50>>
+					<<language>>
+						<<option 'EN'>>"About time," Whitney says, tugging you onto the bed. <<He>> kisses you before you can reply.
+						<<option 'CN'>>“早该这样了。”惠特尼把你拉到床上，没等你回答便吻了过来。
+					<</language>>
+				<<else>>
+					<<language>>
+						<<option 'EN'>>Whitney sits beside you and brushes your hand with <<his>>. "You sure?" <<He>> kisses you when you nod.
+						<<option 'CN'>>惠特尼挨着你坐下，手指碰了碰你的手。“你确定？”你点头后，<<he>>吻了你。
+					<</language>>
+				<</if>>
+			<<case 'Kylar'>>
+				<<if C.npc.Kylar.love gte 60>>
+					<<language>>
+						<<option 'EN'>>Kylar draws you close. "I want to stay like this," <<he>> says, pressing a kiss to your cheek.
+						<<option 'CN'>>凯拉尔把你拉近。“我想一直这样待着。”<<he>>说着吻了吻你的脸颊。
+					<</language>>
+				<<else>>
+					<<language>>
+						<<option 'EN'>>"With me?" Kylar asks. You take <<his>> hand, and <<he>> follows you onto the bed.
+						<<option 'CN'>>“和我一起？”凯拉尔问。你握住<<his>>手，<<he>>才跟着你坐到床上。
+					<</language>>
+				<</if>>
+			<<case 'Sydney'>>
+				<<if C.npc.Sydney.corruption gte 30>>
+					<<language>>
+						<<option 'EN'>>Sydney sets <<his>> temple pendant aside. "Now I can have you to myself," <<he>> murmurs, drawing you close.
+						<<option 'CN'>>悉尼把神殿吊坠放到一旁。“现在你可以只陪着我了。”<<he>>低声说着，把你拉近。
+					<</language>>
+				<<else>>
+					<<language>>
+						<<option 'EN'>>Sydney sets <<his>> temple pendant aside. "Is this all right?" <<he>> asks, waiting for your answer before kissing you.
+						<<option 'CN'>>悉尼把神殿吊坠放到一旁。“这样可以吗？”<<he>>等你回答，才吻了你。
+					<</language>>
+				<</if>>
+		<</switch>>
+		<br><br>
+	<</if>>
+	<<set $enemyanger to 0>>
+	<<effects>>
+	<<effectsman>>
+	<<man>>
+	<<stateman>>
+	<br><br>
+	<<actionsman>>
+	<<if _combatend or _controlRegain is 1>>
+		<span id='next'><<lanLink 'Next' 'Deadwood Reblooms Property Intimacy Finish'>><</lanLink>></span><<nexttext>>
+	<<else>>
+		<span id='next'><<lanLink 'Next' 'Deadwood Reblooms Property Intimacy'>><</lanLink>></span><<nexttext>>
+	<</if>>
+<</if>>
+
+:: Deadwood Reblooms Property Intimacy Finish []
+<<set _partner to maplebirch.VP.realEstate.currentCompanion>>
+<<run maplebirch.VP.realEstate.enter()>><<effects>>
+<<if _partner>>
+	<<if $enemyarousal gte $enemyarousalmax>>
+		<<ejaculation>>
+		<<npcincr _partner.id lust -20>><<lllust>><br>
+	<</if>>
+	<<if $enemyhealth lte 0>>
+		<<npcincr _partner.id love -1>><<llove>>
+		<<language>>
+			<<option 'EN'>>
+				<<= _partner.id>> pulls away. You give <<him>> room to recover.
+			<<option 'CN'>>
+				<<= maplebirch.auto(_partner.id)>>躲开了。你留出地方，让<<him>>缓一缓。
+		<</language>>
+	<<else>>
+		<<npcincr _partner.id love 1>><<glove>>
+		<<language>>
+			<<option 'EN'>>
+				<<switch _partner.id>>
+					<<case 'Robin'>>
+						Robin nestles against you beneath the covers. "Can we stay here a little longer?"
+					<<case 'Whitney'>>
+						Whitney catches your hand as you sit up. "Where are you going?" <<He>> moves over to make room for you again.
+					<<case 'Kylar'>>
+						Kylar stays close, <<his>> fingers curled around yours. "You really want me here?"
+					<<case 'Sydney'>>
+						Sydney finds <<his>> pendant on the bedside table and leaves it there. "The temple can wait until morning."
+				<</switch>>
+			<<option 'CN'>>
+				<<switch _partner.id>>
+					<<case 'Robin'>>
+						罗宾缩进被窝，靠在你身边。“我们能再躺一会儿吗？”
+					<<case 'Whitney'>>
+						你坐起来时，惠特尼拉住你的手。“你要去哪儿？”<<He>>挪了挪，让你重新躺下。
+					<<case 'Kylar'>>
+						凯拉尔挨着你，手指紧紧扣住你的手。“你真的愿意我住在这里？”
+					<<case 'Sydney'>>
+						悉尼看了看床边的吊坠，没有去拿。“神殿的事，明早再说吧。”
+				<</switch>>
+		<</language>>
+	<</if>>
+	<br><br>
+<</if>>
+<<clotheson>><<endcombat>>
+<<lanLink 'Return to the bedroom' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>

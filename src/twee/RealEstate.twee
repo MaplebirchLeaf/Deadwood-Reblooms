@@ -175,8 +175,62 @@
 		<span class='green'><<lanSwitch 'This is your current home.' '这里是你目前的住处。'>></span><br>
 		<<for _resident range maplebirch.VP.realEstate.residentsHome(_property.id)>>
 			<<capture _resident>>
+				<<npc _resident.id>><<person1>>
 				<<= lanSwitch(_resident.evening.EN, _resident.evening.CN)>><br><br>
-				<<lanLink 'Spend time together (0:20)' 'Deadwood Reblooms Property Evening Together'>><<run maplebirch.VP.realEstate.meetResident(_resident.id, _property.id)>><<pass 20>><<stress -2>><</lanLink>><br>
+				<<switch _resident.id>>
+					<<case 'Robin'>>
+						<<if C.npc.Robin.trauma gte 20>>
+							<<language>>
+								<<option 'EN'>>Robin keeps the hall lamp on and glances at the door whenever a sound carries in from the street.
+								<<option 'CN'>>罗宾留着门厅的灯。街上传来一点动静，便朝门口望去。
+							<</language>>
+						<<else>>
+							<<language>>
+								<<option 'EN'>>Robin pours you a cup of tea. "We can worry about the orphanage tomorrow," <<he>> says.
+								<<option 'CN'>>罗宾给你倒了杯茶。“孤儿院的事，明天再操心吧。”<<he>>说。
+							<</language>>
+						<</if>><br><br>
+					<<case 'Whitney'>>
+						<<if C.npc.Whitney.dom gte 50>>
+							<<language>>
+								<<option 'EN'>>Whitney has taken the best chair. "What?" <<He>> moves over when you come closer.
+								<<option 'CN'>>惠特尼占了最舒服的椅子。“干嘛？”你走近时，<<he>>还是挪出一块地方。
+							<</language>>
+						<<else>>
+							<<language>>
+								<<option 'EN'>>Whitney waits until you close the front door. "You're late," <<he>> says, taking your coat before you can answer.
+								<<option 'CN'>>惠特尼等你关上门。“你回来晚了。”<<he>>没等你回答，便接过你脱下的外套。
+							<</language>>
+						<</if>><br><br>
+					<<case 'Kylar'>>
+						<<if C.npc.Kylar.love gte 60>>
+							<<language>>
+								<<option 'EN'>>Kylar looks up from the window when you come in. "There you are." <<He>> hurries over to meet you.
+								<<option 'CN'>>你一进门，凯拉尔便从窗边抬起头。“你回来啦。”<<He>>连忙迎上来。
+							<</language>>
+						<<else>>
+							<<language>>
+								<<option 'EN'>>Kylar sits near the door, turning the spare key over in <<his>> hands. <<He>> lets out a breath when <<he>> sees you.
+								<<option 'CN'>>凯拉尔坐在门边，攥着备用钥匙翻来覆去。见你进来，<<he>>才松了口气。
+							<</language>>
+						<</if>><br><br>
+					<<case 'Sydney'>>
+						<<if C.npc.Sydney.corruption gte 30>>
+							<<language>>
+								<<option 'EN'>>Sydney puts the temple robes aside and draws you close by the wrist. "No one is here to interrupt us."
+								<<option 'CN'>>悉尼把神殿长袍搁到一旁，握住你的手腕拉你靠近。“这里没人会打扰我们。”
+							<</language>>
+						<<else>>
+							<<language>>
+								<<option 'EN'>>Sydney folds the temple robes before sitting beside you. "It's good to be home," <<he>> says quietly.
+								<<option 'CN'>>悉尼叠好神殿长袍，在你身边坐下。“回到家真好。”<<he>>轻声说。
+							<</language>>
+						<</if>><br><br>
+				<</switch>>
+				<<lanLink 'Spend time together (0:20)' 'Deadwood Reblooms Property Evening Together'>>
+					<<run maplebirch.VP.realEstate.meetResident(_resident.id, _property.id)>>
+					<<pass 20>>
+				<</lanLink>><br>
 			<</capture>>
 		<</for>>
 		<<lanLink 'Talk about sharing this home' 'Deadwood Reblooms Property Household'>><</lanLink>><br>
@@ -245,7 +299,65 @@
 	<<lanLink 'Return to the sitting room' 'Deadwood Reblooms Property Home'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
+	<<npc _companion.id>><<person1>>
 	<<= lanSwitch(_companion.together.EN, _companion.together.CN)>><br><br>
+	<<switch _companion.id>>
+		<<case 'Robin'>>
+			<<if C.npc.Robin.trauma gte 20>>
+				<<language>>
+					<<option 'EN'>>Robin's hand trembles around the cup. You sit beside <<him>> until <<he>> puts it down and begins telling you about the orphanage.
+					<<option 'CN'>>罗宾捧着杯子的手微微发抖。你在<<him>>身旁坐了一会儿，直到<<he>>放下杯子，说起孤儿院的事。
+				<</language>>
+			<<else>>
+				<<language>>
+					<<option 'EN'>>Robin lists tomorrow's chores. When you offer to take the earliest one, <<he>> laughs and rests <<his>> head on your shoulder.
+					<<option 'CN'>>罗宾数着明天要做的杂事。你主动揽下最早的一项，<<he>>笑着把头靠在你肩上。
+				<</language>>
+			<</if>><br><br>
+		<<case 'Whitney'>>
+			<<if C.npc.Whitney.dom gte 50>>
+				<<language>>
+					<<option 'EN'>>Whitney makes fun of your furniture. "You could do better." <<He>> pulls you into the chair anyway, keeping an arm around your waist.
+					<<option 'CN'>>惠特尼拿你的家具打趣。“你还能挑得更好点。”<<He>>却把你拉进椅子里，胳膊搭在你的腰上。
+				<</language>>
+			<<else>>
+				<<language>>
+					<<option 'EN'>>Whitney complains about school while you sit together. <<He>> stops halfway through a sentence and gives your hand a squeeze.
+					<<option 'CN'>>惠特尼挨着你抱怨学校的事。话说到一半，<<he>>停下来，握了握你的手。
+				<</language>>
+			<</if>><br><br>
+		<<case 'Kylar'>>
+			<<if C.npc.Kylar.love gte 60>>
+				<<language>>
+					<<option 'EN'>>Kylar shows you the spare key. "I kept it safe." When you say <<he>> can keep it, <<he>> presses it against <<his>> chest.
+					<<option 'CN'>>凯拉尔把备用钥匙拿给你看。“我保管得好好的。”你说<<he>>可以留着，<<he>>便把钥匙贴在胸前。
+				<</language>>
+			<<else>>
+				<<language>>
+					<<option 'EN'>>"I can stay, can't I?" Kylar asks, holding your sleeve. You tell <<him>> yes. <<He>> smiles and lets go.
+					<<option 'CN'>>“我能留下来，对吧？”凯拉尔攥着你的衣袖问。你答应了，<<he>>才松开手笑起来。
+				<</language>>
+			<</if>><br><br>
+		<<case 'Sydney'>>
+			<<if C.npc.Sydney.corruption gte 30>>
+				<<language>>
+					<<option 'EN'>>Sydney tells you about an errand at the temple, then leans close. "I've been thinking about you all day." <<His>> fingers brush your wrist.
+					<<option 'CN'>>悉尼说起神殿里的差事，又靠近你。“我一整天都在想你。”<<His>>手指轻轻擦过你的手腕。
+				<</language>>
+			<<else>>
+				<<language>>
+					<<option 'EN'>>Sydney tells you about someone <<he>> helped at the temple. You tell <<him>> about your day. <<He>> listens, still holding your hand.
+					<<option 'CN'>>悉尼说起今天在神殿帮过的人。你也讲了自己的一天，<<he>>一直握着你的手听。
+				<</language>>
+			<</if>><br><br>
+	<</switch>>
+	<<stress -2>><<lstress>><br>
+	<<if maplebirch.VP.realEstate.residentsHome(_property.id).some(profile => profile.id === _companion.id)>>
+		<<loveicon 'kiss'>>
+		<<lanLink 'Go to bed together' 'Deadwood Reblooms Property Intimacy'>>
+			<<set $sexstart to 1>>
+		<</lanLink>><<promiscuous1>><br>
+	<</if>>
 	<<lanLink 'Return to the sitting room' 'Deadwood Reblooms Property Home'>><</lanLink>>
 <</if>>
 
@@ -324,7 +436,36 @@
 	<<lanSwitch 'You settle beneath your own sheets.' '你躺进属于自己的被褥里。'>><br><br>
 	<<if maplebirch.VP.realEstate.canShareBed(_bedProperty.id) && maplebirch.VP.realEstate.residentsHome(_bedProperty.id).length gt 0>>
 		<<set _bedCompanion to maplebirch.VP.realEstate.residentsHome(_bedProperty.id)[0]>>
-		<<= maplebirch.auto(_bedCompanion.id)>> <<lanSwitch 'settles beside you.' '在你身边躺下。'>><br><br>
+		<<npc _bedCompanion.id>><<person1>>
+		<<switch _bedCompanion.id>>
+			<<case 'Robin'>>
+				<<if C.npc.Robin.trauma gte 20>>
+					<<language>>
+						<<option 'EN'>>"Can we leave the lamp on?" Robin asks. You do, and <<he>> settles beside you.
+						<<option 'CN'>>“能留着灯吗？”罗宾问。你点亮床边的灯，<<he>>在你身旁躺下。
+					<</language>>
+				<<else>>
+					<<language>>
+						<<option 'EN'>>Robin slips under the covers and takes your hand. <<He>> closes <<his>> eyes with a smile.
+						<<option 'CN'>>罗宾钻进被窝，握住你的手，笑着闭上眼睛。
+					<</language>>
+				<</if>>
+			<<case 'Whitney'>>
+				<<language>>
+					<<option 'EN'>>"You're taking up the whole bed," Whitney mutters. <<He>> pulls you closer anyway.
+					<<option 'CN'>>“你把整张床都占了。”惠特尼嘟囔着，却把你拉得更近。
+				<</language>>
+			<<case 'Kylar'>>
+				<<language>>
+					<<option 'EN'>>"Are you comfortable?" Kylar asks. When you nod, <<he>> curls up beside you.
+					<<option 'CN'>>“你睡得舒服吗？”凯拉尔问。你点点头，<<he>>便蜷在你身旁。
+				<</language>>
+			<<case 'Sydney'>>
+				<<language>>
+					<<option 'EN'>>Sydney sets <<his>> temple pendant on the bedside table and lies down beside you.
+					<<option 'CN'>>悉尼把神殿吊坠放在床边，在你身旁躺下。
+				<</language>>
+		<</switch>><br><br>
 	<</if>>
 	<<generateSleepLinks 'Deadwood Reblooms Property Sleep'>>
 	<<lanLink 'Get up' 'Deadwood Reblooms Property Bedroom'>><<deadwood-reblooms-property-clothes-on>><</lanLink>>

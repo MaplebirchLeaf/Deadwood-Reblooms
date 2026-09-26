@@ -244,6 +244,9 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     if (whitney.state === 'pillory') return 'pillory';
     if (whitney.state === 'dungeon' || !['active', 'rescued'].includes(whitney.state)) return '';
 
+    // 深夜在家休息；上学日不能让校服日程覆盖凌晨的私人时间。
+    if (Time.hour < 7) return 'topless';
+
     // 上学日沿用校服
     if (Time.schoolDay) return 'school';
 

@@ -19,7 +19,36 @@
 	<</if>>
 	<<if maplebirch.VP.realEstate.residentsHome(_property.id).length gt 0>>
 		<<set _bedroomCompanion to maplebirch.VP.realEstate.residentsHome(_property.id)[0]>>
-		<<= maplebirch.auto(_bedroomCompanion.id)>> <<lanSwitch 'has left a few belongings beside your wardrobe.' '在衣柜旁放了几样自己的东西。'>><br><br>
+		<<npc _bedroomCompanion.id>><<person1>>
+		<<switch _bedroomCompanion.id>>
+			<<case 'Robin'>>
+				<<language>>
+					<<option 'EN'>>Robin has folded a spare blanket at the foot of the bed. <<He>> pats the space beside <<him>> when you come in.
+					<<option 'CN'>>罗宾把备用毯子叠在床尾。见你进来，<<he>>拍拍身旁的位置。
+				<</language>>
+			<<case 'Whitney'>>
+				<<language>>
+					<<option 'EN'>>Whitney's bag lies where <<he>> dropped it. <<He>> has pulled the second pillow close to yours.
+					<<option 'CN'>>惠特尼的包还丢在原处。<<He>>倒是把第二只枕头挪到了你的枕边。
+				<</language>>
+			<<case 'Kylar'>>
+				<<language>>
+					<<option 'EN'>>Kylar has stacked <<his>> things beside the wardrobe. <<He>> looks up from the bed when you enter.
+					<<option 'CN'>>凯拉尔把东西叠在衣柜旁。你走进来时，<<he>>从床上抬起头。
+				<</language>>
+			<<case 'Sydney'>>
+				<<language>>
+					<<option 'EN'>>Sydney has hung <<his>> temple clothes apart from the rest, ready for the morning. <<He>> makes room for you on the bed.
+					<<option 'CN'>>悉尼把明早要穿的神殿衣服单独挂好，在床上给你让出位置。
+				<</language>>
+		<</switch>><br><br>
+		<<if maplebirch.VP.realEstate.canShareBed(_property.id)>>
+			<<loveicon 'kiss'>>
+			<<lanLink 'Go to bed together' 'Deadwood Reblooms Property Intimacy'>>
+				<<run maplebirch.VP.realEstate.meetResident(_bedroomCompanion.id, _property.id)>>
+				<<set $sexstart to 1>>
+			<</lanLink>><<promiscuous1>><br>
+		<</if>>
 	<</if>>
 	<<bedicon>><<lanLink 'Undress and get into bed' 'Deadwood Reblooms Property Bed'>><<undressSleep 'Deadwood Property Bed'>><</lanLink>><br>
 	<<deadwood-reblooms-property-sleep-outfits>>
