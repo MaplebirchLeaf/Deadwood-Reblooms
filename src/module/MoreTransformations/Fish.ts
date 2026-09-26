@@ -57,7 +57,7 @@ class Fish extends Transformation {
 
         translations: {
           fish: { EN: 'Fish', CN: '鱼' },
-          fins: { EN: 'fins', CN: '鱼鳍' },
+          fins: { EN: 'fins', CN: '耳鳍' },
           tail: { EN: 'tail', CN: '尾巴' }
         }
       },
@@ -193,7 +193,7 @@ class Fish extends Transformation {
             applyafter: '<<if $maplebirch.transformation.fish.level >= 6>><<set _waterActionTime to Math.max(1, Math.ceil(_waterActionTime / 2))>><</if>>',
             expected: 1
           },
-          // 将原版水下耗氧公式替换为带鳃减耗版本；没有有效鱼鳃时乘数仍为 1。
+          // 将原版水下耗氧公式替换为屏息减耗版本；没有有效特质时乘数仍为 1。
           {
             src: '<<set $oxygen -= _waterActionTime * 10>>',
             to: '<<set $oxygen -= _waterActionTime * 10 * ($transformationParts.traits.gills && isPartEnabled($transformationParts.traits.gills) ? 0.25 : 1)>>',
