@@ -1,5 +1,53 @@
 :: Deadwood Reblooms Finance Common Widgets [widget]
 
+<!-- 只在还款临近、逾期或次日自动扣款资金不足时占用日志篇幅。 -->
+<<widget 'deadwood-reblooms-finance-journal'>>
+	<<if $VanillaPlus?.finance?.bank?.opened>>
+		<<set _financeBank to $VanillaPlus.finance.bank>>
+		<<set _financeCreditDue to _financeBank.creditDebt gt 0 and _financeBank.creditDueDay gt 0 and (_financeBank.creditDueDay - Time.days lte 3 or _financeBank.creditMissedPayments gt 0)>>
+		<<set _financeLoanDue to _financeBank.loanDebt gt 0 and (_financeBank.balance lt Math.min(_financeBank.loanPayment, _financeBank.loanDebt) or (_financeBank.loanDueDay gt 0 and _financeBank.loanDueDay - Time.days lte 3))>>
+		<<if _financeCreditDue or _financeLoanDue>>
+			<hr>
+			<h1 class='header gold bold'><<lanSwitch 'Payments' '还款提醒'>></h1>
+			<ul class='journal'>
+				<<if _financeCreditDue>>
+					<li>
+						<<if _financeBank.creditMissedPayments gt 0>>
+							<span class='red'><<lanSwitch 'Your credit card has overdue payments. Repay the balance to restore its use.' '信用卡已有逾期记录。还清欠款才能恢复使用。'>></span>
+						<<else>>
+							<<if _financeBank.creditDueDay lte Time.days>>
+								<<lanSwitch 'The next credit card payment is due today. ' '信用卡将在今天扣款。'>>
+							<<else>>
+								<<lanSwitch 'The next credit card payment is due in ' '信用卡距离下次扣款还有'>>
+								<span class='blue'><<print _financeBank.creditDueDay - Time.days>></span><<lanSwitch ' days. ' '天。'>>
+							<</if>>
+							<<lanSwitch 'Minimum payment: ' '最低还款额：'>><<deadwood-reblooms-finance-money _financeBank.creditMinimumPayment>><<lanSwitch '.' '。'>>
+							<<if _financeBank.balance lt _financeBank.creditMinimumPayment>>
+								<span class='red'><<lanSwitch 'Your bank balance will not cover it.' '银行余额不足以支付这笔扣款。'>></span>
+							<</if>>
+						<</if>>
+					</li>
+				<</if>>
+				<<if _financeLoanDue>>
+					<li>
+						<<if _financeBank.loanDueDay lt Time.days>>
+							<span class='red'><<lanSwitch 'Your loan is past its due date. Interest now accrues at the higher rate.' '贷款已经到期，利息正按较高利率累积。'>></span>
+						<<elseif _financeBank.balance lt Math.min(_financeBank.loanPayment, _financeBank.loanDebt)>>
+							<span class='red'><<lanSwitch 'Your bank balance cannot cover the next scheduled loan payment.' '银行余额不足以支付下次贷款自动扣款。'>></span>
+						<<elseif _financeBank.loanDueDay is Time.days>>
+							<<lanSwitch 'Your loan reaches its due date today.' '贷款今天到期。'>>
+						<<else>>
+							<<lanSwitch 'Your loan is due in ' '贷款距离到期还有'>>
+							<span class='blue'><<print _financeBank.loanDueDay - Time.days>></span>
+							<<lanSwitch ' days.' '天。'>>
+						<</if>>
+					</li>
+				<</if>>
+			</ul>
+		<</if>>
+	<</if>>
+<</widget>>
+
 <!-- 金融金额：复用原版格式，小额有便士时显示小数，大额省略便士。 -->
 <<widget 'deadwood-reblooms-finance-money'>>
 	<<set _financeMoneyAmount to Number(_args[0])>>
@@ -346,7 +394,7 @@
 				<</lanLink>><br>
 			<</if>>
 			<<deadwood-reblooms-finance-quick-transfers 'bank'>>
-			<span class='blue'><<lanSwitch 'Preferred accounts unlock after 7 days with a peak net balance of £5,000. Premier accounts unlock after 30 days at £25,000. Missed card or loan payments pause upgrades.' '开户满 7 天且净余额峰值达到 £5,000 可升级为优选账户；满 30 天且达到 £25,000 可升级为尊享账户。信用卡或贷款逾期会暂停升级。'>></span><br>
+			<span class='blue'><<lanSwitch 'Preferred accounts unlock after 7 days with a peak net balance of £5,000. Premier accounts unlock after 30 days at £25,000. Missed card or loan payments pause upgrades.' '开户满 7 天且净余额峰值达到 £5,000 可升级为优选账户。满 30 天且达到 £25,000 可升级为尊享账户。信用卡或贷款逾期会暂停升级。'>></span><br>
 			<span class='blue'><<lanSwitch 'Bank balances earn 0.02% interest each day.' '银行存款每日计息 0.02%。'>></span>
 			<div class='dr-finance-form'>
 				<label><<lanSwitch 'Custom amount (£)' '自定义金额(£)'>>：<<textbox '_financeBankAmount' _financeBankAmount>></label>
@@ -416,7 +464,7 @@
 				<<if $VanillaPlus.finance.bank.creditMissedPayments gt 0>>
 					<span class='red'><<lanSwitch 'The card is suspended until the balance is repaid in full.' '还清全部欠款前，这张卡已被暂停使用。'>></span><br>
 				<</if>>
-				<span class='blue'><<lanSwitch 'Cash advances add a 5% fee. Debt accrues 0.30% interest each day. A 10% minimum payment, or £10 if greater, is collected every 7 days; a missed payment adds a' '信用卡取现收取 5% 手续费，欠款每日计息 0.30%。每 7 天自动扣除 10% 最低还款，不足 £10 时按 £10 计；扣款不足会加收'>> <<deadwood-reblooms-finance-money 1000>> <<lanSwitch 'late fee and suspends further advances.' '滞纳金，并暂停继续取现。'>></span>
+				<span class='blue'><<lanSwitch 'Cash advances add a 5% fee. Debt accrues 0.30% interest each day. A 10% minimum payment, or £10 if greater, is collected every 7 days; a missed payment adds a' '信用卡取现收取 5% 手续费，欠款每日计息 0.30%。每 7 天自动扣除 10% 最低还款，不足 £10 时按 £10 计。扣款不足会加收'>> <<deadwood-reblooms-finance-money 1000>> <<lanSwitch 'late fee and suspends further advances.' '滞纳金，并暂停继续取现。'>></span>
 				<<deadwood-reblooms-finance-quick-transfers 'credit' 100 500 900>>
 				<div class='dr-finance-form'><label><<lanSwitch 'Amount (£)' '金额(£)'>>：<<textbox '_financeCreditAmount' _financeCreditAmount>></label></div>
 				<div class='dr-finance-actions'>
@@ -466,7 +514,7 @@
 				<<lanSwitch 'Days until due' '距到期日'>>：<<= Math.max(0, $VanillaPlus.finance.bank.loanDueDay - Time.days)>><br>
 				<<lanSwitch 'Missed payments' '未足额还款次数'>>：<<= $VanillaPlus.finance.bank.loanMissedPayments>><br>
 			<</if>>
-			<span class='blue'><<lanSwitch 'Scheduled payments are taken from your bank balance. A missed payment adds £5 or 2% of the unpaid instalment, whichever is greater. After the due date, the daily rate doubles.' '计划还款会自动从银行余额中扣除。漏还时加收 £5 或未付当期金额的 2%，取较高者；到期后每日利率翻倍。'>></span><br>
+			<span class='blue'><<lanSwitch 'Scheduled payments are taken from your bank balance. A missed payment adds £5 or 2% of the unpaid instalment, whichever is greater. After the due date, the daily rate doubles.' '计划还款会自动从银行余额中扣除。漏还时加收 £5 或未付当期金额的 2%，取较高者。到期后每日利率翻倍。'>></span><br>
 			<<lanSwitch '7-day bridge loan' '7 天周转贷款'>>：0.15% / <<lanSwitch 'day' '日'>><br>
 			<<lanSwitch '14-day short-term loan' '14 天短期贷款'>>：0.20% / <<lanSwitch 'day' '日'>><br>
 			<<lanSwitch '30-day personal loan' '30 天个人贷款'>>：0.25% / <<lanSwitch 'day' '日'>>

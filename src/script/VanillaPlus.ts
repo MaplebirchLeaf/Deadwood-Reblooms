@@ -9,6 +9,7 @@ import HandGrip from './VanillaPlus/HandGrip';
 import NPCDoublePenetration from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
+import RealEstate from './VanillaPlus/RealEstate';
 import VirginityRestoration from './VanillaPlus/VirginityRestoration';
 import Willpower from './VanillaPlus/Willpower';
 
@@ -43,6 +44,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   HandGrip(maplebirch);
   NPCDoublePenetration(maplebirch);
   Finance(maplebirch);
+  RealEstate(maplebirch);
   Physique(maplebirch);
   Promiscuity(maplebirch);
   Willpower(maplebirch);
@@ -110,6 +112,6 @@ export default function (maplebirch: typeof window.maplebirch) {
   });
   maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-all-max-feat', {
     output: 'earnFeat "Every Limit Broken"',
-    cond: () => V.VanillaPlus != null && V.VanillaPlus.traits.incorrigible && !V.feats.currentSave['Every Limit Broken']
+    cond: () => V.VanillaPlus != null && V.VanillaPlus.traits.incorrigible
   });
 }

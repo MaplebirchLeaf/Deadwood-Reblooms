@@ -1,21 +1,6 @@
 // ./src/script/VanillaPlus/Willpower.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  // 原版仍负责全部疼痛修正与衰减；这里只在最终钳制前接收超过 200 的溢出伤害。
-  maplebirch.once(':addon:preparePatch', (manager: typeof maplebirch.services.addonPlugin) => {
-    const oldSCData = manager.SC2DataManager.getSC2DataInfoAfterPatch();
-    const SCData = oldSCData.cloneSC2DataInfo();
-    const file = SCData.scriptFileItems.getByNameWithOrWithoutPath('stat-changes.js');
-    if (!file) return;
-
-    file.content = manager.replace(
-      file.content,
-      [[/V\.pain = Math\.clamp\(V\.pain, minPain\(\), 200\);/, 'V.pain = Math.clamp(maplebirch.VP.willpower.absorbPain(V.pain), minPain(), 200);']],
-      'Willpower pain shield'
-    );
-    manager.modUtils.replaceFollowSC2DataInfo(SCData, oldSCData);
-  });
-
   maplebirch.tool.onInit(() => {
     setup.feats['Sovereign Will'] ??= {
       get title() {
@@ -32,7 +17,7 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.dynamic.regStateEvent('gate', 'willpower-max', {
     output: 'earnFeat "Sovereign Will"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.willpower.max && !V.feats.currentSave['Sovereign Will']
+    cond: () => V.VanillaPlus != null && maplebirch.VP.willpower.max
   });
 
   const slimeDefyPassages = [

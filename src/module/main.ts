@@ -24,5 +24,5 @@ import SydneyExpansion from './SydneyExpansion';
   maplebirch.define('VP', new VanillaPlus(maplebirch), ['DR', 'var', 'char']);
   maplebirch.define('SydneyExpansion', new SydneyExpansion(maplebirch), ['DR', 'var']);
   maplebirch.define('LS', new LifeSimulation(maplebirch), ['DR', 'var']);
-  maplebirch.define('DM', new DynamicMusic(maplebirch), ['DR', 'audio']);
+  maplebirch.define('DM', new DynamicMusic(maplebirch), ['DR', 'audio', 'var']);
 })(maplebirch);

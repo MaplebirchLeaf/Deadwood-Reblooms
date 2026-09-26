@@ -42,33 +42,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     }
   });
 
-  maplebirch.once(':addon:preparePatch', (manager: typeof maplebirch.services.addonPlugin) => {
-    const oldSCData = manager.SC2DataManager.getSC2DataInfoAfterPatch();
-    const SCData = oldSCData.cloneSC2DataInfo();
-    const ingame = SCData.scriptFileItems.getByNameWithOrWithoutPath('ingame.js');
-    const statChanges = SCData.scriptFileItems.getByNameWithOrWithoutPath('stat-changes.js');
-
-    if (ingame) {
-      ingame.content = manager.replace(
-        ingame.content,
-        [[/\treturn result;\n}\nwindow\.currentSkillValue = currentSkillValue;/, '\treturn maplebirch.VP.divineTransformations.skillValue(skill, result);\n}\nwindow.currentSkillValue = currentSkillValue;']],
-        'Divine transformation attribute bonuses'
-      );
-    }
-    if (statChanges) {
-      statChanges.content = manager.replace(
-        statChanges.content,
-        [
-          [/V\.semen_amount \+ amount/, 'V.semen_amount + maplebirch.VP.divineTransformations.fluidChange(amount)'],
-          [/V\.milk_amount \+ amount/, 'V.milk_amount + maplebirch.VP.divineTransformations.fluidChange(amount)']
-        ],
-        'Demon combat fluids'
-      );
-    }
-    manager.modUtils.replaceFollowSC2DataInfo(SCData, oldSCData);
-  });
-
-  const crossdressing = () => (globalThis as typeof globalThis & { isCrossdressing?: () => boolean }).isCrossdressing?.() === true;
+  const crossdressing = () => window.isCrossdressing?.() === true;
   const demonName = () => {
     const masculine = V.player?.gender_appearance === 'm';
     const markedSex = (masculine && V.player?.sex === 'f') || (!masculine && V.player?.sex === 'm');

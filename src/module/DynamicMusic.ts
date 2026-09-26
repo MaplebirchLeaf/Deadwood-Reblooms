@@ -1,4 +1,4 @@
-export interface MusicState {
+interface MusicState {
   combat: unknown;
   solarEclipse: unknown;
   bloodMoon: unknown;
@@ -8,45 +8,85 @@ export interface MusicState {
   dayState: unknown;
 }
 
-export interface DynamicMusicTrack {
+interface DynamicMusicTrack {
   track: string;
+  file?: string;
   priority: number;
   when: (state: MusicState) => boolean;
 }
 
-export type DynamicAudioLayer = 'music' | 'ambience';
+interface DynamicMusicConfig {
+  music: DynamicMusicTrack[];
+  ambience: DynamicMusicTrack[];
+}
 
-export const DYNAMIC_AUDIO_MOD_NAME = 'deadwood-reblooms-audio';
+const stateTypes: Record<keyof MusicState, string> = {
+  combat: 'number',
+  solarEclipse: 'boolean',
+  bloodMoon: 'boolean',
+  meteorShower: 'boolean',
+  weather: 'string',
+  precipitation: 'string',
+  dayState: 'string'
+};
+const audioPath = /^audio\/(?!.*(?:^|\/)\.\.\/)[\w/-]+\.(?:ogg|mp3|wav|m4a|flac|webm)$/i;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+export function parseDynamicMusicConfig(value: unknown, hasFile: (file: string) => boolean): DynamicMusicConfig {
+  if (!isRecord(value) || value.version !== 1 || !Array.isArray(value.music) || !Array.isArray(value.ambience)) {
+    throw new Error('Invalid dynamic music config header');
+  }
+
+  const parseLayer = (layer: unknown[], name: string): DynamicMusicTrack[] => {
+    const names = new Set<string>();
+    return layer.map((raw, index) => {
+      if (!isRecord(raw) || typeof raw.track !== 'string' || !/^[\w-]+$/.test(raw.track) || names.has(raw.track)) {
+        throw new Error(`Invalid ${name} track at index ${index}`);
+      }
+      if (typeof raw.file !== 'string' || !audioPath.test(raw.file) || !hasFile(raw.file)) {
+        throw new Error(`Missing or invalid audio file for ${raw.track}`);
+      }
+      if (typeof raw.priority !== 'number' || !Number.isFinite(raw.priority) || !isRecord(raw.when)) {
+        throw new Error(`Invalid priority or condition for ${raw.track}`);
+      }
+      const conditions = Object.entries(raw.when).map(([key, expected]) => {
+        if (!Object.prototype.hasOwnProperty.call(stateTypes, key)) throw new Error(`Unknown music state ${key}`);
+        const type = stateTypes[key as keyof MusicState];
+        const values = Array.isArray(expected) ? expected : [expected];
+        if (!values.length || !values.every(item => typeof item === type && (typeof item !== 'number' || Number.isFinite(item)))) {
+          throw new Error(`Invalid condition for ${raw.track}`);
+        }
+        return { key: key as keyof MusicState, values };
+      });
+      names.add(raw.track);
+      return {
+        track: raw.track,
+        file: raw.file,
+        priority: raw.priority,
+        when: (state: MusicState) => conditions.every(({ key, values }) => values.includes(state[key] as string | number | boolean))
+      };
+    });
+  };
+
+  return { music: parseLayer(value.music, 'music'), ambience: parseLayer(value.ambience, 'ambience') };
+}
+
+type DynamicAudioLayer = 'music' | 'ambience';
+
+const DYNAMIC_AUDIO_MOD_NAME = 'deadwood-reblooms-audio';
 const AMBIENCE_FADE_SECONDS = 2;
 
-export const DEFAULT_DYNAMIC_MUSIC_TRACKS: readonly DynamicMusicTrack[] = [
-  { track: 'encounter', priority: 900, when: state => state.combat === 1 },
-  { track: 'solar-eclipse', priority: 800, when: state => state.solarEclipse === true },
-  { track: 'blood-moon', priority: 700, when: state => state.bloodMoon === true },
-  { track: 'meteor-shower', priority: 600, when: state => state.meteorShower === true },
-  { track: 'night', priority: 100, when: state => state.dayState === 'night' },
-  { track: 'day', priority: 0, when: () => true }
-];
-
-export const DEFAULT_DYNAMIC_AMBIENCE_TRACKS: readonly DynamicMusicTrack[] = [
-  {
-    track: 'ambience-thunderstorm',
-    priority: 600,
-    when: state => state.weather === 'storm' || state.weather === 'thunderstorm'
-  },
-  { track: 'ambience-rain', priority: 500, when: state => state.precipitation === 'rain' },
-  { track: 'ambience-wind', priority: 400, when: state => state.precipitation === 'snow' }
-];
-
-export const DEFAULT_DYNAMIC_MUSIC_OPTIONS = {
+const DEFAULT_DYNAMIC_MUSIC_OPTIONS = {
   enabled: false,
   volume: 0.5,
   ambienceVolume: 0.25
 };
 
-export class DynamicMusicRegistry {
+class DynamicMusicRegistry {
   private readonly tracks = new Map<string, DynamicMusicTrack>();
-  private ordered: DynamicMusicTrack[] = [];
 
   public constructor(tracks: Iterable<DynamicMusicTrack> = []) {
     for (const track of tracks) this.register(track);
@@ -54,34 +94,24 @@ export class DynamicMusicRegistry {
 
   public register(track: DynamicMusicTrack): this {
     this.tracks.set(track.track, track);
-    this.ordered = [...this.tracks.values()].sort((left, right) => right.priority - left.priority);
     return this;
   }
 
   public unregister(track: string): boolean {
-    const removed = this.tracks.delete(track);
-    if (removed) this.ordered = [...this.tracks.values()].sort((left, right) => right.priority - left.priority);
-    return removed;
+    return this.tracks.delete(track);
   }
 
   public has(track: string): boolean {
     return this.tracks.has(track);
   }
 
-  public select(state: MusicState): string | null {
-    return this.ordered.find(track => track.when(state))?.track ?? null;
+  public selectTrack(state: MusicState): DynamicMusicTrack | null {
+    return [...this.tracks.values()].sort((left, right) => right.priority - left.priority).find(track => track.when(state)) ?? null;
   }
-}
 
-const defaultRegistry = new DynamicMusicRegistry(DEFAULT_DYNAMIC_MUSIC_TRACKS);
-const defaultAmbienceRegistry = new DynamicMusicRegistry(DEFAULT_DYNAMIC_AMBIENCE_TRACKS);
-
-export function selectMusic(state: MusicState): string {
-  return defaultRegistry.select(state) ?? 'day';
-}
-
-export function selectAmbience(state: MusicState): string | null {
-  return defaultAmbienceRegistry.select(state);
+  public select(state: MusicState): string | null {
+    return this.selectTrack(state)?.track ?? null;
+  }
 }
 
 interface ActiveAmbience {
@@ -104,7 +134,7 @@ class AmbientLoop {
   private async load(track: string): Promise<AudioBuffer | null> {
     const cached = this.buffers.get(track);
     if (cached) return cached;
-    const file = this.core.modLoader?.getModZip(DYNAMIC_AUDIO_MOD_NAME)?.zip.file(`audio/${track}.ogg`);
+    const file = this.core.modLoader?.getModZip(DYNAMIC_AUDIO_MOD_NAME)?.zip.file(track);
     const context = this.context;
     if (!file || !context) return null;
     const bytes = await file.async('uint8array');
@@ -140,6 +170,7 @@ class AmbientLoop {
 
   public async play(track: string, volume: number): Promise<boolean> {
     if (this.active?.track === track) {
+      this.request++;
       this.setVolume(volume);
       return true;
     }
@@ -187,9 +218,11 @@ class DynamicMusic {
   public readonly exposed = true;
   static readonly options = { ...DEFAULT_DYNAMIC_MUSIC_OPTIONS };
 
-  private readonly tracks = new DynamicMusicRegistry(DEFAULT_DYNAMIC_MUSIC_TRACKS);
-  private readonly ambienceTracks = new DynamicMusicRegistry(DEFAULT_DYNAMIC_AMBIENCE_TRACKS);
+  private readonly tracks = new DynamicMusicRegistry();
+  private readonly ambienceTracks = new DynamicMusicRegistry();
   private readonly ambience: AmbientLoop;
+  private configReady = false;
+  private configLoading: Promise<void> | null = null;
   private requested: string | null = null;
   private syncing = false;
 
@@ -198,8 +231,7 @@ class DynamicMusic {
   }
 
   private get options() {
-    const options = ((V.options ??= {}).maplebirch ??= {});
-    return (options.DynamicMusic ??= { ...DEFAULT_DYNAMIC_MUSIC_OPTIONS });
+    return V.options.maplebirch.DynamicMusic;
   }
 
   private get volume(): number {
@@ -215,6 +247,23 @@ class DynamicMusic {
 
   private get audioPackInstalled(): boolean {
     return this.core.modLoader?.getModZip(DYNAMIC_AUDIO_MOD_NAME) != null;
+  }
+
+  private async loadConfig(): Promise<boolean> {
+    const pack = this.core.modLoader?.getModZip(DYNAMIC_AUDIO_MOD_NAME);
+    try {
+      if (!pack) throw new Error('Audio pack is unavailable');
+      const file = pack.zip.file('dynamic-music.json');
+      if (!file) throw new Error('Audio pack has no dynamic-music.json');
+      const config = parseDynamicMusicConfig(JSON.parse(await file.async('string')), path => pack.zip.file(path) != null);
+      for (const track of config.music) if (!this.tracks.has(track.track)) this.tracks.register(track);
+      for (const track of config.ambience) if (!this.ambienceTracks.has(track.track)) this.ambienceTracks.register(track);
+      this.configReady = true;
+      return true;
+    } catch (error) {
+      this.core.audio.log('Dynamic music config could not be loaded', 'WARN', error);
+      return false;
+    }
   }
 
   private state(): MusicState {
@@ -238,15 +287,20 @@ class DynamicMusic {
         desired = this.requested;
         const current = this.core.audio.CurrentTrack;
         if (desired == null) {
-          if (current?.modName === DYNAMIC_AUDIO_MOD_NAME && this.tracks.has(current.audioName)) this.core.audio.stop();
-        } else if (current?.modName !== DYNAMIC_AUDIO_MOD_NAME || current.audioName !== desired) {
-          if (await this.core.audio.playFromMod(DYNAMIC_AUDIO_MOD_NAME, desired)) {
+          if (current?.modName === DYNAMIC_AUDIO_MOD_NAME) this.core.audio.stop();
+        } else {
+          let playing = current?.modName === DYNAMIC_AUDIO_MOD_NAME && current.audioName === desired;
+          if (!playing) {
+            try {
+              playing = (await this.core.audio.playFromMod(DYNAMIC_AUDIO_MOD_NAME, desired)) !== false;
+            } catch (error) {
+              this.core.audio.log('Dynamic music could not be played', 'WARN', error);
+            }
+          }
+          if (playing) {
             this.core.audio.PlayMode = 'loop_one';
             this.core.audio.Volume = this.volume;
           }
-        } else {
-          this.core.audio.PlayMode = 'loop_one';
-          this.core.audio.Volume = this.volume;
         }
       } while (this.requested !== desired);
     } finally {
@@ -256,22 +310,28 @@ class DynamicMusic {
 
   public refresh(): void {
     const enabled = this.options.enabled === true && this.audioPackInstalled;
-    const state = this.state();
-    this.requested = enabled ? this.tracks.select(state) : null;
-    void this.drain();
-    if (enabled) {
-      const ambience = this.ambienceTracks.select(state);
-      if (ambience) void this.ambience.play(ambience, this.ambienceVolume);
-      else this.ambience.stop();
-    } else {
-      this.ambience.stop();
+    if (enabled && !this.configReady) {
+      this.configLoading ??= this.loadConfig().then(loaded => {
+        this.configLoading = null;
+        // 失败后等待下次状态刷新再尝试，避免坏配置在同一轮微任务里无限重试。
+        if (loaded) this.refresh();
+      });
+      return;
     }
+    const state = this.state();
+    const music = enabled ? this.tracks.selectTrack(state) : null;
+    this.requested = music ? (music.file?.replace(/^audio\//, '').replace(/\.[^.]+$/, '') ?? music.track) : null;
+    void this.drain();
+    const ambience = enabled ? this.ambienceTracks.selectTrack(state) : null;
+    if (ambience)
+      void this.ambience.play(ambience.file ?? `audio/${ambience.track}.ogg`, this.ambienceVolume).catch(error => this.core.audio.log('Dynamic ambience could not be played', 'WARN', error));
+    else this.ambience.stop();
   }
 
   public setVolume(value: number): void {
     this.options.volume = Math.clamp(Number(value) || 0, 0, 1);
     const current = this.core.audio.CurrentTrack;
-    if (current?.modName === DYNAMIC_AUDIO_MOD_NAME && this.tracks.has(current.audioName)) this.core.audio.Volume = this.options.volume;
+    if (current?.modName === DYNAMIC_AUDIO_MOD_NAME) this.core.audio.Volume = this.options.volume;
   }
 
   public setAmbienceVolume(value: number): void {

@@ -72,7 +72,7 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   const npcName = (target: number) => {
     const npc = V.NPCList?.[target];
-    return (maplebirch.Language === 'CN' ? npc?.fullDescription_CN : npc?.fullDescription) || npc?.fullDescription || '';
+    return lanSwitch(npc?.fullDescription, npc?.fullDescription_CN) || npc?.fullDescription || '';
   };
 
   const legLockAllowed = () => {
@@ -82,12 +82,12 @@ export default function (maplebirch: typeof window.maplebirch) {
   const doublePenetrators = (orifice: 'vagina' | 'anus') => maplebirch.VP.NPCDoublePenetration.playerPenetrators(orifice);
   const doublePenetratorNames = () => {
     const names = maplebirch.VP.NPCDoublePenetration.playerPenetrators().map(npcName);
-    if (maplebirch.Language === 'CN') return { names: names.join('、') };
     if (names.length < 2) return { names: names[0] || '' };
-    return { names: `${names.slice(0, -1).join(', ')} and ${names.at(-1)}` };
+    return { names: lanSwitch(`${names.slice(0, -1).join(', ')} and ${names.at(-1)}`, names.join('、')) };
   };
   const canStartLegLock = (orifice: 'vagina' | 'anus') => {
-    return V.combat === 1 && T?.feetOptions === 'free' && V.leglocktarget == null && V.feetuse === 0 && legLockAllowed() && doublePenetrators(orifice).includes(Number(V.feettarget));
+    const penetrators = doublePenetrators(orifice);
+    return V.combat === 1 && T?.feetOptions === 'free' && V.leglocktarget == null && V.feetuse === 0 && legLockAllowed() && penetrators.length >= 2 && penetrators.includes(Number(V.feettarget));
   };
   const canContinueLegLock = () => V.combat === 1 && V.feetuse === 'legLock' && !!maplebirch.VP.NPCDoublePenetration.playerLegLock;
 
@@ -262,10 +262,24 @@ export default function (maplebirch: typeof window.maplebirch) {
         zfn: () => window.CombatRenderer.indices.xrayCondom2
       },
       playerCum: {
-        showfn: (options: any) => !options.npcDouble && !!options.penis.showCum && V.otherFilled >= 1
+        srcfn: (options: any) => {
+          const orifice = options.npcDouble?.orifice ?? options.penis.penetrated;
+          const size = options.npcDouble?.primary.size ?? options.penis.size;
+          const baseSize = size ? `-size${size}` : '';
+          const double = options.npcDouble && orifice === 'vaginal' ? '-dp' : '';
+          const amount = orifice === 'vaginal' ? `-cum${Math.clamp(V.otherFilled, 1, 5)}` : '-cum';
+          return `${options.src}${orifice}/cum/${options.penis.base}${baseSize}${double}${amount}.png`;
+        },
+        showfn: (options: any) => !!options.penis.showCum && V.otherFilled >= 1
       },
       playerEjac: {
-        showfn: (options: any) => !options.npcDouble && !!options.penis.showCum && !!options.penis.isCumActive
+        srcfn: (options: any) => {
+          const orifice = options.npcDouble?.orifice ?? options.penis.penetrated;
+          const size = options.npcDouble?.primary.size ?? options.penis.size;
+          const cumSize = size ? `-size${size}-cumming` : '';
+          return `${options.src}${orifice}/cum/${options.penis.base}${cumSize}.png`;
+        },
+        showfn: (options: any) => !!options.penis.showCum && !!options.penis.isCumActive
       }
     },
     'combatXrayPenis'

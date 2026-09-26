@@ -8,11 +8,13 @@
   fileName: 'stat-changes.js'
   from: 'V.willpower = Math.clamp(V.willpower + amount * 2, 0, V.willpowermax'
   to: "V.willpower = Math.clamp(V.willpower + amount * 2, maplebirch.get('VP')?.minimum('willpower') ?? 0, (V.VanillaPlus?.lock?.willpower ? Math.floor(V.willpowermax * 1.25) : V.willpowermax)"
+
 - comment: '容貌突破后允许原版美容增益继续填充扩展后的六级上限。'
   fileName: 'stat-changes.js'
   from: 'maxValue = V.beautymax; // Special-case for the $beautymax value'
   to: |
     maxValue = maplebirch.get('VP') && V.VanillaPlus?.lock?.beauty ? Math.floor(V.beautymax * 1.25) : V.beautymax; // Special-case for the $beautymax value
+
 - comment: '六项属性全满后，原版美容变化不能令容貌从突破后的峰值降低。'
   fileName: 'stat-changes.js'
   from: 'V[type] = Math.clamp(V[type] + amount, 0, maxValue);'
@@ -74,3 +76,28 @@
   fileName: 'time.js'
   from: 'V.history_exam = Math.clamp('
   to: "if (!maplebirch.get('LS')?.academics.has('history')) V.history_exam = Math.clamp("
+
+- comment: '住进自住房时暂停孤儿院租期，搬回后按原剩余租期继续。'
+  fileName: 'time.js'
+  from: "function passRentTick() {\n\tV.renttime--;"
+  to: "function passRentTick() {\n\tif (V.VanillaPlus?.realEstate?.active) return;\n\tV.renttime--;"
+
+- comment: '将神圣转化加成接入当前技能值。'
+  fileName: 'ingame.js'
+  from: "\treturn result;\n}\nwindow.currentSkillValue = currentSkillValue;"
+  to: "\treturn maplebirch.VP.divineTransformations.skillValue(skill, result);\n}\nwindow.currentSkillValue = currentSkillValue;"
+
+- comment: '神圣转化对精液变化生效。'
+  fileName: 'stat-changes.js'
+  from: 'V.semen_amount + amount'
+  to: 'V.semen_amount + maplebirch.VP.divineTransformations.fluidChange(amount)'
+
+- comment: '神圣转化对乳汁变化生效。'
+  fileName: 'stat-changes.js'
+  from: 'V.milk_amount + amount'
+  to: 'V.milk_amount + maplebirch.VP.divineTransformations.fluidChange(amount)'
+
+- comment: '意志承伤层在疼痛钳制前吸收伤害。'
+  fileName: 'stat-changes.js'
+  from: 'V.pain = Math.clamp(V.pain, minPain(), 200);'
+  to: 'V.pain = Math.clamp(maplebirch.VP.willpower.absorbPain(V.pain), minPain(), 200);'

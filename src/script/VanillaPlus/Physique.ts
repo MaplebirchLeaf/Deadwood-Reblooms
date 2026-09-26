@@ -23,7 +23,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   });
   maplebirch.dynamic.regStateEvent('gate', 'physique-max', {
     output: 'earnFeat "Unbreakable"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.physique.max && !V.feats.currentSave.Unbreakable
+    cond: () => V.VanillaPlus != null && maplebirch.VP.physique.max
   });
   maplebirch.dynamic.regStateEvent('gate', 'physique-break-bindings', {
     output: 'deadwood-reblooms-physique-break-bindings',

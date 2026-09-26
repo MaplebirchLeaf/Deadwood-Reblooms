@@ -22,7 +22,7 @@ export default function (maplebirch: MaplebirchCore) {
         // 在原版关系文字之后追加人物关系图标，不替换关系数值或文本本身。
         {
           src: '<<relationshiptext>>',
-          applyafter: '<<relationshipicon>>',
+          applyafter: '<<relationshipicon _npc>>',
           expected: 1
         }
       ],

@@ -36,6 +36,7 @@ class BaileyRent {
   }
 
   private reconcile(previous: BaileyRentSnapshot): void {
+    // 用前后状态差分追踪原版贝利结算，避免覆盖原版多处分支的租金逻辑。
     const current = this.snapshot();
     if (current.rentStage > previous.rentStage) this.settle();
     else if (current.refusedTotal > previous.refusedTotal) this.accrue();
@@ -91,7 +92,31 @@ class Hint {
     const keyword = this.textbox.value.trim();
     if (!keyword) return;
     const regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-    this.content.innerHTML = this.content.innerHTML.replace(regex, '<span class="gold searchResult">$&</span>');
+    // 只高亮文字节点。改写整段 innerHTML 会误中标签属性，也会销毁内容里的事件监听器。
+    const walker = document.createTreeWalker(this.content, NodeFilter.SHOW_TEXT);
+    const nodes: Text[] = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode as Text;
+      if (node.parentElement && !['SCRIPT', 'STYLE'].includes(node.parentElement.tagName)) nodes.push(node);
+    }
+    for (const node of nodes) {
+      const source = node.data;
+      const matches = [...source.matchAll(regex)];
+      if (matches.length === 0) continue;
+      const fragment = document.createDocumentFragment();
+      let offset = 0;
+      for (const match of matches) {
+        const start = match.index;
+        fragment.append(document.createTextNode(source.slice(offset, start)));
+        const highlight = document.createElement('span');
+        highlight.className = 'gold searchResult';
+        highlight.textContent = match[0];
+        fragment.append(highlight);
+        offset = start + match[0].length;
+      }
+      fragment.append(document.createTextNode(source.slice(offset)));
+      node.replaceWith(fragment);
+    }
     const result = this.content.querySelector('.searchResult');
     if (result) {
       result.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -99,7 +124,7 @@ class Hint {
     }
     const noResult = document.createElement('div');
     noResult.className = 'gold noSearchResult';
-    noResult.textContent = maplebirch.Language === 'CN' ? '无结果' : 'No results';
+    noResult.textContent = lanSwitch('No results', '无结果');
     this.content.before(noResult);
   }
 
@@ -134,7 +159,7 @@ class DeadwoodReblooms extends Module {
   }
 
   public get wiki(): string {
-    return this.markdown(this.core.Language === 'CN' ? hint_cn : hint_en);
+    return this.markdown(lanSwitch(hint_en, hint_cn));
   }
 
   private noticeModuleRows(): string {

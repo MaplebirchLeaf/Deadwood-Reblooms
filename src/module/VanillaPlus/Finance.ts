@@ -265,6 +265,57 @@ class Finance {
     return result;
   }
 
+  // 房产金额已经以便士储存；此入口不再做英镑换算。
+  public payFromBankPennies(amount: unknown): FinanceResult {
+    const bank = this.state.bank;
+    if (!bank.opened) return 'bank-required';
+    const value = Number(amount);
+    if (!Number.isSafeInteger(value) || value <= 0) return 'invalid-amount';
+    if (bank.balance < value) return 'insufficient-bank';
+    bank.balance -= value;
+    return 'ok';
+  }
+
+  public canPayWithCreditPennies(amount: unknown): boolean {
+    const value = Number(amount);
+    const bank = this.state.bank;
+    if (!bank.opened || !Number.isSafeInteger(value) || value <= 0) return false;
+    if (bank.balance >= value) return true;
+    if (!bank.creditCard || bank.creditMissedPayments > 0) return false;
+    return bank.creditDebt + Finance.addPercentage(value - bank.balance, CREDIT_FEE_PERCENT) <= bank.creditLimit;
+  }
+
+  // 信用卡只预借银行余额不足的部分，沿用既有 5% 预借费和信用额度。
+  public payWithCreditPennies(amount: unknown): FinanceResult {
+    const value = Number(amount);
+    const bank = this.state.bank;
+    if (!bank.opened) return 'bank-required';
+    if (!Number.isSafeInteger(value) || value <= 0) return 'invalid-amount';
+    if (bank.balance >= value) return this.payFromBankPennies(value);
+    if (!bank.creditCard) return 'credit-required';
+    if (bank.creditMissedPayments > 0) return 'credit-overdue';
+    const advance = value - bank.balance;
+    const debt = Finance.addPercentage(advance, CREDIT_FEE_PERCENT);
+    if (bank.creditDebt + debt > bank.creditLimit) return 'credit-limit';
+    Finance.addCreditDebt(bank, debt);
+    bank.balance = 0;
+    return 'ok';
+  }
+
+  public creditBankPennies(amount: unknown): void {
+    const value = Number(amount);
+    if (Number.isSafeInteger(value) && value > 0) this.state.bank.balance += value;
+  }
+
+  public collectBankPennies(amount: unknown): number {
+    const value = Number(amount);
+    if (!Number.isSafeInteger(value) || value <= 0) return 0;
+    const bank = this.state.bank;
+    const paid = Math.min(Math.max(0, bank.balance), value);
+    bank.balance -= paid;
+    return paid;
+  }
+
   // 贝利收租前先从已授权的银行账户补足现金，原版 rentpay 继续负责实际扣款和统计。
   public prepareBaileyRent(amount: unknown): void {
     const total = Math.floor(Number(amount));
@@ -502,9 +553,10 @@ class Finance {
     if (!Number.isSafeInteger(finance.market.seed) || finance.market.seed === 0) finance.market.seed = Finance.marketSeed();
     for (const item of securities) {
       finance.brokerage.holdings[item.symbol] ??= 0;
-      const initialPrice = item.symbol === 'ALF' && finance.market.farmStage === undefined
-        ? Math.round(item.initialPrice * (Number(V.farm_stage) >= 12 ? 1.188 : Number(V.farm_stage) >= 9 ? 1.08 : 1))
-        : item.initialPrice;
+      const initialPrice =
+        item.symbol === 'ALF' && finance.market.farmStage === undefined
+          ? Math.round(item.initialPrice * (Number(V.farm_stage) >= 12 ? 1.188 : Number(V.farm_stage) >= 9 ? 1.08 : 1))
+          : item.initialPrice;
       finance.market.prices[item.symbol] ??= initialPrice;
       finance.market.previousPrices[item.symbol] ??= finance.market.prices[item.symbol];
     }
@@ -743,11 +795,7 @@ class Finance {
     for (const item of securities) {
       const move = market.pendingFarmMoves?.[item.symbol] ?? 0;
       if (!move) continue;
-      market.prices[item.symbol] = Math.clamp(
-        Math.round(market.prices[item.symbol] * (100 + move) / 100),
-        Math.round(item.initialPrice * 0.25),
-        item.initialPrice * 4
-      );
+      market.prices[item.symbol] = Math.clamp(Math.round((market.prices[item.symbol] * (100 + move)) / 100), Math.round(item.initialPrice * 0.25), item.initialPrice * 4);
     }
     market.pendingFarmMoves = {};
   }

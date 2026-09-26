@@ -223,8 +223,7 @@ class School {
 
   public get canInviteStudent(): boolean {
     const student = this.state.duties.target;
-    const hasSexStat = (window as typeof window & { hasSexStat?: (stat: string, level: number) => boolean }).hasSexStat;
-    return this.canPerformDuty && student !== null && hasSexStat?.('promiscuity', 3) === true;
+    return this.canPerformDuty && student !== null && window.hasSexStat('promiscuity', 3);
   }
 
   public finishDuty(outcome: SchoolDutyOutcome): boolean {

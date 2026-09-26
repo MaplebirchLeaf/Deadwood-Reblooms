@@ -32,7 +32,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   });
   maplebirch.dynamic.regStateEvent('gate', 'exhibitionism-max', {
     output: 'earnFeat "Beyond Shame"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.exhibitionism.max && !V.feats.currentSave['Beyond Shame']
+    cond: () => V.VanillaPlus != null && maplebirch.VP.exhibitionism.max
   });
 
   // 记录原版裸露挑战结果，并扩展暴露癖上限。

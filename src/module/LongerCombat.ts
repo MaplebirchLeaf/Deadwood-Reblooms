@@ -35,7 +35,8 @@ class LongerCombat {
   }
 
   private npcHis(pronouns: { his: string }): string {
-    return maplebirch.Language === 'CN' && !pronouns.his.endsWith('的') ? pronouns.his + '的' : pronouns.his;
+    const suffix = lanSwitch('', '的');
+    return suffix && !pronouns.his.endsWith(suffix) ? pronouns.his + suffix : pronouns.his;
   }
 
   private npcState(npc: { [x: string]: any }): string {
@@ -86,7 +87,7 @@ class LongerCombat {
     const state = this.npcState(npc);
     const description = state ? this.npcHis(npc.pronouns) + state : '';
     const character = name === 'Sydney' ? `Sydney.${(C.npc?.Sydney?.corruption ?? 0) >= 10 ? 'corrupt' : 'pure'}` : name;
-    const space = maplebirch.Language === 'CN' ? '' : ' ';
+    const space = lanSwitch(' ', '');
     const genders: readonly ('m' | 'f')[] = gender === 'h' ? ['m', 'f'] : [gender];
     const speech: string[] = [];
     for (const value of genders) {
@@ -116,11 +117,10 @@ class LongerCombat {
       const Text = this.npcAgain(npc, i);
       if (!Text) return;
       if (continued) {
-        const cn = maplebirch.Language === 'CN';
-        const name = (cn ? npc.fullDescription_CN : npc.fullDescription) || npc.fullDescription || npc.pronouns?.he || '';
+        const name = lanSwitch(npc.fullDescription, npc.fullDescription_CN) || npc.fullDescription || npc.pronouns?.he || '';
         // 先输出完整的 NPC 段落，再转向下一位；命名角色显示姓名，避免多人代词混淆。
         const transition = this.npcLine(`${LongerCombat.NPC_KEY}:transition`).replace('{name}', () => name);
-        sWikifier((cn ? '' : ' ') + transition);
+        sWikifier(lanSwitch(' ', '') + transition);
       }
       sWikifier(Text);
       continued = true;
@@ -281,7 +281,7 @@ class LongerCombat {
     V.enemyarousal = Math.floor(V.enemyarousalmax * (0.15 + Math.random() * 0.1));
     T.combatend = false;
 
-    sWikifier(`<br><br><<lanLink 'deadwood-reblooms:LongerCombat:next' ${JSON.stringify(this.passageTitle)} 'capitalize'>><</lanLink>>`);
+    sWikifier(`<br><br><<lanLink 'Next' ${JSON.stringify(this.passageTitle)} 'capitalize'>><</lanLink>>`);
 
     return fragment;
   }

@@ -1,4 +1,3 @@
-import type { CarryItemConfig } from '../src/module/reblooms/CarryItems';
 import type { Security } from '../src/module/VanillaPlus/Finance';
 
 declare module 'twine-sugarcube' {
@@ -36,6 +35,12 @@ declare global {
     playerPenisSize(): number;
     npcHasStrapon(index?: number): boolean;
     hasSexStat(input: string, required: number, modifiers?: boolean): boolean;
+    wearingSchoolOutfit?: () => boolean;
+    isCrossdressing?: () => boolean;
+    Furniture: {
+      get(id: string, onlySetup: true): { name: string; nameCap: string; cost: number; type: string[]; iconFile: string } | null;
+      setPrice(pounds: number): number;
+    };
     currentSkillValue(skill: string, disableModifiers?: number): number;
     CombatRenderer: {
       indices: { xrayPenetrator2: number; xrayCondom2: number };
@@ -43,6 +48,7 @@ declare global {
     };
     NpcCombatMapper: { getNpcPenetratorFilter(npc: unknown): unknown };
     XrayCombatMapper: { mapXrayPlayerPenis(options: unknown, penetrator: unknown): void };
+    sydneySchedule?: () => void;
   }
 
   function wearingCondom(who: number | 'player'): boolean;

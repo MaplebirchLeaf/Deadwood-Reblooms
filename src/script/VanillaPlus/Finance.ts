@@ -1,4 +1,6 @@
 export default function Finance(maplebirch: typeof window.maplebirch): void {
+  maplebirch.tool.addTo('Journal', 'deadwood-reblooms-finance-journal');
+
   // 通过框架补丁注册原版天气侧栏地点；base 元素必须提供 image 字段。
   maplebirch.tool.patch.location.configure(
     'financial_centre',
@@ -21,14 +23,14 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
     { overwrite: true }
   );
 
-  // 在 High Street 的常规地点列表中插入金融地点；锚点只有原版宏，不依赖中英文文本。
+  // 地点列表前有昼夜分支和地图链接，链接索引不固定；按办公楼分支定位金融中心。
   maplebirch.tool.inject({
     locationPassage: {
       'High Street': [
         // 在原版 Avery 分支判断前插入金融中心入口；锚点是稳定宏语句，不依赖英汉显示文本。
         {
-          src: '\t\t<<if $avery_fate is "ascended">>',
-          applybefore: '\t\t<<deadwood-reblooms-finance-high-street>>\n',
+          src: '<<if $avery_fate is "ascended">>',
+          applybefore: '<<deadwood-reblooms-finance-high-street>>\n\t\t',
           expected: 1
         }
       ],

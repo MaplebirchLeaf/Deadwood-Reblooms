@@ -89,20 +89,49 @@
     <h1 class='header gold bold'><<lanSwitch 'School affairs' '校园事务'>></h1>
     <ul class='journal'>
       <li>
+        <<lanSwitch 'School role: ' '校内身份：'>>
+        <<switch $LifeSimulation.school.role>>
+          <<case 'prefect'>><span class='green'><<lanSwitch 'Prefect' '风纪委员'>></span>
+          <<case 'president'>><span class='green'><<lanSwitch 'Student council president' '学生会长'>></span>
+          <<default>><<lanSwitch 'Student' '学生'>>
+        <</switch>><<lanSwitch '.' '。'>>
+      </li>
+      <li>
         <<lanSwitch 'Current dress policy: ' '现行着装规范：'>>
         <span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + $LifeSimulation.school.dress.active)>></span>
         <<lanSwitch '.' '。'>>
       </li>
       <li>
         <<lanSwitch 'School order: ' '校园秩序：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.order>>
-        <<lanSwitch '; student support: ' '；学生支持：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.studentSupport>>
-        <<lanSwitch '; staff support: ' '；教职工支持：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.staffSupport>><<lanSwitch '.' '。'>>
+        <<lanSwitch '| student support: ' '| 学生支持：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.studentSupport>>
+        <<lanSwitch '| staff support: ' '| 教职工支持：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.staffSupport>><<lanSwitch '.' '。'>>
       </li>
+      <<if $LifeSimulation.school.role is 'student'>>
+        <li>
+          <<if maplebirch.LS.school.canBecomePrefect>>
+            <<lanSwitch "You can ask Leighton to appoint you as a prefect." '你可以向礼顿申请担任风纪委员。'>>
+          <<else>>
+            <<lanSwitch 'Good grades and a clean disciplinary record are needed before you can become a prefect.' '成为风纪委员需要优良的成绩与没有违纪记录。'>>
+          <</if>>
+        </li>
+      <<elseif $LifeSimulation.school.role is 'prefect'>>
+        <li>
+          <<lanSwitch 'Morning duties: ' '晨间值勤：'>><<print Math.min(5, $LifeSimulation.school.duties.completed)>>/5<<lanSwitch '. ' '。'>>
+          <<if maplebirch.LS.school.canBecomePresident>>
+            <<lanSwitch 'Ask Leighton to appoint you as student council president.' '可以向礼顿申请担任学生会长。'>>
+          <<else>>
+            <<lanSwitch 'School order and both support ratings must each reach 25.' '校园秩序、学生支持与教职工支持均需达到 25。'>>
+          <</if>>
+        </li>
+      <</if>>
       <<if $LifeSimulation.school.role is 'president'>>
-        <li><<lanSwitch 'Leighton has granted you permission to miss classes without being marked absent.' '礼顿已发给你免听凭证；不去上课也不会记为缺课。'>></li>
+        <li><<lanSwitch 'Leighton has granted you permission to miss classes without being marked absent.' '礼顿已发给你免听凭证。不去上课也不会记为缺课。'>></li>
       <</if>>
       <<if $LifeSimulation.school.dress.proposal>>
-        <li><<lanSwitch "Your proposal awaits Leighton's decision." '你的提案正等待礼顿决定。'>></li>
+        <li>
+          <<lanSwitch 'Take your proposal for ' '带着'>><span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + $LifeSimulation.school.dress.proposal)>></span>
+          <<lanSwitch ' to Leighton for a decision.' '提案去找礼顿商议。'>>
+        </li>
       <</if>>
       <<if $LifeSimulation.school.dress.trialUntil gt Time.days>>
         <li>
@@ -113,6 +142,11 @@
       <</if>>
       <<if maplebirch.LS.school.canReviewPolicy>>
         <li><<lanSwitch 'The trial period has ended. Ask Leighton to review the rule.' '试行期已结束，去找礼顿复核校规。'>></li>
+      <</if>>
+      <<if $LifeSimulation.school.role is 'president' and $LifeSimulation.school.dress.cooldownUntil gt Time.days>>
+        <li><<lanSwitch 'You can propose another dress policy in ' '还要等'>>
+          <span class='blue'><<print $LifeSimulation.school.dress.cooldownUntil - Time.days>></span>
+          <<lanSwitch ' days.' '天才能再次提出着装校规。'>></li>
       <</if>>
     </ul>
   <</if>>
@@ -714,7 +748,7 @@
     <<if $phase is 'enforce'>>
       <<language>>
         <<option 'EN'>>You write Whitney's name and the obstruction in your report. Whitney swears at you, then steps aside when you hold up the finished page. The waiting students file past.
-        <<option 'CN'>>你把惠特尼的名字和堵门经过写进报告。惠特尼骂了你一句；你举起写好的记录，惠特尼才让开。学生们赶紧从旁边通过。
+        <<option 'CN'>>你把惠特尼的名字和堵门经过写进报告。惠特尼骂了你一句，你举起写好的记录，惠特尼才让开。学生们赶紧从旁边通过。
       <</language>>
     <<elseif $phase is 'mediate'>>
       <<if _whitneyClose>>

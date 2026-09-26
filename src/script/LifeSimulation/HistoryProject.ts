@@ -80,6 +80,25 @@ export const historyProjectLocationPassages: Record<string, PassagePatch[]> = {
 };
 
 export default function (maplebirch: typeof window.maplebirch) {
+  maplebirch.tool.onInit(() => {
+    setup.feats['Local History Exhibition'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:LifeSimulation:history:feat:title');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:LifeSimulation:history:feat:description');
+      },
+      difficulty: 2,
+      series: '',
+      filter: ['All', 'General'],
+      softLockable: true
+    };
+  });
+  maplebirch.dynamic.regStateEvent('gate', 'life-simulation-history-feat', {
+    output: 'earnFeat "Local History Exhibition"',
+    cond: () => V.LifeSimulation?.historyProject?.status === 'won'
+  });
+
   const registerAntique = () => {
     maplebirch.tool.patch.antiques.add('antiquegoldpriestess', {
       hint: maplebirch.t('deadwood-reblooms:LifeSimulation:history:antique:hint'),

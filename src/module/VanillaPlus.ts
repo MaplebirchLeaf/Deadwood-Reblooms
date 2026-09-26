@@ -10,6 +10,7 @@ import HandGrip from './VanillaPlus/HandGrip';
 import NPCDoublePenetration, { type NPCDoublePenetrationData } from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
+import RealEstate from './VanillaPlus/RealEstate';
 import Willpower from './VanillaPlus/Willpower';
 
 export type VanillaPlusAttribute = 'willpower' | 'physique' | 'beauty' | 'exhibitionism' | 'deviancy' | 'promiscuity';
@@ -42,6 +43,7 @@ class VanillaPlus extends Module {
       expungeUsed: false
     },
     finance: DEFAULT_FINANCE_STATE,
+    realEstate: RealEstate.defaults,
     physique: {
       panic: false,
       heroic: false,
@@ -94,6 +96,7 @@ class VanillaPlus extends Module {
   public readonly divineTransformations = new DivineTransformations();
   public readonly exhibitionism: Exhibitionism;
   public readonly finance: Finance;
+  public readonly realEstate: RealEstate;
   public readonly handGrip = new HandGrip();
   public readonly NPCDoublePenetration = new NPCDoublePenetration();
   public readonly physique: Physique;
@@ -107,6 +110,7 @@ class VanillaPlus extends Module {
     this.deviancy = new Deviancy(this);
     this.exhibitionism = new Exhibitionism(this);
     this.finance = new Finance(core);
+    this.realEstate = new RealEstate(core, this.finance);
     this.physique = new Physique(this);
     this.promiscuity = new Promiscuity(this);
     this.willpower = new Willpower(this);
@@ -115,6 +119,7 @@ class VanillaPlus extends Module {
   public override preInit(): void {
     super.preInit();
     this.finance.preInit();
+    this.realEstate.preInit();
   }
 
   public hasTrait(trait: VanillaPlusTrait): boolean {

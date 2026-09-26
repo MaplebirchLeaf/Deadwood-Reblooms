@@ -21,7 +21,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   });
   maplebirch.dynamic.regStateEvent('gate', 'deviancy-max', {
     output: 'earnFeat "Beyond Nature"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.deviancy.max && !V.feats.currentSave['Beyond Nature']
+    cond: () => V.VanillaPlus != null && maplebirch.VP.deviancy.max
   });
 
   const discover = (mirror: 'home' | 'farm' | 'tower' | 'temple') => `<<run maplebirch.VP.deviancy.discover('${mirror}')>>`;

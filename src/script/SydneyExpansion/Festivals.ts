@@ -1,10 +1,18 @@
-declare global {
-  interface Window {
-    sydneySchedule?: () => void;
-  }
-}
-
 export default function (maplebirch: typeof window.maplebirch) {
+  maplebirch.tool.onInit(() => {
+    setup.feats['Four Halloween Visits'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:sydney:halloween:feat:title');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:sydney:halloween:feat:description');
+      },
+      difficulty: 3,
+      series: '',
+      filter: ['All', 'General']
+    };
+  });
+
   // 原版的页面宏和时间推进分别调用宏与同名全局函数；两个入口都先运行原版日程。
   maplebirch.once(':storyready', () => {
     const schedule = window.sydneySchedule;
@@ -20,11 +28,9 @@ export default function (maplebirch: typeof window.maplebirch) {
         V.SydneyExpansion.halloweenYear === Time.year &&
         ((Time.month === 10 && Time.monthDay === 31 && Time.hour >= 21) || (Time.month === 11 && Time.monthDay === 1 && Time.hour < 7));
       const sirrisMorning =
-        V.SydneyExpansion.sirrisHalloweenVisitYear !== Time.year &&
-        V.SydneyExpansion.halloweenYear === Time.year && Time.month === 11 && Time.monthDay === 1 && Time.hour >= 7 && Time.hour < 10;
+        V.SydneyExpansion.sirrisHalloweenVisitYear !== Time.year && V.SydneyExpansion.halloweenYear === Time.year && Time.month === 11 && Time.monthDay === 1 && Time.hour >= 7 && Time.hour < 10;
       const christmasRest =
-        V.SydneyExpansion.christmasRestYear === Time.year &&
-        ((Time.month === 12 && Time.monthDay === 25 && Time.hour >= 21) || (Time.month === 12 && Time.monthDay === 26 && Time.hour < 6));
+        V.SydneyExpansion.christmasRestYear === Time.year && ((Time.month === 12 && Time.monthDay === 25 && Time.hour >= 21) || (Time.month === 12 && Time.monthDay === 26 && Time.hour < 6));
       if (!halloweenNight && !sirrisMorning && !christmasRest) return;
 
       T.sydney_location = 'temple';

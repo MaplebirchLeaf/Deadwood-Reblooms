@@ -11,7 +11,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   const selectedTarget = (hand: GripHand) => Number(hand === 'left' ? V.lefttarget : V.righttarget);
   const targetName = (hand: GripHand) => {
     const npc = V.NPCList?.[selectedTarget(hand)];
-    return (maplebirch.Language === 'CN' ? npc?.fullDescription_CN : npc?.fullDescription) || npc?.fullDescription || '';
+    return lanSwitch(npc?.fullDescription, npc?.fullDescription_CN) || npc?.fullDescription || '';
   };
   const active = () => V.combat === 1 && V.enemytype === 'man' && V.walltype !== 'front' && !V.gloryhole;
   const available = (hand: GripHand) => T?.[`${hand}Options`] === 'free';

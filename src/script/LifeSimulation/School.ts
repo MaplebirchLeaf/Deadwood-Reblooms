@@ -8,11 +8,43 @@ interface PassagePatch {
 }
 
 export default function School(maplebirch: typeof window.maplebirch): void {
+  maplebirch.tool.onInit(() => {
+    setup.feats['Student Council President'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:president:name');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:LifeSimulation:school:feat:president:description');
+      },
+      difficulty: 2,
+      series: '',
+      filter: ['All', 'General']
+    };
+    setup.feats['Naked School'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:LifeSimulation:school:feat:naked:title');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:LifeSimulation:school:feat:naked:description');
+      },
+      difficulty: 4,
+      series: '',
+      filter: ['All', 'General']
+    };
+  });
+  maplebirch.dynamic.regStateEvent('gate', 'life-simulation-president-feat', {
+    output: 'earnFeat "Student Council President"',
+    cond: () => V.LifeSimulation?.school?.role === 'president'
+  });
+  maplebirch.dynamic.regStateEvent('gate', 'life-simulation-naked-school-feat', {
+    output: 'earnFeat "Naked School"',
+    cond: () => V.LifeSimulation?.school?.dress?.highest === 'mandatoryNudity'
+  });
+
   // 包装原版校服判断，保留原函数与其他模组继续串联包装的空间。
   maplebirch.tool.onInit(() => {
-    const game = window as typeof window & { wearingSchoolOutfit?: () => boolean };
-    const wearingSchoolOutfit = game.wearingSchoolOutfit;
-    if (wearingSchoolOutfit) game.wearingSchoolOutfit = () => maplebirch.LS.school.acceptsDressCode(wearingSchoolOutfit());
+    const wearingSchoolOutfit = window.wearingSchoolOutfit;
+    if (wearingSchoolOutfit) window.wearingSchoolOutfit = () => maplebirch.LS.school.acceptsDressCode(wearingSchoolOutfit());
 
     // 原版的课程提示由 questmarker 独立生成；免听时只关闭学校提醒。
     const events = (setup as typeof setup & { events?: Array<{ name: string; condition: () => boolean; text: string }> }).events;
@@ -102,7 +134,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     ],
     Hallways: [
       {
-        // 只在原版正常走廊的储物柜前加入公告栏，特殊事件分支不受影响。
+        // 储物柜前的链接数随留堂和特殊事件变化，按原版储物柜定位公告栏。
         srcmatch: /<<lockericon>><<link \[\[[^\]\n]+\|School Lockers]]>/,
         applybefore: '<<deadwood-reblooms-life-simulation-school-board-link>>',
         expected: 1

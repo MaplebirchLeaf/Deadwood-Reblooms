@@ -19,7 +19,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   };
   const targetName = (index: number) => {
     const npc = V.NPCList?.[target(index)];
-    return (maplebirch.Language === 'CN' ? npc?.fullDescription_CN : npc?.fullDescription) || npc?.fullDescription || '';
+    return lanSwitch(npc?.fullDescription, npc?.fullDescription_CN) || npc?.fullDescription || '';
   };
   const needsExtraAction = (index: number) => {
     const npc = V.NPCList?.[target(index)];
@@ -30,7 +30,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     const primary = target(first);
     const partner = target(second);
     return (
-      Number.isInteger(primary) && Number.isInteger(partner) && primary !== partner &&
+      Number.isInteger(primary) &&
+      Number.isInteger(partner) &&
+      primary !== partner &&
       [primary, partner].every(index => V.NPCList?.[index]?.active === 'active' && V.NPCList[index].stance !== 'defeated')
     );
   };
@@ -114,7 +116,7 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.dynamic.regStateEvent('gate', 'promiscuity-max', {
     output: 'earnFeat "Every Inch"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.promiscuity.max && !V.feats.currentSave['Every Inch']
+    cond: () => V.VanillaPlus != null && maplebirch.VP.promiscuity.max
   });
   maplebirch.dynamic.regStateEvent('gate', 'promiscuity-unlock', {
     output: 'deadwood-reblooms-promiscuity-unlock',
@@ -202,7 +204,12 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   // 满级淫乱时由模组动作提供双插入口，结算仍调用原版双插效果；其他状态保留原版动作。
   maplebirch.combat.CombatAction.modify(
-    { id: 'promiscuity-double-vaginal-straddle-targets', actionType: 'vaginaaction', value: 'vaginatopenisdouble', cond: () => !active() && hasDistinctDoubleTargets(V.vaginatarget, V.vaginadoubletarget) },
+    {
+      id: 'promiscuity-double-vaginal-straddle-targets',
+      actionType: 'vaginaaction',
+      value: 'vaginatopenisdouble',
+      cond: () => !active() && hasDistinctDoubleTargets(V.vaginatarget, V.vaginadoubletarget)
+    },
     { id: 'promiscuity-double-anal-straddle-targets', actionType: 'anusaction', value: 'anustopenisdouble', cond: () => !active() && hasDistinctDoubleTargets(V.anustarget, V.anusdoubletarget) },
     { id: 'promiscuity-double-vaginal-offer-targets', actionType: 'penisaction', value: 'penispussydouble', cond: () => hasDistinctDoubleTargets(V.penistarget, V.vaginatarget) },
     { id: 'promiscuity-double-anal-offer-targets', actionType: ['penisaction', 'vaginaaction'], value: 'penisanusdouble', cond: () => hasDistinctDoubleTargets(V.penistarget, V.anustarget) }

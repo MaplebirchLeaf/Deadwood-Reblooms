@@ -3,6 +3,7 @@ import { copyFile, readdir, readFile } from 'node:fs/promises';
 import AdmZip from 'adm-zip';
 import { load as loadYaml } from 'js-yaml';
 import { readPackageJSON } from 'pkg-types';
+import { parseDynamicMusicConfig } from '../src/module/DynamicMusic';
 
 export interface ScmlPlugin {
   modName: string;
@@ -579,8 +580,10 @@ export async function createAudioPackPackage(rootDir: string): Promise<PackageAs
   const pkg = (await readPackageJSON(rootDir)) as RootPackage;
   const info = await modPackageInfo(rootDir);
   const files = await scan(path.join(rootDir, 'audio-pack'));
-  const additionFile = [...files.keys()].filter(filePath => AUDIO_EXTENSIONS.has(path.extname(filePath).toLowerCase())).sort();
-  if (!additionFile.length) throw new Error('audio-pack does not contain any supported audio files');
+  const configFile = files.get('dynamic-music.json');
+  if (!configFile) throw new Error('audio-pack is missing dynamic-music.json');
+  parseDynamicMusicConfig(JSON.parse(configFile.toString('utf8')), filePath => files.has(filePath));
+  const additionFile = [...files.keys()].filter(filePath => filePath === 'dynamic-music.json' || AUDIO_EXTENSIONS.has(path.extname(filePath).toLowerCase())).sort();
 
   const dependency = (modName: string): { modName: string; version: string } => {
     const value = pkg.scml.dependenceInfo.find(item => item.modName === modName);

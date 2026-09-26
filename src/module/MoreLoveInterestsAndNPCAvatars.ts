@@ -162,6 +162,9 @@ class NPCAvatars {
 
     Robin       : NPCAvatars.avatar('robin', {}, {
       stateResolver: npc => {
+        const hurt = Number(V.robin?.timer?.hurt ?? 0);
+        if (hurt >= 2) return 'betrayed';
+        if (hurt >= 1) return 'conflicted';
         if (window.isPossibleLoveInterest('Robin')) {
           const trauma = npc.trauma ?? 0;
           if (trauma >= 80) return (npc.lust ?? 0) >= 50 ? 'lost' : 'nothing';
@@ -244,7 +247,7 @@ class NPCAvatars {
 
   public preInit(): void {
     this.core.once(':sugarcube', () => {
-      this.core.tool.macro.defineS('relationshipicon', () => this.avatar());
+      this.core.tool.macro.defineS('relationshipicon', (name: string) => this.avatar(name));
       this.core.tool.macro.defineS('mimicicon', () => this.mimic());
     });
   }
@@ -267,7 +270,10 @@ class NPCAvatars {
     if (!profile) return undefined;
 
     const customLayers = profile.layers?.(npc);
-    if (customLayers) return this.buildLayers(customLayers.base, customLayers.infront);
+    if (customLayers) {
+      const hair = NPCAvatars.sydneyAppearance(npc).hairColor;
+      return this.buildLayers(customLayers.base, customLayers.infront, `${NPCAvatars.avatarBasePath}/sydney/syd_default_${hair}.png`);
+    }
 
     let state: string | undefined;
     if (profile.stateResolver) {
@@ -285,11 +291,13 @@ class NPCAvatars {
       else state = states.default;
     }
 
-    const suffix = profile.gendered === false ? '' : `_${npc.pronoun ?? 'f'}`;
+    const suffix = profile.gendered === false ? '' : `_${npc.pronoun === 'm' ? 'm' : 'f'}`;
     const separator = state ? '_' : '';
     const prefix = profile.prefix ?? profile.folder;
     const path = `${NPCAvatars.avatarBasePath}/${profile.folder}/${prefix}${separator}${state}${suffix}.png`;
-    return this.buildLayers(path);
+    const defaultState = profile.states.default;
+    const fallback = `${NPCAvatars.avatarBasePath}/${profile.folder}/${prefix}${defaultState ? `_${defaultState}` : ''}${suffix}.png`;
+    return this.buildLayers(path, undefined, fallback);
   }
 
   private mimic(): DocumentFragment | undefined {
@@ -305,7 +313,8 @@ class NPCAvatars {
 
     const customMimic = profile.mimic?.(npc, wraithState);
     if (customMimic) {
-      fragment.append(this.buildLayers(customMimic.base, customMimic.infront));
+      const fallback = name === 'Sydney' && wraithState === 'iwb' && NPCAvatars.sydneyAppearance(npc).hairColor === 'st' ? `${NPCAvatars.avatarBasePath}/sydney/syd_iwb_bl.png` : undefined;
+      fragment.append(this.buildLayers(customMimic.base, customMimic.infront, fallback));
       return fragment;
     }
 
@@ -316,8 +325,8 @@ class NPCAvatars {
     return fragment;
   }
 
-  private buildLayers(base: string, infront?: string): HTMLElement {
-    const baseImg = this.createImage(base);
+  private buildLayers(base: string, infront?: string, fallback?: string): HTMLElement {
+    const baseImg = this.createImage(base, 'icon', fallback);
     if (!infront) return baseImg;
     const container = document.createElement('span');
     container.className = 'icon-container';
@@ -325,13 +334,23 @@ class NPCAvatars {
     return container;
   }
 
-  private createImage(path: string, className = 'icon'): HTMLImageElement {
+  private createImage(path: string, className = 'icon', fallback?: string): HTMLImageElement {
     const img = new Image();
     img.className = className;
     img.alt = '';
-    const loaded = loadImage(path);
-    img.src = typeof loaded === 'string' ? loaded : path;
-    if (loaded instanceof Promise) void loaded.then(src => typeof src === 'string' && (img.src = src));
+    const load = async (): Promise<void> => {
+      for (const source of fallback && fallback !== path ? [path, fallback] : [path]) {
+        img.src = source;
+        try {
+          const loaded = await loadImage(source);
+          if (typeof loaded === 'string') {
+            img.src = loaded;
+            return;
+          }
+        } catch {}
+      }
+    };
+    void load();
     return img;
   }
 }
@@ -507,6 +526,7 @@ class MoreLoveInterests {
   }
 
   private sync(): void {
+    // 自定义列表是唯一排序来源；前三项同步给原版三个字段，供原版事件继续读取。
     const stored = Array.isArray(V.loveInterestList) ? V.loveInterestList : Object.values(V.loveInterest ?? {});
     V.loveInterestList = [...new Set(stored.filter((name): name is string => typeof name === 'string' && name !== 'None'))];
     V.loveInterest = {
