@@ -37,6 +37,7 @@ import ZephyrSidebar from './NamedNPCSidebarPortrait/Zephyr';
 export default function (maplebirch: MaplebirchCore) {
   const sidebar = maplebirch.get('NPCSidebarPortrait') as SidebarPortrait;
   const wardrobe = maplebirch.npc.Clothes.wardrobe;
+  // 各角色的颜色缓存只在这次运行中复用，不写入 SugarCube 存档；换装脚本负责按当前剧情重算。
   const pyjamaColours = new Map<string, string>();
   const robinColours = {
     school: new Map<string, string>(),

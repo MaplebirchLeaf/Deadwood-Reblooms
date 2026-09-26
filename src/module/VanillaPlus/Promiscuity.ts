@@ -345,7 +345,9 @@ class Promiscuity {
   }
 
   public get ready(): boolean {
-    return V.promiscuity >= this.vanillaPlus.normalCeiling('promiscuity') && V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism') && V.deviancy >= this.vanillaPlus.normalCeiling('deviancy');
+    return (
+      V.promiscuity >= this.vanillaPlus.normalCeiling('promiscuity') && V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism') && V.deviancy >= this.vanillaPlus.normalCeiling('deviancy')
+    );
   }
 
   public get unlock(): boolean {
@@ -354,13 +356,6 @@ class Promiscuity {
 
   public get max(): boolean {
     return V.VanillaPlus.lock.promiscuity && V.promiscuity >= this.vanillaPlus.ceiling('promiscuity');
-  }
-
-  public developer(): void {
-    V.VanillaPlus.lock.promiscuity = false;
-    V.promiscuity = this.vanillaPlus.normalCeiling('promiscuity');
-    V.exhibitionism = Math.max(V.exhibitionism, this.vanillaPlus.normalCeiling('exhibitionism'));
-    V.deviancy = Math.max(V.deviancy, this.vanillaPlus.normalCeiling('deviancy'));
   }
 }
 

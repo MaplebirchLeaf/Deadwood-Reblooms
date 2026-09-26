@@ -34,6 +34,7 @@ class NPCDoublePenetration {
   }
 
   public get state(): NPCDoublePenetrationState | undefined {
+    // 战斗姿势必须属于当前存档；这里不缓存 NPC 引用，读档后从新的 NPCList 重新验证。
     const state = V.VanillaPlus?.npcDoublePenetration;
     if (!state || typeof state.recipient !== 'number' || typeof state.partner !== 'number' || !state.orifice || !state.stage) return undefined;
     return state as NPCDoublePenetrationState;
@@ -198,6 +199,7 @@ class NPCDoublePenetration {
   }
 
   private clearNPCPenetration(): void {
+    // 仅回滚本模块占用的第二目标和 recipient 标记；原版已经建立的其他插入状态继续保留。
     const state = this.state;
     const partner = state && V.NPCList?.[state.partner];
     if (partner && PARTNER_STATES.includes(partner.penis)) {

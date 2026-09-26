@@ -51,7 +51,7 @@ class Mortgage {
   public constructor(
     private readonly core: typeof maplebirch,
     private readonly finance: Finance,
-    private readonly onAuction: (propertyId: string, debt: number) => void
+    private readonly onAuction: (propertyId: string, debt: number, day: number) => void
   ) {}
 
   public get terms(): MortgageTerms {
@@ -64,15 +64,6 @@ class Mortgage {
 
   private set current(value: MortgageState | null) {
     V.VanillaPlus.realEstate.mortgage = value;
-  }
-
-  public preInit(): void {
-    this.core.tool.onInit(() => void this.terms);
-    this.core.on(':variable', () => this.advanceThrough(), 'Vanilla Plus Mortgage');
-    this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-mortgage', {
-      action: () => this.advanceThrough(),
-      exact: true
-    });
   }
 
   private static loadTerms(core: typeof maplebirch): MortgageTerms {
@@ -132,6 +123,7 @@ class Mortgage {
     const deposit = this.downPayment(price);
     const result = useCredit ? this.finance.payWithCreditPennies(deposit) : this.finance.payFromBankPennies(deposit);
     if (result !== 'ok') return result;
+    // 价格、首付、本金和 dailyPayment 全部是便士；信用卡仅补首付差额，不进入房贷本金。
     const principal = price - deposit;
     const { termDays, dailyInterestRate } = this.terms;
     // 等额本息的日供；每日结算仍先给剩余本金计息，提前还款可减少后续利息。
@@ -175,6 +167,7 @@ class Mortgage {
   private applyPayment(amount: number): void {
     const loan = this.current;
     if (!loan) return;
+    // arrears 是 outstanding 中逾期部分的标记，不是第二笔独立债务；同一笔还款两者同时减少。
     loan.outstanding = Math.max(0, loan.outstanding - amount);
     loan.arrears = Math.max(0, loan.arrears - amount);
     if (loan.outstanding === 0) this.current = null;
@@ -207,6 +200,7 @@ class Mortgage {
     const today = Math.min(Mortgage.today(), Math.max(0, Math.floor(targetDay)));
     for (let day = loan.lastDay + 1; day <= today && this.current === loan; day++) {
       loan.outstanding += Math.ceil(loan.outstanding * this.terms.dailyInterestRate);
+      // 到期日将剩余本金和当日利息一并列为应付；普通日按等额日供尝试扣款。
       const scheduled = Math.min(loan.outstanding, day >= loan.maturityDay ? loan.outstanding : loan.dailyPayment);
       // 当天分期与旧欠款一起尝试扣款；arrears 只记录未偿部分，不额外增加本金。
       const due = Math.min(loan.outstanding, scheduled + loan.arrears);
@@ -233,7 +227,8 @@ class Mortgage {
         this.freeze(loan, day);
       } else if (loan.stage === 'frozen' && loan.frozenDay !== null && day - loan.frozenDay >= this.terms.auctionAfterFreezeDays) {
         this.current = null;
-        this.onAuction(loan.propertyId, loan.outstanding);
+        // 补算可能跨过多天；把实际拍卖日传给房产记录，而非读取补算结束后的当前日期。
+        this.onAuction(loan.propertyId, loan.outstanding, day);
       }
       loan.lastDay = day;
     }

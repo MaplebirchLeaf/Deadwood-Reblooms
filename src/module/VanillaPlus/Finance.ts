@@ -89,6 +89,7 @@ export interface Security {
 }
 
 const PENCE_PER_POUND = 100;
+// 账户金额与原版 $money 都以便士保存；产品额度以英镑写在表内，初始化时统一乘 100。
 const ACCOUNT_TIERS = [
   { id: 'current', days: 0, balance: 0, credit: 1000, loan: 5000, atm: 2000 },
   { id: 'preferred', days: 7, balance: 5000, credit: 5000, loan: 20000, atm: 5000 },
@@ -184,6 +185,7 @@ class Finance {
   public constructor(private readonly core: typeof maplebirch) {}
 
   public get securities(): readonly Security[] {
+    // setup 只缓存静态证券目录；ALF 是否上市每次都按当前存档的农场进度重新筛选。
     const finance = ((setup.DeadwoodReblooms ??= {}).finance ??= {});
     const securities = (finance.securities ??= Finance.loadSecurities(this.core));
     return securities.filter(item => item.symbol !== 'ALF' || Number(V.farm_stage) >= 7);
@@ -195,8 +197,8 @@ class Finance {
 
   public preInit(): void {
     this.core.tool.onInit(() => void this.securities);
-    this.core.on(':variable', () => this.advanceDay(), 'Vanilla Plus Finance');
     this.core.once(':storyready', () => this.moneyPayment());
+    // 读档只恢复 V 里的余额和游标；新的一天由 TimeEvent 结算，房产租金以更高优先级先入账。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-finance-market', {
       action: () => this.advanceDay(),
       exact: true
@@ -204,6 +206,7 @@ class Finance {
   }
 
   private advanceDay(): void {
+    // 银行、信用卡与行情各有自己的结算游标；一次跳过多天或重复触发都不会重复计息。
     Finance.refreshAccountTier(this.state.bank);
     Finance.resetAtmLimit(this.state.bank);
     Finance.advanceMarket(this.state, this.securities);
@@ -308,6 +311,7 @@ class Finance {
   }
 
   public collectBankPennies(amount: unknown): number {
+    // 每日费用允许部分收取；调用方负责记录剩余欠款或房况损失。
     const value = Number(amount);
     if (!Number.isSafeInteger(value) || value <= 0) return 0;
     const bank = this.state.bank;
@@ -539,6 +543,7 @@ class Finance {
   }
 
   private static ensureState(securities: readonly Security[]): FinanceState {
+    // 新存档与旧存档缺项都在当前 V 补齐。不得把可变账户或行情放进 setup / 模块实例。
     V.VanillaPlus.finance ??= clone(DEFAULT_FINANCE_STATE);
     const finance = V.VanillaPlus.finance as FinanceState;
     finance.bank ??= clone(DEFAULT_FINANCE_STATE.bank);
@@ -703,6 +708,7 @@ class Finance {
   }
 
   private static advanceLoan(bank: BankState): void {
+    // lastDay 随存档保存；即使 Time.pass 一次跨数日，也只按尚未结算的游戏日逐日扣款。
     const currentDay = Finance.currentDay();
     if (bank.loanDebt <= 0) return;
     if (bank.loanLastDay < 0) bank.loanLastDay = currentDay;
@@ -828,8 +834,8 @@ class Finance {
   private static advanceMarket(finance: FinanceState, securities: readonly Security[]): void {
     const currentDay = Finance.currentDay();
     if (finance.market.day < 0) {
-      finance.market.day = currentDay;
-      return;
+      // 没有旧行情游标的新存档在首次跨日时也应走完当天行情。
+      finance.market.day = currentDay - 1;
     }
     if (currentDay <= finance.market.day) return;
     for (let day = finance.market.day + 1; day <= currentDay; day++) {

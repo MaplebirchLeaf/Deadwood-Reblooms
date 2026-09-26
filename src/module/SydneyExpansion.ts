@@ -1,6 +1,7 @@
 import Module from './Module';
 
 class SydneyExpansion extends Module {
+  // 年份与日期标记阻止节庆和日常对话重复触发；dormScene 只记录神殿宿舍当前入口。
   static readonly variables = {
     robinHalloweenYear: 0,
     whitneyHalloweenYear: 0,

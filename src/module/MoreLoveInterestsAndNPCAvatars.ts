@@ -269,6 +269,7 @@ class NPCAvatars {
     const profile = NPCAvatars.avatarProfiles[npc.nam];
     if (!profile) return undefined;
 
+    // 少数角色的发色/服装需要多图层；其他角色按关系状态选单张表情图。
     const customLayers = profile.layers?.(npc);
     if (customLayers) {
       const hair = NPCAvatars.sydneyAppearance(npc).hairColor;
@@ -338,6 +339,7 @@ class NPCAvatars {
     const img = new Image();
     img.className = className;
     img.alt = '';
+    // 资源包可能缺少某个状态图；先给 DOM 一个路径，再尝试加载默认表情作为回退。
     const load = async (): Promise<void> => {
       for (const source of fallback && fallback !== path ? [path, fallback] : [path]) {
         img.src = source;
@@ -406,6 +408,7 @@ class MoreLoveInterests {
 
   public Init(): void {
     const original = window.isLoveInterest;
+    // 原版仍只认识前三个槽位；扩展列表必须参与判断，但不能替换原版其它判定。
     window.isLoveInterest = (name: string) => V.loveInterestList?.includes(name) || original(name);
   }
 

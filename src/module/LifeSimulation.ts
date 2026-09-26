@@ -3,6 +3,7 @@ import AcademicHonours from './LifeSimulation/AcademicHonours';
 import School, { DEFAULT_SCHOOL_STATE } from './LifeSimulation/School';
 
 export const DEFAULT_HISTORY_PROJECT_STATE = {
+  // 项目进度和证据结果都写入 V.LifeSimulation；重新读档后直接恢复当前阶段。
   status: 'none' as 'none' | 'ongoing' | 'done' | 'won',
   source: 'none' as 'none' | 'paintingward' | 'paintingsnake',
   availableDay: 0,

@@ -31,17 +31,6 @@ class Physique {
     this.reset();
     return window.breakableSoftBinding();
   }
-
-  public developer(): void {
-    V.VanillaPlus.lock.physique = false;
-    Object.assign(V.VanillaPlus.physique, {
-      panic: true,
-      heroic: true,
-      farm: true,
-      pound: true
-    });
-    V.physique = this.vanillaPlus.normalCeiling('physique');
-  }
 }
 
 export default Physique;

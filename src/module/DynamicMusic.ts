@@ -29,6 +29,7 @@ const stateTypes: Record<keyof MusicState, string> = {
   precipitation: 'string',
   dayState: 'string'
 };
+// 配置只允许音频包内的 audio/ 路径；文件存在性也在加载时检查，避免用 JSON 注入任意资源名。
 const audioPath = /^audio\/(?!.*(?:^|\/)\.\.\/)[\w/-]+\.(?:ogg|mp3|wav|m4a|flac|webm)$/i;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -174,6 +175,7 @@ class AmbientLoop {
       this.setVolume(volume);
       return true;
     }
+    // 解码可能晚于下一次场景切换；序号让旧请求无法在新天气下启动旧环境音。
     const request = ++this.request;
     const buffer = await this.load(track);
     const context = this.context;
@@ -283,6 +285,7 @@ class DynamicMusic {
     this.syncing = true;
     try {
       let desired: string | null;
+      // 播放接口异步返回时，玩家可能已经进了战斗或关闭音乐；始终收敛到最后一次请求。
       do {
         desired = this.requested;
         const current = this.core.audio.CurrentTrack;
@@ -310,6 +313,7 @@ class DynamicMusic {
 
   public refresh(): void {
     const enabled = this.options.enabled === true && this.audioPackInstalled;
+    // 本体只保存调度器；曲目和资源路径都从可选音频包的 JSON 读取。
     if (enabled && !this.configReady) {
       this.configLoading ??= this.loadConfig().then(loaded => {
         this.configLoading = null;

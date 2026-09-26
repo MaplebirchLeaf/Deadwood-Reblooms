@@ -71,6 +71,7 @@ class BaileyRent {
   }
 
   public preInit(): void {
+    // previous 仅是本次会话的差分基线；切换存档后从恢复的 V 重建，不能沿用上一局的贝利状态。
     this.core.on(':variable', () => (this.previous = this.snapshot()), 'Deadwood Reblooms Bailey Rent');
     this.core.dynamic.regTimeEvent('onBefore', 'DeadwoodRebloomsBaileyRentBefore', {
       action: this.sync
@@ -217,6 +218,7 @@ class DeadwoodReblooms extends Module {
   public get rand(): ReturnType<typeof maplebirch.tool.rand.create> {
     const state = (V.DeadwoodReblooms.rand ??= { seed: null, history: [], index: 0 });
     if (!Number.isInteger(state.index)) state.index = 0;
+    // RNG 对象可以缓存，但种子与历史必须跟随当前存档的 V；对象身份变化即重建。
     if (this.random && this.random.state === state) return this.random;
     return (this.random = this.core.tool.rand.create(state));
   }

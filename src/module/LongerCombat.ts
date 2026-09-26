@@ -60,6 +60,7 @@ class LongerCombat {
   }
 
   private npcLine(prefix: string, previous?: string): string {
+    // 台词键以连续数字结尾，遇到缺号即停止；同一 NPC 上一句尽量不重复。
     const lines: string[] = [];
     for (let i = 0; this.core.services.translator.has(`${prefix}:${i}`); i++) {
       const key = `${prefix}:${i}`;
@@ -306,6 +307,7 @@ class LongerCombat {
           forceExit: () => V.enemyarousal >= V.enemyarousalmax && !this.shouldEndCombat
         });
 
+        // 只改变普通遭遇战每回合的流逝秒数，原版 Time.pass 和其它状态结算继续运行。
         maplebirch.dynamic.regTimeEvent('onBefore', 'LongerCombat', {
           cond: () => V.combat === 1 && !V.stalk,
           action: data => (data.passed = this.options.seconds)

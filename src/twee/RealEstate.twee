@@ -64,22 +64,29 @@
 :: Deadwood Reblooms Property Office []
 <<set $outside to 0>><<effects>>
 <<set _agencyStreet to maplebirch.VP.realEstate.properties.find(item => item.agency).street>>
-<strong><<lanSwitch 'Estate agency' '房产中介'>></strong><br>
+<strong class='gold'><<lanSwitch 'Estate agency' '房产中介'>></strong><br><br>
 <<language>>
-	<<option 'EN'>>Five deeds are displayed in the window. Your bank can finance one property over 90 days. The 20% down payment may use an existing credit card; daily mortgage interest and card charges are separate.
-	<<option 'CN'>>橱窗里展示着五处房产。银行可为一处房产提供 90 天房贷。20% 首付可使用已有信用卡补足；房贷按日计息，信用卡费用另计。
+	<<option 'EN'>>
+		Five deeds are displayed in the window. The agent lays out the keys and lets you look through the particulars.<br><br>
+		The bank will finance one property over 90 days. <span class='gold'>You must provide a 20% deposit.</span> An existing credit card can cover a shortfall, though the mortgage and card accrue separate charges.
+	<<option 'CN'>>
+		橱窗里摆着五处房产的契据。中介摊开钥匙，让你逐项查看房屋资料。<br><br>
+		银行可为一处房产提供 90 天房贷。<span class='gold'>你需要支付 20% 首付。</span>已有信用卡可以补足差额，但房贷与信用卡会分别计费。
 <</language>>
 <br><br>
 <<if $VanillaPlus.realEstate.lastAuction>>
 	<<set _sale to $VanillaPlus.realEstate.lastAuction>>
+	<<set _soldProperty to maplebirch.VP.realEstate.properties.find(item => item.id === _sale.propertyId)>>
 	<<set _winner to maplebirch.VP.realEstate.rivalName(_sale.winnerId)>>
-	<span class='gold'><<lanSwitch 'Last auction' '最近一次拍卖'>></span>：<<= lanSwitch(maplebirch.VP.realEstate.properties.find(item => item.id === _sale.propertyId).name.EN, maplebirch.VP.realEstate.properties.find(item => item.id === _sale.propertyId).name.CN)>> · <<deadwood-reblooms-finance-money _sale.proceeds>> · <<lanSwitch 'Winner' '中标者'>>：<<= _winner ? lanSwitch(_winner.EN, _winner.CN) : lanSwitch('Public market', '公开市场')>><br>
-	<<if _sale.kind is 'foreclosure'>><<lanSwitch 'Mortgage debt settled from proceeds' '拍卖款抵偿房贷'>>：<<deadwood-reblooms-finance-money _sale.debt>><br><</if>>
-	<<lanSwitch 'Balance returned to your bank account' '返还银行账户'>>：<<deadwood-reblooms-finance-money _sale.surplus>><br><br>
+	<<if _soldProperty>>
+		<span class='gold'><<lanSwitch 'Last auction' '最近一次拍卖'>></span>：<<= lanSwitch(_soldProperty.name.EN, _soldProperty.name.CN)>> · <<deadwood-reblooms-finance-money _sale.proceeds>> · <<lanSwitch 'Winner' '中标者'>>：<<= _winner ? lanSwitch(_winner.EN, _winner.CN) : lanSwitch('Public market', '公开市场')>><br>
+		<<if _sale.kind is 'foreclosure'>><<lanSwitch 'Mortgage debt settled from proceeds' '拍卖款抵偿房贷'>>：<<deadwood-reblooms-finance-money _sale.debt>><br><</if>>
+		<<lanSwitch 'Balance returned to your bank account' '返还银行账户'>>：<<deadwood-reblooms-finance-money _sale.surplus>><br><br>
+	<</if>>
 <</if>>
 <<for _property range maplebirch.VP.realEstate.properties>>
 	<<capture _property>>
-		<strong><<= lanSwitch(_property.name.EN, _property.name.CN)>></strong> · <<deadwood-reblooms-finance-money maplebirch.VP.realEstate.askingPrice(_property.id)>><br>
+		<strong class='gold'><<= lanSwitch(_property.name.EN, _property.name.CN)>></strong> · <<deadwood-reblooms-finance-money maplebirch.VP.realEstate.askingPrice(_property.id)>><br>
 		<<= lanSwitch(_property.description.EN, _property.description.CN)>><br>
 		<<lanSwitch 'Floors' '楼层数'>>：<<= _property.floors.length>> · <<lanSwitch 'Base daily rent' '基础日租金'>>：<<deadwood-reblooms-finance-money maplebirch.VP.realEstate.baseDailyRent(_property.id)>><br>
 		<<if $VanillaPlus.realEstate.rivalHoldings[_property.id]>>
@@ -126,14 +133,14 @@
 				<</if>>
 			<</if>>
 		<</if>>
-		<br>
+		<br><br>
 	<</capture>>
 <</for>>
 <<if $VanillaPlus.realEstate.mortgage>>
 	<<set _loan to $VanillaPlus.realEstate.mortgage>>
 	<strong><<lanSwitch 'Your mortgage' '你的房贷'>></strong>：<<deadwood-reblooms-finance-money _loan.outstanding>><br>
 	<<lanSwitch 'Daily instalment' '每日应还'>>：<<deadwood-reblooms-finance-money _loan.dailyPayment>> · <<lanSwitch 'Daily interest' '日利率'>>：<<= (maplebirch.VP.realEstate.mortgage.terms.dailyInterestRate * 100).toFixed(2)>>% · <<lanSwitch 'Due on day' '到期日'>> <<=_loan.maturityDay>><br>
-	<<lanSwitch 'Overdue balance' '逾期金额'>>：<<deadwood-reblooms-finance-money _loan.arrears>> · <<lanSwitch 'Status' '状态'>>：<<switch _loan.stage>><<case 'notice'>><<lanSwitch 'Payment notice' '催缴中'>><<case 'frozen'>><<lanSwitch 'Frozen' '已冻结'>><<default>><<lanSwitch 'Current' '正常'>><</switch>><br>
+	<<lanSwitch 'Overdue balance' '逾期金额'>>：<<deadwood-reblooms-finance-money _loan.arrears>> · <<lanSwitch 'Status' '状态'>>：<<switch _loan.stage>><<case 'notice'>><span class='red'><<lanSwitch 'Payment notice' '催缴中'>></span><<case 'frozen'>><span class='red'><<lanSwitch 'Frozen' '已冻结'>></span><<default>><span class='green'><<lanSwitch 'Current' '正常'>></span><</switch>><br>
 	<<if _loan.stage is 'notice' && _loan.baileyPending>>
 		<span class='red'><<lanSwitch 'Bailey is waiting outside the agency with the bank notice.' '贝利拿着银行的催缴通知，守在中介门外。'>></span><br>
 		<<lanLink 'Confront Bailey' 'Deadwood Reblooms Mortgage Bailey'>><</lanLink>><br>
@@ -168,7 +175,7 @@
 		<span class='green'><<lanSwitch 'This is your current home.' '这里是你目前的住处。'>></span><br>
 		<<for _resident range maplebirch.VP.realEstate.residentsHome(_property.id)>>
 			<<capture _resident>>
-				<<= lanSwitch(_resident.evening.EN, _resident.evening.CN)>><br>
+				<<= lanSwitch(_resident.evening.EN, _resident.evening.CN)>><br><br>
 				<<lanLink 'Spend time together (0:20)' 'Deadwood Reblooms Property Evening Together'>><<run maplebirch.VP.realEstate.meetResident(_resident.id, _property.id)>><<pass 20>><<stress -2>><</lanLink>><br>
 			<</capture>>
 		<</for>>
@@ -196,13 +203,15 @@
 	<<set _message to maplebirch.VP.realEstate.takeHouseholdMessage()>>
 	<<if _message>>
 		<<set _profile to maplebirch.VP.realEstate.residentProfiles.find(item => item.id === _message.name)>>
-		<<switch _message.result>>
-			<<case 'joined'>><<= lanSwitch(_profile.welcome.EN, _profile.welcome.CN)>><br><br>
-			<<case 'declined'>><<= lanSwitch(_profile.decline.EN, _profile.decline.CN)>><br><br>
-			<<case 'full'>><<lanSwitch 'There is no room for another person to live here.' '这里已经住不下更多人了。'>><br><br>
-			<<case 'bed'>><<lanSwitch 'You need a double bed before anyone can share this room.' '你需要一张双人床，才能和别人同住这间卧室。'>><br><br>
-			<<case 'left'>><<lanSwitch 'You agree to keep separate homes again.' '你们说好重新分开居住。'>><br><br>
-		<</switch>>
+		<<if _profile>>
+			<<switch _message.result>>
+				<<case 'joined'>><span class='green'><<= lanSwitch(_profile.welcome.EN, _profile.welcome.CN)>></span><br><br>
+				<<case 'declined'>><<= lanSwitch(_profile.decline.EN, _profile.decline.CN)>><br><br>
+				<<case 'full'>><span class='red'><<lanSwitch 'There is no room for another person to live here.' '这里已经住不下更多人了。'>></span><br><br>
+				<<case 'bed'>><span class='red'><<lanSwitch 'You need a double bed before anyone can share this room.' '你需要一张双人床，才能和别人同住这间卧室。'>></span><br><br>
+				<<case 'left'>><<lanSwitch 'You agree to keep separate homes again.' '你们说好重新分开居住。'>><br><br>
+			<</switch>>
+		<</if>>
 	<</if>>
 	<<language>>
 		<<option 'EN'>>You can ask a partner to share your home. They will still keep their daytime commitments. The available bedrooms determine how many people can stay.
@@ -210,17 +219,20 @@
 	<</language>><br><br>
 	<<set _residents to maplebirch.VP.realEstate.residentsAt(_property.id)>>
 	<<lanSwitch 'Living here' '当前同住'>>：<<= _residents.length>>/<<= _property.residentCapacity>><br>
-	<<if maplebirch.VP.realEstate.householdCandidates().length is 0>>
+	<<set _candidates to maplebirch.VP.realEstate.residentProfiles.filter(profile => window.isLoveInterest(profile.id))>>
+	<<if _candidates.length is 0>>
 		<<lanSwitch 'You have no partner to ask.' '目前没有可邀请的恋爱对象。'>><br>
 	<</if>>
-	<<for _candidate range maplebirch.VP.realEstate.householdCandidates()>>
+	<<for _candidate range _candidates>>
 		<<capture _candidate>>
 			<<= maplebirch.auto(_candidate.id)>>：
-			<<if _residents.some(item => item.id === _candidate.id)>>
-				<<lanSwitch 'Living together' '正在同住'>> · <<lanLink 'Live separately' 'Deadwood Reblooms Property Household'>><<run maplebirch.VP.realEstate.endCohabitation(_candidate.id, _property.id)>><</lanLink>>
-			<<else>>
-				<<lanLink 'Ask to move in (0:30)' 'Deadwood Reblooms Property Household'>><<pass 30>><<run maplebirch.VP.realEstate.inviteResident(_candidate.id, _property.id)>><</lanLink>>
-			<</if>><br>
+				<<if _residents.some(item => item.id === _candidate.id)>>
+					<<lanSwitch 'Living together' '正在同住'>> · <<lanLink 'Live separately' 'Deadwood Reblooms Property Household'>><<run maplebirch.VP.realEstate.endCohabitation(_candidate.id, _property.id)>><</lanLink>>
+				<<elseif !maplebirch.VP.realEstate.isFrozen(_property.id)>>
+					<<lanLink 'Ask to move in (0:30)' 'Deadwood Reblooms Property Household'>><<pass 30>><<run maplebirch.VP.realEstate.inviteResident(_candidate.id, _property.id)>><</lanLink>>
+				<<else>>
+					<<lanSwitch 'The bank has frozen this home.' '银行已经冻结这处住所。'>>
+				<</if>><br>
 		<</capture>>
 	<</for>>
 	<br><<lanLink 'Return to the sitting room' 'Deadwood Reblooms Property Home'>><</lanLink>>
@@ -290,10 +302,15 @@
 <<effects>>
 <<if $enemyarousal gte $enemyarousalmax or $enemyhealth lte 0>>
 	<<run maplebirch.VP.realEstate.mortgage.fightBailey(true)>>
-	<<language>><<option 'EN'>>Bailey retreats, furious. You have seven more days to clear the arrears before the bank freezes the property.<<option 'CN'>>贝利愤愤退走。你又争取到七天补缴欠款，否则银行就会冻结房产。<</language>>
+	<<language>>
+		<<option 'EN'>>
+			Bailey retreats, furious. <span class='teal'>You have seven more days to clear the arrears</span> before the bank freezes the property.
+		<<option 'CN'>>
+			贝利愤愤退走。<span class='teal'>你又争取到七天补缴欠款</span>，否则银行就会冻结房产。
+		<</language>>
 <<else>>
 	<<run maplebirch.VP.realEstate.mortgage.fightBailey(false)>>
-	<<language>><<option 'EN'>>Bailey pins you down and takes the notice to the bank. Your property is frozen.<<option 'CN'>>贝利制服了你，拿着催缴通知回了银行。你的房产已被冻结。<</language>>
+	<<language>><<option 'EN'>>Bailey pins you down and takes the notice to the bank. <span class='red'>Your property is frozen.</span><<option 'CN'>>贝利制服了你，拿着催缴通知回了银行。<span class='red'>你的房产已被冻结。</span><</language>>
 <</if>>
 <<endcombat>><br><br>
 <<lanLink 'Continue' 'Deadwood Reblooms Property Office'>><</lanLink>>

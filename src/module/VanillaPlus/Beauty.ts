@@ -41,23 +41,6 @@ class Beauty {
     if (V.VanillaPlus.traits.incorrigible) return this.vanillaPlus.divineTransformations.beautyCeiling(this.vanillaPlus.ceiling('beauty'));
     return V.VanillaPlus.traits.beauty ? this.vanillaPlus.divineTransformations.beautyCeiling(this.vanillaPlus.normalCeiling('beauty')) : 0;
   }
-
-  public developer(): void {
-    V.VanillaPlus.lock.beauty = false;
-    V.VanillaPlus.beauty.alluring = true;
-    V.beauty = this.vanillaPlus.normalCeiling('beauty');
-    V.fame.model = Math.max(V.fame.model, 1000);
-    V.makeup ??= {};
-    Object.assign(V.makeup, {
-      lipstick: 0,
-      eyeshadow: 0,
-      mascara: 0,
-      blusher: 0,
-      browscolour: 0,
-      concealer: 0,
-      eyelenses: { left: 0, right: 0 }
-    });
-  }
 }
 
 export default Beauty;

@@ -66,6 +66,7 @@ class VanillaPlus extends Module {
       mirrorOrigin: '',
       mirrors: {
         home: false,
+        property: false,
         farm: false,
         tower: false,
         temple: false
@@ -153,38 +154,6 @@ class VanillaPlus extends Module {
   public ceiling(attribute: VanillaPlusAttribute): number {
     const ratio = attribute === 'willpower' || attribute === 'physique' || attribute === 'beauty' ? 1.25 : 1.5;
     return Math.floor(this.normalCeiling(attribute) * ratio);
-  }
-
-  // 开发准备只补齐该属性的突破条件，便于测试正常触发流程。
-  public prepare(attribute: VanillaPlusAttribute): void {
-    this[attribute].developer();
-  }
-
-  // 作弊完成会解锁扩展上限并将属性推至上限，后续特质仍可单独控制。
-  public complete(attribute: VanillaPlusAttribute): void {
-    this.prepare(attribute);
-    V.VanillaPlus.lock[attribute] = true;
-    V[attribute] = this.ceiling(attribute);
-  }
-
-  public setTrait(attribute: VanillaPlusAttribute, enabled: boolean): void {
-    V.VanillaPlus.traits[attribute] = enabled;
-    if (!enabled) V.VanillaPlus.traits.incorrigible = false;
-  }
-
-  public prepareAll(): void {
-    for (const attribute of this.attributes) this.prepare(attribute);
-  }
-
-  public completeAll(): void {
-    for (const attribute of this.attributes) this.complete(attribute);
-  }
-
-  public setAllTraits(enabled: boolean): void {
-    if (enabled) this.completeAll();
-    for (const attribute of this.attributes) V.VanillaPlus.traits[attribute] = enabled;
-    V.VanillaPlus.traits.incorrigible = enabled;
-    if (enabled) this.preserve();
   }
 
   public unlockTraits(): VanillaPlusTrait[] {

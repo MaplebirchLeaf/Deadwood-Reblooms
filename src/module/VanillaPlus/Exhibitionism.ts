@@ -18,16 +18,6 @@ class Exhibitionism {
   public get max(): boolean {
     return V.VanillaPlus.lock.exhibitionism && V.exhibitionism >= this.vanillaPlus.ceiling('exhibitionism');
   }
-
-  public developer(): void {
-    V.VanillaPlus.lock.exhibitionism = false;
-    Object.assign(V.VanillaPlus.exhibitionism, {
-      swimming: true,
-      ballroom: true,
-      highStreet: true
-    });
-    V.exhibitionism = this.vanillaPlus.normalCeiling('exhibitionism');
-  }
 }
 
 export default Exhibitionism;

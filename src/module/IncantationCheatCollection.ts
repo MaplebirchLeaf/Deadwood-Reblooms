@@ -9,6 +9,7 @@ interface CheatItem {
 
 class IncantationCheatCollection {
   public readonly exposed = true;
+  // 命令库刻意保存在 IndexedDB，跨游戏存档共用；游戏剧情状态仍只存在当前存档的 V 中。
   private cache: CheatItem[] = [];
   private editingName: string | null = null;
   private sortOrder: number = 0;
@@ -191,20 +192,12 @@ class IncantationCheatCollection {
     this.updateContainer('maplebirch-cheat-content', this.renderItems(this.sortItems(results)));
   }
 
-  public async executeForm(name: string): Promise<boolean> {
+  public executeForm(name: string): boolean {
     const item: CheatItem | undefined = this.cache.find(c => c.name === name);
     if (!item) return false;
     const result: any = this.core.tool.console.execute(item.type, item.code);
     const isSuccess: boolean = result?.success ?? false;
     this.showStatus(isSuccess, isSuccess ? 'Execution successful' : 'Execution failed', isSuccess ? '执行成功' : '执行失败');
-    if (isSuccess) {
-      try {
-        await this.core.with('cheats', 'readwrite', async tx => {
-          const store = tx.objectStore('cheats');
-          await store.put(item);
-        });
-      } catch (err) {}
-    }
     return isSuccess;
   }
 
@@ -257,22 +250,9 @@ class IncantationCheatCollection {
   }
 
   public sortForm(): void {
+    // 实际排序已由 content → sortItems 完成；此处只轮换模式，不再重复改动缓存。
     this.sortOrder = (this.sortOrder + 1) % 5;
-    if (this.sortOrder === 0) {
-      void this.refreshCache().then(() => this.updateDisplay());
-    } else if (this.sortOrder === 1) {
-      this.cache.sort((a, b) => a.name.localeCompare(b.name));
-      this.updateDisplay();
-    } else if (this.sortOrder === 2) {
-      this.cache.sort((a, b) => b.name.localeCompare(a.name));
-      this.updateDisplay();
-    } else if (this.sortOrder === 3) {
-      this.cache.sort((a, b) => a.type.localeCompare(b.type));
-      this.updateDisplay();
-    } else if (this.sortOrder === 4) {
-      this.cache.sort((a, b) => b.type.localeCompare(a.type));
-      this.updateDisplay();
-    }
+    this.updateDisplay();
   }
 
   public async exportForm(): Promise<boolean> {
@@ -315,6 +295,7 @@ class IncantationCheatCollection {
         this.showStatus(false, 'Invalid import file', '导入文件格式错误');
         return false;
       }
+      // 导入文件不是可信存档；只保留支持的字段并按名称去重，避免覆盖时出现含糊的目标。
       const namesInFile: Set<string> = new Set();
       for (const rawItem of rawItems) {
         const item = rawItem as Record<string, unknown>;

@@ -8,6 +8,7 @@ type PropertyId = string;
 type LocalizedText = { EN: string; CN: string };
 type PropertyRoom = 'bedroom' | 'bathroom' | 'kitchen' | 'desk' | 'guest' | 'retreat';
 
+// YAML 是房源的唯一静态来源。价格和租金均以便士计；rooms 的数字是楼层编号。
 interface PropertyFloor {
   name: LocalizedText;
   description: LocalizedText;
@@ -122,7 +123,7 @@ class RealEstate {
     private readonly core: typeof maplebirch,
     private readonly finance: Finance
   ) {
-    this.mortgage = new Mortgage(core, finance, (id, debt) => this.sellByAuction(id, 'foreclosure', debt));
+    this.mortgage = new Mortgage(core, finance, (id, debt, day) => this.sellByAuction(id, 'foreclosure', debt, day));
   }
 
   public get properties(): readonly Property[] {
@@ -152,14 +153,15 @@ class RealEstate {
       void this.properties;
       void this.rivals;
       void this.residentProfiles;
+      void this.mortgage.terms;
     });
-    // 初始化读档与正常跨日都调用同一个补算入口，lastManagedDay 保证一天只结算一次。
-    this.core.on(':variable', () => this.advanceProperties(), 'Vanilla Plus Real Estate');
+    // 读档只恢复 V 中的房产和结算游标；经济结算只由游戏时间跨日触发。
+    // 优先于 Finance 收取其他贷款和信用卡款项，使当天租金能先入账。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-property-management', {
       action: () => this.advanceProperties(),
-      exact: true
+      exact: true,
+      priority: 1
     });
-    this.mortgage.preInit();
   }
 
   private static loadProperties(core: typeof maplebirch): Property[] {
@@ -275,6 +277,7 @@ class RealEstate {
   }
 
   public get current(): Property | undefined {
+    // visiting 是最后进入的房产，不等于 active（PC 实际住处）；这样可参观其他已购房屋。
     return this.properties.find(property => property.id === this.state.visiting);
   }
 
@@ -297,23 +300,13 @@ class RealEstate {
     return this.state.owned[id] === true;
   }
 
-  private isCurrentLoveInterest(name: string): boolean {
-    const selected = Array.isArray(V.loveInterestList) ? V.loveInterestList : Object.values(V.loveInterest ?? {});
-    return selected.includes(name) && typeof window.isPossibleLoveInterest === 'function' && window.isPossibleLoveInterest(name);
-  }
-
-  // 恋人列表由原版/恋爱对象模块管理；住宅只保存入住关系，失去恋爱资格时清除旧住户。
+  // 原版 isLoveInterest 读取当前存档的恋人槽位，模组已将扩展列表接入该函数。
+  // 同住只关心是否为当前恋人，不用判断角色是否还能被选为恋人。
   private reconcileResidents(): void {
-    if (typeof window.isPossibleLoveInterest !== 'function') return;
-    if (!Array.isArray(V.loveInterestList) && !V.loveInterest) return;
     const residents = (this.state.residents ??= {});
     for (const [id, names] of Object.entries(residents)) {
-      residents[id] = names.filter(name => this.owns(id) && this.isCurrentLoveInterest(name) && this.residentProfiles.some(profile => profile.id === name && profile.minimumLove !== undefined));
+      residents[id] = names.filter(name => this.owns(id) && window.isLoveInterest(name) && this.residentProfiles.some(profile => profile.id === name && profile.minimumLove !== undefined));
     }
-  }
-
-  public householdCandidates(): ResidentProfile[] {
-    return this.residentProfiles.filter(profile => this.isCurrentLoveInterest(profile.id));
   }
 
   public residentsAt(id: PropertyId): ResidentProfile[] {
@@ -325,16 +318,16 @@ class RealEstate {
   }
 
   public residentsHome(id: PropertyId): ResidentProfile[] {
-    // 白天保留原版 NPC 日程；同住场景仅在玩家的当前住所和夜间出现。
+    // 当前只给玩家住所提供夜间互动；原版其他地点的 NPC 日程尚未接入同住状态。
     return this.state.active === id && (Time.hour >= 20 || Time.hour < 7) ? this.residentsAt(id) : [];
   }
 
   public inviteResident(name: string, id: PropertyId): boolean {
     this.reconcileResidents();
     const property = this.properties.find(item => item.id === id);
-    if (!property || this.state.active !== id || !this.owns(id) || this.managementFor(id).rented) return false;
+    if (!property || this.state.active !== id || !this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return false;
     const profile = this.residentProfiles.find(item => item.id === name);
-    if (!profile || !this.isCurrentLoveInterest(name)) return false;
+    if (!profile || !window.isLoveInterest(name)) return false;
     const residents = (this.state.residents[id] ??= []);
     if (residents.includes(name)) return false;
     const love = Number((C.npc as Record<string, { love?: number } | undefined>)[name]?.love ?? 0);
@@ -383,6 +376,7 @@ class RealEstate {
     this.state.owned[id] = true;
     delete this.state.rivalHoldings[id];
     this.state.management[id] = RealEstate.newManagement();
+    if (this.state.lastManagedDay < 0) this.state.lastManagedDay = RealEstate.today();
     return 'ok';
   }
 
@@ -395,6 +389,7 @@ class RealEstate {
     this.state.owned[id] = true;
     delete this.state.rivalHoldings[id];
     this.state.management[id] = RealEstate.newManagement();
+    if (this.state.lastManagedDay < 0) this.state.lastManagedDay = RealEstate.today();
     return 'ok';
   }
 
@@ -461,6 +456,7 @@ class RealEstate {
     const companions = former ? this.residentsAt(former).map(profile => profile.id) : [];
     if (!this.visit(id)) return false;
     if (this.state.active === null) {
+      // 原版租期留在孤儿院房间。住在自住房期间钉住 renttime，回迁时恢复原剩余天数。
       this.state.orphanageRentTime = Number(V.renttime);
       V.renttime = 7;
     }
@@ -479,6 +475,9 @@ class RealEstate {
     const remaining = this.state.orphanageRentTime;
     if (remaining !== null && Number.isFinite(remaining)) V.renttime = remaining;
     this.state.active = null;
+    this.state.visiting = null;
+    this.state.floor = 1;
+    this.state.meetingResident = null;
     this.state.orphanageRentTime = null;
   }
 
@@ -583,8 +582,8 @@ class RealEstate {
     const state = this.state;
     const today = RealEstate.today();
     if (state.lastManagedDay < 0) {
-      state.lastManagedDay = today;
-      return;
+      // 没有房产时只建立游标；在控制台手工放入房产的旧存档也能从首次跨日开始结算。
+      state.lastManagedDay = this.properties.some(property => this.owns(property.id)) ? today - 1 : today;
     }
     // 游戏可一次跳过多天；逐日处理房屋和房贷，避免把未来的租金提前用于旧分期。
     for (let day = state.lastManagedDay + 1; day <= today; day++) {
@@ -592,7 +591,7 @@ class RealEstate {
         if (!this.owns(property.id)) continue;
         const management = this.managementFor(property.id);
         if (management.auctionDay !== null && day >= management.auctionDay) {
-          this.sellByAuction(property.id, 'voluntary', 0);
+          this.sellByAuction(property.id, 'voluntary', 0, day);
           continue;
         }
         if (management.leaseEndDay !== null && day >= management.leaseEndDay) {
@@ -601,6 +600,7 @@ class RealEstate {
         }
         const upkeep = this.maintenanceCost(property.id);
         if (management.rented && management.condition >= this.mortgage.terms.rental.minimumCondition) {
+          // 租客直接承担当日维护费；冻结时净租金由银行先抵债，余额才回到玩家账户。
           const netRent = Math.max(0, this.dailyRent(property.id) - upkeep);
           if (this.isFrozen(property.id)) this.mortgage.applySeizedRent(netRent);
           else this.finance.creditBankPennies(netRent);
@@ -618,7 +618,7 @@ class RealEstate {
     state.lastManagedDay = today;
   }
 
-  private sellByAuction(id: PropertyId, kind: 'voluntary' | 'foreclosure', debt: number): void {
+  private sellByAuction(id: PropertyId, kind: 'voluntary' | 'foreclosure', debt: number, day: number): void {
     const property = this.properties.find(item => item.id === id);
     if (!property || !this.owns(id)) return;
     const management = this.managementFor(id);
@@ -637,10 +637,10 @@ class RealEstate {
         winnerId = rival.id;
       }
     }
-    // 拍卖只把抵债后的余额存入银行；房贷状态由 Mortgage 在回调前结束。
+    // 拍卖只把抵债后的余额存入银行；房贷状态由 Mortgage 在回调前结束。债务高于拍价时不产生负存款。
     const surplus = Math.max(0, proceeds - debt);
     this.finance.creditBankPennies(surplus);
-    this.state.lastAuction = { propertyId: id, kind, proceeds, debt, surplus, day: RealEstate.today(), winnerId };
+    this.state.lastAuction = { propertyId: id, kind, proceeds, debt, surplus, day, winnerId };
     if (winnerId === 'market') delete this.state.rivalHoldings[id];
     else this.state.rivalHoldings[id] = winnerId;
     this.state.owned[id] = false;
@@ -652,10 +652,23 @@ class RealEstate {
     const wardrobe = (V.wardrobes as Record<string, Record<string, unknown>> | undefined)?.[`deadwood_${id}`];
     if (wardrobe) wardrobe.unlocked = false;
     if (this.state.active === id) {
-      const alternative = this.properties.find(item => this.owns(item.id) && !this.managementFor(item.id).rented && item.residentCapacity >= displaced.length);
+      // 自动安置必须遵守与手动搬家相同的住房约束；单人床、冻结或待拍卖的房子不能接纳同住者。
+      const alternative = this.properties.find(
+        item =>
+          this.owns(item.id) &&
+          !this.managementFor(item.id).rented &&
+          !this.isFrozen(item.id) &&
+          this.managementFor(item.id).auctionDay === null &&
+          (this.state.residents?.[item.id] ?? []).length === 0 &&
+          item.residentCapacity >= displaced.length &&
+          (displaced.length === 0 || this.canShareBed(item.id))
+      );
       if (alternative) {
         this.state.active = alternative.id;
         this.state.residents[alternative.id] = displaced;
+        this.state.visiting = alternative.id;
+        this.state.floor = 1;
+        this.state.meetingResident = null;
       } else this.moveBack();
     }
   }
@@ -702,6 +715,8 @@ class RealEstate {
       space: 50,
       name
     };
+    // 拍卖曾锁住过这个衣柜；再次买下同一处房产时，保留衣物并恢复使用权。
+    wardrobes[key].unlocked = true;
     wardrobes[key].name = name;
     V.wardrobe_location = key;
   }

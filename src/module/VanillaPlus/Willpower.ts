@@ -96,23 +96,6 @@ class Willpower {
     this.reset();
     delete V.willpowerpain;
   }
-
-  public developer(): void {
-    V.VanillaPlus.lock.willpower = false;
-    Object.assign(V.VanillaPlus.willpower, {
-      wraith: true,
-      schism: true,
-      vigil: true
-    });
-    V.willpower = this.vanillaPlus.normalCeiling('willpower');
-    V.parasite ??= {};
-    V.parasite.left_ear = { ...V.parasite.left_ear, name: 'slime' };
-    V.parasite.right_ear = { ...V.parasite.right_ear, name: 'slime' };
-    V.wraithPrison ??= {};
-    V.wraithPrison.state = 'recovering';
-    V.wraithPrison.timer = 120;
-    V.wraithPrison.search = 4;
-  }
 }
 
 export default Willpower;

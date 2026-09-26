@@ -5,6 +5,7 @@ import Transformation, { TransformationOption } from './Transformation';
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 class Horse extends Transformation {
+  // demonhorse 混合尾只在当前绘制帧合成，玩家实际选择的恶魔尾状态仍由原版存档维护。
   private static demonTailEnabled(): boolean {
     const parts = V.transformationParts;
     return [parts?.horse?.tail, parts?.demon?.tail].every(part => typeof part === 'string' && isPartEnabled(part)) && isChimeraEnabled('demonhorse', 'tail');
@@ -107,6 +108,7 @@ class Horse extends Transformation {
   }
 
   private static pre(options: any): void {
+    // BeautySelector 的贴图管线与原版角色渲染是两套层表；二者需分别隐藏被合成的恶魔尾。
     options.maplebirchTransformation = V.maplebirch?.transformation ?? false;
     options.filters.horseHair = Horse.hairLikeFilter(V.haircolour);
     const demonTail = options.transformations?.demon?.tail;

@@ -61,15 +61,9 @@ export const DEFAULT_SCHOOL_STATE: SchoolState = {
   clothesStored: false
 };
 
-const DRESS_POLICIES: readonly SchoolDressPolicy[] = [
-  'uniform',
-  'free',
-  'revealing',
-  'optionalNudity',
-  'nudeDay',
-  'mandatoryNudity'
-];
+const DRESS_POLICIES: readonly SchoolDressPolicy[] = ['uniform', 'free', 'revealing', 'optionalNudity', 'nudeDay', 'mandatoryNudity'];
 
+// 制服政策按此顺序升级；highest 记录已保住的最高等级，active 可在一周试行后回退。
 const POLICY_REQUIREMENTS: Record<SchoolDressPolicy, SchoolPolicyRequirements> = {
   uniform: { studentSupport: 0, staffSupport: 0, corruption: 0, leightonLove: 0 },
   free: { studentSupport: 30, staffSupport: 25, corruption: 0, leightonLove: 10 },
@@ -186,13 +180,7 @@ class School {
   }
 
   public get canBecomePresident(): boolean {
-    return (
-      this.canRequestPresident &&
-      this.state.duties.completed >= 5 &&
-      this.state.studentSupport >= 25 &&
-      this.state.staffSupport >= 25 &&
-      this.state.order >= 25
-    );
+    return this.canRequestPresident && this.state.duties.completed >= 5 && this.state.studentSupport >= 25 && this.state.staffSupport >= 25 && this.state.order >= 25;
   }
 
   public appointPresident(): boolean {
@@ -216,6 +204,7 @@ class School {
   public startDuty(): SchoolStudent | null {
     if (!this.canPerformDuty) return null;
     if (this.state.duties.target && this.isStudentAvailable(this.state.duties.target)) return this.state.duties.target;
+    // 同一天固定同一目标，避免反复打开页面就能刷到更有利的学生。
     const available = SCHOOL_STUDENT_ROSTER.filter(student => this.isStudentAvailable(student));
     this.state.duties.target = available.length ? available[Time.days % available.length] : null;
     return this.state.duties.target;
@@ -286,13 +275,7 @@ class School {
   }
 
   public get canProposePolicy(): boolean {
-    return (
-      this.state.role === 'president' &&
-      this.nextPolicy !== null &&
-      this.state.dress.proposal === null &&
-      this.state.dress.trialUntil === 0 &&
-      Time.days >= this.state.dress.cooldownUntil
-    );
+    return this.state.role === 'president' && this.nextPolicy !== null && this.state.dress.proposal === null && this.state.dress.trialUntil === 0 && Time.days >= this.state.dress.cooldownUntil;
   }
 
   public proposePolicy(): boolean {
@@ -333,6 +316,7 @@ class School {
     const policy = this.state.dress.proposal;
     if (!policy || !this.canApprovePolicy(route)) return false;
 
+    // 提案通过只开启七天试行；期满才由 reviewPolicy 决定保留还是回滚。
     this.state.dress.previous = this.state.dress.active;
     this.state.dress.active = policy;
     this.state.dress.proposal = null;
@@ -378,6 +362,7 @@ class School {
   private isStudentAvailable(student: SchoolStudent): boolean {
     const npc = C.npc?.[student];
     if (npc?.init !== 1 || ['prison', 'pillory', 'dungeon'].includes(npc.state)) return false;
+    // 侧栏模块安装时复用其原版日程解析；未安装时只做最基本的 NPC 状态检查。
     if (!window.maplebirch.get('NPCSidebarPortrait')) return true;
     return SCHOOL_CAMPUS_LOCATIONS[student].includes(window.maplebirch.npc.Schedule.location[student] ?? '');
   }
