@@ -67,6 +67,9 @@ interface MarketState {
   day: number;
   prices: Record<string, number>;
   previousPrices: Record<string, number>;
+  farmStage?: number;
+  farmAttackDamage?: number;
+  pendingFarmMoves?: Record<string, number>;
 }
 
 interface FinanceState {
@@ -182,7 +185,8 @@ class Finance {
 
   public get securities(): readonly Security[] {
     const finance = ((setup.DeadwoodReblooms ??= {}).finance ??= {});
-    return (finance.securities ??= Finance.loadSecurities(this.core));
+    const securities = (finance.securities ??= Finance.loadSecurities(this.core));
+    return securities.filter(item => item.symbol !== 'ALF' || Number(V.farm_stage) >= 7);
   }
 
   private get state(): FinanceState {
@@ -203,6 +207,7 @@ class Finance {
     Finance.refreshAccountTier(this.state.bank);
     Finance.resetAtmLimit(this.state.bank);
     Finance.advanceMarket(this.state, this.securities);
+    Finance.advanceFarmMarket(this.state.market, this.securities);
     Finance.advanceDepositInterest(this.state.bank);
     Finance.advanceLoan(this.state.bank);
     Finance.advanceCredit(this.state.bank);
@@ -497,9 +502,15 @@ class Finance {
     if (!Number.isSafeInteger(finance.market.seed) || finance.market.seed === 0) finance.market.seed = Finance.marketSeed();
     for (const item of securities) {
       finance.brokerage.holdings[item.symbol] ??= 0;
-      finance.market.prices[item.symbol] ??= item.initialPrice;
+      const initialPrice = item.symbol === 'ALF' && finance.market.farmStage === undefined
+        ? Math.round(item.initialPrice * (Number(V.farm_stage) >= 12 ? 1.188 : Number(V.farm_stage) >= 9 ? 1.08 : 1))
+        : item.initialPrice;
+      finance.market.prices[item.symbol] ??= initialPrice;
       finance.market.previousPrices[item.symbol] ??= finance.market.prices[item.symbol];
     }
+    finance.market.farmStage ??= Math.max(0, Math.floor(Number(V.farm_stage) || 0));
+    finance.market.farmAttackDamage ??= Boolean(V.farm_attacked) && Array.isArray(V.fields_damaged) ? V.fields_damaged.length : 0;
+    finance.market.pendingFarmMoves ??= {};
     if (finance.bank.loanDebt > 0) {
       finance.bank.loanRate = finance.bank.loanRate || 0.002;
       finance.bank.loanTerm = finance.bank.loanTerm || 30;
@@ -728,6 +739,44 @@ class Finance {
     return Math.clamp(next, Math.round(item.initialPrice * 0.25), item.initialPrice * 4);
   }
 
+  private static applyFarmMoves(market: MarketState, securities: readonly Security[]): void {
+    for (const item of securities) {
+      const move = market.pendingFarmMoves?.[item.symbol] ?? 0;
+      if (!move) continue;
+      market.prices[item.symbol] = Math.clamp(
+        Math.round(market.prices[item.symbol] * (100 + move) / 100),
+        Math.round(item.initialPrice * 0.25),
+        item.initialPrice * 4
+      );
+    }
+    market.pendingFarmMoves = {};
+  }
+
+  private static advanceFarmMarket(market: MarketState, securities: readonly Security[]): void {
+    const stage = Math.max(0, Math.floor(Number(V.farm_stage) || 0));
+    const previousStage = market.farmStage ?? stage;
+    const moves = (market.pendingFarmMoves ??= {});
+    if (previousStage < 7 && stage >= 7) moves.RMY = (moves.RMY ?? 0) - 2;
+    if (previousStage < 9 && stage >= 9) {
+      moves.ALF = (moves.ALF ?? 0) + 8;
+      moves.RMY = (moves.RMY ?? 0) - 3;
+    }
+    if (previousStage < 12 && stage >= 12) {
+      moves.ALF = (moves.ALF ?? 0) + 10;
+      moves.RMY = (moves.RMY ?? 0) - 4;
+    }
+    market.farmStage = stage;
+
+    const damage = Boolean(V.farm_attacked) && Array.isArray(V.fields_damaged) ? V.fields_damaged.length : 0;
+    const newDamage = Math.max(0, damage - (market.farmAttackDamage ?? 0));
+    if (newDamage > 0) {
+      moves.ALF = (moves.ALF ?? 0) - Math.min(12, newDamage * 2);
+      moves.RMY = (moves.RMY ?? 0) + Math.min(3, newDamage);
+    }
+    market.farmAttackDamage = damage;
+    if (Number(Time.weekDay) !== 1 && Number(Time.weekDay) !== 7) Finance.applyFarmMoves(market, securities);
+  }
+
   private static advanceMarket(finance: FinanceState, securities: readonly Security[]): void {
     const currentDay = Finance.currentDay();
     if (finance.market.day < 0) {
@@ -740,6 +789,7 @@ class Finance {
       if (weekDay === 1 || weekDay === 7) continue;
       finance.market.previousPrices = { ...finance.market.prices };
       for (const item of securities) finance.market.prices[item.symbol] = Finance.nextPrice(item, finance.market.prices[item.symbol], day, finance.market.seed);
+      Finance.applyFarmMoves(finance.market, securities);
     }
     finance.market.day = currentDay;
   }

@@ -1,5 +1,7 @@
 // ./src/module/VanillaPlus/Promiscuity.ts
 
+import type VanillaPlus from '../VanillaPlus';
+
 type PenisDestination = 'vagina' | 'anus';
 
 type PromiscuityAction =
@@ -22,6 +24,8 @@ type PromiscuityAction =
   | 'offer-anus-to-penis';
 
 class Promiscuity {
+  public constructor(private readonly vanillaPlus: VanillaPlus) {}
+
   private npc(index: number) {
     const target = Number(index);
     const npc = V.NPCList?.[target];
@@ -29,11 +33,11 @@ class Promiscuity {
   }
 
   private hasStrapon(index: number): boolean {
-    return (window as typeof window & { npcHasStrapon?: (target: number) => boolean }).npcHasStrapon?.(index) ?? false;
+    return window.npcHasStrapon?.(index) ?? false;
   }
 
   public get expanded(): boolean {
-    return V.VanillaPlus.lock.promiscuity && V.promiscuity >= window.maplebirch.VP.normalCeiling('promiscuity');
+    return V.VanillaPlus.lock.promiscuity && V.promiscuity >= this.vanillaPlus.normalCeiling('promiscuity');
   }
 
   public get mastered(): boolean {
@@ -235,7 +239,7 @@ class Promiscuity {
     const npc = this.npc(target);
     if (!npc) return;
 
-    if (window.maplebirch.VP.NPCDoublePenetration.isPartner(target)) window.maplebirch.VP.NPCDoublePenetration.clear();
+    if (this.vanillaPlus.NPCDoublePenetration.isPartner(target)) this.vanillaPlus.NPCDoublePenetration.clear();
     if (V.mouthuse === 'penis' && Number(V.mouthtarget) === target) this.clear('mouth');
     if (V.penisuse === 'otherpenis' && Number(V.penistarget) === target) this.clear('penis');
     this.releaseVaginalPenis(target);
@@ -341,7 +345,7 @@ class Promiscuity {
   }
 
   public get ready(): boolean {
-    return V.promiscuity >= window.maplebirch.VP.normalCeiling('promiscuity') && V.exhibitionism >= window.maplebirch.VP.normalCeiling('exhibitionism') && V.deviancy >= window.maplebirch.VP.normalCeiling('deviancy');
+    return V.promiscuity >= this.vanillaPlus.normalCeiling('promiscuity') && V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism') && V.deviancy >= this.vanillaPlus.normalCeiling('deviancy');
   }
 
   public get unlock(): boolean {
@@ -349,14 +353,14 @@ class Promiscuity {
   }
 
   public get max(): boolean {
-    return V.VanillaPlus.lock.promiscuity && V.promiscuity >= window.maplebirch.VP.ceiling('promiscuity');
+    return V.VanillaPlus.lock.promiscuity && V.promiscuity >= this.vanillaPlus.ceiling('promiscuity');
   }
 
   public developer(): void {
     V.VanillaPlus.lock.promiscuity = false;
-    V.promiscuity = window.maplebirch.VP.normalCeiling('promiscuity');
-    V.exhibitionism = Math.max(V.exhibitionism, window.maplebirch.VP.normalCeiling('exhibitionism'));
-    V.deviancy = Math.max(V.deviancy, window.maplebirch.VP.normalCeiling('deviancy'));
+    V.promiscuity = this.vanillaPlus.normalCeiling('promiscuity');
+    V.exhibitionism = Math.max(V.exhibitionism, this.vanillaPlus.normalCeiling('exhibitionism'));
+    V.deviancy = Math.max(V.deviancy, this.vanillaPlus.normalCeiling('deviancy'));
   }
 }
 

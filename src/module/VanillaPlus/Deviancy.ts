@@ -1,6 +1,10 @@
 // ./src/module/VanillaPlus/Deviancy.ts
 
+import type VanillaPlus from '../VanillaPlus';
+
 class Deviancy {
+  public constructor(private readonly vanillaPlus: VanillaPlus) {}
+
   private get mirrors(): Record<'home' | 'farm' | 'tower', boolean> {
     return (V.VanillaPlus.deviancy.mirrors ??= { home: false, farm: false, tower: false });
   }
@@ -21,7 +25,7 @@ class Deviancy {
     return (
       !V.VanillaPlus.lock.deviancy &&
       !V.VanillaPlus.deviancy.conducted &&
-      V.deviancy >= window.maplebirch.VP.normalCeiling('deviancy') &&
+      V.deviancy >= this.vanillaPlus.normalCeiling('deviancy') &&
       V.VanillaPlus.deviancy.wildsong &&
       V.gwylan.purged >= 20 &&
       V.dateCount.GwylanSex >= 3 &&
@@ -40,11 +44,11 @@ class Deviancy {
   }
 
   public get unlock(): boolean {
-    return !V.VanillaPlus.lock.deviancy && V.deviancy >= window.maplebirch.VP.normalCeiling('deviancy') && V.VanillaPlus.deviancy.wildsong && V.VanillaPlus.deviancy.conducted;
+    return !V.VanillaPlus.lock.deviancy && V.deviancy >= this.vanillaPlus.normalCeiling('deviancy') && V.VanillaPlus.deviancy.wildsong && V.VanillaPlus.deviancy.conducted;
   }
 
   public get max(): boolean {
-    return V.VanillaPlus.lock.deviancy && V.deviancy >= window.maplebirch.VP.ceiling('deviancy');
+    return V.VanillaPlus.lock.deviancy && V.deviancy >= this.vanillaPlus.ceiling('deviancy');
   }
 
   public developer(): void {
@@ -52,7 +56,7 @@ class Deviancy {
     V.VanillaPlus.deviancy.wildsong = true;
     V.VanillaPlus.deviancy.conducted = true;
     Object.assign(this.mirrors, { home: true, farm: true, tower: true });
-    V.deviancy = window.maplebirch.VP.normalCeiling('deviancy');
+    V.deviancy = this.vanillaPlus.normalCeiling('deviancy');
   }
 }
 

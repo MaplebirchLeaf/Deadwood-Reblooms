@@ -1,6 +1,10 @@
 // ./src/module/VanillaPlus/Willpower.ts
 
+import type VanillaPlus from '../VanillaPlus';
+
 class Willpower {
+  public constructor(private readonly vanillaPlus: VanillaPlus) {}
+
   private static readonly PAIN_LIMIT = 200;
   private static readonly PAIN_RECOVERY_LIMIT = 100;
   private static readonly PAIN_SHIELD_LIMIT = Willpower.PAIN_LIMIT / 2;
@@ -15,7 +19,7 @@ class Willpower {
 
     return (
       !V.VanillaPlus.lock.willpower &&
-      V.willpower >= window.maplebirch.VP.normalCeiling('willpower') &&
+      V.willpower >= this.vanillaPlus.normalCeiling('willpower') &&
       earSlimes >= 2 &&
       V.VanillaPlus.willpower.wraith &&
       V.VanillaPlus.willpower.schism &&
@@ -26,7 +30,7 @@ class Willpower {
   }
 
   public get max(): boolean {
-    return V.VanillaPlus?.lock?.willpower && V.willpower >= window.maplebirch.VP.ceiling('willpower');
+    return V.VanillaPlus?.lock?.willpower && V.willpower >= this.vanillaPlus.ceiling('willpower');
   }
 
   public earSlimeResistance(value: number): number {
@@ -100,7 +104,7 @@ class Willpower {
       schism: true,
       vigil: true
     });
-    V.willpower = window.maplebirch.VP.normalCeiling('willpower');
+    V.willpower = this.vanillaPlus.normalCeiling('willpower');
     V.parasite ??= {};
     V.parasite.left_ear = { ...V.parasite.left_ear, name: 'slime' };
     V.parasite.right_ear = { ...V.parasite.right_ear, name: 'slime' };

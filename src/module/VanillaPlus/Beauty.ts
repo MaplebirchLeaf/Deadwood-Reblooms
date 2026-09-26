@@ -1,6 +1,10 @@
 // ./src/module/VanillaPlus/Beauty.ts
 
+import type VanillaPlus from '../VanillaPlus';
+
 class Beauty {
+  public constructor(private readonly vanillaPlus: VanillaPlus) {}
+
   public get seductionBonus(): number {
     return V.VanillaPlus?.traits.beauty ? 2000 : 0;
   }
@@ -21,7 +25,7 @@ class Beauty {
   public get unlock(): boolean {
     return (
       !V.VanillaPlus.lock.beauty &&
-      V.beauty >= window.maplebirch.VP.normalCeiling('beauty') &&
+      V.beauty >= this.vanillaPlus.normalCeiling('beauty') &&
       V.VanillaPlus.beauty.alluring &&
       V.fame.model >= 1000 &&
       this.unadorned &&
@@ -30,18 +34,18 @@ class Beauty {
   }
 
   public get max(): boolean {
-    return V.VanillaPlus.lock.beauty && V.beauty >= window.maplebirch.VP.ceiling('beauty');
+    return V.VanillaPlus.lock.beauty && V.beauty >= this.vanillaPlus.ceiling('beauty');
   }
 
   public get floor(): number {
-    if (V.VanillaPlus.traits.incorrigible) return window.maplebirch.VP.ceiling('beauty');
-    return V.VanillaPlus.traits.beauty ? window.maplebirch.VP.normalCeiling('beauty') : 0;
+    if (V.VanillaPlus.traits.incorrigible) return this.vanillaPlus.divineTransformations.beautyCeiling(this.vanillaPlus.ceiling('beauty'));
+    return V.VanillaPlus.traits.beauty ? this.vanillaPlus.divineTransformations.beautyCeiling(this.vanillaPlus.normalCeiling('beauty')) : 0;
   }
 
   public developer(): void {
     V.VanillaPlus.lock.beauty = false;
     V.VanillaPlus.beauty.alluring = true;
-    V.beauty = window.maplebirch.VP.normalCeiling('beauty');
+    V.beauty = this.vanillaPlus.normalCeiling('beauty');
     V.fame.model = Math.max(V.fame.model, 1000);
     V.makeup ??= {};
     Object.assign(V.makeup, {

@@ -3,6 +3,7 @@
 import AcademicHonours from './VanillaPlus/AcademicHonours';
 import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
+import DivineTransformations from './VanillaPlus/DivineTransformations';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
 import Finance from './VanillaPlus/Finance';
 import HistoryProject from './VanillaPlus/HistoryProject';
@@ -43,6 +44,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   AcademicHonours(maplebirch);
   Beauty(maplebirch);
   Deviancy(maplebirch);
+  DivineTransformations(maplebirch);
   Exhibitionism(maplebirch);
   HistoryProject(maplebirch);
   HandGrip(maplebirch);

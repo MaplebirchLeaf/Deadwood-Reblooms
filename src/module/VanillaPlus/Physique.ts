@@ -1,13 +1,17 @@
 // ./src/module/VanillaPlus/Physique.ts
 
+import type VanillaPlus from '../VanillaPlus';
+
 class Physique {
+  public constructor(private readonly vanillaPlus: VanillaPlus) {}
+
   public get unlock(): boolean {
     const physique = V.VanillaPlus.physique;
-    return !V.VanillaPlus.lock.physique && V.physique >= window.maplebirch.VP.normalCeiling('physique') && physique.panic && physique.heroic && physique.farm && physique.pound;
+    return !V.VanillaPlus.lock.physique && V.physique >= this.vanillaPlus.normalCeiling('physique') && physique.panic && physique.heroic && physique.farm && physique.pound;
   }
 
   public get max(): boolean {
-    return V.VanillaPlus.lock.physique && V.physique >= window.maplebirch.VP.ceiling('physique');
+    return V.VanillaPlus.lock.physique && V.physique >= this.vanillaPlus.ceiling('physique');
   }
 
   public get canBreakBindings(): boolean {
@@ -36,7 +40,7 @@ class Physique {
       farm: true,
       pound: true
     });
-    V.physique = window.maplebirch.VP.normalCeiling('physique');
+    V.physique = this.vanillaPlus.normalCeiling('physique');
   }
 }
 

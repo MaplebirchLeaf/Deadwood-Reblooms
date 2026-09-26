@@ -4,6 +4,7 @@ import Module from './Module';
 import AcademicHonours from './VanillaPlus/AcademicHonours';
 import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
+import DivineTransformations from './VanillaPlus/DivineTransformations';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
 import Finance, { DEFAULT_FINANCE_STATE } from './VanillaPlus/Finance';
 import HandGrip from './VanillaPlus/HandGrip';
@@ -36,6 +37,10 @@ class VanillaPlus extends Module {
     },
     beauty: {
       alluring: false
+    },
+    divineTransformations: {
+      beautyBonus: 0,
+      expungeUsed: false
     },
     finance: DEFAULT_FINANCE_STATE,
     historyProject: {
@@ -101,20 +106,27 @@ class VanillaPlus extends Module {
 
   public readonly exposed = true;
   public readonly academicHonours = new AcademicHonours();
-  public readonly beauty = new Beauty();
-  public readonly deviancy = new Deviancy();
-  public readonly exhibitionism = new Exhibitionism();
+  public readonly beauty: Beauty;
+  public readonly deviancy: Deviancy;
+  public readonly divineTransformations = new DivineTransformations();
+  public readonly exhibitionism: Exhibitionism;
   public readonly finance: Finance;
   public readonly handGrip = new HandGrip();
   public readonly NPCDoublePenetration = new NPCDoublePenetration();
-  public readonly physique = new Physique();
-  public readonly promiscuity = new Promiscuity();
-  public readonly willpower = new Willpower();
+  public readonly physique: Physique;
+  public readonly promiscuity: Promiscuity;
+  public readonly willpower: Willpower;
   private readonly attributes: VanillaPlusAttribute[] = ['willpower', 'physique', 'beauty', 'exhibitionism', 'deviancy', 'promiscuity'];
 
   public constructor(core: typeof maplebirch) {
     super(core, 'VanillaPlus', VanillaPlus.variables);
+    this.beauty = new Beauty(this);
+    this.deviancy = new Deviancy(this);
+    this.exhibitionism = new Exhibitionism(this);
     this.finance = new Finance(core);
+    this.physique = new Physique(this);
+    this.promiscuity = new Promiscuity(this);
+    this.willpower = new Willpower(this);
   }
 
   public override preInit(): void {
@@ -204,8 +216,9 @@ class VanillaPlus extends Module {
   }
 
   public minimum(attribute: VanillaPlusAttribute): number {
+    if (attribute === 'beauty') return this.beauty.floor;
     if (V.VanillaPlus.traits.incorrigible) return this.ceiling(attribute);
-    return attribute === 'beauty' && V.VanillaPlus.traits.beauty ? this.normalCeiling('beauty') : 0;
+    return 0;
   }
 
   public get belowMinimum(): boolean {

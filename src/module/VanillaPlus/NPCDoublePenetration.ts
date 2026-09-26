@@ -30,7 +30,7 @@ const PLAYER_ANUS_STATES = ['anusentrance', 'anusimminent', 'anus'];
 
 class NPCDoublePenetration {
   private hasStrapon(index: number): boolean {
-    return (window as typeof window & { npcHasStrapon?: (target: number) => boolean }).npcHasStrapon?.(index) ?? false;
+    return window.npcHasStrapon?.(index) ?? false;
   }
 
   public get state(): NPCDoublePenetrationState | undefined {
