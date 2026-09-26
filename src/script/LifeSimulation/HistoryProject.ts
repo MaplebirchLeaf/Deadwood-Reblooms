@@ -9,9 +9,9 @@ interface PassagePatch {
 
 const startCheck = `
   <<if
-    $VanillaPlus.historyProject.status is 'none' and
-    $VanillaPlus.historyProject.availableDay gt 0 and
-    Time.days gte $VanillaPlus.historyProject.availableDay
+    $LifeSimulation.historyProject.status is 'none' and
+    $LifeSimulation.historyProject.availableDay gt 0 and
+    Time.days gte $LifeSimulation.historyProject.availableDay
   >>
     <<deadwood-reblooms-history-project-intro>><<exit>>
   <</if>>`;
@@ -19,11 +19,11 @@ const startCheck = `
 const schedule = `
         <<if
           ['paintingward', 'paintingsnake'].includes(_labelP) and
-          $VanillaPlus.historyProject.status is 'none' and
-          $VanillaPlus.historyProject.availableDay is 0
+          $LifeSimulation.historyProject.status is 'none' and
+          $LifeSimulation.historyProject.availableDay is 0
         >>
-          <<set $VanillaPlus.historyProject.source to _labelP>>
-          <<set $VanillaPlus.historyProject.availableDay to
+          <<set $LifeSimulation.historyProject.source to _labelP>>
+          <<set $LifeSimulation.historyProject.availableDay to
             Time.days + ((8 - Time.weekDay) % 7) + 1
           >>
         <</if>>`;
@@ -82,12 +82,12 @@ export const historyProjectLocationPassages: Record<string, PassagePatch[]> = {
 export default function (maplebirch: typeof window.maplebirch) {
   const registerAntique = () => {
     maplebirch.tool.patch.antiques.add('antiquegoldpriestess', {
-      hint: maplebirch.t('deadwood-reblooms:VanillaPlus:history:antique:hint'),
-      museum: maplebirch.t('deadwood-reblooms:VanillaPlus:history:antique:museum'),
+      hint: maplebirch.t('deadwood-reblooms:LifeSimulation:history:antique:hint'),
+      museum: maplebirch.t('deadwood-reblooms:LifeSimulation:history:antique:museum'),
       name: 'Golden Priestess Statuette',
       cn_name: '金制女祭司像',
-      journal: maplebirch.t('deadwood-reblooms:VanillaPlus:history:antique:journal'),
-      journalName: maplebirch.t('deadwood-reblooms:VanillaPlus:history:antique:journalName'),
+      journal: maplebirch.t('deadwood-reblooms:LifeSimulation:history:antique:journal'),
+      journalName: maplebirch.t('deadwood-reblooms:LifeSimulation:history:antique:journalName'),
       icon: 'antiques/antique-golden-priestess.png'
     });
   };

@@ -4,6 +4,7 @@ import CelestialAnomalies from './CelestialAnomalies';
 import DynamicMusic from './DynamicMusic';
 import NPCSidebarPortrait from './NPCSidebarPortrait';
 import VanillaPlus from './VanillaPlus';
+import LifeSimulation from './LifeSimulation';
 
 (function (maplebirch): void {
   'use strict';
@@ -15,4 +16,5 @@ import VanillaPlus from './VanillaPlus';
   if (maplebirch.get('DM')) DynamicMusic(maplebirch);
   if (maplebirch.get('NPCSidebarPortrait')) NPCSidebarPortrait(maplebirch);
   if (maplebirch.get('VP')) VanillaPlus(maplebirch);
+  if (maplebirch.get('LS')) LifeSimulation(maplebirch);
 })(maplebirch);

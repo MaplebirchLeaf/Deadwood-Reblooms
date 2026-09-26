@@ -72,35 +72,37 @@ export default function (maplebirch: typeof window.maplebirch) {
   const demonName = () => {
     const masculine = V.player?.gender_appearance === 'm';
     const markedSex = (masculine && V.player?.sex === 'f') || (!masculine && V.player?.sex === 'm');
-    if (maplebirch.Language === 'CN') return masculine ? `魅影${markedSex && crossdressing() ? '(♀)' : ''}` : `魅魔${markedSex && crossdressing() ? '(♂)' : ''}`;
-    return `${masculine ? 'Incubus' : 'Succubus'}${markedSex && crossdressing() ? ` (${V.player.sex === 'f' ? 'female' : 'male'})` : ''}`;
+    const crossdressed = markedSex && crossdressing();
+    const englishName = `${masculine ? 'Incubus' : 'Succubus'}${crossdressed ? ` (${V.player.sex === 'f' ? 'female' : 'male'})` : ''}`;
+    const chineseName = `${masculine ? '魅影' : '魅魔'}${crossdressed ? (masculine ? '(♀)' : '(♂)') : ''}`;
+    return lanSwitch(englishName, chineseName);
   };
 
   // 复用原版特质名称覆盖其说明，使新增效果与对应转化显示在同一项中。
   maplebirch.tool.patch.traits.add(
     {
-      title: 'Special Traits',
+      title: 'General Traits',
       name: () => text('trait:angel:name'),
       colour: 'gold',
       has: () => maplebirch.VP.divineTransformations.angel,
       text: () => text('trait:angel:text')
     },
     {
-      title: 'Special Traits',
+      title: 'General Traits',
       name: () => text('trait:fallenAngel:name'),
       colour: 'black',
       has: () => maplebirch.VP.divineTransformations.fallenAngel,
       text: () => text('trait:fallenAngel:text')
     },
     {
-      title: 'Special Traits',
+      title: 'General Traits',
       name: () => text('trait:ironWill:name'),
       colour: 'silver',
       has: () => maplebirch.VP.divineTransformations.fallenAngel,
       text: () => text('trait:ironWill:text')
     },
     {
-      title: 'Special Traits',
+      title: 'General Traits',
       name: demonName,
       colour: 'red',
       has: () => maplebirch.VP.divineTransformations.demon,

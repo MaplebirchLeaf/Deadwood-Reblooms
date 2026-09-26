@@ -10,7 +10,7 @@ class AcademicHonours {
       case 'english':
         return V.englishPlayWell === 1;
       case 'history':
-        return V.VanillaPlus?.historyProject?.status === 'won';
+        return V.LifeSimulation?.historyProject?.status === 'won';
     }
   }
 }

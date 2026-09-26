@@ -1,7 +1,6 @@
 // ./src/module/VanillaPlus.ts
 
 import Module from './Module';
-import AcademicHonours from './VanillaPlus/AcademicHonours';
 import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
 import DivineTransformations from './VanillaPlus/DivineTransformations';
@@ -43,22 +42,6 @@ class VanillaPlus extends Module {
       expungeUsed: false
     },
     finance: DEFAULT_FINANCE_STATE,
-    historyProject: {
-      status: 'none' as 'none' | 'ongoing' | 'done' | 'won',
-      source: 'none' as 'none' | 'paintingward' | 'paintingsnake',
-      availableDay: 0,
-      deadline: 0,
-      assistant: false,
-      kylar: 'none' as 'none' | 'help' | 'sabotage',
-      kylarStreet: false,
-      kylarPrepared: false,
-      archive: 0,
-      museum: 0,
-      recovery: 'none' as 'none' | 'recorded' | 'rushed',
-      ruin: 0,
-      draft: 0,
-      final: 0
-    },
     physique: {
       panic: false,
       heroic: false,
@@ -105,7 +88,6 @@ class VanillaPlus extends Module {
   };
 
   public readonly exposed = true;
-  public readonly academicHonours = new AcademicHonours();
   public readonly beauty: Beauty;
   public readonly deviancy: Deviancy;
   public readonly divineTransformations = new DivineTransformations();

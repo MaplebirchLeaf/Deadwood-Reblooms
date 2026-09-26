@@ -1,5 +1,5 @@
 export default function (maplebirch: typeof window.maplebirch) {
-  const text = (subject: string, key: 'name' | 'text') => maplebirch.t(`deadwood-reblooms:VanillaPlus:academic:${subject}:${key}`);
+  const text = (subject: string, key: 'name' | 'text') => maplebirch.t(`deadwood-reblooms:LifeSimulation:academic:${subject}:${key}`);
 
   const honours = [
     { subject: 'science', colour: 'green' },
@@ -13,7 +13,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       title: 'School Traits',
       name: () => text(subject, 'name'),
       colour,
-      has: () => maplebirch.VP.academicHonours.has(subject),
+      has: () => maplebirch.LS.academics.has(subject),
       text: () => text(subject, 'text')
     }))
   );

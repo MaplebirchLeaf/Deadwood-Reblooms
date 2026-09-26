@@ -1,0 +1,862 @@
+:: Deadwood Reblooms Life Simulation School Widgets [widget]
+
+<!-- 学校公告栏入口：身份、校园状态与校规集中在同一个面板。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-board-link'>>
+  <<assignmenticon>><<lanLink 'Check the student affairs noticeboard (0:02)' 'Deadwood Reblooms Life Simulation School Board'>><<pass 2>><</lanLink>><br>
+<</widget>>
+
+<!-- 职位申请与新校规提案都必须当面向礼顿提出。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-office-options'>>
+  <<if Time.schoolDay and $schoolstate isnot 'early' and $schoolstate isnot 'late' and $pillory.tenant.special.name isnot 'Leighton' and (wearingSchoolOutfit() or Time.hour gte 14)>>
+    <<if maplebirch.LS.school.canRequestPrefect>>
+      <<schoolicon 'building'>><<lanLink 'Apply to become a prefect' 'Deadwood Reblooms Life Simulation Prefect Appointment'>><</lanLink>><br>
+    <</if>>
+    <<if maplebirch.LS.school.canRequestPresident>>
+      <<schoolicon 'building'>><<lanLink 'Apply to become student council president' 'Deadwood Reblooms Life Simulation President Appointment'>><</lanLink>><br>
+    <</if>>
+    <<if maplebirch.LS.school.canProposePolicy>>
+      <<schoolicon 'building'>><<lanLink 'Propose the next dress policy' 'Deadwood Reblooms Life Simulation Dress Proposal'>><</lanLink>><br>
+    <</if>>
+    <<if $LifeSimulation.school.dress.proposal>>
+      <<schoolicon 'building'>><<lanLink 'Discuss the dress policy with Leighton' 'Deadwood Reblooms Life Simulation Dress Approval'>><</lanLink>><br>
+    <</if>>
+    <<if maplebirch.LS.school.canReviewPolicy>>
+      <<schoolicon 'building'>><<lanLink 'Review the dress policy with Leighton' 'Deadwood Reblooms Life Simulation Dress Review'>><</lanLink>><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<!-- 风纪职责每天早晨只执行一次。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-duty-link'>>
+  <<if maplebirch.LS.school.canPerformDuty>>
+    <<schoolicon 'building'>><<lanLink 'Perform morning duty' 'Deadwood Reblooms Life Simulation Morning Duty'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<!-- 仅替代原版中庭通往走廊的入口链接。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-entry'>>
+  <<if maplebirch.LS.school.requiresNudity and !$LifeSimulation.school.clothesStored>>
+    <<language>>
+      <<option 'EN'>>The rule posted beside the doors requires students to enter without clothes today.
+      <<option 'CN'>>门旁张贴的校规要求学生今天不得穿衣入校。
+    <</language>><br>
+    <<lockericon>><<lanLink 'Obey the rule and enter naked (0:01)' 'Hallways'>>
+      <<undress 'lifeSimulationSchool'>>
+      <<set $LifeSimulation.school.clothesStored to true>>
+      <<pass 1>>
+    <</lanLink>>
+  <<else>>
+    <<entranceicon>><<lanLink 'Enter the school (0:01)' 'Hallways'>><<pass 1>><</lanLink>>
+    <<if maplebirch.LS.school.allowsNudity and !$LifeSimulation.school.clothesStored>>
+      <br>
+      <<lockericon>><<lanLink 'Undress and enter (0:01)' 'Hallways'>>
+        <<undress 'lifeSimulationSchool'>>
+        <<set $LifeSimulation.school.clothesStored to true>>
+        <<pass 1>>
+      <</lanLink>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<!-- 离开学校后恢复进入学校前保存的衣物。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-restore-clothes'>>
+  <<silently>>
+    <<storeon 'lifeSimulationSchool'>>
+    <<set $LifeSimulation.school.clothesStored to false>>
+  <</silently>>
+<</widget>>
+
+<!-- 处理从其它入口进入学校的情况，确保强制校规不会只在前庭生效。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-enforce-clothes'>>
+  <<silently>>
+    <<undress 'lifeSimulationSchool'>>
+    <<set $LifeSimulation.school.clothesStored to true>>
+  <</silently>>
+  <<language>>
+    <<option 'EN'>><span class='purple'>A member of staff stops you and makes you obey the current dress policy before continuing.</span>
+    <<option 'CN'>><span class='purple'>一名教职工拦住了你，要求你遵守当前着装规范后才能继续。</span>
+  <</language>><br><br>
+<</widget>>
+
+<!-- 数值颜色沿用原版的红、粉、蓝、青、绿等级。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-standing'>>
+  <span @class="maplebirch.LS.school.standingColour(_args[0])"><<print _args[0]>>/100</span>
+<</widget>>
+
+<!-- 日志记录现行校规与待办事务，不改变原版学校声望。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-journal'>>
+  <<if $LifeSimulation and $LifeSimulation.school>>
+    <h1 class='header gold bold'><<lanSwitch 'School affairs' '校园事务'>></h1>
+    <ul class='journal'>
+      <li>
+        <<lanSwitch 'Current dress policy: ' '现行着装规范：'>>
+        <span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + $LifeSimulation.school.dress.active)>></span>
+        <<lanSwitch '.' '。'>>
+      </li>
+      <li>
+        <<lanSwitch 'School order: ' '校园秩序：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.order>>
+        <<lanSwitch '; student support: ' '；学生支持：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.studentSupport>>
+        <<lanSwitch '; staff support: ' '；教职工支持：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.staffSupport>><<lanSwitch '.' '。'>>
+      </li>
+      <<if $LifeSimulation.school.role is 'president'>>
+        <li><<lanSwitch 'Leighton has granted you permission to miss classes without being marked absent.' '礼顿已发给你免听凭证；不去上课也不会记为缺课。'>></li>
+      <</if>>
+      <<if $LifeSimulation.school.dress.proposal>>
+        <li><<lanSwitch "Your proposal awaits Leighton's decision." '你的提案正等待礼顿决定。'>></li>
+      <</if>>
+      <<if $LifeSimulation.school.dress.trialUntil gt Time.days>>
+        <li>
+          <<lanSwitch 'The current rule has ' '现行校规还要试行'>>
+          <span class='blue'><<print $LifeSimulation.school.dress.trialUntil - Time.days>></span>
+          <<lanSwitch ' days left in its trial.' '天。'>>
+        </li>
+      <</if>>
+      <<if maplebirch.LS.school.canReviewPolicy>>
+        <li><<lanSwitch 'The trial period has ended. Ask Leighton to review the rule.' '试行期已结束，去找礼顿复核校规。'>></li>
+      <</if>>
+    </ul>
+  <</if>>
+<</widget>>
+
+<!-- 社交页追加校规状态，原版“学校”声望仍按原逻辑显示。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-social'>>
+  <<if $LifeSimulation and $LifeSimulation.school>>
+    <div class='relation-box'>
+      <div class='relation-top-line'>
+        <<if $options.images>><img class='relation-icon' src='img/misc/icon/assignment.png'><</if>>
+        <span class='relation-name'><<lanSwitch 'School affairs' '校园事务'>></span>
+      </div>
+      <div class='relation-description'>
+        <<lanSwitch 'Dress rule: ' '着装规范：'>>
+        <span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + $LifeSimulation.school.dress.active)>></span>
+      </div>
+    </div>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Life Simulation School Board []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<schooleffects>>
+<<effects>>
+<<set _school to $LifeSimulation.school>>
+<h1 class='header gold bold'><<lanSwitch "Student affairs noticeboard" "学生事务公告栏">></h1>
+<<language>>
+  <<option 'EN'>>Pinned notices, reports and dress rules fill the board. Some are neatly typed; others have been crossed out and replaced by <span class='purple'>newer instructions</span>.
+  <<option 'CN'>>公告栏上钉满通知、值勤记录与着装规范。有的排得整整齐齐，有的已被划掉，又贴上<span class='purple'>更大胆的新规定</span>。
+<</language>><br><br>
+<span class='gold'><<lanSwitch 'Student council' '学生会'>></span><br>
+<<lanSwitch "School role" "校内身份">><<lanSwitch ': ' '：'>>
+<span class='green'>
+  <<if _school.role is 'student'>>
+    <<lanSwitch "Student" "学生">>
+  <<else>>
+    <<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:' + _school.role + ':name')>>
+  <</if>>
+</span><br>
+<<lanSwitch "School order" "校园秩序">><<lanSwitch ': ' '：'>><<deadwood-reblooms-life-simulation-school-standing _school.order>><br>
+<<lanSwitch "Student support" "学生支持">><<lanSwitch ': ' '：'>><<deadwood-reblooms-life-simulation-school-standing _school.studentSupport>><br>
+<<lanSwitch "Staff support" "教职工支持">><<lanSwitch ': ' '：'>><<deadwood-reblooms-life-simulation-school-standing _school.staffSupport>><br>
+<<lanSwitch "Duties completed" "已完成值勤">><<lanSwitch ': ' '：'>><<print _school.duties.completed>><br>
+<<if _school.role is 'president'>>
+  <span class='green'><<lanSwitch 'Leighton has issued you an exemption from class attendance.' '礼顿已签发免听凭证，不上课也不会记缺课。'>></span><br>
+<</if>>
+<br>
+<span class='gold'><<lanSwitch 'Dress policy' '着装规范'>></span><br>
+<<lanSwitch "Current dress policy" "当前着装规范">><<lanSwitch ': ' '：'>><span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _school.dress.active)>></span><br>
+<<switch _school.dress.active>>
+  <<case 'uniform'>>
+    <<language>>
+      <<option 'EN'>>The old uniform notice still hangs at eye level. For now, the corridors follow the familiar rule. Staff check clothing at the doors, and the council records any complaints.
+      <<option 'CN'>>标准校服的告示仍挂在最显眼的位置。走廊里暂时沿用熟悉的规定。教职工在门口检查衣着，学生会则记录各种抱怨。
+    <</language>>
+  <<case 'free'>>
+    <<language>>
+      <<option 'EN'>>The uniform requirement has been struck through. Students may <span class='blue'>choose their own clothes</span>, while staff watch for anyone pushing the new freedom too far. Disputes over the wording are sent to the student council.
+      <<option 'CN'>>校服要求被一道粗线划去。如今学生可以<span class='blue'>自行选择衣着</span>，教职工则盯着有没有人把新自由用得过了头。对条文有争议的人，会被指去找学生会。
+    <</language>>
+  <<case 'revealing'>>
+    <<language>>
+      <<option 'EN'>>The revised notice <span class='purple'>permits less coverage</span>. Each morning, students pause before the board to check just how far the rule now goes. The earlier limits remain visible beneath the fresh ink.
+      <<option 'CN'>>修改过的告示<span class='purple'>放宽了遮掩要求</span>。每天早晨，总有人在公告栏前停下，确认这条规定究竟放到了什么程度。新墨迹下仍看得出过去的限制。
+    <</language>>
+  <<case 'optionalNudity'>>
+    <<language>>
+      <<option 'EN'>>Clothing is now <span class='purple'>a choice</span> on campus. The notice makes that freedom explicit, though the arguments around it have not died down. Staff keep a copy of the signed rule beside the doors.
+      <<option 'CN'>>校园里的着装如今<span class='purple'>由个人选择</span>。告示把这份自由写得明明白白，围绕它的争论却没有平息。教职工在门旁留着一份签过字的校规。
+    <</language>>
+  <<case 'nudeDay'>>
+    <<language>>
+      <<option 'EN'>>Friday has its own dress rule. The date is <span class='pink'>circled in red</span> on the weekly schedule so nobody can claim to have missed it. A second notice explains when the rule begins and ends.
+      <<option 'CN'>>周五另有一条着装规定。每周日程上的那一天被<span class='pink'>红笔圈起</span>，谁也不能说自己没看见。旁边另一份告示写明了规定的起止时间。
+    <</language>>
+  <<case 'mandatoryNudity'>>
+    <<language>>
+      <<option 'EN'>>The newest rule leaves <span class='red'>no choice of clothing</span> during school hours. Staff repeat it at the doors, while the board records who approved it. Appeals are directed to the headmaster.
+      <<option 'CN'>>最新规定在上课时段<span class='red'>不再留给学生着装选择</span>。教职工在门口反复提醒，公告栏上也清楚记着是谁批准了它。异议必须交给校长处理。
+    <</language>>
+<</switch>>
+<br><br>
+
+<<if _school.dress.proposal>>
+  <<language>>
+    <<option 'EN'>>Your proposal for <span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _school.dress.proposal)>></span> is waiting for Leighton's decision.
+    <<option 'CN'>>你提出的<span class='blue'>“<<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _school.dress.proposal)>>”</span>正在等待礼顿决定。
+  <</language>><br>
+  <br>
+<<elseif maplebirch.LS.school.canReviewPolicy>>
+  <<language>>
+    <<option 'EN'>>The trial period has ended. The rule now needs a formal review.
+    <<option 'CN'>>试行期已经结束，这项校规需要正式复核。
+  <</language>><br><br>
+<<elseif _school.dress.trialUntil gt Time.days>>
+  <<language>>
+    <<option 'EN'>>The current rule remains on trial for <<print _school.dress.trialUntil - Time.days>> more days.
+    <<option 'CN'>>当前校规还将试行 <<print _school.dress.trialUntil - Time.days>> 天。
+  <</language>><br><br>
+<<elseif maplebirch.LS.school.canProposePolicy>>
+  <<lanSwitch "Bring the next proposal to Leighton in the head's office." '下一项校规提案需要你亲自去校长办公室交给礼顿。'>><br><br>
+<</if>>
+
+<<if maplebirch.LS.school.canSelectPolicy and maplebirch.LS.school.availablePolicies.length gt 1>>
+  <<lanSwitch 'Earlier rules that survived review remain on file. As president, you may reinstate one without repeating its trial.' '通过复核的旧规定仍留在档案里。作为学生会长，你可以恢复其中一项，无须重新试行。'>><br><br>
+  <<assignmenticon>><<lanLink 'Choose an approved dress policy' 'Deadwood Reblooms Life Simulation Dress Selection'>><</lanLink>><br><br>
+<</if>>
+
+<<getouticon>><<lanLink 'Return to the hallways' 'Hallways'>><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Dress Selection []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<effects>>
+<h1 class='header gold bold'><<lanSwitch 'Approved dress policies' '已批准的着装规范'>></h1>
+<<if maplebirch.LS.school.canSelectPolicy>>
+  <<lanSwitch 'The board keeps a copy of every rule that passed its trial. Choose which one to put back into effect.' '公告栏保存着每条通过试行的规定。你可以选择其中一条恢复执行。'>><br><br>
+  <<for _policy range maplebirch.LS.school.availablePolicies>>
+    <<if _policy isnot $LifeSimulation.school.dress.active>>
+      <<switch _policy>>
+        <<case 'uniform'>><<set _policyLabel to 'Standard uniform'>>
+        <<case 'free'>><<set _policyLabel to 'Free dress'>>
+        <<case 'revealing'>><<set _policyLabel to 'Revealing clothes permitted'>>
+        <<case 'optionalNudity'>><<set _policyLabel to 'Nudity permitted'>>
+        <<case 'nudeDay'>><<set _policyLabel to 'Weekly nude day'>>
+        <<case 'mandatoryNudity'>><<set _policyLabel to 'Mandatory nudity'>>
+      <</switch>>
+      <<capture _policy>>
+        <<assignmenticon>><<lanLink _policyLabel 'Deadwood Reblooms Life Simulation School Board'>><<run maplebirch.LS.school.selectPolicy(_policy)>><</lanLink>><br>
+      <</capture>>
+    <</if>>
+  <</for>>
+<<else>>
+  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br>
+<</if>>
+<br>
+<<getouticon>><<lanLink 'Return to the noticeboard' 'Deadwood Reblooms Life Simulation School Board'>><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Prefect Appointment []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<effects>>
+<<npc Leighton>>
+<<person1>>
+<<lanSwitch 'You ask Leighton to appoint you as a prefect. ' '你向礼顿申请担任风纪委员。'>><<He>><<lanSwitch ' opens your school record and checks your grades and conduct.' '翻开你的在校记录，核对成绩和操行。'>><br><br>
+<<if maplebirch.LS.school.canBecomePrefect>>
+  <<lanSwitch '"Your academic standing is excellent, and you have kept out of trouble. I can entrust the morning gate to you," ' '“成绩优秀，操行也没有问题。晨间校门可以交给你，”'>><<he>><<lanSwitch ' says.' '说道。'>><br><br>
+  <<schoolicon 'building'>><<lanLink 'Accept the prefect badge' 'Deadwood Reblooms Life Simulation Prefect Appointment Result'>><</lanLink>><br>
+<<else>>
+  <span class='pink'><<lanSwitch '"Come back with a stronger school record and no delinquency."' '“等你的成绩足够好，违纪记录也清零，再来找我。”'>></span><br>
+<</if>>
+<br>
+<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Prefect Appointment Result []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<effects>>
+<<npc Leighton>>
+<<person1>>
+<<if maplebirch.LS.school.appointPrefect()>>
+  <<language>>
+    <<option 'EN'>>Leighton studies your record, then slides a prefect badge across the desk. "Your grades and conduct are finally suitable. Keep order before classes and report serious trouble to me."
+    <<option 'CN'>>礼顿审视了一遍你的记录，随后把一枚风纪委员徽章推到桌前。“你的成绩和操行总算都合格了。上课前维持秩序，严重的问题交给我处理。”
+  <</language>><br><br>
+  <span class='green'><<lanSwitch "You became a prefect." "你成为了风纪委员。">></span>
+<<else>>
+  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span>
+<</if>>
+<br><br>
+<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation President Appointment []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<effects>>
+<<npc Leighton>>
+<<person1>>
+<<lanSwitch 'You ask Leighton to make you student council president. ' '你向礼顿申请担任学生会长。'>><<He>><<lanSwitch ' lays your duty reports beside notes from students and staff.' '把你的值勤报告与学生、教职工的意见放在一起。'>><br><br>
+<<lanSwitch 'Morning duties: ' '晨间值勤：'>><<print $LifeSimulation.school.duties.completed>>/5<br>
+<<lanSwitch 'School order: ' '校园秩序：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.order>><<lanSwitch ' (at least 25)' '（至少 25）'>><br>
+<<lanSwitch 'Student support: ' '学生支持：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.studentSupport>><<lanSwitch ' (at least 25)' '（至少 25）'>><br>
+<<lanSwitch 'Staff support: ' '教职工支持：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.staffSupport>><<lanSwitch ' (at least 25)' '（至少 25）'>><br><br>
+<<if maplebirch.LS.school.canBecomePresident>>
+  <<lanSwitch '"You have earned enough trust to lead them. The final decision is yours," ' '“你已经赢得了足够的信任。要不要接下这份职责，由你决定，”'>><<he>><<lanSwitch ' says.' '说道。'>><br><br>
+  <<schoolicon 'building'>><<lanLink 'Accept the presidency and attendance exemption' 'Deadwood Reblooms Life Simulation President Appointment Result'>><</lanLink>><br>
+<<else>>
+  <span class='pink'><<lanSwitch '"I need more duty reports and stronger support before I can approve this."' '“我还需要更多值勤记录，以及学生和教职工更明确的支持。”'>></span><br>
+<</if>>
+<br>
+<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation President Appointment Result []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<effects>>
+<<npc Leighton>>
+<<person1>>
+<<if maplebirch.LS.school.appointPresident()>>
+  <<language>>
+    <<option 'EN'>>Leighton signs the appointment and hands you a written exemption from class attendance. "Lead the student council. Bring any proposed rules to me before you announce them. You may still attend lessons if you choose."
+    <<option 'CN'>>礼顿签下任命书，把一张免听凭证交给你。“学生会由你负责。新校规宣布前，先亲自拿来给我看。你想上课仍然可以去。”
+  <</language>><br><br>
+  <span class='green'><<lanSwitch "You became student council president." "你成为了学生会长。">></span>
+<<else>>
+  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span>
+<</if>>
+<br><br>
+<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Morning Duty []
+<<set $outside to 1>>
+<<set $location to 'school'>>
+<<schooleffects>>
+<<effects>>
+<<set _student to maplebirch.LS.school.startDuty()>>
+<<if _student>>
+  <<lanSwitch 'Leighton has put you on the morning gate. You check the arrivals and decide how to handle each breach yourself.' '礼顿安排你在校门口值早班。进校的人从你面前经过，如何处理违规者都要由你亲自决定。'>><br><br>
+  <<if _student is 'Robin'>>
+    <<language>>
+      <<option 'EN'>>
+        Robin hurries up with a younger pupil. The child's shoelace has come undone,
+        and Robin stops to tie it before showing you a pass for the delay.
+        Robin looks from your badge to the register in your hand.
+      <<option 'CN'>>
+        罗宾领着一名低年级学生赶来。那孩子的鞋带散了，罗宾蹲下替他系好，
+        才把说明耽搁原因的条子递给你。罗宾的目光在你的徽章和记录簿之间来回。
+    <</language>>
+    <br><br><<schoolicon 'building'>><<lanLink "Record Robin's delay" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink 'Speak to Robin privately' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
+    <<getouticon>><<lanLink 'Wave Robin through without checking' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
+  <<elseif _student is 'Sydney'>>
+    <<language>>
+      <<option 'EN'>>
+        Sydney reaches the gate with a bundle of temple papers under one arm.
+        You ask why the temple errand has delayed the trip to school.
+        Sydney explains it plainly, then waits for you to decide whether it belongs on the duty register.
+      <<option 'CN'>>
+        悉尼夹着一叠神殿的文件来到校门。你问起神殿的差事为何耽搁了入校，
+        悉尼平静地说明原委，等你决定是否记入值勤簿。
+    <</language>>
+    <br><br><<schoolicon 'building'>><<lanLink "Record Sydney's reason" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink 'Speak to Sydney privately' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
+    <<getouticon>><<lanLink 'Let Sydney pass without checking' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
+  <<elseif _student is 'Kylar'>>
+    <<language>>
+      <<option 'EN'>>
+        You find Kylar alone beside the side gate, holding their books close.
+        They keep away from the stream of students entering by the main doors.
+        Kylar looks up at your voice, then shrinks back when they notice your badge.
+        Someone has scrawled a cruel word across the cover of the top book.
+      <<option 'CN'>>
+        你在侧门边发现独自站着的凯拉尔，书本被紧紧抱在怀里。
+        凯拉尔避开了从正门入校的人群，听见你的声音才抬起头，看到你的徽章又往后缩了缩。
+        最上面那本书的封面被人写了难听的话。
+    <</language>>
+    <br><br><<schoolicon 'building'>><<lanLink 'Order Kylar straight to class' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink 'Speak to Kylar privately' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
+    <<getouticon>><<lanLink 'Leave Kylar at the gate' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        Whitney plants themself across the entrance and sends the next student back with a sneer.
+        You step between them and the queue. Whitney spots your badge and grins,
+        daring you to make a scene in front of everyone.
+      <<option 'CN'>>
+        惠特尼横在入口，讥笑着把下一个学生逼了回去。你挡在惠特尼与队伍之间。
+        惠特尼瞥见你的徽章，咧嘴一笑，像是在等你当众出丑。
+    <</language>>
+    <br><br><<schoolicon 'building'>><<lanLink "Write up Whitney's obstruction" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink 'Speak to Whitney privately' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
+    <<getouticon>><<lanLink 'Ignore Whitney' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
+  <</if>>
+  <br><br>
+<<else>>
+  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span>
+<</if>>
+
+:: Deadwood Reblooms Life Simulation Morning Duty Private Talk []
+<<set $outside to 1>>
+<<set $location to 'school'>>
+<<schooleffects>>
+<<effects>>
+<<set _student to $LifeSimulation.school.duties.target>>
+<<if _student and maplebirch.LS.school.canPerformDuty>>
+  <<switch _student>>
+    <<case 'Robin'>>
+      <<language>>
+        <<option 'EN'>>You draw Robin aside without losing sight of the younger pupil. Robin explains the delay quietly, keeping one eye on the child by the gate.
+        <<option 'CN'>>你请罗宾走到一旁，又留意着等在校门边的低年级学生。罗宾压低声音解释耽搁的原因，目光仍不时落在那孩子身上。
+      <</language>>
+      <<if C.npc.Robin.trauma gte 20>>
+        <<lanSwitch 'Robin keeps a little distance and asks you to finish the register before the child gets anxious.' '罗宾与你隔着一点距离，请你先处理登记，免得那孩子等得不安。'>>
+      <<elseif C.npc.Robin.love gte 40>>
+        <<lanSwitch 'When you lower the register, Robin relaxes and smiles at you, though they still wait for the child to be let inside.' '你放低记录簿，罗宾才松了口气，朝你笑了笑，但仍等着你放那孩子进去。'>>
+      <<else>>
+        <<lanSwitch 'Robin waits for your decision, ready to take the child straight to class.' '罗宾等你作出决定，准备带那孩子直接去教室。'>>
+      <</if>><br><br>
+      <<socialiseicon>><<lanLink 'Hear Robin out and let them in' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
+      <<crimeicon 'coercion'>><<lanLink 'Threaten to report both pupils' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+      <<if maplebirch.LS.school.canInviteStudent>>
+        <<loveicon>><<lanLink 'Invite Robin to meet in private' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
+      <</if>>
+    <<case 'Sydney'>>
+      <<language>>
+        <<option 'EN'>>You step away from the queue with Sydney. The temple papers remain tucked under one arm while Sydney explains the errand in a low voice.
+        <<option 'CN'>>你和悉尼走到队伍旁边。悉尼仍把神殿文件夹在臂弯里，低声向你说明这趟差事。
+      <</language>>
+      <<if C.npc.Sydney.purity gte 50>>
+        <<lanSwitch 'Sydney glances at the school doors. "I should get to class once you have written down the reason."' '悉尼看了眼校门：“记下缘由后，我就该去上课了。”'>>
+      <<elseif C.npc.Sydney.love gte 40 and C.npc.Sydney.corruption gte 30>>
+        <<lanSwitch 'Sydney meets your eyes for a moment longer than the explanation requires, then carefully folds the papers shut.' '悉尼与你对视的时间比解释差事所需的久了一点，随后仔细合上文件。'>>
+      <<else>>
+        <<lanSwitch 'Sydney keeps to the facts and waits for you to decide what belongs in the register.' '悉尼只说了事情的经过，等你决定值勤簿该怎么写。'>>
+      <</if>><br><br>
+      <<socialiseicon>><<lanLink 'Hear the reason and send Sydney to class' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
+      <<crimeicon 'coercion'>><<lanLink "Threaten to report Sydney's temple errand" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+      <<if maplebirch.LS.school.canInviteStudent>>
+        <<loveicon>><<lanLink 'Invite Sydney to meet in private' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
+      <</if>>
+    <<case 'Kylar'>>
+      <<language>>
+        <<option 'EN'>>You lower your voice beside the side gate and ask Kylar about the writing on the book. No one else is close enough to hear the answer.
+        <<option 'CN'>>你在侧门边放低声音，问起书封上的涂写。其他学生离得够远，听不见凯拉尔的回答。
+      <</language>>
+      <<if C.npc.Kylar.rage gte 60>>
+        <<lanSwitch 'Kylar grips the book harder. "Are you going to write down my name too?"' '凯拉尔把书抱得更紧：“连我的名字也要记上吗？”'>>
+      <<elseif C.npc.Kylar.love gte 30>>
+        <<lanSwitch 'Kylar edges closer to you. "They took it from me," Kylar whispers, turning the ruined cover away from the queue.' '凯拉尔朝你靠近了一点，避开队伍举起被涂坏的书封，小声说：“他们抢走了我的书。”'>>
+      <<else>>
+        <<lanSwitch 'Kylar looks down at the book before admitting that someone snatched it on the way to school.' '凯拉尔低头看着书，好一会儿才承认有人在上学路上抢走了它。'>>
+      <</if>><br><br>
+      <<socialiseicon>><<lanLink 'Record what happened to Kylar' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
+      <<crimeicon 'coercion'>><<lanLink 'Threaten Kylar with a disciplinary report' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+      <<if maplebirch.LS.school.canInviteStudent>>
+        <<loveicon>><<lanLink 'Invite Kylar to meet in private' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
+      <</if>>
+    <<case 'Whitney'>>
+      <<language>>
+        <<option 'EN'>>You ask Whitney to step away from the entrance so the waiting students can pass. Whitney follows you a few paces, watching to see whether you will reach for your register.
+        <<option 'CN'>>你让惠特尼先离开入口，好让等候的学生通过。惠特尼跟你走了几步，瞟着你会不会翻开记录簿。
+      <</language>>
+      <<if C.npc.Whitney.love gte 30 or $whitneyromance is 1>>
+        <<lanSwitch 'Whitney leans against the wall and grins. "So, what did you really want to say?"' '惠特尼靠在墙上，笑得意味深长：“所以，你到底想说什么？”'>>
+      <<else>>
+        <<lanSwitch 'Whitney folds their arms. "Got something to say? Say it where everyone can hear."' '惠特尼抱起手臂：“有话就当着所有人的面说。”'>>
+      <</if>><br><br>
+      <<socialiseicon>><<lanLink 'Tell Whitney to move aside' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
+      <<crimeicon 'coercion'>><<lanLink 'Threaten to bring Leighton to the gate' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+      <<if maplebirch.LS.school.canInviteStudent>>
+        <<loveicon>><<lanLink 'Invite Whitney to meet in private' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
+      <</if>>
+  <</switch>>
+  <<getouticon>><<lanLink 'Return to the gate' 'Deadwood Reblooms Life Simulation Morning Duty'>><</lanLink>>
+<<else>>
+  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br><br>
+  <<entranceicon>><<lanLink 'Return to the front courtyard' 'School Front Courtyard'>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Life Simulation Morning Duty Invitation []
+<<set $outside to 1>>
+<<set $location to 'school'>>
+<<schooleffects>>
+<<effects>>
+<<set _student to $LifeSimulation.school.duties.target>>
+<<set _loveBefore to _student ? C.npc[_student].love : 0>>
+<<set _kylarClose to _student is 'Kylar' and C.npc.Kylar.love gte 30>>
+<<set _invitation to maplebirch.LS.school.inviteStudent()>>
+<<set _loveChange to _student ? C.npc[_student].love - _loveBefore : 0>>
+<<if _invitation is 'accepted'>>
+  <<switch _student>>
+    <<case 'Robin'>>
+      <<language>>
+        <<option 'EN'>>You wait while Robin takes the younger pupil inside. When Robin returns, you ask for a moment alone after the gate clears. Robin understands your meaning, glances at the thinning queue and quietly agrees.
+        <<option 'CN'>>你等罗宾把低年级学生送进去。罗宾回来后，你说等队伍散了，想和罗宾单独待一会儿。罗宾听懂了，看一眼渐渐空下来的入口，轻声答应。
+      <</language>>
+    <<case 'Sydney'>>
+      <<language>>
+        <<option 'EN'>>You suggest putting the temple papers aside and finding somewhere quiet together. Sydney studies you for a moment, then gives a small, deliberate nod. The papers can wait.
+        <<option 'CN'>>你提议先放下神殿文件，找个安静的地方待一会儿。悉尼打量了你片刻，认真地点了点头。那叠文件暂时被放到了一旁。
+      <</language>>
+    <<case 'Kylar'>>
+      <<language>>
+        <<option 'EN'>>You ask Kylar if they want to be alone and intimate with you, somewhere no one will bother them. Kylar studies your face, then calls you "my love" and follows you away from the side gate, keeping close.
+        <<option 'CN'>>你问凯拉尔愿不愿意避开人群，与你亲密一会儿。凯拉尔端详你的表情，轻声叫了句“我的爱”，随后紧挨着你离开侧门。
+      <</language>>
+    <<case 'Whitney'>>
+      <<language>>
+        <<option 'EN'>>You lean close and invite Whitney away from the crowd. Whitney smirks. "Finally putting that badge to good use?" Whitney orders their friends to clear the gate, then leads you toward an empty room.
+        <<option 'CN'>>你凑近惠特尼，邀对方避开人群。惠特尼坏笑起来：“总算知道那块徽章该怎么用了？”惠特尼叫朋友们让开入口，随后领着你往空教室走。
+      <</language>>
+  <</switch>>
+  <<if _loveChange gt 0>><<glove _student>><</if>><br><br>
+  <<loveicon>><<lanLink 'Go somewhere private together (0:02)' 'Deadwood Reblooms Life Simulation Morning Duty Encounter'>>
+    <<set $sexstart to 1>>
+    <<pass 2>>
+  <</lanLink>><br>
+<<elseif _invitation is 'refused'>>
+  <<switch _student>>
+    <<case 'Robin'>>
+      <<language>>
+        <<option 'EN'>>Robin makes sure the younger pupil is through the doors before answering. "I need to get to class. Ask me another time, away from the gate." Robin leaves you with the duty sheet.
+        <<option 'CN'>>罗宾先确认那名低年级学生进了校门，才回答你：“我得去上课。下次别在校门口说这个。”罗宾把值勤记录留给你，转身走了。
+      <</language>>
+    <<case 'Sydney'>>
+      <<language>>
+        <<option 'EN'>>Sydney closes the bundle of papers. "Not here, and not while you are supposed to be on duty." Sydney goes inside without waiting for another suggestion.
+        <<option 'CN'>>悉尼合上文件：“不在这里，也不在你值勤的时候。”说完便进了学校，没有给你再次提议的机会。
+      <</language>>
+    <<case 'Kylar'>>
+      <<if C.npc.Kylar.rage gte 60>>
+        <<language>>
+          <<option 'EN'>>Kylar clutches the marked book and glares at you. "You noticed me now?" The anger in their voice ends the invitation. Kylar goes through the side door alone.
+          <<option 'CN'>>凯拉尔抱紧被涂写的书，瞪了你一眼：“现在才看见我？”那股怒气截断了你的邀约。凯拉尔独自从侧门进了学校。
+        <</language>>
+      <<else>>
+        <<if _kylarClose>>
+          <<language>>
+            <<option 'EN'>>Kylar looks down at the writing on their book and shakes their head. "Not today, my love. Please." Kylar slips through the side door before you can say more.
+            <<option 'CN'>>凯拉尔低头看了看书上的涂写，摇了摇头：“今天不行，我的爱。求你了。”你还没来得及再说什么，凯拉尔就从侧门进了学校。
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>Kylar turns the marked book away from you. "I need to get inside." Kylar slips through the side door before you can say more.
+            <<option 'CN'>>凯拉尔把涂写过的书转到你看不见的一侧：“我得进去了。”你还没来得及再说什么，凯拉尔就从侧门走了。
+          <</language>>
+        <</if>>
+      <</if>>
+    <<case 'Whitney'>>
+      <<language>>
+        <<option 'EN'>>Whitney laughs, but takes a step back. "Try asking when you are not waving that badge at me." Whitney clears the doorway with a shove of the shoulder and walks off.
+        <<option 'CN'>>惠特尼笑出了声，却退开一步：“等你不拿那块徽章冲我摆架子，再来问。”惠特尼用肩膀挤开堵着门的人，转身走了。
+      <</language>>
+  <</switch>>
+  <<if _loveChange lt 0>><<llove _student>><</if>><br><br>
+<<else>>
+  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br><br>
+<</if>>
+<<entranceicon>><<lanLink 'Return to the front courtyard' 'School Front Courtyard'>><<run maplebirch.LS.school.endEncounter()>><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Morning Duty Encounter []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<schooleffects>>
+<<if $sexstart is 1 and $LifeSimulation.school.duties.encounter>>
+  <<set $sexstart to 0>>
+  <<clearnpc>>
+  <<npc $LifeSimulation.school.duties.encounter>>
+  <<consensual>>
+  <<set $consensual to 1>>
+  <<neutral 1>>
+  <<maninit>>
+<</if>>
+<<if $LifeSimulation.school.duties.encounter>>
+  <<effects>>
+  <<effectsman>>
+  <<man>>
+  <<stateman>>
+  <br><br>
+  <<actionsman>>
+  <<if _combatend or _controlRegain is 1>>
+    <span id='next'><<lanLink 'Next' 'Deadwood Reblooms Life Simulation Morning Duty Encounter Finish'>><</lanLink>></span>
+  <<else>>
+    <span id='next'><<lanLink 'Next' 'Deadwood Reblooms Life Simulation Morning Duty Encounter'>><</lanLink>></span>
+  <</if>>
+  <<nexttext>>
+<<else>>
+  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br><br>
+  <<entranceicon>><<lanLink 'Return to the front courtyard' 'School Front Courtyard'>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Life Simulation Morning Duty Encounter Finish []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<schooleffects>>
+<<effects>>
+<<set _student to $LifeSimulation.school.duties.encounter>>
+<<if _student>>
+  <<if $enemyarousal gte $enemyarousalmax>>
+    <<ejaculation>><br>
+  <</if>>
+  <<if $enemyhealth lte 0 or $finish is 1>>
+    <<lanSwitch 'The encounter ends abruptly. You give each other room to recover before leaving the empty classroom.' '这次相处戛然而止。你们各自缓了缓，才离开空教室。'>>
+  <<else>>
+    <<switch _student>>
+      <<case 'Robin'>>
+        <<language>>
+          <<option 'EN'>>Robin straightens their clothes and checks the corridor before stepping out. "We really should get to class," Robin says, smiling despite themself.
+          <<option 'CN'>>罗宾整理好衣着，先探头看了看走廊。“我们真该去上课了。”罗宾说着，还是忍不住笑了。
+        <</language>>
+      <<case 'Sydney'>>
+        <<language>>
+          <<option 'EN'>>Sydney retrieves the temple papers and takes a steadying breath. "We should return before anyone notices how long we were gone."
+          <<option 'CN'>>悉尼拿回神殿文件，深吸了一口气：“我们该回去了，免得有人发现离开得太久。”
+        <</language>>
+      <<case 'Kylar'>>
+        <<language>>
+          <<option 'EN'>>Kylar stays beside you a moment longer, then checks the empty corridor. "Can we leave together?" Kylar asks quietly.
+          <<option 'CN'>>凯拉尔又在你身边待了一会儿，才看了看空荡荡的走廊。“我们能一起走吗？”凯拉尔小声问。
+        <</language>>
+      <<case 'Whitney'>>
+        <<language>>
+          <<option 'EN'>>Whitney gives you a crooked grin while putting their clothes in order. "Next time, find me before the bell," Whitney says, and slips into the hall.
+          <<option 'CN'>>惠特尼一边整理衣服一边冲你歪嘴笑了笑。“下回赶在铃响之前来找我。”说完便溜进了走廊。
+        <</language>>
+    <</switch>>
+  <</if>><br><br>
+  <<clotheson>>
+  <<endcombat>>
+  <<run maplebirch.LS.school.endEncounter()>>
+<<else>>
+  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br><br>
+<</if>>
+<<entranceicon>><<lanLink 'Return to the hallways' 'Hallways'>><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Morning Duty Result []
+<<set $outside to 1>>
+<<set $location to 'school'>>
+<<schooleffects>>
+<<effects>>
+<<set _student to $LifeSimulation.school.duties.target>>
+<<set _loveBefore to _student ? C.npc[_student].love : 0>>
+<<set _whitneyClose to _student is 'Whitney' and (C.npc.Whitney.love gte 30 or $whitneyromance is 1)>>
+<<if maplebirch.LS.school.finishDuty($phase)>>
+  <<if _student is 'Robin'>>
+    <<if $phase is 'enforce'>>
+      <<language>>
+        <<option 'EN'>>You put Robin's name in the duty register, but write down why they stopped. Robin accepts the entry and takes the younger pupil inside.
+        <<option 'CN'>>你在值勤簿上记下罗宾的名字，也写明了耽搁的原因。罗宾接受记录，领着那名学生进了学校。
+      <</language>>
+    <<elseif $phase is 'mediate'>>
+      <<language>>
+        <<option 'EN'>>You check the note, add a line about the younger pupil and wave them both through. Robin thanks you and hurries to class.
+        <<option 'CN'>>你看过条子，记下低年级学生的情况，放两人过去。罗宾向你道谢，赶往教室。
+      <</language>>
+    <<elseif $phase is 'pressure'>>
+      <<language>>
+        <<option 'EN'>>Out of the queue's hearing, you threaten to put <span class='red'>both names</span> in the report unless Robin leaves the child and goes straight to class. Robin takes the child's hand. "Write mine down if you must. I won't leave them." Robin leads the pupil away without looking back.
+        <<option 'CN'>>你避开队伍，威胁罗宾若不丢下那孩子去上课，就把<span class='red'>两人的名字</span>一起记进报告。罗宾握住孩子的手：“要记就记我的。我不会丢下他。”罗宾领着孩子离开，没有再回头看你。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>You wave Robin through without opening the register. Robin looks relieved, though another student notices your exception.
+        <<option 'CN'>>你没有翻开记录簿，直接放罗宾进去。罗宾松了口气，旁边的学生却也看见了这次例外。
+      <</language>>
+    <</if>>
+  <<elseif _student is 'Sydney'>>
+    <<if $phase is 'enforce'>>
+      <<language>>
+        <<option 'EN'>>You record Sydney's arrival and the reason given. Sydney asks you to keep the explanation beside the time, then goes to class without another word.
+        <<option 'CN'>>你记下悉尼到校的时间和所说的缘由。悉尼请你把解释留在时间旁边，随后一言不发地去了教室。
+      <</language>>
+    <<elseif $phase is 'mediate'>>
+      <<language>>
+        <<option 'EN'>>You glance through the temple papers, note the errand and send Sydney inside. Sydney gives you a brief, grateful nod.
+        <<option 'CN'>>你看了看神殿文件，记下差事，放悉尼进校。悉尼简短地点头致谢。
+      <</language>>
+    <<elseif $phase is 'pressure'>>
+      <<language>>
+        <<option 'EN'>>Away from the queue, you threaten to tell the teachers Sydney chose temple work over school. Sydney meets your stare. "Then include what I actually told you." Sydney takes back the papers and heads inside, keeping a careful distance from you.
+        <<option 'CN'>>你避开队伍，威胁要告诉老师，悉尼把神殿差事看得比上课更重要。悉尼迎着你的目光：“那就把我刚才说的原委也写上。”悉尼取回文件，与你保持距离，走进学校。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>You leave the register closed. Sydney passes you with a brief nod, while the other students wait to see whether they too can go unmarked.
+        <<option 'CN'>>你合上记录簿，放悉尼过去。其他排队进校的学生则等着看自己能否也不用登记。
+      <</language>>
+    <</if>>
+  <<elseif _student is 'Kylar'>>
+    <<if $phase is 'enforce'>>
+      <<language>>
+        <<option 'EN'>>You tell Kylar it is time to go inside. Kylar hides the marked book beneath the others and obeys without explaining the delay.
+        <<option 'CN'>>你叫凯拉尔进校。凯拉尔把被涂写的书藏到下面，没解释为何迟疑，低头走了进去。
+      <</language>>
+    <<elseif $phase is 'mediate'>>
+      <<language>>
+        <<option 'EN'>>You record that someone took and defaced Kylar's book, without blaming Kylar for the delay.
+        <<option 'CN'>>你记下有人抢走并涂坏凯拉尔的书，没有把迟到的错推给凯拉尔。
+      <</language>>
+      <<if C.npc.Kylar.rage gte 60>>
+        <<lanSwitch 'Kylar checks the entry, then goes inside without another word.' '凯拉尔看了一眼记录，没再说话，独自进了学校。'>>
+      <<else>>
+        <<lanSwitch 'Kylar keeps close as you walk inside together.' '凯拉尔贴着你，一起走进了学校。'>>
+      <</if>>
+    <<elseif $phase is 'pressure'>>
+      <<language>>
+        <<option 'EN'>>You threaten to report Kylar for loitering if they stay another moment. Kylar goes still and turns the marked book away from you. "You brought me aside just to say that?" Kylar enters alone, leaving you with the report in your hand.
+        <<option 'CN'>>你威胁凯拉尔再不走就上报逗留违纪。凯拉尔僵在原地，把涂写过的书转到你看不见的一侧：“你叫我过来，就是为了说这个？”凯拉尔独自进了学校，只留下你和手里的记录簿。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>You leave Kylar by the side gate. Kylar stays there with the marked book pressed against their chest, watching you until the corridor beyond the door falls quiet.
+        <<option 'CN'>>你没有催凯拉尔离开。凯拉尔仍抱着那本被涂写的书站在侧门边，一直望着你，直到门后的走廊安静下来。
+      <</language>>
+    <</if>>
+  <<else>>
+    <<if $phase is 'enforce'>>
+      <<language>>
+        <<option 'EN'>>You write Whitney's name and the obstruction in your report. Whitney swears at you, then steps aside when you hold up the finished page. The waiting students file past.
+        <<option 'CN'>>你把惠特尼的名字和堵门经过写进报告。惠特尼骂了你一句；你举起写好的记录，惠特尼才让开。学生们赶紧从旁边通过。
+      <</language>>
+    <<elseif $phase is 'mediate'>>
+      <<if _whitneyClose>>
+        <<language>>
+          <<option 'EN'>>You tell Whitney to let the students pass. Whitney gives you a crooked smile and steps aside, making a show of obeying only because you asked. You keep the queue moving until the gate clears.
+          <<option 'CN'>>你让惠特尼放学生过去。惠特尼歪嘴一笑，终于让开，还故意做出一副只听你话的样子。你守在入口，直到队伍通过。
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>You stand in front of Whitney and tell them to let the students pass. Whitney studies you, then steps aside with a mocking bow. You keep the queue moving until the gate clears.
+          <<option 'CN'>>你站到惠特尼面前，要求放学生过去。惠特尼打量了你一会儿，做了个挖苦人的鞠躬，终于让开。你守在入口，直到队伍通过。
+        <</language>>
+      <</if>>
+    <<elseif $phase is 'pressure'>>
+      <<language>>
+        <<option 'EN'>>You warn Whitney that you will bring Leighton to the gate and make them answer for blocking it.
+        <<option 'CN'>>你警告惠特尼，再堵着校门就叫礼顿过来问责。
+      <</language>>
+      <<if _whitneyClose>>
+        <<lanSwitch "Whitney's smile disappears. You have made the threat in private, but it still stings." '惠特尼脸上的笑容消失了。你虽然私下说出这番威胁，仍然伤到了对方。'>>
+      <<else>>
+        <span class='red'><<lanSwitch '"This is not over," Whitney mutters.' '“这事没完。”惠特尼低声说。'>></span>
+      <</if>>
+      <<lanSwitch 'Whitney steps aside when you return to the entrance, and the students hurry through.' '你们回到入口时，惠特尼让开了，学生们赶紧进校。'>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>You leave Whitney alone. Whitney notices and stays in the doorway, forcing the next arrivals to squeeze past.
+        <<option 'CN'>>你没有处理。惠特尼看出你的态度，继续堵在门口，逼得后来的人侧身挤过去。
+      <</language>>
+    <</if>>
+  <</if>>
+  <<set _loveChange to C.npc[_student].love - _loveBefore>>
+  <<if _loveChange gt 0>><<glove _student>><</if>>
+  <<if _loveChange lt 0>><<llove _student>><</if>>
+<<else>>
+  <span class='blue'><<lanSwitch "Morning duty has already ended today." "今天的晨间值勤已经结束。">></span>
+<</if>>
+<br><br>
+<<entranceicon>><<lanLink 'Return to the front courtyard' 'School Front Courtyard'>><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Dress Proposal []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<effects>>
+<<npc Leighton>>
+<<person1>>
+<<set _policy to maplebirch.LS.school.nextPolicy>>
+<<if _policy and maplebirch.LS.school.canProposePolicy>>
+  <<set _requirements to maplebirch.LS.school.policyRequirements(_policy)>>
+  <<language>>
+    <<option 'EN'>>
+      You bring the next dress proposal, <span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _policy)>></span>, to Leighton's office.
+      <<He>> reads the heading and asks whether the students, staff and school climate can bear the change.
+    <<option 'CN'>>
+      你把下一项着装提案<span class='blue'>“<<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _policy)>>”</span>带进礼顿的办公室。
+      <<He>>扫了一眼标题，问你学生、教职工和眼下的校风是否承受得起这种改变。
+  <</language>><br><br>
+  <<lanSwitch "Student support" "学生支持">><<lanSwitch ': ' '：'>><<print _requirements.studentSupport>><br>
+  <<lanSwitch "Staff support" "教职工支持">><<lanSwitch ': ' '：'>><<print _requirements.staffSupport>><br>
+  <<lanSwitch "School corruption" "校园堕落度">><<lanSwitch ': ' '：'>><<print _requirements.corruption>><br><br>
+  <<schoolicon 'building'>><<lanLink 'Present the proposal to Leighton' 'Deadwood Reblooms Life Simulation Dress Approval'>><<run maplebirch.LS.school.proposePolicy()>><</lanLink>><br>
+<<else>>
+  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br>
+<</if>>
+<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Dress Approval []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<effects>>
+<<npc Leighton>>
+<<person1>>
+<<set _policy to $LifeSimulation.school.dress.proposal>>
+<<language>>
+  <<option 'EN'>>
+    You place the proposal for <span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _policy)>></span> on Leighton's desk.
+    "A proposal is not a rule," <<he>> says. "Show me why the school will accept it."
+  <<option 'CN'>>
+    你把<span class='blue'>“<<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _policy)>>”</span>提案放在礼顿桌上。
+    “提案还不是校规。”<<he>>说道，“先证明学校能够接受它。”
+<</language>><br><br>
+<<if maplebirch.LS.school.canApprovePolicy('formal')>>
+  <<schoolicon 'building'>><<lanLink 'Present staff support' 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'formal'>><</lanLink>><br>
+<</if>>
+<<if maplebirch.LS.school.canApprovePolicy('petition')>>
+  <<socialiseicon>><<lanLink 'Present the student petition' 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'petition'>><</lanLink>><br>
+<</if>>
+<<if maplebirch.LS.school.canApprovePolicy('pressure')>>
+  <<crimeicon 'coercion'>><<lanLink 'Force Leighton to approve it' 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+<</if>>
+<<if !maplebirch.LS.school.canApprovePolicy('formal') and !maplebirch.LS.school.canApprovePolicy('petition') and !maplebirch.LS.school.canApprovePolicy('pressure')>>
+  <span class='blue'><<lanSwitch "You lack the support or leverage needed to make Leighton approve this proposal." "目前没有足够的支持，也没有可以迫使礼顿批准的把柄。">></span><br>
+<</if>>
+<<getouticon>><<lanLink 'Withdraw the proposal' "Head's Office">><<run maplebirch.LS.school.withdrawProposal()>><</lanLink>><br>
+<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Dress Approval Result []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<effects>>
+<<npc Leighton>>
+<<person1>>
+<<if maplebirch.LS.school.approvePolicy($phase)>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $phase is 'formal'>>
+        Leighton reads the supporting statements and signs the page. "Seven days. If it disrupts the school, it ends."
+      <<elseif $phase is 'petition'>>
+        You lay the students' signatures across the desk. Leighton counts them twice before signing. "Seven days. Their support had better survive the experience."
+      <<else>>
+        You remind Leighton exactly what you can reveal. <<He>> signs without another objection. "Seven days," <<he>> mutters.
+      <</if>>
+    <<option 'CN'>>
+      <<if $phase is 'formal'>>
+        礼顿读完支持意见，在文件末尾签下名字。“试行七天。要是扰乱学校，就立刻终止。”
+      <<elseif $phase is 'petition'>>
+        你把学生签名铺在桌上。礼顿数了两遍才签字。“试行七天。希望他们亲身经历以后还能继续支持。”
+      <<else>>
+        你提醒礼顿，自己随时可以公开哪些东西。<<he>>没有再反对，只是一边签字一边低声说道：“试行七天。”
+      <</if>>
+  <</language>><br><br>
+  <span class='green'><<lanSwitch "The new policy begins its trial." "新校规开始试行。">></span>
+<<else>>
+  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span>
+<</if>>
+<br><br>
+<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Dress Review []
+<<set $outside to 0>>
+<<set $location to 'school'>>
+<<effects>>
+<<npc Leighton>>
+<<person1>>
+<<language>>
+  <<option 'EN'>>Leighton places the week's reports beside the dress rule. "The trial is over. Does this remain school policy?"
+  <<option 'CN'>>礼顿把一周的记录放在校规旁边。“试行结束了。这条规定还要保留吗？”
+<</language>><br><br>
+<<if maplebirch.LS.school.canKeepPolicy>>
+  <<schoolicon 'building'>><<lanLink 'Make the policy permanent' 'Deadwood Reblooms Life Simulation School Board'>><<run maplebirch.LS.school.reviewPolicy(true)>><</lanLink>><br>
+<<else>>
+  <span class='blue'><<lanSwitch "The policy cannot be kept without enough order and support." "秩序或支持度不足，校规无法正式保留。">></span><br>
+<</if>>
+<<getouticon>><<lanLink 'Revoke the policy' 'Deadwood Reblooms Life Simulation School Board'>><<run maplebirch.LS.school.reviewPolicy(false)>><</lanLink>><br>
+<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
