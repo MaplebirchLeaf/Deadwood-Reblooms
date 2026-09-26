@@ -1,6 +1,21 @@
 // ./src/script/VanillaPlus/Willpower.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
+  // 原版仍负责全部疼痛修正与衰减；这里只在最终钳制前接收超过 200 的溢出伤害。
+  maplebirch.once(':addon:preparePatch', (manager: typeof maplebirch.services.addonPlugin) => {
+    const oldSCData = manager.SC2DataManager.getSC2DataInfoAfterPatch();
+    const SCData = oldSCData.cloneSC2DataInfo();
+    const file = SCData.scriptFileItems.getByNameWithOrWithoutPath('stat-changes.js');
+    if (!file) return;
+
+    file.content = manager.replace(
+      file.content,
+      [[/V\.pain = Math\.clamp\(V\.pain, minPain\(\), 200\);/, 'V.pain = Math.clamp(maplebirch.VP.willpower.absorbPain(V.pain), minPain(), 200);']],
+      'Willpower pain shield'
+    );
+    manager.modUtils.replaceFollowSC2DataInfo(SCData, oldSCData);
+  });
+
   maplebirch.tool.onInit(() => {
     setup.feats['Sovereign Will'] ??= {
       get title() {
@@ -54,7 +69,8 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 将每个史莱姆抗拒场景的原版意志值输入包装为耳液抗性值；无特质时返回原值。
         {
           src: "currentSkillValue('willpower')",
-          to: "maplebirch.VP.willpower.earSlimeResistance(currentSkillValue('willpower'))"
+          to: "maplebirch.VP.willpower.earSlimeResistance(currentSkillValue('willpower'))",
+          expected: 1
         }
       ]
     ])
@@ -66,41 +82,44 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.inject({
     locationPassage: {
       ...slimeDefy,
-      'Kylar Abduction Hypnosis Resist': [
-        // 在 Kylar 催眠的成功判断入口记录 kylar 抗拒结果，保留原版成功分支内容。
-        {
-          srcmatch: /<<if [^>]*\$willpowerSuccess[^>]*>>/,
-          applyafter: '<<set $VanillaPlus.willpower.kylar to true>>'
-        }
-      ],
       'Lake Ruin Prison Possession Resist': [
         // 在湖底监狱附身抗拒的成功判断入口记录 wraith 结果，作为意志突破条件。
         {
-          srcmatch: /<<if [^>]*\$willpowerSuccess[^>]*>>/,
-          applyafter: '<<set $VanillaPlus.willpower.wraith to true>>'
+          src: '<<if $willpowerSuccess>>',
+          applyafter: '<<set $VanillaPlus.willpower.wraith to true>>',
+          expected: 1
         }
       ],
       'Schism End': [
         // 在原版 schismEnd 完成结算后记录 schism 结果，避免中途离开也被计为完成。
         {
           src: '<<schismEnd>>',
-          applyafter: '<<set $VanillaPlus.willpower.schism to true>>'
+          applyafter: '<<set $VanillaPlus.willpower.schism to true>>',
+          expected: 1
         }
       ],
       'Temple Vigil 14': [
         // 在守夜最终一小时推进后记录 vigil 结果，确认玩家完成整段神殿守夜。
         {
           src: '<<pass 60>>',
-          applyafter: '<<set $VanillaPlus.willpower.vigil to true>>'
+          applyafter: '<<set $VanillaPlus.willpower.vigil to true>>',
+          expected: 1
         }
       ]
     },
     widgetPassage: {
       Widgets: [
-        // 原版各类战斗共用 willpowerpain；只缩短其入口条件，不复制原版分支和结算。
+        // 承伤层耗尽后继续执行原版意志检定、文本与失能结算。
         {
-          src: '$pain gte 100 and $willpowerpain is undefined and _willpowerpainchecked isnot true',
-          to: '$pain gte 100 and !$VanillaPlus.traits.willpower and $willpowerpain is undefined and _willpowerpainchecked isnot true',
+          src: '$pain gte 100 and $willpowerpain is undefined',
+          to: 'maplebirch.VP.willpower.checkPain($pain) and $pain gte 100 and $willpowerpain is undefined',
+          expected: 1
+        }
+      ],
+      'Widgets End Combat': [
+        {
+          src: '<<unset $willpowerpain>>',
+          applyafter: '<<run maplebirch.VP.willpower.reset()>>',
           expected: 1
         }
       ],
@@ -108,14 +127,16 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 将作弊面板意志滑条上限改为动态 125%，未突破时继续使用原版 $willpowermax。
         {
           srcmatch: /\$willpower "willpower" \{max: (1000)( \* \$AMCTraits\.willpower)?(, percentage: false)?\}/,
-          to: '$willpower "willpower" {max: $VanillaPlus.lock.willpower ? maplebirch.VP.ceiling("willpower") : $1$2$3}'
+          to: '$willpower "willpower" {max: $VanillaPlus.lock.willpower ? maplebirch.VP.ceiling("willpower") : $1$2$3}',
+          expected: 1
         }
       ],
       'Widgets Clamp': [
         // 替换全局意志钳制公式，同时应用特质保底值与突破后的 125% 上限。
         {
           srcmatch: /Math\.clamp\(\$willpower, 0, \$willpowermax( \* \$AMCTraits\.willpower)?\)/,
-          to: "Math.clamp($willpower, maplebirch.VP.minimum('willpower'), $VanillaPlus.lock.willpower ? maplebirch.VP.ceiling('willpower') : $willpowermax$1)"
+          to: "Math.clamp($willpower, maplebirch.VP.minimum('willpower'), $VanillaPlus.lock.willpower ? maplebirch.VP.ceiling('willpower') : $willpowermax$1)",
+          expected: 1
         }
       ]
     }

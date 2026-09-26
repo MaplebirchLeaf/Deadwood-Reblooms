@@ -30,6 +30,21 @@ class HandGrip {
     return undefined;
   }
 
+  // 原版高潮时会先把自由手改回 0；动作生成前恢复仍然有效的抓握，让它继续走 handheld 分支。
+  public restoreOrgasmGrip(): void {
+    if (V.combat !== 1 || Number(V.orgasmdown) < 1) return;
+    const combat = V as unknown as Record<string, unknown>;
+    (['left', 'right'] as const).forEach(hand => {
+      const target = this.state()[hand];
+      if (typeof target !== 'number') return;
+      if (Number(combat[`${hand}target`]) !== target || !this.isPenetrationRecipient(target)) {
+        this.clear(hand);
+        return;
+      }
+      if (combat[`${hand}arm`] === 0) combat[`${hand}arm`] = 'handheld';
+    });
+  }
+
   public set(hand: GripHand, index: number): boolean {
     const target = Number(index);
     if (!this.isPenetrationRecipient(target)) return false;

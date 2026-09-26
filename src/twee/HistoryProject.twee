@@ -38,14 +38,8 @@
   <<historyicon>><<lanLink 'Take the project' 'Deadwood Reblooms History Project Begin'>>
     <<set $phase to 0>>
   <</lanLink>><<ghistory>><br>
-  <<if
-    C.npc.Robin.init is 1 and
-    C.npc.Robin.dom gt 30 and
-    C.npc.Robin.trauma lt 20 and
-    ['active', 'seat'].includes($robinhistory)
-  >>
-    <<loveicon>><<lanLink 'Ask Robin to work with you' 'Deadwood Reblooms History Project Begin'
-    >>
+  <<if C.npc.Robin.init is 1 and C.npc.Robin.dom gt 30 and C.npc.Robin.trauma lt 20 and ['active', 'seat'].includes($robinhistory) >>
+    <<loveicon>><<lanLink 'Ask Robin to work with you' 'Deadwood Reblooms History Project Begin' >>
       <<set $phase to 1>>
     <</lanLink>><<glove 'Robin'>><br>
   <</if>>
@@ -54,17 +48,10 @@
 
 <!-- 家中入口：根据调查进度提供撰写展览稿的选项。 -->
 <<widget 'deadwood-reblooms-history-project-home-option'>>
-  <<if
-    $VanillaPlus.historyProject.status is 'ongoing' and
-    Time.days lt $VanillaPlus.historyProject.deadline
-  >>
+  <<if $VanillaPlus.historyProject.status is 'ongoing' and Time.days lt $VanillaPlus.historyProject.deadline >>
     <<if $VanillaPlus.historyProject.draft is 0>>
-      <<if
-        $VanillaPlus.historyProject.archive gt 0 and
-        $VanillaPlus.historyProject.museum gt 0
-      >>
-        <<historyicon>><<lanLink 'Prepare the exhibition (1:00)' 'Deadwood Reblooms History Project Draft'
-        >><<pass 60>><</lanLink>><br>
+      <<if $VanillaPlus.historyProject.archive gt 0 and $VanillaPlus.historyProject.museum gt 0 >>
+        <<historyicon>><<lanLink 'Prepare the exhibition (1:00)' 'Deadwood Reblooms History Project Draft' >><<pass 60>><</lanLink>><br>
     <</if>>
     <</if>>
   <</if>>
@@ -72,69 +59,36 @@
 
 <!-- 图书馆入口：提供画作档案调查选项。 -->
 <<widget 'deadwood-reblooms-history-project-library-option'>>
-  <<if
-    $VanillaPlus.historyProject.status is 'ongoing' and
-    Time.days lt $VanillaPlus.historyProject.deadline and
-    $VanillaPlus.historyProject.archive is 0
-  >>
-    <<historyicon>><<lanLink 'Research the painting (1:00)' 'Deadwood Reblooms History Project Archive'
-    >><<pass 60>><</lanLink>><br>
+  <<if $VanillaPlus.historyProject.status is 'ongoing' and Time.days lt $VanillaPlus.historyProject.deadline and $VanillaPlus.historyProject.archive is 0 >>
+    <<historyicon>><<lanLink 'Research the painting (1:00)' 'Deadwood Reblooms History Project Archive' >><<pass 60>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 <!-- 博物馆入口：处理画作考证与展览日结算入口。 -->
 <<widget 'deadwood-reblooms-history-project-museum-options'>>
   <<if $VanillaPlus.historyProject.status is 'ongoing'>>
-    <<if
-      Time.days lt $VanillaPlus.historyProject.deadline and
-      $VanillaPlus.historyProject.archive gt 0 and
-      $VanillaPlus.historyProject.museum is 0
-    >>
-      <<museumicon>><<lanLink 'Examine the returned painting (1:00)' 'Deadwood Reblooms History Project Museum'
-      >><<pass 60>><</lanLink>><br>
+    <<if Time.days lt $VanillaPlus.historyProject.deadline and $VanillaPlus.historyProject.archive gt 0 and $VanillaPlus.historyProject.museum is 0 >>
+      <<museumicon>><<lanLink 'Examine the returned painting (1:00)' 'Deadwood Reblooms History Project Museum' >><<pass 60>><</lanLink>><br>
   <<elseif Time.days gte $VanillaPlus.historyProject.deadline>>
-      <<historyicon>><<lanLink 'Present the exhibition (2:00)' 'Deadwood Reblooms History Project Exhibition'
-      >><<pass 2 hours>><</lanLink>><br>
+      <<historyicon>><<lanLink 'Present the exhibition (2:00)' 'Deadwood Reblooms History Project Exhibition' >><<pass 2 hours>><</lanLink>><br>
   <</if>>
   <</if>>
 <</widget>>
 
 <!-- 湖区入口：满足条件时开启遗迹调查，并区分是否由 Robin 协助。 -->
 <<widget 'deadwood-reblooms-history-project-lake-option'>>
-  <<if
-    $VanillaPlus.historyProject.status is 'ongoing' and
-    Time.days lt $VanillaPlus.historyProject.deadline and
-    $VanillaPlus.historyProject.archive gt 0 and
-    $VanillaPlus.historyProject.museum gt 0 and
-    $VanillaPlus.historyProject.ruin is 0 and
-    !Weather.isFrozen('lake') and
-    Time.hour gte 6 and
-    Time.hour lte 18
-  >>
+  <<if $VanillaPlus.historyProject.status is 'ongoing' and Time.days lt $VanillaPlus.historyProject.deadline and $VanillaPlus.historyProject.archive gt 0 and $VanillaPlus.historyProject.museum gt 0 and $VanillaPlus.historyProject.ruin is 0 and !Weather.isFrozen('lake') and Time.hour gte 6 and Time.hour lte 18 >>
     <<if $VanillaPlus.historyProject.assistant>>
-      <<antiqueicon 'disc'>><<lanLink 'Survey the ruin with Robin (2:00)' 'Deadwood Reblooms History Project Lake Preparation'
-      >><<pass 2 hours>><</lanLink>><br>
+      <<antiqueicon 'disc'>><<lanLink 'Survey the ruin with Robin (2:00)' 'Deadwood Reblooms History Project Lake Preparation' >><<pass 2 hours>><</lanLink>><br>
     <<else>>
-      <<antiqueicon 'disc'>><<lanLink 'Survey the lake ruin (2:00)' 'Deadwood Reblooms History Project Lake Preparation'
-      >><<pass 2 hours>><</lanLink>><br>
+      <<antiqueicon 'disc'>><<lanLink 'Survey the lake ruin (2:00)' 'Deadwood Reblooms History Project Lake Preparation' >><<pass 2 hours>><</lanLink>><br>
     <</if>>
   <</if>>
 <</widget>>
 
 <!-- Kylar 街头事件：在调查期间按条件触发跟踪支线。 -->
 <<widget 'deadwood-reblooms-history-project-kylar-street-event'>>
-  <<if
-    $bus is 'high' and
-    $exposed lte 0 and
-    $VanillaPlus.historyProject.status is 'ongoing' and
-    Time.days lt $VanillaPlus.historyProject.deadline and
-    $VanillaPlus.historyProject.kylar isnot 'none' and
-    $VanillaPlus.historyProject.archive gt 0 and
-    $VanillaPlus.historyProject.museum gt 0 and
-    !$VanillaPlus.historyProject.kylarStreet and
-    $VanillaPlus.historyProject.ruin is 0 and
-    C.npc.Kylar.state is 'active'
-  >>
+  <<if $bus is 'high' and $exposed lte 0 and $VanillaPlus.historyProject.status is 'ongoing' and Time.days lt $VanillaPlus.historyProject.deadline and $VanillaPlus.historyProject.kylar isnot 'none' and $VanillaPlus.historyProject.archive gt 0 and $VanillaPlus.historyProject.museum gt 0 and !$VanillaPlus.historyProject.kylarStreet and $VanillaPlus.historyProject.ruin is 0 and C.npc.Kylar.state is 'active' >>
     <<addinlineevent 'deadwoodRebloomsHistoryKylar' 1>>
       <<run statusCheck('Kylar')>>
       <<language>>
@@ -175,10 +129,8 @@
           <</if>>
       <</language>>
       <br><br>
-      <<historyicon>><<lanLink 'Check your numbered notes' 'Deadwood Reblooms History Project Kylar Check'
-      >><</lanLink>><<ghistory>><br>
-      <<loveicon>><<lanLink 'Take Kylar at their word' 'Deadwood Reblooms History Project Kylar Trust'
-      >><</lanLink>><br>
+      <<historyicon>><<lanLink 'Check your numbered notes' 'Deadwood Reblooms History Project Kylar Check' >><</lanLink>><<ghistory>><br>
+      <<loveicon>><<lanLink 'Take Kylar at their word' 'Deadwood Reblooms History Project Kylar Trust' >><</lanLink>><br>
     <</addinlineevent>>
   <</if>>
 <</widget>>
@@ -198,29 +150,17 @@
       <<lanSwitch 'Robin is helping you organise the project.' '罗宾正在协助你整理项目。'>><br>
     <</if>>
     <<lanSwitch 'Historical records' '历史记录'>>:
-      <<= $VanillaPlus.historyProject.archive > 0
-        ? lanSwitch('complete', '已完成')
-        : lanSwitch('incomplete', '未完成')
-      >><br>
+      <<= $VanillaPlus.historyProject.archive > 0 ? lanSwitch('complete', '已完成') : lanSwitch('incomplete', '未完成') >><br>
     <<lanSwitch 'Painting examination' '画作考证'>>:
-      <<= $VanillaPlus.historyProject.museum > 0
-        ? lanSwitch('complete', '已完成')
-        : lanSwitch('incomplete', '未完成')
-      >><br>
+      <<= $VanillaPlus.historyProject.museum > 0 ? lanSwitch('complete', '已完成') : lanSwitch('incomplete', '未完成') >><br>
     <<lanSwitch 'Optional field trip' '可选实地调查'>>:
-      <<= $VanillaPlus.historyProject.ruin > 0
-        ? lanSwitch('complete', '已完成')
-        : lanSwitch('not attempted', '尚未进行')
-      >><br>
+      <<= $VanillaPlus.historyProject.ruin > 0 ? lanSwitch('complete', '已完成') : lanSwitch('not attempted', '尚未进行') >><br>
     <<if $VanillaPlus.historyProject.ruin gt 0>>
       <<antiqueicon 'golden-priestess'>>
       <<lanSwitch 'Forest lake field notes recorded' '已记录森林湖实地笔记'>><br>
     <</if>>
     <<lanSwitch 'Exhibition draft' '展览草稿'>>:
-      <<= $VanillaPlus.historyProject.draft > 0
-        ? lanSwitch('complete', '已完成')
-        : lanSwitch('incomplete', '未完成')
-      >><br><br>
+      <<= $VanillaPlus.historyProject.draft > 0 ? lanSwitch('complete', '已完成') : lanSwitch('incomplete', '未完成') >><br><br>
   <</if>>
 <</widget>>
 
@@ -291,22 +231,7 @@
 :: Deadwood Reblooms History Project Begin []
 <<set $outside to 0>><<set $location to 'school'>><<schooleffects>><<effects>>
 <<set $_historySource to $VanillaPlus.historyProject.source>>
-<<set $VanillaPlus.historyProject to {
-  status: 'ongoing',
-  source: $_historySource,
-  availableDay: 0,
-  deadline: Time.days + 25,
-  assistant: $phase is 1,
-  kylar: $phase is 1 ? 'sabotage' : 'help',
-  kylarStreet: false,
-  kylarPrepared: false,
-  archive: 0,
-  museum: 0,
-  recovery: 'none',
-  ruin: 0,
-  draft: 0,
-  final: 0
-}>>
+<<set $VanillaPlus.historyProject to { status: 'ongoing', source: $_historySource, availableDay: 0, deadline: Time.days + 25, assistant: $phase is 1, kylar: $phase is 1 ? 'sabotage' : 'help', kylarStreet: false, kylarPrepared: false, archive: 0, museum: 0, recovery: 'none', ruin: 0, draft: 0, final: 0 }>>
 <<language>>
   <<option 'EN'>>
     <<if $phase is 1>>
@@ -393,9 +318,7 @@
 :: Deadwood Reblooms History Project Kylar Trust []
 <<set $outside to 1>><<set $location to 'town'>><<effects>><<npc Kylar>><<person1>><<run statusCheck('Kylar')>>
 <<set $VanillaPlus.historyProject.kylarStreet to true>>
-<<set $VanillaPlus.historyProject.kylarPrepared to
-  $VanillaPlus.historyProject.kylar is 'help'
->>
+<<set $VanillaPlus.historyProject.kylarPrepared to $VanillaPlus.historyProject.kylar is 'help' >>
 <<language>>
   <<option 'EN'>>
     <<if $VanillaPlus.historyProject.kylar is 'help'>>
@@ -478,13 +401,10 @@
 <</language>>
 <br><br>
 <<if $historytrait gte 4>>
-  <<historyicon>><<lanLink 'Verify the earliest source' 'Deadwood Reblooms History Project Archive Finish'
-  >><<set $phase to 0>><</lanLink>><<ghistory>><br>
+  <<historyicon>><<lanLink 'Verify the earliest source' 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 0>><</lanLink>><<ghistory>><br>
 <</if>>
-<<historyicon>><<lanLink 'Trust the museum catalogue' 'Deadwood Reblooms History Project Archive Finish'
->><<set $phase to 1>><</lanLink>><br>
-<<crimeicon 'documents'>><<lanLink 'Reconcile the accounts' 'Deadwood Reblooms History Project Archive Finish'
->><<set $phase to 2>><</lanLink>><<skulduggerydifficulty>><br>
+<<historyicon>><<lanLink 'Trust the museum catalogue' 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 1>><</lanLink>><br>
+<<crimeicon 'documents'>><<lanLink 'Reconcile the accounts' 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 2>><</lanLink>><<skulduggerydifficulty>><br>
 
 :: Deadwood Reblooms History Project Archive Finish []
 <<set $VanillaPlus.historyProject.archive to $phase is 0 ? 30 : 18>>
@@ -581,14 +501,11 @@
 <</language>>
 <br><br>
 <<if $historytrait gte 4>>
-  <<historyicon>><<lanLink 'Match records to the object' 'Deadwood Reblooms History Project Museum Finish'
-  >><<set $phase to 0>><</lanLink>><<ghistory>><br>
+  <<historyicon>><<lanLink 'Match records to the object' 'Deadwood Reblooms History Project Museum Finish' >><<set $phase to 0>><</lanLink>><<ghistory>><br>
 <</if>>
-<<museumicon>><<lanLink 'Trust the catalogue card' 'Deadwood Reblooms History Project Museum Finish'
->><<set $phase to 1>><</lanLink>><br>
+<<museumicon>><<lanLink 'Trust the catalogue card' 'Deadwood Reblooms History Project Museum Finish' >><<set $phase to 1>><</lanLink>><br>
 <<if hasSexStat('exhibitionism', 2)>>
-  <<icon 'clothes/tuxedo-jacket.png'>><<lanLink 'Try on the display costume' 'Deadwood Reblooms History Project Museum Finish'
-  >><<set $phase to 2>><</lanLink>><<exhibitionist2>><br>
+  <<icon 'clothes/tuxedo-jacket.png'>><<lanLink 'Try on the display costume' 'Deadwood Reblooms History Project Museum Finish' >><<set $phase to 2>><</lanLink>><<exhibitionist2>><br>
 <</if>>
 
 :: Deadwood Reblooms History Project Museum Finish []
@@ -710,8 +627,7 @@
     <</if>>
 <</language>>
 <br><br>
-<<getinicon>><<lanLink 'Enter the water' 'Deadwood Reblooms History Project Lake Descent'
->><</lanLink>><br>
+<<getinicon>><<lanLink 'Enter the water' 'Deadwood Reblooms History Project Lake Descent' >><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Lake Descent []
 <<set $outside to 0>><<set $location to 'lake_ruin'>><<underwater>><<effects>><<lakeeffects>>
@@ -728,11 +644,7 @@
     <<if $VanillaPlus.historyProject.assistant>>
       Robin keeps one hand locked around the rope and the other around your wrist.
         Each time the current turns <<him>> sideways, <<he>> looks to you before continuing.
-      <<if
-        $VanillaPlus.historyProject.kylar is 'sabotage' and
-        $VanillaPlus.historyProject.kylarStreet and
-        !$VanillaPlus.historyProject.kylarPrepared
-      >>
+      <<if $VanillaPlus.historyProject.kylar is 'sabotage' and $VanillaPlus.historyProject.kylarStreet and !$VanillaPlus.historyProject.kylarPrepared >>
         At the first marker, Robin notices that the route arrow in your folder points the wrong way.
           <<He>> corrects it against <<his>> numbered copy,
           but the detour costs time and stirs silt across the entrance.
@@ -740,10 +652,7 @@
     <<else>>
       The guide rope is anchored at the entrance.
         Its evenly spaced knots are the only straight thing in the wavering dark.
-      <<if
-        $VanillaPlus.historyProject.kylar is 'help' and
-        $VanillaPlus.historyProject.kylarStreet
-      >>
+      <<if $VanillaPlus.historyProject.kylar is 'help' and $VanillaPlus.historyProject.kylarStreet >>
         The letter forms on Kylar's rubbing help you recognise the religious markings around a side alcove.
       <</if>>
     <</if>>
@@ -758,11 +667,7 @@
     <<if $VanillaPlus.historyProject.assistant>>
       罗宾一只手紧抓导向绳，另一只手握住你的手腕。
         每次水流把<<him>>冲得偏转，<<he>>都会先看向你，再继续前进。
-      <<if
-        $VanillaPlus.historyProject.kylar is 'sabotage' and
-        $VanillaPlus.historyProject.kylarStreet and
-        !$VanillaPlus.historyProject.kylarPrepared
-      >>
+      <<if $VanillaPlus.historyProject.kylar is 'sabotage' and $VanillaPlus.historyProject.kylarStreet and !$VanillaPlus.historyProject.kylarPrepared >>
         到达第一处标记时，罗宾发现文件夹里的路线箭头指向了错误方向。
           <<He>>对照<<his>>编好页码的副本修正路线，绕路却耗费了时间，
           还搅起淤泥，遮住了入口。
@@ -770,10 +675,7 @@
     <<else>>
       导向绳固定在入口处。
         水波令一切扭曲不定，只有间距一致的绳结仍维持着笔直的方向。
-      <<if
-        $VanillaPlus.historyProject.kylar is 'help' and
-        $VanillaPlus.historyProject.kylarStreet
-      >>
+      <<if $VanillaPlus.historyProject.kylar is 'help' and $VanillaPlus.historyProject.kylarStreet >>
         凯拉尔拓片上的字形帮助你认出了侧面壁龛周围的宗教标记。
       <</if>>
     <</if>>
@@ -782,10 +684,8 @@
       小巧的女祭司像跪在底座上，周围环绕着一圈古文字。
 <</language>>
 <br><br>
-<<historyicon>><<lanLink 'Record the find' 'Deadwood Reblooms History Project Lake Statuette'
->><<set $VanillaPlus.historyProject.recovery to 'recorded'>><</lanLink>><<ghistory>><br>
-<<antiqueicon 'golden-priestess'>><<lanLink 'Free the statuette' 'Deadwood Reblooms History Project Lake Statuette'
->><<set $VanillaPlus.historyProject.recovery to 'rushed'>><</lanLink>><<stress 6>><<gstress>><br>
+<<historyicon>><<lanLink 'Record the find' 'Deadwood Reblooms History Project Lake Statuette' >><<set $VanillaPlus.historyProject.recovery to 'recorded'>><</lanLink>><<ghistory>><br>
+<<antiqueicon 'golden-priestess'>><<lanLink 'Free the statuette' 'Deadwood Reblooms History Project Lake Statuette' >><<set $VanillaPlus.historyProject.recovery to 'rushed'>><</lanLink>><<stress 6>><<gstress>><br>
 
 :: Deadwood Reblooms History Project Lake Statuette []
 <<set $outside to 0>><<set $location to 'lake_ruin'>><<underwater>><<effects>><<lakeeffects>>
@@ -835,17 +735,13 @@
 <<hallucinogen 120>><<gghallucinogens>>
 <br><br>
 <<if $VanillaPlus.historyProject.assistant>>
-  <<loveicon>><<lanLink 'Follow Robin' 'Deadwood Reblooms History Project Lake Robin'
-  >><</lanLink>><<glove 'Robin'>><br>
+  <<loveicon>><<lanLink 'Follow Robin' 'Deadwood Reblooms History Project Lake Robin' >><</lanLink>><<glove 'Robin'>><br>
   <<if $robinromance is 1>>
-    <<getinicon>><<lanLink 'Enter the air pocket with Robin' 'Deadwood Reblooms History Project Lake Robin Hallucination'
-    >><</lanLink>><<promiscuous2>><br>
+    <<getinicon>><<lanLink 'Enter the air pocket with Robin' 'Deadwood Reblooms History Project Lake Robin Hallucination' >><</lanLink>><<promiscuous2>><br>
   <</if>>
 <<else>>
-  <<historyicon>><<lanLink 'Follow the knots upward' 'Deadwood Reblooms History Project Lake Solo'
-  >><<willpower 1>><</lanLink>><<gwillpower>><br>
-  <<getinicon>><<lanLink 'Break through the phantom prison' 'Deadwood Reblooms History Project Lake Solo'
-  >><<set $phase to 2>><</lanLink>><<trauma 12>><<ggtrauma>><br>
+  <<historyicon>><<lanLink 'Follow the knots upward' 'Deadwood Reblooms History Project Lake Solo' >><<willpower 1>><</lanLink>><<gwillpower>><br>
+  <<getinicon>><<lanLink 'Break through the phantom prison' 'Deadwood Reblooms History Project Lake Solo' >><<set $phase to 2>><</lanLink>><<trauma 12>><<ggtrauma>><br>
 <</if>>
 
 :: Deadwood Reblooms History Project Lake Robin []
@@ -872,10 +768,7 @@
 <</language>>
 <<npcincr Robin love 2>><<gglove 'Robin'>><<stress -12>><<llstress>>
 <br><br>
-<<swimicon 'up'>><<lanLink
-  'Return to the shore'
-  'Deadwood Reblooms History Project Lake Return'
->><</lanLink>><br>
+<<swimicon 'up'>><<lanLink 'Return to the shore' 'Deadwood Reblooms History Project Lake Return' >><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Lake Robin Hallucination []
 <<set $outside to 0>><<set $location to 'lake_ruin'>><<effects>><<lakeeffects>><<npc Robin>><<person1>>
@@ -943,10 +836,8 @@
       导向绳仍缠在你们的手腕上，是这间不断变形的石室中最后一条坚实的线。</span>
 <</language>>
 <br><br>
-<<loveicon>><<lanLink 'Pull Robin closer' 'Deadwood Reblooms History Project Lake Robin Sex'
->><<set $sexstart to 1>><<npcincr Robin love 1>><</lanLink>><<promiscuous3>><<glove 'Robin'>><br>
-<<swimicon 'up'>><<lanLink 'Follow the guide rope' 'Deadwood Reblooms History Project Lake Robin'
->><</lanLink>><br>
+<<loveicon>><<lanLink 'Pull Robin closer' 'Deadwood Reblooms History Project Lake Robin Sex' >><<set $sexstart to 1>><<npcincr Robin love 1>><</lanLink>><<promiscuous3>><<glove 'Robin'>><br>
+<<swimicon 'up'>><<lanLink 'Follow the guide rope' 'Deadwood Reblooms History Project Lake Robin' >><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Lake Robin Sex []
 <<run statusCheck('Robin')>>
@@ -977,15 +868,9 @@
 <br><br>
 <<actionsman>>
 <<if _combatend or $enemyanger gte 20 or $consensual isnot 1>>
-  <span id="next"><<lanLink
-    'Next'
-    'Deadwood Reblooms History Project Lake Robin Sex Finish'
-  >><</lanLink>></span><<nexttext>>
+  <span id="next"><<lanLink 'Next' 'Deadwood Reblooms History Project Lake Robin Sex Finish' >><</lanLink>></span><<nexttext>>
 <<else>>
-  <span id="next"><<lanLink
-    'Next'
-    'Deadwood Reblooms History Project Lake Robin Sex'
-  >><</lanLink>></span><<nexttext>>
+  <span id="next"><<lanLink 'Next' 'Deadwood Reblooms History Project Lake Robin Sex' >><</lanLink>></span><<nexttext>>
 <</if>>
 
 :: Deadwood Reblooms History Project Lake Robin Sex Finish []
@@ -1070,10 +955,7 @@
 <br><br>
 <<endcombat>>
 <<clotheson>>
-<<swimicon 'up'>><<lanLink
-  'Return to the shore'
-  'Deadwood Reblooms History Project Lake Return'
->><</lanLink>><br>
+<<swimicon 'up'>><<lanLink 'Return to the shore' 'Deadwood Reblooms History Project Lake Return' >><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Lake Solo []
 <<set $outside to 0>><<set $location to 'lake_ruin'>><<underwater>><<effects>><<lakeeffects>>
@@ -1089,24 +971,15 @@
 <</language>>
 <<stress 6>><<gstress>>
 <br><br>
-<<swimicon 'up'>><<lanLink
-  'Return to the shore'
-  'Deadwood Reblooms History Project Lake Return'
->><</lanLink>><br>
+<<swimicon 'up'>><<lanLink 'Return to the shore' 'Deadwood Reblooms History Project Lake Return' >><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Lake Return []
 <<set $outside to 1>><<set $location to 'lake'>><<effects>><<lakeeffects>>
 <<if $VanillaPlus.historyProject.assistant>>
   <<npc Robin>><<person1>>
 <</if>>
-<<set $_historyKylarCompromised to
-  $VanillaPlus.historyProject.kylar is 'sabotage' and
-  $VanillaPlus.historyProject.kylarStreet and
-  !$VanillaPlus.historyProject.kylarPrepared
->>
-<<set $VanillaPlus.historyProject.ruin to
-  $VanillaPlus.historyProject.recovery is 'recorded' and !$_historyKylarCompromised ? 2 : 1
->>
+<<set $_historyKylarCompromised to $VanillaPlus.historyProject.kylar is 'sabotage' and $VanillaPlus.historyProject.kylarStreet and !$VanillaPlus.historyProject.kylarPrepared >>
+<<set $VanillaPlus.historyProject.ruin to $VanillaPlus.historyProject.recovery is 'recorded' and !$_historyKylarCompromised ? 2 : 1 >>
 <<language>>
   <<option 'EN'>>
     Back on the shore, you seal the golden statuette inside its padded pouch
@@ -1136,10 +1009,7 @@
     回到湖岸后，你把金制女祭司像封进内衬软垫的回收袋，
     又将湿透的记录板摊在树下。
     <br><br>
-    <<if
-      $VanillaPlus.historyProject.recovery is 'recorded' and
-      !$_historyKylarCompromised
-    >>你的位置草图、测量数据
+    <<if $VanillaPlus.historyProject.recovery is 'recorded' and !$_historyKylarCompromised >>你的位置草图、测量数据
       和回收记录仍然清晰可辨。
       <br><br>
       <span class="green">金制女祭司像拥有完整记录的出土环境。</span>
@@ -1223,10 +1093,8 @@
     <</if>>
 <</language>>
 <br><br>
-<<historyicon>><<lanLink 'Mark the evidence limits' 'Deadwood Reblooms History Project Draft Finish'
->><<set $phase to 0>><</lanLink>><<ghistory>><br>
-<<historyicon>><<lanLink 'Fill the gaps with a story' 'Deadwood Reblooms History Project Draft Finish'
->><<set $phase to 1>><</lanLink>><br>
+<<historyicon>><<lanLink 'Mark the evidence limits' 'Deadwood Reblooms History Project Draft Finish' >><<set $phase to 0>><</lanLink>><<ghistory>><br>
+<<historyicon>><<lanLink 'Fill the gaps with a story' 'Deadwood Reblooms History Project Draft Finish' >><<set $phase to 1>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Draft Finish []
 <<set $VanillaPlus.historyProject.draft to $phase is 0 ? 25 : 12>>
@@ -1309,52 +1177,27 @@
     “这场展览能够确认什么，又必须把什么留作未知？”
 <</language>>
 <br><br>
-<<set $_historyCorrectAnswer to
-  $VanillaPlus.historyProject.source is 'paintingward'
-    ? lanSwitch(
-      'The records establish the raid and the painting, not a prediction',
-      '记录可以确认空袭与画作，却不能证明预言'
-    )
-    : lanSwitch(
-      'The object establishes an old painting and a changing tale, not the event depicted',
-      '实物可以确认古老画作与变化的传说，却不能证明画中事件'
-    )
->>
-<<historyicon>><<link
-  $_historyCorrectAnswer
-  'Deadwood Reblooms History Project Result'
->>
+<<set $_historyCorrectAnswer to $VanillaPlus.historyProject.source is 'paintingward' ? lanSwitch( 'The records establish the raid and the painting, not a prediction', '记录可以确认空袭与画作，却不能证明预言' ) : lanSwitch( 'The object establishes an old painting and a changing tale, not the event depicted', '实物可以确认古老画作与变化的传说，却不能证明画中事件' ) >>
+<<historyicon>><<link $_historyCorrectAnswer 'Deadwood Reblooms History Project Result' >>
   <<set $VanillaPlus.historyProject.final to 15>>
-  <<if
-    $VanillaPlus.historyProject.archive +
-      $VanillaPlus.historyProject.museum +
-      $VanillaPlus.historyProject.draft +
-      $VanillaPlus.historyProject.final is 100
-  >>
+  <<if $VanillaPlus.historyProject.archive + $VanillaPlus.historyProject.museum + $VanillaPlus.historyProject.draft + $VanillaPlus.historyProject.final is 100 >>
     <<set $VanillaPlus.historyProject.status to 'won'>>
   <<else>>
     <<set $VanillaPlus.historyProject.status to 'done'>>
   <</if>>
 <</link>><<ghistory>><br>
-<<museumicon>><<lanLink 'Trust the painting\'s age' 'Deadwood Reblooms History Project Result'
->>
+<<museumicon>><<lanLink 'Trust the painting\'s age' 'Deadwood Reblooms History Project Result' >>
   <<set $VanillaPlus.historyProject.final to 0>>
   <<set $VanillaPlus.historyProject.status to 'done'>>
 <</lanLink>><br>
-<<historyicon>><<lanLink 'Trust the repeated account' 'Deadwood Reblooms History Project Result'
->>
+<<historyicon>><<lanLink 'Trust the repeated account' 'Deadwood Reblooms History Project Result' >>
   <<set $VanillaPlus.historyProject.final to 0>>
   <<set $VanillaPlus.historyProject.status to 'done'>>
 <</lanLink>><br>
 
 :: Deadwood Reblooms History Project Result []
 <<set $outside to 0>><<set $location to 'museum'>><<effects>><<npc Winter>><<person1>>
-<<set $_historyScore to
-  $VanillaPlus.historyProject.archive +
-    $VanillaPlus.historyProject.museum +
-    $VanillaPlus.historyProject.draft +
-    $VanillaPlus.historyProject.final
->>
+<<set $_historyScore to $VanillaPlus.historyProject.archive + $VanillaPlus.historyProject.museum + $VanillaPlus.historyProject.draft + $VanillaPlus.historyProject.final >>
 <<language>>
   <<option 'EN'>>
     <<if $VanillaPlus.historyProject.status is 'won'>>

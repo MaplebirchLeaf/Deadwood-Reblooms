@@ -26,17 +26,18 @@ export default function (maplebirch: MaplebirchCore) {
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Wardrobe': [
-        // 在衣柜筛选与物品列表之间插入双语搜索框，搜索确认后仍调用原版 Dynamic.render 刷新列表。
+        // 在主衣柜的类型列表初始化前插入双语搜索框，不依赖上一个 if 分支的结尾格式。
         {
-          src: ')<</if>>\n\t\t<br>',
-          applyafter:
-            '\n\t\t<<lanSwitch "Search: " "搜索：">><<textbox "$DeadwoodReblooms.wardrobeSearch" $DeadwoodReblooms.wardrobeSearch>><<lanButton "confirm" "capitalize" "style:height:36px;padding:0 12px;line-height:1;">><<run Dynamic.render()>><</lanButton>><br>',
+          src: '<<set _outfitTypes to setup.clothingLayer.torso_inner>>',
+          applybefore:
+            '<<lanSwitch "Search: " "搜索：">><<textbox "$DeadwoodReblooms.wardrobeSearch" $DeadwoodReblooms.wardrobeSearch>><<lanButton "confirm" "capitalize" "style:height:36px;padding:0 12px;line-height:1;">><<run Dynamic.render()>><</lanButton>><br>\n\t\t',
           expected: 1
         },
-        // 在每件衣柜物品渲染前加入语言对应的名称过滤，不修改物品数据与后续穿戴操作。
+        // 物品数据刚取出时立即过滤，避免匹配前一个 if 的结尾和后续 HTML。
         {
-          src: '<</if>>\n\t\t\t<div class="wardrobeItem wardrobe-action no-numberify">',
-          to: '<</if>>\n\t\t\t<<if $DeadwoodReblooms.wardrobeSearch isnot "">><<run $DeadwoodReblooms.wardrobeSearch.toLowerCase()>><<language>><<option "CN">><<if !_itemData.cn_name_cap.toLowerCase().includes($DeadwoodReblooms.wardrobeSearch)>><<continue>><</if>><<option "EN">><<if !_itemData.name_cap.toLowerCase().includes($DeadwoodReblooms.wardrobeSearch)>><<continue>><</if>><</language>><</if>>\n\t\t\t<div class="wardrobeItem wardrobe-action no-numberify">',
+          src: '<<set _itemData to setup.clothes[_wardrobe_list][clothesIndex(_wardrobe_list,_item)]>>',
+          applyafter:
+            '<<if $DeadwoodReblooms.wardrobeSearch isnot "">><<run $DeadwoodReblooms.wardrobeSearch.toLowerCase()>><<language>><<option "CN">><<if !_itemData.cn_name_cap.toLowerCase().includes($DeadwoodReblooms.wardrobeSearch)>><<continue>><</if>><<option "EN">><<if !_itemData.name_cap.toLowerCase().includes($DeadwoodReblooms.wardrobeSearch)>><<continue>><</if>><</language>><</if>>',
           expected: 1
         }
       ],

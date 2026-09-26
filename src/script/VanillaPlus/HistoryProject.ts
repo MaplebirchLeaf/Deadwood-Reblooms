@@ -31,22 +31,22 @@ const schedule = `
 export const historyProjectWidgetPassages: Record<string, PassagePatch[]> = {
   'Widgets School Projects': [
     {
-      src: '<</widget>>\n\n<<widget "scienceprojectchance">>',
-      applybefore: '\t<<deadwood-reblooms-history-project-home-option>>\n',
+      src: '<<widget "projectoptions">>',
+      applyafter: '\n\t<<deadwood-reblooms-history-project-home-option>>',
       expected: 1
     }
   ],
   'Widgets Events History': [
     // 在普通历史课事件池清空后追加课题起始检查，让新事件参与当天的历史课抽取。
     {
-      srcmatch: /<<widget "eventshistory">>\s*<<cleareventpool>>/,
-      applyafter: startCheck,
+      src: '<<addinlineevent "historyCritique">>',
+      applybefore: startCheck,
       expected: 1
     },
     // 在安全历史课组件内部的清池点后追加同一检查，兼容安全模式的独立事件组件。
     {
-      srcmatch: /<<widget "eventshistorysafe">>[\s\S]*?<<cleareventpool>>/,
-      applyafter: startCheck,
+      src: '<<addinlineevent "historyQuiet" 2>>',
+      applybefore: startCheck,
       expected: 1
     }
   ],

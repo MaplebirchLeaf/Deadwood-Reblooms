@@ -1,10 +1,25 @@
 :: Deadwood Reblooms Vanilla Plus Widgets [widget]
 
+<!-- 属性达到第七级上限后，显示本轮实际获得的特质；属性突破提示仍由各自场景负责。 -->
+<<widget 'deadwood-reblooms-trait-unlocks'>>
+  <<set _unlockedTraits to maplebirch.VP.unlockTraits()>>
+  <<for _trait range _unlockedTraits>>
+    <<set _traitName to maplebirch.t(`deadwood-reblooms:VanillaPlus:traits:${_trait}:name`)>>
+    <<set _traitNotice to maplebirch.t('deadwood-reblooms:VanillaPlus:traits:unlocked', { name: _traitName })>>
+    <span @class="_trait is 'incorrigible' ? 'silver' : ['exhibitionism', 'deviancy', 'promiscuity'].includes(_trait) ? 'lustful' : 'gold'"><<= _traitNotice>></span><br>
+  <</for>>
+<</widget>>
+
+<!-- 容貌不再使用独立收束任务；满足既有条件时直接开放第七级。 -->
+<<widget 'deadwood-reblooms-beauty-unlock'>>
+  <<set $VanillaPlus.lock.beauty to true>>
+  <span class="gold"><<lanSwitch 'Your beauty has broken through its former limits.' '你的容貌突破了原本的极限。'>></span><br><br>
+<</widget>>
+
 <!-- 医院入口：符合条件时提供童贞修复手术。 -->
 <<widget 'deadwood-reblooms-virginity-restoration-link'>>
   <<if ($player.vaginaExist and $player.virginity.vaginal isnot true) or ($player.penisExist and $player.virginity.penile isnot true)>>
-    <<icon 'virginity-restoration.png'>><<lanLink 'Enquire about virginity restoration (0:10)' 'Deadwood Reblooms Virginity Restoration'
-    >><<pass 10>><</lanLink>>
+    <<icon 'virginity-restoration.png'>><<lanLink 'Enquire about virginity restoration (0:10)' 'Deadwood Reblooms Virginity Restoration' >><<pass 10>><</lanLink>>
     <br>
   <</if>>
 <</widget>>
@@ -101,15 +116,65 @@
   <</if>>
 <</widget>>
 
-<!-- 露出癖战斗效果：达到特质后调整控制、压力、创伤与欲望。 -->
+<!-- 露出癖战斗效果：达到特质后调整控制、压力与欲望。 -->
 <<widget 'deadwood-reblooms-exhibitionism-trait-effects'>>
-  <<if $VanillaPlus.traits.exhibitionism and !$desperateaction>>
+  <<if $VanillaPlus.traits.exhibitionism and !$desperateaction and _args[0] isnot 6>>
     <<set $_exhibitionismLevel to _args[0]>>
     <<if $control lt $controlmax>>
       <<control $controlmax>><<gggcontrol>>
     <</if>>
-    <<stress $_exhibitionismLevel -300>><<combattrauma `$_exhibitionismLevel * -30`>><<lstress>><<ltrauma>><<arousal `$_exhibitionismLevel * 100`>><<garousal>>
+    <<stress $_exhibitionismLevel -300>><<lstress>><<arousal `$_exhibitionismLevel * 100`>><<garousal>>
   <</if>>
+<</widget>>
+
+<!-- 原版地图的相邻地点与移动组件仍负责路线和效果；特质只补足白天裸露时被隐藏的链接。 -->
+<<widget 'deadwood-reblooms-public-walk-links'>>
+  <<if maplebirch.VP.exhibitionism.canRoamTown and $map.available and $map.available[$passage]>>
+    <<set _routeWidgets to { 'Domus Street': 'domus', 'Barb Street': 'barb', 'Danube Street': 'danube', 'Connudatus Street': 'connudatus', 'Cliff Street': 'cliff', 'Wolf Street': 'wolf', 'High Street': 'high', 'Starfish Street': 'starfish', 'Nightingale Street': 'nightingale', 'Oxford Street': 'oxford', 'Mer Street': 'mer', 'Elk Street': 'elk', 'Harvest Street': 'harvest', 'Residential Alleyways': 'residential', 'Commercial Alleyways': 'commercial', 'Industrial Alleyways': 'industrial', 'Park': 'park' }>>
+    <<if Time.dayState isnot 'night'>>
+      <<set _walkTargets to $map.available[$passage].filter(target => _routeWidgets[target] && !$link_table.some(link => link.includes('|' + target + ']]')) )>>
+      <<if _walkTargets.length>>
+        <<add_link `<br>${lanSwitch('Public walk', '公开裸行')}<br>`>><<hideDisplay>>
+        <<for _target range _walkTargets>>
+          <<run Wikifier.wikifyEval('<<' + _routeWidgets[_target] + '>>')>>
+        <</for>>
+      <</if>>
+    <</if>>
+    <<for _walkIndex to 0; _walkIndex lt $link_table.length; _walkIndex++>>
+      <<set _walkDestination to $link_table[_walkIndex].split('|')[1]>>
+      <<if _walkDestination>><<set _walkDestination to _walkDestination.split(']]')[0]>><</if>>
+      <<if $map.available[$passage].includes(_walkDestination) and $link_table[_walkIndex].includes('<<pass 5>>') and !$link_table[_walkIndex].includes('<<exhibitionism6>>')>>
+        <<set $link_table[_walkIndex] to $link_table[_walkIndex].replace('<<pass 5>>', '<<pass 5>><<exhibitionism6>><<fameexhibitionism 5>>')>>
+      <</if>>
+    <</for>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-public-home-exit'>>
+  <<set _deadwoodPublicFullyNaked to ['over_upper', 'upper', 'under_upper', 'over_lower', 'lower', 'under_lower'].every(slot => $worn[slot].name === 'naked')>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _deadwoodPublicFullyNaked>>
+        Domus Street is busy beyond the door. One step outside, and everyone passing by will see your naked body.
+        <br><br>
+        <<dooricon 'orphanage'>><<link [[Walk out with nothing on and let the whole street see you (0:01)|Domus Street]]>><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</link>>
+      <<else>>
+        People are passing just outside. What you are wearing cannot hide your exposed body from their eyes.
+        <br><br>
+        <<dooricon 'orphanage'>><<link [[Walk onto the street exposed and let passers-by stare (0:01)|Domus Street]]>><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</link>>
+      <</if>>
+    <<option 'CN'>>
+      <<if _deadwoodPublicFullyNaked>>
+        门外就是人来人往的多姆斯街。只要跨出这道门，过路人就会把你赤裸的身体看个清楚。
+        <br><br>
+        <<dooricon 'orphanage'>><<link [[故意一丝不挂地走上街，任所有人看个清楚 (0:01)|Domus Street]]>><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</link>>
+      <<else>>
+        门外不时有人经过。身上的衣物遮不住暴露的身体；只要走出去，就得迎上那些目光。
+        <br><br>
+        <<dooricon 'orphanage'>><<link [[带着暴露的身体走上街，任路人打量 (0:01)|Domus Street]]>><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</link>>
+      <</if>>
+  <</language>>
+  <br>
 <</widget>>
 
 <!-- 日常挣脱入口：体格足够时允许玩家挣断可破坏的束缚。 -->
@@ -144,10 +209,7 @@
       <span class="teal"><<lanSwitch 'You flex hard. The bindings bite into your skin, then snap.' '你猛然发力。束缚勒进皮肤，随后应声断裂。'>></span>
     <<case 'legs'>>
       <<leg_unbind>>
-      <<set $_breakFreeText to lanSwitch(
-        'You spread your legs with all your strength. The bindings strain, then tear apart.',
-        '你用尽力气分开双腿。束缚被拉紧，随即撕裂。'
-      )>>
+      <<set $_breakFreeText to lanSwitch( 'You spread your legs with all your strength. The bindings strain, then tear apart.', '你用尽力气分开双腿。束缚被拉紧，随即撕裂。' )>>
       <span class="teal"><<= $_breakFreeText>></span>
     <<case 'head'>>
       <<set $head to 0>>
@@ -159,8 +221,7 @@
 <<widget 'deadwood-reblooms-deviancy-mirror-enter-link'>>
   <<set $_mirror to _args[0]>>
   <<if maplebirch.VP.deviancy.mirrorOpen and maplebirch.VP.deviancy.discovered($_mirror)>>
-    <<mirroricon 'blood'>><<lanLink 'Step through the eerie mirror' 'Deadwood Reblooms Deviancy Mirror Enter'
-    >>
+    <<mirroricon 'blood'>><<lanLink 'Step through the eerie mirror' 'Deadwood Reblooms Deviancy Mirror Enter' >>
       <<set $VanillaPlus.deviancy.mirrorOrigin to $_mirror>>
     <</lanLink>>
       <<note `lanSwitch('Deviancy', '异种癖')` 'red'>>
@@ -202,21 +263,6 @@
     <span class="gold">你的淫乱突破了原本的极限。</span>
   <</language>>
   <br><br>
-<</widget>>
-
-<!-- 容貌突破入口：条件满足时从摄影棚故障引出突破事件。 -->
-<<widget 'deadwood-reblooms-beauty-breakthrough-link'>>
-  <<if maplebirch.VP.beauty.unlock>>
-    <<language>>
-      <<option 'EN'>>
-        A light behind the diffuser flickers, then bursts with a sharp pop.
-      <br><<link [[Check the failed light|Deadwood Reblooms Beauty Breakthrough]]>><</link>> <<note 'Beauty' 'gold'>>
-      <<option 'CN'>>
-        柔光板后的灯闪烁几下，随即砰然炸裂。
-      <br><<link [[查看坏掉的灯|Deadwood Reblooms Beauty Breakthrough]]>><</link>> <<note '容貌' 'gold'>>
-    <</language>>
-    <br>
-  <</if>>
 <</widget>>
 
 <!-- 异种癖突破结算：完成仪式后解锁属性上限。 -->

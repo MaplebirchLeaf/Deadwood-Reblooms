@@ -47,10 +47,10 @@ export default function (maplebirch: typeof window.maplebirch) {
   };
 
   const partnerVisual = (partnerIndex: number): PenetratorVisual => {
-    const combatRenderer = (window as any).CombatRenderer;
-    const npcMapper = (window as any).NpcCombatMapper;
+    const combatRenderer = window.CombatRenderer;
+    const npcMapper = window.NpcCombatMapper;
     const npc = V.NPCList[partnerIndex];
-    const strapon = (window as any).npcHasStrapon(partnerIndex);
+    const strapon = window.npcHasStrapon(partnerIndex);
     const condom = wearingCondom(partnerIndex);
     const description = String(npc.penisdesc || '');
     const sprite = strapon ? (description.includes('tentacle') ? 'tentacle' : npc.strapon?.color === 'fleshy' ? 'penis' : 'strapon') : 'penis';
@@ -67,9 +67,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   const canUsePleasure = () => {
     const trait = !!V.VanillaPlus?.traits?.promiscuity;
     const stat = V.enemytype === 'man' ? 'promiscuity' : 'deviancy';
-    const hasSexStat = (window as any).hasSexStat as ((name: string, tier: number) => boolean) | undefined;
-    const currentSkillValue = (window as any).currentSkillValue as ((skill: string) => number) | undefined;
-    return trait || (V.consensual === 1 && (V.promiscuityIgnore || (V.awareness >= 300 && !!hasSexStat?.(stat, 5))) && (currentSkillValue?.('penileskill') ?? 0) >= 800);
+    return trait || (V.consensual === 1 && (V.promiscuityIgnore || (V.awareness >= 300 && window.hasSexStat(stat, 5))) && window.currentSkillValue('penileskill') >= 800);
   };
 
   const npcName = (target: number) => {
@@ -79,7 +77,7 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   const legLockAllowed = () => {
     const stat = V.enemytype === 'man' ? 'promiscuity' : 'deviancy';
-    return !!V.VanillaPlus?.traits?.promiscuity || V.promiscuityIgnore || !!(window as any).hasSexStat?.(stat, 6);
+    return !!V.VanillaPlus?.traits?.promiscuity || V.promiscuityIgnore || window.hasSexStat(stat, 6);
   };
   const doublePenetrators = (orifice: 'vagina' | 'anus') => maplebirch.VP.NPCDoublePenetration.playerPenetrators(orifice);
   const doublePenetratorNames = () => {
@@ -89,16 +87,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     return { names: `${names.slice(0, -1).join(', ')} and ${names.at(-1)}` };
   };
   const canStartLegLock = (orifice: 'vagina' | 'anus') => {
-    const temporary = (window as any).State?.temporary;
-    return V.combat === 1 && temporary?.feetOptions === 'free' && V.leglocktarget == null && V.feetuse === 0 && legLockAllowed() && doublePenetrators(orifice).includes(Number(V.feettarget));
+    return V.combat === 1 && T?.feetOptions === 'free' && V.leglocktarget == null && V.feetuse === 0 && legLockAllowed() && doublePenetrators(orifice).includes(Number(V.feettarget));
   };
   const canContinueLegLock = () => V.combat === 1 && V.feetuse === 'legLock' && !!maplebirch.VP.NPCDoublePenetration.playerLegLock;
-  const rememberedPleasureValue = (ctx: { originalCount?: number }) => {
-    const value = 'NPCDoublePleasure';
-    // 原版默认动作分配早于框架动作注册；在选项进入动作表时恢复保存值，使按钮继承上回选择。
-    if (typeof ctx.originalCount === 'number' && V.penisactiondefault === value) V.penisaction = value;
-    return value;
-  };
 
   // PC 双插期间的主动动作由框架注册到原版动作表，并接入对应效果宏。
   maplebirch.combat.CombatAction.reg(
@@ -107,9 +98,10 @@ export default function (maplebirch: typeof window.maplebirch) {
       actionType: 'penisaction',
       cond: () => V.combat === 1 && maplebirch.VP.NPCDoublePenetration.visible && canUsePleasure(),
       display: () => text('action:pleasure'),
-      value: rememberedPleasureValue,
+      value: () => 'NPCDoublePleasure',
       color: 'sub',
       difficulty: '<<combatpromiscuous5>> <<combataware 4>>',
+      order: 2,
       effect: '<<deadwood-reblooms-npc-double-pleasure>>'
     },
     {
@@ -183,7 +175,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       if (!state) return;
 
       // 扩展条件创建画布时，原版可能尚未填写玩家阴茎的尺寸、精灵与过滤器。
-      if (!options.showPcPenis) (window as any).XrayCombatMapper.mapXrayPlayerPenis(options, options.penis);
+      if (!options.showPcPenis) window.XrayCombatMapper.mapXrayPlayerPenis(options, options.penis);
       const player = playerVisual(options);
       const partner = partnerVisual(state.partner);
       const order = orderNPCDoublePenetrators(player.size, partner.size);
@@ -246,7 +238,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         filters: ['npcDoubleSecondary'],
         desaturatefn: (options: any) => !!options.npcDouble.secondary.tintStrapon,
         brightnessfn: (options: any) => (options.npcDouble.secondary.tintStrapon ? -0.25 : 0),
-        zfn: () => (window as any).CombatRenderer.indices.xrayPenetrator2
+        zfn: () => window.CombatRenderer.indices.xrayPenetrator2
       },
       playerCondom: {
         srcfn: (options: any) => {
@@ -267,7 +259,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         animationfn: (options: any) => options.animKeyPenis,
         filters: ['npcDoubleSecondaryCondom'],
         alpha: 0.4,
-        zfn: () => (window as any).CombatRenderer.indices.xrayCondom2
+        zfn: () => window.CombatRenderer.indices.xrayCondom2
       },
       playerCum: {
         showfn: (options: any) => !options.npcDouble && !!options.penis.showCum && V.otherFilled >= 1
@@ -318,14 +310,15 @@ export default function (maplebirch: typeof window.maplebirch) {
           to: '<<deadwood-reblooms-double-penetration-status "NPC-anus">>',
           expected: 1
         },
+        // 双目标锁定只替换原版用于显示目标的表达式，保留整行状态文本、颜色和高潮分支。
         {
-          srcmatch: /(<<set _feetOptions to "legLocked">>)\s*(<span[\s\S]*?<\/span>)/,
-          to: '$1\n\t\t\t\t<<if maplebirch.VP.NPCDoublePenetration.playerLegLock>><<deadwood-reblooms-double-leglock-status>><<else>>$2<</if>>',
+          src: '<<personselect $leglocktarget>><<combatperson>>',
+          to: '<<if maplebirch.VP.NPCDoublePenetration.playerLegLock>><<deadwood-reblooms-double-leglock-targets $VanillaPlus.npcDoublePenetration.playerLegLock.targets>><<else>>$&<</if>>',
           expected: 1
         },
         {
-          srcmatch: /(<<set _feetOptions to "orgasmLegLock">>)\s*(<span[\s\S]*?<\/span>)/,
-          to: '$1\n\t\t\t\t<<if maplebirch.VP.NPCDoublePenetration.playerLegLock>><<deadwood-reblooms-double-leglock-status true>><<else>>$2<</if>>',
+          src: '$NPCList[$leglocktarget].pronouns.him',
+          to: '<<if maplebirch.VP.NPCDoublePenetration.playerLegLock>><<deadwood-reblooms-double-leglock-targets $VanillaPlus.npcDoublePenetration.playerLegLock.targets>><<else>>$&<</if>>',
           expected: 1
         }
       ],

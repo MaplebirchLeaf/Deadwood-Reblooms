@@ -14,17 +14,11 @@ export default function (maplebirch: typeof window.maplebirch) {
     return (maplebirch.Language === 'CN' ? npc?.fullDescription_CN : npc?.fullDescription) || npc?.fullDescription || '';
   };
   const active = () => V.combat === 1 && V.enemytype === 'man' && V.walltype !== 'front' && !V.gloryhole;
-  const available = (hand: GripHand) => (window as any).State?.temporary?.[`${hand}Options`] === 'free';
+  const available = (hand: GripHand) => T?.[`${hand}Options`] === 'free';
   const canStart = (hand: GripHand) => active() && available(hand) && maplebirch.VP.handGrip.target(hand) == null && maplebirch.VP.handGrip.isPenetrationRecipient(selectedTarget(hand));
   const canKeep = (hand: GripHand) => active() && maplebirch.VP.handGrip.target(hand) != null;
   const difficulty = '<<handdifficulty>> <<if $consensual is 0>><<combatpromiscuous6>><<else>><<combatpromiscuous3>><</if>>';
-  const rememberedValue = (hand: GripHand, ctx: { originalCount?: number }) => {
-    const value = hand === 'left' ? 'VanillaPlusHandGripLeftKeep' : 'VanillaPlusHandGripRightKeep';
-    const combat = V as unknown as Record<string, unknown>;
-    // 原版在框架加入注册动作前分配默认值；动作进入表时恢复保存值，确保单选框和列表继承上回选择。
-    if (typeof ctx.originalCount === 'number' && combat[`${hand}actiondefault`] === value) combat[`${hand}action`] = value;
-    return value;
-  };
+  const keepDifficulty = `<<if $orgasmdown lt 1>>${difficulty}<</if>>`;
 
   // 抓握是原版性交动作的增强，不要求淫乱突破；左右手分别注册，因此可以同时抓住目标。
   maplebirch.combat.CombatAction.reg(
@@ -34,7 +28,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       cond: () => canStart('left'),
       display: () => text('action:grip', { name: targetName('left') }),
       value: () => 'VanillaPlusHandGripLeft',
-      color: 'sub',
+      color: 'brat',
       difficulty,
       effect: '<<deadwood-reblooms-hand-grip "left" "start">>'
     },
@@ -44,7 +38,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       cond: () => canStart('right'),
       display: () => text('action:grip', { name: targetName('right') }),
       value: () => 'VanillaPlusHandGripRight',
-      color: 'sub',
+      color: 'brat',
       difficulty,
       effect: '<<deadwood-reblooms-hand-grip "right" "start">>'
     },
@@ -52,26 +46,26 @@ export default function (maplebirch: typeof window.maplebirch) {
       id: 'hand-grip-left-keep',
       actionType: 'leftaction',
       cond: () => canKeep('left'),
-      display: () => text('action:keep'),
-      value: ctx => rememberedValue('left', ctx),
-      color: 'sub',
-      difficulty,
+      display: () => text(Number(V.orgasmdown) >= 1 ? 'action:noEscape' : 'action:keep'),
+      value: () => 'VanillaPlusHandGripLeftKeep',
+      color: 'brat',
+      difficulty: keepDifficulty,
       effect: '<<deadwood-reblooms-hand-grip "left" "keep">>'
     },
     {
       id: 'hand-grip-right-keep',
       actionType: 'rightaction',
       cond: () => canKeep('right'),
-      display: () => text('action:keep'),
-      value: ctx => rememberedValue('right', ctx),
-      color: 'sub',
-      difficulty,
+      display: () => text(Number(V.orgasmdown) >= 1 ? 'action:noEscape' : 'action:keep'),
+      value: () => 'VanillaPlusHandGripRightKeep',
+      color: 'brat',
+      difficulty: keepDifficulty,
       effect: '<<deadwood-reblooms-hand-grip "right" "keep">>'
     },
     {
       id: 'hand-grip-left-release',
       actionType: 'leftaction',
-      cond: () => canKeep('left'),
+      cond: () => canKeep('left') && Number(V.orgasmdown) < 1,
       display: () => text('action:release'),
       value: () => 'VanillaPlusHandGripLeftRelease',
       color: 'white',
@@ -80,7 +74,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     {
       id: 'hand-grip-right-release',
       actionType: 'rightaction',
-      cond: () => canKeep('right'),
+      cond: () => canKeep('right') && Number(V.orgasmdown) < 1,
       display: () => text('action:release'),
       value: () => 'VanillaPlusHandGripRightRelease',
       color: 'white',
@@ -114,18 +108,23 @@ export default function (maplebirch: typeof window.maplebirch) {
     'main'
   );
 
-  // 只替换 handheld 的左右手状态文本，避免复制整段原版动作生成 passage。
+  // 高潮时先恢复抓握占用；只在唯一的人类动作入口插入调用，不匹配原版高潮分支或文本块。
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Actions Generation': [
         {
-          srcmatch: /(<<case "handheld">>\s*<<set _leftOptions to "handheld">>)\s*(<span[\s\S]*?<\/span>)/,
-          to: '$1\n\t\t\t<<if maplebirch.VP.handGrip.target("left") isnot undefined>><<deadwood-reblooms-hand-grip-status "left">><<else>>$2<</if>>',
+          src: '<<widget "generateActionsMan">>',
+          applyafter: '\n\t<<run maplebirch.VP.handGrip.restoreOrgasmGrip()>>',
           expected: 1
         },
         {
-          srcmatch: /(<<case "handheld">>\s*<<set _rightOptions to "handheld">>)\s*(<span[\s\S]*?<\/span>)/,
-          to: '$1\n\t\t\t<<if maplebirch.VP.handGrip.target("right") isnot undefined>><<deadwood-reblooms-hand-grip-status "right">><<else>>$2<</if>>',
+          srcmatch: /(?:Your left hand is being held\.|你的左手被握住了。)/,
+          to: '<<if maplebirch.VP.handGrip.target("left") isnot undefined>><<deadwood-reblooms-hand-grip-status "left">><<else>>$&<</if>>',
+          expected: 1
+        },
+        {
+          srcmatch: /(?:Your right hand is being held\.|你的右手被握住了。)/,
+          to: '<<if maplebirch.VP.handGrip.target("right") isnot undefined>><<deadwood-reblooms-hand-grip-status "right">><<else>>$&<</if>>',
           expected: 1
         }
       ]

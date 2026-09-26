@@ -66,13 +66,13 @@ class VanillaPlus extends Module {
       ballroom: false,
       highStreetRun: false,
       highStreet: false,
-      levelFiveProgress: 0
+      levelFive: 0
     },
     deviancy: {
       wildsong: false,
       conducting: false,
       conducted: false,
-      levelFiveProgress: 0,
+      levelFive: 0,
       mirrorOrigin: '',
       mirrors: {
         home: false,
@@ -81,15 +81,7 @@ class VanillaPlus extends Module {
       }
     },
     promiscuity: {
-      hands: false,
-      feet: false,
-      mouth: false,
-      penis: false,
-      vagina: false,
-      anus: false,
-      chest: false,
-      thigh: false,
-      levelFiveProgress: 0
+      levelFive: 0
     },
     handGrip: {
       left: null as number | null,
@@ -97,10 +89,13 @@ class VanillaPlus extends Module {
     },
     npcDoublePenetration: null as NPCDoublePenetrationData | null,
     willpower: {
-      kylar: false,
       wraith: false,
       schism: false,
-      vigil: false
+      vigil: false,
+      painShield: {
+        remaining: 0,
+        ready: true
+      }
     }
   };
 
@@ -192,14 +187,20 @@ class VanillaPlus extends Module {
     if (enabled) this.preserve();
   }
 
-  public unlockTraits(): void {
+  public unlockTraits(): VanillaPlusTrait[] {
+    const unlocked: VanillaPlusTrait[] = [];
     for (const attribute of this.attributes) {
-      if (this[attribute].max) V.VanillaPlus.traits[attribute] = true;
+      if (this[attribute].max && !V.VanillaPlus.traits[attribute]) {
+        V.VanillaPlus.traits[attribute] = true;
+        unlocked.push(attribute);
+      }
     }
-    if (this.allMax) {
+    if (this.allMax && !V.VanillaPlus.traits.incorrigible) {
       V.VanillaPlus.traits.incorrigible = true;
+      unlocked.push('incorrigible');
       this.preserve();
     }
+    return unlocked;
   }
 
   public minimum(attribute: VanillaPlusAttribute): number {

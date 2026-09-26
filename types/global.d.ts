@@ -25,6 +25,24 @@ declare global {
   interface Window {
     isLoveInterest(name: string): boolean;
     isPossibleLoveInterest(name: string): boolean;
+    mapMove: ((destination: string) => void) & { deadwoodPublicWalk?: boolean };
+    LZString: {
+      compressToBase64(input: string): string;
+      decompressFromBase64(input: string): string | null;
+    };
+    saveAs(blob: Blob, filename: string): void;
+    breakableSoftBinding(): boolean;
+    playerChastity(slots?: string | readonly string[], inAllSlots?: boolean): boolean;
+    playerPenisSize(): number;
+    npcHasStrapon(index?: number): boolean;
+    hasSexStat(input: string, required: number, modifiers?: boolean): boolean;
+    currentSkillValue(skill: string, disableModifiers?: number): number;
+    CombatRenderer: {
+      indices: { xrayPenetrator2: number; xrayCondom2: number };
+      getCondomOptions(condom: unknown): { colour: unknown };
+    };
+    NpcCombatMapper: { getNpcPenetratorFilter(npc: unknown): unknown };
+    XrayCombatMapper: { mapXrayPlayerPenis(options: unknown, penetrator: unknown): void };
   }
 
   function wearingCondom(who: number | 'player'): boolean;

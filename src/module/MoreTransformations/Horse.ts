@@ -223,34 +223,39 @@ class Horse extends Transformation {
         'Riding School Lesson Grab': [
           // 在骑术课吃草链接完整结束后显示马化提示，不插入链接内部以免改变原版点击结算顺序。
           {
-            srcmatch: /<<link \[\[[^\n]*?\|Riding School Lesson Eat\]\]>><[\s\S]*?<<\/link>>/,
-            applyafter: '<<transform-hint "horse" "softbrown">>'
+            src: '<<stress -6>><</link>>',
+            applyafter: '<<transform-hint "horse" "softbrown">>',
+            expected: 1
           }
         ],
         'Farm Horses Brush': [
           // 在农场刷马后续链接结束处追加马化提示，仅对已经开始马化的玩家显示。
           {
-            srcmatch: /<<link \[\[[^\n]*?\|Farm Horses Chase\]\]>>[\s\S]*?<<\/link>>/,
-            applyafter: '<<if $maplebirch.transformation.horse.level > 0>><<transform-hint "horse" "softbrown">><</if>>'
+            src: '<<tiredness 2>><</link>>',
+            applyafter: '<<if $maplebirch.transformation.horse.level > 0>><<transform-hint "horse" "softbrown">><</if>>',
+            expected: 1
           }
         ],
         'Riding School Lesson Eat': [
           // 在吃草场景清空画布模型后增加马化进度，使剧情行为与转化成长直接对应。
           {
-            srcmatch: /<<canvas-model-override "clear">>/,
-            applyafter: '<<transform "horse" 5>>'
+            src: '<<canvas-model-override "clear">>',
+            applyafter: '<<transform "horse" 5>>',
+            expected: 1
           }
         ],
         'Moor Horse Riding': [
           // 在荒原骑马离开链接结束后显示马化提示，保留原版事件跳过和时间推进逻辑。
           {
-            srcmatch: /<<link \[\[[^\n]*?\|Moor\]\]>><<set \$eventskip to 1>>[\s\S]*?<<bird_pass 5>>[\s\S]*?<<\/link>>/,
-            applyafter: '<<if $maplebirch.transformation.horse.level > 0>><<transform-hint "horse" "softbrown">><</if>>'
+            src: '<<set $moormove to "horse">><</link>>',
+            applyafter: '<<if $maplebirch.transformation.horse.level > 0>><<transform-hint "horse" "softbrown">><</if>>',
+            expected: 1
           },
           // 在骑马经过五分钟之前按概率增加马化进度，只对已有马化状态的玩家生效。
           {
-            srcmatch: /<<bird_pass 5>>/,
-            applybefore: '<<if $maplebirch.transformation.horse.level > 0 and $rng <= 30>><<transform "horse" 1>><</if>>'
+            src: '<<bird_pass 5>>',
+            applybefore: '<<if $maplebirch.transformation.horse.level > 0 and $rng <= 30>><<transform "horse" 1>><</if>>',
+            expected: 1
           }
         ]
       },
@@ -275,24 +280,27 @@ class Horse extends Transformation {
           }
         ],
         'Farm Widgets': [
-          // 在 farm_brush 组件生成的每个刷毛链接后追加结算，仅在追马场景点击对应链接时增长马化。
+          // 追上马并完成刷毛时结算一次成长，直接挂在唯一的刷毛组件入口。
           {
-            srcmatchgroup: /(?<=<<widget "farm_brush">>(?:(?!<<\/widget>>)[\s\S])*?)<<link \[\[[^\n]*?\]\]>>/g,
-            applyafter: '<<if passage() is "Farm Horses Chase" and $maplebirch.transformation.horse.level > 0>><<transform "horse" 1>><</if>>'
+            src: '<<widget "farm_brush">>',
+            applyafter: '<<if passage() is "Farm Horses Chase" and $maplebirch.transformation.horse.level > 0>><<transform "horse" 1>><</if>>',
+            expected: 1
           }
         ],
         'Widgets BeastEjaculation': [
           // 在原版狐狸转化判定后追加马类 NPC 的转化判定，使马、马男和马女共享马化增长。
           {
             srcmatchgroup: /<<if _npcisFoxType>><<transform fox 1>><<\/if>>/g,
-            applyafter: '<<if ["horse", "horseboy", "horsegirl"].includes($NPCList[_jj].type)>><<transform "horse" 1>><</if>>'
+            applyafter: '<<if ["horse", "horseboy", "horsegirl"].includes($NPCList[_jj].type)>><<transform "horse" 1>><</if>>',
+            expected: 14
           }
         ],
         'Widgets Effects Man': [
           // 用模组踢击组件替换原版踢击结算入口，以便蹄足特质调整效果且不重复执行原版伤害。
           {
             srcmatchgroup: /<<actionskick \$feettarget>><<defiance 5 \$feettarget>>/g,
-            to: '<<deadwood-reblooms-action-kick $feettarget>>'
+            to: '<<deadwood-reblooms-action-kick $feettarget>>',
+            expected: 2
           }
         ]
       }

@@ -21,20 +21,25 @@ export const sydneyScienceWidgetPassages: Record<string, PassagePatch[]> = {
     },
     // 在普通科学课事件池清空后注册扩展事件，使其参与本次课堂事件抽取。
     {
-      srcmatch: /<<widget "eventsscience">>\s*<<cleareventpool>>/,
-      applyafter: '\n\t<<deadwood-reblooms-sydney-science-events>>',
+      src: '<<addinlineevent "scienceChemicals" 1>>',
+      applybefore: '<<deadwood-reblooms-sydney-science-events>>\n\t',
       expected: 1
     },
     // 在安全科学课组件内部的清池点后注册同一扩展事件，兼容安全模式的独立事件池。
     {
-      srcmatch: /<<widget "eventssciencesafe">>[\s\S]*?<<cleareventpool>>/,
-      applyafter: '\n\t<<deadwood-reblooms-sydney-science-events>>',
+      src: '<<addinlineevent "scienceBook" 2>>',
+      applybefore: '<<deadwood-reblooms-sydney-science-events>>\n\t',
       expected: 1
     },
-    // 包装原版 scienceDelinquents 事件：条件满足时改走 Sydney 保护分支，否则原样执行 $& 内容。
+    // 用事件开头和最后一个动作作为两个短边界，不捕获整段原版事件。
     {
-      srcmatch: /<<addinlineevent "scienceDelinquents" 2>>[\s\S]*?<<\/addinlineevent>>/,
-      to: '<<if $sydneyScience is 1 and _sydney_location is "science" and isLoveInterest("Sydney")>>\n\t\t<<deadwood-reblooms-sydney-science-protect>>\n\t<<else>>\n\t\t$&\n\t<</if>>',
+      src: '<<addinlineevent "scienceDelinquents" 2>>',
+      applyafter: '\n\t\t<<if $sydneyScience is 1 and _sydney_location is "science" and isLoveInterest("Sydney")>><<deadwood-reblooms-sydney-science-protect>><<else>>',
+      expected: 1
+    },
+    {
+      srcmatch: /\|Science Pick\]\]>><<set \$phase to 2>><<detention 2>><<\/link>><<gdelinquency>>/,
+      applyafter: '\n\t\t<</if>>',
       expected: 1
     }
   ]

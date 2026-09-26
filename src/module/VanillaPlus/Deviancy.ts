@@ -25,9 +25,7 @@ class Deviancy {
       V.VanillaPlus.deviancy.wildsong &&
       V.gwylan.purged >= 20 &&
       V.dateCount.GwylanSex >= 3 &&
-      V.dateCount.GwylanBeast >= 3 &&
-      V.gwylanSeen.includes('ritual_sex') &&
-      V.gwylanSeen.includes('ritual_beast')
+      V.dateCount.GwylanBeast >= 3
     );
   }
 

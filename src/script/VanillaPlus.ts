@@ -27,6 +27,19 @@ export default function (maplebirch: typeof window.maplebirch) {
   });
 
   maplebirch.tool.addTo('DegreesBonusDisplay', 'deadwood-reblooms-characteristics-degrees-display');
+  maplebirch.tool.onInit(() => {
+    setup.feats['Every Limit Broken'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:VanillaPlus:incorrigible:feat:title');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:VanillaPlus:incorrigible:feat:description');
+      },
+      difficulty: 5,
+      series: '',
+      filter: ['All', 'Stats']
+    };
+  });
   AcademicHonours(maplebirch);
   Beauty(maplebirch);
   Deviancy(maplebirch);
@@ -96,11 +109,15 @@ export default function (maplebirch: typeof window.maplebirch) {
   );
 
   maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-traits', {
-    output: 'run maplebirch.VP.unlockTraits()',
+    output: 'deadwood-reblooms-trait-unlocks',
     cond: () => V.VanillaPlus != null && maplebirch.VP.traitsPending
   });
   maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-preserve', {
     output: 'run maplebirch.VP.preserve()',
     cond: () => V.VanillaPlus != null && maplebirch.VP.belowMinimum
+  });
+  maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-all-max-feat', {
+    output: 'earnFeat "Every Limit Broken"',
+    cond: () => V.VanillaPlus != null && V.VanillaPlus.traits.incorrigible && !V.feats.currentSave['Every Limit Broken']
   });
 }

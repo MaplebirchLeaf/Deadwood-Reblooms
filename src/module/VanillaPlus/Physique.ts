@@ -25,7 +25,7 @@ class Physique {
   public get outsideBreakAvailable(): boolean {
     if (V.combat === 1 || !V.VanillaPlus.traits.physique) return false;
     this.reset();
-    return (window as any).breakableSoftBinding();
+    return window.breakableSoftBinding();
   }
 
   public developer(): void {

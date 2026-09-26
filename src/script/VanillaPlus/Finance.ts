@@ -67,7 +67,8 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         // 原版只有日光浴，DoLP 还提供美白服务；两处价格判断都交给支付方式检查。
         {
           srcmatchgroup: /<<if \$money gte _price>>/g,
-          to: '<<if maplebirch.VP.finance.canPay(_price, "spa")>>'
+          to: '<<if maplebirch.VP.finance.canPay(_price, "spa")>>',
+          expected: 1
         }
       ],
       'Shopping Centre': [
@@ -222,7 +223,8 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         // 咖啡馆的固定价格判断统一检查现金、借记卡和信用卡；DoLP 另有耳黏液请求分支。
         {
           srcmatchgroup: /\$money gte (200|300|500|600|700|1000|5000)\b/g,
-          to: 'maplebirch.VP.finance.canPay($1, "cafe")'
+          to: 'maplebirch.VP.finance.canPay($1, "cafe")',
+          expected: 13
         }
       ],
       'Gwylan Ocean Breeze Watch': [
@@ -327,7 +329,8 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         // Gwylan 的菜单价格判断支持现金与银行卡；DoLP 还加入蜂蜜面包。
         {
           srcmatchgroup: /\$money gte (200|300|500|600|700|1000|5000)\b/g,
-          to: 'maplebirch.VP.finance.canPay($1, "cafe")'
+          to: 'maplebirch.VP.finance.canPay($1, "cafe")',
+          expected: 7
         }
       ],
       'Widgets Arcade': [

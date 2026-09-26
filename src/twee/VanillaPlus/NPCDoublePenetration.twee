@@ -45,15 +45,6 @@
   <</for>>
 <</nobr>><</widget>>
 
-<<widget 'deadwood-reblooms-double-leglock-status'>>
-  <<set _NPCDoubleLegLockStatus to maplebirch.VP.NPCDoublePenetration.playerLegLock>>
-  <<if _NPCDoubleLegLockStatus>>
-    <span @class="(_args[0] ? 'lewd' : ($lastOptions.feet isnot _feetOptions or _feetGold is true ? 'gold' : ''))">
-      <<if _args[0]>><<lanSwitch 'As you climax, you tighten your legs around ' '高潮时，你用腿更紧地锁住了'>><<else>><<lanSwitch 'Your legs are locked around ' '你用腿锁住了'>><</if>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockStatus.targets>><<lanSwitch '.' '。'>>
-    </span>
-  <</if>>
-<</widget>>
-
 <!-- 双腿锁定、持续和解除操作全部插入者，并沿用原版腿部技能与性行为控制判定。 -->
 <<widget 'deadwood-reblooms-double-leglock-effect'>>
   <<set _NPCDoubleLegLockAction to _args[0]>>
@@ -87,26 +78,27 @@
       <</if>>
       <span @class="(_NPCDoubleLegLockKeep ? 'lewd' : 'lblue')">
         <<if _NPCDoubleLegLockKeep>>
-          <<lanSwitch 'You keep every penetrator locked against you with your legs, leaving no one room to pull away.' '你继续用腿锁住所有插入者，不让任何人抽身。'>>
+          <<lanSwitch 'You keep ' '你继续用腿'>><<if $position is 'missionary'>><<lanSwitch 'your legs wrapped around ' '缠住了'>><<else>><<lanSwitch 'pushing back against ' '向后压住了'>><</if>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch ', leaving none of them room to pull away.' '，不让任何人抽身。'>>
         <<else>>
-          <<lanSwitch 'You lock every penetrator against you with your legs, preventing them from pulling out.' '你用腿锁住所有插入者，使他们无法抽出。'>>
+          <<lanSwitch 'You ' '你用腿'>><<if $position is 'missionary'>><<lanSwitch 'wrap your legs around ' '缠住了'>><<else>><<lanSwitch 'push back against ' '向后压住了'>><</if>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch ', preventing any of them from pulling out.' '，不让任何人抽出。'>>
         <</if>>
       </span>
       <<thighstat>>
     <<elseif $orgasmdown gte 1>>
       <<for _NPCDoubleLegLockTarget range _NPCDoubleLegLockTargets>><<sex 5 'genitals' _NPCDoubleLegLockTarget>><</for>><<set $speechleglock to 1>>
-      <span class="lewd"><<lanSwitch 'You tighten your legs around all of them as you climax, keeping them from pulling away.' '你高潮时用腿更紧地锁住所有人，不让他们抽身。'>></span>
+      <span class="lewd"><<lanSwitch 'As you climax, you ' '高潮时，你用腿更用力地'>><<if $position is 'missionary'>><<lanSwitch 'clench around ' '缠住了'>><<else>><<lanSwitch 'push back against ' '向后压住了'>><</if>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch ', preventing any of them from pulling away.' '，不让任何人抽身。'>></span>
     <<else>>
       <<set $feetactiondefault to _NPCDoubleLegLockAction>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.VP.NPCDoublePenetration.clearPlayerLegLock()>>
       <<if _NPCDoubleLegLockKeep>>
-        <span class="blue"><<lanSwitch 'You try to keep all of them locked with your legs, but they pull free.' '你试图继续用腿锁住所有人，但他们还是挣脱了。'>></span>
+        <span class="blue"><<lanSwitch 'You try to keep hold of ' '你试图继续用腿锁住'>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch ', but your hold fails.' '，但没能继续困住任何人。'>></span>
       <<else>>
-        <<lanSwitch 'You try to lock all of them with your legs, but they pull free.' '你试图用腿锁住所有人，但他们还是挣脱了。'>>
+        <<lanSwitch 'You try to lock ' '你试图用腿锁住'>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch ', but your hold fails.' '，但没能困住任何人。'>>
       <</if>>
     <</if>>
   <<elseif _NPCDoubleLegLockAction is 'NPCDoubleLegLockRelease'>>
+    <<set _NPCDoubleLegLockTargets to $VanillaPlus.npcDoublePenetration and $VanillaPlus.npcDoublePenetration.playerLegLock ? $VanillaPlus.npcDoublePenetration.playerLegLock.targets : []>>
     <<set $feetactiondefault to 'NPCDoubleLegLockRelease'>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.VP.NPCDoublePenetration.clearPlayerLegLock()>>
-    <<lanSwitch 'You release all of them from your legs.' '你松开双腿，放开了所有人。'>>
+    <<lanSwitch 'You release ' '你松开双腿，放开了'>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch '.' '。'>>
   <</if>>
 <</widget>>
 
@@ -123,22 +115,16 @@
     <<combatpromiscuity5>>
     <<set $_NPCDoubleRecipient to $NPCList[$_NPCDouble.recipient]>>
     <<set $_NPCDoublePartner to $NPCList[$_NPCDouble.partner]>>
-    <<set $_NPCDoubleRecipientName to lanSwitch(
-      $_NPCDoubleRecipient.fullDescription,
-      $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription
-    )>>
-    <<set $_NPCDoublePartnerName to lanSwitch(
-      $_NPCDoublePartner.fullDescription,
-      $_NPCDoublePartner.fullDescription_CN || $_NPCDoublePartner.fullDescription
-    )>>
+    <<set $_NPCDoubleRecipientName to lanSwitch( $_NPCDoubleRecipient.fullDescription, $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription )>>
+    <<set $_NPCDoublePartnerName to lanSwitch( $_NPCDoublePartner.fullDescription, $_NPCDoublePartner.fullDescription_CN || $_NPCDoublePartner.fullDescription )>>
     <<set $_NPCDoubleHole to $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>
     <<set $_NPCDoubleHoleCN to $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>
     <<personselect $_NPCDouble.recipient>>
     <<language>>
       <<option 'EN'>>
-        You drive in time with <<print $_NPCDoublePartnerName>>, taking pleasure in the two shafts moving together inside <<print $_NPCDoubleRecipientName+"'s "+$_NPCDoubleHole>>.
+        You drive in time with <<print $_NPCDoublePartnerName>>, <span class="lewd">taking pleasure in the two shafts moving together</span> inside <<print $_NPCDoubleRecipientName+"'s "+$_NPCDoubleHole>>.
       <<option 'CN'>>
-        你主动挺身，和<<print $_NPCDoublePartnerName>>一同抽插，让两根肉棒在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDoubleHoleCN>>里一同进出。
+        你主动挺身，和<<print $_NPCDoublePartnerName>>一同抽插，<span class="lewd">享受两根肉棒在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDoubleHoleCN>>里一同挤磨</span>。
     <</language>>
     <<submission 5>>
     <<sexControl 5 `currentSkillValue("penileskill")` $_NPCDouble.recipient $_NPCDouble.partner>>
@@ -157,10 +143,7 @@
   <<if $_NPCDoubleJoined>>
     <<set $_NPCDoublePrimary to $_NPCDoubleOrifice is 'vagina' ? $vaginatarget : $anustarget>>
     <<set $_NPCDoublePrimaryNPC to $NPCList[$_NPCDoublePrimary]>>
-    <<set $_NPCDoublePrimaryName to lanSwitch(
-      $_NPCDoublePrimaryNPC.fullDescription,
-      $_NPCDoublePrimaryNPC.fullDescription_CN || $_NPCDoublePrimaryNPC.fullDescription
-    )>>
+    <<set $_NPCDoublePrimaryName to lanSwitch( $_NPCDoublePrimaryNPC.fullDescription, $_NPCDoublePrimaryNPC.fullDescription_CN || $_NPCDoublePrimaryNPC.fullDescription )>>
     <<if $NPCList[$_NPCDoublePartner].condom and $NPCList[$_NPCDoublePartner].condom.willUse is true and $NPCList[$_NPCDoublePartner].condom.worn is false and !$NPCList[$_NPCDoublePartner].penisdesc.includes('strap-on')>>
       <<if $NPCList[$_NPCDoublePartner].chastity.penis.includes('chastity')>>
         <<language>>
@@ -207,10 +190,7 @@
   <<set $_NPCDoubleStarted to maplebirch.VP.NPCDoublePenetration.begin($penistarget, $_NPCDoublePartner, $_NPCDoubleOrifice)>>
   <<if $_NPCDoubleStarted>>
     <<set $_NPCDoubleRecipient to $NPCList[$VanillaPlus.npcDoublePenetration.recipient]>>
-    <<set $_NPCDoubleRecipientName to lanSwitch(
-      $_NPCDoubleRecipient.fullDescription,
-      $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription
-    )>>
+    <<set $_NPCDoubleRecipientName to lanSwitch( $_NPCDoubleRecipient.fullDescription, $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription )>>
     <<if $NPCList[$_NPCDoublePartner].condom and $NPCList[$_NPCDoublePartner].condom.willUse is true and $NPCList[$_NPCDoublePartner].condom.worn is false and !$NPCList[$_NPCDoublePartner].penisdesc.includes('strap-on')>>
       <<if $NPCList[$_NPCDoublePartner].chastity.penis.includes('chastity')>>
         <<language>>
@@ -236,16 +216,16 @@
       <<if $_NPCDoubleOrifice is 'vagina'>>
         <<language>>
           <<option 'EN'>>
-            <<He>> pushes <<his>> penis in alongside yours. <<print $_NPCDoubleRecipientName+"'s">> pussy stretches around both cocks, squeezing them tightly together as they thrust.
+            <<He>> pushes <<his>> penis in alongside yours. <<print $_NPCDoubleRecipientName+"'s">> <span class="pink">pussy stretches around both cocks</span>, squeezing them tightly together as they thrust.
           <<option 'CN'>>
-            <<He>>将肉棒贴着你的肉棒顶了进去。<<print $_NPCDoubleRecipientName>>的小穴被两根肉棒撑开，紧紧夹着你们一同抽插。
+            <<He>>将肉棒贴着你的肉棒顶了进去。<<print $_NPCDoubleRecipientName>>的<span class="pink">小穴被两根肉棒撑开</span>，紧紧夹着你们一同抽插。
         <</language>>
       <<else>>
         <<language>>
           <<option 'EN'>>
-            <<He>> pushes <<his>> penis in alongside yours. <<print $_NPCDoubleRecipientName+"'s">> anus stretches around both cocks, squeezing them tightly together as they thrust.
+            <<He>> pushes <<his>> penis in alongside yours. <<print $_NPCDoubleRecipientName+"'s">> <span class="pink">anus stretches around both cocks</span>, squeezing them tightly together as they thrust.
           <<option 'CN'>>
-            <<He>>将肉棒贴着你的肉棒顶了进去。<<print $_NPCDoubleRecipientName>>的菊穴被两根肉棒撑开，紧紧夹着你们一同抽插。
+            <<He>>将肉棒贴着你的肉棒顶了进去。<<print $_NPCDoubleRecipientName>>的<span class="pink">菊穴被两根肉棒撑开</span>，紧紧夹着你们一同抽插。
         <</language>>
       <</if>>
     <<else>>
@@ -264,30 +244,27 @@
   <<if maplebirch.VP.NPCDoublePenetration.update()>>
     <<set $_NPCDouble to $VanillaPlus.npcDoublePenetration>>
     <<set $_NPCDoubleRecipient to $NPCList[$_NPCDouble.recipient]>>
-    <<set $_NPCDoubleRecipientName to lanSwitch(
-      $_NPCDoubleRecipient.fullDescription,
-      $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription
-    )>>
+    <<set $_NPCDoubleRecipientName to lanSwitch( $_NPCDoubleRecipient.fullDescription, $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription )>>
     <<if $_NPCDouble.stage is 'penetrated'>>
       <<language>>
         <<option 'EN'>>
-          <<He_Short>> keeps close beside you, <<his>> hips driving in the same rough rhythm as both cocks grind inside <<print $_NPCDoubleRecipientName+"'s">> <<print $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>.
+          <<He_Short>> keeps close beside you, <<his>> hips driving in the same rough rhythm as <span class="pink">both cocks grind inside <<print $_NPCDoubleRecipientName+"'s">> <<print $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>></span>.
         <<option 'CN'>>
-          <<He_Short>>紧贴在你身旁，胯部随着你的动作一同挺动，两根肉棒在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>里挤磨。
+          <<He_Short>>紧贴在你身旁，胯部随着你的动作一同挺动，<span class="pink">两根肉棒在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>里挤磨</span>。
       <</language>>
     <<elseif $_NPCDouble.stage is 'imminent'>>
       <<language>>
         <<option 'EN'>>
-          <<He_Short>> crowds against you and pushes harder, <<his>> tip squeezing beside yours at <<print $_NPCDoubleRecipientName+"'s">> <<print $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>.
+          <<He_Short>> crowds against you and pushes harder, <span class="purple"><<his>> tip squeezing beside yours at <<print $_NPCDoubleRecipientName+"'s">> <<print $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>></span>.
         <<option 'CN'>>
-          <<He_Short>>贴着你继续用力，龟头抵着你的肉棒，一同挤向<<print $_NPCDoubleRecipientName>>的<<print $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>。
+          <<He_Short>>贴着你继续用力，<span class="purple">龟头抵着你的肉棒，一同挤向<<print $_NPCDoubleRecipientName>>的<<print $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>></span>。
       <</language>>
     <<else>>
       <<language>>
         <<option 'EN'>>
-          <<He_Short>> grinds <<his>> tip against yours at <<print $_NPCDoubleRecipientName+"'s">> <<print $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>, searching for room to press in beside you.
+          <<He_Short>> <span class="purple">grinds <<his>> tip against yours at <<print $_NPCDoubleRecipientName+"'s">> <<print $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>></span>, searching for room to press in beside you.
         <<option 'CN'>>
-          <<He_Short>>把龟头贴着你的肉棒，在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>口来回磨蹭，寻找与你一同挤进去的空隙。
+          <<He_Short>><span class="purple">把龟头贴着你的肉棒，在<<print $_NPCDoubleRecipientName>>的<<print $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>口来回磨蹭</span>，寻找与你一同挤进去的空隙。
       <</language>>
     <</if>>
   <</if>>
@@ -298,10 +275,7 @@
   <<set $_NPCDouble to $VanillaPlus.npcDoublePenetration>>
   <<set $_NPCDoubleRecipient to $NPCList[$_NPCDouble.recipient]>>
   <<set $_NPCDoublePartner to $NPCList[$_NPCDouble.partner]>>
-  <<set $_NPCDoubleRecipientName to lanSwitch(
-    $_NPCDoubleRecipient.fullDescription,
-    $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription
-  )>>
+  <<set $_NPCDoubleRecipientName to lanSwitch( $_NPCDoubleRecipient.fullDescription, $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription )>>
   <<set $_NPCDoubleHole to $_NPCDouble.orifice is 'vagina' ? 'pussy' : 'anus'>>
   <<set $_NPCDoubleHoleCN to $_NPCDouble.orifice is 'vagina' ? '小穴' : '菊穴'>>
   <<set $_NPCDoubleDepth to $_NPCDouble.stage is 'penetrated' ? 'deep' : $_NPCDouble.stage is 'imminent' ? 'imminent' : 'outside'>>
@@ -340,16 +314,6 @@
           <<He>>还没能完全挤进去便低吼着射了出来，浓稠的精液溅满<<print $_NPCDoubleRecipientName>>的<<print $_NPCDoubleHoleCN>>和你的肉棒。
       <</language>>
     <</if>>
-    <<npcPregnancyRoll
-      $_NPCDoubleRecipient.fullDescription
-      $_NPCDoubleRecipient.type
-      $_NPCDoublePartner.fullDescription
-      $_NPCDoublePartner.type
-      $_NPCDouble.orifice
-      $_NPCDoubleDepth
-      $location
-      1
-      $_NPCDouble.recipient
-    >>
+    <<npcPregnancyRoll $_NPCDoubleRecipient.fullDescription $_NPCDoubleRecipient.type $_NPCDoublePartner.fullDescription $_NPCDoublePartner.type $_NPCDouble.orifice $_NPCDoubleDepth $location 1 $_NPCDouble.recipient >>
   <</if>>
 <</widget>>

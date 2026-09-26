@@ -1,6 +1,10 @@
 // ./src/module/VanillaPlus/Beauty.ts
 
 class Beauty {
+  public get seductionBonus(): number {
+    return V.VanillaPlus?.traits.beauty ? 2000 : 0;
+  }
+
   private get unadorned(): boolean {
     const makeup = V.makeup ?? {};
     return !makeup.lipstick && !makeup.eyeshadow && !makeup.mascara && !makeup.blusher && !makeup.browscolour && !makeup.concealer && !makeup.eyelenses?.left && !makeup.eyelenses?.right;
@@ -23,10 +27,6 @@ class Beauty {
       this.unadorned &&
       !V.worn.face.type.includes('mask')
     );
-  }
-
-  public complete(): void {
-    if (this.unlock) V.VanillaPlus.lock.beauty = true;
   }
 
   public get max(): boolean {

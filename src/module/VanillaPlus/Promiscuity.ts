@@ -1,6 +1,5 @@
 // ./src/module/VanillaPlus/Promiscuity.ts
 
-type BodyActions = Partial<Record<'hands' | 'feet' | 'mouth' | 'penis' | 'vagina' | 'anus' | 'chest' | 'thigh', unknown>>;
 type PenisDestination = 'vagina' | 'anus';
 
 type PromiscuityAction =
@@ -23,8 +22,6 @@ type PromiscuityAction =
   | 'offer-anus-to-penis';
 
 class Promiscuity {
-  private readonly bodyParts: Array<keyof BodyActions> = ['hands', 'feet', 'mouth', 'penis', 'vagina', 'anus', 'chest', 'thigh'];
-
   private npc(index: number) {
     const target = Number(index);
     const npc = V.NPCList?.[target];
@@ -41,23 +38,6 @@ class Promiscuity {
 
   public get mastered(): boolean {
     return !!V.VanillaPlus.traits.promiscuity;
-  }
-
-  private isVoluntary(action: unknown): boolean {
-    if (Array.isArray(action)) return action.some(value => this.isVoluntary(value));
-    if (typeof action !== 'string' || !action || action === '0') return false;
-    return !/(?:rest|pull|resist|escape|bite|headbutt|hit|kick|slap|punch|protect|cover|struggle|stop|stifle|ask|speak|noises|letout)/i.test(action);
-  }
-
-  public record(actions: BodyActions): boolean {
-    const progress = V.VanillaPlus.promiscuity;
-    let recorded = false;
-    for (const [part, action] of Object.entries(actions)) {
-      if (!this.isVoluntary(action)) continue;
-      progress[part as keyof BodyActions] = true;
-      recorded = true;
-    }
-    return recorded;
   }
 
   // 原版用 0 同时表示“部位空闲”和“并不存在”；主动动作还要确认 NPC 确实拥有该部位。
@@ -361,20 +341,7 @@ class Promiscuity {
   }
 
   public get ready(): boolean {
-    const progress = V.VanillaPlus.promiscuity;
-    const genitals = (!V.player.penisExist || progress.penis) && (!V.player.vaginaExist || progress.vagina);
-    return (
-      V.promiscuity >= window.maplebirch.VP.normalCeiling('promiscuity') &&
-      V.exhibitionism >= window.maplebirch.VP.normalCeiling('exhibitionism') &&
-      V.deviancy >= window.maplebirch.VP.normalCeiling('deviancy') &&
-      progress.hands &&
-      progress.feet &&
-      progress.mouth &&
-      progress.anus &&
-      progress.chest &&
-      progress.thigh &&
-      genitals
-    );
+    return V.promiscuity >= window.maplebirch.VP.normalCeiling('promiscuity') && V.exhibitionism >= window.maplebirch.VP.normalCeiling('exhibitionism') && V.deviancy >= window.maplebirch.VP.normalCeiling('deviancy');
   }
 
   public get unlock(): boolean {
@@ -387,7 +354,6 @@ class Promiscuity {
 
   public developer(): void {
     V.VanillaPlus.lock.promiscuity = false;
-    for (const part of this.bodyParts) V.VanillaPlus.promiscuity[part] = true;
     V.promiscuity = window.maplebirch.VP.normalCeiling('promiscuity');
     V.exhibitionism = Math.max(V.exhibitionism, window.maplebirch.VP.normalCeiling('exhibitionism'));
     V.deviancy = Math.max(V.deviancy, window.maplebirch.VP.normalCeiling('deviancy'));

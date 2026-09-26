@@ -1,6 +1,11 @@
 // ./src/module/VanillaPlus/Exhibitionism.ts
 
 class Exhibitionism {
+  public get canRoamTown(): boolean {
+    if (!V.VanillaPlus || !window.maplebirch.VP.hasTrait('exhibitionism') || V.exposedRaw < 1) return false;
+    return V.exposedRaw >= 2 ? V.uncomfortable.nude === false : V.uncomfortable.underwear === false;
+  }
+
   public get unlock(): boolean {
     const exhibitionism = V.VanillaPlus.exhibitionism;
     return !V.VanillaPlus.lock.exhibitionism && V.exhibitionism >= window.maplebirch.VP.normalCeiling('exhibitionism') && exhibitionism.swimming && exhibitionism.ballroom && exhibitionism.highStreet;

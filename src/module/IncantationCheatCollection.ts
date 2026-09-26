@@ -286,9 +286,9 @@ class IncantationCheatCollection {
       const mm: string = String(now.getMinutes()).padStart(2, '0');
       const ss: string = String(now.getSeconds()).padStart(2, '0');
       const datestamp: string = `${now.getFullYear()}${MM}${DD}-${hh}${mm}${ss}`;
-      const data: string = (window as any).LZString.compressToBase64(JSON.stringify(items));
+      const data: string = window.LZString.compressToBase64(JSON.stringify(items));
       const saveName: string = `IncantationCheatCollection-${datestamp}.cheat`;
-      (window as any).saveAs(new Blob([data], { type: 'text/plain;charset=UTF-8' }), saveName);
+      window.saveAs(new Blob([data], { type: 'text/plain;charset=UTF-8' }), saveName);
       this.showStatus(true, 'Export successful', '导出成功');
       return true;
     } catch (err) {
@@ -305,7 +305,7 @@ class IncantationCheatCollection {
     let importedItems: CheatItem[] = [];
     try {
       const text: string = await file.text();
-      const json: string | null = (window as any).LZString.decompressFromBase64(text.trim());
+      const json: string | null = window.LZString.decompressFromBase64(text.trim());
       if (!json) {
         this.showStatus(false, 'Invalid import file', '导入文件格式错误');
         return false;
