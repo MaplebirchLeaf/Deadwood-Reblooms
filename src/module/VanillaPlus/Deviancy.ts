@@ -5,20 +5,20 @@ import type VanillaPlus from '../VanillaPlus';
 class Deviancy {
   public constructor(private readonly vanillaPlus: VanillaPlus) {}
 
-  private get mirrors(): Record<'home' | 'farm' | 'tower', boolean> {
-    return (V.VanillaPlus.deviancy.mirrors ??= { home: false, farm: false, tower: false });
+  private get mirrors(): Record<'home' | 'farm' | 'tower' | 'temple', boolean> {
+    return (V.VanillaPlus.deviancy.mirrors ??= { home: false, farm: false, tower: false, temple: false });
   }
 
-  public discover(mirror: 'home' | 'farm' | 'tower'): void {
+  public discover(mirror: 'home' | 'farm' | 'tower' | 'temple'): void {
     this.mirrors[mirror] = true;
   }
 
-  public discovered(mirror: 'home' | 'farm' | 'tower'): boolean {
+  public discovered(mirror: 'home' | 'farm' | 'tower' | 'temple'): boolean {
     return V.VanillaPlus.traits.deviancy && this.mirrors[mirror] === true;
   }
 
   public get mirrorOpen(): boolean {
-    return V.VanillaPlus.traits.deviancy && Time.hour === 3 && V.daily?.mirrorTentacles === 1;
+    return V.VanillaPlus.traits.deviancy && Time.hour === 3 && V.settings.tentaclesEnabled && (V.hallucinations >= 2 || V.daily?.mirrorTentacles === 1);
   }
 
   public get canConduct(): boolean {
@@ -55,7 +55,7 @@ class Deviancy {
     V.VanillaPlus.lock.deviancy = false;
     V.VanillaPlus.deviancy.wildsong = true;
     V.VanillaPlus.deviancy.conducted = true;
-    Object.assign(this.mirrors, { home: true, farm: true, tower: true });
+    Object.assign(this.mirrors, { home: true, farm: true, tower: true, temple: true });
     V.deviancy = this.vanillaPlus.normalCeiling('deviancy');
   }
 }

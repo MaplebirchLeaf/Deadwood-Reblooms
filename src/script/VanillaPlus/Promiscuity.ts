@@ -26,6 +26,21 @@ export default function (maplebirch: typeof window.maplebirch) {
     if (!npc || npc.stance === 'topface') return false;
     return ![0, undefined].includes(npc.location?.genitals) || npc.location?.head === 'genitals';
   };
+  const hasDistinctDoubleTargets = (first: number, second: number) => {
+    const primary = target(first);
+    const partner = target(second);
+    return (
+      Number.isInteger(primary) && Number.isInteger(partner) && primary !== partner &&
+      [primary, partner].every(index => V.NPCList?.[index]?.active === 'active' && V.NPCList[index].stance !== 'defeated')
+    );
+  };
+  const canReceiveDouble = (orifice: 'vagina' | 'anus') => {
+    if (!active()) return false;
+    const second = orifice === 'vagina' ? V.vaginadoubletarget : V.anusdoubletarget;
+    const state = orifice === 'vagina' ? V.vaginastate : V.anusstate;
+    const enabled = orifice === 'vagina' ? V.settings.vaginalDoubleEnabled : V.settings.analDoubleEnabled;
+    return second != null && enabled && state === 'penetrated' && maplebirch.VP.NPCDoublePenetration.canJoinPlayer(target(second), orifice);
+  };
   const handTarget = (hand: GuideHand) => target(hand === 'left' ? V.lefttarget : V.righttarget);
   const handAvailable = (hand: GuideHand) => T?.[`${hand}Options`] === 'free';
   const canTongueKiss = () => {
@@ -111,22 +126,24 @@ export default function (maplebirch: typeof window.maplebirch) {
     {
       id: 'promiscuity-receive-vaginal',
       actionType: 'vaginaaction',
-      cond: () => active() && needsExtraAction(V.vaginatarget) && maplebirch.VP.promiscuity.canDirect('penetrate-vagina', target(V.vaginatarget)),
-      display: () => text('action:straddleVaginal', { name: targetName(V.vaginatarget) }),
+      cond: () => canReceiveDouble('vagina'),
+      display: () => text('action:straddleVaginal', { name: targetName(V.vaginadoubletarget) }),
       value: () => 'VanillaPlusPromiscuityReceiveVaginal',
       color: 'lustful',
+      difficulty: '<<vaginaldifficulty>> <<combatpromiscuous6>> <<combataware 4>>',
       order: 2,
-      effect: direct('vaginaaction to "vaginatopenis"', '$vaginatarget')
+      effect: '<<if $vaginastate is "penetrated" and maplebirch.VP.NPCDoublePenetration.canJoinPlayer(Number($vaginadoubletarget), "vagina")>><<set $vaginaaction to "vaginatopenisdouble">><</if>>'
     },
     {
       id: 'promiscuity-receive-anal',
       actionType: 'anusaction',
-      cond: () => active() && needsExtraAction(V.anustarget) && maplebirch.VP.promiscuity.canDirect('penetrate-anus', target(V.anustarget)),
-      display: () => text('action:straddleAnal', { name: targetName(V.anustarget) }),
+      cond: () => canReceiveDouble('anus'),
+      display: () => text('action:straddleAnal', { name: targetName(V.anusdoubletarget) }),
       value: () => 'VanillaPlusPromiscuityReceiveAnal',
       color: 'lustful',
+      difficulty: '<<analdifficulty>> <<combatpromiscuous6>> <<combataware 4>>',
       order: 2,
-      effect: direct('anusaction to "anustopenis"', '$anustarget')
+      effect: '<<if $anusstate is "penetrated" and maplebirch.VP.NPCDoublePenetration.canJoinPlayer(Number($anusdoubletarget), "anus")>><<set $anusaction to "anustopenisdouble">><</if>>'
     },
     {
       id: 'promiscuity-press-vaginal',
@@ -181,6 +198,14 @@ export default function (maplebirch: typeof window.maplebirch) {
       order: 2,
       effect: '<<deadwood-reblooms-promiscuity-tongue-kiss>>'
     }
+  );
+
+  // 满级淫乱时由模组动作提供双插入口，结算仍调用原版双插效果；其他状态保留原版动作。
+  maplebirch.combat.CombatAction.modify(
+    { id: 'promiscuity-double-vaginal-straddle-targets', actionType: 'vaginaaction', value: 'vaginatopenisdouble', cond: () => !active() && hasDistinctDoubleTargets(V.vaginatarget, V.vaginadoubletarget) },
+    { id: 'promiscuity-double-anal-straddle-targets', actionType: 'anusaction', value: 'anustopenisdouble', cond: () => !active() && hasDistinctDoubleTargets(V.anustarget, V.anusdoubletarget) },
+    { id: 'promiscuity-double-vaginal-offer-targets', actionType: 'penisaction', value: 'penispussydouble', cond: () => hasDistinctDoubleTargets(V.penistarget, V.vaginatarget) },
+    { id: 'promiscuity-double-anal-offer-targets', actionType: ['penisaction', 'vaginaaction'], value: 'penisanusdouble', cond: () => hasDistinctDoubleTargets(V.penistarget, V.anustarget) }
   );
 
   // 左右手沿用原版目标下拉框，引导所选 NPC 的阴茎；动作结算前会再次检查目标与位置。

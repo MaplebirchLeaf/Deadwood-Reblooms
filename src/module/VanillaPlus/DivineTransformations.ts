@@ -5,6 +5,17 @@ interface DivineTransformationState {
   expungeUsed: boolean;
 }
 
+interface StruggleEnemy {
+  health: number;
+  satisfied: number;
+}
+
+interface Tentacle {
+  tentaclehealth: number;
+  tentaclehealthstart: number;
+  shaft: string;
+}
+
 class DivineTransformations {
   private static readonly ATTRIBUTE_MULTIPLIER = 1.1;
   private static readonly ATTRIBUTE_BONUS = 0.1;
@@ -62,6 +73,14 @@ class DivineTransformations {
     return fixed + Math.floor(Math.max(0, Number(maximum) || 0) * rate);
   }
 
+  private get struggleEnemies(): StruggleEnemy[] {
+    return Object.values((V.struggle?.enemy ?? {}) as Record<string, StruggleEnemy>);
+  }
+
+  private get tentacles(): Tentacle[] {
+    return Object.values((V.tentacles ?? {}) as Record<string, Tentacle>);
+  }
+
   // 原版放逐的双手与满纯洁倍率在 passage 内结算；这里只提供每层的固定值与比例值。
   public banishDamage(maximum: unknown): number {
     return this.damage(10, 0.1, maximum);
@@ -76,8 +95,8 @@ class DivineTransformations {
   public canExpunge(encounter: DivineEncounter): boolean {
     if (!this.fallenAngel || V.combat !== 1 || this.state?.expungeUsed || V.mouthuse) return false;
     if (encounter === 'Default') return V.enemytype !== 'man' && Number(V.enemyhealth) > 0;
-    if (encounter === 'Struggle') return Object.values(V.struggle?.enemy ?? {}).some(enemy => Number(enemy?.health) > 0 && Number(enemy?.satisfied) < 1);
-    return Object.values(V.tentacles ?? {}).some(tentacle => Number(tentacle?.tentaclehealth) > 0 && tentacle?.shaft !== 'finished');
+    if (encounter === 'Struggle') return this.struggleEnemies.some(enemy => Number(enemy.health) > 0 && Number(enemy.satisfied) < 1);
+    return this.tentacles.some(tentacle => Number(tentacle.tentaclehealth) > 0 && tentacle.shaft !== 'finished');
   }
 
   // “清除”承袭原版堕天使以体内空洞抹除异物的表现，每场遭遇只能发动一次。
@@ -88,12 +107,12 @@ class DivineTransformations {
     if (encounter === 'Default') {
       V.enemyhealth = Math.max(0, Number(V.enemyhealth) - this.damage(5, 0.05, V.enemyhealthmax));
     } else if (encounter === 'Struggle') {
-      for (const enemy of Object.values(V.struggle.enemy)) {
-        if (Number(enemy?.health) > 0 && Number(enemy?.satisfied) < 1) enemy.health = Math.max(0, Number(enemy.health) - this.damage(1, 0.05, enemy.health));
+      for (const enemy of this.struggleEnemies) {
+        if (Number(enemy.health) > 0 && Number(enemy.satisfied) < 1) enemy.health = Math.max(0, Number(enemy.health) - this.damage(1, 0.05, enemy.health));
       }
     } else {
-      for (const tentacle of Object.values(V.tentacles)) {
-        if (Number(tentacle?.tentaclehealth) > 0 && tentacle?.shaft !== 'finished') {
+      for (const tentacle of this.tentacles) {
+        if (Number(tentacle.tentaclehealth) > 0 && tentacle.shaft !== 'finished') {
           tentacle.tentaclehealth = Math.max(0, Number(tentacle.tentaclehealth) - this.damage(5, 0.05, tentacle.tentaclehealthstart));
         }
       }

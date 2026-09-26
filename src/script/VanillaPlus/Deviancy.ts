@@ -24,12 +24,18 @@ export default function (maplebirch: typeof window.maplebirch) {
     cond: () => V.VanillaPlus != null && maplebirch.VP.deviancy.max && !V.feats.currentSave['Beyond Nature']
   });
 
-  const discover = (mirror: 'home' | 'farm' | 'tower') => `<<run maplebirch.VP.deviancy.discover('${mirror}')>>`;
+  const discover = (mirror: 'home' | 'farm' | 'tower' | 'temple') => `<<run maplebirch.VP.deviancy.discover('${mirror}')>>`;
 
   maplebirch.tool.addTo(
     'BeforeLinkZone',
     { widget: 'deadwood-reblooms-deviancy-mirror-exits', passage: 'Tentacle Plains' },
     { widget: 'deadwood-reblooms-deviancy-conduct-link', passage: 'Gwylan Ritual Select' }
+  );
+  // 诡异镜的“放逐”选项可能占据首位；入口始终紧邻原版“观察”选项。
+  maplebirch.tool.addTo(
+    'CustomLinkZone',
+    { widget: [0, 'deadwood-reblooms-deviancy-eerie-mirror-link 0'], passage: 'Eerie Mirror' },
+    { widget: [1, 'deadwood-reblooms-deviancy-eerie-mirror-link 1'], passage: 'Eerie Mirror' }
   );
 
   // 记录镜面探索与仪式结算，并扩展异种癖上限。
@@ -42,7 +48,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       'Farm Mirror': [
         // 在农场镜子执行 effects 后记录 farm 镜面发现状态，供后续镜面通路判断。
         { src: '<<effects>>', applyafter: discover('farm'), expected: 1 },
-        // 在原版 mirror 宏前插入农场镜面进入链接，保留原版镜像渲染与其他选项。
+        // 镜子菜单会局部重绘；链接区若插进菜单内部，会在重绘后消失。
         { src: '<<mirror>>', applybefore: '<<deadwood-reblooms-deviancy-mirror-enter-link "farm">>\n', expected: 1 }
       ],
       'Bird Tower Mirror': [
@@ -51,15 +57,14 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 在原版 mirror 宏前插入鸟塔镜面进入链接，不替换鸟塔自身的镜子内容。
         { src: '<<mirror>>', applybefore: '<<deadwood-reblooms-deviancy-mirror-enter-link "tower">>\n', expected: 1 }
       ],
+      'Temple Mirror': [
+        // 神殿床铺镜的原版 mirror 带显示文字，取共用前缀以兼容中英文原版。
+        { src: '<<effects>>', applyafter: discover('temple'), expected: 1 },
+        { src: '<<mirror ', applybefore: '<<deadwood-reblooms-deviancy-mirror-enter-link "temple">>\n', expected: 1 }
+      ],
       'Eerie Mirror': [
         // 在诡异镜执行 effects 后同样记录 home 镜面，兼容卧室的两种镜子 Passage。
-        { src: '<<effects>>', applyafter: discover('home'), expected: 1 },
-        // 在诡异镜原版标记图标前加入镜面进入链接，使入口位于原版操作列表中。
-        {
-          src: '<<crimeicon "mark">>',
-          applybefore: '<<deadwood-reblooms-deviancy-mirror-enter-link "home">>\n',
-          expected: 1
-        }
+        { src: '<<effects>>', applyafter: discover('home'), expected: 1 }
       ]
     },
     widgetPassage: {

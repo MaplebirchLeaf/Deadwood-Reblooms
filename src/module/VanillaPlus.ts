@@ -65,7 +65,8 @@ class VanillaPlus extends Module {
       mirrors: {
         home: false,
         farm: false,
-        tower: false
+        tower: false,
+        temple: false
       }
     },
     promiscuity: {

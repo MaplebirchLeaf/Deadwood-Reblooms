@@ -97,6 +97,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     widgetPassage: {
       'Widget displayLinks': [
         {
+          // 先扩充 link_table 再由原版 displayLinks 渲染；渲染后的链接区无法补做这一步。
           src: '<<widget "displayLinks">>',
           applyafter: '\n\t<<deadwood-reblooms-public-walk-links>>',
           expected: 1
