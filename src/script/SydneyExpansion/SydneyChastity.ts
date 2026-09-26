@@ -6,7 +6,7 @@ type PassagePatch = {
 
 export const sydneyChastityWidgetPassages: Record<string, PassagePatch[]> = {
   'Widgets Sydney': [
-    // 在神殿移除贞操带的原版后续判断前加入重新佩戴提议，不改变原版移除剧情条件。
+    // 提议属于共用 sydneyOptions 宏内部，Passage 链接区无法保持它在对话中的位置。
     {
       src: '<<if $location is "temple" and $sydneyChastityRemoveIntro>>',
       applybefore: '<<deadwood-reblooms-sydney-chastity-refit-link>>\n\t',

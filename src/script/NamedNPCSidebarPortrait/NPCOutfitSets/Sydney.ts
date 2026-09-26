@@ -12,6 +12,7 @@ const wardrobeKeys = [
   'monk_habit',
   'novice_nun_habit',
   'initiate_robes',
+  'pyjama',
   'sexy_nun_habit',
   'avowed_nun_habit',
   'confessor_robe',

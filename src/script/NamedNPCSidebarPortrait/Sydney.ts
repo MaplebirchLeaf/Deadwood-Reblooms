@@ -106,6 +106,9 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     wardrobe.wear('Sydney', 'temple', 'novice_nun_habit', () => C.npc?.Sydney?.pronoun !== 'm' && ['initiate', '见习教徒'].includes(V.sydney?.rank));
     wardrobe.wear('Sydney', 'temple', 'initiate_robes', () => C.npc?.Sydney?.pronoun === 'm' && ['initiate', '见习教徒'].includes(V.sydney?.rank));
 
+    // 宿舍里已就寝时使用睡衣；神殿守夜和日常差事仍穿神殿服装。
+    wardrobe.wear('Sydney', 'sleep', 'pyjama');
+
     // 告解室：只在原版选中 Sydney 告解事件后换上对应性别的告解员服装
     wardrobe.wear('Sydney', 'confessional', 'confessor_robe', () => C.npc?.Sydney?.pronoun === 'm');
     wardrobe.wear('Sydney', 'confessional', 'confessor_habit', () => C.npc?.Sydney?.pronoun !== 'm');
@@ -284,7 +287,11 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     // PC 作为忏悔者时，原版会在 Temple Confess Self 中把 $attendant 设为 Sydney。
     if (title.startsWith('Temple Confess Self') && V.attendant === 'Sydney') return 'confessional';
 
-    // VanillaPlus 课堂互动始终使用科学教室状态；换班与神殿叫醒场景保留各自地点。
+    // 悉尼拓展的宿舍、校车与课堂场景各用对应服装。
+    if (maplebirch.get('SydneyExpansion')) {
+      if (title.startsWith('Deadwood Reblooms Sydney Dorm')) return V.sydney_templeWork === 'sleep' ? 'sleep' : 'temple';
+      if (title === 'Deadwood Reblooms Sydney Halloween Ride') return 'class';
+    }
     if (['Deadwood Reblooms Sydney Science Study', 'Deadwood Reblooms Sydney Science Chat', 'Deadwood Reblooms Sydney Science Tease'].includes(title)) return 'science';
 
     // 明确剧情地点

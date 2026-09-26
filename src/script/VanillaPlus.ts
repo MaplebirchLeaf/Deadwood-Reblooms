@@ -9,9 +9,6 @@ import HandGrip from './VanillaPlus/HandGrip';
 import NPCDoublePenetration from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
-import SydneyChastity from './VanillaPlus/SydneyChastity';
-import SydneyConfession from './VanillaPlus/SydneyConfession';
-import SydneyScience from './VanillaPlus/SydneyScience';
 import VirginityRestoration from './VanillaPlus/VirginityRestoration';
 import Willpower from './VanillaPlus/Willpower';
 
@@ -49,9 +46,6 @@ export default function (maplebirch: typeof window.maplebirch) {
   Physique(maplebirch);
   Promiscuity(maplebirch);
   Willpower(maplebirch);
-  SydneyChastity(maplebirch);
-  SydneyConfession(maplebirch);
-  SydneyScience(maplebirch);
   VirginityRestoration(maplebirch);
 
   maplebirch.tool.patch.traits.add(

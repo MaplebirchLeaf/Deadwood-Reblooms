@@ -5,6 +5,7 @@ import DynamicMusic from './DynamicMusic';
 import NPCSidebarPortrait from './NPCSidebarPortrait';
 import VanillaPlus from './VanillaPlus';
 import LifeSimulation from './LifeSimulation';
+import SydneyExpansion from './SydneyExpansion';
 
 (function (maplebirch): void {
   'use strict';
@@ -16,5 +17,6 @@ import LifeSimulation from './LifeSimulation';
   if (maplebirch.get('DM')) DynamicMusic(maplebirch);
   if (maplebirch.get('NPCSidebarPortrait')) NPCSidebarPortrait(maplebirch);
   if (maplebirch.get('VP')) VanillaPlus(maplebirch);
+  if (maplebirch.get('SydneyExpansion')) SydneyExpansion(maplebirch);
   if (maplebirch.get('LS')) LifeSimulation(maplebirch);
 })(maplebirch);
