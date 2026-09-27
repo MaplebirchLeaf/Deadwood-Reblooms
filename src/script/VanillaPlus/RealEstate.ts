@@ -35,7 +35,14 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
-      'Danube Street': [{ src: '<<if $exposed lte 0 and Time.openingHours(2)>>', applybefore: '<<deadwood-reblooms-property-street>>\n\t\t', expected: 1 }],
+      'Danube Street': [
+        {
+          // DoLP 的精品店复用同一条件。只在温泉图标前插入住宅入口。
+          srcmatch: /<<if \$exposed lte 0 and Time\.openingHours\(2\)>>(?=\s*<<spaicon>>)/,
+          applybefore: '<<deadwood-reblooms-property-street>>\n\t\t',
+          expected: 1
+        }
+      ],
       "Robin's Room Entrance": [
         {
           src: '<<elseif _robin_location is "sleep">>',

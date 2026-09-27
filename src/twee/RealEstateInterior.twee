@@ -94,6 +94,12 @@
 	<</language>><br><br>
 	<<if $studyBooks is undefined>><<set $studyBooks to {rented: 'none', stolen: 'none'}>><</if>>
 	<<homeStudyOptions>>
+	<<if maplebirch.get('LS') and $LifeSimulation.school.role isnot 'student' and $daily.schoolStudySession isnot Time.days>>
+		<br><<schoolicon 'library'>><<lanLink '在家整理学生会的学习资料 (0:30)' 'Deadwood Reblooms Property School Study'>><<set $phase to 'solo'>><<pass 30>><</lanLink>><br>
+		<<if maplebirch.VP.realEstate.residentsHome(_property.id).length gt 0>>
+			<<socialiseicon>><<lanLink '请同住的恋人一起准备课后学习 (0:30)' 'Deadwood Reblooms Property School Study'>><<set $phase to 'together'>><<pass 30>><</lanLink>><br>
+		<</if>>
+	<</if>>
 	<br>
 	<<if _property.rooms.desk is _property.rooms.bedroom>>
 		<<lanLink '起身' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
@@ -103,6 +109,38 @@
 		<<lanLink '起身' 'Deadwood Reblooms Property Landing'>><</lanLink>>
 	<</if>>
 <</if>>
+
+:: Deadwood Reblooms Property School Study []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property or !maplebirch.VP.realEstate.owns(_property.id) or maplebirch.VP.realEstate.managementFor(_property.id).rented or !maplebirch.get('LS')>>
+	<<lanSwitch 'The desk is unavailable.' '书桌暂时不能用。'>><br><br>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>><<effects>>
+	<<set _resident to maplebirch.VP.realEstate.residentsHome(_property.id)[0]>>
+	<<set _prepared to currentSkillValue('maths') gte 500 or ($phase is 'together' and _resident)>>
+	<<if maplebirch.LS.school.organiseStudySession(_prepared)>>
+		<<language>>
+			<<option 'EN'>>You spread lesson notes and the student council's plan across the desk. The lamp leaves enough room to sort each subject into a separate pile.
+			<<option 'CN'>>你把课堂笔记与学生会的计划摊在书桌上。灯下的地方够大，每门课都能分成单独一叠。
+		<</language>><br><br>
+		<<if $phase is 'together' and _resident>>
+			<<npc _resident.id>><<person1>>
+			<<switch _resident.id>>
+				<<case 'Robin'>><<lanSwitch 'Robin checks the sums against the shop ledger and spots the page you had skipped.' '罗宾拿店里的账本对照算式，找出你漏掉的一页。'>>
+				<<case 'Whitney'>><<lanSwitch 'Whitney calls the plan dull, then draws a bold heading that the other students will actually notice.' '惠特尼嫌计划写得太闷，却替你画了个其他学生一定会注意的标题。'>>
+				<<case 'Kylar'>><<lanSwitch 'Kylar reads each instruction twice and marks where a nervous student might need more time.' '凯拉尔把每条说明读了两遍，标出容易让紧张的学生跟不上的地方。'>>
+				<<case 'Sydney'>><<lanSwitch 'Sydney compares the notes with the temple library copy and quietly corrects a citation.' '悉尼拿神殿图书馆的抄本对照笔记，悄悄改好一处引文。'>>
+			<</switch>><br>
+			<<npcincr _resident.id love 1>><<glove>>
+		<<elseif currentSkillValue('maths') gte 500>>
+			<<lanSwitch 'You catch a mistake in the figures before copying the plan for the other students.' '你在誊写给其他学生之前，发现一处算错的数字。'>><br>
+		<<else>>
+			<<lanSwitch 'The outline is usable, though you leave the difficult examples for a teacher to check.' '大纲已经能用，难题部分还要请老师核对。'>><br>
+		<</if>>
+		<<deadwood-reblooms-life-simulation-school-feedback>>
+	<</if>>
+<</if>>
+<br><<deskchairicon>><<lanLink '返回书桌' 'Deadwood Reblooms Property Desk'>><</lanLink>>
 
 :: Deadwood Reblooms Property Mirror []
 <<set _property to maplebirch.VP.realEstate.current>>

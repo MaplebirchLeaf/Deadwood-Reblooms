@@ -409,7 +409,8 @@ export default function (maplebirch: typeof window.maplebirch) {
         },
         // PC 成功跨坐第二根阴茎、形成肛门双插时，将原版五级成长提升为六级成长。
         {
-          srcmatch: /<<set \$anusaction to 0>><<submission 10>><<analskilluse>><<combatpromiscuity5>>(?=\s*<<if combatSkillCheck\("anal", \$anusdoubletarget\)>>)/,
+          srcmatch:
+            /<<set \$anusaction to 0>><<submission 10>><<analskilluse>><<combatpromiscuity5>>(?=\s*<<if (?:\$combatExtended\.reverseRapeStart is 1 or )?combatSkillCheck\("anal", \$anusdoubletarget\)>>)/,
           to: '<<set $anusaction to 0>><<submission 10>><<analskilluse>><<combatpromiscuity6>>',
           expected: 1
         },
