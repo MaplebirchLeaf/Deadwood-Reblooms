@@ -51,22 +51,22 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     for (const event of events ?? []) {
       if (event.name === 'school day') {
         const condition = event.condition;
-        event.condition = () => V.LifeSimulation.school.role !== 'president' && condition.call(event);
+        event.condition = () => !V.LifeSimulation.school.attendanceExempt && condition.call(event);
       }
       if (event.name === 'tomorrow') {
-        event.text = `<<if $LifeSimulation.school.role is 'president'>><<lanSwitch 'You may attend school tomorrow.' '明天你可以自愿上课。'>><<else>>${event.text}<</if>>`;
+        event.text = `<<if $LifeSimulation.school.attendanceExempt>><<lanSwitch 'You may attend school tomorrow.' '明天你可以自愿上课。'>><<else>>${event.text}<</if>>`;
       }
       if (event.name === 'no school') {
-        event.text = `<<if $LifeSimulation.school.role is 'president' and Time.schoolDay>><<lanSwitch 'You may attend lessons today.' '今天你可以自愿上课。'>><<else>>${event.text}<</if>>`;
+        event.text = `<<if $LifeSimulation.school.attendanceExempt and Time.schoolDay>><<lanSwitch 'You may attend lessons today.' '今天你可以自愿上课。'>><<else>>${event.text}<</if>>`;
       }
     }
   });
 
-  // 免听凭证只豁免就任后的旷课结算，原版每天的成绩变化照常执行。
+  // 贝利签发的免听凭证只豁免旷课结算，原版每天的成绩变化照常执行。
   const missedLessons = new Array<{ total: number; message: number; subjects: Record<string, number> } | null>();
   maplebirch.dynamic.regTimeEvent('onBefore', 'life-simulation-school-attendance-before', {
     action: () => {
-      if (V.LifeSimulation?.school?.role !== 'president') {
+      if (!V.LifeSimulation?.school?.attendanceExempt) {
         missedLessons.push(null);
         return;
       }
@@ -93,6 +93,13 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.patch.traits.add(
     {
       title: 'School Traits',
+      name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:attendancePass:name'),
+      colour: 'green',
+      has: () => V.LifeSimulation.school.attendanceExempt && V.LifeSimulation.school.role === 'student',
+      text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:attendancePass:text')
+    },
+    {
+      title: 'School Traits',
       name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:prefect:name'),
       colour: 'green',
       has: () => V.LifeSimulation.school.role === 'prefect',
@@ -104,15 +111,29 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       colour: 'green',
       has: () => V.LifeSimulation.school.role === 'president',
       text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:president:text')
-    },
-    {
-      title: 'School Traits',
-      name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:attendancePass:name'),
-      colour: 'green',
-      has: () => V.LifeSimulation.school.role === 'president',
-      text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:attendancePass:text')
     }
   );
+
+  maplebirch.tool.inject({
+    locationPassage: {
+      "Bailey's Office": [
+        {
+          // 贝利只有 7–9 点在办公室；入口仍受原版 _options 限制，避免打断惩罚场景。
+          src: '<<baileyRentReclaimOption>> /* Bailey Confiscation System */',
+          applybefore: '<<deadwood-reblooms-life-simulation-attendance-link>>\n',
+          expected: 1
+        }
+      ],
+      Flats: [
+        {
+          // 使用原版公寓走廊的普通链接分支；随机事件发生时不会提前展示入口。
+          srcmatch: /<<barbicon>><<link \[\[[^\]\n]+\|Barb Street]]>><<\/link>>/,
+          applybefore: '<<deadwood-reblooms-life-simulation-bailey-flat-link>>\n',
+          expected: 1
+        }
+      ]
+    }
+  });
 
   maplebirch.dynamic.regStateEvent('gate', 'life-simulation-school-clothes', {
     output: 'deadwood-reblooms-life-simulation-school-restore-clothes',
@@ -126,6 +147,11 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   const schoolPassages: Record<string, PassagePatch[]> = {
     'School Front Courtyard': [
       {
+        src: '$detention gte 1 and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
+        to: '$detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
+        expected: 2
+      },
+      {
         // 仅接管通往 Hallways 的原版一分钟入口，保留中庭其余事件与离校选项。
         srcmatch: /<<entranceicon>><<link \[\[[^\]\n]+\|Hallways]]>><<pass 1>><<\/link>>/,
         to: '<<deadwood-reblooms-life-simulation-school-duty-link>><<deadwood-reblooms-life-simulation-school-entry>>',
@@ -134,9 +160,21 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     ],
     Hallways: [
       {
+        src: '$detention gte 1 and $daily.school.detentionAttended isnot 1>>\n\t\t<<else>>',
+        to: '$detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1>>\n\t\t<<else>>',
+        expected: 1
+      },
+      {
         // 储物柜前的链接数随留堂和特殊事件变化，按原版储物柜定位公告栏。
         srcmatch: /<<lockericon>><<link \[\[[^\]\n]+\|School Lockers]]>/,
         applybefore: '<<deadwood-reblooms-life-simulation-school-board-link>>',
+        expected: 1
+      }
+    ],
+    'Sydney Walk': [
+      {
+        src: '$location is "school" and $detention gte 1 and $daily.school.detentionAttended isnot 1',
+        to: '$location is "school" and $detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1',
         expected: 1
       }
     ]
@@ -145,6 +183,14 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.inject({
     locationPassage: schoolPassages,
     widgetPassage: {
+      'Widgets Sydney': [
+        {
+          // 同行台词的三处留堂拦截须与前庭一致，风纪委员可自行决定是否留堂。
+          src: '$detention gte 1 and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
+          to: '$detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
+          expected: 3
+        }
+      ],
       Social: [
         {
           // Social 是原版 widget；紧邻学校声望卡片插入，保持原版的双列排版。

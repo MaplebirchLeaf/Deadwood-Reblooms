@@ -28,7 +28,7 @@ class LifeSimulation extends Module {
 
   public readonly exposed = true;
   public readonly academics = new AcademicHonours();
-  public readonly school = new School();
+  public readonly school = new School(this.core);
 
   public constructor(core: typeof maplebirch) {
     super(core, 'LifeSimulation', LifeSimulation.variables);

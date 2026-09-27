@@ -10,9 +10,15 @@ export type SchoolStudent = 'Robin' | 'Sydney' | 'Kylar' | 'Whitney';
 
 interface SchoolState {
   role: SchoolRole;
+  attendanceExempt: boolean;
+  attendanceDay: number;
+  leightonApprovalDay: number;
+  baileySigned: boolean;
   order: number;
   studentSupport: number;
   staffSupport: number;
+  corruption: number;
+  feedback: [number, number, number, number] | null;
   duties: {
     completed: number;
     lastDay: number;
@@ -40,9 +46,15 @@ interface SchoolPolicyRequirements {
 
 export const DEFAULT_SCHOOL_STATE: SchoolState = {
   role: 'student',
+  attendanceExempt: false,
+  attendanceDay: -1,
+  leightonApprovalDay: -1,
+  baileySigned: false,
   order: 20,
   studentSupport: 20,
   staffSupport: 20,
+  corruption: 0,
+  feedback: null,
   duties: {
     completed: 0,
     lastDay: -1,
@@ -90,15 +102,17 @@ const DUTY_LOVE_CHANGES: Record<SchoolStudent, Record<SchoolDutyOutcome, number>
   Whitney: { enforce: -2, mediate: -1, pressure: -3, overlook: 1, inviteAccepted: 2, inviteRefused: -1 }
 };
 
-const DUTY_STANDING_CHANGES: Record<SchoolStudent, Record<SchoolDutyOutcome, readonly [number, number, number]>> = {
-  Robin: { enforce: [2, -1, 2], mediate: [1, 2, 0], pressure: [1, -3, -1], overlook: [-1, 0, -1], inviteAccepted: [-1, 0, -1], inviteRefused: [-1, -1, 0] },
-  Sydney: { enforce: [2, 0, 2], mediate: [1, 2, 0], pressure: [1, -2, -1], overlook: [-1, 0, -1], inviteAccepted: [-1, -1, -1], inviteRefused: [-1, -1, 0] },
-  Kylar: { enforce: [2, -2, 2], mediate: [1, 2, 0], pressure: [1, -3, -1], overlook: [-1, 0, -1], inviteAccepted: [-1, 0, -1], inviteRefused: [-1, -2, 0] },
-  Whitney: { enforce: [2, 1, 2], mediate: [1, 1, 0], pressure: [3, -2, -1], overlook: [-2, -1, -1], inviteAccepted: [-2, 0, -2], inviteRefused: [-1, -1, 0] }
+const DUTY_STANDING_CHANGES: Record<SchoolStudent, Record<SchoolDutyOutcome, readonly [number, number, number, number]>> = {
+  Robin: { enforce: [2, -1, 2, 0], mediate: [1, 2, 0, -1], pressure: [1, -3, -1, 3], overlook: [-1, 0, -1, 1], inviteAccepted: [-1, 0, -1, 3], inviteRefused: [-1, -1, 0, 1] },
+  Sydney: { enforce: [2, 0, 2, 0], mediate: [1, 2, 0, -1], pressure: [1, -2, -1, 3], overlook: [-1, 0, -1, 1], inviteAccepted: [-1, -1, -1, 3], inviteRefused: [-1, -1, 0, 1] },
+  Kylar: { enforce: [2, -2, 2, 0], mediate: [1, 2, 0, -1], pressure: [1, -3, -1, 3], overlook: [-1, 0, -1, 1], inviteAccepted: [-1, 0, -1, 3], inviteRefused: [-1, -2, 0, 1] },
+  Whitney: { enforce: [2, 1, 2, 0], mediate: [1, 1, 0, -1], pressure: [3, -2, -1, 3], overlook: [-2, -1, -1, 1], inviteAccepted: [-2, 0, -2, 3], inviteRefused: [-1, -1, 0, 1] }
 };
 
 class School {
   public readonly policies = DRESS_POLICIES;
+
+  public constructor(private readonly core: typeof maplebirch) {}
 
   private get state(): SchoolState {
     return V.LifeSimulation.school as SchoolState;
@@ -134,7 +148,8 @@ class School {
       index < 0 ||
       index > DRESS_POLICIES.indexOf(this.state.dress.highest) ||
       this.state.dress.active === policy
-    ) return false;
+    )
+      return false;
     this.state.dress.active = policy;
     this.state.dress.previous = policy;
     return true;
@@ -150,20 +165,53 @@ class School {
     return DRESS_POLICIES.indexOf(this.state.dress.active) >= DRESS_POLICIES.indexOf('optionalNudity');
   }
 
-  public appointPrefect(): boolean {
-    if (!(this.state.role === 'student' && V.schooltrait >= 4 && V.delinquency <= 0)) return false;
+  public approveAttendanceApplication(): boolean {
+    const topMarks = V.schooltrait >= 4 && V.sciencetrait >= 4 && V.mathstrait >= 4 && V.englishtrait >= 4 && V.historytrait >= 4;
+    if (this.state.attendanceExempt || this.state.leightonApprovalDay >= 0 || !topMarks || (C.npc.Leighton.love < 10 && V.headblackmailed !== 1)) return false;
+    this.state.leightonApprovalDay = Time.days;
+    return true;
+  }
+
+  public signGuardianApproval(): boolean {
+    if (this.state.attendanceExempt || this.state.baileySigned || this.state.leightonApprovalDay < 0 || (!V.RobinExpansion?.baileyDefeated && V.baileypaychain < 3)) return false;
+    this.state.baileySigned = true;
+    return true;
+  }
+
+  public grantAttendanceExemption(): boolean {
+    if (this.state.attendanceExempt || this.state.leightonApprovalDay < 0 || !this.state.baileySigned) return false;
+    this.state.attendanceExempt = true;
+    this.state.attendanceDay = Time.days;
+    return true;
+  }
+
+  public organiseSchoolDrinks(): boolean {
+    if (this.state.role === 'student' || !V.RobinExpansion?.shop || V.RobinExpansion.shopStock < 1 || V.daily.robinSchoolDrinks === Time.days) return false;
+    V.RobinExpansion.shopStock -= 1;
+    V.RobinExpansion.reserve += 20;
+    V.daily.robinSchoolDrinks = Time.days;
+    this.adjustStanding(0, 3, 1);
+    return true;
+  }
+
+  public organiseStudySession(prepared: boolean): boolean {
+    if (this.state.role === 'student' || V.daily.schoolStudySession === Time.days) return false;
+    V.daily.schoolStudySession = Time.days;
+    this.adjustStanding(0, prepared ? 3 : 1, prepared ? 2 : 0, 0);
+    return true;
+  }
+
+  public appointPrefect(pressure = false): boolean {
+    if (!(this.state.role === 'student' && this.state.attendanceExempt && Time.days >= this.state.attendanceDay + 7 && V.schooltrait >= 4 && V.delinquency <= 0 && V.cool >= 160)) return false;
+    if (pressure ? V.headblackmailed !== 1 : C.npc.Leighton.love < 10) return false;
     this.state.role = 'prefect';
-    this.adjustStanding(2, 2, 4);
+    if (pressure) this.adjustStanding(-2, -2, -4, 6);
+    else this.adjustStanding(2, 2, 4);
     return true;
   }
 
   public appointPresident(): boolean {
-    const eligible =
-      this.state.role === 'prefect' &&
-      this.state.duties.completed >= 5 &&
-      this.state.studentSupport >= 25 &&
-      this.state.staffSupport >= 25 &&
-      this.state.order >= 25;
+    const eligible = this.state.role === 'prefect' && this.state.duties.completed >= 5 && this.state.studentSupport >= 25 && this.state.staffSupport >= 25 && this.state.order >= 25;
     if (!eligible) return false;
     this.state.role = 'president';
     this.adjustStanding(0, 3, 3);
@@ -282,7 +330,7 @@ class School {
     if (!policy) return false;
 
     const requirement = this.policyRequirements(policy);
-    if (V.world_corruption_soft < requirement.corruption) return false;
+    if (this.state.corruption < requirement.corruption || V.world_corruption_soft < requirement.corruption) return false;
 
     switch (route) {
       case 'formal':
@@ -305,9 +353,9 @@ class School {
     this.state.dress.route = route;
     this.state.dress.trialUntil = Time.days + 7;
 
-    if (route === 'formal') this.adjustStanding(1, 0, 1);
-    if (route === 'petition') this.adjustStanding(0, 2, -1);
-    if (route === 'pressure') this.adjustStanding(-2, -2, -2);
+    if (route === 'formal') this.adjustStanding(1, 0, 1, -1);
+    if (route === 'petition') this.adjustStanding(0, 2, -1, 0);
+    if (route === 'pressure') this.adjustStanding(-2, -2, -2, 5);
     return true;
   }
 
@@ -345,8 +393,8 @@ class School {
     const npc = C.npc?.[student];
     if (npc?.init !== 1 || ['prison', 'pillory', 'dungeon'].includes(npc.state)) return false;
     // 侧栏模块安装时复用其原版日程解析；未安装时只做最基本的 NPC 状态检查。
-    if (!window.maplebirch.get('NPCSidebarPortrait')) return true;
-    return SCHOOL_CAMPUS_LOCATIONS[student].includes(window.maplebirch.npc.Schedule.location[student] ?? '');
+    if (!this.core.get('NPCSidebarPortrait')) return true;
+    return SCHOOL_CAMPUS_LOCATIONS[student].includes(this.core.npc.Schedule.location[student] ?? '');
   }
 
   private adjustLove(student: SchoolStudent, change: number): void {
@@ -355,10 +403,14 @@ class School {
     npc.love = Math.clamp((npc.love ?? 0) + change, 0, student === 'Whitney' ? 30 : student === 'Sydney' ? 150 : 100);
   }
 
-  private adjustStanding(order: number, studentSupport: number, staffSupport: number): void {
-    this.state.order = Math.clamp(this.state.order + order, 0, 100);
-    this.state.studentSupport = Math.clamp(this.state.studentSupport + studentSupport, 0, 100);
-    this.state.staffSupport = Math.clamp(this.state.staffSupport + staffSupport, 0, 100);
+  private adjustStanding(order: number, studentSupport: number, staffSupport: number, corruption = 0): void {
+    const previous: [number, number, number, number] = [this.state.order, this.state.studentSupport, this.state.staffSupport, this.state.corruption];
+    this.state.order = Math.clamp(previous[0] + order, 0, 100);
+    this.state.studentSupport = Math.clamp(previous[1] + studentSupport, 0, 100);
+    this.state.staffSupport = Math.clamp(previous[2] + staffSupport, 0, 100);
+    this.state.corruption = Math.clamp(previous[3] + corruption, 0, 100);
+    // Passage 渲染后消费这次实际变化，满值时不显示虚假的收益。
+    this.state.feedback = [this.state.order - previous[0], this.state.studentSupport - previous[1], this.state.staffSupport - previous[2], this.state.corruption - previous[3]];
   }
 }
 
