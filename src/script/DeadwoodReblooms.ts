@@ -35,8 +35,15 @@ export default function (maplebirch: MaplebirchCore) {
         // 物品数据刚取出时立即过滤，避免匹配前一个 if 的结尾和后续 HTML。
         {
           src: '<<set _itemData to setup.clothes[_wardrobe_list][clothesIndex(_wardrobe_list,_item)]>>',
-          applyafter:
-            '<<if $DeadwoodReblooms.wardrobeSearch isnot "">><<run $DeadwoodReblooms.wardrobeSearch.toLowerCase()>><<language>><<option "CN">><<if !_itemData.cn_name_cap.toLowerCase().includes($DeadwoodReblooms.wardrobeSearch)>><<continue>><</if>><<option "EN">><<if !_itemData.name_cap.toLowerCase().includes($DeadwoodReblooms.wardrobeSearch)>><<continue>><</if>><</language>><</if>>',
+          applyafter: [
+            '<<if $DeadwoodReblooms.wardrobeSearch isnot "">>',
+            '<<language>>',
+            '<<option "CN">>',
+            '<<if !_itemData.cn_name_cap.toLowerCase().includes($DeadwoodReblooms.wardrobeSearch.toLowerCase())>><<continue>><</if>>',
+            '<<option "EN">>',
+            '<<if !_itemData.name_cap.toLowerCase().includes($DeadwoodReblooms.wardrobeSearch.toLowerCase())>><<continue>><</if>>',
+            '<</language>><</if>>'
+          ].join(''),
           expected: 1
         }
       ],

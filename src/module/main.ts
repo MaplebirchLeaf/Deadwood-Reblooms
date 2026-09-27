@@ -11,6 +11,8 @@ import DynamicMusic from './DynamicMusic';
 import LifeSimulation from './LifeSimulation';
 import SydneyExpansion from './SydneyExpansion';
 import RobinExpansion from './RobinExpansion';
+import WhitneyExpansion from './WhitneyExpansion';
+import KylarExpansion from './KylarExpansion';
 
 (function (maplebirch): void {
   'use strict';
@@ -25,6 +27,8 @@ import RobinExpansion from './RobinExpansion';
   maplebirch.define('VP', new VanillaPlus(maplebirch), ['DR', 'var', 'char']);
   maplebirch.define('SydneyExpansion', new SydneyExpansion(maplebirch), ['DR', 'var']);
   maplebirch.define('RobinExpansion', new RobinExpansion(maplebirch), ['DR', 'var']);
+  maplebirch.define('WhitneyExpansion', new WhitneyExpansion(maplebirch), ['DR', 'var']);
+  maplebirch.define('KylarExpansion', new KylarExpansion(maplebirch), ['DR', 'var']);
   maplebirch.define('LS', new LifeSimulation(maplebirch), ['DR', 'var']);
   maplebirch.define('DM', new DynamicMusic(maplebirch), ['DR', 'audio', 'var']);
 })(maplebirch);

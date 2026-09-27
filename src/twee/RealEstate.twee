@@ -534,6 +534,13 @@
 					<<option 'EN'>>Robin lists tomorrow's chores. When you offer to take the earliest one, <<he>> laughs and <span class='teal'>rests <<his>> head on your shoulder</span>.
 					<<option 'CN'>>罗宾数着明天要做的杂事。你主动揽下最早的一项，<<he>>笑着<span class='teal'>把头靠在你肩上</span>。
 				<</language>>
+			<</if>>
+			<<if maplebirch.get('RobinExpansion') and $RobinExpansion.shop and C.npc.Robin.trauma lt 20>>
+				<br><br>
+				<<language>>
+					<<option 'EN'>>Robin sets a paper bag from the shop on the table. "I saved the last one for you." <<He>> waits while you try it, watching your face more closely than the food.
+					<<option 'CN'>>罗宾把从店里带回的纸袋放在桌上。“最后一份给你留着。”<<He>>等你尝了一口，目光一直留在你的脸上。
+				<</language>>
 			<</if>><br><br>
 		<<case 'Whitney'>>
 			<<if C.npc.Whitney.dom gte 50>>
@@ -545,6 +552,13 @@
 				<<language>>
 					<<option 'EN'>>Whitney complains about school while you sit together. <<He>> stops halfway through a sentence and <span class='teal'>gives your hand a squeeze</span>.
 					<<option 'CN'>>惠特尼挨着你抱怨学校的事。话说到一半，<<he>>停下来，<span class='teal'>握了握你的手</span>。
+				<</language>>
+			<</if>>
+			<<if maplebirch.get('WhitneyExpansion') and $WhitneyExpansion.rescued>>
+				<br><br>
+				<<language>>
+					<<option 'EN'>>A noise outside makes Whitney look toward the door. <<He>> sees that you have noticed, then <span class='teal'>pulls you closer</span> without a word.
+					<<option 'CN'>>门外有些动静，惠特尼转头看去。<<He>>发觉你注意到了，便一言不发地<span class='teal'>把你拉近</span>。
 				<</language>>
 			<</if>><br><br>
 		<<case 'Kylar'>>
@@ -558,9 +572,17 @@
 					<<option 'EN'>>"I can stay, can't I?" Kylar asks, holding your sleeve. You tell <<him>> yes. <<He>> <span class='green'>smiles and lets go</span>.
 					<<option 'CN'>>“我能留下来，对吧？”凯拉尔攥着你的衣袖问。你答应了，<<he>>才<span class='green'>松开手笑起来</span>。
 				<</language>>
+			<</if>>
+			<<if maplebirch.get('KylarExpansion') and $KylarExpansion.stay_invited>>
+				<br><br>
+				<<language>>
+					<<option 'EN'>>Kylar lays <<his>> manor key beside the key to this house. <<He>> picks up the second one before you can say anything and <span class='teal'>holds it tightly</span>.
+					<<option 'CN'>>凯拉尔把庄园的钥匙放在这间房的钥匙旁。你还没开口，<<he>>便拿起后者，<span class='teal'>紧紧攥在手里</span>。
+				<</language>>
 			<</if>><br><br>
 		<<case 'Sydney'>>
-			<<if C.npc.Sydney.corruption gte 30>>
+			<<run statusCheck('Sydney')>>
+			<<if _sydneyStatus.includes('corrupt')>>
 				<<language>>
 					<<option 'EN'>>Sydney tells you about an errand at the temple, then leans close. "<span class='lewd'>I've been thinking about you all day.</span>" <<His>> fingers brush your wrist.
 					<<option 'CN'>>悉尼说起神殿里的差事，又靠近你。“<span class='lewd'>我一整天都在想你。</span>”<<His>>手指轻轻擦过你的手腕。
@@ -570,12 +592,25 @@
 					<<option 'EN'>>Sydney tells you about someone <<he>> helped at the temple. You tell <<him>> about your day. <<He>> listens, <span class='teal'>still holding your hand</span>.
 					<<option 'CN'>>悉尼说起今天在神殿帮过的人。你也讲了自己的一天，<<he>><span class='teal'>一直握着你的手听</span>。
 				<</language>>
+			<</if>>
+			<<if maplebirch.get('SydneyExpansion') and $SydneyExpansion.estate.visited>>
+				<br><br>
+				<<language>>
+					<<option 'EN'>>Sydney unfolds a recipe <<nnpc_Mum 'Sirris'>> wrote out at the estate. "We could make this here," <<he>> says, looking toward the kitchen.
+					<<option 'CN'>>悉尼摊开一张从庄园带来的食谱，上面是<<nnpc_Mum 'Sirris'>>的字迹。“我们可以在这里试试。”<<he>>望向厨房。
+				<</language>>
 			<</if>><br><br>
 	<</switch>>
-	<<stress -2>><<lstress>><br>
+	<!-- 这段对白可重看，陪伴带来的压力收益每人每处住所每天只结算一次。 -->
+	<<set $daily.deadwoodPropertyEvening ??= []>>
+	<<set _eveningKey to _property.id + ':' + _companion.id>>
+	<<if !$daily.deadwoodPropertyEvening.includes(_eveningKey)>>
+		<<set $daily.deadwoodPropertyEvening.push(_eveningKey)>>
+		<<stress -2>><<lstress>><br>
+	<</if>>
 	<<if maplebirch.VP.realEstate.residentsHome(_property.id).some(profile => profile.id === _companion.id)>>
 		<<loveicon 'kiss'>>
-		<<lanLink '一起上床' 'Deadwood Reblooms Property Intimacy'>>
+		<<lanLink '牵着恋人回卧室' 'Deadwood Reblooms Property Intimacy'>>
 			<<set $sexstart to 1>>
 		<</lanLink>><<promiscuous1>><br>
 	<</if>>

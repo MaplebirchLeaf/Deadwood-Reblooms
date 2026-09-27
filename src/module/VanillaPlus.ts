@@ -71,7 +71,9 @@ class VanillaPlus extends Module {
         property: {} as Record<string, boolean>,
         farm: false,
         tower: false,
-        temple: false
+        temple: false,
+        sirris: false,
+        kylar: false
       }
     },
     promiscuity: {

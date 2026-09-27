@@ -241,6 +241,14 @@
 <<widget 'deadwood-reblooms-deviancy-mirror-hint'>>
   <<set _mirrorLocations to $VanillaPlus.deviancy.mirror_locations>>
   <<set _mirrorTargets to []>>
+  <<if maplebirch.get('SydneyExpansion')>><<deadwood-reblooms-sirris-estate-presence>><</if>>
+  <<set _sirrisMirrorReady to maplebirch.get('SydneyExpansion')
+    and $SydneyExpansion.estate.invited and isLoveInterest('Sydney') and _sydneyAtEstate>>
+  <<set _kylarMirrorReady to maplebirch.get('KylarExpansion')
+    and $KylarExpansion.stay_invited and isLoveInterest('Kylar')
+    and C.npc.Kylar.state is 'active'
+    and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
+    and (!maplebirch.get('VP') or !maplebirch.VP.realEstate.residenceOf('Kylar'))>>
   <<if _mirrorLocations.home and maplebirch.VP.deviancy.discovered('home')>>
     <<run _mirrorTargets.push({..._mirrorLocations.home, EN: 'your bedroom mirror', CN: '卧室的镜子'})>>
   <</if>>
@@ -265,6 +273,12 @@
   <</if>>
   <<if _mirrorLocations.temple and maplebirch.VP.deviancy.discovered('temple')>>
     <<run _mirrorTargets.push({..._mirrorLocations.temple, EN: 'the temple mirror', CN: '神殿宿舍的镜子'})>>
+  <</if>>
+  <<if _mirrorLocations.sirris and _sirrisMirrorReady and maplebirch.VP.deviancy.discovered('sirris')>>
+    <<run _mirrorTargets.push({..._mirrorLocations.sirris, EN: "Sydney's bedroom mirror", CN: '悉尼卧室的镜子'})>>
+  <</if>>
+  <<if _mirrorLocations.kylar and _kylarMirrorReady and maplebirch.VP.deviancy.discovered('kylar')>>
+    <<run _mirrorTargets.push({..._mirrorLocations.kylar, EN: "Kylar's bedroom mirror", CN: '凯拉尔卧室的镜子'})>>
   <</if>>
   <!-- 只提示最近的异地出口。同格出口由下方真实链接显示，无需方向提示。 -->
   <<set _nearestMirror to null>><<set _nearestDistance to 100>>
@@ -310,13 +324,13 @@
           and maplebirch.VP.realEstate.owns(_property.id)
           and !maplebirch.VP.realEstate.managementFor(_property.id).rented>>
           <<if $tentnorth is _mirrorCoordinates.north and $tenteast is _mirrorCoordinates.east>>
-            <<mirroricon 'blood'>><<language>>
+            <<language>>
               <<option 'EN'>>
-                <<link _property.mirrorLabel.EN 'Deadwood Reblooms Deviancy Mirror Property'>>
+                <<mirroricon 'blood'>><<link _property.mirrorLabel.EN 'Deadwood Reblooms Deviancy Mirror Property'>>
                   <<set $VanillaPlus.deviancy.mirror_property to _property.id>>
                 <</link>>
               <<option 'CN'>>
-                <<link _property.mirrorLabel.CN 'Deadwood Reblooms Deviancy Mirror Property'>>
+                <<mirroricon 'blood'>><<link _property.mirrorLabel.CN 'Deadwood Reblooms Deviancy Mirror Property'>>
                   <<set $VanillaPlus.deviancy.mirror_property to _property.id>>
                 <</link>>
             <</language>>
@@ -345,6 +359,24 @@
       and maplebirch.VP.deviancy.discovered('temple')>>
       <<mirroricon 'blood'>><<lanLink '从神殿宿舍的镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Temple'>><</lanLink>>
       <br>
+    <</if>>
+    <<if _mirrorLocations.sirris and _sirrisMirrorReady
+      and $tentnorth is _mirrorLocations.sirris.north
+      and $tenteast is _mirrorLocations.sirris.east
+      and maplebirch.VP.deviancy.discovered('sirris')>>
+      <<language>>
+        <<option 'EN'>><<mirroricon 'blood'>><<link "Climb through Sydney's bedroom mirror" 'Deadwood Reblooms Deviancy Mirror Sirris'>><</link>>
+        <<option 'CN'>><<mirroricon 'blood'>><<link '从悉尼卧室的镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Sirris'>><</link>>
+      <</language>><br>
+    <</if>>
+    <<if _mirrorLocations.kylar and _kylarMirrorReady
+      and $tentnorth is _mirrorLocations.kylar.north
+      and $tenteast is _mirrorLocations.kylar.east
+      and maplebirch.VP.deviancy.discovered('kylar')>>
+      <<language>>
+        <<option 'EN'>><<mirroricon 'blood'>><<link "Climb through Kylar's bedroom mirror" 'Deadwood Reblooms Deviancy Mirror Kylar'>><</link>>
+        <<option 'CN'>><<mirroricon 'blood'>><<link '从凯拉尔卧室的镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Kylar'>><</link>>
+      <</language>><br>
     <</if>>
   <</if>>
 <</widget>>

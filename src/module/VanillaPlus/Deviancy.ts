@@ -2,14 +2,14 @@
 
 import type VanillaPlus from '../VanillaPlus';
 
-type MirrorId = 'home' | 'farm' | 'tower' | 'temple';
+type MirrorId = 'home' | 'farm' | 'tower' | 'temple' | 'sirris' | 'kylar';
 type MirrorDiscovery = Record<MirrorId, boolean> & { property: Record<string, boolean> };
 
 class Deviancy {
   public constructor(private readonly vanillaPlus: VanillaPlus) {}
 
   private get mirrors(): MirrorDiscovery {
-    const mirrors = (V.VanillaPlus.deviancy.mirrors ??= { home: false, property: {}, farm: false, tower: false, temple: false });
+    const mirrors = (V.VanillaPlus.deviancy.mirrors ??= { home: false, property: {}, farm: false, tower: false, temple: false, sirris: false, kylar: false });
     if (typeof mirrors.property !== 'object' || mirrors.property === null) mirrors.property = {};
     return mirrors;
   }
@@ -29,7 +29,7 @@ class Deviancy {
     const locations: typeof V.VanillaPlus.deviancy.mirror_locations = {};
     V.VanillaPlus.deviancy.mirror_locations = locations;
     const randomLocation = () => ({ north: Math.floor(Math.random() * 9) - 4, east: Math.floor(Math.random() * 9) - 4 });
-    for (const mirror of ['home', 'farm', 'tower', 'temple']) locations[mirror] = randomLocation();
+    for (const mirror of ['home', 'farm', 'tower', 'temple', 'sirris', 'kylar']) locations[mirror] = randomLocation();
     for (const property of this.vanillaPlus.realEstate.properties) locations[`property:${property.id}`] = randomLocation();
   }
 

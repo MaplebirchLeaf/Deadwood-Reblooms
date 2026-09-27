@@ -8,6 +8,8 @@ import VanillaPlus from './VanillaPlus';
 import LifeSimulation from './LifeSimulation';
 import SydneyExpansion from './SydneyExpansion';
 import RobinExpansion from './RobinExpansion';
+import WhitneyExpansion from './WhitneyExpansion';
+import KylarExpansion from './KylarExpansion';
 
 (function (maplebirch): void {
   'use strict';
@@ -22,5 +24,7 @@ import RobinExpansion from './RobinExpansion';
   if (maplebirch.get('VP')) VanillaPlus(maplebirch);
   if (maplebirch.get('SydneyExpansion')) SydneyExpansion(maplebirch);
   if (maplebirch.get('RobinExpansion')) RobinExpansion(maplebirch);
+  if (maplebirch.get('WhitneyExpansion')) WhitneyExpansion(maplebirch);
+  if (maplebirch.get('KylarExpansion')) KylarExpansion(maplebirch);
   if (maplebirch.get('LS')) LifeSimulation(maplebirch);
 })(maplebirch);

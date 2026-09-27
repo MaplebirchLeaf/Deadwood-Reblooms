@@ -464,6 +464,10 @@
     <br><br>
     <<if _sirrisAtEstate>>
       Sirris looks up from a student's work. "I was meant to finish these before coming home," <<he>> says. "Would you check my diagram?"
+      <<if $scienceprojectwon is 1>>
+        <br><br>
+        "I remember your science fair display," <<he>> adds, sliding the drawing toward you. <span class='teal'>"You have a good eye for this."</span>
+      <</if>>
     <<elseif _sydneyAtEstate>>
       Sydney points to the drawings. "<<nnpc_Mum 'Sirris'>> says you can understand a thing better once you've drawn it."
     <<else>>
@@ -474,6 +478,10 @@
     <br><br>
     <<if _sirrisAtEstate>>
       西里斯从学生的作业上抬起头。“我本该回家前就改完的。”<<he>>说，“要不要帮我看看这张图？”
+      <<if $scienceprojectwon is 1>>
+        <br><br>
+        “我记得你在科学展上的作品。”<<he>>把图纸推向你，<span class='teal'>“你看这个很在行。”</span>
+      <</if>>
     <<elseif _sydneyAtEstate>>
       悉尼指着那些图。“<<nnpc_Mum 'Sirris'>>总说，能画出来，才算真的看明白了。”
     <<else>>
@@ -494,13 +502,22 @@
 :: Deadwood Reblooms Sirris Estate Study Help []
 <<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
 <<deadwood-reblooms-sirris-estate-presence>>
+<<set _scienceInsight to currentSkillValue('science') gte 500>>
 <<if _sirrisAtEstate>><<npc Sirris>><<person1>><<elseif _sydneyAtEstate>><<npc Sydney>><<person1>><</if>>
 <<language>>
   <<option 'EN'>>
     You sort the papers by lesson and put the shop receipts in a separate pile. A page about plant cells has been filed with the invoices. You carry it back to the desk.
+    <<if _scienceInsight>>
+      <br><br>
+      One label on the cell drawing points to the wrong part. You mark it in pencil before putting the page down.
+    <</if>>
     <br><br>
     <<if _sirrisAtEstate>>
-      "There it is," Sirris says. "I'd have taken that to the shop tomorrow." <<He>> thanks you and checks the stack again.
+      <<if _scienceInsight>>
+        "There it is," Sirris says. "I'd have taken that to the shop tomorrow." <<He>> checks the stack again, then notices your correction. <span class='teal'>"You're right. I missed that."</span>
+      <<else>>
+        "There it is," Sirris says. "I'd have taken that to the shop tomorrow." <<He>> thanks you and checks the stack again.
+      <</if>>
     <<elseif _sydneyAtEstate>>
       Sydney laughs when <<he>> sees the missing page. "That happens every week. Thank you."
     <<else>>
@@ -508,16 +525,24 @@
     <</if>>
   <<option 'CN'>>
     你按课程整理讲义，把店铺收据单独放好。一张画着植物细胞的纸被夹进了账单里，你把它找出来，放回书桌。
+    <<if _scienceInsight>>
+      <br><br>
+      图上有一处标注指错了地方。你拿铅笔改好，才把纸放下。
+    <</if>>
     <br><br>
     <<if _sirrisAtEstate>>
-      “原来在这里。”西里斯说，“明天我差点就把它带去店里了。”<<He>>向你道谢，又检查了一遍那叠纸。
+      <<if _scienceInsight>>
+        “原来在这里。”西里斯说，“明天我差点就把它带去店里了。”<<He>>检查了一遍那叠纸，看到了你的修改。<span class='teal'>“你说得对，这里是我标错了。”</span>
+      <<else>>
+        “原来在这里。”西里斯说，“明天我差点就把它带去店里了。”<<He>>向你道谢，又检查了一遍那叠纸。
+      <</if>>
     <<elseif _sydneyAtEstate>>
       悉尼看到失而复得的那一页，笑出了声。“每周都这样。谢谢你。”
     <<else>>
       你把失而复得的那页纸放在整理好的讲义上，留给西里斯回来时查看。
     <</if>>
 <</language>>
-<<scienceskill 1>><<gscience>>
+<<if _scienceInsight>><<scienceskill 2>><<else>><<scienceskill 1>><</if>><<gscience>>
 <br><br>
 <<getouticon>><<lanLink '返回书房' 'Deadwood Reblooms Sirris Estate Study'>><</lanLink>>
 
@@ -798,6 +823,10 @@
   <<lanLink '与悉尼单独待一会儿 (0:05)' 'Deadwood Reblooms Sirris Estate Sydney Privacy'>>
     <<pass 5>>
   <</lanLink>><br>
+  <<language>>
+    <<option 'EN'>><<mirroricon>><<link 'Mirror' 'Deadwood Reblooms Sirris Estate Sydney Mirror'>><<preMirror>><</link>>
+    <<option 'CN'>><<mirroricon>><<link '镜子' 'Deadwood Reblooms Sirris Estate Sydney Mirror'>><<preMirror>><</link>>
+  <</language>><br>
   <<if $earSlime.event and $earSlime.noSleep>>
     <span class='red'><<lanSwitch 'The slime will not let you sleep yet.' '史莱姆现在不让你睡觉。'>></span><br>
   <<else>>
@@ -822,6 +851,25 @@
   <</if>>
   <br>
   <<getouticon>><<lanLink '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Sirris Estate Sydney Mirror []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if !$SydneyExpansion.estate.invited or !isLoveInterest('Sydney') or !_sydneyAtEstate>>
+  <<lanSwitch 'Sydney is away. You step back from the mirror.' '悉尼不在家。你从镜子前退开。'>><br><br>
+  <<language>>
+    <<option 'EN'>><<getouticon>><<link 'Return to the hall' 'Deadwood Reblooms Sirris Estate Hall'>><</link>>
+    <<option 'CN'>><<getouticon>><<link '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</link>>
+  <</language>>
+<<else>>
+  <<if maplebirch.get('VP')>><<run maplebirch.VP.deviancy.discover('sirris')>><</if>>
+  <<language>>
+    <<option 'EN'>><<getouticon>><<link 'Step away' 'Deadwood Reblooms Sirris Estate Sydney Room'>><<unset $mirrorMenu>><<unset $bodywritingSet>><<postMirror>><</link>>
+    <<option 'CN'>><<getouticon>><<link '走开' 'Deadwood Reblooms Sirris Estate Sydney Room'>><<unset $mirrorMenu>><<unset $bodywritingSet>><<postMirror>><</link>>
+  <</language>><br>
+  <<if maplebirch.get('VP')>><<deadwood-reblooms-deviancy-mirror-enter-link 'sirris'>><</if>>
+  <<mirror>><br><br>
 <</if>>
 
 :: Deadwood Reblooms Sirris Estate Sydney Bed []
@@ -977,7 +1025,7 @@
   <</language>>
   <br><br>
   <<loveicon>>
-  <<lanLink '与悉尼做爱' 'Deadwood Reblooms Sirris Estate Sydney Intimacy'>>
+  <<lanLink '在被子里吻悉尼' 'Deadwood Reblooms Sirris Estate Sydney Intimacy'>>
     <<set $sleephour to 0>><<set $sexstart to 1>>
   <</lanLink>><<promiscuous1>><br>
   <<bedicon>>
@@ -1058,7 +1106,7 @@
 <</language>>
 <br><br>
 <<loveicon>>
-<<lanLink '与悉尼做爱' 'Deadwood Reblooms Sirris Estate Sydney Intimacy'>>
+<<lanLink '吻悉尼' 'Deadwood Reblooms Sirris Estate Sydney Intimacy'>>
   <<set $sexstart to 1>>
 <</lanLink>><<promiscuous1>><br>
 <<getouticon>><<lanLink '到此为止' 'Deadwood Reblooms Sirris Estate Sydney Room'>><</lanLink>>
