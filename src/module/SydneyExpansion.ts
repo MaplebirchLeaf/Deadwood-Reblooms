@@ -17,7 +17,12 @@ class SydneyExpansion extends Module {
     readDay: -1,
     talkDay: -1,
     teaseDay: -1,
-    wardrobeDay: -1
+    wardrobeDay: -1,
+    gardenDay: -1,
+    quartersDay: -1,
+    trialTalkDay: -1,
+    touchDay: -1,
+    touchPart: ''
   };
 
   public constructor(core: typeof maplebirch) {

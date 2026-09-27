@@ -1,4 +1,4 @@
-export type AcademicHonourSubject = 'science' | 'maths' | 'english' | 'history';
+type AcademicHonourSubject = 'science' | 'maths' | 'english' | 'history';
 
 class AcademicHonours {
   public has(subject: AcademicHonourSubject): boolean {

@@ -1,6 +1,6 @@
 type PassagePatch = { src?: string; srcmatch?: RegExp; to?: string; applyafter?: string; applybefore?: string; expected: number };
 
-export const sydneyScienceLocationPassages: Record<string, PassagePatch[]> = {
+const sydneyScienceLocationPassages: Record<string, PassagePatch[]> = {
   'Science Lesson': [
     // 在原版标记当天科学课出席后追加首次同桌剧情，避免未实际上课时触发。
     {
@@ -11,7 +11,7 @@ export const sydneyScienceLocationPassages: Record<string, PassagePatch[]> = {
   ]
 };
 
-export const sydneyScienceWidgetPassages: Record<string, PassagePatch[]> = {
+const sydneyScienceWidgetPassages: Record<string, PassagePatch[]> = {
   'Widgets Events Science': [
     // 在 Sydney 科学课事件判断前刷新日程，并要求 Sydney 当时确实位于科学教室。
     {

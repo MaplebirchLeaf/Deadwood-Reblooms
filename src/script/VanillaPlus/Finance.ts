@@ -39,7 +39,7 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         // 放宽两个诱惑交租选项的金额判断：贝利获授权后，随身现金与银行余额均可用于足额交租。
         {
           srcmatchgroup: /<<if \$money gte \$rentmoney \+ \(\$babyRent or 0\)>>/g,
-          to: '<<if $money + ($VanillaPlus.finance.bank.baileyKnowsAccount ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
+          to: '<<if $money + ($VanillaPlus.finance.bank.bailey_knows_account ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
           expected: 2
         }
       ],
@@ -47,7 +47,7 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         // 放宽两个神殿代缴租金选项的金额判断，使其与贝利授权后的银行扣款规则保持一致。
         {
           srcmatchgroup: /<<if \$money gte \$rentmoney \+ \(\$babyRent or 0\)>>/g,
-          to: '<<if $money + ($VanillaPlus.finance.bank.baileyKnowsAccount ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
+          to: '<<if $money + ($VanillaPlus.finance.bank.bailey_knows_account ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
           expected: 2
         }
       ],
@@ -369,13 +369,13 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         // 放宽 Widgets Rent 中两个可交租分支的前置判断，授权账户余额可以补足随身现金。
         {
           srcmatchgroup: /<<if \$money gte \$rentmoney \+ \(\$babyRent or 0\)>>/g,
-          to: '<<if $money + ($VanillaPlus.finance.bank.baileyKnowsAccount ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
+          to: '<<if $money + ($VanillaPlus.finance.bank.bailey_knows_account ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
           expected: 2
         },
         // 在最终 money 扣款前按授权从银行补足现金；原版宏仍负责租金统计、音效与后续结算。
         {
           src: '\t<<money `-($rentmoney + ($babyRent or 0))` "baileyRent">>',
-          applybefore: '\t<<if $VanillaPlus.finance.bank.baileyKnowsAccount>>\n\t\t<<run maplebirch.VP.finance.prepareBaileyRent($rentmoney + ($babyRent or 0))>>\n\t<</if>>\n',
+          applybefore: '\t<<if $VanillaPlus.finance.bank.bailey_knows_account>>\n\t\t<<run maplebirch.VP.finance.prepareBaileyRent($rentmoney + ($babyRent or 0))>>\n\t<</if>>\n',
           expected: 1
         }
       ],
@@ -383,7 +383,7 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         // 放宽农场路线中的交租判断，避免授权账户有钱却因随身现金不足而隐藏付款选项。
         {
           src: '<<if $money gte $rentmoney + ($babyRent or 0)>>',
-          to: '<<if $money + ($VanillaPlus.finance.bank.baileyKnowsAccount ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
+          to: '<<if $money + ($VanillaPlus.finance.bank.bailey_knows_account ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
           expected: 1
         }
       ],
@@ -391,7 +391,7 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         // 放宽神殿通用组件中的交租判断，使银行授权覆盖该条原版租金结算路线。
         {
           src: '<<if $money gte $rentmoney + ($babyRent or 0)>>',
-          to: '<<if $money + ($VanillaPlus.finance.bank.baileyKnowsAccount ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
+          to: '<<if $money + ($VanillaPlus.finance.bank.bailey_knows_account ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
           expected: 1
         }
       ],
@@ -399,7 +399,7 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         // 放宽对话动作组件中的交租判断，使对话内付款也能读取已授权的银行余额。
         {
           src: '<<if $money gte $rentmoney + ($babyRent or 0)>>',
-          to: '<<if $money + ($VanillaPlus.finance.bank.baileyKnowsAccount ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
+          to: '<<if $money + ($VanillaPlus.finance.bank.bailey_knows_account ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
           expected: 1
         }
       ],
@@ -407,7 +407,7 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
         // 放宽人物效果组件中的交租判断，覆盖该组件生成的另一条原版租金付款入口。
         {
           src: '<<if $money gte $rentmoney + ($babyRent or 0)>>',
-          to: '<<if $money + ($VanillaPlus.finance.bank.baileyKnowsAccount ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
+          to: '<<if $money + ($VanillaPlus.finance.bank.bailey_knows_account ? $VanillaPlus.finance.bank.balance : 0) gte $rentmoney + ($babyRent or 0)>>',
           expected: 1
         }
       ],

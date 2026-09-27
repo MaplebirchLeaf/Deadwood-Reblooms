@@ -1,14 +1,14 @@
-export type SchoolRole = 'student' | 'prefect' | 'president';
+type SchoolRole = 'student' | 'prefect' | 'president';
 
 export type SchoolDressPolicy = 'uniform' | 'free' | 'revealing' | 'optionalNudity' | 'nudeDay' | 'mandatoryNudity';
 
-export type SchoolApprovalRoute = 'none' | 'formal' | 'petition' | 'pressure';
+type SchoolApprovalRoute = 'none' | 'formal' | 'petition' | 'pressure';
 
-export type SchoolDutyOutcome = 'enforce' | 'mediate' | 'pressure' | 'overlook' | 'inviteAccepted' | 'inviteRefused';
+type SchoolDutyOutcome = 'enforce' | 'mediate' | 'pressure' | 'overlook' | 'inviteAccepted' | 'inviteRefused';
 
 export type SchoolStudent = 'Robin' | 'Sydney' | 'Kylar' | 'Whitney';
 
-export interface SchoolState {
+interface SchoolState {
   role: SchoolRole;
   order: number;
   studentSupport: number;
@@ -31,7 +31,7 @@ export interface SchoolState {
   clothesStored: boolean;
 }
 
-export interface SchoolPolicyRequirements {
+interface SchoolPolicyRequirements {
   studentSupport: number;
   staffSupport: number;
   corruption: number;
@@ -64,12 +64,13 @@ export const DEFAULT_SCHOOL_STATE: SchoolState = {
 const DRESS_POLICIES: readonly SchoolDressPolicy[] = ['uniform', 'free', 'revealing', 'optionalNudity', 'nudeDay', 'mandatoryNudity'];
 
 // 制服政策按此顺序升级；highest 记录已保住的最高等级，active 可在一周试行后回退。
+// prettier-ignore
 const POLICY_REQUIREMENTS: Record<SchoolDressPolicy, SchoolPolicyRequirements> = {
-  uniform: { studentSupport: 0, staffSupport: 0, corruption: 0, leightonLove: 0 },
-  free: { studentSupport: 30, staffSupport: 25, corruption: 0, leightonLove: 10 },
-  revealing: { studentSupport: 40, staffSupport: 30, corruption: 20, leightonLove: 20 },
-  optionalNudity: { studentSupport: 55, staffSupport: 35, corruption: 35, leightonLove: 30 },
-  nudeDay: { studentSupport: 65, staffSupport: 45, corruption: 50, leightonLove: 40 },
+  uniform        : { studentSupport: 0, staffSupport: 0, corruption: 0, leightonLove: 0 },
+  free           : { studentSupport: 30, staffSupport: 25, corruption: 0, leightonLove: 10 },
+  revealing      : { studentSupport: 40, staffSupport: 30, corruption: 20, leightonLove: 20 },
+  optionalNudity : { studentSupport: 55, staffSupport: 35, corruption: 35, leightonLove: 30 },
+  nudeDay        : { studentSupport: 65, staffSupport: 45, corruption: 50, leightonLove: 40 },
   mandatoryNudity: { studentSupport: 80, staffSupport: 60, corruption: 70, leightonLove: 50 }
 };
 
@@ -97,16 +98,10 @@ const DUTY_STANDING_CHANGES: Record<SchoolStudent, Record<SchoolDutyOutcome, rea
 };
 
 class School {
+  public readonly policies = DRESS_POLICIES;
+
   private get state(): SchoolState {
     return V.LifeSimulation.school as SchoolState;
-  }
-
-  public get role(): SchoolRole {
-    return this.state.role;
-  }
-
-  public get studentRoster(): readonly SchoolStudent[] {
-    return SCHOOL_STUDENT_ROSTER;
   }
 
   public standingColour(value: number): 'red' | 'pink' | 'blue' | 'teal' | 'green' {
@@ -130,21 +125,16 @@ class School {
     return true;
   }
 
-  public get nextPolicy(): SchoolDressPolicy | null {
-    const index = DRESS_POLICIES.indexOf(this.state.dress.highest);
-    return DRESS_POLICIES[index + 1] ?? null;
-  }
-
-  public get availablePolicies(): readonly SchoolDressPolicy[] {
-    return DRESS_POLICIES.slice(0, DRESS_POLICIES.indexOf(this.state.dress.highest) + 1);
-  }
-
-  public get canSelectPolicy(): boolean {
-    return this.state.role === 'president' && this.state.dress.proposal === null && this.state.dress.trialUntil === 0;
-  }
-
   public selectPolicy(policy: SchoolDressPolicy): boolean {
-    if (!this.canSelectPolicy || !this.availablePolicies.includes(policy) || this.state.dress.active === policy) return false;
+    const index = DRESS_POLICIES.indexOf(policy);
+    if (
+      this.state.role !== 'president' ||
+      this.state.dress.proposal !== null ||
+      this.state.dress.trialUntil !== 0 ||
+      index < 0 ||
+      index > DRESS_POLICIES.indexOf(this.state.dress.highest) ||
+      this.state.dress.active === policy
+    ) return false;
     this.state.dress.active = policy;
     this.state.dress.previous = policy;
     return true;
@@ -160,31 +150,21 @@ class School {
     return DRESS_POLICIES.indexOf(this.state.dress.active) >= DRESS_POLICIES.indexOf('optionalNudity');
   }
 
-  public get canRequestPrefect(): boolean {
-    return this.state.role === 'student';
-  }
-
-  public get canBecomePrefect(): boolean {
-    return this.canRequestPrefect && V.schooltrait >= 4 && V.delinquency <= 0;
-  }
-
   public appointPrefect(): boolean {
-    if (!this.canBecomePrefect) return false;
+    if (!(this.state.role === 'student' && V.schooltrait >= 4 && V.delinquency <= 0)) return false;
     this.state.role = 'prefect';
     this.adjustStanding(2, 2, 4);
     return true;
   }
 
-  public get canRequestPresident(): boolean {
-    return this.state.role === 'prefect';
-  }
-
-  public get canBecomePresident(): boolean {
-    return this.canRequestPresident && this.state.duties.completed >= 5 && this.state.studentSupport >= 25 && this.state.staffSupport >= 25 && this.state.order >= 25;
-  }
-
   public appointPresident(): boolean {
-    if (!this.canBecomePresident) return false;
+    const eligible =
+      this.state.role === 'prefect' &&
+      this.state.duties.completed >= 5 &&
+      this.state.studentSupport >= 25 &&
+      this.state.staffSupport >= 25 &&
+      this.state.order >= 25;
+    if (!eligible) return false;
     this.state.role = 'president';
     this.adjustStanding(0, 3, 3);
     return true;
@@ -275,12 +255,14 @@ class School {
   }
 
   public get canProposePolicy(): boolean {
-    return this.state.role === 'president' && this.nextPolicy !== null && this.state.dress.proposal === null && this.state.dress.trialUntil === 0 && Time.days >= this.state.dress.cooldownUntil;
+    const next = DRESS_POLICIES[DRESS_POLICIES.indexOf(this.state.dress.highest) + 1];
+    return this.state.role === 'president' && next !== undefined && this.state.dress.proposal === null && this.state.dress.trialUntil === 0 && Time.days >= this.state.dress.cooldownUntil;
   }
 
   public proposePolicy(): boolean {
-    if (!this.canProposePolicy || !this.nextPolicy) return false;
-    this.state.dress.proposal = this.nextPolicy;
+    const next = DRESS_POLICIES[DRESS_POLICIES.indexOf(this.state.dress.highest) + 1];
+    if (!this.canProposePolicy || !next) return false;
+    this.state.dress.proposal = next;
     return true;
   }
 

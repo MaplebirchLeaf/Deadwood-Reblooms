@@ -1,6 +1,6 @@
 import apply from './MeteorShowerLayer';
 
-export interface MeteorDate {
+interface MeteorDate {
   year: number;
   month: number;
   day: number;
@@ -25,7 +25,7 @@ function hash(seed: number, date: MeteorDate, salt: number): number {
   return (seed + date.year * salt + date.month * 131 + date.day * 17) >>> 0;
 }
 
-export function predictMeteorShower(seed: number, date: MeteorDate): MeteorShowerStored | null {
+function predictMeteorShower(seed: number, date: MeteorDate): MeteorShowerStored | null {
   // 存档种子与日期共同决定是否发生，读档后不会因为重新掷随机数改变预报。
   if (hash(seed, date, 1543) % trigger !== 0) return null;
 
@@ -41,7 +41,7 @@ export function predictMeteorShower(seed: number, date: MeteorDate): MeteorShowe
   };
 }
 
-export function meteorShowerStrength(phase: number): number {
+function meteorShowerStrength(phase: number): number {
   const progress = Math.min(1, Math.max(0, phase));
   if (progress < 0.2) return progress / 0.2;
   if (progress > 0.8) return (1 - progress) / 0.2;

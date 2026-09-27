@@ -1,4 +1,4 @@
-import { SCHOOL_CAMPUS_LOCATIONS, type SchoolDressPolicy, type SchoolStudent } from '../../module/LifeSimulation/School';
+import { SCHOOL_CAMPUS_LOCATIONS, SCHOOL_STUDENT_ROSTER, type SchoolDressPolicy, type SchoolStudent } from '../../module/LifeSimulation/School';
 import type { WardrobeItem } from '../../module/NPCSidebarPortrait';
 
 export default function SchoolNPCs(maplebirch: typeof window.maplebirch): void {
@@ -22,7 +22,7 @@ export default function SchoolNPCs(maplebirch: typeof window.maplebirch): void {
       if (student === 'Sydney' || student === 'Kylar') wardrobe.strip(clothes, 'lower');
     };
 
-    for (const student of maplebirch.LS.school.studentRoster) {
+    for (const student of SCHOOL_STUDENT_ROSTER) {
       wardrobe.modify(student, (clothes, context) => {
         if (!SCHOOL_CAMPUS_LOCATIONS[student].includes(context.location)) return;
         const policy = V.LifeSimulation?.school?.dress?.active as SchoolDressPolicy | undefined;

@@ -29,7 +29,7 @@ const stateTypes: Record<keyof MusicState, string> = {
   precipitation: 'string',
   dayState: 'string'
 };
-// 配置只允许音频包内的 audio/ 路径；文件存在性也在加载时检查，避免用 JSON 注入任意资源名。
+
 const audioPath = /^audio\/(?!.*(?:^|\/)\.\.\/)[\w/-]+\.(?:ogg|mp3|wav|m4a|flac|webm)$/i;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -233,6 +233,7 @@ class DynamicMusic {
   }
 
   private get options() {
+    this.core.var.options.define('DynamicMusic', DynamicMusic.options);
     return V.options.maplebirch.DynamicMusic;
   }
 

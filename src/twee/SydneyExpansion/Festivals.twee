@@ -1,26 +1,7 @@
 :: Deadwood Reblooms Festivals Widgets [widget]
-<!-- 节日与宿舍只保存进度；时间、职级和悉尼日程每次从当前游戏状态读取。 -->
-<<widget 'deadwood-reblooms-sydney-state'>>
-  <<if _sydney_location is undefined>><<sydneySchedule>><</if>>
-  <<set _sydneyActive to C.npc.Sydney.init is 1 and C.npc.Sydney.state isnot 'prison' and C.npc.Sydney.state isnot 'dungeon' and $daily.sydney?.punish isnot 1>>
-  <<set _sydneyAvailable to _sydneyActive and _sydney_location is 'temple'>>
-  <<set _halloweenNight to (Time.month is 10 and Time.monthDay is 31 and Time.hour gte 21) or (Time.month is 11 and Time.monthDay is 1 and Time.hour lt 7)>>
-  <<set _festivalNight to _sydneyActive and _halloweenNight and $SydneyExpansion.halloweenYear is Time.year and $SydneyExpansion.sirrisHalloweenVisitYear isnot Time.year>>
-  <<set _sirrisMorning to _sydneyActive and $SydneyExpansion.halloweenYear is Time.year and $SydneyExpansion.sirrisHalloweenVisitYear isnot Time.year and Time.month is 11 and Time.monthDay is 1 and Time.hour gte 7 and Time.hour lt 10>>
-  <<set _dormAccess to _sydneyActive and ['monk', 'priest'].includes($temple_rank) and $sydney?.rank is 'monk' and $sydneyromance is 1>>
-  <<set _christmasRest to $SydneyExpansion.christmasRestYear is Time.year and ((Time.month is 12 and Time.monthDay is 25 and Time.hour gte 21) or (Time.month is 12 and Time.monthDay is 26 and Time.hour lt 6))>>
-  <!-- 原版 quarters 指在宿舍做杂务；只有 sleep 才是在床铺休息。 -->
-  <<set _sydneyWorking to _sydneyActive and _sydney_location is 'temple' and $sydney_templeWork is 'quarters'>>
-  <<set _sydneyResting to _sydneyActive and _sydney_location is 'temple' and $sydney_templeWork is 'sleep'>>
-  <<set _sydneyHere to _sydneyWorking or _sydneyResting>>
-  <<set _shareSydneyBed to _dormAccess and _sydneyResting>>
-  <<set _minutesUntilSirris to Time.month is 10 ? 31 * 60 - (Time.hour * 60 + Time.minute) : Math.max(1, 7 * 60 - (Time.hour * 60 + Time.minute))>>
-<</widget>>
-
 <<widget 'deadwood-reblooms-sydney-christmas-link'>><<silently>>
-  <<deadwood-reblooms-sydney-state>>
   <<set _showChristmasLink to $christmas is 1 and Time.month is 12 and Time.monthDay is 25 and Time.hour gte 8 and Time.hour lt 22 and _sydneyAvailable and $SydneyExpansion.christmasYear isnot Time.year>>
-<</silently>><<if _showChristmasLink>><<gifticon 'christmas'>><<lanLink 'Spend Christmas with Sydney' 'Deadwood Reblooms Sydney Christmas'>><</lanLink>><br><</if>><</widget>>
+<</silently>><<if _showChristmasLink>><<gifticon 'christmas'>><<lanLink '和悉尼一起过圣诞节' 'Deadwood Reblooms Sydney Christmas'>><</lanLink>><br><</if>><</widget>>
 
 <!-- 罗宾路线的三种收尾共用同一段引导，原版选择与结算保持不变。 -->
 <<widget 'deadwood-reblooms-halloween-robin-guide'>>
@@ -28,7 +9,10 @@
   <<set _whitneyHalloweenTime to Time.month is 10 and Time.monthDay is 31 and (Time.hour lt 23 or (Time.hour is 23 and Time.minute lte 54))>>
   <<if _whitneyHalloweenTime and $halloween is 1 and $halloween_whitney_proposed isnot 1 and $halloween_kylar_whitney isnot 1 and $SydneyExpansion.whitneyHalloweenYear isnot Time.year and C.npc.Whitney.init is 1 and C.npc.Whitney.state isnot 'dungeon' and !$possessed>>
     <br><br>
-    <span class="teal"><<lanSwitch "Once you leave Robin's room, Whitney and his gang will be trick-or-treating on Domus Street after 19:00." '离开罗宾的房间后，你可以在19:00以后去宅邸街，惠特尼和同伙会在那里玩不给糖就捣蛋。'>></span>
+    <<language>>
+      <<option 'EN'>>After <span class="teal">19:00</span>, Whitney and his gang will be trick-or-treating on <span class="teal">Domus Street</span>.
+      <<option 'CN'>>惠特尼和同伙会在<span class="teal">19:00后</span>到<span class="teal">宅邸街</span>讨糖。
+    <</language>>
   <</if>>
 <</widget>>
 
@@ -37,11 +21,17 @@
   <<if _kylarHalloweenTime and $SydneyExpansion.robinHalloweenYear is Time.year and $SydneyExpansion.whitneyHalloweenYear is Time.year and ($halloween_kylar is 1 or C.npc.Kylar.love gte 60) and $halloween_kylar_proposed isnot 1 and C.npc.Kylar.init is 1 and C.npc.Kylar.state is 'active' and !$possessed>>
     <br><br>
     <<if Time.month is 10 and Time.hour lt 21>>
-      <span class="teal"><<lanSwitch 'Kylar may be at the park after 21:00. You could wait here before going on.' '21:00后，或许能在公园遇见凯拉尔。你可以等一会儿再继续走。'>></span>
+      <<language>>
+        <<option 'EN'>>Kylar may be at the <span class="teal">park after 21:00</span>. There is still time to wait before going on.
+        <<option 'CN'>>凯拉尔或许会在<span class="teal">21:00后</span>去<span class="teal">公园</span>。现在还来得及等一会儿。
+      <</language>>
       <br><br>
-      <<lanLink 'Wait until 21:00 and go to the park' 'Park'>><<set _festivalWait to Time.month is 10 and Time.monthDay is 31 ? Math.max(5, 21 * 60 - (Time.hour * 60 + Time.minute)) : 5>><<pass _festivalWait>><<endevent>><<set $eventskip to 1>><</lanLink>><br>
+      <<lanLink '等到21:00，再去公园' 'Park'>><<set _festivalWait to Time.month is 10 and Time.monthDay is 31 ? Math.max(5, 21 * 60 - (Time.hour * 60 + Time.minute)) : 5>><<pass _festivalWait>><<endevent>><<set $eventskip to 1>><</lanLink>><br>
     <<else>>
-      <span class="teal"><<lanSwitch 'The path ahead leads to the park. Kylar may still be there.' '前面就是公园，凯拉尔或许还在那里。'>></span>
+      <<language>>
+        <<option 'EN'>>The path ahead leads to the <span class="teal">park</span>. Kylar may still be there.
+        <<option 'CN'>>前面就是<span class="teal">公园</span>。凯拉尔或许还在那里。
+      <</language>>
     <</if>>
   <</if>>
 <</widget>>
@@ -52,9 +42,12 @@
   <<set _sydneyHalloweenTime to (Time.month is 10 and Time.monthDay is 31 and Time.hour gte 21) or (Time.month is 11 and Time.monthDay is 1 and (Time.hour lt 5 or (Time.hour is 5 and Time.minute lte 49)))>>
   <<if _sydneyHalloweenTime and $SydneyExpansion.robinHalloweenYear is Time.year and $SydneyExpansion.whitneyHalloweenYear is Time.year and $halloween_kylar_proposed is 1 and _sydneyActive and $SydneyExpansion.halloweenYear isnot Time.year>>
     <br><br>
-    <span class="teal"><<lanSwitch 'A light is still burning inside the temple. Sydney is keeping watch over the Halloween candles tonight.' '神殿里还有灯光。悉尼今晚留下来守着万圣节的烛火。'>></span>
+    <<language>>
+      <<option 'EN'>>A light is still burning inside the <span class="teal">temple</span>. Sydney is keeping watch over the Halloween candles tonight.
+      <<option 'CN'>><span class="teal">神殿</span>里还亮着灯。悉尼今晚留下来守着万圣节的烛火。
+    <</language>>
     <br><br>
-    <<templeicon 'pew'>><<lanLink 'Visit Sydney at the temple (0:10)' 'Deadwood Reblooms Sydney Halloween'>><<pass 10>><<endevent>><</lanLink>><br>
+    <<templeicon 'pew'>><<lanLink '去神殿看悉尼 (0:10)' 'Deadwood Reblooms Sydney Halloween'>><<pass 10>><<endevent>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -67,23 +60,23 @@
 
 <!-- 未通过试炼时守夜留在大厅，不借节日剧情进入悉尼的床铺。 -->
 <<widget 'deadwood-reblooms-sydney-halloween-rest'>>
-  <<deadwood-reblooms-sydney-state>>
+  <<if _sydneyAvailable is undefined>><<sydneySchedule>><</if>>
   <<if _festivalNight>>
     <br><br>
     <<if _dormAccess>>
       <<lanSwitch 'Sydney gathers up the blanket and starts up the stairs to the temple quarters. There is room for you to follow.' '悉尼抱起毯子，朝神殿宿舍的楼梯走去。你也可以跟上。'>>
       <br><br>
-      <<icon 'temple/sydney-quarters.png'>><<lanLink 'Follow Sydney to the quarters (0:01)' 'Deadwood Reblooms Sydney Dorm'>><<set $SydneyExpansion.halloweenRestYear to Time.year>><<pass 1>><</lanLink>>
+      <<icon 'temple/sydney-quarters.png'>><<lanLink '跟悉尼去宿舍 (0:01)' 'Deadwood Reblooms Sydney Dorm'>><<set $SydneyExpansion.halloweenRestYear to Time.year>><<pass 1>><</lanLink>>
     <<else>>
       <<lanSwitch 'Sydney still has duties downstairs. You can stay beside the candles until the morning shift arrives.' '悉尼还要留在楼下值守。你可以陪悉尼守灯，直到早班的人到来。'>>
       <br><br>
-      <<lanLink 'Keep Sydney company until morning' 'Deadwood Reblooms Sydney Halloween Morning'>><<pass _minutesUntilSirris>><</lanLink>>
+      <<lanLink '陪悉尼守夜到早晨' 'Deadwood Reblooms Sydney Halloween Morning'>><<pass _minutesUntilSirris>><</lanLink>>
     <</if>>
   <<elseif _sirrisMorning>>
     <br><br>
     <<lanSwitch 'Morning has arrived. Sirris is waiting outside the temple for Sydney.' '天已经亮了。西里斯正在神殿外等悉尼。'>>
     <br><br>
-    <<lanLink 'Go with Sydney to meet Sirris' 'Deadwood Reblooms Sydney Halloween Morning'>><</lanLink>>
+    <<lanLink '和悉尼去见西里斯' 'Deadwood Reblooms Sydney Halloween Morning'>><</lanLink>>
   <</if>>
 <</widget>>
 
@@ -138,10 +131,10 @@
     <</if>>
 <</language>>
 <br><br>
-<<templeicon 'altar'>><<lanLink 'Help Sydney with the lanterns (0:15)' 'Deadwood Reblooms Sydney Halloween Lanterns'>><<set $SydneyExpansion.halloweenYear to Time.year>><<pass 15>><<npcincr Sydney love 1>><</lanLink>><<glove>><br>
-<<foodicon 'sweets'>><<lanLink 'Share your Halloween sweets (0:15)' 'Deadwood Reblooms Sydney Halloween Sweets'>><<set $SydneyExpansion.halloweenYear to Time.year>><<pass 15>><<npcincr Sydney love 1>><</lanLink>><<glove>><br>
+<<templeicon 'altar'>><<lanLink '帮悉尼整理灯笼 (0:15)' 'Deadwood Reblooms Sydney Halloween Lanterns'>><<set $SydneyExpansion.halloweenYear to Time.year>><<pass 15>><<npcincr Sydney love 1>><</lanLink>><<glove>><br>
+<<foodicon 'sweets'>><<lanLink '与悉尼分享万圣节糖果 (0:15)' 'Deadwood Reblooms Sydney Halloween Sweets'>><<set $SydneyExpansion.halloweenYear to Time.year>><<pass 15>><<npcincr Sydney love 1>><</lanLink>><<glove>><br>
 <br>
-<<getouticon>><<lanLink 'Leave' 'Temple'>><<endevent>><</lanLink>>
+<<getouticon>><<lanLink '离开' 'Temple'>><<endevent>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Halloween Lanterns []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
@@ -192,13 +185,13 @@
 <</language>>
 <<stress -2>><<lstress>>
 <br><br>
-<<foodicon 'sweets'>><<lanLink 'Share the sweets with Sydney (0:15)' 'Deadwood Reblooms Sydney Halloween Sweets'>><<pass 15>><<npcincr Sydney love 1>><</lanLink>><<glove>><br>
+<<foodicon 'sweets'>><<lanLink '和悉尼分糖 (0:15)' 'Deadwood Reblooms Sydney Halloween Sweets'>><<pass 15>><<npcincr Sydney love 1>><</lanLink>><<glove>><br>
 <<if $sydneyromance is 1>>
-  <<socialiseicon>><<lanLink 'Talk with Sydney alone for a while (0:10)' 'Deadwood Reblooms Sydney Halloween Quiet'>><<pass 10>><</lanLink>><br>
+  <<socialiseicon>><<lanLink '和悉尼去侧室谈谈 (0:10)' 'Deadwood Reblooms Sydney Halloween Quiet'>><<pass 10>><</lanLink>><br>
 <</if>>
 <<deadwood-reblooms-sydney-halloween-rest>>
 <br><br>
-<<getouticon>><<lanLink 'Leave' 'Temple'>><<endevent>><</lanLink>>
+<<getouticon>><<lanLink '离开' 'Temple'>><<endevent>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Halloween Quiet []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
@@ -231,10 +224,10 @@
 <</language>>
 <br><br>
 <<if hasSexStat('promiscuity', 1)>>
-  <<loveicon 'kiss'>><<lanLink 'Kiss Sydney (0:05)' 'Deadwood Reblooms Sydney Halloween Kiss'>><<pass 5>><<npcincr Sydney love 1>><<set $sexstart to 1>><</lanLink>><<promiscuous1>><<glove>><br>
+  <<loveicon 'kiss'>><<lanLink '吻悉尼 (0:05)' 'Deadwood Reblooms Sydney Halloween Kiss'>><<pass 5>><<npcincr Sydney love 1>><<set $sexstart to 1>><</lanLink>><<promiscuous1>><<glove>><br>
   <br>
 <</if>>
-<<getouticon>><<lanLink 'Return to the hall' 'Temple'>><<endevent>><</lanLink>>
+<<getouticon>><<lanLink '回到大厅' 'Temple'>><<endevent>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Halloween Kiss []
 <<if $sexstart is 1>>
@@ -281,9 +274,9 @@
 <br><br>
 <<actionsman>>
 <<if _combatend>>
-  <span id="next"><<lanLink 'Next' 'Deadwood Reblooms Sydney Halloween Kiss Finish'>><</lanLink>></span><<nexttext>>
+  <span id="next"><<lanLink '继续' 'Deadwood Reblooms Sydney Halloween Kiss Finish'>><</lanLink>></span><<nexttext>>
 <<else>>
-  <span id="next"><<lanLink 'Next' 'Deadwood Reblooms Sydney Halloween Kiss'>><</lanLink>></span><<nexttext>>
+  <span id="next"><<lanLink '继续' 'Deadwood Reblooms Sydney Halloween Kiss'>><</lanLink>></span><<nexttext>>
 <</if>>
 
 :: Deadwood Reblooms Sydney Halloween Kiss Finish []
@@ -327,7 +320,7 @@
 <</language>>
 <<deadwood-reblooms-sydney-halloween-rest>>
 <br><br>
-<<getouticon>><<lanLink 'Leave' 'Temple'>><<endevent>><</lanLink>>
+<<getouticon>><<lanLink '离开' 'Temple'>><<endevent>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Halloween Sweets []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
@@ -345,7 +338,7 @@
     <</if>>
     <br><br>
     <<if _sydneyStatus.includes('corrupt') and $sydneyromance is 1>>
-      Sydney lifts the last sweet to your lips. <span class="lewd"><<His>> fingers linger there as you take it.</span> <span class="lewd">"If you want something sweeter, wait until we're alone,"</span> <<he>> whispers.
+      Sydney lifts the last sweet to your lips. <span class="lewd"><<His>> fingers linger there as you take it.</span> "If you want <span class="lewd">something sweeter</span>, wait until we're alone," <<he>> whispers.
     <<elseif _sydneyStatus.includes('corrupt')>>
       <<He>> steals the last sweet from your palm with a sly smile. "You'll have to catch me if you want it back."
     <<elseif _sydneyStatus.includes('pure')>>
@@ -363,7 +356,7 @@
     <</if>>
     <br><br>
     <<if _sydneyStatus.includes('corrupt') and $sydneyromance is 1>>
-      悉尼把最后一颗糖递到你唇边，<span class="lewd">等你含住了，手指才慢慢离开。</span><span class="lewd">“想尝更甜的，等只剩我们两个人时再说。”</span><<he>>低声说。
+      悉尼把最后一颗糖递到你唇边，<span class="lewd">等你含住了，手指才慢慢离开。</span>“想尝<span class="lewd">更甜的</span>，等只剩我们两个人时再说。”<<he>>低声说。
     <<elseif _sydneyStatus.includes('corrupt')>>
       <<He>>带着狡黠的笑，从你掌心拿走最后一颗糖。“想要回来，就来抓我呀。”
     <<elseif _sydneyStatus.includes('pure')>>
@@ -375,11 +368,11 @@
 <<stress -2>><<lstress>>
 <<if $sydneyromance is 1>>
   <br><br>
-  <<socialiseicon>><<lanLink 'Talk with Sydney alone for a while (0:10)' 'Deadwood Reblooms Sydney Halloween Quiet'>><<pass 10>><</lanLink>>
+  <<socialiseicon>><<lanLink '和悉尼去侧室谈谈 (0:10)' 'Deadwood Reblooms Sydney Halloween Quiet'>><<pass 10>><</lanLink>>
 <</if>>
 <<deadwood-reblooms-sydney-halloween-rest>>
 <br><br>
-<<getouticon>><<lanLink 'Leave' 'Temple'>><<endevent>><</lanLink>>
+<<getouticon>><<lanLink '离开' 'Temple'>><<endevent>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Christmas []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
@@ -420,21 +413,20 @@
     <</if>>
 <</language>>
 <br><br>
-<<gifticon 'christmas'>><<lanLink 'Help Sydney prepare the gifts (0:20)' 'Deadwood Reblooms Sydney Christmas Gifts'>><<set $SydneyExpansion.christmasYear to Time.year>><<pass 20>><<npcincr Sydney love 1>><</lanLink>><<glove>><br>
+<<gifticon 'christmas'>><<lanLink '帮悉尼准备礼物 (0:20)' 'Deadwood Reblooms Sydney Christmas Gifts'>><<set $SydneyExpansion.christmasYear to Time.year>><<pass 20>><<npcincr Sydney love 1>><</lanLink>><<glove>><br>
 <br>
-<<getouticon>><<lanLink 'Leave' 'Temple'>><<endevent>><</lanLink>>
+<<getouticon>><<lanLink '离开' 'Temple'>><<endevent>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Christmas Gifts []
-<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
+<<set $outside to 0>><<set $location to 'temple'>><<if _sydneyAvailable is undefined>><<sydneySchedule>><</if>><<temple_effects>><<effects>>
 <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<deadwood-reblooms-sydney-state>>
 <<language>>
   <<option 'EN'>>
     You hold the parcels while Sydney ties the ribbons. When you finish, <<he>> slips a small wrapped sweet into your hand.
     <br><br>
     <<if _sydneyStatus.includes('corrupt')>>
       <<if $sydneyromance is 1>>
-        "That's your reward for helping," <<he>> says, leaning close. <<if _dormAccess>><span class="lewd">"The real gift can wait until we're alone."</span><<else>>"I saved the last one to share with you."<</if>>
+        "That's your reward for helping," <<he>> says, leaning close. <<if _dormAccess>>"The <span class="lewd">real gift</span> can wait until we're alone."<<else>>"I saved the last one to share with you."<</if>>
       <<else>>
         "That's your reward for helping," <<he>> says with a grin. "Don't tell Jordan I stole it from the pile."
       <</if>>
@@ -448,7 +440,7 @@
     <br><br>
     <<if _sydneyStatus.includes('corrupt')>>
       <<if $sydneyromance is 1>>
-        “这是帮忙的报酬。”<<he>>靠近你说，<<if _dormAccess>><span class="lewd">“真正的礼物，等只剩我们两个人时再给你。”</span><<else>>“最后一颗，我特意留着和你一起吃。”<</if>>
+        “这是帮忙的报酬。”<<he>>靠近你说，<<if _dormAccess>>“<span class="lewd">真正的礼物</span>，等只剩我们两个人时再给你。”<<else>>“最后一颗，我特意留着和你一起吃。”<</if>>
       <<else>>
         “这是帮忙的报酬。”<<he>>笑着说，“别告诉约旦是我从那堆里拿的。”
       <</if>>
@@ -469,7 +461,7 @@
       悉尼收好卡片，抱着剩下的包裹上楼。“来看看我把书放在哪里。”<<he>>侧过身，给你让出路。
   <</language>>
   <br><br>
-  <<icon 'temple/sydney-quarters.png'>><<lanLink 'Follow Sydney to the quarters (0:01)' 'Deadwood Reblooms Sydney Dorm'>><<set $SydneyExpansion.christmasRestYear to Time.year>><<pass 1>><</lanLink>><br>
+  <<icon 'temple/sydney-quarters.png'>><<lanLink '跟悉尼去宿舍 (0:01)' 'Deadwood Reblooms Sydney Dorm'>><<set $SydneyExpansion.christmasRestYear to Time.year>><<pass 1>><</lanLink>><br>
   <br>
 <</if>>
-<<getouticon>><<lanLink 'Leave' 'Temple'>><<endevent>><</lanLink>>
+<<getouticon>><<lanLink '离开' 'Temple'>><<endevent>><</lanLink>>

@@ -51,7 +51,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     for (const event of events ?? []) {
       if (event.name === 'school day') {
         const condition = event.condition;
-        event.condition = () => maplebirch.LS.school.role !== 'president' && condition.call(event);
+        event.condition = () => V.LifeSimulation.school.role !== 'president' && condition.call(event);
       }
       if (event.name === 'tomorrow') {
         event.text = `<<if $LifeSimulation.school.role is 'president'>><<lanSwitch 'You may attend school tomorrow.' '明天你可以自愿上课。'>><<else>>${event.text}<</if>>`;
@@ -95,21 +95,21 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       title: 'School Traits',
       name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:prefect:name'),
       colour: 'green',
-      has: () => maplebirch.LS.school.role === 'prefect',
+      has: () => V.LifeSimulation.school.role === 'prefect',
       text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:prefect:text')
     },
     {
       title: 'School Traits',
       name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:president:name'),
       colour: 'green',
-      has: () => maplebirch.LS.school.role === 'president',
+      has: () => V.LifeSimulation.school.role === 'president',
       text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:president:text')
     },
     {
       title: 'School Traits',
       name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:attendancePass:name'),
       colour: 'green',
-      has: () => maplebirch.LS.school.role === 'president',
+      has: () => V.LifeSimulation.school.role === 'president',
       text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:attendancePass:text')
     }
   );

@@ -24,6 +24,8 @@ declare global {
   interface Window {
     isLoveInterest(name: string): boolean;
     isPossibleLoveInterest(name: string): boolean;
+    getRobinLocation(): string | undefined;
+    getKylarLocation(): { area: string; state: string };
     mapMove: ((destination: string) => void) & { deadwoodPublicWalk?: boolean };
     LZString: {
       compressToBase64(input: string): string;

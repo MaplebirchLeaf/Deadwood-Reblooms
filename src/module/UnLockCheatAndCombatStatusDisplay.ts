@@ -1,13 +1,17 @@
 // ./src/module/UnlockCheatAndCombatStatusDisplay.ts
 
-// 战斗状态颜色由分支内的原版 span 决定；数值必须写入 span 内才能继承同一颜色。
-function statusPatch(suffixMacro: string, duplicateMarker: string): string {
-  return ((matchedBlock: string) => {
-    return matchedBlock.replace(/(<span\b[^>]*>[\s\S]*?)(<\/span>)/g, (span, body, close) => {
-      if (span.includes(duplicateMarker)) return span;
-      return `${body}${suffixMacro}${close}`;
-    });
-  }) as unknown as string;
+// 四段状态各自限定在原版相邻的 if 分支之间，只给该段的彩色 span 插入数值。
+// srcmatchgroup 与 to 都遵守框架的字符串替换契约；已插入的宏不会被再次匹配。
+function statusPatch(start: string, end: string, suffixMacro: string, expected: number) {
+  const marker = suffixMacro.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return {
+    srcmatchgroup: new RegExp(
+      `(?<=<<if \\$${start}\\b(?:(?!<<if \\$${end}\\b)[\\s\\S])*?)(<span\\b[^>]*>(?:(?!<\\/span>)[\\s\\S])*?)(?<!${marker})(<\\/span>)(?=(?:(?!<<if \\$${end}\\b)[\\s\\S])*?<<if \\$${end}\\b)`,
+      'g'
+    ),
+    to: `$1${suffixMacro}$2`,
+    expected
+  };
 }
 
 class UnlockCheatAndCombatStatusDisplay {
@@ -34,30 +38,10 @@ class UnlockCheatAndCombatStatusDisplay {
 
       widgetPassage: {
         'Widgets State Man': [
-          // 用数值生命面板替换原版从 loveDrunk 到 enemyarousal 前的生命状态文本区块。
-          {
-            srcmatch: /<<if\s+\$loveDrunk\b[\s\S]*?(?=\n\s*<<if\s+\$enemyarousal\b)/,
-            to: statusPatch(health, 'Math.round($enemyhealth)'),
-            expected: 1
-          },
-          // 用数值兴奋面板替换原版 enemyarousal 状态区块，保留后续愤怒区块作为边界。
-          {
-            srcmatch: /<<if\s+\$enemyarousal\b[\s\S]*?(?=\n\s*<<if\s+\$enemyanger\b)/,
-            to: statusPatch(arousal, 'Math.round($enemyarousal)'),
-            expected: 1
-          },
-          // 用数值愤怒面板替换原版 enemyanger 状态区块，保留后续信任区块作为边界。
-          {
-            srcmatch: /<<if\s+\$enemyanger\b[\s\S]*?(?=\n\s*<<if\s+\$enemytrust\b)/,
-            to: statusPatch(anger, 'Math.round($enemyanger)'),
-            expected: 1
-          },
-          // 用数值信任面板替换原版 enemytrust 状态区块，截止到恐慌暴力判断之前。
-          {
-            srcmatch: /<<if\s+\$enemytrust\b[\s\S]*?(?=\n\s*<<if\s+\$panicviolence\b)/,
-            to: statusPatch(trust, 'Math.round($enemytrust)'),
-            expected: 1
-          }
+          statusPatch('loveDrunk', 'enemyarousal', health, 8),
+          statusPatch('enemyarousal', 'enemyanger', arousal, 10),
+          statusPatch('enemyanger', 'enemytrust', anger, 7),
+          statusPatch('enemytrust', 'panicviolence', trust, 7)
         ]
       }
     });

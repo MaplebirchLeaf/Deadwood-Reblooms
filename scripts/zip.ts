@@ -5,7 +5,7 @@ import { load as loadYaml } from 'js-yaml';
 import { readPackageJSON } from 'pkg-types';
 import { parseDynamicMusicConfig } from '../src/module/DynamicMusic';
 
-export interface ScmlPlugin {
+interface ScmlPlugin {
   modName: string;
   addonName: string;
   modVersion: string;
@@ -25,7 +25,7 @@ interface RootPackage {
   scml: ScmlConfig;
 }
 
-export interface PackageInfo {
+interface PackageInfo {
   name: string;
   version: string;
   gameVersion: string;
@@ -120,7 +120,7 @@ async function scan(dir: string, { base = '', prefix = '', excludes = [] }: Scan
   return out;
 }
 
-export function validateTweeWidgets(files: Map<string, Buffer>): void {
+function validateTweeWidgets(files: Map<string, Buffer>): void {
   const widgets = new Map<string, string>();
   const errors: string[] = [];
 
@@ -465,10 +465,6 @@ export async function modPackageInfo(rootDir: string): Promise<PackageInfo> {
     gameVersion,
     baseName: `${pkg.name}-${gameVersion}-v${pkg.version}`
   };
-}
-
-export function devZipFileName(name: string, version: string): string {
-  return `${name}-${version}.mod.zip`;
 }
 
 export async function createZip(rootDir: string): Promise<Buffer> {

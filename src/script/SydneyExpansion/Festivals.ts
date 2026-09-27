@@ -18,33 +18,48 @@ export default function (maplebirch: typeof window.maplebirch) {
     const schedule = window.sydneySchedule;
     if (typeof schedule !== 'function' || !maplebirch.tool.macro.Macro.has('sydneySchedule')) return;
 
-    const keepSydneyAtTemple = () => {
-      if (!V.SydneyExpansion || V.replayScene) return;
+    const adjustSydneySchedule = () => {
+      if (!V.SydneyExpansion) return;
       const sydneyActive = C.npc.Sydney.init === 1 && C.npc.Sydney.state !== 'prison' && C.npc.Sydney.state !== 'dungeon' && V.daily.sydney?.punish !== 1;
-      if (!sydneyActive) return;
-
-      const halloweenNight =
-        V.SydneyExpansion.sirrisHalloweenVisitYear !== Time.year &&
-        V.SydneyExpansion.halloweenYear === Time.year &&
-        ((Time.month === 10 && Time.monthDay === 31 && Time.hour >= 21) || (Time.month === 11 && Time.monthDay === 1 && Time.hour < 7));
+      const halloweenNight = (Time.month === 10 && Time.monthDay === 31 && Time.hour >= 21) || (Time.month === 11 && Time.monthDay === 1 && Time.hour < 7);
+      const festivalNight = sydneyActive && halloweenNight && V.SydneyExpansion.halloweenYear === Time.year && V.SydneyExpansion.sirrisHalloweenVisitYear !== Time.year;
       const sirrisMorning =
-        V.SydneyExpansion.sirrisHalloweenVisitYear !== Time.year && V.SydneyExpansion.halloweenYear === Time.year && Time.month === 11 && Time.monthDay === 1 && Time.hour >= 7 && Time.hour < 10;
+        sydneyActive && V.SydneyExpansion.halloweenYear === Time.year && V.SydneyExpansion.sirrisHalloweenVisitYear !== Time.year && Time.month === 11 && Time.monthDay === 1 && Time.hour >= 7 && Time.hour < 10;
       const christmasRest =
         V.SydneyExpansion.christmasRestYear === Time.year && ((Time.month === 12 && Time.monthDay === 25 && Time.hour >= 21) || (Time.month === 12 && Time.monthDay === 26 && Time.hour < 6));
-      if (!halloweenNight && !sirrisMorning && !christmasRest) return;
 
-      T.sydney_location = 'temple';
-      T.sydney_location_message = 'temple';
-      V.sydney_templeWork = (halloweenNight && V.SydneyExpansion.halloweenRestYear === Time.year) || christmasRest ? 'sleep' : 'pray';
+      if (sydneyActive && !V.replayScene) {
+        // 原版周一 00:00 短暂标为祈祷；留宿日程将这一小时视为睡在神殿。
+        if (T.sydney_location === 'temple' && Time.weekDay === 1 && Time.hour === 0 && V.sydney_templeWork === 'pray') {
+          V.sydney_templeWork = 'sleep';
+        }
+        if (festivalNight || sirrisMorning || christmasRest) {
+          T.sydney_location = 'temple';
+          T.sydney_location_message = 'temple';
+          V.sydney_templeWork = (festivalNight && V.SydneyExpansion.halloweenRestYear === Time.year) || christmasRest ? 'sleep' : 'pray';
+        }
+      }
+
+      // 页面只读取临时状态；每次原版日程更新后统一刷新。
+      T.sydneyAvailable = sydneyActive && T.sydney_location === 'temple';
+      T.festivalNight = festivalNight;
+      T.sirrisMorning = sirrisMorning;
+      T.dormAccess = sydneyActive && ['monk', 'priest'].includes(V.temple_rank) && V.sydney?.rank === 'monk' && V.sydneyromance === 1;
+      T.christmasRest = christmasRest;
+      // quarters 表示在宿舍区域做杂务，不能据此认定悉尼就在床铺旁。
+      T.sydneyWorking = T.sydneyAvailable && V.sydney_templeWork === 'quarters';
+      T.sydneyResting = T.sydneyAvailable && V.sydney_templeWork === 'sleep';
+      T.shareSydneyBed = T.dormAccess && T.sydneyResting;
+      T.minutesUntilSirris = Time.month === 10 ? 31 * 60 - (Time.hour * 60 + Time.minute) : Math.max(1, 7 * 60 - (Time.hour * 60 + Time.minute));
     };
 
     window.sydneySchedule = () => {
       schedule();
-      keepSydneyAtTemple();
+      adjustSydneySchedule();
     };
     maplebirch.tool.macro.define('sydneySchedule', () => {
       schedule();
-      keepSydneyAtTemple();
+      adjustSydneySchedule();
     });
   });
 

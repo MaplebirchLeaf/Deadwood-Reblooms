@@ -2,26 +2,26 @@
 
 <!-- 学校公告栏入口：身份、校园状态与校规集中在同一个面板。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-board-link'>>
-  <<assignmenticon>><<lanLink 'Check the student affairs noticeboard (0:02)' 'Deadwood Reblooms Life Simulation School Board'>><<pass 2>><</lanLink>><br>
+  <<assignmenticon>><<lanLink '查看学生事务公告栏 (0:02)' 'Deadwood Reblooms Life Simulation School Board'>><<pass 2>><</lanLink>><br>
 <</widget>>
 
 <!-- 职位申请与新校规提案都必须当面向礼顿提出。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-office-options'>>
   <<if Time.schoolDay and $schoolstate isnot 'early' and $schoolstate isnot 'late' and $pillory.tenant.special.name isnot 'Leighton' and (wearingSchoolOutfit() or Time.hour gte 14)>>
-    <<if maplebirch.LS.school.canRequestPrefect>>
-      <<schoolicon 'building'>><<lanLink 'Apply to become a prefect' 'Deadwood Reblooms Life Simulation Prefect Appointment'>><</lanLink>><br>
+    <<if $LifeSimulation.school.role is 'student'>>
+      <<schoolicon 'building'>><<lanLink '申请担任风纪委员' 'Deadwood Reblooms Life Simulation Prefect Appointment'>><</lanLink>><br>
     <</if>>
-    <<if maplebirch.LS.school.canRequestPresident>>
-      <<schoolicon 'building'>><<lanLink 'Apply to become student council president' 'Deadwood Reblooms Life Simulation President Appointment'>><</lanLink>><br>
+    <<if $LifeSimulation.school.role is 'prefect'>>
+      <<schoolicon 'building'>><<lanLink '申请担任学生会长' 'Deadwood Reblooms Life Simulation President Appointment'>><</lanLink>><br>
     <</if>>
     <<if maplebirch.LS.school.canProposePolicy>>
-      <<schoolicon 'building'>><<lanLink 'Propose the next dress policy' 'Deadwood Reblooms Life Simulation Dress Proposal'>><</lanLink>><br>
+      <<schoolicon 'building'>><<lanLink '提出下一项着装规范' 'Deadwood Reblooms Life Simulation Dress Proposal'>><</lanLink>><br>
     <</if>>
     <<if $LifeSimulation.school.dress.proposal>>
-      <<schoolicon 'building'>><<lanLink 'Discuss the dress policy with Leighton' 'Deadwood Reblooms Life Simulation Dress Approval'>><</lanLink>><br>
+      <<schoolicon 'building'>><<lanLink '与礼顿讨论着装规范' 'Deadwood Reblooms Life Simulation Dress Approval'>><</lanLink>><br>
     <</if>>
     <<if maplebirch.LS.school.canReviewPolicy>>
-      <<schoolicon 'building'>><<lanLink 'Review the dress policy with Leighton' 'Deadwood Reblooms Life Simulation Dress Review'>><</lanLink>><br>
+      <<schoolicon 'building'>><<lanLink '与礼顿复核着装规范' 'Deadwood Reblooms Life Simulation Dress Review'>><</lanLink>><br>
     <</if>>
   <</if>>
 <</widget>>
@@ -29,7 +29,7 @@
 <!-- 风纪职责每天早晨只执行一次。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-duty-link'>>
   <<if maplebirch.LS.school.canPerformDuty>>
-    <<schoolicon 'building'>><<lanLink 'Perform morning duty' 'Deadwood Reblooms Life Simulation Morning Duty'>><</lanLink>><br>
+    <<schoolicon 'building'>><<lanLink '执行晨间值勤' 'Deadwood Reblooms Life Simulation Morning Duty'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -37,19 +37,19 @@
 <<widget 'deadwood-reblooms-life-simulation-school-entry'>>
   <<if maplebirch.LS.school.requiresNudity and !$LifeSimulation.school.clothesStored>>
     <<language>>
-      <<option 'EN'>>The rule posted beside the doors requires students to enter without clothes today.
-      <<option 'CN'>>门旁张贴的校规要求学生今天不得穿衣入校。
-    <</language>><br>
-    <<lockericon>><<lanLink 'Obey the rule and enter naked (0:01)' 'Hallways'>>
+      <<option 'EN'>>A member of staff points to the rule beside the doors. You must <span class='red'>remove your clothes</span> before entering today.
+      <<option 'CN'>>教职工指了指门旁的校规。今天入校前，你<span class='red'>必须脱下衣服</span>。
+    <</language>><br><br>
+    <<lockericon>><<lanLink '遵守校规，脱衣入校 (0:01)' 'Hallways'>>
       <<undress 'lifeSimulationSchool'>>
       <<set $LifeSimulation.school.clothesStored to true>>
       <<pass 1>>
     <</lanLink>>
   <<else>>
-    <<entranceicon>><<lanLink 'Enter the school (0:01)' 'Hallways'>><<pass 1>><</lanLink>>
+    <<entranceicon>><<lanLink '进入学校 (0:01)' 'Hallways'>><<pass 1>><</lanLink>>
     <<if maplebirch.LS.school.allowsNudity and !$LifeSimulation.school.clothesStored>>
       <br>
-      <<lockericon>><<lanLink 'Undress and enter (0:01)' 'Hallways'>>
+      <<lockericon>><<lanLink '脱衣入校 (0:01)' 'Hallways'>>
         <<undress 'lifeSimulationSchool'>>
         <<set $LifeSimulation.school.clothesStored to true>>
         <<pass 1>>
@@ -73,8 +73,8 @@
     <<set $LifeSimulation.school.clothesStored to true>>
   <</silently>>
   <<language>>
-    <<option 'EN'>><span class='purple'>A member of staff stops you and makes you obey the current dress policy before continuing.</span>
-    <<option 'CN'>><span class='purple'>一名教职工拦住了你，要求你遵守当前着装规范后才能继续。</span>
+    <<option 'EN'>>A member of staff stops you and points to the posted rule. You must <span class='red'>remove your clothes</span> before they let you pass.
+    <<option 'CN'>>一名教职工拦住你，指向墙上的校规。你<span class='red'>脱下衣服</span>后，才被放行。
   <</language>><br><br>
 <</widget>>
 
@@ -108,16 +108,19 @@
       </li>
       <<if $LifeSimulation.school.role is 'student'>>
         <li>
-          <<if maplebirch.LS.school.canBecomePrefect>>
+          <<if $schooltrait gte 4 and $delinquency lte 0>>
             <<lanSwitch "You can ask Leighton to appoint you as a prefect." '你可以向礼顿申请担任风纪委员。'>>
           <<else>>
             <<lanSwitch 'Good grades and a clean disciplinary record are needed before you can become a prefect.' '成为风纪委员需要优良的成绩与没有违纪记录。'>>
           <</if>>
         </li>
       <<elseif $LifeSimulation.school.role is 'prefect'>>
+        <<set _school to $LifeSimulation.school>>
+        <<set _enoughDuties to _school.duties.completed gte 5>>
+        <<set _enoughSupport to _school.order gte 25 and _school.studentSupport gte 25 and _school.staffSupport gte 25>>
         <li>
           <<lanSwitch 'Morning duties: ' '晨间值勤：'>><<print Math.min(5, $LifeSimulation.school.duties.completed)>>/5<<lanSwitch '. ' '。'>>
-          <<if maplebirch.LS.school.canBecomePresident>>
+          <<if _enoughDuties and _enoughSupport>>
             <<lanSwitch 'Ask Leighton to appoint you as student council president.' '可以向礼顿申请担任学生会长。'>>
           <<else>>
             <<lanSwitch 'School order and both support ratings must each reach 25.' '校园秩序、学生支持与教职工支持均需达到 25。'>>
@@ -174,20 +177,21 @@
 <<schooleffects>>
 <<effects>>
 <<set _school to $LifeSimulation.school>>
+<<set _policies to maplebirch.LS.school.policies>>
+<<set _availablePolicies to _policies.slice(0, _policies.indexOf(_school.dress.highest) + 1)>>
+<<set _canSelect to _school.role is 'president' and _school.dress.proposal is null and _school.dress.trialUntil is 0>>
 <h1 class='header gold bold'><<lanSwitch "Student affairs noticeboard" "学生事务公告栏">></h1>
 <<language>>
-  <<option 'EN'>>Pinned notices, reports and dress rules fill the board. Some are neatly typed; others have been crossed out and replaced by <span class='purple'>newer instructions</span>.
-  <<option 'CN'>>公告栏上钉满通知、值勤记录与着装规范。有的排得整整齐齐，有的已被划掉，又贴上<span class='purple'>更大胆的新规定</span>。
+  <<option 'EN'>>Notices, duty records and dress rules cover the board. New sheets overlap older ones, with Leighton's signature at the foot of each rule.
+  <<option 'CN'>>公告栏上贴着通知、值勤记录和着装校规。新告示压在旧告示上，每条校规的末尾都留着礼顿的签名。
 <</language>><br><br>
 <span class='gold'><<lanSwitch 'Student council' '学生会'>></span><br>
 <<lanSwitch "School role" "校内身份">><<lanSwitch ': ' '：'>>
-<span class='green'>
-  <<if _school.role is 'student'>>
-    <<lanSwitch "Student" "学生">>
-  <<else>>
-    <<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:' + _school.role + ':name')>>
-  <</if>>
-</span><br>
+<<if _school.role is 'student'>>
+  <<lanSwitch 'Student' '学生'>>
+<<else>>
+  <span class='green'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:' + _school.role + ':name')>></span>
+<</if>><br>
 <<lanSwitch "School order" "校园秩序">><<lanSwitch ': ' '：'>><<deadwood-reblooms-life-simulation-school-standing _school.order>><br>
 <<lanSwitch "Student support" "学生支持">><<lanSwitch ': ' '：'>><<deadwood-reblooms-life-simulation-school-standing _school.studentSupport>><br>
 <<lanSwitch "Staff support" "教职工支持">><<lanSwitch ': ' '：'>><<deadwood-reblooms-life-simulation-school-standing _school.staffSupport>><br>
@@ -249,32 +253,39 @@
     <<option 'CN'>>当前校规还将试行 <<print _school.dress.trialUntil - Time.days>> 天。
   <</language>><br><br>
 <<elseif maplebirch.LS.school.canProposePolicy>>
-  <<lanSwitch "Bring the next proposal to Leighton in the head's office." '下一项校规提案需要你亲自去校长办公室交给礼顿。'>><br><br>
+  <<language>>
+    <<option 'EN'>>Leighton will hear your next proposal in the <span class='blue'>head's office</span>.
+    <<option 'CN'>>下一项校规提案，要去<span class='blue'>校长办公室</span>当面交给礼顿。
+  <</language>><br><br>
 <</if>>
 
-<<if maplebirch.LS.school.canSelectPolicy and maplebirch.LS.school.availablePolicies.length gt 1>>
+<<if _canSelect and _availablePolicies.length gt 1>>
   <<lanSwitch 'Earlier rules that survived review remain on file. As president, you may reinstate one without repeating its trial.' '通过复核的旧规定仍留在档案里。作为学生会长，你可以恢复其中一项，无须重新试行。'>><br><br>
-  <<assignmenticon>><<lanLink 'Choose an approved dress policy' 'Deadwood Reblooms Life Simulation Dress Selection'>><</lanLink>><br><br>
+  <<assignmenticon>><<lanLink '选择已批准的着装规范' 'Deadwood Reblooms Life Simulation Dress Selection'>><</lanLink>><br><br>
 <</if>>
 
-<<getouticon>><<lanLink 'Return to the hallways' 'Hallways'>><</lanLink>>
+<<getouticon>><<lanLink '返回走廊' 'Hallways'>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Dress Selection []
 <<set $outside to 0>>
 <<set $location to 'school'>>
 <<effects>>
+<<set _school to $LifeSimulation.school>>
+<<set _policies to maplebirch.LS.school.policies>>
+<<set _availablePolicies to _policies.slice(0, _policies.indexOf(_school.dress.highest) + 1)>>
+<<set _canSelect to _school.role is 'president' and _school.dress.proposal is null and _school.dress.trialUntil is 0>>
 <h1 class='header gold bold'><<lanSwitch 'Approved dress policies' '已批准的着装规范'>></h1>
-<<if maplebirch.LS.school.canSelectPolicy>>
+<<if _canSelect and _availablePolicies.length gt 1>>
   <<lanSwitch 'The board keeps a copy of every rule that passed its trial. Choose which one to put back into effect.' '公告栏保存着每条通过试行的规定。你可以选择其中一条恢复执行。'>><br><br>
-  <<for _policy range maplebirch.LS.school.availablePolicies>>
+  <<for _policy range _availablePolicies>>
     <<if _policy isnot $LifeSimulation.school.dress.active>>
       <<switch _policy>>
-        <<case 'uniform'>><<set _policyLabel to 'Standard uniform'>>
-        <<case 'free'>><<set _policyLabel to 'Free dress'>>
-        <<case 'revealing'>><<set _policyLabel to 'Revealing clothes permitted'>>
-        <<case 'optionalNudity'>><<set _policyLabel to 'Nudity permitted'>>
-        <<case 'nudeDay'>><<set _policyLabel to 'Weekly nude day'>>
-        <<case 'mandatoryNudity'>><<set _policyLabel to 'Mandatory nudity'>>
+        <<case 'uniform'>><<set _policyLabel to '标准校服'>>
+        <<case 'free'>><<set _policyLabel to '自由着装'>>
+        <<case 'revealing'>><<set _policyLabel to '允许暴露着装'>>
+        <<case 'optionalNudity'>><<set _policyLabel to '允许裸体'>>
+        <<case 'nudeDay'>><<set _policyLabel to '每周裸体日'>>
+        <<case 'mandatoryNudity'>><<set _policyLabel to '强制裸体'>>
       <</switch>>
       <<capture _policy>>
         <<assignmenticon>><<lanLink _policyLabel 'Deadwood Reblooms Life Simulation School Board'>><<run maplebirch.LS.school.selectPolicy(_policy)>><</lanLink>><br>
@@ -282,10 +293,18 @@
     <</if>>
   <</for>>
 <<else>>
-  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br>
+  <<if _canSelect>>
+    <<lanSwitch 'No earlier dress rule has been approved yet.' '目前还没有通过复核的旧校规。'>><br>
+  <<elseif _school.role isnot 'president'>>
+    <<lanSwitch 'Only the student council president can restore an older rule.' '只有学生会长才能恢复旧校规。'>><br>
+  <<elseif _school.dress.proposal>>
+    <<lanSwitch 'Leighton has not decided on your proposal yet. You cannot replace the current rule.' '礼顿还没决定是否批准提案，现行校规暂时不能更换。'>><br>
+  <<else>>
+    <<lanSwitch 'The current rule must finish its trial and review before you can change it.' '现行校规还需完成试行和复核，暂时不能更换。'>><br>
+  <</if>>
 <</if>>
 <br>
-<<getouticon>><<lanLink 'Return to the noticeboard' 'Deadwood Reblooms Life Simulation School Board'>><</lanLink>>
+<<getouticon>><<lanLink '返回公告栏' 'Deadwood Reblooms Life Simulation School Board'>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Prefect Appointment []
 <<set $outside to 0>>
@@ -294,14 +313,14 @@
 <<npc Leighton>>
 <<person1>>
 <<lanSwitch 'You ask Leighton to appoint you as a prefect. ' '你向礼顿申请担任风纪委员。'>><<He>><<lanSwitch ' opens your school record and checks your grades and conduct.' '翻开你的在校记录，核对成绩和操行。'>><br><br>
-<<if maplebirch.LS.school.canBecomePrefect>>
+<<if $LifeSimulation.school.role is 'student' and $schooltrait gte 4 and $delinquency lte 0>>
   <<lanSwitch '"Your academic standing is excellent, and you have kept out of trouble. I can entrust the morning gate to you," ' '“成绩优秀，操行也没有问题。晨间校门可以交给你，”'>><<he>><<lanSwitch ' says.' '说道。'>><br><br>
-  <<schoolicon 'building'>><<lanLink 'Accept the prefect badge' 'Deadwood Reblooms Life Simulation Prefect Appointment Result'>><</lanLink>><br>
+  <<schoolicon 'building'>><<lanLink '接受风纪委员徽章' 'Deadwood Reblooms Life Simulation Prefect Appointment Result'>><</lanLink>><br>
 <<else>>
   <span class='pink'><<lanSwitch '"Come back with a stronger school record and no delinquency."' '“等你的成绩足够好，违纪记录也清零，再来找我。”'>></span><br>
 <</if>>
 <br>
-<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+<<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Prefect Appointment Result []
 <<set $outside to 0>>
@@ -316,15 +335,18 @@
   <</language>><br><br>
   <span class='green'><<lanSwitch "You became a prefect." "你成为了风纪委员。">></span>
 <<else>>
-  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span>
+  <<lanSwitch 'Leighton closes your record. The appointment has not been approved.' '礼顿合上你的档案。这次任命没有获批。'>>
 <</if>>
 <br><br>
-<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+<<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation President Appointment []
 <<set $outside to 0>>
 <<set $location to 'school'>>
 <<effects>>
+<<set _school to $LifeSimulation.school>>
+<<set _enoughDuties to _school.duties.completed gte 5>>
+<<set _enoughSupport to _school.order gte 25 and _school.studentSupport gte 25 and _school.staffSupport gte 25>>
 <<npc Leighton>>
 <<person1>>
 <<lanSwitch 'You ask Leighton to make you student council president. ' '你向礼顿申请担任学生会长。'>><<He>><<lanSwitch ' lays your duty reports beside notes from students and staff.' '把你的值勤报告与学生、教职工的意见放在一起。'>><br><br>
@@ -332,14 +354,14 @@
 <<lanSwitch 'School order: ' '校园秩序：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.order>><<lanSwitch ' (at least 25)' '（至少 25）'>><br>
 <<lanSwitch 'Student support: ' '学生支持：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.studentSupport>><<lanSwitch ' (at least 25)' '（至少 25）'>><br>
 <<lanSwitch 'Staff support: ' '教职工支持：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.staffSupport>><<lanSwitch ' (at least 25)' '（至少 25）'>><br><br>
-<<if maplebirch.LS.school.canBecomePresident>>
+<<if _school.role is 'prefect' and _enoughDuties and _enoughSupport>>
   <<lanSwitch '"You have earned enough trust to lead them. The final decision is yours," ' '“你已经赢得了足够的信任。要不要接下这份职责，由你决定，”'>><<he>><<lanSwitch ' says.' '说道。'>><br><br>
-  <<schoolicon 'building'>><<lanLink 'Accept the presidency and attendance exemption' 'Deadwood Reblooms Life Simulation President Appointment Result'>><</lanLink>><br>
+  <<schoolicon 'building'>><<lanLink '接受会长任命及免听凭证' 'Deadwood Reblooms Life Simulation President Appointment Result'>><</lanLink>><br>
 <<else>>
   <span class='pink'><<lanSwitch '"I need more duty reports and stronger support before I can approve this."' '“我还需要更多值勤记录，以及学生和教职工更明确的支持。”'>></span><br>
 <</if>>
 <br>
-<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+<<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation President Appointment Result []
 <<set $outside to 0>>
@@ -354,10 +376,10 @@
   <</language>><br><br>
   <span class='green'><<lanSwitch "You became student council president." "你成为了学生会长。">></span>
 <<else>>
-  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span>
+  <<lanSwitch 'Leighton sets the appointment aside. The council will have to wait.' '礼顿把任命书放到一旁。学生会暂时还不能交给你。'>>
 <</if>>
 <br><br>
-<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+<<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Morning Duty []
 <<set $outside to 1>>
@@ -377,9 +399,9 @@
         罗宾领着一名低年级学生赶来。那孩子的鞋带散了，罗宾蹲下替他系好，
         才把说明耽搁原因的条子递给你。罗宾的目光在你的徽章和记录簿之间来回。
     <</language>>
-    <br><br><<schoolicon 'building'>><<lanLink "Record Robin's delay" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
-    <<socialiseicon>><<lanLink 'Speak to Robin privately' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
-    <<getouticon>><<lanLink 'Wave Robin through without checking' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
+    <br><br><<schoolicon 'building'>><<lanLink "记下罗宾耽搁的原因" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink '私下与罗宾谈谈' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
+    <<getouticon>><<lanLink '不查记录，直接放罗宾进去' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
   <<elseif _student is 'Sydney'>>
     <<language>>
       <<option 'EN'>>
@@ -390,9 +412,9 @@
         悉尼夹着一叠神殿的文件来到校门。你问起神殿的差事为何耽搁了入校，
         悉尼平静地说明原委，等你决定是否记入值勤簿。
     <</language>>
-    <br><br><<schoolicon 'building'>><<lanLink "Record Sydney's reason" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
-    <<socialiseicon>><<lanLink 'Speak to Sydney privately' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
-    <<getouticon>><<lanLink 'Let Sydney pass without checking' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
+    <br><br><<schoolicon 'building'>><<lanLink "记下悉尼的缘由" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink '私下与悉尼谈谈' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
+    <<getouticon>><<lanLink '不查记录，放悉尼过去' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
   <<elseif _student is 'Kylar'>>
     <<language>>
       <<option 'EN'>>
@@ -405,9 +427,9 @@
         凯拉尔避开了从正门入校的人群，听见你的声音才抬起头，看到你的徽章又往后缩了缩。
         最上面那本书的封面被人写了难听的话。
     <</language>>
-    <br><br><<schoolicon 'building'>><<lanLink 'Order Kylar straight to class' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
-    <<socialiseicon>><<lanLink 'Speak to Kylar privately' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
-    <<getouticon>><<lanLink 'Leave Kylar at the gate' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
+    <br><br><<schoolicon 'building'>><<lanLink '命令凯拉尔马上去上课' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink '私下与凯拉尔谈谈' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
+    <<getouticon>><<lanLink '任由凯拉尔留在校门口' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
   <<else>>
     <<language>>
       <<option 'EN'>>
@@ -418,13 +440,12 @@
         惠特尼横在入口，讥笑着把下一个学生逼了回去。你挡在惠特尼与队伍之间。
         惠特尼瞥见你的徽章，咧嘴一笑，像是在等你当众出丑。
     <</language>>
-    <br><br><<schoolicon 'building'>><<lanLink "Write up Whitney's obstruction" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
-    <<socialiseicon>><<lanLink 'Speak to Whitney privately' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
-    <<getouticon>><<lanLink 'Ignore Whitney' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
+    <br><br><<schoolicon 'building'>><<lanLink "记录惠特尼堵门的行为" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink '私下与惠特尼谈谈' 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
+    <<getouticon>><<lanLink '不理会惠特尼' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
   <</if>>
-  <br><br>
 <<else>>
-  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span>
+  <span class='blue'><<lanSwitch 'The morning gate duty has ended.' '晨间校门值勤已经结束。'>></span>
 <</if>>
 
 :: Deadwood Reblooms Life Simulation Morning Duty Private Talk []
@@ -447,10 +468,10 @@
       <<else>>
         <<lanSwitch 'Robin waits for your decision, ready to take the child straight to class.' '罗宾等你作出决定，准备带那孩子直接去教室。'>>
       <</if>><br><br>
-      <<socialiseicon>><<lanLink 'Hear Robin out and let them in' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
-      <<crimeicon 'coercion'>><<lanLink 'Threaten to report both pupils' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+      <<socialiseicon>><<lanLink '听罗宾说明并放行' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
+      <<crimeicon 'coercion'>><<lanLink '威胁把两名学生都记进报告' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
       <<if maplebirch.LS.school.canInviteStudent>>
-        <<loveicon>><<lanLink 'Invite Robin to meet in private' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
+        <<loveicon>><<lanLink '邀罗宾单独见面' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
       <</if>>
     <<case 'Sydney'>>
       <<language>>
@@ -464,10 +485,10 @@
       <<else>>
         <<lanSwitch 'Sydney keeps to the facts and waits for you to decide what belongs in the register.' '悉尼只说了事情的经过，等你决定值勤簿该怎么写。'>>
       <</if>><br><br>
-      <<socialiseicon>><<lanLink 'Hear the reason and send Sydney to class' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
-      <<crimeicon 'coercion'>><<lanLink "Threaten to report Sydney's temple errand" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+      <<socialiseicon>><<lanLink '听完缘由，送悉尼去上课' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
+      <<crimeicon 'coercion'>><<lanLink "威胁上报悉尼的神殿差事" 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
       <<if maplebirch.LS.school.canInviteStudent>>
-        <<loveicon>><<lanLink 'Invite Sydney to meet in private' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
+        <<loveicon>><<lanLink '邀悉尼单独见面' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
       <</if>>
     <<case 'Kylar'>>
       <<language>>
@@ -481,10 +502,10 @@
       <<else>>
         <<lanSwitch 'Kylar looks down at the book before admitting that someone snatched it on the way to school.' '凯拉尔低头看着书，好一会儿才承认有人在上学路上抢走了它。'>>
       <</if>><br><br>
-      <<socialiseicon>><<lanLink 'Record what happened to Kylar' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
-      <<crimeicon 'coercion'>><<lanLink 'Threaten Kylar with a disciplinary report' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+      <<socialiseicon>><<lanLink '记下凯拉尔的遭遇' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
+      <<crimeicon 'coercion'>><<lanLink '威胁将凯拉尔记作违纪' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
       <<if maplebirch.LS.school.canInviteStudent>>
-        <<loveicon>><<lanLink 'Invite Kylar to meet in private' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
+        <<loveicon>><<lanLink '邀凯拉尔单独见面' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
       <</if>>
     <<case 'Whitney'>>
       <<language>>
@@ -496,16 +517,16 @@
       <<else>>
         <<lanSwitch 'Whitney folds their arms. "Got something to say? Say it where everyone can hear."' '惠特尼抱起手臂：“有话就当着所有人的面说。”'>>
       <</if>><br><br>
-      <<socialiseicon>><<lanLink 'Tell Whitney to move aside' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
-      <<crimeicon 'coercion'>><<lanLink 'Threaten to bring Leighton to the gate' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+      <<socialiseicon>><<lanLink '要求惠特尼让开' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
+      <<crimeicon 'coercion'>><<lanLink '威胁叫礼顿到校门口' 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
       <<if maplebirch.LS.school.canInviteStudent>>
-        <<loveicon>><<lanLink 'Invite Whitney to meet in private' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
+        <<loveicon>><<lanLink '邀惠特尼单独见面' 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
       <</if>>
   <</switch>>
-  <<getouticon>><<lanLink 'Return to the gate' 'Deadwood Reblooms Life Simulation Morning Duty'>><</lanLink>>
+  <<getouticon>><<lanLink '返回校门口' 'Deadwood Reblooms Life Simulation Morning Duty'>><</lanLink>>
 <<else>>
-  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br><br>
-  <<entranceicon>><<lanLink 'Return to the front courtyard' 'School Front Courtyard'>><</lanLink>>
+  <span class='blue'><<lanSwitch 'The student has already left the gate.' '那名学生已经离开校门。'>></span><br><br>
+  <<entranceicon>><<lanLink '返回前庭' 'School Front Courtyard'>><</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Life Simulation Morning Duty Invitation []
@@ -542,7 +563,7 @@
       <</language>>
   <</switch>>
   <<if _loveChange gt 0>><<glove _student>><</if>><br><br>
-  <<loveicon>><<lanLink 'Go somewhere private together (0:02)' 'Deadwood Reblooms Life Simulation Morning Duty Encounter'>>
+  <<loveicon>><<lanLink '一起去僻静处 (0:02)' 'Deadwood Reblooms Life Simulation Morning Duty Encounter'>>
     <<set $sexstart to 1>>
     <<pass 2>>
   <</lanLink>><br>
@@ -585,9 +606,9 @@
   <</switch>>
   <<if _loveChange lt 0>><<llove _student>><</if>><br><br>
 <<else>>
-  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br><br>
+  <span class='blue'><<lanSwitch 'The student has gone before you can speak in private.' '那名学生已经走了，你没能私下开口。'>></span><br><br>
 <</if>>
-<<entranceicon>><<lanLink 'Return to the front courtyard' 'School Front Courtyard'>><<run maplebirch.LS.school.endEncounter()>><</lanLink>>
+<<entranceicon>><<lanLink '返回前庭' 'School Front Courtyard'>><<run maplebirch.LS.school.endEncounter()>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Morning Duty Encounter []
 <<set $outside to 0>>
@@ -610,14 +631,14 @@
   <br><br>
   <<actionsman>>
   <<if _combatend or _controlRegain is 1>>
-    <span id='next'><<lanLink 'Next' 'Deadwood Reblooms Life Simulation Morning Duty Encounter Finish'>><</lanLink>></span>
+    <span id='next'><<lanLink '继续' 'Deadwood Reblooms Life Simulation Morning Duty Encounter Finish'>><</lanLink>></span>
   <<else>>
-    <span id='next'><<lanLink 'Next' 'Deadwood Reblooms Life Simulation Morning Duty Encounter'>><</lanLink>></span>
+    <span id='next'><<lanLink '继续' 'Deadwood Reblooms Life Simulation Morning Duty Encounter'>><</lanLink>></span>
   <</if>>
   <<nexttext>>
 <<else>>
-  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br><br>
-  <<entranceicon>><<lanLink 'Return to the front courtyard' 'School Front Courtyard'>><</lanLink>>
+  <span class='blue'><<lanSwitch 'There is no private meeting to continue.' '没有尚未结束的私下约见。'>></span><br><br>
+  <<entranceicon>><<lanLink '返回前庭' 'School Front Courtyard'>><</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Life Simulation Morning Duty Encounter Finish []
@@ -660,9 +681,9 @@
   <<endcombat>>
   <<run maplebirch.LS.school.endEncounter()>>
 <<else>>
-  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br><br>
+  <span class='blue'><<lanSwitch 'The meeting has ended.' '这次约见已经结束。'>></span><br><br>
 <</if>>
-<<entranceicon>><<lanLink 'Return to the hallways' 'Hallways'>><</lanLink>>
+<<entranceicon>><<lanLink '返回走廊' 'Hallways'>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Morning Duty Result []
 <<set $outside to 1>>
@@ -787,7 +808,7 @@
   <span class='blue'><<lanSwitch "Morning duty has already ended today." "今天的晨间值勤已经结束。">></span>
 <</if>>
 <br><br>
-<<entranceicon>><<lanLink 'Return to the front courtyard' 'School Front Courtyard'>><</lanLink>>
+<<entranceicon>><<lanLink '返回前庭' 'School Front Courtyard'>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Dress Proposal []
 <<set $outside to 0>>
@@ -795,7 +816,8 @@
 <<effects>>
 <<npc Leighton>>
 <<person1>>
-<<set _policy to maplebirch.LS.school.nextPolicy>>
+<<set _policies to maplebirch.LS.school.policies>>
+<<set _policy to _policies[_policies.indexOf($LifeSimulation.school.dress.highest) + 1]>>
 <<if _policy and maplebirch.LS.school.canProposePolicy>>
   <<set _requirements to maplebirch.LS.school.policyRequirements(_policy)>>
   <<language>>
@@ -809,11 +831,21 @@
   <<lanSwitch "Student support" "学生支持">><<lanSwitch ': ' '：'>><<print _requirements.studentSupport>><br>
   <<lanSwitch "Staff support" "教职工支持">><<lanSwitch ': ' '：'>><<print _requirements.staffSupport>><br>
   <<lanSwitch "School corruption" "校园堕落度">><<lanSwitch ': ' '：'>><<print _requirements.corruption>><br><br>
-  <<schoolicon 'building'>><<lanLink 'Present the proposal to Leighton' 'Deadwood Reblooms Life Simulation Dress Approval'>><<run maplebirch.LS.school.proposePolicy()>><</lanLink>><br>
+  <<schoolicon 'building'>><<lanLink '向礼顿呈交提案' 'Deadwood Reblooms Life Simulation Dress Approval'>><<run maplebirch.LS.school.proposePolicy()>><</lanLink>><br>
 <<else>>
-  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span><br>
+  <<if $LifeSimulation.school.role isnot 'president'>>
+    <span class='blue'><<lanSwitch 'Only the student council president may submit a dress proposal.' '只有学生会长可以提出着装校规。'>></span><br>
+  <<elseif $LifeSimulation.school.dress.proposal>>
+    <span class='blue'><<lanSwitch 'Leighton has not decided on your previous proposal.' '礼顿还没有决定是否批准上一份提案。'>></span><br>
+  <<elseif $LifeSimulation.school.dress.trialUntil gt 0>>
+    <span class='blue'><<lanSwitch 'The current dress rule is still awaiting its review.' '现行着装校规还在等待复核。'>></span><br>
+  <<elseif $LifeSimulation.school.dress.cooldownUntil gt Time.days>>
+    <span class='blue'><<lanSwitch 'You must wait before proposing another dress rule.' '还得再等几天，才能提出下一项着装校规。'>></span><br>
+  <<else>>
+    <span class='blue'><<lanSwitch 'Every dress rule has already been considered.' '所有着装校规都已提出。'>></span><br>
+  <</if>>
 <</if>>
-<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+<<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Dress Approval []
 <<set $outside to 0>>
@@ -831,19 +863,19 @@
     “提案还不是校规。”<<he>>说道，“先证明学校能够接受它。”
 <</language>><br><br>
 <<if maplebirch.LS.school.canApprovePolicy('formal')>>
-  <<schoolicon 'building'>><<lanLink 'Present staff support' 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'formal'>><</lanLink>><br>
+  <<schoolicon 'building'>><<lanLink '提交教职工支持意见' 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'formal'>><</lanLink>><br>
 <</if>>
 <<if maplebirch.LS.school.canApprovePolicy('petition')>>
-  <<socialiseicon>><<lanLink 'Present the student petition' 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'petition'>><</lanLink>><br>
+  <<socialiseicon>><<lanLink '提交学生联署' 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'petition'>><</lanLink>><br>
 <</if>>
 <<if maplebirch.LS.school.canApprovePolicy('pressure')>>
-  <<crimeicon 'coercion'>><<lanLink 'Force Leighton to approve it' 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+  <<crimeicon 'coercion'>><<lanLink '迫使礼顿批准' 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'pressure'>><</lanLink>><br>
 <</if>>
 <<if !maplebirch.LS.school.canApprovePolicy('formal') and !maplebirch.LS.school.canApprovePolicy('petition') and !maplebirch.LS.school.canApprovePolicy('pressure')>>
   <span class='blue'><<lanSwitch "You lack the support or leverage needed to make Leighton approve this proposal." "目前没有足够的支持，也没有可以迫使礼顿批准的把柄。">></span><br>
 <</if>>
-<<getouticon>><<lanLink 'Withdraw the proposal' "Head's Office">><<run maplebirch.LS.school.withdrawProposal()>><</lanLink>><br>
-<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+<<getouticon>><<lanLink '撤回提案' "Head's Office">><<run maplebirch.LS.school.withdrawProposal()>><</lanLink>><br>
+<<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Dress Approval Result []
 <<set $outside to 0>>
@@ -872,10 +904,10 @@
   <</language>><br><br>
   <span class='green'><<lanSwitch "The new policy begins its trial." "新校规开始试行。">></span>
 <<else>>
-  <span class='blue'><<lanSwitch "This cannot be arranged right now." "现在无法办理这件事。">></span>
+  <span class='blue'><<lanSwitch 'There is no pending dress proposal for Leighton to review.' '目前没有等待礼顿审议的着装提案。'>></span>
 <</if>>
 <br><br>
-<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+<<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Dress Review []
 <<set $outside to 0>>
@@ -888,9 +920,9 @@
   <<option 'CN'>>礼顿把一周的记录放在校规旁边。“试行结束了。这条规定还要保留吗？”
 <</language>><br><br>
 <<if maplebirch.LS.school.canKeepPolicy>>
-  <<schoolicon 'building'>><<lanLink 'Make the policy permanent' 'Deadwood Reblooms Life Simulation School Board'>><<run maplebirch.LS.school.reviewPolicy(true)>><</lanLink>><br>
+  <<schoolicon 'building'>><<lanLink '正式保留校规' 'Deadwood Reblooms Life Simulation School Board'>><<run maplebirch.LS.school.reviewPolicy(true)>><</lanLink>><br>
 <<else>>
   <span class='blue'><<lanSwitch "The policy cannot be kept without enough order and support." "秩序或支持度不足，校规无法正式保留。">></span><br>
 <</if>>
-<<getouticon>><<lanLink 'Revoke the policy' 'Deadwood Reblooms Life Simulation School Board'>><<run maplebirch.LS.school.reviewPolicy(false)>><</lanLink>><br>
-<<getouticon>><<lanLink "Return to the head's office" "Head's Office">><</lanLink>>
+<<getouticon>><<lanLink '撤销校规' 'Deadwood Reblooms Life Simulation School Board'>><<run maplebirch.LS.school.reviewPolicy(false)>><</lanLink>><br>
+<<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>

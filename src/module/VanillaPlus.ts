@@ -13,8 +13,8 @@ import Promiscuity from './VanillaPlus/Promiscuity';
 import RealEstate from './VanillaPlus/RealEstate';
 import Willpower from './VanillaPlus/Willpower';
 
-export type VanillaPlusAttribute = 'willpower' | 'physique' | 'beauty' | 'exhibitionism' | 'deviancy' | 'promiscuity';
-export type VanillaPlusTrait = VanillaPlusAttribute | 'incorrigible';
+type VanillaPlusAttribute = 'willpower' | 'physique' | 'beauty' | 'exhibitionism' | 'deviancy' | 'promiscuity';
+type VanillaPlusTrait = VanillaPlusAttribute | 'incorrigible';
 
 class VanillaPlus extends Module {
   static readonly variables = {
@@ -43,7 +43,7 @@ class VanillaPlus extends Module {
       expungeUsed: false
     },
     finance: DEFAULT_FINANCE_STATE,
-    realEstate: RealEstate.defaults,
+    real_estate: RealEstate.defaults,
     physique: {
       panic: false,
       heroic: false,
@@ -64,9 +64,10 @@ class VanillaPlus extends Module {
       conducted: false,
       levelFive: 0,
       mirrorOrigin: '',
+      mirror_property: null as string | null,
       mirrors: {
         home: false,
-        property: false,
+        property: {} as Record<string, boolean>,
         farm: false,
         tower: false,
         temple: false

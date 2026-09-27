@@ -1,7 +1,7 @@
-export type NPCDoubleOrifice = 'vagina' | 'anus';
-export type NPCDoubleStage = 'entrance' | 'imminent' | 'penetrated';
+type NPCDoubleOrifice = 'vagina' | 'anus';
+type NPCDoubleStage = 'entrance' | 'imminent' | 'penetrated';
 
-export interface NPCDoublePenetrationState {
+interface NPCDoublePenetrationState {
   recipient: number;
   partner: number;
   partnerLocation?: string | number;
@@ -11,7 +11,7 @@ export interface NPCDoublePenetrationState {
   playerLegLock?: NPCDoublePlayerLegLockState;
 }
 
-export interface NPCDoublePlayerLegLockState {
+interface NPCDoublePlayerLegLockState {
   targets: number[];
 }
 

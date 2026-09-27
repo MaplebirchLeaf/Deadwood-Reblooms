@@ -4,7 +4,7 @@ import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 export type TransformationOption = Parameters<MaplebirchCore['char']['transformation']['add']>[2];
 
-export type TransformationHooks = {
+type TransformationHooks = {
   pre?: (options: Record<string, unknown>) => void;
   layers?: CanvasLayerMap;
 };

@@ -1,6 +1,13 @@
 :: Deadwood Reblooms Deviancy Mirror Enter []
 <<location 'tentworld'>><<set $outside to 0>><<effects>><<tentacleworldintro>><<set $tentacleEntrance to 'vanillaPlusMirror'>>
 <<switch $VanillaPlus.deviancy.mirrorOrigin>>
+  <<case 'property'>>
+    <<set _mirrorProperty to maplebirch.VP.realEstate.properties.find(property => property.id === $VanillaPlus.deviancy.mirror_property)>>
+    <<if _mirrorProperty>>
+      <<set _mirrorCoordinates to maplebirch.VP.realEstate.managementFor(_mirrorProperty.id).mirror_coordinates>>
+      <<set $tentnorth to _mirrorCoordinates.north>>
+      <<set $tenteast to _mirrorCoordinates.east>>
+    <</if>>
   <<case 'farm'>>
     <<set $tentnorth to 3>><<set $tenteast to -3>>
   <<case 'tower'>>
@@ -19,7 +26,7 @@
     镜面如湿润的薄膜般贴紧你的皮肤。你迫使身体穿过其中，跌入触手平原陌生的天空之下。
 <</language>>
 <br><br>
-<<lanLink 'Next' 'Tentacle Plains'>><</lanLink>>
+<<lanLink '继续' 'Tentacle Plains'>><</lanLink>>
 
 :: Deadwood Reblooms Deviancy Mirror Home []
 <<set $location to 'home'>><<set $outside to 0>><<effects>><<tentacleworldend>>
@@ -30,11 +37,11 @@
   你挤过荡漾的镜面，跌回自己的卧室。
 <</language>>
 <br><br>
-<<lanLink 'Next' 'Bedroom'>><</lanLink>>
+<<lanLink '继续' 'Bedroom'>><</lanLink>>
 
 :: Deadwood Reblooms Deviancy Mirror Property []
-<<if $VanillaPlus.realEstate.active and maplebirch.VP.realEstate.owns($VanillaPlus.realEstate.active)>>
-  <<run maplebirch.VP.realEstate.visit($VanillaPlus.realEstate.active)>><<run maplebirch.VP.realEstate.enter()>><<effects>><<tentacleworldend>>
+<<if $VanillaPlus.deviancy.mirror_property and maplebirch.VP.realEstate.visit($VanillaPlus.deviancy.mirror_property)>>
+  <<run maplebirch.VP.realEstate.enter()>><<effects>><<tentacleworldend>>
   <<language>>
     <<option 'EN'>>
       You push through the glass and find your own bedroom on the other side. The air smells of the house again.
@@ -42,10 +49,10 @@
       你挤过镜面，回到了自己的卧室。房间熟悉的气息重新包围了你。
   <</language>>
   <br><br>
-  <<lanLink 'Next' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+  <<lanLink '继续' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
 <<else>>
   <<set $location to 'home'>><<set $outside to 0>><<effects>><<tentacleworldend>>
-  <<lanLink 'Next' 'Bedroom'>><</lanLink>>
+  <<lanLink '继续' 'Bedroom'>><</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Deviancy Mirror Farm []
@@ -57,7 +64,7 @@
   你挤过荡漾的镜面，踉跄着落进农场的房间。
 <</language>>
 <br><br>
-<<lanLink 'Next' 'Farm Bedroom'>><</lanLink>>
+<<lanLink '继续' 'Farm Bedroom'>><</lanLink>>
 
 :: Deadwood Reblooms Deviancy Mirror Tower []
 <<set $location to 'tower'>><<set $outside to 0>><<effects>><<tentacleworldend>>
@@ -67,7 +74,7 @@
   <<option 'CN'>>
     你挤过荡漾的镜面，摔落在高塔的地面上。
 <</language>>
-<br><br><<lanLink 'Next' 'Bird Tower'>><</lanLink>>
+<br><br><<lanLink '继续' 'Bird Tower'>><</lanLink>>
 
 :: Deadwood Reblooms Deviancy Mirror Temple []
 <<set $location to 'temple'>><<set $outside to 0>><<effects>><<tentacleworldend>>
@@ -77,7 +84,7 @@
   <<option 'CN'>>
     你挤过荡漾的镜面，踉跄着回到神殿宿舍的床铺旁。
 <</language>>
-<br><br><<lanLink 'Next' 'Temple Bunk'>><</lanLink>>
+<br><br><<lanLink '继续' 'Temple Bunk'>><</lanLink>>
 
 :: Deadwood Reblooms Deviancy Conduct []
 <<set $outside to 0>><<set $location to 'forest_shop'>><<effects>><<npc Gwylan>><<person1>><<run statusCheck('Gwylan')>>

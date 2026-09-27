@@ -282,7 +282,7 @@ class LongerCombat {
     V.enemyarousal = Math.floor(V.enemyarousalmax * (0.15 + Math.random() * 0.1));
     T.combatend = false;
 
-    sWikifier(`<br><br><<lanLink 'Next' ${JSON.stringify(this.passageTitle)} 'capitalize'>><</lanLink>>`);
+    sWikifier(`<br><br><<lanLink '继续' ${JSON.stringify(this.passageTitle)} 'capitalize'>><</lanLink>>`);
 
     return fragment;
   }

@@ -1,19 +1,23 @@
 :: Deadwood Reblooms Property Intimacy []
-<!-- 入口已从当晚在家的同住者中选人；战斗回合跨过起床时间后，继续使用当前存档里选中的同一人。 -->
+<!-- 入口已从当晚在家的同住者中选人。战斗回合跨过起床时间后，继续使用当前存档里选中的同一人。 -->
 <<set _property to maplebirch.VP.realEstate.current>>
 <<set _partner to maplebirch.VP.realEstate.currentCompanion>>
-<<if !_property || !_partner || $VanillaPlus.realEstate.active isnot _property.id>>
+<<if !_property || !_partner || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
 	<<set $sexstart to 0>>
-	<<lanLink 'Return to the bedroom' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+	<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>>
 	<<if $sexstart is 1>>
 		<<set $sexstart to 0>>
 		<<clearnpc>>
 		<<npc _partner.id>><<person1>>
+		<<run statusCheck(_partner.id)>>
 		<<consensual>>
 		<<set $consensual to 1>>
 		<<neutral 1>>
+		<<if $exposed lt 2>>
+			<<lanSwitch 'You slip out of your clothes.' '你脱下衣服。'>><<strip>><br><br>
+		<</if>>
 		<<maninit>>
 		<<set $enemytrust += 500>>
 		<<set $enemyarousalmax to 600>>
@@ -83,9 +87,9 @@
 	<br><br>
 	<<actionsman>>
 	<<if _combatend or _controlRegain is 1>>
-		<span id='next'><<lanLink 'Next' 'Deadwood Reblooms Property Intimacy Finish'>><</lanLink>></span><<nexttext>>
+		<span id='next'><<lanLink '继续' 'Deadwood Reblooms Property Intimacy Finish'>><</lanLink>></span><<nexttext>>
 	<<else>>
-		<span id='next'><<lanLink 'Next' 'Deadwood Reblooms Property Intimacy'>><</lanLink>></span><<nexttext>>
+		<span id='next'><<lanLink '继续' 'Deadwood Reblooms Property Intimacy'>><</lanLink>></span><<nexttext>>
 	<</if>>
 <</if>>
 
@@ -135,4 +139,4 @@
 	<br><br>
 <</if>>
 <<clotheson>><<endcombat>>
-<<lanLink 'Return to the bedroom' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>

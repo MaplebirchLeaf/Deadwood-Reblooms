@@ -3,7 +3,7 @@ import { mkdir, readFile } from 'node:fs/promises';
 import { createModPackPackage } from './modpack';
 import { createAudioPackPackage, createZipPackage, type PackageAsset } from './zip';
 
-export interface PackageOptions {
+interface PackageOptions {
   force: boolean;
   zip: boolean;
   modpack: boolean;

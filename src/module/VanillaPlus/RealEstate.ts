@@ -1,12 +1,13 @@
 import propertiesSource from '@/assets/finance/properties.yaml';
-import rivalsSource from '@/assets/finance/auction-rivals.yaml';
 import residentsSource from '@/assets/finance/residents.yaml';
 import type Finance from './Finance';
 import Mortgage, { type MortgageState } from './Mortgage';
 
 type PropertyId = string;
 type LocalizedText = { EN: string; CN: string };
-type PropertyRoom = 'bedroom' | 'bathroom' | 'kitchen' | 'desk' | 'guest' | 'retreat';
+type PropertyRoom = 'bedroom' | 'bathroom' | 'kitchen' | 'desk' | 'guest' | 'retreat' | 'outdoor' | 'balcony';
+type FurnitureKind = 'bed' | 'wardrobe';
+type PropertyFurniture = { name: string; nameCap: string; cost: number; type: string[]; iconFile: string };
 
 // YAML 是房源的唯一静态来源。价格和租金均以便士计；rooms 的数字是楼层编号。
 interface PropertyFloor {
@@ -17,24 +18,35 @@ interface PropertyFloor {
 interface Property {
   id: PropertyId;
   street: string;
-  agency?: boolean;
   streetName: LocalizedText;
   price: number;
-  dailyRentPercent: number;
+  weeklyRentPercent: number;
   residentCapacity: number;
   bedId: string;
   bedUpgradeId?: string;
+  wardrobeId: string;
+  wardrobeUpgradeId?: string;
   name: LocalizedText;
   entryLabel: LocalizedText;
+  mirrorLabel: LocalizedText;
+  // 庭院、阳台的门从哪一处打开，不用楼层号推断动线。
+  outdoorAccess: 'sitting' | 'landing' | 'retreat';
   description: LocalizedText;
   floors: PropertyFloor[];
-  rooms: Record<'bedroom' | 'bathroom' | 'kitchen', number> & Partial<Record<'desk' | 'guest' | 'retreat', number>>;
+  rooms: Record<'bedroom' | 'bathroom' | 'kitchen' | 'outdoor', number> & Partial<Record<'desk' | 'guest' | 'retreat' | 'balcony', number>>;
   interior: {
     bedroomLabel: LocalizedText;
     bedroom: LocalizedText;
+    sittingRest?: LocalizedText;
     bathroom: LocalizedText;
     kitchenLabel: LocalizedText;
     kitchen: LocalizedText;
+    outdoorLabel: LocalizedText;
+    outdoor: LocalizedText;
+    outdoorView: LocalizedText;
+    balconyLabel?: LocalizedText;
+    balcony?: LocalizedText;
+    balconyView?: LocalizedText;
     guest?: LocalizedText;
     retreatLabel?: LocalizedText;
     retreat?: LocalizedText;
@@ -44,78 +56,61 @@ interface Property {
 }
 
 interface RealEstateState {
+  // 每次从当前存档的 V 读取。房产表放在配置中，这里只保留产权与房屋的可变状态。
   owned: Partial<Record<PropertyId, boolean>>;
-  active: PropertyId | null;
   visiting: PropertyId | null;
   floor: number;
-  orphanageRentTime: number | null;
   mortgage: MortgageState | null;
   management: Record<PropertyId, PropertyManagement>;
-  lastManagedDay: number;
-  lastAuction: AuctionRecord | null;
-  rivalHoldings: Record<PropertyId, string>;
+  last_managed_day: number;
+  last_auction: AuctionRecord | null;
   residents: Record<PropertyId, string[]>;
-  householdMessage: { name: string; result: 'joined' | 'declined' | 'full' | 'bed' | 'left' } | null;
-  meetingResident: string | null;
+  household_message: { name: string; result: 'joined' | 'full' | 'bed' | 'left' } | null;
+  meeting_resident: string | null;
 }
 
 interface ResidentProfile {
   id: string;
-  cohabits?: boolean;
-  welcome?: LocalizedText;
-  decline?: LocalizedText;
-  evening?: LocalizedText;
-  together?: LocalizedText;
-}
-
-interface AuctionRival {
-  id: string;
-  name: { EN: string; CN: string };
-  requiresIntroduction: boolean;
-  unavailableStates?: string[];
-  preferredStreets: string[];
-  minimumBidPercent: number;
-  maximumBidPercent: number;
-  preferredBonusPercent: number;
+  welcome: LocalizedText;
+  evening: LocalizedText;
+  together: LocalizedText;
 }
 
 interface PropertyManagement {
   condition: number;
   renovation: number;
   rented: boolean;
-  leaseEndDay: number | null;
-  auctionDay: number | null;
-  bedId: string | null;
+  lease_end_day: number | null;
+  auction_day: number | null;
+  next_settlement_day: number;
+  bed_id: string | null;
+  wardrobe_id: string | null;
+  mirror_coordinates: { north: number; east: number };
 }
 
 interface AuctionRecord {
-  propertyId: PropertyId;
+  property_id: PropertyId;
   kind: 'voluntary' | 'foreclosure';
   proceeds: number;
   debt: number;
   surplus: number;
   day: number;
-  winnerId: string;
 }
 
 class RealEstate {
   public static readonly defaults: RealEstateState = {
     owned: {},
-    active: null,
     visiting: null,
     floor: 1,
-    orphanageRentTime: null,
     mortgage: null,
     management: {},
-    lastManagedDay: -1,
-    lastAuction: null,
-    rivalHoldings: {},
+    last_managed_day: -1,
+    last_auction: null,
     residents: {},
-    householdMessage: null,
-    meetingResident: null
+    household_message: null,
+    meeting_resident: null
   };
   private loadedProperties?: Property[];
-  private loadedRivals?: AuctionRival[];
   private loadedResidents?: ResidentProfile[];
   public readonly mortgage: Mortgage;
 
@@ -123,37 +118,26 @@ class RealEstate {
     private readonly core: typeof maplebirch,
     private readonly finance: Finance
   ) {
-    this.mortgage = new Mortgage(core, finance, (id, debt, day) => this.sellByAuction(id, 'foreclosure', debt, day));
+    this.mortgage = new Mortgage(finance, (id, debt, day) => this.sellByAuction(id, 'foreclosure', debt, day));
   }
 
   public get properties(): readonly Property[] {
     return (this.loadedProperties ??= RealEstate.loadProperties(this.core));
   }
 
-  public get rivals(): readonly AuctionRival[] {
-    return (this.loadedRivals ??= RealEstate.loadRivals(this.core));
-  }
-
   public get residentProfiles(): readonly ResidentProfile[] {
     return (this.loadedResidents ??= RealEstate.loadResidents(this.core));
   }
 
-  public rivalName(id: string): { EN: string; CN: string } | undefined {
-    return this.rivals.find(rival => rival.id === id)?.name;
-  }
-
   public askingPrice(id: PropertyId): number {
     const property = this.properties.find(item => item.id === id);
-    if (!property) return 0;
-    return this.state.rivalHoldings[id] ? Math.ceil(property.price * (1 + this.mortgage.terms.rivalBuyoutPremiumPercent / 100)) : property.price;
+    return property?.price ?? 0;
   }
 
   public preInit(): void {
     this.core.tool.onInit(() => {
       void this.properties;
-      void this.rivals;
       void this.residentProfiles;
-      void this.mortgage.terms;
     });
     // 读档只恢复 V 中的房产和结算游标；经济结算只由游戏时间跨日触发。
     // 优先于 Finance 收取其他贷款和信用卡款项，使当天租金能先入账。
@@ -179,29 +163,43 @@ class RealEstate {
         typeof property.price !== 'number' ||
         !Number.isSafeInteger(property.price) ||
         property.price <= 0 ||
-        typeof property.dailyRentPercent !== 'number' ||
-        !Number.isFinite(property.dailyRentPercent) ||
-        property.dailyRentPercent <= 0 ||
+        typeof property.weeklyRentPercent !== 'number' ||
+        !Number.isFinite(property.weeklyRentPercent) ||
+        property.weeklyRentPercent <= 0 ||
         !Number.isSafeInteger(property.residentCapacity) ||
         property.residentCapacity! < 0 ||
         !property.bedId ||
         (property.bedUpgradeId !== undefined && property.bedUpgradeId === property.bedId) ||
+        !property.wardrobeId ||
+        (property.wardrobeUpgradeId !== undefined && property.wardrobeUpgradeId === property.wardrobeId) ||
         !localized(property.name) ||
         !localized(property.entryLabel) ||
+        !localized(property.mirrorLabel) ||
+        !['sitting', 'landing', 'retreat'].includes(property.outdoorAccess!) ||
         !localized(property.description) ||
         !Array.isArray(property.floors) ||
         property.floors.length === 0 ||
         property.floors.some(floor => !localized(floor?.name) || !localized(floor?.description)) ||
         !property.rooms ||
-        (['bedroom', 'bathroom', 'kitchen'] as const).some(room => !Number.isInteger(property.rooms?.[room]) || property.rooms![room] < 1 || property.rooms![room] > property.floors!.length) ||
-        (['desk', 'guest', 'retreat'] as const).some(
+        (['bedroom', 'bathroom', 'kitchen', 'outdoor'] as const).some(
+          room => !Number.isInteger(property.rooms?.[room]) || property.rooms![room] < 1 || property.rooms![room] > property.floors!.length
+        ) ||
+        (['desk', 'guest', 'retreat', 'balcony'] as const).some(
           room => property.rooms?.[room] !== undefined && (!Number.isInteger(property.rooms[room]) || property.rooms[room]! < 1 || property.rooms[room]! > property.floors!.length)
         ) ||
+        (property.outdoorAccess === 'sitting' && property.rooms.outdoor !== 1) ||
+        (property.outdoorAccess === 'landing' && property.rooms.outdoor === 1) ||
+        (property.outdoorAccess === 'retreat' && property.rooms.retreat !== property.rooms.outdoor) ||
         !localized(property.interior?.bedroomLabel) ||
         !localized(property.interior?.bedroom) ||
+        (property.rooms?.retreat === undefined && !localized(property.interior?.sittingRest)) ||
         !localized(property.interior?.bathroom) ||
         !localized(property.interior?.kitchenLabel) ||
         !localized(property.interior?.kitchen) ||
+        !localized(property.interior?.outdoorLabel) ||
+        !localized(property.interior?.outdoor) ||
+        !localized(property.interior?.outdoorView) ||
+        (property.rooms?.balcony !== undefined && (!localized(property.interior?.balconyLabel) || !localized(property.interior?.balcony) || !localized(property.interior?.balconyView))) ||
         (property.rooms?.guest !== undefined && !localized(property.interior?.guest)) ||
         (property.rooms?.retreat !== undefined && (!localized(property.interior?.retreatLabel) || !localized(property.interior?.retreat) || !localized(property.interior?.retreatRest))) ||
         !localized(property.interior?.renovated) ||
@@ -212,14 +210,7 @@ class RealEstate {
       ids.add(property.id);
       return property as Property;
     });
-    if (properties.filter(property => property.agency === true).length !== 1) throw new Error('Real estate config requires one agency location.');
     if (properties.some(property => property.residentCapacity > (property.rooms.guest === undefined ? 1 : 2))) throw new Error('Resident capacity exceeds the configured bedrooms.');
-    if (properties.some(property => !window.Furniture.get(property.bedId, true)?.type.some(type => type === 'single' || type === 'double'))) {
-      throw new Error('Real estate bed is missing from the vanilla furniture catalogue.');
-    }
-    if (properties.some(property => property.bedUpgradeId && !window.Furniture.get(property.bedUpgradeId, true)?.type.includes('double'))) {
-      throw new Error('Real estate bed upgrade must be a vanilla double bed.');
-    }
     return properties;
   }
 
@@ -230,11 +221,7 @@ class RealEstate {
     const localized = (value: LocalizedText | undefined): boolean => typeof value?.EN === 'string' && value.EN.length > 0 && typeof value.CN === 'string' && value.CN.length > 0;
     return data.map((item, index) => {
       const profile = item as Partial<ResidentProfile> | null;
-      if (
-        !profile?.id ||
-        ids.has(profile.id) ||
-        (profile.cohabits === true ? !localized(profile.welcome) || !localized(profile.evening) || !localized(profile.together) : !localized(profile.decline))
-      ) {
+      if (!profile?.id || ids.has(profile.id) || !localized(profile.welcome) || !localized(profile.evening) || !localized(profile.together)) {
         throw new Error(`Real estate resident #${index + 1} is incomplete or duplicated.`);
       }
       ids.add(profile.id);
@@ -242,40 +229,13 @@ class RealEstate {
     });
   }
 
-  private static loadRivals(core: typeof maplebirch): AuctionRival[] {
-    const data = core.yaml.load(rivalsSource);
-    if (!Array.isArray(data)) throw new Error('Auction rivals config must be an array.');
-    const ids = new Set<string>();
-    return data.map((item, index) => {
-      const rival = item as Partial<AuctionRival> | null;
-      if (
-        !rival ||
-        !rival.id ||
-        ids.has(rival.id) ||
-        !rival.name?.EN ||
-        !rival.name.CN ||
-        typeof rival.requiresIntroduction !== 'boolean' ||
-        !Array.isArray(rival.preferredStreets) ||
-        !Number.isFinite(rival.minimumBidPercent) ||
-        !Number.isFinite(rival.maximumBidPercent) ||
-        !Number.isFinite(rival.preferredBonusPercent) ||
-        rival.minimumBidPercent! <= 0 ||
-        rival.maximumBidPercent! < rival.minimumBidPercent! ||
-        rival.preferredBonusPercent! < 0
-      ) {
-        throw new Error(`Auction rival #${index + 1} is incomplete or duplicated.`);
-      }
-      ids.add(rival.id);
-      return rival as AuctionRival;
-    });
-  }
-
   private get state(): RealEstateState {
-    return V.VanillaPlus.realEstate;
+    // 每次从当前 V 取房产状态，切换存档后不会继续操作上一份存档的对象。
+    return V.VanillaPlus.real_estate as RealEstateState;
   }
 
   public get current(): Property | undefined {
-    // visiting 是最后进入的房产，不等于 active（PC 实际住处）；这样可参观其他已购房屋。
+    // visiting 仅记录当前进入哪处房产，不决定其是否为住所。
     return this.properties.find(property => property.id === this.state.visiting);
   }
 
@@ -303,7 +263,7 @@ class RealEstate {
   private reconcileResidents(): void {
     const residents = (this.state.residents ??= {});
     for (const [id, names] of Object.entries(residents)) {
-      residents[id] = names.filter(name => this.owns(id) && window.isLoveInterest(name) && this.residentProfiles.some(profile => profile.id === name && profile.cohabits));
+      residents[id] = names.filter(name => this.owns(id) && !this.managementFor(id).rented && window.isLoveInterest(name) && this.residentProfiles.some(profile => profile.id === name));
     }
   }
 
@@ -315,21 +275,29 @@ class RealEstate {
     });
   }
 
+  public residenceOf(name: string): Property | undefined {
+    return this.properties.find(property => this.residentsAt(property.id).some(resident => resident.id === name));
+  }
+
   public residentsHome(id: PropertyId): ResidentProfile[] {
-    if (this.state.active !== id) return [];
-    // 只借用原有日程的休息时段。四人的地点名不同，且 Sydney 的 home 与 Whitney 的 topless
-    // 也会在清晨使用，所以后两者还需限定夜间时间。特殊剧情地点保持优先，不强行迁到住宅。
+    // Robin 与 Kylar 使用原版地点函数。Whitney 与 Sydney 没有同等的原版查询函数，
+    // 因此按原版夜间时段与剧情状态判断；悉尼的排除日来自 sydneySchedule。
     return this.residentsAt(id).filter(profile => {
-      const location = this.core.npc.Schedule.get(profile.id).location;
       switch (profile.id) {
         case 'Robin':
-          return location === 'sleep';
+          return window.getRobinLocation() === 'sleep';
         case 'Whitney':
-          return location === 'topless' && Time.hour < 7;
+          return Time.hour < 7 && C.npc.Whitney?.init === 1 && ['active', 'rescued'].includes(C.npc.Whitney.state);
         case 'Kylar':
-          return location === 'manor_bedroom' && Time.hour < 7;
+          return Time.hour < 7 && window.getKylarLocation().area === 'manor_bedroom';
         case 'Sydney':
-          return location === 'home' && (Time.hour >= 23 || Time.hour < 6);
+          // 原版 sydneySchedule 在周一整天安排神殿值守，且剧情回放可以强制指定地点。
+          return (
+            C.npc.Sydney?.init === 1 &&
+            (Time.hour >= 23 || Time.hour < 6) &&
+            (V.daily.sydney.punish === 1 || (Time.weekDay !== 1 && (Time.weekDay !== 7 || Time.hour < 6))) &&
+            !(V.sydney_location_override && V.replayScene && V.sydney_location_override !== 'home')
+          );
         default:
           return false;
       }
@@ -339,44 +307,47 @@ class RealEstate {
   public inviteResident(name: string, id: PropertyId): boolean {
     this.reconcileResidents();
     const property = this.properties.find(item => item.id === id);
-    if (!property || this.state.active !== id || !this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return false;
+    if (!property || !this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return false;
     const profile = this.residentProfiles.find(item => item.id === name);
     if (!profile || !window.isLoveInterest(name)) return false;
     const residents = (this.state.residents[id] ??= []);
     if (residents.includes(name)) return false;
-    let result: 'joined' | 'declined' | 'full' | 'bed';
-    if (!profile.cohabits) result = 'declined';
-    else if (residents.length >= property.residentCapacity) result = 'full';
+    let result: 'joined' | 'full' | 'bed';
+    if (residents.length >= property.residentCapacity) result = 'full';
     else if (!this.canShareBed(id)) result = 'bed';
     else {
+      // 恋人只在一处住宅登记同住。玩家的其他空置房屋仍可随时自住。
+      for (const [home, names] of Object.entries(this.state.residents)) {
+        if (home !== id) this.state.residents[home] = names.filter(resident => resident !== name);
+      }
       residents.push(name);
       result = 'joined';
     }
-    this.state.householdMessage = { name, result };
+    this.state.household_message = { name, result };
     return result === 'joined';
   }
 
   public endCohabitation(name: string, id: PropertyId): boolean {
-    if (this.state.active !== id || !(this.state.residents?.[id] ?? []).includes(name)) return false;
+    if (!(this.state.residents?.[id] ?? []).includes(name)) return false;
     this.state.residents[id] = this.state.residents[id].filter(resident => resident !== name);
-    this.state.householdMessage = { name, result: 'left' };
+    this.state.household_message = { name, result: 'left' };
     return true;
   }
 
-  public takeHouseholdMessage(): RealEstateState['householdMessage'] {
-    const message = this.state.householdMessage;
-    this.state.householdMessage = null;
+  public takeHouseholdMessage(): RealEstateState['household_message'] {
+    const message = this.state.household_message;
+    this.state.household_message = null;
     return message;
   }
 
   public meetResident(name: string, id: PropertyId): boolean {
     if (!this.residentsHome(id).some(profile => profile.id === name)) return false;
-    this.state.meetingResident = name;
+    this.state.meeting_resident = name;
     return true;
   }
 
   public get currentCompanion(): ResidentProfile | undefined {
-    const name = this.state.meetingResident;
+    const name = this.state.meeting_resident;
     // 互动开始时已检查夜间日程。对话或遭遇战跨过日程边界后，仍要认得本次选中的同住者。
     return name && this.current ? this.residentsAt(this.current.id).find(profile => profile.id === name) : undefined;
   }
@@ -388,9 +359,8 @@ class RealEstate {
     const result = this.finance.payFromBankPennies(this.askingPrice(id));
     if (result !== 'ok') return result;
     this.state.owned[id] = true;
-    delete this.state.rivalHoldings[id];
     this.state.management[id] = RealEstate.newManagement();
-    if (this.state.lastManagedDay < 0) this.state.lastManagedDay = RealEstate.today();
+    if (this.state.last_managed_day < 0) this.state.last_managed_day = RealEstate.today();
     return 'ok';
   }
 
@@ -401,46 +371,64 @@ class RealEstate {
     const result = this.mortgage.start(id, this.askingPrice(id), useCredit);
     if (result !== 'ok') return result;
     this.state.owned[id] = true;
-    delete this.state.rivalHoldings[id];
     this.state.management[id] = RealEstate.newManagement();
-    if (this.state.lastManagedDay < 0) this.state.lastManagedDay = RealEstate.today();
+    if (this.state.last_managed_day < 0) this.state.last_managed_day = RealEstate.today();
     return 'ok';
   }
 
   private static newManagement(): PropertyManagement {
-    return { condition: 100, renovation: 0, rented: false, leaseEndDay: null, auctionDay: null, bedId: null };
+    return {
+      condition: 100,
+      renovation: 0,
+      rented: false,
+      lease_end_day: null,
+      auction_day: null,
+      next_settlement_day: RealEstate.today() + 7,
+      bed_id: null,
+      wardrobe_id: null,
+      mirror_coordinates: RealEstate.randomMirrorCoordinates()
+    };
+  }
+
+  private static randomMirrorCoordinates(): PropertyManagement['mirror_coordinates'] {
+    // 允许房产之间及房产与其他镜子重合。坐标只生成一次，之后随 V 存档。
+    return { north: Math.floor(Math.random() * 9) - 4, east: Math.floor(Math.random() * 9) - 4 };
   }
 
   public managementFor(id: PropertyId): PropertyManagement {
-    return (this.state.management[id] ??= RealEstate.newManagement());
+    const management = (this.state.management[id] ??= RealEstate.newManagement());
+    management.mirror_coordinates ??= RealEstate.randomMirrorCoordinates();
+    return management;
   }
 
-  public bed(id: PropertyId): { name: string; nameCap: string; cost: number; type: string[]; iconFile: string } | null {
+  public furniture(id: PropertyId, kind: FurnitureKind): PropertyFurniture | null {
     const property = this.properties.find(item => item.id === id);
-    return property ? window.Furniture.get(this.managementFor(id).bedId ?? property.bedId, true) : null;
+    if (!property) return null;
+    const installed = kind === 'bed' ? (this.managementFor(id).bed_id ?? property.bedId) : (this.managementFor(id).wardrobe_id ?? property.wardrobeId);
+    return window.Furniture.get(installed, true);
   }
 
   public canShareBed(id: PropertyId): boolean {
-    return this.bed(id)?.type.includes('double') === true;
+    return this.furniture(id, 'bed')?.type.includes('double') === true;
   }
 
-  public bedUpgradeCost(id: PropertyId): number {
+  public furnitureUpgrade(id: PropertyId, kind: FurnitureKind): { id: string; item: PropertyFurniture; cost: number } | null {
     const property = this.properties.find(item => item.id === id);
-    if (!property?.bedUpgradeId || this.managementFor(id).bedId === property.bedUpgradeId) return 0;
-    const furniture = window.Furniture.get(property.bedUpgradeId, true);
-    return furniture ? window.Furniture.setPrice(furniture.cost) : 0;
+    if (!property) return null;
+    const next = kind === 'bed' ? property.bedUpgradeId : property.wardrobeUpgradeId;
+    const installed = kind === 'bed' ? this.managementFor(id).bed_id : this.managementFor(id).wardrobe_id;
+    if (!next || installed === next) return null;
+    const item = window.Furniture.get(next, true);
+    return item ? { id: next, item, cost: window.Furniture.setPrice(item.cost) } : null;
   }
 
-  public upgradeBed(id: PropertyId): string {
-    if (!this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return 'unavailable';
-    const property = this.properties.find(item => item.id === id);
-    const cost = this.bedUpgradeCost(id);
-    if (!property?.bedUpgradeId || cost <= 0) return 'unavailable';
-    const result = this.finance.payFromBankPennies(cost);
-    if (result !== 'ok') return result;
-    // 原版 Furniture.set() 只识别预置地点；新房的床放在自己的房产存档里。
-    this.managementFor(id).bedId = property.bedUpgradeId;
-    return 'ok';
+  public installFurniture(id: PropertyId, kind: FurnitureKind): void {
+    if (!this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return;
+    const upgrade = this.furnitureUpgrade(id, kind);
+    if (!upgrade) return;
+    // 付款由家具店链接中的原版 money 宏完成。Furniture.set() 不认识新增的房产地点。
+    if (kind === 'bed') this.managementFor(id).bed_id = upgrade.id;
+    else this.managementFor(id).wardrobe_id = upgrade.id;
   }
 
   public visit(id: PropertyId): boolean {
@@ -448,51 +436,6 @@ class RealEstate {
     this.state.visiting = id;
     this.state.floor = 1;
     return true;
-  }
-
-  public canMoveIn(id: PropertyId): boolean {
-    const property = this.properties.find(item => item.id === id);
-    const companions = this.state.active ? this.residentsAt(this.state.active).length : 0;
-    return (
-      !!property &&
-      this.owns(id) &&
-      !this.managementFor(id).rented &&
-      !this.isFrozen(id) &&
-      this.managementFor(id).auctionDay === null &&
-      companions <= property.residentCapacity &&
-      (companions === 0 || this.canShareBed(id))
-    );
-  }
-
-  public moveIn(id: PropertyId): boolean {
-    if (!this.canMoveIn(id)) return false;
-    const former = this.state.active;
-    const companions = former ? this.residentsAt(former).map(profile => profile.id) : [];
-    if (!this.visit(id)) return false;
-    if (this.state.active === null) {
-      // 原版租期留在孤儿院房间。住在自住房期间钉住 renttime，回迁时恢复原剩余天数。
-      this.state.orphanageRentTime = Number(V.renttime);
-      V.renttime = 7;
-    }
-    // 搬家转移的是同住关系，不改变恋爱关系或 NPC 的原版白天行程。
-    if (former && former !== id) {
-      this.state.residents[former] = [];
-      this.state.residents[id] = companions;
-    }
-    this.state.active = id;
-    return true;
-  }
-
-  public moveBack(): void {
-    if (this.state.active === null) return;
-    (this.state.residents ??= {})[this.state.active] = [];
-    const remaining = this.state.orphanageRentTime;
-    if (remaining !== null && Number.isFinite(remaining)) V.renttime = remaining;
-    this.state.active = null;
-    this.state.visiting = null;
-    this.state.floor = 1;
-    this.state.meetingResident = null;
-    this.state.orphanageRentTime = null;
   }
 
   public enter(): void {
@@ -503,20 +446,20 @@ class RealEstate {
 
   public maintenanceCost(id: PropertyId): number {
     const property = this.properties.find(item => item.id === id);
-    return property ? Math.ceil((property.price * this.mortgage.terms.rental.dailyMaintenancePercent) / 100) : 0;
+    return property ? Math.ceil((property.price * this.mortgage.terms.rental.weeklyMaintenancePercent) / 100) : 0;
   }
 
-  public dailyRent(id: PropertyId): number {
+  public weeklyRent(id: PropertyId): number {
     const property = this.properties.find(item => item.id === id);
     if (!property) return 0;
     const management = this.managementFor(id);
     const { renovationRentBonusPercent } = this.mortgage.terms.rental;
-    return Math.floor((this.baseDailyRent(id) * (1 + (management.renovation * renovationRentBonusPercent) / 100) * management.condition) / 100);
+    return Math.floor((this.baseWeeklyRent(id) * (1 + (management.renovation * renovationRentBonusPercent) / 100) * management.condition) / 100);
   }
 
-  public baseDailyRent(id: PropertyId): number {
+  public baseWeeklyRent(id: PropertyId): number {
     const property = this.properties.find(item => item.id === id);
-    return property ? Math.floor((property.price * property.dailyRentPercent) / 100) : 0;
+    return property ? Math.floor((property.price * property.weeklyRentPercent) / 100) : 0;
   }
 
   public renovationCost(id: PropertyId): number {
@@ -533,7 +476,7 @@ class RealEstate {
   public renovate(id: PropertyId): string {
     if (!this.owns(id)) return 'not-owned';
     const management = this.managementFor(id);
-    if (management.rented || management.auctionDay !== null || this.isFrozen(id)) return 'unavailable';
+    if (management.rented || management.auction_day !== null || this.isFrozen(id)) return 'unavailable';
     if (management.renovation >= this.mortgage.terms.rental.maxRenovationLevel) return 'max-renovation';
     const result = this.finance.payFromBankPennies(this.renovationCost(id));
     if (result !== 'ok') return result;
@@ -545,7 +488,7 @@ class RealEstate {
   public repair(id: PropertyId): string {
     if (!this.owns(id)) return 'not-owned';
     const management = this.managementFor(id);
-    if (management.auctionDay !== null || this.isFrozen(id)) return 'unavailable';
+    if (management.auction_day !== null || this.isFrozen(id)) return 'unavailable';
     const cost = this.repairCost(id);
     if (cost <= 0) return 'nothing-due';
     const result = this.finance.payFromBankPennies(cost);
@@ -555,81 +498,82 @@ class RealEstate {
   }
 
   public rentOut(id: PropertyId): boolean {
-    if (!this.owns(id) || this.state.active === id || this.isFrozen(id)) return false;
+    if (!this.owns(id) || this.isFrozen(id) || this.residentsAt(id).length > 0) return false;
     const management = this.managementFor(id);
-    if (management.rented || management.auctionDay !== null || management.condition < this.mortgage.terms.rental.minimumCondition) return false;
+    if (management.rented || management.auction_day !== null || management.condition < this.mortgage.terms.rental.minimumCondition) return false;
     management.rented = true;
-    management.leaseEndDay = null;
+    management.lease_end_day = null;
     return true;
   }
 
   public endLease(id: PropertyId): boolean {
     const management = this.managementFor(id);
-    if (!this.owns(id) || !management.rented || management.leaseEndDay !== null) return false;
-    management.leaseEndDay = RealEstate.today() + 7;
+    if (!this.owns(id) || !management.rented || management.lease_end_day !== null) return false;
+    management.lease_end_day = RealEstate.today() + 7;
     return true;
   }
 
   public listAuction(id: PropertyId): boolean {
-    if (!this.owns(id) || this.state.active === id || this.mortgage.current?.propertyId === id) return false;
+    if (!this.owns(id) || this.residentsAt(id).length > 0 || this.mortgage.current?.property_id === id) return false;
     const management = this.managementFor(id);
-    if (management.rented || management.auctionDay !== null) return false;
-    management.auctionDay = RealEstate.today() + this.mortgage.terms.voluntaryAuctionDays;
+    if (management.rented || management.auction_day !== null) return false;
+    management.auction_day = RealEstate.today() + this.mortgage.terms.voluntaryAuctionDays;
     return true;
   }
 
   public cancelAuction(id: PropertyId): boolean {
     if (!this.owns(id)) return false;
     const management = this.managementFor(id);
-    if (management.auctionDay === null) return false;
-    management.auctionDay = null;
+    if (management.auction_day === null) return false;
+    management.auction_day = null;
     return true;
   }
 
   public isFrozen(id: PropertyId): boolean {
     const loan = this.mortgage.current;
-    return loan?.propertyId === id && loan.stage === 'frozen';
+    return loan?.property_id === id && loan.stage === 'frozen';
   }
 
   private advanceProperties(): void {
     this.reconcileResidents();
     const state = this.state;
     const today = RealEstate.today();
-    if (state.lastManagedDay < 0) {
-      // 没有房产时只建立游标；在控制台手工放入房产的旧存档也能从首次跨日开始结算。
-      state.lastManagedDay = this.properties.some(property => this.owns(property.id)) ? today - 1 : today;
+    if (state.last_managed_day < 0) {
+      // 没有房产也要推进个人债务。具体到期日仍由各账户自己的 V 游标决定。
+      state.last_managed_day = today - 1;
     }
-    // 游戏可一次跳过多天；逐日处理房屋和房贷，避免把未来的租金提前用于旧分期。
-    for (let day = state.lastManagedDay + 1; day <= today; day++) {
+    // 跨日循环只为检查通知、拍卖到期和周结算日期，不会每日扣维护费或收租。
+    for (let day = state.last_managed_day + 1; day <= today; day++) {
       for (const property of this.properties) {
         if (!this.owns(property.id)) continue;
         const management = this.managementFor(property.id);
-        if (management.auctionDay !== null && day >= management.auctionDay) {
-          this.sellByAuction(property.id, 'voluntary', 0, day);
-          continue;
-        }
-        if (management.leaseEndDay !== null && day >= management.leaseEndDay) {
-          management.rented = false;
-          management.leaseEndDay = null;
-        }
-        const upkeep = this.maintenanceCost(property.id);
-        if (management.rented && management.condition >= this.mortgage.terms.rental.minimumCondition) {
-          // 租客直接承担当日维护费；冻结时净租金由银行先抵债，余额才回到玩家账户。
-          const netRent = Math.max(0, this.dailyRent(property.id) - upkeep);
-          if (this.isFrozen(property.id)) this.mortgage.applySeizedRent(netRent);
-          else this.finance.creditBankPennies(netRent);
-          management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.conditionLossPerDay);
-          if (management.condition < this.mortgage.terms.rental.minimumCondition) {
-            management.rented = false;
-            management.leaseEndDay = null;
+        if (day >= management.next_settlement_day) {
+          const upkeep = this.maintenanceCost(property.id);
+          if (management.rented && management.condition >= this.mortgage.terms.rental.minimumCondition) {
+            // 租客支付当周租金和维护费。冻结时净租金先抵房贷。
+            const netRent = Math.max(0, this.weeklyRent(property.id) - upkeep);
+            if (this.isFrozen(property.id)) this.mortgage.applySeizedRent(netRent);
+            else this.finance.creditBankPennies(netRent);
+            management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.conditionLossPerWeek);
+            if (management.condition < this.mortgage.terms.rental.minimumCondition) {
+              management.rented = false;
+              management.lease_end_day = null;
+            }
+          } else if (this.finance.collectBankPennies(upkeep) < upkeep) {
+            management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.conditionLossPerWeek);
           }
-        } else if (this.finance.collectBankPennies(upkeep) < upkeep) {
-          management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.conditionLossPerDay);
+          management.next_settlement_day = day + 7;
         }
+        if (management.lease_end_day !== null && day >= management.lease_end_day) {
+          management.rented = false;
+          management.lease_end_day = null;
+        }
+        if (management.auction_day !== null && day >= management.auction_day) this.sellByAuction(property.id, 'voluntary', 0, day);
       }
       this.mortgage.advanceThrough(day);
+      this.finance.advanceBankThrough(day);
     }
-    state.lastManagedDay = today;
+    state.last_managed_day = today;
   }
 
   private sellByAuction(id: PropertyId, kind: 'voluntary' | 'foreclosure', debt: number, day: number): void {
@@ -639,60 +583,42 @@ class RealEstate {
     const conditionFactor = 0.8 + management.condition / 500;
     const renovationFactor = 1 + management.renovation * 0.1;
     const assessedValue = Math.floor(property.price * conditionFactor * renovationFactor);
-    let proceeds = Math.floor((assessedValue * (kind === 'foreclosure' ? this.mortgage.terms.foreclosureAuctionPercent : this.mortgage.terms.rivalAuctionReservePercent)) / 100);
-    let winnerId = 'market';
-    for (const rival of this.rivals) {
-      if (!this.rivalCanBid(rival)) continue;
-      const percent =
-        rival.minimumBidPercent + Math.random() * (rival.maximumBidPercent - rival.minimumBidPercent) + (rival.preferredStreets.includes(property.street) ? rival.preferredBonusPercent : 0);
-      const bid = Math.floor((assessedValue * percent) / 100);
-      if (bid > proceeds) {
-        proceeds = bid;
-        winnerId = rival.id;
-      }
-    }
+    const percent = kind === 'foreclosure' ? this.mortgage.terms.foreclosureAuctionPercent : this.mortgage.terms.voluntaryAuctionPercent;
+    const proceeds = Math.floor((assessedValue * percent) / 100);
     // 拍卖只把抵债后的余额存入银行；房贷状态由 Mortgage 在回调前结束。债务高于拍价时不产生负存款。
     const surplus = Math.max(0, proceeds - debt);
     this.finance.creditBankPennies(surplus);
-    this.state.lastAuction = { propertyId: id, kind, proceeds, debt, surplus, day, winnerId };
-    if (winnerId === 'market') delete this.state.rivalHoldings[id];
-    else this.state.rivalHoldings[id] = winnerId;
+    this.state.last_auction = { property_id: id, kind, proceeds, debt, surplus, day };
     this.state.owned[id] = false;
+    // 地块沿用原版 $plots。产权拍卖后清掉这处房屋的作物，避免重新购买时接手旧存档的苗圃。
+    if (V.plots) delete V.plots[id];
     const displaced = this.state.residents?.[id] ?? [];
     if (this.state.residents) this.state.residents[id] = [];
     management.rented = false;
-    management.leaseEndDay = null;
-    management.auctionDay = null;
+    management.lease_end_day = null;
+    management.auction_day = null;
     const wardrobe = (V.wardrobes as Record<string, Record<string, unknown>> | undefined)?.[`deadwood_${id}`];
     if (wardrobe) wardrobe.unlocked = false;
-    if (this.state.active === id) {
-      // 自动安置必须遵守与手动搬家相同的住房约束；单人床、冻结或待拍卖的房子不能接纳同住者。
-      const alternative = this.properties.find(
+    let alternative: Property | undefined;
+    if (displaced.length > 0) {
+      // 被强制拍卖后，恋人只搬到另一处有足够床位的未出租房屋。
+      alternative = this.properties.find(
         item =>
           this.owns(item.id) &&
           !this.managementFor(item.id).rented &&
           !this.isFrozen(item.id) &&
-          this.managementFor(item.id).auctionDay === null &&
+          this.managementFor(item.id).auction_day === null &&
           (this.state.residents?.[item.id] ?? []).length === 0 &&
           item.residentCapacity >= displaced.length &&
-          (displaced.length === 0 || this.canShareBed(item.id))
+          this.canShareBed(item.id)
       );
-      if (alternative) {
-        this.state.active = alternative.id;
-        this.state.residents[alternative.id] = displaced;
-        this.state.visiting = alternative.id;
-        this.state.floor = 1;
-        this.state.meetingResident = null;
-      } else this.moveBack();
+      if (alternative) this.state.residents[alternative.id] = displaced;
     }
-  }
-
-  private rivalCanBid(rival: AuctionRival): boolean {
-    const npc = (C.npc as Record<string, { init?: number; state?: string } | undefined>)[rival.id];
-    if (rival.requiresIntroduction && npc?.init !== 1) return false;
-    if (rival.unavailableStates?.includes(npc?.state ?? '')) return false;
-    if (rival.id === 'Avery' && ['fallen', 'kicked'].includes(String(V.avery_fate ?? ''))) return false;
-    return true;
+    if (this.state.visiting === id) {
+      this.state.visiting = alternative?.id ?? null;
+      this.state.floor = 1;
+      this.state.meeting_resident = null;
+    }
   }
 
   private static today(): number {
@@ -726,12 +652,14 @@ class RealEstate {
       transfer: true,
       isolated: true,
       locationRequirement: [],
-      space: 50,
+      space: 20,
       name
     };
     // 拍卖曾锁住过这个衣柜；再次买下同一处房产时，保留衣物并恢复使用权。
     wardrobes[key].unlocked = true;
     wardrobes[key].name = name;
+    const wardrobe = this.furniture(property.id, 'wardrobe');
+    wardrobes[key].space = wardrobe?.type.includes('organiser') ? 40 : wardrobe?.type.includes('spacious') ? 30 : 20;
     V.wardrobe_location = key;
   }
 }

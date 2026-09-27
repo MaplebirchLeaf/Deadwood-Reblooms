@@ -1,22 +1,11 @@
 :: Deadwood Reblooms Property Bedroom []
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
-	<<lanLink 'Return to the agency' 'Deadwood Reblooms Property Office'>><</lanLink>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<home_effects>><<effects>>
 	<<= lanSwitch(_property.interior.bedroom.EN, _property.interior.bedroom.CN)>><br><br>
-	<<set _bed to maplebirch.VP.realEstate.bed(_property.id)>>
-	<<if _bed>>
-		<<furnitureicon _bed.iconFile>><<if maplebirch.VP.realEstate.canShareBed(_property.id)>><<lanSwitch 'The double bed has room for two.' '双人床可以睡下两个人。'>><<else>><<lanSwitch 'The single bed has room for one.' '单人床只能睡一个人。'>><</if>><br>
-	<</if>>
-	<<set _bedUpgradeCost to maplebirch.VP.realEstate.bedUpgradeCost(_property.id)>>
-	<<if _bedUpgradeCost gt 0 && !maplebirch.VP.realEstate.isFrozen(_property.id)>>
-		<<if $VanillaPlus.finance.bank.balance gte _bedUpgradeCost>>
-			<<lanLink 'Buy a larger bed' 'Deadwood Reblooms Property Bedroom'>><<run maplebirch.VP.realEstate.upgradeBed(_property.id)>><</lanLink>>
-		<<else>>
-			<<lanSwitch 'Buy a larger bed' '购买更大的床'>>
-		<</if>>：<<deadwood-reblooms-finance-money _bedUpgradeCost>><br>
-	<</if>>
+	<<set _bedroomCompanion to null>>
 	<<if maplebirch.VP.realEstate.residentsHome(_property.id).length gt 0>>
 		<<set _bedroomCompanion to maplebirch.VP.realEstate.residentsHome(_property.id)[0]>>
 		<<npc _bedroomCompanion.id>><<person1>>
@@ -42,36 +31,57 @@
 					<<option 'CN'>>悉尼把明早要穿的神殿衣服单独挂好，在床上给你让出位置。
 				<</language>>
 		<</switch>><br><br>
-		<<if maplebirch.VP.realEstate.canShareBed(_property.id)>>
-			<<loveicon 'kiss'>>
-			<<lanLink 'Go to bed together' 'Deadwood Reblooms Property Intimacy'>>
-				<<run maplebirch.VP.realEstate.meetResident(_bedroomCompanion.id, _property.id)>>
-				<<set $sexstart to 1>>
-			<</lanLink>><<promiscuous1>><br>
-		<</if>>
 	<</if>>
-	<<bedicon>><<lanLink 'Undress and get into bed' 'Deadwood Reblooms Property Bed'>><<undressSleep 'Deadwood Property Bed'>><</lanLink>><br>
+	<<set _bed to maplebirch.VP.realEstate.furniture(_property.id, 'bed')>>
+	<<if _bed>>
+		<<if maplebirch.VP.realEstate.canShareBed(_property.id)>>
+			<<lanSwitch 'The bed is made up for two. There is room to turn over without disturbing the other side.' '双人床铺好了被褥。即使翻身，也不会碰到另一侧的人。'>>
+		<<else>>
+			<<lanSwitch 'You smooth the sheets across the narrow mattress. There is room for only one person.' '你抚平窄床垫上的被褥。这里仅够一个人睡下。'>>
+		<</if>><br>
+		<<furnitureicon _bed.iconFile>>
+		<<lanLink '脱衣上床' 'Deadwood Reblooms Property Bed'>><<undressSleep 'Deadwood Property Bed'>><</lanLink>><br>
+	<</if>>
 	<<deadwood-reblooms-property-sleep-outfits>>
-	<<lanLink 'Wardrobe' 'Deadwood Reblooms Property Wardrobe'>><</lanLink>><br>
-	<<mirroricon 'home'>><<lanLink 'Mirror' 'Deadwood Reblooms Property Mirror'>><<preMirror>><</lanLink>><br>
+	<<if _bedroomCompanion && maplebirch.VP.realEstate.canShareBed(_property.id)>>
+		<<loveicon 'kiss'>>
+		<<lanLink '一起上床' 'Deadwood Reblooms Property Intimacy'>>
+			<<run maplebirch.VP.realEstate.meetResident(_bedroomCompanion.id, _property.id)>>
+			<<set $sexstart to 1>>
+		<</lanLink>><<promiscuous1>><br>
+	<</if>>
+	<br>
+	<<set _wardrobe to maplebirch.VP.realEstate.furniture(_property.id, 'wardrobe')>>
+	<<if _wardrobe>>
+		<<if _wardrobe.type.includes('organiser')>>
+			<<lanSwitch 'The wardrobe has drawers for smaller things and a rail for your clothes.' '衣柜里有收纳小物的抽屉，也有挂衣服的横杆。'>>
+		<<elseif _wardrobe.type.includes('spacious')>>
+			<<lanSwitch 'Your clothes have room to hang without being pressed together.' '衣服能宽松地挂在衣柜里，不必挤作一团。'>>
+		<<else>>
+			<<lanSwitch 'The narrow wardrobe creaks when you open it. Your clothes just fit inside.' '打开狭窄的衣柜时，柜门吱呀作响。里面勉强放得下你的衣服。'>>
+		<</if>><br>
+		<<furnitureicon _wardrobe.iconFile>><<lanLink '衣柜' 'Deadwood Reblooms Property Wardrobe'>><</lanLink>><br>
+	<</if>>
+	<<mirroricon 'home'>><<lanLink '镜子' 'Deadwood Reblooms Property Mirror'>><<preMirror>><</lanLink>><br>
 	<<roomoptions>>
 	<<if playerHasSexToys()>>
-		<<sextoysicon>><<lanLink 'Sex toys' 'Sextoys Inventory'>><<set $sextoyInvReturnLink to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
+		<<sextoysicon>><<lanLink '性玩具' 'Sextoys Inventory'>><<set $sextoyInvReturnLink to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
 	<</if>>
 	<<if _property.rooms.desk is _property.rooms.bedroom>>
-		<<deskchairicon>><<lanLink 'Writing desk' 'Deadwood Reblooms Property Desk'>><</lanLink>><br>
+		<<deskchairicon>><<lanLink '书桌' 'Deadwood Reblooms Property Desk'>><</lanLink>><br>
 	<</if>>
+	<br>
 	<<if _property.rooms.bedroom is 1>>
-		<<lanLink 'Sitting room (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
+		<<getouticon>><<lanLink '起居室 (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
 	<<else>>
-		<<lanLink 'Return to the landing (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
+		<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
 	<</if>>
 <</if>>
 
 :: Deadwood Reblooms Property Desk []
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
-	<<lanLink 'Return to the agency' 'Deadwood Reblooms Property Office'>><</lanLink>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<language>>
@@ -80,24 +90,25 @@
 	<</language>><br><br>
 	<<if $studyBooks is undefined>><<set $studyBooks to {rented: 'none', stolen: 'none'}>><</if>>
 	<<homeStudyOptions>>
+	<br>
 	<<if _property.rooms.desk is _property.rooms.bedroom>>
-		<<lanLink 'Leave the desk' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+		<<lanLink '起身' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
 	<<elseif _property.rooms.desk is 1>>
-		<<lanLink 'Leave the desk' 'Deadwood Reblooms Property Home'>><</lanLink>>
+		<<lanLink '起身' 'Deadwood Reblooms Property Home'>><</lanLink>>
 	<<else>>
-		<<lanLink 'Leave the desk' 'Deadwood Reblooms Property Landing'>><</lanLink>>
+		<<lanLink '起身' 'Deadwood Reblooms Property Landing'>><</lanLink>>
 	<</if>>
 <</if>>
 
 :: Deadwood Reblooms Property Mirror []
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
-	<<lanLink 'Return to the agency' 'Deadwood Reblooms Property Office'>><</lanLink>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
-	<!-- 发现记录和通道来源都在当前存档的 $VanillaPlus 中；此处不借用孤儿院镜子的 home 标记。 -->
-	<<run maplebirch.VP.deviancy.discover('property')>>
-	<<bedicon>><<lanLink 'Step away' 'Deadwood Reblooms Property Bedroom'>><<unset $mirrorMenu>><<unset $bodywritingSet>><<postMirror>><</lanLink>><br>
+	<!-- 发现记录和通道来源都在当前存档的 $VanillaPlus 中。此处不借用孤儿院镜子的 home 标记。 -->
+	<<run maplebirch.VP.deviancy.discover('property', _property.id)>>
+	<<getouticon>><<lanLink '走开' 'Deadwood Reblooms Property Bedroom'>><<unset $mirrorMenu>><<unset $bodywritingSet>><<postMirror>><</lanLink>><br>
 	<<deadwood-reblooms-deviancy-mirror-enter-link 'property'>>
 	<<mirror>><br><br>
 <</if>>
@@ -105,65 +116,264 @@
 :: Deadwood Reblooms Property Bathroom []
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
-	<<lanLink 'Return to the agency' 'Deadwood Reblooms Property Office'>><</lanLink>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<= lanSwitch(_property.interior.bathroom.EN, _property.interior.bathroom.CN)>><br><br>
-	<<bathroomicon 'bath'>><<lanLink 'Have a bath (0:30)' 'Deadwood Reblooms Property Bath'>><<strip>><<pass 30>><<stress -6>><<set $hygiene to 0>><</lanLink>><<lstress>><br>
+	<<bathroomicon 'bath'>><<lanLink '泡澡 (0:30)' 'Deadwood Reblooms Property Bath'>><<strip>><<pass 30>><<stress -6>><<set $hygiene to 0>><</lanLink>><<lstress>><br>
 	<<personalUpkeep>>
 	<<pregnancyTest 'Deadwood Reblooms Property Bathroom'>>
+	<br>
 	<<if _property.rooms.bathroom is 1>>
-		<<lanLink 'Sitting room (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
+		<<getouticon>><<lanLink '起居室 (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
 	<<else>>
-		<<lanLink 'Return to the landing (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
+		<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
 	<</if>>
 <</if>>
 
 :: Deadwood Reblooms Property Bath []
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
-	<<lanLink 'Return to the agency' 'Deadwood Reblooms Property Office'>><</lanLink>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>><<wash>>
 	<<language>>
 		<<option 'EN'>>You wash in the privacy of your own bathroom. Warm water runs down the drain, taking the grime of the day with it.
 		<<option 'CN'>>你在自己的浴室里洗了个澡。温水流进下水道，也带走了身上的污垢。
 	<</language>><br><br>
-	<<lanLink 'Get out of the bath' 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
+	<<getouticon>><<lanLink '离开浴缸' 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Property Kitchen []
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
-	<<lanLink 'Return to the agency' 'Deadwood Reblooms Property Office'>><</lanLink>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<= lanSwitch(_property.interior.kitchen.EN, _property.interior.kitchen.CN)>><br><br>
-	<<lanLink 'Make a hot drink (0:10)' 'Deadwood Reblooms Property Kitchen Drink'>><<pass 10>><<stress -1>><</lanLink>><br>
-	<<if _property.rooms.kitchen is 1>>
-		<<lanLink 'Sitting room (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
+	<<for _resident range maplebirch.VP.realEstate.residentsHome(_property.id)>>
+		<<switch _resident.id>>
+			<<case 'Robin'>>
+				<<lanSwitch 'Robin has put two plates on the table and left the second chair out for you.' '罗宾在桌上摆了两只盘子，还给你留出了另一张椅子。'>>
+			<<case 'Whitney'>>
+				<<language>>
+					<<option 'EN'>>Whitney is looking through the cupboard. "What are you making?" <<He>> asks without turning around.
+					<<option 'CN'>>惠特尼正在翻橱柜。“你要做什么？”<<He>>头也不回地问。
+				<</language>>
+			<<case 'Kylar'>>
+				<<language>>
+					<<option 'EN'>>Kylar stays close to the worktop, watching your hands. <<He>> offers to wash anything you use.
+					<<option 'CN'>>凯拉尔靠在操作台旁，看着你的动作。<<He>>说用过的碗可以交给<<him>>洗。
+				<</language>>
+			<<case 'Sydney'>>
+				<<language>>
+					<<option 'EN'>>Sydney sets a clean cup beside yours, then rolls up <<his>> sleeves to help.
+					<<option 'CN'>>悉尼把一只干净的杯子放在你的杯子旁，随后卷起袖子准备帮忙。
+				<</language>>
+		<</switch>><br><br>
+	<</for>>
+	<<if Time.dayState is 'night'>>
+		<<lanSwitch 'The kitchen light falls across the worktop.' '厨房的灯光落在操作台上。'>><br><br>
+	<<elseif Time.hour lt 11>>
+		<<lanSwitch 'There is room to prepare breakfast.' '这里有地方准备早餐。'>><br><br>
 	<<else>>
-		<<lanLink 'Return to the landing (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
+		<<lanSwitch 'The worktop is ready for whatever you have brought home.' '操作台空着，等你处理带回家的食材。'>><br><br>
+	<</if>>
+	<!-- 与原版厨房共用食材、菜谱和烹饪时间。房产不免费提供食材。 -->
+	<<ingredientsSupplied>><<allowLewdIngredients>><<kitchenDisplay>>
+	<<if _property.rooms.kitchen is 1>>
+		<<getouticon>><<lanLink '起居室 (0:01)' 'Deadwood Reblooms Property Home'>><<kitchenExit>><<pass 1>><</lanLink>>
+	<<else>>
+		<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<kitchenExit>><<pass 1>><</lanLink>>
 	<</if>>
 <</if>>
 
-:: Deadwood Reblooms Property Kitchen Drink []
+:: Deadwood Reblooms Property Outdoor []
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
-	<<lanLink 'Return to the agency' 'Deadwood Reblooms Property Office'>><</lanLink>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
-	<<run maplebirch.VP.realEstate.enter()>><<effects>>
-	<<language>>
-		<<option 'EN'>>You put the kettle on and wait for the water to boil. The cup warms your hands as you drink.
-		<<option 'CN'>>你烧开一壶水，捧着温热的杯子慢慢喝完。
-	<</language>><br><br>
-	<<lanLink 'Return to the kitchen' 'Deadwood Reblooms Property Kitchen'>><</lanLink>>
+	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<= lanSwitch(_property.interior.outdoor.EN, _property.interior.outdoor.CN)>><br><br>
+	<<for _resident range maplebirch.VP.realEstate.residentsHome(_property.id)>>
+		<<switch _resident.id>>
+			<<case 'Robin'>>
+				<<lanSwitch 'Robin comes outside with you and stays close. For once, neither of you has to hurry back to the orphanage.' '罗宾跟着你出来，站在你身旁。这一回，你们都不用急着赶回孤儿院。'>>
+			<<case 'Whitney'>>
+				<<language>>
+					<<option 'EN'>>Whitney leans beside you. <<He>> watches the view while pretending not to watch you.
+					<<option 'CN'>>惠特尼靠在你身旁。<<He>>望着外面，装作没有留意你。
+				<</language>>
+			<<case 'Kylar'>>
+				<<lanSwitch 'Kylar steps outside after you and takes hold of your sleeve.' '凯拉尔跟着你出来，轻轻攥住你的衣袖。'>>
+			<<case 'Sydney'>>
+				<<language>>
+					<<option 'EN'>>Sydney comes out for a breath of air. <<His>> hand finds yours.
+					<<option 'CN'>>悉尼出来透了口气，随后握住你的手。
+				<</language>>
+		<</switch>><br><br>
+	<</for>>
+	<<if Weather.precipitation is 'rain'>>
+		<<if _property.id is 'domus' or _property.id is 'danube'>>
+			<<lanSwitch 'Rain darkens the garden path.' '雨水浸湿了花园的小径。'>><br><br>
+		<<else>>
+			<<lanSwitch 'Rain patters against the railing and dampens the ground.' '雨滴敲在栏杆上，打湿了地面。'>><br><br>
+		<</if>>
+	<<elseif Weather.isSnow>>
+		<<if _property.id is 'domus' or _property.id is 'danube'>>
+			<<lanSwitch 'Snow settles along the garden path.' '花园小径上落了一层雪。'>><br><br>
+		<<else>>
+			<<lanSwitch 'Snow settles on the rail and the path below.' '雪落在栏杆和下方的小径上。'>><br><br>
+		<</if>>
+	<<elseif Time.dayState is 'night'>>
+		<<lanSwitch 'The lights beyond your home stand out against the dark.' '夜色里，屋外的灯光格外显眼。'>><br><br>
+	<<else>>
+		<<lanSwitch 'The air is clear enough to linger outside.' '空气清朗，适合在外面待一会儿。'>><br><br>
+	<</if>>
+	<<if _property.id is 'domus'>>
+		<!-- 原版所有苗圃都存于 $plots，时间事件会让这里的单块小苗圃正常生长。 -->
+		<<if !$plots.domus>><<plots_init domus 1 earth 1 small>><</if>>
+		<<plot_effects>>
+		<<display_plot domus>>
+	<<elseif _property.id is 'high'>>
+		<!-- 店铺上方的浅木箱只容得下一块小苗圃，不与小屋或宅邸共用作物。 -->
+		<<if !$plots.high>><<plots_init high 1 earth 2 small>><</if>>
+		<<plot_effects>>
+		<<display_plot high>>
+	<<elseif _property.id is 'danube'>>
+		<<gardenicon>><<lanLink '走进花园 (0:01)' 'Deadwood Reblooms Property Garden'>><<pass 1>><</lanLink>><br><br>
+	<</if>>
+	<<deadwood-reblooms-property-outdoor-icon _property.id>>
+	<<lanLink '看看外面 (0:10)' 'Deadwood Reblooms Property Outdoor View'>><<pass 10>><</lanLink>><br><br>
+	<<if _property.outdoorAccess is 'sitting'>>
+		<<getouticon>><<lanLink '起居室 (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
+	<<elseif _property.outdoorAccess is 'retreat'>>
+		<<getouticon>><<lanLink _property.interior.retreatLabel.CN 'Deadwood Reblooms Property Retreat'>><<pass 1>><</lanLink>>
+	<<else>>
+		<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
+	<</if>>
+<</if>>
+
+:: Deadwood Reblooms Property Garden []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || _property.id isnot 'danube' || !maplebirch.VP.realEstate.owns('danube') || maplebirch.VP.realEstate.managementFor('danube').rented>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<lanSwitch
+		'The terrace lies behind you. Three planting beds run along the garden path, sheltered from the street by the high wall.'
+		'花园露台在你身后。三块苗圃沿着小径排开，高墙挡住了街上的视线。'
+	>><br><br>
+	<!-- 与小屋使用不同的原版种植地点，跨日成长和收获互不覆盖。 -->
+	<<if !$plots.danube>><<plots_init danube 3 earth 3 medium>><</if>>
+	<<plot_effects>>
+	<<display_plot danube>>
+	<<getouticon>><<lanLink '返回花园露台 (0:01)' 'Deadwood Reblooms Property Outdoor'>><<pass 1>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Balcony []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || _property.id isnot 'danube' || !maplebirch.VP.realEstate.owns('danube') || maplebirch.VP.realEstate.managementFor('danube').rented>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<= lanSwitch(_property.interior.balcony.EN, _property.interior.balcony.CN)>><br><br>
+	<<if Weather.precipitation is 'rain'>>
+		<<lanSwitch 'Rain runs along the stone rail.' '雨水沿着石栏杆流下。'>><br><br>
+	<<elseif Weather.isSnow>>
+		<<lanSwitch 'Snow gathers on the rail and the garden below.' '栏杆和下方花园都覆着雪。'>><br><br>
+	<<elseif Time.dayState is 'night'>>
+		<<lanSwitch 'The garden paths are pale in the moonlight.' '花园的小径在月色里泛着微光。'>><br><br>
+	<</if>>
+	<<lanLink '俯瞰花园 (0:10)' 'Deadwood Reblooms Property Balcony View'>><<pass 10>><</lanLink>><br>
+	<<if Weather.precipitation isnot 'rain' && !Weather.isSnow>>
+		<<lanLink '在阳台坐一会儿 (0:15)' 'Deadwood Reblooms Property Balcony Rest'>><<pass 15>><<stress -2>><</lanLink>><<lstress>><br>
+	<</if>>
+	<!-- 原版翅膀特质本身就允许从高处下降。鸟翼即使被拔羽仍能滑翔。 -->
+	<<if $harpy gte 6>>
+		<<glideicon>><<lanLink '滑翔到花园 (0:02)' 'Deadwood Reblooms Property Balcony Glide'>><<bird_pass 2>><<endevent>><</lanLink>><br>
+	<<elseif $angel gte 6 or $demon gte 6 or $fallenangel gte 2>>
+		<<if $pain gte 21>>
+			<span class='purple'><<lanSwitch 'Your wings could carry you down, but you are too injured to jump.' '翅膀本可以带你滑下去，但你伤得太重，不能冒险跃出阳台。'>></span><br>
+		<<elseif $birdFly is 1 or $birdGlide is 1>>
+			<<glideicon>><<lanLink '滑翔到花园 (0:02)' 'Deadwood Reblooms Property Balcony Glide'>><<bird_pass 2>><<endevent>><</lanLink>><br>
+		<<elseif currentSkillValue('willpower') lt 250>>
+			<span class='red'><<lanSwitch 'You cannot bring yourself to jump from the balcony.' '你鼓不起勇气从阳台跃下。'>></span><br>
+		<<elseif $daily.glideScared>>
+			<span class='red'><<lanSwitch 'You are still too frightened to try again today.' '今天你仍不敢再试一次。'>></span><br>
+		<<else>>
+			<<glideicon>>
+			<<lanLink '尝试滑翔到花园 (0:02)' 'Deadwood Reblooms Property Balcony Glide Attempt'>>
+				<<bird_pass 2>><<endevent>>
+			<</lanLink>><<willpowerdifficulty 250 1100>><br>
+		<</if>>
+	<</if>>
+	<br>
+	<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Balcony View []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || _property.id isnot 'danube' || !maplebirch.VP.realEstate.owns('danube') || maplebirch.VP.realEstate.managementFor('danube').rented>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<= lanSwitch(_property.interior.balconyView.EN, _property.interior.balconyView.CN)>><br><br>
+	<<lanLink '返回二层阳台 (0:01)' 'Deadwood Reblooms Property Balcony'>><<pass 1>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Balcony Rest []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || _property.id isnot 'danube' || !maplebirch.VP.realEstate.owns('danube') || maplebirch.VP.realEstate.managementFor('danube').rented>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<lanSwitch 'You settle into a chair beneath the eaves. The walls keep out the street noise, and the garden is still.' '你坐进檐下的椅子。围墙挡住了街上的喧闹，花园里一片安静。'>><br><br>
+	<<lanLink '返回二层阳台 (0:01)' 'Deadwood Reblooms Property Balcony'>><<pass 1>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Balcony Glide []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || _property.id isnot 'danube' || !maplebirch.VP.realEstate.owns('danube') || maplebirch.VP.realEstate.managementFor('danube').rented>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.setFloor(1)>><<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<lanSwitch 'You spread your wings and glide across the garden. Your feet find the path between the planting beds.' '你展开翅膀，从花园上方滑过，落在苗圃之间的小径上。'>><br><br>
+	<<gardenicon>><<lanLink '走进花园 (0:01)' 'Deadwood Reblooms Property Garden'>><<pass 1>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Balcony Glide Attempt []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || _property.id isnot 'danube' || !maplebirch.VP.realEstate.owns('danube') || maplebirch.VP.realEstate.managementFor('danube').rented>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<lanSwitch 'You step up to the stone rail and spread your wings.' '你走到石栏杆前，展开翅膀。'>><br><br>
+	<<if $willpowerSuccess>>
+		<<set $birdGlide to 1>>
+		<span class='green'><<lanSwitch 'You steady yourself. The garden waits below.' '你稳住心神。花园就在下方。'>></span><<gwillpower>><<willpower 1>><br><br>
+		<<glideicon>><<lanLink '滑翔到花园' 'Deadwood Reblooms Property Balcony Glide'>><<endevent>><</lanLink>><br>
+	<<else>>
+		<<set $daily.glideScared to true>>
+		<span class='red'><<lanSwitch 'You draw back from the edge. You cannot make yourself jump.' '你从阳台边退开，终究没能跳下去。'>></span><br><br>
+	<</if>>
+	<<getouticon>><<lanLink '返回二层阳台 (0:01)' 'Deadwood Reblooms Property Balcony'>><<pass 1>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Outdoor View []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<= lanSwitch(_property.interior.outdoorView.EN, _property.interior.outdoorView.CN)>><br><br>
+	<<getouticon>><<lanLink _property.interior.outdoorLabel.CN 'Deadwood Reblooms Property Outdoor'>><<pass 1>><</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Property Guest Bedroom []
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented || !_property.interior.guest>>
-	<<lanLink 'Return to the agency' 'Deadwood Reblooms Property Office'>><</lanLink>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<= lanSwitch(_property.interior.guest.EN, _property.interior.guest.CN)>><br><br>
@@ -171,30 +381,35 @@
 		<<set _guestResident to maplebirch.VP.realEstate.residentsAt(_property.id)[1]>>
 		<<= maplebirch.auto(_guestResident.id)>> <<lanSwitch 'keeps their things here.' '把自己的东西放在这里。'>><br><br>
 	<</if>>
-	<<lanLink 'Return to the landing (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
+	<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Property Retreat []
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented || !_property.interior.retreat>>
-	<<lanLink 'Return to the agency' 'Deadwood Reblooms Property Office'>><</lanLink>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<= lanSwitch(_property.interior.retreat.EN, _property.interior.retreat.CN)>><br><br>
-	<<lanLink 'Rest a while (0:15)' 'Deadwood Reblooms Property Retreat Rest'>><<pass 15>><<stress -2>><</lanLink>><br>
+	<<couchicon>><<lanLink '休息片刻 (0:15)' 'Deadwood Reblooms Property Retreat Rest'>><<pass 15>><<stress -2>><<tiredness -4>><</lanLink>><<lstress>><<ltiredness>><br>
+	<<if _property.outdoorAccess is 'retreat'>>
+		<<deadwood-reblooms-property-outdoor-icon _property.id>>
+		<<lanLink _property.interior.outdoorLabel.CN 'Deadwood Reblooms Property Outdoor'>><<pass 1>><</lanLink>><br>
+	<</if>>
+	<br>
 	<<if _property.rooms.retreat is 1>>
-		<<lanLink 'Sitting room (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
+		<<getouticon>><<lanLink '起居室 (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
 	<<else>>
-		<<lanLink 'Return to the landing (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
+		<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
 	<</if>>
 <</if>>
 
 :: Deadwood Reblooms Property Retreat Rest []
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented || !_property.interior.retreatRest>>
-	<<lanLink 'Return to the agency' 'Deadwood Reblooms Property Office'>><</lanLink>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<= lanSwitch(_property.interior.retreatRest.EN, _property.interior.retreatRest.CN)>><br><br>
-	<<lanLink 'Get up' 'Deadwood Reblooms Property Retreat'>><</lanLink>>
+	<<lanLink '起身' 'Deadwood Reblooms Property Retreat'>><</lanLink>>
 <</if>>

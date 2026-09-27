@@ -44,12 +44,12 @@ class IncantationCheatCollection {
     const name = JSON.stringify(item.name);
     const favoriteClass = item.favorite ? 'gold' : 'blue';
     const favoriteMark = item.favorite ? '★' : '☆';
-    const deleteLink = item.favorite ? '' : ` | <<lanLink 'delete' 'capitalize' 'class:red'>><<run maplebirch.ICC.deleteForm(${name})>><</lanLink>>`;
+    const deleteLink = item.favorite ? '' : ` | <<lanLink '删除' 'capitalize' 'class:red'>><<run maplebirch.ICC.deleteForm(${name})>><</lanLink>>`;
     return `
       <span style='float:right'><<lanLink '${favoriteMark}' 'class:${favoriteClass}'>><<run maplebirch.ICC.toggleFavorite(${name})>><</lanLink>></span>
       <<lanLink ${name} 'class:strawberry'>><<run maplebirch.ICC.updateForm(${name})>><</lanLink>><br>
       <span class='cheat-code' data-type="${item.type === 'javascript' ? 'JS' : 'Twine'}">${this.briefCode(item.code)}</span>
-      <<lanLink 'execute' 'capitalize' 'class:teal'>><<run maplebirch.ICC.executeForm(${name})>><</lanLink>>${deleteLink}
+      <<lanLink '执行' 'capitalize' 'class:teal'>><<run maplebirch.ICC.executeForm(${name})>><</lanLink>>${deleteLink}
     `;
   }
 
@@ -223,7 +223,7 @@ class IncantationCheatCollection {
     const confirmHtml: string = `
       <span class='red'><<lanSwitch 'Confirm to delete: ' '确认删除：'>>"${item.name}"?</span><br>
       <span class='cheat-code' data-type="${item.type === 'javascript' ? 'JS' : 'Twine'}">${escapedCode}</span>
-      <<lanLink 'confirm' 'capitalize' 'class:teal'>><<run maplebirch.ICC.removeForm(${nameArg})>><</lanLink>> | <<lanLink 'cancel' 'capitalize' 'class:blue'>><<run maplebirch.ICC.cancelDelete(${nameArg})>><</lanLink>>
+      <<lanLink '确认' 'capitalize' 'class:teal'>><<run maplebirch.ICC.removeForm(${nameArg})>><</lanLink>> | <<lanLink '取消' 'capitalize' 'class:blue'>><<run maplebirch.ICC.cancelDelete(${nameArg})>><</lanLink>>
     `;
     this.updateContainer(itemId, confirmHtml);
   }
@@ -355,8 +355,8 @@ class IncantationCheatCollection {
       const confirmHtml: string = `
         <div class='settingsToggleItem'>
           <span class='red'><<lanSwitch 'Are you sure to clear' '确认清空'>> ${removableCount} <<lanSwitch 'codes' '个命令'>>?</span><br>
-          <<lanLink 'confirm' 'capitalize' 'class:teal'>><<run maplebirch.ICC.clearForm('confirm')>>
-          <</lanLink>>|<<lanLink 'cancel' 'capitalize' 'class:blue'>><<run maplebirch.ICC.clearForm('cancel')>><</lanLink>>
+          <<lanLink '确认' 'capitalize' 'class:teal'>><<run maplebirch.ICC.clearForm('confirm')>>
+          <</lanLink>>|<<lanLink '取消' 'capitalize' 'class:blue'>><<run maplebirch.ICC.clearForm('cancel')>><</lanLink>>
         </div>
       `;
       this.updateContainer('maplebirch-cheat-content', confirmHtml);

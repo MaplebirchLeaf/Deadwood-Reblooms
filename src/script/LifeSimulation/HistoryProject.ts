@@ -28,7 +28,7 @@ const schedule = `
           >>
         <</if>>`;
 
-export const historyProjectWidgetPassages: Record<string, PassagePatch[]> = {
+const historyProjectWidgetPassages: Record<string, PassagePatch[]> = {
   'Widgets School Projects': [
     {
       src: '<<widget "projectoptions">>',
@@ -68,7 +68,7 @@ export const historyProjectWidgetPassages: Record<string, PassagePatch[]> = {
   ]
 };
 
-export const historyProjectLocationPassages: Record<string, PassagePatch[]> = {
+const historyProjectLocationPassages: Record<string, PassagePatch[]> = {
   Museum: [
     // 在玩家确认讨论博物馆画作后安排历史课题，不因仅浏览画作而提前触发。
     {

@@ -210,7 +210,7 @@ function xxHash64(data: Uint8Array): bigint {
   return h64;
 }
 
-export function createModPackFromZip(modName: string, zipBuffer: Buffer): Buffer {
+function createModPackFromZip(modName: string, zipBuffer: Buffer): Buffer {
   const files = readZipFiles(zipBuffer);
   const bootFile = files.get('boot.json');
   if (!bootFile) throw new Error('boot.json not found in zip');

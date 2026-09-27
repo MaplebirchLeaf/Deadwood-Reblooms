@@ -1,17 +1,23 @@
-# 金额单位是便士。floors 从入户层往上排列；rooms 指定功能房间所在的楼层（从 1 开始）。
-# desk、guest 和 retreat 可以省略；单层小屋没有独立书桌或休闲房，只有宅邸设客房。
-# dailyRentPercent 是各房产的每日挂牌租金率，状况与装修再参与实际租金计算。
-# bedId / bedUpgradeId 引用原版家具 ID；床属于这处房产，不修改孤儿院卧室家具。
-# residentCapacity 是除 PC 以外可同住的人数；普通住宅共用主卧，宅邸另有一间客房。
+# 金额单位是便士。floors 从入户层往上排列。rooms 指定功能房间所在的楼层（从 1 开始）。
+# desk、guest 和 retreat 可以省略。outdoor 是各房产的庭院或阳台入口，仍按所在楼层配置。
+# weeklyRentPercent 是各房产的每周挂牌租金率，状况与装修再参与实际租金计算。
+# 床和衣柜的初始及升级 ID 均引用原版家具。每处房产独立保存，不修改孤儿院卧室。
+# residentCapacity 是除 PC 以外可同住的人数。普通住宅共用主卧，宅邸另有一间客房。
+# 镜子坐标在购买房产时随机生成，保存于该房屋状态。不同出口可以落在同一格。
+# outdoorAccess 指出通向室外的实际房间。sitting 为起居室，landing 为楼梯间，retreat 为休憩室。
 - id: domus
   street: Domus Street
+  outdoorAccess: sitting
+  mirrorLabel: { EN: Climb through the cottage mirror, CN: 从宅邸街小屋的镜子爬出去 }
   streetName:
     EN: Domus Street
     CN: 宅邸街
   price: 8000000
-  dailyRentPercent: 0.07
+  weeklyRentPercent: 0.49
   residentCapacity: 0
   bedId: singlebed
+  wardrobeId: wardrobe
+  wardrobeUpgradeId: wardrobebasic
   name:
     EN: Domus Street cottage
     CN: 宅邸街小屋
@@ -25,34 +31,48 @@
     - name: { EN: Ground floor, CN: 一层 }
       description:
         EN: You step into a small sitting room. Light falls across the worn floorboards; beyond the window, the garden fence separates you from the street.
-        CN: 你走进狭小的起居室。阳光落在磨旧的地板上；窗外的庭院围栏隔开了街上的目光。
-  rooms: { bedroom: 1, bathroom: 1, kitchen: 1 }
+        CN: 你走进狭小的起居室。阳光落在磨旧的地板上。窗外的庭院围栏隔开了街上的目光。
+  rooms: { bedroom: 1, bathroom: 1, kitchen: 1, outdoor: 1 }
   interior:
     bedroomLabel: { EN: Sleeping nook (0:01), CN: 睡觉的角落 (0:01) }
     bedroom:
       EN: Your bed is tucked against the sitting room wall, with a narrow wardrobe beside it. There is no room for a proper desk; the orphanage roof is visible beyond the garden fence.
-      CN: 床紧贴着起居室的墙，旁边仅摆得下一只窄衣柜。这里没有放书桌的空地；越过庭院围栏还能看见孤儿院的屋顶。
+      CN: 床紧贴着起居室的墙，旁边仅摆得下一只窄衣柜。这里没有放书桌的空地。越过庭院围栏还能看见孤儿院的屋顶。
+    sittingRest:
+      EN: You settle into the old chair beside the garden window. The orphanage roof catches your eye as the noise of the street fades.
+      CN: 你坐进庭院窗边的旧椅子。街上的声音渐渐远了，你的目光停在孤儿院的屋顶上。
     bathroom:
       EN: A narrow bath sits under the frosted window. The old pipes knock softly before the water warms.
       CN: 窄浴缸摆在磨砂窗下。水热起来之前，旧水管会轻轻敲响。
     kitchenLabel: { EN: Kitchen corner (0:01), CN: 厨房角落 (0:01) }
     kitchen:
-      EN: A single hob and a battered kettle occupy the end of the sitting room. The cupboard beneath them holds just enough for a few meals.
-      CN: 起居室尽头的一小块台面放着单炉灶和旧水壶。下面的橱柜只装得下几顿饭的材料。
+      EN: A single hob, a compact oven and a battered kettle occupy the end of the sitting room. The cupboard beneath them holds just enough for a few meals.
+      CN: 起居室尽头的一小块台面放着单炉灶、小烤箱和旧水壶。下面的橱柜只装得下几顿饭的材料。
+    outdoorLabel: { EN: Garden (0:01), CN: 庭院 (0:01) }
+    outdoor:
+      EN: A low fence hems in the little garden. There is room for one narrow bed of soil beside the path, and no more. The orphanage roof rises beyond it.
+      CN: 低矮的围栏圈出一小块庭院。小径旁只容得下一块窄苗圃，再多就种不下了。孤儿院的屋顶就在围栏外。
+    outdoorView:
+      EN: You stand beside the fence and watch people pass on Domus Street. No one pays the small garden much attention.
+      CN: 你站在围栏旁，看着宅邸街上的行人经过。没人留意这片小小的庭院。
     renovated:
       EN: Fresh paint covers the scuffed walls, and the repaired window closes without a draught.
       CN: 新漆盖住了墙上的磨痕，修好的窗户关上后也不再漏风。
 
 - id: barb
   street: Barb Street
+  outdoorAccess: sitting
+  mirrorLabel: { EN: Climb through the flat mirror, CN: 从倒钩街公寓的镜子爬出去 }
   streetName:
     EN: Barb Street
     CN: 倒钩街
   price: 15000000
-  dailyRentPercent: 0.075
+  weeklyRentPercent: 0.525
   residentCapacity: 1
   bedId: singlebed
   bedUpgradeId: doublebed
+  wardrobeId: wardrobebasic
+  wardrobeUpgradeId: organiser
   name:
     EN: Barb Street flat
     CN: 倒钩街公寓
@@ -67,41 +87,47 @@
       description:
         EN: You climb the stairs to your flat. The sitting room looks out over the empty canal, while traffic rolls past on the far bank.
         CN: 你爬上楼梯，走进自己的公寓。起居室朝着干涸的运河，车流从对岸驶过。
-  rooms: { bedroom: 1, bathroom: 1, kitchen: 1, desk: 1, retreat: 1 }
+  rooms: { bedroom: 1, bathroom: 1, kitchen: 1, desk: 1, outdoor: 1 }
   interior:
     bedroomLabel: { EN: Bedroom (0:01), CN: 卧室 (0:01) }
     bedroom:
       EN: The bedroom door muffles the road noise. A desk fits beneath the window, with the wardrobe against the opposite wall.
       CN: 卧室的门挡住了道路的喧闹。书桌安在窗下，衣柜靠着对面的墙。
+    sittingRest:
+      EN: You settle into the cushioned window seat. Traffic rolls past the canal, muffled by the closed glass.
+      CN: 你坐进窗边的软垫座位。车流经过运河，声音被关着的玻璃隔得模糊。
     bathroom:
       EN: White tiles line the compact bathroom. Running water drowns out the traffic outside.
       CN: 紧凑的浴室铺着白瓷砖。水声盖过了外面的车流声。
     kitchenLabel: { EN: Kitchenette (0:01), CN: 小厨房 (0:01) }
     kitchen:
-      EN: A small counter divides the kitchenette from the sitting room. A kettle, two burners and a narrow cupboard fit along the wall.
-      CN: 一段矮柜把小厨房与起居室隔开。水壶、双炉灶和窄橱柜沿墙排开。
-    retreatLabel: { EN: Window seat (0:01), CN: 窗边座位 (0:01) }
-    retreat:
-      EN: A cushioned seat fills the recess beside the canal-facing window. There is only room for one person, but the noise of the road feels farther away here.
-      CN: 朝向运河的窗边嵌着一张软垫座位。这里只坐得下一个人，路上的喧闹却仿佛远了一些。
-    retreatRest:
-      EN: You watch the canal from the window seat until your shoulders relax.
-      CN: 你坐在窗边望着运河，直到肩膀慢慢放松。
+      EN: A small counter divides the kitchenette from the sitting room. A kettle, two burners, a small oven and a narrow cupboard fit along the wall.
+      CN: 一段矮柜把小厨房与起居室隔开。水壶、双炉灶、小烤箱和窄橱柜沿墙排开。
+    outdoorLabel: { EN: Balcony (0:01), CN: 阳台 (0:01) }
+    outdoor:
+      EN: The balcony is hardly wider than the doorway. There is room to stand by the metal railing, but not for a planting bed. The dry canal and road lie below.
+      CN: 阳台只比门口宽出一点。你可以靠着金属栏杆站一会儿，却摆不下一块苗圃。下面是干涸的运河，再远些便是马路。
+    outdoorView:
+      EN: A car crosses the canal bridge. Its sound fades before the next one appears.
+      CN: 一辆车驶过运河桥。引擎声渐渐远去，下一辆车还没有出现。
     renovated:
       EN: New fittings brighten the flat, and the sealed windows keep the canal air outside.
       CN: 新装的家具让公寓明亮起来，密封好的窗户把运河边的风挡在外面。
 
 - id: high
   street: High Street
-  agency: true
+  outdoorAccess: landing
+  mirrorLabel: { EN: Climb through the loft mirror, CN: 从商业街楼上住宅的镜子爬出去 }
   streetName:
     EN: High Street
     CN: 商业街
   price: 25000000
-  dailyRentPercent: 0.08
+  weeklyRentPercent: 0.56
   residentCapacity: 1
   bedId: doublebed
   bedUpgradeId: doublebeddeluxe
+  wardrobeId: wardrobebasic
+  wardrobeUpgradeId: organiser
   name:
     EN: High Street loft
     CN: 商业街楼上住宅
@@ -120,7 +146,7 @@
       description:
         EN: A short staircase leads to the quieter upper level. The sloping roof leaves room for a bedroom and a writing desk.
         CN: 一段短楼梯通向较为安静的上层。倾斜的屋顶下留着卧室与书桌的位置。
-  rooms: { bedroom: 2, bathroom: 1, kitchen: 1, desk: 2, retreat: 2 }
+  rooms: { bedroom: 2, bathroom: 1, kitchen: 1, desk: 2, retreat: 2, outdoor: 2 }
   interior:
     bedroomLabel: { EN: Bedroom (0:01), CN: 卧室 (0:01) }
     bedroom:
@@ -131,8 +157,15 @@
       CN: 铺瓷砖的浴室藏在楼梯后面。浴缸放满水时，蒸汽会蒙住小小的天窗。
     kitchenLabel: { EN: Kitchen (0:01), CN: 厨房 (0:01) }
     kitchen:
-      EN: The kitchen occupies a separate room beside the lower loft. Its broad counter catches the last light from the shop windows.
-      CN: 厨房是阁楼下层旁边的独立房间。宽阔的台面映着店铺窗外最后一抹光。
+      EN: The kitchen occupies a separate room beside the lower loft. An oven stands beneath its broad counter, where the last light from the shop windows falls.
+      CN: 厨房是阁楼下层旁边的独立房间。宽阔的台面下嵌着烤箱，店铺窗外最后一抹光落在上面。
+    outdoorLabel: { EN: Roof terrace (0:01), CN: 屋顶露台 (0:01) }
+    outdoor:
+      EN: A narrow roof terrace sits above the shops. One shallow timber planter rests against the sheltered wall. Shop signs glow below the parapet, and the market can be heard from here.
+      CN: 店铺上方有一方狭长的屋顶露台。背风的墙边只摆得下一只浅木种植箱。女儿墙下亮着招牌，市场的声音也传得上来。
+    outdoorView:
+      EN: From above, the shoppers seem to move together in little streams. A stallholder calls out a final price.
+      CN: 从高处看，逛街的人群像一股股细流。一名摊主喊出了收摊前的价格。
     retreatLabel: { EN: Reading alcove (0:01), CN: 阅读角 (0:01) }
     retreat:
       EN: A low bookcase and an armchair sit beneath the upper roof window. The shopkeepers' voices are only a murmur from up here.
@@ -146,13 +179,17 @@
 
 - id: cliff
   street: Cliff Street
+  outdoorAccess: retreat
+  mirrorLabel: { EN: Climb through the cliffside mirror, CN: 从峭壁街住宅的镜子爬出去 }
   streetName:
     EN: Cliff Street
     CN: 峭壁街
   price: 40000000
-  dailyRentPercent: 0.065
+  weeklyRentPercent: 0.455
   residentCapacity: 1
   bedId: doublebeddeluxe
+  wardrobeId: wardrobebasic
+  wardrobeUpgradeId: carved
   name:
     EN: Cliff Street sea-view house
     CN: 峭壁街海景住宅
@@ -166,12 +203,12 @@
     - name: { EN: Ground floor, CN: 一层 }
       description:
         EN: The sitting room faces the sea. Waves break below the cliff, and the windows rattle whenever the wind rises.
-        CN: 起居室面朝大海。浪花在峭壁下碎开；风一起，窗户便轻轻作响。
+        CN: 起居室面朝大海。浪花在峭壁下碎开。风一起，窗户便轻轻作响。
     - name: { EN: Upper floor, CN: 二层 }
       description:
         EN: The stairs rise towards a sea-facing window. The landing is quiet except for the wind beyond the glass.
         CN: 楼梯向一扇朝海的窗户延伸。除了玻璃外的风声，二层楼梯间一片安静。
-  rooms: { bedroom: 2, bathroom: 1, kitchen: 1, desk: 2, retreat: 2 }
+  rooms: { bedroom: 2, bathroom: 1, kitchen: 1, desk: 2, retreat: 2, outdoor: 2 }
   interior:
     bedroomLabel: { EN: Bedroom (0:01), CN: 卧室 (0:01) }
     bedroom:
@@ -182,12 +219,19 @@
       CN: 海风吹不进温暖的浴室。泡澡时，你仍能从通风口听见潮声。
     kitchenLabel: { EN: Kitchen (0:01), CN: 厨房 (0:01) }
     kitchen:
-      EN: The kitchen sits on the sheltered side of the house. A sturdy table and deep cupboards leave room to prepare food while the wind shakes the seaward windows.
-      CN: 厨房位于房子背风的一侧。结实的餐桌与深橱柜留出烹饪空间，海侧的窗户在风中作响。
+      EN: The kitchen sits on the sheltered side of the house. A sturdy table, an oven and deep cupboards leave room to prepare food while the wind shakes the seaward windows.
+      CN: 厨房位于房子背风的一侧。结实的餐桌、烤箱与深橱柜留出烹饪空间，海侧的窗户在风中作响。
+    outdoorLabel: { EN: Sea balcony (0:01), CN: 观海阳台 (0:01) }
+    outdoor:
+      EN: The upper balcony faces the water. Its stone wall keeps you back from the cliff edge, but it cannot keep out the salt wind. Nothing delicate would grow out here.
+      CN: 二层阳台正对大海。石墙挡住了峭壁边缘，却挡不住带着盐味的海风。娇嫩的作物在这里长不起来。
+    outdoorView:
+      EN: You follow a line of white foam until it breaks against the rocks below.
+      CN: 你望着一道白色浪线，直到它撞上峭壁下的礁石。
     retreatLabel: { EN: Sea-view alcove (0:01), CN: 观海角 (0:01) }
     retreat:
-      EN: A broad chair faces the sea through a sheltered upper window. A thick blanket lies folded over its arm.
-      CN: 二层一扇避风的窗前摆着宽椅，正对大海。扶手上叠着一条厚毯。
+      EN: A broad chair faces the sea through a sheltered upper window. A thick blanket lies folded over its arm. A glass door opens onto the sea balcony.
+      CN: 二层一扇避风的窗前摆着宽椅，正对大海。扶手上叠着一条厚毯。旁边的玻璃门通向观海阳台。
     retreatRest:
       EN: You draw the blanket over your knees and listen to the waves below.
       CN: 你把毯子盖在膝上，听着下方的浪声。
@@ -197,13 +241,17 @@
 
 - id: danube
   street: Danube Street
+  outdoorAccess: retreat
+  mirrorLabel: { EN: Climb through the mansion mirror, CN: 从多瑙河街宅邸的镜子爬出去 }
   streetName:
     EN: Danube Street
     CN: 多瑙河街
   price: 60000000
-  dailyRentPercent: 0.055
+  weeklyRentPercent: 0.385
   residentCapacity: 2
   bedId: doublebedexotic
+  wardrobeId: armoire
+  wardrobeUpgradeId: carved
   name:
     EN: Danube Street manor
     CN: 多瑙河街宅邸
@@ -226,7 +274,7 @@
       description:
         EN: The last flight of stairs reaches a quiet room beneath the roof. A writing desk stands beside the dormer window.
         CN: 最后一段楼梯通往屋顶下安静的房间。一张书桌摆在老虎窗旁。
-  rooms: { bedroom: 2, bathroom: 2, kitchen: 1, desk: 3, guest: 2, retreat: 1 }
+  rooms: { bedroom: 2, bathroom: 2, kitchen: 1, desk: 3, guest: 2, retreat: 1, outdoor: 1, balcony: 2 }
   interior:
     bedroomLabel: { EN: Bedroom (0:01), CN: 卧室 (0:01) }
     bedroom:
@@ -237,8 +285,22 @@
       CN: 宽敞的浴室里有一只深浴缸。温水声在石地板与高天花板之间回荡。
     kitchenLabel: { EN: Kitchen (0:01), CN: 厨房 (0:01) }
     kitchen:
-      EN: The manor kitchen has a long worktop, a pantry and a dining table large enough for company. The chairs stand empty for now.
-      CN: 宅邸的厨房有长操作台、储藏室，还有一张足以招待客人的餐桌。现在椅子仍空着。
+      EN: The manor kitchen has a long worktop, an oven, a pantry and a dining table large enough for company. The chairs stand empty for now.
+      CN: 宅邸的厨房有长操作台、烤箱、储藏室，还有一张足以招待客人的餐桌。现在椅子仍空着。
+    outdoorLabel: { EN: Garden terrace (0:01), CN: 花园露台 (0:01) }
+    outdoor:
+      EN: Stone steps lead from the conservatory to a terrace overlooking the walled garden. A path continues between its planted beds. The house hides the street from sight.
+      CN: 石阶从温室通往花园露台。一条小径从露台边通向围墙内的苗圃。街道被宅邸挡在了身后。
+    outdoorView:
+      EN: You walk to the edge of the terrace. The garden is quiet enough to hear leaves stir along the far wall.
+      CN: 你走到露台边。花园很安静，远处围墙旁的树叶一动，声音也听得见。
+    balconyLabel: { EN: Upper balcony (0:01), CN: 二层阳台 (0:01) }
+    balcony:
+      EN: You step through the glass doors onto the upper balcony. The garden spreads below, enclosed by the manor walls. The street lies beyond them.
+      CN: 你推开玻璃门，走上二层阳台。花园铺展在下方，被宅邸的围墙围住。街道在围墙另一头。
+    balconyView:
+      EN: You lean against the rail. From here you can see the garden path winding between the planting beds and the conservatory roof below.
+      CN: 你倚着栏杆。花园小径从苗圃间蜿蜒穿过，温室的屋顶就在下方。
     guest:
       EN: The guest bedroom is furnished with a bed, a wardrobe and a washstand. The broad window overlooks the garden.
       CN: 客房备着床、衣柜与洗漱台。宽阔的窗户俯瞰花园。

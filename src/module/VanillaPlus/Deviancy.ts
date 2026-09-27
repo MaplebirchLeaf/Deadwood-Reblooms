@@ -2,21 +2,26 @@
 
 import type VanillaPlus from '../VanillaPlus';
 
-type MirrorId = 'home' | 'property' | 'farm' | 'tower' | 'temple';
+type MirrorId = 'home' | 'farm' | 'tower' | 'temple';
+type MirrorDiscovery = Record<MirrorId, boolean> & { property: Record<string, boolean> };
 
 class Deviancy {
   public constructor(private readonly vanillaPlus: VanillaPlus) {}
 
-  private get mirrors(): Record<MirrorId, boolean> {
-    return (V.VanillaPlus.deviancy.mirrors ??= { home: false, property: false, farm: false, tower: false, temple: false });
+  private get mirrors(): MirrorDiscovery {
+    const mirrors = (V.VanillaPlus.deviancy.mirrors ??= { home: false, property: {}, farm: false, tower: false, temple: false });
+    if (typeof mirrors.property !== 'object' || mirrors.property === null) mirrors.property = {};
+    return mirrors;
   }
 
-  public discover(mirror: MirrorId): void {
-    this.mirrors[mirror] = true;
+  public discover(mirror: MirrorId | 'property', propertyId?: string): void {
+    if (mirror === 'property') {
+      if (propertyId) this.mirrors.property[propertyId] = true;
+    } else this.mirrors[mirror] = true;
   }
 
-  public discovered(mirror: MirrorId): boolean {
-    return V.VanillaPlus.traits.deviancy && this.mirrors[mirror] === true;
+  public discovered(mirror: MirrorId | 'property', propertyId?: string): boolean {
+    return V.VanillaPlus.traits.deviancy && (mirror === 'property' ? Boolean(propertyId && this.mirrors.property[propertyId]) : this.mirrors[mirror] === true);
   }
 
   public get mirrorOpen(): boolean {

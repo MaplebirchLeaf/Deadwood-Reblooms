@@ -4,7 +4,7 @@ type PassagePatch = {
   expected: number;
 };
 
-export const sydneyChastityWidgetPassages: Record<string, PassagePatch[]> = {
+const sydneyChastityWidgetPassages: Record<string, PassagePatch[]> = {
   'Widgets Sydney': [
     // 提议属于共用 sydneyOptions 宏内部，Passage 链接区无法保持它在对话中的位置。
     {
