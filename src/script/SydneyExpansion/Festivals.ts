@@ -24,7 +24,13 @@ export default function (maplebirch: typeof window.maplebirch) {
       const halloweenNight = (Time.month === 10 && Time.monthDay === 31 && Time.hour >= 21) || (Time.month === 11 && Time.monthDay === 1 && Time.hour < 7);
       const festivalNight = sydneyActive && halloweenNight && V.SydneyExpansion.halloweenYear === Time.year && V.SydneyExpansion.sirrisHalloweenVisitYear !== Time.year;
       const sirrisMorning =
-        sydneyActive && V.SydneyExpansion.halloweenYear === Time.year && V.SydneyExpansion.sirrisHalloweenVisitYear !== Time.year && Time.month === 11 && Time.monthDay === 1 && Time.hour >= 7 && Time.hour < 10;
+        sydneyActive &&
+        V.SydneyExpansion.halloweenYear === Time.year &&
+        V.SydneyExpansion.sirrisHalloweenVisitYear !== Time.year &&
+        Time.month === 11 &&
+        Time.monthDay === 1 &&
+        Time.hour >= 7 &&
+        Time.hour < 10;
       const christmasRest =
         V.SydneyExpansion.christmasRestYear === Time.year && ((Time.month === 12 && Time.monthDay === 25 && Time.hour >= 21) || (Time.month === 12 && Time.monthDay === 26 && Time.hour < 6));
 

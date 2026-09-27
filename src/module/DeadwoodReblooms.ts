@@ -52,7 +52,7 @@ const guideSections = {
   KylarExpansion: { en: hint_KylarExpansion_en, cn: hint_KylarExpansion_cn, title: { en: 'Kylar', cn: '凯拉尔拓展' } },
   LS: { en: hint_LS_en, cn: hint_LS_cn, title: { en: 'Life Simulation', cn: '模拟生活' } },
   DM: { en: hint_DM_en, cn: hint_DM_cn, title: { en: 'Dynamic Music', cn: '动态音乐' } },
-  Credits: { en: hint_Credits_en, cn: hint_Credits_cn, title: { en: 'Credits', cn: '致谢' } }
+  Credits: { en: hint_Credits_en, cn: hint_Credits_cn, title: { en: 'Related works', cn: '相关作品' } }
 } as const;
 
 const guideOrder = [
@@ -81,7 +81,7 @@ const overlappingMods = {
   LongerCombat: [{ ids: ['LongerCombat'], author: '狐千月', title: 'LongerCombat', url: 'https://github.com/emicoto/DOLMods/' }],
   MLIANPCA: [
     { ids: ['More Love Interests Mod'], author: '苯环', title: 'More Love Interests', url: 'https://github.com/Nephthelana/DoL-More-Love-Interests-Mod' },
-    { ids: ['NPC Avatars Mod', 'NPC Avatars Mod (SF)'], author: 'Eudemonism00', title: 'NPC Avatars Mod', url: 'https://github.com/Eudemonism00/DOL-NPC-Avatars-Mod' }
+    { ids: ['NPC Avatars Mod', 'NPC Avatars Mod (SF)'], author: 'Eudemonism00', title: 'NPC Avatars Mod', url: 'https://github.com/Eudemonism00/DOL-npcicon-mods/' }
   ],
   RobinExpansion: [{ ids: ['DomRobin'], author: '零环零幻想', title: 'Dom Robin', url: 'https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod' }],
   LS: [{ ids: ['DoLSims'], author: '丧心', title: 'DoLSims', url: 'https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims' }]
@@ -242,6 +242,7 @@ class DeadwoodReblooms extends Module {
   public hint?: Hint;
   private random?: ReturnType<typeof maplebirch.tool.rand.create>;
   private noticeSaving = false;
+  private noticeActive = false;
   private noticeLinksEnabled?: boolean;
   private readonly baileyRent: BaileyRent;
 
@@ -261,7 +262,7 @@ class DeadwoodReblooms extends Module {
       .map(name => {
         const section = guideSections[name];
         const label = lanSwitch(section.title.en, section.title.cn);
-        return `<li><a href='#deadwood-guide-${name}' data-guide-target='deadwood-guide-${name}'>${name === 'Credits' ? label : `${name} · ${label}`}</a></li>`;
+        return `<div class='settingsToggleItem'><a href='#deadwood-guide-${name}' data-guide-target='deadwood-guide-${name}'>${name === 'Credits' ? label : `${name} · ${label}`}</a></div>`;
       })
       .join('');
     // 每个模块都是独立折叠节，只有总览默认展开。搜索仍能打开命中的节。
@@ -270,10 +271,10 @@ class DeadwoodReblooms extends Module {
       const label = name === 'Credits' ? title : `${name} · ${title}`;
       return `<details id='deadwood-guide-${name}'${name === 'DR' ? ' open' : ''}>
         <summary class='settingsHeader options'><span class='gold'>${label}</span></summary>
-        <div class='wikiGuideArticle'>${this.markdown(lanSwitch(section.en, section.cn))}</div>
+        <div class='settingsGrid'><div class='settingsToggleItemWide'>${this.markdown(lanSwitch(section.en, section.cn))}</div></div>
       </details>`;
     });
-    return `<div class='wikiGuide'><div class='wikiGuideIntro'>${intro}</div><nav class='settingsToggleItem wikiGuideContents' aria-label='${lanSwitch('Guide contents', '指南目录')}'><ul>${contents}</ul></nav>${sections.join('')}</div>`;
+    return `${intro}<nav aria-label='${lanSwitch('Guide contents', '指南目录')}'><div class='settingsGrid'>${contents}</div></nav><br>${sections.join('')}`;
   }
 
   private overlapping(): Map<OverlappingModule, string[]> {
@@ -298,7 +299,7 @@ class DeadwoodReblooms extends Module {
       .map(name => {
         const label = this.core.t(`deadwood-reblooms:notice:module:${name}`);
         const credits = name in overlappingMods ? overlappingMods[name as OverlappingModule] : [];
-        const thanks = credits.length
+        const sources = credits.length
           ? `<br><small><span class='gold'>${this.core.t('deadwood-reblooms:notice:thanks')}</span> ${credits
               .map(mod => `<a href='${mod.url}' target='_blank' rel='noopener noreferrer'>${mod.author} · ${mod.title}</a>`)
               .join(' · ')}</small>`
@@ -308,12 +309,14 @@ class DeadwoodReblooms extends Module {
         const reason = overlap
           ? `<br><small class='green'>${this.core.t('deadwood-reblooms:notice:overlap')} ${overlap.join(' · ')}</small>${name === 'MLIANPCA' ? `<br><small>${this.core.t('deadwood-reblooms:notice:bundled')}</small>` : ''}`
           : '';
-        return `<div class='settingsToggleItem'><label>${checkbox}<span>${label}</span></label>${thanks}${reason}</div>`;
+        return `<div class='settingsToggleItem'><label>${checkbox}<span>${label}</span></label>${sources}${reason}</div>`;
       })
       .join('')}</div>`;
   }
 
   private get notice(): string {
+    if (this.noticeActive) return '';
+    this.noticeActive = true;
     this.noticeLinksEnabled ??= Links.enabled;
     Links.enabled = false;
     $('#story').addClass('gateBlur');
@@ -339,23 +342,31 @@ class DeadwoodReblooms extends Module {
     this.noticeSaving = true;
     const gui = this.core.services.gui;
     const available = new Set([...gui.enabledModules, ...gui.disabledModules].map(module => module.name));
+    const enabled = new Set(gui.enabledModules.map(module => module.name));
     const conflicts = this.overlapping();
-    const states = Object.fromEntries(noticeModules.filter(name => available.has(name)).map(name => [name, selection[name] === true && !conflicts.has(name as OverlappingModule)]));
+    // 只提交实际变化，避免首次确认未改选项时写入 IndexedDB 或触发重载。
+    const states = Object.fromEntries(
+      noticeModules
+        .filter(name => available.has(name))
+        .map(name => [name, selection[name] === true && !conflicts.has(name as OverlappingModule)] as const)
+        .filter(([name, selected]) => selected !== enabled.has(name))
+    );
 
     try {
       const changed = await gui.setModuleStates(states);
-      localStorage.setItem('deadwoodRebloomsNotice', 'true');
       if (changed) {
+        localStorage.setItem('deadwoodRebloomsNotice', 'true');
         location.reload();
         return;
       }
       Links.enabled = this.noticeLinksEnabled ?? true;
       this.noticeLinksEnabled = undefined;
       $('#story, #ui-bar').removeClass('gateBlur');
-      Dialog.close();
+      this.core.SugarCube.Dialog.close();
+      localStorage.setItem('deadwoodRebloomsNotice', 'true');
       this.noticeSaving = false;
     } catch (error) {
-      this.log('Failed to apply notice module selection', 'ERROR', error);
+      this.log(`Failed to apply notice module selection: ${error instanceof Error ? error.message : String(error)}`, 'ERROR', error);
       this.noticeSaving = false;
     }
   }
@@ -396,10 +407,21 @@ class DeadwoodReblooms extends Module {
     }
     this.baileyRent.preInit();
     this.core.tool.onInit(() => setup.maplebirch.hint.push('<<= maplebirch.DR.wiki>>'));
-    this.core.once(':sugarcube', () => this.core.tool.macro.defineS('DeadwoodRebloomsNotice', () => this.notice));
+    const noticeReady = () => localStorage.getItem('verifiedAge') === 'true' && localStorage.getItem('maplebirchFrameworkNotice') === 'true' && !localStorage.getItem('deadwoodRebloomsNotice');
+    this.core.once(':sugarcube', () => {
+      this.core.tool.macro.defineS('DeadwoodRebloomsNotice', () => this.notice);
+      // 框架在关闭自身弹窗时才写入确认标志。此时没有新的 Passage，gate 事件不会再运行。
+      $(document).on(':dialogclosed.deadwoodRebloomsNotice', () => {
+        if (State.passage !== 'Start' || this.noticeActive || !noticeReady()) return;
+        queueMicrotask(() => {
+          if (!this.noticeActive && noticeReady()) $.wiki('<<DeadwoodRebloomsNotice>>');
+        });
+      });
+    });
     this.core.dynamic.regStateEvent('gate', 'DeadwoodRebloomsNotice', {
       output: 'DeadwoodRebloomsNotice',
-      cond: () => localStorage.getItem('verifiedAge') === 'true' && localStorage.getItem('maplebirchFrameworkNotice') === 'true' && !localStorage.getItem('deadwoodRebloomsNotice')
+      cond: noticeReady,
+      extra: { passage: ['Start'] }
     });
     this.core.once(':storyready', () => {
       $('#history-backward').ariaClick(() => this.rand.back(1));

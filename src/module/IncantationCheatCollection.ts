@@ -15,6 +15,7 @@ class IncantationCheatCollection {
   private sortOrder: number = 0;
 
   public constructor(readonly core: typeof maplebirch) {
+    // IndexedDB 事件先于模块 preInit。缓存需在 onInit 渲染作弊集前读完。
     this.core.once(':indexedDB', () => this.core.idb('cheats', { keyPath: 'name' }));
     this.core.once(':idbReady', async () => await this.refreshCache());
   }
@@ -405,10 +406,6 @@ class IncantationCheatCollection {
             <div id='maplebirch-cheat-status' class=''></div><div id='maplebirch-cheat-content' class='settingsGrid'><<= maplebirch.ICC.content>></div>
           </details>
         </div>
-        <details class='deadwood-reblooms-playback'>
-          <summary class='deadwood-reblooms-playback-summary'><span class='red'><<lanSwitch 'Music Player' '音乐播放器'>></span></summary>
-          <div id='deadwood-reblooms-playback' class='deadwood-reblooms-playback-content'><<DeadwoodRebloomsPlayback 'deadwood-reblooms'>></div>
-        </details>
       `);
     });
   }

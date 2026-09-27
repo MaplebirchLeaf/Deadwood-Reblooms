@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source and protection tool
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.2'
+
+      - name: Verify tag version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          package_version="$(bun -e "console.log(require('./package.json').version)")"
+          if [[ "$RELEASE_TAG" != "v$package_version" ]]; then
+            echo "Release tag $RELEASE_TAG does not match package version v$package_version" >&2
+            exit 1
+          fi
+
+      - name: Install mod dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install protection tool dependencies
+        run: bun install --frozen-lockfile
+        working-directory: tools/dol-mod-protection-tools
+
+      - name: Check source
+        run: |
+          bun run check
+          bunx tsc --noEmit --pretty false
+
+      - name: Build mod and audio packages
+        run: bun run build:all
+
+      - name: Encrypt packages without player credentials
+        run: bun run scripts/protected-release.ts
+
+      - name: Publish encrypted packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          shopt -s nullglob
+          packages=(package/*.modpack)
+          if [[ "${#packages[@]}" -ne 2 ]]; then
+            echo "Expected two encrypted modpacks, found ${#packages[@]}" >&2
+            exit 1
+          fi
+          gh release create "$RELEASE_TAG" "${packages[@]}" --verify-tag --title "Deadwood Reblooms $RELEASE_TAG" --generate-notes

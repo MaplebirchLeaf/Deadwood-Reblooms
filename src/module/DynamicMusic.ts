@@ -354,6 +354,14 @@ class DynamicMusic {
   }
 
   public preInit(): void {
+    this.core.tool.onInit(() =>
+      setup.maplebirch.content.push(`
+        <details class='deadwood-reblooms-playback'>
+          <summary class='deadwood-reblooms-playback-summary'><span class='red'><<lanSwitch 'Music Player' '音乐播放器'>></span></summary>
+          <div id='deadwood-reblooms-playback' class='deadwood-reblooms-playback-content'><<DeadwoodRebloomsPlayback 'deadwood-reblooms'>></div>
+        </details>
+      `)
+    );
     this.core.var.options.define('DynamicMusic', DynamicMusic.options);
     this.core.on(':passagedisplay', () => this.refresh(), 'DM');
     this.core.on(':audio', () => this.ambience.setVolume(this.ambienceVolume), 'DM ambience volume');
