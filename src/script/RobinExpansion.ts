@@ -1,0 +1,156 @@
+export default function (maplebirch: typeof window.maplebirch): void {
+  maplebirch.tool.onInit(() => {
+    for (const [id, difficulty] of [
+      ['Deadwood Robin Independent', 2],
+      ['Deadwood Robin Together', 3],
+      ['Deadwood Robin Free', 4]
+    ] as const) {
+      setup.feats[id] ??= {
+        get title() {
+          return maplebirch.t(`deadwood-reblooms:robin:feat:${id}:name`);
+        },
+        get desc() {
+          return maplebirch.t(`deadwood-reblooms:robin:feat:${id}:text`);
+        },
+        difficulty,
+        series: '',
+        filter: ['All', 'Social']
+      };
+    }
+  });
+
+  maplebirch.tool.patch.traits.add(
+    {
+      title: 'Special Traits',
+      name: () => maplebirch.t('deadwood-reblooms:robin:trait:solidarity:name'),
+      colour: 'green',
+      has: () => Boolean(V.RobinExpansion?.selfRent && !V.RobinExpansion.bothRent && !V.RobinExpansion.baileyDefeated),
+      text: () => maplebirch.t('deadwood-reblooms:robin:trait:solidarity:text')
+    },
+    {
+      title: 'Special Traits',
+      name: () => maplebirch.t('deadwood-reblooms:robin:trait:protected:name'),
+      colour: 'gold',
+      has: () => Boolean(V.RobinExpansion?.bothRent && !V.RobinExpansion.baileyDefeated),
+      text: () => maplebirch.t('deadwood-reblooms:robin:trait:protected:text')
+    },
+    {
+      title: 'Special Traits',
+      name: () => maplebirch.t('deadwood-reblooms:robin:trait:free:name'),
+      colour: 'gold',
+      has: () => Boolean(V.RobinExpansion?.baileyDefeated),
+      text: () => maplebirch.t('deadwood-reblooms:robin:trait:free:text')
+    }
+  );
+
+  // 原版这些页面的可见链接数量会随日程和剧情变化；放在首个操作链接前，保留末尾的离开/返回链接。
+  // CustomLinkZone 使用固定可见链接序号，不适合这些动态页面。
+  maplebirch.tool.addTo(
+    'BeforeLinkZone',
+    { widget: 'deadwood-robin-room-links', passage: 'Robin Options' },
+    { widget: 'deadwood-robin-lemonade-links', passage: "Robin's Lemonade" },
+    { widget: 'deadwood-robin-beach-links', passage: "Robin's Lemonade" },
+    { widget: 'deadwood-robin-chocolate-links', passage: 'Robin Chocolate' },
+    { widget: 'deadwood-robin-balloon-links', passage: 'Balloon Stand' },
+    { widget: 'deadwood-robin-shop-link', passage: 'Cliff Street' },
+    { widget: 'deadwood-robin-shop-permit-link', passage: 'Town Hall Wait' },
+    { widget: 'deadwood-robin-night-link', passage: "Robin's Room Entrance" },
+    { widget: 'deadwood-robin-tutor-link', passage: 'Danube Street' },
+    { widget: 'deadwood-robin-asylum-links', passage: 'Asylum' },
+    { widget: 'deadwood-robin-tutor-clue', passage: 'Orphanage' },
+    { widget: 'deadwood-robin-meteor-hall-link', passage: 'Orphanage' }
+  );
+
+  maplebirch.tool.inject({
+    widgetPassage: {
+      'Widgets Journal': [
+        {
+          src: '<<if !_avery_pay>>\n\t\t\t\t<<if $rentday isnot undefined>>',
+          to: `<<deadwood-robin-journal>>
+        <<if !_avery_pay>>
+        <<if $RobinExpansion.baileyDefeated>>
+          <li><span class='green'><<lanSwitch 'Bailey no longer collects rent from you or Robin.' '贝利不再向你和罗宾收租。'>></span></li>
+        <<elseif $rentday isnot undefined>>`,
+          expected: 1
+        }
+      ],
+      'Widgets Rent': [
+        {
+          src: '<<if $robinpaid is 1>>',
+          to: '<<if $robinpaid is 1 and !$RobinExpansion.selfRent>>',
+          expected: 1
+        },
+        {
+          src: '<<set $renttime to 7>><<set $rentday to Time.weekDay>>\n<</widget>>\n\n<<widget "rentnopay">>',
+          applybefore: '<<deadwood-robin-rent-links>>\n\t',
+          expected: 1
+        }
+      ],
+      'Asylum Widgets': [
+        {
+          src: '<<set $robinReunionScene to "asylum">>',
+          applyafter: "\n\t<<if $RobinExpansion.asylum.status is 'admitted'>><<unset $robinReunionScene>><</if>>",
+          expected: 1
+        }
+      ]
+    },
+    locationPassage: {
+      Sleep: [
+        {
+          src: '<<set $wardrobe_location to "wardrobe">>',
+          applybefore: '<<deadwood-robin-school-wake>>\n\t\t',
+          expected: 1
+        }
+      ],
+      "Bailey's Office Robin 2": [
+        {
+          src: '<<set $rentmoney *= 2>>',
+          to: '<<if !$RobinExpansion.selfRent>><<set $rentmoney *= 2>><</if>>',
+          expected: 1
+        }
+      ],
+      Bedroom: [
+        {
+          src: '<<if $robinpaid is 1 and $robinmissing is 0 and $robinnote isnot 1 and C.npc.Robin.lust gte 10 and C.npc.Robin.love gte 60 and C.npc.Robin.trauma lt 10>>',
+          to: '<<deadwood-robin-independent-note-link>>\n<<if $robinpaid is 1 and !$RobinExpansion.selfRent and $robinmissing is 0 and $robinnote isnot 1 and C.npc.Robin.lust gte 10 and C.npc.Robin.love gte 60 and C.npc.Robin.trauma lt 10>>',
+          expected: 1
+        }
+      ],
+      "Robin's Room Entrance": [
+        {
+          src: '<<elseif $robinmissing isnot 0>>',
+          applybefore: `<<elseif $RobinExpansion.asylum.status is 'admitted'>>
+  <<npc Robin>><<person1>>
+  <span class='red'><<lanSwitch "Robin has not come home." '罗宾还没有回来。'>></span><br><br>
+  <<lanSwitch "The note says Robin became overwhelmed after several difficult days. Staff took Robin to the hospital; the hospital then transferred Robin to the asylum in the forest. No one has given you a date for Robin's return." '纸条写着，罗宾连着几天状态很差，最后在院里崩溃了。工作人员先送罗宾去了医院，医院随后将罗宾转到森林里的精神病院。没人告诉你罗宾什么时候能回来。'>>
+  <br><br>
+  <<main_hall_icon>><<lanLink '返回孤儿院' 'Orphanage'>><<pass 1>><</lanLink>>
+<<elseif _robin_location is 'tutor'>>
+  <<lanSwitch "Robin's note says the tutoring lesson will finish this evening." '罗宾的纸条上写着，家教课今晚才结束。'>>
+  <br><br>
+  <<main_hall_icon>><<lanLink '返回孤儿院' 'Orphanage'>><<pass 1>><</lanLink>>
+<<elseif _robin_location is 'shop'>>
+  <<lanSwitch "Robin is minding your shop on Cliff Street." '罗宾正在峭壁街照看你们的店。'>>
+  <br><br>
+  <<main_hall_icon>><<lanLink '返回孤儿院' 'Orphanage'>><<pass 1>><</lanLink>>
+`,
+          expected: 1
+        }
+      ],
+      'Rent Robin Fight': [
+        {
+          src: '<<stateman>>',
+          applybefore: '<<deadwood-robin-combat-turn>>\n',
+          expected: 1
+        }
+      ],
+      'Rent Robin Fight Finish': [
+        {
+          src: '<<set _robin to statusCheck("Robin")>>',
+          applyafter: "\n<<run maplebirch.get('RobinExpansion').combatFinish()>>",
+          expected: 1
+        }
+      ]
+    }
+  });
+}

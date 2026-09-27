@@ -180,6 +180,7 @@
 
 <<widget 'deadwood-reblooms-property-sleep-outfits'>>
 	<<run maplebirch.VP.realEstate.openWardrobe()>><<wardrobeSelection true>>
+	<<set $storeLocation to 'Deadwood Property Bed'>>
 	<<set _sleepBed to maplebirch.VP.realEstate.furniture(maplebirch.VP.realEstate.current.id, 'bed')>>
 	<<if !$earSlime.alwaysSleepNaked or $hypnosis_traits.silence>>
 		<<for _index, _outfit range $outfit>>
@@ -193,13 +194,8 @@
 <</widget>>
 
 <<widget 'deadwood-reblooms-property-clothes-on'>>
-	<<run maplebirch.VP.realEstate.openWardrobe()>><<wardrobeSelection true>>
-	<<updateWornClothingLocation $wardrobe_location>>
-	<<if $wear_outfit is 'clotheson'>>
-		<<loadTempHairStyle>><<storeon 'Deadwood Property Bed'>>
-	<<elseif $wear_outfit isnot 'none'>>
-		<<storeon 'Deadwood Property Bed'>><<wearoutfit>>
-	<</if>>
+	<<run maplebirch.VP.realEstate.openWardrobe()>>
+	<<storeon 'Deadwood Property Bed'>><<loadTempHairStyle>>
 	<<updateWornClothingLocation $wardrobe_location>>
 	<<set $wear_outfit to 'none'>>
 <</widget>>
@@ -208,9 +204,9 @@
 <<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
 <<language>>
 	<<option 'EN'>>
-	Behind the property desk at the financial centre, five deeds stand in a glass display. The agent spreads out the keys and lets you look over the particulars.
+	Behind the property desk at the financial centre, <span class='gold'>five deeds</span> stand in a glass display. The agent spreads out the keys and lets you look over the particulars.
 	<<option 'CN'>>
-	金融中心的房产柜台后，玻璃橱窗里摆着五处房产的契据。中介摊开钥匙，让你逐项查看房屋资料。
+	金融中心的房产柜台后，玻璃橱窗里摆着<span class='gold'>五处房产的契据</span>。中介摊开钥匙，让你逐项查看房屋资料。
 <</language>><br><br>
 <<if $VanillaPlus.real_estate.last_auction>>
 	<<set _sale to $VanillaPlus.real_estate.last_auction>>
@@ -368,8 +364,8 @@
 <<elseif maplebirch.VP.realEstate.mortgage.baileyAtDoor(_property.id)>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<language>>
-		<<option 'EN'>>Bailey waits on your doorstep with a bank notice in hand. "Your mortgage is overdue. Pay what you owe, or I'll see this place taken from you."
-		<<option 'CN'>>贝利拿着银行的催缴通知，堵在你家门前。“房贷逾期了。把欠款交出来，不然我就看着他们收走这房子。”
+		<<option 'EN'>>Bailey waits on your doorstep with a bank notice in hand. "Your mortgage is overdue. <span class='red'>Pay what you owe, or I'll see this place taken from you.</span>"
+		<<option 'CN'>>贝利拿着银行的催缴通知，堵在你家门前。“房贷逾期了。<span class='red'>把欠款交出来，不然我就看着他们收走这房子。</span>”
 	<</language>><br><br>
 	<<lanLink '与贝利交涉' 'Deadwood Reblooms Mortgage Bailey'>><</lanLink>><br>
 <<else>>
@@ -388,49 +384,49 @@
 				<<case 'Robin'>>
 					<<if C.npc.Robin.trauma gte 20>>
 						<<language>>
-							<<option 'EN'>>Robin keeps the hall lamp on and glances at the door whenever a sound carries in from the street.
-							<<option 'CN'>>罗宾留着门厅的灯。街上传来一点动静，便朝门口望去。
+							<<option 'EN'>>Robin keeps the hall lamp on and <span class='red'>glances at the door</span> whenever a sound carries in from the street.
+							<<option 'CN'>>罗宾留着门厅的灯。街上传来一点动静，便<span class='red'>朝门口望去</span>。
 						<</language>>
 					<<else>>
 						<<language>>
-							<<option 'EN'>>Robin pours you a cup of tea. "We can worry about the orphanage tomorrow," <<he>> says.
-							<<option 'CN'>>罗宾给你倒了杯茶。“孤儿院的事，明天再操心吧。”<<he>>说。
+							<<option 'EN'>>Robin pours you a cup of tea. "<span class='teal'>We can worry about the orphanage tomorrow</span>," <<he>> says.
+							<<option 'CN'>>罗宾给你倒了杯茶。“<span class='teal'>孤儿院的事，明天再操心吧。</span>”<<he>>说。
 						<</language>>
 					<</if>><br><br>
 				<<case 'Whitney'>>
 					<<if C.npc.Whitney.dom gte 50>>
 						<<language>>
-							<<option 'EN'>>Whitney has taken the best chair. "What?" <<He>> moves over when you come closer.
-							<<option 'CN'>>惠特尼占了最舒服的椅子。“干嘛？”你走近时，<<he>>还是挪出一块地方。
+							<<option 'EN'>>Whitney has taken the best chair. "What?" <<He>> <span class='teal'>moves over</span> when you come closer.
+							<<option 'CN'>>惠特尼占了最舒服的椅子。“干嘛？”你走近时，<<he>>还是<span class='teal'>挪出一块地方</span>。
 						<</language>>
 					<<else>>
 						<<language>>
-							<<option 'EN'>>Whitney waits until you close the front door. "You're late," <<he>> says, taking your coat before you can answer.
-							<<option 'CN'>>惠特尼等你关上门。“你回来晚了。”<<he>>没等你回答，便接过你脱下的外套。
+							<<option 'EN'>>Whitney waits until you close the front door. "You're late," <<he>> says, <span class='teal'>taking your coat</span> before you can answer.
+							<<option 'CN'>>惠特尼等你关上门。“你回来晚了。”<<he>>没等你回答，便<span class='teal'>接过你脱下的外套</span>。
 						<</language>>
 					<</if>><br><br>
 				<<case 'Kylar'>>
 					<<if C.npc.Kylar.love gte 60>>
 						<<language>>
-							<<option 'EN'>>Kylar looks up from the window when you come in. "There you are." <<He>> hurries over to meet you.
-							<<option 'CN'>>你一进门，凯拉尔便从窗边抬起头。“你回来啦。”<<He>>连忙迎上来。
+							<<option 'EN'>>Kylar looks up from the window when you come in. "<span class='teal'>There you are.</span>" <<He>> hurries over to meet you.
+							<<option 'CN'>>你一进门，凯拉尔便从窗边抬起头。“<span class='teal'>你回来啦。</span>”<<He>>连忙迎上来。
 						<</language>>
 					<<else>>
 						<<language>>
-							<<option 'EN'>>Kylar sits near the door, turning the spare key over in <<his>> hands. <<He>> lets out a breath when <<he>> sees you.
-							<<option 'CN'>>凯拉尔坐在门边，攥着备用钥匙翻来覆去。见你进来，<<he>>才松了口气。
+							<<option 'EN'>>Kylar sits near the door, turning the spare key over in <<his>> hands. <<He>> <span class='teal'>lets out a breath</span> when <<he>> sees you.
+							<<option 'CN'>>凯拉尔坐在门边，攥着备用钥匙翻来覆去。见你进来，<<he>>才<span class='teal'>松了口气</span>。
 						<</language>>
 					<</if>><br><br>
 				<<case 'Sydney'>>
 					<<if C.npc.Sydney.corruption gte 30>>
 						<<language>>
-							<<option 'EN'>>Sydney puts the temple robes aside and draws you close by the wrist. "No one is here to interrupt us."
-							<<option 'CN'>>悉尼把神殿长袍搁到一旁，握住你的手腕拉你靠近。“这里没人会打扰我们。”
+							<<option 'EN'>>Sydney puts the temple robes aside and draws you close by the wrist. "<span class='lewd'>No one is here to interrupt us.</span>"
+							<<option 'CN'>>悉尼把神殿长袍搁到一旁，握住你的手腕拉你靠近。“<span class='lewd'>这里没人会打扰我们。</span>”
 						<</language>>
 					<<else>>
 						<<language>>
-							<<option 'EN'>>Sydney folds the temple robes before sitting beside you. "It's good to be home," <<he>> says quietly.
-							<<option 'CN'>>悉尼叠好神殿长袍，在你身边坐下。“回到家真好。”<<he>>轻声说。
+							<<option 'EN'>>Sydney folds the temple robes before sitting beside you. "<span class='teal'>It's good to be home</span>," <<he>> says quietly.
+							<<option 'CN'>>悉尼叠好神殿长袍，在你身边坐下。“<span class='teal'>回到家真好。</span>”<<he>>轻声说。
 						<</language>>
 					<</if>><br><br>
 			<</switch>>
@@ -530,49 +526,49 @@
 		<<case 'Robin'>>
 			<<if C.npc.Robin.trauma gte 20>>
 				<<language>>
-					<<option 'EN'>>Robin's hand trembles around the cup. You sit beside <<him>> until <<he>> puts it down and begins telling you about the orphanage.
-					<<option 'CN'>>罗宾捧着杯子的手微微发抖。你在<<him>>身旁坐了一会儿，直到<<he>>放下杯子，说起孤儿院的事。
+					<<option 'EN'>>Robin's hand <span class='red'>trembles around the cup</span>. You sit beside <<him>> until <<he>> puts it down and begins telling you about the orphanage.
+					<<option 'CN'>>罗宾捧着杯子的手<span class='red'>微微发抖</span>。你在<<him>>身旁坐了一会儿，直到<<he>>放下杯子，说起孤儿院的事。
 				<</language>>
 			<<else>>
 				<<language>>
-					<<option 'EN'>>Robin lists tomorrow's chores. When you offer to take the earliest one, <<he>> laughs and rests <<his>> head on your shoulder.
-					<<option 'CN'>>罗宾数着明天要做的杂事。你主动揽下最早的一项，<<he>>笑着把头靠在你肩上。
+					<<option 'EN'>>Robin lists tomorrow's chores. When you offer to take the earliest one, <<he>> laughs and <span class='teal'>rests <<his>> head on your shoulder</span>.
+					<<option 'CN'>>罗宾数着明天要做的杂事。你主动揽下最早的一项，<<he>>笑着<span class='teal'>把头靠在你肩上</span>。
 				<</language>>
 			<</if>><br><br>
 		<<case 'Whitney'>>
 			<<if C.npc.Whitney.dom gte 50>>
 				<<language>>
-					<<option 'EN'>>Whitney makes fun of your furniture. "You could do better." <<He>> pulls you into the chair anyway, keeping an arm around your waist.
-					<<option 'CN'>>惠特尼拿你的家具打趣。“你还能挑得更好点。”<<He>>却把你拉进椅子里，胳膊搭在你的腰上。
+					<<option 'EN'>>Whitney makes fun of your furniture. "You could do better." <<He>> pulls you into the chair anyway, <span class='lewd'>keeping an arm around your waist</span>.
+					<<option 'CN'>>惠特尼拿你的家具打趣。“你还能挑得更好点。”<<He>>却把你拉进椅子里，<span class='lewd'>胳膊搭在你的腰上</span>。
 				<</language>>
 			<<else>>
 				<<language>>
-					<<option 'EN'>>Whitney complains about school while you sit together. <<He>> stops halfway through a sentence and gives your hand a squeeze.
-					<<option 'CN'>>惠特尼挨着你抱怨学校的事。话说到一半，<<he>>停下来，握了握你的手。
+					<<option 'EN'>>Whitney complains about school while you sit together. <<He>> stops halfway through a sentence and <span class='teal'>gives your hand a squeeze</span>.
+					<<option 'CN'>>惠特尼挨着你抱怨学校的事。话说到一半，<<he>>停下来，<span class='teal'>握了握你的手</span>。
 				<</language>>
 			<</if>><br><br>
 		<<case 'Kylar'>>
 			<<if C.npc.Kylar.love gte 60>>
 				<<language>>
-					<<option 'EN'>>Kylar shows you the spare key. "I kept it safe." When you say <<he>> can keep it, <<he>> presses it against <<his>> chest.
-					<<option 'CN'>>凯拉尔把备用钥匙拿给你看。“我保管得好好的。”你说<<he>>可以留着，<<he>>便把钥匙贴在胸前。
+					<<option 'EN'>>Kylar shows you the spare key. "I kept it safe." When you say <<he>> can keep it, <<he>> <span class='teal'>presses it against <<his>> chest</span>.
+					<<option 'CN'>>凯拉尔把备用钥匙拿给你看。“我保管得好好的。”你说<<he>>可以留着，<<he>>便<span class='teal'>把钥匙贴在胸前</span>。
 				<</language>>
 			<<else>>
 				<<language>>
-					<<option 'EN'>>"I can stay, can't I?" Kylar asks, holding your sleeve. You tell <<him>> yes. <<He>> smiles and lets go.
-					<<option 'CN'>>“我能留下来，对吧？”凯拉尔攥着你的衣袖问。你答应了，<<he>>才松开手笑起来。
+					<<option 'EN'>>"I can stay, can't I?" Kylar asks, holding your sleeve. You tell <<him>> yes. <<He>> <span class='green'>smiles and lets go</span>.
+					<<option 'CN'>>“我能留下来，对吧？”凯拉尔攥着你的衣袖问。你答应了，<<he>>才<span class='green'>松开手笑起来</span>。
 				<</language>>
 			<</if>><br><br>
 		<<case 'Sydney'>>
 			<<if C.npc.Sydney.corruption gte 30>>
 				<<language>>
-					<<option 'EN'>>Sydney tells you about an errand at the temple, then leans close. "I've been thinking about you all day." <<His>> fingers brush your wrist.
-					<<option 'CN'>>悉尼说起神殿里的差事，又靠近你。“我一整天都在想你。”<<His>>手指轻轻擦过你的手腕。
+					<<option 'EN'>>Sydney tells you about an errand at the temple, then leans close. "<span class='lewd'>I've been thinking about you all day.</span>" <<His>> fingers brush your wrist.
+					<<option 'CN'>>悉尼说起神殿里的差事，又靠近你。“<span class='lewd'>我一整天都在想你。</span>”<<His>>手指轻轻擦过你的手腕。
 				<</language>>
 			<<else>>
 				<<language>>
-					<<option 'EN'>>Sydney tells you about someone <<he>> helped at the temple. You tell <<him>> about your day. <<He>> listens, still holding your hand.
-					<<option 'CN'>>悉尼说起今天在神殿帮过的人。你也讲了自己的一天，<<he>>一直握着你的手听。
+					<<option 'EN'>>Sydney tells you about someone <<he>> helped at the temple. You tell <<him>> about your day. <<He>> listens, <span class='teal'>still holding your hand</span>.
+					<<option 'CN'>>悉尼说起今天在神殿帮过的人。你也讲了自己的一天，<<he>><span class='teal'>一直握着你的手听</span>。
 				<</language>>
 			<</if>><br><br>
 	<</switch>>
@@ -615,8 +611,8 @@
 <<else>>
 	<<effects>><<npc Bailey>>
 	<<language>>
-		<<option 'EN'>>Bailey taps the notice against the doorframe. "I'll give you a chance to settle the arrears. Make me drag you out and the bank will freeze the deed."
-		<<option 'CN'>>贝利用催缴单拍了拍门框。“给你一个补缴的机会。非要我动手赶人，银行就会冻结房契。”
+		<<option 'EN'>>Bailey taps the notice against the doorframe. "I'll give you a chance to settle the arrears. <span class='red'>Make me drag you out and the bank will freeze the deed.</span>"
+		<<option 'CN'>>贝利用催缴单拍了拍门框。“给你一个补缴的机会。<span class='red'>非要我动手赶人，银行就会冻结房契。</span>”
 	<</language>><br><br>
 	<<if $VanillaPlus.finance.bank.balance gte $VanillaPlus.real_estate.mortgage.arrears>>
 		<<lanLink '补缴逾期款' 'Deadwood Reblooms Property Office'>><<run maplebirch.VP.realEstate.mortgage.repay('arrears')>><</lanLink>><br>
@@ -628,9 +624,15 @@
 :: Deadwood Reblooms Mortgage Fight []
 <<if $fightstart is 1>>
 	<<set $fightstart to 0>><<neutral 1>><<maninit>><<set $enemyanger += 200>><<npcidlegenitals>>
-	<<language>><<option 'EN'>>"Then I'll take the deed myself," Bailey snarls.<<option 'CN'>>“那我就亲手把房契拿走。”贝利怒吼道。<</language>><br><br>
+	<<language>>
+		<<option 'EN'>>"<span class='red'>Then I'll take the deed myself</span>," Bailey snarls.
+		<<option 'CN'>>“<span class='red'>那我就亲手把房契拿走。</span>”贝利怒吼道。
+	<</language>>
+	<br><br>
 <</if>>
-<<effects>><<effectsman>><<man>><<stateman>><br><br><<actionsman>>
+<<effects>><<effectsman>><<man>><<stateman>>
+<br><br>
+<<actionsman>>
 <<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
 	<span id='next'><<lanLink '继续' 'Deadwood Reblooms Mortgage Fight Finish'>><</lanLink>></span><<nexttext>>
 <<else>>
@@ -649,7 +651,10 @@
 		<</language>>
 <<else>>
 	<<run maplebirch.VP.realEstate.mortgage.fightBailey(false)>>
-	<<language>><<option 'EN'>>Bailey pins you down and takes the notice to the bank. <span class='red'>Your property is frozen.</span><<option 'CN'>>贝利制服了你，拿着催缴通知回了银行。<span class='red'>你的房产已被冻结。</span><</language>>
+	<<language>>
+		<<option 'EN'>>Bailey pins you down and takes the notice to the bank. <span class='red'>Your property is frozen.</span>
+		<<option 'CN'>>贝利制服了你，拿着催缴通知回了银行。<span class='red'>你的房产已被冻结。</span>
+	<</language>>
 <</if>>
 <<endcombat>><br><br>
 <<lanLink '继续' 'Deadwood Reblooms Property Office'>><</lanLink>>
@@ -709,39 +714,75 @@
 	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<set _autosavehere to true>>
-	<<run maplebirch.VP.realEstate.enter()>><<sleep>><<effects>>
-	<<wakingEffects $sleepHoursTotal>><<sleepeffects>>
-	<<if $nightmares gte 1 and $controlled is 0>><<nightmareWake>><<else>><<lanSwitch 'You wake in your own bed.' '你在自己的床上醒来。'>><</if>>
-	<<set _wakingCompanion to maplebirch.VP.realEstate.currentCompanion>>
-	<<if _wakingCompanion>>
-		<br><br>
-		<<if maplebirch.VP.realEstate.residentsHome(_sleepProperty.id).some(resident => resident.id === _wakingCompanion.id)>>
-			<<switch _wakingCompanion.id>>
-				<<case 'Robin'>>
-					<<lanSwitch 'Robin is still beside you, one hand curled around yours.' '罗宾仍睡在你身边，一只手还握着你的手。'>>
-				<<case 'Whitney'>>
-					<<lanSwitch 'Whitney is still asleep, an arm draped over you.' '惠特尼还睡着，一只胳膊搭在你身上。'>>
-				<<case 'Kylar'>>
-					<<lanSwitch 'Kylar shifts closer in their sleep when you stir.' '你一动，凯拉尔就在睡梦中往你身边靠了靠。'>>
-				<<case 'Sydney'>>
-					<<lanSwitch 'Sydney is still beside you. The temple pendant rests on the bedside table.' '悉尼仍在你身旁。神殿吊坠还放在床头。'>>
-			<</switch>>
-		<<else>>
-			<<switch _wakingCompanion.id>>
-				<<case 'Robin'>>
-					<<lanSwitch 'Robin has gone out. The spare blanket is folded at the foot of the bed.' '罗宾已经出门了，备用毯子叠在床尾。'>>
-				<<case 'Whitney'>>
-					<<lanSwitch 'Whitney has gone out. The second pillow is still pressed against yours.' '惠特尼出门了，第二只枕头还挨着你的枕头。'>>
-				<<case 'Kylar'>>
-					<<lanSwitch 'Kylar has gone out. Their side of the bed is still warm.' '凯拉尔出门了，那侧被窝里还留着一点暖意。'>>
-				<<case 'Sydney'>>
-					<<lanSwitch 'Sydney has left for the temple. The pendant is gone from the bedside table.' '悉尼去神殿了，床头的吊坠也不见了。'>>
-			<</switch>>
-		<</if>>
+	<<run maplebirch.VP.realEstate.enter()>>
+	<<set _sleepPartner to maplebirch.VP.realEstate.currentCompanion>>
+	<<if _sleepPartner
+		and maplebirch.VP.realEstate.residentsHome(_sleepProperty.id).some(resident => resident.id === _sleepPartner.id)>>
+		<<set $bedGuest to _sleepPartner.id>>
 	<</if>>
-	<br><br>
-	<<lanLink '起床' 'Deadwood Reblooms Property Bedroom'>><<deadwood-reblooms-property-clothes-on>><</lanLink>><br>
-	<<lanLink '继续睡觉' 'Deadwood Reblooms Property Bed'>><</lanLink>>
+	<!-- 原版按小时睡眠。这里预先选出一个较早的醒来小时，不改动原版 sleephour。 -->
+	<<set _requestedHours to $sleephour>>
+	<<set _nightWake to _sleepPartner
+		and maplebirch.VP.realEstate.residentsHome(_sleepProperty.id).some(resident => resident.id === _sleepPartner.id)
+		and _requestedHours gte 3
+		and (Time.hour gte 23 or Time.hour lt 3)
+		and !$daily.deadwoodPropertyNightWake
+		and $nightmares lte 0
+		and random(1, 8) is 1>>
+	<<if _nightWake>>
+		<<set $sleephour to random(1, Math.min(2, _requestedHours - 1))>>
+	<</if>>
+	<<sleep>>
+	<<if !_dreaming>>
+		<<effects>><<wakingEffects $sleepHoursTotal>>
+		<<set _nightWake to _nightWake
+			and !_wakingEffect
+			and $sleepHoursTotal gte 1
+			and (Time.hour gte 23 or Time.hour lt 6)
+			and maplebirch.VP.realEstate.residentsHome(_sleepProperty.id).some(resident => resident.id === _sleepPartner.id)>>
+		<<sleepeffects>>
+		<<if $nightmares gte 1 and $controlled is 0>>
+			<<nightmareWake>>
+		<<elseif _nightWake>>
+			<<set $daily.deadwoodPropertyNightWake to 1>>
+			<<set $sleephour to Math.max(1, _requestedHours - $sleepHoursTotal)>>
+			<<lanSwitch 'Something shifts beside you in the dark. You wake before the night is over.' '黑暗中，身旁的人动了动。夜还没过去，你已经醒了。'>>
+			<br><br>
+			<<bedicon>><<lanLink '睁开眼' 'Deadwood Reblooms Property Night Wake'>><</lanLink>>
+		<<else>>
+			<<if !_wakingEffect>><<lanSwitch 'You wake in your own bed.' '你在自己的床上醒来。'>><</if>>
+			<<set _wakingCompanion to maplebirch.VP.realEstate.currentCompanion>>
+			<<if _wakingCompanion>>
+				<br><br>
+				<<if maplebirch.VP.realEstate.residentsHome(_sleepProperty.id).some(resident => resident.id === _wakingCompanion.id)>>
+					<<switch _wakingCompanion.id>>
+						<<case 'Robin'>>
+							<<lanSwitch 'Robin is still beside you, one hand curled around yours.' '罗宾仍睡在你身边，一只手还握着你的手。'>>
+						<<case 'Whitney'>>
+							<<lanSwitch 'Whitney is still asleep, an arm draped over you.' '惠特尼还睡着，一只胳膊搭在你身上。'>>
+						<<case 'Kylar'>>
+							<<lanSwitch 'Kylar shifts closer in their sleep when you stir.' '你一动，凯拉尔就在睡梦中往你身边靠了靠。'>>
+						<<case 'Sydney'>>
+							<<lanSwitch 'Sydney is still beside you. The temple pendant rests on the bedside table.' '悉尼仍在你身旁。神殿吊坠还放在床头。'>>
+					<</switch>>
+				<<else>>
+					<<switch _wakingCompanion.id>>
+						<<case 'Robin'>>
+							<<lanSwitch 'Robin has gone out. The spare blanket is folded at the foot of the bed.' '罗宾已经出门了，备用毯子叠在床尾。'>>
+						<<case 'Whitney'>>
+							<<lanSwitch 'Whitney has gone out. The second pillow is still pressed against yours.' '惠特尼出门了，第二只枕头还挨着你的枕头。'>>
+						<<case 'Kylar'>>
+							<<lanSwitch 'Kylar has gone out. Their side of the bed is still warm.' '凯拉尔出门了，那侧被窝里还留着一点暖意。'>>
+						<<case 'Sydney'>>
+							<<lanSwitch 'Sydney has left for the temple. The pendant is gone from the bedside table.' '悉尼去神殿了，床头的吊坠也不见了。'>>
+					<</switch>>
+				<</if>>
+			<</if>>
+			<br><br>
+			<<lanLink '起床' 'Deadwood Reblooms Property Bedroom'>><<deadwood-reblooms-property-clothes-on>><</lanLink>><br>
+			<<lanLink '继续睡觉' 'Deadwood Reblooms Property Bed'>><</lanLink>>
+	<</if>>
+	<</if>>
 <</if>>
 
 :: Deadwood Reblooms Property Wardrobe [exitCheckBypass]

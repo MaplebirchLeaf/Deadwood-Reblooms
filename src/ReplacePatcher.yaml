@@ -4,6 +4,20 @@
   before: |
     if (maplebirch.get('MoreTransformations') && amount > 0 && V.maplebirch?.transformation?.horse?.level >= 6) fatigueMod *= 0.75;
 
+- comment: '罗宾与孤儿们逼退贝利后暂停原版收租倒计时，不影响其他每日时间逻辑。'
+  fileName: 'time.js'
+  from: 'V.renttime--;'
+  to: "if (!maplebirch.get('RobinExpansion') || !V.RobinExpansion?.baileyDefeated) V.renttime--;"
+
+- comment: '悉尼事先答应当晚回家时，将原版日程同步转为 home，避免神殿与庄园同时出现悉尼。'
+  fileName: 'named-npc.js'
+  from: 'if (T.sydney_location === "temple") {'
+  before: |
+    if (V.SydneyExpansion?.estate?.visitDay === Time.days && Time.hour >= 21 && Time.hour < 23 && V.daily.sydney.punish !== 1 && !V.replayScene && C.npc.Sydney.init === 1 && !["prison", "dungeon"].includes(C.npc.Sydney.state)) {
+      T.sydney_location = "home";
+      T.sydney_location_message = "home";
+    }
+
 - comment: '意志突破后允许正常增益继续填充扩展后的六级上限。'
   fileName: 'stat-changes.js'
   from: 'V.willpower = Math.clamp(V.willpower + amount * 2, 0, V.willpowermax'

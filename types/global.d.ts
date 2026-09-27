@@ -22,9 +22,11 @@ declare global {
   const Links: { enabled: boolean };
 
   interface Window {
+    statChange: { stress(amount: number, multiplierOverride?: number): void };
     isLoveInterest(name: string): boolean;
     isPossibleLoveInterest(name: string): boolean;
     getRobinLocation(): string | undefined;
+    weekPassed?: () => void;
     getKylarLocation(): { area: string; state: string };
     mapMove: ((destination: string) => void) & { deadwoodPublicWalk?: boolean };
     LZString: {

@@ -12,13 +12,13 @@
 		<<switch _bedroomCompanion.id>>
 			<<case 'Robin'>>
 				<<language>>
-					<<option 'EN'>>Robin has folded a spare blanket at the foot of the bed. <<He>> pats the space beside <<him>> when you come in.
-					<<option 'CN'>>罗宾把备用毯子叠在床尾。见你进来，<<he>>拍拍身旁的位置。
+					<<option 'EN'>>Robin has folded a spare blanket at the foot of the bed. <<He>> <span class='teal'>pats the space beside <<him>></span> when you come in.
+					<<option 'CN'>>罗宾把备用毯子叠在床尾。见你进来，<<he>><span class='teal'>拍拍身旁的位置</span>。
 				<</language>>
 			<<case 'Whitney'>>
 				<<language>>
-					<<option 'EN'>>Whitney's bag lies where <<he>> dropped it. <<He>> has pulled the second pillow close to yours.
-					<<option 'CN'>>惠特尼的包还丢在原处。<<He>>倒是把第二只枕头挪到了你的枕边。
+					<<option 'EN'>>Whitney's bag lies where <<he>> dropped it. <<He>> has <span class='teal'>pulled the second pillow close to yours</span>.
+					<<option 'CN'>>惠特尼的包还丢在原处。<<He>>倒是<span class='teal'>把第二只枕头挪到了你的枕边</span>。
 				<</language>>
 			<<case 'Kylar'>>
 				<<language>>
@@ -27,22 +27,26 @@
 				<</language>>
 			<<case 'Sydney'>>
 				<<language>>
-					<<option 'EN'>>Sydney has hung <<his>> temple clothes apart from the rest, ready for the morning. <<He>> makes room for you on the bed.
-					<<option 'CN'>>悉尼把明早要穿的神殿衣服单独挂好，在床上给你让出位置。
+					<<option 'EN'>>Sydney has hung <<his>> temple clothes apart from the rest, ready for the morning. <<He>> <span class='teal'>makes room for you on the bed</span>.
+					<<option 'CN'>>悉尼把明早要穿的神殿衣服单独挂好，<span class='teal'>在床上给你让出位置</span>。
 				<</language>>
 		<</switch>><br><br>
 	<</if>>
 	<<set _bed to maplebirch.VP.realEstate.furniture(_property.id, 'bed')>>
-	<<if _bed>>
+	<<if $earSlime.event and $earSlime.noSleep>>
+		<span class='red'><<lanSwitch 'The slime will not let you sleep yet.' '史莱姆现在不让你睡觉。'>></span><br>
+	<<elseif _bed>>
 		<<if maplebirch.VP.realEstate.canShareBed(_property.id)>>
 			<<lanSwitch 'The bed is made up for two. There is room to turn over without disturbing the other side.' '双人床铺好了被褥。即使翻身，也不会碰到另一侧的人。'>>
 		<<else>>
 			<<lanSwitch 'You smooth the sheets across the narrow mattress. There is room for only one person.' '你抚平窄床垫上的被褥。这里仅够一个人睡下。'>>
 		<</if>><br>
 		<<furnitureicon _bed.iconFile>>
-		<<lanLink '脱衣上床' 'Deadwood Reblooms Property Bed'>><<undressSleep 'Deadwood Property Bed'>><</lanLink>><br>
+		<<lanLink '脱衣上床' 'Deadwood Reblooms Property Bed'>>
+			<<undressSleep 'Deadwood Property Bed'>>
+		<</lanLink>><br>
 	<</if>>
-	<<deadwood-reblooms-property-sleep-outfits>>
+	<<if !($earSlime.event and $earSlime.noSleep)>><<deadwood-reblooms-property-sleep-outfits>><</if>>
 	<<if _bedroomCompanion && maplebirch.VP.realEstate.canShareBed(_property.id)>>
 		<<loveicon 'kiss'>>
 		<<lanLink '一起上床' 'Deadwood Reblooms Property Intimacy'>>
@@ -138,8 +142,8 @@
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>><<wash>>
 	<<language>>
-		<<option 'EN'>>You wash in the privacy of your own bathroom. Warm water runs down the drain, taking the grime of the day with it.
-		<<option 'CN'>>你在自己的浴室里洗了个澡。温水流进下水道，也带走了身上的污垢。
+		<<option 'EN'>>You wash in the privacy of your own bathroom. Warm water runs down the drain, <span class='teal'>taking the grime of the day with it</span>.
+		<<option 'CN'>>你在自己的浴室里洗了个澡。温水流进下水道，<span class='teal'>也带走了身上的污垢</span>。
 	<</language>><br><br>
 	<<getouticon>><<lanLink '离开浴缸' 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
 <</if>>
@@ -154,7 +158,12 @@
 	<<for _resident range maplebirch.VP.realEstate.residentsHome(_property.id)>>
 		<<switch _resident.id>>
 			<<case 'Robin'>>
-				<<lanSwitch 'Robin has put two plates on the table and left the second chair out for you.' '罗宾在桌上摆了两只盘子，还给你留出了另一张椅子。'>>
+				<<language>>
+					<<option 'EN'>>
+						Robin has put two plates on the table and <span class='teal'>left the second chair out for you</span>.
+					<<option 'CN'>>
+						罗宾在桌上摆了两只盘子，还<span class='teal'>给你留出了另一张椅子</span>。
+				<</language>>
 			<<case 'Whitney'>>
 				<<language>>
 					<<option 'EN'>>Whitney is looking through the cupboard. "What are you making?" <<He>> asks without turning around.
@@ -167,8 +176,8 @@
 				<</language>>
 			<<case 'Sydney'>>
 				<<language>>
-					<<option 'EN'>>Sydney sets a clean cup beside yours, then rolls up <<his>> sleeves to help.
-					<<option 'CN'>>悉尼把一只干净的杯子放在你的杯子旁，随后卷起袖子准备帮忙。
+					<<option 'EN'>>Sydney sets a clean cup beside yours, then <span class='teal'>rolls up <<his>> sleeves to help</span>.
+					<<option 'CN'>>悉尼把一只干净的杯子放在你的杯子旁，随后<span class='teal'>卷起袖子准备帮忙</span>。
 				<</language>>
 		<</switch>><br><br>
 	<</for>>
@@ -198,18 +207,28 @@
 	<<for _resident range maplebirch.VP.realEstate.residentsHome(_property.id)>>
 		<<switch _resident.id>>
 			<<case 'Robin'>>
-				<<lanSwitch 'Robin comes outside with you and stays close. For once, neither of you has to hurry back to the orphanage.' '罗宾跟着你出来，站在你身旁。这一回，你们都不用急着赶回孤儿院。'>>
+				<<language>>
+					<<option 'EN'>>
+						Robin comes outside with you and stays close. <span class='teal'>For once, neither of you has to hurry back to the orphanage.</span>
+					<<option 'CN'>>
+						罗宾跟着你出来，站在你身旁。<span class='teal'>这一回，你们都不用急着赶回孤儿院。</span>
+				<</language>>
 			<<case 'Whitney'>>
 				<<language>>
 					<<option 'EN'>>Whitney leans beside you. <<He>> watches the view while pretending not to watch you.
 					<<option 'CN'>>惠特尼靠在你身旁。<<He>>望着外面，装作没有留意你。
 				<</language>>
 			<<case 'Kylar'>>
-				<<lanSwitch 'Kylar steps outside after you and takes hold of your sleeve.' '凯拉尔跟着你出来，轻轻攥住你的衣袖。'>>
+				<<language>>
+					<<option 'EN'>>
+						Kylar steps outside after you and <span class='teal'>takes hold of your sleeve</span>.
+					<<option 'CN'>>
+						凯拉尔跟着你出来，<span class='teal'>轻轻攥住你的衣袖</span>。
+				<</language>>
 			<<case 'Sydney'>>
 				<<language>>
-					<<option 'EN'>>Sydney comes out for a breath of air. <<His>> hand finds yours.
-					<<option 'CN'>>悉尼出来透了口气，随后握住你的手。
+					<<option 'EN'>>Sydney comes out for a breath of air. <span class='teal'><<His>> hand finds yours</span>.
+					<<option 'CN'>>悉尼出来透了口气，随后<span class='teal'>握住你的手</span>。
 				<</language>>
 		<</switch>><br><br>
 	<</for>>
@@ -338,7 +357,13 @@
 	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.setFloor(1)>><<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
-	<<lanSwitch 'You spread your wings and glide across the garden. Your feet find the path between the planting beds.' '你展开翅膀，从花园上方滑过，落在苗圃之间的小径上。'>><br><br>
+	<<language>>
+		<<option 'EN'>>
+			You spread your wings and glide across the garden. <span class='green'>Your feet find the path between the planting beds.</span>
+		<<option 'CN'>>
+			你展开翅膀，从花园上方滑过，<span class='green'>落在苗圃之间的小径上。</span>
+	<</language>>
+	<br><br>
 	<<gardenicon>><<lanLink '走进花园 (0:01)' 'Deadwood Reblooms Property Garden'>><<pass 1>><</lanLink>>
 <</if>>
 

@@ -85,7 +85,6 @@ interface PropertyManagement {
   next_settlement_day: number;
   bed_id: string | null;
   wardrobe_id: string | null;
-  mirror_coordinates: { north: number; east: number };
 }
 
 interface AuctionRecord {
@@ -385,20 +384,12 @@ class RealEstate {
       auction_day: null,
       next_settlement_day: RealEstate.today() + 7,
       bed_id: null,
-      wardrobe_id: null,
-      mirror_coordinates: RealEstate.randomMirrorCoordinates()
+      wardrobe_id: null
     };
   }
 
-  private static randomMirrorCoordinates(): PropertyManagement['mirror_coordinates'] {
-    // 允许房产之间及房产与其他镜子重合。坐标只生成一次，之后随 V 存档。
-    return { north: Math.floor(Math.random() * 9) - 4, east: Math.floor(Math.random() * 9) - 4 };
-  }
-
   public managementFor(id: PropertyId): PropertyManagement {
-    const management = (this.state.management[id] ??= RealEstate.newManagement());
-    management.mirror_coordinates ??= RealEstate.randomMirrorCoordinates();
-    return management;
+    return (this.state.management[id] ??= RealEstate.newManagement());
   }
 
   public furniture(id: PropertyId, kind: FurnitureKind): PropertyFurniture | null {

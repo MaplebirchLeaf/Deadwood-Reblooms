@@ -66,7 +66,7 @@
     <<if _dormAccess>>
       <<lanSwitch 'Sydney gathers up the blanket and starts up the stairs to the temple quarters. There is room for you to follow.' '悉尼抱起毯子，朝神殿宿舍的楼梯走去。你也可以跟上。'>>
       <br><br>
-      <<icon 'temple/sydney-quarters.png'>><<lanLink '跟悉尼去宿舍 (0:01)' 'Deadwood Reblooms Sydney Dorm'>><<set $SydneyExpansion.halloweenRestYear to Time.year>><<pass 1>><</lanLink>>
+      <<icon 'temple/sydney-quarters.png'>><<lanLink '跟悉尼去宿舍 (0:01)' 'Deadwood Reblooms Sydney Dorm'>><<set $SydneyExpansion.dormInvited to true>><<set $SydneyExpansion.halloweenRestYear to Time.year>><<pass 1>><</lanLink>>
     <<else>>
       <<lanSwitch 'Sydney still has duties downstairs. You can stay beside the candles until the morning shift arrives.' '悉尼还要留在楼下值守。你可以陪悉尼守灯，直到早班的人到来。'>>
       <br><br>
@@ -230,8 +230,9 @@
 <<getouticon>><<lanLink '回到大厅' 'Temple'>><<endevent>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Halloween Kiss []
+<<run statusCheck('Sydney')>>
 <<if $sexstart is 1>>
-  <<set $sexstart to 0>><<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<set $sexstart to 0>><<npc Sydney>><<person1>>
   <<set $daily.sydney.sex = ($daily.sydney.sex || 0) + 1>><<set $sydney.sexTotal += 1>>
   <<language>>
     <<option 'EN'>>
@@ -259,6 +260,20 @@
       <br><br>
       你<span class="lewd">吻住了<<him>></span>。悉尼回应着，又把你拉回去，与你再吻一次。门外，烛火还在燃烧。
   <</language>>
+  <<if _sydneyChastity and $sydneyChastityKnown>>
+    <br><br><span class='teal'>
+      <<lanSwitch "The edge of Sydney's chastity belt presses against you as Sydney draws closer. Sydney notices and waits for your reaction." '悉尼靠近时，贞操带的边缘抵住了你。悉尼察觉到了，等着你的反应。'>>
+    </span>
+  <<elseif _sydneyChastity>>
+    <br><br><span class='lewd'>
+      <<lanSwitch "Something hard rests beneath Sydney's robe. Sydney catches your questioning glance but says nothing yet." '悉尼的修道袍下藏着一件硬物。悉尼看见你疑惑的目光，暂时没有解释。'>>
+    </span>
+  <<elseif $sydneyChastityKnown>>
+    <br><br><span class='teal'>
+      <<lanSwitch "The familiar metal edge is absent when Sydney leans against you. Sydney smiles at your surprise." '悉尼贴过来时，那道熟悉的金属边缘已经不在了。见你吃惊，悉尼笑了。'>>
+    </span>
+  <</if>>
+  <br><br>
   <<consensual>><<set $consensual to 1>><<neutral 1>><<maninit>><<npckiss>>
   <<takeKissVirginity 'Sydney' `($sydneyromance is 1 ? 'loveInterest' : 'romantic')`>>
   <<set $enemytrust += 500>><<set $enemyarousalmax to 600>>
@@ -281,6 +296,7 @@
 
 :: Deadwood Reblooms Sydney Halloween Kiss Finish []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
+<<run statusCheck('Sydney')>>
 <<set _sydneyHurt to $enemyhealth lte 0>>
 <<if $enemyarousal gte $enemyarousalmax>>
   <<ejaculation>>
@@ -295,6 +311,7 @@
 <<else>>
   <<npcincr Sydney lust 5>><<gglust>>
 <</if>>
+<br><br>
 <<clotheson>><<endcombat>><<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
 <<language>>
   <<option 'EN'>>
@@ -461,7 +478,7 @@
       悉尼收好卡片，抱着剩下的包裹上楼。“来看看我把书放在哪里。”<<he>>侧过身，给你让出路。
   <</language>>
   <br><br>
-  <<icon 'temple/sydney-quarters.png'>><<lanLink '跟悉尼去宿舍 (0:01)' 'Deadwood Reblooms Sydney Dorm'>><<set $SydneyExpansion.christmasRestYear to Time.year>><<pass 1>><</lanLink>><br>
+  <<icon 'temple/sydney-quarters.png'>><<lanLink '跟悉尼去宿舍 (0:01)' 'Deadwood Reblooms Sydney Dorm'>><<set $SydneyExpansion.dormInvited to true>><<set $SydneyExpansion.christmasRestYear to Time.year>><<pass 1>><</lanLink>><br>
   <br>
 <</if>>
 <<getouticon>><<lanLink '离开' 'Temple'>><<endevent>><</lanLink>>

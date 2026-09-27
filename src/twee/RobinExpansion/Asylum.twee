@@ -1,0 +1,135 @@
+:: Deadwood Robin Asylum Widgets [widget]
+<<widget 'deadwood-robin-asylum-links'>>
+  <<if $RobinExpansion.asylum.status is 'admitted' and $location is 'asylum' and $asylumstate is 'free' and $stress lt $stressmax and Time.hour gte 7 and Time.hour lt 21>>
+    <<socialiseicon>><<lanLink '在院内找罗宾' 'Deadwood Robin Asylum Meeting'>><</lanLink>><br>
+  <<elseif $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.plan gte 2 and $location is 'asylum' and $asylumstate is 'sleep' and Time.hour isnot 22 and $stress lt $stressmax and $asylumkeycard is 1 and !pcAreArmsBound('any')>>
+    <<getouticon>><<lanLink '和罗宾一起逃走' 'Deadwood Robin Asylum Escape'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Robin Asylum Meeting []
+<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>><<npc Robin>><<person1>>
+<<if $RobinExpansion.asylum.status isnot 'admitted'>>
+  <<lanSwitch 'Robin is not here.' '罗宾不在这里。'>>
+<<else>>
+  <<set $RobinExpansion.asylum.met to true>>
+  <<if $RobinExpansion.asylum.plan is 0>>
+    <<lanSwitch 'Robin is sitting beside the recreation room window, tracing a finger along the marks on the glass. When Robin sees you, the hand drops.' '罗宾坐在活动室窗边，用手指顺着玻璃上的痕迹往下描。看见你时，那只手停住了。'>>
+    <br><br><span class='blue'><<lanSwitch '"You are here too?" Robin reaches for your sleeve. A guard looks over, and Robin quickly lets go.' '“你也在这里？”罗宾伸手碰了碰你的衣袖。守卫朝这边看来，罗宾立刻松开手。'>></span>
+    <br><br><<lanSwitch 'You sit close enough to speak quietly, waiting until Robin can talk without shaking.' '你们靠得足够近，压低声音交谈，等罗宾不再发抖。'>>
+    <<if C.npc.Robin.dom gte 60>>
+      <br><<lanSwitch '"I kept looking for a way out," Robin says. "I could not do it alone. But you are here now."' '“我一直在找出去的路。”罗宾说，“我一个人办不到。但现在你来了。”'>>
+    <<else>>
+      <br><<lanSwitch '"I thought I would never see you again," Robin whispers. You promise not to leave Robin behind. After a moment, Robin begins telling you what has been happening on this ward.' '“我还以为再也见不到你了。”罗宾低声说。你答应不会把罗宾留在这里。过了一会儿，罗宾开始告诉你病区这段时间发生的事。'>>
+    <</if>>
+    <<if $RobinExpansion.asylum.daysConfined gte 7>>
+      <br><<lanSwitch 'Robin has learned the treatment schedule too well. A distant bell makes Robin flinch before either of you sees the orderlies coming.' '罗宾对治疗时间已经熟悉得过头了。远处铃声一响，还没看见护工，罗宾便先缩了一下。'>>
+    <</if>>
+  <<elseif $RobinExpansion.asylum.plan is 1>>
+    <<lanSwitch 'Robin has watched the staff change shifts, just as you agreed. "I was afraid I would forget," Robin says, showing you careful notes on a scrap of paper. "I wrote it down. The staff door needs a keycard. We cannot just walk out."' '罗宾按约定记下了值班交接。“我怕自己记错。”罗宾把一张写满小字的纸片给你看，“所以全写下来了。员工通道需要门禁卡。我们不能直接走出去。”'>>
+  <<else>>
+    <<lanSwitch 'Robin has found a short interval when the service corridor has only one guard. "We still need Harper’s keycard and we have to wait until lights out," Robin says. "If one of us is caught, we do not leave the other behind."' '罗宾找到了侧廊只有一名守卫的短暂空隙。“还得拿到哈珀的门禁卡，等熄灯后才能动身。”罗宾说，“只要有一个人被抓，我们就不丢下另一个人。”'>>
+  <</if>>
+  <br><br>
+  <<if $RobinExpansion.asylum.visitDay isnot Time.days>>
+    <<socialiseicon>><<lanLink '陪罗宾待一会 (0:30)' 'Deadwood Robin Asylum Visit'>><</lanLink>><br>
+  <</if>>
+  <<if $RobinExpansion.asylum.plan lt 2 and $RobinExpansion.asylum.planDay isnot Time.days>>
+    <<socialiseicon>><<lanLink '和罗宾计划逃离 (0:20)' 'Deadwood Robin Asylum Plan'>><</lanLink>>
+  <<elseif $RobinExpansion.asylum.plan lt 2>>
+    <span class='blue'><<lanSwitch 'You need time to observe another staff shift before planning further.' '要再观察一次换班，才能把计划往下推进。'>></span>
+  <<else>>
+    <<if $asylumkeycard is 1>>
+      <<lanSwitch 'You have the keycard. You must wait until lights out, free your arms and reach the corridor without alerting the staff.' '你已经拿到门禁卡。还得等到熄灯、解开双臂的束缚，并避开员工进入走廊。'>>
+    <<else>>
+      <<lanSwitch 'Harper has a keycard. Taking it will be dangerous; the staff punish escape attempts.' '哈珀身上有门禁卡。拿到它并不容易。员工会惩罚企图出逃的人。'>>
+    <</if>>
+  <</if>>
+<</if>>
+<br><br><<getouticon>><<lanLink '回到院内' 'Asylum'>><</lanLink>>
+
+:: Deadwood Robin Asylum Visit []
+<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>><<npc Robin>><<person1>>
+<<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.visitDay isnot Time.days and $asylumstate is 'free'>>
+  <<set $RobinExpansion.asylum.visitDay to Time.days>>
+  <<set _robinVisit to random(1, 4)>>
+  <<switch _robinVisit>>
+    <<case 1>>
+      <<lanSwitch 'Robin slides a book across the table. The page is open to a drawing of the town. "I have been trying to remember which way the streets turn," Robin says. You trace the route back to the orphanage together.' '罗宾把一本书推到你面前，摊开的那页画着城镇。“我一直在想，街道到底朝哪边拐。”罗宾说。你们一起顺着纸上的路，找回孤儿院。'>>
+    <<case 2>>
+      <<lanSwitch 'A trolley rattles past the recreation room. Robin grips the edge of the table until the sound fades. You move your hand close, leaving Robin room to choose whether to take it. After a moment, Robin does.' '推车从活动室门外经过。罗宾攥着桌沿，直到车轮声远去。你把手放近一些，留给罗宾自己选择。过了一会，罗宾握住了它。'>>
+    <<case 3>>
+      <<lanSwitch 'Robin has saved half a biscuit from lunch. "I was not sure they would let us sit together," Robin says. You break it in two before the orderly returns.' '罗宾从午餐里留了半块饼干。“我不知道他们会不会让我们坐在一起。”罗宾说。趁护工回来之前，你把饼干掰成两半。'>>
+    <<default>>
+      <<lanSwitch 'You and Robin talk about the drinks stall. Robin names the ingredients from memory, then pauses. "Do you think it will still be there?" You remind Robin that the stall can wait for its owner.' '你和罗宾聊起饮品摊。罗宾凭记忆数着原料，数到一半却停住了。“它还会在吗？”你告诉罗宾，摊位会等它的主人回来。'>>
+  <</switch>>
+  <br><br><span class='green'><<lanSwitch 'Robin seems a little steadier with you nearby.' '有你在身边，罗宾稍微安定了一些。'>></span>
+  <<pass 30>><<npcincr Robin trauma -2>><<npcincr Robin love 1>><<lrtrauma>><<glove>>
+<<else>>
+  <<lanSwitch 'Robin needs some quiet now.' '罗宾现在需要安静一会。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '回到院内' 'Asylum'>><</lanLink>>
+
+:: Deadwood Robin Asylum Plan []
+<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>><<npc Robin>><<person1>>
+<<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.plan lt 2 and $RobinExpansion.asylum.planDay isnot Time.days and $asylumstate is 'free'>>
+  <<set $RobinExpansion.asylum.planDay to Time.days>>
+  <<set $RobinExpansion.asylum.plan += 1>>
+  <<if $RobinExpansion.asylum.plan is 1>>
+    <<lanSwitch 'You and Robin compare what you have seen of the staff rota. Robin volunteers to watch the corridor from the recreation room; you will look for a route to the gate. You agree on a meeting place and a time, then repeat it to each other until you are certain.' '你和罗宾核对已经观察到的值班表。罗宾愿意从活动室盯着走廊，你去找通向大门的路。你们约好地点和时间，又相互重复一遍，直到确信不会弄错。'>>
+  <<else>>
+    <<lanSwitch 'Robin points out the service corridor beyond the staff door. You trace a route to the fence and note where the guards change shifts. Robin checks every turn with you, then hides the scrap of paper before an orderly enters.' '罗宾指出员工通道后的侧廊。你们一路记下通往围栏的路线和守卫换班的位置。罗宾和你逐个核对转弯，随后赶在护工进门前把纸片藏好。'>>
+  <</if>>
+  <<pass 20>><<npcincr Robin love 1>><<glove>>
+<<else>>
+  <<lanSwitch 'There is nothing more to plan here.' '这里已经没有更多需要商量的事。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '回到院内' 'Asylum'>><</lanLink>>
+
+:: Deadwood Robin Asylum Escape []
+<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>><<npc Robin>><<person1>>
+<<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.plan gte 2 and $asylumkeycard is 1 and $asylumstate is 'sleep' and !pcAreArmsBound('any')>>
+  <<set _escapeChance to Math.clamp(45 + currentSkillValue('skulduggery') / 8 + $asylumstatus / 4 - $suspicion / 3, 20, 90)>>
+  <<lanSwitch 'You open the staff door with Harper’s keycard. Robin meets you beyond the corner, pale but ready. The sound of a trolley approaching forces you both against the wall. You wait for it to pass, then make for the outer gate.' '你用哈珀的门禁卡打开员工通道。罗宾在转角后与你会合，脸色苍白，却已经准备好了。一辆推车的声音逼得你们贴紧墙面。等车过去，才赶向外门。'>>
+  <br><br>
+  <<if random(1, 100) lte _escapeChance>>
+    <<lanSwitch 'A guard turns just as you reach the gate. Robin pulls you behind the supply trolley; its wheels squeal loudly enough to mask the card reader. You squeeze through, cross the grounds and climb the fence together. Only when the trees hide the asylum do you stop running. Robin is still holding your hand.' '你们刚到大门，一名守卫就转过头来。罗宾把你拉到运货车后，车轮的吱呀声正好盖过读卡器的响动。你们挤过门，穿过院子，一起翻越围栏。直到树林遮住精神病院，你们才敢停下。罗宾还握着你的手。'>>
+    <br><br><span class='green'><<lanSwitch 'You both made it beyond the fence.' '你们两个都翻出了围栏。'>></span><br><br>
+    <<asylumescape>><<run maplebirch.get('RobinExpansion').escapeAsylumTogether()>><<badEndTrackingEnd 'Asylum' { reason: 'asylumSabotage' }>>
+    <<stress -12>><<trauma -6>><<npcincr Robin love 3>><<lstress>><<ltrauma>><<glove>>
+    <br><br><<lanLink '继续' 'Deadwood Robin Asylum Reunion'>><</lanLink>>
+  <<else>>
+    <<lanSwitch 'The guard hears the card reader and shouts. Robin shoves you toward the nearer exit, but the orderlies block it. You refuse to leave Robin behind. They seize the card and drag you apart. Robin cries out as they take Robin back to the ward.' '守卫听见读卡器的声音，厉声喊人。罗宾推你朝近处的出口跑，护工却堵住了路。你不肯丢下罗宾。他们夺走门禁卡，将你们强行分开。罗宾被带回病区时，喊了你的名字。'>>
+    <<set $asylumkeycard to 0>><<set $RobinExpansion.asylum.plan to 1>>
+    <<npcincr Robin trauma 8>><<trauma 12>><<stress 12>><<grtrauma true>><<gtrauma>><<gstress>>
+    <br><br><<asylumpunish>>
+  <</if>>
+<<else>>
+  <<lanSwitch 'You and Robin cannot leave this way without a keycard, a complete plan and a chance after lights out.' '没有门禁卡、周全的计划和熄灯后的机会，你和罗宾无法从这里逃走。'>>
+  <br><br><<lanLink '回到院内' 'Asylum'>><</lanLink>>
+<</if>>
+
+:: Deadwood Robin Asylum Reunion []
+<<set $outside to 1>><<set $location to 'forest'>><<effects>><<npc Robin>><<person1>>
+<<lanSwitch 'The trees hide the lights of the asylum. Robin lets go of your hand only long enough to check the marks left by the fence. "We are really out," Robin says, as if saying it aloud might make it true.' '树木遮住了精神病院的灯光。罗宾松开你的手，查看围栏留下的擦伤。“我们真的出来了。”罗宾说，仿佛说出口才能相信。'>>
+<br><br>
+<<socialiseicon>><<lanLink '抱紧罗宾' 'Deadwood Robin Asylum Reunion Hug'>><<npcincr Robin love 2>><<glove>><</lanLink>><br>
+<<socialiseicon 'ask'>><<lanLink '问罗宾今后的打算' 'Deadwood Robin Asylum Reunion Talk'>><</lanLink>><br>
+<<getouticon>><<lanLink '一起继续赶路' 'Deadwood Robin Asylum Reunion Move'>><</lanLink>>
+
+:: Deadwood Robin Asylum Reunion Hug []
+<<set $outside to 1>><<set $location to 'forest'>><<effects>><<npc Robin>><<person1>>
+<<lanSwitch 'You draw Robin close. For a moment Robin stands rigid, listening for footsteps. Then Robin leans into you and begins to shake. You stay until Robin can breathe evenly again. When you step apart, Robin reaches for your hand.' '你把罗宾拉进怀里。罗宾僵着身子，仍在听身后有没有脚步声。过了一会，罗宾靠向你，浑身发抖。你没有催，直到罗宾的呼吸慢慢平稳。分开时，罗宾重新握住你的手。'>>
+<br><br><span class='green'><<lanSwitch 'You are leaving together.' '你们一起离开。'>></span>
+<br><br><<getouticon>><<lanLink '进入森林' 'Forest'>><<set $forest to 100>><<endevent>><</lanLink>>
+
+:: Deadwood Robin Asylum Reunion Talk []
+<<set $outside to 1>><<set $location to 'forest'>><<effects>><<npc Robin>><<person1>>
+<<lanSwitch '"What will you do when we get back?" you ask. Robin glances toward the town. "Sleep somewhere I can open the door myself," Robin says. "Then see what is left of the stall. We can decide the rest when it is light."' '“回去以后，你打算怎么办？”你问。罗宾朝城镇的方向看了一眼。“先找个能自己开门的地方睡觉。”罗宾说，“再去看看摊位。其他的，天亮后再商量。”'>>
+<br><br><span class='blue'><<lanSwitch 'Robin does not pretend the last few days have been easy.' '罗宾没有假装这几天的事都已经过去。'>></span>
+<br><br><<getouticon>><<lanLink '进入森林' 'Forest'>><<set $forest to 100>><<endevent>><</lanLink>>
+
+:: Deadwood Robin Asylum Reunion Move []
+<<set $outside to 1>><<set $location to 'forest'>><<effects>><<npc Robin>><<person1>>
+<<lanSwitch 'You gesture toward the path. Robin nods and follows, keeping close enough that your shoulders brush. Neither of you speaks until the asylum lights are far behind you.' '你指向林间小路。罗宾点点头，紧跟在你身侧，肩膀偶尔碰到一起。直到精神病院的灯光被远远甩在身后，你们才重新开口。'>>
+<br><br><<getouticon>><<lanLink '进入森林' 'Forest'>><<set $forest to 100>><<endevent>><</lanLink>>

@@ -10,6 +10,7 @@ import VanillaPlus from './VanillaPlus';
 import DynamicMusic from './DynamicMusic';
 import LifeSimulation from './LifeSimulation';
 import SydneyExpansion from './SydneyExpansion';
+import RobinExpansion from './RobinExpansion';
 
 (function (maplebirch): void {
   'use strict';
@@ -23,6 +24,7 @@ import SydneyExpansion from './SydneyExpansion';
   maplebirch.define('NPCSidebarPortrait', new NPCSidebarPortrait(maplebirch), ['DR', 'npc']);
   maplebirch.define('VP', new VanillaPlus(maplebirch), ['DR', 'var', 'char']);
   maplebirch.define('SydneyExpansion', new SydneyExpansion(maplebirch), ['DR', 'var']);
+  maplebirch.define('RobinExpansion', new RobinExpansion(maplebirch), ['DR', 'var']);
   maplebirch.define('LS', new LifeSimulation(maplebirch), ['DR', 'var']);
   maplebirch.define('DM', new DynamicMusic(maplebirch), ['DR', 'audio', 'var']);
 })(maplebirch);

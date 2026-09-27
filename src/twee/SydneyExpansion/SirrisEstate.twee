@@ -1,0 +1,1185 @@
+:: Deadwood Reblooms Sirris Estate Widgets [widget]
+
+<!-- 西里斯在成人商店当面邀请。地点只会在玩家认识悉尼的家长并成为恋人后开放。 -->
+<<widget 'deadwood-reblooms-sirris-estate-invitation-link'>>
+  <<if isLoveInterest('Sydney')
+    and $sydneySeen.includes('parent')
+    and !$SydneyExpansion.estate.invited>>
+    <<socialiseicon 'ask'>>
+    <<lanLink '询问能否去西里斯家坐坐' 'Deadwood Reblooms Sirris Estate Invitation'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<!-- 只在悉尼确实待在宿舍的晚间提供约定，回家前不会凭空出现在庄园。 -->
+<<widget 'deadwood-reblooms-sirris-estate-evening-link'>>
+  <<sydneySchedule>>
+  <<if $SydneyExpansion.estate.invited
+    and isLoveInterest('Sydney')
+    and Time.hour gte 17 and Time.hour lt 21
+    and _sydney_location is 'temple'
+    and $sydney_templeWork is 'quarters'
+    and $SydneyExpansion.estate.visitDay isnot Time.days
+    and $daily.sydney.punish isnot 1
+    and $stress lt $stressmax
+    and $exposed lte 0>>
+    <<socialiseicon 'ask'>><<lanLink '约悉尼今晚回西里斯家 (0:10)' 'Deadwood Reblooms Sirris Estate Evening Invitation'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<!-- 街道入口随原版地点列表显示，不插入特殊事件或遭遇战页面。 -->
+<<widget 'deadwood-reblooms-sirris-estate-street-link'>>
+  <<if $SydneyExpansion.estate.invited and $exposed lte 0>>
+    <<icon 'sirris-manor.png'>><<lanLink '西里斯的庄园 (0:05)' 'Deadwood Reblooms Sirris Estate Gate'>>
+      <<pass 5>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<!-- 原版日程把 Sydney 的一部分时段标为 home。已搬去玩家住宅时不再出现在此处。 -->
+<<widget 'deadwood-reblooms-sirris-estate-presence'>>
+  <<sydneySchedule>>
+  <<set _sydneyAtEstate to _sydney_location is 'home'
+    and C.npc.Sydney.init is 1
+    and !['prison', 'dungeon'].includes(C.npc.Sydney.state)
+    and $daily.sydney.punish isnot 1
+    and !$replayScene
+    and (!maplebirch.get('VP') or !maplebirch.VP.realEstate.residenceOf('Sydney'))>>
+  <!-- 西里斯教科学课且经营商店。只在晚上，或无课的商店休息日安排在家。 -->
+  <<set _sirrisAtEstate to Time.hour gte 21
+    or Time.hour lt 7
+    or (Time.weekDay is 1 and !Time.schoolDay)>>
+<</widget>>
+
+:: Deadwood Reblooms Sirris Estate Invitation []
+<<set $outside to 0>><<set $location to 'adult_shop'>><<effects>>
+<<npc Sirris>><<person1>><<run statusCheck('Sydney')>>
+<<if !isLoveInterest('Sydney') or !$sydneySeen.includes('parent')>>
+  <<lanSwitch 'Sirris is busy with the shop. You leave the question for another day.' '西里斯正忙着照看店铺。你暂时没有提起拜访的事。'>>
+<<else>>
+  <<set $SydneyExpansion.estate.invited to true>>
+  <<language>>
+    <<option 'EN'>>
+      Sirris puts down a stack of science papers when you ask about visiting. A shop invoice is tucked among them. <<He>> catches you looking and laughs.
+      <br><br>
+      "I bring work home often enough. Sydney says I leave it on every table." <<He>> writes an address on the back of an old receipt and hands it to you.
+      <br><br>
+      "The house is behind a white gate on <span class='teal'>Danube Street</span>. Come by when one of us is home. I'd like to know you somewhere quieter than this shop."
+      <<if _sydneyStatus.includes('pure')>>
+        <br><br>
+        "And don't worry about what to say," <<he>> adds. "Sydney has already told me you listen."
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        <br><br>
+        "Sydney might tell you I ask too many questions," <<he>> adds, smiling. "I'm still going to ask some."
+      <</if>>
+    <<option 'CN'>>
+      你问能否登门拜访。西里斯放下手中的一叠科学课讲义，里面还夹着一张店铺账单。见你看过去，<<he>>笑了。
+      <br><br>
+      “我总把工作带回家。悉尼说，家里每张桌子都堆着我的东西。”<<He>>在一张旧收据背面写下地址，交给你。
+      <br><br>
+      “<span class='teal'>多瑙河街</span>有一扇白色大门。我们在家的时候，你可以过来。这里太吵了，我也想找个安静地方和你说话。”
+      <<if _sydneyStatus.includes('pure')>>
+        <br><br>
+        “不用担心聊什么。”<<he>>又说，“悉尼告诉我，你肯听<<him>>说话。”
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        <br><br>
+        “悉尼大概会说我问得太多。”<<he>>笑道，“但我还是会问几句的。”
+      <</if>>
+  <</language>>
+<</if>>
+<br><br>
+<<getouticon>><<lanLink '返回店铺' 'Adult Shop Approach Sirris'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Evening Invitation []
+<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
+<<sydneySchedule>><<npc Sydney>><<person1>>
+<<if $SydneyExpansion.estate.invited
+  and isLoveInterest('Sydney')
+  and Time.hour gte 17 and Time.hour lt 21
+  and _sydney_location is 'temple'
+  and $sydney_templeWork is 'quarters'
+  and $SydneyExpansion.estate.visitDay isnot Time.days
+  and $daily.sydney.punish isnot 1>>
+  <<set $SydneyExpansion.estate.visitDay to Time.days>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney is putting away a stack of books in the quarters when you ask about visiting home tonight. "I still have work here," <<he>> says, looking toward the stairs. "Once I've finished, meet me at the house <span class='gold'>after nine</span>."
+      <br><br>
+      <<He>> writes a note for the temple schedule and folds it beneath the book at the top of the stack. "<<nnpc_Mum 'Sirris'>> will be glad to see you."
+    <<option 'CN'>>
+      你问悉尼今晚能否回家坐坐。<<he>>正把一摞书放回宿舍的架上，听完后朝楼梯望了一眼。“我还得做完这里的事。”<<he>>说，“忙完我就回去。<span class='gold'>九点以后</span>到家里找我吧。”
+      <br><br>
+      <<He>>给神殿日程留了张字条，夹在最上面那本书底下。“<<nnpc_Mum 'Sirris'>>见到你会高兴的。”
+  <</language>>
+  <<pass 10>>
+<<else>>
+  <<lanSwitch 'Sydney cannot make that plan tonight.' '悉尼今晚无法赴约。'>>
+<</if>>
+<br><br><<templeicon 'quarters'>><<lanLink '返回神殿宿舍' 'Temple Quarters'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Gate []
+<<set $outside to 1>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if !$SydneyExpansion.estate.invited>>
+  <<lanSwitch 'The gate is closed. You do not know who lives behind it.' '大门紧闭。你不知道里面住着谁。'>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      You pass through a white gate into the front garden. Gravel crunches beneath your shoes. The hedges are trimmed, and the stone steps have been swept. Beyond them stands a broad house with a slate roof. The path carries on around its side.
+      <br><br>
+      <<if $sydneySeen.includes('Kylar manor')>>
+        You remember the thorny bushes around <span class='blue'>Kylar's manor</span>. This garden has not been left to grow wild.
+        <br><br>
+      <</if>>
+      <<if _sydneyAtEstate>>
+        A light burns in an upstairs window. You recognise Sydney's books stacked against the glass.
+      <<elseif _sirrisAtEstate>>
+        Light spills across the ground floor windows. A car is parked beside the house.
+      <<else>>
+        The windows are dark. <span class='blue'>No one answers when you ring.</span>
+      <</if>>
+    <<option 'CN'>>
+      你穿过白色大门，来到前花园。碎石在脚下沙沙作响，树篱修剪得整齐，石阶也扫得干净。阶梯上方是一栋深色屋顶的宽敞房子，一条小路沿着屋侧绕向后方。
+      <br><br>
+      <<if $sydneySeen.includes('Kylar manor')>>
+        你想起<span class='blue'>凯拉尔庄园</span>外那些带刺的灌木。这里的花草没有任其疯长。
+        <br><br>
+      <</if>>
+      <<if _sydneyAtEstate>>
+        楼上的窗户亮着灯。你认出玻璃后那一摞悉尼的书。
+      <<elseif _sirrisAtEstate>>
+        一楼的窗户透出灯光。房子旁边停着一辆车。
+      <<else>>
+        窗户黑着。<span class='blue'>你按了门铃，却没人应答。</span>
+      <</if>>
+  <</language>>
+  <<if _sydneyAtEstate or _sirrisAtEstate>>
+    <br><br>
+    <<icon 'sirris-hall.png'>><<lanLink '走进西里斯家 (0:01)' 'Deadwood Reblooms Sirris Estate Hall'>><<pass 1>><</lanLink>><br>
+  <</if>>
+  <<if _sydneyAtEstate
+    and $sydneySeen.includes('Kylar manor')
+    and !$SydneyExpansion.estate.kylarTalk>>
+    <<socialiseicon 'ask'>>
+    <<lanLink '和悉尼谈谈凯拉尔的庄园' 'Deadwood Reblooms Sirris Estate Kylar Talk'>><</lanLink>><br>
+  <</if>>
+<</if>>
+<br>
+<<danubeicon>><<lanLink '返回多瑙河街 (0:05)' 'Danube Street'>><<pass 5>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Kylar Talk []
+<<set $outside to 1>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if !_sydneyAtEstate or !$sydneySeen.includes('Kylar manor')>>
+  <<lanSwitch 'Sydney is not here to talk.' '悉尼不在这里。'>>
+<<else>>
+  <<npc Sydney>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney follows your gaze down the swept path. "You're thinking of Kylar's manor," <<he>> says. <<He>> rubs a leaf between <<his>> fingers and lets it fall.
+      <br><br>
+      "Our parents knew each other. I went over a lot when we were little." <<He>> looks toward the gate. "I liked going there."
+      <br><br>
+      <<He>> falls quiet. You remember how <<he>> looked at the <span class='blue'>temple symbol</span> on the manor's pillar.
+    <<option 'CN'>>
+      悉尼顺着你的目光望向扫净的小路。“你在想凯拉尔的庄园。”<<he>>说。<<He>>捻了捻手中的叶子，又任它落到地上。
+      <br><br>
+      “我们的父母相识。小时候，我常去<<nnpc_his 'Kylar'>>家。”<<He>>看向大门，“那时候，我很喜欢去那里。”
+      <br><br>
+      <<He>>沉默下来。你想起<<he>>站在凯拉尔庄园外，看着门柱上<span class='blue'>神殿标志</span>时的神情。
+  <</language>>
+  <br><br>
+  <<socialiseicon 'ask'>>
+  <<lanLink '问悉尼后来发生了什么' 'Deadwood Reblooms Sirris Estate Kylar Answer'>>
+    <<set $SydneyExpansion.estate.kylarTalk to 'ask'>>
+  <</lanLink>><br>
+  <<gardenicon>>
+  <<lanLink '陪悉尼在花园走走' 'Deadwood Reblooms Sirris Estate Kylar Answer'>>
+    <<set $SydneyExpansion.estate.kylarTalk to 'walk'>>
+  <</lanLink>><br>
+<</if>>
+<br>
+<<getouticon>><<lanLink '返回前花园' 'Deadwood Reblooms Sirris Estate Gate'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Kylar Answer []
+<<set $outside to 1>><<set $location to 'sirris_estate'>><<effects>>
+<<npc Sydney>><<person1>>
+<<if $SydneyExpansion.estate.kylarTalk is 'ask'>>
+  <<language>>
+    <<option 'EN'>>
+      "I wasn't allowed to go back," Sydney says. <<He>> starts to say something else, then stops. "I don't want to talk about why. Not yet."
+      <br><br>
+      You let the question rest. Sydney stays beside you until <<his>> shoulders relax.
+    <<option 'CN'>>
+      “后来，我不被允许再去了。”悉尼说。<<He>>似乎还想说什么，却又停下。“为什么会这样，我现在还不想说。”
+      <br><br>
+      你没有追问。悉尼留在你身边，肩膀慢慢松了下来。
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      You walk beside Sydney without asking for the rest. <<He>> brushes <<his>> fingers along the clipped hedge.
+      <br><br>
+      "It's good to remember the days before all that," <<he>> says. <span class='teal'>"Thank you for staying with me."</span>
+    <<option 'CN'>>
+      你没有追问，只陪悉尼沿着小路走。<<He>>的手指轻轻拂过修剪齐整的树篱。
+      <br><br>
+      “能想起那以前的日子，也挺好。”<<he>>说，<span class='teal'>“谢谢你陪我。”</span>
+  <</language>>
+<</if>>
+<<npcincr Sydney love 1>><<glove>>
+<br><br>
+<<getouticon>><<lanLink '返回前花园' 'Deadwood Reblooms Sirris Estate Gate'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Hall []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if _sirrisAtEstate>>
+  <<npc Sirris>><<person1>>
+<<elseif _sydneyAtEstate>>
+  <<npc Sydney>><<person1>>
+<</if>>
+<<if !$SydneyExpansion.estate.invited or (!_sydneyAtEstate and !_sirrisAtEstate)>>
+  <<lanSwitch 'The house is quiet. You step back outside and pull the door shut.' '屋里安静得很。你退回门外，轻轻带上门。'>><br><br>
+  <<getouticon>><<lanLink '走向大门' 'Deadwood Reblooms Sirris Estate Gate'>><</lanLink>>
+<<else>>
+  <<if !$SydneyExpansion.estate.visited>>
+    <<set $SydneyExpansion.estate.visited to true>>
+    <<language>>
+      <<option 'EN'>>
+        You wipe your shoes before entering. Shelves of books share the front hall with coats and a pair of muddy gardening gloves. A box of shop stock waits beneath the stairs.
+        <br><br>
+        <<if _sirrisAtEstate>>
+          Sirris takes your coat. "Mind the box," <<he>> says, shifting it out of your way. "I did mean to clear that before you came."
+        <<else>>
+          Sydney opens the door and lets you in. "<<nnpc_Mum 'Sirris'>> left the light on for me," <<he>> says, moving the box from your path.
+        <</if>>
+      <<option 'CN'>>
+        你擦净鞋底才走进前厅。书架旁挂着外套，一双沾泥的园艺手套搁在下面。楼梯底下还放着一箱尚未整理的店铺货品。
+        <br><br>
+        <<if _sirrisAtEstate>>
+          西里斯替你接过外套。“当心箱子。”<<he>>把它挪开，“我本来打算在你来之前收好。”
+        <<else>>
+          悉尼为你开门。“<<nnpc_Mum 'Sirris'>>给我留了灯。”<<he>>说着，把挡路的箱子搬到一旁。
+        <</if>>
+    <</language>>
+  <<else>>
+    <<lanSwitch 'The front hall smells faintly of paper and damp earth. The box has been pushed out of the way.' '前厅里有淡淡的纸张与湿土气息。那箱货品被推到了不碍事的地方。'>>
+  <</if>>
+  <<if _sydneyAtEstate>>
+    <br><br>
+    <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+    <<language>>
+      <<option 'EN'>>
+        <<if _sydneyStatus.includes('pure')>>
+          Sydney closes the book in <<his>> hands. "I was going to show you the garden," <<he>> says. <span class='teal'>"I'm glad you came."</span>
+        <<elseif _sydneyStatus.includes('corrupt')>>
+          Sydney leans over the banister. "You found us." <<He>> smiles. <span class='lewd'>"I can show you my room later."</span>
+        <<else>>
+          Sydney comes down the stairs with a book in <<his>> hands. "There you are," <<he>> says, smiling.
+        <</if>>
+      <<option 'CN'>>
+        <<if _sydneyStatus.includes('pure')>>
+          悉尼合上手里的书。“我正想带你看看花园。”<<he>>说，<span class='teal'>“你来了真好。”</span>
+        <<elseif _sydneyStatus.includes('corrupt')>>
+          悉尼倚在楼梯扶手边。“你找到这里啦。”<<He>>笑了，<span class='lewd'>“待会儿我可以带你看我的房间。”</span>
+        <<else>>
+          悉尼拿着书走下楼梯。“你来啦。”<<he>>笑着说。
+        <</if>>
+    <</language>>
+  <</if>>
+  <br><br>
+  <<icon 'sirris-living-room.png'>><<lanLink '客厅 (0:01)' 'Deadwood Reblooms Sirris Estate Living Room'>><<pass 1>><</lanLink>><br>
+  <<schoolicon 'science'>><<lanLink '书房 (0:01)' 'Deadwood Reblooms Sirris Estate Study'>><<pass 1>><</lanLink>><br>
+  <<kitchenicon 'stove'>><<lanLink '厨房 (0:01)' 'Deadwood Reblooms Sirris Estate Kitchen'>><<pass 1>><</lanLink>><br>
+  <<if _sydneyAtEstate and isLoveInterest('Sydney')>>
+    <<bedicon>><<lanLink '悉尼的房间 (0:01)' 'Deadwood Reblooms Sirris Estate Sydney Room'>><<pass 1>><</lanLink>><br>
+  <</if>>
+  <br>
+  <<getouticon>><<lanLink '返回前花园 (0:01)' 'Deadwood Reblooms Sirris Estate Gate'>><<pass 1>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Sirris Estate Living Room []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if _sydneyAtEstate>><<npc Sydney>><<person1>><</if>>
+<<language>>
+  <<option 'EN'>>
+    A worn sofa faces the windows of the living room. School papers lie on the low table beside an unfinished shopping list. There is room for guests, but Sydney's books have claimed one end of the sofa.
+    <br><br>
+    <<if _sirrisAtEstate and _sydneyAtEstate>>
+      Sirris brings in three cups. Sydney shifts a stack of books to make room for yours.
+    <<elseif _sirrisAtEstate>>
+      Sirris sets a cup on the table for you, then sits among the school papers.
+    <<elseif _sydneyAtEstate>>
+      Sydney sits beside you and puts <<his>> book face down so you can talk.
+    <</if>>
+  <<option 'CN'>>
+    客厅的窗边放着一张坐旧的沙发。矮桌上，学校讲义压着尚未写完的购物单。这里有招待客人的地方，沙发的一端却被悉尼的书占去了。
+    <br><br>
+    <<if _sirrisAtEstate and _sydneyAtEstate>>
+      西里斯端来三只杯子。悉尼挪开一摞书，给你的杯子腾出位置。
+    <<elseif _sirrisAtEstate>>
+      西里斯为你放下一杯茶，自己在讲义旁坐了下来。
+    <<elseif _sydneyAtEstate>>
+      悉尼在你身边坐下，合上书，准备陪你说话。
+    <</if>>
+<</language>>
+<br><br>
+<<if _sirrisAtEstate and _sydneyAtEstate and isLoveInterest('Sydney') and !$SydneyExpansion.estate.familyTalk>>
+  <<socialiseicon 'ask'>>
+  <<lanLink '和西里斯、悉尼谈谈将来的事 (0:10)' 'Deadwood Reblooms Sirris Estate Family Talk'>><<pass 10>><</lanLink>><br>
+<</if>>
+<<if _sydneyAtEstate
+  and isLoveInterest('Sydney')
+  and $SydneyExpansion.estate.teaseDay isnot Time.days>>
+  <<loveicon>>
+  <<lanLink '悄悄逗悉尼 (0:10)' 'Deadwood Reblooms Sirris Estate Sydney Tease'>>
+    <<set $SydneyExpansion.estate.teaseDay to Time.days>>
+    <<pass 10>>
+  <</lanLink>><br>
+<</if>>
+<br>
+<<getouticon>><<lanLink '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Sydney Tease []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<language>>
+  <<option 'EN'>>
+    <<if _sirrisAtEstate>>
+      Sirris turns back to the papers on the table. You lean close to Sydney and brush a finger against <<his>> hand where it rests beside the books. <<He>> tries to keep reading.
+    <<else>>
+      You take the empty place beside Sydney on the sofa. When <<he>> reaches for a book, you catch <<his>> hand and keep it in yours.
+    <</if>>
+    <br><br>
+    <<if _sydneyStatus.includes('pure')>>
+      Sydney's cheeks warm. "<span class='teal'>You could have just asked me to sit with you</span>," <<he>> whispers, but makes no effort to move away.
+    <<elseif _sydneyStatus.includes('corrupt')>>
+      Sydney hooks a finger around yours. "<span class='lewd'>You're making it difficult to behave</span>," <<he>> murmurs, letting the book fall shut.
+    <<else>>
+      Sydney smiles over the top of <<his>> book. "I was waiting to see how long you'd last," <<he>> says.
+    <</if>>
+  <<option 'CN'>>
+    <<if _sirrisAtEstate>>
+      西里斯低头继续看桌上的讲义。你悄悄挨近悉尼，轻碰<<he>>搭在书边的手。<<He>>装作还在读书。
+    <<else>>
+      你在沙发上悉尼身边的空位坐下。<<He>>伸手拿书时，你握住<<his>>的手，没有松开。
+    <</if>>
+    <br><br>
+    <<if _sydneyStatus.includes('pure')>>
+      悉尼的脸渐渐红了。“<span class='teal'>你想让我陪着，直接说就好。</span>”<<he>>小声说，却没有挪开。
+    <<elseif _sydneyStatus.includes('corrupt')>>
+      悉尼用手指勾住你的手。“<span class='lewd'>你这样，我可很难装作没事。</span>”<<he>>低声说，任那本书合上了。
+    <<else>>
+      悉尼从书上方望着你笑。“我还在等你什么时候忍不住呢。”<<he>>说。
+    <</if>>
+<</language>>
+<<npcincr Sydney love 1>><<glove>>
+<<npcincr Sydney lust 2>><<gglust>>
+<br><br>
+<<getouticon>><<lanLink '返回客厅' 'Deadwood Reblooms Sirris Estate Living Room'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Family Talk []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<npc Sydney 1>><<person1>><<npc Sirris 2>><<person2>><<run statusCheck('Sydney')>>
+<<language>>
+  <<option 'EN'>>
+    Sirris gathers the loose papers into a pile. "Between the temple, school and the shop, I hardly know when Sydney will be home," <<nnpc_he 'Sirris'>> says. "I don't want to decide <<nnpc_his 'Sydney'>> future for <<nnpc_him 'Sydney'>>. I do want to hear what <<nnpc_he 'Sydney'>> wants."
+    <br><br>
+    Sydney looks into <<nnpc_his 'Sydney'>> cup before answering.
+    <<if _sydneyStatus.includes('pure')>>
+      "I still want to serve at the temple," <<nnpc_he 'Sydney'>> says. "But I want to make that choice myself."
+    <<elseif _sydneyStatus.includes('corrupt')>>
+      "I don't want every part of my life decided before I get a say," <<nnpc_he 'Sydney'>> says. <<nnpc_He 'Sydney'>> glances at you, then back at Sirris.
+    <<else>>
+      "I'm still working it out," <<nnpc_he 'Sydney'>> says. "I need a little time."
+    <</if>>
+    <br><br>
+    Sirris leaves a space in the conversation for you.
+  <<option 'CN'>>
+    西里斯把桌上的讲义拢成一叠。“神殿、学校、店铺，悉尼每天都忙。”<<nnpc_he 'Sirris'>>说，“我不想替<<nnpc_him 'Sydney'>>决定以后该怎么过。但我想听听<<nnpc_he 'Sydney'>>自己的想法。”
+    <br><br>
+    悉尼看着杯子，过了一会儿才回答。
+    <<if _sydneyStatus.includes('pure')>>
+      “我还是想留在神殿服务。”<<nnpc_he 'Sydney'>>说，“但我想自己做这个决定。”
+    <<elseif _sydneyStatus.includes('corrupt')>>
+      “我不想事事都由别人先替我安排好。”<<nnpc_he 'Sydney'>>先看了看你，又转向西里斯。
+    <<else>>
+      “我还在想。”<<nnpc_he 'Sydney'>>说，“再给我点时间吧。”
+    <</if>>
+    <br><br>
+    西里斯停下来，等你也说几句。
+<</language>>
+<br><br>
+<<socialiseicon>><<lanLink '让悉尼把话说完' 'Deadwood Reblooms Sirris Estate Family Answer'>><<set $SydneyExpansion.estate.familyTalk to 'listen'>><</lanLink>><br>
+<<loveicon>><<lanLink '告诉西里斯你会支持悉尼' 'Deadwood Reblooms Sirris Estate Family Answer'>><<set $SydneyExpansion.estate.familyTalk to 'support'>><</lanLink>><br>
+
+:: Deadwood Reblooms Sirris Estate Family Answer []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<npc Sydney 1>><<person1>><<npc Sirris 2>><<person2>>
+<<if $SydneyExpansion.estate.familyTalk is 'listen'>>
+  <<language>>
+    <<option 'EN'>>
+      You wait. Sydney puts down <<nnpc_his 'Sydney'>> cup and tells Sirris what <<nnpc_he 'Sydney'>> has been trying to say. Sirris listens without touching the papers again.
+      <br><br>
+      "I can do that," <<nnpc_he 'Sirris'>> says when Sydney finishes. "You don't have to bring me a decision tonight."
+      <br><br>
+      Sydney brushes your hand beneath the table. <span class='teal'>"Thanks for letting me speak."</span>
+    <<option 'CN'>>
+      你没有抢着接话。悉尼放下杯子，把刚才没说完的话告诉西里斯。西里斯安静听着，没再碰桌上的讲义。
+      <br><br>
+      “好。”悉尼说完后，<<nnpc_he 'Sirris'>>点头，“今晚不用急着给我答案。”
+      <br><br>
+      悉尼在桌下碰了碰你的手。<span class='teal'>“谢谢你让我自己说。”</span>
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      You tell Sirris that whatever Sydney chooses, you intend to stand beside <<nnpc_him 'Sydney'>>. Sydney looks up sharply, then reaches for your hand.
+      <br><br>
+      Sirris smiles over the rim of <<nnpc_his 'Sirris'>> cup. "Good. But do let <<nnpc_him 'Sydney'>> tell you when <<nnpc_he 'Sydney'>> needs space, too."
+      <br><br>
+      Sydney squeezes your fingers. <span class='teal'>"I will."</span>
+    <<option 'CN'>>
+      你告诉西里斯，无论悉尼将来怎么选，你都愿意站在<<nnpc_him 'Sydney'>>身边。悉尼猛地抬头，随即握住你的手。
+      <br><br>
+      西里斯隔着杯沿笑了。“这样很好。不过，也要让<<nnpc_him 'Sydney'>>自己告诉你什么时候想独处。”
+      <br><br>
+      悉尼握紧你的手指。<span class='teal'>“我会说的。”</span>
+  <</language>>
+<</if>>
+<<npcincr Sydney love 1>><<glove 'Sydney'>>
+<<npcincr Sirris love 1>><<glove 'Sirris'>>
+<br><br>
+<<getouticon>><<lanLink '返回客厅' 'Deadwood Reblooms Sirris Estate Living Room'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Study []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if _sirrisAtEstate>><<npc Sirris>><<person1>><<elseif _sydneyAtEstate>><<npc Sydney>><<person1>><</if>>
+<<language>>
+  <<option 'EN'>>
+    School notebooks fill one shelf of the study. The next holds shop ledgers and unopened letters. A wide desk faces the garden, with a magnifying glass left beside a page of careful drawings.
+    <br><br>
+    <<if _sirrisAtEstate>>
+      Sirris looks up from a student's work. "I was meant to finish these before coming home," <<he>> says. "Would you check my diagram?"
+    <<elseif _sydneyAtEstate>>
+      Sydney points to the drawings. "<<nnpc_Mum 'Sirris'>> says you can understand a thing better once you've drawn it."
+    <<else>>
+      The desk is empty. A lesson plan lies open beside the drawings.
+    <</if>>
+  <<option 'CN'>>
+    书房的一层架子放满了学校的笔记本，另一层则是店铺账册和没拆封的信。宽大的书桌朝向花园，放大镜压在一页画得很仔细的示意图旁。
+    <br><br>
+    <<if _sirrisAtEstate>>
+      西里斯从学生的作业上抬起头。“我本该回家前就改完的。”<<he>>说，“要不要帮我看看这张图？”
+    <<elseif _sydneyAtEstate>>
+      悉尼指着那些图。“<<nnpc_Mum 'Sirris'>>总说，能画出来，才算真的看明白了。”
+    <<else>>
+      书桌旁没有人。一本教案摊开放在示意图旁。
+    <</if>>
+<</language>>
+<br><br>
+<<if $SydneyExpansion.estate.studyDay isnot Time.days>>
+  <<schoolicon 'science'>>
+  <<lanLink '整理桌上的科学讲义 (0:20)' 'Deadwood Reblooms Sirris Estate Study Help'>>
+    <<set $SydneyExpansion.estate.studyDay to Time.days>>
+    <<pass 20>>
+  <</lanLink>><br>
+<</if>>
+<br>
+<<getouticon>><<lanLink '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Study Help []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if _sirrisAtEstate>><<npc Sirris>><<person1>><<elseif _sydneyAtEstate>><<npc Sydney>><<person1>><</if>>
+<<language>>
+  <<option 'EN'>>
+    You sort the papers by lesson and put the shop receipts in a separate pile. A page about plant cells has been filed with the invoices. You carry it back to the desk.
+    <br><br>
+    <<if _sirrisAtEstate>>
+      "There it is," Sirris says. "I'd have taken that to the shop tomorrow." <<He>> thanks you and checks the stack again.
+    <<elseif _sydneyAtEstate>>
+      Sydney laughs when <<he>> sees the missing page. "That happens every week. Thank you."
+    <<else>>
+      You leave the missing page on top of the sorted papers for Sirris to find.
+    <</if>>
+  <<option 'CN'>>
+    你按课程整理讲义，把店铺收据单独放好。一张画着植物细胞的纸被夹进了账单里，你把它找出来，放回书桌。
+    <br><br>
+    <<if _sirrisAtEstate>>
+      “原来在这里。”西里斯说，“明天我差点就把它带去店里了。”<<He>>向你道谢，又检查了一遍那叠纸。
+    <<elseif _sydneyAtEstate>>
+      悉尼看到失而复得的那一页，笑出了声。“每周都这样。谢谢你。”
+    <<else>>
+      你把失而复得的那页纸放在整理好的讲义上，留给西里斯回来时查看。
+    <</if>>
+<</language>>
+<<scienceskill 1>><<gscience>>
+<br><br>
+<<getouticon>><<lanLink '返回书房' 'Deadwood Reblooms Sirris Estate Study'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Kitchen []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if _sydneyAtEstate>><<npc Sydney>><<person1>><</if>>
+<<language>>
+  <<option 'EN'>>
+    A kettle stands on the stove. Three mismatched mugs dry by the sink, and a list of groceries is pinned above the counter. The kitchen is warm enough to fog the window overlooking the garden.
+    <br><br>
+    <<if _sydneyAtEstate and _sirrisAtEstate>>
+      Sydney is putting the mugs away while Sirris searches a cupboard for biscuits.
+    <<elseif _sydneyAtEstate>>
+      Sydney offers to put the kettle on while you look for the tea.
+    <<elseif _sirrisAtEstate>>
+      Sirris has left the kettle ready to boil.
+    <<else>>
+      The kettle has cooled. No one is in the kitchen.
+    <</if>>
+    <<if _sydneyAtEstate and $sydneySeen.includes('Kylar manor')>>
+      <br><br>
+      Sydney finds an old recipe for <span class='yellow'>apple crumble</span> tucked into the shopping list. "I used to ask my <<sydneyOtherParent>> to make this," <<he>> says. <<He>> folds the paper carefully and puts it back.
+    <</if>>
+  <<option 'CN'>>
+    炉上放着水壶，三只不成套的杯子晾在水槽旁。橱柜上钉着采购清单。厨房暖得让朝向花园的窗户蒙上一层雾。
+    <br><br>
+    <<if _sydneyAtEstate and _sirrisAtEstate>>
+      悉尼正把杯子收起来，西里斯则在橱柜里翻找饼干。
+    <<elseif _sydneyAtEstate>>
+      悉尼说<<he>>来烧水，让你找找茶叶放在哪里。
+    <<elseif _sirrisAtEstate>>
+      西里斯已经把水壶准备好了。
+    <<else>>
+      水壶已经凉了。厨房里没有人。
+    <</if>>
+    <<if _sydneyAtEstate and $sydneySeen.includes('Kylar manor')>>
+      <br><br>
+      悉尼从采购清单里抽出一张旧食谱，上面写着<span class='yellow'>苹果酥</span>的做法。“小时候，我总缠着我<<sydneyOtherParent>>做这个。”<<he>>说。<<He>>小心叠好纸，又把它放了回去。
+    <</if>>
+<</language>>
+<br><br>
+<<if _sydneyAtEstate
+  and isLoveInterest('Sydney')
+  and $sydneySeen.includes('Kylar manor')
+  and Time.hour gte 21 and Time.hour lt 23
+  and $daily.sirrisRecipe isnot Time.days>>
+  <<kitchenicon 'stove'>>
+  <<lanLink '和悉尼照着旧食谱做苹果酥 (0:30)' 'Deadwood Reblooms Sirris Estate Recipe'>><</lanLink>><br>
+<</if>>
+<<if $SydneyExpansion.estate.kitchenDay isnot Time.days>>
+  <<kitchenicon 'stove'>>
+  <<lanLink '帮忙准备茶点 (0:15)' 'Deadwood Reblooms Sirris Estate Kitchen Help'>>
+    <<set $SydneyExpansion.estate.kitchenDay to Time.days>>
+    <<pass 15>>
+  <</lanLink>><br>
+<</if>>
+<<gardenicon>><<lanLink '后花园与温室 (0:01)' 'Deadwood Reblooms Sirris Estate Garden'>><<pass 1>><</lanLink>><br>
+<br>
+<<getouticon>><<lanLink '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Recipe []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<if !_sydneyAtEstate
+  or !isLoveInterest('Sydney')
+  or !$sydneySeen.includes('Kylar manor')
+  or Time.hour lt 21 or Time.hour gte 23
+  or $daily.sirrisRecipe is Time.days>>
+  <<lanSwitch 'Sydney is not free to cook with you now.' '悉尼现在没空和你一起做点心。'>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney lays the old recipe beside two apples and a chipped mixing bowl. The paper is soft from being unfolded so often. "I remember the smell better than the measurements," <<he>> says. Flour dusts the end of <<his>> sleeve.
+      <br><br>
+      <<if _sirrisAtEstate>>
+        Sirris calls from the living room that there is enough butter in the cold cupboard. Sydney looks relieved to have someone else remember that part.
+      <<else>>
+        The house is quiet. Sydney reads each line aloud while you find the ingredients.
+      <</if>>
+    <<option 'CN'>>
+      悉尼把旧食谱摊在两只苹果和一只缺了口的搅拌碗旁。纸被翻得很软。“分量我记不清了。”<<he>>说，“但味道还记得。”面粉沾在<<his>>袖口上。
+      <br><br>
+      <<if _sirrisAtEstate>>
+        西里斯从客厅提醒你们，冷柜里还有黄油。悉尼松了口气，幸好有人记得放在哪里。
+      <<else>>
+        屋里很安静。悉尼一行行读着做法，你照着找齐材料。
+      <</if>>
+  <</language>>
+  <br><br>
+  <<kitchenicon 'stove'>><<lanLink '按食谱慢慢烤' 'Deadwood Reblooms Sirris Estate Recipe Careful'>><</lanLink>><br>
+  <<loveicon>><<lanLink '让悉尼决定调味' 'Deadwood Reblooms Sirris Estate Recipe Sydney'>><</lanLink>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回厨房' 'Deadwood Reblooms Sirris Estate Kitchen'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Recipe Careful []
+<<set _sirrisRecipeStyle to 'careful'>><<include 'Deadwood Reblooms Sirris Estate Recipe Finish'>>
+
+:: Deadwood Reblooms Sirris Estate Recipe Sydney []
+<<set _sirrisRecipeStyle to 'sydney'>><<include 'Deadwood Reblooms Sirris Estate Recipe Finish'>>
+
+:: Deadwood Reblooms Sirris Estate Recipe Finish []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<if _sydneyAtEstate and Time.hour gte 21 and Time.hour lt 23 and $daily.sirrisRecipe isnot Time.days>>
+  <<set $daily.sirrisRecipe to Time.days>>
+  <<if _sirrisRecipeStyle is 'careful'>>
+    <<lanSwitch 'You measure each spoonful while Sydney cuts the apples. The crust browns evenly. Sydney sets three plates on the table when Sirris is home, and two when you are alone together.' '你量好每一勺材料，悉尼负责切苹果。酥皮烤得色泽均匀。西里斯在家时，悉尼摆出三只盘子。家里只有你们时，桌上便只有两只。'>>
+    <<scienceskill 1>><<gscience>>
+  <<else>>
+    <<lanSwitch 'Sydney adds a little extra cinnamon, tastes the filling and asks you to try it. The crumble comes out uneven at the edges, but Sydney takes the first bite with a shy smile.' '悉尼多撒了一点肉桂，尝过馅料，又让你尝尝。苹果酥的边缘烤得不太齐整，悉尼却红着脸先吃了一口。'>>
+    <<npcincr Sydney love 2>><<glove>>
+  <</if>>
+  <br><br>
+  <<if _sydneyStatus.includes('pure')>>
+    <span class='teal'><<lanSwitch 'Sydney saves the recipe under a clean plate, ready for another day.' '悉尼把食谱压在干净的盘子下，留着下次再做。'>></span>
+  <<elseif _sydneyStatus.includes('corrupt')>>
+    <span class='lewd'><<lanSwitch 'Sydney brushes a crumb from your lip with a finger, then licks it away.' '悉尼用手指抹去你唇边的碎屑，又舔了舔指尖。'>></span>
+  <</if>>
+  <<stress -3>><<lstress>><<pass 30>>
+<<else>>
+  <<lanSwitch 'The kitchen is quiet again.' '厨房又安静了下来。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回厨房' 'Deadwood Reblooms Sirris Estate Kitchen'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Kitchen Help []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<language>>
+  <<option 'EN'>>
+    You fill the kettle and set out the mugs. By the time the tea has brewed, there is enough for everyone at home.
+    <br><br>
+    <<if _sydneyAtEstate>>
+      Sydney nudges a biscuit toward you. "<span class='teal'>You helped. You get the first one.</span>"
+    <<elseif _sirrisAtEstate>>
+      Sirris takes a cup and thanks you for saving <<nnpc_him 'Sirris'>> a little work.
+    <<else>>
+      You leave the remaining tea in the pot for when they return.
+    <</if>>
+  <<option 'CN'>>
+    你给水壶添满水，摆好杯子。茶泡好时，屋里的人每人都能分到一杯。
+    <br><br>
+    <<if _sydneyAtEstate>>
+      悉尼把一块饼干推到你面前。“<span class='teal'>你帮了忙，第一块归你。</span>”
+    <<elseif _sirrisAtEstate>>
+      西里斯接过茶，谢你替<<nnpc_him 'Sirris'>>省了一会儿工夫。
+    <<else>>
+      你把剩下的茶留在壶里，等他们回来再喝。
+    <</if>>
+<</language>>
+<<stress -2>><<lstress>>
+<br><br>
+<<getouticon>><<lanLink '返回厨房' 'Deadwood Reblooms Sirris Estate Kitchen'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Garden []
+<<set $outside to 1>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if _sydneyAtEstate>><<npc Sydney>><<person1>><</if>>
+<<language>>
+  <<option 'EN'>>
+    A narrow glasshouse stands at the end of the back garden. Seed trays line its shelves, each marked in careful handwriting. The path is clear of weeds, though moss has taken hold between the old stones.
+    <br><br>
+    <<if _sydneyAtEstate>>
+      Sydney checks the soil in one of the trays. "We used to start seedlings here before planting them outside," <<he>> says.
+    <<elseif _sirrisAtEstate>>
+      Sirris is reading the labels, trying to remember which tray was planted first.
+    <<else>>
+      The glasshouse is quiet. The watering can is still by the door.
+    <</if>>
+  <<option 'CN'>>
+    后花园尽头有一间不大的玻璃温室。架上的育苗盘都贴着字迹工整的标签。石板缝间生了青苔，小路上的杂草却被拔得干干净净。
+    <br><br>
+    <<if _sydneyAtEstate>>
+      悉尼摸了摸一只育苗盘里的土。“以前我们会先在这里育苗，再把它们移到外面。”<<he>>说。
+    <<elseif _sirrisAtEstate>>
+      西里斯正挨个看标签，回想哪一盘是最早种下的。
+    <<else>>
+      温室里静悄悄的。水壶还放在门边。
+    <</if>>
+<</language>>
+<br><br>
+<<if $SydneyExpansion.estate.gardenDay isnot Time.days>>
+  <<gardenicon>>
+  <<lanLink '给育苗盘浇水 (0:20)' 'Deadwood Reblooms Sirris Estate Garden Help'>>
+    <<set $SydneyExpansion.estate.gardenDay to Time.days>>
+    <<pass 20>>
+  <</lanLink>><br>
+<</if>>
+<br>
+<<kitchenicon 'stove'>><<lanLink '返回厨房 (0:01)' 'Deadwood Reblooms Sirris Estate Kitchen'>><<pass 1>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Garden Help []
+<<set $outside to 1>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<language>>
+  <<option 'EN'>>
+    You check the labels before watering each tray. A thin stream of water darkens the soil without washing the seeds free. You put the can back by the door when you're done.
+    <br><br>
+    <<if _sydneyAtEstate>>
+      Sydney checks your work and smiles. "<span class='green'>They'll be all right until tomorrow.</span>"
+    <<elseif _sirrisAtEstate>>
+      Sirris thanks you, then moves the smallest tray toward the light.
+    <<else>>
+      You move the smallest tray toward the light before leaving.
+    <</if>>
+  <<option 'CN'>>
+    你先核对标签，再给每盘苗浇水。细细的水流润湿泥土，没有把种子冲走。忙完后，你把水壶放回门边。
+    <br><br>
+    <<if _sydneyAtEstate>>
+      悉尼检查了你的成果，笑了。“<span class='green'>它们明天也会好好的。</span>”
+    <<elseif _sirrisAtEstate>>
+      西里斯向你道谢，把最小的育苗盘移到阳光下。
+    <<else>>
+      离开前，你把最小的育苗盘移到阳光下。
+    <</if>>
+<</language>>
+<<tending 1>><<gtending>>
+<br><br>
+<<getouticon>><<lanLink '返回温室' 'Deadwood Reblooms Sirris Estate Garden'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Sydney Room []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if !_sydneyAtEstate or !isLoveInterest('Sydney')>>
+  <<lanSwitch "Sydney isn't in the room. You leave it as you found it." '悉尼不在房间里。你把东西放回原处，准备离开。'>><br><br>
+  <<getouticon>><<lanLink '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</lanLink>>
+<<else>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney's room has a narrow bed, a desk and more books than the shelves will hold. A school project from years ago rests against the wall. Some things are left exactly where <<he>> put them before moving between school and the temple.
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        "I still come back here," <<he>> says, smoothing a page on the desk. "It helps to remember I have somewhere else to go."
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        Sydney closes the door partway and sits beside you. "<<nnpc_Mum 'Sirris'>> knows you're here," <<he>> says with a smile. "We don't have to whisper."
+      <<else>>
+        Sydney finds a place for you among the books. "I never seem to take enough of them back to the temple," <<he>> admits.
+      <</if>>
+      <<if $SydneyExpansion.estate.familyTalk>>
+        <br><br>
+        <<if $SydneyExpansion.estate.familyTalk is 'listen'>>
+          "I meant what I said downstairs," <<he>> adds. <span class='teal'>"Thank you for giving me time to say it."</span>
+        <<else>>
+          Sydney touches your hand. <span class='teal'>"I know you'll stand beside me. I won't forget to tell you what I need."</span>
+        <</if>>
+      <</if>>
+    <<option 'CN'>>
+      悉尼的房间里有一张窄床、一张书桌，还有书架装不下的书。几年前的学校作品靠墙放着。<<He>>在学校和神殿间来回奔忙时，有些东西仍留在原处。
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        “我还是会回来。”<<he>>抚平桌上的一页纸，“记得自己还有另一个能去的地方，总会安心些。”
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        悉尼把门虚掩着，在你身边坐下。“<<nnpc_Mum 'Sirris'>>知道你来了。”<<he>>笑道，“不用说悄悄话。”
+      <<else>>
+        悉尼挪开几本书，给你腾出位置。“我每次带去神殿的书都不够。”<<he>>承认道。
+      <</if>>
+      <<if $SydneyExpansion.estate.familyTalk>>
+        <br><br>
+        <<if $SydneyExpansion.estate.familyTalk is 'listen'>>
+          “我刚才在楼下说的，都是真心话。”<<he>>又说，<span class='teal'>“谢谢你给我时间说出来。”</span>
+        <<else>>
+          悉尼碰了碰你的手。<span class='teal'>“我知道你会陪着我。我也会记得告诉你，我自己需要什么。”</span>
+        <</if>>
+      <</if>>
+  <</language>>
+  <br><br>
+  <<if $SydneyExpansion.estate.roomDay isnot Time.days>>
+    <<loveicon 'kiss'>>
+    <<lanLink '在床边吻悉尼 (0:10)' 'Deadwood Reblooms Sirris Estate Sydney Kiss'>>
+      <<set $SydneyExpansion.estate.roomDay to Time.days>>
+      <<pass 10>>
+    <</lanLink>><<promiscuous1>><br>
+  <</if>>
+  <<loveicon>>
+  <<lanLink '与悉尼单独待一会儿 (0:05)' 'Deadwood Reblooms Sirris Estate Sydney Privacy'>>
+    <<pass 5>>
+  <</lanLink>><br>
+  <<if $earSlime.event and $earSlime.noSleep>>
+    <span class='red'><<lanSwitch 'The slime will not let you sleep yet.' '史莱姆现在不让你睡觉。'>></span><br>
+  <<else>>
+    <<bedicon>>
+    <<lanLink '脱衣钻进悉尼的被窝' 'Deadwood Reblooms Sirris Estate Sydney Bed'>>
+      <<undressSleep 'sirris estate bed'>>
+    <</lanLink>><br>
+    <<if !$earSlime.alwaysSleepNaked or $hypnosis_traits.silence>>
+      <<set $storeLocation to 'sirris estate bed'>>
+      <<set $wardrobe_location to 'wardrobe'>><<wardrobeSelection true>>
+      <<for _index, _outfit range $outfit>>
+        <<if _outfit.type.includes('sleep')>>
+          <<capture _index>>
+            <<bedicon>>
+            <<lanLink '换上睡衣并钻进悉尼的被窝' 'Deadwood Reblooms Sirris Estate Sydney Bed'>>
+              <<set $wear_outfit to _index>><<saveTempHairStyle>>
+            <</lanLink>><br>
+          <</capture>>
+        <</if>>
+      <</for>>
+    <</if>>
+  <</if>>
+  <br>
+  <<getouticon>><<lanLink '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Sirris Estate Sydney Bed []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>><<wearoutfit>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if !_sydneyAtEstate or !isLoveInterest('Sydney')>>
+  <<lanSwitch 'Sydney has left the house. You pull back the covers and get up.' '悉尼已经离开了。你掀开被子，起身下床。'>>
+  <br><br>
+  <<bedicon>>
+  <<lanLink '起床' 'Deadwood Reblooms Sirris Estate Sydney Room'>>
+    <<storeon 'sirris estate bed'>><<loadTempHairStyle>>
+  <</lanLink>>
+<<else>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      You settle into Sydney's narrow bed. <<He>> shifts a stack of books away from your pillow and draws the blanket over both of you.
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        "Is there enough room?" <<he>> asks, making space for you before resting <<his>> head against yours.
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        "<span class='lewd'>You're staying, then.</span>" <<He>> presses close, smiling when you try to find room for your legs.
+      <<else>>
+        Sydney draws the curtain. "We can stay here a while," <<he>> says, taking your hand beneath the blanket.
+      <</if>>
+    <<option 'CN'>>
+      你钻进悉尼的窄床。<<He>>挪开枕边的一摞书，拉起被子盖住你们两人。
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        “挤吗？”<<he>>问，往旁边让了让，才把头轻轻靠向你。
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        “<span class='lewd'>看来你要留下了。</span>”<<He>>挨了过来。你试着安放双腿时，<<he>>忍不住笑了。
+      <<else>>
+        悉尼拉上窗帘。“我们可以多待一会儿。”<<he>>说，在被子底下握住你的手。
+      <</if>>
+  <</language>>
+  <br><br>
+  <<nightmareCheck 'Deadwood Reblooms Sirris Estate Sydney Sleep'>>
+  <<generateSleepLinks 'Deadwood Reblooms Sirris Estate Sydney Sleep'>>
+  <<bedicon>>
+  <<lanLink '起床' 'Deadwood Reblooms Sirris Estate Sydney Room'>>
+    <<storeon 'sirris estate bed'>><<loadTempHairStyle>>
+  <</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Sirris Estate Sydney Sleep []
+<<set $outside to 0>><<set $location to 'sirris_estate'>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<set _requestedHours to $sleephour>>
+<<set _nightWake to _sydneyAtEstate
+  and isLoveInterest('Sydney')
+  and _requestedHours gte 3
+  and (Time.hour gte 22 or Time.hour lt 3)
+  and !$daily.sydney.nightWake
+  and $nightmares lte 0
+  and random(1, 8) is 1>>
+<<if _nightWake>><<set $sleephour to random(1, Math.min(2, _requestedHours - 1))>><</if>>
+<<set $bedGuest to 'Sydney'>><<set _autosavehere to true>>
+<<sleep>>
+<<if !_dreaming>>
+  <<effects>><<wakingEffects $sleepHoursTotal>>
+  <<deadwood-reblooms-sirris-estate-presence>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<set _nightWake to _nightWake
+    and _sydneyAtEstate
+    and !_wakingEffect
+    and $sleepHoursTotal gte 1
+    and (Time.hour gte 23 or Time.hour lt 6)>>
+  <<if _nightWake>>
+    <<set $daily.sydney.nightWake to 1>>
+    <<set $sleephour to Math.max(1, _requestedHours - $sleepHoursTotal)>>
+    <<sleepeffects>>
+    <<lanSwitch 'The narrow bed shifts beneath you. You wake before dawn.' '窄床在身下轻轻一晃。天还没亮，你便醒了。'>>
+    <br><br>
+    <<bedicon>><<lanLink '睁开眼' 'Deadwood Reblooms Sirris Estate Sydney Night Wake'>><</lanLink>>
+  <<else>>
+  <<if $nightmares gte 1 and $controlled is 0>>
+    <<nightmareWake>>
+  <<elseif !$wakingEffect>>
+    <<language>>
+      <<option 'EN'>>
+        You wake beneath Sydney's blanket.
+        <<if Time.dayState is 'night'>>
+          A sliver of light falls across the desk.
+        <<else>>
+          Daylight falls across the books on the desk.
+        <</if>>
+        <br><br>
+        <<if _sydneyAtEstate>>
+          Sydney is still beside you. <<He>> reaches over you to rescue a book slipping from the bed, then settles back under the covers.
+        <<else>>
+          Sydney has gone to <<his>> duties. <<He>> left the blanket tucked around you and a note beside the lamp: <span class='teal'>"See you soon."</span>
+        <</if>>
+      <<option 'CN'>>
+        你在悉尼的被子下醒来。
+        <<if Time.dayState is 'night'>>
+          一线微光落在书桌上。
+        <<else>>
+          日光落在书桌上的书脊间。
+        <</if>>
+        <br><br>
+        <<if _sydneyAtEstate>>
+          悉尼仍在你身旁。一本书快从床沿滑下，<<he>>越过你把它接住，又缩回被子里。
+        <<else>>
+          悉尼已经去忙今天的事了。<<He>>替你掖好了被角，还在床头灯旁留下一张字条：<span class='teal'>“回头见。”</span>
+        <</if>>
+    <</language>>
+    <br><br>
+  <</if>>
+  <<sleepeffects>>
+  <<bedicon>>
+  <<lanLink '起床' 'Deadwood Reblooms Sirris Estate Sydney Room'>>
+    <<storeon 'sirris estate bed'>><<loadTempHairStyle>>
+  <</lanLink>>
+  <</if>>
+  <<set $phase to 0>>
+<</if>>
+
+:: Deadwood Reblooms Sirris Estate Sydney Night Wake []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if !_sydneyAtEstate or !isLoveInterest('Sydney')>>
+  <<lanSwitch 'Sydney has left. The other side of the bed is empty.' '悉尼已经离开。床的另一侧空了。'>>
+  <br><br>
+  <<getouticon>>
+  <<lanLink '起床' 'Deadwood Reblooms Sirris Estate Sydney Room'>>
+    <<set $sleephour to 0>>
+    <<storeon 'sirris estate bed'>><<loadTempHairStyle>>
+  <</lanLink>>
+<<else>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney has turned toward you in <<his>> sleep. When you stir, <<he>> opens <<his>> eyes and draws the blanket back over your shoulder. A floorboard creaks somewhere below.
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        "<span class='teal'>I didn't mean to wake you.</span>" <<He>> waits for the house to grow quiet before taking your hand.
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        Sydney brushes <<his>> lips against your ear. "<span class='lewd'>We're both awake now.</span>" <<He>> waits to see if you draw closer.
+      <<else>>
+        "I thought you were still dreaming," <<he>> says with a small smile, keeping one hand beneath yours.
+      <</if>>
+    <<option 'CN'>>
+      悉尼在梦里翻身朝向你。你一动，<<he>>便睁开眼，把被子重新拉到你的肩头。楼下有块地板轻轻响了一声。
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        “<span class='teal'>我不是故意吵醒你的。</span>”<<He>>等屋里安静下来，才握住你的手。
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        悉尼的唇轻轻擦过你的耳边。“<span class='lewd'>这下我们都醒了。</span>”<<He>>等着看你会不会靠近。
+      <<else>>
+        “我还以为你在做梦。”<<he>>轻声笑了，仍把一只手放在你的手下。
+      <</if>>
+  <</language>>
+  <br><br>
+  <<loveicon>>
+  <<lanLink '与悉尼做爱' 'Deadwood Reblooms Sirris Estate Sydney Intimacy'>>
+    <<set $sleephour to 0>><<set $sexstart to 1>>
+  <</lanLink>><<promiscuous1>><br>
+  <<bedicon>>
+  <<lanLink '继续睡觉' 'Deadwood Reblooms Sirris Estate Sydney Sleep'>><</lanLink>><br>
+  <<getouticon>>
+  <<lanLink '起床' 'Deadwood Reblooms Sirris Estate Sydney Room'>>
+    <<set $sleephour to 0>>
+    <<storeon 'sirris estate bed'>><<loadTempHairStyle>>
+  <</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Sirris Estate Sydney Kiss []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<language>>
+  <<option 'EN'>>
+    You sit close and kiss Sydney. <<He>> takes your hand, waiting until you draw nearer before kissing you again.
+    <br><br>
+    <<if _sydneyStatus.includes('pure')>>
+      "<span class='teal'>I'm glad you came here with me</span>," <<he>> says. <<He>> leaves <<his>> hand in yours.
+    <<elseif _sydneyStatus.includes('corrupt')>>
+      Sydney smiles against your lips. "<span class='lewd'>I was wondering when you'd do that.</span>" <<He>> listens for footsteps, then kisses you once more.
+    <<else>>
+      Sydney glances at the door and laughs quietly. "I thought I'd be more nervous."
+    <</if>>
+  <<option 'CN'>>
+    你挨着悉尼坐下，吻了<<him>>。<<He>>握住你的手，等你靠近，才又回吻过来。
+    <br><br>
+    <<if _sydneyStatus.includes('pure')>>
+      “<span class='teal'>我很高兴你陪我来这里。</span>”<<he>>说，仍握着你的手。
+    <<elseif _sydneyStatus.includes('corrupt')>>
+      悉尼贴着你的嘴唇笑了。“<span class='lewd'>我还在想，你什么时候才会亲我。</span>”<<He>>听了听门外的脚步声，又吻了你一次。
+    <<else>>
+      悉尼瞥了眼房门，轻声笑道。“我还以为自己会更紧张呢。”
+    <</if>>
+<</language>>
+<<npcincr Sydney love 1>><<glove>>
+<br><br>
+<<getouticon>><<lanLink '继续' 'Deadwood Reblooms Sirris Estate Sydney Room'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Sydney Privacy []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<language>>
+  <<option 'EN'>>
+    Sydney closes the bedroom door and puts the book in <<his>> hands on the desk. <<He>> moves the loose papers aside so you can sit together on the bed.
+    <br><br>
+    <<if _sirrisAtEstate>>
+      You hear Sirris downstairs. Sydney waits until the footsteps pass, then turns back to you.
+    <<else>>
+      The house is quiet. Sydney takes your hand and draws you closer.
+    <</if>>
+    <br><br>
+    <<if _sydneyStatus.includes('pure')>>
+      "<span class='teal'>We can take our time</span>," <<he>> says. <<He>> watches your face, waiting for you to decide.
+    <<elseif _sydneyStatus.includes('corrupt')>>
+      Sydney catches your sleeve before you can move away. "<span class='lewd'>I didn't bring you up here just to look at my books.</span>" <<He>> smiles and waits for your answer.
+    <<else>>
+      "I wanted a little more time with you," <<he>> admits, leaving <<his>> hand in yours.
+    <</if>>
+  <<option 'CN'>>
+    悉尼关上卧室门，把手里的书放到桌上，又挪开散落的纸张，让你们能一起坐在床边。
+    <br><br>
+    <<if _sirrisAtEstate>>
+      楼下传来西里斯的脚步声。悉尼等声音远了，才重新看向你。
+    <<else>>
+      屋里很安静。悉尼握住你的手，把你拉近了些。
+    <</if>>
+    <br><br>
+    <<if _sydneyStatus.includes('pure')>>
+      “<span class='teal'>我们可以慢慢来。</span>”<<he>>说，望着你的脸，等你自己做决定。
+    <<elseif _sydneyStatus.includes('corrupt')>>
+      悉尼勾住你的衣袖，不让你走开。“<span class='lewd'>带你上来，可不是只为了看书。</span>”<<He>>笑着等你回答。
+    <<else>>
+      “我还想和你单独待一会儿。”<<he>>说，没有松开你的手。
+    <</if>>
+<</language>>
+<br><br>
+<<loveicon>>
+<<lanLink '与悉尼做爱' 'Deadwood Reblooms Sirris Estate Sydney Intimacy'>>
+  <<set $sexstart to 1>>
+<</lanLink>><<promiscuous1>><br>
+<<getouticon>><<lanLink '到此为止' 'Deadwood Reblooms Sirris Estate Sydney Room'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris Estate Sydney Intimacy []
+<<set $outside to 0>><<set $location to 'sirris_estate'>>
+<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<!-- 与原版悉尼的自愿遭遇战共用首次进入、循环动作和结算契约。 -->
+<<if $sexstart is 1>>
+  <<set $sexstart to 0>>
+  <<set $daily.sydney.sex to ($daily.sydney.sex || 0) + 1>>
+  <<set $sydney.sexTotal += 1>>
+  <<consensual>><<set $consensual to 1>><<neutral 1>><<maninit>>
+  <<if _sydneyStatus.includes('corrupt')>>
+    <<npcexpose>>
+  <<else>>
+    <<npcClothesType $NPCList[0] 'undies'>>
+  <</if>>
+  <<set $enemytrust += 500>>
+  <<set $enemyarousalmax to 600>>
+  <<if _sydneyStatus.includes('corrupt')>>
+    <<set $enemyarousalmax += 100>>
+  <<elseif _sydneyStatus.includes('pure')>>
+    <<set $enemyarousalmax -= 100>>
+  <</if>>
+  <<if _sydneyChastity and C.npc.Sydney.chastity.anus.includes('shield')>>
+    <<set $enemyarousalmax -= 100>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $passagePrev is 'Deadwood Reblooms Sirris Estate Sydney Night Wake'>>
+        Sydney checks that you want to stay close. <<He>> waits for your answer before kissing you beneath the blanket. The rest of the house is quiet.
+      <<else>>
+        Sydney checks that you still want to continue before drawing you onto the bed. The papers on the desk stir in the draught from the window.
+      <</if>>
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        "<span class='teal'>Tell me if you want to stop</span>," <<he>> whispers.
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        "<span class='lewd'>You really did stay</span>," <<he>> murmurs with a smile, pulling you close.
+      <<else>>
+        Sydney takes a breath and kisses you, still holding your hand.
+      <</if>>
+    <<option 'CN'>>
+      <<if $passagePrev is 'Deadwood Reblooms Sirris Estate Sydney Night Wake'>>
+        悉尼确认你想继续靠近，等你回答，才在被子下吻了过来。屋里其余地方静悄悄的。
+      <<else>>
+        悉尼确认你仍愿意继续，才把你带到床上。窗缝透进的风轻轻吹动书桌上的纸张。
+      <</if>>
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        “<span class='teal'>想停的话，告诉我。</span>”<<he>>轻声说。
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        “<span class='lewd'>你还真留下了。</span>”<<he>>笑着说，把你拉近。
+      <<else>>
+        悉尼深吸一口气，仍握着你的手，吻了过来。
+      <</if>>
+  <</language>>
+  <<if _sydneyChastity and $sydneyChastityKnown>>
+    <br><br><span class='teal'>
+      <<lanSwitch "As Sydney settles beside you, you feel the familiar lock at Sydney's waist. Sydney sees that you have noticed and leaves your hand there." '悉尼在你身旁躺下时，你碰到那枚熟悉的腰间锁扣。悉尼知道你察觉了，仍让你的手留在那里。'>>
+    </span>
+  <<elseif _sydneyChastity>>
+    <br><br><span class='lewd'>
+      <<lanSwitch "Your fingers brush something hard beneath Sydney's clothes. Sydney catches your hand and waits for you to look up." '你的指尖隔着悉尼的衣服碰到硬物。悉尼握住你的手，等你抬头看过来。'>>
+    </span>
+  <<elseif $sydneyChastityKnown>>
+    <br><br><span class='teal'>
+      <<lanSwitch "The lock you remember is gone. Sydney draws you closer without its metal edge between you." '你记得的锁扣已经不在了。悉尼把你拉近，腰间再没有那道金属边缘。'>>
+    </span>
+  <</if>>
+  <br><br>
+<</if>>
+<<set $enemyanger to -10>>
+<<effects>><<effectsman>>
+<<man>><<stateman>>
+<br><br>
+<<actionsman>>
+<<if _combatend>>
+  <span id='next'>
+    <<lanLink '继续' 'Deadwood Reblooms Sirris Estate Sydney Intimacy Finish'>><</lanLink>>
+  </span><<nexttext>>
+<<else>>
+  <span id='next'>
+    <<lanLink '继续' 'Deadwood Reblooms Sirris Estate Sydney Intimacy'>><</lanLink>>
+  </span><<nexttext>>
+<</if>>
+
+:: Deadwood Reblooms Sirris Estate Sydney Intimacy Finish []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<if $enemyarousal gte $enemyarousalmax>>
+  <<ejaculation>>
+  <<if _sydneyChastity and $sydneyChastityKnown>>
+    <<sydneyChastityMessage>><<npcincr Sydney lust 3>><<ggslust>>
+  <<else>>
+    <<npcincr Sydney lust -20>><<lllslust>>
+  <</if>>
+  <<npcincr Sydney purity -2>><<lspurity>>
+  <<npcincr Sydney love 1>><<glove>>
+  <<sydneyFinish>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney stays close while you catch your breath, then pulls the blanket back over the bed. "<span class='teal'>I'm glad you came home with me</span>," <<he>> says, resting <<his>> head against yours.
+    <<option 'CN'>>
+      你们平复呼吸时，悉尼仍挨着你，随后才把毯子重新拉好。“<span class='teal'>我很高兴你陪我回家。</span>”<<he>>说，轻轻靠着你的头。
+  <</language>>
+<<elseif $enemyhealth lte 0>>
+  <<npcincr Sydney love -1>><<llove>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney pulls away and asks you to stop. You give <<him>> space and help straighten the bedding.
+    <<option 'CN'>>
+      悉尼躲开，请你停下。你给<<him>>留出位置，帮<<him>>整理好床铺。
+  <</language>>
+<<else>>
+  <<npcincr Sydney lust 5>><<gglust>>
+  <<npcincr Sydney love 1>><<glove>>
+  <<lanSwitch 'You stop. Sydney nods and remains beside you for a moment, still holding your hand.' '你停了下来。悉尼点点头，仍握着你的手，在你身边多待了一会儿。'>>
+<</if>>
+<br><br>
+<<clotheson>><<endcombat>><<npc Sydney>><<person1>>
+<<storeon 'sirris estate bed'>><<loadTempHairStyle>>
+<<getouticon>><<lanLink '继续' 'Deadwood Reblooms Sirris Estate Sydney Room'>><</lanLink>>

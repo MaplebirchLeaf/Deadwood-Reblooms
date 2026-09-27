@@ -7,6 +7,7 @@ import NPCSidebarPortrait from './NPCSidebarPortrait';
 import VanillaPlus from './VanillaPlus';
 import LifeSimulation from './LifeSimulation';
 import SydneyExpansion from './SydneyExpansion';
+import RobinExpansion from './RobinExpansion';
 
 (function (maplebirch): void {
   'use strict';
@@ -20,5 +21,6 @@ import SydneyExpansion from './SydneyExpansion';
   if (maplebirch.get('NPCSidebarPortrait')) NPCSidebarPortrait(maplebirch);
   if (maplebirch.get('VP')) VanillaPlus(maplebirch);
   if (maplebirch.get('SydneyExpansion')) SydneyExpansion(maplebirch);
+  if (maplebirch.get('RobinExpansion')) RobinExpansion(maplebirch);
   if (maplebirch.get('LS')) LifeSimulation(maplebirch);
 })(maplebirch);

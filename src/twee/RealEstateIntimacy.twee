@@ -1,3 +1,74 @@
+:: Deadwood Reblooms Property Night Wake []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<set _partner to maplebirch.VP.realEstate.currentCompanion>>
+<<if !_property || !_partner || !maplebirch.VP.realEstate.residentsHome(_property.id).some(resident => resident.id === _partner.id)>>
+	<<lanSwitch 'The other side of the bed is empty. You pull the covers close.' '床的另一侧空了。你把被子拉回身上。'>>
+	<br><br>
+	<<getouticon>><<lanLink '起床' 'Deadwood Reblooms Property Bedroom'>><<set $sleephour to 0>><<deadwood-reblooms-property-clothes-on>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>>
+	<<npc _partner.id>><<person1>><<run statusCheck(_partner.id)>>
+	<<language>>
+		<<option 'EN'>>
+			<<switch _partner.id>>
+				<<case 'Robin'>>
+					<<if C.npc.Robin.trauma gte 50>>
+						Robin wakes with a start, gripping the edge of the blanket. <<He>> lets go when <<he>> recognises you. You hold out your hand, and <<he>> takes it while <<his>> breathing slows.
+						<br><br>
+						"<span class='teal'>Stay until I fall asleep?</span>" <<he>> asks.
+					<<else>>
+						Robin has woken before you. <<He>> brushes your hair aside and leans in when you open your eyes. "<span class='lewd'>I was trying not to wake you.</span>"
+					<</if>>
+				<<case 'Whitney'>>
+					Whitney's arm rests across your waist. <<He>> notices you're awake and draws you nearer. "<span class='lewd'>Couldn't sleep either?</span>" <<he>> murmurs, close enough to kiss.
+				<<case 'Kylar'>>
+					Kylar says your name in <<his>> sleep. When you touch <<his>> hand, <<he>> wakes and loosens <<his>> grip. "<span class='teal'>You're still here.</span>" <<He>> looks at you for an answer before moving closer.
+				<<case 'Sydney'>>
+					Sydney's temple pendant catches a little light on the bedside table. <<He>> has woken too and is watching you.
+					<<if _sydneyStatus.includes('corrupt')>>
+						"<span class='lewd'>We don't have to go back to sleep yet,</span>" <<he>> whispers.
+					<<else>>
+						"<span class='teal'>Would you like me to stay awake with you?</span>" <<he>> asks.
+					<</if>>
+			<</switch>>
+		<<option 'CN'>>
+			<<switch _partner.id>>
+				<<case 'Robin'>>
+					<<if C.npc.Robin.trauma gte 50>>
+						罗宾猛地醒来，紧抓着被角。认出你后，<<he>>才松开手。你伸出手，<<he>>握住了，呼吸也渐渐平稳。
+						<br><br>
+						“<span class='teal'>等我睡着再松手，好吗？</span>”<<he>>问。
+					<<else>>
+						罗宾比你先醒。你睁开眼时，<<he>>拨开你脸旁的头发，靠近了些。“<span class='lewd'>我本来不想吵醒你的。</span>”
+					<</if>>
+				<<case 'Whitney'>>
+					惠特尼的手臂搭在你腰上。见你醒来，<<he>>又把你拉近。“<span class='lewd'>你也睡不着？</span>”<<he>>轻声问，近得几乎要吻上来。
+				<<case 'Kylar'>>
+					凯拉尔在梦里叫了你的名字。你碰了碰<<his>>的手，<<he>>醒过来，松开攥着你的手。“<span class='teal'>你还在。</span>”<<He>>望着你，等你回应后才往你身边挪。
+				<<case 'Sydney'>>
+					床头的神殿吊坠映着一点微光。悉尼也醒了，正望着你。
+					<<if _sydneyStatus.includes('corrupt')>>
+						“<span class='lewd'>我们不急着再睡。</span>”<<he>>贴近你，小声说。
+					<<else>>
+						“<span class='teal'>要我陪你醒一会儿吗？</span>”<<he>>问。
+					<</if>>
+			<</switch>>
+	<</language>>
+	<br><br>
+	<<if _partner.id isnot 'Robin' or C.npc.Robin.trauma lt 50>>
+		<<loveicon>>
+		<<lanLink '和恋人做爱' 'Deadwood Reblooms Property Intimacy'>>
+			<<set $sleephour to 0>><<set $sexstart to 1>>
+		<</lanLink>><<promiscuous1>><br>
+	<</if>>
+	<<bedicon>>
+	<<lanLink '继续睡觉' 'Deadwood Reblooms Property Sleep'>><</lanLink>><br>
+	<<getouticon>>
+	<<lanLink '起床' 'Deadwood Reblooms Property Bedroom'>>
+		<<set $sleephour to 0>><<deadwood-reblooms-property-clothes-on>>
+	<</lanLink>>
+<</if>>
+
 :: Deadwood Reblooms Property Intimacy []
 <!-- 入口已从当晚在家的同住者中选人。战斗回合跨过起床时间后，继续使用当前存档里选中的同一人。 -->
 <<set _property to maplebirch.VP.realEstate.current>>
@@ -16,64 +87,65 @@
 		<<set $consensual to 1>>
 		<<neutral 1>>
 		<<if $exposed lt 2>>
-			<<lanSwitch 'You slip out of your clothes.' '你脱下衣服。'>><<strip>><br><br>
+			<span class='lewd'><<lanSwitch 'You slip out of your clothes.' '你脱下衣服。'>></span><<strip>><br><br>
 		<</if>>
 		<<maninit>>
 		<<set $enemytrust += 500>>
 		<<set $enemyarousalmax to 600>>
 		<<npckiss>>
-		<<language>>
-			<<option 'EN'>>You close the bedroom door and turn to <<him>>.
-			<<option 'CN'>>你关上卧室门，转身看向<<him>>。
-		<</language>>
+		<<if $passagePrev is 'Deadwood Reblooms Property Night Wake'>>
+			<<lanSwitch 'You turn toward your lover beneath the covers.' '你在被子下转过身，面向身边的恋人。'>>
+		<<else>>
+			<<lanSwitch 'You close the bedroom door and turn to them.' '你关上卧室门，转身看向对方。'>>
+		<</if>>
 		<br><br>
 		<<switch _partner.id>>
 			<<case 'Robin'>>
 				<<if C.npc.Robin.trauma gte 20>>
 					<<language>>
-						<<option 'EN'>>"We can take our time," Robin says. <<He>> waits for you to come closer before kissing you.
-						<<option 'CN'>>“我们可以慢慢来。”罗宾等你靠近，才吻了你。
+						<<option 'EN'>>"We can take our time," Robin says. <<He>> waits for you to come closer before <span class='lewd'>kissing you</span>.
+						<<option 'CN'>>“我们可以慢慢来。”罗宾等你靠近，才<span class='lewd'>吻了你</span>。
 					<</language>>
 				<<else>>
 					<<language>>
-						<<option 'EN'>>Robin smiles and pulls you down beside <<him>>. "I've been waiting for you."
-						<<option 'CN'>>罗宾笑着把你拉到身边。“我一直在等你。”
+						<<option 'EN'>>Robin smiles and pulls you down beside <<him>>. "<span class='lewd'>I've been waiting for you.</span>"
+						<<option 'CN'>>罗宾笑着把你拉到身边。“<span class='lewd'>我一直在等你。</span>”
 					<</language>>
 				<</if>>
 			<<case 'Whitney'>>
 				<<if C.npc.Whitney.dom gte 50>>
 					<<language>>
-						<<option 'EN'>>"About time," Whitney says, tugging you onto the bed. <<He>> kisses you before you can reply.
-						<<option 'CN'>>“早该这样了。”惠特尼把你拉到床上，没等你回答便吻了过来。
+						<<option 'EN'>>"About time," Whitney says, tugging you onto the bed. <<He>> <span class='lewd'>kisses you before you can reply</span>.
+						<<option 'CN'>>“早该这样了。”惠特尼把你拉到床上，<span class='lewd'>没等你回答便吻了过来</span>。
 					<</language>>
 				<<else>>
 					<<language>>
-						<<option 'EN'>>Whitney sits beside you and brushes your hand with <<his>>. "You sure?" <<He>> kisses you when you nod.
-						<<option 'CN'>>惠特尼挨着你坐下，手指碰了碰你的手。“你确定？”你点头后，<<he>>吻了你。
+						<<option 'EN'>>Whitney sits beside you and brushes your hand with <<his>>. "<span class='teal'>You sure?</span>" <<He>> kisses you when you nod.
+						<<option 'CN'>>惠特尼挨着你坐下，手指碰了碰你的手。“<span class='teal'>你确定？</span>”你点头后，<<he>>吻了你。
 					<</language>>
 				<</if>>
 			<<case 'Kylar'>>
 				<<if C.npc.Kylar.love gte 60>>
 					<<language>>
-						<<option 'EN'>>Kylar draws you close. "I want to stay like this," <<he>> says, pressing a kiss to your cheek.
-						<<option 'CN'>>凯拉尔把你拉近。“我想一直这样待着。”<<he>>说着吻了吻你的脸颊。
+						<<option 'EN'>>Kylar draws you close. "<span class='teal'>I want to stay like this,</span>" <<he>> says, pressing a kiss to your cheek.
+						<<option 'CN'>>凯拉尔把你拉近。“<span class='teal'>我想一直这样待着。</span>”<<he>>说着吻了吻你的脸颊。
 					<</language>>
 				<<else>>
 					<<language>>
-						<<option 'EN'>>"With me?" Kylar asks. You take <<his>> hand, and <<he>> follows you onto the bed.
-						<<option 'CN'>>“和我一起？”凯拉尔问。你握住<<his>>手，<<he>>才跟着你坐到床上。
+						<<option 'EN'>>"<span class='teal'>With me?</span>" Kylar asks. You take <<his>> hand, and <<he>> follows you onto the bed.
+						<<option 'CN'>>“<span class='teal'>和我一起？</span>”凯拉尔问。你握住<<his>>手，<<he>>才跟着你坐到床上。
 					<</language>>
 				<</if>>
 			<<case 'Sydney'>>
 				<<if C.npc.Sydney.corruption gte 30>>
 					<<language>>
-						<<option 'EN'>>Sydney sets <<his>> temple pendant aside. "Now I can have you to myself," <<he>> murmurs, drawing you close.
-						<<option 'CN'>>悉尼把神殿吊坠放到一旁。“现在你可以只陪着我了。”<<he>>低声说着，把你拉近。
+						<<option 'EN'>>Sydney sets <<his>> temple pendant aside. "<span class='lewd'>Now I can have you to myself,</span>" <<he>> murmurs, drawing you close.
+						<<option 'CN'>>悉尼把神殿吊坠放到一旁。“<span class='lewd'>现在你可以只陪着我了。</span>”<<he>>低声说着，把你拉近。
 					<</language>>
 				<<else>>
 					<<language>>
-						<<option 'EN'>>Sydney sets <<his>> temple pendant aside. "Is this all right?" <<he>> asks, waiting for your answer before kissing you.
-						<<option 'CN'>>悉尼把神殿吊坠放到一旁。“这样可以吗？”<<he>>等你回答，才吻了你。
+						<<option 'EN'>>Sydney sets <<his>> temple pendant aside. "<span class='teal'>Is this all right?</span>" <<he>> asks, waiting for your answer before kissing you.
+						<<option 'CN'>>悉尼把神殿吊坠放到一旁。“<span class='teal'>这样可以吗？</span>”<<He>>等你回答，才吻了你。
 					<</language>>
 				<</if>>
 		<</switch>>
@@ -105,9 +177,9 @@
 		<<npcincr _partner.id love -1>><<llove>>
 		<<language>>
 			<<option 'EN'>>
-				<<= _partner.id>> pulls away. You give <<him>> room to recover.
+				<<= _partner.id>> <span class='red'>pulls away</span>. You give <<him>> room to recover.
 			<<option 'CN'>>
-				<<= maplebirch.auto(_partner.id)>>躲开了。你留出地方，让<<him>>缓一缓。
+				<<= maplebirch.auto(_partner.id)>><span class='red'>躲开了</span>。你留出地方，让<<him>>缓一缓。
 		<</language>>
 	<<else>>
 		<<npcincr _partner.id love 1>><<glove>>
@@ -115,28 +187,32 @@
 			<<option 'EN'>>
 				<<switch _partner.id>>
 					<<case 'Robin'>>
-						Robin nestles against you beneath the covers. "Can we stay here a little longer?"
+						Robin nestles against you beneath the covers. "<span class='green'>Can we stay here a little longer?</span>"
 					<<case 'Whitney'>>
-						Whitney catches your hand as you sit up. "Where are you going?" <<He>> moves over to make room for you again.
+						Whitney catches your hand as you sit up. "Where are you going?" <<He>> <span class='green'>moves over to make room for you again</span>.
 					<<case 'Kylar'>>
-						Kylar stays close, <<his>> fingers curled around yours. "You really want me here?"
+						Kylar stays close, <<his>> fingers curled around yours. "<span class='teal'>You really want me here?</span>"
 					<<case 'Sydney'>>
-						Sydney finds <<his>> pendant on the bedside table and leaves it there. "The temple can wait until morning."
+						Sydney finds <<his>> pendant on the bedside table and leaves it there. "<span class='green'>The temple can wait until morning.</span>"
 				<</switch>>
 			<<option 'CN'>>
 				<<switch _partner.id>>
 					<<case 'Robin'>>
-						罗宾缩进被窝，靠在你身边。“我们能再躺一会儿吗？”
+						罗宾缩进被窝，靠在你身边。“<span class='green'>我们能再躺一会儿吗？</span>”
 					<<case 'Whitney'>>
-						你坐起来时，惠特尼拉住你的手。“你要去哪儿？”<<He>>挪了挪，让你重新躺下。
+						你坐起来时，惠特尼拉住你的手。“你要去哪儿？”<<He>><span class='green'>挪了挪，让你重新躺下</span>。
 					<<case 'Kylar'>>
-						凯拉尔挨着你，手指紧紧扣住你的手。“你真的愿意我住在这里？”
+						凯拉尔挨着你，手指紧紧扣住你的手。“<span class='teal'>你真的愿意我住在这里？</span>”
 					<<case 'Sydney'>>
-						悉尼看了看床边的吊坠，没有去拿。“神殿的事，明早再说吧。”
+						悉尼看了看床边的吊坠，没有去拿。“<span class='green'>神殿的事，明早再说吧。</span>”
 				<</switch>>
 		<</language>>
 	<</if>>
 	<br><br>
 <</if>>
 <<clotheson>><<endcombat>>
+<!-- 夜里从床上进入遭遇战时，脱下的睡前衣物仍留在这张床边。 -->
+<<if Object.values($store).some(items => items.some(item => item.location === 'Deadwood Property Bed'))>>
+	<<deadwood-reblooms-property-clothes-on>>
+<</if>>
 <<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>

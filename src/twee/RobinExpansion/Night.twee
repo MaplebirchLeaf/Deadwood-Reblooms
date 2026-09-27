@@ -1,0 +1,112 @@
+:: Deadwood Robin Night Knock []
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
+<<if maplebirch.get('RobinExpansion').startNightVisit()>>
+  <<pass 5>>
+  <<lanSwitch 'You knock softly. The note says Robin is sleeping, so you wait without touching the handle. After a moment Robin opens the door just enough to see you.' '你轻轻敲门。纸条上写着罗宾已经睡了，你便等在门外，没有碰门把手。片刻后，罗宾把门打开一条缝。'>>
+  <br><br><span class='blue'><<lanSwitch '"Is something wrong?" Robin asks, then steps back to let you speak.' '“出什么事了吗？”罗宾问，然后退开一步，等你开口。'>></span>
+  <<if C.npc.Robin.trauma gte 50>>
+    <br><br><<lanSwitch 'A half finished page lies on the desk. Robin keeps glancing at the corridor and says the footsteps outside made it hard to sleep. Robin does not seem ready for a long conversation.' '桌上有张写了一半的纸。罗宾不时看向走廊，说外面的脚步声让自己睡不着。此刻罗宾似乎不想谈太久。'>>
+  <<elseif $RobinExpansion.rebellion>>
+    <br><br><<lanSwitch 'Robin has been thinking about Bailey and the other children. "I keep wondering if they know we meant what we said," Robin admits. The room is quiet enough to hear the clock in the hall.' '罗宾还在想着贝利与其他孩子。“我一直在想，他们知不知道我们说过的话是认真的。”罗宾坦白道。房间静得能听见走廊里的钟声。'>>
+  <<elseif $RobinExpansion.tutorDay is Time.days>>
+    <br><br><<lanSwitch 'A pupil’s exercise book lies beside Robin’s own homework. Robin taps a correction in the margin. "The pupil understood it after I changed the example," Robin says, sounding pleased and tired at once.' '学生的练习册放在罗宾自己的作业旁。罗宾点点边上的批注：“换个例子之后，那孩子就懂了。”语气既高兴又困倦。'>>
+  <<elseif $RobinExpansion.shopStage isnot 'none' or $RobinExpansion.shop>>
+    <br><br><<lanSwitch 'Two stall ledgers and a list for tomorrow lie open on the desk. Robin rubs tired eyes. "I wanted to check one more sum before bed," Robin says, moving the papers aside to make room for you.' '桌上摊着两处摊位的账本和明天的清单。罗宾揉揉困倦的眼睛：“睡前想再核一道账。”说着把纸张挪开，给你腾出位置。'>>
+  <<elseif $RobinExpansion.meteorDay is Time.days>>
+    <br><br><<lanSwitch 'The blanket from the meteor shower is folded at the end of the bed. Robin points out the brightest streak again, tracing its path in the air before lowering a sleepy hand.' '看流星雨用的毯子叠在床尾。罗宾又比划了一遍最亮的那颗划过的方向，困倦地放下手。'>>
+  <<else>>
+    <br><br><<lanSwitch 'Robin puts a bookmark between two pages. "I was almost asleep," Robin says with a small smile. "But you can tell me what brought you here."' '罗宾给书夹上书签，轻轻一笑：“我都快睡着了。不过，你可以告诉我为什么来找我。”'>>
+  <</if>>
+  <br><br>
+  <<socialiseicon 'ask'>><<lanLink '听罗宾说说心事' 'Deadwood Robin Night Listen'>><</lanLink>>
+  <br><<socialiseicon>><<lanLink '和罗宾商量明天' 'Deadwood Robin Night Tomorrow'>><</lanLink>>
+  <<if $robinromance is 1 and C.npc.Robin.love gte 50 and C.npc.Robin.trauma lt 50>>
+    <br><<loveicon>><<lanLink '问罗宾能否陪坐一会' 'Deadwood Robin Night Stay'>><</lanLink>>
+  <</if>>
+  <<if ($RobinExpansion.shopStage isnot 'none' or $RobinExpansion.shop) and !$RobinExpansion.rebellion and C.npc.Robin.trauma lt 50>>
+    <br><<shopicon 'register'>><<lanLink '催罗宾继续核账' 'Deadwood Robin Night Push'>><</lanLink>>
+  <</if>>
+  <br><br><<getouticon>><<lanLink '道声晚安并离开' 'Orphanage'>><<endevent>><</lanLink>>
+<<else>>
+  <<lanSwitch 'Robin has already settled in for the night.' '罗宾今晚已经歇下了。'>>
+  <br><br><<getouticon>><<lanLink '返回孤儿院' 'Orphanage'>><<endevent>><</lanLink>>
+<</if>>
+
+:: Deadwood Robin Night Listen []
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
+<<if maplebirch.get('RobinExpansion').finishNightVisit()>>
+  <<if C.npc.Robin.trauma gte 50>>
+    <<lanSwitch 'You stay by the open door and listen. Robin speaks in short pieces about the day, then asks you to leave the hall light on. You agree.' '你留在敞开的门边听着。罗宾断断续续地讲起今天，随后请你把走廊灯留着。你答应了。'>>
+    <br><br><span class='green'><<lanSwitch 'Robin checks the latch and says, "Thank you for asking first."' '罗宾确认门闩后说：“谢谢你先问我。”'>></span>
+    <<npcincr Robin trauma -3>><<npcincr Robin love 2>><<stress -3>><<lrtrauma>><<glove>><<lstress>>
+  <<elseif $RobinExpansion.tutorDay is Time.days>>
+    <<lanSwitch 'Robin tells you the pupil finally tried an answer without looking up at the parent first. You listen while Robin works out what to ask next time. Neither of you needs to turn the lesson into another late-night task.' '罗宾说，学生终于没有先看家长的脸色，而是自己试着回答。你听罗宾慢慢想好下次该问什么，不再把这堂课变成深夜的另一份功课。'>>
+    <<npcincr Robin love 2>><<stress -5>><<glove>><<lstress>>
+  <<else>>
+    <<lanSwitch 'Robin tells you about a small mistake at the stall and laughs at how enormous it felt at the time. You tell Robin about your day in turn. Neither of you needs to fix anything tonight.' '罗宾说起摊位上一个小差错，又笑自己当时把它看得天大。你也讲了今天的事。今晚你们不用急着解决什么。'>>
+    <<npcincr Robin love 2>><<npcincr Robin trauma -1>><<stress -5>><<glove>><<lrtrauma>><<lstress>>
+  <</if>>
+<<else>>
+  <<lanSwitch 'It is time to let Robin rest.' '该让罗宾休息了。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '道声晚安并离开' 'Orphanage'>><<endevent>><</lanLink>>
+
+:: Deadwood Robin Night Tomorrow []
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
+<<if maplebirch.get('RobinExpansion').finishNightVisit()>>
+  <<if C.npc.Robin.trauma gte 50>>
+    <<lanSwitch 'You ask what would make tomorrow easier. Robin thinks for a moment and chooses just one thing: to start with breakfast together. You write it down and leave the rest for daylight.' '你问明天怎样能轻松些。罗宾想了一会，只挑了一件事：一起吃早饭。你把它记下，其他事情留到天亮再说。'>>
+    <<npcincr Robin dom 1>><<npcincr Robin trauma -2>><<npcincr Robin love 1>><<gdom>><<lrtrauma>><<glove>>
+  <<elseif $RobinExpansion.rebellion>>
+    <<lanSwitch 'You agree to speak to the other children after school, when everyone can leave if they wish. Robin decides what to say and asks you to stand nearby. The plan feels smaller and possible.' '你们约好放学后再与其他孩子谈，那时谁不想参与都能离开。罗宾自己决定要说的话，请你在旁边陪着。计划因此变得小些，也更做得到。'>>
+    <<npcincr Robin dom 2>><<npcincr Robin love 1>><<gdom>><<glove>>
+  <<elseif $RobinExpansion.tutorDay is Time.days>>
+    <<lanSwitch 'Robin asks whether the pupil solved the final question after you left. You do not know yet, so you agree to ask next lesson. Robin puts the exercise book away and chooses to finish personal homework in the morning.' '罗宾问，你们走后学生有没有做出最后一题。你也不知道，于是约好下次上课再问。罗宾收起练习册，决定自己的作业明早再做。'>>
+    <<npcincr Robin dom 1>><<npcincr Robin love 1>><<gdom>><<glove>>
+  <<elseif $RobinExpansion.shopStage isnot 'none' or $RobinExpansion.shop>>
+    <<lanSwitch 'You ask which task Robin wants to take tomorrow. Robin chooses the stock list and gives you the receipts to sort. Once the work is divided, Robin closes the ledger without checking it again.' '你问明天罗宾想负责什么。罗宾选了存货清单，把收据交给你整理。分好工后，罗宾合上账本，没有再翻开。'>>
+    <<npcincr Robin dom 2>><<npcincr Robin love 1>><<gdom>><<glove>>
+  <<else>>
+    <<lanSwitch 'Robin suggests a short walk after school if the weather holds. You agree to decide tomorrow. Robin smiles and finally puts the book away.' '罗宾提议放学后若天气好，就一起走一小段路。你们约好明天再决定。罗宾笑着把书收了起来。'>>
+    <<npcincr Robin love 1>><<npcincr Robin dom 1>><<glove>><<gdom>>
+  <</if>>
+<<else>>
+  <<lanSwitch 'It is time to let Robin rest.' '该让罗宾休息了。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '道声晚安并离开' 'Orphanage'>><<endevent>><</lanLink>>
+
+:: Deadwood Robin Night Stay []
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
+<<if maplebirch.get('RobinExpansion').finishNightVisit()>>
+  <<lanSwitch '"A little while," Robin agrees. You sit beside the desk, close enough to share the quiet. Robin reaches for your hand, and lets go only when you both stand. "Good night," Robin says, sounding steadier.' '“坐一会就好。”罗宾答应了。你在桌旁坐下，一起安静地待着。罗宾伸手握住你的手，直到你们起身才松开。“晚安。”罗宾的声音平稳了些。'>>
+  <<npcincr Robin love 2>><<npcincr Robin trauma -2>><<stress -8>><<glove>><<lrtrauma>><<lstress>>
+<<else>>
+  <<lanSwitch 'It is time to let Robin rest.' '该让罗宾休息了。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '道声晚安并离开' 'Orphanage'>><<endevent>><</lanLink>>
+
+:: Deadwood Robin Night Push []
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
+<<if maplebirch.get('RobinExpansion').finishNightVisit()>>
+  <<lanSwitch 'You point to the unfinished figures. Robin tries to work through them, but writes the same number twice.' '你指着尚未算完的数字。罗宾试着继续，却把同一个数抄了两遍。'>>
+  <br><br><span class='red'><<lanSwitch '"I can do it in the morning," Robin says, closing the ledger.' '“我早上能做。”罗宾合上账本。'>></span>
+  <br><br><<lanSwitch 'The way Robin sets down the pen makes it clear you should go.' '放下笔的动作已经说明，你该离开了。'>>
+  <<npcincr Robin dom -1>><<npcincr Robin love -1>><<npcincr Robin trauma 2>><<ldom 'Robin'>><<llove 'Robin'>><<grtrauma>>
+<<else>>
+  <<lanSwitch 'It is time to let Robin rest.' '该让罗宾休息了。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '道声晚安并离开' 'Orphanage'>><<endevent>><</lanLink>>
+:: Deadwood Robin School Wake Widgets [widget]
+<<widget 'deadwood-robin-school-wake'>>
+  <<if $location is 'home' and Time.schoolDay and Time.hour gte 6 and Time.hour lt 9 and !$daily.robinSchoolWake and !$daily.motherWake and !_sleepinterrupt and !$robinbed and ($RobinExpansion.bothRent or $RobinExpansion.baileyDefeated) and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and $robin.timer.hurt is 0 and C.npc.Robin.trauma lt 80 and ['sleep', 'orphanage', 'bath'].includes(getRobinLocation())>>
+    <<set $daily.robinSchoolWake to 1>>
+    <br><br><<npc Robin>><<person1>>
+    <<lanSwitch 'A light knock comes at your door. Robin waits for your answer before opening it.' '门上传来轻轻的敲击声。罗宾等你应声，才推开房门。'>>
+    <<if $RobinExpansion.baileyDefeated>>
+      <br><<lanSwitch '"School starts soon," Robin says. "I left breakfast for you. No rent book to check this morning." Robin grins and holds the door while you get up.' '“快上课了。”罗宾说，“早餐给你留着。今天早上不用核房租账。”罗宾笑着扶住门，等你起身。'>>
+    <<else>>
+      <br><<lanSwitch '"We have enough time if you get up now," Robin says. A folded page from the shared ledger peeks out of Robin’s pocket. Robin has already checked the day’s figures, and waits while you find your shoes.' '“现在起来就来得及。”罗宾说。共同账本里折起的一页露在口袋边。罗宾已经核过今天的数字，站在门边等你找鞋。'>>
+    <</if>>
+    <br><br><span class='green'><<lanSwitch 'Robin made sure you would not miss the morning bell.' '罗宾提醒了你，早课的铃声还赶得上。'>></span>
+  <</if>>
+<</widget>>

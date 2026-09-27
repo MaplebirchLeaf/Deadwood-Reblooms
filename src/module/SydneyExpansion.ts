@@ -10,6 +10,8 @@ class SydneyExpansion extends Module {
     halloweenRestYear: 0,
     christmasRestYear: 0,
     sirrisHalloweenVisitYear: 0,
+    scienceHint: false,
+    dormInvited: false,
     dormVisited: false,
     dormScene: 'bed',
     halloweenTalkYear: 0,
@@ -22,7 +24,20 @@ class SydneyExpansion extends Module {
     quartersDay: -1,
     trialTalkDay: -1,
     touchDay: -1,
-    touchPart: ''
+    touchPart: '',
+    // 西里斯庄园的邀请、初访、童年对话和每日互动均属于当前存档，不从窗口或 Passage 历史推断。
+    estate: {
+      invited: false,
+      visited: false,
+      visitDay: -1,
+      familyTalk: '',
+      kylarTalk: '',
+      studyDay: -1,
+      gardenDay: -1,
+      kitchenDay: -1,
+      roomDay: -1,
+      teaseDay: -1
+    }
   };
 
   public constructor(core: typeof maplebirch) {

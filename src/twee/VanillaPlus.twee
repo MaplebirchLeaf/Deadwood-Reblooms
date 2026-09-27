@@ -230,6 +230,7 @@
     <<mirroricon 'blood'>><<lanLink '穿过诡异镜面' 'Deadwood Reblooms Deviancy Mirror Enter' >>
       <<set $VanillaPlus.deviancy.mirrorOrigin to $_mirror>>
       <<if $_mirror is 'property'>><<set $VanillaPlus.deviancy.mirror_property to maplebirch.VP.realEstate.current.id>><</if>>
+      <<run maplebirch.VP.deviancy.enter()>>
     <</lanLink>>
       <<note `lanSwitch('Deviancy', '异种癖')` 'red'>>
     <br>
@@ -238,15 +239,16 @@
 
 <!-- 诡异镜出口：按触手平原坐标显示已经发现的返回地点。 -->
 <<widget 'deadwood-reblooms-deviancy-mirror-hint'>>
+  <<set _mirrorLocations to $VanillaPlus.deviancy.mirror_locations>>
   <<set _mirrorTargets to []>>
-  <<if maplebirch.VP.deviancy.discovered('home')>>
-    <<run _mirrorTargets.push({north: 0, east: 0, EN: 'your bedroom mirror', CN: '卧室的镜子'})>>
+  <<if _mirrorLocations.home and maplebirch.VP.deviancy.discovered('home')>>
+    <<run _mirrorTargets.push({..._mirrorLocations.home, EN: 'your bedroom mirror', CN: '卧室的镜子'})>>
   <</if>>
   <<for _property range maplebirch.VP.realEstate.properties>>
-    <<if maplebirch.VP.deviancy.discovered('property', _property.id)
+    <<set _coordinates to _mirrorLocations['property:' + _property.id]>>
+    <<if _coordinates and maplebirch.VP.deviancy.discovered('property', _property.id)
       and maplebirch.VP.realEstate.owns(_property.id)
       and !maplebirch.VP.realEstate.managementFor(_property.id).rented>>
-      <<set _coordinates to maplebirch.VP.realEstate.managementFor(_property.id).mirror_coordinates>>
       <<run _mirrorTargets.push({
         north: _coordinates.north,
         east: _coordinates.east,
@@ -255,14 +257,14 @@
       })>>
     <</if>>
   <</for>>
-  <<if maplebirch.VP.deviancy.discovered('farm')>>
-    <<run _mirrorTargets.push({north: 3, east: -3, EN: 'the farm mirror', CN: '农场的镜子'})>>
+  <<if _mirrorLocations.farm and maplebirch.VP.deviancy.discovered('farm')>>
+    <<run _mirrorTargets.push({..._mirrorLocations.farm, EN: 'the farm mirror', CN: '农场的镜子'})>>
   <</if>>
-  <<if maplebirch.VP.deviancy.discovered('tower')>>
-    <<run _mirrorTargets.push({north: -3, east: 3, EN: 'the tower mirror', CN: '高塔的镜子'})>>
+  <<if _mirrorLocations.tower and maplebirch.VP.deviancy.discovered('tower')>>
+    <<run _mirrorTargets.push({..._mirrorLocations.tower, EN: 'the tower mirror', CN: '高塔的镜子'})>>
   <</if>>
-  <<if maplebirch.VP.deviancy.discovered('temple')>>
-    <<run _mirrorTargets.push({north: -3, east: -3, EN: 'the temple mirror', CN: '神殿宿舍的镜子'})>>
+  <<if _mirrorLocations.temple and maplebirch.VP.deviancy.discovered('temple')>>
+    <<run _mirrorTargets.push({..._mirrorLocations.temple, EN: 'the temple mirror', CN: '神殿宿舍的镜子'})>>
   <</if>>
   <!-- 只提示最近的异地出口。同格出口由下方真实链接显示，无需方向提示。 -->
   <<set _nearestMirror to null>><<set _nearestDistance to 100>>
@@ -292,17 +294,21 @@
 
 <<widget 'deadwood-reblooms-deviancy-mirror-exits'>>
   <<if $tentacleEntrance is 'vanillaPlusMirror'>>
+    <<set _mirrorLocations to $VanillaPlus.deviancy.mirror_locations>>
     <<deadwood-reblooms-deviancy-mirror-hint>>
-    <<if $tentnorth is 0 and $tenteast is 0 and maplebirch.VP.deviancy.discovered('home')>>
+    <<if _mirrorLocations.home
+      and $tentnorth is _mirrorLocations.home.north
+      and $tenteast is _mirrorLocations.home.east
+      and maplebirch.VP.deviancy.discovered('home')>>
       <<mirroricon 'blood'>><<lanLink '从卧室镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Home'>><</lanLink>>
       <br>
     <</if>>
     <<for _property range maplebirch.VP.realEstate.properties>>
       <<capture _property>>
-        <<if maplebirch.VP.deviancy.discovered('property', _property.id)
+        <<set _mirrorCoordinates to _mirrorLocations['property:' + _property.id]>>
+        <<if _mirrorCoordinates and maplebirch.VP.deviancy.discovered('property', _property.id)
           and maplebirch.VP.realEstate.owns(_property.id)
           and !maplebirch.VP.realEstate.managementFor(_property.id).rented>>
-          <<set _mirrorCoordinates to maplebirch.VP.realEstate.managementFor(_property.id).mirror_coordinates>>
           <<if $tentnorth is _mirrorCoordinates.north and $tenteast is _mirrorCoordinates.east>>
             <<mirroricon 'blood'>><<language>>
               <<option 'EN'>>
@@ -319,15 +325,24 @@
         <</if>>
       <</capture>>
     <</for>>
-    <<if $tentnorth is 3 and $tenteast is -3 and maplebirch.VP.deviancy.discovered('farm')>>
+    <<if _mirrorLocations.farm
+      and $tentnorth is _mirrorLocations.farm.north
+      and $tenteast is _mirrorLocations.farm.east
+      and maplebirch.VP.deviancy.discovered('farm')>>
       <<mirroricon 'blood'>><<lanLink '从农场镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Farm'>><</lanLink>>
       <br>
     <</if>>
-    <<if $tentnorth is -3 and $tenteast is 3 and maplebirch.VP.deviancy.discovered('tower')>>
+    <<if _mirrorLocations.tower
+      and $tentnorth is _mirrorLocations.tower.north
+      and $tenteast is _mirrorLocations.tower.east
+      and maplebirch.VP.deviancy.discovered('tower')>>
       <<mirroricon 'blood'>><<lanLink '从高塔镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Tower'>><</lanLink>>
       <br>
     <</if>>
-    <<if $tentnorth is -3 and $tenteast is -3 and maplebirch.VP.deviancy.discovered('temple')>>
+    <<if _mirrorLocations.temple
+      and $tentnorth is _mirrorLocations.temple.north
+      and $tenteast is _mirrorLocations.temple.east
+      and maplebirch.VP.deviancy.discovered('temple')>>
       <<mirroricon 'blood'>><<lanLink '从神殿宿舍的镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Temple'>><</lanLink>>
       <br>
     <</if>>

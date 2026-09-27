@@ -1,29 +1,21 @@
 :: Deadwood Reblooms Deviancy Mirror Enter []
 <<location 'tentworld'>><<set $outside to 0>><<effects>><<tentacleworldintro>><<set $tentacleEntrance to 'vanillaPlusMirror'>>
-<<switch $VanillaPlus.deviancy.mirrorOrigin>>
-  <<case 'property'>>
-    <<set _mirrorProperty to maplebirch.VP.realEstate.properties.find(property => property.id === $VanillaPlus.deviancy.mirror_property)>>
-    <<if _mirrorProperty>>
-      <<set _mirrorCoordinates to maplebirch.VP.realEstate.managementFor(_mirrorProperty.id).mirror_coordinates>>
-      <<set $tentnorth to _mirrorCoordinates.north>>
-      <<set $tenteast to _mirrorCoordinates.east>>
-    <</if>>
-  <<case 'farm'>>
-    <<set $tentnorth to 3>><<set $tenteast to -3>>
-  <<case 'tower'>>
-    <<set $tentnorth to -3>><<set $tenteast to 3>>
-  <<case 'temple'>>
-    <<set $tentnorth to -3>><<set $tenteast to -3>>
-<</switch>>
+<<set _mirrorOrigin to $VanillaPlus.deviancy.mirrorOrigin>>
+<<set _mirrorKey to _mirrorOrigin is 'property' ? 'property:' + $VanillaPlus.deviancy.mirror_property : _mirrorOrigin>>
+<<set _mirrorArrival to $VanillaPlus.deviancy.mirror_locations[_mirrorKey]>>
+<<if _mirrorArrival>>
+  <<set $tentnorth to _mirrorArrival.north>>
+  <<set $tenteast to _mirrorArrival.east>>
+<</if>>
 <<if !$daily.vanillaPlusMirror>>
   <<set $daily.vanillaPlusMirror to true>><<deviancy6>>
 <</if>>
 <<language>>
   <<option 'EN'>>
-    The glass clings to your skin like a wet membrane. You force your body through and spill out beneath the alien sky of the tentacle
-    plains.
+    The glass clings to your skin like a <span class="purple">wet membrane</span>. You force your body through and spill out beneath the
+    alien sky of the tentacle plains.
   <<option 'CN'>>
-    镜面如湿润的薄膜般贴紧你的皮肤。你迫使身体穿过其中，跌入触手平原陌生的天空之下。
+    镜面如<span class="purple">湿润的薄膜</span>般贴紧你的皮肤。你迫使身体穿过其中，跌入触手平原陌生的天空之下。
 <</language>>
 <br><br>
 <<lanLink '继续' 'Tentacle Plains'>><</lanLink>>
@@ -31,10 +23,10 @@
 :: Deadwood Reblooms Deviancy Mirror Home []
 <<set $location to 'home'>><<set $outside to 0>><<effects>><<tentacleworldend>>
 <<language>>
-<<option 'EN'>>
-  You force yourself through the rippling surface and tumble back into your bedroom.
-<<option 'CN'>>
-  你挤过荡漾的镜面，跌回自己的卧室。
+  <<option 'EN'>>
+    You force yourself through the rippling surface and tumble <span class="green">back into your bedroom</span>.
+  <<option 'CN'>>
+    你挤过荡漾的镜面，<span class="green">跌回自己的卧室</span>。
 <</language>>
 <br><br>
 <<lanLink '继续' 'Bedroom'>><</lanLink>>
@@ -44,9 +36,9 @@
   <<run maplebirch.VP.realEstate.enter()>><<effects>><<tentacleworldend>>
   <<language>>
     <<option 'EN'>>
-      You push through the glass and find your own bedroom on the other side. The air smells of the house again.
+      You push through the glass and find <span class="green">your own bedroom</span> on the other side. The air smells of the house again.
     <<option 'CN'>>
-      你挤过镜面，回到了自己的卧室。房间熟悉的气息重新包围了你。
+      你挤过镜面，<span class="green">回到了自己的卧室</span>。房间熟悉的气息重新包围了你。
   <</language>>
   <br><br>
   <<lanLink '继续' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
@@ -58,10 +50,10 @@
 :: Deadwood Reblooms Deviancy Mirror Farm []
 <<set $location to 'farm'>><<set $outside to 0>><<effects>><<tentacleworldend>>
 <<language>>
-<<option 'EN'>>
-  You force yourself through the rippling surface and stumble into your room at the farm.
-<<option 'CN'>>
-  你挤过荡漾的镜面，踉跄着落进农场的房间。
+  <<option 'EN'>>
+    You force yourself through the rippling surface and stumble <span class="green">into your room at the farm</span>.
+  <<option 'CN'>>
+    你挤过荡漾的镜面，踉跄着<span class="green">落进农场的房间</span>。
 <</language>>
 <br><br>
 <<lanLink '继续' 'Farm Bedroom'>><</lanLink>>
@@ -70,27 +62,29 @@
 <<set $location to 'tower'>><<set $outside to 0>><<effects>><<tentacleworldend>>
 <<language>>
   <<option 'EN'>>
-    You force yourself through the rippling surface and spill onto the tower floor.
+    You force yourself through the rippling surface and spill <span class="green">onto the tower floor</span>.
   <<option 'CN'>>
-    你挤过荡漾的镜面，摔落在高塔的地面上。
+    你挤过荡漾的镜面，<span class="green">摔落在高塔的地面上</span>。
 <</language>>
-<br><br><<lanLink '继续' 'Bird Tower'>><</lanLink>>
+<br><br>
+<<lanLink '继续' 'Bird Tower'>><</lanLink>>
 
 :: Deadwood Reblooms Deviancy Mirror Temple []
 <<set $location to 'temple'>><<set $outside to 0>><<effects>><<tentacleworldend>>
 <<language>>
   <<option 'EN'>>
-    You force yourself through the rippling surface and stumble back beside your bunk in the temple quarters.
+    You force yourself through the rippling surface and stumble <span class="green">back beside your bunk</span> in the temple quarters.
   <<option 'CN'>>
-    你挤过荡漾的镜面，踉跄着回到神殿宿舍的床铺旁。
+    你挤过荡漾的镜面，踉跄着<span class="green">回到神殿宿舍的床铺旁</span>。
 <</language>>
-<br><br><<lanLink '继续' 'Temple Bunk'>><</lanLink>>
+<br><br>
+<<lanLink '继续' 'Temple Bunk'>><</lanLink>>
 
 :: Deadwood Reblooms Deviancy Conduct []
 <<set $outside to 0>><<set $location to 'forest_shop'>><<effects>><<npc Gwylan>><<person1>><<run statusCheck('Gwylan')>>
 <<language>>
   <<option 'EN'>>
-    You tell Gwylan that you want to lead the next cleansing. You have felt the forest's poison squirm through your body often enough.
+    You tell Gwylan that you want to lead the next cleansing. You have felt the forest's <span class="purple">poison squirm through your body</span> often enough.
     This time, you want it to follow your rhythm.
   <br><br>
   <<He>> stops arranging the bottles behind the counter. <<His>> gaze lingers on you. "You've learned how it moves through you," <<he>> says. "And
@@ -105,7 +99,7 @@
   <br>
   <<link [[Not today|Forest Shop Entrance]]>><</link>>
   <<option 'CN'>>
-    你告诉格威岚，下一场净化仪式想由自己主持。森林的毒素已经在你的身体里蠕动过太多次。这一次，你想让它顺从你的节奏。
+    你告诉格威岚，下一场净化仪式想由自己主持。<span class="purple">森林的毒素已经在你的身体里蠕动过太多次。</span>这一次，你想让它顺从你的节奏。
   <br><br>
   <<He>>停下整理柜台后方瓶罐的动作，目光在你身上停留片刻。“你已经学会毒素如何在体内游走，”<<he>>说道，“当你主动向森林敞开身体，它也会回应你。
     但这不代表它属于你。”

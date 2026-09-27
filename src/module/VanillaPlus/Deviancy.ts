@@ -24,6 +24,15 @@ class Deviancy {
     return V.VanillaPlus.traits.deviancy && (mirror === 'property' ? Boolean(propertyId && this.mirrors.property[propertyId]) : this.mirrors[mirror] === true);
   }
 
+  public enter(): void {
+    // 在点击入口时重排出口，而不是在入口 Passage 渲染时重排，以免读档后坐标移动。
+    const locations: typeof V.VanillaPlus.deviancy.mirror_locations = {};
+    V.VanillaPlus.deviancy.mirror_locations = locations;
+    const randomLocation = () => ({ north: Math.floor(Math.random() * 9) - 4, east: Math.floor(Math.random() * 9) - 4 });
+    for (const mirror of ['home', 'farm', 'tower', 'temple']) locations[mirror] = randomLocation();
+    for (const property of this.vanillaPlus.realEstate.properties) locations[`property:${property.id}`] = randomLocation();
+  }
+
   public get mirrorOpen(): boolean {
     return V.VanillaPlus.traits.deviancy && Time.hour === 3 && V.settings.tentaclesEnabled && (V.hallucinations >= 2 || V.daily?.mirrorTentacles === 1);
   }

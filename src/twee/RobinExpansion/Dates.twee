@@ -1,0 +1,56 @@
+:: Deadwood Robin Date Widgets [widget]
+<<widget 'deadwood-robin-date-room-links'>>
+  <<if Weather.meteorShower and Time.hour gte 20 and $RobinExpansion.meteorDay isnot Time.days and Weather.precipitation isnot 'rain' and C.npc.Robin.love gte 20>>
+    <<loveicon 'hug'>><<lanLink '和罗宾看流星雨 (0:30)' 'Deadwood Robin Meteor Date'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-robin-beach-links'>>
+  <<if C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and getRobinLocation() is 'beach' and Time.hour gte 9 and Time.hour lte 16 and Weather.precipitation isnot 'rain' and C.npc.Robin.love gte 20 and $RobinExpansion.swimDay isnot Time.days>>
+    <<loveicon 'hug'>><<lanLink '和罗宾一起游泳 (1:00)' 'Deadwood Robin Swim Date'>><</lanLink>><br>
+  <</if>>
+  <<if Weather.meteorShower and Time.hour gte 20 and C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and $RobinExpansion.meteorDay isnot Time.days and Weather.precipitation isnot 'rain' and C.npc.Robin.love gte 20>>
+    <<loveicon 'hug'>><<lanLink '和罗宾看流星雨 (0:30)' 'Deadwood Robin Meteor Date'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-robin-meteor-hall-link'>>
+  <<if Weather.meteorShower and Time.hour gte 20 and C.npc.Robin.init is 1 and ($robinmissing is 0 or !$robinmissing) and $RobinExpansion.asylum.status isnot 'admitted' and $RobinExpansion.meteorDay isnot Time.days and Weather.precipitation isnot 'rain' and C.npc.Robin.love gte 20>>
+    <<loveicon 'hug'>><<lanLink '和罗宾看流星雨 (0:30)' 'Deadwood Robin Meteor Date'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Robin Meteor Date []
+<<set $outside to 1>><<set $location to 'beach'>><<effects>><<npc Robin>><<person1>>
+<<if $RobinExpansion.meteorDay isnot Time.days and Weather.meteorShower and Weather.precipitation isnot 'rain' and Time.hour gte 20 and C.npc.Robin.love gte 20 and !$robinmissing and $RobinExpansion.asylum.status isnot 'admitted'>>
+  <<set $RobinExpansion.meteorDay to Time.days>>
+  <<lanSwitch 'You and Robin find a quiet place away from the streetlights. The first meteor appears while Robin is still unfolding a blanket. "Did you see that?" Robin asks, then laughs at the obvious answer. More lights cross the sky. Robin stops trying to count them and leans against your shoulder instead.' '你和罗宾找到一处远离路灯的安静地方。罗宾还在铺毯子，第一颗流星就划过了天空。“你看见了吗？”罗宾问完，又为这个明知故问笑起来。更多光点从夜空滑过。罗宾不再费力计数，靠在了你的肩上。'>>
+  <br><br>
+  <<if C.npc.Robin.trauma gte 60>>
+    <span class='blue'><<lanSwitch 'Robin still checks the path back to the orphanage. You ask whether to leave; Robin shakes their head. "Just one more," Robin says as another streak crosses the sky.' '罗宾还是不时回头看回孤儿院的路。你问要不要走，罗宾摇头。“再看一颗。”话音刚落，又一道亮光划过天际。'>></span>
+  <<elseif $RobinExpansion.rebellion>>
+    <<lanSwitch '"Tomorrow we still have work to do," Robin says. "But I wanted one night where we could look up instead of watching the door." You stay until the shower begins to thin.' '“明天还有事要做。”罗宾说，“但我想有一晚，我们能抬头看天，而不是一直盯着门。”你们待到流星渐渐稀疏。'>>
+  <<else>>
+    <<lanSwitch '"I used to think a wish had to be kept secret," Robin says. "Now I think I would rather tell you mine." Robin takes your hand, and the wish is simple: another evening together.' '“以前我觉得愿望说出来就不灵了，”罗宾说，“现在我更想告诉你。”罗宾握住你的手。愿望很简单：以后还能一起度过这样的夜晚。'>>
+  <</if>>
+  <<pass 30>><<stress -12>><<trauma -6>><<npcincr Robin trauma -3>><<npcincr Robin love 2>><<lstress>><<ltrauma>><<lrtrauma>><<glove>>
+<<else>>
+  <<lanSwitch 'You have already watched tonight’s meteors together.' '今晚你们已经一起看过流星了。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回孤儿院' 'Orphanage'>><<endevent>><</lanLink>>
+
+:: Deadwood Robin Swim Date []
+<<set $outside to 1>><<set $location to 'beach'>><<effects>><<npc Robin>><<person1>>
+<<if $RobinExpansion.swimDay isnot Time.days and getRobinLocation() is 'beach' and Time.hour gte 9 and Time.hour lte 16 and Weather.precipitation isnot 'rain' and C.npc.Robin.love gte 20 and !$robinmissing and $RobinExpansion.asylum.status isnot 'admitted'>>
+  <<set $RobinExpansion.swimDay to Time.days>>
+  <<lanSwitch 'Robin leaves the stall with another orphan for a while and meets you at the water. You start in the shallows, racing from one marker to the next. When a wave catches you both, Robin surfaces laughing and reaches for your hand. On the way back, Robin checks that the stall was looked after and pays the helper for the shift.' '罗宾请另一位孤儿暂时照看摊位，随后到水边与你会合。你们从浅水区游起，比赛谁先到下一个浮标。一阵浪把你们同时卷进去，罗宾笑着浮出水面，向你伸出手。回来时，罗宾核对摊位的情况，并付给帮工这段时间的报酬。'>>
+  <<if $RobinExpansion.balloon is 'cooperate'>>
+    <br><br><span class='blue'><<lanSwitch 'The balloon seller keeps an eye on the shared sign while you are away. Robin thanks them before taking the cart back.' '你们离开时，气球摊主也帮忙看着共同招牌。回来后，罗宾先道了谢，才重新接手推车。'>></span>
+  <<elseif $RobinExpansion.shop>>
+    <br><br><span class='blue'><<lanSwitch 'Robin makes a note to put the helper’s paid hour on the shop rota. The business can keep running while you take a break.' '罗宾记下帮工的这一小时，准备写进店铺的付薪班表。你们休息时，生意也仍有人照看。'>></span>
+  <</if>>
+  <<pass 60>><<stress -9>><<npcincr Robin trauma -2>><<npcincr Robin love 2>><<lstress>><<lrtrauma>><<glove>>
+<<else>>
+  <<lanSwitch 'You have already swum together today.' '今天你们已经一起游过泳了。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回海滩' 'Beach'>><<endevent>><</lanLink>>

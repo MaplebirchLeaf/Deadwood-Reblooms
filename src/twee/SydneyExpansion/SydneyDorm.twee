@@ -4,7 +4,9 @@
   <<if _sydneyAvailable is undefined>><<sydneySchedule>><</if>>
   <<set _cleaningLink to $exposed lt 1 and Time.dayState isnot 'night' and $temple_quarters lt 100 and !pcAreArmsBound('both')>>
   <<set _showDormLink to _dormAccess and $temple_rank is 'monk' and $stress lt $stressmax and _position is (_cleaningLink ? 2 : 1)>>
-<</silently>><<if _showDormLink>>
+<</silently>><<if _showDormLink and !$SydneyExpansion.dormInvited and _sydneyWorking>>
+  <<icon 'temple/sydney-quarters.png'>><<lanLink '问悉尼能否来床铺旁坐坐' 'Deadwood Reblooms Sydney Dorm Bunk Invitation'>><</lanLink>><br>
+<<elseif _showDormLink and $SydneyExpansion.dormInvited>>
   <<icon 'temple/sydney-quarters.png'>><<lanLink "悉尼的床铺 (0:01)" 'Deadwood Reblooms Sydney Dorm'>><<pass 1>><</lanLink>><br>
 <</if>><</widget>>
 
@@ -12,8 +14,62 @@
   <<if _sydneyAvailable is undefined>><<sydneySchedule>><</if>>
 <</silently>><<if _sirrisMorning>><<getouticon>><<lanLink '和悉尼去见西里斯' 'Deadwood Reblooms Sydney Halloween Morning'>><</lanLink>><br><</if>><</widget>>
 
+<<widget 'deadwood-reblooms-sydney-dorm-bed-links'>>
+  <<if $earSlime.event and $earSlime.noSleep>>
+    <span class='red'><<lanSwitch 'The slime will not let you sleep yet.' '史莱姆现在不让你睡觉。'>></span><br>
+  <<else>>
+    <<icon 'temple/sydney-bed.png'>>
+    <<lanLink '脱衣躺到悉尼身旁' 'Deadwood Reblooms Sydney Dorm Bed'>>
+      <<undressSleep 'Deadwood Sydney Dorm Bed'>>
+    <</lanLink>><br>
+    <<if !$earSlime.alwaysSleepNaked or $hypnosis_traits.silence>>
+      <<set $storeLocation to 'Deadwood Sydney Dorm Bed'>>
+      <<set $wardrobe_location to 'temple'>><<wardrobeSelection true>>
+      <<for _index, _outfit range $outfit>>
+        <<if _outfit.type.includes('sleep')>>
+          <<capture _index>>
+            <<icon 'temple/sydney-bed.png'>>
+            <<lanLink '换上睡衣并躺到悉尼身旁' 'Deadwood Reblooms Sydney Dorm Bed'>>
+              <<set $wear_outfit to _index>><<saveTempHairStyle>>
+            <</lanLink>><br>
+          <</capture>>
+        <</if>>
+      <</for>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Sydney Dorm Bunk Invitation []
+<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>><<sydneySchedule>>
+<<npc Sydney>><<person1>>
+<<if _dormAccess and $temple_rank is 'monk' and _sydneyWorking>>
+  <<set $SydneyExpansion.dormInvited to true>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney finishes folding a robe and looks up when you ask about <<his>> bunk.
+      "You can come and sit with me when I'm here," <<he>> says. <<He>> moves a stack of books from the end of the bed.
+      <br><br>
+      "If I'm asleep, wake me gently. The others get up early."
+    <<option 'CN'>>
+      悉尼叠好修道袍。你问起<<his>>的床铺，<<he>>抬头看向你。
+      “我在这儿的时候，你可以过来坐。”<<he>>说着，把床尾的书挪开。
+      <br><br>
+      “要是我睡着了，轻点叫醒我。其他人起得很早。”
+  <</language>>
+<<else>>
+  <<lanSwitch 'Sydney is not by the bunks now. You can ask another time.' '悉尼现在不在床铺旁。你可以改天再问。'>>
+<</if>>
+<br><br>
+<<getouticon>><<lanLink '返回宿舍' 'Temple Quarters'>><</lanLink>>
+
 :: Deadwood Reblooms Sydney Dorm []
 <<set $outside to 0>><<set $location to 'temple'>><<sydneySchedule>><<temple_effects>><<effects>>
+<!-- 宿舍床上的衣物单独存放。返回宿舍时按原版床铺的做法取回。 -->
+<<if Object.values($store).some(items => items.some(item => item.location === 'Deadwood Sydney Dorm Bed'))>>
+  <<set $wardrobe_location to 'temple'>>
+  <<storeon 'Deadwood Sydney Dorm Bed'>><<loadTempHairStyle>>
+  <<set $wear_outfit to 'none'>>
+<</if>>
 <!-- 在宿舍场景再次检查权限，避免节日链接绕过入口条件。 -->
 <<if !_dormAccess>>
   <<if !['monk', 'priest'].includes($temple_rank) or $sydney?.rank isnot 'monk'>>
@@ -23,6 +79,10 @@
   <<else>>
     <<lanSwitch "Sydney is not here today. The bunk is empty." '悉尼今天不在这里。床铺空着。'>>
   <</if>>
+  <br><br>
+  <<lanLink '继续' 'Temple Quarters'>><</lanLink>>
+<<elseif !$SydneyExpansion.dormInvited>>
+  <<lanSwitch 'Sydney has not shown you the bunk yet. You leave the quarters alone.' '悉尼还没有带你看过床铺。你独自离开宿舍。'>>
   <br><br>
   <<lanLink '继续' 'Temple Quarters'>><</lanLink>>
 <<elseif !_sydneyResting>>
@@ -44,25 +104,27 @@
 <<else>>
 <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
 
-<!-- 首次来访说明考核后的床铺权限；节日不会单独触发此解锁。 -->
+<!-- 首访说明双方通过试炼后的床铺权限；普通日程和节日同行都需要悉尼当面邀请。 -->
 <<if !$SydneyExpansion.dormVisited>>
   <<set $SydneyExpansion.dormVisited to true>>
   <<language>>
     <<option 'EN'>>
-      You and Sydney have both passed the temple's trial. When you reach the quarters together, <<he>> shows you the bunk that is now <<his>> to use between duties. A folded robe rests at the head of the bed; the books below it have already found their places.
+      You and Sydney have both passed the temple's trial. When you reach the quarters together, <<he>> shows you the bunk that is now <<his>> to use
+      between duties. A folded robe rests at the head of the bed; the books below it have already found their places.
       <br><br>
       <<if _sydneyStatus.includes('pure')>>
-        "We made it," <<he>> says, touching the neatly folded sleeve. <<He>> smiles at you before looking away.
+        "<span class='green'>We made it</span>," <<he>> says, touching the neatly folded sleeve. <<He>> smiles at you before looking away.
       <<elseif _sydneyStatus.includes('corrupt')>>
         "Same floor, different shifts," <<he>> murmurs. "At least we'll know where to find each other."
       <<else>>
         "I kept wondering whether we'd both pass," <<he>> admits. "It's good to see you here."
       <</if>>
     <<option 'CN'>>
-      你和悉尼都通过了神殿的考核。你们一起来到宿舍，<<he>>指给你看今后轮班之余属于<<him>>的床铺。床头叠着一件修道袍，床下的书也已经归置妥当。
+      你和悉尼都通过了神殿的考核。你们一起来到宿舍，<<he>>指给你看今后轮班之余属于<<him>>的床铺。
+      床头叠着一件修道袍，床下的书也已经归置妥当。
       <br><br>
       <<if _sydneyStatus.includes('pure')>>
-        “我们都通过了。”<<he>>摸了摸叠好的衣袖，朝你笑了一下，又不好意思地移开目光。
+        “<span class='green'>我们都通过了。</span>”<<he>>摸了摸叠好的衣袖，朝你笑了一下，又不好意思地移开目光。
       <<elseif _sydneyStatus.includes('corrupt')>>
         “同一层楼，不同的值班时间。”<<he>>轻声说，“至少我们知道该去哪里找对方。”
       <<else>>
@@ -74,7 +136,8 @@
 
 <<language>>
   <<option 'EN'>>
-    You stop beside Sydney's bunk in the temple quarters. A robe hangs neatly from the bedpost. Books are stacked beneath it, with a ribbon marking the page Sydney left open. A wardrobe stands against the wall, and a screen gives the residents somewhere to change.
+    You stop beside Sydney's bunk in the temple quarters. A robe hangs neatly from the bedpost. Books are stacked beneath it, with a ribbon marking
+    the page Sydney left open. A wardrobe stands against the wall, and a screen gives the residents somewhere to change.
     <br><br>
     <<if _sydneyWorking>>
       Sydney is sorting the laundry for the next shift. <<He>> puts down a folded robe and makes room for you beside the wardrobe.
@@ -89,9 +152,9 @@
     <<if _sydneyWorking>>
       Sydney shows you the robes still waiting to be folded. "Could you give me a hand?" <<he>> asks, clearing a space beside the wardrobe.
     <<elseif _sydneyStatus.includes('corrupt')>>
-      Sydney catches your sleeve and draws you nearer. "I was hoping you'd follow me," <<he>> whispers, glancing at the neighbouring beds.
+      Sydney catches your sleeve and draws you nearer. "<span class='lewd'>I was hoping you'd follow me</span>," <<he>> whispers, glancing at the neighbouring beds.
     <<elseif _sydneyStatus.includes('pure')>>
-      Sydney smooths the blanket beside <<him>>. "I'm glad you came," <<he>> says softly.
+      Sydney smooths the blanket beside <<him>>. "<span class='teal'>I'm glad you came</span>," <<he>> says softly.
     <<else>>
       Sydney moves a book aside. "I could use a little company," <<he>> says.
     <</if>>
@@ -100,7 +163,8 @@
       Sydney notices your uncovered skin. <<if _sydneyStatus.includes('corrupt')>><span class="lewd"><<He>> lets <<his>> gaze linger</span> until you catch <<him>>, then smiles.<<else>><<He>> looks away, the tips of <<his>> ears turning pink.<</if>>
     <</if>>
   <<option 'CN'>>
-    你走到神殿宿舍里悉尼的床铺旁。一件修道袍整齐地挂在床柱上，下面叠着几本书。悉尼在读到一半的那页夹了根缎带。墙边是收纳衣物的柜子，屏风挡住了换衣服的地方。
+    你走到神殿宿舍里悉尼的床铺旁。一件修道袍整齐地挂在床柱上，下面叠着几本书。
+    悉尼在读到一半的那页夹了根缎带。墙边是收纳衣物的柜子，屏风挡住了换衣服的地方。
     <br><br>
     <<if _sydneyWorking>>
       悉尼正为下一班值勤的人整理衣物。<<He>>放下叠好的修道袍，在柜子旁给你腾出位置。
@@ -115,9 +179,9 @@
     <<if _sydneyWorking>>
       悉尼指了指还没叠好的修道袍。“可以搭把手吗？”<<he>>问，在衣柜旁给你腾出位置。
     <<elseif _sydneyStatus.includes('corrupt')>>
-      悉尼勾住你的衣袖，让你靠近些。“我就盼着你跟来呢。”<<he>>瞥了眼旁边的床铺，贴近你轻声说。
+      悉尼勾住你的衣袖，让你靠近些。“<span class='lewd'>我就盼着你跟来呢。</span>”<<he>>瞥了眼旁边的床铺，贴近你轻声说。
     <<elseif _sydneyStatus.includes('pure')>>
-      悉尼理平身旁的毯子。“你能来真好。”<<he>>轻声说。
+      悉尼理平身旁的毯子。“<span class='teal'>你能来真好。</span>”<<he>>轻声说。
     <<else>>
       悉尼把一本书挪开。“正好有人陪我说说话。”<<he>>说。
     <</if>>
@@ -158,14 +222,25 @@
     <<set _touchPart to 'fish'>><<set _touchLabel to '让悉尼抚摸你的耳鳍 (0:10)'>>
   <</if>>
   <<if _touchPart>>
-    <<loveicon>><<lanLink _touchLabel 'Deadwood Reblooms Sydney Dorm Transformation'>><<set $SydneyExpansion.touchPart to _touchPart>><<set $SydneyExpansion.touchDay to Time.days>><<set $daily.sydney.tf to ($daily.sydney.tf || 0) + 1>><<pass 10>><<npcincr Sydney love 2>><<if _sydneyStatus.includes('corrupt')>><<npcincr Sydney lust 1>><<npcincr Sydney purity -1>><<elseif _sydneyStatus.includes('pure')>><<npcincr Sydney purity 1>><</if>><</lanLink>><<glove>><br>
+    <<loveicon>>
+    <<lanLink _touchLabel 'Deadwood Reblooms Sydney Dorm Transformation'>>
+      <<set $SydneyExpansion.touchPart to _touchPart>>
+      <<set $SydneyExpansion.touchDay to Time.days>>
+      <<set $daily.sydney.tf to ($daily.sydney.tf || 0) + 1>>
+      <<pass 10>><<npcincr Sydney love 2>>
+      <<if _sydneyStatus.includes('corrupt')>>
+        <<npcincr Sydney lust 1>><<npcincr Sydney purity -1>>
+      <<elseif _sydneyStatus.includes('pure')>>
+        <<npcincr Sydney purity 1>>
+      <</if>>
+    <</lanLink>><<glove>><br>
   <</if>>
 <</if>>
 <<if _sydneyWorking>>
   <<wardrobeicon>><<lanLink '帮悉尼整理衣柜 (0:10)' 'Deadwood Reblooms Sydney Dorm Wardrobe'>><<pass 10>><</lanLink>><br>
 <</if>>
 <<if _shareSydneyBed>>
-  <<icon 'temple/sydney-bed.png'>><<lanLink '在悉尼身旁睡一会儿' 'Deadwood Reblooms Sydney Dorm Bed'>><</lanLink>><br>
+  <<deadwood-reblooms-sydney-dorm-bed-links>>
 <</if>>
 <<if _festivalNight>>
   <br>
@@ -313,7 +388,7 @@
   <<socialiseicon>><<lanLink '问悉尼今天过得如何 (0:10)' 'Deadwood Reblooms Sydney Dorm Conversation'>><<pass 10>><</lanLink>><br>
 <</if>>
 <<if _shareSydneyBed>>
-  <<icon 'temple/sydney-bed.png'>><<lanLink '在悉尼身旁睡一会儿' 'Deadwood Reblooms Sydney Dorm Bed'>><</lanLink>><br>
+  <<deadwood-reblooms-sydney-dorm-bed-links>>
 <</if>>
 <<if (_sydneyResting and $SydneyExpansion.talkDay isnot Time.days) or _shareSydneyBed>><br><</if>>
 <<lanLink '继续' 'Deadwood Reblooms Sydney Dorm'>><</lanLink>>
@@ -386,7 +461,7 @@
 <<npcincr Sydney love 1>><<glove>><<stress -3>><<lstress>>
 <br><br>
 <<if _shareSydneyBed>>
-  <<icon 'temple/sydney-bed.png'>><<lanLink '在悉尼身旁睡一会儿' 'Deadwood Reblooms Sydney Dorm Bed'>><</lanLink>><br>
+  <<deadwood-reblooms-sydney-dorm-bed-links>>
   <br>
 <</if>>
 <<lanLink '继续' 'Deadwood Reblooms Sydney Dorm'>><</lanLink>>
@@ -420,7 +495,7 @@
 <<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 2>><<glust>>
 <br><br>
 <<if _shareSydneyBed>>
-  <<icon 'temple/sydney-bed.png'>><<lanLink '在悉尼身旁睡一会儿' 'Deadwood Reblooms Sydney Dorm Bed'>><</lanLink>><br>
+  <<deadwood-reblooms-sydney-dorm-bed-links>>
   <br>
 <</if>>
 <<lanLink '继续' 'Deadwood Reblooms Sydney Dorm'>><</lanLink>>
@@ -560,7 +635,7 @@
 <</language>>
 <br><br>
 <<if _shareSydneyBed>>
-  <<icon 'temple/sydney-bed.png'>><<lanLink '在悉尼身旁睡一会儿' 'Deadwood Reblooms Sydney Dorm Bed'>><</lanLink>><br>
+  <<deadwood-reblooms-sydney-dorm-bed-links>>
   <br>
 <</if>>
 <<lanLink '继续' 'Deadwood Reblooms Sydney Dorm'>><</lanLink>>
@@ -598,13 +673,13 @@
 <</language>>
 <br><br>
 <<if _shareSydneyBed>>
-  <<icon 'temple/sydney-bed.png'>><<lanLink '在悉尼身旁睡一会儿' 'Deadwood Reblooms Sydney Dorm Bed'>><</lanLink>><br>
+  <<deadwood-reblooms-sydney-dorm-bed-links>>
   <br>
 <</if>>
 <<lanLink '继续' 'Deadwood Reblooms Sydney Dorm'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Dorm Bed []
-<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
+<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>><<wearoutfit>>
 <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
 <<language>>
   <<option 'EN'>>
@@ -681,26 +756,26 @@
     Sydney turns toward you beneath the blanket. <<He>> starts to speak, then checks that the other beds are quiet.
     <br><br>
     <<if _sydneyStatus.includes('pure')>>
-      "I was thinking about you all day," <<he>> says. "I want to be close to you tonight, if you want that too."
+      "I was thinking about you all day," <<he>> says. "<span class='teal'>I want to be close to you tonight, if you want that too.</span>"
     <<elseif _sydneyStatus.includes('corrupt')>>
-      Sydney takes your hand and places it against <<his>> cheek. "I was hoping you'd stay awake with me," <<he>> says with a small smile.
+      Sydney takes your hand and places it against <<his>> cheek. "<span class='lewd'>I was hoping you'd stay awake with me</span>," <<he>> says with a small smile.
     <<else>>
       "Can I ask you to stay with me a little longer?" <<he>> asks. <<He>> waits for you to answer before moving closer.
     <</if>>
     <br><br>
-    The choice is yours. Sydney leaves enough room for you to turn away.
+    <span class='teal'>The choice is yours.</span> Sydney leaves enough room for you to turn away.
   <<option 'CN'>>
     悉尼在毯子下转向你，欲言又止，先听了听旁边床铺的动静。
     <br><br>
     <<if _sydneyStatus.includes('pure')>>
-      “我今天一直在想你。”<<he>>说，“今晚我想和你更亲近些。如果你也愿意的话。”
+      “我今天一直在想你。”<<he>>说，“<span class='teal'>今晚我想和你更亲近些。如果你也愿意的话。</span>”
     <<elseif _sydneyStatus.includes('corrupt')>>
-      悉尼牵起你的手，贴在<<his>>脸颊上。“我正盼着你陪我晚些再睡。”<<he>>带着一点笑意说。
+      悉尼牵起你的手，贴在<<his>>脸颊上。“<span class='lewd'>我正盼着你陪我晚些再睡。</span>”<<he>>带着一点笑意说。
     <<else>>
       “可以再陪我一会儿吗？”<<he>>问，等你回答了，才向你靠近。
     <</if>>
     <br><br>
-    悉尼给你留了转身离开的空间，由你决定要不要留下。
+    悉尼给你留了转身离开的空间，<span class='teal'>由你决定要不要留下。</span>
 <</language>>
 <br><br>
 <<loveicon 'kiss'>><<lanLink "回应悉尼的邀请" 'Deadwood Reblooms Sydney Dorm Intimacy'>><<set $SydneyExpansion.dormScene to 'invitation'>><<set $sexstart to 1>><</lanLink>><<promiscuous1>><br>
@@ -767,9 +842,9 @@
         Sydney draws the screen across the space beside <<his>> bunk. <<He>> pauses to make sure you are still comfortable, then takes your hand when you move closer. Voices pass in the corridor and fade toward the evening service.
         <br><br>
         <<if _sydneyStatus.includes('pure')>>
-          "We can stop whenever you like," <<he>> says quietly. <<He>> waits for your answer before kissing you.
+          "<span class='teal'>We can stop whenever you like</span>," <<he>> says quietly. <<He>> waits for your answer before kissing you.
         <<elseif _sydneyStatus.includes('corrupt')>>
-          Sydney leans close enough for you to hear <<his>> smile. "I was trying to find a reason to keep you here."
+          Sydney leans close enough for you to hear <<his>> smile. "<span class='lewd'>I was trying to find a reason to keep you here.</span>"
         <<else>>
           "I don't usually ask anyone to stay," <<he>> admits. <<He>> gives your hand a nervous squeeze.
         <</if>>
@@ -777,9 +852,9 @@
         Sydney draws the blanket over your shoulders, then waits while you settle beside <<him>>. <<He>> kisses you, stopping when a floorboard creaks beyond the screen.
         <br><br>
         <<if _sydneyStatus.includes('pure')>>
-          "Is this all right?" <<he>> asks. When you draw <<him>> back, <<he>> smiles and kisses you again.
+          "<span class='teal'>Is this all right?</span>" <<he>> asks. When you draw <<him>> back, <<he>> smiles and kisses you again.
         <<elseif _sydneyStatus.includes('corrupt')>>
-          "I asked you to stay," <<he>> whispers, tracing your hand beneath the blanket. "You can tell me what you want."
+          "I asked you to stay," <<he>> whispers, tracing your hand beneath the blanket. "<span class='lewd'>You can tell me what you want.</span>"
         <<else>>
           Sydney lets out a nervous laugh. "I thought I would lose my nerve before you answered."
         <</if>>
@@ -789,6 +864,8 @@
         The last Halloween lantern has gone dark. Beneath the blanket, Sydney's hand finds yours while the temple settles for the night. <<He>> draws you closer, careful of the sleeping residents.
       <<elseif $SydneyExpansion.dormScene is 'christmas'>>
         The ribbon from Sydney's gift rests by the pillow. <<He>> puts it safely aside before drawing the blanket over you both. Outside the quarters, the temple has finally grown quiet.
+      <<elseif $SydneyExpansion.dormScene is 'night'>>
+        Sydney has woken beneath the blanket. <<He>> asks if you want to stay close, then waits for your answer before kissing you. The neighbouring bunks are quiet.
       <<else>>
         Sydney draws the blanket over both of you. The other residents are close enough that every creak of the bunk makes you pause. <<He>> holds your hand, then draws you nearer again.
       <</if>>
@@ -797,9 +874,9 @@
         悉尼把屏风拉到床边，隔出一小块地方。<<He>>停下来，确认你还愿意留下。你靠近时，<<he>>才握住你的手。走廊上传来几句说话声，又渐渐远向晚祷的方向。
         <br><br>
         <<if _sydneyStatus.includes('pure')>>
-          “你想停下来的时候，我们就停。”<<he>>轻声说，等你回答后才吻你。
+          “<span class='teal'>你想停下来的时候，我们就停。</span>”<<he>>轻声说，等你回答后才吻你。
         <<elseif _sydneyStatus.includes('corrupt')>>
-          悉尼贴近你，笑意藏在声音里。“我一直在想，该找什么理由留你。”
+          悉尼贴近你，笑意藏在声音里。“<span class='lewd'>我一直在想，该找什么理由留你。</span>”
         <<else>>
           “我平时不会请人留下。”<<he>>承认道，有些紧张地握了握你的手。
         <</if>>
@@ -807,9 +884,9 @@
         悉尼将毯子拉过你的肩膀，等你在<<him>>身旁躺好才吻过来。屏风外的地板忽然一响，<<he>>便停下，听着脚步声远去。
         <br><br>
         <<if _sydneyStatus.includes('pure')>>
-          “这样可以吗？”<<he>>问。你把<<him>>拉回来，<<he>>笑了，又吻住你。
+          “<span class='teal'>这样可以吗？</span>”<<he>>问。你把<<him>>拉回来，<<he>>笑了，又吻住你。
         <<elseif _sydneyStatus.includes('corrupt')>>
-          “是我请你留下的。”<<he>>贴着你的耳边说，手指沿着毯子下你的手滑过。“想要什么，你可以告诉我。”
+          “是我请你留下的。”<<he>>贴着你的耳边说，手指沿着毯子下你的手滑过。“<span class='lewd'>想要什么，你可以告诉我。</span>”
         <<else>>
           悉尼紧张地笑了一声。“你还没回答时，我差点就不敢再问了。”
         <</if>>
@@ -819,10 +896,25 @@
         万圣节最后一盏灯笼已经熄灭。神殿渐渐安静下来，毯子下悉尼摸索到你的手，又顾及着睡着的住客，把你轻轻拉近。
       <<elseif $SydneyExpansion.dormScene is 'christmas'>>
         悉尼送你的礼物上那根缎带还放在枕边。<<He>>先将它收好，才把毯子盖过你们两人。宿舍外的神殿终于安静了。
+      <<elseif $SydneyExpansion.dormScene is 'night'>>
+        悉尼在被子里醒了。<<He>>问你要不要靠近些，等你回答，才吻了过来。邻近的床铺仍然安静。
       <<else>>
         悉尼把毯子拉过你们身上。旁边的住客离得太近，床铺每响一下，你们便停一停。<<He>>握着你的手，随即又将你拉近。
       <</if>>
   <</language>>
+  <<if _sydneyChastity and $sydneyChastityKnown>>
+    <br><br><span class='teal'>
+      <<lanSwitch "Your hand meets the cool edge of Sydney's chastity belt beneath the blanket. Sydney covers your hand and lets you choose where to touch next." '你的手在毯子下碰到悉尼贞操带冰凉的边缘。悉尼覆住你的手，让你决定接下来碰哪里。'>>
+    </span>
+  <<elseif _sydneyChastity>>
+    <br><br><span class='lewd'>
+      <<lanSwitch "Something firm presses against your hand beneath Sydney's robe. Sydney draws a breath but does not move away." '隔着悉尼的修道袍，你摸到一件硬物。悉尼吸了口气，却没有躲开。'>>
+    </span>
+  <<elseif $sydneyChastityKnown>>
+    <br><br><span class='teal'>
+      <<lanSwitch "There is no lock at Sydney's waist now. Sydney notices your glance and draws your hand back under the blanket." '悉尼腰间已经没有锁扣。悉尼察觉到你的目光，又把你的手带回毯子里。'>>
+    </span>
+  <</if>>
   <br><br>
 <</if>>
 <<set $enemyanger to -10>>
@@ -859,6 +951,8 @@
         The lantern by the bunk is dark now. Sydney rests against you a while longer, listening for the first sounds of the morning shift.
       <<elseif $SydneyExpansion.dormScene is 'christmas'>>
         Sydney finds the ribbon again and winds it around your fingers. "Keep it," <<he>> says. "So you remember tonight."
+      <<elseif $SydneyExpansion.dormScene is 'night'>>
+        Sydney settles back beside you, listening until the room is quiet again. <<He>> keeps hold of your hand beneath the blanket.
       <<else>>
         Sydney catches <<his>> breath against your shoulder and pulls the blanket back over you both.
       <</if>>
@@ -881,6 +975,8 @@
         床边的灯笼已经熄灭。悉尼又靠了你一会儿，听着晨间值班的人何时会来。
       <<elseif $SydneyExpansion.dormScene is 'christmas'>>
         悉尼拿起那根缎带，缠在你的手指上。“留着吧。”<<he>>说，“这样你会记得今晚。”
+      <<elseif $SydneyExpansion.dormScene is 'night'>>
+        悉尼重新躺到你身旁，等宿舍安静下来，仍在被子底下握着你的手。
       <<else>>
         悉尼靠在你肩上平复呼吸，又把毯子拉回你们身上。
       <</if>>
@@ -910,10 +1006,33 @@
 :: Deadwood Reblooms Sydney Dorm Sleep []
 <<set $outside to 0>><<set $location to 'temple'>><<set $bedGuest to 'Sydney'>>
 <<set _autosavehere to true>>
+<<sydneySchedule>>
+<<set _requestedHours to $sleephour>>
+<<set _nightWake to _sydneyResting
+  and isLoveInterest('Sydney')
+  and _requestedHours gte 3
+  and (Time.hour gte 22 or Time.hour lt 3)
+  and !$daily.sydney.nightWake
+  and $nightmares lte 0
+  and random(1, 8) is 1>>
+<<if _nightWake>><<set $sleephour to random(1, Math.min(2, _requestedHours - 1))>><</if>>
 <<sleep>>
 <<if !_dreaming>>
   <<effects>><<wakingEffects $sleepHoursTotal>>
   <<sydneySchedule>><<run statusCheck('Sydney')>>
+  <<set _nightWake to _nightWake
+    and _sydneyResting
+    and !_wakingEffect
+    and $sleepHoursTotal gte 1
+    and (Time.hour gte 23 or Time.hour lt 6)>>
+  <<if _nightWake>>
+    <<set $daily.sydney.nightWake to 1>>
+    <<set $sleephour to Math.max(1, _requestedHours - $sleepHoursTotal)>>
+    <<sleepeffects>>
+    <<lanSwitch 'A movement beneath the blanket wakes you before the temple stirs.' '被子里传来动静。神殿还没醒，你却先睁开了眼。'>>
+    <br><br>
+    <<icon 'temple/sydney-bed.png'>><<lanLink '睁开眼' 'Deadwood Reblooms Sydney Dorm Night Wake'>><</lanLink>>
+  <<else>>
   <<if $nightmares gte 1 and $controlled is 0>>
     <<nightmareWake>>
   <<elseif !$wakingEffect>>
@@ -972,7 +1091,53 @@
     <<lanLink '和悉尼去见西里斯' 'Deadwood Reblooms Sydney Halloween Morning'>><</lanLink>><br>
   <</if>>
   <<lanLink '继续' 'Deadwood Reblooms Sydney Dorm'>><</lanLink>>
+  <</if>>
   <<set $phase to 0>>
+<</if>>
+
+:: Deadwood Reblooms Sydney Dorm Night Wake []
+<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
+<<sydneySchedule>><<run statusCheck('Sydney')>>
+<<if !_sydneyResting or !isLoveInterest('Sydney')>>
+  <<lanSwitch 'Sydney has left for work. The bunk is quiet.' '悉尼已经去忙差事了。床铺安静下来。'>>
+  <br><br>
+  <<getouticon>><<lanLink '离开床铺' 'Deadwood Reblooms Sydney Dorm'>><<set $sleephour to 0>><</lanLink>>
+<<else>>
+  <<npc Sydney>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney murmurs in <<his>> sleep. The bunk creaks as <<he>> turns toward you. When you open your eyes, <<he>> wakes too and draws the blanket over your shoulders.
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        "<span class='teal'>Did I wake you?</span>" <<he>> whispers. The other residents are still asleep.
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        Sydney brushes your hand beneath the blanket. "<span class='lewd'>I hoped you were awake.</span>" <<He>> waits for you to come closer.
+      <<else>>
+        "I thought I heard someone," <<he>> says. <<He>> listens to the quiet room, then smiles at you.
+      <</if>>
+    <<option 'CN'>>
+      悉尼在梦里低声说着话，翻身时床铺轻轻一响。你睁开眼，<<he>>也醒了，把毯子拉回你的肩头。
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        “<span class='teal'>我吵醒你了吗？</span>”<<he>>小声问。其他住客还睡着。
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        悉尼在被子底下碰了碰你的手。“<span class='lewd'>我正希望你醒着。</span>”<<He>>等着你靠近。
+      <<else>>
+        “我还以为听见有人来了。”<<he>>说。<<He>>听了一会儿，见屋里安静，才朝你笑。
+      <</if>>
+  <</language>>
+  <br><br>
+  <<loveicon>>
+  <<lanLink '与悉尼做爱' 'Deadwood Reblooms Sydney Dorm Intimacy'>>
+    <<set $sleephour to 0>>
+    <<set $SydneyExpansion.dormScene to 'night'>><<set $sexstart to 1>>
+  <</lanLink>><<promiscuous1>><br>
+  <<icon 'temple/sydney-bed.png'>>
+  <<lanLink '继续睡觉' 'Deadwood Reblooms Sydney Dorm Sleep'>><</lanLink>><br>
+  <<getouticon>>
+  <<lanLink '离开床铺' 'Deadwood Reblooms Sydney Dorm'>>
+    <<set $sleephour to 0>>
+  <</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Sydney Halloween Morning []
