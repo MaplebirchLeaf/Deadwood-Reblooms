@@ -61,4 +61,9 @@ jobs:
             echo "Expected two encrypted modpacks, found ${#packages[@]}" >&2
             exit 1
           fi
-          gh release create "$RELEASE_TAG" "${packages[@]}" --verify-tag --title "枯木逢春 · Deadwood Reblooms $RELEASE_TAG" --notes-file ".github/release-notes/$RELEASE_TAG.md"
+          notes_file=".github/release-notes/$RELEASE_TAG.md"
+          if [[ -s "$notes_file" ]]; then
+            gh release create "$RELEASE_TAG" "${packages[@]}" --verify-tag --title "枯木逢春 · Deadwood Reblooms $RELEASE_TAG" --notes-file "$notes_file"
+          else
+            gh release create "$RELEASE_TAG" "${packages[@]}" --verify-tag --title "枯木逢春 · Deadwood Reblooms $RELEASE_TAG" --notes "$(cat .github/release-notes/default.md)" --generate-notes
+          fi
