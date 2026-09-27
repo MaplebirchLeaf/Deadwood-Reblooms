@@ -6,6 +6,7 @@ export default function (maplebirch: MaplebirchCore) {
   'use strict';
 
   maplebirch.tool.addTo('Options', 'Deadwood-Reblooms-Options');
+  maplebirch.tool.addTo('Statistics', 'deadwood-reblooms-statistics');
   maplebirch.char.use(
     'post',
     options => {

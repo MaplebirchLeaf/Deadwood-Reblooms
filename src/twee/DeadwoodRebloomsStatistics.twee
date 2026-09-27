@@ -1,0 +1,111 @@
+:: Deadwood Reblooms Statistics [widget]
+
+<!-- 模组统计只读取当前存档的 V。没有开启的模块不显示空栏目。 -->
+<<widget 'deadwood-reblooms-statistics'>>
+  <<if maplebirch.get('VP') or maplebirch.get('MoreTransformations') or maplebirch.get('LS')>>
+  <<foldout false '_deadwoodProgressFoldout'>>
+    <span class='gold'><<lanSwitch 'Deadwood Reblooms: progress' '枯木逢春：进度'>></span>
+    <<if maplebirch.get('VP') and $VanillaPlus>>
+      <<lanSwitch 'Attribute breakthroughs:' '属性突破：'>>
+      <span class='teal'><<= Object.values($VanillaPlus.lock ?? {}).filter(Boolean).length>> / 6</span><br>
+      <<lanSwitch 'Breakthrough traits:' '突破特质：'>>
+      <span class='green'><<= Object.values($VanillaPlus.traits ?? {}).filter(Boolean).length>> / 7</span><br>
+    <</if>>
+    <<if maplebirch.get('MoreTransformations')>>
+      <<lanSwitch 'Horse transformation:' '马转化：'>>
+      <span class='softbrown'><<= $maplebirch?.transformation?.horse?.level ?? 0>> / 6</span>
+      (<span class='softbrown'><<= $maplebirch?.transformation?.horse?.build ?? 0>> / 30</span>)<br>
+      <<lanSwitch 'Fish transformation:' '鱼转化：'>>
+      <span class='lblue'><<= $maplebirch?.transformation?.fish?.level ?? 0>> / 6</span>
+      (<span class='lblue'><<= $maplebirch?.transformation?.fish?.build ?? 0>> / 30</span>)<br>
+    <</if>>
+    <<if maplebirch.get('LS') and $LifeSimulation>>
+      <<lanSwitch 'Attendance pass:' '免听凭证：'>>
+      <<if $LifeSimulation.school.attendanceExempt>><span class='green'><<lanSwitch 'Obtained' '已取得'>></span>
+      <<else>><<lanSwitch 'Not obtained' '未取得'>><</if>><br>
+      <<lanSwitch 'School role:' '校园身份：'>>
+      <<switch $LifeSimulation.school.role>>
+        <<case 'president'>><span class='gold'><<lanSwitch 'Student president' '学生会长'>></span>
+        <<case 'prefect'>><span class='teal'><<lanSwitch 'Prefect' '风纪委员'>></span>
+        <<default>><<lanSwitch 'Student' '学生'>>
+      <</switch>><br>
+      <<lanSwitch 'Morning duties:' '晨间值勤：'>>
+      <span class='teal'><<= $LifeSimulation.school?.duties?.completed ?? 0>></span><br>
+      <<lanSwitch 'History exhibition:' '历史展览：'>>
+      <<switch $LifeSimulation.historyProject?.status>>
+        <<case 'won'>><span class='green'><<lanSwitch 'Top evaluation' '最高评价'>></span>
+        <<case 'done'>><<lanSwitch 'Completed' '已完成'>>
+        <<case 'ongoing'>><<lanSwitch 'Ongoing' '进行中'>>
+        <<default>><<lanSwitch 'Not started' '未开始'>>
+      <</switch>><br>
+    <</if>>
+    <br>
+  <</foldout>>
+  <</if>>
+
+  <<if maplebirch.get('LS') and $LifeSimulation>>
+    <<foldout false '_deadwoodSchoolFoldout'>>
+      <span class='gold'><<lanSwitch 'School standing' '校园评价'>></span>
+      <<lanSwitch 'Order:' '校内秩序：'>>
+      <span @class="maplebirch.LS.school.standingColour($LifeSimulation.school?.order ?? 0)"><<= $LifeSimulation.school?.order ?? 0>></span><br>
+      <<lanSwitch 'Students:' '学生声望：'>>
+      <span @class="maplebirch.LS.school.standingColour($LifeSimulation.school?.studentSupport ?? 0)"><<= $LifeSimulation.school?.studentSupport ?? 0>></span><br>
+      <<lanSwitch 'Staff:' '教职工信任：'>>
+      <span @class="maplebirch.LS.school.standingColour($LifeSimulation.school?.staffSupport ?? 0)"><<= $LifeSimulation.school?.staffSupport ?? 0>></span><br>
+      <<lanSwitch 'Corruption:' '校内堕落：'>>
+      <span @class="maplebirch.LS.school.standingColour($LifeSimulation.school?.corruption ?? 0)"><<= $LifeSimulation.school?.corruption ?? 0>></span><br><br>
+    <</foldout>>
+  <</if>>
+
+  <<if maplebirch.get('VP') and $VanillaPlus>>
+    <<foldout false '_deadwoodFinanceFoldout'>>
+      <span class='gold'><<lanSwitch 'Finance and property' '金融与房产'>></span>
+      <<if $VanillaPlus.finance?.bank?.opened>>
+        <<lanSwitch 'Bank balance:' '银行余额：'>><<printmoney ($VanillaPlus.finance.bank.balance ?? 0)>><br>
+        <<lanSwitch 'Credit card debt:' '信用卡欠款：'>><<printmoney ($VanillaPlus.finance.bank.credit_debt ?? 0)>><br>
+        <<lanSwitch 'Personal loan debt:' '个人贷款余额：'>><<printmoney ($VanillaPlus.finance.bank.loan_debt ?? 0)>><br>
+      <<else>>
+        <<lanSwitch 'Bank account not opened' '尚未开立银行账户'>><br>
+      <</if>>
+      <<lanSwitch 'Owned properties:' '已持有房产：'>>
+      <span class='teal'><<= Object.values($VanillaPlus.real_estate?.owned ?? {}).filter(Boolean).length>></span><br>
+      <<lanSwitch 'Cohabitants:' '同住者：'>>
+      <span class='teal'><<= Object.values($VanillaPlus.real_estate?.residents ?? {}).flat().length>></span><br><br>
+    <</foldout>>
+  <</if>>
+
+  <<if (maplebirch.get('RobinExpansion') and $RobinExpansion)
+    or (maplebirch.get('SydneyExpansion') and $SydneyExpansion)
+    or (maplebirch.get('WhitneyExpansion') and $WhitneyExpansion)
+    or (maplebirch.get('KylarExpansion') and $KylarExpansion)>>
+    <<foldout false '_deadwoodPeopleFoldout'>>
+      <span class='gold'><<lanSwitch 'Character routes' '人物路线'>></span>
+      <<if maplebirch.get('RobinExpansion') and $RobinExpansion>>
+        <<lanSwitch "Robin's stall upgrades:" '罗宾摊位改造：'>>
+        <span class='teal'><<= ($RobinExpansion.lemonade ?? 0) + ($RobinExpansion.chocolate ?? 0)>> / 4</span><br>
+        <<lanSwitch "Robin's shop:" '罗宾的店：'>>
+        <<if $RobinExpansion.shop>><span class='green'><<lanSwitch 'Open' '已开业'>></span>
+        <<else>><<lanSwitch 'Not open' '未开业'>><</if>><br>
+      <</if>>
+      <<if maplebirch.get('SydneyExpansion') and $SydneyExpansion>>
+        <<lanSwitch "Sydney's dorm bed:" '悉尼宿舍床位：'>>
+        <<if $SydneyExpansion.dormInvited>><span class='green'><<lanSwitch 'Invited' '已获邀请'>></span>
+        <<else>><<lanSwitch 'Not invited' '未获邀请'>><</if>><br>
+        <<lanSwitch "Sirris's estate:" '西里斯庄园：'>>
+        <<if $SydneyExpansion.estate?.invited>><span class='green'><<lanSwitch 'Address known' '已获得地址'>></span>
+        <<else>><<lanSwitch 'Address unknown' '尚未知晓地址'>><</if>><br>
+      <</if>>
+      <<if maplebirch.get('WhitneyExpansion') and $WhitneyExpansion>>
+        <<lanSwitch 'Whitney rescued from the basement:' '地下妓院营救惠特尼：'>>
+        <<if $WhitneyExpansion.rescued>><span class='green'><<lanSwitch 'Yes' '已完成'>></span>
+        <<else>><<lanSwitch 'No' '未完成'>><</if>><br>
+      <</if>>
+      <<if maplebirch.get('KylarExpansion') and $KylarExpansion>>
+        <<lanSwitch "Kylar's manor stay:" '凯拉尔庄园留宿：'>>
+        <<if $KylarExpansion.stay_invited>><span class='green'><<lanSwitch 'Invited' '已获邀请'>></span>
+        <<else>><<lanSwitch 'Not invited' '未获邀请'>><</if>><br>
+      <</if>>
+      <br>
+    <</foldout>>
+  <</if>>
+<</widget>>
