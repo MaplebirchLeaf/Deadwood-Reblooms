@@ -496,8 +496,37 @@
     <<pass 20>>
   <</lanLink>><br>
 <</if>>
+<<if maplebirch.get('LS') and $LifeSimulation.school.role isnot 'student'
+  and (_sirrisAtEstate or _sydneyAtEstate)
+  and $daily.schoolStudySession isnot Time.days>>
+  <<schoolicon 'science'>><<lanLink '准备学生会的课后讲解 (0:30)' 'Deadwood Reblooms Sirris School Project'>><<pass 30>><</lanLink>><br>
+<</if>>
 <br>
 <<getouticon>><<lanLink '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</lanLink>>
+
+:: Deadwood Reblooms Sirris School Project []
+<<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
+<<deadwood-reblooms-sirris-estate-presence>>
+<<if !maplebirch.get('LS') or $LifeSimulation.school.role is 'student' or (!_sirrisAtEstate and !_sydneyAtEstate)>>
+  <<lanSwitch 'The study is empty. You leave the lesson plan where it is.' '书房里没有人。你把教案留在原处。'>><br><br>
+<<else>>
+  <<set _scienceReady to currentSkillValue('science') gte 500>>
+  <<if maplebirch.LS.school.organiseStudySession(_scienceReady)>>
+    <<if _sirrisAtEstate>><<npc Sirris>><<person1>><<else>><<npc Sydney>><<person1>><</if>>
+    <<language>>
+      <<option 'EN'>>You spread a draft for an after-school session across the desk. <<if _sirrisAtEstate>>Sirris points out which diagrams the younger students have already seen.<<else>>Sydney finds the relevant temple notes and marks two passages to explain in plain words.<</if>>
+      <<option 'CN'>>你把课后讲解的草稿铺在桌上。<<if _sirrisAtEstate>>西里斯指出低年级学生已经学过哪些图示。<<else>>悉尼翻出神殿的相关笔记，圈了两处需要用简单说法解释的地方。<</if>>
+    <</language>><br><br>
+    <<if _scienceReady>>
+      <span class='teal'><<lanSwitch 'You catch an error in the experiment notes and correct it before the session is announced.' '你发现实验笔记里有一处错误，在活动公布前改好了。'>></span><br>
+      <<scienceskill 1>><<gscience>>
+    <<else>>
+      <<lanSwitch 'You keep the plan short and ask for another pair of eyes before teaching it.' '你把讲解压短，准备正式开讲前再请人核对一遍。'>><br>
+    <</if>>
+    <<deadwood-reblooms-life-simulation-school-feedback>>
+  <</if>>
+<</if>>
+<br><<getouticon>><<lanLink '返回书房' 'Deadwood Reblooms Sirris Estate Study'>><</lanLink>>
 
 :: Deadwood Reblooms Sirris Estate Study Help []
 <<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>

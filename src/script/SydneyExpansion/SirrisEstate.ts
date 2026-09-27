@@ -43,7 +43,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
     locationPassage: {
       'Danube Street': [
         {
-          src: '<<if $exposed lte 0 and Time.openingHours(2)>>',
+          srcmatch: /<<if \$exposed lte 0 and Time\.openingHours\(2\)>>(?=\s*<<spaicon>>)/,
           applybefore: '<<deadwood-reblooms-sirris-estate-street-link>>\n\t\t',
           expected: 1
         }

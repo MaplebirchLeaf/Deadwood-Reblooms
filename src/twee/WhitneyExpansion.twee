@@ -175,6 +175,15 @@
 <</if>>
 
 :: Deadwood Whitney Reunion Widgets [widget]
+<!-- 营救后的普通校园日才开放，每日一次。 -->
+<<widget 'deadwood-whitney-aftercare-link'>>
+  <<if $WhitneyExpansion?.rescued and $WhitneyExpansion.reunionSeen
+    and C.npc.Whitney.state is 'active' and Time.schoolDay
+    and Time.hour gte 7 and Time.hour lt 18 and $exposed lte 0
+    and $daily.whitneyAftercare isnot Time.days>>
+    <<socialiseicon>><<lanLink '去找惠特尼说话 (0:10)' 'Deadwood Whitney Aftercare'>><<pass 10>><</lanLink>><br><br>
+  <</if>>
+<</widget>>
 <<widget 'deadwood-whitney-reunion-intro'>>
   <<npc Whitney>><<person1>>
   <<language>>
@@ -252,6 +261,45 @@
     <<option 'CN'>>
       “你现在怎么样？”你问。惠特尼瞪了你一眼。“像个逃出来的人。”<<he>>说。<<He>>盯着手里的烟，最后没点，直接收了起来。“明天我还会来。你知道这些就够了。”
   <</language>>
-  <<npcincr Whitney love 1>><<glove>>
+<<npcincr Whitney love 1>><<glove>>
 <</if>>
 <br><br><<getinicon>><<lanLink '进入学校' 'Hallways'>><<pass 1>><</lanLink>>
+
+:: Deadwood Whitney Aftercare []
+<<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
+<<if !$WhitneyExpansion?.rescued or !$WhitneyExpansion.reunionSeen or C.npc.Whitney.state isnot 'active'>>
+  <<lanSwitch 'Whitney has already left the school grounds.' '惠特尼已经离开学校。'>><br><br>
+<<else>>
+  <<set $daily.whitneyAftercare to Time.days>>
+  <<npc Whitney>><<person1>>
+  <<language>>
+    <<option 'EN'>>Whitney is arguing with a friend by the gate. The friend asks another question about the days Whitney disappeared. Whitney's smile vanishes. <<He>> catches sight of you and waves the friend away. "You here to ask too?"
+    <<option 'CN'>>惠特尼正和朋友在校门边争执。那人又问起惠特尼失踪的几天，<<his>>笑容立刻没了。<<He>>看到你，挥手让朋友先走。“你也是来问这个的？”
+  <</language>><br><br>
+  <<if $LifeSimulation?.school and $LifeSimulation.school.role isnot 'student'>>
+    <<lanSwitch 'Whitney glances at your badge. "Put that away before someone thinks you are here to write me up."' '惠特尼瞥了眼你的徽章。“收起来，省得别人以为你要记我的过。”'>><br><br>
+  <</if>>
+  <<socialiseicon>><<lanLink '告诉惠特尼不必解释' 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'space'>><</lanLink>><br>
+  <<if isLoveInterest('Whitney')>>
+    <<loveicon>><<lanLink '陪惠特尼走一段' 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'walk'>><</lanLink>><br>
+  <</if>>
+<</if>>
+<br><<getouticon>><<lanLink '返回前庭' 'School Front Courtyard'>><</lanLink>>
+
+:: Deadwood Whitney Aftercare Answer []
+<<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
+<<npc Whitney>><<person1>>
+<<if $phase is 'walk' and isLoveInterest('Whitney')>>
+  <<language>>
+    <<option 'EN'>>You walk beside Whitney until the bell rings. <<He>> keeps close enough that your sleeves touch. "Don't make a thing of it," <<he>> says, though <<he>> slows when you do.
+    <<option 'CN'>>你陪惠特尼走到铃声响起。<<He>>靠得很近，袖口不时碰到你。“别大惊小怪的。”<<he>>嘴上这样说，你放慢脚步时，<<he>>也跟着慢下来。
+  <</language>><br><br>
+  <<npcincr Whitney love 2>><<glove>><<stress -2>><<lstress>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>"Good," Whitney mutters. "I'm sick of telling the story." <<He>> nudges your shoulder, then goes inside before anyone else can call out.
+    <<option 'CN'>>“那就好。”惠特尼嘟囔道，“这事我讲烦了。”<<He>>用肩膀碰了你一下，赶在别人开口前进了学校。
+  <</language>><br><br>
+  <<npcincr Whitney love 1>><<glove>>
+<</if>>
+<<getinicon>><<lanLink '进入学校' 'Hallways'>><</lanLink>>
