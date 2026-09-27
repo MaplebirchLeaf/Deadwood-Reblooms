@@ -66,12 +66,13 @@ export default function (maplebirch: typeof window.maplebirch): void {
     widgetPassage: {
       'Widgets Journal': [
         {
-          src: '<<if !_avery_pay>>\n\t\t\t\t<<if $rentday isnot undefined>>',
+          // 原版在这里直接列出房租，DoLP 则先列押金。截断共同的房租分支，保留各自后续结构。
+          src: '<<if !_avery_pay>>',
           to: `<<deadwood-robin-journal>>
-        <<if !_avery_pay>>
-        <<if $RobinExpansion.baileyDefeated>>
-          <li><span class='green'><<lanSwitch 'Bailey no longer collects rent from you or Robin.' '贝利不再向你和罗宾收租。'>></span></li>
-        <<elseif $rentday isnot undefined>>`,
+            <<if $RobinExpansion.baileyDefeated>>
+              <li><span class='green'><<lanSwitch 'Bailey no longer collects rent from you or Robin.' '贝利不再向你和罗宾收租。'>></span></li>
+            <</if>>
+            <<if !_avery_pay and !$RobinExpansion.baileyDefeated>>`,
           expected: 1
         }
       ],

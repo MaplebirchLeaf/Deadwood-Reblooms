@@ -1,0 +1,205 @@
+:: Deadwood Robin Private Invite []
+<<set _site to $RobinExpansion.intimacySite>>
+<<set _return to _site is 'shop' ? (Time.hour lt 21 ? 'Deadwood Robin Shop' : 'Cliff Street')
+  : _site is 'lemonade' ? 'Beach'
+  : _site is 'chocolate' ? 'Park'
+  : $RobinExpansion.meteorReturn>>
+<<set $outside to _site is 'meteor' ? 1 : 0>>
+<<set $location to _site is 'shop' ? 'town' : _site is 'chocolate' ? 'park' : 'beach'>>
+<<effects>><<npc Robin>><<person1>>
+<<if !['shop', 'lemonade', 'chocolate', 'meteor'].includes(_site)
+  or !isLoveInterest('Robin') or C.npc.Robin.trauma gte 50
+  or $robinmissing or $robin.timer.hurt gt 0
+  or $RobinExpansion.asylum.status is 'admitted'>>
+  <<set $RobinExpansion.intimacySite to null>>
+  <<lanSwitch 'Robin cannot spend time with you now.' '罗宾现在没法陪你。'>>
+<<else>>
+  <<switch _site>>
+    <<case 'shop'>>
+      <<language>>
+        <<option 'EN'>>
+          The paid helper takes the till. Robin slips into the stockroom with
+          you and pulls the door almost shut. You can hear customers at the
+          counter. "Only if you want to," <<he>> says.
+        <<option 'CN'>>
+          受薪帮工接过收银台，罗宾和你一起溜进储藏室，轻轻掩上门。
+          柜台那边仍有客人说话。“你愿意才行。”<<he>>等你回答。
+      <</language>>
+    <<case 'lemonade'>>
+      <<language>>
+        <<option 'EN'>>
+          You duck beneath the lemonade cart while Robin is serving. The
+          canvas hides you from the queue. Robin looks down, startled, then
+          murmurs, "There are people here." <<He>> waits for your answer.
+        <<option 'CN'>>
+          罗宾忙着招呼客人，你悄悄钻到柠檬水车下。帆布挡住排队的人。
+          罗宾吃了一惊，低声说：“这里有人。”<<He>>等你回答。
+      <</language>>
+    <<case 'chocolate'>>
+      <<language>>
+        <<option 'EN'>>
+          You crouch beneath the cocoa stand while Robin stirs the next cup.
+          The counter conceals you from the path. Robin glances down and
+          whispers, "Someone might come over." <<He>> waits for your answer.
+        <<option 'CN'>>
+          罗宾正在搅动下一杯可可，你在摊位下面蹲下。柜台挡住小路上的视线。
+          罗宾低头看了你一眼，轻声说：“随时会有客人过来。”<<He>>等你回答。
+      <</language>>
+    <<case 'meteor'>>
+      <<language>>
+        <<option 'EN'>>
+          Another meteor crosses the sky. Robin draws the blanket around you
+          both, then pauses. "Would you like to stay here with me?" <<he>> asks.
+        <<option 'CN'>>
+          又一颗流星划过夜空。罗宾把毯子拉到你们身上，随后停下来。
+          “你想和我在这里多待一会儿吗？”<<he>>轻声问。
+      <</language>>
+  <</switch>>
+  <br><br>
+  <<if _site is 'lemonade' or _site is 'chocolate'>>
+    <<loveicon 'hug'>><<lanLink '在摊位下继续' 'Deadwood Robin Private Sex'>>
+      <<set $sexstart to 1>>
+    <</lanLink>><<promiscuous4>><br>
+  <<else>>
+    <<loveicon 'hug'>><<lanLink '吻罗宾' 'Deadwood Robin Private Sex'>>
+      <<set $sexstart to 1>>
+    <</lanLink>><<promiscuous1>><br>
+  <</if>>
+<</if>>
+<br><<getouticon>><<lanLink '先回去' _return>>
+  <<set $RobinExpansion.intimacySite to null>><<endevent>>
+<</lanLink>>
+
+:: Deadwood Robin Private Sex []
+<!-- 原版罗宾的合意战斗初始化与结束流程。site 保存在当前 V 中，读档或跨回合后仍返回正确地点。 -->
+<<set _site to $RobinExpansion.intimacySite>>
+<<if !['shop', 'lemonade', 'chocolate', 'meteor'].includes(_site)>>
+  <<set $sexstart to 0>>
+  <<getouticon>><<lanLink '离开' 'Orphanage'>><<endevent>><</lanLink>>
+<<else>>
+  <<set $outside to _site is 'meteor' ? 1 : 0>>
+  <<set $location to _site is 'shop' ? 'town' : _site is 'chocolate' ? 'park' : 'beach'>>
+  <<if $sexstart is 1>>
+    <<set $sexstart to 0>>
+    <<clearnpc>><<npc Robin>><<person1>>
+    <<run statusCheck('Robin')>>
+    <<consensual>><<set $consensual to 1>><<neutral 1>>
+    <<if _site isnot 'lemonade' and _site isnot 'chocolate' and $exposed lt 2>><<strip>><</if>>
+    <<maninit>><<set $enemytrust += 500>>
+    <<set $enemyarousalmax to 600>>
+    <<if _site is 'lemonade' or _site is 'chocolate'>>
+      <!-- 工作中的摊位借用原版口部遭遇战姿态，不让 PC 在柜台外脱衣。 -->
+      <<npcoral>><<set $NPCList[0].mouth to 'none'>>
+      <<set $NPCList[0].lefthand to 'none'>><<set $NPCList[0].righthand to 'none'>>
+      <<set $speechdisable to 1>><<set $head to 'grappled'>>
+      <<set $timer to random(5, 9)>>
+    <<else>>
+      <<npcexpose>><<npckiss>>
+    <</if>>
+    <<switch _site>>
+      <<case 'shop'>>
+        <<lanSwitch
+          'Robin pulls you close in the quiet stockroom.'
+          '罗宾在安静的储藏室里把你拉近。'>>
+      <<case 'lemonade'>>
+        <<lanSwitch
+          'Robin grips the edge of the cart as the next customer approaches.'
+          '下一位客人走近时，罗宾抓紧了推车边缘。'>>
+      <<case 'chocolate'>>
+        <<lanSwitch
+          'Robin keeps stirring the cocoa while footsteps pass the stand.'
+          '脚步声从摊位前经过，罗宾继续搅着可可。'>>
+      <<case 'meteor'>>
+        <<lanSwitch 'You turn toward Robin beneath the blanket as another light crosses the sky.' '又一道光划过天空。你在毯子下面向罗宾转过身。'>>
+    <</switch>><br><br>
+    <<if _site is 'lemonade' or _site is 'chocolate'>>
+      <<promiscuity4>>
+    <<else>>
+      <<promiscuity1>>
+    <</if>>
+    <br><br>
+  <</if>>
+  <<set $enemyanger to 0>>
+  <<effects>><<effectsman>><<man>><<stateman>>
+  <<if _site is 'lemonade' or _site is 'chocolate'>>
+    <<if $timer is 3>>
+      <br><br><span class='lewd'><<lanSwitch 'Footsteps stop at the counter.' '脚步声停在柜台前。'>></span>
+    <<elseif $timer is 2>>
+      <br><br><<lanSwitch 'Robin takes an order and reaches for a clean cup.' '罗宾应了一声，伸手拿起干净的杯子。'>>
+    <<elseif $timer is 1>>
+      <br><br><<lanSwitch 'Robin hands over the drink. The customer hesitates, then walks away.' '罗宾递出饮料。客人停顿片刻，终于走开。'>>
+    <<elseif $timer is 0>>
+      <<set $timer to random(5, 9)>>
+      <br><br><<lanSwitch 'Robin glances down to check on you before taking the next order.' '接待下一位客人前，罗宾低头看了你一眼。'>>
+    <</if>>
+  <</if>>
+  <br><br><<actionsman>>
+  <<if _combatend or $consensual isnot 1>>
+    <span id='next'><<lanLink '继续' 'Deadwood Robin Private Sex Finish'>><</lanLink>></span><<nexttext>>
+  <<else>>
+    <span id='next'><<lanLink '继续' 'Deadwood Robin Private Sex'>><</lanLink>></span><<nexttext>>
+  <</if>>
+<</if>>
+
+:: Deadwood Robin Private Sex Finish []
+<<set _site to $RobinExpansion.intimacySite>>
+<<set _return to _site is 'shop' ? 'Cliff Street'
+  : _site is 'lemonade' ? 'Beach'
+  : _site is 'chocolate' ? 'Park'
+  : $RobinExpansion.meteorReturn>>
+<<set $outside to _site is 'meteor' ? 1 : 0>>
+<<set $location to _site is 'shop' ? 'town' : _site is 'chocolate' ? 'park' : 'beach'>>
+<<effects>><<npc Robin>><<person1>>
+<<if $enemyarousal gte $enemyarousalmax>>
+  <<ejaculation>><<npcincr Robin lust -20>>
+<</if>>
+<<if $consensual isnot 1>>
+  <<lanSwitch 'Robin draws back. You give <<him>> room, and neither of you tries to continue.' '罗宾退开了。你给<<him>>留出空间，谁也没有再继续。'>>
+<<else>>
+  <<if _site is 'shop' or _site is 'meteor'>>
+    <<takeKissVirginity 'Robin' 'loveInterest'>>
+  <</if>>
+  <<switch _site>>
+    <<case 'shop'>>
+      <<language>>
+        <<option 'EN'>>
+          Robin straightens <<his>> apron and checks the stockroom latch.
+          "The helper will want the keys back," <<he>> says with a smile.
+        <<option 'CN'>>
+          罗宾理好围裙，检查储藏室的门闩。
+          “帮工还等着我把钥匙还回去呢。”<<he>>笑着说。
+      <</language>>
+    <<case 'lemonade'>>
+      <<language>>
+        <<option 'EN'>>
+          The queue thins. You emerge from beneath the cart while Robin
+          straightens the cups. <<He>> gives you a shy look before serving again.
+        <<option 'CN'>>
+          队伍短了些。你从推车下钻出来，罗宾摆正杯子。
+          继续招呼客人前，<<he>>有些害羞地看了你一眼。
+      <</language>>
+    <<case 'chocolate'>>
+      <<language>>
+        <<option 'EN'>>
+          You slip out from beneath the stand. Robin checks the cocoa pot,
+          then gives your hand a quick squeeze before the next customer arrives.
+        <<option 'CN'>>
+          你从摊位下钻出来。罗宾看了看可可锅。
+          下一位客人到来前，<<he>>匆匆握了握你的手。
+      <</language>>
+    <<case 'meteor'>>
+      <<language>>
+        <<option 'EN'>>
+          The meteors have thinned. Robin stays beneath the blanket until
+          the last bright trail fades, then helps you fold it.
+        <<option 'CN'>>
+          流星渐渐稀疏。罗宾仍留在毯子里。
+          直到最后一道亮光消失，<<he>>才和你一起把毯子叠好。
+      <</language>>
+  <</switch>>
+<</if>>
+<br><br>
+<<clotheson>><<endcombat>>
+<<getouticon>><<lanLink '离开' _return>>
+  <<set $RobinExpansion.intimacySite to null>><<endevent>>
+<</lanLink>>

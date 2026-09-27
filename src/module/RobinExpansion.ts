@@ -40,6 +40,9 @@ interface RobinExpansionState {
   solidarity: boolean;
   baileyDefeated: boolean;
   meteorDay: number;
+  // 场景入口跨越遭遇战回合后仍要知道该回到哪处摊位或约会地点。
+  intimacySite: 'shop' | 'lemonade' | 'chocolate' | 'meteor' | null;
+  meteorReturn: string;
   swimDay: number;
   tutorDay: number;
   tutorLessons: number;
@@ -100,6 +103,8 @@ class RobinExpansion extends Module {
     solidarity: false,
     baileyDefeated: false,
     meteorDay: -1,
+    intimacySite: null,
+    meteorReturn: 'Orphanage',
     swimDay: -1,
     tutorDay: -1,
     tutorLessons: 0,

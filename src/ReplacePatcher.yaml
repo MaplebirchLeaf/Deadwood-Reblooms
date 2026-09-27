@@ -4,10 +4,12 @@
   before: |
     if (maplebirch.get('MoreTransformations') && amount > 0 && V.maplebirch?.transformation?.horse?.level >= 6) fatigueMod *= 0.75;
 
-- comment: '罗宾与孤儿们逼退贝利后暂停原版收租倒计时，不影响其他每日时间逻辑。'
+- comment: '罗宾与孤儿们逼退贝利后跳过整次原版收租结算，避免 DoLP 继续从押金扣款。'
   fileName: 'time.js'
-  from: 'V.renttime--;'
-  to: "if (!maplebirch.get('RobinExpansion') || !V.RobinExpansion?.baileyDefeated) V.renttime--;"
+  from: 'function passRentTick() {'
+  to: |
+    function passRentTick() {
+      if (maplebirch.get('RobinExpansion') && V.RobinExpansion?.baileyDefeated) return;
 
 - comment: '悉尼事先答应当晚回家时，将原版日程同步转为 home，直至次日清晨，避免半夜突然回到神殿。'
   fileName: 'named-npc.js'
