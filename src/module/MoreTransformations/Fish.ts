@@ -118,6 +118,13 @@ class Fish extends Transformation {
     };
     maplebirch.tool.onInit(descriptions);
     maplebirch.on(':language', descriptions);
+    maplebirch.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-loft-rice', {
+      exact: true,
+      cond: () => V.loft_river === 1,
+      action: () => {
+        V.loftIngredients.rice = Math.max(V.loftIngredients.rice ?? 0, 3);
+      }
+    });
 
     maplebirch.tool.patch.traits.add(
       {
@@ -136,7 +143,10 @@ class Fish extends Transformation {
       },
       {
         title: 'General Traits',
-        name: () => (V.player?.gender === 'n' ? '<<lanSwitch "Fish " "鱼">>' : '<<lanSwitch "Fish " "鱼">><<pcGender>>'),
+        name: () => {
+          const name = V.player.gender === 'n' ? '<<lanSwitch "Fish" "鱼">>' : '<<lanSwitch "Fish " "鱼">><<pcGender>>';
+          return name + (V.player.sex === 'h' ? "<<lanSwitch ' (⚥)' '(⚥)'>>" : '');
+        },
         colour: 'lblue',
         has: () => V.maplebirch.transformation.fish.level >= 6,
         text: () => maplebirch.t('deadwood-reblooms:Traits:fish:text')
@@ -175,17 +185,17 @@ class Fish extends Transformation {
               '<<icon "fish.png">><<link `lanSwitch(\'Lounge in the water like a fish (0:10)\', \'像鱼一样泡着 (0:10)\')` $passage>><<pass 10>><<stress -3>><<transform "fish" 1>><</link>><<lstress>><<transform-hint "fish" "lblue">><br>',
             expected: 1
           }
+        ],
+        'Orphanage Loft Kitchen': [
+          // 在原版食材库存与烹饪界面之间放专属动作，不改动其他厨房的食谱。
+          {
+            src: '<<kitchenDisplay>>',
+            applybefore: '<<deadwood-reblooms-loft-rice>>\n',
+            expected: 1
+          }
         ]
       },
       widgetPassage: {
-        'Widgets Kitchen': [
-          // 在厨房完成最近食谱分组计算后追加吃生米组件，让鱼化的特殊饮食入口能复用原版食谱状态。
-          {
-            src: '<<set $_group to _recipeKeys.find((obj) => obj.key is $lastRecipeViewed).group>>',
-            applyafter: '<<deadwood-reblooms-eat-rice>>',
-            expected: 1
-          }
-        ],
         Widgets: [
           // 在原版游泳动作耗时计算后应用高等级鱼化减时，保留原本由游泳技能决定的基础耗时。
           {

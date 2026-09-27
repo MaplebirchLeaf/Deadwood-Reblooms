@@ -46,7 +46,9 @@ interface ScanOptions {
 interface TweePatcherRule {
   passage: string;
   all?: boolean;
-  findString: string;
+  findString?: string;
+  findRegex?: string;
+  regexFlag?: string;
   replace?: string;
   replaceFile?: string;
 }
@@ -194,6 +196,7 @@ function buildRules(content: string, type: 'patcher'): ReplacePatcherRule[];
 function buildRules(content: string, type: 'twee' | 'patcher'): Array<TweePatcherRule | ReplacePatcherRule> {
   return parseYamlList(content, item => {
     const source = String(item[type === 'twee' ? 'findString' : 'from'] ?? '');
+    const regex = type === 'twee' ? String(item.findRegex ?? '') : '';
     const before = typeof item.before === 'string' ? item.before : '';
     const after = typeof item.after === 'string' ? item.after : '';
     const relative = before || after ? `${before}${source}${after}` : undefined;
@@ -208,9 +211,11 @@ function buildRules(content: string, type: 'twee' | 'patcher'): Array<TweePatche
     }
 
     const rule: TweePatcherRule = {
-      passage: String(item.passage ?? ''),
-      findString: source
+      passage: String(item.passage ?? '')
     };
+    if (source) rule.findString = source;
+    else if (regex) rule.findRegex = regex;
+    if (typeof item.regexFlag === 'string') rule.regexFlag = item.regexFlag;
     if (item.all === true) rule.all = true;
     if (typeof item.replace === 'string') {
       rule.replace = item.replace;
@@ -220,7 +225,7 @@ function buildRules(content: string, type: 'twee' | 'patcher'): Array<TweePatche
       rule.replace = relative;
     }
 
-    return rule.passage && rule.findString ? rule : null;
+    return rule.passage && (rule.findString || rule.findRegex) ? rule : null;
   });
 }
 

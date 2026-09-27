@@ -1,6 +1,6 @@
 :: Deadwood Reblooms More Transformations Widgets [widget]
 
-<!-- 沿用原版混合转化开关；马尾和恶魔尾均可见时才提供此选项。 -->
+<!-- 沿用原版混合转化开关，马尾和恶魔尾均可见时才提供此选项。 -->
 <<widget 'deadwood-reblooms-demon-horse-tail-option'>>
 	<<if $_chimeraOptions.demonhorse_tail>>
 		<div class='tf-part-item'>
@@ -22,32 +22,23 @@
 	<</if>>
 <</widget>>
 
-<!-- 米饭食谱：消耗一杯米并推进鱼类转化。 -->
-<<widget 'deadwood-reblooms-eat-rice'>>
-	<<if $lastRecipeViewed is "rice" and $_group isnot "Provided" and $foodstuff.rice.amount gt 0>>
-		<<language>>
-			<<option 'EN'>>
-				<<link 'Cook and eat a bowl of rice - 1 cup (0:10)' $passage>>
-				<<set $foodstuff.rice.amount -= 1>><<pass 10>><<transform "fish" 1>>
-			<</link>>
-			<<option 'CN'>>
-				<<link '煮食一碗白米饭 - 1 杯米 (0:10)' $passage>>
-				<<set $foodstuff.rice.amount -= 1>><<pass 10>><<transform "fish" 1>>
-			<</link>>
-		<</language>>
-		<<transform-hint "fish" "lblue">><br>
-		<<if $foodstuff.rice.amount gte 3>>
-			<<language>>
-				<<option 'EN'>>
-					<<link 'Cook and eat three bowls of rice - 3 cups (0:30)' $passage>>
-					<<set $foodstuff.rice.amount -= 3>><<pass 30>><<transform "fish" 2>>
-				<</link>>
-				<<option 'CN'>>
-					<<link '煮食三碗白米饭 - 3 杯米 (0:30)' $passage>>
-					<<set $foodstuff.rice.amount -= 3>><<pass 30>><<transform "fish" 2>>
-				<</link>>
-			<</language>>
-			<<transform-hint "fish" "lblue">><br>
+<!-- 瑞沃安装阁楼厨房后，每日送来的米可在此烹成白米饭。 -->
+<<widget 'deadwood-reblooms-loft-rice'>>
+	<<if $loftIngredients.rice gt 0>>
+		<<set _oneRiceLabel to lanSwitch('Cook and eat a bowl of rice (0:10)', '煮食一碗白米饭 (0:10)')>>
+		<<foodstufficon 'rice'>><<link _oneRiceLabel 'Orphanage Loft Kitchen'>>
+			<<set $loftIngredients.rice -= 1>>
+			<<pass 10>>
+			<<transform 'fish' 1>>
+		<</link>><<transform-hint 'fish' 'lblue'>><br>
+		<<if $loftIngredients.rice gte 3>>
+			<<set _threeRiceLabel to lanSwitch('Cook and eat three bowls of rice (0:30)', '煮食三碗白米饭 (0:30)')>>
+			<<foodstufficon 'rice'>><<link _threeRiceLabel 'Orphanage Loft Kitchen'>>
+				<<set $loftIngredients.rice -= 3>>
+				<<pass 30>>
+				<<transform 'fish' 3>>
+			<</link>><<transform-hint 'fish' 'lblue'>><br>
 		<</if>>
+		<br>
 	<</if>>
 <</widget>>

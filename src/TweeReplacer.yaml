@@ -1,0 +1,30 @@
+- passage: Traits
+  # 狼、猫的称号原本只根据认同的性别拼接文字，双性角色还需要生理标记。
+  findRegex: >-
+    name: \(\) => V\.player\.gender is "n" \? "([^"]+)" : "([^"]+)",
+  replace: >-
+    name: () => (V.player.gender is "n" ? "$1" : "$2") + (V.player.sex is "h" ? "<<lanSwitch ' (⚥)' '(⚥)'>>" : ""),
+  all: true
+
+- passage: Traits
+  # 鸟/哈比的两个外观分支都显示双性标记。
+  findRegex: >-
+    name: \(\) => V\.hallucinations gte 2 \|\| !V\.settings\.bestialityEnabled \? "([^"]+)" : V\.player\.gender is "n" \? "([^"]+)" : "([^"]+)",
+  replace: >-
+    name: () => (V.hallucinations gte 2 || !V.settings.bestialityEnabled ? "$1" : V.player.gender is "n" ? "$2" : "$3") + (V.player.sex is "h" ? "<<lanSwitch ' (⚥)' '(⚥)'>>" : ""),
+
+- passage: Traits
+  # 牛、狐称号已有多条性别分支，只在各分支的返回值上补标记。
+  findRegex: >-
+    return "(Bull(?: <<pcGender>>)?|Cow(?: <<pcGender>>)?|Fox(?: <<pcGender>>)?|Vixen|公牛(?:<<pcGender>>)?|奶牛(?:<<pcGender>>)?|雄狐|狐<<pcGender>>|雌狐)";
+  replace: >-
+    return "$1" + (V.player.sex is "h" ? "<<lanSwitch ' (⚥)' '(⚥)'>>" : "");
+  all: true
+
+- passage: Traits
+  # 原版恶魔称号只给异装男女标注生理性别，双性角色补上对应符号。
+  findRegex: >-
+    return "(Incubus|Succubus|魅影|魅魔)";
+  replace: >-
+    return "$1" + (V.player.sex is "h" ? "<<lanSwitch ' (⚥)' '(⚥)'>>" : "");
+  all: true
