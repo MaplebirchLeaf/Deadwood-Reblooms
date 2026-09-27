@@ -52,7 +52,7 @@ const guideSections = {
   KylarExpansion: { en: hint_KylarExpansion_en, cn: hint_KylarExpansion_cn, title: { en: 'Kylar', cn: '凯拉尔拓展' } },
   LS: { en: hint_LS_en, cn: hint_LS_cn, title: { en: 'Life Simulation', cn: '模拟生活' } },
   DM: { en: hint_DM_en, cn: hint_DM_cn, title: { en: 'Dynamic Music', cn: '动态音乐' } },
-  Credits: { en: hint_Credits_en, cn: hint_Credits_cn, title: { en: 'Related works', cn: '相关作品' } }
+  Credits: { en: hint_Credits_en, cn: hint_Credits_cn, title: { en: 'Credits and sources', cn: '致谢与素材来源' } }
 } as const;
 
 const guideOrder = [

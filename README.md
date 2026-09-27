@@ -15,7 +15,7 @@
 - [安装与前置](#安装与前置)
 - [模块与游戏指南](#模块与游戏指南)
 - [可选音频包](#可选音频包)
-- [相关作品](#相关作品)
+- [致谢与素材来源](#致谢与素材来源)
 - [反馈与相关项目](#反馈与相关项目)
 
 ## 安装与前置
@@ -53,16 +53,19 @@
 
 `DM` 的音频和 `dynamic-music.json` 位于独立的音频包中。本体只提供播放调度。安装音频包后，在**模组设置 → 动态音乐**启用，并分别调整音乐与环境声的音量。缺少音频包时，动态音乐不会播放，其他模块可以照常使用。
 
-## 相关作品
+## 致谢与素材来源
 
-枯木逢春的部分功能受以下作品启发。若已安装原模组，可在模块选择界面关闭枯木逢春的对应功能：
+感谢以下作者的作品与协助。若已安装功能相近的原模组，可在模块选择界面关闭枯木逢春的对应功能：
 
 - `LongerCombat`：狐千月的[更长遭遇战](https://github.com/emicoto/DOLMods/)。
 - `MLIANPCA`：Eudemonism00 的[社交栏小头像](https://github.com/Eudemonism00/DOL-npcicon-mods/)与苯环的[更多恋人](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod)。
 - `RobinExpansion`：零环零幻想的[Dom 罗宾](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod)。
 - `LS`：丧心的[模拟人生](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims)。
+- 马转化贴图：元夕。
 
-社交栏头像与场景立绘属于同人创作，不代表游戏官方形象。相关作品和作者也收录在游戏指南中。
+动态音乐使用 Kresiek The Furry、Augmentality（Brandon Morris）、AdoTheLimey、primbal、Breviceps、Joth、TinyWorlds、isaiah658、SketchMan3 和 rubberduck 的 CC0 音频。逐曲来源见[音频素材记录](audio-pack/audio/CREDITS.md)。也感谢所有提供建议、测试反馈与帮助的朋友。
+
+社交栏头像与场景立绘属于同人创作，不代表游戏官方形象。作者与素材来源也收录在游戏指南中。
 
 ## 反馈与相关项目
 
@@ -70,4 +73,3 @@
 
 - [Degrees of Lewdity](https://gitgud.io/Vrelnir/degrees-of-lewdity)
 - [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)
-- [DOL Mod Protection Tools](https://github.com/MaplebirchLeaf/Dol-Mod-Protection-Tools)

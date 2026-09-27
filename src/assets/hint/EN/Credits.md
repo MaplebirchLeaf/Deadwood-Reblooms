@@ -1,7 +1,14 @@
-- `LongerCombat`: [Longer Encounters](https://github.com/emicoto/DOLMods/) by 狐千月.
-- `MLIANPCA` portraits: [NPC icon mod](https://github.com/Eudemonism00/DOL-npcicon-mods/) by Eudemonism00.
-- `MLIANPCA` more love interests: [More Love Interests](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod) by 苯环.
-- `RobinExpansion`: [Dom Robin](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod) by 零环零幻想.
-- `LS`: [DolSims](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims) by 丧心.
+Thanks to the following creators for their work and help:
+
+- 狐千月: [Longer Encounters](https://github.com/emicoto/DOLMods/), which informed `LongerCombat`.
+- Eudemonism00: [NPC sidebar portraits](https://github.com/Eudemonism00/DOL-npcicon-mods/), a source for `MLIANPCA` portraits.
+- 苯环: [More Love Interests](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod), which informed `MLIANPCA`.
+- 零环零幻想: [Dom Robin](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod), which informed `RobinExpansion`.
+- 丧心: [DoLSims](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims), which informed `LS` school gameplay.
+- 元夕: provided the horse transformation sprites.
+
+Dynamic music uses CC0 audio by Kresiek The Furry, Augmentality (Brandon Morris), AdoTheLimey, primbal, Breviceps, Joth, TinyWorlds, isaiah658, SketchMan3, and rubberduck. See the [audio source record](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/blob/main/audio-pack/audio/CREDITS.md) for each track and source.
+
+Thanks also to everyone who shared ideas, testing feedback, and other help.
 
 When reporting a problem, include the game and framework versions, enabled modules, save location, and steps to reproduce it.
