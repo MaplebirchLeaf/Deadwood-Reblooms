@@ -57,10 +57,16 @@ class SolarEclipse {
   public apply = apply;
 
   private get state(): SolarEclipseState {
-    return ((V.CelestialAnomalies ??= {}).solarEclipse ??= {
-      seed: this.seed(),
+    const state = ((V.CelestialAnomalies ??= {}).solarEclipse ??= {
+      seed: 0,
       stored: []
     });
+    // 模块默认值会先填入 seed: 0。仅首次读取当前存档时掷种子，读档沿用已保存的值。
+    if (state.seed === 0) {
+      state.seed = this.seed() || 1;
+      state.stored = [];
+    }
+    return state;
   }
 
   private get enabled(): boolean {

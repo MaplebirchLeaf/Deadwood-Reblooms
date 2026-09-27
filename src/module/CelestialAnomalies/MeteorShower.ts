@@ -68,10 +68,16 @@ class MeteorShower {
   public apply = apply;
 
   private get state(): MeteorShowerState {
-    return ((V.CelestialAnomalies ??= {}).meteorShower ??= {
-      seed: this.seed(),
+    const state = ((V.CelestialAnomalies ??= {}).meteorShower ??= {
+      seed: 0,
       stored: []
     });
+    // 种子属于当前 V，首次生成后固定，不能在重新载入同一存档时重掷。
+    if (state.seed === 0) {
+      state.seed = this.seed() || 1;
+      state.stored = [];
+    }
+    return state;
   }
 
   private get enabled(): boolean {
