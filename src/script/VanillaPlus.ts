@@ -32,7 +32,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       get desc() {
         return maplebirch.t('deadwood-reblooms:VanillaPlus:incorrigible:feat:description');
       },
-      difficulty: 5,
+      difficulty: 4,
       series: '',
       filter: ['All', 'Stats']
     };

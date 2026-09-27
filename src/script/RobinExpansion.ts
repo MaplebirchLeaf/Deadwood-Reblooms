@@ -3,7 +3,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
     for (const [id, difficulty] of [
       ['Deadwood Robin Independent', 2],
       ['Deadwood Robin Together', 3],
-      ['Deadwood Robin Free', 4],
+      ['Deadwood Robin Free', 3],
       ['Deadwood Robin Shop Open', 3]
     ] as const) {
       setup.feats[id] ??= {

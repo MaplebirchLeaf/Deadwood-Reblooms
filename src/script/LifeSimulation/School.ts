@@ -27,7 +27,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       get desc() {
         return maplebirch.t('deadwood-reblooms:LifeSimulation:school:feat:naked:description');
       },
-      difficulty: 4,
+      difficulty: 3,
       series: '',
       filter: ['All', 'General']
     };
