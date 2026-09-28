@@ -54,7 +54,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 将每个史莱姆抗拒场景的原版意志值输入包装为耳液抗性值；无特质时返回原值。
         {
           src: "currentSkillValue('willpower')",
-          to: "maplebirch.VP.willpower.earSlimeResistance(currentSkillValue('willpower'))",
+          to: "maplebirch.VP.willpower.earSlime(currentSkillValue('willpower'))",
           expected: 1
         }
       ]

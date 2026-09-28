@@ -3,27 +3,27 @@ import type { FinanceResult } from './Finance';
 
 // 房贷和持有成本固定在同一套规则内，房源价格与房间布局仍由 properties.yaml 提供。
 const PROPERTY_TERMS = {
-  downPaymentPercent: 20,
-  closingFeePercent: 2,
-  paymentReserveWeeks: 1,
-  termDays: 90,
-  weeklyInterestRate: 0.0035,
-  lateFeePennies: 2000,
-  freezeAfterNoticeDays: 7,
-  auctionAfterFreezeDays: 7,
-  fightExtensionDays: 7,
-  freezeFeePennies: 50000,
-  foreclosureAuctionPercent: 80,
-  voluntaryAuctionPercent: 75,
-  voluntaryAuctionDays: 7,
+  down_payment_percent: 20,
+  closing_fee_percent: 2,
+  payment_reserve_weeks: 1,
+  term_days: 90,
+  weekly_interest_rate: 0.0035,
+  late_fee_pennies: 2000,
+  freeze_after_notice_days: 7,
+  auction_after_freeze_days: 7,
+  fight_extension_days: 7,
+  freeze_fee_pennies: 50000,
+  foreclosure_auction_percent: 80,
+  voluntary_auction_percent: 75,
+  voluntary_auction_days: 7,
   rental: {
-    weeklyMaintenancePercent: 0.105,
-    minimumCondition: 50,
-    conditionLossPerWeek: 1,
-    renovationRentBonusPercent: 60,
-    renovationCostPercent: 5,
-    repairCostPerConditionPercent: 0.05,
-    maxRenovationLevel: 3
+    weekly_maintenance_percent: 0.105,
+    minimum_condition: 50,
+    condition_loss_per_week: 1,
+    renovation_rent_bonus_percent: 60,
+    renovation_cost_percent: 5,
+    repair_cost_per_condition_percent: 0.05,
+    max_renovation_level: 3
   }
 };
 
@@ -62,19 +62,19 @@ class Mortgage {
   }
 
   public downPayment(price: number): number {
-    return Math.ceil((price * this.terms.downPaymentPercent) / 100);
+    return Math.ceil((price * this.terms.down_payment_percent) / 100);
   }
 
   public purchaseCosts(price: number): { deposit: number; fee: number; weekly_payment: number; reserve: number } {
     const deposit = this.downPayment(price);
     const principal = price - deposit;
-    const { closingFeePercent, paymentReserveWeeks, termDays, weeklyInterestRate } = this.terms;
-    const weekly_payment = Mortgage.instalment(principal, Math.ceil(termDays / 7), weeklyInterestRate);
+    const { closing_fee_percent, payment_reserve_weeks, term_days, weekly_interest_rate } = this.terms;
+    const weekly_payment = Mortgage.instalment(principal, Math.ceil(term_days / 7), weekly_interest_rate);
     return {
       deposit,
-      fee: Math.ceil((price * closingFeePercent) / 100),
+      fee: Math.ceil((price * closing_fee_percent) / 100),
       weekly_payment,
-      reserve: weekly_payment * paymentReserveWeeks
+      reserve: weekly_payment * payment_reserve_weeks
     };
   }
 
@@ -105,7 +105,7 @@ class Mortgage {
     this.finance.payFromBankPennies(fee);
     // 价格、首付、本金和 weekly_payment 全部是便士。信用卡仅补首付差额，不进入房贷本金。
     const principal = price - deposit;
-    const { termDays } = this.terms;
+    const { term_days } = this.terms;
     const today = Mortgage.today();
     this.current = {
       property_id,
@@ -115,7 +115,7 @@ class Mortgage {
       next_payment_day: today + 7,
       last_interest_day: today,
       last_day: today,
-      maturity_day: today + termDays,
+      maturity_day: today + term_days,
       stage: 'current',
       notice_day: null,
       frozen_day: null,
@@ -165,7 +165,7 @@ class Mortgage {
     loan.bailey_pending = false;
     if (won && !loan.fight_used) {
       loan.fight_used = true;
-      loan.notice_day = Mortgage.today() + this.terms.fightExtensionDays - this.terms.freezeAfterNoticeDays;
+      loan.notice_day = Mortgage.today() + this.terms.fight_extension_days - this.terms.freeze_after_notice_days;
     } else this.freeze(loan, Mortgage.today());
   }
 
@@ -192,8 +192,8 @@ class Mortgage {
           break;
         }
         if (loan.arrears > 0) {
-          loan.outstanding += this.terms.lateFeePennies;
-          loan.arrears += this.terms.lateFeePennies;
+          loan.outstanding += this.terms.late_fee_pennies;
+          loan.arrears += this.terms.late_fee_pennies;
         } else Mortgage.clearDefault(loan);
         loan.next_payment_day = day < loan.maturity_day ? Math.min(day + 7, loan.maturity_day) : day + 7;
       }
@@ -201,9 +201,9 @@ class Mortgage {
         loan.stage = 'notice';
         loan.notice_day = day;
         loan.bailey_pending = true;
-      } else if (loan.stage === 'notice' && loan.notice_day !== null && day - loan.notice_day >= this.terms.freezeAfterNoticeDays) {
+      } else if (loan.stage === 'notice' && loan.notice_day !== null && day - loan.notice_day >= this.terms.freeze_after_notice_days) {
         this.freeze(loan, day);
-      } else if (loan.stage === 'frozen' && loan.frozen_day !== null && day - loan.frozen_day >= this.terms.auctionAfterFreezeDays) {
+      } else if (loan.stage === 'frozen' && loan.frozen_day !== null && day - loan.frozen_day >= this.terms.auction_after_freeze_days) {
         this.current = null;
         // 补算可能跨过多天；把实际拍卖日传给房产记录，而非读取补算结束后的当前日期。
         this.onAuction(loan.property_id, loan.outstanding, day);
@@ -216,7 +216,7 @@ class Mortgage {
   private accrueInterest(loan: MortgageState, day: number): void {
     const elapsedDays = Math.max(0, day - loan.last_interest_day);
     if (elapsedDays === 0) return;
-    loan.outstanding += Math.ceil((loan.outstanding * this.terms.weeklyInterestRate * elapsedDays) / 7);
+    loan.outstanding += Math.ceil((loan.outstanding * this.terms.weekly_interest_rate * elapsedDays) / 7);
     loan.last_interest_day = day;
   }
 
@@ -225,8 +225,8 @@ class Mortgage {
     loan.stage = 'frozen';
     loan.frozen_day = day;
     loan.bailey_pending = false;
-    loan.outstanding += this.terms.freezeFeePennies;
-    loan.arrears += this.terms.freezeFeePennies;
+    loan.outstanding += this.terms.freeze_fee_pennies;
+    loan.arrears += this.terms.freeze_fee_pennies;
   }
 
   private static clearDefault(loan: MortgageState): void {

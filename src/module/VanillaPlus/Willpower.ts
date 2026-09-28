@@ -33,7 +33,7 @@ class Willpower {
     return V.VanillaPlus?.lock?.willpower && V.willpower >= this.vanillaPlus.ceiling('willpower');
   }
 
-  public earSlimeResistance(value: number): number {
+  public earSlime(value: number): number {
     return V.VanillaPlus.traits.willpower ? Infinity : value;
   }
 

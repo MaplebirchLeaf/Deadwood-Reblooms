@@ -25,7 +25,7 @@ function hash(seed: number, date: MeteorDate, salt: number): number {
   return (seed + date.year * salt + date.month * 131 + date.day * 17) >>> 0;
 }
 
-function predictMeteorShower(seed: number, date: MeteorDate): MeteorShowerStored | null {
+function predict(seed: number, date: MeteorDate): MeteorShowerStored | null {
   // 存档种子与日期共同决定是否发生，读档后不会因为重新掷随机数改变预报。
   if (hash(seed, date, 1543) % trigger !== 0) return null;
 
@@ -41,7 +41,7 @@ function predictMeteorShower(seed: number, date: MeteorDate): MeteorShowerStored
   };
 }
 
-function meteorShowerStrength(phase: number): number {
+function strength(phase: number): number {
   const progress = Math.min(1, Math.max(0, phase));
   if (progress < 0.2) return progress / 0.2;
   if (progress > 0.8) return (1 - progress) / 0.2;
@@ -93,7 +93,7 @@ class MeteorShower {
   }
 
   public get strength(): number {
-    return meteorShowerStrength(this.phase);
+    return strength(this.phase);
   }
 
   public get stored(): MeteorShowerStored[] {
@@ -115,7 +115,7 @@ class MeteorShower {
   }
 
   private build(date: DateTime): MeteorShowerStored | null {
-    return predictMeteorShower(this.state.seed, this.date(date));
+    return predict(this.state.seed, this.date(date));
   }
 
   private current(date = new DateTime(Time.date)) {
