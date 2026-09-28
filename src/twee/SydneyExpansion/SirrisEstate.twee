@@ -157,9 +157,8 @@
       <<else>>
         窗户黑着。<span class='blue'>你按了门铃，却没人应答。</span>
       <</if>>
-  <</language>>
+  <</language>><br><br>
   <<if _sydneyAtEstate or _sirrisAtEstate>>
-    <br><br>
     <<icon 'sirris-hall.png'>><<lanLink '走进西里斯家 (0:01)' 'Deadwood Reblooms Sirris Estate Hall'>><<pass 1>><</lanLink>><br>
   <</if>>
   <<if _sydneyAtEstate
@@ -169,7 +168,6 @@
     <<lanLink '和悉尼谈谈凯拉尔的庄园' 'Deadwood Reblooms Sirris Estate Kylar Talk'>><</lanLink>><br>
   <</if>>
 <</if>>
-<br>
 <<danubeicon>><<lanLink '返回多瑙河街 (0:05)' 'Danube Street'>><<pass 5>><</lanLink>>
 
 :: Deadwood Reblooms Sirris Estate Kylar Talk []
@@ -298,9 +296,7 @@
   <<schoolicon 'science'>><<lanLink '书房 (0:01)' 'Deadwood Reblooms Sirris Estate Study'>><<pass 1>><</lanLink>><br>
   <<kitchenicon 'stove'>><<lanLink '厨房 (0:01)' 'Deadwood Reblooms Sirris Estate Kitchen'>><<pass 1>><</lanLink>><br>
   <<bathroomicon 'bath'>><<lanLink '浴室 (0:01)' 'Deadwood Reblooms Sirris Estate Bathroom'>><<pass 1>><</lanLink>><br>
-  <<if _sydneyAtEstate and isLoveInterest('Sydney')>>
-    <<bedicon>><<lanLink '悉尼的房间 (0:01)' 'Deadwood Reblooms Sirris Estate Sydney Room'>><<pass 1>><</lanLink>><br>
-  <</if>>
+  <<icon 'temple/sydney-bed.png'>><<lanLink '悉尼的房间 (0:01)' 'Deadwood Reblooms Sirris Estate Sydney Room'>><<pass 1>><</lanLink>><br>
   <br>
   <<getouticon>><<lanLink '返回前花园 (0:01)' 'Deadwood Reblooms Sirris Estate Gate'>><<pass 1>><</lanLink>>
 <</if>>
@@ -804,23 +800,23 @@
 :: Deadwood Reblooms Sirris Estate Sydney Room []
 <<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
 <<deadwood-reblooms-sirris-estate-presence>>
-<<if !_sydneyAtEstate or !isLoveInterest('Sydney')>>
-  <<lanSwitch "Sydney isn't in the room. You leave it as you found it." '悉尼不在房间里。你把东西放回原处，准备离开。'>><br><br>
-  <<getouticon>><<lanLink '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</lanLink>>
-<<else>>
-  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<if _sydneyAtEstate>><<npc Sydney>><<person1>><<run statusCheck('Sydney')>><</if>>
   <<language>>
     <<option 'EN'>>
-      Sydney's room has a narrow bed, a desk and more books than the shelves will hold. A school project from years ago rests against the wall. Some things are left exactly where <<he>> put them before moving between school and the temple.
+      Sydney's room has a narrow bed, a desk and more books than the shelves will hold. A school project from years ago rests against the wall. Some things are left exactly where Sydney put them before moving between school and the temple.
       <br><br>
-      <<if _sydneyStatus.includes('pure')>>
+      <<if !_sydneyAtEstate>>
+        Sydney is away. You leave the books and bedding as Sydney arranged them.
+      <<elseif !isLoveInterest('Sydney')>>
+        Sydney shows you the books on the desk and makes room for you to look around.
+      <<elseif _sydneyStatus.includes('pure')>>
         "I still come back here," <<he>> says, smoothing a page on the desk. "It helps to remember I have somewhere else to go."
       <<elseif _sydneyStatus.includes('corrupt')>>
         Sydney closes the door partway and sits beside you. "<<nnpc_Mum 'Sirris'>> knows you're here," <<he>> says with a smile. "We don't have to whisper."
       <<else>>
         Sydney finds a place for you among the books. "I never seem to take enough of them back to the temple," <<he>> admits.
       <</if>>
-      <<if $SydneyExpansion.estate.familyTalk>>
+      <<if _sydneyAtEstate and isLoveInterest('Sydney') and $SydneyExpansion.estate.familyTalk>>
         <br><br>
         <<if $SydneyExpansion.estate.familyTalk is 'listen'>>
           "I meant what I said downstairs," <<he>> adds. <span class='teal'>"Thank you for giving me time to say it."</span>
@@ -829,16 +825,20 @@
         <</if>>
       <</if>>
     <<option 'CN'>>
-      悉尼的房间里有一张窄床、一张书桌，还有书架装不下的书。几年前的学校作品靠墙放着。<<He>>在学校和神殿间来回奔忙时，有些东西仍留在原处。
+      悉尼的房间里有一张窄床、一张书桌，还有书架装不下的书。几年前的学校作品靠墙放着。悉尼在学校和神殿间来回奔忙时，有些东西仍留在原处。
       <br><br>
-      <<if _sydneyStatus.includes('pure')>>
+      <<if !_sydneyAtEstate>>
+        悉尼不在家。你没有碰悉尼摆好的书和被褥。
+      <<elseif !isLoveInterest('Sydney')>>
+        悉尼向你介绍桌上的书，又挪出一点地方，让你四处看看。
+      <<elseif _sydneyStatus.includes('pure')>>
         “我还是会回来。”<<he>>抚平桌上的一页纸，“记得自己还有另一个能去的地方，总会安心些。”
       <<elseif _sydneyStatus.includes('corrupt')>>
         悉尼把门虚掩着，在你身边坐下。“<<nnpc_Mum 'Sirris'>>知道你来了。”<<he>>笑道，“不用说悄悄话。”
       <<else>>
         悉尼挪开几本书，给你腾出位置。“我每次带去神殿的书都不够。”<<he>>承认道。
       <</if>>
-      <<if $SydneyExpansion.estate.familyTalk>>
+      <<if _sydneyAtEstate and isLoveInterest('Sydney') and $SydneyExpansion.estate.familyTalk>>
         <br><br>
         <<if $SydneyExpansion.estate.familyTalk is 'listen'>>
           “我刚才在楼下说的，都是真心话。”<<he>>又说，<span class='teal'>“谢谢你给我时间说出来。”</span>
@@ -848,46 +848,49 @@
       <</if>>
   <</language>>
   <br><br>
-  <<if $SydneyExpansion.estate.roomDay isnot Time.days>>
-    <<loveicon 'kiss'>>
-    <<lanLink '在床边吻悉尼 (0:10)' 'Deadwood Reblooms Sirris Estate Sydney Kiss'>>
-      <<set $SydneyExpansion.estate.roomDay to Time.days>>
-      <<pass 10>>
-    <</lanLink>><<promiscuous1>><br>
-  <</if>>
-  <<loveicon>>
-  <<lanLink '与悉尼单独待一会儿 (0:05)' 'Deadwood Reblooms Sirris Estate Sydney Privacy'>>
-    <<pass 5>>
-  <</lanLink>><br>
-  <<language>>
-    <<option 'EN'>><<mirroricon>><<link 'Mirror' 'Deadwood Reblooms Sirris Estate Sydney Mirror'>><<preMirror>><</link>>
-    <<option 'CN'>><<mirroricon>><<link '镜子' 'Deadwood Reblooms Sirris Estate Sydney Mirror'>><<preMirror>><</link>>
-  <</language>><br>
-  <<if $earSlime.event and $earSlime.noSleep>>
-    <span class='red'><<lanSwitch 'The slime will not let you sleep yet.' '史莱姆现在不让你睡觉。'>></span><br>
-  <<else>>
-    <<bedicon>>
-    <<lanLink '脱衣钻进悉尼的被窝' 'Deadwood Reblooms Sirris Estate Sydney Bed'>>
-      <<undressSleep 'sirris estate bed'>>
-    <</lanLink>><br>
-    <<if !$earSlime.alwaysSleepNaked or $hypnosis_traits.silence>>
-      <<set $storeLocation to 'sirris estate bed'>>
-      <<set $wardrobe_location to 'wardrobe'>><<wardrobeSelection true>>
-      <<for _index, _outfit range $outfit>>
-        <<if _outfit.type.includes('sleep')>>
-          <<capture _index>>
-            <<bedicon>>
-            <<lanLink '换上睡衣并钻进悉尼的被窝' 'Deadwood Reblooms Sirris Estate Sydney Bed'>>
-              <<set $wear_outfit to _index>><<saveTempHairStyle>>
-            <</lanLink>><br>
-          <</capture>>
-        <</if>>
-      <</for>>
+  <<if _sydneyAtEstate and isLoveInterest('Sydney')>>
+    <<if $earSlime.event and $earSlime.noSleep>>
+      <span class='red'><<lanSwitch 'The slime will not let you sleep yet.' '史莱姆现在不让你睡觉。'>></span><br>
+    <<else>>
+      <<icon 'temple/sydney-bed.png'>>
+      <<lanLink '脱衣钻进悉尼的被窝' 'Deadwood Reblooms Sirris Estate Sydney Bed'>>
+        <<undressSleep 'sirris estate bed'>>
+      <</lanLink>><br>
+      <<if !$earSlime.alwaysSleepNaked or $hypnosis_traits.silence>>
+        <<set $storeLocation to 'sirris estate bed'>>
+        <<set $wardrobe_location to 'wardrobe'>><<wardrobeSelection true>>
+        <<for _index, _outfit range $outfit>>
+          <<if _outfit.type.includes('sleep')>>
+            <<capture _index _outfit>>
+              <<icon 'temple/sydney-bed.png'>>
+              <<set _sleepwearLabel to lanSwitch(
+                'Wear ' + _outfit.name + " and climb into Sydney's bed",
+                '换上' + (_outfit.cn_name_cap || _outfit.name) + '并钻进悉尼的被窝')>>
+              <<lanLink _sleepwearLabel 'Deadwood Reblooms Sirris Estate Sydney Bed'>><<set $wear_outfit to _index>><<saveTempHairStyle>><</lanLink>><br>
+            <</capture>>
+          <</if>>
+        <</for>>
+      <</if>>
     <</if>>
+    <br>
+    <<language>>
+      <<option 'EN'>><<mirroricon>><<link 'Mirror' 'Deadwood Reblooms Sirris Estate Sydney Mirror'>><<preMirror>><</link>>
+      <<option 'CN'>><<mirroricon>><<link '镜子' 'Deadwood Reblooms Sirris Estate Sydney Mirror'>><<preMirror>><</link>>
+    <</language>><br>
+    <<if $SydneyExpansion.estate.roomDay isnot Time.days>>
+      <<loveicon 'kiss'>>
+      <<lanLink '在床边吻悉尼 (0:10)' 'Deadwood Reblooms Sirris Estate Sydney Kiss'>>
+        <<set $SydneyExpansion.estate.roomDay to Time.days>>
+        <<pass 10>>
+      <</lanLink>><<promiscuous1>><br>
+    <</if>>
+    <<loveicon>>
+    <<lanLink '与悉尼单独待一会儿 (0:05)' 'Deadwood Reblooms Sirris Estate Sydney Privacy'>>
+      <<pass 5>>
+    <</lanLink>><br>
   <</if>>
   <br>
   <<getouticon>><<lanLink '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</lanLink>>
-<</if>>
 
 :: Deadwood Reblooms Sirris Estate Sydney Mirror []
 <<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
@@ -914,7 +917,7 @@
 <<if !_sydneyAtEstate or !isLoveInterest('Sydney')>>
   <<lanSwitch 'Sydney has left the house. You pull back the covers and get up.' '悉尼已经离开了。你掀开被子，起身下床。'>>
   <br><br>
-  <<bedicon>>
+  <<icon 'temple/sydney-bed.png'>>
   <<lanLink '起床' 'Deadwood Reblooms Sirris Estate Sydney Room'>>
     <<storeon 'sirris estate bed'>><<loadTempHairStyle>>
   <</lanLink>>
@@ -945,7 +948,7 @@
   <br><br>
   <<nightmareCheck 'Deadwood Reblooms Sirris Estate Sydney Sleep'>>
   <<generateSleepLinks 'Deadwood Reblooms Sirris Estate Sydney Sleep'>>
-  <<bedicon>>
+  <<icon 'temple/sydney-bed.png'>>
   <<lanLink '起床' 'Deadwood Reblooms Sirris Estate Sydney Room'>>
     <<storeon 'sirris estate bed'>><<loadTempHairStyle>>
   <</lanLink>>
@@ -980,7 +983,7 @@
     <<sleepeffects>>
     <<lanSwitch 'The narrow bed shifts beneath you. You wake before dawn.' '窄床在身下轻轻一晃。天还没亮，你便醒了。'>>
     <br><br>
-    <<bedicon>><<lanLink '睁开眼' 'Deadwood Reblooms Sirris Estate Sydney Night Wake'>><</lanLink>>
+    <<icon 'temple/sydney-bed.png'>><<lanLink '睁开眼' 'Deadwood Reblooms Sirris Estate Sydney Night Wake'>><</lanLink>>
   <<else>>
   <<if $nightmares gte 1 and $controlled is 0>>
     <<nightmareWake>>
@@ -1016,7 +1019,7 @@
     <br><br>
   <</if>>
   <<sleepeffects>>
-  <<bedicon>>
+  <<icon 'temple/sydney-bed.png'>>
   <<lanLink '起床' 'Deadwood Reblooms Sirris Estate Sydney Room'>>
     <<storeon 'sirris estate bed'>><<loadTempHairStyle>>
   <</lanLink>>
@@ -1064,7 +1067,7 @@
   <<lanLink '在被子里吻悉尼' 'Deadwood Reblooms Sirris Estate Sydney Intimacy'>>
     <<set $sleephour to 0>><<set $sexstart to 1>>
   <</lanLink>><<promiscuous1>><br>
-  <<bedicon>>
+  <<icon 'temple/sydney-bed.png'>>
   <<lanLink '继续睡觉' 'Deadwood Reblooms Sirris Estate Sydney Sleep'>><</lanLink>><br>
   <<getouticon>>
   <<lanLink '起床' 'Deadwood Reblooms Sirris Estate Sydney Room'>>

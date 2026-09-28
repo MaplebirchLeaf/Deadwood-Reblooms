@@ -16,8 +16,8 @@
         <<option 'EN'>>A space beside Kylar's bed has been cleared for your things. Kylar left a folded blanket there.
         <<option 'CN'>>凯拉尔在床边为你的东西腾出了地方，还放了一条叠好的毯子。
       <</language>><br><br>
-      <<if C.npc.Kylar.state isnot 'active'>>
-        <span class='red'><<lanSwitch 'Kylar is away. You leave the bed undisturbed.' '凯拉尔不在。你没有动床上的被子。'>></span><br>
+      <<if !isLoveInterest('Kylar')>>
+        <span class='red'><<lanSwitch "You leave Kylar's bed as it is." '你没有动凯拉尔的床铺。'>></span><br>
       <<elseif !($earSlime.event and $earSlime.noSleep)>>
         <<language>>
           <<option 'EN'>>
@@ -31,13 +31,12 @@
         <<if !$earSlime.alwaysSleepNaked or $hypnosis_traits.silence>>
           <<for _index, _outfit range $outfit>>
             <<if _outfit.type.includes('sleep')>>
-              <<capture _index>>
-                <<language>>
-                  <<option 'EN'>>
-                    <<bedicon 'kylar'>><<link 'Change into sleepwear and get in bed' 'Deadwood Reblooms Kylar Bed'>><<set $wear_outfit to _index>><<saveTempHairStyle>><</link>>
-                  <<option 'CN'>>
-                    <<bedicon 'kylar'>><<link '换上睡衣并上床' 'Deadwood Reblooms Kylar Bed'>><<set $wear_outfit to _index>><<saveTempHairStyle>><</link>>
-                <</language>><br>
+              <<capture _index _outfit>>
+                <<bedicon 'kylar'>>
+                <<set _sleepwearLabel to lanSwitch(
+                  'Wear ' + _outfit.name + " and climb into Kylar's bed",
+                  '换上' + (_outfit.cn_name_cap || _outfit.name) + '并钻进凯拉尔的被窝')>>
+                <<lanLink _sleepwearLabel 'Deadwood Reblooms Kylar Bed'>><<set $wear_outfit to _index>><<saveTempHairStyle>><</lanLink>><br>
               <</capture>>
             <</if>>
           <</for>>
@@ -255,10 +254,10 @@
 <<set _kylarAtManor to C.npc.Kylar.state is 'active'
   and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
   and (!maplebirch.get('VP') or !maplebirch.VP.realEstate.residenceOf('Kylar'))>>
-<<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar') or C.npc.Kylar.state isnot 'active'>>
+<<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar')>>
   <<lanSwitch 'You pull back the sheets and step away.' '你掀开被子，从床边退开。'>><br><br>
 <<else>>
-  <<npc Kylar>><<person1>>
+  <<if _kylarAtManor>><<npc Kylar>><<person1>><</if>>
   <<language>>
     <<option 'EN'>>
       You climb into the bed beneath the skylights. The sheets smell of soap and the faint warmth of Kylar's computer.
