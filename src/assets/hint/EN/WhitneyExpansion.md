@@ -10,4 +10,6 @@ Escaping with Whitney grants the rescue achievement. Leaving alone does not coun
 
 After a successful rescue, visit the **school front courtyard on a school day between 07:00 and 18:00** for the reunion. Ask how Whitney is doing; a lover can hold hands. On later days, when Whitney is at school, the PC is not exposed, and no other event occupies the courtyard, speak there once per day. Lovers can walk together. A prefect badge changes Whitney's reaction.
 
+The later school conversations rotate through everyday moments. You need not keep asking about the disappearance.
+
 If reunion is missing, check that the rescue succeeded, Whitney has returned to school, and today is a school day. Daily talk can disappear after it has been used today or while vanilla events occupy Whitney.

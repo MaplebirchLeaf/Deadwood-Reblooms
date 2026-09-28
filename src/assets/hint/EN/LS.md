@@ -21,3 +21,7 @@ The **student affairs noticeboard** in the hallway shows these four values, duty
 After the vanilla painting event, accept Winter's history project in class. Follow **library archive → museum collection → forest lake → report at home → museum exhibition**. The journal points to the next lead. Robin and Kylar can change the available choices and dialogue.
 
 Prefects and presidents can order student council drinks from Robin's shop once a day when Robin is present, special stock remains, and the bank balance is at least £20. Prepare school notes at your property desk or a lesson in Sirris's study. Correcting the estate lesson requires science skill 500.
+
+### Cliff Street gym
+
+Enter from Cliff Street's normal places of interest between 06:00 and 22:00. A £5 day pass allows three training sessions that day. Weights improve physique, running improves athletics and physique, and stretching relieves stress. Training takes time and causes tiredness. Bound arms prevent equipment use. Debit or credit can cover the pass under the bank module's merchant payment rules.

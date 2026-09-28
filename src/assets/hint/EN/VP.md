@@ -26,6 +26,8 @@ Enter from **High Street → Financial Centre** for the bank, securities desk, a
 | Personal loan   | Choose a 7-, 14-, or 30-day term, with weekly interest and payments                                               |
 | Brokerage       | Trade at the securities desk. Holdings change value with the market and remain separate from the bank balance     |
 
+Ocean Breeze's price change, closure for expansion, and reopening affect OBC. Avery's company outcome in the vanilla story affects AVY. Farm progress and attacks continue to affect ALF and RMY. Story moves enter the market once after the event, rather than each time you open the desk. The bank displays today's personal loan payoff including accrued interest before the next weekly instalment.
+
 ### Buying and living in a home
 
 Use the **Financial Centre estate desk** to buy, renovate, rent out, end a tenancy, or consign a property to auction. Each home has its own street entrance:
@@ -41,3 +43,5 @@ Use the **Financial Centre estate desk** to buy, renovate, rent out, end a tenan
 Buy outright or take a **90-day mortgage on one property**. Deposit 20% of the price and pay a 2% fee, leaving one weekly payment in the bank. An existing credit card may cover a deposit shortfall, but the fee and payment reserve must be in the bank account. Interest and instalments settle weekly, with the remainder due on day 90. Arrears lead to a notice, freezing, then auction. Auctions and rental income do not settle instantly.
 
 **Every non-rented home remains available to live in.** No primary residence designation is needed, and the orphanage room stays available. Floors expose their configured bed, wardrobe, mirror, bath, kitchen, desk, and outdoor space. Buy bed and wardrobe upgrades at the furniture shop. Once Robin, Whitney, Kylar, or Sydney is your lover, meet them at their current vanilla location to invite them in person. The home must not be rented or frozen and must have a bed and room. Resident lovers have night interactions. Prefects and presidents can also prepare study notes at the home desk once a day.
+
+A frozen home's street entrance closes, and its residents follow their original schedules until the freeze ends. The co-residence remains registered. Sydney's temple duty, punishment, festival visits, and invited nights at Sirris's estate take priority over the shared home, preventing simultaneous appearances.

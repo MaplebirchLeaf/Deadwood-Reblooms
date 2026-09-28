@@ -392,9 +392,19 @@ class School {
   private isStudentAvailable(student: SchoolStudent): boolean {
     const npc = C.npc?.[student];
     if (npc?.init !== 1 || ['prison', 'pillory', 'dungeon'].includes(npc.state)) return false;
-    // 侧栏模块安装时复用其原版日程解析；未安装时只做最基本的 NPC 状态检查。
-    if (!this.core.get('NPCSidebarPortrait')) return true;
-    return SCHOOL_CAMPUS_LOCATIONS[student].includes(this.core.npc.Schedule.location[student] ?? '');
+    if (this.core.get('NPCSidebarPortrait')) return SCHOOL_CAMPUS_LOCATIONS[student].includes(this.core.npc.Schedule.location[student] ?? '');
+
+    // 侧栏可单独关闭。值勤目标仍须遵守原版晨间日程，不能仅凭 NPC 处于 active 状态就召到校门。
+    switch (student) {
+      case 'Robin':
+        return window.getRobinLocation() === 'school';
+      case 'Kylar':
+        return SCHOOL_CAMPUS_LOCATIONS.Kylar.includes(window.getKylarLocation().area);
+      case 'Sydney':
+        return V.daily.sydney?.punish !== 1 && V.sydneyLate !== 1 && !(V.sydney_location_override && V.replayScene);
+      case 'Whitney':
+        return Time.schoolDay && Time.hour >= 7;
+    }
   }
 
   private adjustLove(student: SchoolStudent, change: number): void {

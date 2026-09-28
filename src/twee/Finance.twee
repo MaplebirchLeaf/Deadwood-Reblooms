@@ -584,6 +584,7 @@
 				<<lanSwitch 'Days until next payment' '距下次还款日'>>：<<= Math.max(0, $VanillaPlus.finance.bank.loan_next_payment_day - Time.days)>><br>
 				<<lanSwitch 'Days until due' '距到期日'>>：<<= Math.max(0, $VanillaPlus.finance.bank.loan_due_day - Time.days)>><br>
 				<<lanSwitch 'Missed payments' '未足额还款次数'>>：<<= $VanillaPlus.finance.bank.loan_missed_payments>><br>
+				<<lanSwitch 'Payoff today' '今日结清金额'>>：<<deadwood-reblooms-finance-money maplebirch.VP.finance.loanPayoff>><br>
 			<</if>>
 			<<language>>
 				<<option 'EN'>>Scheduled payments are taken weekly from your bank balance. A missed payment adds <span class='red'>£5 or 2% of the unpaid instalment</span>, whichever is greater. After the due date, the <span class='red'>weekly rate doubles</span>.
@@ -615,7 +616,7 @@
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 				<</lanLink>>
 				<<lanLink '还清贷款'>>
-					<<set _financeResult to maplebirch.VP.finance.repayLoan($VanillaPlus.finance.bank.loan_debt / 100)>>
+					<<set _financeResult to maplebirch.VP.finance.repayLoan(maplebirch.VP.finance.loanPayoff / 100)>>
 					<<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 				<</lanLink>>
@@ -742,6 +743,19 @@
 			<<lanSwitch 'Open a securities account before trading.' '交易前需要先开立证券账户。'>>
 		<<else>>
 			<<deadwood-reblooms-finance-exchange-summary>><br><br>
+			<<if $chef_state gte 7 and $chef_state lt 9>>
+				<span class='blue'><<lanSwitch 'Ocean Breeze is closed for expansion. Traders are watching the reopening.' '海风咖啡馆停业扩建，交易员正等待重新开业的消息。'>></span><br>
+			<<elseif $chef_state gte 9>>
+				<span class='green'><<lanSwitch 'Ocean Breeze has reopened after its expansion.' '海风咖啡馆扩建后重新开业了。'>></span><br>
+			<</if>>
+			<<if $avery_fate is 'ascended'>>
+				<span class='green'><<lanSwitch 'Avery has emerged from the tower gathering with powerful supporters.' '艾弗里在高楼集会后得到了一群有权势的人支持。'>></span><br>
+			<<elseif $avery_fate is 'saved'>>
+				<span class='red'><<lanSwitch 'Avery survived the tower fire, but the damage weighs on the company.' '艾弗里从高楼火灾中幸存，公司仍要承担损失。'>></span><br>
+			<<elseif $avery_fate is 'fallen' or $avery_fate is 'kicked'>>
+				<span class='red'><<lanSwitch 'Avery is gone after the tower fire. The company faces an uncertain future.' '高楼火灾后，艾弗里不在了。公司的前景尚不明朗。'>></span><br>
+			<</if>>
+			<<if $chef_state gte 7 or ['ascended', 'saved', 'fallen', 'kicked'].includes($avery_fate)>><br><</if>>
 			<div class='dr-finance-board'>
 				<table class='dr-finance-quotes' aria-label="<<lanSwitch 'Market quotes' '股票行情'>>">
 					<tr>

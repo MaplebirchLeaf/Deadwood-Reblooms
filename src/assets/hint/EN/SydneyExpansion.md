@@ -1,6 +1,6 @@
 ### Begin at school and the temple
 
-Attend science class for Sydney's desk-mate scenes. The temple garden, confession room, and quarters gain new choices. Availability follows Sydney's schedule, your temple status, and your relationship. **Advance Sydney's vanilla route first.**
+Get to know Sydney first and raise their vanilla love to **10**. Vanilla canteen dialogue then mentions a possible science-class transfer. After the PC attends science class and hears Sirris's hint, have lunch with Sydney and ask about moving classes. Sydney joins your science class from the following day. The transfer does not start on first meeting. The temple garden, confession room, and quarters also gain choices based on Sydney's schedule, your temple status, and your relationship.
 
 After gaining **monk rank** and access to the temple quarters, ask Sydney in person while they are working there and the PC's stress is below maximum whether you may sit by the bunk. Once invited, read, talk, change clothes, and enter bed in sleepwear or undressed. Intimate choices also require the current lover relationship. Night scenes vary with Sydney's presence, sleep, and story state. The quarters do not summon Sydney when they are elsewhere.
 

@@ -1,13 +1,13 @@
 :: Deadwood Whitney Rescue Widgets [widget]
 <<widget 'deadwood-whitney-cell-link'>>
   <<if $WhitneyExpansion and C.npc.Whitney.state is 'dungeon' and $undergroundbrothel?.active>>
-    <<investigateicon>><<lanLink '听门外的动静 (0:01)' 'Deadwood Whitney Door'>><<pass 1>><</lanLink>><br>
+    <<investigateicon>><<lanLink lanSwitch('Listen beyond the door (0:01)', '听门外的动静 (0:01)') 'Deadwood Whitney Door'>><<pass 1>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 <!-- 原版的地下逃脱会重置牢房状态，也会处理罗宾失踪和服装解锁。 -->
 <<widget 'deadwood-whitney-escape-effects'>>
-  <<set _withRobin to $undergroundbrothel.robin>>
+  <<set _escapedWithRobin to _args[1]>>
   <<if _args[0]>>
     <<set $WhitneyExpansion.rescued to true>>
     <<earnFeat 'Deadwood Whitney Rescued'>>
@@ -21,7 +21,7 @@
   <<unset $whitneyReunionScene>>
   <<specialClothesUnlock 'set' 'underground_brothel'>>
   <<set $stress -= 1000>>
-  <<if _withRobin>>
+  <<if _escapedWithRobin>>
     <<set $robinSeen.pushUnique('ubEscapeTogether')>>
     <<npcincr Robin trauma -10>><<npcincr Robin love 5>><<lrtrauma>><<glove>>
   <</if>>
@@ -31,7 +31,7 @@
 <<set $outside to 0>><<set $location to 'underground'>><<effects>>
 <<if !$undergroundbrothel?.active or C.npc.Whitney.state isnot 'dungeon'>>
   <<lanSwitch 'The corridor is quiet.' '走廊里静悄悄的。'>>
-  <br><br><<getouticon>><<lanLink '回到牢房' 'Underground Cell'>><</lanLink>>
+  <br><br><<getouticon>><<lanLink lanSwitch('Return to the cell', '回到牢房') 'Underground Cell'>><</lanLink>>
 <<else>>
   <<npc Whitney>><<person1>>
   <<language>>
@@ -54,15 +54,15 @@
   <br><br><span class='blue'>
     <<lanSwitch 'Skulduggery and physique will help you slip past the guard. Getting caught will hurt.' '巧手和体格能帮你避开守卫。被抓住会付出代价。'>>
   </span><br><br>
-  <<investigateicon>><<lanLink '等守卫开门 (0:30)' 'Deadwood Whitney Guard'>><<set $undergroundbrothel.timepass to true>><<pass 30>><</lanLink>><br>
-  <<getouticon>><<lanLink '退回牢房' 'Underground Cell'>><<set $undergroundbrothel.timepass to false>><</lanLink>>
+  <<investigateicon>><<lanLink lanSwitch('Wait for the guard to open the door (0:30)', '等守卫开门 (0:30)') 'Deadwood Whitney Guard'>><<set $undergroundbrothel.timepass to true>><<pass 30>><</lanLink>><br>
+  <<getouticon>><<lanLink lanSwitch('Step back into the cell', '退回牢房') 'Underground Cell'>><<set $undergroundbrothel.timepass to false>><</lanLink>>
 <</if>>
 
 :: Deadwood Whitney Guard []
 <<set $outside to 0>><<set $location to 'underground'>><<effects>>
 <<if !$undergroundbrothel?.active or C.npc.Whitney.state isnot 'dungeon'>>
   <<lanSwitch 'There is no one to follow.' '外面已经没有你要找的人。'>>
-  <br><br><<getouticon>><<lanLink '回到牢房' 'Underground Cell'>><</lanLink>>
+  <br><br><<getouticon>><<lanLink lanSwitch('Return to the cell', '回到牢房') 'Underground Cell'>><</lanLink>>
 <<else>>
   <<set _chance to Math.clamp(25 + currentSkillValue('skulduggery') / 18 + $physique / 500 + ($undergroundbrothel.robin ? 10 : 0), 25, 90)>>
   <<if random(1, 100) lte _chance>>
@@ -76,7 +76,7 @@
       <br><br><<lanSwitch 'Robin rattles the hatch in the next cell. The guard turns towards the noise.' '隔壁的罗宾猛地摇响舱门。守卫朝声音传来的方向转过身。'>>
     <</if>>
     <br><br><span class='green'><<lanSwitch 'You reach the backstage passage unseen.' '你悄悄摸到了舞台侧面的通道。'>></span>
-    <br><br><<getinicon>><<lanLink '继续' 'Deadwood Whitney Backstage'>><</lanLink>>
+    <br><br><<getinicon>><<lanLink lanSwitch('Continue', '继续') 'Deadwood Whitney Backstage'>><</lanLink>>
   <<else>>
     <<language>>
       <<option 'EN'>>
@@ -85,7 +85,7 @@
         守卫在门口抓住你，把你抵在石墙上，拽着项圈拖回牢房。“什么时候让你出去，由我们说了算。”牢门砰地关上。
     <</language>>
     <<stress 12>><<pain 5>><<trauma 4>><<gstress>><<gpain>><<gtrauma>>
-    <br><br><<getouticon>><<lanLink '继续' 'Underground Cell'>><</lanLink>>
+    <br><br><<getouticon>><<lanLink lanSwitch('Continue', '继续') 'Underground Cell'>><</lanLink>>
   <</if>>
 <</if>>
 
@@ -93,7 +93,7 @@
 <<set $outside to 0>><<set $location to 'underground'>><<effects>>
 <<if !$undergroundbrothel?.active or C.npc.Whitney.state isnot 'dungeon'>>
   <<lanSwitch 'The backstage passage is empty.' '舞台侧面的通道空无一人。'>>
-  <br><br><<getouticon>><<lanLink '回到牢房' 'Underground Cell'>><</lanLink>>
+  <br><br><<getouticon>><<lanLink lanSwitch('Return to the cell', '回到牢房') 'Underground Cell'>><</lanLink>>
 <<else>>
   <<npc Whitney>><<person1>>
   <<language>>
@@ -112,16 +112,16 @@
   <br><br><span class='blue'>
     <<lanSwitch 'The clasp can be worked loose. The guard is close enough to grab you.' '搭扣可以撬开。守卫离得很近，随时会抓住你。'>>
   </span><br><br>
-  <<lockicon>><<lanLink '撬开搭扣 (0:05)' 'Deadwood Whitney Rescue Attempt'>><<set $phase to 1>><<pass 5>><</lanLink>><br>
-  <<getouticon>><<lanLink '撞开守卫 (0:05)' 'Deadwood Whitney Rescue Attempt'>><<set $phase to 2>><<pass 5>><</lanLink>><br>
-  <<getouticon>><<lanLink '独自离开' 'Deadwood Whitney Leave Behind'>><</lanLink>>
+  <<lockicon>><<lanLink lanSwitch('Unfasten the clasp (0:05)', '撬开搭扣 (0:05)') 'Deadwood Whitney Rescue Attempt'>><<set $phase to 1>><<pass 5>><</lanLink>><br>
+  <<getouticon>><<lanLink lanSwitch('Shove the guard aside (0:05)', '撞开守卫 (0:05)') 'Deadwood Whitney Rescue Attempt'>><<set $phase to 2>><<pass 5>><</lanLink>><br>
+  <<getouticon>><<lanLink lanSwitch('Leave alone', '独自离开') 'Deadwood Whitney Leave Behind'>><</lanLink>>
 <</if>>
 
 :: Deadwood Whitney Rescue Attempt []
 <<set $outside to 0>><<set $location to 'underground'>><<effects>>
 <<if !$undergroundbrothel?.active or C.npc.Whitney.state isnot 'dungeon'>>
   <<lanSwitch 'There is no one to free here.' '这里已经没有你要救的人。'>>
-  <br><br><<getouticon>><<lanLink '回到牢房' 'Underground Cell'>><</lanLink>>
+  <br><br><<getouticon>><<lanLink lanSwitch('Return to the cell', '回到牢房') 'Underground Cell'>><</lanLink>>
 <<else>>
   <<npc Whitney>><<person1>>
   <<set _approach to $phase>><<set $phase to 0>>
@@ -138,11 +138,12 @@
     <br><br>
     <<lanSwitch 'You reach the forest before anyone sounds an alarm. Whitney pulls away from you, breathing hard. "Don’t expect a thank you," <<he>> says, but <<he>> waits until you are safely on the path before turning towards town.' '直到跑进森林，身后都没人拉响警报。惠特尼松开你，大口喘着气。“别指望我道谢。”<<he>>说道，却等你站稳在小路上，才转身朝城镇走去。'>>
     <br><br><span class='green'><<lanSwitch 'Whitney is free.' '惠特尼自由了。'>></span>
-    <<deadwood-whitney-escape-effects true>>
+    <<set _withRobin to $undergroundbrothel.robin>>
+    <<deadwood-whitney-escape-effects true _withRobin>>
     <<if _withRobin>>
       <br><br><<lanSwitch 'Robin squeezes your hand, then heads for the orphanage. "Come and find me when you can," Robin says.' '罗宾握了握你的手，随后朝孤儿院走去。“等你有空了，记得来找我。”罗宾说道。'>>
     <</if>>
-    <br><br><<getouticon>><<lanLink '走进森林' 'Forest'>><<set $forest to 40>><</lanLink>>
+    <br><br><<getouticon>><<lanLink lanSwitch('Enter the forest', '走进森林') 'Forest'>><<set $forest to 40>><</lanLink>>
   <<else>>
     <<if _approach is 1>>
       <<lanSwitch 'The clasp gives a sharp click before you can free it. The guard wheels round, seizes your arm and tears you away from Whitney.' '搭扣还没打开，就发出清脆的声响。守卫猛地转身，抓住你的胳膊，把你从惠特尼身边扯开。'>>
@@ -151,7 +152,7 @@
     <</if>>
     <br><br><<lanSwitch 'Whitney shouts after you. The door closes between you before <<he>> can say anything else.' '惠特尼在身后喊了一声。还没听清<<he>>接下来的话，门就把你们隔开了。'>>
     <<stress 16>><<pain 6>><<trauma 6>><<gstress>><<gpain>><<gtrauma>>
-    <br><br><<getouticon>><<lanLink '回到牢房' 'Underground Cell'>><</lanLink>>
+    <br><br><<getouticon>><<lanLink lanSwitch('Return to the cell', '回到牢房') 'Underground Cell'>><</lanLink>>
   <</if>>
 <</if>>
 
@@ -159,7 +160,7 @@
 <<set $outside to 0>><<set $location to 'underground'>><<effects>>
 <<if !$undergroundbrothel?.active>>
   <<lanSwitch 'You are already outside.' '你已经离开了。'>>
-  <br><br><<getouticon>><<lanLink '继续' 'Forest'>><<set $forest to 40>><</lanLink>>
+  <br><br><<getouticon>><<lanLink lanSwitch('Continue', '继续') 'Forest'>><<set $forest to 40>><</lanLink>>
 <<else>>
   <<npc Whitney>><<person1>>
   <<lanSwitch 'You keep to the dark edge of the room and find the stairs. Whitney sees you go. <<He>> says nothing.' '你贴着房间边缘的阴影摸到楼梯。惠特尼看见你离开，却什么都没说。'>>
@@ -167,11 +168,12 @@
     <br><br><<lanSwitch 'You double back to Robin’s cell and open it from the corridor. Robin follows you up the stairs.' '你折回罗宾的牢房，从走廊里打开门。罗宾跟着你一起跑上楼梯。'>>
   <</if>>
   <br><br><<lanSwitch 'By the time you reach the trees, the music has faded behind you.' '等你钻进树林，身后的音乐已经听不见了。'>>
-  <<deadwood-whitney-escape-effects false>>
+  <<set _withRobin to $undergroundbrothel.robin>>
+  <<deadwood-whitney-escape-effects false _withRobin>>
   <<if _withRobin>>
     <br><br><<lanSwitch 'Robin stays beside you on the path, glancing back once. At the edge of the forest, Robin heads towards the orphanage without asking you to return.' '罗宾在小路上紧跟着你，回头看了一次。走到森林边缘时，罗宾没有开口要你回去，径直朝孤儿院走去。'>>
   <</if>>
-  <br><br><<getouticon>><<lanLink '走进森林' 'Forest'>><<set $forest to 40>><</lanLink>>
+  <br><br><<getouticon>><<lanLink lanSwitch('Enter the forest', '走进森林') 'Forest'>><<set $forest to 40>><</lanLink>>
 <</if>>
 
 :: Deadwood Whitney Reunion Widgets [widget]
@@ -181,7 +183,7 @@
     and C.npc.Whitney.state is 'active' and Time.schoolDay
     and Time.hour gte 7 and Time.hour lt 18 and $exposed lte 0
     and $daily.whitneyAftercare isnot Time.days>>
-    <<socialiseicon>><<lanLink '去找惠特尼说话 (0:10)' 'Deadwood Whitney Aftercare'>><<pass 10>><</lanLink>><br><br>
+    <<socialiseicon>><<lanLink lanSwitch('Talk to Whitney (0:10)', '去找惠特尼说话 (0:10)') 'Deadwood Whitney Aftercare'>><<pass 10>><</lanLink>><br><br>
   <</if>>
 <</widget>>
 <<widget 'deadwood-whitney-reunion-intro'>>
@@ -193,15 +195,15 @@
       惠特尼站在校门边。两个朋友看见你，刚要喊出声，惠特尼抬手让他们安静。<<He>>移开目光，又重新看向你。<span class='purple'>寻人启事已经撤下了。</span>
   <</language>>
   <br><br>
-  <<socialiseicon>><<lanLink '走向惠特尼' 'Deadwood Whitney Reunion'>><</lanLink>><br>
-  <<getinicon>><<lanLink '暂时走开' 'Hallways'>><<pass 1>><</lanLink>>
+  <<socialiseicon>><<lanLink lanSwitch('Approach Whitney', '走向惠特尼') 'Deadwood Whitney Reunion'>><</lanLink>><br>
+  <<getinicon>><<lanLink lanSwitch('Walk away for now', '暂时走开') 'Hallways'>><<pass 1>><</lanLink>>
 <</widget>>
 
 :: Deadwood Whitney Reunion []
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
 <<if !$WhitneyExpansion?.rescued or C.npc.Whitney.state isnot 'active'>>
   <<lanSwitch 'Whitney is not at the gate.' '惠特尼不在校门边。'>>
-  <br><br><<getinicon>><<lanLink '进入学校' 'Hallways'>><</lanLink>>
+  <br><br><<getinicon>><<lanLink lanSwitch('Enter the school', '进入学校') 'Hallways'>><</lanLink>>
 <<else>>
   <<set $WhitneyExpansion.reunionSeen to true>>
   <<npc Whitney>><<person1>>
@@ -224,10 +226,10 @@
   <br><br><span class='blue'><<lanSwitch 'You cannot undo what happened in the alley.' '巷子里发生的事，无法当作没有发生。'>></span>
   <br><br>
   <<if $whitneyromance is 1>>
-    <<socialiseicon>><<lanLink '握住惠特尼的手' 'Deadwood Whitney Reunion Close'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink lanSwitch("Take Whitney's hand", '握住惠特尼的手') 'Deadwood Whitney Reunion Close'>><</lanLink>><br>
   <</if>>
-  <<socialiseicon 'ask'>><<lanLink '问惠特尼现在怎么样' 'Deadwood Whitney Reunion Talk'>><</lanLink>><br>
-  <<getinicon>><<lanLink '让惠特尼自己待一会' 'Hallways'>><<pass 1>><</lanLink>>
+  <<socialiseicon 'ask'>><<lanLink lanSwitch('Ask how Whitney is doing', '问惠特尼现在怎么样') 'Deadwood Whitney Reunion Talk'>><</lanLink>><br>
+  <<getinicon>><<lanLink lanSwitch('Give Whitney some space', '让惠特尼自己待一会') 'Hallways'>><<pass 1>><</lanLink>>
 <</if>>
 
 :: Deadwood Whitney Reunion Close []
@@ -247,7 +249,7 @@
     <br><br><<loveInterestAdd 'Whitney'>>
   <</if>>
 <</if>>
-<br><br><<getinicon>><<lanLink '进入学校' 'Hallways'>><<pass 1>><</lanLink>>
+<br><br><<getinicon>><<lanLink lanSwitch('Enter the school', '进入学校') 'Hallways'>><<pass 1>><</lanLink>>
 
 :: Deadwood Whitney Reunion Talk []
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
@@ -263,7 +265,7 @@
   <</language>>
 <<npcincr Whitney love 1>><<glove>>
 <</if>>
-<br><br><<getinicon>><<lanLink '进入学校' 'Hallways'>><<pass 1>><</lanLink>>
+<br><br><<getinicon>><<lanLink lanSwitch('Enter the school', '进入学校') 'Hallways'>><<pass 1>><</lanLink>>
 
 :: Deadwood Whitney Aftercare []
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
@@ -272,19 +274,32 @@
 <<else>>
   <<set $daily.whitneyAftercare to Time.days>>
   <<npc Whitney>><<person1>>
-  <<language>>
-    <<option 'EN'>>Whitney is arguing with a friend by the gate. The friend asks another question about the days Whitney disappeared. Whitney's smile vanishes. <<He>> catches sight of you and waves the friend away. "You here to ask too?"
-    <<option 'CN'>>惠特尼正和朋友在校门边争执。那人又问起惠特尼失踪的几天，<<his>>笑容立刻没了。<<He>>看到你，挥手让朋友先走。“你也是来问这个的？”
-  <</language>><br><br>
+  <<switch Time.days % 3>>
+    <<case 0>>
+      <<language>>
+        <<option 'EN'>>Whitney is arguing with a friend by the gate. The friend asks another question about the days Whitney disappeared. Whitney's smile vanishes. <<He>> catches sight of you and waves the friend away. "You here to ask too?"
+        <<option 'CN'>>惠特尼正和朋友在校门边争执。那人又问起惠特尼失踪的几天，<<his>>笑容立刻没了。<<He>>看到你，挥手让朋友先走。“你也是来问这个的？”
+      <</language>>
+    <<case 1>>
+      <<language>>
+        <<option 'EN'>>Whitney leans against the wall with an unlit cigarette. A whistle sounds at the gate. <<He>> starts, then glares at you as though daring you to mention it. "What?"
+        <<option 'CN'>>惠特尼叼着一支没点燃的烟，靠在墙边。校门口的哨声响起，<<he>>猛地一颤，随即瞪向你，像是在警告你别提。“看什么？”
+      <</language>>
+    <<case 2>>
+      <<language>>
+        <<option 'EN'>>Whitney tosses a ball to one of <<his>> friends. They call for <<him>> to join them, but <<he>> spots you first. "I'll be there in a minute," <<he>> says, and comes over.
+        <<option 'CN'>>惠特尼把球抛给一个朋友。那人叫<<him>>过去，<<he>>却先看见了你。“等会儿。”<<he>>说着，朝你走来。
+      <</language>>
+  <</switch>><br><br>
   <<if $LifeSimulation?.school and $LifeSimulation.school.role isnot 'student'>>
     <<lanSwitch 'Whitney glances at your badge. "Put that away before someone thinks you are here to write me up."' '惠特尼瞥了眼你的徽章。“收起来，省得别人以为你要记我的过。”'>><br><br>
   <</if>>
-  <<socialiseicon>><<lanLink '告诉惠特尼不必解释' 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'space'>><</lanLink>><br>
+  <<socialiseicon>><<lanLink lanSwitch('Ask Whitney how their day is going', '问惠特尼今天怎么样') 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'space'>><</lanLink>><br>
   <<if isLoveInterest('Whitney')>>
-    <<loveicon>><<lanLink '陪惠特尼走一段' 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'walk'>><</lanLink>><br>
+    <<loveicon>><<lanLink lanSwitch('Walk with Whitney for a while', '陪惠特尼走一段') 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'walk'>><</lanLink>><br>
   <</if>>
 <</if>>
-<br><<getouticon>><<lanLink '返回前庭' 'School Front Courtyard'>><</lanLink>>
+<br><<getouticon>><<lanLink lanSwitch('Return to the courtyard', '返回前庭') 'School Front Courtyard'>><</lanLink>>
 
 :: Deadwood Whitney Aftercare Answer []
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
@@ -297,9 +312,9 @@
   <<npcincr Whitney love 2>><<glove>><<stress -2>><<lstress>>
 <<else>>
   <<language>>
-    <<option 'EN'>>"Good," Whitney mutters. "I'm sick of telling the story." <<He>> nudges your shoulder, then goes inside before anyone else can call out.
-    <<option 'CN'>>“那就好。”惠特尼嘟囔道，“这事我讲烦了。”<<He>>用肩膀碰了你一下，赶在别人开口前进了学校。
+    <<option 'EN'>>"Fine," Whitney says. <<He>> nudges your shoulder, then heads inside. At the door, <<he>> looks back once to check that you're following.
+    <<option 'CN'>>“还行。”惠特尼说着，用肩膀碰了你一下，随后走进学校。到了门边，<<he>>又回头看了你一眼。
   <</language>><br><br>
   <<npcincr Whitney love 1>><<glove>>
 <</if>>
-<<getinicon>><<lanLink '进入学校' 'Hallways'>><</lanLink>>
+<<getinicon>><<lanLink lanSwitch('Enter the school', '进入学校') 'Hallways'>><</lanLink>>

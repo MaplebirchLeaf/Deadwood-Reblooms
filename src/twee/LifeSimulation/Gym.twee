@@ -1,0 +1,75 @@
+:: Deadwood Reblooms Life Simulation Gym Widgets [widget]
+<!-- 专属建筑图尚未到位，街道入口暂用原版运动图标。室内保留峭壁街侧栏地点。 -->
+<<widget 'deadwood-reblooms-life-simulation-gym-street'>>
+	<<if $exposed lte 0>>
+		<<if Time.hour gte 6 and Time.hour lt 22>>
+			<<exerciseicon>><<lanLink lanSwitch('Gym (0:02)', '健身房 (0:02)') 'Deadwood Reblooms Life Simulation Gym'>><<pass 2>><</lanLink>>
+		<<else>>
+			<<exerciseicon>><span class='blue'><<lanSwitch 'The gym is closed.' '健身房已经关门了。'>></span>
+		<</if>><br>
+	<</if>>
+<</widget>>
+
+:: Deadwood Reblooms Life Simulation Gym []
+<<set $outside to 0>><<set $location to 'town'>><<set $bus to 'cliff'>><<effects>>
+<<language>>
+	<<option 'EN'>>
+		The gym occupies a low building above the sea road. The front windows face the water. Weights clink beyond the desk, and the floor smells faintly of rubber and salt air.
+	<<option 'CN'>>
+		健身房坐落在临海公路旁的一栋矮楼里。前窗朝向大海，柜台后传来器械碰撞的轻响。地板带着橡胶与海风的气味。
+<</language>><br><br>
+<<if Time.hour lt 6 or Time.hour gte 22>>
+	<span class='blue'><<lanSwitch 'The attendant has locked the training floor for the night.' '管理员已经锁上训练区。'>></span><br><br>
+<<elseif $exposed gt 0>>
+	<span class='red'><<lanSwitch 'The attendant asks you to dress before entering.' '管理员请你先穿好衣服再进来。'>></span><br><br>
+<<elseif !$daily.deadwoodGymPaid>>
+	<<language>>
+		<<option 'EN'>>A day pass costs <span class='gold'>£5</span>. It covers the training floor until closing time.
+		<<option 'CN'>>单日入场费为<span class='gold'>£5</span>，可以使用训练区直到关门。
+	<</language>><br><br>
+	<<if $money gte 500 or (maplebirch.get('VP') and maplebirch.VP.finance.canPay(500, 'shopping'))>>
+		<<exerciseicon>><<lanLink lanSwitch('Buy a day pass', '购买单日入场券') 'Deadwood Reblooms Life Simulation Gym'>><<money -500 'shopping'>><<set $daily.deadwoodGymPaid to true>><</lanLink>><br>
+	<<else>>
+		<span class='red'><<lanSwitch 'You cannot afford the day pass.' '你付不起今天的入场费。'>></span><br>
+	<</if>>
+<<else>>
+	<<language>>
+		<<option 'EN'>>
+			The training floor has a row of weights and a clear strip for running. A tap stands beside the changing rooms. Beyond the windows, waves break below the cliff.
+		<<option 'CN'>>
+			训练区摆着一排杠铃，旁边留出一条跑步的空地。更衣室旁有饮水处。透过窗户，能看见浪花拍在峭壁下方。
+	<</language>><br><br>
+	<<set _gymSessions to $daily.deadwoodGymSessions || 0>>
+	<<if _gymSessions gte 3>>
+		<span class='blue'><<lanSwitch 'You have trained enough for today.' '今天已经练得够多了。'>></span><br>
+	<<elseif pcAreArmsBound('both')>>
+		<span class='red'><<lanSwitch 'You cannot use the equipment with your arms bound.' '双臂受缚，没法使用这里的器械。'>></span><br>
+	<<else>>
+		<<exerciseicon>><<lanLink lanSwitch('Lift weights (1:00)', '举重 (1:00)') 'Deadwood Reblooms Life Simulation Gym Training'>><<set $phase to 'weights'>><<pass 60>><</lanLink>><<gtiredness>><<gphysique>><br>
+		<<exerciseicon>><<lanLink lanSwitch('Run (0:30)', '跑步 (0:30)') 'Deadwood Reblooms Life Simulation Gym Training'>><<set $phase to 'run'>><<pass 30>><</lanLink>><<gtiredness>><<gathletics>><<gphysique>><br>
+		<<exerciseicon>><<lanLink lanSwitch('Stretch (0:20)', '伸展身体 (0:20)') 'Deadwood Reblooms Life Simulation Gym Training'>><<set $phase to 'stretch'>><<pass 20>><</lanLink>><<lstress>><br>
+	<</if>>
+<</if>>
+<br><<clifficon>><<lanLink lanSwitch('Return to Cliff Street', '回到峭壁街') 'Cliff Street'>><<pass 2>><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Gym Training []
+<<set $outside to 0>><<set $location to 'town'>><<set $bus to 'cliff'>><<effects>>
+<<if !$daily.deadwoodGymPaid or ($daily.deadwoodGymSessions || 0) gte 3 or !['weights', 'run', 'stretch'].includes($phase)>>
+	<<lanSwitch 'The equipment is not available.' '现在不能使用器械。'>><br><br>
+<<else>>
+	<<set $daily.deadwoodGymSessions to ($daily.deadwoodGymSessions || 0) + 1>>
+	<<switch $phase>>
+		<<case 'weights'>>
+			<<lanSwitch 'You work through a set of lifts. Your arms shake by the last repetition, but you put the weights back under control.' '你完成一组举重。最后几次抬举时双臂发颤，仍稳稳地把杠铃放回架上。'>><br><br>
+			<<physique 6>><<tiredness 6>><<stress -2>><<gphysique>><<gtiredness>><<lstress>>
+		<<case 'run'>>
+			<<lanSwitch 'You keep pace along the clear floor. The sea flashes between the window frames whenever you turn.' '你沿着空出的跑道来回奔跑。每次转身，都能从窗框间瞥见海面。'>><br><br>
+			<<athletics 2>><<physique 2>><<tiredness 3>><<stress -2>><<gathletics>><<gphysique>><<gtiredness>><<lstress>>
+		<<case 'stretch'>>
+			<<lanSwitch 'You stretch beside the window until your breathing settles. The noise of the training floor fades behind the sound of the sea.' '你在窗边舒展身体，直到呼吸平稳下来。器械声渐渐退去，耳边只剩海浪。'>><br><br>
+			<<tiredness 1>><<stress -3>><<gtiredness>><<lstress>>
+	<</switch>>
+<</if>>
+<<set $phase to 0>>
+<<exerciseicon>><<lanLink lanSwitch('Return to the training floor', '返回训练区') 'Deadwood Reblooms Life Simulation Gym'>><</lanLink>><br>
+<<clifficon>><<lanLink lanSwitch('Leave', '离开') 'Cliff Street'>><<pass 2>><</lanLink>>
