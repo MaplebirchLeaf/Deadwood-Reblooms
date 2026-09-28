@@ -217,6 +217,7 @@ export default function (
     }
 
     // 浴室剧情
+    if (title.startsWith('Deadwood Reblooms Kylar Manor Bath')) return 'naked';
     if (['Kylar Bath Help', 'Kylar Bath Sex', 'Kylar Bath Watch', 'Kylar Bath Shove', 'Kylar Bath End'].some(prefix => title.startsWith(prefix))) return 'naked';
 
     // 公园交出衣服

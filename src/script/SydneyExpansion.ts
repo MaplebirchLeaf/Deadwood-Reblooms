@@ -5,6 +5,7 @@ import SydneyDorm from './SydneyExpansion/SydneyDorm';
 import SydneyScience from './SydneyExpansion/SydneyScience';
 import SirrisEstate from './SydneyExpansion/SirrisEstate';
 import Work from './SydneyExpansion/Work';
+import Baths from './SydneyExpansion/Baths';
 
 export default function (maplebirch: typeof window.maplebirch): void {
   Festivals(maplebirch);
@@ -14,4 +15,5 @@ export default function (maplebirch: typeof window.maplebirch): void {
   SydneyScience(maplebirch);
   SirrisEstate(maplebirch);
   Work(maplebirch);
+  Baths(maplebirch);
 }

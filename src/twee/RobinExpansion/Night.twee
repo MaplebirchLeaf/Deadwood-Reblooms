@@ -98,8 +98,14 @@
 <br><br><<getouticon>><<lanLink '道声晚安并离开' 'Orphanage'>><<endevent>><</lanLink>>
 :: Deadwood Robin School Wake Widgets [widget]
 <<widget 'deadwood-robin-school-wake'>>
-  <<if $location is 'home' and Time.schoolDay and Time.hour gte 6 and Time.hour lt 9 and !$daily.robinSchoolWake and !$daily.motherWake and !_sleepinterrupt and !$robinbed and ($RobinExpansion.bothRent or $RobinExpansion.baileyDefeated) and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and $robin.timer.hurt is 0 and C.npc.Robin.trauma lt 80 and ['sleep', 'orphanage', 'bath'].includes(getRobinLocation())>>
-    <<set $daily.robinSchoolWake to 1>>
+  <<if $location is 'home' and Time.schoolDay and Time.hour gte 6 and Time.hour lt 9
+    and $RobinExpansion.school_wake_day isnot Time.days and !$daily.motherWake
+    and !_sleepinterrupt and !$robinbed
+    and ($RobinExpansion.bothRent or $RobinExpansion.baileyDefeated)
+    and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing
+    and $robin.timer.hurt is 0 and C.npc.Robin.trauma lt 80
+    and ['sleep', 'orphanage', 'bath'].includes(getRobinLocation())>>
+    <<set $RobinExpansion.school_wake_day to Time.days>>
     <br><br><<npc Robin>><<person1>>
     <<lanSwitch 'A light knock comes at your door. Robin waits for your answer before opening it.' '门上传来轻轻的敲击声。罗宾等你应声，才推开房门。'>>
     <<if $RobinExpansion.baileyDefeated>>

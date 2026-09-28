@@ -603,10 +603,9 @@
 			<</if>><br><br>
 	<</switch>>
 	<!-- 这段对白可重看，陪伴带来的压力收益每人每处住所每天只结算一次。 -->
-	<<set $daily.deadwoodPropertyEvening ??= []>>
 	<<set _eveningKey to _property.id + ':' + _companion.id>>
-	<<if !$daily.deadwoodPropertyEvening.includes(_eveningKey)>>
-		<<set $daily.deadwoodPropertyEvening.push(_eveningKey)>>
+	<<if !$VanillaPlus.real_estate.daily_evening.includes(_eveningKey)>>
+		<<set $VanillaPlus.real_estate.daily_evening.push(_eveningKey)>>
 		<<stress -2>><<lstress>><br>
 	<</if>>
 	<<if maplebirch.VP.realEstate.residentsHome(_property.id).some(profile => profile.id === _companion.id)>>
@@ -762,7 +761,7 @@
 		and maplebirch.VP.realEstate.residentsHome(_sleepProperty.id).some(resident => resident.id === _sleepPartner.id)
 		and _requestedHours gte 3
 		and (Time.hour gte 23 or Time.hour lt 3)
-		and !$daily.deadwoodPropertyNightWake
+		and !$VanillaPlus.real_estate.daily_night_wake
 		and $nightmares lte 0
 		and random(1, 8) is 1>>
 	<<if _nightWake>>
@@ -780,7 +779,7 @@
 		<<if $nightmares gte 1 and $controlled is 0>>
 			<<nightmareWake>>
 		<<elseif _nightWake>>
-			<<set $daily.deadwoodPropertyNightWake to 1>>
+			<<set $VanillaPlus.real_estate.daily_night_wake to true>>
 			<<set $sleephour to Math.max(1, _requestedHours - $sleepHoursTotal)>>
 			<<lanSwitch 'Something shifts beside you in the dark. You wake before the night is over.' '黑暗中，身旁的人动了动。夜还没过去，你已经醒了。'>>
 			<br><br>

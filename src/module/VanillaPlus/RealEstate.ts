@@ -67,6 +67,9 @@ interface RealEstateState {
   residents: Record<PropertyId, string[]>;
   household_message: { name: string; result: 'joined' | 'full' | 'bed' | 'left' } | null;
   meeting_resident: string | null;
+  daily_evening: string[];
+  daily_night_wake: boolean;
+  glide_scared_day: number;
 }
 
 interface ResidentProfile {
@@ -107,7 +110,10 @@ class RealEstate {
     last_auction: null,
     residents: {},
     household_message: null,
-    meeting_resident: null
+    meeting_resident: null,
+    daily_evening: [],
+    daily_night_wake: false,
+    glide_scared_day: -1
   };
   private loadedProperties?: Property[];
   private loadedResidents?: ResidentProfile[];
@@ -544,6 +550,8 @@ class RealEstate {
   private advanceProperties(): void {
     this.reconcileResidents();
     const state = this.state;
+    state.daily_evening = [];
+    state.daily_night_wake = false;
     const today = RealEstate.today();
     if (state.last_managed_day < 0) {
       // 没有房产也要推进个人债务。具体到期日仍由各账户自己的 V 游标决定。

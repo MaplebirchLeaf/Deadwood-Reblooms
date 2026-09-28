@@ -22,9 +22,13 @@ class SydneyExpansion extends Module {
     wardrobeDay: -1,
     gardenDay: -1,
     quartersDay: -1,
+    templeBathDay: -1,
+    bathReturn: 'temple',
     trialTalkDay: -1,
     touchDay: -1,
     touchPart: '',
+    // 神殿宿舍与西里斯庄园共用一次夜醒机会。
+    night_wake_day: -1,
     // 西里斯庄园的邀请、初访、童年对话和每日互动均属于当前存档，不从窗口或 Passage 历史推断。
     estate: {
       invited: false,
@@ -36,7 +40,10 @@ class SydneyExpansion extends Module {
       gardenDay: -1,
       kitchenDay: -1,
       roomDay: -1,
-      teaseDay: -1
+      teaseDay: -1,
+      recipe_day: -1,
+      bathVisitDay: -1,
+      bathVisitor: ''
     }
   };
 

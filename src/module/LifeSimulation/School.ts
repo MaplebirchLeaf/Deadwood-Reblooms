@@ -12,6 +12,8 @@ interface SchoolState {
   role: SchoolRole;
   attendanceExempt: boolean;
   attendanceDay: number;
+  // 住宅与西里斯庄园共用每日一次的课后辅导机会。
+  study_session_day: number;
   leightonApprovalDay: number;
   baileySigned: boolean;
   order: number;
@@ -48,6 +50,7 @@ export const DEFAULT_SCHOOL_STATE: SchoolState = {
   role: 'student',
   attendanceExempt: false,
   attendanceDay: -1,
+  study_session_day: -1,
   leightonApprovalDay: -1,
   baileySigned: false,
   order: 20,
@@ -186,17 +189,17 @@ class School {
   }
 
   public organiseSchoolDrinks(): boolean {
-    if (this.state.role === 'student' || !V.RobinExpansion?.shop || V.RobinExpansion.shopStock < 1 || V.daily.robinSchoolDrinks === Time.days) return false;
+    if (this.state.role === 'student' || !V.RobinExpansion?.shop || V.RobinExpansion.shopStock < 1 || V.RobinExpansion.school_drinks_day === Time.days) return false;
     V.RobinExpansion.shopStock -= 1;
     V.RobinExpansion.reserve += 20;
-    V.daily.robinSchoolDrinks = Time.days;
+    V.RobinExpansion.school_drinks_day = Time.days;
     this.adjustStanding(0, 3, 1);
     return true;
   }
 
   public organiseStudySession(prepared: boolean): boolean {
-    if (this.state.role === 'student' || V.daily.schoolStudySession === Time.days) return false;
-    V.daily.schoolStudySession = Time.days;
+    if (this.state.role === 'student' || this.state.study_session_day === Time.days) return false;
+    this.state.study_session_day = Time.days;
     this.adjustStanding(0, prepared ? 3 : 1, prepared ? 2 : 0, 0);
     return true;
   }

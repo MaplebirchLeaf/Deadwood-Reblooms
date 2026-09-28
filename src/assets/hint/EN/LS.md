@@ -24,4 +24,6 @@ Prefects and presidents can order student council drinks from Robin's shop once 
 
 ### Cliff Street gym
 
-Enter from Cliff Street's normal places of interest between 06:00 and 22:00. A £5 day pass allows three training sessions that day. Weights improve physique, running improves athletics and physique, and stretching relieves stress. Training takes time and causes tiredness. Bound arms prevent equipment use. Debit or credit can cover the pass under the bank module's merchant payment rules.
+Enter from Cliff Street's normal places of interest between 06:00 and 22:00. A single visit costs £20 and ends when you leave. The seven-day card costs £100. A calendar-month card costs £350, a calendar-year card £3,500, and lifetime membership £20,000. Game-day events expire term memberships; saved expiry times survive loading a save.
+
+Inside, you can lift weights, run, or stretch with a coach. Jogging on the seafront deck closes in rain or frost. You can train three times a day. The changing room has a separate locker using the vanilla wardrobe interface. You can retrieve your clothes during opening hours even after your pass expires. Admitted visitors can use the sink once a day. Training takes time and causes tiredness. Bound arms prevent equipment use. Debit or credit can cover entry under the bank module's merchant payment rules.
