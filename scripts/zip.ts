@@ -100,25 +100,23 @@ function normalizePath(filePath: string): string {
 
 async function scan(dir: string, { base = '', prefix = '', excludes = [] }: ScanOptions = {}): Promise<Map<string, Buffer>> {
   const out = new Map<string, Buffer>();
-  try {
-    const entries = (await readdir(dir, { withFileTypes: true })).sort((left, right) => left.name.localeCompare(right.name));
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-      const normalizedFullPath = normalizePath(fullPath);
-      if (excludes.some(exclude => entry.name === exclude || normalizedFullPath.includes(exclude))) continue;
-      const relPath = normalizePath(path.join(prefix, base, entry.name));
-      if (entry.isDirectory()) {
-        const subFiles = await scan(fullPath, {
-          base: relPath,
-          excludes
-        });
-        subFiles.forEach((buffer, filePath) => out.set(filePath, buffer));
-        continue;
-      }
-
-      out.set(relPath, await readFile(fullPath));
+  const entries = (await readdir(dir, { withFileTypes: true })).sort((left, right) => left.name.localeCompare(right.name));
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    const normalizedFullPath = normalizePath(fullPath);
+    if (excludes.some(exclude => entry.name === exclude || normalizedFullPath.includes(exclude))) continue;
+    const relPath = normalizePath(path.join(prefix, base, entry.name));
+    if (entry.isDirectory()) {
+      const subFiles = await scan(fullPath, {
+        base: relPath,
+        excludes
+      });
+      subFiles.forEach((buffer, filePath) => out.set(filePath, buffer));
+      continue;
     }
-  } catch {}
+
+    out.set(relPath, await readFile(fullPath));
+  }
   return out;
 }
 
@@ -178,23 +176,21 @@ function upsertPlugin(plugins: ScmlPlugin[], match: (plugin: ScmlPlugin) => bool
   }
 }
 
-function parseYamlList<T>(content: string, normalize: (item: Record<string, unknown>) => T | null): T[] {
-  try {
-    const parsed = loadYaml(content);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter((item): item is Record<string, unknown> => item != null && typeof item === 'object' && !Array.isArray(item))
-      .map(normalize)
-      .filter((item): item is T => item != null);
-  } catch {
-    return [];
-  }
+function parseYamlList<T>(content: string, fileName: string, normalize: (item: Record<string, unknown>) => T | null): T[] {
+  const parsed: unknown = loadYaml(content);
+  if (!Array.isArray(parsed)) throw new Error(`${fileName} must contain a YAML list.`);
+  return parsed.map((item, index) => {
+    if (item == null || typeof item !== 'object' || Array.isArray(item)) throw new Error(`${fileName} rule #${index + 1} must be an object.`);
+    const rule = normalize(item as Record<string, unknown>);
+    if (!rule) throw new Error(`${fileName} rule #${index + 1} is incomplete.`);
+    return rule;
+  });
 }
 
 function buildRules(content: string, type: 'twee'): TweePatcherRule[];
 function buildRules(content: string, type: 'patcher'): ReplacePatcherRule[];
 function buildRules(content: string, type: 'twee' | 'patcher'): Array<TweePatcherRule | ReplacePatcherRule> {
-  return parseYamlList(content, item => {
+  return parseYamlList(content, type === 'twee' ? 'TweeReplacer.yaml' : 'ReplacePatcher.yaml', item => {
     const source = String(item[type === 'twee' ? 'findString' : 'from'] ?? '');
     const regex = type === 'twee' ? String(item.findRegex ?? '') : '';
     const before = typeof item.before === 'string' ? item.before : '';
@@ -225,7 +221,7 @@ function buildRules(content: string, type: 'twee' | 'patcher'): Array<TweePatche
       rule.replace = relative;
     }
 
-    return rule.passage && (rule.findString || rule.findRegex) ? rule : null;
+    return rule.passage && (rule.findString || rule.findRegex) && (rule.replace !== undefined || rule.replaceFile !== undefined) ? rule : null;
   });
 }
 
@@ -492,10 +488,14 @@ export async function createZip(rootDir: string): Promise<Buffer> {
       prefix: 'dist',
       excludes: ['/types/', '\\types\\']
     }),
-    readFile(path.join(rootDir, 'src', 'TweeReplacer.yaml'), 'utf8').catch(() => ''),
-    readFile(path.join(rootDir, 'src', 'ReplacePatcher.yaml'), 'utf8').catch(() => '')
+    readFile(path.join(rootDir, 'src', 'TweeReplacer.yaml'), 'utf8'),
+    readFile(path.join(rootDir, 'src', 'ReplacePatcher.yaml'), 'utf8')
   ]);
   validateTweeWidgets(sourceTweeFiles);
+
+  for (const filePath of ['dist/module.js', 'dist/script.js']) {
+    if (!distFiles.has(filePath)) throw new Error(`Required build output is missing: ${filePath}`);
+  }
 
   const zip = new AdmZip();
   publicFiles.forEach((buffer, filePath) => zip.addFile(filePath, buffer));
