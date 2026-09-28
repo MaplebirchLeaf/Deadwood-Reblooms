@@ -62,12 +62,12 @@ class LifeSimulation extends Module {
     });
   }
 
-  public get hasGymAccess(): boolean {
+  public get has(): boolean {
     const gym = V.LifeSimulation.gym;
     return gym.ticket_day === Time.days || gym.membership === 'lifetime' || (gym.membership !== 'none' && gym.expires_at > Time.date.timeStamp);
   }
 
-  public activateGymPlan(plan: GymPlan): void {
+  public activate(plan: GymPlan): void {
     const gym = V.LifeSimulation.gym;
     if (plan === 'visit') {
       gym.ticket_day = Time.days;
