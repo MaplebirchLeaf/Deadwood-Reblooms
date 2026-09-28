@@ -1,17 +1,17 @@
 :: Deadwood Reblooms Life Simulation Gym Widgets [widget]
-<!-- 专属建筑图尚未到位，街道入口暂用原版运动图标。室内保留峭壁街侧栏地点。 -->
+<!-- 街道入口使用专属建筑图标；训练动作继续沿用原版运动图标。 -->
 <<widget 'deadwood-reblooms-life-simulation-gym-street'>>
 	<<if $exposed lte 0>>
 		<<if Time.hour gte 6 and Time.hour lt 22>>
-			<<exerciseicon>><<lanLink lanSwitch('Gym (0:02)', '健身房 (0:02)') 'Deadwood Reblooms Life Simulation Gym'>><<pass 2>><</lanLink>>
+			<<icon 'gym.png'>><<lanLink lanSwitch('Gym (0:02)', '健身房 (0:02)') 'Deadwood Reblooms Life Simulation Gym'>><<pass 2>><</lanLink>>
 		<<else>>
-			<<exerciseicon>><span class='blue'><<lanSwitch 'The gym is closed.' '健身房已经关门了。'>></span>
+			<<icon 'gym.png'>><span class='blue'><<lanSwitch 'The gym is closed.' '健身房已经关门了。'>></span>
 		<</if>><br>
 	<</if>>
 <</widget>>
 
 :: Deadwood Reblooms Life Simulation Gym []
-<<set $outside to 0>><<set $location to 'town'>><<set $bus to 'cliff'>><<effects>>
+<<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
 <<language>>
 	<<option 'EN'>>
 		The gym occupies a low building above the sea road. The front windows face the water. Weights clink beyond the desk, and the floor smells faintly of rubber and salt air.
@@ -53,8 +53,9 @@
 <br><<clifficon>><<lanLink lanSwitch('Return to Cliff Street', '回到峭壁街') 'Cliff Street'>><<pass 2>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Gym Training []
-<<set $outside to 0>><<set $location to 'town'>><<set $bus to 'cliff'>><<effects>>
-<<if !$daily.deadwoodGymPaid or ($daily.deadwoodGymSessions || 0) gte 3 or !['weights', 'run', 'stretch'].includes($phase)>>
+<<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
+<<if !$daily.deadwoodGymPaid or ($daily.deadwoodGymSessions || 0) gte 3 or !['weights', 'run', 'stretch'].includes($phase)
+	or Time.hour lt 6 or Time.hour gte 22 or $exposed gt 0 or pcAreArmsBound('both')>>
 	<<lanSwitch 'The equipment is not available.' '现在不能使用器械。'>><br><br>
 <<else>>
 	<<set $daily.deadwoodGymSessions to ($daily.deadwoodGymSessions || 0) + 1>>
