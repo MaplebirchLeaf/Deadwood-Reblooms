@@ -367,6 +367,10 @@ class DeadwoodReblooms extends Module {
       this.noticeSaving = false;
     } catch (error) {
       this.log(`Failed to apply notice module selection: ${error instanceof Error ? error.message : String(error)}`, 'ERROR', error);
+      Links.enabled = this.noticeLinksEnabled ?? true;
+      this.noticeLinksEnabled = undefined;
+      $('#story, #ui-bar').removeClass('gateBlur');
+      this.core.SugarCube.Dialog.close();
       this.noticeSaving = false;
     }
   }

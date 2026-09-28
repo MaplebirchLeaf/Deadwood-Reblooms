@@ -21,7 +21,7 @@
 ## 安装与前置
 
 1. 准备支持 SugarCube 2 ModLoader 的游戏。当前构建以 **DoL 0.5.12.13** 为目标。
-2. 加载 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)，版本须满足模组包声明的 `maplebirch >= 5.1.0`，并安装模组包所列的其他前置。
+2. 加载 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)，版本须满足模组包声明的 `maplebirch >= 5.1.1`，并安装模组包所列的其他前置。
 3. 从 [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases) 加载 `deadwood-reblooms-*.modpack`。需要动态音乐时，再加载独立的 `deadwood-reblooms-audio-*.modpack`。
 4. 首次进入游戏时选择模块。以后可在框架的模块管理中调整，发生更改时按提示重载。
 

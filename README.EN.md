@@ -21,7 +21,7 @@
 ## Installation and dependencies
 
 1. Use a game build with SugarCube 2 ModLoader. The current package targets **DoL 0.5.12.13**.
-2. Load the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). Its version must satisfy the mod package's `maplebirch >= 5.1.0` requirement, together with the other listed dependencies.
+2. Load the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). Its version must satisfy the mod package's `maplebirch >= 5.1.1` requirement, together with the other listed dependencies.
 3. Load `deadwood-reblooms-*.modpack` from [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases). To use dynamic music, also load the separate `deadwood-reblooms-audio-*.modpack`.
 4. Select modules on first load. You can change the selection later in the framework's module manager; reload when prompted.
 
