@@ -60,7 +60,7 @@ interface BrokerageState {
 }
 
 interface MarketState {
-  // 前一交易日价格用于页面涨跌显示。农场事件的待处理涨跌要跨周末保存。
+  // 前一交易日价格用于页面涨跌显示。剧情事件的待处理涨跌要跨周末保存。
   seed: number;
   day: number;
   prices: Record<string, number>;
@@ -68,6 +68,8 @@ interface MarketState {
   farm_stage?: number;
   farm_attack_damage?: number;
   pending_farm_moves?: Record<string, number>;
+  cafe_stage?: number;
+  avery_fate?: string;
 }
 
 interface FinanceState {
@@ -193,6 +195,15 @@ class Finance {
     return Finance.creditMinimumPayment(this.state.bank.credit_debt);
   }
 
+  public get loanPayoff(): number {
+    const bank = this.state.bank;
+    if (bank.loan_debt <= 0) return 0;
+    const day = Finance.currentDay();
+    const elapsedDays = Math.max(0, day - bank.loan_interest_last_day);
+    const rate = bank.loan_rate * (day > bank.loan_due_day ? LOAN_OVERDUE_MULTIPLIER : 1);
+    return bank.loan_debt + (elapsedDays > 0 ? Math.ceil((bank.loan_debt * rate * elapsedDays) / 7) : 0);
+  }
+
   public get accountLimits(): { credit: number; loan: number; atm: number } {
     const tier = ACCOUNT_TIERS.find(item => item.id === this.state.bank.account_tier) ?? ACCOUNT_TIERS[0];
     return {
@@ -217,7 +228,7 @@ class Finance {
     Finance.refreshAccountTier(this.state.bank);
     Finance.resetAtmLimit(this.state.bank);
     Finance.advanceMarket(this.state, this.securities);
-    Finance.advanceFarmMarket(this.state.market, this.securities);
+    Finance.advanceStoryMarket(this.state.market, this.securities);
   }
 
   public advanceBankThrough(day: number): void {
@@ -404,13 +415,11 @@ class Finance {
     if (bank.loan_debt <= 0) return 'no-debt';
     const value = Finance.toPennies(amount);
     if (value == null) return 'invalid-amount';
-    const payingAll = value >= bank.loan_debt;
     // 提前还款时结清已经使用的天数，防止周扣款日前全额还款变成无息贷款。
     const day = Finance.currentDay();
-    const elapsedDays = Math.max(0, day - bank.loan_interest_last_day);
-    const rate = bank.loan_rate * (day > bank.loan_due_day ? LOAN_OVERDUE_MULTIPLIER : 1);
-    const interest = elapsedDays > 0 ? Math.ceil((bank.loan_debt * rate * elapsedDays) / 7) : 0;
-    const payment = payingAll ? bank.loan_debt + interest : Math.min(value, bank.loan_debt + interest);
+    const payoff = this.loanPayoff;
+    const interest = payoff - bank.loan_debt;
+    const payment = Math.min(value, payoff);
     if (payment > bank.balance) return 'insufficient-bank';
     bank.loan_debt += interest;
     bank.loan_interest_last_day = day;
@@ -581,6 +590,8 @@ class Finance {
     finance.market.farm_stage ??= Math.max(0, Math.floor(Number(V.farm_stage) || 0));
     finance.market.farm_attack_damage ??= Boolean(V.farm_attacked) && Array.isArray(V.fields_damaged) ? V.fields_damaged.length : 0;
     finance.market.pending_farm_moves ??= {};
+    finance.market.cafe_stage ??= Math.max(0, Math.floor(Number(V.chef_state) || 0));
+    finance.market.avery_fate ??= String(V.avery_fate ?? '');
     if (finance.bank.opened && finance.bank.bank_interest_last_day < 0) finance.bank.bank_interest_last_day = Finance.currentDay();
     if (finance.bank.opened && finance.bank.opened_day < 0) finance.bank.opened_day = Finance.currentDay();
     Finance.refreshAccountTier(finance.bank);
@@ -792,7 +803,7 @@ class Finance {
     return Math.clamp(next, Math.round(item.initialPrice * 0.25), item.initialPrice * 4);
   }
 
-  private static applyFarmMoves(market: MarketState, securities: readonly Security[]): void {
+  private static applyStoryMoves(market: MarketState, securities: readonly Security[]): void {
     for (const item of securities) {
       const move = market.pending_farm_moves?.[item.symbol] ?? 0;
       if (!move) continue;
@@ -801,7 +812,7 @@ class Finance {
     market.pending_farm_moves = {};
   }
 
-  private static advanceFarmMarket(market: MarketState, securities: readonly Security[]): void {
+  private static advanceStoryMarket(market: MarketState, securities: readonly Security[]): void {
     const stage = Math.max(0, Math.floor(Number(V.farm_stage) || 0));
     const previousStage = market.farm_stage ?? stage;
     const moves = (market.pending_farm_moves ??= {});
@@ -823,7 +834,24 @@ class Finance {
       moves.RMY = (moves.RMY ?? 0) + Math.min(3, newDamage);
     }
     market.farm_attack_damage = damage;
-    if (Number(Time.weekDay) !== 1 && Number(Time.weekDay) !== 7) Finance.applyFarmMoves(market, securities);
+
+    // 咖啡馆涨价、停业扩建和重新开业都由原版 chef_state 推进，行情只在节点变化时响应一次。
+    const cafeStage = Math.max(0, Math.floor(Number(V.chef_state) || 0));
+    const previousCafeStage = market.cafe_stage ?? cafeStage;
+    if (previousCafeStage < 2 && cafeStage >= 2) moves.OBC = (moves.OBC ?? 0) + 3;
+    if (previousCafeStage < 7 && cafeStage >= 7) moves.OBC = (moves.OBC ?? 0) - 4;
+    if (previousCafeStage < 9 && cafeStage >= 9) moves.OBC = (moves.OBC ?? 0) + 10;
+    market.cafe_stage = cafeStage;
+
+    // 原版高楼事件的结局：仪式成功获得麋鹿们支持，救援路线则仍有火灾损失。
+    // 已开始的存档以当前结局为基线，不重复补涨跌。
+    const averyFate = String(V.avery_fate ?? '');
+    if (market.avery_fate !== averyFate) {
+      const move = averyFate === 'ascended' ? 8 : averyFate === 'saved' ? -4 : ['fallen', 'kicked'].includes(averyFate) ? -12 : 0;
+      if (move) moves.AVY = (moves.AVY ?? 0) + move;
+      market.avery_fate = averyFate;
+    }
+    if (Number(Time.weekDay) !== 1 && Number(Time.weekDay) !== 7) Finance.applyStoryMoves(market, securities);
   }
 
   private static advanceMarket(finance: FinanceState, securities: readonly Security[]): void {
@@ -838,7 +866,7 @@ class Finance {
       if (weekDay === 1 || weekDay === 7) continue;
       finance.market.previous_prices = { ...finance.market.prices };
       for (const item of securities) finance.market.prices[item.symbol] = Finance.nextPrice(item, finance.market.prices[item.symbol], day, finance.market.seed);
-      Finance.applyFarmMoves(finance.market, securities);
+      Finance.applyStoryMoves(finance.market, securities);
     }
     finance.market.day = currentDay;
   }

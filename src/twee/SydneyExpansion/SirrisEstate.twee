@@ -38,12 +38,13 @@
 <!-- 原版日程把 Sydney 的一部分时段标为 home。已搬去玩家住宅时不再出现在此处。 -->
 <<widget 'deadwood-reblooms-sirris-estate-presence'>>
   <<sydneySchedule>>
+  <<set _sydneyProperty to maplebirch.get('VP') ? maplebirch.VP.realEstate.residenceOf('Sydney') : null>>
   <<set _sydneyAtEstate to _sydney_location is 'home'
     and C.npc.Sydney.init is 1
     and !['prison', 'dungeon'].includes(C.npc.Sydney.state)
     and $daily.sydney.punish isnot 1
     and !$replayScene
-    and (!maplebirch.get('VP') or !maplebirch.VP.realEstate.residenceOf('Sydney'))>>
+    and (!_sydneyProperty or !maplebirch.VP.realEstate.residentsHome(_sydneyProperty.id).some(resident => resident.id === 'Sydney'))>>
   <!-- 西里斯教科学课且经营商店。只在晚上，或无课的商店休息日安排在家。 -->
   <<set _sirrisAtEstate to Time.hour gte 21
     or Time.hour lt 7

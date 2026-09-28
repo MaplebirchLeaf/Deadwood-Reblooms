@@ -235,7 +235,8 @@ class RealEstate {
 
   public get current(): Property | undefined {
     // visiting 仅记录当前进入哪处房产，不决定其是否为住所。
-    return this.properties.find(property => property.id === this.state.visiting);
+    const property = this.properties.find(item => item.id === this.state.visiting);
+    return property && this.owns(property.id) && !this.managementFor(property.id).rented && !this.isFrozen(property.id) ? property : undefined;
   }
 
   public get currentFloor(): number {
@@ -275,12 +276,13 @@ class RealEstate {
   }
 
   public residenceOf(name: string): Property | undefined {
-    return this.properties.find(property => this.residentsAt(property.id).some(resident => resident.id === name));
+    return this.properties.find(property => !this.isFrozen(property.id) && this.residentsAt(property.id).some(resident => resident.id === name));
   }
 
   public residentsHome(id: PropertyId): ResidentProfile[] {
     // Robin 与 Kylar 使用原版地点函数。Whitney 与 Sydney 没有同等的原版查询函数，
     // 因此按原版夜间时段与剧情状态判断；悉尼的排除日来自 sydneySchedule。
+    if (this.isFrozen(id)) return [];
     return this.residentsAt(id).filter(profile => {
       switch (profile.id) {
         case 'Robin':
@@ -289,14 +291,28 @@ class RealEstate {
           return Time.hour < 7 && C.npc.Whitney?.init === 1 && ['active', 'rescued'].includes(C.npc.Whitney.state);
         case 'Kylar':
           return Time.hour < 7 && window.getKylarLocation().area === 'manor_bedroom';
-        case 'Sydney':
-          // 原版 sydneySchedule 在周一整天安排神殿值守，且剧情回放可以强制指定地点。
+        case 'Sydney': {
+          // 原版 sydneySchedule 的 home 不总是夜间：受罚和假日白天也会返回 home。
+          // 同住只接管正常睡眠时段，节庆留宿与已约好的庄园探访优先。
+          const expansion = this.core.get('SydneyExpansion') ? V.SydneyExpansion : undefined;
+          const halloweenNight = (Time.month === 10 && Time.monthDay === 31 && Time.hour >= 21) || (Time.month === 11 && Time.monthDay === 1 && Time.hour < 7);
+          const halloweenVisit =
+            expansion?.halloweenYear === Time.year || (expansion?.robinHalloweenYear === Time.year && expansion?.whitneyHalloweenYear === Time.year && V.halloween_kylar_proposed === 1);
+          const christmasNight = (Time.month === 12 && Time.monthDay === 25 && Time.hour >= 21) || (Time.month === 12 && Time.monthDay === 26 && Time.hour < 6);
+          const estateVisit = (expansion?.estate.visitDay === Time.days && Time.hour >= 21) || (expansion?.estate.visitDay === Time.days - 1 && Time.hour < 6);
           return (
             C.npc.Sydney?.init === 1 &&
+            !['prison', 'dungeon'].includes(C.npc.Sydney.state) &&
+            V.daily.sydney.punish !== 1 &&
             (Time.hour >= 23 || Time.hour < 6) &&
-            (V.daily.sydney.punish === 1 || (Time.weekDay !== 1 && (Time.weekDay !== 7 || Time.hour < 6))) &&
-            !(V.sydney_location_override && V.replayScene && V.sydney_location_override !== 'home')
+            Time.weekDay !== 1 &&
+            (Time.weekDay !== 7 || Time.hour < 6) &&
+            !(halloweenNight && halloweenVisit) &&
+            !(christmasNight && expansion?.christmasRestYear === Time.year) &&
+            !estateVisit &&
+            !V.replayScene
           );
+        }
         default:
           return false;
       }
@@ -423,7 +439,7 @@ class RealEstate {
   }
 
   public visit(id: PropertyId): boolean {
-    if (!this.properties.some(property => property.id === id) || !this.owns(id) || this.managementFor(id).rented) return false;
+    if (!this.properties.some(property => property.id === id) || !this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return false;
     this.state.visiting = id;
     this.state.floor = 1;
     return true;
