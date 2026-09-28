@@ -41,25 +41,28 @@ for (const ref of ['main', legacyBranch]) {
 
 const tagCommit = (tag: string): string | null => {
   try {
+    git('show-ref', '--verify', '--quiet', `refs/tags/${tag}`);
     return git('rev-parse', `${tag}^{commit}`);
   } catch {
     return null;
   }
 };
 
-const legacyCommit = git('rev-parse', legacyBranch);
-if (tagCommit(legacyTag) !== legacyCommit) {
-  if (tagCommit(legacyTag)) throw new Error(`${legacyTag} points to a different commit.`);
-  git('tag', '-a', legacyTag, '-m', `Deadwood Reblooms ${releaseTag} for DoL 0.5.11.9`, legacyBranch);
-}
-
-// 先发布旧版源码标签，主标签触发 CI 时才能检出两个确定的版本。
-git('push', '--atomic', 'origin', `refs/heads/${legacyBranch}`, `refs/tags/${legacyTag}`);
-
 if (current.version !== version) {
   execFileSync(process.execPath, ['node_modules/bumpp/bin/bumpp.mjs', '--release', version, '--no-push', '--tag', 'v%s', '--yes'], { cwd: root, stdio: 'inherit' });
 }
 
-if (tagCommit(releaseTag) !== git('rev-parse', 'main')) throw new Error(`${releaseTag} does not point to the main branch HEAD.`);
-git('push', '--atomic', 'origin', 'refs/heads/main', `refs/tags/${releaseTag}`);
+if (packageAt('main').version !== version) throw new Error(`The main branch was not bumped to ${version}.`);
+for (const [tag, ref, message] of [
+  [legacyTag, legacyBranch, `Deadwood Reblooms ${releaseTag} for DoL 0.5.11.9`],
+  [releaseTag, 'main', `Deadwood Reblooms ${releaseTag}`]
+]) {
+  const commit = git('rev-parse', ref);
+  const existing = tagCommit(tag);
+  if (existing && existing !== commit) throw new Error(`${tag} points to a different commit.`);
+  if (!existing) git('tag', '-a', tag, '-m', message, ref);
+}
+
+// 同一次推送同时发布两个源码分支和标签，主标签触发 CI 时旧版标签已可检出。
+git('push', '--atomic', 'origin', `refs/heads/${legacyBranch}`, 'refs/heads/main', `refs/tags/${legacyTag}`, `refs/tags/${releaseTag}`);
 console.log(`Pushed ${releaseTag} and ${legacyTag}. The release workflow will build both game versions.`);
