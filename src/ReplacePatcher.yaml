@@ -4,12 +4,15 @@
   before: |
     if (maplebirch.get('MoreTransformations') && amount > 0 && V.maplebirch?.transformation?.horse?.level >= 6) fatigueMod *= 0.75;
 
-- comment: '罗宾与孤儿们逼退贝利后跳过整次原版收租结算，避免 DoLP 继续从押金扣款。'
+- comment: '0.5.11.9 没有 passRentTick；艾弗里路线只跳过贝利租金，保留庄园每周更新。'
   fileName: 'time.js'
-  from: 'function passRentTick() {'
-  to: |
-    function passRentTick() {
-      if (maplebirch.get('RobinExpansion') && V.RobinExpansion?.baileyDefeated) return;
+  from: 'if (V.avery_mansion.rage.assess >= 9 || V.avery_mansion.days_absent >= 2) {'
+  to: "if ((V.avery_mansion.rage.assess >= 9 || V.avery_mansion.days_absent >= 2) && (!maplebirch.get('RobinExpansion') || !V.RobinExpansion?.baileyDefeated)) {"
+
+- comment: '0.5.11.9 普通居住路线击退贝利后停止每周租期与欠租计数。'
+  fileName: 'time.js'
+  from: "} else {\n\t\tV.renttime--;"
+  to: "} else if (!maplebirch.get('RobinExpansion') || !V.RobinExpansion?.baileyDefeated) {\n\t\tV.renttime--;"
 
 - comment: '悉尼事先答应当晚回家时，将原版日程同步转为 home，直至次日清晨，避免半夜突然回到神殿。'
   fileName: 'named-npc.js'

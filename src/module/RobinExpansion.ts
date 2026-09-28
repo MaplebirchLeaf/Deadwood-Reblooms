@@ -23,6 +23,11 @@ interface RobinExpansionState {
   shopBankSupported: boolean;
   pcLoan: number;
   shopStock: number;
+  shopStaff: number;
+  shopFlowers: boolean;
+  flowerStock: Record<string, number>;
+  shopPopcorn: boolean;
+  shopBalloons: boolean;
   balloon: BalloonRoute;
   balloonWins: number;
   balloonDay: number;
@@ -86,6 +91,11 @@ class RobinExpansion extends Module {
     shopBankSupported: false,
     pcLoan: 0,
     shopStock: 0,
+    shopStaff: 0,
+    shopFlowers: false,
+    flowerStock: {},
+    shopPopcorn: false,
+    shopBalloons: false,
     balloon: 'none',
     balloonWins: 0,
     balloonDay: -1,
@@ -146,8 +156,120 @@ class RobinExpansion extends Module {
     const state = this.state;
     if (state.asylum.status === 'admitted') return 0;
     const stall = state.shop ? state.lemonade + state.chocolate : Time.season === 'winter' ? state.chocolate : state.lemonade;
-    // 店铺的增收已经扣除每周的店租、水电和原料损耗。
-    return (V.robin.stayup >= 1 ? 250 : 300) + (V.robin.moneyModifier || 0) + stall * 1200 + this.tutorIncome + (state.shop ? 1500 : 0) + this.balloonIncome;
+    // 基础店铺增收已扣除店租、水电、原料和临时帮工；正式员工的增收与工资单独入账。
+    return (
+      (V.robin.stayup >= 1 ? 250 : 300) +
+      (V.robin.moneyModifier || 0) +
+      stall * 1200 +
+      this.tutorIncome +
+      (state.shop ? 1500 + this.shopStaffSales - this.shopStaffWages + this.flowerSalesEstimate + (state.shopPopcorn ? 150 : 0) + (state.shopBalloons ? 75 : 0) : 0) +
+      this.balloonIncome
+    );
+  }
+
+  public get shopStaffSales(): number {
+    return Math.min(2, this.state.shopStaff || 0) * 700;
+  }
+
+  public get shopStaffWages(): number {
+    return Math.min(2, this.state.shopStaff || 0) * 350;
+  }
+
+  public canHireShopStaff(): boolean {
+    return this.robinAvailable && window.getRobinLocation() === 'shop' && this.state.shop && this.state.shopStaff < 2 && this.canSpend(350);
+  }
+
+  public hireShopStaff(): boolean {
+    if (!this.canHireShopStaff() || !this.spend(350)) return false;
+    this.state.shopStaff++;
+    return true;
+  }
+
+  public get flowerTypes(): string[] {
+    return ['daisy', 'tulip', 'carnation', 'sunflower', 'white_rose', 'pink_rose', 'red_rose', 'orchid'].filter(
+      type => setup.foodstuff?.[type]?.category === 'flower' && Number.isFinite(setup.foodstuff[type].shop?.sell_price) && (setup.foodstuff[type].shop?.sell_price ?? 0) > 0
+    );
+  }
+
+  public get flowerStockTotal(): number {
+    return Object.values(this.state.flowerStock).reduce((total, count) => total + Math.max(0, count), 0);
+  }
+
+  public get flowerSalesEstimate(): number {
+    if (!this.state.shopFlowers) return 0;
+    let remaining = 10;
+    let sales = 0;
+    for (const type of this.flowerTypes) {
+      const sold = Math.min(remaining, Math.max(0, this.state.flowerStock[type] || 0));
+      sales += sold * this.flowerPrice(type);
+      remaining -= sold;
+      if (remaining === 0) break;
+    }
+    return sales;
+  }
+
+  private settleFlowerSales(): void {
+    if (!this.state.shop || !this.state.shopFlowers) return;
+    let remaining = 10;
+    for (const type of this.flowerTypes) {
+      const sold = Math.min(remaining, Math.max(0, this.state.flowerStock[type] || 0));
+      if (sold > 0) this.state.flowerStock[type] -= sold;
+      remaining -= sold;
+      if (remaining === 0) break;
+    }
+  }
+
+  public flowerPrice(type: string): number {
+    if (!this.flowerTypes.includes(type)) return 0;
+    return Math.ceil(((setup.foodstuff[type]?.shop?.sell_price ?? 0) * 1.4) / 100);
+  }
+
+  public arrangeShopFlowers(): boolean {
+    if (!this.state.shop || this.state.shopFlowers || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(100)) return false;
+    this.state.shopFlowers = true;
+    this.state.flowerStock.daisy = 10;
+    return true;
+  }
+
+  public restockShopFlowers(): boolean {
+    if (!this.state.shopFlowers || this.flowerStockTotal > 5 || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(15)) return false;
+    this.state.flowerStock.daisy = (this.state.flowerStock.daisy || 0) + 10;
+    return true;
+  }
+
+  public supplyShopFlowers(type: string): boolean {
+    if (!this.state.shopFlowers || !this.flowerTypes.includes(type) || this.flowerStockTotal > 20 || !this.robinAvailable || window.getRobinLocation() !== 'shop') return false;
+    if (!V.foodstuff?.[type] || V.foodstuff[type].amount < 10) return false;
+    const pounds = (setup.foodstuff[type]?.shop?.sell_price ?? 0) / 10;
+    if (pounds <= 0) return false;
+    if (!this.spend(pounds)) return false;
+    V.foodstuff[type].amount -= 10;
+    V.money += pounds * 100;
+    this.state.flowerStock[type] = (this.state.flowerStock[type] || 0) + 10;
+    return true;
+  }
+
+  public buyShopFlower(type: string): boolean {
+    const price = this.flowerPrice(type);
+    if (!this.state.shop || !this.state.shopFlowers || Time.hour < 9 || Time.hour >= 21 || !price || !(this.state.flowerStock[type] > 0) || V.money < price * 100 || !V.foodstuff?.[type]) return false;
+    V.money -= price * 100;
+    V.foodstuff[type].amount++;
+    this.state.flowerStock[type]--;
+    this.state.reserve += price;
+    return true;
+  }
+
+  public arrangeShopPopcorn(): boolean {
+    if (!this.state.shop || this.state.shopPopcorn || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(150)) return false;
+    this.state.shopPopcorn = true;
+    return true;
+  }
+
+  public arrangeShopBalloons(): boolean {
+    if (!this.state.shop || this.state.shopBalloons || !['cooperate', 'resolved'].includes(this.state.balloon) || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(100))
+      return false;
+    this.state.shopBalloons = true;
+    return true;
   }
 
   public get tutorIncome(): number {
@@ -564,6 +686,7 @@ class RobinExpansion extends Module {
       V.robinmoney = cashBefore;
       return;
     }
+    this.settleFlowerSales();
     // 原版先扣房租、检查债务，再发周收入；先入账才可用于当周房租。
     V.robinmoney += Math.max(0, state.weeklyIncome - vanillaIncome);
     if (V.robinpaid !== 1 || state.selfRent) {
@@ -612,6 +735,21 @@ class RobinExpansion extends Module {
         if (V.RobinExpansion?.asylum?.status === 'admitted') {
           T.robin_location = 'asylum';
           return 'asylum';
+        }
+        if (
+          location === 'orphanage' &&
+          !V.robinlocationoverride?.during?.includes(Time.hour) &&
+          Weather.precipitation === 'rain' &&
+          Time.isWeekEnd() &&
+          Time.hour >= 9 &&
+          (Time.hour < 16 || (Time.hour === 16 && Time.minute >= 30)) &&
+          C.npc.Robin.init === 1 &&
+          !V.robinmissing &&
+          C.npc.Robin.trauma < 80 &&
+          (Time.season === 'winter' ? (V.RobinExpansion?.chocolate ?? 0) >= 1 : (V.RobinExpansion?.lemonade ?? 0) >= 1)
+        ) {
+          T.robin_location = Time.season === 'winter' ? 'park' : 'beach';
+          return T.robin_location;
         }
         if (
           V.RobinExpansion?.tutor &&

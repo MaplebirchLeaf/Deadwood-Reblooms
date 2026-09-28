@@ -119,8 +119,8 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       "Bailey's Office": [
         {
           // 贝利只有 7–9 点在办公室；入口仍受原版 _options 限制，避免打断惩罚场景。
-          src: '<<baileyRentReclaimOption>> /* Bailey Confiscation System */',
-          applybefore: '<<deadwood-reblooms-life-simulation-attendance-link>>\n',
+          src: '<<if _options is 1>>',
+          applyafter: '\n\t<<deadwood-reblooms-life-simulation-attendance-link>>',
           expected: 1
         }
       ],

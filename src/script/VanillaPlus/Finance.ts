@@ -340,19 +340,6 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
-      'Bait Shop Widgets': [
-        // 鱼饵与试穿装备分别按实际价格检查正规支付方式。
-        {
-          src: '<<if $money gte 600>>',
-          to: '<<if maplebirch.VP.finance.canPay(600, "fishing")>>',
-          expected: 1
-        },
-        {
-          src: '$tryOn.value lte $money',
-          to: 'maplebirch.VP.finance.canPay($tryOn.value, "clothes")',
-          expected: 1
-        }
-      ],
       'Toy Shop Widgets': [
         // 玩具选项按选中商品价格检查现金、借记卡与信用卡。
         {

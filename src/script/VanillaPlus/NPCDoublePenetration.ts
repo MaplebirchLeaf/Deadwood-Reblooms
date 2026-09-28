@@ -363,12 +363,6 @@ export default function (maplebirch: typeof window.maplebirch) {
           to: '<<if _nn is $leglocktarget or ($VanillaPlus.npcDoublePenetration and $VanillaPlus.npcDoublePenetration.playerLegLock and $VanillaPlus.npcDoublePenetration.playerLegLock.targets.includes(Number(_nn)))>>',
           expected: 1
         },
-        // 第二名插入者由扩展组件处理，避免原版把其自定义状态误判为射入 PC。
-        {
-          src: '<<combatInseminate _nn>>',
-          to: '<<if !maplebirch.VP.NPCDoublePenetration.isPartner(_nn)>><<combatInseminate _nn>><</if>>',
-          expected: 1
-        },
         // 原版多人共用一组 enemyarousal；这里只改写第二名插入者的射精目标，不另建高潮或结束流程。
         {
           src: '<<if !!namedNpcEjaculation(_nn, _args[0])>>',
