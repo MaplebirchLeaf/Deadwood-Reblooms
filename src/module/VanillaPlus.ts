@@ -1,101 +1,20 @@
 // ./src/module/VanillaPlus.ts
 
 import Module from './Module';
+import { DEFAULT_VANILLA_PLUS_STATE, type VanillaPlusAttribute, type VanillaPlusTrait } from './constants';
 import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
 import DivineTransformations from './VanillaPlus/DivineTransformations';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
-import Finance, { DEFAULT_FINANCE_STATE } from './VanillaPlus/Finance';
+import Finance from './VanillaPlus/Finance';
 import HandGrip from './VanillaPlus/HandGrip';
-import NPCDoublePenetration, { type NPCDoublePenetrationData } from './VanillaPlus/NPCDoublePenetration';
+import NPCDoublePenetration from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
 import RealEstate from './VanillaPlus/RealEstate';
 import Willpower from './VanillaPlus/Willpower';
 
-type VanillaPlusAttribute = 'willpower' | 'physique' | 'beauty' | 'exhibitionism' | 'deviancy' | 'promiscuity';
-type VanillaPlusTrait = VanillaPlusAttribute | 'incorrigible';
-
 class VanillaPlus extends Module {
-  static readonly variables = {
-    lock: {
-      physique: false,
-      willpower: false,
-      beauty: false,
-      promiscuity: false,
-      exhibitionism: false,
-      deviancy: false
-    },
-    traits: {
-      willpower: false,
-      physique: false,
-      beauty: false,
-      exhibitionism: false,
-      deviancy: false,
-      promiscuity: false,
-      incorrigible: false
-    },
-    beauty: {
-      alluring: false
-    },
-    divineTransformations: {
-      beautyBonus: 0,
-      expungeUsed: false
-    },
-    finance: DEFAULT_FINANCE_STATE,
-    real_estate: RealEstate.defaults,
-    physique: {
-      panic: false,
-      heroic: false,
-      farm: false,
-      pound: false,
-      breakUsed: false
-    },
-    exhibitionism: {
-      swimming: false,
-      ballroom: false,
-      highStreetRun: false,
-      highStreet: false,
-      levelFive: 0
-    },
-    deviancy: {
-      wildsong: false,
-      conducting: false,
-      conducted: false,
-      levelFive: 0,
-      mirrorOrigin: '',
-      mirror_day: -1,
-      mirror_property: null as string | null,
-      mirror_locations: {} as Record<string, { north: number; east: number }>,
-      mirrors: {
-        home: false,
-        property: {} as Record<string, boolean>,
-        farm: false,
-        tower: false,
-        temple: false,
-        sirris: false,
-        kylar: false
-      }
-    },
-    promiscuity: {
-      levelFive: 0
-    },
-    handGrip: {
-      left: null as number | null,
-      right: null as number | null
-    },
-    npcDoublePenetration: null as NPCDoublePenetrationData | null,
-    willpower: {
-      wraith: false,
-      schism: false,
-      vigil: false,
-      painShield: {
-        remaining: 0,
-        ready: true
-      }
-    }
-  };
-
   public readonly exposed = true;
   public readonly beauty: Beauty;
   public readonly deviancy: Deviancy;
@@ -111,7 +30,7 @@ class VanillaPlus extends Module {
   private readonly attributes: VanillaPlusAttribute[] = ['willpower', 'physique', 'beauty', 'exhibitionism', 'deviancy', 'promiscuity'];
 
   public constructor(core: typeof maplebirch) {
-    super(core, 'VanillaPlus', VanillaPlus.variables);
+    super(core, 'VanillaPlus', DEFAULT_VANILLA_PLUS_STATE);
     this.beauty = new Beauty(this);
     this.deviancy = new Deviancy(this);
     this.exhibitionism = new Exhibitionism(this);

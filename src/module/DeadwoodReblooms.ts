@@ -1,58 +1,59 @@
 // ./src/module/DeadwoodReblooms.ts
-import hint_cn from '@/assets/hint/CN/Index.md';
-import hint_en from '@/assets/hint/EN/Index.md';
-import hint_DR_cn from '@/assets/hint/CN/DR.md';
-import hint_DR_en from '@/assets/hint/EN/DR.md';
-import hint_UCACSD_cn from '@/assets/hint/CN/UCACSD.md';
-import hint_UCACSD_en from '@/assets/hint/EN/UCACSD.md';
-import hint_LongerCombat_cn from '@/assets/hint/CN/LongerCombat.md';
-import hint_LongerCombat_en from '@/assets/hint/EN/LongerCombat.md';
-import hint_MLIANPCA_cn from '@/assets/hint/CN/MLIANPCA.md';
-import hint_MLIANPCA_en from '@/assets/hint/EN/MLIANPCA.md';
-import hint_ICC_cn from '@/assets/hint/CN/ICC.md';
-import hint_ICC_en from '@/assets/hint/EN/ICC.md';
-import hint_CA_cn from '@/assets/hint/CN/CA.md';
-import hint_CA_en from '@/assets/hint/EN/CA.md';
-import hint_MoreTransformations_cn from '@/assets/hint/CN/MoreTransformations.md';
-import hint_MoreTransformations_en from '@/assets/hint/EN/MoreTransformations.md';
-import hint_NPCSidebarPortrait_cn from '@/assets/hint/CN/NPCSidebarPortrait.md';
-import hint_NPCSidebarPortrait_en from '@/assets/hint/EN/NPCSidebarPortrait.md';
-import hint_VP_cn from '@/assets/hint/CN/VP.md';
-import hint_VP_en from '@/assets/hint/EN/VP.md';
-import hint_SydneyExpansion_cn from '@/assets/hint/CN/SydneyExpansion.md';
-import hint_SydneyExpansion_en from '@/assets/hint/EN/SydneyExpansion.md';
-import hint_RobinExpansion_cn from '@/assets/hint/CN/RobinExpansion.md';
-import hint_RobinExpansion_en from '@/assets/hint/EN/RobinExpansion.md';
-import hint_WhitneyExpansion_cn from '@/assets/hint/CN/WhitneyExpansion.md';
-import hint_WhitneyExpansion_en from '@/assets/hint/EN/WhitneyExpansion.md';
-import hint_KylarExpansion_cn from '@/assets/hint/CN/KylarExpansion.md';
-import hint_KylarExpansion_en from '@/assets/hint/EN/KylarExpansion.md';
-import hint_LS_cn from '@/assets/hint/CN/LS.md';
-import hint_LS_en from '@/assets/hint/EN/LS.md';
-import hint_DM_cn from '@/assets/hint/CN/DM.md';
-import hint_DM_en from '@/assets/hint/EN/DM.md';
-import hint_Credits_cn from '@/assets/hint/CN/Credits.md';
-import hint_Credits_en from '@/assets/hint/EN/Credits.md';
+import Hint_CN from '@/assets/hint/CN/Index.md';
+import Hint_EN from '@/assets/hint/EN/Index.md';
+import Hint_DR_CN from '@/assets/hint/CN/DR.md';
+import Hint_DR_EN from '@/assets/hint/EN/DR.md';
+import Hint_UCACSD_CN from '@/assets/hint/CN/UCACSD.md';
+import Hint_UCACSD_EN from '@/assets/hint/EN/UCACSD.md';
+import Hint_LongerCombat_CN from '@/assets/hint/CN/LongerCombat.md';
+import Hint_LongerCombat_EN from '@/assets/hint/EN/LongerCombat.md';
+import Hint_MLIANPCA_CN from '@/assets/hint/CN/MLIANPCA.md';
+import Hint_MLIANPCA_EN from '@/assets/hint/EN/MLIANPCA.md';
+import Hint_ICC_CN from '@/assets/hint/CN/ICC.md';
+import Hint_ICC_EN from '@/assets/hint/EN/ICC.md';
+import Hint_CA_CN from '@/assets/hint/CN/CA.md';
+import Hint_CA_EN from '@/assets/hint/EN/CA.md';
+import Hint_MoreTransformations_CN from '@/assets/hint/CN/MoreTransformations.md';
+import Hint_MoreTransformations_EN from '@/assets/hint/EN/MoreTransformations.md';
+import Hint_NPCSidebarPortrait_CN from '@/assets/hint/CN/NPCSidebarPortrait.md';
+import Hint_NPCSidebarPortrait_EN from '@/assets/hint/EN/NPCSidebarPortrait.md';
+import Hint_VP_CN from '@/assets/hint/CN/VP.md';
+import Hint_VP_EN from '@/assets/hint/EN/VP.md';
+import Hint_SydneyExpansion_CN from '@/assets/hint/CN/SydneyExpansion.md';
+import Hint_SydneyExpansion_EN from '@/assets/hint/EN/SydneyExpansion.md';
+import Hint_RobinExpansion_CN from '@/assets/hint/CN/RobinExpansion.md';
+import Hint_RobinExpansion_EN from '@/assets/hint/EN/RobinExpansion.md';
+import Hint_WhitneyExpansion_CN from '@/assets/hint/CN/WhitneyExpansion.md';
+import Hint_WhitneyExpansion_EN from '@/assets/hint/EN/WhitneyExpansion.md';
+import Hint_KylarExpansion_CN from '@/assets/hint/CN/KylarExpansion.md';
+import Hint_KylarExpansion_EN from '@/assets/hint/EN/KylarExpansion.md';
+import Hint_LS_CN from '@/assets/hint/CN/LS.md';
+import Hint_LS_EN from '@/assets/hint/EN/LS.md';
+import Hint_DM_CN from '@/assets/hint/CN/DM.md';
+import Hint_DM_EN from '@/assets/hint/EN/DM.md';
+import Hint_Credits_CN from '@/assets/hint/CN/Credits.md';
+import Hint_Credits_EN from '@/assets/hint/EN/Credits.md';
 import { defaults } from './constants';
 import Module from './Module';
 
+// prettier-ignore
 const guideSections = {
-  DR: { en: hint_DR_en, cn: hint_DR_cn, title: { en: 'Core features', cn: '基础功能' } },
-  UCACSD: { en: hint_UCACSD_en, cn: hint_UCACSD_cn, title: { en: 'Cheats and combat values', cn: '作弊入口与战斗数值' } },
-  LongerCombat: { en: hint_LongerCombat_en, cn: hint_LongerCombat_cn, title: { en: 'Longer encounters', cn: '更长遭遇战' } },
-  MLIANPCA: { en: hint_MLIANPCA_en, cn: hint_MLIANPCA_cn, title: { en: 'Love interests and portraits', cn: '更多恋人与社交栏头像' } },
-  ICC: { en: hint_ICC_en, cn: hint_ICC_cn, title: { en: 'Cheat collection', cn: '作弊集' } },
-  CA: { en: hint_CA_en, cn: hint_CA_cn, title: { en: 'Celestial anomalies', cn: '天体异象' } },
-  MoreTransformations: { en: hint_MoreTransformations_en, cn: hint_MoreTransformations_cn, title: { en: 'Transformations', cn: '更多转化' } },
-  NPCSidebarPortrait: { en: hint_NPCSidebarPortrait_en, cn: hint_NPCSidebarPortrait_cn, title: { en: 'Sidebar portraits', cn: 'NPC 侧边栏立绘' } },
-  VP: { en: hint_VP_en, cn: hint_VP_cn, title: { en: 'Vanilla Plus', cn: '原版增强' } },
-  SydneyExpansion: { en: hint_SydneyExpansion_en, cn: hint_SydneyExpansion_cn, title: { en: 'Sydney', cn: '悉尼拓展' } },
-  RobinExpansion: { en: hint_RobinExpansion_en, cn: hint_RobinExpansion_cn, title: { en: 'Robin', cn: '罗宾拓展' } },
-  WhitneyExpansion: { en: hint_WhitneyExpansion_en, cn: hint_WhitneyExpansion_cn, title: { en: 'Whitney', cn: '惠特尼拓展' } },
-  KylarExpansion: { en: hint_KylarExpansion_en, cn: hint_KylarExpansion_cn, title: { en: 'Kylar', cn: '凯拉尔拓展' } },
-  LS: { en: hint_LS_en, cn: hint_LS_cn, title: { en: 'Life Simulation', cn: '模拟生活' } },
-  DM: { en: hint_DM_en, cn: hint_DM_cn, title: { en: 'Dynamic Music', cn: '动态音乐' } },
-  Credits: { en: hint_Credits_en, cn: hint_Credits_cn, title: { en: 'Credits and sources', cn: '致谢与素材来源' } }
+  DR:                   { EN: Hint_DR_EN,                   CN: Hint_DR_CN,                   title: { EN: 'Core features',                 CN: '基础功能' } },
+  UCACSD:               { EN: Hint_UCACSD_EN,               CN: Hint_UCACSD_CN,               title: { EN: 'Cheats and combat values',      CN: '作弊入口与战斗数值' } },
+  LongerCombat:         { EN: Hint_LongerCombat_EN,         CN: Hint_LongerCombat_CN,         title: { EN: 'Longer encounters',             CN: '更长遭遇战' } },
+  MLIANPCA:             { EN: Hint_MLIANPCA_EN,             CN: Hint_MLIANPCA_CN,             title: { EN: 'Love interests and portraits',  CN: '更多恋人与社交栏头像' } },
+  ICC:                  { EN: Hint_ICC_EN,                  CN: Hint_ICC_CN,                  title: { EN: 'Cheat collection',              CN: '作弊集' } },
+  CA:                   { EN: Hint_CA_EN,                   CN: Hint_CA_CN,                   title: { EN: 'Celestial anomalies',           CN: '天体异象' } },
+  MoreTransformations:  { EN: Hint_MoreTransformations_EN,  CN: Hint_MoreTransformations_CN,  title: { EN: 'Transformations',               CN: '更多转化' } },
+  NPCSidebarPortrait:   { EN: Hint_NPCSidebarPortrait_EN,   CN: Hint_NPCSidebarPortrait_CN,   title: { EN: 'Sidebar portraits',             CN: 'NPC 侧边栏立绘' } },
+  VP:                   { EN: Hint_VP_EN,                   CN: Hint_VP_CN,                   title: { EN: 'Vanilla Plus',                  CN: '原版增强' } },
+  SydneyExpansion:      { EN: Hint_SydneyExpansion_EN,      CN: Hint_SydneyExpansion_CN,      title: { EN: 'Sydney',                        CN: '悉尼拓展' } },
+  RobinExpansion:       { EN: Hint_RobinExpansion_EN,       CN: Hint_RobinExpansion_CN,       title: { EN: 'Robin',                         CN: '罗宾拓展' } },
+  WhitneyExpansion:     { EN: Hint_WhitneyExpansion_EN,     CN: Hint_WhitneyExpansion_CN,     title: { EN: 'Whitney',                       CN: '惠特尼拓展' } },
+  KylarExpansion:       { EN: Hint_KylarExpansion_EN,       CN: Hint_KylarExpansion_CN,       title: { EN: 'Kylar',                         CN: '凯拉尔拓展' } },
+  LS:                   { EN: Hint_LS_EN,                   CN: Hint_LS_CN,                   title: { EN: 'Life Simulation',               CN: '模拟生活' } },
+  DM:                   { EN: Hint_DM_EN,                   CN: Hint_DM_CN,                   title: { EN: 'Dynamic Music',                 CN: '动态音乐' } },
+  Credits:              { EN: Hint_Credits_EN,              CN: Hint_Credits_CN,              title: { EN: 'Credits and sources',           CN: '致谢与素材来源' } }
 } as const;
 
 const guideOrder = [
@@ -247,22 +248,22 @@ class DeadwoodReblooms extends Module {
   }
 
   public get wiki(): string {
-    const intro = this.markdown(lanSwitch(hint_en, hint_cn));
+    const intro = this.markdown(lanSwitch(Hint_EN, Hint_CN));
     const contents = guideOrder
       .map(name => {
         const section = guideSections[name];
-        const title = lanSwitch(section.title.en, section.title.cn);
+        const title = lanSwitch(section.title.EN, section.title.CN);
         const label = name === 'Credits' ? title : `${name} · ${title}`;
         return `<div class='settingsToggleItem'><a href='#deadwood-guide-${name}' data-guide-target='deadwood-guide-${name}'>${label}</a></div>`;
       })
       .join('');
     const sections = guideOrder.map(name => {
       const section = guideSections[name];
-      const title = lanSwitch(section.title.en, section.title.cn);
+      const title = lanSwitch(section.title.EN, section.title.CN);
       const label = name === 'Credits' ? title : `${name} · ${title}`;
       return `<section id='deadwood-guide-${name}'>
         <h2><span class='gold'>${label}</span></h2>
-        ${this.markdown(lanSwitch(section.en, section.cn))}
+        ${this.markdown(lanSwitch(section.EN, section.CN))}
       </section>`;
     });
     return `${intro}<nav aria-label='${lanSwitch('Guide contents', '指南目录')}'><div class='settingsGrid'>${contents}</div></nav><br>${sections.join('<br>')}`;

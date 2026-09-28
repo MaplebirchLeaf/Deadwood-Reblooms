@@ -3,6 +3,7 @@
 import Module from './Module';
 import SolarEclipse from './CelestialAnomalies/SolarEclipse';
 import MeteorShower from './CelestialAnomalies/MeteorShower';
+import { DEFAULT_CELESTIAL_ANOMALIES_STATE } from './constants';
 import { MacroDefinition } from 'twine-sugarcube';
 
 function formatTime(timestamp: number): string {
@@ -17,23 +18,12 @@ class CelestialAnomalies extends Module {
     MeteorShower: true
   };
 
-  static readonly variables = {
-    solarEclipse: {
-      seed: 0,
-      stored: []
-    },
-    meteorShower: {
-      seed: 0,
-      stored: []
-    }
-  };
-
   public readonly exposed = true;
   private readonly solarEclipse: SolarEclipse;
   private readonly meteorShower: MeteorShower;
 
   public constructor(core: typeof maplebirch) {
-    super(core, 'CelestialAnomalies', CelestialAnomalies.variables);
+    super(core, 'CelestialAnomalies', DEFAULT_CELESTIAL_ANOMALIES_STATE);
     this.solarEclipse = new SolarEclipse(core);
     this.meteorShower = new MeteorShower(core);
   }

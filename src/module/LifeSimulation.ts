@@ -1,47 +1,15 @@
 import Module from './Module';
 import AcademicHonours from './LifeSimulation/AcademicHonours';
-import School, { DEFAULT_SCHOOL_STATE } from './LifeSimulation/School';
-
-type GymPlan = 'visit' | 'week' | 'month' | 'year' | 'lifetime';
-
-const DEFAULT_HISTORY_PROJECT_STATE = {
-  // 项目进度和证据结果都写入 V.LifeSimulation；重新读档后直接恢复当前阶段。
-  status: 'none' as 'none' | 'ongoing' | 'done' | 'won',
-  source: 'none' as 'none' | 'paintingward' | 'paintingsnake',
-  availableDay: 0,
-  deadline: 0,
-  assistant: false,
-  kylar: 'none' as 'none' | 'help' | 'sabotage',
-  kylarStreet: false,
-  kylarPrepared: false,
-  archive: 0,
-  museum: 0,
-  recovery: 'none' as 'none' | 'recorded' | 'rushed',
-  ruin: 0,
-  draft: 0,
-  final: 0
-};
+import School from './LifeSimulation/School';
+import { DEFAULT_LIFE_SIMULATION_STATE, type GymPlan } from './constants';
 
 class LifeSimulation extends Module {
-  static readonly variables = {
-    historyProject: DEFAULT_HISTORY_PROJECT_STATE,
-    school: DEFAULT_SCHOOL_STATE,
-    gym: {
-      ticket_day: -1,
-      membership: 'none' as Exclude<GymPlan, 'visit'> | 'none',
-      expires_at: 0,
-      sessions_today: 0,
-      washed_today: false,
-      activity: '' as '' | 'weights' | 'run' | 'stretch' | 'deck-run'
-    }
-  };
-
   public readonly exposed = true;
   public readonly academics = new AcademicHonours();
   public readonly school = new School(this.core);
 
   public constructor(core: typeof maplebirch) {
-    super(core, 'LifeSimulation', LifeSimulation.variables);
+    super(core, 'LifeSimulation', DEFAULT_LIFE_SIMULATION_STATE);
   }
 
   public override preInit(): void {

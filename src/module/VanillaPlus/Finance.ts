@@ -72,7 +72,7 @@ interface MarketState {
   avery_fate?: string;
 }
 
-interface FinanceState {
+export interface FinanceState {
   bank: BankState;
   brokerage: BrokerageState;
   market: MarketState;

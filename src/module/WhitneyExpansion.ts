@@ -1,15 +1,9 @@
 import Module from './Module';
+import { DEFAULT_WHITNEY_EXPANSION_STATE } from './constants';
 
 class WhitneyExpansion extends Module {
-  // 地下营救和巷子里的原版营救是两件事，不能共用 $whitneyrescued。
-  static readonly variables = {
-    rescued: false,
-    reunionSeen: false,
-    aftercare_day: -1
-  };
-
   public constructor(core: typeof maplebirch) {
-    super(core, 'WhitneyExpansion', WhitneyExpansion.variables);
+    super(core, 'WhitneyExpansion', DEFAULT_WHITNEY_EXPANSION_STATE);
   }
 }
 

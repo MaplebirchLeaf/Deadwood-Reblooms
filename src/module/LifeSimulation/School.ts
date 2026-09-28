@@ -8,7 +8,7 @@ type SchoolDutyOutcome = 'enforce' | 'mediate' | 'pressure' | 'overlook' | 'invi
 
 export type SchoolStudent = 'Robin' | 'Sydney' | 'Kylar' | 'Whitney';
 
-interface SchoolState {
+export interface SchoolState {
   role: SchoolRole;
   attendanceExempt: boolean;
   attendanceDay: number;
