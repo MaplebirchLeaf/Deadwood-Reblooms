@@ -20,9 +20,9 @@
 
 ## Installation and dependencies
 
-1. Use a game build with SugarCube 2 ModLoader. The current package targets **DoL 0.5.12.13**.
+1. Use a game build with SugarCube 2 ModLoader. Separate packages target **DoL 0.5.12.13** and **DoL 0.5.11.9**.
 2. Load the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). Its version must satisfy the mod package's `maplebirch >= 5.1.1` requirement, together with the other listed dependencies.
-3. Load `deadwood-reblooms-*.modpack` from [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases). To use dynamic music, also load the separate `deadwood-reblooms-audio-*.modpack`.
+3. From [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases), load only the main `deadwood-reblooms-*.modpack` matching your game version. To use dynamic music, also load the audio `deadwood-reblooms-audio-*.modpack` for that same game version.
 4. To change modules, use the framework's module manager and reload when prompted.
 
 `DR` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
@@ -36,7 +36,7 @@
 | `RobinExpansion`      | Robin's stands, Cliff Street drink shop, shared life, and intimate scenes |
 | `WhitneyExpansion`    | Underground brothel rescue, reunion, and daily interactions               |
 | `KylarExpansion`      | Manor stays and room interactions                                         |
-| `LS`                  | Attendance pass, prefect, student president, and school reputation        |
+| `LS`                  | Attendance pass, prefect, student president, school reputation, and gym   |
 | `VP`                  | Stat breakthroughs, homes, banking, stocks, and other vanilla additions   |
 | `CA`                  | Solar eclipses, meteor showers, and changing sky and weather visuals      |
 | `MoreTransformations` | Horse and fish transformations, locations, equipment, and traits          |
