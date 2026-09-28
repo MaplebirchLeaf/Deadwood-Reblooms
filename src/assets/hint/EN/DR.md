@@ -1,6 +1,6 @@
 ### Entry, settings, and statistics
 
-Open this guide from the sidebar mod hint. Select a module from the contents or search for a character, place, or feature. Search expands sections with matches. The framework module manager controls which features load; reload when it asks. Disabling the root `DR` module disables every child module.
+Open this guide from the sidebar mod hint. Use the contents to jump to a module, read straight down, or search for a character, place, or feature. The framework module manager controls which features load; reload when it asks. Disabling the root `DR` module disables every child module.
 
 Open **Character → Statistics → Mods Statistics** for foldouts showing this save's breakthroughs and transformations, school standing, finance and property, and character routes. Disabled child modules have no corresponding section. The journal and this guide explain the next step when a route stalls.
 

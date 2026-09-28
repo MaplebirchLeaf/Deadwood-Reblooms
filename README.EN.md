@@ -6,7 +6,7 @@
 [![Framework](https://img.shields.io/badge/Framework-maplebirch-blue)](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)
 [![Issues](https://img.shields.io/github/issues-raw/MaplebirchLeaf/Deadwood-Reblooms?label=issues)](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/issues)
 
-**Deadwood Reblooms** is a _Degrees of Lewdity_ content mod built on the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). It expands character stories, school life, housing and finance, transformations, encounters, and game UI. Players can choose its modules on first load.
+**Deadwood Reblooms** is a _Degrees of Lewdity_ content mod built on the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). It expands character stories, school life, housing and finance, transformations, encounters, and game UI. Its modules are managed through the framework.
 
 ---
 
@@ -23,9 +23,9 @@
 1. Use a game build with SugarCube 2 ModLoader. The current package targets **DoL 0.5.12.13**.
 2. Load the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). Its version must satisfy the mod package's `maplebirch >= 5.1.1` requirement, together with the other listed dependencies.
 3. Load `deadwood-reblooms-*.modpack` from [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases). To use dynamic music, also load the separate `deadwood-reblooms-audio-*.modpack`.
-4. Select modules on first load. You can change the selection later in the framework's module manager; reload when prompted.
+4. To change modules, use the framework's module manager and reload when prompted.
 
-`DR` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, the first-load selector names that mod and turns off the corresponding Deadwood Reblooms module while retaining the external mod. Character stories still follow vanilla relationships, locations, and schedules.
+`DR` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
 
 ## Modules and game guide
 
@@ -47,7 +47,7 @@
 | `ICC`                 | A searchable, importable, and exportable cheat command collection         |
 | `DM`                  | Music selected by combat, time of day, weather, and celestial events      |
 
-Open **Mod Hints** in the game sidebar for the guide. Its contents and search cover characters, places, unlock conditions, and troubleshooting. **Character → Statistics → Mod Statistics** shows progress for the current save, including stats, school, finance, property, and character routes. Check the journal and the actual scene for the next story step.
+Open **Mod Hints** in the game sidebar for the single-page guide. Its sections and search cover characters, places, unlock conditions, and troubleshooting. **Character → Statistics → Mod Statistics** shows progress for the current save, including stats, school, finance, property, and character routes. Check the journal and the actual scene for the next story step.
 
 ## Optional audio pack
 

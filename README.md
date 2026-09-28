@@ -6,7 +6,7 @@
 [![Framework](https://img.shields.io/badge/Framework-maplebirch-blue)](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)
 [![Issues](https://img.shields.io/github/issues-raw/MaplebirchLeaf/Deadwood-Reblooms?label=issues)](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/issues)
 
-**枯木逢春**是基于 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework) 的 _Degrees of Lewdity_ 内容模组。它扩展人物路线、校园生活、住宅与金融、转化、遭遇战及游戏界面。各部分作为独立模块管理，玩家可在首次加载时选择启用内容。
+**枯木逢春**是基于 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework) 的 _Degrees of Lewdity_ 内容模组。它扩展人物路线、校园生活、住宅与金融、转化、遭遇战及游戏界面。各部分作为独立模块在框架中管理。
 
 ---
 
@@ -23,9 +23,9 @@
 1. 准备支持 SugarCube 2 ModLoader 的游戏。当前构建以 **DoL 0.5.12.13** 为目标。
 2. 加载 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)，版本须满足模组包声明的 `maplebirch >= 5.1.1`，并安装模组包所列的其他前置。
 3. 从 [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases) 加载 `deadwood-reblooms-*.modpack`。需要动态音乐时，再加载独立的 `deadwood-reblooms-audio-*.modpack`。
-4. 首次进入游戏时选择模块。以后可在框架的模块管理中调整，发生更改时按提示重载。
+4. 需要调整模块时，在框架的模块管理中启用或关闭，并按提示重载。
 
-`DR` 是根模块，关闭它会停用所有子模块。检测到功能重叠的外部模组时，首次选择界面会说明来源，并关闭枯木逢春中对应的模块，保留外部模组。角色剧情仍遵循原版的人物关系、地点和日程条件。
+`DR` 是根模块，关闭它会停用所有子模块。检测到功能重叠的外部模组时，枯木逢春会关闭自身对应模块，保留外部模组。角色剧情仍遵循原版的人物关系、地点和日程条件。
 
 ## 模块与游戏指南
 
@@ -47,7 +47,7 @@
 | `ICC`                 | 可保存、搜索、导入及导出的作弊命令集         |
 | `DM`                  | 根据战斗、昼夜、天气与天体异象切换的动态音乐 |
 
-在游戏侧边栏打开**模组提示**，可进入按模块折叠的游戏指南。目录和搜索框可查地点、人物、解锁条件与排查步骤。**角色页 → 统计 → 模组统计**显示当前存档的属性、校园、金融、房产和人物路线进度。人物剧情的下一步仍以游戏日志和实际场景为准。
+在游戏侧边栏打开**模组提示**，可进入按模块排列的单页游戏指南。搜索框可查地点、人物、解锁条件与排查步骤。**角色页 → 统计 → 模组统计**显示当前存档的属性、校园、金融、房产和人物路线进度。人物剧情的下一步仍以游戏日志和实际场景为准。
 
 ## 可选音频包
 
@@ -55,7 +55,7 @@
 
 ## 致谢与素材来源
 
-感谢以下作者的作品与协助。若已安装功能相近的原模组，可在模块选择界面关闭枯木逢春的对应功能：
+感谢以下作者的作品与协助。若已安装功能相近的原模组，枯木逢春会关闭自身对应功能：
 
 - `LongerCombat`：狐千月的[更长遭遇战](https://github.com/emicoto/DOLMods/)。
 - `MLIANPCA`：Eudemonism00 的[社交栏小头像](https://github.com/Eudemonism00/DOL-npcicon-mods/)与苯环的[更多恋人](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod)。
