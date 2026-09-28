@@ -35,6 +35,15 @@ export default function Gym(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ]
+    },
+    widgetPassage: {
+      'Widgets Wardrobe': [
+        {
+          src: '<<case "Farm Wardrobe">>',
+          applybefore: '<<case "Deadwood Reblooms Life Simulation Gym Wardrobe">>\n\t\t\t<<deadwood-reblooms-life-simulation-gym-wardrobe-exit>>\n\t\t',
+          expected: 1
+        }
+      ]
     }
   });
 }

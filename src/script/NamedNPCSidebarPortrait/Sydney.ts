@@ -190,6 +190,9 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
       const title = maplebirch.passage.title;
       const all = ['over_head', 'over_upper', 'over_lower', 'upper', 'lower', 'under_upper', 'under_lower', 'head', 'face', 'neck', 'hands', 'legs', 'feet', 'handheld'];
       const naked =
+        title.startsWith('Deadwood Reblooms Sydney Temple Bath') ||
+        title.startsWith('Deadwood Reblooms Sirris Estate Sydney Bath') ||
+        title.startsWith('Deadwood Reblooms Sydney Bath') ||
         title === 'Sydney Temple Test' ||
         title === 'Sydney Temple Test 2' ||
         title === 'Sydney Temple Corrupt End' ||
@@ -283,6 +286,9 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
 
     // 承诺仪式评估服装优先于普通神殿服装
     if (title.startsWith('Sydney Temple Pure')) return 'promise';
+
+    if (title.startsWith('Deadwood Reblooms Sydney Temple Bath') || title.startsWith('Deadwood Reblooms Sirris Estate Sydney Bath') || title.startsWith('Deadwood Reblooms Sydney Bath'))
+      return 'naked';
 
     // PC 作为忏悔者时，原版会在 Temple Confess Self 中把 $attendant 设为 Sydney。
     if (title.startsWith('Temple Confess Self') && V.attendant === 'Sydney') return 'confessional';

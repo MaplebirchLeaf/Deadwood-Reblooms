@@ -7,6 +7,10 @@ export default function KylarExpansion(maplebirch: typeof window.maplebirch): vo
     widget: 'deadwood-reblooms-kylar-kitchen-link',
     passage: 'Manor Kitchen'
   });
+  maplebirch.tool.addTo('BeforeLinkZone', {
+    widget: 'deadwood-reblooms-kylar-bathroom-link',
+    passage: 'Manor Hall'
+  });
 
   // 原版卧室只看时间决定凯拉尔是否在场，同住后要避开这个冲突。
   // 衣柜的退出链接按 Passage 选择，在同一次注入中补上新衣柜的回程。

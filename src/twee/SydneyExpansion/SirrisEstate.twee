@@ -1,12 +1,17 @@
 :: Deadwood Reblooms Sirris Estate Widgets [widget]
 
-<!-- 西里斯在成人商店当面邀请。地点只会在玩家认识悉尼的家长并成为恋人后开放。 -->
+<!-- 悉尼恋人或与西里斯熟识的店员，可以分别获得登门邀请。 -->
 <<widget 'deadwood-reblooms-sirris-estate-invitation-link'>>
   <<if isLoveInterest('Sydney')
     and $sydneySeen.includes('parent')
     and !$SydneyExpansion.estate.invited>>
     <<socialiseicon 'ask'>>
     <<lanLink '询问能否去西里斯家坐坐' 'Deadwood Reblooms Sirris Estate Invitation'>><</lanLink>><br>
+  <</if>>
+  <<if $adultshopclerk and C.npc.Sirris.love gt 50
+    and !isLoveInterest('Sydney') and !$SydneyExpansion.estate.invited>>
+    <<socialiseicon 'ask'>>
+    <<lanLink '问西里斯能否登门拜访' 'Deadwood Reblooms Sirris Estate Sirris Invitation'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -292,6 +297,7 @@
   <<icon 'sirris-living-room.png'>><<lanLink '客厅 (0:01)' 'Deadwood Reblooms Sirris Estate Living Room'>><<pass 1>><</lanLink>><br>
   <<schoolicon 'science'>><<lanLink '书房 (0:01)' 'Deadwood Reblooms Sirris Estate Study'>><<pass 1>><</lanLink>><br>
   <<kitchenicon 'stove'>><<lanLink '厨房 (0:01)' 'Deadwood Reblooms Sirris Estate Kitchen'>><<pass 1>><</lanLink>><br>
+  <<bathroomicon 'bath'>><<lanLink '浴室 (0:01)' 'Deadwood Reblooms Sirris Estate Bathroom'>><<pass 1>><</lanLink>><br>
   <<if _sydneyAtEstate and isLoveInterest('Sydney')>>
     <<bedicon>><<lanLink '悉尼的房间 (0:01)' 'Deadwood Reblooms Sirris Estate Sydney Room'>><<pass 1>><</lanLink>><br>
   <</if>>
@@ -499,7 +505,7 @@
 <</if>>
 <<if maplebirch.get('LS') and $LifeSimulation.school.role isnot 'student'
   and (_sirrisAtEstate or _sydneyAtEstate)
-  and $daily.schoolStudySession isnot Time.days>>
+  and $LifeSimulation.school.study_session_day isnot Time.days>>
   <<schoolicon 'science'>><<lanLink '准备学生会的课后讲解 (0:30)' 'Deadwood Reblooms Sirris School Project'>><<pass 30>><</lanLink>><br>
 <</if>>
 <br>
@@ -619,7 +625,7 @@
   and isLoveInterest('Sydney')
   and $sydneySeen.includes('Kylar manor')
   and Time.hour gte 21 and Time.hour lt 23
-  and $daily.sirrisRecipe isnot Time.days>>
+  and $SydneyExpansion.estate.recipe_day isnot Time.days>>
   <<kitchenicon 'stove'>>
   <<lanLink '和悉尼照着旧食谱做苹果酥 (0:30)' 'Deadwood Reblooms Sirris Estate Recipe'>><</lanLink>><br>
 <</if>>
@@ -642,7 +648,7 @@
   or !isLoveInterest('Sydney')
   or !$sydneySeen.includes('Kylar manor')
   or Time.hour lt 21 or Time.hour gte 23
-  or $daily.sirrisRecipe is Time.days>>
+  or $SydneyExpansion.estate.recipe_day is Time.days>>
   <<lanSwitch 'Sydney is not free to cook with you now.' '悉尼现在没空和你一起做点心。'>>
 <<else>>
   <<language>>
@@ -679,8 +685,8 @@
 <<set $outside to 0>><<set $location to 'sirris_estate'>><<effects>>
 <<deadwood-reblooms-sirris-estate-presence>>
 <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<if _sydneyAtEstate and Time.hour gte 21 and Time.hour lt 23 and $daily.sirrisRecipe isnot Time.days>>
-  <<set $daily.sirrisRecipe to Time.days>>
+<<if _sydneyAtEstate and Time.hour gte 21 and Time.hour lt 23 and $SydneyExpansion.estate.recipe_day isnot Time.days>>
+  <<set $SydneyExpansion.estate.recipe_day to Time.days>>
   <<if _sirrisRecipeStyle is 'careful'>>
     <<lanSwitch 'You measure each spoonful while Sydney cuts the apples. The crust browns evenly. Sydney sets three plates on the table when Sirris is home, and two when you are alone together.' '你量好每一勺材料，悉尼负责切苹果。酥皮烤得色泽均匀。西里斯在家时，悉尼摆出三只盘子。家里只有你们时，桌上便只有两只。'>>
     <<scienceskill 1>><<gscience>>
@@ -953,7 +959,7 @@
   and isLoveInterest('Sydney')
   and _requestedHours gte 3
   and (Time.hour gte 22 or Time.hour lt 3)
-  and !$daily.sydney.nightWake
+  and $SydneyExpansion.night_wake_day isnot Time.days
   and $nightmares lte 0
   and random(1, 8) is 1>>
 <<if _nightWake>><<set $sleephour to random(1, Math.min(2, _requestedHours - 1))>><</if>>
@@ -969,7 +975,7 @@
     and $sleepHoursTotal gte 1
     and (Time.hour gte 23 or Time.hour lt 6)>>
   <<if _nightWake>>
-    <<set $daily.sydney.nightWake to 1>>
+    <<set $SydneyExpansion.night_wake_day to Time.days>>
     <<set $sleephour to Math.max(1, _requestedHours - $sleepHoursTotal)>>
     <<sleepeffects>>
     <<lanSwitch 'The narrow bed shifts beneath you. You wake before dawn.' '窄床在身下轻轻一晃。天还没亮，你便醒了。'>>

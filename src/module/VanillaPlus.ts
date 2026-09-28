@@ -64,6 +64,7 @@ class VanillaPlus extends Module {
       conducted: false,
       levelFive: 0,
       mirrorOrigin: '',
+      mirror_day: -1,
       mirror_property: null as string | null,
       mirror_locations: {} as Record<string, { north: number; east: number }>,
       mirrors: {

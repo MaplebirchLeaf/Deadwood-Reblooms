@@ -55,6 +55,12 @@ interface RobinExpansionState {
   marketDay: number;
   marketSales: number;
   shopDay: number;
+  // 摊位、店铺与校园各自限一次；日期标记由当前存档保存，不占用原版 $daily。
+  stall_taste_day: number;
+  shop_taste_day: number;
+  sale_event_day: number;
+  school_drinks_day: number;
+  school_wake_day: number;
   nightDay: number;
   nightOutcomeDay: number;
   asylum: {
@@ -122,6 +128,11 @@ class RobinExpansion extends Module {
     marketDay: -1,
     marketSales: 0,
     shopDay: -1,
+    stall_taste_day: -1,
+    shop_taste_day: -1,
+    sale_event_day: -1,
+    school_drinks_day: -1,
+    school_wake_day: -1,
     nightDay: -1,
     nightOutcomeDay: -1,
     asylum: {
