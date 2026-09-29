@@ -87,7 +87,7 @@
 <</language>>
 <br><br>
 <<bathroomicon 'shower'>><<lanLink '一起淋浴 (0:20)' 'Deadwood Reblooms Sydney Temple Bath Wash'>><<strip>><<pass 20>><</lanLink>><br>
-<<loveicon 'kiss'>><<lanLink '吻悉尼' 'Deadwood Reblooms Sydney Bath Intimacy'>><<set $SydneyExpansion.bathReturn to 'temple'>><<set $sexstart to 1>><<strip>><</lanLink>><<promiscuous1>><br>
+<<loveicon 'kiss'>><<lanLink '吻悉尼' 'Deadwood Reblooms Sydney Bath Intimacy'>><<set $SydneyExpansion.bathReturn to 'temple'>><<set $sexstart to 1>><<strip>><</lanLink>><<promiscuous1>><<kissvirginitywarning>><<NPCvirginitywarning 'Sydney' 'kiss'>><br>
 <br><br><<getouticon>><<lanLink '到此为止' 'Temple Cloister Showers'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Temple Bath Wash []
@@ -193,7 +193,7 @@
   <</language>>
   <br><br>
   <<bathroomicon 'bath'>><<lanLink '一起洗浴 (0:20)' 'Deadwood Reblooms Sirris Estate Sydney Bath Wash'>><<pass 20>><<strip>><</lanLink>><br>
-  <<loveicon 'kiss'>><<lanLink '吻悉尼' 'Deadwood Reblooms Sydney Bath Intimacy'>><<set $SydneyExpansion.bathReturn to 'estate'>><<set $sexstart to 1>><<strip>><</lanLink>><<promiscuous1>><br>
+  <<loveicon 'kiss'>><<lanLink '吻悉尼' 'Deadwood Reblooms Sydney Bath Intimacy'>><<set $SydneyExpansion.bathReturn to 'estate'>><<set $sexstart to 1>><<strip>><</lanLink>><<promiscuous1>><<kissvirginitywarning>><<NPCvirginitywarning 'Sydney' 'kiss'>><br>
 <</if>>
 <br><br><<getouticon>><<lanLink '到此为止' 'Deadwood Reblooms Sirris Estate Hall'>><</lanLink>>
 
@@ -237,12 +237,14 @@
 
 :: Deadwood Reblooms Sydney Bath Intimacy []
 <<set $outside to 0>><<set $location to ($SydneyExpansion.bathReturn is 'estate') ? 'sirris_estate' : 'temple'>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<if $sexstart is 1>><<clearnpc>><<npc Sydney>><</if>>
+<<person1>><<run statusCheck('Sydney')>>
 <<if $sexstart is 1>>
   <<set $sexstart to 0>>
   <<set $daily.sydney.sex to ($daily.sydney.sex || 0) + 1>><<set $sydney.sexTotal += 1>>
   <<consensual>><<set $consensual to 1>><<neutral 1>><<maninit>><<npcexpose>>
   <<set $enemytrust += 500>><<set $enemyarousalmax to 600>>
+  <<set $enemyanger to -10>>
   <<if _sydneyStatus.includes('corrupt')>><<set $enemyarousalmax += 100>>
   <<elseif _sydneyStatus.includes('pure')>><<set $enemyarousalmax -= 100>><</if>>
   <<if _sydneyChastity and C.npc.Sydney.chastity.anus.includes('shield')>><<set $enemyarousalmax -= 100>><</if>>
@@ -251,7 +253,6 @@
     <<option 'CN'>>悉尼认真听了你的回答，才在你身后合上屏风。<<if _sydneyStatus.includes('pure')>><span class='teal'>“想停就告诉我。”</span><<elseif _sydneyStatus.includes('corrupt')>><span class='lewd'>“再靠近一点。”</span><<else>>“这样可以吗？”<</if>><<he>>问过，才吻住你。
   <</language>><br><br>
 <</if>>
-<<set $enemyanger to -10>>
 <<effects>><<effectsman>><<man>><<stateman>>
 <br><br><<actionsman>>
 <<if _combatend>>
@@ -263,7 +264,7 @@
 :: Deadwood Reblooms Sydney Bath Intimacy Finish []
 <<set $outside to 0>><<set $location to ($SydneyExpansion.bathReturn is 'estate') ? 'sirris_estate' : 'temple'>><<effects>>
 <<if $SydneyExpansion.bathReturn is 'estate'>><<set $SydneyExpansion.estate.bathVisitor to ''>><</if>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<person1>><<run statusCheck('Sydney')>>
 <<if $enemyarousal gte $enemyarousalmax>>
   <<ejaculation>>
   <<if _sydneyChastity and $sydneyChastityKnown>><<sydneyChastityMessage>><<npcincr Sydney lust 3>><<ggslust>>
