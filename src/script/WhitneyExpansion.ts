@@ -36,16 +36,6 @@ export default function (maplebirch: typeof window.maplebirch): void {
           applybefore: '<<deadwood-whitney-cell-link>>\n',
           expected: 1
         }
-      ],
-      'School Front Courtyard': [
-        {
-          // 作为正常庭院事件的一个分支，不在学校的强制事件或危险状态叠加链接。
-          src: '<<elseif $adultshopintro is undefined and $adultshopunlocked is undefined and $adultshopintrosirris is undefined and $schoolstate is "afternoon" and Time.weekDay is 6 and $exposed lte 0>>',
-          applybefore: `<<elseif $WhitneyExpansion?.rescued and !$WhitneyExpansion.reunionSeen and C.npc.Whitney.state is "active" and Time.schoolDay and !["early", "late", "earlynoschool", "latenoschool", "daynoschool"].includes($schoolstate) and Time.hour gte 7 and Time.hour lt 18 and $exposed lte 0>>
-  <<deadwood-whitney-reunion-intro>>
-`,
-          expected: 1
-        }
       ]
     }
   });

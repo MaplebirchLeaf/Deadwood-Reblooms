@@ -11,14 +11,11 @@
   <<if _args[0]>>
     <<set $WhitneyExpansion.rescued to true>>
     <<earnFeat 'Deadwood Whitney Rescued'>>
-    <<set $WhitneyExpansion.reunionSeen to false>>
     <<npcset Whitney state 'active'>>
-    <<npcincr Whitney love 5>><<glove>>
+    <<npcincr Whitney dom 3>><<gdom>>
   <</if>>
   <<badEndTrackingEnd 'Underground Dungeon' { reason: 'uDungeonSneak' }>>
   <<dungeonescape>>
-  <!-- 惠特尼不是在学校等 PC 回来的那个人，不能触发原版的失踪重逢。 -->
-  <<unset $whitneyReunionScene>>
   <<specialClothesUnlock 'set' 'underground_brothel'>>
   <<set $stress -= 1000>>
   <<if _escapedWithRobin>>
@@ -136,7 +133,7 @@
       <br><br><<lanSwitch 'You open Robin’s cell on the way out. Robin stares at Whitney for a second, then takes your hand. The three of you run for the stairs.' '你在离开前打开罗宾的牢房。罗宾看了惠特尼一眼，随即握住你的手。你们三人一起朝楼梯跑去。'>>
     <</if>>
     <br><br>
-    <<lanSwitch 'You reach the forest before anyone sounds an alarm. Whitney pulls away from you, breathing hard. "Don’t expect a thank you," <<he>> says, but <<he>> waits until you are safely on the path before turning towards town.' '直到跑进森林，身后都没人拉响警报。惠特尼松开你，大口喘着气。“别指望我道谢。”<<he>>说道，却等你站稳在小路上，才转身朝城镇走去。'>>
+    <<lanSwitch 'You reach the forest before anyone sounds an alarm. Whitney pulls away from you, breathing hard, and will not look at you. <<He>> wipes <<his>> face with one arm and says nothing at all. Only when you are steady on the path does <<he>> turn towards town.' '直到跑进森林，身后都没人拉响警报。惠特尼松开你，大口喘着气，别开脸不看你。<<He>>用一条手臂抹了把脸，一个字也没说。直到你在小路上站稳，<<he>>才转身朝城镇走去。'>>
     <br><br><span class='green'><<lanSwitch 'Whitney is free.' '惠特尼自由了。'>></span>
     <<set _withRobin to $undergroundbrothel.robin>>
     <<deadwood-whitney-escape-effects true _withRobin>>
@@ -176,100 +173,20 @@
   <br><br><<getouticon>><<lanLink '走进森林' 'Forest'>><<set $forest to 40>><</lanLink>>
 <</if>>
 
-:: Deadwood Whitney Reunion Widgets [widget]
+:: Deadwood Whitney Aftercare Widgets [widget]
 <!-- 营救后的普通校园日才开放，每日一次。 -->
 <<widget 'deadwood-whitney-aftercare-link'>>
-  <<if $WhitneyExpansion?.rescued and $WhitneyExpansion.reunionSeen
+  <<if $WhitneyExpansion?.rescued and $whitneyReunionScene is undefined
     and C.npc.Whitney.state is 'active' and Time.schoolDay
     and Time.hour gte 7 and Time.hour lt 18 and $exposed lte 0
     and $WhitneyExpansion.aftercare_day isnot Time.days>>
     <<socialiseicon>><<lanLink '去找惠特尼说话 (0:10)' 'Deadwood Whitney Aftercare'>><<pass 10>><</lanLink>><br><br>
   <</if>>
 <</widget>>
-<<widget 'deadwood-whitney-reunion-intro'>>
-  <<npc Whitney>><<person1>>
-  <<language>>
-    <<option 'EN'>>
-      Whitney stands near the school gate. Two friends begin to call out when they spot you, but Whitney raises a hand and they fall quiet. <<He>> looks away, then back at you. <span class='purple'>The missing posters have come down.</span>
-    <<option 'CN'>>
-      惠特尼站在校门边。两个朋友看见你，刚要喊出声，惠特尼抬手让他们安静。<<He>>移开目光，又重新看向你。<span class='purple'>寻人启事已经撤下了。</span>
-  <</language>>
-  <br><br>
-  <<socialiseicon>><<lanLink '走向惠特尼' 'Deadwood Whitney Reunion'>><</lanLink>><br>
-  <<getinicon>><<lanLink '暂时走开' 'Hallways'>><<pass 1>><</lanLink>>
-<</widget>>
-
-:: Deadwood Whitney Reunion []
-<<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
-<<if !$WhitneyExpansion?.rescued or C.npc.Whitney.state isnot 'active'>>
-  <<lanSwitch 'Whitney is not at the gate.' '惠特尼不在校门边。'>>
-  <br><br><<getinicon>><<lanLink '进入学校' 'Hallways'>><</lanLink>>
-<<else>>
-  <<set $WhitneyExpansion.reunionSeen to true>>
-  <<npc Whitney>><<person1>>
-  <<language>>
-    <<option 'EN'>>
-      Whitney steps away from the others before you reach <<him>>. "They keep asking where I was," <<he>> says. "They can mind their own fucking business." <<He>> tries to light a cigarette. The first match breaks in <<his>> hand.
-    <<option 'CN'>>
-      你还没走到跟前，惠特尼就离开朋友们，朝你走来。“他们老问我去了哪儿。”<<he>>说，“关他们屁事。”<<He>>想点燃一支烟，第一根火柴却折在<<his>>手里。
-  <</language>>
-  <br><br>
-  <<language>>
-    <<option 'EN'>>
-      "I saw you in that alley," Whitney says without looking up. "I thought you'd leave me there again." <<He>> throws the broken match away. "You didn't. I still don't know why."
-    <<option 'CN'>>
-      “那条巷子里，我看见你了。”惠特尼没抬头，“我以为这次你还会把我丢在那里。”<<He>>把折断的火柴扔掉。“结果你没有。我还是想不通。”
-  <</language>>
-  <<if $whitneyromance is 1>>
-    <br><br><<lanSwitch 'Whitney catches your sleeve before you can answer, then loosens <<his>> grip as though expecting you to pull away.' '你还没来得及回答，惠特尼便抓住你的衣袖，又像是怕你挣开似的松了些力道。'>>
-  <</if>>
-  <br><br><span class='blue'><<lanSwitch 'You cannot undo what happened in the alley.' '巷子里发生的事，无法当作没有发生。'>></span>
-  <br><br>
-  <<if $whitneyromance is 1>>
-    <<socialiseicon>><<lanLink '握住惠特尼的手' 'Deadwood Whitney Reunion Close'>><</lanLink>><br>
-  <</if>>
-  <<socialiseicon 'ask'>><<lanLink '问惠特尼现在怎么样' 'Deadwood Whitney Reunion Talk'>><</lanLink>><br>
-  <<getinicon>><<lanLink '让惠特尼自己待一会' 'Hallways'>><<pass 1>><</lanLink>>
-<</if>>
-
-:: Deadwood Whitney Reunion Close []
-<<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
-<<if !$WhitneyExpansion?.rescued or C.npc.Whitney.state isnot 'active' or $whitneyromance isnot 1>>
-  <<lanSwitch 'You cannot find Whitney by the gate.' '你没在校门边找到惠特尼。'>>
-<<else>>
-  <<npc Whitney>><<person1>>
-  <<language>>
-    <<option 'EN'>>
-      You take Whitney's hand. <<He>> glances back at the others. "Don't tell them I let you do this," <<he>> mutters. But <<he>> doesn't let go. When the school bell rings, Whitney squeezes your hand once before stepping away.
-    <<option 'CN'>>
-      你握住惠特尼的手。<<He>>回头看了一眼朋友们。“别告诉他们我让你这么做了。”<<he>>嘟囔着，却没有松手。上课铃响起时，惠特尼握紧你的手一下，才退开。
-  <</language>>
-  <<npcincr Whitney love 2>><<glove>>
-  <<if !isLoveInterest('Whitney')>>
-    <br><br><<loveInterestAdd 'Whitney'>>
-  <</if>>
-<</if>>
-<br><br><<getinicon>><<lanLink '进入学校' 'Hallways'>><<pass 1>><</lanLink>>
-
-:: Deadwood Whitney Reunion Talk []
-<<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
-<<if !$WhitneyExpansion?.rescued or C.npc.Whitney.state isnot 'active'>>
-  <<lanSwitch 'You cannot find Whitney by the gate.' '你没在校门边找到惠特尼。'>>
-<<else>>
-  <<npc Whitney>><<person1>>
-  <<language>>
-    <<option 'EN'>>
-      "How are you doing?" you ask. Whitney gives you a sharp look. "Like someone who got out," <<he>> says. <<He>> stares at the cigarette in <<his>> hand, then puts it away unlit. "I'll be here tomorrow. That's enough to tell you."
-    <<option 'CN'>>
-      “你现在怎么样？”你问。惠特尼瞪了你一眼。“像个逃出来的人。”<<he>>说。<<He>>盯着手里的烟，最后没点，直接收了起来。“明天我还会来。你知道这些就够了。”
-  <</language>>
-<<npcincr Whitney love 1>><<glove>>
-<</if>>
-<br><br><<getinicon>><<lanLink '进入学校' 'Hallways'>><<pass 1>><</lanLink>>
 
 :: Deadwood Whitney Aftercare []
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
-<<if !$WhitneyExpansion?.rescued or !$WhitneyExpansion.reunionSeen or C.npc.Whitney.state isnot 'active'>>
+<<if !$WhitneyExpansion?.rescued or $whitneyReunionScene isnot undefined or C.npc.Whitney.state isnot 'active'>>
   <<lanSwitch 'Whitney has already left the school grounds.' '惠特尼已经离开学校。'>><br><br>
 <<else>>
   <<set $WhitneyExpansion.aftercare_day to Time.days>>
@@ -278,7 +195,7 @@
     <<case 0>>
       <<language>>
         <<option 'EN'>>Whitney is arguing with a friend by the gate. The friend asks another question about the days Whitney disappeared. Whitney's smile vanishes. <<He>> catches sight of you and waves the friend away. "You here to ask too?"
-        <<option 'CN'>>惠特尼正和朋友在校门边争执。那人又问起惠特尼失踪的几天，<<his>>笑容立刻没了。<<He>>看到你，挥手让朋友先走。“你也是来问这个的？”
+        <<option 'CN'>>惠特尼正和朋友在校门边争执。那人又问起惠特尼失踪的几天，惠特尼脸上的笑容立刻没了。<<He>>看到你，挥手让朋友先走。“你也是来问这个的？”
       <</language>>
     <<case 1>>
       <<language>>
