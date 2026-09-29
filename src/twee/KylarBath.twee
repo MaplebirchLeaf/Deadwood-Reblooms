@@ -88,8 +88,8 @@
   <<lanSwitch 'You have already finished here. There is nothing more to do.' '你已经收拾好了。这里没有别的事可做。'>>
 <<else>>
   <<language>>
-    <<option 'EN'>>You ask whether Kylar wants you to stay. <<He>> blinks, then steps aside to make room. "If— if you want to," <<he>> says. <<if C.npc.Kylar.rage gte 50>>"I thought you might have gone to see someone else."<</if>> <<He>> waits for your answer without blocking the door.
-    <<option 'CN'>>你问凯拉尔是否愿意让你留下。<<He>>愣了一下，随后挪开身体。“你、你想的话。”<<he>>说。<<if C.npc.Kylar.rage gte 50>>“我还以为你去找别人了。”<</if>><<He>>没有挡着门，只是等你回答。
+    <<option 'EN'>>You ask whether Kylar wants you to stay. <<if C.npc.Kylar.rage gte 50>> <<He>> keeps hold of the door frame and does not step aside. "You only just got here. You are not going anywhere yet." <<He>> waits for your answer without letting go.<<else>> <<He>> blinks, then steps aside to make room. "If— if you want to," <<he>> says. <<He>> waits for your answer, looking at you rather than away.<</if>>
+    <<option 'CN'>>你问凯拉尔是否愿意让你留下。<<if C.npc.Kylar.rage gte 50>> <<He>>抓着门框，没有让开。“你才刚来。哪儿也别想去。”<<He>>等着你回答，手也没有松开。<<else>> <<He>>愣了一下，随后挪开身体。“你、你想的话。”<<he>>说。<<He>>看着你，没有再移开视线，等你回答。<</if>>
   <</language>>
   <br><br>
   <<bathroomicon 'bath'>><<lanLink '一起洗浴 (0:20)' 'Deadwood Reblooms Kylar Manor Bath Together Wash'>><<pass 20>><<strip>><</lanLink>><br>
@@ -107,14 +107,17 @@
 
 :: Deadwood Reblooms Kylar Manor Bath Intimacy []
 <<set $outside to 0>><<location 'kylarmanor'>>
-<<npc Kylar>><<person1>>
+<<if $sexstart is 1>>
+  <<clearnpc>><<npc Kylar>>
+<</if>>
+<<person1>>
 <<if $sexstart is 1>>
   <<set $sexstart to 0>>
   <<consensual>><<set $consensual to 1>><<neutral 1>><<maninit>><<npcexpose>>
   <<set $enemytrust += 100>>
   <<language>>
-    <<option 'EN'>>Kylar asks again if you mean to stay. When you kiss <<him>>, <<he>> folds the towel out of the water's reach. "I— I can stop," <<he>> says, and then adds, much too quickly: "Not that I want to. Unless you do. Sorry." <<He>> waits for your answer, watching your face.
-    <<option 'CN'>>凯拉尔又问了一遍，你是否真的想留下。你吻过来，<<he>>才把毛巾叠好，放到水溅不到的地方。“我、我可以停。”<<he>>说，又急急忙忙补上一句：“不是我想停。除非你想。对不起。”<<He>>盯着你的脸，等你回答。
+    <<option 'EN'>>Kylar asks again if you mean to stay. When you kiss <<him>>, <<he>> folds the towel out of the water's reach. <<if C.npc.Kylar.rage gte 50>><span class='teal'>"Tell me if I'm too close,"</span><<else>>"I— I can stop,"<</if>> <<he>> says, and then adds, much too quickly: "Not that I want to. Unless you do. Sorry." <<He>> waits for your answer, watching your face.
+    <<option 'CN'>>凯拉尔又问了一遍，你是否真的想留下。你吻过来，<<he>>才把毛巾叠好，放到水溅不到的地方。<<if C.npc.Kylar.rage gte 50>><span class='teal'>“靠得太近就告诉我。”</span><<else>>“我、我可以停。”<</if>><<he>>说，又急急忙忙补上一句：“不是我想停。除非你想。对不起。”<<He>>盯着你的脸，等你回答。
   <</language>><br><br>
 <</if>>
 <<set $enemyanger to -10>>
@@ -129,7 +132,7 @@
 :: Deadwood Reblooms Kylar Manor Bath Intimacy Finish []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
 <<set $KylarExpansion.bathEncounter to false>>
-<<npc Kylar>><<person1>>
+<<person1>>
 <<if $enemyarousal gte $enemyarousalmax>>
   <<ejaculation>><<npcincr Kylar lust -20>><<lllust>><<npcincr Kylar love 1>><<glove>>
   <<lanSwitch 'Kylar rests against you for a while. When the water begins to cool, <<he>> finds the towel and asks whether you are comfortable.' '凯拉尔靠着你待了一会儿。水渐渐凉了，<<he>>才拿起毛巾，问你还好吗。'>>

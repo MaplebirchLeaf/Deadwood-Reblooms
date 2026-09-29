@@ -1,7 +1,10 @@
 :: Deadwood Reblooms Kylar Sketch Widgets [widget]
 <!-- 公园原版已有凯拉尔的素描描写，只在原版对话入口补充回应。 -->
-<<widget 'deadwood-reblooms-kylar-sketch-link'>>
-  <<if $KylarExpansion and C.npc.Kylar.state is 'active'
+<<widget 'deadwood-reblooms-kylar-sketch-link'>><<silently>>
+  <!-- 与原版 Kylar Park.twee 一致：素描只在 Love 状态下公开，否则凯拉尔会藏起来。 -->
+  <<run statusCheck('Kylar')>>
+  <<set _kylarSketchOpen to _kylarStatus.includes('Love')>>
+<</silently>><<if $KylarExpansion and C.npc.Kylar.state is 'active' and _kylarSketchOpen
     and getKylarLocation().area is 'park' and $KylarExpansion.sketch_day isnot Time.days>>
     <<schoolicon 'library'>><<lanLink '问凯拉尔在画什么 (0:10)' 'Deadwood Reblooms Kylar Sketch'>><<pass 10>><</lanLink>><br>
   <</if>>
@@ -14,7 +17,7 @@
 <<else>>
   <<set $KylarExpansion.sketch_day to Time.days>>
   <<npc Kylar>><<person1>>
-  <<lanSwitch 'Kylar turns the sketchbook halfway towards you, then hesitates. A few lines show the park path and the place where you stood a moment ago. "It is not finished," <<he>> says.' '凯拉尔把素描本朝你转了半圈，又犹豫着停住。纸上勾出公园的小路，还有你刚才站过的位置。“还没画完。”<<he>>说。'>><br><br>
+  <<lanSwitch 'Kylar has been drawing you again. <<He>> notices you looking and shuts the book, then, after a moment, opens it a little way. A few lines show the park path and the place where you stood a moment ago. "It is— it is not finished," <<he>> says.' '凯拉尔又在画你了。<<He>>发现你在看，立刻合上本子，过了一会儿才又稍稍打开。纸上勾出公园的小路，还有你刚才站过的位置。“还没、还没画完。”<<he>>说。'>><br><br>
   <<socialiseicon>><<lanLink '等凯拉尔自己展示' 'Deadwood Reblooms Kylar Sketch Answer'>><<set $phase to 'wait'>><</lanLink>><br>
   <<loveicon>><<lanLink '称赞凯拉尔画的小路' 'Deadwood Reblooms Kylar Sketch Answer'>><<set $phase to 'praise'>><</lanLink>><br>
   <<socialiseicon>><<lanLink '不再追问' 'Deadwood Reblooms Kylar Sketch Answer'>><<set $phase to 'leave'>><</lanLink>>
