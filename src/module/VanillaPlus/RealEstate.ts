@@ -325,6 +325,15 @@ export class RealEstate {
     });
   }
 
+  public residentsInCommonRooms(id: PropertyId): ResidentProfile[] {
+    // 夜间日程中的 home 包含睡眠；23 点可在公共房间相处，午夜后转入卧室。
+    return Time.hour === 23 ? this.residentsHome(id) : [];
+  }
+
+  public residentsInBedroom(id: PropertyId): ResidentProfile[] {
+    return Time.hour === 23 ? [] : this.residentsHome(id);
+  }
+
   public inviteResident(name: string, id: PropertyId): boolean {
     this.reconcileResidents();
     const property = this.properties.find(item => item.id === id);

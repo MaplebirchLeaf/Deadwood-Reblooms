@@ -6,8 +6,8 @@
 	<<run maplebirch.VP.realEstate.enter()>><<home_effects>><<effects>>
 	<<= lanSwitch(_property.interior.bedroom.EN, _property.interior.bedroom.CN)>><br><br>
 	<<set _bedroomCompanion to null>>
-	<<if maplebirch.VP.realEstate.residentsHome(_property.id).length gt 0>>
-		<<set _bedroomCompanion to maplebirch.VP.realEstate.residentsHome(_property.id)[0]>>
+	<<if maplebirch.VP.realEstate.residentsInBedroom(_property.id).length gt 0>>
+		<<set _bedroomCompanion to maplebirch.VP.realEstate.residentsInBedroom(_property.id)[0]>>
 		<<npc _bedroomCompanion.id>><<person1>>
 		<<switch _bedroomCompanion.id>>
 			<<case 'Robin'>>
@@ -68,6 +68,13 @@
 	<</if>>
 	<<mirroricon 'home'>><<lanLink '镜子' 'Deadwood Reblooms Property Mirror'>><<preMirror>><</lanLink>><br>
 	<<roomoptions>>
+	<<lanLink '游戏设置' 'Settings'>><<set $settingsExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
+	<<attitudesControlCheck>>
+	<<if $attitudesControl.showGoldLink is true>>
+		<span class='goldLink'><<lanLink '态度' 'Attitudes'>><<set $attitudesExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>></span> <span class='red'>!!</span>
+	<<else>>
+		<<lanLink '态度' 'Attitudes'>><<set $attitudesExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
+	<</if>>
 	<<if playerHasSexToys()>>
 		<<sextoysicon>><<lanLink '性玩具' 'Sextoys Inventory'>><<set $sextoyInvReturnLink to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
 	<</if>>
@@ -162,7 +169,11 @@
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<= lanSwitch(_property.interior.bathroom.EN, _property.interior.bathroom.CN)>><br><br>
-	<<bathroomicon 'bath'>><<lanLink '泡澡 (0:30)' 'Deadwood Reblooms Property Bath'>><<strip>><<pass 30>><<stress -6>><<set $hygiene to 0>><</lanLink>><<lstress>><br>
+	<<if pcAreArmsBound('both')>>
+		<<bathroomicon 'bath'>><<lanLink '泡澡 (0:30)' 'Deadwood Reblooms Property Bath'>><<water>><<pass 30>><<stress -6>><<set $hygiene to 0>><</lanLink>><<lstress>>
+	<<else>>
+		<<bathroomicon 'bath'>><<lanLink '泡澡 (0:30)' 'Deadwood Reblooms Property Bath'>><<strip>><<pass 30>><<stress -6>><<set $hygiene to 0>><</lanLink>><<lstress>>
+	<</if>><br>
 	<<personalUpkeep>>
 	<<pregnancyTest 'Deadwood Reblooms Property Bathroom'>>
 	<br>
@@ -183,7 +194,35 @@
 		<<option 'EN'>>You wash in the privacy of your own bathroom. Warm water runs down the drain, <span class='teal'>taking the grime of the day with it</span>.
 		<<option 'CN'>>你在自己的浴室里洗了个澡。温水流进下水道，<span class='teal'>也带走了身上的污垢</span>。
 	<</language>><br><br>
-	<<getouticon>><<lanLink '离开浴缸' 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
+	<<getouticon>><<lanLink '离开浴缸' 'Deadwood Reblooms Property Bath Finish'>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Bath Finish []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
+	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>><<effects>>
+	<<language>>
+		<<option 'EN'>>Your skin is still damp.
+		<<option 'CN'>>你的皮肤仍有些湿润。
+	<</language>><br><br>
+	<<if pcAreArmsBound('both')>>
+		<<getouticon>><<lanLink '返回浴室' 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
+	<<else>>
+		<<dressasyouwereicon>><<lanLink '穿回原来的衣服' 'Deadwood Reblooms Property Bathroom'>><<clotheson>><</lanLink>><br>
+		<<towelicon>><<lanLink '裹上浴巾' 'Deadwood Reblooms Property Bathroom'>>
+			<<if $player.gender == 'f' or $player.breastsize > 0>>
+				<<set $wear_upper = 'large_towel'>>
+			<<else>>
+				<<set $wear_lower = 'towel'>>
+			<</if>>
+			<<returnCarried>><<wardrobewear>>
+		<</lanLink>>
+		<<if $wardrobe.upper.findIndex(x => x.name == 'bathrobe') >= 0 or $carried.upper.name == 'bathrobe'>>
+			<br><<bathroomicon 'robe'>><<lanLink '穿上浴袍' 'Deadwood Reblooms Property Bathroom'>><<returnCarried>><<set $wardrobeOption to 'wear'>><<set $wear_upper = $wardrobe.upper.findIndex(x => x.name == 'bathrobe')>><<wardrobewear>><</lanLink>>
+		<</if>>
+	<</if>>
 <</if>>
 
 :: Deadwood Reblooms Property Kitchen []
@@ -193,7 +232,7 @@
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<= lanSwitch(_property.interior.kitchen.EN, _property.interior.kitchen.CN)>><br><br>
-	<<for _resident range maplebirch.VP.realEstate.residentsHome(_property.id)>>
+	<<for _resident range maplebirch.VP.realEstate.residentsInCommonRooms(_property.id)>>
 		<<switch _resident.id>>
 			<<case 'Robin'>>
 				<<language>>
@@ -242,7 +281,7 @@
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
 	<<= lanSwitch(_property.interior.outdoor.EN, _property.interior.outdoor.CN)>><br><br>
-	<<for _resident range maplebirch.VP.realEstate.residentsHome(_property.id)>>
+	<<for _resident range maplebirch.VP.realEstate.residentsInCommonRooms(_property.id)>>
 		<<switch _resident.id>>
 			<<case 'Robin'>>
 				<<language>>

@@ -82,11 +82,13 @@
 	<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>>
+	<!-- 悉尼的临时状态每回合重建，沿用原版 Sydney Shopping Sex 的战斗标记。 -->
+	<<if _partner.id is 'Sydney'>><<run statusCheck('Sydney')>><<set $corruptionEvent to 1>><</if>>
 	<<if $sexstart is 1>>
 		<<set $sexstart to 0>>
 		<<clearnpc>>
 		<<npc _partner.id>><<person1>>
-		<<run statusCheck(_partner.id)>>
+		<<if _partner.id isnot 'Sydney'>><<run statusCheck(_partner.id)>><</if>>
 		<<if _partner.id is 'Sydney'>>
 			<<set $daily.sydney.sex to ($daily.sydney.sex || 0) + 1>>
 			<<set $sydney.sexTotal += 1>>
@@ -100,11 +102,13 @@
 		<<maninit>>
 		<<set $enemyarousalmax to 600>>
 		<<if _partner.id is 'Sydney'>>
-			<<if _sydneyStatus.includes('corrupt')>>
+			<!-- 贞操带尚在时保留遮挡；裸体初始化会把 NPC 的生殖器展示状态改为裸露。 -->
+			<<if _sydneyStatus.includes('corrupt') and !_sydneyChastity>>
 				<<npcexpose>>
 				<<set $enemyarousalmax += 100>>
 			<<else>>
 				<<npcClothesType $NPCList[0] 'undies'>>
+				<<if _sydneyStatus.includes('corrupt')>><<set $enemyarousalmax += 100>><</if>>
 				<<if _sydneyStatus.includes('pure')>><<set $enemyarousalmax -= 100>><</if>>
 			<</if>>
 			<<if _sydneyChastity and C.npc.Sydney.chastity.anus.includes('shield')>>
@@ -186,6 +190,7 @@
 		<</if>>
 		<br><br>
 	<</if>>
+	<<if _partner.id is 'Sydney'>><<set $enemyanger to -10>><</if>>
 	<<effects>>
 	<<effectsman>>
 	<<man>>
