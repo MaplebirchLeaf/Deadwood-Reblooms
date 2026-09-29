@@ -4,6 +4,7 @@ import type { RobinFacade } from './RobinExpansion/Shared';
 import RobinAsylum from './RobinExpansion/Asylum';
 import RobinBalloon from './RobinExpansion/Balloon';
 import RobinFlowers from './RobinExpansion/Flowers';
+import RobinFishing from './RobinExpansion/Fishing';
 import RobinMarket from './RobinExpansion/Market';
 import RobinNight from './RobinExpansion/Night';
 import RobinRent from './RobinExpansion/Rent';
@@ -13,6 +14,7 @@ import RobinTutoring from './RobinExpansion/Tutoring';
 class RobinExpansion extends Module implements RobinFacade {
   public readonly rent: RobinRent;
   public readonly flowers: RobinFlowers;
+  public readonly fishing: RobinFishing;
   public readonly shop: RobinShop;
   public readonly tutoring: RobinTutoring;
   public readonly balloon: RobinBalloon;
@@ -24,6 +26,7 @@ class RobinExpansion extends Module implements RobinFacade {
     super(core, 'RobinExpansion', DEFAULT_ROBIN_EXPANSION_STATE);
     this.rent = new RobinRent(core, this);
     this.flowers = new RobinFlowers(core, this);
+    this.fishing = new RobinFishing(core, this);
     this.shop = new RobinShop(core, this);
     this.tutoring = new RobinTutoring(core, this);
     this.balloon = new RobinBalloon(core, this);

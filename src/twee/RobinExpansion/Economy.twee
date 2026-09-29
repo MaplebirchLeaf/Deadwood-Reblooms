@@ -75,6 +75,10 @@
   <<if maplebirch.get('RobinExpansion').market.canWork>>
     <<shopicon 'register'>><<lanLink '帮罗宾照看当日摊位 (0:45)' 'Deadwood Robin Market Day'>><</lanLink>><br>
   <</if>>
+  <<if maplebirch.get('RobinExpansion').fishing.canAddGrill>>
+    <<kitchenicon 'stove'>><<lanLink '和罗宾添置便携烤架 £30 (0:30)' 'Deadwood Robin Fish Grill'>><</lanLink>><br>
+  <</if>>
+  <<deadwood-robin-fish-link 'stall'>>
   <<if $RobinExpansion.lemonade gte 1 and $RobinExpansion.stall_taste_day isnot Time.days and $money gte ($RobinExpansion.lemonade gte 2 ? 300 : 200)>>
     <<robinicon 'lemonade'>>
     <<if $RobinExpansion.lemonade gte 2>><<lanLink '尝尝罗宾的新品 (£3 0:05)' 'Deadwood Robin Stall Taste'>><</lanLink>><<else>><<lanLink '尝尝罗宾的新品 (£2 0:05)' 'Deadwood Robin Stall Taste'>><</lanLink>><</if>><br>
@@ -130,6 +134,17 @@
     <<loveicon 'hug'>><<lanLink '在热巧克力摊下逗罗宾 (0:02)' 'Deadwood Robin Private Invite'>>
       <<set $RobinExpansion.intimacySite to 'chocolate'>><<pass 2>>
     <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-robin-fish-link'>>
+  <<if maplebirch.get('RobinExpansion').fishing.available and maplebirch.get('RobinExpansion').fishing.types.length gt 0>>
+    <<set _fishReturn to _args[0]>>
+    <<capture _fishReturn>>
+      <<foodstufficon 'salmon'>><<lanLink '把鲜鱼拿给罗宾' 'Deadwood Robin Fish Offer'>>
+        <<set $RobinExpansion.fishReturn to _fishReturn>>
+      <</lanLink>><br>
+    <</capture>>
   <</if>>
 <</widget>>
 
@@ -720,6 +735,7 @@
 <</if>>
 <<shopicon 'register'>><<lanLink '查看更多饮品' 'Deadwood Robin Shop More Drinks'>><</lanLink>><br>
 <<shopicon 'register'>><<lanLink '查看鲜花、爆米花与气球' 'Deadwood Robin Shop Other Goods'>><</lanLink>><br>
+<<deadwood-robin-fish-link 'shop'>>
 <span class='blue'><<lanSwitch 'Special ingredient crates remaining:' '新品原料剩余箱数：'>> <<= $RobinExpansion.shopStock>></span><br><br>
 <<if $RobinExpansion.shopStock is 0
   and getRobinLocation() is 'shop'
@@ -1345,6 +1361,7 @@
 <<if $RobinExpansion.tutor and $RobinExpansion.tutorLessons gt 0 and !Time.schoolTerm>><<lanSwitch 'Tutoring: school holiday break' '家教：假期暂停'>><br><<elseif $RobinExpansion.tutor and $RobinExpansion.tutorLessons gt 0>><<lanSwitch 'Tutoring:' '家教：'>> <span class='gold'>£<<print maplebirch.get('RobinExpansion').tutoring.income>></span><br><<elseif $RobinExpansion.tutor>><<lanSwitch 'Tutoring: trial lesson pending' '家教：待试课'>><br><</if>>
 <<if maplebirch.get('RobinExpansion').balloon.income gt 0>><<lanSwitch 'Balloon stall referrals:' '气球摊互荐：'>> <span class='gold'>£<<print maplebirch.get('RobinExpansion').balloon.income>></span><br><</if>>
 <span class='green'><<lanSwitch 'Total expected income:' '预计收入合计：'>></span> <span class='gold'>£<<print maplebirch.get('RobinExpansion').income>></span><br>
+<<if $RobinExpansion.fishSoldDay is Time.days and $RobinExpansion.fishEarningsToday gt 0>><<lanSwitch 'Fish special today, Robin’s share (already in reserve):' '今日烤鱼特选，罗宾所得（已入储备金）：'>> <span class='gold'>£<<print $RobinExpansion.fishEarningsToday>></span><br><</if>>
 <<lanSwitch 'Robin’s rent share this week:' '罗宾本周房租份额：'>> <span class='gold'>£<<print maplebirch.get('RobinExpansion').rent.due>></span><<if $robinpaid is 1 and !$RobinExpansion.selfRent>> <span class='blue'><<lanSwitch '(currently included in your doubled bill)' '（目前包含在你的翻倍账单内）'>></span><</if>><br>
 <<if $robindebt gt 0>><<lanSwitch 'Past rent due at the current rate:' '按当前租金额结算的旧欠：'>> <span class='gold'>£<<print maplebirch.get('RobinExpansion').rent.debt>></span><br><</if>>
 <<if $RobinExpansion.selfRent and !$RobinExpansion.bothRent>><<lanSwitch 'Income needed to promise both rents:' '承诺承担两人房租所需周收入：'>> <span class='gold'>£<<print maplebirch.get('RobinExpansion').rent.bothRequirement>></span><br><</if>>

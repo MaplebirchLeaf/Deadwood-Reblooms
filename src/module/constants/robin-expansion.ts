@@ -39,7 +39,7 @@ export interface RobinExpansionState {
   shopInspectionDay: number;
   /** 银行是否已提供开店支持。 */
   shopBankSupported: boolean;
-  /** 玩家为店铺垫付的贷款（便士）。 */
+  /** 玩家为摊位或店铺垫付的借款（英镑）；PC 的 $money 使用便士。 */
   pcLoan: number;
   /** 店铺库存量。 */
   shopStock: number;
@@ -59,12 +59,29 @@ export interface RobinExpansionState {
   balloonWins: number;
   /** 上次气球小游戏发生的游戏日。 */
   balloonDay: number;
-  /** 罗宾的储备金（便士），不计入原版 $robinmoney。 */
+  /** 罗宾的储备金（英镑），不计入原版 $robinmoney。 */
   reserve: number;
   /** 关怀基金余额（便士），由玩家存入供罗宾使用。 */
   careFund: number;
-  /** 本周收入快照（便士）。 */
+  /** 本周收入快照（英镑）。 */
   weeklyIncome: number;
+  /** 罗宾是否已经和 PC 试做过鲜鱼料理。 */
+  fishCooked: boolean;
+  /** 柠檬水摊是否添置了便携烤架；店铺使用自身的厨房设备。 */
+  fishGrill: boolean;
+  /** 当日鲜鱼售出数量，供摊位与店铺共用。 */
+  fishSoldDay: number;
+  fishSoldToday: number;
+  /** 当日烤鱼销售中罗宾的净收入，单位英镑。 */
+  fishEarningsToday: number;
+  /** 本次交付的鱼种、数量与返回地点。 */
+  fishSelection: string;
+  fishAmount: number;
+  fishReturn: 'stall' | 'shop';
+  /** 和罗宾在海滩钓鱼的游戏日、进行状态及开始时的累计渔获。 */
+  fishDateDay: number;
+  fishDateActive: boolean;
+  fishDateCatchStart: number;
   /** 上次结算所在的周序号；-1 表示尚未结算。 */
   week: number;
   /** 罗宾是否开始自己付房租。 */
@@ -182,6 +199,17 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
   reserve: 0,
   careFund: 0,
   weeklyIncome: 0,
+  fishCooked: false,
+  fishGrill: false,
+  fishSoldDay: -1,
+  fishSoldToday: 0,
+  fishEarningsToday: 0,
+  fishSelection: '',
+  fishAmount: 1,
+  fishReturn: 'stall',
+  fishDateDay: -1,
+  fishDateActive: false,
+  fishDateCatchStart: 0,
   week: -1,
   selfRent: false,
   rentSeparated: false,

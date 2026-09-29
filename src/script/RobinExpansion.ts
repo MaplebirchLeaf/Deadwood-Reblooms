@@ -51,6 +51,8 @@ export default function (maplebirch: typeof window.maplebirch): void {
     { widget: 'deadwood-robin-room-links', passage: 'Robin Options' },
     { widget: 'deadwood-robin-lemonade-links', passage: "Robin's Lemonade" },
     { widget: 'deadwood-robin-beach-links', passage: "Robin's Lemonade" },
+    { widget: 'deadwood-robin-fishing-wait', passage: 'Fishing Beach Wait' },
+    { widget: 'deadwood-robin-fishing-return', passage: 'Beach' },
     { widget: 'deadwood-robin-chocolate-links', passage: 'Robin Chocolate' },
     { widget: 'deadwood-robin-balloon-links', passage: 'Balloon Stand' },
     { widget: 'deadwood-robin-shop-link', passage: 'Cliff Street' },
