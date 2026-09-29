@@ -129,7 +129,8 @@ class School {
     return 'green';
   }
 
-  public acceptsDressCode(vanillaAccepted: boolean): boolean {
+  /** 当前穿着是否满足已生效的着装政策。政策为 uniform 时沿用原版判定。 */
+  public meetsDressCode(vanillaAccepted: boolean): boolean {
     const policy = V.LifeSimulation?.school?.dress?.active as SchoolDressPolicy | undefined;
     if (!policy || policy === 'uniform') return vanillaAccepted;
 
@@ -168,14 +169,14 @@ class School {
     return DRESS_POLICIES.indexOf(this.state.dress.active) >= DRESS_POLICIES.indexOf('optionalNudity');
   }
 
-  public approveAttendanceApplication(): boolean {
+  public requestAttendanceExemption(): boolean {
     const topMarks = V.schooltrait >= 4 && V.sciencetrait >= 4 && V.mathstrait >= 4 && V.englishtrait >= 4 && V.historytrait >= 4;
     if (this.state.attendanceExempt || this.state.leightonApprovalDay >= 0 || !topMarks || (C.npc.Leighton.love < 10 && V.headblackmailed !== 1)) return false;
     this.state.leightonApprovalDay = Time.days;
     return true;
   }
 
-  public signGuardianApproval(): boolean {
+  public signAttendanceExemption(): boolean {
     if (this.state.attendanceExempt || this.state.baileySigned || this.state.leightonApprovalDay < 0 || (!V.RobinExpansion?.baileyDefeated && V.baileypaychain < 3)) return false;
     this.state.baileySigned = true;
     return true;
