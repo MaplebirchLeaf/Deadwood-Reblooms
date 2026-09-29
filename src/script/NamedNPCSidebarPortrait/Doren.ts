@@ -25,8 +25,8 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
     wardrobe.base('Doren', clothes => {
       wardrobe.put(clothes, C.npc?.Doren?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
-    // Doren Jog 明确穿跑鞋一起慢跑；只选择服装，在场仍由原版 npc Doren 决定。
-    wardrobe.wear('Doren', '*', 'tracksuit', () => maplebirch.passage.title === 'Doren Jog');
+    // 只在明确的运动场景穿运动套装；NPC 是否在场仍由各场景决定。
+    wardrobe.wear('Doren', '*', 'tracksuit', () => maplebirch.passage.title === 'Doren Jog' || maplebirch.passage.title.startsWith('Deadwood Reblooms Life Simulation Gym Doren'));
     wardrobe.modify('Doren', (clothes, context) => {
       if (context.key !== 'tracksuit') return;
       if (C.npc?.Doren?.pronoun !== 'm') sidebar.apply(clothes, Clothing.sports_bra);

@@ -35,6 +35,7 @@ declare global {
     };
     saveAs(blob: Blob, filename: string): void;
     breakableSoftBinding(): boolean;
+    pcAreArmsBound(arm?: 'any' | 'both'): boolean;
     playerChastity(slots?: string | readonly string[], inAllSlots?: boolean): boolean;
     playerPenisSize(): number;
     npcHasStrapon(index?: number): boolean;

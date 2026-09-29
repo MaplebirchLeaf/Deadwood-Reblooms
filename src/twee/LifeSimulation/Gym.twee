@@ -109,6 +109,15 @@
 	<span class='red'><<lanSwitch 'You need a valid pass to enter the training floor.' '进入训练区需要有效入场资格。'>></span><br><br>
 <<else>>
 	<<lanSwitch 'The training floor has a row of weights, open mats and a clear strip for running. A coach moves between the equipment, keeping an eye on form rather than rushing anyone.' '训练区摆着一排杠铃、几块空出的软垫和一条跑步通道。教练在器械间巡视，留意每个人的动作，也不催促谁。'>><br><br>
+	<<run maplebirch.LS.rollDorenVisit()>>
+	<<if maplebirch.LS.dorenPresent>>
+		<<if $LifeSimulation.gym.doren_interaction_day is Time.days>>
+			<span class='blue'><<lanSwitch 'Doren is finishing <<his>> own routine and gives you a quick wave.' '多伦正在做完自己的训练，朝你挥了挥手。'>></span><br><br>
+		<<else>>
+			<span class='blue'><<lanSwitch 'Off duty, Doren is working through a steady run near the windows. <<He>> spots you between sets.' '多伦下班后正在窗边匀速跑步，休息时看见了你。'>></span><br>
+			<<socialiseicon>><<lanLink '和多伦打个招呼' 'Deadwood Reblooms Life Simulation Gym Doren'>><</lanLink>><br><br>
+		<</if>>
+	<</if>>
 	<<switch Time.days % 3>>
 		<<case 0>><<lanSwitch 'An older regular patiently shows a newcomer how to return the weights to the rack.' '一位常客耐心地教新来的人把杠铃放回架上。'>>
 		<<case 1>><<lanSwitch 'Two students compare their training notes, then make room for you beside the mats.' '两个学生对照训练笔记，随后在软垫旁给你腾出位置。'>>
@@ -132,6 +141,7 @@
 <</if>>
 <br><<coastalpathicon>><<lanLink '临海平台 (0:01)' 'Deadwood Reblooms Life Simulation Gym Deck'>><<pass 1>><</lanLink>><br>
 <<changingroomicon>><<lanLink '更衣室 (0:01)' 'Deadwood Reblooms Life Simulation Gym Changing Room'>><<pass 1>><</lanLink>><br>
+<br>
 <<getouticon>><<lanLink '返回前台' 'Deadwood Reblooms Life Simulation Gym'>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Gym Deck []
@@ -160,6 +170,7 @@
 	<br><<if maplebirch.LS.has and Time.hour gte 6 and Time.hour lt 22>>
 		<<getinicon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>><br>
 	<</if>>
+	<br>
 	<<getouticon>><<lanLink '返回前台' 'Deadwood Reblooms Life Simulation Gym'>><</lanLink>>
 <<else>>
 	<br><span class='red'><<lanSwitch 'Get dressed before leaving the changing room.' '离开更衣室前，先穿好衣服。'>></span>
@@ -232,3 +243,42 @@
 	<<getinicon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
 <</if>>
 <<set $LifeSimulation.gym.activity to ''>>
+
+:: Deadwood Reblooms Life Simulation Gym Doren []
+<<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
+<<if maplebirch.LS.dorenPresent and $LifeSimulation.gym.doren_interaction_day isnot Time.days and $exposed lte 0>>
+	<<npc Doren>><<person1>>
+	<<lanSwitch 'Doren slows the treadmill, then steps aside to make room. "Didn't expect to see you here," <<he>> says, catching <<his>> breath. "I come in after work when I can. Easier to keep it up with company."' '多伦放慢跑步机，走到一旁给你让出位置。“没想到在这儿见到你。”<<he>>喘匀了气说，“下班后有空我就来练练。有人一起坚持，总比自己练容易。”'>>
+	<br><br>
+	<<socialiseicon 'ask'>><<lanLink '问多伦如何安排训练 (0:10)' 'Deadwood Reblooms Life Simulation Gym Doren Advice'>><</lanLink>><br>
+	<<if C.npc.Doren.love gte 10 and $LifeSimulation.gym.sessions_today lt 3 and !pcAreArmsBound('both')>>
+		<<runicon>><<lanLink '和多伦一起跑一组 (0:30)' 'Deadwood Reblooms Life Simulation Gym Doren Run'>><</lanLink>><<gathletics>><<gtiredness>><br>
+	<</if>>
+<<else>>
+	<<lanSwitch 'Doren has already returned to <<his>> own training, or has left the gym.' '多伦已经回去继续训练，或是离开了健身房。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Gym Doren Advice []
+<<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
+<<if maplebirch.LS.meetDoren(false)>>
+	<<npc Doren>><<person1>>
+	<<pass 10>>
+	<<lanSwitch 'Doren points to the empty space between sets on the coach’s schedule. "You don't have to push every day. Pick a pace you can return to, and leave time to recover." <<He>> watches you try the movement once, then nods when you slow it down.' '多伦指了指教练日程里两组训练之间的空档。“不用每天都拼命练。选个你能坚持的强度，也得留时间恢复。”<<he>>看你试了一遍动作，等你放慢后才点头。'>>
+	<<npcincr Doren love 1>><<stress -2>><<glove>><<lstress>>
+<<else>>
+	<<lanSwitch 'You cannot ask Doren for advice now.' '你现在没法向多伦请教。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Gym Doren Run []
+<<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
+<<if C.npc.Doren.love gte 10 and maplebirch.LS.meetDoren(true)>>
+	<<npc Doren>><<person1>>
+	<<pass 30>>
+	<<lanSwitch 'Doren starts at a pace you can match. When you speed up, <<he>> keeps alongside you instead of turning it into a race. You finish the set breathing hard; <<he>> hands you your water and reminds you to ease down before stopping.' '多伦先按你跟得上的速度跑。你加快脚步时，<<he>>仍陪在旁边，没有把训练变成比赛。跑完这一组，你喘得厉害；<<he>>把水递给你，提醒你先慢下来再停。'>>
+	<<athletics 3>><<physique 1>><<tiredness 4>><<stress -4>><<npcincr Doren love 1>><<gathletics>><<gphysique>><<gtiredness>><<lstress>><<glove>>
+<<else>>
+	<<lanSwitch 'The running track is no longer free for a shared set.' '跑步通道现在不方便一起训练。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>

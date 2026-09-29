@@ -35,6 +35,34 @@ class LifeSimulation extends Module {
     return gym.ticket_day === Time.days || gym.membership === 'lifetime' || (gym.membership !== 'none' && gym.expires_at > Time.date.timeStamp);
   }
 
+  /** 多伦在工作日放学后、休息日白天才可能来训练。 */
+  private get dorenCanVisit(): boolean {
+    return C.npc.Doren?.init === 1 && C.npc.Doren.state === 'active' && Time.hour >= (Time.schoolDay ? 16 : 10) && Time.hour < 20;
+  }
+
+  /** 首次在合适时段进入训练区时决定当天是否遇见多伦。 */
+  public rollDorenVisit(): void {
+    const gym = V.LifeSimulation.gym;
+    if (!this.has || !this.dorenCanVisit || gym.doren_checked_day === Time.days) return;
+    gym.doren_checked_day = Time.days;
+    gym.doren_present = Math.random() < 0.5;
+  }
+
+  public get dorenPresent(): boolean {
+    const gym = V.LifeSimulation.gym;
+    return this.has && this.dorenCanVisit && gym.doren_checked_day === Time.days && gym.doren_present;
+  }
+
+  /** 聊天与陪练共用每日次数；陪练也占用一次正常锻炼额度。 */
+  public meetDoren(train: boolean): boolean {
+    const gym = V.LifeSimulation.gym;
+    if (!this.dorenPresent || gym.doren_interaction_day === Time.days || V.exposed > 0) return false;
+    if (train && (gym.sessions_today >= 3 || window.pcAreArmsBound('both'))) return false;
+    gym.doren_interaction_day = Time.days;
+    if (train) gym.sessions_today++;
+    return true;
+  }
+
   public activate(plan: GymPlan): void {
     const gym = V.LifeSimulation.gym;
     if (plan === 'visit') {

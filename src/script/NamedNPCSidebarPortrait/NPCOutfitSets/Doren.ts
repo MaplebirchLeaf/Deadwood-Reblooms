@@ -24,7 +24,7 @@ export default function (maplebirch: MaplebirchCore): void {
         const npc = C.npc?.Doren;
         if (!npc) return;
         npc.outfits = [...new Set([...(npc.outfits ?? ['naked']), ...names])];
-        if (maplebirch.passage.title !== 'Doren Jog') return;
+        if (maplebirch.passage.title !== 'Doren Jog' && !maplebirch.passage.title.startsWith('Deadwood Reblooms Life Simulation Gym Doren')) return;
         wardrobe.worn('Doren');
         inject(npcName, npcno, npc.clothes, npc);
       },

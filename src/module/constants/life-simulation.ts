@@ -52,6 +52,10 @@ export interface GymState {
   washed_today: boolean;
   /** 当日进行中的项目；空串表示未选择。 */
   activity: '' | 'weights' | 'run' | 'stretch' | 'deck-run';
+  /** 多伦的健身房日程：当天只决定一次是否出现，互动也只结算一次。 */
+  doren_checked_day: number;
+  doren_present: boolean;
+  doren_interaction_day: number;
 }
 
 // 模块 LifeSimulation 的存档结构，对应 V.LifeSimulation。
@@ -89,6 +93,9 @@ export const DEFAULT_LIFE_SIMULATION_STATE: LifeSimulationState = {
     expires_at: 0,
     sessions_today: 0,
     washed_today: false,
-    activity: ''
+    activity: '',
+    doren_checked_day: -1,
+    doren_present: false,
+    doren_interaction_day: -1
   }
 };
