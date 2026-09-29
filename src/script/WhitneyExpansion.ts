@@ -9,7 +9,11 @@ export default function (maplebirch: typeof window.maplebirch): void {
   });
   maplebirch.tool.addTo('BeforeLinkZone', {
     widget: 'deadwood-whitney-flats-link',
-    passage: 'Barb Street'
+    passage: 'Whitney Home Knock'
+  });
+  maplebirch.tool.addTo('BeforeLinkZone', {
+    widget: 'deadwood-whitney-music-link',
+    passage: 'Whitney Chat'
   });
   maplebirch.tool.onInit(() => {
     setup.feats['Deadwood Whitney Rescued'] ??= {

@@ -1,0 +1,127 @@
+:: Deadwood Reblooms Kylar Game []
+<<set $outside to 0>><<location 'kylarmanor'>><<effects>>
+<<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar')
+  or C.npc.Kylar.state isnot 'active'
+  or (Time.hour lt 18 and getKylarLocation().area isnot 'manor_bedroom')
+  or (maplebirch.get('VP') and maplebirch.VP.realEstate.residenceOf('Kylar'))>>
+  <<lanSwitch 'Kylar is not at the computer. You set the controller down.' '凯拉尔不在电脑前。你放下了手柄。'>>
+<<else>>
+<<npc Kylar>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    Kylar makes room for you at the desk and gives you the controller with the working buttons. On one monitor, your characters run through a ruined castle together.
+    <br><br>
+    <<He>> starts to explain every shortcut, then stops when you find one yourself. <span class='teal'>"You saw that before I did,"</span> <<he>> says, grinning.
+  <<option 'CN'>>
+    凯拉尔在桌前为你腾出位置，把按键完好的手柄交给你。屏幕上，你们操纵的角色一起穿过一座破败的城堡。
+    <br><br>
+    <<He>>正要把每条近路都讲给你听，你却先发现了一条。<span class='teal'>“你比我还早看见。”</span><<he>>笑着说。
+<</language>>
+
+<<npcincr Kylar love 1>><<glove>><<stress -3>><<lstress>>
+<</if>>
+<br><br>
+<<language>>
+  <<option 'EN'>><<getouticon>><<link "Return to Kylar's room" 'Manor Kylar Room'>><</link>>
+  <<option 'CN'>><<getouticon>><<link '返回凯拉尔的房间' 'Manor Kylar Room'>><</link>>
+<</language>>
+
+:: Deadwood Reblooms Kylar Notes []
+<<set $outside to 0>><<location 'kylarmanor'>><<effects>>
+<<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar') or C.npc.Kylar.state isnot 'active'>>
+  <<lanSwitch 'Kylar has put the books away.' '凯拉尔已经把书收起来了。'>><br><br>
+<<else>>
+  <<set $KylarExpansion.notes_day to Time.days>>
+  <<npc Kylar>><<person1>>
+  <<language>>
+    <<option 'EN'>>A schoolbook lies open on Kylar's desk. A page has been torn at the corner. Kylar covers the marks with one hand. "Someone wrote on it again. I wanted to fix it before you saw."
+    <<option 'CN'>>凯拉尔的书摊在桌上，书页一角被撕破了。<<He>>用手遮住上面的涂写。“又有人在上面乱写。我本想在你看见之前弄好。”
+  <</language>><br><br>
+  <<if $LifeSimulation?.school and $LifeSimulation.school.role isnot 'student'>>
+    <<lanSwitch 'Your badge catches the light. Kylar looks at it, then at the ruined page. "Will you write down what they did?"' '你的徽章反着光。凯拉尔看看它，又看看破损的书页。“你会把他们做的事记下来吗？”'>><br><br>
+  <</if>>
+  <<if currentSkillValue('english') gte 400>>
+    <<lanSwitch 'You can still read the exercise beneath the ink.' '墨迹下面的习题还看得清。'>><br><br>
+    <<schoolicon 'library'>><<lanLink '和凯拉尔补好这一页' 'Deadwood Reblooms Kylar Notes Answer'>><<set $phase to 'repair'>><</lanLink>><br>
+  <</if>>
+  <<socialiseicon>><<lanLink '先听凯拉尔说完' 'Deadwood Reblooms Kylar Notes Answer'>><<set $phase to 'listen'>><</lanLink>><br>
+<</if>>
+<br><<getouticon>><<lanLink '返回凯拉尔的房间' 'Manor Kylar Room'>><</lanLink>>
+
+:: Deadwood Reblooms Kylar Notes Answer []
+<<set $outside to 0>><<location 'kylarmanor'>><<effects>>
+<<npc Kylar>><<person1>>
+<<if $phase is 'repair' and currentSkillValue('english') gte 400>>
+  <<lanSwitch 'You copy the exercise onto a clean sheet while Kylar holds the book flat. <<He>> checks each line against yours, then carefully tucks the new page beneath the cover. "Now I can take it back to class."' '你把习题誊到一张干净的纸上，凯拉尔按住书页，逐行与你核对，最后小心把新纸夹进封皮。“这下我能带它去上课了。”'>><br><br>
+  <<englishskill 1>><<genglish>><<npcincr Kylar love 2>><<glove>>
+<<else>>
+  <<lanSwitch 'You sit beside Kylar until <<he>> has finished explaining. <<He>> stops hiding the page from you. The book stays open on the desk while you talk.' '你坐在凯拉尔身边，听<<him>>慢慢说完。<<He>>不再遮住书页，你们说话时，那本书始终摊在桌上。'>><br><br>
+  <<npcincr Kylar love 1>><<glove>>
+<</if>>
+<br><br>
+<<getouticon>><<lanLink '返回凯拉尔的房间' 'Manor Kylar Room'>><</lanLink>>
+
+:: Deadwood Reblooms Kylar Yard []
+<<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
+<<if !$KylarExpansion?.stay_invited or !isLoveInterest('Kylar') or C.npc.Kylar.state isnot 'active'
+  or (maplebirch.get('VP') and maplebirch.VP.realEstate.residenceOf('Kylar'))>>
+  <<lanSwitch 'The yard is empty.' '后院空无一人。'>><br><br>
+<<else>>
+  <<set $KylarExpansion.yard_day to Time.days>>
+  <<npc Kylar>><<person1>>
+  <<language>>
+    <<option 'EN'>>Kylar is kneeling at the edge of the lawn with a pair of shears, cutting back the thorns one stem at a time. <<He>> has not noticed you yet. When <<he>> finally looks up, <<he>> drops the shears. "I— how long have you been standing there?"
+    <<option 'CN'>>凯拉尔跪在草坪边缘，拿着修枝剪，一根一根地剪掉那些荆棘。<<He>>还没注意到你。等<<he>>终于抬起头，剪刀掉在了地上。“你、你站那儿多久了？”
+  <</language>>
+  <br><br>
+  <<language>>
+    <<option 'EN'>>You tell <<him>> you only just arrived. Kylar picks the shears back up and turns the blades over in <<his>> hands without starting again. "I was going to have this finished before you woke up. It was supposed to be—" <<He>> stops.
+    <<option 'CN'>>你说你才刚到。凯拉尔把剪刀捡起来，翻来覆去地看着刃口，却没再动手。“我本来想在你醒之前就弄完。本来是想——”<<He>>停住了。
+  <</language>>
+  <br><br>
+  <span class='blue'><<lanSwitch 'Upstairs, something heavy shifts across the floorboards and goes still.' '楼上，有什么沉重的东西在地板上挪了一下，又不动了。'>></span><br><br>
+  <<socialiseicon>><<lanLink '问凯拉尔本来想做什么' 'Deadwood Reblooms Kylar Yard Ask'>><</lanLink>><br>
+  <<if isLoveInterest('Kylar')>>
+    <<loveicon>><<lanLink '蹲下来帮凯拉尔一起剪' 'Deadwood Reblooms Kylar Yard Help'>><</lanLink>><br>
+  <</if>>
+  <<if C.npc.Kylar.rage gte 50>>
+    <<socialiseicon>><<lanLink '问凯拉尔是不是担心你会去找别人' 'Deadwood Reblooms Kylar Yard Jealousy'>><</lanLink>><br>
+  <</if>>
+<</if>>
+<br><br><<getouticon>><<lanLink '回到屋内' 'Manor Hall'>><</lanLink>>
+
+:: Deadwood Reblooms Kylar Yard Ask []
+<<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
+<<npc Kylar>><<person1>>
+<<language>>
+  <<option 'EN'>>You ask what it was supposed to be. Kylar stares at the thorns for a long moment. "Nothing. It doesn't matter now that you have seen it half done." <<He>> cuts one stem, badly. "You should go inside. The sun is strong."
+    <<option 'CN'>>你问本来是想怎样。凯拉尔盯着那些荆棘看了很久。“没什么。既然你已经看见没做完的样子，那就无所谓了。”<<He>>剪了一根，剪歪了。“你进屋去吧。太阳晒。”
+<</language>>
+<br><br>
+<<npcincr Kylar love 1>><<glove>>
+<br><br>
+<<getinicon>><<lanLink '继续' 'Manor Hall'>><</lanLink>>
+
+:: Deadwood Reblooms Kylar Yard Jealousy []
+<<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
+<<npc Kylar>><<person1>>
+<<lanSwitch 'You ask why Kylar keeps glancing toward the path. "I thought someone else might come looking for you," <<he>> admits. <<He>> sets the shears down instead of reaching for your hand. You tell <<him>> you came to the garden because you wanted to. Kylar nods and leaves the path alone.' '你问凯拉尔为什么一直朝小路张望。“我以为会有别人来找你。”<<he>>承认，放下剪刀，没有伸手拉住你。你告诉<<him>>，来花园是你自己的决定。凯拉尔点点头，不再盯着小路。'>>
+<<npcincr Kylar rage -2>><<npcincr Kylar love 1>><<glove>>
+<br><br><<getinicon>><<lanLink '返回屋内' 'Manor Hall'>><</lanLink>>
+
+:: Deadwood Reblooms Kylar Yard Help []
+<<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
+<<npc Kylar>><<person1>>
+<<language>>
+  <<option 'EN'>>You kneel beside <<him>> and take one side of the hedge. Kylar watches your hands for a while before <<he>> starts cutting again.
+  <<option 'CN'>>你在<<him>>身边跪下，接过树篱的另一侧。凯拉尔看着你的手看了一阵，才重新动剪。
+<</language>>
+<br><br>
+<<language>>
+  <<option 'EN'>>"Thank you," <<he>> says at last. "I did not ask. You did not have to."
+  <<option 'CN'>>“谢谢。”<<he>>终于开口，“我没开口。你本来不用来的。”
+<</language>>
+<br><br>
+<<npcincr Kylar love 2>><<glove>><<stress -2>><<lstress>>
+<br><br>
+<<getinicon>><<lanLink '继续' 'Manor Hall'>><</lanLink>>

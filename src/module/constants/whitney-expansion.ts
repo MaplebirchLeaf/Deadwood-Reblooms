@@ -13,11 +13,14 @@ export interface WhitneyExpansionState {
   pier_day: number;
   /** 上次在公寓门口遇见惠特尼的游戏日。 */
   flats_day: number;
+  /** 上次在公寓里与惠特尼听音乐的游戏日。 */
+  music_day: number;
 }
 
 export const DEFAULT_WHITNEY_EXPANSION_STATE: WhitneyExpansionState = {
   rescued: false,
   aftercare_day: -1,
   pier_day: -1,
-  flats_day: -1
+  flats_day: -1,
+  music_day: -1
 };

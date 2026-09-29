@@ -51,7 +51,7 @@
   or (maplebirch.get('VP') and maplebirch.VP.realEstate.residenceOf('Kylar'))>>
   <<lanSwitch 'Kylar has finished bathing and gone back to the bedroom.' '凯拉尔已经洗完，回到房间去了。'>>
 <<else>>
-  <<npc Kylar>><<person1>><<run statusCheck('Kylar')>>
+  <<npc Kylar>><<person1>>
   <<language>>
     <<option 'EN'>>Kylar opens the door a crack after you answer. <<He>> had heard you enter the hall and wondered whether the pipes had frightened you. "They make that noise every time," <<he>> says. A towel is draped around <<his>> shoulders.
     <<option 'CN'>>你应声后，凯拉尔才把门打开一条缝。<<He>>听见你走进门厅，担心水管的响声吓到了你。“它每次都会这样。”<<he>>说，肩上披着毛巾。
@@ -80,7 +80,7 @@
 
 :: Deadwood Reblooms Kylar Manor Bath Together []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
-<<npc Kylar>><<person1>><<run statusCheck('Kylar')>>
+<<npc Kylar>><<person1>>
 <<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar')
   or $KylarExpansion.bathDay isnot Time.days or !$KylarExpansion.bathEncounter
   or C.npc.Kylar.state isnot 'active'
@@ -88,8 +88,8 @@
   <<lanSwitch 'You have already finished here. There is nothing more to do.' '你已经收拾好了。这里没有别的事可做。'>>
 <<else>>
   <<language>>
-    <<option 'EN'>>You ask whether Kylar wants you to stay. <<He>> blinks, then steps aside to make room. "If— if you want to," <<he>> says, and then looks away before you can answer. <<if _kylarStatus.includes('Rage')>> <<He>> is gripping the door frame hard enough to whiten <<his>> knuckles, and does not let go. "You just got here," <<he>> says. "You are not going anywhere yet."<</if>>
-    <<option 'CN'>>你问凯拉尔是否愿意让你留下。<<He>>愣了一下，随后挪开身体。“你、你想的话。”<<he>>说，说完就移开了视线，不看你回答。<<if _kylarStatus.includes('Rage')>> <<He>>抓着门框，指节都泛了白，却没有松手。“你才刚来。”<<he>>说，“哪儿也别想去。”<</if>>
+    <<option 'EN'>>You ask whether Kylar wants you to stay. <<He>> blinks, then steps aside to make room. "If— if you want to," <<he>> says. <<if C.npc.Kylar.rage gte 50>>"I thought you might have gone to see someone else."<</if>> <<He>> waits for your answer without blocking the door.
+    <<option 'CN'>>你问凯拉尔是否愿意让你留下。<<He>>愣了一下，随后挪开身体。“你、你想的话。”<<he>>说。<<if C.npc.Kylar.rage gte 50>>“我还以为你去找别人了。”<</if>><<He>>没有挡着门，只是等你回答。
   <</language>>
   <br><br>
   <<bathroomicon 'bath'>><<lanLink '一起洗浴 (0:20)' 'Deadwood Reblooms Kylar Manor Bath Together Wash'>><<pass 20>><<strip>><</lanLink>><br>
@@ -107,14 +107,14 @@
 
 :: Deadwood Reblooms Kylar Manor Bath Intimacy []
 <<set $outside to 0>><<location 'kylarmanor'>>
-<<npc Kylar>><<person1>><<run statusCheck('Kylar')>>
+<<npc Kylar>><<person1>>
 <<if $sexstart is 1>>
   <<set $sexstart to 0>>
   <<consensual>><<set $consensual to 1>><<neutral 1>><<maninit>><<npcexpose>>
   <<set $enemytrust += 100>>
   <<language>>
-    <<option 'EN'>>Kylar asks again if you mean to stay. When you kiss <<him>>, <<he>> folds the towel out of the water's reach. <<if _kylarStatus.includes('Rage')>><span class='teal'>"Tell me if I'm too close,"</span><<else>>"I— I can stop,"<</if>> <<he>> says, and then adds, much too quickly: "Not that I want to. Unless you do. Sorry." <<He>> waits for your answer, watching your face.
-    <<option 'CN'>>凯拉尔又问了一遍，你是否真的想留下。你吻过来，<<he>>才把毛巾叠好，放到水溅不到的地方。<<if _kylarStatus.includes('Rage')>><span class='teal'>“靠得太近就告诉我。”</span><<else>>“我、我可以停。”<</if>><<he>>说，又急急忙忙补上一句：“不是我想停。除非你想。对不起。”<<He>>盯着你的脸，等你回答。
+    <<option 'EN'>>Kylar asks again if you mean to stay. When you kiss <<him>>, <<he>> folds the towel out of the water's reach. "I— I can stop," <<he>> says, and then adds, much too quickly: "Not that I want to. Unless you do. Sorry." <<He>> waits for your answer, watching your face.
+    <<option 'CN'>>凯拉尔又问了一遍，你是否真的想留下。你吻过来，<<he>>才把毛巾叠好，放到水溅不到的地方。“我、我可以停。”<<he>>说，又急急忙忙补上一句：“不是我想停。除非你想。对不起。”<<He>>盯着你的脸，等你回答。
   <</language>><br><br>
 <</if>>
 <<set $enemyanger to -10>>

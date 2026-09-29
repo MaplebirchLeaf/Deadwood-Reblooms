@@ -20,6 +20,8 @@ export interface KylarExpansionState {
   night_scene: string;
   /** 上次在后院遇见凯拉尔的游戏日；-1 表示尚未发生。 */
   yard_day: number;
+  /** 上次在公园谈及凯拉尔素描的游戏日。 */
+  sketch_day: number;
 }
 
 export const DEFAULT_KYLAR_EXPANSION_STATE: KylarExpansionState = {
@@ -31,5 +33,6 @@ export const DEFAULT_KYLAR_EXPANSION_STATE: KylarExpansionState = {
   notes_day: -1,
   night_day: -1,
   night_scene: '',
-  yard_day: -1
+  yard_day: -1,
+  sketch_day: -1
 };
