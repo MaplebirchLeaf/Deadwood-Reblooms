@@ -195,7 +195,7 @@
 
 <!-- 原版只有黎明，或无雨的非上学日白天，才会由惠特尼本人应门。 -->
 <<widget 'deadwood-whitney-flats-link'>>
-  <<if $whitneyromance is 1 and C.npc.Whitney.state is 'active'
+  <<if $whitneyromance is 1 and ['active', 'rescued'].includes(C.npc.Whitney.state)
     and C.npc.Whitney.love gte 20
     and (Time.dayState is 'dawn' or (Time.dayState is 'day' and Weather.precipitation is 'none' and !Time.schoolDay))
     and $whitney_home_stage gte 3 and $exposed lte 0
@@ -306,7 +306,7 @@
 
 :: Deadwood Whitney Flats []
 <<set $outside to 0>><<set $location to 'flats'>><<effects>>
-<<if $whitneyromance isnot 1 or C.npc.Whitney.state isnot 'active' or $whitney_home_stage lt 3
+<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state) or $whitney_home_stage lt 3
   or !(Time.dayState is 'dawn' or (Time.dayState is 'day' and Weather.precipitation is 'none' and !Time.schoolDay))>>
   <<lanSwitch 'The door is shut. You should not be here.' '门关着。你不该在这里。'>><br><br>
   <<getouticon>><<lanLink '离开' 'Barb Street'>><</lanLink>>
@@ -324,7 +324,7 @@
 
 :: Deadwood Whitney Flats Knock []
 <<set $outside to 0>><<set $location to 'flats'>><<effects>>
-<<if $whitneyromance isnot 1 or C.npc.Whitney.state isnot 'active' or $whitney_home_stage lt 3>>
+<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state) or $whitney_home_stage lt 3>>
   <<lanSwitch 'There is no answer.' '门里没有回应。'>><br><br>
 <<else>>
 <<npc Whitney>><<person1>>

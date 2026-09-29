@@ -13,7 +13,7 @@ export default function KylarExpansion(maplebirch: typeof window.maplebirch): vo
   });
   maplebirch.tool.addTo('BeforeLinkZone', {
     widget: 'deadwood-reblooms-kylar-yard-link',
-    passage: 'Manor Grounds'
+    passage: 'Manor Garden'
   });
 
   // 原版卧室只看时间决定凯拉尔是否在场，同住后要避开这个冲突。
