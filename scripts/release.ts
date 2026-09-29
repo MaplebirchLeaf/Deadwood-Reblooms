@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const legacyBranch = 'dol-v0.5.11.9';
-const version = '1.1.0';
+const version = '1.1.1';
 
 function git(...args: string[]): string {
   return execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['inherit', 'pipe', 'inherit'] }).trim();
@@ -26,7 +26,7 @@ const releaseTag = `v${version}`;
 const legacyTag = `dol-0.5.11.9-${releaseTag}`;
 
 if (legacy.version !== version) throw new Error(`Unexpected legacy package version: ${legacy.version}`);
-if (current.version !== version && current.version !== '1.0.1') throw new Error(`Unexpected main package version: ${current.version}`);
+if (current.version !== version) throw new Error(`Unexpected main package version: ${current.version}`);
 if (gameVersion(current) !== '>=0.5.12.13' || gameVersion(legacy) !== '>=0.5.11.9') throw new Error('The two branches do not target the expected game versions.');
 if (!Bun.file(`${root}/.github/release-notes/${releaseTag}.md`).size) throw new Error(`Missing release notes for ${releaseTag}.`);
 
@@ -48,11 +48,6 @@ const tagCommit = (tag: string): string | null => {
   }
 };
 
-if (current.version !== version) {
-  execFileSync(process.execPath, ['node_modules/bumpp/bin/bumpp.mjs', '--release', version, '--no-push', '--tag', 'v%s', '--yes'], { cwd: root, stdio: 'inherit' });
-}
-
-if (packageAt('main').version !== version) throw new Error(`The main branch was not bumped to ${version}.`);
 for (const [tag, ref, message] of [
   [legacyTag, legacyBranch, `Deadwood Reblooms ${releaseTag} for DoL 0.5.11.9`],
   [releaseTag, 'main', `Deadwood Reblooms ${releaseTag}`]
