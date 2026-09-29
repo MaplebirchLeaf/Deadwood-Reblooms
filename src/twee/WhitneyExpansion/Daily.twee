@@ -2,7 +2,7 @@
 <!-- 营救后的普通校园日才开放，每日一次。 -->
 <<widget 'deadwood-whitney-aftercare-link'>>
   <<if $WhitneyExpansion?.rescued and $whitneyReunionScene is undefined
-    and C.npc.Whitney.state is 'active' and Time.schoolDay
+    and ['active', 'rescued'].includes(C.npc.Whitney.state) and Time.schoolDay
     and Time.hour gte 7 and Time.hour lt 18 and $exposed lte 0
     and $WhitneyExpansion.aftercare_day isnot Time.days>>
     <<socialiseicon>><<lanLink '去找惠特尼说话 (0:10)' 'Deadwood Whitney Aftercare'>><<pass 10>><</lanLink>><br><br>
@@ -11,7 +11,7 @@
 
 <!-- 放学后的码头：惠特尼在高好感下才会把玩家叫住，且必须由她自己打断。 -->
 <<widget 'deadwood-whitney-pier-link'>>
-  <<if $whitneyromance is 1 and C.npc.Whitney.state is 'active'
+  <<if $whitneyromance is 1 and ['active', 'rescued'].includes(C.npc.Whitney.state)
     and Time.hour gte 16 and Time.hour lt 20 and $location is 'docks'
     and $exposed lte 0 and $WhitneyExpansion.pier_day isnot Time.days>>
     <<socialiseicon>><<lanLink '看看惠特尼在做什么 (0:10)' 'Deadwood Whitney Pier'>><<pass 10>><</lanLink>><br><br>
@@ -32,14 +32,14 @@
 <!-- 原版公寓聊天已确保惠特尼在场；这里只补一项每日互动。 -->
 <<widget 'deadwood-whitney-music-link'>>
   <<if $WhitneyExpansion and $location is 'flats' and $whitneyromance is 1
-    and C.npc.Whitney.state is 'active' and $WhitneyExpansion.music_day isnot Time.days>>
+    and ['active', 'rescued'].includes(C.npc.Whitney.state) and $WhitneyExpansion.music_day isnot Time.days>>
     <<socialiseicon>><<lanLink '听听惠特尼在放什么 (0:10)' 'Deadwood Whitney Music'>><<pass 10>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 :: Deadwood Whitney Music []
 <<set $outside to 0>><<set $location to 'flats'>><<effects>>
-<<if $whitneyromance isnot 1 or C.npc.Whitney.state isnot 'active'>>
+<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
   <<lanSwitch 'Whitney has gone out.' '惠特尼已经出门了。'>>
 <<else>>
   <<set $WhitneyExpansion.music_day to Time.days>>
@@ -63,7 +63,7 @@
 
 :: Deadwood Whitney Aftercare []
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
-<<if !$WhitneyExpansion?.rescued or $whitneyReunionScene isnot undefined or C.npc.Whitney.state isnot 'active'>>
+<<if !$WhitneyExpansion?.rescued or $whitneyReunionScene isnot undefined or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
   <<lanSwitch 'Whitney has already left the school grounds.' '惠特尼已经离开学校。'>><br><br>
 <<else>>
   <<set $WhitneyExpansion.aftercare_day to Time.days>>
@@ -116,7 +116,7 @@
 
 :: Deadwood Whitney Pier []
 <<set $outside to 1>><<set $location to 'docks'>><<effects>>
-<<if $whitneyromance isnot 1 or C.npc.Whitney.state isnot 'active'>>
+<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
   <<lanSwitch 'Whitney is not around.' '惠特尼不在这附近。'>><br><br>
 <<else>>
   <<set $WhitneyExpansion.pier_day to Time.days>>
