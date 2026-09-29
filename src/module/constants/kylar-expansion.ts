@@ -18,6 +18,8 @@ export interface KylarExpansionState {
   night_day: number;
   /** 夜间事件的结算结果标识；空串表示尚未结算。 */
   night_scene: string;
+  /** 上次在后院遇见凯拉尔的游戏日；-1 表示尚未发生。 */
+  yard_day: number;
 }
 
 export const DEFAULT_KYLAR_EXPANSION_STATE: KylarExpansionState = {
@@ -28,5 +30,6 @@ export const DEFAULT_KYLAR_EXPANSION_STATE: KylarExpansionState = {
   tea_day: -1,
   notes_day: -1,
   night_day: -1,
-  night_scene: ''
+  night_scene: '',
+  yard_day: -1
 };

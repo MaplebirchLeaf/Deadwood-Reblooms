@@ -3,6 +3,14 @@ export default function (maplebirch: typeof window.maplebirch): void {
     widget: 'deadwood-whitney-aftercare-link',
     passage: 'School Front Courtyard'
   });
+  maplebirch.tool.addTo('BeforeLinkZone', {
+    widget: 'deadwood-whitney-pier-link',
+    passage: 'Docks'
+  });
+  maplebirch.tool.addTo('BeforeLinkZone', {
+    widget: 'deadwood-whitney-flats-link',
+    passage: 'Barb Street'
+  });
   maplebirch.tool.onInit(() => {
     setup.feats['Deadwood Whitney Rescued'] ??= {
       get title() {

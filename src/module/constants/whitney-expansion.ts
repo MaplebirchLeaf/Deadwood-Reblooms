@@ -9,9 +9,15 @@ export interface WhitneyExpansionState {
   rescued: boolean;
   /** 上次进行善后对话的游戏日，用于限制每日一次。 */
   aftercare_day: number;
+  /** 上次在码头遇见惠特尼的游戏日。 */
+  pier_day: number;
+  /** 上次在公寓门口遇见惠特尼的游戏日。 */
+  flats_day: number;
 }
 
 export const DEFAULT_WHITNEY_EXPANSION_STATE: WhitneyExpansionState = {
   rescued: false,
-  aftercare_day: -1
+  aftercare_day: -1,
+  pier_day: -1,
+  flats_day: -1
 };

@@ -74,6 +74,19 @@
   <</if>>
 <</widget>>
 
+
+<!-- 白天的庄园后院：凯拉尔只在同住后出现，且必须由玩家主导话题。 -->
+<<widget 'deadwood-reblooms-kylar-yard-link'>>
+  <<if $kylar_sleep_abduction is 1 and $KylarExpansion?.stay_invited
+    and isLoveInterest('Kylar')
+    and C.npc.Kylar.state is 'active'
+    and (!maplebirch.get('VP') or !maplebirch.VP.realEstate.residenceOf('Kylar'))
+    and Time.dayState is 'day' and Time.hour gte 8 and Time.hour lt 17
+    and $exposed lte 0 and !pcAreArmsBound('both')
+    and $KylarExpansion.yard_day isnot Time.days>>
+    <<socialiseicon>><<lanLink '到后院找凯拉尔 (0:20)' 'Deadwood Reblooms Kylar Yard'>><<pass 20>><</lanLink>><br><br>
+  <</if>>
+<</widget>>
 <<widget 'deadwood-reblooms-kylar-kitchen-link'>>
   <<if $KylarExpansion?.stay_invited and $KylarExpansion.tea_day isnot Time.days>>
     <<language>>
@@ -96,7 +109,7 @@
   and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
   and (!maplebirch.get('VP') or !maplebirch.VP.realEstate.residenceOf('Kylar'))>>
 <<if $kylar_sleep_abduction isnot 1 or !isLoveInterest('Kylar') or !_kylarAtManor>>
-  <<lanSwitch 'Kylar is not here to ask.' '凯拉尔现在不在房间里。'>>
+  <<lanSwitch 'Kylar is not in the room. You can ask another time.' '凯拉尔不在房间里。你可以改天再问。'>>
 <<else>>
   <<npc Kylar>><<person1>>
   <<language>>
@@ -165,7 +178,7 @@
   or C.npc.Kylar.state isnot 'active'
   or (Time.hour lt 18 and getKylarLocation().area isnot 'manor_bedroom')
   or (maplebirch.get('VP') and maplebirch.VP.realEstate.residenceOf('Kylar'))>>
-  <<lanSwitch 'Kylar has left the computer. You set the controller down.' '凯拉尔已经离开电脑前。你放下手柄。'>>
+  <<lanSwitch 'Kylar is not at the computer. You set the controller down.' '凯拉尔不在电脑前。你放下了手柄。'>>
 <<else>>
 <<npc Kylar>><<person1>>
 <<language>>
@@ -220,6 +233,69 @@
   <<npcincr Kylar love 1>><<glove>>
 <</if>>
 <<getouticon>><<lanLink '返回凯拉尔的房间' 'Manor Kylar Room'>><</lanLink>>
+
+:: Deadwood Reblooms Kylar Yard []
+<<set $outside to 1>><<location 'kylarmanor_grounds'>><<effects>>
+<<if !$KylarExpansion?.stay_invited or !isLoveInterest('Kylar') or C.npc.Kylar.state isnot 'active'
+  or (maplebirch.get('VP') and maplebirch.VP.realEstate.residenceOf('Kylar'))>>
+  <<lanSwitch 'The yard is empty.' '后院空无一人。'>><br><br>
+<<else>>
+  <<set $KylarExpansion.yard_day to Time.days>>
+  <<npc Kylar>><<person1>><<run statusCheck('Kylar')>>
+  <<language>>
+    <<option 'EN'>>Kylar is kneeling at the edge of the lawn with a pair of shears, cutting back the thorns one stem at a time. <<He>> has not noticed you yet. When <<he>> finally looks up, <<he>> drops the shears. "I— how long have you been standing there?"
+    <<option 'CN'>>凯拉尔跪在草坪边缘，拿着修枝剪，一根一根地剪掉那些荆棘。<<He>>还没注意到你。等<<he>>终于抬起头，剪刀掉在了地上。“你、你站那儿多久了？”
+  <</language>>
+  <br><br>
+  <<language>>
+    <<option 'EN'>>You tell <<him>> you only just arrived. Kylar picks the shears back up and turns the blades over in <<his>> hands without starting again. "I was going to have this finished before you woke up. It was supposed to be—" <<He>> stops.
+    <<option 'CN'>>你说你才刚到。凯拉尔把剪刀捡起来，翻来覆去地看着刃口，却没再动手。“我本来想在你醒之前就弄完。本来是想——”<<He>>停住了。
+  <</language>>
+  <br><br>
+  <span class='blue'><<lanSwitch 'Upstairs, something heavy shifts across the floorboards and goes still.' '楼上，有什么沉重的东西在地板上挪了一下，又不动了。'>></span><br><br>
+  <<socialiseicon>><<lanLink '问凯拉尔本来想做什么' 'Deadwood Reblooms Kylar Yard Ask'>><</lanLink>><br>
+  <<if isLoveInterest('Kylar')>>
+    <<loveicon>><<lanLink '蹲下来帮凯拉尔一起剪' 'Deadwood Reblooms Kylar Yard Help'>><</lanLink>><br>
+  <</if>>
+<</if>>
+<br><<getouticon>><<lanLink '回到屋内' 'Manor Hall'>><</lanLink>>
+
+:: Deadwood Reblooms Kylar Yard Ask []
+<<set $outside to 1>><<location 'kylarmanor_grounds'>><<effects>>
+<<npc Kylar>><<person1>><<run statusCheck('Kylar')>>
+<<language>>
+  <<option 'EN'>>You ask what it was supposed to be. Kylar stares at the thorns for a long moment. "Nothing. It doesn't matter now that you have seen it half done." <<He>> cuts one stem, badly. "You should go inside. The sun is strong."
+    <<option 'CN'>>你问本来是想怎样。凯拉尔盯着那些荆棘看了很久。“没什么。既然你已经看见没做完的样子，那就无所谓了。”<<He>>剪了一根，剪歪了。“你进屋去吧。太阳晒。”
+<</language>>
+<br><br>
+<<npcincr Kylar love 1>><<glove>>
+<br><br>
+<<getinicon>><<lanLink '继续' 'Manor Hall'>><</lanLink>>
+
+:: Deadwood Reblooms Kylar Yard Help []
+<<set $outside to 1>><<location 'kylarmanor_grounds'>><<effects>>
+<<npc Kylar>><<person1>><<run statusCheck('Kylar')>>
+<<language>>
+  <<option 'EN'>>You kneel beside <<him>> and take one side of the hedge. Kylar watches your hands for a while before <<he>> starts cutting again.
+  <<option 'CN'>>你在<<him>>身边跪下，接过树篱的另一侧。凯拉尔看着你的手看了一阵，才重新动剪。
+<</language>>
+<br><br>
+<<if _kylarStatus.includes('Rage')>>
+  <<language>>
+    <<option 'EN'>>"Stay where I can see you," <<he>> says, and does not look away from you again.
+    <<option 'CN'>>“待在我看得见的地方。”<<he>>说，之后就再没把视线从你身上移开。
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>"Thank you," <<he>> says at last. "I did not ask. You did not have to."
+    <<option 'CN'>>“谢谢。”<<he>>终于开口，“我没开口。你本来不用来的。”
+  <</language>>
+<</if>>
+<br><br>
+<<npcincr Kylar love 2>><<glove>><<stress -2>><<lstress>>
+<br><br>
+<<getinicon>><<lanLink '继续' 'Manor Hall'>><</lanLink>>
+
 :: Deadwood Reblooms Kylar Kitchen Tea []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
 <<if C.npc.Kylar.state is 'active' and Time.hour gte 18
