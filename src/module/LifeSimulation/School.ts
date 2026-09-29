@@ -8,7 +8,7 @@ type SchoolDutyOutcome = 'enforce' | 'mediate' | 'pressure' | 'overlook' | 'invi
 
 export type SchoolStudent = 'Robin' | 'Sydney' | 'Kylar' | 'Whitney';
 
-interface SchoolState {
+export interface SchoolState {
   role: SchoolRole;
   attendanceExempt: boolean;
   attendanceDay: number;
@@ -129,7 +129,8 @@ class School {
     return 'green';
   }
 
-  public acceptsDressCode(vanillaAccepted: boolean): boolean {
+  /** 当前穿着是否满足已生效的着装政策。政策为 uniform 时沿用原版判定。 */
+  public meetsDressCode(vanillaAccepted: boolean): boolean {
     const policy = V.LifeSimulation?.school?.dress?.active as SchoolDressPolicy | undefined;
     if (!policy || policy === 'uniform') return vanillaAccepted;
 
@@ -168,14 +169,14 @@ class School {
     return DRESS_POLICIES.indexOf(this.state.dress.active) >= DRESS_POLICIES.indexOf('optionalNudity');
   }
 
-  public approveAttendanceApplication(): boolean {
+  public requestAttendanceExemption(): boolean {
     const topMarks = V.schooltrait >= 4 && V.sciencetrait >= 4 && V.mathstrait >= 4 && V.englishtrait >= 4 && V.historytrait >= 4;
     if (this.state.attendanceExempt || this.state.leightonApprovalDay >= 0 || !topMarks || (C.npc.Leighton.love < 10 && V.headblackmailed !== 1)) return false;
     this.state.leightonApprovalDay = Time.days;
     return true;
   }
 
-  public signGuardianApproval(): boolean {
+  public signAttendanceExemption(): boolean {
     if (this.state.attendanceExempt || this.state.baileySigned || this.state.leightonApprovalDay < 0 || (!V.RobinExpansion?.baileyDefeated && V.baileypaychain < 3)) return false;
     this.state.baileySigned = true;
     return true;
@@ -256,13 +257,13 @@ class School {
       if (target === 'Robin' && C.npc.Robin.trauma >= 20) loveChange = 1;
       if (target === 'Sydney' && C.npc.Sydney.love >= 40 && C.npc.Sydney.corruption >= 30 && C.npc.Sydney.purity < 50) loveChange = 2;
       if (target === 'Kylar' && C.npc.Kylar.rage >= 60) loveChange = 1;
-      if (target === 'Whitney' && (C.npc.Whitney.love >= 30 || V.whitneyromance === 1)) loveChange = 1;
+      if (target === 'Whitney' && (C.npc.Whitney.love >= 25 || V.whitneyromance === 1)) loveChange = 1;
     }
     if (outcome === 'pressure') {
       if (target === 'Robin' && C.npc.Robin.trauma >= 20) loveChange = -4;
       if (target === 'Sydney' && C.npc.Sydney.purity >= 50) loveChange = -3;
       if (target === 'Kylar' && C.npc.Kylar.rage >= 60) loveChange = -4;
-      if (target === 'Whitney' && (C.npc.Whitney.love >= 30 || V.whitneyromance === 1)) loveChange = -4;
+      if (target === 'Whitney' && (C.npc.Whitney.love >= 25 || V.whitneyromance === 1)) loveChange = -4;
     }
 
     this.adjustStanding(...DUTY_STANDING_CHANGES[target][outcome]);
@@ -288,7 +289,7 @@ class School {
         case 'Kylar':
           return C.npc.Kylar.love >= 30 && C.npc.Kylar.rage < 60;
         case 'Whitney':
-          return C.npc.Whitney.love >= 30 || V.whitneyromance === 1;
+          return C.npc.Whitney.love >= 25 || V.whitneyromance === 1;
       }
     })();
 

@@ -1,0 +1,120 @@
+:: Deadwood Reblooms Kylar Night Wake []
+<<set $outside to 0>><<location 'kylarmanor'>><<effects>>
+<<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar')
+  or C.npc.Kylar.state isnot 'active'
+  or (Time.hour lt 18 and getKylarLocation().area isnot 'manor_bedroom')
+  or (maplebirch.get('VP') and maplebirch.VP.realEstate.residenceOf('Kylar'))>>
+  <<lanSwitch 'The other side of the bed is empty.' '床的另一侧空了。'>><br><br>
+<<else>>
+  <<npc Kylar>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<switch $KylarExpansion.night_scene>>
+        <<case 'meteor'>>
+          Kylar sits up beside you, watching a bright trail through the skylights. <<He>> points before it fades. <span class='teal'>"Did you see that?"</span>
+        <<case 'rain'>>
+          Rain beats against the skylights. Kylar has drawn close enough to hear your breathing. <<He>> relaxes when you open your eyes.
+        <<case 'monitor'>>
+          A monitor casts pale shapes across the ceiling. Kylar reaches past you to switch it off, then stops when <<he>> sees you are awake.
+        <<default>>
+          Kylar has caught your wrist in <<his>> sleep. <<He>> lets go as soon as you stir. Downstairs, a floorboard creaks.
+      <</switch>>
+      <br><br>
+      <<if C.npc.Kylar.rage gte 50>>
+        "I thought you might have gone to someone else," <<he>> says, and then goes still, as if he had not meant to say it out loud. <<He>> lets go of your wrist and waits for your answer.
+      <<else>>
+        <span class='teal'>"You're still here, <<kylar_pet_name>>,"</span> <<he>> murmurs. <<He>> catches himself, looks away, then moves aside to leave you room beneath the blanket.
+      <</if>>
+    <<option 'CN'>>
+      <<switch $KylarExpansion.night_scene>>
+        <<case 'meteor'>>
+          凯拉尔在你身旁坐起，望着一道亮光划过天窗。消失前，<<he>>抬手指向夜空。<span class='teal'>“你看到了吗？”</span>
+        <<case 'rain'>>
+          雨点敲打着天窗。凯拉尔靠得很近，近得能听见你的呼吸。见你睁眼，<<he>>才松了口气。
+        <<case 'monitor'>>
+          显示器的微光映在天花板上。凯拉尔伸手想关掉它，发现你醒了，动作便停下来。
+        <<default>>
+          凯拉尔在梦里攥住你的手腕。你一动，<<he>>立刻松开。楼下有块地板轻轻响了一声。
+      <</switch>>
+      <br><br>
+      <<if C.npc.Kylar.rage gte 50>>
+        “我还以为你去找别人了。”<<he>>说出口，随即僵住，像是没打算把这句话讲出来。<<He>>松开你的手腕，等你回答。
+      <<else>>
+        <span class='teal'>“你还在，<<kylar_pet_name>>。”</span><<he>>低声说，随即意识到自己说了什么，移开视线，才往旁边挪了挪，给你留出被子里的位置。
+      <</if>>
+  <</language>><br><br>
+  <<switch $KylarExpansion.night_scene>>
+    <<case 'meteor'>><<set _talkLabel to { EN: 'Watch the sky with Kylar', CN: '陪凯拉尔看夜空' }>>
+    <<case 'rain'>><<set _talkLabel to { EN: 'Stay close while the rain falls', CN: '陪凯拉尔听雨' }>>
+    <<case 'monitor'>><<set _talkLabel to { EN: 'Ask about the glowing screen', CN: '问凯拉尔屏幕上是什么' }>>
+    <<default>><<set _talkLabel to { EN: 'Ask Kylar if he is all right', CN: '问凯拉尔还好吗' }>>
+  <</switch>>
+  <<language>>
+    <<option 'EN'>><<socialiseicon 'ask'>><<link _talkLabel.EN 'Deadwood Reblooms Kylar Night Talk'>><<pass 5>><</link>>
+    <<option 'CN'>><<socialiseicon 'ask'>><<link _talkLabel.CN 'Deadwood Reblooms Kylar Night Talk'>><<pass 5>><</link>>
+  <</language>><br>
+  <<language>>
+    <<option 'EN'>><<loveicon>><<link 'Kiss Kylar' 'Manor Kylar Sex'>>
+      <<set $sleephour to 0>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><<set $sexstart to 1>>
+    <</link>>
+    <<option 'CN'>><<loveicon>><<link '亲吻凯拉尔' 'Manor Kylar Sex'>>
+      <<set $sleephour to 0>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><<set $sexstart to 1>>
+    <</link>>
+  <</language>><<promiscuous1>><<kissvirginitywarning>><<NPCvirginitywarning 'Kylar' 'kiss'>><br>
+<</if>>
+<<language>>
+  <<option 'EN'>><<bedicon 'kylar'>><<link 'Go back to sleep' 'Deadwood Reblooms Kylar Sleep'>><</link>>
+  <<option 'CN'>><<bedicon 'kylar'>><<link '继续睡觉' 'Deadwood Reblooms Kylar Sleep'>><</link>>
+<</language>><br><br>
+<<language>>
+  <<option 'EN'>><<getouticon>><<link 'Get up' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.KylarExpansion.openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
+  <<option 'CN'>><<getouticon>><<link '起床' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.KylarExpansion.openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
+<</language>>
+
+:: Deadwood Reblooms Kylar Night Talk []
+<<set $outside to 0>><<location 'kylarmanor'>><<effects>>
+<<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar')
+  or C.npc.Kylar.state isnot 'active'
+  or (maplebirch.get('VP') and maplebirch.VP.realEstate.residenceOf('Kylar'))>>
+  <<lanSwitch 'Kylar has gone quiet. You draw the blanket back around yourself.' '凯拉尔不再说话。你把被子重新拉好。'>>
+<<else>>
+  <<npc Kylar>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<switch $KylarExpansion.night_scene>>
+        <<case 'meteor'>>
+          You look up at the place where the light vanished. Kylar traces its path against the glass, then lowers <<his>> hand to yours. "I thought I'd be the only one awake for it," <<he>> says.
+        <<case 'rain'>>
+          You listen to the rain together. Kylar takes your hand as water streams down the skylights. <span class='teal'>"It's easier when you're here,"</span> <<he>> says.
+        <<case 'monitor'>>
+          The screen shows an unfinished game. Kylar admits <<he>> left it on to make the room feel less empty. You ask <<him>> to save the game, and <<he>> finally darkens the monitor.
+        <<default>>
+          You ask what woke <<him>>. Kylar listens to the house for a moment. "I don't know," <<he>> says. <<He>> loosens <<his>> grip and lets you hold <<his>> hand instead.
+      <</switch>>
+    <<option 'CN'>>
+      <<switch $KylarExpansion.night_scene>>
+        <<case 'meteor'>>
+          你望向亮光消失的地方。凯拉尔隔着玻璃描摹那道轨迹，随后把手放在你的手边。“我还以为只有我醒着看见了。”<<he>>说。
+        <<case 'rain'>>
+          你们一起听着雨声。雨水顺着天窗往下流时，凯拉尔握住了你的手。<span class='teal'>“有你在就好多了。”</span><<he>>说。
+        <<case 'monitor'>>
+          屏幕上是一局没打完的游戏。凯拉尔承认，开着它，房间就不会显得太空。你让<<him>>先存档，<<he>>终于关掉显示器。
+        <<default>>
+          你问<<him>>是什么吵醒了<<him>>。凯拉尔听了一会屋里的动静。“不知道。”<<he>>说着松开手，任你反过来握住<<him>>。
+      <</switch>>
+  <</language>>
+  <<if C.npc.Kylar.rage gte 50>>
+    <br><br><<lanSwitch 'You tell Kylar you chose to spend the night here. <<He>> holds on to your hand a moment longer than <<he>> needs to, then lets go.' '你告诉凯拉尔，今晚留在这里是你自己的选择。<<He>>把<<his>>的手多攥了一会儿，才松开。'>>
+  <</if>>
+  <<if C.npc.Kylar.rage gte 50>><<npcincr Kylar rage -1>><</if>>
+  <<npcincr Kylar love 1>><<glove>><<stress -2>><<lstress>>
+<</if>>
+<br><br>
+<<language>>
+  <<option 'EN'>><<bedicon 'kylar'>><<link 'Go back to sleep' 'Deadwood Reblooms Kylar Sleep'>><</link>>
+  <<option 'CN'>><<bedicon 'kylar'>><<link '继续睡觉' 'Deadwood Reblooms Kylar Sleep'>><</link>>
+<</language>><br><br>
+<<language>>
+  <<option 'EN'>><<getouticon>><<link 'Get up' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.KylarExpansion.openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
+  <<option 'CN'>><<getouticon>><<link '起床' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.KylarExpansion.openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
+<</language>>

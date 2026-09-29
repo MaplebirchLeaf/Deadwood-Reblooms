@@ -12,9 +12,17 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source and protection tool
+      - name: Checkout DoL 0.5.12.13 source and protection tool
         uses: actions/checkout@v4
         with:
+          path: current
+          submodules: true
+
+      - name: Checkout matching DoL 0.5.11.9 release tag
+        uses: actions/checkout@v4
+        with:
+          ref: dol-0.5.11.9-${{ github.ref_name }}
+          path: legacy
           submodules: true
 
       - name: Set up Bun
@@ -22,48 +30,61 @@ jobs:
         with:
           bun-version: '1.4.2'
 
-      - name: Verify tag version
+      - name: Verify both release versions
         env:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          package_version="$(bun -e "console.log(require('./package.json').version)")"
-          if [[ "$RELEASE_TAG" != "v$package_version" ]]; then
-            echo "Release tag $RELEASE_TAG does not match package version v$package_version" >&2
-            exit 1
-          fi
+          for entry in current:0.5.12.13 legacy:0.5.11.9; do
+            IFS=: read -r source game_version <<< "$entry"
+            package_version="$(bun -e "console.log(require('./$source/package.json').version)")"
+            dependency_version="$(bun -e "console.log(require('./$source/package.json').scml.dependenceInfo.find(dep => dep.modName === 'GameVersion').version)")"
+            if [[ "$RELEASE_TAG" != "v$package_version" || "$dependency_version" != ">=$game_version" ]]; then
+              echo "$source does not match $RELEASE_TAG for DoL $game_version" >&2
+              exit 1
+            fi
+          done
 
-      - name: Install mod dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Install protection tool dependencies
-        run: bun install --frozen-lockfile
-        working-directory: tools/dol-mod-protection-tools
-
-      - name: Check source
+      - name: Install both builds and protection tools
         run: |
-          bun run check
-          bunx tsc --noEmit --pretty false
+          for source in current legacy; do
+            (cd "$source" && bun install --frozen-lockfile)
+            (cd "$source/tools/dol-mod-protection-tools" && bun install --frozen-lockfile)
+          done
 
-      - name: Build mod and audio packages
-        run: bun run build:all
+      - name: Check both sources
+        run: |
+          for source in current legacy; do
+            (cd "$source" && bun run check && bunx tsc --noEmit --pretty false)
+          done
 
-      - name: Encrypt packages without player credentials
-        run: bun run scripts/protected-release.ts
+      - name: Build both game versions and audio packages
+        run: |
+          for source in current legacy; do
+            (cd "$source" && bun run build:all)
+          done
+
+      - name: Encrypt both builds without player credentials
+        run: |
+          for source in current legacy; do
+            (cd "$source" && bun run scripts/protected-release.ts)
+          done
 
       - name: Publish encrypted packages
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           shopt -s nullglob
-          packages=(package/*.modpack)
-          if [[ "${#packages[@]}" -ne 2 ]]; then
-            echo "Expected two encrypted modpacks, found ${#packages[@]}" >&2
+          packages=(current/package/*.modpack legacy/package/*.modpack)
+          if [[ "${#packages[@]}" -ne 4 ]]; then
+            echo "Expected four encrypted modpacks, found ${#packages[@]}" >&2
             exit 1
           fi
-          notes_file=".github/release-notes/$RELEASE_TAG.md"
+          notes_file="current/.github/release-notes/$RELEASE_TAG.md"
           if [[ -s "$notes_file" ]]; then
             gh release create "$RELEASE_TAG" "${packages[@]}" --verify-tag --title "Deadwood Reblooms-$RELEASE_TAG" --notes-file "$notes_file"
           else
-            gh release create "$RELEASE_TAG" "${packages[@]}" --verify-tag --title "Deadwood Reblooms-$RELEASE_TAG" --notes "$(cat .github/release-notes/default.md)" --generate-notes
+            echo "Missing release notes: $notes_file" >&2
+            exit 1
           fi

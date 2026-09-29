@@ -3,7 +3,7 @@ import { copyFile, readdir, readFile } from 'node:fs/promises';
 import AdmZip from 'adm-zip';
 import { load as loadYaml } from 'js-yaml';
 import { readPackageJSON } from 'pkg-types';
-import { parseDynamicMusicConfig } from '../src/module/DynamicMusic';
+import { parseDMConfig } from '../src/module/DynamicMusic';
 
 interface ScmlPlugin {
   modName: string;
@@ -583,7 +583,7 @@ export async function createAudioPackPackage(rootDir: string): Promise<PackageAs
   const files = await scan(path.join(rootDir, 'audio-pack'));
   const configFile = files.get('dynamic-music.json');
   if (!configFile) throw new Error('audio-pack is missing dynamic-music.json');
-  parseDynamicMusicConfig(JSON.parse(configFile.toString('utf8')), filePath => files.has(filePath));
+  parseDMConfig(JSON.parse(configFile.toString('utf8')), filePath => files.has(filePath));
   const additionFile = [...files.keys()].filter(filePath => filePath === 'dynamic-music.json' || AUDIO_EXTENSIONS.has(path.extname(filePath).toLowerCase())).sort();
 
   const dependency = (modName: string): { modName: string; version: string } => {

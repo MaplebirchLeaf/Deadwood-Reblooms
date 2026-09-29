@@ -1,19 +1,9 @@
 import Module from './Module';
+import { DEFAULT_KYLAR_EXPANSION_STATE } from './constants';
 
 class KylarExpansion extends Module {
-  static readonly variables = {
-    stay_invited: false,
-    bathDay: -1,
-    bathEncounter: false,
-    game_day: -1,
-    tea_day: -1,
-    notes_day: -1,
-    night_day: -1,
-    night_scene: ''
-  };
-
   public constructor(core: typeof maplebirch) {
-    super(core, 'KylarExpansion', KylarExpansion.variables);
+    super(core, 'KylarExpansion', DEFAULT_KYLAR_EXPANSION_STATE);
   }
 
   public openWardrobe(): void {

@@ -277,7 +277,7 @@ export default function (
     if (C.npc?.Robin?.init !== 1) return '';
 
     // 历史项目湖底勘察
-    if (title.startsWith('Deadwood Reblooms History Project Lake') && V.VanillaPlus?.historyProject?.assistant) return 'historyDive';
+    if (title.startsWith('Deadwood Reblooms History Project Lake') && V.LifeSimulation?.historyProject?.assistant) return 'historyDive';
 
     // 强制位置覆盖（剧情回放等）
     if (V.robinlocationoverride && V.robinlocationoverride.during.includes(Time.hour)) return V.robinlocationoverride.location;

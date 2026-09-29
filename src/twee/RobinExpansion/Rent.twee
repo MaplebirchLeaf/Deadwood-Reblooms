@@ -1,18 +1,18 @@
 :: Deadwood Robin Rent Widgets [widget]
 <<widget 'deadwood-robin-rent-room-links'>>
-  <<if maplebirch.get('RobinExpansion').canAcceptSelfRent()>>
+  <<if maplebirch.get('RobinExpansion').rent.canAcceptSelfRent>>
     <<socialiseicon 'ask'>><<lanLink '谈谈罗宾自己的房租' 'Deadwood Robin Self Rent'>><</lanLink>><br>
-  <<elseif $RobinExpansion.selfRent and !$RobinExpansion.bothRent and maplebirch.get('RobinExpansion').income gte maplebirch.get('RobinExpansion').bothRentIncomeRequirement and C.npc.Robin.dom gte 80 and C.npc.Robin.love gte 60 and C.npc.Robin.trauma lte 30>>
+  <<elseif $RobinExpansion.selfRent and !$RobinExpansion.bothRent and maplebirch.get('RobinExpansion').income gte maplebirch.get('RobinExpansion').rent.bothRequirement and C.npc.Robin.dom gte 80 and C.npc.Robin.love gte 60 and C.npc.Robin.trauma lte 30>>
     <<socialiseicon 'ask'>><<lanLink '谈谈分担两人的房租' 'Deadwood Robin Both Rent'>><</lanLink>><br>
   <</if>>
-  <<if !$RobinExpansion.rebellion and $RobinExpansion.selfRent and maplebirch.get('RobinExpansion').income gte 4000 and C.npc.Robin.dom gte 85 and C.npc.Robin.trauma lte 30>>
+  <<if !$RobinExpansion.rebellion and $RobinExpansion.selfRent and maplebirch.get('RobinExpansion').income gte 4000 and C.npc.Robin.dom gte 80 and C.npc.Robin.trauma lte 30>>
     <<socialiseicon 'ask'>><<lanLink '说服罗宾一起反抗贝利' 'Deadwood Robin Rebellion'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-robin-rent-links'>>
   <<if !$RobinExpansion.baileyDefeated and $bus is 'home' and C.npc.Robin.init is 1 and ($robinmissing is 0 or !$robinmissing) and $RobinExpansion.asylum.status isnot 'admitted'>>
-    <<if maplebirch.get('RobinExpansion').canPayPcRent()>>
+    <<if maplebirch.get('RobinExpansion').rent.canPayPcRent>>
       <<robinicon 'lemonade'>><<lanLink '请罗宾按约定付这周房租' 'Deadwood Robin Pays Rent'>><</lanLink>><br>
     <</if>>
     <<if $RobinExpansion.rebellion>>
@@ -23,7 +23,7 @@
 
 <<widget 'deadwood-robin-combat-turn'>>
   <<if $RobinExpansion.rebellion and $enemyhealth gt 0>>
-    <<set _robinResisted to maplebirch.get('RobinExpansion').combatTurn()>>
+    <<set _robinResisted to maplebirch.get('RobinExpansion').rent.combatTurn()>>
     <<if _robinResisted>>
       <span class='green'><<lanSwitch 'Robin twists against the thug’s grip and buys a moment to breathe. "Keep going," Robin calls to you.' '罗宾奋力挣动，让打手的钳制松了一瞬，终于能喘口气。“继续！”罗宾朝你喊。'>></span>
     <<else>>
@@ -53,12 +53,12 @@
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
 <<lanSwitch 'Robin closes the ledger and looks straight at you. The outstanding debt at the current rent rate, next week’s rent and the money for ingredients sit in separate columns.' '罗宾合上账本，直视着你。按当前租金额结清的旧欠、下周要付的房租、购买原料的钱，分别列在不同栏里。'>>
 <br><span class='blue'>
-  <<lanSwitch 'Robin’s current rent:' '罗宾当前的房租：'>> £<<print maplebirch.get('RobinExpansion').robinRent>><br>
-  <<lanSwitch 'Outstanding balance:' '旧欠：'>> £<<print maplebirch.get('RobinExpansion').robinRentDebt>>
+  <<lanSwitch 'Robin’s current rent:' '罗宾当前的房租：'>> £<<print maplebirch.get('RobinExpansion').rent.due>><br>
+  <<lanSwitch 'Outstanding balance:' '旧欠：'>> £<<print maplebirch.get('RobinExpansion').rent.debt>>
 </span>
 <br><br><span class='blue'><<lanSwitch '"I have enough steady work now. I want to pay my own share before Bailey can use it against either of us," Robin says. You stay beside Robin while the figures are checked.' '“我现在有稳定的收入了。我要先付清自己的那份，别再让贝利拿它威胁我们。”罗宾说。你陪着罗宾把账核了一遍。'>></span>
 <br><br>
-<<if maplebirch.get('RobinExpansion').canAcceptSelfRent()>>
+<<if maplebirch.get('RobinExpansion').rent.canAcceptSelfRent>>
   <<socialiseicon 'ask'>>
   <<lanLink '让罗宾付清旧欠并承担自己的房租' 'Deadwood Robin Self Rent Accept'>><</lanLink>>
 <<else>>
@@ -68,7 +68,7 @@
 
 :: Deadwood Robin Self Rent Accept []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('RobinExpansion').acceptSelfRent()>>
+<<if maplebirch.get('RobinExpansion').rent.acceptSelfRent()>>
   <<earnFeat 'Deadwood Robin Independent'>>
   <span class='green'><<lanSwitch 'Robin settles the outstanding balance. From now on, Robin’s own rent follows Bailey’s rising rent stage. If you are still Robin’s protector, the bill is split into your equal shares; Robin pays their own share from earnings or reserve.' '罗宾付清了积欠的房租。此后罗宾自己的租金额也随贝利的房租阶段上涨。如果你仍是罗宾的保护人，翻倍账单会拆成你们各自的一份。罗宾从收入或储备金中支付自己的份额。'>></span>
   <<npcincr Robin dom 5>><<gdom>>
@@ -80,9 +80,9 @@
 :: Deadwood Robin Both Rent []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
 <<lanSwitch 'Robin notices you counting rent money and sits beside you. The ledger shows income, your rent and a reserve for a bad week.' '罗宾看见你在数房租，便在你身旁坐下。账本上清楚地列着收入、你的房租，以及应付生意差的一周的储备金。'>>
-<br><br><span class='blue'><<lanSwitch '"I can cover yours too when you need it," Robin says. "But I will ask you first each time. We should both know what we are agreeing to."' '“你需要的时候，我也能帮你付那份。”罗宾说，“不过每次都先问你。我们俩都该明白自己答应的是什么。”'>></span>
+<br><br><span class='blue'><<lanSwitch '"I could cover yours too, when you need it," Robin says, and does not quite meet your eyes. "If that would not be a burden on you. I will ask first, every time — I want us both to know what we are agreeing to."' '“你需要的时候，我也可以帮你付那份。”罗宾说着，没有完全对上你的目光。“只要这不会让你为难。每次我都会先问你——我想让我们俩都清楚自己答应的是什么。”'>></span>
 <br><br>
-<<if maplebirch.get('RobinExpansion').acceptBothRent()>>
+<<if maplebirch.get('RobinExpansion').rent.promiseBothRent()>>
   <<earnFeat 'Deadwood Robin Together'>>
   <<lanSwitch 'Robin will offer to pay at the next rent collection when the reserve is sufficient. You can still choose to pay or fight yourself.' '下次收租时，只要储备金足够，罗宾就会提出代付。你仍能选择自己付款或反抗。'>>
   <<npcincr Robin love 3>><<glove>>
@@ -93,7 +93,7 @@
 
 :: Deadwood Robin Pays Rent []
 <<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('RobinExpansion').payPcRent()>>
+<<if maplebirch.get('RobinExpansion').rent.payPcRent()>>
   <<lanSwitch 'You hand Bailey the sum Robin set aside in an envelope. Robin, still held by the thug, confirms the amount. Bailey counts it twice and orders the thug to let go. Afterwards Robin shows you the ledger entry. "That was our choice," Robin says. "Next week we decide again."' '你把罗宾事先封好的钱交给贝利。打手还钳着罗宾，罗宾仍清楚地报出数目。贝利数了两遍，才叫打手松手。事后罗宾给你看账本上的记录。“这是我们一起决定的。”罗宾说，“下周再一起决定。”'>>
   <br><br><<rentpay>><<endevent>>
 <<else>>
@@ -105,7 +105,7 @@
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
 <<lanSwitch 'Robin has budgeted for both of you, but the weekly collection still leaves the other children frightened. "Money bought us time," Robin says. "It will not stop Bailey from hurting someone else." You study the hall together. Robin knows Bailey may bring thugs and restrain Robin first, so you agree on signals to warn each other and a path for retreat.' '罗宾已经算过你们的开支，可每周收租仍让其他孩子胆战心惊。“钱给我们争取了时间，”罗宾说，“但它阻止不了贝利伤害别人。”你们一起看过大厅。罗宾知道贝利可能带打手来，还会先控制住自己，于是你们约好互相示警的暗号，也留好撤退的路。'>>
 <br><br>
-<<if maplebirch.get('RobinExpansion').proposeRebellion()>>
+<<if maplebirch.get('RobinExpansion').rent.proposeRebellion()>>
   <span class='blue'><<lanSwitch 'At the next rent demand, Robin will resist the thug holding Robin and warn you when possible. Robin can still be hurt.' '下次收租时，罗宾会尽力挣开打手的钳制，并在可能时提醒你。罗宾仍可能受伤。'>></span>
   <<npcincr Robin dom 3>><<gdom>>
 <<else>>

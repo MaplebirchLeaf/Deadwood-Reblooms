@@ -10,7 +10,7 @@
 :: Deadwood Robin Asylum Meeting []
 <<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>><<npc Robin>><<person1>>
 <<if $RobinExpansion.asylum.status isnot 'admitted'>>
-  <<lanSwitch 'Robin is not here.' '罗宾不在这里。'>>
+  <<lanSwitch 'You should not be on this ward.' '你不该出现在这个病区。'>>
 <<else>>
   <<set $RobinExpansion.asylum.met to true>>
   <<if $RobinExpansion.asylum.plan is 0>>
@@ -18,7 +18,7 @@
     <br><br><span class='blue'><<lanSwitch '"You are here too?" Robin reaches for your sleeve. A guard looks over, and Robin quickly lets go.' '“你也在这里？”罗宾伸手碰了碰你的衣袖。守卫朝这边看来，罗宾立刻松开手。'>></span>
     <br><br><<lanSwitch 'You sit close enough to speak quietly, waiting until Robin can talk without shaking.' '你们靠得足够近，压低声音交谈，等罗宾不再发抖。'>>
     <<if C.npc.Robin.dom gte 60>>
-      <br><<lanSwitch '"I kept looking for a way out," Robin says. "I could not do it alone. But you are here now."' '“我一直在找出去的路。”罗宾说，“我一个人办不到。但现在你来了。”'>>
+      <br><<lanSwitch '"I kept looking for a way out," Robin says. "I did not find one. But I am not going to just sit here until they let me go, either."' '“我一直在找出去的路。”罗宾说，“我没找到。但我也不会就这么坐着，等他们放我走。”'>>
     <<else>>
       <br><<lanSwitch '"I thought I would never see you again," Robin whispers. You promise not to leave Robin behind. After a moment, Robin begins telling you what has been happening on this ward.' '“我还以为再也见不到你了。”罗宾低声说。你答应不会把罗宾留在这里。过了一会儿，罗宾开始告诉你病区这段时间发生的事。'>>
     <</if>>
@@ -26,9 +26,17 @@
       <br><<lanSwitch 'Robin has learned the treatment schedule too well. A distant bell makes Robin flinch before either of you sees the orderlies coming.' '罗宾对治疗时间已经熟悉得过头了。远处铃声一响，还没看见护工，罗宾便先缩了一下。'>>
     <</if>>
   <<elseif $RobinExpansion.asylum.plan is 1>>
-    <<lanSwitch 'Robin has watched the staff change shifts, just as you agreed. "I was afraid I would forget," Robin says, showing you careful notes on a scrap of paper. "I wrote it down. The staff door needs a keycard. We cannot just walk out."' '罗宾按约定记下了值班交接。“我怕自己记错。”罗宾把一张写满小字的纸片给你看，“所以全写下来了。员工通道需要门禁卡。我们不能直接走出去。”'>>
+    <<if C.npc.Robin.dom gte 60>>
+      <<lanSwitch 'Robin watched the staff change shifts, because you asked. "There is a door past the office. I do not know what it needs yet, but I will find out." <<He>> hands you a scrap of paper covered in careful writing.' '你让罗宾留意换班时间，罗宾照做了。“办公室后面有扇门。要什么才能开，我还没弄清楚，但我会想办法。”<<He>>递来一张写满字的纸片，字迹工整。'>>
+    <<else>>
+      <<lanSwitch 'Robin watched the staff change shifts, because you asked. "I was afraid I would get it wrong," Robin says, offering you a scrap of paper covered in shaky writing. "There is a door past the office. I do not know what it needs. I am sorry, that is all I saw."' '你让罗宾留意换班时间，罗宾照做了。“我怕自己记错。”罗宾递来一张写满字的纸片，字迹抖得厉害，“办公室后面有扇门。要什么才能开，我不知道。对不起，我只看到这些。”'>>
+    <</if>>
   <<else>>
-    <<lanSwitch 'Robin has found a short interval when the service corridor has only one guard. "We still need Harper’s keycard and we have to wait until lights out," Robin says. "If one of us is caught, we do not leave the other behind."' '罗宾找到了侧廊只有一名守卫的短暂空隙。“还得拿到哈珀的门禁卡，等熄灯后才能动身。”罗宾说，“只要有一个人被抓，我们就不丢下另一个人。”'>>
+    <<if $asylumkeycard is 1>>
+      <<lanSwitch 'Robin points out the window where the service corridor runs, and says the guards thin out after lights out. You already have what you need. Robin grips your sleeve. "If they catch us... please do not leave me behind. I will not leave you either."' '罗宾指着窗外那条侧廊，说熄灯之后守卫会变少。你需要的东西已经到手了。罗宾攥住你的袖子。“要是被抓到……请别丢下我。我也不会丢下你。”'>>
+    <<else>>
+      <<lanSwitch 'Robin points out the window where the service corridor runs, and says the guards thin out after lights out. It is you who works out that Harper carries the keycard. Robin grips your sleeve. "If they catch us... please do not leave me behind. I will not leave you either."' '罗宾指着窗外那条侧廊，说熄灯之后守卫会变少。是你看出来门禁卡在哈珀身上。罗宾攥住你的袖子。“要是被抓到……请别丢下我。我也不会丢下你。”'>>
+    <</if>>
   <</if>>
   <br><br>
   <<if $RobinExpansion.asylum.visitDay isnot Time.days>>
@@ -76,9 +84,17 @@
   <<set $RobinExpansion.asylum.planDay to Time.days>>
   <<set $RobinExpansion.asylum.plan += 1>>
   <<if $RobinExpansion.asylum.plan is 1>>
-    <<lanSwitch 'You and Robin compare what you have seen of the staff rota. Robin volunteers to watch the corridor from the recreation room; you will look for a route to the gate. You agree on a meeting place and a time, then repeat it to each other until you are certain.' '你和罗宾核对已经观察到的值班表。罗宾愿意从活动室盯着走廊，你去找通向大门的路。你们约好地点和时间，又相互重复一遍，直到确信不会弄错。'>>
+    <<if C.npc.Robin.dom gte 60>>
+      <<lanSwitch 'You go over the times you have both seen the staff move. Robin points at the recreation room window without being asked. "That one looks straight down the corridor. If we watch from there, we will know when it is clear." <<He>> waits for you to agree before writing anything down.' '你和罗宾核对两人各自见过的换班时间。不用你问，罗宾就指向活动室的窗户。“那扇窗正对着走廊。从那儿盯着，就知道什么时候没人。”<<He>>等你点头，才把要点记下来。'>>
+    <<else>>
+      <<lanSwitch 'You go over the times you have both seen the staff move. Robin says, in a small voice, that the recreation room window looks straight down the corridor, and then falls silent, waiting for you to decide what to do with that. You set the meeting place and the time yourself, and make Robin repeat it back until you are sure it is remembered.' '你和罗宾核对两人各自见过的换班时间。罗宾小声说，活动室的窗户正对着走廊，说完就低下头，等你去想这有什么用。碰头的地点和时间由你定下，你再让罗宾复述一遍，确认没有记错。'>>
+    <</if>>
   <<else>>
-    <<lanSwitch 'Robin points out the service corridor beyond the staff door. You trace a route to the fence and note where the guards change shifts. Robin checks every turn with you, then hides the scrap of paper before an orderly enters.' '罗宾指出员工通道后的侧廊。你们一路记下通往围栏的路线和守卫换班的位置。罗宾和你逐个核对转弯，随后赶在护工进门前把纸片藏好。'>>
+    <<if C.npc.Robin.dom gte 60>>
+      <<lanSwitch 'Robin goes over the service corridor beyond the staff door a second time, keeping <<his>> voice level. "Past the office, then left. I am sure of that part." You work out the route to the fence and where the guards change. Robin follows your finger along it and nods, then hides the scrap of paper before an orderly enters.' '罗宾把员工通道后的侧廊又说了一遍，声音平稳。“过了办公室往左。这一段我确定。”通往围栏的路线和守卫换班的位置由你推出来。罗宾顺着你的手指看过去，点了点头，随后赶在护工进门前把纸片藏好。'>>
+    <<else>>
+      <<lanSwitch 'Robin describes the service corridor beyond the staff door a second time, in the same words, to be sure of it. You work out the route to the fence and where the guards change. Robin follows your finger along it and nods, then hides the scrap of paper before an orderly enters.' '罗宾把员工通道后的侧廊又描述了一遍，用的还是同样的措辞，生怕说错。通往围栏的路线和守卫换班的位置由你推出来。罗宾顺着你的手指看过去，点了点头，随后赶在护工进门前把纸片藏好。'>>
+    <</if>>
   <</if>>
   <<pass 20>><<npcincr Robin love 1>><<glove>>
 <<else>>
@@ -95,7 +111,7 @@
   <<if random(1, 100) lte _escapeChance>>
     <<lanSwitch 'A guard turns just as you reach the gate. Robin pulls you behind the supply trolley; its wheels squeal loudly enough to mask the card reader. You squeeze through, cross the grounds and climb the fence together. Only when the trees hide the asylum do you stop running. Robin is still holding your hand.' '你们刚到大门，一名守卫就转过头来。罗宾把你拉到运货车后，车轮的吱呀声正好盖过读卡器的响动。你们挤过门，穿过院子，一起翻越围栏。直到树林遮住精神病院，你们才敢停下。罗宾还握着你的手。'>>
     <br><br><span class='green'><<lanSwitch 'You both made it beyond the fence.' '你们两个都翻出了围栏。'>></span><br><br>
-    <<asylumescape>><<run maplebirch.get('RobinExpansion').escapeAsylumTogether()>><<badEndTrackingEnd 'Asylum' { reason: 'asylumSabotage' }>>
+    <<asylumescape>><<run maplebirch.get('RobinExpansion').asylum.escape()>><<badEndTrackingEnd 'Asylum' { reason: 'asylumSabotage' }>>
     <<stress -12>><<trauma -6>><<npcincr Robin love 3>><<lstress>><<ltrauma>><<glove>>
     <br><br><<lanLink '继续' 'Deadwood Robin Asylum Reunion'>><</lanLink>>
   <<else>>

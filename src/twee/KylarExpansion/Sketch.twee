@@ -1,0 +1,39 @@
+:: Deadwood Reblooms Kylar Sketch Widgets [widget]
+<!-- 公园原版已有凯拉尔的素描描写，只在原版对话入口补充回应。 -->
+<<widget 'deadwood-reblooms-kylar-sketch-link'>><<silently>>
+  <!-- 与原版 Kylar Park.twee 一致：素描只在 Love 状态下公开，否则凯拉尔会藏起来。 -->
+  <<run statusCheck('Kylar')>>
+  <<set _kylarSketchOpen to _kylarStatus.includes('Love')>>
+<</silently>><<if $KylarExpansion and C.npc.Kylar.state is 'active' and _kylarSketchOpen
+    and getKylarLocation().area is 'park' and $KylarExpansion.sketch_day isnot Time.days>>
+    <<schoolicon 'library'>><<lanLink '问凯拉尔在画什么 (0:10)' 'Deadwood Reblooms Kylar Sketch'>><<pass 10>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Kylar Sketch []
+<<set $outside to 1>><<set $location to 'park'>><<effects>>
+<<if C.npc.Kylar.state isnot 'active' or getKylarLocation().area isnot 'park'>>
+  <<lanSwitch 'Kylar has already left the park.' '凯拉尔已经离开公园了。'>>
+<<else>>
+  <<set $KylarExpansion.sketch_day to Time.days>>
+  <<npc Kylar>><<person1>>
+  <<lanSwitch 'Kylar has been drawing you again. <<He>> notices you looking and shuts the book, then, after a moment, opens it a little way. A few lines show the park path and the place where you stood a moment ago. "It is— it is not finished," <<he>> says.' '凯拉尔又在画你了。<<He>>发现你在看，立刻合上本子，过了一会儿才又稍稍打开。纸上勾出公园的小路，还有你刚才站过的位置。“还没、还没画完。”<<he>>说。'>><br><br>
+  <<socialiseicon>><<lanLink '等凯拉尔自己展示' 'Deadwood Reblooms Kylar Sketch Answer'>><<set $phase to 'wait'>><</lanLink>><br>
+  <<loveicon>><<lanLink '称赞凯拉尔画的小路' 'Deadwood Reblooms Kylar Sketch Answer'>><<set $phase to 'praise'>><</lanLink>><br>
+  <<socialiseicon>><<lanLink '不再追问' 'Deadwood Reblooms Kylar Sketch Answer'>><<set $phase to 'leave'>><</lanLink>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回公园' 'Park'>><</lanLink>>
+
+:: Deadwood Reblooms Kylar Sketch Answer []
+<<set $outside to 1>><<set $location to 'park'>><<effects>>
+<<npc Kylar>><<person1>>
+<<if $phase is 'wait'>>
+  <<lanSwitch 'You keep your hands to yourself. After a while Kylar opens the book again and points out a detail <<he>> likes. <<He>> keeps hold of the page while you look.' '你没有去碰素描本。过了一会儿，凯拉尔重新翻开它，指给你看<<he>>喜欢的一处细节。你看的时候，<<he>>始终自己拿着画纸。'>>
+  <<if isLoveInterest('Kylar')>><<npcincr Kylar love 1>><<glove>><</if>>
+<<elseif $phase is 'praise'>>
+  <<lanSwitch 'You tell Kylar the winding path looks just like the one beneath your feet. <<He>> looks from the page to the path, then quickly adds another line. "You noticed, <<kylar_pet_name>>," <<he>> says softly.' '你说纸上弯曲的小路和脚下这条一模一样。凯拉尔在画纸与小路之间看了看，飞快地补上一笔。“你注意到了，<<kylar_pet_name>>。”<<he>>轻声说。'>>
+  <<npcincr Kylar love 1>><<glove>>
+<<else>>
+  <<lanSwitch 'You leave the sketchbook closed and change the subject. Kylar loosens <<his>> grip on the cover.' '你没有要求看画，转而聊起别的事。凯拉尔按着封面的手渐渐放松了。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回公园' 'Park'>><</lanLink>>

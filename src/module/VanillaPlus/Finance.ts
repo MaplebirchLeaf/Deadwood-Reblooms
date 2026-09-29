@@ -72,7 +72,7 @@ interface MarketState {
   avery_fate?: string;
 }
 
-interface FinanceState {
+export interface FinanceState {
   bank: BankState;
   brokerage: BrokerageState;
   market: MarketState;
@@ -627,8 +627,10 @@ class Finance {
   }
 
   private static currentWeek(): number {
+    // 原版 Time.weekDay 是 1=周日 … 7=周六（见 datetime.js 的 weekEnd：7 或 1 为周末）。
+    // 以周日为一周起点回推，否则周日会算出与本周其余六天不同的 id，ATM 额度一周重置两次。
     const weekDay = Math.clamp(Math.floor(Number(Time.weekDay) || 1), 1, 7);
-    return Finance.currentDay() - ((weekDay + 5) % 7);
+    return Finance.currentDay() - (weekDay - 1);
   }
 
   private static resetAtmLimit(bank: BankState): void {

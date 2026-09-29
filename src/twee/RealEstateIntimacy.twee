@@ -25,8 +25,10 @@
 					Kylar says your name in <<his>> sleep. When you touch <<his>> hand, <<he>> wakes and loosens <<his>> grip. "<span class='teal'>You're still here.</span>" <<He>> looks at you for an answer before moving closer.
 				<<case 'Sydney'>>
 					Sydney's temple pendant catches a little light on the bedside table. <<He>> has woken too and is watching you.
-					<<if _sydneyStatus.includes('corrupt')>>
+					<<if _sydneyStatus.includes('corruptLust')>>
 						"<span class='lewd'>We don't have to go back to sleep yet,</span>" <<he>> whispers.
+					<<elseif _sydneyStatus.includes('corrupt')>>
+						"Go back to sleep," <<he>> says, and does not turn away. "I will be here in the morning."
 					<<else>>
 						"<span class='teal'>Would you like me to stay awake with you?</span>" <<he>> asks.
 					<</if>>
@@ -47,8 +49,10 @@
 					凯拉尔在梦里叫了你的名字。你碰了碰<<his>>的手，<<he>>醒过来，松开攥着你的手。“<span class='teal'>你还在。</span>”<<He>>望着你，等你回应后才往你身边挪。
 				<<case 'Sydney'>>
 					床头的神殿吊坠映着一点微光。悉尼也醒了，正望着你。
-					<<if _sydneyStatus.includes('corrupt')>>
+					<<if _sydneyStatus.includes('corruptLust')>>
 						“<span class='lewd'>我们不急着再睡。</span>”<<he>>贴近你，小声说。
+					<<elseif _sydneyStatus.includes('corrupt')>>
+						“继续睡吧。”<<he>>说，却没有翻过身去。“明早我还在。”
 					<<else>>
 						“<span class='teal'>要我陪你醒一会儿吗？</span>”<<he>>问。
 					<</if>>
@@ -59,7 +63,7 @@
 		<<loveicon>>
 		<<lanLink '亲吻身边的恋人' 'Deadwood Reblooms Property Intimacy'>>
 			<<set $sleephour to 0>><<set $sexstart to 1>>
-		<</lanLink>><<promiscuous1>><br>
+		<</lanLink>><<promiscuous1>><<kissvirginitywarning>><<NPCvirginitywarning _partner.id 'kiss'>><br>
 	<</if>>
 	<<bedicon>>
 	<<lanLink '继续睡觉' 'Deadwood Reblooms Property Sleep'>><</lanLink>><br>
@@ -78,11 +82,13 @@
 	<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>>
+	<!-- 悉尼的临时状态每回合重建，沿用原版 Sydney Shopping Sex 的战斗标记。 -->
+	<<if _partner.id is 'Sydney'>><<run statusCheck('Sydney')>><<set $corruptionEvent to 1>><</if>>
 	<<if $sexstart is 1>>
 		<<set $sexstart to 0>>
 		<<clearnpc>>
 		<<npc _partner.id>><<person1>>
-		<<run statusCheck(_partner.id)>>
+		<<if _partner.id isnot 'Sydney'>><<run statusCheck(_partner.id)>><</if>>
 		<<if _partner.id is 'Sydney'>>
 			<<set $daily.sydney.sex to ($daily.sydney.sex || 0) + 1>>
 			<<set $sydney.sexTotal += 1>>
@@ -96,11 +102,13 @@
 		<<maninit>>
 		<<set $enemyarousalmax to 600>>
 		<<if _partner.id is 'Sydney'>>
-			<<if _sydneyStatus.includes('corrupt')>>
+			<!-- 贞操带尚在时保留遮挡；裸体初始化会把 NPC 的生殖器展示状态改为裸露。 -->
+			<<if _sydneyStatus.includes('corrupt') and !_sydneyChastity>>
 				<<npcexpose>>
 				<<set $enemyarousalmax += 100>>
 			<<else>>
 				<<npcClothesType $NPCList[0] 'undies'>>
+				<<if _sydneyStatus.includes('corrupt')>><<set $enemyarousalmax += 100>><</if>>
 				<<if _sydneyStatus.includes('pure')>><<set $enemyarousalmax -= 100>><</if>>
 			<</if>>
 			<<if _sydneyChastity and C.npc.Sydney.chastity.anus.includes('shield')>>
@@ -129,15 +137,15 @@
 					<</language>>
 				<</if>>
 			<<case 'Whitney'>>
-				<<if C.npc.Whitney.dom gte 50>>
+				<<if C.npc.Whitney.dom gte 10>>
 					<<language>>
 						<<option 'EN'>>"About time," Whitney says, tugging you onto the bed. <<He>> <span class='lewd'>kisses you before you can reply</span>.
 						<<option 'CN'>>“早该这样了。”惠特尼把你拉到床上，<span class='lewd'>没等你回答便吻了过来</span>。
 					<</language>>
 				<<else>>
 					<<language>>
-						<<option 'EN'>>Whitney sits beside you and brushes your hand with <<his>>. "<span class='teal'>You sure?</span>" <<He>> kisses you when you nod.
-						<<option 'CN'>>惠特尼挨着你坐下，手指碰了碰你的手。“<span class='teal'>你确定？</span>”你点头后，<<he>>吻了你。
+						<<option 'EN'>>Whitney drops onto the bed without asking and waits for you to follow. "<span class='teal'>Well?</span>" <<He>> does not reach for you first.
+						<<option 'CN'>>惠特尼没问一声就坐到床上，等着你跟上来。“<span class='teal'>怎么？</span>”<<he>>没有先伸手碰你。
 					<</language>>
 				<</if>>
 			<<case 'Kylar'>>
@@ -156,7 +164,7 @@
 				<<if _sydneyStatus.includes('corrupt')>>
 					<<language>>
 						<<option 'EN'>>Sydney sets <<his>> temple pendant aside. "<span class='lewd'>Now I can have you to myself,</span>" <<he>> murmurs, drawing you close.
-						<<option 'CN'>>悉尼把神殿吊坠放到一旁。“<span class='lewd'>现在你可以只陪着我了。</span>”<<he>>低声说着，把你拉近。
+						<<option 'CN'>>悉尼把神殿吊坠放到一旁。“<span class='lewd'>现在你只属于我了。</span>”<<he>>低声说着，把你拉近。
 					<</language>>
 				<<else>>
 					<<language>>
@@ -182,7 +190,7 @@
 		<</if>>
 		<br><br>
 	<</if>>
-	<<set $enemyanger to 0>>
+	<<if _partner.id is 'Sydney'>><<set $enemyanger to -10>><</if>>
 	<<effects>>
 	<<effectsman>>
 	<<man>>
@@ -201,7 +209,7 @@
 <<run maplebirch.VP.realEstate.enter()>><<effects>>
 <<if _partner>>
 	<<if _partner.id is 'Sydney' and $enemyarousal gte $enemyarousalmax>>
-		<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+		<<person1>><<run statusCheck('Sydney')>>
 		<<ejaculation>>
 		<<if _sydneyChastity and $sydneyChastityKnown>>
 			<<sydneyChastityMessage>><<npcincr Sydney lust 3>><<ggslust>>

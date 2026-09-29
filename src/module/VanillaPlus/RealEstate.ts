@@ -18,44 +18,44 @@ interface PropertyFloor {
 interface Property {
   id: PropertyId;
   street: string;
-  streetName: LocalizedText;
+  street_name: LocalizedText;
   price: number;
-  weeklyRentPercent: number;
-  residentCapacity: number;
-  bedId: string;
-  bedUpgradeId?: string;
-  wardrobeId: string;
-  wardrobeUpgradeId?: string;
+  weekly_rent_percent: number;
+  resident_capacity: number;
+  bed_id: string;
+  bed_upgrade_id?: string;
+  wardrobe_id: string;
+  wardrobe_upgrade_id?: string;
   name: LocalizedText;
-  entryLabel: LocalizedText;
-  mirrorLabel: LocalizedText;
+  entry_label: LocalizedText;
+  mirror_label: LocalizedText;
   // 庭院、阳台的门从哪一处打开，不用楼层号推断动线。
-  outdoorAccess: 'sitting' | 'landing' | 'retreat';
+  outdoor_access: 'sitting' | 'landing' | 'retreat';
   description: LocalizedText;
   floors: PropertyFloor[];
   rooms: Record<'bedroom' | 'bathroom' | 'kitchen' | 'outdoor', number> & Partial<Record<'desk' | 'guest' | 'retreat' | 'balcony', number>>;
   interior: {
-    bedroomLabel: LocalizedText;
+    bedroom_label: LocalizedText;
     bedroom: LocalizedText;
-    sittingRest?: LocalizedText;
+    sitting_rest?: LocalizedText;
     bathroom: LocalizedText;
-    kitchenLabel: LocalizedText;
+    kitchen_label: LocalizedText;
     kitchen: LocalizedText;
-    outdoorLabel: LocalizedText;
+    outdoor_label: LocalizedText;
     outdoor: LocalizedText;
-    outdoorView: LocalizedText;
-    balconyLabel?: LocalizedText;
+    outdoor_view: LocalizedText;
+    balcony_label?: LocalizedText;
     balcony?: LocalizedText;
-    balconyView?: LocalizedText;
+    balcony_view?: LocalizedText;
     guest?: LocalizedText;
-    retreatLabel?: LocalizedText;
+    retreat_label?: LocalizedText;
     retreat?: LocalizedText;
-    retreatRest?: LocalizedText;
+    retreat_rest?: LocalizedText;
     renovated: LocalizedText;
   };
 }
 
-interface RealEstateState {
+export interface RealEstateState {
   // 每次从当前存档的 V 读取。房产表放在配置中，这里只保留产权与房屋的可变状态。
   owned: Partial<Record<PropertyId, boolean>>;
   visiting: PropertyId | null;
@@ -99,7 +99,7 @@ interface AuctionRecord {
   day: number;
 }
 
-class RealEstate {
+export class RealEstate {
   public static readonly defaults: RealEstateState = {
     owned: {},
     visiting: null,
@@ -164,23 +164,23 @@ class RealEstate {
       if (
         !property.id ||
         !property.street ||
-        !localized(property.streetName) ||
+        !localized(property.street_name) ||
         typeof property.price !== 'number' ||
         !Number.isSafeInteger(property.price) ||
         property.price <= 0 ||
-        typeof property.weeklyRentPercent !== 'number' ||
-        !Number.isFinite(property.weeklyRentPercent) ||
-        property.weeklyRentPercent <= 0 ||
-        !Number.isSafeInteger(property.residentCapacity) ||
-        property.residentCapacity! < 0 ||
-        !property.bedId ||
-        (property.bedUpgradeId !== undefined && property.bedUpgradeId === property.bedId) ||
-        !property.wardrobeId ||
-        (property.wardrobeUpgradeId !== undefined && property.wardrobeUpgradeId === property.wardrobeId) ||
+        typeof property.weekly_rent_percent !== 'number' ||
+        !Number.isFinite(property.weekly_rent_percent) ||
+        property.weekly_rent_percent <= 0 ||
+        !Number.isSafeInteger(property.resident_capacity) ||
+        property.resident_capacity! < 0 ||
+        !property.bed_id ||
+        (property.bed_upgrade_id !== undefined && property.bed_upgrade_id === property.bed_id) ||
+        !property.wardrobe_id ||
+        (property.wardrobe_upgrade_id !== undefined && property.wardrobe_upgrade_id === property.wardrobe_id) ||
         !localized(property.name) ||
-        !localized(property.entryLabel) ||
-        !localized(property.mirrorLabel) ||
-        !['sitting', 'landing', 'retreat'].includes(property.outdoorAccess!) ||
+        !localized(property.entry_label) ||
+        !localized(property.mirror_label) ||
+        !['sitting', 'landing', 'retreat'].includes(property.outdoor_access!) ||
         !localized(property.description) ||
         !Array.isArray(property.floors) ||
         property.floors.length === 0 ||
@@ -192,21 +192,21 @@ class RealEstate {
         (['desk', 'guest', 'retreat', 'balcony'] as const).some(
           room => property.rooms?.[room] !== undefined && (!Number.isInteger(property.rooms[room]) || property.rooms[room]! < 1 || property.rooms[room]! > property.floors!.length)
         ) ||
-        (property.outdoorAccess === 'sitting' && property.rooms.outdoor !== 1) ||
-        (property.outdoorAccess === 'landing' && property.rooms.outdoor === 1) ||
-        (property.outdoorAccess === 'retreat' && property.rooms.retreat !== property.rooms.outdoor) ||
-        !localized(property.interior?.bedroomLabel) ||
+        (property.outdoor_access === 'sitting' && property.rooms.outdoor !== 1) ||
+        (property.outdoor_access === 'landing' && property.rooms.outdoor === 1) ||
+        (property.outdoor_access === 'retreat' && property.rooms.retreat !== property.rooms.outdoor) ||
+        !localized(property.interior?.bedroom_label) ||
         !localized(property.interior?.bedroom) ||
-        (property.rooms?.retreat === undefined && !localized(property.interior?.sittingRest)) ||
+        (property.rooms?.retreat === undefined && !localized(property.interior?.sitting_rest)) ||
         !localized(property.interior?.bathroom) ||
-        !localized(property.interior?.kitchenLabel) ||
+        !localized(property.interior?.kitchen_label) ||
         !localized(property.interior?.kitchen) ||
-        !localized(property.interior?.outdoorLabel) ||
+        !localized(property.interior?.outdoor_label) ||
         !localized(property.interior?.outdoor) ||
-        !localized(property.interior?.outdoorView) ||
-        (property.rooms?.balcony !== undefined && (!localized(property.interior?.balconyLabel) || !localized(property.interior?.balcony) || !localized(property.interior?.balconyView))) ||
+        !localized(property.interior?.outdoor_view) ||
+        (property.rooms?.balcony !== undefined && (!localized(property.interior?.balcony_label) || !localized(property.interior?.balcony) || !localized(property.interior?.balcony_view))) ||
         (property.rooms?.guest !== undefined && !localized(property.interior?.guest)) ||
-        (property.rooms?.retreat !== undefined && (!localized(property.interior?.retreatLabel) || !localized(property.interior?.retreat) || !localized(property.interior?.retreatRest))) ||
+        (property.rooms?.retreat !== undefined && (!localized(property.interior?.retreat_label) || !localized(property.interior?.retreat) || !localized(property.interior?.retreat_rest))) ||
         !localized(property.interior?.renovated) ||
         ids.has(property.id)
       ) {
@@ -215,7 +215,7 @@ class RealEstate {
       ids.add(property.id);
       return property as Property;
     });
-    if (properties.some(property => property.residentCapacity > (property.rooms.guest === undefined ? 1 : 2))) throw new Error('Resident capacity exceeds the configured bedrooms.');
+    if (properties.some(property => property.resident_capacity > (property.rooms.guest === undefined ? 1 : 2))) throw new Error('Resident capacity exceeds the configured bedrooms.');
     return properties;
   }
 
@@ -325,6 +325,15 @@ class RealEstate {
     });
   }
 
+  public residentsInCommonRooms(id: PropertyId): ResidentProfile[] {
+    // 夜间日程中的 home 包含睡眠；23 点可在公共房间相处，午夜后转入卧室。
+    return Time.hour === 23 ? this.residentsHome(id) : [];
+  }
+
+  public residentsInBedroom(id: PropertyId): ResidentProfile[] {
+    return Time.hour === 23 ? [] : this.residentsHome(id);
+  }
+
   public inviteResident(name: string, id: PropertyId): boolean {
     this.reconcileResidents();
     const property = this.properties.find(item => item.id === id);
@@ -334,7 +343,7 @@ class RealEstate {
     const residents = (this.state.residents[id] ??= []);
     if (residents.includes(name)) return false;
     let result: 'joined' | 'full' | 'bed';
-    if (residents.length >= property.residentCapacity) result = 'full';
+    if (residents.length >= property.resident_capacity) result = 'full';
     else if (!this.canShareBed(id)) result = 'bed';
     else {
       // 恋人只在一处住宅登记同住。玩家的其他空置房屋仍可随时自住。
@@ -417,7 +426,7 @@ class RealEstate {
   public furniture(id: PropertyId, kind: FurnitureKind): PropertyFurniture | null {
     const property = this.properties.find(item => item.id === id);
     if (!property) return null;
-    const installed = kind === 'bed' ? (this.managementFor(id).bed_id ?? property.bedId) : (this.managementFor(id).wardrobe_id ?? property.wardrobeId);
+    const installed = kind === 'bed' ? (this.managementFor(id).bed_id ?? property.bed_id) : (this.managementFor(id).wardrobe_id ?? property.wardrobe_id);
     return window.Furniture.get(installed, true);
   }
 
@@ -428,7 +437,7 @@ class RealEstate {
   public furnitureUpgrade(id: PropertyId, kind: FurnitureKind): { id: string; item: PropertyFurniture; cost: number } | null {
     const property = this.properties.find(item => item.id === id);
     if (!property) return null;
-    const next = kind === 'bed' ? property.bedUpgradeId : property.wardrobeUpgradeId;
+    const next = kind === 'bed' ? property.bed_upgrade_id : property.wardrobe_upgrade_id;
     const installed = kind === 'bed' ? this.managementFor(id).bed_id : this.managementFor(id).wardrobe_id;
     if (!next || installed === next) return null;
     const item = window.Furniture.get(next, true);
@@ -459,38 +468,38 @@ class RealEstate {
 
   public maintenanceCost(id: PropertyId): number {
     const property = this.properties.find(item => item.id === id);
-    return property ? Math.ceil((property.price * this.mortgage.terms.rental.weeklyMaintenancePercent) / 100) : 0;
+    return property ? Math.ceil((property.price * this.mortgage.terms.rental.weekly_maintenance_percent) / 100) : 0;
   }
 
   public weeklyRent(id: PropertyId): number {
     const property = this.properties.find(item => item.id === id);
     if (!property) return 0;
     const management = this.managementFor(id);
-    const { renovationRentBonusPercent } = this.mortgage.terms.rental;
-    return Math.floor((this.baseWeeklyRent(id) * (1 + (management.renovation * renovationRentBonusPercent) / 100) * management.condition) / 100);
+    const { renovation_rent_bonus_percent } = this.mortgage.terms.rental;
+    return Math.floor((this.baseWeeklyRent(id) * (1 + (management.renovation * renovation_rent_bonus_percent) / 100) * management.condition) / 100);
   }
 
   public baseWeeklyRent(id: PropertyId): number {
     const property = this.properties.find(item => item.id === id);
-    return property ? Math.floor((property.price * property.weeklyRentPercent) / 100) : 0;
+    return property ? Math.floor((property.price * property.weekly_rent_percent) / 100) : 0;
   }
 
   public renovationCost(id: PropertyId): number {
     const property = this.properties.find(item => item.id === id);
-    return property ? Math.ceil(((property.price * this.mortgage.terms.rental.renovationCostPercent) / 100) * (this.managementFor(id).renovation + 1)) : 0;
+    return property ? Math.ceil(((property.price * this.mortgage.terms.rental.renovation_cost_percent) / 100) * (this.managementFor(id).renovation + 1)) : 0;
   }
 
   public repairCost(id: PropertyId): number {
     const property = this.properties.find(item => item.id === id);
     if (!property) return 0;
-    return Math.ceil(((property.price * this.mortgage.terms.rental.repairCostPerConditionPercent) / 100) * (100 - this.managementFor(id).condition));
+    return Math.ceil(((property.price * this.mortgage.terms.rental.repair_cost_per_condition_percent) / 100) * (100 - this.managementFor(id).condition));
   }
 
   public renovate(id: PropertyId): string {
     if (!this.owns(id)) return 'not-owned';
     const management = this.managementFor(id);
     if (management.rented || management.auction_day !== null || this.isFrozen(id)) return 'unavailable';
-    if (management.renovation >= this.mortgage.terms.rental.maxRenovationLevel) return 'max-renovation';
+    if (management.renovation >= this.mortgage.terms.rental.max_renovation_level) return 'max-renovation';
     const result = this.finance.payFromBankPennies(this.renovationCost(id));
     if (result !== 'ok') return result;
     management.renovation++;
@@ -513,7 +522,7 @@ class RealEstate {
   public rentOut(id: PropertyId): boolean {
     if (!this.owns(id) || this.isFrozen(id) || this.residentsAt(id).length > 0) return false;
     const management = this.managementFor(id);
-    if (management.rented || management.auction_day !== null || management.condition < this.mortgage.terms.rental.minimumCondition) return false;
+    if (management.rented || management.auction_day !== null || management.condition < this.mortgage.terms.rental.minimum_condition) return false;
     management.rented = true;
     management.lease_end_day = null;
     return true;
@@ -530,7 +539,7 @@ class RealEstate {
     if (!this.owns(id) || this.residentsAt(id).length > 0 || this.mortgage.current?.property_id === id) return false;
     const management = this.managementFor(id);
     if (management.rented || management.auction_day !== null) return false;
-    management.auction_day = RealEstate.today() + this.mortgage.terms.voluntaryAuctionDays;
+    management.auction_day = RealEstate.today() + this.mortgage.terms.voluntary_auction_days;
     return true;
   }
 
@@ -564,18 +573,18 @@ class RealEstate {
         const management = this.managementFor(property.id);
         if (day >= management.next_settlement_day) {
           const upkeep = this.maintenanceCost(property.id);
-          if (management.rented && management.condition >= this.mortgage.terms.rental.minimumCondition) {
+          if (management.rented && management.condition >= this.mortgage.terms.rental.minimum_condition) {
             // 租客支付当周租金和维护费。冻结时净租金先抵房贷。
             const netRent = Math.max(0, this.weeklyRent(property.id) - upkeep);
             if (this.isFrozen(property.id)) this.mortgage.applySeizedRent(netRent);
             else this.finance.creditBankPennies(netRent);
-            management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.conditionLossPerWeek);
-            if (management.condition < this.mortgage.terms.rental.minimumCondition) {
+            management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.condition_loss_per_week);
+            if (management.condition < this.mortgage.terms.rental.minimum_condition) {
               management.rented = false;
               management.lease_end_day = null;
             }
           } else if (this.finance.collectBankPennies(upkeep) < upkeep) {
-            management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.conditionLossPerWeek);
+            management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.condition_loss_per_week);
           }
           management.next_settlement_day = day + 7;
         }
@@ -598,7 +607,7 @@ class RealEstate {
     const conditionFactor = 0.8 + management.condition / 500;
     const renovationFactor = 1 + management.renovation * 0.1;
     const assessedValue = Math.floor(property.price * conditionFactor * renovationFactor);
-    const percent = kind === 'foreclosure' ? this.mortgage.terms.foreclosureAuctionPercent : this.mortgage.terms.voluntaryAuctionPercent;
+    const percent = kind === 'foreclosure' ? this.mortgage.terms.foreclosure_auction_percent : this.mortgage.terms.voluntary_auction_percent;
     const proceeds = Math.floor((assessedValue * percent) / 100);
     // 拍卖只把抵债后的余额存入银行；房贷状态由 Mortgage 在回调前结束。债务高于拍价时不产生负存款。
     const surplus = Math.max(0, proceeds - debt);
@@ -624,7 +633,7 @@ class RealEstate {
           !this.isFrozen(item.id) &&
           this.managementFor(item.id).auction_day === null &&
           (this.state.residents?.[item.id] ?? []).length === 0 &&
-          item.residentCapacity >= displaced.length &&
+          item.resident_capacity >= displaced.length &&
           this.canShareBed(item.id)
       );
       if (alternative) this.state.residents[alternative.id] = displaced;

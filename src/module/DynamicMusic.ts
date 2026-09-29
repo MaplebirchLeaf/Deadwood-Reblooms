@@ -36,7 +36,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
-export function parseDynamicMusicConfig(value: unknown, hasFile: (file: string) => boolean): DynamicMusicConfig {
+export function parseDMConfig(value: unknown, hasFile: (file: string) => boolean): DynamicMusicConfig {
   if (!isRecord(value) || value.version !== 1 || !Array.isArray(value.music) || !Array.isArray(value.ambience)) {
     throw new Error('Invalid dynamic music config header');
   }
@@ -258,7 +258,7 @@ class DynamicMusic {
       if (!pack) throw new Error('Audio pack is unavailable');
       const file = pack.zip.file('dynamic-music.json');
       if (!file) throw new Error('Audio pack has no dynamic-music.json');
-      const config = parseDynamicMusicConfig(JSON.parse(await file.async('string')), path => pack.zip.file(path) != null);
+      const config = parseDMConfig(JSON.parse(await file.async('string')), path => pack.zip.file(path) != null);
       for (const track of config.music) if (!this.tracks.has(track.track)) this.tracks.register(track);
       for (const track of config.ambience) if (!this.ambienceTracks.has(track.track)) this.ambienceTracks.register(track);
       this.configReady = true;

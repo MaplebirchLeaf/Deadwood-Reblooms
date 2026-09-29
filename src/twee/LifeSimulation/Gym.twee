@@ -38,12 +38,12 @@
 	<<if maplebirch.LS.has>>
 		<span class='green'><<lanSwitch 'Your pass is valid.' '你的入场资格仍然有效。'>></span><br><br>
 		<<exerciseicon>><<lanLink '训练区 (0:01)' 'Deadwood Reblooms Life Simulation Gym Floor'>><<pass 1>><</lanLink>><br>
-		<<exerciseicon>><<lanLink '临海平台 (0:01)' 'Deadwood Reblooms Life Simulation Gym Deck'>><<pass 1>><</lanLink>><br>
+		<<coastalpathicon>><<lanLink '临海平台 (0:01)' 'Deadwood Reblooms Life Simulation Gym Deck'>><<pass 1>><</lanLink>><br>
 	<<else>>
 		<<lanSwitch 'A single visit costs' '单次入场费为'>> <span class='gold'>£20</span>.
 		<<lanSwitch 'The attendant points to the membership rates beside the desk.' '管理员指向前台旁的会员价目表。'>><br><br>
 		<<if $money gte 2000 or (maplebirch.get('VP') and maplebirch.VP.finance.canPay(2000, 'shopping'))>>
-			<<exerciseicon>><<lanLink '购买单次入场券' 'Deadwood Reblooms Life Simulation Gym'>>
+			<<shopicon 'register'>><<lanLink '购买单次入场券' 'Deadwood Reblooms Life Simulation Gym'>>
 				<<money -2000 'shopping'>>
 				<<run maplebirch.LS.activate('visit')>>
 			<</lanLink>><br>
@@ -52,7 +52,7 @@
 		<</if>>
 	<</if>>
 	<<shopicon 'register'>><<lanLink '查看会员卡' 'Deadwood Reblooms Life Simulation Gym Membership'>><</lanLink>><br>
-	<<bathroomicon 'robe'>><<lanLink '更衣室 (0:01)' 'Deadwood Reblooms Life Simulation Gym Changing Room'>><<pass 1>><</lanLink>><br>
+	<<changingroomicon>><<lanLink '更衣室 (0:01)' 'Deadwood Reblooms Life Simulation Gym Changing Room'>><<pass 1>><</lanLink>><br>
 <</if>>
 <br><<clifficon>><<lanLink '回到峭壁街' 'Cliff Street'>>
 	<<set $LifeSimulation.gym.ticket_day to -1>>
@@ -67,41 +67,41 @@
 <<elseif $LifeSimulation.gym.membership isnot 'none' and $LifeSimulation.gym.expires_at gt Time.date.timeStamp>>
 	<span class='green'><<lanSwitch 'Your membership is active.' '你的会员卡仍然有效。'>></span>
 	<<lanSwitch 'Days remaining:' '剩余天数：'>> <span class='gold'><<= Math.ceil(($LifeSimulation.gym.expires_at - Time.date.timeStamp) / 86400)>></span><br>
-	<span class='blue'><<lanSwitch 'You can choose another term after this card expires.' '这张卡到期后才能改办其他期限。'>></span><br>
+	<span class='blue'><i><<lanSwitch 'You can upgrade to lifetime now, or choose another term after this card expires.' '现在可以升级终身会员；其他期限仍要等这张卡到期后再选。'>></i></span><br>
+	<<lanSwitch 'Lifetime' '终身会员'>> · <span class='gold'>£2,000</span><br>
+	<<if $money gte 200000 or (maplebirch.get('VP') and maplebirch.VP.finance.canPay(200000, 'shopping'))>>
+		<<shopicon 'register'>><<lanLink '购买终身会员卡' 'Deadwood Reblooms Life Simulation Gym Membership'>>
+			<<money -200000 'shopping'>>
+			<<run maplebirch.LS.activate('lifetime')>>
+		<</lanLink>><br>
+	<</if>>
 <<else>>
 	<<if $LifeSimulation.gym.ticket_day is Time.days>>
 		<span class='green'><<lanSwitch 'Your single-visit ticket remains valid until you leave today.' '今天离开前，你的单次入场券仍然有效。'>></span><br><br>
 	<</if>>
 	<<lanSwitch 'Seven days' '七天周卡'>> · <span class='gold'>£100</span><br>
 	<<if $money gte 10000 or (maplebirch.get('VP') and maplebirch.VP.finance.canPay(10000, 'shopping'))>>
-		<<exerciseicon>><<lanLink '购买周卡' 'Deadwood Reblooms Life Simulation Gym Membership'>>
+		<<shopicon 'register'>><<lanLink '购买周卡' 'Deadwood Reblooms Life Simulation Gym Membership'>>
 			<<money -10000 'shopping'>>
 			<<run maplebirch.LS.activate('week')>>
 		<</lanLink>><br>
 	<</if>><br>
 	<<lanSwitch 'One calendar month' '一个自然月'>> · <span class='gold'>£350</span><br>
 	<<if $money gte 35000 or (maplebirch.get('VP') and maplebirch.VP.finance.canPay(35000, 'shopping'))>>
-		<<exerciseicon>><<lanLink '购买月卡' 'Deadwood Reblooms Life Simulation Gym Membership'>>
+		<<shopicon 'register'>><<lanLink '购买月卡' 'Deadwood Reblooms Life Simulation Gym Membership'>>
 			<<money -35000 'shopping'>>
 			<<run maplebirch.LS.activate('month')>>
 		<</lanLink>><br>
 	<</if>><br>
-	<<lanSwitch 'One calendar year' '一个自然年'>> · <span class='gold'>£3,500</span><br>
-	<<if $money gte 350000 or (maplebirch.get('VP') and maplebirch.VP.finance.canPay(350000, 'shopping'))>>
-		<<exerciseicon>><<lanLink '购买年卡' 'Deadwood Reblooms Life Simulation Gym Membership'>>
-			<<money -350000 'shopping'>>
-			<<run maplebirch.LS.activate('year')>>
-		<</lanLink>><br>
-	<</if>><br>
-	<<lanSwitch 'Lifetime' '终身会员'>> · <span class='gold'>£20,000</span><br>
-	<<if $money gte 2000000 or (maplebirch.get('VP') and maplebirch.VP.finance.canPay(2000000, 'shopping'))>>
-		<<exerciseicon>><<lanLink '购买终身会员卡' 'Deadwood Reblooms Life Simulation Gym Membership'>>
-			<<money -2000000 'shopping'>>
+	<<lanSwitch 'Lifetime' '终身会员'>> · <span class='gold'>£2,000</span><br>
+	<<if $money gte 200000 or (maplebirch.get('VP') and maplebirch.VP.finance.canPay(200000, 'shopping'))>>
+		<<shopicon 'register'>><<lanLink '购买终身会员卡' 'Deadwood Reblooms Life Simulation Gym Membership'>>
+			<<money -200000 'shopping'>>
 			<<run maplebirch.LS.activate('lifetime')>>
 		<</lanLink>><br>
 	<</if>>
 <</if>>
-<br><<icon 'gym.png'>><<lanLink '返回前台' 'Deadwood Reblooms Life Simulation Gym'>><</lanLink>>
+<br><<getouticon>><<lanLink '返回前台' 'Deadwood Reblooms Life Simulation Gym'>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Gym Floor []
 <<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
@@ -109,6 +109,15 @@
 	<span class='red'><<lanSwitch 'You need a valid pass to enter the training floor.' '进入训练区需要有效入场资格。'>></span><br><br>
 <<else>>
 	<<lanSwitch 'The training floor has a row of weights, open mats and a clear strip for running. A coach moves between the equipment, keeping an eye on form rather than rushing anyone.' '训练区摆着一排杠铃、几块空出的软垫和一条跑步通道。教练在器械间巡视，留意每个人的动作，也不催促谁。'>><br><br>
+	<<run maplebirch.LS.rollDorenVisit()>>
+	<<if maplebirch.LS.dorenPresent>>
+		<<if $LifeSimulation.gym.doren_interaction_day is Time.days>>
+			<span class='blue'><<lanSwitch 'Doren is finishing <<his>> own routine and gives you a quick wave.' '多伦正在做完自己的训练，朝你挥了挥手。'>></span><br><br>
+		<<else>>
+			<span class='blue'><<lanSwitch 'Off duty, Doren is working through a steady run near the windows. <<He>> spots you between sets.' '多伦下班后正在窗边匀速跑步，休息时看见了你。'>></span><br>
+			<<socialiseicon>><<lanLink '和多伦打个招呼' 'Deadwood Reblooms Life Simulation Gym Doren'>><</lanLink>><br><br>
+		<</if>>
+	<</if>>
 	<<switch Time.days % 3>>
 		<<case 0>><<lanSwitch 'An older regular patiently shows a newcomer how to return the weights to the rack.' '一位常客耐心地教新来的人把杠铃放回架上。'>>
 		<<case 1>><<lanSwitch 'Two students compare their training notes, then make room for you beside the mats.' '两个学生对照训练笔记，随后在软垫旁给你腾出位置。'>>
@@ -121,21 +130,19 @@
 	<<else>>
 		<<exerciseicon>><<lanLink '举重 (1:00)' 'Deadwood Reblooms Life Simulation Gym Training'>>
 			<<set $LifeSimulation.gym.activity to 'weights'>>
-			<<pass 60>>
 		<</lanLink>><<gtiredness>><<gphysique>><br>
-		<<exerciseicon>><<lanLink '室内跑步 (0:30)' 'Deadwood Reblooms Life Simulation Gym Training'>>
+		<<runicon>><<lanLink '室内跑步 (0:30)' 'Deadwood Reblooms Life Simulation Gym Training'>>
 			<<set $LifeSimulation.gym.activity to 'run'>>
-			<<pass 30>>
 		<</lanLink>><<gtiredness>><<gathletics>><br>
-		<<exerciseicon>><<lanLink '跟教练做伸展 (0:20)' 'Deadwood Reblooms Life Simulation Gym Training'>>
+		<<relaxicon>><<lanLink '跟教练做伸展 (0:20)' 'Deadwood Reblooms Life Simulation Gym Training'>>
 			<<set $LifeSimulation.gym.activity to 'stretch'>>
-			<<pass 20>>
 		<</lanLink>><<lstress>><br>
 	<</if>>
 <</if>>
-<br><<exerciseicon>><<lanLink '临海平台 (0:01)' 'Deadwood Reblooms Life Simulation Gym Deck'>><<pass 1>><</lanLink>><br>
-<<bathroomicon 'robe'>><<lanLink '更衣室 (0:01)' 'Deadwood Reblooms Life Simulation Gym Changing Room'>><<pass 1>><</lanLink>><br>
-<<icon 'gym.png'>><<lanLink '返回前台' 'Deadwood Reblooms Life Simulation Gym'>><</lanLink>>
+<br><<coastalpathicon>><<lanLink '临海平台 (0:01)' 'Deadwood Reblooms Life Simulation Gym Deck'>><<pass 1>><</lanLink>><br>
+<<changingroomicon>><<lanLink '更衣室 (0:01)' 'Deadwood Reblooms Life Simulation Gym Changing Room'>><<pass 1>><</lanLink>><br>
+<br>
+<<getouticon>><<lanLink '返回前台' 'Deadwood Reblooms Life Simulation Gym'>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Gym Deck []
 <<set $outside to 1>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
@@ -146,9 +153,8 @@
 	<span class='blue'><<lanSwitch 'Frost has settled on the path. Outdoor training is closed for now.' '小径上结了霜，室外训练暂时关闭。'>></span><br>
 <<elseif maplebirch.LS.has and $LifeSimulation.gym.sessions_today lt 3 and Time.hour gte 6 and Time.hour lt 22 and $exposed lte 0 and !pcAreArmsBound('both')>>
 	<<lanSwitch 'A few people jog at their own pace, leaving room to pass near the rail.' '几个人按自己的步调慢跑，在栏杆旁留出相互错身的空间。'>><br><br>
-	<<exerciseicon>><<lanLink '沿海慢跑 (0:30)' 'Deadwood Reblooms Life Simulation Gym Training'>>
+	<<runicon>><<lanLink '沿海慢跑 (0:30)' 'Deadwood Reblooms Life Simulation Gym Training'>>
 		<<set $LifeSimulation.gym.activity to 'deck-run'>>
-		<<pass 30>>
 	<</lanLink>><<gtiredness>><<gathletics>><br>
 <</if>>
 <br><<getinicon>><<lanLink '返回室内' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
@@ -156,15 +162,16 @@
 :: Deadwood Reblooms Life Simulation Gym Changing Room []
 <<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
 <<lanSwitch 'The changing room has narrow lockers, a row of benches and sinks beneath a wide mirror. Someone folds a towel while another visitor ties their shoes before heading back out.' '更衣室里有狭窄的储物柜、成排的长凳，还有宽镜下的洗手池。有人折好毛巾，另一个人系紧鞋带，准备回到训练区。'>><br><br>
-<<wardrobeicon>><<lanLink '你的储物柜' 'Deadwood Reblooms Life Simulation Gym Wardrobe'>><</lanLink>><br>
+<<lockericon>><<lanLink '你的储物柜' 'Deadwood Reblooms Life Simulation Gym Wardrobe'>><</lanLink>><br>
 <<if maplebirch.LS.has and !$LifeSimulation.gym.washed_today>>
 	<<bathroomicon 'sink'>><<lanLink '洗净脸和手 (0:05)' 'Deadwood Reblooms Life Simulation Gym Wash'>><<pass 5>><</lanLink>><<lstress>><br>
 <</if>>
 <<if $exposed lte 0>>
 	<br><<if maplebirch.LS.has and Time.hour gte 6 and Time.hour lt 22>>
-		<<exerciseicon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>><br>
+		<<getinicon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>><br>
 	<</if>>
-	<<icon 'gym.png'>><<lanLink '返回前台' 'Deadwood Reblooms Life Simulation Gym'>><</lanLink>>
+	<br>
+	<<getouticon>><<lanLink '返回前台' 'Deadwood Reblooms Life Simulation Gym'>><</lanLink>>
 <<else>>
 	<br><span class='red'><<lanSwitch 'Get dressed before leaving the changing room.' '离开更衣室前，先穿好衣服。'>></span>
 <</if>>
@@ -186,7 +193,7 @@
 <<else>>
 	<<lanSwitch 'You are done at the sinks for now.' '你暂时不需要再用洗手池了。'>>
 <</if>><br><br>
-<<bathroomicon 'robe'>><<lanLink '返回更衣室' 'Deadwood Reblooms Life Simulation Gym Changing Room'>><</lanLink>>
+<<changingroomicon>><<lanLink '返回更衣室' 'Deadwood Reblooms Life Simulation Gym Changing Room'>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Gym Training []
 <<set _gymActivity to $LifeSimulation.gym.activity>>
@@ -198,15 +205,19 @@
 	<<set $LifeSimulation.gym.sessions_today += 1>>
 	<<switch _gymActivity>>
 		<<case 'weights'>>
+			<<pass 60>>
 			<<lanSwitch 'You work through a set of lifts. Your arms shake by the last repetition, but you put the weights back under control.' '你完成一组举重。最后几次抬举时双臂发颤，仍稳稳地把杠铃放回架上。'>><br><br>
 			<<physique 6>><<tiredness 6>><<stress -2>><<gphysique>><<gtiredness>><<lstress>>
 		<<case 'run'>>
+			<<pass 30>>
 			<<lanSwitch 'You keep pace along the indoor track. The sea flashes between the window frames whenever you turn.' '你沿室内跑道来回奔跑。每次转身，都能从窗框间瞥见海面。'>><br><br>
 			<<athletics 2>><<physique 2>><<tiredness 3>><<stress -2>><<gathletics>><<gphysique>><<gtiredness>><<lstress>>
 		<<case 'stretch'>>
+			<<pass 20>>
 			<<lanSwitch 'The coach reminds you to slow down and hold each stretch. Your breathing settles while the noise of the room recedes.' '教练提醒你放慢动作，保持每一次伸展。呼吸渐渐平稳，周围的器械声也远了些。'>><br><br>
 			<<tiredness 1>><<stress -3>><<gtiredness>><<lstress>>
 		<<case 'deck-run'>>
+			<<pass 30>>
 			<<lanSwitch 'You follow the fenced path at an even pace. Wind comes in from the sea and cools your face before you turn back towards the building.' '你沿着围栏小径匀速慢跑。海风吹凉了脸颊，你转身跑回建筑门前。'>><br><br>
 			<<athletics 3>><<tiredness 4>><<stress -2>><<gathletics>><<gtiredness>><<lstress>>
 	<</switch>>
@@ -229,6 +240,45 @@
 <<if _gymActivity is 'deck-run'>>
 	<<getinicon>><<lanLink '返回室内' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
 <<else>>
-	<<exerciseicon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
+	<<getinicon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
 <</if>>
 <<set $LifeSimulation.gym.activity to ''>>
+
+:: Deadwood Reblooms Life Simulation Gym Doren []
+<<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
+<<if maplebirch.LS.dorenPresent and $LifeSimulation.gym.doren_interaction_day isnot Time.days and $exposed lte 0>>
+	<<npc Doren>><<person1>>
+	<<lanSwitch 'Doren slows the treadmill, then steps aside to make room. "Didn't expect to see you here, <<lassie>>," <<he>> says, catching <<his>> breath. "I come by to run after work when I can. Easier to keep it up with company."' '多伦放慢跑步机，走到一旁给你让出位置。“没想到在这儿见到你，<<lassie>>。”<<he>>喘匀了气说，“下班后有空我就来跑一跑。有人一起，总比自己跑容易坚持。”'>>
+	<br><br>
+	<<socialiseicon 'ask'>><<lanLink '问多伦如何安排训练 (0:10)' 'Deadwood Reblooms Life Simulation Gym Doren Advice'>><</lanLink>><br>
+	<<if C.npc.Doren.love gte 10 and $LifeSimulation.gym.sessions_today lt 3 and !pcAreArmsBound('both')>>
+		<<runicon>><<lanLink '和多伦一起跑一组 (0:30)' 'Deadwood Reblooms Life Simulation Gym Doren Run'>><</lanLink>><<gathletics>><<gtiredness>><br>
+	<</if>>
+<<else>>
+	<<lanSwitch 'Doren has already returned to <<his>> own training, or has left the gym.' '多伦已经回去继续训练，或是离开了健身房。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Gym Doren Advice []
+<<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
+<<if maplebirch.LS.meetDoren(false)>>
+	<<npc Doren>><<person1>>
+	<<pass 10>>
+	<<lanSwitch 'Doren waits until the equipment beside you is free, then nods at it. "You don't have to push every day, <<lassie>>. Pick a pace you can come back to, and leave time to recover." <<He>> watches you try the movement once, then nods when you slow it down.' '多伦等你旁边的器械空出来，才朝那边示意。“不用每天都拼命练，<<lassie>>。挑个你能一直跟上的强度，也得留时间恢复。”<<he>>看你试了一遍动作，等你放慢后才点头。'>>
+	<<npcincr Doren love 1>><<stress -2>><<glove>><<lstress>>
+<<else>>
+	<<lanSwitch 'You cannot ask Doren for advice now.' '你现在没法向多伦请教。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
+
+:: Deadwood Reblooms Life Simulation Gym Doren Run []
+<<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
+<<if C.npc.Doren.love gte 10 and maplebirch.LS.meetDoren(true)>>
+	<<npc Doren>><<person1>>
+	<<pass 30>>
+	<<lanSwitch 'Doren starts at a pace you can match. When you speed up, <<he>> keeps alongside you instead of turning it into a race. You finish the set breathing hard; <<he>> hands you your water and reminds you to ease down before stopping.' '多伦先按你跟得上的速度跑。你加快脚步时，<<he>>仍陪在旁边，没有把训练变成比赛。跑完这一组，你喘得厉害；<<he>>把水递给你，提醒你先慢下来再停。'>>
+	<<athletics 3>><<physique 1>><<tiredness 4>><<stress -4>><<npcincr Doren love 1>><<gathletics>><<gphysique>><<gtiredness>><<lstress>><<glove>>
+<<else>>
+	<<lanSwitch 'The running track is no longer free for a shared set.' '跑步通道现在不方便一起训练。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回训练区' 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>

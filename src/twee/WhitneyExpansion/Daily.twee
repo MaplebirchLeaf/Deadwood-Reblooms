@@ -1,0 +1,192 @@
+:: Deadwood Whitney Aftercare Widgets [widget]
+<!-- 营救后的普通校园日才开放，每日一次。 -->
+<<widget 'deadwood-whitney-aftercare-link'>>
+  <<if $WhitneyExpansion?.rescued and $whitneyReunionScene is undefined
+    and ['active', 'rescued'].includes(C.npc.Whitney.state) and Time.schoolDay
+    and Time.hour gte 7 and Time.hour lt 18 and $exposed lte 0
+    and $WhitneyExpansion.aftercare_day isnot Time.days>>
+    <<socialiseicon>><<lanLink '去找惠特尼说话 (0:10)' 'Deadwood Whitney Aftercare'>><<pass 10>><</lanLink>><br><br>
+  <</if>>
+<</widget>>
+
+<!-- 白天的码头：原版夜间关门并有保安巡逻，因此只在白天开放。 -->
+<<widget 'deadwood-whitney-pier-link'>>
+  <<if $whitneyromance is 1 and ['active', 'rescued'].includes(C.npc.Whitney.state)
+    and Time.dayState isnot 'night' and Time.hour gte 9 and Time.hour lt 17 and $location is 'docks'
+    and $exposed lte 0 and $WhitneyExpansion.pier_day isnot Time.days>>
+    <<socialiseicon>><<lanLink '看看惠特尼在做什么 (0:10)' 'Deadwood Whitney Pier'>><<pass 10>><</lanLink>><br><br>
+  <</if>>
+<</widget>>
+
+<!-- 接在原版敲门页面的开门对白之后，不重复倒钩街的公寓入口。 -->
+<<widget 'deadwood-whitney-flats-link'>>
+  <<if $whitneyromance is 1 and ['active', 'rescued'].includes(C.npc.Whitney.state)
+    and C.npc.Whitney.love gte 20
+    and (Time.dayState is 'dawn' or (Time.dayState is 'day' and Weather.precipitation is 'none' and !Time.schoolDay and ![3, 6, 7].includes(Time.weekDay)))
+    and $whitney_home_stage gte 3 and $exposed lte 0
+    and $WhitneyExpansion.flats_day isnot Time.days>>
+    <<socialiseicon>><<lanLink '与惠特尼在门口聊几句 (0:05)' 'Deadwood Whitney Flats'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<!-- 原版公寓聊天已确保惠特尼在场；这里只补一项每日互动。 -->
+<<widget 'deadwood-whitney-music-link'>>
+  <<if $WhitneyExpansion and $location is 'flats' and $whitneyromance is 1
+    and ['active', 'rescued'].includes(C.npc.Whitney.state) and $WhitneyExpansion.music_day isnot Time.days>>
+    <<socialiseicon>><<lanLink '听听惠特尼在放什么 (0:10)' 'Deadwood Whitney Music'>><<pass 10>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Whitney Music []
+<<set $outside to 0>><<set $location to 'flats'>><<effects>>
+<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
+  <<lanSwitch 'Whitney has gone out.' '惠特尼已经出门了。'>>
+<<else>>
+  <<set $WhitneyExpansion.music_day to Time.days>>
+  <<npc Whitney>><<person1>>
+  <<lanSwitch 'Whitney sits with one earphone in, tapping <<his>> foot to the beat. When you glance at the player, <<he>> pulls the earphone out and holds it towards you, watching your face. "What, want a turn?"' '惠特尼戴着一只耳机，脚尖随着节拍轻点。你瞥向播放器时，<<he>>把耳机扯下来递向你，盯着你的脸。“怎么，也想听听？”'>><br><br>
+  <<socialiseicon>><<lanLink '问惠特尼这是什么歌' 'Deadwood Whitney Music Answer'>><<set $phase to 'ask'>><</lanLink>><br>
+  <<loveicon>><<lanLink '等惠特尼把耳机递过来' 'Deadwood Whitney Music Answer'>><<set $phase to 'wait'>><</lanLink>>
+<</if>>
+<br><br><<getouticon>><<lanLink '结束交谈' 'Whitney Home Enter'>><</lanLink>>
+
+:: Deadwood Whitney Music Answer []
+<<set $outside to 0>><<set $location to 'flats'>><<effects>>
+<<npc Whitney>><<person1>>
+<<if $phase is 'wait'>>
+  <<lanSwitch 'You sit beside Whitney without reaching for the earphone. After the next song starts, <<he>> presses it into your hand and clicks the volume up. "Just this one," <<he>> says, and keeps watching you. "Well? Can you take it or not?"' '你在惠特尼身旁坐下，没有伸手去拿耳机。下一首歌响起时，<<he>>把耳机塞进你手里，顺手调高了音量。“就听这一首。”<<he>>说完仍看着你。“怎么，扛不住？”'>>
+  <<npcincr Whitney love 1>><<glove>><<stress -1>><<lstress>>
+<<else>>
+  <<lanSwitch '"You would hate it," Whitney says. <<He>> names the band anyway and lets the next song play for a few seconds. "There. Now stop asking."' '“你肯定不喜欢。”惠特尼说着，却还是报出了乐队的名字，让下一首歌放了几秒。“行了，别再问了。”'>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回房间' 'Whitney Home Enter'>><</lanLink>>
+
+:: Deadwood Whitney Aftercare []
+<<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
+<<if !$WhitneyExpansion?.rescued or $whitneyReunionScene isnot undefined or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
+  <<lanSwitch 'Whitney has already left the school grounds.' '惠特尼已经离开学校。'>><br><br>
+<<else>>
+  <<set $WhitneyExpansion.aftercare_day to Time.days>>
+  <<npc Whitney>><<person1>>
+  <<switch Time.days % 3>>
+    <<case 0>>
+      <<language>>
+        <<option 'EN'>>Whitney is arguing with a friend by the gate. The friend asks another question about the days Whitney disappeared. Whitney's smile vanishes. <<He>> catches sight of you and waves the friend away. "You here to ask too?"
+        <<option 'CN'>>惠特尼正和朋友在校门边争执。那人又问起惠特尼失踪的几天，惠特尼脸上的笑容立刻没了。<<He>>看到你，挥手让朋友先走。“你也是来问这个的？”
+      <</language>>
+    <<case 1>>
+      <<language>>
+        <<option 'EN'>>Whitney leans against the wall with an unlit cigarette. A whistle sounds at the gate. <<He>> starts, then glares at you as though daring you to mention it. "What?"
+        <<option 'CN'>>惠特尼叼着一支没点燃的烟，靠在墙边。校门口的哨声响起，<<he>>猛地一颤，随即瞪向你，像是在警告你别提。“看什么？”
+      <</language>>
+    <<case 2>>
+      <<language>>
+        <<option 'EN'>>Whitney tosses a ball to one of <<his>> friends. They call for <<him>> to join them, but <<he>> spots you first. "I'll be there in a minute," <<he>> says, and comes over.
+        <<option 'CN'>>惠特尼把球抛给一个朋友。那人叫<<him>>过去，<<he>>却先看见了你。“等会儿。”<<he>>说着，朝你走来。
+      <</language>>
+  <</switch>><br><br>
+  <<if $LifeSimulation?.school and $LifeSimulation.school.role isnot 'student'>>
+    <<lanSwitch 'Whitney glances at your badge. "Put that away before someone thinks you are here to write me up."' '惠特尼瞥了眼你的徽章。“收起来，省得别人以为你要记我的过。”'>><br><br>
+  <</if>>
+  <<socialiseicon>><<lanLink '问惠特尼今天怎么样' 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'space'>><</lanLink>><br>
+  <<if isLoveInterest('Whitney')>>
+    <<loveicon>><<lanLink '陪惠特尼走一段' 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'walk'>><</lanLink>><br>
+  <</if>>
+<</if>>
+<br><br><<getouticon>><<lanLink '返回前庭' 'School Front Courtyard'>><</lanLink>>
+
+:: Deadwood Whitney Aftercare Answer []
+<<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
+<<npc Whitney>><<person1>>
+<<if $phase is 'walk' and isLoveInterest('Whitney')>>
+  <<language>>
+    <<option 'EN'>>You walk beside Whitney until the bell rings. <<He>> keeps close enough that your sleeves touch, then notices and puts a step between you. "Don't make a thing of it, slut," <<he>> says. "I just don't want some creep's hands on what's mine."
+    <<option 'CN'>>你陪惠特尼走到铃声响起。<<He>>靠得很近，袖口不时碰到你，随即像意识到什么，往旁边让开半步。“别大惊小怪的，骚货。”<<he>>说，“我只是不想让哪个变态碰我的东西。”
+  <</language>><br><br>
+  <<npcincr Whitney love 2>><<glove>><<stress -2>><<lstress>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>"Fine, slut," Whitney says. <<He>> shoves your shoulder hard enough to stagger you, then heads inside without looking back.
+    <<option 'CN'>>“还行，骚货。”惠特尼说着，用力推了一下你的肩膀，推得你一个踉跄，随后头也不回地走进学校。
+  <</language>><br><br>
+  <<npcincr Whitney love 1>><<glove>>
+<</if>>
+<br><br>
+<<getinicon>><<lanLink '进入学校' 'Hallways'>><</lanLink>>
+
+:: Deadwood Whitney Pier []
+<<set $outside to 1>><<set $location to 'docks'>><<effects>>
+<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
+  <<lanSwitch 'Whitney is not around.' '惠特尼不在这附近。'>><br><br>
+<<else>>
+  <<set $WhitneyExpansion.pier_day to Time.days>>
+  <<npc Whitney>><<person1>>
+  <<language>>
+    <<option 'EN'>>Whitney is sitting on a bollard at the end of the pier, flicking stones into the water. <<He>> does not turn around. "You following me now, slut?"
+    <<option 'CN'>>惠特尼坐在码头尽头的系缆桩上，一颗颗往水里踢石子。<<He>>没有回头。“怎么，现在开始跟踪我了，骚货？”
+  <</language>>
+  <br><br>
+  <<language>>
+    <<option 'EN'>>You sit down beside <<him>>. For a while <<he>> says nothing at all, and the two of you watch the water slide past the pilings. Then <<he>> nudges your leg with <<his>> boot. "Say something or piss off, slut."
+    <<option 'CN'>>你在<<him>>旁边坐下。有一阵子<<he>>什么也没说，你们就那么看着海水从桩子间流过。然后<<he>>用靴子碰了碰你的腿。“说话，不然就滚，骚货。”
+  <</language>>
+  <br><br>
+  <<socialiseicon>><<lanLink '问惠特尼在这儿做什么' 'Deadwood Whitney Pier Talk'>><</lanLink>><br>
+  <<if isLoveInterest('Whitney')>>
+    <<loveicon>><<lanLink '靠着惠特尼坐一会儿' 'Deadwood Whitney Pier Lean'>><</lanLink>><br>
+  <</if>>
+<</if>>
+<br><br><<getouticon>><<lanLink '离开码头' 'Docks'>><</lanLink>>
+
+:: Deadwood Whitney Pier Talk []
+<<set $outside to 1>><<set $location to 'docks'>><<effects>>
+<<npc Whitney>><<person1>>
+<<language>>
+  <<option 'EN'>>You ask what <<he>> comes here for. Whitney keeps throwing stones. "None of your business." A pause. "It's quiet. That's all." <<He>> throws another stone, harder. "Don't look at me like that."
+  <<option 'CN'>>你问<<he>>来这儿做什么。惠特尼继续踢石子。“关你屁事。”停了一下。“这儿安静。就这个。”<<He>>又踢了一颗，比刚才用力。“别用那种眼神看我。”
+<</language>>
+<br><br>
+<<npcincr Whitney love 1>><<glove>><<stress -1>><<lstress>>
+<br><br>
+<<getinicon>><<lanLink '继续' 'Docks'>><</lanLink>>
+
+:: Deadwood Whitney Pier Lean []
+<<set $outside to 1>><<set $location to 'docks'>><<effects>>
+<<npc Whitney>><<person1>>
+<<language>>
+  <<option 'EN'>>You lean against <<him>>. Whitney goes rigid for a moment, then shifts so your shoulder fits under <<his>> arm. <<He>> does not say anything about it. When a gull cries overhead, <<he>> pulls <<his>> arm back and stands up. "Shift change. Come on."
+  <<option 'CN'>>你靠过去。惠特尼僵了一下，随后挪了挪身子，让你的肩膀正好落在<<his>>臂弯里。<<He>>对此只字不提。头顶有海鸥叫了一声，<<he>>便把手臂抽回去，站了起来。“换班了。走吧。”
+<</language>>
+<br><br>
+<<npcincr Whitney love 2>><<glove>><<npcincr Whitney dom 1>><<gdom>><<stress -2>><<lstress>>
+<br><br>
+<<getinicon>><<lanLink '继续' 'Docks'>><</lanLink>>
+
+:: Deadwood Whitney Flats []
+<<set $outside to 0>><<set $location to 'flats'>><<effects>>
+<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state) or $whitney_home_stage lt 3
+  or !(Time.dayState is 'dawn' or (Time.dayState is 'day' and Weather.precipitation is 'none' and !Time.schoolDay and ![3, 6, 7].includes(Time.weekDay)))>>
+  <<lanSwitch 'Whitney has gone back inside.' '惠特尼已经回到屋里。'>><br><br>
+<<else>>
+  <<set $WhitneyExpansion.flats_day to Time.days>>
+  <<set _flatWasDawn to Time.dayState is 'dawn'>>
+  <<pass 5>>
+  <<npc Whitney>><<person1>>
+  <<if $WhitneyExpansion.rescued>>
+    <<language>>
+      <<option 'EN'>>Whitney keeps a hand on the door. For a moment <<he>> does not say anything, and <<his>> grip on the frame loosens. Then <<he>> catches himself and pulls the door back to the width it was. "That thing at the brothel, slut," <<he>> says quietly. "Don't bring it up in here. Understood?"
+      <<option 'CN'>>惠特尼一只手扶着门。有一瞬间<<he>>什么也没说，扣着门框的手指松了些。随即<<he>>像是意识到什么，又把门推回原来的宽度。“妓院那件事，骚货。”<<he>>压低声音说，“进了这个门就别提。听明白了吗？”
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>Whitney stays in the doorway, looking you over. "You came all this way just to talk?" <<He>> leans on the frame and waits, letting you hear how stupid the excuse sounds.
+      <<option 'CN'>>惠特尼倚在门口，把你从头看到脚。“跑这么远过来，就为了说几句话？”<<He>>靠着门框等你开口，摆明了在等你听出这借口有多站不住脚。
+    <</language>>
+  <</if>>
+  <br><br>
+  <<npcincr Whitney love 1>><<glove>>
+  <br><br>
+  <<getinicon>><<if _flatWasDawn>><<lanLink '请求进屋' 'Whitney Home Knock Dawn'>><</lanLink>><<else>><<lanLink '走进公寓' 'Whitney Home Enter'>><</lanLink>><</if>>
+<</if>>
+<br><br>
+<<getouticon>><<lanLink '离开' 'Barb Street'>><</lanLink>>

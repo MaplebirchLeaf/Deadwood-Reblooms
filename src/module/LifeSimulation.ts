@@ -1,47 +1,15 @@
 import Module from './Module';
 import AcademicHonours from './LifeSimulation/AcademicHonours';
-import School, { DEFAULT_SCHOOL_STATE } from './LifeSimulation/School';
-
-type GymPlan = 'visit' | 'week' | 'month' | 'year' | 'lifetime';
-
-const DEFAULT_HISTORY_PROJECT_STATE = {
-  // 项目进度和证据结果都写入 V.LifeSimulation；重新读档后直接恢复当前阶段。
-  status: 'none' as 'none' | 'ongoing' | 'done' | 'won',
-  source: 'none' as 'none' | 'paintingward' | 'paintingsnake',
-  availableDay: 0,
-  deadline: 0,
-  assistant: false,
-  kylar: 'none' as 'none' | 'help' | 'sabotage',
-  kylarStreet: false,
-  kylarPrepared: false,
-  archive: 0,
-  museum: 0,
-  recovery: 'none' as 'none' | 'recorded' | 'rushed',
-  ruin: 0,
-  draft: 0,
-  final: 0
-};
+import School from './LifeSimulation/School';
+import { DEFAULT_LIFE_SIMULATION_STATE, type GymPlan } from './constants';
 
 class LifeSimulation extends Module {
-  static readonly variables = {
-    historyProject: DEFAULT_HISTORY_PROJECT_STATE,
-    school: DEFAULT_SCHOOL_STATE,
-    gym: {
-      ticket_day: -1,
-      membership: 'none' as Exclude<GymPlan, 'visit'> | 'none',
-      expires_at: 0,
-      sessions_today: 0,
-      washed_today: false,
-      activity: '' as '' | 'weights' | 'run' | 'stretch' | 'deck-run'
-    }
-  };
-
   public readonly exposed = true;
   public readonly academics = new AcademicHonours();
   public readonly school = new School(this.core);
 
   public constructor(core: typeof maplebirch) {
-    super(core, 'LifeSimulation', LifeSimulation.variables);
+    super(core, 'LifeSimulation', DEFAULT_LIFE_SIMULATION_STATE);
   }
 
   public override preInit(): void {
@@ -65,6 +33,34 @@ class LifeSimulation extends Module {
   public get has(): boolean {
     const gym = V.LifeSimulation.gym;
     return gym.ticket_day === Time.days || gym.membership === 'lifetime' || (gym.membership !== 'none' && gym.expires_at > Time.date.timeStamp);
+  }
+
+  /** 多伦在工作日放学后、休息日白天才可能来训练。 */
+  private get dorenCanVisit(): boolean {
+    return C.npc.Doren?.init === 1 && C.npc.Doren.state === 'active' && Time.hour >= (Time.schoolDay ? 16 : 10) && Time.hour < 20;
+  }
+
+  /** 首次在合适时段进入训练区时决定当天是否遇见多伦。 */
+  public rollDorenVisit(): void {
+    const gym = V.LifeSimulation.gym;
+    if (!this.has || !this.dorenCanVisit || gym.doren_checked_day === Time.days) return;
+    gym.doren_checked_day = Time.days;
+    gym.doren_present = Math.random() < 0.5;
+  }
+
+  public get dorenPresent(): boolean {
+    const gym = V.LifeSimulation.gym;
+    return this.has && this.dorenCanVisit && gym.doren_checked_day === Time.days && gym.doren_present;
+  }
+
+  /** 聊天与陪练共用每日次数；陪练也占用一次正常锻炼额度。 */
+  public meetDoren(train: boolean): boolean {
+    const gym = V.LifeSimulation.gym;
+    if (!this.dorenPresent || gym.doren_interaction_day === Time.days || V.exposed > 0) return false;
+    if (train && (gym.sessions_today >= 3 || window.pcAreArmsBound('both'))) return false;
+    gym.doren_interaction_day = Time.days;
+    if (train) gym.sessions_today++;
+    return true;
   }
 
   public activate(plan: GymPlan): void {
