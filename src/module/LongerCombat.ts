@@ -34,6 +34,11 @@ class LongerCombat {
     return V.options.maplebirch.LongerCombat;
   }
 
+  private get canExtendCombat(): boolean {
+    const train = V.combatTrain;
+    return V.combat === 1 && !V.stalk && !(Number(train?.length) > 0 || Number(train?.total_length) > 0);
+  }
+
   private npcHis(pronouns: { his: string }): string {
     const suffix = lanSwitch('', '的');
     return suffix && !pronouns.his.endsWith(suffix) ? pronouns.his + suffix : pronouns.his;
@@ -303,13 +308,13 @@ class LongerCombat {
         maplebirch.dynamic.regStateEvent('gate', 'LongerCombat', {
           output: 'LongerCombat',
           priority: 100,
-          cond: () => V.combat === 1 && !V.stalk,
+          cond: () => this.canExtendCombat,
           forceExit: () => V.enemyarousal >= V.enemyarousalmax && !this.shouldEndCombat
         });
 
         // 只改变普通遭遇战每回合的流逝秒数，原版 Time.pass 和其它状态结算继续运行。
         maplebirch.dynamic.regTimeEvent('onBefore', 'LongerCombat', {
-          cond: () => V.combat === 1 && !V.stalk,
+          cond: () => this.canExtendCombat,
           action: data => (data.passed = this.options.seconds)
         });
       },
