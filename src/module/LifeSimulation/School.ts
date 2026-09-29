@@ -257,13 +257,13 @@ class School {
       if (target === 'Robin' && C.npc.Robin.trauma >= 20) loveChange = 1;
       if (target === 'Sydney' && C.npc.Sydney.love >= 40 && C.npc.Sydney.corruption >= 30 && C.npc.Sydney.purity < 50) loveChange = 2;
       if (target === 'Kylar' && C.npc.Kylar.rage >= 60) loveChange = 1;
-      if (target === 'Whitney' && (C.npc.Whitney.love >= 30 || V.whitneyromance === 1)) loveChange = 1;
+      if (target === 'Whitney' && (C.npc.Whitney.love >= 25 || V.whitneyromance === 1)) loveChange = 1;
     }
     if (outcome === 'pressure') {
       if (target === 'Robin' && C.npc.Robin.trauma >= 20) loveChange = -4;
       if (target === 'Sydney' && C.npc.Sydney.purity >= 50) loveChange = -3;
       if (target === 'Kylar' && C.npc.Kylar.rage >= 60) loveChange = -4;
-      if (target === 'Whitney' && (C.npc.Whitney.love >= 30 || V.whitneyromance === 1)) loveChange = -4;
+      if (target === 'Whitney' && (C.npc.Whitney.love >= 25 || V.whitneyromance === 1)) loveChange = -4;
     }
 
     this.adjustStanding(...DUTY_STANDING_CHANGES[target][outcome]);
@@ -289,7 +289,7 @@ class School {
         case 'Kylar':
           return C.npc.Kylar.love >= 30 && C.npc.Kylar.rage < 60;
         case 'Whitney':
-          return C.npc.Whitney.love >= 30 || V.whitneyromance === 1;
+          return C.npc.Whitney.love >= 25 || V.whitneyromance === 1;
       }
     })();
 
