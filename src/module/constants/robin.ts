@@ -7,7 +7,7 @@ export type AsylumStatus = 'home' | 'admitted' | 'recovering';
 /** 罗宾店铺的开办阶段。 */
 export type ShopStage = 'none' | 'planning' | 'applied' | 'site' | 'inspected' | 'permitted';
 
-// 模块 RobinExpansion 的存档结构，对应 V.RobinExpansion。
+// Robin 模块沿用 V.RobinExpansion 存档字段，保留旧存档进度。
 export interface RobinExpansionState {
   /** 柠檬水摊位的改造等级。 */
   lemonade: number;

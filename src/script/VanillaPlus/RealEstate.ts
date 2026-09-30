@@ -1,8 +1,9 @@
 export default function RealEstate(maplebirch: typeof window.maplebirch): void {
-  maplebirch.tool.addTo('BeforeLinkZone', {
-    widget: 'deadwood-reblooms-property-furnishings-link',
-    passage: 'Furniture Shop Catalogue'
-  });
+  maplebirch.tool.addTo(
+    'BeforeLinkZone',
+    { widget: 'deadwood-reblooms-property-furnishings-link', passage: 'Furniture Shop' },
+    { widget: 'deadwood-reblooms-property-furnishings-link', passage: 'Furniture Shop Catalogue' }
+  );
   // 这些原版 Passage 能与 NPC 当面交谈。课堂入口还需由原版出勤状态与考试阶段筛选。
   maplebirch.tool.addTo(
     'BeforeLinkZone',

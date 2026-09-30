@@ -66,6 +66,13 @@
 		<</if>><br>
 		<<furnitureicon _wardrobe.iconFile>><<lanLink '衣柜' 'Deadwood Reblooms Property Wardrobe'>><</lanLink>><br>
 	<</if>>
+	<<set _roomFurnishings to ['table', 'chair', 'desk', 'decoration', 'windowsill']>>
+	<<for _kind range _roomFurnishings>>
+		<<set _furnishing to maplebirch.VP.realEstate.furniture(_property.id, _kind)>>
+		<<if _furnishing and (_kind isnot 'desk' or _property.rooms.desk)>>
+			<<furnitureicon _furnishing.iconFile>><<= _furnishing.nameCap>><br>
+		<</if>>
+	<</for>>
 	<<mirroricon 'home'>><<lanLink '镜子' 'Deadwood Reblooms Property Mirror'>><<preMirror>><</lanLink>><br>
 	<<roomoptions>>
 	<<lanLink '游戏设置' 'Settings'>><<set $settingsExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
@@ -95,10 +102,15 @@
 	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
+	<<set _deskFurniture to maplebirch.VP.realEstate.furniture(_property.id, 'desk')>>
+	<<set _deskChair to maplebirch.VP.realEstate.furniture(_property.id, 'chair')>>
 	<<language>>
 		<<option 'EN'>>You sit at the desk. There is enough room to spread out a book beneath the lamp.
 		<<option 'CN'>>你在书桌前坐下。灯下有足够的地方摊开一本书。
 	<</language>><br><br>
+	<<if _deskFurniture>><<furnitureicon _deskFurniture.iconFile>><<= _deskFurniture.nameCap>><br><</if>>
+	<<if _deskChair>><<furnitureicon _deskChair.iconFile>><<= _deskChair.nameCap>><br><</if>>
+	<br>
 	<<if $studyBooks is undefined>><<set $studyBooks to {rented: 'none', stolen: 'none'}>><</if>>
 	<<homeStudyOptions>>
 	<<if maplebirch.get('LS') and $LifeSimulation.school.role isnot 'student' and $LifeSimulation.school.study_session_day isnot Time.days>>

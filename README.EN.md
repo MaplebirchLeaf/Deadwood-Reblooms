@@ -32,10 +32,10 @@
 | Module                | Content                                                                   |
 | --------------------- | ------------------------------------------------------------------------- |
 | `DR`                  | Base options, game guide, clothing search, and mod statistics             |
-| `SydneyExpansion`     | Sydney's dormitory, Sirris estate, and relationship scenes                |
-| `RobinExpansion`      | Robin's stands, Cliff Street drink shop, shared life, and intimate scenes |
-| `WhitneyExpansion`    | Underground brothel rescue, reunion, and daily interactions               |
-| `KylarExpansion`      | Manor stays and room interactions                                         |
+| `Sydney`              | Sydney's dormitory, Sirris estate, and relationship scenes                |
+| `Robin`               | Robin's stands, Cliff Street drink shop, shared life, and intimate scenes |
+| `Whitney`             | Underground brothel rescue, reunion, and daily interactions               |
+| `Kylar`               | Manor stays and room interactions                                         |
 | `LS`                  | Attendance pass, prefect, student president, school reputation, and gym   |
 | `VP`                  | Stat breakthroughs, homes, banking, stocks, and other vanilla additions   |
 | `CA`                  | Solar eclipses, meteor showers, and changing sky and weather visuals      |
@@ -59,7 +59,7 @@ Thanks to the following creators for their work and help. You can turn off the c
 
 - `LongerCombat`: [Longer Combat](https://github.com/emicoto/DOLMods/) by 狐千月.
 - `MLIANPCA`: [social sidebar portraits](https://github.com/Eudemonism00/DOL-npcicon-mods/) by Eudemonism00 and [More Love Interests](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod) by 苯环.
-- `RobinExpansion`: [Dom Robin](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod) by 零环零幻想.
+- `Robin`: [Dom Robin](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod) by 零环零幻想.
 - `LS`: [DoLSims](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims) by 丧心.
 - Horse transformation sprites: 元夕.
 

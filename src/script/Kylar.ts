@@ -1,4 +1,4 @@
-export default function KylarExpansion(maplebirch: typeof window.maplebirch): void {
+export default function Kylar(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo('BeforeLinkZone', {
     widget: 'deadwood-reblooms-kylar-bedroom-links',
     passage: 'Manor Kylar Room'

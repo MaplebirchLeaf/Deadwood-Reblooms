@@ -6,8 +6,8 @@ import Mortgage, { type MortgageState } from './Mortgage';
 type PropertyId = string;
 type LocalizedText = { EN: string; CN: string };
 type PropertyRoom = 'bedroom' | 'bathroom' | 'kitchen' | 'desk' | 'guest' | 'retreat' | 'outdoor' | 'balcony';
-type FurnitureKind = 'bed' | 'wardrobe';
-type PropertyFurniture = { name: string; nameCap: string; cost: number; type: string[]; iconFile: string };
+type FurnitureKind = 'bed' | 'table' | 'chair' | 'desk' | 'wardrobe' | 'decoration' | 'windowsill';
+type PropertyFurniture = { id: string; name: string; nameCap: string; cost: number; type: string[]; category: string[]; iconFile: string; description?: string; showCheck?: string; tier?: number };
 
 // YAML 是房源的唯一静态来源。价格和租金均以便士计；rooms 的数字是楼层编号。
 interface PropertyFloor {
@@ -23,9 +23,7 @@ interface Property {
   weekly_rent_percent: number;
   resident_capacity: number;
   bed_id: string;
-  bed_upgrade_id?: string;
   wardrobe_id: string;
-  wardrobe_upgrade_id?: string;
   name: LocalizedText;
   entry_label: LocalizedText;
   mirror_label: LocalizedText;
@@ -88,6 +86,7 @@ interface PropertyManagement {
   next_settlement_day: number;
   bed_id: string | null;
   wardrobe_id: string | null;
+  furnishings?: Partial<Record<FurnitureKind, string>>;
 }
 
 interface AuctionRecord {
@@ -174,9 +173,7 @@ export class RealEstate {
         !Number.isSafeInteger(property.resident_capacity) ||
         property.resident_capacity! < 0 ||
         !property.bed_id ||
-        (property.bed_upgrade_id !== undefined && property.bed_upgrade_id === property.bed_id) ||
         !property.wardrobe_id ||
-        (property.wardrobe_upgrade_id !== undefined && property.wardrobe_upgrade_id === property.wardrobe_id) ||
         !localized(property.name) ||
         !localized(property.entry_label) ||
         !localized(property.mirror_label) ||
@@ -300,7 +297,7 @@ export class RealEstate {
         case 'Sydney': {
           // 原版 sydneySchedule 的 home 不总是夜间：受罚和假日白天也会返回 home。
           // 同住只接管正常睡眠时段，节庆留宿与已约好的庄园探访优先。
-          const expansion = this.core.get('SydneyExpansion') ? V.SydneyExpansion : undefined;
+          const expansion = this.core.get('Sydney') ? V.SydneyExpansion : undefined;
           const halloweenNight = (Time.month === 10 && Time.monthDay === 31 && Time.hour >= 21) || (Time.month === 11 && Time.monthDay === 1 && Time.hour < 7);
           const halloweenVisit =
             expansion?.halloweenYear === Time.year || (expansion?.robinHalloweenYear === Time.year && expansion?.whitneyHalloweenYear === Time.year && V.halloween_kylar_proposed === 1);
@@ -415,7 +412,8 @@ export class RealEstate {
       auction_day: null,
       next_settlement_day: RealEstate.today() + 7,
       bed_id: null,
-      wardrobe_id: null
+      wardrobe_id: null,
+      furnishings: {}
     };
   }
 
@@ -426,31 +424,41 @@ export class RealEstate {
   public furniture(id: PropertyId, kind: FurnitureKind): PropertyFurniture | null {
     const property = this.properties.find(item => item.id === id);
     if (!property) return null;
-    const installed = kind === 'bed' ? (this.managementFor(id).bed_id ?? property.bed_id) : (this.managementFor(id).wardrobe_id ?? property.wardrobe_id);
-    return window.Furniture.get(installed, true);
+    const state = this.managementFor(id);
+    const installed =
+      state.furnishings?.[kind] ??
+      (kind === 'bed' ? (state.bed_id ?? property.bed_id) : kind === 'wardrobe' ? (state.wardrobe_id ?? property.wardrobe_id) : kind === 'desk' && property.rooms.desk ? 'desk' : null);
+    if (!installed) return null;
+    const item = window.Furniture.get(installed, true);
+    return item ? { ...item, id: installed, category: [] } : null;
   }
 
   public canShareBed(id: PropertyId): boolean {
     return this.furniture(id, 'bed')?.type.includes('double') === true;
   }
 
-  public furnitureUpgrade(id: PropertyId, kind: FurnitureKind): { id: string; item: PropertyFurniture; cost: number } | null {
+  public furnitureOffers(id: PropertyId, kind: FurnitureKind): { id: string; item: PropertyFurniture; cost: number }[] {
     const property = this.properties.find(item => item.id === id);
-    if (!property) return null;
-    const next = kind === 'bed' ? property.bed_upgrade_id : property.wardrobe_upgrade_id;
-    const installed = kind === 'bed' ? this.managementFor(id).bed_id : this.managementFor(id).wardrobe_id;
-    if (!next || installed === next) return null;
-    const item = window.Furniture.get(next, true);
-    return item ? { id: next, item, cost: window.Furniture.setPrice(item.cost) } : null;
+    if (!property || (kind === 'desk' && !property.rooms.desk)) return [];
+    const current = this.furniture(id, kind);
+    const stock = setup.furniture as Map<string, PropertyFurniture>;
+    return Array.from(stock.entries())
+      .filter(([key, item]) => item.category.includes(kind) && !item.type.includes('starter') && key !== current?.id && !['disabled', 'notBedroom'].includes(item.showCheck ?? ''))
+      .filter(([, item]) => item.showCheck !== 'isWardrobeHigherTier' || (item.tier ?? 0) > (current?.tier ?? 0))
+      .map(([key, item]) => ({ id: key, item, cost: window.Furniture.setPrice(item.cost) }));
   }
 
-  public installFurniture(id: PropertyId, kind: FurnitureKind): void {
-    if (!this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return;
-    const upgrade = this.furnitureUpgrade(id, kind);
-    if (!upgrade) return;
-    // 付款由家具店链接中的原版 money 宏完成。Furniture.set() 不认识新增的房产地点。
-    if (kind === 'bed') this.managementFor(id).bed_id = upgrade.id;
-    else this.managementFor(id).wardrobe_id = upgrade.id;
+  public installFurniture(id: PropertyId, kind: FurnitureKind, itemId: string): boolean {
+    if (!this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return false;
+    const offer = this.furnitureOffers(id, kind).find(item => item.id === itemId);
+    if (!offer || V.money < offer.cost) return false;
+    const management = this.managementFor(id);
+    management.furnishings ??= {};
+    management.furnishings[kind] = itemId;
+    if (kind === 'bed') management.bed_id = itemId;
+    if (kind === 'wardrobe') management.wardrobe_id = itemId;
+    // 家具目录的默认目标只有原版住所；自购房的安装状态独立存档。
+    return true;
   }
 
   public visit(id: PropertyId): boolean {

@@ -3,7 +3,7 @@
 - 狐千月：[更长遭遇战](https://github.com/emicoto/DOLMods/)，为 `LongerCombat` 提供创作方向。
 - Eudemonism00：[NPC 社交栏头像](https://github.com/Eudemonism00/DOL-npcicon-mods/)，为 `MLIANPCA` 提供头像来源。
 - 苯环：[更多恋人](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod)，为 `MLIANPCA` 提供功能方向。
-- 零环零幻想：[Dom 罗宾](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod)，为 `RobinExpansion` 提供创作方向。
+- 零环零幻想：[Dom 罗宾](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod)，为 `Robin` 提供创作方向。
 - 丧心：[模拟人生](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims)，为 `LS` 提供校园玩法参考。
 - 元夕：提供马转化贴图。
 

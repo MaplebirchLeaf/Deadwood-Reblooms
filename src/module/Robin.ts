@@ -1,17 +1,17 @@
 import Module from './Module';
 import { DEFAULT_ROBIN_EXPANSION_STATE, type RobinExpansionState } from './constants';
-import type { RobinFacade } from './RobinExpansion/Shared';
-import RobinAsylum from './RobinExpansion/Asylum';
-import RobinBalloon from './RobinExpansion/Balloon';
-import RobinFlowers from './RobinExpansion/Flowers';
-import RobinFishing from './RobinExpansion/Fishing';
-import RobinMarket from './RobinExpansion/Market';
-import RobinNight from './RobinExpansion/Night';
-import RobinRent from './RobinExpansion/Rent';
-import RobinShop from './RobinExpansion/Shop';
-import RobinTutoring from './RobinExpansion/Tutoring';
+import type { RobinFacade } from './Robin/Shared';
+import RobinAsylum from './Robin/Asylum';
+import RobinBalloon from './Robin/Balloon';
+import RobinFlowers from './Robin/Flowers';
+import RobinFishing from './Robin/Fishing';
+import RobinMarket from './Robin/Market';
+import RobinNight from './Robin/Night';
+import RobinRent from './Robin/Rent';
+import RobinShop from './Robin/Shop';
+import RobinTutoring from './Robin/Tutoring';
 
-class RobinExpansion extends Module implements RobinFacade {
+class Robin extends Module implements RobinFacade {
   public readonly rent: RobinRent;
   public readonly flowers: RobinFlowers;
   public readonly fishing: RobinFishing;
@@ -260,4 +260,4 @@ class RobinExpansion extends Module implements RobinFacade {
   }
 }
 
-export default RobinExpansion;
+export default Robin;

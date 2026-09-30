@@ -32,10 +32,10 @@
 | 模块                  | 内容                                           |
 | --------------------- | ---------------------------------------------- |
 | `DR`                  | 基础设置、模组指南、服装搜索和模组统计         |
-| `SydneyExpansion`     | 悉尼宿舍、西里斯庄园与关系互动                 |
-| `RobinExpansion`      | 罗宾的摊位、峭壁街饮品店、共同生活与亲密互动   |
-| `WhitneyExpansion`    | 地下妓院营救、重逢与后续日常                   |
-| `KylarExpansion`      | 凯拉尔庄园留宿与房间互动                       |
+| `Sydney`              | 悉尼宿舍、西里斯庄园与关系互动                 |
+| `Robin`               | 罗宾的摊位、峭壁街饮品店、共同生活与亲密互动   |
+| `Whitney`             | 地下妓院营救、重逢与后续日常                   |
+| `Kylar`               | 凯拉尔庄园留宿与房间互动                       |
 | `LS`                  | 免听凭证、风纪委员、学生会长、校园评价及健身房 |
 | `VP`                  | 属性突破、住宅、银行、证券及其他原版增强       |
 | `CA`                  | 日蚀、流星雨与天气画面变化                     |
@@ -59,7 +59,7 @@
 
 - `LongerCombat`：狐千月的[更长遭遇战](https://github.com/emicoto/DOLMods/)。
 - `MLIANPCA`：Eudemonism00 的[社交栏小头像](https://github.com/Eudemonism00/DOL-npcicon-mods/)与苯环的[更多恋人](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod)。
-- `RobinExpansion`：零环零幻想的[Dom 罗宾](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod)。
+- `Robin`：零环零幻想的[Dom 罗宾](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod)。
 - `LS`：丧心的[模拟人生](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims)。
 - 马转化贴图：元夕。
 
