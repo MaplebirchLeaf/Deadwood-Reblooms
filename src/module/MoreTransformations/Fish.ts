@@ -6,6 +6,14 @@ import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 type SkillValue = (skill: string, disableModifiers?: number) => number;
 
+const fishFinsLayer: CanvasLayerMap[string] = {
+  showfn: options => options.show_tf && isPartEnabled(V.transformationParts?.fish?.fins) && !options.hide_all && options.maplebirchTransformation,
+  masksrcfn: options => {
+    if (options.worn.over_upper.setup.name === 'kaiju costume') return 'img/clothes/over-upper/kaiju/mask.png';
+    if (!options.hideHeadAcc) return options.headMask;
+  }
+};
+
 class Fish extends Transformation {
   constructor() {
     super(
@@ -34,15 +42,19 @@ class Fish extends Transformation {
 
         layers: {
           fish_fins: {
+            ...fishFinsLayer,
             src: 'img/transformations/fish/fins/default.png',
-            showfn: options => options.show_tf && isPartEnabled(V.transformationParts?.fish?.fins) && !options.hide_all && options.maplebirchTransformation,
-            masksrcfn: options => {
-              if (options.worn.over_upper.setup.name === 'kaiju costume') return 'img/clothes/over-upper/kaiju/mask.png';
-              if (!options.hideHeadAcc) return options.headMask;
-            },
             zfn: options => {
               if (options.hideHeadAcc) return maplebirch.char.ZIndices.over_head;
               return maplebirch.char.ZIndices.front_hair + 1;
+            }
+          },
+          fish_fins_portrait: {
+            ...fishFinsLayer,
+            src: 'img/transformations/fish/fins/default-portrait.png',
+            zfn: options => {
+              if (options.hideHeadAcc) return maplebirch.char.ZIndices.over_head;
+              return maplebirch.char.ZIndices.ears + 0.1;
             }
           },
           fish_tail: {

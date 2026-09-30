@@ -1,6 +1,6 @@
 // ./src/module/constants/kylar-expansion.ts
 
-// 模块 KylarExpansion 的存档结构，对应 V.KylarExpansion。
+// Kylar 模块沿用 V.KylarExpansion 存档字段，保留旧存档进度。
 export interface KylarExpansionState {
   /** 是否已接受庄园留宿邀请。 */
   stay_invited: boolean;

@@ -1,59 +1,11 @@
-import propertiesSource from '@/assets/finance/properties.yaml';
-import residentsSource from '@/assets/finance/residents.yaml';
+import PropertyCatalog, { type Property, type ResidentProfile } from './PropertyCatalog';
 import type Finance from './Finance';
 import Mortgage, { type MortgageState } from './Mortgage';
 
 type PropertyId = string;
-type LocalizedText = { EN: string; CN: string };
 type PropertyRoom = 'bedroom' | 'bathroom' | 'kitchen' | 'desk' | 'guest' | 'retreat' | 'outdoor' | 'balcony';
-type FurnitureKind = 'bed' | 'wardrobe';
-type PropertyFurniture = { name: string; nameCap: string; cost: number; type: string[]; iconFile: string };
-
-// YAML 是房源的唯一静态来源。价格和租金均以便士计；rooms 的数字是楼层编号。
-interface PropertyFloor {
-  name: LocalizedText;
-  description: LocalizedText;
-}
-
-interface Property {
-  id: PropertyId;
-  street: string;
-  street_name: LocalizedText;
-  price: number;
-  weekly_rent_percent: number;
-  resident_capacity: number;
-  bed_id: string;
-  bed_upgrade_id?: string;
-  wardrobe_id: string;
-  wardrobe_upgrade_id?: string;
-  name: LocalizedText;
-  entry_label: LocalizedText;
-  mirror_label: LocalizedText;
-  // 庭院、阳台的门从哪一处打开，不用楼层号推断动线。
-  outdoor_access: 'sitting' | 'landing' | 'retreat';
-  description: LocalizedText;
-  floors: PropertyFloor[];
-  rooms: Record<'bedroom' | 'bathroom' | 'kitchen' | 'outdoor', number> & Partial<Record<'desk' | 'guest' | 'retreat' | 'balcony', number>>;
-  interior: {
-    bedroom_label: LocalizedText;
-    bedroom: LocalizedText;
-    sitting_rest?: LocalizedText;
-    bathroom: LocalizedText;
-    kitchen_label: LocalizedText;
-    kitchen: LocalizedText;
-    outdoor_label: LocalizedText;
-    outdoor: LocalizedText;
-    outdoor_view: LocalizedText;
-    balcony_label?: LocalizedText;
-    balcony?: LocalizedText;
-    balcony_view?: LocalizedText;
-    guest?: LocalizedText;
-    retreat_label?: LocalizedText;
-    retreat?: LocalizedText;
-    retreat_rest?: LocalizedText;
-    renovated: LocalizedText;
-  };
-}
+type FurnitureKind = 'bed' | 'table' | 'chair' | 'desk' | 'wardrobe' | 'decoration' | 'windowsill';
+type PropertyFurniture = { id: string; name: string; nameCap: string; cost: number; type: string[]; category: string[]; iconFile: string; description?: string; showCheck?: string; tier?: number };
 
 export interface RealEstateState {
   // 每次从当前存档的 V 读取。房产表放在配置中，这里只保留产权与房屋的可变状态。
@@ -72,13 +24,6 @@ export interface RealEstateState {
   glide_scared_day: number;
 }
 
-interface ResidentProfile {
-  id: string;
-  welcome: LocalizedText;
-  evening: LocalizedText;
-  together: LocalizedText;
-}
-
 interface PropertyManagement {
   condition: number;
   renovation: number;
@@ -88,6 +33,7 @@ interface PropertyManagement {
   next_settlement_day: number;
   bed_id: string | null;
   wardrobe_id: string | null;
+  furnishings?: Partial<Record<FurnitureKind, string>>;
 }
 
 interface AuctionRecord {
@@ -127,11 +73,11 @@ export class RealEstate {
   }
 
   public get properties(): readonly Property[] {
-    return (this.loadedProperties ??= RealEstate.loadProperties(this.core));
+    return (this.loadedProperties ??= PropertyCatalog.loadProperties(this.core));
   }
 
   public get residentProfiles(): readonly ResidentProfile[] {
-    return (this.loadedResidents ??= RealEstate.loadResidents(this.core));
+    return (this.loadedResidents ??= PropertyCatalog.loadResidents(this.core));
   }
 
   public askingPrice(id: PropertyId): number {
@@ -147,90 +93,9 @@ export class RealEstate {
     // 读档只恢复 V 中的房产和结算游标；经济结算只由游戏时间跨日触发。
     // 优先于 Finance 收取其他贷款和信用卡款项，使当天租金能先入账。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-property-management', {
-      action: () => this.advanceProperties(),
+      action: () => this.settleDays(),
       exact: true,
       priority: 1
-    });
-  }
-
-  private static loadProperties(core: typeof maplebirch): Property[] {
-    const data = core.yaml.load(propertiesSource);
-    if (!Array.isArray(data)) throw new Error('Real estate config must be an array.');
-    const ids = new Set<string>();
-    const localized = (value: LocalizedText | undefined): boolean => typeof value?.EN === 'string' && value.EN.length > 0 && typeof value.CN === 'string' && value.CN.length > 0;
-    const properties = data.map((item, index) => {
-      if (!item || typeof item !== 'object' || Array.isArray(item)) throw new Error(`Real estate property #${index + 1} is invalid.`);
-      const property = item as Partial<Property>;
-      if (
-        !property.id ||
-        !property.street ||
-        !localized(property.street_name) ||
-        typeof property.price !== 'number' ||
-        !Number.isSafeInteger(property.price) ||
-        property.price <= 0 ||
-        typeof property.weekly_rent_percent !== 'number' ||
-        !Number.isFinite(property.weekly_rent_percent) ||
-        property.weekly_rent_percent <= 0 ||
-        !Number.isSafeInteger(property.resident_capacity) ||
-        property.resident_capacity! < 0 ||
-        !property.bed_id ||
-        (property.bed_upgrade_id !== undefined && property.bed_upgrade_id === property.bed_id) ||
-        !property.wardrobe_id ||
-        (property.wardrobe_upgrade_id !== undefined && property.wardrobe_upgrade_id === property.wardrobe_id) ||
-        !localized(property.name) ||
-        !localized(property.entry_label) ||
-        !localized(property.mirror_label) ||
-        !['sitting', 'landing', 'retreat'].includes(property.outdoor_access!) ||
-        !localized(property.description) ||
-        !Array.isArray(property.floors) ||
-        property.floors.length === 0 ||
-        property.floors.some(floor => !localized(floor?.name) || !localized(floor?.description)) ||
-        !property.rooms ||
-        (['bedroom', 'bathroom', 'kitchen', 'outdoor'] as const).some(
-          room => !Number.isInteger(property.rooms?.[room]) || property.rooms![room] < 1 || property.rooms![room] > property.floors!.length
-        ) ||
-        (['desk', 'guest', 'retreat', 'balcony'] as const).some(
-          room => property.rooms?.[room] !== undefined && (!Number.isInteger(property.rooms[room]) || property.rooms[room]! < 1 || property.rooms[room]! > property.floors!.length)
-        ) ||
-        (property.outdoor_access === 'sitting' && property.rooms.outdoor !== 1) ||
-        (property.outdoor_access === 'landing' && property.rooms.outdoor === 1) ||
-        (property.outdoor_access === 'retreat' && property.rooms.retreat !== property.rooms.outdoor) ||
-        !localized(property.interior?.bedroom_label) ||
-        !localized(property.interior?.bedroom) ||
-        (property.rooms?.retreat === undefined && !localized(property.interior?.sitting_rest)) ||
-        !localized(property.interior?.bathroom) ||
-        !localized(property.interior?.kitchen_label) ||
-        !localized(property.interior?.kitchen) ||
-        !localized(property.interior?.outdoor_label) ||
-        !localized(property.interior?.outdoor) ||
-        !localized(property.interior?.outdoor_view) ||
-        (property.rooms?.balcony !== undefined && (!localized(property.interior?.balcony_label) || !localized(property.interior?.balcony) || !localized(property.interior?.balcony_view))) ||
-        (property.rooms?.guest !== undefined && !localized(property.interior?.guest)) ||
-        (property.rooms?.retreat !== undefined && (!localized(property.interior?.retreat_label) || !localized(property.interior?.retreat) || !localized(property.interior?.retreat_rest))) ||
-        !localized(property.interior?.renovated) ||
-        ids.has(property.id)
-      ) {
-        throw new Error(`Real estate property #${index + 1} is incomplete or duplicated.`);
-      }
-      ids.add(property.id);
-      return property as Property;
-    });
-    if (properties.some(property => property.resident_capacity > (property.rooms.guest === undefined ? 1 : 2))) throw new Error('Resident capacity exceeds the configured bedrooms.');
-    return properties;
-  }
-
-  private static loadResidents(core: typeof maplebirch): ResidentProfile[] {
-    const data = core.yaml.load(residentsSource);
-    if (!Array.isArray(data)) throw new Error('Real estate residents config must be an array.');
-    const ids = new Set<string>();
-    const localized = (value: LocalizedText | undefined): boolean => typeof value?.EN === 'string' && value.EN.length > 0 && typeof value.CN === 'string' && value.CN.length > 0;
-    return data.map((item, index) => {
-      const profile = item as Partial<ResidentProfile> | null;
-      if (!profile?.id || ids.has(profile.id) || !localized(profile.welcome) || !localized(profile.evening) || !localized(profile.together)) {
-        throw new Error(`Real estate resident #${index + 1} is incomplete or duplicated.`);
-      }
-      ids.add(profile.id);
-      return profile as ResidentProfile;
     });
   }
 
@@ -266,7 +131,7 @@ export class RealEstate {
 
   // 原版 isLoveInterest 读取当前存档的恋人槽位，模组已将扩展列表接入该函数。
   // 同住只关心是否为当前恋人，不用判断角色是否还能被选为恋人。
-  private reconcileResidents(): void {
+  private filterResidents(): void {
     const residents = (this.state.residents ??= {});
     for (const [id, names] of Object.entries(residents)) {
       residents[id] = names.filter(name => this.owns(id) && !this.managementFor(id).rented && window.isLoveInterest(name) && this.residentProfiles.some(profile => profile.id === name));
@@ -274,7 +139,7 @@ export class RealEstate {
   }
 
   public residentsAt(id: PropertyId): ResidentProfile[] {
-    this.reconcileResidents();
+    this.filterResidents();
     return (this.state.residents[id] ?? []).flatMap(name => {
       const profile = this.residentProfiles.find(item => item.id === name);
       return profile ? [profile] : [];
@@ -300,7 +165,7 @@ export class RealEstate {
         case 'Sydney': {
           // 原版 sydneySchedule 的 home 不总是夜间：受罚和假日白天也会返回 home。
           // 同住只接管正常睡眠时段，节庆留宿与已约好的庄园探访优先。
-          const expansion = this.core.get('SydneyExpansion') ? V.SydneyExpansion : undefined;
+          const expansion = this.core.get('Sydney') ? V.SydneyExpansion : undefined;
           const halloweenNight = (Time.month === 10 && Time.monthDay === 31 && Time.hour >= 21) || (Time.month === 11 && Time.monthDay === 1 && Time.hour < 7);
           const halloweenVisit =
             expansion?.halloweenYear === Time.year || (expansion?.robinHalloweenYear === Time.year && expansion?.whitneyHalloweenYear === Time.year && V.halloween_kylar_proposed === 1);
@@ -335,7 +200,7 @@ export class RealEstate {
   }
 
   public inviteResident(name: string, id: PropertyId): boolean {
-    this.reconcileResidents();
+    this.filterResidents();
     const property = this.properties.find(item => item.id === id);
     if (!property || !this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return false;
     const profile = this.residentProfiles.find(item => item.id === name);
@@ -415,7 +280,8 @@ export class RealEstate {
       auction_day: null,
       next_settlement_day: RealEstate.today() + 7,
       bed_id: null,
-      wardrobe_id: null
+      wardrobe_id: null,
+      furnishings: {}
     };
   }
 
@@ -426,31 +292,41 @@ export class RealEstate {
   public furniture(id: PropertyId, kind: FurnitureKind): PropertyFurniture | null {
     const property = this.properties.find(item => item.id === id);
     if (!property) return null;
-    const installed = kind === 'bed' ? (this.managementFor(id).bed_id ?? property.bed_id) : (this.managementFor(id).wardrobe_id ?? property.wardrobe_id);
-    return window.Furniture.get(installed, true);
+    const state = this.managementFor(id);
+    const installed =
+      state.furnishings?.[kind] ??
+      (kind === 'bed' ? (state.bed_id ?? property.bed_id) : kind === 'wardrobe' ? (state.wardrobe_id ?? property.wardrobe_id) : kind === 'desk' && property.rooms.desk ? 'desk' : null);
+    if (!installed) return null;
+    const item = window.Furniture.get(installed, true);
+    return item ? { ...item, id: installed, category: [] } : null;
   }
 
   public canShareBed(id: PropertyId): boolean {
     return this.furniture(id, 'bed')?.type.includes('double') === true;
   }
 
-  public furnitureUpgrade(id: PropertyId, kind: FurnitureKind): { id: string; item: PropertyFurniture; cost: number } | null {
+  public furnitureOffers(id: PropertyId, kind: FurnitureKind): { id: string; item: PropertyFurniture; cost: number }[] {
     const property = this.properties.find(item => item.id === id);
-    if (!property) return null;
-    const next = kind === 'bed' ? property.bed_upgrade_id : property.wardrobe_upgrade_id;
-    const installed = kind === 'bed' ? this.managementFor(id).bed_id : this.managementFor(id).wardrobe_id;
-    if (!next || installed === next) return null;
-    const item = window.Furniture.get(next, true);
-    return item ? { id: next, item, cost: window.Furniture.setPrice(item.cost) } : null;
+    if (!property || (kind === 'desk' && !property.rooms.desk)) return [];
+    const current = this.furniture(id, kind);
+    const stock = setup.furniture as Map<string, PropertyFurniture>;
+    return Array.from(stock.entries())
+      .filter(([key, item]) => item.category.includes(kind) && !item.type.includes('starter') && key !== current?.id && !['disabled', 'notBedroom'].includes(item.showCheck ?? ''))
+      .filter(([, item]) => item.showCheck !== 'isWardrobeHigherTier' || (item.tier ?? 0) > (current?.tier ?? 0))
+      .map(([key, item]) => ({ id: key, item, cost: window.Furniture.setPrice(item.cost) }));
   }
 
-  public installFurniture(id: PropertyId, kind: FurnitureKind): void {
-    if (!this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return;
-    const upgrade = this.furnitureUpgrade(id, kind);
-    if (!upgrade) return;
-    // 付款由家具店链接中的原版 money 宏完成。Furniture.set() 不认识新增的房产地点。
-    if (kind === 'bed') this.managementFor(id).bed_id = upgrade.id;
-    else this.managementFor(id).wardrobe_id = upgrade.id;
+  public installFurniture(id: PropertyId, kind: FurnitureKind, itemId: string): boolean {
+    if (!this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return false;
+    const offer = this.furnitureOffers(id, kind).find(item => item.id === itemId);
+    if (!offer || !this.finance.canPay(offer.cost, 'furniture')) return false;
+    const management = this.managementFor(id);
+    management.furnishings ??= {};
+    management.furnishings[kind] = itemId;
+    if (kind === 'bed') management.bed_id = itemId;
+    if (kind === 'wardrobe') management.wardrobe_id = itemId;
+    // 家具目录的默认目标只有原版住所；自购房的安装状态独立存档。
+    return true;
   }
 
   public visit(id: PropertyId): boolean {
@@ -556,8 +432,8 @@ export class RealEstate {
     return loan?.property_id === id && loan.stage === 'frozen';
   }
 
-  private advanceProperties(): void {
-    this.reconcileResidents();
+  private settleDays(): void {
+    this.filterResidents();
     const state = this.state;
     state.daily_evening = [];
     state.daily_night_wake = false;

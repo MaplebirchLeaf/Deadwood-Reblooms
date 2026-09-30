@@ -79,8 +79,8 @@ export default class RobinFlowers extends Shared {
   /** 玩家从店里买走一支花，营业时间 9:00–21:00，货款进罗宾的储备金。 */
   public buyFromShop(type: string): boolean {
     const price = this.price(type);
-    if (!this.state.shop || !this.state.shopFlowers || Time.hour < 9 || Time.hour >= 21 || !price || !(this.state.flowerStock[type] > 0) || V.money < price * 100 || !V.foodstuff?.[type]) return false;
-    V.money -= price * 100;
+    if (!this.state.shop || !this.state.shopFlowers || Time.hour < 9 || Time.hour >= 21 || !price || !(this.state.flowerStock[type] > 0) || !V.foodstuff?.[type]) return false;
+    if (!(this.vanillaPlus?.finance.canPay(price * 100, 'shopping') ?? V.money >= price * 100)) return false;
     V.foodstuff[type].amount++;
     this.state.flowerStock[type]--;
     this.state.reserve += price;

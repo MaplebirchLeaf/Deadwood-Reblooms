@@ -30,7 +30,8 @@
 <</widget>>
 
 <<widget 'deadwood-reblooms-property-furnishings-link'>>
-	<<if maplebirch.VP.realEstate.properties.some(property => maplebirch.VP.realEstate.owns(property.id))>>
+	<<if $exposed lte 0 and Time.dayState isnot 'night' and Time.hour isnot 21 and $stress lt $stressmax
+		and maplebirch.VP.realEstate.properties.some(property => maplebirch.VP.realEstate.owns(property.id))>>
 		<<furnitureicon 'catalogue'>><<lanLink '为自住房选购家具' 'Deadwood Reblooms Property Furnishings'>><</lanLink>><br><br>
 	<</if>>
 <</widget>>
@@ -77,7 +78,7 @@
 		<</switch>>
 	<</if>>
 	<<if !window.isLoveInterest(_name)>>
-		<<lanSwitch 'You need to speak as lovers before making such a promise.' '你们还不是恋人，没法谈这件事。'>><br><br>
+		<span class='blue'><i><<lanSwitch 'You need to speak as lovers before making such a promise.' '你们还不是恋人，没法谈这件事。'>></i></span><br><br>
 	<<else>>
 		<<if _inLesson>>
 			<<lanSwitch 'You lean close and keep your voice low so the teacher cannot hear.' '你凑近对方，压低声音，免得被老师听见。'>><br><br>
@@ -88,11 +89,11 @@
 				<<option 'EN'>>
 				You mention the keys to <<= _currentHome.name.EN>>. <<= _name>> already has one, tucked safely away.
 				<br><br>
-				You can ask <<= _name>> to live separately again, or offer a different home.
+				<span class='blue'><i>You can ask <<= _name>> to live separately again, or offer a different home.</i></span>
 				<<option 'CN'>>
 				你提起<<= _currentHome.name.CN>>的钥匙。<<= maplebirch.auto(_name)>>已经收好了一把。
 				<br><br>
-				你可以和<<= maplebirch.auto(_name)>>商量重新分开住，或是搬去另一处房子。
+				<span class='blue'><i>你可以和<<= maplebirch.auto(_name)>>商量重新分开住，或是搬去另一处房子。</i></span>
 			<</language>><br><br>
 			<<lanLink '商量分开居住' _invitePassage>>
 				<<run maplebirch.VP.realEstate.endCohabitation(_name, _currentHome.id)>>
@@ -163,7 +164,11 @@
 	<</if>>
 	<<if maplebirch.VP.realEstate.floorOf('retreat') is _args[0]>>
 		<<if _roomProperty.id is 'danube'>><<icon 'danube-conservatory.png'>><<else>><<couchicon>><</if>>
-		<<lanLink _roomProperty.interior.retreat_label.CN 'Deadwood Reblooms Property Retreat'>><<pass 1>><</lanLink>><br>
+		<<if _roomProperty.outdoor_access is 'retreat'>>
+			<<lanLink `lanSwitch('Sea-view alcove and balcony (0:01)', '观海角与阳台 (0:01)')` 'Deadwood Reblooms Property Outdoor'>><<pass 1>><</lanLink>><br>
+		<<else>>
+			<<lanLink _roomProperty.interior.retreat_label.CN 'Deadwood Reblooms Property Retreat'>><<pass 1>><</lanLink>><br>
+		<</if>>
 	<</if>>
 	<<if maplebirch.VP.realEstate.floorOf('outdoor') is _args[0]
 		and (_roomProperty.outdoor_access is 'landing' or (_roomProperty.outdoor_access is 'sitting' and _args[0] is 1))>>
@@ -311,52 +316,123 @@
 
 :: Deadwood Reblooms Property Furnishings []
 <<set $outside to 0>><<set $location to 'shopping_centre'>><<effects>>
-<<language>>
-	<<option 'EN'>>
-		You ask to see the furniture that can be delivered to your homes. The shopkeeper opens a catalogue to the beds and wardrobes. Each purchase will be delivered to the chosen address by the time you return.
-	<<option 'CN'>>
-		你问店员有哪些家具能送到你的房子。店员翻开床与衣柜的目录。买下的家具会在你回家前送到指定住处。
-<</language>><br><br>
+<<lanSwitch 'Choose the home to which the furniture should be delivered.' '选择要配送家具的住处。'>><br><br>
 <<for _property range maplebirch.VP.realEstate.properties>>
 	<<capture _property>>
 		<<if maplebirch.VP.realEstate.owns(_property.id)>>
-			<strong class='gold'><<= lanSwitch(_property.name.EN, _property.name.CN)>></strong><br><br>
-			<<set _bed to maplebirch.VP.realEstate.furniture(_property.id, 'bed')>>
-			<<if _bed>>
-				<<furnitureicon _bed.iconFile>><<lanSwitch 'Bed' '床'>>：<<= _bed.nameCap>><br>
-			<</if>>
-			<<set _wardrobe to maplebirch.VP.realEstate.furniture(_property.id, 'wardrobe')>>
-			<<if _wardrobe>>
-				<<furnitureicon _wardrobe.iconFile>><<lanSwitch 'Wardrobe' '衣柜'>>：<<= _wardrobe.nameCap>><br>
-			<</if>>
-			<br>
-			<<if maplebirch.VP.realEstate.managementFor(_property.id).rented || maplebirch.VP.realEstate.isFrozen(_property.id)>>
-				<span class='red'><<lanSwitch 'Furniture cannot be delivered while this home is rented out or frozen.' '房屋出租或冻结期间，无法配送家具。'>></span><br>
-			<<else>>
-				<<set _bedOffer to maplebirch.VP.realEstate.furnitureUpgrade(_property.id, 'bed')>>
-				<<if _bedOffer>>
-					<<capture _bedOffer>>
-						<<furnitureicon _bedOffer.item.iconFile>><<lanSwitch 'Larger bed' '更大的床'>>：<<deadwood-reblooms-finance-money _bedOffer.cost>><br>
-						<<if $money gte _bedOffer.cost>>
-							<<lanLink '购买床' 'Deadwood Reblooms Property Furnishings'>><<money `-_bedOffer.cost` 'furniture'>><<run maplebirch.VP.realEstate.installFurniture(_property.id, 'bed')>><</lanLink>><br>
-						<</if>>
-					<</capture>>
-				<</if>>
-				<<set _wardrobeOffer to maplebirch.VP.realEstate.furnitureUpgrade(_property.id, 'wardrobe')>>
-				<<if _wardrobeOffer>>
-					<<capture _wardrobeOffer>>
-						<<furnitureicon _wardrobeOffer.item.iconFile>><<lanSwitch 'Larger wardrobe' '更大的衣柜'>>：<<deadwood-reblooms-finance-money _wardrobeOffer.cost>><br>
-						<<if $money gte _wardrobeOffer.cost>>
-							<<lanLink '购买衣柜' 'Deadwood Reblooms Property Furnishings'>><<money `-_wardrobeOffer.cost` 'furniture'>><<run maplebirch.VP.realEstate.installFurniture(_property.id, 'wardrobe')>><</lanLink>><br>
-						<</if>>
-					<</capture>>
-				<</if>>
-			<</if>>
-			<br><br>
+			<<deadwood-reblooms-property-street-icon _property.id>>
+			<<lanLink _property.name.CN 'Deadwood Reblooms Property Furniture Catalogue'>>
+				<<set $deadwoodFurnitureProperty to _property.id>>
+				<<set $deadwoodFurnitureCategory to 'bed'>>
+			<</lanLink>><br>
 		<</if>>
 	<</capture>>
 <</for>>
-<<getouticon>><<lanLink '返回家具目录' 'Furniture Shop Catalogue'>><</lanLink>>
+<br><<getouticon>><<lanLink '返回家具店' 'Furniture Shop'>><</lanLink>>
+
+:: Deadwood Reblooms Property Furniture Catalogue []
+<<set $outside to 0>><<set $location to 'shopping_centre'>><<effects>>
+<<set _property to maplebirch.VP.realEstate.properties.find(item => item.id === $deadwoodFurnitureProperty && maplebirch.VP.realEstate.owns(item.id))>>
+<<if !_property>>
+	<<lanSwitch 'Choose a home first.' '请先选择住处。'>><br><br>
+	<<getouticon>><<lanLink '返回' 'Deadwood Reblooms Property Furnishings'>><</lanLink>>
+<<else>>
+	<strong class='gold'><<= lanSwitch(_property.name.EN, _property.name.CN)>></strong><br><br>
+	<<if maplebirch.VP.realEstate.managementFor(_property.id).rented or maplebirch.VP.realEstate.isFrozen(_property.id)>>
+		<span class='red'><<lanSwitch 'Furniture cannot be delivered while this home is rented out or frozen.' '房屋出租或冻结期间，无法配送家具。'>></span><br><br>
+	<<else>>
+		<<lanSwitch 'You browse the furniture catalogue. "No Refunds!" is printed along the top.' '你浏览着家具目录。顶部印着“不退款！”的字样。'>><br><br>
+		<hr>
+		<div class='settingsHeader'><<lanSwitch 'Furniture' '家具'>></div>
+		<div id='furnitureContainer'>
+			<<dynamic 'deadwood-reblooms-property-furniture-links' 'furnitureContainerHeader'>>
+			<<dynamic 'deadwood-reblooms-property-furniture-list' 'furniture-menu-container'>>
+		</div>
+	<</if>>
+	<br><br><<getouticon>><<lanLink '返回住处列表' 'Deadwood Reblooms Property Furnishings'>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Furniture Links [widget]
+<<widget 'deadwood-reblooms-property-furniture-links'>>
+	<<set _categories to [
+		{ id: 'bed', EN: 'Bed', CN: '床' },
+		{ id: 'table', EN: 'Table', CN: '茶几' },
+		{ id: 'chair', EN: 'Chairs', CN: '椅子' },
+		{ id: 'desk', EN: 'Desks', CN: '书桌' },
+		{ id: 'wardrobe', EN: 'Wardrobe', CN: '衣橱' },
+		{ id: 'decoration', EN: 'Decorations', CN: '饰品' },
+		{ id: 'windowsill', EN: 'Miscellaneous', CN: '杂项' }
+	]>>
+	<<run _categories.forEach(item => item.label = lanSwitch(item.EN, item.CN))>>
+	<<for _category range _categories>>
+		<<capture _category>>
+			<div @class="$deadwoodFurnitureCategory is _category.id ? 'shopTabSelected' : 'shopTab'">
+				<button
+					@class="($deadwoodFurnitureCategory is _category.id ? 'selected' : '')"
+					@id="Dynamic.eventBinder(_category.id)"
+					onclick="(id) => $deadwoodFurnitureCategory = id"
+				>_category.label
+				</button>
+			</div>
+		<</capture>>
+	<</for>>
+<</widget>>
+
+:: Deadwood Reblooms Property Furniture List [widget]
+<<widget 'deadwood-reblooms-property-furniture-list'>>
+<<set _property to maplebirch.VP.realEstate.properties.find(item => item.id === $deadwoodFurnitureProperty && maplebirch.VP.realEstate.owns(item.id))>>
+	<<set _current to maplebirch.VP.realEstate.furniture(_property.id, $deadwoodFurnitureCategory)>>
+	<<lanSwitch 'Currently installed in this home:' '这处住处当前摆放的是：'>>
+	<<if _current>>
+		<<furnitureicon _current.iconFile>> <<= _current.nameCap>><br>
+		<<if _current.description>>
+			<span class='description'><<= _current.description>>
+				<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('organiser')>> <<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
+				<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('spacious')>> <<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
+				<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('starter')>> <<lanSwitch 'Can hold 20 of each item type.' '每种物品类别可容纳 20 个。'>><</if>>
+				<<if _current.type.includes('comfy')>> <<if $deadwoodFurnitureCategory is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
+				<<if _current.type.includes('double')>> <<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>><</if>>
+			</span>
+		<</if>>
+	<<else>>
+		<<lanSwitch 'Nothing.' '暂无。'>>
+	<</if>>
+	<hr>
+	<div id='furnitureContainer'>
+		<<set _offers to maplebirch.VP.realEstate.furnitureOffers(_property.id, $deadwoodFurnitureCategory)>>
+		<<for _offer range _offers>>
+			<<capture _offer>>
+				<<set _priceLabel to '£' + _offer.cost / 100>>
+				<div class='shopBlock no-numberify'>
+					<<furnitureicon _offer.item.iconFile>> <<= _offer.item.nameCap>> |
+					<<if _offer.item.type.includes('comfy')>><<lanSwitch 'Comfortable' '舒适'>> | <</if>>
+					<<if _offer.item.type.includes('single')>><<lanSwitch 'Single' '单人'>> | <</if>>
+					<<if _offer.item.type.includes('double')>><<lanSwitch 'Double' '双人'>> | <</if>>
+					<<if _offer.item.type.includes('spacious')>><<lanSwitch 'Spacious' '宽敞'>> | <</if>>
+					<<if _offer.item.type.includes('organiser')>><<lanSwitch 'Organiser' '收纳'>> | <</if>>
+					<<if _offer.item.description>>
+						<mouse class='tooltip linkBlue'>(?)<span><<= _offer.item.description>>
+							<<if _offer.item.type.includes('comfy')>><br><<if $deadwoodFurnitureCategory is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
+							<<if _offer.item.type.includes('double')>><br><<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>><</if>>
+							<<if _offer.item.type.includes('spacious')>><br><<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
+							<<if _offer.item.type.includes('organiser')>><br><<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
+						</span></mouse> |
+					<</if>>
+					<<if maplebirch.VP.finance.canPay(_offer.cost, 'furniture')>>
+						<<link _priceLabel 'Deadwood Reblooms Property Furniture Catalogue'>>
+							<<if maplebirch.VP.realEstate.installFurniture(_property.id, $deadwoodFurnitureCategory, _offer.id)>>
+								<<money `-_offer.cost` 'furniture'>>
+								<<run Furniture.log(_offer.id)>>
+							<</if>>
+						<</link>>
+					<<else>>
+						<span class='red'><<= _priceLabel>></span>
+					<</if>>
+				</div>
+			<</capture>>
+		<</for>>
+	</div>
+<</widget>>
 
 :: Deadwood Reblooms Property Home []
 <<set _property to maplebirch.VP.realEstate.current>>
@@ -402,8 +478,8 @@
 						<</language>>
 					<<else>>
 						<<language>>
-							<<option 'EN'>>Whitney is leaning on the doorframe and does not move aside. "You're late," <<he>> says, and tips <<his>> chin at the coat in your arms. "Hang it up yourself."
-							<<option 'CN'>>惠特尼靠在门框上，没有让开。“你回来晚了。”<<he>>说着，朝你臂弯里的外套抬了抬下巴，“自己挂去。”
+							<<option 'EN'>>Whitney looks up when you come in. "You're late," <<he>> mutters, shifting aside and nodding at the empty coat hook beside the door.
+							<<option 'CN'>>你进门时，惠特尼抬头看了你一眼。“回来晚了。”<<he>>小声说着，侧身让开，朝门边空着的衣帽钩点了点头。
 						<</language>>
 					<</if>><br><br>
 				<<case 'Kylar'>>
@@ -419,7 +495,8 @@
 						<</language>>
 					<</if>><br><br>
 				<<case 'Sydney'>>
-					<<if C.npc.Sydney.corruption gte 30>>
+					<<run statusCheck('Sydney')>>
+					<<if _sydneyStatus.includes('corrupt')>>
 						<<language>>
 							<<option 'EN'>>Sydney puts the temple robes aside and draws you close by the wrist. "<span class='lewd'>No one is here to interrupt us.</span>"
 							<<option 'CN'>>悉尼把神殿长袍搁到一旁，握住你的手腕拉你靠近。“<span class='lewd'>这里没人会打扰我们。</span>”
@@ -434,7 +511,7 @@
 			<<lanLink '一起待一会儿 (0:20)' 'Deadwood Reblooms Property Evening Together'>>
 				<<run maplebirch.VP.realEstate.meetResident(_resident.id, _property.id)>>
 				<<pass 20>>
-			<</lanLink>><br>
+			<</lanLink>><br><br>
 		<</capture>>
 	<</for>>
 	<<if !_property.rooms.retreat>>
@@ -536,7 +613,7 @@
 					<<option 'CN'>>罗宾数着明天要做的杂事。你主动揽下最早的一项，<<he>>笑着<span class='teal'>把头靠在你肩上</span>。
 				<</language>>
 			<</if>>
-			<<if maplebirch.get('RobinExpansion') and $RobinExpansion.shop and C.npc.Robin.trauma lt 20>>
+			<<if maplebirch.get('Robin') and $RobinExpansion.shop and C.npc.Robin.trauma lt 20>>
 				<br><br>
 				<<language>>
 					<<option 'EN'>>Robin sets a paper bag from the shop on the table. "I saved the last one for you." <<He>> waits while you try it, watching your face more closely than the food.
@@ -555,7 +632,7 @@
 					<<option 'CN'>>惠特尼挨着你抱怨学校的事，中间却隔着半个坐垫。<<he>>说话时不看你，但也没有走开。
 				<</language>>
 			<</if>>
-			<<if maplebirch.get('WhitneyExpansion') and $WhitneyExpansion.rescued>>
+			<<if maplebirch.get('Whitney') and $WhitneyExpansion.rescued>>
 				<br><br>
 				<<language>>
 					<<option 'EN'>>A noise outside makes Whitney look toward the door. <<He>> sees that you have noticed, then <span class='teal'>pulls you closer</span> without a word.
@@ -574,7 +651,7 @@
 					<<option 'CN'>>“我能留下来，对吧？”凯拉尔攥着你的衣袖问。你答应了，<<he>>才<span class='green'>松开手笑起来</span>。
 				<</language>>
 			<</if>>
-			<<if maplebirch.get('KylarExpansion') and $KylarExpansion.stay_invited>>
+			<<if maplebirch.get('Kylar') and $KylarExpansion.stay_invited>>
 				<br><br>
 				<<language>>
 					<<option 'EN'>>Kylar lays <<his>> manor key beside the key to this house. <<He>> picks up the second one before you can say anything and <span class='teal'>holds it tightly</span>.
@@ -594,7 +671,7 @@
 					<<option 'CN'>>悉尼说起今天在神殿帮过的人。你也讲了自己的一天，<<he>><span class='teal'>一直握着你的手听</span>。
 				<</language>>
 			<</if>>
-			<<if maplebirch.get('SydneyExpansion') and $SydneyExpansion.estate.visited>>
+			<<if maplebirch.get('Sydney') and $SydneyExpansion.estate.visited>>
 				<br><br>
 				<<language>>
 					<<option 'EN'>>Sydney unfolds a recipe <<nnpc_Mum 'Sirris'>> wrote out at the estate. "We could make this here," <<he>> says, looking toward the kitchen.
@@ -768,6 +845,13 @@
 		<<set $sleephour to random(1, Math.min(2, _requestedHours - 1))>>
 	<</if>>
 	<<sleep>>
+	<!-- 原版只在 $location 为 home 时读取孤儿院的床；自购房在此补上同等的每小时床铺收益。 -->
+	<<set _sleepBed to maplebirch.VP.realEstate.furniture(_sleepProperty.id, 'bed')>>
+	<<if _sleepBed and _sleepBed.type.includes('comfy')>>
+		<<set $tiredness to Math.max(0, $tiredness - 10 * $sleepHoursTotal)>>
+	<<elseif _sleepBed and _sleepBed.type.includes('starter')>>
+		<<set $tiredness += 10 * $sleepHoursTotal>>
+	<</if>>
 	<<if !_dreaming>>
 		<<effects>><<wakingEffects $sleepHoursTotal>>
 		<<set _nightWake to _nightWake
@@ -786,6 +870,10 @@
 			<<bedicon>><<lanLink '睁开眼' 'Deadwood Reblooms Property Night Wake'>><</lanLink>>
 		<<else>>
 			<<if !_wakingEffect>><<lanSwitch 'You wake in your own bed.' '你在自己的床上醒来。'>><</if>>
+			<<if !_wakingEffect and Time.schoolDay and Time.hour gte 6 and Time.hour lt 9
+				and (!$LifeSimulation?.school or ($LifeSimulation.school.role is 'student' and !$LifeSimulation.school.attendanceExempt))>>
+				<br><br><<schoolicon 'building'>><span class='teal'><<lanSwitch 'Today is a school day. Remember your uniform and books before heading out.' '今天有课。出门前记得换好校服，带上课本。'>></span>
+			<</if>>
 			<<set _wakingCompanion to maplebirch.VP.realEstate.currentCompanion>>
 			<<if _wakingCompanion>>
 				<br><br>

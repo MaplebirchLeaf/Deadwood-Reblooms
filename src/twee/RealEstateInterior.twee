@@ -66,6 +66,13 @@
 		<</if>><br>
 		<<furnitureicon _wardrobe.iconFile>><<lanLink '衣柜' 'Deadwood Reblooms Property Wardrobe'>><</lanLink>><br>
 	<</if>>
+	<<set _roomFurnishings to ['table', 'chair', 'desk', 'decoration', 'windowsill']>>
+	<<for _kind range _roomFurnishings>>
+		<<set _furnishing to maplebirch.VP.realEstate.furniture(_property.id, _kind)>>
+		<<if _furnishing and (_kind isnot 'desk' or _property.rooms.desk)>>
+			<<furnitureicon _furnishing.iconFile>><<= _furnishing.nameCap>><br>
+		<</if>>
+	<</for>>
 	<<mirroricon 'home'>><<lanLink '镜子' 'Deadwood Reblooms Property Mirror'>><<preMirror>><</lanLink>><br>
 	<<roomoptions>>
 	<<lanLink '游戏设置' 'Settings'>><<set $settingsExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
@@ -95,10 +102,15 @@
 	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
+	<<set _deskFurniture to maplebirch.VP.realEstate.furniture(_property.id, 'desk')>>
+	<<set _deskChair to maplebirch.VP.realEstate.furniture(_property.id, 'chair')>>
 	<<language>>
 		<<option 'EN'>>You sit at the desk. There is enough room to spread out a book beneath the lamp.
 		<<option 'CN'>>你在书桌前坐下。灯下有足够的地方摊开一本书。
 	<</language>><br><br>
+	<<if _deskFurniture>><<furnitureicon _deskFurniture.iconFile>><<= _deskFurniture.nameCap>><br><</if>>
+	<<if _deskChair>><<furnitureicon _deskChair.iconFile>><<= _deskChair.nameCap>><br><</if>>
+	<br>
 	<<if $studyBooks is undefined>><<set $studyBooks to {rented: 'none', stolen: 'none'}>><</if>>
 	<<homeStudyOptions>>
 	<<if maplebirch.get('LS') and $LifeSimulation.school.role isnot 'student' and $LifeSimulation.school.study_session_day isnot Time.days>>
@@ -280,6 +292,9 @@
 	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<if _property.outdoor_access is 'retreat'>>
+		<<= lanSwitch(_property.interior.retreat.EN, _property.interior.retreat.CN)>><br><br>
+	<</if>>
 	<<= lanSwitch(_property.interior.outdoor.EN, _property.interior.outdoor.CN)>><br><br>
 	<<for _resident range maplebirch.VP.realEstate.residentsInCommonRooms(_property.id)>>
 		<<switch _resident.id>>
@@ -339,12 +354,13 @@
 	<<elseif _property.id is 'danube'>>
 		<<gardenicon>><<lanLink '走进花园 (0:01)' 'Deadwood Reblooms Property Garden'>><<pass 1>><</lanLink>><br><br>
 	<</if>>
+	<<if _property.outdoor_access is 'retreat'>>
+		<<couchicon>><<lanLink '休息片刻 (0:15)' 'Deadwood Reblooms Property Retreat Rest'>><<pass 15>><<stress -2>><<tiredness -4>><</lanLink>><<lstress>><<ltiredness>><br>
+	<</if>>
 	<<deadwood-reblooms-property-outdoor-icon _property.id>>
 	<<lanLink '看看外面 (0:10)' 'Deadwood Reblooms Property Outdoor View'>><<pass 10>><</lanLink>><br><br>
 	<<if _property.outdoor_access is 'sitting'>>
 		<<getouticon>><<lanLink '起居室 (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
-	<<elseif _property.outdoor_access is 'retreat'>>
-		<<getouticon>><<lanLink _property.interior.retreat_label.CN 'Deadwood Reblooms Property Retreat'>><<pass 1>><</lanLink>>
 	<<else>>
 		<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
 	<</if>>
@@ -381,9 +397,9 @@
 	<<elseif Time.dayState is 'night'>>
 		<<lanSwitch 'The garden paths are pale in the moonlight.' '花园的小径在月色里泛着微光。'>><br><br>
 	<</if>>
-	<<lanLink '俯瞰花园 (0:10)' 'Deadwood Reblooms Property Balcony View'>><<pass 10>><</lanLink>><br>
+	<<gardenicon>><<lanLink '俯瞰花园 (0:10)' 'Deadwood Reblooms Property Balcony View'>><<pass 10>><</lanLink>><br>
 	<<if Weather.precipitation isnot 'rain' && !Weather.isSnow>>
-		<<lanLink '在阳台坐一会儿 (0:15)' 'Deadwood Reblooms Property Balcony Rest'>><<pass 15>><<stress -2>><</lanLink>><<lstress>><br>
+		<<couchicon>><<lanLink '在阳台坐一会儿 (0:15)' 'Deadwood Reblooms Property Balcony Rest'>><<pass 15>><<stress -2>><</lanLink>><<lstress>><br>
 	<</if>>
 	<!-- 原版翅膀特质本身就允许从高处下降。鸟翼即使被拔羽仍能滑翔。 -->
 	<<if $harpy gte 6>>
@@ -404,6 +420,9 @@
 			<</lanLink>><<willpowerdifficulty 250 1100>><br>
 		<</if>>
 	<</if>>
+	<<if $harpy gte 6 or (($angel gte 6 or $demon gte 6 or $fallenangel gte 2) and $pain lt 21 and ($birdFly is 1 or $birdGlide is 1))>>
+		<<glideicon>><<lanLink '滑翔到小镇其他街道' 'Deadwood Reblooms Property Flight'>><</lanLink>><br>
+	<</if>>
 	<br>
 	<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
 <</if>>
@@ -415,7 +434,13 @@
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
 	<<= lanSwitch(_property.interior.balcony_view.EN, _property.interior.balcony_view.CN)>><br><br>
-	<<lanLink '返回二层阳台 (0:01)' 'Deadwood Reblooms Property Balcony'>><<pass 1>><</lanLink>>
+	<<lanSwitch 'The wall hides the street, but not its faint noise. From this height the conservatory glass catches the light while the paths below meet at the garden gate.' '围墙遮住街道，却挡不住隐约传来的声音。这个高度看去，温室的玻璃映着天光，下面的小径在花园门边汇合。'>><br><br>
+	<<if Weather.precipitation is 'rain'>>
+		<span class='blue'><<lanSwitch 'Rain stipples the conservatory roof and darkens the paths between the beds.' '雨点敲着温室屋顶，苗圃间的小径也渐渐变深。'>></span><br><br>
+	<<elseif Time.dayState is 'night'>>
+		<<lanSwitch 'A few lit windows mark the edge of the garden. Beyond the wall, the rest of the town is mostly shadow.' '几扇亮着灯的窗标出花园的边界。围墙之外，小镇的大半景物隐入夜色。'>><br><br>
+	<</if>>
+	<<getouticon>><<lanLink '返回二层阳台' 'Deadwood Reblooms Property Balcony'>><</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Property Balcony Rest []
@@ -425,7 +450,7 @@
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
 	<<lanSwitch 'You settle into a chair beneath the eaves. The walls keep out the street noise, and the garden is still.' '你坐进檐下的椅子。围墙挡住了街上的喧闹，花园里一片安静。'>><br><br>
-	<<lanLink '返回二层阳台 (0:01)' 'Deadwood Reblooms Property Balcony'>><<pass 1>><</lanLink>>
+	<<lanLink '返回二层阳台' 'Deadwood Reblooms Property Balcony'>><</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Property Balcony Glide []
@@ -459,8 +484,94 @@
 		<<set $VanillaPlus.real_estate.glide_scared_day to Time.days>>
 		<span class='red'><<lanSwitch 'You draw back from the edge. You cannot make yourself jump.' '你从阳台边退开，终究没能跳下去。'>></span><br><br>
 	<</if>>
-	<<getouticon>><<lanLink '返回二层阳台 (0:01)' 'Deadwood Reblooms Property Balcony'>><<pass 1>><</lanLink>>
+	<<getouticon>><<lanLink '返回二层阳台' 'Deadwood Reblooms Property Balcony'>><</lanLink>>
 <</if>>
+
+:: Deadwood Reblooms Property Flight Widgets [widget]
+<<widget 'deadwood-reblooms-property-flight'>>
+	<!-- 原版高处下降条件；从这些屋顶也可滑翔到小镇的其他街道。 -->
+	<<if $harpy gte 6>>
+		<<glideicon>><<lanLink '滑翔到楼下 (0:02)' 'Deadwood Reblooms Property Street Glide'>><<bird_pass 2>><<endevent>><</lanLink>><br>
+	<<elseif $angel gte 6 or $demon gte 6 or $fallenangel gte 2>>
+		<<if $pain gte 21>>
+			<span class='purple'><<lanSwitch 'You are too injured to jump from here.' '你伤得太重，不能从这里跃下。'>></span><br>
+		<<elseif $birdFly is 1 or $birdGlide is 1>>
+			<<glideicon>><<lanLink '滑翔到楼下 (0:02)' 'Deadwood Reblooms Property Street Glide'>><<bird_pass 2>><<endevent>><</lanLink>><br>
+		<<elseif currentSkillValue('willpower') gte 250 and $VanillaPlus.real_estate.glide_scared_day isnot Time.days>>
+			<<glideicon>><<lanLink '尝试滑翔到楼下 (0:02)' 'Deadwood Reblooms Property Street Glide Attempt'>><<bird_pass 2>><<endevent>><</lanLink>><<willpowerdifficulty 250 1100>><br>
+		<</if>>
+	<</if>>
+	<<if $harpy gte 6 or (($angel gte 6 or $demon gte 6 or $fallenangel gte 2) and $pain lt 21 and ($birdFly is 1 or $birdGlide is 1))>>
+		<<glideicon>><<lanLink '滑翔到小镇其他街道' 'Deadwood Reblooms Property Flight'>><</lanLink>><br>
+	<</if>>
+<</widget>>
+
+:: Deadwood Reblooms Property Street Glide Attempt []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || !['barb', 'high', 'cliff'].includes(_property.id) || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented || maplebirch.VP.realEstate.isFrozen(_property.id)>>
+	<<getouticon>><<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<if $willpowerSuccess>>
+		<<set $birdGlide to 1>>
+		<span class='green'><<lanSwitch 'The wind catches your wings as you step over the rail.' '你越过栏杆，风托住了展开的翅膀。'>></span><<gwillpower>><<willpower 1>><br><br>
+		<<glideicon>><<lanLink '滑翔到楼下' 'Deadwood Reblooms Property Street Glide'>><<endevent>><</lanLink>><br>
+	<<else>>
+		<<set $VanillaPlus.real_estate.glide_scared_day to Time.days>>
+		<span class='red'><<lanSwitch 'You step back from the edge.' '你从边缘退了回来。'>></span><br><br>
+	<</if>>
+	<<getouticon>><<lanLink '返回露台或阳台' 'Deadwood Reblooms Property Outdoor'>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Street Glide []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || !['barb', 'high', 'cliff'].includes(_property.id) || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented || maplebirch.VP.realEstate.isFrozen(_property.id)>>
+	<<getouticon>><<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<set $outside to 1>><<effects>>
+	<<lanSwitch 'You spread your wings, cross the short distance from the roof and land on a clear stretch of pavement.' '你展开翅膀，从屋顶滑过一小段距离，落在街边一处空地上。'>><br><br>
+	<<getouticon>><<lanLink _property.street_name.CN _property.street>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Flight []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented || maplebirch.VP.realEstate.isFrozen(_property.id) || !(($harpy gte 6) or (($angel gte 6 or $demon gte 6 or $fallenangel gte 2) and $pain lt 21 and ($birdFly is 1 or $birdGlide is 1)))>>
+	<<getouticon>><<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
+	<<lanSwitch 'The rooftops and the slope of the streets leave room for a long glide. Where will you land?' '屋顶与街道的落差足以让你滑翔一程。你要落在哪里？'>><br><br>
+	<<if $exposed gte 2 and !hasSexStat('exhibitionism', 4)>>
+		<span class='red'><<lanSwitch 'You cannot bring yourself to glide exposed above town.' '你不敢赤裸着滑翔过小镇上空。'>></span><br>
+	<<else>>
+		<<set _destinations to [
+			{ passage: 'Domus Street', EN: 'Domus Street', CN: '宅邸街' },
+			{ passage: 'Barb Street', EN: 'Barb Street', CN: '倒钩街' },
+			{ passage: 'High Street', EN: 'High Street', CN: '商业街' },
+			{ passage: 'Cliff Street', EN: 'Cliff Street', CN: '峭壁街' },
+			{ passage: 'Danube Street', EN: 'Danube Street', CN: '多瑙河街' }
+		]>>
+		<<for _destination range _destinations>>
+			<<capture _destination>>
+				<<glideicon>><<lanLink _destination.CN 'Deadwood Reblooms Property Flight Land'>><<set $deadwoodFlightStreet to _destination.passage>><<bird_pass 10>><<endevent>><</lanLink>> <span class='blue'>(0:10)</span><br>
+			<</capture>>
+		<</for>>
+	<</if>>
+	<<set _returnPassage to _property.id is 'danube' ? 'Deadwood Reblooms Property Balcony' : 'Deadwood Reblooms Property Outdoor View'>>
+	<br><<getouticon>><<lanLink '返回住处' _returnPassage>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Flight Land []
+<<set $outside to 1>><<effects>>
+<<if !['Domus Street', 'Barb Street', 'High Street', 'Cliff Street', 'Danube Street'].includes($deadwoodFlightStreet)>><<set $deadwoodFlightStreet to 'High Street'>><</if>>
+<<lanSwitch 'You hold your wings open, ride the air over the roofs and descend toward a clear place on the street.' '你展开翅膀，乘着气流滑过屋顶，朝街上一处空地降下。'>><br><br>
+<<switch $deadwoodFlightStreet>>
+	<<case 'Domus Street'>><<lanSwitch 'The orphanage roof comes into view beyond the garden fences.' '花园围栏后，孤儿院的屋顶映入眼帘。'>><br>
+	<<case 'Barb Street'>><<lanSwitch 'The dry canal and the passing traffic guide you down.' '干涸的运河和往来的车流为你指明了落点。'>><br>
+	<<case 'High Street'>><<lanSwitch 'Shop signs and the moving crowd spread beneath you.' '店铺招牌与往来的人群在你脚下铺开。'>><br>
+	<<case 'Cliff Street'>><<lanSwitch 'The sea wind follows you as you turn back toward the street.' '你转向街道时，海风仍追在身后。'>><br>
+	<<case 'Danube Street'>><<lanSwitch 'You keep clear of the garden walls and land by the road.' '你避开花园的围墙，落在路边。'>><br>
+<</switch>>
+<br><<getouticon>><<lanLink '落到街上' $deadwoodFlightStreet>><</lanLink>>
 
 :: Deadwood Reblooms Property Outdoor View []
 <<set _property to maplebirch.VP.realEstate.current>>
@@ -469,7 +580,26 @@
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<set $outside to 1>><<effects>>
 	<<= lanSwitch(_property.interior.outdoor_view.EN, _property.interior.outdoor_view.CN)>><br><br>
-	<<getouticon>><<lanLink _property.interior.outdoor_label.CN 'Deadwood Reblooms Property Outdoor'>><<pass 1>><</lanLink>>
+	<<switch _property.id>>
+		<<case 'domus'>><<lanSwitch 'Beyond the fence, footsteps pass the orphanage road. You can hear its gate open and close, but the little garden stays out of sight.' '围栏外的脚步声沿着孤儿院那条路渐近又远去。大门开了又关，这片小庭院仍藏在路人视线之外。'>><br><br>
+		<<case 'barb'>><<lanSwitch 'The canal bed draws a long pale line between the buildings. A vehicle crosses the bridge, its sound briefly filling the space below your balcony.' '干涸的河床在楼宇之间划出一道浅色的长线。一辆车驶过桥面，声响短暂地填满阳台下的空间。'>><br><br>
+		<<case 'high'>><<lanSwitch 'The shop fronts hide part of the pavement, but you can follow the crowd by its shifting voices. A stallholder folds away a sign when trade slows.' '店面的檐篷遮住部分人行道，你仍能循着起伏的人声辨认人群的去向。生意渐淡时，一名摊主收起了招牌。'>><br><br>
+		<<case 'cliff'>><<lanSwitch 'A gust carries salt spray up from the rocks. Farther along the street, people keep close to the buildings to avoid the exposed edge.' '一阵风把礁石间的盐雾送了上来。街道另一头，行人贴着房屋走，避开无遮拦的崖边。'>><br><br>
+		<<case 'danube'>><<lanSwitch 'The high wall muffles the road. You can make out the paths between the beds and the upper balcony looking down on them.' '高墙隔远了马路的声音。你能看清苗圃之间的小径，以及俯瞰这片花园的二层阳台。'>><br><br>
+	<</switch>>
+	<<if Weather.precipitation is 'rain'>>
+		<span class='blue'><<lanSwitch 'Rain softens the distant sounds and beads along the edge beside you.' '雨声压低了远处的动静，也在你身旁的边沿聚成水珠。'>></span><br><br>
+	<<elseif Weather.isSnow>>
+		<span class='blue'><<lanSwitch 'Snow makes the familiar view quieter; fresh tracks show where someone passed recently.' '雪让熟悉的景象安静下来。新留下的脚印说明不久前还有人经过。'>></span><br><br>
+	<<elseif Time.dayState is 'night'>>
+		<<lanSwitch 'One light goes out, then another. You stay a little longer before turning back inside.' '一盏灯熄了，又有一盏暗下去。你多待了一会儿，才转身回屋。'>><br><br>
+	<<else>>
+		<<lanSwitch 'The air changes as you stand still. You take one last look before heading back.' '站得久了，风向也有了变化。你又看了一眼，才准备回去。'>><br><br>
+	<</if>>
+	<<if ['barb', 'high', 'cliff'].includes(_property.id)>>
+		<<deadwood-reblooms-property-flight>>
+	<</if>>
+	<<getouticon>><<lanLink '收回视线' 'Deadwood Reblooms Property Outdoor'>><</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Property Guest Bedroom []
@@ -490,14 +620,12 @@
 <<set _property to maplebirch.VP.realEstate.current>>
 <<if !_property || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented || !_property.interior.retreat>>
 	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<elseif _property.outdoor_access is 'retreat'>>
+	<<include 'Deadwood Reblooms Property Outdoor'>>
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<= lanSwitch(_property.interior.retreat.EN, _property.interior.retreat.CN)>><br><br>
 	<<couchicon>><<lanLink '休息片刻 (0:15)' 'Deadwood Reblooms Property Retreat Rest'>><<pass 15>><<stress -2>><<tiredness -4>><</lanLink>><<lstress>><<ltiredness>><br>
-	<<if _property.outdoor_access is 'retreat'>>
-		<<deadwood-reblooms-property-outdoor-icon _property.id>>
-		<<lanLink _property.interior.outdoor_label.CN 'Deadwood Reblooms Property Outdoor'>><<pass 1>><</lanLink>><br>
-	<</if>>
 	<br>
 	<<if _property.rooms.retreat is 1>>
 		<<getouticon>><<lanLink '起居室 (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
@@ -513,5 +641,9 @@
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<= lanSwitch(_property.interior.retreat_rest.EN, _property.interior.retreat_rest.CN)>><br><br>
-	<<lanLink '起身' 'Deadwood Reblooms Property Retreat'>><</lanLink>>
+	<<if _property.outdoor_access is 'retreat'>>
+		<<lanLink '起身' 'Deadwood Reblooms Property Outdoor'>><</lanLink>>
+	<<else>>
+		<<lanLink '起身' 'Deadwood Reblooms Property Retreat'>><</lanLink>>
+	<</if>>
 <</if>>

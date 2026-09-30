@@ -1,17 +1,17 @@
 import Module from './Module';
 import { DEFAULT_ROBIN_EXPANSION_STATE, type RobinExpansionState } from './constants';
-import type { RobinFacade } from './RobinExpansion/Shared';
-import RobinAsylum from './RobinExpansion/Asylum';
-import RobinBalloon from './RobinExpansion/Balloon';
-import RobinFlowers from './RobinExpansion/Flowers';
-import RobinFishing from './RobinExpansion/Fishing';
-import RobinMarket from './RobinExpansion/Market';
-import RobinNight from './RobinExpansion/Night';
-import RobinRent from './RobinExpansion/Rent';
-import RobinShop from './RobinExpansion/Shop';
-import RobinTutoring from './RobinExpansion/Tutoring';
+import type { RobinFacade } from './Robin/Shared';
+import RobinAsylum from './Robin/Asylum';
+import RobinBalloon from './Robin/Balloon';
+import RobinFlowers from './Robin/Flowers';
+import RobinFishing from './Robin/Fishing';
+import RobinMarket from './Robin/Market';
+import RobinNight from './Robin/Night';
+import RobinRent from './Robin/Rent';
+import RobinShop from './Robin/Shop';
+import RobinTutoring from './Robin/Tutoring';
 
-class RobinExpansion extends Module implements RobinFacade {
+class Robin extends Module implements RobinFacade {
   public readonly rent: RobinRent;
   public readonly flowers: RobinFlowers;
   public readonly fishing: RobinFishing;
@@ -49,12 +49,17 @@ class RobinExpansion extends Module implements RobinFacade {
     const state = this.state;
     if (state.asylum.status === 'admitted') return 0;
     const stall = state.shop ? state.lemonade + state.chocolate : Time.season === 'winter' ? state.chocolate : state.lemonade;
+    // 旧神殿线的周津贴由本模块统一结算，避免两个模组重复给罗宾发收入。
+    const temple = this.core.get('RobinTemple') ? V.RobinTemple : undefined;
+    const templeGrace = Number(temple?.grace);
+    const templeIncome = temple && ['member', 'approved', 'promised'].includes(temple.stage) && Number.isFinite(templeGrace) ? Math.max(0, Math.min(100, templeGrace)) * 10 : 0;
     // 基础店铺增收已扣除店租、水电、原料和临时帮工；正式员工的增收与工资单独入账。
     return (
       (V.robin.stayup >= 1 ? 250 : 300) +
       (V.robin.moneyModifier || 0) +
       stall * 1200 +
       this.tutoring.income +
+      templeIncome +
       (state.shop ? 1500 + this.shop.staffSales - this.shop.staffWages + this.flowers.salesEstimate + (state.shopPopcorn ? 150 : 0) + (state.shopBalloons ? 75 : 0) : 0) +
       this.balloon.income
     );
@@ -260,4 +265,4 @@ class RobinExpansion extends Module implements RobinFacade {
   }
 }
 
-export default RobinExpansion;
+export default Robin;

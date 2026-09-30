@@ -1,7 +1,7 @@
 import Module from './Module';
 import { DEFAULT_KYLAR_EXPANSION_STATE } from './constants';
 
-class KylarExpansion extends Module {
+class Kylar extends Module {
   public constructor(core: typeof maplebirch) {
     super(core, 'KylarExpansion', DEFAULT_KYLAR_EXPANSION_STATE);
   }
@@ -36,4 +36,4 @@ class KylarExpansion extends Module {
   }
 }
 
-export default KylarExpansion;
+export default Kylar;

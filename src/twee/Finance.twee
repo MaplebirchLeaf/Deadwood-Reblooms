@@ -1,12 +1,26 @@
 :: Deadwood Reblooms Finance Common Widgets [widget]
 
+<<widget 'deadwood-reblooms-finance-date'>>
+	<<nobr>>
+	<<set _financeDate to Time.startDate.addDays(_args[0])>>
+	<span class='blue'><<= lanSwitch(`${_financeDate.day} ${_financeDate.monthName} ${_financeDate.year}`, `${_financeDate.year}年${_financeDate.month}月${_financeDate.day}日`)>></span>
+	<<set _financeDaysLeft to Math.ceil(_args[0] - Time.days)>>
+	<<if _financeDaysLeft gt 0>>
+		<<lanSwitch ' (in ' '（还有 '>> <<= _financeDaysLeft>> <<lanSwitch ' days)' '天）'>>
+	<<elseif _financeDaysLeft is 0>>
+		<<lanSwitch ' (due today)' '（今日到期）'>>
+	<<else>>
+		<span class='red'><<lanSwitch ' (overdue)' '（已到期）'>></span>
+	<</if>>
+	<</nobr>>
+<</widget>>
+
 <!-- 日志只读取当前存档的余额、持仓与产权，结算仍交给游戏时间事件。 -->
 <<widget 'deadwood-reblooms-finance-journal'>>
 	<<if $VanillaPlus?.finance?.bank?.opened>>
 		<<set _financeBank to $VanillaPlus.finance.bank>>
 		<<set _financeBrokerage to $VanillaPlus.finance.brokerage>>
 		<<set _financeMortgage to maplebirch.VP.realEstate.mortgage.current>>
-		<hr>
 		<h1 class='header gold bold'><<lanSwitch 'Finances' '财务'>></h1>
 		<ul class='journal'>
 			<li><<lanSwitch 'Bank balance: ' '银行存款：'>><<deadwood-reblooms-finance-money _financeBank.balance>></li>
@@ -73,8 +87,8 @@
 							<</if>>
 							<br><<lanSwitch 'Weekly upkeep: ' '每周维护费：'>>
 							<<deadwood-reblooms-finance-money _financePropertyUpkeep>>
-							<<lanSwitch ', next settlement on day ' '，下次结算在第 '>>
-							<span class='blue'><<= _financePropertyState.next_settlement_day>></span><<lanSwitch '.' ' 天。'>>
+							<<lanSwitch ', next settlement: ' '，下次结算：'>>
+							<<deadwood-reblooms-finance-date _financePropertyState.next_settlement_day>><<lanSwitch '.' '。'>>
 							<br><<lanSwitch 'Condition: ' '房屋状况：'>><<= _financePropertyState.condition>>/100
 							<<if _financePropertyState.lease_end_day isnot null>>
 								<span class='blue'><<lanSwitch ' Tenant leaves on day ' ' 租客将在第 '>>
@@ -105,6 +119,7 @@
 				<</if>>
 			<</if>>
 		</ul>
+		<hr>
 	<</if>>
 <</widget>>
 

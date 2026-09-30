@@ -1,6 +1,6 @@
 :: Deadwood Robin Night Knock []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('RobinExpansion').night.start()>>
+<<if maplebirch.get('Robin').night.start()>>
   <<pass 5>>
   <<lanSwitch 'You knock softly. The note says Robin is sleeping, so you wait without touching the handle. After a moment Robin opens the door just enough to see you.' '你轻轻敲门。纸条上写着罗宾已经睡了，你便等在门外，没有碰门把手。片刻后，罗宾把门打开一条缝。'>>
   <br><br><span class='blue'><<lanSwitch '"Is something wrong?" Robin asks, then steps back to let you speak.' '“出什么事了吗？”罗宾问，然后退开一步，等你开口。'>></span>
@@ -34,7 +34,7 @@
 
 :: Deadwood Robin Night Listen []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('RobinExpansion').night.finish()>>
+<<if maplebirch.get('Robin').night.finish()>>
   <<if C.npc.Robin.trauma gte 50>>
     <<lanSwitch 'You stay by the open door and listen. Robin speaks in short pieces about the day, then asks you to leave the hall light on. You agree.' '你留在敞开的门边听着。罗宾断断续续地讲起今天，随后请你把走廊灯留着。你答应了。'>>
     <br><br><span class='green'><<lanSwitch 'Robin checks the latch and says, "Thank you for asking first."' '罗宾确认门闩后说：“谢谢你先问我。”'>></span>
@@ -53,7 +53,7 @@
 
 :: Deadwood Robin Night Tomorrow []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('RobinExpansion').night.finish()>>
+<<if maplebirch.get('Robin').night.finish()>>
   <<if C.npc.Robin.trauma gte 50>>
     <<lanSwitch 'You ask what would make tomorrow easier. Robin thinks for a moment and chooses just one thing: to start with breakfast together. You write it down and leave the rest for daylight.' '你问明天怎样能轻松些。罗宾想了一会，只挑了一件事：一起吃早饭。你把它记下，其他事情留到天亮再说。'>>
     <<npcincr Robin dom 1>><<npcincr Robin trauma -2>><<npcincr Robin love 1>><<gdom>><<lrtrauma>><<glove>>
@@ -77,7 +77,7 @@
 
 :: Deadwood Robin Night Stay []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('RobinExpansion').night.finish()>>
+<<if maplebirch.get('Robin').night.finish()>>
   <<lanSwitch '"A little while," Robin agrees. You sit beside the desk, close enough to share the quiet. Robin reaches for your hand, and lets go only when you both stand. "Good night," Robin says, sounding steadier.' '“坐一会就好。”罗宾答应了。你在桌旁坐下，一起安静地待着。罗宾伸手握住你的手，直到你们起身才松开。“晚安。”罗宾的声音平稳了些。'>>
   <<npcincr Robin love 2>><<npcincr Robin trauma -2>><<stress -8>><<glove>><<lrtrauma>><<lstress>>
 <<else>>
@@ -87,7 +87,7 @@
 
 :: Deadwood Robin Night Push []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('RobinExpansion').night.finish()>>
+<<if maplebirch.get('Robin').night.finish()>>
   <<lanSwitch 'You point to the unfinished figures. Robin tries to work through them, but writes the same number twice.' '你指着尚未算完的数字。罗宾试着继续，却把同一个数抄了两遍。'>>
   <br><br><span class='red'><<lanSwitch '"I can do it in the morning," Robin says, closing the ledger.' '“我早上能做。”罗宾合上账本。'>></span>
   <br><br><<lanSwitch 'The way Robin sets down the pen makes it clear you should go.' '放下笔的动作已经说明，你该离开了。'>>
@@ -100,7 +100,9 @@
 <<widget 'deadwood-robin-school-wake'>>
   <<if $location is 'home' and Time.schoolDay and Time.hour gte 6 and Time.hour lt 9
     and $RobinExpansion.school_wake_day isnot Time.days and !$daily.motherWake
-    and !_sleepinterrupt and !$robinbed
+    and !_sleepinterrupt and !_wakingEffect and !$robinbed and $kylarbed isnot 1
+    and C.npc.Robin.init is 1
+    and (!maplebirch.get('VP') or !maplebirch.VP.realEstate.residenceOf('Robin'))
     and ($RobinExpansion.bothRent or $RobinExpansion.baileyDefeated)
     and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing
     and $robin.timer.hurt is 0 and C.npc.Robin.trauma lt 80
@@ -108,11 +110,19 @@
     <<set $RobinExpansion.school_wake_day to Time.days>>
     <br><br><<npc Robin>><<person1>>
     <<lanSwitch 'A light knock comes at your door. Robin waits for your answer before opening it.' '门上传来轻轻的敲击声。罗宾等你应声，才推开房门。'>>
-    <<if $RobinExpansion.baileyDefeated>>
-      <br><<lanSwitch '"School starts soon," Robin says. "I left breakfast for you. No rent book to check this morning." Robin grins and holds the door while you get up.' '“快上课了。”罗宾说，“早餐给你留着。今天早上不用核房租账。”罗宾笑着扶住门，等你起身。'>>
+    <<if $LifeSimulation?.school?.attendanceExempt>>
+      <br><<lanSwitch '"I am leaving for school soon," Robin says, adjusting the strap of <<his>> bag. "You do not have to come to class, do you? Will I see you later?"' '“我快去学校了。”罗宾理了理书包带，“你不用来听课，对吧？晚点还能见到你吗？”'>>
+    <<elseif C.npc.Robin.trauma gte 50>>
+      <br><<lanSwitch 'Robin stays close to the doorway, <<his>> schoolbag held against <<his>> chest. "It is a school day," <<he>> says quietly. "I thought you might want to know before I go."' '罗宾站在门边，把书包抱在胸前。“今天要上学。”<<he>>轻声说，“我走之前，想先告诉你一声。”'>>
+    <<elseif Time.hour lt 7>>
+      <br><<lanSwitch '"There is still time to get ready," Robin says. <<He>> has <<his>> schoolbag over one shoulder. "I did not want you to sleep through the morning."' '“还有时间准备。”罗宾把书包搭在一边肩上，“我不想让你一觉睡过早上。”'>>
+    <<elseif $RobinExpansion.baileyDefeated>>
+      <br><<lanSwitch '"We should get ready for school," Robin says, checking <<his>> bag once more. "At least there is no rent book to check first." <<He>> smiles at you from the doorway.' '“我们该准备去学校了。”罗宾又检查了一遍书包，“至少不用先核房租账。”<<He>>站在门边朝你笑了笑。'>>
     <<else>>
-      <br><<lanSwitch '"We have enough time if you get up now," Robin says. A folded page from the shared ledger peeks out of Robin’s pocket. Robin has already checked the day’s figures, and waits while you find your shoes.' '“现在起来就来得及。”罗宾说。共同账本里折起的一页露在口袋边。罗宾已经核过今天的数字，站在门边等你找鞋。'>>
+      <br><<lanSwitch '"It is a school day. Do not forget your uniform," Robin says. A folded page from the shared ledger peeks out of <<his>> pocket. <<He>> tucks it away and checks that <<his>> books are in the bag.' '“今天要上学，别忘了换校服。”罗宾口袋边露出共同账本里折起的一页。<<He>>把它收好，确认课本都装进了书包。'>>
     <</if>>
-    <br><br><span class='green'><<lanSwitch 'Robin made sure you would not miss the morning bell.' '罗宾提醒了你，早课的铃声还赶得上。'>></span>
+    <<if !$LifeSimulation?.school?.attendanceExempt>>
+      <br><br><<schoolicon 'building'>><span class='teal'><<lanSwitch 'Today is a school day. Get dressed and check the time before leaving.' '今天有课。换好衣服，出门前留意时间。'>></span>
+    <</if>>
   <</if>>
 <</widget>>

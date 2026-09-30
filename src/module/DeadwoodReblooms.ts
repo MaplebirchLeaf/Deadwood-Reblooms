@@ -19,14 +19,14 @@ import Hint_NPCSidebarPortrait_CN from '@/assets/hint/CN/NPCSidebarPortrait.md';
 import Hint_NPCSidebarPortrait_EN from '@/assets/hint/EN/NPCSidebarPortrait.md';
 import Hint_VP_CN from '@/assets/hint/CN/VP.md';
 import Hint_VP_EN from '@/assets/hint/EN/VP.md';
-import Hint_SydneyExpansion_CN from '@/assets/hint/CN/SydneyExpansion.md';
-import Hint_SydneyExpansion_EN from '@/assets/hint/EN/SydneyExpansion.md';
-import Hint_RobinExpansion_CN from '@/assets/hint/CN/RobinExpansion.md';
-import Hint_RobinExpansion_EN from '@/assets/hint/EN/RobinExpansion.md';
-import Hint_WhitneyExpansion_CN from '@/assets/hint/CN/WhitneyExpansion.md';
-import Hint_WhitneyExpansion_EN from '@/assets/hint/EN/WhitneyExpansion.md';
-import Hint_KylarExpansion_CN from '@/assets/hint/CN/KylarExpansion.md';
-import Hint_KylarExpansion_EN from '@/assets/hint/EN/KylarExpansion.md';
+import Hint_Sydney_CN from '@/assets/hint/CN/Sydney.md';
+import Hint_Sydney_EN from '@/assets/hint/EN/Sydney.md';
+import Hint_Robin_CN from '@/assets/hint/CN/Robin.md';
+import Hint_Robin_EN from '@/assets/hint/EN/Robin.md';
+import Hint_Whitney_CN from '@/assets/hint/CN/Whitney.md';
+import Hint_Whitney_EN from '@/assets/hint/EN/Whitney.md';
+import Hint_Kylar_CN from '@/assets/hint/CN/Kylar.md';
+import Hint_Kylar_EN from '@/assets/hint/EN/Kylar.md';
 import Hint_LS_CN from '@/assets/hint/CN/LS.md';
 import Hint_LS_EN from '@/assets/hint/EN/LS.md';
 import Hint_DM_CN from '@/assets/hint/CN/DM.md';
@@ -47,39 +47,22 @@ const guideSections = {
   MoreTransformations:  { EN: Hint_MoreTransformations_EN,  CN: Hint_MoreTransformations_CN,  title: { EN: 'Transformations',               CN: '更多转化' } },
   NPCSidebarPortrait:   { EN: Hint_NPCSidebarPortrait_EN,   CN: Hint_NPCSidebarPortrait_CN,   title: { EN: 'Sidebar portraits',             CN: 'NPC 侧边栏立绘' } },
   VP:                   { EN: Hint_VP_EN,                   CN: Hint_VP_CN,                   title: { EN: 'Vanilla Plus',                  CN: '原版增强' } },
-  SydneyExpansion:      { EN: Hint_SydneyExpansion_EN,      CN: Hint_SydneyExpansion_CN,      title: { EN: 'Sydney',                        CN: '悉尼拓展' } },
-  RobinExpansion:       { EN: Hint_RobinExpansion_EN,       CN: Hint_RobinExpansion_CN,       title: { EN: 'Robin',                         CN: '罗宾拓展' } },
-  WhitneyExpansion:     { EN: Hint_WhitneyExpansion_EN,     CN: Hint_WhitneyExpansion_CN,     title: { EN: 'Whitney',                       CN: '惠特尼拓展' } },
-  KylarExpansion:       { EN: Hint_KylarExpansion_EN,       CN: Hint_KylarExpansion_CN,       title: { EN: 'Kylar',                         CN: '凯拉尔拓展' } },
+  Sydney:      { EN: Hint_Sydney_EN,      CN: Hint_Sydney_CN,      title: { EN: 'Sydney',                        CN: '悉尼拓展' } },
+  Robin:       { EN: Hint_Robin_EN,       CN: Hint_Robin_CN,       title: { EN: 'Robin',                         CN: '罗宾拓展' } },
+  Whitney:     { EN: Hint_Whitney_EN,     CN: Hint_Whitney_CN,     title: { EN: 'Whitney',                       CN: '惠特尼拓展' } },
+  Kylar:       { EN: Hint_Kylar_EN,       CN: Hint_Kylar_CN,       title: { EN: 'Kylar',                         CN: '凯拉尔拓展' } },
   LS:                   { EN: Hint_LS_EN,                   CN: Hint_LS_CN,                   title: { EN: 'Life Simulation',               CN: '模拟生活' } },
   DM:                   { EN: Hint_DM_EN,                   CN: Hint_DM_CN,                   title: { EN: 'Dynamic Music',                 CN: '动态音乐' } },
   Credits:              { EN: Hint_Credits_EN,              CN: Hint_Credits_CN,              title: { EN: 'Credits and sources',           CN: '致谢与素材来源' } }
 } as const;
 
-const guideOrder = [
-  'DR',
-  'SydneyExpansion',
-  'RobinExpansion',
-  'WhitneyExpansion',
-  'KylarExpansion',
-  'LS',
-  'VP',
-  'CA',
-  'MoreTransformations',
-  'LongerCombat',
-  'MLIANPCA',
-  'NPCSidebarPortrait',
-  'UCACSD',
-  'ICC',
-  'DM',
-  'Credits'
-] as const;
+const guideOrder = ['DR', 'Sydney', 'Robin', 'Whitney', 'Kylar', 'LS', 'VP', 'CA', 'MoreTransformations', 'LongerCombat', 'MLIANPCA', 'NPCSidebarPortrait', 'UCACSD', 'ICC', 'DM', 'Credits'] as const;
 
 // 使用 boot.json 的模组名识别已加载模组。只关闭重叠的本模组模块，不改动玩家安装的外部模组。
 const overlappingMods = {
   LongerCombat: ['LongerCombat'],
   MLIANPCA: ['More Love Interests Mod', 'NPC Avatars Mod', 'NPC Avatars Mod (SF)'],
-  RobinExpansion: ['DomRobin'],
+  Robin: ['DomRobin'],
   LS: ['DoLSims']
 } as const;
 
@@ -302,15 +285,27 @@ class DeadwoodReblooms extends Module {
     // 根模块先于所有子模块预初始化。框架此时已读入 GUI 状态，可以一次保存全部冲突模块。
     const enabled = new Set(this.core.services.gui.enabledModules.map(module => module.name));
     const states = Object.fromEntries([...this.overlapping()].filter(name => enabled.has(name)).map(name => [name, false]));
-    if (Object.keys(states).length) {
-      try {
-        if (await this.core.services.gui.setModuleStates(states)) {
-          location.reload();
-          return;
-        }
-      } catch (error) {
-        this.log('Failed to disable overlapping Deadwood modules', 'ERROR', error);
+    const legacyNames = { SydneyExpansion: 'Sydney', RobinExpansion: 'Robin', WhitneyExpansion: 'Whitney', KylarExpansion: 'Kylar' } as const;
+    const store = this.core.services.indexedDB;
+    const modulesRecord = (await store.with('settings', 'readonly', tx => tx.objectStore('settings').get('Modules'))) as
+      | { key: string; value: { disabled: { name: string; source: string }[] } }
+      | undefined;
+    const oldDisabled = new Set(modulesRecord?.value.disabled.map(module => module.name) ?? []);
+    for (const [oldName, name] of Object.entries(legacyNames)) {
+      if (oldDisabled.has(oldName) && enabled.has(name)) states[name] = false;
+    }
+    try {
+      const changed = Object.keys(states).length ? await this.core.services.gui.setModuleStates(states) : false;
+      if (modulesRecord && Object.keys(legacyNames).some(name => oldDisabled.has(name))) {
+        modulesRecord.value.disabled = modulesRecord.value.disabled.filter(module => !Object.hasOwn(legacyNames, module.name));
+        await store.with('settings', 'readwrite', tx => tx.objectStore('settings').put(modulesRecord));
       }
+      if (changed) {
+        location.reload();
+        return;
+      }
+    } catch (error) {
+      this.log('Failed to migrate Deadwood module settings', 'ERROR', error);
     }
     this.baileyRent.preInit();
     this.core.tool.onInit(() => setup.maplebirch.hint.push('<<= maplebirch.DR.wiki>>'));

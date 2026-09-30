@@ -294,7 +294,7 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     if (title.startsWith('Temple Confess Self') && V.attendant === 'Sydney') return 'confessional';
 
     // 悉尼拓展的宿舍、校车与课堂场景各用对应服装。
-    if (maplebirch.get('SydneyExpansion')) {
+    if (maplebirch.get('Sydney')) {
       if (title.startsWith('Deadwood Reblooms Sydney Dorm')) return V.sydney_templeWork === 'sleep' ? 'sleep' : 'temple';
       if (title === 'Deadwood Reblooms Sydney Halloween Ride') return 'class';
     }

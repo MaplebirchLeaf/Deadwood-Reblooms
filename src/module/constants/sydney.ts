@@ -1,6 +1,6 @@
 // ./src/module/constants/sydney-expansion.ts
 
-// 模块 SydneyExpansion 的存档结构，对应 V.SydneyExpansion。
+// Sydney 模块沿用 V.SydneyExpansion 存档字段，保留旧存档进度。
 export interface SydneyExpansionState {
   /*
    * 年份与日期标记阻止节庆和日常对话重复触发；dormScene 只记录神殿宿舍当前入口。

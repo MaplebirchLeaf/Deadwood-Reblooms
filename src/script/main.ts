@@ -6,10 +6,10 @@ import MoreTransformations from './MoreTransformations';
 import NPCSidebarPortrait from './NPCSidebarPortrait';
 import VanillaPlus from './VanillaPlus';
 import LifeSimulation from './LifeSimulation';
-import SydneyExpansion from './SydneyExpansion';
-import RobinExpansion from './RobinExpansion';
-import WhitneyExpansion from './WhitneyExpansion';
-import KylarExpansion from './KylarExpansion';
+import Sydney from './Sydney';
+import Robin from './Robin';
+import Whitney from './Whitney';
+import Kylar from './Kylar';
 
 (function (maplebirch): void {
   'use strict';
@@ -22,9 +22,9 @@ import KylarExpansion from './KylarExpansion';
   if (maplebirch.get('MoreTransformations')) MoreTransformations(maplebirch);
   if (maplebirch.get('NPCSidebarPortrait')) NPCSidebarPortrait(maplebirch);
   if (maplebirch.get('VP')) VanillaPlus(maplebirch);
-  if (maplebirch.get('SydneyExpansion')) SydneyExpansion(maplebirch);
-  if (maplebirch.get('RobinExpansion')) RobinExpansion(maplebirch);
-  if (maplebirch.get('WhitneyExpansion')) WhitneyExpansion(maplebirch);
-  if (maplebirch.get('KylarExpansion')) KylarExpansion(maplebirch);
+  if (maplebirch.get('Sydney')) Sydney(maplebirch);
+  if (maplebirch.get('Robin')) Robin(maplebirch);
+  if (maplebirch.get('Whitney')) Whitney(maplebirch);
+  if (maplebirch.get('Kylar')) Kylar(maplebirch);
   if (maplebirch.get('LS')) LifeSimulation(maplebirch);
 })(maplebirch);
