@@ -2,6 +2,20 @@
 
 export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.onInit(() => {
+    setup.feats['Beyond the Mirror'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:feats:Beyond the Mirror:name');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:feats:Beyond the Mirror:text');
+      },
+      difficulty: 2,
+      series: '',
+      filter: ['All', 'General']
+    };
+  });
+
+  maplebirch.tool.onInit(() => {
     setup.feats['Beyond Nature'] ??= {
       get title() {
         return maplebirch.t('deadwood-reblooms:VanillaPlus:deviancy:feat:title');
@@ -19,9 +33,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     output: 'deadwood-reblooms-deviancy-unlock',
     cond: () => V.VanillaPlus != null && maplebirch.VP.deviancy.unlock
   });
-  maplebirch.dynamic.regStateEvent('gate', 'deviancy-max', {
+  maplebirch.dynamic.regStateEvent('append', 'deviancy-max', {
     output: 'earnFeat "Beyond Nature"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.deviancy.max
+    cond: () => V.feats?.currentSave['Beyond Nature'] === undefined && V.VanillaPlus != null && maplebirch.VP.deviancy.max
   });
 
   const discover = (mirror: 'home' | 'farm' | 'tower' | 'temple') => `<<run maplebirch.VP.deviancy.discover('${mirror}')>>`;

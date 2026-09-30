@@ -110,8 +110,8 @@ export default function (maplebirch: typeof window.maplebirch) {
     output: 'run maplebirch.VP.preserve()',
     cond: () => V.VanillaPlus != null && maplebirch.VP.belowMinimum
   });
-  maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-all-max-feat', {
+  maplebirch.dynamic.regStateEvent('append', 'vanilla-plus-all-max-feat', {
     output: 'earnFeat "Every Limit Broken"',
-    cond: () => V.VanillaPlus != null && V.VanillaPlus.traits.incorrigible
+    cond: () => V.feats?.currentSave['Every Limit Broken'] === undefined && V.VanillaPlus != null && V.VanillaPlus.traits.incorrigible
   });
 }

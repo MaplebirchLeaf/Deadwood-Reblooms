@@ -30,9 +30,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     output: 'deadwood-reblooms-exhibitionism-unlock',
     cond: () => V.VanillaPlus != null && maplebirch.VP.exhibitionism.unlock
   });
-  maplebirch.dynamic.regStateEvent('gate', 'exhibitionism-max', {
+  maplebirch.dynamic.regStateEvent('append', 'exhibitionism-max', {
     output: 'earnFeat "Beyond Shame"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.exhibitionism.max
+    cond: () => V.feats?.currentSave['Beyond Shame'] === undefined && V.VanillaPlus != null && maplebirch.VP.exhibitionism.max
   });
 
   // 记录原版裸露挑战结果，并扩展暴露癖上限。

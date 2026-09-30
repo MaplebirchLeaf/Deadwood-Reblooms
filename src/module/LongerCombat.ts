@@ -34,9 +34,37 @@ class LongerCombat {
     return V.options.maplebirch.LongerCombat;
   }
 
+  private get climax(): 'ejaculation' | 'beastejaculation' | undefined {
+    const title = maplebirch.passage.title;
+    const finish = title.endsWith(' Finish') ? title : `${title} Finish`;
+    const story = maplebirch.SugarCube.Story;
+    if (!story.has(finish)) return undefined;
+    const macro = V.enemytype === 'beast' ? 'beastejaculation' : 'ejaculation';
+    // 带 knot 等参数的专用结算仍交给剧情处理。
+    return new RegExp(`<<${macro}\\s*>>`).test(story.get(finish).text) ? macro : undefined;
+  }
+
   private get canExtendCombat(): boolean {
     const train = V.combatTrain;
-    return V.combat === 1 && !V.stalk && !(Number(train?.length) > 0 || Number(train?.total_length) > 0);
+    return V.combat === 1 && !V.stalk && !(Number(train?.length) > 0 || Number(train?.total_length) > 0) && !!this.climax && !!this.passageTitle;
+  }
+
+  private reset(): void {
+    this.options.rounds = 0;
+    this.options.end = null;
+    this.lastLines.clear();
+  }
+
+  private beastClimax(sWikifier: (text: string) => void): void {
+    const index = V.active_enemy;
+    const health = V.enemyhealth;
+    const anger = V.enemyanger;
+    const trust = V.enemytrust;
+    sWikifier('<<beastejaculation>>');
+    V.active_enemy = index;
+    V.enemyhealth = health;
+    V.enemyanger = anger;
+    V.enemytrust = trust;
   }
 
   private npcHis(pronouns: { his: string }): string {
@@ -252,12 +280,12 @@ class LongerCombat {
 
   get passageTitle(): string {
     const current = maplebirch.passage.title;
-    const found = maplebirch.lodash.findLast(maplebirch.SugarCube.State.history, function (entry: { title?: string }) {
-      const title = entry?.title;
-      return title && title !== current && !title.endsWith(' Finish');
-    });
-    const title = found?.title || current;
-    return title.endsWith(' Finish') ? title.slice(0, -' Finish'.length) : title;
+    const story = maplebirch.SugarCube.Story;
+    if (!current.endsWith(' Finish')) return story.has(current) && /<<actionsman\s*>>/.test(story.get(current).text) ? current : '';
+    const source = maplebirch.SugarCube.State.peek(1)?.title;
+    if (!source || !story.has(source)) return '';
+    const text = story.get(source).text;
+    return /<<actionsman\s*>>/.test(text) && text.includes(current) ? source : '';
   }
 
   public main(): DocumentFragment {
@@ -266,28 +294,29 @@ class LongerCombat {
       fragment.append(Wikifier.wikifyEval(Text));
     };
 
-    if (V.enemyarousal < V.enemyarousalmax) return fragment;
+    const source = this.passageTitle;
+    if (!this.canExtendCombat || !source || V.enemyhealth <= 0 || V.enemyarousal < V.enemyarousalmax) return fragment;
 
     const options = this.options;
     if (Number(options.rounds || 0) === 0) this.lastLines.clear();
 
     if (this.shouldEndCombat) {
       T.combatend = true;
-      options.rounds = 0;
-      options.end = null;
-      this.lastLines.clear();
+      this.reset();
       return fragment;
     }
 
-    this.ejaculation(sWikifier);
+    if (this.climax === 'beastejaculation') this.beastClimax(sWikifier);
+    else this.ejaculation(sWikifier);
 
     const current = this.options;
     current.rounds = Number(current.rounds || 0) + 1;
     current.end = null;
     V.enemyarousal = Math.floor(V.enemyarousalmax * (0.15 + Math.random() * 0.1));
+    if (V.enemytype === 'beast') V[`enemyarousal${V.active_enemy + 1}`] = V.enemyarousal;
     T.combatend = false;
 
-    sWikifier(`<br><br><<lanLink '继续' ${JSON.stringify(this.passageTitle)} 'capitalize'>><</lanLink>>`);
+    sWikifier(`<br><br><<lanLink '继续' ${JSON.stringify(source)} 'capitalize'>><</lanLink>>`);
 
     return fragment;
   }
@@ -308,13 +337,13 @@ class LongerCombat {
         maplebirch.dynamic.regStateEvent('gate', 'LongerCombat', {
           output: 'LongerCombat',
           priority: 100,
-          cond: () => this.canExtendCombat,
+          cond: () => this.canExtendCombat && maplebirch.passage.title.endsWith(' Finish') && V.enemyhealth > 0 && V.enemyarousal >= V.enemyarousalmax,
           forceExit: () => V.enemyarousal >= V.enemyarousalmax && !this.shouldEndCombat
         });
 
         // 只改变普通遭遇战每回合的流逝秒数，原版 Time.pass 和其它状态结算继续运行。
         maplebirch.dynamic.regTimeEvent('onBefore', 'LongerCombat', {
-          cond: () => this.canExtendCombat,
+          cond: () => this.canExtendCombat && !maplebirch.passage.title.endsWith(' Finish'),
           action: data => (data.passed = this.options.seconds)
         });
       },
@@ -326,7 +355,13 @@ class LongerCombat {
       () => {
         const macros = this.core.SugarCube.Macro;
         const tidyEjaculation = this.tidyEjaculation.bind(this);
+        const reset = (action: () => void): void => {
+          action();
+          this.reset();
+        };
         for (const [name, action] of [
+          ['combatinit', reset],
+          ['endcombat', reset],
           ['orgasm', this.orgasm.bind(this)],
           ['ejaculation', this.npcOrgasm.bind(this)]
         ] as const) {
@@ -342,7 +377,7 @@ class LongerCombat {
           });
         }
       },
-      'LongerCombat NPC Fluids'
+      'LongerCombat Macros'
     );
   }
 }

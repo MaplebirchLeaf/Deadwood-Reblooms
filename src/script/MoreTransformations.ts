@@ -25,12 +25,12 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
   });
 
   // 转化会衰减，成就只在首次达到完整形态时授予。
-  maplebirch.dynamic.regStateEvent('gate', 'horse-transformation-feat', {
+  maplebirch.dynamic.regStateEvent('append', 'horse-transformation-feat', {
     output: 'earnFeat "Horse Transformation"',
-    cond: () => (V.maplebirch?.transformation?.horse?.level ?? 0) >= 6
+    cond: () => V.feats?.currentSave['Horse Transformation'] === undefined && (V.maplebirch?.transformation?.horse?.level ?? 0) >= 6
   });
-  maplebirch.dynamic.regStateEvent('gate', 'fish-transformation-feat', {
+  maplebirch.dynamic.regStateEvent('append', 'fish-transformation-feat', {
     output: 'earnFeat "Fish Transformation"',
-    cond: () => (V.maplebirch?.transformation?.fish?.level ?? 0) >= 6
+    cond: () => V.feats?.currentSave['Fish Transformation'] === undefined && (V.maplebirch?.transformation?.fish?.level ?? 0) >= 6
   });
 }

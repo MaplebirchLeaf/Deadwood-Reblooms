@@ -81,6 +81,20 @@ const historyProjectLocationPassages: Record<string, PassagePatch[]> = {
 
 export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.onInit(() => {
+    setup.feats['Evidence Matters'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:feats:Evidence Matters:name');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:feats:Evidence Matters:text');
+      },
+      difficulty: 2,
+      series: '',
+      filter: ['All', 'General']
+    };
+  });
+
+  maplebirch.tool.onInit(() => {
     setup.feats['Local History Exhibition'] ??= {
       get title() {
         return maplebirch.t('deadwood-reblooms:LifeSimulation:history:feat:title');
@@ -94,9 +108,9 @@ export default function (maplebirch: typeof window.maplebirch) {
       softLockable: true
     };
   });
-  maplebirch.dynamic.regStateEvent('gate', 'life-simulation-history-feat', {
+  maplebirch.dynamic.regStateEvent('append', 'life-simulation-history-feat', {
     output: 'earnFeat "Local History Exhibition"',
-    cond: () => V.LifeSimulation?.historyProject?.status === 'won'
+    cond: () => V.feats?.currentSave['Local History Exhibition'] === undefined && V.LifeSimulation?.historyProject?.status === 'won'
   });
 
   const registerAntique = () => {

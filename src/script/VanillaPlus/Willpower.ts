@@ -15,9 +15,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     };
   });
 
-  maplebirch.dynamic.regStateEvent('gate', 'willpower-max', {
+  maplebirch.dynamic.regStateEvent('append', 'willpower-max', {
     output: 'earnFeat "Sovereign Will"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.willpower.max
+    cond: () => V.feats?.currentSave['Sovereign Will'] === undefined && V.VanillaPlus != null && maplebirch.VP.willpower.max
   });
 
   const slimeDefyPassages = [

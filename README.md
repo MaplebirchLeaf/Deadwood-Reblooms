@@ -21,7 +21,7 @@
 ## 安装与前置
 
 1. 准备支持 SugarCube 2 ModLoader 的游戏。发布包分别支持 **DoL 0.5.12.13** 和 **DoL 0.5.11.9**。
-2. 加载 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)，版本须满足模组包声明的 `maplebirch >= 5.1.1`，并安装模组包所列的其他前置。
+2. 加载 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)，版本须满足模组包声明的 `maplebirch >= 5.1.3`，并安装模组包所列的其他前置。
 3. 从 [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases) 选择与游戏版本一致的 `deadwood-reblooms-*.modpack`，不要同时加载两个游戏版本的主包。需要动态音乐时，再加载相同游戏版本的 `deadwood-reblooms-audio-*.modpack`。
 4. 需要调整模块时，在框架的模块管理中启用或关闭，并按提示重载。
 
@@ -48,6 +48,10 @@
 | `DM`                  | 根据战斗、昼夜、天气与天体异象切换的动态音乐   |
 
 在游戏侧边栏打开**模组提示**，可进入按模块排列的单页游戏指南。搜索框可查地点、人物、解锁条件与排查步骤。**角色页 → 统计 → 模组统计**显示当前存档的属性、校园、金融、房产和人物路线进度。人物剧情的下一步仍以游戏日志和实际场景为准。
+
+### 目录中的模块开关
+
+游戏指南目录将章节跳转与模块复选框放在同一项中。复选框共用框架模块管理的设置，依赖模块随父子关系一起调整。修改后显示待重载列表，先保存游戏，再点击「立即重载」。已发生的剧情与当前存档进度不会因关闭模块而回滚。动态音乐等存档内选项仍在模组设置中调整。
 
 ## 可选音频包
 

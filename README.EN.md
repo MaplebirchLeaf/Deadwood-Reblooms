@@ -21,7 +21,7 @@
 ## Installation and dependencies
 
 1. Use a game build with SugarCube 2 ModLoader. Separate packages target **DoL 0.5.12.13** and **DoL 0.5.11.9**.
-2. Load the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). Its version must satisfy the mod package's `maplebirch >= 5.1.1` requirement, together with the other listed dependencies.
+2. Load the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). Its version must satisfy the mod package's `maplebirch >= 5.1.3` requirement, together with the other listed dependencies.
 3. From [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases), load only the main `deadwood-reblooms-*.modpack` matching your game version. To use dynamic music, also load the audio `deadwood-reblooms-audio-*.modpack` for that same game version.
 4. To change modules, use the framework's module manager and reload when prompted.
 
@@ -48,6 +48,10 @@
 | `DM`                  | Music selected by combat, time of day, weather, and celestial events      |
 
 Open **Mod Hints** in the game sidebar for the single-page guide. Its sections and search cover characters, places, unlock conditions, and troubleshooting. **Character → Statistics → Mod Statistics** shows progress for the current save, including stats, school, finance, property, and character routes. Check the journal and the actual scene for the next story step.
+
+### Module switches in the contents
+
+Each guide entry combines a chapter link and its module checkbox. Checkboxes share the framework manager's settings and apply dependency changes together. A pending-reload list appears after changes: save your game, then choose Reload now. Disabling a module does not roll back existing story progress. Per-save options such as music playback remain in mod settings.
 
 ## Optional audio pack
 

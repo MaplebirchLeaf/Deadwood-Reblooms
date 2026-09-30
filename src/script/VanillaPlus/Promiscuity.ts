@@ -114,9 +114,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     };
   });
 
-  maplebirch.dynamic.regStateEvent('gate', 'promiscuity-max', {
+  maplebirch.dynamic.regStateEvent('append', 'promiscuity-max', {
     output: 'earnFeat "Every Inch"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.promiscuity.max
+    cond: () => V.feats?.currentSave['Every Inch'] === undefined && V.VanillaPlus != null && maplebirch.VP.promiscuity.max
   });
   maplebirch.dynamic.regStateEvent('gate', 'promiscuity-unlock', {
     output: 'deadwood-reblooms-promiscuity-unlock',

@@ -1,0 +1,124 @@
+:: Deadwood Reblooms Household Widgets [widget]
+
+<<widget 'deadwood-reblooms-household-scene'>>
+  <<set _housemates to maplebirch.VP.realEstate.residentsHome(_args[0])>>
+  <<if _housemates.length is 2>>
+    <<set _pair to _housemates.map(profile => profile.id).sort().join(':')>>
+    <<switch _pair>>
+      <<case 'Robin:Sydney'>>
+        <<lanSwitch 'Robin brings three cups from the kitchen while Sydney clears a place among the books. They compare tomorrow’s early starts, then both look to you when the conversation turns to breakfast. Robin offers to put the kettle on first. Sydney checks that this will not make Robin late for the orphanage.' '罗宾从厨房拿来三只杯子，悉尼把桌上的书往旁边收了收。两人说起明早各自要出门的时间，谈到早餐时，又一同望向你。罗宾主动说可以先烧水，悉尼则问，这会不会耽误罗宾回孤儿院。'>>
+      <<case 'Robin:Whitney'>>
+        <<lanSwitch 'Whitney greets Robin with a sneer. Robin stops in the doorway rather than taking the chair beside Whitney. The distance between them has followed them home.' '惠特尼看见罗宾，嘴角便露出讥笑。罗宾停在门边，没有坐到惠特尼旁边。学校里的隔阂并没有被这间房子挡在门外。'>><br>
+        <<if C.npc.Robin.trauma gte 20>>
+          <span class='red'><<lanSwitch 'Robin asks to speak to you outside the room. You do not make Robin stay beside the person causing that fear.' '罗宾小声问，能不能到外面单独和你说话。你没有要求罗宾继续坐在令自己害怕的人旁边。'>></span>
+        <<elseif C.npc.Robin.dom gte 80>>
+          <<lanSwitch '“You don’t get to talk to me like that here,” Robin says. Whitney laughs sharply. Neither offers to sit down.' '“在这里，你也不能这样跟我说话。”罗宾说。惠特尼短促地笑了一声，谁也没有坐下的意思。'>>
+        <<else>>
+          <<lanSwitch 'Robin looks at you instead of answering Whitney. You keep the route to the guest room clear.' '罗宾没有回应惠特尼，只是看着你。你留着通向客房的路，没有挡在门口。'>>
+        <</if>>
+      <<case 'Kylar:Robin'>>
+        <<lanSwitch 'Kylar moves the chair nearest you before Robin can sit down. Robin notices, and keeps a hand on the back of the other chair.' '罗宾还没坐下，凯拉尔便把最靠近你的椅子拉了过去。罗宾注意到了，手仍放在另一只椅背上。'>><br>
+        <<if C.npc.Kylar.rage gte 60>>
+          <<if C.npc.Robin.dom gte 80 and C.npc.Robin.trauma lt 20>>
+            <<lanSwitch 'Robin asks Kylar to stop pushing between you. Kylar turns toward Robin, then back to you. The conversation cannot proceed as though this were only about seats.' '罗宾叫凯拉尔别总挤到你们中间。凯拉尔先看向罗宾，又转回来看你。这场谈话没法当作只是在选座位。'>>
+          <<else>>
+            <<lanSwitch 'Robin steps back. You ask Kylar to leave room at the table, rather than waiting for Robin to compete for a place.' '罗宾往后退了一步。你叫凯拉尔给桌边留出位置，没有等着罗宾争抢座位。'>>
+          <</if>>
+        <<else>>
+          <<lanSwitch 'You leave space for both chairs. Kylar keeps watching whenever Robin speaks to you. Robin asks about the orphanage tomorrow, but does not lean against you while Kylar is watching.' '你给两只椅子都留出位置。每当罗宾和你说话，凯拉尔便看过来。罗宾问起明天孤儿院的事，却没有在凯拉尔注视下靠到你身上。'>>
+        <</if>>
+      <<case 'Sydney:Whitney'>>
+        <<run statusCheck('Sydney')>>
+        <<lanSwitch 'Whitney reaches toward the book Sydney has left on the table. Sydney takes it back before Whitney can open it.' '惠特尼伸手去拿悉尼留在桌上的书，悉尼在书被翻开之前便收了回来。'>><br>
+        <<if _sydneyStatus.includes('corrupt')>>
+          <<lanSwitch '“Leave my books alone.” Sydney’s voice is sharp. Whitney steps closer with a mocking smile. You move the cups before either knocks them over. Sydney does not laugh along.' '“别碰我的书。”悉尼的声音很硬。惠特尼带着嘲弄的笑容往前靠，你在杯子被碰翻前把它们移开。悉尼并没有跟着笑。'>>
+        <<else>>
+          <<lanSwitch 'Sydney holds the book close and asks Whitney to leave it alone. Whitney makes a remark about temple rules. Sydney answers that these are personal belongings, not a sermon.' '悉尼抱着书，请惠特尼别动它。惠特尼拿神殿的规矩打趣，悉尼回答，这是自己的东西，不是在布道。'>>
+        <</if>>
+      <<case 'Kylar:Sydney'>>
+        <<lanSwitch 'Sydney starts to ask Kylar about the morning, then stops when Kylar turns toward you. They know each other, but that does not make this a reunion.' '悉尼刚想问凯拉尔明早的安排，凯拉尔便转向你，悉尼的话停在半途。两人不是第一次认识，但这也不是一次和好的重逢。'>><br>
+        <<if C.npc.Kylar.rage gte 60>>
+          <span class='red'><<lanSwitch 'Kylar tells Sydney that you were talking together. Sydney looks to you. You do not ask Sydney to apologise for speaking in a shared room.' '凯拉尔对悉尼说，你们正在说话。悉尼看向你。你没有要求悉尼为在起居室开口而道歉。'>></span>
+        <<else>>
+          <<lanSwitch 'Sydney leaves the question open. After a pause, Kylar gives a short answer, still watching where you sit. There is no easy conversation about their past.' '悉尼没有追问。停了一会儿，凯拉尔简短地答了一句，仍留意着你坐在哪里。没人轻松地聊起从前的事。'>>
+        <</if>>
+      <<case 'Kylar:Whitney'>>
+        <<lanSwitch 'Whitney calls Kylar a creep before the cups reach the table. Kylar goes rigid, keeping the chair between them. You have to stand between their lines of sight to speak.' '杯子还没放上桌，惠特尼便叫了凯拉尔一声怪胎。凯拉尔僵在原地，把椅子挡在两人之间。你得站到他们视线中间，才能把话说下去。'>><br>
+        <span class='red'><<lanSwitch 'Neither agrees to spend the evening together. You discuss separate rooms and separate homes, rather than treating the refusal as a joke.' '两人都不肯一起度过今晚。你只能谈分开房间，或分别住到不同的住所，没有把拒绝当成玩笑。'>></span>
+    <</switch>><br><br>
+    <<if _housemates.some(profile => profile.id === 'Kylar') and C.npc.Kylar.rage gte 60>>
+      <span class='red'><<lanSwitch 'Kylar keeps watching whenever you address the other resident. Sharing an address has not made that attention easier to bear.' '每当你和另一位住户说话，凯拉尔的目光便跟过来。住在同一个屋檐下，并没有让这份关注变得更容易接受。'>></span><br><br>
+    <</if>>
+    <<if _housemates.some(profile => profile.id === 'Robin') and C.npc.Robin.trauma gte 20>>
+      <<lanSwitch 'Robin sits nearest the door, holding the cup with both hands. You leave the way out clear and let Robin decide when to speak.' '罗宾坐在离门最近的地方，两手捧着杯子。你留着通向门口的空隙，等罗宾自己决定什么时候开口。'>><br><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-household-boundary'>>
+  <<set _otherResidents to maplebirch.VP.realEstate.residentsAt(_args[0]).filter(profile => profile.id !== _args[1])>>
+  <<if _otherResidents.length gt 0>>
+    <<lanSwitch 'You explain who else lives there and show which room is available. Living under the same roof does not mean sharing a bed or entering someone else’s room without asking.' '你说明还有谁住在这里，以及哪间房可以使用。同住不等于同床，进别人的房间之前，也要先问一声。'>><br><br>
+    <<switch _args[1]>>
+      <<case 'Robin'>>
+        <<lanSwitch 'Robin asks whether there will still be somewhere to sit with you alone. You point out the guest room and promise to knock.' '罗宾问，还能不能找个地方单独和你坐一会儿。你指出客房的位置，答应进门前会敲门。'>><br>
+      <<case 'Whitney'>>
+        <<lanSwitch '“Keep them out of my things,” Whitney says. Whitney checks the room before putting the key away.' '“别让人乱翻我的东西。”惠特尼说。惠特尼确认了房间的位置，才收起钥匙。'>><br>
+      <<case 'Kylar'>>
+        <<lanSwitch 'Kylar’s smile falters at the other name. “I thought this was for us.” You explain the arrangement again, without calling the guest room a promise of anything more. Kylar checks which room is available, without taking the arrangement as a promise that you belong only to Kylar.' '听到另一个名字，凯拉尔的笑容僵了一下。“我以为这是给我们的。”你又解释了一遍安排，没有把客房说成更多的承诺。凯拉尔确认了能用哪间房，却没有把这份安排当成你只属于凯拉尔的承诺。'>><br>
+      <<case 'Sydney'>>
+        <<lanSwitch 'Sydney asks about privacy and the early morning routine. “Please tell me before changing the arrangement,” Sydney says, looking at you rather than the spare key.' '悉尼问起私人空间和清晨的作息。“以后要改安排，先告诉我，好吗？”悉尼看着你，没有去看那把备用钥匙。'>><br>
+    <</switch>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Property Household []
+<<set _property to maplebirch.VP.realEstate.current>>
+<<if !_property or maplebirch.VP.realEstate.residentsHome(_property.id).length lt 2>>
+  <<lanSwitch 'The others have already gone to their rooms or left for the day. You leave the conversation for another time.' '其他人已经回房或出门了。你把这次谈话留到下次。'>><br><br>
+<<else>>
+  <<run maplebirch.VP.realEstate.enter()>><<effects>>
+  <<deadwood-reblooms-household-scene _property.id>>
+  <<lanSwitch 'You ask how to arrange tonight. The guest room remains available, and no one has to share the main bed.' '你问起今晚的安排。客房仍可以使用，没有谁必须陪你睡在主卧。'>><br><br>
+  <<set _conflict to maplebirch.VP.realEstate.householdConflict(maplebirch.VP.realEstate.residentsAt(_property.id).map(profile => profile.id))>>
+  <<if _conflict>>
+    <span class='red'><<lanSwitch 'The proposed shared routine is refused. Tonight needs separate arrangements. You can discuss moving with each resident individually.' '共同作息的提议被拒绝了。今晚需要分别安排，你也可以单独和住户商量换一处住所。'>></span><br><br>
+  <<else>>
+  <<socialiseicon>><<linkreplace `lanSwitch('Agree on tomorrow’s morning routine', '商量明早的作息')`>>
+    <<lanSwitch 'You suggest leaving the kettle ready and keeping the bathroom clear for whoever must leave first. Each person names a departure time. You write them down instead of deciding who should give up their own plans.' '你提议把烧水的东西备好，让最早出门的人先用浴室。大家各自说了出门的时间，你把它们记下来，没有替谁取消原来的安排。'>><br><br>
+    <<if maplebirch.VP.realEstate.residentsHome(_property.id).some(profile => profile.id === 'Robin')>>
+      <<lanSwitch 'Robin offers to wash the cups. You remind Robin that everyone can take a turn.' '罗宾主动说可以洗杯子。你提醒罗宾，大家都可以轮流做。'>><br>
+    <</if>>
+    <<if maplebirch.VP.realEstate.residentsHome(_property.id).some(profile => profile.id === 'Whitney')>>
+      <<lanSwitch 'Whitney complains about the list, then checks the bathroom time once more before handing the pencil back.' '惠特尼嫌这张表麻烦，却在把笔还给你之前，又看了一遍浴室的时间。'>><br>
+    <</if>>
+  <</linkreplace>><br>
+  <<socialiseicon>><<linkreplace `lanSwitch('Discuss privacy and the bedrooms', '说清房间与私人空间')`>>
+    <<lanSwitch 'You point out the guest room and ask everyone to knock. A closed door means waiting for an answer. You make no promise about sharing a bed on someone else’s behalf.' '你指出客房的位置，请大家进门前先敲门。房门关着，就等里面的人回答。你没有替任何人承诺要和谁同床。'>><br><br>
+    <<if maplebirch.VP.realEstate.residentsHome(_property.id).some(profile => profile.id === 'Kylar')>>
+      <<if C.npc.Kylar.rage gte 60>>
+        <span class='red'><<lanSwitch '“And if you shut the door on me?” Kylar asks. You repeat that knocking comes first. Kylar looks away, still gripping the key.' '“那你把我关在外面呢？”凯拉尔问。你又说了一遍，先敲门。凯拉尔移开目光，手里仍紧攥着钥匙。'>></span><br>
+      <<else>>
+        <<lanSwitch 'Kylar asks whether you will still make time alone together. You say that you can ask each other, without making it a rule for every night.' '凯拉尔问，你们还会不会单独相处。你说可以彼此询问，没有把每一晚都说成必须兑现的约定。'>><br>
+      <</if>>
+    <</if>>
+    <<if maplebirch.VP.realEstate.residentsHome(_property.id).some(profile => profile.id === 'Sydney')>>
+      <<run statusCheck('Sydney')>>
+      <<if _sydneyStatus.includes('corrupt')>>
+        <<lanSwitch '“Then I’ll ask you myself,” Sydney says, smiling at you before putting the spare pillow back in the guest room.' '“那我就自己来问你。”悉尼朝你笑了笑，把备用枕头放回客房。'>><br>
+      <<else>>
+        <<lanSwitch 'Sydney nods and asks that the same rule apply to everyone. The guest-room door is left ajar until the conversation ends.' '悉尼点点头，请你对每个人都遵守同样的规矩。谈话结束之前，客房的门仍留着一条缝。'>><br>
+      <</if>>
+    <</if>>
+  <</linkreplace>><br><br>
+  <</if>>
+  <<for _resident range maplebirch.VP.realEstate.residentsHome(_property.id)>>
+    <<capture _resident>>
+      <<socialiseicon>><<link `lanSwitch('Talk privately with ', '单独和') + lanSwitch(_resident.id, maplebirch.auto(_resident.id)) + lanSwitch('', '聊聊')` 'Deadwood Reblooms Property Evening Together'>>
+        <<run maplebirch.VP.realEstate.meetResident(_resident.id, _property.id)>><<pass 20>>
+      <</link>><br>
+    <</capture>>
+  <</for>>
+  <br><<lanSwitch 'You leave each person free to return to their own room. Sharing this address has not resolved their relationship with one another.' '你让每个人都可以回自己的房间。住在同一个地址，并没有解决他们之间的关系。'>><br><br>
+<</if>>
+<<getouticon>><<lanLink '返回起居室' 'Deadwood Reblooms Property Home'>><</lanLink>>

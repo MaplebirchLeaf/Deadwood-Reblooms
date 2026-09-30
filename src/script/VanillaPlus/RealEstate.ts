@@ -1,4 +1,62 @@
 export default function RealEstate(maplebirch: typeof window.maplebirch): void {
+  maplebirch.tool.onInit(() => {
+    setup.feats['Own Keys'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:feats:Own Keys:name');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:feats:Own Keys:text');
+      },
+      difficulty: 1,
+      series: '',
+      filter: ['All', 'General']
+    };
+    setup.feats['Feels Like Home'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:feats:Feels Like Home:name');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:feats:Feels Like Home:text');
+      },
+      difficulty: 2,
+      series: '',
+      filter: ['All', 'General']
+    };
+    setup.feats['Leave a Light On'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:feats:Leave a Light On:name');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:feats:Leave a Light On:text');
+      },
+      difficulty: 2,
+      series: '',
+      filter: ['All', 'Social']
+    };
+    setup.feats['Ride the Wind'] ??= {
+      get title() {
+        return maplebirch.t('deadwood-reblooms:feats:Ride the Wind:name');
+      },
+      get desc() {
+        return maplebirch.t('deadwood-reblooms:feats:Ride the Wind:text');
+      },
+      difficulty: 1,
+      series: '',
+      filter: ['All', 'General']
+    };
+  });
+
+  maplebirch.dynamic.regStateEvent('append', 'property-keys-feat', {
+    output: 'earnFeat "Own Keys"',
+    extra: { passage: ['Deadwood Reblooms Property Office', 'Deadwood Reblooms Property Home'] },
+    cond: () => V.feats?.currentSave['Own Keys'] === undefined && maplebirch.VP.realEstate.properties.some(property => maplebirch.VP.realEstate.owns(property.id))
+  });
+  maplebirch.dynamic.regStateEvent('append', 'property-furniture-feat', {
+    output: 'earnFeat "Feels Like Home"',
+    extra: { passage: ['Deadwood Reblooms Property Furniture Catalogue', 'Deadwood Reblooms Property Home'] },
+    cond: () => V.feats?.currentSave['Feels Like Home'] === undefined && maplebirch.VP.realEstate.properties.some(property => maplebirch.VP.realEstate.furnished(property.id))
+  });
+
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-property-furnishings-link', passage: 'Furniture Shop' });
   // 这些原版 Passage 能与 NPC 当面交谈。课堂入口还需由原版出勤状态与考试阶段筛选。
   maplebirch.tool.addTo(

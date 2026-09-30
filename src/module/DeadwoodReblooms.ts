@@ -35,6 +35,7 @@ import Hint_Credits_CN from '@/assets/hint/CN/Credits.md';
 import Hint_Credits_EN from '@/assets/hint/EN/Credits.md';
 import { defaults } from './constants';
 import Module from './Module';
+import Guide from './Guide';
 
 // prettier-ignore
 const guideSections = {
@@ -144,69 +145,6 @@ class BaileyRent {
   }
 }
 
-class Hint {
-  constructor(
-    private readonly textbox: HTMLInputElement,
-    private readonly content: HTMLElement
-  ) {
-    this.content.addEventListener('click', event => {
-      const target = event.target as HTMLElement;
-      const link = target.closest<HTMLAnchorElement>('a[data-guide-target]');
-      if (!link) return;
-      const section = document.getElementById(link.dataset.guideTarget || '');
-      if (!section) return;
-      event.preventDefault();
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  }
-
-  public search() {
-    this.clear();
-    const keyword = this.textbox.value.trim();
-    if (!keyword) return;
-    const regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-    // 只高亮文字节点。改写整段 innerHTML 会误中标签属性，也会销毁内容里的事件监听器。
-    const walker = document.createTreeWalker(this.content, NodeFilter.SHOW_TEXT);
-    const nodes: Text[] = [];
-    while (walker.nextNode()) {
-      const node = walker.currentNode as Text;
-      if (node.parentElement && !['SCRIPT', 'STYLE'].includes(node.parentElement.tagName) && !node.parentElement.closest('nav')) nodes.push(node);
-    }
-    for (const node of nodes) {
-      const source = node.data;
-      const matches = [...source.matchAll(regex)];
-      if (matches.length === 0) continue;
-      const fragment = document.createDocumentFragment();
-      let offset = 0;
-      for (const match of matches) {
-        const start = match.index;
-        fragment.append(document.createTextNode(source.slice(offset, start)));
-        const highlight = document.createElement('span');
-        highlight.className = 'gold searchResult';
-        highlight.textContent = match[0];
-        fragment.append(highlight);
-        offset = start + match[0].length;
-      }
-      fragment.append(document.createTextNode(source.slice(offset)));
-      node.replaceWith(fragment);
-    }
-    const result = this.content.querySelector('.searchResult');
-    if (result) {
-      result.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-    const noResult = document.createElement('div');
-    noResult.className = 'gold noSearchResult';
-    noResult.textContent = lanSwitch('No results', '无结果');
-    this.content.before(noResult);
-  }
-
-  public clear() {
-    document.querySelector('.noSearchResult')?.remove();
-    this.content.querySelectorAll('.searchResult').forEach(element => element.replaceWith(...element.childNodes));
-  }
-}
-
 class DeadwoodReblooms extends Module {
   static readonly options = {
     modhint: 'disabled' as 'disabled' | 'mobile' | 'desktop',
@@ -216,40 +154,27 @@ class DeadwoodReblooms extends Module {
   };
 
   public readonly exposed = true;
-  public hint?: Hint;
+  public readonly guide: Guide;
+  public hint?: ReturnType<Guide['bind']>;
   private random?: ReturnType<typeof maplebirch.tool.rand.create>;
   private readonly baileyRent: BaileyRent;
 
   public constructor(core: typeof maplebirch) {
     super(core, 'DeadwoodReblooms', defaults);
     this.baileyRent = new BaileyRent(core);
-  }
-
-  private markdown(source: string): string {
-    const rendered = this.core.marked.parse(source);
-    return typeof rendered === 'string' ? rendered : '';
+    this.guide = new Guide(core);
   }
 
   public get wiki(): string {
-    const intro = this.markdown(lanSwitch(Hint_EN, Hint_CN));
-    const contents = guideOrder
-      .map(name => {
+    return this.guide.render(
+      'deadwood-guide',
+      lanSwitch(Hint_EN, Hint_CN),
+      guideOrder.map(name => {
         const section = guideSections[name];
         const title = lanSwitch(section.title.EN, section.title.CN);
-        const label = name === 'Credits' ? title : `${name} · ${title}`;
-        return `<div class='settingsToggleItem'><a href='#deadwood-guide-${name}' data-guide-target='deadwood-guide-${name}'>${label}</a></div>`;
+        return { id: name, title: name === 'Credits' ? title : `${name} · ${title}`, content: lanSwitch(section.EN, section.CN), module: name === 'Credits' ? undefined : name };
       })
-      .join('');
-    const sections = guideOrder.map(name => {
-      const section = guideSections[name];
-      const title = lanSwitch(section.title.EN, section.title.CN);
-      const label = name === 'Credits' ? title : `${name} · ${title}`;
-      return `<section id='deadwood-guide-${name}'>
-        <h2><span class='gold'>${label}</span></h2>
-        ${this.markdown(lanSwitch(section.EN, section.CN))}
-      </section>`;
-    });
-    return `${intro}<nav aria-label='${lanSwitch('Guide contents', '指南目录')}'><div class='settingsGrid'>${contents}</div></nav><br>${sections.join('<br>')}`;
+    );
   }
 
   private overlapping(): Set<OverlappingModule> {
@@ -275,10 +200,13 @@ class DeadwoodReblooms extends Module {
 
   public open(): void {
     $.wiki("<<maplebirchReplace 'DeadwoodRebloomsHint' 'title'>>");
+  }
+
+  public bindHint(): void {
     const textbox = document.querySelector<HTMLInputElement>('#textbox--deadwoodrebloomshinttextbox');
     const content = document.querySelector<HTMLElement>('#modhint-content');
     if (!textbox || !content) return;
-    this.hint = new Hint(textbox, content);
+    this.hint = this.guide.bind(textbox, content);
   }
 
   public async preInit(): Promise<void> {

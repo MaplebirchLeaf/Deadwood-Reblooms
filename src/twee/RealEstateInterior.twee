@@ -75,13 +75,6 @@
 	<</for>>
 	<<mirroricon 'home'>><<lanLink '镜子' 'Deadwood Reblooms Property Mirror'>><<preMirror>><</lanLink>><br>
 	<<roomoptions>>
-	<<lanLink '游戏设置' 'Settings'>><<set $settingsExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
-	<<attitudesControlCheck>>
-	<<if $attitudesControl.showGoldLink is true>>
-		<span class='goldLink'><<lanLink '态度' 'Attitudes'>><<set $attitudesExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>></span> <span class='red'>!!</span>
-	<<else>>
-		<<lanLink '态度' 'Attitudes'>><<set $attitudesExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
-	<</if>>
 	<<if playerHasSexToys()>>
 		<<sextoysicon>><<lanLink '性玩具' 'Sextoys Inventory'>><<set $sextoyInvReturnLink to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
 	<</if>>
@@ -93,6 +86,14 @@
 		<<getouticon>><<lanLink '起居室 (0:01)' 'Deadwood Reblooms Property Home'>><<pass 1>><</lanLink>>
 	<<else>>
 		<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
+	<</if>>
+	<br><br>
+	<<lanLink '游戏设置' 'Settings'>><<set $settingsExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
+	<<attitudesControlCheck>>
+	<<if $attitudesControl.showGoldLink is true>>
+		<span class='goldLink'><<lanLink '态度' 'Attitudes'>><<set $attitudesExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>></span> <span class='red'>!!</span><br>
+	<<else>>
+		<<lanLink '态度' 'Attitudes'>><<set $attitudesExitPassage to 'Deadwood Reblooms Property Bedroom'>><</lanLink>><br>
 	<</if>>
 <</if>>
 
@@ -571,7 +572,11 @@
 	<<case 'Cliff Street'>><<lanSwitch 'The sea wind follows you as you turn back toward the street.' '你转向街道时，海风仍追在身后。'>><br>
 	<<case 'Danube Street'>><<lanSwitch 'You keep clear of the garden walls and land by the road.' '你避开花园的围墙，落在路边。'>><br>
 <</switch>>
-<br><<getouticon>><<lanLink '落到街上' $deadwoodFlightStreet>><</lanLink>>
+<br><<getouticon>><<lanLink '落到街上' $deadwoodFlightStreet>>
+	<<if maplebirch.VP.realEstate.current and $deadwoodFlightStreet isnot maplebirch.VP.realEstate.current.street>>
+		<<earnFeat 'Ride the Wind'>>
+	<</if>>
+<</lanLink>>
 
 :: Deadwood Reblooms Property Outdoor View []
 <<set _property to maplebirch.VP.realEstate.current>>
@@ -609,9 +614,23 @@
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<= lanSwitch(_property.interior.guest.EN, _property.interior.guest.CN)>><br><br>
-	<<if maplebirch.VP.realEstate.residentsAt(_property.id).length gt 1>>
+	<<set _guests to maplebirch.VP.realEstate.residentsInGuestRoom(_property.id)>>
+	<<if _guests.length gt 0>>
+		<<for _guestResident range _guests>>
+			<<capture _guestResident>>
+				<<npc _guestResident.id>><<person1>>
+				<<= maplebirch.auto(_guestResident.id)>> <<lanSwitch 'looks up from the guest bed as you enter.' '见你进来，从客房的床上抬起头。'>><br><br>
+				<<socialiseicon>><<lanLink '一起待一会儿 (0:20)' 'Deadwood Reblooms Property Evening Together'>>
+					<<run maplebirch.VP.realEstate.meetResident(_guestResident.id, _property.id)>><<pass 20>>
+				<</lanLink>><br>
+				<<loveicon 'kiss'>><<lanLink '请恋人到主卧陪你' 'Deadwood Reblooms Property Bedroom'>>
+					<<run maplebirch.VP.realEstate.meetResident(_guestResident.id, _property.id)>>
+				<</lanLink>><br><br>
+			<</capture>>
+		<</for>>
+	<<elseif maplebirch.VP.realEstate.residentsAt(_property.id).length gt 1>>
 		<<set _guestResident to maplebirch.VP.realEstate.residentsAt(_property.id)[1]>>
-		<<= maplebirch.auto(_guestResident.id)>> <<lanSwitch 'keeps their things here.' '把自己的东西放在这里。'>><br><br>
+		<<= maplebirch.auto(_guestResident.id)>> <<lanSwitch 'keeps their things here, but is not in the guest room now.' '把自己的东西放在这里，但现在不在客房。'>><br><br>
 	<</if>>
 	<<getouticon>><<lanLink '返回楼梯间 (0:01)' 'Deadwood Reblooms Property Landing'>><<pass 1>><</lanLink>>
 <</if>>

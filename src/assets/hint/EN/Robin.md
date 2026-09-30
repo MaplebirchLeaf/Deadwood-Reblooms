@@ -52,6 +52,12 @@ If Robin is your lover and trauma is below 50, four **optional consensual encoun
 
 Each scene offers a clear choice to continue or leave. Afterwards you return to the relevant stall or street. If the shop has closed, you return to Cliff Street.
 
+### Fishing and grilled fish
+
+The beach fishing date requires Robin working at the lemonade cart, healthy and present, love at least 20, **09:00 until before 16:00**, no precipitation, and an unexposed PC. Hold a fishing rod with usable arms. The date is available once per day and uses vanilla beach fishing. The return dialogue checks whether you caught fish during this date.
+
+Prepare fish at an equipped grill or the opened drinks shop. Eligible fish come from the PC’s food inventory and must be cookable. Sell at most three fish per day. Taste the first recipe together before selling it. If your catch is absent, check inventory amounts, cookability, and Robin’s presence at the counter.
+
 ### School connection
 
 As prefect or president, order student council drinks once a day if Robin is in the shop, special ingredients remain, and your bank account holds £20. The bank pays, Robin's business reserve grows, and student standing and staff trust improve.

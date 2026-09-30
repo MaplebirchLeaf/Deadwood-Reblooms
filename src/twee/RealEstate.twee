@@ -72,9 +72,11 @@
 	<<if _message && _message.name is _name>>
 		<<switch _message.result>>
 			<<case 'joined'>><span class='green'><<= lanSwitch(_profile.welcome.EN, _profile.welcome.CN)>></span><br><br>
+				<<set _joinedHome to maplebirch.VP.realEstate.residenceOf(_name)>>
+				<<if _joinedHome>><<deadwood-reblooms-household-boundary _joinedHome.id _name>><</if>>
 			<<case 'full'>><span class='red'><<lanSwitch 'There is no room for another person to live there.' '那处房子住不下更多人了。'>></span><br><br>
 			<<case 'bed'>><span class='red'><<lanSwitch 'You need a double bed before you can live together there.' '你们需要一张双人床，才能住在一起。'>></span><br><br>
-			<<case 'left'>><<lanSwitch 'You agree to live apart again.' '你们说好重新分开居住。'>><br><br>
+			<<case 'conflict'>><span class='red'><<lanSwitch 'The invitation is refused. A spare room is not enough to make this arrangement acceptable. You can offer a separate home instead.' '这次邀请被拒绝了。多一间空房，并不足以让对方接受这样的安排。你可以改为提出另一处住所。'>></span><br><br>			<<case 'left'>><<lanSwitch 'You agree to live apart again.' '你们说好重新分开居住。'>><br><br>
 		<</switch>>
 	<</if>>
 	<<if !window.isLoveInterest(_name)>>
@@ -122,6 +124,12 @@
 					<<elseif !maplebirch.VP.realEstate.canShareBed(_property.id)>>
 						<<deadwood-reblooms-property-street-icon _property.id>><span class='red'><<= lanSwitch(_property.name.EN, _property.name.CN)>> · <<lanSwitch 'Needs a double bed' '需要双人床'>></span><br>
 					<<else>>
+						<<if _occupants gt 0 and maplebirch.VP.realEstate.householdConflict([...maplebirch.VP.realEstate.residentsAt(_property.id).map(profile => profile.id), _name])>>
+							<span class='red'><i><<lanSwitch 'You cannot assume these two will agree to live together. They can stay in separate homes.' '你不能指望这两个人会同意一起住。可以让他们分别住在不同的房子里。'>></i></span><br>
+						<</if>>
+						<<if _occupants gt 0>>
+							<span class='blue'><i><<lanSwitch 'Already living here: ' '这里已有同住者：'>><<= maplebirch.VP.realEstate.residentsAt(_property.id).map(profile => lanSwitch(profile.id, maplebirch.auto(profile.id))).join(lanSwitch(', ', '、'))>><<lanSwitch '. ' '。'>><<lanSwitch 'You explain this before offering the spare key.' '你先说明这一点，再提出交付备用钥匙。'>></i></span><br>
+						<</if>>
 						<<deadwood-reblooms-property-street-icon _property.id>><<language>>
 							<<option 'EN'>>
 								<<link _property.name.EN _invitePassage>>
@@ -498,8 +506,8 @@
 					<<run statusCheck('Sydney')>>
 					<<if _sydneyStatus.includes('corrupt')>>
 						<<language>>
-							<<option 'EN'>>Sydney puts the temple robes aside and draws you close by the wrist. "<span class='lewd'>No one is here to interrupt us.</span>"
-							<<option 'CN'>>悉尼把神殿长袍搁到一旁，握住你的手腕拉你靠近。“<span class='lewd'>这里没人会打扰我们。</span>”
+							<<option 'EN'>>Sydney puts the temple robes aside and draws you close by the wrist. "<span class='lewd'>Come sit here.</span>"
+							<<option 'CN'>>悉尼把神殿长袍搁到一旁，握住你的手腕拉你靠近。“<span class='lewd'>过来坐。</span>”
 						<</language>>
 					<<else>>
 						<<language>>
@@ -514,6 +522,9 @@
 			<</lanLink>><br><br>
 		<</capture>>
 	<</for>>
+	<<if maplebirch.VP.realEstate.residentsInCommonRooms(_property.id).length is 2>>
+		<<socialiseicon>><<lanLink '和同住的恋人一起聊聊 (0:20)' 'Deadwood Reblooms Property Household'>><<pass 20>><</lanLink>><br><br>
+	<</if>>
 	<<if !_property.rooms.retreat>>
 		<<couchicon>><<lanLink '在起居室休息 (0:20)' 'Deadwood Reblooms Property Sitting Rest'>><<pass 20>><<tiredness -4>><</lanLink>><<ltiredness>><br>
 	<</if>>
@@ -599,6 +610,9 @@
 <<else>>
 	<<run maplebirch.VP.realEstate.enter()>><<effects>>
 	<<npc _companion.id>><<person1>>
+	<<if maplebirch.VP.realEstate.residentsAt(_property.id).length gt 1>>
+		<<lanSwitch 'You find a quiet place to talk. The other resident’s room stays undisturbed.' '你们找了一处安静的地方说话，没有去打扰另一位住户的房间。'>><br><br>
+	<</if>>
 	<<= lanSwitch(_companion.together.EN, _companion.together.CN)>><br><br>
 	<<switch _companion.id>>
 		<<case 'Robin'>>
@@ -680,6 +694,9 @@
 			<</if>><br><br>
 	<</switch>>
 	<!-- 这段对白可重看，陪伴带来的压力收益每人每处住所每天只结算一次。 -->
+	<<if maplebirch.VP.realEstate.residentsHome(_property.id).some(profile => profile.id === _companion.id)>>
+		<<earnFeat 'Leave a Light On'>>
+	<</if>>
 	<<set _eveningKey to _property.id + ':' + _companion.id>>
 	<<if !$VanillaPlus.real_estate.daily_evening.includes(_eveningKey)>>
 		<<set $VanillaPlus.real_estate.daily_evening.push(_eveningKey)>>
@@ -779,10 +796,8 @@
 	<<run maplebirch.VP.realEstate.enter()>><<effects>><<wearoutfit>>
 	<<lanSwitch 'You settle beneath your own sheets.' '你躺进属于自己的被褥里。'>><br><br>
 	<<unset $bedGuest>>
-	<<set $VanillaPlus.real_estate.meeting_resident to null>>
 	<<if maplebirch.VP.realEstate.canShareBed(_bedProperty.id) && maplebirch.VP.realEstate.residentsHome(_bedProperty.id).length gt 0>>
-		<<set _bedCompanion to maplebirch.VP.realEstate.residentsHome(_bedProperty.id)[0]>>
-		<!-- 原版 sleephour 通过 $bedGuest 计算同床与终生伴侣收益，并在醒来时清理。 -->
+		<<set _bedCompanion to maplebirch.VP.realEstate.residentsHome(_bedProperty.id).find(profile => profile.id === $VanillaPlus.real_estate.meeting_resident) || maplebirch.VP.realEstate.residentsHome(_bedProperty.id)[0]>>
 		<<set $bedGuest to _bedCompanion.id>>
 		<<run maplebirch.VP.realEstate.meetResident(_bedCompanion.id, _bedProperty.id)>>
 		<<npc _bedCompanion.id>><<person1>>

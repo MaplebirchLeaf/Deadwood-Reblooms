@@ -21,9 +21,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     output: 'deadwood-reblooms-physique-unlock',
     cond: () => V.VanillaPlus != null && maplebirch.VP.physique.unlock
   });
-  maplebirch.dynamic.regStateEvent('gate', 'physique-max', {
+  maplebirch.dynamic.regStateEvent('append', 'physique-max', {
     output: 'earnFeat "Unbreakable"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.physique.max
+    cond: () => V.feats?.currentSave['Unbreakable'] === undefined && V.VanillaPlus != null && maplebirch.VP.physique.max
   });
   maplebirch.dynamic.regStateEvent('gate', 'physique-break-bindings', {
     output: 'deadwood-reblooms-physique-break-bindings',

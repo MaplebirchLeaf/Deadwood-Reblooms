@@ -17,7 +17,7 @@ export interface RealEstateState {
   last_managed_day: number;
   last_auction: AuctionRecord | null;
   residents: Record<PropertyId, string[]>;
-  household_message: { name: string; result: 'joined' | 'full' | 'bed' | 'left' } | null;
+  household_message: { name: string; result: 'joined' | 'full' | 'bed' | 'left' | 'conflict' } | null;
   meeting_resident: string | null;
   daily_evening: string[];
   daily_night_wake: boolean;
@@ -191,12 +191,27 @@ export class RealEstate {
   }
 
   public residentsInCommonRooms(id: PropertyId): ResidentProfile[] {
-    // 夜间日程中的 home 包含睡眠；23 点可在公共房间相处，午夜后转入卧室。
-    return Time.hour === 23 ? this.residentsHome(id) : [];
+    const sleeping = [...this.residentsInBedroom(id), ...this.residentsInGuestRoom(id)];
+    return this.residentsHome(id).filter(profile => !sleeping.some(resident => resident.id === profile.id));
   }
 
   public residentsInBedroom(id: PropertyId): ResidentProfile[] {
-    return Time.hour === 23 ? [] : this.residentsHome(id);
+    const home = this.residentsHome(id);
+    const selected = home.find(profile => profile.id === this.state.meeting_resident);
+    return selected ? [selected] : Time.hour === 23 ? [] : home.slice(0, 1);
+  }
+
+  public residentsInGuestRoom(id: PropertyId): ResidentProfile[] {
+    if (!this.properties.find(property => property.id === id)?.rooms.guest || Time.hour === 23) return [];
+    const bedroom = this.residentsInBedroom(id);
+    return this.residentsHome(id).filter(profile => !bedroom.some(resident => resident.id === profile.id));
+  }
+
+  // 模组入住规则：不靠空房强行消除原版霸凌与高嫉妒冲突。已有同住登记仍保留。
+  public householdConflict(names: readonly string[]): boolean {
+    if (names.length < 2) return false;
+    if (names.includes('Whitney') && (names.includes('Robin') || names.includes('Kylar'))) return true;
+    return names.includes('Kylar') && C.npc.Kylar.rage >= 60;
   }
 
   public inviteResident(name: string, id: PropertyId): boolean {
@@ -207,9 +222,10 @@ export class RealEstate {
     if (!profile || !window.isLoveInterest(name)) return false;
     const residents = (this.state.residents[id] ??= []);
     if (residents.includes(name)) return false;
-    let result: 'joined' | 'full' | 'bed';
+    let result: 'joined' | 'full' | 'bed' | 'conflict';
     if (residents.length >= property.resident_capacity) result = 'full';
     else if (!this.canShareBed(id)) result = 'bed';
+    else if (this.householdConflict([...residents, name])) result = 'conflict';
     else {
       // 恋人只在一处住宅登记同住。玩家的其他空置房屋仍可随时自住。
       for (const [home, names] of Object.entries(this.state.residents)) {
@@ -299,6 +315,14 @@ export class RealEstate {
     if (!installed) return null;
     const item = window.Furniture.get(installed, true);
     return item ? { ...item, id: installed, category: [] } : null;
+  }
+
+  public furnished(id: PropertyId): boolean {
+    const property = this.properties.find(item => item.id === id);
+    if (!property || !this.owns(id)) return false;
+    const kinds: FurnitureKind[] = ['bed', 'wardrobe', 'table', 'chair', 'decoration'];
+    if (property.rooms.desk) kinds.push('desk');
+    return kinds.every(kind => this.furniture(id, kind) !== null);
   }
 
   public canShareBed(id: PropertyId): boolean {

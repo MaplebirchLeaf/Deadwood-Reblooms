@@ -32,13 +32,13 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       filter: ['All', 'General']
     };
   });
-  maplebirch.dynamic.regStateEvent('gate', 'life-simulation-president-feat', {
+  maplebirch.dynamic.regStateEvent('append', 'life-simulation-president-feat', {
     output: 'earnFeat "Student Council President"',
-    cond: () => V.LifeSimulation?.school?.role === 'president'
+    cond: () => V.feats?.currentSave['Student Council President'] === undefined && V.LifeSimulation?.school?.role === 'president'
   });
-  maplebirch.dynamic.regStateEvent('gate', 'life-simulation-naked-school-feat', {
+  maplebirch.dynamic.regStateEvent('append', 'life-simulation-naked-school-feat', {
     output: 'earnFeat "Naked School"',
-    cond: () => V.LifeSimulation?.school?.dress?.highest === 'mandatoryNudity'
+    cond: () => V.feats?.currentSave['Naked School'] === undefined && V.LifeSimulation?.school?.dress?.highest === 'mandatoryNudity'
   });
 
   // 包装原版校服判断，保留原函数与其他模组继续串联包装的空间。

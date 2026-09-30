@@ -15,9 +15,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     };
   });
 
-  maplebirch.dynamic.regStateEvent('gate', 'beauty-max', {
+  maplebirch.dynamic.regStateEvent('append', 'beauty-max', {
     output: 'earnFeat "Unadorned"',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.beauty.max
+    cond: () => V.feats?.currentSave['Unadorned'] === undefined && V.VanillaPlus != null && maplebirch.VP.beauty.max
   });
   maplebirch.dynamic.regStateEvent('gate', 'beauty-unlock', {
     output: 'deadwood-reblooms-beauty-unlock',
