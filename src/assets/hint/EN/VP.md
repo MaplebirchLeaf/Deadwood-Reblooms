@@ -50,6 +50,15 @@ A frozen home's street entrance closes, and its residents follow their original 
 
 - **Cash** remains appropriate for street stalls. Formal shops, furniture purchases, and gym services can use supported debit or credit payments. Obtain a card and select a payment method at the bank; bank deposits are separate from carried cash. Debit needs sufficient deposits; credit needs available credit.
 - **Weekly upkeep** is charged per property. The journal shows the next in-game date and days remaining. Check the bank balance and arrears when due. Owning several homes adds their upkeep together.
-- **Multiple residents** depend on capacity and character relationships. Whitney refuses new shared arrangements with Robin or Kylar. At jealousy 60 or higher, Kylar refuses an additional resident. Offer separate homes instead. Existing registrations remain intact. When both are home, they can talk together. After choosing one companion, the other remains in the sitting room or guest room according to the time. A double bed holds the PC and one companion.
+- **Multiple residents** depend on capacity and character relationships. Robin and Kylar refuse to share a home with Whitney. At jealousy 60 or higher, Kylar refuses an additional resident. Offer separate homes instead. When both residents are home, you can invite them to talk together. After choosing one companion, the other remains in the sitting room or guest room according to the time. A double bed holds the PC and one companion.
 - **Gliding from high places** appears inside Look outside and requires sufficient height, a flying transformation, and a suitable physical state. A balcony alone does not grant flight.
 - **Furniture** starts at the furniture shop entrance: choose owned homes, then the target property. Installed items, prices, and payment requirements refer to that home. The orphanage catalogue retains vanilla behavior.
+
+### Time together as three
+
+Choose **Invite both lovers to talk (0:20)** in the sitting room while both residents are home. You can then invite them to stay close during the shared conversation.
+
+- Robin and Sydney answer separately. At trauma 20 or higher, Robin prefers time alone with you. Sydney has different dialogue for pure and corrupt states. You can cancel after both agree.
+- Kylar’s former friendship with Sydney does not imply agreement to shared intimacy. At lower jealousy, Kylar asks for time alone. At high jealousy, Kylar leaves the conversation for the bedroom.
+- Sydney can refuse closeness with Whitney. Hostile pairs do not agree simply because they share an address.
+- The private moment fades out and is followed by a closing conversation. Stress relief uses each resident’s existing once-per-day allowance, shared with one-to-one evenings.

@@ -73,17 +73,143 @@
 		<<switch _message.result>>
 			<<case 'joined'>><span class='green'><<= lanSwitch(_profile.welcome.EN, _profile.welcome.CN)>></span><br><br>
 				<<set _joinedHome to maplebirch.VP.realEstate.residenceOf(_name)>>
-				<<if _joinedHome>><<deadwood-reblooms-household-boundary _joinedHome.id _name>><</if>>
+				<<if _joinedHome>>
+					<<set _otherResidents to maplebirch.VP.realEstate.residentsAt(_joinedHome.id).filter(profile => profile.id !== _name)>>
+					<<if _otherResidents.length gt 0>>
+						<<language>>
+							<<option 'EN'>>
+								You explain who else lives there and show which room is available. Living under the same roof does not mean sharing a bed or entering someone else’s room without asking.
+							<<option 'CN'>>
+								你说明还有谁住在这里，以及哪间房可以使用。同住不等于同床，进别人的房间之前，也要先问一声。
+						<</language>><br><br>
+						<<switch _name>>
+							<<case 'Robin'>>
+								<<language>>
+									<<option 'EN'>>
+										Robin asks whether there will still be somewhere to sit with you alone. You point out the guest room and promise to knock.
+									<<option 'CN'>>
+										罗宾问，还能不能找个地方单独和你坐一会儿。你指出客房的位置，答应进门前会敲门。
+								<</language>><br>
+							<<case 'Whitney'>>
+								<<language>>
+									<<option 'EN'>>
+										“Keep them out of my things,” Whitney says. Whitney checks the room before putting the key away.
+									<<option 'CN'>>
+										“别让人乱翻我的东西。”惠特尼说。惠特尼确认了房间的位置，才收起钥匙。
+								<</language>><br>
+							<<case 'Kylar'>>
+								<<language>>
+									<<option 'EN'>>
+										Kylar’s smile falters at the other name. “I thought this was for us.” You explain the arrangement again, without calling the guest room a promise of anything more. Kylar checks which room is available, without taking the arrangement as a promise that you belong only to Kylar.
+									<<option 'CN'>>
+										听到另一个名字，凯拉尔的笑容僵了一下。“我以为这是给我们的。”你又解释了一遍安排，没有把客房说成更多的承诺。凯拉尔确认了能用哪间房，却没有把这份安排当成你只属于凯拉尔的承诺。
+								<</language>><br>
+							<<case 'Sydney'>>
+								<<language>>
+									<<option 'EN'>>
+										Sydney asks about privacy and the early morning routine. “Please tell me before changing the arrangement,” Sydney says, looking at you rather than the spare key.
+									<<option 'CN'>>
+										悉尼问起私人空间和清晨的作息。“以后要改安排，先告诉我，好吗？”悉尼看着你，没有去看那把备用钥匙。
+								<</language>><br>
+						<</switch>><br>
+					<</if>>
+				<</if>>
 			<<case 'full'>><span class='red'><<lanSwitch 'There is no room for another person to live there.' '那处房子住不下更多人了。'>></span><br><br>
-			<<case 'bed'>><span class='red'><<lanSwitch 'You need a double bed before you can live together there.' '你们需要一张双人床，才能住在一起。'>></span><br><br>
-			<<case 'conflict'>><span class='red'><<lanSwitch 'The invitation is refused. A spare room is not enough to make this arrangement acceptable. You can offer a separate home instead.' '这次邀请被拒绝了。多一间空房，并不足以让对方接受这样的安排。你可以改为提出另一处住所。'>></span><br><br>			<<case 'left'>><<lanSwitch 'You agree to live apart again.' '你们说好重新分开居住。'>><br><br>
+			<<case 'bed'>><span class='red'><<language>>
+				<<option 'EN'>>
+					You need a double bed before you can live together there.
+				<<option 'CN'>>
+					你们需要一张双人床，才能住在一起。
+			<</language>></span><br><br>
+			<<case 'conflict'>>
+				<<if _message.refused_by isnot _name>>
+					<<if _message.refused_by is 'Robin'>>
+						<<language>>
+							<<option 'EN'>>
+								You think of Robin returning home to find Whitney there. You put the spare key away rather than offer Robin’s home without agreement.
+							<<option 'CN'>>
+								你想到罗宾回家后发现惠特尼也住在那里。你收起备用钥匙，没有替罗宾答应这项安排。
+						<</language>><br>
+					<<elseif C.npc.Kylar.rage gte 60>>
+						<<language>>
+							<<option 'EN'>>
+								You know how Kylar reacts when someone else gets close to you. You withdraw this offer rather than promise a shared address Kylar will refuse.
+							<<option 'CN'>>
+								你知道凯拉尔看见别人靠近你时会有什么反应。你收回这次提议，没有许下凯拉尔不会接受的共同住址。
+						<</language>><br>
+					<<else>>
+						<<language>>
+							<<option 'EN'>>
+								You cannot offer Whitney a place in Kylar’s home as though their hostility ended at the door. You put the spare key away.
+							<<option 'CN'>>
+								你没法把凯拉尔的住处也交给惠特尼，装作两人的敌意到了门口就会消失。你收起备用钥匙。
+						<</language>><br>
+					<</if>>
+					<<if _name is 'Whitney'>>
+						<<language>>
+							<<option 'EN'>>
+								Whitney laughs through the nose. “So find me somewhere better.” You leave the occupied house out of the offer.
+							<<option 'CN'>>
+								惠特尼从鼻子里笑了一声。“那就给我找个更好的。”你没有把已经有人住的房子重新提出。
+						<</language>><br><br>
+					<</if>>
+				<<elseif _message.refused_by is 'Robin'>>
+					<<if C.npc.Robin.dom gte 80 and C.npc.Robin.trauma lt 20>>
+						<<language>>
+							<<option 'EN'>>
+								Robin puts the key down. “I’m not living with Whitney. Find somewhere else.” The answer is directed at you, and Robin waits until you acknowledge it.
+							<<option 'CN'>>
+								罗宾把钥匙放下。“我不和惠特尼住。换个地方吧。”这句话是对你说的，罗宾等着你回应，没有让你略过。
+						<</language>><br><br>
+					<<else>>
+						<<language>>
+							<<option 'EN'>>
+								Robin stops smiling when you mention Whitney. “Will Whitney be there too? Then I don’t want to.” You put the spare key away.
+							<<option 'CN'>>
+								听见惠特尼的名字，罗宾脸上的笑容消失了。“惠特尼也住在那里？那我不想去。”你收起了备用钥匙。
+						<</language>><br><br>
+					<</if>>
+				<<elseif _message.refused_by is 'Kylar'>>
+					<<if C.npc.Kylar.rage gte 60>>
+						<<language>>
+							<<option 'EN'>>
+								Kylar grips the key until the knuckles whiten. “So this isn’t just for us.” You start to answer, but Kylar turns away and ends the conversation.
+							<<option 'CN'>>
+								凯拉尔攥着钥匙，指节渐渐发白。“所以，这里不只是给我们的。”你刚要回答，凯拉尔便转身离开，结束了这场谈话。
+						<</language>><br><br>
+					<<else>>
+						<<language>>
+							<<option 'EN'>>
+								“Whitney?” Kylar pulls back before taking the spare key. “No. Somewhere else.” The suggestion of a separate room does not change the answer.
+							<<option 'CN'>>
+								“惠特尼？”凯拉尔在接过备用钥匙前退了一步。“不要。换个地方。”你提到还有单独的房间，也没有改变这个回答。
+						<</language>><br><br>
+					<</if>>
+				<</if>>
+				<span class='red'><i><<language>>
+					<<option 'EN'>>
+						The shared arrangement was refused. You can offer a separate home.
+					<<option 'CN'>>
+						共同入住的安排被拒绝了，你可以另找一处住所。
+				<</language>></i></span><br><br>
+			<<case 'left'>><<lanSwitch 'You agree to live apart again.' '你们说好重新分开居住。'>><br><br>
 		<</switch>>
 	<</if>>
 	<<if !window.isLoveInterest(_name)>>
-		<span class='blue'><i><<lanSwitch 'You need to speak as lovers before making such a promise.' '你们还不是恋人，没法谈这件事。'>></i></span><br><br>
+		<span class='blue'><i><<language>>
+			<<option 'EN'>>
+				You need to speak as lovers before making such a promise.
+			<<option 'CN'>>
+				你们还不是恋人，没法谈这件事。
+		<</language>></i></span><br><br>
 	<<else>>
 		<<if _inLesson>>
-			<<lanSwitch 'You lean close and keep your voice low so the teacher cannot hear.' '你凑近对方，压低声音，免得被老师听见。'>><br><br>
+			<<language>>
+				<<option 'EN'>>
+					You lean close and keep your voice low so the teacher cannot hear.
+				<<option 'CN'>>
+					你凑近对方，压低声音，免得被老师听见。
+			<</language>><br><br>
 		<</if>>
 		<<set _currentHome to maplebirch.VP.realEstate.properties.find(property => maplebirch.VP.realEstate.residentsAt(property.id).some(resident => resident.id === _name))>>
 		<<if _currentHome>>
@@ -103,13 +229,33 @@
 		<<else>>
 			<<switch _name>>
 				<<case 'Robin'>>
-					<<lanSwitch 'You ask Robin whether they would like a key of their own, while still helping at the orphanage.' '你问罗宾，愿不愿意收下一把钥匙。白天还可以照常照顾孤儿院。'>><br><br>
+					<<language>>
+						<<option 'EN'>>
+							You ask Robin whether they would like a key of their own, while still helping at the orphanage.
+						<<option 'CN'>>
+							你问罗宾，愿不愿意收下一把钥匙。白天还可以照常照顾孤儿院。
+					<</language>><br><br>
 				<<case 'Whitney'>>
-					<<lanSwitch 'You suggest sharing a place. Whitney folds their arms, waiting for you to say where.' '你提出一起住。惠特尼抱起胳膊，等你说出住处。'>><br><br>
+					<<language>>
+						<<option 'EN'>>
+							You suggest sharing a place. Whitney folds their arms, waiting for you to say where.
+						<<option 'CN'>>
+							你提出一起住。惠特尼抱起胳膊，等你说出住处。
+					<</language>><br><br>
 				<<case 'Kylar'>>
-					<<lanSwitch 'You ask Kylar whether they would like somewhere to come home to with you.' '你问凯拉尔，愿不愿意和你一起有个回去的地方。'>><br><br>
+					<<language>>
+						<<option 'EN'>>
+							You ask Kylar whether they would like somewhere to come home to with you.
+						<<option 'CN'>>
+							你问凯拉尔，愿不愿意和你一起有个回去的地方。
+					<</language>><br><br>
 				<<case 'Sydney'>>
-					<<lanSwitch 'You ask Sydney whether they could come home to you after their temple duties.' '你问悉尼，忙完神殿的事后，愿不愿意回到你们共同的家。'>><br><br>
+					<<language>>
+						<<option 'EN'>>
+							You ask Sydney whether they could come home to you after their temple duties.
+						<<option 'CN'>>
+							你问悉尼，忙完神殿的事后，愿不愿意回到你们共同的家。
+					<</language>><br><br>
 			<</switch>>
 		<</if>>
 		<<for _property range maplebirch.VP.realEstate.properties>>
@@ -124,8 +270,13 @@
 					<<elseif !maplebirch.VP.realEstate.canShareBed(_property.id)>>
 						<<deadwood-reblooms-property-street-icon _property.id>><span class='red'><<= lanSwitch(_property.name.EN, _property.name.CN)>> · <<lanSwitch 'Needs a double bed' '需要双人床'>></span><br>
 					<<else>>
-						<<if _occupants gt 0 and maplebirch.VP.realEstate.householdConflict([...maplebirch.VP.realEstate.residentsAt(_property.id).map(profile => profile.id), _name])>>
-							<span class='red'><i><<lanSwitch 'You cannot assume these two will agree to live together. They can stay in separate homes.' '你不能指望这两个人会同意一起住。可以让他们分别住在不同的房子里。'>></i></span><br>
+						<<if _occupants gt 0 and maplebirch.VP.realEstate.householdRefusal([...maplebirch.VP.realEstate.residentsAt(_property.id).map(profile => profile.id), _name])>>
+							<span class='red'><i><<language>>
+								<<option 'EN'>>
+									You cannot assume these two will agree to live together. They can stay in separate homes.
+								<<option 'CN'>>
+									你不能指望这两个人会同意一起住。可以让他们分别住在不同的房子里。
+							<</language>></i></span><br>
 						<</if>>
 						<<if _occupants gt 0>>
 							<span class='blue'><i><<lanSwitch 'Already living here: ' '这里已有同住者：'>><<= maplebirch.VP.realEstate.residentsAt(_property.id).map(profile => lanSwitch(profile.id, maplebirch.auto(profile.id))).join(lanSwitch(', ', '、'))>><<lanSwitch '. ' '。'>><<lanSwitch 'You explain this before offering the spare key.' '你先说明这一点，再提出交付备用钥匙。'>></i></span><br>
@@ -522,8 +673,8 @@
 			<</lanLink>><br><br>
 		<</capture>>
 	<</for>>
-	<<if maplebirch.VP.realEstate.residentsInCommonRooms(_property.id).length is 2>>
-		<<socialiseicon>><<lanLink '和同住的恋人一起聊聊 (0:20)' 'Deadwood Reblooms Property Household'>><<pass 20>><</lanLink>><br><br>
+	<<if maplebirch.VP.realEstate.residentsHome(_property.id).length is 2>>
+		<<socialiseicon>><<link `lanSwitch('Invite both lovers to talk (0:20)', '请两位恋人一起聊聊 (0:20)')` 'Deadwood Reblooms Property Household'>><<pass 20>><</link>><br><br>
 	<</if>>
 	<<if !_property.rooms.retreat>>
 		<<couchicon>><<lanLink '在起居室休息 (0:20)' 'Deadwood Reblooms Property Sitting Rest'>><<pass 20>><<tiredness -4>><</lanLink>><<ltiredness>><br>
@@ -860,7 +1011,7 @@
 		<<set $sleephour to random(1, Math.min(2, _requestedHours - 1))>>
 	<</if>>
 	<<sleep>>
-	<!-- 原版只在 $location 为 home 时读取孤儿院的床；自购房在此补上同等的每小时床铺收益。 -->
+	<!-- 原版只在 $location 为 home 时读取孤儿院的床，自购房在此补上同等的每小时床铺收益。 -->
 	<<set _sleepBed to maplebirch.VP.realEstate.furniture(_sleepProperty.id, 'bed')>>
 	<<if _sleepBed and _sleepBed.type.includes('comfy')>>
 		<<set $tiredness to Math.max(0, $tiredness - 10 * $sleepHoursTotal)>>

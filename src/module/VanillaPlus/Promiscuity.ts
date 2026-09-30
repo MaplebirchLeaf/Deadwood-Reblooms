@@ -75,7 +75,7 @@ class Promiscuity {
   public canSwitchPenis(destination: PenisDestination, index: number): boolean {
     const target = Number(index);
     const npc = this.npc(target);
-    if (!npc || Number(V.penistarget) !== target) return false;
+    if (V.position === 'stalk' || !npc || Number(V.penistarget) !== target) return false;
 
     if (destination === 'vagina') {
       if (V.penisuse !== 'otheranus' || !['otheranusentrance', 'otheranusimminent', 'otheranus'].includes(V.penisstate)) return false;
@@ -101,7 +101,7 @@ class Promiscuity {
   public canDirect(action: PromiscuityAction, index: number): boolean {
     const target = Number(index);
     const npc = this.npc(target);
-    if (!npc) return false;
+    if (V.position === 'stalk' || !npc) return false;
 
     const handAvailable = npc.lefthand === 0 || npc.righthand === 0;
     const mouthAvailable = npc.mouth === 0;
@@ -147,7 +147,7 @@ class Promiscuity {
   public canAsk(action: PromiscuityAction, index: number): boolean {
     const target = Number(index);
     const npc = this.npc(target);
-    if (!npc) return false;
+    if (V.position === 'stalk' || !npc) return false;
 
     const destinationAvailable = (part: 'mouth' | 'vagina' | 'penis' | 'anus' | 'chest' | 'thigh' | 'bottom', sameAction: boolean) => {
       const state = V as unknown as Record<string, unknown>;

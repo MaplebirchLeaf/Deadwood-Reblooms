@@ -17,7 +17,7 @@ export interface RealEstateState {
   last_managed_day: number;
   last_auction: AuctionRecord | null;
   residents: Record<PropertyId, string[]>;
-  household_message: { name: string; result: 'joined' | 'full' | 'bed' | 'left' | 'conflict' } | null;
+  household_message: { name: string; result: 'joined' | 'full' | 'bed' | 'left' | 'conflict'; refused_by: string | null } | null;
   meeting_resident: string | null;
   daily_evening: string[];
   daily_night_wake: boolean;
@@ -207,11 +207,14 @@ export class RealEstate {
     return this.residentsHome(id).filter(profile => !bedroom.some(resident => resident.id === profile.id));
   }
 
-  // 模组入住规则：不靠空房强行消除原版霸凌与高嫉妒冲突。已有同住登记仍保留。
-  public householdConflict(names: readonly string[]): boolean {
-    if (names.length < 2) return false;
-    if (names.includes('Whitney') && (names.includes('Robin') || names.includes('Kylar'))) return true;
-    return names.includes('Kylar') && C.npc.Kylar.rage >= 60;
+  // 拒绝来自受霸凌的一方，或不愿与别人分享伴侣的凯拉尔。
+  public householdRefusal(names: readonly string[]): string | null {
+    if (names.length < 2) return null;
+    if (names.includes('Whitney')) {
+      if (names.includes('Robin')) return 'Robin';
+      if (names.includes('Kylar')) return 'Kylar';
+    }
+    return names.includes('Kylar') && C.npc.Kylar.rage >= 60 ? 'Kylar' : null;
   }
 
   public inviteResident(name: string, id: PropertyId): boolean {
@@ -222,10 +225,11 @@ export class RealEstate {
     if (!profile || !window.isLoveInterest(name)) return false;
     const residents = (this.state.residents[id] ??= []);
     if (residents.includes(name)) return false;
+    const refusedBy = this.householdRefusal([...residents, name]);
     let result: 'joined' | 'full' | 'bed' | 'conflict';
     if (residents.length >= property.resident_capacity) result = 'full';
     else if (!this.canShareBed(id)) result = 'bed';
-    else if (this.householdConflict([...residents, name])) result = 'conflict';
+    else if (refusedBy) result = 'conflict';
     else {
       // 恋人只在一处住宅登记同住。玩家的其他空置房屋仍可随时自住。
       for (const [home, names] of Object.entries(this.state.residents)) {
@@ -234,14 +238,14 @@ export class RealEstate {
       residents.push(name);
       result = 'joined';
     }
-    this.state.household_message = { name, result };
+    this.state.household_message = { name, result, refused_by: result === 'conflict' ? refusedBy : null };
     return result === 'joined';
   }
 
   public endCohabitation(name: string, id: PropertyId): boolean {
     if (!(this.state.residents?.[id] ?? []).includes(name)) return false;
     this.state.residents[id] = this.state.residents[id].filter(resident => resident !== name);
-    this.state.household_message = { name, result: 'left' };
+    this.state.household_message = { name, result: 'left', refused_by: null };
     return true;
   }
 

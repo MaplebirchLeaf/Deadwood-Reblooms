@@ -51,7 +51,7 @@
   <<set _promiscuityGuideNPC to $NPCList[_promiscuityGuideTarget]>>
   <<set _promiscuityGuideSuccess to false>>
   <<set _promiscuityGuideReady to false>>
-  <<if _promiscuityGuideNPC and maplebirch.VP.promiscuity.hasPenis(_promiscuityGuideTarget) and !_promiscuityGuideNPC.chastity.penis.includes('chastity')>>
+  <<if $combat is 1 and $position isnot 'stalk' and _promiscuityGuideNPC and maplebirch.VP.promiscuity.hasPenis(_promiscuityGuideTarget) and !_promiscuityGuideNPC.chastity.penis.includes('chastity')>>
     <<handstat>><<handskilluse>>
     <<set _promiscuityGuideSuccess to maplebirch.VP.promiscuity.mastered or $gamemode is 'soft' or $gloryhole>>
     <<if !_promiscuityGuideSuccess>><<set _promiscuityGuideSuccess to combatSkillCheck('hand', _promiscuityGuideTarget, _promiscuityGuideNPC.fullDescription)>><</if>>
@@ -77,13 +77,23 @@
       <<if _promiscuityGuideReady>>
         <<submission 5>><<sexControl 5 `currentSkillValue('handskill')` _promiscuityGuideTarget>><<combatpromiscuity6>>
         <<personselect _promiscuityGuideTarget>>
-        <span class="lblue"><<lanSwitch 'You take hold of ' '你握住'>><<combatperson>><<lanSwitch "'s penis and guide it into position" '的肉棒，将它引向合适的位置'>></span><<lanSwitch ', directing the movement with your hand.' '，用手掌控着它的去向。'>>
+        <<language>>
+          <<option 'EN'>>
+            <span class="lblue">You take hold of <<combatperson>>'s penis and guide it into position</span>, directing the movement with your hand.
+          <<option 'CN'>>
+            <span class="lblue">你握住<<combatperson>>的肉棒，将它引向合适的位置</span>，用手掌控着它的去向。
+        <</language>>
       <<else>>
         <span class="red"><<lanSwitch 'The position is no longer available.' '所需的位置已经无法使用。'>></span>
       <</if>>
     <<else>>
       <<personselect _promiscuityGuideTarget>>
-      <<lanSwitch 'You reach for ' '你伸手去抓'>><<combatperson>><<lanSwitch "'s penis, " '的肉棒，'>><span class="blue"><<lanSwitch 'but fail to move it where you want.' '却没能把它移到想要的位置。'>></span>
+      <<language>>
+        <<option 'EN'>>
+          You reach for <<combatperson>>'s penis, <span class="blue">but fail to move it where you want.</span>
+        <<option 'CN'>>
+          你伸手去抓<<combatperson>>的肉棒，<span class="blue">却没能把它移到想要的位置。</span>
+      <</language>>
     <</if>>
   <<else>>
     <span class="red"><<lanSwitch 'That penis is no longer available to guide.' '那根肉棒已经无法再由你引导。'>></span>
@@ -94,7 +104,7 @@
 <<widget 'deadwood-reblooms-promiscuity-request-options'>>
   <<set _promiscuityTarget to Number($mouthtarget)>>
   <<set _promiscuityCommands to _askActions>>
-  <<if maplebirch.VP.promiscuity.expanded and $enemytype is 'man' and $NPCList[_promiscuityTarget]>>
+  <<if $position isnot 'stalk' and maplebirch.VP.promiscuity.expanded and $enemytype is 'man' and $NPCList[_promiscuityTarget]>>
     <<set _promiscuityTargetName to lanSwitch( $NPCList[_promiscuityTarget].fullDescription, $NPCList[_promiscuityTarget].fullDescription_CN || $NPCList[_promiscuityTarget].fullDescription )>>
     <!-- Ask 沿用原版说服难度；双重插入额外显示六级淫乱评级。 -->
     <<set _promiscuityDifficulty to _diffText>>
@@ -231,6 +241,7 @@
       <<set $_promiscuityAction to $_promiscuityChoice.replace('promiscuity-', '')>>
       <<set $_promiscuityAvailable to maplebirch.VP.promiscuity.canAsk($_promiscuityAction, $_promiscuityTarget)>>
     <</if>>
+    <<if $position is 'stalk'>><<set $_promiscuityAvailable to false>><</if>>
     <<if !$_promiscuityAvailable>>
       <span class="red"><<lanSwitch 'The position is no longer available, so you cannot move them there.' '所需的位置已被占用，你无法把对方移到那里。' >></span>
     <<else>>

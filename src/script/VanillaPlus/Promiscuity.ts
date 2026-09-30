@@ -10,7 +10,8 @@ export default function (maplebirch: typeof window.maplebirch) {
     return result;
   };
   const target = (index: number) => Number(index);
-  const active = () => V.combat === 1 && maplebirch.VP.promiscuity.expanded && V.enemytype === 'man' && V.walltype !== 'front' && !V.gloryhole;
+  // 原版 stalk 包含跟踪和追逐，空闲的手不能用于接触对方。
+  const active = () => V.combat === 1 && V.position !== 'stalk' && maplebirch.VP.promiscuity.expanded && V.enemytype === 'man' && V.walltype !== 'front' && !V.gloryhole;
   const direct = (action: string, targetVariable: string) =>
     `<<set _vanillaPlusPromiscuity to true>><<set _vanillaPlusPromiscuityIgnore to $promiscuityIgnore>><<set _vanillaPlusPromiscuityTarget to Number(${targetVariable})>><<set $promiscuityIgnore to true>><<set $${action}>>`;
   const switchPenis = (destination: 'vagina' | 'anus') => {
