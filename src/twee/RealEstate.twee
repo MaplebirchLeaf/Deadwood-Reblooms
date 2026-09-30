@@ -345,7 +345,7 @@
 				{ id: 'table', EN: 'Table', CN: '茶几' },
 				{ id: 'chair', EN: 'Chairs', CN: '椅子' },
 				{ id: 'desk', EN: 'Desks', CN: '书桌' },
-				{ id: 'wardrobe', EN: 'Wardrobe', CN: '衣柜' },
+				{ id: 'wardrobe', EN: 'Wardrobe', CN: '衣橱' },
 				{ id: 'decoration', EN: 'Decorations', CN: '饰品' },
 				{ id: 'windowsill', EN: 'Miscellaneous', CN: '杂项' }
 			]>>
@@ -365,7 +365,15 @@
 				<<lanSwitch 'Currently installed in this home:' '这处住处当前摆放的是：'>>
 				<<if _current>>
 					<<furnitureicon _current.iconFile>> <<= _current.nameCap>><br>
-					<<if _current.description>><span class='description'><<= _current.description>></span><</if>>
+					<<if _current.description>>
+						<span class='description'><<= _current.description>>
+							<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('organiser')>> <<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
+							<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('spacious')>> <<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
+							<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('starter')>> <<lanSwitch 'Can hold 20 of each item type.' '每种物品类别可容纳 20 个。'>><</if>>
+							<<if _current.type.includes('comfy')>> <<if $deadwoodFurnitureCategory is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
+							<<if _current.type.includes('double')>> <<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>><</if>>
+						</span>
+					<</if>>
 				<<else>>
 					<<lanSwitch 'Nothing.' '暂无。'>>
 				<</if>>
@@ -373,6 +381,7 @@
 				<<set _offers to maplebirch.VP.realEstate.furnitureOffers(_property.id, $deadwoodFurnitureCategory)>>
 				<<for _offer range _offers>>
 					<<capture _offer>>
+						<<set _priceLabel to '£' + _offer.cost / 100>>
 						<div class='shopBlock no-numberify'>
 							<<furnitureicon _offer.item.iconFile>> <<= _offer.item.nameCap>> |
 							<<if _offer.item.type.includes('comfy')>><<lanSwitch 'Comfortable' '舒适'>> | <</if>>
@@ -380,16 +389,23 @@
 							<<if _offer.item.type.includes('double')>><<lanSwitch 'Double' '双人'>> | <</if>>
 							<<if _offer.item.type.includes('spacious')>><<lanSwitch 'Spacious' '宽敞'>> | <</if>>
 							<<if _offer.item.type.includes('organiser')>><<lanSwitch 'Organiser' '收纳'>> | <</if>>
-							<<if _offer.item.description>><mouse class='tooltip linkBlue'>(?)<span><<= _offer.item.description>></span></mouse> | <</if>>
+							<<if _offer.item.description>>
+								<mouse class='tooltip linkBlue'>(?)<span><<= _offer.item.description>>
+									<<if _offer.item.type.includes('comfy')>><br><<if $deadwoodFurnitureCategory is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
+									<<if _offer.item.type.includes('double')>><br><<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>><</if>>
+									<<if _offer.item.type.includes('spacious')>><br><<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
+									<<if _offer.item.type.includes('organiser')>><br><<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
+								</span></mouse> |
+							<</if>>
 							<<if $money gte _offer.cost>>
-								<<lanLink _offer.item.nameCap 'Deadwood Reblooms Property Furniture Catalogue'>>
+								<<link _priceLabel 'Deadwood Reblooms Property Furniture Catalogue'>>
 									<<if maplebirch.VP.realEstate.installFurniture(_property.id, $deadwoodFurnitureCategory, _offer.id)>>
 										<<money `-_offer.cost` 'furniture'>>
 										<<run Furniture.log(_offer.id)>>
 									<</if>>
-								<</lanLink>> | <<deadwood-reblooms-finance-money _offer.cost>>
+								<</link>>
 							<<else>>
-								<span class='red'><<deadwood-reblooms-finance-money _offer.cost>></span>
+								<span class='red'><<= _priceLabel>></span>
 							<</if>>
 						</div>
 					<</capture>>
@@ -444,8 +460,8 @@
 						<</language>>
 					<<else>>
 						<<language>>
-							<<option 'EN'>>Whitney is leaning on the doorframe and does not move aside. "You're late," <<he>> says, and tips <<his>> chin at the coat in your arms. "Hang it up yourself."
-							<<option 'CN'>>惠特尼靠在门框上，没有让开。“你回来晚了。”<<he>>说着，朝你臂弯里的外套抬了抬下巴，“自己挂去。”
+							<<option 'EN'>>Whitney looks up when you come in. "You're late," <<he>> mutters, shifting aside and nodding at the empty coat hook beside the door.
+							<<option 'CN'>>你进门时，惠特尼抬头看了你一眼。“回来晚了。”<<he>>小声说着，侧身让开，朝门边空着的衣帽钩点了点头。
 						<</language>>
 					<</if>><br><br>
 				<<case 'Kylar'>>
@@ -461,7 +477,8 @@
 						<</language>>
 					<</if>><br><br>
 				<<case 'Sydney'>>
-					<<if C.npc.Sydney.corruption gte 30>>
+					<<run statusCheck('Sydney')>>
+					<<if _sydneyStatus.includes('corrupt')>>
 						<<language>>
 							<<option 'EN'>>Sydney puts the temple robes aside and draws you close by the wrist. "<span class='lewd'>No one is here to interrupt us.</span>"
 							<<option 'CN'>>悉尼把神殿长袍搁到一旁，握住你的手腕拉你靠近。“<span class='lewd'>这里没人会打扰我们。</span>”
@@ -476,7 +493,7 @@
 			<<lanLink '一起待一会儿 (0:20)' 'Deadwood Reblooms Property Evening Together'>>
 				<<run maplebirch.VP.realEstate.meetResident(_resident.id, _property.id)>>
 				<<pass 20>>
-			<</lanLink>><br>
+			<</lanLink>><br><br>
 		<</capture>>
 	<</for>>
 	<<if !_property.rooms.retreat>>
