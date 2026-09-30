@@ -49,12 +49,17 @@ class Robin extends Module implements RobinFacade {
     const state = this.state;
     if (state.asylum.status === 'admitted') return 0;
     const stall = state.shop ? state.lemonade + state.chocolate : Time.season === 'winter' ? state.chocolate : state.lemonade;
+    // 旧神殿线的周津贴由本模块统一结算，避免两个模组重复给罗宾发收入。
+    const temple = this.core.get('RobinTemple') ? V.RobinTemple : undefined;
+    const templeGrace = Number(temple?.grace);
+    const templeIncome = temple && ['member', 'approved', 'promised'].includes(temple.stage) && Number.isFinite(templeGrace) ? Math.max(0, Math.min(100, templeGrace)) * 10 : 0;
     // 基础店铺增收已扣除店租、水电、原料和临时帮工；正式员工的增收与工资单独入账。
     return (
       (V.robin.stayup >= 1 ? 250 : 300) +
       (V.robin.moneyModifier || 0) +
       stall * 1200 +
       this.tutoring.income +
+      templeIncome +
       (state.shop ? 1500 + this.shop.staffSales - this.shop.staffWages + this.flowers.salesEstimate + (state.shopPopcorn ? 150 : 0) + (state.shopBalloons ? 75 : 0) : 0) +
       this.balloon.income
     );
