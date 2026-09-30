@@ -30,6 +30,6 @@ import Kylar from './Kylar';
   maplebirch.define('Robin', new Robin(maplebirch), ['DR', 'var']);
   maplebirch.define('Whitney', new Whitney(maplebirch), ['DR', 'var']);
   maplebirch.define('Kylar', new Kylar(maplebirch), ['DR', 'var']);
-  maplebirch.define('LS', new LifeSimulation(maplebirch), ['DR', 'var']);
+  maplebirch.define('LS', new LifeSimulation(maplebirch), ['DR', 'var', 'combat']);
   maplebirch.define('DM', new DynamicMusic(maplebirch), ['DR', 'audio', 'var']);
 })(maplebirch);

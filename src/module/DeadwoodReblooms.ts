@@ -52,7 +52,7 @@ const guideSections = {
   Robin:       { EN: Hint_Robin_EN,       CN: Hint_Robin_CN,       title: { EN: 'Robin',                         CN: '罗宾拓展' } },
   Whitney:     { EN: Hint_Whitney_EN,     CN: Hint_Whitney_CN,     title: { EN: 'Whitney',                       CN: '惠特尼拓展' } },
   Kylar:       { EN: Hint_Kylar_EN,       CN: Hint_Kylar_CN,       title: { EN: 'Kylar',                         CN: '凯拉尔拓展' } },
-  LS:                   { EN: Hint_LS_EN,                   CN: Hint_LS_CN,                   title: { EN: 'Life Simulation',               CN: '模拟生活' } },
+  LS:                   { EN: Hint_LS_EN,                   CN: Hint_LS_CN,                   title: { EN: 'Life Simulation',               CN: '模拟人生' } },
   DM:                   { EN: Hint_DM_EN,                   CN: Hint_DM_CN,                   title: { EN: 'Dynamic Music',                 CN: '动态音乐' } },
   Credits:              { EN: Hint_Credits_EN,              CN: Hint_Credits_CN,              title: { EN: 'Credits and sources',           CN: '致谢与素材来源' } }
 } as const;

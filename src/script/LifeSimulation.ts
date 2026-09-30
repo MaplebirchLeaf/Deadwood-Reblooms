@@ -3,6 +3,7 @@ import HistoryProject from './LifeSimulation/HistoryProject';
 import Gym from './LifeSimulation/Gym';
 import School from './LifeSimulation/School';
 import SchoolNPCs from './LifeSimulation/SchoolNPCs';
+import Weapons from './LifeSimulation/Weapons';
 
 export default function LifeSimulation(maplebirch: typeof window.maplebirch): void {
   AcademicHonours(maplebirch);
@@ -10,4 +11,5 @@ export default function LifeSimulation(maplebirch: typeof window.maplebirch): vo
   Gym(maplebirch);
   School(maplebirch);
   SchoolNPCs(maplebirch);
+  Weapons(maplebirch);
 }

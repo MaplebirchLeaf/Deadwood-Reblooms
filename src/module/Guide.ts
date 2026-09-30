@@ -14,6 +14,7 @@ class GuideView {
     this.content.addEventListener('click', event => {
       if (!(event.target instanceof Element)) return;
       if (event.target.closest('[data-guide-reload]')) {
+        event.preventDefault();
         location.reload();
         return;
       }
@@ -46,12 +47,15 @@ class GuideView {
     const pending = modules.filter(module => enabled.has(module.name) !== (graph[module.name]?.state !== 'DISABLED'));
     for (const [index, status] of [...this.content.querySelectorAll<HTMLElement>('[data-guide-status]')].entries()) {
       status.replaceChildren();
-      if (index > 0 || !pending.length) continue;
+      const visible = index === 0 && pending.length > 0;
+      status.classList.toggle('settingsToggleItemWide', visible);
+      status.hidden = !visible;
+      if (!visible) continue;
       const text = document.createElement('span');
-      text.className = 'teal';
       text.textContent = lanSwitch('Reload required: ', '待重载：') + pending.map(module => module.name).join(', ');
-      const reload = document.createElement('button');
-      reload.type = 'button';
+      const reload = document.createElement('a');
+      reload.href = '#';
+      reload.className = 'teal';
       reload.dataset.guideReload = '';
       reload.textContent = lanSwitch('Reload now', '立即重载');
       status.append(text, document.createTextNode(' '), reload);
@@ -72,6 +76,8 @@ class GuideView {
       this.refresh();
       const status = this.content.querySelector<HTMLElement>('[data-guide-status]');
       if (status) {
+        status.hidden = false;
+        status.classList.add('settingsToggleItemWide');
         const message = document.createElement('span');
         message.className = 'red';
         message.textContent = lanSwitch('Could not save module settings. ', '模块开关保存失败。') + (error instanceof Error ? error.message : String(error));
@@ -150,6 +156,6 @@ export default class Guide {
       )
       .join('');
     const body = sections.map(section => `<section id='${target(section)}'><h2><span class='gold'>${escape(section.title)}</span></h2>${markdown(section.content)}</section>`).join('<br>');
-    return `${markdown(intro)}<nav aria-label='${lanSwitch('Guide contents', '指南目录')}'><div class='settingsGrid'>${contents}</div></nav><div data-guide-status role='status' aria-live='polite'></div><br>${body}`;
+    return `${markdown(intro)}<nav aria-label='${lanSwitch('Guide contents', '指南目录')}'><div class='settingsGrid'>${contents}<div data-guide-status role='status' aria-live='polite' hidden></div></div></nav><br>${body}`;
   }
 }
