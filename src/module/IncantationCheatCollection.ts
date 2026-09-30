@@ -8,7 +8,7 @@ interface CheatItem {
 }
 
 class IncantationCheatCollection {
-  // 命令库刻意保存在 IndexedDB，跨游戏存档共用；游戏剧情状态仍只存在当前存档的 V 中。
+  // 命令库刻意保存在 IndexedDB，跨游戏存档共用，游戏剧情状态仍只存在当前存档的 V 中。
   private cache: CheatItem[] = [];
   private editingName: string | null = null;
   private sortOrder: number = 0;
@@ -44,12 +44,12 @@ class IncantationCheatCollection {
     const name = JSON.stringify(item.name);
     const favoriteClass = item.favorite ? 'gold' : 'blue';
     const favoriteMark = item.favorite ? '★' : '☆';
-    const deleteLink = item.favorite ? '' : ` | <<lanLink '删除' 'capitalize' 'class:red'>><<run maplebirch.get("ICC").deleteForm(${name})>><</lanLink>>`;
+    const deleteLink = item.favorite ? '' : ` | <<lanLink '删除' 'capitalize' 'class:red'>><<run maplebirch.get("IncantationCheatCollection").deleteForm(${name})>><</lanLink>>`;
     return `
-      <span style='float:right'><<lanLink '${favoriteMark}' 'class:${favoriteClass}'>><<run maplebirch.get("ICC").toggleFavorite(${name})>><</lanLink>></span>
-      <<lanLink ${name} 'class:strawberry'>><<run maplebirch.get("ICC").updateForm(${name})>><</lanLink>><br>
+      <span style='float:right'><<lanLink '${favoriteMark}' 'class:${favoriteClass}'>><<run maplebirch.get("IncantationCheatCollection").toggleFavorite(${name})>><</lanLink>></span>
+      <<lanLink ${name} 'class:strawberry'>><<run maplebirch.get("IncantationCheatCollection").updateForm(${name})>><</lanLink>><br>
       <span class='cheat-code' data-type="${item.type === 'javascript' ? 'JS' : 'Twine'}">${this.briefCode(item.code)}</span>
-      <<lanLink '执行' 'capitalize' 'class:teal'>><<run maplebirch.get("ICC").executeForm(${name})>><</lanLink>>${deleteLink}
+      <<lanLink '执行' 'capitalize' 'class:teal'>><<run maplebirch.get("IncantationCheatCollection").executeForm(${name})>><</lanLink>>${deleteLink}
     `;
   }
 
@@ -91,11 +91,11 @@ class IncantationCheatCollection {
     html += `<span class='cheat-action-row'>`;
     const isExisting: CheatItem | undefined = this.cache.find(item => item.name === T.IncantationCheatCollectionNamebox);
     if (isExisting) {
-      html += `<<lanButton lanSwitch('Modify', '修改') 'capitalize'>><<run maplebirch.get("ICC").modifyForm(_IncantationCheatCollectionNamebox, _IncantationCheatCollectionCodebox)>><</lanButton>>`;
+      html += `<<lanButton lanSwitch('Modify', '修改') 'capitalize'>><<run maplebirch.get("IncantationCheatCollection").modifyForm(_IncantationCheatCollectionNamebox, _IncantationCheatCollectionCodebox)>><</lanButton>>`;
     } else {
-      html += `<<lanButton lanSwitch('Create', '创建') 'capitalize'>><<run maplebirch.get("ICC").createForm(_IncantationCheatCollectionNamebox, _IncantationCheatCollectionCodebox)>><</lanButton>>`;
+      html += `<<lanButton lanSwitch('Create', '创建') 'capitalize'>><<run maplebirch.get("IncantationCheatCollection").createForm(_IncantationCheatCollectionNamebox, _IncantationCheatCollectionCodebox)>><</lanButton>>`;
     }
-    html += `<<lanButton lanSwitch('Clear', '清除') 'capitalize' 'class:red'>><<run maplebirch.get("ICC").clearForm()>><</lanButton>>`;
+    html += `<<lanButton lanSwitch('Clear', '清除') 'capitalize' 'class:red'>><<run maplebirch.get("IncantationCheatCollection").clearForm()>><</lanButton>>`;
     html += `</span>`;
     html += `</div>`;
     return html;
@@ -106,15 +106,15 @@ class IncantationCheatCollection {
     let html: string = `<div class='input-row cheat-search-row'>`;
     html += `<<textbox '_IncantationCheatCollectionSearch' _IncantationCheatCollectionSearch>>`;
     html += `<span class='cheat-search-action-row'>`;
-    html += `<<lanButton lanSwitch('Search', '搜索') 'capitalize'>><<run maplebirch.get("ICC").searchForm(_IncantationCheatCollectionSearch)>><</lanButton>>`;
-    html += `<<lanButton lanSwitch('Sort', '排序') 'capitalize'>><<run maplebirch.get("ICC").sortForm()>><</lanButton>>`;
+    html += `<<lanButton lanSwitch('Search', '搜索') 'capitalize'>><<run maplebirch.get("IncantationCheatCollection").searchForm(_IncantationCheatCollectionSearch)>><</lanButton>>`;
+    html += `<<lanButton lanSwitch('Sort', '排序') 'capitalize'>><<run maplebirch.get("IncantationCheatCollection").sortForm()>><</lanButton>>`;
     html += `</span>`;
     html += `<span class='cheat-transfer-row'>`;
-    html += `<<lanButton lanSwitch('Export', '导出') 'capitalize' 'class:blue'>><<run maplebirch.get("ICC").exportForm()>><</lanButton>>`;
+    html += `<<lanButton lanSwitch('Export', '导出') 'capitalize' 'class:blue'>><<run maplebirch.get("IncantationCheatCollection").exportForm()>><</lanButton>>`;
     html += `<<lanButton lanSwitch('Import', '导入') 'capitalize' 'class:teal'>><<run (() => { const input = document.getElementById('cheat-import-file'); if (input) input.click(); })()>><</lanButton>>`;
     html += `</span>`;
     html += `</div>`;
-    html += `<input id='cheat-import-file' class='cheat-import-file' type='file' accept='.cheat' hidden onchange='void maplebirch.get("ICC").importFromFileInput(this)'>`;
+    html += `<input id='cheat-import-file' class='cheat-import-file' type='file' accept='.cheat' hidden onchange='void maplebirch.get("IncantationCheatCollection").importFromFileInput(this)'>`;
     return html;
   }
 
@@ -223,7 +223,7 @@ class IncantationCheatCollection {
     const confirmHtml: string = `
       <span class='red'><<lanSwitch 'Confirm to delete: ' '确认删除：'>>"${item.name}"?</span><br>
       <span class='cheat-code' data-type="${item.type === 'javascript' ? 'JS' : 'Twine'}">${escapedCode}</span>
-      <<lanLink '确认' 'capitalize' 'class:teal'>><<run maplebirch.get("ICC").removeForm(${nameArg})>><</lanLink>> | <<lanLink '取消' 'capitalize' 'class:blue'>><<run maplebirch.get("ICC").cancelDelete(${nameArg})>><</lanLink>>
+      <<lanLink '确认' 'capitalize' 'class:teal'>><<run maplebirch.get("IncantationCheatCollection").removeForm(${nameArg})>><</lanLink>> | <<lanLink '取消' 'capitalize' 'class:blue'>><<run maplebirch.get("IncantationCheatCollection").cancelDelete(${nameArg})>><</lanLink>>
     `;
     this.updateContainer(itemId, confirmHtml);
   }
@@ -250,7 +250,7 @@ class IncantationCheatCollection {
   }
 
   public sortForm(): void {
-    // 实际排序已由 content → sortItems 完成；此处只轮换模式，不再重复改动缓存。
+    // 实际排序已由 content → sortItems 完成，此处只轮换模式，不再重复改动缓存。
     this.sortOrder = (this.sortOrder + 1) % 5;
     this.updateDisplay();
   }
@@ -295,7 +295,7 @@ class IncantationCheatCollection {
         this.showStatus(false, 'Invalid import file', '导入文件格式错误');
         return false;
       }
-      // 导入文件不是可信存档；只保留支持的字段并按名称去重，避免覆盖时出现含糊的目标。
+      // 导入文件不是可信存档，只保留支持的字段并按名称去重，避免覆盖时出现含糊的目标。
       const namesInFile: Set<string> = new Set();
       for (const rawItem of rawItems) {
         const item = rawItem as Record<string, unknown>;
@@ -355,8 +355,8 @@ class IncantationCheatCollection {
       const confirmHtml: string = `
         <div class='settingsToggleItem'>
           <span class='red'><<lanSwitch 'Are you sure to clear' '确认清空'>> ${removableCount} <<lanSwitch 'codes' '个命令'>>?</span><br>
-          <<lanLink '确认' 'capitalize' 'class:teal'>><<run maplebirch.get("ICC").clearForm('confirm')>>
-          <</lanLink>>|<<lanLink '取消' 'capitalize' 'class:blue'>><<run maplebirch.get("ICC").clearForm('cancel')>><</lanLink>>
+          <<lanLink '确认' 'capitalize' 'class:teal'>><<run maplebirch.get("IncantationCheatCollection").clearForm('confirm')>>
+          <</lanLink>>|<<lanLink '取消' 'capitalize' 'class:blue'>><<run maplebirch.get("IncantationCheatCollection").clearForm('cancel')>><</lanLink>>
         </div>
       `;
       this.updateContainer('maplebirch-cheat-content', confirmHtml);
@@ -400,9 +400,9 @@ class IncantationCheatCollection {
         <div id='ConsoleCheat'>
           <details class='cheat-section' open>
             <summary class='cheat-section'><span class='gold'><<lanSwitch 'Cheating Collection' '作弊集'>></span></summary>
-            <div id='maplebirch-cheat-panel' class='searchButtons'><<= maplebirch.get("ICC").panel>></div>
-            <div id='maplebirch-cheat-search' class='searchButtons'><<= maplebirch.get("ICC").search>></div>
-            <div id='maplebirch-cheat-status' class=''></div><div id='maplebirch-cheat-content' class='settingsGrid'><<= maplebirch.get("ICC").content>></div>
+            <div id='maplebirch-cheat-panel' class='searchButtons'><<= maplebirch.get("IncantationCheatCollection").panel>></div>
+            <div id='maplebirch-cheat-search' class='searchButtons'><<= maplebirch.get("IncantationCheatCollection").search>></div>
+            <div id='maplebirch-cheat-status' class=''></div><div id='maplebirch-cheat-content' class='settingsGrid'><<= maplebirch.get("IncantationCheatCollection").content>></div>
           </details>
         </div>
       `);

@@ -27,7 +27,7 @@ export default function (maplebirch: MaplebirchCore): void {
     // 市政厅、咖啡馆开幕与艾弗里牌局：在场沿用原版 npc Quinn 写入的 V.npc。
     wardrobe.wear('Quinn', '*', 'business_suit_male', () => !party() && C.npc?.Quinn?.pronoun === 'm');
     wardrobe.wear('Quinn', '*', 'business_suit_female', () => !party() && C.npc?.Quinn?.pronoun !== 'm');
-    // Mansion Party Quinn 是泳池派对；Quinn 3 明写离开泳池后未换衣服便入席，后续分支继续泳装。
+    // Mansion Party Quinn 是泳池派对，Quinn 3 明写离开泳池后未换衣服便入席，后续分支继续泳装。
     wardrobe.wear('Quinn', '*', 'speedo', () => party() && C.npc?.Quinn?.pronoun === 'm');
     wardrobe.wear('Quinn', '*', 'bikini', () => party() && C.npc?.Quinn?.pronoun !== 'm');
     wardrobe.modify('Quinn', clothes => {

@@ -31,7 +31,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
     passage: 'Adult Shop Approach Sirris'
   });
 
-  // 悉尼在神殿宿舍答应当晚回家；原版日程也会在约定时段同步转为 home。
+  // 悉尼在神殿宿舍答应当晚回家，原版日程也会在约定时段同步转为 home。
   maplebirch.tool.addTo('BeforeLinkZone', {
     widget: 'deadwood-reblooms-sirris-estate-evening-link',
     passage: 'Temple Quarters'

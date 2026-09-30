@@ -18,7 +18,11 @@ export default function (maplebirch: typeof window.maplebirch) {
     if (window.mapMove.deadwoodPublicWalk) return;
     const originalMapMove = window.mapMove;
     window.mapMove = destination => {
-      if (maplebirch.get('VP')!.exhibitionism.canRoamTown && V.map.available?.[V.passage]?.includes(destination) && V.link_table.some((link: string) => link.includes('|' + destination + ']]'))) {
+      if (
+        maplebirch.get('VanillaPlus')!.exhibitionism.canRoamTown &&
+        V.map.available?.[V.passage]?.includes(destination) &&
+        V.link_table.some((link: string) => link.includes('|' + destination + ']]'))
+      ) {
         Wikifier.wikifyEval('<<exhibitionism6>><<fameexhibitionism 5>>');
       }
       originalMapMove(destination);
@@ -28,11 +32,11 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.dynamic.regStateEvent('gate', 'exhibitionism-unlock', {
     output: 'deadwood-reblooms-exhibitionism-unlock',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VP')!.exhibitionism.unlock
+    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.exhibitionism.unlock
   });
   maplebirch.dynamic.regStateEvent('append', 'exhibitionism-max', {
     output: 'earnFeat "Beyond Shame"',
-    cond: () => V.feats?.currentSave['Beyond Shame'] === undefined && V.VanillaPlus != null && maplebirch.get('VP')!.exhibitionism.max
+    cond: () => V.feats?.currentSave['Beyond Shame'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.exhibitionism.max
   });
 
   // 记录原版裸露挑战结果，并扩展暴露癖上限。
@@ -42,14 +46,14 @@ export default function (maplebirch: typeof window.maplebirch) {
         {
           // 仅扩展强制回卧室分支的裸露判断，保留原版及其他模组的后续条件。
           src: '<<elseif $exposed gte 1',
-          to: '<<elseif $exposed gte 1 and !maplebirch.get("VP").exhibitionism.canRoamTown',
+          to: '<<elseif $exposed gte 1 and !maplebirch.get("VanillaPlus").exhibitionism.canRoamTown',
           expected: 1
         }
       ],
       Garden: [
         {
           src: '<<elseif $exposed gte 1',
-          to: '<<elseif $exposed gte 1 and !maplebirch.get("VP").exhibitionism.canRoamTown',
+          to: '<<elseif $exposed gte 1 and !maplebirch.get("VanillaPlus").exhibitionism.canRoamTown',
           expected: 1
         }
       ],
@@ -97,7 +101,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     widgetPassage: {
       'Widget displayLinks': [
         {
-          // 先扩充 link_table 再由原版 displayLinks 渲染；渲染后的链接区无法补做这一步。
+          // 先扩充 link_table 再由原版 displayLinks 渲染，渲染后的链接区无法补做这一步。
           src: '<<widget "displayLinks">>',
           applyafter: '\n\t<<deadwood-reblooms-public-walk-links>>',
           expected: 1
@@ -106,7 +110,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       'Widgets Home': [
         {
           src: '<<if $exposed gte 1>>',
-          to: '<<if maplebirch.get("VP").exhibitionism.canRoamTown>>\n\t\t<<deadwood-reblooms-public-home-exit>>\n\t<<elseif $exposed gte 1>>',
+          to: '<<if maplebirch.get("VanillaPlus").exhibitionism.canRoamTown>>\n\t\t<<deadwood-reblooms-public-home-exit>>\n\t<<elseif $exposed gte 1>>',
           expected: 1
         }
       ],
@@ -114,7 +118,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 将作弊面板暴露癖滑条上限按突破倍率计算，保留原版反向显示。
         {
           src: '$exhibitionism "exhibitionism" {reverse: true}',
-          to: '$exhibitionism "exhibitionism" {max: $VanillaPlus.lock.exhibitionism ? maplebirch.get("VP").ceiling("exhibitionism") : maplebirch.get("VP").normalCeiling("exhibitionism"), reverse: true}',
+          to: '$exhibitionism "exhibitionism" {max: $VanillaPlus.lock.exhibitionism ? maplebirch.get("VanillaPlus").ceiling("exhibitionism") : maplebirch.get("VanillaPlus").normalCeiling("exhibitionism"), reverse: true}',
           expected: 1
         }
       ],
@@ -128,7 +132,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 完整保留原版五级结算后，每四次非绝望行为折算一点六级进度，再应用倍率上限。
         {
           src: '<<set $exhibitionism to Math.clamp($exhibitionism, 0, 100)>>',
-          to: '<<if $_n is 5 and $VanillaPlus.lock.exhibitionism and $exhibitionism gte maplebirch.get("VP").normalCeiling("exhibitionism") and $exhibitionism lt maplebirch.get("VP").ceiling("exhibitionism") and $desperateaction isnot 1 and $desperateaction isnot 2 and typeof $desperateaction isnot "string">>\n\t<<set $VanillaPlus.exhibitionism.levelFive to ($VanillaPlus.exhibitionism.levelFive || 0) + 1>>\n\t<<if $VanillaPlus.exhibitionism.levelFive gte 4>>\n\t\t<<set $VanillaPlus.exhibitionism.levelFive -= 4>>\n\t\t<<set $exhibitionism to Math.clamp($exhibitionism + 1, maplebirch.get("VP").normalCeiling("exhibitionism"), maplebirch.get("VP").ceiling("exhibitionism"))>>\n\t<</if>>\n<</if>>\n<<set $exhibitionism to Math.clamp($exhibitionism, maplebirch.get("VP").minimum(\'exhibitionism\'), $VanillaPlus.lock.exhibitionism ? maplebirch.get("VP").ceiling("exhibitionism") : maplebirch.get("VP").normalCeiling("exhibitionism"))>>',
+          to: '<<if $_n is 5 and $VanillaPlus.lock.exhibitionism and $exhibitionism gte maplebirch.get("VanillaPlus").normalCeiling("exhibitionism") and $exhibitionism lt maplebirch.get("VanillaPlus").ceiling("exhibitionism") and $desperateaction isnot 1 and $desperateaction isnot 2 and typeof $desperateaction isnot "string">>\n\t<<set $VanillaPlus.exhibitionism.levelFive to ($VanillaPlus.exhibitionism.levelFive || 0) + 1>>\n\t<<if $VanillaPlus.exhibitionism.levelFive gte 4>>\n\t\t<<set $VanillaPlus.exhibitionism.levelFive -= 4>>\n\t\t<<set $exhibitionism to Math.clamp($exhibitionism + 1, maplebirch.get("VanillaPlus").normalCeiling("exhibitionism"), maplebirch.get("VanillaPlus").ceiling("exhibitionism"))>>\n\t<</if>>\n<</if>>\n<<set $exhibitionism to Math.clamp($exhibitionism, maplebirch.get("VanillaPlus").minimum(\'exhibitionism\'), $VanillaPlus.lock.exhibitionism ? maplebirch.get("VanillaPlus").ceiling("exhibitionism") : maplebirch.get("VanillaPlus").normalCeiling("exhibitionism"))>>',
           expected: 1
         }
       ],
@@ -136,7 +140,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 替换全局暴露癖钳制公式，使其他来源的数值变化同样遵守突破边界。
         {
           src: '<<set $exhibitionism to Math.clamp($exhibitionism, 0, 100)>>',
-          to: '<<set $exhibitionism to Math.clamp($exhibitionism, maplebirch.get("VP").minimum(\'exhibitionism\'), $VanillaPlus.lock.exhibitionism ? maplebirch.get("VP").ceiling(\'exhibitionism\') : maplebirch.get("VP").normalCeiling(\'exhibitionism\'))>>',
+          to: '<<set $exhibitionism to Math.clamp($exhibitionism, maplebirch.get("VanillaPlus").minimum(\'exhibitionism\'), $VanillaPlus.lock.exhibitionism ? maplebirch.get("VanillaPlus").ceiling(\'exhibitionism\') : maplebirch.get("VanillaPlus").normalCeiling(\'exhibitionism\'))>>',
           expected: 1
         }
       ]

@@ -4,7 +4,7 @@ import residentsSource from '@/assets/finance/residents.yaml';
 type PropertyId = string;
 type LocalizedText = { EN: string; CN: string };
 
-// YAML 是房源的唯一静态来源。价格和租金均以便士计；rooms 的数字是楼层编号。
+// YAML 是房源的唯一静态来源。价格和租金均以便士计，rooms 的数字是楼层编号。
 interface PropertyFloor {
   name: LocalizedText;
   description: LocalizedText;

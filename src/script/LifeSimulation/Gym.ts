@@ -25,7 +25,7 @@ export default function Gym(maplebirch: typeof window.maplebirch): void {
     { overwrite: true }
   );
 
-  // 峭壁街的普通地点列表才有入口；遇到街道强制事件时不额外显示健身房链接。
+  // 峭壁街的普通地点列表才有入口，遇到街道强制事件时不额外显示健身房链接。
   maplebirch.tool.inject({
     locationPassage: {
       'Cliff Street': [

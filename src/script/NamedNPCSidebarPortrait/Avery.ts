@@ -49,7 +49,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       }
     });
 
-    // 日常商务、正式场合和庄园生活服装；艾弗里没有学生或校服分支
+    // 日常商务、正式场合和庄园生活服装，艾弗里没有学生或校服分支
     wardrobe.wear('Avery', 'business', 'business_suit_male', () => C.npc?.Avery?.pronoun === 'm');
     wardrobe.wear('Avery', 'business', 'business_suit_female', () => C.npc?.Avery?.pronoun !== 'm');
     wardrobe.wear('Avery', 'formal', 'tuxedo_formal', () => C.npc?.Avery?.pronoun === 'm');
@@ -83,7 +83,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     if (title.startsWith('Mansion Bedroom Avery Dress')) return 'business';
     if (title.startsWith('Mansion Pool Swim Avery')) return 'naked';
 
-    // 酒店热水池全裸；过夜前艾弗里只穿内衣，性爱阶段不保留内衣
+    // 酒店热水池全裸，过夜前艾弗里只穿内衣，性爱阶段不保留内衣
     if (title.startsWith('Avery Hotel Bath') || title === 'Avery Hotel 4' || title === 'Avery Hotel 5' || title.startsWith('Avery Hotel Sex')) return 'naked';
     if (title === 'Avery Hotel Stay' || title === 'Avery Hotel Pajamas' || title === 'Avery Hotel Lingerie' || title.startsWith('Avery Hotel No ')) return 'underwear';
     if (V.location === 'hotel') return 'formal';
@@ -93,7 +93,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     if (title.startsWith('Avery Valentines Sex') || title.startsWith('Avery Valentines Rape')) return 'naked';
     if (title.startsWith('Avery Valentines')) return 'formal';
 
-    // 约会、宴会与摩天楼仪式穿正式服；失火破损服装按用户决定暂不单独表现
+    // 约会、宴会与摩天楼仪式穿正式服，失火破损服装按用户决定暂不单独表现
     if (title.startsWith('Avery Date') || title.startsWith('Skyscraper Party') || title.startsWith('Skyscraper Save') || title.startsWith('Skyscraper Kick')) return 'formal';
 
     // 办公室、接送、直升机及学校活动均是成年人的商务场景，不生成校园日程
@@ -104,7 +104,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       if (Time.weekDay === 7 && Time.hour === 20 && V.averydate === 1) return 'formal';
       const workHours = Time.weekDay !== 7 && Time.hour > 6 && Time.hour <= (Time.weekDay === 1 ? 16 : 20);
       if (workHours && V.averySeen?.includes('office') && !V.avery_injury) return 'business';
-      // 没有明确日程衣装时保留上一套；此值不控制侧边栏在场判断。
+      // 没有明确日程衣装时保留上一套，此值不控制侧边栏在场判断。
       return 'nowhere';
     }
 

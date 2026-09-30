@@ -53,7 +53,7 @@ class Robin extends Module implements RobinFacade {
     const temple = this.core.get('RobinTemple') ? V.RobinTemple : undefined;
     const templeGrace = Number(temple?.grace);
     const templeIncome = temple && ['member', 'approved', 'promised'].includes(temple.stage) && Number.isFinite(templeGrace) ? Math.max(0, Math.min(100, templeGrace)) * 10 : 0;
-    // 基础店铺增收已扣除店租、水电、原料和临时帮工；正式员工的增收与工资单独入账。
+    // 基础店铺增收已扣除店租、水电、原料和临时帮工，正式员工的增收与工资单独入账。
     return (
       (V.robin.stayup >= 1 ? 250 : 300) +
       (V.robin.moneyModifier || 0) +
@@ -126,7 +126,7 @@ class Robin extends Module implements RobinFacade {
           V.robindebt = -1;
         }
       } else if (asylum.status === 'home') asylum.severeDays = 0;
-      // 原版 PC 可经评估出院；罗宾没有这条既有路径。此处只记录留院的创伤，
+      // 原版 PC 可经评估出院，罗宾没有这条既有路径。此处只记录留院的创伤，
       // 罗宾不会在玩家未参与时凭空完成逃离。
       if (asylum.status === 'admitted' && Time.days > asylum.admittedDay && elapsedDays > 0) {
         const previousPeriods = Math.floor(asylum.daysConfined / 3);
@@ -172,7 +172,7 @@ class Robin extends Module implements RobinFacade {
       return;
     }
     this.flowers.settle();
-    // 原版先扣房租、检查债务，再发周收入；先入账才可用于当周房租。
+    // 原版先扣房租、检查债务，再发周收入，先入账才可用于当周房租。
     V.robinmoney += Math.max(0, state.weeklyIncome - vanillaIncome);
     if (V.robinpaid !== 1 || state.selfRent) {
       const reserveTransfer = Math.min(state.reserve, Math.max(0, robinRent - V.robinmoney));
@@ -187,7 +187,7 @@ class Robin extends Module implements RobinFacade {
       }
     } else if (V.robinpaid !== 1) V.robinmoney += 400 - robinRent;
     const beforeVanilla = V.robinmoney;
-    // 原版用 <= 0 判定欠租；现金恰好 £400 时会误记欠债并可能立刻触发惩罚。
+    // 原版用 <= 0 判定欠租，现金恰好 £400 时会误记欠债并可能立刻触发惩罚。
     const exactRent = V.robinpaid !== 1 && beforeVanilla === 400;
     if (exactRent) V.robinmoney++;
     const expected = (V.robinpaid === 1 ? beforeVanilla : Math.max(0, beforeVanilla - 400)) + vanillaIncome;
@@ -212,7 +212,7 @@ class Robin extends Module implements RobinFacade {
       exact: true
     });
     this.core.once(':storyready', () => {
-      // onWeek 在原版 weekPassed() 后触发；房租抵扣须在原版周结算前入账。
+      // onWeek 在原版 weekPassed() 后触发，房租抵扣须在原版周结算前入账。
       const vanillaWeekPassed = window.weekPassed;
       if (vanillaWeekPassed) window.weekPassed = () => this.settleWeek(vanillaWeekPassed);
       const getLocation = window.getRobinLocation;

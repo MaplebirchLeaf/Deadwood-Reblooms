@@ -1,6 +1,6 @@
 // ./src/module/constants/robin-expansion.ts
 
-/** 气球摊位的走向；resolved 表示该支线已经收束。 */
+/** 气球摊位的走向，resolved 表示该支线已经收束。 */
 export type BalloonRoute = 'none' | 'cooperate' | 'compete' | 'resolved';
 /** 收容所（精神病院）路线状态。 */
 export type AsylumStatus = 'home' | 'admitted' | 'recovering';
@@ -19,7 +19,7 @@ export interface RobinExpansionState {
   shop: boolean;
   /**
    * 摊位与店铺的线索进度。
-   * 线索先在对应场景出现，再把话题带回罗宾房间；摊位用等级记录每次改造后的下一条线索。
+   * 线索先在对应场景出现，再把话题带回罗宾房间，摊位用等级记录每次改造后的下一条线索。
    */
   topics: {
     /** 柠檬水摊位的线索等级。 */
@@ -39,7 +39,7 @@ export interface RobinExpansionState {
   shopInspectionDay: number;
   /** 银行是否已提供开店支持。 */
   shopBankSupported: boolean;
-  /** 玩家为摊位或店铺垫付的借款（英镑）；PC 的 $money 使用便士。 */
+  /** 玩家为摊位或店铺垫付的借款（英镑），PC 的 $money 使用便士。 */
   pcLoan: number;
   /** 店铺库存量。 */
   shopStock: number;
@@ -67,7 +67,7 @@ export interface RobinExpansionState {
   weeklyIncome: number;
   /** 罗宾是否已经和 PC 试做过鲜鱼料理。 */
   fishCooked: boolean;
-  /** 柠檬水摊是否添置了便携烤架；店铺使用自身的厨房设备。 */
+  /** 柠檬水摊是否添置了便携烤架，店铺使用自身的厨房设备。 */
   fishGrill: boolean;
   /** 当日鲜鱼售出数量，供摊位与店铺共用。 */
   fishSoldDay: number;
@@ -82,7 +82,7 @@ export interface RobinExpansionState {
   fishDateDay: number;
   fishDateActive: boolean;
   fishDateCatchStart: number;
-  /** 上次结算所在的周序号；-1 表示尚未结算。 */
+  /** 上次结算所在的周序号，-1 表示尚未结算。 */
   week: number;
   /** 罗宾是否开始自己付房租。 */
   selfRent: boolean;
@@ -126,7 +126,7 @@ export interface RobinExpansionState {
   /** 上次看店的游戏日。 */
   shopDay: number;
   /*
-   * 摊位、店铺与校园各自限一次；日期标记由当前存档保存，不占用原版 $daily。
+   * 摊位、店铺与校园各自限一次，日期标记由当前存档保存，不占用原版 $daily。
    */
   /** 上次摊位试吃的游戏日。 */
   stall_taste_day: number;

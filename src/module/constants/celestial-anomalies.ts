@@ -4,14 +4,14 @@
 export interface CelestialAnomaliesState {
   /** 日食的排期状态。 */
   solarEclipse: {
-    /** 本次排期使用的随机种子；0 表示尚未生成。 */
+    /** 本次排期使用的随机种子，0 表示尚未生成。 */
     seed: number;
     /** 已触发但尚未结算的日食事件队列。 */
     stored: unknown[];
   };
   /** 流星雨的排期状态。 */
   meteorShower: {
-    /** 本次排期使用的随机种子；0 表示尚未生成。 */
+    /** 本次排期使用的随机种子，0 表示尚未生成。 */
     seed: number;
     /** 已触发但尚未结算的流星雨事件队列。 */
     stored: unknown[];

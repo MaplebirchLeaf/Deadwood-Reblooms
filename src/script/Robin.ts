@@ -44,7 +44,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
     }
   );
 
-  // 原版这些页面的可见链接数量会随日程和剧情变化；放在首个操作链接前，保留末尾的离开/返回链接。
+  // 原版这些页面的可见链接数量会随日程和剧情变化，放在首个操作链接前，保留末尾的离开/返回链接。
   // CustomLinkZone 使用固定可见链接序号，不适合这些动态页面。
   maplebirch.tool.addTo(
     'BeforeLinkZone',

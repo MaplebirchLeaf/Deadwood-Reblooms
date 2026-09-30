@@ -4,7 +4,7 @@
 export interface KylarExpansionState {
   /** 是否已接受庄园留宿邀请。 */
   stay_invited: boolean;
-  /** 上次澡堂事件的游戏日；-1 表示尚未发生。 */
+  /** 上次澡堂事件的游戏日，-1 表示尚未发生。 */
   bathDay: number;
   /** 澡堂遭遇是否已触发，避免重复播放。 */
   bathEncounter: boolean;
@@ -16,9 +16,9 @@ export interface KylarExpansionState {
   notes_day: number;
   /** 上次夜间事件的游戏日。 */
   night_day: number;
-  /** 夜间事件的结算结果标识；空串表示尚未结算。 */
+  /** 夜间事件的结算结果标识，空串表示尚未结算。 */
   night_scene: string;
-  /** 上次在后院遇见凯拉尔的游戏日；-1 表示尚未发生。 */
+  /** 上次在后院遇见凯拉尔的游戏日，-1 表示尚未发生。 */
   yard_day: number;
   /** 上次在公园谈及凯拉尔素描的游戏日。 */
   sketch_day: number;

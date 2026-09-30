@@ -15,7 +15,7 @@ class LifeSimulation extends Module {
 
   public override preInit(): void {
     super.preInit();
-    // 只在原版确实跨日时清除到期卡；读档时直接按保存的到期时间判断入场资格。
+    // 只在原版确实跨日时清除到期卡，读档时直接按保存的到期时间判断入场资格。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-gym-membership', {
       exact: true,
       action: () => {
@@ -54,7 +54,7 @@ class LifeSimulation extends Module {
     return this.has && this.dorenCanVisit && gym.doren_checked_day === Time.days && gym.doren_present;
   }
 
-  /** 聊天与陪练共用每日次数；陪练也占用一次正常锻炼额度。 */
+  /** 聊天与陪练共用每日次数，陪练也占用一次正常锻炼额度。 */
   public meetDoren(train: boolean): boolean {
     const gym = V.LifeSimulation.gym;
     if (!this.dorenPresent || gym.doren_interaction_day === Time.days || V.exposed > 0) return false;
@@ -115,7 +115,7 @@ class LifeSimulation extends Module {
 
 declare module '@scml-dol-maplebirch/types' {
   interface Extensions {
-    readonly LS: LifeSimulation;
+    readonly LifeSimulation: LifeSimulation;
   }
 }
 

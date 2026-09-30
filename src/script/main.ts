@@ -14,17 +14,17 @@ import Kylar from './Kylar';
 (function (maplebirch): void {
   'use strict';
 
-  if (maplebirch.get('DR')) DeadwoodReblooms(maplebirch);
-  if (maplebirch.get('MLIANPCA')) MoreLoveInterestsAndNPCAvatars(maplebirch);
+  if (maplebirch.get('DeadwoodReblooms')) DeadwoodReblooms(maplebirch);
+  if (maplebirch.get('MoreLoveInterestsAndNPCAvatars')) MoreLoveInterestsAndNPCAvatars(maplebirch);
   if (maplebirch.get('LongerCombat')) maplebirch.tool.addTo('Options', 'Deadwood-Reblooms-LongerCombat-Options');
-  if (maplebirch.get('CA')) CelestialAnomalies(maplebirch);
-  if (maplebirch.get('DM')) DynamicMusic(maplebirch);
+  if (maplebirch.get('CelestialAnomalies')) CelestialAnomalies(maplebirch);
+  if (maplebirch.get('DynamicMusic')) DynamicMusic(maplebirch);
   if (maplebirch.get('MoreTransformations')) MoreTransformations(maplebirch);
   if (maplebirch.get('NPCSidebarPortrait')) NPCSidebarPortrait(maplebirch);
-  if (maplebirch.get('VP')) VanillaPlus(maplebirch);
+  if (maplebirch.get('VanillaPlus')) VanillaPlus(maplebirch);
   if (maplebirch.get('Sydney')) Sydney(maplebirch);
   if (maplebirch.get('Robin')) Robin(maplebirch);
   if (maplebirch.get('Whitney')) Whitney(maplebirch);
   if (maplebirch.get('Kylar')) Kylar(maplebirch);
-  if (maplebirch.get('LS')) LifeSimulation(maplebirch);
+  if (maplebirch.get('LifeSimulation')) LifeSimulation(maplebirch);
 })(maplebirch);

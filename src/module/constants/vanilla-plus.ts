@@ -15,18 +15,18 @@ export type VanillaPlusTrait = VanillaPlusAttribute | 'incorrigible';
 export interface VanillaPlusState {
   /** 各属性的突破结算锁。为 true 表示该属性的突破已经结算过，不再重复触发。 */
   lock: Record<VanillaPlusAttribute, boolean>;
-  /** 各属性特质是否已解锁；incorrigible 需六项属性全部满值后才置位。 */
+  /** 各属性特质是否已解锁，incorrigible 需六项属性全部满值后才置位。 */
   traits: Record<VanillaPlusTrait, boolean>;
   /** 美貌相关的一次性进度。 */
   beauty: {
-    /** 是否已经历过"倾城"事件；该事件只发生一次。 */
+    /** 是否已经历过"倾城"事件，该事件只发生一次。 */
     alluring: boolean;
   };
   /** 神圣转化带来的一次性数值加成。 */
   divineTransformations: {
     /** 转化赋予的额外美貌上限加成，参与 normalCeiling 计算。 */
     beautyBonus: number;
-    /** 是否已使用过"净化"（清除转化惩罚）；每次存档仅一次。 */
+    /** 是否已使用过"净化"（清除转化惩罚），每次存档仅一次。 */
     expungeUsed: boolean;
   };
   /** 银行、证券与市场的全部可变状态。 */
@@ -43,7 +43,7 @@ export interface VanillaPlusState {
     farm: boolean;
     /** 已遭遇过围栏/牢笼事件。 */
     pound: boolean;
-    /** 本存档已用过一次"挣脱"；用后不再提供。 */
+    /** 本存档已用过一次"挣脱"，用后不再提供。 */
     breakUsed: boolean;
   };
   /** 露出癖相关的场景进度。 */
@@ -56,14 +56,14 @@ export interface VanillaPlusState {
     highStreetRun: boolean;
     /** 商业街暴露（初次）已发生。 */
     highStreet: boolean;
-    /** 五级突破事件已完成；用于避免重复触发。 */
+    /** 五级突破事件已完成，用于避免重复触发。 */
     levelFive: number;
   };
   /** 异种癖相关进度与镜子出口坐标。 */
   deviancy: {
     /** 野性之歌前置已满足。 */
     wildsong: boolean;
-    /** 仪式正在进行中；读档后据此恢复流程。 */
+    /** 仪式正在进行中，读档后据此恢复流程。 */
     conducting: boolean;
     /** 仪式已完成，上限已解锁。 */
     conducted: boolean;
@@ -77,7 +77,7 @@ export interface VanillaPlusState {
     mirror_property: string | null;
     /** 各类镜面出口落在触手平原的随机坐标，键形如 'property:domus'。 */
     mirror_locations: Record<string, { north: number; east: number }>;
-    /** 各处镜子是否已被发现；property 再按房产 id 细分。 */
+    /** 各处镜子是否已被发现，property 再按房产 id 细分。 */
     mirrors: {
       /** 孤儿院卧室的镜子。 */
       home: boolean;
@@ -100,14 +100,14 @@ export interface VanillaPlusState {
     /** 五级突破事件已完成。 */
     levelFive: number;
   };
-  /** 手部抓握开关状态；null 表示尚未选择。 */
+  /** 手部抓握开关状态，null 表示尚未选择。 */
   handGrip: {
     /** 左手是否启用抓握，null 为未设置。 */
     left: number | null;
     /** 右手是否启用抓握，null 为未设置。 */
     right: number | null;
   };
-  /** 双人插入遭遇战的进行状态；不在遭遇战中时为 null。 */
+  /** 双人插入遭遇战的进行状态，不在遭遇战中时为 null。 */
   npcDoublePenetration: NPCDoublePenetrationData | null;
   /** 意志相关的一次性事件与痛苦护盾。 */
   willpower: {
@@ -119,7 +119,7 @@ export interface VanillaPlusState {
     vigil: boolean;
     /** 痛苦护盾的当前状态。 */
     painShield: {
-      /** 护盾剩余量；归零后失效。 */
+      /** 护盾剩余量，归零后失效。 */
       remaining: number;
       /** 护盾是否已就绪可再次使用。 */
       ready: boolean;

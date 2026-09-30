@@ -68,7 +68,7 @@ class CelestialAnomalies extends Module {
     this.core.once(':storyready', () => {
       const macro = this.core.SugarCube.Macro.get('weatherIcon') as MacroDefinition | undefined;
       if (!macro) return;
-      // 保留原版宏处理普通天气；仅天象活动期间换图，并复用原版 skybox 提示。
+      // 保留原版宏处理普通天气，仅天象活动期间换图，并复用原版 skybox 提示。
       this.core.tool.macro.define('weatherIcon', function (this: any) {
         if (!Weather.solarEclipse && !Weather.meteorShower) {
           macro.handler.call(this);
@@ -95,7 +95,7 @@ class CelestialAnomalies extends Module {
 
 declare module '@scml-dol-maplebirch/types' {
   interface Extensions {
-    readonly CA: CelestialAnomalies;
+    readonly CelestialAnomalies: CelestialAnomalies;
   }
 }
 

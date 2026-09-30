@@ -22,7 +22,7 @@ export function cycle(maplebirch: MaplebirchCore): boolean {
 }
 
 export function present(maplebirch: MaplebirchCore): boolean {
-  // 原版名单决定人物；附身和教会分裂中的 PC 演绎没有第二具怨灵身体。
+  // 原版名单决定人物，附身和教会分裂中的 PC 演绎没有第二具怨灵身体。
   return !!V.npc?.includes(name) && !V.possessed && !/^Schism(?: |$)/.test(maplebirch.passage.title);
 }
 
@@ -79,7 +79,7 @@ export default function (maplebirch: MaplebirchCore): void {
           if (!resource) continue;
           clothes[slot] = { ...clone(resource), ...clone(worn) };
         }
-        // 原版暴露标志优先于衣物名字；下身脱除包含袜子，手铐和项链保留。
+        // 原版暴露标志优先于衣物名字，下身脱除包含袜子，手铐和项链保留。
         if (exposed(npc.chest)) wardrobe.strip(clothes, upper);
         if (exposed(npc.penis) || exposed(npc.vagina)) wardrobe.strip(clothes, lower);
       }

@@ -26,7 +26,7 @@ export default function (maplebirch: MaplebirchCore): void {
     // 骑术学校、地下农场与庄园的实际出场由原版 npc Remy 写入 V.npc。
     wardrobe.wear('Remy', '*', 'riding_formal');
     wardrobe.modify('Remy', clothes => {
-      // Riding School、farmStage5 与 Livestock Intro：艾弗里事件后用白色面具遮盖烧伤；remy_mask 记录首次对话。
+      // Riding School、farmStage5 与 Livestock Intro：艾弗里事件后用白色面具遮盖烧伤，remy_mask 记录首次对话。
       if (['saved', 'fallen', 'kicked'].includes(V.avery_fate)) sidebar.apply(clothes, Clothing.skeleton_mask);
     });
   });

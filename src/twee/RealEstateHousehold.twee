@@ -1,6 +1,6 @@
 :: Deadwood Reblooms Property Household []
-<<set _property to maplebirch.get("VP").realEstate.current>>
-<<if !_property or maplebirch.get("VP").realEstate.residentsHome(_property.id).length lt 2>>
+<<set _property to maplebirch.get("VanillaPlus").realEstate.current>>
+<<if !_property or maplebirch.get("VanillaPlus").realEstate.residentsHome(_property.id).length lt 2>>
   <<language>>
     <<option 'EN'>>
       The others have already gone to their rooms or left for the day. You leave the conversation for another time.
@@ -8,8 +8,8 @@
       其他人已经回房或出门了。你把这次谈话留到下次。
   <</language>><br><br>
 <<else>>
-  <<run maplebirch.get("VP").realEstate.enter()>><<effects>>
-  <<set _housemates to maplebirch.get("VP").realEstate.residentsHome(_property.id)>>
+  <<run maplebirch.get("VanillaPlus").realEstate.enter()>><<effects>>
+  <<set _housemates to maplebirch.get("VanillaPlus").realEstate.residentsHome(_property.id)>>
   <<if _housemates.length is 2>>
     <<set _pair to _housemates.map(profile => profile.id).sort().join(':')>>
     <<switch _pair>>
@@ -162,7 +162,7 @@
     <<option 'CN'>>
       你问起今晚的安排。<span class='teal'><i>客房仍可以使用，没有谁必须陪你睡在主卧。</i></span>
   <</language>><br><br>
-  <<set _conflict to maplebirch.get("VP").realEstate.householdRefusal(maplebirch.get("VP").realEstate.residentsAt(_property.id).map(profile => profile.id))>>
+  <<set _conflict to maplebirch.get("VanillaPlus").realEstate.householdRefusal(maplebirch.get("VanillaPlus").realEstate.residentsAt(_property.id).map(profile => profile.id))>>
   <<if _conflict>>
     <span class='red'><<language>>
       <<option 'EN'>>
@@ -178,7 +178,7 @@
       <<option 'CN'>>
         你提议把烧水的东西备好，让最早出门的人先用浴室。大家各自说了出门的时间，你把它们记下来，没有替谁取消原来的安排。
     <</language>><br><br>
-    <<if maplebirch.get("VP").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Robin')>>
+    <<if maplebirch.get("VanillaPlus").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Robin')>>
       <<language>>
         <<option 'EN'>>
           Robin offers to wash the cups. You remind Robin that everyone can take a turn.
@@ -186,7 +186,7 @@
           罗宾主动说可以洗杯子。你提醒罗宾，大家都可以轮流做。
       <</language>><br>
     <</if>>
-    <<if maplebirch.get("VP").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Whitney')>>
+    <<if maplebirch.get("VanillaPlus").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Whitney')>>
       <<language>>
         <<option 'EN'>>
           Whitney complains about the list, then checks the bathroom time once more before handing the pencil back.
@@ -202,7 +202,7 @@
       <<option 'CN'>>
         你指出客房的位置，请大家进门前先敲门。房门关着，就等里面的人回答。你没有替任何人承诺要和谁同床。
     <</language>><br><br>
-    <<if maplebirch.get("VP").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Kylar')>>
+    <<if maplebirch.get("VanillaPlus").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Kylar')>>
       <<if C.npc.Kylar.rage gte 60>>
         <span class='red'><<language>>
           <<option 'EN'>>
@@ -219,7 +219,7 @@
         <</language>><br>
       <</if>>
     <</if>>
-    <<if maplebirch.get("VP").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Sydney')>>
+    <<if maplebirch.get("VanillaPlus").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Sydney')>>
       <<run statusCheck('Sydney')>>
       <<if _sydneyStatus.includes('corrupt')>>
         <<language>>
@@ -242,8 +242,8 @@
   <<capture _property _pair>>
     <<loveicon>><<linkreplace `lanSwitch('Invite both lovers to stay close', '邀请两位恋人一起亲近')`>>
       <div id='deadwood-household-close'>
-        <<if maplebirch.get("VP").realEstate.current?.id isnot _property.id
-          or maplebirch.get("VP").realEstate.residentsHome(_property.id).map(profile => profile.id).sort().join(':') isnot _pair>>
+        <<if maplebirch.get("VanillaPlus").realEstate.current?.id isnot _property.id
+          or maplebirch.get("VanillaPlus").realEstate.residentsHome(_property.id).map(profile => profile.id).sort().join(':') isnot _pair>>
           <<language>>
             <<option 'EN'>>
               One of them has already left. You put the invitation aside.
@@ -300,8 +300,8 @@
                 <</language>></i></span><br><br>
                 <<loveicon>><<link `lanSwitch('Stay close for a while (0:20)', '一起依偎一会儿 (0:20)')`>>
                   <<replace '#deadwood-household-close'>>
-                    <<if maplebirch.get("VP").realEstate.current?.id isnot _property.id
-                      or maplebirch.get("VP").realEstate.residentsHome(_property.id).map(profile => profile.id).sort().join(':') isnot _pair
+                    <<if maplebirch.get("VanillaPlus").realEstate.current?.id isnot _property.id
+                      or maplebirch.get("VanillaPlus").realEstate.residentsHome(_property.id).map(profile => profile.id).sort().join(':') isnot _pair
                       or C.npc.Robin.trauma gte 20>>
                       <<language>>
                         <<option 'EN'>>
@@ -374,7 +374,7 @@
                   <<option 'CN'>>
                     凯拉尔把椅子往后推。“你说过，想和我待在一起。”钥匙碰在桌面上，轻轻响了一声。你还没来得及回答，凯拉尔便回卧室去了。
                 <</language>><br><br>
-                <<run maplebirch.get("VP").realEstate.meetResident('Kylar', _property.id)>>
+                <<run maplebirch.get("VanillaPlus").realEstate.meetResident('Kylar', _property.id)>>
                 <span class='teal'><<language>>
                   <<option 'EN'>>
                     Kylar has left the conversation. You can speak privately in the bedroom, or leave some space.
@@ -415,10 +415,10 @@
       </div>
     <</linkreplace>><br><br>
   <</capture>>
-  <<for _resident range maplebirch.get("VP").realEstate.residentsHome(_property.id)>>
+  <<for _resident range maplebirch.get("VanillaPlus").realEstate.residentsHome(_property.id)>>
     <<capture _resident>>
       <<socialiseicon>><<link `lanSwitch('Talk privately with ', '单独和') + maplebirch.auto(_resident.id) + lanSwitch('', '聊聊')` 'Deadwood Reblooms Property Evening Together'>>
-        <<run maplebirch.get("VP").realEstate.meetResident(_resident.id, _property.id)>><<pass 20>>
+        <<run maplebirch.get("VanillaPlus").realEstate.meetResident(_resident.id, _property.id)>><<pass 20>>
       <</link>><br>
     <</capture>>
   <</for>>

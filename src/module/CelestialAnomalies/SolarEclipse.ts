@@ -99,7 +99,7 @@ class SolarEclipse {
   }
 
   private build(date: DateTime): SolarEclipseStored | null {
-    // 先要求接近新月，再用存档种子决定当天是否形成日蚀；同一日期的结果必须稳定。
+    // 先要求接近新月，再用存档种子决定当天是否形成日蚀，同一日期的结果必须稳定。
     const phase = date.moonPhaseFraction;
     const threshold = SolarEclipse.config.threshold;
     if (phase > threshold && phase < 1 - threshold) return null;

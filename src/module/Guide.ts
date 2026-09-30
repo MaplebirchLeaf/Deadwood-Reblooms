@@ -133,8 +133,8 @@ class GuideView {
   }
 }
 
-// 系列模组可选取得 maplebirch.get('DR')?.guide，生成指南后加入 setup.maplebirch.hint。
-// DR 未载入时跳过注册；使用独立 id 前缀与可信 Markdown，弹窗统一绑定搜索及模块复选框。
+// 系列模组可选取得 maplebirch.get('DeadwoodReblooms')?.guide，生成指南后加入 setup.maplebirch.hint。
+// DeadwoodReblooms 未载入时跳过注册，使用独立 id 前缀与可信 Markdown，弹窗统一绑定搜索及模块复选框。
 export default class Guide {
   public constructor(private readonly core: typeof maplebirch) {}
 

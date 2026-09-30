@@ -37,14 +37,14 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
     const female = wardrobe.get('female_underwear') ?? {};
 
-    // 日常保留女性胸罩和红黑条纹内裤；睡衣明确不穿胸罩
+    // 日常保留女性胸罩和红黑条纹内裤，睡衣明确不穿胸罩
     wardrobe.base('Alex', (clothes, context) => {
       if (context.location === 'naked' || context.location === 'sleep_shirt_only') return;
       if (context.location !== 'sleep' && C.npc?.Alex?.pronoun !== 'm' && female.under_upper) sidebar.apply(clothes, female.under_upper, 'under_upper');
       sidebar.apply(clothes, Clothing.striped_panties);
     });
 
-    // 农场劳动、临时进城与小屋生活；原版没有校园日程
+    // 农场劳动、临时进城与小屋生活，原版没有校园日程
     wardrobe.wear('Alex', ['farm', 'woodland', 'admin', 'breakfast', 'town', 'summer', 'lower_removed'], 'wilds_flannel');
     wardrobe.wear('Alex', ['sleep', 'sleep_shirt_only'], 'pyjama');
     wardrobe.wear('Alex', 'naked', 'naked');
@@ -120,7 +120,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     if (title.startsWith('Farm Alex Somno Wake Sex')) return 'sleep_shirt_only';
     if (title.startsWith('Farm Alex Birth')) return 'sleep_shirt_only';
 
-    // 噩梦从睡衣开始；只有高欲望分支自行脱去下装
+    // 噩梦从睡衣开始，只有高欲望分支自行脱去下装
     if (title === 'Nightmare Alex 2') return (alex.lust ?? 0) >= 60 ? 'sleep_shirt_only' : 'sleep';
     if (title.startsWith('Nightmare Alex Rape')) return (alex.lust ?? 0) >= 60 ? 'sleep_shirt_only' : 'sleep';
     if (title.startsWith('Nightmare Alex')) return 'sleep';

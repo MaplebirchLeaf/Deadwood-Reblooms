@@ -13,7 +13,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     };
   });
 
-  // 原版的页面宏和时间推进分别调用宏与同名全局函数；两个入口都先运行原版日程。
+  // 原版的页面宏和时间推进分别调用宏与同名全局函数，两个入口都先运行原版日程。
   maplebirch.once(':storyready', () => {
     const schedule = window.sydneySchedule;
     if (typeof schedule !== 'function' || !maplebirch.tool.macro.Macro.has('sydneySchedule')) return;
@@ -35,7 +35,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         V.SydneyExpansion.christmasRestYear === Time.year && ((Time.month === 12 && Time.monthDay === 25 && Time.hour >= 21) || (Time.month === 12 && Time.monthDay === 26 && Time.hour < 6));
 
       if (sydneyActive && !V.replayScene) {
-        // 原版周一 00:00 短暂标为祈祷；留宿日程将这一小时视为睡在神殿。
+        // 原版周一 00:00 短暂标为祈祷，留宿日程将这一小时视为睡在神殿。
         if (T.sydney_location === 'temple' && Time.weekDay === 1 && Time.hour === 0 && V.sydney_templeWork === 'pray') {
           V.sydney_templeWork = 'sleep';
         }
@@ -46,7 +46,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         }
       }
 
-      // 页面只读取临时状态；每次原版日程更新后统一刷新。
+      // 页面只读取临时状态，每次原版日程更新后统一刷新。
       T.sydneyAvailable = sydneyActive && T.sydney_location === 'temple';
       T.festivalNight = festivalNight;
       T.sirrisMorning = sirrisMorning;

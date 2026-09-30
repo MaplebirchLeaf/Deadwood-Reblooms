@@ -18,7 +18,7 @@ export default function (maplebirch: MaplebirchCore): void {
     }
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    // Brothel Intro phase 2：男性蓝色西装不穿衬衫，女性红色低领礼服；在场沿用原版 V.npc。
+    // Brothel Intro phase 2：男性蓝色西装不穿衬衫，女性红色低领礼服，在场沿用原版 V.npc。
     wardrobe.wear('Briar', '*', 'formal_suit', () => C.npc?.Briar?.pronoun === 'm');
     wardrobe.wear('Briar', '*', 'evening_gown', () => C.npc?.Briar?.pronoun !== 'm');
     wardrobe.modify('Briar', (clothes, context) => {

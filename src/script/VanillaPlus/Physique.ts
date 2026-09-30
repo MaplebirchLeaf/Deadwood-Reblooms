@@ -19,18 +19,18 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.dynamic.regStateEvent('gate', 'physique-unlock', {
     output: 'deadwood-reblooms-physique-unlock',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VP')!.physique.unlock
+    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.physique.unlock
   });
   maplebirch.dynamic.regStateEvent('append', 'physique-max', {
     output: 'earnFeat "Unbreakable"',
-    cond: () => V.feats?.currentSave['Unbreakable'] === undefined && V.VanillaPlus != null && maplebirch.get('VP')!.physique.max
+    cond: () => V.feats?.currentSave['Unbreakable'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.physique.max
   });
   maplebirch.dynamic.regStateEvent('gate', 'physique-break-bindings', {
     output: 'deadwood-reblooms-physique-break-bindings',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VP')!.physique.outsideBreakAvailable
+    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.physique.outsideBreakAvailable
   });
 
-  const available = () => V.combat === 1 && maplebirch.get('VP')!.physique.canBreakBindings;
+  const available = () => V.combat === 1 && maplebirch.get('VanillaPlus')!.physique.canBreakBindings;
   maplebirch.combat.CombatAction.reg(
     {
       id: 'physique-break-arms',
@@ -110,15 +110,15 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 将作弊面板体格滑条上限改为动态 125%，未突破时继续使用原版 $physiquesize。
         {
           srcmatch: /\$physique "physique" \{max: (\$physiquesize)( \* \$AMCTraits\.physique)?(, percentage: false)?\}/,
-          to: '$physique "physique" {max: $VanillaPlus.lock.physique ? maplebirch.get("VP").ceiling("physique") : $1$2$3}',
+          to: '$physique "physique" {max: $VanillaPlus.lock.physique ? maplebirch.get("VanillaPlus").ceiling("physique") : $1$2$3}',
           expected: 1
         }
       ],
       Widgets: [
-        // 通用组件有两处相同钳制公式；作为明确的两处批量替换，避免依赖补丁执行顺序。
+        // 通用组件有两处相同钳制公式，作为明确的两处批量替换，避免依赖补丁执行顺序。
         {
           srcmatchgroup: /Math\.clamp\(\$physique, 0, \$physiquesize( \* \$AMCTraits\.physique)?\)/g,
-          to: 'Math.clamp($physique, maplebirch.get("VP").minimum(\'physique\'), $VanillaPlus.lock.physique ? maplebirch.get("VP").ceiling(\'physique\') : $physiquesize$1)',
+          to: 'Math.clamp($physique, maplebirch.get("VanillaPlus").minimum(\'physique\'), $VanillaPlus.lock.physique ? maplebirch.get("VanillaPlus").ceiling(\'physique\') : $physiquesize$1)',
           expected: 2
         }
       ],
@@ -126,7 +126,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 替换全局体格钳制公式，使所有非专用变化同样遵守突破后的上下限。
         {
           srcmatch: /Math\.clamp\(\$physique, 0, \$physiquesize( \* \$AMCTraits\.physique)?\)/,
-          to: 'Math.clamp($physique, maplebirch.get("VP").minimum(\'physique\'), $VanillaPlus.lock.physique ? maplebirch.get("VP").ceiling(\'physique\') : $physiquesize$1)',
+          to: 'Math.clamp($physique, maplebirch.get("VanillaPlus").minimum(\'physique\'), $VanillaPlus.lock.physique ? maplebirch.get("VanillaPlus").ceiling(\'physique\') : $physiquesize$1)',
           expected: 1
         }
       ]

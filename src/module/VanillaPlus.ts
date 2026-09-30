@@ -113,7 +113,7 @@ class VanillaPlus extends Module {
 
 declare module '@scml-dol-maplebirch/types' {
   interface Extensions {
-    readonly VP: VanillaPlus;
+    readonly VanillaPlus: VanillaPlus;
   }
 }
 

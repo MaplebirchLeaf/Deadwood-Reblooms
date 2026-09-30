@@ -79,9 +79,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     const stat = V.enemytype === 'man' ? 'promiscuity' : 'deviancy';
     return !!V.VanillaPlus?.traits?.promiscuity || V.promiscuityIgnore || window.hasSexStat(stat, 6);
   };
-  const doublePenetrators = (orifice: 'vagina' | 'anus') => maplebirch.get('VP')!.NPCDoublePenetration.playerPenetrators(orifice);
+  const doublePenetrators = (orifice: 'vagina' | 'anus') => maplebirch.get('VanillaPlus')!.NPCDoublePenetration.playerPenetrators(orifice);
   const doublePenetratorNames = () => {
-    const names = maplebirch.get('VP')!.NPCDoublePenetration.playerPenetrators().map(npcName);
+    const names = maplebirch.get('VanillaPlus')!.NPCDoublePenetration.playerPenetrators().map(npcName);
     if (names.length < 2) return { names: names[0] || '' };
     return { names: lanSwitch(`${names.slice(0, -1).join(', ')} and ${names.at(-1)}`, names.join('、')) };
   };
@@ -89,14 +89,14 @@ export default function (maplebirch: typeof window.maplebirch) {
     const penetrators = doublePenetrators(orifice);
     return V.combat === 1 && T?.feetOptions === 'free' && V.leglocktarget == null && V.feetuse === 0 && legLockAllowed() && penetrators.length >= 2 && penetrators.includes(Number(V.feettarget));
   };
-  const canContinueLegLock = () => V.combat === 1 && V.feetuse === 'legLock' && !!maplebirch.get('VP')!.NPCDoublePenetration.playerLegLock;
+  const canContinueLegLock = () => V.combat === 1 && V.feetuse === 'legLock' && !!maplebirch.get('VanillaPlus')!.NPCDoublePenetration.playerLegLock;
 
   // PC 双插期间的主动动作由框架注册到原版动作表，并接入对应效果宏。
   maplebirch.combat.CombatAction.reg(
     {
       id: 'NPCDouble-pleasure',
       actionType: 'penisaction',
-      cond: () => V.combat === 1 && maplebirch.get('VP')!.NPCDoublePenetration.visible && canUsePleasure(),
+      cond: () => V.combat === 1 && maplebirch.get('VanillaPlus')!.NPCDoublePenetration.visible && canUsePleasure(),
       display: () => text('action:pleasure'),
       value: () => 'NPCDoublePleasure',
       color: 'sub',
@@ -151,7 +151,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       id: 'NPCDouble-hide-single-leg-lock-start',
       actionType: 'feetaction',
       value: 'legLock',
-      cond: () => maplebirch.get('VP')!.NPCDoublePenetration.playerPenetrators().length < 2
+      cond: () => maplebirch.get('VanillaPlus')!.NPCDoublePenetration.playerPenetrators().length < 2
     },
     {
       id: 'NPCDouble-hide-single-leg-lock-keep',
@@ -171,7 +171,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     'pre',
     options => {
       delete options.npcDouble;
-      const state = maplebirch.get('VP')!.NPCDoublePenetration.visible ? maplebirch.get('VP')!.NPCDoublePenetration.state : undefined;
+      const state = maplebirch.get('VanillaPlus')!.NPCDoublePenetration.visible ? maplebirch.get('VanillaPlus')!.NPCDoublePenetration.state : undefined;
       if (!state) return;
 
       // 扩展条件创建画布时，原版可能尚未填写玩家阴茎的尺寸、精灵与过滤器。
@@ -187,7 +187,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         primary: { ...primary, size: order.primarySize },
         secondary: { ...secondary, size: order.secondarySize }
       };
-      // 原版先生成单插选项；这里把 NPC 目标双插明确映射为阴茎 X-ray，并保证对应画布图层可见。
+      // 原版先生成单插选项，这里把 NPC 目标双插明确映射为阴茎 X-ray，并保证对应画布图层可见。
       options.showPcPenis = true;
       options.showNpcVagina = orifice === 'vaginal';
       options.showNpcArse = orifice === 'anal';
@@ -201,7 +201,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     'combatXrayPenis'
   );
 
-  // 使用框架扩展原版 combatXrayPenis；单插分支保持原版资源路径和显示规则。
+  // 使用框架扩展原版 combatXrayPenis，单插分支保持原版资源路径和显示规则。
   maplebirch.char.use(
     {
       base: {
@@ -288,16 +288,16 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.inject({
     widgetPassage: {
       'Combat Demo Widgets': [
-        // NPC 目标双插也要创建阴茎 X-ray 画布；画布内部仍由 combatXrayPenis 的框架图层负责。
+        // NPC 目标双插也要创建阴茎 X-ray 画布，画布内部仍由 combatXrayPenis 的框架图层负责。
         {
           src: '<<if XrayCombatMapper.isPcBlowjobVisible()>>',
-          to: '<<if XrayCombatMapper.isPcBlowjobVisible() or maplebirch.get("VP").NPCDoublePenetration.visible>>',
+          to: '<<if XrayCombatMapper.isPcBlowjobVisible() or maplebirch.get("VanillaPlus").NPCDoublePenetration.visible>>',
           expected: 1
         },
         // 双插使用独立缓存槽，保证原版模型的底图和两根阴茎图层同时按扩展配置创建。
         {
           src: '<<selectmodel "combatXrayPenis" "divXrayPenis">>',
-          to: '<<selectmodel "combatXrayPenis" `maplebirch.get("VP").NPCDoublePenetration.visible ? "divXrayPenisDouble" : "divXrayPenis"`>>',
+          to: '<<selectmodel "combatXrayPenis" `maplebirch.get("VanillaPlus").NPCDoublePenetration.visible ? "divXrayPenisDouble" : "divXrayPenis"`>>',
           expected: 1
         }
       ],
@@ -313,7 +313,7 @@ export default function (maplebirch: typeof window.maplebirch) {
           to: '<<deadwood-reblooms-double-penetration-status "player-anus">>',
           expected: 1
         },
-        // NPC 承受双插时，只替换阴茎状态行；目标选择、动作表和原版单插状态保持不变。
+        // NPC 承受双插时，只替换阴茎状态行，目标选择、动作表和原版单插状态保持不变。
         {
           srcmatch: /(?:<<combatPersons>>的小穴裹住了你的<<penis>>。|<<combatPersons>> vagina envelops your <<penis>>\.)/,
           to: '<<deadwood-reblooms-double-penetration-status "NPC-vagina">>',
@@ -327,32 +327,32 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 双目标锁定只替换原版用于显示目标的表达式，保留整行状态文本、颜色和高潮分支。
         {
           src: '<<personselect $leglocktarget>><<combatperson>>',
-          to: '<<if maplebirch.get("VP").NPCDoublePenetration.playerLegLock>><<deadwood-reblooms-double-leglock-targets $VanillaPlus.npcDoublePenetration.playerLegLock.targets>><<else>>$&<</if>>',
+          to: '<<if maplebirch.get("VanillaPlus").NPCDoublePenetration.playerLegLock>><<deadwood-reblooms-double-leglock-targets $VanillaPlus.npcDoublePenetration.playerLegLock.targets>><<else>>$&<</if>>',
           expected: 1
         },
         {
           src: '$NPCList[$leglocktarget].pronouns.him',
-          to: '<<if maplebirch.get("VP").NPCDoublePenetration.playerLegLock>><<deadwood-reblooms-double-leglock-targets $VanillaPlus.npcDoublePenetration.playerLegLock.targets>><<else>>$&<</if>>',
+          to: '<<if maplebirch.get("VanillaPlus").NPCDoublePenetration.playerLegLock>><<deadwood-reblooms-double-leglock-targets $VanillaPlus.npcDoublePenetration.playerLegLock.targets>><<else>>$&<</if>>',
           expected: 1
         }
       ],
       'Widgets Combat Man-Combat': [
-        // 双插同伴已有明确的 NPC 目标；禁止原版手部 AI 在同一回合又随机转向 PC。
+        // 双插同伴已有明确的 NPC 目标，禁止原版手部 AI 在同一回合又随机转向 PC。
         {
           src: '<<hand_section>>',
-          to: '<<if !maplebirch.get("VP").NPCDoublePenetration.isPartner(_n)>><<hand_section>><</if>>',
+          to: '<<if !maplebirch.get("VanillaPlus").NPCDoublePenetration.isPartner(_n)>><<hand_section>><</if>>',
           expected: 1
         },
-        // 原版胸部方位只区分 NPC 在 PC 上下；双插同伴位于承受者身旁，不能套用该段描述。
+        // 原版胸部方位只区分 NPC 在 PC 上下，双插同伴位于承受者身旁，不能套用该段描述。
         {
           src: '<<chest_section>>',
-          to: '<<if !maplebirch.get("VP").NPCDoublePenetration.isPartner(_n)>><<chest_section>><</if>>',
+          to: '<<if !maplebirch.get("VanillaPlus").NPCDoublePenetration.isPartner(_n)>><<chest_section>><</if>>',
           expected: 1
         },
-        // 命名 NPC 对白仍默认面向 PC；双插同伴改用明确写出承受者的回合文本，并阻止随后生成泛用对白。
+        // 命名 NPC 对白仍默认面向 PC，双插同伴改用明确写出承受者的回合文本，并阻止随后生成泛用对白。
         {
           srcmatch: /<<namedNpcComments (\$NPCList\[_n\]\.fullDescription|_n)>>/,
-          to: '<<if maplebirch.get("VP").NPCDoublePenetration.isPartner(_n)>><<deadwood-reblooms-npc-double-turn>><<set _noNameComment to false>><<else>><<namedNpcComments $1>><</if>>',
+          to: '<<if maplebirch.get("VanillaPlus").NPCDoublePenetration.isPartner(_n)>><<deadwood-reblooms-npc-double-turn>><<set _noNameComment to false>><<else>><<namedNpcComments $1>><</if>>',
           expected: 1
         }
       ],
@@ -366,13 +366,13 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 第二名插入者由扩展组件处理，避免原版把其自定义状态误判为射入 PC。
         {
           src: '<<combatInseminate _nn>>',
-          to: '<<if !maplebirch.get("VP").NPCDoublePenetration.isPartner(_nn)>><<combatInseminate _nn>><</if>>',
+          to: '<<if !maplebirch.get("VanillaPlus").NPCDoublePenetration.isPartner(_nn)>><<combatInseminate _nn>><</if>>',
           expected: 1
         },
-        // 原版多人共用一组 enemyarousal；这里只改写第二名插入者的射精目标，不另建高潮或结束流程。
+        // 原版多人共用一组 enemyarousal，这里只改写第二名插入者的射精目标，不另建高潮或结束流程。
         {
           src: '<<if !!namedNpcEjaculation(_nn, _args[0])>>',
-          to: '<<if maplebirch.get("VP").NPCDoublePenetration.isPartner(_nn)>><<deadwood-reblooms-npc-double-ejaculation>><<elseif !!namedNpcEjaculation(_nn, _args[0])>>',
+          to: '<<if maplebirch.get("VanillaPlus").NPCDoublePenetration.isPartner(_nn)>><<deadwood-reblooms-npc-double-ejaculation>><<elseif !!namedNpcEjaculation(_nn, _args[0])>>',
           expected: 1
         }
       ],
@@ -380,7 +380,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 战斗结束前释放第二名 NPC 的阴茎状态并删除本场战斗的临时数据。
         {
           src: '<<set $combat to 0>>',
-          applybefore: '<<run maplebirch.get("VP").NPCDoublePenetration.clear()>><<run maplebirch.get("VP").handGrip.clearAll()>>\n\t',
+          applybefore: '<<run maplebirch.get("VanillaPlus").NPCDoublePenetration.clear()>><<run maplebirch.get("VanillaPlus").handGrip.clearAll()>>\n\t',
           expected: 1
         }
       ]

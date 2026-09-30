@@ -161,7 +161,7 @@ export default function (
     wardrobe.modify('Kylar', (clothes, context) => {
       const title = maplebirch.passage.title;
 
-      // 圣诞服被烟囱撕掉后只剩下身内衣；重新穿上时衣料仍破得遮不住身体。
+      // 圣诞服被烟囱撕掉后只剩下身内衣，重新穿上时衣料仍破得遮不住身体。
       if (context.location === 'christmas') {
         if (/^Kylar Christmas (?:3|4|5)$/.test(title)) {
           for (const slot of ['over_head', 'over_upper', 'over_lower', 'upper', 'lower', 'under_upper', 'head', 'face', 'neck', 'hands', 'legs', 'feet', 'handheld'] as const) delete clothes[slot];
@@ -261,7 +261,7 @@ export default function (
       return Weather.precipitation === 'none' ? 'rear_courtyard' : 'library';
     }
 
-    // 凌晨仍在卧室；上学日的校服日程不能覆盖休息时段。
+    // 凌晨仍在卧室，上学日的校服日程不能覆盖休息时段。
     if (Time.hour < 7) return 'manor_bedroom';
 
     // 上学日沿用校服

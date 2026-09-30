@@ -78,7 +78,7 @@ export const DEFAULT_SCHOOL_STATE: SchoolState = {
 
 const DRESS_POLICIES: readonly SchoolDressPolicy[] = ['uniform', 'free', 'revealing', 'optionalNudity', 'nudeDay', 'mandatoryNudity'];
 
-// 制服政策按此顺序升级；highest 记录已保住的最高等级，active 可在一周试行后回退。
+// 制服政策按此顺序升级，highest 记录已保住的最高等级，active 可在一周试行后回退。
 // prettier-ignore
 const POLICY_REQUIREMENTS: Record<SchoolDressPolicy, SchoolPolicyRequirements> = {
   uniform        : { studentSupport: 0, staffSupport: 0, corruption: 0, leightonLove: 0 },
@@ -189,8 +189,12 @@ class School {
     return true;
   }
 
+  public get canSupplyDrinks(): boolean {
+    return this.state.role !== 'student' && V.RobinExpansion?.shop === true && V.RobinExpansion.shopStock > 0 && V.RobinExpansion.school_drinks_day !== Time.days;
+  }
+
   public organiseSchoolDrinks(): boolean {
-    if (this.state.role === 'student' || !V.RobinExpansion?.shop || V.RobinExpansion.shopStock < 1 || V.RobinExpansion.school_drinks_day === Time.days) return false;
+    if (!this.canSupplyDrinks) return false;
     V.RobinExpansion.shopStock -= 1;
     V.RobinExpansion.reserve += 20;
     V.RobinExpansion.school_drinks_day = Time.days;
@@ -279,7 +283,7 @@ class School {
     const student = this.state.duties.target;
     if (!this.canInviteStudent || !student) return 'unavailable';
 
-    // 校门口的私人邀约由关系与人物状态决定；满级特质保证的是战斗中的 Ask 请求。
+    // 校门口的私人邀约由关系与人物状态决定，满级特质保证的是战斗中的 Ask 请求。
     const accepted = (() => {
       switch (student) {
         case 'Robin':
@@ -350,7 +354,7 @@ class School {
     const policy = this.state.dress.proposal;
     if (!policy || !this.canApprovePolicy(route)) return false;
 
-    // 提案通过只开启七天试行；期满才由 reviewPolicy 决定保留还是回滚。
+    // 提案通过只开启七天试行，期满才由 reviewPolicy 决定保留还是回滚。
     this.state.dress.previous = this.state.dress.active;
     this.state.dress.active = policy;
     this.state.dress.proposal = null;

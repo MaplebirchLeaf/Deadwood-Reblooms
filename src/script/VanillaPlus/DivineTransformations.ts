@@ -6,7 +6,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     id: `divine-transformations-expunge-${encounter.toLowerCase()}`,
     actionType: 'mouthaction' as const,
     combatType: encounter,
-    cond: () => maplebirch.get('VP')!.divineTransformations.canExpunge(encounter),
+    cond: () => maplebirch.get('VanillaPlus')!.divineTransformations.canExpunge(encounter),
     display: () => text('action:expunge'),
     value: () => `VanillaPlusDivineExpunge${encounter}`,
     color: 'def',
@@ -14,14 +14,14 @@ export default function (maplebirch: typeof window.maplebirch) {
     effect: `<<deadwood-reblooms-divine-expunge "${encounter}">>`
   });
 
-  // 堕天使的清除来自原版仪式剧情中的同名能力；只接入框架已有结算点，不改写遭遇战 passage。
+  // 堕天使的清除来自原版仪式剧情中的同名能力，只接入框架已有结算点，不改写遭遇战 passage。
   maplebirch.combat.CombatAction.reg(action('Default'), action('Struggle'), action('Tentacle'));
 
   // 先同步转化数值与战斗体液，再让可能输出文本的状态事件接管页面。
   maplebirch.dynamic.regStateEvent('gate', 'divine-transformations', {
     priority: 100,
     cond: () => V.VanillaPlus != null,
-    action: () => maplebirch.get('VP')!.divineTransformations.update()
+    action: () => maplebirch.get('VanillaPlus')!.divineTransformations.update()
   });
 
   maplebirch.tool.inject({
@@ -30,7 +30,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 沿用原版放逐的命中、双手与满纯洁倍率，只把每层固定伤害扩展为固定值加初始生命百分比。
         {
           src: '<<if $rng lte ($purity / 20)>>',
-          applybefore: '<<set _banishDamage to maplebirch.get("VP").divineTransformations.banishDamage(_tentacle.tentaclehealthstart)>>',
+          applybefore: '<<set _banishDamage to maplebirch.get("VanillaPlus").divineTransformations.banishDamage(_tentacle.tentaclehealthstart)>>',
           expected: 1
         },
         {
@@ -58,28 +58,28 @@ export default function (maplebirch: typeof window.maplebirch) {
       title: 'General Traits',
       name: () => text('trait:angel:name'),
       colour: 'gold',
-      has: () => maplebirch.get('VP')!.divineTransformations.angel,
+      has: () => maplebirch.get('VanillaPlus')!.divineTransformations.angel,
       text: () => text('trait:angel:text')
     },
     {
       title: 'General Traits',
       name: () => text('trait:fallenAngel:name'),
       colour: 'black',
-      has: () => maplebirch.get('VP')!.divineTransformations.fallenAngel,
+      has: () => maplebirch.get('VanillaPlus')!.divineTransformations.fallenAngel,
       text: () => text('trait:fallenAngel:text')
     },
     {
       title: 'General Traits',
       name: () => text('trait:ironWill:name'),
       colour: 'silver',
-      has: () => maplebirch.get('VP')!.divineTransformations.fallenAngel,
+      has: () => maplebirch.get('VanillaPlus')!.divineTransformations.fallenAngel,
       text: () => text('trait:ironWill:text')
     },
     {
       title: 'General Traits',
       name: demonName,
       colour: 'red',
-      has: () => maplebirch.get('VP')!.divineTransformations.demon,
+      has: () => maplebirch.get('VanillaPlus')!.divineTransformations.demon,
       text: () => text('trait:demon:text')
     }
   );

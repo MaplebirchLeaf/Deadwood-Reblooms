@@ -17,7 +17,7 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.dynamic.regStateEvent('append', 'willpower-max', {
     output: 'earnFeat "Sovereign Will"',
-    cond: () => V.feats?.currentSave['Sovereign Will'] === undefined && V.VanillaPlus != null && maplebirch.get('VP')!.willpower.max
+    cond: () => V.feats?.currentSave['Sovereign Will'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.willpower.max
   });
 
   const slimeDefyPassages = [
@@ -51,10 +51,10 @@ export default function (maplebirch: typeof window.maplebirch) {
     slimeDefyPassages.map(passage => [
       passage,
       [
-        // 将每个史莱姆抗拒场景的原版意志值输入包装为耳液抗性值；无特质时返回原值。
+        // 将每个史莱姆抗拒场景的原版意志值输入包装为耳液抗性值，无特质时返回原值。
         {
           src: "currentSkillValue('willpower')",
-          to: 'maplebirch.get("VP").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
           expected: 1
         }
       ]
@@ -97,14 +97,14 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 承伤层耗尽后继续执行原版意志检定、文本与失能结算。
         {
           src: '$pain gte 100 and $willpowerpain is undefined',
-          to: 'maplebirch.get("VP").willpower.checkPain($pain) and $pain gte 100 and $willpowerpain is undefined',
+          to: 'maplebirch.get("VanillaPlus").willpower.checkPain($pain) and $pain gte 100 and $willpowerpain is undefined',
           expected: 1
         }
       ],
       'Widgets End Combat': [
         {
           src: '<<unset $willpowerpain>>',
-          applyafter: '<<run maplebirch.get("VP").willpower.reset()>>',
+          applyafter: '<<run maplebirch.get("VanillaPlus").willpower.reset()>>',
           expected: 1
         }
       ],
@@ -112,7 +112,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 将作弊面板意志滑条上限改为动态 125%，未突破时继续使用原版 $willpowermax。
         {
           srcmatch: /\$willpower "willpower" \{max: (1000)( \* \$AMCTraits\.willpower)?(, percentage: false)?\}/,
-          to: '$willpower "willpower" {max: $VanillaPlus.lock.willpower ? maplebirch.get("VP").ceiling("willpower") : $1$2$3}',
+          to: '$willpower "willpower" {max: $VanillaPlus.lock.willpower ? maplebirch.get("VanillaPlus").ceiling("willpower") : $1$2$3}',
           expected: 1
         }
       ],
@@ -120,7 +120,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 替换全局意志钳制公式，同时应用特质保底值与突破后的 125% 上限。
         {
           srcmatch: /Math\.clamp\(\$willpower, 0, \$willpowermax( \* \$AMCTraits\.willpower)?\)/,
-          to: 'Math.clamp($willpower, maplebirch.get("VP").minimum(\'willpower\'), $VanillaPlus.lock.willpower ? maplebirch.get("VP").ceiling(\'willpower\') : $willpowermax$1)',
+          to: 'Math.clamp($willpower, maplebirch.get("VanillaPlus").minimum(\'willpower\'), $VanillaPlus.lock.willpower ? maplebirch.get("VanillaPlus").ceiling(\'willpower\') : $willpowermax$1)',
           expected: 1
         }
       ]

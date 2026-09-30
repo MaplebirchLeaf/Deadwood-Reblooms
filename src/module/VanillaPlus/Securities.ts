@@ -9,7 +9,7 @@ export interface Security {
 
 type MarketState = FinanceState['market'];
 
-/** 证券行情与剧情涨跌；不持有存档，始终操作调用方提供的状态。 */
+/** 证券行情与剧情涨跌，不持有存档，始终操作调用方提供的状态。 */
 export default class Securities {
   // 每日行情
   public static generateSeed(): number {

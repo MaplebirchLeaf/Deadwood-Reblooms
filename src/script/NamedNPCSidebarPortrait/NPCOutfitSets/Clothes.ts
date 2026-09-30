@@ -56,7 +56,7 @@ export function sync(npcName: string, name: string, clothes: Item, options: SetO
   const set = setup.npcClothesSets?.find((item: any) => item.name === name);
   if (name !== 'naked' && !set) return;
   const [upper, lower] = parts(clothes);
-  // 只更新该 NPC 的套装；共享的原版 naked 配置保持原样。
+  // 只更新该 NPC 的套装，共享的原版 naked 配置保持原样。
   if (name !== 'naked') {
     Object.assign(set.clothes.upper, describe(upper, 'upper', options));
     Object.assign(set.clothes.lower, describe(lower, 'lower', options));
@@ -71,7 +71,7 @@ export function sync(npcName: string, name: string, clothes: Item, options: SetO
   for (const part of ['penis', 'vagina']) if (npc[part] !== 'none') npc[part] = lower.name === 'naked' ? 0 : 'clothed';
 }
 
-// 同一套注册、同步与初始生成流程；剧情专用流程仍保留在各 NPC 文件。
+// 同一套注册、同步与初始生成流程，剧情专用流程仍保留在各 NPC 文件。
 export function register(core: MaplebirchCore, npcName: string, keys: string[], config: SetOptions & { preserve?: boolean } = {}): void {
   core.tool.onInit(() => {
     const wardrobe = core.npc.Clothes.wardrobe;

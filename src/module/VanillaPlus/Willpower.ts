@@ -9,7 +9,7 @@ class Willpower {
   private static readonly PAIN_RECOVERY_LIMIT = 100;
   private static readonly PAIN_SHIELD_LIMIT = Willpower.PAIN_LIMIT / 2;
 
-  private state() {
+  private get state() {
     return V.VanillaPlus?.willpower?.painShield;
   }
 
@@ -37,9 +37,9 @@ class Willpower {
     return V.VanillaPlus.traits.willpower ? Infinity : value;
   }
 
-  // 疼痛达到原版上限时，额外承受相当于上限 50% 的溢出伤害；真实疼痛仍由原版维护。
+  // 疼痛达到原版上限时，额外承受相当于上限 50% 的溢出伤害，真实疼痛仍由原版维护。
   public absorbPain(value: number): number {
-    const shield = this.state();
+    const shield = this.state;
     if (!shield) return value;
     if (!V.VanillaPlus.traits.willpower || V.combat !== 1 || V.gamemode === 'soft') {
       this.reset();
@@ -66,7 +66,7 @@ class Willpower {
   }
 
   public checkPain(value: number): boolean {
-    const shield = this.state();
+    const shield = this.state;
     if (!shield) return true;
     if (!V.VanillaPlus.traits.willpower || V.combat !== 1) {
       this.reset();
@@ -86,7 +86,7 @@ class Willpower {
   }
 
   public reset(): void {
-    const shield = this.state();
+    const shield = this.state;
     if (!shield) return;
     shield.remaining = 0;
     shield.ready = true;

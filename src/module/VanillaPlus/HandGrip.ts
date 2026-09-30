@@ -13,7 +13,7 @@ class HandGrip {
     return Number.isInteger(target) && npc?.active === 'active' && npc.stance !== 'defeated' ? npc : undefined;
   }
 
-  // 抓握腰臀只面向 PC 当前正在插入的承受者；插入 PC 的 NPC 由双腿锁定处理。
+  // 抓握腰臀只面向 PC 当前正在插入的承受者，插入 PC 的 NPC 由双腿锁定处理。
   public isPenetrationRecipient(index: number): boolean {
     const target = Number(index);
     if (!this.npc(target)) return false;
@@ -30,7 +30,7 @@ class HandGrip {
     return undefined;
   }
 
-  // 原版高潮时会先把自由手改回 0；动作生成前恢复仍然有效的抓握，让它继续走 handheld 分支。
+  // 原版高潮时会先把自由手改回 0，动作生成前恢复仍然有效的抓握，让它继续走 handheld 分支。
   public restoreOrgasmGrip(): void {
     if (V.combat !== 1 || Number(V.orgasmdown) < 1) return;
     const combat = V as unknown as Record<string, unknown>;

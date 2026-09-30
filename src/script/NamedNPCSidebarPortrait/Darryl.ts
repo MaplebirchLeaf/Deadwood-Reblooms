@@ -27,7 +27,7 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
       wardrobe.put(clothes, C.npc?.Darryl?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
 
-    // Widgets Named Npcs 固定选择 formal；办公室、吧台和救援均沿用该正装。
+    // Widgets Named Npcs 固定选择 formal，办公室、吧台和救援均沿用该正装。
     wardrobe.wear('Darryl', '*', 'tuxedo_formal', () => C.npc?.Darryl?.pronoun === 'm');
     wardrobe.wear('Darryl', '*', 'evening_gown', () => C.npc?.Darryl?.pronoun !== 'm');
     wardrobe.modify('Darryl', (clothes, context) => {

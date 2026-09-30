@@ -190,7 +190,7 @@ class Fish extends Transformation {
     maplebirch.tool.inject({
       locationPassage: {
         'Rocks Pool': [
-          // 在礁石泳池的原版潜水链接前加入鱼化休憩选项；正则只依赖目标 Passage，不匹配英汉链接文本。
+          // 在礁石泳池的原版潜水链接前加入鱼化休憩选项，正则只依赖目标 Passage，不匹配英汉链接文本。
           {
             src: '<<swimicon "dive">>',
             applybefore:
@@ -215,7 +215,7 @@ class Fish extends Transformation {
             applyafter: '<<if $maplebirch.transformation.fish.level >= 6>><<set _waterActionTime to Math.max(1, Math.ceil(_waterActionTime / 2))>><</if>>',
             expected: 1
           },
-          // 将原版水下耗氧公式替换为屏息减耗版本；没有有效特质时乘数仍为 1。
+          // 将原版水下耗氧公式替换为屏息减耗版本，没有有效特质时乘数仍为 1。
           {
             src: '<<set $oxygen -= _waterActionTime * 10>>',
             to: '<<set $oxygen -= _waterActionTime * 10 * ($transformationParts.traits.gills && isPartEnabled($transformationParts.traits.gills) ? 0.25 : 1)>>',

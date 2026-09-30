@@ -20,7 +20,7 @@ export default function (maplebirch: MaplebirchCore): void {
     wardrobe.base('Wren', clothes => {
       wardrobe.put(clothes, C.npc?.Wren?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
-    // 原版 npc Wren 决定实际在场；监狱交易采用囚服外观，不赋予囚犯作息。
+    // 原版 npc Wren 决定实际在场，监狱交易采用囚服外观，不赋予囚犯作息。
     const heist = () => maplebirch.passage.title.startsWith('Wren Heist');
     wardrobe.wear('Wren', '*', 'prison_jumpsuit', () => V.location === 'prison');
     wardrobe.wear('Wren', '*', 'catsuit', () => V.location !== 'prison' && heist());

@@ -3,7 +3,7 @@
 <!-- 抓握状态沿用原版左右手的 handheld 行，只替换属于本模块的状态文本。 -->
 <<widget 'deadwood-reblooms-hand-grip-status'>>
   <<set _handGripHand to _args[0]>>
-  <<set _handGripTarget to maplebirch.get("VP").handGrip.target(_handGripHand)>>
+  <<set _handGripTarget to maplebirch.get("VanillaPlus").handGrip.target(_handGripHand)>>
   <<if _handGripTarget isnot undefined>>
     <span @class="($orgasmdown gte 1 ? 'lewd' : ($lastOptions[_handGripHand] isnot 'handheld' ? 'gold' : ''))">
       <<personselect _handGripTarget>><<if $orgasmdown gte 1>><<lanSwitch 'As you climax, you tighten your grip on ' '当你高潮时，你更用力地抓紧了'>><<combatperson>><<lanSwitch "'s hips." '的腰臀。'>><<else>><<lanSwitch 'You are gripping ' '你正抓住'>><<combatperson>><<lanSwitch ' by the hips.' '的腰臀。'>><</if>>
@@ -11,27 +11,27 @@
   <</if>>
 <</widget>>
 
-<!-- 左右手共用同一结算；每只手保存自己的目标，所以允许同时抓握。 -->
+<!-- 左右手共用同一结算，每只手保存自己的目标，所以允许同时抓握。 -->
 <<widget 'deadwood-reblooms-hand-grip'>>
   <<set _handGripHand to _args[0]>>
   <<set _handGripAction to _args[1]>>
-  <<set _handGripTarget to _handGripAction is 'start' ? Number(_handGripHand is 'left' ? $lefttarget : $righttarget) : maplebirch.get("VP").handGrip.target(_handGripHand)>>
+  <<set _handGripTarget to _handGripAction is 'start' ? Number(_handGripHand is 'left' ? $lefttarget : $righttarget) : maplebirch.get("VanillaPlus").handGrip.target(_handGripHand)>>
   <<if _handGripAction is 'release'>>
-    <<run maplebirch.get("VP").handGrip.clear(_handGripHand)>>
+    <<run maplebirch.get("VanillaPlus").handGrip.clear(_handGripHand)>>
     <<if _handGripHand is 'left'>><<set $leftactiondefault to 'rest'>><<else>><<set $rightactiondefault to 'rest'>><</if>>
     <<lanSwitch 'You release your grip.' '你松开了手。'>>
   <<elseif _handGripTarget isnot undefined>>
-    <<set _handGripSuccess to $orgasmdown gte 1 or maplebirch.get("VP").promiscuity.mastered or $gamemode is 'soft' or $gloryhole>>
+    <<set _handGripSuccess to $orgasmdown gte 1 or maplebirch.get("VanillaPlus").promiscuity.mastered or $gamemode is 'soft' or $gloryhole>>
     <<if !_handGripSuccess>><<set _handGripSuccess to combatSkillCheck('hand', _handGripTarget, $NPCList[_handGripTarget].fullDescription)>><</if>>
     <<handstat>><<handskilluse>>
-    <<if _handGripSuccess and maplebirch.get("VP").handGrip.set(_handGripHand, _handGripTarget)>>
+    <<if _handGripSuccess and maplebirch.get("VanillaPlus").handGrip.set(_handGripHand, _handGripTarget)>>
       <<if _handGripHand is 'left'>><<set $leftactiondefault to 'VanillaPlusHandGripLeftKeep'>><<else>><<set $rightactiondefault to 'VanillaPlusHandGripRightKeep'>><</if>>
       <<submission 5>><<sexControl 5 `currentSkillValue('handskill')` _handGripTarget>>
       <<if $consensual is 0>><<combatpromiscuity6>><<else>><<combatpromiscuity3>><</if>>
       <<personselect _handGripTarget>>
       <span class="lewd"><<if _handGripAction is 'keep' and $orgasmdown gte 1>><<lanSwitch 'As you climax, you tighten your grip on ' '当你高潮时，你更用力地抓紧了'>><<elseif _handGripAction is 'keep'>><<lanSwitch 'You keep your grip on ' '你继续抓住'>><<else>><<lanSwitch 'You grip ' '你抓住'>><</if>><<combatperson>><<if _handGripAction is 'keep' and $orgasmdown gte 1>><<lanSwitch "'s hips, giving them no chance to escape." '的腰臀，不许对方逃开。'>><<else>><<lanSwitch "'s hips, holding them steady through each thrust." '的腰臀，在抽插中稳住对方。'>><</if>></span>
     <<else>>
-      <<run maplebirch.get("VP").handGrip.clear(_handGripHand)>><<personselect _handGripTarget>>
+      <<run maplebirch.get("VanillaPlus").handGrip.clear(_handGripHand)>><<personselect _handGripTarget>>
       <<if _handGripHand is 'left'>><<set $leftactiondefault to 'rest'>><<else>><<set $rightactiondefault to 'rest'>><</if>>
       <<if _handGripAction is 'keep'>><<lanSwitch 'You try to keep hold of ' '你试图继续抓住'>><<else>><<lanSwitch 'You try to grab ' '你试图抓住'>><</if>><<combatperson>><<lanSwitch "'s hips, " '的腰臀，'>><span class="blue"><<lanSwitch 'but lose your grip.' '却没能稳住手。'>></span>
     <</if>>

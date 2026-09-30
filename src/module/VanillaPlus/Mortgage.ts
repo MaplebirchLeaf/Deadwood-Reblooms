@@ -106,7 +106,7 @@ class Mortgage {
     // 价格、首付、本金和 weekly_payment 全部是便士。信用卡仅补首付差额，不进入房贷本金。
     const principal = price - deposit;
     const { term_days } = this.terms;
-    const today = Mortgage.today();
+    const today = Mortgage.today;
     this.current = {
       property_id,
       outstanding: principal,
@@ -128,7 +128,7 @@ class Mortgage {
   public repay(which: 'arrears' | 'all', useCredit = false): MortgageResult {
     const loan = this.current;
     if (!loan) return 'no-mortgage';
-    if (which === 'all') this.accrueInterest(loan, Mortgage.today());
+    if (which === 'all') this.accrueInterest(loan, Mortgage.today);
     const amount = which === 'all' ? loan.outstanding : Math.min(loan.arrears, loan.outstanding);
     if (amount <= 0) return 'nothing-due';
     const result = useCredit ? this.finance.payWithCreditPennies(amount) : this.finance.payFromBankPennies(amount);
@@ -147,7 +147,7 @@ class Mortgage {
   private applyPayment(amount: number): void {
     const loan = this.current;
     if (!loan) return;
-    // arrears 是 outstanding 中逾期部分的标记，不是第二笔独立债务；同一笔还款两者同时减少。
+    // arrears 是 outstanding 中逾期部分的标记，不是第二笔独立债务，同一笔还款两者同时减少。
     loan.outstanding = Math.max(0, loan.outstanding - amount);
     loan.arrears = Math.max(0, loan.arrears - amount);
     if (loan.outstanding === 0) this.current = null;
@@ -165,19 +165,19 @@ class Mortgage {
     loan.bailey_pending = false;
     if (won && !loan.fight_used) {
       loan.fight_used = true;
-      loan.notice_day = Mortgage.today() + this.terms.fight_extension_days - this.terms.freeze_after_notice_days;
-    } else this.freeze(loan, Mortgage.today());
+      loan.notice_day = Mortgage.today + this.terms.fight_extension_days - this.terms.freeze_after_notice_days;
+    } else this.freeze(loan, Mortgage.today);
   }
 
   public refuseBailey(): void {
     const loan = this.current;
-    if (loan?.stage === 'notice') this.freeze(loan, Mortgage.today());
+    if (loan?.stage === 'notice') this.freeze(loan, Mortgage.today);
   }
 
-  public advanceThrough(targetDay = Mortgage.today()): void {
+  public advanceThrough(targetDay = Mortgage.today): void {
     const loan = this.current;
     if (!loan) return;
-    const today = Math.min(Mortgage.today(), Math.max(0, Math.floor(targetDay)));
+    const today = Math.min(Mortgage.today, Math.max(0, Math.floor(targetDay)));
     for (let day = loan.last_day + 1; day <= today && this.current === loan; day++) {
       if (day >= loan.next_payment_day || day === loan.maturity_day) {
         this.accrueInterest(loan, day);
@@ -205,7 +205,7 @@ class Mortgage {
         this.freeze(loan, day);
       } else if (loan.stage === 'frozen' && loan.frozen_day !== null && day - loan.frozen_day >= this.terms.auction_after_freeze_days) {
         this.current = null;
-        // 补算可能跨过多天；把实际拍卖日传给房产记录，而非读取补算结束后的当前日期。
+        // 补算可能跨过多天，把实际拍卖日传给房产记录，而非读取补算结束后的当前日期。
         this.onAuction(loan.property_id, loan.outstanding, day);
       }
       loan.last_day = day;
@@ -236,7 +236,7 @@ class Mortgage {
     loan.bailey_pending = false;
   }
 
-  private static today(): number {
+  private static get today(): number {
     return Math.max(0, Math.floor(Number(Time.days) || 0));
   }
 }

@@ -23,7 +23,7 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
     wardrobe.base('Landry', clothes => {
       wardrobe.put(clothes, C.npc?.Landry?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
-    // Pub Intro 与 maleLandry/femaleLandry 分别描述毛衣、开衫和深色长裤；在场沿用原版 V.npc。
+    // Pub Intro 与 maleLandry/femaleLandry 分别描述毛衣、开衫和深色长裤，在场沿用原版 V.npc。
     wardrobe.wear('Landry', '*', 'sweater_trousers', () => C.npc?.Landry?.pronoun === 'm');
     wardrobe.wear('Landry', '*', 'cardigan_trousers', () => C.npc?.Landry?.pronoun !== 'm');
     wardrobe.modify('Landry', (clothes, context) => {

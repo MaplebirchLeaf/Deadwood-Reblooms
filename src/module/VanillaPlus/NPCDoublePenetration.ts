@@ -19,7 +19,7 @@ export type NPCDoublePenetrationData = Partial<NPCDoublePenetrationState> & {
   playerLegLock?: NPCDoublePlayerLegLockState;
 };
 
-// 沿用原版“插入另一名 NPC”的 other 阶段命名；不含 vagina/anus/double，避免原版把同伴误判为正在插入 PC。
+// 沿用原版“插入另一名 NPC”的 other 阶段命名，不含 vagina/anus/double，避免原版把同伴误判为正在插入 PC。
 const PARTNER_ENTRANCE = 'otherentrance';
 const PARTNER_IMMINENT = 'otherimminent';
 const PARTNER_PENETRATED = 'otherpenetrated';
@@ -34,7 +34,7 @@ class NPCDoublePenetration {
   }
 
   public get state(): NPCDoublePenetrationState | undefined {
-    // 战斗姿势必须属于当前存档；这里不缓存 NPC 引用，读档后从新的 NPCList 重新验证。
+    // 战斗姿势必须属于当前存档，这里不缓存 NPC 引用，读档后从新的 NPCList 重新验证。
     const state = V.VanillaPlus?.npcDoublePenetration;
     if (!state || typeof state.recipient !== 'number' || typeof state.partner !== 'number' || !state.orifice || !state.stage) return undefined;
     return state as NPCDoublePenetrationState;
@@ -59,7 +59,7 @@ class NPCDoublePenetration {
     return V.VanillaPlus?.npcDoublePenetration?.playerLegLock;
   }
 
-  // 阴道与肛门双插可以同时存在；锁腿需要得到当前所有实际插入 PC 的 NPC。
+  // 阴道与肛门双插可以同时存在，锁腿需要得到当前所有实际插入 PC 的 NPC。
   public playerPenetrators(orifice?: NPCDoubleOrifice): number[] {
     const targets: number[] = [];
     if ((!orifice || orifice === 'vagina') && V.vaginause === 'penisdouble' && V.vaginastate === 'doublepenetrated') {
@@ -72,11 +72,11 @@ class NPCDoublePenetration {
   }
 
   public get visible(): boolean {
-    return this.state?.stage === 'penetrated' && this.valid();
+    return this.state?.stage === 'penetrated' && this.valid;
   }
 
   public isPartner(index: number): boolean {
-    return this.state?.partner === Number(index) && this.valid();
+    return this.state?.partner === Number(index) && this.valid;
   }
 
   // NPC 目标双插只使用真正空闲的阴茎，不能把正在插入 PC 的 NPC 强行挪走。
@@ -86,7 +86,7 @@ class NPCDoublePenetration {
     return Number.isInteger(target) && !!npc && this.validNPC(target) && npc.penis === 0 && (npc.penissize > 0 || this.hasStrapon(target));
   }
 
-  // 玩家身上的阴道、肛门双插沿用原版状态；两组可同时存在，也不会占用 NPC 目标双插的数据。
+  // 玩家身上的阴道、肛门双插沿用原版状态，两组可同时存在，也不会占用 NPC 目标双插的数据。
   public canJoinPlayer(index: number, orifice: NPCDoubleOrifice): boolean {
     const target = Number(index);
     const npc = V.NPCList?.[target];
@@ -99,7 +99,7 @@ class NPCDoublePenetration {
     return V.anususe === 'penis' && Number(V.anustarget) !== target && this.validNPC(Number(V.anustarget)) && PLAYER_ANUS_STATES.includes(primary.penis);
   }
 
-  // 把指定 NPC 写入原版第二目标；后续动作、X-ray 与射精都继续由原版双插逻辑处理。
+  // 把指定 NPC 写入原版第二目标，后续动作、X-ray 与射精都继续由原版双插逻辑处理。
   public joinPlayer(index: number, orifice: NPCDoubleOrifice): boolean {
     const target = Number(index);
     if (!this.canJoinPlayer(target, orifice)) return false;
@@ -147,7 +147,7 @@ class NPCDoublePenetration {
     return true;
   }
 
-  // 记录目标和第二名插入者；PC 仍沿用原版 $penis* 状态。
+  // 记录目标和第二名插入者，PC 仍沿用原版 $penis* 状态。
   public begin(recipient: number, partner: number, orifice: NPCDoubleOrifice): boolean {
     const recipientTarget = Number(recipient);
     const partnerTarget = Number(partner);
@@ -175,12 +175,12 @@ class NPCDoublePenetration {
     return this.update();
   }
 
-  // 每回合跟随 PC 的插入阶段；目标变化、拔出或 NPC 退场时立即清理。
+  // 每回合跟随 PC 的插入阶段，目标变化、拔出或 NPC 退场时立即清理。
   public update(): boolean {
     this.updatePlayerLegLock();
     const state = this.state;
     if (!state) return false;
-    if (!this.valid()) {
+    if (!this.valid) {
       this.clearNPCPenetration();
       return false;
     }
@@ -199,7 +199,7 @@ class NPCDoublePenetration {
   }
 
   private clearNPCPenetration(): void {
-    // 仅回滚本模块占用的第二目标和 recipient 标记；原版已经建立的其他插入状态继续保留。
+    // 仅回滚本模块占用的第二目标和 recipient 标记，原版已经建立的其他插入状态继续保留。
     const state = this.state;
     const partner = state && V.NPCList?.[state.partner];
     if (partner && PARTNER_STATES.includes(partner.penis)) {
@@ -232,7 +232,7 @@ class NPCDoublePenetration {
     }
   }
 
-  private valid(): boolean {
+  private get valid(): boolean {
     const state = this.state;
     if (!state || V.combat !== 1 || Number(V.penistarget) !== state.recipient) return false;
     if (!this.validNPC(state.recipient) || !this.validNPC(state.partner)) return false;

@@ -1,6 +1,6 @@
 ### Entry, settings, and statistics
 
-Open this guide from the sidebar mod hint. Use the contents to jump to a module, read straight down, or search for a character, place, or feature. The contents checkboxes share the framework manager’s module settings; reload to apply changes. Disabling the root `DR` module disables every child module.
+Open this guide from the sidebar mod hint. Use the contents to jump to a module, read straight down, or search for a character, place, or feature. The contents checkboxes share the framework manager’s module settings; reload to apply changes. Disabling the root `DeadwoodReblooms` module disables every child module.
 
 Open **Character → Statistics → Mods Statistics** for foldouts showing this save's breakthroughs and transformations, school standing, finance and property, and character routes. Disabled child modules have no corresponding section. The journal and this guide explain the next step when a route stalls.
 
@@ -26,7 +26,7 @@ The main wardrobe also has a clothing search field. Enter an item name and confi
 
 ### Switches and reloads
 
-**Checked / unchecked shows the saved module selection.** After changing it, the page lists modules awaiting a reload. Adjust several modules, then choose Reload now. Disabling a parent also disables its dependents; enabling a child enables required dependencies. `DR` is Deadwood's root: disabling it disables all Deadwood submodules. After reloading, use the framework manager to enable it again.
+**Checked / unchecked shows the saved module selection.** After changing it, the page lists modules awaiting a reload. Adjust several modules, then choose Reload now. Disabling a parent also disables its dependents; enabling a child enables required dependencies. `DeadwoodReblooms` is Deadwood's root: disabling it disables all Deadwood submodules. After reloading, use the framework manager to enable it again.
 
 Module selections belong to the framework settings in this browser and apply across saves in this installation. Per-save options, such as dynamic music playback, remain separate controls. Switching a module does not undo story events or erase character progress. **Save your game before reloading** to preserve unsaved progress.
 

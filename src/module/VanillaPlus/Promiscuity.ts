@@ -44,7 +44,7 @@ class Promiscuity {
     return !!V.VanillaPlus.traits.promiscuity;
   }
 
-  // 原版用 0 同时表示“部位空闲”和“并不存在”；主动动作还要确认 NPC 确实拥有该部位。
+  // 原版用 0 同时表示“部位空闲”和“并不存在”，主动动作还要确认 NPC 确实拥有该部位。
   public hasPenis(index: number): boolean {
     const target = Number(index);
     const npc = this.npc(target);
@@ -59,7 +59,7 @@ class Promiscuity {
   public vaginaAvailable(index: number): boolean {
     const target = Number(index);
     const npc = this.npc(target);
-    // 原版以 vagina === "none" 表示没有阴部；0 则表示确实拥有且当前空闲，不能再由 gender 推断。
+    // 原版以 vagina === "none" 表示没有阴部，0 则表示确实拥有且当前空闲，不能再由 gender 推断。
     return !!npc && npc.vagina === 0;
   }
 
@@ -143,7 +143,7 @@ class Promiscuity {
     }
   }
 
-  // Ask 可以把同一名 NPC 从旧动作移到新动作；这里只检查身体条件与目标位置，不要求其当前部位空闲。
+  // Ask 可以把同一名 NPC 从旧动作移到新动作，这里只检查身体条件与目标位置，不要求其当前部位空闲。
   public canAsk(action: PromiscuityAction, index: number): boolean {
     const target = Number(index);
     const npc = this.npc(target);

@@ -23,10 +23,10 @@ export default function (maplebirch: MaplebirchCore): void {
     wardrobe.base('River', clothes => {
       wardrobe.put(clothes, C.npc?.River?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
-    // 数学与家务课采用男女商务装；在场由原版 npc River 写入 V.npc。
+    // 数学与家务课采用男女商务装，在场由原版 npc River 写入 V.npc。
     wardrobe.wear('River', '*', 'business_suit_male', () => V.location === 'school' && C.npc?.River?.pronoun === 'm');
     wardrobe.wear('River', '*', 'business_suit_female', () => V.location === 'school' && C.npc?.River?.pronoun !== 'm');
-    // Soup Kitchen 的 location 是 temple，剧情明确描述衬衫；采用白衬衫与卡其裤，不套修士袍。
+    // Soup Kitchen 的 location 是 temple，剧情明确描述衬衫，采用白衬衫与卡其裤，不套修士袍。
     wardrobe.wear('River', '*', 'shirt_khakis', () => V.location !== 'school');
     wardrobe.modify('River', (clothes, context) => {
       sidebar.apply(clothes, Clothing.horsebit_loafers);

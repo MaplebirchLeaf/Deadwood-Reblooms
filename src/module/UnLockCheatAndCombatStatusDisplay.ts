@@ -1,7 +1,7 @@
 // ./src/module/UnlockCheatAndCombatStatusDisplay.ts
 
 // 四段状态各自限定在原版相邻的 if 分支之间，只给该段的彩色 span 插入数值。
-// srcmatchgroup 与 to 都遵守框架的字符串替换契约；已插入的宏不会被再次匹配。
+// srcmatchgroup 与 to 都遵守框架的字符串替换契约，已插入的宏不会被再次匹配。
 function statusPatch(start: string, end: string, suffixMacro: string, expected: number) {
   const marker = suffixMacro.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return {

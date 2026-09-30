@@ -19,9 +19,9 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
     function location(): string {
       const title = maplebirch.passage.title;
-      // Lake Underwater 的冰下救援及三个后续回应明确延续潜水服；在场仍以 V.npc 为准。
+      // Lake Underwater 的冰下救援及三个后续回应明确延续潜水服，在场仍以 V.npc 为准。
       if (['Lake Underwater', 'Lake Mason Reassure', 'Lake Mason Thank', 'Lake Mason Angry'].includes(title)) return 'diving';
-      // Lake Mason Swim 揭示裸泳；池塘初见与聊天则明确仍穿泳装。
+      // Lake Mason Swim 揭示裸泳，池塘初见与聊天则明确仍穿泳装。
       if (title.startsWith('Lake Mason')) return 'naked';
       // 礼顿处罚后 swimall 标记裸体教学，普通泳池状态不能据玩家裸泳直接脱掉梅森衣物。
       if (V.location === 'pool') return V.swimall === 1 ? 'naked' : 'swim';

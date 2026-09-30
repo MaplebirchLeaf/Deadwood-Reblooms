@@ -83,7 +83,7 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     // 学校制服
     schoolUniforms(maplebirch, sidebar, 'Whitney', 'school', colours);
 
-    // 仅校服使用卷袖素材；上衣塞入仍由 tucked[0] 控制
+    // 仅校服使用卷袖素材，上衣塞入仍由 tucked[0] 控制
     wardrobe.modify('Whitney', (clothes, context) => {
       if (!(schoolUniformKeys as readonly string[]).includes(context.key)) return;
       const upper = clothes.upper;
@@ -244,7 +244,7 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     if (whitney.state === 'pillory') return 'pillory';
     if (whitney.state === 'dungeon' || !['active', 'rescued'].includes(whitney.state)) return '';
 
-    // 深夜在家休息；上学日不能让校服日程覆盖凌晨的私人时间。
+    // 深夜在家休息，上学日不能让校服日程覆盖凌晨的私人时间。
     if (Time.hour < 7) return 'topless';
 
     // 上学日沿用校服

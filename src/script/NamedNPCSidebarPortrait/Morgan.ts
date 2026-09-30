@@ -25,10 +25,10 @@ export default function (maplebirch: MaplebirchCore): void {
       if (naked()) return;
       wardrobe.put(clothes, C.npc?.Morgan?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
-    // Sewers Intro 明写破旧西装／礼服；追猎提示不代表在场，仍以 V.npc 为准。
+    // Sewers Intro 明写破旧西装／礼服，追猎提示不代表在场，仍以 V.npc 为准。
     wardrobe.wear('Morgan', '*', 'tattered_tuxedo', () => !naked() && C.npc?.Morgan?.pronoun === 'm');
     wardrobe.wear('Morgan', '*', 'tattered_gown', () => !naked() && C.npc?.Morgan?.pronoun !== 'm');
-    // Sex Ed 脱衣后进入 phase 1；拒绝分支 phase 2 没有这段脱衣描述。
+    // Sex Ed 脱衣后进入 phase 1，拒绝分支 phase 2 没有这段脱衣描述。
     wardrobe.wear('Morgan', '*', 'naked', naked);
   });
 }

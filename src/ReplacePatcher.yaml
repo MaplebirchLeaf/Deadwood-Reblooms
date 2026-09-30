@@ -15,7 +15,7 @@
   fileName: 'named-npc.js'
   from: 'if (T.sydney_location === "temple") {'
   before: |
-    if (((V.SydneyExpansion?.estate?.visitDay === Time.days && Time.hour >= 21) || (V.SydneyExpansion?.estate?.visitDay === Time.days - 1 && Time.hour < 6)) && V.daily.sydney.punish !== 1 && !V.replayScene && C.npc.Sydney.init === 1 && !["prison", "dungeon"].includes(C.npc.Sydney.state)) {
+    if (maplebirch.get('Sydney') && ((V.SydneyExpansion?.estate?.visitDay === Time.days && Time.hour >= 21) || (V.SydneyExpansion?.estate?.visitDay === Time.days - 1 && Time.hour < 6)) && V.daily.sydney.punish !== 1 && !V.replayScene && C.npc.Sydney.init === 1 && !["prison", "dungeon"].includes(C.npc.Sydney.state)) {
       T.sydney_location = "home";
       T.sydney_location_message = "home";
     }
@@ -23,92 +23,92 @@
 - comment: '意志突破后允许正常增益继续填充扩展后的六级上限。'
   fileName: 'stat-changes.js'
   from: 'V.willpower = Math.clamp(V.willpower + amount * 2, 0, V.willpowermax'
-  to: "V.willpower = Math.clamp(V.willpower + amount * 2, maplebirch.get('VP')?.minimum('willpower') ?? 0, (V.VanillaPlus?.lock?.willpower ? Math.floor(V.willpowermax * 1.25) : V.willpowermax)"
+  to: "V.willpower = Math.clamp(V.willpower + amount * 2, maplebirch.get('VanillaPlus')?.minimum('willpower') ?? 0, (maplebirch.get('VanillaPlus') && V.VanillaPlus?.lock?.willpower ? Math.floor(V.willpowermax * 1.25) : V.willpowermax)"
 
 - comment: '容貌突破后允许原版美容增益继续填充扩展后的六级上限。'
   fileName: 'stat-changes.js'
   from: 'maxValue = V.beautymax; // Special-case for the $beautymax value'
   to: |
-    maxValue = maplebirch.get('VP') && V.VanillaPlus?.lock?.beauty ? Math.floor(V.beautymax * 1.25) : V.beautymax; // Special-case for the $beautymax value
+    maxValue = maplebirch.get('VanillaPlus') && V.VanillaPlus?.lock?.beauty ? Math.floor(V.beautymax * 1.25) : V.beautymax; // Special-case for the $beautymax value
 
 - comment: '六项属性全满后，原版美容变化不能令容貌从突破后的峰值降低。'
   fileName: 'stat-changes.js'
   from: 'V[type] = Math.clamp(V[type] + amount, 0, maxValue);'
   to: |
-    V[type] = Math.clamp(V[type] + amount, type === 'beauty' ? (maplebirch.get('VP')?.minimum('beauty') ?? 0) : 0, maxValue);
+    V[type] = Math.clamp(V[type] + amount, type === 'beauty' ? (maplebirch.get('VanillaPlus')?.minimum('beauty') ?? 0) : 0, maxValue);
 
 - comment: '六项属性全满后，创伤溢出不能令容貌从突破后的峰值降低。'
   fileName: 'stat-changes.js'
   from: 'V.beauty -= overflow * 0.2;'
   to: |
-    V.beauty = Math.max(maplebirch.get('VP')?.minimum('beauty') ?? 0, V.beauty - overflow * 0.2);
+    V.beauty = Math.max(maplebirch.get('VanillaPlus')?.minimum('beauty') ?? 0, V.beauty - overflow * 0.2);
 
 - comment: '六项属性全满后，每日衰减不能令暴露癖从突破后的峰值降低。'
   fileName: 'time.js'
   from: 'V.exhibitionism = Math.max(V.exhibitionism - 1, 0);'
   to: |
-    V.exhibitionism = Math.max(V.exhibitionism - 1, maplebirch.get('VP')?.minimum('exhibitionism') ?? 0);
+    V.exhibitionism = Math.max(V.exhibitionism - 1, maplebirch.get('VanillaPlus')?.minimum('exhibitionism') ?? 0);
 
 - comment: '六项属性全满后，每日衰减不能令淫乱从突破后的峰值降低。'
   fileName: 'time.js'
   from: 'V.promiscuity = Math.max(V.promiscuity - 1, 0);'
   to: |
-    V.promiscuity = Math.max(V.promiscuity - 1, maplebirch.get('VP')?.minimum('promiscuity') ?? 0);
+    V.promiscuity = Math.max(V.promiscuity - 1, maplebirch.get('VanillaPlus')?.minimum('promiscuity') ?? 0);
 
 - comment: '六项属性全满后，每日衰减不能令异种癖从突破后的峰值降低。'
   fileName: 'time.js'
   from: 'V.deviancy = Math.max(V.deviancy - 1, 0);'
   to: |
-    V.deviancy = Math.max(V.deviancy - 1, maplebirch.get('VP')?.minimum('deviancy') ?? 0);
+    V.deviancy = Math.max(V.deviancy - 1, maplebirch.get('VanillaPlus')?.minimum('deviancy') ?? 0);
 
 - comment: '六项属性全满后，农场日常衰减不能令体格从突破后的峰值降低。'
   fileName: 'time.js'
   from: 'if (V.farm_stage >= 6) V.physique = V.physique - V.physique / 3000;'
   to: |
-    if (V.farm_stage >= 6) V.physique = Math.max(maplebirch.get('VP')?.minimum('physique') ?? 0, V.physique - V.physique / 3000);
+    if (V.farm_stage >= 6) V.physique = Math.max(maplebirch.get('VanillaPlus')?.minimum('physique') ?? 0, V.physique - V.physique / 3000);
 
 - comment: '六项属性全满后，农场日常衰减不能令体格从突破后的峰值降低。'
   fileName: 'time.js'
   from: 'else V.physique = V.physique - V.physique / 2500;'
   to: |
-    else V.physique = Math.max(maplebirch.get('VP')?.minimum('physique') ?? 0, V.physique - V.physique / 2500);
+    else V.physique = Math.max(maplebirch.get('VanillaPlus')?.minimum('physique') ?? 0, V.physique - V.physique / 2500);
 
 - comment: '赢得科学博览会后，科学成绩不再自然衰减。'
   fileName: 'time.js'
   from: 'V.science_exam = Math.clamp('
-  to: "if (!maplebirch.get('LS')?.academics.has('science')) V.science_exam = Math.clamp("
+  to: "if (!maplebirch.get('LifeSimulation')?.academics.has('science')) V.science_exam = Math.clamp("
 
 - comment: '赢得数学竞赛后，数学成绩不再自然衰减。'
   fileName: 'time.js'
   from: 'V.maths_exam = Math.clamp('
-  to: "if (!maplebirch.get('LS')?.academics.has('maths')) V.maths_exam = Math.clamp("
+  to: "if (!maplebirch.get('LifeSimulation')?.academics.has('maths')) V.maths_exam = Math.clamp("
 
 - comment: '获得舞台剧表演者特质后，语文成绩不再自然衰减。'
   fileName: 'time.js'
   from: 'V.english_exam = Math.clamp('
-  to: "if (!maplebirch.get('LS')?.academics.has('english')) V.english_exam = Math.clamp("
+  to: "if (!maplebirch.get('LifeSimulation')?.academics.has('english')) V.english_exam = Math.clamp("
 
 - comment: '以最高评价完成本地历史展览后，历史成绩不再自然衰减。'
   fileName: 'time.js'
   from: 'V.history_exam = Math.clamp('
-  to: "if (!maplebirch.get('LS')?.academics.has('history')) V.history_exam = Math.clamp("
+  to: "if (!maplebirch.get('LifeSimulation')?.academics.has('history')) V.history_exam = Math.clamp("
 
 - comment: '将神圣转化加成接入当前技能值。'
   fileName: 'ingame.js'
   from: "\treturn result;\n}\nwindow.currentSkillValue = currentSkillValue;"
-  to: "\treturn maplebirch.VP.divineTransformations.skillValue(skill, result);\n}\nwindow.currentSkillValue = currentSkillValue;"
+  to: "\treturn maplebirch.get('VanillaPlus')?.divineTransformations.skillValue(skill, result) ?? result;\n}\nwindow.currentSkillValue = currentSkillValue;"
 
 - comment: '神圣转化对精液变化生效。'
   fileName: 'stat-changes.js'
   from: 'V.semen_amount + amount'
-  to: 'V.semen_amount + maplebirch.VP.divineTransformations.fluidChange(amount)'
+  to: 'V.semen_amount + (maplebirch.get("VanillaPlus")?.divineTransformations.fluidChange(amount) ?? amount)'
 
 - comment: '神圣转化对乳汁变化生效。'
   fileName: 'stat-changes.js'
   from: 'V.milk_amount + amount'
-  to: 'V.milk_amount + maplebirch.VP.divineTransformations.fluidChange(amount)'
+  to: 'V.milk_amount + (maplebirch.get("VanillaPlus")?.divineTransformations.fluidChange(amount) ?? amount)'
 
 - comment: '意志承伤层在疼痛钳制前吸收伤害。'
   fileName: 'stat-changes.js'
   from: 'V.pain = Math.clamp(V.pain, minPain(), 200);'
-  to: 'V.pain = Math.clamp(maplebirch.VP.willpower.absorbPain(V.pain), minPain(), 200);'
+  to: 'V.pain = Math.clamp(maplebirch.get("VanillaPlus")?.willpower.absorbPain(V.pain) ?? V.pain, minPain(), 200);'

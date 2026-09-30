@@ -26,9 +26,9 @@ export default abstract class Shared {
     return Math.max(0, Number(V.robinmoney) || 0) + this.state.reserve;
   }
 
-  /** VanillaPlus 未载入时为空；房产与银行的调用都要先过这一层。 */
+  /** VanillaPlus 未载入时为空，房产与银行的调用都要先过这一层。 */
   protected get vanillaPlus(): VanillaPlus | undefined {
-    return this.core.get('VP') as VanillaPlus | undefined;
+    return this.core.get('VanillaPlus') as VanillaPlus | undefined;
   }
 
   protected get robinAvailable(): boolean {

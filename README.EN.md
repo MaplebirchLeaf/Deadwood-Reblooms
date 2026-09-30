@@ -25,27 +25,27 @@
 3. From [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases), load only the main `deadwood-reblooms-*.modpack` matching your game version. To use dynamic music, also load the audio `deadwood-reblooms-audio-*.modpack` for that same game version.
 4. To change modules, use the framework's module manager and reload when prompted.
 
-`DR` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
+`DeadwoodReblooms` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
 
 ## Modules and game guide
 
-| Module                | Content                                                                   |
-| --------------------- | ------------------------------------------------------------------------- |
-| `DR`                  | Base options, game guide, clothing search, and mod statistics             |
-| `Sydney`              | Sydney's dormitory, Sirris estate, and relationship scenes                |
-| `Robin`               | Robin's stands, Cliff Street drink shop, shared life, and intimate scenes |
-| `Whitney`             | Underground brothel rescue, reunion, and daily interactions               |
-| `Kylar`               | Manor stays and room interactions                                         |
-| `LS`                  | Attendance pass, prefect, student president, school reputation, and gym   |
-| `VP`                  | Stat breakthroughs, homes, banking, stocks, and other vanilla additions   |
-| `CA`                  | Solar eclipses, meteor showers, and changing sky and weather visuals      |
-| `MoreTransformations` | Horse and fish transformations, locations, equipment, and traits          |
-| `LongerCombat`        | Longer encounters, staged dialogue, and fluid displays                    |
-| `MLIANPCA`            | More love interests and social sidebar portraits                          |
-| `NPCSidebarPortrait`  | NPC portraits in scenes and the sidebar                                   |
-| `UCACSD`              | Vanilla cheat access and encounter stat values                            |
-| `ICC`                 | A searchable, importable, and exportable cheat command collection         |
-| `DM`                  | Music selected by combat, time of day, weather, and celestial events      |
+| Module                              | Content                                                                   |
+| ----------------------------------- | ------------------------------------------------------------------------- |
+| `DeadwoodReblooms`                  | Base options, game guide, clothing search, and mod statistics             |
+| `Sydney`                            | Sydney's dormitory, Sirris estate, and relationship scenes                |
+| `Robin`                             | Robin's stands, Cliff Street drink shop, shared life, and intimate scenes |
+| `Whitney`                           | Underground brothel rescue, reunion, and daily interactions               |
+| `Kylar`                             | Manor stays and room interactions                                         |
+| `LifeSimulation`                    | Attendance pass, prefect, student president, school reputation, and gym   |
+| `VanillaPlus`                       | Stat breakthroughs, homes, banking, stocks, and other vanilla additions   |
+| `CelestialAnomalies`                | Solar eclipses, meteor showers, and changing sky and weather visuals      |
+| `MoreTransformations`               | Horse and fish transformations, locations, equipment, and traits          |
+| `LongerCombat`                      | Longer encounters, staged dialogue, and fluid displays                    |
+| `MoreLoveInterestsAndNPCAvatars`    | More love interests and social sidebar portraits                          |
+| `NPCSidebarPortrait`                | NPC portraits in scenes and the sidebar                                   |
+| `UnLockCheatAndCombatStatusDisplay` | Vanilla cheat access and encounter stat values                            |
+| `IncantationCheatCollection`        | A searchable, importable, and exportable cheat command collection         |
+| `DynamicMusic`                      | Music selected by combat, time of day, weather, and celestial events      |
 
 Open **Mod Hints** in the game sidebar for the single-page guide. Its sections and search cover characters, places, unlock conditions, and troubleshooting. **Character → Statistics → Mod Statistics** shows progress for the current save, including stats, school, finance, property, and character routes. Check the journal and the actual scene for the next story step.
 
@@ -55,16 +55,16 @@ Each guide entry combines a chapter link and its module checkbox. Checkboxes sha
 
 ## Optional audio pack
 
-The audio files and `dynamic-music.json` for `DM` live in a separate pack. The main mod only provides the playback controller. After loading the audio pack, enable **Dynamic Music** in mod options and adjust music and ambience volumes separately. Without the audio pack, dynamic music stays silent and the other modules still work.
+The audio files and `dynamic-music.json` for `DynamicMusic` live in a separate pack. The main mod only provides the playback controller. After loading the audio pack, enable **Dynamic Music** in mod options and adjust music and ambience volumes separately. Without the audio pack, dynamic music stays silent and the other modules still work.
 
 ## Acknowledgements and asset sources
 
 Thanks to the following creators for their work and help. You can turn off the corresponding Deadwood Reblooms module when using an overlapping original mod:
 
 - `LongerCombat`: [Longer Combat](https://github.com/emicoto/DOLMods/) by 狐千月.
-- `MLIANPCA`: [social sidebar portraits](https://github.com/Eudemonism00/DOL-npcicon-mods/) by Eudemonism00 and [More Love Interests](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod) by 苯环.
+- `MoreLoveInterestsAndNPCAvatars`: [social sidebar portraits](https://github.com/Eudemonism00/DOL-npcicon-mods/) by Eudemonism00 and [More Love Interests](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod) by 苯环.
 - `Robin`: [Dom Robin](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod) by 零环零幻想.
-- `LS`: [DoLSims](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims) by 丧心.
+- `LifeSimulation`: [DoLSims](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims) by 丧心.
 - Horse transformation sprites: 元夕.
 
 Dynamic music uses CC0 audio by Kresiek The Furry, Augmentality (Brandon Morris), AdoTheLimey, primbal, Breviceps, Joth, TinyWorlds, isaiah658, SketchMan3, and rubberduck. See the [audio source record](audio-pack/audio/CREDITS.md) for individual tracks. Thanks also to everyone who shared ideas, testing feedback, and other help.

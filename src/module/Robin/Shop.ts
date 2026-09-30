@@ -7,7 +7,7 @@ export type ShopStage = 'none' | 'planning' | 'applied' | 'site' | 'inspected' |
 const MAX_SHOP_STAFF = 2;
 
 export default class RobinShop extends Shared {
-  /** 正式店铺可刷卡；VanillaPlus 未启用时保留原本的现金购买。 */
+  /** 正式店铺可刷卡，VanillaPlus 未启用时保留原本的现金购买。 */
   public canCustomerPay(pennies: number): boolean {
     if (!Number.isSafeInteger(pennies) || pennies < 0) return false;
     return this.vanillaPlus?.finance.canPay(pennies, 'shopping') ?? V.money >= pennies;
@@ -55,7 +55,7 @@ export default class RobinShop extends Shared {
     return true;
   }
 
-  /** 提交开店申请，花 500 便士，记录申请日。 */
+  /** 提交开店申请，花 500 英镑，记录申请日。 */
   public applyForPermit(): boolean {
     if (!this.robinAvailable || this.state.shopStage !== 'planning' || !this.spend(500)) return false;
     this.state.shopStage = 'applied';
@@ -63,14 +63,14 @@ export default class RobinShop extends Shared {
     return true;
   }
 
-  /** 落实店面，花 1500 便士。 */
+  /** 落实店面，花 1500 英镑。 */
   public secureSite(): boolean {
     if (!this.robinAvailable || this.state.shopStage !== 'applied' || !this.spend(1500)) return false;
     this.state.shopStage = 'site';
     return true;
   }
 
-  /** 付费接受验店（1400 便士）；须在申请次日之后。 */
+  /** 付费接受验店（1400 英镑），须在申请次日之后。 */
   public payInspection(): boolean {
     if (!this.robinAvailable || this.state.shopStage !== 'site' || Time.days <= this.state.shopApplicationDay || !this.spend(1400)) return false;
     this.state.shopStage = 'inspected';
@@ -78,14 +78,14 @@ export default class RobinShop extends Shared {
     return true;
   }
 
-  /** 领取执照；须在验店次日之后领取。 */
+  /** 领取执照，须在验店次日之后领取。 */
   public collectPermit(): boolean {
     if (!this.robinAvailable || this.state.shopStage !== 'inspected' || Time.days <= this.state.shopInspectionDay) return false;
     this.state.shopStage = 'permitted';
     return true;
   }
 
-  /** 正式开张：花 4000 便士，初始饮品库存 3 箱。 */
+  /** 正式开张：花 4000 英镑，初始饮品库存 3 箱。 */
   public open(): boolean {
     const state = this.state;
     if (!this.robinAvailable || state.shop || state.shopStage !== 'permitted' || state.lemonade < 2 || state.chocolate < 2 || !this.spend(4000)) return false;
@@ -118,7 +118,7 @@ export default class RobinShop extends Shared {
     return true;
   }
 
-  /** 增设气球，花 100 便士；需气球摊已合作或已收束。 */
+  /** 增设气球，花 100 便士，需气球摊已合作或已收束。 */
   public addBalloons(): boolean {
     if (!this.state.shop || this.state.shopBalloons || !['cooperate', 'resolved'].includes(this.state.balloon) || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(100))
       return false;

@@ -25,27 +25,27 @@
 3. 从 [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases) 选择与游戏版本一致的 `deadwood-reblooms-*.modpack`，不要同时加载两个游戏版本的主包。需要动态音乐时，再加载相同游戏版本的 `deadwood-reblooms-audio-*.modpack`。
 4. 需要调整模块时，在框架的模块管理中启用或关闭，并按提示重载。
 
-`DR` 是根模块，关闭它会停用所有子模块。检测到功能重叠的外部模组时，枯木逢春会关闭自身对应模块，保留外部模组。角色剧情仍遵循原版的人物关系、地点和日程条件。
+`DeadwoodReblooms` 是根模块，关闭它会停用所有子模块。检测到功能重叠的外部模组时，枯木逢春会关闭自身对应模块，保留外部模组。角色剧情仍遵循原版的人物关系、地点和日程条件。
 
 ## 模块与游戏指南
 
-| 模块                  | 内容                                           |
-| --------------------- | ---------------------------------------------- |
-| `DR`                  | 基础设置、模组指南、服装搜索和模组统计         |
-| `Sydney`              | 悉尼宿舍、西里斯庄园与关系互动                 |
-| `Robin`               | 罗宾的摊位、峭壁街饮品店、共同生活与亲密互动   |
-| `Whitney`             | 地下妓院营救、重逢与后续日常                   |
-| `Kylar`               | 凯拉尔庄园留宿与房间互动                       |
-| `LS`                  | 免听凭证、风纪委员、学生会长、校园评价及健身房 |
-| `VP`                  | 属性突破、住宅、银行、证券及其他原版增强       |
-| `CA`                  | 日蚀、流星雨与天气画面变化                     |
-| `MoreTransformations` | 马与鱼转化及相关地点、装备和特质               |
-| `LongerCombat`        | 更长的遭遇战、分阶段对白与体液显示             |
-| `MLIANPCA`            | 更多恋人与社交栏小头像                         |
-| `NPCSidebarPortrait`  | 场景与侧边栏的 NPC 立绘                        |
-| `UCACSD`              | 原版作弊入口与遭遇战数值显示                   |
-| `ICC`                 | 可保存、搜索、导入及导出的作弊命令集           |
-| `DM`                  | 根据战斗、昼夜、天气与天体异象切换的动态音乐   |
+| 模块                                | 内容                                           |
+| ----------------------------------- | ---------------------------------------------- |
+| `DeadwoodReblooms`                  | 基础设置、模组指南、服装搜索和模组统计         |
+| `Sydney`                            | 悉尼宿舍、西里斯庄园与关系互动                 |
+| `Robin`                             | 罗宾的摊位、峭壁街饮品店、共同生活与亲密互动   |
+| `Whitney`                           | 地下妓院营救、重逢与后续日常                   |
+| `Kylar`                             | 凯拉尔庄园留宿与房间互动                       |
+| `LifeSimulation`                    | 免听凭证、风纪委员、学生会长、校园评价及健身房 |
+| `VanillaPlus`                       | 属性突破、住宅、银行、证券及其他原版增强       |
+| `CelestialAnomalies`                | 日蚀、流星雨与天气画面变化                     |
+| `MoreTransformations`               | 马与鱼转化及相关地点、装备和特质               |
+| `LongerCombat`                      | 更长的遭遇战、分阶段对白与体液显示             |
+| `MoreLoveInterestsAndNPCAvatars`    | 更多恋人与社交栏小头像                         |
+| `NPCSidebarPortrait`                | 场景与侧边栏的 NPC 立绘                        |
+| `UnLockCheatAndCombatStatusDisplay` | 原版作弊入口与遭遇战数值显示                   |
+| `IncantationCheatCollection`        | 可保存、搜索、导入及导出的作弊命令集           |
+| `DynamicMusic`                      | 根据战斗、昼夜、天气与天体异象切换的动态音乐   |
 
 在游戏侧边栏打开**模组提示**，可进入按模块排列的单页游戏指南。搜索框可查地点、人物、解锁条件与排查步骤。**角色页 → 统计 → 模组统计**显示当前存档的属性、校园、金融、房产和人物路线进度。人物剧情的下一步仍以游戏日志和实际场景为准。
 
@@ -55,16 +55,16 @@
 
 ## 可选音频包
 
-`DM` 的音频和 `dynamic-music.json` 位于独立的音频包中。本体只提供播放调度。安装音频包后，在**模组设置 → 动态音乐**启用，并分别调整音乐与环境声的音量。缺少音频包时，动态音乐不会播放，其他模块可以照常使用。
+`DynamicMusic` 的音频和 `dynamic-music.json` 位于独立的音频包中。本体只提供播放调度。安装音频包后，在**模组设置 → 动态音乐**启用，并分别调整音乐与环境声的音量。缺少音频包时，动态音乐不会播放，其他模块可以照常使用。
 
 ## 致谢与素材来源
 
 感谢以下作者的作品与协助。若已安装功能相近的原模组，枯木逢春会关闭自身对应功能：
 
 - `LongerCombat`：狐千月的[更长遭遇战](https://github.com/emicoto/DOLMods/)。
-- `MLIANPCA`：Eudemonism00 的[社交栏小头像](https://github.com/Eudemonism00/DOL-npcicon-mods/)与苯环的[更多恋人](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod)。
+- `MoreLoveInterestsAndNPCAvatars`：Eudemonism00 的[社交栏小头像](https://github.com/Eudemonism00/DOL-npcicon-mods/)与苯环的[更多恋人](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod)。
 - `Robin`：零环零幻想的[Dom 罗宾](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod)。
-- `LS`：丧心的[模拟人生](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims)。
+- `LifeSimulation`：丧心的[模拟人生](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims)。
 - 马转化贴图：元夕。
 
 动态音乐使用 Kresiek The Furry、Augmentality（Brandon Morris）、AdoTheLimey、primbal、Breviceps、Joth、TinyWorlds、isaiah658、SketchMan3 和 rubberduck 的 CC0 音频。逐曲来源见[音频素材记录](audio-pack/audio/CREDITS.md)。也感谢所有提供建议、测试反馈与帮助的朋友。

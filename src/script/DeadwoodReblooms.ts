@@ -20,10 +20,12 @@ export default function (maplebirch: MaplebirchCore) {
   );
   maplebirch.tool.addTo('HintMobile', () =>
     V.options.maplebirch.modhint === 'mobile' && V.options.sidebarStats !== 'disabled'
-      ? "<input type='button' class='saveMenuButton DeadwoodRebloomsHintMobile' onclick='maplebirch.get(\"DR\").open()'>"
+      ? "<input type='button' class='saveMenuButton DeadwoodRebloomsHintMobile' onclick='maplebirch.get(\"DeadwoodReblooms\").open()'>"
       : ''
   );
-  maplebirch.tool.addTo('MenuBig', () => (V.options.maplebirch.modhint === 'desktop' ? "<<lanButton 'Deadwood Reblooms' 'upper'>><<run maplebirch.get(\"DR\").open()>><</lanButton>>" : ''));
+  maplebirch.tool.addTo('MenuBig', () =>
+    V.options.maplebirch.modhint === 'desktop' ? "<<lanButton 'Deadwood Reblooms' 'upper'>><<run maplebirch.get(\"DeadwoodReblooms\").open()>><</lanButton>>" : ''
+  );
   // 给原版衣柜加入搜索，并把身体涂写设置嵌入镜子界面。
   maplebirch.tool.inject({
     widgetPassage: {

@@ -44,9 +44,9 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   // 包装原版校服判断，保留原函数与其他模组继续串联包装的空间。
   maplebirch.tool.onInit(() => {
     const wearingSchoolOutfit = window.wearingSchoolOutfit;
-    if (wearingSchoolOutfit) window.wearingSchoolOutfit = () => maplebirch.get('LS')!.school.meetsDressCode(wearingSchoolOutfit());
+    if (wearingSchoolOutfit) window.wearingSchoolOutfit = () => maplebirch.get('LifeSimulation')!.school.meetsDressCode(wearingSchoolOutfit());
 
-    // 原版的课程提示由 questmarker 独立生成；免听时只关闭学校提醒。
+    // 原版的课程提示由 questmarker 独立生成，免听时只关闭学校提醒。
     const events = (setup as typeof setup & { events?: Array<{ name: string; condition: () => boolean; text: string }> }).events;
     for (const event of events ?? []) {
       if (event.name === 'school day') {
@@ -118,7 +118,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     locationPassage: {
       "Bailey's Office": [
         {
-          // 贝利只有 7–9 点在办公室；入口仍受原版 _options 限制，避免打断惩罚场景。
+          // 贝利只有 7–9 点在办公室，入口仍受原版 _options 限制，避免打断惩罚场景。
           src: '<<baileyRentReclaimOption>> /* Bailey Confiscation System */',
           applybefore: '<<deadwood-reblooms-life-simulation-attendance-link>>\n',
           expected: 1
@@ -126,7 +126,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       ],
       Flats: [
         {
-          // 使用原版公寓走廊的普通链接分支；随机事件发生时不会提前展示入口。
+          // 使用原版公寓走廊的普通链接分支，随机事件发生时不会提前展示入口。
           srcmatch: /<<barbicon>><<link \[\[[^\]\n]+\|Barb Street]]>><<\/link>>/,
           applybefore: '<<deadwood-reblooms-life-simulation-bailey-flat-link>>\n',
           expected: 1
@@ -141,7 +141,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   });
   maplebirch.dynamic.regStateEvent('gate', 'life-simulation-school-dress-enforcement', {
     output: 'deadwood-reblooms-life-simulation-school-enforce-clothes',
-    cond: () => V.location === 'school' && maplebirch.get('LS')!.school.requiresNudity && V.LifeSimulation?.school?.clothesStored !== true
+    cond: () => V.location === 'school' && maplebirch.get('LifeSimulation')!.school.requiresNudity && V.LifeSimulation?.school?.clothesStored !== true
   });
 
   const schoolPassages: Record<string, PassagePatch[]> = {
@@ -193,7 +193,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       ],
       Social: [
         {
-          // Social 是原版 widget；紧邻学校声望卡片插入，保持原版的双列排版。
+          // Social 是原版 widget，紧邻学校声望卡片插入，保持原版的双列排版。
           src: '<<relation-box-simple _studentBoxConfig>>',
           applyafter: '\n\t\t\t<<deadwood-reblooms-life-simulation-school-social>>',
           expected: 1

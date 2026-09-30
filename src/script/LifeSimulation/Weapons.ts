@@ -1,10 +1,10 @@
 export default function Weapons(maplebirch: typeof window.maplebirch): void {
-  const weapons = maplebirch.get('LS')!.weapons;
+  const weapons = maplebirch.get('LifeSimulation')!.weapons;
   maplebirch.combat.CombatAction.reg({
     id: 'ls-weapon',
     actionType: ['leftaction', 'rightaction'],
     combatType: 'Tentacle',
-    cond: ctx => !!maplebirch.get('LS') && weapons.can(ctx.actionType === 'leftaction' ? 'left' : 'right'),
+    cond: ctx => !!maplebirch.get('LifeSimulation') && weapons.can(ctx.actionType === 'leftaction' ? 'left' : 'right'),
     display: () => (weapons.weapon === 'whip' ? lanSwitch('Strike with whip', '挥鞭') : lanSwitch('Strike with baton', '挥棍')),
     value: () => 'lsWeapon',
     color: 'def',

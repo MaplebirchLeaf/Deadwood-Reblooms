@@ -93,7 +93,7 @@ class LongerCombat {
   }
 
   private npcLine(prefix: string, previous?: string): string {
-    // 台词键以连续数字结尾，遇到缺号即停止；同一 NPC 上一句尽量不重复。
+    // 台词键以连续数字结尾，遇到缺号即停止，同一 NPC 上一句尽量不重复。
     const lines: string[] = [];
     for (let i = 0; this.core.services.translator.has(`${prefix}:${i}`); i++) {
       const key = `${prefix}:${i}`;
@@ -141,7 +141,7 @@ class LongerCombat {
   }
 
   public ejaculation(sWikifier: (Text: string) => void): void {
-    // 原版宏已逐人处理声望、避孕套、受孕与玩家体液；整组只结算一次。
+    // 原版宏已逐人处理声望、避孕套、受孕与玩家体液，整组只结算一次。
     sWikifier('<<ejaculation>>');
 
     let continued = false;
@@ -152,7 +152,7 @@ class LongerCombat {
       if (!Text) return;
       if (continued) {
         const name = lanSwitch(npc.fullDescription, npc.fullDescription_CN) || npc.fullDescription || npc.pronouns?.he || '';
-        // 先输出完整的 NPC 段落，再转向下一位；命名角色显示姓名，避免多人代词混淆。
+        // 先输出完整的 NPC 段落，再转向下一位，命名角色显示姓名，避免多人代词混淆。
         const transition = this.npcLine(`${LongerCombat.NPC_KEY}:transition`).replace('{name}', () => name);
         sWikifier(lanSwitch(' ', '') + transition);
       }
@@ -186,7 +186,7 @@ class LongerCombat {
       (!parasite || parasite === 'parasite') &&
       V.worn?.genitals?.name !== 'chastity parasite'
     ) {
-      // npc 与 npcrow 是原版命名 NPC/战斗槽的对应表；不为随机遭遇者创建持久化数据。
+      // npc 与 npcrow 是原版命名 NPC/战斗槽的对应表，不为随机遭遇者创建持久化数据。
       for (const [position, index] of (V.npcrow ?? []).entries()) {
         const name = V.npc?.[position];
         const npc = V.NPCList?.[index];
@@ -226,7 +226,7 @@ class LongerCombat {
       }
     }
 
-    // 先捕获落点，再完整运行原版宏；高潮效果可能改变接触状态或变为干/被打断的高潮。
+    // 先捕获落点，再完整运行原版宏，高潮效果可能改变接触状态或变为干/被打断的高潮。
     action();
     if (T.deniedOrgasm) return;
     if (!V.femaleclimax) this.addFluids(targets, 'semen');
@@ -251,7 +251,7 @@ class LongerCombat {
     this.addFluids(wetTargets, 'goo');
   }
 
-  // 原版会给每个未输出高潮文本的 NPC 仍追加两次换行；多人战时移除这些前导空行，并限制连续换行。
+  // 原版会给每个未输出高潮文本的 NPC 仍追加两次换行，多人战时移除这些前导空行，并限制连续换行。
   private tidyEjaculation(output: ParentNode): void {
     let hasContent = false;
     let breaks = 0;

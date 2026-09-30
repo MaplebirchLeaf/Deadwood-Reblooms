@@ -19,7 +19,7 @@ export interface DeadwoodRebloomsState {
 
 export const defaults: DeadwoodRebloomsState = {
   rand: {
-    /** 尚未播种；首次取用随机数时才生成种子。 */
+    /** 尚未播种，首次取用随机数时才生成种子。 */
     seed: null,
     /** 已产出的随机数历史，供回退/前进按钮复用。 */
     history: [],

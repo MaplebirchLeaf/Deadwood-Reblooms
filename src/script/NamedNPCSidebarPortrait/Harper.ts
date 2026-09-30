@@ -25,7 +25,7 @@ export default function (maplebirch: MaplebirchCore): void {
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
     const party = () => /^Skyscraper Party(?: |$)/.test(maplebirch.passage.title);
     // 原版 hospital 衣物类型：医院、精神病院、农场检查均穿医生服。
-    // Mansion Party Harper 明写刚下班仍穿工作服；在场沿用原版 V.npc。
+    // Mansion Party Harper 明写刚下班仍穿工作服，在场沿用原版 V.npc。
     wardrobe.wear('Harper', '*', 'doctor', () => !party());
     // Skyscraper Party 初见明写为重要场合盛装打扮，后续宴会分支延续该服装。
     wardrobe.wear('Harper', '*', 'tuxedo_formal', () => party() && C.npc?.Harper?.pronoun === 'm');

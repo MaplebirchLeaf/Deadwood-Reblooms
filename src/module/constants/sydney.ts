@@ -3,7 +3,7 @@
 // Sydney 模块沿用 V.SydneyExpansion 存档字段，保留旧存档进度。
 export interface SydneyExpansionState {
   /*
-   * 年份与日期标记阻止节庆和日常对话重复触发；dormScene 只记录神殿宿舍当前入口。
+   * 年份与日期标记阻止节庆和日常对话重复触发，dormScene 只记录神殿宿舍当前入口。
    * 一律用 -1 表示"尚未发生"，避免与第 0 天混淆。
    */
   /** 罗宾万圣节剧情已推进到的年份。 */
@@ -52,7 +52,7 @@ export interface SydneyExpansionState {
   trialTalkDay: number;
   /** 上次触碰事件的游戏日。 */
   touchDay: number;
-  /** 上次触碰的部位标识；空串表示未发生。 */
+  /** 上次触碰的部位标识，空串表示未发生。 */
   touchPart: string;
   /** 神殿宿舍与西里斯庄园共用一次夜醒机会，故合并为一个游标。 */
   night_wake_day: number;
@@ -82,7 +82,7 @@ export interface SydneyExpansionState {
     recipe_day: number;
     /** 上次沐浴探访的游戏日。 */
     bathVisitDay: number;
-    /** 上次沐浴时的访客标识；空串表示无人。 */
+    /** 上次沐浴时的访客标识，空串表示无人。 */
     bathVisitor: string;
   };
 }

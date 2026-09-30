@@ -749,10 +749,8 @@
 <<if $RobinExpansion.shopDay isnot Time.days and $RobinExpansion.shopStock gt 0 and getRobinLocation() is 'shop'>>
   <<shopicon 'register'>><<lanLink '和罗宾一起看店 (1:00)' 'Deadwood Robin Shop Shift'>><</lanLink>><br>
 <</if>>
-<<if maplebirch.get('LS') and maplebirch.get('VP')
-  and $LifeSimulation.school.role isnot 'student'
-  and $RobinExpansion.shopStock gt 0 and getRobinLocation() is 'shop'
-  and $RobinExpansion.school_drinks_day isnot Time.days
+<<if maplebirch.get('LifeSimulation') and maplebirch.get('VanillaPlus')
+  and maplebirch.get('LifeSimulation').school.canSupplyDrinks and getRobinLocation() is 'shop'
   and $VanillaPlus.finance.bank.balance gte 2000>>
   <<schoolicon 'building'>><<lanLink '请罗宾准备学生会饮品 (£20 0:20)' 'Deadwood Robin School Drinks'>><<pass 20>><</lanLink>><br>
 <</if>>
@@ -983,7 +981,7 @@
 
 :: Deadwood Robin Shop Staff Hire []
 <<set $outside to 0>><<set $location to 'town'>><<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('Robin').shop.hireStaff>>
+<<if maplebirch.get('Robin').shop.hireStaff()>>
   <<if $RobinExpansion.shopStaff is 1>>
     <<lanSwitch 'Robin pays for training and writes the first employee into the rota. The new hire checks the till and copies Robin’s recipe cards before taking a daytime shift. Robin looks relieved to know the counter has steady cover.' '罗宾付了培训费，把第一位店员写进班表。新店员核对收银，抄好罗宾的配方卡，接下白天的班次。柜台终于有人稳定照看，罗宾松了口气。'>>
   <<else>>
@@ -998,13 +996,11 @@
 
 :: Deadwood Robin School Drinks []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if maplebirch.get('LS') and maplebirch.get('VP')
-  and $LifeSimulation.school.role isnot 'student'
-  and $RobinExpansion.shopStock gt 0 and getRobinLocation() is 'shop'
-  and $RobinExpansion.school_drinks_day isnot Time.days
+<<if maplebirch.get('LifeSimulation') and maplebirch.get('VanillaPlus')
+  and maplebirch.get('LifeSimulation').school.canSupplyDrinks and getRobinLocation() is 'shop'
   and $VanillaPlus.finance.bank.balance gte 2000>>
-  <<set _payment to maplebirch.get("VP").finance.payFromBankPennies(2000)>>
-  <<if _payment is 'ok' and maplebirch.get("LS").school.organiseSchoolDrinks()>>
+  <<set _payment to maplebirch.get("VanillaPlus").finance.payFromBankPennies(2000)>>
+  <<if _payment is 'ok' and maplebirch.get("LifeSimulation").school.organiseSchoolDrinks()>>
     <<npc Robin>><<person1>>
     <<language>>
       <<option 'EN'>>Robin checks the council's order against the stock list. "One crate will cover the meeting. I'll write the price down so no one has to argue over it later." You carry the drinks back to school together. The students notice Robin's name on each label.

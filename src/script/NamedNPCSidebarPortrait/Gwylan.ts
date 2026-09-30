@@ -129,7 +129,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     const gwylan = C.npc?.Gwylan;
     if (gwylan?.init !== 1) return '';
 
-    // summon_brown_fox 生成的仍是 Gwylan；酒吧、庄园行动和救援明写绿色兜帽斗篷与狐狸面具。
+    // summon_brown_fox 生成的仍是 Gwylan，酒吧、庄园行动和救援明写绿色兜帽斗篷与狐狸面具。
     // Mansion Piano Fox 2 的面具放在旁边座位上，身份已揭露也不等于自动摘面具。
     if (title === 'Mansion Piano Fox 2') return 'brown_fox_unmasked';
     if (/^(?:Pub Brown Fox(?: |$)|Mansion Brown Fox(?: |$)|Mansion Fox Heist(?: |$)|Mansion Piano Fox$|Mansion Party Remy Brown Fox(?: |$))/.test(title)) return 'brown_fox';
@@ -143,13 +143,13 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     if (title.startsWith('Gwylan Yearning Sex') && !title.startsWith('Gwylan Yearning Sex Finish')) return 'naked';
     if (title.startsWith('Gwylan Forest Run Clearing Mount Persist') || title.startsWith('Gwylan Forest Run Sex')) return 'naked';
 
-    // 其余仪式段落穿仪式长袍；素材暂由男女驱魔师套提供，但 NPC outfit 统一记为 gwylan_ritual_robes
+    // 其余仪式段落穿仪式长袍，素材暂由男女驱魔师套提供，但 NPC outfit 统一记为 gwylan_ritual_robes
     if (title.startsWith('Gwylan Ritual') || title.startsWith('Forest Gwylan Ritual')) return 'ritual';
 
     // 厨师开场与渴望剧情的非性爱阶段穿复古正装
     if (title.startsWith('Chef Opening Gwylan') || title.startsWith('Gwylan Yearning')) return 'formal';
 
-    // 实际地点优先于日程；狗床睡眠是原版未写入持续服装状态的例外。
+    // 实际地点优先于日程，狗床睡眠是原版未写入持续服装状态的例外。
     if (title === 'Forest Shop Dog Bed Sleep') return 'sleep';
     const places: Record<string, string> = { pub: 'pub', promenade: 'town', park: 'town', forest: 'forest', forest_shop: 'shop', forest_shop_garden: 'shop' };
     if (places[V.location]) return places[V.location];
@@ -162,7 +162,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     }
     if (V.robin_in_forest_shop) return 'shop';
 
-    // 05:00–06:44 照料花园；07:00–09:20 前往咖啡馆并停留，厨师剧情改去悬崖。
+    // 05:00–06:44 照料花园，07:00–09:20 前往咖啡馆并停留，厨师剧情改去悬崖。
     if (Time.hour === 5 || (Time.hour === 6 && Time.minute < 45)) return 'garden';
     if (!V.daily.gwylan.cafeSkip) {
       const cliff = V.chef_state >= 7 && V.chef_state <= 8 && V.chef_rework <= 30;
@@ -170,7 +170,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       if (Time.hour === 7 || Time.hour === 8 || (Time.hour === 9 && Time.minute <= 20)) return cliff ? 'cliff' : 'cafe';
     }
 
-    // 非血月 23:00–05:59 睡眠；清晨花园已优先处理，狩猎期间仅在商店选择睡衣。
+    // 非血月 23:00–05:59 睡眠，清晨花园已优先处理，狩猎期间仅在商店选择睡衣。
     if (!Time.isBloodMoon() && (Time.hour >= 23 || Time.hour <= 5) && (!V.gwylan?.hunting || V.location === 'forest_shop')) return 'sleep';
     return 'shop';
   }

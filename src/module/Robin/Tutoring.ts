@@ -1,7 +1,7 @@
 import Shared from './Shared';
 
 export default class RobinTutoring extends Shared {
-  /** 周家教收入，单位英镑。学期外为 0；六节以上提价。 */
+  /** 周家教收入，单位英镑。学期外为 0，六节以上提价。 */
   public get income(): number {
     return this.state.tutor && this.state.tutorLessons > 0 && Time.schoolTerm ? (this.state.tutorLessons >= 6 ? 60 : 40) : 0;
   }
@@ -10,7 +10,7 @@ export default class RobinTutoring extends Shared {
   public start(): boolean {
     if (!this.robinAvailable || !this.state.topics.tutor || this.state.tutor || Math.max(this.state.lemonade, this.state.chocolate) < 1 || C.npc.Robin.dom < 45) return false;
     this.state.tutor = true;
-    // 当天尚未到授课时间，罗宾也能自行完成试课；已过授课时间则从下个上课日开始。
+    // 当天尚未到授课时间，罗宾也能自行完成试课，已过授课时间则从下个上课日开始。
     this.state.tutorDay = Time.hour < 19 ? Time.days - 1 : Time.days;
     return true;
   }

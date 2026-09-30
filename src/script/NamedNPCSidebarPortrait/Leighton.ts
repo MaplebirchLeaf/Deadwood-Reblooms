@@ -23,7 +23,7 @@ export default function (maplebirch: MaplebirchCore): void {
     wardrobe.base('Leighton', clothes => {
       wardrobe.put(clothes, C.npc?.Leighton?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
-    // Widgets Named Npcs 注册 teacher；办公室、巡查及妓院会面采用商务装，在场沿用原版 V.npc。
+    // Widgets Named Npcs 注册 teacher，办公室、巡查及妓院会面采用商务装，在场沿用原版 V.npc。
     wardrobe.wear('Leighton', '*', 'business_suit_male', () => C.npc?.Leighton?.pronoun === 'm');
     wardrobe.wear('Leighton', '*', 'business_suit_female', () => C.npc?.Leighton?.pronoun !== 'm');
     wardrobe.modify('Leighton', (clothes, context) => {

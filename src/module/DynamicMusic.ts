@@ -175,7 +175,7 @@ class AmbientLoop {
       this.setVolume(volume);
       return true;
     }
-    // 解码可能晚于下一次场景切换；序号让旧请求无法在新天气下启动旧环境音。
+    // 解码可能晚于下一次场景切换，序号让旧请求无法在新天气下启动旧环境音。
     const request = ++this.request;
     const buffer = await this.load(track);
     const context = this.context;
@@ -268,7 +268,7 @@ class DynamicMusic {
     }
   }
 
-  private state(): MusicState {
+  private get state(): MusicState {
     return {
       combat: V.combat,
       solarEclipse: Weather.solarEclipse,
@@ -285,7 +285,7 @@ class DynamicMusic {
     this.syncing = true;
     try {
       let desired: string | null;
-      // 播放接口异步返回时，玩家可能已经进了战斗或关闭音乐；始终收敛到最后一次请求。
+      // 播放接口异步返回时，玩家可能已经进了战斗或关闭音乐，始终收敛到最后一次请求。
       do {
         desired = this.requested;
         const current = this.core.audio.CurrentTrack;
@@ -313,7 +313,7 @@ class DynamicMusic {
 
   public refresh(): void {
     const enabled = this.options.enabled === true && this.audioPackInstalled;
-    // 本体只保存调度器；曲目和资源路径都从可选音频包的 JSON 读取。
+    // 本体只保存调度器，曲目和资源路径都从可选音频包的 JSON 读取。
     if (enabled && !this.configReady) {
       this.configLoading ??= this.loadConfig().then(loaded => {
         this.configLoading = null;
@@ -322,7 +322,7 @@ class DynamicMusic {
       });
       return;
     }
-    const state = this.state();
+    const state = this.state;
     const music = enabled ? this.tracks.selectTrack(state) : null;
     this.requested = music ? (music.file?.replace(/^audio\//, '').replace(/\.[^.]+$/, '') ?? music.track) : null;
     void this.drain();
@@ -362,14 +362,14 @@ class DynamicMusic {
       `)
     );
     this.core.var.options.define('DynamicMusic', DynamicMusic.options);
-    this.core.on(':passagedisplay', () => this.refresh(), 'DM');
-    this.core.on(':audio', () => this.ambience.setVolume(this.ambienceVolume), 'DM ambience volume');
+    this.core.on(':passagedisplay', () => this.refresh(), 'DynamicMusic');
+    this.core.on(':audio', () => this.ambience.setVolume(this.ambienceVolume), 'DynamicMusic ambience volume');
   }
 }
 
 declare module '@scml-dol-maplebirch/types' {
   interface Extensions {
-    readonly DM: DynamicMusic;
+    readonly DynamicMusic: DynamicMusic;
   }
 }
 

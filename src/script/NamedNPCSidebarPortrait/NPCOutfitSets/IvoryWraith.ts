@@ -24,7 +24,7 @@ export default function (maplebirch: MaplebirchCore): void {
         });
     }
 
-    // 原版下一次生成仍读取 ivory_robe；当前战斗的裸体、破损不能写回这份初始套装。
+    // 原版下一次生成仍读取 ivory_robe，当前战斗的裸体、破损不能写回这份初始套装。
     function sync(worn: Record<string, any>): void {
       const npc = C.npc?.[name];
       if (!npc || !present(maplebirch) || cycle(maplebirch) || !V.npc?.includes(name) || !wraith()) return;

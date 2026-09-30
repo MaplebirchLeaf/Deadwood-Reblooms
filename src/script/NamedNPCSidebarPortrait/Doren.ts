@@ -25,7 +25,7 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
     wardrobe.base('Doren', clothes => {
       wardrobe.put(clothes, C.npc?.Doren?.pronoun === 'm' ? 'male_underwear' : 'female_underwear');
     });
-    // 只在明确的运动场景穿运动套装；NPC 是否在场仍由各场景决定。
+    // 只在明确的运动场景穿运动套装，NPC 是否在场仍由各场景决定。
     wardrobe.wear('Doren', '*', 'tracksuit', () => maplebirch.passage.title === 'Doren Jog' || maplebirch.passage.title.startsWith('Deadwood Reblooms Life Simulation Gym Doren'));
     wardrobe.modify('Doren', (clothes, context) => {
       if (context.key !== 'tracksuit') return;
@@ -36,7 +36,7 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
         if (!colours.outfit.has('sport.lower')) colours.outfit.set('sport.lower', Math.random() < 0.5 ? 'trousers' : 'skort');
         if (colours.outfit.get('sport.lower') === 'skort') sidebar.apply(clothes, Clothing.open_side_skort);
       }
-      // 上下装主色取各自资源的共同选项；运动衫的配饰色也与裤子的配饰选项保持一致。
+      // 上下装主色取各自资源的共同选项，运动衫的配饰色也与裤子的配饰选项保持一致。
       let palette =
         colours.outfit.get('sport') === 'shirt'
           ? ['black', 'white', 'light pink', 'red', 'tangerine', 'teal']

@@ -36,7 +36,7 @@ class DivineTransformations {
     return Number(V.demon) >= 6;
   }
 
-  // 三种完整神圣转化各强化与其内核最贴近的一项数值；不改变原始成长值。
+  // 三种完整神圣转化各强化与其内核最贴近的一项数值，不改变原始成长值。
   public skillValue(skill: string, value: number): number {
     if ((skill === 'physique' && this.angel) || (skill === 'willpower' && this.fallenAngel)) return Math.floor(value * DivineTransformations.ATTRIBUTE_MULTIPLIER);
     return value;
@@ -58,7 +58,7 @@ class DivineTransformations {
     state.beautyBonus = next;
   }
 
-  // 完整恶魔在遭遇战中始终拥有当前容量的体液；容量本身仍由原版转化和成长决定。
+  // 完整恶魔在遭遇战中始终拥有当前容量的体液，容量本身仍由原版转化和成长决定。
   private restoreFluids(): void {
     if (!this.demon || V.combat !== 1) return;
     if (V.player?.penisExist) V.semen_amount = Number(V.semen_volume) || 0;
@@ -81,7 +81,7 @@ class DivineTransformations {
     return Object.values((V.tentacles ?? {}) as Record<string, Tentacle>);
   }
 
-  // 原版放逐的双手与满纯洁倍率在 passage 内结算；这里只提供每层的固定值与比例值。
+  // 原版放逐的双手与满纯洁倍率在 passage 内结算，这里只提供每层的固定值与比例值。
   public banishDamage(maximum: unknown): number {
     return this.damage(10, 0.1, maximum);
   }

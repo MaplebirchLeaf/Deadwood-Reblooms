@@ -26,7 +26,7 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
     });
     // Widgets Named Npcs 的 teacher：学校采用衬衫与夹克、领带和长裤，在场仍由 V.npc 决定。
     wardrobe.wear('Sirris', '*', 'business_suit_male', () => V.location === 'school');
-    // townTurtleneck/townCollar 对应成人商店与日常便装；两套按日固定，男女均采用长裤。
+    // townTurtleneck/townCollar 对应成人商店与日常便装，两套按日固定，男女均采用长裤。
     const outfits = ['turtleneck_jeans', 'shirt_khakis'] as const;
     for (const key of outfits)
       wardrobe.wear('Sirris', '*', key, () => {

@@ -43,7 +43,7 @@ export default class RobinRent extends Shared {
     return true;
   }
 
-  /** 只登记“两人共同承担”的承诺；实际付款由 payPcRent 完成。 */
+  /** 只登记“两人共同承担”的承诺，实际付款由 payPcRent 完成。 */
   public promiseBothRent(): boolean {
     if (!this.robinAvailable || !this.state.selfRent || this.state.bothRent || this.facade.income < this.bothRequirement || C.npc.Robin.dom < 80 || C.npc.Robin.love < 60 || C.npc.Robin.trauma > 30)
       return false;

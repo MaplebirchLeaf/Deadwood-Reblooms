@@ -90,7 +90,7 @@ export class RealEstate {
       void this.properties;
       void this.residentProfiles;
     });
-    // 读档只恢复 V 中的房产和结算游标；经济结算只由游戏时间跨日触发。
+    // 读档只恢复 V 中的房产和结算游标，经济结算只由游戏时间跨日触发。
     // 优先于 Finance 收取其他贷款和信用卡款项，使当天租金能先入账。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-property-management', {
       action: () => this.settleDays(),
@@ -152,7 +152,7 @@ export class RealEstate {
 
   public residentsHome(id: PropertyId): ResidentProfile[] {
     // Robin 与 Kylar 使用原版地点函数。Whitney 与 Sydney 没有同等的原版查询函数，
-    // 因此按原版夜间时段与剧情状态判断；悉尼的排除日来自 sydneySchedule。
+    // 因此按原版夜间时段与剧情状态判断，悉尼的排除日来自 sydneySchedule。
     if (this.isFrozen(id)) return [];
     return this.residentsAt(id).filter(profile => {
       switch (profile.id) {
@@ -275,7 +275,7 @@ export class RealEstate {
     if (result !== 'ok') return result;
     this.state.owned[id] = true;
     this.state.management[id] = RealEstate.newManagement();
-    if (this.state.last_managed_day < 0) this.state.last_managed_day = RealEstate.today();
+    if (this.state.last_managed_day < 0) this.state.last_managed_day = RealEstate.today;
     return 'ok';
   }
 
@@ -287,7 +287,7 @@ export class RealEstate {
     if (result !== 'ok') return result;
     this.state.owned[id] = true;
     this.state.management[id] = RealEstate.newManagement();
-    if (this.state.last_managed_day < 0) this.state.last_managed_day = RealEstate.today();
+    if (this.state.last_managed_day < 0) this.state.last_managed_day = RealEstate.today;
     return 'ok';
   }
 
@@ -298,7 +298,7 @@ export class RealEstate {
       rented: false,
       lease_end_day: null,
       auction_day: null,
-      next_settlement_day: RealEstate.today() + 7,
+      next_settlement_day: RealEstate.today + 7,
       bed_id: null,
       wardrobe_id: null,
       furnishings: {}
@@ -353,7 +353,7 @@ export class RealEstate {
     management.furnishings[kind] = itemId;
     if (kind === 'bed') management.bed_id = itemId;
     if (kind === 'wardrobe') management.wardrobe_id = itemId;
-    // 家具目录的默认目标只有原版住所；自购房的安装状态独立存档。
+    // 家具目录的默认目标只有原版住所，自购房的安装状态独立存档。
     return true;
   }
 
@@ -435,7 +435,7 @@ export class RealEstate {
   public endLease(id: PropertyId): boolean {
     const management = this.managementFor(id);
     if (!this.owns(id) || !management.rented || management.lease_end_day !== null) return false;
-    management.lease_end_day = RealEstate.today() + 7;
+    management.lease_end_day = RealEstate.today + 7;
     return true;
   }
 
@@ -443,7 +443,7 @@ export class RealEstate {
     if (!this.owns(id) || this.residentsAt(id).length > 0 || this.mortgage.current?.property_id === id) return false;
     const management = this.managementFor(id);
     if (management.rented || management.auction_day !== null) return false;
-    management.auction_day = RealEstate.today() + this.mortgage.terms.voluntary_auction_days;
+    management.auction_day = RealEstate.today + this.mortgage.terms.voluntary_auction_days;
     return true;
   }
 
@@ -465,7 +465,7 @@ export class RealEstate {
     const state = this.state;
     state.daily_evening = [];
     state.daily_night_wake = false;
-    const today = RealEstate.today();
+    const today = RealEstate.today;
     if (state.last_managed_day < 0) {
       // 没有房产也要推进个人债务。具体到期日仍由各账户自己的 V 游标决定。
       state.last_managed_day = today - 1;
@@ -513,7 +513,7 @@ export class RealEstate {
     const assessedValue = Math.floor(property.price * conditionFactor * renovationFactor);
     const percent = kind === 'foreclosure' ? this.mortgage.terms.foreclosure_auction_percent : this.mortgage.terms.voluntary_auction_percent;
     const proceeds = Math.floor((assessedValue * percent) / 100);
-    // 拍卖只把抵债后的余额存入银行；房贷状态由 Mortgage 在回调前结束。债务高于拍价时不产生负存款。
+    // 拍卖只把抵债后的余额存入银行，房贷状态由 Mortgage 在回调前结束。债务高于拍价时不产生负存款。
     const surplus = Math.max(0, proceeds - debt);
     this.finance.creditBankPennies(surplus);
     this.state.last_auction = { property_id: id, kind, proceeds, debt, surplus, day };
@@ -549,7 +549,7 @@ export class RealEstate {
     }
   }
 
-  private static today(): number {
+  private static get today(): number {
     return Math.max(0, Math.floor(Number(Time.days) || 0));
   }
 
@@ -583,7 +583,7 @@ export class RealEstate {
       space: 20,
       name
     };
-    // 拍卖曾锁住过这个衣柜；再次买下同一处房产时，保留衣物并恢复使用权。
+    // 拍卖曾锁住过这个衣柜，再次买下同一处房产时，保留衣物并恢复使用权。
     wardrobes[key].unlocked = true;
     wardrobes[key].name = name;
     const wardrobe = this.furniture(property.id, 'wardrobe');

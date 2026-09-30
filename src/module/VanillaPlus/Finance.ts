@@ -80,7 +80,7 @@ export interface FinanceState {
 }
 
 const PENCE_PER_POUND = 100;
-// 账户金额与原版 $money 都以便士保存；产品额度以英镑写在表内，初始化时统一乘 100。
+// 账户金额与原版 $money 都以便士保存，产品额度以英镑写在表内，初始化时统一乘 100。
 const ACCOUNT_TIERS = [
   { id: 'current', days: 0, balance: 0, credit: 1000, loan: 5000, atm: 2000 },
   { id: 'preferred', days: 7, balance: 5000, credit: 5000, loan: 20000, atm: 5000 },
@@ -172,7 +172,7 @@ class Finance {
   public constructor(private readonly core: typeof maplebirch) {}
 
   public get securities(): readonly Security[] {
-    // setup 只缓存静态证券目录；ALF 是否上市每次都按当前存档的农场进度重新筛选。
+    // setup 只缓存静态证券目录，ALF 是否上市每次都按当前存档的农场进度重新筛选。
     const finance = ((setup.DeadwoodReblooms ??= {}).finance ??= {});
     const securities = (finance.securities ??= Finance.loadSecurities(this.core));
     return securities.filter(item => item.symbol !== 'ALF' || Number(V.farm_stage) >= 7);
@@ -189,7 +189,7 @@ class Finance {
   public get loanPayoff(): number {
     const bank = this.state.bank;
     if (bank.loan_debt <= 0) return 0;
-    const day = Finance.currentDay();
+    const day = Finance.currentDay;
     const elapsedDays = Math.max(0, day - bank.loan_interest_last_day);
     const rate = bank.loan_rate * (day > bank.loan_due_day ? LOAN_OVERDUE_MULTIPLIER : 1);
     return bank.loan_debt + (elapsedDays > 0 ? Math.ceil((bank.loan_debt * rate * elapsedDays) / 7) : 0);
@@ -235,8 +235,8 @@ class Finance {
     const bank = this.state.bank;
     if (bank.opened) return 'already-open';
     bank.opened = true;
-    bank.opened_day = Finance.currentDay();
-    bank.bank_interest_last_day = Finance.currentDay();
+    bank.opened_day = Finance.currentDay;
+    bank.bank_interest_last_day = Finance.currentDay;
     Finance.updateAccountTier(bank);
     return 'ok';
   }
@@ -282,7 +282,7 @@ class Finance {
     return result;
   }
 
-  // 房产金额已经以便士储存；此入口不再做英镑换算。
+  // 房产金额已经以便士储存，此入口不再做英镑换算。
   public payFromBankPennies(amount: unknown): FinanceResult {
     const bank = this.state.bank;
     if (!bank.opened) return 'bank-required';
@@ -303,7 +303,7 @@ class Finance {
     return bank.credit_debt + Finance.addPercentage(value - available, CREDIT_FEE_PERCENT) <= this.accountLimits.credit;
   }
 
-  // 房贷可预留手续费和首周周供；其他调用者仍默认使用全部银行余额。
+  // 房贷可预留手续费和首周周供，其他调用者仍默认使用全部银行余额。
   public payWithCreditPennies(amount: unknown, keepBalance = 0): FinanceResult {
     const value = Number(amount);
     const bank = this.state.bank;
@@ -328,7 +328,7 @@ class Finance {
   }
 
   public collectBankPennies(amount: unknown): number {
-    // 周期费用允许部分收取；调用方负责记录剩余欠款或房况损失。
+    // 周期费用允许部分收取，调用方负责记录剩余欠款或房况损失。
     const value = Number(amount);
     if (!Number.isSafeInteger(value) || value <= 0) return 0;
     const bank = this.state.bank;
@@ -342,7 +342,7 @@ class Finance {
     const total = Math.floor(Number(amount));
     const bank = this.state.bank;
     if (!bank.bailey_knows_account || !Number.isSafeInteger(total) || total <= 0) return;
-    const cash = Finance.cashOnHand();
+    const cash = Finance.cashOnHand;
     if (cash + bank.balance < total) return;
     const withdrawn = Math.min(bank.balance, total);
     bank.balance -= withdrawn;
@@ -393,9 +393,9 @@ class Finance {
     bank.loan_rate = product.weeklyRate;
     bank.loan_term = product.days;
     bank.loan_payment = Finance.loanPayment(value, Math.ceil(product.days / 7), product.weeklyRate);
-    bank.loan_due_day = Finance.currentDay() + days;
-    bank.loan_next_payment_day = Math.min(Finance.currentDay() + 7, bank.loan_due_day);
-    bank.loan_interest_last_day = Finance.currentDay();
+    bank.loan_due_day = Finance.currentDay + days;
+    bank.loan_next_payment_day = Math.min(Finance.currentDay + 7, bank.loan_due_day);
+    bank.loan_interest_last_day = Finance.currentDay;
     bank.loan_missed_payments = 0;
     return 'ok';
   }
@@ -407,7 +407,7 @@ class Finance {
     const value = Finance.toPennies(amount);
     if (value == null) return 'invalid-amount';
     // 提前还款时结清已经使用的天数，防止周扣款日前全额还款变成无息贷款。
-    const day = Finance.currentDay();
+    const day = Finance.currentDay;
     const payoff = this.loanPayoff;
     const interest = payoff - bank.loan_debt;
     const payment = Math.min(value, payoff);
@@ -451,7 +451,7 @@ class Finance {
   public canPay(amount: unknown, source?: unknown): boolean {
     const value = Math.floor(Number(amount));
     if (!Number.isSafeInteger(value) || value < 0) return false;
-    if (source != null && !Finance.isMerchantSource(source)) return Finance.cashOnHand() >= value;
+    if (source != null && !Finance.isMerchantSource(source)) return Finance.cashOnHand >= value;
     return this.choosePayment(value) != null;
   }
 
@@ -467,7 +467,7 @@ class Finance {
   private choosePayment(value: number): PaymentMethod | null {
     const bank = this.state.bank;
     const available: Record<PaymentMethod, boolean> = {
-      cash: Finance.cashOnHand() >= value,
+      cash: Finance.cashOnHand >= value,
       debit: bank.debit_card && bank.balance >= value,
       credit: bank.credit_card && bank.credit_missed_payments === 0 && bank.credit_debt + value <= this.accountLimits.credit
     };
@@ -495,17 +495,19 @@ class Finance {
     const refresh = () => this.refreshMoneyUI();
     this.core.tool.macro.define('money', function (this: any, amountArg: unknown, sourceArg: unknown, optionalArg?: unknown) {
       const amount = Number(amountArg);
-      if (amount >= 0 || !chargeMerchant(-amount, sourceArg)) {
+      const optional = optionalArg;
+      const recordOnly = typeof optional === 'object' && optional !== null && 'recordOnly' in optional && optional.recordOnly;
+      if (recordOnly || amount >= 0 || !chargeMerchant(-amount, sourceArg)) {
         original.handler.call(this);
         return;
       }
-      const optional = optionalArg;
+      const argumentCount = this.args.length;
       this.args[2] = { ...(typeof optional === 'object' && optional !== null ? optional : {}), recordOnly: true };
       try {
         original.handler.call(this);
       } finally {
-        if (optional === undefined) this.args.length = 2;
-        else this.args[2] = optional;
+        if (argumentCount > 2) this.args[2] = optional;
+        this.args.length = argumentCount;
       }
       refresh();
     });
@@ -583,18 +585,18 @@ class Finance {
     finance.market.pending_farm_moves ??= {};
     finance.market.cafe_stage ??= Math.max(0, Math.floor(Number(V.chef_state) || 0));
     finance.market.avery_fate ??= String(V.avery_fate ?? '');
-    if (finance.bank.opened && finance.bank.bank_interest_last_day < 0) finance.bank.bank_interest_last_day = Finance.currentDay();
-    if (finance.bank.opened && finance.bank.opened_day < 0) finance.bank.opened_day = Finance.currentDay();
+    if (finance.bank.opened && finance.bank.bank_interest_last_day < 0) finance.bank.bank_interest_last_day = Finance.currentDay;
+    if (finance.bank.opened && finance.bank.opened_day < 0) finance.bank.opened_day = Finance.currentDay;
     Finance.updateAccountTier(finance.bank);
     Finance.resetAtmLimit(finance.bank);
     if (finance.bank.credit_debt > 0 && finance.bank.credit_due_day <= 0) {
-      finance.bank.credit_due_day = Finance.currentDay() + CREDIT_BILLING_DAYS;
+      finance.bank.credit_due_day = Finance.currentDay + CREDIT_BILLING_DAYS;
     }
     return finance;
   }
 
   // 金额换算与转账
-  private static cashOnHand(): number {
+  private static get cashOnHand(): number {
     const cash = Math.floor(Number(V.money));
     return Number.isFinite(cash) ? Math.max(0, cash) : 0;
   }
@@ -613,19 +615,19 @@ class Finance {
     return amount + Math.ceil((amount * percent) / 100);
   }
 
-  private static currentDay(): number {
+  private static get currentDay(): number {
     return Math.max(0, Math.floor(Number(Time.days) || 0));
   }
 
-  private static currentWeek(): number {
+  private static get currentWeek(): number {
     // 原版 Time.weekDay 是 1=周日 … 7=周六（见 datetime.js 的 weekEnd：7 或 1 为周末）。
     // 以周日为一周起点回推，否则周日会算出与本周其余六天不同的 id，ATM 额度一周重置两次。
     const weekDay = Math.clamp(Math.floor(Number(Time.weekDay) || 1), 1, 7);
-    return Finance.currentDay() - (weekDay - 1);
+    return Finance.currentDay - (weekDay - 1);
   }
 
   private static resetAtmLimit(bank: BankState): void {
-    const week = Finance.currentWeek();
+    const week = Finance.currentWeek;
     if (bank.atm_week === week) return;
     bank.atm_week = week;
     bank.atm_withdrawn = 0;
@@ -642,7 +644,7 @@ class Finance {
     if (!bank.opened) return;
     const netBalance = Math.max(0, bank.balance - bank.credit_debt - bank.loan_debt);
     bank.peak_balance = Math.max(bank.peak_balance, netBalance);
-    const age = Math.max(0, Finance.currentDay() - bank.opened_day);
+    const age = Math.max(0, Finance.currentDay - bank.opened_day);
     const cleanRecord = bank.credit_missed_payments === 0 && bank.loan_missed_payments === 0;
     const current = Math.max(
       0,
@@ -685,7 +687,7 @@ class Finance {
 
   private static addCreditDebt(bank: BankState, amount: number): void {
     if (bank.credit_debt <= 0) {
-      bank.credit_due_day = Finance.currentDay() + CREDIT_BILLING_DAYS;
+      bank.credit_due_day = Finance.currentDay + CREDIT_BILLING_DAYS;
     }
     bank.credit_debt += amount;
   }
@@ -759,7 +761,7 @@ class Finance {
     const value = Finance.toPennies(amount);
     if (value == null) return 'invalid-amount';
     const balances = {
-      cash: Finance.cashOnHand(),
+      cash: Finance.cashOnHand,
       bank: finance.bank.balance,
       brokerage: finance.brokerage.cash
     };
@@ -771,7 +773,7 @@ class Finance {
     if (source === 'cash') V.money = balances.cash - value;
     else if (source === 'bank') finance.bank.balance -= value;
     else finance.brokerage.cash -= value;
-    if (target === 'cash') V.money = Finance.cashOnHand() + value;
+    if (target === 'cash') V.money = Finance.cashOnHand + value;
     else if (target === 'bank') finance.bank.balance += value;
     else finance.brokerage.cash += value;
     return 'ok';

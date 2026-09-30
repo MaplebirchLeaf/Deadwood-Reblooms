@@ -31,7 +31,7 @@ export default class RobinFishing extends Shared {
     return DAILY_FISH_LIMIT - (this.state.fishSoldDay === Time.days ? this.state.fishSoldToday : 0);
   }
 
-  /** 原版食材售价是便士；料理按食材售价的两倍加 £1 辅料定价。返回英镑。 */
+  /** 原版食材售价是便士，料理按食材售价的两倍加 £1 辅料定价。返回英镑。 */
   public price(type: string): number {
     return (this.basePricePennies(type) * 2 + 100) / 100;
   }
