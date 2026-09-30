@@ -12,7 +12,7 @@ export default function (maplebirch: MaplebirchCore) {
         // 在原版海报图标宏执行前覆盖已计算的文件名，不替换原版的长三元表达式。
         {
           src: '<<furnitureicon _poster>>',
-          applybefore: '<<set _poster to maplebirch.MLIANPCA.icon(_furniture.poster.name, _premadePoster)>>',
+          applybefore: '<<set _poster to maplebirch.get("MLIANPCA").icon(_furniture.poster.name, _premadePoster)>>',
           expected: 1
         }
       ]
@@ -55,7 +55,7 @@ export default function (maplebirch: MaplebirchCore) {
         // 在原版移除恋爱对象组件入口调用模块清理逻辑并立即退出，防止旧逻辑重复处理。
         {
           src: '<<widget "loveInterestRemove">>',
-          applyafter: '\n\t<<run maplebirch.MLIANPCA.remove(_args[0])>><<exit>>',
+          applyafter: '\n\t<<run maplebirch.get("MLIANPCA").remove(_args[0])>><<exit>>',
           expected: 1
         }
       ]

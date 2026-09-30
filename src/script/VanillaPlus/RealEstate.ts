@@ -49,12 +49,12 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
   maplebirch.dynamic.regStateEvent('append', 'property-keys-feat', {
     output: 'earnFeat "Own Keys"',
     extra: { passage: ['Deadwood Reblooms Property Office', 'Deadwood Reblooms Property Home'] },
-    cond: () => V.feats?.currentSave['Own Keys'] === undefined && maplebirch.VP.realEstate.properties.some(property => maplebirch.VP.realEstate.owns(property.id))
+    cond: () => V.feats?.currentSave['Own Keys'] === undefined && maplebirch.get('VP')!.realEstate.properties.some(property => maplebirch.get('VP')!.realEstate.owns(property.id))
   });
   maplebirch.dynamic.regStateEvent('append', 'property-furniture-feat', {
     output: 'earnFeat "Feels Like Home"',
     extra: { passage: ['Deadwood Reblooms Property Furniture Catalogue', 'Deadwood Reblooms Property Home'] },
-    cond: () => V.feats?.currentSave['Feels Like Home'] === undefined && maplebirch.VP.realEstate.properties.some(property => maplebirch.VP.realEstate.furnished(property.id))
+    cond: () => V.feats?.currentSave['Feels Like Home'] === undefined && maplebirch.get('VP')!.realEstate.properties.some(property => maplebirch.get('VP')!.realEstate.furnished(property.id))
   });
 
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-property-furnishings-link', passage: 'Furniture Shop' });
@@ -102,7 +102,7 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
         {
           src: '<<elseif _robin_location is "sleep">>',
           applybefore:
-            '<<elseif _robin_location is "sleep" and maplebirch.VP.realEstate.residenceOf("Robin")>>\n' +
+            '<<elseif _robin_location is "sleep" and maplebirch.get("VP").realEstate.residenceOf("Robin")>>\n' +
             '\t<<lanSwitch "Robin\'s room is empty. A note says Robin has gone home to you." "罗宾的房间空着。门上的纸条写着，罗宾今晚回你们的住处。">><br><br>\n' +
             '\t<<main_hall_icon>><<link [[Main hall (0:01)|Orphanage]]>><<pass 1>><</link>><br>\n',
           expected: 1
@@ -112,7 +112,7 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
         {
           src: '<<elseif Time.dayState is "dawn">>',
           applybefore:
-            '<<elseif maplebirch.VP.realEstate.residenceOf("Whitney")>>\n' +
+            '<<elseif maplebirch.get("VP").realEstate.residenceOf("Whitney")>>\n' +
             '\t<<lanSwitch "Whitney has moved in with you. The flat is quiet behind the door." "惠特尼已经搬去与你同住。房门后静悄悄的。">><br><br>\n' +
             '\t<<getouticon>><<link [[Leave (0:02)|Barb Street]]>><<pass 2>><</link>><br>\n',
           expected: 1

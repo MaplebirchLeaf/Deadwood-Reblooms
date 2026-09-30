@@ -5,7 +5,6 @@ import Weapons from './LifeSimulation/Weapons';
 import { DEFAULT_LIFE_SIMULATION_STATE, type GymPlan } from './constants';
 
 class LifeSimulation extends Module {
-  public readonly exposed = true;
   public readonly academics = new AcademicHonours();
   public readonly school = new School(this.core);
   public readonly weapons = new Weapons();

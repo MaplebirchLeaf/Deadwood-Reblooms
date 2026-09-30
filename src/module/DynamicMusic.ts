@@ -217,7 +217,6 @@ class AmbientLoop {
 }
 
 class DynamicMusic {
-  public readonly exposed = true;
   static readonly options = { ...DEFAULT_DYNAMIC_MUSIC_OPTIONS };
 
   private readonly tracks = new DynamicMusicRegistry();

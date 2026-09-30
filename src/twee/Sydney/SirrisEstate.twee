@@ -43,13 +43,13 @@
 <!-- 原版日程把 Sydney 的一部分时段标为 home。已搬去玩家住宅时不再出现在此处。 -->
 <<widget 'deadwood-reblooms-sirris-estate-presence'>>
   <<sydneySchedule>>
-  <<set _sydneyProperty to maplebirch.get('VP') ? maplebirch.VP.realEstate.residenceOf('Sydney') : null>>
+  <<set _sydneyProperty to maplebirch.get('VP') ? maplebirch.get("VP").realEstate.residenceOf('Sydney') : null>>
   <<set _sydneyAtEstate to _sydney_location is 'home'
     and C.npc.Sydney.init is 1
     and !['prison', 'dungeon'].includes(C.npc.Sydney.state)
     and $daily.sydney.punish isnot 1
     and !$replayScene
-    and (!_sydneyProperty or !maplebirch.VP.realEstate.residentsHome(_sydneyProperty.id).some(resident => resident.id === 'Sydney'))>>
+    and (!_sydneyProperty or !maplebirch.get("VP").realEstate.residentsHome(_sydneyProperty.id).some(resident => resident.id === 'Sydney'))>>
   <!-- 西里斯教科学课且经营商店。只在晚上，或无课的商店休息日安排在家。 -->
   <<set _sirrisAtEstate to Time.hour gte 21
     or Time.hour lt 7
@@ -517,7 +517,7 @@
   <<lanSwitch 'The study is empty. You leave the lesson plan where it is.' '书房里没有人。你把教案留在原处。'>><br><br>
 <<else>>
   <<set _scienceReady to currentSkillValue('science') gte 500>>
-  <<if maplebirch.LS.school.organiseStudySession(_scienceReady)>>
+  <<if maplebirch.get("LS").school.organiseStudySession(_scienceReady)>>
     <<if _sirrisAtEstate>><<npc Sirris>><<person1>><<else>><<npc Sydney>><<person1>><</if>>
     <<language>>
       <<option 'EN'>>You spread a draft for an after-school session across the desk. <<if _sirrisAtEstate>>Sirris points out which diagrams the younger students have already seen.<<else>>Sydney finds the relevant temple notes and marks two passages to explain in plain words.<</if>>
@@ -920,7 +920,7 @@
     <<option 'CN'>><<getouticon>><<link '返回门厅' 'Deadwood Reblooms Sirris Estate Hall'>><</link>>
   <</language>>
 <<else>>
-  <<if maplebirch.get('VP')>><<run maplebirch.VP.deviancy.discover('sirris')>><</if>>
+  <<if maplebirch.get('VP')>><<run maplebirch.get("VP").deviancy.discover('sirris')>><</if>>
   <<language>>
     <<option 'EN'>><<getouticon>><<link 'Step away' 'Deadwood Reblooms Sirris Estate Sydney Room'>><<unset $mirrorMenu>><<unset $bodywritingSet>><<postMirror>><</link>>
     <<option 'CN'>><<getouticon>><<link '走开' 'Deadwood Reblooms Sirris Estate Sydney Room'>><<unset $mirrorMenu>><<unset $bodywritingSet>><<postMirror>><</link>>

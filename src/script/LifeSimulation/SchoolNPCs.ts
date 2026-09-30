@@ -17,7 +17,7 @@ export default function SchoolNPCs(maplebirch: typeof window.maplebirch): void {
 
     const applyRevealingDress = (student: SchoolStudent, clothes: WardrobeItem): void => {
       applyFreeDress(student, clothes);
-      if (!maplebirch.LS.school.prefersRevealingOutfit(student)) return;
+      if (!maplebirch.get('LS')!.school.prefersRevealingOutfit(student)) return;
       if (student === 'Robin' || student === 'Whitney') wardrobe.strip(clothes, 'upper');
       if (student === 'Sydney' || student === 'Kylar') wardrobe.strip(clothes, 'lower');
     };
@@ -28,7 +28,7 @@ export default function SchoolNPCs(maplebirch: typeof window.maplebirch): void {
         const policy = V.LifeSimulation?.school?.dress?.active as SchoolDressPolicy | undefined;
         if (!policy || policy === 'uniform') return;
 
-        if (maplebirch.LS.school.requiresNudity) {
+        if (maplebirch.get('LS')!.school.requiresNudity) {
           wardrobe.put(clothes, 'naked');
           return;
         }

@@ -15,8 +15,9 @@ export default function (maplebirch: typeof window.maplebirch) {
   };
   const active = () => V.combat === 1 && V.enemytype === 'man' && V.walltype !== 'front' && !V.gloryhole;
   const available = (hand: GripHand) => T?.[`${hand}Options`] === 'free';
-  const canStart = (hand: GripHand) => active() && available(hand) && maplebirch.VP.handGrip.target(hand) == null && maplebirch.VP.handGrip.isPenetrationRecipient(selectedTarget(hand));
-  const canKeep = (hand: GripHand) => active() && maplebirch.VP.handGrip.target(hand) != null;
+  const canStart = (hand: GripHand) =>
+    active() && available(hand) && maplebirch.get('VP')!.handGrip.target(hand) == null && maplebirch.get('VP')!.handGrip.isPenetrationRecipient(selectedTarget(hand));
+  const canKeep = (hand: GripHand) => active() && maplebirch.get('VP')!.handGrip.target(hand) != null;
   const difficulty = '<<handdifficulty>> <<if $consensual is 0>><<combatpromiscuous6>><<else>><<combatpromiscuous3>><</if>>';
   const keepDifficulty = `<<if $orgasmdown lt 1>>${difficulty}<</if>>`;
 
@@ -84,12 +85,12 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   // 抓握借用原版 handheld 占用；持续期间隐藏原版牵手选项，只保留抓握自己的继续与停止。
   maplebirch.combat.CombatAction.modify(
-    { id: 'hand-grip-left-hide-keep', actionType: 'leftaction', value: 'lefthandholdkeep', cond: () => maplebirch.VP.handGrip.target('left') == null },
-    { id: 'hand-grip-left-hide-release', actionType: 'leftaction', value: 'lefthandholdstop', cond: () => maplebirch.VP.handGrip.target('left') == null },
-    { id: 'hand-grip-left-hide-guide', actionType: 'leftaction', value: 'handguide', cond: () => maplebirch.VP.handGrip.target('left') == null },
-    { id: 'hand-grip-right-hide-keep', actionType: 'rightaction', value: 'righthandholdkeep', cond: () => maplebirch.VP.handGrip.target('right') == null },
-    { id: 'hand-grip-right-hide-release', actionType: 'rightaction', value: 'righthandholdstop', cond: () => maplebirch.VP.handGrip.target('right') == null },
-    { id: 'hand-grip-right-hide-guide', actionType: 'rightaction', value: 'handguide', cond: () => maplebirch.VP.handGrip.target('right') == null }
+    { id: 'hand-grip-left-hide-keep', actionType: 'leftaction', value: 'lefthandholdkeep', cond: () => maplebirch.get('VP')!.handGrip.target('left') == null },
+    { id: 'hand-grip-left-hide-release', actionType: 'leftaction', value: 'lefthandholdstop', cond: () => maplebirch.get('VP')!.handGrip.target('left') == null },
+    { id: 'hand-grip-left-hide-guide', actionType: 'leftaction', value: 'handguide', cond: () => maplebirch.get('VP')!.handGrip.target('left') == null },
+    { id: 'hand-grip-right-hide-keep', actionType: 'rightaction', value: 'righthandholdkeep', cond: () => maplebirch.get('VP')!.handGrip.target('right') == null },
+    { id: 'hand-grip-right-hide-release', actionType: 'rightaction', value: 'righthandholdstop', cond: () => maplebirch.get('VP')!.handGrip.target('right') == null },
+    { id: 'hand-grip-right-hide-guide', actionType: 'rightaction', value: 'handguide', cond: () => maplebirch.get('VP')!.handGrip.target('right') == null }
   );
 
   // 原版会在 showfn 隐藏右臂前先求值 srcfn，导致受缚时请求不存在的 right-arm-none.png。
@@ -114,17 +115,17 @@ export default function (maplebirch: typeof window.maplebirch) {
       'Widgets Actions Generation': [
         {
           src: '<<widget "generateActionsMan">>',
-          applyafter: '\n\t<<run maplebirch.VP.handGrip.restoreOrgasmGrip()>>',
+          applyafter: '\n\t<<run maplebirch.get("VP").handGrip.restoreOrgasmGrip()>>',
           expected: 1
         },
         {
           srcmatch: /(?:Your left hand is being held\.|你的左手被握住了。)/,
-          to: '<<if maplebirch.VP.handGrip.target("left") isnot undefined>><<deadwood-reblooms-hand-grip-status "left">><<else>>$&<</if>>',
+          to: '<<if maplebirch.get("VP").handGrip.target("left") isnot undefined>><<deadwood-reblooms-hand-grip-status "left">><<else>>$&<</if>>',
           expected: 1
         },
         {
           srcmatch: /(?:Your right hand is being held\.|你的右手被握住了。)/,
-          to: '<<if maplebirch.VP.handGrip.target("right") isnot undefined>><<deadwood-reblooms-hand-grip-status "right">><<else>>$&<</if>>',
+          to: '<<if maplebirch.get("VP").handGrip.target("right") isnot undefined>><<deadwood-reblooms-hand-grip-status "right">><<else>>$&<</if>>',
           expected: 1
         }
       ]

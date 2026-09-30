@@ -1,5 +1,5 @@
 export default function Weapons(maplebirch: typeof window.maplebirch): void {
-  const weapons = maplebirch.LS.weapons;
+  const weapons = maplebirch.get('LS')!.weapons;
   maplebirch.combat.CombatAction.reg({
     id: 'ls-weapon',
     actionType: ['leftaction', 'rightaction'],

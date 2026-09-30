@@ -55,60 +55,60 @@ export default function (maplebirch: typeof window.maplebirch) {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:willpower:name'),
       colour: 'gold',
-      has: () => maplebirch.VP.hasTrait('willpower'),
+      has: () => maplebirch.get('VP')!.hasTrait('willpower'),
       text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:willpower:text')
     },
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:physique:name'),
       colour: 'gold',
-      has: () => maplebirch.VP.hasTrait('physique'),
+      has: () => maplebirch.get('VP')!.hasTrait('physique'),
       text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:physique:text')
     },
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:beauty:name'),
       colour: 'gold',
-      has: () => maplebirch.VP.hasTrait('beauty'),
+      has: () => maplebirch.get('VP')!.hasTrait('beauty'),
       text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:beauty:text')
     },
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:exhibitionism:name'),
       colour: 'lustful',
-      has: () => maplebirch.VP.hasTrait('exhibitionism'),
+      has: () => maplebirch.get('VP')!.hasTrait('exhibitionism'),
       text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:exhibitionism:text')
     },
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:deviancy:name'),
       colour: 'lustful',
-      has: () => maplebirch.VP.hasTrait('deviancy'),
+      has: () => maplebirch.get('VP')!.hasTrait('deviancy'),
       text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:deviancy:text')
     },
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:promiscuity:name'),
       colour: 'lustful',
-      has: () => maplebirch.VP.hasTrait('promiscuity'),
+      has: () => maplebirch.get('VP')!.hasTrait('promiscuity'),
       text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:promiscuity:text')
     },
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:incorrigible:name'),
       colour: 'silver',
-      has: () => maplebirch.VP.hasTrait('incorrigible'),
+      has: () => maplebirch.get('VP')!.hasTrait('incorrigible'),
       text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:incorrigible:text')
     }
   );
 
   maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-traits', {
     output: 'deadwood-reblooms-trait-unlocks',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.traitsPending
+    cond: () => V.VanillaPlus != null && maplebirch.get('VP')!.traitsPending
   });
   maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-preserve', {
-    output: 'run maplebirch.VP.preserve()',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.belowMinimum
+    output: 'run maplebirch.get("VP").preserve()',
+    cond: () => V.VanillaPlus != null && maplebirch.get('VP')!.belowMinimum
   });
   maplebirch.dynamic.regStateEvent('append', 'vanilla-plus-all-max-feat', {
     output: 'earnFeat "Every Limit Broken"',

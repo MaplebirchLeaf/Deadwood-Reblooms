@@ -7,7 +7,7 @@ type SkyColors = {
 };
 
 function eclipseStrength(): number {
-  const progress = Math.clamp(maplebirch.CA.SolarEclipsePhase, 0, 1) * 25;
+  const progress = Math.clamp(maplebirch.get('CA')!.SolarEclipsePhase, 0, 1) * 25;
   if (progress < 1) return progress * 0.25;
   if (progress < 4) return 0.25 + ((progress - 1) / 3) * 0.25;
   if (progress < 9) return 0.5 + ((progress - 4) / 5) * 0.5;
@@ -139,7 +139,7 @@ function applySolarEclipseLayer(): void {
       effects: Array.from({ length: 7 }, (_, index) => ({
         effect: 'skyOrbital',
         drawCondition(this: any): boolean {
-          return Weather.solarEclipse && this.renderInstance.orbitals.sun.factor > -0.5 && !this.renderInstance.sidebarSkyDisabled && maplebirch.CA.SolarEclipseStageIndex === index;
+          return Weather.solarEclipse && this.renderInstance.orbitals.sun.factor > -0.5 && !this.renderInstance.sidebarSkyDisabled && maplebirch.get('CA')!.SolarEclipseStageIndex === index;
         },
         params: {
           images: {

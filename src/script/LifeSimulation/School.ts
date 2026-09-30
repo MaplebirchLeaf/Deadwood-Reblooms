@@ -44,7 +44,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   // 包装原版校服判断，保留原函数与其他模组继续串联包装的空间。
   maplebirch.tool.onInit(() => {
     const wearingSchoolOutfit = window.wearingSchoolOutfit;
-    if (wearingSchoolOutfit) window.wearingSchoolOutfit = () => maplebirch.LS.school.meetsDressCode(wearingSchoolOutfit());
+    if (wearingSchoolOutfit) window.wearingSchoolOutfit = () => maplebirch.get('LS')!.school.meetsDressCode(wearingSchoolOutfit());
 
     // 原版的课程提示由 questmarker 独立生成；免听时只关闭学校提醒。
     const events = (setup as typeof setup & { events?: Array<{ name: string; condition: () => boolean; text: string }> }).events;
@@ -141,7 +141,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   });
   maplebirch.dynamic.regStateEvent('gate', 'life-simulation-school-dress-enforcement', {
     output: 'deadwood-reblooms-life-simulation-school-enforce-clothes',
-    cond: () => V.location === 'school' && maplebirch.LS.school.requiresNudity && V.LifeSimulation?.school?.clothesStored !== true
+    cond: () => V.location === 'school' && maplebirch.get('LS')!.school.requiresNudity && V.LifeSimulation?.school?.clothesStored !== true
   });
 
   const schoolPassages: Record<string, PassagePatch[]> = {

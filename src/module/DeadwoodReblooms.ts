@@ -153,7 +153,6 @@ class DeadwoodReblooms extends Module {
     hideEarSlimeParasites: false as boolean
   };
 
-  public readonly exposed = true;
   public readonly guide: Guide;
   public hint?: ReturnType<Guide['bind']>;
   private random?: ReturnType<typeof maplebirch.tool.rand.create>;
@@ -236,7 +235,7 @@ class DeadwoodReblooms extends Module {
       this.log('Failed to migrate Deadwood module settings', 'ERROR', error);
     }
     this.baileyRent.preInit();
-    this.core.tool.onInit(() => setup.maplebirch.hint.push('<<= maplebirch.DR.wiki>>'));
+    this.core.tool.onInit(() => setup.maplebirch.hint.push('<<= maplebirch.get("DR").wiki>>'));
     this.core.once(':storyready', () => {
       $('#history-backward').ariaClick(() => this.rand.back(1));
       $('#history-forward').ariaClick(() => this.rand.forward(1));

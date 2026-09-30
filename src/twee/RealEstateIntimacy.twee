@@ -1,12 +1,12 @@
 :: Deadwood Reblooms Property Night Wake []
-<<set _property to maplebirch.VP.realEstate.current>>
-<<set _partner to maplebirch.VP.realEstate.currentCompanion>>
-<<if !_property || !_partner || !maplebirch.VP.realEstate.residentsHome(_property.id).some(resident => resident.id === _partner.id)>>
+<<set _property to maplebirch.get("VP").realEstate.current>>
+<<set _partner to maplebirch.get("VP").realEstate.currentCompanion>>
+<<if !_property || !_partner || !maplebirch.get("VP").realEstate.residentsHome(_property.id).some(resident => resident.id === _partner.id)>>
 	<<lanSwitch 'The other side of the bed is empty. You pull the covers close.' '床的另一侧空了。你把被子拉回身上。'>>
 	<br><br>
 	<<getouticon>><<lanLink '起床' 'Deadwood Reblooms Property Bedroom'>><<set $sleephour to 0>><<deadwood-reblooms-property-clothes-on>><</lanLink>>
 <<else>>
-	<<run maplebirch.VP.realEstate.enter()>>
+	<<run maplebirch.get("VP").realEstate.enter()>>
 	<<npc _partner.id>><<person1>><<run statusCheck(_partner.id)>>
 	<<language>>
 		<<option 'EN'>>
@@ -75,13 +75,13 @@
 
 :: Deadwood Reblooms Property Intimacy []
 <!-- 入口已从当晚在家的同住者中选人。战斗回合跨过起床时间后，继续使用当前存档里选中的同一人。 -->
-<<set _property to maplebirch.VP.realEstate.current>>
-<<set _partner to maplebirch.VP.realEstate.currentCompanion>>
-<<if !_property || !_partner || !maplebirch.VP.realEstate.owns(_property.id) || maplebirch.VP.realEstate.managementFor(_property.id).rented>>
+<<set _property to maplebirch.get("VP").realEstate.current>>
+<<set _partner to maplebirch.get("VP").realEstate.currentCompanion>>
+<<if !_property || !_partner || !maplebirch.get("VP").realEstate.owns(_property.id) || maplebirch.get("VP").realEstate.managementFor(_property.id).rented>>
 	<<set $sexstart to 0>>
 	<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
 <<else>>
-	<<run maplebirch.VP.realEstate.enter()>>
+	<<run maplebirch.get("VP").realEstate.enter()>>
 	<!-- 悉尼的临时状态每回合重建，沿用原版 Sydney Shopping Sex 的战斗标记。 -->
 	<<if _partner.id is 'Sydney'>><<run statusCheck('Sydney')>><<set $corruptionEvent to 1>><</if>>
 	<<if $sexstart is 1>>
@@ -205,8 +205,8 @@
 <</if>>
 
 :: Deadwood Reblooms Property Intimacy Finish []
-<<set _partner to maplebirch.VP.realEstate.currentCompanion>>
-<<run maplebirch.VP.realEstate.enter()>><<effects>>
+<<set _partner to maplebirch.get("VP").realEstate.currentCompanion>>
+<<run maplebirch.get("VP").realEstate.enter()>><<effects>>
 <<if _partner>>
 	<<if _partner.id is 'Sydney' and $enemyarousal gte $enemyarousalmax>>
 		<<person1>><<run statusCheck('Sydney')>>

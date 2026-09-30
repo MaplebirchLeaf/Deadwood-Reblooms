@@ -13,7 +13,7 @@ export default function (maplebirch: typeof window.maplebirch) {
       title: 'School Traits',
       name: () => text(subject, 'name'),
       colour,
-      has: () => maplebirch.LS.academics.has(subject),
+      has: () => maplebirch.get('LS')!.academics.has(subject),
       text: () => text(subject, 'text')
     }))
   );

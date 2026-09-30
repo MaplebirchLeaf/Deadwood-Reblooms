@@ -11,7 +11,7 @@
 
 <!-- 属性达到第七级上限后，显示本轮实际获得的特质；属性突破提示仍由各自场景负责。 -->
 <<widget 'deadwood-reblooms-trait-unlocks'>>
-  <<set _unlockedTraits to maplebirch.VP.unlockTraits()>>
+  <<set _unlockedTraits to maplebirch.get("VP").unlockTraits()>>
   <<for _trait range _unlockedTraits>>
     <<set _traitName to maplebirch.t(`deadwood-reblooms:VanillaPlus:traits:${_trait}:name`)>>
     <<set _traitNotice to maplebirch.t('deadwood-reblooms:VanillaPlus:traits:unlocked', { name: _traitName })>>
@@ -42,7 +42,7 @@
       <<option 'CN'>>
         <<set $_display_text to `你的身体${$player.bodyshape === 'soft' ? '强壮' : '健美'}且已臻巅峰。`>>
     <</language>>
-    <<set _physiqueConfig.maxValue to maplebirch.VP.ceiling('physique')>>
+    <<set _physiqueConfig.maxValue to maplebirch.get("VP").ceiling('physique')>>
     <<run _physiqueConfig.states.push({ requiredValue: _physiqueConfig.maxValue, level: 7, color: 'gold', description: $_display_text })>>
     <<if $physique gte _physiqueConfig.maxValue>><<set _physiqueConfig.percent to 100>><</if>>
   <</if>>
@@ -54,7 +54,7 @@
       <<option 'CN'>>
         <<set $_display_text to '你坚毅不可撼动。'>>
     <</language>>
-    <<set _willpowerConfig.maxValue to maplebirch.VP.ceiling('willpower')>>
+    <<set _willpowerConfig.maxValue to maplebirch.get("VP").ceiling('willpower')>>
     <<run _willpowerConfig.states.push({ requiredValue: _willpowerConfig.maxValue, level: 7, color: 'gold', description: $_display_text })>>
     <<if $willpower gte _willpowerConfig.maxValue>><<set _willpowerConfig.percent to 100>><</if>>
   <</if>>
@@ -66,7 +66,7 @@
       <<option 'CN'>>
         <<set $_display_text to '你的容貌超凡脱俗。'>>
     <</language>>
-    <<set _beautyConfig.maxValue to maplebirch.VP.ceiling('beauty')>>
+    <<set _beautyConfig.maxValue to maplebirch.get("VP").ceiling('beauty')>>
     <<run _beautyConfig.states.push({ requiredValue: _beautyConfig.maxValue, level: 7, color: 'gold', description: $_display_text })>>
     <<if $beauty gte _beautyConfig.maxValue>><<set _beautyConfig.percent to 100>><</if>>
   <</if>>
@@ -79,7 +79,7 @@
         <<set $_display_text to '你已被欲望吞噬。'>>
     <</language>>
 
-    <<set _promiscuityConfig.maxValue to maplebirch.VP.ceiling('promiscuity')>>
+    <<set _promiscuityConfig.maxValue to maplebirch.get("VP").ceiling('promiscuity')>>
     <<run _promiscuityConfig.states.push({ requiredValue: _promiscuityConfig.maxValue, level: 7, color: 'lustful', description: $_display_text })>>
     <<if $promiscuity gte _promiscuityConfig.maxValue>><<set _promiscuityConfig.percent to 100>><</if>>
   <</if>>
@@ -91,7 +91,7 @@
       <<option 'CN'>>
         <<set $_display_text to '赤裸之欢愉教你神魂颠倒。'>>
     <</language>>
-    <<set _exhibitionismConfig.maxValue to maplebirch.VP.ceiling('exhibitionism')>>
+    <<set _exhibitionismConfig.maxValue to maplebirch.get("VP").ceiling('exhibitionism')>>
     <<run _exhibitionismConfig.states.push({ requiredValue: _exhibitionismConfig.maxValue, level: 7, color: 'lustful', description: $_display_text })>>
     <<if $exhibitionism gte _exhibitionismConfig.maxValue>><<set _exhibitionismConfig.percent to 100>><</if>>
   <</if>>
@@ -103,7 +103,7 @@
       <<option 'CN'>>
         <<set $_display_text to '禁忌本能正在主宰你。'>>
     <</language>>
-    <<set _deviancyConfig.maxValue to maplebirch.VP.ceiling('deviancy')>>
+    <<set _deviancyConfig.maxValue to maplebirch.get("VP").ceiling('deviancy')>>
     <<run _deviancyConfig.states.push({ requiredValue: _deviancyConfig.maxValue, level: 7, color: 'lustful', description: $_display_text })>>
     <<if $deviancy gte _deviancyConfig.maxValue>><<set _deviancyConfig.percent to 100>><</if>>
   <</if>>
@@ -111,7 +111,7 @@
 
 <!-- 异种癖仪式入口：满足 Gwylan 与仪式条件时显示主持选项。 -->
 <<widget 'deadwood-reblooms-deviancy-conduct-link'>>
-  <<set $_canConductDeviancy to maplebirch.VP.deviancy.canConduct and $phase isnot 'no'>>
+  <<set $_canConductDeviancy to maplebirch.get("VP").deviancy.canConduct and $phase isnot 'no'>>
   <<set $_canConductDeviancy to $_canConductDeviancy and !_gwylanStatus.includes('cautious')>>
   <<set $_canConductDeviancy to $_canConductDeviancy and $settings.tentaclesEnabled and $settings.hypnosisEnabled>>
   <<if $_canConductDeviancy and !playerChastity()>>
@@ -138,7 +138,7 @@
 
 <!-- 原版地图的相邻地点与移动组件仍负责路线和效果；特质只补足白天裸露时被隐藏的链接。 -->
 <<widget 'deadwood-reblooms-public-walk-links'>>
-  <<if maplebirch.VP.exhibitionism.canRoamTown and $map.available and $map.available[$passage]>>
+  <<if maplebirch.get("VP").exhibitionism.canRoamTown and $map.available and $map.available[$passage]>>
     <<set _routeWidgets to { 'Domus Street': 'domus', 'Barb Street': 'barb', 'Danube Street': 'danube', 'Connudatus Street': 'connudatus', 'Cliff Street': 'cliff', 'Wolf Street': 'wolf', 'High Street': 'high', 'Starfish Street': 'starfish', 'Nightingale Street': 'nightingale', 'Oxford Street': 'oxford', 'Mer Street': 'mer', 'Elk Street': 'elk', 'Harvest Street': 'harvest', 'Residential Alleyways': 'residential', 'Commercial Alleyways': 'commercial', 'Industrial Alleyways': 'industrial', 'Park': 'park' }>>
     <<if Time.dayState isnot 'night'>>
       <<set _walkTargets to $map.available[$passage].filter(target => _routeWidgets[target] && !$link_table.some(link => link.includes('|' + target + ']]')) )>>
@@ -211,7 +211,7 @@
 
 <!-- 战斗挣脱结算：消耗体格突破效果并解除指定部位束缚。 -->
 <<widget 'deadwood-reblooms-physique-combat-break'>>
-  <<run maplebirch.VP.physique.use()>>
+  <<run maplebirch.get("VP").physique.use()>>
   <<switch _args[0]>>
     <<case 'arms'>>
       <<arm_unbind>>
@@ -229,17 +229,17 @@
 <!-- 诡异镜入口：已发现镜面且通道开放时进入触手平原。 -->
 <<widget 'deadwood-reblooms-deviancy-eerie-mirror-link'>><<silently>>
   <<set _banishAvailable to !pcAreArmsBound('both') and $angel gte 4 and $angelBanish gte 1>>
-  <<set _showMirrorLink to _args[0] is (_banishAvailable ? 1 : 0) and maplebirch.VP.deviancy.mirrorOpen and maplebirch.VP.deviancy.discovered('home')>>
+  <<set _showMirrorLink to _args[0] is (_banishAvailable ? 1 : 0) and maplebirch.get("VP").deviancy.mirrorOpen and maplebirch.get("VP").deviancy.discovered('home')>>
 <</silently>><<if _showMirrorLink>><<deadwood-reblooms-deviancy-mirror-enter-link 'home'>><</if>><</widget>>
 
 <<widget 'deadwood-reblooms-deviancy-mirror-enter-link'>>
   <<set $_mirror to _args[0]>>
-  <<if maplebirch.VP.deviancy.mirrorOpen and maplebirch.VP.deviancy.discovered($_mirror, $_mirror is 'property' ? maplebirch.VP.realEstate.current?.id : undefined)>>
+  <<if maplebirch.get("VP").deviancy.mirrorOpen and maplebirch.get("VP").deviancy.discovered($_mirror, $_mirror is 'property' ? maplebirch.get("VP").realEstate.current?.id : undefined)>>
     <br>
     <<mirroricon 'blood'>><<lanLink '穿过诡异镜面' 'Deadwood Reblooms Deviancy Mirror Enter' >>
-      <<set $VanillaPlus.deviancy.mirrorOrigin to $_mirror is 'property' ? 'property:' + maplebirch.VP.realEstate.current.id : $_mirror>>
-      <<if $_mirror is 'property'>><<set $VanillaPlus.deviancy.mirror_property to maplebirch.VP.realEstate.current.id>><</if>>
-      <<run maplebirch.VP.deviancy.enter()>>
+      <<set $VanillaPlus.deviancy.mirrorOrigin to $_mirror is 'property' ? 'property:' + maplebirch.get("VP").realEstate.current.id : $_mirror>>
+      <<if $_mirror is 'property'>><<set $VanillaPlus.deviancy.mirror_property to maplebirch.get("VP").realEstate.current.id>><</if>>
+      <<run maplebirch.get("VP").deviancy.enter()>>
     <</lanLink>>
       <<note `lanSwitch('Deviancy', '异种癖')` 'red'>>
     <br>
@@ -257,15 +257,15 @@
     and $KylarExpansion.stay_invited and isLoveInterest('Kylar')
     and C.npc.Kylar.state is 'active'
     and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
-    and (!maplebirch.get('VP') or !maplebirch.VP.realEstate.residenceOf('Kylar'))>>
-  <<if _mirrorLocations.home and maplebirch.VP.deviancy.discovered('home')>>
+    and (!maplebirch.get('VP') or !maplebirch.get("VP").realEstate.residenceOf('Kylar'))>>
+  <<if _mirrorLocations.home and maplebirch.get("VP").deviancy.discovered('home')>>
     <<run _mirrorTargets.push({..._mirrorLocations.home, EN: 'your bedroom mirror', CN: '卧室的镜子'})>>
   <</if>>
-  <<for _property range maplebirch.VP.realEstate.properties>>
+  <<for _property range maplebirch.get("VP").realEstate.properties>>
     <<set _coordinates to _mirrorLocations['property:' + _property.id]>>
-    <<if _coordinates and maplebirch.VP.deviancy.discovered('property', _property.id)
-      and maplebirch.VP.realEstate.owns(_property.id)
-      and !maplebirch.VP.realEstate.managementFor(_property.id).rented>>
+    <<if _coordinates and maplebirch.get("VP").deviancy.discovered('property', _property.id)
+      and maplebirch.get("VP").realEstate.owns(_property.id)
+      and !maplebirch.get("VP").realEstate.managementFor(_property.id).rented>>
       <<run _mirrorTargets.push({
         north: _coordinates.north,
         east: _coordinates.east,
@@ -274,19 +274,19 @@
       })>>
     <</if>>
   <</for>>
-  <<if _mirrorLocations.farm and maplebirch.VP.deviancy.discovered('farm')>>
+  <<if _mirrorLocations.farm and maplebirch.get("VP").deviancy.discovered('farm')>>
     <<run _mirrorTargets.push({..._mirrorLocations.farm, EN: 'the farm mirror', CN: '农场的镜子'})>>
   <</if>>
-  <<if _mirrorLocations.tower and maplebirch.VP.deviancy.discovered('tower')>>
+  <<if _mirrorLocations.tower and maplebirch.get("VP").deviancy.discovered('tower')>>
     <<run _mirrorTargets.push({..._mirrorLocations.tower, EN: 'the tower mirror', CN: '高塔的镜子'})>>
   <</if>>
-  <<if _mirrorLocations.temple and maplebirch.VP.deviancy.discovered('temple')>>
+  <<if _mirrorLocations.temple and maplebirch.get("VP").deviancy.discovered('temple')>>
     <<run _mirrorTargets.push({..._mirrorLocations.temple, EN: 'the temple mirror', CN: '神殿宿舍的镜子'})>>
   <</if>>
-  <<if _mirrorLocations.sirris and _sirrisMirrorReady and maplebirch.VP.deviancy.discovered('sirris')>>
+  <<if _mirrorLocations.sirris and _sirrisMirrorReady and maplebirch.get("VP").deviancy.discovered('sirris')>>
     <<run _mirrorTargets.push({..._mirrorLocations.sirris, EN: "Sydney's bedroom mirror", CN: '悉尼卧室的镜子'})>>
   <</if>>
-  <<if _mirrorLocations.kylar and _kylarMirrorReady and maplebirch.VP.deviancy.discovered('kylar')>>
+  <<if _mirrorLocations.kylar and _kylarMirrorReady and maplebirch.get("VP").deviancy.discovered('kylar')>>
     <<run _mirrorTargets.push({..._mirrorLocations.kylar, EN: "Kylar's bedroom mirror", CN: '凯拉尔卧室的镜子'})>>
   <</if>>
   <!-- 只提示最近的异地出口。同格出口由下方真实链接显示，无需方向提示。 -->
@@ -322,16 +322,16 @@
     <<if _mirrorLocations.home
       and $tentnorth is _mirrorLocations.home.north
       and $tenteast is _mirrorLocations.home.east
-      and maplebirch.VP.deviancy.discovered('home')>>
+      and maplebirch.get("VP").deviancy.discovered('home')>>
       <<mirroricon 'blood'>><<lanLink '从卧室镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Home'>><</lanLink>>
       <br>
     <</if>>
-    <<for _property range maplebirch.VP.realEstate.properties>>
+    <<for _property range maplebirch.get("VP").realEstate.properties>>
       <<capture _property>>
         <<set _mirrorCoordinates to _mirrorLocations['property:' + _property.id]>>
-        <<if _mirrorCoordinates and maplebirch.VP.deviancy.discovered('property', _property.id)
-          and maplebirch.VP.realEstate.owns(_property.id)
-          and !maplebirch.VP.realEstate.managementFor(_property.id).rented>>
+        <<if _mirrorCoordinates and maplebirch.get("VP").deviancy.discovered('property', _property.id)
+          and maplebirch.get("VP").realEstate.owns(_property.id)
+          and !maplebirch.get("VP").realEstate.managementFor(_property.id).rented>>
           <<if $tentnorth is _mirrorCoordinates.north and $tenteast is _mirrorCoordinates.east>>
             <<language>>
               <<option 'EN'>>
@@ -351,28 +351,28 @@
     <<if _mirrorLocations.farm
       and $tentnorth is _mirrorLocations.farm.north
       and $tenteast is _mirrorLocations.farm.east
-      and maplebirch.VP.deviancy.discovered('farm')>>
+      and maplebirch.get("VP").deviancy.discovered('farm')>>
       <<mirroricon 'blood'>><<lanLink '从农场镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Farm'>><</lanLink>>
       <br>
     <</if>>
     <<if _mirrorLocations.tower
       and $tentnorth is _mirrorLocations.tower.north
       and $tenteast is _mirrorLocations.tower.east
-      and maplebirch.VP.deviancy.discovered('tower')>>
+      and maplebirch.get("VP").deviancy.discovered('tower')>>
       <<mirroricon 'blood'>><<lanLink '从高塔镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Tower'>><</lanLink>>
       <br>
     <</if>>
     <<if _mirrorLocations.temple
       and $tentnorth is _mirrorLocations.temple.north
       and $tenteast is _mirrorLocations.temple.east
-      and maplebirch.VP.deviancy.discovered('temple')>>
+      and maplebirch.get("VP").deviancy.discovered('temple')>>
       <<mirroricon 'blood'>><<lanLink '从神殿宿舍的镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Temple'>><</lanLink>>
       <br>
     <</if>>
     <<if _mirrorLocations.sirris and _sirrisMirrorReady
       and $tentnorth is _mirrorLocations.sirris.north
       and $tenteast is _mirrorLocations.sirris.east
-      and maplebirch.VP.deviancy.discovered('sirris')>>
+      and maplebirch.get("VP").deviancy.discovered('sirris')>>
       <<language>>
         <<option 'EN'>><<mirroricon 'blood'>><<link "Climb through Sydney's bedroom mirror" 'Deadwood Reblooms Deviancy Mirror Sirris'>><</link>>
         <<option 'CN'>><<mirroricon 'blood'>><<link '从悉尼卧室的镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Sirris'>><</link>>
@@ -381,7 +381,7 @@
     <<if _mirrorLocations.kylar and _kylarMirrorReady
       and $tentnorth is _mirrorLocations.kylar.north
       and $tenteast is _mirrorLocations.kylar.east
-      and maplebirch.VP.deviancy.discovered('kylar')>>
+      and maplebirch.get("VP").deviancy.discovered('kylar')>>
       <<language>>
         <<option 'EN'>><<mirroricon 'blood'>><<link "Climb through Kylar's bedroom mirror" 'Deadwood Reblooms Deviancy Mirror Kylar'>><</link>>
         <<option 'CN'>><<mirroricon 'blood'>><<link '从凯拉尔卧室的镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Kylar'>><</link>>
@@ -463,7 +463,7 @@
 
 <!-- 意志突破入口：条件满足时允许再次潜向符文。 -->
 <<widget 'deadwood-reblooms-willpower-unlock'>>
-  <<if maplebirch.VP.willpower.unlock>>
+  <<if maplebirch.get("VP").willpower.unlock>>
     <<language>>
       <<option 'EN'>>
         <<link [[Dive towards the rune again|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>

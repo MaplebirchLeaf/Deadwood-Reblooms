@@ -15,7 +15,6 @@ import RealEstate from './VanillaPlus/RealEstate';
 import Willpower from './VanillaPlus/Willpower';
 
 class VanillaPlus extends Module {
-  public readonly exposed = true;
   public readonly beauty: Beauty;
   public readonly deviancy: Deviancy;
   public readonly divineTransformations = new DivineTransformations();

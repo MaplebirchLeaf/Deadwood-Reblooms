@@ -259,7 +259,7 @@ class NPCAvatars {
       .toLowerCase();
     if (normalized.includes('vrel') && normalized.includes('puri')) return 'poster_purivrel';
     for (const [icon, aliases] of Object.entries(NPCAvatars.posterAliases)) if (aliases.some(alias => normalized === alias.toLowerCase())) return `poster_${icon}`;
-    if (['象牙怨灵', 'ivory wraith'].some(alias => normalized.includes(alias))) return this.core.DR.rng > 96 ? 'poster_iwlife' : `poster_iw${V.wraith.state}`;
+    if (['象牙怨灵', 'ivory wraith'].some(alias => normalized.includes(alias))) return this.core.get('DR')!.rng > 96 ? 'poster_iwlife' : `poster_iw${V.wraith.state}`;
     return ['dol', 'degrees of lewdity'].some(alias => normalized.includes(alias)) ? 'poster_dol' : 'poster';
   }
 
@@ -543,7 +543,6 @@ class MoreLoveInterests {
 }
 
 class MoreLoveInterestsAndNPCAvatars {
-  public readonly exposed = true;
   private readonly avatars: NPCAvatars;
   private readonly loveInterests: MoreLoveInterests;
 

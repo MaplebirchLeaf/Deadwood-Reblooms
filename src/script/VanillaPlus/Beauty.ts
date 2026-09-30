@@ -17,15 +17,15 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.dynamic.regStateEvent('append', 'beauty-max', {
     output: 'earnFeat "Unadorned"',
-    cond: () => V.feats?.currentSave['Unadorned'] === undefined && V.VanillaPlus != null && maplebirch.VP.beauty.max
+    cond: () => V.feats?.currentSave['Unadorned'] === undefined && V.VanillaPlus != null && maplebirch.get('VP')!.beauty.max
   });
   maplebirch.dynamic.regStateEvent('gate', 'beauty-unlock', {
     output: 'deadwood-reblooms-beauty-unlock',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.beauty.unlock
+    cond: () => V.VanillaPlus != null && maplebirch.get('VP')!.beauty.unlock
   });
   maplebirch.dynamic.regStateEvent('gate', 'beauty-alluring', {
-    output: 'run maplebirch.VP.beauty.rememberAllure()',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.beauty.alluring && !V.VanillaPlus.beauty.alluring
+    output: 'run maplebirch.get("VP").beauty.rememberAllure()',
+    cond: () => V.VanillaPlus != null && maplebirch.get('VP')!.beauty.alluring && !V.VanillaPlus.beauty.alluring
   });
 
   // 原版言语动作的结算点各一处；仅增强实际发生的减怒。
@@ -47,7 +47,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         {
           // 同一诱惑评分公式在明示与隐藏属性分支复用；显示与实际等级一起提高。
           src: '$attractiveness + (currentSkillValue("seductionskill") * 5)',
-          to: '$attractiveness + (currentSkillValue("seductionskill") * 5) + maplebirch.VP.beauty.seductionBonus',
+          to: '$attractiveness + (currentSkillValue("seductionskill") * 5) + maplebirch.get("VP").beauty.seductionBonus',
           expected: 10
         }
       ]
@@ -61,7 +61,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 将作弊面板的美貌滑条上限改为动态上限；未锁定突破时仍使用原版 $beautymax。
         {
           srcmatch: /\$beauty "beauty" \{max: (10000)( \* \$AMCTraits\.beauty)?(, percentage: false)?\}/,
-          to: '$beauty "beauty" {max: maplebirch.VP.divineTransformations.beautyCeiling($VanillaPlus.lock.beauty ? maplebirch.VP.ceiling("beauty") : $1$2)$3}',
+          to: '$beauty "beauty" {max: maplebirch.get("VP").divineTransformations.beautyCeiling($VanillaPlus.lock.beauty ? maplebirch.get("VP").ceiling("beauty") : $1$2)$3}',
           expected: 1
         }
       ],
@@ -69,7 +69,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 替换全局美貌钳制公式，同时应用特质保底值与突破后的 125% 上限。
         {
           srcmatch: /<<set \$beauty = Math\.clamp\(\$beauty, 0, \$beautymax( \* \$AMCTraits\.beauty)?\)>>/,
-          to: '<<set $beauty = Math.clamp($beauty, maplebirch.VP.beauty.floor, maplebirch.VP.divineTransformations.beautyCeiling($VanillaPlus.lock.beauty ? maplebirch.VP.ceiling("beauty") : $beautymax$1))>>',
+          to: '<<set $beauty = Math.clamp($beauty, maplebirch.get("VP").beauty.floor, maplebirch.get("VP").divineTransformations.beautyCeiling($VanillaPlus.lock.beauty ? maplebirch.get("VP").ceiling("beauty") : $beautymax$1))>>',
           expected: 1
         }
       ]

@@ -31,14 +31,14 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.dynamic.regStateEvent('gate', 'deviancy-unlock', {
     output: 'deadwood-reblooms-deviancy-unlock',
-    cond: () => V.VanillaPlus != null && maplebirch.VP.deviancy.unlock
+    cond: () => V.VanillaPlus != null && maplebirch.get('VP')!.deviancy.unlock
   });
   maplebirch.dynamic.regStateEvent('append', 'deviancy-max', {
     output: 'earnFeat "Beyond Nature"',
-    cond: () => V.feats?.currentSave['Beyond Nature'] === undefined && V.VanillaPlus != null && maplebirch.VP.deviancy.max
+    cond: () => V.feats?.currentSave['Beyond Nature'] === undefined && V.VanillaPlus != null && maplebirch.get('VP')!.deviancy.max
   });
 
-  const discover = (mirror: 'home' | 'farm' | 'tower' | 'temple') => `<<run maplebirch.VP.deviancy.discover('${mirror}')>>`;
+  const discover = (mirror: 'home' | 'farm' | 'tower' | 'temple') => `<<run maplebirch.get("VP").deviancy.discover('${mirror}')>>`;
 
   maplebirch.tool.addTo(
     'BeforeLinkZone',
@@ -86,7 +86,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 将作弊面板的异种癖滑条上限按突破倍率计算，保留原版反向显示。
         {
           src: '$deviancy "deviancy" {reverse: true}',
-          to: '$deviancy "deviancy" {max: $VanillaPlus.lock.deviancy ? maplebirch.VP.ceiling("deviancy") : maplebirch.VP.normalCeiling("deviancy"), reverse: true}',
+          to: '$deviancy "deviancy" {max: $VanillaPlus.lock.deviancy ? maplebirch.get("VP").ceiling("deviancy") : maplebirch.get("VP").normalCeiling("deviancy"), reverse: true}',
           expected: 1
         }
       ],
@@ -100,7 +100,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 在原版清除 $sexRitual 前提交仪式结果，避免状态被 unset 后无法判断过程。
         {
           src: '<<unset $sexRitual>>',
-          applybefore: '<<run maplebirch.VP.deviancy.finish($sexRitual)>>',
+          applybefore: '<<run maplebirch.get("VP").deviancy.finish($sexRitual)>>',
           expected: 1
         }
       ],
@@ -116,27 +116,27 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 两处相同的阶段上限作为明确的批量替换，避免依赖补丁先后顺序。
         {
           srcmatchgroup: /<<set \$_scaledDeviancyMax to 20 \* \$_n>>/g,
-          to: '<<set $_scaledDeviancyMax to $_n is 6 and $VanillaPlus.lock.deviancy ? maplebirch.VP.ceiling("deviancy") : 20 * $_n>>',
+          to: '<<set $_scaledDeviancyMax to $_n is 6 and $VanillaPlus.lock.deviancy ? maplebirch.get("VP").ceiling("deviancy") : 20 * $_n>>',
           expected: 2
         },
         // 非战斗的成长接在唯一的原版兴奋结算后，不匹配后续钳制语句。
         {
           src: '<<arousal `$_n * 100`>><<garousal>>',
           applyafter:
-            "\n\t<<if $_n is 5 and $VanillaPlus.lock.deviancy and $deviancy gte maplebirch.VP.normalCeiling('deviancy') and $deviancy lt maplebirch.VP.ceiling('deviancy')>>\n\t\t<<set $VanillaPlus.deviancy.levelFive to ($VanillaPlus.deviancy.levelFive || 0) + 1>>\n\t\t<<if $VanillaPlus.deviancy.levelFive gte 4>>\n\t\t\t<<set $VanillaPlus.deviancy.levelFive -= 4>>\n\t\t\t<<set $deviancy to Math.clamp($deviancy + 1, maplebirch.VP.normalCeiling('deviancy'), maplebirch.VP.ceiling('deviancy'))>>\n\t\t<</if>>\n\t<</if>>",
+            '\n\t<<if $_n is 5 and $VanillaPlus.lock.deviancy and $deviancy gte maplebirch.get("VP").normalCeiling(\'deviancy\') and $deviancy lt maplebirch.get("VP").ceiling(\'deviancy\')>>\n\t\t<<set $VanillaPlus.deviancy.levelFive to ($VanillaPlus.deviancy.levelFive || 0) + 1>>\n\t\t<<if $VanillaPlus.deviancy.levelFive gte 4>>\n\t\t\t<<set $VanillaPlus.deviancy.levelFive -= 4>>\n\t\t\t<<set $deviancy to Math.clamp($deviancy + 1, maplebirch.get("VP").normalCeiling(\'deviancy\'), maplebirch.get("VP").ceiling(\'deviancy\'))>>\n\t\t<</if>>\n\t<</if>>',
           expected: 1
         },
         // 战斗成长插在唯一的耳液行为记录前，避免捕获外层 if 结尾。
         {
           src: '<<earSlimeSeenActions "deviancy" $_n 5>>',
           applybefore:
-            "<<if $_n is 5 and $VanillaPlus.lock.deviancy and $deviancy gte maplebirch.VP.normalCeiling('deviancy') and $deviancy lt maplebirch.VP.ceiling('deviancy') and $consensual is 1>>\n\t\t<<set $VanillaPlus.deviancy.levelFive to ($VanillaPlus.deviancy.levelFive || 0) + 1>>\n\t\t<<if $VanillaPlus.deviancy.levelFive gte 4>>\n\t\t\t<<set $VanillaPlus.deviancy.levelFive -= 4>>\n\t\t\t<<set $deviancy to Math.clamp($deviancy + 1, maplebirch.VP.normalCeiling('deviancy'), maplebirch.VP.ceiling('deviancy'))>>\n\t\t<</if>>\n\t<</if>>\n\t",
+            '<<if $_n is 5 and $VanillaPlus.lock.deviancy and $deviancy gte maplebirch.get("VP").normalCeiling(\'deviancy\') and $deviancy lt maplebirch.get("VP").ceiling(\'deviancy\') and $consensual is 1>>\n\t\t<<set $VanillaPlus.deviancy.levelFive to ($VanillaPlus.deviancy.levelFive || 0) + 1>>\n\t\t<<if $VanillaPlus.deviancy.levelFive gte 4>>\n\t\t\t<<set $VanillaPlus.deviancy.levelFive -= 4>>\n\t\t\t<<set $deviancy to Math.clamp($deviancy + 1, maplebirch.get("VP").normalCeiling(\'deviancy\'), maplebirch.get("VP").ceiling(\'deviancy\'))>>\n\t\t<</if>>\n\t<</if>>\n\t',
           expected: 1
         },
         // 两处原版钳制语句内容完全相同，用最短表达式成组替换并锁定数量。
         {
           srcmatchgroup: /<<set \$deviancy to Math\.clamp\(\$deviancy, 0, 100\)>>/g,
-          to: "<<set $deviancy to Math.clamp($deviancy, maplebirch.VP.minimum('deviancy'), $VanillaPlus.lock.deviancy ? maplebirch.VP.ceiling('deviancy') : maplebirch.VP.normalCeiling('deviancy'))>>",
+          to: '<<set $deviancy to Math.clamp($deviancy, maplebirch.get("VP").minimum(\'deviancy\'), $VanillaPlus.lock.deviancy ? maplebirch.get("VP").ceiling(\'deviancy\') : maplebirch.get("VP").normalCeiling(\'deviancy\'))>>',
           expected: 2
         }
       ],
@@ -144,7 +144,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 替换全局异种癖钳制公式，使非专用组件触发的数值变化也遵守突破边界。
         {
           src: '<<set $deviancy to Math.clamp($deviancy, 0, 100)>>',
-          to: "<<set $deviancy to Math.clamp($deviancy, maplebirch.VP.minimum('deviancy'), $VanillaPlus.lock.deviancy ? maplebirch.VP.ceiling('deviancy') : maplebirch.VP.normalCeiling('deviancy'))>>",
+          to: '<<set $deviancy to Math.clamp($deviancy, maplebirch.get("VP").minimum(\'deviancy\'), $VanillaPlus.lock.deviancy ? maplebirch.get("VP").ceiling(\'deviancy\') : maplebirch.get("VP").normalCeiling(\'deviancy\'))>>',
           expected: 1
         }
       ]

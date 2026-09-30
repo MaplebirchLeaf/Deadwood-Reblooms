@@ -15,9 +15,9 @@
     <</language>>
     <<personselect _NPCDoubleStatusFirst>>
   <<else>>
-    <<set _NPCDoubleStatus to maplebirch.VP.NPCDoublePenetration.state>>
+    <<set _NPCDoubleStatus to maplebirch.get("VP").NPCDoublePenetration.state>>
     <<set _NPCDoubleStatusOrifice to _NPCDoubleStatusMode.includes('vagina') ? 'vagina' : 'anus'>>
-    <<if maplebirch.VP.NPCDoublePenetration.visible and _NPCDoubleStatus and _NPCDoubleStatus.recipient is Number($penistarget) and _NPCDoubleStatus.orifice is _NPCDoubleStatusOrifice>>
+    <<if maplebirch.get("VP").NPCDoublePenetration.visible and _NPCDoubleStatus and _NPCDoubleStatus.recipient is Number($penistarget) and _NPCDoubleStatus.orifice is _NPCDoubleStatusOrifice>>
       <<language>>
         <<option 'EN'>>
           <<personselect _NPCDoubleStatus.recipient>><<combatPersons>> <<if _NPCDoubleStatusOrifice is 'vagina'>>vagina<<else>>ass<</if>> envelops your penis alongside <<personselect _NPCDoubleStatus.partner>><<combatpersons>> penis.
@@ -56,7 +56,7 @@
       <<combatpromiscuity6>>
     <</if>>
     <<if _NPCDoubleLegLockKeep is false>>
-      <<set _NPCDoubleLegLockTargets to maplebirch.VP.NPCDoublePenetration.playerPenetrators()>>
+      <<set _NPCDoubleLegLockTargets to maplebirch.get("VP").NPCDoublePenetration.playerPenetrators()>>
     <<elseif $VanillaPlus.npcDoublePenetration and $VanillaPlus.npcDoublePenetration.playerLegLock>>
       <<set _NPCDoubleLegLockTargets to $VanillaPlus.npcDoublePenetration.playerLegLock.targets>>
     <</if>>
@@ -71,7 +71,7 @@
     <<if _NPCDoubleLegLockSuccess>>
       <<for _NPCDoubleLegLockTarget range _NPCDoubleLegLockTargets>><<sex 5 'genitals' _NPCDoubleLegLockTarget>><</for>>
       <<if _NPCDoubleLegLockKeep is false>>
-        <<brat 2>><<run maplebirch.VP.NPCDoublePenetration.setPlayerLegLock(_NPCDoubleLegLockTargets)>><<set $leglocktarget to _NPCDoubleLegLockTargets[0]>>
+        <<brat 2>><<run maplebirch.get("VP").NPCDoublePenetration.setPlayerLegLock(_NPCDoubleLegLockTargets)>><<set $leglocktarget to _NPCDoubleLegLockTargets[0]>>
         <<set $feetuse to 'legLock'>><<set $feetactiondefault to 'NPCDoubleLegLockKeep'>><<set $speechleglock to 1>>
       <<else>>
         <<brat 2>><<set $speechleglock to 1>>
@@ -88,7 +88,7 @@
       <<for _NPCDoubleLegLockTarget range _NPCDoubleLegLockTargets>><<sex 5 'genitals' _NPCDoubleLegLockTarget>><</for>><<set $speechleglock to 1>>
       <span class="lewd"><<lanSwitch 'As you climax, you ' '高潮时，你用腿更用力地'>><<if $position is 'missionary'>><<lanSwitch 'clench around ' '缠住了'>><<else>><<lanSwitch 'push back against ' '向后压住了'>><</if>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch ', preventing any of them from pulling away.' '，不让任何人抽身。'>></span>
     <<else>>
-      <<set $feetactiondefault to _NPCDoubleLegLockAction>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.VP.NPCDoublePenetration.clearPlayerLegLock()>>
+      <<set $feetactiondefault to _NPCDoubleLegLockAction>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.get("VP").NPCDoublePenetration.clearPlayerLegLock()>>
       <<if _NPCDoubleLegLockKeep>>
         <span class="blue"><<lanSwitch 'You try to keep hold of ' '你试图继续用腿锁住'>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch ', but your hold fails.' '，但没能继续困住任何人。'>></span>
       <<else>>
@@ -97,7 +97,7 @@
     <</if>>
   <<elseif _NPCDoubleLegLockAction is 'NPCDoubleLegLockRelease'>>
     <<set _NPCDoubleLegLockTargets to $VanillaPlus.npcDoublePenetration and $VanillaPlus.npcDoublePenetration.playerLegLock ? $VanillaPlus.npcDoublePenetration.playerLegLock.targets : []>>
-    <<set $feetactiondefault to 'NPCDoubleLegLockRelease'>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.VP.NPCDoublePenetration.clearPlayerLegLock()>>
+    <<set $feetactiondefault to 'NPCDoubleLegLockRelease'>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.get("VP").NPCDoublePenetration.clearPlayerLegLock()>>
     <<lanSwitch 'You release ' '你松开双腿，放开了'>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch '.' '。'>>
   <</if>>
 <</widget>>
@@ -110,7 +110,7 @@
   <<set $_NPCDoublePleasureStatReady to hasSexStat($_NPCDoublePleasureStat, 5)>>
   <<set $_NPCDoublePleasureAware to $promiscuityIgnore or ($awareness gte 300 and $_NPCDoublePleasureStatReady)>>
   <<set $_NPCDoubleCanUsePleasure to $VanillaPlus.traits.promiscuity or ($consensual is 1 and $_NPCDoublePleasureAware)>>
-  <<if maplebirch.VP.NPCDoublePenetration.visible and $_NPCDouble and $_NPCDoubleCanUsePleasure and ($VanillaPlus.traits.promiscuity or currentSkillValue('penileskill') gte 800)>>
+  <<if maplebirch.get("VP").NPCDoublePenetration.visible and $_NPCDouble and $_NPCDoubleCanUsePleasure and ($VanillaPlus.traits.promiscuity or currentSkillValue('penileskill') gte 800)>>
     <<set $penisactiondefault to 'NPCDoublePleasure'>>
     <<combatpromiscuity5>>
     <<set $_NPCDoubleRecipient to $NPCList[$_NPCDouble.recipient]>>
@@ -139,7 +139,7 @@
 <<widget 'deadwood-reblooms-player-double-begin'>>
   <<set $_NPCDoubleOrifice to _args[0]>>
   <<set $_NPCDoublePartner to _args[1]>>
-  <<set $_NPCDoubleJoined to maplebirch.VP.NPCDoublePenetration.joinPlayer($_NPCDoublePartner, $_NPCDoubleOrifice)>>
+  <<set $_NPCDoubleJoined to maplebirch.get("VP").NPCDoublePenetration.joinPlayer($_NPCDoublePartner, $_NPCDoubleOrifice)>>
   <<if $_NPCDoubleJoined>>
     <<set $_NPCDoublePrimary to $_NPCDoubleOrifice is 'vagina' ? $vaginatarget : $anustarget>>
     <<set $_NPCDoublePrimaryNPC to $NPCList[$_NPCDoublePrimary]>>
@@ -187,7 +187,7 @@
 <<widget 'deadwood-reblooms-npc-double-begin'>>
   <<set $_NPCDoubleOrifice to _args[0]>>
   <<set $_NPCDoublePartner to _args[1]>>
-  <<set $_NPCDoubleStarted to maplebirch.VP.NPCDoublePenetration.begin($penistarget, $_NPCDoublePartner, $_NPCDoubleOrifice)>>
+  <<set $_NPCDoubleStarted to maplebirch.get("VP").NPCDoublePenetration.begin($penistarget, $_NPCDoublePartner, $_NPCDoubleOrifice)>>
   <<if $_NPCDoubleStarted>>
     <<set $_NPCDoubleRecipient to $NPCList[$VanillaPlus.npcDoublePenetration.recipient]>>
     <<set $_NPCDoubleRecipientName to lanSwitch( $_NPCDoubleRecipient.fullDescription, $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription )>>
@@ -241,7 +241,7 @@
 
 <!-- NPC 双插回合：以明确的同伴和承受者关系取代原版仅面向 PC 的随机动作文本。 -->
 <<widget 'deadwood-reblooms-npc-double-turn'>>
-  <<if maplebirch.VP.NPCDoublePenetration.update()>>
+  <<if maplebirch.get("VP").NPCDoublePenetration.update()>>
     <<set $_NPCDouble to $VanillaPlus.npcDoublePenetration>>
     <<set $_NPCDoubleRecipient to $NPCList[$_NPCDouble.recipient]>>
     <<set $_NPCDoubleRecipientName to lanSwitch( $_NPCDoubleRecipient.fullDescription, $_NPCDoubleRecipient.fullDescription_CN || $_NPCDoubleRecipient.fullDescription )>>

@@ -18,7 +18,6 @@ class CelestialAnomalies extends Module {
     MeteorShower: true
   };
 
-  public readonly exposed = true;
   private readonly solarEclipse: SolarEclipse;
   private readonly meteorShower: MeteorShower;
 
