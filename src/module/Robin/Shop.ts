@@ -7,6 +7,12 @@ export type ShopStage = 'none' | 'planning' | 'applied' | 'site' | 'inspected' |
 const MAX_SHOP_STAFF = 2;
 
 export default class RobinShop extends Shared {
+  /** 正式店铺可刷卡；VanillaPlus 未启用时保留原本的现金购买。 */
+  public canCustomerPay(pennies: number): boolean {
+    if (!Number.isSafeInteger(pennies) || pennies < 0) return false;
+    return this.vanillaPlus?.finance.canPay(pennies, 'shopping') ?? V.money >= pennies;
+  }
+
   /** 店员带来的额外周销售，单位英镑。 */
   public get staffSales(): number {
     return Math.min(MAX_SHOP_STAFF, this.state.shopStaff || 0) * 700;

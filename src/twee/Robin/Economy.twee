@@ -713,25 +713,25 @@
 <br><br>
 <<lanSwitch 'The familiar drinks remain on the menu alongside the recipes you developed at the stalls. Fresh specials are prepared in small batches.' '原本的饮料与在摊位试出的新配方一同列在菜单上。新鲜特饮按小批备料。'>><br>
 <span class='gold'><<lanSwitch 'Everyday menu' '常备菜单'>></span><br>
-<<if $money gte 200>>
+<<if maplebirch.get('Robin').shop.canCustomerPay(200)>>
   <<foodicon 'lemonade'>><<lanLink '购买柠檬水 (0:15)' 'Deadwood Robin Shop Buy Classic Lemonade'>><</lanLink>> <span class='gold'>£2</span><br>
 <</if>>
-<<if $money gte 300>>
+<<if maplebirch.get('Robin').shop.canCustomerPay(300)>>
   <<foodicon 'cocoa'>><<lanLink '购买热巧克力 (0:15)' 'Deadwood Robin Shop Buy Hot Chocolate'>><</lanLink>> <span class='gold'>£3</span><br>
 <</if>>
 <span class='gold'><<lanSwitch 'House specials' '店内特选'>></span><br>
-<<if $money gte 300>>
+<<if maplebirch.get('Robin').shop.canCustomerPay(300)>>
   <<foodicon 'mintlemonade'>><<lanLink '购买薄荷柠檬水 (0:15)' 'Deadwood Robin Shop Buy Lemonade'>><</lanLink>> <span class='gold'>£3</span><br>
 <</if>>
-<<if $money gte 400>>
+<<if maplebirch.get('Robin').shop.canCustomerPay(400)>>
   <<foodicon 'chilledfruit'>><<lanLink '购买冰镇水果 (0:15)' 'Deadwood Robin Shop Buy Fruit'>><</lanLink>> <span class='gold'>£4</span><br>
   <<foodicon 'spicedcocoa'>><<lanLink '购买香料可可 (0:15)' 'Deadwood Robin Shop Buy Cocoa'>><</lanLink>> <span class='gold'>£4</span><br>
 <</if>>
-<<if $money gte 500>>
+<<if maplebirch.get('Robin').shop.canCustomerPay(500)>>
   <<foodicon 'cocoabiscuit'>><<lanLink '购买可可饼干 (0:15)' 'Deadwood Robin Shop Buy Biscuit'>><</lanLink>> <span class='gold'>£5</span><br>
 <</if>>
-<<if $money lt 200>>
-  <span class='blue'><<lanSwitch 'You do not have enough cash for the menu.' '你的现金不够购买菜单上的商品。'>></span><br>
+<<if !maplebirch.get('Robin').shop.canCustomerPay(200)>>
+  <span class='blue'><<lanSwitch 'You cannot afford anything on the menu.' '你目前买不起菜单上的商品。'>></span><br>
 <</if>>
 <<shopicon 'register'>><<lanLink '查看更多饮品' 'Deadwood Robin Shop More Drinks'>><</lanLink>><br>
 <<shopicon 'register'>><<lanLink '查看鲜花、爆米花与气球' 'Deadwood Robin Shop Other Goods'>><</lanLink>><br>
@@ -756,7 +756,7 @@
   and $VanillaPlus.finance.bank.balance gte 2000>>
   <<schoolicon 'building'>><<lanLink '请罗宾准备学生会饮品 (£20 0:20)' 'Deadwood Robin School Drinks'>><<pass 20>><</lanLink>><br>
 <</if>>
-<<if $RobinExpansion.shop_taste_day isnot Time.days and $money gte 300 and getRobinLocation() is 'shop'>>
+<<if $RobinExpansion.shop_taste_day isnot Time.days and maplebirch.get('Robin').shop.canCustomerPay(300) and getRobinLocation() is 'shop'>>
   <<shopicon 'register'>><<lanLink '尝尝店里的新品 (£3 0:05)' 'Deadwood Robin Shop Taste'>><</lanLink>><br>
 <</if>>
 <<if $RobinExpansion.shopStaff lt 2 and getRobinLocation() is 'shop'>>
@@ -775,24 +775,24 @@
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
 <<lanSwitch 'The cold cabinet and coffee equipment let the shop serve more than the old carts could hold. Robin keeps these drinks on the menu all year, with a fresh batch prepared each morning.' '冷藏柜与咖啡设备让店里能供应比旧推车更多的饮品。罗宾把它们全年写在菜单上，每天早上重新备料。'>>
 <br><br><span class='gold'><<lanSwitch 'Fruit drinks' '果味饮品'>></span><br>
-<<if $money gte 400>>
+<<if maplebirch.get('Robin').shop.canCustomerPay(400)>>
   <<foodicon 'strawberrylemonade'>><<lanLink '购买草莓柠檬水 (0:15)' 'Deadwood Robin Shop Buy Strawberry Lemonade'>><</lanLink>> <span class='gold'>£4</span><br>
   <<icon 'tending/orange-juice.png'>><<lanLink '购买鲜榨橙汁 (0:15)' 'Deadwood Robin Shop Buy Orange Juice'>><</lanLink>> <span class='gold'>£4</span><br>
 <</if>>
 <span class='gold'><<lanSwitch 'Coffee and sweets' '咖啡与甜饮'>></span><br>
-<<if $money gte 400>>
+<<if maplebirch.get('Robin').shop.canCustomerPay(400)>>
   <<foodicon 'coffee'>><<lanLink '购买罗宾的咖啡 (0:15)' 'Deadwood Robin Shop Buy Coffee'>><</lanLink>> <span class='gold'>£4</span><br>
 <</if>>
-<<if $money gte 500>>
+<<if maplebirch.get('Robin').shop.canCustomerPay(500)>>
   <<foodicon 'milkshake'>><<lanLink '购买水果奶昔 (0:15)' 'Deadwood Robin Shop Buy Milkshake'>><</lanLink>> <span class='gold'>£5</span><br>
 <</if>>
-<<if $money lt 400>><span class='blue'><<lanSwitch 'These drinks start at £4.' '这些饮品最低售价 £4。'>></span><br><</if>>
+<<if !maplebirch.get('Robin').shop.canCustomerPay(400)>><span class='blue'><<lanSwitch 'These drinks start at £4.' '这些饮品最低售价 £4。'>></span><br><</if>>
 <br><br><<getouticon>><<lanLink '返回店内' 'Deadwood Robin Shop'>><</lanLink>>
 
 :: Deadwood Robin Shop Buy Strawberry Lemonade []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and $money gte 400>>
-  <<money -400>><<set $RobinExpansion.reserve += 4>><<pass 15>><<wearProp 'strawberry lemonade'>>
+<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(400)>>
+  <<money -400 'shopping'>><<set $RobinExpansion.reserve += 4>><<pass 15>><<wearProp 'strawberry lemonade'>>
   <<stress -6>><<trauma -1>><<lstress>><<ltrauma>>
   <<if Weather.bodyTemperature gte 36.5>><<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>><</if>>
   <<lanSwitch 'The attendant crushes strawberries into chilled lemonade. Robin has marked the fruit delivery date on the pitcher.' '店员把草莓压进冰镇柠檬水里。罗宾在壶身标好了水果到货的日期。'>>
@@ -802,8 +802,8 @@
 
 :: Deadwood Robin Shop Buy Orange Juice []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and $money gte 400>>
-  <<money -400>><<set $RobinExpansion.reserve += 4>><<pass 15>>
+<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(400)>>
+  <<money -400 'shopping'>><<set $RobinExpansion.reserve += 4>><<pass 15>>
   <<stress -6>><<trauma -1>><<lstress>><<ltrauma>>
   <<if Weather.bodyTemperature gte 36.5>><<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>><</if>>
   <<lanSwitch 'The attendant squeezes the oranges in front of you and strains the juice into a cold glass. A little pulp remains at the bottom.' '店员当着你的面榨好橙子，把果汁滤进冰凉的玻璃杯。杯底还留着一点果肉。'>>
@@ -813,8 +813,8 @@
 
 :: Deadwood Robin Shop Buy Coffee []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and $money gte 400>>
-  <<money -400>><<set $RobinExpansion.reserve += 4>><<pass 15>><<wearProp 'coffee'>>
+<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(400)>>
+  <<money -400 'shopping'>><<set $RobinExpansion.reserve += 4>><<pass 15>><<wearProp 'coffee'>>
   <<stress -6>><<lstress>>
   <<if Weather.bodyTemperature lte 39>><<set Weather.bodyTemperature to Weather.bodyTemperature + 1>><</if>>
   <<lanSwitch 'You take a freshly brewed coffee from the counter. Robin has written a second, milder recipe beside the machine for customers who prefer it.' '你从柜台接过刚煮好的咖啡。罗宾还在机器旁写了另一份淡一些的配方，留给喜欢清淡口味的顾客。'>>
@@ -824,8 +824,8 @@
 
 :: Deadwood Robin Shop Buy Milkshake []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and $money gte 500>>
-  <<money -500>><<set $RobinExpansion.reserve += 5>><<pass 15>><<wearProp 'milkshake'>>
+<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(500)>>
+  <<money -500 'shopping'>><<set $RobinExpansion.reserve += 5>><<pass 15>><<wearProp 'milkshake'>>
   <<stress -6>><<trauma -1>><<lstress>><<ltrauma>>
   <<if Weather.bodyTemperature gte 36.5>><<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>><</if>>
   <<lanSwitch 'The attendant blends fruit and milk until the drink turns thick. Robin has left a note to ask customers about the fruit before preparing it.' '店员把水果和牛奶打成浓稠的奶昔。罗宾留了张便条，提醒出杯前先问顾客想要哪种水果。'>>
@@ -846,7 +846,7 @@
     <<if $RobinExpansion.flowerStock[_flowerType] gt 0>>
       <<capture _flowerType>>
         <<foodstufficon _flowerType>><span class='green'> <<print setup.foodstuff[_flowerType].singular>></span>
-        <<if $money gte maplebirch.get('Robin').flowers.price(_flowerType) * 100>>
+        <<if maplebirch.get('Robin').shop.canCustomerPay(maplebirch.get('Robin').flowers.price(_flowerType) * 100)>>
           <<lanLink '购买这一枝鲜花 (0:05)' 'Deadwood Robin Shop Buy Flower'>><<set $RobinExpansion.flowerSelection to _flowerType>><</lanLink>>
         <</if>>
         <span class='gold'>£<<print maplebirch.get('Robin').flowers.price(_flowerType)>></span><br>
@@ -875,7 +875,7 @@
   <</if>>
 <<elseif ($popcorn or 0) gte 3>>
   <span class='blue'><i><<lanSwitch 'You can carry only three bags of popcorn.' '你最多只能携带三袋爆米花。'>></i></span><br>
-<<elseif $money gte 700>>
+<<elseif maplebirch.get('Robin').shop.canCustomerPay(700)>>
   <<foodicon 'popcorn'>><<lanLink '购买爆米花 (0:02)' 'Deadwood Robin Shop Buy Popcorn'>><</lanLink>> <span class='gold'>£7</span><br>
 <</if>>
 <br><span class='gold'><<lanSwitch 'Balloons' '气球'>></span><br>
@@ -919,8 +919,9 @@
 :: Deadwood Robin Shop Buy Flower []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
 <<set _flowerType to $RobinExpansion.flowerSelection>>
+<<set _flowerPrice to maplebirch.get('Robin').flowers.price(_flowerType) * 100>>
 <<if maplebirch.get('Robin').flowers.buyFromShop(_flowerType)>>
-  <<pass 5>><<lanSwitch 'The attendant wraps the stem in paper so it will not bruise on the way home. You can find it with your other flowers.' '店员给花枝包上一层纸，免得路上碰伤。它已经放进你的鲜花库存。'>>
+  <<money `-_flowerPrice` 'shopping'>><<pass 5>><<lanSwitch 'The attendant wraps the stem in paper so it will not bruise on the way home. You can find it with your other flowers.' '店员给花枝包上一层纸，免得路上碰伤。它已经放进你的鲜花库存。'>>
   <<deadwood-robin-sale-event 'shop'>>
 <<else>><<lanSwitch 'That flower is no longer available.' '这枝花已经卖完了。'>><</if>>
 <br><br><<getouticon>><<lanLink '返回其他商品' 'Deadwood Robin Shop Other Goods'>><</lanLink>>
@@ -935,8 +936,8 @@
 
 :: Deadwood Robin Shop Buy Popcorn []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and $RobinExpansion.shopPopcorn and Time.hour gte 9 and Time.hour lt 21 and $money gte 700 and ($popcorn or 0) lt 3>>
-  <<money -700>><<set $RobinExpansion.reserve += 7>><<set $popcorn to ($popcorn or 0) + 1>><<pass 2>>
+<<if $RobinExpansion.shop and $RobinExpansion.shopPopcorn and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(700) and ($popcorn or 0) lt 3>>
+  <<money -700 'shopping'>><<set $RobinExpansion.reserve += 7>><<set $popcorn to ($popcorn or 0) + 1>><<pass 2>>
   <<lanSwitch 'The attendant folds the top of a warm bag of popcorn and hands it to you. It is added to the popcorn you carry, so you can eat it later.' '店员把一袋热爆米花封好递给你。它已计入你携带的爆米花，可以稍后再吃。'>>
   <<deadwood-robin-sale-event 'shop'>>
 <<else>><<lanSwitch 'You cannot carry or buy another bag right now.' '现在没法再买或携带一袋爆米花。'>><</if>>
@@ -1034,8 +1035,8 @@
 
 :: Deadwood Robin Shop Buy Classic Lemonade []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and $money gte 200>>
-  <<money -200>><<set $RobinExpansion.reserve += 2>><<pass 15>><<wearProp 'lemonade'>>
+<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(200)>>
+  <<money -200 'shopping'>><<set $RobinExpansion.reserve += 2>><<pass 15>><<wearProp 'lemonade'>>
   <<stress -6>><<trauma -1>><<lstress>><<ltrauma>>
   <<if Weather.bodyTemperature gte 36.5>><<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>><</if>>
   <<lanSwitch 'You buy the familiar lemonade from the printed menu. The attendant serves it in a clean glass at the counter.' '你按印好的菜单买了那杯熟悉的柠檬水。店员在柜台用干净的玻璃杯端给你。'>>
@@ -1047,8 +1048,8 @@
 
 :: Deadwood Robin Shop Buy Hot Chocolate []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and $money gte 300>>
-  <<money -300>><<set $RobinExpansion.reserve += 3>><<pass 15>><<wearProp 'hot cocoa'>>
+<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(300)>>
+  <<money -300 'shopping'>><<set $RobinExpansion.reserve += 3>><<pass 15>><<wearProp 'hot cocoa'>>
   <<stress -6>><<trauma -1>><<lstress>><<ltrauma>>
   <<if Weather.bodyTemperature lte 39>><<set Weather.bodyTemperature to Weather.bodyTemperature + 1>><</if>>
   <<lanSwitch 'You buy a hot chocolate. The attendant warms the milk to Robin’s marked temperature before adding the cocoa.' '你买了一杯热巧克力。店员按罗宾标好的温度热好牛奶，才搅进可可粉。'>>
@@ -1060,8 +1061,8 @@
 
 :: Deadwood Robin Shop Buy Lemonade []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and $money gte 300>>
-  <<money -300>><<set $RobinExpansion.reserve += 3>><<pass 15>><<wearProp 'lemonade'>>
+<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(300)>>
+  <<money -300 'shopping'>><<set $RobinExpansion.reserve += 3>><<pass 15>><<wearProp 'lemonade'>>
   <<stress -6>><<trauma -1>><<lstress>><<ltrauma>>
   <<if Weather.bodyTemperature gte 36.5>><<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>><</if>>
   <<lanSwitch 'You buy mint lemonade. Crushed leaves cool the drink, and Robin’s note on the counter asks the attendant to use only a little sugar.' '你买了一杯薄荷柠檬水。压碎的薄荷叶让饮料格外清凉；收银台上罗宾留下的便条提醒店员少放些糖。'>>
@@ -1073,8 +1074,8 @@
 
 :: Deadwood Robin Shop Buy Fruit []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and $money gte 400>>
-  <<money -400>><<set $RobinExpansion.reserve += 4>><<pass 15>>
+<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(400)>>
+  <<money -400 'shopping'>><<set $RobinExpansion.reserve += 4>><<pass 15>>
   <<stress -6>><<trauma -1>><<lstress>><<ltrauma>>
   <<if Weather.bodyTemperature gte 36.5>><<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>><</if>>
   <<lanSwitch 'You buy a cup of chilled fruit. The attendant takes it from the cold cabinet; Robin has written the preparation date on the lid.' '你买了一杯冰镇水果。店员从冷藏柜取出杯子；罗宾在杯盖上写着备料日期。'>>
@@ -1086,8 +1087,8 @@
 
 :: Deadwood Robin Shop Buy Cocoa []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and $money gte 400>>
-  <<money -400>><<set $RobinExpansion.reserve += 4>><<pass 15>><<wearProp 'hot cocoa'>>
+<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(400)>>
+  <<money -400 'shopping'>><<set $RobinExpansion.reserve += 4>><<pass 15>><<wearProp 'hot cocoa'>>
   <<stress -6>><<trauma -1>><<lstress>><<ltrauma>>
   <<if Weather.bodyTemperature lte 39>><<set Weather.bodyTemperature to Weather.bodyTemperature + 1>><</if>>
   <<lanSwitch 'You buy a cup of spiced cocoa. The attendant warms it before handing it over, following the measurements Robin left beside the stove.' '你买了一杯香料可可。店员照着罗宾留在炉边的配比把它热好，才递到你手里。'>>
@@ -1099,8 +1100,8 @@
 
 :: Deadwood Robin Shop Buy Biscuit []
 <<set $outside to 0>><<set $location to 'town'>><<effects>>
-<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and $money gte 500>>
-  <<money -500>><<set $RobinExpansion.reserve += 5>><<pass 15>>
+<<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(500)>>
+  <<money -500 'shopping'>><<set $RobinExpansion.reserve += 5>><<pass 15>>
   <<stress -6>><<trauma -1>><<lstress>><<ltrauma>>
   <<lanSwitch 'You buy a cocoa biscuit from the winter tray. Its centre is soft, and the attendant checks the date on the tin before serving it.' '你从冬季托盘买下一块可可饼干。内馅还是软的，店员端上来前又核对了一遍盒上的日期。'>>
   <<deadwood-robin-sale-event 'shop'>>
@@ -1111,8 +1112,8 @@
 
 :: Deadwood Robin Shop Taste []
 <<set $outside to 0>><<set $location to 'town'>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.shop and $RobinExpansion.shop_taste_day isnot Time.days and $money gte 300 and getRobinLocation() is 'shop'>>
-  <<set $RobinExpansion.shop_taste_day to Time.days>><<money -300>><<set $RobinExpansion.reserve += 3>><<pass 5>>
+<<if $RobinExpansion.shop and $RobinExpansion.shop_taste_day isnot Time.days and maplebirch.get('Robin').shop.canCustomerPay(300) and getRobinLocation() is 'shop'>>
+  <<set $RobinExpansion.shop_taste_day to Time.days>><<money -300 'shopping'>><<set $RobinExpansion.reserve += 3>><<pass 5>>
   <<if random(1, 2) is 1>>
     <<lanSwitch 'Robin warms a small cup of cocoa with cinnamon. The first sip is hot enough to make you slow down. Robin watches your face, then adds a little less spice to the next batch.' '罗宾端来一小杯撒着肉桂的热可可。第一口烫得你放慢了速度。罗宾看着你的表情，给下一锅少添了一点香料。'>>
   <<else>>
@@ -1271,7 +1272,7 @@
     <<if $RobinExpansion.lemonade gte 2>>
       <<lanSwitch 'Robin slices chilled fruit into a paper cup and adds a spoonful of lemonade syrup. You try it beneath the shade of the new cart while Robin watches the queue.' '罗宾把冰镇水果切进纸杯，又添了一勺柠檬糖浆。你在新推车的遮阳棚下尝着，罗宾还留意着排队的人。'>>
     <<else>>
-      <<lanSwitch 'Robin bruises a few mint leaves against the rim of your lemonade glass. The drink is sharper and cooler than the old recipe. Robin notes your verdict on the back of the day's order list.' '罗宾把几片薄荷叶在杯沿压了压。柠檬水比旧配方更清爽。罗宾把你的评价记在当天订单的背面。'>>
+      <<lanSwitch 'Robin bruises a few mint leaves against the rim of your lemonade glass. The drink is sharper and cooler than the old recipe. Robin notes your verdict on the back of the day’s order list.' '罗宾把几片薄荷叶在杯沿压了压。柠檬水比旧配方更清爽。罗宾把你的评价记在当天订单的背面。'>>
     <</if>>
   <</if>>
   <<stress -2>><<lstress>><<npcincr Robin love 1>><<glove>>

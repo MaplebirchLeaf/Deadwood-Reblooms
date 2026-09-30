@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const legacyBranch = 'dol-v0.5.11.9';
-const version = '1.1.1';
+const version = JSON.parse(await Bun.file(`${root}/package.json`).text()).version as string;
 
 function git(...args: string[]): string {
   return execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['inherit', 'pipe', 'inherit'] }).trim();

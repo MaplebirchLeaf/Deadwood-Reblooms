@@ -30,7 +30,7 @@
 <</widget>>
 
 <<widget 'deadwood-reblooms-property-furnishings-link'>>
-	<<if ($passage isnot 'Furniture Shop' or ($exposed lte 0 and Time.dayState isnot 'night' and Time.hour isnot 21 and $stress lt $stressmax))
+	<<if $exposed lte 0 and Time.dayState isnot 'night' and Time.hour isnot 21 and $stress lt $stressmax
 		and maplebirch.VP.realEstate.properties.some(property => maplebirch.VP.realEstate.owns(property.id))>>
 		<<furnitureicon 'catalogue'>><<lanLink '为自住房选购家具' 'Deadwood Reblooms Property Furnishings'>><</lanLink>><br><br>
 	<</if>>
@@ -164,7 +164,11 @@
 	<</if>>
 	<<if maplebirch.VP.realEstate.floorOf('retreat') is _args[0]>>
 		<<if _roomProperty.id is 'danube'>><<icon 'danube-conservatory.png'>><<else>><<couchicon>><</if>>
-		<<lanLink _roomProperty.interior.retreat_label.CN 'Deadwood Reblooms Property Retreat'>><<pass 1>><</lanLink>><br>
+		<<if _roomProperty.outdoor_access is 'retreat'>>
+			<<lanLink `lanSwitch('Sea-view alcove and balcony (0:01)', '观海角与阳台 (0:01)')` 'Deadwood Reblooms Property Outdoor'>><<pass 1>><</lanLink>><br>
+		<<else>>
+			<<lanLink _roomProperty.interior.retreat_label.CN 'Deadwood Reblooms Property Retreat'>><<pass 1>><</lanLink>><br>
+		<</if>>
 	<</if>>
 	<<if maplebirch.VP.realEstate.floorOf('outdoor') is _args[0]
 		and (_roomProperty.outdoor_access is 'landing' or (_roomProperty.outdoor_access is 'sitting' and _args[0] is 1))>>
@@ -324,7 +328,7 @@
 		<</if>>
 	<</capture>>
 <</for>>
-<br><<getouticon>><<lanLink '返回家具目录' 'Furniture Shop Catalogue'>><</lanLink>>
+<br><<getouticon>><<lanLink '返回家具店' 'Furniture Shop'>><</lanLink>>
 
 :: Deadwood Reblooms Property Furniture Catalogue []
 <<set $outside to 0>><<set $location to 'shopping_centre'>><<effects>>
@@ -338,16 +342,18 @@
 		<span class='red'><<lanSwitch 'Furniture cannot be delivered while this home is rented out or frozen.' '房屋出租或冻结期间，无法配送家具。'>></span><br><br>
 	<<else>>
 		<<lanSwitch 'You browse the furniture catalogue. "No Refunds!" is printed along the top.' '你浏览着家具目录。顶部印着“不退款！”的字样。'>><br><br>
+		<hr>
 		<div class='settingsHeader'><<lanSwitch 'Furniture' '家具'>></div>
-		<<dynamic 'deadwood-reblooms-property-furniture-content' 'deadwood-property-furniture-container'>>
+		<div id='furnitureContainer'>
+			<<dynamic 'deadwood-reblooms-property-furniture-links' 'furnitureContainerHeader'>>
+			<<dynamic 'deadwood-reblooms-property-furniture-list' 'furniture-menu-container'>>
+		</div>
 	<</if>>
 	<br><br><<getouticon>><<lanLink '返回住处列表' 'Deadwood Reblooms Property Furnishings'>><</lanLink>>
 <</if>>
 
-:: Deadwood Reblooms Property Furniture Content [widget]
-<<widget 'deadwood-reblooms-property-furniture-content'>>
-<<set _property to maplebirch.VP.realEstate.properties.find(item => item.id === $deadwoodFurnitureProperty && maplebirch.VP.realEstate.owns(item.id))>>
-<div id='furnitureContainer'>
+:: Deadwood Reblooms Property Furniture Links [widget]
+<<widget 'deadwood-reblooms-property-furniture-links'>>
 	<<set _categories to [
 		{ id: 'bed', EN: 'Bed', CN: '床' },
 		{ id: 'table', EN: 'Table', CN: '茶几' },
@@ -359,37 +365,40 @@
 	]>>
 	<<run _categories.forEach(item => item.label = lanSwitch(item.EN, item.CN))>>
 	<<for _category range _categories>>
-		<<if _category.id isnot 'desk' or _property.rooms.desk>>
-			<<capture _category>>
-				<div @class="$deadwoodFurnitureCategory is _category.id ? 'shopTabSelected' : 'shopTab'">
-					<button
-						@class="($deadwoodFurnitureCategory is _category.id ? 'selected' : '')"
-						@id="Dynamic.eventBinder(_category.id)"
-						onclick="(id) => $deadwoodFurnitureCategory = id"
-					>_category.label
-					</button>
-				</div>
-			<</capture>>
-		<</if>>
+		<<capture _category>>
+			<div @class="$deadwoodFurnitureCategory is _category.id ? 'shopTabSelected' : 'shopTab'">
+				<button
+					@class="($deadwoodFurnitureCategory is _category.id ? 'selected' : '')"
+					@id="Dynamic.eventBinder(_category.id)"
+					onclick="(id) => $deadwoodFurnitureCategory = id"
+				>_category.label
+				</button>
+			</div>
+		<</capture>>
 	<</for>>
-	<div id='deadwood-furniture-offers'>
-		<<set _current to maplebirch.VP.realEstate.furniture(_property.id, $deadwoodFurnitureCategory)>>
-		<<lanSwitch 'Currently installed in this home:' '这处住处当前摆放的是：'>>
-		<<if _current>>
-			<<furnitureicon _current.iconFile>> <<= _current.nameCap>><br>
-			<<if _current.description>>
-				<span class='description'><<= _current.description>>
-					<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('organiser')>> <<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
-					<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('spacious')>> <<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
-					<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('starter')>> <<lanSwitch 'Can hold 20 of each item type.' '每种物品类别可容纳 20 个。'>><</if>>
-					<<if _current.type.includes('comfy')>> <<if $deadwoodFurnitureCategory is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
-					<<if _current.type.includes('double')>> <<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>><</if>>
-				</span>
-			<</if>>
-		<<else>>
-			<<lanSwitch 'Nothing.' '暂无。'>>
+<</widget>>
+
+:: Deadwood Reblooms Property Furniture List [widget]
+<<widget 'deadwood-reblooms-property-furniture-list'>>
+<<set _property to maplebirch.VP.realEstate.properties.find(item => item.id === $deadwoodFurnitureProperty && maplebirch.VP.realEstate.owns(item.id))>>
+	<<set _current to maplebirch.VP.realEstate.furniture(_property.id, $deadwoodFurnitureCategory)>>
+	<<lanSwitch 'Currently installed in this home:' '这处住处当前摆放的是：'>>
+	<<if _current>>
+		<<furnitureicon _current.iconFile>> <<= _current.nameCap>><br>
+		<<if _current.description>>
+			<span class='description'><<= _current.description>>
+				<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('organiser')>> <<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
+				<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('spacious')>> <<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
+				<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('starter')>> <<lanSwitch 'Can hold 20 of each item type.' '每种物品类别可容纳 20 个。'>><</if>>
+				<<if _current.type.includes('comfy')>> <<if $deadwoodFurnitureCategory is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
+				<<if _current.type.includes('double')>> <<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>><</if>>
+			</span>
 		<</if>>
-		<hr>
+	<<else>>
+		<<lanSwitch 'Nothing.' '暂无。'>>
+	<</if>>
+	<hr>
+	<div id='furnitureContainer'>
 		<<set _offers to maplebirch.VP.realEstate.furnitureOffers(_property.id, $deadwoodFurnitureCategory)>>
 		<<for _offer range _offers>>
 			<<capture _offer>>
@@ -409,7 +418,7 @@
 							<<if _offer.item.type.includes('organiser')>><br><<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
 						</span></mouse> |
 					<</if>>
-					<<if $money gte _offer.cost>>
+					<<if maplebirch.VP.finance.canPay(_offer.cost, 'furniture')>>
 						<<link _priceLabel 'Deadwood Reblooms Property Furniture Catalogue'>>
 							<<if maplebirch.VP.realEstate.installFurniture(_property.id, $deadwoodFurnitureCategory, _offer.id)>>
 								<<money `-_offer.cost` 'furniture'>>
@@ -423,7 +432,6 @@
 			<</capture>>
 		<</for>>
 	</div>
-</div>
 <</widget>>
 
 :: Deadwood Reblooms Property Home []
@@ -862,6 +870,10 @@
 			<<bedicon>><<lanLink '睁开眼' 'Deadwood Reblooms Property Night Wake'>><</lanLink>>
 		<<else>>
 			<<if !_wakingEffect>><<lanSwitch 'You wake in your own bed.' '你在自己的床上醒来。'>><</if>>
+			<<if !_wakingEffect and Time.schoolDay and Time.hour gte 6 and Time.hour lt 9
+				and (!$LifeSimulation?.school or ($LifeSimulation.school.role is 'student' and !$LifeSimulation.school.attendanceExempt))>>
+				<br><br><<schoolicon 'building'>><span class='teal'><<lanSwitch 'Today is a school day. Remember your uniform and books before heading out.' '今天有课。出门前记得换好校服，带上课本。'>></span>
+			<</if>>
 			<<set _wakingCompanion to maplebirch.VP.realEstate.currentCompanion>>
 			<<if _wakingCompanion>>
 				<br><br>

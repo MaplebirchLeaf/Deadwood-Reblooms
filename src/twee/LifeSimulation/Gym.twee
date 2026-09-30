@@ -22,13 +22,13 @@
 		<br><br>
 		<<if Time.hour lt 10>>A few people train before work. Someone quietly counts repetitions while the attendant opens the windows.
 		<<elseif Time.hour lt 17>>The floor is busy with students and workers taking a break. Shoes squeak against the mats.
-		<<else>>People arriving after their shifts shake the rain or sea air from their coats before heading inside.<</if>>
+		<<else>>People arriving after their shifts hang their coats by the lockers before heading to the equipment.<</if>>
 	<<option 'CN'>>
 		健身房就在临海公路上方。透过窗户，你能看见杠铃、成排的储物柜，还有一扇通向临海平台的门。管理员在狭窄的前台核对入场资格。
 		<br><br>
 		<<if Time.hour lt 10>>几个人赶在上工前锻炼。有人轻声数着抬举次数，管理员则推开窗户透气。
 		<<elseif Time.hour lt 17>>学生和趁空休息的工人挤满训练区。鞋底在软垫上发出吱响。
-		<<else>>下工后来的人抖落外套上的雨水或海风，才走向训练区。<</if>>
+		<<else>>下工后来的人把外套挂在储物柜旁，才走向训练区。<</if>>
 <</language>><br><br>
 <<if Time.hour lt 6 or Time.hour gte 22>>
 	<span class='blue'><<lanSwitch 'The attendant has locked the training floor for the night.' '管理员已经锁上训练区。'>></span><br>
@@ -112,9 +112,9 @@
 	<<run maplebirch.LS.rollDorenVisit()>>
 	<<if maplebirch.LS.dorenPresent>>
 		<<if $LifeSimulation.gym.doren_interaction_day is Time.days>>
-			<span class='blue'><<lanSwitch 'Doren is finishing <<his>> own routine and gives you a quick wave.' '多伦正在做完自己的训练，朝你挥了挥手。'>></span><br><br>
+			<span class='blue'><<lanSwitch 'Doren is finishing <<nnpc_his Doren>> own routine and gives you a quick wave.' '多伦正在做完自己的训练，朝你挥了挥手。'>></span><br><br>
 		<<else>>
-			<span class='blue'><<lanSwitch 'Off duty, Doren is working through a steady run near the windows. <<He>> spots you between sets.' '多伦下班后正在窗边匀速跑步，休息时看见了你。'>></span><br>
+			<span class='blue'><<lanSwitch 'Off duty, Doren is working through a steady run near the windows. <<nnpc_He Doren>> spots you between sets.' '多伦下班后正在窗边匀速跑步，休息时看见了你。'>></span><br>
 			<<socialiseicon>><<lanLink '和多伦打个招呼' 'Deadwood Reblooms Life Simulation Gym Doren'>><</lanLink>><br><br>
 		<</if>>
 	<</if>>
@@ -198,7 +198,7 @@
 :: Deadwood Reblooms Life Simulation Gym Training []
 <<set _gymActivity to $LifeSimulation.gym.activity>>
 <<set $outside to _gymActivity is 'deck-run' ? 1 : 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
-<<if !maplebirch.LS.has or $LifeSimulation.gym.sessions_today gte 3 or !['weights', 'run', 'stretch', 'deck-run'].includes(_gymActivity)
+<<if !maplebirch.LS.has or Time.hour lt 6 or Time.hour gte 22 or $LifeSimulation.gym.sessions_today gte 3 or !['weights', 'run', 'stretch', 'deck-run'].includes(_gymActivity)
 	or $exposed gt 0 or pcAreArmsBound('both')>>
 	<span class='blue'><<lanSwitch 'The equipment is not available now.' '现在没法继续锻炼。'>></span><br><br>
 <<else>>

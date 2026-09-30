@@ -1,3 +1,4 @@
+import Securities, { type Security } from './Securities';
 import securitiesSource from '@/assets/finance/securities.yaml';
 import type { MacroDefinition } from 'twine-sugarcube';
 
@@ -76,16 +77,6 @@ export interface FinanceState {
   bank: BankState;
   brokerage: BrokerageState;
   market: MarketState;
-}
-
-interface Security {
-  symbol: string;
-  name: {
-    EN: string;
-    CN: string;
-  };
-  initialPrice: number;
-  volatility: number;
 }
 
 const PENCE_PER_POUND = 100;
@@ -215,20 +206,20 @@ class Finance {
 
   public preInit(): void {
     this.core.tool.onInit(() => void this.securities);
-    this.core.once(':storyready', () => this.moneyPayment());
+    this.core.once(':storyready', () => this.registerMoneyMacro());
     // 行情在时间事件里刷新。银行周账务由房地产逐日推进，保持批量跳日时的真实顺序。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-finance-market', {
-      action: () => this.advanceDay(),
+      action: () => this.updateDay(),
       exact: true
     });
   }
 
-  private advanceDay(): void {
+  private updateDay(): void {
     // 行情仍按游戏时间事件刷新，个人债务由房产结算循环按日期推进。
-    Finance.refreshAccountTier(this.state.bank);
+    Finance.updateAccountTier(this.state.bank);
     Finance.resetAtmLimit(this.state.bank);
-    Finance.advanceMarket(this.state, this.securities);
-    Finance.advanceStoryMarket(this.state.market, this.securities);
+    Securities.updatePrices(this.state, this.securities);
+    Securities.applyEvents(this.state.market, this.securities);
   }
 
   public advanceBankThrough(day: number): void {
@@ -246,7 +237,7 @@ class Finance {
     bank.opened = true;
     bank.opened_day = Finance.currentDay();
     bank.bank_interest_last_day = Finance.currentDay();
-    Finance.refreshAccountTier(bank);
+    Finance.updateAccountTier(bank);
     return 'ok';
   }
 
@@ -272,7 +263,7 @@ class Finance {
     if (!bank.opened) return 'bank-required';
     if (atm && !bank.debit_card) return 'debit-required';
     const result = Finance.moveFunds(finance, amount, 'cash', 'bank');
-    if (result === 'ok') Finance.refreshAccountTier(bank);
+    if (result === 'ok') Finance.updateAccountTier(bank);
     return result;
   }
 
@@ -452,7 +443,7 @@ class Finance {
     if (!bank.opened) return 'bank-required';
     if (!brokerage.opened) return 'brokerage-required';
     const result = Finance.moveFunds(finance, amount, 'brokerage', 'bank');
-    if (result === 'ok') Finance.refreshAccountTier(bank);
+    if (result === 'ok') Finance.updateAccountTier(bank);
     return result;
   }
 
@@ -461,7 +452,7 @@ class Finance {
     const value = Math.floor(Number(amount));
     if (!Number.isSafeInteger(value) || value < 0) return false;
     if (source != null && !Finance.isMerchantSource(source)) return Finance.cashOnHand() >= value;
-    return this.purchaseMethod(value) != null;
+    return this.choosePayment(value) != null;
   }
 
   public setPaymentMethod(method: unknown): FinanceResult {
@@ -473,7 +464,7 @@ class Finance {
     return 'ok';
   }
 
-  private purchaseMethod(value: number): PaymentMethod | null {
+  private choosePayment(value: number): PaymentMethod | null {
     const bank = this.state.bank;
     const available: Record<PaymentMethod, boolean> = {
       cash: Finance.cashOnHand() >= value,
@@ -484,11 +475,11 @@ class Finance {
     return methods.find((method, index) => methods.indexOf(method) === index && available[method]) ?? null;
   }
 
-  private purchase(amount: unknown, source: unknown): boolean {
+  private chargeMerchant(amount: unknown, source: unknown): boolean {
     const value = Math.floor(Number(amount));
     const bank = this.state.bank;
     if (!Number.isSafeInteger(value) || value <= 0 || !Finance.isMerchantSource(source)) return false;
-    const method = this.purchaseMethod(value);
+    const method = this.choosePayment(value);
     if (method) bank.payment_method = method;
     if (method === 'debit') bank.balance -= value;
     else if (method === 'credit') Finance.addCreditDebt(bank, value);
@@ -497,14 +488,14 @@ class Finance {
   }
 
   // 包装原版 money 宏：银行卡负责扣款，原宏以 recordOnly 保留消费统计。
-  private moneyPayment(): void {
+  private registerMoneyMacro(): void {
     const original = this.core.SugarCube.Macro.get('money') as MacroDefinition | undefined;
     if (!original) return;
-    const purchase = (amount: unknown, source: unknown) => this.purchase(amount, source);
-    const refresh = () => this.refreshMoney();
+    const chargeMerchant = (amount: unknown, source: unknown) => this.chargeMerchant(amount, source);
+    const refresh = () => this.refreshMoneyUI();
     this.core.tool.macro.define('money', function (this: any, amountArg: unknown, sourceArg: unknown, optionalArg?: unknown) {
       const amount = Number(amountArg);
-      if (amount >= 0 || !purchase(-amount, sourceArg)) {
+      if (amount >= 0 || !chargeMerchant(-amount, sourceArg)) {
         original.handler.call(this);
         return;
       }
@@ -520,7 +511,7 @@ class Finance {
     });
   }
 
-  private refreshMoney(): void {
+  private refreshMoneyUI(): void {
     $.wiki('<<updatesidebarmoney>>');
     if (document.getElementById('dr-finance-caption')) $.wiki('<<replace "#dr-finance-caption">><<deadwood-reblooms-finance-caption-content>><</replace>>');
   }
@@ -537,7 +528,7 @@ class Finance {
     brokerage.cash -= cost;
     brokerage.holdings[item.symbol] += shares;
     // 成交后重置未来行情，避免回退后按已知涨跌交易。
-    market.seed = Finance.marketSeed();
+    market.seed = Securities.generateSeed();
     return 'ok';
   }
 
@@ -551,7 +542,7 @@ class Finance {
     if (shares > brokerage.holdings[item.symbol]) return 'insufficient-shares';
     brokerage.holdings[item.symbol] -= shares;
     brokerage.cash += market.prices[item.symbol] * shares;
-    market.seed = Finance.marketSeed();
+    market.seed = Securities.generateSeed();
     return 'ok';
   }
 
@@ -577,7 +568,7 @@ class Finance {
   private static ensureState(securities: readonly Security[]): FinanceState {
     // 账户和行情始终读取当前 V，不把可变状态放进 setup 或模块实例。
     const finance = V.VanillaPlus.finance as FinanceState;
-    if (!Number.isSafeInteger(finance.market.seed) || finance.market.seed === 0) finance.market.seed = Finance.marketSeed();
+    if (!Number.isSafeInteger(finance.market.seed) || finance.market.seed === 0) finance.market.seed = Securities.generateSeed();
     for (const item of securities) {
       finance.brokerage.holdings[item.symbol] ??= 0;
       const initialPrice =
@@ -594,7 +585,7 @@ class Finance {
     finance.market.avery_fate ??= String(V.avery_fate ?? '');
     if (finance.bank.opened && finance.bank.bank_interest_last_day < 0) finance.bank.bank_interest_last_day = Finance.currentDay();
     if (finance.bank.opened && finance.bank.opened_day < 0) finance.bank.opened_day = Finance.currentDay();
-    Finance.refreshAccountTier(finance.bank);
+    Finance.updateAccountTier(finance.bank);
     Finance.resetAtmLimit(finance.bank);
     if (finance.bank.credit_debt > 0 && finance.bank.credit_due_day <= 0) {
       finance.bank.credit_due_day = Finance.currentDay() + CREDIT_BILLING_DAYS;
@@ -647,7 +638,7 @@ class Finance {
     return MERCHANT_SOURCES.has(name) || name.startsWith('hospital') || name.startsWith('pharmacy');
   }
 
-  private static refreshAccountTier(bank: BankState): void {
+  private static updateAccountTier(bank: BankState): void {
     if (!bank.opened) return;
     const netBalance = Math.max(0, bank.balance - bank.credit_debt - bank.loan_debt);
     bank.peak_balance = Math.max(bank.peak_balance, netBalance);
@@ -784,93 +775,6 @@ class Finance {
     else if (target === 'bank') finance.bank.balance += value;
     else finance.brokerage.cash += value;
     return 'ok';
-  }
-
-  // 每日行情
-  private static marketSeed(): number {
-    return Math.floor(Math.random() * 0x100000000) >>> 0 || 1;
-  }
-
-  private static marketMove(item: Security, day: number, seed: number): number {
-    let hash = 2166136261 ^ seed;
-    for (const character of `${item.symbol}:${day}`) {
-      hash ^= character.charCodeAt(0);
-      hash = Math.imul(hash, 16777619);
-    }
-    return ((hash >>> 0) % (item.volatility * 2 + 1)) - item.volatility;
-  }
-
-  private static nextPrice(item: Security, price: number, day: number, seed: number): number {
-    const next = Math.round((price * (100 + Finance.marketMove(item, day, seed))) / 100);
-    return Math.clamp(next, Math.round(item.initialPrice * 0.25), item.initialPrice * 4);
-  }
-
-  private static applyStoryMoves(market: MarketState, securities: readonly Security[]): void {
-    for (const item of securities) {
-      const move = market.pending_farm_moves?.[item.symbol] ?? 0;
-      if (!move) continue;
-      market.prices[item.symbol] = Math.clamp(Math.round((market.prices[item.symbol] * (100 + move)) / 100), Math.round(item.initialPrice * 0.25), item.initialPrice * 4);
-    }
-    market.pending_farm_moves = {};
-  }
-
-  private static advanceStoryMarket(market: MarketState, securities: readonly Security[]): void {
-    const stage = Math.max(0, Math.floor(Number(V.farm_stage) || 0));
-    const previousStage = market.farm_stage ?? stage;
-    const moves = (market.pending_farm_moves ??= {});
-    if (previousStage < 7 && stage >= 7) moves.RMY = (moves.RMY ?? 0) - 2;
-    if (previousStage < 9 && stage >= 9) {
-      moves.ALF = (moves.ALF ?? 0) + 8;
-      moves.RMY = (moves.RMY ?? 0) - 3;
-    }
-    if (previousStage < 12 && stage >= 12) {
-      moves.ALF = (moves.ALF ?? 0) + 10;
-      moves.RMY = (moves.RMY ?? 0) - 4;
-    }
-    market.farm_stage = stage;
-
-    const damage = Boolean(V.farm_attacked) && Array.isArray(V.fields_damaged) ? V.fields_damaged.length : 0;
-    const newDamage = Math.max(0, damage - (market.farm_attack_damage ?? 0));
-    if (newDamage > 0) {
-      moves.ALF = (moves.ALF ?? 0) - Math.min(12, newDamage * 2);
-      moves.RMY = (moves.RMY ?? 0) + Math.min(3, newDamage);
-    }
-    market.farm_attack_damage = damage;
-
-    // 咖啡馆涨价、停业扩建和重新开业都由原版 chef_state 推进，行情只在节点变化时响应一次。
-    const cafeStage = Math.max(0, Math.floor(Number(V.chef_state) || 0));
-    const previousCafeStage = market.cafe_stage ?? cafeStage;
-    if (previousCafeStage < 2 && cafeStage >= 2) moves.OBC = (moves.OBC ?? 0) + 3;
-    if (previousCafeStage < 7 && cafeStage >= 7) moves.OBC = (moves.OBC ?? 0) - 4;
-    if (previousCafeStage < 9 && cafeStage >= 9) moves.OBC = (moves.OBC ?? 0) + 10;
-    market.cafe_stage = cafeStage;
-
-    // 原版高楼事件的结局：仪式成功获得麋鹿们支持，救援路线则仍有火灾损失。
-    // 已开始的存档以当前结局为基线，不重复补涨跌。
-    const averyFate = String(V.avery_fate ?? '');
-    if (market.avery_fate !== averyFate) {
-      const move = averyFate === 'ascended' ? 8 : averyFate === 'saved' ? -4 : ['fallen', 'kicked'].includes(averyFate) ? -12 : 0;
-      if (move) moves.AVY = (moves.AVY ?? 0) + move;
-      market.avery_fate = averyFate;
-    }
-    if (Number(Time.weekDay) !== 1 && Number(Time.weekDay) !== 7) Finance.applyStoryMoves(market, securities);
-  }
-
-  private static advanceMarket(finance: FinanceState, securities: readonly Security[]): void {
-    const currentDay = Finance.currentDay();
-    if (finance.market.day < 0) {
-      // 新存档首次跨日时，也要计算刚过去的营业日行情。
-      finance.market.day = currentDay - 1;
-    }
-    if (currentDay <= finance.market.day) return;
-    for (let day = finance.market.day + 1; day <= currentDay; day++) {
-      const weekDay = (((((Number(Time.weekDay) || 1) - (currentDay - day) - 1) % 7) + 7) % 7) + 1;
-      if (weekDay === 1 || weekDay === 7) continue;
-      finance.market.previous_prices = { ...finance.market.prices };
-      for (const item of securities) finance.market.prices[item.symbol] = Finance.nextPrice(item, finance.market.prices[item.symbol], day, finance.market.seed);
-      Finance.applyStoryMoves(finance.market, securities);
-    }
-    finance.market.day = currentDay;
   }
 }
 

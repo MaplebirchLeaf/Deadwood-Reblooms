@@ -24,6 +24,8 @@ class Horse extends Transformation {
       'horse',
       'physical',
       {
+        // 胡萝卜位于图标右下方；覆盖原色，毛发沿用原版红底发色滤镜。
+        icon: `<span style="display:inline-grid" @class="'hair-'+$haircolour"><span style="grid-area:1/1" class="colour-hair"><<iconUi 'horse.png'>></span><span style="grid-area:1/1;clip-path:polygon(31.25% 46.875%,100% 46.875%,100% 100%,25% 100%,25% 84.375%,31.25% 78.125%)"><<iconUi 'horse.png'>></span></span>`,
         parts: [
           { name: 'ears', tfRequired: 4 },
           { name: 'tail', tfRequired: 6 }
