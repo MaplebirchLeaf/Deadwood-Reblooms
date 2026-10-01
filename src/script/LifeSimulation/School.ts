@@ -1,12 +1,3 @@
-interface PassagePatch {
-  src?: string;
-  srcmatch?: RegExp;
-  to?: string;
-  applybefore?: string;
-  applyafter?: string;
-  expected: number;
-}
-
 export default function School(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.onInit(() => {
     setup.feats['Student Council President'] ??= {
@@ -87,7 +78,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     }
   });
 
-  maplebirch.tool.addTo('AfterLinkZone', { widget: 'deadwood-reblooms-life-simulation-school-office-options', passage: "Head's Office" });
+  maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-reblooms-life-simulation-school-office-options'], passage: "Head's Office" });
   maplebirch.tool.addTo('Journal', 'deadwood-reblooms-life-simulation-school-journal');
 
   maplebirch.tool.patch.traits.add(
@@ -144,44 +135,42 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     cond: () => V.location === 'school' && maplebirch.get('LifeSimulation')!.school.requiresNudity && V.LifeSimulation?.school?.clothesStored !== true
   });
 
-  const schoolPassages: Record<string, PassagePatch[]> = {
-    'School Front Courtyard': [
-      {
-        src: '$detention gte 1 and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
-        to: '$detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
-        expected: 2
-      },
-      {
-        // 仅接管通往 Hallways 的原版一分钟入口，保留中庭其余事件与离校选项。
-        srcmatch: /<<entranceicon>><<link \[\[[^\]\n]+\|Hallways]]>><<pass 1>><<\/link>>/,
-        to: '<<deadwood-reblooms-life-simulation-school-duty-link>><<deadwood-reblooms-life-simulation-school-entry>>',
-        expected: 1
-      }
-    ],
-    Hallways: [
-      {
-        src: '$detention gte 1 and $daily.school.detentionAttended isnot 1>>\n\t\t<<else>>',
-        to: '$detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1>>\n\t\t<<else>>',
-        expected: 1
-      },
-      {
-        // 储物柜前的链接数随留堂和特殊事件变化，按原版储物柜定位公告栏。
-        srcmatch: /<<lockericon>><<link \[\[[^\]\n]+\|School Lockers]]>/,
-        applybefore: '<<deadwood-reblooms-life-simulation-school-board-link>>',
-        expected: 1
-      }
-    ],
-    'Sydney Walk': [
-      {
-        src: '$location is "school" and $detention gte 1 and $daily.school.detentionAttended isnot 1',
-        to: '$location is "school" and $detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1',
-        expected: 1
-      }
-    ]
-  };
-
   maplebirch.tool.inject({
-    locationPassage: schoolPassages,
+    locationPassage: {
+      'School Front Courtyard': [
+        {
+          src: '$detention gte 1 and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
+          to: '$detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
+          expected: 2
+        },
+        {
+          // 仅接管通往 Hallways 的原版一分钟入口，保留中庭其余事件与离校选项。
+          srcmatch: /<<entranceicon>><<link \[\[[^\]\n]+\|Hallways]]>><<pass 1>><<\/link>>/,
+          to: '<<deadwood-reblooms-life-simulation-school-duty-link>><<deadwood-reblooms-life-simulation-school-entry>>',
+          expected: 1
+        }
+      ],
+      Hallways: [
+        {
+          src: '$detention gte 1 and $daily.school.detentionAttended isnot 1>>\n\t\t<<else>>',
+          to: '$detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1>>\n\t\t<<else>>',
+          expected: 1
+        },
+        {
+          // 储物柜前的链接数随留堂和特殊事件变化，按原版储物柜定位公告栏。
+          srcmatch: /<<lockericon>><<link \[\[[^\]\n]+\|School Lockers]]>/,
+          applybefore: '<<deadwood-reblooms-life-simulation-school-board-link>>',
+          expected: 1
+        }
+      ],
+      'Sydney Walk': [
+        {
+          src: '$location is "school" and $detention gte 1 and $daily.school.detentionAttended isnot 1',
+          to: '$location is "school" and $detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1',
+          expected: 1
+        }
+      ]
+    },
     widgetPassage: {
       'Widgets Sydney': [
         {

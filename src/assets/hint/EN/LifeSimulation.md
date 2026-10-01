@@ -1,35 +1,127 @@
-### School roles
+### Prerequisites and map
 
-| Stage                     | Where                                                       | Requirements                                                                                                                                                                                        | Result                                                                  |
-| ------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Class exemption pass      | Headmaster's office → Bailey's office → headmaster's office | Top marks in all four subjects and overall school performance. Leighton love at least 10, or leverage from his vanilla story. Bailey normally requires three consecutive weeks of rent paid on time | Missing lessons no longer counts as truancy. Subject grades still decay |
-| Prefect                   | Ask Leighton seven days after receiving the pass            | Keep top overall marks. The vanilla Social cards must show **model student** for Teachers and at least **cool** for Students. Leighton love at least 10, or leverage over him                       | Morning duty at the front courtyard. Detention becomes optional         |
-| Student council president | Ask Leighton after duty on five separate school days        | School order, student standing, and staff trust at least 25 each                                                                                                                                    | Propose dress policies, trial them, then request a review               |
+Enable **LifeSimulation** and reload. School uses vanilla grades and social evaluations. The gym is independent, while weapons require vanilla borrowing.
 
-**Where is Bailey?** Before Robin's confrontation, ask at the orphanage office between 07:00 and 09:00. After Bailey leaves, find him at the Barb Street flats. The three-week rent condition no longer applies there. Once both signatures are on the form, **return it to Leighton** to activate the pass.
+| Feature             | Where                                                  | Start                                               |
+| ------------------- | ------------------------------------------------------ | --------------------------------------------------- |
+| Exemption           | Headteacher and Bailey offices                         | Maximum grades and Leighton's permission            |
+| Prefect             | Office and courtyard                                   | Seven days after exemption, with school evaluations |
+| President and rules | Office and noticeboard                                 | Duties on distinct dates, order and support         |
+| History             | Class, library, museum, lake and home project entrance | Relevant vanilla paintings returned and discussed   |
+| Gym                 | Cliff Street                                           | Admission during opening hours                      |
+| Weapons             | Hand actions against eligible nonanimal tentacles      | Borrowed vanilla whip or baton                      |
 
-**No prefect option?** Wait seven days after the pass. Leighton must be available on a school day. Winter's separate recommendation is no longer required. Leighton explains missing reputation requirements. Leverage over him can replace his personal affection, but does not replace marks or the two school reputation requirements.
+### Attendance exemption
 
-### Morning duty, standing, and policies
+**Requirements**: vanilla **A\*** in science, maths, English and history, with maximum overall performance. Leighton must agree or the PC must possess vanilla leverage.
 
-Begin morning duty from the school front courtyard between 07:00 and 09:00 on school days. Robin, Sydney, Kylar, and Whitney appear according to their own schedules. Your choices affect relationships and four module values: **school order, student standing, staff trust, and school corruption**. The scene shows the actual change after each decision.
+1. Apply in the office on a schoolday.
+2. Obtain Bailey's signature. At the orphanage, visit **07:00–09:00**, normally after three consecutive on-time rent payments.
+3. After Robin's resistance moves Bailey out, visit his **Barb Street flat**, without the three-payment requirement.
+4. **Return the form to Leighton** to activate it. Two verbal approvals alone are insufficient.
 
-The **student affairs noticeboard** in the hallway shows these four values, duty count, and the current policy. The Teachers and Students cards in vanilla Social are separate measures. As president, propose the next dress rule to Leighton, let it run for a week, then request a review. More permissive policies need enough support and corruption.
+Exemption avoids truancy penalties, not grade decay or every school responsibility. Leverage replaces private approval, not grades.
 
-### History exhibition and connected routes
+### Prefect and morning duty
 
-After the vanilla painting event, accept Winter's history project in class. Follow **library archive → museum collection → forest lake → report at home → museum exhibition**. The journal points to the next lead. Robin and Kylar can change the available choices and dialogue.
+Wait **seven days** after exemption. Maintain maximum overall performance, vanilla teacher evaluation **Model student** and school popularity at least **Cool**, then apply to Leighton. Winter does not need to recommend you separately.
 
-Prefects and presidents can order student council drinks from Robin's shop once a day when Robin is present, special stock remains, and the bank balance is at least £20. Prepare school notes at your property desk or a lesson in Sirris's study. Correcting the estate lesson requires science skill 500.
+Duty is **07:00–09:00 on schooldays**, once daily. Robin, Sydney, Kylar and Whitney follow their locations rather than all appearing together.
 
-### Cliff Street gym
+| Response | Direction                         | Consideration                     |
+| -------- | --------------------------------- | --------------------------------- |
+| Enforce  | Order and staff evaluation        | Different reactions to punishment |
+| Mediate  | Relationships and student opinion | Different order benefits          |
+| Pressure | Enforcement and conflict          | Possible resentment or corruption |
+| Overlook | Character responses and order     | Not consequence-free              |
 
-Enter from Cliff Street's normal places of interest between 06:00 and 22:00. A single visit costs £20 and ends when you leave. The seven-day card costs £100. A calendar-month card costs £350, and lifetime membership costs £2,000. Annual cards from older saves remain valid until their original expiry. Game-day events expire term memberships; saved expiry times survive loading a save.
+Actual effects appear beside prose. Prefects may decide about detention attendance, not ignore every responsibility.
 
-Inside, you can lift weights, run, or stretch with a coach. Jogging on the seafront deck closes in rain or frost. You can train three times a day. The changing room has a separate locker using the vanilla wardrobe interface. You can retrieve your clothes during opening hours even after your pass expires. Admitted visitors can use the sink once a day. Training takes time and causes tiredness. Bound arms prevent equipment use. Debit or credit can cover entry under the bank module's merchant payment rules.
+### Noticeboard, presidency and dress rules
+
+The corridor noticeboard records order, student standing, staff trust, school corruption and duties. These differ from vanilla teacher/popularity evaluations.
+
+Complete duties on **five distinct schooldays**, build order and both support ratings to application eligibility and ask Leighton for presidency. Reopening one day's scene does not count five days.
+
+Policies progress: standard uniform → free dress → revealing dress → optional nudity → nude day → mandatory nudity. Appointment does not immediately unlock the final policy.
+
+1. Review the noticeboard and propose the next policy in the office.
+2. Choose an eligible formal application, petition or pressure route, each with distinct support/Leighton requirements.
+3. More permissive rules share corruption requirements which pressure cannot bypass.
+4. Maintain support and order through a **seven-day trial**.
+5. Return for review. Insufficient standing rolls back with a **three-day cooldown**.
+
+Nude day concerns Friday school hours, unlike daily mandatory nudity. Previously retained policies can be selected under their respective rules.
+
+### Private invitations and study activities
+
+Private invitations also require vanilla **promiscuity level three** and individual willingness. Robin needs trust and low trauma, Sydney appropriate corruption rather than purity, Kylar manageable jealousy and Whitney love or established romance. A badge does not guarantee agreement.
+
+| Activity       | Preparation                                  | Effects and limits                                                       |
+| -------------- | -------------------------------------------- | ------------------------------------------------------------------------ |
+| Council drinks | Robin at shop, special stock, £20 bank funds | Once daily, standing and trust                                           |
+| Home notes     | Owned-home desk                              | Prefect/president daily activity                                         |
+| Estate lesson  | Sirris study with Sirris or Sydney           | Shared daily limit with home study, ability-dependent science correction |
+
+### History project unlock
+
+Return and discuss the vanilla **red-moon or snake-woman painting** at the museum, then attend history for Winter's project. Arbitrary antiques, browsing or visiting the lake alone do not start it.
+
+Accept for **25 preparation days**. Follow journal deadlines, investigate and draft before the deadline, then exhibit at the museum.
+
+| Order | Place and action          | Time      | Requirements and result                                         |
+| ----- | ------------------------- | --------- | --------------------------------------------------------------- |
+| 1     | Library archival research | One hour  | Accepted project, source investigation                          |
+| 2     | Museum object research    | One hour  | Archive done, compare object                                    |
+| 3     | Forest lake ruins         | Two hours | Both previous steps, unfrozen lake, 06:00–18:00 before deadline |
+| 4     | Home drafting             | One hour  | Archive and museum done, choices affect score                   |
+| 5     | Museum exhibition         | Two hours | Project date reached, answer evidence questions                 |
+
+Lake evidence supplements investigation rather than automatically proving painting claims. Drafting can occur without it, but the full evidence achievement needs recorded recovery.
+
+### Evidence Matters and honours
+
+1. With history **A\***, investigate the earliest source at the library.
+2. Compare records with the object at the museum.
+3. Record the priestess statue's find location at the lake.
+4. Mark evidence limits in the draft rather than inventing a story.
+5. Answer within the evidence: raid records do not prove prediction, and a painting's age and changing tale do not prove its depicted event.
+
+<span class="teal">Grades open choices, but you must choose them.</span> History, science, maths and the English play have separate honours, not automatic rewards for four A\* grades.
+
+### Gym admission
+
+Enter **Cliff Street → Gym**, **06:00–22:00**, while unexposed. Buy admission at reception.
+
+| Option   | Cost   | Duration                       |
+| -------- | ------ | ------------------------------ |
+| Single   | £20    | This visit, expires on leaving |
+| Weekly   | £100   | Seven days                     |
+| Monthly  | £350   | Calendar month                 |
+| Lifetime | £2,000 | No periodic renewal            |
+
+Active weekly/monthly members can upgrade to lifetime. Other short-term cards do not freely stack extensions. Cards need VanillaPlus banking and merchant eligibility.
+
+### Gym rooms and activities
+
+Choose weights, running, stretching or outdoor jogging, up to three sessions daily. Options and prose show time and effects. Training generally adds tiredness, while stretching can reduce stress.
+
+- Machines require usable arms.
+- Rain or frost closes the outdoor platform, not every indoor entrance.
+- Independent lockers use the wardrobe interface, with retrieval available during opening hours after admission expires.
+- The basin provides one daily wash to admitted players.
 
 ### Temple weapons
 
-After obtaining a whip or baton at the temple, either free hand can use that weapon through the vanilla combat target selector. You can attack tentacles, vines, roots, shoots, or tendrils, including those extending from the wraith or plant people in mixed encounters. Switch that hand's target to tentacles, then select a specific one. Damage applies only to the selected tentacle, leaving the body untouched. Human, animal, and vore encounters remain excluded. The encounter must be non-consensual, and bound hands or incapacitation prevent attacks.
+Borrow a vanilla whip or baton, one at a time. Use a free unbound hand in a **nonconsensual, nonvore**, nonhuman/nonanimal tentacle encounter.
 
-Each hit deals **2 fixed damage plus 5%–10% of the target's starting health**, with the percentage increasing with the matching vanilla weapon proficiency and rounded down. Damage is capped at 9 per hit, below vanilla banishment's base damage. A hit grants one raw proficiency point and adds a little tiredness. The temple lends only one weapon, so selecting it for both hands still produces one strike. The selected target recoils, and vanilla handles its withdrawal when its health runs out.
+1. Switch the hand target to tentacles.
+2. Select a particular tentacle, vine, root, sprout or tendril.
+3. Select whip or baton attack. Ghost or plant-person mixed encounters permit eligible tentacles, not their bodies.
+4. Hits deal fixed-plus-proportional damage improved by proficiency, below angelic banishment's base damage.
+
+Hits train the existing weapon proficiency and add some tiredness. Both hands selecting the attack still produce only one strike. Humans, animals and consensual scenes are excluded.
+
+### Troubleshooting
+
+School: grades, evaluations, returned forms and waiting days. Policies: trial and support. History: painting discussion, deadline and order. Gym: hours, admission, weather and daily sessions. Weapons: loan, free hand, selected target and encounter type.

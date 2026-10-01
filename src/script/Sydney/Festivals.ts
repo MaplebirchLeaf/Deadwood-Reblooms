@@ -76,9 +76,9 @@ export default function (maplebirch: typeof window.maplebirch) {
   });
 
   // 只在当前剧情的收尾页提供下一站入口，错过后不另设补看入口。
+  maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-reblooms-sydney-christmas-link'], passage: 'Temple' });
   maplebirch.tool.addTo(
     'AfterLinkZone',
-    { widget: 'deadwood-reblooms-sydney-christmas-link', passage: 'Temple' },
     { widget: 'deadwood-reblooms-halloween-robin-guide', passage: 'Robin Trick Hug' },
     { widget: 'deadwood-reblooms-halloween-robin-guide', passage: 'Robin Trick Talk' },
     { widget: 'deadwood-reblooms-halloween-robin-guide', passage: 'Robin Trick Kiss Finish' },

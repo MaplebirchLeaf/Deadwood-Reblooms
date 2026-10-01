@@ -1,10 +1,29 @@
-### Where to configure them
+### Prerequisites and entrance
 
-Open **Celestial Anomalies** in mod options and enable eclipses and meteor showers separately. Dates depend on the **in-game calendar and this save's seed**. Reloading the same save does not reroll the same date. No story action can force an event.
+Enable **CelestialAnomalies**, reload and enable eclipse and meteor options separately in **Mod settings → Celestial anomalies**. No skill or relationship requirement applies.
 
-| Event         | Date and time                                                                                                      | Visible effect                                                                                      |
-| ------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| Solar eclipse | Dates near a new moon are candidates. A selected eclipse usually begins around 07:00 or 08:00 and lasts 9–11 hours | Sky image, weather icon, and weather description change with its stage                              |
-| Meteor shower | Save-dependent dates. Usually begins between 20:00 and 22:00, lasts 5–7 hours, and may continue after midnight     | Night sky and weather text change. Robin's stargazing date checks whether a shower is really active |
+### Observing events
 
-Robin's date also requires his presence, enough relationship progress, and dry weather. If the sky looks ordinary, first check the corresponding switch and the in-game time. Most nights have no anomaly.
+1. Check each toggle. Enabling eclipses does not enable meteors.
+2. Watch sky, weather icon and prose by game date and time. Scheduling uses the save seed, not the computer calendar.
+3. Advance normally if no event is scheduled rather than repeatedly reloading the same date.
+4. Check character integrations after the event begins. Their requirements remain separate.
+
+| Event   | Schedule                                                                                 | Visible effects and connections           |
+| ------- | ---------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Eclipse | Near-new-moon candidate dates, usually starting 07:00 or 08:00 for 9–11 hours            | Sky, weather icon and phase prose         |
+| Meteors | Save-scheduled dates, usually starting 20:00–22:00 for 5–7 hours, possibly past midnight | Night sky and prose, read by Robin's date |
+
+### Dates and music
+
+Robin's stargazing requires their module, eligible relationship, suitable location and dry weather. Meteors are one prerequisite and do not summon Robin.
+
+Music requires DynamicMusic, enabled playback and a pack containing the track. This module does not include audio itself.
+
+### Effects and limits
+
+Adds scheduled sky events, not guaranteed daily appearances or a manual story button to summon them. Reloading the same save date does not reroll the schedule. Ordinary blood moons are separate from the eclipse toggle.
+
+### Troubleshooting
+
+Check toggle, reload, game date and active period. A normal sky can simply mean no event that day. Missing dates belong to the character guide, while missing sound belongs to DynamicMusic.

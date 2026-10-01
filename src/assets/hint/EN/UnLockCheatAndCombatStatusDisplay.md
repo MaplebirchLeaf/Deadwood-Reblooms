@@ -1,9 +1,23 @@
-### Vanilla cheat entry
+### Prerequisites and entrances
 
-When this module is enabled, the sidebar can open the **vanilla cheat menu** even if the current save has not enabled cheats. It only relaxes the menu-entry condition. It does not switch the save's cheat flag or create another “mod cheats” panel. If the entry is missing, check the framework module manager and reload as prompted.
+Enable **UnLockCheatAndCombatStatusDisplay** and reload. No character or skill unlock applies. It adds access to vanilla cheats and numerical NPC combat statuses.
 
-### Combat numbers
+### Opening vanilla cheats
 
-In vanilla combat, NPC **health, arousal, anger, and trust** show numerical values beside the coloured state text. Health, arousal, and anger also show their maxima; trust shows only its current value. Vanilla still handles the status wording, actions, and combat resolution.
+Use the sidebar entrance even without the save's cheat flag. **Opening the menu alone does not automatically mark the save as cheated**, while individual actions retain vanilla rules and consequences.
 
-These numbers appear where vanilla draws an NPC combat status. If they are absent, open an ordinary encounter and inspect the opponent's status bar. The module adds no duplicate meter to street or character pages.
+For saved custom commands, use the framework content entrance described in Cheat Collection instead.
+
+### Combat display
+
+In encounters drawing NPC statuses, check beside coloured status text. Health, arousal and anger show current and maximum values. Trust shows only its current value, without an invented maximum.
+
+Use them to judge progress. Actions and story endings remain vanilla. No automatic attacks, victories or ordinary-street combat dashboard are added.
+
+### Effects and limits
+
+Only menu visibility and status display change. Dedicated stories can use their own interfaces. An absent status bar does not mean the NPC's state was deleted.
+
+### Troubleshooting
+
+Check module, reload and a collapsed sidebar. Numbers appear only where vanilla draws the corresponding status. Compare a normal encounter. Cheat-menu access and command collection are separate modules.

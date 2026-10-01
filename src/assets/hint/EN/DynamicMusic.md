@@ -1,9 +1,28 @@
-### Installation and options
+### Prerequisites
 
-The main mod contains only the scheduler. Also sideload the **deadwood-reblooms-audio** pack, which contains `dynamic-music.json` and the sound files. Open **Mod Options → Dynamic Music**, enable it, then set music and ambience volumes separately. Added tracks do not play without the audio pack.
+Enable **DynamicMusic** and install the separate **deadwood-reblooms-audio** pack. The main mod schedules playback, while the pack supplies configuration and tracks. Both are needed.
 
-### When tracks play
+### Activation steps
 
-Combat has the highest music priority. Outside combat, solar eclipse, blood moon, and meteor shower take precedence over ordinary day and night music in that order. Ambience is separate: thunderstorm takes precedence over rain, which takes precedence over snowy wind. The track changes when the game state matches a condition in the pack configuration.
+1. Confirm the loader loaded the pack rather than leaving it in Downloads.
+2. Save and reload module changes.
+3. Tick enable in **Mod settings → Dynamic music**. This playback option is separate from the module toggle.
+4. Adjust music and ambience independently, defaulting to 50% and 25%. Muting one does not mute the other.
+5. Click inside the game to permit browser audio, then enter a configured scene.
 
-If playback is silent, check that **the pack is loaded, the DynamicMusic module is enabled, the checkbox is on, game audio is unmuted, and neither volume slider is zero**. A weather state with no configured ambience remains silent.
+### Track selection
+
+| Layer    | Priority                                                     | Basis                                |
+| -------- | ------------------------------------------------------------ | ------------------------------------ |
+| Music    | Combat → eclipse → blood moon → meteors → ordinary day/night | Current state and pack configuration |
+| Ambience | Thunderstorm → rain → snowy wind                             | Weather and pack configuration       |
+
+Ambience is independent. Time, weather and scene changes refresh playback. Clicking does not randomly choose a new track every time.
+
+### Effects and limits
+
+Sound only, without changing dates, weather or dates with characters. Eclipse and meteor scheduling belongs to CelestialAnomalies. A track does not establish date eligibility. Ordinary blood moons do not need the eclipse toggle.
+
+### Troubleshooting
+
+Check **pack loaded → module reload → playback enabled → both volumes → game master volume → tab mute / autoplay → resource errors**. For one missing weather sound, check that the pack actually includes it. Volume cannot create missing tracks.

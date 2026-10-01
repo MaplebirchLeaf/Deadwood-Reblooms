@@ -1,12 +1,3 @@
-interface PassagePatch {
-  src?: string;
-  srcmatch?: RegExp;
-  to?: string;
-  applyafter?: string;
-  applybefore?: string;
-  expected: number;
-}
-
 const startCheck = `
   <<if
     $LifeSimulation.historyProject.status is 'none' and
@@ -27,57 +18,6 @@ const schedule = `
             Time.days + ((8 - Time.weekDay) % 7) + 1
           >>
         <</if>>`;
-
-const historyProjectWidgetPassages: Record<string, PassagePatch[]> = {
-  'Widgets School Projects': [
-    {
-      src: '<<widget "projectoptions">>',
-      applyafter: '\n\t<<deadwood-reblooms-history-project-home-option>>',
-      expected: 1
-    }
-  ],
-  'Widgets Events History': [
-    // 在普通历史课事件池清空后追加课题起始检查，让新事件参与当天的历史课抽取。
-    {
-      src: '<<addinlineevent "historyCritique">>',
-      applybefore: startCheck,
-      expected: 1
-    },
-    // 在安全历史课组件内部的清池点后追加同一检查，兼容安全模式的独立事件组件。
-    {
-      src: '<<addinlineevent "historyQuiet" 2>>',
-      applybefore: startCheck,
-      expected: 1
-    }
-  ],
-  'Widgets Journal': [
-    // 在原版数学课题日志分支前插入历史课题日志，使两个课题可以同时显示。
-    {
-      src: '<<if $mathsproject is "ongoing">>',
-      applybefore: '<<deadwood-reblooms-history-project-journal>>\n\t',
-      expected: 1
-    }
-  ],
-  'Widgets Events Street': [
-    // 在街道事件池清空后加入 Kylar 历史课题事件，确保它按原版事件池时机注册。
-    {
-      src: '<<cleareventpool>>',
-      applyafter: '\n\t\t<<deadwood-reblooms-history-project-kylar-street-event>>',
-      expected: 1
-    }
-  ]
-};
-
-const historyProjectLocationPassages: Record<string, PassagePatch[]> = {
-  Museum: [
-    // 在玩家确认讨论博物馆画作后安排历史课题，不因仅浏览画作而提前触发。
-    {
-      src: '<<set $museumAntiques.paintings[_labelP] to "talk">>',
-      applyafter: schedule,
-      expected: 1
-    }
-  ]
-};
 
 export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.onInit(() => {
@@ -129,15 +69,61 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.on(':language', registerAntique);
 
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-history-project-museum-options', passage: 'Museum' });
-  maplebirch.tool.addTo(
-    'AfterLinkZone',
-    { widget: 'deadwood-reblooms-history-project-library-option', passage: 'School Library' },
-    { widget: 'deadwood-reblooms-history-project-lake-option', passage: 'Lake Shore' }
-  );
+  maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-reblooms-history-project-library-option'], passage: 'School Library' });
+
+  // 湖岸末尾有多个方向出口，调查动作放在活动区前部。
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-history-project-lake-option', passage: 'Lake Shore' });
 
   // 在原版事件池、日志和画作归还结算点接入历史项目状态。
   maplebirch.tool.inject({
-    locationPassage: historyProjectLocationPassages,
-    widgetPassage: historyProjectWidgetPassages
+    locationPassage: {
+      Museum: [
+        // 在玩家确认讨论博物馆画作后安排历史课题，不因仅浏览画作而提前触发。
+        {
+          src: '<<set $museumAntiques.paintings[_labelP] to "talk">>',
+          applyafter: schedule,
+          expected: 1
+        }
+      ]
+    },
+    widgetPassage: {
+      'Widgets School Projects': [
+        {
+          src: '<<widget "projectoptions">>',
+          applyafter: '\n\t<<deadwood-reblooms-history-project-home-option>>',
+          expected: 1
+        }
+      ],
+      'Widgets Events History': [
+        // 在普通历史课事件池清空后追加课题起始检查，让新事件参与当天的历史课抽取。
+        {
+          src: '<<addinlineevent "historyCritique">>',
+          applybefore: startCheck,
+          expected: 1
+        },
+        // 在安全历史课组件内部的清池点后追加同一检查，兼容安全模式的独立事件组件。
+        {
+          src: '<<addinlineevent "historyQuiet" 2>>',
+          applybefore: startCheck,
+          expected: 1
+        }
+      ],
+      'Widgets Journal': [
+        // 在原版数学课题日志分支前插入历史课题日志，使两个课题可以同时显示。
+        {
+          src: '<<if $mathsproject is "ongoing">>',
+          applybefore: '<<deadwood-reblooms-history-project-journal>>\n\t',
+          expected: 1
+        }
+      ],
+      'Widgets Events Street': [
+        // 在街道事件池清空后加入 Kylar 历史课题事件，确保它按原版事件池时机注册。
+        {
+          src: '<<cleareventpool>>',
+          applyafter: '\n\t\t<<deadwood-reblooms-history-project-kylar-street-event>>',
+          expected: 1
+        }
+      ]
+    }
   });
 }

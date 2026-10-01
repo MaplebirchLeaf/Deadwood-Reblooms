@@ -1028,14 +1028,15 @@
 		<<sleepeffects>>
 		<<if $nightmares gte 1 and $controlled is 0>>
 			<<nightmareWake>>
-		<<elseif _nightWake>>
+		<</if>>
+		<<if _nightWake and !($nightmares gte 1 and $controlled is 0)>>
 			<<set $VanillaPlus.real_estate.daily_night_wake to true>>
 			<<set $sleephour to Math.max(1, _requestedHours - $sleepHoursTotal)>>
 			<<lanSwitch 'Something shifts beside you in the dark. You wake before the night is over.' '黑暗中，身旁的人动了动。夜还没过去，你已经醒了。'>>
 			<br><br>
 			<<bedicon>><<lanLink '睁开眼' 'Deadwood Reblooms Property Night Wake'>><</lanLink>>
 		<<else>>
-			<<if !_wakingEffect>><<lanSwitch 'You wake in your own bed.' '你在自己的床上醒来。'>><</if>>
+			<<if !_wakingEffect and !($nightmares gte 1 and $controlled is 0)>><<lanSwitch 'You wake in your own bed.' '你在自己的床上醒来。'>><</if>>
 			<<if !_wakingEffect and Time.schoolDay and Time.hour gte 6 and Time.hour lt 9
 				and (!$LifeSimulation?.school or ($LifeSimulation.school.role is 'student' and !$LifeSimulation.school.attendanceExempt))>>
 				<br><br><<schoolicon 'building'>><span class='teal'><<lanSwitch 'Today is a school day. Remember your uniform and books before heading out.' '今天有课。出门前记得换好校服，带上课本。'>></span>

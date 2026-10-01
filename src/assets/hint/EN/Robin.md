@@ -1,63 +1,139 @@
-### From the stalls to a drinks shop
+### Prerequisites and suggested route
 
-| Progress               | Where and what to do                                                                                                                                              | If the option is missing                                                                                                                             |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Notice a stall problem | Watch Robin work at the beach lemonade cart or park cocoa stand. Follow the clue about the cart or ingredients, then discuss an upgrade in Robin's orphanage room | Check Robin's location, injuries, and asylum status. Each stall has two upgrades                                                                     |
-| Shifts and products    | Help at the stall Robin runs today. Tasting costs £2 after the first upgrade and £3 after the second                                                              | Tasting is once per day. Shifts follow Robin's schedule                                                                                              |
-| Tutoring               | Upgrade at least one stall and raise Robin's dominance to 45. Find the tutoring notice at the orphanage and bring it up in Robin's room                           | The Danube Street trial lesson is after school. You may accompany Robin or let them teach alone                                                      |
-| Shop                   | Upgrade both stalls twice, then discuss a Cliff Street shop in Robin's room                                                                                       | Town hall application → inspect the Cliff Street site → inspection → collect the permit on a later day → opening. The journal names the current step |
+Enable **Robin** and reload. Business begins at vanilla stalls without property ownership or romance. Injuries, disappearance, asylum status and schedules affect availability.
 
-Robin can pay for upgrades from business savings while reserving next week's rent. The PC can instead lend the money. The loan stays in Robin's ledger. Dominance, trauma, and savings determine which steps Robin can complete alone. Opening grants the **“Honeyhole Ice City”** achievement.
+Suggested order: **stall clues → bedroom upgrades → both stalls complete → tutoring and reserves → shop application → opening → own rent → shared rent / resistance**. Fishing, balloons and dates have separate unlocks.
 
-| Stage                        | Purchases                                                                                                                                                                                                                       |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Vanilla lemonade stand       | Lemonade £1                                                                                                                                                                                                                     |
-| Upgraded lemonade stand      | Lemonade £1; mint lemonade £2 after the first upgrade; chilled fruit £3 after the second                                                                                                                                        |
-| Vanilla hot chocolate stand  | Hot chocolate £2                                                                                                                                                                                                                |
-| Upgraded hot chocolate stand | Hot chocolate £2; spiced cocoa £3 after the first upgrade; cocoa biscuit £4 after the second                                                                                                                                    |
-| Cliff Street drinks shop     | Year-round lemonade £2, hot chocolate £3, mint lemonade £3, strawberry lemonade £4, fresh orange juice £4, Robin's coffee £4, spiced cocoa £4, and fruit milkshake £5; chilled fruit £4 and cocoa biscuit £5 are also available |
+<span class="teal">Robin's personal funds, business reserve, PC loans, carried cash and bank balance are separate. Check the ledger first.</span>
 
-After the first upgrade, rainproof canopies let Robin work the stands on rainy weekends. A small sales event occurs once per day when you buy something. Once open, enter the shop from Cliff Street between 09:00 and 21:00. Paid relief workers cover the counter while Robin is away. At the shop you can review applications and hire up to two adult permanent employees. Each costs £350 to hire and train, then adds £700 in weekly sales while earning £350 in weekly wages. Wages are already deducted from the ledger's estimated income. Tasting a new drink with Robin is available once a day while Robin is in the shop. You can also buy ingredients, take shifts, and check the accounts.
+### Stalls and upgrades
 
-The other goods need separate setup. A flower counter costs £100 and begins with ten daisies; Robin can restock from the flower market. You can also supply ten ordinary flowers of one type at their vanilla market price. Purchased flowers enter your flower inventory. Up to ten flowers sell each week; the ledger estimates sales from the current stock and price, then removes those stems at settlement. A popcorn machine costs £150; bags cost £7 and enter the vanilla carried popcorn stock, with its three-bag limit. After the beach balloon seller partnership or friendly contest is complete, £100 opens a wholesale agreement. By day, balloons and handheld toys use the vanilla stall selection and wear interface. Net popcorn and balloon takings also enter the weekly estimate.
+| Stall    | Place and season                       | First step                                       |
+| -------- | -------------------------------------- | ------------------------------------------------ |
+| Lemonade | Beach, vanilla nonwinter work schedule | Notice cart and wheel problems while Robin works |
+| Cocoa    | Park, vanilla winter work schedule     | Notice ingredients and business problems         |
 
-| Cost                                         |                      Amount | When                                                                                                                                             |
-| -------------------------------------------- | --------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| First and second upgrade of either stall     |             £600, then £400 | Notice the problem at that stall, then discuss it in Robin's room. The PC may lend cash                                                          |
-| Town hall application, shop site, inspection |        £500, £1,500, £1,400 | Follow the journal's order. Inspection is no earlier than the day after applying, and permit collection no earlier than the day after inspection |
-| Equipment and opening stock                  |                      £4,000 | After collecting the permit, open on Cliff Street                                                                                                |
-| Permanent employee hiring and training       |              £350 each once | Review applications after opening; each also earns £350 per week                                                                                 |
-| Special ingredient restock                   | £25, or £30 below maths 300 | When crates run out and Robin is in the shop, buy 3 crates                                                                                       |
+1. See the relevant clue, then discuss improvements in **Orphanage → Robin's room**. Money alone does not skip clues.
+2. Each stall costs £600 then £400, totalling £2,000 for both.
+3. Lend PC cash or use Robin's available reserve. Independent purchases also need confidence, stable trauma and funds, reflected in the conversation.
+4. PC funding becomes a loan. Robin-funded purchases reserve next own rent rather than spending the ledger total.
+5. First upgrades provide rain canopies for eligible rainy-weekend work. Daily tastings cost £2 / £3 after the first / second upgrade.
 
-If Robin's reserve is short, the accounts let the PC **lend £2,000 from an opened bank account**. It enters the reserve and is recorded as Robin's debt to the PC. Robin also keeps enough for next week's own rent. Buying stall equipment alone requires dominance 55 and trauma below 60; later solo shop steps need higher dominance and trauma below 50.
+| Stage             | Products                                                        |
+| ----------------- | --------------------------------------------------------------- |
+| Original lemonade | Lemonade £1                                                     |
+| Upgraded lemonade | Lemonade £1, first-level mint £2, second-level chilled fruit £3 |
+| Original cocoa    | Cocoa £2                                                        |
+| Upgraded cocoa    | Cocoa £2, first-level spiced cocoa £3, second-level biscuit £4  |
 
-### Rent, crises, and daily life
+Work a stall shift for about 45 minutes once daily while Robin works there. Both earn money, depending on upgrades and cooperation. Severe trauma and absence block normal shifts.
 
-Discuss Robin's old debt and own rent in the bedroom before asking about sharing the PC's rent. The ledger shows weekly earnings, reserves, and loans. If the option is unavailable, improve the stalls and earnings first. At high trauma, ask Robin how they are doing in the bedroom. If Robin is sent to the asylum, visit the forest facility and work toward a rescue. For the confrontation with Bailey and the other orphans, follow the journal's current lead.
+### Tutoring
 
-Daily scenes include the bedroom note, a knock at night, and a reminder before school. Robin's ability to handle a task alone depends on confidence, trauma, and business progress. After Bailey leaves the orphanage, seek his signature for school permission at his Barb Street flat. With DoLP installed, any unused rent deposit held by Bailey is returned at the end of the confrontation.
+After at least one stall upgrade, notice the orphanage tutoring lead and discuss it in the bedroom. Discussion and actual starting are separate stages requiring further confidence.
 
-### Dates and intimacy during work
+Follow the journal to the **Danube Street** trial lesson. Schoolday tutoring is **17:30–18:30**, with accompaniment or eligible independent teaching.
 
-On a dry meteor-shower night after 20:00, Robin love 20 opens stargazing from Robin's room or the beach. When Robin is at the beach in suitable weather, you can swim together. Each date has a daily limit and may change with Robin's trauma or story progress.
+Accompanying pays the PC £7.50 and adds £8 to the reserve. Six lessons raise term-time estimated weekly tutoring income from £40 to £60. Re-entering the bedroom does not count lessons. Captivity, trauma and schedules can pause work.
 
-If Robin is your lover and trauma is below 50, four **optional consensual encounters** are available:
+### Cliff Street shop application
 
-| Place             | Requirements                                                                               | What happens                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| Lemonade cart     | At least one cart upgrade, Robin working at the beach, no rain, 09:00–17:00                | Stay beneath the cart while Robin serves. Approaching customers change the encounter text |
-| Cocoa stand       | At least one stand upgrade, Robin working at the park, 09:00–17:00                         | Stay beneath the counter while sales and customer movement continue                       |
-| Cliff Street shop | Open, Robin present, 19:00–21:00                                                           | The paid attendant handles the till while Robin joins you in the stockroom                |
-| Meteor date       | After watching the night's meteors, while Robin is still your lover and trauma is below 50 | Decide whether to stay beneath the blanket                                                |
+With both stalls fully upgraded, discuss a shop and follow the journal:
 
-Each scene offers a clear choice to continue or leave. Afterwards you return to the relevant stall or street. If the shop has closed, you return to Cliff Street.
+| Step | Place and action               | Cost                                          | Timing                                   |
+| ---- | ------------------------------ | --------------------------------------------- | ---------------------------------------- |
+| 1    | Town hall application          | £500                                          | Apply first                              |
+| 2    | Inspect Cliff Street site      | £1,500                                        | Follow the started application           |
+| 3    | Inspection                     | £1,400                                        | No earlier than the day after applying   |
+| 4    | Collect permit                 | No separately listed opening-equipment charge | No earlier than the day after inspection |
+| 5    | Equip and open on Cliff Street | £4,000                                        | Permit required                          |
+
+These stages total £7,400, excluding stalls. Independent steps need stronger confidence, stable trauma and sufficient reserves. Funds alone do not submit forms.
+
+The ledger offers one **£2,000 loan from the PC's existing bank funds**. It requires an account and actual deposits, not free funding or a new bank loan. Repaying the PC also protects rent reserves.
+
+### Running the open shop
+
+Enter **Cliff Street → Robin's drinks shop**, **09:00–21:00**. Relief staff cover absence, but do not provide Robin's personal activities. Opening grants the shop achievement.
+
+| Activity          | Steps                               | Returns and limits                                                          |
+| ----------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| New-drink tasting | Robin present                       | Once daily                                                                  |
+| Shop shift        | Special ingredients available       | Once daily, one crate, PC £10 and reserve £20                               |
+| Restock           | Robin present after crates run out  | Three crates £30, or £25 with eligible maths ability                        |
+| Permanent staff   | Review, hire and train              | Two adult staff maximum, £350 each once, £700 weekly sales minus £350 wages |
+| Ledger            | Check shop or relevant conversation | Income, wages, protected rent and loans, not another spendable balance      |
+
+| Product                                                         | Price      |
+| --------------------------------------------------------------- | ---------- |
+| Lemonade, cocoa, mint lemonade                                  | £2, £3, £3 |
+| Strawberry lemonade, orange juice, Robin's coffee, spiced cocoa | £4 each    |
+| Fruit milkshake                                                 | £5         |
+| Chilled fruit, cocoa biscuit                                    | £4, £5     |
+
+### Flowers, popcorn and balloons
+
+| Item              | Setup                                                   | Result                                                                                                          |
+| ----------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Flower counter    | £100 after opening                                      | Ten daisies initially, flower-market or ten same-type ordinary flowers for restocking, ten sales maximum weekly |
+| Popcorn machine   | £150 after opening                                      | £7 bags using vanilla carried popcorn with its three-bag cap                                                    |
+| Balloon wholesale | Complete cooperation or friendly competition, then £100 | Daytime vanilla balloon and handheld-toy selection/wearing                                                      |
+
+Flower estimates follow stock and price, with actual stems removed weekly. Staff wages are already deducted from estimated net income.
+
+**Balloon start**: complete vanilla help/conversation, upgrade lemonade once and establish Robin's confidence. Ask at the dry nonwinter beach while Robin is there. Cooperation and competition are committed choices. Compete once daily, with three wins progressing reconciliation.
+
+### Own rent and shared payments
+
+1. Complete both stalls, earn enough and hold funds for old debt plus next own rent. Discuss debt once Robin is confident and stable.
+2. Settle old debt before Robin independently takes their rent. Agreement does not immediately pay the PC or create funds.
+3. Grow income, confidence and trust before asking to cover both rents. This needs stronger business and emotional readiness.
+4. Once agreed, ask Robin to pay on **Bailey's rent page**. Actual available funds must still protect Robin's next own payment.
+
+Own-rent income must reach at least £1,500 weekly and cover own rent plus £50. Shared income must reach at least £5,000 and cover PC / applicable baby rent plus £1,000. Vanilla rent changes can increase the requirement.
+
+### Resistance stages
+
+| Stage              | Preparation                                                           | Next action                                                  |
+| ------------------ | --------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Discuss resistance | Own rent, viable business, independent Robin and stable trauma        | Bedroom proposal. A visible topic is not automatic agreement |
+| Confront Bailey    | Agreed plan                                                           | Coordinated resistance at the next rent event                |
+| Rally orphans      | Two victories and sufficient hope                                     | Orphanage hall                                               |
+| Solidarity         | Three victories and allies                                            | Hall and journal follow-up                                   |
+| Reckoning          | Four victories, solidarity and progressed vanilla Bailey defeat chain | Rent and hall continuation, not four wins alone              |
+
+<span class="red">Failure can increase Robin's trauma.</span> Support improves assistance, but vanilla combat remains. Basic resistance income is £4,000 weekly, alongside confidence and stability. Bailey's school-signature entrance moves to his Barb Street flat after departure.
+
+### Asylum warning, visits and escape
+
+Consecutive severe-trauma days produce a warning before admission. Timely care interrupts that accumulation. Admission stops relevant work.
+
+1. Check Robin in the bedroom and read the warning.
+2. **The PC must already be an asylum patient** with free daytime movement. No outside visitor entrance is added.
+3. Find Robin **07:00 until before 21:00**, free and below maximum stress, then visit.
+4. Prepare on two different dates. Obtain Harper's keycard and wait for the sleeping phase with usable arms. The specific 22:00 phase excludes joint escape.
+5. Attempt escape. Skulduggery, asylum status and suspicion affect success. Failure loses the keycard, sets planning back and raises trauma.
+6. Successful escape begins recovery, not an immediate return to work.
 
 ### Fishing and grilled fish
 
-The beach fishing date requires Robin working at the lemonade cart, healthy and present, love at least 20, **09:00 until before 16:00**, no precipitation, and an unexposed PC. Hold a fishing rod with usable arms. The date is available once per day and uses vanilla beach fishing. The return dialogue checks whether you caught fish during this date.
+**Fishing date**: eligible relationship, healthy Robin at the beach cart, unexposed PC, usable rod and arms, **09:00 until before 16:00**, no precipitation, once daily. Uses vanilla fishing, not a new fishing skill.
 
-Prepare fish at an equipped grill or the opened drinks shop. Eligible fish come from the PC’s food inventory and must be cookable. Sell at most three fish per day. Taste the first recipe together before selling it. If your catch is absent, check inventory amounts, cookability, and Robin’s presence at the counter.
+**Grilling**: one lemonade upgrade and a £30 grill, or an open shop. Share a cookable fish from PC food inventory to learn its recipe before sales. Three sales maximum daily. The PC and reserve each receive the fish's vanilla sale value, not the whole meal price.
 
-### School connection
+### Dates, night waking and school reminders
 
-As prefect or president, order student council drinks once a day if Robin is in the shop, special ingredients remain, and your bank account holds £20. The bank pays, Robin's business reserve grows, and student standing and staff trust improve.
+| Activity       | Location and requirements                                                      | Limits                                                |
+| -------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| Stargazing     | Actual meteors, dry weather, after 20:00, eligible relationship, room or beach | Actual event required                                 |
+| Swimming       | Robin at the beach and suitable weather                                        | Vanilla body/swimming rules                           |
+| Work intimacy  | Selected love interest, stable trauma and upgraded stall / open shop           | Optional and consensual, with exit choices            |
+| Stall intimacy | Robin working, 09:00–17:00                                                     | Lemonade also needs no rain                           |
+| Shop intimacy  | Robin present, 19:00–21:00                                                     | Return depends on opening hours                       |
+| School wake-up | Schooldays 06:00 until before 09:00, Robin home and available                  | Reads bedroom waking state, not a schedule-free alarm |
+
+### School connection and troubleshooting
+
+Prefects/presidents can order drinks once daily with Robin present, special stock and £20 bank funds. Bank payment raises reserves, student standing and staff trust.
+
+Check **schedule/state → season/weather → clues/upgrades → journal stage → relationship, confidence and trauma → available funds → daily limits**. Tastings, shifts, lessons, dates and orders have separate counters.

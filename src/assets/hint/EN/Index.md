@@ -1,3 +1,3 @@
-# Deadwood Reblooms · Game Guide
+# Deadwood Reblooms · Game guide
 
-Choose a chapter to read its guide, or use the checkbox on the right to change its module setting. Save your game before reloading to apply changes. Search for characters, places, or features; check the journal for story progress.
+Choose a chapter for requirements, entrances and steps. Right-hand checkboxes toggle modules. Save before reloading changes. Search by character, place or feature, and consult the journal for current story progress.
