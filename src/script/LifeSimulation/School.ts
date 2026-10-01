@@ -1,4 +1,11 @@
 export default function School(maplebirch: typeof window.maplebirch): void {
+  // 留堂提示、拦截和同行分支共用这段条件，只追加身份检查，保留各处其他限制。
+  const detention = (expected: number) => ({
+    srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
+    applyafter: ' and $LifeSimulation.school.role is "student"',
+    expected
+  });
+
   maplebirch.tool.onInit(() => {
     setup.feats['Student Council President'] ??= {
       get title() {
@@ -138,11 +145,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.inject({
     locationPassage: {
       'School Front Courtyard': [
-        {
-          src: '$detention gte 1 and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
-          to: '$detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
-          expected: 2
-        },
+        detention(2),
         {
           // 仅接管通往 Hallways 的原版一分钟入口，保留中庭其余事件与离校选项。
           srcmatch: /<<entranceicon>><<link \[\[[^\]\n]+\|Hallways]]>><<pass 1>><<\/link>>/,
@@ -151,11 +154,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
         }
       ],
       Hallways: [
-        {
-          src: '$detention gte 1 and $daily.school.detentionAttended isnot 1>>\n\t\t<<else>>',
-          to: '$detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1>>\n\t\t<<else>>',
-          expected: 1
-        },
+        detention(2),
         {
           // 储物柜前的链接数随留堂和特殊事件变化，按原版储物柜定位公告栏。
           srcmatch: /<<lockericon>><<link \[\[[^\]\n]+\|School Lockers]]>/,
@@ -163,23 +162,10 @@ export default function School(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
-      'Sydney Walk': [
-        {
-          src: '$location is "school" and $detention gte 1 and $daily.school.detentionAttended isnot 1',
-          to: '$location is "school" and $detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1',
-          expected: 1
-        }
-      ]
+      'Sydney Walk': [detention(1)]
     },
     widgetPassage: {
-      'Widgets Sydney': [
-        {
-          // 同行台词的三处留堂拦截须与前庭一致，风纪委员可自行决定是否留堂。
-          src: '$detention gte 1 and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
-          to: '$detention gte 1 and $LifeSimulation.school.role is "student" and $daily.school.detentionAttended isnot 1 and $headnodetention isnot 1 and $pillory.tenant.special.name isnot "Leighton"',
-          expected: 3
-        }
-      ],
+      'Widgets Sydney': [detention(3)],
       Social: [
         {
           // Social 是原版 widget，紧邻学校声望卡片插入，保持原版的双列排版。

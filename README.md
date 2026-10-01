@@ -20,9 +20,9 @@
 
 ## 安装与前置
 
-1. 准备支持 SugarCube 2 ModLoader 的游戏。发布包分别支持 **DoL 0.5.12.13** 和 **DoL 0.5.11.9**。
-2. 加载 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)，版本须满足模组包声明的 `maplebirch >= 5.1.3`，并安装模组包所列的其他前置。
-3. 从 [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases) 选择与游戏版本一致的 `deadwood-reblooms-*.modpack`，不要同时加载两个游戏版本的主包。需要动态音乐时，再加载相同游戏版本的 `deadwood-reblooms-audio-*.modpack`。
+1. 准备支持 SugarCube 2 ModLoader 的 **DoL 0.5.12.13**。
+2. 加载 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)，版本须满足模组包声明的 `maplebirch >= 5.2.0`，并安装模组包所列的其他前置。
+3. 从 [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases) 加载 `deadwood-reblooms-*.modpack`。需要动态音乐时，再加载对应的 `deadwood-reblooms-audio-*.modpack`。
 4. 需要调整模块时，在框架的模块管理中启用或关闭，并按提示重载。
 
 `DeadwoodReblooms` 是根模块，关闭它会停用所有子模块。检测到功能重叠的外部模组时，枯木逢春会关闭自身对应模块，保留外部模组。角色剧情仍遵循原版的人物关系、地点和日程条件。

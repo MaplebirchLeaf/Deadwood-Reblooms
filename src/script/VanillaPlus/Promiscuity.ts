@@ -332,8 +332,8 @@ export default function (maplebirch: typeof window.maplebirch) {
         },
         // 阴茎与肛门动作都会生成阴道双插邀请，两处统一显示六级标识。
         {
-          src: '<<case "penispussydouble">><<vaginaldifficulty>> <<combatpromiscuous5>> <<combataware 4>>',
-          to: '<<case "penispussydouble">><<vaginaldifficulty>> <<combatpromiscuous6>> <<combataware 4>>',
+          srcmatchgroup: /(<<case "penispussydouble">><<vaginaldifficulty>>\s*)<<combatpromiscuous5>>/g,
+          to: '$1<<combatpromiscuous6>>',
           expected: 2
         },
         // 将 PC 主动跨坐第二根阴茎的阴道双插动作提升为六级标识。

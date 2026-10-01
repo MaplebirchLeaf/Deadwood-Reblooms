@@ -1,5 +1,21 @@
 :: Deadwood Reblooms More Transformations Widgets [widget]
 
+<!-- 狐火只在成功放逐后触发，波及目标沿用原版触手伤害记录与束缚清理。 -->
+<<widget 'deadwood-foxfire'>>
+	<<set _foxfireMain to _args[0]>>
+	<<set _foxfire to maplebirch.get('MoreTransformations').flare(_foxfireMain, _args[1])>>
+	<<if _foxfire>>
+		<span class="gold"><<language>><<option 'EN'>>
+			Foxfire leaps to the <<= _foxfire.target.fullDesc>>, scorching it.
+		<<option 'CN'>>
+			狐火掠向附近的<<= _foxfire.target.fullDesc>>，将其灼伤。
+		<</language>></span>
+		<<tentacle_record 'banish' _foxfire.damage>>
+		<<if _foxfire.target.tentaclehealth lte 0>><<tentacleadvdisable _foxfire.target>><</if>>
+		<<set _tentacle to _foxfireMain>>
+	<</if>>
+<</widget>>
+
 <!-- 马蹄踢击：有马蹄时替换原版踢击文本并提高反抗效果。 -->
 <<widget 'deadwood-reblooms-action-kick'>>
 	<<if typeof $transformationParts?.traits?.hooves is 'string' and isPartEnabled($transformationParts.traits.hooves)>>

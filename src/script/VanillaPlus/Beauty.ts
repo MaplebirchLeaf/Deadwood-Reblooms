@@ -46,8 +46,8 @@ export default function (maplebirch: typeof window.maplebirch) {
       'Widgets Difficulty': [
         {
           // 同一诱惑评分公式在明示与隐藏属性分支复用，显示与实际等级一起提高。
-          src: '$attractiveness + (currentSkillValue("seductionskill") * 5)',
-          to: '$attractiveness + (currentSkillValue("seductionskill") * 5) + maplebirch.get("VanillaPlus").beauty.seductionBonus',
+          srcmatchgroup: /\$attractiveness \+ \(currentSkillValue\("seductionskill"\) \* 5\)/g,
+          to: '$& + maplebirch.get("VanillaPlus").beauty.seductionBonus',
           expected: 10
         }
       ]

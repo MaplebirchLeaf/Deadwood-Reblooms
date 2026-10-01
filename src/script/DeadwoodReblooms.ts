@@ -60,7 +60,7 @@ export default function (maplebirch: MaplebirchCore) {
       'Widgets Mirror': [
         // 在镜子设置的下一项控件前插入身体刻字组件，保持原版设置网格的 HTML 层级不变。
         {
-          srcmatch: /<div class="settingsToggleItemWide">\s*<span class="gold bold">(?:Body shape:|身形：)<\/span>/,
+          srcmatch: /<div class="settingsToggleItemWide">(?=(?:(?!<\/div>)[\s\S])*<<listbox "\$player\.bodyshape" autoselect>>)/,
           applybefore: '<<DeadwoodRebloomsBodyWriting>>\n\t\t',
           expected: 1
         }

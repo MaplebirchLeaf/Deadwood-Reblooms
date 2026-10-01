@@ -38,7 +38,20 @@ export default function (maplebirch: typeof window.maplebirch) {
     cond: () => V.feats?.currentSave['Beyond Nature'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.deviancy.max
   });
 
-  const discover = (mirror: 'home' | 'farm' | 'tower' | 'temple') => `<<run maplebirch.get("VanillaPlus").deviancy.discover('${mirror}')>>`;
+  const mirrors: Record<string, 'home' | 'farm' | 'tower' | 'temple'> = {
+    Mirror: 'home',
+    'Eerie Mirror': 'home',
+    'Farm Mirror': 'farm',
+    'Bird Tower Mirror': 'tower',
+    'Temple Mirror': 'temple'
+  };
+  // 到达镜面页就记录发现，无文本输出、不截断页面，也不依赖各页 effects 的写法。
+  maplebirch.dynamic.regStateEvent('gate', 'deviancy-mirror-discovery', {
+    forceExit: false,
+    extra: { passage: Object.keys(mirrors) },
+    cond: () => V.VanillaPlus != null,
+    action: () => maplebirch.get('VanillaPlus')!.deviancy.discover(mirrors[maplebirch.host.sugarcube.passage.title])
+  });
 
   maplebirch.tool.addTo(
     'BeforeLinkZone',
@@ -52,33 +65,20 @@ export default function (maplebirch: typeof window.maplebirch) {
     { widget: [1, 'deadwood-reblooms-deviancy-eerie-mirror-link 1'], passage: 'Eerie Mirror' }
   );
 
-  // 记录镜面探索与仪式结算，并扩展异种癖上限。
+  // 接入镜面通路与仪式结算，并扩展异种癖上限。
   maplebirch.tool.inject({
     locationPassage: {
-      Mirror: [
-        // 在卧室普通镜子执行 effects 后记录 home 镜面发现状态，不影响原版镜子内容。
-        { src: '<<effects>>', applyafter: discover('home'), expected: 1 }
-      ],
       'Farm Mirror': [
-        // 在农场镜子执行 effects 后记录 farm 镜面发现状态，供后续镜面通路判断。
-        { src: '<<effects>>', applyafter: discover('farm'), expected: 1 },
         // 镜子菜单会局部重绘，链接区若插进菜单内部，会在重绘后消失。
         { src: '<<mirror>>', applybefore: '<<deadwood-reblooms-deviancy-mirror-enter-link "farm">>\n', expected: 1 }
       ],
       'Bird Tower Mirror': [
-        // 在鸟塔镜子执行 effects 后记录 tower 镜面发现状态，供跨镜移动判断。
-        { src: '<<effects>>', applyafter: discover('tower'), expected: 1 },
         // 在原版 mirror 宏前插入鸟塔镜面进入链接，不替换鸟塔自身的镜子内容。
         { src: '<<mirror>>', applybefore: '<<deadwood-reblooms-deviancy-mirror-enter-link "tower">>\n', expected: 1 }
       ],
       'Temple Mirror': [
         // 神殿床铺镜的原版 mirror 带显示文字，取共用前缀以兼容中英文原版。
-        { src: '<<effects>>', applyafter: discover('temple'), expected: 1 },
         { src: '<<mirror ', applybefore: '<<deadwood-reblooms-deviancy-mirror-enter-link "temple">>\n', expected: 1 }
-      ],
-      'Eerie Mirror': [
-        // 在诡异镜执行 effects 后同样记录 home 镜面，兼容卧室的两种镜子 Passage。
-        { src: '<<effects>>', applyafter: discover('home'), expected: 1 }
       ]
     },
     widgetPassage: {

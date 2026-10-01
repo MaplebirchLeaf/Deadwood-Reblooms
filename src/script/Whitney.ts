@@ -6,6 +6,8 @@ export default function (maplebirch: typeof window.maplebirch): void {
     { widget: 'deadwood-whitney-flats-link', passage: 'Whitney Home Knock' },
     { widget: 'deadwood-whitney-music-link', passage: 'Whitney Chat' }
   );
+  // 原版开锁选项按巧手显示，最后一个链接始终是返回牢房。
+  maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-whitney-cell-link'], passage: 'Underground Cell Lock' });
   maplebirch.tool.onInit(() => {
     setup.feats['Deadwood Whitney Rescued'] ??= {
       get title() {
@@ -27,16 +29,6 @@ export default function (maplebirch: typeof window.maplebirch): void {
           // 原版只看恋爱标记。惠特尼仍被关着时，PC 独自逃脱不应触发她在学校迎接 PC。
           srcmatch: /<<if \$whitneyromance is 1(?=(?: and [^>]+)?>>)/,
           applyafter: ' and C.npc.Whitney.state isnot "dungeon"',
-          expected: 1
-        }
-      ]
-    },
-    locationPassage: {
-      'Underground Cell Lock': [
-        {
-          // 锚点在英中原版一致，保留原版的高巧手开锁与返回牢房选项。
-          src: '<<set $undergroundbrothel.timepass to false>>',
-          applybefore: '<<deadwood-whitney-cell-link>>\n',
           expected: 1
         }
       ]
