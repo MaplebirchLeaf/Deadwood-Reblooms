@@ -1,5 +1,6 @@
 // ./src/module/constants/life-simulation.ts
 
+import type { MedicineState } from '../LifeSimulation/Medicine';
 import type { SchoolState } from '../LifeSimulation/School';
 import { DEFAULT_SCHOOL_STATE } from '../LifeSimulation/School';
 
@@ -62,6 +63,7 @@ export interface GymState {
 export interface LifeSimulationState {
   /** 历史课题的进度与证据结果。 */
   historyProject: HistoryProjectState;
+  medicine: MedicineState;
   /** 校园生活的全部状态。 */
   school: SchoolState;
   /** 健身房的会员与当日状态。 */
@@ -70,6 +72,7 @@ export interface LifeSimulationState {
 
 // 项目进度和证据结果都写入 V.LifeSimulation，重新读档后直接恢复当前阶段。
 export const DEFAULT_LIFE_SIMULATION_STATE: LifeSimulationState = {
+  medicine: { uses: {}, notices: [], review: { day: -1, shared: false, pending: false } },
   historyProject: {
     status: 'none',
     source: 'none',

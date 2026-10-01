@@ -57,14 +57,6 @@ export default function (maplebirch: typeof window.maplebirch) {
   // 放宽原版美貌上限与钳制范围。
   maplebirch.tool.inject({
     widgetPassage: {
-      Cheats: [
-        // 将作弊面板的美貌滑条上限改为动态上限，未锁定突破时仍使用原版 $beautymax。
-        {
-          srcmatch: /\$beauty "beauty" \{max: (10000)( \* \$AMCTraits\.beauty)?(, percentage: false)?\}/,
-          to: '$beauty "beauty" {max: maplebirch.get("VanillaPlus").divineTransformations.beautyCeiling($VanillaPlus.lock.beauty ? maplebirch.get("VanillaPlus").ceiling("beauty") : $1$2)$3}',
-          expected: 1
-        }
-      ],
       'Widgets Clamp': [
         // 替换全局美貌钳制公式，同时应用特质保底值与突破后的 125% 上限。
         {

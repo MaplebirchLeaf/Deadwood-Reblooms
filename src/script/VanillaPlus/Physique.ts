@@ -106,14 +106,6 @@ export default function (maplebirch: typeof window.maplebirch) {
       ]
     },
     widgetPassage: {
-      Cheats: [
-        // 将作弊面板体格滑条上限改为动态 125%，未突破时继续使用原版 $physiquesize。
-        {
-          srcmatch: /\$physique "physique" \{max: (\$physiquesize)( \* \$AMCTraits\.physique)?(, percentage: false)?\}/,
-          to: '$physique "physique" {max: $VanillaPlus.lock.physique ? maplebirch.get("VanillaPlus").ceiling("physique") : $1$2$3}',
-          expected: 1
-        }
-      ],
       Widgets: [
         // 通用组件有两处相同钳制公式，作为明确的两处批量替换，避免依赖补丁执行顺序。
         {

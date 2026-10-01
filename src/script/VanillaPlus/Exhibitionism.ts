@@ -114,14 +114,6 @@ export default function (maplebirch: typeof window.maplebirch) {
           expected: 1
         }
       ],
-      Cheats: [
-        // 将作弊面板暴露癖滑条上限按突破倍率计算，保留原版反向显示。
-        {
-          src: '$exhibitionism "exhibitionism" {reverse: true}',
-          to: '$exhibitionism "exhibitionism" {max: $VanillaPlus.lock.exhibitionism ? maplebirch.get("VanillaPlus").ceiling("exhibitionism") : maplebirch.get("VanillaPlus").normalCeiling("exhibitionism"), reverse: true}',
-          expected: 1
-        }
-      ],
       'Widgets Exhibitionism': [
         // 在原版清除 desperateaction 前应用突破特质效果，确保仍能读取本次行动阶段。
         {

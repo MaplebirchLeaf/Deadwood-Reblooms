@@ -241,14 +241,6 @@ export default function (maplebirch: typeof window.maplebirch) {
   // 扩展战斗性行为选项，并接入淫乱突破与数值上限。
   maplebirch.tool.inject({
     widgetPassage: {
-      Cheats: [
-        // 将作弊面板淫乱滑条上限按突破倍率计算，保留原版反向显示。
-        {
-          src: '$promiscuity "promiscuity" {reverse: true}',
-          to: '$promiscuity "promiscuity" {max: $VanillaPlus.lock.promiscuity ? maplebirch.get("VanillaPlus").ceiling("promiscuity") : maplebirch.get("VanillaPlus").normalCeiling("promiscuity"), reverse: true}',
-          expected: 1
-        }
-      ],
       'Widgets Effects Man': [
         // 在男性战斗结算入口先清理失效的 NPC 双插状态。
         {

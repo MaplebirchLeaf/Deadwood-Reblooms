@@ -82,14 +82,6 @@ export default function (maplebirch: typeof window.maplebirch) {
       ]
     },
     widgetPassage: {
-      Cheats: [
-        // 将作弊面板的异种癖滑条上限按突破倍率计算，保留原版反向显示。
-        {
-          src: '$deviancy "deviancy" {reverse: true}',
-          to: '$deviancy "deviancy" {max: $VanillaPlus.lock.deviancy ? maplebirch.get("VanillaPlus").ceiling("deviancy") : maplebirch.get("VanillaPlus").normalCeiling("deviancy"), reverse: true}',
-          expected: 1
-        }
-      ],
       'Gwylan Ritual Sex Widgets': [
         // 在获得 Wildsong feat 后记录仪式完成标记，作为异种癖突破条件之一。
         {

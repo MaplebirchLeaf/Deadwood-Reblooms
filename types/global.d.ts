@@ -22,6 +22,7 @@ declare global {
   const Links: { enabled: boolean };
 
   interface Window {
+    formatMoney(amount: number): string;
     statChange: { stress(amount: number, multiplierOverride?: number): void };
     isLoveInterest(name: string): boolean;
     isPossibleLoveInterest(name: string): boolean;

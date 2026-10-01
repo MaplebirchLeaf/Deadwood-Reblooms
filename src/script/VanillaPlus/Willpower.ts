@@ -108,14 +108,6 @@ export default function (maplebirch: typeof window.maplebirch) {
           expected: 1
         }
       ],
-      Cheats: [
-        // 将作弊面板意志滑条上限改为动态 125%，未突破时继续使用原版 $willpowermax。
-        {
-          srcmatch: /\$willpower "willpower" \{max: (1000)( \* \$AMCTraits\.willpower)?(, percentage: false)?\}/,
-          to: '$willpower "willpower" {max: $VanillaPlus.lock.willpower ? maplebirch.get("VanillaPlus").ceiling("willpower") : $1$2$3}',
-          expected: 1
-        }
-      ],
       'Widgets Clamp': [
         // 替换全局意志钳制公式，同时应用特质保底值与突破后的 125% 上限。
         {

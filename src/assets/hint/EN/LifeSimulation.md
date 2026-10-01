@@ -125,3 +125,19 @@ Hits train the existing weapon proficiency and add some tiredness. Both hands se
 ### Troubleshooting
 
 School: grades, evaluations, returned forms and waiting days. Policies: trial and support. History: painting discussion, deadline and order. Gym: hours, admission, weather and daily sessions. Weapons: loan, free hand, selected target and encounter type.
+
+### Hospital tablets
+
+With Life Simulation enabled and reloaded, the hospital pharmacy sells calming, sleeping, wakefulness, concentration and soothing tablets. Purchase a packet and take tablets manually through the original medicine drawer.
+
+- **Calming tablets** ease stress but cause fatigue.
+- **Sleeping tablets** cause drowsiness and improve fatigue recovery during sleep. They do not remove hypnosis or prevent every nightmare.
+- **Wakefulness tablets** temporarily mask fatigue, which returns when the effect expires.
+- **Concentration tablets** improve actual study gains while active. Taking a tablet alone gives no academic progress.
+- **Soothing tablets** temporarily ease trauma. The suppressed portion returns when the effect expires, without permanently erasing past experiences.
+
+Follow the interval printed on the packet. Early repeat use can increase dependence. Another dose while an effect is active does not stack or extend the benefit. Consecutive daily use can also gradually increase dependence, and established dependence weakens some benefits. Going without may cause unease, which gradually subsides with time away from the tablets.
+
+The character page's Medicinal Traits describe active effects and the consequences of dependence. Read the instructions on the pharmacy packets. Temporary relief does not mean you have recovered.
+
+If you have recently taken these tablets or still have a dependence, Harper asks about your medication during hospital appointments, at most once per game day. You can disclose the tablets or conceal them. Harper responds to frequent use, dependence and current drowsiness, and your answer is recorded. The discussion does not instantly remove dependence or replace the existing prescription, hypnosis or examination.

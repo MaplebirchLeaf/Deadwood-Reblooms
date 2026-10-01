@@ -2,12 +2,14 @@ import Module from './Module';
 import AcademicHonours from './LifeSimulation/AcademicHonours';
 import School from './LifeSimulation/School';
 import Weapons from './LifeSimulation/Weapons';
+import Medicine from './LifeSimulation/Medicine';
 import { DEFAULT_LIFE_SIMULATION_STATE, type GymPlan } from './constants';
 
 class LifeSimulation extends Module {
   public readonly academics = new AcademicHonours();
   public readonly school = new School(this.core);
   public readonly weapons = new Weapons();
+  public readonly medicine = new Medicine(this.core);
 
   public constructor(core: typeof maplebirch) {
     super(core, 'LifeSimulation', DEFAULT_LIFE_SIMULATION_STATE);
@@ -15,6 +17,7 @@ class LifeSimulation extends Module {
 
   public override preInit(): void {
     super.preInit();
+    this.medicine.init();
     // 只在原版确实跨日时清除到期卡，读档时直接按保存的到期时间判断入场资格。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-gym-membership', {
       exact: true,

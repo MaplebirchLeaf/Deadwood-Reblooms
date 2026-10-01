@@ -1,9 +1,14 @@
 // ./src/script/DeadwoodReblooms.ts
 
+import Cheats from './DeadwoodReblooms/Cheats';
+import Tips from './DeadwoodReblooms/Tips';
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 export default function (maplebirch: MaplebirchCore) {
   'use strict';
+
+  Cheats(maplebirch);
+  Tips(maplebirch);
 
   maplebirch.tool.addTo('Options', 'Deadwood-Reblooms-Options');
   maplebirch.tool.addTo('Statistics', 'deadwood-reblooms-statistics');

@@ -1,0 +1,257 @@
+export type MedicineId = 'calm' | 'sleep' | 'alert' | 'focus' | 'soothe';
+
+interface Use {
+  owned: number;
+  last: number;
+  day: number;
+  count: number;
+  streak: number;
+  dependence: number;
+  until: number;
+  rebound: number;
+}
+
+export interface MedicineState {
+  uses: Partial<Record<MedicineId, Use>>;
+  notices: { id: MedicineId; kind: 'expiry' | 'withdrawal' }[];
+  review: { day: number; shared: boolean; pending: boolean };
+}
+
+export const MEDICINES = [
+  { id: 'calm', name: ['Calming tablets', '镇静片'], description: ['Temporarily eases stress. Causes drowsiness.', '暂时缓解压力，同时使人困倦。'], price: 1200, hours: 4 },
+  { id: 'sleep', name: ['Sleeping tablets', '安眠片'], description: ['Helps with troubled sleep. Does not prevent every nightmare.', '帮助入睡，不保证阻止所有噩梦。'], price: 1500, hours: 8 },
+  {
+    id: 'alert',
+    name: ['Wakefulness tablets', '提神片'],
+    description: ['Temporarily masks fatigue. Fatigue returns when it wears off.', '暂时压低疲劳，药效消退后疲劳会回升。'],
+    price: 1600,
+    hours: 4
+  },
+  {
+    id: 'focus',
+    name: ['Concentration tablets', '专注片'],
+    description: ['Improves gains from studying while active. Causes tension.', '药效期间提高实际学习收益，同时增加压力。'],
+    price: 1800,
+    hours: 4
+  },
+  { id: 'soothe', name: ['Soothing tablets', '安神片'], description: ['Temporarily eases the burden of trauma. Does not erase memories.', '暂时减轻创伤负担，不抹去经历。'], price: 1400, hours: 4 }
+] as const;
+
+const EMPTY_USE: Use = { owned: 0, last: -1, day: -1, count: 0, streak: 0, dependence: 0, until: 0, rebound: 0 };
+const HOURS = 60 * 60 * 1000;
+const key = (id: MedicineId) => MEDICINES.find(item => item.id === id)!.name[0].toLowerCase();
+
+export default class Medicine {
+  public constructor(private readonly core: typeof maplebirch) {}
+
+  private get state(): MedicineState {
+    return V.LifeSimulation.medicine;
+  }
+
+  private use(id: MedicineId): Use {
+    return (this.state.uses[id] ??= { ...EMPTY_USE });
+  }
+
+  public get offers() {
+    return MEDICINES;
+  }
+
+  public name(id: MedicineId): string {
+    const item = MEDICINES.find(item => item.id === id)!;
+    return lanSwitch(item.name[0], item.name[1]);
+  }
+
+  /** 最近服用或仍有明显依赖的药片，供哈珀问诊读取。 */
+  public get recent() {
+    return MEDICINES.filter(item => {
+      const use = this.state.uses[item.id];
+      return use && ((use.last >= 0 && Time.date.timeStamp - use.last <= 7 * 24 * HOURS) || this.level(item.id) > 0);
+    });
+  }
+
+  public get reviewDue(): boolean {
+    return this.state.review.day !== Time.days && this.recent.length > 0;
+  }
+
+  public get dependence(): number {
+    return Math.max(0, ...this.recent.map(item => this.level(item.id)));
+  }
+
+  public get frequent(): boolean {
+    return this.recent.some(item => {
+      const use = this.state.uses[item.id]!;
+      return (use.day === Time.days && use.count > 1) || use.streak >= 7;
+    });
+  }
+
+  public get drowsy(): boolean {
+    return this.sleepy || this.active('calm') || this.active('soothe');
+  }
+
+  public report(shared: boolean): boolean {
+    if (!this.reviewDue) return false;
+    this.state.review = { day: Time.days, shared, pending: true };
+    return true;
+  }
+
+  public reply(): boolean | undefined {
+    if (!this.state.review.pending) return undefined;
+    this.state.review.pending = false;
+    return this.state.review.shared;
+  }
+
+  public owned(id: MedicineId): number {
+    return this.state.uses[id]?.owned ?? 0;
+  }
+
+  public active(id: MedicineId): boolean {
+    return (this.state.uses[id]?.until ?? 0) > Time.date.timeStamp;
+  }
+
+  public get focus(): number {
+    return this.active('focus') ? 1.15 : 1;
+  }
+
+  public get sleepy(): boolean {
+    return this.active('sleep');
+  }
+
+  public level(id: MedicineId): number {
+    const value = this.state.uses[id]?.dependence ?? 0;
+    return value >= 60 ? 3 : value >= 30 ? 2 : value >= 12 ? 1 : 0;
+  }
+
+  public canTake(id: MedicineId): boolean {
+    const use = this.use(id);
+    return V.statFreeze !== true && V.combat !== 1 && this.owned(id) > 0 && (use.last < 0 || Time.date.timeStamp - use.last >= HOURS);
+  }
+
+  public buy(id: MedicineId): boolean {
+    const item = MEDICINES.find(item => item.id === id);
+    if (!item || V.location !== 'hospital' || V.daily.pharm.closed) return false;
+    const finance = this.core.get('VanillaPlus')?.finance;
+    if (!(finance ? finance.canPay(item.price, 'shopping') : V.money >= item.price)) return false;
+    // 复用原版 money 宏和模组付款路由，所有结算金额均为便士。
+    new Wikifier(null, `<<money -${item.price} 'shopping'>>`);
+    this.use(id).owned += 7;
+    return true;
+  }
+
+  public take(id: MedicineId): void {
+    if (!this.canTake(id)) return;
+    this.tick();
+    const use = this.use(id);
+    const item = MEDICINES.find(item => item.id === id)!;
+    const now = Time.date.timeStamp;
+    const repeat = use.last >= 0 && now - use.last < 8 * HOURS;
+    const consecutive = use.day === Time.days - 1;
+    if (use.day !== Time.days) {
+      use.streak = consecutive ? use.streak + 1 : 1;
+      use.day = Time.days;
+      use.count = 0;
+    }
+    use.count++;
+    use.dependence = Math.min(100, use.dependence + (repeat ? 8 : 0) + (use.count > 1 ? 4 : 0) + (use.streak >= 7 ? 2 : 0));
+    use.last = now;
+    use.owned--;
+    V.pillsConsumed = (V.pillsConsumed || 0) + 1;
+    // 重复使用只增加风险，不累积或延长当前药效。
+    const fresh = !this.active(id);
+    const strength = this.level(id) >= 2 ? 0.5 : 1;
+    let text = lanSwitch('You swallow a tablet with water.', '你就着水服下一片药。');
+    if (fresh) {
+      use.until = now + item.hours * HOURS;
+      const before = id === 'alert' ? V.tiredness : V.trauma;
+      const effects: Record<MedicineId, string> = {
+        calm: `<<stress ${-6 * strength}>><<tiredness 4>><<lstress>><<gtiredness>>`,
+        sleep: '<<tiredness 6>><<gtiredness>>',
+        alert: `<<tiredness ${-12 * strength}>><<stress 3>><<ltiredness>><<gstress>>`,
+        focus: '<<stress 3>><<gstress>>',
+        soothe: `<<trauma ${-2 * strength}>><<tiredness 2>><<ltrauma>><<gtiredness>>`
+      };
+      new Wikifier(null, effects[id].replace(/<<[lg][^>]*>>/g, ''));
+      if (id === 'alert' || id === 'soothe') use.rebound = Math.max(0, before - (id === 'alert' ? V.tiredness : V.trauma));
+      text += ` ${lanSwitch(item.description[0], item.description[1])} ${effects[id].replace(/<<(stress|tiredness|trauma) [^>]*>>/g, '')}`;
+    } else {
+      new Wikifier(null, '<<stress 3>><<tiredness 3>>');
+      text += lanSwitch(
+        ' The previous dose is still active. Another tablet brings no additional benefit. <<gstress>><<gtiredness>>',
+        ' 上一次服药的效果仍未消退，再吃一片并没有带来更多益处。<<gstress>><<gtiredness>>'
+      );
+    }
+    if (repeat || use.count > 1) text += lanSwitch(' <span class="red">You have exceeded the directions on the packet.</span>', ' <span class="red">你没有遵守包装上的服用间隔。</span>');
+    if (use.streak >= 7) text += lanSwitch(' <span class="purple">You have been reaching for these tablets every day.</span>', ' <span class="purple">你已经连续多日依靠这些药片。</span>');
+    V.lastPillTakenDescription = text;
+    Engine.play('Take Pill From Medicine Drawer');
+  }
+
+  public get expired(): boolean {
+    const uses: MedicineState['uses'] = V.LifeSimulation?.medicine?.uses ?? {};
+    return Object.values(uses).some(use => use && use.until > 0 && use.until <= Time.date.timeStamp);
+  }
+
+  public get pending(): boolean {
+    return (V.LifeSimulation?.medicine?.notices?.length ?? 0) > 0;
+  }
+
+  public flush(): string {
+    const messages = this.state.notices.splice(0).map(({ id, kind }) => {
+      if (kind === 'withdrawal') return `${this.name(id)}：${lanSwitch('Going without leaves you uneasy. <<gstress>>', '停用后，你感到有些不安。<<gstress>>')}`;
+      const result = id === 'alert' ? '<<gtiredness>>' : id === 'soothe' ? '<<gtrauma>>' : id === 'sleep' ? '<<gtiredness>>' : '';
+      return `${this.name(id)}：${lanSwitch('The effect has worn off.', '药效已经消退。')} ${result}`;
+    });
+    return `${messages.join('<br>')}<br><br>`;
+  }
+
+  public tick(): void {
+    if (!V.LifeSimulation?.medicine) return;
+    const now = Time.date.timeStamp;
+    for (const item of MEDICINES) {
+      const use = this.state.uses[item.id];
+      if (!use || !use.until || use.until > now) continue;
+      if (item.id === 'alert') V.tiredness = Math.min(V.tirednessmax, V.tiredness + use.rebound);
+      if (item.id === 'soothe' && V.innocencestate !== 1) V.trauma = Math.min(V.traumamax, V.trauma + use.rebound);
+      if (item.id === 'sleep') new Wikifier(null, '<<tiredness 2>>');
+      this.state.notices.push({ id: item.id, kind: 'expiry' });
+      use.rebound = 0;
+      use.until = 0;
+    }
+  }
+
+  public day(): void {
+    for (const item of MEDICINES) {
+      const use = this.state.uses[item.id];
+      if (!use) continue;
+      if (use.day < Time.days - 1) {
+        use.streak = 0;
+        if (use.dependence >= 12 && !V.statFreeze) {
+          new Wikifier(null, '<<stress 1>>');
+          this.state.notices.push({ id: item.id, kind: 'withdrawal' });
+        }
+        use.dependence = Math.max(0, use.dependence - 2);
+      }
+    }
+  }
+
+  public init(): void {
+    this.core.dynamic.regTimeEvent('onAfter', 'LifeSimulation Medicine Expiry', { action: () => this.tick() });
+    this.core.dynamic.regTimeEvent('onDay', 'LifeSimulation Medicine Dependence', { exact: true, action: () => this.day() });
+    for (const item of MEDICINES) {
+      const config = {
+        cn_name: item.name[1],
+        icon: `img/misc/icon/pill-${item.id}.png`,
+        description: () => lanSwitch(item.description[0], item.description[1]),
+        warning_label: () =>
+          lanSwitch(
+            'Leave at least eight hours between doses. Repeated and prolonged use may cause dependence. Manual use only.',
+            '两次服用至少间隔八小时。反复或长期使用可能形成依赖，仅限手动服用。'
+          ),
+        owned: () => this.owned(item.id),
+        doseTaken: () => (this.use(item.id).day === Time.days ? this.use(item.id).count : 0),
+        canTake: () => !!this.core.get('LifeSimulation') && this.canTake(item.id),
+        take: () => this.take(item.id)
+      };
+      this.core.tool.patch.require<{ add: (name: string, definition: typeof config) => void }>('pills').add(key(item.id), config);
+    }
+  }
+}
