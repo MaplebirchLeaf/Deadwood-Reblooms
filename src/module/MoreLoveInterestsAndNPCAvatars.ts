@@ -136,7 +136,17 @@ class NPCAvatars {
     Darryl      : NPCAvatars.avatar('darryl'  , NPCAvatars.avatarStates.cute),
     Doren       : NPCAvatars.avatar('doren'   , NPCAvatars.avatarStates.love),
     Eden        : NPCAvatars.avatar('eden'    , NPCAvatars.avatarStates.inspiring, { mimicFolder: 'eden' }),
-    'Great Hawk': NPCAvatars.avatar('gh'      , { loved: 'mate'      , disliked: 'distraught', dominant: 'domhigh', submissive: 'domlow' }, { gendered: false }),
+    'Great Hawk': NPCAvatars.avatar('gh', {}, {
+      gendered: false,
+      stateResolver: npc => {
+        if (V.syndromebird !== 1) return 'stay';
+        const love = npc.love ?? 0;
+        const dom = npc.dom ?? 0;
+        if (love >= 60) return dom >= 50 ? 'domhigh' : dom >= 20 ? 'mate' : 'domlow';
+        if (love >= 20) return dom >= 50 ? 'return' : dom >= 20 ? 'distraught' : 'desperate';
+        return dom >= 50 ? 'mate' : dom >= 20 ? 'default' : 'smitten';
+      }
+    }),
     Harper      : NPCAvatars.avatar('harper'  , NPCAvatars.avatarStates.cute    , { gendered: false }),
     Jordan      : NPCAvatars.avatar('jordan'  , NPCAvatars.avatarStates.normal  , { gendered: false }),
 
@@ -154,7 +164,16 @@ class NPCAvatars {
 
     Landry      : NPCAvatars.avatar('landry') ,
     Leighton    : NPCAvatars.avatar('leighton', NPCAvatars.avatarStates.cute),
-    Mason       : NPCAvatars.avatar('mason'   , { loved: 'best'       , disliked: 'terrible', lustful: 'lust3' }),
+    Mason       : NPCAvatars.avatar('mason', {}, {
+      stateResolver: npc => {
+        const love = npc.love ?? 0;
+        const lust = npc.lust ?? 0;
+        if (love >= 35) return lust >= 40 ? 'lust3' : 'best';
+        if (love >= 15) return lust >= 30 ? 'lust2' : 'delightful';
+        if (love <= Number(V.npclovelow ?? 0)) return 'terrible';
+        return lust >= 20 ? 'lust1' : 'default';
+      }
+    }),
     Morgan      : NPCAvatars.avatar('morgan'  , NPCAvatars.avatarStates.inspiring, { mimicFolder: 'morgan' }),
     Niki        : NPCAvatars.avatar('niki'    , NPCAvatars.avatarStates.love),
     Quinn       : NPCAvatars.avatar('quinn'   , { loved: 'interest'   , disliked: 'terrible', lustful: 'mind' }),
@@ -226,12 +245,53 @@ class NPCAvatars {
       }
     }),
 
-    Gwylan        : NPCAvatars.avatar('gwylan', { default: '' }    , { gendered: false }),
+    Gwylan        : NPCAvatars.avatar('gwylan', { default: '' }, {
+      gendered: false,
+      stateResolver: npc => {
+        const seen = V.gwylanSeen ?? [];
+        const dom = npc.dom ?? 0;
+        const status = T.npc === npc.nam ? (T.gwylanStatus ?? []) : [];
+        const known = T.npc === npc.nam && T.gwylanTF?.known;
+        if (npc.state === 'scorned') return V.yearningLetter === 2 ? 'yearning' : seen.includes('yearning_pub') ? 'sulking' : 'scorned';
+        if (seen.includes('ritual_sex') && V.gwylan?.timer?.ritual && Time.date.dayDifference(new DateTime(V.gwylan.timer.ritual)) <= 0) {
+          if (V.gwylan.hunting >= 2) return 'found';
+          if (status.includes('heat') && known) return npc.pronoun === 'm' ? 'rut' : 'heat';
+          return status.includes('aroused') || status.includes('lust') ? 'ready' : 'ritual';
+        }
+        if (seen.includes('romance') && V.gwylan?.timer?.nobody >= Time.date.timeStamp) return 'home';
+        if (seen.includes('romance') && V.gwylan?.taken) return V.gwylan.taken === 'scarred' ? 'taken' : 'home';
+        const close = seen.includes('romance') || seen.includes('partners') || (seen.includes('yearning') && dom >= 25);
+        if (close && V.gwylan?.wary >= 2 && (V.brownFoxRevealed || seen.includes('auriga_scar')))
+          return V.avery_fate === 'ascended' && V.auriga_scar >= 1 ? 'ascended' : 'disappointed';
+        if (seen.includes('romance')) return dom >= 140 ? 'think5' : dom >= 110 ? 'think4' : dom >= 80 ? 'think3' : dom >= 50 ? 'think2' : 'think1';
+        if (seen.includes('partners')) {
+          if (status.includes('wantsPregnancy')) return known ? (npc.pronoun === 'm' ? 'rut' : 'heat') : 'conflicted';
+          if (dom >= 140) return 'conflicted';
+          if (status.includes('heat')) return known ? (npc.pronoun === 'm' ? 'rut' : 'heat') : 'conflicted';
+          return dom >= 110 ? 'think4' : dom >= 80 ? 'think3' : dom >= 50 ? 'think2' : 'think1';
+        }
+        if (seen.includes('yearning') && dom >= 25) {
+          if (dom >= 75 && V.dateCount?.GwylanSex >= 5) return 'advance';
+          if (status.includes('lust')) return 'conflicted';
+          return dom >= 50 ? 'companionship' : 'back';
+        }
+        if (V.gwylan?.wary > 1 && (V.brownFoxRevealed || seen.includes('auriga_scar'))) return 'disappointed';
+        if (status.includes('aroused')) return 'nervous';
+        if (T.npc === npc.nam && T.gwylanLovePercent >= 60) return 'special';
+        return '';
+      }
+    }),
     'Ivory Wraith': NPCAvatars.avatar('iw'    , { default: 'life' }, {
       gendered: false,
       stateResolver: () => (['active', 'despair', 'haunt'].includes(V.wraith?.state) ? V.wraith.state : 'life')
     }),
-    Zephyr        : NPCAvatars.avatar('zephyr', NPCAvatars.avatarStates.normal)
+    Zephyr        : NPCAvatars.avatar('zephyr', NPCAvatars.avatarStates.normal),
+    'Night Monster': NPCAvatars.avatar('nightmonster', { default: 'beast' }, {
+      gendered: false,
+      layers: npc => ({
+        base: `${NPCAvatars.avatarBasePath}/nightmonster/nightmonster_${V.daily?.nmMonsterRoll ? (npc.pronoun === 'm' ? 'm' : 'f') : 'beast'}.png`
+      })
+    })
   };
 
   // prettier-ignore
@@ -269,11 +329,11 @@ class NPCAvatars {
     const profile = NPCAvatars.avatarProfiles[npc.nam];
     if (!profile) return undefined;
 
-    // 少数角色的发色/服装需要多图层，其他角色按关系状态选单张表情图。
+    // 少数角色按发色、装束或形态选择图层，其他角色按关系状态选单张表情图。
     const customLayers = profile.layers?.(npc);
     if (customLayers) {
-      const hair = NPCAvatars.sydneyAppearance(npc).hairColor;
-      return this.buildLayers(customLayers.base, customLayers.infront, `${NPCAvatars.avatarBasePath}/sydney/syd_default_${hair}.png`);
+      const fallback = npc.nam === 'Sydney' ? `${NPCAvatars.avatarBasePath}/sydney/syd_default_${NPCAvatars.sydneyAppearance(npc).hairColor}.png` : undefined;
+      return this.buildLayers(customLayers.base, customLayers.infront, fallback);
     }
 
     let state: string | undefined;
@@ -314,8 +374,7 @@ class NPCAvatars {
 
     const customMimic = profile.mimic?.(npc, wraithState);
     if (customMimic) {
-      const fallback = name === 'Sydney' && wraithState === 'iwb' && NPCAvatars.sydneyAppearance(npc).hairColor === 'st' ? `${NPCAvatars.avatarBasePath}/sydney/syd_iwb_bl.png` : undefined;
-      fragment.append(this.buildLayers(customMimic.base, customMimic.infront, fallback));
+      fragment.append(this.buildLayers(customMimic.base, customMimic.infront));
       return fragment;
     }
 

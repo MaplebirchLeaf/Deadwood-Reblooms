@@ -39,22 +39,22 @@ import Guide from './Guide';
 
 // prettier-ignore
 const guideSections = {
-  DeadwoodReblooms:                   { EN: Hint_DeadwoodReblooms_EN,                   CN: Hint_DeadwoodReblooms_CN,                   title: { EN: 'Core features',                 CN: '基础功能' } },
-  UnLockCheatAndCombatStatusDisplay:               { EN: Hint_UnLockCheatAndCombatStatusDisplay_EN,               CN: Hint_UnLockCheatAndCombatStatusDisplay_CN,               title: { EN: 'Cheats and combat values',      CN: '作弊入口与战斗数值' } },
-  LongerCombat:         { EN: Hint_LongerCombat_EN,         CN: Hint_LongerCombat_CN,         title: { EN: 'Longer encounters',             CN: '更长遭遇战' } },
-  MoreLoveInterestsAndNPCAvatars:             { EN: Hint_MoreLoveInterestsAndNPCAvatars_EN,             CN: Hint_MoreLoveInterestsAndNPCAvatars_CN,             title: { EN: 'Love interests and portraits',  CN: '更多恋人与社交栏头像' } },
-  IncantationCheatCollection:                  { EN: Hint_IncantationCheatCollection_EN,                  CN: Hint_IncantationCheatCollection_CN,                  title: { EN: 'Cheat collection',              CN: '作弊集' } },
-  CelestialAnomalies:                   { EN: Hint_CelestialAnomalies_EN,                   CN: Hint_CelestialAnomalies_CN,                   title: { EN: 'Celestial anomalies',           CN: '天体异象' } },
-  MoreTransformations:  { EN: Hint_MoreTransformations_EN,  CN: Hint_MoreTransformations_CN,  title: { EN: 'Transformations',               CN: '更多转化' } },
-  NPCSidebarPortrait:   { EN: Hint_NPCSidebarPortrait_EN,   CN: Hint_NPCSidebarPortrait_CN,   title: { EN: 'Sidebar portraits',             CN: 'NPC 侧边栏立绘' } },
-  VanillaPlus:                   { EN: Hint_VanillaPlus_EN,                   CN: Hint_VanillaPlus_CN,                   title: { EN: 'Vanilla Plus',                  CN: '原版增强' } },
-  Sydney:      { EN: Hint_Sydney_EN,      CN: Hint_Sydney_CN,      title: { EN: 'Sydney',                        CN: '悉尼拓展' } },
-  Robin:       { EN: Hint_Robin_EN,       CN: Hint_Robin_CN,       title: { EN: 'Robin',                         CN: '罗宾拓展' } },
-  Whitney:     { EN: Hint_Whitney_EN,     CN: Hint_Whitney_CN,     title: { EN: 'Whitney',                       CN: '惠特尼拓展' } },
-  Kylar:       { EN: Hint_Kylar_EN,       CN: Hint_Kylar_CN,       title: { EN: 'Kylar',                         CN: '凯拉尔拓展' } },
-  LifeSimulation:                   { EN: Hint_LifeSimulation_EN,                   CN: Hint_LifeSimulation_CN,                   title: { EN: 'Life Simulation',               CN: '模拟人生' } },
-  DynamicMusic:                   { EN: Hint_DynamicMusic_EN,                   CN: Hint_DynamicMusic_CN,                   title: { EN: 'Dynamic Music',                 CN: '动态音乐' } },
-  Credits:              { EN: Hint_Credits_EN,              CN: Hint_Credits_CN,              title: { EN: 'Credits and sources',           CN: '致谢与素材来源' } }
+  DeadwoodReblooms:                  { EN: Hint_DeadwoodReblooms_EN                 , CN: Hint_DeadwoodReblooms_CN                 , title: { EN: 'Core features'               , CN: '基础功能' } },
+  UnLockCheatAndCombatStatusDisplay: { EN: Hint_UnLockCheatAndCombatStatusDisplay_EN, CN: Hint_UnLockCheatAndCombatStatusDisplay_CN, title: { EN: 'Cheats and combat values'    , CN: '作弊入口与战斗数值' } },
+  LongerCombat:                      { EN: Hint_LongerCombat_EN                     , CN: Hint_LongerCombat_CN                     , title: { EN: 'Longer encounters'           , CN: '更长遭遇战' } },
+  MoreLoveInterestsAndNPCAvatars:    { EN: Hint_MoreLoveInterestsAndNPCAvatars_EN   , CN: Hint_MoreLoveInterestsAndNPCAvatars_CN   , title: { EN: 'Love interests and portraits', CN: '更多恋人与社交栏头像' } },
+  IncantationCheatCollection:        { EN: Hint_IncantationCheatCollection_EN       , CN: Hint_IncantationCheatCollection_CN       , title: { EN: 'Cheat collection'            , CN: '作弊集' } },
+  CelestialAnomalies:                { EN: Hint_CelestialAnomalies_EN               , CN: Hint_CelestialAnomalies_CN               , title: { EN: 'Celestial anomalies'         , CN: '天体异象' } },
+  MoreTransformations:               { EN: Hint_MoreTransformations_EN              , CN: Hint_MoreTransformations_CN              , title: { EN: 'Transformations'             , CN: '更多转化' } },
+  NPCSidebarPortrait:                { EN: Hint_NPCSidebarPortrait_EN               , CN: Hint_NPCSidebarPortrait_CN               , title: { EN: 'Sidebar portraits'           , CN: 'NPC 侧边栏立绘' } },
+  VanillaPlus:                       { EN: Hint_VanillaPlus_EN                      , CN: Hint_VanillaPlus_CN                      , title: { EN: 'Vanilla Plus'                , CN: '原版增强' } },
+  Sydney:                            { EN: Hint_Sydney_EN                           , CN: Hint_Sydney_CN                           , title: { EN: 'Sydney'                      , CN: '悉尼拓展' } },
+  Robin:                             { EN: Hint_Robin_EN                            , CN: Hint_Robin_CN                            , title: { EN: 'Robin'                       , CN: '罗宾拓展' } },
+  Whitney:                           { EN: Hint_Whitney_EN                          , CN: Hint_Whitney_CN                          , title: { EN: 'Whitney'                     , CN: '惠特尼拓展' } },
+  Kylar:                             { EN: Hint_Kylar_EN                            , CN: Hint_Kylar_CN                            , title: { EN: 'Kylar'                       , CN: '凯拉尔拓展' } },
+  LifeSimulation:                    { EN: Hint_LifeSimulation_EN                   , CN: Hint_LifeSimulation_CN                   , title: { EN: 'Life Simulation'             , CN: '模拟人生' } },
+  DynamicMusic:                      { EN: Hint_DynamicMusic_EN                     , CN: Hint_DynamicMusic_CN                     , title: { EN: 'Dynamic Music'               , CN: '动态音乐' } },
+  Credits:                           { EN: Hint_Credits_EN                          , CN: Hint_Credits_CN                          , title: { EN: 'Credits and sources'         , CN: '致谢与素材来源' } }
 } as const;
 
 const guideOrder = [
@@ -79,7 +79,7 @@ const guideOrder = [
 // 使用 boot.json 的模组名识别已加载模组。只关闭重叠的本模组模块，不改动玩家安装的外部模组。
 const overlappingMods = {
   LongerCombat: ['LongerCombat'],
-  MoreLoveInterestsAndNPCAvatars: ['More Love Interests Mod', 'NPC Avatars Mod', 'NPC Avatars Mod (SF)'],
+  MoreLoveInterestsAndNPCAvatars: ['More Love Interests Mod', 'NPC Avatars Mod'],
   Robin: ['DomRobin'],
   LifeSimulation: ['DoLSims']
 } as const;
@@ -151,7 +151,6 @@ class BaileyRent {
   }
 
   public preInit(): void {
-    // previous 仅是本次会话的差分基线，切换存档后从恢复的 V 重建，不能沿用上一局的贝利状态。
     this.core.on(':variable', () => (this.previous = this.snapshot), 'Deadwood Reblooms Bailey Rent');
     this.core.dynamic.regTimeEvent('onBefore', 'DeadwoodRebloomsBaileyRentBefore', {
       action: this.sync
@@ -196,9 +195,7 @@ class DeadwoodReblooms extends Module {
   private get overlapping(): Set<OverlappingModule> {
     const loaded = new Set(this.core.host.modLoader.modUtils.getModListNameNoAlias());
     const conflicts = new Set<OverlappingModule>();
-    for (const name of Object.keys(overlappingMods) as OverlappingModule[]) {
-      if (overlappingMods[name].some(id => loaded.has(id))) conflicts.add(name);
-    }
+    for (const name of Object.keys(overlappingMods) as OverlappingModule[]) if (overlappingMods[name].some(id => loaded.has(id))) conflicts.add(name);
     return conflicts;
   }
 
@@ -209,7 +206,6 @@ class DeadwoodReblooms extends Module {
   public get rand(): ReturnType<typeof maplebirch.tool.rand.create> {
     const state = (V.DeadwoodReblooms.rand ??= { seed: null, history: [], index: 0 });
     if (!Number.isInteger(state.index)) state.index = 0;
-    // RNG 对象可以缓存，但种子与历史必须跟随当前存档的 V，对象身份变化即重建。
     if (this.random && this.random.state === state) return this.random;
     return (this.random = this.core.tool.rand.create(state));
   }
@@ -235,9 +231,7 @@ class DeadwoodReblooms extends Module {
       | { key: string; value: { disabled: { name: string; source: string }[] } }
       | undefined;
     const oldDisabled = new Set(modulesRecord?.value.disabled.map(module => module.name) ?? []);
-    for (const [oldName, name] of Object.entries(legacyNames)) {
-      if (oldDisabled.has(oldName) && enabled.has(name)) states[name] = false;
-    }
+    for (const [oldName, name] of Object.entries(legacyNames)) if (oldDisabled.has(oldName) && enabled.has(name)) states[name] = false;
     try {
       const changed = Object.keys(states).length ? await this.core.services.gui.setModuleStates(states) : false;
       if (modulesRecord && Object.keys(legacyNames).some(name => oldDisabled.has(name))) {

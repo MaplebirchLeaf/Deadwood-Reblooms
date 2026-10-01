@@ -132,7 +132,7 @@ export default class Medicine {
     const finance = this.core.get('VanillaPlus')?.finance;
     if (!(finance ? finance.canPay(item.price, 'shopping') : V.money >= item.price)) return false;
     // 复用原版 money 宏和模组付款路由，所有结算金额均为便士。
-    new Wikifier(null, `<<money -${item.price} 'shopping'>>`);
+    this.core.SugarCube.Wikifier.wikifyEval(`<<money -${item.price} 'shopping'>>`);
     this.use(id).owned += 7;
     return true;
   }
@@ -169,11 +169,11 @@ export default class Medicine {
         focus: '<<stress 3>><<gstress>>',
         soothe: `<<trauma ${-2 * strength}>><<tiredness 2>><<ltrauma>><<gtiredness>>`
       };
-      new Wikifier(null, effects[id].replace(/<<[lg][^>]*>>/g, ''));
+      this.core.SugarCube.Wikifier.wikifyEval(effects[id].replace(/<<[lg][^>]*>>/g, ''));
       if (id === 'alert' || id === 'soothe') use.rebound = Math.max(0, before - (id === 'alert' ? V.tiredness : V.trauma));
       text += ` ${lanSwitch(item.description[0], item.description[1])} ${effects[id].replace(/<<(stress|tiredness|trauma) [^>]*>>/g, '')}`;
     } else {
-      new Wikifier(null, '<<stress 3>><<tiredness 3>>');
+      this.core.SugarCube.Wikifier.wikifyEval('<<stress 3>><<tiredness 3>>');
       text += lanSwitch(
         ' The previous dose is still active. Another tablet brings no additional benefit. <<gstress>><<gtiredness>>',
         ' 上一次服药的效果仍未消退，再吃一片并没有带来更多益处。<<gstress>><<gtiredness>>'
@@ -182,7 +182,7 @@ export default class Medicine {
     if (repeat || use.count > 1) text += lanSwitch(' <span class="red">You have exceeded the directions on the packet.</span>', ' <span class="red">你没有遵守包装上的服用间隔。</span>');
     if (use.streak >= 7) text += lanSwitch(' <span class="purple">You have been reaching for these tablets every day.</span>', ' <span class="purple">你已经连续多日依靠这些药片。</span>');
     V.lastPillTakenDescription = text;
-    Engine.play('Take Pill From Medicine Drawer');
+    this.core.SugarCube.Engine.play('Take Pill From Medicine Drawer');
   }
 
   public get expired(): boolean {
@@ -211,7 +211,7 @@ export default class Medicine {
       if (!use || !use.until || use.until > now) continue;
       if (item.id === 'alert') V.tiredness = Math.min(V.tirednessmax, V.tiredness + use.rebound);
       if (item.id === 'soothe' && V.innocencestate !== 1) V.trauma = Math.min(V.traumamax, V.trauma + use.rebound);
-      if (item.id === 'sleep') new Wikifier(null, '<<tiredness 2>>');
+      if (item.id === 'sleep') this.core.SugarCube.Wikifier.wikifyEval('<<tiredness 2>>');
       this.state.notices.push({ id: item.id, kind: 'expiry' });
       use.rebound = 0;
       use.until = 0;
@@ -225,7 +225,7 @@ export default class Medicine {
       if (use.day < Time.days - 1) {
         use.streak = 0;
         if (use.dependence >= 12 && !V.statFreeze) {
-          new Wikifier(null, '<<stress 1>>');
+          this.core.SugarCube.Wikifier.wikifyEval('<<stress 1>>');
           this.state.notices.push({ id: item.id, kind: 'withdrawal' });
         }
         use.dependence = Math.max(0, use.dependence - 2);

@@ -48,6 +48,7 @@ declare global {
       setPrice(pounds: number): number;
     };
     currentSkillValue(skill: string, disableModifiers?: number): number;
+    Renderer: { CanvasModels: Record<'main' | 'combatMainPc', { layers: CanvasLayerMap }> };
     CombatRenderer: {
       indices: { xrayPenetrator2: number; xrayCondom2: number };
       getCondomOptions(condom: unknown): { colour: unknown };

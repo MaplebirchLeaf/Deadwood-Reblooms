@@ -36,14 +36,46 @@ Horse build gradually decays without further gains. The **clothing shop on the s
 
 Ordinary swimming skill resolutions and completed underwater actions also have separate random growth checks. If the loft action is absent, confirm that River has installed the kitchen. Discovering the loft alone is insufficient.
 
-Fish transformation likewise advances through the stages shown on the character page. Stage 2 grants **gills**, reducing underwater oxygen consumption to one quarter. Stage 3 grants **finned limbs**, increasing effective swimming skill by roughly 10%. Fins appear at stage 4. Stage 6 adds the tail and halves underwater action time, with a minimum of one second.
+Fish transformation likewise advances through the stages shown on the character page. Stage 2 grants **Deep Diver**, reducing underwater oxygen consumption to one quarter. Stage 3 grants **Finned Limbs**, increasing effective swimming skill by roughly 10%. Fins appear at stage 4. Stage 6 adds the tail and halves underwater action time, with a minimum of one second.
 
 The second-floor clothing shop in the shopping centre sells the **Pearl shell hair clip**. Wearing it prevents natural fish decay and suppression by other animal transformations. You can wear only one head item at a time. To maintain both forms, use the **Golden carrot pendant** for horse form and keep the head slot for the shell clip.
 
 **If progress stalls:** Check that MoreTransformations is enabled. Build and stage are different values on the character page. Horse brushing, riding, and swimming have conditions or random checks. Use the riding-school fruit and rocks-pool lounging actions for reliable starting points. If a part has reached its stage but is invisible, check its mirror display setting and whether clothing covers it.
 
+### Raven transformation: starting the route
+
+**Requirements and location:** Enable MoreTransformations and reload. Explore the forest during daylight or dusk while you are not being hunted. The flock may appear in a vanilla safe encounter. The entry is unavailable during a blood moon.
+
+**First acquisition:** Follow the birds or leave some fruit to begin the change. Following takes fifteen minutes and leads you deeper into the forest. Feeding takes five minutes and consumes one blackberry, strawberry or apple from native food stock, selected in that order. Wings and the Great Hawk route are not required.
+
+**Further growth:** After the first interaction, ordinary forest travel pages offer “Look for the raven flock”. Finding them takes five minutes. Feed them once per day or imitate their calls once per day. Calling takes ten minutes and slightly increases tiredness. Once visible plumage has grown, spend ten minutes preening it once per day to ease stress and build the transformation. Completed actions disappear for the rest of the day and return the next day. Looking for the flock, returning to the path and redrawing the page do not grant build.
+
+**Checking progress:** The character page shows your stage. The mirror controls visible parts. **Mods Transformation → Raven** in framework cheats can still set, clear or adjust build. Stage changes use framework transformation settlement. These actions remain available to rebuild after decay.
+
+### Raven stages and retention
+
+Raven transformation likewise advances through stages 1 to 6 on the character page. Distant movement catches your attention at stage 1. Stage 2 changes your eyes and grants the vanilla **Sharp Eyes** trait, increasing effective skulduggery by 5%. Your skin begins to itch at stage 3. Stage 4 adds dark plumage and a feathered tail, granting **Dark Plumage**. Wings begin growing at stage 5 and become complete at stage 6, granting the **Raven Boy / Raven Girl** trait.
+
+**Dark Plumage:** New pain from marked physical blows in combat is reduced by 15%. Existing pain, stress, trauma and other attack results are unchanged. Choking, neck restraints and other sources of pain do not receive this reduction.
+
+**Complete transformation:** Speech effects affected by the vanilla English trait are enhanced by 25%, multiplied after the original English trait bonus. This does not change English rank, story dialogue requirements or an NPC's refusal conditions.
+
+Sharp Eyes is shared with vanilla cat, bird, fox and other eligible transformations. Its bonus is applied only once. Raven form uses independent black wings, wedge-shaped tail feathers and plumage sprites. Standing and combat models retain the vanilla bird attachment points, animations and masking. Feather colours do not follow hair colour. Natural decay and suppression by other animal transformations apply unless you wear a raven feather necklace. No dedicated flight training story has been added. This feature requires framework 5.2.0 with the shared transformation trait fix.
+
+### Ominous Voice: raven and fallen angel
+
+**Requirements:** Complete raven transformation and reach the fallen angel stage that unlocks Disparage. **Ominous Voice** appears under General Traits. Eligibility depends on transformation stages. Mirror visibility and chimera wing settings do not affect it. The trait stops working when either transformation falls below its required stage.
+
+**How to use:** Choose the existing mouth action **Disparage** in non-consensual encounters where vanilla offers it. Ominous Voice allows two uses per encounter, with no extra action button. The native choking failure branch still applies without consuming a use. Uses are stored in the current save, are not restored by loading it and reset when vanilla ends combat. Ordinary fallen angels retain one use. Opponents who cannot understand your language still prevent the control recovery from hitting their insecurity.
+
+**Effects:** Disparage restores twice the vanilla control and relieves twice the vanilla trauma. These replace the usual 25% raven speech bonus, without multiplying it again. It also relieves **15% of current pain**, rather than reducing all later damage. Stress, anger, boldness and defiance use vanilla Disparage settlement. Ordinary mocking and other speech actions retain the usual raven effects. Control recovery still respects the native encounter starting limit, and trauma cannot fall below zero. Pain relief still respects the native minimum pain floor.
+
+When demon, angel or fallen angel wings and raven wings are visible, the mirror offers the corresponding **demon raven wings**, **angel raven wings** or **fallen angel raven wings**. Demon fusion uses the dark violet raven wing variants. Angel fusion retains narrow black raven wings with ivory and pale gold coverts. Fallen angel fusion uses warm grey and charcoal feathers. The native `fallenplus` style retains dark wings with muted ivory and gold coverts. Standing and combat models each use one pair of dedicated fused raven wings, while the selected native halo remains visible. Hiding either pair or disabling its chimera option stops fusion. These settings control appearance only, do not grant build and do not determine whether Ominous Voice works.
+
 ### Accessories and icon questions
 
 Retention accessories must be worn in the correct slot. Storage in a wardrobe or inventory does not activate them. Horse retention uses a head ribbon or neck pendant, while fish uses a head clip. Maintain both with the **horse neck item plus fish head item**.
 
-Horse transformation icons follow hair colour while carrot decorations retain their original colour. Fish fins stay blue. Check build, trait effects and mirror visibility separately. Hiding an image is not losing its trait.
+Buy the **raven feather necklace (£45)** from the clothing shop's neckwear category. Wearing it prevents natural decay and suppression by other animal transformations; taking it off restores the normal rules. It does not grant transformation build or require complete raven form.
+
+Horse transformation icons follow hair colour while carrot decorations retain their original colour. Fish fins stay blue. The raven icon is a single dark feather with a quill and fixed colours. Check build, trait effects and mirror visibility separately. Hiding an image is not losing its trait.

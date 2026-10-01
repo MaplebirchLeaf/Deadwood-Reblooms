@@ -61,6 +61,15 @@ The list belongs to the current game save. Loading another save restores that sa
 
 Small avatars appear on existing vanilla Social cards. Expressions and layers can follow Robin's trauma and dominance, Kylar's love and jealousy, Sydney's purity and corruption, and other character states. These visuals do not raise love or unlock relationships.
 
+| Character                   | Avatar changes                                                                                                                                                                                                      |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Gwylan                      | Follows vanilla relationship descriptions for rejection, waiting, rituals, closeness, longing and disappointment. Heat or rut variants require the corresponding vanilla status and knowledge of the transformation |
+| Mason                       | Distinguishes neutral, encouraging, approving and different lust expressions according to vanilla relationship descriptions                                                                                         |
+| Great Hawk                  | Uses attachment, love and dominance to distinguish keeping you, courting, distress and partner expressions                                                                                                          |
+| Sydney's Ivory Wraith mimic | Both black and strawberry blond hair have blue-eye and red-eye variants, selected by vanilla Wraith state                                                                                                           |
+
+The Night Monster has a hairless, scaled beast avatar and male and female monster avatars with messy hair and two horns. The avatar follows the form recorded by vanilla without changing when the NPC appears in the Social tab.
+
 Large scene portraits belong to **NPCSidebarPortrait**. A social avatar does not guarantee a scene portrait, or vice versa.
 
 ### Troubleshooting

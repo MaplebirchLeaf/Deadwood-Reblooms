@@ -24,6 +24,20 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
     };
   });
 
+  // 只扩展安全事件池，不截断追猎、危险遭遇或原版行进结算。
+  maplebirch.tool.inject({
+    widgetPassage: {
+      'Widgets Forest': [
+        {
+          src: '<<addinlineevent "safeforest_easytrail" 0.33>>',
+          applybefore: '<<deadwood-raven-events>>\n\t',
+          expected: 1
+        }
+      ]
+    }
+  });
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-raven-link', passage: 'Forest' });
+
   // 转化会衰减，成就只在首次达到完整形态时授予。
   maplebirch.dynamic.regStateEvent('append', 'horse-transformation-feat', {
     output: 'earnFeat "Horse Transformation"',

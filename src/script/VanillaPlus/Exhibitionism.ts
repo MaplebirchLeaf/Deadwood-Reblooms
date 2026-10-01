@@ -23,7 +23,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         V.map.available?.[V.passage]?.includes(destination) &&
         V.link_table.some((link: string) => link.includes('|' + destination + ']]'))
       ) {
-        Wikifier.wikifyEval('<<exhibitionism6>><<fameexhibitionism 5>>');
+        maplebirch.SugarCube.Wikifier.wikifyEval('<<exhibitionism6>><<fameexhibitionism 5>>');
       }
       originalMapMove(destination);
     };

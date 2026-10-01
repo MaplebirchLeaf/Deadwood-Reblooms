@@ -12,7 +12,13 @@ export default function Medicine(core: typeof maplebirch): void {
     cond: () => V.combat !== 1 && core.get('LifeSimulation')?.medicine?.pending === true,
     output: 'print maplebirch.get("LifeSimulation").medicine.flush()'
   });
-  core.tool.addTo('BeforeLinkZone', { widget: 'deadwood-medicine-shop', passage: 'Pharmacy' });
+  core.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-medicine-shop'], passage: 'Pharmacy' });
+  core.dynamic.regStateEvent('gate', 'life-simulation-medicine-sale', {
+    forceExit: true,
+    cond: () => Boolean(core.get('LifeSimulation')) && MEDICINES.some(item => V.pharmacyItem?.type === `deadwood-${item.id}`),
+    output: 'deadwood-medicine-sale',
+    extra: { passage: ['Pharmacy Sale'] }
+  });
   core.tool.patch.traits.add(
     ...MEDICINES.flatMap(item => [
       {

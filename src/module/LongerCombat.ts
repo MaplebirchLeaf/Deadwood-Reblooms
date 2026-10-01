@@ -291,7 +291,7 @@ class LongerCombat {
   public main(): DocumentFragment {
     const fragment = document.createDocumentFragment();
     const sWikifier = function (Text: string) {
-      fragment.append(Wikifier.wikifyEval(Text));
+      fragment.append(maplebirch.SugarCube.Wikifier.wikifyEval(Text));
     };
 
     const source = this.passageTitle;

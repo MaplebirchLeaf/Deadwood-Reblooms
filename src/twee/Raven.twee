@@ -1,0 +1,119 @@
+:: Deadwood Reblooms Raven Widgets [widget]
+
+<<widget 'deadwood-raven-events'>>
+	<<if maplebirch.get('MoreTransformations') and maplebirch.get('MoreTransformations').Raven.available and !maplebirch.get('MoreTransformations').Raven.met>>
+		<<addinlineevent 'deadwood_raven_flock' 0.33>>
+			<<set _raven to maplebirch.get('MoreTransformations').Raven>>
+			<<language>><<option 'EN'>>
+				A low croak draws your attention to a cluster of black birds among the roots. One turns a scrap of glass in its beak, watching you with one dark eye.<br><br>
+				You stop. The birds remain where they are. <span class='teal'>One hops a little closer.</span>
+			<<option 'CN'>>
+				一声低哑的鸣叫吸引了你的注意。几只黑鸟聚在树根之间，其中一只衔着玻璃碎片转了转，用一只黑眼睛看着你。<br><br>
+				你停下脚步。鸟群没有飞走，<span class='teal'>其中一只往你这边跳近了些。</span>
+			<</language>><br><br>
+			<<if _raven.canFeed>>
+				<<print _raven.icon>><<lanLink ['Leave some fruit (0:05)', '留下一份水果 (0:05)']>>
+					<<if maplebirch.get('MoreTransformations').Raven.act('feed')>><<goto 'Deadwood Reblooms Raven'>><</if>>
+				<</lanLink>><<transform-hint 'raven' 'grey'>><br>
+			<</if>>
+			<<print _raven.icon>><<lanLink ['Follow the birds (0:15)', '跟随鸟群 (0:15)']>>
+				<<if maplebirch.get('MoreTransformations').Raven.act('follow')>><<goto 'Deadwood Reblooms Raven'>><</if>>
+			<</lanLink>><<transform-hint 'raven' 'grey'>><br>
+			<<lanLink ['Keep walking', '继续前行'] 'Forest'>><<set $eventskip to 1>><</lanLink>><br>
+		<</addinlineevent>>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-raven-link'>>
+	<<if maplebirch.get('MoreTransformations') and $eventskip gte 1 and maplebirch.get('MoreTransformations').Raven.available and maplebirch.get('MoreTransformations').Raven.met>>
+		<<print maplebirch.get('MoreTransformations').Raven.icon>><<lanLink ['Look for the raven flock (0:05)', '寻找渡鸦群 (0:05)']>>
+			<<if maplebirch.get('MoreTransformations').Raven.act('visit')>><<goto 'Deadwood Reblooms Raven'>><</if>>
+		<</lanLink>><br>
+	<</if>>
+<</widget>>
+
+:: Deadwood Reblooms Raven
+<<set $outside to 1>><<set $location to 'forest'>><<effects>>
+<<set _raven to maplebirch.get('MoreTransformations')?.Raven>>
+<<if _raven and _raven.met>>
+	<<switch $MoreTransformations.raven.action>>
+		<<case 'follow'>>
+			<<language>><<option 'EN'>>
+				The birds hop from branch to branch, leading you away from the path. A croak sounds just above your shoulder. You answer before you can think.<br><br>
+				Your throat tightens. For a moment, you can pick out every rustle in the canopy. One bird gives a short, rasping call, and you know how to answer.<br><br>
+				When you turn around, <span class='purple'>the path is farther away than you expected.</span>
+			<<option 'CN'>>
+				鸟群在树枝间跳跃，带着你离开小径。一声鸣叫从你肩头上方传来。你还没想好，就已经回应了它。<br><br>
+				你的喉咙发紧。有那么一瞬间，树冠里的每一声轻响都清晰可辨。一只鸟短促地叫了一声，你知道该怎么回应。<br><br>
+				回过头时，<span class='purple'>小径比你想象中离得更远。</span>
+			<</language>>
+		<<case 'feed'>>
+			<<language>><<option 'EN'>>
+				You leave the fruit on a root and step back. A raven takes a piece, then another joins it. Their beaks click against the bark.<br><br>
+				One looks up and croaks. An answering sound catches in your throat. You swallow, but the urge to answer stays with you.
+			<<option 'CN'>>
+				你把水果放在树根上，往后退了退。一只渡鸦啄走一块，另一只也凑了过来，鸟喙碰在树皮上，发出轻响。<br><br>
+				其中一只抬头叫了一声。回应它的声音卡在你的喉咙里。你咽了咽口水，那股想要回应的冲动仍未消散。
+			<</language>>
+		<<case 'call'>>
+			<<language>><<option 'EN'>>
+				You listen to the ravens, then try their calls for yourself.
+				<<if $maplebirch.transformation.raven.level gte 6>>
+					Your voice carries through the trees. Several birds turn towards you, answering in quick succession.
+				<<elseif $maplebirch.transformation.raven.level gte 2>>
+					You hear the small differences between their voices. One answers when you get its call right.
+				<<else>>
+					The sound comes out hoarse. A bird tilts its head and croaks again. You try once more.
+				<</if>>
+				Your throat feels tired by the time you stop.
+			<<option 'CN'>>
+				你听着渡鸦的叫声，试着模仿。
+				<<if $maplebirch.transformation.raven.level gte 6>>
+					你的声音穿过林间，几只鸟转向你，接连回应。
+				<<elseif $maplebirch.transformation.raven.level gte 2>>
+					你能听出它们声音里细微的差别。模仿对了时，其中一只回应了你。
+				<<else>>
+					发出的声音有些沙哑。一只鸟歪了歪头，又叫了一声。你再试了一次。
+				<</if>>
+				停下来时，你的喉咙已经有些累了。
+			<</language>><<gtiredness>>
+		<<case 'preen'>>
+			<<language>><<option 'EN'>>
+				You sit beneath the branches, smoothing your dark feathers into place. A loose feather comes away between your fingers. Above you, a raven works its beak through its own plumage.<br><br>
+				The remaining feathers settle neatly against your skin. You feel a little more at ease.
+			<<option 'CN'>>
+				你坐在枝条下，把黑色羽毛一根根理顺。一片松动的羽毛落在指间。头顶上，一只渡鸦正用鸟喙梳理自己的覆羽。<br><br>
+				其余羽毛顺服地贴着皮肤，你也放松了些。
+			<</language>><<lstress>>
+		<<default>>
+			<<language>><<option 'EN'>>
+				You find the ravens among the trees. One hops along a branch as you approach, keeping you in view.
+				<<if $maplebirch.transformation.raven.level gte 4>> It settles beside you, close enough for its feathers to brush against yours.<</if>>
+			<<option 'CN'>>
+				你在林间找到了渡鸦。走近时，一只鸟沿着枝条跳了几步，始终看着你。
+				<<if $maplebirch.transformation.raven.level gte 4>>它在你身边停下，近得羽毛几乎碰到了你的覆羽。<</if>>
+			<</language>>
+	<</switch>><br><br>
+	<<if _raven.available>>
+		<<if _raven.canFeed>>
+			<<print _raven.icon>><<lanLink ['Leave some fruit (0:05)', '留下一份水果 (0:05)']>>
+				<<if maplebirch.get('MoreTransformations').Raven.act('feed')>><<goto 'Deadwood Reblooms Raven'>><</if>>
+			<</lanLink>><<transform-hint 'raven' 'grey'>><br>
+		<</if>>
+		<<if _raven.canCall>>
+			<<print _raven.icon>><<lanLink ['Imitate the ravens (0:10)', '模仿渡鸦的叫声 (0:10)']>>
+				<<if maplebirch.get('MoreTransformations').Raven.act('call')>><<goto 'Deadwood Reblooms Raven'>><</if>>
+			<</lanLink>><<transform-hint 'raven' 'grey'>><br>
+		<</if>>
+		<<if _raven.canPreen>>
+			<<print _raven.icon>><<lanLink ['Preen your feathers (0:10)', '梳理覆羽 (0:10)']>>
+				<<if maplebirch.get('MoreTransformations').Raven.act('preen')>><<goto 'Deadwood Reblooms Raven'>><</if>>
+			<</lanLink>><<lstress>><<transform-hint 'raven' 'grey'>><br>
+		<</if>>
+	<<else>>
+		<<language>><<option 'EN'>>The birds have flown out of sight. You should return to the path.
+		<<option 'CN'>>鸟群已经飞出了视野。你该回到小径上了。
+		<</language>><br><br>
+	<</if>>
+<</if>>
+<<getouticon>><<lanLink ['Return to the path', '返回小径'] 'Forest'>><<set $eventskip to 1>><</lanLink>>

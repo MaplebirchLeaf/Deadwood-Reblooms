@@ -21,8 +21,8 @@ class Fish extends Transformation {
       'physical',
       {
         parts: [
-          { name: 'fins', tfRequired: 4 },
-          { name: 'tail', tfRequired: 6 }
+          { name: 'fins', tfRequired: 4, label: () => lanSwitch('Fins', '鱼鳍') },
+          { name: 'tail', tfRequired: 6, label: () => lanSwitch('Tail', '尾巴') }
         ],
 
         traits: [
@@ -68,9 +68,7 @@ class Fish extends Transformation {
         },
 
         translations: {
-          fish: { EN: 'Fish', CN: '鱼' },
-          fins: { EN: 'fins', CN: '耳鳍' },
-          tail: { EN: 'tail', CN: '尾巴' }
+          fish: { EN: 'Fish', CN: '鱼' }
         }
       },
       {
@@ -156,8 +154,8 @@ class Fish extends Transformation {
       {
         title: 'General Traits',
         name: () => {
-          const name = V.player.gender === 'n' ? '<<lanSwitch "Fish" "鱼">>' : '<<lanSwitch "Fish " "鱼">><<pcGender>>';
-          return name + (V.player.sex === 'h' ? "<<lanSwitch ' (⚥)' '(⚥)'>>" : '');
+          const name = maplebirch.t(`deadwood-reblooms:Traits:fish:${V.player.gender === 'n' ? 'name' : 'gender'}`);
+          return name + (V.player.sex === 'h' ? lanSwitch(' (⚥)', '(⚥)') : '');
         },
         colour: 'lblue',
         has: () => V.maplebirch.transformation.fish.level >= 6,

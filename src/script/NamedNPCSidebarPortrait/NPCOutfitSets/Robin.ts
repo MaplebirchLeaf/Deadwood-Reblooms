@@ -6,6 +6,8 @@ import { schoolUniformKeys } from '../Common/SchoolUniform';
 import inject from './Inject';
 import { addSet, sync } from './Clothes';
 
+const templeKeys = ['initiate_robes', 'novice_nun_habit', 'monk_habit', 'nun_habit'] as const;
+
 const wardrobeKeys = [
   ...schoolUniformKeys,
   'tshirt_shorts',
@@ -19,10 +21,7 @@ const wardrobeKeys = [
   'diving_suit',
   'pyjama',
   'towel_wrap',
-  'initiate_robes',
-  'novice_nun_habit',
-  'monk_habit',
-  'nun_habit',
+  ...templeKeys,
   'witch',
   'classy_vampire_formal',
   'ghost_sheet',
@@ -42,7 +41,7 @@ export default function (maplebirch: MaplebirchCore): void {
     const outfitNames: string[] = [];
     for (const key of wardrobeKeys) {
       const template = wardrobe.get(key);
-      if (template) addSet(maplebirch, outfitNames, `robin_${key}`, template, { type: ['initiate_robes', 'novice_nun_habit', 'monk_habit', 'nun_habit'].includes(key) ? 'temple' : undefined });
+      if (template) addSet(maplebirch, outfitNames, `robin_${key}`, template, { type: templeKeys.some(temple => temple === key) ? 'temple' : undefined });
     }
 
     const schoolUniform = wardrobe.get('school_uniform_skirt');
@@ -61,7 +60,8 @@ export default function (maplebirch: MaplebirchCore): void {
         if (npcName !== 'Robin') return;
         const npc = C.npc?.Robin;
         if (!npc) return;
-        npc.outfits = ['naked', ...outfitNames];
+        const temple = Boolean(maplebirch.get('RobinTemple'));
+        npc.outfits = ['naked', ...outfitNames.filter(name => temple || !templeKeys.some(key => name === `robin_${key}`))];
         wardrobe.worn('Robin');
         inject(npcName, npcno, npc.clothes, npc);
       },

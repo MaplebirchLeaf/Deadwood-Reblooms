@@ -27,8 +27,8 @@ class Horse extends Transformation {
         // 胡萝卜位于图标右下方，覆盖原色，毛发沿用原版红底发色滤镜。
         icon: `<span style="display:inline-grid" @class="'hair-'+$haircolour"><span style="grid-area:1/1" class="colour-hair"><<iconUi 'horse.png'>></span><span style="grid-area:1/1;clip-path:polygon(31.25% 46.875%,100% 46.875%,100% 100%,25% 100%,25% 84.375%,31.25% 78.125%)"><<iconUi 'horse.png'>></span></span>`,
         parts: [
-          { name: 'ears', tfRequired: 4 },
-          { name: 'tail', tfRequired: 6 }
+          { name: 'ears', tfRequired: 4, label: () => lanSwitch('Ears', '耳朵') },
+          { name: 'tail', tfRequired: 6, label: () => lanSwitch('Tail', '尾巴') }
         ],
 
         traits: [
@@ -46,6 +46,8 @@ class Horse extends Transformation {
         ],
 
         suppressConditions: [sourceName => sourceName !== 'horse', () => V.worn.head.name !== 'mane ribbon', () => V.worn.neck.name !== 'golden carrot pendant'],
+
+        chimeras: [{ name: 'demonhorse', part: 'tail', sources: ['horse', 'demon'], label: () => lanSwitch('Demon horse tail:', '恶魔马尾：') }],
 
         pre: options => {
           options.maplebirchTransformation = V.maplebirch?.transformation ?? false;
@@ -97,9 +99,7 @@ class Horse extends Transformation {
         },
 
         translations: {
-          horse: { EN: 'Horse', CN: '马' },
-          ears: { EN: 'ears', CN: '耳朵' },
-          tail: { EN: 'tail', CN: '尾巴' }
+          horse: { EN: 'Horse', CN: '马' }
         }
       },
       {
@@ -200,8 +200,8 @@ class Horse extends Transformation {
       {
         title: 'General Traits',
         name: () => {
-          const name = V.player.gender === 'n' ? '<<lanSwitch "Horse" "马">>' : '<<lanSwitch "Horse " "马">><<pcGender>>';
-          return name + (V.player.sex === 'h' ? "<<lanSwitch ' (⚥)' '(⚥)'>>" : '');
+          const name = maplebirch.t(`deadwood-reblooms:Traits:horse:${V.player.gender === 'n' ? 'name' : 'gender'}`);
+          return name + (V.player.sex === 'h' ? lanSwitch(' (⚥)', '(⚥)') : '');
         },
         colour: 'softbrown',
         has: () => V.maplebirch.transformation.horse.level >= 6,
@@ -267,25 +267,6 @@ class Horse extends Transformation {
         ]
       },
       widgetPassage: {
-        'Transformation Widgets': [
-          {
-            src: '<<set _defaultChimeraConfig to {',
-            applyafter: '\n\t\tdemonhorse: { tail: true },',
-            expected: 1
-          }
-        ],
-        'Widgets Mirror': [
-          {
-            src: '<<set $_chimeraOptions to {',
-            applyafter: '\n\t\t\t\t\t"demonhorse_tail": [$transformationParts.horse?.tail, $transformationParts.demon?.tail].every(part => typeof part === "string" && isPartEnabled(part)),',
-            expected: 1
-          },
-          {
-            src: '<<if $_chimeraOptions.demoncat_tail>>',
-            applybefore: '<<deadwood-reblooms-demon-horse-tail-option>>\n\t\t\t\t\t',
-            expected: 1
-          }
-        ],
         'Farm Widgets': [
           // 追上马并完成刷毛时结算一次成长，直接挂在唯一的刷毛组件入口。
           {

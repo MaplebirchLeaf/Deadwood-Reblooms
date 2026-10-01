@@ -2,30 +2,47 @@
 <<widget 'deadwood-medicine-shop'>>
 	<<if maplebirch.get('LifeSimulation') and $location is 'hospital' and !$daily.pharm.closed>>
 		<<set _medicine to maplebirch.get('LifeSimulation').medicine>>
-		<<language 'EN'>>
-			<h3>Tablets</h3>
-			The packets advise leaving at least eight hours between doses. <span class='purple'>Repeated or prolonged use may cause dependence.</span> These tablets must be taken manually.<br><br>
-		<</language>>
-		<<language 'CN'>>
-			<h3>药片</h3>
-			包装建议两次服用至少间隔八小时。<span class='purple'>反复或长期服用可能形成依赖。</span>这些药片只能手动服用。<br><br>
-		<</language>>
+		<<lanSwitch 'Psychiatric medication:' '精神类药物：'>><br>
 		<<for _offer range _medicine.offers>>
 			<<set _drug to _offer.id>>
-			<<set _price to _offer.price>>
-			<<icon `"pill-" + _drug + ".png"`>><<= _medicine.name(_drug)>> · <span class='gold'>£<<= _price / 100>></span> · <<lanSwitch 'Owned: ' '持有：'>><<= _medicine.owned(_drug)>><br>
-			<span class='grey'><<lanSwitch _offer.description[0] _offer.description[1]>></span><br>
-			<<if (maplebirch.get('VanillaPlus') and maplebirch.get('VanillaPlus').finance.canPay(_price, 'shopping')) or (!maplebirch.get('VanillaPlus') and $money gte _price)>>
-				<<capture _drug>>
-					<<lanLink ['Buy a packet of seven', '购买一包七片装'] 'Pharmacy'>>
-						<<run maplebirch.get('LifeSimulation').medicine.buy(_drug)>>
-					<</lanLink>>
-				<</capture>>
-			<<else>>
-				<span class='red'><<lanSwitch 'Insufficient funds.' '余额不足。'>></span>
-			<</if>><br><br>
-		<</for>>
+			<<capture _drug _offer>>
+				<<icon `"pill-" + _drug + ".png"`>><<lanLink ["Packet of seven " + _offer.name[0].toLowerCase(), "一包（7片）" + _offer.name[1]] 'Pharmacy Sale'>>
+					<<set $pharmacyItem to { name: maplebirch.get('LifeSimulation').medicine.name(_drug), price: _offer.price, type: 'deadwood-' + _drug }>>
+				<</lanLink>> | <<lanSwitch 'Owned: ' '已拥有：'>><span class='gold'><<= _medicine.owned(_drug)>></span><br>
+			<</capture>>
+		<</for>><br>
 	<</if>>
+<</widget>>
+
+<<widget 'deadwood-medicine-sale'>>
+	<<set $outside to 0>><<set $location to 'hospital'>><<effects>>
+	<<set _medicine to maplebirch.get('LifeSimulation').medicine>>
+	<<set _offer to _medicine.offers.find(item => $pharmacyItem.type === 'deadwood-' + item.id)>>
+	<<if _offer and !$daily.pharm.closed>>
+		<<language>><<option 'EN'>>
+			The nurse looks at the packet of <<= _offer.name[0].toLowerCase()>> you are holding. "£<<= _offer.price / 100>>, please."
+		<<option 'CN'>>
+			护士看了看你拿着的那包<<= _offer.name[1]>>。“£<<= _offer.price / 100>>，谢谢。”
+		<</language>><br><br>
+		<<lanSwitch _offer.description[0] _offer.description[1]>><br>
+		<<language>><<option 'EN'>>
+			The packet contains seven tablets. The label advises leaving at least eight hours between doses. <span class='purple'>Repeated or prolonged use may cause dependence.</span>
+		<<option 'CN'>>
+			包装内有七片药。标签建议两次服用至少间隔八小时。<span class='purple'>反复或长期服用可能形成依赖。</span>
+		<</language>><br><br>
+		<<if (maplebirch.get('VanillaPlus') and maplebirch.get('VanillaPlus').finance.canPay(_offer.price, 'shopping')) or (!maplebirch.get('VanillaPlus') and $money gte _offer.price)>>
+			<<capture _offer>>
+				<<lanLink ['Hand over the money', '付款'] 'Pharmacy'>>
+					<<run maplebirch.get('LifeSimulation').medicine.buy(_offer.id)>>
+				<</lanLink>>
+			<</capture>>
+		<<else>>
+			<span class='purple'><<lanSwitch 'You cannot afford them.' '你买不起这些药。'>></span>
+		<</if>><br>
+	<</if>>
+	<<lanLink ["Don't buy", '不买了'] 'Pharmacy'>>
+		<<unset $pharmacyItem>>
+	<</lanLink>>
 <</widget>>
 
 <<widget 'deadwood-medicine-review'>>
@@ -34,17 +51,17 @@
 		<<set _answer to _medicine.reply()>>
 		<<if typeof _answer is 'boolean'>>
 			<<if _answer>>
-				<<language 'EN'>>
+				<<language>><<option 'EN'>>
 					You tell Harper about the tablets you have been taking:
 				<</language>>
-				<<language 'CN'>>
+				<<language>><<option 'CN'>>
 					你告诉哈珀，近来服用的药片有：
 				<</language>>
 				<<for _item range _medicine.recent>>
 					<<if _item isnot _medicine.recent[0]>><<lanSwitch ', ' '、'>><</if>><span class='gold'><<= _medicine.name(_item.id)>></span>
 				<</for>><<lanSwitch '.' '。'>><br><br>
 				<<if _medicine.dependence gte 2>>
-					<<language 'EN'>>
+					<<language>><<option 'EN'>>
 						Harper asks whether you feel worse without them. As you describe the unease, <<he>> makes a note on your file.<br><br>
 						<<if _medicine.dependence gte 3>>
 							"You are finding it difficult to manage without them, then." <<He>> sounds almost pleased to have an answer. "That is something we will need to keep an eye on."<br><br>
@@ -52,7 +69,7 @@
 						"<span class='purple'>Taking more because they seem less effective will not solve this.</span> Bring the packets to your next appointment. I need to know exactly what you are taking."<br><br>
 						<<He>> closes the file. "For now, let us continue with today's appointment."
 					<</language>>
-					<<language 'CN'>>
+					<<language>><<option 'CN'>>
 						哈珀问你，不服药时是否会更难受。你描述着那阵不安，<<he>>在病历上记下一笔。<br><br>
 						<<if _medicine.dependence gte 3>>
 							“也就是说，你已经很难离开它们了。”<<He>>的语气近乎满意，像是终于找到了答案。“这件事需要继续观察。”<br><br>
@@ -61,57 +78,57 @@
 						<<He>>合上病历。“现在，我们继续今天的安排。”
 					<</language>>
 				<<elseif _medicine.dependence is 1 or _medicine.frequent>>
-					<<language 'EN'>>
+					<<language>><<option 'EN'>>
 						Harper asks how often you have been taking them. <<His>> pen pauses over the file when you answer.<br><br>
 						"Feeling a little better does not mean you should reach for another tablet. <span class='purple'>You can become accustomed to them.</span> Bring the packets next time." <<He>> writes something down. "We can discuss it again then."
 					<</language>>
-					<<language 'CN'>>
+					<<language>><<option 'CN'>>
 						哈珀问你多久服一次药。听到回答时，<<his>>的笔在病历上停了一下。<br><br>
 						“觉得舒服一些，不代表你该立刻再吃一片。<span class='purple'>你可能会越来越依赖它们。</span>下次把包装带来。”<<He>>写下几个字。“到时候我们再谈。”
 					<</language>>
 				<<else>>
-					<<language 'EN'>>
+					<<language>><<option 'EN'>>
 						Harper notes the names and asks when you last took them. "Including anything you buy at the pharmacy," <<he>> says. "My prescription is not the only thing I need to know about."
 					<</language>>
-					<<language 'CN'>>
+					<<language>><<option 'CN'>>
 						哈珀记下药名，又问你最后一次服药是什么时候。“包括你在药房买的东西，”<<he>>说，“我需要了解的不只是我开的处方。”
 					<</language>>
 				<</if>>
 				<<if _medicine.drowsy>>
 					<br><br>
-					<<language 'EN'>>
+					<<language>><<option 'EN'>>
 						<<He>> watches you blink heavily. "Feeling sleepy? You can tell me." <<His>> voice softens, though <<his>> eyes stay on you.
 					<</language>>
-					<<language 'CN'>>
+					<<language>><<option 'CN'>>
 						<<He>>看着你沉重地眨了眨眼。“困了吗？可以告诉我。”<<His>>声音柔和下来，目光却仍停在你身上。
 					<</language>>
 				<</if>>
 			<<else>>
-				<<language 'EN'>>
+				<<language>><<option 'EN'>>
 					You say you have not been taking anything else. Harper looks at you for a moment, then returns to the file.<br><br>
 					"That includes things bought without a prescription. It is important that you tell me." <<He>> taps the page with <<his>> pen and moves on.
 				<</language>>
-				<<language 'CN'>>
+				<<language>><<option 'CN'>>
 					你说自己没有服用别的药。哈珀看了你片刻，又低头看向病历。<br><br>
 					“没有处方就能买到的药也算。告诉我很重要。”<<He>>用笔点了点纸页，继续今天的安排。
 				<</language>>
 			<</if>><br><br>
 		<<elseif _medicine.reviewDue>>
 			<div id='deadwood-medicine-review'>
-				<<language 'EN'>>
+				<<language>><<option 'EN'>>
 					Before beginning, Harper asks whether you have been taking any other medication.<br><br>
 				<</language>>
-				<<language 'CN'>>
+				<<language>><<option 'CN'>>
 					开始之前，哈珀问你近来有没有服用其它药物。<br><br>
 				<</language>>
 				<<lanLink ['Tell Harper about the tablets', '如实说明用药']>>
 					<<if maplebirch.get('LifeSimulation').medicine.report(true)>>
-						<<run Engine.show()>>
+						<<run maplebirch.SugarCube.Engine.show()>>
 					<</if>>
 				<</lanLink>><br>
 				<<lanLink ['Say you are not taking anything else', '说自己没有服用别的药']>>
 					<<if maplebirch.get('LifeSimulation').medicine.report(false)>>
-						<<run Engine.show()>>
+						<<run maplebirch.SugarCube.Engine.show()>>
 					<</if>>
 				<</lanLink>><br><br>
 			</div>
