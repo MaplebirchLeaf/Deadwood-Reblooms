@@ -19,6 +19,10 @@ const wardrobeKeys = [
   'diving_suit',
   'pyjama',
   'towel_wrap',
+  'initiate_robes',
+  'novice_nun_habit',
+  'monk_habit',
+  'nun_habit',
   'witch',
   'classy_vampire_formal',
   'ghost_sheet',
@@ -38,7 +42,7 @@ export default function (maplebirch: MaplebirchCore): void {
     const outfitNames: string[] = [];
     for (const key of wardrobeKeys) {
       const template = wardrobe.get(key);
-      if (template) addSet(maplebirch, outfitNames, `robin_${key}`, template);
+      if (template) addSet(maplebirch, outfitNames, `robin_${key}`, template, { type: ['initiate_robes', 'novice_nun_habit', 'monk_habit', 'nun_habit'].includes(key) ? 'temple' : undefined });
     }
 
     const schoolUniform = wardrobe.get('school_uniform_skirt');

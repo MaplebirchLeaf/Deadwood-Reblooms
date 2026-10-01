@@ -52,6 +52,10 @@ export default function (
 
       // 基层发饰：佩戴花环
       if (context.key !== 'naked') sidebar.apply(clothes, Clothing.flower_crown);
+
+      // 神殿贞操器具和剧情里的实际穿戴状态一致。
+      const chastity = C.npc?.Robin?.chastity;
+      if (maplebirch.get('RobinTemple') && (chastity?.penis === 'chastity belt' || chastity?.vagina === 'chastity belt')) wardrobe.put(clothes, 'chastity_belt');
     });
 
     // 学校制服
@@ -241,6 +245,20 @@ export default function (
     // 睡觉：睡衣
     wardrobe.wear('Robin', 'sleep', 'pyjama');
 
+    // 归途之书的神殿值班与留宿，未启用神殿路线时不改变原版衣装。
+    const temple = () => Boolean(maplebirch.get('RobinTemple'));
+    wardrobe.wear('Robin', 'temple', 'initiate_robes', () => temple() && C.npc?.Robin?.pronoun === 'm');
+    wardrobe.wear('Robin', 'temple', 'novice_nun_habit', () => temple() && C.npc?.Robin?.pronoun !== 'm');
+    wardrobe.wear('Robin', 'temple', 'monk_habit', () => temple() && V.RobinTemple?.vigil_result === 'passed' && C.npc?.Robin?.pronoun === 'm');
+    wardrobe.wear('Robin', 'temple', 'nun_habit', () => temple() && V.RobinTemple?.vigil_result === 'passed' && C.npc?.Robin?.pronoun !== 'm');
+    wardrobe.wear('Robin', 'temple', 'pyjama', () => temple() && (Time.hour >= 21 || Time.hour < 7) && /^RobinTemple (?:Bunk|Bed|Sleep|Night Wake)(?: |$)/.test(maplebirch.passage.title));
+    wardrobe.wear('Robin', 'temple', 'naked', () => temple() && ['RobinTemple Promise Altar', 'RobinTemple Promise End'].includes(maplebirch.passage.title));
+    wardrobe.modify('Robin', (clothes, context) => {
+      if (context.location !== 'temple' || !temple()) return;
+      // 神殿服装使用自身头饰，避免把便服花环叠在兜帽上。
+      if (clothes.head?.name === Clothing.flower_crown.name) delete clothes.head;
+    });
+
     // 英语剧：罗宾扮演圣诞树，原版没有圣诞树服装，没招
     wardrobe.wear('Robin', 'englishPlay', 'naked');
 
@@ -281,6 +299,9 @@ export default function (
 
     // 强制位置覆盖（剧情回放等）
     if (V.robinlocationoverride && V.robinlocationoverride.during.includes(Time.hour)) return V.robinlocationoverride.location;
+
+    // 仅接管神殿内的当前剧情，邀请和回家页面沿用原版地点。
+    if (maplebirch.get('RobinTemple') && V.location === 'temple' && title.startsWith('RobinTemple ')) return 'temple';
 
     // 迷雾营救：Rescue 2 中途从垃圾堆找到破衣，后续返程继续穿着。
     if (['Robin Mist Rescue 2', 'Robin Mist Walk', 'Robin Mist Abandon'].includes(title)) return 'mist';

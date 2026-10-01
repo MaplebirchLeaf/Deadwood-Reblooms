@@ -287,6 +287,12 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     // 承诺仪式评估服装优先于普通神殿服装
     if (title.startsWith('Sydney Temple Pure')) return 'promise';
 
+    // 归途之书的共同誓约沿用原版仪式衣装，仪式结束后才恢复神殿便服。
+    if (maplebirch.get('RobinTemple') && V.templePromised === 'Sydney') {
+      if (title === 'RobinTemple Promise Rite') return 'promise';
+      if (['RobinTemple Promise Altar', 'RobinTemple Promise End'].includes(title)) return 'naked';
+    }
+
     if (title.startsWith('Deadwood Reblooms Sydney Temple Bath') || title.startsWith('Deadwood Reblooms Sirris Estate Sydney Bath') || title.startsWith('Deadwood Reblooms Sydney Bath'))
       return 'naked';
 

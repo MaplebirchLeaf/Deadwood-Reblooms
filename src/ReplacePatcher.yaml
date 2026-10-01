@@ -1,6 +1,6 @@
 - comment: '六级马化降低行动产生的疲劳。'
   fileName: 'stat-changes.js'
-  from: 'if (source === "pass") {'
+  from: 'if (source === "pass")'
   before: |
     if (maplebirch.get('MoreTransformations') && amount > 0 && V.maplebirch?.transformation?.horse?.level >= 6) fatigueMod *= 0.75;
 
@@ -95,8 +95,12 @@
 
 - comment: '将神圣转化加成接入当前技能值。'
   fileName: 'ingame.js'
-  from: "\treturn result;\n}\nwindow.currentSkillValue = currentSkillValue;"
-  to: "\treturn maplebirch.get('VanillaPlus')?.divineTransformations.skillValue(skill, result) ?? result;\n}\nwindow.currentSkillValue = currentSkillValue;"
+  from: 'window.currentSkillValue = currentSkillValue;'
+  to: |
+    window.currentSkillValue = ((original) => function (skill, ...args) {
+      const result = original.call(this, skill, ...args);
+      return maplebirch.get('VanillaPlus')?.divineTransformations.skillValue(skill, result) ?? result;
+    })(currentSkillValue);
 
 - comment: '神圣转化对精液变化生效。'
   fileName: 'stat-changes.js'

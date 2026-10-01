@@ -1,17 +1,24 @@
-- passage: Traits
-  # 狼、猫的称号原本只根据认同的性别拼接文字，双性角色还需要生理标记。
+- passage: Widgets NPCs
+  # 补充恋人首次发现异装的入口，后续反应仍由原版处理。
   findRegex: >-
-    name: \(\) => V\.player\.gender is "n" \? "([^"]+)" : "([^"]+)",
+    (?<=<<elseif \$crossdressing is 2>>[^\n]*\n\s*<<if \$npc\.length is 1 and \()\["Kylar","Sydney","Gwylan","Avery"\]
   replace: >-
-    name: () => (V.player.gender is "n" ? "$1" : "$2") + (V.player.sex is "h" ? "<<lanSwitch ' (⚥)' '(⚥)'>>" : ""),
-  all: true
+    ["Kylar","Sydney","Gwylan","Avery","Robin","Whitney","Alex","Eden"]
+
+- passage: Widgets NPCs
+  # 双性特征的首次发现使用共用 widget。
+  findRegex: >-
+    <<if(?= \$npc\[0\] is "Sydney" and !\$sydneySeen\.includes\("herm"\)>>)
+  replace: >-
+    <<if ["Robin","Whitney","Alex","Eden"].includes($npc[0])>><<deadwood-reblooms-li-discovery>><<elseif
 
 - passage: Traits
-  # 鸟/哈比的两个外观分支都显示双性标记。
+  # 保留原版与 DoLX 的称号判断，只在返回名称后补生理标记。
   findRegex: >-
-    name: \(\) => V\.hallucinations gte 2 \|\| !V\.settings\.bestialityEnabled \? "([^"]+)" : V\.player\.gender is "n" \? "([^"]+)" : "([^"]+)",
+    name: \(\) => (V\.player\.gender is "n" \? "[^"]+" : "[^"]+"|V\.hallucinations gte 2 \|\| !V\.settings\.bestialityEnabled \? "[^"]+" : V\.player\.gender is "n" \? "[^"]+" : "[^"]+"|\{\s*(?:if \(V\.hallucinations gte 2 \|\| !V\.settings\.bestialityEnabled\) return "Harpy";\s*)?if \(playerFeelsManlike\(\)\) return "(?:Wolf|Cat|Bird)boy";\s*if \(playerFeelsGirllike\(\)\) return "(?:Wolf|Cat|Bird)girl";\s*return "(?:Wolf|Cat|Bird)kin";\s*\}),
   replace: >-
-    name: () => (V.hallucinations gte 2 || !V.settings.bestialityEnabled ? "$1" : V.player.gender is "n" ? "$2" : "$3") + (V.player.sex is "h" ? "<<lanSwitch ' (⚥)' '(⚥)'>>" : ""),
+    name: () => (() => $1)() + (V.player.sex is "h" ? "<<lanSwitch ' (⚥)' '(⚥)'>>" : ""),
+  all: true
 
 - passage: Traits
   # 牛、狐称号已有多条性别分支，只在各分支的返回值上补标记。

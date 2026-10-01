@@ -20,6 +20,11 @@ abstract class Transformation {
 
   public readonly transformation: TransformationOption;
 
+  public get icon(): string {
+    const icon = this.transformation.icon;
+    return icon?.startsWith('<') ? icon : icon ? `<<iconUi '${icon}'>>` : '';
+  }
+
   protected constructor(
     private readonly id: string,
     private readonly type: string,
