@@ -21,7 +21,7 @@
           The temporary staff take the till. Robin slips into the stockroom with
           you and pulls the door almost shut, then freezes at the sound of a
           customer at the counter.
-          <<if C.npc.Robin.dom gte 70>>
+          <<if maplebirch.get('Robin').canTease>>
             "You do pick
             your moments," <<he>> whispers, and reaches for you anyway.
           <<else>>
@@ -32,7 +32,7 @@
         <<option 'CN'>>
           临时店员接过收银台，罗宾和你一起溜进储藏室，轻轻掩上门，
           却在柜台传来客人声音时僵住。
-          <<if C.npc.Robin.dom gte 70>>
+          <<if maplebirch.get('Robin').canTease>>
             “你挑的时机可真好。”<<he>>低声说，还是伸手拉住了你。
           <<else>>
             <<he>>的手仍按在门上。“不要在这里。他们就隔着一道门。”
@@ -70,7 +70,9 @@
       <</language>>
   <</switch>>
   <br><br>
-  <<if _site is 'lemonade' or _site is 'chocolate'>>
+  <<if _site isnot 'meteor' and !maplebirch.get('Robin').canTease>>
+    <span class='teal'><<lanSwitch 'Robin would rather return to work.' '罗宾想先回去工作。'>></span>
+  <<elseif _site is 'lemonade' or _site is 'chocolate'>>
     <<loveicon 'hug'>><<lanLink ['Continue beneath the stall', '在摊位下继续'] 'Deadwood Robin Private Sex'>>
       <<set $sexstart to 1>>
     <</lanLink>><<promiscuous4>><br>
@@ -87,7 +89,10 @@
 :: Deadwood Robin Private Sex []
 <!-- 原版罗宾的合意战斗初始化与结束流程。site 保存在当前 V 中，读档或跨回合后仍返回正确地点。 -->
 <<set _site to $RobinExpansion.intimacySite>>
-<<if !['shop', 'lemonade', 'chocolate', 'meteor'].includes(_site)>>
+<<if !['shop', 'lemonade', 'chocolate', 'meteor'].includes(_site)
+  or ($sexstart is 1 and (!isLoveInterest('Robin') or C.npc.Robin.trauma gte 50
+    or $robinmissing or $robin.timer.hurt gt 0 or $RobinExpansion.asylum.status is 'admitted'
+    or (_site isnot 'meteor' and !maplebirch.get('Robin').canTease)))>>
   <<set $sexstart to 0>>
   <<getouticon>><<lanLink '离开' 'Orphanage'>><<endevent>><</lanLink>>
 <<else>>

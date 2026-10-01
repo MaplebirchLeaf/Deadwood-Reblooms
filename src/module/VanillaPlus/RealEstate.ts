@@ -263,6 +263,19 @@ export class RealEstate {
     return true;
   }
 
+  /** 只在亲密互动开始前检查，进行中的遭遇战不因日程变化换人或中止。 */
+  public canIntimate(name: string, id = this.current?.id): boolean {
+    return (
+      !!id &&
+      this.owns(id) &&
+      !this.managementFor(id).rented &&
+      this.canShareBed(id) &&
+      window.isLoveInterest(name) &&
+      this.residentsHome(id).some(profile => profile.id === name) &&
+      (name !== 'Robin' || C.npc.Robin.trauma < 50)
+    );
+  }
+
   public get currentCompanion(): ResidentProfile | undefined {
     const name = this.state.meeting_resident;
     // 互动开始时已检查夜间日程。对话或遭遇战跨过日程边界后，仍要认得本次选中的同住者。

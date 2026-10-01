@@ -19,6 +19,5 @@ export default class RobinAsylum extends Shared {
     asylum.severeDays = 0;
     V.robindebt = asylum.savedDebt;
     V.robinReunionScene = undefined;
-    C.npc.Robin.trauma = Math.max(0, C.npc.Robin.trauma - 15);
   }
 }

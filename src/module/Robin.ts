@@ -70,6 +70,11 @@ class Robin extends Module implements RobinFacade {
     return C.npc.Robin?.init === 1 && !V.robinmissing && V.robin.timer.hurt === 0 && this.state.asylum.status !== 'admitted';
   }
 
+  /** 营业中的冒险互动按性欲和主动程度判断，普通约会不使用这个门槛。 */
+  public get canTease(): boolean {
+    return this.available && window.isLoveInterest('Robin') && C.npc.Robin.trauma < 50 && C.npc.Robin.lust >= 60 && C.npc.Robin.dom >= 70;
+  }
+
   /** 能否动用储备金完成一笔开销。 */
   public canSpend(amount: number, protectNextRent = true): boolean {
     return this.flowers.canSpend(amount, protectNextRent);

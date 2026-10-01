@@ -16,11 +16,17 @@
 						Robin wakes with a start, gripping the edge of the blanket. <<He>> lets go when <<he>> recognises you. You hold out your hand, and <<he>> takes it while <<his>> breathing slows.
 						<br><br>
 						"<span class='teal'>Stay until I fall asleep?</span>" <<he>> asks.
-					<<else>>
+					<<elseif C.npc.Robin.lust gte 80>>
 						Robin has woken before you. <<He>> brushes your hair aside and leans in when you open your eyes. "<span class='lewd'>I was trying not to wake you.</span>"
+					<<else>>
+						Robin wakes when you stir. <<He>> smiles at you and pulls the blanket over your shoulders.
 					<</if>>
 				<<case 'Whitney'>>
+					<<if C.npc.Whitney.lust gte 60>>
 					Whitney's arm rests across your waist. <<He>> notices you're awake and draws you nearer. "<span class='lewd'>Couldn't sleep either?</span>" <<he>> murmurs, close enough to kiss.
+					<<else>>
+					Whitney opens <<his>> eyes when you move. "What?" <<He>> shifts the pillow and stays beside you.
+					<</if>>
 				<<case 'Kylar'>>
 					Kylar says your name in <<his>> sleep. When you touch <<his>> hand, <<he>> wakes and loosens <<his>> grip. "<span class='teal'>You're still here.</span>" <<He>> looks at you for an answer before moving closer.
 				<<case 'Sydney'>>
@@ -40,11 +46,17 @@
 						罗宾猛地醒来，紧抓着被角。认出你后，<<he>>才松开手。你伸出手，<<he>>握住了，呼吸也渐渐平稳。
 						<br><br>
 						“<span class='teal'>等我睡着再松手，好吗？</span>”<<he>>问。
-					<<else>>
+					<<elseif C.npc.Robin.lust gte 80>>
 						罗宾比你先醒。你睁开眼时，<<he>>拨开你脸旁的头发，靠近了些。“<span class='lewd'>我本来不想吵醒你的。</span>”
+					<<else>>
+						你一动，罗宾也醒了。<<He>>朝你笑了笑，把毯子拉过你的肩头。
 					<</if>>
 				<<case 'Whitney'>>
+					<<if C.npc.Whitney.lust gte 60>>
 					惠特尼的手臂搭在你腰上。见你醒来，<<he>>又把你拉近。“<span class='lewd'>你也睡不着？</span>”<<he>>轻声问，近得几乎要吻上来。
+					<<else>>
+					你动了一下，惠特尼睁开眼。“怎么了？”<<He>>挪了挪枕头，仍躺在你身旁。
+					<</if>>
 				<<case 'Kylar'>>
 					凯拉尔在梦里叫了你的名字。你碰了碰<<his>>的手，<<he>>醒过来，松开攥着你的手。“<span class='teal'>你还在。</span>”<<He>>望着你，等你回应后才往你身边挪。
 				<<case 'Sydney'>>
@@ -59,7 +71,7 @@
 			<</switch>>
 	<</language>>
 	<br><br>
-	<<if _partner.id isnot 'Robin' or C.npc.Robin.trauma lt 50>>
+	<<if maplebirch.get("VanillaPlus").realEstate.canIntimate(_partner.id, _property.id)>>
 		<<loveicon>>
 		<<lanLink ['Kiss your lover beside you', '亲吻身边的恋人'] 'Deadwood Reblooms Property Intimacy'>>
 			<<set $sleephour to 0>><<set $sexstart to 1>>
@@ -77,7 +89,8 @@
 <!-- 入口已从当晚在家的同住者中选人。战斗回合跨过起床时间后，继续使用当前存档里选中的同一人。 -->
 <<set _property to maplebirch.get("VanillaPlus").realEstate.current>>
 <<set _partner to maplebirch.get("VanillaPlus").realEstate.currentCompanion>>
-<<if !_property || !_partner || !maplebirch.get("VanillaPlus").realEstate.owns(_property.id) || maplebirch.get("VanillaPlus").realEstate.managementFor(_property.id).rented>>
+<<if !_property || !_partner || !maplebirch.get("VanillaPlus").realEstate.owns(_property.id) || maplebirch.get("VanillaPlus").realEstate.managementFor(_property.id).rented
+  || ($sexstart is 1 && !maplebirch.get("VanillaPlus").realEstate.canIntimate(_partner.id, _property.id))>>
 	<<set $sexstart to 0>>
 	<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
 <<else>>
@@ -161,7 +174,7 @@
 					<</language>>
 				<</if>>
 			<<case 'Sydney'>>
-				<<if _sydneyStatus.includes('corrupt')>>
+				<<if _sydneyStatus.includes('corruptLust')>>
 					<<language>>
 						<<option 'EN'>>Sydney sets <<his>> temple pendant aside. "<span class='lewd'>Now I can have you to myself,</span>" <<he>> murmurs, drawing you close.
 						<<option 'CN'>>悉尼把神殿吊坠放到一旁。“<span class='lewd'>现在你只属于我了。</span>”<<he>>低声说着，把你拉近。
@@ -207,7 +220,8 @@
 :: Deadwood Reblooms Property Intimacy Finish []
 <<set _partner to maplebirch.get("VanillaPlus").realEstate.currentCompanion>>
 <<run maplebirch.get("VanillaPlus").realEstate.enter()>><<effects>>
-<<if _partner>>
+<<if _partner and $combat is 1>>
+	<<person1>>
 	<<if _partner.id is 'Sydney' and $enemyarousal gte $enemyarousalmax>>
 		<<person1>><<run statusCheck('Sydney')>>
 		<<ejaculation>>
@@ -220,12 +234,18 @@
 		<<npcincr Sydney love 1>><<glove>><<sydneyFinish>>
 		<br><br>
 		<<lanSwitch 'Sydney stays beside you and pulls the blanket back over the bed.' '悉尼仍挨着你，把毯子重新拉好。'>>
+	<<elseif $enemyarousal lt $enemyarousalmax and $enemyhealth gt 0>>
+		<<if _partner.id is 'Sydney'>>
+			<<run statusCheck('Sydney')>>
+			<<npcincr Sydney lust 5>><<npcincr Sydney purity 2>><<gglust>><<gspurity>><br>
+		<</if>>
+		<<lanSwitch 'You stop and give your lover some room.' '你停下来，给恋人留出一些空间。'>>
 	<<else>>
 		<<if $enemyarousal gte $enemyarousalmax>>
 			<<ejaculation>>
 			<<npcincr _partner.id lust -20>><<lllust>><br>
 		<</if>>
-			<<if $enemyhealth lte 0>>
+			<<if $enemyhealth lte 0 and $enemyarousal lt $enemyarousalmax>>
 				<<npcincr _partner.id love -1>><<llove>>
 				<<language>>
 					<<option 'EN'>>

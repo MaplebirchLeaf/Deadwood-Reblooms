@@ -49,10 +49,12 @@
     <<case 'monitor'>><<set _talkLabel to { EN: 'Ask about the glowing screen', CN: '问凯拉尔屏幕上是什么' }>>
     <<default>><<set _talkLabel to { EN: 'Ask Kylar if he is all right', CN: '问凯拉尔还好吗' }>>
   <</switch>>
-  <<language>>
-    <<option 'EN'>><<socialiseicon 'ask'>><<link _talkLabel.EN 'Deadwood Reblooms Kylar Night Talk'>><<pass 5>><</link>>
-    <<option 'CN'>><<socialiseicon 'ask'>><<link _talkLabel.CN 'Deadwood Reblooms Kylar Night Talk'>><<pass 5>><</link>>
-  <</language>><br>
+  <<if $KylarExpansion.night_scene>>
+    <<language>>
+      <<option 'EN'>><<socialiseicon 'ask'>><<link _talkLabel.EN 'Deadwood Reblooms Kylar Night Talk'>><<pass 5>><</link>>
+      <<option 'CN'>><<socialiseicon 'ask'>><<link _talkLabel.CN 'Deadwood Reblooms Kylar Night Talk'>><<pass 5>><</link>>
+    <</language>><br>
+  <</if>>
   <<language>>
     <<option 'EN'>><<loveicon>><<link 'Kiss Kylar' 'Manor Kylar Sex'>>
       <<set $sleephour to 0>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><<set $sexstart to 1>>
@@ -67,14 +69,16 @@
   <<option 'CN'>><<bedicon 'kylar'>><<link '继续睡觉' 'Deadwood Reblooms Kylar Sleep'>><</link>>
 <</language>><br><br>
 <<language>>
-  <<option 'EN'>><<getouticon>><<link 'Get up' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.KylarExpansion.openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
-  <<option 'CN'>><<getouticon>><<link '起床' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.KylarExpansion.openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
+  <<option 'EN'>><<getouticon>><<link 'Get up' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.get('Kylar').openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
+  <<option 'CN'>><<getouticon>><<link '起床' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.get('Kylar').openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
 <</language>>
 
 :: Deadwood Reblooms Kylar Night Talk []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
 <<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar')
   or C.npc.Kylar.state isnot 'active'
+  or !['meteor', 'rain', 'monitor', 'wrist'].includes($KylarExpansion.night_scene)
+  or (Time.hour lt 18 and getKylarLocation().area isnot 'manor_bedroom')
   or (maplebirch.get('VanillaPlus') and maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
   <<lanSwitch 'Kylar has gone quiet. You draw the blanket back around yourself.' '凯拉尔不再说话。你把被子重新拉好。'>>
 <<else>>
@@ -107,6 +111,7 @@
     <br><br><<lanSwitch 'You tell Kylar you chose to spend the night here. <<He>> holds on to your hand a moment longer than <<he>> needs to, then lets go.' '你告诉凯拉尔，今晚留在这里是你自己的选择。<<He>>把<<his>>的手多攥了一会儿，才松开。'>>
   <</if>>
   <<if C.npc.Kylar.rage gte 50>><<npcincr Kylar rage -1>><</if>>
+  <<set $KylarExpansion.night_scene to ''>>
   <<npcincr Kylar love 1>><<glove>><<stress -2>><<lstress>>
 <</if>>
 <br><br>
@@ -115,6 +120,6 @@
   <<option 'CN'>><<bedicon 'kylar'>><<link '继续睡觉' 'Deadwood Reblooms Kylar Sleep'>><</link>>
 <</language>><br><br>
 <<language>>
-  <<option 'EN'>><<getouticon>><<link 'Get up' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.KylarExpansion.openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
-  <<option 'CN'>><<getouticon>><<link '起床' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.KylarExpansion.openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
+  <<option 'EN'>><<getouticon>><<link 'Get up' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.get('Kylar').openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
+  <<option 'CN'>><<getouticon>><<link '起床' 'Manor Kylar Room'>><<set $sleephour to 0>><<run maplebirch.get('Kylar').openWardrobe()>><<storeon 'kylar manor bed'>><<loadTempHairStyle>><</link>>
 <</language>>
