@@ -154,7 +154,7 @@ class Fish extends Transformation {
       {
         title: 'General Traits',
         name: () => {
-          const name = maplebirch.t(`deadwood-reblooms:Traits:fish:${V.player.gender === 'n' ? 'name' : 'gender'}`);
+          const name = maplebirch.t('deadwood-reblooms:Traits:fish:gender');
           return name + (V.player.sex === 'h' ? lanSwitch(' (⚥)', '(⚥)') : '');
         },
         colour: 'lblue',

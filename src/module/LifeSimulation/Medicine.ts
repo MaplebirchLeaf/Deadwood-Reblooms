@@ -18,23 +18,23 @@ export interface MedicineState {
 }
 
 export const MEDICINES = [
-  { id: 'calm', name: ['Calming tablets', '镇静片'], description: ['Temporarily eases stress. Causes drowsiness.', '暂时缓解压力，同时使人困倦。'], price: 1200, hours: 4 },
-  { id: 'sleep', name: ['Sleeping tablets', '安眠片'], description: ['Helps with troubled sleep. Does not prevent every nightmare.', '帮助入睡，不保证阻止所有噩梦。'], price: 1500, hours: 8 },
+  { id: 'calm', name: ['Calming tablets', '镇静药'], description: ['Temporarily eases stress. Causes drowsiness.', '暂时缓解压力，同时使人困倦。'], price: 1200, hours: 4 },
+  { id: 'sleep', name: ['Sleeping tablets', '助眠药'], description: ['Helps with troubled sleep. Does not prevent every nightmare.', '帮助入睡，不保证阻止所有噩梦。'], price: 1500, hours: 8 },
   {
     id: 'alert',
-    name: ['Wakefulness tablets', '提神片'],
+    name: ['Wakefulness tablets', '提神药'],
     description: ['Temporarily masks fatigue. Fatigue returns when it wears off.', '暂时压低疲劳，药效消退后疲劳会回升。'],
     price: 1600,
     hours: 4
   },
   {
     id: 'focus',
-    name: ['Concentration tablets', '专注片'],
+    name: ['Concentration tablets', '专注药'],
     description: ['Improves gains from studying while active. Causes tension.', '药效期间提高实际学习收益，同时增加压力。'],
     price: 1800,
     hours: 4
   },
-  { id: 'soothe', name: ['Soothing tablets', '安神片'], description: ['Temporarily eases the burden of trauma. Does not erase memories.', '暂时减轻创伤负担，不抹去经历。'], price: 1400, hours: 4 }
+  { id: 'soothe', name: ['Soothing tablets', '安神药'], description: ['Temporarily eases the burden of trauma. Does not erase memories.', '暂时减轻创伤负担，不抹去经历。'], price: 1400, hours: 4 }
 ] as const;
 
 const EMPTY_USE: Use = { owned: 0, last: -1, day: -1, count: 0, streak: 0, dependence: 0, until: 0, rebound: 0 };
@@ -236,11 +236,34 @@ export default class Medicine {
   public init(): void {
     this.core.dynamic.regTimeEvent('onAfter', 'LifeSimulation Medicine Expiry', { action: () => this.tick() });
     this.core.dynamic.regTimeEvent('onDay', 'LifeSimulation Medicine Dependence', { exact: true, action: () => this.day() });
+    const indicators: Record<MedicineId, [string, string, string][]> = {
+      calm: [
+        ['- Stress', '- 压力', 'green'],
+        ['+ Fatigue', '+ 疲劳', 'red']
+      ],
+      sleep: [
+        ['Easier sleep', '助眠', 'green'],
+        ['+ Fatigue', '+ 疲劳', 'red']
+      ],
+      alert: [
+        ['- Fatigue', '- 疲劳', 'green'],
+        ['+ Stress', '+ 压力', 'red']
+      ],
+      focus: [
+        ['+ Learning', '+ 学习收益', 'green'],
+        ['+ Stress', '+ 压力', 'red']
+      ],
+      soothe: [
+        ['- Trauma', '- 创伤', 'green'],
+        ['+ Fatigue', '+ 疲劳', 'red']
+      ]
+    };
     for (const item of MEDICINES) {
       const config = {
         cn_name: item.name[1],
         icon: `img/misc/icon/pill-${item.id}.png`,
         description: () => lanSwitch(item.description[0], item.description[1]),
+        indicators: () => indicators[item.id].map(([en, cn, colour]) => `<span class="${colour}">${lanSwitch(en, cn)}</span>`),
         warning_label: () =>
           lanSwitch(
             'Leave at least eight hours between doses. Repeated and prolonged use may cause dependence. Manual use only.',

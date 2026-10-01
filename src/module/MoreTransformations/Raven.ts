@@ -255,7 +255,7 @@ class Raven extends Transformation {
       {
         title: 'General Traits',
         name: () => {
-          const name = maplebirch.t(`deadwood-reblooms:Traits:raven:${V.player.gender === 'n' ? 'name' : 'gender'}`);
+          const name = maplebirch.t('deadwood-reblooms:Traits:raven:gender');
           return name + (V.player.sex === 'h' ? lanSwitch(' (⚥)', '(⚥)') : '');
         },
         colour: 'black',
@@ -319,15 +319,15 @@ class Raven extends Transformation {
             applyafter: '<<if _ravenOmen>><<set $MoreTransformations.raven.disparaged to $angelforgive is 1 ? $MoreTransformations.raven.disparaged + 1 : 1>><</if>>',
             expected: 1
           },
-          // 融合讥讽沿用原版 brat 的压力、愤怒等结算，只补一份创伤减轻。
+          // 融合讥讽保留鸦化言语加成，只为创伤减轻和自控恢复再加一倍。
           // 三个表达式限定在嘲讽分支内，自控翻倍不影响自愿遭遇的 submission。
           {
             srcmatch:
               /(<<actionsmock>><<set \$speechdemand to 1>>\s*<<brat `)1 \+ \$englishtrait(` \$mouthtarget>>)([\s\S]*?<<submission `)1 \+ \$englishtrait(` \$mouthtarget>>\s*<<else>>\s*<<combatcontrol `)1 \+ \$englishtrait/,
             to:
-              `$1($englishtrait + 1) * (_ravenOmen ? 1 : ${speech})$2` +
-              '<<if _ravenOmen>><<combattrauma `-($englishtrait + 1)`>><<if $pain gt 0>><<set _ravenPain to $pain>><<set $pain *= 0.85>><<painclamp>><<if $pain lt _ravenPain>><<lpain>><</if>><</if>><</if>>' +
-              `$3($englishtrait + 1) * ${speech}$4($englishtrait + 1) * (_ravenOmen ? 2 : ${speech})`,
+              `$1($englishtrait + 1) * ${speech}$2` +
+              `<<if _ravenOmen>><<combattrauma \`-($englishtrait + 1) * ${speech}\`>><<if $pain gt 0>><<set _ravenPain to $pain>><<set $pain *= 0.85>><<painclamp>><<if $pain lt _ravenPain>><<lpain>><</if>><</if>><</if>>` +
+              `$3($englishtrait + 1) * ${speech}$4($englishtrait + 1) * ${speech} * (_ravenOmen ? 2 : 1)`,
             expected: 1
           },
           // 在原版演说倍率之后相乘，保留目标、拒绝分支与技能等级。

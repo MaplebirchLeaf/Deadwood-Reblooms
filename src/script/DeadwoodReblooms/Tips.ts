@@ -46,10 +46,10 @@ export default function Tips(core: typeof maplebirch): void {
       ],
       [
         'Wakefulness tablets hide some fatigue for a while. <span class="red">That fatigue returns when they wear off.</span>',
-        '提神片暂时压低一部分疲劳。<span class="red">药效消退后，这部分疲劳会回来。</span>'
+        '提神药暂时压低一部分疲劳。<span class="red">药效消退后，这部分疲劳会回来。</span>'
       ],
-      ['Concentration tablets help with actual studying. Swallowing one does not improve your grades by itself.', '专注片提高实际学习的收益。只吞下药片，并不会凭空提高成绩。'],
-      ['Sleeping tablets can help you rest, but they do not guarantee peaceful dreams.', '安眠片可以帮助休息，但不保证每一个梦都安稳。']
+      ['Concentration tablets help with actual studying. Swallowing one does not improve your grades by itself.', '专注药提高实际学习的收益。只吞下药片，并不会凭空提高成绩。'],
+      ['Sleeping tablets can help you rest, but they do not guarantee peaceful dreams.', '助眠药可以帮助休息，但不保证每一个梦都安稳。']
     );
   if (core.get('LifeSimulation'))
     add('tentacles', [

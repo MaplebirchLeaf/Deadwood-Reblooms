@@ -133,29 +133,38 @@ class GuideView {
   }
 }
 
-// 系列模组可选取得 maplebirch.get('DeadwoodReblooms')?.guide，生成指南后加入 setup.maplebirch.hint。
-// DeadwoodReblooms 未载入时跳过注册，使用独立 id 前缀与可信 Markdown，弹窗统一绑定搜索及模块复选框。
 export default class Guide {
+  private readonly groups = new Map<string, () => readonly GuideSection[]>();
+
   public constructor(private readonly core: typeof maplebirch) {}
+
+  public add(id: string, sections: () => readonly GuideSection[]): void {
+    this.groups.set(id, sections);
+  }
 
   public bind(textbox: HTMLInputElement, content: HTMLElement): GuideView {
     return new GuideView(textbox, content, this.core);
   }
 
   public render(id: string, intro: string, sections: readonly GuideSection[]): string {
+    const scoped = (prefix: string, sections: readonly GuideSection[]): GuideSection[] => sections.map(section => ({ ...section, id: `${prefix}-${section.id}` }));
+    const entries = scoped(id, sections);
+    const extra = [...this.groups].flatMap(([prefix, sections]) => scoped(prefix, sections()));
+    const credits = sections.findIndex(section => section.id === 'Credits');
+    entries.splice(credits < 0 ? entries.length : credits, 0, ...extra);
     const escape = (text: string): string => text.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
     const markdown = (text: string): string => {
       const rendered = this.core.marked.parse(text);
       return typeof rendered === 'string' ? rendered : '';
     };
-    const target = (section: GuideSection): string => escape(`${id}-${section.id}`);
-    const contents = sections
+    const target = (section: GuideSection): string => escape(section.id);
+    const contents = entries
       .map(
         section =>
           `<div class='settingsToggleItem' style='display:flex;align-items:center;gap:.5em'><a href='#${target(section)}' data-guide-target='${target(section)}' style='min-width:0;overflow-wrap:anywhere'>${escape(section.title)}</a>${section.module ? `<input type='checkbox' data-guide-module='${escape(section.module)}' aria-label='${escape(section.title)}' style='margin-left:auto;flex-shrink:0' disabled>` : ''}</div>`
       )
       .join('');
-    const body = sections.map(section => `<section id='${target(section)}'><h2><span class='gold'>${escape(section.title)}</span></h2>${markdown(section.content)}</section>`).join('<br>');
+    const body = entries.map(section => `<section id='${target(section)}'><h2><span class='gold'>${escape(section.title)}</span></h2>${markdown(section.content)}</section>`).join('<br>');
     return `${markdown(intro)}<nav aria-label='${lanSwitch('Guide contents', '指南目录')}'><div class='settingsGrid'>${contents}<div data-guide-status role='status' aria-live='polite' hidden></div></div></nav><br>${body}`;
   }
 }

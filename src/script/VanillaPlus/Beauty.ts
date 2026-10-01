@@ -33,13 +33,14 @@ export default function (maplebirch: typeof window.maplebirch) {
     widgetPassage: {
       'Widgets Effects Man': [
         {
-          src: '<<meek `1 + $englishtrait`>>',
+          // 鸦化先注册时保留其演说倍率，容貌只追加自己的减怒效果。
+          srcmatch: /<<meek `(?:1 \+ \$englishtrait|\(1 \+ \$englishtrait\) \* maplebirch\.get\('MoreTransformations'\)\.Raven\.speech)`>>/,
           applyafter: '<<if $VanillaPlus.traits.beauty>><<set $enemyanger -= 25>><</if>>',
           expected: 1
         },
         {
-          srcmatch: /<<set \$enemyanger -= (50|100) \* \(1 \+ \$englishtrait\)>>/g,
-          to: '<<set $enemyanger -= $1 * (1 + $englishtrait) * ($VanillaPlus.traits.beauty ? 1.25 : 1)>>',
+          srcmatch: /(<<set \$enemyanger -= (?:50|100) \* \((?:1 \+ \$englishtrait|\(1 \+ \$englishtrait\) \* maplebirch\.get\('MoreTransformations'\)\.Raven\.speech)\))>>/g,
+          to: '$1 * ($VanillaPlus.traits.beauty ? 1.25 : 1)>>',
           expected: 3
         }
       ],
