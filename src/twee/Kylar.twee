@@ -81,10 +81,10 @@
   <</if>>
 <</widget>>
 <<widget 'deadwood-reblooms-kylar-kitchen-link'>>
-  <<if $KylarExpansion?.stay_invited and $KylarExpansion.tea_day isnot Time.days>>
+  <<if $KylarExpansion?.stay_invited and !pcAreArmsBound('both') and $KylarExpansion.tea_day isnot Time.days>>
     <<language>>
-      <<option 'EN'>><<kitchenicon 'stove'>><<link 'Make tea (0:10)' 'Deadwood Reblooms Kylar Kitchen Tea'>><<pass 10>><<set $KylarExpansion.tea_day to Time.days>><</link>>
-      <<option 'CN'>><<kitchenicon 'stove'>><<link '泡一杯茶 (0:10)' 'Deadwood Reblooms Kylar Kitchen Tea'>><<pass 10>><<set $KylarExpansion.tea_day to Time.days>><</link>>
+      <<option 'EN'>><<kitchenicon 'stove'>><<link 'Make tea (0:10)' 'Deadwood Reblooms Kylar Kitchen Tea'>><</link>>
+      <<option 'CN'>><<kitchenicon 'stove'>><<link '泡一杯茶 (0:10)' 'Deadwood Reblooms Kylar Kitchen Tea'>><</link>>
     <</language>><br><br>
   <</if>>
 <</widget>>
@@ -101,6 +101,8 @@
 <<set _kylarAtManor to maplebirch.get('Kylar').atManor>>
 <<if $kylar_sleep_abduction isnot 1 or !isLoveInterest('Kylar') or !_kylarAtManor>>
   <<lanSwitch 'Kylar is not in the room. You can ask another time.' '凯拉尔不在房间里。你可以改天再问。'>>
+<<elseif $KylarExpansion.stay_invited>>
+  <<lanSwitch 'Kylar has already made room for you.' '凯拉尔已经为你腾出地方了。'>>
 <<else>>
   <<npc Kylar>><<person1>>
   <<language>>
@@ -165,27 +167,30 @@
 
 :: Deadwood Reblooms Kylar Kitchen Tea []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
-<<if C.npc.Kylar.state is 'active' and Time.hour gte 18
-  and (!maplebirch.get('VanillaPlus') or !maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
-  <<npc Kylar>><<person1>>
+<<if !$KylarExpansion.stay_invited or $KylarExpansion.tea_day is Time.days or pcAreArmsBound('both')>>
+  <<lanSwitch 'You cannot make tea here right now.' '现在无法在这里泡茶。'>>
+<<else>>
+  <<set _kylarTeaTogether to maplebirch.get('Kylar').atManor>>
+  <<pass 10>><<set $KylarExpansion.tea_day to Time.days>>
+  <<if _kylarTeaTogether>>
+    <<npc Kylar>><<person1>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      You rinse two cups and put the kettle on. The kitchen still smells faintly of chemicals, but the tea is warm in your hands.
+      <<if _kylarTeaTogether>>
+        <br><br>
+        Kylar peers in from the hall. You offer <<him>> the second cup. <<He>> takes it carefully and stays beside you while it cools.
+      <</if>>
+    <<option 'CN'>>
+      你洗净两只杯子，烧开一壶水。厨房里仍有淡淡的化学气味，手里的茶却是热的。
+      <<if _kylarTeaTogether>>
+        <br><br>
+        凯拉尔从门厅探头。你把另一只杯子递给<<him>>。<<He>>小心接过，留在你身边等茶稍凉。
+      <</if>>
+  <</language>>
+  <<stress -2>><<lstress>>
 <</if>>
-<<language>>
-  <<option 'EN'>>
-    You rinse two cups and put the kettle on. The kitchen still smells faintly of chemicals, but the tea is warm in your hands.
-    <<if C.npc.Kylar.state is 'active' and Time.hour gte 18
-      and (!maplebirch.get('VanillaPlus') or !maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
-      <br><br>
-      Kylar peers in from the hall. You offer <<him>> the second cup. <<He>> takes it carefully and stays beside you while it cools.
-    <</if>>
-  <<option 'CN'>>
-    你洗净两只杯子，烧开一壶水。厨房里仍有淡淡的化学气味，手里的茶却是热的。
-    <<if C.npc.Kylar.state is 'active' and Time.hour gte 18
-      and (!maplebirch.get('VanillaPlus') or !maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
-      <br><br>
-      凯拉尔从门厅探头。你把另一只杯子递给<<him>>。<<He>>小心接过，留在你身边等茶稍凉。
-    <</if>>
-<</language>>
-<<stress -2>><<lstress>>
 <br><br>
 <<language>>
   <<option 'EN'>><<kitchenicon 'stove'>><<link 'Return to the kitchen' 'Manor Kitchen'>><</link>>

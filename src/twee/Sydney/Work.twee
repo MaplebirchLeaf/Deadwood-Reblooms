@@ -12,6 +12,7 @@
 <</silently>><<if _workTogether>>
   <<templeicon 'garden'>>
   <<lanLink ['Tend the garden with Sydney (1:00)', '和悉尼一起打理花园 (1:00)'] 'Deadwood Reblooms Sydney Garden Work'>>
+    <<set $phase to 'sydney-garden-work'>>
     <<set $SydneyExpansion.gardenDay to Time.days>>
     <<set $temple_garden to Math.min(100, $temple_garden + 6)>>
     <<pass 60>><<grace 1 monk>><<tiredness 6>><<tending 1>>
@@ -30,6 +31,7 @@
 <</silently>><<if _workTogether>>
   <<choreicon 'sweep'>>
   <<lanLink ['Tidy the quarters with Sydney (1:00)', '和悉尼一起整理宿舍 (1:00)'] 'Deadwood Reblooms Sydney Quarters Work'>>
+    <<set $phase to 'sydney-quarters-work'>>
     <<set $SydneyExpansion.quartersDay to Time.days>>
     <<set $temple_quarters to Math.min(100, $temple_quarters + 6)>>
     <<pass 60>><<grace 1 monk>><<housekeeping 1 1000>>
@@ -41,238 +43,292 @@
   <<if _sydneyAvailable is undefined>><<sydneySchedule>><</if>>
   <<set _canTalkBeforeTrial to _sydneyAvailable and $sydney_templeWork is 'anguish' and Time.hour gte 17 and Time.hour lt 20 and !$weekly.trialFailed and $exposed lte 0 and $SydneyExpansion.trialTalkDay isnot Time.days>>
 <</silently>><<if _canTalkBeforeTrial>>
-  <<templeicon 'pew'>><<lanLink ['Sit with Sydney by the pew (0:10)', '在长椅旁陪悉尼坐一会儿 (0:10)'] 'Deadwood Reblooms Sydney Trial Talk'>><<set $SydneyExpansion.trialTalkDay to Time.days>><<pass 10>><</lanLink>><br>
+  <<templeicon 'pew'>><<lanLink ['Sit with Sydney by the pew (0:10)', '在长椅旁陪悉尼坐一会儿 (0:10)'] 'Deadwood Reblooms Sydney Trial Talk'>><<set $phase to 'sydney-trial-talk'>><<set $SydneyExpansion.trialTalkDay to Time.days>><<pass 10>><</lanLink>><br>
 <</if>><</widget>>
 
 :: Deadwood Reblooms Sydney Garden Work []
 <<set $outside to 1>><<set $location to 'temple'>><<temple_effects>><<effects>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    You and Sydney work along the garden's outer edge. <<He>> steadies a basket while you clear the weeds from a flowerbed. By the time the fountain comes into view again, the basket is full and there is soil on both your hands.
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      Sydney sets the tools in a tidy row. "<span class='green'>The plants will have a little more room to grow now</span>," <<he>> says, pleased with what you have done together.
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      Sydney brushes a loose leaf from your sleeve, though <span class='lewd'><<his>> fingers linger at your wrist</span>. "You make this shift go quickly," <<he>> says.
-    <<else>>
-      Sydney notices a flower you nearly pulled up and catches your hand in time. <span class='teal'>You both laugh</span>, then work your way around it.
-    <</if>>
-  <<option 'CN'>>
-    你和悉尼从花园外沿开始干活。<<He>>扶稳篮子，你把花坛里的野草一把把拔出来。等你们重新看见喷泉，篮子已经装满，你们的手上也都沾了泥。
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      悉尼把工具整齐地排在一边。“<span class='green'>这下花也能长得舒展些了。</span>”<<he>>看着你们一起清理过的花坛，显得很高兴。
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      悉尼替你拂去衣袖上的叶片，<span class='lewd'>手指却在你腕上多停了一会儿</span>。“和你一起值勤，时间过得真快。”<<he>>说。
-    <<else>>
-      你差点把一株花也拔出来，悉尼及时握住你的手。<span class='teal'>你们笑了一阵</span>，又绕开那株花继续干活。
-    <</if>>
-<</language>>
-<br><br>
-<<socialiseicon>><<lanLink ['Help Sydney put away the garden tools (0:10)', '帮悉尼收好园艺工具 (0:10)'] 'Deadwood Reblooms Sydney Garden Help'>><<pass 10>><</lanLink>><br>
-<<if $sydneyromance is 1 and hasSexStat('promiscuity', 2)>>
-  <<loveicon>><<lanLink ['Tease Sydney while no one is looking (0:10)', '趁四下无人调戏悉尼 (0:10)'] 'Deadwood Reblooms Sydney Garden Tease'>><<pass 10>><</lanLink>><<promiscuous2>><br>
+<<if $phase isnot 'sydney-garden-work'
+  or C.npc.Sydney.init isnot 1 or ['prison', 'dungeon'].includes(C.npc.Sydney.state) or $daily.sydney?.punish is 1>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<unset $phase>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      You and Sydney work along the garden's outer edge. <<He>> steadies a basket while you clear the weeds from a flowerbed. By the time the fountain comes into view again, the basket is full and there is soil on both your hands.
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        Sydney sets the tools in a tidy row. "<span class='green'>The plants will have a little more room to grow now</span>," <<he>> says, pleased with what you have done together.
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        Sydney brushes a loose leaf from your sleeve, though <span class='lewd'><<his>> fingers linger at your wrist</span>. "You make this shift go quickly," <<he>> says.
+      <<else>>
+        Sydney notices a flower you nearly pulled up and catches your hand in time. <span class='teal'>You both laugh</span>, then work your way around it.
+      <</if>>
+    <<option 'CN'>>
+      你和悉尼从花园外沿开始干活。<<He>>扶稳篮子，你把花坛里的野草一把把拔出来。等你们重新看见喷泉，篮子已经装满，你们的手上也都沾了泥。
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        悉尼把工具整齐地排在一边。“<span class='green'>这下花也能长得舒展些了。</span>”<<he>>看着你们一起清理过的花坛，显得很高兴。
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        悉尼替你拂去衣袖上的叶片，<span class='lewd'>手指却在你腕上多停了一会儿</span>。“和你一起值勤，时间过得真快。”<<he>>说。
+      <<else>>
+        你差点把一株花也拔出来，悉尼及时握住你的手。<span class='teal'>你们笑了一阵</span>，又绕开那株花继续干活。
+      <</if>>
+  <</language>>
+  <br><br>
+  <<socialiseicon>><<lanLink ['Help Sydney put away the garden tools (0:10)', '帮悉尼收好园艺工具 (0:10)'] 'Deadwood Reblooms Sydney Garden Help'>><<set $phase to 'sydney-garden-help'>><<pass 10>><</lanLink>><br>
+  <<if $sydneyromance is 1 and hasSexStat('promiscuity', 2) and !pcAreArmsBound('both')>>
+    <<loveicon>><<lanLink ['Tease Sydney while no one is looking (0:10)', '趁四下无人调戏悉尼 (0:10)'] 'Deadwood Reblooms Sydney Garden Tease'>><<set $phase to 'sydney-garden-tease'>><<pass 10>><</lanLink>><<promiscuous2>><br>
+  <</if>>
 <</if>>
 <br>
 <<lanLink '继续' 'Temple Garden'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Garden Help []
 <<set $outside to 1>><<set $location to 'temple'>><<temple_effects>><<effects>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    You gather the shears and gloves before Sydney has to ask. <<He>> carries the full basket beside you. At the shed, <<he>> holds the door while you put each tool back in its place.
-    <br><br>
-    "<span class='green'>Thank you</span>," <<he>> says. "I would have been here much longer on my own."
-  <<option 'CN'>>
-    不用悉尼开口，你就拾起剪刀和手套。<<He>>在你身边提着满满的篮子。到了工具房，<<he>>替你扶住门，你把工具一件件归位。
-    <br><br>
-    “<span class='green'>谢谢。</span>”<<he>>说，“只有我一个人的话，还得忙上好一阵。”
-<</language>>
-<<npcincr Sydney love 1>><<glove>><<if _sydneyStatus.includes('pure')>><<npcincr Sydney purity 1>><<gspurity>><</if>>
+<<if $phase isnot 'sydney-garden-help'
+  or C.npc.Sydney.init isnot 1 or ['prison', 'dungeon'].includes(C.npc.Sydney.state) or $daily.sydney?.punish is 1 or pcAreArmsBound('both')>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<unset $phase>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      You gather the shears and gloves before Sydney has to ask. <<He>> carries the full basket beside you. At the shed, <<he>> holds the door while you put each tool back in its place.
+      <br><br>
+      "<span class='green'>Thank you</span>," <<he>> says. "I would have been here much longer on my own."
+    <<option 'CN'>>
+      不用悉尼开口，你就拾起剪刀和手套。<<He>>在你身边提着满满的篮子。到了工具房，<<he>>替你扶住门，你把工具一件件归位。
+      <br><br>
+      “<span class='green'>谢谢。</span>”<<he>>说，“只有我一个人的话，还得忙上好一阵。”
+  <</language>>
+  <<npcincr Sydney love 1>><<glove>><<if _sydneyStatus.includes('pure')>><<npcincr Sydney purity 1>><<gspurity>><</if>>
+<</if>>
 <br><br>
 <<lanLink '继续' 'Temple Garden'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Garden Tease []
 <<set $outside to 1>><<set $location to 'temple'>><<temple_effects>><<effects>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    You catch Sydney by the waist as <<he>> reaches past you for the basket. <<He>> turns, suddenly close enough to feel your breath.
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      Sydney gently moves your hand away. "<span class='red'>There are people working nearby</span>," <<he>> says. <<He>> waits until you let go before lifting the basket.
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      Sydney's hand closes over yours. <<He>> looks toward the path, then <span class='lewd'>leans in to brush <<his>> lips against your cheek</span>. "Now let me finish the work," <<he>> whispers.
-    <<else>>
-      Sydney blushes and glances toward the path. <<He>> stays close for a moment, then nudges the basket into your hands. "We should finish before someone comes looking," <<he>> says.
-    <</if>>
-  <<option 'CN'>>
-    悉尼伸手去拿你身后的篮子，你趁机揽住<<his>>的腰。<<He>>一回头，近得连你的呼吸都能感觉到。
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      悉尼轻轻移开你的手。“<span class='red'>附近还有人在干活。</span>”<<he>>说。等你松开，<<he>>才提起篮子。
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      悉尼按住你的手，朝小路看了一眼，然后<span class='lewd'>俯身用嘴唇轻擦你的脸颊</span>。“先让我把活干完。”<<he>>低声说。
-    <<else>>
-      悉尼红着脸朝小路看了一眼，挨着你站了一会儿，又把篮子递到你手里。“趁没人来找，先把活干完吧。”<<he>>说。
-    <</if>>
-<</language>>
-<<if _sydneyStatus.includes('pure')>>
-  <<npcincr Sydney love -1>><<llove>>
-<<elseif _sydneyStatus.includes('corrupt')>>
-  <<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 2>><<gslust>><<npcincr Sydney purity -1>><<lspurity>>
+<<if $phase isnot 'sydney-garden-tease'
+  or C.npc.Sydney.init isnot 1 or ['prison', 'dungeon'].includes(C.npc.Sydney.state) or $daily.sydney?.punish is 1 or $sydneyromance isnot 1 or !hasSexStat('promiscuity', 2) or pcAreArmsBound('both')>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
-  <<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 1>><<gslust>><<npcincr Sydney purity -1>><<lspurity>>
+  <<unset $phase>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      You catch Sydney by the waist as <<he>> reaches past you for the basket. <<He>> turns, suddenly close enough to feel your breath.
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        Sydney gently moves your hand away. "<span class='red'>There are people working nearby</span>," <<he>> says. <<He>> waits until you let go before lifting the basket.
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        Sydney's hand closes over yours. <<He>> looks toward the path, then <span class='lewd'>leans in to brush <<his>> lips against your cheek</span>. "Now let me finish the work," <<he>> whispers.
+      <<else>>
+        Sydney blushes and glances toward the path. <<He>> stays close for a moment, then nudges the basket into your hands. "We should finish before someone comes looking," <<he>> says.
+      <</if>>
+    <<option 'CN'>>
+      悉尼伸手去拿你身后的篮子，你趁机揽住<<his>>的腰。<<He>>一回头，近得连你的呼吸都能感觉到。
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        悉尼轻轻移开你的手。“<span class='red'>附近还有人在干活。</span>”<<he>>说。等你松开，<<he>>才提起篮子。
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        悉尼按住你的手，朝小路看了一眼，然后<span class='lewd'>俯身用嘴唇轻擦你的脸颊</span>。“先让我把活干完。”<<he>>低声说。
+      <<else>>
+        悉尼红着脸朝小路看了一眼，挨着你站了一会儿，又把篮子递到你手里。“趁没人来找，先把活干完吧。”<<he>>说。
+      <</if>>
+  <</language>>
+  <<if _sydneyStatus.includes('pure')>>
+    <<npcincr Sydney love -1>><<llove>>
+  <<elseif _sydneyStatus.includes('corrupt')>>
+    <<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 2>><<gslust>><<npcincr Sydney purity -1>><<lspurity>>
+  <<else>>
+    <<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 1>><<gslust>><<npcincr Sydney purity -1>><<lspurity>>
+  <</if>>
 <</if>>
 <br><br>
 <<lanLink '继续' 'Temple Garden'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Quarters Work []
 <<set $outside to 0>><<set $location to 'temple'>><<if _sydneyAvailable is undefined>><<sydneySchedule>><</if>><<temple_effects>><<effects>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    Sydney carries the clean laundry from room to room while you sweep the floor and straighten the bunks. Each time you pass in the corridor, one of you makes space for the other's load.
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      Sydney folds the last robe with careful, even edges. "<span class='green'>The evening shift can come back to a clean room</span>," <<he>> says.
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      Sydney catches you looking while <<he>> stretches to reach a high shelf. "I know you came to help," <<he>> says, smiling, "<span class='lewd'>but you've stopped sweeping.</span>"
-    <<else>>
-      You find a lost bookmark among the sheets. Sydney recognises it at once and tucks it into <<his>> pocket with a relieved smile.
-    <</if>>
-  <<option 'CN'>>
-    悉尼把洗净的衣物一间间送回去，你则扫净地面，理好床铺。每次在走廊相遇，你们都会侧身给对方手里的东西让路。
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      悉尼把最后一件修道袍叠得方方正正。“<span class='green'>晚班的人回来，就能住进干净的房间了。</span>”<<he>>说。
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      悉尼踮脚去够高处的架子，发现你正看着<<him>>。“你是来帮忙的吧？”<<he>>笑着提醒，“<span class='lewd'>扫帚都停下了。</span>”
-    <<else>>
-      你在床单里翻出一张遗失的书签。悉尼一眼认出来，松了口气，笑着把它收进口袋。
-    <</if>>
-<</language>>
-<br><br>
-<<if _dormAccess>>
-  <<wardrobeicon>><<lanLink ['Help Sydney put away the robes', '帮悉尼收好修道袍'] 'Deadwood Reblooms Sydney Dorm Wardrobe'>><</lanLink>><br>
+<<if $phase isnot 'sydney-quarters-work'
+  or C.npc.Sydney.init isnot 1 or ['prison', 'dungeon'].includes(C.npc.Sydney.state) or $daily.sydney?.punish is 1>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
-  <<socialiseicon>><<lanLink ['Help Sydney put away the laundry (0:10)', '帮悉尼收好衣物 (0:10)'] 'Deadwood Reblooms Sydney Quarters Help'>><<pass 10>><</lanLink>><br>
-<</if>>
-<<if $sydneyromance is 1 and hasSexStat('promiscuity', 2)>>
-  <<loveicon>><<lanLink ['Tease Sydney in the corridor (0:10)', '在走廊里调戏悉尼 (0:10)'] 'Deadwood Reblooms Sydney Quarters Tease'>><<pass 10>><</lanLink>><<promiscuous2>><br>
+  <<unset $phase>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney carries the clean laundry from room to room while you sweep the floor and straighten the bunks. Each time you pass in the corridor, one of you makes space for the other's load.
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        Sydney folds the last robe with careful, even edges. "<span class='green'>The evening shift can come back to a clean room</span>," <<he>> says.
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        Sydney catches you looking while <<he>> stretches to reach a high shelf. "I know you came to help," <<he>> says, smiling, "<span class='lewd'>but you've stopped sweeping.</span>"
+      <<else>>
+        You find a lost bookmark among the sheets. Sydney recognises it at once and tucks it into <<his>> pocket with a relieved smile.
+      <</if>>
+    <<option 'CN'>>
+      悉尼把洗净的衣物一间间送回去，你则扫净地面，理好床铺。每次在走廊相遇，你们都会侧身给对方手里的东西让路。
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        悉尼把最后一件修道袍叠得方方正正。“<span class='green'>晚班的人回来，就能住进干净的房间了。</span>”<<he>>说。
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        悉尼踮脚去够高处的架子，发现你正看着<<him>>。“你是来帮忙的吧？”<<he>>笑着提醒，“<span class='lewd'>扫帚都停下了。</span>”
+      <<else>>
+        你在床单里翻出一张遗失的书签。悉尼一眼认出来，松了口气，笑着把它收进口袋。
+      <</if>>
+  <</language>>
+  <br><br>
+  <<if _dormAccess>>
+    <<wardrobeicon>><<lanLink ['Help Sydney put away the robes', '帮悉尼收好修道袍'] 'Deadwood Reblooms Sydney Dorm Wardrobe'>><</lanLink>><br>
+  <<else>>
+    <<socialiseicon>><<lanLink ['Help Sydney put away the laundry (0:10)', '帮悉尼收好衣物 (0:10)'] 'Deadwood Reblooms Sydney Quarters Help'>><<set $phase to 'sydney-quarters-help'>><<pass 10>><</lanLink>><br>
+  <</if>>
+  <<if $sydneyromance is 1 and hasSexStat('promiscuity', 2) and !pcAreArmsBound('both')>>
+    <<loveicon>><<lanLink ['Tease Sydney in the corridor (0:10)', '在走廊里调戏悉尼 (0:10)'] 'Deadwood Reblooms Sydney Quarters Tease'>><<set $phase to 'sydney-quarters-tease'>><<pass 10>><</lanLink>><<promiscuous2>><br>
+  <</if>>
 <</if>>
 <br>
 <<lanLink '继续' 'Temple Quarters'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Trial Talk []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    Sydney is sitting at the end of a pew, with a folded robe beside <<him>>. <<He>> has been reading the same page for some time; when you sit down, <<he>> finally closes the book.
-    <br><br>
-    "<span class='red'>The trial is tonight</span>," <<he>> says. "You will be there too. I keep telling myself that is the difference." <<He>> looks at the folded robe. "It was always the fire. I am always the one the fire beats."
-    <<if ['monk', 'priest'].includes($temple_rank)>>
+<<if $phase isnot 'sydney-trial-talk'
+  or C.npc.Sydney.init isnot 1 or ['prison', 'dungeon'].includes(C.npc.Sydney.state) or $daily.sydney?.punish is 1>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<unset $phase>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney is sitting at the end of a pew, with a folded robe beside <<him>>. <<He>> has been reading the same page for some time; when you sit down, <<he>> finally closes the book.
       <br><br>
-      You remember your own vigil. Sydney notices your expression and waits for you to speak.
-    <</if>>
-  <<option 'CN'>>
-    悉尼坐在长椅的一端，身旁放着叠好的修道袍。<<He>>对着同一页书看了许久。你一坐下，<<he>>终于把书合上。
-    <br><br>
-    “<span class='red'>今晚就要接受审判了。</span>”<<he>>说，“你也会在场。我一直告诉自己，这就是不一样的地方。”<<He>>看着叠好的修道袍。“每次都是火。每次被火打败的都是我。”
-    <<if ['monk', 'priest'].includes($temple_rank)>>
+      "<span class='red'>The trial is tonight</span>," <<he>> says. "You will be there too. I keep telling myself that is the difference." <<He>> looks at the folded robe. "It was always the fire. I am always the one the fire beats."
+      <<if ['monk', 'priest'].includes($temple_rank)>>
+        <br><br>
+        You remember your own vigil. Sydney notices your expression and waits for you to speak.
+      <</if>>
+    <<option 'CN'>>
+      悉尼坐在长椅的一端，身旁放着叠好的修道袍。<<He>>对着同一页书看了许久。你一坐下，<<he>>终于把书合上。
       <br><br>
-      你想起自己当时的守夜。悉尼看见你的神情，等你开口。
-    <</if>>
-<</language>>
-<br><br>
-<<socialiseicon>><<lanLink ['Encourage Sydney (0:05)', '鼓励悉尼 (0:05)'] 'Deadwood Reblooms Sydney Trial Encourage'>><<pass 5>><</lanLink>><br>
-<<if $sydneyromance is 1>>
-  <<loveicon>><<lanLink '牵住悉尼的手 (0:05)' 'Deadwood Reblooms Sydney Trial Hand'>><<pass 5>><</lanLink>><<handholdingvirginitywarning>><<NPCvirginitywarning 'Sydney' 'handholding'>><br>
+      “<span class='red'>今晚就要接受审判了。</span>”<<he>>说，“你也会在场。我一直告诉自己，这就是不一样的地方。”<<He>>看着叠好的修道袍。“每次都是火。每次被火打败的都是我。”
+      <<if ['monk', 'priest'].includes($temple_rank)>>
+        <br><br>
+        你想起自己当时的守夜。悉尼看见你的神情，等你开口。
+      <</if>>
+  <</language>>
+  <br><br>
+  <<socialiseicon>><<lanLink ['Encourage Sydney (0:05)', '鼓励悉尼 (0:05)'] 'Deadwood Reblooms Sydney Trial Encourage'>><<set $phase to 'sydney-trial-encourage'>><<pass 5>><</lanLink>><br>
+  <<if $sydneyromance is 1 and !pcAreArmsBound('both')>>
+    <<loveicon>><<lanLink '牵住悉尼的手 (0:05)' 'Deadwood Reblooms Sydney Trial Hand'>><<set $phase to 'sydney-trial-hand'>><<pass 5>><</lanLink>><<handholdingvirginitywarning>><<NPCvirginitywarning 'Sydney' 'handholding'>><br>
+  <</if>>
 <</if>>
 <br>
 <<lanLink '继续' 'Temple'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Trial Encourage []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    You remind Sydney of the work <<he>> has already done and the people <<he>> has helped. <<He>> looks down at the robe, then folds it once more with steadier hands.
-    <br><br>
-    "<span class='green'>Maybe this time</span>," <<he>> says, not quite a question. "If you are beside me, maybe the fire does not win again. Thank you for staying."
-  <<option 'CN'>>
-    你提起悉尼已经做过的事，还有受过<<his>>帮助的人。<<He>>低头看着修道袍，又把它重新叠好，手比刚才稳了许多。
-    <br><br>
-    “<span class='green'>也许这次不一样。</span>”<<he>>说，语气里带着不确定，“有你在我旁边，也许火就不会再赢了。谢谢你留下来。”
-<</language>>
-<<npcincr Sydney love 1>><<glove>><<if _sydneyStatus.includes('pure')>><<npcincr Sydney purity 1>><<gspurity>><</if>>
+<<if $phase isnot 'sydney-trial-encourage'
+  or C.npc.Sydney.init isnot 1 or ['prison', 'dungeon'].includes(C.npc.Sydney.state) or $daily.sydney?.punish is 1>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<unset $phase>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      You remind Sydney of the work <<he>> has already done and the people <<he>> has helped. <<He>> looks down at the robe, then folds it once more with steadier hands.
+      <br><br>
+      "<span class='green'>Maybe this time</span>," <<he>> says, not quite a question. "If you are beside me, maybe the fire does not win again. Thank you for staying."
+    <<option 'CN'>>
+      你提起悉尼已经做过的事，还有受过<<his>>帮助的人。<<He>>低头看着修道袍，又把它重新叠好，手比刚才稳了许多。
+      <br><br>
+      “<span class='green'>也许这次不一样。</span>”<<he>>说，语气里带着不确定，“有你在我旁边，也许火就不会再赢了。谢谢你留下来。”
+  <</language>>
+  <<npcincr Sydney love 1>><<glove>><<if _sydneyStatus.includes('pure')>><<npcincr Sydney purity 1>><<gspurity>><</if>>
+<</if>>
 <br><br>
 <<lanLink '继续' 'Temple'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Trial Hand []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    You take Sydney's hand. <<He>> closes <<his>> fingers around yours and breathes out slowly. For a moment the sounds of the temple carry on around you without either of you speaking.
-    <br><br>
-    "<span class='teal'>I'll remember this when I'm out there</span>," <<he>> says at last.
-  <<option 'CN'>>
-    你握住悉尼的手。<<He>>回握住你，慢慢呼出一口气。神殿里的脚步声与低语声照常在四周响着，你们一时谁也没有开口。
-    <br><br>
-    “<span class='teal'>等我到了那里，会记得这一刻的。</span>”<<he>>终于说。
-<</language>>
-<<npcincr Sydney love 2>><<gglove>><<stress -2>><<lstress>>
+<<if $phase isnot 'sydney-trial-hand'
+  or C.npc.Sydney.init isnot 1 or ['prison', 'dungeon'].includes(C.npc.Sydney.state) or $daily.sydney?.punish is 1 or $sydneyromance isnot 1 or pcAreArmsBound('both')>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<unset $phase>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      You take Sydney's hand. <<He>> closes <<his>> fingers around yours and breathes out slowly. For a moment the sounds of the temple carry on around you without either of you speaking.
+      <br><br>
+      "<span class='teal'>I'll remember this when I'm out there</span>," <<he>> says at last.
+    <<option 'CN'>>
+      你握住悉尼的手。<<He>>回握住你，慢慢呼出一口气。神殿里的脚步声与低语声照常在四周响着，你们一时谁也没有开口。
+      <br><br>
+      “<span class='teal'>等我到了那里，会记得这一刻的。</span>”<<he>>终于说。
+  <</language>>
+  <<npcincr Sydney love 2>><<gglove>><<stress -2>><<lstress>>
+<</if>>
 <br><br>
 <<lanLink '继续' 'Temple'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Quarters Help []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    You stack the clean linen while Sydney checks the beds against the duty list. When you finish, <<he>> runs a hand over the empty shelf and gives you <span class='green'>a grateful smile</span>.
-  <<option 'CN'>>
-    你把干净的被单摞好，悉尼对照值勤表检查床铺。忙完后，<<he>>用手掌掠过腾空的架子，<span class='green'>感激地朝你笑了笑</span>。
-<</language>>
-<<npcincr Sydney love 1>><<glove>><<if _sydneyStatus.includes('pure')>><<npcincr Sydney purity 1>><<gspurity>><</if>>
+<<if $phase isnot 'sydney-quarters-help'
+  or C.npc.Sydney.init isnot 1 or ['prison', 'dungeon'].includes(C.npc.Sydney.state) or $daily.sydney?.punish is 1 or pcAreArmsBound('both')>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<unset $phase>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      You stack the clean linen while Sydney checks the beds against the duty list. When you finish, <<he>> runs a hand over the empty shelf and gives you <span class='green'>a grateful smile</span>.
+    <<option 'CN'>>
+      你把干净的被单摞好，悉尼对照值勤表检查床铺。忙完后，<<he>>用手掌掠过腾空的架子，<span class='green'>感激地朝你笑了笑</span>。
+  <</language>>
+  <<npcincr Sydney love 1>><<glove>><<if _sydneyStatus.includes('pure')>><<npcincr Sydney purity 1>><<gspurity>><</if>>
+<</if>>
 <br><br>
 <<lanLink '继续' 'Temple Quarters'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Quarters Tease []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
-<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    As Sydney passes with an armful of robes, you stop <<him>> with a hand at <<his>> waist. <<He>> glances toward the other rooms.
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      "<span class='red'>Please let me finish</span>," <<he>> says, easing past you. <<He>> does not leave you holding the laundry alone.
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      Sydney shifts the robes into one arm and <span class='lewd'>slips the other around you</span>. "If someone comes out, you'll have to explain why we're both late," <<he>> murmurs.
-    <<else>>
-      Sydney flushes and leans against you for a breath. Then <<he>> straightens the robes in <<his>> arms. "We had better finish these first," <<he>> says.
-    <</if>>
-  <<option 'CN'>>
-    悉尼抱着一摞修道袍经过，你伸手扶住<<his>>的腰，让<<him>>停下来。<<He>>朝其他房间看了一眼。
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      “<span class='red'>先让我忙完，好吗？</span>”<<he>>说，从你身边绕过去，却也没把剩下的衣物全留给你。
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      悉尼把衣服挪到一边，<span class='lewd'>用空出的手臂揽住你</span>。“要是有人出来，可得由你解释我们为什么都迟到了。”<<he>>低声说。
-    <<else>>
-      悉尼红着脸靠了你一下，又抱稳怀里的修道袍。“还是先把这些收好吧。”<<he>>说。
-    <</if>>
-<</language>>
-<<if _sydneyStatus.includes('pure')>>
-  <<npcincr Sydney love -1>><<llove>>
-<<elseif _sydneyStatus.includes('corrupt')>>
-  <<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 2>><<gslust>><<npcincr Sydney purity -1>><<lspurity>>
+<<if $phase isnot 'sydney-quarters-tease'
+  or C.npc.Sydney.init isnot 1 or ['prison', 'dungeon'].includes(C.npc.Sydney.state) or $daily.sydney?.punish is 1 or $sydneyromance isnot 1 or !hasSexStat('promiscuity', 2) or pcAreArmsBound('both')>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
-  <<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 1>><<gslust>><<npcincr Sydney purity -1>><<lspurity>>
+  <<unset $phase>>
+  <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      As Sydney passes with an armful of robes, you stop <<him>> with a hand at <<his>> waist. <<He>> glances toward the other rooms.
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        "<span class='red'>Please let me finish</span>," <<he>> says, easing past you. <<He>> does not leave you holding the laundry alone.
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        Sydney shifts the robes into one arm and <span class='lewd'>slips the other around you</span>. "If someone comes out, you'll have to explain why we're both late," <<he>> murmurs.
+      <<else>>
+        Sydney flushes and leans against you for a breath. Then <<he>> straightens the robes in <<his>> arms. "We had better finish these first," <<he>> says.
+      <</if>>
+    <<option 'CN'>>
+      悉尼抱着一摞修道袍经过，你伸手扶住<<his>>的腰，让<<him>>停下来。<<He>>朝其他房间看了一眼。
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        “<span class='red'>先让我忙完，好吗？</span>”<<he>>说，从你身边绕过去，却也没把剩下的衣物全留给你。
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        悉尼把衣服挪到一边，<span class='lewd'>用空出的手臂揽住你</span>。“要是有人出来，可得由你解释我们为什么都迟到了。”<<he>>低声说。
+      <<else>>
+        悉尼红着脸靠了你一下，又抱稳怀里的修道袍。“还是先把这些收好吧。”<<he>>说。
+      <</if>>
+  <</language>>
+  <<if _sydneyStatus.includes('pure')>>
+    <<npcincr Sydney love -1>><<llove>>
+  <<elseif _sydneyStatus.includes('corrupt')>>
+    <<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 2>><<gslust>><<npcincr Sydney purity -1>><<lspurity>>
+  <<else>>
+    <<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 1>><<gslust>><<npcincr Sydney purity -1>><<lspurity>>
+  <</if>>
 <</if>>
 <br><br>
 <<lanLink '继续' 'Temple Quarters'>><</lanLink>>
