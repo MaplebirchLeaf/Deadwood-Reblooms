@@ -24,17 +24,17 @@ export interface HistoryProjectState {
   kylarStreet: boolean;
   /** 凯拉尔是否已做好准备。 */
   kylarPrepared: boolean;
-  /** 档案研究进度。 */
+  /** 档案研究得分，30 表示查证最早来源，18 表示照抄目录或整合说法。 */
   archive: number;
-  /** 博物馆研究进度。 */
+  /** 画作考证得分，30 表示对照实物，18 表示照抄目录卡或试穿服装。 */
   museum: number;
-  /** 受灾后的应对方式，rushed 表示仓促处理。 */
+  /** 女祭司像的回收方式，recorded 表示先记录位置，rushed 表示直接取出。 */
   recovery: 'none' | 'recorded' | 'rushed';
-  /** 灾损程度。 */
+  /** 实地记录质量：0 未勘察，1 记录不完整，2 出土环境完整。 */
   ruin: number;
-  /** 草稿完成度。 */
+  /** 展览草稿得分，25 表示如实标注，12 表示用故事填补空缺。 */
   draft: number;
-  /** 终稿完成度。 */
+  /** 终稿得分，回答正确为 15。 */
   final: number;
 }
 

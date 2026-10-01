@@ -135,14 +135,14 @@
 
 <!-- High Street 只增加一个金融中心地点，内部业务不再重复消耗时间。 -->
 <<widget 'deadwood-reblooms-finance-high-street'>>
-	<<icon 'financial-centre.png'>><<lanLink '金融中心 (0:02)' 'Deadwood Reblooms Financial Centre'>><<pass 2>><</lanLink>>
+	<<icon 'financial-centre.png'>><<lanLink ['Financial centre (0:02)', '金融中心 (0:02)'] 'Deadwood Reblooms Financial Centre'>><<pass 2>><</lanLink>>
 	<br>
 <</widget>>
 
 <!-- 贝利银行授权入口：只有玩家开立账户后，才能主动向贝利提出。 -->
 <<widget 'deadwood-reblooms-finance-bailey-bank-option'>>
 	<<if _options is 1 && $VanillaPlus.finance.bank.opened && !$VanillaPlus.finance.bank.bailey_knows_account>>
-		<<socialiseicon 'ask'>><<lanLink '告诉贝利你的银行账户' 'Deadwood Reblooms Bailey Bank Account'>><</lanLink>>
+		<<socialiseicon 'ask'>><<lanLink ['Tell Bailey about your bank account', '告诉贝利你的银行账户'] 'Deadwood Reblooms Bailey Bank Account'>><</lanLink>>
 		<br>
 	<</if>>
 <</widget>>
@@ -496,7 +496,7 @@
 					<<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 				<</lanLink>>
-				<<lanLink '全部取出'>>
+				<<lanLink ['Withdraw all', '全部取出']>>
 					<<set _financeResult to maplebirch.get("VanillaPlus").finance.withdraw($VanillaPlus.finance.bank.balance / 100)>>
 					<<updatesidebarmoney>>
 					<<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
@@ -561,7 +561,7 @@
 						<<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
 						<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 					<</lanLink>>
-					<<lanLink '还清信用卡'>>
+					<<lanLink ['Repay credit in full', '还清信用卡']>>
 						<<set _financeResult to maplebirch.get("VanillaPlus").finance.repayCredit($VanillaPlus.finance.bank.credit_debt / 100)>>
 						<<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
 						<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
@@ -629,7 +629,7 @@
 					<<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 				<</lanLink>>
-				<<lanLink '还清贷款'>>
+				<<lanLink ['Repay loan in full', '还清贷款']>>
 					<<set _financeResult to maplebirch.get("VanillaPlus").finance.repayLoan(maplebirch.get("VanillaPlus").finance.loanPayoff / 100)>>
 					<<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
@@ -677,7 +677,7 @@
 				<</lanLink>>
 				<<set _financeAtmMaximum to Math.min($VanillaPlus.finance.bank.balance, _financeAtmRemaining)>>
 				<<if _financeAtmMaximum gt 0>>
-					<<lanLink '按限额取款'>>
+					<<lanLink ['Withdraw maximum', '按限额取款']>>
 						<<set _financeResult to maplebirch.get("VanillaPlus").finance.withdraw(_financeAtmMaximum / 100, true)>>
 						<<updatesidebarmoney>>
 						<<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
@@ -719,22 +719,22 @@
 			<<deadwood-reblooms-finance-quick-transfers 'brokerage'>>
 			<div class='dr-finance-form'><label><<lanSwitch 'Custom amount (£)' '自定义金额(£)'>>：<<textbox '_financeTransferAmount' _financeTransferAmount>></label></div>
 			<div class='dr-finance-actions'>
-				<<lanLink '转入证券账户'>>
+				<<lanLink ['Transfer to securities account', '转入证券账户']>>
 					<<set _financeResult to maplebirch.get("VanillaPlus").finance.transferToBrokerage(_financeTransferAmount)>>
 					<<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 				<</lanLink>>
-				<<lanLink '转回银行账户'>>
+				<<lanLink ['Transfer to bank account', '转回银行账户']>>
 					<<set _financeResult to maplebirch.get("VanillaPlus").finance.transferFromBrokerage(_financeTransferAmount)>>
 					<<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 				<</lanLink>>
-				<<lanLink '银行余额全部转入'>>
+				<<lanLink ['Transfer all from bank', '银行余额全部转入']>>
 					<<set _financeResult to maplebirch.get("VanillaPlus").finance.transferToBrokerage($VanillaPlus.finance.bank.balance / 100)>>
 					<<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 				<</lanLink>>
-				<<lanLink '证券资金全部转回'>>
+				<<lanLink ['Transfer all to bank', '证券资金全部转回']>>
 					<<set _financeResult to maplebirch.get("VanillaPlus").finance.transferFromBrokerage($VanillaPlus.finance.brokerage.cash / 100)>>
 					<<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
@@ -853,7 +853,7 @@
 					<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 				<</lanLink>>
-				<<lanLink '最大数量买入'>>
+				<<lanLink ['Buy maximum', '最大数量买入']>>
 					<<set _financeMaximumShares to Math.floor($VanillaPlus.finance.brokerage.cash / $VanillaPlus.finance.market.prices[_financeSymbol])>>
 					<<set _financeResult to maplebirch.get("VanillaPlus").finance.buy(_financeSymbol, _financeMaximumShares)>>
 					<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
@@ -864,7 +864,7 @@
 					<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 				<</lanLink>>
-				<<lanLink '全部卖出'>>
+				<<lanLink ['Sell all held', '全部卖出']>>
 					<<set _financeHolding to $VanillaPlus.finance.brokerage.holdings[_financeSymbol]>>
 					<<set _financeResult to maplebirch.get("VanillaPlus").finance.sell(_financeSymbol, _financeHolding)>>
 					<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
@@ -1023,8 +1023,8 @@
 		贝利放下笔。“有点用。”<<he>>从抽屉里抽出一张表格，推到你面前，“签了。租金到期时先从账户里取，不够的部分你再用现金补上。”
 <</language>>
 <br><br>
-<<lanLink '授权银行扣款' 'Deadwood Reblooms Bailey Bank Account Authorised'>><</lanLink>><br>
-<<lanLink '不透露账户' 'Orphanage'>><</lanLink>><br>
+<<lanLink ['Authorise bank payments', '授权银行扣款'] 'Deadwood Reblooms Bailey Bank Account Authorised'>><</lanLink>><br>
+<<lanLink ['Keep the account private', '不透露账户'] 'Orphanage'>><</lanLink>><br>
 
 :: Deadwood Reblooms Bailey Bank Account Authorised []
 <<set $outside to 0>>

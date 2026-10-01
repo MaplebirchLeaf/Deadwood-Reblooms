@@ -376,7 +376,7 @@ class MoreLoveInterests {
           }
           V.loveInterestList = V.loveInterestList.slice(0, Math.max(1, this.level));
         },
-        cond: () => V.loveInterestList?.length > Math.max(1, this.level)
+        cond: () => V.loveInterestList?.length > Math.max(1, this.level) && (this.level < 4 || !V.moreLoveInterest_message)
       });
     });
     this.core.once(':variable', () => this.sync());

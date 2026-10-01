@@ -13,12 +13,12 @@
         The snake-woman's carved frame casts a crooked shadow across the photograph.
       <</if>>
     <br><br>
-    "The museum intends to build a local-history exhibition around this painting," <<he>> says.
-      "The records attached to it are incomplete, while the stories are anything but."
+    "The museum is putting on an exhibition about this painting," <<he>> says.
+      "The paperwork that came with it is a mess. Everyone who ever owned it wrote a different story."
     <br><br>
     <<He>> lays a blank catalogue card beside the photograph.
-      "Establish what can be verified about the painting, its history and the scene it depicts.
-      Mark everything else for what it is. A compelling story is not the same thing as evidence."
+      "Start with the catalogues. Find out who recorded what, and when.
+      Write down only what you can point at. The rest of it, mark as gossip."
     <<option 'CN'>>
       温特等教室安静下来，随后把你交还的画作照片放在讲桌上。
       <<if $LifeSimulation.historyProject.source is 'paintingward'>>
@@ -27,24 +27,24 @@
         蛇女画框的雕纹在照片上投下一道歪斜的阴影。
       <</if>>
     <br><br>
-    “博物馆准备以这幅画为中心，举办一场本地历史展览。”<<he>>说道，
-      “与它有关的记录残缺不全，故事倒是多得很。”
+    “博物馆要给这幅画办个展览。”<<he>>说道，
+      “随它一起送来的东西乱七八糟。经手过它的人，每人都写了一版故事。”
     <br><br>
     <<He>>把一张空白的藏品卡放在照片旁。
-      “查清这幅画的年代、流传经历，以及画中场景有哪些内容可以核实。
-      其余部分要如实标明。一个故事再动听，也不等于证据。”
+      “先从目录查起。弄清楚谁抄过什么，什么时候抄的。
+      能指出来的才写下来。其余那些，标成传闻。”
   <</language>>
   <br><br>
-  <<historyicon>><<lanLink '接下项目' 'Deadwood Reblooms History Project Begin'>>
+  <<historyicon>><<lanLink ['Take the project', '接下项目'] 'Deadwood Reblooms History Project Begin'>>
     <<set $phase to 0>>
   <</lanLink>><<ghistory>><br>
   <<if C.npc.Robin.init is 1 and C.npc.Robin.dom gt 30 and C.npc.Robin.trauma lt 20 and ['active', 'seat'].includes($robinhistory) >>
-    <<loveicon>><<lanLink '邀请罗宾协助' 'Deadwood Reblooms History Project Begin' >>
+    <<loveicon>><<lanLink ['Ask Robin to work with you', '邀请罗宾协助'] 'Deadwood Reblooms History Project Begin' >>
       <<set $phase to 1>>
     <</lanLink>><<glove 'Robin'>><br>
   <</if>>
   <br>
-  <<lanLink '暂时不接' 'History Lesson'>><<endevent>><</lanLink>><br>
+  <<lanLink ['Not yet', '暂时不接'] 'History Lesson'>><<endevent>><</lanLink>><br>
 <</widget>>
 
 <!-- 家中入口：根据调查进度提供撰写展览稿的选项。 -->
@@ -52,7 +52,7 @@
   <<if $LifeSimulation.historyProject.status is 'ongoing' and Time.days lt $LifeSimulation.historyProject.deadline >>
     <<if $LifeSimulation.historyProject.draft is 0>>
       <<if $LifeSimulation.historyProject.archive gt 0 and $LifeSimulation.historyProject.museum gt 0 >>
-        <<historyicon>><<lanLink '准备展览 (1:00)' 'Deadwood Reblooms History Project Draft' >><<pass 60>><</lanLink>><br>
+        <<historyicon>><<lanLink ['Prepare the exhibition (1:00)', '准备展览 (1:00)'] 'Deadwood Reblooms History Project Draft' >><<pass 60>><</lanLink>><br>
     <</if>>
     <</if>>
   <</if>>
@@ -61,18 +61,18 @@
 <!-- 图书馆入口：提供画作档案调查选项。 -->
 <<widget 'deadwood-reblooms-history-project-library-option'>>
   <<if $LifeSimulation.historyProject.status is 'ongoing' and Time.days lt $LifeSimulation.historyProject.deadline and $LifeSimulation.historyProject.archive is 0 >>
-    <<historyicon>><<lanLink '调查画作 (1:00)' 'Deadwood Reblooms History Project Archive' >><<pass 60>><</lanLink>><br>
+    <<historyicon>><<lanLink ['Research the painting (1:00)', '调查画作 (1:00)'] 'Deadwood Reblooms History Project Archive' >><<pass 60>><</lanLink>><br>
   <</if>>
 <</widget>>
 
-<!-- 博物馆入口：处理画作考证与展览日结算入口。 -->
+<!-- 博物馆入口：处理画作考证与展览入口。草稿完成后随时可以开展，不必等到期限。 -->
 <<widget 'deadwood-reblooms-history-project-museum-options'>>
   <<if $LifeSimulation.historyProject.status is 'ongoing'>>
     <<if Time.days lt $LifeSimulation.historyProject.deadline and $LifeSimulation.historyProject.archive gt 0 and $LifeSimulation.historyProject.museum is 0 >>
-      <<museumicon>><<lanLink '考证交还的画作 (1:00)' 'Deadwood Reblooms History Project Museum' >><<pass 60>><</lanLink>><br>
-  <<elseif Time.days gte $LifeSimulation.historyProject.deadline>>
-      <<historyicon>><<lanLink '进行展览 (2:00)' 'Deadwood Reblooms History Project Exhibition' >><<pass 2 hours>><</lanLink>><br>
-  <</if>>
+      <<museumicon>><<lanLink ['Examine the returned painting (1:00)', '考证交还的画作 (1:00)'] 'Deadwood Reblooms History Project Museum' >><<pass 60>><</lanLink>><br>
+    <<elseif $LifeSimulation.historyProject.draft gt 0 or Time.days gte $LifeSimulation.historyProject.deadline>>
+      <<historyicon>><<lanLink ['Present the exhibition (2:00)', '进行展览 (2:00)'] 'Deadwood Reblooms History Project Exhibition' >><<pass 2 hours>><</lanLink>><br>
+    <</if>>
   <</if>>
 <</widget>>
 
@@ -80,9 +80,9 @@
 <<widget 'deadwood-reblooms-history-project-lake-option'>>
   <<if $LifeSimulation.historyProject.status is 'ongoing' and Time.days lt $LifeSimulation.historyProject.deadline and $LifeSimulation.historyProject.archive gt 0 and $LifeSimulation.historyProject.museum gt 0 and $LifeSimulation.historyProject.ruin is 0 and !Weather.isFrozen('lake') and Time.hour gte 6 and Time.hour lte 18 >>
     <<if $LifeSimulation.historyProject.assistant>>
-      <<antiqueicon 'disc'>><<lanLink '与罗宾勘察湖底废墟 (2:00)' 'Deadwood Reblooms History Project Lake Preparation' >><<pass 2 hours>><</lanLink>><br>
+      <<antiqueicon 'disc'>><<lanLink ['Survey the ruin with Robin (2:00)', '与罗宾勘察湖底废墟 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation' >><<pass 2 hours>><</lanLink>><br>
     <<else>>
-      <<antiqueicon 'disc'>><<lanLink '前往湖底废墟进行勘察 (2:00)' 'Deadwood Reblooms History Project Lake Preparation' >><<pass 2 hours>><</lanLink>><br>
+      <<antiqueicon 'disc'>><<lanLink ['Survey the lake ruin (2:00)', '前往湖底废墟进行勘察 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation' >><<pass 2 hours>><</lanLink>><br>
     <</if>>
   <</if>>
 <</widget>>
@@ -130,8 +130,8 @@
           <</if>>
       <</language>>
       <br><br>
-      <<historyicon>><<lanLink '核对编号笔记' 'Deadwood Reblooms History Project Kylar Check' >><</lanLink>><<ghistory>><br>
-      <<loveicon>><<lanLink '相信凯拉尔的话' 'Deadwood Reblooms History Project Kylar Trust' >><</lanLink>><br>
+      <<historyicon>><<lanLink ['Check your numbered notes', '核对编号笔记'] 'Deadwood Reblooms History Project Kylar Check' >><</lanLink>><<ghistory>><br>
+      <<loveicon>><<lanLink ['Take Kylar at their word', '相信凯拉尔的话'] 'Deadwood Reblooms History Project Kylar Trust' >><</lanLink>><br>
     <</addinlineevent>>
   <</if>>
 <</widget>>
@@ -142,7 +142,12 @@
     <hr>
     <h1 class="header gold bold"><<lanSwitch 'Local History Exhibition' '本地历史展览'>></h1>
     <<set $_historyDays to Math.max(0, $LifeSimulation.historyProject.deadline - Time.days)>>
-    <<if $_historyDays is 0>>
+    <<if $LifeSimulation.historyProject.draft gt 0>>
+      <<language>>
+        <<option 'EN'>><span class="blue"><i>The exhibition is ready. Present it at the museum.</i></span>
+        <<option 'CN'>><span class="blue"><i>展览已经准备完成。到博物馆开展。</i></span>
+      <</language>>
+    <<elseif $_historyDays is 0>>
       <<lanSwitch 'The exhibition opens ' '展览将在'>><span class="pink"><<lanSwitch 'today' '今天'>></span><<lanSwitch '.' '开始。'>>
     <<else>>
       <<language>>
@@ -246,12 +251,12 @@
         "I can keep the records in order while you work out what they mean."
       <br><br>
       <<npc Winter>><<person1>>
-      Winter gives Robin a stern look. "Assistance is permitted. The argument remains your responsibility."
+      Winter gives Robin a stern look. "Robin can carry the paper. The catalogue card is yours."
     <<else>>
       <<npc Winter>><<person1>>
       You take the catalogue card. Winter watches you slip it behind the photograph.
-        "Good," <<he>> says. "Begin with the records.
-        Establish when each claim first appeared before you decide what to believe."
+        "Good," <<he>> says. "Start at the library.
+        Read the oldest card first, and work forward."
     <</if>>
   <<option 'CN'>>
     <<if $phase is 1>>
@@ -260,11 +265,11 @@
         “你来判断那些东西意味着什么，我可以帮你把资料整理好。”
       <br><br>
       <<npc Winter>><<person1>>
-      温特严厉地看了罗宾一眼。“可以协助整理，但最终论证仍由你负责。”
+      温特严厉地看了罗宾一眼。“搬纸可以交给罗宾。藏品卡是你的事。”
     <<else>>
       <<npc Winter>><<person1>>
       你接过藏品卡，把它夹在照片后面。温特注视着你的动作。“很好。”<<he>>说道，
-        “先从记录查起。先弄清每种说法最早在何时出现，再决定哪些内容值得相信。”
+        “先去图书馆。从最旧的那张卡看起，再往后排。”
     <</if>>
 <</language>>
 <br><br>
@@ -408,8 +413,8 @@
 <<if $historytrait gte 4>>
   <<historyicon>><<lanLink '查证最早来源' 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 0>><</lanLink>><<ghistory>><br>
 <</if>>
-<<historyicon>><<lanLink '相信博物馆目录' 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 1>><</lanLink>><br>
-<<crimeicon 'documents'>><<lanLink '整合不同说法' 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 2>><</lanLink>><<skulduggerydifficulty>><br>
+<<historyicon>><<lanLink ['Trust the museum catalogue', '相信博物馆目录'] 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 1>><</lanLink>><br>
+<<crimeicon 'documents'>><<lanLink ['Reconcile the accounts', '整合不同说法'] 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 2>><</lanLink>><<skulduggerydifficulty>><br>
 
 :: Deadwood Reblooms History Project Archive Finish []
 <<set $LifeSimulation.historyProject.archive to $phase is 0 ? 30 : 18>>
@@ -425,17 +430,17 @@
         The changing tale records how people interpreted it, not what literally happened.
       <</if>>
       <br><br>
-      <span class="green">Your written record distinguishes evidence from repetition.</span>
+      <span class="green">The pile is down to three accounts that do not simply repeat each other.</span>
     <<elseif $phase is 1>>
       You copy the museum catalogue.
-      Its summary is useful, but several confident statements lack a cited source.
+      Its summary is useful, but several confident statements name nobody.
       <br><br>
-      <span class="teal">You have a usable source record.</span>
+      <span class="teal">You have something to work from.</span>
     <<else>>
       You smooth away the contradictions and turn several versions into one convincing narrative.
-      It reads well, but some of its certainty comes from your own wording.
+      It reads well. That is mostly because you chose the wording.
       <br><br>
-      <span class="teal">You have a usable source record.</span><<delinquency 10>><<gdelinquency>>
+      <span class="teal">You have a clean draft, and a clean conscience is another matter.</span><<delinquency 10>><<gdelinquency>>
     <</if>>
   <<option 'CN'>>
     <<if $phase is 0>>
@@ -448,21 +453,21 @@
         不断变化的故事记录的是后人的理解，而非事件原貌。
       <</if>>
       <br><br>
-      <span class="green">你的文献记录清楚区分了证据与重复转述。</span>
+      <span class="green">庞杂的资料只剩下三份，彼此并非转抄。</span>
     <<elseif $phase is 1>>
       你抄下博物馆目录的概要。
-      内容足够使用，其中几句笃定的判断却没有注明出处。
+      内容足够使用，其中几句笃定的判断却没写明是谁说的。
       <br><br>
-      <span class="teal">你整理出了一份可用的史料记录。</span>
+      <span class="teal">你手上有了一份能用的东西。</span>
     <<else>>
       你抹平彼此矛盾的部分，把不同版本拼成了一条颇具说服力的叙述。
-      文章读起来很顺畅，只是其中一部分确定语气来自你自己的改写。
+      文章读起来很顺畅，大概是因为措辞都出自你手。
       <br><br>
-      <span class="teal">你整理出了一份可用的史料记录。</span><<delinquency 10>><<gdelinquency>>
+      <span class="teal">稿子很干净，良心是另一回事。</span><<delinquency 10>><<gdelinquency>>
     <</if>>
 <</language>>
 <br><br>
-<<schoolicon 'library'>><<lanLink '返回图书馆' 'School Library'>><</lanLink>><br>
+<<schoolicon 'library'>><<lanLink ['Return to the library', '返回图书馆'] 'School Library'>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Museum []
 <<set $outside to 0>><<set $location to 'museum'>><<effects>>
@@ -506,11 +511,11 @@
 <</language>>
 <br><br>
 <<if $historytrait gte 4>>
-  <<historyicon>><<lanLink '将记录与实物对照' 'Deadwood Reblooms History Project Museum Finish' >><<set $phase to 0>><</lanLink>><<ghistory>><br>
+  <<historyicon>><<lanLink ['Match records to the object', '将记录与实物对照'] 'Deadwood Reblooms History Project Museum Finish' >><<set $phase to 0>><</lanLink>><<ghistory>><br>
 <</if>>
-<<museumicon>><<lanLink '相信目录卡' 'Deadwood Reblooms History Project Museum Finish' >><<set $phase to 1>><</lanLink>><br>
+<<museumicon>><<lanLink ['Trust the catalogue card', '相信目录卡'] 'Deadwood Reblooms History Project Museum Finish' >><<set $phase to 1>><</lanLink>><br>
 <<if hasSexStat('exhibitionism', 2)>>
-  <<icon 'clothes/tuxedo-jacket.png'>><<lanLink '试穿展览服装' 'Deadwood Reblooms History Project Museum Finish' >><<set $phase to 2>><</lanLink>><<exhibitionist2>><br>
+  <<icon 'clothes/tuxedo-jacket.png'>><<lanLink ['Try on the display costume', '试穿展览服装'] 'Deadwood Reblooms History Project Museum Finish' >><<set $phase to 2>><</lanLink>><<exhibitionist2>><br>
 <</if>>
 
 :: Deadwood Reblooms History Project Museum Finish []
@@ -529,12 +534,12 @@
         The silver in the cut is damage, not proof of any version of the tale.
       <</if>>
       <br><br>
-      <span class="green">You separate the painting from the claims attached to it.</span>
+      <span class="green">The frame, the canvas and the damage all agree with each other. The stories do not.</span>
     <<elseif $phase is 1>>
       You copy the most detailed card.
       Its confident wording hides how much was added after the painting entered the collection.
       <br><br>
-      <span class="teal">Your object notes are usable, though some claims remain weak.</span>
+      <span class="teal">Your object notes are usable. A few of them rest on nothing.</span>
     <<else>>
       The proposed costume is an unfinished reconstruction held together with pins and narrow ties.
       You remove your outer clothes before stepping into it.
@@ -568,12 +573,12 @@
         割痕里的银屑只是损伤，不能证明任何一个故事版本。
       <</if>>
       <br><br>
-      <span class="green">你把画作本身与后来附会的说法区分开来。</span>
+      <span class="green">画框、画布与损伤彼此吻合。那些故事不吻合。</span>
     <<elseif $phase is 1>>
       你抄下内容最详细的目录卡。
       笃定的语气掩盖了一个事实：其中不少说法都是画作入藏后才添上的。
       <br><br>
-      <span class="teal">你的实物记录可以使用，只是部分说法依据薄弱。</span>
+      <span class="teal">实物记录可以使用，有几条底下什么也没有。</span>
     <<else>>
       拟用于展览的复原服装尚未完工，只靠别针和细带固定。
       你脱去外衣，随后钻了进去。
@@ -632,7 +637,7 @@
     <</if>>
 <</language>>
 <br><br>
-<<getinicon>><<lanLink '进入湖水' 'Deadwood Reblooms History Project Lake Descent' >><</lanLink>><br>
+<<getinicon>><<lanLink ['Enter the water', '进入湖水'] 'Deadwood Reblooms History Project Lake Descent' >><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Lake Descent []
 <<set $outside to 0>><<set $location to 'lake_ruin'>><<underwater>><<effects>><<lakeeffects>>
@@ -689,8 +694,8 @@
       小巧的女祭司像跪在底座上，周围环绕着一圈古文字。
 <</language>>
 <br><br>
-<<historyicon>><<lanLink '记录发现位置' 'Deadwood Reblooms History Project Lake Statuette' >><<set $LifeSimulation.historyProject.recovery to 'recorded'>><</lanLink>><<ghistory>><br>
-<<antiqueicon 'golden-priestess'>><<lanLink '取出女祭司像' 'Deadwood Reblooms History Project Lake Statuette' >><<set $LifeSimulation.historyProject.recovery to 'rushed'>><</lanLink>><<stress 6>><<gstress>><br>
+<<historyicon>><<lanLink ['Record the find', '记录发现位置'] 'Deadwood Reblooms History Project Lake Statuette' >><<set $LifeSimulation.historyProject.recovery to 'recorded'>><</lanLink>><<ghistory>><br>
+<<antiqueicon 'golden-priestess'>><<lanLink ['Free the statuette', '取出女祭司像'] 'Deadwood Reblooms History Project Lake Statuette' >><<set $LifeSimulation.historyProject.recovery to 'rushed'>><</lanLink>><<stress 6>><<gstress>><br>
 
 :: Deadwood Reblooms History Project Lake Statuette []
 <<set $outside to 0>><<set $location to 'lake_ruin'>><<underwater>><<effects>><<lakeeffects>>
@@ -740,13 +745,13 @@
 <<hallucinogen 120>><<gghallucinogens>>
 <br><br>
 <<if $LifeSimulation.historyProject.assistant>>
-  <<loveicon>><<lanLink '跟随罗宾' 'Deadwood Reblooms History Project Lake Robin' >><</lanLink>><<glove 'Robin'>><br>
+  <<loveicon>><<lanLink ['Follow Robin', '跟随罗宾'] 'Deadwood Reblooms History Project Lake Robin' >><</lanLink>><<glove 'Robin'>><br>
   <<if $robinromance is 1>>
-    <<getinicon>><<lanLink '与罗宾进入气穴' 'Deadwood Reblooms History Project Lake Robin Hallucination' >><</lanLink>><<promiscuous2>><<kissvirginitywarning>><<NPCvirginitywarning 'Robin' 'kiss'>><br>
+    <<getinicon>><<lanLink ['Enter the air pocket with Robin', '与罗宾进入气穴'] 'Deadwood Reblooms History Project Lake Robin Hallucination' >><</lanLink>><<promiscuous2>><<kissvirginitywarning>><<NPCvirginitywarning 'Robin' 'kiss'>><br>
   <</if>>
 <<else>>
-  <<historyicon>><<lanLink '沿绳结上浮' 'Deadwood Reblooms History Project Lake Solo' >><<willpower 1>><</lanLink>><<gwillpower>><br>
-  <<getinicon>><<lanLink '冲破幻象囚笼' 'Deadwood Reblooms History Project Lake Solo' >><<set $phase to 2>><</lanLink>><<trauma 12>><<ggtrauma>><br>
+  <<historyicon>><<lanLink ['Follow the knots upward', '沿绳结上浮'] 'Deadwood Reblooms History Project Lake Solo' >><<willpower 1>><</lanLink>><<gwillpower>><br>
+  <<getinicon>><<lanLink ['Break through the phantom prison', '冲破幻象囚笼'] 'Deadwood Reblooms History Project Lake Solo' >><<set $phase to 2>><</lanLink>><<trauma 12>><<ggtrauma>><br>
 <</if>>
 
 :: Deadwood Reblooms History Project Lake Robin []
@@ -841,8 +846,8 @@
       导向绳仍缠在你们的手腕上，是这间不断变形的石室中最后一条坚实的线。</span>
 <</language>>
 <br><br>
-<<loveicon>><<lanLink '把罗宾拉得更近' 'Deadwood Reblooms History Project Lake Robin Sex' >><<set $sexstart to 1>><<npcincr Robin love 1>><</lanLink>><<promiscuous3>><<glove 'Robin'>><br>
-<<swimicon 'up'>><<lanLink '沿导向绳离开' 'Deadwood Reblooms History Project Lake Robin' >><</lanLink>><br>
+<<loveicon>><<lanLink ['Pull Robin closer', '把罗宾拉得更近'] 'Deadwood Reblooms History Project Lake Robin Sex' >><<set $sexstart to 1>><<npcincr Robin love 1>><</lanLink>><<promiscuous3>><<glove 'Robin'>><br>
+<<swimicon 'up'>><<lanLink ['Follow the guide rope', '沿导向绳离开'] 'Deadwood Reblooms History Project Lake Robin' >><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Lake Robin Sex []
 <<run statusCheck('Robin')>>
@@ -995,7 +1000,7 @@
       Your position sketch,
       measurements and recovery notes remain legible.
       <br><br>
-      <span class="green">The golden priestess statuette has a documented context.</span>
+      <span class="green">You know where the statuette was lying, and you wrote it down in time.</span>
     <<elseif $_historyKylarCompromised>>
       Robin corrected the altered route,
       but the detour disturbed the entrance before you could record it.
@@ -1018,7 +1023,7 @@
     <<if $LifeSimulation.historyProject.recovery is 'recorded' and !$_historyKylarCompromised >>你的位置草图、测量数据
       和回收记录仍然清晰可辨。
       <br><br>
-      <span class="green">金制女祭司像拥有完整记录的出土环境。</span>
+      <span class="green">你记下了女祭司像原本躺着的位置，而且赶在痕迹消失之前。</span>
     <<elseif $_historyKylarCompromised>>
       罗宾修正了被篡改的路线，
       绕路却在记录前搅乱了入口处的淤泥。
@@ -1060,12 +1065,12 @@
     <</if>>
     <br><br>
     <<if $LifeSimulation.historyProject.assistant>>
-      Robin trims labels and pins them beside each piece of evidence.
-        "This one says what the record shows," <<he>> says, passing you a card.
-        "This one says what people believe. They shouldn't look the same."
+      Robin trims labels and pins them beside the cards.
+        "This one says what the catalogue wrote," <<he>> says, passing you a card.
+        "This one says what people kept saying. They shouldn't look the same."
     <<else>>
-      Once each written claim is placed beside the physical evidence,
-        the limit of your conclusion becomes as clear as the conclusion itself.
+      With the cards laid out beside the frame and the damage, you can see where your notes end
+        and somebody else's version begins.
     <</if>>
     <<if $LifeSimulation.historyProject.ruin gt 0>>
       <br><br>
@@ -1085,12 +1090,12 @@
     <</if>>
     <br><br>
     <<if $LifeSimulation.historyProject.assistant>>
-      罗宾裁好标签，把它们钉在每份证据旁。
-        “这张写记录能证明什么，”<<he>>说道，把一张卡递给你，
-        “那张写人们相信什么。它们不该看起来完全一样。”
+      罗宾裁好标签，把它们钉在卡片旁。
+        “这张写目录上原本怎么写的，”<<he>>说道，把一张卡递给你，
+        “那张写大家后来一直在说什么。它们不该看起来完全一样。”
     <<else>>
-      当每项书面说法都与实物证据并排放置后，
-        你能够得出的结论，以及这条结论的界限，都变得同样清晰。
+      卡片和画框、损伤并排摊开后，你能一眼看出哪几行到你的笔记为止，
+        哪几行已经是别人添上去的版本。
     <</if>>
     <<if $LifeSimulation.historyProject.ruin gt 0>>
       <br><br>
@@ -1099,8 +1104,8 @@
     <</if>>
 <</language>>
 <br><br>
-<<historyicon>><<lanLink '标明证据边界' 'Deadwood Reblooms History Project Draft Finish' >><<set $phase to 0>><</lanLink>><<ghistory>><br>
-<<historyicon>><<lanLink '用故事填补空白' 'Deadwood Reblooms History Project Draft Finish' >><<set $phase to 1>><</lanLink>><br>
+<<historyicon>><<lanLink ['Hang only what the cards support', '只挂有据可查的部分'] 'Deadwood Reblooms History Project Draft Finish' >><<set $phase to 0>><</lanLink>><<ghistory>><br>
+<<historyicon>><<lanLink ['Fill the gaps with the best story', '用最精彩的说法补上缺口'] 'Deadwood Reblooms History Project Draft Finish' >><<set $phase to 1>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Draft Finish []
 <<set $LifeSimulation.historyProject.draft to $phase is 0 ? 25 : 12>>
@@ -1143,7 +1148,7 @@
       <span class="teal">你的展览已经准备完成。</span><<famesocial 1>>
     <</if>>
 <</language>>
-<br><br><<homeicon>><<lanLink '收好项目' 'Bedroom'>><</lanLink>><br>
+<br><br><<homeicon>><<lanLink ['Put the project away', '收好项目'] 'Bedroom'>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Exhibition []
 <<set $outside to 0>><<set $location to 'museum'>><<effects>><<npc Winter>><<person1>>
@@ -1157,14 +1162,18 @@
       The snake-woman painting hangs above its translated title,
       condition record and a branching map of the tale's incompatible versions.
     <</if>>
-    <<if $LifeSimulation.historyProject.ruin gt 0>>
-      A smaller case to one side contains
-      the golden priestess statuette, your position sketch and a plainly labelled field note.
+    <<if $LifeSimulation.historyProject.ruin gte 2>>
+      A smaller case to one side contains the golden priestess statuette,
+      your position sketch and a plainly labelled field note.
+      The sketch still shows where she was lying when you found her.
+    <<elseif $LifeSimulation.historyProject.ruin gt 0>>
+      A smaller case to one side contains the golden priestess statuette and your field note.
+      The note admits that the statuette's original position was disturbed before you could fix it.
     <</if>>
   <br><br>
-  Winter waits until the room quiets.
+  Winter waits until the room quiets. A visitor leans in to hear.
     "One question," <<he>> says.
-    "What can this exhibition establish, and what must it leave unresolved?"
+    "Which of these labels would you defend, and which would you take down?"
   <<option 'CN'>>
     你的展览占据了博物馆的一整面墙。
     <<if $LifeSimulation.historyProject.source is 'paintingward'>>
@@ -1174,16 +1183,21 @@
       蛇女画作悬在展板上方，下面依次展示题名译文、状况记录，
       以及一张向外分岔的图表，梳理彼此冲突的故事版本。
     <</if>>
-    <<if $LifeSimulation.historyProject.ruin gt 0>>
-      侧边另有一只较小的展柜，
-      放着金制女祭司像、位置草图，以及明确标注为实地记录的说明。
+    <<if $LifeSimulation.historyProject.ruin gte 2>>
+      侧边另有一只较小的展柜，放着金制女祭司像、
+      位置草图，以及明确标注为实地记录的说明。
+      草图上还留着你就地画下的、她原本躺着的位置。
+    <<elseif $LifeSimulation.historyProject.ruin gt 0>>
+      侧边另有一只较小的展柜，放着金制女祭司像和你的实地记录。
+      记录里说明，你还没来得及固定位置，那片淤泥就已经被搅动了。
     <</if>>
   <br><br>
-  温特等房间安静下来。“最后一个问题。”<<he>>说道，
-    “这场展览能够确认什么，又必须把什么留作未知？”
+  温特等房间安静下来。一名参观者凑近了些。
+    “最后一个问题。”<<he>>说道，
+    “这些标签里，哪几块你愿意替它辩护，哪几块你会亲手摘下来？”
 <</language>>
 <br><br>
-<<set $_historyCorrectAnswer to $LifeSimulation.historyProject.source is 'paintingward' ? lanSwitch( 'The records establish the raid and the painting, not a prediction', '记录可以确认空袭与画作，却不能证明预言' ) : lanSwitch( 'The object establishes an old painting and a changing tale, not the event depicted', '实物可以确认古老画作与变化的传说，却不能证明画中事件' ) >>
+<<set $_historyCorrectAnswer to $LifeSimulation.historyProject.source is 'paintingward' ? lanSwitch( 'Say the painting was there, and later people decided what it meant', '画就在那里，是后来的人替它定下了含义' ) : lanSwitch( 'Say the painting is old, but the story about it is not', '画是旧的，画上的故事不是' ) >>
 <<historyicon>><<link $_historyCorrectAnswer 'Deadwood Reblooms History Project Result' >>
   <<set $LifeSimulation.historyProject.final to 15>>
   <<if $LifeSimulation.historyProject.archive + $LifeSimulation.historyProject.museum + $LifeSimulation.historyProject.draft + $LifeSimulation.historyProject.final is 100 >>
@@ -1192,11 +1206,11 @@
     <<set $LifeSimulation.historyProject.status to 'done'>>
   <</if>>
 <</link>><<ghistory>><br>
-<<museumicon>><<lanLink '相信画作年代' 'Deadwood Reblooms History Project Result' >>
+<<museumicon>><<lanLink ['Trust the painting\'s age', '相信画作年代'] 'Deadwood Reblooms History Project Result' >>
   <<set $LifeSimulation.historyProject.final to 0>>
   <<set $LifeSimulation.historyProject.status to 'done'>>
 <</lanLink>><br>
-<<historyicon>><<lanLink '相信流传最广的说法' 'Deadwood Reblooms History Project Result' >>
+<<historyicon>><<lanLink ['Trust the repeated account', '相信流传最广的说法'] 'Deadwood Reblooms History Project Result' >>
   <<set $LifeSimulation.historyProject.final to 0>>
   <<set $LifeSimulation.historyProject.status to 'done'>>
 <</lanLink>><br>
@@ -1212,59 +1226,60 @@
     <<if $LifeSimulation.historyProject.status is 'won'>>
       "Exactly," Winter says.
         <<if $LifeSimulation.historyProject.source is 'paintingward'>>
-          "The raid belongs to the town's history. The painting's strange behaviour belongs to the object.
-          Its supposed foresight remains an interpretation."
+          "The raid is in the town records. The paint is on the canvas.
+          What is left over is what people wanted the painting to mean."
         <<else>>
-          "The frame, canvas and records establish an old painting with an old reputation.
-          They do not turn its subject into a witness."
+          "An old frame, an old canvas, an old grudge.
+          That is the whole of it. The rest is other people's handwriting."
         <</if>>
       <br><br>
       <<He>> turns to the visitors.
-        "This conclusion stands precisely because the exhibit does not claim more than its evidence."
+        "The exhibit holds because it stops where the paperwork stops."
         The questions that follow are directed to you rather than Winter.
         <span class="green">You answer each one without needing to look at your notes.</span>
     <<elseif $_historyScore gte 75>>
       Winter studies your display before nodding.
-        "<span class="green">Good work.</span> Your conclusion is sound, though parts of the chain rely too heavily on assumption."
+        "<span class="green">Not bad.</span> Two of these labels are guessing. A visitor will find them."
         <br><br>
         The visitors remain to examine your reconstruction.
     <<elseif $_historyScore gte 50>>
-      "You found a <span class="teal">plausible story</span>," Winter says.
-        "Next time, prove it before you present it as fact."
+      "This is a <span class="teal">good story</span>," Winter says.
+        "Next time, separate it from the cards before you put it on a wall."
         <br><br>
         <<He>> leaves your display open for the afternoon.
     <<else>>
       Winter corrects several labels while the visitors move on.
-        "<span class="red">Research is not decoration</span>," <<he>> says quietly.
-        "You need evidence before confidence."
+        "<span class="red">You wrote half of this yourself</span>," <<he>> says quietly.
+        "The museum catalogues would like a word."
     <</if>>
   <<option 'CN'>>
     <<if $LifeSimulation.historyProject.status is 'won'>>
       “完全正确。”温特说道，
         <<if $LifeSimulation.historyProject.source is 'paintingward'>>
-          “空袭属于城镇的历史，画作的异常变化属于实物本身。
-          至于它是否曾预示未来，仍然只是一种解释。”
+          “空袭记在镇子的档案里，颜料就在画布上。
+          剩下的部分，是后人希望这幅画意味着什么。”
         <<else>>
-          “画框、画布与记录可以确认，这是一幅声名流传已久的古老画作。
-          它们却不能让画中人物变成历史见证者。”
+          “旧画框、旧画布、一桩旧怨。
+          全部就这些。其余的，是别人的笔迹。”
         <</if>>
       <br><br>
       <<He>>转向参观者。
-        “这个结论之所以站得住，正是因为这场展览没有声称证据之外的事。”
+        “这场展览站得住，是因为它在档案停下的地方也停下了。”
         接下来的问题全都抛向你，而非温特。<span class="green">你不必查看笔记，便逐一作出回答。</span>
     <<elseif $_historyScore gte 75>>
       温特审视展板片刻，随后点了点头。
-        “<span class="green">做得不错。</span>结论是可靠的，只是论证中的几处环节太依赖推测。”
+        “<span class="green">还行。</span>这两块是猜的。参观者会揪出来。”
       <br><br>
       参观者仍留在原地，继续查看你的复原图。
     <<elseif $_historyScore gte 50>>
-      “你找到了一个<span class="teal">说得通的故事</span>。”温特说道，
-        “下次，在把它当成事实展示之前，先证明它。”
+      “这是个<span class="teal">好故事</span>。”温特说道，
+        “下次记得先把它和目录卡分开，再挂到墙上。”
       <br><br>
       <<He>>让你的展览继续开放了一下午。
     <<else>>
       参观者逐渐离开，温特则亲手修正了几张标签。
-        “<span class="red">研究不是装饰</span>。”<<he>>低声说道，“先拿出证据，再表现得胸有成竹。”
+        “<span class="red">这里一半是你自己编的</span>。”<<he>>低声说道，
+        “博物馆的目录不会同意。”
     <</if>>
 <</language>>
 <br><br><<museumicon>><<lanLink '返回博物馆' 'Museum'>><</lanLink>><br>
@@ -1276,18 +1291,16 @@
     Winter studies the statuette's kneeling robes and the script around its base through the glass.
     "A priestess making an offering," <<he>> says. "Not a soldier."
     <br><br>
-    "Its recorded position matters more than the gold.
-      Together with the script and the surviving accounts of the forest sanctuary,
-      it identifies the ruin as an old temple tied to the same religious tradition.
-      It does not tell us what sank it."
+    "The gold is the least interesting part. Where you found it is the important thing.
+      Same script as the forest sanctuary, same temple. Old, and not originally ours.
+      It still won't tell you why the place went under."
   <<option 'CN'>>
     温特隔着玻璃，仔细观察女祭司像跪伏的长袍与底座周围的文字。
     “正在奉上供物的女祭司。”<<he>>说道，“不是士兵。”
     <br><br>
-    “它被发现的位置，比黄金本身更重要。
-      结合上面的字形和现存的森林礼拜场所记录，
-      它可以确认湖底废墟是一座古老神殿，与同一宗教传统相联。
-      它却无法告诉我们，那座神殿为何沉没。”
+    “黄金是最没意思的部分。你是在哪儿找到它的，这才是关键。
+      和森林里那座礼拜场所一样的字形，同一座神殿。年头很久，本来也不属于我们。
+      它还是不会告诉你，那地方为什么会沉下去。”
 <</language>>
 <br><br>
 <<museumicon>><<lanLink '返回博物馆' 'Museum'>><<endevent>><</lanLink>><br>

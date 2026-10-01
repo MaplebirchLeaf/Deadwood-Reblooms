@@ -198,7 +198,9 @@ export class RealEstate {
   public residentsInBedroom(id: PropertyId): ResidentProfile[] {
     const home = this.residentsHome(id);
     const selected = home.find(profile => profile.id === this.state.meeting_resident);
-    return selected ? [selected] : Time.hour === 23 ? [] : home.slice(0, 1);
+    // 选中的同住者离开后保持主卧空置，不把客房里的另一人自动换进来。
+    if (this.state.meeting_resident) return selected ? [selected] : [];
+    return Time.hour === 23 || this.residentsAt(id).length > 1 ? [] : home.slice(0, 1);
   }
 
   public residentsInGuestRoom(id: PropertyId): ResidentProfile[] {
@@ -359,6 +361,7 @@ export class RealEstate {
 
   public visit(id: PropertyId): boolean {
     if (!this.properties.some(property => property.id === id) || !this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return false;
+    if (this.state.visiting !== id) this.state.meeting_resident = null;
     this.state.visiting = id;
     this.state.floor = 1;
     return true;
