@@ -12,17 +12,9 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout DoL 0.5.12.13 source and protection tool
+      - name: Checkout mod and protection tool
         uses: actions/checkout@v4
         with:
-          path: current
-          submodules: true
-
-      - name: Checkout matching DoL 0.5.11.9 release tag
-        uses: actions/checkout@v4
-        with:
-          ref: dol-0.5.11.9-${{ github.ref_name }}
-          path: legacy
           submodules: true
 
       - name: Set up Bun
@@ -30,44 +22,32 @@ jobs:
         with:
           bun-version: '1.4.2'
 
-      - name: Verify both release versions
+      - name: Verify release version
         env:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          for entry in current:0.5.12.13 legacy:0.5.11.9; do
-            IFS=: read -r source game_version <<< "$entry"
-            package_version="$(bun -e "console.log(require('./$source/package.json').version)")"
-            dependency_version="$(bun -e "console.log(require('./$source/package.json').scml.dependenceInfo.find(dep => dep.modName === 'GameVersion').version)")"
-            if [[ "$RELEASE_TAG" != "v$package_version" || "$dependency_version" != ">=$game_version" ]]; then
-              echo "$source does not match $RELEASE_TAG for DoL $game_version" >&2
-              exit 1
-            fi
-          done
+          package_version="$(bun -e "console.log(require('./package.json').version)")"
+          dependency_version="$(bun -e "console.log(require('./package.json').scml.dependenceInfo.find(dep => dep.modName === 'GameVersion').version)")"
+          if [[ "$RELEASE_TAG" != "v$package_version" || "$dependency_version" != ">=0.5.12.13" ]]; then
+            echo "Release does not match $RELEASE_TAG for DoL 0.5.12.13" >&2
+            exit 1
+          fi
 
-      - name: Install both builds and protection tools
+      - name: Install dependencies and protection tool
         run: |
-          for source in current legacy; do
-            (cd "$source" && bun install --frozen-lockfile)
-            (cd "$source/tools/dol-mod-protection-tools" && bun install --frozen-lockfile)
-          done
+          bun install --frozen-lockfile
+          (cd tools/dol-mod-protection-tools && bun install --frozen-lockfile)
 
-      - name: Check both sources
+      - name: Check sources
         run: |
-          for source in current legacy; do
-            (cd "$source" && bun run check && bunx tsc --noEmit --pretty false)
-          done
+          bun run check
+          bunx tsc --noEmit --pretty false
 
-      - name: Build both game versions and audio packages
-        run: |
-          for source in current legacy; do
-            (cd "$source" && bun run build:all)
-          done
+      - name: Build mod and audio package
+        run: bun run build:all
 
-      - name: Encrypt both builds without player credentials
-        run: |
-          for source in current legacy; do
-            (cd "$source" && bun run scripts/protected-release.ts)
-          done
+      - name: Encrypt without player credentials
+        run: bun run scripts/protected-release.ts
 
       - name: Publish encrypted packages
         env:
@@ -76,12 +56,12 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           shopt -s nullglob
-          packages=(current/package/*.modpack legacy/package/*.modpack)
-          if [[ "${#packages[@]}" -ne 4 ]]; then
-            echo "Expected four encrypted modpacks, found ${#packages[@]}" >&2
+          packages=(package/*.modpack)
+          if [[ "${#packages[@]}" -ne 2 ]]; then
+            echo "Expected two encrypted modpacks, found ${#packages[@]}" >&2
             exit 1
           fi
-          notes_file="current/.github/release-notes/$RELEASE_TAG.md"
+          notes_file=".github/release-notes/$RELEASE_TAG.md"
           if [[ -s "$notes_file" ]]; then
             gh release create "$RELEASE_TAG" "${packages[@]}" --verify-tag --title "Deadwood Reblooms-$RELEASE_TAG" --notes-file "$notes_file"
           else
