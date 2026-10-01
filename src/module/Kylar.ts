@@ -6,6 +6,20 @@ class Kylar extends Module {
     super(core, 'KylarExpansion', DEFAULT_KYLAR_EXPANSION_STATE);
   }
 
+  private get available(): boolean {
+    return C.npc.Kylar.state === 'active' && !this.core.get('VanillaPlus')?.realEstate.residenceOf('Kylar');
+  }
+
+  /** 夜间沿用原版卧室判断，白天使用原版地点查询。 */
+  public get atManor(): boolean {
+    return this.available && (Time.hour >= 18 || window.getKylarLocation().area === 'manor_bedroom');
+  }
+
+  /** 起床后、去公园或街机厅前的空档，不覆盖上学日程。 */
+  public get canGarden(): boolean {
+    return this.available && V.KylarExpansion.stay_invited && window.isLoveInterest('Kylar') && !Time.schoolTime && Time.dayState === 'day' && Time.hour >= 8 && Time.hour < 9;
+  }
+
   public openWardrobe(): void {
     const wardrobes = V.wardrobes as Record<string, Record<string, unknown>>;
     wardrobes.kylar_manor ??= {

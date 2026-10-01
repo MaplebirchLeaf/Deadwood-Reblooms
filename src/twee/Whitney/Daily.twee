@@ -5,7 +5,7 @@
     and ['active', 'rescued'].includes(C.npc.Whitney.state) and Time.schoolDay
     and Time.hour gte 7 and Time.hour lt 18 and $exposed lte 0
     and $WhitneyExpansion.aftercare_day isnot Time.days>>
-    <<socialiseicon>><<lanLink ['Talk to Whitney (0:10)', '去找惠特尼说话 (0:10)'] 'Deadwood Whitney Aftercare'>><<pass 10>><</lanLink>><br><br>
+    <<socialiseicon>><<lanLink ['Talk to Whitney (0:10)', '去找惠特尼说话 (0:10)'] 'Deadwood Whitney Aftercare'>><</lanLink>><br><br>
   <</if>>
 <</widget>>
 
@@ -14,7 +14,7 @@
   <<if $whitneyromance is 1 and ['active', 'rescued'].includes(C.npc.Whitney.state)
     and Time.dayState isnot 'night' and Time.hour gte 9 and Time.hour lt 17 and $location is 'docks'
     and $exposed lte 0 and $WhitneyExpansion.pier_day isnot Time.days>>
-    <<socialiseicon>><<lanLink ['See what Whitney is doing (0:10)', '看看惠特尼在做什么 (0:10)'] 'Deadwood Whitney Pier'>><<pass 10>><</lanLink>><br><br>
+    <<socialiseicon>><<lanLink ['See what Whitney is doing (0:10)', '看看惠特尼在做什么 (0:10)'] 'Deadwood Whitney Pier'>><</lanLink>><br><br>
   <</if>>
 <</widget>>
 
@@ -33,40 +33,47 @@
 <<widget 'deadwood-whitney-music-link'>>
   <<if $WhitneyExpansion and $location is 'flats' and $whitneyromance is 1
     and ['active', 'rescued'].includes(C.npc.Whitney.state) and $WhitneyExpansion.music_day isnot Time.days>>
-    <<socialiseicon>><<lanLink ['Listen to Whitney\'s music (0:10)', '听听惠特尼在放什么 (0:10)'] 'Deadwood Whitney Music'>><<pass 10>><</lanLink>><br>
+    <<socialiseicon>><<lanLink ['Listen to Whitney\'s music (0:10)', '听听惠特尼在放什么 (0:10)'] 'Deadwood Whitney Music'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 :: Deadwood Whitney Music []
 <<set $outside to 0>><<set $location to 'flats'>><<effects>>
-<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
+<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state) or $WhitneyExpansion.music_day is Time.days>>
   <<lanSwitch 'Whitney has gone out.' '惠特尼已经出门了。'>>
 <<else>>
-  <<set $WhitneyExpansion.music_day to Time.days>>
+  <<pass 10>><<set $WhitneyExpansion.music_day to Time.days>>
   <<npc Whitney>><<person1>>
   <<lanSwitch 'Whitney sits with one earphone in, tapping <<his>> foot to the beat. When you glance at the player, <<he>> pulls the earphone out and holds it towards you, watching your face. "What, want a turn?"' '惠特尼戴着一只耳机，脚尖随着节拍轻点。你瞥向播放器时，<<he>>把耳机扯下来递向你，盯着你的脸。“怎么，也想听听？”'>><br><br>
-  <<socialiseicon>><<lanLink ['Ask Whitney what song this is', '问惠特尼这是什么歌'] 'Deadwood Whitney Music Answer'>><<set $phase to 'ask'>><</lanLink>><br>
-  <<loveicon>><<lanLink ['Wait for Whitney to offer the earphone', '等惠特尼把耳机递过来'] 'Deadwood Whitney Music Answer'>><<set $phase to 'wait'>><</lanLink>>
+  <<socialiseicon>><<lanLink ['Ask Whitney what song this is', '问惠特尼这是什么歌'] 'Deadwood Whitney Music Answer'>><<set $phase to 'whitney-music-ask'>><</lanLink>><br>
+  <<loveicon>><<lanLink ['Wait for Whitney to offer the earphone', '等惠特尼把耳机递过来'] 'Deadwood Whitney Music Answer'>><<set $phase to 'whitney-music-wait'>><</lanLink>>
 <</if>>
 <br><br><<getouticon>><<lanLink ['End the conversation', '结束交谈'] 'Whitney Home Enter'>><</lanLink>>
 
 :: Deadwood Whitney Music Answer []
 <<set $outside to 0>><<set $location to 'flats'>><<effects>>
-<<npc Whitney>><<person1>>
-<<if $phase is 'wait'>>
-  <<lanSwitch 'You sit beside Whitney without reaching for the earphone. After the next song starts, <<he>> presses it into your hand and clicks the volume up. "Just this one," <<he>> says, and keeps watching you. "Well? Can you take it or not?"' '你在惠特尼身旁坐下，没有伸手去拿耳机。下一首歌响起时，<<he>>把耳机塞进你手里，顺手调高了音量。“就听这一首。”<<he>>说完仍看着你。“怎么，扛不住？”'>>
-  <<npcincr Whitney love 1>><<glove>><<stress -1>><<lstress>>
+<<if !['whitney-music-ask', 'whitney-music-wait'].includes($phase)
+  or $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
-  <<lanSwitch '"You would hate it," Whitney says. <<He>> names the band anyway and lets the next song play for a few seconds. "There. Now stop asking."' '“你肯定不喜欢。”惠特尼说着，却还是报出了乐队的名字，让下一首歌放了几秒。“行了，别再问了。”'>>
+  <<npc Whitney>><<person1>>
+  <<if $phase is 'whitney-music-wait'>>
+    <<lanSwitch 'You sit beside Whitney without reaching for the earphone. After the next song starts, <<he>> presses it into your hand and clicks the volume up. "Just this one," <<he>> says, and keeps watching you. "Well? Can you take it or not?"' '你在惠特尼身旁坐下，没有伸手去拿耳机。下一首歌响起时，<<he>>把耳机塞进你手里，顺手调高了音量。“就听这一首。”<<he>>说完仍看着你。“怎么，扛不住？”'>>
+    <<npcincr Whitney love 1>><<glove>><<stress -1>><<lstress>>
+  <<else>>
+    <<lanSwitch '"You would hate it," Whitney says. <<He>> names the band anyway and lets the next song play for a few seconds. "There. Now stop asking."' '“你肯定不喜欢。”惠特尼说着，却还是报出了乐队的名字，让下一首歌放了几秒。“行了，别再问了。”'>>
+  <</if>>
+  <<unset $phase>>
 <</if>>
 <br><br><<getouticon>><<lanLink ['Return to the room', '返回房间'] 'Whitney Home Enter'>><</lanLink>>
 
 :: Deadwood Whitney Aftercare []
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
-<<if !$WhitneyExpansion?.rescued or $whitneyReunionScene isnot undefined or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
+<<if !$WhitneyExpansion?.rescued or $whitneyReunionScene isnot undefined or !['active', 'rescued'].includes(C.npc.Whitney.state)
+  or !Time.schoolDay or Time.hour lt 7 or Time.hour gte 18 or $exposed gt 0 or $WhitneyExpansion.aftercare_day is Time.days>>
   <<lanSwitch 'Whitney has already left the school grounds.' '惠特尼已经离开学校。'>><br><br>
 <<else>>
-  <<set $WhitneyExpansion.aftercare_day to Time.days>>
+  <<pass 10>><<set $WhitneyExpansion.aftercare_day to Time.days>>
   <<npc Whitney>><<person1>>
   <<switch Time.days % 3>>
     <<case 0>>
@@ -88,38 +95,46 @@
   <<if $LifeSimulation?.school and $LifeSimulation.school.role isnot 'student'>>
     <<lanSwitch 'Whitney glances at your badge. "Put that away before someone thinks you are here to write me up."' '惠特尼瞥了眼你的徽章。“收起来，省得别人以为你要记我的过。”'>><br><br>
   <</if>>
-  <<socialiseicon>><<lanLink ['Ask Whitney how their day is going', '问惠特尼今天怎么样'] 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'space'>><</lanLink>><br>
+  <<socialiseicon>><<lanLink ['Ask Whitney how their day is going', '问惠特尼今天怎么样'] 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'whitney-aftercare-space'>><</lanLink>><br>
   <<if isLoveInterest('Whitney')>>
-    <<loveicon>><<lanLink ['Walk with Whitney for a while', '陪惠特尼走一段'] 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'walk'>><</lanLink>><br>
+    <<loveicon>><<lanLink ['Walk with Whitney for a while', '陪惠特尼走一段'] 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'whitney-aftercare-walk'>><</lanLink>><br>
   <</if>>
 <</if>>
 <br><br><<getouticon>><<lanLink '返回前庭' 'School Front Courtyard'>><</lanLink>>
 
 :: Deadwood Whitney Aftercare Answer []
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
-<<npc Whitney>><<person1>>
-<<if $phase is 'walk' and isLoveInterest('Whitney')>>
-  <<language>>
-    <<option 'EN'>>You walk beside Whitney until the bell rings. <<He>> keeps close enough that your sleeves touch, then notices and puts a step between you. "Don't make a thing of it, slut," <<he>> says. "I just don't want some creep's hands on what's mine."
-    <<option 'CN'>>你陪惠特尼走到铃声响起。<<He>>靠得很近，袖口不时碰到你，随即像意识到什么，往旁边让开半步。“别大惊小怪的，骚货。”<<he>>说，“我只是不想让哪个变态碰我的东西。”
-  <</language>>
-  <<npcincr Whitney love 2>><<glove>><<stress -2>><<lstress>>
+<<if !['whitney-aftercare-space', 'whitney-aftercare-walk'].includes($phase)
+  or !$WhitneyExpansion.rescued or !['active', 'rescued'].includes(C.npc.Whitney.state)
+  or ($phase is 'whitney-aftercare-walk' and !isLoveInterest('Whitney'))>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
-  <<language>>
-    <<option 'EN'>>"Fine, slut," Whitney says. <<He>> shoves your shoulder hard enough to stagger you, then heads inside without looking back.
-    <<option 'CN'>>“还行，骚货。”惠特尼说着，用力推了一下你的肩膀，推得你一个踉跄，随后头也不回地走进学校。
-  <</language>>
-  <<npcincr Whitney love 1>><<glove>>
+  <<npc Whitney>><<person1>>
+  <<if $phase is 'whitney-aftercare-walk' and isLoveInterest('Whitney')>>
+    <<language>>
+      <<option 'EN'>>You walk beside Whitney until the bell rings. <<He>> keeps close enough that your sleeves touch, then notices and puts a step between you. "Don't make a thing of it, slut," <<he>> says. "I just don't want some creep's hands on what's mine."
+      <<option 'CN'>>你陪惠特尼走到铃声响起。<<He>>靠得很近，袖口不时碰到你，随即像意识到什么，往旁边让开半步。“别大惊小怪的，骚货。”<<he>>说，“我只是不想让哪个变态碰我的东西。”
+    <</language>>
+    <<npcincr Whitney love 2>><<glove>><<stress -2>><<lstress>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>"Fine, slut," Whitney says. <<He>> shoves your shoulder hard enough to stagger you, then heads inside without looking back.
+      <<option 'CN'>>“还行，骚货。”惠特尼说着，用力推了一下你的肩膀，推得你一个踉跄，随后头也不回地走进学校。
+    <</language>>
+    <<npcincr Whitney love 1>><<glove>>
+  <</if>>
+  <<unset $phase>>
 <</if>>
 <br><br>
 <<getinicon>><<lanLink '进入学校' 'Hallways'>><</lanLink>>
 
 :: Deadwood Whitney Pier []
 <<set $outside to 1>><<set $location to 'docks'>><<effects>>
-<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
+<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state)
+  or Time.dayState is 'night' or Time.hour lt 9 or Time.hour gte 17 or $exposed gt 0 or $WhitneyExpansion.pier_day is Time.days>>
   <<lanSwitch 'Whitney is not around.' '惠特尼不在这附近。'>><br><br>
 <<else>>
-  <<set $WhitneyExpansion.pier_day to Time.days>>
+  <<pass 10>><<set $WhitneyExpansion.pier_day to Time.days>>
   <<npc Whitney>><<person1>>
   <<language>>
     <<option 'EN'>>Whitney is sitting on a bollard at the end of the pier, flicking stones into the water. <<He>> does not turn around. "You following me now, slut?"
@@ -131,38 +146,50 @@
     <<option 'CN'>>你在<<him>>旁边坐下。有一阵子<<he>>什么也没说，你们就那么看着海水从桩子间流过。然后<<he>>用靴子碰了碰你的腿。“说话，不然就滚，骚货。”
   <</language>>
   <br><br>
-  <<socialiseicon>><<lanLink ['Ask Whitney what they are doing here', '问惠特尼在这儿做什么'] 'Deadwood Whitney Pier Talk'>><</lanLink>><br>
+  <<socialiseicon>><<lanLink ['Ask Whitney what they are doing here', '问惠特尼在这儿做什么'] 'Deadwood Whitney Pier Talk'>><<set $phase to 'whitney-pier-talk'>><</lanLink>><br>
   <<if isLoveInterest('Whitney')>>
-    <<loveicon>><<lanLink ['Sit close to Whitney for a while', '靠着惠特尼坐一会儿'] 'Deadwood Whitney Pier Lean'>><</lanLink>><br>
+    <<loveicon>><<lanLink ['Sit close to Whitney for a while', '靠着惠特尼坐一会儿'] 'Deadwood Whitney Pier Lean'>><<set $phase to 'whitney-pier-lean'>><</lanLink>><br>
   <</if>>
 <</if>>
 <br><br><<getouticon>><<lanLink ['Leave the pier', '离开码头'] 'Docks'>><</lanLink>>
 
 :: Deadwood Whitney Pier Talk []
 <<set $outside to 1>><<set $location to 'docks'>><<effects>>
-<<npc Whitney>><<person1>>
-<<language>>
-  <<option 'EN'>>You ask what <<he>> comes here for. Whitney keeps throwing stones. "None of your business." A pause. "It's quiet. That's all." <<He>> throws another stone, harder. "Don't look at me like that."
-  <<option 'CN'>>你问<<he>>来这儿做什么。惠特尼继续踢石子。“关你屁事。”停了一下。“这儿安静。就这个。”<<He>>又踢了一颗，比刚才用力。“别用那种眼神看我。”
-<</language>>
-<<npcincr Whitney love 1>><<glove>><<stress -1>><<lstress>>
+<<if $phase isnot 'whitney-pier-talk' or $whitneyromance isnot 1
+  or !['active', 'rescued'].includes(C.npc.Whitney.state)>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<npc Whitney>><<person1>>
+  <<language>>
+    <<option 'EN'>>You ask what <<he>> comes here for. Whitney keeps throwing stones. "None of your business." A pause. "It's quiet. That's all." <<He>> throws another stone, harder. "Don't look at me like that."
+    <<option 'CN'>>你问<<he>>来这儿做什么。惠特尼继续踢石子。“关你屁事。”停了一下。“这儿安静。就这个。”<<He>>又踢了一颗，比刚才用力。“别用那种眼神看我。”
+  <</language>>
+  <<npcincr Whitney love 1>><<glove>><<stress -1>><<lstress>>
+  <<unset $phase>>
+<</if>>
 <br><br>
 <<getinicon>><<lanLink '继续' 'Docks'>><</lanLink>>
 
 :: Deadwood Whitney Pier Lean []
 <<set $outside to 1>><<set $location to 'docks'>><<effects>>
-<<npc Whitney>><<person1>>
-<<language>>
-  <<option 'EN'>>You lean against <<him>>. Whitney goes rigid for a moment, then shifts so your shoulder fits under <<his>> arm. <<He>> does not say anything about it. When a gull cries overhead, <<he>> pulls <<his>> arm back and stands up. "Shift change. Come on."
-  <<option 'CN'>>你靠过去。惠特尼僵了一下，随后挪了挪身子，让你的肩膀正好落在<<his>>臂弯里。<<He>>对此只字不提。头顶有海鸥叫了一声，<<he>>便把手臂抽回去，站了起来。“换班了。走吧。”
-<</language>>
-<<npcincr Whitney love 2>><<glove>><<npcincr Whitney dom 1>><<gdom>><<stress -2>><<lstress>>
+<<if $phase isnot 'whitney-pier-lean' or $whitneyromance isnot 1
+  or !['active', 'rescued'].includes(C.npc.Whitney.state) or !isLoveInterest('Whitney')>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<npc Whitney>><<person1>>
+  <<language>>
+    <<option 'EN'>>You lean against <<him>>. Whitney goes rigid for a moment, then shifts so your shoulder fits under <<his>> arm. <<He>> does not say anything about it. When a gull cries overhead, <<he>> pulls <<his>> arm back and stands up. "Shift change. Come on."
+    <<option 'CN'>>你靠过去。惠特尼僵了一下，随后挪了挪身子，让你的肩膀正好落在<<his>>臂弯里。<<He>>对此只字不提。头顶有海鸥叫了一声，<<he>>便把手臂抽回去，站了起来。“换班了。走吧。”
+  <</language>>
+  <<npcincr Whitney love 2>><<glove>><<npcincr Whitney dom 1>><<gdom>><<stress -2>><<lstress>>
+  <<unset $phase>>
+<</if>>
 <br><br>
 <<getinicon>><<lanLink '继续' 'Docks'>><</lanLink>>
 
 :: Deadwood Whitney Flats []
 <<set $outside to 0>><<set $location to 'flats'>><<effects>>
-<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state) or $whitney_home_stage lt 3
+<<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state) or $whitney_home_stage lt 3 or $WhitneyExpansion.flats_day is Time.days
   or !(Time.dayState is 'dawn' or (Time.dayState is 'day' and Weather.precipitation is 'none' and !Time.schoolDay and ![3, 6, 7].includes(Time.weekDay)))>>
   <<lanSwitch 'Whitney has gone back inside.' '惠特尼已经回到屋里。'>><br><br>
 <<else>>

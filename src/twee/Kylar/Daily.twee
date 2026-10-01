@@ -1,11 +1,10 @@
 :: Deadwood Reblooms Kylar Game []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
 <<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar')
-  or C.npc.Kylar.state isnot 'active'
-  or (Time.hour lt 18 and getKylarLocation().area isnot 'manor_bedroom')
-  or (maplebirch.get('VanillaPlus') and maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
-  <<lanSwitch 'Kylar is not at the computer. You set the controller down.' '凯拉尔不在电脑前。你放下了手柄。'>>
+  or !maplebirch.get('Kylar').atManor or pcAreArmsBound('both') or $KylarExpansion.game_day is Time.days>>
+  <<lanSwitch 'You cannot play together right now.' '现在无法一起玩游戏。'>>
 <<else>>
+<<pass 20>><<set $KylarExpansion.game_day to Time.days>>
 <<npc Kylar>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -27,10 +26,11 @@
 
 :: Deadwood Reblooms Kylar Notes []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
-<<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar') or C.npc.Kylar.state isnot 'active'>>
+<<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar') or !maplebirch.get('Kylar').atManor
+  or $KylarExpansion.notes_day is Time.days>>
   <<lanSwitch 'Kylar has put the books away.' '凯拉尔已经把书收起来了。'>><br><br>
 <<else>>
-  <<set $KylarExpansion.notes_day to Time.days>>
+  <<pass 20>><<set $KylarExpansion.notes_day to Time.days>>
   <<npc Kylar>><<person1>>
   <<language>>
     <<option 'EN'>>A schoolbook lies open on Kylar's desk. A page has been torn at the corner. Kylar covers the marks with one hand. "Someone wrote on it again. I— I wanted to fix it before you saw. I did not want you to think I—" <<He>> stops and keeps <<his>> hand where it is.
@@ -39,34 +39,41 @@
   <<if $LifeSimulation?.school and $LifeSimulation.school.role isnot 'student'>>
     <<lanSwitch 'Your badge catches the light. Kylar looks at it, then at the ruined page. "Will you write down what they did?"' '你的徽章反着光。凯拉尔看看它，又看看破损的书页。“你会把他们做的事记下来吗？”'>><br><br>
   <</if>>
-  <<if currentSkillValue('english') gte 400>>
+  <<if currentSkillValue('english') gte 400 and !pcAreArmsBound('both')>>
     <<lanSwitch 'You can still read the exercise beneath the ink.' '墨迹下面的习题还看得清。'>><br><br>
-    <<schoolicon 'library'>><<lanLink ['Repair the page with Kylar', '和凯拉尔补好这一页'] 'Deadwood Reblooms Kylar Notes Answer'>><<set $phase to 'repair'>><</lanLink>><br>
+    <<schoolicon 'library'>><<lanLink ['Repair the page with Kylar', '和凯拉尔补好这一页'] 'Deadwood Reblooms Kylar Notes Answer'>><<set $phase to 'kylar-notes-repair'>><</lanLink>><br>
   <</if>>
-  <<socialiseicon>><<lanLink ['Listen to Kylar first', '先听凯拉尔说完'] 'Deadwood Reblooms Kylar Notes Answer'>><<set $phase to 'listen'>><</lanLink>><br>
+  <<socialiseicon>><<lanLink ['Listen to Kylar first', '先听凯拉尔说完'] 'Deadwood Reblooms Kylar Notes Answer'>><<set $phase to 'kylar-notes-listen'>><</lanLink>><br>
 <</if>>
 <br><<getouticon>><<lanLink '返回凯拉尔的房间' 'Manor Kylar Room'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Notes Answer []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
-<<npc Kylar>><<person1>>
-<<if $phase is 'repair' and currentSkillValue('english') gte 400>>
-  <<lanSwitch 'You copy the exercise onto a clean sheet while Kylar holds the book flat. <<He>> checks each line against yours, then carefully tucks the new page beneath the cover. "Now I can take it back to class."' '你把习题誊到一张干净的纸上，凯拉尔按住书页，逐行与你核对，最后小心把新纸夹进封皮。“这下我能带它去上课了。”'>>
-  <<englishskill 1>><<genglish>><<npcincr Kylar love 2>><<glove>>
+<<if !['kylar-notes-repair', 'kylar-notes-listen'].includes($phase)
+  or C.npc.Kylar.state isnot 'active' or !isLoveInterest('Kylar')
+  or ($phase is 'kylar-notes-repair' and (currentSkillValue('english') lt 400 or pcAreArmsBound('both')))>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
-  <<lanSwitch 'You sit beside Kylar until <<he>> has finished explaining. <<He>> stops hiding the page from you. The book stays open on the desk while you talk.' '你坐在凯拉尔身边，听<<him>>慢慢说完。<<He>>不再遮住书页，你们说话时，那本书始终摊在桌上。'>>
-  <<npcincr Kylar love 1>><<glove>>
+  <<npc Kylar>><<person1>>
+  <<if $phase is 'kylar-notes-repair' and currentSkillValue('english') gte 400>>
+    <<lanSwitch 'You copy the exercise onto a clean sheet while Kylar holds the book flat. <<He>> checks each line against yours, then carefully tucks the new page beneath the cover. "Now I can take it back to class."' '你把习题誊到一张干净的纸上，凯拉尔按住书页，逐行与你核对，最后小心把新纸夹进封皮。“这下我能带它去上课了。”'>>
+    <<englishskill 1>><<genglish>><<npcincr Kylar love 2>><<glove>>
+  <<else>>
+    <<lanSwitch 'You sit beside Kylar until <<he>> has finished explaining. <<He>> stops hiding the page from you. The book stays open on the desk while you talk.' '你坐在凯拉尔身边，听<<him>>慢慢说完。<<He>>不再遮住书页，你们说话时，那本书始终摊在桌上。'>>
+    <<npcincr Kylar love 1>><<glove>>
+  <</if>>
+  <<unset $phase>>
 <</if>>
 <br><br>
 <<getouticon>><<lanLink '返回凯拉尔的房间' 'Manor Kylar Room'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Yard []
 <<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
-<<if !$KylarExpansion?.stay_invited or !isLoveInterest('Kylar') or C.npc.Kylar.state isnot 'active'
-  or (maplebirch.get('VanillaPlus') and maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
+<<if !maplebirch.get('Kylar').canGarden or $exposed gt 0 or pcAreArmsBound('both')
+  or $KylarExpansion.yard_day is Time.days>>
   <<lanSwitch 'The garden is empty.' '花园里空无一人。'>><br><br>
 <<else>>
-  <<set $KylarExpansion.yard_day to Time.days>>
+  <<pass 20>><<set $KylarExpansion.yard_day to Time.days>>
   <<npc Kylar>><<person1>>
   <<language>>
     <<option 'EN'>>Kylar is kneeling at the edge of the lawn with a pair of shears, cutting back the thorns one stem at a time. <<He>> has not noticed you yet. When <<he>> finally looks up, <<he>> drops the shears. "I— how long have you been standing there?"
@@ -79,46 +86,61 @@
   <</language>>
   <br><br>
   <span class='blue'><<lanSwitch 'Upstairs, something heavy shifts across the floorboards and goes still.' '楼上，有什么沉重的东西在地板上挪了一下，又不动了。'>></span><br><br>
-  <<socialiseicon>><<lanLink ['Ask Kylar what they were planning', '问凯拉尔本来想做什么'] 'Deadwood Reblooms Kylar Yard Ask'>><</lanLink>><br>
+  <<socialiseicon>><<lanLink ['Ask Kylar what they were planning', '问凯拉尔本来想做什么'] 'Deadwood Reblooms Kylar Yard Ask'>><<set $phase to 'kylar-yard-ask'>><</lanLink>><br>
   <<if isLoveInterest('Kylar')>>
-    <<loveicon>><<lanLink ['Kneel and help Kylar trim the hedge', '蹲下来帮凯拉尔一起剪'] 'Deadwood Reblooms Kylar Yard Help'>><</lanLink>><br>
+    <<loveicon>><<lanLink ['Kneel and help Kylar trim the hedge', '蹲下来帮凯拉尔一起剪'] 'Deadwood Reblooms Kylar Yard Help'>><<set $phase to 'kylar-yard-help'>><</lanLink>><br>
   <</if>>
   <<if C.npc.Kylar.rage gte 50>>
-    <<socialiseicon>><<lanLink ['Ask if Kylar is worried you will see someone else', '问凯拉尔是不是担心你会去找别人'] 'Deadwood Reblooms Kylar Yard Jealousy'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink ['Ask if Kylar is worried you will see someone else', '问凯拉尔是不是担心你会去找别人'] 'Deadwood Reblooms Kylar Yard Jealousy'>><<set $phase to 'kylar-yard-jealousy'>><</lanLink>><br>
   <</if>>
 <</if>>
 <br><br><<getouticon>><<lanLink ['Go back inside', '回到屋内'] 'Manor Hall'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Yard Ask []
 <<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
-<<npc Kylar>><<person1>>
-<<language>>
-  <<option 'EN'>>You ask what it was supposed to be. Kylar stares at the thorns for a long moment. "Nothing. It doesn't matter now that you have seen it half done, <<kylar_pet_name>>." <<He>> cuts one stem, badly. "You should go inside. The sun is strong."
-  <<option 'CN'>>你问本来是想怎样。凯拉尔盯着那些荆棘看了很久。“没什么，<<kylar_pet_name>>。既然你已经看见没做完的样子，那就无所谓了。”<<He>>剪了一根，剪歪了。“你进屋去吧。太阳晒。”
-<</language>>
-<<npcincr Kylar love 1>><<glove>>
+<<if $phase isnot 'kylar-yard-ask' or C.npc.Kylar.state isnot 'active' or !isLoveInterest('Kylar')>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<npc Kylar>><<person1>>
+  <<language>>
+    <<option 'EN'>>You ask what it was supposed to be. Kylar stares at the thorns for a long moment. "Nothing. It doesn't matter now that you have seen it half done, <<kylar_pet_name>>." <<He>> cuts one stem, badly. "You should go inside. The sun is strong."
+    <<option 'CN'>>你问本来是想怎样。凯拉尔盯着那些荆棘看了很久。“没什么，<<kylar_pet_name>>。既然你已经看见没做完的样子，那就无所谓了。”<<He>>剪了一根，剪歪了。“你进屋去吧。太阳晒。”
+  <</language>>
+  <<npcincr Kylar love 1>><<glove>>
+  <<unset $phase>>
+<</if>>
 <br><br>
 <<getinicon>><<lanLink '继续' 'Manor Hall'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Yard Jealousy []
 <<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
-<<npc Kylar>><<person1>>
-<<lanSwitch 'You ask why Kylar keeps glancing toward the path. <<He>> catches hold of your wrist before <<he>> answers, and does not let go straight away. "I thought someone else might come looking for you." You tell <<him>> you came to the garden because you wanted to. <<He>> loosens <<his>> grip, one finger at a time, and leaves the path alone.' '你问凯拉尔为什么一直朝小路张望。<<He>>先攥住你的手腕才开口，没有立刻松开。“我以为会有别人来找你。”你告诉<<him>>，来花园是你自己的决定。<<He>>一根手指一根手指地松开，不再盯着小路。'>>
-<<npcincr Kylar rage -2>><<npcincr Kylar love 1>><<glove>>
+<<if $phase isnot 'kylar-yard-jealousy' or C.npc.Kylar.state isnot 'active' or !isLoveInterest('Kylar') or C.npc.Kylar.rage lt 50>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<npc Kylar>><<person1>>
+  <<lanSwitch 'You ask why Kylar keeps glancing toward the path. <<He>> catches hold of your wrist before <<he>> answers, and does not let go straight away. "I thought someone else might come looking for you." You tell <<him>> you came to the garden because you wanted to. <<He>> loosens <<his>> grip, one finger at a time, and leaves the path alone.' '你问凯拉尔为什么一直朝小路张望。<<He>>先攥住你的手腕才开口，没有立刻松开。“我以为会有别人来找你。”你告诉<<him>>，来花园是你自己的决定。<<He>>一根手指一根手指地松开，不再盯着小路。'>>
+  <<npcincr Kylar rage -2>><<npcincr Kylar love 1>><<glove>>
+  <<unset $phase>>
+<</if>>
 <br><br><<getinicon>><<lanLink ['Go back inside', '返回屋内'] 'Manor Hall'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Yard Help []
-<<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>><<wearProp 'hedge shears'>>
-<<npc Kylar>><<person1>>
-<<language>>
-  <<option 'EN'>>You fetch the second pair of shears from the shed and take one side of the hedge. Kylar watches your hands for a while before <<he>> starts cutting again.
-  <<option 'CN'>>你从工具棚里取出另一把园艺剪，接过树篱的另一侧。凯拉尔看着你的手看了一阵，才重新动剪。
-<</language>>
-<br><br>
-<<language>>
-  <<option 'EN'>>"Thank you, <<kylar_pet_name>>," <<he>> says at last. "I did not ask. You did not have to."
-  <<option 'CN'>>“谢谢你，<<kylar_pet_name>>。”<<he>>终于开口，“我没开口。你本来不用来的。”
-<</language>>
-<<npcincr Kylar love 2>><<glove>><<stress -2>><<lstress>>
+<<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
+<<if $phase isnot 'kylar-yard-help' or C.npc.Kylar.state isnot 'active' or !isLoveInterest('Kylar') or pcAreArmsBound('both')>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+<<else>>
+  <<npc Kylar>><<person1>><<wearProp 'hedge shears'>>
+  <<language>>
+    <<option 'EN'>>You fetch the second pair of shears from the shed and take one side of the hedge. Kylar watches your hands for a while before <<he>> starts cutting again.
+    <<option 'CN'>>你从工具棚里取出另一把园艺剪，接过树篱的另一侧。凯拉尔看着你的手看了一阵，才重新动剪。
+  <</language>>
+  <br><br>
+  <<language>>
+    <<option 'EN'>>"Thank you, <<kylar_pet_name>>," <<he>> says at last. "I did not ask. You did not have to."
+    <<option 'CN'>>“谢谢你，<<kylar_pet_name>>。”<<he>>终于开口，“我没开口。你本来不用来的。”
+  <</language>>
+  <<npcincr Kylar love 2>><<glove>><<stress -2>><<lstress>>
+  <<unset $phase>>
+<</if>>
 <br><br>
 <<getinicon>><<lanLink '继续' 'Manor Hall'>><</lanLink>>

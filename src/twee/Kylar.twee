@@ -3,9 +3,7 @@
 <!-- 原版首次借宿会被凯拉尔的父母带走。只有经历过该事件，才出现常规留宿入口。 -->
 <<widget 'deadwood-reblooms-kylar-bedroom-links'>>
   <<if $kylar_sleep_abduction is 1 and $KylarExpansion>>
-    <<set _kylarAtManor to C.npc.Kylar.state is 'active'
-      and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
-      and (!maplebirch.get('VanillaPlus') or !maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
+    <<set _kylarAtManor to maplebirch.get('Kylar').atManor>>
     <<if !$KylarExpansion.stay_invited and isLoveInterest('Kylar') and _kylarAtManor>>
       <<language>>
         <<option 'EN'>><<socialiseicon 'ask'>><<link 'Ask Kylar if you can stay again' 'Deadwood Reblooms Kylar Stay Invitation'>><</link>>
@@ -52,14 +50,14 @@
         <<option 'EN'>><<mirroricon>><<link 'Mirror' 'Deadwood Reblooms Kylar Mirror'>><<preMirror>><</link>>
         <<option 'CN'>><<mirroricon>><<link '镜子' 'Deadwood Reblooms Kylar Mirror'>><<preMirror>><</link>>
       <</language>><br>
-      <<if _kylarAtManor and $KylarExpansion.game_day isnot Time.days>>
+      <<if _kylarAtManor and !pcAreArmsBound('both') and $KylarExpansion.game_day isnot Time.days>>
         <<language>>
-          <<option 'EN'>><<techicon 'monitors'>><<link 'Play a game with Kylar (0:20)' 'Deadwood Reblooms Kylar Game'>><<pass 20>><<set $KylarExpansion.game_day to Time.days>><</link>>
-          <<option 'CN'>><<techicon 'monitors'>><<link '和凯拉尔玩游戏 (0:20)' 'Deadwood Reblooms Kylar Game'>><<pass 20>><<set $KylarExpansion.game_day to Time.days>><</link>>
+          <<option 'EN'>><<techicon 'monitors'>><<link 'Play a game with Kylar (0:20)' 'Deadwood Reblooms Kylar Game'>><</link>>
+          <<option 'CN'>><<techicon 'monitors'>><<link '和凯拉尔玩游戏 (0:20)' 'Deadwood Reblooms Kylar Game'>><</link>>
         <</language>><br>
       <</if>>
       <<if _kylarAtManor and isLoveInterest('Kylar') and $KylarExpansion.notes_day isnot Time.days>>
-        <<schoolicon 'library'>><<lanLink ['Sort through Kylar\'s notes (0:20)', '陪凯拉尔整理笔记 (0:20)'] 'Deadwood Reblooms Kylar Notes'>><<pass 20>><</lanLink>><br>
+        <<schoolicon 'library'>><<lanLink ['Sort through Kylar\'s notes (0:20)', '陪凯拉尔整理笔记 (0:20)'] 'Deadwood Reblooms Kylar Notes'>><</lanLink>><br>
       <</if>>
       <<roomoptions>>
       <<safehouseEvents>>
@@ -75,16 +73,11 @@
 <</widget>>
 
 
-<!-- 白天的庄园前花园：凯拉尔只在同住后出现，且必须由玩家主导话题。 -->
+<!-- 起床后去公园或街机厅前的花园空档，不覆盖学校日程。 -->
 <<widget 'deadwood-reblooms-kylar-yard-link'>>
-  <<if $kylar_sleep_abduction is 1 and $KylarExpansion?.stay_invited
-    and isLoveInterest('Kylar')
-    and C.npc.Kylar.state is 'active'
-    and (!maplebirch.get('VanillaPlus') or !maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))
-    and Time.dayState is 'day' and Time.hour gte 8 and Time.hour lt 17
-    and $exposed lte 0 and !pcAreArmsBound('both')
+  <<if maplebirch.get('Kylar').canGarden and $exposed lte 0 and !pcAreArmsBound('both')
     and $KylarExpansion.yard_day isnot Time.days>>
-    <<socialiseicon>><<lanLink ['Find Kylar in the garden (0:20)', '到花园找凯拉尔 (0:20)'] 'Deadwood Reblooms Kylar Yard'>><<pass 20>><</lanLink>><br><br>
+    <<socialiseicon>><<lanLink ['Find Kylar in the garden (0:20)', '到花园找凯拉尔 (0:20)'] 'Deadwood Reblooms Kylar Yard'>><</lanLink>><br><br>
   <</if>>
 <</widget>>
 <<widget 'deadwood-reblooms-kylar-kitchen-link'>>
@@ -105,9 +98,7 @@
 
 :: Deadwood Reblooms Kylar Stay Invitation []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
-<<set _kylarAtManor to C.npc.Kylar.state is 'active'
-  and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
-  and (!maplebirch.get('VanillaPlus') or !maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
+<<set _kylarAtManor to maplebirch.get('Kylar').atManor>>
 <<if $kylar_sleep_abduction isnot 1 or !isLoveInterest('Kylar') or !_kylarAtManor>>
   <<lanSwitch 'Kylar is not in the room. You can ask another time.' '凯拉尔不在房间里。你可以改天再问。'>>
 <<else>>
@@ -203,9 +194,7 @@
 
 :: Deadwood Reblooms Kylar Bed []
 <<set $outside to 0>><<set $bus to 'kylarmanor'>><<location 'kylarmanor'>><<effects>><<wearoutfit>>
-<<set _kylarAtManor to C.npc.Kylar.state is 'active'
-  and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
-  and (!maplebirch.get('VanillaPlus') or !maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
+<<set _kylarAtManor to maplebirch.get('Kylar').atManor>>
 <<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar')>>
   <<lanSwitch 'You pull back the sheets and step away.' '你掀开被子，从床边退开。'>><br><br>
 <<else>>
@@ -240,9 +229,7 @@
 :: Deadwood Reblooms Kylar Sleep []
 <<set $outside to 0>><<location 'kylarmanor'>>
 <<set _requestedHours to $sleephour>>
-<<set _kylarAtManor to C.npc.Kylar.state is 'active'
-  and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
-  and (!maplebirch.get('VanillaPlus') or !maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
+<<set _kylarAtManor to maplebirch.get('Kylar').atManor>>
 <<set _nightWake to _kylarAtManor and _requestedHours gte 3
   and (Time.hour gte 22 or Time.hour lt 3)
   and $KylarExpansion.night_day isnot Time.days

@@ -13,15 +13,17 @@ Invitation does not cancel family stories. Moving to a PC home transfers some co
 
 ### Manor activities
 
-| Place      | Action                   | Effects and limits                                                              |
-| ---------- | ------------------------ | ------------------------------------------------------------------------------- |
-| Bedroom    | Wardrobe, mirror and bed | A place to stay, with separate VanillaPlus eerie-mirror requirements            |
-| Computer   | Shared gaming            | Available evening presence, love and stress benefits                            |
-| Schoolbook | Repair marked notes      | Once daily, with ability-dependent repair choice                                |
-| Kitchen    | Tea                      | Once daily, also available alone                                                |
-| Garden     | Questions and pruning    | Daytime 08:00 until before 17:00, unexposed and not both arms bound, once daily |
+| Place      | Action                   | Effects and limits                                                                                   |
+| ---------- | ------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Bedroom    | Wardrobe, mirror and bed | A place to stay, with separate VanillaPlus eerie-mirror requirements                                 |
+| Computer   | Shared gaming            | Available evening presence, love and stress benefits                                                 |
+| Schoolbook | Repair marked notes      | Once daily, with ability-dependent repair choice                                                     |
+| Kitchen    | Tea                      | Once daily, also available alone                                                                     |
+| Garden     | Questions and pruning    | Daytime 08:00 until before 09:00 outside school hours, unexposed and not both arms bound, once daily |
 
 ### Notes choices
+
+Playing together and copying notes require at least one unbound arm. You can still listen to Kylar with both arms bound.
 
 Listen first or repair exercises when English ability qualifies. Listening improves love, while repair also improves English. The school grade letter and this ability check are separate records, so one high exam grade does not guarantee the option.
 
@@ -29,7 +31,7 @@ Prefect or president status changes questions without replacing the ability requ
 
 ### Garden and jealousy
 
-After invitation, ask, help or respond to worries in the daytime garden scene. Helping increases love and reduces stress. Higher jealousy opens concern about other people. Responding slightly lowers jealousy without erasing possessiveness.
+After invitation, ask, help or respond to worries in the garden before Kylar leaves in the morning. Helping increases love and reduces stress. Higher jealousy opens concern about other people. Responding slightly lowers jealousy without erasing possessiveness.
 
 The garden entrance also requires Kylar not registered at a PC-owned home, avoiding simultaneous companionship in both places.
 
