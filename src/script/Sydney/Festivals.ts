@@ -20,7 +20,7 @@ export default function (maplebirch: typeof window.maplebirch) {
 
     const adjustSydneySchedule = () => {
       if (!V.SydneyExpansion) return;
-      const sydneyActive = C.npc.Sydney.init === 1 && C.npc.Sydney.state !== 'prison' && C.npc.Sydney.state !== 'dungeon' && V.daily.sydney?.punish !== 1;
+      const sydneyActive = maplebirch.get('Sydney')!.available;
       const halloweenNight = (Time.month === 10 && Time.monthDay === 31 && Time.hour >= 21) || (Time.month === 11 && Time.monthDay === 1 && Time.hour < 7);
       const festivalNight = sydneyActive && halloweenNight && V.SydneyExpansion.halloweenYear === Time.year && V.SydneyExpansion.sirrisHalloweenVisitYear !== Time.year;
       const sirrisMorning =
@@ -79,19 +79,21 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-reblooms-sydney-christmas-link'], passage: 'Temple' });
   maplebirch.tool.addTo(
     'AfterLinkZone',
-    { widget: 'deadwood-reblooms-halloween-robin-guide', passage: 'Robin Trick Hug' },
-    { widget: 'deadwood-reblooms-halloween-robin-guide', passage: 'Robin Trick Talk' },
-    { widget: 'deadwood-reblooms-halloween-robin-guide', passage: 'Robin Trick Kiss Finish' },
-    { widget: 'deadwood-reblooms-halloween-kylar-guide', passage: 'Whitney Trick 7' },
-    { widget: 'deadwood-reblooms-halloween-kylar-guide', passage: 'Whitney Trick Sex Finish' },
-    { widget: 'deadwood-reblooms-halloween-sydney-guide', passage: 'Kylar Halloween Town' },
-    { widget: 'deadwood-reblooms-halloween-sydney-guide', passage: 'Kylar Halloween Sex Finish' },
-    { widget: 'deadwood-reblooms-halloween-sydney-guide', passage: 'Kylar Halloween Alone' },
-    { widget: 'deadwood-reblooms-halloween-sydney-guide', passage: 'Kylar Halloween Thank' },
-    { widget: 'deadwood-reblooms-halloween-sydney-guide', passage: 'Kylar Halloween Whitney Kiss' },
-    { widget: 'deadwood-reblooms-halloween-sydney-guide', passage: 'Kylar Halloween Whitney Apologise' },
-    { widget: 'deadwood-reblooms-halloween-sydney-guide', passage: 'Kylar Halloween Whitney Silent' },
-    { widget: 'deadwood-reblooms-halloween-sydney-guide', passage: 'Kylar Halloween Skulduggery Pull' },
+    { widget: 'deadwood-reblooms-halloween-robin-guide', passage: ['Robin Trick Hug', 'Robin Trick Talk', 'Robin Trick Kiss Finish'] },
+    { widget: 'deadwood-reblooms-halloween-kylar-guide', passage: ['Whitney Trick 7', 'Whitney Trick Sex Finish'] },
+    {
+      widget: 'deadwood-reblooms-halloween-sydney-guide',
+      passage: [
+        'Kylar Halloween Town',
+        'Kylar Halloween Sex Finish',
+        'Kylar Halloween Alone',
+        'Kylar Halloween Thank',
+        'Kylar Halloween Whitney Kiss',
+        'Kylar Halloween Whitney Apologise',
+        'Kylar Halloween Whitney Silent',
+        'Kylar Halloween Skulduggery Pull'
+      ]
+    },
     { widget: 'deadwood-reblooms-halloween-sydney-accompany-guide', passage: 'Kylar Halloween Accompany' }
   );
 }
