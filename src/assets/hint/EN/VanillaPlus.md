@@ -151,7 +151,9 @@ Ellis is the financial centre's bank clerk, handling personal accounts and banki
 
 You can chat once per day. Visits on different days build familiarity, and listening improves the relationship. Re-entering the counter or moving money repeatedly does not award affection. Banking conversations respond to overdue payments, distress, your first property and your new account. Estate-desk conversations cover funding and household costs, while securities-desk conversations cover opening accounts and transferring money.
 
-With an open account and visits on at least three different days, ask about work. Promotion depends on actual customer business, rather than affection:
+The social page calls this relationship **Familiarity**. Ellis's attitude progresses from professional distance through recognition, enjoying conversation and feeling at ease to trust. Once you help Ellis become manager, a familiar Ellis also expresses gratitude for your support. This reflects personal friendship rather than romance.
+
+With an open account and visits on at least three different days, ask about work. Promotion depends on actual customer business, rather than familiarity:
 
 1. At the bank counter, choose Ellis as your account contact. Business starts recording at future daily settlements, without crediting earlier account history.
 2. Hold a debit card and retain at least £5,000 in net bank deposits with no overdue repayments for seven consecutive daily settlements. Ellis becomes a senior clerk.

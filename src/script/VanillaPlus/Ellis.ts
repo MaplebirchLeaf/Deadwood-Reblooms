@@ -18,7 +18,7 @@ export default function Ellis(maplebirch: typeof window.maplebirch): void {
       hair_sides_length: 200,
       hair_fringe_length: 200
     },
-    { important: true, love: { maxValue: 50 }, loveInterest: false },
+    { love: { maxValue: 50 }, loveAlias: ['Familiarity', '熟悉'], loveInterest: false },
     {
       Ellis: { EN: 'Ellis', CN: '埃利斯' },
       'bank clerk': { EN: 'bank clerk', CN: '银行职员' },
