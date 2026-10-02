@@ -26,7 +26,7 @@ import Kylar from './Kylar';
   maplebirch.define('CelestialAnomalies', new CelestialAnomalies(maplebirch), ['DeadwoodReblooms', 'var']);
   maplebirch.define('MoreTransformations', new MoreTransformations(maplebirch), ['DeadwoodReblooms', 'char']);
   maplebirch.define('NPCSidebarPortrait', new NPCSidebarPortrait(maplebirch), ['DeadwoodReblooms', 'npc']);
-  maplebirch.define('VanillaPlus', new VanillaPlus(maplebirch), ['DeadwoodReblooms', 'var', 'char']);
+  maplebirch.define('VanillaPlus', new VanillaPlus(maplebirch), ['DeadwoodReblooms', 'var', 'char', 'npc']);
   maplebirch.define('Sydney', new Sydney(maplebirch), ['DeadwoodReblooms', 'var']);
   maplebirch.define('Robin', new Robin(maplebirch), ['DeadwoodReblooms', 'var']);
   maplebirch.define('Whitney', new Whitney(maplebirch), ['DeadwoodReblooms', 'var']);

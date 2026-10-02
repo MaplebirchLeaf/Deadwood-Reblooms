@@ -144,3 +144,38 @@ The other side remains the tentacle plains with vanilla dangers and encounters. 
 | Ride the Wind    | Glide from an owned home and actually land on a different street from its home street                    | Opening the destination list or descending to your own ground floor    |
 
 Achievements record completed actions and do not need a separate purchase. The miscellaneous furniture category is not an extra requirement for Feels Like Home.
+
+### Ellis and the management application
+
+Ellis is the financial centre's bank clerk, handling personal accounts and banking enquiries across the desks. Weekday hours are 09:00–17:00: the estate desk at 11:00–12:00, lunch beside the hall entrance at 12:00–13:00, the securities desk at 15:00–16:00, and the bank counter otherwise. Ellis is absent on weekends and after work. Other staff continue to handle ordinary services.
+
+You can chat once per day. Visits on different days build familiarity, and listening improves the relationship. Re-entering the counter or moving money repeatedly does not award affection. Banking conversations respond to overdue payments, distress, your first property and your new account. Estate-desk conversations cover funding and household costs, while securities-desk conversations cover opening accounts and transferring money.
+
+With an open account and visits on at least three different days, ask about work. Promotion depends on actual customer business, rather than affection:
+
+1. At the bank counter, choose Ellis as your account contact. Business starts recording at future daily settlements, without crediting earlier account history.
+2. Hold a debit card and retain at least £5,000 in net bank deposits with no overdue repayments for seven consecutive daily settlements. Ellis becomes a senior clerk.
+3. Retain at least £25,000 in net deposits with current repayments for fourteen consecutive daily settlements to establish the portfolio needed for a management application.
+4. Authorise the use of your account in the application at the bank counter. Maintain the qualifying account for a further week, then ask about the interview result. The assessment also considers Ellis's other customers and work performance.
+
+Net deposits are the bank balance minus credit-card and personal-loan debts. Repeated transfers do not add days, and depositing borrowed money does not increase net deposits. You do not need to borrow or buy shares. A failed daily settlement resets the current accumulation stage, without removing an earned position. During review, it restarts the review week. The work conversation displays your current progress.
+
+#### Exact rates and eligibility after promotion
+
+After the management appointment is confirmed at the counter, **new personal loans** receive a ten-percent reduction in the weekly interest rate: `standard weekly rate × 0.9`. These are weekly rates, rather than the total interest on the loan.
+
+| Product                | Standard weekly rate | Discounted weekly rate | Reduction in percentage points |
+| ---------------------- | -------------------- | ---------------------- | ------------------------------ |
+| 7-day bridge loan      | 1.050%               | 0.945%                 | 0.105                          |
+| 14-day short-term loan | 1.400%               | 1.260%                 | 0.140                          |
+| 30-day personal loan   | 1.750%               | 1.575%                 | 0.175                          |
+
+- You must have collected the management appointment result. Senior-clerk status and an application under review do not unlock the discount.
+- Both credit-card and personal-loan missed-payment counters must be zero. Either counter being positive restores standard rates for new borrowing. Clearing the affected debt resets that counter and restores eligibility.
+- Successful borrowing saves the quoted weekly rate in the contract. Gaining or losing eligibility later does not recalculate existing loans.
+- Only personal-loan rates change. Deposit interest remains 0.140% per week and credit-card interest remains 2.100% per week. Mortgages, borrowing limits and other charges are unaffected.
+- Missing a personal-loan instalment still adds £5 or 2% of its unpaid amount, whichever is greater. After the final due date, the saved contractual weekly rate doubles, including rates fixed under the discount.
+
+For a £1,000 seven-day loan, the first week's interest on the principal falls from £10.50 to £9.45. Other terms depend on outstanding debt, instalments and rounding to pennies. Multiplying the first week's interest by the number of weeks does not give the total interest.
+
+The work conversation and application page read current quotes directly from the finance system. The work conversation shows the standard rate, current rate and whether eligibility is suspended. The sidebar portrait and social avatar belong to their respective optional image modules.

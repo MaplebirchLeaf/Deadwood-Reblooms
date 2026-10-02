@@ -5,6 +5,7 @@ import Deviancy from './VanillaPlus/Deviancy';
 import DivineTransformations from './VanillaPlus/DivineTransformations';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
 import Finance from './VanillaPlus/Finance';
+import Ellis from './VanillaPlus/Ellis';
 import HandGrip from './VanillaPlus/HandGrip';
 import NPCDoublePenetration from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
@@ -44,6 +45,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   HandGrip(maplebirch);
   NPCDoublePenetration(maplebirch);
   Finance(maplebirch);
+  Ellis(maplebirch);
   RealEstate(maplebirch);
   Physique(maplebirch);
   Promiscuity(maplebirch);

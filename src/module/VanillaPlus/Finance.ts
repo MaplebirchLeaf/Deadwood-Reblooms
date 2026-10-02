@@ -169,7 +169,14 @@ export const DEFAULT_FINANCE_STATE: FinanceState = {
 };
 
 class Finance {
+  public loanDiscount: () => number = () => 0;
   public constructor(private readonly core: typeof maplebirch) {}
+
+  public get loanProducts(): readonly { days: number; baseWeeklyRate: number; weeklyRate: number }[] {
+    const discount = Math.clamp(this.loanDiscount(), 0, 0.1);
+    // 折扣乘法先消除浮点尾差，避免便士向上取整时多收一便士。
+    return LOAN_PRODUCTS.map(product => ({ ...product, baseWeeklyRate: product.weeklyRate, weeklyRate: Number((product.weeklyRate * (1 - discount)).toFixed(8)) }));
+  }
 
   public get securities(): readonly Security[] {
     // setup 只缓存静态证券目录，ALF 是否上市每次都按当前存档的农场进度重新筛选。
@@ -386,7 +393,7 @@ class Finance {
     if (value == null) return 'invalid-amount';
     if (value > this.accountLimits.loan) return 'loan-limit';
     const days = Number(term);
-    const product = LOAN_PRODUCTS.find(option => option.days === days);
+    const product = this.loanProducts.find(option => option.days === days);
     if (!product) return 'invalid-term';
     bank.balance += value;
     bank.loan_debt = value;

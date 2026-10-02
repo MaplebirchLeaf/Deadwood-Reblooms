@@ -12,6 +12,7 @@ interface NPCData {
   corruption?: number;
   state?: string;
   hairColour?: string;
+  skincolour?: string;
 }
 
 interface AvatarStates {
@@ -40,6 +41,7 @@ interface AvatarProfile {
 }
 
 class NPCAvatars {
+  public readonly custom = new Map<string, AvatarProfile>();
   private static readonly avatarBasePath = 'img/misc/icon/social';
 
   private static readonly THRESHOLDS = {
@@ -326,7 +328,7 @@ class NPCAvatars {
   public avatar(name = String(T.npc ?? '')): HTMLElement | undefined {
     const npc = V.NPCName.find((entry: NPCData) => entry.nam === name) as NPCData | undefined;
     if (!npc) return undefined;
-    const profile = NPCAvatars.avatarProfiles[npc.nam];
+    const profile = this.custom.get(npc.nam) ?? NPCAvatars.avatarProfiles[npc.nam];
     if (!profile) return undefined;
 
     // 少数角色按发色、装束或形态选择图层，其他角色按关系状态选单张表情图。
@@ -619,6 +621,10 @@ class MoreLoveInterestsAndNPCAvatars {
     return this.avatars.icon(name, premade);
   }
 
+  public add(name: string, profile: AvatarProfile): void {
+    this.avatars.custom.set(name, profile);
+  }
+
   public remove(name: string): void {
     this.loveInterests.remove(name);
   }
@@ -629,3 +635,9 @@ class MoreLoveInterestsAndNPCAvatars {
 }
 
 export default MoreLoveInterestsAndNPCAvatars;
+
+declare module '@scml-dol-maplebirch/types' {
+  interface Extensions {
+    readonly MoreLoveInterestsAndNPCAvatars: MoreLoveInterestsAndNPCAvatars;
+  }
+}

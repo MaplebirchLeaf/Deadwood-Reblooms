@@ -31,6 +31,17 @@ export interface VanillaPlusState {
   };
   /** 银行、证券与市场的全部可变状态。 */
   finance: FinanceState;
+  ellis: {
+    lastVisit: number;
+    visits: number;
+    lastChat: number;
+    accountDiscussed: boolean;
+    homeDiscussed: boolean;
+    career: number;
+    careerReadyDay: number;
+    businessDay: number;
+    businessDays: number;
+  };
   /** 房产产权、租约、拍卖与同住状态。 */
   real_estate: RealEstateState;
   /** 体格相关的一次性事件标记。 */
@@ -128,6 +139,7 @@ export interface VanillaPlusState {
 }
 
 export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
+  ellis: { lastVisit: -1, visits: 0, lastChat: -1, accountDiscussed: false, homeDiscussed: false, career: 0, careerReadyDay: 0, businessDay: -1, businessDays: 0 },
   lock: {
     physique: false,
     willpower: false,

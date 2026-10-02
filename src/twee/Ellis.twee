@@ -1,0 +1,389 @@
+:: Deadwood Reblooms Ellis Widgets [widget]
+
+<<widget 'deadwood-reblooms-ellis-context'>>
+	<<set $_state to $VanillaPlus.ellis>>
+	<<set $_bank to $VanillaPlus.finance.bank>>
+	<<set $_location to maplebirch.npc.Schedule.get('Ellis').location>>
+	<<set _ellisContext to {
+		state: $_state,
+		bank: $_bank,
+		location: $_location,
+		desk: {
+			financial_centre: 'Deadwood Reblooms Financial Centre Bank',
+			financial_centre_property: 'Deadwood Reblooms Property Office',
+			financial_centre_securities: 'Deadwood Reblooms Financial Centre Securities'
+		}[$_location] or '',
+		netDeposit: Math.max(0, $_bank.balance - $_bank.credit_debt - $_bank.loan_debt),
+		goodAccount: $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0
+	}>>
+	<<set _ellisContext.present to Boolean(_ellisContext.desk) or $_location is 'financial_centre_break'>>
+	<<set _ellisContext.canChat to _ellisContext.present and $_state.lastChat isnot Time.days>>
+	<<set _ellisContext.careerAvailable to _ellisContext.present and ($_state.career gt 0 or ($_state.visits gte 3 and $_bank.opened))>>
+	<<set _ellisContext.businessReady to _ellisContext.goodAccount and _ellisContext.netDeposit gte 2500000>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-ellis-business-day'>>
+	<<set $_state to $VanillaPlus.ellis>>
+	<<set $_bank to $VanillaPlus.finance.bank>>
+	<<set $_elapsed to Math.max(0, Time.days - $_state.businessDay)>>
+	<<if $_elapsed gt 0>>
+		<<set $_state.businessDay to Time.days>>
+		<<set $_netDeposit to Math.max(0, $_bank.balance - $_bank.credit_debt - $_bank.loan_debt)>>
+		<<set $_goodAccount to $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0>>
+		<<for $_day to 0; $_day lt Math.min(21, $_elapsed) and $_state.career lt 3; $_day++>>
+			<<set $_target to $_state.career is 1 ? 500000 : 2500000>>
+			<<set $_state.businessDays to $_goodAccount and $_netDeposit gte $_target ? $_state.businessDays + 1 : 0>>
+			<<if $_state.businessDays gte ($_state.career is 1 ? 7 : 14)>>
+				<<set $_state.career += 1>>
+				<<set $_state.businessDays to 0>>
+				<<set C.npc.Ellis.title to 'senior bank clerk'>>
+				<<set C.npc.Ellis.description to 'senior bank clerk'>>
+			<</if>>
+		<</for>>
+		<<if $_state.career is 4 and (!$_goodAccount or $_netDeposit lt 2500000)>>
+			<<set $_state.careerReadyDay to Time.days + 7>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-ellis-greeting'>>
+	<<deadwood-reblooms-ellis-context>>
+	<<if _ellisContext.location is (_args[0] or 'financial_centre')>>
+		<<set $_new to C.npc.Ellis.init isnot 1>>
+		<<if _ellisContext.state.lastVisit isnot Time.days>>
+			<<set _ellisContext.state.lastVisit to Time.days>>
+			<<set _ellisContext.state.visits += 1>>
+		<</if>>
+		<<npc 'Ellis'>><<person1>>
+		<<if (_ellisContext.location is 'financial_centre_property')>>
+			<<language>>
+				<<option 'EN'>>Ellis has brought a folder from the bank counter. The estate agent passes over a property leaflet. "I'll go through the funding with you. The agent can arrange the viewing."
+				<<option 'CN'>>埃利斯从银行柜台带来一个文件夹。中介递过房屋介绍。“我来和你核对购房资金。看房的事，中介会安排。”
+			<</language>>
+		<<elseif (_ellisContext.location is 'financial_centre_securities')>>
+			<<language>>
+				<<option 'EN'>>Ellis stands beside the securities clerk, pointing out the account-transfer forms. "Banking on this side. Trades on that one." The market board flickers behind them.
+				<<option 'CN'>>埃利斯站在证券职员旁，指出账户转账的表格。“这一侧办理银行对接。交易在那边。”身后的行情板闪动着。
+			<</language>>
+		<<elseif _ellisContext.state.career is 5>>
+			<<language>>
+				<<option 'EN'>>Ellis stands beside the desk marked <span class='gold'>Branch Manager</span>. A member of staff brings over a form for approval. "I'll be with you in a moment."
+				<<option 'CN'>>埃利斯站在标着<span class='gold'>分行经理</span>的办公桌旁。一名职员拿来表格，请经理批准。“稍等，我马上过来。”
+			<</language>>
+		<<elseif $_new>>
+			<<language>>
+				<<option 'EN'>>The clerk straightens a stack of forms before looking up. A small badge reads <span class='blue'>Ellis</span>. "Accounts and personal banking. What can I help you with?"
+				<<option 'CN'>>柜员把一叠表格的边缘理齐，随后抬起头。小小的名牌上写着<span class='blue'>埃利斯</span>。“这里办理账户和个人银行业务。有什么能帮你的？”
+			<</language>>
+		<<elseif (C.npc.Ellis.love gte 20)>>
+			<<language>>
+				<<option 'EN'>>Ellis notices you waiting and puts the pen down. "Good to see you. Business first, I suppose?" The greeting is quieter than the one given to the previous customer.
+				<<option 'CN'>>埃利斯注意到正在等候的你，放下了笔。“见到你真好。还是先办正事？”这声招呼比刚才接待上一位客户时轻了些。
+			<</language>>
+		<<elseif (_ellisContext.state.visits gte 3)>>
+			<<language>>
+				<<option 'EN'>>"Welcome back." Ellis recognises you before you reach the glass. A fresh form is placed beside the card reader.
+				<<option 'CN'>>“欢迎回来。”你还没走到玻璃前，埃利斯就认出了你。一张新表格被放到读卡器旁边。
+			<</language>>
+		<<else>>
+			<<language>>
+				<<option 'EN'>>Ellis looks up from the paperwork and gestures towards the counter. "How can I help?"
+				<<option 'CN'>>埃利斯从文书间抬起头，朝柜台示意。“需要办什么业务？”
+			<</language>>
+		<</if>>
+		<br><br>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-ellis-counter-link'>>
+	<<deadwood-reblooms-ellis-context>>
+	<<if _ellisContext.desk and passage() is _ellisContext.desk and _ellisContext.canChat>>
+		<<lanLink ['Talk to Ellis (0:05)', '与埃利斯聊聊 (0:05)'] 'Deadwood Reblooms Ellis Conversation'>><</lanLink>><br>
+	<</if>>
+	<<if _ellisContext.desk and passage() is _ellisContext.desk>><<deadwood-reblooms-ellis-career-link>><</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-ellis-break-link'>>
+	<<deadwood-reblooms-ellis-context>>
+	<<if (_ellisContext.location is 'financial_centre_break')>>
+		<<language>>
+			<<option 'EN'>>Ellis sits beside the entrance with a sandwich and a paper cup. The name badge has been turned face down on the table.
+			<<option 'CN'>>埃利斯坐在入口旁，面前放着三明治和纸杯。名牌被翻过来，扣在桌面上。
+		<</language>><br>
+		<<if _ellisContext.canChat>>
+			<<lanLink ['Join Ellis for a moment (0:05)', '和埃利斯坐一会儿 (0:05)'] 'Deadwood Reblooms Ellis Conversation'>><</lanLink>><br>
+		<</if>>
+		<<deadwood-reblooms-ellis-career-link>>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-ellis-career-link'>>
+	<<deadwood-reblooms-ellis-context>>
+	<<if _ellisContext.careerAvailable>>
+		<<lanLink ["Ask about Ellis\'s work", '询问埃利斯的工作近况'] 'Deadwood Reblooms Ellis Career'>><</lanLink>><br>
+	<</if>>
+<</widget>>
+
+:: Deadwood Reblooms Ellis Conversation []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<<deadwood-reblooms-ellis-context>>
+<<if _ellisContext.present>><<initnpc 'Ellis'>><</if>>
+<<set _ellisConversation to { topic: '', ownsHome: false, responseUsed: false }>>
+<<if _ellisContext.canChat>>
+	<<set _ellisContext.state.lastChat to Time.days>>
+	<<for _ellisProperty range maplebirch.get('VanillaPlus').realEstate.properties>>
+		<<if maplebirch.get('VanillaPlus').realEstate.owns(_ellisProperty.id)>><<set _ellisConversation.ownsHome to true>><<break>><</if>>
+	<</for>>
+	<<if _ellisContext.bank.credit_missed_payments gt 0 or _ellisContext.bank.loan_missed_payments gt 0>>
+		<<set _ellisConversation.topic to 'overdue'>>
+	<<elseif $pain gte 50 or $stress gte 600>>
+		<<set _ellisConversation.topic to 'concern'>>
+	<<elseif (_ellisContext.location is 'financial_centre_property')>>
+		<<set _ellisConversation.topic to 'property'>>
+	<<elseif (_ellisContext.location is 'financial_centre_securities')>>
+		<<set _ellisConversation.topic to 'securities'>>
+	<<elseif !_ellisContext.state.homeDiscussed and _ellisConversation.ownsHome>>
+		<<set _ellisConversation.topic to 'home'>><<set _ellisContext.state.homeDiscussed to true>>
+	<<elseif _ellisContext.bank.opened and !_ellisContext.state.accountDiscussed>>
+		<<set _ellisConversation.topic to 'account'>><<set _ellisContext.state.accountDiscussed to true>>
+	<<else>>
+		<<set _ellisConversation.topic to (_ellisContext.location is 'financial_centre_break') ? 'break' : 'work'>>
+	<</if>>
+<</if>>
+<<if _ellisConversation.topic>>
+	<<npc 'Ellis'>><<person1>>
+	<<set C.npc.Ellis.intro to 1>>
+	<<pass 5>>
+	<<switch _ellisConversation.topic>>
+		<<case 'overdue'>>
+			<<language>>
+				<<option 'EN'>>Ellis lowers the voice usually used for account enquiries. "There's a missed payment on your account. I can go through the statement with you, if you'd like." The paper stays on your side of the glass. "I can't remove it. I can make sure you know what you're being asked to pay."
+				<<option 'CN'>>埃利斯压低了平常办理业务时的声音。“你的账户有一笔逾期款。如果你愿意，我可以陪你看一遍账单。”纸张留在你这侧的玻璃前。“我不能替你免掉它。但我可以让你弄清楚，他们要你付的究竟是什么。”
+			<</language>>
+		<<case 'concern'>>
+			<<language>>
+				<<option 'EN'>>Ellis pauses before asking the usual questions. "There's a chair by the door. You don't have to do everything standing up." Another customer approaches, and the subject quietly changes to forms. Only when they have moved away does Ellis ask, "Do you need a minute?"
+				<<option 'CN'>>埃利斯没有立刻问起惯常的业务问题。“门边有椅子。你不用一直站着。”另一个客户走近，话题便悄悄转回了表格。直到对方离开，埃利斯才又问：“要缓一会儿吗？”
+			<</language>>
+		<<case 'home'>>
+			<<language>>
+				<<option 'EN'>>"I saw the property paperwork." Ellis taps the corner of the desk, rather than reaching for a sales leaflet. "Congratulations. Have you actually had time to settle in?" A smile follows. "Everyone asks about the price. I thought someone ought to ask about the house."
+				<<option 'CN'>>“我看到了房产手续。”埃利斯轻轻敲了敲桌角，没有伸手去拿推销用的宣传单。“恭喜。你已经有空住进去了吗？”随后露出一点笑意。“大家都在问价钱。我想，总该有人问问房子本身。”
+			<</language>>
+		<<case 'account'>>
+			<<language>>
+				<<option 'EN'>>"Your account's open now." Ellis points out the account number on your paperwork. "Keep the card details to yourself. Someone knowing you have money doesn't mean they need access to it." The pen hovers above the next form. "And keep an eye on payment dates. Those letters aren't pleasant."
+				<<option 'CN'>>“你的账户已经开好了。”埃利斯指出文书上的账号。“保管好卡片信息。别人知道你有钱，不代表他们就该有权动用它。”笔尖悬在下一张表格上。“还有，留意还款日期。那些催款信可不好看。”
+			<</language>>
+		<<case 'property'>>
+			<<if _ellisConversation.ownsHome>>
+				<<language>>
+					<<option 'EN'>>Ellis turns the leaflet over to the running costs. "The keys are only the first payment. Upkeep, furniture, the mortgage if you have one." A fingertip stops beside the account details. "Leave yourself enough for the next bill. I've seen people buy a house and then have nowhere comfortable to sit in it."
+					<<option 'CN'>>埃利斯把介绍翻到日常开销那面。“拿到钥匙，只是第一笔支出。维护、家具，还有可能要还的房贷。”指尖停在账户资料旁。“给下一张账单留点余地。我见过有人买完房，里面却连个能舒服坐下的地方都没有。”
+				<</language>>
+			<<else>>
+				<<language>>
+					<<option 'EN'>>"Which one caught your eye?" Ellis waits while you look over the deeds. "I'll check the deposit and repayment terms with you before you sign anything. The agent will tell you about the rooms." The cheapest leaflet is placed where you can reach it too. "A bigger loan isn't always a better house."
+					<<option 'CN'>>“看中哪一处了？”埃利斯等你看过契据。“签字前，我可以陪你核对首付和还款条件。房间的情况由中介介绍。”最便宜的那张资料也被放到你够得着的位置。“贷款借得更多，不一定住得更好。”
+				<</language>>
+			<</if>>
+		<<case 'securities'>>
+			<<if $VanillaPlus.finance.brokerage.opened>>
+				<<language>>
+					<<option 'EN'>>Ellis checks the transfer details with the securities clerk. "This money leaves your bank balance when it goes into the trading account. Don't count it twice when you're planning repayments." The clerk turns towards the market board. Ellis stays with your statement. "And don't mistake yesterday's price for tomorrow's."
+					<<option 'CN'>>埃利斯和证券职员核对转账资料。“钱转进交易账户，就会从银行余额里扣走。安排还款时，别把它算上两遍。”职员转向行情板，埃利斯仍看着你的账单。“也别把昨天的价格，当成明天的保证。”
+				<</language>>
+			<<else>>
+				<<language>>
+					<<option 'EN'>>"Thinking about opening a trading account?" Ellis picks out the forms and introduces you to the securities clerk. "I can explain how money moves between the two accounts. Ask the clerk about orders and shares." The introduction ends with a quiet addition. "You don't have to buy anything today."
+					<<option 'CN'>>“想开个交易账户？”埃利斯找出表格，把你介绍给证券职员。“两个账户之间怎么转钱，我可以解释。下单和股票的事，问这位职员。”介绍完，又轻轻补了一句。“今天不一定非得买点什么。”
+				<</language>>
+			<</if>>
+		<<case 'break'>>
+			<<language>>
+				<<option 'EN'>>Ellis moves the paper cup to make room for you. "Five minutes. After that I'm officially helpful again." The sandwich wrapper crackles between careful fingers. "People tell you a surprising amount across a counter. Then the next person walks up, and you're expected to forget it all."
+				<<option 'CN'>>埃利斯挪开纸杯，给你腾出位置。“五分钟。过了这个时间，我就得正式恢复乐于助人了。”三明治的包装纸在仔细的手指间沙沙作响。“隔着一个柜台，人们会告诉你出乎意料多的事。然后下一个人走过来，你就得把刚才的事全忘掉。”
+			<</language>>
+		<<default>>
+			<<if (C.npc.Ellis.love gte 20)>>
+				<<language>>
+					<<option 'EN'>>"You don't always need an account question to say hello." Ellis glances at the queue, then back at you. "Though if the manager asks, we were discussing your statement."
+					<<option 'CN'>>“也不是非得有账户问题才能来打招呼。”埃利斯看看等候的队伍，又看回你。“不过经理要是问起，我们就是在讨论你的账单。”
+				<</language>>
+			<<else>>
+				<<language>>
+					<<option 'EN'>>"Busy morning?" Ellis listens to your answer while capping the pen. "Mine has mostly involved explaining that signing a form doesn't mean you've read it." A glance at the stack of paperwork follows. "I probably shouldn't say that too loudly."
+					<<option 'CN'>>“今天忙吗？”埃利斯扣上笔帽，听你回答。“我今天主要忙着解释，签过字和读过表格是两回事。”目光随后落在那叠文书上。“这话大概不该说得太响。”
+				<</language>>
+			<</if>>
+	<</switch>>
+	<br><br>
+	<div id='ellis-response'>
+		<<lanLink ['Listen and thank Ellis', '认真听完，向埃利斯道谢']>>
+			<<if !_ellisConversation.responseUsed>>
+				<<set _ellisConversation.responseUsed to true>>
+				<<npcincr 'Ellis' 'love' 2>>
+				<<replace '#ellis-response'>>
+					<<language>>
+						<<option 'EN'>>You let Ellis finish. <<glove 'Ellis'>><span class='green'>The smile you receive seems less practised.</span>
+						<<option 'CN'>>你等埃利斯把话说完。<<glove 'Ellis'>><span class='green'>这次收到的微笑，似乎少了些刻意。</span>
+					<</language>>
+				<</replace>>
+			<</if>>
+		<</lanLink>><br>
+		<<lanLink ['Dismiss the conversation', '不耐烦地打断谈话']>>
+			<<if !_ellisConversation.responseUsed>>
+				<<set _ellisConversation.responseUsed to true>>
+				<<npcincr 'Ellis' 'love' -2>>
+				<<replace '#ellis-response'>>
+					<<language>>
+						<<option 'EN'>>"Of course." <<llove 'Ellis'>><span class='red'>Ellis returns to the careful tone used with strangers.</span>
+						<<option 'CN'>>“当然。”<<llove 'Ellis'>><span class='red'>埃利斯重新用上了接待陌生人时那种谨慎的语气。</span>
+					<</language>>
+				<</replace>>
+			<</if>>
+		<</lanLink>>
+	</div>
+	<br><br>
+<<else>>
+	<<language>>
+		<<option 'EN'>>Ellis is occupied, or has already left the counter. You'll have to catch up another time.
+		<<option 'CN'>>埃利斯正在忙，或已经离开了柜台。你得另找时间再聊。
+	<</language>><br><br>
+<</if>>
+<<if _ellisContext.desk>>
+	<<lanLink ['Return to the desk', '返回柜台'] _ellisContext.desk>><</lanLink>><br>
+<</if>>
+<<lanLink ['Return to the banking hall', '返回银行大厅'] 'Deadwood Reblooms Financial Centre'>><</lanLink>><br>
+
+:: Deadwood Reblooms Ellis Career []
+<<set $outside to 0>>
+<<set $location to 'financial_centre'>>
+<<effects>>
+<<deadwood-reblooms-ellis-context>>
+<<if _ellisContext.careerAvailable>>
+	<<npc 'Ellis'>><<person1>>
+	<<switch _ellisContext.state.career>>
+		<<case 0>>
+			<<language>>
+				<<option 'EN'>>"They look at the customers you bring in, and whether those customers stay." Ellis slides an account leaflet across the desk. "I'd like to move beyond the counter. But I need a portfolio they can actually point to."<br><br>"You can name me as your regular contact. I'll handle your account enquiries. Only do it if you intend to bank here."
+				<<option 'CN'>>“他们会看你带来了多少客户，以及这些客户会不会留下。”埃利斯把一张账户介绍推过桌面。“我想从柜台再往前走一步。但得拿出实实在在的业务。”<br><br>“你可以指定我负责你的账户服务。以后有账户问题，就来找我。前提是，你确实打算在这里办业务。”
+			<</language>>
+		<<case 1>>
+			<<language>>
+				<<option 'EN'>>Ellis finds your account in the customer file. "A card and a deposit that stays here. That's a customer relationship, rather than another withdrawal slip." The file is placed beside several others.<br><br><span class='blue'>Keep at least £5,000 in net deposits for a week of daily settlements, with a debit card and no overdue repayments.</span> Ellis's other customers will be included in the internal assessment too.
+				<<option 'CN'>>埃利斯在客户档案里找到了你的账户。“办好卡，存款也留在这里。这才是客户业务，不是又一张取款单。”档案被放到另外几份旁边。<br><br><span class='blue'>办好借记卡，在每日结算时保持至少 £5,000 净存款，连续一周没有逾期还款。</span>内部考核也会计入埃利斯服务的其他客户。
+			<</language>>
+		<<case 2>>
+			<<language>>
+				<<option 'EN'>>A new badge lies beside Ellis's pen. <span class='gold'>Senior Clerk.</span> "Your account helped. So did the customers who came back rather than moving to another branch." Ellis straightens the badge.<br><br>"There's a management vacancy. They want to see that I can retain larger accounts as well." <span class='blue'>Keep at least £25,000 in net deposits for a fortnight of daily settlements, with your debit card and repayments in order.</span> You don't need to take out a loan to help.
+				<<option 'CN'>>埃利斯的笔旁放着新的名牌。<span class='gold'>资深柜员。</span>“你的账户帮了忙。其他愿意回来，没有转去别的分行的客户也一样。”埃利斯把名牌摆正。<br><br>“现在有个经理职位空出来了。他们还想看看，我能不能留住更大的客户业务。”<span class='blue'>办好借记卡，在每日结算时保持至少 £25,000 净存款，连续两周没有逾期还款。</span>你不必为了帮忙去借贷款。
+			<</language>>
+		<<case 3>>
+			<<language>>
+				<<option 'EN'>>"The figures are there now." Ellis closes a folder of account reports. "If you're willing, I'll include your account in the portfolio for my application. They'll still interview me and check how I've handled the rest of the work."<br><br><span class='blue'>Confirm this at the counter while your qualifying deposit and payment record are still in place.</span>
+				<<option 'CN'>>“现在业绩已经够了。”埃利斯合上装着账户报告的文件夹。“如果你同意，我会把你的账户业务列进竞聘材料。他们还会面试我，检查我处理其他工作的情况。”<br><br><span class='blue'>保持符合条件的存款和还款记录，在柜台确认授权。</span>
+			<</language>>
+		<<case 4>>
+			<<language>>
+				<<option 'EN'>>"The interview's arranged. They're checking the portfolio too." Ellis rests a hand on the closed folder. "That takes <span class='blue'>a week</span>. Don't move money around for my sake. A balance that vanishes before the review doesn't help either of us."
+				<<option 'CN'>>“面试安排好了。他们也在核对客户业务。”埃利斯的手停在合起的文件夹上。“需要<span class='blue'>一周</span>。别为了我来回转钱。审核还没结束，存款就不见了，对我们都没帮助。”
+			<</language>>
+		<<case 5>>
+			<<language>>
+				<<option 'EN'>>"More forms. A different desk." Ellis shows you the appointment letter. <span class='gold'>Branch Manager.</span> "The accounts got me an interview. They liked my work at it too." The letter is folded away. "Thank you for trusting me with your business."<br><br><span class='green'>You qualify for the branch's preferred personal-loan rate.</span> With no missed-payment records, the weekly interest rate on new personal loans is reduced by <span class='green'>10%</span>. The rate is fixed when you borrow. Existing contracts, late charges and mortgage terms are unchanged.
+				<<option 'CN'>>“更多表格。一张不同的桌子。”埃利斯拿出任命信。<span class='gold'>分行经理。</span>“这些客户业务让我拿到了面试机会。面试里，他们也认可了我的工作。”信被收好。“谢谢你愿意把业务交给我。”<br><br><span class='green'>你可以享受分行的个人贷款优惠利率。</span>没有漏还记录时，新个人贷款的<span class='green'>周利率降低 10%</span>，签约时确定合同利率。已有合同、逾期费用和房贷条款仍按原来的规定执行。
+			<</language>>
+	<</switch>>
+	<br><br>
+	<<if _ellisContext.state.career is 5>>
+		<strong class='gold'><<lanSwitch 'Personal-loan weekly rates' '个人贷款周利率'>></strong><br>
+		<<for _ellisLoan range maplebirch.get('VanillaPlus').finance.loanProducts>>
+			<<= _ellisLoan.days>> <<lanSwitch 'days' '天'>>：
+			<<= (_ellisLoan.baseWeeklyRate * 100).toFixed(3)>>% →
+			<span class='blue'><<= (_ellisLoan.weeklyRate * 100).toFixed(3)>>%</span><br>
+		<</for>>
+		<<if _ellisContext.bank.credit_missed_payments gt 0 or _ellisContext.bank.loan_missed_payments gt 0>>
+			<<language>>
+				<<option 'EN'>><span class='red'>The discount is currently suspended because of missed repayments.</span> The rates above show your current quote. Clear the affected credit-card or personal-loan debt to reset its missed-payment record.
+				<<option 'CN'>><span class='red'>当前有逾期记录，优惠已暂停。</span>上方显示的是当前报价。结清有逾期记录的信用卡或个人贷款欠款，才能清除对应的漏还记录。
+			<</language>>
+		<<else>>
+			<<language>>
+				<<option 'EN'>><span class='green'>The discount is active.</span> A ten-percent reduction means the original rate is multiplied by 0.9. Deposit interest, credit-card interest and mortgages are unaffected.
+				<<option 'CN'>><span class='green'>优惠已生效。</span>降低一成是原利率乘以 0.9。存款利息、信用卡利息和房贷不受影响。
+			<</language>>
+		<</if>>
+		<br><br>
+	<</if>>
+	<div id='ellis-career-actions'>
+		<<if (_ellisContext.location is 'financial_centre') and _ellisContext.state.career is 0>>
+			<<lanLink ['Choose Ellis as your account contact (0:05)', '指定埃利斯负责账户服务 (0:05)']>>
+				<<if _ellisContext.state.career is 0>>
+					<<set _ellisContext.state.career to 1>><<set _ellisContext.state.businessDay to Time.days>><<set _ellisContext.state.businessDays to 0>>
+					<<pass 5>>
+					<<replace '#ellis-career-actions'>>
+						<<language>>
+							<<option 'EN'>>Ellis records your request and gives you a card bearing the name from the badge. "Ask for me next time." <span class='blue'>Future daily account settlements will count towards the business record.</span>
+							<<option 'CN'>>埃利斯记下你的请求，递来一张印着名牌上那个名字的卡片。“下次来找我就好。”<span class='blue'>从此后的每日账户结算开始记录业务。</span>
+						<</language>>
+					<</replace>>
+				<</if>>
+			<</lanLink>><br>
+		<<elseif (_ellisContext.location is 'financial_centre') and _ellisContext.state.career is 3 and _ellisContext.businessReady>>
+			<<lanLink ['Allow Ellis to include your account (0:05)', '同意埃利斯将账户业务列入竞聘材料 (0:05)']>>
+				<<if _ellisContext.state.career is 3>>
+					<<set _ellisContext.state.career to 4>><<set _ellisContext.state.careerReadyDay to Time.days + 7>>
+					<<pass 5>>
+					<<replace '#ellis-career-actions'>>
+						<<language>>
+							<<option 'EN'>>You sign the authorisation. Ellis puts it with the portfolio, ready for the internal review. "Now it's my turn. I'd better give them a good interview."
+							<<option 'CN'>>你签好授权，埃利斯把它放进送交内部审核的材料里。“接下来就看我了。面试得好好表现。”
+						<</language>>
+					<</replace>>
+				<</if>>
+			<</lanLink>><br>
+		<<elseif (_ellisContext.location is 'financial_centre') and _ellisContext.state.career is 4 and _ellisContext.businessReady and Time.days gte _ellisContext.state.careerReadyDay>>
+			<<lanLink ['Ask how the interview went (0:05)', '询问面试结果 (0:05)']>>
+				<<if _ellisContext.state.career is 4>>
+					<<set _ellisContext.state.career to 5>>
+					<<set C.npc.Ellis.title to 'bank manager'>><<set C.npc.Ellis.description to 'bank manager'>>
+					<<pass 5>>
+					<<replace '#ellis-career-actions'>>
+						<<language>>
+							<<option 'EN'>>Ellis opens the letter. <span class='gold'>The appointment is confirmed.</span> "They approved it. I'll be moving to the new desk." A smaller leaflet follows. "Your account qualifies for our preferred loan rate. That was approved too."
+							<<option 'CN'>>埃利斯打开信。<span class='gold'>任命已经获批。</span>“通过了。以后我会在新的办公桌。”随后又递来一张小些的介绍单。“你的账户可以享受优惠贷款利率。这个也批下来了。”
+						<</language>>
+					<</replace>>
+				<</if>>
+			<</lanLink>><br>
+		<<elseif _ellisContext.state.career is 1 or _ellisContext.state.career is 2>>
+			<<language>>
+				<<option 'EN'>>Qualifying daily settlements: <span class='blue'><<= _ellisContext.state.businessDays>> / <<= _ellisContext.state.career is 1 ? 7 : 14>></span>. Below the deposit requirement or behind on repayments, the current streak starts again.
+				<<option 'CN'>>符合条件的连续日结：<span class='blue'><<= _ellisContext.state.businessDays>> / <<= _ellisContext.state.career is 1 ? 7 : 14>></span>。日结时存款不足或还款逾期，当前阶段重新累计。
+			<</language>><br>
+		<<elseif _ellisContext.state.career is 3 or _ellisContext.state.career is 4>>
+			<<language>>
+				<<option 'EN'>>Keep the qualifying deposit and payment record. Confirm the paperwork or collect the result during counter hours. If a daily settlement fails during review, the review week starts again.
+				<<option 'CN'>>保持符合条件的存款与还款记录，在柜台办公时确认材料或领取结果。审核期间有一次日结不符合条件，审核周会重新计算。
+			<</language>><br>
+		<</if>>
+	</div>
+	<br>
+	<<if _ellisContext.state.career gt 0 and _ellisContext.state.career lt 5>>
+		<<language>>
+			<<option 'EN'>><i>Net deposits are the balance left after credit-card and personal-loan debts. Repeated transfers do not add business days.</i>
+			<<option 'CN'>><i>净存款按账户余额扣除信用卡和个人贷款欠款计算。反复存取不会增加业务天数。</i>
+		<</language>><br>
+	<</if>>
+<<else>>
+	<<language>>
+		<<option 'EN'>>Ellis isn't available to discuss this now.
+		<<option 'CN'>>埃利斯现在不方便谈这些。
+	<</language>><br>
+<</if>>
+<br>
+<<lanLink ['Return to the counter', '返回银行柜台'] 'Deadwood Reblooms Financial Centre Bank'>><</lanLink>><br>
+<<lanLink ['Return to the banking hall', '返回银行大厅'] 'Deadwood Reblooms Financial Centre'>><</lanLink>><br>
