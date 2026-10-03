@@ -71,7 +71,7 @@ export default function (maplebirch: MaplebirchCore) {
   $(document).on('change', 'input[name="radiobutton--bodywritingcolor"]', function () {
     if (!maplebirch.services.modules.initPhase.preInitCompleted) return;
     if (T.bodywriting.color === 'custom') {
-      $.wiki('<<replace "#DeadwoodRebloomsBodyWriting">><br><<lanSwitch "Custom Color" "自定义颜色">>: <<textbox "_bodywriting.custom" "#FFFFFF">><</replace>>');
+      maplebirch.SugarCube.Wikifier.wikifyEval('<<replace "#DeadwoodRebloomsBodyWriting">><br><<lanSwitch "Custom Color" "自定义颜色">>: <<textbox "_bodywriting.custom" "#FFFFFF">><</replace>>');
       const colorInput = $('#textbox--bodywritingcustom') as any;
       if (typeof colorInput.spectrum === 'function') {
         colorInput.spectrum({
@@ -90,7 +90,7 @@ export default function (maplebirch: MaplebirchCore) {
         colorInput.attr('type', 'color');
       }
     } else {
-      $.wiki('<<replace "#DeadwoodRebloomsBodyWriting">><</replace>>');
+      maplebirch.SugarCube.Wikifier.wikifyEval('<<replace "#DeadwoodRebloomsBodyWriting">><</replace>>');
     }
   });
 

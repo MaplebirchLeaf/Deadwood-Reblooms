@@ -27,7 +27,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   });
   maplebirch.dynamic.regStateEvent('gate', 'physique-break-bindings', {
     output: 'deadwood-reblooms-physique-break-bindings',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.physique.outsideBreakAvailable
+    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.physique.outsideBreak()
   });
 
   const available = () => V.combat === 1 && maplebirch.get('VanillaPlus')!.physique.canBreakBindings;

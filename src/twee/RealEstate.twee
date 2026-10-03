@@ -40,16 +40,20 @@
 <<widget 'deadwood-reblooms-property-invitation-link'>>
 	<<set _name to _args[0]>>
 	<<set _invitePassage to _args[1]>>
+	<!-- 是否能当面邀请由原版日程决定，关闭立绘后也照常显示。 -->
+	<<if _name is 'Sydney' and ['Library Rental Counter', 'Science Lesson'].includes($passage)>>
+		<<silently>><<sydneySchedule>><</silently>>
+	<</if>>
 	<!-- Science Lesson 在特殊检查分支先将事件计数加一，并把计时器设为 14，然后才执行 BeforeLinkZone。 -->
 	<<if window.isLoveInterest(_name)
 		and maplebirch.get("VanillaPlus").realEstate.properties.some(property => maplebirch.get("VanillaPlus").realEstate.owns(property.id) && !maplebirch.get("VanillaPlus").realEstate.managementFor(property.id).rented)
-		and ($passage isnot 'Library Rental Counter' or maplebirch.npc.Schedule.get('Sydney').location is 'library')
+		and ($passage isnot 'Library Rental Counter' or _sydney_location is 'library')
 		and ($passage isnot 'Maths Lesson' or ($schoolstate is 'second' and $whitneymaths is 'seat'
 			and Time.minute lt 59 and (Time.weekDay isnot 6 or Time.minute lt 37)))
 		and ($passage isnot 'English Lesson' or ($schoolstate is 'third' and $kylarenglishstate is 'active'
 			and Time.minute lt 59 and (Time.weekDay isnot 6 or Time.minute lt 37)))
 		and ($passage isnot 'Science Lesson' or ($schoolstate is 'first' and $sydneyScience is 1
-			and maplebirch.npc.Schedule.get('Sydney').location is 'science'
+			and _sydney_location is 'science'
 			and Time.minute lt 59 and (Time.weekDay isnot 6 or Time.minute lt 37)
 			and !($schooleventtimer is 14 and [1, 2, 3].includes($schoolevent))
 			and !($stress gte $stressmax and isPregnancyEnding())))

@@ -31,7 +31,7 @@ function describe(item: Item, slot: 'upper' | 'lower', options: SetOptions) {
     integrity_max: item.integrity_max ?? item.integrity ?? 100,
     action: item.name === 'naked' ? 'none' : slot === 'upper' ? (options.upperAction ?? 'lift') : (options.lowerAction ?? (item.skirt_down ? 'lift' : 'pull')),
     word: item.name === 'naked' || item.plural ? 'n' : 'a',
-    desc: item.cn_name_cap ?? item.desc ?? item.name
+    desc: lanSwitch(item.name, item.cn_name_cap ?? item.desc ?? item.name)
   };
 }
 
@@ -45,7 +45,7 @@ export function addSet(core: MaplebirchCore, names: string[], name: string, clot
     outfit: options.outfit ?? 0,
     upper: describe(upper, 'upper', options),
     lower: describe(lower, 'lower', options),
-    desc: `${upper.cn_name_cap ?? upper.desc ?? upper.name}和${lower.cn_name_cap ?? lower.desc ?? lower.name}`
+    desc: lanSwitch(`${upper.name} and ${lower.name}`, `${upper.cn_name_cap ?? upper.desc ?? upper.name}和${lower.cn_name_cap ?? lower.desc ?? lower.name}`)
   });
   names.push(name);
 }
@@ -60,7 +60,7 @@ export function sync(npcName: string, name: string, clothes: Item, options: SetO
   if (name !== 'naked') {
     Object.assign(set.clothes.upper, describe(upper, 'upper', options));
     Object.assign(set.clothes.lower, describe(lower, 'lower', options));
-    set.desc = `${set.clothes.upper.desc}和${set.clothes.lower.desc}`;
+    set.desc = lanSwitch(`${set.clothes.upper.desc} and ${set.clothes.lower.desc}`, `${set.clothes.upper.desc}和${set.clothes.lower.desc}`);
   }
   npc.clothes = {
     set: name,

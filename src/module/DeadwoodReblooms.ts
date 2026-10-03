@@ -31,6 +31,8 @@ import Hint_LifeSimulation_CN from '@/assets/hint/CN/LifeSimulation.md';
 import Hint_LifeSimulation_EN from '@/assets/hint/EN/LifeSimulation.md';
 import Hint_DynamicMusic_CN from '@/assets/hint/CN/DynamicMusic.md';
 import Hint_DynamicMusic_EN from '@/assets/hint/EN/DynamicMusic.md';
+import Hint_Orchard_CN from '@/assets/hint/CN/Orchard.md';
+import Hint_Orchard_EN from '@/assets/hint/EN/Orchard.md';
 import Hint_Credits_CN from '@/assets/hint/CN/Credits.md';
 import Hint_Credits_EN from '@/assets/hint/EN/Credits.md';
 import { defaults } from './constants';
@@ -53,6 +55,7 @@ const guideSections = {
   Whitney:                           { EN: Hint_Whitney_EN                          , CN: Hint_Whitney_CN                          , title: { EN: 'Whitney'                     , CN: '惠特尼拓展' } },
   Kylar:                             { EN: Hint_Kylar_EN                            , CN: Hint_Kylar_CN                            , title: { EN: 'Kylar'                       , CN: '凯拉尔拓展' } },
   LifeSimulation:                    { EN: Hint_LifeSimulation_EN                   , CN: Hint_LifeSimulation_CN                   , title: { EN: 'Life Simulation'             , CN: '模拟人生' } },
+  Orchard:                           { EN: Hint_Orchard_EN                          , CN: Hint_Orchard_CN                          , title: { EN: 'Orchard'                      , CN: '果园' } },
   DynamicMusic:                      { EN: Hint_DynamicMusic_EN                     , CN: Hint_DynamicMusic_CN                     , title: { EN: 'Dynamic Music'               , CN: '动态音乐' } },
   Credits:                           { EN: Hint_Credits_EN                          , CN: Hint_Credits_CN                          , title: { EN: 'Credits and sources'         , CN: '致谢与素材来源' } }
 } as const;
@@ -64,6 +67,7 @@ const guideOrder = [
   'Whitney',
   'Kylar',
   'LifeSimulation',
+  'Orchard',
   'VanillaPlus',
   'CelestialAnomalies',
   'MoreTransformations',
@@ -211,7 +215,7 @@ class DeadwoodReblooms extends Module {
   }
 
   public open(): void {
-    $.wiki("<<maplebirchReplace 'DeadwoodRebloomsHint' 'title'>>");
+    this.core.SugarCube.Wikifier.wikifyEval("<<maplebirchReplace 'DeadwoodRebloomsHint' 'title'>>");
   }
 
   public bindHint(): void {
@@ -235,8 +239,13 @@ class DeadwoodReblooms extends Module {
     try {
       const changed = Object.keys(states).length ? await this.core.services.gui.setModuleStates(states) : false;
       if (modulesRecord && Object.keys(legacyNames).some(name => oldDisabled.has(name))) {
-        modulesRecord.value.disabled = modulesRecord.value.disabled.filter(module => !Object.hasOwn(legacyNames, module.name));
-        await store.with('settings', 'readwrite', tx => tx.objectStore('settings').put(modulesRecord));
+        await store.with('settings', 'readwrite', async tx => {
+          const settings = tx.objectStore('settings');
+          const current = (await settings.get('Modules')) as typeof modulesRecord;
+          if (!current) return;
+          current.value.disabled = current.value.disabled.filter(module => !Object.hasOwn(legacyNames, module.name));
+          await settings.put(current);
+        });
       }
       if (changed) {
         location.reload();

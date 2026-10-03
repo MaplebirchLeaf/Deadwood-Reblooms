@@ -1,6 +1,6 @@
 ### Prerequisites
 
-The target game version is **0.5.12.13**, with maplebirch framework **5.2.0 or later**. Install the loader's required dependencies, enable the root and desired submodules, save and reload. Character, location and story prerequisites still apply to each feature.
+The target game version is **0.5.12.13**, with maplebirch framework **5.2.2 or later**. Install the loader's required dependencies, enable the root and desired submodules, save and reload. Character, location and story prerequisites still apply to each feature.
 
 ### Guide, settings and statistics
 

@@ -38,7 +38,7 @@
   <<historyicon>><<lanLink ['Take the project', '接下项目'] 'Deadwood Reblooms History Project Begin'>>
     <<set $phase to 0>>
   <</lanLink>><<ghistory>><br>
-  <<if C.npc.Robin.init is 1 and C.npc.Robin.dom gt 30 and C.npc.Robin.trauma lt 20 and ['active', 'seat'].includes($robinhistory) >>
+  <<if C.npc.Robin.init is 1 and C.npc.Robin.dom gt 30 and C.npc.Robin.trauma lt 20 and !$robinmissing and $robin.timer.hurt is 0 and getRobinLocation() is 'school' and ['active', 'seat'].includes($robinhistory) >>
     <<loveicon>><<lanLink ['Ask Robin to work with you', '邀请罗宾协助'] 'Deadwood Reblooms History Project Begin' >>
       <<set $phase to 1>>
     <</lanLink>><<glove 'Robin'>><br>
@@ -79,7 +79,7 @@
 <!-- 湖区入口：满足条件时开启遗迹调查，并区分是否由 Robin 协助。 -->
 <<widget 'deadwood-reblooms-history-project-lake-option'>>
   <<if $LifeSimulation.historyProject.status is 'ongoing' and Time.days lt $LifeSimulation.historyProject.deadline and $LifeSimulation.historyProject.archive gt 0 and $LifeSimulation.historyProject.museum gt 0 and $LifeSimulation.historyProject.ruin is 0 and !Weather.isFrozen('lake') and Time.hour gte 6 and Time.hour lte 18 >>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       <<antiqueicon 'disc'>><<lanLink ['Survey the ruin with Robin (2:00)', '与罗宾勘察湖底废墟 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation' >><<pass 2 hours>><</lanLink>><br>
     <<else>>
       <<antiqueicon 'disc'>><<lanLink ['Survey the lake ruin (2:00)', '前往湖底废墟进行勘察 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation' >><<pass 2 hours>><</lanLink>><br>
@@ -156,7 +156,7 @@
       <</language>>
     <</if>>
     <br>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       <<lanSwitch 'Robin is helping you organise the project.' '罗宾正在协助你整理项目。'>><br>
     <</if>>
     <<lanSwitch 'Historical records' '历史记录'>><<lanSwitch ': ' '：'>>
@@ -368,7 +368,7 @@
 
 :: Deadwood Reblooms History Project Archive []
 <<set $outside to 0>><<set $location to 'school'>><<schooleffects>><<effects>>
-<<if $LifeSimulation.historyProject.assistant>>
+<<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
   <<npc Robin>><<person1>>
 <</if>>
 <<language>>
@@ -384,7 +384,7 @@
       The catalogues agree that the painting is centuries old.
       The stories agree on little beyond a persecuted wise woman, a gaoler and the temple's hostility.
     <</if>>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       <br><br>
       Robin sorts the accounts by date and copies each citation onto a separate slip.
         "These three all repeat the same book," <<he>> says.
@@ -402,7 +402,7 @@
       目录一致认为画作已有数百年历史。
       至于遭受迫害的智者、狱卒与神殿的敌意，各版故事除此之外几乎没有共识。
     <</if>>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       <br><br>
       罗宾按年代整理记载，又把每条引文分别抄到纸条上。
         “这三份其实都在转述同一本书，”<<he>>说道，
@@ -471,7 +471,7 @@
 
 :: Deadwood Reblooms History Project Museum []
 <<set $outside to 0>><<set $location to 'museum'>><<effects>>
-<<if $LifeSimulation.historyProject.assistant>>
+<<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
   <<npc Robin>><<person1>>
 <</if>>
 <<language>>
@@ -486,7 +486,7 @@
       The translated title remains on the back of the carved frame.
       Burns, water damage and a silver-lined cut scar the canvas.
     <</if>>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       <br><br>
       Robin arranges the cards by date, careful not to lean across the painting.
         "This description was copied from a later one," <<he>> says.
@@ -502,7 +502,7 @@
       雕花画框背面仍保留着题名的原文。
       火烧、水浸，以及一道残留银屑的割痕共同留在画布上。
     <</if>>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       <br><br>
       罗宾按日期排好卡片，小心地避开画作。
         “这段说明抄自更晚的一份。”<<he>>说道，
@@ -520,7 +520,7 @@
 
 :: Deadwood Reblooms History Project Museum Finish []
 <<set $LifeSimulation.historyProject.museum to $phase is 0 ? 30 : 18>>
-<<if $LifeSimulation.historyProject.assistant>>
+<<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
   <<npc Robin>><<person1>>
 <</if>>
 <<language>>
@@ -544,7 +544,7 @@
       The proposed costume is an unfinished reconstruction held together with pins and narrow ties.
       You remove your outer clothes before stepping into it.
       <br><br>
-      <<if $LifeSimulation.historyProject.assistant>>
+      <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
         Robin holds a folding screen around you and compares each loose panel with the painted figure.
         When a curator approaches, <<he>> abandons the notes and presses the screen closed,
         <span class="lewd">trapping <<himself>> inside with you</span>. "It still needs work," <<he>> whispers, bright red.
@@ -583,7 +583,7 @@
       拟用于展览的复原服装尚未完工，只靠别针和细带固定。
       你脱去外衣，随后钻了进去。
       <br><br>
-      <<if $LifeSimulation.historyProject.assistant>>
+      <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
         罗宾把折叠屏风围在你身边，对照画中人物检查每一片松散的布料。
         馆员的脚步声接近时，<<he>>扔下笔记，匆忙合拢屏风，
         结果<span class="lewd">把<<himself>>也关在了里面</span>。“还得再改改。”<<he>>满脸通红地低声说道。
@@ -605,7 +605,7 @@
 
 :: Deadwood Reblooms History Project Lake Preparation []
 <<set $outside to 1>><<set $location to 'lake'>><<effects>><<lakeeffects>>
-<<if $LifeSimulation.historyProject.assistant>>
+<<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
   <<npc Robin>><<person1>>
 <</if>>
 <<language>>
@@ -614,7 +614,7 @@
     You mark the planned route on a slate, knot the guide rope at measured intervals
     and fasten a padded recovery pouch to your diving suit.
     <br><br>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       Robin copies the route onto a second slate while you test both tethers.
         "I'm not a great swimmer," <<person1>><<he>> admits,
         fastening <<his>> line beside yours, "but I'm not letting you go down there alone."
@@ -627,7 +627,7 @@
     你把预定路线画在记录板上，按固定间距给导向绳打结，
     又将内衬软垫的回收袋系在潜水服外。
     <br><br>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       你测试两根安全绳时，罗宾把路线誊写到第二块记录板上。
         “我不太会游泳，”<<person1>><<he>>承认道，
         同时把<<his>>绳索扣在你的绳索旁，“但我不会让你独自下去。”
@@ -641,7 +641,7 @@
 
 :: Deadwood Reblooms History Project Lake Descent []
 <<set $outside to 0>><<set $location to 'lake_ruin'>><<underwater>><<effects>><<lakeeffects>>
-<<if $LifeSimulation.historyProject.assistant>>
+<<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
   <<npc Robin>><<person1>>
 <</if>>
 <<language>>
@@ -651,7 +651,7 @@
     Weathered figures with six arms repeat along the walls,
     interrupted by a sealed doorway ringed with unfamiliar runes.
     Purple lichen glows between the stones like veins beneath skin.
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       Robin keeps one hand locked around the rope and the other around your wrist.
         Each time the current turns <<him>> sideways, <<he>> looks to you before continuing.
       <<if $LifeSimulation.historyProject.kylar is 'sabotage' and $LifeSimulation.historyProject.kylarStreet and !$LifeSimulation.historyProject.kylarPrepared >>
@@ -674,7 +674,7 @@
     墙面上反复出现风化的六臂人像，一道封死的门扉打断了它们，
     门边还环绕着你无法辨认的符文。
     紫色地衣在石缝间发光，仿佛皮肤下的血管。
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       罗宾一只手紧抓导向绳，另一只手握住你的手腕。
         每次水流把<<him>>冲得偏转，<<he>>都会先看向你，再继续前进。
       <<if $LifeSimulation.historyProject.kylar is 'sabotage' and $LifeSimulation.historyProject.kylarStreet and !$LifeSimulation.historyProject.kylarPrepared >>
@@ -703,7 +703,7 @@
   <<set $antiquemoney += 4000>>
   <<museumAntiqueStatus 'antiquegoldpriestess' 'found'>>
 <</if>>
-<<if $LifeSimulation.historyProject.assistant>>
+<<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
   <<npc Robin>><<person1>>
 <</if>>
 <<language>>
@@ -717,7 +717,7 @@
     The broken wall stretches into a vast stone chamber.
     Cages line its edges. Shackles gleam inside them.
     A pale figure watches from beyond the bars while your tether becomes a golden chain around your ankles.
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       Robin catches you as you recoil.
         <<person1>><<His>> frightened face stays real while the pale figure draws closer.
         <<He>> presses your hand to the knots in the guide rope, trying to make you count them.
@@ -734,7 +734,7 @@
     断墙向两侧延伸，化作一间巨大的石室。
     囚笼沿墙排列，里面的镣铐反射着紫光。
     一道苍白的身影隔着栏杆注视着你，导向绳也化作了锁在脚踝上的金制镣铐。
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       你后退时，罗宾一把接住了你。苍白身影不断逼近，
         只有<<person1>><<his>>惊恐的面孔仍然真实。
         <<He>>把你的手按在导向绳的绳结上，试图让你数清它们。
@@ -744,7 +744,7 @@
 <</language>>
 <<hallucinogen 120>><<gghallucinogens>>
 <br><br>
-<<if $LifeSimulation.historyProject.assistant>>
+<<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
   <<loveicon>><<lanLink ['Follow Robin', '跟随罗宾'] 'Deadwood Reblooms History Project Lake Robin' >><</lanLink>><<glove 'Robin'>><br>
   <<if $robinromance is 1>>
     <<getinicon>><<lanLink ['Enter the air pocket with Robin', '与罗宾进入气穴'] 'Deadwood Reblooms History Project Lake Robin Hallucination' >><</lanLink>><<promiscuous2>><<kissvirginitywarning>><<NPCvirginitywarning 'Robin' 'kiss'>><br>
@@ -986,7 +986,7 @@
 
 :: Deadwood Reblooms History Project Lake Return []
 <<set $outside to 1>><<set $location to 'lake'>><<effects>><<lakeeffects>>
-<<if $LifeSimulation.historyProject.assistant>>
+<<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
   <<npc Robin>><<person1>>
 <</if>>
 <<set $_historyKylarCompromised to $LifeSimulation.historyProject.kylar is 'sabotage' and $LifeSimulation.historyProject.kylarStreet and !$LifeSimulation.historyProject.kylarPrepared >>
@@ -1011,7 +1011,7 @@
       <br><br>
       <span class="teal">The recovery record remains incomplete.</span>
     <</if>>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       <br><br>
       Robin copies the fading measurements onto dry paper while you redraw the chamber.
         When <<person1>><<his>> hand begins to shake, <<he>> presses it against yours until both are steady.
@@ -1034,7 +1034,7 @@
       <br><br>
       <span class="teal">这份回收记录仍不完整。</span>
     <</if>>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       <br><br>
       你重画石室时，罗宾趁测量数据消退前，把它们誊写到干纸上。
         <<person1>><<his>>手指开始发抖时，<<he>>把手压在你的手上，直到两人都稳定下来。
@@ -1047,7 +1047,7 @@
 
 :: Deadwood Reblooms History Project Draft []
 <<set $outside to 0>><<set $location to 'home'>><<effects>>
-<<if $LifeSimulation.historyProject.assistant>>
+<<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
   <<npc Robin>><<person1>>
 <</if>>
 <<language>>
@@ -1064,7 +1064,7 @@
       Nothing you found turns one of those versions into an eyewitness account.
     <</if>>
     <br><br>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       Robin trims labels and pins them beside the cards.
         "This one says what the catalogue wrote," <<he>> says, passing you a card.
         "This one says what people kept saying. They shouldn't look the same."
@@ -1089,7 +1089,7 @@
       你找到的东西中，没有一样能把某个版本变成亲历记录。
     <</if>>
     <br><br>
-    <<if $LifeSimulation.historyProject.assistant>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       罗宾裁好标签，把它们钉在卡片旁。
         “这张写目录上原本怎么写的，”<<he>>说道，把一张卡递给你，
         “那张写大家后来一直在说什么。它们不该看起来完全一样。”

@@ -3,26 +3,31 @@
 import NPCAvatars, { type AvatarOverlay, type AvatarProfile, type NPCData } from './MoreLoveInterestsAndNPCAvatars/Avatars';
 
 class MoreLoveInterests {
+  private partners?: string[];
+
   public constructor(
     readonly core: typeof maplebirch,
     readonly avatars: NPCAvatars
   ) {}
 
   public preInit(): void {
-    this.core.once(':sugarcube', () => {
-      this.core.tool.macro.defineS('moreLoveInterest', () => this.panel);
-      this.core.tool.macro.defineS('moreLoveInterestMessage', () => this.message);
-      this.core.dynamic.regStateEvent('gate', 'MoreLoveInterest', {
-        output: 'moreLoveInterestMessage',
-        action: () => {
-          if (this.level >= 4) {
-            V.moreLoveInterest_message = true;
-            return;
-          }
-          V.loveInterestList = V.loveInterestList.slice(0, Math.max(1, this.level));
-        },
-        cond: () => V.loveInterestList?.length > Math.max(1, this.level) && (this.level < 4 || !V.moreLoveInterest_message)
-      });
+    this.core.tool.macro.defineS('moreLoveInterest', () => {
+      this.sync();
+      this.partners = V.loveInterestList.slice();
+      return this.panel;
+    });
+    this.core.tool.macro.defineS('moreLoveInterestMessage', () => this.message);
+    this.core.dynamic.regStateEvent('gate', 'MoreLoveInterest', {
+      output: 'moreLoveInterestMessage',
+      action: () => {
+        if (this.level >= 4) {
+          V.moreLoveInterest_message = true;
+          return;
+        }
+        V.loveInterestList = V.loveInterestList.slice(0, Math.max(1, this.level));
+        this.sync();
+      },
+      cond: () => V.loveInterestList?.length > Math.max(1, this.level) && (this.level < 4 || !V.moreLoveInterest_message)
     });
     this.core.once(':variable', () => this.sync());
     this.core.once(':storyready', () => document.querySelector('.love-interests')?.replaceWith(this.panel));
@@ -58,12 +63,22 @@ class MoreLoveInterests {
   }
 
   public remove(name: string): void {
+    if (!Array.isArray(V.loveInterestList)) this.sync();
     V.loveInterestList = V.loveInterestList.filter((n: string) => n !== name);
     this.sync();
   }
 
-  get panel(): HTMLElement {
+  public add(name: string): void {
+    if (!Array.isArray(V.loveInterestList)) this.sync();
+    if (!V.loveInterestList.includes(name)) V.loveInterestList.push(name);
     this.sync();
+  }
+
+  get breaks(): boolean {
+    return V.transformationParts.traits.mateForLife !== 'disabled' && (this.partners?.some(name => !window.isLoveInterest(name)) ?? false);
+  }
+
+  get panel(): HTMLElement {
     const panel = document.createElement('section');
     panel.className = 'love-interests';
 
@@ -82,6 +97,15 @@ class MoreLoveInterests {
         V.loveInterestList.length
       )
     );
+    if (this.breaks) {
+      const warning = document.createElement('div');
+      warning.className = 'red';
+      warning.textContent = lanSwitch(
+        'Changing your partners goes against your instincts to mate for life. It will take a toll on your mental state.',
+        '更换伴侣违背了你终身相伴的誓言，这会对你的精神造成损伤。'
+      );
+      panel.append(warning);
+    }
     return panel;
   }
 
@@ -193,7 +217,7 @@ class MoreLoveInterestsAndNPCAvatars {
 
   public constructor(readonly core: typeof maplebirch) {
     this.avatars = new NPCAvatars({
-      exists: path => window.modSC2DataManager.getHtmlTagSrcHook().checkImageExist(path),
+      exists: path => this.core.host.modLoader.resources.has(path),
       load: async path => {
         const image = await loadImage(path);
         return typeof image === 'string' ? image : undefined;
@@ -203,10 +227,8 @@ class MoreLoveInterestsAndNPCAvatars {
   }
 
   public preInit(): void {
-    this.core.once(':sugarcube', () => {
-      this.core.tool.macro.defineS('relationshipicon', (name: string) => this.avatars.avatar(name));
-      this.core.tool.macro.defineS('mimicicon', () => this.avatars.mimic());
-    });
+    this.core.tool.macro.defineS('relationshipicon', (name: string) => this.avatars.avatar(name));
+    this.core.tool.macro.defineS('mimicicon', () => this.avatars.mimic());
     this.loveInterests.preInit();
   }
 
@@ -238,6 +260,14 @@ class MoreLoveInterestsAndNPCAvatars {
 
   public remove(name: string): void {
     this.loveInterests.remove(name);
+  }
+
+  public addLoveInterest(name: string): void {
+    this.loveInterests.add(name);
+  }
+
+  get breaks(): boolean {
+    return this.loveInterests.breaks;
   }
 
   public Init(): void {

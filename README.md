@@ -21,11 +21,13 @@
 ## 安装与前置
 
 1. 准备支持 SugarCube 2 ModLoader 的 **DoL 0.5.12.13**。
-2. 加载 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)，版本须满足模组包声明的 `maplebirch >= 5.2.0`，并安装模组包所列的其他前置。
+2. 加载 [秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)，版本须满足模组包声明的 `maplebirch >= 5.2.2`，并安装模组包所列的其他前置。
 3. 从 [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases) 加载 `deadwood-reblooms-*.modpack`。需要动态音乐时，再加载对应的 `deadwood-reblooms-audio-*.modpack`。
 4. 需要调整模块时，在框架的模块管理中启用或关闭，并按提示重载。
 
 `DeadwoodReblooms` 是根模块，关闭它会停用所有子模块。检测到功能重叠的外部模组时，枯木逢春会关闭自身对应模块，保留外部模组。角色剧情仍遵循原版的人物关系、地点和日程条件。
+
+当前版本为 **1.3.0**，完整改动见[更新说明](.github/release-notes/v1.3.0.md)。新增果园、埃利斯与金融中心职业内容，并整理校园日程、战斗、服装和药效结算。
 
 ## 模块与游戏指南
 
@@ -37,9 +39,10 @@
 | `Whitney`                           | 地下妓院营救、重逢与后续日常                   |
 | `Kylar`                             | 凯拉尔庄园留宿与房间互动                       |
 | `LifeSimulation`                    | 免听凭证、风纪委员、学生会长、校园评价及健身房 |
-| `VanillaPlus`                       | 属性突破、住宅、银行、证券及其他原版增强       |
+| `Orchard`                           | 神殿与农场果园、果树照料、逐步开垦与雇工       |
+| `VanillaPlus`                       | 属性突破、住宅、金融中心、银行与证券           |
 | `CelestialAnomalies`                | 日蚀、流星雨与天气画面变化                     |
-| `MoreTransformations`               | 马与鱼转化及相关地点、装备和特质               |
+| `MoreTransformations`               | 马、鱼与渡鸦转化及相关地点、装备和特质         |
 | `LongerCombat`                      | 更长的遭遇战、分阶段对白与体液显示             |
 | `MoreLoveInterestsAndNPCAvatars`    | 更多恋人与社交栏小头像                         |
 | `NPCSidebarPortrait`                | 场景与侧边栏的 NPC 立绘                        |

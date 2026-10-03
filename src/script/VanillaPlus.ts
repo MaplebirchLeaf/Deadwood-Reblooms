@@ -17,12 +17,10 @@ import Willpower from './VanillaPlus/Willpower';
 export default function (maplebirch: typeof window.maplebirch) {
   'use strict';
 
-  maplebirch.once(':sugarcube', () => {
-    const { macro } = maplebirch.tool;
-    macro.create('lwillpower', () => macro.statChange(`${lanSwitch('Willpower', '意志')}`, -1, 'lblue'));
-    macro.create('llwillpower', () => macro.statChange(`${lanSwitch('Willpower', '意志')}`, -2, 'lblue'));
-    macro.create('lllwillpower', () => macro.statChange(`${lanSwitch('Willpower', '意志')}`, -3, 'lblue'));
-  });
+  const { macro } = maplebirch.tool;
+  macro.create('lwillpower', () => macro.statChange(`${lanSwitch('Willpower', '意志')}`, -1, 'lblue'));
+  macro.create('llwillpower', () => macro.statChange(`${lanSwitch('Willpower', '意志')}`, -2, 'lblue'));
+  macro.create('lllwillpower', () => macro.statChange(`${lanSwitch('Willpower', '意志')}`, -3, 'lblue'));
 
   maplebirch.tool.addTo('DegreesBonusDisplay', 'deadwood-reblooms-characteristics-degrees-display');
   maplebirch.tool.onInit(() => {

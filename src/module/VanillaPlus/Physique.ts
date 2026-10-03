@@ -18,17 +18,13 @@ class Physique {
     return V.VanillaPlus.traits.physique && !V.VanillaPlus.physique.breakUsed;
   }
 
-  public reset(): void {
-    V.VanillaPlus.physique.breakUsed = false;
-  }
-
   public use(): void {
     V.VanillaPlus.physique.breakUsed = true;
   }
 
-  public get outsideBreakAvailable(): boolean {
+  public outsideBreak(): boolean {
     if (V.combat === 1 || !V.VanillaPlus.traits.physique) return false;
-    this.reset();
+    V.VanillaPlus.physique.breakUsed = false;
     return window.breakableSoftBinding();
   }
 }

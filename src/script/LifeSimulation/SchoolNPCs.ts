@@ -1,5 +1,6 @@
 import { SCHOOL_CAMPUS_LOCATIONS, SCHOOL_STUDENT_ROSTER, type SchoolDressPolicy, type SchoolStudent } from '../../module/LifeSimulation/School';
 import type { WardrobeItem } from '../../module/NPCSidebarPortrait';
+import { sync } from '../NamedNPCSidebarPortrait/NPCOutfitSets/Clothes';
 
 export default function SchoolNPCs(maplebirch: typeof window.maplebirch): void {
   if (!maplebirch.get('NPCSidebarPortrait')) return;
@@ -36,6 +37,8 @@ export default function SchoolNPCs(maplebirch: typeof window.maplebirch): void {
         if (policy === 'free') applyFreeDress(student, clothes);
         else applyRevealingDress(student, clothes);
       });
+      // 服饰政策先改完立绘，最后只同步一次给原版具名 NPC 与本次 npcInject。
+      wardrobe.modify(student, (clothes, context) => sync(student, context.key === 'naked' ? 'naked' : `${student.toLowerCase()}_${context.key}`, clothes));
     }
   });
 }

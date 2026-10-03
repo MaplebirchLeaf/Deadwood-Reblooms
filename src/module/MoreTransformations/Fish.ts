@@ -221,7 +221,7 @@ class Fish extends Transformation {
           },
           // 在游泳技能结算完成后追加概率鱼化成长，不改变原版技能上限与增长流程。
           {
-            src: '<<set $swimmingskill to Math.clamp($swimmingskill, 0, 1000)>>',
+            srcmatch: /<<set \$swimmingskill to Math\.clamp\(\$swimmingskill, 0, 1000(?: \* \$AMCTraits\.swimming)?\)>>/,
             applyafter: '<<if $rng <= 30>><<transform "fish" 1>><</if>>',
             expected: 1
           },

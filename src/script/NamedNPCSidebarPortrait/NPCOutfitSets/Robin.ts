@@ -52,7 +52,7 @@ export default function (maplebirch: MaplebirchCore): void {
       }
     }
 
-    wardrobe.modify('Robin', (clothes, context) => sync('Robin', context.key === 'naked' ? 'naked' : `robin_${context.key}`, clothes));
+    if (!maplebirch.get('LifeSimulation')) wardrobe.modify('Robin', (clothes, context) => sync('Robin', context.key === 'naked' ? 'naked' : `robin_${context.key}`, clothes));
 
     maplebirch.on(
       ':npcInject',

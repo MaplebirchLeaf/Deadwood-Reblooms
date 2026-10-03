@@ -109,10 +109,6 @@ class DynamicMusicRegistry {
   public selectTrack(state: MusicState): DynamicMusicTrack | null {
     return [...this.tracks.values()].sort((left, right) => right.priority - left.priority).find(track => track.when(state)) ?? null;
   }
-
-  public select(state: MusicState): string | null {
-    return this.selectTrack(state)?.track ?? null;
-  }
 }
 
 interface ActiveAmbience {

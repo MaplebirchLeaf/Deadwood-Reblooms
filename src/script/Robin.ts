@@ -60,6 +60,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
     { widget: 'deadwood-robin-night-link', passage: "Robin's Room Entrance" },
     { widget: 'deadwood-robin-tutor-link', passage: 'Danube Street' },
     { widget: 'deadwood-robin-asylum-links', passage: 'Asylum' },
+    { widget: 'deadwood-robin-tentacle-plains-link', passage: 'Tentacle Plains' },
     { widget: 'deadwood-robin-tutor-clue', passage: 'Orphanage' },
     { widget: 'deadwood-robin-meteor-hall-link', passage: 'Orphanage' }
   );
@@ -96,9 +97,53 @@ export default function (maplebirch: typeof window.maplebirch): void {
           applyafter: "\n\t<<if $RobinExpansion.asylum.status is 'admitted'>><<unset $robinReunionScene>><</if>>",
           expected: 1
         }
+      ],
+      'Widgets School Events': [
+        {
+          // 原版位置函数返回字符串，不接受地点参数。非空的 asylum 也会被误判为真。
+          src: 'getRobinLocation("school")',
+          to: 'getRobinLocation() is "school"',
+          expected: 1
+        }
+      ],
+      Pregnancy2: [
+        {
+          src: 'C.npc.Robin.init is 1',
+          applyafter: " and $RobinExpansion.asylum.status isnot 'admitted'",
+          expected: 1
+        }
       ]
     },
     locationPassage: {
+      // 保留原版探望、援助条件，仅排除本模组收容中的罗宾。
+      'School Infirmary Wakeup': [
+        {
+          src: 'C.npc.Robin.init is 1',
+          applyafter: " and $RobinExpansion.asylum.status isnot 'admitted'",
+          expected: 1
+        }
+      ],
+      'Canteen Lunch Whitney Milking Strip Finish': [
+        {
+          src: 'C.npc.Robin.init is 1',
+          applyafter: " and $RobinExpansion.asylum.status isnot 'admitted'",
+          expected: 1
+        }
+      ],
+      'Canteen Kylar Whitney Intervene': [
+        {
+          src: 'C.npc.Robin.init is 1',
+          applyafter: " and $RobinExpansion.asylum.status isnot 'admitted'",
+          expected: 1
+        }
+      ],
+      'Canteen Kylar Whitney Intervene Finish': [
+        {
+          src: 'C.npc.Robin.init is 1',
+          applyafter: " and $RobinExpansion.asylum.status isnot 'admitted'",
+          expected: 1
+        }
+      ],
       Sleep: [
         {
           src: '<<set $wardrobe_location to "wardrobe">>',

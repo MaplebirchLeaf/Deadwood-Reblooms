@@ -61,12 +61,8 @@ class Mortgage {
     V.VanillaPlus.real_estate.mortgage = value;
   }
 
-  public downPayment(price: number): number {
-    return Math.ceil((price * this.terms.down_payment_percent) / 100);
-  }
-
   public purchaseCosts(price: number): { deposit: number; fee: number; weekly_payment: number; reserve: number } {
-    const deposit = this.downPayment(price);
+    const deposit = Math.ceil((price * this.terms.down_payment_percent) / 100);
     const principal = price - deposit;
     const { closing_fee_percent, payment_reserve_weeks, term_days, weekly_interest_rate } = this.terms;
     const weekly_payment = Mortgage.instalment(principal, Math.ceil(term_days / 7), weekly_interest_rate);
@@ -186,7 +182,8 @@ class Mortgage {
         const due = Math.min(loan.outstanding, scheduled + loan.arrears);
         const paid = this.finance.collectBankPennies(due);
         loan.outstanding -= paid;
-        loan.arrears = Math.max(0, loan.arrears + scheduled - paid);
+        // 到期应还全部余额，其中已包含旧欠款。逾期标记不能超过剩余债务。
+        loan.arrears = Math.min(loan.outstanding, Math.max(0, loan.arrears + scheduled - paid));
         if (loan.outstanding === 0) {
           this.current = null;
           break;

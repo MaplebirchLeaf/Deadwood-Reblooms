@@ -189,6 +189,13 @@ class School {
     return true;
   }
 
+  /** 项目约定不覆盖缺席、受伤或收容。校园内协助还要求罗宾实际在校。 */
+  public get historyAssistantAvailable(): boolean {
+    if (!V.LifeSimulation.historyProject.assistant || C.npc.Robin?.init !== 1 || V.robinmissing || V.robin?.timer?.hurt !== 0 || V.RobinExpansion?.asylum?.status === 'admitted') return false;
+    const location = window.getRobinLocation();
+    return location !== 'asylum' && (V.location !== 'school' || location === 'school');
+  }
+
   public get canSupplyDrinks(): boolean {
     return this.state.role !== 'student' && V.RobinExpansion?.shop === true && V.RobinExpansion.shopStock > 0 && V.RobinExpansion.school_drinks_day !== Time.days;
   }
@@ -400,16 +407,18 @@ class School {
   private isStudentAvailable(student: SchoolStudent): boolean {
     const npc = C.npc?.[student];
     if (npc?.init !== 1 || ['prison', 'pillory', 'dungeon'].includes(npc.state)) return false;
-    if (this.core.get('NPCSidebarPortrait')) return SCHOOL_CAMPUS_LOCATIONS[student].includes(this.core.npc.Schedule.location[student] ?? '');
+    // 立绘日程用于选择衣装，不能把受伤、留院或尚未到校的罗宾召到校门。
+    if (student === 'Robin') return !V.robinmissing && V.robin.timer.hurt === 0 && V.RobinExpansion?.asylum?.status !== 'admitted' && window.getRobinLocation() === 'school';
+    // late 仍可用于绘制悉尼的校服，但实际表示尚未起床。
+    if (student === 'Sydney' && (V.daily.sydney?.punish === 1 || V.sydneyLate === 1 || (V.sydney_location_override && V.replayScene))) return false;
+    if (this.core.get('NPCSidebarPortrait')) return SCHOOL_CAMPUS_LOCATIONS[student].includes(this.core.npc.Schedule.get(student).location ?? '');
 
     // 侧栏可单独关闭。值勤目标仍须遵守原版晨间日程，不能仅凭 NPC 处于 active 状态就召到校门。
     switch (student) {
-      case 'Robin':
-        return window.getRobinLocation() === 'school';
       case 'Kylar':
         return SCHOOL_CAMPUS_LOCATIONS.Kylar.includes(window.getKylarLocation().area);
       case 'Sydney':
-        return V.daily.sydney?.punish !== 1 && V.sydneyLate !== 1 && !(V.sydney_location_override && V.replayScene);
+        return true;
       case 'Whitney':
         return Time.schoolDay && Time.hour >= 7;
     }

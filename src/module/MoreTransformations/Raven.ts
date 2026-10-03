@@ -275,19 +275,19 @@ class Raven extends Transformation {
     const impact = /<<violence ([1-9]\d*)>>(?=(?:(?!<<violence|<<bruise neck>>)[^\r\n])*<<hitstat>>)/g;
     const armour = "`maplebirch.get('MoreTransformations').Raven.armour`";
     const speech = "maplebirch.get('MoreTransformations').Raven.speech";
-    const hits = (expected: number) => ({ srcmatchgroup: impact, to: `<<violence $1 1 1 ${armour}>>`, expected });
+    // DoLP 扩展了人类与兽类的击打分支。按 hitstat 语义匹配，其他固定分支仍校验数量。
+    const hits = (expected?: number) => ({ srcmatchgroup: impact, to: `<<violence $1 1 1 ${armour}>>`, ...(expected === undefined ? {} : { expected }) });
     maplebirch.tool.inject({
       widgetPassage: {
         'Widgets Combat Man-Combat': [
-          hits(40),
+          hits(),
           {
-            src: '<<violence `($spankobject is "paddle" ? 10 : 5)` 1 1 1 _n>>',
-            to: `<<violence \`($spankobject is "paddle" ? 10 : 5)\` 1 1 ${armour} _n>>`,
-            expected: 1
-          },
-          ...[5, 20, 2].map(amount => ({ src: `<<violence ${amount} 1 1 1 _n>>`, to: `<<violence ${amount} 1 1 ${armour} _n>>`, expected: 1 }))
+            // DoLP 将拍打拆成多个力度分支，保留每个分支的伤害与攻击者索引。
+            srcmatchgroup: /<<violence (10|5|20|2|`\(\$spankobject is "paddle" \? 10 : 5\)`) 1 1 1 _n>>/g,
+            to: `<<violence $1 1 1 ${armour} _n>>`
+          }
         ],
-        'Widgets Combat Beast': [hits(4)],
+        'Widgets Combat Beast': [hits()],
         'Widgets Combat Tentacle Test': [hits(6)],
         'Widgets Combat Tentacle Adv': [hits(6)],
         'Widgets Actions Speak': [

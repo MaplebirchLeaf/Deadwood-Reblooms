@@ -11,6 +11,14 @@
     function passRentTick() {
       if (maplebirch.get('Robin') && V.RobinExpansion?.baileyDefeated) return;
 
+- comment: '留院位置接入原版函数内部，避免 statusCheck 的内部调用绕过 window 上的日程扩展。'
+  fileName: 'ingame.js'
+  from: 'else if (V.robinlocationoverride && V.robinlocationoverride.during.includes(Time.hour)) {'
+  before: |
+    else if (maplebirch.get('Robin') && V.RobinExpansion?.asylum?.status === 'admitted') {
+      T.robin_location = 'asylum';
+    }
+
 - comment: '悉尼事先答应当晚回家时，将原版日程同步转为 home，直至次日清晨，避免半夜突然回到神殿。'
   fileName: 'named-npc.js'
   from: 'if (T.sydney_location === "temple") {'

@@ -50,7 +50,7 @@
 
 <!-- 科学课互动：提供核对笔记、聊天等常规行动。 -->
 <<widget 'deadwood-reblooms-sydney-science-actions'>>
-  <<if $sydneyScience is 1 and _sydney_location is 'science'>>
+  <<if maplebirch.get('Sydney').available and $sydneyScience is 1 and _sydney_location is 'science'>>
     <<scienceicon>><<lanLink ['Compare notes with Sydney', '和悉尼核对笔记'] 'Deadwood Reblooms Sydney Science Study' >><</lanLink>><<gstress>><<gscience>><<glove 'Sydney'>>
     <br>
     <<socialiseicon>><<lanLink ['Chat with Sydney', '和悉尼聊天'] 'Deadwood Reblooms Sydney Science Chat' >><</lanLink>><<gcool>><<lstress>><<glove 'Sydney'>>
@@ -154,34 +154,34 @@
   <<schoolicon 'science'>><<lanLink '继续上课' 'Science Lesson'>><<endevent>><</lanLink>><br>
 <</widget>>
 
-<!-- 迟到补救入口：Sydney 尚未到过科学课时提供叫醒选项。 -->
+<!-- 迟到补救入口：仅在上课日清晨，原版日程确认悉尼睡过头时显示。 -->
 <<widget 'deadwood-reblooms-sydney-science-late-intro'>>
-  <<if $sydneyScience is 1 and !$sydneySeen.includes('science')>>
+  <<sydneySchedule>>
+  <<if maplebirch.get('Sydney').available and $exposed lte 0 and Time.schoolDay and _sydney_location is 'late' and $sydneyScience is 1 and !$sydneySeen.includes('science')>>
     <br>
-    <<npc Sydney>><<person1>>
-  <<language>>
-    <<option 'EN'>>
-      You find Sydney asleep on a pew, with <<his>> neatly folded school clothes beside <<him>>.
-      <<if Time.hour is 9>>
-        <<He>> has slept through the start of <<his>> new science class.
-      <<else>>
-        If no one wakes <<him>>, <<he>> may miss <<his>> first science class with you.
-      <</if>>
-    <<option 'CN'>>
-      你发现悉尼睡在长椅上，身旁放着叠得整整齐齐的校服。
-      <<if Time.hour is 9>>
-        <<He>>已经错过了换到这间教室后的第一堂科学课开头。
-      <<else>>
-        如果没人叫醒<<him>>，<<he>>可能会错过第一次和你一起上的科学课。
-      <</if>>
-  <</language>>
+    <<language>>
+      <<option 'EN'>>
+        You find Sydney asleep on a pew, with <<nnpc_his 'Sydney'>> neatly folded school clothes beside <<nnpc_him 'Sydney'>>.
+        <<if Time.hour is 9>>
+          <<nnpc_He 'Sydney'>> has slept through the start of <<nnpc_his 'Sydney'>> new science class.
+        <<else>>
+          If no one wakes <<nnpc_him 'Sydney'>>, <<nnpc_he 'Sydney'>> may miss <<nnpc_his 'Sydney'>> first science class with you.
+        <</if>>
+      <<option 'CN'>>
+        你发现悉尼睡在长椅上，身旁放着叠得整整齐齐的校服。
+        <<if Time.hour is 9>>
+          <<nnpc_He 'Sydney'>>已经错过了换到这间教室后的第一堂科学课开头。
+        <<else>>
+          如果没人叫醒<<nnpc_him 'Sydney'>>，<<nnpc_he 'Sydney'>>可能会错过第一次和你一起上的科学课。
+        <</if>>
+    <</language>>
     <br>
     <<if Time.hour is 9>>
       <<templeicon 'pew'>><<lanLink '叫醒悉尼' 'Deadwood Reblooms Sydney Science Late Wake'>><<npcincr Sydney love 1>><</lanLink>>
     <<else>>
       <<templeicon 'pew'>><<lanLink '叫醒悉尼' 'Temple Sydney Wakeup'>><<npcincr Sydney love 1>><</lanLink>>
     <</if>>
-    <<glove>>
+    <<glove 'Sydney'>>
     <br>
   <</if>>
 <</widget>>
@@ -283,6 +283,7 @@
 <</language>>
 <<npcincr Sydney love 1>><<glove>><<advancelesson>><<scienceskill _lesson_progress>><<stress _lesson_progress>>
 <br><br>
+<<endnpc>>
 <<if $phase is 1>>
   <<lessonEnd 'scienceClassroom'>>
 <<else>>
@@ -322,6 +323,7 @@
 <<set _stress to _lesson_progress * -1>><<stress _stress>>
 <<set _trauma to _lesson_progress * -0.5>><<trauma _trauma>>
 <br><br>
+<<endnpc>>
 <<if $phase is 1>>
   <<lessonEnd 'scienceClassroom'>>
 <<else>>

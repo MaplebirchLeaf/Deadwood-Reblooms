@@ -133,13 +133,17 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     }
   });
 
-  maplebirch.dynamic.regStateEvent('gate', 'life-simulation-school-clothes', {
-    output: 'deadwood-reblooms-life-simulation-school-restore-clothes',
-    cond: () => V.LifeSimulation?.school?.clothesStored === true && V.location !== 'school'
-  });
-  maplebirch.dynamic.regStateEvent('gate', 'life-simulation-school-dress-enforcement', {
-    output: 'deadwood-reblooms-life-simulation-school-enforce-clothes',
-    cond: () => V.location === 'school' && maplebirch.get('LifeSimulation')!.school.requiresNudity && V.LifeSimulation?.school?.clothesStored !== true
+  // 地点由正文写入后再处理衣物，随后仍由原版 effects 计算暴露与服装状态。
+  maplebirch.tool.onInit(() => {
+    const effects = maplebirch.tool.macro.Macro.get('effects')?.handler;
+    if (typeof effects !== 'function') return;
+    maplebirch.tool.macro.define('effects', function () {
+      const school = maplebirch.get('LifeSimulation')?.school;
+      if (school && (V.LifeSimulation?.school?.clothesStored || school.requiresNudity)) {
+        this.output.append(maplebirch.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-life-simulation-school-sync-clothes>>'));
+      }
+      return effects.call(this);
+    });
   });
 
   maplebirch.tool.inject({
@@ -162,9 +166,50 @@ export default function School(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
-      'Sydney Walk': [detention(1)]
+      'School Infirmary Kylar Walk': [
+        {
+          src: '<<set $location to "arcade">><<set $bus to "starfish">>',
+          applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
+          expected: 1
+        },
+        {
+          src: '<<set $location to "park">><<set $bus to "park">>',
+          applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
+          expected: 1
+        }
+      ],
+      'Sydney Walk': [
+        detention(1),
+        {
+          src: '<<set $location to "town">>',
+          applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
+          expected: 1
+        }
+      ],
+      'Sydney Walk Shopping': [
+        {
+          src: '<<set $exit to "library">><<set $location to "park">>',
+          applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
+          expected: 1
+        }
+      ],
+      'Sydney Walk Beach': [
+        {
+          src: '<<set $exit to "library">><<set $location to "town">>',
+          applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
+          expected: 1
+        }
+      ]
     },
     widgetPassage: {
+      'Widgets Changing Room': [
+        {
+          // 四个正常离校链接共用此宏。拦截留堂时也只恢复一次。
+          src: '<<storeon "school pool girls" "return">>',
+          applyafter: '\n\t<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
+          expected: 1
+        }
+      ],
       'Widgets Sydney': [detention(3)],
       Social: [
         {

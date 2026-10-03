@@ -21,11 +21,13 @@
 ## Installation and dependencies
 
 1. Use a **DoL 0.5.12.13** build with SugarCube 2 ModLoader.
-2. Load the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). Its version must satisfy the mod package's `maplebirch >= 5.2.0` requirement, together with the other listed dependencies.
+2. Load the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). Its version must satisfy the mod package's `maplebirch >= 5.2.2` requirement, together with the other listed dependencies.
 3. From [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases), load `deadwood-reblooms-*.modpack`. To use dynamic music, also load the corresponding `deadwood-reblooms-audio-*.modpack`.
 4. To change modules, use the framework's module manager and reload when prompted.
 
 `DeadwoodReblooms` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
+
+The current version is **1.3.0**. See the [release notes](.github/release-notes/v1.3.0.md) for the full changes. This release adds orchards, Ellis and financial-centre work, and refines school schedules, combat, clothing and medicine settlement.
 
 ## Modules and game guide
 
@@ -37,9 +39,10 @@
 | `Whitney`                           | Underground brothel rescue, reunion, and daily interactions               |
 | `Kylar`                             | Manor stays and room interactions                                         |
 | `LifeSimulation`                    | Attendance pass, prefect, student president, school reputation, and gym   |
-| `VanillaPlus`                       | Stat breakthroughs, homes, banking, stocks, and other vanilla additions   |
+| `Orchard`                           | Temple and farm orchards, tree care, gradual clearing, and hired help     |
+| `VanillaPlus`                       | Stat breakthroughs, homes, financial-centre work, banking, and stocks     |
 | `CelestialAnomalies`                | Solar eclipses, meteor showers, and changing sky and weather visuals      |
-| `MoreTransformations`               | Horse and fish transformations, locations, equipment, and traits          |
+| `MoreTransformations`               | Horse, fish, and raven transformations, locations, equipment, and traits  |
 | `LongerCombat`                      | Longer encounters, staged dialogue, and fluid displays                    |
 | `MoreLoveInterestsAndNPCAvatars`    | More love interests and social sidebar portraits                          |
 | `NPCSidebarPortrait`                | NPC portraits in scenes and the sidebar                                   |

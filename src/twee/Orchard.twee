@@ -1,0 +1,276 @@
+:: Deadwood Reblooms Orchard Widgets [widget]
+<<widget 'deadwood-orchard-entry'>>
+  <<set _orchardSite to _args[0]>>
+  <<set _orchardExit to _orchardSite is 'farm' ? 'Farm Work' : 'Temple'>>
+  <<capture _orchardSite>>
+    <!-- LinkZone 在页面渲染后执行。核对普通菜单的出口，避免在遭遇或昏倒剧情中增加离开选项。 -->
+    <<if maplebirch.get('Orchard') and $stress lt $stressmax and (_orchardSite isnot 'farm' or !maplebirch.get('Orchard').farmInterrupted) and document.querySelector('#passage-content a[data-passage="' + _orchardExit + '"]')>>
+      <<if maplebirch.get('Orchard').ready(_orchardSite)>>
+        <<set _orchardOpeningLabel to _orchardSite is 'farm' ? ['Find Alex to talk about fruit trees', '去找艾利克斯商量种果树'] : ['Follow the monk beyond the flower beds', '跟随神殿成员走到花圃后面']>>
+        <<gardenicon 'plot'>><<lanLink _orchardOpeningLabel 'Deadwood Reblooms Orchard Opening'>>
+          <<set $Orchard.site to _orchardSite>>
+        <</lanLink>><br>
+      <<elseif maplebirch.get('Orchard').available(_orchardSite) and $exposed lte 0>>
+        <<gardenicon 'plot'>><<lanLink ['Orchard (0:02)', '果园 (0:02)'] 'Deadwood Reblooms Orchard'>>
+          <<set $Orchard.site to _orchardSite>><<pass 2>>
+        <</lanLink>><br>
+      <</if>>
+    <</if>>
+  <</capture>>
+<</widget>>
+
+<<widget 'deadwood-orchard-worker-recruitment'>>
+  <<set $_orchard to maplebirch.get('Orchard')>>
+  <!-- 普通酒馆菜单才招聘，先结束菜单里的随机 NPC，避免占用同一个人物槽。 -->
+  <<if $_orchard and $_orchard.available('farm') and !$_orchard.state.worker.hired and $exposed lte 0 and $stress lt $stressmax and !pcAreArmsBound('both') and document.querySelector('#passage-content a[data-passage="Harvest Street"]')>>
+    <<investigateicon>><<lanLink ['Look for help for your orchard (0:30)', '寻找果园雇工 (0:30)'] 'Deadwood Reblooms Orchard Hire'>>
+      <<endevent>><<pass 30>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-orchard-worker'>>
+  <<set $_orchard to maplebirch.get('Orchard')>>
+  <<if !$_orchard or $Orchard.site isnot 'farm' or !$_orchard.available('farm')>><<exit>><</if>>
+  <br>
+  <<if $_orchard.irrigated>>
+    <<gardenicon 'water'>><span class='green'><<lanSwitch 'The farm irrigation keeps the young trees watered.' '农场的灌溉系统为幼树补足水分。'>></span><br>
+  <</if>>
+  <<if $_orchard.state.worker.hired>>
+    <<set $_worker to $_orchard.state.worker>>
+    <<if $per_npc.deadwood_orchard_worker>>
+      <<print $per_npc.deadwood_orchard_worker.name>><<lanSwitch ' looks after your orchard.' '受雇照料你的果园。'>><br>
+    <</if>>
+    <<if $_orchard.workerActive>>
+      <<set $_paidUntil to new DateTime($_worker.paidUntil)>>
+      <<lanSwitch 'Paid until ' '薪资已预付至 '>><span class='gold'><<print getFormattedDate($_paidUntil)>></span> <<ampm $_paidUntil.hour $_paidUntil.minute>><<lanSwitch '.' '。'>><br>
+    <<else>>
+      <span class='red'><<lanSwitch 'The paid week has ended. Your worker will not work until you pay again.' '预付的薪期已经结束。续付薪资前，雇工不会继续干活。'>></span><br>
+    <</if>>
+    <<if $_worker.pick>>
+      <<lanSwitch 'Waters young trees and picks ripe fruit.' '浇灌幼树，并采收成熟水果。'>><br>
+      <<lanLink ['Leave the picking to me', '让我自己采收'] 'Deadwood Reblooms Orchard'>>
+        <<run maplebirch.get('Orchard').setWorkerPicking(false)>><<set $eventskip to 1>>
+      <</lanLink>><br>
+    <<else>>
+      <<lanSwitch 'Waters young trees. Leaves the fruit for you.' '浇灌幼树，把水果留给你采收。'>><br>
+      <<lanLink ['Ask the worker to pick ripe fruit too', '也让雇工采收成熟水果'] 'Deadwood Reblooms Orchard'>>
+        <<run maplebirch.get('Orchard').setWorkerPicking(true)>><<set $eventskip to 1>>
+      <</lanLink>><br>
+    <</if>>
+    <<if $_worker.report.day gte 0>>
+      <<set $_shiftDate to new DateTime($_worker.report.day * 86400 + 8 * 3600)>>
+      <<if $_worker.report.day is Math.floor(Time.date.timeStamp / 86400)>><<lanSwitch "Today's work: " '今日照料：'>><<else>><<lanSwitch 'Last shift: ' '最近一次照料：'>><</if>><<print getFormattedDate($_shiftDate)>><<lanSwitch '.' '。'>><<lanSwitch ' Young trees watered: ' ' 浇灌幼树：'>><span class='green'><<print $_worker.report.watered>></span><<lanSwitch '.' '。'>><br>
+      <<if Object.values($_worker.report.kept).some(amount => amount gt 0)>>
+        <<lanSwitch 'Fruit put away: ' '收好的水果：'>><<deadwood-orchard-worker-harvest>><br>
+      <<else>>
+        <<lanSwitch 'No fruit picked.' '没有采收水果。'>><br>
+      <</if>>
+    <</if>>
+    <<if $_orchard.canPayWorker>>
+      <<lanLink ['Pay for another week', '预付下一周薪资'] 'Deadwood Reblooms Orchard'>>
+        <<run maplebirch.get('Orchard').payWorker()>><<set $eventskip to 1>>
+      <</lanLink>> (<<printmoney $_orchard.workerWage>>)<br>
+    <<elseif $money lt $_orchard.workerWage>>
+      <span class='red'><<lanSwitch 'You cannot afford another week.' '你付不起下一周的薪资。'>></span> (<<printmoney $_orchard.workerWage>>)<br>
+    <</if>>
+    <<lanLink ['Dismiss your orchard worker', '辞退果园雇工'] 'Deadwood Reblooms Orchard Dismiss'>><</lanLink>><br>
+  <<else>>
+    <<lanSwitch 'You could look for someone to help with the orchard at the pub.' '你可以去酒馆找人帮忙照料果园。'>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Orchard Opening []
+<<if !maplebirch.get('Orchard')>>
+  <<getouticon>>
+  <<if $Orchard.site is 'farm'>>
+    <<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>>
+  <<else>>
+    <<lanLink ['Return to the garden', '返回花园'] 'Temple Garden'>><</lanLink>>
+  <</if>><<exit>>
+<</if>>
+<<set $outside to 1>>
+<<if $Orchard.site is 'temple'>>
+  <<set $location to 'temple'>><<temple_effects>>
+<<else>>
+  <<set $location to 'alex_farm'>><<set $bus to 'farm_fields'>><<farm_work_update>>
+<</if>><<effects>>
+<<if $stress gte $stressmax>>
+  <<if $Orchard.site is 'farm'>><<passoutfarmroad>><<else>><<passouttemple>><</if>><<exit>>
+<<elseif $Orchard.site is 'farm' and maplebirch.get('Orchard').farmInterrupted>>
+  <<getouticon>><<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>><<exit>>
+<</if>>
+<<if maplebirch.get('Orchard').ready($Orchard.site)>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $Orchard.site is 'temple'>>
+        A <<monk>> pauses by the last hedge you trimmed. "You have done well here. Come along. There is another part of the garden you should see."
+        <br><br>
+        You follow a narrow path behind the flower beds. A gap in the hedge reveals a sheltered strip of earth. The <<monk>> lifts a loose branch away from the path.
+        <br><br>
+        "We used to grow more fruit here. A plum tree still grows here, and the kitchen could use more. You may plant some trees, if you are willing to look after them. Leave a share of the harvest for the others."
+        <br><br>
+        The <<monk>> points to the ground beside the path. "We can prepare these plots first. You will have to work your way through the old roots beyond them. Take your time."
+      <<else>>
+        <<npc Alex>><<person1>>
+        You find Alex in the farmhouse, sorting a stack of papers. <<He>> looks up when you mention the unused ground beside the fields. "All that ground, and we finally got it cleared." <<He>> sets the papers aside. "Might be nice to grow something we don't have to plant again after every harvest."
+        <br><br>
+        You head outside together. <<He>> leads you along the hedgerow and pushes a fallen branch aside with <<his>> boot. "Fruit trees would fit here. The hedge should keep the worst of the wind off. Takes longer than potatoes, though."
+        <br><br>
+        Alex looks back at you. "Want to give it a go? We could start by getting this patch ready." <<He>> nudges a clump of weeds with <<his>> boot. "Plenty of roots further along. Best do a bit at a time."
+      <</if>>
+    <<option 'CN'>>
+      <<if $Orchard.site is 'temple'>>
+        一位<<monk>>在你刚修整好的树篱旁停下。“这里做得不错。跟我来，花园还有一处地方，你也该看看。”
+        <br><br>
+        你沿着花圃后面的小路跟过去。树篱的缺口后露出一条避风的土地。<<monk>>把横在路上的枝条挪到一边。
+        <br><br>
+        “以前这里种过不少果树，现在还留着一棵李子树，厨房也用得上。你愿意照料的话，可以在这里再栽几棵。收成记得给其他人留一份。”
+        <br><br>
+        <<monk>>指向小路旁的土地。“我们先整理这几块。后面还有不少旧根，你得一点点清过去。不用着急。”
+      <<else>>
+        <<npc Alex>><<person1>>
+        你在农舍里找到正在整理账单的艾利克斯。你提起田地边空着的土地，<<he>>抬起头。“这么多地，总算都清出来了。”<<He>>放下账单。“也许可以种点不用收一回就重种一回的东西。”
+        <br><br>
+        你们一起走出农舍。<<He>>带你沿着树篱走，用靴子拨开一根落枝。“这里能种果树。树篱挡着，风也不至于太大。不过，比土豆费时间。”
+        <br><br>
+        艾利克斯回头看你。“想试试吗？先把这块地方拾掇好。”<<He>>用靴子碰了碰一丛杂草。“后面草根多，一次弄一点就行。”
+      <</if>>
+  <</language>><br><br>
+  <<gardenicon 'plot'>><<lanLink ['Help prepare the ground (1:00)', '一起整理土地 (1:00)'] 'Deadwood Reblooms Orchard'>>
+    <<if maplebirch.get('Orchard').unlock($Orchard.site)>>
+      <<if $Orchard.site is 'farm'>><<farm_count 60>><</if>>
+      <<physique 6>><<tiredness 6>><<pass 60>>
+    <</if>>
+  <</lanLink>><<ggtiredness>><br>
+<</if>>
+<<getouticon>>
+<<if $Orchard.site is 'farm'>>
+  <<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>>
+<<else>>
+  <<lanLink ['Return to the garden', '返回花园'] 'Temple Garden'>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Orchard []
+<<if !maplebirch.get('Orchard')>>
+  <<getouticon>>
+  <<if $Orchard.site is 'farm'>>
+    <<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>>
+  <<else>>
+    <<lanLink ['Return to the garden', '返回花园'] 'Temple Garden'>><</lanLink>>
+  <</if>><<exit>>
+<</if>>
+<<set $outside to 1>>
+<<if $Orchard.site is 'farm'>>
+  <<set $location to 'alex_farm'>><<set $bus to 'farm_fields'>><<farm_work_update>>
+<<else>>
+  <<set $location to 'temple'>><<temple_effects>>
+<</if>>
+<<effects>>
+<<if $stress gte $stressmax>>
+  <<if $Orchard.site is 'farm'>><<passoutfarmroad>><<else>><<passouttemple>><</if>>
+<<elseif $Orchard.site is 'farm' and maplebirch.get('Orchard').farmInterrupted>>
+  <<lanSwitch 'Shouts carry from the fields. You need to return to the farm.' '田地那边传来喊声。你得先回去看看。'>><br><br>
+  <<getouticon>><<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>>
+<<elseif $Orchard.site is 'farm' and dangerEvent() and $eventskip isnot 1>>
+  <<farm_tending_events>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $Orchard.site is 'temple'>>
+        Beyond the flower beds, a narrow strip of earth runs beside the hedge. The temple keeps it for fruit trees. The harvest supplies the kitchen, though those who tend the trees may take a share.
+      <<else>>
+        At the edge of your fields, a sheltered strip of ground lies between the fence and the hedgerow. There is room for fruit trees without taking space from your crops.
+      <</if>>
+    <<option 'CN'>>
+      <<if $Orchard.site is 'temple'>>
+        花圃后面，一条狭长的土地沿着树篱延伸。神殿把这里留给果树。收成供厨房使用，照料果树的人也可以分到一份水果。
+      <<else>>
+        你的田地边缘，围栏与树篱之间留着一条避风的土地。这里容得下果树，也不会挤占种庄稼的地方。
+      <</if>>
+  <</language>><br><br>
+  <<if maplebirch.get('Orchard').available($Orchard.site)>>
+    <<deadwood-orchard-map>>
+    <<if $Orchard.site is 'farm'>><<deadwood-orchard-worker>><</if>>
+    <<if Weather.dayState is 'night'>>
+      <<lanSwitch 'It is too dark to work.' '天太黑了，无法干活。'>><br>
+    <<elseif pcAreArmsBound('both')>>
+      <span class='red'><<lanSwitch 'Your bound arms prevent you from working.' '你的双臂受缚，无法干活。'>></span><br>
+    <<elseif $exposed gt 0>>
+      <span class='red'><<lanSwitch 'You need to dress before working here.' '你得先穿好衣服才能在这里干活。'>></span><br>
+    <</if>>
+  <<else>>
+    <span class='blue'><<lanSwitch 'You no longer have permission to tend this land.' '你现在没有照料这块土地的资格。'>></span><br>
+  <</if>><br>
+  <<getouticon>>
+  <<if $Orchard.site is 'farm'>>
+    <<lanLink ['Return to the fields (0:02)', '返回田地 (0:02)'] 'Farm Fields'>><<pass 2>><</lanLink>>
+  <<else>>
+    <<lanLink ['Return to the garden (0:02)', '返回花园 (0:02)'] 'Temple Garden'>><<pass 2>><</lanLink>>
+  <</if>>
+<</if>>
+<<set $eventskip to 0>>
+
+:: Deadwood Reblooms Orchard Hire []
+<<set $outside to 0>><<set $location to 'pub'>><<set $bus to 'harvest'>><<effects>>
+<<endevent>>
+<<if !maplebirch.get('Orchard') or !maplebirch.get('Orchard').available('farm') or $Orchard.worker.hired or $exposed gt 0 or $stress gte $stressmax or pcAreArmsBound('both')>>
+  <<getouticon>><<lanLink ['Return to the pub', '返回酒馆'] 'Pub'>><</lanLink>><<exit>>
+<</if>>
+<!-- 首次生成后直接使用同一人物。重访时只载入保存的人物，不重复生成或占用姓名。 -->
+<<if maplebirch.get('Orchard').candidate>>
+  <<loadNPC 0 'deadwood_orchard_worker'>>
+<<else>>
+  <<generate1>><<npcClothesName $NPCList[0] 'wildsFlannel'>><<saveNPC 0 'deadwood_orchard_worker'>>
+<</if>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You ask at the bar for someone who can help with fruit trees. The landlord points you towards a <<person>> by the window. You take the empty seat opposite <<him>>.
+    <br><br>
+    "I can water the young ones, and pick the fruit if you want," <<he>> says. "But I won't be clearing new ground. You'll have to do that yourself."
+    <br><br>
+    <<He>> gives you <<his>> name: <<print $NPCList[0].name>>. "A week's work costs <<printmoney maplebirch.get('Orchard').workerWage>>. Pay first, and I'll come by in the mornings."
+  <<option 'CN'>>
+    你向酒馆老板打听有没有人能帮忙照料果树。老板指向窗边的一位<<person>>。你在<<him>>对面的空位坐下。
+    <br><br>
+    “小树我可以浇水，你需要的话，水果也能帮你摘，”<<he>>说。“不过，我不负责开荒。那得你自己来。”
+    <br><br>
+    <<He>>告诉你自己的名字：<<print $NPCList[0].name>>。“干一周收<<printmoney maplebirch.get('Orchard').workerWage>>。先付钱，我每天早上过去。”
+<</language>><br><br>
+<<if $money gte maplebirch.get('Orchard').workerWage>>
+  <<lanLink ['Hire for a week', '雇用一周'] 'Pub'>>
+    <<run maplebirch.get('Orchard').hire()>><<endevent>>
+  <</lanLink>> (<<printmoney maplebirch.get('Orchard').workerWage>>)<br>
+<<else>>
+  <span class='red'><<lanSwitch 'You cannot afford a week of work.' '你付不起一周的薪资。'>></span> (<<printmoney maplebirch.get('Orchard').workerWage>>)<br>
+<</if>>
+<<getouticon>><<lanLink ['Refuse', '拒绝'] 'Pub'>>
+  <<endevent>><<if maplebirch.get('Orchard').candidate>><<clearNPC 'deadwood_orchard_worker'>><</if>>
+<</lanLink>>
+
+:: Deadwood Reblooms Orchard Dismiss []
+<<set $outside to 1>><<set $location to 'alex_farm'>><<set $bus to 'farm_fields'>><<farm_work_update>><<effects>>
+<<endevent>>
+<<if !maplebirch.get('Orchard') or !maplebirch.get('Orchard').available('farm') or !$Orchard.worker.hired>>
+  <<getouticon>><<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>><<exit>>
+<<elseif $stress gte $stressmax>>
+  <<passoutfarmroad>><<exit>>
+<<elseif maplebirch.get('Orchard').farmInterrupted>>
+  <<getouticon>><<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>><<exit>>
+<</if>>
+<<if $per_npc.deadwood_orchard_worker>>
+  <<loadNPC 0 'deadwood_orchard_worker'>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      You find <<print $NPCList[0].name>> beside the orchard. <<He>> listens as you explain that you no longer need help.
+    <<option 'CN'>>
+      你在果园旁找到<<print $NPCList[0].name>>。你告诉<<him>>，自己已经不再需要帮手了。
+  <</language>><br><br>
+<</if>>
+<<lanSwitch 'Dismiss your orchard worker? Any prepaid wages will not be returned.' '要辞退果园雇工吗？已经预付的薪资不会退还。'>><br><br>
+<<lanLink ['Dismiss', '辞退'] 'Deadwood Reblooms Orchard'>>
+  <<run maplebirch.get('Orchard').dismissWorker()>><<endevent>><<set $Orchard.site to 'farm'>><<set $eventskip to 1>>
+<</lanLink>><br>
+<<getouticon>><<lanLink ['Keep the worker', '继续雇用'] 'Deadwood Reblooms Orchard'>>
+  <<endevent>><<set $Orchard.site to 'farm'>><<set $eventskip to 1>>
+<</lanLink>>

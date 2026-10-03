@@ -115,6 +115,22 @@ Consecutive severe-trauma days produce a warning before admission. Timely care i
 5. Attempt escape. Skulduggery, asylum status and suspicion affect success. Failure loses the keycard, sets planning back and raises trauma.
 6. Successful escape begins recovery, not an immediate return to work.
 
+**Tentacle Plains route** is a parallel exit. It does not replace the ward plan and does not require the PC to be a patient. First obtain the seventh-level deviancy trait (see the eerie mirror section in [VanillaPlus](VanillaPlus.md)), then enter the vanilla Tentacle Plains. Either the mirror or asylum entrance works.
+
+1. While Robin is confined, **"Follow the traces that do not belong here"** appears on the plains. You can enter the ward to look for Robin once per game day.
+2. Follow the voice through the door into an isolation room. Staff can be heard beyond another door; you can take Robin back through the plains and look for the forest exit.
+3. Travel using the vanilla **coordinate grid**. Each step takes ten minutes and exposes you to the plains' air and tendrils.
+4. If no encounter has occurred, one triggers after three steps; a random attack can happen earlier. More encounters can follow. Winning one fight does not take you straight to the exit.
+5. Encounters use the vanilla tentacle advances and mixed action menu. The tentacles act on the PC; Robin's distress is represented through trauma, without another health bar.
+6. After clearing an encounter, catch your breath or spend five minutes to **"Comfort Robin"**. This is company and a hug, once after each encounter. Afterwards, continue walking; the finished battle is not reopened.
+7. Maximum stress fails the rescue, increases both characters' trauma and enters the vanilla Tentacle Plains collapse and return sequence. Robin remains confined; try again another day. The PC returns according to the original mirror or asylum entrance.
+8. The **forest door** lets Robin escape and begin recovery. If the PC was also a patient, it settles the PC's vanilla asylum escape too.
+9. Returning through the **ward door** at the origin has Harper capture you both. Robin remains confined, and the PC enters or returns to the vanilla asylum sequence. Neither exit needs a keycard or shift observation.
+
+Robin's reactions consider trauma before confidence: severe distress causes hesitation, trembling and clinging to the PC. When steadier, Robin can stand independently or check on the PC. Catching a breath does not erase the encounter's trauma; comfort only gives a small reduction.
+
+<span class="red">The route still carries the vanilla Tentacle Plains dangers.</span> Prepare for travel and combat. Reaching the forest door does not immediately restore Robin's normal condition.
+
 ### Fishing and grilled fish
 
 **Fishing date**: eligible relationship, healthy Robin at the beach cart, unexposed PC, usable rod and arms, **09:00 until before 16:00**, no precipitation, once daily. Uses vanilla fishing, not a new fishing skill.

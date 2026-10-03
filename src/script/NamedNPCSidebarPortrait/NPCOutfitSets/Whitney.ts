@@ -16,7 +16,7 @@ export default function (maplebirch: MaplebirchCore): void {
       if (template) addSet(maplebirch, outfitNames, `whitney_${key}`, template);
     }
 
-    wardrobe.modify('Whitney', (clothes, context) => sync('Whitney', context.key === 'naked' ? 'naked' : `whitney_${context.key}`, clothes));
+    if (!maplebirch.get('LifeSimulation')) wardrobe.modify('Whitney', (clothes, context) => sync('Whitney', context.key === 'naked' ? 'naked' : `whitney_${context.key}`, clothes));
 
     maplebirch.on(
       ':npcInject',

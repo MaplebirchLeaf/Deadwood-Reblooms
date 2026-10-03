@@ -6,7 +6,7 @@ import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 class Horse extends Transformation {
   // demonhorse 混合尾只在当前绘制帧合成，玩家实际选择的恶魔尾状态仍由原版存档维护。
-  private static demonTailEnabled(): boolean {
+  private static get demonTailEnabled(): boolean {
     const parts = V.transformationParts;
     return [parts?.horse?.tail, parts?.demon?.tail].every(part => typeof part === 'string' && isPartEnabled(part)) && isChimeraEnabled('demonhorse', 'tail');
   }
@@ -54,7 +54,7 @@ class Horse extends Transformation {
           options.horse_ears_layer = V.tfearslayer ?? 'back';
           options.horse_tail_layer = V.taillayer ?? 'front';
           // 只合并当前可见且未被原版其他混合形态接管的恶魔尾，不改动存档里的部件选择。
-          options.horse_demon_tail = !!options.maplebirchTransformation && Horse.demonTailEnabled() && options.demon_tail_type === V.transformationParts.demon.tail;
+          options.horse_demon_tail = !!options.maplebirchTransformation && Horse.demonTailEnabled && options.demon_tail_type === V.transformationParts.demon.tail;
           if (options.horse_demon_tail) options.demon_tail_type = 'hidden';
           if (options.worn.head.setup.name === 'sage witch hat' && isPartEnabled(V.transformationParts?.horse?.ears)) options.hideHeadAcc = true;
         },
@@ -114,7 +114,7 @@ class Horse extends Transformation {
     options.maplebirchTransformation = V.maplebirch?.transformation ?? false;
     options.filters.horseHair = Horse.hairLikeFilter(V.haircolour);
     const demonTail = options.transformations?.demon?.tail;
-    options.horse_demon_tail = !!options.maplebirchTransformation && Horse.demonTailEnabled() && demonTail?.show === true && !['cat', 'cow'].includes(demonTail.style);
+    options.horse_demon_tail = !!options.maplebirchTransformation && Horse.demonTailEnabled && demonTail?.show === true && !['cat', 'cow'].includes(demonTail.style);
     if (options.horse_demon_tail) options.transformations.demon.tail.show = false;
   }
 
@@ -284,11 +284,16 @@ class Horse extends Transformation {
           }
         ],
         'Widgets Effects Man': [
-          // 用模组踢击组件替换原版踢击结算入口，以便蹄足特质调整效果且不重复执行原版伤害。
+          // 只替换动作描写，保留 DoLP 的闪避、反击与成功后的数值结算。
           {
-            srcmatchgroup: /<<actionskick \$feettarget>><<defiance 5 \$feettarget>>/g,
+            srcmatchgroup: /<<actionskick \$feettarget>>/g,
             to: '<<deadwood-reblooms-action-kick $feettarget>>',
             expected: 2
+          },
+          // 两版成功踢击的基础伤害不同，蹄足倍率沿用各自原值。DoLP 分支数不固定。
+          {
+            srcmatchgroup: /<<defiance (5|10) \$feettarget>>/g,
+            to: '<<defiance `$1 * (typeof $transformationParts?.traits?.hooves is "string" and isPartEnabled($transformationParts.traits.hooves) ? 3 : 1)` $feettarget>>'
           }
         ]
       }

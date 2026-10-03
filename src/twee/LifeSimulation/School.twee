@@ -93,12 +93,30 @@
   <</if>>
 <</widget>>
 
-<!-- 离开学校后恢复进入学校前保存的衣物。 -->
+<!-- 正文设置实际地点后调用。后庭与泳池仍属于校园。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-sync-clothes'>>
+  <<if $LifeSimulation?.school>>
+    <<if $LifeSimulation.school.clothesStored and !['school', 'school_rear_courtyard', 'pool'].includes($location)>>
+      <<deadwood-reblooms-life-simulation-school-restore-clothes>>
+    <<elseif !$LifeSimulation.school.clothesStored and $location is 'school' and $outside is 0 and $combat isnot 1 and !$statFreeze and maplebirch.get("LifeSimulation").school.requiresNudity>>
+      <<deadwood-reblooms-life-simulation-school-enforce-clothes>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<!-- 离校时恢复衣物。收容或战斗中仅归还储物，保留原版的服装与束缚。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-restore-clothes'>>
-  <<silently>>
-    <<storeon 'lifeSimulationSchool'>>
-    <<set $LifeSimulation.school.clothesStored to false>>
-  <</silently>>
+  <<if $LifeSimulation?.school?.clothesStored>>
+    <<silently>>
+      <<if $combat is 1 or $statFreeze or ['hospital', 'asylum', 'prison'].includes($location)>>
+        <<storeon 'lifeSimulationSchool' 'return'>>
+      <<else>>
+        <<storeon 'lifeSimulationSchool'>>
+      <</if>>
+      <<set $LifeSimulation.school.clothesStored to setup.clothingLayer.all.some(slot => $store[slot]?.some(item => item.location === 'lifeSimulationSchool'))>>
+      <<exposure>>
+    <</silently>>
+  <</if>>
 <</widget>>
 
 <!-- 处理从其它入口进入学校的情况，确保强制校规不会只在前庭生效。 -->

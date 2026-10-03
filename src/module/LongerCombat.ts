@@ -326,29 +326,26 @@ class LongerCombat {
     this.core.on(':variable', () => this.lastLines.clear(), 'Longer Combat');
     const main = this.main.bind(this);
 
-    this.core.once(
-      ':sugarcube',
-      () => {
-        maplebirch.tool.macro.define('LongerCombat', function (this: any) {
-          const fragment = main();
-          this.output.append(fragment);
-        });
+    this.core.tool.macro.define('LongerCombat', function (this: any) {
+      const fragment = main();
+      this.output.append(fragment);
+    });
 
-        maplebirch.dynamic.regStateEvent('gate', 'LongerCombat', {
-          output: 'LongerCombat',
-          priority: 100,
-          cond: () => this.canExtendCombat && maplebirch.passage.title.endsWith(' Finish') && V.enemyhealth > 0 && V.enemyarousal >= V.enemyarousalmax,
-          forceExit: () => V.enemyarousal >= V.enemyarousalmax && !this.shouldEndCombat
-        });
+    this.core.dynamic.regStateEvent('gate', 'LongerCombat', {
+      output: 'LongerCombat',
+      priority: 100,
+      cond: () => this.canExtendCombat && maplebirch.passage.title.endsWith(' Finish') && V.enemyhealth > 0 && V.enemyarousal >= V.enemyarousalmax,
+      forceExit: () => V.enemyarousal >= V.enemyarousalmax && !this.shouldEndCombat
+    });
 
-        // 只改变普通遭遇战每回合的流逝秒数，原版 Time.pass 和其它状态结算继续运行。
-        maplebirch.dynamic.regTimeEvent('onBefore', 'LongerCombat', {
-          cond: () => this.canExtendCombat && !maplebirch.passage.title.endsWith(' Finish'),
-          action: data => (data.passed = this.options.seconds)
-        });
-      },
-      'LongerCombat'
-    );
+    this.core.dynamic.regTimeEvent('onBefore', 'LongerCombat', {
+      priority: 100,
+      cond: data => (data.passed ?? 0) > 0 && this.canExtendCombat && !maplebirch.passage.title.endsWith(' Finish'),
+      action: data => {
+        const seconds = Number(this.options.seconds);
+        if (Number.isInteger(seconds) && seconds > 0) data.passed = seconds;
+      }
+    });
 
     this.core.once(
       ':storyready',

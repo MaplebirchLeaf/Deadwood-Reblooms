@@ -34,7 +34,7 @@ export default function (maplebirch: MaplebirchCore): void {
       if (template) addSet(maplebirch, outfitNames, `kylar_${key}`, template, { type: key === 'prison_jumpsuit' ? 'prison' : undefined });
     }
 
-    wardrobe.modify('Kylar', (clothes, context) => sync('Kylar', context.key === 'naked' ? 'naked' : `kylar_${context.key}`, clothes));
+    if (!maplebirch.get('LifeSimulation')) wardrobe.modify('Kylar', (clothes, context) => sync('Kylar', context.key === 'naked' ? 'naked' : `kylar_${context.key}`, clothes));
 
     maplebirch.on(
       ':npcInject',

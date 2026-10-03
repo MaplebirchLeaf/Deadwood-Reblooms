@@ -9,6 +9,7 @@ interface Use {
   dependence: number;
   until: number;
   rebound: number;
+  settledDay: number;
 }
 
 export interface MedicineState {
@@ -37,8 +38,8 @@ export const MEDICINES = [
   { id: 'soothe', name: ['Soothing tablets', '安神药'], description: ['Temporarily eases the burden of trauma. Does not erase memories.', '暂时减轻创伤负担，不抹去经历。'], price: 1400, hours: 4 }
 ] as const;
 
-const EMPTY_USE: Use = { owned: 0, last: -1, day: -1, count: 0, streak: 0, dependence: 0, until: 0, rebound: 0 };
-const HOURS = 60 * 60 * 1000;
+const EMPTY_USE: Use = { owned: 0, last: -1, day: -1, count: 0, streak: 0, dependence: 0, until: 0, rebound: 0, settledDay: -1 };
+const HOURS = 60 * 60;
 const key = (id: MedicineId) => MEDICINES.find(item => item.id === id)!.name[0].toLowerCase();
 
 export default class Medicine {
@@ -49,7 +50,7 @@ export default class Medicine {
   }
 
   private use(id: MedicineId): Use {
-    return (this.state.uses[id] ??= { ...EMPTY_USE });
+    return (this.state.uses[id] ??= { ...EMPTY_USE, settledDay: Time.days });
   }
 
   public get offers() {
@@ -204,7 +205,7 @@ export default class Medicine {
   }
 
   public tick(): void {
-    if (!V.LifeSimulation?.medicine) return;
+    if (!V.LifeSimulation?.medicine || V.statFreeze) return;
     const now = Time.date.timeStamp;
     for (const item of MEDICINES) {
       const use = this.state.uses[item.id];
@@ -219,21 +220,37 @@ export default class Medicine {
   }
 
   public day(): void {
+    if (!V.LifeSimulation?.medicine || V.statFreeze) return;
     for (const item of MEDICINES) {
       const use = this.state.uses[item.id];
       if (!use) continue;
-      if (use.day < Time.days - 1) {
-        use.streak = 0;
-        if (use.dependence >= 12 && !V.statFreeze) {
-          this.core.SugarCube.Wikifier.wikifyEval('<<stress 1>>');
-          this.state.notices.push({ id: item.id, kind: 'withdrawal' });
-        }
-        use.dependence = Math.max(0, use.dependence - 2);
+      // 时间事件一次可以跨过多天。停药第二天起回补依赖衰减，不倒放过去的 PC 状态。
+      const previousDay = Math.max(use.settledDay ?? Time.days, use.day + 1);
+      const days = Math.max(0, Time.days - previousDay);
+      use.settledDay = Math.max(use.settledDay ?? Time.days, Time.days);
+      if (days === 0) continue;
+      use.streak = 0;
+      if (use.dependence - (days - 1) * 2 >= 12 && !V.statFreeze) {
+        this.core.SugarCube.Wikifier.wikifyEval('<<stress 1>>');
+        this.state.notices.push({ id: item.id, kind: 'withdrawal' });
       }
+      use.dependence = Math.max(0, use.dependence - days * 2);
     }
   }
 
   public init(): void {
+    this.core.on(':variable', () => {
+      for (const item of MEDICINES) {
+        const use = V.LifeSimulation?.medicine?.uses[item.id];
+        if (!use) continue;
+        use.settledDay ??= Time.days;
+        const duration = item.hours * HOURS;
+        const savedDuration = use.until - use.last;
+        if (use.last >= 0 && use.until >= duration * 1000 && savedDuration > duration && savedDuration <= duration * 1000) {
+          use.until -= duration * 999;
+        }
+      }
+    });
     this.core.dynamic.regTimeEvent('onAfter', 'LifeSimulation Medicine Expiry', { action: () => this.tick() });
     this.core.dynamic.regTimeEvent('onDay', 'LifeSimulation Medicine Dependence', { exact: true, action: () => this.day() });
     const indicators: Record<MedicineId, [string, string, string][]> = {

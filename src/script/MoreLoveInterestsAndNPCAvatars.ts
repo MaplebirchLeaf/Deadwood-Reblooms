@@ -5,7 +5,7 @@ import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 export default function (maplebirch: MaplebirchCore) {
   'use strict';
 
-  // 扩展海报头像、恋人列表和恋人移除逻辑。
+  // 扩展海报头像、恋人列表和原版恋人的增删逻辑。
   maplebirch.tool.inject({
     locationPassage: {
       Bedroom: [
@@ -13,6 +13,14 @@ export default function (maplebirch: MaplebirchCore) {
         {
           src: '<<furnitureicon _poster>>',
           applybefore: '<<set _poster to maplebirch.get("MoreLoveInterestsAndNPCAvatars").icon(_furniture.poster.name, _premadePoster)>>',
+          expected: 1
+        }
+      ],
+      Attitudes: [
+        // 只替换原版确认时的条件，压力与创伤仍由原版按钮一次结算。
+        {
+          src: '<<if $LIChanged>>',
+          to: '<<if maplebirch.get("MoreLoveInterestsAndNPCAvatars").breaks>>',
           expected: 1
         }
       ]
@@ -41,6 +49,12 @@ export default function (maplebirch: MaplebirchCore) {
         }
       ],
       'Widgets Attitudes': [
+        // 保留原版自动分配条件和关系提示，只把已分配的恋人同步进扩展名单。
+        {
+          src: '<<set $_assigned to true>>',
+          applyafter: '<<run maplebirch.get("MoreLoveInterestsAndNPCAvatars").addLoveInterest($_LI)>>',
+          expected: 3
+        },
         // 只在原版恋爱对象面板的首尾加边界，避免跨越整段设置内容进行替换。
         {
           src: '<<set _loveIntStart1 to $loveInterest.primary>>',

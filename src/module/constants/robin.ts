@@ -166,8 +166,16 @@ export interface RobinExpansionState {
     warningDay: number;
     /** 上次预警探视的游戏日。 */
     warningVisitDay: number;
-    /** 为解救垫付的债务（便士）。 */
+    /** 入院前的原版罗宾债务状态，离院后恢复。 */
     savedDebt: number;
+    /** 上次从触手平原寻找罗宾的游戏日，用于限制每天一次。 */
+    tentacleDay: number;
+    /** 触手平原路线失败的累计次数，用于文案与日志。 */
+    tentacleFailures: number;
+    /** 已度过的触手遭遇次数，用于区分第一场与之后。 */
+    tentacleWave: number;
+    /** 本次寻找期间已经安慰罗宾的次数，每次遭遇后限一次。 */
+    tentacleClose: number;
   };
 }
 
@@ -249,6 +257,10 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
     visitDay: -1,
     warningDay: -1,
     warningVisitDay: -1,
-    savedDebt: 0
+    savedDebt: 0,
+    tentacleDay: -1,
+    tentacleFailures: 0,
+    tentacleWave: 0,
+    tentacleClose: 0
   }
 };

@@ -25,7 +25,7 @@ class NPCSidebarPortrait {
     if (!itemSlot) return;
     const clothing = { ...item } as Record<string, unknown>;
     delete clothing.slot;
-    clothes[itemSlot as keyof WardrobeItem] = clone(clothing) as WardrobeItem[keyof WardrobeItem];
+    this.core.npc.Clothes.wardrobe.apply(clothes, itemSlot as keyof WardrobeItem, clothing);
   }
 }
 

@@ -69,6 +69,8 @@ Return and discuss the vanilla **red-moon or snake-woman painting** at the museu
 
 Accept for **25 preparation days**. Follow journal deadlines, investigate and draft before the deadline, then exhibit at the museum.
 
+You work alone while Robin is missing, injured or confined. Library assistance is only available while Robin is at school.
+
 | Order | Place and action          | Time      | Requirements and result                                         |
 | ----- | ------------------------- | --------- | --------------------------------------------------------------- |
 | 1     | Library archival research | One hour  | Accepted project, source investigation                          |

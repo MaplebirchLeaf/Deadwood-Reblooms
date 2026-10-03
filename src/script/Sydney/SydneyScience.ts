@@ -1,9 +1,5 @@
 export default function (maplebirch: typeof window.maplebirch) {
-  maplebirch.tool.addTo(
-    'BeforeLinkZone',
-    { widget: 'deadwood-reblooms-sydney-science-actions', passage: 'Science Lesson' },
-    { widget: 'deadwood-reblooms-sydney-science-late-intro', passage: 'Temple' }
-  );
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-sydney-science-late-intro', passage: 'Temple' });
 
   // 接入科学课事件池、首次同桌剧情和悉尼保护分支。
   maplebirch.tool.inject({
@@ -21,6 +17,12 @@ export default function (maplebirch: typeof window.maplebirch) {
         {
           src: '<<set $daily.school.attended.science to true>>',
           applyafter: '\n\n<<deadwood-reblooms-sydney-science-intro>>',
+          expected: 1
+        },
+        // 仅在原版普通上课选项前显示，考试、检查与突发事件不提供同桌互动。
+        {
+          src: '<<scienceicon>>',
+          applybefore: '<<deadwood-reblooms-sydney-science-actions>>\n\t',
           expected: 1
         }
       ]

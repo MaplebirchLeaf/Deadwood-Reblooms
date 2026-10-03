@@ -521,8 +521,8 @@ class Finance {
   }
 
   private refreshMoneyUI(): void {
-    $.wiki('<<updatesidebarmoney>>');
-    if (document.getElementById('dr-finance-caption')) $.wiki('<<replace "#dr-finance-caption">><<deadwood-reblooms-finance-caption-content>><</replace>>');
+    this.core.SugarCube.Wikifier.wikifyEval('<<updatesidebarmoney>>');
+    if (document.getElementById('dr-finance-caption')) this.core.SugarCube.Wikifier.wikifyEval('<<replace "#dr-finance-caption">><<deadwood-reblooms-finance-caption-content>><</replace>>');
   }
 
   public buy(symbol: unknown, amount: unknown): FinanceResult {

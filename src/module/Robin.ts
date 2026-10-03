@@ -143,6 +143,13 @@ class Robin extends Module implements RobinFacade {
       if (asylum.status === 'recovering' && C.npc.Robin.trauma < 60) asylum.status = 'home';
     }
 
+    if (asylum.status === 'admitted') {
+      // 同座、同行与原版重逢标记不能让留院中的罗宾出现在学校。
+      V.robinhistory = 'missing';
+      V.withRobin = undefined;
+      V.robinReunionScene = undefined;
+    }
+
     if (state.tutor) {
       // 原版 Robin 17:30 至 18:30 的日程已转到家教。PC 未陪同的上课日照常推进，
       // 而共同授课已写入 tutorDay，因此不会重复计算。逐日回补睡眠等跨日推进。
@@ -223,10 +230,6 @@ class Robin extends Module implements RobinFacade {
       const getLocation = window.getRobinLocation;
       window.getRobinLocation = () => {
         const location = getLocation();
-        if (V.RobinExpansion?.asylum?.status === 'admitted') {
-          T.robin_location = 'asylum';
-          return 'asylum';
-        }
         if (
           location === 'orphanage' &&
           !V.robinlocationoverride?.during?.includes(Time.hour) &&
