@@ -22,6 +22,7 @@ interface OrchardSpeciesData {
 export const species = data as Record<OrchardSpecies, OrchardSpeciesData>;
 export const harvestTiers = rules.harvestTiers;
 export const soilMultipliers = rules.soilMultipliers;
+export const offSeasonYieldMultiplier = rules.offSeasonYieldMultiplier;
 export const orchardSites = rules.sites;
 export const clearingStepMinutes = rules.clearingStepMinutes;
 export const harvestDays = 3;

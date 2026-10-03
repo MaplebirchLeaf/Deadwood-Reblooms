@@ -17,28 +17,28 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
       'Temple Garden': [
         {
           srcmatch: /<<wolficon>>(?=\s*<<link\s+\[\[[^\]\r\n]*\|Temple\]\]>>)/,
-          applybefore: "<<deadwood-orchard-entry 'temple'>>\n\t",
+          applybefore: "<<deadwood-orchard-entry 'temple'>>",
           expected: 1
         }
       ],
       'Farm Fields': [
         {
-          src: '<<display_plot farm>>',
-          applybefore: "<<deadwood-orchard-entry 'farm'>>\n\t",
+          srcmatch: /<<getouticon>>(?=\s*<<link\s+\[\[[^\]\r\n]*\|Farm Work\]\]>>)/,
+          applybefore: "<<deadwood-orchard-entry 'farm'>>",
           expected: 1
         }
       ],
       Pub: [
         {
           srcmatch: /<<harvesticon>>(?=\s*<<link\s+\[\[[^\]\r\n]*\|Harvest Street\]\]>>)/,
-          applybefore: '<<deadwood-orchard-worker-recruitment>>\n\t\t',
+          applybefore: '<<deadwood-orchard-worker-recruitment>>',
           expected: 1
         }
       ],
       Supermarket: [
         {
           src: '<<supermarketDisplay "supermarket">>',
-          applybefore: '<<deadwood-orchard-seed-shop>>\n\t\t',
+          applybefore: '<<deadwood-orchard-seed-shop>>',
           expected: 1
         }
       ]

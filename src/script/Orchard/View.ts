@@ -2,7 +2,7 @@
 
 import type Orchard from '../../module/Orchard';
 import type { OrchardSite, OrchardTool, OrchardReceipt } from '../../module/Orchard';
-import { species, harvestTiers, harvestDays, moistureDays, orchardSites, clearingStepMinutes, type OrchardSpecies, type OrchardFruit } from '../../module/Orchard/Species';
+import { species, harvestTiers, harvestDays, moistureDays, orchardSites, clearingStepMinutes, offSeasonYieldMultiplier, type OrchardSpecies, type OrchardFruit } from '../../module/Orchard/Species';
 
 const tools: readonly [OrchardTool, string, string][] = [
   ['plant', 'Plant', '播种'],
@@ -167,10 +167,7 @@ export default class OrchardView {
     const dry = trees.filter(tree => this.orchard.stage(tree) < 2 && tree.moisture === 0).length;
     this.summary.replaceChildren(document.createTextNode(lanSwitch(`There are ${opened} cleared plots here.`, `这里有 ${opened} 块开垦好的土地。`)));
     const status = document.createElement('span');
-    if (Time.season === 'winter') {
-      status.className = 'lblue';
-      status.textContent = lanSwitch(' The trees are dormant until spring.', ' 果树正在休眠，等待春天到来。');
-    } else if (dry) {
+    if (dry) {
       status.className = 'purple';
       status.textContent = lanSwitch(` ${dry} young ${dry === 1 ? 'tree needs' : 'trees need'} water.`, ` ${dry} 棵幼树需要浇水。`);
     }
@@ -215,7 +212,7 @@ export default class OrchardView {
     });
     for (const button of this.tray.querySelectorAll('button')) {
       button.setAttribute('aria-pressed', String(button.dataset.tool === this.tool));
-      button.disabled = !this.orchard.canWork || (Time.season === 'winter' && ['plant', 'water', 'fertiliser'].includes(button.dataset.tool!));
+      button.disabled = !this.orchard.canWork;
       if (button.dataset.tool === 'plant' && !this.orchard.varieties.length) button.disabled = true;
       if (button.dataset.tool === 'fertiliser' && V.fertiliser.current < 1) button.disabled = true;
     }
@@ -341,7 +338,8 @@ export default class OrchardView {
     const stock = document.createElement('div');
     stock.textContent = lanSwitch(`You have ${V.fertiliser.current} ${V.fertiliser.current === 1 ? 'bag' : 'bags'} of fertiliser.`, `你有 ${V.fertiliser.current} 袋肥料。`);
     const season = document.createElement('div');
-    season.textContent = `${lanSwitch('Fruiting season: ', '结果季节：')}${data.fruitSeasons.map(key => lanSwitch(...seasons[key])).join(' / ')}`;
+    const offSeasonPercent = Math.round(offSeasonYieldMultiplier * 100);
+    season.textContent = `${lanSwitch('Peak season: ', '丰产季节：')}${data.fruitSeasons.map(key => lanSwitch(...seasons[key])).join(' / ')}${lanSwitch(`. Other seasons yield ${offSeasonPercent}% of the normal harvest.`, `。其他季节产量为正常收成的 ${offSeasonPercent}%。`)}`;
     this.supplies.append(label, stock);
     if (this.orchard.varieties.length) this.supplies.append(season);
     else {
@@ -391,7 +389,7 @@ export default class OrchardView {
           this.toolIcon('harvest'),
           this.link(lanSwitch('Ask Alex to help pick (0:05)', '请艾利克斯一起采果 (0:05)'), () => this.perform(this.selected, 'harvest', true))
         );
-      } else if (Time.season !== 'winter' && this.orchard.stage(tree) < 2 && tree.moisture < moistureDays) {
+      } else if (this.orchard.stage(tree) < 2 && tree.moisture < moistureDays) {
         help.append(
           this.toolIcon('water'),
           this.link(lanSwitch('Ask Alex to help water (0:02:30)', '请艾利克斯一起浇水 (0:02:30)'), () => this.perform(this.selected, 'water', true))

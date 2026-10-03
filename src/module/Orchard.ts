@@ -5,6 +5,7 @@ import {
   species,
   harvestTiers,
   soilMultipliers,
+  offSeasonYieldMultiplier,
   orchardSites,
   clearingStepMinutes,
   harvestDays,
@@ -104,7 +105,6 @@ class Orchard extends Module {
     this.core.dynamic.regWeatherEvent(':deadwood-orchard-rain', {
       condition: () => !!V.Orchard && !V.statFreeze,
       precip: 'rain',
-      season: ['spring', 'summer', 'autumn'],
       onEnter: () => this.advance()
     });
     this.core.dynamic.regTimeEvent('onBefore', ':deadwood-orchard-sync', {
@@ -256,11 +256,12 @@ class Orchard extends Module {
   }
 
   /** 沿用旧果园的树龄、技能、树种和土壤产量，接入当前原版的收成倍率字段。 */
-  public yield(tree: OrchardTree, quality: number): number {
+  public yield(tree: OrchardTree, quality: number, season = Time.season): number {
     const tier = harvestTiers.filter(tier => tree.harvests >= tier.harvests).at(-1)!;
     const upper = Math.floor(window.currentSkillValue('tending') / tier.skillDivisor + tier.upperBase);
     const amount = random(10, Math.max(10, upper));
-    const multiplier = species[tree.species].yieldMultiplier * soilMultipliers[Math.max(0, Math.min(3, quality - 1))];
+    const data = species[tree.species];
+    const multiplier = data.yieldMultiplier * soilMultipliers[Math.max(0, Math.min(3, quality - 1))] * (data.fruitSeasons.includes(season) ? 1 : offSeasonYieldMultiplier);
     return Math.trunc(amount * multiplier * (V.backgroundTraits.includes('greenthumb') ? 1.2 : 1) * (V.settings.tendingYieldModifier / 5));
   }
 
@@ -287,13 +288,13 @@ class Orchard extends Module {
           if (!tree) continue;
           const data = species[tree.species];
           if (tree.growth < data.matureDays) {
-            if (site === 'farm' && this.irrigated && state.irrigationSince < midnight.timeStamp && season !== 'winter') tree.moisture = moistureDays;
-            if (season !== 'winter' && tree.moisture > 0) tree.growth = Math.min(data.matureDays, tree.growth + (tree.fertiliser > 0 ? 2 : 1));
+            if (site === 'farm' && this.irrigated && state.irrigationSince < midnight.timeStamp) tree.moisture = moistureDays;
+            if (tree.moisture > 0) tree.growth = Math.min(data.matureDays, tree.growth + (tree.fertiliser > 0 ? 2 : 1));
           }
-          if (tree.growth >= data.matureDays && data.fruitSeasons.includes(season) && tree.fruit.length < harvestDays) {
+          if (tree.growth >= data.matureDays && tree.fruit.length < harvestDays) {
             const type = bloodMoon && data.bloodMoonFruit ? data.bloodMoonFruit : tree.species;
             if (setup.foodstuff[type]) {
-              const amount = this.yield(tree, soil.quality);
+              const amount = this.yield(tree, soil.quality, season);
               tree.fruit.push({ type, amount });
             }
           }
@@ -305,7 +306,7 @@ class Orchard extends Module {
     }
     if (state.day === today) this.workShift(today);
     // 只应用当前已知的雨水，不捏造原版未保存的历史降雨。
-    if (state.day !== today || Time.season === 'winter') return;
+    if (state.day !== today) return;
     for (const site of ['temple', 'farm'] as const) {
       if (Weather.precipitation !== 'rain' && !(site === 'farm' && this.irrigated)) continue;
       for (const tree of state[site]) {
@@ -322,11 +323,10 @@ class Orchard extends Module {
     if (!worker.hired || day <= worker.lastShift || morning > Time.date.timeStamp) return;
     worker.lastShift = day;
     if (morning < worker.paidFrom || morning >= worker.paidUntil || !V.per_npc?.deadwood_orchard_worker || !this.available('farm') || V.farm_assault) return;
-    const winter = Time.getSeason(new window.DateTime(morning)) === 'winter';
     const report = { day, watered: 0, kept: {} as Partial<Record<OrchardFruit, number>> };
     this.state.farm.forEach((tree, index) => {
       if (!tree || !this.cleared('farm', index)) return;
-      if (!winter && this.stage(tree) < 2 && tree.moisture < moistureDays && !(this.irrigated && this.state.irrigationSince <= morning)) {
+      if (this.stage(tree) < 2 && tree.moisture < moistureDays && !(this.irrigated && this.state.irrigationSince <= morning)) {
         tree.moisture = moistureDays;
         report.watered++;
       }
@@ -360,7 +360,7 @@ class Orchard extends Module {
     const soil = this.state.soil[site][index];
     switch (tool) {
       case 'plant':
-        if (tree || !this.varieties.includes(this.state.seed) || Time.season === 'winter') return 0;
+        if (tree || !this.varieties.includes(this.state.seed)) return 0;
         plots[index] = {
           species: this.state.seed,
           growth: 0,
@@ -371,13 +371,13 @@ class Orchard extends Module {
         };
         return 10;
       case 'water':
-        if (!tree || this.stage(tree) === 2 || tree.moisture === moistureDays || Time.season === 'winter') return 0;
+        if (!tree || this.stage(tree) === 2 || tree.moisture === moistureDays) return 0;
         tree.moisture = moistureDays;
         if (helped) this.state.helpDay = Math.floor(Time.date.timeStamp / 86400);
         this.notice = { tool, helped };
         return helped ? 2.5 : 5;
       case 'fertiliser':
-        if (!tree || V.fertiliser.current < 1 || Time.season === 'winter') return 0;
+        if (!tree || V.fertiliser.current < 1) return 0;
         if (this.stage(tree) < 2) {
           if (tree.fertiliser > 0) return 0;
           tree.fertiliser = fertiliserDays;
