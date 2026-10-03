@@ -32,6 +32,7 @@ function fruitImage(type: OrchardFruit): HTMLImageElement {
 /** 图片经框架读取 BSA 资源，成功取得地址后再设置 src，避免显示破图。 */
 function image(path: string): HTMLImageElement {
   const element = document.createElement('img');
+  element.className = 'icon';
   element.width = element.height = 30;
   element.alt = '';
   element.draggable = false;
@@ -286,7 +287,11 @@ export default class OrchardView {
       warning.textContent = lanSwitch(' Remove this tree? It cannot be recovered.', ' 铲除这棵树？移除后无法恢复。');
       this.detail.append(
         warning,
+        document.createElement('br'),
+        this.toolIcon('shovel'),
         this.link(lanSwitch('Confirm removal', '确认铲除'), () => this.perform(this.selected)),
+        document.createElement('br'),
+        image('img/misc/icon/refuse.png'),
         this.link(lanSwitch('Cancel', '取消'), () => {
           this.pending = null;
           this.render();
@@ -300,9 +305,9 @@ export default class OrchardView {
       plant: species[this.orchard.state.seed].images.seedling,
       water: 'img/misc/icon/watering-can.gif',
       fertiliser: 'img/misc/icon/fertiliser.png',
+      harvest: 'img/misc/icon/orchard-harvest.png',
       shovel: 'img/misc/icon/dig.png'
     };
-    if (tool === 'harvest') return fruitImage(this.orchard.state.seed);
     return image(paths[tool]);
   }
 
@@ -328,10 +333,8 @@ export default class OrchardView {
     if (this.orchard.varieties.length) select.value = this.orchard.state.seed;
     select.addEventListener('change', () => {
       this.orchard.state.seed = select.value as OrchardSpecies;
-      for (const tool of ['plant', 'harvest'] as const) {
-        const button = this.tray.querySelector(`[data-tool="${tool}"]`)!;
-        button.firstElementChild?.replaceWith(this.toolIcon(tool));
-      }
+      const button = this.tray.querySelector('[data-tool="plant"]')!;
+      button.firstElementChild?.replaceWith(this.toolIcon('plant'));
       this.render();
     });
     label.append(select);
@@ -384,9 +387,15 @@ export default class OrchardView {
     if (this.site === 'farm' && this.orchard.canAskAlex && tree) {
       const help = document.createElement('div');
       if (this.orchard.ripe(tree)) {
-        help.append(this.link(lanSwitch('Ask Alex to help pick (0:05)', '请艾利克斯一起采果 (0:05)'), () => this.perform(this.selected, 'harvest', true)));
+        help.append(
+          this.toolIcon('harvest'),
+          this.link(lanSwitch('Ask Alex to help pick (0:05)', '请艾利克斯一起采果 (0:05)'), () => this.perform(this.selected, 'harvest', true))
+        );
       } else if (Time.season !== 'winter' && this.orchard.stage(tree) < 2 && tree.moisture < moistureDays) {
-        help.append(this.link(lanSwitch('Ask Alex to help water (0:02:30)', '请艾利克斯一起浇水 (0:02:30)'), () => this.perform(this.selected, 'water', true)));
+        help.append(
+          this.toolIcon('water'),
+          this.link(lanSwitch('Ask Alex to help water (0:02:30)', '请艾利克斯一起浇水 (0:02:30)'), () => this.perform(this.selected, 'water', true))
+        );
       }
       if (help.firstElementChild) this.supplies.append(help);
     }

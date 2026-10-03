@@ -11,8 +11,39 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
     if (orchard) orchard.notice = undefined;
   });
 
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: "deadwood-orchard-entry 'temple'", passage: 'Temple Garden' }, { widget: "deadwood-orchard-entry 'farm'", passage: 'Farm Fields' });
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-orchard-seed-shop', passage: 'Supermarket' }, { widget: 'deadwood-orchard-worker-recruitment', passage: 'Pub' });
+  // 在原版普通菜单分支调用入口，昏倒、袭击和强制剧情不会执行这些宏。
+  maplebirch.tool.inject({
+    locationPassage: {
+      'Temple Garden': [
+        {
+          srcmatch: /<<wolficon>>(?=\s*<<link\s+\[\[[^\]\r\n]*\|Temple\]\]>>)/,
+          applybefore: "<<deadwood-orchard-entry 'temple'>>\n\t",
+          expected: 1
+        }
+      ],
+      'Farm Fields': [
+        {
+          src: '<<display_plot farm>>',
+          applybefore: "<<deadwood-orchard-entry 'farm'>>\n\t",
+          expected: 1
+        }
+      ],
+      Pub: [
+        {
+          srcmatch: /<<harvesticon>>(?=\s*<<link\s+\[\[[^\]\r\n]*\|Harvest Street\]\]>>)/,
+          applybefore: '<<deadwood-orchard-worker-recruitment>>\n\t\t',
+          expected: 1
+        }
+      ],
+      Supermarket: [
+        {
+          src: '<<supermarketDisplay "supermarket">>',
+          applybefore: '<<deadwood-orchard-seed-shop>>\n\t\t',
+          expected: 1
+        }
+      ]
+    }
+  });
 
   maplebirch.tool.macro.defineS('deadwood-orchard-worker-harvest', () => {
     const kept = maplebirch.get('Orchard')?.state.worker.report.kept;
@@ -29,8 +60,7 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
 
   maplebirch.tool.macro.defineS('deadwood-orchard-seed-shop', () => {
     const orchard = maplebirch.get('Orchard');
-    // 收银区的正常出口必须存在，关店、夜间潜入和昏倒剧情不增加购物选项。
-    if (!orchard || !orchard.canWork || Time.dayState === 'night' || Time.hour === 21 || !document.querySelector('#passage-content a[data-passage="Shopping Centre"]')) return;
+    if (!orchard || !orchard.canWork || Time.dayState === 'night' || Time.hour === 21) return;
     return (Object.keys(species) as OrchardSpecies[])
       .filter(key => species[key].seedSource === 'shop' && !orchard.state.known.includes(key) && setup.foodstuff[key])
       .map(key => {
