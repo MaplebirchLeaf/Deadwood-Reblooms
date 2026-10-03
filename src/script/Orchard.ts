@@ -15,6 +15,7 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.inject({
     locationPassage: {
       'Temple Garden': [
+        // 在神殿花园的普通离开选项前追加果园入口。
         {
           srcmatch: /<<wolficon>>(?=\s*<<link\s+\[\[[^\]\r\n]*\|Temple\]\]>>)/,
           applybefore: "<<deadwood-orchard-entry 'temple'>>",
@@ -22,6 +23,7 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
         }
       ],
       'Farm Fields': [
+        // 原版农田说明结束后才显示果园入口，与农田的耕作信息分开。
         {
           srcmatch: /<<getouticon>>(?=\s*<<link\s+\[\[[^\]\r\n]*\|Farm Work\]\]>>)/,
           applybefore: "<<deadwood-orchard-entry 'farm'>>",
@@ -29,6 +31,7 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
         }
       ],
       Pub: [
+        // 招募入口只跟随酒馆的普通菜单显示。
         {
           srcmatch: /<<harvesticon>>(?=\s*<<link\s+\[\[[^\]\r\n]*\|Harvest Street\]\]>>)/,
           applybefore: '<<deadwood-orchard-worker-recruitment>>',
@@ -36,9 +39,20 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
         }
       ],
       Supermarket: [
+        // 在原版货架前追加已解锁种子的购买选项。
         {
           src: '<<supermarketDisplay "supermarket">>',
           applybefore: '<<deadwood-orchard-seed-shop>>',
+          expected: 1
+        }
+      ]
+    },
+    widgetPassage: {
+      'Farm Widgets': [
+        // 只扩展返回条件；保留原版 widget、农田返回链接和事件清理。
+        {
+          src: '<<if $bus is "farm_fields">>',
+          to: '<<if $bus is "deadwood_orchard">><<deadwood-orchard-event-return>><<elseif $bus is "farm_fields">>',
           expected: 1
         }
       ]

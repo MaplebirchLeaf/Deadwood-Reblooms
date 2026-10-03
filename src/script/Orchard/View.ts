@@ -426,8 +426,8 @@ export default class OrchardView {
     );
     if (this.orchard.notice?.clearing === 0) this.selected = index;
     const interrupted = this.site === 'farm' && this.orchard.farmInterrupted;
-    if (interrupted || !this.orchard.canWork || !this.orchard.available(this.site)) {
-      this.orchard.core.SugarCube.Engine.play(this.site === 'farm' ? 'Farm Fields' : 'Temple Garden');
+    if (interrupted) {
+      this.orchard.core.SugarCube.Engine.play('Farm Fields');
       return;
     }
     this.orchard.notice ??= { tool };

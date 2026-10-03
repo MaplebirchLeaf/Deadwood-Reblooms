@@ -17,6 +17,14 @@
   <</capture>>
 <</widget>>
 
+<<widget 'deadwood-orchard-event-return'>>
+  <<set $_orchard to maplebirch.get('Orchard')>>
+  <<set $_returnTo to $_orchard and $_orchard.available('farm') and !$_orchard.farmInterrupted ? 'Deadwood Reblooms Orchard' : 'Farm Fields'>>
+  <<lanLink ['Next', '继续'] $_returnTo>>
+    <<endevent>><<set $eventskip to 1>>
+  <</lanLink>><br>
+<</widget>>
+
 <<widget 'deadwood-orchard-worker-recruitment'>>
   <<set $_orchard to maplebirch.get('Orchard')>>
   <!-- 普通酒馆菜单才招聘，先结束菜单里的随机 NPC，避免占用同一个人物槽。 -->
@@ -175,7 +183,7 @@
   <<lanSwitch 'Shouts carry from the fields. You need to return to the farm.' '田地那边传来喊声。你得先回去看看。'>><br><br>
   <<getouticon>><<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>>
 <<elseif $Orchard.site is 'farm' and dangerEvent() and $eventskip isnot 1>>
-  <<farm_tending_events>>
+  <<set $bus to 'deadwood_orchard'>><<farm_tending_events>>
 <<else>>
   <<language>>
     <<option 'EN'>>
