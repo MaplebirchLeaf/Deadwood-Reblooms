@@ -1,10 +1,12 @@
+import paperhangings from './Paperhangings.json';
 import PropertyCatalog, { type Property, type ResidentProfile } from './PropertyCatalog';
 import type Finance from './Finance';
 import Mortgage, { type MortgageState } from './Mortgage';
 
 type PropertyId = string;
 type PropertyRoom = 'bedroom' | 'bathroom' | 'kitchen' | 'desk' | 'guest' | 'retreat' | 'outdoor' | 'balcony';
-type FurnitureKind = 'bed' | 'table' | 'chair' | 'desk' | 'wardrobe' | 'decoration' | 'windowsill';
+type PaperKind = 'poster' | 'wallpaper';
+type FurnitureKind = PaperKind | 'bed' | 'table' | 'chair' | 'desk' | 'wardrobe' | 'decoration' | 'windowsill';
 type PropertyFurniture = { id: string; name: string; nameCap: string; cost: number; type: string[]; category: string[]; iconFile: string; description?: string; showCheck?: string; tier?: number };
 
 export interface RealEstateState {
@@ -34,6 +36,7 @@ interface PropertyManagement {
   bed_id: string | null;
   wardrobe_id: string | null;
   furnishings?: Partial<Record<FurnitureKind, string>>;
+  paperhangings?: Partial<Record<PaperKind, { design: string; custom: boolean }>>;
 }
 
 interface AuctionRecord {
@@ -328,6 +331,20 @@ export class RealEstate {
     const property = this.properties.find(item => item.id === id);
     if (!property) return null;
     const state = this.managementFor(id);
+    if (kind === 'poster' || kind === 'wallpaper') {
+      const hanging = state.paperhangings?.[kind];
+      const template = window.Furniture.get(kind, true);
+      if (!hanging || !template) return null;
+      const label = !hanging.custom ? (paperhangings[kind] as Record<string, { EN: string; CN: string }>)[hanging.design] : undefined;
+      const name = label ? lanSwitch(label.EN, label.CN) : hanging.design;
+      const iconFile =
+        kind === 'poster'
+          ? (this.core.get('MoreLoveInterestsAndNPCAvatars')?.icon(hanging.design, !hanging.custom) ?? 'poster')
+          : hanging.custom
+            ? 'wallpaper-custom'
+            : `wallpaper-${hanging.design.replaceAll(' ', '-')}`;
+      return { ...template, id: hanging.custom ? 'custom' : hanging.design, name, nameCap: name, iconFile, description: undefined, category: [kind] };
+    }
     const installed =
       state.furnishings?.[kind] ??
       (kind === 'bed' ? (state.bed_id ?? property.bed_id) : kind === 'wardrobe' ? (state.wardrobe_id ?? property.wardrobe_id) : kind === 'desk' && property.rooms.desk ? 'desk' : null);
@@ -352,6 +369,41 @@ export class RealEstate {
     const property = this.properties.find(item => item.id === id);
     if (!property || (kind === 'desk' && !property.rooms.desk)) return [];
     const current = this.furniture(id, kind);
+    if (kind === 'poster' || kind === 'wallpaper') {
+      const template = window.Furniture.get(kind, true);
+      if (!template) return [];
+      const cost = window.Furniture.setPrice(template.cost);
+      const offers = Object.entries(paperhangings[kind])
+        .filter(([design]) => design !== current?.id)
+        .map(([design, label]) => ({
+          id: design,
+          cost,
+          item: {
+            ...template,
+            id: design,
+            category: [kind],
+            name: lanSwitch(label.EN, label.CN),
+            nameCap: lanSwitch(label.EN, label.CN),
+            description: undefined,
+            iconFile: `${kind}-${design.replaceAll(' ', '-')}`
+          }
+        }));
+      if (Time.dayState !== 'night')
+        offers.push({
+          id: 'custom',
+          cost: cost * 2,
+          item: {
+            ...template,
+            id: 'custom',
+            category: [kind],
+            name: lanSwitch('Custom design', '定制图案'),
+            nameCap: lanSwitch('Custom design', '定制图案'),
+            description: undefined,
+            iconFile: kind === 'wallpaper' ? 'wallpaper-custom' : 'poster'
+          }
+        });
+      return offers;
+    }
     const stock = setup.furniture as Map<string, PropertyFurniture>;
     return Array.from(stock.entries())
       .filter(([key, item]) => item.category.includes(kind) && !item.type.includes('starter') && key !== current?.id && !['disabled', 'notBedroom'].includes(item.showCheck ?? ''))
@@ -359,11 +411,24 @@ export class RealEstate {
       .map(([key, item]) => ({ id: key, item, cost: window.Furniture.setPrice(item.cost) }));
   }
 
-  public installFurniture(id: PropertyId, kind: FurnitureKind, itemId: string): boolean {
+  public installFurniture(id: PropertyId, kind: FurnitureKind, itemId: string, design?: string): boolean {
     if (!this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return false;
     const offer = this.furnitureOffers(id, kind).find(item => item.id === itemId);
     if (!offer || !this.finance.canPay(offer.cost, 'furniture')) return false;
     const management = this.managementFor(id);
+    if (kind === 'poster' || kind === 'wallpaper') {
+      const custom = itemId === 'custom';
+      const name = custom
+        ? this.core.host.sugarcube
+            .require()
+            .Util.escape(String(design ?? '').trim() || lanSwitch('a custom design', '定制图案'))
+            .replaceAll('[', '&#91;')
+            .replaceAll(']', '&#93;')
+        : itemId;
+      management.paperhangings ??= {};
+      management.paperhangings[kind] = { design: name, custom };
+      return true;
+    }
     management.furnishings ??= {};
     management.furnishings[kind] = itemId;
     if (kind === 'bed') management.bed_id = itemId;

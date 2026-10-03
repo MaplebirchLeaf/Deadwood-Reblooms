@@ -80,7 +80,7 @@ When demon, angel or fallen angel wings and raven wings are visible, the mirror 
 
 **Effects:** The primary target takes its normal damage. Foxfire then scorches one other living tentacle or vine that has not finished, dealing weaker damage. The splash costs no additional use and cannot hit the primary target, a human body or an animal. With no other living tentacle, only the native Banish effect occurs. If the splash exhausts a target's health, its restraints are cleared immediately, while vanilla handles its departure.
 
-**Combined effects:** Maximum purity, a two-handed Banish and VanillaPlus's increased Banish damage all affect Foxfire because the splash follows damage actually dealt to the primary target. Banishing one target with both hands produces one splash and still costs the native number of uses. Successful Banish actions aimed at separate targets resolve separately. Gold Foxfire text appears only when another tentacle is actually scorched.
+**Combined effects:** Maximum purity, a two-handed Banish and VanillaPlus's increased Banish damage all affect Foxfire because the splash follows damage actually dealt to the primary target. Banishing one target with both hands produces one splash and still costs the native number of uses. Successful Banish actions aimed at separate targets resolve separately. Teal Foxfire text appears only when another tentacle is actually scorched.
 
 ### Accessories and icon questions
 

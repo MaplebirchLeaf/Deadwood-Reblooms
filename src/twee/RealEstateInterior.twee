@@ -5,6 +5,14 @@
 <<else>>
 	<<run maplebirch.get("VanillaPlus").realEstate.enter()>><<home_effects>><<effects>>
 	<<= lanSwitch(_property.interior.bedroom.EN, _property.interior.bedroom.CN)>><br><br>
+	<<for _paperKind range ['wallpaper', 'poster']>>
+		<<set _hanging to maplebirch.get("VanillaPlus").realEstate.furniture(_property.id, _paperKind)>>
+		<<if _hanging>>
+			<<furnitureicon _hanging.iconFile>>
+			<<if _paperKind is 'poster'>><<lanSwitch 'A poster hangs on the wall:' '墙上挂着一张海报：'>><<else>><<lanSwitch 'The walls are covered with wallpaper:' '墙上贴着壁纸：'>><</if>> <<= _hanging.nameCap>><<lanSwitch '.' '。'>><br>
+		<</if>>
+	<</for>>
+	<<if maplebirch.get("VanillaPlus").realEstate.managementFor(_property.id).paperhangings>><br><</if>>
 	<<set _bedroomCompanion to null>>
 	<<if maplebirch.get("VanillaPlus").realEstate.residentsInBedroom(_property.id).length gt 0>>
 		<<set _bedroomCompanion to maplebirch.get("VanillaPlus").realEstate.residentsInBedroom(_property.id)[0]>>

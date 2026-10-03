@@ -526,7 +526,9 @@
 		{ id: 'desk', EN: 'Desks', CN: '书桌' },
 		{ id: 'wardrobe', EN: 'Wardrobe', CN: '衣橱' },
 		{ id: 'decoration', EN: 'Decorations', CN: '饰品' },
-		{ id: 'windowsill', EN: 'Miscellaneous', CN: '杂项' }
+		{ id: 'windowsill', EN: 'Miscellaneous', CN: '杂项' },
+		{ id: 'poster', EN: 'Posters', CN: '海报' },
+		{ id: 'wallpaper', EN: 'Wallpaper', CN: '壁纸' }
 	]>>
 	<<run _categories.forEach(item => item.label = lanSwitch(item.EN, item.CN))>>
 	<<for _category range _categories>>
@@ -547,7 +549,10 @@
 <<widget 'deadwood-reblooms-property-furniture-list'>>
 <<set _property to maplebirch.get("VanillaPlus").realEstate.properties.find(item => item.id === $deadwoodFurnitureProperty && maplebirch.get("VanillaPlus").realEstate.owns(item.id))>>
 	<<set _current to maplebirch.get("VanillaPlus").realEstate.furniture(_property.id, $deadwoodFurnitureCategory)>>
-	<<lanSwitch 'Currently installed in this home:' '这处住处当前摆放的是：'>>
+	<<if ['poster', 'wallpaper'].includes($deadwoodFurnitureCategory)>>
+		<<lanSwitch 'You browse the samples of pre-made designs. A custom design costs twice as much.' '你翻看着预制图案的样品。支付双倍价格，可以定制图案。'>><br><br>
+	<</if>>
+	<<lanSwitch 'Currently installed in this home:' '这处住处当前布置的是：'>>
 	<<if _current>>
 		<<furnitureicon _current.iconFile>> <<= _current.nameCap>><br>
 		<<if _current.description>>
@@ -570,6 +575,7 @@
 				<<set _priceLabel to '£' + _offer.cost / 100>>
 				<div class='shopBlock no-numberify'>
 					<<furnitureicon _offer.item.iconFile>> <<= _offer.item.nameCap>> |
+					<<if _offer.id is 'custom'>><<textbox '_customHanging' ''>> | <</if>>
 					<<if _offer.item.type.includes('comfy')>><<lanSwitch 'Comfortable' '舒适'>> | <</if>>
 					<<if _offer.item.type.includes('single')>><<lanSwitch 'Single' '单人'>> | <</if>>
 					<<if _offer.item.type.includes('double')>><<lanSwitch 'Double' '双人'>> | <</if>>
@@ -585,9 +591,9 @@
 					<</if>>
 					<<if maplebirch.get("VanillaPlus").finance.canPay(_offer.cost, 'furniture')>>
 						<<link _priceLabel 'Deadwood Reblooms Property Furniture Catalogue'>>
-							<<if maplebirch.get("VanillaPlus").realEstate.installFurniture(_property.id, $deadwoodFurnitureCategory, _offer.id)>>
+							<<if maplebirch.get("VanillaPlus").realEstate.installFurniture(_property.id, $deadwoodFurnitureCategory, _offer.id, _offer.id is 'custom' ? _customHanging : undefined)>>
 								<<money `-_offer.cost` 'furniture'>>
-								<<run Furniture.log(_offer.id)>>
+								<<run Furniture.log(['poster', 'wallpaper'].includes($deadwoodFurnitureCategory) ? $deadwoodFurnitureCategory : _offer.id)>>
 							<</if>>
 						<</link>>
 					<<else>>

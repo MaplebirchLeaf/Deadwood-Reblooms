@@ -1,8 +1,14 @@
+// ./src/module/VanillaPlus/DivineTransformations.ts
+
 export type DivineEncounter = 'Default' | 'Struggle' | 'Tentacle';
+export type PrayerContact = 'holy' | 'stone' | 'dark';
 
 interface DivineTransformationState {
   beautyBonus: number;
   expungeUsed: boolean;
+  prayer: Record<PrayerContact, boolean>;
+  trinity: boolean;
+  contact: 'none' | 'pending' | 'success' | 'failure' | 'escape';
 }
 
 interface StruggleEnemy {
@@ -34,6 +40,35 @@ class DivineTransformations {
 
   public get demon(): boolean {
     return Number(V.demon) >= 6;
+  }
+
+  public get trinity(): boolean {
+    return this.state?.trinity === true;
+  }
+
+  public get canContact(): boolean {
+    const contacts = this.state?.prayer;
+    return (
+      !this.trinity &&
+      this.fallenAngel &&
+      V.worn?.neck?.name === 'dark pendant' &&
+      V.settings?.transformDivineEnabled === true &&
+      Weather.solarEclipse === true &&
+      !!contacts?.holy &&
+      !!contacts.stone &&
+      !!contacts.dark
+    );
+  }
+
+  public record(contact: PrayerContact): void {
+    if (this.state) this.state.prayer[contact] = true;
+  }
+
+  public unlock(): void {
+    const state = this.state;
+    if (!state) return;
+    state.trinity = true;
+    state.contact = 'success';
   }
 
   // 三种完整神圣转化各强化与其内核最贴近的一项数值，不改变原始成长值。

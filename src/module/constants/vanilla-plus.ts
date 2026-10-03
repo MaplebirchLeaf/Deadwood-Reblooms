@@ -22,12 +22,20 @@ export interface VanillaPlusState {
     /** 是否已经历过"倾城"事件，该事件只发生一次。 */
     alluring: boolean;
   };
-  /** 神圣转化带来的一次性数值加成。 */
+  /** 神圣转化加成与祈祷室的异常接触。 */
   divineTransformations: {
     /** 转化赋予的额外美貌上限加成，参与 normalCeiling 计算。 */
     beautyBonus: number;
-    /** 是否已使用过"净化"（清除转化惩罚），每次存档仅一次。 */
+    /** 本场遭遇是否已使用过“清除”。 */
     expungeUsed: boolean;
+    /** 已亲历过的三种原版祈祷室接触，挣脱也计入。 */
+    prayer: Record<'holy' | 'stone' | 'dark', boolean>;
+    /** 是否获得“三位一体”，允许神圣转化共存。 */
+    trinity: boolean;
+    /** 当前接触的结算状态，避免重绘结果时重复施加变化。 */
+    contact: 'none' | 'pending' | 'success' | 'failure' | 'escape';
+    /** 接触入口使用原版意志检定得到的结果。 */
+    contactHeld: boolean;
   };
   /** 银行、证券与市场的全部可变状态。 */
   finance: FinanceState;
@@ -162,7 +170,11 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
   },
   divineTransformations: {
     beautyBonus: 0,
-    expungeUsed: false
+    expungeUsed: false,
+    prayer: { holy: false, stone: false, dark: false },
+    trinity: false,
+    contact: 'none',
+    contactHeld: false
   },
   finance: DEFAULT_FINANCE_STATE,
   real_estate: RealEstate.defaults,

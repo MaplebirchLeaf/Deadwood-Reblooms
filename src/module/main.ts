@@ -1,3 +1,4 @@
+import DoLP from '../compat/DoLP';
 import DoLX from '../compat/DoLX';
 import DeadwoodReblooms from './DeadwoodReblooms';
 import UnLockCheatAndCombatStatusDisplay from './UnLockCheatAndCombatStatusDisplay';
@@ -18,6 +19,7 @@ import Kylar from './Kylar';
 
 (function (maplebirch): void {
   'use strict';
+  DoLP(maplebirch);
   DoLX(maplebirch);
   maplebirch.define('DeadwoodReblooms', new DeadwoodReblooms(maplebirch), ['var']);
   maplebirch.define('UnLockCheatAndCombatStatusDisplay', new UnLockCheatAndCombatStatusDisplay(maplebirch), ['DeadwoodReblooms', 'tool']);

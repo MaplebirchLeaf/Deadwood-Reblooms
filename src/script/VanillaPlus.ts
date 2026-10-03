@@ -11,6 +11,7 @@ import NPCDoublePenetration from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
 import RealEstate from './VanillaPlus/RealEstate';
+import Trinity from './VanillaPlus/Trinity';
 import VirginityRestoration from './VanillaPlus/VirginityRestoration';
 import Willpower from './VanillaPlus/Willpower';
 
@@ -39,6 +40,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   Beauty(maplebirch);
   Deviancy(maplebirch);
   DivineTransformations(maplebirch);
+  Trinity(maplebirch);
   Exhibitionism(maplebirch);
   HandGrip(maplebirch);
   NPCDoublePenetration(maplebirch);
@@ -51,6 +53,13 @@ export default function (maplebirch: typeof window.maplebirch) {
   VirginityRestoration(maplebirch);
 
   maplebirch.tool.patch.traits.add(
+    {
+      title: 'Special Traits',
+      name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:sadomasochist:name'),
+      colour: 'def',
+      has: () => maplebirch.get('VanillaPlus')!.sadomasochist,
+      text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:sadomasochist:text')
+    },
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:willpower:name'),

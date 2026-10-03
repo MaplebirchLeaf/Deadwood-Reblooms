@@ -49,7 +49,7 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
     },
     widgetPassage: {
       'Farm Widgets': [
-        // 只扩展返回条件；保留原版 widget、农田返回链接和事件清理。
+        // 只扩展返回条件，保留原版 widget、农田返回链接和事件清理。
         {
           src: '<<if $bus is "farm_fields">>',
           to: '<<if $bus is "deadwood_orchard">><<deadwood-orchard-event-return>><<elseif $bus is "farm_fields">>',

@@ -1,6 +1,34 @@
 // ./src/script/Robin.ts
 
 export default function (maplebirch: typeof window.maplebirch): void {
+  // 饮品店使用独立地点，开店前查看空铺时仍显示原版街景。
+  maplebirch.tool.patch.location.configure(
+    'deadwood_robin_shop',
+    {
+      folder: 'robin-shop',
+      customMapping: () => (V.RobinExpansion?.shop ? 'deadwood_robin_shop' : 'town'),
+      base: {
+        default: { condition: () => !Weather.isSnow, image: 'base.png' },
+        snow: { condition: () => Weather.isSnow, image: 'snow.png' }
+      },
+      // 原版按底部对齐：32×32 灯光层相对 32×38 底图上移 6 像素。
+      emissive: {
+        image: 'emissive.png',
+        condition: () => Weather.lightsOn,
+        color: '#fbff86dd',
+        size: 4,
+        intensity: 0.8
+      },
+      weather: {
+        fogDistributionCurve: 1,
+        rainSplashEnabled: true,
+        fogEnabled: true,
+        groundBounds: { splashes: { top: 4, bottom: 0 }, fog: { top: 19, bottom: 0 } }
+      }
+    },
+    { overwrite: true }
+  );
+
   maplebirch.tool.onInit(() => {
     for (const [id, difficulty] of [
       ['Deadwood Robin Independent', 2],
@@ -40,7 +68,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:robin:trait:free:name'),
-      colour: 'gold',
+      colour: 'def',
       has: () => Boolean(V.RobinExpansion?.baileyDefeated),
       text: () => maplebirch.t('deadwood-reblooms:robin:trait:free:text')
     }
@@ -70,7 +98,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Journal': [
-        // 原版先列房租，DoLP 先列押金；在共同房租分支前追加罗宾日志。
+        // 原版先列房租，DoLP 先列押金。在共同房租分支前追加罗宾日志。
         {
           src: '<<if !_avery_pay>>',
           applybefore: `<<deadwood-robin-journal>>

@@ -135,7 +135,7 @@ class NPCAvatars {
 
   private path(npc: NPCData, profile: AvatarProfile, state: string | undefined): string {
     const gender = profile.gendered === false ? '' : npc.pronoun === 'm' ? 'm' : 'f';
-    const file = [profile.prefix, state || 'default', gender].filter(Boolean).join('_');
+    const file = [profile.prefix, state || 'default', gender].filter(Boolean).join('-');
     return `${this.options.basePath ?? NPCAvatars.avatarBasePath}/${profile.folder}/${file}.png`;
   }
 
@@ -170,7 +170,7 @@ class NPCAvatars {
 
     const folder = profile.mimicFolder;
     if (!folder) return undefined;
-    const path = `${this.options.basePath ?? NPCAvatars.avatarBasePath}/${folder}/${wraithState}_${npc.pronoun === 'm' ? 'm' : 'f'}.png`;
+    const path = `${this.options.basePath ?? NPCAvatars.avatarBasePath}/${folder}/${wraithState}-${npc.pronoun === 'm' ? 'm' : 'f'}.png`;
     fragment.append(this.buildLayers({ base: path }));
     return fragment;
   }

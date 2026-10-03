@@ -50,6 +50,10 @@ class VanillaPlus extends Module {
     return V.VanillaPlus.traits.incorrigible || V.VanillaPlus.traits[trait];
   }
 
+  public get sadomasochist(): boolean {
+    return V.feats?.currentSave?.Sadomasochist != null;
+  }
+
   public get allMax(): boolean {
     return this.attributes.every(attribute => this[attribute].max);
   }

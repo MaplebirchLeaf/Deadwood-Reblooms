@@ -278,7 +278,7 @@ class Raven extends Transformation {
     maplebirch.tool.inject({
       widgetPassage: {
         'Widgets Combat Man-Combat': [
-          // DoLP 扩展了击打分支；按 hitstat 定位，保留各分支原有伤害。
+          // DoLP 扩展了击打分支。按 hitstat 定位，保留各分支原有伤害。
           { srcmatchgroup: impact, to: `<<violence $1 1 1 ${armour}>>` },
           // DoLP 将拍打拆成多个力度分支，保留每个分支的伤害与攻击者索引。
           {

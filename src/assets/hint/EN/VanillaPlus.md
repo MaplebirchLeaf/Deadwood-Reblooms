@@ -29,6 +29,24 @@ Willpower, physique, and beauty gain a new ceiling at **125%** of their old ceil
 
 The seventh-level exhibitionism trait permits naked travel around town once the PC is comfortable with that degree of exposure. Vanilla exposure, fame, and encounter consequences remain. Deviancy connects to strange mirrors: first visit a given mirror, then at **03:00** enable tentacles and have hallucinations at level 2 or meet the day's mirror-tentacle condition to enter the Tentacle Plains. **Exit coordinates randomise on every entry**; separate mirrors can lead to the same tile. Extra hand and multiplayer actions still require enough NPCs, free body parts, and vanilla combat conditions. The hospital also offers separate virginity restoration services.
 
+### Taste for Cruelty
+
+**Unlock**: Enable VanillaPlus and earn the native **Sadomasochist** feat in the **current save**. The native feat requires both sadism and masochism to reach their highest levels, with normal feat eligibility rules. Saves that already earned it immediately display <span class="def">Taste for Cruelty</span>. No extra scene is required.
+
+**Effects**: <span class="def">Both sadism and masochism stop decaying naturally each day</span>. Positive gains, level calculations and other scene effects still follow vanilla. The trait does not directly increase either inclination or restore deliberate reductions from scenes or other effects.
+
+**Settings**: The hypnosis setting does not affect it. Disabling VanillaPlus restores normal decay. Re-enabling it applies the effect according to this save's feat record.
+
+### Trinity
+
+**Prerequisites**: Enable VanillaPlus and divine transformations in the game settings. Pray in the temple's prayer room and encounter each of the three vanilla presences: warmth, stone and empty darkness. Both embracing a presence and snapping out of it count as experiencing that contact. Your fallen angel form must have **settled into its stable stage**, and you must wear a **dark pendant** when praying.
+
+**Where and when**: Once all three contacts have been recorded, wear a dark pendant during a solar eclipse and use the native **Sneak inside** option at the prayer-room entrance, then pray. This entrance requires the vanilla history level and costs grace. Each prayer has a **10%** chance of a new encounter. The eclipse must still be active when that prayer finishes.
+
+**Choices**: Choose **Embrace** to take a vanilla willpower check. Higher willpower makes it easier to remain conscious, and the option displays the difficulty. Success still causes pain, stress and trauma, increases awareness and grants **Trinity**. Failure brings a stronger shock and reduces control. You can try again during a later eclipse. **Snap out of it** lets you leave, gaining a little stress, awareness and willpower.
+
+**Trait and mirror**: Trinity allows angel, fallen angel and demon forms to coexist and prevents their development points from decaying. Point gain conditions and transformation side effects follow vanilla. Forms you have not gained still need to be developed, and the mirror shows the existing forms' native settings together.
+
 ### Opening and using bank services
 
 1. Open a free bank account and deposit carried cash. Apply for a free debit card to spend those deposits at merchants.

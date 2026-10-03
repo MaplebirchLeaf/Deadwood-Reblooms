@@ -1,6 +1,35 @@
 // ./src/script/VanillaPlus/RealEstate.ts
 
 export default function RealEstate(maplebirch: typeof window.maplebirch): void {
+  const realEstate = maplebirch.get('VanillaPlus')!.realEstate;
+  for (const property of realEstate.properties) {
+    maplebirch.tool.patch.location.configure(
+      `deadwood_home_${property.id}`,
+      {
+        folder: `property-${property.id}`,
+        base: {
+          default: { condition: () => !Weather.isSnow, image: 'base.png' },
+          snow: { condition: () => Weather.isSnow, image: 'snow.png' }
+        },
+        emissive: { image: 'emissive.png', condition: () => Weather.lightsOn, color: '#fbff86dd', size: 4, intensity: 0.8 },
+        weather: {
+          fogDistributionCurve: 1,
+          rainSplashEnabled: true,
+          fogEnabled: true,
+          groundBounds: { splashes: { top: 4, bottom: 0 }, fog: { top: 19, bottom: 0 } }
+        }
+      },
+      { overwrite: true }
+    );
+  }
+  maplebirch.tool.patch.location.configure('deadwood_home', {
+    // current 沿用产权、出租和冻结判断，并在切换存档后读取当前房屋。
+    customMapping: () => {
+      const property = V.VanillaPlus?.real_estate ? realEstate.current : undefined;
+      return property ? `deadwood_home_${property.id}` : 'home';
+    }
+  });
+
   maplebirch.tool.onInit(() => {
     setup.feats['Own Keys'] ??= {
       get title() {

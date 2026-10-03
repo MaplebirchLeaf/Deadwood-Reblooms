@@ -233,11 +233,11 @@ class MoreLoveInterestsAndNPCAvatars {
   }
 
   public icon(name: string, premade: boolean): string {
-    if (premade) return `poster_${name}`;
+    if (premade) return `poster-${name}`;
     const normalized = String(name ?? '')
       .trim()
       .toLowerCase();
-    if (normalized.includes('vrel') && normalized.includes('puri')) return 'poster_purivrel';
+    if (normalized.includes('vrel') && normalized.includes('puri')) return 'poster-purivrel';
     const aliases: Record<string, readonly string[]> = {
       vrel: ['vrel', 'vrelnir'],
       puri: ['puri', 'purityguy'],
@@ -245,9 +245,9 @@ class MoreLoveInterestsAndNPCAvatars {
       fayne: ['fayne', '费恩'],
       seabird: ['seabird', '海鸟']
     };
-    for (const [icon, names] of Object.entries(aliases)) if (names.includes(normalized)) return `poster_${icon}`;
-    if (['象牙怨灵', 'ivory wraith'].some(alias => normalized.includes(alias))) return this.core.get('DeadwoodReblooms')!.rng > 96 ? 'poster_iwlife' : `poster_iw${V.wraith.state}`;
-    return ['dol', 'degrees of lewdity'].some(alias => normalized.includes(alias)) ? 'poster_dol' : 'poster';
+    for (const [icon, names] of Object.entries(aliases)) if (names.includes(normalized)) return `poster-${icon}`;
+    if (['象牙怨灵', 'ivory wraith'].some(alias => normalized.includes(alias))) return this.core.get('DeadwoodReblooms')!.rng > 96 ? 'poster-iwlife' : `poster-iw${V.wraith.state}`;
+    return ['dol', 'degrees of lewdity'].some(alias => normalized.includes(alias)) ? 'poster-dol' : 'poster';
   }
 
   public add(name: string, profile: AvatarProfile): void {
