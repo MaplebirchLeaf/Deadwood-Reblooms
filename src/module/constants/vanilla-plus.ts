@@ -39,7 +39,7 @@ export interface VanillaPlusState {
   };
   /** 银行、证券与市场的全部可变状态。 */
   finance: FinanceState;
-  ellis: {
+  adrian: {
     lastVisit: number;
     visits: number;
     lastChat: number;
@@ -147,7 +147,7 @@ export interface VanillaPlusState {
 }
 
 export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
-  ellis: { lastVisit: -1, visits: 0, lastChat: -1, accountDiscussed: false, homeDiscussed: false, career: 0, careerReadyDay: 0, businessDay: -1, businessDays: 0 },
+  adrian: { lastVisit: -1, visits: 0, lastChat: -1, accountDiscussed: false, homeDiscussed: false, career: 0, careerReadyDay: 0, businessDay: -1, businessDays: 0 },
   lock: {
     physique: false,
     willpower: false,

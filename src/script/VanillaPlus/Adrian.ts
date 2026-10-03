@@ -1,11 +1,11 @@
-// ./src/script/VanillaPlus/Ellis.ts
+// ./src/script/VanillaPlus/Adrian.ts
 
-import EllisPortrait from '../NamedNPCSidebarPortrait/Ellis';
+import AdrianPortrait from '../NamedNPCSidebarPortrait/Adrian';
 
-export default function Ellis(maplebirch: typeof window.maplebirch): void {
+export default function Adrian(maplebirch: typeof window.maplebirch): void {
   maplebirch.npc.add(
     {
-      nam: 'Ellis',
+      nam: 'Adrian',
       adult: 1,
       teen: 0,
       age: 28,
@@ -20,15 +20,15 @@ export default function Ellis(maplebirch: typeof window.maplebirch): void {
     },
     { love: { maxValue: 50 }, loveAlias: ['Familiarity', '熟悉'], loveInterest: false },
     {
-      Ellis: { EN: 'Ellis', CN: '埃利斯' },
+      Adrian: { EN: 'Adrian', CN: '阿德里安' },
       'bank clerk': { EN: 'bank clerk', CN: '银行职员' },
       'senior bank clerk': { EN: 'senior clerk', CN: '资深柜员' },
       'bank manager': { EN: 'bank manager', CN: '银行经理' }
     }
   );
 
-  maplebirch.npc.addSchedule('Ellis', schedule => {
-    schedule.at(0, 'ellis_home');
+  maplebirch.npc.addSchedule('Adrian', schedule => {
+    schedule.at(0, 'adrian_home');
     schedule.when(
       date => date.weekDay >= 2 && date.weekDay <= 6 && date.hour >= 9 && date.hour < 17,
       date => {
@@ -43,22 +43,22 @@ export default function Ellis(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo(
     'CustomLinkZone',
     {
-      widget: [-1, 'deadwood-reblooms-ellis-counter-link'],
+      widget: [-1, 'deadwood-reblooms-adrian-counter-link'],
       passage: ['Deadwood Reblooms Financial Centre Bank', 'Deadwood Reblooms Property Office', 'Deadwood Reblooms Financial Centre Securities']
     },
-    { widget: [-1, 'deadwood-reblooms-ellis-break-link'], passage: 'Deadwood Reblooms Financial Centre' }
+    { widget: [-1, 'deadwood-reblooms-adrian-break-link'], passage: 'Deadwood Reblooms Financial Centre' }
   );
-  // 日结只推进已交给埃利斯服务的业务，剧情和条件留在 Twee。
-  maplebirch.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-ellis-business', {
+  // 日结只推进已交给阿德里安服务的业务，剧情和条件留在 Twee。
+  maplebirch.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-adrian-business', {
     exact: true,
     priority: -1,
-    cond: () => V.VanillaPlus.ellis.career > 0 && V.VanillaPlus.ellis.career < 5,
-    action: () => maplebirch.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-ellis-business-day>>')
+    cond: () => V.VanillaPlus.adrian.career > 0 && V.VanillaPlus.adrian.career < 5,
+    action: () => maplebirch.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-adrian-business-day>>')
   });
-  EllisPortrait(maplebirch);
+  AdrianPortrait(maplebirch);
   // 财务系统只接收优惠比例，不认识人物或剧情阶段。
   maplebirch.get('VanillaPlus')!.finance.loanDiscount = () => {
-    const { ellis, finance } = V.VanillaPlus;
-    return ellis.career === 5 && finance.bank.credit_missed_payments === 0 && finance.bank.loan_missed_payments === 0 ? 0.1 : 0;
+    const { adrian, finance } = V.VanillaPlus;
+    return adrian.career === 5 && finance.bank.credit_missed_payments === 0 && finance.bank.loan_missed_payments === 0 ? 0.1 : 0;
   };
 }
