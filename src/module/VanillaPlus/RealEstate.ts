@@ -339,7 +339,7 @@ export class RealEstate {
       const name = label ? lanSwitch(label.EN, label.CN) : hanging.design;
       const iconFile =
         kind === 'poster'
-          ? (this.core.get('MoreLoveInterestsAndNPCAvatars')?.icon(hanging.design, !hanging.custom) ?? 'poster')
+          ? (this.core.get('MoreLoveInterestsAndNPCAvatars')?.icon(hanging.design, !hanging.custom) ?? (hanging.custom ? 'poster' : `poster-${hanging.design}`))
           : hanging.custom
             ? 'wallpaper-custom'
             : `wallpaper-${hanging.design.replaceAll(' ', '-')}`;
