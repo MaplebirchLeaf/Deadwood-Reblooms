@@ -1,3 +1,5 @@
+// ./src/script/VanillaPlus/NPCDoublePenetration.ts
+
 type PenetratorOwner = 'player' | 'partner';
 
 interface OrderedPenetrators {

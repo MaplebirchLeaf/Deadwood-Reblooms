@@ -1,3 +1,5 @@
+// ./src/script/VanillaPlus/DivineTransformations.ts
+
 import type { DivineEncounter } from '../../module/VanillaPlus/DivineTransformations';
 
 export default function (maplebirch: typeof window.maplebirch) {

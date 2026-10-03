@@ -1,3 +1,5 @@
+// ./src/script/VanillaPlus/Finance.ts
+
 export default function Finance(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo('Journal', 'deadwood-reblooms-finance-journal');
 

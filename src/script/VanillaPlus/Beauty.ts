@@ -32,8 +32,8 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Effects Man': [
+        // 鸦化先注册时保留其演说倍率，容貌只追加自己的减怒效果。
         {
-          // 鸦化先注册时保留其演说倍率，容貌只追加自己的减怒效果。
           srcmatch: /<<meek `(?:1 \+ \$englishtrait|\(1 \+ \$englishtrait\) \* maplebirch\.get\('MoreTransformations'\)\.Raven\.speech)`>>/,
           applyafter: '<<if $VanillaPlus.traits.beauty>><<set $enemyanger -= 25>><</if>>',
           expected: 1
@@ -45,10 +45,10 @@ export default function (maplebirch: typeof window.maplebirch) {
         }
       ],
       'Widgets Difficulty': [
+        // 同一诱惑评分公式在明示与隐藏属性分支复用，显示与实际等级一起提高。
         {
-          // 同一诱惑评分公式在明示与隐藏属性分支复用，显示与实际等级一起提高。
           srcmatchgroup: /\$attractiveness \+ \(currentSkillValue\("seductionskill"\) \* 5\)/g,
-          to: '$& + maplebirch.get("VanillaPlus").beauty.seductionBonus',
+          applyafter: ' + maplebirch.get("VanillaPlus").beauty.seductionBonus',
           expected: 10
         }
       ]

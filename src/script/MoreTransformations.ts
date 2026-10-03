@@ -1,3 +1,5 @@
+// ./src/script/MoreTransformations.ts
+
 export default function MoreTransformations(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.onInit(() => {
     maplebirch.tool.patch.traits.add({

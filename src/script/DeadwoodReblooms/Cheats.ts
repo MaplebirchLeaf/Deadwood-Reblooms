@@ -1,3 +1,5 @@
+// ./src/script/DeadwoodReblooms/Cheats.ts
+
 import FinanceCheats from './Finance';
 
 export default function Cheats(core: typeof maplebirch): void {

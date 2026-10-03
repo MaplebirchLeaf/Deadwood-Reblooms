@@ -275,21 +275,29 @@ class Raven extends Transformation {
     const impact = /<<violence ([1-9]\d*)>>(?=(?:(?!<<violence|<<bruise neck>>)[^\r\n])*<<hitstat>>)/g;
     const armour = "`maplebirch.get('MoreTransformations').Raven.armour`";
     const speech = "maplebirch.get('MoreTransformations').Raven.speech";
-    // DoLP 扩展了人类与兽类的击打分支。按 hitstat 语义匹配，其他固定分支仍校验数量。
-    const hits = (expected?: number) => ({ srcmatchgroup: impact, to: `<<violence $1 1 1 ${armour}>>`, ...(expected === undefined ? {} : { expected }) });
     maplebirch.tool.inject({
       widgetPassage: {
         'Widgets Combat Man-Combat': [
-          hits(),
+          // DoLP 扩展了击打分支；按 hitstat 定位，保留各分支原有伤害。
+          { srcmatchgroup: impact, to: `<<violence $1 1 1 ${armour}>>` },
+          // DoLP 将拍打拆成多个力度分支，保留每个分支的伤害与攻击者索引。
           {
-            // DoLP 将拍打拆成多个力度分支，保留每个分支的伤害与攻击者索引。
             srcmatchgroup: /<<violence (10|5|20|2|`\(\$spankobject is "paddle" \? 10 : 5\)`) 1 1 1 _n>>/g,
             to: `<<violence $1 1 1 ${armour} _n>>`
           }
         ],
-        'Widgets Combat Beast': [hits()],
-        'Widgets Combat Tentacle Test': [hits(6)],
-        'Widgets Combat Tentacle Adv': [hits(6)],
+        'Widgets Combat Beast': [
+          // 兽类击打分支数量随 DoLP 扩展变化，仍以 hitstat 为界。
+          { srcmatchgroup: impact, to: `<<violence $1 1 1 ${armour}>>` }
+        ],
+        'Widgets Combat Tentacle Test': [
+          // 六个固定触手击打分支接入覆羽减伤。
+          { srcmatchgroup: impact, to: `<<violence $1 1 1 ${armour}>>`, expected: 6 }
+        ],
+        'Widgets Combat Tentacle Adv': [
+          // 进阶触手战的六个固定击打分支使用相同减伤。
+          { srcmatchgroup: impact, to: `<<violence $1 1 1 ${armour}>>`, expected: 6 }
+        ],
         'Widgets Actions Speak': [
           // 只放宽讥讽的第二次机会，保留原版发声、目标与自愿状态的外层判断。
           {
@@ -299,6 +307,7 @@ class Raven extends Transformation {
           }
         ],
         'Widgets End Combat': [
+          // 战斗结束时清除本场额外讥讽次数。
           {
             src: '<<set $angelforgive to 0>>',
             applyafter: '<<set $MoreTransformations.raven.disparaged to 0>>',
@@ -306,7 +315,8 @@ class Raven extends Transformation {
           }
         ],
         'Widgets Effects Man': [
-          hits(13),
+          // 言语和主动动作中的十三个固定击打分支接入覆羽减伤。
+          { srcmatchgroup: impact, to: `<<violence $1 1 1 ${armour}>>`, expected: 13 },
           // 在原版清空动作前，用临时变量记录本次融合资格。
           {
             src: '<<if $mouthaction is "mock" or $mouthaction is "disparage">>',
@@ -319,23 +329,26 @@ class Raven extends Transformation {
             applyafter: '<<if _ravenOmen>><<set $MoreTransformations.raven.disparaged to $angelforgive is 1 ? $MoreTransformations.raven.disparaged + 1 : 1>><</if>>',
             expected: 1
           },
-          // 融合讥讽保留鸦化言语加成，只为创伤减轻和自控恢复再加一倍。
-          // 三个表达式限定在嘲讽分支内，自控翻倍不影响自愿遭遇的 submission。
+          // 在原版嘲讽结算后追加融合效果，不捕获或重写中间的语言、目标与自愿分支。
           {
-            srcmatch:
-              /(<<actionsmock>><<set \$speechdemand to 1>>\s*<<brat `)1 \+ \$englishtrait(` \$mouthtarget>>)([\s\S]*?<<submission `)1 \+ \$englishtrait(` \$mouthtarget>>\s*<<else>>\s*<<combatcontrol `)1 \+ \$englishtrait/,
-            to:
-              `$1($englishtrait + 1) * ${speech}$2` +
-              `<<if _ravenOmen>><<combattrauma \`-($englishtrait + 1) * ${speech}\`>><<if $pain gt 0>><<set _ravenPain to $pain>><<set $pain *= 0.85>><<painclamp>><<if $pain lt _ravenPain>><<lpain>><</if>><</if>><</if>>` +
-              `$3($englishtrait + 1) * ${speech}$4($englishtrait + 1) * ${speech} * (_ravenOmen ? 2 : 1)`,
+            src: '<<brat `1 + $englishtrait` $mouthtarget>>',
+            applyafter: `<<if _ravenOmen>><<combattrauma \`-($englishtrait + 1) * ${speech}\`>><<if $pain gt 0>><<set _ravenPain to $pain>><<set $pain *= 0.85>><<painclamp>><<if $pain lt _ravenPain>><<lpain>><</if>><</if>><</if>>`,
             expected: 1
           },
           // 在原版演说倍率之后相乘，保留目标、拒绝分支与技能等级。
-          { srcmatchgroup: /1 \+ \$englishtrait\b/g, to: `(1 + $englishtrait) * ${speech}`, expected: 7 },
+          { srcmatchgroup: /1 \+ \$englishtrait\b/g, to: `(1 + $englishtrait) * ${speech}`, expected: 10 },
+          // 只有非自愿嘲讽分支的自控恢复翻倍，自愿分支的 submission 不变。
+          {
+            src: `<<combatcontrol \`(1 + $englishtrait) * ${speech}\`>>`,
+            to: `<<combatcontrol \`(1 + $englishtrait) * ${speech} * (_ravenOmen ? 2 : 1)\`>>`,
+            expected: 1
+          },
+          // 技能等级带来的额外言语效果使用同一演说倍率。
           { srcmatchgroup: /\(10 \* \$englishtrait\)/g, to: `(10 * $englishtrait) * ${speech}`, expected: 3 },
+          // 在减怒钳制结果之后追加演说倍率，保留原版钳制表达式。
           {
             srcmatchgroup: /Math\.clamp\((?:25|100) - \$englishtrait \* 20, (?:\$enemyangermax \/ -[24]|0), \$enemyangermax \/ 2\)/g,
-            to: `$& * ${speech}`,
+            applyafter: ` * ${speech}`,
             expected: 6
           }
         ]

@@ -1,3 +1,5 @@
+// ./src/script/LifeSimulation/Gym.ts
+
 export default function Gym(maplebirch: typeof window.maplebirch): void {
   // 地点图由侧栏天气渲染器叠加。32×32 的灯光层相对 32×38 底图按底部对齐。
   maplebirch.tool.patch.location.configure(

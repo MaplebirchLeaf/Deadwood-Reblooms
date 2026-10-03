@@ -1,3 +1,5 @@
+// ./src/script/Sydney/SydneyScience.ts
+
 export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-sydney-science-late-intro', passage: 'Temple' });
 
@@ -29,10 +31,16 @@ export default function (maplebirch: typeof window.maplebirch) {
     },
     widgetPassage: {
       'Widgets Events Science': [
-        // 在 Sydney 科学课事件判断前刷新日程，并要求 Sydney 当时确实位于科学教室。
+        // 在科学课事件判断前刷新悉尼日程。
         {
           src: '<<if $sydneyScience is 1>>',
-          to: '<<sydneySchedule>>\n\t<<if $sydneyScience is 1 and _sydney_location is "science">>',
+          applybefore: '<<sydneySchedule>>\n\t',
+          expected: 1
+        },
+        // 在原版出席条件上追加实际位置检查。
+        {
+          src: '$sydneyScience is 1',
+          applyafter: ' and _sydney_location is "science"',
           expected: 1
         },
         // 在普通科学课事件池清空后注册扩展事件，使其参与本次课堂事件抽取。

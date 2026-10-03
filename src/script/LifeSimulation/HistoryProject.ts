@@ -1,3 +1,5 @@
+// ./src/script/LifeSimulation/HistoryProject.ts
+
 const startCheck = `
   <<if
     $LifeSimulation.historyProject.status is 'none' and

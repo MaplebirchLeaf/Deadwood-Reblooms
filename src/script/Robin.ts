@@ -1,3 +1,5 @@
+// ./src/script/Robin.ts
+
 export default function (maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.onInit(() => {
     for (const [id, difficulty] of [
@@ -68,14 +70,20 @@ export default function (maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Journal': [
+        // 原版先列房租，DoLP 先列押金；在共同房租分支前追加罗宾日志。
         {
-          // 原版在这里直接列出房租，DoLP 则先列押金。截断共同的房租分支，保留各自后续结构。
           src: '<<if !_avery_pay>>',
-          to: `<<deadwood-robin-journal>>
+          applybefore: `<<deadwood-robin-journal>>
             <<if $RobinExpansion.baileyDefeated>>
               <li><span class='green'><<lanSwitch 'Bailey no longer collects rent from you or Robin.' '贝利不再向你和罗宾收租。'>></span></li>
             <</if>>
-            <<if !_avery_pay and !$RobinExpansion.baileyDefeated>>`,
+            `,
+          expected: 1
+        },
+        // 逼退贝利后不再显示原版欠租说明，其余日志结构照常保留。
+        {
+          src: '!_avery_pay',
+          applyafter: ' and !$RobinExpansion.baileyDefeated',
           expected: 1
         }
       ],
@@ -99,8 +107,8 @@ export default function (maplebirch: typeof window.maplebirch): void {
         }
       ],
       'Widgets School Events': [
+        // 原版位置函数返回字符串，不接受地点参数。非空的 asylum 也会被误判为真。
         {
-          // 原版位置函数返回字符串，不接受地点参数。非空的 asylum 也会被误判为真。
           src: 'getRobinLocation("school")',
           to: 'getRobinLocation() is "school"',
           expected: 1
@@ -159,9 +167,16 @@ export default function (maplebirch: typeof window.maplebirch): void {
         }
       ],
       Bedroom: [
+        // 将独立交租纸条放在原版纸条分支前，不重写后续条件。
         {
           src: '<<if $robinpaid is 1 and $robinmissing is 0 and $robinnote isnot 1 and C.npc.Robin.lust gte 10 and C.npc.Robin.love gte 60 and C.npc.Robin.trauma lt 10>>',
-          to: '<<deadwood-robin-independent-note-link>>\n<<if $robinpaid is 1 and !$RobinExpansion.selfRent and $robinmissing is 0 and $robinnote isnot 1 and C.npc.Robin.lust gte 10 and C.npc.Robin.love gte 60 and C.npc.Robin.trauma lt 10>>',
+          applybefore: '<<deadwood-robin-independent-note-link>>\n',
+          expected: 1
+        },
+        // 独立交租后排除原版代交租纸条，保留其他判定。
+        {
+          src: '$robinpaid is 1',
+          applyafter: ' and !$RobinExpansion.selfRent',
           expected: 1
         }
       ],

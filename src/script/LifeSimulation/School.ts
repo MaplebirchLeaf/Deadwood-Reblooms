@@ -1,11 +1,6 @@
-export default function School(maplebirch: typeof window.maplebirch): void {
-  // 留堂提示、拦截和同行分支共用这段条件，只追加身份检查，保留各处其他限制。
-  const detention = (expected: number) => ({
-    srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
-    applyafter: ' and $LifeSimulation.school.role is "student"',
-    expected
-  });
+// ./src/script/LifeSimulation/School.ts
 
+export default function School(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.onInit(() => {
     setup.feats['Student Council President'] ??= {
       get title() {
@@ -115,16 +110,16 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.inject({
     locationPassage: {
       "Bailey's Office": [
+        // 贝利只有 7–9 点在办公室，入口仍受原版 _options 限制，避免打断惩罚场景。
         {
-          // 贝利只有 7–9 点在办公室，入口仍受原版 _options 限制，避免打断惩罚场景。
           src: '<<baileyRentReclaimOption>> /* Bailey Confiscation System */',
           applybefore: '<<deadwood-reblooms-life-simulation-attendance-link>>\n',
           expected: 1
         }
       ],
       Flats: [
+        // 使用原版公寓走廊的普通链接分支，随机事件发生时不会提前展示入口。
         {
-          // 使用原版公寓走廊的普通链接分支，随机事件发生时不会提前展示入口。
           srcmatch: /<<barbicon>><<link \[\[[^\]\n]+\|Barb Street]]>><<\/link>>/,
           applybefore: '<<deadwood-reblooms-life-simulation-bailey-flat-link>>\n',
           expected: 1
@@ -149,18 +144,28 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.inject({
     locationPassage: {
       'School Front Courtyard': [
-        detention(2),
+        // 在原版留堂条件上追加学生身份检查，其余限制照常保留。
         {
-          // 仅接管通往 Hallways 的原版一分钟入口，保留中庭其余事件与离校选项。
+          srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
+          applyafter: ' and $LifeSimulation.school.role is "student"',
+          expected: 2
+        },
+        // 仅接管通往 Hallways 的原版一分钟入口，保留中庭其余事件与离校选项。
+        {
           srcmatch: /<<entranceicon>><<link \[\[[^\]\n]+\|Hallways]]>><<pass 1>><<\/link>>/,
           to: '<<deadwood-reblooms-life-simulation-school-duty-link>><<deadwood-reblooms-life-simulation-school-entry>>',
           expected: 1
         }
       ],
       Hallways: [
-        detention(2),
+        // 在原版留堂条件上追加学生身份检查，其余限制照常保留。
         {
-          // 储物柜前的链接数随留堂和特殊事件变化，按原版储物柜定位公告栏。
+          srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
+          applyafter: ' and $LifeSimulation.school.role is "student"',
+          expected: 2
+        },
+        // 储物柜前的链接数随留堂和特殊事件变化，按原版储物柜定位公告栏。
+        {
           srcmatch: /<<lockericon>><<link \[\[[^\]\n]+\|School Lockers]]>/,
           applybefore: '<<deadwood-reblooms-life-simulation-school-board-link>>',
           expected: 1
@@ -179,7 +184,12 @@ export default function School(maplebirch: typeof window.maplebirch): void {
         }
       ],
       'Sydney Walk': [
-        detention(1),
+        // 在原版留堂条件上追加学生身份检查，其余限制照常保留。
+        {
+          srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
+          applyafter: ' and $LifeSimulation.school.role is "student"',
+          expected: 1
+        },
         {
           src: '<<set $location to "town">>',
           applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
@@ -203,17 +213,24 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     },
     widgetPassage: {
       'Widgets Changing Room': [
+        // 四个正常离校链接共用此宏。拦截留堂时也只恢复一次。
         {
-          // 四个正常离校链接共用此宏。拦截留堂时也只恢复一次。
           src: '<<storeon "school pool girls" "return">>',
           applyafter: '\n\t<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
           expected: 1
         }
       ],
-      'Widgets Sydney': [detention(3)],
-      Social: [
+      'Widgets Sydney': [
+        // 在原版留堂条件上追加学生身份检查，其余限制照常保留。
         {
-          // Social 是原版 widget，紧邻学校声望卡片插入，保持原版的双列排版。
+          srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
+          applyafter: ' and $LifeSimulation.school.role is "student"',
+          expected: 3
+        }
+      ],
+      Social: [
+        // Social 是原版 widget，紧邻学校声望卡片插入，保持原版的双列排版。
+        {
           src: '<<relation-box-simple _studentBoxConfig>>',
           applyafter: '\n\t\t\t<<deadwood-reblooms-life-simulation-school-social>>',
           expected: 1

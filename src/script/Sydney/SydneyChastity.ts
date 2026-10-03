@@ -1,3 +1,5 @@
+// ./src/script/Sydney/SydneyChastity.ts
+
 export default function (maplebirch: typeof window.maplebirch) {
   // 补完堕落仪式结尾的重新佩戴提议，并按 Sydney 当前状态处理回应。
   maplebirch.tool.inject({

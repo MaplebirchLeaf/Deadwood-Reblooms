@@ -1,3 +1,5 @@
+// ./src/script/Sydney/SirrisEstate.ts
+
 export default function (maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.patch.location.configure(
     'sirris_estate',

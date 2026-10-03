@@ -1,18 +1,4 @@
-// ./src/module/UnlockCheatAndCombatStatusDisplay.ts
-
-// 四段状态各自限定在原版相邻的 if 分支之间，只给该段的彩色 span 插入数值。
-// srcmatchgroup 与 to 都遵守框架的字符串替换契约，已插入的宏不会被再次匹配。
-function statusPatch(start: string, end: string, suffixMacro: string, expected: number) {
-  const marker = suffixMacro.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return {
-    srcmatchgroup: new RegExp(
-      `(?<=<<if \\$${start}\\b(?:(?!<<if \\$${end}\\b)[\\s\\S])*?)(<span\\b[^>]*>(?:(?!<\\/span>)[\\s\\S])*?)(?<!${marker})(<\\/span>)(?=(?:(?!<<if \\$${end}\\b)[\\s\\S])*?<<if \\$${end}\\b)`,
-      'g'
-    ),
-    to: `$1${suffixMacro}$2`,
-    expected
-  };
-}
+// ./src/module/UnLockCheatAndCombatStatusDisplay.ts
 
 class UnlockCheatAndCombatStatusDisplay {
   public constructor(readonly core: typeof maplebirch) {}
@@ -36,10 +22,34 @@ class UnlockCheatAndCombatStatusDisplay {
 
       widgetPassage: {
         'Widgets State Man': [
-          statusPatch('loveDrunk', 'enemyarousal', health, 8),
-          statusPatch('enemyarousal', 'enemyanger', arousal, 10),
-          statusPatch('enemyanger', 'enemytrust', anger, 7),
-          statusPatch('enemytrust', 'panicviolence', trust, 7)
+          // 在原版生命描述中追加当前值和上限，限定在生命分支内。
+          {
+            srcmatchgroup:
+              /(?<=<<if \$loveDrunk\b(?:(?!<<if \$enemyarousal\b)[\s\S])*?)(?<! <<print "\(" \+ Math\.round\(\$enemyhealth\) \+ "\/" \+ \$enemyhealthmax \+ "\)">>)<\/span>(?=(?:(?!<<if \$enemyarousal\b)[\s\S])*?<<if \$enemyarousal\b)/g,
+            applybefore: health,
+            expected: 8
+          },
+          // 在原版兴奋描述中追加当前值和上限，限定在兴奋分支内。
+          {
+            srcmatchgroup:
+              /(?<=<<if \$enemyarousal\b(?:(?!<<if \$enemyanger\b)[\s\S])*?)(?<! <<print "\(" \+ Math\.round\(\$enemyarousal\) \+ "\/" \+ \$enemyarousalmax \+ "\)">>)<\/span>(?=(?:(?!<<if \$enemyanger\b)[\s\S])*?<<if \$enemyanger\b)/g,
+            applybefore: arousal,
+            expected: 10
+          },
+          // 在原版怒气描述中追加当前值和上限，限定在怒气分支内。
+          {
+            srcmatchgroup:
+              /(?<=<<if \$enemyanger\b(?:(?!<<if \$enemytrust\b)[\s\S])*?)(?<! <<print "\(" \+ Math\.round\(\$enemyanger\) \+ "\/" \+ \$enemyangermax \+ "\)">>)<\/span>(?=(?:(?!<<if \$enemytrust\b)[\s\S])*?<<if \$enemytrust\b)/g,
+            applybefore: anger,
+            expected: 7
+          },
+          // 在原版信任描述中追加当前值，限定在信任分支内。
+          {
+            srcmatchgroup:
+              /(?<=<<if \$enemytrust\b(?:(?!<<if \$panicviolence\b)[\s\S])*?)(?<! <<print "\(" \+ Math\.round\(\$enemytrust\) \+ "\)">>)<\/span>(?=(?:(?!<<if \$panicviolence\b)[\s\S])*?<<if \$panicviolence\b)/g,
+            applybefore: trust,
+            expected: 7
+          }
         ]
       }
     });

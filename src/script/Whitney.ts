@@ -1,3 +1,5 @@
+// ./src/script/Whitney.ts
+
 export default function (maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo(
     'BeforeLinkZone',
@@ -25,8 +27,8 @@ export default function (maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Underground': [
+        // 原版只看恋爱标记。惠特尼仍被关着时，PC 独自逃脱不应触发她在学校迎接 PC。
         {
-          // 原版只看恋爱标记。惠特尼仍被关着时，PC 独自逃脱不应触发她在学校迎接 PC。
           srcmatch: /<<if \$whitneyromance is 1(?=(?: and [^>]+)?>>)/,
           applyafter: ' and C.npc.Whitney.state isnot "dungeon"',
           expected: 1

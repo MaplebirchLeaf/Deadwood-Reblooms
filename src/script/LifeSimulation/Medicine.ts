@@ -1,3 +1,5 @@
+// ./src/script/LifeSimulation/Medicine.ts
+
 import { MEDICINES } from '../../module/LifeSimulation/Medicine';
 
 export default function Medicine(core: typeof maplebirch): void {
@@ -49,8 +51,8 @@ export default function Medicine(core: typeof maplebirch): void {
   core.tool.inject({
     locationPassage: {
       "Doctor Harper's Office": [
+        // 已敲门并载入哈珀，原版诊疗事件尚未开始。中英文共用这个逻辑锚点。
         {
-          // 已敲门并载入哈珀，原版诊疗事件尚未开始。中英文共用这个逻辑锚点。
           src: '<<if !$harper_appointments.hypnosis_intro>>',
           applybefore: '<<deadwood-medicine-review>>\n\n',
           expected: 1

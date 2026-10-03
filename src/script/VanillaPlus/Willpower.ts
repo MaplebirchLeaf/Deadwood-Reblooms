@@ -20,53 +20,211 @@ export default function (maplebirch: typeof window.maplebirch) {
     cond: () => V.feats?.currentSave['Sovereign Will'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.willpower.max
   });
 
-  const slimeDefyPassages = [
-    'Asylum Mundane Slime Defy',
-    'Asylum Patient Slime Defy',
-    'Farm Slime Strip Defy',
-    'Forest Pitcher Slime Defy',
-    'Forest Slime Pair Defy',
-    'Forest Slime Wolf Defy',
-    'Hallways Slime Breasts Defy',
-    'Hallways Slime Strip Defy',
-    'Lake Stroll Slime Defy',
-    'Livestock Slime Field Grass Defy',
-    'Livestock Slime Field Grass Extreme Defy',
-    'Meadow Relax Slime Defy',
-    'Ocean Breeze Slime Defy',
-    'Pound Food Event Slime Defy',
-    'School Lesson Slime',
-    'School Lesson 2 Slime',
-    'Sea Slime Dolphins Defy',
-    'SleepSlimeEventDefy',
-    'Street Bind Slime Defy',
-    'Street Car Slime Defy',
-    'Street Exhibitionism Fame Flaunt Slime Defy',
-    'Street Slime Defy',
-    'Street Slime Extreme Defy',
-    'Tentacle Plains Ear Slime Defy',
-    'Trash Slime Defy'
-  ];
-  const slimeDefy = Object.fromEntries(
-    slimeDefyPassages.map(passage => [
-      passage,
-      [
-        // 将每个史莱姆抗拒场景的原版意志值输入包装为耳液抗性值，无特质时返回原值。
-        {
-          src: "currentSkillValue('willpower')",
-          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
-          expected: 1
-        }
-      ]
-    ])
-  );
-
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-willpower-unlock', passage: 'Lake Ruin Prison' });
 
   // 记录原版抗拒成功点，并扩展意志上限与耳液抵抗。
   maplebirch.tool.inject({
     locationPassage: {
-      ...slimeDefy,
+      'Asylum Mundane Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Asylum Patient Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Farm Slime Strip Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Forest Pitcher Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Forest Slime Pair Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Forest Slime Wolf Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Hallways Slime Breasts Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Hallways Slime Strip Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Lake Stroll Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Livestock Slime Field Grass Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Livestock Slime Field Grass Extreme Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Meadow Relax Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Ocean Breeze Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Pound Food Event Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'School Lesson Slime': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'School Lesson 2 Slime': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Sea Slime Dolphins Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      SleepSlimeEventDefy: [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Street Bind Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Street Car Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Street Exhibitionism Fame Flaunt Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Street Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Street Slime Extreme Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Tentacle Plains Ear Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
+      'Trash Slime Defy': [
+        // 原版耳液抗拒的意志检定接入特质抗性，无特质时返回原值。
+        {
+          src: "currentSkillValue('willpower')",
+          to: 'maplebirch.get("VanillaPlus").willpower.earSlime(currentSkillValue(\'willpower\'))',
+          expected: 1
+        }
+      ],
       'Lake Ruin Prison Possession Resist': [
         // 在湖底监狱附身抗拒的成功判断入口记录 wraith 结果，作为意志突破条件。
         {
@@ -97,7 +255,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 承伤层耗尽后继续执行原版意志检定、文本与失能结算。
         {
           src: '$pain gte 100 and $willpowerpain is undefined',
-          to: 'maplebirch.get("VanillaPlus").willpower.checkPain($pain) and $pain gte 100 and $willpowerpain is undefined',
+          applybefore: 'maplebirch.get("VanillaPlus").willpower.checkPain($pain) and ',
           expected: 1
         }
       ],

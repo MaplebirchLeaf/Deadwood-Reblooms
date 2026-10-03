@@ -1,3 +1,5 @@
+// ./src/script/VanillaPlus/RealEstate.ts
+
 export default function RealEstate(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.onInit(() => {
     setup.feats['Own Keys'] ??= {
@@ -92,8 +94,8 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
         }
       ],
       'Danube Street': [
+        // DoLP 的精品店复用同一条件。只在温泉图标前插入住宅入口。
         {
-          // DoLP 的精品店复用同一条件。只在温泉图标前插入住宅入口。
           srcmatch: /<<if \$exposed lte 0 and Time\.openingHours\(2\)>>(?=\s*<<spaicon>>)/,
           applybefore: '<<deadwood-reblooms-property-street>>\n\t\t',
           expected: 1

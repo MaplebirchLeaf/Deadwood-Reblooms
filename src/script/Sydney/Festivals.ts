@@ -1,3 +1,5 @@
+// ./src/script/Sydney/Festivals.ts
+
 export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.onInit(() => {
     setup.feats['Four Halloween Visits'] ??= {

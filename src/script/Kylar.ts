@@ -1,3 +1,5 @@
+// ./src/script/Kylar.ts
+
 export default function Kylar(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo(
     'BeforeLinkZone',

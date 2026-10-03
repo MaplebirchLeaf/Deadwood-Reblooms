@@ -61,48 +61,46 @@ export default function (maplebirch: typeof window.maplebirch) {
     }
   );
 
-  const flag = (name: string) => `<<set $VanillaPlus.physique.${name} to true>>`;
-
   // 记录原版挣脱挑战结果，并扩展体格上限。
   maplebirch.tool.inject({
     locationPassage: {
       'Flats Sneak Physique': [
         // 在公寓潜入的体格成功判断后记录 panic 挑战结果，仅成功分支会保留该标记。
-        { src: '<<if $physiqueSuccess>>', applyafter: flag('panic'), expected: 1 }
+        { src: '<<if $physiqueSuccess>>', applyafter: '<<set $VanillaPlus.physique.panic to true>>', expected: 1 }
       ],
       'Flats Sneak Fight Finish': [
         // 在公寓战斗以敌人高潮结束的分支入口记录 panic 结果，覆盖该原版胜利结局。
-        { src: '<<if $enemyarousal gte $enemyarousalmax>>', applyafter: flag('panic'), expected: 1 },
+        { src: '<<if $enemyarousal gte $enemyarousalmax>>', applyafter: '<<set $VanillaPlus.physique.panic to true>>', expected: 1 },
         // 在公寓战斗以敌人生命归零结束的分支入口记录 panic 结果，覆盖另一胜利结局。
-        { src: '<<elseif $enemyhealth lte 0>>', applyafter: flag('panic'), expected: 1 }
+        { src: '<<elseif $enemyhealth lte 0>>', applyafter: '<<set $VanillaPlus.physique.panic to true>>', expected: 1 }
       ],
       'Flats Sneak Smash': [
         // 在砸开公寓障碍的场景 effects 后记录 panic 结果，确认玩家已经完成该体格路线。
-        { src: '<<effects>>', applyafter: flag('panic'), expected: 1 }
+        { src: '<<effects>>', applyafter: '<<set $VanillaPlus.physique.panic to true>>', expected: 1 }
       ],
       'Farm Assault': [
         // 在农场达到对应剧情阶段的判断后记录 heroic 结果，避免低阶段误计突破条件。
-        { src: '<<if $farm_stage gte 12>>', applyafter: flag('heroic'), expected: 1 }
+        { src: '<<if $farm_stage gte 12>>', applyafter: '<<set $VanillaPlus.physique.heroic to true>>', expected: 1 }
       ],
       'Farm Tending Group Fight': [
         // 在农场群战开始结算 effects 后记录 farm 挑战参与结果。
-        { src: '<<effects>>', applyafter: flag('farm'), expected: 1 }
+        { src: '<<effects>>', applyafter: '<<set $VanillaPlus.physique.farm to true>>', expected: 1 }
       ],
       'Farm Tending Gang Rape Finish': [
         // 在农场多人战以敌人生命归零结束的分支入口记录 farm 胜利结果。
-        { src: '<<elseif $enemyhealth lte 0>>', applyafter: flag('farm'), expected: 1 }
+        { src: '<<elseif $enemyhealth lte 0>>', applyafter: '<<set $VanillaPlus.physique.farm to true>>', expected: 1 }
       ],
       'Farm Axe Fight Finish': [
         // 在农场斧战的击倒分支入口记录 farm 胜利结果，保留原版结束处理。
-        { src: '<<elseif $enemyhealth lte 0>>', applyafter: flag('farm'), expected: 1 }
+        { src: '<<elseif $enemyhealth lte 0>>', applyafter: '<<set $VanillaPlus.physique.farm to true>>', expected: 1 }
       ],
       'Farm Lorry Fight End': [
         // 在农场货车战结束 effects 后记录 farm 挑战结果。
-        { src: '<<effects>>', applyafter: flag('farm'), expected: 1 }
+        { src: '<<effects>>', applyafter: '<<set $VanillaPlus.physique.farm to true>>', expected: 1 }
       ],
       'Pound Free 4': [
         // 在收容所脱困场景 effects 后记录 pound 挑战结果，作为体格突破条件。
-        { src: '<<effects>>', applyafter: flag('pound'), expected: 1 }
+        { src: '<<effects>>', applyafter: '<<set $VanillaPlus.physique.pound to true>>', expected: 1 }
       ]
     },
     widgetPassage: {
