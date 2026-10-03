@@ -184,6 +184,7 @@ class Robin extends Module implements RobinFacade {
       return;
     }
     this.flowers.settle();
+    this.shop.settle();
     // 原版先扣房租、检查债务，再发周收入，先入账才可用于当周房租。
     V.robinmoney += Math.max(0, state.weeklyIncome - vanillaIncome);
     if (V.robinpaid !== 1 || state.selfRent) {

@@ -38,15 +38,15 @@ The selector lists only unlocked varieties. Changing it does not change planted 
 
 Each plot spans three soil tiles. Icons and tiles remain 30×30 pixels. Narrow screens wrap whole plots onto the next soil strip. Drag a tool onto a plot, or select the tool and then tap the plot.
 
-| Action            | Requirements                                                  | Effect                                                                                    |
-| ----------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Plant             | Cleared empty plot, known selected variety                    | Plant that variety without consuming its seeds                                            |
-| Water             | Young tree, soil needs replenishing                           | Supply three days of moisture, mature trees need no watering                              |
-| Fertilise         | Young tree, fertiliser, no remaining effect                   | Use one bag to speed growth while the soil is moist                                       |
-| Fertilise         | Mature tree, C-grade tending, improvable soil and no cooldown | Use one bag to improve soil by one grade                                                  |
-| Pick              | Plot displays ripe fruit and its quantity                     | Collect all stored ripe fruit from that tree and keep the tree                            |
-| Continue clearing | Next uncleared plot adjoining the cleared ground              | Work for forty minutes and save progress, planting becomes possible when clearing is done |
-| Shovel            | Planted tree, explicit confirmation                           | Remove the tree without refunding fertiliser or stored fruit, keeping the ground cleared  |
+| Action            | Requirements                                                           | Effect                                                                                    |
+| ----------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Plant             | Cleared empty plot, known selected variety                             | Plant that variety without consuming its seeds                                            |
+| Water             | Tree with exhausted soil moisture                                      | Supply seven days of moisture to either young or mature trees                             |
+| Fertilise         | Young tree, fertiliser, no remaining effect                            | Use one bag to speed growth while the soil is moist                                       |
+| Fertilise         | Mature tree, C-grade tending, improvable soil and no active fertiliser | Use one bag to improve soil by one grade for thirty days                                  |
+| Pick              | Plot displays ripe fruit and its quantity                              | Collect all stored ripe fruit from that tree and keep the tree                            |
+| Continue clearing | Next uncleared plot adjoining the cleared ground                       | Work for forty minutes and save progress, planting becomes possible when clearing is done |
+| Shovel            | Planted tree, explicit confirmation                                    | Remove the tree without refunding fertiliser or stored fruit, keeping the ground cleared  |
 
 The orchard uses vanilla bags of fertiliser, sharing stock with the farm fields and orphanage garden. Fertilising a young tree or improving a mature tree's soil consumes one bag and counts towards vanilla fertiliser use. The orchard does not sell fertiliser. Selecting varieties takes no time.
 
@@ -60,29 +60,31 @@ Successful planting, watering, fertilising, picking and removal advance game tim
 
 Eight varieties grow from seedlings into saplings and then mature trees. Each stage has its own PNG. Cherry trees mature slightly sooner, lime trees slightly later.
 
-- **Moisture**: one watering supports the next three days of growth. Soil colour and the watered label show whether moisture remains. Dry young trees stop growing. Rain replenishes young trees even while you are away from the orchard. A long time skip does not apply its final day's rainfall to every preceding day.
-- **Young-tree fertiliser**: its effect lasts three days and speeds growth while the tree has water. It cannot replace watering or mature a tree immediately. Apply another portion after the effect expires.
+- **Moisture**: one watering supports seven days of growth and fruiting. Plot details show the remaining days. Dry young trees stop growing and mature trees pause their fruiting progress. Rain replenishes fruit trees even while you are away from the orchard. A long time skip does not apply its final day's rainfall to every preceding day.
+- **Young-tree fertiliser**: one bag lasts thirty days and doubles daily growth progress while the young tree has water. It cannot replace watering or mature a tree immediately. Apply another portion after the effect expires.
 - **Progress**: the selected plot displays a growth bar. Neglect delays growth instead of immediately destroying the tree.
 - **Seasons**: do not restrict planting, young-tree growth, watering or fertilising. Winter care works normally; seasons only affect the quantity of new fruit produced by mature trees.
 
 ### Farm irrigation and help
 
-- **Irrigation**: once all nine vanilla fields are connected, the orchard shares the farm's water supply and young trees stay watered. The temple orchard still relies on manual watering or rain.
-- **Alex**: while Alex is doing paperwork, you can ask for help once per day, provided it is light and you can work safely. Clearing together takes twenty minutes for forty minutes of progress; watering one young tree takes two and a half minutes; picking one tree takes five minutes. These actions share one daily opportunity. Help is unavailable during farm attacks.
+- **Irrigation**: once all nine vanilla fields are connected, the orchard shares the farm's water supply and young and mature trees stay watered. The temple orchard still relies on manual watering or rain.
+- **Alex**: while Alex is doing paperwork, you can ask for help once per day, provided it is light and you can work safely. Clearing together takes twenty minutes for forty minutes of progress; watering one dry fruit tree takes two and a half minutes; picking one tree takes five minutes. These actions share one daily opportunity. Help is unavailable during farm attacks.
 - **Orchard worker**: after opening the farm orchard, spend thirty minutes looking for help through the pub's normal menu. This is a new mod employee with a separate NPC record, rather than the vanilla farm guard or their wage rules.
 - **Wages**: **£250 per week**, with seven days paid in advance when hiring. Pay for another week when no more than seven paid days remain, keeping at most fourteen days prepaid. Work stops on expiry without accumulating unpaid wages. Renewal extends the current paid period, or starts at the current time if it has expired. Dismissal requires confirmation; prepaid wages are not refunded.
-- **Work**: one shift at eight each morning. By default, the worker only waters young trees that need it. You can also ask them to pick ripe fruit, putting the harvest directly into your vanilla food storage. The date, trees watered and fruit collected in the latest shift appear below the map. An ongoing farm assault stops work. Watering and picking continue normally in winter.
-- The worker does not use fertiliser, plant, clear ground or remove trees, and does not grant PC tending experience or fatigue. This worker is only available for the farm orchard.
+- **Work**: one shift at eight each morning. The worker waters fruit trees only when their moisture runs out. You can also ask them to pick ripe fruit, putting the harvest directly into your vanilla food storage. The date, trees watered, bags used and fruit collected in the latest shift appear below the map. An ongoing farm assault stops work. Watering and picking continue normally in winter.
+- **Reports**: after the morning shift, choose **Ask your worker about the orchard** between eight and noon at the farm orchard. Wages must be current, and you must be dressed and able to work, with no farm attack underway. Your worker reports the actual watering and harvest, remembers fruit left for you to pick, and mentions trees producing less outside their season. The record also notes when rain or irrigation supplied the water. The latest record remains available at other times. Talking does not grant the harvest again.
+- **Automatic fertilising**: select **Allow the worker to use your fertiliser** below the orchard map. Future shifts replenish young trees after their previous fertiliser expires. Mature trees use the same C-grade tending and improvable-soil requirements as manual care. Each eligible tree consumes one existing bag. Active applications are not refreshed, and the worker neither buys fertiliser nor borrows it. Shortages appear in the record and dialogue. You can return fertilising to manual care; changes take effect at the next morning shift.
+- The worker does not plant, clear ground or remove trees, and does not grant PC tending experience or fatigue. This worker is only available for the farm orchard.
 
 ### Tree age, soil and yield
 
-Mature trees produce a harvest each day throughout the year. **Yield follows the old orchard's rules**: tending skill determines the random yield range, modified by tree age, variety and soil quality. The Green Thumb trait and vanilla crop-yield setting also apply.
+Mature trees produce a batch after seven days of watered growth. A tree starts its first fruiting cycle after reaching maturity. **Yield follows the old orchard's rules**: tending skill determines the random yield range, modified by tree age, variety and soil quality. The Green Thumb trait and vanilla crop-yield setting also apply.
 
-- **Tree age**: newly bearing trees have a lower yield. Three successful harvests make it a medium tree, and nine make it a large tree, raising its yield ceiling. Collecting several stored days counts as one harvest. Replacing a tree resets its age.
+- **Tree age**: newly bearing trees have a lower yield. Three successful harvests make it a medium tree, and nine make it a large tree, raising its yield ceiling. Collecting several stored batches counts as one harvest. Replacing a tree resets its age.
 - **Variety**: cherries retain the old extra yield multiplier. Other available varieties use their own data.
 - **Soil**: base quality is determined when opening the orchard. Plot details follow vanilla descriptions: poor, decent, good or excellent soil. Removing trees or reopening the interface does not reroll quality.
-- **Fertilising mature trees**: with C-grade tending, improve soil by one grade, up to excellent soil. Each improvement has a seven-day cooldown. It does not change fruit already produced.
-- **Fading improvements**: ordinary improvements drop one grade every two harvests until base quality is reached. Green Thumb improvements do not fade with harvesting. Removing a tree clears improvements that still have a limited number of harvests.
+- **Fertilising mature trees**: with C-grade tending, improve soil by one grade, up to excellent soil. An application lasts thirty days, during which another cannot be applied. It does not change fruit already produced.
+- **Fading improvements**: ordinary soil improvements return to base quality when the thirty-day effect ends. Harvesting does not shorten the effect. Green Thumb improvements remain permanently, although another application still requires the previous effect to end. Removing a tree clears ordinary temporary improvements.
 
 Fruit enters vanilla food storage and follows vanilla rules for eating, cooking, gifts and sales.
 
@@ -96,15 +98,15 @@ Fruit enters vanilla food storage and follows vanilla rules for eating, cooking,
 | Cherry        | Spring                 |
 | Lemon, lime   | Spring, summer, autumn |
 
-The selector shows the chosen variety's peak seasons. **Peak seasons retain normal yield; other seasons, including winter, produce 50% of normal yield, rounded down.** Seasons never block fruit production or change fruit already stored. Mature trees need no routine watering. Fertiliser improves soil rather than being required for each harvest.
+The selector shows the chosen variety's peak seasons. **Peak seasons retain normal yield; other seasons, including winter, produce 50% of normal yield, rounded down.** Seasons never block fruit production or change fruit already stored. Mature trees also need water, with one watering lasting seven days. Fertiliser improves yield and is not required for each harvest.
 
-### Three days of stored harvests
+### Fruiting cycles and stored harvests
 
-Each mature tree stores up to three days of harvests, so you can visit every few days rather than pick every tree daily.
+Each mature tree has its own seven-day fruiting progress and stores up to three batches. With continuous water, a full tree holds three completed cycles. Plot details show how many days remain until the next batch.
 
 - The number beside the fruit icon shows the actual quantity. Full branches are noted in the plot details.
 - A full tree stops producing additional fruit. Existing fruit remains without accumulating indefinitely.
-- Picking collects every stored harvest from that tree. It can then produce again each day.
+- Picking collects every stored harvest from that tree. It can then resume its fruiting cycle.
 - Changing seasons does not remove or recalculate existing fruit. You can still pick it in daylight.
 - Reopening the interface, repeated clicks and loading saves do not grant another day's growth. Long sleeps process each calendar date crossed.
 
@@ -118,4 +120,4 @@ Existing ordinary lemons stay unchanged, and blood lemons remain after sunrise. 
 
 Check that the module is enabled and the game has been reloaded, then check temple rank, garden clearing or farm progress. The initial farm invitation also requires Alex to be doing paperwork.
 
-Unknown seeds, uncleared ground, occupied plots, fully replenished moisture, active young-tree fertiliser, soil-improvement cooldowns, insufficient tending skill, no ripe fruit and work restrictions can prevent an action. Only the next adjoining plot can be cleared. Use "Continue clearing" to keep working; a progress bar appears once clearing has begun. The summary lists harvestable trees and young trees needing water. Select a cleared plot to inspect its soil. Return to the farm fields when an attack interrupts work.
+Unknown seeds, uncleared ground, occupied plots, remaining moisture, active fertiliser, soil already at its highest quality, insufficient tending skill, no ripe fruit and work restrictions can prevent an action. Only the next adjoining plot can be cleared. Use "Continue clearing" to keep working; a progress bar appears once clearing has begun. The summary lists harvestable trees and trees needing water. Select a cleared plot to inspect its soil. Return to the farm fields when an attack interrupts work.

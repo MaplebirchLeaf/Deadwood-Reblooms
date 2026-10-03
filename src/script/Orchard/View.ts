@@ -2,7 +2,7 @@
 
 import type Orchard from '../../module/Orchard';
 import type { OrchardSite, OrchardTool, OrchardReceipt } from '../../module/Orchard';
-import { species, harvestTiers, harvestDays, moistureDays, orchardSites, clearingStepMinutes, offSeasonYieldMultiplier, type OrchardSpecies, type OrchardFruit } from '../../module/Orchard/Species';
+import { species, harvestTiers, fruitingDays, harvestBatches, orchardSites, clearingStepMinutes, offSeasonYieldMultiplier, type OrchardSpecies, type OrchardFruit } from '../../module/Orchard/Species';
 
 const tools: readonly [OrchardTool, string, string][] = [
   ['plant', 'Plant', '播种'],
@@ -164,12 +164,12 @@ export default class OrchardView {
     const clearing = this.orchard.state.clearing[this.site];
     const opened = clearing.filter(minutes => minutes === 0).length;
     const ready = trees.filter(tree => this.orchard.ripe(tree)).length;
-    const dry = trees.filter(tree => this.orchard.stage(tree) < 2 && tree.moisture === 0).length;
+    const dry = trees.filter(tree => tree.moisture === 0).length;
     this.summary.replaceChildren(document.createTextNode(lanSwitch(`There are ${opened} cleared plots here.`, `这里有 ${opened} 块开垦好的土地。`)));
     const status = document.createElement('span');
     if (dry) {
       status.className = 'purple';
-      status.textContent = lanSwitch(` ${dry} young ${dry === 1 ? 'tree needs' : 'trees need'} water.`, ` ${dry} 棵幼树需要浇水。`);
+      status.textContent = lanSwitch(` ${dry} ${dry === 1 ? 'tree needs' : 'trees need'} water.`, ` ${dry} 棵果树需要浇水。`);
     }
     this.summary.append(status);
     if (ready) {
@@ -233,11 +233,14 @@ export default class OrchardView {
       status.className = ['blue', 'lblue', 'teal'][stage];
       status.textContent = `${lanSwitch(species[tree.species].name[0], species[tree.species].name[1])} · ${stages[stage]}`;
       this.detail.append(status);
+      const water = document.createElement('div');
+      water.className = tree.moisture > 0 ? 'green' : 'purple';
+      water.textContent =
+        tree.moisture > 0
+          ? lanSwitch(`The soil has water for ${tree.moisture} more days.`, `土壤水分还能维持 ${tree.moisture} 天。`)
+          : lanSwitch('The soil is dry. Growth and fruiting have paused.', '土壤干燥，生长与结果已经暂停。');
+      this.detail.append(water);
       if (stage < 2) {
-        const water = document.createElement('span');
-        water.className = tree.moisture > 0 ? 'green' : 'purple';
-        water.textContent = tree.moisture > 0 ? lanSwitch(' The soil is watered.', ' 土壤已经浇过水。') : lanSwitch(' The soil is dry.', ' 土壤干燥。');
-        this.detail.append(water);
         const progress = document.createElement('progress');
         progress.max = species[tree.species].matureDays;
         progress.value = tree.growth;
@@ -245,7 +248,7 @@ export default class OrchardView {
         this.detail.append(progress);
       } else {
         const tier = harvestTiers.filter(tier => tree.harvests >= tier.harvests).length - 1;
-        this.detail.append(document.createTextNode(` · ${lanSwitch(['Small tree', 'Medium tree', 'Large tree'][tier], ['小果树', '中等果树', '大果树'][tier])}`));
+        status.append(document.createTextNode(` · ${lanSwitch(['Small tree', 'Medium tree', 'Large tree'][tier], ['小果树', '中等果树', '大果树'][tier])}`));
         const totals: Partial<Record<OrchardFruit, number>> = {};
         for (const crop of tree.fruit) totals[crop.type] = (totals[crop.type] ?? 0) + crop.amount;
         const fruit = document.createElement('div');
@@ -256,23 +259,26 @@ export default class OrchardView {
           fruit.append(item);
         }
         this.detail.append(fruit);
-        if (tree.fruit.length === harvestDays) {
+        if (tree.fruit.length === harvestBatches) {
           const full = document.createElement('div');
           full.className = 'green';
           full.textContent = lanSwitch('The branches are laden with ripe fruit.', '枝头挂满了成熟的水果。');
           this.detail.append(full);
+        } else {
+          const wait = document.createElement('div');
+          const days = fruitingDays - (tree.fruiting ?? 0);
+          wait.textContent = lanSwitch(`The next batch needs ${days} more days of watered growth.`, `下一批果实还需 ${days} 天有水的生长。`);
+          this.detail.append(wait);
         }
       }
       if (tree.fertiliser > 0 || soil.quality > soil.baseQuality) {
         const fertilised = document.createElement('div');
         fertilised.className = 'green';
-        fertilised.textContent = lanSwitch('The soil has been fertilised.', '土壤已经施过肥。');
+        fertilised.textContent =
+          tree.fertiliser > 0
+            ? lanSwitch(`Fertiliser remains effective for ${tree.fertiliser} days.`, `肥效还能维持 ${tree.fertiliser} 天。`)
+            : lanSwitch('Green Thumb has permanently improved the soil.', '园艺大师已永久改良土壤。');
         this.detail.append(fertilised);
-      }
-      if (soil.fertiliserCooldown > 0) {
-        const wait = document.createElement('div');
-        wait.textContent = lanSwitch(`Wait ${soil.fertiliserCooldown} days before fertilising again.`, `再等 ${soil.fertiliserCooldown} 天才能继续施肥。`);
-        this.detail.append(wait);
       }
     } else this.detail.append(document.createTextNode(lanSwitch('The soil is ready for planting.', '土壤已经可以种植。')));
     this.renderSupplies();
@@ -389,7 +395,7 @@ export default class OrchardView {
           this.toolIcon('harvest'),
           this.link(lanSwitch('Ask Alex to help pick (0:05)', '请艾利克斯一起采果 (0:05)'), () => this.perform(this.selected, 'harvest', true))
         );
-      } else if (this.orchard.stage(tree) < 2 && tree.moisture < moistureDays) {
+      } else if (tree.moisture === 0) {
         help.append(
           this.toolIcon('water'),
           this.link(lanSwitch('Ask Alex to help water (0:02:30)', '请艾利克斯一起浇水 (0:02:30)'), () => this.perform(this.selected, 'water', true))

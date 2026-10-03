@@ -113,6 +113,14 @@ Choose weights, running, stretching or outdoor jogging, up to three sessions dai
 - Independent lockers use the wardrobe interface, with retrieval available during opening hours after admission expires.
 - The basin provides one daily wash to admitted players.
 
+#### Coach guidance and training habits
+
+Choose **Ask the coach about your routine** on the training floor. You can ask once daily with valid admission, appropriate clothing, usable arms and a training session remaining.
+
+The coach introduces themselves and keeps your training card. Completed weights, indoor runs, outdoor runs and stretches enter the record. Returning keeps the same coach. If you have spent more time lifting than running, they suggest a run. Otherwise, they recommend weights. High tiredness, noticeable pain or a week away from training takes priority and leads to stretching.
+
+Following that day's advice gives a small extra physique or athletics gain, or additional stress relief from stretching. It uses a normal training session, and the extra benefit applies only once daily. After several completed sessions, the coach reviews your previous training rather than treating you as a newcomer.
+
 ### Temple weapons
 
 Borrow a vanilla whip or baton, one at a time. Use a free unbound hand in a **nonconsensual, nonvore**, nonhuman/nonanimal tentacle encounter.

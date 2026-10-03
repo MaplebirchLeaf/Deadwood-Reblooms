@@ -60,7 +60,7 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
   });
 
   maplebirch.tool.macro.defineS('deadwood-orchard-worker-harvest', () => {
-    const kept = maplebirch.get('Orchard')?.state.worker.report.kept;
+    const kept = maplebirch.get('Orchard')?.workerReport?.kept;
     if (!kept) return;
     return Object.entries(kept)
       .filter(([, amount]) => amount && amount > 0)

@@ -30,11 +30,16 @@ export default class RobinTutoring extends Shared {
   }
 
   /** 与罗宾共同授课一次，推进科目并结算收益。 */
-  public teach(): boolean {
-    if (!this.canTutorToday) return false;
+  public teach(approach: 'lead' | 'together' | 'skills'): boolean {
+    const pupil = V.per_npc?.deadwood_robin_tutor_pupil;
+    const parent = V.per_npc?.deadwood_robin_tutor_parent;
+    if (!this.canTutorToday || pupil?.name_known !== 1 || parent?.name_known !== 1 || !['lead', 'together', 'skills'].includes(approach)) return false;
     this.state.tutorDay = Time.days;
     this.state.tutorLessons++;
     this.state.tutorSubject = (this.state.tutorLessons - 1) % 3;
+    // 只记录 PC 真正完成的帮课，进门后离开不会让学生进步或增加家长的信任。
+    pupil.tutorConfidence = Math.min(6, (pupil.tutorConfidence ?? 0) + (approach === 'together' ? 2 : 1));
+    parent.tutorVisits = (parent.tutorVisits ?? 0) + 1;
     V.money += 750;
     this.state.reserve += 8;
     return true;

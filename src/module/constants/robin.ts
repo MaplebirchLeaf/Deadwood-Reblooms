@@ -45,6 +45,10 @@ export interface RobinExpansionState {
   shopStock: number;
   /** 店铺雇员数。 */
   shopStaff: number;
+  /** 当前查看的应聘来源，孤儿院应聘者与外来店员分别保存。 */
+  shopApplicant: 'adult' | 'orphan';
+  /** 已聘人员的持久 NPC 键，按聘用顺序保存。 */
+  shopRoster: string[];
   /** 店铺是否经营鲜花。 */
   shopFlowers: boolean;
   /** 各花种的库存，按花名计数。 */
@@ -197,6 +201,8 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
   pcLoan: 0,
   shopStock: 0,
   shopStaff: 0,
+  shopApplicant: 'adult',
+  shopRoster: [],
   shopFlowers: false,
   flowerStock: {},
   shopPopcorn: false,

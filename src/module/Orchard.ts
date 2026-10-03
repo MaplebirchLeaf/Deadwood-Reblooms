@@ -8,11 +8,10 @@ import {
   offSeasonYieldMultiplier,
   orchardSites,
   clearingStepMinutes,
-  harvestDays,
+  fruitingDays,
+  harvestBatches,
   moistureDays,
   fertiliserDays,
-  soilFertiliserDays,
-  soilFertiliserHarvests,
   type OrchardSpecies,
   type OrchardFruit
 } from './Orchard/Species';
@@ -26,15 +25,27 @@ export interface OrchardTree {
   moisture: number;
   fertiliser: number;
   harvests: number;
-  /** 最多保留三天的收成。果实种类在结果时确定，采收不会再改写。 */
+  /** 成熟后的结果进度。缺水或枝头已满时暂停，结出一批后归零。 */
+  fruiting: number;
+  /** 最多保留三批收成。果实种类在结果时确定，采收不会再改写。 */
   fruit: { type: OrchardFruit; amount: number }[];
 }
 
 interface OrchardSoil {
   baseQuality: number;
   quality: number;
-  fertiliserCooldown: number;
-  fertiliserHarvests: number;
+}
+
+interface OrchardWorkerReport {
+  day: number;
+  watered: number;
+  fertilised: number;
+  noFertiliser: boolean;
+  kept: Partial<Record<OrchardFruit, number>>;
+  irrigation: boolean;
+  rain: boolean;
+  offSeason: boolean;
+  leftFruit: boolean;
 }
 
 export interface OrchardReceipt {
@@ -65,7 +76,7 @@ interface OrchardState {
     paidUntil: number;
     lastShift: number;
     pick: boolean;
-    report: { day: number; watered: number; kept: Partial<Record<OrchardFruit, number>> };
+    fertilise: boolean;
   };
   temple: (OrchardTree | null)[];
   farm: (OrchardTree | null)[];
@@ -83,7 +94,7 @@ const defaults: OrchardState = {
   clearing: { temple: [], farm: [] },
   helpDay: -1,
   irrigationSince: -1,
-  worker: { hired: false, paidFrom: 0, paidUntil: 0, lastShift: -1, pick: false, report: { day: -1, watered: 0, kept: {} } },
+  worker: { hired: false, paidFrom: 0, paidUntil: 0, lastShift: -1, pick: false, fertilise: false },
   temple: Array(orchardSites.temple.plots).fill(null),
   farm: Array(orchardSites.farm.plots).fill(null)
 };
@@ -140,10 +151,10 @@ class Orchard extends Module {
     this.state.clearing[site] = this.state[site].map((_, index) => (index < data.initialPlots ? 0 : data.clearingMinutes));
     this.state.soil[site] = this.state[site].map(() => {
       const quality = random(1, 3);
-      return { baseQuality: quality, quality, fertiliserCooldown: 0, fertiliserHarvests: 0 };
+      return { baseQuality: quality, quality };
     });
     // 神殿首次开放时保留一棵成树，果实仍由正常季节结算生成。
-    if (site === 'temple') this.state.temple[0] ??= { species: 'plum', growth: species.plum.matureDays, moisture: 0, fertiliser: 0, harvests: 0, fruit: [] };
+    if (site === 'temple') this.state.temple[0] ??= { species: 'plum', growth: species.plum.matureDays, moisture: moistureDays, fertiliser: 0, harvests: 0, fruiting: 0, fruit: [] };
     return true;
   }
 
@@ -180,6 +191,24 @@ class Orchard extends Module {
     return this.state.worker.hired && !!V.per_npc?.deadwood_orchard_worker && this.state.worker.paidUntil > Time.date.timeStamp;
   }
 
+  /** 汇报跟随雇工本人保存，辞退后不会显示上一位的工作记录。 */
+  public get workerReport(): OrchardWorkerReport | null {
+    return V.per_npc?.deadwood_orchard_worker?.orchardReport ?? null;
+  }
+
+  public get canTalkWorker(): boolean {
+    return (
+      this.available('farm') &&
+      this.workerActive &&
+      this.canWork &&
+      !this.farmInterrupted &&
+      !V.farm_assault &&
+      Time.hour >= 8 &&
+      Time.hour < 12 &&
+      this.workerReport?.day === Math.floor(Time.date.timeStamp / 86400)
+    );
+  }
+
   public get canPayWorker(): boolean {
     return this.available('farm') && this.state.worker.hired && !!V.per_npc?.deadwood_orchard_worker && V.money >= this.workerWage && this.state.worker.paidUntil <= Time.date.timeStamp + 7 * 86400;
   }
@@ -207,6 +236,11 @@ class Orchard extends Module {
   public setWorkerPicking(pick: boolean): void {
     this.advance();
     this.state.worker.pick = pick;
+  }
+
+  public setWorkerFertilising(fertilise: boolean): void {
+    this.advance();
+    this.state.worker.fertilise = fertilise;
   }
 
   public dismissWorker(): boolean {
@@ -284,22 +318,25 @@ class Orchard extends Module {
       for (const site of ['temple', 'farm'] as const) {
         for (const [index, tree] of state[site].entries()) {
           const soil = state.soil[site][index];
-          if (soil) soil.fertiliserCooldown = Math.max(0, soil.fertiliserCooldown - 1);
           if (!tree) continue;
           const data = species[tree.species];
+          if (site === 'farm' && this.irrigated && state.irrigationSince < midnight.timeStamp) tree.moisture = moistureDays;
+          const wasMature = tree.growth >= data.matureDays;
           if (tree.growth < data.matureDays) {
-            if (site === 'farm' && this.irrigated && state.irrigationSince < midnight.timeStamp) tree.moisture = moistureDays;
             if (tree.moisture > 0) tree.growth = Math.min(data.matureDays, tree.growth + (tree.fertiliser > 0 ? 2 : 1));
           }
-          if (tree.growth >= data.matureDays && tree.fruit.length < harvestDays) {
+          tree.fruiting ??= 0;
+          if (wasMature && tree.moisture > 0 && tree.fruit.length < harvestBatches) tree.fruiting++;
+          if (tree.fruiting >= fruitingDays && tree.fruit.length < harvestBatches) {
             const type = bloodMoon && data.bloodMoonFruit ? data.bloodMoonFruit : tree.species;
             if (setup.foodstuff[type]) {
               const amount = this.yield(tree, soil.quality, season);
               tree.fruit.push({ type, amount });
+              tree.fruiting = 0;
             }
           }
           tree.moisture = Math.max(0, tree.moisture - 1);
-          tree.fertiliser = Math.max(0, tree.fertiliser - 1);
+          if (tree.fertiliser > 0 && --tree.fertiliser === 0 && !V.backgroundTraits.includes('greenthumb')) soil.quality = soil.baseQuality;
         }
       }
       state.day++;
@@ -310,7 +347,7 @@ class Orchard extends Module {
     for (const site of ['temple', 'farm'] as const) {
       if (Weather.precipitation !== 'rain' && !(site === 'farm' && this.irrigated)) continue;
       for (const tree of state[site]) {
-        if (!tree || this.stage(tree) === 2) continue;
+        if (!tree) continue;
         tree.moisture = moistureDays;
       }
     }
@@ -323,19 +360,39 @@ class Orchard extends Module {
     if (!worker.hired || day <= worker.lastShift || morning > Time.date.timeStamp) return;
     worker.lastShift = day;
     if (morning < worker.paidFrom || morning >= worker.paidUntil || !V.per_npc?.deadwood_orchard_worker || !this.available('farm') || V.farm_assault) return;
-    const report = { day, watered: 0, kept: {} as Partial<Record<OrchardFruit, number>> };
+    const npc = V.per_npc.deadwood_orchard_worker;
+    const season = Time.getSeason(new window.DateTime(morning));
+    const report: OrchardWorkerReport = {
+      day,
+      watered: 0,
+      fertilised: 0,
+      noFertiliser: false,
+      kept: {},
+      irrigation: this.irrigated && this.state.irrigationSince <= morning,
+      // 跨过八点的 pass 会在结束时结算。只使用当天早班时段的雨水，不倒填历史天气。
+      rain: day === Math.floor(Time.date.timeStamp / 86400) && Time.date.hour === 8 && Weather.precipitation === 'rain',
+      offSeason: false,
+      leftFruit: false
+    };
     this.state.farm.forEach((tree, index) => {
       if (!tree || !this.cleared('farm', index)) return;
-      if (this.stage(tree) < 2 && tree.moisture < moistureDays && !(this.irrigated && this.state.irrigationSince <= morning)) {
+      if (tree.moisture === 0) {
         tree.moisture = moistureDays;
-        report.watered++;
+        if (!report.irrigation && !report.rain) report.watered++;
       }
+      if (worker.fertilise && tree.fertiliser === 0 && (this.stage(tree) < 2 || (window.currentSkillValue('tending') >= 400 && this.state.soil.farm[index].quality < 4))) {
+        if (this.fertilise(tree, this.state.soil.farm[index])) report.fertilised++;
+        else if (V.fertiliser.current < 1) report.noFertiliser = true;
+      }
+      if (this.stage(tree) === 2 && !species[tree.species].fruitSeasons.includes(season)) report.offSeason = true;
+      if (!worker.pick && this.ripe(tree)) report.leftFruit = true;
       if (worker.pick && this.ripe(tree)) {
         const receipt = this.collect('farm', index);
         for (const [type, amount] of Object.entries(receipt?.kept ?? {})) report.kept[type as OrchardFruit] = (report.kept[type as OrchardFruit] ?? 0) + amount!;
       }
     });
-    worker.report = report;
+    npc.orchardReport = report;
+    npc.orchardShifts = (npc.orchardShifts ?? 0) + 1;
   }
 
   /** 返回成功时的耗时。无效操作不扣材料、不增加技能、不推进时间。 */
@@ -367,30 +424,18 @@ class Orchard extends Module {
           moisture: Weather.precipitation === 'rain' || (site === 'farm' && this.irrigated) ? moistureDays : 0,
           fertiliser: 0,
           harvests: 0,
+          fruiting: 0,
           fruit: []
         };
         return 10;
       case 'water':
-        if (!tree || this.stage(tree) === 2 || tree.moisture === moistureDays) return 0;
+        if (!tree || tree.moisture > 0) return 0;
         tree.moisture = moistureDays;
         if (helped) this.state.helpDay = Math.floor(Time.date.timeStamp / 86400);
         this.notice = { tool, helped };
         return helped ? 2.5 : 5;
       case 'fertiliser':
-        if (!tree || V.fertiliser.current < 1) return 0;
-        if (this.stage(tree) < 2) {
-          if (tree.fertiliser > 0) return 0;
-          tree.fertiliser = fertiliserDays;
-        } else {
-          if (window.currentSkillValue('tending') < 400 || soil.quality >= 4 || soil.fertiliserCooldown > 0) return 0;
-          soil.quality++;
-          soil.fertiliserCooldown = soilFertiliserDays;
-          // 园艺大师改良的土壤不会随采收衰退，其他人每两次采收消耗一级改良。
-          soil.fertiliserHarvests = V.backgroundTraits.includes('greenthumb') ? 0 : soilFertiliserHarvests;
-        }
-        V.fertiliser.current--;
-        V.fertiliser.used++;
-        return 5;
+        return tree && this.fertilise(tree, soil) ? 5 : 0;
       case 'harvest': {
         const receipt = this.collect(site, index);
         if (!receipt) return 0;
@@ -402,8 +447,7 @@ class Orchard extends Module {
         if (!tree || helped) return 0;
         plots[index] = null;
         // 铲树不能重新抽取这块土地的基础质量。
-        if (soil.fertiliserHarvests > 0 && !V.backgroundTraits.includes('greenthumb')) soil.quality = soil.baseQuality;
-        soil.fertiliserHarvests = 0;
+        if (!V.backgroundTraits.includes('greenthumb')) soil.quality = soil.baseQuality;
         return 15;
     }
   }
@@ -412,7 +456,6 @@ class Orchard extends Module {
   private collect(site: OrchardSite, index: number): OrchardReceipt | undefined {
     const tree = this.state[site][index];
     if (!tree || !this.ripe(tree) || tree.fruit.some(crop => !setup.foodstuff[crop.type])) return;
-    const soil = this.state.soil[site][index];
     const totals: Partial<Record<OrchardFruit, number>> = {};
     for (const crop of tree.fruit) totals[crop.type] = (totals[crop.type] ?? 0) + crop.amount;
     const kept: Partial<Record<OrchardFruit, number>> = {};
@@ -427,11 +470,20 @@ class Orchard extends Module {
     if (donated > 0) this.core.SugarCube.Wikifier.wikifyEval('<<grace 1 monk>>');
     tree.fruit = [];
     tree.harvests++;
-    if (soil.fertiliserHarvests > 0 && !V.backgroundTraits.includes('greenthumb') && --soil.fertiliserHarvests === 0) {
-      soil.quality = Math.max(soil.baseQuality, soil.quality - 1);
-      if (soil.quality > soil.baseQuality) soil.fertiliserHarvests = soilFertiliserHarvests;
-    }
     return { tool: 'harvest', kept, donated };
+  }
+
+  /** 玩家与雇工共用同一份肥料和肥效规则，雇工不领取玩家经验。 */
+  private fertilise(tree: OrchardTree, soil: OrchardSoil): boolean {
+    if (tree.fertiliser > 0 || V.fertiliser.current < 1) return false;
+    if (this.stage(tree) === 2) {
+      if (window.currentSkillValue('tending') < 400 || soil.quality >= 4) return false;
+      soil.quality++;
+    }
+    tree.fertiliser = fertiliserDays;
+    V.fertiliser.current--;
+    V.fertiliser.used++;
+    return true;
   }
 }
 

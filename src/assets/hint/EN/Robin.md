@@ -34,6 +34,8 @@ After at least one stall upgrade, notice the orphanage tutoring lead and discuss
 
 Follow the journal to the **Danube Street** trial lesson. Schoolday tutoring is **17:30–18:30**, with accompaniment or eligible independent teaching.
 
+Your first visit introduces the pupil and parent, who remain the same family on later visits. Robin introduces you even if lessons have already taken place without you. Working through problems together helps the pupil attempt more independently. After several completed lessons with you, the parent is comfortable leaving you to teach. Visiting and leaving without teaching does not advance these changes.
+
 Accompanying pays the PC £7.50 and adds £8 to the reserve. Six lessons raise term-time estimated weekly tutoring income from £40 to £60. Re-entering the bedroom does not count lessons. Captivity, trauma and schedules can pause work.
 
 ### Cliff Street shop application
@@ -56,13 +58,27 @@ The ledger offers one **£2,000 loan from the PC's existing bank funds**. It req
 
 Enter **Cliff Street → Robin's drinks shop**, **09:00–21:00**. Relief staff cover absence, but do not provide Robin's personal activities. Opening grants the shop achievement.
 
-| Activity          | Steps                               | Returns and limits                                                          |
-| ----------------- | ----------------------------------- | --------------------------------------------------------------------------- |
-| New-drink tasting | Robin present                       | Once daily                                                                  |
-| Shop shift        | Special ingredients available       | Once daily, one crate, PC £10 and reserve £20                               |
-| Restock           | Robin present after crates run out  | Three crates £30, or £25 with eligible maths ability                        |
-| Permanent staff   | Review, hire and train              | Two adult staff maximum, £350 each once, £700 weekly sales minus £350 wages |
-| Ledger            | Check shop or relevant conversation | Income, wages, protected rent and loans, not another spendable balance      |
+| Activity          | Steps                               | Returns and limits                                                                                 |
+| ----------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------- |
+| New-drink tasting | Robin present                       | Once daily                                                                                         |
+| Shop shift        | Special ingredients available       | Once daily, one crate, PC £10 and reserve £20                                                      |
+| Restock           | Robin present after crates run out  | Three crates £30, or £25 with eligible maths ability                                               |
+| Permanent staff   | Review, hire and train              | Two shared positions for outside staff or fellow orphans, £350 training and £350 weekly wages each |
+| Ledger            | Check shop or relevant conversation | Income, wages, protected rent and loans, not another spendable balance                             |
+
+Applications retain the same candidate when you leave and return. Hired employees appear by name in the ledger and daily rota. The two alternate days, so revisiting on the same day does not change the employee at the counter. Orphans work after school or on days off.
+
+### Hiring a fellow orphan
+
+With Robin at the shop, choose **Ask Robin about hiring a fellow orphan**. On school days, return after four. Robin introduces an older orphan and discusses paid hours and learning the job. Leaving or postponing the offer retains that applicant.
+
+- **Hiring**: training comes from Robin's reserve or cash, while protecting the next rent bill. Actually hiring grants orphanage hope and begins a first training scene with syrup measurements and practice drinks.
+- **Experience**: the ledger shows **Learning**, **Independent** and **Experienced**. A beginner adds £400 in weekly sales, rising to £550 and £700 with experience. Weekly wages stay £350. Actual weekly settlements add work experience.
+- **Shared training**: when both Robin and your fellow orphan are at the shop, choose **Help Robin train your fellow orphan**. Once daily, spend thirty minutes practising recipes, change or stock checks according to current experience. This adds experience and Robin's affection. Fully experienced staff no longer need this lesson.
+- **Wages and hope**: wages remain part of the normal weekly accounts; recording payment does not deduct them again. The first paid week grants hope once more and leads to a one-time payslip conversation on a later visit. Reopening applications, training results or the ledger does not repeat those gains.
+- **Looking after each other**: counter dialogue changes as your fellow orphan learns, eventually showing them teaching other helpers. Outside staff or temporary cover handle school hours.
+
+During a shared shop shift, Robin introduces a regular customer. Their name and preference stay fixed: either lemonade or hot chocolate, with less sugar. After several completed orders, they ask for "the usual". Letting Robin choose the special produces mint lemonade or cinnamon cocoa to suit that preference. Later tastings remember the previous preparation. Opening the shift menu and leaving does not complete an order. These interactions are part of the existing shift earnings.
 
 | Product                                                         | Price      |
 | --------------------------------------------------------------- | ---------- |

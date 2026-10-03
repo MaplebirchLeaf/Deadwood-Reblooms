@@ -3,6 +3,7 @@ import AcademicHonours from './LifeSimulation/AcademicHonours';
 import School from './LifeSimulation/School';
 import Weapons from './LifeSimulation/Weapons';
 import Medicine from './LifeSimulation/Medicine';
+import GymCoach from './LifeSimulation/GymCoach';
 import { DEFAULT_LIFE_SIMULATION_STATE, type GymPlan } from './constants';
 
 class LifeSimulation extends Module {
@@ -10,6 +11,7 @@ class LifeSimulation extends Module {
   public readonly school = new School(this.core);
   public readonly weapons = new Weapons();
   public readonly medicine = new Medicine(this.core);
+  public readonly coach = new GymCoach();
 
   public constructor(core: typeof maplebirch) {
     super(core, 'LifeSimulation', DEFAULT_LIFE_SIMULATION_STATE);

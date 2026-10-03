@@ -40,7 +40,7 @@
   <<if !$_orchard or $Orchard.site isnot 'farm' or !$_orchard.available('farm')>><<exit>><</if>>
   <br>
   <<if $_orchard.irrigated>>
-    <<gardenicon 'water'>><span class='green'><<lanSwitch 'The farm irrigation keeps the young trees watered.' '农场的灌溉系统为幼树补足水分。'>></span><br>
+    <<gardenicon 'water'>><span class='green'><<lanSwitch 'The farm irrigation keeps the fruit trees watered.' '农场的灌溉系统为果树补足水分。'>></span><br>
   <</if>>
   <<if $_orchard.state.worker.hired>>
     <<set $_worker to $_orchard.state.worker>>
@@ -54,26 +54,49 @@
       <span class='red'><<lanSwitch 'The paid week has ended. Your worker will not work until you pay again.' '预付的薪期已经结束。续付薪资前，雇工不会继续干活。'>></span><br>
     <</if>>
     <<if $_worker.pick>>
-      <<lanSwitch 'Waters young trees and picks ripe fruit.' '浇灌幼树，并采收成熟水果。'>><br>
+      <<lanSwitch 'Waters trees when the soil dries and picks ripe fruit.' '土壤干燥时浇水，并采收成熟水果。'>><br>
       <<icon 'orchard-harvest.png'>><<lanLink ['Leave the picking to me', '让我自己采收']>>
         <<run maplebirch.get('Orchard').setWorkerPicking(false)>>
         <<replace '#deadwood-orchard-worker'>><<deadwood-orchard-worker>><</replace>>
       <</lanLink>><br>
     <<else>>
-      <<lanSwitch 'Waters young trees. Leaves the fruit for you.' '浇灌幼树，把水果留给你采收。'>><br>
+      <<lanSwitch 'Waters trees when the soil dries. Leaves the fruit for you.' '土壤干燥时浇水，把水果留给你采收。'>><br>
       <<icon 'orchard-harvest.png'>><<lanLink ['Ask the worker to pick ripe fruit too', '也让雇工采收成熟水果']>>
         <<run maplebirch.get('Orchard').setWorkerPicking(true)>>
         <<replace '#deadwood-orchard-worker'>><<deadwood-orchard-worker>><</replace>>
       <</lanLink>><br>
     <</if>>
-    <<if $_worker.report.day gte 0>>
-      <<set $_shiftDate to new DateTime($_worker.report.day * 86400 + 8 * 3600)>>
-      <<if $_worker.report.day is Math.floor(Time.date.timeStamp / 86400)>><<lanSwitch "Today's work: " '今日照料：'>><<else>><<lanSwitch 'Last shift: ' '最近一次照料：'>><</if>><<print getFormattedDate($_shiftDate)>><<lanSwitch '.' '。'>><<lanSwitch ' Young trees watered: ' ' 浇灌幼树：'>><span class='green'><<print $_worker.report.watered>></span><<lanSwitch '.' '。'>><br>
-      <<if Object.values($_worker.report.kept).some(amount => amount gt 0)>>
+    <<if $_worker.fertilise>>
+      <<lanSwitch 'Uses your fertiliser when the previous application wears off.' '肥效耗尽后，使用你现有的肥料补肥。'>><br>
+      <<gardenicon 'fertiliser'>><<lanLink ['Leave fertilising to me', '让我自己施肥']>>
+        <<run maplebirch.get('Orchard').setWorkerFertilising(false)>>
+        <<replace '#deadwood-orchard-worker'>><<deadwood-orchard-worker>><</replace>>
+      <</lanLink>><br>
+    <<else>>
+      <<gardenicon 'fertiliser'>><<lanLink ['Allow the worker to use your fertiliser', '允许雇工使用你的肥料']>>
+        <<run maplebirch.get('Orchard').setWorkerFertilising(true)>>
+        <<replace '#deadwood-orchard-worker'>><<deadwood-orchard-worker>><</replace>>
+      <</lanLink>><br>
+    <</if>>
+    <<set $_report to $_orchard.workerReport>>
+    <<if $_report>>
+      <<set $_shiftDate to new DateTime($_report.day * 86400 + 8 * 3600)>>
+      <<if $_report.day is Math.floor(Time.date.timeStamp / 86400)>><<lanSwitch "Today's work: " '今日照料：'>><<else>><<lanSwitch 'Last shift: ' '最近一次照料：'>><</if>><<print getFormattedDate($_shiftDate)>><<lanSwitch '.' '。'>><<lanSwitch ' Trees watered: ' ' 浇灌果树：'>><span class='green'><<print $_report.watered>></span><<lanSwitch '.' '。'>><br>
+      <<if $_report.fertilised gt 0>><<lanSwitch 'Bags of fertiliser used: ' '使用肥料：'>><span class='green'><<print $_report.fertilised>></span><<lanSwitch '.' ' 袋。'>><br><</if>>
+      <<if $_report.noFertiliser>><span class='gold'><<lanSwitch 'Fertiliser ran out before every tree could be tended.' '肥料已经用完，有些树还没补肥。'>></span><br><</if>>
+      <<if Object.values($_report.kept).some(amount => amount gt 0)>>
         <<lanSwitch 'Fruit put away: ' '收好的水果：'>><<deadwood-orchard-worker-harvest>><br>
       <<else>>
         <<lanSwitch 'No fruit picked.' '没有采收水果。'>><br>
       <</if>>
+      <<if $_report.irrigation>>
+        <<lanSwitch 'Irrigation supplied the fruit trees during that shift.' '这一班由灌溉系统为果树供水。'>><br>
+      <<elseif $_report.rain>>
+        <<lanSwitch 'Rain watered the fruit trees during that shift.' '这一班的雨水已经浇透果树。'>><br>
+      <</if>>
+    <</if>>
+    <<if $_orchard.canTalkWorker>>
+      <<socialiseicon 'ask'>><<lanLink ['Ask your worker about the orchard (0:05)', '问问雇工果园的情况 (0:05)'] 'Deadwood Reblooms Orchard Worker Report'>><</lanLink>><br>
     <</if>>
     <<if $_orchard.canPayWorker>>
       <<shopicon 'register'>><<lanLink ['Pay for another week', '预付下一周薪资']>>
@@ -221,6 +244,53 @@
 <</if>>
 <<set $eventskip to 0>>
 
+:: Deadwood Reblooms Orchard Worker Report []
+<<set $outside to 1>><<set $location to 'alex_farm'>><<set $bus to 'farm_fields'>><<farm_work_update>><<effects>>
+<<if $stress gte $stressmax>><<passoutfarmroad>><<exit>><</if>>
+<<run maplebirch.get('Orchard').advance()>>
+<<if maplebirch.get('Orchard').canTalkWorker>>
+  <<endevent>><<loadNPC 0 'deadwood_orchard_worker'>><<person1>>
+  <<set _orchardReport to maplebirch.get('Orchard').workerReport>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $per_npc.deadwood_orchard_worker.orchardShifts lt 3>><<person>> puts the watering can down when you approach. "I've been round the trees. Come and have a look."
+      <<else>><<person>> greets you by name. "Come to check on the trees?" <<He>> tucks a pair of gloves into <<his>> pocket and walks along the row with you.<</if>>
+      <br><br>
+      <<if _orchardReport.irrigation>>"Water's reaching the trees fine. I checked the channels this morning."
+      <<elseif _orchardReport.rain>>"The rain saved some work this morning. The soil's wet right through."
+      <<elseif _orchardReport.watered gt 0>>"I've watered the trees that needed it. The soil should hold that for a week."
+      <<else>>"Nothing needed watering this morning. I checked the soil by the roots."<</if>>
+      <br><br>
+      <<if Object.values(_orchardReport.kept).some(amount => amount gt 0)>>"I've put the ripe fruit away. You can check what came in." <<He>> points to the work record.
+      <<elseif _orchardReport.leftFruit>>"Some fruit is ripe. I've left it on the trees for you, like you asked. Don't leave it too long."
+      <<else>>"No fruit to bring in this morning. I'll keep an eye on it."<</if>>
+      <<if _orchardReport.offSeason>><br><br>"Some of these trees are out of season. Don't expect as much from them until the weather turns."<</if>>
+      <<if _orchardReport.fertilised gt 0>><br><br>"I've spread the fertiliser where it was due. That should last about a month."<</if>>
+      <<if _orchardReport.noFertiliser>><br><br><span class='gold'>"We're out of fertiliser. I couldn't finish all the trees, but I've kept them watered."</span><</if>>
+    <<option 'CN'>>
+      <<if $per_npc.deadwood_orchard_worker.orchardShifts lt 3>><<person>>见你走来，放下水壶。“树都看过一遍了。来看看吧。”
+      <<else>><<person>>叫着你的名字打招呼。“来看看树？”<<he>>把手套塞进口袋，陪你沿着树行走过去。<</if>>
+      <br><br>
+      <<if _orchardReport.irrigation>>“水已经通到果树这边了，我早上检查过水道。”
+      <<elseif _orchardReport.rain>>“早上的雨省了些事，土已经湿透了。”
+      <<elseif _orchardReport.watered gt 0>>“需要水的树都浇过了，这次够维持一个星期。”
+      <<else>>“早上没什么需要浇水的，我检查过树根旁的土。”<</if>>
+      <br><br>
+      <<if Object.values(_orchardReport.kept).some(amount => amount gt 0)>>“成熟的果子都收好了，你可以看看收了多少。”<<he>>指了指工作记录。
+      <<elseif _orchardReport.leftFruit>>“树上有熟果子，按你说的给你留着了。别放太久。”
+      <<else>>“早上还没果子可收，我再留意着。”<</if>>
+      <<if _orchardReport.offSeason>><br><br>“有几种树现在不当季。等天气转过来之前，别指望它们结太多。”<</if>>
+      <<if _orchardReport.fertilised gt 0>><br><br>“该补肥的已经补上了，差不多能管一个月。”<</if>>
+      <<if _orchardReport.noFertiliser>><br><br><span class='gold'>“肥料用完了，有几棵还没补上。水都浇过了，先不用担心。”</span><</if>>
+  <</language>><<pass 5>><br><br>
+  <<if Object.values(_orchardReport.kept).some(amount => amount gt 0)>>
+    <<lanSwitch 'Fruit put away: ' '收好的水果：'>><<deadwood-orchard-worker-harvest>><br><br>
+  <</if>>
+<<else>>
+  <<lanSwitch 'Your worker is not available to go over the morning\'s work now. The latest work record remains beside the orchard.' '雇工现在没法陪你检查早上的工作。最近一次的工作记录仍留在果园旁。'>><br><br>
+<</if>>
+<<deadwood-orchard-event-return>>
+
 :: Deadwood Reblooms Orchard Hire []
 <<set $outside to 0>><<set $location to 'pub'>><<set $bus to 'harvest'>><<effects>>
 <<endevent>>
@@ -231,22 +301,26 @@
 <<if maplebirch.get('Orchard').candidate>>
   <<loadNPC 0 'deadwood_orchard_worker'>>
 <<else>>
-  <<generate1>><<npcClothesName $NPCList[0] 'wildsFlannel'>><<saveNPC 0 'deadwood_orchard_worker'>>
+  <<generate1>><<npcClothesName $NPCList[0] 'wildsFlannel'>>
 <</if>><<person1>>
+<<set _orchardWorkerMet to $NPCList[0].name_known is 1>>
 <<language>>
   <<option 'EN'>>
-    You ask at the bar for someone who can help with fruit trees. The landlord points you towards a <<person>> by the window. You take the empty seat opposite <<him>>.
+    <<if _orchardWorkerMet>>You find <<print $NPCList[0].name>> at the same table by the window. <<He>> recognises you and moves a glass aside to make room.
+    <<else>>You ask at the bar for someone who can help with fruit trees. The landlord points you towards a <<person>> by the window. You take the empty seat opposite <<him>>.<</if>>
     <br><br>
-    "I can water the young ones, and pick the fruit if you want," <<he>> says. "But I won't be clearing new ground. You'll have to do that yourself."
+    "I can water the trees, and pick the fruit if you want," <<he>> says. "Leave me fertiliser and I can spread that too. But I won't be clearing new ground. You'll have to do that yourself."
     <br><br>
-    <<He>> gives you <<his>> name: <<print $NPCList[0].name>>. "A week's work costs <<printmoney maplebirch.get('Orchard').workerWage>>. Pay first, and I'll come by in the mornings."
+    <<if not _orchardWorkerMet>><<He>> gives you <<his>> name: <<print $NPCList[0].name>>. <</if>>"A week's work costs <<printmoney maplebirch.get('Orchard').workerWage>>. Pay first, and I'll come by in the mornings."
   <<option 'CN'>>
-    你向酒馆老板打听有没有人能帮忙照料果树。老板指向窗边的一位<<person>>。你在<<him>>对面的空位坐下。
+    <<if _orchardWorkerMet>>你在窗边同一张桌子找到<<print $NPCList[0].name>>。<<He>>认出你，把杯子挪开，让你坐下。
+    <<else>>你向酒馆老板打听有没有人能帮忙照料果树。老板指向窗边的一位<<person>>。你在<<him>>对面的空位坐下。<</if>>
     <br><br>
-    “小树我可以浇水，你需要的话，水果也能帮你摘，”<<he>>说。“不过，我不负责开荒。那得你自己来。”
+    “树我可以浇水，你需要的话，水果也能帮你摘，”<<he>>说。“肥料备好了，我也能帮你撒。不过，我不负责开荒。那得你自己来。”
     <br><br>
-    <<He>>告诉你自己的名字：<<print $NPCList[0].name>>。“干一周收<<printmoney maplebirch.get('Orchard').workerWage>>。先付钱，我每天早上过去。”
-<</language>><br><br>
+    <<if not _orchardWorkerMet>><<He>>告诉你自己的名字：<<print $NPCList[0].name>>。<</if>>“干一周收<<printmoney maplebirch.get('Orchard').workerWage>>。先付钱，我每天早上过去。”
+<</language>>
+<<set $NPCList[0].name_known to 1>><<saveNPC 0 'deadwood_orchard_worker'>><br><br>
 <<if $money gte maplebirch.get('Orchard').workerWage>>
   <<icon 'orchard-worker.png'>><<lanLink ['Hire for a week', '雇用一周'] 'Pub'>>
     <<run maplebirch.get('Orchard').hire()>><<endevent>>
