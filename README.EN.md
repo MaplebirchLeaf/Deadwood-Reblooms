@@ -27,7 +27,7 @@
 
 `DeadwoodReblooms` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
 
-The current version is **1.3.1**. See the [release notes](.github/release-notes/v1.3.1.md) for the full changes. This release fixes orchard return destinations after work and random events, and refines source patches for transformations, characters and school life. See the [1.3.0 release notes](.github/release-notes/v1.3.0.md) for orchards, Ellis and other additions.
+The current version is **1.3.2**. See the [release notes](.github/release-notes/v1.3.2.md) for the full changes. The bank clerk is now Adrian, with dialogue stat errors fixed. This update expands property decorations, orchard care, Robin's shop and gym interactions, adds native pixel icons and location art, and introduces the Sadomasochism and Trinity traits.
 
 ## Modules and game guide
 
