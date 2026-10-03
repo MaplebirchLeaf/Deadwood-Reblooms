@@ -27,7 +27,7 @@
 
 `DeadwoodReblooms` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
 
-The current version is **1.3.0**. See the [release notes](.github/release-notes/v1.3.0.md) for the full changes. This release adds orchards, Ellis and financial-centre work, and refines school schedules, combat, clothing and medicine settlement.
+The current version is **1.3.1**. See the [release notes](.github/release-notes/v1.3.1.md) for the full changes. This release fixes orchard return destinations after work and random events, and refines source patches for transformations, characters and school life. See the [1.3.0 release notes](.github/release-notes/v1.3.0.md) for orchards, Ellis and other additions.
 
 ## Modules and game guide
 
