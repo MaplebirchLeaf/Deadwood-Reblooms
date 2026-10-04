@@ -168,9 +168,11 @@ Achievements record completed actions and do not need a separate purchase. The m
 
 Adrian is the financial centre's bank clerk, handling personal accounts and banking enquiries across the desks. Weekday hours are 09:00–17:00: the estate desk at 11:00–12:00, lunch beside the hall entrance at 12:00–13:00, the securities desk at 15:00–16:00, and the bank counter otherwise. Adrian is absent on weekends and after work. Other staff continue to handle ordinary services.
 
+Follow up on the current topic: go through a statement, discuss your plans for a house, ask about the forms, or ask how work has been. If you are unwell, you can sit and catch your breath; during an ordinary lunch conversation, you can buy Adrian a cup of tea for £2. These replies increase familiarity. Resting and sharing tea also reduce stress. Only one reply takes effect in each conversation.
+
 You can chat once per day. Visits on different days build familiarity, and listening improves the relationship. Re-entering the counter or moving money repeatedly does not award affection. Banking conversations respond to overdue payments, distress, your first property and your new account. Estate-desk conversations cover funding and household costs, while securities-desk conversations cover opening accounts and transferring money.
 
-The social page calls this relationship **Familiarity**. Adrian's attitude progresses from professional distance through recognition, enjoying conversation and feeling at ease to trust. Once you help Adrian become manager, a familiar Adrian also expresses gratitude for your support. This reflects personal friendship rather than romance.
+The social page calls this relationship **Familiarity**. Adrian gradually recognises you, takes time to explain the paperwork, and enjoys talking once the business is done. Career progress shifts the description towards the business you bring to the bank. Once you help Adrian become manager, a familiar Adrian also expresses gratitude for your support. This reflects business relations and personal friendship rather than romance.
 
 With an open account and visits on at least three different days, ask about work. Promotion depends on actual customer business, rather than familiarity:
 
