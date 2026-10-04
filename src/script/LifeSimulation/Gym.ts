@@ -1,18 +1,25 @@
 // ./src/script/LifeSimulation/Gym.ts
 
 export default function Gym(maplebirch: typeof window.maplebirch): void {
+  const open = () => Time.hour >= 6 && Time.hour < 22;
   // 地点图由侧栏天气渲染器叠加。32×32 的灯光层相对 32×38 底图按底部对齐。
   maplebirch.tool.patch.location.configure(
     'deadwood_gym',
     {
       folder: 'gym',
       base: {
-        default: { condition: () => !Weather.isSnow, image: 'base.png' },
-        snow: { condition: () => Weather.isSnow, image: 'snow.png' }
+        default: { condition: () => open() && !Weather.isSnow && !Weather.lightsOn, image: 'base.png' },
+        snow: { condition: () => open() && Weather.isSnow && !Weather.lightsOn, image: 'snow.png' },
+        night: { condition: () => open() && !Weather.isSnow && Weather.lightsOn, image: 'base-night.png' },
+        snowNight: { condition: () => open() && Weather.isSnow && Weather.lightsOn, image: 'snow-night.png' },
+        closed: { condition: () => !open() && !Weather.isSnow && !Weather.lightsOn, image: 'closed.png' },
+        snowClosed: { condition: () => !open() && Weather.isSnow && !Weather.lightsOn, image: 'snow-closed.png' },
+        closedNight: { condition: () => !open() && !Weather.isSnow && Weather.lightsOn, image: 'closed-night.png' },
+        snowClosedNight: { condition: () => !open() && Weather.isSnow && Weather.lightsOn, image: 'snow-closed-night.png' }
       },
       emissive: {
         image: 'emissive.png',
-        condition: () => Weather.lightsOn,
+        condition: () => open() && Weather.lightsOn,
         color: '#fbff86dd',
         size: 4,
         intensity: 0.8

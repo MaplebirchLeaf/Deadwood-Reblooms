@@ -8,8 +8,10 @@ export default function (maplebirch: typeof window.maplebirch): void {
       folder: 'robin-shop',
       customMapping: () => (V.RobinExpansion?.shop ? 'deadwood_robin_shop' : 'town'),
       base: {
-        default: { condition: () => !Weather.isSnow, image: 'base.png' },
-        snow: { condition: () => Weather.isSnow, image: 'snow.png' }
+        default: { condition: () => !Weather.isSnow && !Weather.lightsOn, image: 'base.png' },
+        snow: { condition: () => Weather.isSnow && !Weather.lightsOn, image: 'snow.png' },
+        night: { condition: () => !Weather.isSnow && Weather.lightsOn, image: 'base-night.png' },
+        snowNight: { condition: () => Weather.isSnow && Weather.lightsOn, image: 'snow-night.png' }
       },
       // 原版按底部对齐：32×32 灯光层相对 32×38 底图上移 6 像素。
       emissive: {

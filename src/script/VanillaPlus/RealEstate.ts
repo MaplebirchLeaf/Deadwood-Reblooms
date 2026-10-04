@@ -8,8 +8,10 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
       {
         folder: `property-${property.id}`,
         base: {
-          default: { condition: () => !Weather.isSnow, image: 'base.png' },
-          snow: { condition: () => Weather.isSnow, image: 'snow.png' }
+          default: { condition: () => !Weather.isSnow && !Weather.lightsOn, image: 'base.png' },
+          snow: { condition: () => Weather.isSnow && !Weather.lightsOn, image: 'snow.png' },
+          night: { condition: () => !Weather.isSnow && Weather.lightsOn, image: 'base-night.png' },
+          snowNight: { condition: () => Weather.isSnow && Weather.lightsOn, image: 'snow-night.png' }
         },
         emissive: { image: 'emissive.png', condition: () => Weather.lightsOn, color: '#fbff86dd', size: 4, intensity: 0.8 },
         weather: {

@@ -9,9 +9,13 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
     {
       folder: 'financial-centre',
       base: {
-        default: { condition: () => !Weather.isSnow, image: 'base.png' },
-        snow: { condition: () => Weather.isSnow, image: 'snow.png' }
+        default: { condition: () => !Weather.isSnow && !Weather.lightsOn, image: 'base.png' },
+        snow: { condition: () => Weather.isSnow && !Weather.lightsOn, image: 'snow.png' },
+        night: { condition: () => !Weather.isSnow && Weather.lightsOn, image: 'base-night.png' },
+        snowNight: { condition: () => Weather.isSnow && Weather.lightsOn, image: 'snow-night.png' }
       },
+      // 完整 32×45 灯层保留顶楼窗，底图夜色由原版天气渲染器统一叠加。
+      emissive: { image: 'emissive.png', condition: () => Weather.lightsOn, color: '#b5d5efb0', size: 2, intensity: 0.6, blur: 0.2 },
       weather: {
         fogDistributionCurve: 1.2,
         rainSplashEnabled: true,

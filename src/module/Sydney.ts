@@ -14,6 +14,17 @@ class Sydney extends Module {
   public get canTease(): boolean {
     return V.sydneyromance === 1 && window.hasSexStat('promiscuity', 2) && !window.pcAreArmsBound('both');
   }
+
+  /** 门前叙事与窗户灯光共用原版日程和现有同住判定。 */
+  public get estatePresence(): { sydney: boolean; sirris: boolean } {
+    window.sydneySchedule?.();
+    const housing = this.core.get('VanillaPlus')?.realEstate;
+    const property = housing?.residenceOf('Sydney');
+    return {
+      sydney: T.sydney_location === 'home' && this.available && !V.replayScene && (!property || !housing!.residentsHome(property.id).some(resident => resident.id === 'Sydney')),
+      sirris: Time.hour >= 21 || Time.hour < 7 || (Time.weekDay === 1 && !Time.schoolDay)
+    };
+  }
 }
 
 declare module '@scml-dol-maplebirch/types' {
