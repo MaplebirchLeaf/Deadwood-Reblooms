@@ -295,6 +295,7 @@ class Finance {
   public payFromBankPennies(amount: unknown): FinanceResult {
     const bank = this.state.bank;
     if (!bank.opened) return 'bank-required';
+    if (!bank.debit_card) return 'debit-required';
     const value = Number(amount);
     if (!Number.isSafeInteger(value) || value <= 0) return 'invalid-amount';
     if (bank.balance < value) return 'insufficient-bank';

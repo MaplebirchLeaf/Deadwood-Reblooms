@@ -1,0 +1,311 @@
+:: Deadwood Reblooms Life Simulation Blackjack Widgets [widget]
+<<widget 'deadwood-blackjack-arcade-entry'>>
+	<<if maplebirch.get('LifeSimulation')?.casino.blackjack.arcadeAvailable>>
+		<<icon 'blackjack.png'>><<lanLink ['Sit at the blackjack table', '坐到二十一点牌桌前'] 'Deadwood Reblooms Life Simulation Blackjack'>>
+			<<run maplebirch.get('LifeSimulation').casino.blackjack.prepare('arcade')>>
+		<</lanLink>><br>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-blackjack-home-entry'>>
+	<<if maplebirch.get('LifeSimulation')?.casino.blackjack.homeOpponents.length>>
+		<<set _blackjackReturn to _args[0]>>
+		<<set _blackjackNames to {Robin: '罗宾', Whitney: '惠特尼', Kylar: '凯拉尔', Sydney: '悉尼'}>>
+		<<for _resident range maplebirch.get('LifeSimulation').casino.blackjack.homeOpponents>>
+			<<capture _resident _blackjackReturn _blackjackNames>>
+				<<icon 'blackjack.png'>><<lanLink `['Play blackjack with ' + _resident.id, '和' + (_blackjackNames[_resident.id] || _resident.id) + '玩二十一点']` 'Deadwood Reblooms Life Simulation Blackjack'>>
+					<<run maplebirch.get('LifeSimulation').casino.blackjack.prepare('home', _resident.id, _blackjackReturn)>>
+				<</lanLink>><br>
+			<</capture>>
+		<</for>>
+		<<if maplebirch.get('LifeSimulation').casino.blackjack.homeGroupAvailable>>
+			<<set _blackjackGroup to maplebirch.get('LifeSimulation').casino.blackjack.homeOpponents>>
+			<<capture _blackjackGroup _blackjackReturn>>
+				<<icon 'blackjack.png'>><<lanLink ['Invite both lovers to play blackjack', '邀请两位恋人一起玩二十一点'] 'Deadwood Reblooms Life Simulation Blackjack'>>
+					<<run maplebirch.get('LifeSimulation').casino.blackjack.prepare('home', _blackjackGroup[0].id, _blackjackReturn, _blackjackGroup[1].id)>>
+				<</lanLink>><br>
+			<</capture>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-blackjack-action'>>
+	<<set _blackjackGame to maplebirch.get('LifeSimulation')?.casino.blackjack>>
+	<<set _blackjackActed to false>>
+	<<if _blackjackGame>>
+		<<switch _args[0]>>
+			<<case 'start'>><<set _blackjackActed to _blackjackGame.start()>>
+			<<case 'hit'>><<set _blackjackActed to _blackjackGame.hit()>>
+			<<case 'stand'>><<set _blackjackActed to _blackjackGame.stand()>>
+		<</switch>>
+		<<if _blackjackActed>>
+			<<if _args[0] is 'start' and _blackjackGame.state.venue isnot 'home'>>
+				<<if _blackjackGame.state.venue is 'casino'>>
+					<<run maplebirch.get('LifeSimulation').casino.adjustChips(-_blackjackGame.state.bet)>>
+				<<else>><<money `-_blackjackGame.state.bet`>><</if>>
+			<</if>>
+			<<set _blackjackAward to _blackjackGame.collectPayout()>>
+			<<if _blackjackAward gt 0>>
+				<<if _blackjackGame.state.venue is 'casino'>><<run maplebirch.get('LifeSimulation').casino.adjustChips(_blackjackAward)>>
+				<<else>><<money _blackjackAward>><</if>>
+			<</if>>
+			<<pass `_args[0] === 'start' ? 2 : 1`>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-blackjack-companion'>>
+	<<set _blackjackState to maplebirch.get('LifeSimulation').casino.blackjack.state>>
+	<<set _blackjackWon to ['win', 'blackjack'].includes(_blackjackState.result)>>
+	<<if _blackjackState.phase is 'player'>>
+		<<lanSwitch 'You study your cards. Your partner waits for you to ask for another or turn the hand over.' '你端详着手里的牌。恋人等着你决定再要一张，还是停牌揭晓点数。'>><br><br>
+	<<else>>
+	<<switch _blackjackState.companion>>
+		<<case 'Robin'>>
+			<<if _blackjackState.phase is 'done'>>
+				<<if _blackjackWon>><<lanSwitch 'Robin slides the cards together. "You got me. Another hand?"' '罗宾把牌拢到一起。“你赢了。再来一局？”'>>
+				<<elseif _blackjackState.result is 'loss'>><<lanSwitch 'Robin glances at your cards, then gives you a small smile. "We can play again, if you want."' '罗宾看了看你的牌，朝你微微一笑。“想的话，我们可以再玩一局。”'>>
+				<<else>><<lanSwitch '"Neither of us, then," Robin says, gathering the cards.' '“那就是谁也没赢。”罗宾说着，把牌收起来。'>><</if>>
+			<<else>><<lanSwitch 'Robin brings a chair closer. "No money, right? I can play a few hands." You agree and clear a space for the cards.' '罗宾把椅子挪近了一点。“不赌钱，对吧？我可以陪你玩几局。”你答应下来，腾出一块地方摆牌。'>><</if>>
+		<<case 'Whitney'>>
+			<<if _blackjackState.phase is 'done'>>
+				<<if _blackjackWon>><<lanSwitch '"Fine. You won that one," Whitney says, reaching for the deck. "Don\'t get used to it."' '“行，这局你赢。”惠特尼伸手去拿牌。“可别得意太早。”'>>
+				<<elseif _blackjackState.result is 'loss'>><<lanSwitch 'Whitney taps the winning hand. "Told you. Go on, deal again."' '惠特尼敲了敲赢下这局的牌。“我说什么来着？来，再发一局。”'>>
+				<<else>><<lanSwitch 'Whitney compares the two hands. "Again. That settles nothing."' '惠特尼对比着两边的牌。“再来，这局不算分出高下。”'>><</if>>
+			<<else>><<lanSwitch 'Whitney pulls out a chair. "You\'re not going to change the rules when you lose, are you?" You set the deck between you.' '惠特尼拉开椅子。“你可别输了就改规则。”你把牌放到两人之间。'>><</if>>
+		<<case 'Kylar'>>
+			<<if _blackjackState.phase is 'done'>>
+				<<if _blackjackWon>><<lanSwitch 'Kylar looks from your cards to your face. "You won. Do you want to keep playing?"' '凯拉尔的视线从你的牌移到你的脸上。“你赢了。还想继续玩吗？”'>>
+				<<elseif _blackjackState.result is 'loss'>><<lanSwitch '"I won?" Kylar checks the totals again, then smiles. "We could play another."' '“我赢了？”凯拉尔又算了一遍点数，随后笑了。“我们可以再来一局。”'>>
+				<<else>><<lanSwitch 'Kylar leaves the cards where they are for a moment. "Same score. Another hand?"' '凯拉尔让牌在桌上多停了一会儿。“点数一样。再来一局？”'>><</if>>
+			<<else>><<lanSwitch '"Just the two of us?" Kylar asks. You nod. Kylar sits close enough to watch you shuffle, then makes room for the cards.' '“就我们两个？”凯拉尔问。你点点头。凯拉尔坐近了些，看着你洗牌，随后给桌上的牌让出位置。'>><</if>>
+		<<case 'Sydney'>>
+			<<if _blackjackState.phase is 'done'>>
+				<<if _blackjackWon>><<lanSwitch 'Sydney checks the totals. "That\'s yours. Nicely played."' '悉尼核对了点数。“这局是你赢。打得不错。”'>>
+				<<elseif _blackjackState.result is 'loss'>><<lanSwitch '"That makes this hand mine," Sydney says, gathering the cards. "Shall we try another?"' '“那这局就是我赢。”悉尼把牌收起来。“再来一局吗？”'>>
+				<<else>><<lanSwitch '"A tie," Sydney says. "We\'ll have to settle it in the next hand."' '“平局。”悉尼说。“看来得等下一局才能分出胜负了。”'>><</if>>
+			<<else>><<lanSwitch 'Sydney squares the deck. "Let\'s agree on the rules first." You decide to play without money, and leave the rules beside the cards.' '悉尼把牌理齐。“先说好规则。”你们约定不赌钱，把写好的规则放在牌旁边。'>><</if>>
+	<</switch>><br><br>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-blackjack-status'>>
+	<<set $_bjGame to maplebirch.get('LifeSimulation').casino.blackjack>><<set $_bjState to $_bjGame.state>>
+	<<set $_bjNames to {Robin: '罗宾', Whitney: '惠特尼', Kylar: '凯拉尔', Sydney: '悉尼'}>>
+	<<set $_bjLabels to {
+		player: ['you', '你'],
+		dealer: [$_bjState.companion, $_bjNames[$_bjState.companion] || $_bjState.companion],
+		partner: [$_bjState.partner, $_bjNames[$_bjState.partner] || $_bjState.partner]
+	}>>
+	<<if $_bjState.venue is 'home' and $_bjState.wager is 'strip' and $_bjState.clothing>>
+		<p><<lanSwitch 'Stake garments remaining' '剩余赌注衣物'>>：<<for $_bjIndex, $_bjSeat range ($_bjState.partner ? ['player', 'dealer', 'partner'] : ['player', 'dealer'])>>
+			<<if $_bjIndex gt 0>><<lanSwitch '; ' '；'>><</if>><<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>>
+			<<if $_bjState.match_lost_seats.includes($_bjSeat)>><<lanSwitch 'out' '已出局'>><<else>><<print $_bjGame.remainingClothes($_bjSeat)>><</if>>
+		<</for>></p>
+	<</if>>
+	<p class='blackjack-result' role='status'>
+	<<if $_bjState.phase isnot 'done'>>
+		<<if $_bjState.phase is 'player'>><<lanSwitch 'Take another card, or stand on your current hand.' '你可以再要一张牌，或以现有的点数停牌。'>>
+		<<else>><<lanSwitch 'The cards wait on the table.' '牌已经放在桌上。'>><</if>>
+	<<else>>
+		<<set $_bjWinners to $_bjGame.winningSeats>>
+		<span @class="!$_bjWinners.length || $_bjGame.playerEliminated ? 'blue' : $_bjState.result === 'loss' ? 'red' : $_bjState.result === 'push' ? 'blue' : 'gold'">
+			<<if !$_bjWinners.length>><<lanSwitch 'Everyone busts. No winner.' '全员爆牌，本局没有赢家。'>>
+			<<elseif $_bjGame.playerEliminated>><<lanSwitch 'You are out of the game. The remaining players settle this hand.' '你已出局，其他人还在继续这局牌。'>>
+			<<else>><<switch $_bjState.result>>
+				<<case 'loss'>><<lanSwitch 'You lose.' '你输了。'>>
+				<<case 'push'>><<lanSwitch 'Push.' '平局。'>>
+				<<case 'blackjack'>><<lanSwitch 'Blackjack!' '起手二十一点！'>>
+				<<default>><<lanSwitch 'You win!' '你赢了！'>>
+			<</switch>><</if>>
+		</span>
+		<<if $_bjState.partner and $_bjWinners.length>>
+			<span @class="$_bjWinners.length === 1 ? 'gold' : 'blue'"> <<lanSwitch 'Winner' '本局赢家'>>：<<for $_bjIndex, $_bjSeat range $_bjWinners>><<if $_bjIndex gt 0>><<lanSwitch ' and ' '、'>><</if>><<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>></span>
+		<</if>>
+		<<if $_bjState.venue is 'home' and $_bjState.wager is 'strip'>>
+			<<if $_bjState.stripped_seats.length>>
+				<<language>>
+					<<option 'EN'>>
+						<<for $_bjIndex, $_bjSeat range $_bjState.stripped_seats>><<if $_bjIndex gt 0>> and <</if>><<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>>: one stake garment removed this hand.
+					<<option 'CN'>>
+						这局结束，<<for $_bjIndex, $_bjSeat range $_bjState.stripped_seats>><<if $_bjIndex gt 0>>、<</if>><<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>>已<<if $_bjState.stripped_seats.length gt 1>>各<</if>>脱一件赌注衣物。
+				<</language>>
+			<<else>><<lanSwitch ' No garments removed this hand.' ' 本局无人脱衣。'>><</if>>
+			<<if $_bjState.match_lost_seats.length>>
+				<<lanSwitch ' Out of the game: ' ' 已出局：'>><<for $_bjIndex, $_bjSeat range $_bjState.match_lost_seats>><<if $_bjIndex gt 0>><<lanSwitch ' and ' '、'>><</if>><<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>>.
+			<</if>>
+			<<if $_bjGame.matchEnded>>
+				<<language>>
+					<<option 'EN'>>
+						Last player remaining: <<lanSwitch `$_bjLabels[$_bjGame.activeSeats[0]][0]` `$_bjLabels[$_bjGame.activeSeats[0]][1]`>>. This game is over. You can refuse intimacy and leave the table.
+					<<option 'CN'>>
+						最后留在场上的赢家是<<lanSwitch `$_bjLabels[$_bjGame.activeSeats[0]][0]` `$_bjLabels[$_bjGame.activeSeats[0]][1]`>>，牌局结束了。你可以拒绝亲密，直接离桌。
+				<</language>>
+			<</if>>
+		<</if>>
+		<<if $_bjState.venue isnot 'home'>>
+			<span @class="$_bjState.result === 'loss' ? 'red' : $_bjState.result === 'push' ? 'blue' : 'green'">
+				<<if $_bjState.result is 'loss'>><<lanSwitch ' Lost £' ' 损失 £'>><<print $_bjState.bet / 100>>.
+				<<elseif $_bjState.result is 'push'>><<lanSwitch ' Stake returned: £' ' 收回本金 £'>><<print $_bjState.bet / 100>>.
+				<<else>><<lanSwitch ' Won £' ' 赢得 £'>><<print $_bjGame.payout / 100>> (<<lanSwitch 'net £' '净赢 £'>><<print ($_bjGame.payout - $_bjState.bet) / 100>>).<</if>>
+			</span>
+		<</if>>
+	<</if>>
+	</p>
+<</widget>>
+
+<<widget 'deadwood-blackjack-controls'>>
+	<<set $_bjGame to maplebirch.get('LifeSimulation').casino.blackjack>><<set $_bjState to $_bjGame.state>>
+	<<if $_bjState.venue is 'casino'>><<deadwood-casino-balance>><</if>>
+	<<if $_bjState.venue is 'home' and ($_bjState.phase is 'ready' or $_bjGame.matchEnded)>>
+		<div class='blackjack-bets'><<lanSwitch 'Rules' '玩法'>>：
+			<button type='button' data-action='wager' data-value='fun' @aria-pressed="String($_bjState.wager === 'fun')"><<lanSwitch 'Just cards' '只玩牌'>></button>
+			<button type='button' data-action='wager' data-value='strip' @aria-pressed="String($_bjState.wager === 'strip')" @data-disabled="$_bjState.wager !== 'strip' && !$_bjGame.canStrip"><<lanSwitch 'Lose a hand, remove one garment' '输一局脱一件'>></button>
+		</div>
+	<</if>>
+	<<if $_bjState.venue isnot 'home' and $_bjState.phase isnot 'player'>>
+		<div class='blackjack-bets'><<lanSwitch 'Stake' '赌注'>>：<<for $_bjBet range $_bjGame.bets>>
+			<button type='button' data-action='bet' @data-value="$_bjBet" @aria-pressed="String($_bjState.bet === $_bjBet)">£<<print $_bjBet / 100>></button>
+		<</for>></div>
+	<</if>>
+	<<if $_bjState.phase is 'player' and !$_bjGame.playerEliminated>>
+		<button type='button' data-action='hit' @data-disabled="!$_bjGame.canAct"><<lanSwitch 'Hit (0:01)' '要牌 (0:01)'>></button>
+		<button type='button' data-action='stand' @data-disabled="!$_bjGame.canAct"><<lanSwitch 'Stand (0:01)' '停牌 (0:01)'>></button>
+	<<elseif !$_bjGame.matchEnded>>
+		<button type='button' data-action='start' @data-disabled="!$_bjGame.canStart">
+			<<if $_bjGame.playerEliminated>><<lanSwitch 'Continue watching the next hand (0:02)' '继续旁观下一局 (0:02)'>>
+			<<elseif $_bjState.venue is 'home'>><<lanSwitch 'Deal a hand (0:02)' '发牌 (0:02)'>>
+			<<else>><<lanSwitch 'Deal a hand (£' '发牌 (£'>><<print $_bjState.bet / 100>> 0:02)<</if>>
+		</button>
+	<</if>>
+	<<if $_bjState.venue is 'home' and $_bjState.wager is 'strip' and $_bjState.phase isnot 'player'>>
+		<<if !$_bjState.intimacy_declined>><button type='button' data-action='decline'><<lanSwitch 'This game is only about clothes; no intimacy' '这场只脱衣，不继续亲密'>></button><</if>>
+		<<if $_bjGame.matchEnded>>
+			<<if $_bjGame.pairIntimacyReady>>
+				<button type='button' data-action='pair'><<language>>
+					<<option 'EN'>>Invite <<print [$_bjState.companion, $_bjState.partner].sort().join(' and ')>> to stay, all three of you
+					<<option 'CN'>>邀<<for $_bjIndex, $_bjSeat range [$_bjState.companion, $_bjState.partner].sort()>><<if $_bjIndex gt 0>>和<</if>><<lanSwitch $_bjSeat `({Robin: '罗宾', Whitney: '惠特尼', Kylar: '凯拉尔', Sydney: '悉尼'})[$_bjSeat] || $_bjSeat`>><</for>>一起留下
+				<</language>></button>
+			<</if>>
+			<<for $_bjPerson range $_bjGame.intimacyCandidates>>
+				<button type='button' data-action='intimacy' @data-value="$_bjPerson"><<lanSwitch `"Invite " + $_bjPerson + " into bed for intimacy"` `'邀' + (({Robin: '罗宾', Whitney: '惠特尼', Kylar: '凯拉尔', Sydney: '悉尼'})[$_bjPerson] || $_bjPerson) + '上床亲密'`>></button>
+			<</for>>
+			<button type='button' data-action='reset'><<lanSwitch 'Get dressed and start a new game' '穿好衣服，重新开局'>></button>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-blackjack-choice'>>
+	<<set $_bjChoiceGame to maplebirch.get('LifeSimulation').casino.blackjack>>
+	<<switch _args[0]>>
+		<<case 'wager'>><<run $_bjChoiceGame.setWager(_args[1])>>
+		<<case 'bet'>><<set $_bjChoiceGame.bet to Number(_args[1])>>
+		<<case 'decline'>><<run $_bjChoiceGame.declineIntimacy()>>
+		<<case 'reset'>><<run $_bjChoiceGame.resetMatch()>>
+		<<case 'pair'>>
+			<<if $_bjChoiceGame.beginPairIntimacy()>><<set $sexstart to 1>><<run maplebirch.SugarCube.Engine.play('Deadwood Reblooms Property Pair Intimacy')>><</if>>
+		<<case 'intimacy'>>
+			<<if $_bjChoiceGame.beginIntimacy(_args[1])>><<set $sexstart to 1>><<run maplebirch.SugarCube.Engine.play('Deadwood Reblooms Property Intimacy')>><</if>>
+	<</switch>>
+<</widget>>
+
+:: Deadwood Reblooms Life Simulation Blackjack []
+<<nobr>>
+<<set _blackjackGame to maplebirch.get('LifeSimulation')?.casino.blackjack>>
+<<if !_blackjackGame>>
+	<<lanLink ['Return to the arcade', '返回游戏厅'] 'Arcade'>><</lanLink>><br>
+<<else>>
+	<<if _blackjackGame.state.venue is 'arcade'>>
+		<<set $outside to 0>><<set $location to 'arcade'>><<effects>>
+		<<lanSwitch 'A green cloth covers the small card table beside the change counter. The attendant sets a deck between you. "Closest to twenty-one wins. Go over, and you lose."' '换币柜台旁的小牌桌铺着绿毡。店员把一副牌摆在你面前。“谁最接近二十一点，谁就赢。超过了，就算你输。”'>><br><br>
+	<<elseif _blackjackGame.state.venue is 'casino'>>
+		<<run maplebirch.get('LifeSimulation').casino.enter()>><<effects>>
+		<<language>>
+			<<option 'EN'>>
+				Marlow lays a fresh deck beside the chip rack. "Place your stake first. Hit or stand; I draw below seventeen." A small rules card rests at the edge of the cloth.
+			<<option 'CN'>>
+				马洛把一副新牌摆在筹码托盘旁。“先下注。要牌或者停牌；我不足十七点就要牌。”绿毡边缘放着一张小小的规则卡。
+		<</language>><br><br>
+	<<else>>
+		<<if maplebirch.get('VanillaPlus')?.realEstate.current>>
+			<<run maplebirch.get('VanillaPlus').realEstate.enter()>><<effects>>
+		<</if>>
+		<<if _blackjackGame.available>>
+			<<if _blackjackGame.state.wager is 'strip'>>
+				<<if _blackjackGame.state.phase is 'ready'>>
+					<<lanSwitch 'You agree on the stakes before dealing: only upper clothing, lower clothing, upper underwear and lower underwear count. Coats and accessories are excluded. Each losing player removes one stake garment. Anyone who runs out is eliminated; the others continue until one winner remains. Intimacy is a separate choice, and you can refuse it.' '发牌前，你们说好赌注：只计上装、下装、上身内衣和下身内衣，外套与配饰不参与。每位输家各脱一件赌注衣物，赌注衣物用尽的人出局，剩余参与者继续玩，直到最后一位赢家留下。亲密是另外的选择，你可以拒绝。'>><br><br>
+				<<elseif _blackjackGame.state.phase is 'player'>>
+					<<lanSwitch 'You consider whether to take another card or stand. The clothing stakes will be settled once the hand ends.' '你考虑着再要一张牌还是停牌。衣物赌注要等本局结束才会结算。'>><br><br>
+				<<elseif _blackjackGame.playerEliminated and !_blackjackGame.matchEnded>>
+					<<lanSwitch 'You watch the remaining players reveal their hands and settle the stakes. You can stay to watch the next hand, keep intimacy out of this game, or get dressed and leave.' '你旁观剩余参与者揭晓手牌、结算赌注。你可以继续看下一局，决定这场只脱不做，也可以穿好衣服离桌。'>><br><br>
+				<<else>>
+					<<lanSwitch 'The cards are turned over and the stakes for this hand are settled. You can keep intimacy out of this game, or get dressed and leave the table.' '手牌揭晓，本局的赌注已经结算。你可以选择这场只脱不做，也可以穿好衣服离开牌桌。'>><br><br>
+				<</if>>
+				<<if _blackjackGame.state.intimacy_declined>>
+					<span class='blue'><<lanSwitch 'You have chosen clothes-only stakes for this game. There will be no invitation to intimacy.' '你已决定这场只脱不做，牌局结束后不会继续亲密。'>></span><br><br>
+				<</if>>
+			<<elseif _blackjackGame.state.partner>>
+				<<if _blackjackGame.state.phase is 'ready'>>
+					<<lanSwitch 'You invite both lovers to join you at the cards. They agree to play without money. You make room for three hands, leaving the rules where everyone can read them.' '你邀请两位恋人一起玩牌。两人同意不赌钱。你腾出能摆下三副手牌的位置，发牌前，你们说好了怎么玩。'>><br><br>
+				<<elseif _blackjackGame.state.phase is 'player'>>
+					<<lanSwitch 'The other two wait as you consider your hand. One card in each of their hands remains face down.' '另外两人等着你考虑手里的牌。两人的手牌都还各有一张背面朝上。'>><br><br>
+				<<else>>
+					<<lanSwitch 'You lay the three hands side by side and compare the totals. With the result settled, the cards are gathered for another round if everyone wants one.' '你们把三副手牌并排摆好，对比点数。胜负揭晓后，牌又收拢起来，留着大家愿意时再玩下一局。'>><br><br>
+				<</if>>
+			<<else>><<deadwood-blackjack-companion>><</if>>
+		<</if>>
+	<</if>>
+	<<deadwood-blackjack-table>>
+	<<if !_blackjackGame.available>>
+		<span class='blue'><<lanSwitch 'You cannot continue here now. Leave the table for another time.' '现在无法继续这场牌局。留到下次再玩吧。'>></span><br><br>
+	<<elseif _blackjackGame.state.venue isnot 'home' and !_blackjackGame.canStart and _blackjackGame.state.phase isnot 'player'>>
+		<span class='blue'><<lanSwitch 'You do not have enough money for this stake.' '你没有足够的钱支付这档赌注。'>></span><br><br>
+	<</if>>
+	<<icon 'blackjack.png'>><<lanLink ['Read the table rules', '查看桌上的规则'] 'Deadwood Reblooms Life Simulation Blackjack Rules'>><</lanLink>><br>
+	<<getouticon>><<lanLink `[_blackjackGame.state.phase === 'player' && _blackjackGame.state.venue !== 'home' ? 'Leave and forfeit this stake' : _blackjackGame.state.venue === 'home' && _blackjackGame.state.wager === 'strip' ? 'Get dressed and leave the table' : 'Leave the table', _blackjackGame.state.phase === 'player' && _blackjackGame.state.venue !== 'home' ? '离开并放弃本局赌注' : _blackjackGame.state.venue === 'home' && _blackjackGame.state.wager === 'strip' ? '穿好衣服，离开牌桌' : '离开牌桌']` `_blackjackGame.state.return_passage`>>
+		<<run maplebirch.get('LifeSimulation').casino.blackjack.leave()>>
+	<</lanLink>><br>
+<</if>>
+<</nobr>>
+
+:: Deadwood Reblooms Life Simulation Blackjack Rules []
+<<nobr>>
+<<language>>
+	<<option 'EN'>>
+		The card beside the deck reads:<br><br>
+		"Get as close to twenty-one as you can without going over. Number cards count as shown. Jacks, queens and kings count as ten. An ace counts as eleven, or one if eleven would put you over."<br><br>
+		"Everyone begins with two cards. One card in each opponent's hand stays face down until the hand ends. Hit to take another card; stand to keep your total. At twenty-one, you automatically stand. Opponents draw below seventeen and stand on all seventeens, including a soft seventeen."
+	<<option 'CN'>>
+		牌堆旁的说明卡上写着：<br><br>
+		“尽量接近二十一点，但不能超过。数字牌按牌面计分，J、Q、K 算十点。A 算十一点；若会因此爆牌，就改算一点。”<br><br>
+		“每人先拿两张牌。牌局结束前，对手各有一张牌保持背面朝上。要牌可再拿一张，停牌则保留现有点数。达到二十一点时自动停牌。对手不足十七点必须要牌，达到十七点便停牌，包括把 A 算作十一点的软十七点。”
+<</language>><br><br>
+<<if maplebirch.get('LifeSimulation')?.casino.blackjack.state.venue isnot 'home'>>
+	<<language>>
+		<<option 'EN'>>
+			"Choose your stake before the deal:"<br><<deadwood-poker-stakes 'blackjack'>><br>
+			"An ordinary win pays twice your stake, including the stake itself. An ace and a ten-point card in your first two cards pays two and a half times. A later twenty-one receives no bonus. Equal totals are a push: your stake returns. Two starting blackjacks also push. Leaving an unfinished hand forfeits your stake."
+		<<option 'CN'>>
+			“发牌前选好赌注：”<br><<deadwood-poker-stakes 'blackjack'>><br>
+			“普通获胜拿回两倍赌注，包含本金。起手两张牌若是一张 A 与一张十点牌，拿回两倍半赌注；后续凑成二十一点没有额外奖励。同点平局，收回本金；双方都是起手二十一点，也算平局。中途离开，放弃已投入的赌注。”
+	<</language>><br><br>
+	<<if maplebirch.get('LifeSimulation').casino.blackjack.state.venue is 'casino'>>
+		<<language>>
+			<<option 'EN'>>This table uses casino chips. Winnings go back to your chip balance; exchange them at the counter when you leave.
+			<<option 'CN'>>本桌使用赌馆筹码。赢得的筹码记入账户，离场时到柜台兑回。
+		<</language>><br><br>
+	<</if>>
+<<else>>
+	<<if maplebirch.get('LifeSimulation')?.casino.blackjack.state.partner>>
+		<<lanSwitch 'In a three-person game, the highest hand that has not gone over twenty-one wins. Equal highest hands share the win. A starting blackjack beats a later twenty-one. Partners still in the game draw below seventeen and stand on all seventeens. If you bust, they finish their hands and compare them. If everyone busts, nobody wins.' '三人牌局由没有爆牌的最高点数获胜，最高点数相同时并列获胜。起手二十一点胜过后续凑成的二十一点。仍在场的恋人不足十七点要牌，达到十七点停牌。若你爆牌，他们仍会完成各自的手牌，再比较结果。全员爆牌，则没有赢家。'>><br><br>
+	<</if>>
+	<<if maplebirch.get('LifeSimulation')?.casino.blackjack.state.wager is 'strip'>>
+		<<lanSwitch 'Only upper clothing, lower clothing, upper underwear and lower underwear count as stake garments. Coats and accessories are excluded. Each losing player removes one stake garment after a hand. Equal highest hands win together and do not remove anything; any other losing players still remove one stake garment each. If everyone busts, no garments are removed. Anyone who runs out of stake garments is eliminated and receives no more cards. The remaining players continue until only one winner is left. If you are eliminated, you can watch the others continue; they draw below seventeen and stand on all seventeens.' '赌注衣物只计上装、下装、上身内衣和下身内衣，外套与配饰不参与。每局结束，每位输家各脱一件赌注衣物。最高点数相同时并列获胜，并列赢家不脱衣，其余输家仍各脱一件。全员爆牌时无人脱衣。赌注衣物用尽的人出局，不再发牌；剩余参与者继续玩，直到只剩最后一位赢家。如果你出局，可以继续旁观其他人玩牌；他们不足十七点要牌，达到十七点停牌。'>><br><br>
+		<<lanSwitch 'You can choose clothes-only stakes before dealing or between hands. Losing never commits you to intimacy: you can refuse at the table. Leaving, or starting a new game after this one ends, restores the clothes removed at the table.' '发牌前或两局之间，你可以决定这场只脱不做。输牌不代表同意亲密，你可以在牌桌上拒绝。离桌或在整场结束后重新开局，都会穿回牌桌上脱下的衣服。'>><br><br>
+	<<else>>
+		<<lanSwitch 'You have agreed to play for fun. No money changes hands. Your partner follows the same drawing rule, and either of you can end the game.' '你们约定只作消遣，不赌钱。恋人按相同的要牌规则行动，你们随时都可以结束游戏。'>><br><br>
+	<</if>>
+<</if>>
+<<lanSwitch 'The deck contains fifty-two cards. Jokers are not used.' '牌堆使用五十二张常规牌，不加入鬼牌。'>><br><br>
+<<icon 'blackjack.png'>><<lanLink ['Return to the table', '返回牌桌'] 'Deadwood Reblooms Life Simulation Blackjack'>><</lanLink>><br>
+<</nobr>>

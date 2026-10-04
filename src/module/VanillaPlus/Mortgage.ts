@@ -83,7 +83,7 @@ class Mortgage {
 
   public canStart(price: number, useCredit = false): boolean {
     const bank = V.VanillaPlus.finance.bank;
-    if (!Number.isSafeInteger(price) || price <= 0 || this.current || !bank.opened || bank.loan_missed_payments > 0 || bank.credit_missed_payments > 0) return false;
+    if (!Number.isSafeInteger(price) || price <= 0 || this.current || !bank.opened || !bank.debit_card || bank.loan_missed_payments > 0 || bank.credit_missed_payments > 0) return false;
     const { deposit, fee, reserve } = this.purchaseCosts(price);
     const bankReserve = fee + reserve;
     if (bank.balance < bankReserve) return false;

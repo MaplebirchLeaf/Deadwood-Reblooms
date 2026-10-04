@@ -31,24 +31,24 @@
 
 ## 模块与游戏指南
 
-| 模块                                | 内容                                           |
-| ----------------------------------- | ---------------------------------------------- |
-| `DeadwoodReblooms`                  | 基础设置、模组指南、服装搜索和模组统计         |
-| `Sydney`                            | 悉尼宿舍、西里斯庄园与关系互动                 |
-| `Robin`                             | 罗宾的摊位、峭壁街饮品店、共同生活与亲密互动   |
-| `Whitney`                           | 地下妓院营救、重逢与后续日常                   |
-| `Kylar`                             | 凯拉尔庄园留宿与房间互动                       |
-| `LifeSimulation`                    | 免听凭证、风纪委员、学生会长、校园评价及健身房 |
-| `Orchard`                           | 神殿与农场果园、果树照料、逐步开垦与雇工       |
-| `VanillaPlus`                       | 属性突破、住宅、金融中心、银行与证券           |
-| `CelestialAnomalies`                | 日蚀、流星雨与天气画面变化                     |
-| `MoreTransformations`               | 马、鱼与渡鸦转化及相关地点、装备和特质         |
-| `LongerCombat`                      | 更长的遭遇战、分阶段对白与体液显示             |
-| `MoreLoveInterestsAndNPCAvatars`    | 更多恋人与社交栏小头像                         |
-| `NPCSidebarPortrait`                | 场景与侧边栏的 NPC 立绘                        |
-| `UnLockCheatAndCombatStatusDisplay` | 原版作弊入口与遭遇战数值显示                   |
-| `IncantationCheatCollection`        | 可保存、搜索、导入及导出的作弊命令集           |
-| `DynamicMusic`                      | 根据战斗、昼夜、天气与天体异象切换的动态音乐   |
+| 模块                                | 内容                                                     |
+| ----------------------------------- | -------------------------------------------------------- |
+| `DeadwoodReblooms`                  | 基础设置、模组指南、服装搜索和模组统计                   |
+| `Sydney`                            | 悉尼宿舍、西里斯庄园与关系互动                           |
+| `Robin`                             | 罗宾的摊位、峭壁街饮品店、共同生活与亲密互动             |
+| `Whitney`                           | 地下妓院营救、重逢与后续日常                             |
+| `Kylar`                             | 凯拉尔庄园留宿与房间互动                                 |
+| `LifeSimulation`                    | 免听凭证、风纪委员、学生会长、校园评价、健身房与赌馆牌桌 |
+| `Orchard`                           | 神殿与农场果园、果树照料、逐步开垦与雇工                 |
+| `VanillaPlus`                       | 属性突破、住宅、金融中心、银行与证券                     |
+| `CelestialAnomalies`                | 日蚀、流星雨与天气画面变化                               |
+| `MoreTransformations`               | 马、鱼与渡鸦转化及相关地点、装备和特质                   |
+| `LongerCombat`                      | 更长的遭遇战、分阶段对白与体液显示                       |
+| `MoreLoveInterestsAndNPCAvatars`    | 更多恋人与社交栏小头像                                   |
+| `NPCSidebarPortrait`                | 场景与侧边栏的 NPC 立绘                                  |
+| `UnLockCheatAndCombatStatusDisplay` | 原版作弊入口与遭遇战数值显示                             |
+| `IncantationCheatCollection`        | 可保存、搜索、导入及导出的作弊命令集                     |
+| `DynamicMusic`                      | 根据战斗、昼夜、天气与天体异象切换的动态音乐             |
 
 在游戏侧边栏打开**模组提示**，可进入按模块排列的单页游戏指南。搜索框可查地点、人物、解锁条件与排查步骤。**角色页 → 统计 → 模组统计**显示当前存档的属性、校园、金融、房产和人物路线进度。人物剧情的下一步仍以游戏日志和实际场景为准。
 

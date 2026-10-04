@@ -1,0 +1,166 @@
+:: Deadwood Reblooms Life Simulation Poker View Widgets [widget]
+<<widget 'deadwood-poker-name'>>
+	<<set $_names to {player: ['You', '你'], Wren: ['Wren', '伦恩'], regular: ['The regular', '熟客'], visitor: ['The visitor', '来客']}>>
+	<<lanSwitch `$_names[_args[0]][0]` `$_names[_args[0]][1]`>>
+<</widget>>
+
+<<widget 'deadwood-poker-stakes'>>
+	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
+	<<set $_stakes to _args[0] is 'holdem' ? $_casino.holdem.buyIns : _args[0] is 'three' ? $_casino.threeCard.antes : $_casino.blackjack.bets>>
+	<<for $_index, $_stake range $_stakes>>
+		<<if $_index gt 0>> / <</if>>
+		<span class='gold'>£<<print Number(($_stake / 100).toFixed(2))>></span>
+		<<if _args[0] is 'holdem'>>
+			(£<<print Number(($_stake / $_casino.holdem.options.bigBlindDivisor / 2 / 100).toFixed(2))>> / £<<print Number(($_stake / $_casino.holdem.options.bigBlindDivisor / 100).toFixed(2))>>)
+		<</if>>
+	<</for>>
+<</widget>>
+
+<<widget 'deadwood-poker-log'>>
+	<<set $_pokerLogGame to _args[0] is 'holdem' ? maplebirch.get('LifeSimulation').casino.holdem : maplebirch.get('LifeSimulation').casino.threeCard>>
+	<div class='poker-log' role='log'>
+		<<for $_pokerEntry range $_pokerLogGame.state.log.slice(-6)>>
+			<p><<deadwood-poker-name `$_pokerLogGame.state.seats[$_pokerEntry.seat].name`>>
+				<<switch $_pokerEntry.action>>
+					<<case 'fold'>><<lanSwitch 'folds' '弃牌'>>
+					<<case 'check'>><<lanSwitch 'checks' '过牌'>>
+					<<case 'call'>><<lanSwitch 'calls' '跟注'>>
+					<<case 'raise'>>
+						<<if _args[0] is 'holdem'>><<lanSwitch 'raises to' '加注至'>>
+						<<else>><<lanSwitch 'raises, putting in' '加注，投入'>><</if>>
+					<<case 'allin'>><<lanSwitch 'goes all-in at' '全下至'>>
+					<<case 'compare'>><<lanSwitch 'compares' '比牌'>>
+					<<default>><<print $_pokerEntry.action>>
+				<</switch>>
+				<<if !['fold', 'check'].includes($_pokerEntry.action)>>£<<print Number(($_pokerEntry.amount / 100).toFixed(2))>><</if>>
+			</p>
+		<</for>>
+	</div>
+<</widget>>
+
+<<widget 'deadwood-poker-holdem-view'>>
+	<<set $_holdemHandNames to [['High card', '高牌'], ['One pair', '一对'], ['Two pair', '两对'], ['Three of a kind', '三条'], ['Straight', '顺子'], ['Flush', '同花'], ['Full house', '葫芦'], ['Four of a kind', '四条'], ['Straight flush', '同花顺']]>>
+	<<set $_holdem to maplebirch.get('LifeSimulation').casino.holdem>><<set $_holdemState to $_holdem.state>>
+	<div class='poker-table'>
+		<<if !$_holdemState.joined>>
+			<p><<language>>
+				<<option 'EN'>>Choose how many of your casino chips to bring to the table. Chips left when you leave return to your casino balance.
+				<<option 'CN'>>选择带上牌桌的筹码数额。离桌时，剩余筹码会退回给你。
+			<</language>></p>
+		<<else>>
+			<p class='poker-summary'>
+				<<switch $_holdemState.phase>>
+					<<case 'ready'>><<lanSwitch 'Waiting for a hand' '等待发牌'>>
+					<<case 'preflop'>><<lanSwitch 'Pre-flop' '翻牌前'>>
+					<<case 'flop'>><<lanSwitch 'Flop' '翻牌圈'>>
+					<<case 'turn'>><<lanSwitch 'Turn' '转牌圈'>>
+					<<case 'river'>><<lanSwitch 'River' '河牌圈'>>
+					<<case 'done'>><<lanSwitch 'Hand settled' '本局已结算'>>
+				<</switch>>
+				· <<lanSwitch 'Pot' '底池'>> £<<print Number(($_holdem.pot / 100).toFixed(2))>> · <<lanSwitch 'Blinds' '盲注'>> £<<print Number(($_holdem.bigBlind / 2 / 100).toFixed(2))>> / £<<print Number(($_holdem.bigBlind / 100).toFixed(2))>>
+			</p>
+			<section class='poker-board'>
+				<p class='gold'><<lanSwitch 'Community cards' '公共牌'>></p>
+				<div class='poker-cards' data-cards='board' data-visible='true' data-placeholders='5'></div>
+			</section>
+			<<for $_holdemIndex, $_holdemSeat range $_holdemState.seats>>
+				<<set $_holdemVisible to $_holdemIndex is 0 or ($_holdemState.phase is 'done' and $_holdemState.showdown and !$_holdemSeat.folded)>>
+				<section @class="'poker-seat' + ($_holdemSeat.folded ? ' poker-folded' : '')">
+					<strong><<deadwood-poker-name `$_holdemSeat.name`>><<if $_holdemIndex is $_holdemState.button>><<lanSwitch ' · Button' ' · 庄位'>><</if>></strong>
+					<p class='poker-seat-detail'>
+						<<lanSwitch 'Chips' '筹码'>> £<<print Number(($_holdemSeat.stack / 100).toFixed(2))>> · <<lanSwitch 'This round' '本轮投入'>> £<<print Number(($_holdemSeat.street_bet / 100).toFixed(2))>>
+						<<if $_holdemSeat.folded>><<lanSwitch ' · Folded' ' · 已弃牌'>>
+						<<elseif $_holdemSeat.stack is 0 and $_holdem.active>><<lanSwitch ' · All-in' ' · 已全下'>><</if>>
+					</p>
+					<div class='poker-cards' @data-cards="$_holdemIndex" @data-visible="$_holdemVisible" data-placeholders='2'></div>
+					<<if $_holdemVisible and $_holdemSeat.cards.length and $_holdemState.board.length gte 3>>
+						<p class='poker-hand-name'><<lanSwitch `$_holdemHandNames[$_holdem.handRank($_holdemIndex)][0]` `$_holdemHandNames[$_holdem.handRank($_holdemIndex)][1]`>></p>
+					<</if>>
+				</section>
+			<</for>>
+		<</if>>
+	</div>
+	<<if $_holdemState.joined>><<deadwood-poker-log 'holdem'>><</if>>
+	<div class='poker-controls'>
+		<<if !$_holdemState.joined>>
+			<<for $_holdemBuyIn range $_holdem.buyIns>>
+				<button type='button' data-action='join' @data-amount="$_holdemBuyIn" @data-disabled="!$_holdem.available || $_holdem.funds < $_holdemBuyIn"><<lanSwitch 'Bring to the table: ' '带上牌桌：'>>£<<print Number(($_holdemBuyIn / 100).toFixed(2))>><<lanSwitch '' ' 筹码'>></button>
+			<</for>>
+		<<else>>
+			<<if $_holdem.active>>
+				<button type='button' data-action='fold' @data-disabled="!$_holdem.canAct"><<lanSwitch 'Fold (0:01)' '弃牌 (0:01)'>></button>
+				<button type='button' @data-action="$_holdem.callAmount ? 'call' : 'check'" @data-disabled="!$_holdem.canAct">
+					<<if $_holdem.callAmount>><<lanSwitch 'Call ' '跟注 '>>£<<print Number(($_holdem.callAmount / 100).toFixed(2))>> (0:01)
+					<<else>><<lanSwitch 'Check (0:01)' '过牌 (0:01)'>><</if>>
+				</button>
+				<label class='poker-raise'><<lanSwitch 'Raise this round to £' '本轮加注至 £'>>
+					<input type='number' @min="$_holdem.minimumRaise / 100" @max="$_holdem.maximumRaise / 100" step='0.01' @value="$_holdem.minimumRaise / 100" @data-disabled="!$_holdem.canRaise || $_holdem.maximumRaise < $_holdem.minimumRaise">
+				</label>
+				<button type='button' data-action='raise' @data-disabled="!$_holdem.canRaise || $_holdem.maximumRaise < $_holdem.minimumRaise"><<lanSwitch 'Raise (0:01)' '加注 (0:01)'>></button>
+				<button type='button' data-action='allin' @data-disabled="!$_holdem.canAct || ($_holdem.maximumRaise > $_holdemState.current_bet && !$_holdem.canRaise)"><<lanSwitch 'All-in ' '全下 '>>£<<print Number(($_holdem.player.stack / 100).toFixed(2))>> (0:01)</button>
+			<<else>><button type='button' data-action='deal' @data-disabled="!$_holdem.canDeal"><<lanSwitch 'Deal a hand (0:02)' '发牌 (0:02)'>></button><</if>>
+			<button type='button' data-action='cashout'><<lanSwitch `$_holdem.active ? 'Fold and return chips' : 'Return chips'` `$_holdem.active ? '弃牌并收回剩余筹码' : '收回筹码'`>></button>
+		<</if>>
+	</div>
+	<<if $_holdemState.phase is 'done'>>
+		<<for $_holdemPotIndex, $_holdemPot range $_holdemState.pots>>
+			<p @class="$_holdemPot.winners.includes(0) ? 'gold' : 'blue'">
+				<<lanSwitch `$_holdemPot.returned ? 'Uncalled chips returned' : $_holdemPotIndex === 0 ? 'Main pot' : 'Side pot'` `$_holdemPot.returned ? '未被跟注的筹码退回' : $_holdemPotIndex === 0 ? '主池' : '边池'`>> £<<print Number((($_holdemPot.amount - $_holdemPot.fee) / 100).toFixed(2))>> →
+				<<for $_holdemWinnerIndex, $_holdemWinner range $_holdemPot.winners>><<if $_holdemWinnerIndex gt 0>> / <</if>><<deadwood-poker-name `$_holdemState.seats[$_holdemWinner].name`>><</for>>
+			</p>
+		<</for>>
+		<p class='poker-fee'><<lanSwitch 'Table fee' '本局抽水'>> £<<print Number(($_holdemState.fee / 100).toFixed(2))>></p>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-poker-three-view'>>
+	<<set $_threeHandNames to [['High card', '单张'], ['Pair', '对子'], ['Straight', '顺子'], ['Flush', '金花'], ['Straight flush', '顺金'], ['Three of a kind', '豹子']]>>
+	<<set $_three to maplebirch.get('LifeSimulation').casino.threeCard>><<set $_threeState to $_three.state>>
+	<div class='poker-table'>
+		<p class='poker-summary'><<lanSwitch 'Ante' '底注'>> £<<print Number(($_threeState.ante / 100).toFixed(2))>> · <<lanSwitch 'Pot' '底池'>> £<<print Number(($_three.pot / 100).toFixed(2))>> · <<lanSwitch 'Rounds' '下注轮数'>> <<print $_threeState.rounds>>/10</p>
+		<<if $_threeState.seats.length>>
+			<<for $_threeIndex, $_threeSeat range $_threeState.seats>>
+				<<set $_threeVisible to $_threeIndex is 0 ? $_threeSeat.seen : $_threeState.compared.includes($_threeIndex) or ($_threeState.phase is 'done' and $_threeState.showdown and !$_threeSeat.folded)>>
+				<section @class="'poker-seat' + ($_threeSeat.folded ? ' poker-folded' : '')">
+					<strong><<deadwood-poker-name `$_threeSeat.name`>></strong>
+					<p class='poker-seat-detail'><<lanSwitch 'Committed' '累计投入'>> £<<print Number(($_threeSeat.total / 100).toFixed(2))>> ·
+						<<if $_threeSeat.folded>><<lanSwitch 'Folded' '已弃牌'>>
+						<<elseif $_threeSeat.seen>><<lanSwitch 'Seen' '已看牌'>>
+						<<else>><<lanSwitch 'Blind' '暗牌'>><</if>>
+					</p>
+					<div class='poker-cards' @data-cards="$_threeIndex" @data-visible="$_threeVisible"></div>
+					<<if $_threeVisible>><p class='poker-hand-name'><<lanSwitch `$_threeHandNames[$_three.handRank($_threeIndex)][0]` `$_threeHandNames[$_three.handRank($_threeIndex)][1]`>></p><</if>>
+				</section>
+			<</for>>
+		<<else>><div class='poker-cards' data-cards='0' data-visible='false' data-placeholders='3'></div><</if>>
+	</div>
+	<<deadwood-poker-log 'three'>>
+	<div class='poker-controls'>
+		<<if $_threeState.phase is 'player'>>
+			<button type='button' data-action='look' @data-disabled="!$_three.canAct || $_threeState.seats[0].seen"><<lanSwitch 'Look at your cards' '看牌'>></button>
+			<button type='button' data-action='call' @data-disabled="!$_three.canAct || $_three.funds < $_three.callCost"><<lanSwitch 'Call ' '跟注 '>>£<<print Number(($_three.callCost / 100).toFixed(2))>> (0:01)</button>
+			<button type='button' data-action='raise' @data-disabled="!$_three.canRaise"><<lanSwitch 'Raise ' '加注 '>>£<<print Number(($_three.callCost * 2 / 100).toFixed(2))>> (0:01)</button>
+			<<if $_threeState.seats[0].seen>>
+				<<for $_threeTarget range [1, 2]>>
+					<<if !$_threeState.seats[$_threeTarget].folded>>
+						<button type='button' data-action='compare' @data-amount="$_threeTarget" @data-disabled="!$_three.canAct || $_three.funds < $_three.compareCost">
+							<<lanSwitch 'Compare with ' '与'>><<deadwood-poker-name `$_threeState.seats[$_threeTarget].name`>><<lanSwitch ' (' '比牌 ('>>£<<print Number(($_three.compareCost / 100).toFixed(2))>> 0:01)
+						</button>
+					<</if>>
+				<</for>>
+			<</if>>
+			<button type='button' data-action='fold' @data-disabled="!$_three.canAct"><<lanSwitch 'Fold (0:01)' '弃牌 (0:01)'>></button>
+		<<else>>
+			<<for $_threeAnte range $_three.antes>>
+				<button type='button' data-action='ante' @data-amount="$_threeAnte" @aria-pressed="String($_threeAnte === $_threeState.ante)"><<lanSwitch 'Ante ' '底注 '>>£<<print Number(($_threeAnte / 100).toFixed(2))>></button>
+			<</for>>
+			<button type='button' data-action='start' @data-disabled="!$_three.canStart"><<lanSwitch 'Deal (' '发牌 ('>>£<<print Number(($_threeState.ante / 100).toFixed(2))>> 0:02)</button>
+		<</if>>
+	</div>
+	<<if $_threeState.phase is 'done'>>
+		<p @class="$_threeState.winners.includes(0) ? 'gold' : 'red'">
+			<<if $_threeState.winners.includes(0)>><<lanSwitch 'You win ' '你赢得 '>>£<<print Number(($_threeState.payout / 100).toFixed(2))>><<lanSwitch ' after the table fee.' '，已扣除抽水。'>>
+			<<else>><<lanSwitch 'Hand won by ' '本局赢家：'>><<for $_threeWinnerIndex, $_threeWinner range $_threeState.winners>><<if $_threeWinnerIndex gt 0>> / <</if>><<deadwood-poker-name `$_threeState.seats[$_threeWinner].name`>><</for>>.<</if>>
+		</p>
+	<</if>>
+<</widget>>

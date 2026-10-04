@@ -151,3 +151,36 @@ Follow the interval printed on the packet. Early repeat use can increase depende
 The character page's Medicinal Traits describe active effects and the consequences of dependence. Read the instructions on the pharmacy packets. Temporary relief does not mean you have recovered.
 
 If you have recently taken these tablets or still have a dependence, Harper asks about your medication during hospital appointments, at most once per game day. You can disclose the tablets or conceal them. Harper responds to frequent use, dependence and current drowsiness, and your answer is recorded. The discussion does not instantly remove dependence or replace the existing prescription, hypnosis or examination.
+
+### Casino and card tables
+
+The gambling room above the bar on Connudatus Street opens from **18:00 to 04:00**. It needs skulduggery at **grade D** and the **formal ID** Briar arranges; a school card is handed straight back.
+
+Exchange cash or use the Financial Centre's **debit card** at the counter, at £1 for £1. Card exchanges require an open account, an issued debit card and enough savings. Every casino table and the slot machine use your casino chip balance. Hold'em chips stay at the table until you return them to that balance. At the cashier, select an amount and cash or bank payment. Exchange chips to keep playing, or redeem your full balance to cash or the same bank account. The maximum exchange is £10,000 at a time. Leaving settles your tables and keeps your chips on the casino account. You must redeem them manually at the cashier for cash or a bank transfer. Redemption remains available after closing.
+
+You can rest, watch a table or talk to a server in the lounge. Attendants keep watch over the room and its walkways.
+
+Ask **Marlow** (card dealer, not a love interest) for work. One training hour unlocks regular shifts at £30 base pay, plus £10 for a table handled correctly, and it affects later dialogue.
+
+| Table        | Stakes and buy-in                     | Notes                                                             |
+| ------------ | ------------------------------------- | ----------------------------------------------------------------- |
+| Blackjack    | £50 / £250 / £500 (arcade and casino) | Vanilla scoring, stands on all seventeens, starting 21 pays 2.5x  |
+| Hold'em      | Buy in £500 / £2,500 / £5,000         | Blinds scale with the buy-in, all-ins and side pots, 5% house fee |
+| Three card   | Ante £10 / £50 / £100                 | Play blind or seen, compare or show down                          |
+| Slot machine | £5 a play                             | Three of a kind pays, any two cherries returns the stake          |
+
+**Wren** may appear at the casino on Wednesday and Friday after 22:00. His dialogue reads the vanilla meeting flags but does not add new ones.
+
+### Strip blackjack at your own property
+
+At a property you own, invite a resident lover to play blackjack in the sitting room or bedroom. Choose **cards only** or **lose a hand, remove one garment**.
+
+- Only **upper clothing, lower clothing, upper underwear and lower underwear** count as stake garments, outermost first. Coats and accessories are excluded.
+- Each losing player removes one garment. Anyone who runs out is eliminated; the others continue until one winner remains.
+- If everyone busts, no garments are removed. Tied highest hands mean every tied winner keeps their clothes.
+- Clothes removed at the table are put back on when you leave or when the game ends. Vanilla wardrobes and confiscation are untouched.
+- Before dealing, or between hands, you can declare the game **clothes only**. After that no invitation appears, and losing never counts as consent.
+
+### Troubleshooting the casino
+
+If the room is closed, check the opening hours first. If you cannot enter at all, check skulduggery grade D and the formal ID. If a table is unavailable, check the opening hours, your state of dress and your stress. If the property table has no opponent, check that a resident lover is home and that the pair will not refuse to share the table. If the strip game will not start, check that both you and your lover still have stake garments left.

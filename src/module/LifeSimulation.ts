@@ -1,12 +1,16 @@
+// ./src/module/LifeSimulation.ts
+
 import Module from './Module';
 import AcademicHonours from './LifeSimulation/AcademicHonours';
 import School from './LifeSimulation/School';
+import Casino from './LifeSimulation/Casino';
 import Weapons from './LifeSimulation/Weapons';
 import Medicine from './LifeSimulation/Medicine';
 import GymCoach from './LifeSimulation/GymCoach';
 import { DEFAULT_LIFE_SIMULATION_STATE, type GymPlan } from './constants';
 
 class LifeSimulation extends Module {
+  public readonly casino = new Casino(this.core);
   public readonly academics = new AcademicHonours();
   public readonly school = new School(this.core);
   public readonly weapons = new Weapons();

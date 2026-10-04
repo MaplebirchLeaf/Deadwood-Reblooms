@@ -1,3 +1,4 @@
+import type { PlayingCard } from '../src/module/LifeSimulation/Casino/Blackjack';
 import type { Security } from '../src/module/VanillaPlus/Finance';
 
 declare module 'twine-sugarcube' {
@@ -22,6 +23,8 @@ declare global {
   const Links: { enabled: boolean };
 
   interface Window {
+    deck(): PlayingCard[];
+    shuffle<T>(items: T[]): T[];
     formatMoney(amount: number): string;
     statChange: { stress(amount: number, multiplierOverride?: number): void };
     isLoveInterest(name: string): boolean;

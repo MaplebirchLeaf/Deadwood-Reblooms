@@ -31,24 +31,24 @@ The current version is **1.3.2**. See the [release notes](.github/release-notes/
 
 ## Modules and game guide
 
-| Module                              | Content                                                                   |
-| ----------------------------------- | ------------------------------------------------------------------------- |
-| `DeadwoodReblooms`                  | Base options, game guide, clothing search, and mod statistics             |
-| `Sydney`                            | Sydney's dormitory, Sirris estate, and relationship scenes                |
-| `Robin`                             | Robin's stands, Cliff Street drink shop, shared life, and intimate scenes |
-| `Whitney`                           | Underground brothel rescue, reunion, and daily interactions               |
-| `Kylar`                             | Manor stays and room interactions                                         |
-| `LifeSimulation`                    | Attendance pass, prefect, student president, school reputation, and gym   |
-| `Orchard`                           | Temple and farm orchards, tree care, gradual clearing, and hired help     |
-| `VanillaPlus`                       | Stat breakthroughs, homes, financial-centre work, banking, and stocks     |
-| `CelestialAnomalies`                | Solar eclipses, meteor showers, and changing sky and weather visuals      |
-| `MoreTransformations`               | Horse, fish, and raven transformations, locations, equipment, and traits  |
-| `LongerCombat`                      | Longer encounters, staged dialogue, and fluid displays                    |
-| `MoreLoveInterestsAndNPCAvatars`    | More love interests and social sidebar portraits                          |
-| `NPCSidebarPortrait`                | NPC portraits in scenes and the sidebar                                   |
-| `UnLockCheatAndCombatStatusDisplay` | Vanilla cheat access and encounter stat values                            |
-| `IncantationCheatCollection`        | A searchable, importable, and exportable cheat command collection         |
-| `DynamicMusic`                      | Music selected by combat, time of day, weather, and celestial events      |
+| Module                              | Content                                                                              |
+| ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `DeadwoodReblooms`                  | Base options, game guide, clothing search, and mod statistics                        |
+| `Sydney`                            | Sydney's dormitory, Sirris estate, and relationship scenes                           |
+| `Robin`                             | Robin's stands, Cliff Street drink shop, shared life, and intimate scenes            |
+| `Whitney`                           | Underground brothel rescue, reunion, and daily interactions                          |
+| `Kylar`                             | Manor stays and room interactions                                                    |
+| `LifeSimulation`                    | Attendance pass, prefect, student president, school reputation, gym, and card tables |
+| `Orchard`                           | Temple and farm orchards, tree care, gradual clearing, and hired help                |
+| `VanillaPlus`                       | Stat breakthroughs, homes, financial-centre work, banking, and stocks                |
+| `CelestialAnomalies`                | Solar eclipses, meteor showers, and changing sky and weather visuals                 |
+| `MoreTransformations`               | Horse, fish, and raven transformations, locations, equipment, and traits             |
+| `LongerCombat`                      | Longer encounters, staged dialogue, and fluid displays                               |
+| `MoreLoveInterestsAndNPCAvatars`    | More love interests and social sidebar portraits                                     |
+| `NPCSidebarPortrait`                | NPC portraits in scenes and the sidebar                                              |
+| `UnLockCheatAndCombatStatusDisplay` | Vanilla cheat access and encounter stat values                                       |
+| `IncantationCheatCollection`        | A searchable, importable, and exportable cheat command collection                    |
+| `DynamicMusic`                      | Music selected by combat, time of day, weather, and celestial events                 |
 
 Open **Mod Hints** in the game sidebar for the single-page guide. Its sections and search cover characters, places, unlock conditions, and troubleshooting. **Character → Statistics → Mod Statistics** shows progress for the current save, including stats, school, finance, property, and character routes. Check the journal and the actual scene for the next story step.
 

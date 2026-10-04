@@ -131,7 +131,15 @@ export default class RobinShop extends Shared {
   /** 银行是否愿意为开店提供贷款：需已开户、余额足够，且尚未接受过。 */
   public get canBorrowLoan(): boolean {
     const stage = this.state.shopStage;
-    return !this.state.shopBankSupported && stage !== 'none' && !this.state.shop && !!V.VanillaPlus?.finance?.bank?.opened && V.VanillaPlus.finance.bank.balance >= 200000 && !!this.vanillaPlus;
+    return (
+      !this.state.shopBankSupported &&
+      stage !== 'none' &&
+      !this.state.shop &&
+      !!V.VanillaPlus?.finance?.bank?.opened &&
+      V.VanillaPlus.finance.bank.debit_card &&
+      V.VanillaPlus.finance.bank.balance >= 200000 &&
+      !!this.vanillaPlus
+    );
   }
 
   /** 从银行贷款 2000 英镑作为开店资金，同时记入 PC 垫付。 */

@@ -1,3 +1,5 @@
+// ./src/script/LifeSimulation.ts
+
 import AcademicHonours from './LifeSimulation/AcademicHonours';
 import HistoryProject from './LifeSimulation/HistoryProject';
 import Gym from './LifeSimulation/Gym';
@@ -5,6 +7,7 @@ import School from './LifeSimulation/School';
 import SchoolNPCs from './LifeSimulation/SchoolNPCs';
 import Weapons from './LifeSimulation/Weapons';
 import Medicine from './LifeSimulation/Medicine';
+import Casino from './LifeSimulation/Casino';
 
 export default function LifeSimulation(maplebirch: typeof window.maplebirch): void {
   AcademicHonours(maplebirch);
@@ -14,4 +17,5 @@ export default function LifeSimulation(maplebirch: typeof window.maplebirch): vo
   SchoolNPCs(maplebirch);
   Weapons(maplebirch);
   Medicine(maplebirch);
+  Casino(maplebirch);
 }

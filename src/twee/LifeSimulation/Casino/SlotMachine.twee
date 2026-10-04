@@ -1,0 +1,74 @@
+:: Deadwood Reblooms Life Simulation Slot Widgets [widget]
+<<widget 'deadwood-slot-entry'>>
+	<<if maplebirch.get('LifeSimulation')?.casino.slots.available>>
+		<<icon 'slot-machine.png'>><<lanLink ['Examine the slot machine', '查看老虎机'] 'Deadwood Reblooms Life Simulation Slot Machine'>><</lanLink>><br>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-slot-spin'>>
+	<<if maplebirch.get('LifeSimulation')?.casino.slots.spin()>>
+		<<set $_slotAward to maplebirch.get('LifeSimulation').casino.slots.state.payout * 100>>
+		<<if $location is 'deadwood_casino'>>
+			<<run maplebirch.get('LifeSimulation').casino.adjustChips($_slotAward - 500)>>
+		<<else>><<money -500>><<money $_slotAward>><</if>>
+		<<pass 1>>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-slot-result'>>
+	<<set $_slotResult to maplebirch.get('LifeSimulation').casino.slots.state>>
+	<<set $_slotNames to [['Cherries', '樱桃'], ['Lemons', '柠檬'], ['Plums', '李子'], ['Bells', '铃铛'], ['Stars', '星星'], ['Sevens', '七']]>>
+	<<if !$_slotResult.played>>
+		<<lanSwitch 'The three reels wait behind the glass.' '三条转轮静静地停在玻璃后。'>>
+	<<else>>
+		<<for $_slotAxis, $_slotSymbol range $_slotResult.reels>><<if $_slotAxis gt 0>> / <</if>><<lanSwitch `$_slotNames[$_slotSymbol][0]` `$_slotNames[$_slotSymbol][1]`>><</for>> —
+		<span @class="$_slotResult.payout === 0 ? 'red' : $_slotResult.payout === 5 ? 'blue' : 'gold'">
+			<<if $_slotResult.payout is 0>><<lanSwitch 'No win' '未中奖'>>
+			<<else>><<lanSwitch `$_slotResult.payout === 5 ? 'Stake returned' : 'Won'` `$_slotResult.payout === 5 ? '收回本金' : '赢得'`>> £<<print $_slotResult.payout>><</if>>
+		</span>
+		<<if $_slotResult.payout gt 5>><span class='green'> (<<lanSwitch 'Net win' '净赢'>> £<<print $_slotResult.payout - 5>>)</span>
+		<<elseif $_slotResult.payout is 0>><span class='red'> (<<lanSwitch 'Lost £5' '损失 £5'>>)</span><</if>>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-slot-rules'>>
+	<<language>>
+		<<option 'EN'>>
+			The faded card reads: "£5 a play. Three matching pictures win the amount printed beside them. Two cherries return your £5, wherever they stop. Anything else pays nothing."
+		<<option 'CN'>>
+			褪色的牌子上写着：“每次 £5。三个相同的图案，可获得旁边标出的奖金。任意位置出现两个樱桃，取回投入的 £5。其余组合没有奖金。”
+	<</language>><br><br>
+	<<icon 'slots/cherry.png'>><<lanSwitch 'Three cherries' '三个樱桃'>> — <span class='gold'>£20</span><br>
+	<<icon 'slots/lemon.png'>><<lanSwitch 'Three lemons' '三个柠檬'>> — <span class='gold'>£30</span><br>
+	<<icon 'slots/plum.png'>><<lanSwitch 'Three plums' '三个李子'>> — <span class='gold'>£50</span><br>
+	<<icon 'slots/bell.png'>><<lanSwitch 'Three bells' '三个铃铛'>> — <span class='gold'>£80</span><br>
+	<<icon 'slots/star.png'>><<lanSwitch 'Three stars' '三个星星'>> — <span class='gold'>£150</span><br>
+	<<icon 'slots/seven.png'>><<lanSwitch 'Three sevens' '三个七'>> — <span class='gold'>£500</span><br><br>
+	<<language>>
+		<<option 'EN'>>
+			Small print beneath the pictures adds: "All payouts include your stake. Only the highest prize is paid."
+		<<option 'CN'>>
+			图案下方另有一行小字：“奖金包含本金，仅支付最高的一项奖金。”
+	<</language>><br><br>
+<</widget>>
+
+:: Deadwood Reblooms Life Simulation Slot Machine []
+<<nobr>>
+<<set $outside to 0>><<set $location to 'arcade'>><<effects>>
+<<if maplebirch.get('LifeSimulation')>>
+	<<language>>
+		<<option 'EN'>>
+			A small slot machine stands beside the change counter. A faded payout card is fixed beneath its three reels. Coins rattle in the tray whenever somebody wins.
+		<<option 'CN'>>
+			一台小老虎机摆在换币柜台旁。三条转轮下方贴着一张褪色的奖金表。有人中奖时，硬币就在托盘里叮当作响。
+	<</language>><br><br>
+	<<deadwood-slot-machine>>
+	<<if !maplebirch.get('LifeSimulation').casino.slots.available>>
+		<span class='red'><<lanSwitch 'You cannot play right now. Return to the arcade.' '你现在无法游玩。返回游戏厅吧。'>></span><br>
+	<<elseif $money lt 500>>
+		<span class='blue'><<lanSwitch 'You need £5 to play.' '你需要 £5 才能游玩。'>></span><br>
+	<</if>>
+	<<deadwood-slot-rules>>
+<</if>>
+<<arcadeicon>><<lanLink ['Return to the arcade', '返回游戏厅'] 'Arcade'>><</lanLink>><br>
+<</nobr>>

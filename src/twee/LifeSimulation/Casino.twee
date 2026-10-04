@@ -1,0 +1,336 @@
+:: Deadwood Reblooms Life Simulation Casino Widgets [widget]
+<<widget 'deadwood-casino-street'>>
+	<<if $exposed lte 0 and !$possessed>>
+		<<icon 'casino.png'>>
+		<<if maplebirch.get('LifeSimulation').casino.open>>
+			<<lanLink ['Gambling room (0:02)', '赌馆 (0:02)'] 'Deadwood Reblooms Life Simulation Casino'>><<pass 2>><</lanLink>>
+		<<else>><span class='blue'><<language>>
+			<<option 'EN'>>
+				The gambling room upstairs is closed until 18:00.
+			<<option 'CN'>>
+				楼上的赌馆要到 18:00 才开门。
+		<</language>></span><</if>><br>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-casino-balance'>>
+	<<icon 'casino-chips.png'>><<language>>
+		<<option 'EN'>>
+			Chips: <span class='gold'>£<<print Number((maplebirch.get('LifeSimulation').casino.chips / 100).toFixed(2))>></span>.
+		<<option 'CN'>>
+			你有价值 <span class='gold'>£<<print Number((maplebirch.get('LifeSimulation').casino.chips / 100).toFixed(2))>></span> 的筹码。
+	<</language>><br><br>
+<</widget>>
+
+<<widget 'deadwood-casino-exchange'>>
+	<<set $_exchange to {amount: Number(_args[0]), method: _args[1]}>>
+	<<if maplebirch.get('LifeSimulation').casino.exchange($_exchange.amount, $_exchange.method)>>
+		<<money `-$_exchange.amount` 'deadwoodCasino' `{recordOnly: $_exchange.method === 'bank'}`>>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-casino-cashout'>>
+	<<set $_cashOutMethod to _args[0] || 'cash'>>
+	<<set $_cashOutAmount to maplebirch.get('LifeSimulation').casino.cashOut($_cashOutMethod)>>
+	<<if $_cashOutAmount gt 0>><<money $_cashOutAmount 'deadwoodCasino' `{recordOnly: $_cashOutMethod === 'bank'}`>><</if>>
+<</widget>>
+
+<<widget 'deadwood-casino-cashier'>>
+	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
+	<<deadwood-casino-balance>>
+	<<lanSwitch 'Cash: ' '现金：'>><span class='gold'>£<<print Number(($money / 100).toFixed(2))>></span>
+		<<if $_casino.bankAvailable>> · <<lanSwitch 'Bank: ' '银行存款：'>><span class='teal'>£<<print Number(($VanillaPlus.finance.bank.balance / 100).toFixed(2))>></span><</if>>
+	<br><br>
+	<<set $_methods to {}>>
+	<<set $_methods[lanSwitch('Cash', '现金')] to 'cash'>>
+	<<if $_casino.bankAvailable>><<set $_methods[lanSwitch('Bank account (debit card)', '银行账户（借记卡）')] to 'bank'>><</if>>
+	<label><<lanSwitch 'Payment: ' '结算方式：'>>
+		<<listbox '_cashier.method' autoselect>><<optionsfrom $_methods>><</listbox>>
+	</label><br>
+	<<if $_casino.available>>
+		<label><<lanSwitch 'Amount: ' '兑换金额：'>><<listbox '_cashier.amount' autoselect>><<optionsfrom _cashier.amounts>><</listbox>></label><br><br>
+		<<icon 'casino-exchange.png'>><<lanLink ['Exchange for chips', '兑换筹码']>>
+			<<if maplebirch.get('LifeSimulation').casino.canExchange(_cashier.amount, _cashier.method)>>
+				<<deadwood-casino-exchange _cashier.amount _cashier.method>>
+				<<replace '#deadwood-casino-cashier'>><<deadwood-casino-cashier>><</replace>>
+				<<replace '#deadwood-casino-cashier-result'>><span class='green'><<lanSwitch 'The cashier hands you the chips.' '柜台后的人把筹码递给你。'>></span><</replace>>
+			<<else>>
+				<<replace '#deadwood-casino-cashier-result'>><span class='blue'><<lanSwitch 'You do not have enough money for that exchange.' '你没有足够的钱兑换这笔筹码。'>></span><</replace>>
+			<</if>>
+		<</lanLink>><br>
+	<<else>><br><</if>>
+	<<if $_casino.chips gt 0 or $_casino.holdem.state.joined>>
+		<<icon 'casino-redeem.png'>><<lanLink ['Redeem all chips', '兑回全部筹码']>>
+			<<deadwood-casino-cashout _cashier.method>>
+			<<replace '#deadwood-casino-cashier'>><<deadwood-casino-cashier>><</replace>>
+			<<replace '#deadwood-casino-cashier-result'>><span class='green'><<lanSwitch `_cashier.method === 'bank' ? 'Your chips have been returned to your bank account.' : 'The cashier counts your cash into your hand.'` `_cashier.method === 'bank' ? '筹码已兑回你的银行账户。' : '柜台后的人把兑回的现金点到你手里。'`>></span><</replace>>
+		<</lanLink>><br>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-casino-table-action'>>
+	<<set $_turn to {mode: _args[0], action: _args[1], amount: Number(_args[2]), accepted: false, chips: 0, minutes: 0}>>
+	<<if $_turn.mode is 'holdem'>>
+		<<set $_game to maplebirch.get('LifeSimulation').casino.holdem>>
+		<<switch $_turn.action>>
+			<<case 'join'>>
+				<<set $_turn.accepted to $_game.join($_turn.amount)>>
+				<<if $_turn.accepted>><<set $_turn.chips to -$_turn.amount>><</if>>
+			<<case 'deal'>>
+				<<set $_turn.accepted to $_game.deal()>><<if $_turn.accepted>><<set $_turn.minutes to 2>><</if>>
+			<<case 'cashout'>>
+				<<set $_turn.accepted to $_game.state.joined>><<set $_turn.chips to $_game.cashOut()>>
+			<<default>>
+				<<set $_turn.accepted to $_game.act($_turn.action, $_turn.amount)>>
+				<<if $_turn.accepted>><<set $_turn.minutes to 1>><</if>>
+		<</switch>>
+	<<elseif $_turn.mode is 'three'>>
+		<<set $_game to maplebirch.get('LifeSimulation').casino.threeCard>>
+		<<switch $_turn.action>>
+			<<case 'ante'>>
+				<<set $_game.ante to $_turn.amount>>
+			<<case 'start'>>
+				<<set $_turn.accepted to $_game.start()>>
+				<<if $_turn.accepted>><<set $_turn.chips to -$_game.state.ante>><<set $_turn.minutes to 2>><</if>>
+			<<default>>
+				<<set $_turn.cost to $_game.act($_turn.action, $_turn.amount)>>
+				<<set $_turn.accepted to $_turn.cost gte 0>>
+				<<if $_turn.accepted>><<set $_turn.chips to -$_turn.cost>><<set $_turn.minutes to $_turn.action is 'look' ? 0 : 1>><</if>>
+		<</switch>>
+		<<if $_turn.accepted>><<set $_turn.chips += $_game.collectPayout()>><</if>>
+	<</if>>
+	<<if $_turn.accepted>>
+		<<if $_turn.chips isnot 0>><<run maplebirch.get('LifeSimulation').casino.adjustChips($_turn.chips)>><</if>>
+		<<if $_turn.minutes gt 0>><<pass $_turn.minutes>><</if>>
+	<</if>>
+<</widget>>
+
+<<widget 'Marlowrelationshiptext'>>
+	<<if C.npc.Marlow.love gte 20>>
+		<<language>>
+			<<option 'EN'>>
+				&#32;trusts you to handle a busy table.
+			<<option 'CN'>>
+				相信你能照看好忙碌的牌桌。
+		<</language>>
+	<<elseif C.npc.Marlow.love gte 10>>
+		<<language>>
+			<<option 'EN'>>
+				&#32;greets you with a brief, familiar nod.
+			<<option 'CN'>>
+				见到你时，会点头打招呼。
+		<</language>>
+	<<else>><<language>>
+		<<option 'EN'>>
+			&#32;keeps a professional distance.
+		<<option 'CN'>>
+			待你礼貌而疏离。
+	<</language>><</if>>
+<</widget>>
+
+:: Deadwood Reblooms Life Simulation Casino []
+<<nobr>>
+<<run maplebirch.get('LifeSimulation').casino.enter()>><<effects>>
+<<set _casino to maplebirch.get('LifeSimulation').casino>>
+<<if !_casino.open>>
+	<<language>>
+		<<option 'EN'>>
+			The upstairs lights are off. <span class='blue'>The tables are closed.</span> A cleaner has propped the door open just far enough to carry buckets through. The room opens at <span class='gold'>18:00</span> and closes at <span class='gold'>04:00</span>.
+		<<option 'CN'>>
+			楼上的灯已经熄了。<span class='blue'>牌桌已经收摊。</span>清洁工把门支开一道只够搬进水桶的缝隙。赌馆在 <span class='gold'>18:00</span> 开门，<span class='gold'>04:00</span> 关门。
+	<</language>><br><br>
+<<elseif $id lte 0>>
+	<<language>>
+		<<option 'EN'>>
+			A narrow stairway leads above one of the bars. The person at the top holds out a hand. "Legal ID. Same as downstairs." Your school card is handed straight back. You are directed towards the stairs.
+		<<option 'CN'>>
+			狭窄的楼梯通向酒吧楼上。门口的人伸出手。“正式证件。和楼下一样。”你的学生证很快就被退回来，对方示意你下楼。
+	<</language>><br><br>
+<<elseif !_casino.available>>
+	<span class='blue'><<language>>
+		<<option 'EN'>>
+			You are in no condition to sit at a table. The attendant leaves the way to the stairs clear.
+		<<option 'CN'>>
+			你现在不适合坐上牌桌。门口的工作人员给你让出通向楼梯的路。
+	<</language>></span><br><br>
+<<else>>
+	<<initnpc 'Marlow'>>
+	<<language>>
+		<<option 'EN'>>
+			You climb above the bar, leaving the music muffled beneath your feet. Green cloth covers three small tables. At the far wall, a slot machine clicks between bursts of conversation. A person by the stairs watches the door; another counts chips into racks behind a narrow counter.
+		<<option 'CN'>>
+			你走上酒吧楼层，脚下的音乐声变得闷闷的。三张小牌桌铺着绿毡。远处墙边，一台老虎机在交谈声的间隙咔嗒作响。楼梯边的人盯着门口；狭窄柜台后，另一个人正把筹码点进托盘。
+	<</language>><br><br>
+	<<if !_casino.state.met_dealer>>
+		<<language>>
+			<<option 'EN'>>
+				The dealer squares a deck against the table. "Marlow. Chips only. Read the stakes before you sit down; arguing afterwards won't change them." A fingertip rests on the printed rules.
+			<<option 'CN'>>
+				荷官在桌边把牌理齐。“马洛。只收筹码。入座前看清赌注，事后争论也改不了规则。”指尖点了点印好的说明牌。
+		<</language>><br><br>
+		<<set _casino.state.met_dealer to true>>
+	<<elseif _casino.state.good_shifts gte 5>>
+		<<language>>
+			<<option 'EN'>>
+				Marlow glances at you, then at the occupied tables. "Playing tonight, or taking a shift?"
+			<<option 'CN'>>
+				马洛看了你一眼，又看看坐满人的牌桌。“今晚来玩，还是来接班？”
+		<</language>><br><br>
+	<</if>>
+	<<if _casino.wrenPresent>>
+		<<language>>
+			<<option 'EN'>>
+				You recognise Wren among the people at a card table, leaning back while someone else counts a bet. A smile appears when your eyes meet.
+			<<option 'CN'>>
+				你认出牌桌旁的伦恩。别人点着筹码时，伦恩向后靠着。与你对上视线，脸上便浮起一丝笑意。
+		<</language>><br>
+		<<socialiseicon>><<lanLink ['Approach Wren', '走近伦恩'] 'Deadwood Reblooms Casino Wren'>><</lanLink>><br><br>
+	<</if>>
+	<<if _casino.landryPresent>>
+		<<language>>
+			<<option 'EN'>>
+				Landry sits away from the tables with an untouched glass. A person in a coat speaks quietly across from Landry. Neither has a stack of chips.
+			<<option 'CN'>>
+				兰德里坐在远离牌桌的地方，面前的杯子还没动过。一个穿外套的人在对面低声说话。两人面前都没有筹码。
+		<</language>><br>
+		<<socialiseicon>><<lanLink ['Greet Landry', '向兰德里打招呼'] 'Deadwood Reblooms Casino Landry'>><</lanLink>><br><br>
+	<</if>>
+	<<language>>
+		<<option 'EN'>>
+			Low lamps leave the edges of the room in red shadow. Servers in close-cut uniforms slip between the tables, carrying drinks past <span class='purple'>flirtatious jokes</span> and murmured bets. Behind a velvet curtain, you hear a burst of laughter. The attendant by the stairs watches the room as closely as the door.
+		<<option 'CN'>>
+			低垂的灯把房间边缘染成暗红色。穿着贴身制服的服务员端着酒杯穿过牌桌，<span class='purple'>调笑声</span>夹杂在低声报出的赌注里。绒帘后传来一阵笑声。楼梯旁的保安不仅盯着门口，也留意着客人的举动。
+	<</language>><br><br>
+	<<deadwood-casino-balance>>
+	<<icon 'casino-cashier.png'>><<lanLink ['Visit the cashier', '前往筹码柜台'] 'Deadwood Reblooms Casino Cashier'>><</lanLink>><br><br>
+	<<icon 'poker-chips.png'>><<lanLink ["Texas hold'em table", '德州扑克牌桌'] 'Deadwood Reblooms Life Simulation Holdem'>><</lanLink>><br>
+	<<icon 'blackjack.png'>><<lanLink ['Three-card poker table', '炸金花牌桌'] 'Deadwood Reblooms Life Simulation Three Card'>><</lanLink>><br>
+	<<icon 'blackjack.png'>><<lanLink ['Blackjack table', '二十一点牌桌'] 'Deadwood Reblooms Life Simulation Blackjack'>>
+		<<run maplebirch.get('LifeSimulation').casino.blackjack.prepare('casino', null, 'Deadwood Reblooms Life Simulation Casino')>>
+	<</lanLink>><br>
+	<<icon 'slot-machine.png'>><<lanLink ['Slot machine', '老虎机'] 'Deadwood Reblooms Casino Slot Machine'>><</lanLink>><br>
+	<<icon 'dealer.png'>><<lanLink ['Talk to Marlow about work', '向马洛询问工作'] 'Deadwood Reblooms Casino Dealer'>><</lanLink>><br><br>
+	<<icon 'casino-lounge.png'>><<lanLink ['Go to the lounge', '前往休息区'] 'Deadwood Reblooms Casino Lounge'>><</lanLink>><br><br>
+<</if>>
+<<if !_casino.available and (_casino.chips gt 0 or _casino.holdem.state.joined)>>
+	<<icon 'casino-cashier.png'>><<lanLink ['Visit the cashier', '前往筹码柜台'] 'Deadwood Reblooms Casino Cashier'>><</lanLink>><br><br>
+<</if>>
+<<if _casino.chips gt 0 or _casino.holdem.state.joined>>
+	<span class='blue'><<language>>
+		<<option 'EN'>>Your chips stay on your casino account when you leave. Redeem them at the cashier if you want cash or a bank transfer.
+		<<option 'CN'>>离开后，筹码会保留在你的赌场账户。需要现金或银行转账，请先去柜台兑换。
+	<</language>></span><br><br>
+<</if>>
+<<connudatusicon>><<lanLink ['Leave (0:02)', '离开 (0:02)'] 'Connudatus Street'>><<run maplebirch.get('LifeSimulation').casino.leave()>><<endevent>><<pass 2>><</lanLink>><br>
+<</nobr>>
+
+:: Deadwood Reblooms Casino Cashier []
+<<nobr>>
+<<run maplebirch.get('LifeSimulation').casino.enter()>><<effects>>
+<<set _cashier to {amount: maplebirch.get('LifeSimulation').casino.options.exchanges[0], method: 'cash', amounts: {}}>>
+<<for _amount range maplebirch.get('LifeSimulation').casino.options.exchanges>>
+	<<set _cashier.amounts['£' + Number((_amount / 100).toFixed(2))] to _amount>>
+<</for>>
+<<language>>
+	<<option 'EN'>>
+		The cashier taps the chip rack. "Cash or debit card. Same value when you bring them back. You can cash out mid-hand, but your cards will be folded. Chips stay on your account until you redeem them here. Keep them if you plan to come back."
+	<<option 'CN'>>
+		柜台后的人点了点筹码托盘。“现金、借记卡都收，带回来时按原值兑回。没打完也能结账，不过手里的牌算弃牌。筹码只在这里兑成现金或转回银行。想下次再来，也可以先留着。”
+<</language>><br><br>
+<div id='deadwood-casino-cashier'><<deadwood-casino-cashier>></div>
+<div id='deadwood-casino-cashier-result' role='status'></div><br>
+<<getouticon>><<lanLink ['Return to the room', '返回赌馆'] 'Deadwood Reblooms Life Simulation Casino'>><</lanLink>><br>
+<</nobr>>
+
+:: Deadwood Reblooms Life Simulation Holdem []
+<<nobr>>
+<<run maplebirch.get('LifeSimulation').casino.enter()>><<effects>>
+<<language>>
+	<<option 'EN'>>
+		Marlow gathers the chips into neat rows. "Two cards each, five on the table. Your chips are your limit. No reaching into your pockets halfway through a hand." The dealer button waits beside the deck.
+	<<option 'CN'>>
+		马洛把筹码拢成整齐的几排。“每人两张底牌，桌上五张公共牌。你面前的筹码就是限额。一局没结束，别往口袋里掏钱。”庄位标记放在牌堆旁。
+<</language>><br><br>
+<<deadwood-casino-balance>><<deadwood-holdem-table>>
+<<if !maplebirch.get('LifeSimulation').casino.available>><span class='blue'><<language>>
+	<<option 'EN'>>
+		The table cannot continue. You can still return your remaining chips to the counter.
+	<<option 'CN'>>
+		牌桌现在无法继续。你仍可收回剩余筹码，再去柜台兑回。
+<</language>></span><br><br><</if>>
+<<icon 'dealer.png'>><<lanLink ['Read the table rules', '查看牌桌规则'] 'Deadwood Reblooms Casino Holdem Rules'>><</lanLink>><br>
+<<getouticon>><<lanLink ['Return to the room', '返回赌馆'] 'Deadwood Reblooms Life Simulation Casino'>><</lanLink>><br>
+<</nobr>>
+
+:: Deadwood Reblooms Life Simulation Three Card []
+<<nobr>>
+<<run maplebirch.get('LifeSimulation').casino.enter()>><<effects>>
+<<language>>
+	<<option 'EN'>>
+		The next table has three face-down cards at every place. "Blind or seen," Marlow says. "It costs twice as much once you've looked. Compare if you want to settle it, but pay first."
+	<<option 'CN'>>
+		隔壁牌桌上，每个座位前都摆着三张暗牌。“可以不看，也可以看牌。”马洛说。“看过以后，每次下注翻倍。想比牌就先把筹码放下。”
+<</language>><br><br>
+<<deadwood-casino-balance>><<deadwood-three-card-table>>
+<<if !maplebirch.get('LifeSimulation').casino.available>><span class='blue'><<language>>
+	<<option 'EN'>>
+		The table cannot continue. You may leave, giving up the chips already committed.
+	<<option 'CN'>>
+		牌桌现在无法继续。你可以离席，放弃已经投入的筹码。
+<</language>></span><br><br><</if>>
+<<icon 'dealer.png'>><<lanLink ['Read the table rules', '查看牌桌规则'] 'Deadwood Reblooms Casino Three Card Rules'>><</lanLink>><br>
+<<getouticon>><<lanLink ['Leave the table', '离开牌桌'] 'Deadwood Reblooms Life Simulation Casino'>><<run maplebirch.get('LifeSimulation').casino.threeCard.leave()>><</lanLink>><br>
+<</nobr>>
+
+:: Deadwood Reblooms Casino Holdem Rules []
+<<nobr>>
+<<language>>
+	<<option 'EN'>>
+		The card on the table reads:<br><br>
+		"Choose your buy-in. The small and big blinds are shown in brackets."<br><<deadwood-poker-stakes 'holdem'>><br>"The button moves one seat after every hand. Both opponents bring their own chips. A player who runs out is replaced before the next hand."<br><br>
+		<b>Dealing and betting</b><br>"Each player receives two private cards. Bet before the flop, then after three community cards, the fourth card and the fifth. After the flop, the first active seat left of the button acts first. Check when nobody has bet, call to match, raise or fold. A raise must increase the current bet by at least the last full raise, and an opening bet must be at least the big blind."<br><br>
+		<b>All-in and side pots</b><br>"You may go all-in with fewer chips. A short all-in cannot reopen raising for someone who has already acted, unless the increases faced together reach a full raise. An all-in player can only win pots funded by their own contribution. Excess, uncalled bets are returned. No money can be added during a hand."<br><br>
+		<b>Hand rankings</b><br>"Use the best five of your two cards and the five community cards. From high to low: straight flush, four of a kind, full house, flush, straight, three of a kind, two pair, pair, high card. A2345 is the lowest straight. Suits do not break ties. Identical best hands split each eligible pot; odd pennies go clockwise from the button."<br><br>
+		<b>Settlement and leaving</b><br>"The house takes five percent of contested pots, capped at three big blinds per hand. Uncalled money is not charged. Leaving during a hand folds your cards and returns your remaining chips to your casino balance. Take them to the counter to exchange them for cash or return them to your bank."
+	<<option 'CN'>>
+		桌上的说明牌写着：<br><br>
+		“选择买入金额，括号内依次为小盲与大盲。”<br><<deadwood-poker-stakes 'holdem'>><br>“每局结束，庄位顺时针移动一位。对手自带筹码，输光的人在下一局前换人入座。”<br><br>
+		<b>发牌与下注</b><br>“每人两张底牌。翻牌前下注，随后依次发三张公共牌、第四张和第五张，每次发牌后再下注。翻牌后，从庄位左边仍在牌局中的人开始行动。无人下注时可以过牌；有人下注时可以跟注、加注或弃牌。加注至少增加上次完整加注的数额，首次下注至少为大盲。”<br><br>
+		<b>全下与边池</b><br>“筹码不足时可以全下。小额全下不会让已经行动过的人重新获得加注权，除非累计增加的数额达到一次完整加注。全下者只能争夺自己出资覆盖的底池。没人跟注的超额筹码退回，一局内不能追加买入。”<br><br>
+		<b>牌型大小</b><br>“从自己的两张底牌与五张公共牌中选最强五张。由大到小：同花顺、四条、葫芦、同花、顺子、三条、两对、一对、高牌。A2345 是最小顺子，花色不分大小。最强手牌相同则平分各自有资格争夺的底池，分不尽的便士从庄位左侧起顺时针分配。”<br><br>
+		<b>结算与离席</b><br>“赌馆从有人争夺的底池抽取 5%，每局最多三个大盲；未被跟注而退回的钱不抽水。一局中途离席视为弃牌，剩余筹码会退回给你。到柜台可兑回现金，也可转回银行账户。”
+<</language>><br><br>
+<<getouticon>><<lanLink ['Return to the table', '返回牌桌'] 'Deadwood Reblooms Life Simulation Holdem'>><</lanLink>><br>
+<</nobr>>
+
+:: Deadwood Reblooms Casino Three Card Rules []
+<<nobr>>
+<<language>>
+	<<option 'EN'>>
+		The dealer points out this table's rules. "Three cards each. No jokers. Choose an ante from the listed amounts before the deal."<br><span class='gold'><<language>><<option 'EN'>>Ante: <<option 'CN'>>底注：<</language>></span><<deadwood-poker-stakes 'three'>><br><br>
+		<b>Betting</b><br>"You can play blind or look at your own cards for free. A seen hand pays twice the current blind stake. A raise doubles the blind stake, up to eight times the ante. You cannot borrow or go into debt. If you cannot pay, fold."<br><br>
+		<b>Comparing and showing cards</b><br>"After looking, pay twice your usual call to compare with one opponent. The weaker hand folds. If the cards are identical, the person requesting the comparison loses. The other player's cards are shown only to you. If two players remain, play continues; after ten rounds, everyone still in shows and the strongest hand wins."<br><br>
+		<b>Hand rankings</b><br>"Three of a kind beats straight flush, then flush, straight, pair and high card. AKQ is the highest straight; A23 is the lowest. Suits do not break ties, and 235 has no special power here. Matching best hands at the final showdown split the winnings, with odd pennies assigned in seat order."<br><br>
+		<b>Settlement and leaving</b><br>"Five percent is taken from the final pot, capped at three antes. The winnings include the winner's own stake and return to the casino chip balance. Leaving an unfinished hand gives up the chips already in the pot."
+	<<option 'CN'>>
+		荷官指了指本桌的规则。“每人三张牌，不用鬼牌。发牌前选好底注。”<br><span class='gold'><<language>><<option 'EN'>>Ante: <<option 'CN'>>底注：<</language>></span><<deadwood-poker-stakes 'three'>><br><br>
+		<b>下注与加注</b><br>“可以暗牌下注，也可以免费查看自己的牌。看过牌的人支付当前暗牌注额的两倍。加注会把暗牌注额翻倍，最多为底注的八倍。不赊账，不借钱；付不起就弃牌。”<br><br>
+		<b>比牌与摊牌</b><br>“看牌后，可以支付自己跟注金额的<span class='gold'>两倍</span>，与一名对手比牌。较弱的一方弃牌；牌型与点数完全相同，主动比牌者输。对手的牌只向你展示。若还剩两人则继续下注，十轮后仍未弃牌的人摊牌，最强者获胜。”<br><br>
+		<b>牌型大小</b><br>“豹子大于顺金，其后依次为金花、顺子、对子、单张。AKQ 为最大顺子，A23 最小。花色不分大小，本桌没有 235 吃豹子的特殊规则。最终摊牌时，最强牌相同则平分奖金，零头按座位顺序分配。”<br><br>
+		<b>结算与离席</b><br>“最终底池抽水 <span class='gold'>5%</span>，最多三个底注。奖金包含赢家自己投入的筹码，牌局结束后加到你的筹码里。未结束的牌局中途离席，放弃已经投入底池的筹码。”
+<</language>><br><br>
+<<getouticon>><<lanLink ['Return to the table', '返回牌桌'] 'Deadwood Reblooms Life Simulation Three Card'>><</lanLink>><br>
+<</nobr>>
+
+:: Deadwood Reblooms Casino Slot Machine []
+<<nobr>>
+<<run maplebirch.get('LifeSimulation').casino.enter()>><<effects>>
+<<language>>
+	<<option 'EN'>>
+		The machine is wedged between the counter and a coat stand. Someone has tapped a coin against its scratched glass. A small card below the reels lists the prizes.
+	<<option 'CN'>>
+		机台挤在柜台与衣帽架之间。划花的玻璃上留着有人用硬币敲过的痕迹。转轮下方的小牌子列着奖金。
+<</language>><br><br>
+<<deadwood-casino-balance>><<deadwood-slot-machine>><<deadwood-slot-rules>>
+<<getouticon>><<lanLink ['Return to the room', '返回赌馆'] 'Deadwood Reblooms Life Simulation Casino'>><</lanLink>><br>
+<</nobr>>

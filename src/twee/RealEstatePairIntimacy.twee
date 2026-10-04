@@ -1,0 +1,129 @@
+:: Deadwood Reblooms Property Pair Intimacy []
+
+<<set _estate to maplebirch.get("VanillaPlus").realEstate>>
+<<set _property to _estate.current>>
+<<if $sexstart is 1>>
+	<<set _pair to maplebirch.get("LifeSimulation").blackjack.takeIntimacyPair()>>
+	<<if !_property or !Array.isArray(_pair) or _pair.length isnot 2 or _pair[0] is _pair[1]
+	  or _estate.householdRefusal(_pair)
+	  or !_pair.every(_name => _estate.canIntimate(_name, _property.id))>>
+		<<set $sexstart to 0>>
+		<<run maplebirch.get("LifeSimulation").blackjack.clearIntimacyPair()>>
+		<<run _estate.enter()>><<effects>>
+		<span class='blue'><<lanSwitch 'They have already gone to their own rooms.' '两人已经各自回房了。'>></span><br><br>
+		<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+	<<else>>
+		<<set $sexstart to 0>>
+		<<run _estate.enter()>>
+		<<clearnpc>>
+		<<npc _pair[0]>><<npc _pair[1] 2>>
+		<<run _pair.forEach(_name => statusCheck(_name))>>
+		<<if _pair.includes('Sydney')>>
+			<<set $corruptionEvent to 1>>
+			<<set $daily.sydney.sex to ($daily.sydney.sex || 0) + 1>>
+			<<set $sydney.sexTotal += 1>>
+		<</if>>
+		<<person1>>
+		<<consensual>><<set $consensual to 1>><<neutral 1>>
+		<<if $exposed lt 2>>
+			<span class='lewd'><<lanSwitch 'You slip out of your clothes.' '你脱下衣服。'>></span><<strip>><br><br>
+		<</if>>
+		<<maninit>>
+		<<set $enemyarousalmax to 1500>>
+		<<if _pair.includes('Sydney')>>
+			<<set _sydneyIndex to _pair.indexOf('Sydney')>>
+			<<if _sydneyStatus.includes('corrupt') and !_sydneyChastity>>
+				<<npcexpose>>
+				<<set $enemyarousalmax += 100>>
+			<<else>>
+				<<npcClothesType $NPCList[_sydneyIndex] 'undies'>>
+				<<if _sydneyStatus.includes('corrupt')>><<set $enemyarousalmax += 100>><</if>>
+				<<if _sydneyStatus.includes('pure')>><<set $enemyarousalmax -= 100>><</if>>
+			<</if>>
+			<<if _sydneyChastity and C.npc.Sydney.chastity.anus.includes('shield')>>
+				<<set $enemyarousalmax -= 100>>
+			<</if>>
+		<</if>>
+		<<set $enemytrust += 500>>
+		<<npckiss>>
+		<<language>>
+			<<option 'EN'>>
+				You close the bedroom door behind the three of you. Robin sits on the edge of the bed with <<his>> hands folded, glancing at Sydney until Sydney sits down first. "I said I would stay," Robin says quietly. "I meant it."
+				<br><br>
+				Sydney sets <<his>> temple pendant on the bedside table. "Then neither of us has to guess," <<he>> says. <<He>> waits for you to sit between them before reaching for you.
+			<<option 'CN'>>
+				你关上卧室门。罗宾坐到床边，两手拢在一起，先看了看悉尼，直到悉尼先坐下。“我说过会留下。”罗宾轻声说，“我是认真的。”
+				<br><br>
+				悉尼把神殿吊坠放到床头柜上。“那就不用猜了。”<<he>>说。<<He>>等你坐到两人中间，才伸手碰你。
+		<</language>>
+		<br><br>
+	<</if>>
+<</if>>
+<<if $combat is 1>>
+	<<set _estate to maplebirch.get("VanillaPlus").realEstate>>
+	<<run _estate.enter()>>
+	<<set $enemyanger to -10>>
+	<<effects>>
+	<<effectsman>>
+	<<man>>
+	<<stateman>>
+	<br><br>
+	<<actionsman>>
+	<<if _combatend or _controlRegain is 1>>
+		<span id='next'><<lanLink '继续' 'Deadwood Reblooms Property Pair Intimacy Finish'>><</lanLink>></span><<nexttext>>
+	<<else>>
+		<span id='next'><<lanLink '继续' 'Deadwood Reblooms Property Pair Intimacy'>><</lanLink>></span><<nexttext>>
+	<</if>>
+<</if>>
+
+:: Deadwood Reblooms Property Pair Intimacy Finish []
+<<set _estate to maplebirch.get("VanillaPlus").realEstate>>
+<<run _estate.enter()>><<effects>>
+<<if $combat is 1>>
+	<<person1>>
+	<<if $enemyarousal gte $enemyarousalmax>>
+		<<ejaculation>>
+		<<for _name range $npc>>
+			<<npcincr _name lust -20>><<npcincr _name love 1>>
+		<</for>>
+		<<llust>>
+		<br>
+		<<language>>
+			<<option 'EN'>>
+				Robin recovers first, then notices how quiet <<he>> has been and looks at Sydney. "That was... all right," Robin says, testing the words. Sydney answers without mocking <<him>>, and the two of them leave room for you between them.
+			<<option 'CN'>>
+				罗宾先缓过来，随即意识到自己一直太安静，便看向悉尼。“刚才……还可以。”罗宾试着说出口。悉尼没有取笑<<him>>，两人把中间的位置留给你。
+		<</language>>
+	<<elseif $enemyarousal lt $enemyarousalmax and $enemyhealth gt 0>>
+		<<llust>>
+		<br>
+		<<language>>
+			<<option 'EN'>>
+				You stop before either of them has to ask. Robin loosens <<his>> grip, and Sydney sits back against the headboard to catch <<his>> breath.
+			<<option 'CN'>>
+				不必等谁开口，你先停了下来。罗宾松开手，悉尼靠回床头缓气。
+		<</language>>
+	<<else>>
+		<<if $enemyarousal gte $enemyarousalmax>><<ejaculation>><</if>>
+		<<language>>
+			<<option 'EN'>>
+				They are both past the point of continuing. Robin pulls the blanket up over the three of you while Sydney catches <<his>> breath.
+			<<option 'CN'>>
+				两人都没法继续了。罗宾把毯子拉过你们三个人，悉尼还在缓气。
+		<</language>>
+	<</if>>
+	<<if $npc.includes('Robin')>>
+		<<if C.npc.Robin.trauma gte 20>><<npcincr Robin trauma -1>><<lrtrauma>><</if>>
+	<</if>>
+	<<if $npc.includes('Sydney')>>
+		<<run statusCheck('Sydney')>>
+		<<set $corruptionEvent to 1>>
+		<<npcincr Sydney purity -2>><<lspurity>>
+	<</if>>
+	<br><br>
+<</if>>
+<<clotheson>><<endcombat>>
+<<if Object.values($store).some(items => items.some(item => item.location === 'Deadwood Property Bed'))>>
+	<<deadwood-reblooms-property-clothes-on>>
+<</if>>
+<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
