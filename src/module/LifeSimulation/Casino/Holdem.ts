@@ -53,8 +53,10 @@ type HoldemAction = 'fold' | 'check' | 'call' | 'raise' | 'allin';
 class Holdem {
   public constructor(
     private readonly core: typeof maplebirch,
-    public readonly options: HoldemOptions = DEFAULT_CASINO_OPTIONS.holdem
+    public readonly options: HoldemOptions = DEFAULT_CASINO_OPTIONS.holdem,
+    public readonly watching = false
   ) {}
+
   public get buyIns(): readonly number[] {
     return this.options.buyIns;
   }
@@ -68,7 +70,7 @@ class Holdem {
   }
 
   public get state(): HoldemState {
-    return V.LifeSimulation.casino.holdem;
+    return this.watching ? V.LifeSimulation.casino.watch : V.LifeSimulation.casino.holdem;
   }
 
   public get available(): boolean {
@@ -88,7 +90,7 @@ class Holdem {
   }
 
   public get canAct(): boolean {
-    return this.available && this.active && this.state.pending[0] === 0;
+    return !this.watching && this.available && this.active && this.state.pending[0] === 0;
   }
 
   public get callAmount(): number {
@@ -116,10 +118,26 @@ class Holdem {
   }
 
   public join(amount: number): boolean {
-    if (!this.available || this.state.joined || !this.buyIns.includes(amount) || !Number.isSafeInteger(amount / this.options.bigBlindDivisor / 2) || amount <= 0 || this.funds < amount) return false;
+    if (
+      !this.available ||
+      (this.state.joined && (!this.watching || this.active)) ||
+      !this.buyIns.includes(amount) ||
+      !Number.isSafeInteger(amount / this.options.bigBlindDivisor / 2) ||
+      amount <= 0 ||
+      (!this.watching && this.funds < amount)
+    )
+      return false;
     const casino = this.core.get('LifeSimulation')!.casino;
     Object.assign(this.state, structuredClone(DEFAULT_HOLDEM_STATE), { joined: true, buy_in: amount });
-    this.state.seats = ['player', casino.tableGuest ?? 'regular', 'visitor'].map(name => ({ name, stack: amount, cards: [], folded: false, street_bet: 0, total: 0, acted_at: null }));
+    this.state.seats = (this.watching ? ['regular', 'visitor', 'guest'] : ['player', casino.tableGuest ?? 'regular', 'visitor']).map(name => ({
+      name,
+      stack: amount,
+      cards: [],
+      folded: false,
+      street_bet: 0,
+      total: 0,
+      acted_at: null
+    }));
     return true;
   }
 
@@ -130,7 +148,7 @@ class Holdem {
     state.deck = window.shuffle(window.deck());
     Object.assign(state, { board: [], phase: 'preflop', current_bet: this.bigBlind, last_raise: this.bigBlind, pots: [], fee: 0, log: [], showdown: false });
     state.seats.forEach((seat, index) => {
-      if (index === 1) {
+      if (index === 1 && !this.watching) {
         const name = this.core.get('LifeSimulation')!.casino.tableGuest ?? 'regular';
         if (seat.name !== name) {
           seat.name = name;
@@ -151,6 +169,13 @@ class Holdem {
 
   public act(action: HoldemAction, raiseTo = 0): boolean {
     if (!this.canAct || !this.takeAction(0, action, raiseTo)) return false;
+    this.advance();
+    return true;
+  }
+
+  public next(): boolean {
+    if (!this.watching || !this.active || !this.state.pending.length || V.id <= 0 || V.location !== 'deadwood_casino' || V.combat === 1 || V.exposed > 0 || V.stress >= V.stressmax) return false;
+    this.opponent(this.state.pending[0]);
     this.advance();
     return true;
   }
@@ -240,7 +265,7 @@ class Holdem {
         continue;
       }
       const index = state.pending[0];
-      if (index === 0) break;
+      if (this.watching || index === 0) break;
       this.opponent(index);
     }
   }
@@ -279,7 +304,7 @@ class Holdem {
 
   /** 离席视为弃牌，随后结清已买入的剩余筹码；关闭营业也可兑回。 */
   public cashOut(): number {
-    if (!this.state.joined) return 0;
+    if (this.watching || !this.state.joined) return 0;
     if (this.active) {
       this.player!.folded = true;
       this.state.pending = this.state.pending.filter(index => index !== 0);

@@ -41,6 +41,11 @@ export default function Casino(maplebirch: typeof window.maplebirch): void {
     if (game) return holdemView(maplebirch, game);
   });
 
+  maplebirch.tool.macro.defineS('deadwood-casino-watch-table', () => {
+    const game = maplebirch.get('LifeSimulation')?.casino.watch;
+    if (game) return holdemView(maplebirch, game);
+  });
+
   maplebirch.tool.macro.defineS('deadwood-three-card-table', () => {
     const game = maplebirch.get('LifeSimulation')?.casino.threeCard;
     if (game) return threeCardView(maplebirch, game);

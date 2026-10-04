@@ -6,21 +6,50 @@
 	<<npc 'Marlow'>><<person1>>
 	<<language>>
 		<<option 'EN'>>
-			Marlow finishes paying a winner before turning to you. "Looking for work? Keep the bets visible, deal cleanly, and call me before a disagreement turns into a fight. Nobody needs a clever dealer who can't count the chips."
+			<<if _casino.state.good_shifts gte 5>>
+				Marlow puts the deck down when you approach. "Good to see you. Here to play, or taking a shift?"
+			<<elseif _casino.state.trained>>
+				Marlow finishes counting a stack of chips. "Back again? There's a table you can take if you want a shift."
+			<<elseif C.npc.Marlow.love gte 10>>
+				Marlow notices you beside the table and nods. "Playing tonight? Or just having a look?"
+			<<else>>
+				Marlow pays out the winning hand, then turns to you. "Need something? I can explain the tables, or show you the work if you're interested."
+			<</if>>
 		<<option 'CN'>>
-			马洛先把奖金付给赢下牌局的人，才转向你。“找工作？把下注摆在明处，发牌别出差错。争论闹成动手以前先叫我。大家需要的是点得清筹码的荷官。”
+			<<if _casino.state.good_shifts gte 5>>
+				见你过来，马洛放下牌。“你来了。今晚来玩，还是接个班？”
+			<<elseif _casino.state.trained>>
+				马洛数完一摞筹码。“又来了？想接班的话，有张桌子需要人照看。”
+			<<elseif C.npc.Marlow.love gte 10>>
+				马洛看见你站在桌旁，点了点头。“今晚玩牌吗？还是随便看看？”
+			<<else>>
+				马洛把筹码推给赢家，才转向你。“有什么事？不懂牌桌的规矩可以问我。想找工作，我也可以教你。”
+			<</if>>
 	<</language>><br><br>
+	<<if _casino.canTalk>>
+		<<socialiseicon>><<lanLink ['Have a word with Marlow', '和马洛聊聊'] 'Deadwood Reblooms Casino Marlow Talk'>><</lanLink>><br><br>
+	<<elseif _casino.state.last_chat_night is _casino.state.guest_night>>
+		<<if _casino.state.chat_topic and !_casino.state.chat_reply>>
+			<<socialiseicon>><<lanLink ['Finish your conversation', '继续刚才的谈话'] 'Deadwood Reblooms Casino Marlow Conversation'>><</lanLink>><br><br>
+		<<else>>
+			<<language>>
+				<<option 'EN'>>Marlow nods to you, then turns back to the next customer.
+				<<option 'CN'>>马洛朝你点了点头，又去招呼下一位客人。
+			<</language>><br><br>
+		<</if>>
+	<</if>>
 	<<if !_casino.state.trained>>
 		<<language>>
 			<<option 'EN'>>
-				"I can show you the job for an hour. <span class='gold'>£10</span> for the training shift. After that, the base pay is <span class='gold'>£30</span> an hour, plus <span class='gold'>£10</span> if you handle the table correctly." Marlow sets an unused deck beside an empty place.
+				"I'll show you what to do for the first hour. You get <span class='gold'>£10</span> while you learn. After that, it's <span class='gold'>£30</span> an hour, with another <span class='gold'>£10</span> if you don't make any mistakes." Marlow puts a deck of cards at an empty seat.
 			<<option 'CN'>>
-				“我可以带你做一小时。这一小时给你 <span class='gold'>£10</span>。之后每小时底薪 <span class='gold'>£30</span>，照看牌桌没有出错，再加 <span class='gold'>£10</span>。”马洛把一副没用过的牌放在空位旁。
+				“头一个小时，我会教你怎么做，给你 <span class='gold'>£10</span>。学会以后，每小时底薪 <span class='gold'>£30</span>，没有出错，再加 <span class='gold'>£10</span>。”马洛把一副牌放在空位前。
 		<</language>><br><br>
 		<<if _casino.canWork>>
-			<<icon 'dealer.png'>><<lanLink ['Take the training shift (1:00)', '跟马洛学做荷官 (1:00)'] 'Deadwood Reblooms Casino Training'>>
+			<<icon 'dealer.png'>><<lanLink ['Take the training shift (1:00)', '跟马洛学做荷官 (1:00)']>>
 				<<if maplebirch.get('LifeSimulation').casino.canWork and !$LifeSimulation.casino.trained>>
 					<<set $LifeSimulation.casino.trained to true>><<money 1000>><<tiredness 4>><<stress 2>><<pass 60>>
+					<<if maplebirch.passage.title is 'Deadwood Reblooms Casino Dealer'>><<goto 'Deadwood Reblooms Casino Training'>><</if>>
 				<</if>>
 			<</lanLink>><br>
 		<</if>>
@@ -38,12 +67,12 @@
 		<</if>>
 	<</if>>
 	<<if !_casino.canWork>>
-		<span class='blue'><<language>>
+		<<language>>
 			<<option 'EN'>>
-				You cannot start an hour-long shift now. You need to be free of a live hand, able to use your hands and speak, and rested enough to work. New shifts stop at 03:00.
+				You <span class='blue'>cannot take a shift now</span>. Finish any hand you are playing first. You must be able to use your hands and speak, and be rested enough to work for an hour. No new shifts begin after <span class='gold'>03:00</span>.
 			<<option 'CN'>>
-				你现在无法接一小时班次。需要先结束正在玩的牌局，双手和说话不受束缚，并保持足够清醒。03:00 起不再安排新班次。
-		<</language>></span><br>
+				你<span class='blue'>现在无法上班</span>。先结束正在玩的牌局，并确保双手能自由活动、可以说话，也有精力做满一小时。<span class='gold'>03:00</span> 起不再安排新班次。
+		<</language>><br>
 	<</if>>
 <<else>><span class='blue'><<language>>
 	<<option 'EN'>>
@@ -59,11 +88,11 @@
 <<set $outside to 0>><<set $location to 'deadwood_casino'>><<effects>>
 <<language>>
 	<<option 'EN'>>
-		Marlow has you practise with an unused deck before letting you deal a quiet table. Your fingers catch the edge of a card; Marlow stops your hand and shows you the motion again. You learn to keep folded cards apart, count bets aloud, and leave a full view of the chips.<br><br>
-		At the end of the hour, <span class='gold'>£10</span> is counted into your hand. "You can take a regular shift next time. If you're uncertain, ask before you pay the pot."
+		Marlow lets you practise with a deck before putting you at a quiet table. You catch a card with your finger while dealing. Marlow stops you and demonstrates again. You learn to set discarded cards aside, announce the bets, and keep the chips where everyone can see them.<br><br>
+		At the end of the hour, Marlow hands you <span class='gold'>£10</span>. "<span class='green'>Come back for a regular shift next time</span>. If you're unsure who wins, ask before you hand over the pot."
 	<<option 'CN'>>
-		马洛先让你用闲置的牌练习，才让你接手一张不太忙的牌桌。你的手指勾住牌角，马洛按住你的手，又示范了一次。你学着把弃牌放在一旁，报出注额，让桌上的筹码保持清楚可见。<br><br>
-		一小时结束后，<span class='gold'>£10</span> 被点到你手里。“下次就可以来上班了。不确定的话，发奖金以前先问。”
+		马洛先让你拿一副牌练习，再带你到一张客人不多的牌桌旁。发牌时，你的手指勾住了牌角。马洛叫你停下，又示范了一次。你学会了把弃牌放到一旁，报出赌注，让所有人都能看清桌上的筹码。<br><br>
+		一小时结束后，马洛把 <span class='gold'>£10</span> 交给你。“<span class='green'>下次就可以来上班了</span>。不确定谁赢，先问我，再把筹码交出去。”
 <</language>><br><br>
 <<getouticon>><<lanLink ['Return to the room', '返回赌馆'] 'Deadwood Reblooms Life Simulation Casino'>><<endevent>><</lanLink>><br>
 <</nobr>>
@@ -75,9 +104,9 @@
 <<if _casino.canWork and _casino.state.work_scenario isnot null>>
 	<<language>>
 		<<option 'EN'>>
-			You take the dealer's place. For most of the shift, the work is counting, shuffling and moving cards across the cloth. Marlow watches from the next table, stepping in when the room grows louder. Then a player questions a ruling and everyone waits for you.
+			You take your place at the table. You spend most of the shift counting chips, shuffling and dealing. Marlow watches from the next table and comes over when the players get too loud. A guest questions a ruling. The others turn to you, waiting for an answer.
 		<<option 'CN'>>
-			你站到荷官的位置上。大半时间，你都在点筹码、洗牌，把牌沿着绿毡推过去。马洛从隔壁牌桌留意着你，赌馆嘈杂起来时就走近些。随后有客人对一项判定提出异议，所有人都等着你答复。
+			你站到牌桌前，开始数筹码、洗牌和发牌。马洛在隔壁牌桌留意着你，客人的声音太大时，就过来看看。一名客人对牌局的判定提出异议。其他人看向你，等着你的答复。
 	<</language>><br><br>
 	<<switch _casino.state.work_scenario>>
 		<<case 0>>
@@ -87,17 +116,17 @@
 				<<option 'CN'>>
 					一个客人已在面前放了 £20。下一位把总注额加到 £60。前者指着自己的筹码。“我还要补多少？”
 			<</language>><br><br>
-			<<lanLink ['£40', '£40'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 0>><</lanLink>><br>
-			<<lanLink ['£60', '£60'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 1>><</lanLink>><br>
+			<<lanLink ['£40', '£40']>><<deadwood-casino-work-pay 0>><</lanLink>><br>
+			<<lanLink ['£60', '£60']>><<deadwood-casino-work-pay 1>><</lanLink>><br>
 		<<case 1>>
 			<<language>>
 				<<option 'EN'>>
 					One player is all-in for £50. Two others have put in £100 each. The short stack wins the best hand and reaches for all £250.
 				<<option 'CN'>>
-					一位客人以 £50 全下，另外两人各投入 £100。短筹码的客人拿着最强手牌，伸手要取走全部 £250。
+					一位客人把仅剩的 £50 全部下注，另外两人各投入 £100。筹码较少的客人牌最好，伸手要拿走底池里的全部 £250。
 			<</language>><br><br>
-			<<lanLink ['Pay all £250 to the best hand', '把 £250 全付给最强手牌'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 0>><</lanLink>><br>
-			<<lanLink ['Award the £150 main pot; settle the £100 side pot separately', '先判定 £150 主池，另外结算 £100 边池'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 1>><</lanLink>><br>
+			<<lanLink ['Pay all £250 to the best hand', '把 £250 全付给最强手牌']>><<deadwood-casino-work-pay 0>><</lanLink>><br>
+			<<lanLink ['Award the £150 main pot; settle the £100 side pot separately', '先判定 £150 主池，另外结算 £100 边池']>><<deadwood-casino-work-pay 1>><</lanLink>><br>
 		<<case 2>>
 			<<language>>
 				<<option 'EN'>>
@@ -105,8 +134,8 @@
 				<<option 'CN'>>
 					五张公共牌已经组成皇家同花顺，两人的底牌都无法让它更强。其中一人坚称自己的一对 Q 应当赢。
 			<</language>><br><br>
-			<<lanLink ['Split the pot', '平分底池'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 0>><</lanLink>><br>
-			<<lanLink ['Award the pot to the pair of queens', '把底池判给一对 Q'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 1>><</lanLink>><br>
+			<<lanLink ['Split the pot', '平分底池']>><<deadwood-casino-work-pay 0>><</lanLink>><br>
+			<<lanLink ['Award the pot to the pair of queens', '把底池判给一对 Q']>><<deadwood-casino-work-pay 1>><</lanLink>><br>
 	<</switch>>
 <<else>>
 	<span class='blue'><<language>>
@@ -128,6 +157,7 @@
 			<<stress 2>><<set C.npc.Marlow.love to Math.clamp(C.npc.Marlow.love + 1, 0, 30)>>
 		<<else>><<stress 6>><</if>>
 		<<pass 60>>
+		<<if maplebirch.passage.title is 'Deadwood Reblooms Casino Work'>><<goto 'Deadwood Reblooms Casino Work End'>><</if>>
 	<</if>>
 <</widget>>
 
@@ -137,16 +167,16 @@
 <<if $LifeSimulation.casino.last_work_correct is true>>
 	<<language>>
 		<<option 'EN'>>
-			You explain the ruling and count the chips where everyone can see. The objection quiets down. Marlow checks the payout, then leaves you to finish the table. At the end of the hour, you receive <span class='gold'>£40</span>.
+			You explain the ruling and count the chips in front of the players. <span class='teal'>The guest accepts your answer</span>. Marlow checks the payout and lets you carry on. At the end of the hour, you receive <span class='gold'>£40</span>.
 		<<option 'CN'>>
-			你说明判定，把筹码点在所有人都看得见的地方。异议渐渐平息。马洛核对过金额，便让你继续照看牌桌。一小时结束，你领到 <span class='gold'>£40</span>。
-	<</language>><br><br>
+			你解释了判定，当着客人的面数清筹码。<span class='teal'>对方接受了你的答复</span>。马洛核对过金额，让你继续发牌。一小时结束，你领到 <span class='gold'>£40</span>。
+	<</language>><<glove 'Marlow'>><br><br>
 <<elseif $LifeSimulation.casino.last_work_correct is false>>
 	<<language>>
 		<<option 'EN'>>
-			Marlow puts a hand on the rack before any chips leave it. "Wait. Count it again." The ruling is corrected in front of the players. You finish the hour under closer supervision and receive your base pay of <span class='gold'>£30</span>.
+			Marlow stops you before you hand over the chips. "Wait. <span class='blue'>Check the bets and the hands again</span>." You correct the ruling in front of the players. Marlow stays beside you for the rest of the hour. You receive your base pay of <span class='gold'>£30</span>.
 		<<option 'CN'>>
-			筹码还没离开托盘，马洛就按住了它。“等等。再数一遍。”判定当着客人的面纠正过来。你在更严密的看顾下做完这一小时，领到底薪 <span class='gold'>£30</span>。
+			你还没把筹码交出去，马洛就拦住了你。“等等。<span class='blue'>再核对一下下注和手牌</span>。”你当着客人的面纠正了判定。余下的时间里，马洛一直站在你旁边。你领到底薪 <span class='gold'>£30</span>。
 	<</language>><br><br>
 <<else>><<language>>
 	<<option 'EN'>>
@@ -165,22 +195,22 @@
 	<<language>>
 		<<option 'EN'>>
 			<<if $wrenSeen?.includes('cards')>>
-				"Found another card table, have you?" Wren asks, a grin spreading across the familiar face.
+				"Found another card table, have you?" Wren asks with a grin.
 			<<elseif $wrenSeen?.length>>
-				"Fancy meeting you somewhere with chairs," Wren says, recognising you.
+				"Didn't expect to see you here," Wren says, recognising you.
 			<<else>>
 				"New face." Wren looks you over once, a grin spreading.
 			<</if>>
-			&#32;A chip is turned between two fingers. "Go on, sit down. Or watch. You might learn something." Wren glances towards Marlow as the deck is shuffled, then returns attention to the bets.
+			 Wren rolls a chip between <<his>> fingers. "Go on, sit down. Or watch. You might learn something." Wren glances towards Marlow as the deck is shuffled, then turns back to the bets.
 		<<option 'CN'>>
 			<<if $wrenSeen?.includes('cards')>>
-				“又找到一张牌桌，是吧？”伦恩问，熟悉的脸上扬起笑容。
+				“又找到一张牌桌，是吧？”伦恩咧嘴笑道。
 			<<elseif $wrenSeen?.length>>
-				“没想到在有椅子的地方也能碰上你。”伦恩认出你，开口道。
+				“没想到会在这里遇见你。”伦恩认出你，开口道。
 			<<else>>
 				“生面孔。”伦恩上下看了你一眼，扬起笑容。
 			<</if>>
-			&#32;一枚筹码在两指间翻动。“来，坐下。看着也行，说不定能学点什么。”洗牌声响起时，伦恩朝马洛看了一眼，随后又把注意力放回下注上。
+			伦恩用两根手指把玩着一枚筹码。“来，坐下。看着也行，说不定能学点什么。”洗牌声响起时，伦恩朝马洛看了一眼，随后又去看桌上的赌注。
 	<</language>><br><br>
 	<<icon 'poker-chips.png'>><<lanLink ["Join the hold'em table", '加入德州扑克'] 'Deadwood Reblooms Life Simulation Holdem'>><<endevent>><</lanLink>><br>
 <<else>><<language>>
@@ -199,9 +229,9 @@
 	<<npc 'Landry'>><<person1>>
 	<<language>>
 		<<option 'EN'>>
-			Landry acknowledges you with a small nod. The person opposite rises and disappears down the stairs. "Just meeting someone," Landry says, turning the untouched glass by its rim. "If you need to discuss work, find me at the pub. Too many ears here." The conversation ends as another guest approaches.
+			Landry nods as you approach. The person opposite gets up and heads downstairs. "Just meeting someone," Landry says, turning the glass. "If it's about work, come to the pub. Too many people listening here." Another guest approaches, and Landry turns away.
 		<<option 'CN'>>
-			兰德里轻轻点头，算是向你打招呼。对面的人起身，沿着楼梯离开。“只是见个人。”兰德里捏着杯沿，转了转没动过的杯子。“找我谈工作的话，去酒馆。这里耳朵太多。”另一个客人走近，交谈也就到此为止。
+			见你走近，兰德里点了点头。对面的人起身下楼。“只是来见个人。”兰德里转着酒杯，说道。“想谈工作，来酒吧找我。这里听着的人太多。”另一个客人走近，兰德里转过身去。
 	<</language>><br><br>
 <<else>><<language>>
 	<<option 'EN'>>

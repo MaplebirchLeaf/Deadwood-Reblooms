@@ -10,6 +10,7 @@ export const casinoPassage = 'Deadwood Reblooms Life Simulation Casino';
 export interface CasinoState {
   blackjack: BlackjackState;
   holdem: HoldemState;
+  watch: HoldemState;
   three_card: ThreeCardState;
   slots: SlotMachineState;
   chips: number;
@@ -22,11 +23,15 @@ export interface CasinoState {
   landry_visit: boolean;
   work_scenario: number | null;
   last_work_correct: boolean | null;
+  last_chat_night: number;
+  chat_topic: '' | 'work' | 'past' | 'gambling';
+  chat_reply: '' | 'listen' | 'joke';
 }
 
 export const DEFAULT_CASINO_STATE: CasinoState = {
   blackjack: DEFAULT_BLACKJACK_STATE,
   holdem: DEFAULT_HOLDEM_STATE,
+  watch: structuredClone(DEFAULT_HOLDEM_STATE),
   three_card: DEFAULT_THREE_CARD_STATE,
   slots: { reels: [0, 1, 2], payout: 0, played: false },
   chips: 0,
@@ -38,12 +43,16 @@ export const DEFAULT_CASINO_STATE: CasinoState = {
   wren_visit: false,
   landry_visit: false,
   work_scenario: null,
-  last_work_correct: null
+  last_work_correct: null,
+  last_chat_night: -1,
+  chat_topic: '',
+  chat_reply: ''
 };
 
 class Casino {
   public readonly blackjack: Blackjack;
   public readonly holdem: Holdem;
+  public readonly watch: Holdem;
   public readonly threeCard: ThreeCard;
   public readonly slots = new SlotMachine();
 
@@ -53,6 +62,7 @@ class Casino {
   ) {
     this.blackjack = new Blackjack(core, options.blackjack);
     this.holdem = new Holdem(core, options.holdem);
+    this.watch = new Holdem(core, options.holdem, true);
     this.threeCard = new ThreeCard(core, options.threeCard);
   }
 
@@ -79,6 +89,10 @@ class Casino {
       !V.worn.face.type.includes('gag') &&
       V.tiredness < 800
     );
+  }
+
+  public get canTalk(): boolean {
+    return this.available && this.state.work_scenario === null && this.state.last_chat_night !== this.state.guest_night && !V.worn.face.type.includes('gag');
   }
 
   public get wrenPresent(): boolean {

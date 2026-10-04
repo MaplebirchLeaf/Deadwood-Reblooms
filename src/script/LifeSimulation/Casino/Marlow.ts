@@ -16,7 +16,7 @@ export default function Marlow(maplebirch: typeof window.maplebirch): void {
       hair_sides_length: 100,
       hair_fringe_length: 50
     },
-    { love: { maxValue: 30 }, loveInterest: false },
+    { love: { maxValue: 30 }, loveAlias: ['Trust', '信任'], loveInterest: false },
     {
       Marlow: { EN: 'Marlow', CN: '马洛' },
       'card dealer': { EN: 'card dealer', CN: '荷官' }
