@@ -1,4 +1,4 @@
-// ./src/module/constants/sydney-expansion.ts
+// ./src/module/constants/sydney.ts
 
 // Sydney 模块沿用 V.SydneyExpansion 存档字段，保留旧存档进度。
 export interface SydneyExpansionState {

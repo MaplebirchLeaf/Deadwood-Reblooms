@@ -57,15 +57,19 @@ export default class OrchardView {
   private get selected(): number {
     return Math.min(this.orchard.state.selected, this.orchard.state[this.site].length - 1);
   }
+
   private set selected(value: number) {
     this.orchard.state.selected = value;
   }
+
   private get tool(): OrchardTool {
     return this.orchard.state.tool;
   }
+
   private set tool(value: OrchardTool) {
     this.orchard.state.tool = value;
   }
+
   private pending: number | null = null;
 
   public constructor(

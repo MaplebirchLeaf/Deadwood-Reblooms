@@ -1,3 +1,5 @@
+// ./src/module/Robin/Shop.ts
+
 import Shared from './Shared';
 
 /** 店铺开办流程的六个阶段，必须按序推进。 */

@@ -1,4 +1,4 @@
-// ./src/module/constants/kylar-expansion.ts
+// ./src/module/constants/kylar.ts
 
 // Kylar 模块沿用 V.KylarExpansion 存档字段，保留旧存档进度。
 export interface KylarExpansionState {

@@ -1,3 +1,5 @@
+// ./src/module/LifeSimulation/School.ts
+
 type SchoolRole = 'student' | 'prefect' | 'president';
 
 export type SchoolDressPolicy = 'uniform' | 'free' | 'revealing' | 'optionalNudity' | 'nudeDay' | 'mandatoryNudity';

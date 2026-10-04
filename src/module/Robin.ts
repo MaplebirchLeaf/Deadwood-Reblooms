@@ -1,3 +1,5 @@
+// ./src/module/Robin.ts
+
 import Module from './Module';
 import { DEFAULT_ROBIN_EXPANSION_STATE, type RobinExpansionState } from './constants';
 import type { RobinFacade } from './Robin/Shared';

@@ -1,3 +1,5 @@
+// ./src/script/LifeSimulation/AcademicHonours.ts
+
 export default function (maplebirch: typeof window.maplebirch) {
   const text = (subject: string, key: 'name' | 'text') => maplebirch.t(`deadwood-reblooms:LifeSimulation:academic:${subject}:${key}`);
 

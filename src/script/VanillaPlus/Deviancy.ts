@@ -65,6 +65,28 @@ export default function (maplebirch: typeof window.maplebirch) {
     { widget: [1, 'deadwood-reblooms-deviancy-eerie-mirror-link 1'], passage: 'Eerie Mirror' }
   );
 
+  // 原版镜子入口没有模组来源，清除其它离开方式留下的记录。
+  maplebirch.dynamic.regStateEvent('gate', 'deviancy-mirror-native-entry', {
+    extra: { passage: ['Eerie Mirror Tentacle Plains'] },
+    cond: () => V.VanillaPlus != null,
+    action: () => {
+      V.VanillaPlus.deviancy.mirror = '';
+    }
+  });
+
+  // 入口沿用原版 "mirror"；只接管真正离开的页面，导航、鸟瞰与产程保持原样。
+  for (const [passage, arrival] of [
+    ['Passout Tentacle World 4', 'passout'],
+    ['Tentacle Home Return', 'return']
+  ] as const) {
+    maplebirch.dynamic.regStateEvent('gate', `deviancy-mirror-${arrival}`, {
+      output: `deadwood-reblooms-deviancy-mirror-return "${arrival}"`,
+      forceExit: true,
+      extra: { passage: [passage] },
+      cond: () => V.tentacleEntrance === 'mirror' && Boolean(V.VanillaPlus?.deviancy.mirror)
+    });
+  }
+
   // 接入镜面通路与仪式结算，并扩展异种癖上限。
   maplebirch.tool.inject({
     locationPassage: {

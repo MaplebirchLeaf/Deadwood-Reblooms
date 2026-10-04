@@ -1,3 +1,5 @@
+// ./src/module/Robin/Flowers.ts
+
 import Shared from './Shared';
 
 /** 花摊每日最多售出的支数。估算与周结算共用，改动必须保持一致。 */

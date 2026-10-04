@@ -1,3 +1,5 @@
+// ./src/module/main.ts
+
 import DoLP from '../compat/DoLP';
 import DoLX from '../compat/DoLX';
 import DeadwoodReblooms from './DeadwoodReblooms';

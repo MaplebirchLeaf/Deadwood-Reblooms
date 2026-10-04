@@ -1,3 +1,5 @@
+// ./src/script/LifeSimulation/Weapons.ts
+
 export default function Weapons(maplebirch: typeof window.maplebirch): void {
   const weapons = maplebirch.get('LifeSimulation')!.weapons;
   maplebirch.combat.CombatAction.reg({

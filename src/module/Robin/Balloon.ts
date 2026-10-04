@@ -1,3 +1,5 @@
+// ./src/module/Robin/Balloon.ts
+
 import Shared from './Shared';
 
 /** 气球摊支线的走向。resolved 表示竞争营业日已达标，支线收束。 */

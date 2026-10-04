@@ -1,3 +1,5 @@
+// ./src/module/Whitney.ts
+
 import Module from './Module';
 import { DEFAULT_WHITNEY_EXPANSION_STATE } from './constants';
 

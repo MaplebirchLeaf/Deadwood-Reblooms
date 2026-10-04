@@ -1,3 +1,5 @@
+// ./src/module/LifeSimulation/Weapons.ts
+
 type Hand = 'left' | 'right';
 type Weapon = 'whip' | 'baton';
 

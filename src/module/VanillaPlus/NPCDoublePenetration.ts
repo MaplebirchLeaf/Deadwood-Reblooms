@@ -1,3 +1,5 @@
+// ./src/module/VanillaPlus/NPCDoublePenetration.ts
+
 type NPCDoubleOrifice = 'vagina' | 'anus';
 type NPCDoubleStage = 'entrance' | 'imminent' | 'penetrated';
 

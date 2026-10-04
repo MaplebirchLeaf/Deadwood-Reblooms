@@ -1,3 +1,5 @@
+// ./src/script/Sydney.ts
+
 import Festivals from './Sydney/Festivals';
 import SydneyChastity from './Sydney/SydneyChastity';
 import SydneyConfession from './Sydney/SydneyConfession';

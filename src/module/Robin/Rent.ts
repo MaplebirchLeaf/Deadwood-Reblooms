@@ -1,3 +1,5 @@
+// ./src/module/Robin/Rent.ts
+
 import Shared from './Shared';
 
 export default class RobinRent extends Shared {

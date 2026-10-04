@@ -149,6 +149,7 @@ Choose **Invite both lovers to talk (0:20)** in the sitting room while both resi
 3. At game time **03:00 until before 04:00**, with tentacles enabled and either hallucinations stage two or the day's mirror-tentacle condition, check for crossing the eerie mirror.
 4. Read mirror hints and exits on the plains. This is not a safe fixed teleport lobby. Mirror coordinates are reassigned on every entry.
 5. Returning through a different mirror from the entry origin awards **Beyond the Mirror**. When mirrors share nearby coordinates, the actual exit selected matters.
+6. Leaving through the entry mirror on the plains or collapsing there **returns you to the mirror you entered through**. Collapsing in labour follows the vanilla mirror-entry route to the hospital.
 
 The other side remains the tentacle plains with vanilla dangers and encounters. Discovering one mirror does not replace another mirror's discovery, home access or the time requirement.
 

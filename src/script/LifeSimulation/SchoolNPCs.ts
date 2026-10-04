@@ -1,3 +1,5 @@
+// ./src/script/LifeSimulation/SchoolNPCs.ts
+
 import { SCHOOL_CAMPUS_LOCATIONS, SCHOOL_STUDENT_ROSTER, type SchoolDressPolicy, type SchoolStudent } from '../../module/LifeSimulation/School';
 import type { WardrobeItem } from '../../module/NPCSidebarPortrait';
 import { sync } from '../NamedNPCSidebarPortrait/NPCOutfitSets/Clothes';

@@ -1,3 +1,5 @@
+// ./src/script/DeadwoodReblooms/Finance.ts
+
 export default function FinanceCheats(core: typeof maplebirch): void {
   core.tool.defineS('deadwood-finance-cheats', (body = false) => {
     const finance = core.get('VanillaPlus')?.finance;

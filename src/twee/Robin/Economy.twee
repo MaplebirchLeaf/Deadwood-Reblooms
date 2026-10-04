@@ -198,11 +198,31 @@
 <</widget>>
 
 <<widget 'deadwood-robin-journal'>>
-  <<if $RobinExpansion.topics.lemonade gt $RobinExpansion.lemonade>>
-    <li><<lanSwitch 'The lemonade cart needs attention. You can talk to Robin about it in Robin’s room.' '柠檬水摊还有改造的余地。可以回罗宾的房间谈谈。'>></li>
+  <<if C.npc.Robin.init is 1 and $RobinExpansion.topics.lemonade gt $RobinExpansion.lemonade and $RobinExpansion.lemonade lt 2>>
+    <li>
+      <<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met>>
+        <<lanSwitch 'The lemonade stall can be improved. Wait until Robin leaves the asylum before discussing it.' '柠檬水摊还有改造的余地。等罗宾离开精神病院后，再谈改造。'>>
+      <<elseif $robinmissing or $RobinExpansion.asylum.status is 'admitted'>>
+        <<lanSwitch 'The lemonade stall can be improved. Wait until Robin returns before discussing it.' '柠檬水摊还有改造的余地。等罗宾回来后，再谈改造。'>>
+      <<elseif $robin.timer.hurt isnot 0>>
+        <<lanSwitch 'The lemonade stall can be improved. Wait until Robin recovers before discussing it.' '柠檬水摊还有改造的余地。等罗宾伤势恢复后，再谈改造。'>>
+      <<else>>
+        <<lanSwitch 'The lemonade stall can be improved. Return to Robin’s room to discuss it with Robin.' '柠檬水摊还有改造的余地。回罗宾的房间，和罗宾谈谈改造。'>>
+      <</if>>
+    </li>
   <</if>>
-  <<if $RobinExpansion.topics.chocolate gt $RobinExpansion.chocolate>>
-    <li><<lanSwitch 'The hot chocolate stall needs attention. You can talk to Robin about it in Robin’s room.' '热巧克力摊还有改造的余地。可以回罗宾的房间谈谈。'>></li>
+  <<if C.npc.Robin.init is 1 and $RobinExpansion.topics.chocolate gt $RobinExpansion.chocolate and $RobinExpansion.chocolate lt 2>>
+    <li>
+      <<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met>>
+        <<lanSwitch 'The hot chocolate stall can be improved. Wait until Robin leaves the asylum before discussing it.' '热巧克力摊还有改造的余地。等罗宾离开精神病院后，再谈改造。'>>
+      <<elseif $robinmissing or $RobinExpansion.asylum.status is 'admitted'>>
+        <<lanSwitch 'The hot chocolate stall can be improved. Wait until Robin returns before discussing it.' '热巧克力摊还有改造的余地。等罗宾回来后，再谈改造。'>>
+      <<elseif $robin.timer.hurt isnot 0>>
+        <<lanSwitch 'The hot chocolate stall can be improved. Wait until Robin recovers before discussing it.' '热巧克力摊还有改造的余地。等罗宾伤势恢复后，再谈改造。'>>
+      <<else>>
+        <<lanSwitch 'The hot chocolate stall can be improved. Return to Robin’s room to discuss it with Robin.' '热巧克力摊还有改造的余地。回罗宾的房间，和罗宾谈谈改造。'>>
+      <</if>>
+    </li>
   <</if>>
   <<if $RobinExpansion.topics.tutor and !$RobinExpansion.tutor>>
     <li><<lanSwitch 'A family on Danube Street is looking for a tutor. You can discuss it with Robin in Robin’s room.' '多瑙河街的一户人家正在找家教。可以回罗宾的房间谈谈。'>></li>
@@ -244,9 +264,7 @@
   <</if>>
   <<if $RobinExpansion.pcLoan gt 0>>
     <li><<lanSwitch 'Robin owes you' '罗宾还欠你'>> <span class='gold'>£<<print $RobinExpansion.pcLoan>></span><<lanSwitch '. The amount is recorded in the shop ledger.' '。这笔借款已经记在店铺账本里。'>></li>
-    <<if maplebirch.get('Robin').canSpend($RobinExpansion.pcLoan)>>
-      <li><span class='green'><<lanSwitch 'Robin has saved enough to repay you while keeping next week’s rent covered.' '罗宾已经攒够还款，也留足了下周房租。'>></span></li>
-    <</if>>
+    <li><<lanSwitch 'Check the ledger with Robin to discuss repayment.' '和罗宾核对账本，商量还款。'>></li>
   <</if>>
   <<if $RobinExpansion.shop and $RobinExpansion.shopStock is 0>>
     <li><<lanSwitch 'The shop has run out of ingredients for its shared special shifts. Robin can reorder at the shop.' '店里供你们一起做新品班次的原料用完了。罗宾可以在店里重新进货。'>></li>
@@ -263,13 +281,13 @@
 
 <<widget 'deadwood-robin-tutor-link'>>
   <<if maplebirch.get('Robin').tutoring.canTutorToday and $exposed lte 0>>
-    <<schoolicon 'library'>><<lanLink ['Join Robin\'s tutoring lesson (1:00)', '陪罗宾做家教 (1:00)'] 'Deadwood Robin Tutoring'>><</lanLink>><br>
+    <<schoolicon 'library'>><<lanLink ["Join Robin's tutoring lesson (1:00)", '陪罗宾做家教 (1:00)'] 'Deadwood Robin Tutoring'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-robin-night-link'>>
   <<if maplebirch.get('Robin').night.canVisit>>
-    <<socialiseicon 'ask'>><<lanLink ['Knock softly on Robin\'s door (0:05)', '轻敲罗宾的门 (0:05)'] 'Deadwood Robin Night Knock'>><</lanLink>><br>
+    <<socialiseicon 'ask'>><<lanLink ["Knock softly on Robin's door (0:05)", '轻敲罗宾的门 (0:05)'] 'Deadwood Robin Night Knock'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -329,7 +347,7 @@
   <</if>>
   <br><br>
   <<if maplebirch.get('Robin').canSpend($RobinExpansion.lemonade is 0 ? 600 : 400)>>
-    <<shopicon 'register'>><<lanLink ['Upgrade Robin\'s lemonade stall (3:00)', '用罗宾的储蓄升级柠檬水摊 (3:00)'] 'Deadwood Robin Upgrade Lemonade Result'>><<pass 180>><</lanLink>>
+    <<shopicon 'register'>><<lanLink ["Upgrade Robin's lemonade stall (3:00)", '用罗宾的储蓄升级柠檬水摊 (3:00)'] 'Deadwood Robin Upgrade Lemonade Result'>><<pass 180>><</lanLink>>
     <<if C.npc.Robin.dom gte 50 and C.npc.Robin.trauma lt 60>>
       <br><<shopicon 'register'>><<lanLink ['Let Robin buy the lemonade stall equipment alone (3:00)', '让罗宾独自采购柠檬水摊设备 (3:00)'] 'Deadwood Robin Upgrade Lemonade Solo'>><</lanLink>>
     <</if>>
@@ -385,7 +403,7 @@
   <</if>>
   <br><br>
   <<if maplebirch.get('Robin').canSpend($RobinExpansion.chocolate is 0 ? 600 : 400)>>
-    <<shopicon 'register'>><<lanLink ['Upgrade Robin\'s hot chocolate stall (3:00)', '用罗宾的储蓄升级热巧克力摊 (3:00)'] 'Deadwood Robin Upgrade Chocolate Result'>><<pass 180>><</lanLink>>
+    <<shopicon 'register'>><<lanLink ["Upgrade Robin's hot chocolate stall (3:00)", '用罗宾的储蓄升级热巧克力摊 (3:00)'] 'Deadwood Robin Upgrade Chocolate Result'>><<pass 180>><</lanLink>>
     <<if C.npc.Robin.dom gte 50 and C.npc.Robin.trauma lt 60>>
       <br><<shopicon 'register'>><<lanLink ['Let Robin buy the hot chocolate stall equipment alone (3:00)', '让罗宾独自采购热巧克力摊设备 (3:00)'] 'Deadwood Robin Upgrade Chocolate Solo'>><</lanLink>>
     <</if>>
@@ -828,7 +846,7 @@
   <<schoolicon 'building'>><<lanLink ['Order drinks for the student council (£20 0:20)', '请罗宾准备学生会饮品 (£20 0:20)'] 'Deadwood Robin School Drinks'>><<pass 20>><</lanLink>><br>
 <</if>>
 <<if $RobinExpansion.shop_taste_day isnot Time.days and maplebirch.get('Robin').shop.canCustomerPay(300) and getRobinLocation() is 'shop'>>
-  <<shopicon 'register'>><<lanLink ['Try the shop\'s new special (£3 0:05)', '尝尝店里的新品 (£3 0:05)'] 'Deadwood Robin Shop Taste'>><</lanLink>><br>
+  <<shopicon 'register'>><<lanLink ["Try the shop's new special (£3 0:05)", '尝尝店里的新品 (£3 0:05)'] 'Deadwood Robin Shop Taste'>><</lanLink>><br>
 <</if>>
 <<if $RobinExpansion.shopStaff lt 2 and getRobinLocation() is 'shop'>>
   <<icon 'staff-applications.png'>><<lanLink ['Review staff applications', '查看店员应聘'] 'Deadwood Robin Shop Staff'>>
@@ -864,7 +882,7 @@
 <</if>>
 <span class='gold'><<lanSwitch 'Coffee and sweets' '咖啡与甜饮'>></span><br>
 <<if maplebirch.get('Robin').shop.canCustomerPay(400)>>
-  <<foodicon 'coffee'>><<lanLink ['Buy Robin\'s coffee (0:15)', '购买罗宾的咖啡 (0:15)'] 'Deadwood Robin Shop Buy Coffee'>><</lanLink>> <span class='gold'>£4</span><br>
+  <<foodicon 'coffee'>><<lanLink ["Buy Robin's coffee (0:15)", '购买罗宾的咖啡 (0:15)'] 'Deadwood Robin Shop Buy Coffee'>><</lanLink>> <span class='gold'>£4</span><br>
 <</if>>
 <<if maplebirch.get('Robin').shop.canCustomerPay(500)>>
   <<foodicon 'milkshake'>><<lanLink ['Buy a fruit milkshake (0:15)', '购买水果奶昔 (0:15)'] 'Deadwood Robin Shop Buy Milkshake'>><</lanLink>> <span class='gold'>£5</span><br>
@@ -1307,7 +1325,7 @@
   <</language>>
   <<set $NPCList[1].name_known to 1>><<saveNPC 1 'deadwood_robin_shop_regular'>>
   <br><br>
-  <<shopicon 'register'>><<lanLink ['Let Robin choose today\'s special', '由罗宾决定今日特饮'] 'Deadwood Robin Shop Shift Robin'>><</lanLink>><br>
+  <<shopicon 'register'>><<lanLink ["Let Robin choose today's special", '由罗宾决定今日特饮'] 'Deadwood Robin Shop Shift Robin'>><</lanLink>><br>
   <<shopicon 'register'>><<lanLink ['Run the till while Robin serves drinks', '你守收银台，罗宾负责出杯'] 'Deadwood Robin Shop Shift Together'>><</lanLink>>
 <<else>>
   <<lanSwitch 'The shop has already closed its shared shift for today.' '今天的共同班次已经结束。'>>
@@ -1583,7 +1601,7 @@
   <br><<lanSwitch 'Robin still owes you:' '罗宾还欠你的借款：'>> <span class='gold'>£<<print $RobinExpansion.pcLoan>></span>
   <<if maplebirch.get('Robin').canSpend($RobinExpansion.pcLoan)>>
     <<if ['shop', 'orphanage'].includes(getRobinLocation())>>
-      <br><br><<shopicon 'register'>><<lanLink ['Accept Robin\'s repayment', '收下罗宾归还的借款'] 'Deadwood Robin Loan Repayment'>><</lanLink>>
+      <br><br><<shopicon 'register'>><<lanLink ["Accept Robin's repayment", '收下罗宾归还的借款'] 'Deadwood Robin Loan Repayment'>><</lanLink>>
     <</if>>
   <</if>>
 <</if>>

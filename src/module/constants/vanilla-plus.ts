@@ -89,7 +89,7 @@ export interface VanillaPlusState {
     /** 五级突破事件已完成。 */
     levelFive: number;
     /** 本次爬镜的出发点类型，决定进入触手平原后返回哪里。 */
-    mirrorOrigin: string;
+    mirror: string;
     /** 上次触发镜子事件的游戏日，防止同日重复。 */
     mirror_day: number;
     /** 选择"从房产镜子出去"时记录的目标房产 id。 */
@@ -197,7 +197,7 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
     conducting: false,
     conducted: false,
     levelFive: 0,
-    mirrorOrigin: '',
+    mirror: '',
     mirror_day: -1,
     mirror_property: null,
     mirror_locations: {},

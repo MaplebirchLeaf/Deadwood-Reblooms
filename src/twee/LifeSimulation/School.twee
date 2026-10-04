@@ -10,7 +10,7 @@
 <!-- 原版 Avery 纸牌路线确认贝利住在倒钩街公寓。反抗成功后只在公寓找他。 -->
 <<widget 'deadwood-reblooms-life-simulation-bailey-flat-link'>>
   <<if $RobinExpansion?.baileyDefeated and !$LifeSimulation.school.attendanceExempt and !$LifeSimulation.school.baileySigned and $LifeSimulation.school.leightonApprovalDay gte 0 and $exposed lt 1 and Time.hour gte 7 and Time.hour lt 21>>
-    <<dooricon>><<lanLink ['Visit Bailey\'s flat about a class exemption (0:02)', '去贝利的公寓申请免听凭证 (0:02)'] 'Deadwood Reblooms Life Simulation Attendance Approval'>><<pass 2>><</lanLink>><br><br>
+    <<dooricon>><<lanLink ["Visit Bailey's flat about a class exemption (0:02)", '去贝利的公寓申请免听凭证 (0:02)'] 'Deadwood Reblooms Life Simulation Attendance Approval'>><<pass 2>><</lanLink>><br><br>
   <</if>>
 <</widget>>
 
@@ -168,7 +168,12 @@
             <<if $LifeSimulation.school.leightonApprovalDay lt 0>>
               <<lanSwitch 'Take top marks in all four subjects to Leighton for an attendance exemption review.' '四科都达到最高档后，先找礼顿审核免听申请。'>>
             <<else>>
-              <<lanSwitch 'Leighton approved the school form. Ask Bailey for guardian permission after three consecutive rent payments, or after the orphanage confrontation.' '礼顿已通过学校审核。连续正常交租三周后找贝利签监护人许可。若已在孤儿院与贝利摊牌，也可以直接找他。'>>
+              <<language>>
+                <<option 'EN'>>
+                  <<if $RobinExpansion?.baileyDefeated>>Leighton approved the school form. Find Bailey at the Barb Street flats for the guardian signature.<<else>>Leighton approved the school form. After three consecutive rent payments, ask Bailey to sign in the office between 07:00 and 09:00.<</if>>
+                <<option 'CN'>>
+                  <<if $RobinExpansion?.baileyDefeated>>礼顿已通过学校审核。去倒钩街公寓找贝利签监护人许可。<<else>>礼顿已通过学校审核。连续按时交租三周后，在 07:00–09:00 到办公室找贝利签字。<</if>>
+              <</language>>
             <</if>>
           <<elseif Time.days lt $LifeSimulation.school.attendanceDay + 7>>
             <<lanSwitch 'Hold your marks and standing for seven days before asking Leighton about prefect duties.' '继续保持成绩与声望。取得免听凭证七天后，再向礼顿申请风纪委员。'>>
@@ -269,24 +274,43 @@
 <<set $location to $RobinExpansion?.baileyDefeated ? 'flats' : 'home'>>
 <<effects>>
 <<npc Bailey>><<person1>>
-<<if $LifeSimulation.school.leightonApprovalDay gte 0 and !$LifeSimulation.school.attendanceExempt>>
-  <<if $RobinExpansion?.baileyDefeated>>
-    <<language>>
-      <<option 'EN'>>You find Bailey in the Barb Street block of flats. <<He>> starts to close the door when you show <<him>> your school record. The marks are excellent. Bailey's eyes move to the copies of the rent ledger under your arm. "What do you want?"
-      <<option 'CN'>>你在倒钩街的公寓楼里找到贝利。<<He>>正要关门，你便递上成绩单。上面的分数挑不出毛病。贝利的目光又落到你臂弯里的房租账本副本上。“你又想怎样？”
-    <</language>><br><br>
-    <<lanSwitch '"Leighton has approved it. Your signature is all that is missing." Bailey looks at the copied rent accounts again, then signs without inviting you inside.' '“礼顿已经通过申请，就差你的签名。”贝利又看了一眼房租账本副本，没有请你进门，只在上面签了字。'>><br><br>
-  <<else>>
-    <<if $baileypaychain gte 3>>
-      <<lanSwitch 'Bailey checks the three consecutive rent payments in <<his>> ledger and signs without looking up. "Three weeks on time. Do not make me write your name down twice."' '贝利翻到账本里连续三周交租的记录，头也没抬就签了字。“三周都按时。别让我再记你第二次。”'>><br><br>
-    <<else>>
-      <<lanSwitch 'Bailey sees Leighton’s signature and closes the ledger. "Three weeks of rent on time. Then I’ll sign."' '贝利看见礼顿的签名，合上账本。“连续三周按时交租，我才签。”'>><br><br>
-    <</if>>
-  <</if>>
+<<if $LifeSimulation.school.leightonApprovalDay gte 0 and !$LifeSimulation.school.attendanceExempt and !$LifeSimulation.school.baileySigned>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $RobinExpansion?.baileyDefeated>>
+        Bailey opens the flat's door just far enough to see you. "What now?" You hold out the school form. <<He>> reads Leighton's signature, then looks up. "You wanted me out."
+        <br><br>
+        "The school still has you down as my guardian." Bailey keeps a hand on the door. You remind <<him>> that the copies of the rent ledger are still safe. For a moment, neither of you moves. Then <<he>> takes the form. "This is the last time."
+        <br><br>
+        <<He>> signs against the doorframe and pushes the paper back at you. "Tell Leighton to stop sending you here."
+      <<elseif $baileypaychain gte 3>>
+        Bailey checks your name in the rent ledger, then turns to Leighton's signature. "So you think you don't need lessons anymore?" <<He>> taps the payment entries with <<his>> pen. "Keep paying on time. I don't want to hear that school got in the way."
+        <br><br>
+        <<He>> signs the guardian section and slides the form across the desk.
+      <<else>>
+        Bailey reads Leighton's signature, then sets your form beside the rent ledger. "Three weeks on time. Then I'll sign." <<He>> pushes the paper back before you can explain your marks. "You heard me."
+      <</if>>
+    <<option 'CN'>>
+      <<if $RobinExpansion?.baileyDefeated>>
+        贝利只把公寓的门打开一道够看见你的缝。“又怎么了？”你递上学校的表格。<<He>>看过礼顿的签名，抬起头。“不是你们要我走的吗？”
+        <br><br>
+        “学校那边，你还是我的监护人。”贝利的手仍扶着门。你提醒<<him>>，房租账本的副本还好好留着。你们僵持了片刻，<<he>>才接过表格。“最后一次。”
+        <br><br>
+        <<He>>抵着门框签完，把纸塞回你手里。“叫礼顿别再让你来烦我。”
+      <<elseif $baileypaychain gte 3>>
+        贝利在房租账本里找到你的名字，又看了看礼顿的签名。“觉得自己不用上课了？”<<He>>用笔点了点交租记录。“钱照常交。别到时候拿学校当借口。”
+        <br><br>
+        <<He>>签了监护人的那一栏，把表格推过桌面。
+      <<else>>
+        贝利看过礼顿的签名，把表格放在房租账本旁。“连续三周按时交租，我才签。”还没等你解释成绩，<<he>>就把纸推了回来。“听清楚了？”
+      <</if>>
+  <</language>><br><br>
   <<if maplebirch.get("LifeSimulation").school.signAttendanceExemption()>>
     <span class='green'><<lanSwitch 'Bailey has signed the guardian section.' '贝利签了监护人的那一栏。'>></span><br>
     <span class='teal'><i><<lanSwitch 'Take the form back to Leighton before skipping any lessons.' '要把表格交回礼顿，上课才能由你自行安排。'>></i></span><br>
   <</if>>
+<<elseif $LifeSimulation.school.baileySigned and !$LifeSimulation.school.attendanceExempt>>
+  <<lanSwitch 'Bailey has already signed. Take the form back to Leighton.' '贝利已经签字了。把表格交回礼顿。'>><br>
 <<else>>
   <<lanSwitch 'Bailey has no reason to sign another request.' '贝利没理由再签一份申请。'>><br>
 <</if>>
@@ -547,7 +571,7 @@
         罗宾领着一名低年级学生赶来。那孩子的鞋带散了，罗宾蹲下替他系好，
         才把说明耽搁原因的条子递给你。罗宾的目光在你的徽章和记录簿之间来回。
     <</language>>
-    <br><br><<schoolicon 'building'>><<lanLink ['Record Robin\'s delay', '记下罗宾耽搁的原因'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <br><br><<schoolicon 'building'>><<lanLink ["Record Robin's delay", '记下罗宾耽搁的原因'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
     <<socialiseicon>><<lanLink ['Speak to Robin privately', '私下与罗宾谈谈'] 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
     <<getouticon>><<lanLink ['Wave Robin through without checking', '不查记录，直接放罗宾进去'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
   <<elseif _student is 'Sydney'>>
@@ -560,7 +584,7 @@
         悉尼夹着一叠神殿的文件来到校门。你问起神殿的差事为何耽搁了入校，
         悉尼平静地说明原委，等你决定是否记入值勤簿。
     <</language>>
-    <br><br><<schoolicon 'building'>><<lanLink ['Record Sydney\'s reason', '记下悉尼的缘由'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <br><br><<schoolicon 'building'>><<lanLink ["Record Sydney's reason", '记下悉尼的缘由'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
     <<socialiseicon>><<lanLink ['Speak to Sydney privately', '私下与悉尼谈谈'] 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
     <<getouticon>><<lanLink ['Let Sydney pass without checking', '不查记录，放悉尼过去'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
   <<elseif _student is 'Kylar'>>
@@ -588,7 +612,7 @@
         惠特尼横在入口，讥笑着把下一个学生逼了回去。你挡在惠特尼与队伍之间。
         惠特尼瞥见你的徽章，咧嘴一笑，像是在等你当众出丑。
     <</language>>
-    <br><br><<schoolicon 'building'>><<lanLink ['Write up Whitney\'s obstruction', '记录惠特尼堵门的行为'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <br><br><<schoolicon 'building'>><<lanLink ["Write up Whitney's obstruction", '记录惠特尼堵门的行为'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
     <<socialiseicon>><<lanLink ['Speak to Whitney privately', '私下与惠特尼谈谈'] 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
     <<getouticon>><<lanLink ['Ignore Whitney', '不理会惠特尼'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
   <</if>>
@@ -634,7 +658,7 @@
         <<lanSwitch 'Sydney keeps to the facts and waits for you to decide what belongs in the register.' '悉尼只说了事情的经过，等你决定值勤簿该怎么写。'>>
       <</if>><br><br>
       <<socialiseicon>><<lanLink ['Hear the reason and send Sydney to class', '听完缘由，送悉尼去上课'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
-      <<crimeicon 'coercion'>><<lanLink ['Threaten to report Sydney\'s temple errand', '威胁上报悉尼的神殿差事'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
+      <<crimeicon 'coercion'>><<lanLink ["Threaten to report Sydney's temple errand", '威胁上报悉尼的神殿差事'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
       <<if maplebirch.get("LifeSimulation").school.canInviteStudent>>
         <<loveicon>><<lanLink ['Invite Sydney to meet in private', '邀悉尼单独见面'] 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
       <</if>>

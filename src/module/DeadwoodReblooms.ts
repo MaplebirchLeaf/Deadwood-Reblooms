@@ -1,4 +1,5 @@
 // ./src/module/DeadwoodReblooms.ts
+
 import Hint_CN from '@/assets/hint/CN/Index.md';
 import Hint_EN from '@/assets/hint/EN/Index.md';
 import Hint_DeadwoodReblooms_CN from '@/assets/hint/CN/DeadwoodReblooms.md';

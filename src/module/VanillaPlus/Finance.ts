@@ -1,3 +1,5 @@
+// ./src/module/VanillaPlus/Finance.ts
+
 import Securities, { type Security } from './Securities';
 import securitiesSource from '@/assets/finance/securities.yaml';
 import type { MacroDefinition } from 'twine-sugarcube';

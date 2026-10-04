@@ -1,4 +1,4 @@
-// ./src/script/SolarEclipse.ts
+// ./src/script/CelestialAnomalies.ts
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 

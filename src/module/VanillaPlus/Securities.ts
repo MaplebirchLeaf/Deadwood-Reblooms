@@ -1,3 +1,5 @@
+// ./src/module/VanillaPlus/Securities.ts
+
 import type { FinanceState } from './Finance';
 
 export interface Security {

@@ -137,7 +137,7 @@ Consecutive severe-trauma days produce a warning before admission. Timely care i
 2. Follow the voice through the door into an isolation room. Staff can be heard beyond another door; you can take Robin back through the plains and look for the forest exit.
 3. Travel using the vanilla **coordinate grid**. Each step takes ten minutes and exposes you to the plains' air and tendrils.
 4. If no encounter has occurred, one triggers after three steps; a random attack can happen earlier. More encounters can follow. Winning one fight does not take you straight to the exit.
-5. Encounters use the vanilla tentacle advances and mixed action menu. The tentacles act on the PC; Robin's distress is represented through trauma, without another health bar.
+5. Encounters use the vanilla tentacle advances and mixed action menu. The tentacles act on the PC. Robin is present as a companion NPC, so you can also have sex with Robin during the fight. Robin's distress is represented through trauma, without another health bar.
 6. After clearing an encounter, catch your breath or spend five minutes to **"Comfort Robin"**. This is company and a hug, once after each encounter. Afterwards, continue walking; the finished battle is not reopened.
 7. Maximum stress fails the rescue, increases both characters' trauma and enters the vanilla Tentacle Plains collapse and return sequence. Robin remains confined; try again another day. The PC returns according to the original mirror or asylum entrance.
 8. The **forest door** lets Robin escape and begin recovery. If the PC was also a patient, it settles the PC's vanilla asylum escape too.

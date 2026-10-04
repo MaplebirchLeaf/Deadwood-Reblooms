@@ -1,3 +1,5 @@
+// ./src/module/LifeSimulation/Medicine.ts
+
 export type MedicineId = 'calm' | 'sleep' | 'alert' | 'focus' | 'soothe';
 
 interface Use {

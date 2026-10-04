@@ -1,4 +1,4 @@
-// ./src/module/constants/whitney-expansion.ts
+// ./src/module/constants/whitney.ts
 
 // Whitney 模块沿用 V.WhitneyExpansion 存档字段，保留旧存档进度。
 export interface WhitneyExpansionState {

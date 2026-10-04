@@ -32,7 +32,7 @@ class IncantationCheatCollection {
   }
 
   private updateContainer(containerId: string, content: string): void {
-    if (!containerId) return;
+    if (!containerId || !document.getElementById(containerId)) return;
     this.core.SugarCube.Wikifier.wikifyEval(`<<replace "#${containerId}">>${content}<</replace>>`);
   }
 

@@ -1,3 +1,5 @@
+// ./src/module/Guide.ts
+
 interface GuideSection {
   id: string;
   title: string;

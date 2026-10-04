@@ -1,3 +1,5 @@
+// ./src/module/VanillaPlus/RealEstate.ts
+
 import paperhangings from './Paperhangings.json';
 import PropertyCatalog, { type Property, type ResidentProfile } from './PropertyCatalog';
 import type Finance from './Finance';

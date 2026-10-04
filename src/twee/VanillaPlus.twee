@@ -1,12 +1,44 @@
 :: Deadwood Reblooms Vanilla Plus Widgets [widget]
 
+<!-- 主动离开或昏厥后按镜面来源提供出口；出口 passage 各自完成 location 与状态收尾。 -->
+<<widget 'deadwood-reblooms-deviancy-mirror-return'>>
+  <<if _args[0]>>
+    <<set $outside to 0>><<set $location to 'tentworld'>><<effects>>
+    <<language>>
+      <<option 'EN'>>
+        <<if _args[0] is 'passout'>>You wake on the floor. The mirror above you is still, and the plain is gone.<<else>>You step through the mirror. The plain falls away behind the glass.<</if>>
+      <<option 'CN'>>
+        <<if _args[0] is 'passout'>>你在地板上醒来。头顶的镜面纹丝不动，平原已经消失。<<else>>你穿过镜面。平原在镜后褪去。<</if>>
+    <</language>>
+    <br><br>
+  <</if>>
+  <<set _mirrorReturn to $VanillaPlus.deviancy.mirror>>
+  <<if _mirrorReturn is 'home'>>
+    <<lanLink ['Continue', '继续'] 'Deadwood Reblooms Deviancy Mirror Home'>><</lanLink>>
+  <<elseif _mirrorReturn is 'farm'>>
+    <<lanLink ['Continue', '继续'] 'Deadwood Reblooms Deviancy Mirror Farm'>><</lanLink>>
+  <<elseif _mirrorReturn is 'tower'>>
+    <<lanLink ['Continue', '继续'] 'Deadwood Reblooms Deviancy Mirror Tower'>><</lanLink>>
+  <<elseif _mirrorReturn is 'temple'>>
+    <<lanLink ['Continue', '继续'] 'Deadwood Reblooms Deviancy Mirror Temple'>><</lanLink>>
+  <<elseif _mirrorReturn is 'sirris'>>
+    <<lanLink ['Continue', '继续'] 'Deadwood Reblooms Deviancy Mirror Sirris'>><</lanLink>>
+  <<elseif _mirrorReturn is 'kylar'>>
+    <<lanLink ['Continue', '继续'] 'Deadwood Reblooms Deviancy Mirror Kylar'>><</lanLink>>
+  <<elseif _mirrorReturn and _mirrorReturn.startsWith('property:')>>
+    <<lanLink ['Continue', '继续'] 'Deadwood Reblooms Deviancy Mirror Property'>><</lanLink>>
+  <<else>>
+    <<lanLink ['Continue', '继续'] 'Bedroom'>><<set $location to 'home'>><<set $outside to 0>><</lanLink>>
+  <</if>>
+<</widget>>
+
 <!-- 镜子出口统一结束触手世界，并按实际出口结算成就。未指定出口时只清理状态。 -->
 <<widget 'deadwood-reblooms-mirror-exit'>>
   <<effects>><<tentacleworldend>>
-  <<if _args[0] and $VanillaPlus.deviancy.mirrorOrigin and $VanillaPlus.deviancy.mirrorOrigin isnot _args[0]>>
+  <<if _args[0] and $VanillaPlus.deviancy.mirror and $VanillaPlus.deviancy.mirror isnot _args[0]>>
     <<earnFeat 'Beyond the Mirror'>>
   <</if>>
-  <<set $VanillaPlus.deviancy.mirrorOrigin to ''>>
+  <<set $VanillaPlus.deviancy.mirror to ''>>
 <</widget>>
 
 <!-- 属性达到第七级上限后，显示本轮实际获得的特质，属性突破提示仍由各自场景负责。 -->
@@ -143,7 +175,7 @@
     <<if Time.dayState isnot 'night'>>
       <<set _walkTargets to $map.available[$passage].filter(target => _routeWidgets[target] && !$link_table.some(link => link.includes('|' + target + ']]')) )>>
       <<if _walkTargets.length>>
-        <<add_link `<br>${lanSwitch('Public walk', '公开裸行')}<br>`>><<hideDisplay>>
+        <<add_link `'<br>' + lanSwitch('Public walk', '公开裸行') + '<br>'`>><<hideDisplay>>
         <<for _target range _walkTargets>>
           <<run maplebirch.SugarCube.Wikifier.wikifyEval('<<' + _routeWidgets[_target] + '>>')>>
         <</for>>
@@ -237,7 +269,7 @@
   <<if maplebirch.get("VanillaPlus").deviancy.mirrorOpen and maplebirch.get("VanillaPlus").deviancy.discovered($_mirror, $_mirror is 'property' ? maplebirch.get("VanillaPlus").realEstate.current?.id : undefined)>>
     <br>
     <<mirroricon 'blood'>><<lanLink ['Step through the eerie mirror', '穿过诡异镜面'] 'Deadwood Reblooms Deviancy Mirror Enter' >>
-      <<set $VanillaPlus.deviancy.mirrorOrigin to $_mirror is 'property' ? 'property:' + maplebirch.get("VanillaPlus").realEstate.current.id : $_mirror>>
+      <<set $VanillaPlus.deviancy.mirror to $_mirror is 'property' ? 'property:' + maplebirch.get("VanillaPlus").realEstate.current.id : $_mirror>>
       <<if $_mirror is 'property'>><<set $VanillaPlus.deviancy.mirror_property to maplebirch.get("VanillaPlus").realEstate.current.id>><</if>>
       <<run maplebirch.get("VanillaPlus").deviancy.enter()>>
     <</lanLink>>
@@ -316,7 +348,7 @@
 <</widget>>
 
 <<widget 'deadwood-reblooms-deviancy-mirror-exits'>>
-  <<if $tentacleEntrance is 'vanillaPlusMirror'>>
+  <<if $tentacleEntrance is 'mirror' and $VanillaPlus.deviancy.mirror>>
     <<set _mirrorLocations to $VanillaPlus.deviancy.mirror_locations>>
     <<deadwood-reblooms-deviancy-mirror-hint>>
     <<if _mirrorLocations.home

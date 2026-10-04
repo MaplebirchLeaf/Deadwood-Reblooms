@@ -1,3 +1,5 @@
+// ./src/module/CelestialAnomalies/MeteorShowerLayer.ts
+
 function meteorEffect(rate: number) {
   return {
     effect: 'meteorShower',

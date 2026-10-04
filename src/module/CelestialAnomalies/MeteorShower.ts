@@ -1,3 +1,5 @@
+// ./src/module/CelestialAnomalies/MeteorShower.ts
+
 import apply from './MeteorShowerLayer';
 
 interface MeteorDate {

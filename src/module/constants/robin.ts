@@ -1,4 +1,4 @@
-// ./src/module/constants/robin-expansion.ts
+// ./src/module/constants/robin.ts
 
 /** 气球摊位的走向，resolved 表示该支线已经收束。 */
 export type BalloonRoute = 'none' | 'cooperate' | 'compete' | 'resolved';

@@ -1,3 +1,5 @@
+// ./src/script/DeadwoodReblooms/Tips.ts
+
 type Tip = readonly [english: string, chinese: string];
 
 // 沿用原版提示池与内容开关，关闭的模块不注册提示。不新增提示弹窗。

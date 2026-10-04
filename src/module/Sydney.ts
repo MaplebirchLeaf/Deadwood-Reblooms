@@ -1,3 +1,5 @@
+// ./src/module/Sydney.ts
+
 import Module from './Module';
 import { DEFAULT_SYDNEY_EXPANSION_STATE } from './constants';
 

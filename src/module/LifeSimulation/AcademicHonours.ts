@@ -1,3 +1,5 @@
+// ./src/module/LifeSimulation/AcademicHonours.ts
+
 type AcademicHonourSubject = 'science' | 'maths' | 'english' | 'history';
 
 class AcademicHonours {

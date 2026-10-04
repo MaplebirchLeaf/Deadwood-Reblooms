@@ -1,3 +1,5 @@
+// ./src/module/DynamicMusic.ts
+
 interface MusicState {
   combat: unknown;
   solarEclipse: unknown;

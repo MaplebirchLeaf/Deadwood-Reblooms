@@ -1,3 +1,5 @@
+// ./src/script/Sydney/SydneyDorm.ts
+
 export default function (maplebirch: typeof window.maplebirch) {
   // 床铺后的可见链接索引通常为 1，打扫选项出现时移到 2，两处只显示其一。
   maplebirch.tool.addTo(

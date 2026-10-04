@@ -1,3 +1,5 @@
+// ./src/script/main.ts
+
 import DeadwoodReblooms from './DeadwoodReblooms';
 import MoreLoveInterestsAndNPCAvatars from './MoreLoveInterestsAndNPCAvatars';
 import CelestialAnomalies from './CelestialAnomalies';

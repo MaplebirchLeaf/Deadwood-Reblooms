@@ -1,3 +1,5 @@
+// ./src/module/Robin/Fishing.ts
+
 import Shared from './Shared';
 
 /** 每天最多处理三条鱼，避免在同一营业日无限重复售卖。 */
