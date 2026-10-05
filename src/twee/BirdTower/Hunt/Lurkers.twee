@@ -1,0 +1,431 @@
+:: Deadwood BirdTower Hunt Lurkers Lot []
+<<effects>><<childSelect $BirdTower.hunt.leader>>
+<<language>>
+  <<option 'EN'>>
+    You and <<babyhawks>> surround the lurkers. <<childname>>
+  <<option 'CN'>>
+    你和<<babyhawks>>包围了潜伏者，<<childname>>
+<</language>>
+<<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
+  <<language>>
+    <<option 'EN'>>
+      fixates on one of the lurkers. <<childHe>> has already locked onto a target.
+    <<option 'CN'>>
+      盯着其中一只潜伏者。<<childHe>>已经锁定目标了。
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      looks at you, waiting for you to choose a target.
+    <<option 'CN'>>
+      看着你，等着你选择目标。
+  <</language>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    One is on its own, and a few others are huddled close together.
+  <<option 'CN'>>
+    有一只落单的，还有几只紧靠在一起。
+<</language>>
+<br><br>
+<<set _Single to 600-maplebirch.get('BirdTower').party.length*50>>
+<<set _Double to 1200-maplebirch.get('BirdTower').party.length*50>>
+<<lanLink ["Hunt the one on its own", "狩猎落单的那只"] "Deadwood BirdTower Hunt Lurkers Lot Single">><</lanLink>><<dancedifficulty 1 _Single>>
+<br>
+<<lanLink ["Hunt the two huddled together", "狩猎凑在一起的两只"] "Deadwood BirdTower Hunt Lurkers Lot Double">><</lanLink>><<dancedifficulty 300 _Double>>
+<br>
+<<lanLink ["Hunt the whole group", "狩猎一整群"] "Deadwood BirdTower Hunt Lurkers Lot Group">><</lanLink>><<dancedifficulty 600 1200>><<tendingdifficulty 1 700>>
+<br>
+:: Deadwood BirdTower Hunt Lurkers Lot Single []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You fix your eyes on the lone lurker, then glance at your children. You have all decided on your target. You dive down after <<babyhawksthem>>.
+    <br><br>
+    <<childname>> succeeds in grabbing one with their talons.
+  <<option 'CN'>>
+    你盯着落单的那只潜伏者，再看了看你的孩子。你们都决定好目标了。你跟着<<babyhawksthem>>俯冲而下。
+    <br><br>
+    <<childname>>成功用爪子抓住了一只。
+<</language>>
+<<if maplebirch.get('BirdTower').party.length gt 1>>
+  <<set _hawksIDcopy to $BirdTower.hunt.ids.filter(id => id !== $BirdTower.hunt.leader)>>
+  <<language>>
+    <<option 'EN'>>
+      <<childrenNames _hawksIDcopy>> pounce on the lurkers too.
+    <<option 'CN'>>
+      <<childrenNames _hawksIDcopy>>也扑向潜伏者。
+  <</language>>
+<</if>>
+<br><br>
+<<set _Single to 600-maplebirch.get('BirdTower').party.length*50>>
+<<dancedifficulty 1 _Single true>>
+<<if $danceSuccess>>
+  <<language>>
+    <<option 'EN'>>
+      The other lurkers leap away, <span class="green">but you still caught one</span>. You fly back into the air with your spoils.
+    <<option 'CN'>>
+      其他潜伏者跳着逃开了，<span class="green">但你还是抓到了一只</span>。你带着战利品飞回空中。
+  <</language>>
+  <br><br>
+  <<flight_hunt_get "lurkers" 2>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      The other lurkers leap away, and your target <span class="red">dodges your dive</span>; you catch only air. You try to grab another, but they have all fled. You return to the air empty-taloned.
+    <<option 'CN'>>
+      其他潜伏者跳着逃开了，你的目标<span class="red">躲开了你的俯冲</span>，你只抓到了空气。你试着再去捉另一只，但它们已经全逃了。你空着手回到了空中。
+  <</language>>
+  <br><br>
+  <<set _huntFail to 1>>
+  <<language>>
+    <<option 'EN'>>
+      <<childname>> gives a soft chatter, comforting you. At least <<childhim>> did not fail.
+    <<option 'CN'>>
+      <<childname>>发出小声的叽喳叫，安慰着你。至少，<<childhim>>并没有失败。
+  <</language>>
+  <<flight_hunt_get "lurkers" 1>>
+<</if>>
+<br><br>
+<<birdtower_hunt_companion_loot>>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Lurkers Lot Double []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    Eager to prove your skill, you fix your eyes on the pair of lurkers. To show that you want to strike first, you tilt to the side.
+  <<option 'CN'>>
+    想证明你的能力，你盯着那对潜伏者。为了表示你想先进攻，你向侧边倾斜。
+<</language>>
+<<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
+  <<childname>><<= $cmonster ? lanSwitch(" snorts in displeasure.","不满地哼了一声。") : lanSwitch(" clacks their beak in displeasure.","不满地敲了敲喙。")>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawks>> follow behind you.
+    <<option 'CN'>>
+      <<babyhawks>>跟在你的身后。
+  <</language>>
+<</if>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    You keep circling from above, waiting for the perfect moment. You see it; your hunting instinct takes over, and you begin to dive.
+  <<option 'CN'>>
+    你继续从高处盘旋，等待完美的时机。你看到它了，你的狩猎本能开始发挥作用，你开始俯冲。
+<</language>>
+<br><br>
+<<set _Double to 1200-maplebirch.get('BirdTower').party.length*50>>
+<<dancedifficulty 300 _Double true>>
+<<if $danceSuccess>>
+  <<language>>
+    <<option 'EN'>>
+      You move fast, <span class="green">fast enough to catch them before they recover.</span> The other lurker leaps up, trying to escape, but it is too slow. <<childname>> catches it in midair. You fly into the clouds, and your child follows you.
+    <<option 'CN'>>
+      你的动作很快，<span class="green">足够在它们恢复前就抓住了它们。</span>另一只潜伏者跳了起来，想要逃跑，但它的动作太慢了。<<childname>>在半空抓住了它。你飞进了云层中，你的孩子也跟上了你。
+  <</language>>
+  <<flight_hunt_get "lurkers" 3>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <span class="red">But you are too slow.</span> The other lurkers leap up and intercept you. You veer off course and land on your side.
+    <<option 'CN'>>
+      <span class="red">但是你太慢了。</span>其他的潜伏者跳起来拦截了你。你偏离了路径，侧身落地。
+  <</language>>
+  <<pain 3>><<gpain>>
+  <br><br>
+  <<language>>
+    <<option 'EN'>>
+      Before the lurkers can leap onto you, a screech cuts through the air. <<babyhawks>> dive into the midst of the lurker group, trying to catch prey in the chaos. You brush the dust off yourself and take off again. <<childname>> flies to your side, and <<childHe>> seems to have missed <<childhis>> prey as well.
+    <<option 'CN'>>
+      没等潜伏者跳到你身上，一声尖鸣划破了空气。<<babyhawks>>猛扑到潜伏者群当中，试图在混乱的局面里抓住猎物。你拍了拍身上的尘土，重新起飞。<<childname>>飞到你身边，<<childHe>>似乎也错失了<<childhis>>的猎物。
+  <</language>>
+  <<set _huntFail to 1>>
+<</if>>
+<br><br>
+<<birdtower_hunt_companion_loot>>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Lurkers Lot Group []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    Eager to prove your skill, you fix your eyes on the whole group of lurkers. To show that you want to strike first, you tilt to the side.
+  <<option 'CN'>>
+    想证明你的能力，你盯着整群潜伏者。为了表示你想先进攻，你向侧边倾斜。
+<</language>>
+<<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
+  <<childname>><<= $cmonster ? lanSwitch(" snorts in displeasure.","不满地哼了一声。") : lanSwitch(" clacks their beak in displeasure.","不满地敲了敲喙。")>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawks>> follow behind you.
+    <<option 'CN'>>
+      <<babyhawks>>跟在你的身后。
+  <</language>>
+<</if>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    You keep circling high above, waiting for the perfect moment. You see it; your hunting instinct takes over. You let out a shriek and begin to dive.
+  <<option 'CN'>>
+    你继续在高处盘旋，等待完美的时机。你看到它了，你的狩猎本能开始发挥作用。你发出一声尖叫，然后开始俯冲。
+<</language>>
+<br><br>
+<<dancedifficulty 600 1200 true>><<tendingdifficulty 1 700 true>>
+<<if $danceSuccess and $tendingSuccess>>
+  <<language>>
+    <<option 'EN'>>
+      <span class="green">In an instant, terror has nowhere left to hide.</span> Your shriek paralyzes the lurkers. You are fast enough to catch them before they recover. Your senses are sharper than ever. You grab a lurker in each hand, ready to return to the sky. But you spot another lurker within reach, and your body moves on its own; your feet come down right on it, and you catch that one too. <<childname>> snatches one in the air. You climb into the clouds and reunite with your child.
+    <<option 'CN'>>
+      <span class="green">刹那间，恐怖无处遁形。</span>你的尖叫声让潜伏者们瘫痪。你速度极快，足以在它们恢复之前抓住它们。你的感官前所未有地敏锐。你两手各抓住一个潜伏者，准备重返天空。但你瞄到范围内的另一只潜伏者，身体自行移动，双脚直接踩上去，也抓到了它。<<childname>>在空中捕捉到一个。你升上云端，和你的孩子会合。
+  <</language>>
+  <<flight_hunt_get "lurkers" 4>>
+  <<earnFeat "Feather Trick">>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <span class="red">But you are too slow.</span> The other lurkers leap up and intercept you. You veer off course and land on your side.
+    <<option 'CN'>>
+      <span class="red">但是你太慢了。</span>其他的潜伏者跳起来拦截了你。你偏离了路径，侧身落地。
+  <</language>>
+  <<pain 3>><<gpain>>
+  <br><br>
+  <<language>>
+    <<option 'EN'>>
+      Before the lurkers can leap onto you, a screech cuts through the air. <<babyhawks>> dive into the midst of the lurker group, trying to catch prey in the chaos. You brush the dust off yourself and take off again. <<childname>> flies back to your side with empty talons, seeming to have missed <<childhis>> prey as well.
+    <<option 'CN'>>
+      没等潜伏者跳到你身上，一声尖鸣划破了空气。<<babyhawks>>猛扑到潜伏者群当中，试图在混乱的局面里抓住猎物。你拍了拍身上的尘土，重新起飞。<<childname>>空着爪子飞回你身边，似乎也错失了<<childhis>>的猎物。
+  <</language>>
+  <<set _huntFail to 1>>
+<</if>>
+<br><br>
+<<birdtower_hunt_companion_loot>>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Lurkers Few []
+<<effects>><<childSelect $BirdTower.hunt.leader>>
+<<language>>
+  <<option 'EN'>>
+    The lurker moves quite fast, darting between the bushes. You do not think you can catch it in flight.
+    You could wait for it to stop and then ambush it, or chase it on the ground.
+  <<option 'CN'>>
+    潜伏者移动得相当快，在灌木丛之间穿梭。你不认为你能在飞行中抓住它。
+    你可以等到它停下来再伏击它，或者是在地面上追击它。
+<</language>>
+<br><br>
+<<if maplebirch.get('BirdTower').leaderTrait is "clever">>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawks>> wait, wanting to see what you will do.
+    <<option 'CN'>>
+      <<babyhawks>>等待着，想要看你会怎么做。
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawks>> stare intently at the bushes, talons flexing lightly, eager and clearly itching to hunt this lurker.
+    <<option 'CN'>>
+      <<babyhawks>>紧盯着灌木丛的动静，爪子轻轻地虚握着，显得跃跃欲试，似乎迫不及待地想要捕猎这只潜伏者。
+  <</language>>
+<</if>>
+<br><br>
+<!-- 小鹰自己拿东西 -->
+<<set _athlDiffMin to Math.max(0, $bird.hunts.weight - maplebirch.get('BirdTower').party.length) * 50>>
+<<set _athlDiffMax to (_athlDiffMin + 500)>>
+<<set $skulduggerydifficulty to 500>>
+<<if maplebirch.get('BirdTower').leaderTrait isnot "clever">>
+  <<lanLink ["Let your child hunt", "让你的孩子捕猎"] "Deadwood BirdTower Hunt Lurkers Few PokemonGo">><</lanLink>>
+  <br>
+<</if>>
+<<lanLink ["Ambush", "伏击"] "Deadwood BirdTower Hunt Lurkers Few Ambush">><</lanLink>><<skulduggerydifficulty>>
+<br>
+<<lanLink ["Chase", "追赶"] "Deadwood BirdTower Hunt Lurkers Few Chase">><</lanLink>><<athleticsdifficulty _athlDiffMin _athlDiffMax>>
+<br>
+:: Deadwood BirdTower Hunt Lurkers Few PokemonGo []
+<<switch $speech_attitude>>
+  <<case "bratty">>
+    <<language>>
+      <<option 'EN'>>
+        You point at the lurker on the ground and command your
+      <<option 'CN'>>
+        你指着地面上的潜伏者，指挥你的
+    <</language>>
+    <<= $cmonster ? lanSwitch("harpy chick","小哈比") : lanSwitch("hawk chick","小鹰")>>
+    <<language>>
+      <<option 'EN'>>
+        . "I choose you, <<childname>>! Go!"
+      <<option 'CN'>>
+        。"就决定是你了，<<childname>>！去吧！"
+    <</language>>
+  <<case "meek">>
+    <<language>>
+      <<option 'EN'>>
+        "Y-you can go if <<babyhawksyou>> want to try." You circle around <<babyhawks>>, encouraging <<babyhawksthem>>.
+      <<option 'CN'>>
+        "你、<<babyhawksyou>>想试试的话就去吧。"你绕着<<babyhawks>>飞行，鼓励<<babyhawksthem>>。
+    <</language>>
+  <<case "neutral">>
+    <<language>>
+      <<option 'EN'>>
+        "Go on, <<babyhawksyou>>." You chuckle. "Show me what <<babyhawksyou>> can do."
+      <<option 'CN'>>
+        "<<babyhawksyou>>去吧。"你窃笑，"让我看看<<babyhawksyou>>的本事。"
+    <</language>>
+<</switch>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    <<babyhawks>> let out a screech and dive down at the prey from high above. The lurker notices <<babyhawksthem>> at once and starts to flee.
+    <br><br>
+    It is agile and keeps changing direction, leaving the
+  <<option 'CN'>>
+    <<babyhawks>>尖鸣一声，从高空向猎物俯冲而去。潜伏者立刻注意到了<<babyhawksthem>>，并且开始逃跑。
+    <br><br>
+    它的动作敏捷，反复改变移动的方向，把追逐在后面的
+<</language>>
+<<= $cmonster ? lanSwitch("harpy chick","小哈比") : lanSwitch("hawk chick","小鹰")>>
+<<if maplebirch.get('BirdTower').party.length gt 1>>
+  <<language>>
+    <<option 'EN'>>
+      s
+    <<option 'CN'>>
+      们
+  <</language>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    chasing behind it far behind.
+  <<option 'CN'>>
+    甩开一大截距离。
+<</language>>
+<<if maplebirch.get('BirdTower').selectTrait("clumsy")>>
+  <<language>>
+    <<option 'EN'>>
+      <<childrenNames _tempIDs>> lose their balance in a sharp turn and crash face-first into the ground.
+    <<option 'CN'>>
+      <<childrenNames _tempIDs>>在一个猛地急转弯之下失去平衡，脸着地撞向了地面。
+  <</language>>
+  <br>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    <<babyhawksthem>> shriek and make one last lunge at the lurker, but it darts into a crevice and vanishes.
+    <br><br>
+    <<babyhawks>> return to your side with dejected calls. You soothe <<babyhawksthem>> for a while.
+  <<option 'CN'>>
+    <<babyhawksthem>>尖啸着，最后一次猛扑潜伏者，但它飞快钻入了一条缝隙，消失不见了。
+    <br><br>
+    <<babyhawks>>懊丧地低鸣，飞回了你的身边。你安抚了<<babyhawksthem>>好一会儿。
+<</language>>
+<br><br>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Lurkers Few Ambush []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You wait for the lurker to settle down to rest, then land quietly. You memorize its position and sneak toward it carefully.
+  <<option 'CN'>>
+    你等待潜伏者开始休息，悄悄着陆。你记住了它的位置，小心地溜过去。
+<</language>>
+<<skulduggerycheck>>
+<<if $skulduggerysuccess is 1>>
+  <<language>>
+    <<option 'EN'>>
+      <span class="green">You manage to slip behind it.</span> While the lurker is unaware, you
+    <<option 'CN'>>
+      <span class="green">你成功溜到了它身后。</span>趁潜伏者浑然不觉时，你
+  <</language>>
+  <<if $farm_stage gte 10>>
+    <<language>>
+      <<option 'EN'>>
+        toss your net over it. It struggles hard inside the net,
+      <<option 'CN'>>
+        把你的网扔向它。它在网中努力挣扎，
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        leap over and grab it. It struggles in your hands,
+      <<option 'CN'>>
+        跳过去抓住它。它在你的手中挣扎，
+    <</language>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      but soon gives up.
+      <br><br>
+      <<babyhawks>> land beside you, chirping, seemingly curious about your land-creature-like hunting method.
+    <<option 'CN'>>
+      但是很快就放弃了。
+      <br><br>
+      <<babyhawks>>降落在你的身边唧唧叫着，似乎对你类似于陆地生物的捕猎方法感到好奇。
+  <</language>>
+  <<if maplebirch.get('BirdTower').leaderTrait is "clever" and $farm_stage gte 10>>
+    <<language>>
+      <<option 'EN'>>
+        <<childname>> curiously claws at your net, and you stop them just in time before they tear it.
+      <<option 'CN'>>
+        <<childname>>好奇地用爪子抓挠你的网，在抓破网兜前被你及时制止了。
+    <</language>>
+  <</if>>
+  <br><br>
+  <<flight_hunt_get "lurkers" 1>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      Just as you reach where it was, you <span class="red">come up empty</span>. It must have heard you and fled.
+      <br><br>
+      <<babyhawks>> land beside you, then run off in one direction. It seems <<babyhawksthem>> saw the lurker's escape route from above. You follow <<babyhawksthem>> and chase it all the way to a large crevice in the ground.
+      <br>
+      It seems the lurker escaped through here.
+    <<option 'CN'>>
+      就在你抵达它原先在的位置时，你<span class="red">扑了个空</span>。它肯定是听见你的动静逃跑了。
+      <br><br>
+      <<babyhawks>>降落在你的身边，随后向一个方向跑去。看起来<<babyhawksthem>>从上空看到了潜伏者的逃跑方向，你跟着<<babyhawksthem>>，一路追到了地面上的一处大缝隙。
+      <br>
+      看来潜伏者从这里逃走了。
+  <</language>>
+  <<set _huntFail to 1>>
+<</if>>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Lurkers Few Chase []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You land near it and start running. The lurker notices you at once and starts to flee.
+  <<option 'CN'>>
+    你降落在它附近，开始奔跑。潜伏者立刻注意到了你，并且开始逃跑。
+<</language>>
+<<if $athleticsSuccess>>
+  <<language>>
+    <<option 'EN'>>
+      <span class="green">You manage to keep up with it.</span> Soon the creature is within arm's reach. You jump on it and hold it fast. It struggles for a while, but soon gives up.
+      <br><br>
+      <<babyhawks>> land nearby, chirping happily for you.
+    <<option 'CN'>>
+      <span class="green">你设法跟上了它。</span>很快，这只生物就进入了你触手可及的范围内。你跳上并牢牢抓住了它。它挣扎了一会，但很快就放弃了。
+      <br><br>
+      <<babyhawks>>降落在一旁，为你高兴地叽喳叫着。
+  <</language>>
+  <br><br>
+  <<flight_hunt_get "lurkers" 1>>
+  <<babyhawk_hunt_return>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <span class="red">The lurker is simply too fast.</span> It slips away faster still, and in no time you are left behind in frustration.
+      <br><br>
+      You return to <<babyhawks>>, and <<babyhawksthem>> chatter around you.
+    <<option 'CN'>>
+      <span class="red">潜伏者实在是太快了。</span>它溜得更快，不一会你就被懊丧地甩开。
+      <br><br>
+      你回到<<babyhawks>>身边，<<babyhawksthem>>围绕着你叽喳叫。
+  <</language>>
+  <br><br>
+  <<set _huntFail to 1>>
+  <<babyhawk_hunt_return>>
+<</if>>

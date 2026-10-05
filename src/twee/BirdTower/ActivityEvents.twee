@@ -1,0 +1,1050 @@
+:: Deadwood BirdTower Activity Events []
+<<effects>>
+<<childSelect $childActivityEvent.childid>>
+<<childAge $childActivityEvent.childid>>
+<<childInteratedWith>>
+<<set $childRecords[$childActivityEvent.childid].development.event to false>>
+<<switch $childActivityEvent.event>>
+  <<case "Hawk_weather_cold">>
+    <<set _multi to maplebirch.get('BirdTower').at($childRecords[$childActivityEvent.childid].development.location).some(child => child.childId isnot $childActivityEvent.childid)>>
+    <<language>>
+      <<option 'EN'>>
+        You pick <<childname>> up and try to warm <<childhim>> with <<if $harpy gte 6 and ($transformationParts.bird.wings isnot "hidden" or $transformationParts.bird.plumage isnot "hidden")>>your feathers<<else>>your arms<</if>>.
+        <br>
+        <<childHe>> soon stops shivering and lies in your arms breathing slowly. When you feel it is enough and want to put <<childhim>> back in the nest, <<childhe>> starts shivering again the moment <<childhe>> leaves your arms.<<if _multi>> The other children also come close, shivering as they huddle together for warmth.<</if>>
+      <<option 'CN'>>
+        你抱起<<childname>>，试图用<<if $harpy gte 6 and ($transformationParts.bird.wings isnot "hidden" or $transformationParts.bird.plumage isnot "hidden")>>你的羽毛<<else>>你的怀抱<</if>>温暖<<childhim>>。
+        <br>
+        <<childHe>>很快就停止了颤抖，趴在你的怀里缓慢地呼吸。你觉得差不多了，想把<<childhim>>放回巢里，但<<childhe>>一离开你的怀抱就又开始颤抖起来。<<if _multi>>其他孩子也凑到你们身边，瑟瑟发抖着挤成一团取暖。<</if>>
+    <</language>>
+    <br>
+    <<if ($bird.materials.wood gte 1 or $bird.materials.sticks gte 1) and $bird.upgrades.firepit gte 1>>
+      <<language>>
+        <<option 'EN'>>
+          You look around and dig <<= $bird.materials.wood gte 1 ? "a piece of wood" : "a stick">> out of your pile of spoils and add it to the firepit.
+          The burning firepit gradually warms the whole tower.
+          <br><br>
+          You sit beside <<= _multi ? "the children" : "<<childname>>">>, holding <<= _multi ? "them" : "<<childhim>>">> and enjoying the warmth of the flames for a while.
+        <<option 'CN'>>
+          你环顾四周，从你的战利品堆里翻出了<<= $bird.materials.wood gte 1 ? "一块木头" : "一根木棍">>加入了火坑里。
+          燃烧的火坑让整个高塔都逐渐暖和了起来。
+          <br><br>
+          你坐在<<= _multi ? "孩子们" : "<<childname>>">>身边，抱着<<= _multi ? "他们" : "<<childhim>>">>享受了一会儿火焰的温暖。
+      <</language>>
+      <<lstress>><<stress -5>>
+      <<if Weather.bodyTemperature lt 37.5>>
+        <<set Weather.bodyTemperature to 37.5>>
+      <</if>>
+      <<if $bird.materials.wood gte 1>>
+        <<set $bird.materials.wood-->>
+        <<run Cooker.addBurnTime($bird.firepit, 240 * 60)>>
+      <<else>>
+        <<set $bird.materials.sticks-->>
+        <<run Cooker.addBurnTime($bird.firepit, 60 * 60)>>
+      <</if>>
+      <<run Weather.Observables.checkForUpdate()>>
+    <<elseif $bird.upgrades.firepit gte 1>>
+      <<language>>
+        <<option 'EN'>>
+          Maybe you should light the firepit. You search your pile of spoils and find there is no spare wood or sticks left at home.
+          <br>
+          You have no choice but to hold <<childname>> a while longer, hoping this will help <<childhim>> get a little warmer.
+        <<option 'CN'>>
+          也许你应该把火坑点燃。你翻找你的战利品堆，却发现家里没有多余的木头或木棍了。
+          <br>
+          你只好再抱了一会儿<<childname>>，希望这能帮助<<childhim>>再暖和一点。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          In this cold and empty tower, you have nothing to warm yourself with.
+        <<option 'CN'>>
+          在这个寒冷又空旷的高塔里，你没有什么能用来取暖的。
+      <</language>>
+      <<gstress>><<stress 3>>
+      <<language>>
+        <<option 'EN'>>
+          <br>
+          You have no choice but to hold <<childname>> a while longer, hoping the weather will warm up soon.
+        <<option 'CN'>>
+          <br>
+          你只好再抱了一会儿<<childname>>，期盼着天气能够早日转暖。
+      <</language>>
+    <</if>>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "sleeping">>
+  <<case "Hawk_weather_hot">>
+    <<language>>
+      <<option 'EN'>>
+        You pick <<childname>> up and carry <<childhim>> into the rainwater pool,
+        <<if $bird.upgrades.pot is 3 and getBirdBurnTime() gt 0>>
+          even though the rainwater pool has been heated by you, soaking in it is more comfortable than staying in the stuffy air.
+        <<else>>
+          the cool water makes you both feel much better.
+        <</if>>
+      <<option 'CN'>>
+        你抱起<<childname>>走进雨水池，
+        <<if $bird.upgrades.pot is 3 and getBirdBurnTime() gt 0>>
+          哪怕雨水池被你加热了，泡在里面也比待在闷热的空气中舒服。
+        <<else>>
+          凉爽的水流让你们都舒服了许多。
+        <</if>>
+    <</language>>
+    <<if Weather.bodyTemperature gt 38>>
+      <<set Weather.bodyTemperature to 38>>
+    <</if>>
+    <<set _otherIDs to maplebirch.get('BirdTower').at($childRecords[$childActivityEvent.childid].development.location).filter(child => child.childId isnot $childActivityEvent.childid and ["batheSelf", "weather"].includes(child.development.activity)).map(child => child.childId)>>
+    <<run _otherIDs.forEach(id => $childRecords[id].development.activity = "rest")>>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+    <<set _multi to _otherIDs.length gt 0>>
+    <<if _multi>>
+      <<language>>
+        <<option 'EN'>>
+          <<childrenNames _otherIDs>> follow you in too, plunging into the rainwater pool and beating their wings.
+        <<option 'CN'>>
+          <<childrenNames _otherIDs>>也跟上你们，扑进雨水池里拍打着翅膀。
+      <</language>>
+    <</if>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        You help <<childname>> wash <<childhis>> feathers and clean off the grime.<<if _multi>> The other children splash about at the side, sending some of the water over you. <<childname>> splashes back.<<else>> <<childname>> splashes a little water at you too.<</if>>
+      <<option 'CN'>>
+        你帮<<childname>>擦洗<<childhis>>的羽毛，清洗掉身上的污垢。<<if _multi>>其他孩子在一旁拍打水面，让一些水流溅在你们身上。<<childname>>予以回击。<<else>><<childname>>也用小小的水花泼向你。<</if>>
+    <</language>>
+    <<lstress>><<stress -5>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        You play in the water for a good while before leaving the rainwater pool.
+      <<option 'CN'>>
+        你们玩了好一会儿水才从雨水池里离开。
+    <</language>>
+  <<case "Hawk_weather_mild">>
+    <<language>>
+      <<option 'EN'>>
+        You sit down beside <<childname>>.
+        <br>
+        You follow <<childhis>> gaze outward,
+        <<switch Weather.name>>
+          <<case "clear" "lightClouds">>
+            the sky is clear now, the sunlight bright. <<childname>> stares intently into the distance, <<childhis>> feathers swaying gently in the wind, as if summoned by the sky.
+          <<case "heavyClouds">>
+            thick clouds fill the sky now. <<childname>> stares unmoving at the heavens, and only after a good while do you notice <<childhis>> head slowly following a cloud shaped like <<print either(lanSwitch("an elk", "麋鹿"),lanSwitch("a wing", "翅膀"),lanSwitch("something you cannot name", "某种你说不出来的"),lanSwitch("a young hawk", "小鹰"),lanSwitch("a puppy", "小狗"),lanSwitch("cotton candy", "棉花糖"),lanSwitch("a kitten", "小猫"),lanSwitch("a star", "星星"),lanSwitch("a horse", "马匹"),lanSwitch("a pillow", "枕头"))>>.
+          <<case "lightPrecipitation">>
+            <<= Weather.precipitation is "rain" ? "A light rain is falling with a soft patter." : "Snowflakes are drifting through the air.">><<childname>> shifts and squeezes into your arms, watching the scenery outside curiously.
+          <<case "heavyPrecipitation">>
+            <<= Weather.precipitation is "rain" ? "It is pouring outside." : "A blizzard blankets the whole sky.">><<childname>> trembles slightly; you tuck <<childhe>> into your arms and watch the wind-ravaged sky together.
+          <<case "thunderStorm">>
+            Lightning tears a bright gash across the clouds. <<childname>>'s feathers puff up slightly, and <<childhe>> stares at the dark clouds without blinking, waiting for the next clap of thunder or flash of lightning.
+        <</switch>>
+      <<option 'CN'>>
+        你在<<childname>>身边坐下。
+        <br>
+        你随着<<childhis>>的目光向外望去，
+        <<switch Weather.name>>
+          <<case "clear" "lightClouds">>
+            此时天空晴朗，阳光明媚。<<childname>>专注地看着远方，<<childhis>>的羽毛在风中轻轻摇曳，好像正受到天空的召唤。
+          <<case "heavyClouds">>
+            此时的空中密布着厚厚的云层。<<childname>>一动不动地盯着天空，好一会儿你才发现<<childhis>>的脑袋正跟随着一朵<<print either("麋鹿","翅膀","某种你说不出来的","小鹰","小狗","棉花糖","小猫","星星","马匹","枕头")>>形状的云团缓慢转动。
+          <<case "lightPrecipitation">>
+            <<= Weather.precipitation is "rain" ? "小雨正淅淅沥沥地下着。" : "空中正飘散着朵朵雪花。">><<childname>>挪动身体挤进你的怀里，好奇地看着外面的风景。
+          <<case "heavyPrecipitation">>
+            <<= Weather.precipitation is "rain" ? "外面正大雨倾盆。" : "暴风雪笼罩着整片天空。">><<childname>>有些轻微地颤抖着，你把<<childhe>>揣进怀里，和<<childhe>>一起观赏着狂风肆虐的天空。
+          <<case "thunderStorm">>
+            闪电在云层上撕开一道明亮的口子。<<childname>>的羽毛微微炸起，<<childhe>>一眨不眨地盯着乌云，期待着下一声惊雷或是闪电的到来。
+        <</switch>>
+    <</language>>
+    <<lstress>><<stress -5>>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+  <<case "Hawk_build">>
+    <<childSelect $childActivityEvent.childid>>
+    <<language>>
+      <<option 'EN'>>
+        <<your_bird_text>> is carefully adjusting the twigs in the nest, while <<childname>> follows behind <<bhim>>,
+      <<option 'CN'>>
+        <<your_bird_text>>正小心翼翼地重新调整巢里的小树枝，而<<childname>>跟在<<bhim>>身后，
+    <</language>>
+    <<switch $childRecords[$childActivityEvent.childid].development.trait>>
+      <<case "clumsy">>
+        <<language>>
+          <<option 'EN'>>
+            chattering, seemingly wanting <<bhe>> to play with <<him>>. <<GreatHawk>> turns and <<= $monster ? "pats <<childhis>> head" : "gently pecks <<childhim>>">>,
+          <<option 'CN'>>
+            叽喳叫着，似乎想要<<bhe>>陪自己玩。<<GreatHawk>>转身<<= $monster ? "摸了摸<<childhis>>的脑袋" : "轻轻啄了啄<<childhim>>">>，
+        <</language>>
+      <<case "sympathy">>
+        <<language>>
+          <<option 'EN'>>
+            chattering, seemingly wanting <<bhe>> to play with <<him>>. <<GreatHawk>> turns and <<= $monster ? "pats <<childhis>> head" : "gently pecks <<childhim>>">>,
+          <<option 'CN'>>
+            叽喳叫着，似乎想要<<bhe>>陪自己玩。<<GreatHawk>>转身<<= $monster ? "摸了摸<<childhis>>的脑袋" : "轻轻啄了啄<<childhim>>">>，
+        <</language>>
+      <<case "clever">>
+        <<language>>
+          <<option 'EN'>>
+            helping <<= $cmonster ? "carry" : "hold">> one of the twigs. <<GreatHawk>> turns and takes the twig from <<childhis>> <<= $cmonster ? "hand" : "beak">>, and <<= $monster ? "pats <<childhis>> head" : "gently pecks <<childhim>>">> encouragingly,
+          <<option 'CN'>>
+            帮忙<<= $cmonster ? "拿" : "衔">>着其中一根小树枝。<<GreatHawk>>转身从<<childhis>><<= $cmonster ? "手" : "嘴">>里接过树枝，鼓励地<<= $monster ? "摸了摸<<childhis>>的脑袋" : "轻轻啄了啄<<childhim>>">>，
+        <</language>>
+      <<case "dominant">>
+        <<language>>
+          <<option 'EN'>>
+            trying to grab <<bhis>> tail. <<GreatHawk>> keeps turning in the nest and makes <<childhim>> circle after <<bhim>>, until in the end <<childname>> has to sit dizzily back down in the nest. <<GreatHawk>> <<= $monster ? "chuckles softly" : "gives a triumphant coo">>,
+          <<option 'CN'>>
+            试图抓住<<bhis>>的尾巴。<<GreatHawk>>在巢里不断转身，让<<childhim>>跟着自己转圈，到最后<<childname>>不得不晕乎乎地坐回巢里。<<GreatHawk>><<= $monster ? "轻轻笑了笑" : "发出一声胜利的咕咕叫">>，
+        <</language>>
+      <<default>>
+        <<language>>
+          <<option 'EN'>>
+            pulling one of the twigs out of the nest. <<GreatHawk>> tries to take the twig from <<childhis>> <<= $cmonster ? "hand" : "beak">>, but <<childhim>> <<= $cmonster ? "clutches" : "holds">> onto it tightly and will not let go.
+            <br>
+            <<bhe>> has no choice but to pick up another twig,
+          <<option 'CN'>>
+            正从巢里拔出其中一根小树枝。<<GreatHawk>>试图从<<childhis>><<= $cmonster ? "手" : "嘴">>里拿走树枝，但<<childhim>>紧紧<<= $cmonster ? "抓" : "叼">>着树枝不愿松开。
+            <br>
+            <<bhe>>只好选择拿起另一根小树枝，
+        <</language>>
+    <</switch>>
+    <<language>>
+      <<option 'EN'>>
+        and goes back to <<bhis>> nest-building with <<bhis>> head down.
+      <<option 'CN'>>
+        埋头继续<<bhis>>的筑巢工作。
+    <</language>>
+    <<lstress>><<stress -5>>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+  <<case "Hawk_brood">>
+    <<if $childRecords[$childActivityEvent.childid].development.location is "tower">>
+      <<language>>
+        <<option 'EN'>>
+          You walk over and try to catch <<childname>>, who is stubbornly trying to squeeze under <<your_bird_text>>.
+          <br>
+          <<GreatHawk>> opens <<bhis>> eyes. <<if $monster is 1>>"<<Wife>>? It's fine."<</if>><<bhe>> rises a little, fluffs up <<bhis>> feathers, carefully shifts the eggs beneath <<bhim>>, then tucks the eggs and <<childname>> together into <<bhis>> soft plumage.
+          <br>
+          The sound of <<childname>>'s quiet chattering complaints vanishes at once; <<childhe>> closes <<childhis>> eyes and falls asleep comfortably under <<your_bird_text>>.
+        <<option 'CN'>>
+          你走向他们，试图抓住一股劲往<<your_bird_text>>身下钻的<<childname>>。
+          <br>
+          <<GreatHawk>>睁开眼睛，<<if $monster is 1>>"<<Wife>>？没关系的。"<</if>><<bhe>>略微起身，抖松羽毛，小心地挪动身下的蛋，随后把蛋和<<childname>>一起塞到了<<bhe>>柔软的羽毛里。
+          <br>
+          <<childname>>小声叽喳抱怨的声音立刻消失了，<<childhe>>闭上眼睛，舒舒服服地在<<your_bird_text>>身下睡着了。
+      <</language>>
+      <<lstress>><<stress -5>>
+      <<set $childRecords[$childActivityEvent.childid].development.activity to "sleepingWithGreatHawk">>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          You walk over and take <<childname>> in your arms, stroking <<childhis>> feathers. <<childHis>> eyes stay fixed on your egg, seemingly very curious.
+          <br>
+          <<if $monster is 1>>"<<childname>> is looking forward to new siblings too."<</if>><<your_bird_text>> coos softly, <<= $monster ? "gently pats <<childname>>'s head" : "gently nuzzles <<childname>>, looking just as eager for new life as <<childhim>>">>.
+        <<option 'CN'>>
+          你走向他们，把<<childname>>抱在怀里轻抚羽毛。<<childHis>>的眼睛一直盯着你们的蛋，似乎很好奇。
+          <br>
+          <<if $monster is 1>>"<<childname>>也很期待新的兄弟姐妹。"<</if>><<your_bird_text>>轻柔地颤鸣，<<= $monster ? "温柔地摸了摸<<childname>>的脑袋" : "温柔地蹭了蹭<<childname>>，看起来和<<childhim>>一样期待新生命的诞生">>。
+      <</language>>
+      <<lstress>><<stress -5>>
+      <<language>>
+        <<option 'EN'>>
+          <br>
+          After holding <<childhim>> for a while, you put <<childname>> back in <<childhimself>>'s nest.
+        <<option 'CN'>>
+          <br>
+          抱了一会儿，你把<<childname>>放回了<<childhimself>>的巢里。
+      <</language>>
+      <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+    <</if>>
+  <<case "Hawk_rest">>
+    /* 受伤和怀孕中的差分 */
+    <<if $bird.injured gt 1>>
+      <<if $monster>>
+        <<language>>
+          <<option 'EN'>>
+            You hear the harpy speaking softly to <<childname>>.
+            <br>
+            "<<print either(lanSwitch("Watch out for those dangerous things.", "小心那些危险的存在。"),lanSwitch("Touch gently, alright? It still hurts...", "轻轻地碰，好吗？还很疼……"))>>" <<bHe>> slowly spreads <<bhis>> wings and shows <<childname>> <<bhis>> wound.
+          <<option 'CN'>>
+            你听见哈比低声对<<childname>>说着什么。
+            <br>
+            "<<print either("小心那些危险的存在。","轻轻地碰，好吗？还很疼……")>>"<<bHe>>缓慢地展开自己的翅膀，向<<childname>>展示<<bhis>>的伤口。
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            You see the Great Hawk slowly spread <<bhis>> wings, <<print either(lanSwitch("anxiously", "担忧地"),lanSwitch("sternly", "严肃地"))>> cooing as <<bhe>> shows <<childname>> <<bhis>> wound.
+            <br>
+            Perhaps <<bHe>> is <<print either(lanSwitch("warning", "告诫"),lanSwitch("teaching", "教导"))>> your child.
+          <<option 'CN'>>
+            你看到巨鹰缓慢地展开自己的翅膀，一边<<print either("担忧地","严肃地")>>轻鸣着，一边向<<childname>>展示<<bhis>>的伤口。
+            <br>
+            <<bHe>>或许是在<<print either("告诫","教导")>>你们的孩子。
+        <</language>>
+      <</if>>
+      <br>
+      <<language>>
+        <<option 'EN'>>
+          <<childname>> curiously touches <<bhim>> lightly, trying to help <<bhim>> smooth out some tangled feathers. <<your_bird_text>> <<= $monster ? "shakes <<bhis>> head" : "shakes <<bhis>> head">>, and folds <<bhis>> wings.
+        <<option 'CN'>>
+          <<childname>>好奇地轻碰<<bhim>>，试图帮<<bhim>>理开一些纠缠的羽毛。<<your_bird_text>><<= $monster ? "摇摇头" : "晃晃脑袋">>，收起了翅膀。
+      <</language>>
+    <<else>>
+      <<if $monster>>
+        <<language>>
+          <<option 'EN'>>
+            You hear the harpy speaking softly to <<childname>>.
+            <br>
+            "<<print either(lanSwitch("In there? It's an egg.", "这里面？是蛋。"),lanSwitch("There will be new siblings soon.", "很快就要有新的兄弟姐妹了。"),lanSwitch("Touch gently, alright?", "轻轻地碰，好吗？"))>>" <<bHe>> lightly strokes <<bellyDescription "Great Hawk">>.
+          <<option 'CN'>>
+            你听见哈比低声对<<childname>>说着什么。
+            <br>
+            "<<print either("这里面？是蛋。","很快就要有新的兄弟姐妹了。","轻轻地碰，好吗？")>>"<<bHe>>轻轻抚摸着<<bellyDescription "Great Hawk">>。
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            You see the Great Hawk lift <<bhis>> wings, cooing as <<bhe>> shows <<childname>> <<bhis>> <<bellyDescription "Great Hawk">>.
+          <<option 'CN'>>
+            你看到巨鹰抬起自己的翅膀，轻鸣着向<<childname>>展示<<bhis>>的<<bellyDescription "Great Hawk">>。
+        <</language>>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          <<childname>> curiously <<= $cmonster ? "strokes" : "nuzzles">> <<bhis>> belly.
+          You walk over and gather your <<nnpc_wife "Great Hawk">> and the child together into a hug.
+          <br>
+          You huddle together and enjoy a while of quiet time.
+        <<option 'CN'>>
+          <<childname>>好奇地<<= $cmonster ? "抚摸" : "轻蹭">><<bhis>>的肚皮。
+          你走向他们，把你的<<nnpc_wife "Great Hawk">>和孩子一起揽入一个拥抱里。
+          <br>
+          你们围成一团，一起享受了一会儿平静的时光。
+      <</language>>
+      <<lstress>><<stress -5>>
+    <</if>>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+  <<case "begHawk">>
+    <<set _begRoll to random(1,4)>>
+    <<if _begRoll isnot 4 and !maplebirch.get('BirdTower').feed($childActivityEvent.childid).length>>
+      <<set _begRoll to 4>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        You dig a lurker out of the pile of spoils and tear off pieces of meat with your hands to feed <<childname>>.
+      <<option 'CN'>>
+        你从战利品堆里掏出一只潜伏者，用手撕下一块块肉喂给<<childname>>。
+    <</language>>
+    <<switch _begRoll>>
+      <<case 1>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> seems to have a bigger appetite than usual, eating the whole lurker bite by bite. You can see <<childHis>> <<if $cmonster>>belly<<else>>crop<</if>> is stuffed full.
+          <<option 'CN'>>
+            <<childHe>>似乎比平时胃口更大，一口一口将潜伏者吃了个干净。你可以看见<<childHis>>的<<if $cmonster>>肚皮<<else>>嗦囊<</if>>鼓鼓囊囊的。
+        <</language>>
+      <<case 2>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> laboriously <<if $cmonster>>chews<<else>>pecks at<</if>> the lurker meat, and soon eats half of it.
+          <<option 'CN'>>
+            <<childHe>>费劲地<<if $cmonster>>嚼<<else>>啄食<</if>>着潜伏者肉，很快将潜伏者吃下了一半。
+        <</language>>
+      <<case 3>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>><<if $cmonster>> takes<<else>> snatches<</if>> the strip of meat, but loses interest after only a few bites.
+          <<option 'CN'>>
+            <<childHe>><<if $cmonster>>接过<<else>>叼过<</if>>肉条，没吃上几口好像就失去了胃口。
+        <</language>>
+      <<case 4>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> shuts <<childhis>> beak tight instead, and no matter how you coax <<childhim>>, <<childhe>> will not eat the lurker meat you hold up to <<childhis>> beak.
+          <<option 'CN'>>
+            <<childHe>>这时却紧紧闭上了嘴，无论你怎么劝哄都不肯吃下你递到嘴边的潜伏者肉。
+        <</language>>
+    <</switch>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        After that <<childHe>> falls contentedly asleep.
+      <<option 'CN'>>
+        在这之后<<childHe>>便满足地睡去了。
+    <</language>>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "sleeping">>
+  <<case "explore">>
+    <<language>>
+      <<option 'EN'>>
+        You call <<childname>>'s name and search the tower for <<childhim>>.
+      <<option 'CN'>>
+        你喊着<<childname>>的名字，在高塔里四处寻找<<childhim>>。
+    <</language>>
+    <br>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+    <<language>>
+      <<option 'EN'>>
+        A rustling sound draws you; you look towards it and find
+      <<option 'CN'>>
+        一阵窸窸窣窣的声音吸引了你，你望向声源，发现
+    <</language>>
+    <<switch random(1,4)>>
+      <<case 1>>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> poking <<childhis>> head out of your pile of spoils.
+          <<option 'CN'>>
+            <<childname>>从你们的战利品堆里探出了头。
+        <</language>>
+        <<if maplebirch.get('BirdTower').feed($childActivityEvent.childid).length>>
+          <<language>>
+            <<option 'EN'>>
+              Half a lurker is still in <<childhe>>'s mouth.
+            <<option 'CN'>>
+              <<childhe>>的嘴里还叼着半只潜伏者。
+          <</language>>
+        <<elseif $bird.materials.valuables>>
+          <<language>>
+            <<option 'EN'>>
+              A shiny thing is balanced on top of <<childhe>>'s head.
+            <<option 'CN'>>
+              <<childhe>>的头上还顶着一块亮闪闪。
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              <<childhis>> feathers are a complete mess from <<childhe>> rummaging through the clutter.
+            <<option 'CN'>>
+              <<childhis>>的羽毛被<<childhe>>钻进杂物的行为搞得一团糟。
+          <</language>>
+        <</if>>
+      <<case 2>>
+        <<if $bird.state is "home">>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> poking <<childhis>> head out from under your mate's wings. The Great Hawk does not seem bothered by <<childhim>> burrowing around under <<bhim>>.
+            <<option 'CN'>>
+              <<childname>>从你的配偶的翅膀下探出了头。巨鹰看起来并没有被<<childhim>>在自己身下钻来钻去的行为所困扰。
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> standing on the perch, a tiny silhouette from behind. <<childHe>> is gazing out at the sky from the spot where the Great Hawk usually rests.
+            <<option 'CN'>>
+              <<childname>>站在栖木上的小小背影。<<childHe>>正在平时巨鹰待着的位置上远眺着天空。
+          <</language>>
+        <</if>>
+      <<case 3>>
+        <<if $bird.upgrades.firepit gte 1>>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> crouching in front of the firepit. <<if getBirdBurnTime() lte 0>>Even though the firepit is not lit, you can see<</if>>curious flames dancing in <<childhis>> eyes.
+            <<option 'CN'>>
+              <<childname>>正蹲在火坑面前。<<if getBirdBurnTime() lte 0>>尽管火坑没有点燃，你也能看见<</if>>好奇的火焰在<<childhis>>的眼里跳跃。
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> climbing out from under the trapdoor; <<childHe>>'s feathers are coated in a layer of dust.
+            <<option 'CN'>>
+              <<childname>>正从活板门下面钻出来，<<childHe>>的羽毛上裹了一层灰尘。
+          <</language>>
+          <<set $childRecords[$childActivityEvent.childid].development.activity to "batheSelf">>
+        <</if>>
+      <<case 4>>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> is at the bottom of the tower! You hurry down, and only after making sure <<childhe>> is unhurt do you notice
+          <<option 'CN'>>
+            <<childname>>在塔底！你连忙赶到塔底，确认<<childhe>>没有受伤后才发觉，
+        <</language>>
+        <<if $bird and $bird.upgrades and $bird.upgrades.snare gte 1 and $bird.lurkerSnareState is "captured">>
+          <<language>>
+            <<option 'EN'>>
+              <<childHe>> is staring intently at the lurker in the trap.
+            <<option 'CN'>>
+              <<childHe>>正目不转睛地盯着陷阱里的潜伏者。
+          <</language>>
+        <<elseif $bird and $bird.upgrades and $bird.upgrades.snare gte 1 and $bird.lurkerSnareState is "ready">>
+          <<language>>
+            <<option 'EN'>>
+              <<childHe>> is staring intently at the shiny thing in the trap.
+            <<option 'CN'>>
+              <<childHe>>正目不转睛地盯着陷阱里的亮闪闪。
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              <<childHe>> is staring intently at a stone pillar not far off.
+            <<option 'CN'>>
+              <<childHe>>正目不转睛地盯着不远处的一根石柱。
+          <</language>>
+        <</if>>
+    <</switch>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        It seems <<childname>> is no longer satisfied with simply staying cooped up in the nest all day.
+      <<option 'CN'>>
+        看起来<<childname>>已经不满足于单纯在巢里窝着的日子了。
+    <</language>>
+    <<lstress>><<stress -5>>
+  <<case "Fledgling_preen">>
+    <<language>>
+      <<option 'EN'>>
+        <<childname>>'s feathers have been filling out, but <<childhe>> does not seem very good at tidying them yet. You come close to <<childtype>> and comb through <<childhis>> feathers with your fingers.
+        <br>
+        <<childname>> gives a soft chirp. You begin neatening <<childhis>> feather tips, your fingertips loosening the down that is about to fall out, then smoothing the ruffled stray feathers along the direction of the plumage.
+        <<childHe>> watches you happily, <<if $cmonster>>reaching out a hand to smooth <<else>>giving a light peck to<</if>><<if $harpy gte 6 and ($transformationParts.bird.wings isnot "hidden" or $transformationParts.bird.plumage isnot "hidden")>> your feathers<<else>> your hair<</if>>. Maybe this little one is grooming you too.
+      <<option 'CN'>>
+        <<childname>>的羽毛已经逐渐丰满，但<<childhe>>似乎还不太擅长整理那些羽毛。你便靠近<<childtype>>，用手指梳理起<<childhis>>的羽毛。
+        <br>
+        <<childname>>发出了一声轻轻的啾鸣，你开始整理<<childhis>>羽端，指尖理开一些将脱未脱的绒毛，再顺着羽毛的方向抚平翘起的杂毛。
+        <<childHe>>高兴地看着你，<<if $cmonster>>伸出手捋了捋<<else>>用喙轻轻啄了啄<</if>><<if $harpy gte 6 and ($transformationParts.bird.wings isnot "hidden" or $transformationParts.bird.plumage isnot "hidden")>>你的羽毛<<else>>你的头发<</if>>。也许这个小家伙也在帮你梳理呢。
+    <</language>>
+    <<stress -4>><<lstress>>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+  <<case "Fledgling_fly">>
+    <<language>>
+      <<option 'EN'>>
+        You come close to <<childname>>, wanting to help <<childhim>> get airborne.
+      <<option 'CN'>>
+        你靠近<<childname>>，想要帮助<<childhim>>腾空。
+    <</language>>
+    <<switch random(1,3)>>
+      <<case 1>>
+        <<language>>
+          <<option 'EN'>>
+            Yet before you can touch <<childhim>>, <<childhe>> takes off with a flutter and begins hopping between the various footholds of the tower.
+          <<option 'CN'>>
+            然而，在你能接触到<<childhim>>之前，<<childhe>>便扑地腾飞了起来，开始在高塔上各个落脚点之间腾跃。
+        <</language>>
+      <<case 2>>
+        <<language>>
+          <<option 'EN'>>
+            You lift <<childhim>> out of the nest with both hands and raise <<childhim>> into the air. <<childHe>><<if $cmonster>>'s eyes light up<<else>>seems to understand what you mean<</if>>, and <<childhe>> flaps <<childhis>> wings and glides on the height difference. The moment <<childhe>> lands on the ground, <<childhe>><<if $cmonster>> reaches out a hand to you with a smile<<else>> chirps at you<</if>>, wanting another "lifts-high".
+          <<option 'CN'>>
+            你用双手把<<childhim>>从巢中抱出来，托到半空中。<<childHe>><<if $cmonster>>眼神亮了起来<<else>>似乎理解了你的意思<</if>>，扑打着翅膀借助高度差滑翔。一落到地面上，<<childhe>>便朝你<<if $cmonster>>笑着伸出手<<else>>叽叽喳喳地叫着<</if>>，想要再来一次“举高高”。
+        <</language>>
+      <<case 3>>
+        <<language>>
+          <<option 'EN'>>
+            You lift <<childhim>> out of the nest with both hands and raise <<childhim>> into the air. <<childhim>> jumps out of your palms and tries to glide on the height difference, but in the end only lands face-first on the ground.
+          <<option 'CN'>>
+            你用双手把<<childhim>>从巢中抱出来，托到半空中。<<childhim>>跳出你的手掌，试图借助高度差滑翔，但最终只是脸朝下摔在了地面上。
+        <</language>>
+    <</switch>>
+    <<lstress>><<stress -5>>
+    <br>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+  <<case "Fledgling_perch">>
+    <<language>>
+      <<option 'EN'>>
+        You come close to <<childname>>; <<childhis>> eyes are fixed on the edge of the tower, and <<childhe>> is straining eagerly to climb out of the nest. You understand at once that <<childname>> wants to go out and see the moor.
+        <br><br>
+        You stoop to pick <<childname>> up, but see <<childhe>> push off with both feet, jump out of the nest, and stand on the ground <<print either(lanSwitch("unsteadily", "颤颤巍巍"),lanSwitch("firmly", "稳稳当当"),lanSwitch("wobbling", "摇摇晃晃"))>>.
+      <<option 'CN'>>
+        你走近<<childname>>，<<childhis>>的眼睛盯着塔的边缘，正在跃跃欲试地试图从巢里爬出。你心领神会，意识到<<childname>>想出去看看荒原。
+        <br><br>
+        你弓下身，准备抱起<<childname>>，却看到<<childhe>>双爪一蹬，从巢中跳了出来，<<print either("颤颤巍巍","稳稳当当","摇摇晃晃")>>地立在地上。
+    <</language>>
+    <<if $cmonster>>
+      <<language>>
+        <<option 'EN'>>
+          You are surprised by how fast the harpy is growing. It seems <<childhis>> claws, like a hawk's, can develop grip and support in a very short time.
+          <br><br>
+          <<childname>> begins to hop step by step, flapping <<childhis>> wings wildly to keep balance, but loses <<childhis>> centre of gravity and falls to the ground. You hurry over, gather <<childhim>> into your arms, and soothe <<childhim>> as you carry <<childhim>> to the perch,
+        <<option 'CN'>>
+          你惊讶于哈比的成长速度之快。看起来<<childhis>>的爪子和鹰一样，能在很快的时间内发育出抓握和支撑能力。
+          <br><br>
+          <<childname>>开始一步一步地跳跃，胡乱地扑腾翅膀来保持平衡，却因为重心不稳摔在了地上。你赶忙把上前<<childhim>>抱在怀中，安抚着<<childhim>>来到栖木，
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          You marvel at how fast the young hawk is growing. A human infant can barely move at this age, yet <<childname>> can already hop about a little.
+          <br><br>
+          <<childname>> begins to hop step by step, flapping <<childhis>> wings wildly to keep balance, and you follow <<childhe>> step by step to the perch,
+        <<option 'CN'>>
+          你感慨于小鹰的成长速度之快。人类的婴孩在这个年纪还难以移动，而<<childname>>已经可以进行简单的跳跃了。
+          <br><br>
+          <<childname>>开始一步一步地跳跃，胡乱地扑腾翅膀来保持平衡，你一步步跟随着<<childhe>>来到栖木，
+      <</language>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        looking out over the familiar <<if Weather.isSnow>>snow-covered wilderness.<<else>>green wilderness.<</if>>
+      <<option 'CN'>>
+        俯瞰着熟悉的<<if Weather.isSnow>>被白雪覆盖的荒野。<<else>>绿色的荒野。<</if>>
+    <</language>>
+    <br><br>
+    <<if $bird.state is "home" and ["sing","groom"].includes($bird.activity)>>
+      <<npc "Great Hawk">>
+      <<language>>
+        <<option 'EN'>>
+          <<your_bird_text>> looks at you and <<childname>> in surprise. You slowly sit down beside <<bhis>> side; <<if $cmonster>>you set <<childname>> from your arms down on the perch.<<else>>you watch <<childname>> dive into <<your_bird_text>>'s arms.<</if>>
+          <br>
+          The open moor unfurls before your eyes, stretching away into infinite distance. The sky seems closer to you than the ground. You can see this view has the same effect on your child <<= $harpy gte 6 ? "and you" : "and your mate">>: the sky is calling.
+          <br><br>
+          You take a deep breath and begin to sing, note after note drifting from your mouth. It is a gentle little song, singing idly of the sky, and your mate joins in too.
+          As you hum, <<childname>>'s chirping joins in as well; the still-immature baby sounds disrupt the melody, but they are utterly adorable.
+        <<option 'CN'>>
+          <<your_bird_text>>惊讶地看着你和<<childname>>。你缓缓坐在<<bhis>>的身旁，<<if $cmonster>>将你怀中的<<childname>>放在栖木上。<<else>>看着<<childname>>扑进<<your_bird_text>>的怀里。<</if>>
+          <br>
+          开阔的荒原在你的视野内展开，延伸至无限的远方。天空与你们的距离似乎比地面还要近。你能看出这片景色对你的孩子<<= $harpy gte 6 ? "和你" : "和你的配偶">>有着相同的影响：天空在召唤。
+          <br><br>
+          你深吸一口气，开始唱歌，一音接着一音从你嘴里飘出。这是一首轻柔的小曲，随性地歌唱着天空，你的配偶也加入了你。
+          随着你们的哼唱，<<childname>>的啁啾声也加入了进来，尚未成熟的幼稚发音扰乱了旋律，但十足可爱。
+      <</language>>
+      <<stress -5>><<lstress>>
+      <<language>>
+        <<option 'EN'>>
+          <br><br>
+          Your singing goes on, and before long <<childname>>'s mind wanders and <<childhe>> stops singing, <<if $cmonster>>beginning to claw at a small branch on the perch.<<else>>beginning to worry a small branch on the perch with <<childhis>> beak.<</if>>
+        <<option 'CN'>>
+          <br><br>
+          你们的歌声持续下去，不一会儿<<childname>>便走了神，停止了鸣唱，<<if $cmonster>>开始用爪子抓挠起栖木上的一根小树杈。<<else>>开始用喙掰弄栖木上的一根小树杈。<</if>>
+      <</language>>
+      <br><br>
+      <<if $monster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            "<<childname>> is full of energy," <<your_bird_text>> looks very proud of your child.
+          <<option 'CN'>>
+            "<<childname>>很有精神，"<<your_bird_text>>看起来对你们的孩子感到很骄傲。
+        <</language>>
+      <</if>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          You sit down by the viewpoint with the best view of the grass below; <<if $cmonster>>you set <<childname>> from your arms down on the perch.<<else>>you watch <<childname>> dive onto the perch.<</if>>
+          <br><br>
+          The moment <<childhe>> lands on the perch, <<childhe>> starts exploring eagerly.<<if $cmonster>> <<childHe>> slaps and scratches at the branches with <<childhis>> hands and claws, trying to pull a leaf off the perch.<<else>> <<childHe>> scratches at the branches with <<childhis>> claws, trying to peck a leaf off the perch.<</if>>
+          <br><br>
+          You reach out and snap the leaf off, which sends <<childhe>> straining desperately to reach your arm,
+          <<switch random(1,2)>>
+            <<case 1>>
+              but in the end <<childhe>> only loses balance and tumbles into your arms. You laugh and hold <<childhe>> tight, letting the annoyed <<childname>> squirm in your arms.
+            <<case 2>>
+              and after a flurry of wings, the leaf in your hand lands in <<childhe>>'s mouth. <<childname>> looks quite proud and hops aside to play with the leaf.
+          <</switch>>
+          <br><br>
+          You sit on the perch enjoying the wind and spend a relaxed while together.
+        <<option 'CN'>>
+          你在最能欣赏下方草地的观景点旁坐下，<<if $cmonster>>将你怀中的<<childname>>放在栖木上。<<else>>看着<<childname>>扑向栖木上。<</if>>
+          <br><br>
+          一落到栖木上，<<childhe>>就兴致勃勃地探索了起来。<<if $cmonster>><<childHe>>用手和爪子拍打抓挠着树枝，试图把栖木上的一片叶子给摘下来。<<else>><<childHe>>用爪子抓挠着树枝，试图把栖木上的一片叶子啄下来。<</if>>
+          <br><br>
+          你伸手把那片叶子折下，引得<<childhe>>奋力地尝试够到你的手臂，
+          <<switch random(1,2)>>
+            <<case 1>>
+              但最终只是失去平衡扑到了你的怀里。你笑了起来，将<<childhe>>紧紧地抱住，任由懊恼的<<childname>>在你怀里挣扎。
+            <<case 2>>
+              一阵振翅之后，你手中的叶子落到了<<childhe>>的嘴里。<<childname>>看起来相当骄傲，跳到一旁玩耍起了叶片。
+          <</switch>>
+          <br><br>
+          你们坐在栖木上享受着风，度过了一段轻松的时光。
+      <</language>>
+      <<stress -5>><<lstress>>
+    <</if>>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+  <<case "Subadult_fly">>
+    <<language>>
+      <<option 'EN'>>
+        You lean on the edge of the tower and look up at the sky, watching <<childname>>'s movements in the air.
+      <<option 'CN'>>
+        你靠在塔的边缘望向天空，观察<<childname>>在空中的动作。
+    <</language>>
+    <br>
+    <<switch random(1,4)>>
+      <<case 1>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> keeps changing flight direction, practising how to control <<childhis>> wings.
+          <<option 'CN'>>
+            <<childHe>>不断改变着飞行的方向，练习如何控制自己的羽翼。
+        <</language>>
+      <<case 2>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> tries to hover in the flowing wind, buffeted back and forth by the headwind.
+          <<option 'CN'>>
+            <<childHe>>借着流风尝试在空中悬停，被迎面而来的风吹得摇摇晃晃。
+        <</language>>
+      <<case 3>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> flaps <<childhis>> wings aimlessly, circling above the tower.
+          <<option 'CN'>>
+            <<childHe>>漫无目的地拍打着翅膀，在高塔上空盘旋飞行。
+        <</language>>
+      <<case 4>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> seems to be chasing something; looking closer, you find it is a leisurely butterfly.
+          <<option 'CN'>>
+            <<childHe>>似乎追逐着什么东西，你仔细一看，发现是一只慢悠悠的蝴蝶。
+        <</language>>
+    <</switch>>
+    <<stress -5>><<lstress>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        After a little while <<childhe>> seems tired and turns to fly back to the tower.
+      <<option 'CN'>>
+        过了一小会儿，<<childhe>>似乎觉得累了，转身飞向高塔。
+    <</language>>
+    <<switch $childRecords[$childActivityEvent.childid].development.trait>>
+      <<case "clumsy">>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> fails to control <<childhis>> landing and pitches headlong into your arms.
+          <<option 'CN'>>
+            <<childHe>>降落时没能控制好落地的力度，一头哉进了你的怀里。
+        <</language>>
+      <<default>>
+        <<language>>
+          <<option 'EN'>>
+            You spread your arms, and <<childhe>> lands gently in your arms.
+          <<option 'CN'>>
+            你展开双手，<<childhe>>就轻轻落在了你的怀里。
+        <</language>>
+    <</switch>>
+    <<language>>
+      <<option 'EN'>>
+        You stroke <<childhis>> feathers and put <<childhe>> back in the nest.
+      <<option 'CN'>>
+        你轻抚<<childhis>>的羽毛，把<<childhe>>放回了巢里。
+    <</language>>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+  <<case "Subadult_preen">>
+    <<switch $childRecords[$childActivityEvent.childid].development.trait>>
+      <<case "clumsy">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> is struggling to preen <<childhis>> own feathers.
+          <<option 'CN'>>
+            <<childname>>正奋力地啄弄自己的羽毛。
+        <</language>>
+      <<default>>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> is trying to <<= $monster ? "peel" : "bite">> open some feather sheaths.
+          <<option 'CN'>>
+            <<childname>>正试图<<= $monster ? "剥" : "咬">>开一些羽鞘。
+        <</language>>
+    <</switch>>
+    <<language>>
+      <<option 'EN'>>
+        You come close to <<childtype>> and help <<childhe>> peel open some of the sheaths, releasing the new feathers.
+        <<childname>> gives a soft chirp and stays obediently still for you to groom <<childhis>> feathers, shaking <<childhis>> head and ruffling <<childhis>> plumage now and then at the ticklish touch.
+        <br>
+        When you are done, <<childHe>> gives a happy chatter and <<= $monster ? "reaches out to groom you" : "turns behind you to preen">>
+      <<option 'CN'>>
+        你靠近<<childtype>>，帮<<childhe>>轻轻剥开一些羽鞘，释放出新的羽毛。
+        <<childname>>发出了一声轻轻的啾鸣，乖巧地停在原地仍你梳理，时不时因为痒痒的触感甩甩脑袋抖抖毛。
+        <br>
+        你做完后，<<childHe>>高兴地叽喳一声，<<= $monster ? "伸出手帮你梳理" : "转到你身后啄弄">>
+    <</language>>
+    <<if $harpy gte 6 and $transformationParts.bird.wings isnot "hidden">>
+      <<language>>
+        <<option 'EN'>>
+          your feathers.
+        <<option 'CN'>>
+          你的羽毛。
+      <</language>>
+      <<stress -5>><<lstress>>
+      <<if $daily.birdSelfPreen is undefined>>
+        <<set $daily.birdSelfPreen to 1>>
+        <<set $bird.materials.feathers += 1>>
+        <<language>>
+          <<option 'EN'>>
+            Under <<childhis>> grooming, one of your feathers comes loose. <span class="teal">You take it off.</span>
+          <<option 'CN'>>
+            在<<childhis>>的梳理下，你的一根羽毛松了。<span class="teal">你拿掉了它。</span>
+        <</language>>
+      <</if>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          your hair. <<childHe>> fusses with it for a good while before stopping, then circles around you contentedly.
+        <<option 'CN'>>
+          你的头发。<<childHe>>拨弄了好一会儿才停下，满意地围着你转悠。
+      <</language>>
+      <<if $childRecords[$childActivityEvent.childid].development.stage is "Immature">>
+        <<language>>
+          <<option 'EN'>>
+            You reach up and touch your neatly groomed hair.
+          <<option 'CN'>>
+            你抬手摸了摸自己被梳理整齐的头发。
+        <</language>>
+        <<set $hairtype to "all down">>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            You reach up and touch your thoroughly messed-up hair, not sure whether to laugh or cry.
+          <<option 'CN'>>
+            你抬手摸了摸自己被搞得一团乱的头发，哭笑不得。
+        <</language>>
+        <<set $hairtype to either("ruffled","bedhead")>>
+      <</if>>
+      <<stress -5>><<lstress>>
+    <</if>>
+    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+  <<case "Subadult_perch">>
+    <<set _IDs to []>>
+    <<run getBornChildren().forEach(child => {
+        if (child.development?.activity == "Subadult_perch") {
+            T.IDs.push(child.childId);
+            child.development.activity = "rest";
+        }
+    })>>
+    <<set _multi to _IDs.length-1>>
+    <<childSelect _IDs[0]>>
+    <<run _otherIDs = _IDs.filter(item => item !== $childActivityEvent.childid)>>
+    <<language>>
+      <<option 'EN'>>
+        You follow behind <<childname>>, wanting to see what <<childhe>> is going to do.
+      <<option 'CN'>>
+        你跟在<<childname>>身后，想看看<<childhe>>要去做些什么。
+    <</language>>
+    <<switch $childRecords[$childActivityEvent.childid].development.trait>>
+      <<case "clumsy">>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> looks back at you curiously.
+          <<option 'CN'>>
+            <<childHe>>好奇地回头看了看你。
+        <</language>>
+      <<default>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> looks back at you, then keeps moving towards the perch.
+          <<option 'CN'>>
+            <<childHe>>回头看了看你，继续向栖木移动。
+        <</language>>
+    <</switch>>
+    <<if _multi>>
+      <<language>>
+        <<option 'EN'>>
+          <<childrenNames _otherIDs>> come up behind you too, chattering as they catch up with <<childname>>.
+        <<option 'CN'>>
+          <<childrenNames _otherIDs>>也从你们身后走来，叽叽喳喳地追上了<<childname>>。
+      <</language>>
+    <</if>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        You walk to the perch together.
+      <<option 'CN'>>
+        你们一起走到栖木上。
+    <</language>>
+    <<if $bird.state is "home" and ["sing","groom"].includes($bird.activity)>>
+      <<npc "Great Hawk">>
+      <<language>>
+        <<option 'EN'>>
+          <<your_bird_text>> stops <<bhis>> movements and <<= _multi ? "looks at the little flock of young hawks in surprise" : "makes room for you">>. You sit down beside <<GreatHawk>> and watch your <<= _multi ? "child" : "children">>.
+        <<option 'CN'>>
+          <<your_bird_text>>停下<<bhis>>的动作，<<= _multi ? "惊讶地看着一小群小鹰们" : "为你们腾出位置">>。你在<<GreatHawk>>的身边坐下，看着你的<<= _multi ? "孩子" : "孩子们">>。
+      <</language>>
+      <br>
+      <<if $childRecords[$childActivityEvent.childid].development.fed_daily < 2 and $childRecords[$childActivityEvent.childid].development.location is "otherNest">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> walks to the front edge of the perch and shakes out <<childhis>> feathers facing into the wind.
+          <<option 'CN'>>
+            <<childname>>走到栖木前端，迎着风吹来的方向抖抖自己的羽毛。
+        <</language>>
+        <<switch $childRecords[$childActivityEvent.childid].development.trait>>
+          <<case "clumsy" "clever">>
+            <<language>>
+              <<option 'EN'>>
+                <<childHe>> calls back to you a few times, then spreads <<childhis>> wings and flies off towards the moor.
+              <<option 'CN'>>
+                <<childHe>>回头对你们鸣叫几声，随后展开翅膀向着荒原飞去。
+            <</language>>
+          <<default>>
+            <<language>>
+              <<option 'EN'>>
+                <<childHe>> shrieks once towards the moor, then spreads <<childhis>> wings and leaps from the tower.
+              <<option 'CN'>>
+                <<childHe>>向着荒原尖鸣一声，随后展开翅膀跳下高塔。
+            <</language>>
+        <</switch>>
+        <br><br>
+        <<language>>
+          <<option 'EN'>>
+            <span class="teal"><<childHe>> has gone hunting.</span><<childname>>'s small figure moves not far off in your sight, exploring this world with <<childhis>> own body.
+          <<option 'CN'>>
+            <span class="teal"><<childHe>>去狩猎了。</span><<childname>>小小的身影在你们视野里的不远处移动，用自己的身体探索着这片天地。
+        <</language>>
+        <<set $childRecords[$childActivityEvent.childid].development.activity to "hunting">>
+        <<set $childRecords[$childActivityEvent.childid].development.timer to 30>>
+        <<if _multi>>
+          <br><br>
+          <<language>>
+            <<option 'EN'>>
+              <<childrenNames _otherIDs>> settle at your side, tilting their heads to watch <<childsiblings $childActivityEvent.childid>> fly in the air with you.
+            <<option 'CN'>>
+              <<childrenNames _otherIDs>>停在你们身边，歪着脑袋和你们一起看着<<childsiblings $childActivityEvent.childid>>在空中飞翔。
+          <</language>>
+        <</if>>
+        <<stress -5>><<lstress>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> walks to the front edge of the perch and <<print either(lanSwitch("relaxedly", "放松地"),lanSwitch("curiously", "好奇地"))>> observes this moor from the tower.
+          <<option 'CN'>>
+            <<childname>>走到栖木前端，<<print either("放松地","好奇地")>>从高塔上观察着这片荒原。
+        <</language>>
+        <<if _multi>>
+          <br>
+          <<language>>
+            <<option 'EN'>>
+              <<childrenNames _otherIDs>> shove <<childhim>> aside, wanting a better spot, and <<childsiblings _IDs>> end up tussling in a noisy heap.
+            <<option 'CN'>>
+              <<childrenNames _otherIDs>>推搡着<<childhim>>，想要更好的位置，<<childsiblings _IDs>>互相打闹成一片。
+          <</language>>
+        <</if>>
+        <br><br>
+        <<language>>
+          <<option 'EN'>>
+            The open moor unfurls before you, stretching away into infinite distance. The sky seems closer to you than the ground. You can see this view has the same effect on your child <<= $harpy gte 6 ? "and you" : "and your mate">>: the sky is calling.
+            <br><br>
+            You take a deep breath and begin to sing, note after note drifting from your mouth. It is a gentle little song, singing idly of the sky, and your mate joins in too.
+            As you hum, <<childname>>'s chirping joins in as well; <<childhis>> clear calls slip out of tune now and then, blending with your singing into a perfect little song.
+          <<option 'CN'>>
+            开阔的荒原在你们面前内展开，延伸至无限的远方。天空与你们的距离似乎比地面还要近。你能看出这片景色对你的孩子<<= $harpy gte 6 ? "和你" : "和你的配偶">>有着相同的影响：天空在召唤。
+            <br><br>
+            你深吸一口气，开始唱歌，一音接着一音从你嘴里飘出。这是一首轻柔的小曲，随性地歌唱着天空，你的配偶也加入了你。
+            随着你们的哼唱，<<childname>>的啁啾声也加入了进来，<<childhis>>清脆的鸣啼声偶有错音，与你们的歌声合奏，组成了一首完美的小曲。
+        <</language>>
+        <<stress -5>><<lstress>>
+        <<if _multi>>
+          <br><br>
+          <<language>>
+            <<option 'EN'>>
+              <<childrenNames _otherIDs>> eagerly join your chorus too; your singing and the young hawks' chirping weave together into a wondrous harmony. The sky itself seems to answer your song.
+            <<option 'CN'>>
+              <<childrenNames _otherIDs>>也兴奋地加入了你们的合唱，你们的歌声和小鹰们的啁啾交织在一起，形成了一种神奇的和谐。天空本身仿佛也在回应你们的歌唱。
+          <</language>>
+          <<trauma -5>><<ltrauma>>
+        <</if>>
+        <<if $monster is 1>>
+          <br><br>
+          <<language>>
+            <<option 'EN'>>
+              "<<= _multi ? "The children" : "<<childname>>">> are very good at this." <<your_bird_text>> looks very proud of your children.
+            <<option 'CN'>>
+              "<<= _multi ? "孩子们" : "<<childname>>">>很擅长这个。"<<your_bird_text>>看起来对你们的孩子感到很骄傲。
+          <</language>>
+        <</if>>
+      <</if>>
+    <<else>>
+      <<if $childRecords[$childActivityEvent.childid].development.fed_daily < 2 and $childRecords[$childActivityEvent.childid].development.location is "otherNest">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> walks to the front edge of the perch and shakes out <<childhis>> feathers facing into the wind.
+          <<option 'CN'>>
+            <<childname>>走到栖木前端，迎着风吹来的方向抖抖自己的羽毛。
+        <</language>>
+        <<switch $childRecords[$childActivityEvent.childid].development.trait>>
+          <<case "clumsy" "clever">>
+            <<language>>
+              <<option 'EN'>>
+                <<childHe>> calls back to you a few times, then spreads <<childhis>> wings and flies off towards the moor.
+              <<option 'CN'>>
+                <<childHe>>回头对你鸣叫几声，随后展开翅膀向着荒原飞去。
+            <</language>>
+          <<default>>
+            <<language>>
+              <<option 'EN'>>
+                <<childHe>> shrieks once towards the moor, then spreads <<childhis>> wings and leaps from the tower.
+              <<option 'CN'>>
+                <<childHe>>向着荒原尖鸣一声，随后展开翅膀跳下高塔。
+            <</language>>
+        <</switch>>
+        <br><br>
+        <<language>>
+          <<option 'EN'>>
+            <span class="teal"><<childHe>> has gone hunting.</span><<childname>>'s small figure moves not far off in your sight, exploring this world with <<childhis>> own body.
+          <<option 'CN'>>
+            <span class="teal"><<childHe>>去狩猎了。</span><<childname>>小小的身影在你的视野的不远处移动，用自己的身体探索着这片天地。
+        <</language>>
+        <<set $childRecords[$childActivityEvent.childid].development.activity to "hunting">>
+        <<set $childRecords[$childActivityEvent.childid].development.timer to 30>>
+        <<if _multi>>
+          <br><br>
+          <<language>>
+            <<option 'EN'>>
+              <<childrenNames _otherIDs>> settle at your side, tilting their heads to watch <<childsiblings $childActivityEvent.childid>> fly in the air with you.
+            <<option 'CN'>>
+              <<childrenNames _otherIDs>>停在你身边，歪着脑袋和你一起看着<<childsiblings $childActivityEvent.childid>>在空中飞翔。
+          <</language>>
+        <</if>>
+        <<stress -5>><<lstress>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> walks to the front edge of the perch and <<print either(lanSwitch("relaxedly", "放松地"),lanSwitch("curiously", "好奇地"))>> observes this moor from the tower.
+          <<option 'CN'>>
+            <<childname>>走到栖木前端，<<print either("放松地","好奇地")>>从高塔上观察着这片荒原。
+        <</language>>
+        <<if _multi>>
+          <br>
+          <<language>>
+            <<option 'EN'>>
+              <<childrenNames _otherIDs>> shove <<childhim>> aside, wanting a better spot, and <<childsiblings _IDs>> end up tussling in a noisy heap.
+            <<option 'CN'>>
+              <<childrenNames _otherIDs>>推搡着<<childhim>>，想要更好的位置，<<childsiblings _IDs>>互相打闹成一片。
+          <</language>>
+        <</if>>
+        <br><br>
+        <<language>>
+          <<option 'EN'>>
+            The open moor unfurls before you, stretching away into infinite distance. The sky seems closer to you than the ground. You can see this view has the same effect on your child <<= $harpy gte 6 ? "and you" : "and your mate">>: the sky is calling.
+            <br><br>
+            You take a deep breath and begin to sing, note after note drifting from your mouth. It is a gentle little song, singing idly of the sky.
+            As you hum, <<childname>>'s chirping joins in as well; <<childhis>> clear calls slip out of tune now and then, blending with your singing into a perfect little song.
+          <<option 'CN'>>
+            开阔的荒原在你们面前内展开，延伸至无限的远方。天空与你们的距离似乎比地面还要近。你能看出这片景色对你的孩子<<= $harpy gte 6 ? "和你" : "和你的配偶">>有着相同的影响：天空在召唤。
+            <br><br>
+            你深吸一口气，开始唱歌，一音接着一音从你嘴里飘出。这是一首轻柔的小曲，随性地歌唱着天空。
+            随着你的哼唱，<<childname>>的啁啾声也加入了进来，<<childhis>>清脆的鸣啼声偶有错音，与你的歌声合奏，组成了一首完美的小曲。
+        <</language>>
+        <<stress -5>><<lstress>>
+        <br><br>
+        <<if _multi>>
+          <br><br>
+          <<language>>
+            <<option 'EN'>>
+              <<childrenNames _otherIDs>> eagerly join your chorus too; your singing and the young hawks' chirping weave together into a wondrous harmony. The sky itself seems to answer your song.
+            <<option 'CN'>>
+              <<childrenNames _otherIDs>>也兴奋地加入了你们的合唱，你的歌声和小鹰们的啁啾交织在一起，形成了一种神奇的和谐。天空本身仿佛也在回应你们的歌唱。
+          <</language>>
+          <<trauma -5>><<ltrauma>>
+        <</if>>
+        <<language>>
+          <<option 'EN'>>
+            You sit on the perch enjoying the wind and spend a relaxed while together.
+          <<option 'CN'>>
+            你们坐在栖木上享受着风，度过了一段轻松的时光。
+        <</language>>
+      <</if>>
+    <</if>>
+  <<default>>
+    <<language>>
+      <<option 'EN'>>
+        Could not find that event.
+        <br>
+        Event: $childActivityEvent.event
+        Child: $childActivityEvent.childid
+      <<option 'CN'>>
+        无法找到该事件。
+        <br>
+        Event: $childActivityEvent.event
+        Child: $childActivityEvent.childid
+    <</language>>
+<</switch>>
+<br><br>
+<<lanLink ["Continue", "继续"] `$otherNest ? "Deadwood BirdTower Childrens Home" : "Childrens Home"`>>
+  <<unset $childActivityEvent>>
+  <<endevent>>
+<</lanLink>>

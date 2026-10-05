@@ -40,6 +40,7 @@
 | `Kylar`                             | 凯拉尔庄园留宿与房间互动                                 |
 | `LifeSimulation`                    | 免听凭证、风纪委员、学生会长、校园评价、健身房与赌馆牌桌 |
 | `Orchard`                           | 神殿与农场果园、果树照料、逐步开垦与雇工                 |
+| `BirdTower`                         | 高塔扩展：鹰崽的成长、喂食、性格与随行狩猎               |
 | `VanillaPlus`                       | 属性突破、住宅、金融中心、银行与证券                     |
 | `CelestialAnomalies`                | 日蚀、流星雨与天气画面变化                               |
 | `MoreTransformations`               | 马、鱼与渡鸦转化及相关地点、装备和特质                   |
@@ -68,6 +69,7 @@
 - `MoreLoveInterestsAndNPCAvatars`：Eudemonism00 的[社交栏小头像](https://github.com/Eudemonism00/DOL-npcicon-mods/)与苯环的[更多恋人](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod)。
 - `Robin`：零环零幻想的[Dom 罗宾](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod)。
 - `LifeSimulation`：丧心的[模拟人生](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims)。
+- `BirdTower`：鲤鱼旗🎏的[鹰宝宝模组](https://github.com/koooooiCarp/DOL-BabyHawk-Mod)（润色：行歌）。
 - 马转化贴图：元夕。
 
 动态音乐使用 Kresiek The Furry、Augmentality（Brandon Morris）、AdoTheLimey、primbal、Breviceps、Joth、TinyWorlds、isaiah658、SketchMan3 和 rubberduck 的 CC0 音频。逐曲来源见[音频素材记录](audio-pack/audio/CREDITS.md)。也感谢所有提供建议、测试反馈与帮助的朋友。

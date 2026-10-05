@@ -34,6 +34,8 @@ import Hint_DynamicMusic_CN from '@/assets/hint/CN/DynamicMusic.md';
 import Hint_DynamicMusic_EN from '@/assets/hint/EN/DynamicMusic.md';
 import Hint_Orchard_CN from '@/assets/hint/CN/Orchard.md';
 import Hint_Orchard_EN from '@/assets/hint/EN/Orchard.md';
+import Hint_BirdTower_CN from '@/assets/hint/CN/BirdTower.md';
+import Hint_BirdTower_EN from '@/assets/hint/EN/BirdTower.md';
 import Hint_Credits_CN from '@/assets/hint/CN/Credits.md';
 import Hint_Credits_EN from '@/assets/hint/EN/Credits.md';
 import { defaults } from './constants';
@@ -57,6 +59,7 @@ const guideSections = {
   Kylar:                             { EN: Hint_Kylar_EN                            , CN: Hint_Kylar_CN                            , title: { EN: 'Kylar'                       , CN: '凯拉尔拓展' } },
   LifeSimulation:                    { EN: Hint_LifeSimulation_EN                   , CN: Hint_LifeSimulation_CN                   , title: { EN: 'Life Simulation'             , CN: '模拟人生' } },
   Orchard:                           { EN: Hint_Orchard_EN                          , CN: Hint_Orchard_CN                          , title: { EN: 'Orchard'                      , CN: '果园' } },
+  BirdTower:                         { EN: Hint_BirdTower_EN                        , CN: Hint_BirdTower_CN                        , title: { EN: 'Bird Tower'                  , CN: '高塔扩展' } },
   DynamicMusic:                      { EN: Hint_DynamicMusic_EN                     , CN: Hint_DynamicMusic_CN                     , title: { EN: 'Dynamic Music'               , CN: '动态音乐' } },
   Credits:                           { EN: Hint_Credits_EN                          , CN: Hint_Credits_CN                          , title: { EN: 'Credits and sources'         , CN: '致谢与素材来源' } }
 } as const;
@@ -69,6 +72,7 @@ const guideOrder = [
   'Kylar',
   'LifeSimulation',
   'Orchard',
+  'BirdTower',
   'VanillaPlus',
   'CelestialAnomalies',
   'MoreTransformations',
@@ -86,7 +90,8 @@ const overlappingMods = {
   LongerCombat: ['LongerCombat'],
   MoreLoveInterestsAndNPCAvatars: ['More Love Interests Mod', 'NPC Avatars Mod'],
   Robin: ['DomRobin'],
-  LifeSimulation: ['DoLSims']
+  LifeSimulation: ['DoLSims'],
+  BirdTower: ['BabyHawk']
 } as const;
 
 type OverlappingModule = keyof typeof overlappingMods;

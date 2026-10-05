@@ -1,0 +1,72 @@
+:: Deadwood BirdTower Test Many Hawks []
+<<set _hawks to [
+  ["大强", "f", "dominant", "large", "monster"],
+  ["中强", "m", "dominant", "normal", 0],
+  ["小强", "f", "dominant", "normal", "monster"],
+  ["大聪明", "f", "clever", null, "monster"],
+  ["中聪明", "m", "clever", null, 0],
+  ["小聪明", "m", "clever", null, "monster"],
+  ["大善", "f", "sympathy", null, "monster"],
+  ["中善", "m", "sympathy", null, 0],
+  ["小善", "f", "sympathy", null, "monster"],
+  ["大笨", "f", "clumsy", null, "monster"],
+  ["中笨", "m", "clumsy", null, 0],
+  ["小笨", "m", "clumsy", null, "monster"]
+]>>
+<<for _hawk range _hawks>>
+  <<run maplebirch.get('BirdTower').createDebugChild(_hawk[0], _hawk[1], {
+    size: _hawk[3] ?? ['tiny', 'small', 'normal', 'normal'][random(0, 3)],
+    eyeColour: ['purple', 'dark blue', 'light blue', 'amber', 'hazel', 'green', 'lime green', 'red', 'pink', 'grey', 'light grey'][random(0, 10)],
+    hairColour: ['white', 'brown'][random(0, 1)],
+    skinColour: random(1, 100) <= V.settings.darkSkinChance ? 'dark' : 'light',
+    monster: _hawk[4]
+  }, _hawk[2])>>
+<</for>>
+<<getChildrenIds `{location: "otherNest", excludeUnhatched: true}` "both">>
+<<set _childrenIds to _childrenIds.filter(id => $childRecords[id].species is "hawk")>>
+<<childViewerDisplay _childrenIds>>
+<br><br>
+<<lanLink ['Continue', '继续'] 'Bird Tower'>>
+  <<endevent>>
+<</lanLink>>
+
+:: Deadwood BirdTower Test OrphanHawk []
+<<set _hatchedTime to new DateTime(Time.date).addDays(random(-120, -60))>>
+<<set _laidTime to new DateTime(_hatchedTime).addDays(random(-30, -21))>>
+<<set _conceivedTime to new DateTime(_hatchedTime).addDays(random(-44, -30))>>
+<<set $orphanHawkPreview to {
+  gender: random(0, 100) > 50 ? "f" : "m",
+  features: {
+    size: ["tiny", "small", "normal", "normal"][random(0, 3)],
+    eyeColour: ["purple", "dark blue", "light blue", "amber", "hazel", "green", "lime green", "red", "pink", "grey", "light grey"][random(0, 10)],
+    hairColour: ["white", "brown"][random(0,1)],
+    skinColour: random(1, 100) lte $settings.darkSkinChance ? "dark" : "light",
+    monster: ((V.settings.monsterChance > random(0, 100) && (V.hallucinations >= 1 || !V.settings.monsterHallucinationsOnly)) || V.greathawkmonster === 2) ? "monster" : 0
+  },
+  conceivedDate: _conceivedTime.timeStamp,
+  laidDate: _laidTime.timeStamp,
+  hatchedDate: _hatchedTime.timeStamp
+}>>
+<<npc "Great Hawk">><<person1>>
+<<language>>
+  <<option 'EN'>>
+    Your <<if $monster is 1>><<nnpc_wife "Great Hawk">> gasps<<else>>partner lets out a surprised chatter<</if>>, and signals you to look at the bushes below.
+  <<option 'CN'>>
+    你的<<if $monster is 1>><<nnpc_wife "Great Hawk">>倒吸一口气<<else>>伴侣发出一声惊讶的叽喳声<</if>>，示意你注意下方的灌木。
+<</language>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    <span class="gold">It is <<if $orphanHawkPreview.features.monster is "monster">>a harpy<<else>>a hawk<</if>> baby lying on the ground.</span><span class="red">There is no sign of <<orphanHawkhis>> parents anywhere nearby.</span>
+  <<option 'CN'>>
+    <span class="gold">是一个躺在地上的<<if $orphanHawkPreview.features.monster is "monster">>哈比<<else>>鹰<</if>>宝宝。</span><span class="red">附近完全没看见<<orphanHawkhis>>双亲的行踪。</span>
+<</language>>
+<br><br>
+<<lanLink ['Land (0:05)', '降落 (0:05)'] 'Bird Hunt Chick Approach'>>
+  <<bird_pass 5>>
+<</lanLink>>
+<br>
+<<lanLink ['Keep flying', '继续飞'] 'Bird Hunt Chick Ignore'>>
+  <<npcincr "Great Hawk" love -5>>
+<</lanLink>>
+<<lllove>>

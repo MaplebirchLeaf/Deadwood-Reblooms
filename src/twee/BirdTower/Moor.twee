@@ -1,0 +1,487 @@
+:: Deadwood BirdTower Moor Screech []
+<<effects>>
+<<if $pain gte 95>>
+  <<set $phase to 1>>
+  <<language>>
+    <<option 'EN'>>
+      You try to screech at the sky, but all that comes out is a pained little chirp.
+    <<option 'CN'>>
+      你试图向空中尖啸，但发出的只是一声痛苦的唧唧叫声。
+  <</language>>
+<<elseif $stress gte ($stressmax / 5) * 3>>
+  <<set $phase to 2>>
+  <<language>>
+    <<option 'EN'>>
+      You screech at the sky. It sounds sharper than usual.
+    <<option 'CN'>>
+      你对着天空啸叫。它比平时更加尖锐。
+  <</language>>
+<<elseif $trauma gte ($traumamax / 5) * 3>>
+  <<set $phase to 3>>
+  <<language>>
+    <<option 'EN'>>
+      You call out to your children. Your voice sounds a little hollow.
+    <<option 'CN'>>
+      你呼唤着你的孩子。声音有些空洞。
+  <</language>>
+<<elseif $tiredness gte (C.tiredness.max / 5) * 3>>
+  <<set $phase to 4>>
+  <<language>>
+    <<option 'EN'>>
+      You let out a tired screech into the air.
+    <<option 'CN'>>
+      你向空中发出一声疲惫的尖啸。
+  <</language>>
+<<else>>
+  <<set $phase to 0>>
+  <<language>>
+    <<option 'EN'>>
+      You screech at the sky.
+    <<option 'CN'>>
+      你对着天空啸叫。
+  <</language>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    <<babyhawks>> hear your voice and swoop down, landing nearby.
+  <<option 'CN'>>
+    <<babyhawks>>听到了你的声音俯冲过来，降落在附近。
+<</language>>
+<br><br>
+<<if $phase isnot 0>>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawksthem>> notice how <<if $phase is 4>>exhausted<<elseif $phase is 1>>pained<<else>>uncomfortable<</if>> you look, and chatter around you in worry.
+    <<option 'CN'>>
+      <<babyhawksthem>>注意到你<<if $phase is 4>>筋疲力尽<<elseif $phase is 1>>痛苦<<else>>不适<</if>>的模样，担忧地绕着你叽喳叫。
+  <</language>>
+  <<language>>
+    <<option 'EN'>>
+      Before you can answer, <<babyhawksthem>> tumble into your arms, soft, warm feathers brushing against you. You and your child hold each other, and you feel
+    <<option 'CN'>>
+      没等你做出回应，<<babyhawksthem>>就扑进你的怀里，毛茸茸、暖呼呼的羽毛轻蹭着你。你和你的孩子互相拥抱着，让你感到
+  <</language>>
+  <<switch $phase>>
+    <<case 1>>
+      <<language>>
+        <<option 'EN'>>
+          the pain slowly fading.
+        <<option 'CN'>>
+          痛苦正在逐渐消退。
+      <</language>>
+      <<llpain>><<pain -50>>
+    <<case 2>>
+      <<language>>
+        <<option 'EN'>>
+          relaxed and at ease.
+        <<option 'CN'>>
+          放松且安心。
+      <</language>>
+      <<llstress>><<stress -20>>
+    <<case 3>>
+      <<language>>
+        <<option 'EN'>>
+          truly alive.
+        <<option 'CN'>>
+          自己真切地活着。
+      <</language>>
+      <<lltrauma>><<trauma -20>>
+    <<case 4>>
+      <<language>>
+        <<option 'EN'>>
+          at ease, and then drowsy... in fact, you may really have dozed off for a while.
+        <<option 'CN'>>
+          安心，随后便是昏昏欲睡……实际上，你可能真的小睡了一会儿。
+      <</language>>
+      <<lltiredness>><<tiredness -20>>
+  <</switch>>
+  <br><br>
+  <<if Weather.bodyTemperature lt 37.5>>
+    <span class="green">
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawks>>'s warm body heat passes to you in the embrace.
+      <<option 'CN'>>
+        <<babyhawks>>温暖的体温在拥抱中传递给了你。
+    <</language>>
+    </span>
+    <<set Weather.bodyTemperature to 37.5>>
+  <<elseif Weather.bodyTemperature gt 38>>
+    <span class="green">
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawks>> seem to have just come out of the water; the feathers feel cool to the touch.
+      <<option 'CN'>>
+        <<babyhawks>>似乎是刚刚从水里出来，羽毛间摸起来凉飕飕的。
+    <</language>>
+    </span>
+    <<set Weather.bodyTemperature to 38>>
+  <</if>>
+  <<pass 10>>
+  <<language>>
+    <<option 'EN'>>
+      You feel much better. You hug your child gratefully, making <<babyhawksthem>> let out a cute squashed chirp, then let <<babyhawksthem>> go.
+    <<option 'CN'>>
+      你感觉好多了。你感激地紧紧拥抱你的孩子，让<<babyhawksthem>>发出可爱的被挤压的唧唧声，随后松开了<<babyhawksthem>>。
+  <</language>>
+<<else>>
+  <<if $cmonster is 1>>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawksthem>> happily cling to your arm, chattering around you.
+      <<option 'CN'>>
+        <<babyhawksthem>>开心地抱着你的手臂，绕着你叽喳叫。
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawksthem>> puff up their feathers lightly and nuzzle you, letting out a happy trill.
+      <<option 'CN'>>
+        <<babyhawksthem>>轻轻蓬起羽毛磨蹭你，发出开心的颤鸣。
+    <</language>>
+  <</if>>
+<</if>>
+<br>
+<<lanLink ['Go home together', '一起回家'] 'Deadwood BirdTower Moor Home'>><</lanLink>>
+<br>
+<<lanLink ['Just hold each other (0:05)', '只是拥抱 (0:05)'] 'Deadwood BirdTower Moor Hug'>>
+  <<transform bird 1>>
+  <<pass 5>>
+  <<stress -6>><<trauma -6>>
+<</lanLink>>
+<<ltrauma>><<lstress>>
+<br>
+:: Deadwood BirdTower Moor Home []
+<<effects>>
+<<switch $speech_attitude>>
+  <<case "bratty">>
+    <<language>>
+      <<option 'EN'>>
+        "Want me to give <<babyhawksyou>> a lift?"
+      <<option 'CN'>>
+        "要不要我捎<<babyhawksyou>>一程？"
+    <</language>>
+  <<case "meek">>
+    <<language>>
+      <<option 'EN'>>
+        "Shall we go home together?"
+      <<option 'CN'>>
+        "我们一起回家吧？"
+    <</language>>
+  <<case "neutral">>
+    <<language>>
+      <<option 'EN'>>
+        "Will you come back with me?"
+      <<option 'CN'>>
+        "要和我一起回去吗？"
+    <</language>>
+<</switch>>
+<<language>>
+  <<option 'EN'>>
+    You reach out and scratch <<babyhawks>>'s heads, inviting <<babyhawksthem>> to return to the nest with you.
+  <<option 'CN'>>
+    你伸手挠挠<<babyhawks>>的脑袋，邀请<<babyhawksthem>>和你一起回巢。
+<</language>>
+<br><br>
+<<set _returnNum to 0>>
+<<set _tempIDs to []>>
+<<if maplebirch.get('BirdTower').selectTrait("clumsy")>>
+  <!--笨拙小鹰百分百跟PC走-->
+  <<language>>
+    <<option 'EN'>>
+      <<childrenNames _tempIDs>> answer you at once, excited.
+    <<option 'CN'>>
+      <<childrenNames _tempIDs>>立刻兴奋地回应你。
+  <</language>>
+  <<set _returnNum += _length>>
+<</if>>
+<<if _returnNum lt maplebirch.get('BirdTower').party.length>>
+  <!-- 除去笨拙小鹰以外还有其他鹰 -->
+  <<language>>
+    <<option 'EN'>>
+      <<if _returnNum>>The others<</if>><<babyhawks>> tilt their heads and look at you for a while,
+    <<option 'CN'>>
+      <<if _returnNum>>其他<</if>><<babyhawks>>歪着脑袋看了你一会儿，
+  <</language>>
+  <<if _returnNum>>
+    <!-- 笨拙小鹰已经走了，其他鹰就回去继续狩猎。-->
+    <<language>>
+      <<option 'EN'>>
+        chatter at you a few times, spread their wings and fly away. It looks like <<babyhawksthem>> still want to keep hunting.
+      <<option 'CN'>>
+        冲你叽喳叫几声，展翅飞走了。看起来<<babyhawksthem>>还想继续狩猎。
+    <</language>>
+  <<else>>
+    <!-- 笨拙0只，小鹰随机回家不回家 -->
+    <<set _rng to random(0, 1)>>
+    <<set _returnNum += _rng>>
+    <<if _returnNum>>
+      <!-- 随机一只小鹰一起回 -->
+      <<set _rng to random(0, maplebirch.get('BirdTower').party.length-1)>>
+      <<set _tempIDs.push($BirdTower.hunt.ids[_rng])>>
+      <<language>>
+        <<option 'EN'>>
+          In the end, <<childname $BirdTower.hunt.ids[_rng]>> answers with a chirp and follows you.
+        <<option 'CN'>>
+          最终，<<childname $BirdTower.hunt.ids[_rng]>>唧唧叫着回应，跟上了你。
+      <</language>>
+      <<if _returnNum lt maplebirch.get('BirdTower').party.length>>
+        <<language>>
+          <<option 'EN'>>
+            The other children chatter at you a few times, spread their wings and fly away. It looks like they still want to keep hunting.
+          <<option 'CN'>>
+            其他孩子冲你们叽喳叫几声，展翅飞走了。看起来他们还想继续狩猎。
+        <</language>>
+      <</if>>
+    <<else>>
+      <!-- 没人回 -->
+      <<language>>
+        <<option 'EN'>>
+          chatter at you a few times, spread their wings and fly away. It looks like <<babyhawksthem>> still want to keep hunting.
+        <<option 'CN'>>
+          冲你叽喳叫几声，展翅飞走了。看起来<<babyhawksthem>>还想继续狩猎。
+      <</language>>
+    <</if>>
+  <</if>>
+<</if>>
+<br><br>
+<<if _returnNum>>
+  <!-- 取消狩猎状态 -->
+  <<for _cc to 0; _cc lt _returnNum; _cc++>>
+    <<set $childRecords[_tempIDs[_cc]].development.activity to "rest">>
+    <<set $childRecords[_tempIDs[_cc]].development.timer to undefined>>
+  <</for>>
+  <<language>>
+    <<option 'EN'>>
+      You set off for home with <<childrenNames _tempIDs>>.
+    <<option 'CN'>>
+      你带着<<childrenNames _tempIDs>>踏上了返程。
+  <</language>>
+  <br><br>
+  <<set $tempIDsCopy to clone(_tempIDs)>>
+  <<set _time to (100 - $moor) / 5 * 2>>
+  <<lanLink `['Continue (0:' + String(_time).padStart(2, '0') + ')', '继续 (0:' + String(_time).padStart(2, '0') + ')']` 'Deadwood BirdTower Moor Return'>>
+    <<HuntTogetherClean>>
+    <<pass _time>>
+    <<endevent>>
+  <</lanLink>>
+  <br>
+<<else>>
+  <<switch $speech_attitude>>
+    <<case "bratty">>
+      <<language>>
+        <<option 'EN'>>
+          You shrug,
+        <<option 'CN'>>
+          你耸耸肩，
+      <</language>>
+    <<case "meek">>
+      <<language>>
+        <<option 'EN'>>
+          You wave,
+        <<option 'CN'>>
+          你挥挥手，
+      <</language>>
+    <<case "neutral">>
+      <<language>>
+        <<option 'EN'>>
+          You
+        <<option 'CN'>>
+          你
+      <</language>>
+  <</switch>>
+  <<language>>
+    <<option 'EN'>>
+      continue on your journey.
+    <<option 'CN'>>
+      继续你的旅途。
+  <</language>>
+  <br><br>
+  <<lanLink ['Continue', '继续'] 'Moor'>>
+    <<HuntTogetherClean>>
+    <<set $eventskip to 1>>
+    <<endevent>>
+  <</lanLink>>
+  <br>
+<</if>>
+
+:: Deadwood BirdTower Moor Hug []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    <<if $phase is 2 or $phase is 4>>You stroke <<babyhawks>>'s feathers, holding <<babyhawksthem>> in a relaxed embrace.<<else>>You hug your child gently, <<if $phase is 1>>slowly <</if>>stroking <<babyhawksthem>>'s feathers.<</if>>
+  <<option 'CN'>>
+    <<if $phase is 2 or $phase is 4>>你抚摸起<<babyhawks>>的羽毛，放松地怀抱着<<babyhawksthem>>。<<else>>你轻轻拥抱你的孩子，<<if $phase is 1>>慢慢<</if>>抚摸着<<babyhawksthem>>的羽毛。<</if>>
+<</language>>
+<<if $cmonster is 1>>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawksthem>><<= $phase ? " lets out a worried little cry" : " giggles">>, reaching out to hug you.
+    <<option 'CN'>>
+      <<babyhawksthem>><<= $phase ? "发出一声担忧的轻鸣" : "咯咯笑着">>，伸手拥抱着你。
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawksthem>><<= $phase ? " chirps softly" : " chatters">>, nuzzling you with their head.
+    <<option 'CN'>>
+      <<babyhawksthem>><<= $phase ? "轻柔啾鸣了一声" : "叽喳叫着">>，用脑袋轻蹭着你。
+  <</language>>
+<</if>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    You snuggle together like this for a little while, <<= $phase ? "until <<babyhawks>> chirp in protest, " : "until <<babyhawks>> ">>and then leave your arms. <<babyhawksthem>> bid you farewell and take to the sky again.
+  <<option 'CN'>>
+    你们就这样依偎了一小会儿，<<= $phase ? "直到<<babyhawks>>啾啾叫着抗议，" : "直到<<babyhawks>>">>从你的怀抱里离开。<<babyhawksthem>>向你告别，再次飞向天空。
+<</language>>
+<br><br>
+<<if $rng is 1>>
+  <<for _cc to 0; _cc lt maplebirch.get('BirdTower').party.length; _cc++>>
+    <<if getChildDays($BirdTower.hunt.ids[_cc]) gte 200 and $childRecords[$BirdTower.hunt.ids[_cc]].development.trait is "clever" and $childRecords[$BirdTower.hunt.ids[_cc]].features.monster and $childRecords[$BirdTower.hunt.ids[_cc]].development.firstWord == null>>
+      <<childSelect $BirdTower.hunt.ids[_cc]>>
+      <<if getPregnancyOf($childSelected).carrier is "pc">>
+        <<set _playerRole to "妈妈">>
+      <<elseif getPregnancyOf($childSelected).donor is "pc">>
+        <<set _playerRole to "爸爸">>
+      <<elseif $player.gender_appearance is "m">>
+        <<set _playerRole to "爸爸">>
+      <<else>>
+        <<set _playerRole to "妈妈">>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          "Bye bye <<print lanSwitch("Mama", "妈妈")>>," you hear a lisped farewell from your <<childname>>. When did <<childHe>> learn to talk?...
+        <<option 'CN'>>
+          "拜拜<<print _playerRole>>，"你听见一句口齿不清的告别，来自你的<<childname>>。<<childHe>>什么时候学会说话了？……
+      <</language>>
+      <br><br>
+      <<set $childRecords[$BirdTower.hunt.ids[_cc]].development.firstWord to _playerRole>>
+      <<break>>
+    <</if>>
+  <</for>>
+<</if>>
+<<lanLink ['Continue', '继续'] 'Moor'>>
+  <<endevent>>
+  <<set $eventskip to 1>>
+  <<HuntTogetherClean>>
+<</lanLink>>
+<br>
+:: Deadwood BirdTower Moor Bath []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You sit down on the moor, <<= $transformationParts.traits.sharpEyes isnot "disabled" ? "using your extraordinary eyesight, " : "forming a small circle with your hands to peer through, ">>watching your children from afar.
+  <<option 'CN'>>
+    你在山岗上坐下，<<= $transformationParts.traits.sharpEyes isnot "disabled" ? "利用你超凡的视力，" : "用手握出一个小圈，通过小圈">>远远地看着你的孩子们。
+<</language>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    They ruffle their feathers in the small pond, stirring rings of ripples across the water, and <<= $cmonster ? "scoop up water with their hands" : "beat the water with their wings">> to splash their <<childsiblings $BirdTower.hunt.ids>>.
+  <<option 'CN'>>
+    他们在小池塘里抖动着羽毛，把水面搅出一圈圈的波纹，<<= $cmonster ? "用手舀起水" : "用翅膀拍打水面">>向他们的<<childsiblings $BirdTower.hunt.ids>>泼去。
+<</language>>
+<<language>>
+  <<option 'EN'>>
+    The little <<= $cmonster ? "harpies" : "hawks">>' happy <<= $cmonster ? "laughter" : "chatter">> carries to your ears even from quite a distance.
+  <<option 'CN'>>
+    小<<= $cmonster ? "哈比" : "鹰">>们开心的<<= $cmonster ? "笑声" : "叽喳声">>哪怕隔着相当一段距离也能传到你的耳边。
+<</language>>
+<<trauma -5>><<ltrauma>>
+<br><br>
+<<if maplebirch.get('BirdTower').selectTrait("dominant")>>
+  <<childSelect  _tempIDs[0]>>
+  <<language>>
+    <<option 'EN'>>
+      <<childname>> prowls near the pond, seemingly on guard against nearby creatures, but the other children splash water at <<childhim>> from the shore, making <<childhe>> spread <<childhis>> wings and flop into the small pond with a splash, scrapping with <<childsiblings $BirdTower.hunt.ids>>.
+    <<option 'CN'>>
+      <<childname>>在池塘附近徘徊，似乎在警惕附近的生物，但其他孩子向站在岸上的<<childhim>>泼水，惹得<<childhe>>展开翅膀扑通一声跳进了小池塘，和<<childsiblings $BirdTower.hunt.ids>>争斗起来。
+  <</language>>
+  <<lstress>><<stress -5>>
+  <br><br>
+<</if>>
+<<set _rng to random(0, maplebirch.get('BirdTower').party.length-1)>>
+<<childSelect $BirdTower.hunt.ids[_rng]>>
+<<language>>
+  <<option 'EN'>>
+    One of the little <<= $cmonster ? "harpies" : "hawks">> suddenly bursts up from deep in the pond with a live, wriggling fish in its beak. <<childHe>> brings the fish over to the other children, and they poke and prod at it, studying it for a good while.
+  <<option 'CN'>>
+    其中一只小<<= $cmonster ? "哈比" : "鹰">>猛地从池塘深处钻了出来，嘴里还叼着一条活蹦乱跳的鱼。<<childHe>>把鱼带到其他孩子身边，他们绕着它戳戳碰碰，观察了好一会儿。
+<</language>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    You are a little worried they <<= $cmonster ? "will eat the live fish raw" : "do not know how to start eating it">>. Perhaps you should find a time to teach your children how to handle fish...
+  <<option 'CN'>>
+    你有点担心他们<<= $cmonster ? "会生吃活鱼" : "不知道如何下嘴">>。也许应该找个时间教教你的孩子怎么处理鱼……
+<</language>>
+<br>
+<!--哈哈，还是吃了-->
+<<for _cc to 0; _cc lt maplebirch.get('BirdTower').party.length; _cc++>>
+  <<set $childRecords[$BirdTower.hunt.ids[_cc]].development.fed_daily++>>
+<</for>>
+<<if currentSkillValue("skulduggery") gte 800 or (currentSkillValue("skulduggery") gte 600 and $transformationParts.traits.sharpEyes isnot "disabled")>>
+  <<npc "Great Hawk">>
+  <<language>>
+    <<option 'EN'>>
+      While you are thinking, you catch some strange movement in a treetop high above out of the corner of your eye.
+      <br>
+      <span class="green">You quickly realise that it is <<your_bird_text>>.</span>
+      It seems <<bHe>> also cannot rest easy about your children, and chose to stay nearby quietly watching over them.
+    <<option 'CN'>>
+      在你思考的同时，你眼角的余光发现高处某个树冠里有些奇怪的动静。
+      <br>
+      <span class="green">你很快意识到那是<<your_bird_text>>。</span>
+      看来<<bHe>>也放心不下你们的孩子，选择跟在附近默默守护着他们。
+  <</language>>
+  <<lstress>><<stress -5>>
+  <br>
+<</if>>
+<<lanLink ['Continue', '继续'] 'Moor'>>
+  <<HuntTogetherClean>>
+  <<set $eventskip to 1>>
+  <<endevent>>
+<</lanLink>>
+<br>
+:: Deadwood BirdTower Moor Return []
+<<set $location to "tower">>
+<<effects>>
+<<npc "Great Hawk">>
+<<set _hawks to ($tempIDsCopy.length gt 1 ? lanSwitch('the children', '孩子们') : "<<childname $tempIDsCopy[0]>>")>>
+<<language>>
+  <<option 'EN'>>
+    You fly back to the tower with _hawks and land beside the nest.
+  <<option 'CN'>>
+    你带着_hawks飞向高塔，在鸟巢旁降落。
+<</language>>
+<<if $bird.state is "home">>
+  <<if $monster is 1>>
+    <<language>>
+      <<option 'EN'>>
+        <<beasttype>> stands up and wraps <<bhis>> arms and wings around you all: "<<Wife>>, _hawks, welcome home."
+      <<option 'CN'>>
+        <<beasttype>>站了起来，用<<bhis>>的胳膊和翅膀环抱住你们：“<<Wife>>，_hawks，欢迎回家。”
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        <<beasttype>> rushes over excitedly, and after greeting you, pecks you affectionately.
+      <<option 'CN'>>
+        <<beasttype>>激动地扑了过来，在向你们表达问候之后，深情地啄了你一下。
+    <</language>>
+  <</if>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<beasttype>> is not home.
+    <<option 'CN'>>
+      <<beasttype>>并不在家。
+  <</language>>
+<</if>>
+<br><br>
+<<run delete $tempIDsCopy>>
+<<lanLink ['Continue', '继续'] 'Bird Tower'>>
+  <<endevent>>
+<</lanLink>>
+<br>

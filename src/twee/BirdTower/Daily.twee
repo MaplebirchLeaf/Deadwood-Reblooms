@@ -1,0 +1,264 @@
+:: Deadwood BirdTower Daily Events [widget]
+/*args[0] - location, args[1] - passageExit*/
+<<widget "babyhawkEvents">>
+  <<if _args[0] and maplebirch.get('BirdTower').selectActive(_args[0])>>
+    <<set $childPassageExit to _args[1]>>
+    <<if _tempIDs.length is 1 or random(0, 100) gt 40>>
+      <<addevent "babyhawkSingle">>
+    <<else>>
+      <<addevent "babyhawkMultiple">>
+    <</if>>
+  <</if>>
+<</widget>>
+<<widget "deadwood-birdtower-care-links">>
+  <<if $cmonster is 1 and $lactating is 1 and $breastfeedingdisable is "f" and $milk_amount gte 1>>
+    <<lanLink ["Nurse (0:30)", "哺乳 (0:30)"] `_args[0] + "BreastFeed"`>>
+      <<pass 30>>
+    <</lanLink>>
+    <br>
+  <</if>>
+  <<lanLink ["Cuddle (0:30)", "拥抱 (0:30)"] `_args[0] + "Cuddle"`>>
+    <<pass 30>>
+  <</lanLink>>
+  <br>
+  <<lanLink ["Talk to your child (0:30)", "和孩子说话 (0:30)"] `_args[0] + "Talk"`>>
+    <<pass 30>>
+  <</lanLink>>
+  <br>
+  <<lanLink ["Play (0:30)", "玩耍 (0:30)"] `_args[0] + "Play"`>>
+    <<pass 30>>
+  <</lanLink>>
+<</widget>>
+<<widget "babyhawkSingle">>
+  <<set _ID to _tempIDs[random(0,_tempIDs.length-1)]>>
+  <<childSelect _ID>>
+  <<switch $childRecords[_ID].development.stage>>
+    <<case "Fledgling" "Subadult">>
+      <<if random(0,1) is 1>>
+        <br>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> notices you and happily leaps into your arms.
+            <br><br>
+            You pat <<childhim>>, and <<childhe>> <<childgiggles>> wriggles about.
+          <<option 'CN'>>
+            <<childname>>注意到你，高兴地跃入你的怀抱里。
+            <br><br>
+            你轻拍<<childhim>>，<<childhe>><<childgiggles>>动来动去。
+        <</language>>
+        <br><br>
+        <<deadwood-birdtower-care-links "Deadwood BirdTower ">>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            You see <<childname>> in the nest, head down, pecking at something. As soon as you come close, <<childhe>> sits up straight and <<childgiggles>>.
+          <<option 'CN'>>
+            你看到<<childname>>正在鸟巢里低头啄弄着什么。你一靠近，<<childhe>>立马坐正，<<childgiggles>>。
+        <</language>>
+        <<if random(20) is 1>>
+          <<language>>
+            <<option 'EN'>>
+              You notice a few plucked twigs behind <<childhis>> back. It looks like <<childHe>> was just wrecking the nest.
+            <<option 'CN'>>
+              你看到<<childhis>>的身后有几根被拔出来的小树枝。看起来<<childHe>>刚刚正在拆家。
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              <<childHe>> looks happy to see you!
+            <<option 'CN'>>
+              <<childHe>>看上去见到你很高兴！
+          <</language>>
+          <<stress -12>><<llstress>>
+        <</if>>
+        <br><br>
+        <<lanLink ["Continue", "继续"] $childPassageExit>>
+          <<unset $childPassageExit>>
+          <<endevent>>
+        <</lanLink>>
+      <</if>>
+    <<case "Immature">>
+      <<if random(0,1) is 1>>
+        <br>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> finds you looking for <<childhim>> and happily runs towards you.
+            <br><br>
+            You pick <<childhim>> up, and <<childhe>> <<childgiggles>> and hugs you back.
+          <<option 'CN'>>
+            <<childname>>发现你在找<<childhim>>，高兴地跑向你。
+            <br><br>
+            你抱起<<childhim>>，<<childhe>><<childgiggles>>回拥你。
+        <</language>>
+        <br><br>
+        <<deadwood-birdtower-care-links "Deadwood BirdTower ">>
+      <<else>>
+        <<switch $childRecords[_ID].development.trait>>
+          <<case "clumsy">>
+            <<language>>
+              <<option 'EN'>>
+                You see <<childname>> in the nest, <<print either(lanSwitch("resting", "休息"),lanSwitch("gazing at the sky", "望着天空"),lanSwitch("peeking out at you", "探头探脑地望着你"),lanSwitch("spacing out", "发呆"))>>.
+              <<option 'CN'>>
+                你看到<<childname>>正在巢里<<print either("休息","望着天空","探头探脑地望着你","发呆")>>。
+            <</language>>
+          <<case "sympathy">>
+            <<language>>
+              <<option 'EN'>>
+                You see <<childname>> in the nest, <<print either(lanSwitch("resting", "休息"),lanSwitch("gazing at the sky", "望着天空"),lanSwitch("curiously looking around", "好奇地观察四周"),lanSwitch("spacing out", "发呆"))>>.
+              <<option 'CN'>>
+                你看到<<childname>>正在巢里<<print either("休息","望着天空","好奇地观察四周","发呆")>>。
+            <</language>>
+          <<case "clever">>
+            <<language>>
+              <<option 'EN'>>
+                You see <<childname>> in the nest, <<print either(lanSwitch("resting", "休息"),lanSwitch("gazing at the sky", "望着天空"),lanSwitch("watching you as you walk about", "望着你，看着你走来走去"),lanSwitch("playing with a twig in <<childhis>> beak", "衔着树枝玩耍"))>>.
+              <<option 'CN'>>
+                你看到<<childname>>正在巢里<<print either("休息","望着天空","望着你，看着你走来走去","衔着树枝玩耍")>>。
+            <</language>>
+          <<case "dominant">>
+            <<language>>
+              <<option 'EN'>>
+                You see <<childname>> in the nest, <<print either(lanSwitch("resting", "休息"),lanSwitch("gazing at the sky", "望着天空"),lanSwitch("wrecking the place and pulling out several twigs", "拆家，拔掉了好几根小树枝"),lanSwitch("sharpening <<childhis>> claws", "磨爪"))>>.
+              <<option 'CN'>>
+                你看到<<childname>>正在巢里<<print either("休息","望着天空","拆家，拔掉了好几根小树枝","磨爪")>>。
+            <</language>>
+        <</switch>>
+        <<language>>
+          <<option 'EN'>>
+            As soon as you come close, <<childhe>> looks at you at once and <<childgiggles>> happily. <<childHe>> looks happy to see you!
+          <<option 'CN'>>
+            你一靠近，<<childhe>>立马看向你，开心地<<childgiggles>>。<<childHe>>看上去见到你很高兴！
+        <</language>>
+        <<stress -12>><<llstress>>
+        <br><br>
+        <<lanLink ["Continue", "继续"] $childPassageExit>>
+          <<unset $childPassageExit>>
+          <<endevent>>
+        <</lanLink>>
+      <</if>>
+    <<default>>
+      <!--null or "Hatchling" or "Nestling"-->
+      <<if random(0,1) is 1>>
+        <<language>>
+          <<option 'EN'>>
+            You notice your <<childtype>><<childname>> lying in the nest watching you, reaching <<childhands>> out towards you.
+            <br><br>
+            You pick <<childhim>> up, and <<childhe>> <<childgiggles>> wriggles about.
+          <<option 'CN'>>
+            你注意到你的<<childtype>><<childname>>正躺在鸟巢里看着你，将<<childhands>>朝你这边伸了过来。
+            <br><br>
+            你抱起<<childhim>>，<<childhe>><<childgiggles>>动来动去。
+        <</language>>
+        <br><br>
+        <<deadwood-birdtower-care-links "child">>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            You see <<childname>> rolling around in the nest. As soon as <<childhe>> sees it is you, <<childhe>> sits up straight and <<childgiggles>>. <<childHe>> looks happy to see you!
+          <<option 'CN'>>
+            你看到<<childname>>正在鸟巢里滚来滚去。一看到是你，<<childhe>>立马坐正，<<childgiggles>>。<<childHe>>看上去见到你很高兴！
+        <</language>>
+        <<stress -12>><<llstress>>
+        <br><br>
+        <<lanLink ["Continue", "继续"] $childPassageExit>>
+          <<unset $childPassageExit>>
+          <<endevent>>
+        <</lanLink>>
+      <</if>>
+  <</switch>>
+  <br>
+<</widget>>
+<<widget "babyhawkMultiple">>
+  <<switch random(0,3)>>
+    <<case 0>>
+      <<language>>
+        <<option 'EN'>>
+          You notice <<childrenNames _tempIDs>> rolling around on top of one another.
+        <<option 'CN'>>
+          你注意到<<childrenNames _tempIDs>>正在彼此身上滚来滚去。
+      <</language>>
+      <br>
+      <<set _child1 to _tempIDs.pluck()>>
+      <<set _child2 to _tempIDs.pluck()>>
+      <<language>>
+        <<option 'EN'>>
+          The children stop now and then to look at each other. After a while, <<childname _child1>> goes around behind <<childSelect _child2>><<childname>> and starts preening <<childhim>>.
+        <<option 'CN'>>
+          孩子们时不时地停下来你看看我，我看看你。过了一会儿，<<childname _child1>>绕到<<childSelect _child2>><<childname>>身后，开始给<<childhim>>理毛。
+      <</language>>
+      <br><br>
+      <<lanLink ["Continue", "继续"] $childPassageExit>>
+        <<unset $childPassageExit>>
+        <<endevent>>
+      <</lanLink>>
+      <br>
+    <<case 1>>
+      <<language>>
+        <<option 'EN'>>
+          You notice the children squabbling in the nest.
+        <<option 'CN'>>
+          你注意到孩子们正在巢里吵成一团。
+      <</language>>
+      <br>
+      <<set _child1 to _tempIDs.pluck()>>
+      <<set _child2 to _tempIDs.pluck()>>
+      <<language>>
+        <<option 'EN'>>
+          <<childname _child1>> is standing on top of <<childname _child2>>, flapping <<childhis>> wings and tearing at <<childsiblings _child2>>'s feathers.
+          You hurry over and separate them. Several minutes later they are still screeching furiously at each other.
+        <<option 'CN'>>
+          <<childname _child1>>正踩在<<childname _child2>>身上，扑腾着翅膀撕扯<<childsiblings _child2>>的羽毛。
+          你连忙靠近他们，将他们分开。好几分钟过去，他们仍然冲着对方愤怒地鸣叫着。
+      <</language>>
+      <<gstress>><<stress 6>>
+      <br><br>
+      <<lanLink ["Continue", "继续"] $childPassageExit>>
+        <<unset $childPassageExit>>
+        <<endevent>>
+      <</lanLink>>
+      <br>
+    <<case 2>>
+      <<language>>
+        <<option 'EN'>>
+          You hear anxious chattering from the nest.
+        <<option 'CN'>>
+          你听见巢里传来了焦急的叽喳叫声。
+      <</language>>
+      <br>
+      <<set _child1 to _tempIDs.pluck()>>
+      <<set _child2 to _tempIDs.pluck()>>
+      <<language>>
+        <<option 'EN'>>
+          <<childname _child1>> and <<childname _child2>> have their claws caught together; the young hawks flap their wings desperately, but that only wedges them tighter.
+          <br><br>
+          You step in and carefully free the children's claws. <<childname _child2>> immediately hops away, tidies <<childhis>> feathers and chirps happily at you.
+        <<option 'CN'>>
+          <<childname _child1>>和<<childname _child2>>的爪子卡在了一起，小鹰们奋力地扑腾着翅膀，但只是让他们卡得更紧了。
+          <br><br>
+          你上前，小心地帮孩子们解开了爪子。<<childname _child2>>立刻跳开了，<<childhe _child2>>理了理毛，高兴地对你唧唧叫。
+      <</language>>
+      <br><br>
+      <<lanLink ["Continue", "继续"] $childPassageExit>>
+        <<unset $childPassageExit>>
+        <<endevent>>
+      <</lanLink>>
+      <br>
+    <<case 3>>
+      <<language>>
+        <<option 'EN'>>
+          <<childrenNames _tempIDs>> are looking down at something. You come closer and find it is <<print either(lanSwitch("a tuft of bright red fox fur", "一撮鲜红色的狐狸毛"),lanSwitch("a tuft of orange cat fur", "一撮橘色的猫毛"),lanSwitch("an unusually long vine", "一条格外长的藤蔓"),lanSwitch("a broken stick that looks a lot like some kind of cane", "一根断裂的木棍，看起来很像某种手杖"),lanSwitch("half a broken metal rod with a pointed tip", "半根断裂的金属杆，上面附有尖头"))>>.
+          <br><br>
+          You wonder where this thing came from.
+        <<option 'CN'>>
+          <<childrenNames _tempIDs>>正低着头观察着什么。你靠近他们，发现那是<<print either("一撮鲜红色的狐狸毛","一撮橘色的猫毛","一条格外长的藤蔓","一根断裂的木棍，看起来很像某种手杖","半根断裂的金属杆，上面附有尖头")>>。
+          <br><br>
+          你想知道这东西是从哪里来的。
+      <</language>>
+      <br><br>
+      <<lanLink ["Continue", "继续"] $childPassageExit>>
+        <<unset $childPassageExit>>
+        <<endevent>>
+      <</lanLink>>
+      <br>
+  <</switch>>
+<</widget>>

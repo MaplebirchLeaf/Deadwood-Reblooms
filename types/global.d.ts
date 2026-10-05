@@ -1,5 +1,6 @@
 import type { PlayingCard } from '../src/module/LifeSimulation/Casino/Blackjack';
 import type { Security } from '../src/module/VanillaPlus/Finance';
+import type { BirdTowerState } from '../src/module/constants';
 
 declare module 'twine-sugarcube' {
   interface SugarCubeSetupObject {
@@ -8,6 +9,13 @@ declare module 'twine-sugarcube' {
         securities?: readonly Security[];
       };
     };
+  }
+}
+
+declare module 'twine-sugarcube/userdata' {
+  interface SugarCubeStoryVariables {
+    /** 鹰塔模块的存档字段。 */
+    BirdTower: BirdTowerState;
   }
 }
 
@@ -73,6 +81,23 @@ declare global {
   function wikifier(widget: string, ...args: any): DocumentFragment;
   const Weather: any;
   const ColourUtils: any;
+
+  // 原版妊娠与育儿系统的全局函数与常量，鹰塔模块直接复用。
+  interface VanillaChild {
+    childId: number;
+    species: string;
+    features: Record<string, any>;
+    development: Record<string, any> & { location?: string; activity?: string; trait?: string; stage?: string };
+    bornDate?: number | null;
+  }
+
+  function getBornChildren(): VanillaChild[];
+  function childIsBorn(child: VanillaChild): boolean;
+  function pushPregnancyRecord(fields: Record<string, any>): number;
+  function pushChildRecord(fields: Record<string, any>): number;
+  function beginRearing(child: VanillaChild, location: string, birthLocation: string): void;
+  function npcIsPregnant(npc: string): boolean;
+  const TimeConstants: { secondsPerDay: number; secondsPerHour: number; secondsPerMinute: number; minutesPerHour: number };
 
   function lanSwitch(this: void, ...lanObj: any[]): string;
   function lanSwitch(this: MacroContext, ...lanObj: any[]): HTMLElement;

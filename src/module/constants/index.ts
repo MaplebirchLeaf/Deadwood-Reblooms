@@ -8,3 +8,4 @@ export { DEFAULT_SYDNEY_EXPANSION_STATE, type SydneyExpansionState } from './syd
 export { DEFAULT_WHITNEY_EXPANSION_STATE, type WhitneyExpansionState } from './whitney';
 export { DEFAULT_KYLAR_EXPANSION_STATE, type KylarExpansionState } from './kylar';
 export { DEFAULT_CELESTIAL_ANOMALIES_STATE, type CelestialAnomaliesState } from './celestial-anomalies';
+export { BIRD_TOWER_STAGES, BIRD_TOWER_HINTS, BIRD_TOWER_MEALS, DEFAULT_BIRD_TOWER_STATE, type BirdTowerStage, type BirdTowerTrait, type BirdTowerState } from './bird-tower';

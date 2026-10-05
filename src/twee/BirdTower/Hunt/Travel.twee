@@ -1,0 +1,293 @@
+:: Deadwood BirdTower Hunt Passout []
+<<effects>>
+<<npc "Great Hawk">><<person1>>
+<<if isPregnancyEnding()>>
+  <<language>>
+    <<option 'EN'>>
+      The whole face of the <<beasttype>> is right in front of you.
+    <<option 'CN'>>
+      你的面前是<<beasttype>>的整张脸。
+  <</language>>
+  <<if $monster is 1>>
+    <<language>>
+      <<option 'EN'>>
+        <<bHe>> says something to you, but the words sound incomprehensible.
+      <<option 'CN'>>
+        <<bHe>>对你说了些什么，但那些单词听起来令人费解。
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        <<bHe>> looks at you with curious, concerned eyes.
+      <<option 'CN'>>
+        <<bHe>>用好奇和关切的眼神看着你。
+    <</language>>
+  <</if>>
+  <br><br>
+  <<language>>
+    <<option 'EN'>>
+      <<bHis>> wings begin to beat faster, and your stomach churns. When you open your eyes again, you see the hospital below and feathers at the edge of your vision.
+      You blink, and in that instant you feel yourself suddenly begin to drop. Your feet touch the pavement. A powerful gust follows, and the <<beasttype>> is gone.
+    <<option 'CN'>>
+      <<bHis>>的翅膀开始更快地拍动，你感到胃里一阵翻腾。再次睁开眼睛时，你看到了下方的医院，以及视野边缘的羽毛。
+      你一眨眼，那一瞬间你感觉自己突然开始降低。你的脚碰到了人行道。一股强烈的气流随之而来，<<beasttype>>消失了。
+  <</language>>
+  <br><br>
+  <<flight_hunt_end>><<HuntTogetherClean>>
+  <<lanLink ["Continue", "继续"] "Pregnancy Birth Hospital Passout">>
+    <<set $stress -= 5000>>
+    <<endevent>>
+  <</lanLink>>
+  <br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      When you open your eyes again, you are back at the tower. The <<beasttype>> and <<babyhawks>> are gathered around you.
+    <<option 'CN'>>
+      你再次睁开眼睛时，你已经回到了高塔。<<beasttype>>和<<babyhawks>>围在你身边。
+  <</language>>
+  <<set $stress -= 5000>>
+  <<if $monster is 1>>
+    <<language>>
+      <<option 'EN'>>
+        "<<Wife>>! What happened? I heard <<babyhawks>> crying out, and I saw you suddenly... drop. It was as if the sky had thrown you down."
+      <<option 'CN'>>
+        "<<Wife>>！发生什么了？我听见<<babyhawks>>的叫声，看到你突然……掉了下去。就像是天空突然把你扔了下去一样。"
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        <<bHe>> and <<babyhawks>> begin chirping urgently, clearly panicked.
+      <<option 'CN'>>
+        <<bHe>>和<<babyhawks>>开始急切地喳喳叫，显得十分惊慌。
+    <</language>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      You reassure them that you are fine. <<babyhawks>> nuzzle their heads against you.
+    <<option 'CN'>>
+      你安慰了他们，表示你没事。<<babyhawks>>用脑袋蹭着你。
+  <</language>>
+  <<if $monster is 1>>
+    <<language>>
+      <<option 'EN'>>
+        "Are you sure?" <<bhe>> is still very concerned.
+      <<option 'CN'>>
+        "你确定吗？"<<bhe>>依然十分关切。
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        <<bHe>> looks a little relieved, but still worried.
+      <<option 'CN'>>
+        <<bHe>>看起来稍微安心了些，但还是很担忧。
+    <</language>>
+  <</if>>
+  <<flight_hunt_end>><<HuntTogetherClean>>
+  <br><br>
+  <<lanLink ["Comfort them", "安慰他们"] "Bird Hunt Passout 2">>
+    <<set $phase to 0>>
+    <<npcincr "Great Hawk" dom 1>>
+  <</lanLink>>
+  <<gdom>>
+  <br>
+  <<lanLink ["Ignore them", "无视他们"] "Bird Hunt Passout 2">>
+    <<set $phase to 1>>
+    <<npcincr "Great Hawk" dom -1>>
+  <</lanLink>>
+  <<ldom>>
+  <br>
+<</if>>
+
+:: Deadwood BirdTower Hunt Return Ask []
+<<effects>><<childSelect $BirdTower.hunt.leader>>
+<<language>>
+  <<option 'EN'>>
+    You tell your <<babyhawks>> that you want to return to the castle.
+  <<option 'CN'>>
+    你告诉你的<<babyhawks>>，你想回城堡了。
+<</language>>
+<br><br>
+<<if $BirdTower.ring.hint is 1>>
+  <<language>>
+    <<option 'EN'>>
+      <<childname $orphanHawkChildId>> screeches happily in reply, <<childhis>> talons still clutching <<childhis>> ring.
+    <<option 'CN'>>
+      <<childname $orphanHawkChildId>>高兴地尖鸣回应你，<<childhis>>的爪里还抓着<<childhis>>的戒指。
+  <</language>>
+<<elseif $bird.hunts.lootAmount is 0>>
+  <<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
+    <<language>>
+      <<option 'EN'>>
+        <<childname>> screeches loudly in complaint; it seems <<childhim>> still wants to keep hunting. Regardless, you set off on the way home.
+      <<option 'CN'>>
+        <<childname>>大声尖鸣抱怨，看起来<<childhim>>还想继续狩猎。无论如何，你们踏上返程。
+    <</language>>
+    <<set $childRecords[$BirdTower.hunt.leader].development.activity to "hunting">>
+    <<set $childRecords[$BirdTower.hunt.leader].development.timer to 30>>
+    <!-- 这里没法做单独处理，就不情愿地回家再自己出去狩猎吧！ -->
+  <<elseif maplebirch.get('BirdTower').leaderTrait is "clever">>
+    <<language>>
+      <<option 'EN'>>
+        <<childname>> gives a small grumble; with empty talons, <<childhim>> still wants to keep hunting. You set off on the way home.
+      <<option 'CN'>>
+        <<childname>>发出小小的抱怨声，<<childhim>>两爪空空，还想继续狩猎。你们踏上返程。
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        Empty-taloned, <<babyhawksthem>> answer your call with frustration. You set off on the way home.
+      <<option 'CN'>>
+        两爪空空，<<babyhawksthem>>回应你的叫声里带上了沮丧。你们踏上返程。
+    <</language>>
+  <</if>>
+<<elseif $bird.hunts.timer lte 30>>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawksthem>> chirp and twitter, unwilling to head back so soon. You set off on the way home with the grumbling <<babyhawks>>.
+    <<option 'CN'>>
+      <<babyhawksthem>>唧唧喳喳地叫着，不想这么快就回去。你带着不断抱怨的<<babyhawks>>踏上了返程。
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawksthem>> screech in reply, and you set off on the way home.
+    <<option 'CN'>>
+      <<babyhawksthem>>尖鸣着回应你，你们踏上返程。
+  <</language>>
+<</if>>
+<br><br>
+<<lanLink ["Continue", "继续"] "Deadwood BirdTower Hunt Return">>
+  <<endevent>>
+<</lanLink>>
+<br>
+:: Deadwood BirdTower Hunt Plane Chase []
+<<effects>><<childSelect $BirdTower.hunt.leader>>
+<<if maplebirch.get('BirdTower').leaderTrait is "clever">>
+  <<language>>
+    <<option 'EN'>>
+      You fly behind your child; <<childname>> is
+    <<option 'CN'>>
+      你飞在你的孩子身后，<<childname>>正
+  <</language>>
+  <<if maplebirch.get('BirdTower').party.length gt 1>>
+    <<language>>
+      <<option 'EN'>>
+        taking the lead up front,
+      <<option 'CN'>>
+        在最前方领头，
+    <</language>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      chasing the plane as fast as possible.
+    <<option 'CN'>>
+      尽可能快地追着飞机。
+  <</language>>
+  <<if $athletics gte 600>>
+    <<language>>
+      <<option 'EN'>>
+        You keep close behind <<babyhawksthem>>.
+      <<option 'CN'>>
+        你紧紧跟着<<babyhawksthem>>。
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        The speed of <<babyhawksthem>> shocks you, and you struggle to keep up with <<childname>>.
+      <<option 'CN'>>
+        <<babyhawksthem>>的速度令你震惊，你努力跟上<<childname>>。
+    <</language>>
+  <</if>>
+  <br><br>
+  <<language>>
+    <<option 'EN'>>
+      Together you chase the plane for several minutes, until it finally flies out of sight.
+      <br><br>
+      <<childname>> cries out in disappointment, but still looks determined. You doubt this will be <<childhim>> last attempt at catching a plane.
+    <<option 'CN'>>
+      你们一起追了飞机好几分钟，直到它最终飞出视野。
+      <br><br>
+      <<childname>>失望地叫着，但看起来仍然坚定。你怀疑这不会是<<childhim>>最后一次尝试抓飞机。
+  <</language>>
+  <br><br>
+  <<babyhawk_hunt_options>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      You fly behind your children; <<babyhawks>> are chasing the plane as fast as they can.
+    <<option 'CN'>>
+      你飞在你的孩子身后，<<babyhawks>>正尽可能快地追着飞机。
+  <</language>>
+  <<if $athletics gte 400>>
+    <<language>>
+      <<option 'EN'>>
+        You keep close behind <<babyhawksthem>>.
+      <<option 'CN'>>
+        你紧紧跟着<<babyhawksthem>>。
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        You struggle to keep up with <<babyhawksthem>>.
+      <<option 'CN'>>
+        你努力跟上<<babyhawksthem>>。
+    <</language>>
+  <</if>>
+  <br><br>
+  <<language>>
+    <<option 'EN'>>
+      Together you chase the plane for several minutes, until <<babyhawks>> stop, panting, and watch it finally fly out of sight. <<babyhawksthem>> cry out to the sky in disappointment.
+      <br><br>
+      You take <<babyhawks>> to rest on a nearby tree trunk for a while.
+    <<option 'CN'>>
+      你们一起追了飞机几分钟，直到<<babyhawks>>气喘吁吁地停下，看着它最终飞出了视野。<<babyhawksthem>>冲着天空失望地叫着。
+      <br><br>
+      你带着<<babyhawks>>到附近的树干上歇息了一会儿。
+  <</language>>
+  <<tiredness -6>>
+  <br><br>
+  <<babyhawk_hunt_options>>
+<</if>>
+
+:: Deadwood BirdTower Hunt Ignore []
+<<effects>><<flight_distance_check>>
+<<if $bird.hunts.goal is "babyhawk">>
+  <<language>>
+    <<option 'EN'>>
+      You tell <<babyhawks>> to ignore it, then look away.
+    <<option 'CN'>>
+      你告诉<<babyhawks>>无视它，然后看向了别处。
+  <</language>>
+  <br><br>
+  <<if ["clever", "dominant"].includes(maplebirch.get('BirdTower').leaderTrait)>>
+    <<language>>
+      <<option 'EN'>>
+        <<childname $BirdTower.hunt.leader>> screeches in response.
+      <<option 'CN'>>
+        <<childname $BirdTower.hunt.leader>>尖鸣着回应。
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawks>> screech in response.
+      <<option 'CN'>>
+        <<babyhawks>>尖鸣着回应。
+    <</language>>
+  <</if>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      You decide to ignore it and look away.
+    <<option 'CN'>>
+      你们决定无视它，然后看向别处。
+  <</language>>
+<</if>>
+<br><br>
+<<endevent>>
+<<babyhawk_hunt_options>>
+
+:: Deadwood BirdTower Hunt Exit []
+<<effects>>
+<<set _huntFail to 1>>
+<<babyhawk_hunt_return>>

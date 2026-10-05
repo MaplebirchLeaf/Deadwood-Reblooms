@@ -13,6 +13,7 @@ import Sydney from './Sydney';
 import Robin from './Robin';
 import Whitney from './Whitney';
 import Kylar from './Kylar';
+import BirdTower from './BirdTower';
 
 (function (maplebirch): void {
   'use strict';
@@ -29,6 +30,7 @@ import Kylar from './Kylar';
   if (maplebirch.get('Robin')) Robin(maplebirch);
   if (maplebirch.get('Whitney')) Whitney(maplebirch);
   if (maplebirch.get('Kylar')) Kylar(maplebirch);
+  if (maplebirch.get('BirdTower')) BirdTower(maplebirch);
   if (maplebirch.get('LifeSimulation')) LifeSimulation(maplebirch);
   if (maplebirch.get('Orchard')) Orchard(maplebirch);
 })(maplebirch);

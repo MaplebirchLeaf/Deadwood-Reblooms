@@ -40,6 +40,7 @@ The current version is **1.3.2**. See the [release notes](.github/release-notes/
 | `Kylar`                             | Manor stays and room interactions                                                    |
 | `LifeSimulation`                    | Attendance pass, prefect, student president, school reputation, gym, and card tables |
 | `Orchard`                           | Temple and farm orchards, tree care, gradual clearing, and hired help                |
+| `BirdTower`                         | Bird Tower expansion: hawk chick growth, feeding, personality, and hunts             |
 | `VanillaPlus`                       | Stat breakthroughs, homes, financial-centre work, banking, and stocks                |
 | `CelestialAnomalies`                | Solar eclipses, meteor showers, and changing sky and weather visuals                 |
 | `MoreTransformations`               | Horse, fish, and raven transformations, locations, equipment, and traits             |
@@ -68,6 +69,7 @@ Thanks to the following creators for their work and help. You can turn off the c
 - `MoreLoveInterestsAndNPCAvatars`: [social sidebar portraits](https://github.com/Eudemonism00/DOL-npcicon-mods/) by Eudemonism00 and [More Love Interests](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod) by 苯环.
 - `Robin`: [Dom Robin](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod) by 零环零幻想.
 - `LifeSimulation`: [DoLSims](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims) by 丧心.
+- `BirdTower`: [BabyHawk](https://github.com/koooooiCarp/DOL-BabyHawk-Mod) by 鲤鱼旗🎏 (polish by 行歌).
 - Horse transformation sprites: 元夕.
 
 Dynamic music uses CC0 audio by Kresiek The Furry, Augmentality (Brandon Morris), AdoTheLimey, primbal, Breviceps, Joth, TinyWorlds, isaiah658, SketchMan3, and rubberduck. See the [audio source record](audio-pack/audio/CREDITS.md) for individual tracks. Thanks also to everyone who shared ideas, testing feedback, and other help.

@@ -1,0 +1,182 @@
+:: Deadwood BirdTower Childrens Home []
+<<getChildrenIds `{location: "otherNest", excludeUnhatched: true}` "both">>
+<<set _childrenIds to _childrenIds.filter(id => $childRecords[id].species is "hawk")>>
+<<set $otherNest to true>>
+<<language>>
+  <<option 'EN'>>
+    You are near the new nest of <<if _childrenIds.length gte 2>>the children<<else>>the child<</if>>.
+  <<option 'CN'>>
+    你正待在<<if _childrenIds.length gte 2>>孩子们<<else>>孩子<</if>>的新巢附近。
+<</language>>
+<<if $BirdTower.ring.kept>>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawkicon "Gold Ring">>That gold ring is glinting at <<childname $orphanHawkChildId>>'s spot.
+    <<option 'CN'>>
+      <<babyhawkicon "Gold Ring">>那枚金戒指正在<<childname $orphanHawkChildId>>的位置闪闪发光。
+  <</language>>
+<</if>>
+<<if Time.dayState isnot "night" and (!$daily.childrenHomeEvent or !$daily.childrenHomeEvent.includes("otherNest")) and random(1) is 1>>
+  <!-- 页面事件，每日一次 -->
+  <<if !$daily.childrenHomeEvent>>
+    <<set $daily.childrenHomeEvent to ["otherNest"]>>
+  <<else>>
+    <<run $daily.childrenHomeEvent = Array.isArray($daily.childrenHomeEvent) ? $daily.childrenHomeEvent : [$daily.childrenHomeEvent]>>
+    <<run $daily.childrenHomeEvent.pushUnique("otherNest")>>
+  <</if>>
+  <<cleareventpool>>
+  <<babyhawkEvents "otherNest" $passage>>
+  <<if _eventpool.length>>
+    <<runeventpool>>
+    <<exit>>
+  <</if>>
+<</if>>
+<br><br>
+<<childViewerDisplay _childrenIds>>
+<br><br>
+<<lanLink ["Return", "返回"] "Bird Tower">>
+  <<unset $otherNest>>
+<</lanLink>>
+
+:: Deadwood BirdTower Build OtherNest []
+<<npc "Great Hawk">><<person1>>
+<<run maplebirch.get('BirdTower').at('tower').forEach(child => {
+  if (child.development.stage === 'Immature' && child.development.grow_hint_immature !== 1) {
+    child.development.location = "otherNest";
+  }
+})>>
+<<set _childrenIds to maplebirch.get('BirdTower').at('otherNest').map(child => child.childId)>>
+<<run maplebirch.get('BirdTower').beginScene(_childrenIds)>>
+<<if !$BirdTower.scene.ids.length>>
+  <<language>>
+    <<option 'EN'>>
+      BUG: Could not find the matching ID, please report this to the author.
+    <<option 'CN'>>
+      BUG:无法找到对应ID，请汇报作者。
+  <</language>>
+<</if>>
+<<childSelect $BirdTower.scene.actors[0]>>
+<<language>>
+  <<option 'EN'>>
+    You pick up some of the twigs and leaves you collected, ready to build the children a new nest.
+  <<option 'CN'>>
+    你拿起一些收集到的小树枝和树叶，准备给孩子们建一个新巢。
+<</language>>
+<<if ["rest","sleep"].includes($bird.activity)>>
+  <<language>>
+    <<option 'EN'>>
+      <<your_bird_text "cap">> stirs slightly and wakes up. <<bHe>> looks at you curiously.
+    <<option 'CN'>>
+      <<your_bird_text "cap">>微微动了动，醒了过来。<<bHe>>好奇地看着你。
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<your_bird_text "cap">> comes over to your side, curious.
+    <<option 'CN'>>
+      <<your_bird_text "cap">>好奇地凑到你身边来。
+  <</language>>
+<</if>>
+<br><br>
+<<switch $speech_attitude>>
+  <<case "meek">>
+    <<language>>
+      <<option 'EN'>>
+        "I— I want to build <<babyhawks>> a new nest," you say. "The current nest might be a bit too crowded for <<babyhawks>>."
+      <<option 'CN'>>
+        "我、我想给<<babyhawks>>做一个新的巢。"你说。"现在的巢可能对<<babyhawks>>来说有点太挤了。"
+    <</language>>
+  <<case "bratty">>
+    <<language>>
+      <<option 'EN'>>
+        " <<babyhawks>> have long outgrown it," you say. "<<babyhawksthem>> can't keep squeezing in with the two of us."
+      <<option 'CN'>>
+        " <<babyhawks>>的个头早就太大了，"你说，"<<babyhawksthem>>不能再和我们俩挤在一块儿了。"
+    <</language>>
+  <<default>>
+    <<language>>
+      <<option 'EN'>>
+        "I'm going to build <<babyhawks>> a new nest," you say. "<<babyhawksthem>> sleeping with us might be a bit too crowded."
+      <<option 'CN'>>
+        "我要给<<babyhawks>>做一个新的巢，"你说，"<<babyhawksthem>>和我们睡在一起可能有点太挤了。"
+    <</language>>
+<</switch>>
+<br><br>
+<<if $monster is 1>>
+  <<language>>
+    <<option 'EN'>>
+      A flicker of disappointment crosses <<bHe>>'s eyes, but <<bhe>> still smiles at you. "I'd be glad to build <<babyhawks>> a new nest."
+    <<option 'CN'>>
+      <<bHe>>的眼里闪过一瞬失望，但还是冲你微笑了一下，"我很乐意为<<babyhawks>>建一个新巢。"
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<bHe>> chatters, a little hurt, but soon cheers up again.
+    <<option 'CN'>>
+      <<bHe>>叽喳叫着，有些伤心，但很快又振作起来。
+  <</language>>
+<</if>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    You begin building the new nest. <<babyhawks>> lift their heads from the nest and watch you busily carrying materials. Before long, <<babyhawksthem>> hop out too and follow behind you.
+    <br><br>
+    You pick another corner of the tower for the new nest. You layer the larger pieces of wood over one another as a base, while <<GreatHawk>> weaves each twig and short log in among them, building up the basic frame of the nest.
+    <br>
+    <<childname>> copies your mate, poking twig after twig into the gaps; <<childhim>> looks like <<childhe>> is having a lot of fun.
+    <br>
+    With <<babyhawks>> keeping you company, your work is slow and relaxed.
+  <<option 'CN'>>
+    你们开始搭建新巢。<<babyhawks>>从巢里抬起头，看着你们忙忙碌碌地搬运材料。没一会儿，<<babyhawksthem>>也跳出来跟在你们身后。
+    <br><br>
+    你们选中了高塔的另一个角落来放置新巢。你将大块的木材互相交叠作为基底，而<<GreatHawk>>负责将每根小树枝和短原木穿插其中，搭建成巢穴的基础框架。
+    <br>
+    <<childname>>学着你的配偶的样子，把一根根小树枝戳进缝隙间，<<childhim>>看起来玩得很开心。
+    <br>
+    在<<babyhawks>>的陪伴下，你们的工作做得缓慢又悠闲。
+<</language>>
+<<stress -6>><<trauma -6>><<lstress>><<ltrauma>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    While they put up the frame, you sit to one side and start stitching large sheets of hide out of cloth and lurker leather.
+    <<if $BirdTower.scene.ids.length gt 1>><<childSelect $BirdTower.scene.actors[1]>><<childname>> rests <<childhis>> fuzzy little head on your shoulder and watches you thread the needle, curious. <<childhim>> tries to reach out a claw to catch the dancing thread ends, but the thread just slips out of <<childhis>> claws.<</if>>
+    You spread this fabric through the middle of the nest, padding it soft and safe, and then you fill the nest out with leaves and feathers, making the new nest both soft and sturdy.
+  <<option 'CN'>>
+    在他们组建框架的同时，你坐在一旁开始用布料和潜伏者的皮革缝制大张的皮料。
+    <<if $BirdTower.scene.ids.length gt 1>><<childSelect $BirdTower.scene.actors[1]>><<childname>>把毛茸茸的小脑袋放在你的肩膀上，好奇地看着你穿针引线。<<childhim>>试图伸出爪子抓住那些舞动的线头，但线只是从<<childhim>>的爪子里溜走了。<</if>>
+    这张织物被你铺在巢的中央，将巢垫得松软又安全，随后你们再用叶子和羽毛把巢填充得结结实实，让这个新巢变得既柔软又稳固。
+<</language>>
+<br><br>
+<<if $BirdTower.scene.ids.length gt 2>>
+  <<language>>
+    <<option 'EN'>>
+      <<childSelect $BirdTower.scene.actors[2]>>The fabric has barely been laid when <<childname>> eagerly jumps into the pile of feathers and rolls around, sending loose down drifting everywhere with <<childhis>> antics. <<your_bird_text>>
+      <<if $monster>>
+        <<lanSwitch "grabs <<childhim>> and sets <<childhim>> aside." "把<<childhim>>抓住放到了一旁。">>
+      <<else>>
+        <<lanSwitch "picks <<childhim>> up by the scruff and sets <<childhim>> aside." "把<<childhim>>叼起放到了一旁。">>
+      <</if>>
+    <<option 'CN'>>
+      <<childSelect $BirdTower.scene.actors[2]>>才铺好织物，<<childname>>就迫不及待地跳进羽毛堆里打滚，杂乱的绒毛因为<<childhim>>的举动漫天飘散。<<your_bird_text>><<= $monster ? "把<<childhim>>抓住放到了一旁。" : "把<<childhim>>叼起放到了一旁。">>
+  <</language>>
+  <br>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    Before long you tuck the last few poking-out twigs securely into the bottom of the nest and make sure every part is finished. You step back, stand beside <<your_bird_text>>, and watch <<babyhawks>> happily dive into the newly built nest, bouncing about inside it.
+    <br><br>
+    You and <<GreatHawk>> rest together for a while amid <<babyhawks>>' laughter and cries.
+  <<option 'CN'>>
+    没一会儿，你把最后几根支棱出来的小树枝稳当地塞进巢的底部，确认好每个部分都搭建完毕。你退开，站在<<your_bird_text>>身边，看着<<babyhawks>>开心地扑进新搭建的巢里，在巢里蹦蹦跳跳。
+    <br><br>
+    你和<<GreatHawk>>一起待在<<babyhawks>>的笑声和尖叫声里休息了一会儿。
+<</language>>
+<<tiredness -6>><<ltiredness>>
+<br><br>
+<<lanLink ['Continue', '继续'] 'Bird Tower Build'>>
+  <<BabyHawkStoryClean>>
+  <<endevent>>
+<</lanLink>>
+<br>

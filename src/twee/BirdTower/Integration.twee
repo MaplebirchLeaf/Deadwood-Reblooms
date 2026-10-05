@@ -1,0 +1,549 @@
+:: Deadwood BirdTower Integration [widget]
+<<widget "deadwood-birdtower-activity-return">>
+  <<lanLink ["Next", "继续"] `$otherNest ? "Deadwood BirdTower Childrens Home" : "Childrens Home"`>>
+    <<if $otherNest>>
+      <<unset $exitPassage $otherNest>>
+    <</if>>
+    <<unset $childActivityEvent>>
+    <<endevent>>
+  <</lanLink>>
+<</widget>>
+<<widget "deadwood-birdtower-nest-link">>
+  <<if maplebirch.get('BirdTower').at('otherNest').length>>
+    <<babyhawkicon "children">><<lanLink ["Visit the children's nest", "查看孩子的巢"] "Deadwood BirdTower Childrens Home">><</lanLink>>
+    <br><br>
+  <</if>>
+<</widget>>
+<<widget "deadwood-birdtower-hunt-invitation">>
+  <<if maplebirch.get('BirdTower').canInvite and $rng lte 25>>
+    <<run maplebirch.get('BirdTower').startHunt()>>
+    <<childSelect $BirdTower.hunt.ids[0]>>
+    <<language>>
+      <<option 'EN'>>
+        Before you set off, <<= maplebirch.get('BirdTower').party.length gt 1 ? "a chorus of" : "a single young">> chirps come from behind you and cut short your steps. <<childrenNames $BirdTower.hunt.ids>> fly to your side, chirping at you.
+      <<option 'CN'>>
+        在你出发之前，<<= maplebirch.get('BirdTower').party.length gt 1 ? "一阵喧闹的" : "一声稚嫩的">>啾鸣声从你身后传来，截住了你的脚步。<<childrenNames $BirdTower.hunt.ids>>飞到了你的身边，冲着你叽喳叫。
+    <</language>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawksthem>> seem to want to hunt with you.
+      <<option 'CN'>>
+        <<babyhawksthem>>似乎想要和你一起去狩猎。
+    <</language>>
+    <br><br>
+    <<lanLink ["Bring your children along", "带上你的孩子"] "Deadwood BirdTower Hunt Accept">>
+      <<bird_fly_reveal_wings>>
+    <</lanLink>>
+    <br>
+    <<lanLink ["Refuse", "拒绝"] "Deadwood BirdTower Hunt Refuse">><</lanLink>>
+    <br>
+    <<exitAll>>
+  <</if>>
+<</widget>>
+<<widget "deadwood-birdtower-hunt-loot">>
+  <<set _birdtower_fed to maplebirch.get('BirdTower').hungryParty(_args[0])>>
+  <<if _birdtower_fed gt 0>>
+    <<language>>
+      <<option 'EN'>>
+        <<childrenNames _tempIDs>> carry the lurkers back to the nest and start wolfing them down.
+      <<option 'CN'>>
+        <<childrenNames _tempIDs>>抓着带回来的潜伏者回到了巢里，开始狼吞虎咽地进食。
+    <</language>>
+    <<set $bird.materials.lurkers -= _birdtower_fed>>
+    <br><br>
+  <</if>>
+  <<if $BirdTower.ring.hint>>
+    <<babyhawkicon "Gold Ring">>
+    <<if $BirdTower.ring.hint is 1>>
+      <<language>>
+        <<option 'EN'>>
+          You watch <<childname $orphanHawkChildId>> place the gold ring into their own nest.
+        <<option 'CN'>>
+          你看到<<childname $orphanHawkChildId>>把那枚金戒指放进了自己的巢里。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          A gold ring.
+        <<option 'CN'>>
+          一枚金戒指。
+      <</language>>
+    <</if>>
+    <<unset $BirdTower.ring.hint>>
+    <br><br>
+  <</if>>
+<</widget>>
+<<widget "deadwood-birdtower-moor-event">>
+  <!-- 白天、荒原深处、每日一次、十分之一概率遇上小鹰正在单独狩猎 -->
+  <<if Time.dayState isnot "night" and $moor gte 21 and !$BirdTower.daily.moor_event and $rng lte 10 and maplebirch.get('BirdTower').at('otherNest').some(child => child.development.activity isnot "hunting")>>
+    <<set $BirdTower.daily.moor_event to true>>
+    <<eventsMoorBabyhawk>>
+    <<exitAll>>
+  <</if>>
+<</widget>>
+<<widget "deadwood-birdtower-pool-link">>
+  <<if $daily.birdSexHelp isnot true>>
+    <<skinicon "masturbate">><<lanLink ["Masturbate in the rain pool", "在雨水池里自慰"] "Deadwood BirdTower Masturbation Help">><</lanLink>>
+    <br>
+  <</if>>
+<</widget>>
+<<widget "deadwood-birdtower-child-activity">>
+  <<switch $childRecords[_args[0]].development.activity>>
+    <<case "beg">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> is in the nest,
+        <<option 'CN'>>
+          <<childHe>>在巢里
+      <</language>>
+      <<set _rng to random(1,4)>>
+      <<language>>
+        <<option 'EN'>>
+          <<childcry _rng>>. As you come closer, <<childhe>> lifts <<childhis>> head and opens <<childhis>> beak wide at you.
+        <<option 'CN'>>
+          <<childcry _rng>>着。你一靠近，<<childhe>>便抬起头来对你大张着嘴。
+      <</language>>
+      <br>
+      <<if $bird.materials.lurkers gte 1>>
+        <<lanLink ["Feed your child a lurker (0:15)", "给孩子喂食一只潜伏者 (0:15)"] "Deadwood BirdTower Activity Events">>
+          <<pass 15>>
+          <<set $childActivityEvent to {event:"begHawk", childid:_args[0]}>>
+        <</lanLink>>
+        |
+      <<else>>
+        <span class="blue"><<lanSwitch 'There are no lurkers left in your nest.' '你的巢里没有潜伏者了。'>></span>
+      <</if>>
+    <<case "GreatHawk">>
+      <<if $bird.state is "home" and ["build","brood","rest"].includes($bird.activity)>>
+        <<npc "Great Hawk">>
+        <<switch $bird.activity>>
+          <<case "build">>
+            <<language>>
+              <<option 'EN'>>
+                <<childHe>> follows <<GreatHawk>> around while <<bhe>> builds the nest.
+              <<option 'CN'>>
+                <<childHe>>跟在正在筑巢的<<GreatHawk>>身后。
+            <</language>>
+            <br>
+            <<lanLink ["Watch them (0:15)", "看看他们 (0:15)"] "Deadwood BirdTower Activity Events">>
+              <<pass 15>>
+              <<set $childActivityEvent to {event:"Hawk_build", childid:_args[0]}>>
+            <</lanLink>>
+            |
+          <<case "brood">>
+            <<if $childRecords[_args[0]].development.location is "tower">>
+              <<language>>
+                <<option 'EN'>>
+                  <<childHe>> is trying to squirm under <<GreatHawk>> while <<bhe>> broods.
+                <<option 'CN'>>
+                  <<childHe>>正试图钻进孵蛋的<<GreatHawk>>身下。
+              <</language>>
+            <<else>>
+              <<language>>
+                <<option 'EN'>>
+                  <<childHe>> watches <<GreatHawk>> brooding with curiosity.
+                <<option 'CN'>>
+                  <<childHe>>好奇地看着正在孵蛋的<<GreatHawk>>。
+              <</language>>
+            <</if>>
+            <br>
+            <<lanLink ["Pick your child up (0:15)", "抱起孩子 (0:15)"] "Deadwood BirdTower Activity Events">>
+              <<pass 15>>
+              <<set $childActivityEvent to {event:"Hawk_brood", childid:_args[0]}>>
+            <</lanLink>>
+            |
+          <<case "rest">>
+            <<language>>
+              <<option 'EN'>>
+                <<your_bird_text>> is softly <<= $monster ? "saying something" : "chirping">> to <<childHe>>.
+              <<option 'CN'>>
+                <<your_bird_text>>正在对<<childHe>>轻声<<= $monster ? "说些什么" : "唧唧叫">>。
+            <</language>>
+            <br>
+            <<lanLink ["Observe them (0:15)", "观察他们 (0:15)"] "Deadwood BirdTower Activity Events">>
+              <<pass 15>>
+              <<set $childActivityEvent to {event:"Hawk_rest", childid:_args[0]}>>
+            <</lanLink>>
+            |
+        <</switch>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> is in the nest, <<print either(lanSwitch("resting", "休息"),lanSwitch("spacing out", "发呆"),lanSwitch("curiously looking around", "好奇地观察四周"),lanSwitch("dozing off", "打瞌睡"))>>.
+          <<option 'CN'>>
+            <<childHe>>在巢里<<print either("休息","发呆","好奇地观察四周","打瞌睡")>>。
+        <</language>>
+      <</if>>
+    <<case "weather">>
+      <<if Weather.temperature lte -15 and getBirdBurnTime() lte 0>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> is shivering in the nest.
+          <<option 'CN'>>
+            <<childHe>>在巢里瑟瑟发抖。
+        <</language>>
+        <br>
+        <<lanLink ["Help keep your child warm (0:15)", "帮孩子保暖 (0:15)"] "Deadwood BirdTower Activity Events">>
+          <<pass 15>>
+          <<set $childActivityEvent to {event:"Hawk_weather_cold", childid:_args[0]}>>
+        <</lanLink>>
+        |
+      <<elseif Weather.temperature gte 30>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> is panting in the nest with <<childhis>> beak open.
+          <<option 'CN'>>
+            <<childHe>>在巢里张着嘴巴喘气。
+        <</language>>
+        <br>
+        <<lanLink ["Help cool your child down (0:15)", "帮孩子降温 (0:15)"] "Deadwood BirdTower Activity Events">>
+          <<pass 15>>
+          <<set $childActivityEvent to {event:"Hawk_weather_hot", childid:_args[0]}>>
+        <</lanLink>>
+        |
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> is looking out at the sky from the nest.
+          <<option 'CN'>>
+            <<childHe>>在巢里向外看着天空。
+        <</language>>
+        <br>
+        <<lanLink ["Stay with your child (0:15)", "陪伴孩子 (0:15)"] "Deadwood BirdTower Activity Events">>
+          <<pass 15>>
+          <<set $childActivityEvent to {event:"Hawk_weather_mild", childid:_args[0]}>>
+        <</lanLink>>
+        |
+      <</if>>
+    <<case "GoldRing">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> is in the nest, playing with the gold ring.
+        <<option 'CN'>>
+          <<childHe>>正在巢里把玩着那枚金戒指。
+      <</language>>
+    <<case "Fledgling_fly">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> is flapping <<childhis>> wings in the nest.
+        <<option 'CN'>>
+          <<childHe>>正在巢里扑打着翅膀。
+      <</language>>
+      <br>
+      <<lanLink ["Help your child try to fly (0:15)", "帮孩子尝试飞行 (0:15)"] "Deadwood BirdTower Activity Events">>
+        <<pass 15>>
+        <<set $childActivityEvent to {event:"Fledgling_fly", childid:_args[0]}>>
+      <</lanLink>>
+      |
+    <<case "explore">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> is not in the nest.
+        <<option 'CN'>>
+          <<childHe>>不在巢里。
+      <</language>>
+      <br>
+      <<lanLink ["Look for your child (0:15)", "寻找孩子 (0:15)"] "Deadwood BirdTower Activity Events">>
+        <<pass 15>>
+        <<set $childActivityEvent to {event:"explore", childid:_args[0]}>>
+      <</lanLink>>
+      |
+    <<case "Fledgling_preen">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> is struggling with <<childhis>> wings.
+        <<option 'CN'>>
+          <<childHe>>正在和自己的翅膀做斗争。
+      <</language>>
+      <br>
+      <<lanLink ["Help your child preen (0:15)", "帮孩子整理羽毛 (0:15)"] "Deadwood BirdTower Activity Events">>
+        <<pass 15>>
+        <<set $childActivityEvent to {event:"Fledgling_preen", childid:_args[0]}>>
+      <</lanLink>>
+      |
+    <<case "Fledgling_perch">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> stares out at the perch.
+        <<option 'CN'>>
+          <<childHe>>向外看着栖木。
+      <</language>>
+      <br>
+      <<lanLink ["Take your child to the perch (0:15)", "带孩子去栖木那里 (0:15)"] "Deadwood BirdTower Activity Events">>
+        <<pass 15>>
+        <<set $childActivityEvent to {event:"Fledgling_perch", childid:_args[0]}>>
+      <</lanLink>>
+      |
+    <<case "Subadult_fly">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> is practising flight near the tower.
+        <<option 'CN'>>
+          <<childHe>>正在高塔附近练习飞行。
+      <</language>>
+      <br>
+      <<lanLink ["Watch over your child (0:15)", "守望孩子 (0:15)"] "Deadwood BirdTower Activity Events">>
+        <<pass 15>>
+        <<set $childActivityEvent to {event:"Subadult_fly", childid:_args[0]}>>
+      <</lanLink>>
+      |
+    <<case "Subadult_preen">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> is preening <<childhis>> feathers.
+        <<option 'CN'>>
+          <<childHe>>正在梳理自己的羽毛。
+      <</language>>
+      <br>
+      <<lanLink ["Help your child preen (0:15)", "帮孩子整理羽毛 (0:15)"] "Deadwood BirdTower Activity Events">>
+        <<pass 15>>
+        <<set $childActivityEvent to {event:"Subadult_preen", childid:_args[0]}>>
+      <</lanLink>>
+      |
+    <<case "Subadult_perch">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> is heading for the perch.
+        <<option 'CN'>>
+          <<childHe>>正在向栖木走去。
+      <</language>>
+      <br>
+      <<lanLink ["Follow your child (0:15)", "跟上孩子 (0:15)"] "Deadwood BirdTower Activity Events">>
+        <<pass 15>>
+        <<set $childActivityEvent to {event:"Subadult_perch", childid:_args[0]}>>
+      <</lanLink>>
+      |
+    <<case "rest">>
+      <<switch $childRecords[_args[0]].development.trait>>
+        <<case "clumsy">>
+          <<language>>
+            <<option 'EN'>>
+              <<childHe>> is in the nest, <<print either(lanSwitch("resting", "休息"),lanSwitch("gazing at the sky", "望着天空"),lanSwitch("peeking out at you", "探头探脑地望着你"),lanSwitch("spacing out", "发呆"),lanSwitch("dozing off", "打瞌睡"))>>.
+            <<option 'CN'>>
+              <<childHe>>在巢里<<print either("休息","望着天空","探头探脑地望着你","发呆","打瞌睡")>>。
+          <</language>>
+        <<case "sympathy">>
+          <<language>>
+            <<option 'EN'>>
+              <<childHe>> is in the nest, <<print either(lanSwitch("resting", "休息"),lanSwitch("gazing at the sky", "望着天空"),lanSwitch("curiously looking around", "好奇地观察四周"),lanSwitch("spacing out", "发呆"),lanSwitch("dozing off", "打瞌睡"))>>.
+            <<option 'CN'>>
+              <<childHe>>在巢里<<print either("休息","望着天空","好奇地观察四周","发呆","打瞌睡")>>。
+          <</language>>
+        <<case "clever">>
+          <<language>>
+            <<option 'EN'>>
+              <<childHe>> is in the nest, <<print either(lanSwitch("resting", "休息"),lanSwitch("gazing at the sky", "望着天空"),lanSwitch("watching you as you walk about", "望着你，看着你走来走去"),lanSwitch("playing with a twig in <<childhis>> beak", "衔着树枝玩耍"),lanSwitch("curled up asleep", "团成一团睡觉"))>>.
+            <<option 'CN'>>
+              <<childHe>>在巢里<<print either("休息","望着天空","望着你，看着你走来走去","衔着树枝玩耍","团成一团睡觉")>>。
+          <</language>>
+        <<case "dominant">>
+          <<language>>
+            <<option 'EN'>>
+              <<childHe>> is in the nest, <<print either(lanSwitch("resting", "休息"),lanSwitch("gazing at the sky", "望着天空"),lanSwitch("wrecking the place and pulling out several twigs", "拆家，拔掉了好几根小树枝"),lanSwitch("sharpening <<childhis>> claws", "磨爪"),lanSwitch("curled up asleep", "团成一团睡觉"))>>.
+            <<option 'CN'>>
+              <<childHe>>在巢里<<print either("休息","望着天空","拆家，拔掉了好几根小树枝","磨爪","团成一团睡觉")>>。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              <<childHe>> is in the nest, <<print either(lanSwitch("resting", "休息"),lanSwitch("spacing out", "发呆"),lanSwitch("curiously looking around", "好奇地观察四周"),lanSwitch("dozing off", "打瞌睡"))>>.
+            <<option 'CN'>>
+              <<childHe>>在巢里<<print either("休息","发呆","好奇地观察四周","打瞌睡")>>。
+          <</language>>
+      <</switch>>
+    <<case "hunting">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> is out hunting.
+        <<option 'CN'>>
+          <<childHe>>正在外面狩猎。
+      <</language>>
+  <</switch>>
+<</widget>>
+<<widget "deadwood-birdtower-child-feeding">>
+  <<if $childRecords[_args[0]].development.fed_daily>>
+    <<language>>
+      <<option 'EN'>>
+        Fed today: <<print $childRecords[_args[0]].development.fed_daily>>
+      <<option 'CN'>>
+        今日已喂食：<<print $childRecords[_args[0]].development.fed_daily>>
+    <</language>>
+    <br>
+  <</if>>
+  <<if $childRecords[_args[0]].development.fed_total>>
+    <<language>>
+      <<option 'EN'>>
+        Total feeds: <<print $childRecords[_args[0]].development.fed_total>>
+      <<option 'CN'>>
+        总喂食次数：<<print $childRecords[_args[0]].development.fed_total>>
+    <</language>>
+    <br>
+  <</if>>
+  <<if $cheatdisable is "f">>
+    <<if $childRecords[_args[0]].development.stage>>
+      <<language>>
+        <<option 'EN'>>
+          Stage: <<print $childRecords[_args[0]].development.stage>>
+        <<option 'CN'>>
+          阶段：<<print $childRecords[_args[0]].development.stage>>
+      <</language>>
+      <br>
+    <</if>>
+    <<if $childRecords[_args[0]].development.trait>>
+      <<language>>
+        <<option 'EN'>>
+          Trait: <<print $childRecords[_args[0]].development.trait>>
+        <<option 'CN'>>
+          特质：<<print $childRecords[_args[0]].development.trait>>
+      <</language>>
+      <br>
+    <</if>>
+  <</if>>
+<</widget>>
+<<widget "deadwood-birdtower-child-growth">>
+  <<if $childRecords[_args[0]].development.size_hint>>
+    <<language>>
+      <<option 'EN'>>
+        <span class="teal">Thanks to the rich meals lately, <<childname>> seems to have grown a little bigger.</span>
+      <<option 'CN'>>
+        <span class="teal">由于近来的丰富饮食，<<childname>>的体型好像增大了一点儿。</span>
+    <</language>>
+    <br>
+    <<run delete $childRecords[_args[0]].development.size_hint>>
+  <</if>>
+<</widget>>
+<<widget "deadwood-birdtower-nest-upgrade">>
+  <<set $_upgrade to _args[0]>>
+  <<switch $bird.upgrades.otherNest>>
+    <<case 0>>
+      <<language>>
+        <<option 'EN'>>
+          <span class="red">No spare nest (0)</span>: your children sleep in the same nest as you. It is a little cramped.
+        <<option 'CN'>>
+          <span class="red">没有备用巢 (0)</span>：你的孩子和你们睡在一个巢里。有点挤。
+      <</language>>
+      <<set $_upgrade.passage to "Deadwood BirdTower Build OtherNest">>
+      <<set $_upgrade.timeTaken to 60>>
+      <<set $_upgrade.materialsUsed to {
+        wood: 4,
+        fabric: 4,
+        sticks: 8,
+        leaves: 8,
+        leather: 8,
+        feathers: 8,
+      }>>
+      <<set $_upgrade.upgradesRequired to {
+        tools: 1
+      }>>
+      <<set $_upgrade.activityRequired to ["build","brood","rest","sleep"]>>
+      <<set $_upgrade.housekeeping to 300>>
+    <<case 1>>
+      <<language>>
+        <<option 'EN'>>
+          <span class="green">A small nest (1)</span>: a temporary home for the children.
+        <<option 'CN'>>
+          <span class="green">小小的巢 (1)</span>：给孩子们的临时居所。
+      <</language>>
+  <</switch>>
+<</widget>>
+<<widget "deadwood-birdtower-hunt-trespasser">>
+  <<if !$BirdTower.seen.nestling_danger and $bird.trespasser and $bird.hunts.duo is true and $bird.materials.lurkers gt 3 and $dateCount.GreatHawkHunts gte 20 and $bird.hunts.timer gte 45 and (_distanceNorthSouth gte 4 or _distanceEastWest lte -4) and getBornChildren().find(child => (child.development?.stage == "Nestling" || child.development?.stage == "Hatchling")) isnot undefined>>
+    <<addinlineevent "babyhawk_hunt_trespasser" 2>>
+      <<set $BirdTower.seen.nestling_danger to true>>
+      <<beastNEWinit 1 hawk>><<npc "Great Hawk" 2>><<person2>>
+      <<if $NPCList[1].monster is "monster">>
+        <<set $monster to 1>>
+        <<set $NPCList[0].monster to "monster">>
+        <<set $NPCList[0].type to "harpy">>
+      <<else>>
+        <<set $monster to 0>>
+        <<set $NPCList[0].monster to "">>
+        <<set $NPCList[0].type to "hawk">>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          <<your_bird_text "cap">> suddenly becomes very agitated. Some of <<bhis 1>>'s feathers stand on end.
+        <<option 'CN'>>
+          <<your_bird_text "cap">>突然变得很激动。<<bhis 1>>的一些羽毛都竖了起来。
+      <</language>>
+      <br><br>
+      <<if $monster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            <span style="display: contents;">"An intruder, near the tower—" <<bhe 1>> screeches a warning and immediately flies towards the tower.</span>
+          <<option 'CN'>>
+            <span style="display: contents;">"外来者，在塔的附近——"<<bhe 1>>高声尖鸣着警告，立刻向塔的方向飞去。</span>
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<bHe 1>> lets out a screech, different from any you have heard before. It sounds like a warning. <<bHe 1>> immediately flies towards the tower.
+          <<option 'CN'>>
+            <<bHe 1>>发出一声啸叫，但和你以前听过的不一样。这一声似乎是个警告。<<bHe 1>>立刻向塔的方向飞去。
+        <</language>>
+      <</if>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          Thanks to your sharp eyes, you can see a tiny figure gradually approaching your tower from the south.
+        <<option 'CN'>>
+          得益于你锐利的眼神，你能看见一个很小的身影从南边逐渐接近你的高塔。
+      <</language>>
+      <<language>>
+        <<option 'EN'>>
+          <span class="red">It is another <<beasttype>>.</span>
+        <<option 'CN'>>
+          <span class="red">是另一只<<beasttype>>。</span>
+      <</language>>
+      <br>
+      <<language>>
+        <<option 'EN'>>
+          And your child is alone in the tower right now.
+        <<option 'CN'>>
+          而你的孩子此时正在塔里独自待着。
+      <</language>>
+      <<ggstress>><<stress 8>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          <<bHis 1>> flies faster than ever before, and you do your best to keep up with <<bhim 1>>.
+        <<option 'CN'>>
+          <<bHis 1>>飞行的速度前所未有地快，你尽力跟上<<bhim 1>>。
+      <</language>>
+      <br><br>
+      <<flight_time_check _returnTime "silent">>
+      <<set _flightTime to Math.floor(_flightTime / 2)>>
+      <<set _hoursPassed to Math.floor(_flightTime / 60)>>
+      <<set _minutesPassed to _flightTime % 60>>
+      <<lanLink `["Return to the castle" + " (" + getTimeString(_hoursPassed, _minutesPassed) + ")", "返回城堡" + " (" + getTimeString(_hoursPassed, _minutesPassed) + ")"]` "Deadwood BirdTower Hunt Trespasser">>
+        <<set $fatigueMod to _fatigueMod>>
+        <<set $flightTime to _flightTime>>
+        <<bird_pass _flightTime>>
+        <<set $phase to 0>>
+      <</lanLink>>
+      <<print _fatigueText>>
+      <br>
+    <</addinlineevent>>
+  <</if>>
+<</widget>>
+<<widget "deadwood-birdtower-hunt-ambush">>
+  <<if $BirdTower and maplebirch.get('BirdTower').party.length gt 0>>
+    <<if maplebirch.get('BirdTower').party.length gt 1>>
+      <<language>>
+        <<option 'EN'>>
+          Your children crowd onto the stone beside you, jostling for footing. You spread your wings and shoo them down behind the rim.
+        <<option 'CN'>>
+          孩子们挤上石面，争抢落脚的地方。你张开翅膀，把它们赶到柱沿后面。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          Your child settles beside you, peering over the edge.
+        <<option 'CN'>>
+          你的孩子在你身边安顿下来，探头望向柱外。
+      <</language>>
+    <</if>>
+    <br><br>
+  <</if>>
+<</widget>>

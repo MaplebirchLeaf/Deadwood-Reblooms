@@ -1,0 +1,345 @@
+:: Deadwood BirdTower Widgets [widget]
+<!-- 通用 widget：调试入口、鹰崽称呼、图标与回塔结算。 -->
+<<widget 'BabyhawkTestFunc'>>
+  <<if $debug>>
+    <<setupOptions>>
+    <span class="gold"><<lanSwitch 'Bird Tower (BabyHawk)' '高塔扩展（鹰宝宝）'>></span>
+    <br>
+    <<lanSwitch 'Spawn hawks or reassign the orphan for debugging:' '调试小鹰性格/数量差分：'>>
+    <br>
+    <<lanLink ["Summon a flock of hawks", "召唤小鹰大军"] "Deadwood BirdTower Test Many Hawks">>
+      <<endevent>>
+    <</lanLink>>
+    <br><br>
+    <<lanSwitch 'Reassign the orphan hawk:' '调试孤儿小鹰赋值：'>>
+    <br>
+    <<lanLink ["Pick up a hawk", "捡一下小鹰"] "Deadwood BirdTower Test OrphanHawk">>
+      <<endevent>>
+    <</lanLink>>
+  <</if>>
+<</widget>>
+
+<<widget "babyhawks">>
+  <<if maplebirch.get('BirdTower').party.length gt 1 or $BirdTower.scene.ids.length gt 1>>
+    <<lanSwitch "the children" "孩子们">>
+  <<else>>
+    <<childname>>
+  <</if>>
+<</widget>>
+
+<<widget "babyhawksthem">>
+  <<if maplebirch.get('BirdTower').party.length gt 1 or $BirdTower.scene.ids.length gt 1>>
+    <<lanSwitch "them" "他们">>
+  <<else>>
+    <<childhim>>
+  <</if>>
+<</widget>>
+
+<<widget "babyhawksyou">>
+  <<if maplebirch.get('BirdTower').party.length gt 1 or $BirdTower.scene.ids.length gt 1>>
+    <<lanSwitch "you all" "你们">>
+  <<else>>
+    <<lanSwitch "you" "你">>
+  <</if>>
+<</widget>>
+
+<<widget "GreatHawk">>
+  <<if $greathawkmonster is 2 or $monster is 1>>
+    <<lanSwitch "harpy" "哈比">>
+  <<else>>
+    <<lanSwitch "Great Hawk" "巨鹰">>
+  <</if>>
+<</widget>>
+
+<<widget "BabyHawkStoryClean">>
+  <<set $BirdTower.scene to { ids: [], actors: [] }>>
+<</widget>>
+
+<<widget "babyhawkicon">>
+  <<switch _args[0]>>
+    <<case "children">>
+      <<set _childrenIconSelect to maplebirch.get('BirdTower').at('otherNest').map(child => child.childId)>>
+      <<if !_childrenIconSelect.length>>
+        <<icon "bird-tower/tower.png">>
+      <<elseif _childrenIconSelect.length gte 2>>
+        <<set $_child1 to _childrenIconSelect[0]>>
+        <<set $_child2 to _childrenIconSelect[1]>>
+        <<if $childRecords[$_child1].features.monster is $childRecords[$_child2].features.monster>>
+          <<if $childRecords[$_child1].features.monster is "monster">>
+            <<set _childIconFilter1 = "filter: " + setup.colours.getSkinCSSFilter($childRecords[$_child1].features.skinColour)>>
+            <<set _childIconFilter2 = "filter: " + setup.colours.getSkinCSSFilter($childRecords[$_child2].features.skinColour)>>
+            <<set $_baseIcon to "bird-tower/child-harpies.png">>
+            <<set $_skinIcon1 to "bird-tower/child-harpies-skin1.png">>
+            <<set $_skinIcon2 to "bird-tower/child-harpies-skin2.png">>
+            <span class="icon-container">
+              <<icon $_baseIcon>>
+              <span @style="_childIconFilter1">
+                <<icon $_skinIcon2>>
+              </span>
+              <span @style="_childIconFilter2">
+                <<icon $_skinIcon1>>
+              </span>
+            </span>
+          <<else>>
+            <<icon "bird-tower/child-hawks.png">>
+          <</if>>
+        <<else>>
+          <<set _childIconFilter = "filter: " + ($childRecords[$_child1].features.monster is "monster" ? setup.colours.getSkinCSSFilter($childRecords[$_child1].features.skinColour) : setup.colours.getSkinCSSFilter($childRecords[$_child2].features.skinColour))>>
+          <<set $_baseIcon to "bird-tower/child-birds.png">>
+          <<set $_skinIcon to "bird-tower/child-birds-skin.png">>
+          <span class="icon-container">
+            <<icon $_baseIcon>>
+            <span @style="_childIconFilter">
+              <<icon $_skinIcon>>
+            </span>
+          </span>
+        <</if>>
+      <<else>>
+        <<if $childRecords[_childrenIconSelect[0]].features.monster is "monster">>
+          <<set _childIconFilter = "filter: " + setup.colours.getSkinCSSFilter($childRecords[_childrenIconSelect[0]].features.skinColour)>>
+          <<set $_baseIcon to "bird-tower/child-harpy.png">>
+          <<set $_skinIcon to "bird-tower/child-harpy-skin.png">>
+          <span class="icon-container">
+            <<icon $_baseIcon>>
+            <span @style="_childIconFilter">
+              <<icon $_skinIcon>>
+            </span>
+          </span>
+        <<else>>
+          <<icon "bird-tower/child-hawk.png">>
+        <</if>>
+      <</if>>
+    <<case "Gold Ring">>
+      <<if ($BirdTower.ring.hint or $BirdTower.ring.kept) is 1>>
+        /* 非特殊戒指 */
+        <<icon "antiques/antique-gold-ring.png">>
+      <<else>>
+        <<set _colour = setup.colours.eyes_map[$childRecords[$orphanHawkChildId].features.eyeColour].variable>>
+        <<set $_baseIcon to "BirdTower/gold_ring.png">>
+        <<set $_gemIcon to "BirdTower/gold_ring_gem.png">>
+        <<icon $_baseIcon infront>>
+        <span @class="'eye-' + _colour.replace(/ /g, '-')">
+          <span class="colour-eye" style="color:#6E4E11;"><<icon $_gemIcon>></span>
+        </span>
+      <</if>>
+    <<default>>
+      <<icon "bird-tower/tower.png">>
+  <</switch>>
+<</widget>>
+
+<<widget 'deadwood-birdtower-hunters-return'>>
+  <<set $_returned to maplebirch.get('BirdTower').returned>>
+  <<set $_ids to $_returned.map(child => child.id)>>
+  <<if $_ids.length>>
+    <<childSelect $_ids[0]>>
+    <span class="teal"><<childrenNames $_ids>><<lanSwitch " came back." "回来了。">></span>
+    <<= $_ids.length gt 1 ? lanSwitch("They", "他们") : "<<childHe>>">><<lanSwitch " brought back " "带回了">><<deadwood-birdtower-hunters-loot $_returned>>。
+    <br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-birdtower-hunters-loot'>>
+  <<set $_returned to _args[0]>>
+  <<set $_total to $_returned.length>>
+  <<for $_i to 0; $_i lt $_total; $_i++>>
+    <<set $_loot to $_returned[$_i].loot>>
+    <<switch $_loot>>
+      <<case "nothing">>
+        <<if $_total is 1>><<lanSwitch "……hmm, it seems " "……嗯，好像">><<childhe>><<lanSwitch " brought back nothing at all. You pat " "什么都没有带回来。你摸了摸">><<childhim>><<lanSwitch "'s head to comfort " "的头以示安慰">><<childhim>><</if>>
+      <<case "junk">>
+        <<birdicon "junk">><<lanSwitch "glittering little junk" "闪闪发光的小垃圾">>
+      <<case "leaves" "sticks" "fabric" "wood">>
+        <<birdicon $_loot>><<print lanSwitch($_loot.replace("leaves", "large leaves").replace("sticks", "small branches").replace("fabric", "fabric").replace("wood", "wood"), $_loot.replace("leaves", "大树叶").replace("sticks", "小树枝").replace("fabric", "布料").replace("wood", "木头"))>>
+      <<case "watch" "ring" "necklace" "bracelet">>
+        <<deadwood-birdtower-hunters-valuable $_loot>>
+      <<case "lurkers">>
+        <<birdicon "lurkers">><<lanSwitch "lurker" "潜伏者">>
+    <</switch>>
+    <<if $_i isnot $_total-1 and $_loot isnot "nothing">><<lanSwitch ", " "、">><</if>>
+  <</for>>
+<</widget>>
+
+<<widget 'deadwood-birdtower-hunters-valuable'>>
+  <<birdicon _args[0]>><<print lanSwitch(_args[0].replace("watch", "a watch").replace("ring", "a ring").replace("necklace", "a necklace").replace("bracelet", "a bracelet"), _args[0].replace("watch", "手表").replace("ring", "指环").replace("necklace", "项链").replace("bracelet", "手链"))>>
+<</widget>>
+
+<<widget 'eventsMoorBabyhawk'>>
+  <!-- 根据小鹰数量写差分（单只、多只小鹰才能触发的不同事件） -->
+  <<set _moorIds to maplebirch.get('BirdTower').startHunt('moor')>>
+  <<if !_moorIds.length>>
+    <<exit>>
+  <</if>>
+  <<childSelect $BirdTower.hunt.ids[0]>>
+  <<cleareventpool>>
+  <<if $moor isnot 100>>
+    <<addinlineevent "shadow">>
+      <<lanSwitch "You see a small shadow sweep past beneath your feet. " "你看见一小片影子从你的脚下掠过。">><<childrenNames $BirdTower.hunt.ids>><<lanSwitch " circle above you." "在你的上方盘旋。">><<lstress>><<stress -5>>
+      <br><br>
+      <<if $harpy gte 6>>
+        <<lanLink ["Call out", "呼唤"] "Deadwood BirdTower Moor Screech">><</lanLink>><<harpy>>
+        <br>
+      <</if>>
+      <<lanLink ["Continue", "继续"] "Moor">>
+        <<HuntTogetherClean>>
+        <<set $eventskip to 1>>
+      <</lanLink>>
+      <br>
+    <</addinlineevent>>
+  <</if>>
+  <<if maplebirch.get('BirdTower').party.length gt 2>>
+    <<addinlineevent "lot">>
+      <<lanSwitch "You hear a noisy chattering from somewhere far off. You climb a nearby hill and look out, spotting " "你听到一阵喧闹的叽喳声从远处传来。你爬上附近的山岗向远处望去，发现">><<childrenNames $BirdTower.hunt.ids>><<lanSwitch " bathing in a small pond, apparently having a great time." "在一个小池塘里洗澡，好像正玩得十分起劲。">><<lstress>><<stress -5>>
+      <br><br>
+      <<lanLink ["Watch (0:10)", "观察 (0:10)"] "Deadwood BirdTower Moor Bath">>
+        <<pass 10>>
+      <</lanLink>>
+      <br>
+      <<lanLink ["Continue", "继续"] "Moor">>
+        <<HuntTogetherClean>>
+        <<set $eventskip to 1>>
+      <</lanLink>>
+      <br>
+    <</addinlineevent>>
+  <</if>>
+  <<if maplebirch.get('BirdTower').party.length is 2>>
+    <<addinlineevent "pair">>
+      <<language>>
+        <<option 'EN'>>
+          You hear chirping from the sky. <<childrenNames $BirdTower.hunt.ids>> are flying in a pair.
+        <<option 'CN'>>
+          你听到一阵叽喳声从天空传来。<<childrenNames $BirdTower.hunt.ids>>正在空中成对飞行。
+      <</language>>
+      <br><br>
+      <<if $childRecords[$BirdTower.hunt.ids[0]].development.trait is $childRecords[$BirdTower.hunt.ids[1]].development.trait>>
+        <<switch $childRecords[$BirdTower.hunt.ids[0]].development.trait>>
+          <<case "clumsy">>
+            <<language>>
+              <<option 'EN'>>
+                <<childname $BirdTower.hunt.ids[0]>> is clutching a lurker in their talons. They weave through some branches, but <<childname $BirdTower.hunt.ids[0]>> misjudges the distance. The lurker smacks into a branch and drops from their grip, landing right on <<childname $BirdTower.hunt.ids[1]>>'s head.
+              <<option 'CN'>>
+                <<childname $BirdTower.hunt.ids[0]>>的爪中正抓着一只潜伏者。他们飞梭穿过一些树枝，但<<childname $BirdTower.hunt.ids[0]>>没能估计好距离，让潜伏者撞在了树枝上，从爪里掉了下去，正好砸在了<<childname $BirdTower.hunt.ids[1]>>的脑袋上。
+            <</language>>
+            <br>
+            <<lanSwitch "After a flurry of chaos they grab the lurker again. After a chattering debate they seem to decide to eat it right there, carrying it to a nearby branch to feed." "一阵骚乱后，他们重新抓住了这只潜伏者，在一阵唧唧喳喳的讨论后，他们似乎决定就地开吃，把潜伏者带到了附近的树杈上开始进食。">>
+            <<set $childRecords[$BirdTower.hunt.ids[0]].development.fed_daily++>>
+            <<set $childRecords[$BirdTower.hunt.ids[1]].development.fed_daily++>>
+          <<case "sympathy">>
+            <<childSelect $BirdTower.hunt.ids[1]>>
+            <<language>>
+              <<option 'EN'>>
+                <<childname $BirdTower.hunt.ids[0]>> seems tired, and <<childhe $BirdTower.hunt.ids[0]>> stops on a nearby branch to rest, while <<childname $BirdTower.hunt.ids[1]>> follows <<childsiblings $BirdTower.hunt.ids[0]>> over to the branch, beating their wings and landing... on <<childname $BirdTower.hunt.ids[0]>>.
+              <<option 'CN'>>
+                <<childname $BirdTower.hunt.ids[0]>>似乎是累了，<<childhe $BirdTower.hunt.ids[0]>>停在了附近的树枝上歇脚，而<<childname $BirdTower.hunt.ids[1]>>也跟随<<childsiblings $BirdTower.hunt.ids[0]>>来到树枝附近，拍打着翅膀停在了……<<childname $BirdTower.hunt.ids[0]>>身上。
+            <</language>>
+            <br>
+            <<language>>
+              <<option 'EN'>>
+                <<childHe $BirdTower.hunt.ids[0]>> turns their head with an irritated protest, but <<childname $BirdTower.hunt.ids[1]>> has already flown off to another tree, <<= $cmonster ? lanSwitch("chuckling", "偷笑着") : lanSwitch("cooing", "咕咕叫着")>> away.
+              <<option 'CN'>>
+                <<childHe $BirdTower.hunt.ids[0]>>恼怒地转头抗议，但<<childname $BirdTower.hunt.ids[1]>>已经<<= $cmonster ? lanSwitch("chuckling", "偷笑着") : lanSwitch("cooing", "咕咕叫着")>>飞向另一棵树，跑远了。
+            <</language>>
+          <<case "clever">>
+            <<language>>
+              <<option 'EN'>>
+                <<childname $BirdTower.hunt.ids[0]>> chases something at a low height while <<childname $BirdTower.hunt.ids[1]>> circles in the clouds, watching for a moment to strike from the other side.
+              <<option 'CN'>>
+                <<childname $BirdTower.hunt.ids[0]>>在接近地面的高度追逐着什么东西，而<<childname $BirdTower.hunt.ids[1]>>在云端盘旋，看准时机从另一端突袭。
+            <</language>>
+            <br>
+            <<lanSwitch "Their pincer hunt pins the prey in no time. You see them take off again, each carrying a lurker in their talons." "在他们的围猎下，猎物很快就被扣在爪下。你看见他们重新起飞，爪里各自抓着一只潜伏者。">>
+            <<set $childRecords[$BirdTower.hunt.ids[0]].development.hunt_loot to "lurkers">>
+            <<set $childRecords[$BirdTower.hunt.ids[1]].development.hunt_loot to "lurkers">>
+          <<case "dominant">>
+            <<language>>
+              <<option 'EN'>>
+                On closer look, it is less a paired flight than <<childname $BirdTower.hunt.ids[0]>> and <<childname $BirdTower.hunt.ids[1]>> tangling in midair. <<childname $BirdTower.hunt.ids[1]>> beats their wings furiously, screeching at <<childsiblings $BirdTower.hunt.ids[0]>>, while <<childname $BirdTower.hunt.ids[0]>> answers with shrieks just as sharp.
+              <<option 'CN'>>
+                仔细一看，与其说是成对飞行，不如说是<<childname $BirdTower.hunt.ids[0]>>和<<childname $BirdTower.hunt.ids[1]>>正在空中缠斗。<<childname $BirdTower.hunt.ids[1]>>奋力拍打翅膀，对着<<childsiblings $BirdTower.hunt.ids[0]>>大声啸叫，而<<childname $BirdTower.hunt.ids[0]>>不甘示弱，用同样的尖鸣回应。
+            <</language>>
+            <br>
+            <<language>>
+              <<option 'EN'>>
+                They spiral down out of the sky. Soon enough <<childname $BirdTower.hunt.ids[0]>> takes off again and lands on a branch not far off to preen, with <<childname $BirdTower.hunt.ids[1]>> close behind, back into the sky. You wonder what set them fighting.
+              <<option 'CN'>>
+                他们旋转着从天空落下。没过多久，<<childname $BirdTower.hunt.ids[0]>>重新起飞，落在不远处的树杈上理毛，<<childname $BirdTower.hunt.ids[1]>>紧随其后回到了天空中。你好奇是什么让他们发生了争斗。
+            <</language>>
+        <</switch>>
+      <<else>>
+        <<if maplebirch.get('BirdTower').selectTrait("dominant")>>
+          <<childSelect _tempIDs[0]>><!--dom小鹰当领队-->
+          <<set $childRecords[_tempIDs[0]].development.hunt_loot to "lurkers">>
+          <<set _otherHawk to ($childRecords[$BirdTower.hunt.ids[0]].development.trait is "dominant" ? $BirdTower.hunt.ids[1] : $BirdTower.hunt.ids[0])>>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> flies ahead while <<childname _otherHawk>> follows behind <<childhim>>, straining to keep up with <<childhis>> speed. Suddenly <<childname>> spots something and dives. <<childname _otherHawk>>, a beat behind, dives as well.
+            <<option 'CN'>>
+              <<childname>>在前方飞行，而<<childname _otherHawk>>跟在<<childhim>>的身后，努力跟上<<childhis>>的速度。忽然，<<childname>>似乎发现了什么，猛地向下俯冲而去，<<childname _otherHawk>>慢一拍行动，也跟着降落。
+          <</language>>
+          <br>
+          <<lanSwitch "Before long you see them take off again, but only " "没过多久，你看见他们重新起飞，但只有">><<childname>><<lanSwitch " carries prey in their talons. " "的爪里抓着猎物，而">><<childname _otherHawk>><<lanSwitch " comes back empty-handed, chattering at " "空着手回到天空中，对着">><<childsiblings _tempIDs[0]>><<lanSwitch " and trying to beg a share." "叽喳叫，试图从">><<childhim>><<lanSwitch "手里分一杯羹。">>
+          <br>
+          <<language>>
+            <<option 'EN'>>
+              <<childHe _otherHawk>> fails, and <<childname>>, <<= $cmonster ? lanSwitch("giggling", "咯咯的笑着") : lanSwitch("chattering a string of boasts", "发出一连串炫耀的叽叽叫")>>, carries the prey away.
+            <<option 'CN'>>
+              <<childHe _otherHawk>>没能成功，<<childname>>，<<= $cmonster ? lanSwitch("giggling", "咯咯的笑着") : lanSwitch("chattering a string of boasts", "发出一连串炫耀的叽叽叫")>>，带着猎物飞远了。
+          <</language>>
+        <<elseif maplebirch.get('BirdTower').selectTrait("clever")>>
+          <<childSelect _tempIDs[0]>><!--clever小鹰当领队-->
+          <<set _otherHawk to ($childRecords[$BirdTower.hunt.ids[0]].development.trait is "clever" ? $BirdTower.hunt.ids[1] : $BirdTower.hunt.ids[0])>>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> flies ahead while <<childname _otherHawk>> follows close behind <<childhim>>, watching the ground. Suddenly <<childname>> spots something, and <<childhe>> chirps back at <<childname _otherHawk>> before leading <<childsiblings _otherHawk>> down to the ground.
+            <<option 'CN'>>
+              <<childname>>在前方飞行，而<<childname _otherHawk>>紧紧跟在<<childhim>>的身后，观察着地面的动静。忽然，<<childname>>似乎发现了什么，<<childhe>>回头对<<childname _otherHawk>>叽喳几声，带着<<childsiblings _otherHawk>>一起降落到地面上。
+          <</language>>
+          <br>
+          <<lanSwitch "Before long you see them take off again, both with talons full of glittering things, flying off happily with their spoils." "没过多久，你看见他们重新起飞，两只小鹰的爪里都抓着满满当当的亮闪闪，他们高兴地带着战利品飞远了。">>
+          <<set $childRecords[$BirdTower.hunt.ids[0]].development.hunt_loot to "bracelet">>
+          <<set $childRecords[$BirdTower.hunt.ids[1]].development.hunt_loot to "necklace">>
+        <<elseif maplebirch.get('BirdTower').selectTrait("sympathy")>>
+          <<childSelect _tempIDs[0]>><!--sympathy小鹰当领队，另一只是clumsy-->
+          <<set _otherHawk to ($childRecords[$BirdTower.hunt.ids[0]].development.trait is "sympathy" ? $BirdTower.hunt.ids[1] : $BirdTower.hunt.ids[0])>>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> glides leisurely, looping around <<childname _otherHawk>> from time to time, as if wanting <<childhim _otherHawk>> to play.
+            <<option 'CN'>>
+              <<childname>>悠闲地在空中滑翔，时不时在<<childname _otherHawk>>身边绕圈飞行，似乎想要<<childhim _otherHawk>>陪自己玩耍。
+          <</language>>
+          <br>
+          <<language>>
+            <<option 'EN'>>
+              <<childname _otherHawk>> tries to match <<childsiblings _tempIDs[0]>>'s moves. They chase each other's tails and tumble around in the air for a good while before moving on.
+            <<option 'CN'>>
+              <<childname _otherHawk>>试图跟上<<childsiblings _tempIDs[0]>>的动作，他们互相追逐着尾巴，在空中玩闹了好一会儿才继续上路。
+          <</language>>
+        <</if>>
+      <</if>>
+      <<lstress>><<stress -5>>
+      <br><br>
+      <<lanLink ["Continue", "继续"] "Moor">>
+        <<HuntTogetherClean>>
+        <<set $eventskip to 1>>
+      <</lanLink>>
+      <br>
+    <</addinlineevent>>
+  <</if>>
+  <<if $moor is 100>>
+    <<addinlineevent "home">>
+      <<language>>
+        <<option 'EN'>>
+          You see a small shadow burst out from your tower. Your <<childrenNames $BirdTower.hunt.ids>> set out from the top of the tower to hunt.
+        <<option 'CN'>>
+          你看见一小片影子从你的高塔跃出。你的<<childrenNames $BirdTower.hunt.ids>>正从塔顶出发去狩猎。
+      <</language>>
+      <br><br>
+      <<set $BirdTower.daily.moor_event to false>>
+      <<lanLink ["Continue", "继续"] "Moor">>
+        <<HuntTogetherClean>>
+        <<set $eventskip to 1>>
+      <</lanLink>>
+      <br>
+    <</addinlineevent>>
+  <</if>>
+  <<runeventpool>>
+<</widget>>

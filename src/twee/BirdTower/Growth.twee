@@ -1,0 +1,1317 @@
+:: Deadwood BirdTower Growth [widget]
+<<widget "deadwood-birdtower-fledgling">>
+  <<if maplebirch.get('BirdTower').at('tower').some(child => child.development.grow_hint_fledgling is 1)>>
+    <<set _childrenIds to maplebirch.get('BirdTower').at('tower').map(child => child.childId)>>
+    <<set _childrenTotal to _childrenIds.length>>
+    <<set _fledgling_ids to []>>
+    <<for _cc to 0; _cc lt _childrenTotal; _cc++>>
+      <<if $childRecords[_childrenIds[_cc]].development.grow_hint_fledgling is 1>>
+        <<run _fledgling_ids.push(_childrenIds[_cc])>>
+        <<run delete $childRecords[_childrenIds[_cc]].development.grow_hint_fledgling>>
+      <</if>>
+      <<updateChildActivity _childrenIds[_cc]>>
+    <</for>>
+    <<set _fledgling_total to _fledgling_ids.length>>
+    <<if _fledgling_total gte 3>>
+      <<set _child1 to _fledgling_ids.pluck()>>
+      <<set _child2 to _fledgling_ids.pluck()>>
+      <<set _child3 to _fledgling_ids.pluck()>>
+    <<elseif _fledgling_total gte 2>>
+      <<set _child1 to _fledgling_ids.pluck()>>
+      <<set _child2 to _fledgling_ids.pluck()>>
+    <<elseif _fledgling_total gte 1>>
+      <<set _child1 to _fledgling_ids.pluck()>>
+    <</if>>
+    <<childSelect _child1>>
+    <<language>>
+      <<option 'EN'>>
+        You find <<childname>> crouched at the edge of the nest, watching you with pleading eyes. You walk over, and <<childHe>> strains upward, trying to reach you.
+      <<option 'CN'>>
+        你看见<<childname>>正在趴在巢边眼巴巴地望着你。你走到巢边，<<childHe>>努力撑起身子，试图够到你。
+    <</language>>
+    <<switch random(1,2)>>
+      <<case 1>>
+        <<language>>
+          <<option 'EN'>>
+            When that fails, <<childhe>> starts <<childcry>> loudly. You hurry to scoop <<childhe>> up,
+          <<option 'CN'>>
+            尝试无果后，<<childhe>>便大声<<childcry>>了起来。你连忙将<<childhe>>抱起，
+        <</language>>
+      <<case 2>>
+        <<language>>
+          <<option 'EN'>>
+            But before you can bend down to pick <<childhim>> up, <<childhe>> flaps <<childhis>> wings and dives headlong into your arms.
+          <<option 'CN'>>
+            但在你能弯下腰抱起<<childhim>>之前，<<childhe>>拍打翅膀，猛地扑进了你的怀里。
+        <</language>>
+    <</switch>>
+    <<language>>
+      <<option 'EN'>>
+        Only then do you notice that among the pale <span class="teal">down on <<childname>> in your arms, new feathers of a different colour are growing.</span>
+      <<option 'CN'>>
+        这时你才发现，怀中的<<childname>>浅色的<span class="teal">绒毛间长出了一些颜色不同的新羽。</span>
+    <</language>>
+    <br><br>
+    <<if !$BirdTower.seen.fledgling>>
+      <<set $BirdTower.seen.fledgling to true>>
+      <<if _childrenTotal gte 2>>
+        <<language>>
+          <<option 'EN'>>
+            Startled, you check the feathers of your other children,
+          <<option 'CN'>>
+            你惊讶地检查了其他孩子的羽毛，
+        <</language>>
+        <<if _fledgling_total gte 4>>
+          <<language>>
+            <<option 'EN'>>
+              and find the same signs on all of them.
+            <<option 'CN'>>
+              发现其他孩子们身上也有相同的迹象。
+          <</language>>
+        <<elseif _fledgling_total gte 3>>
+          <<language>>
+            <<option 'EN'>>
+              and find the same signs on <<childname _child2>> and <<childname _child3>>.
+            <<option 'CN'>>
+              发现<<childname _child2>>和<<childname _child3>>身上也有相同的迹象。
+          <</language>>
+        <<elseif _fledgling_total gte 2>>
+          <<language>>
+            <<option 'EN'>>
+              and find the same signs on <<childname _child2>>.
+            <<option 'CN'>>
+              发现<<childname _child2>>身上也有相同的迹象。
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              but for now <<childhe>> is the only one showing such signs.
+            <<option 'CN'>>
+              但暂且只有<<childhe>>一只身上有这样的迹象。
+          <</language>>
+        <</if>>
+        <br>
+      <</if>>
+      <<childSelect _child1>>
+      <<if $bird.state is "home">>
+        <<npc "Great Hawk">>
+        <<language>>
+          <<option 'EN'>>
+            You call <<your_bird_text>> over. <<bHe>>
+          <<option 'CN'>>
+            你叫来了<<your_bird_text>>，<<bHe>>
+        <</language>>
+        <<switch $bird.activity>>
+          <<case "sleep" "rest">>
+            <<language>>
+              <<option 'EN'>>
+                stirs and wakes up,
+              <<option 'CN'>>
+                动了动，醒了过来，
+            <</language>>
+          <<case "build" "brood">>
+            <<language>>
+              <<option 'EN'>>
+                tilts <<bhis>> head and looks at you,
+              <<option 'CN'>>
+                歪着脑袋看向你，
+            <</language>>
+          <<case "bathe">>
+            <<language>>
+              <<option 'EN'>>
+                hops out of the rain pool,
+              <<option 'CN'>>
+                跳出雨水池，
+            <</language>>
+            <<if $monster is 1>>
+              <<language>>
+                <<option 'EN'>>
+                  walks over to
+                <<option 'CN'>>
+                  走向
+              <</language>>
+            <<else>>
+              <<language>>
+                <<option 'EN'>>
+                  hops over to
+                <<option 'CN'>>
+                  跳向
+              <</language>>
+            <</if>>
+            <<language>>
+              <<option 'EN'>>
+                you,
+              <<option 'CN'>>
+                你，
+            <</language>>
+          <<default>>
+            <<language>>
+              <<option 'EN'>>
+                hops over,
+              <<option 'CN'>>
+                跳了过来，
+            <</language>>
+        <</switch>>
+        <<language>>
+          <<option 'EN'>>
+            and inspects <<childname>> in your arms.
+          <<option 'CN'>>
+            查看你怀中的<<childname>>。
+        <</language>>
+        <<language>>
+          <<option 'EN'>>
+            Realising what <<bhe>> has seen, <<bhe>> happily fluffs up <<bhis>> feathers.
+          <<option 'CN'>>
+            意识到自己看见什么后，<<bhe>>开心地膨起了羽毛。
+        <</language>>
+        <br>
+        <<if $monster is 1>>
+          <<language>>
+            <<option 'EN'>>
+              "Our child is growing strong." <<bHe>> gathers you and the chick into <<bhis>> arms and spreads <<bhis>> wings to explain, "<<childname>>'s new feathers are replacing the old down. <<childhe>>'s wings will be stronger and more powerful."
+            <<option 'CN'>>
+              "我们的孩子正在茁壮成长。"<<bHe>>将你和孩子一同揽入怀中，展开自己的翅膀为你讲解，"<<childname>>的新羽毛正在替换旧的绒毛，<<childhe>>的翅膀会更有力，更健壮。"
+          <</language>>
+          <br>
+          <<language>>
+            <<option 'EN'>>
+              The harpy gently combs through <<childname>>'s down with <<bhis>> hand. Loose tufts come away and drift through the air like willow catkins. "<<childname>> will need more food. I will catch more prey for the children."
+            <<option 'CN'>>
+              哈比用手温柔地轻梳着<<childname>>身上的绒毛，一些松动的绒毛脱落了下来，像一团柳絮一般飘散在空中。"<<childname>>会需要更多的食物。我会为了孩子们捕到更多猎物的。"
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              <<bhe>> spreads <<bhis>> wings with a showy flap and lightly pecks the base of <<bhis>> wings with <<bhis>> beak. It reminds you of how the great hawk preens every day, so this must be the normal process of old feathers falling out and new ones growing in.
+            <<option 'CN'>>
+              <<bhe>>展开翅膀，展示般的拍打着，用喙轻啄<<bhis>>的翅膀根部。这让你想起巨鹰每天清理羽毛的样子，看来这是正常的旧羽脱落，换成新羽的过程。
+          <</language>>
+          <br>
+          <<language>>
+            <<option 'EN'>>
+              The great hawk gently preens <<childname>>'s down. Loose tufts come away and drift through the air like willow catkins. After a while <<bhe>> stops, gazing out at the moor beyond the tower, as if ready to hunt for the child.
+            <<option 'CN'>>
+              巨鹰温柔地轻啄<<childname>>身上的绒毛，一些松动的绒毛脱落了下来，像一团柳絮一般飘散在空中。<<bhis>>的动作渐渐停了下来，望向塔外的荒原，似乎做好了为孩子狩猎的准备。
+          <</language>>
+        <</if>>
+      <<else>>
+        <<if $sciencetrait gte 3>>
+          <<language>>
+            <<option 'EN'>>
+              You know the basics of bird biology. Soon after hatching, chicks go through their first moult, shedding their down and growing true feathers. These new feathers will help <<childname>> stay warm and move more easily.
+            <<option 'CN'>>
+              你了解一些鸟类的基本知识，雏鸟在孵化后很短的一段时间里就会开始经历第一次换羽，将身上的绒毛脱去，长出真正的羽毛。这些新羽毛会更加有助于<<childname>>的保暖和移动。
+          <</language>>
+          <<language>>
+            <<option 'EN'>>
+              While the new feathers grow, your child will surely need more food for energy.
+            <<option 'CN'>>
+              在新羽的生长过程中，你的孩子一定会需要更多的食物来补充能量。
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              You know the common facts about birds. Before long after hatching, chicks shed their down and grow new feathers. During this, your child will surely need more food.
+            <<option 'CN'>>
+              你了解一些鸟类的常识，小鸟在孵化后不久就会将身上的绒毛脱去，长出新的羽毛。这个过程中，你的孩子一定会需要更多的食物。
+          <</language>>
+        <</if>>
+      <</if>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          <span class="blue">Your child's appetite has grown along with them.</span>
+        <<option 'CN'>>
+          <span class="blue">孩子的食量随着成长而增加了。</span>
+      <</language>>
+      <br><br>
+      <<lanLink ['Continue', '继续'] 'Bird Tower'>>
+        <<endevent>>
+      <</lanLink>>
+      <br>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          It seems <<childname>> has entered the moulting period too.
+        <<option 'CN'>>
+          看来<<childname>>也进入了换羽期。
+      <</language>>
+      <<if _childrenTotal gte 2>>
+        <<language>>
+          <<option 'EN'>>
+            You check the feathers of your other children,
+          <<option 'CN'>>
+            你检查了其他孩子的羽毛，
+        <</language>>
+        <<if _fledgling_total gte 4>>
+          <<language>>
+            <<option 'EN'>>
+              and find they have started moulting as well.
+            <<option 'CN'>>
+              发现其他孩子们也开始了换羽。
+          <</language>>
+        <<elseif _fledgling_total gte 3>>
+          <<language>>
+            <<option 'EN'>>
+              and find <<childname _child2>> and <<childname _child3>> have started moulting as well.
+            <<option 'CN'>>
+              发现<<childname _child2>>和<<childname _child3>>也开始了换羽。
+          <</language>>
+        <<elseif _fledgling_total gte 2>>
+          <<language>>
+            <<option 'EN'>>
+              and find <<childname _child2>> has started moulting as well.
+            <<option 'CN'>>
+              发现<<childname _child2>>也开始了换羽。
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              but for now <<childhe>> is the only one just beginning to moult.
+            <<option 'CN'>>
+              但暂且只有<<childhe>>一只刚刚开始换羽。
+          <</language>>
+        <</if>>
+        <br>
+      <</if>>
+      <<childSelect _child1>>
+      <<if $bird.state is "home">>
+        <<npc "Great Hawk">>
+        <<your_bird_text "cap">>
+        <<switch $bird.activity>>
+          <<case "sleep" "rest">>
+            <<language>>
+              <<option 'EN'>>
+                wakes with narrowed eyes,
+              <<option 'CN'>>
+                眯着眼睛醒了过来，
+            <</language>>
+          <<case "build" "brood">>
+            <<language>>
+              <<option 'EN'>>
+                looks at you,
+              <<option 'CN'>>
+                看向你，
+            <</language>>
+          <<case "bathe">>
+            <<language>>
+              <<option 'EN'>>
+                rises from the rain pool,
+              <<option 'CN'>>
+                从雨水池里起身，
+            <</language>>
+          <<default>>
+            <<language>>
+              <<option 'EN'>>
+                hops over,
+              <<option 'CN'>>
+                跳了过来，
+            <</language>>
+        <</switch>>
+        <<language>>
+          <<option 'EN'>>
+            and comes close to inspect <<childname>> in your arms.
+          <<option 'CN'>>
+            靠近查看你怀中的<<childname>>。
+        <</language>>
+        <<language>>
+          <<option 'EN'>>
+            Realising what <<bhe>> has seen, <<bhe>> proudly fluffs up <<bhis>> feathers.
+          <<option 'CN'>>
+            意识到自己看见什么后，<<bhe>>骄傲地膨起了羽毛。
+        <</language>>
+        <br>
+        <<if $monster is 1>>
+          <<language>>
+            <<option 'EN'>>
+              "<<babyhawks>> is growing strong." <<bHe>> gathers you and the chick into <<bhis>> arms and nuzzles your cheek affectionately, "<<childname>> is healthy too. Thank you, <<wife>>."
+            <<option 'CN'>>
+              "<<babyhawks>>正在茁壮成长。"<<bHe>>将你和孩子一同揽入怀中，亲昵地磨蹭脸颊，"<<childname>>也很健康。谢谢你，<<wife>>。"
+          <</language>>
+          <<npcincr "Great Hawk" love 1>><<glove>>
+          <br>
+          <<language>>
+            <<option 'EN'>>
+              The harpy gently combs through <<childname>>'s down with <<bhis>> hand. Loose tufts come away and drift through the air like willow catkins. "<<childname>> will need more food. I will catch more prey for the children."
+            <<option 'CN'>>
+              哈比用手温柔地轻梳着<<childname>>身上的绒毛，一些松动的绒毛脱落了下来，像一团柳絮一般飘散在空中。"<<childname>>会需要更多的食物。我会为了孩子们捕到更多猎物的。"
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              <<bhe>> spreads <<bhis>> wings and gives a proud screech, nuzzling you with <<bhis>> head.
+            <<option 'CN'>>
+              <<bhe>>展开翅膀，发出一声自豪的啸叫，用脑袋亲昵地磨蹭你。
+          <</language>>
+          <<npcincr "Great Hawk" love 1>><<glove>>
+          <br>
+          <<language>>
+            <<option 'EN'>>
+              The great hawk gently preens <<childname>>'s down. Loose tufts come away and drift through the air like willow catkins. After a while <<bhe>> stops, gazing out at the moor beyond the tower, as if ready to hunt for the child.
+            <<option 'CN'>>
+              巨鹰温柔地轻啄<<childname>>身上的绒毛，一些松动的绒毛脱落了下来，像一团柳絮一般飘散在空中。<<bhis>>的动作渐渐停了下来，望向塔外的荒原，似乎做好了为孩子狩猎的准备。
+          <</language>>
+        <</if>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            It seems you will need to prepare more food for the children.
+          <<option 'CN'>>
+            看起来你需要为孩子们准备更多的食物了。
+        <</language>>
+      <</if>>
+      <br><br>
+      <<lanLink ['Continue', '继续'] 'Bird Tower'>>
+        <<endevent>>
+      <</lanLink>>
+      <br>
+    <</if>>
+    <<exitAll>>
+  <</if>>
+<</widget>>
+
+<<widget "deadwood-birdtower-first-flight">>
+  <<set _childrenIds to maplebirch.get('BirdTower').at('tower').map(child => child.childId)>>
+  <<set _childrenTotal to _childrenIds.length>>
+  <<set _scene_ids to []>>
+  <<for _cc to 0; _cc lt _childrenTotal; _cc++>>
+    <<if $childRecords[_childrenIds[_cc]].development.grow_hint_subadult is 1>>
+      <<run _scene_ids.push(_childrenIds[_cc])>>
+      <<set $childRecords[_childrenIds[_cc]].development.activity to "sleeping">>
+      <<run delete $childRecords[_childrenIds[_cc]].development.grow_hint_subadult>>
+    <</if>>
+    <<updateChildActivity _childrenIds[_cc]>>
+  <</for>>
+  <<if !_scene_ids.length>>
+    <<exit>>
+  <</if>>
+  <<run maplebirch.get('BirdTower').beginScene(_scene_ids, 4)>>
+  <<childSelect $BirdTower.scene.actors[0]>>
+  <<language>>
+    <<option 'EN'>>
+      You
+    <<option 'CN'>>
+      你
+  <</language>>
+  <<if $bird.upgrades.decor gte 3>>
+    <<language>>
+      <<option 'EN'>>
+        duck through the curtain,
+      <<option 'CN'>>
+        挤过帘子，
+    <</language>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      come to stand beside <<beasttype>> on the perch. <<your_bird_text "cap">> stops singing,
+    <<option 'CN'>>
+      来到栖木上的<<beasttype>>旁边。<<your_bird_text "cap">>停下歌唱，
+  <</language>>
+  <<if !$BirdTower.seen.subadult>>
+    <<language>>
+      <<option 'EN'>>
+        and, surprised,
+      <<option 'CN'>>
+        惊讶地
+    <</language>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      looks behind you. You turn and see <<childname>> following after you, step by step onto the perch.
+    <<option 'CN'>>
+      望向你的身后。你转头，看见<<childname>>跟在你的身后，正一步一步往栖木上移动。
+  <</language>>
+  <<language>>
+    <<option 'EN'>>
+      <<childHe>> raises <<childhis>> head to meet your gaze and gives a loud screech, then steps to the front of the perch and spreads <<childhis>> wings to meet the wind.
+    <<option 'CN'>>
+      <<childHe>>抬头迎接你们的注视，发出了一声响亮的啸叫，随后站到栖木的前端，展开翅膀迎接风的吹拂。
+  <</language>>
+  <br><br>
+  <<switch $childRecords[$BirdTower.scene.actors[0]].development.trait>>
+    <<case "clumsy">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> adjusts <<childhis>> wings to the wind, only for a strong gust to knock <<childhim>> off balance.
+        <<option 'CN'>>
+          <<childHe>>感受着风的方向调整着翅膀，却被一阵强风袭来吹得失去了平衡。
+      <</language>>
+    <<case "sympathy">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> calls softly down at the moor below, eager to explore this wide world.
+        <<option 'CN'>>
+          <<childHe>>冲着爪下的荒原轻鸣，似乎正对探索这片天地跃跃欲试。
+      <</language>>
+    <<case "clever">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> adjusts <<childhis>> wings to the wind and turns to chirp at you both.
+        <<option 'CN'>>
+          <<childHe>>感受着风的方向调整着翅膀，转过头来对着你们啾鸣。
+      <</language>>
+    <<case "dominant">>
+      <<language>>
+        <<option 'EN'>>
+          Before either of you can move, <<childhe>> suddenly leaps up and hovers on the wind, showing off <<childhis>> skill.
+        <<option 'CN'>>
+          没等你们做出任何行动，<<childhe>>忽然跃起，凭借风的托举悬停在空中，展示着自己的技巧。
+      <</language>>
+  <</switch>>
+  <<language>>
+    <<option 'EN'>>
+      Only then do you notice that <<childname>>'s wings have lost their down completely. They look like a miniature version of <<your_bird_text>>'s wings, only paler and looser in form.
+    <<option 'CN'>>
+      这时你才发现，<<childname>>的羽翼已经完全褪去了绒毛。这对翅膀看起来就像<<your_bird_text>>的翅膀的微缩版本，只不过<<childname>>的羽毛颜色更浅，形态更松散。
+  <</language>>
+  <br>
+  <<language>>
+    <<option 'EN'>>
+      <span class="teal"><<childHe>> is now old enough to learn to fly.</span>
+    <<option 'CN'>>
+      <span class="teal"><<childHe>>已经成长到可以学习飞行了。</span>
+  <</language>>
+  <br><br>
+  <<if $BirdTower.scene.ids.length gte 4>>
+    <<language>>
+      <<option 'EN'>>
+        Another chirp sounds behind you.
+      <<option 'CN'>>
+        你的身后传来了另一声啾鸣。
+    <</language>>
+    <<if $childRecords[$BirdTower.scene.actors[1]].development.trait is $childRecords[$BirdTower.scene.actors[2]].development.trait or $childRecords[$BirdTower.scene.actors[1]].development.trait is $childRecords[$BirdTower.scene.actors[3]].development.trait>>
+      <<switch $childRecords[$BirdTower.scene.actors[1]].development.trait>>
+        <<case "clumsy">>
+          <<language>>
+            <<option 'EN'>>
+              Several little hawk heads poke out of the entrance, watching you. It seems they want to join their <<childsiblings $BirdTower.scene.actors[0]>> too.
+            <<option 'CN'>>
+              好几只小鹰脑袋正从洞口探出来望着你们，看起来他们也想要加入他们的<<childsiblings $BirdTower.scene.actors[0]>>。
+          <</language>>
+        <<case "sympathy">>
+          <<language>>
+            <<option 'EN'>>
+              The other children hop out of the tower and gather around their <<childsiblings $BirdTower.scene.actors[0]>>, cheeping.
+            <<option 'CN'>>
+              其他孩子们从塔里蹦跶着跳了出来，一起围绕着<<childsiblings $BirdTower.scene.actors[0]>>唧唧叫。
+          <</language>>
+        <<case "clever">>
+          <<language>>
+            <<option 'EN'>>
+              The other children jump out of the tower and cheep around you and <<your_bird_text>>.
+            <<option 'CN'>>
+              其他孩子们从塔里跳了出来，围绕在你和<<your_bird_text>>身边唧唧叫。
+          <</language>>
+        <<case "dominant">>
+          <<language>>
+            <<option 'EN'>>
+              Several little hawks burst out of the tower and crash into each other in a tangle, screeching at one another and trying to come out on top.
+            <<option 'CN'>>
+              好几只小鹰从塔里飞扑了出来，他们乱七八糟地撞在一起，互相大声啸叫，试图占据上风。
+          <</language>>
+      <</switch>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<childname $BirdTower.scene.actors[1]>>, <<childname $BirdTower.scene.actors[2]>> and <<childname $BirdTower.scene.actors[3]>> are pushing through in a noisy, tangled heap, struggling past the
+        <<option 'CN'>>
+          <<childname $BirdTower.scene.actors[1]>>、<<childname $BirdTower.scene.actors[2]>>和<<childname $BirdTower.scene.actors[3]>>正叽叽喳喳地挤成混乱的一团，艰难地穿过
+      <</language>>
+      <<if $bird.upgrades.decor gte 3>>
+        <<language>>
+          <<option 'EN'>>
+            curtain
+          <<option 'CN'>>
+            帘子
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            broken gap
+          <<option 'CN'>>
+            破洞
+        <</language>>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          and onto the perch.
+        <<option 'CN'>>
+          落到栖木上。
+      <</language>>
+      <<language>>
+        <<option 'EN'>>
+          It seems the other children want to join their <<childsiblings $BirdTower.scene.actors[0]>> too.
+        <<option 'CN'>>
+          看起来其他孩子们也想要加入他们的<<childsiblings $BirdTower.scene.actors[0]>>。
+      <</language>>
+    <</if>>
+    <br>
+  <<elseif $BirdTower.scene.ids.length gte 3>>
+    <<language>>
+      <<option 'EN'>>
+        Another chirp sounds behind you.
+      <<option 'CN'>>
+        你的身后传来了另一声啾鸣。
+    <</language>>
+    <<if $childRecords[$BirdTower.scene.actors[1]].development.trait is $childRecords[$BirdTower.scene.actors[2]].development.trait>>
+      <<switch $childRecords[$BirdTower.scene.actors[1]].development.trait>>
+        <<case "clumsy">>
+          <<language>>
+            <<option 'EN'>>
+              Two little hawks peer out of the entrance at you. It seems <<childname $BirdTower.scene.actors[1]>> and <<childname $BirdTower.scene.actors[2]>> want to join their <<childsiblings $BirdTower.scene.actors[0]>> too.
+            <<option 'CN'>>
+              两只小鹰正从洞口探出头来望着你们，看起来<<childname $BirdTower.scene.actors[1]>>和<<childname $BirdTower.scene.actors[2]>>也想要加入他们的<<childsiblings $BirdTower.scene.actors[0]>>。
+          <</language>>
+        <<case "sympathy">>
+          <<language>>
+            <<option 'EN'>>
+              <<childname $BirdTower.scene.actors[1]>> and <<childname $BirdTower.scene.actors[2]>> hop out of the tower, gathering around their <<childsiblings $BirdTower.scene.actors[0]>> and cheeping.
+            <<option 'CN'>>
+              <<childname $BirdTower.scene.actors[1]>>和<<childname $BirdTower.scene.actors[2]>>从塔里蹦跶着跳了出来，围绕着<<childsiblings $BirdTower.scene.actors[0]>>唧唧叫。
+          <</language>>
+        <<case "clever">>
+          <<language>>
+            <<option 'EN'>>
+              <<childname $BirdTower.scene.actors[1]>> and <<childname $BirdTower.scene.actors[2]>> jump out of the tower and cheep at <<your_bird_text>> and you.
+            <<option 'CN'>>
+              <<childname $BirdTower.scene.actors[1]>>和<<childname $BirdTower.scene.actors[2]>>从塔里跳了出来，对着<<your_bird_text>>和你唧唧叫。
+          <</language>>
+        <<case "dominant">>
+          <<language>>
+            <<option 'EN'>>
+              <<childname $BirdTower.scene.actors[1]>> bursts out of the tower and lands right on <<childname $BirdTower.scene.actors[0]>>. <<childname $BirdTower.scene.actors[2]>> leaps out after <<childhim>>, screeching at <<childhe $BirdTower.scene.actors[1]>> and trying to come out on top.
+            <<option 'CN'>>
+              <<childname $BirdTower.scene.actors[1]>>从塔里飞扑了出来，正好落在<<childname $BirdTower.scene.actors[0]>>身上，<<childname $BirdTower.scene.actors[2]>>紧随其后跃出，对着<<childhe $BirdTower.scene.actors[1]>>大声啸叫，试图占据上风。
+          <</language>>
+      <</switch>>
+    <<else>>
+      <<switch $childRecords[$BirdTower.scene.actors[1]].development.trait>>
+        <<childSelect $BirdTower.scene.actors[1]>>
+        <<case "clumsy">>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> peers out of the entrance at you,
+            <<option 'CN'>>
+              <<childname>>正从洞口探出头来望着你们，
+          <</language>>
+        <<case "sympathy">>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> jumps out of the tower,
+            <<option 'CN'>>
+              <<childname>>从塔里跳了出来，
+          <</language>>
+        <<case "clever">>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> jumps out of the tower,
+            <<option 'CN'>>
+              <<childname>>从塔里跳了出来，
+          <</language>>
+        <<case "dominant">>
+          <<language>>
+            <<option 'EN'>>
+              <<childname>> bursts out of the tower and lands right on <<childname $BirdTower.scene.actors[0]>>,
+            <<option 'CN'>>
+              <<childname>>从塔里飞扑了出来，正好落在<<childname $BirdTower.scene.actors[0]>>身上，
+          <</language>>
+      <</switch>>
+      <<switch $childRecords[$BirdTower.scene.actors[2]].development.trait>>
+        <<childSelect $BirdTower.scene.actors[2]>>
+        <<case "clumsy">>
+          <<language>>
+            <<option 'EN'>>
+              while <<childname>> peers out of the entrance, seeming to want to join <<childsiblings $BirdTower.scene.actors[0]>> too.
+            <<option 'CN'>>
+              而<<childname>>正从洞口探出头来望着你们，看起来他们也想要加入<<childsiblings $BirdTower.scene.actors[0]>>。
+          <</language>>
+        <<case "sympathy">>
+          <<language>>
+            <<option 'EN'>>
+              while <<childname>> lands on the perch too, cheeping at their <<childsiblings $BirdTower.scene.actors[0]>>.
+            <<option 'CN'>>
+              而<<childname>>也落到栖木上，对着他们的<<childsiblings $BirdTower.scene.actors[0]>>唧唧叫。
+          <</language>>
+        <<case "clever">>
+          <<language>>
+            <<option 'EN'>>
+              while <<childname>> lands on the perch too, cheeping at <<your_bird_text>>.
+            <<option 'CN'>>
+              而<<childname>>也落到栖木上，对着<<your_bird_text>>唧唧叫。
+          <</language>>
+        <<case "dominant">>
+          <<language>>
+            <<option 'EN'>>
+              while <<childname>> leaps right over <<childsiblings $BirdTower.scene.actors[1]>> and lands on <<childname $BirdTower.scene.actors[0]>>, drawing a complaining screech from <<childhe $BirdTower.scene.actors[0]>>.
+            <<option 'CN'>>
+              而<<childname>>直接跃过了<<childsiblings $BirdTower.scene.actors[1]>>飞扑了出来，正好落在<<childname $BirdTower.scene.actors[0]>>身上，压得<<childhe $BirdTower.scene.actors[0]>>抱怨地大叫起来。
+          <</language>>
+      <</switch>>
+    <</if>>
+    <br>
+  <<elseif $BirdTower.scene.ids.length gte 2>>
+    <<language>>
+      <<option 'EN'>>
+        Another chirp sounds behind you.
+      <<option 'CN'>>
+        你的身后传来了另一声啾鸣。
+    <</language>>
+    <<childSelect $BirdTower.scene.actors[1]>>
+    <<switch $childRecords[$BirdTower.scene.actors[1]].development.trait>>
+      <<case "clumsy">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> peers out of the entrance at you. It seems <<childHe>> wants to join <<childhis>> <<childsiblings $BirdTower.scene.actors[0]>> too.
+          <<option 'CN'>>
+            <<childname>>正从洞口探出头来望着你们，看起来<<childHe>>也想要加入自己的<<childsiblings $BirdTower.scene.actors[0]>>。
+        <</language>>
+      <<case "sympathy">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> jumps out of the tower and cheeps at <<childhis>> <<childsiblings $BirdTower.scene.actors[0]>>.
+          <<option 'CN'>>
+            <<childname>>从塔里跳了出来，对着<<childhis>>的<<childsiblings $BirdTower.scene.actors[0]>>唧唧叫。
+        <</language>>
+      <<case "clever">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> jumps out of the tower and cheeps at <<your_bird_text>>.
+          <<option 'CN'>>
+            <<childname>>从塔里跳了出来，对着<<your_bird_text>>唧唧叫。
+        <</language>>
+      <<case "dominant">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> bursts out of the tower and lands right on <<childhis>> <<childname $BirdTower.scene.actors[0]>>, drawing a complaining screech from <<childhe $BirdTower.scene.actors[0]>>.
+          <<option 'CN'>>
+            <<childname>>从塔里飞扑了出来，正好落在<<childhis>>的<<childname $BirdTower.scene.actors[0]>>身上，压得<<childhe $BirdTower.scene.actors[0]>>抱怨地大叫起来。
+        <</language>>
+    <</switch>>
+    <br>
+  <</if>>
+  <<childSelect $BirdTower.scene.actors[0]>>
+  <<if !$BirdTower.seen.subadult>>
+    <<language>>
+      <<option 'EN'>>
+        <<your_bird_text "cap">> seems stunned by the sight. You nudge <<bhe>>, and <<bHe>> snaps out of it with a start, feathers fluffing up as <<bhe>> rises excitedly.
+      <<option 'CN'>>
+        <<your_bird_text "cap">>似乎对眼前的景象呆住了。你推了推<<bhe>>，<<bHe>>才猛地回神，浑身羽毛蓬起，激动地站了起来。
+    <</language>>
+    <br>
+    <<if $monster is 1>>
+      <<language>>
+        <<option 'EN'>>
+          "<<= $BirdTower.scene.ids.length gt 1 ? "The children are" : "Our child is">> ready to fly." <<bHe>> gently inspects <<childname>>'s wings, "Still soft, not much muscle, but <<childname>> is light enough to carry <<childhim>>self."
+        <<option 'CN'>>
+          "<<= $BirdTower.scene.ids.length gt 1 ? "孩子们" : "我们的孩子">>已经做好飞行的准备了。"<<bHe>>动作轻柔地检查<<childname>>的翅膀，"还很稚嫩，没什么肌肉，但<<childname>>很轻，已经足够支撑体重。"
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<bHe>> gently nudges <<childname>>'s wings with <<bhis>> beak and gives a satisfied trill.
+        <<option 'CN'>>
+          <<bHe>>用喙轻轻戳弄<<childname>>的翅膀，发出一声满意的颤鸣。
+      <</language>>
+    <</if>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        <<childname>> stays put obediently, letting <<your_bird_text>> spread <<childhis>> wings to check them.
+      <<option 'CN'>>
+        <<childname>>乖巧地待在原地，仍由<<your_bird_text>>拉开<<childhis>>的翅膀检查。
+    <</language>>
+    <<if $BirdTower.scene.ids.length gt 1>>
+      <<language>>
+        <<option 'EN'>>
+          You copy <<beasttype>> and comb through <<childname $BirdTower.scene.actors[1]>>'s feathers with your fingers. Under your hands, <<childHis $BirdTower.scene.actors[1]>> young but powerful muscles thrum with life.
+        <<option 'CN'>>
+          你也照着<<beasttype>>的样子，用手指梳理起<<childname $BirdTower.scene.actors[1]>>的羽毛。<<childHis $BirdTower.scene.actors[1]>>稚嫩但有力的肌肉在你的手下迸发出生命的律动。
+      <</language>>
+    <</if>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        Once the child's wings are settled, <<GreatHawk>> turns <<bhis>> head to preen
+      <<option 'CN'>>
+        整理好孩子的翅膀，<<GreatHawk>>侧过头简单梳理
+    <</language>>
+    <<if $harpy gte 6>>
+      <<language>>
+        <<option 'EN'>>
+          you and
+        <<option 'CN'>>
+          你和
+      <</language>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<bhimself>>. There is still an excited tremor in <<bhis>> movements.
+      <<option 'CN'>>
+        <<bhimself>>的羽毛。<<bHe>>的动作中依然带着激动的颤抖。
+    <</language>>
+    <br>
+    <<if $harpy gte 6>>
+      <<if $monster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            "<<Wife>>, will you come with us?" The harpy holds out a hand to you. "<<babyhawks>>'s first flight."
+          <<option 'CN'>>
+            "<<Wife>>和我们一起来吗？"哈比向你伸出手，"<<babyhawks>>的第一次飞行。"
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<bHe>> spreads <<bhis>> wings at you with a soft call and stares at you expectantly. <<bHe>> wants you to fly with them.
+          <<option 'CN'>>
+            <<bHe>>对你展开翅膀轻声鸣叫，期待地盯着你。<<bHe>>想让你和他们一起飞翔。
+        <</language>>
+      <</if>>
+      <br><br>
+      <<lanLink ['Come along', '一起去'] 'Deadwood BirdTower FirstFlight'>>
+        <<bird_pass 10>>
+        <<npcincr "Great Hawk" love 1>>
+      <</lanLink>>
+      <<glove>>
+      <br>
+      <<lanLink ['Stay and watch', '留下观看'] 'Deadwood BirdTower FirstFlight Stay'>>
+        <<bird_pass 10>>
+      <</lanLink>>
+      <br>
+    <<else>>
+      <<if $monster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            "Sorry, I cannot bring <<Wife>> along." The harpy turns to embrace you. "<<babyhawks>>'s first flight needs careful watching."
+          <<option 'CN'>>
+            "抱歉不能带着<<Wife>>一起。"哈比转过身来拥抱你，"<<babyhawks>>的第一次飞行需要小心看护。"
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            The great hawk turns and calls to you apologetically. <<babyhawks>>'s first flight needs <<bhe>> to fly alongside.
+          <<option 'CN'>>
+            巨鹰转过头对你歉意地轻声鸣叫，<<babyhawks>>的第一次飞行需要<<bhe>>伴飞。
+        <</language>>
+      <</if>>
+      <br><br>
+      <<lanLink ['Stay and watch', '留下观看'] 'Deadwood BirdTower FirstFlight Stay'>><</lanLink>>
+      <br>
+    <</if>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        <<your_bird_text "cap">> fluffs up <<bhis>> feathers excitedly, ready for another round of teaching.
+      <<option 'CN'>>
+        <<your_bird_text "cap">>兴奋地蓬起羽毛，准备好了新一轮的教学。
+    <</language>>
+    <br>
+    <<if $monster is 1>>
+      <<language>>
+        <<option 'EN'>>
+          "<<= $BirdTower.scene.ids.length gt 1 ? "The children are" : "Our child is">> ready to fly." <<bHe>> gently inspects <<childname>>'s wings, "Still soft, not much muscle, but I believe <<babyhawks>> can do it."
+        <<option 'CN'>>
+          "<<= $BirdTower.scene.ids.length gt 1 ? "孩子们" : "我们的孩子">>已经做好飞行的准备了。"<<bHe>>动作轻柔地检查<<childname>>的翅膀，"依然很稚嫩，没什么肌肉，但我相信<<babyhawks>>能做到。"
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<bHe>> nudges and checks <<childname>>'s wings with <<bhis>> beak and gives a satisfied trill. <<babyhawks>>'s muscles are well developed and <<babyhawksthem>>'s plumage full; they can already carry their own weight.
+        <<option 'CN'>>
+          <<bHe>>用喙轻轻戳弄检查<<childname>>的翅膀，发出一声满意的颤鸣。<<babyhawks>>的肌肉发育完好，羽翼丰满，已然能承担<<babyhawksthem>>的体重。
+      <</language>>
+    <</if>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        <<childname>> stays put obediently, letting <<your_bird_text>> spread <<childhis>> wings to check them.
+      <<option 'CN'>>
+        <<childname>>乖巧地待在原地，仍由<<your_bird_text>>拉开<<childhis>>的翅膀检查。
+    <</language>>
+    <<if $BirdTower.scene.ids.length gt 1>>
+      <<language>>
+        <<option 'EN'>>
+          You copy <<beasttype>> and comb through <<childname $BirdTower.scene.actors[1]>>'s feathers with your fingers. Under your hands, <<childHis $BirdTower.scene.actors[1]>> young but powerful muscles thrum with life.
+        <<option 'CN'>>
+          你也照着<<beasttype>>的样子，用手指梳理起<<childname $BirdTower.scene.actors[1]>>的羽毛。<<childHis $BirdTower.scene.actors[1]>>稚嫩但有力的肌肉在你的手下迸发出生命的律动。
+      <</language>>
+    <</if>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        Once the child's wings are settled, <<GreatHawk>> turns <<bhis>> head to preen
+      <<option 'CN'>>
+        整理好孩子的翅膀，<<GreatHawk>>侧过头简单梳理
+    <</language>>
+    <<if $harpy gte 6>>
+      <<language>>
+        <<option 'EN'>>
+          you and
+        <<option 'CN'>>
+          你和
+      <</language>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<bhimself>>.
+      <<option 'CN'>>
+        <<bhimself>>的羽毛。
+    <</language>>
+    <br>
+    <<if $harpy gte 6>>
+      <<if $monster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            "<<Wife>>, will you come with us?" The harpy holds out a hand to you. "<<babyhawks>>'s first flight."
+          <<option 'CN'>>
+            "<<Wife>>和我们一起来吗？"哈比向你伸出手，"<<babyhawks>>的第一次飞行。"
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<bHe>> spreads <<bhis>> wings at you with a soft call and stares at you expectantly. <<bHe>> wants you to fly with them.
+          <<option 'CN'>>
+            <<bHe>>对你展开翅膀轻声鸣叫，期待地盯着你。<<bHe>>想让你和他们一起飞翔。
+        <</language>>
+      <</if>>
+      <br><br>
+      <<lanLink ['Come along', '一起去'] 'Deadwood BirdTower FirstFlight'>>
+        <<bird_pass 10>>
+        <<npcincr "Great Hawk" love 1>>
+      <</lanLink>>
+      <<glove>>
+      <br>
+      <<lanLink ['Stay and watch', '留下观看'] 'Deadwood BirdTower FirstFlight Stay'>>
+        <<bird_pass 10>>
+      <</lanLink>>
+      <br>
+    <<else>>
+      <<if $monster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            "Sorry, I cannot bring <<Wife>> along." The harpy turns to embrace you. "<<babyhawks>>'s first flight needs careful watching."
+          <<option 'CN'>>
+            "抱歉不能带着<<Wife>>一起。"哈比转过身来拥抱你，"<<babyhawks>>的第一次飞行需要小心看护。"
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            The great hawk turns and calls to you apologetically. <<babyhawks>>'s first flight needs <<bhe>> to fly alongside.
+          <<option 'CN'>>
+            巨鹰转过头对你歉意地轻声鸣叫，<<babyhawks>>的第一次飞行需要<<bhe>>伴飞。
+        <</language>>
+      <</if>>
+      <br><br>
+      <<lanLink ['Stay and watch', '留下观看'] 'Deadwood BirdTower FirstFlight Stay'>><</lanLink>>
+      <br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget "deadwood-birdtower-first-hunt">>
+  <<if maplebirch.get('BirdTower').at('tower').some(child => child.development.grow_hint_immature is 1 and child.development.grow_hint_subadult isnot 1) and $birdFly is 1 and $harpy gt 5 and !playerBellyVisible() and $bird.hunts.unlocked isnot false and Weather.precipitation isnot 'rain'>>
+    <<set $dateCount.Total++>>
+    <<set $dateCount.GreatHawkHunts++>>
+    <<unset $birdPerch>>
+    <<set _childrenIds to maplebirch.get('BirdTower').at('tower').map(child => child.childId)>>
+    <<set _childrenTotal to _childrenIds.length>>
+    <<set _scene_ids to []>>
+    <<for _cc to 0; _cc lt _childrenTotal; _cc++>>
+      <<if $childRecords[_childrenIds[_cc]].development.grow_hint_immature is 1 and $childRecords[_childrenIds[_cc]].development.grow_hint_subadult isnot 1>>
+        <<run _scene_ids.push(_childrenIds[_cc])>>
+        <<set $childRecords[_childrenIds[_cc]].development.activity to "lurkerEat">>
+        <<run delete $childRecords[_childrenIds[_cc]].development.grow_hint_immature>>
+      <</if>>
+      <<updateChildActivity _childrenIds[_cc]>>
+    <</for>>
+    <<run maplebirch.get('BirdTower').beginScene(_scene_ids)>>
+    <<childSelect $BirdTower.scene.actors[0]>>
+    <<language>>
+      <<option 'EN'>>
+        You stand beside <<bhim>>.
+      <<option 'CN'>>
+        你站在<<bhim>>身边。
+    <</language>>
+    <<if $speech_attitude is "meek">>
+      <<language>>
+        <<option 'EN'>>
+          "I— I will join you," you say.
+        <<option 'CN'>>
+          "我、我会加入你的，"你说。
+      <</language>>
+    <<elseif $speech_attitude is "bratty">>
+      <<language>>
+        <<option 'EN'>>
+          "I want to stretch my wings," you say. "I will come with you."
+        <<option 'CN'>>
+          "我想伸展一下我的翅膀，"你说道。"我跟你一起去。"
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          "I will come with you," you say.
+        <<option 'CN'>>
+          "我跟你一起去，"你说。
+      <</language>>
+    <</if>>
+    <br>
+    <<if $monster is 1>>
+      <<language>>
+        <<option 'EN'>>
+          "I am glad to hunt with <<wife>>," <<bhe>> says. <<bHe>> spreads <<bhis>> wings, ready to leap from the tower, and you follow.
+        <<option 'CN'>>
+          "我很高兴能和<<wife>>一起狩猎，"<<bhe>>说。<<bHe>>伸展开翅膀，准备从塔上跃出，你也跟了上去。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<bHe>> gives a small chirp and gestures with <<bhis>> wings. <<bHe>> spreads them, ready to leap from the top of the tower, and you follow.
+        <<option 'CN'>>
+          <<bHe>>发出一声小小的叽喳声，用翅膀向你示意。<<bhis>>展开翅膀，准备从塔顶跃出，你也跟了上去。
+      <</language>>
+    <</if>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        But before you leave the tower, a young screech sounds behind you. <<babyhawks>> flap over to hover between you, cheeping at you without pause,
+      <<option 'CN'>>
+        然而，在你们离开高塔前，一声稚嫩的啸叫声从你们身后传来。<<babyhawks>>扑打着翅膀飞到你们之间，冲着你们叽喳个不停，
+    <</language>>
+    <<switch $childRecords[$BirdTower.scene.actors[0]].development.trait>>
+      <<case "clumsy">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> circles you in flight, unwilling to be parted from you.
+          <<option 'CN'>>
+            <<childname>>围绕着你飞行，似乎不想和你们分开。
+        <</language>>
+      <<case "sympathy">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> seems to hope you will take <<childhim>> along.
+          <<option 'CN'>>
+            <<childname>>似乎希望你们能带上<<childhim>>。
+        <</language>>
+      <<case "clever">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> seems eager to join you.
+          <<option 'CN'>>
+            <<childname>>似乎对加入你们跃跃欲试。
+        <</language>>
+      <<case "dominant">>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> seems very unhappy at being left behind.
+          <<option 'CN'>>
+            <<childname>>好像很不满自己被落下了。
+        <</language>>
+    <</switch>>
+    <br><br>
+    <<if !$BirdTower.seen.immature>>
+      <<language>>
+        <<option 'EN'>>
+          You and <<your_bird_text>> exchange a look.
+        <<option 'CN'>>
+          你和<<your_bird_text>>面面相觑。
+      <</language>>
+      <br>
+      <<if $speech_attitude is "meek">>
+        <<language>>
+          <<option 'EN'>>
+            "Do <<babyhawksyou>> want to hunt with us?" You circle <<babyhawks>>, checking <<babyhawksthem>> for any sign of discomfort.
+          <<option 'CN'>>
+            "<<babyhawksyou>>是想要和我们一起打猎吗？"你围绕着<<babyhawks>>转圈，检查<<babyhawksthem>>是否有什么不适。
+        <</language>>
+      <<elseif $speech_attitude is "bratty">>
+        <<language>>
+          <<option 'EN'>>
+            You scoop <<childname>> into your arms and ruffle the top of <<childhis>> head. "Want to come hunt with us?"
+          <<option 'CN'>>
+            你一把将<<childname>>捞入怀里，搓揉<<childhis>>的头顶。"想和我们一起去打猎吗？"
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            "Want to come hunt with us?" you ask.
+          <<option 'CN'>>
+            "想和我们一起打猎吗？"你问。
+        <</language>>
+      <</if>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          <<childname>> gives <<= $childRecords[$BirdTower.scene.actors[0]].development.trait is "clever" ? "an approving" : "a puzzled">> cheep and turns to look at <<GreatHawk>>.
+        <<option 'CN'>>
+          <<childname>>发出一声<<= $childRecords[$BirdTower.scene.actors[0]].development.trait is "clever" ? "赞同的" : "迷茫的">>叽喳声，转头看向<<GreatHawk>>。
+      <</language>>
+      <br>
+      <<if $monster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            <<bHe>> is clearly still surprised. "<<babyhawks>> do not need to hunt for themselves. I will hunt for <<babyhawksyou>>." <<bHe>> says it with a look of disapproval and confusion.
+          <<option 'CN'>>
+            <<bHe>>明显仍在惊讶之中，"<<babyhawks>>用不着自己狩猎，我会给<<babyhawksyou>>打猎的。"<<bHe>>说着，以不赞同和困惑的目光回应。
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<bHe>> tilts <<bhis>> head to one side and spreads <<bhis>> wings with a low, rasping call, a clear refusal.
+          <<option 'CN'>>
+            <<bHe>>将头歪向一边，展开翅膀发出低沉的嘎嘎声，一个明显的拒绝姿态。
+        <</language>>
+      <</if>>
+      <br>
+      <<language>>
+        <<option 'EN'>>
+          Amid <<babyhawks>>'s indignant clamour, <<bHe>> finally gives in and silently inspects <<babyhawksthem>>'s wings.
+        <<option 'CN'>>
+          在<<babyhawks>>不满的吵闹叫声中，<<bHe>>最终还是败下阵来，默默检查起<<babyhawksthem>>的羽翼。
+      <</language>>
+      <<language>>
+        <<option 'EN'>>
+          Their parent-and-child exchange brings a smile to your face.
+        <<option 'CN'>>
+          他们的亲子互动让你不禁会心一笑。
+      <</language>>
+      <<stress -6>><<lstress>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          You join your mate in grooming the young hawk's feathers. Your child has grown a full set of new feathers. Compared with the first flight, their wings are stronger and fuller, the edges smooth and unworn, almost identical to your own.
+        <<option 'CN'>>
+          你加入你的配偶，整理小鹰的羽毛。你的孩子已经换上了一身新的羽毛，相比起初次飞行的时候，<<babyhawksthem>>的羽翼更结实，更丰满，除了羽毛的边缘光滑，没有磨损的痕迹，几乎与你的翅膀别无二致。
+      <</language>>
+      <br>
+      <<language>>
+        <<option 'EN'>>
+          You step back to take in your child fully. <<babyhawks>> stand tall and sure on powerful talons, their young but beautiful feathers swaying in the wind.
+        <<option 'CN'>>
+          你向后退，将你的孩子完整地纳入视野中。<<babyhawks>>身姿挺拔，脚爪有力，稚嫩但美丽的羽毛在风中摇晃。
+      <</language>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          <span class="green"><<babyhawksthem>> is ready to learn to hunt.</span>
+        <<option 'CN'>>
+          <span class="green"><<babyhawksthem>>已经做好了学习狩猎的准备。</span>
+      <</language>>
+      <br><br>
+      <<if $monster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            Once the inspection is done, <<your_bird_text>> declares in a serious tone, "I will teach <<babyhawks>> to hunt."
+          <<option 'CN'>>
+            检查完毕，<<your_bird_text>>用认真的语气宣告，"我会教会<<babyhawks>>狩猎。"
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            Once the inspection is done, <<your_bird_text>> gives a sharp cry, announcing the start of the hunt.
+          <<option 'CN'>>
+            检查完毕，<<your_bird_text>>发出一声尖鸣，宣告着狩猎的开始。
+        <</language>>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          <<bHe>> leaps from the tower, and you dive after <<bhim>>, slowing in the air to wait for <<babyhawks>> to catch up.
+        <<option 'CN'>>
+          <<bHe>>从塔上跃了出去，你也紧随其后飞下，在空中放慢了速度等待<<babyhawks>>追上你们。
+      <</language>>
+      <br><br>
+      <<if $BirdTower.scene.ids.length gte 3>>
+        <<language>>
+          <<option 'EN'>>
+            The young hawks follow behind you in a flock. You worry a little about how chaotic it will get.
+          <<option 'CN'>>
+            小鹰在你们身后成群结队地跟着。你有些担心之后的场面会有多么混乱。
+        <</language>>
+        <br><br>
+      <</if>>
+      <<lanLink ['Start the hunt (0:40)', '开始打猎 (0:40)'] 'Deadwood BirdTower FirstHunt Intro'>>
+        <<bird_pass 5>>
+      <</lanLink>>
+      <br>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          You turn to <<your_bird_text>>, whose feathers are fluffed up with excitement, clearly ready for another round of teaching.
+        <<option 'CN'>>
+          你转头看向<<your_bird_text>>，<<bHis>>的羽毛兴奋地蓬起，显然已经做了新一轮教学的准备。
+      <</language>>
+      <br>
+      <<language>>
+        <<option 'EN'>>
+          The two of you <<= $monster is 1 ? "share a smile" : "meet each other's eyes in silent understanding">> and begin grooming the young hawk's feathers. Your child has grown a full set of new feathers. Compared with the first flight, their wings are stronger and fuller, the edges smooth and unworn, almost identical to your own.
+        <<option 'CN'>>
+          你们<<= $monster is 1 ? "相视一笑" : "默契地对视">>，开始整理小鹰的羽毛。你的孩子已经换上了一身新的羽毛，相比起初次飞行的时候，<<babyhawksthem>>的羽翼更结实，更丰满，除了羽毛的边缘光滑，没有磨损的痕迹，几乎与你的翅膀别无二致。
+      <</language>>
+      <br>
+      <<language>>
+        <<option 'EN'>>
+          You step back to take in your child fully. <<babyhawks>> stand tall and sure on powerful talons, their young but beautiful feathers swaying in the wind.
+        <<option 'CN'>>
+          你向后退，将你的孩子完整地纳入视野中。<<babyhawks>>身姿挺拔，脚爪有力，稚嫩但美丽的羽毛在风中摇晃。
+      <</language>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          <span class="green"><<babyhawksthem>> is ready to learn to hunt.</span>
+        <<option 'CN'>>
+          <span class="green"><<babyhawksthem>>已经做好了学习狩猎的准备。</span>
+      <</language>>
+      <br><br>
+      <<if $monster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            Once the inspection is done, <<your_bird_text>> declares in a serious tone, "I will teach <<babyhawks>> to hunt."
+          <<option 'CN'>>
+            检查完毕，<<your_bird_text>>用认真的语气宣告，"我会教会<<babyhawks>>狩猎。"
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            Once the inspection is done, <<your_bird_text>> gives a sharp cry, announcing the start of the hunt.
+          <<option 'CN'>>
+            检查完毕，<<your_bird_text>>发出一声尖鸣，宣告着狩猎的开始。
+        <</language>>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          <<bHe>> leaps from the tower, and you dive after <<bhim>>, slowing in the air to wait for <<babyhawks>> to catch up.
+        <<option 'CN'>>
+          <<bHe>>从塔上跃了出去，你也紧随其后飞下，在空中放慢了速度等待<<babyhawks>>追上你们。
+      <</language>>
+      <br><br>
+      <<if $BirdTower.scene.ids.length gte 3>>
+        <<language>>
+          <<option 'EN'>>
+            The young hawks follow behind you in a flock. You worry a little about how chaotic it will get.
+          <<option 'CN'>>
+            小鹰在你们身后成群结队地跟着。你有些担心之后的场面会有多么混乱。
+        <</language>>
+        <br><br>
+      <</if>>
+      <<lanLink ['Start the hunt (0:40)', '开始打猎 (0:40)'] 'Deadwood BirdTower FirstHunt Intro'>>
+        <<bird_pass 5>>
+      <</lanLink>>
+      <br>
+    <</if>>
+    <<exitAll>>
+  <</if>>
+<</widget>>
+
+<<widget "deadwood-birdtower-nest-growth">>
+  <<if $bird.hunts.unlocked is true and maplebirch.get('BirdTower').at('tower').some(child => child.development.stage is 'Immature' and child.development.grow_hint_immature isnot 1)>>
+    <<set _childrenIds to maplebirch.get('BirdTower').at('tower').map(child => child.childId)>>
+    <<set _childrenTotal to _childrenIds.length>>
+    <<if !$BirdTower.nest.hinted>>
+      <!-- 未建巢，初次提示建巢 -->
+      <<set $BirdTower.nest.hinted to true>>
+      <<set $bird.upgrades.otherNest to 0>>
+      <<language>>
+        <<option 'EN'>>
+          You look around your tower.
+        <<option 'CN'>>
+          你环顾你的高塔。
+      <</language>>
+      <br>
+      <<language>>
+        <<option 'EN'>>
+          You study the state of your nest for a while. Your eyes sweep across the room and catch on imperfections that bother you.
+        <<option 'CN'>>
+          你观察了一会儿你的巢的状态。你的眼睛在房间内扫过，注意到了让你烦恼的不完美之处。
+      <</language>>
+      <<if _childrenTotal gt 1>>
+        <<language>>
+          <<option 'EN'>>
+            The children
+          <<option 'CN'>>
+            孩子们
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            Your child
+          <<option 'CN'>>
+            你的孩子
+        <</language>>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          's growing size makes the nest you share with your mate feel cramped by comparison.
+        <<option 'CN'>>
+          的个头与日俱增，相比之下，你和你的配偶的巢已经显得有些拥挤了。
+      <</language>>
+      <<language>>
+        <<option 'EN'>>
+          <span class="blue">Perhaps you could build your child a new nest.</span>
+        <<option 'CN'>>
+          <span class="blue">也许你可以给你的孩子建一个新巢。</span>
+      <</language>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          <span class="gold">You can now build a new nest for your children.</span>
+        <<option 'CN'>>
+          <span class="gold">你现在可以为你的孩子建造新的巢穴了。</span>
+      <</language>>
+      <br><br>
+      <<lanLink ['Continue', '继续'] 'Bird Tower Build'>><</lanLink>>
+      <br>
+      <<exitAll>>
+    <<elseif $bird.upgrades.otherNest lte 0>>
+      <!-- 未建巢，长期挂着可以建巢的提示 -->
+      <<if _childrenTotal gt 1>>
+        <<language>>
+          <<option 'EN'>>
+            <span class="blue">In the nest, the chicks <<print either(lanSwitch("shove each other around","互相推搡着"),lanSwitch("flap their wings with noisy cheeps, their claws tangled together","叽叽喳喳地扑棱翅膀，他们的爪子卡在了一起"),lanSwitch("doze in a huddled heap","挤成一团打瞌睡"))>>.</span>
+          <<option 'CN'>>
+            <span class="blue">小鹰在巢里<<print either(lanSwitch("shove each other around","互相推搡着"),lanSwitch("flap their wings with noisy cheeps, their claws tangled together","叽叽喳喳地扑棱翅膀，他们的爪子卡在了一起"),lanSwitch("doze in a huddled heap","挤成一团打瞌睡"))>>。</span>
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <span class="blue">In the nest, the chicks <<print either(lanSwitch("anxiously scrape their talons","焦虑地磨爪"),lanSwitch("pick at the twigs in the nest","扒拉巢里的小树枝"),lanSwitch("struggle to pull their claws out of the gaps","努力从缝里拔出自己的爪子"))>>.</span>
+          <<option 'CN'>>
+            <span class="blue">小鹰在巢里<<print either(lanSwitch("anxiously scrape their talons","焦虑地磨爪"),lanSwitch("pick at the twigs in the nest","扒拉巢里的小树枝"),lanSwitch("struggle to pull their claws out of the gaps","努力从缝里拔出自己的爪子"))>>。</span>
+        <</language>>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          <span class="blue">Perhaps you could build your child a new nest.</span>
+        <<option 'CN'>>
+          <span class="blue">也许你可以给你的孩子建一个新巢。</span>
+      <</language>>
+      <br><br>
+    <<else>>
+      <!-- 建了，把新一批孩子挪进去，反正衔接在初狩事件后面 -->
+      <<set _immature_ids to []>>
+      <<for _cc to 0; _cc lt _childrenTotal; _cc++>>
+        <<if $childRecords[_childrenIds[_cc]].development.stage is "Immature" and $childRecords[_childrenIds[_cc]].development.grow_hint_immature isnot 1 and $childRecords[_childrenIds[_cc]].development.location is "tower">>
+          <<set $childRecords[_childrenIds[_cc]].development.location to "otherNest">>
+          <<run _immature_ids.push(_childrenIds[_cc])>>
+        <</if>>
+        <<updateChildActivity _childrenIds[_cc]>>
+      <</for>>
+      <<set _immature_total to _immature_ids.length>>
+      <<language>>
+        <<option 'EN'>>
+          Looking around, you carry <<childrenNames _immature_ids>>, still clutching lurkers in their beaks, over to the new nest.
+        <<option 'CN'>>
+          环顾四周，你把嘴里还叼着潜伏者的<<childrenNames _immature_ids>>抱到了新的巢里。
+      <</language>>
+      <<set _child1 to _immature_ids.pluck()>>
+      <<childSelect _child1>>
+      <<language>>
+        <<option 'EN'>>
+          <<= _immature_total is 1 ? "<<childhe>> has" : "They have">> grown too big to sleep with you.
+        <<option 'CN'>>
+          <<= _immature_total is 1 ? "<<childhe>>" : "他们">>的个头已经不适合和你们一起睡了。
+      <</language>>
+      <br><br>
+      <<lanLink ['Continue', '继续'] 'Bird Tower Build'>><</lanLink>>
+      <br>
+      <<exitAll>>
+    <</if>>
+  <</if>>
+<</widget>>

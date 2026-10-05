@@ -1,0 +1,2363 @@
+:: Deadwood BirdTower Hunt Scavenge Party Site []
+<<effects>>
+<<endevent>>
+<<set $daily.emptyCamp to true>>
+<<language>>
+  <<option 'EN'>>
+    You and <<babyhawks>> land at the edge of the area. <<babyhawksthem>> look around.
+  <<option 'CN'>>
+    你和<<babyhawks>>降落在这片区域外围。<<babyhawksthem>>环顾着四周。
+<</language>>
+<<if maplebirch.get('BirdTower').selectTrait("clever")>>
+  <<language>>
+    <<option 'EN'>>
+      <<childrenNames _tempIDs>> chirp excitedly and bury their heads in the rubbish to search.
+    <<option 'CN'>>
+      <<childrenNames _tempIDs>>激动地叽喳叫着，埋头在垃圾堆里翻找起来。
+  <</language>>
+<</if>>
+<br><br>
+<<if $daily.emptyCampLoot is undefined>>
+  <<set $daily.emptyCampLoot to 4>>
+<</if>>
+<<switch $daily.emptyCampLoot>>
+  <<case 4>>
+    <<language>>
+      <<option 'EN'>>
+        There is rubbish everywhere; you are sure you can find something useful.
+      <<option 'CN'>>
+        到处都是垃圾，你觉得自己肯定能找到一些有用的东西。
+    <</language>>
+  <<case 3>>
+    <<language>>
+      <<option 'EN'>>
+        You have already searched part of the rubbish, but there is still plenty left to search.
+      <<option 'CN'>>
+        你已经翻找过了一部分垃圾，不过还有很多可以搜寻的部分。
+    <</language>>
+  <<case 2>>
+    <<language>>
+      <<option 'EN'>>
+        You have already found many things, but there should still be more waiting to be discovered.
+      <<option 'CN'>>
+        你已经找到了许多东西，但应该还有很多等待发现。
+    <</language>>
+  <<case 1>>
+    <<language>>
+      <<option 'EN'>>
+        You have searched almost every spot; there is hardly anything left to find.
+      <<option 'CN'>>
+        你已经几乎翻遍了所有位置，已经没有什么可以发现的了。
+    <</language>>
+<</switch>>
+<<language>>
+  <<option 'EN'>>
+    Digging through rubbish is not an interesting task, but with your
+  <<option 'CN'>>
+    翻找垃圾并不是一件有意思的事情，但和你的
+<</language>>
+<<= maplebirch.get('BirdTower').party.length gt 1 ? lanSwitch("children","孩子们") : lanSwitch("child","孩子")>>
+<<language>>
+  <<option 'EN'>>
+    along, it goes much faster.
+  <<option 'CN'>>
+    一起，让效率更高了。
+<</language>>
+<br>
+<<set _time to 10 - maplebirch.get('BirdTower').party.length * 2>>
+<<if _time lt 0>>
+  <<set _time to 1>>
+<</if>>
+<<set _showtime to String(_time).padStart(2, "0")>>
+<<lanLink ["Search (0:" + _showtime + ")", "翻找 (0:" + _showtime + ")"] "Deadwood BirdTower Hunt Scavenge">>
+  <<bird_pass _time>>
+<</lanLink>>
+<br>
+:: Deadwood BirdTower Hunt Scavenge []
+<<effects>>
+<<endevent>>
+<<childSelect $BirdTower.hunt.leader>>
+<<if !$daily.emptyCampFox and $rng gte 80>>
+  <<beastNEWinit 1 fox>><<earnFeat "Wild Animals">>
+  <<set $daily.emptyCampFox to true>>
+  <<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
+    <<language>>
+      <<option 'EN'>>
+        You and <<babyhawks>> look around for anything useful.
+        <br><br>
+        Just as you are rummaging through the rubbish, you hear a sound behind you. You turn and see <<childname $BirdTower.hunt.leader>> screeching at a <<beasttype>>.
+        <br><br>
+        <<bHis>> ears flatten back; it stops in place and stares at you and
+      <<option 'CN'>>
+        你和<<babyhawks>>环顾四周，寻找着有用的东西。
+        <br><br>
+        就在你翻找垃圾的时候，你听见背后传来一个声音。你转身，看见<<childname $BirdTower.hunt.leader>>正冲着一只<<beasttype>>尖啸。
+        <br><br>
+        <<bHis>>的耳朵向后压，停在原地看着你和
+    <</language>>
+    <<= $cmonster ? lanSwitch("harpy chick","小哈比") : lanSwitch("hawk chick","小鹰")>>
+    <<language>>
+      <<option 'EN'>>
+        .
+      <<option 'CN'>>
+        。
+    <</language>>
+    <<gstress>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        <<childname $BirdTower.hunt.leader>> and <<bhe>> lock eyes for a few tense seconds, then, with a sudden violent beat of wings, they screech and lunge at the <<beasttype>>!
+      <<option 'CN'>>
+        <<childname $BirdTower.hunt.leader>>和<<bhe>>对视僵持了几秒，随后猛地拍打翅膀，尖鸣着扑向了<<beasttype>>！
+    <</language>>
+    <<if maplebirch.get('BirdTower').party.length gt 1>>
+      <<language>>
+        <<option 'EN'>>
+          The other chicks lunge at <<bhim>> too, and their screeching makes the <<beasttype>> nervously puff up its tail.
+        <<option 'CN'>>
+          其他孩子也扑向<<bhim>>，他们的尖叫声让<<beasttype>>紧张地蓬起尾巴。
+      <</language>>
+    <</if>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        <span class="green">The <<beasttype>> immediately turns and flees.</span>
+        <br>
+        Your children keep screeching to drive <<bhim>> off, but do not give chase.
+        <br><br>
+        You hurry to <<babyhawks>> side, soothe <<babyhawksthem>>, and pull <<babyhawksthem>> into a hug of gratitude. <<childname $BirdTower.hunt.leader>> chirps proudly.
+      <<option 'CN'>>
+        <span class="green">这只<<beasttype>>当即转身逃跑了。</span>
+        <br>
+        你的孩子继续尖鸣着驱赶<<bhim>>，没有追上去。
+        <br><br>
+        你赶到<<babyhawks>>身边，安抚着<<babyhawksthem>>，将<<babyhawksthem>>揽入一个怀抱以示感谢。<<childname $BirdTower.hunt.leader>>自豪地啾啾叫着。
+    <</language>>
+    <<lstress>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        You return to your search.
+      <<option 'CN'>>
+        你们回到搜寻当中。
+    <</language>>
+    <br><br>
+    <<lanLink ["Continue", "继续"] "Deadwood BirdTower Hunt Scavenge">>
+      <<endevent>>
+    <</lanLink>>
+    <br>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        You and <<babyhawks>> look around for anything useful.
+        <br><br>
+        Just as you are rummaging through the rubbish, you hear a sound behind you. You turn and see a <<beasttype>> charging at you! <<bHe>> leaps up and pins you to the ground.
+      <<option 'CN'>>
+        你和<<babyhawks>>环顾四周，寻找着有用的东西。
+        <br><br>
+        就在你翻找垃圾时，你听见背后传来一个声音。你转身，看见一个<<beasttype>>向你冲来！<<bHe>>跳起来，将你按在了地上。
+    <</language>>
+    <<gpain>><<pain 5>>
+    <br><br>
+    <<if $monster is 1>>
+      <<language>>
+        <<option 'EN'>>
+          "This is my find, and I won't give it up for nothing. I need some fun." <<bhe>> says.
+        <<option 'CN'>>
+          "这是我发现的，我不会无缘由地放弃。我得找点乐子。"<<bhe>>说。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<bHe>> yips in victory and pokes you with its nose.
+        <<option 'CN'>>
+          <<bHe>>胜利地嘤嘤叫着，用鼻子戳了戳你。
+      <</language>>
+    <</if>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        Seeing stars, you watch
+      <<option 'CN'>>
+        眼冒金星，你看到
+    <</language>>
+    <<if maplebirch.get('BirdTower').party.length gt 1>>
+      <<= $cmonster ? lanSwitch("harpy chick","小哈比") : lanSwitch("hawk chick","小鹰")>>
+      <<language>>
+        <<option 'EN'>>
+          s
+        <<option 'CN'>>
+          们
+      <</language>>
+    <<else>>
+      <<childname $BirdTower.hunt.leader>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        appear behind the <<beasttype>> and pounce onto <<bhis>> back!
+        <br>
+        The <<beasttype>> is caught off guard and yelps in pain, and you seize the chance to kick <<bhe>> away.
+        <br><br>
+        The <<beasttype>>, enraged, tries to
+      <<option 'CN'>>
+        在<<beasttype>>身后出现，猛地扑到了<<bhis>>的背上！
+        <br>
+        <<beasttype>>毫无防备，发出疼痛的大叫声，你趁机蹬开<<bhe>>。
+        <br><br>
+        <<beasttype>>恼怒地试图
+    <</language>>
+    <<= $monster ? lanSwitch("reach out and grab","伸手抓住") : lanSwitch("turn its head and bite","转头咬向")>>
+    <<language>>
+      <<option 'EN'>>
+        your child, but you land a punch on its jaw, and it yelps in pain.
+        <span class="green">The <<beasttype>> gives in under your chaotic assault and flees.</span>
+        <br><br>
+        <<babyhawks>>
+      <<option 'CN'>>
+        你的孩子，却被你一拳打中了下巴，吃痛地嗷嗷叫。
+        <span class="green">这只<<beasttype>>在你们混乱的攻势中败下阵来，逃跑了。</span>
+        <br><br>
+        <<babyhawks>>
+    <</language>>
+    <<= maplebirch.get('BirdTower').party.length gt 1 ? lanSwitch("gather around","围在") : lanSwitch("come up to","凑到")>>
+    <<language>>
+      <<option 'EN'>>
+        you, chirping worriedly. You pull <<babyhawksthem>> into a soothing embrace and check that <<babyhawksthem>> are unharmed.
+      <<option 'CN'>>
+        你身边，担心地啾啾叫着。你把<<babyhawksthem>>揽入一个安抚的怀抱里，确认<<babyhawksthem>>没有受伤。
+    <</language>>
+    <<lstress>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        After resting for a while, you return to your search.
+      <<option 'CN'>>
+        休息了一会儿，你们继续回到搜寻当中。
+    <</language>>
+    <<bird_pass 3>>
+    <br><br>
+    <<lanLink ["Continue", "继续"] "Deadwood BirdTower Hunt Scavenge">>
+      <<endevent>>
+    <</lanLink>>
+    <br>
+  <</if>>
+<<else>>
+  <<set $daily.emptyCampLoot-->>
+  <<language>>
+    <<option 'EN'>>
+      You and <<babyhawks>> look around for anything useful.
+    <<option 'CN'>>
+      你和<<babyhawks>>环顾四周，想寻找有用的东西。
+  <</language>>
+  <br><br>
+  <<if $rng gte 70>>
+    <<select_random_clothes_limited "upper" "lower" "under_upper" "under_lower" "legs" "hands">>
+    <<language>>
+      <<option 'EN'>>
+        None of the rubbish interests you, but you still manage to find
+      <<option 'CN'>>
+        你对那些垃圾都没什么兴趣，但你还是找到了
+    <</language>>
+    <<if _random_clothes isnot "piece of fabric">>
+      <<if setup.clothes[_random_slot][_random_index].word is "an">>
+        <<language>>
+          <<option 'EN'>>
+            an
+          <<option 'CN'>>
+            一件
+        <</language>>
+      <<elseif setup.clothes[_random_slot][_random_index].word is "a">>
+        <<language>>
+          <<option 'EN'>>
+            a
+          <<option 'CN'>>
+            一件
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            a pair of
+          <<option 'CN'>>
+            一双
+        <</language>>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          _random_clothes.
+        <<option 'CN'>>
+          _random_clothes。
+      <</language>>
+      <<if $bird.upgrades.wardrobe is 1>>
+        <<language>>
+          <<option 'EN'>>
+            You can take it with you, or simply tear it up for some fabric.
+          <<option 'CN'>>
+            你可以拿上它，或者直接撕掉来获取一些布料。
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            You have nowhere to store it, so you can only tear it up for fabric.
+          <<option 'CN'>>
+            你并没有可以存放它的地方，你只能将它撕掉来获取布料。
+        <</language>>
+      <</if>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          Some torn fabric.
+        <<option 'CN'>>
+          一些破损的布料。
+      <</language>>
+    <</if>>
+    <br><br>
+    <<if _random_clothes isnot "piece of fabric">>
+      <<set _cursedPrevent to false>>
+      <<if $worn[_random_slot].cursed is 1>>
+        <<set _cursedPrevent to true>>
+      <</if>>
+      <<set _outfitPrimaryWear to setup.clothes[_random_slot][$worn[_random_slot].index].outfitPrimary>>
+      <<if _outfitPrimaryWear isnot undefined>>
+        <<for _outfitSlot, _value range _outfitPrimaryWear>>
+          <<if $worn[_outfitSlot].cursed is 1>>
+            <<set _cursedPrevent to true>>
+          <</if>>
+        <</for>>
+      <</if>>
+      <<if !_cursedPrevent>>
+        <<set _replace_worn to $worn[_random_slot].name isnot "naked">>
+        <<set _ruin_worn to _replace_worn and $bird.upgrades.wardrobe isnot 1>>
+        <<lanLink ["Wear", "穿上"] "Deadwood BirdTower Hunt Scavenge Clothes">>
+          <<set $phase to 1>>
+          <<if _ruin_worn>><<generalRuined _random_slot>><</if>>
+          <<flight_hunt_get "clothing" 1 _random_slot _random_index "wear">>
+          <<if _ruin_worn>><<flight_hunt_get "fabric" 1>><</if>>
+        <</lanLink>>
+        <<if _replace_worn>>
+          <<language>>
+            <<option 'EN'>>
+              <span class="blue">Your $worn[_random_slot].cn_name_cap will be replaced.</span>
+            <<option 'CN'>>
+              <span class="blue">你的$worn[_random_slot].cn_name_cap将被替换。</span>
+          <</language>>
+        <</if>>
+      <</if>>
+      <br>
+      <<lanLink ["Tear into fabric", "撕成布料"] "Deadwood BirdTower Hunt Scavenge Clothes">>
+        <<set $phase to 2>>
+        <<flight_hunt_get "fabric" 1>>
+      <</lanLink>>
+      <br>
+      <<if $bird.upgrades.wardrobe is 1>>
+        <<lanLink ["Steal", "偷窃"] "Deadwood BirdTower Hunt Scavenge Clothes">>
+          <<set $phase to 3>>
+          <<flight_hunt_get "clothing" 1 _random_slot _random_index>>
+        <</lanLink>>
+        <br>
+      <</if>>
+    <<else>>
+      <<lanLink ["Steal", "偷窃"] "Deadwood BirdTower Hunt Scavenge Clothes">>
+        <<set $phase to 4>>
+        <<flight_hunt_get "fabric" 3>>
+      <</lanLink>>
+      <br>
+    <</if>>
+  <<else>>
+    <<if $rng gte 30>>
+      <<if $rng gte 66>>
+        <<language>>
+          <<option 'EN'>>
+            Among a pile of useless rubbish, you manage to find some tattered clothes.
+          <<option 'CN'>>
+            在一堆没用的垃圾中，你成功找到一些残破的衣服。
+        <</language>>
+        <<flight_hunt_get "fabric" 1>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            Among a pile of useless rubbish, you manage to find some tattered clothes. They are too badly damaged to be mended again. Still, they can serve as useful material.
+          <<option 'CN'>>
+            在一堆没用的垃圾中，你成功找到一些残破的衣服。这些衣服破损的太严重，无法再缝补好了。虽然，它们仍能作为有用的材料。
+        <</language>>
+        <<flight_hunt_get "fabric" 2>>
+      <</if>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          <<babyhawks>> look at your new find. <<babyhawksthem>> come over and nuzzle their heads against the fabric, enjoying its softness.
+        <<option 'CN'>>
+          <<babyhawks>>看着你的新发现。<<babyhawksthem>>凑过来用脑袋磨蹭着布料，享受着布料的柔软。
+      <</language>>
+      <br><br>
+    <<else>>
+      <<if $rng gte 18>>
+        <<language>>
+          <<option 'EN'>>
+            Most of the rubbish is boring and does not catch your attention, but you still manage to find some nice shiny things.
+          <<option 'CN'>>
+            大部分垃圾很无聊，并不能引起你的注意，但你们还是成功找到了一些闪亮亮的好东西。
+        <</language>>
+        <<flight_hunt_get "junk" 1>>
+      <<elseif $rng gte 9>>
+        <<language>>
+          <<option 'EN'>>
+            Most of the rubbish is boring and does not catch your attention, but you still manage to find some nice shiny things.
+          <<option 'CN'>>
+            大部分垃圾很无聊，并不能引起你的注意，但你们还是成功找到了一些闪亮亮的好东西。
+        <</language>>
+        <<flight_hunt_get "junk" 2>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            You manage to find a pit full of empty cans. A lucky find.
+          <<option 'CN'>>
+            你们成功找到了一个全是空罐的坑。幸运的发现。
+        <</language>>
+        <<flight_hunt_get "junk" 3>>
+      <</if>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          Your children come over and
+        <<option 'CN'>>
+          你的孩子凑过来
+      <</language>>
+      <<= $cmonster ? lanSwitch("tap","敲了敲") : lanSwitch("peck","啄了啄")>>
+      <<language>>
+        <<option 'EN'>>
+          one of the empty cans, making it ring out clearly.
+        <<option 'CN'>>
+          其中一个空罐头，让它发出清脆的响声。
+      <</language>>
+      <<if maplebirch.get('BirdTower').selectTrait("clever")>>
+        <<language>>
+          <<option 'EN'>>
+            <<childrenNames _tempIDs>> cheer and leap around these things.
+          <<option 'CN'>>
+            <<childrenNames _tempIDs>>围绕着这些东西欢呼雀跃。
+        <</language>>
+        <<= _length gt 1 ? lanSwitch("They","他们") : "<<childhim _tempIDs>>" >>
+        <<language>>
+          <<option 'EN'>>
+            really seem to love these shinies.
+          <<option 'CN'>>
+            看起来真的很喜欢这些闪亮亮。
+        <</language>>
+      <</if>>
+      <br><br>
+    <</if>>
+    <<birdtower_scavenge_options>>
+  <</if>>
+<</if>>
+
+:: Deadwood BirdTower Hunt Scavenge Clothes []
+<<effects>>
+<<switch $phase>>
+  <<case 1>>
+    <<language>>
+      <<option 'EN'>>
+        You put it on and show it to your children.
+      <<option 'CN'>>
+        你穿上它，向你的孩子展示着。
+    <</language>>
+  <<case 2>>
+    <<language>>
+      <<option 'EN'>>
+        You tear it into pieces so you can carry it.
+      <<option 'CN'>>
+        你将它撕碎，以便携带。
+    <</language>>
+  <<case 3>>
+    <<language>>
+      <<option 'EN'>>
+        You tuck it under your arm.
+      <<option 'CN'>>
+        你将它夹在胳膊底下。
+    <</language>>
+  <<case 4>>
+    <<language>>
+      <<option 'EN'>>
+        You fold the clothes as neatly as you can so you can carry them. Then you tuck them under your arm.
+      <<option 'CN'>>
+        你将衣服尽可能地叠好，以便携带。然后你将它夹在胳膊底下。
+    <</language>>
+<</switch>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    <<babyhawks>> look at your new find, come over, and nuzzle their heads against the fabric, enjoying its softness.
+  <<option 'CN'>>
+    <<babyhawks>>看着你的新发现，凑过来用脑袋磨蹭着布料，享受着布料的柔软。
+<</language>>
+<br><br>
+<<if $phase is 1 and maplebirch.get('BirdTower').selectTrait("sympathy")>>
+  <<childSelect _tempIDs[0]>>
+  <<language>>
+    <<option 'EN'>>
+      <<childname>> watches curiously as you put on new "feathers". <<childhe>> tries to imitate you and stuffs their head into
+    <<option 'CN'>>
+      <<childname>>好奇地看着你换上新的"羽毛"。<<childhe>>试图模仿你的举动，把脑袋塞进了
+  <</language>>
+  <<print either(lanSwitch("a plastic bag","一个塑料袋"),lanSwitch("a wrapper","一个包装袋"),lanSwitch("a piece of torn fabric","一块破损的布料"))>>
+  <<language>>
+    <<option 'EN'>>
+      .
+      <br>
+      <<childhe>> is trapped inside at once, chirping in annoyance.
+      <br>
+      You cannot help but laugh, and reach in to set <<childhe>> free.
+    <<option 'CN'>>
+      里。
+      <br>
+      <<childhe>>立刻被困在了里面，不断发出烦恼的啁啾声。
+      <br>
+      你不禁失笑，伸手把<<childhe>>解放了出来。
+  <</language>>
+  <br><br>
+<</if>>
+<<birdtower_scavenge_options>>
+
+:: Deadwood BirdTower Hunt Scavenge Leave []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You decide you have found enough, and prepare to leave. <<babyhawks>> follow you.
+  <<option 'CN'>>
+    你认为自己已经找到得够多了，于是准备离开。<<babyhawks>>跟上了你。
+<</language>>
+<br><br>
+<<endevent>>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Camp []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You and <<babyhawks>> land on the ground and investigate your surroundings.
+  <<option 'CN'>>
+    你和<<babyhawks>>落在地面上，调查着周围。
+<</language>>
+<br><br>
+<<if $rng gte 20>>
+  <<language>>
+    <<option 'EN'>>
+      You notice that some firewood has been left behind. Most of it is ruined by the damp climate, but you notice two smaller short logs are still in decent condition.
+    <<option 'CN'>>
+      你注意到有些柴火被留下了。大部分都被潮湿的气候所毁坏，但你注意到有两个较小的短原木状态尚可。
+  <</language>>
+  <br><br>
+  <<lanLink ["Take the wood", "拿走木材"] "Deadwood BirdTower Hunt Camp 2">>
+    <<set $phase to 1>>
+  <</lanLink>>
+  <br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      You notice large pieces of fabric scattered on the ground. Most of it is already damaged. You might be able to put it to another use.
+    <<option 'CN'>>
+      你注意到地上散落着大块的布料。它的大部分已经破损。你也许能将它派上别的用场。
+  <</language>>
+  <br><br>
+  <<lanLink ["Take a few at random", "随机拿走几块"] "Deadwood BirdTower Hunt Camp 2">>
+    <<set $phase to 2>>
+  <</lanLink>>
+  <br>
+  <<lanLink ["Look for higher-quality material", "寻找质量更高的材料"] "Deadwood BirdTower Hunt Camp 2">>
+    <<set $phase to 3>>
+  <</lanLink>>
+  <<housekeepingdifficulty 1 300>><<ghousekeeping 300>>
+  <br>
+<</if>>
+<<lanLink ["Leave", "离开"] "Deadwood BirdTower Hunt Exit">>
+  <<endevent>>
+<</lanLink>>
+<br>
+:: Deadwood BirdTower Hunt Camp 2 []
+<<effects>><<childSelect $BirdTower.hunt.leader>>
+<<switch $phase>>
+  <<case 1>>
+    <<language>>
+      <<option 'EN'>>
+        You pick up a log and signal for <<babyhawks>> to do the same.
+      <<option 'CN'>>
+        你拿起一根原木，示意<<babyhawks>>也跟你做一样的事。
+    <</language>>
+    <<if maplebirch.get('BirdTower').party.length gt 1>>
+      <<set _hawksIDcopy to $BirdTower.hunt.ids.filter(id => id !== $BirdTower.hunt.leader)>>
+      <<set _rng to random(0, maplebirch.get('BirdTower').party.length-2)>>
+      <<language>>
+        <<option 'EN'>>
+          <<childname $BirdTower.hunt.leader>> and <<childname _hawksIDcopy[_rng]>> grab another log together.
+        <<option 'CN'>>
+          <<childname $BirdTower.hunt.leader>>和<<childname _hawksIDcopy[_rng]>>一起抓起了另一根原木。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> grabs another, smaller log with their talons. The wood seems a little heavy for <<childhim>>, but <<childhim>> still manages to take off.
+        <<option 'CN'>>
+          <<childHe>>用爪子抓起另一根较小的原木。木头对<<childhim>>来说似乎稍微有点沉，但<<childhim>>还是成功飞了起来。
+      <</language>>
+    <</if>>
+    <br><br>
+    <<flight_hunt_get "wood" 2>>
+    <<babyhawk_hunt_return>>
+  <<case 2>>
+    <<language>>
+      <<option 'EN'>>
+        You gather a few pieces of fabric at random, hoping they will come in handy later.
+      <<option 'CN'>>
+        你随便收集了几块布料，希望之后能派上用场。
+    <</language>>
+    <br><br>
+    <<if maplebirch.get('BirdTower').selectTrait("clumsy")>>
+      <<set _ID to _tempIDs[0]>>
+      <<language>>
+        <<option 'EN'>>
+          You turn to look for your child, only to find that <<childname _ID>> has crawled under a large sheet of fabric at some point and is trapped beneath it, crying out in alarm.
+          <br><br>
+          You free <<childhim _ID>>.
+        <<option 'CN'>>
+          你转过身寻找你的孩子，却发现不知何时<<childname _ID>>钻到了一大片布料底下，正被困在下面慌张地大声鸣叫着。
+          <br><br>
+          你把<<childhim _ID>>解救了出来。
+      <</language>>
+      <br><br>
+    <</if>>
+    <<flight_hunt_get "fabric" random(1, 2)>>
+    <<babyhawk_hunt_return>>
+  <<case 3>>
+    <<if $housekeepingSuccess>>
+      <<language>>
+        <<option 'EN'>>
+          You manage to find more useful fabric, and a few sturdier pieces catch your eye. <<childname $BirdTower.hunt.leader>> tries to pick up the pile, but accidentally tears a hole in it with their talons.
+          <br>
+          You take the rest of the fabric.
+        <<option 'CN'>>
+          你成功找到了更多有用的布料，有几块更结实的部分吸引了你。<<childname $BirdTower.hunt.leader>>试图拿起这堆布料，却一不小心用爪子划出了一个破洞。
+          <br>
+          你拿上了剩下的布料。
+      <</language>>
+      <<flight_hunt_get "fabric" 2>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          Try as you might, you cannot find any intact fabric. You take the little bit of fabric you were able to find.
+        <<option 'CN'>>
+          虽然你尽力了，但还是没能发现完整的布料。你拿上了你唯一能找到的一点点布料。
+      <</language>>
+      <<flight_hunt_get "fabric" 1>>
+    <</if>>
+    <<housekeeping 1 300>><<ghousekeeping 300>>
+    <br><br>
+    <<babyhawk_hunt_return>>
+<</switch>>
+
+:: Deadwood BirdTower Hunt Dead Tree []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You and your <<babyhawks>> land on a nearby tree. You notice that one of the thickest branches seems about to break. It is wrapped in the thorny branches covering the top of the tree, which means it is impossible for you to fly up and take that branch.
+  <<option 'CN'>>
+    你和你的<<babyhawks>>降落到附近的树上。你注意到其中一根最粗的树枝似乎快要断裂了。它被覆盖树顶部的荆棘枝条包裹，这意味着你不可能飞上去拿那根树枝。
+<</language>>
+<br>
+<<if maplebirch.get('BirdTower').leaderTrait is "clever">>
+  <<language>>
+    <<option 'EN'>>
+      <<childname $BirdTower.hunt.leader>> notices you looking at the branch and chatters.
+    <<option 'CN'>>
+      <<childname $BirdTower.hunt.leader>>发现你正看着树枝，喳喳叫起来。
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<babyhawks>> tilt their heads and study the tree.
+    <<option 'CN'>>
+      <<babyhawks>>歪着脑袋观察着这棵树。
+  <</language>>
+<</if>>
+<br><br>
+<<language>>
+  <<option 'EN'>>
+    You could try climbing up to knock it loose. Or you could shake the tree long enough for the branch to fall on its own.
+  <<option 'CN'>>
+    你可以尝试爬上去把它弄掉。或者，你可以通过摇晃树木足够长的时间，来让那根树枝自己掉下来。
+<</language>>
+<br>
+<<lanLink ["Climb the tree", "爬树"] "Deadwood BirdTower Hunt Dead Tree 2">>
+  <<set $phase to 1>>
+<</lanLink>>
+<<if maplebirch.get('BirdTower').leaderTrait is "clever">><<athleticsdifficulty 400 700>><<else>><<athleticsdifficulty 500 850>><</if>>
+<br>
+<<lanLink ["Shake the tree", "摇树"] "Deadwood BirdTower Hunt Dead Tree 2">>
+  <<set $phase to 2>>
+<</lanLink>>
+<br>
+:: Deadwood BirdTower Hunt Dead Tree 2 []
+<<effects>><<childSelect $BirdTower.hunt.leader>>
+<<if $phase is 1>>
+  <<language>>
+    <<option 'EN'>>
+      You tell <<babyhawks>> that you can climb up and knock the branch down.
+    <<option 'CN'>>
+      你告诉<<babyhawks>>，你可以爬上去把树枝弄下来。
+  <</language>>
+  <<if maplebirch.get('BirdTower').leaderTrait is "clever">>
+    <<language>>
+      <<option 'EN'>>
+        <<childname>> chirps and begins circling the tree.
+      <<option 'CN'>>
+        <<childname>>啾鸣一声，开始在树周围绕圈飞行。
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawks>> do not seem to understand what you are doing, and simply fly over to watch.
+      <<option 'CN'>>
+        <<babyhawks>>看起来并不是很明白你要做什么，只是飞到你身边观察着。
+    <</language>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      You start climbing slowly, making sure not to press too hard on the small branches.
+    <<option 'CN'>>
+      你缓慢地开始往上爬，确保自己踩在那些小树枝上的时候不会太用力。
+  <</language>>
+  <br><br>
+  <<set _tree_success to (maplebirch.get('BirdTower').leaderTrait is "clever" and maplebirch.get('BirdTower').party.length gte 4) or $athleticsSuccess>>
+  <<if maplebirch.get('BirdTower').leaderTrait is "clever" and maplebirch.get('BirdTower').party.length gte 4>>
+    <<language>>
+      <<option 'EN'>>
+        Thanks to the chicks' small size, <<childname>> slips between the canopy and lands at the base of the branch, chattering to call <<childhis>> <<childsiblings $BirdTower.hunt.ids>>. Led by <<childname>>, they squeeze between the thorny branches and land on the large bough.
+        <br>
+        <span class="green">Their weight makes the branch creak sharply.</span> You quickly have all the chicks back off, and as they fly off together, the bough gives way under the strain and crashes to the ground.
+      <<option 'CN'>>
+        得益于孩子们的小体型，<<childname>>钻进树冠之间，落在了那根树枝的根部，叽喳叫着呼唤<<childhis>>的<<childsiblings $BirdTower.hunt.ids>>。他们在<<childname>>的引导下钻进荆棘枝条之间，落到大树枝上。
+        <br>
+        <span class="green">他们的重量让树枝发出嘎吱的脆响。</span>你连忙让所有孩子退开，他们一起飞，这根大树枝就不堪重负地断裂，掉在了地上。
+    <</language>>
+  <<elseif $athleticsSuccess>>
+    <<language>>
+      <<option 'EN'>>
+        You climb up carefully, and <span class="green">finally reach the branch that is about to fall</span>. You brace yourself and kick it.
+      <<option 'CN'>>
+        你小心地往上爬，<span class="green">最终够到了那根快掉下去的树枝</span>。你摆好姿势，踢向它。
+    <</language>>
+    <<if maplebirch.get('BirdTower').leaderTrait is "clever">>
+      <<language>>
+        <<option 'EN'>>
+          <<childname>> jumps over as well, landing on the branch and adding <<childhis>> weight to help you.
+        <<option 'CN'>>
+          <<childname>>也跟着跳了过来，落在树枝上，用<<childhis>>的重量帮助你。
+      <</language>>
+      <<if maplebirch.get('BirdTower').party.length gt 1>>
+        <<language>>
+          <<option 'EN'>>
+            <<childHe>> calls the other chicks to join in.
+          <<option 'CN'>>
+            <<childHe>>呼唤其他孩子一起帮忙。
+        <</language>>
+      <</if>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        A few kicks are all it takes to break the branch off the tree. With a satisfying crack, it falls to the ground.
+      <<option 'CN'>>
+        你只用了几脚就把树枝从树上踢断了。伴随着一声令人满意的裂响，树枝掉到了地上。
+    <</language>>
+  <</if>>
+  <<if _tree_success>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        You climb down carefully and check your work. <<childrenNames $BirdTower.hunt.ids>> are hopping around the intact bough. The bough itself will certainly be useful, and some of the smaller branches on it can be put to use too.
+      <<option 'CN'>>
+        你小心地爬下树，查看你的成果。<<childrenNames $BirdTower.hunt.ids>>正围着这根完整的大树枝跳来跳去。这根大树枝本身肯定能派上用场，而它上面的一些小树枝也能有些用处。
+    <</language>>
+    <<if maplebirch.get('BirdTower').leaderTrait is "clever" and maplebirch.get('BirdTower').party.length gte 4>>
+      <br>
+      <<language>>
+        <<option 'EN'>>
+          You stroke <<childname>>'s head, and <<childhe>> nuzzles your palm, chirping happily.
+        <<option 'CN'>>
+          你抚摸<<childname>>的头顶，<<childhe>>蹭蹭你的手心，发出开心的唧唧声。
+      <</language>>
+    <</if>>
+    <<flight_hunt_get "wood" 1>><<flight_hunt_get "sticks" 2>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        You try to climb carefully, but <span class="red">accidentally put too much weight on a small branch</span>. It snaps beneath your foot, you lose your balance, and you fall. You try to grab anything you can to stop your fall, breaking several other branches on the way down.
+      <<option 'CN'>>
+        你试图小心地爬树，但还是<span class="red">不小心太用力踩了一根小树枝</span>。它在你的脚下咔嚓断开，你失去了平衡，掉了下去。你试图抓住任何能抓住的东西，来阻止自己掉落，你在下坠过程中弄断了好几根其它树枝。
+    <</language>>
+    <<pain 10>><<ggpain>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        You hit the ground and are instantly dizzy. It takes you a while to catch your breath again.
+      <<option 'CN'>>
+        你摔在了地上，瞬间感到头晕目眩。你花了好一会儿才重新调整好呼吸。
+    <</language>>
+    <<pain 5>><<gpain>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        When your vision returns, <<babyhawks>> are standing at your side, chirping worriedly at you.
+        <br><br>
+        The tree you just climbed no longer has anything left for you to climb, and you no longer have the strength to try again. At least one of the branches you broke might be of use.
+      <<option 'CN'>>
+        你重新恢复视野时，<<babyhawks>>正站在你的身边，冲你发出担忧的唧唧叫。
+        <br><br>
+        你刚才攀爬的树现在已经没有任何可供你再次攀爬的东西了，再说你也没有力气再爬一次。至少你折断的其中一根树枝可能能派上用场。
+    <</language>>
+    <<flight_hunt_get "sticks" 1>>
+  <</if>>
+  <br><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      You have <<babyhawks>> help you shake the tree.
+      <<babyhawksthem>> do not seem to understand what you are doing, but they imitate you and grab hold of the branches.
+      You stand under the tree, while
+    <<option 'CN'>>
+      你让<<babyhawks>>协助你摇树。
+      <<babyhawksthem>>看起来并不是很明白你要做什么，但还是模仿着你的动作抓住树枝。
+      你站在树底下，而
+  <</language>>
+  <<if maplebirch.get('BirdTower').party.length gt 1>>
+    <<language>>
+      <<option 'EN'>>
+        they spread out and stand on the forks,
+      <<option 'CN'>>
+        他们分散着站在树杈上，
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawksthem>> stay up high,
+      <<option 'CN'>>
+        <<babyhawksthem>>在高处，
+    <</language>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      and together you begin to shake the tree.
+    <<option 'CN'>>
+      你们一起开始摇树。
+  <</language>>
+  <<if $rng gte (70-maplebirch.get('BirdTower').party.length*10)>>
+    <<language>>
+      <<option 'EN'>>
+        You try for several minutes, but at last the branch breaks with a huge crack. <<babyhawks>> fly down after the falling branch, and you check your work. The bough itself will certainly be useful, and some of the smaller branches on it can be put to use too.
+      <<option 'CN'>>
+        你尝试了好几分钟，但最终树枝发出巨大的咔嚓声折断了。<<babyhawks>>跟着落下的树枝飞了下来，你查看成果。这根大树枝本身肯定能派上用场，而它上面的一些小树枝也能有些用处。
+    <</language>>
+    <<flight_hunt_get "wood" 1>> <<flight_hunt_get "sticks" 2>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawks>> seem to have had a lot of fun with it.
+      <<option 'CN'>>
+        <<babyhawks>>似乎从中获得了不少乐趣。
+    <</language>>
+    <br><br>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        You shake and shake, but minutes pass and the branch shows no sign of falling on its own. <<babyhawks>> seem to have had a lot of fun with it.
+        <br><br>
+        You have already spent a lot of effort shaking the tree, and you no longer have the strength to climb it now. You think it is best to leave.
+      <<option 'CN'>>
+        你摇啊摇，但几分钟过去了，树枝并没有自己要掉下来的样子。<<babyhawks>>似乎从中获得了不少乐趣。
+        <br><br>
+        你刚刚已经花了不少精力去摇树，现在要爬树已经没力气了。你觉得现在还是离开比较好。
+    <</language>>
+    <br><br>
+  <</if>>
+<</if>>
+<<endevent>>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Sticks []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You and your <<babyhawks>> land near the branches. Only two of them look useful. Together, you should be able to carry them without much effort.
+  <<option 'CN'>>
+    你和你的<<babyhawks>>降落在树枝附近。只有两根树枝看上去能派上用场。你们一起，应该可以不费力地将它们拿上。
+<</language>>
+<br>
+<<lanLink ["Take them", "拿上它们"] "Deadwood BirdTower Hunt Sticks 2">><</lanLink>>
+<br>
+:: Deadwood BirdTower Hunt Sticks 2 []
+<<language>>
+  <<option 'EN'>>
+    You pick up one of the branches, then signal for your child to take the other.
+  <<option 'CN'>>
+    你拿上其中一根树枝，然后示意你的孩子拿上另一根。
+<</language>>
+<<set _rng to random(0, maplebirch.get('BirdTower').party.length-1)>>
+<<childSelect $BirdTower.hunt.ids[_rng]>>
+<<if $cmonster is 1>>
+  <<language>>
+    <<option 'EN'>>
+      <<childname>> grips the branch in their talons.
+    <<option 'CN'>>
+      <<childname>>把那根树枝抓在爪子里。
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      <<childname>> lowers their head and picks up the branch in their beak.
+    <<option 'CN'>>
+      <<childname>>低头衔起树枝。
+  <</language>>
+<</if>>
+<br><br>
+<<flight_hunt_get "sticks" 2>>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Leaves []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You land near the leaves.
+  <<option 'CN'>>
+    你降落在叶子附近。
+<</language>>
+<<if $rng gte 90>>
+  <<if $quicksand gte 5>>
+    <<language>>
+      <<option 'EN'>>
+        You notice a pattern. They are not simply scattered here; someone placed them deliberately. Looking closer, you see that the ground does not look stable. It is quicksand.
+        <br><br>
+        You spread your wings to block the hawk chick
+      <<option 'CN'>>
+        你注意到一个规律。它们并不是简单散落在这里，而是有人特意摆放的。仔细观察，你发现地面看起来并不稳定。是流沙。
+        <br><br>
+        你张开翅膀挡住小鹰
+    <</language>>
+    <<if maplebirch.get('BirdTower').party.length gt 1>>
+      <<language>>
+        <<option 'EN'>>
+          s
+        <<option 'CN'>>
+          们
+      <</language>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        and keep <<babyhawksthem>> from coming closer. <<babyhawksthem>> chirp in reply and stop behind you.
+        <br><br>
+        You move carefully around the pit and pick up some of the better leaves from the surface. Most of them are in decent condition.
+      <<option 'CN'>>
+        ，让<<babyhawksthem>>不要靠近。<<babyhawksthem>>唧唧叫着回应，停在你身后。
+        <br><br>
+        你小心地在坑周围走动，从表面捡起一些更好一些的叶子。大部分状态还不错。
+    <</language>>
+    <br><br>
+    <<flight_hunt_get "leaves" 2>>
+    <<babyhawk_hunt_return>>
+  <<else>>
+    <<childSelect $BirdTower.hunt.leader>>
+    <<if maplebirch.get('BirdTower').leaderTrait is "clever">>
+      <<language>>
+        <<option 'EN'>>
+          <<childname>> suddenly stops and tilts their head to look at their own talons. <<childHe>> scratches at the ground and squawks. The ground shows signs of instability beneath <<childhis>> talons. It is quicksand.
+        <<option 'CN'>>
+          <<childname>>突然停下，歪着脑袋看着自己的爪下。<<childHe>>用爪子刨动地面，嘎嘎叫起来。地面在<<childhis>>的爪下显示出了不稳定的迹象。是流沙。
+      <</language>>
+      <br><br>
+      <<if maplebirch.get('BirdTower').party.length gt 1>>
+        <<language>>
+          <<option 'EN'>>
+            The other chicks come closer out of curiosity and watch the slowly shifting ground. You keep the chicks at a distance.
+          <<option 'CN'>>
+            其他的孩子好奇地凑近，观察着缓慢移动的地面。你让孩子们保持距离。
+        <</language>>
+        <br><br>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          You carefully walk across the pit and pick up some of the better leaves from the surface. Most of them are in decent condition.
+        <<option 'CN'>>
+          你小心地走过坑，从表面捡起一些更好一些的叶子。大部分状态还不错。
+      <</language>>
+      <br><br>
+      <<flight_hunt_get "leaves" 2>>
+      <<babyhawk_hunt_return>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<childname>> walks over and picks up a leaf in their beak, then <<childhe>> begins to sink. <span class="red">Quicksand!</span> These leaves might have been used to mark the quicksand, or to hide it.
+          <br><br>
+          <<childHe>> cries out in panic and beats their wings to break free, but only sinks <<childhimself>> deeper.
+        <<option 'CN'>>
+          <<childname>>走过去叼起一片叶子，随后<<childhe>>开始下陷。<span class="red">是流沙！</span>这些叶子可能是用来标记流沙的，或者是用来掩藏它的。
+          <br><br>
+          <<childHe>>惊慌地大叫，拍打翅膀试图挣脱，但只是让<<childhimself>>陷得更深了。
+      <</language>>
+      <<if maplebirch.get('BirdTower').party.length gt 1>>
+        <<language>>
+          <<option 'EN'>>
+            The other chicks gather around <<childhim>>, squawking helplessly.
+          <<option 'CN'>>
+            其他的孩子围着<<childhim>>嘎嘎叫着，束手无策。
+        <</language>>
+      <</if>>
+      <br><br>
+      <<language>>
+        <<option 'EN'>>
+          You quickly grab <<childname>>
+        <<option 'CN'>>
+          你连忙抓住<<childname>>
+      <</language>>
+      <<if $cmonster>>
+        <<language>>
+          <<option 'EN'>>
+            's arm
+          <<option 'CN'>>
+            的胳膊
+        <</language>>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          and pull <<childhim>> out. <<childHe>> is covered in ruffled feathers and badly startled. You soothe <<childhim>> for a while before setting off again.
+        <<option 'CN'>>
+          把<<childhim>>拉了出来。<<childHe>>浑身羽毛炸起，受了不少惊吓。你安抚了<<childhim>>好一会儿才重新上路。
+      <</language>>
+      <br><br>
+      <<set _huntFail to 1>>
+      <<babyhawk_hunt_return>>
+    <</if>>
+  <</if>>
+<<elseif $rng gte 20>>
+  <<language>>
+    <<option 'EN'>>
+      Once you get close, you see that many of them are damaged or gnawed on. Still, there are some leaves in good condition.
+      <br><br>
+      You take as many suitable leaves as you can, then leave.
+    <<option 'CN'>>
+      接近之后，你看出它们中的许多已经破损或被啃坏。不过还是有些状态不错的叶子。
+      <br><br>
+      你尽可能地拿走了合适的叶子，然后离开了。
+  <</language>>
+  <br><br>
+  <<flight_hunt_get "leaves" 1>>
+  <<babyhawk_hunt_return>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      Once you get close, you see that many of the leaves are in good condition. You take them.
+    <<option 'CN'>>
+      接近之后，你看出许多叶子状态都还不错。你把它们拿走了。
+  <</language>>
+  <br><br>
+  <<flight_hunt_get "leaves" 2>>
+  <<babyhawk_hunt_return>>
+<</if>>
+
+:: Deadwood BirdTower Hunt Underbrush []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You land beside the dying plants. They look so fragile. You will have to choose the most important parts to take with you.
+  <<option 'CN'>>
+    你在濒死的植物边降落。它们看起来是如此脆弱。你得选择最重要的部分带走。
+<</language>>
+<br>
+<<lanLink ["Take the wood", "拿走木材"] "Deadwood BirdTower Hunt Underbrush 2">>
+  <<set $phase to 0>>
+<</lanLink>>
+<br>
+<<lanLink ["Take the branches", "拿走树枝"] "Deadwood BirdTower Hunt Underbrush 2">>
+  <<set $phase to 1>>
+<</lanLink>>
+<br>
+<<lanLink ["Take the leaves", "拿走树叶"] "Deadwood BirdTower Hunt Underbrush 2">>
+  <<set $phase to 2>>
+<</lanLink>>
+<br>
+:: Deadwood BirdTower Hunt Underbrush 2 []
+<<effects>>
+<<switch $phase>>
+  <<case 0>>
+    <<language>>
+      <<option 'EN'>>
+        You focus on gathering the larger pieces of wood from the dead saplings.
+      <<option 'CN'>>
+        你集中于收集小枯树上较大的木块。
+    <</language>>
+    <<flight_hunt_get "wood" 1>>
+  <<case 1>>
+    <<language>>
+      <<option 'EN'>>
+        You break branches off the dead bushes and saplings.
+      <<option 'CN'>>
+        你从枯死的灌木和小树上折下枝条。
+    <</language>>
+    <<flight_hunt_get "sticks" 2>>
+  <<case 2>>
+    <<language>>
+      <<option 'EN'>>
+        You pick the few living leaves.
+      <<option 'CN'>>
+        你摘走了仅有的几片活叶。
+    <</language>>
+    <<flight_hunt_get "leaves" 2>>
+<</switch>>
+<<language>>
+  <<option 'EN'>>
+    <<babyhawks>> try to imitate you and gather materials, but the rest of the plants crumble at the lightest touch of <<babyhawksthem>>.
+  <<option 'CN'>>
+    <<babyhawks>>试图模仿你收集材料，但这些植物剩下的部分被<<babyhawksthem>>轻轻一碰就碎裂了。
+<</language>>
+<br><br>
+<<set $danger to random(1, 10000)>>
+<<if $danger gte (9000 - $allure)>>
+  <<if $rng gte 50>><<beastNEWinit 1 fox>><<else>><<beastNEWinit 1 cat>><</if>>
+  <<language>>
+    <<option 'EN'>>
+      You hear a low growl from the tangled branches. Two glowing eyes stare at you.
+    <<option 'CN'>>
+      你听到乱枝中传来低沉的咆哮声。两只发光的眼睛盯着你。
+  <</language>>
+  <<if maplebirch.get('BirdTower').selectTrait("sympathy")>>
+    <<set _ID to _tempIDs[0]>>
+    <<language>>
+      <<option 'EN'>>
+        <<childname _ID>> stares curiously at the <<beasttype>>, seemingly unafraid of <<bhim>>.
+        <br>
+        <<childhe _ID>> ruffles their down and makes cooing, chirping sounds in their throat, until they manage to produce a call like
+      <<option 'CN'>>
+        <<childname _ID>>好奇地盯着<<beasttype>>，似乎并没有被<<bhim>>吓到。
+        <br>
+        <<childhe _ID>>抖动绒毛，喉咙里发出一些咕咕唧唧的声音，直到成功发出一声类似
+    <</language>>
+    <<if $NPCList[0].type.includes("fox")>>
+      <<language>>
+        <<option 'EN'>>
+          a yip
+        <<option 'CN'>>
+          嗷嗷
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          a meow
+        <<option 'CN'>>
+          喵喵
+      <</language>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        .
+        <br><br>
+        Both you and the <<beasttype>> stare at <<childname _ID>> in shock,
+      <<option 'CN'>>
+        的叫声。
+        <br><br>
+        你和<<beasttype>>都震惊地盯着<<childname _ID>>，
+    <</language>>
+    <<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
+      <<language>>
+        <<option 'EN'>>
+          and just then <<childname $BirdTower.hunt.leader>> approaches from behind the <<beasttype>> and slams their talons down on the <<beasttype>>'s tail.
+          <br>
+          The <<beasttype>> shrieks in pain and thrashes around, trying to break free of <<childname $BirdTower.hunt.leader>>'s talons. <span class="green"><<bHe>> leaves a trail of drifting fur before finally slipping away.</span>
+        <<option 'CN'>>
+          而此时<<childname $BirdTower.hunt.leader>>从<<beasttype>>身后靠近，猛地用爪子踩住了<<beasttype>>的尾巴。
+          <br>
+          <<beasttype>>因疼痛而尖叫，四处乱窜试图挣开<<childname $BirdTower.hunt.leader>>的爪子。<span class="green"><<bHe>>在最终溜走前留下了一地飘散的毛发。</span>
+      <</language>>
+    <<elseif maplebirch.get('BirdTower').leaderTrait is "clever">>
+      <<language>>
+        <<option 'EN'>>
+          and just then <<childname $BirdTower.hunt.leader>> approaches from behind the <<beasttype>> and lets out a sudden, piercing screech.
+          <br>
+          The <<beasttype>> puffs up in fright. <<bHe>> looks around and realizes you have surrounded it without it noticing. <span class="green"><<bHe>> immediately gives up on attacking and flees.</span>
+        <<option 'CN'>>
+          而此时<<childname $BirdTower.hunt.leader>>从<<beasttype>>身后靠近，猛地发出一声尖啸。
+          <br>
+          <<beasttype>>被吓得炸毛，<<bHe>>环顾四周，发现自己不知不觉间已经被你们包围了。<span class="green"><<bHe>>立刻放弃袭击的念头逃走了。</span>
+      <</language>>
+    <<else>>
+      <<if maplebirch.get('BirdTower').party.length gt 1>>
+        <<language>>
+          <<option 'EN'>>
+            The other chicks come over too, learning from <<childname _ID>> to imitate the <<beasttype>>'s call. The chicks seem to treat it as a special singing practice and enjoy it immensely.
+          <<option 'CN'>>
+            其他孩子也凑过来，学着<<childname _ID>>模仿<<beasttype>>的叫声。孩子们似乎把这当做了一种特别的歌唱练习，玩得不亦乐乎。
+        <</language>>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          The <<beasttype>> freezes in place, confused.
+        <<option 'CN'>>
+          <<beasttype>>因困惑而僵在原地。
+      <</language>>
+      <br><br>
+      <<if $rng gte 50>>
+        <<if $monster is 1>>
+          "
+          <<if maplebirch.get('BirdTower').party.length gt 1>>
+            <<language>>
+              <<option 'EN'>>
+                A flock of
+              <<option 'CN'>>
+                一群
+            <</language>>
+          <</if>>
+          <<language>>
+            <<option 'EN'>>
+              freaks!" <<bHe>>
+            <<option 'CN'>>
+              怪胎！"<<bHe>>
+          <</language>>
+          <<if $NPCList[0].type.includes("fox")>>
+            <<language>>
+              <<option 'EN'>>
+                bares its teeth
+              <<option 'CN'>>
+                呲起牙
+            <</language>>
+          <<else>>
+            <<language>>
+              <<option 'EN'>>
+                hisses
+              <<option 'CN'>>
+                嘶嘶叫着
+            <</language>>
+          <</if>>
+          <<language>>
+            <<option 'EN'>>
+              , <span class="green">gives up on attacking, and flees.</span>
+            <<option 'CN'>>
+              ，<span class="green">放弃了袭击的念头，逃走了。</span>
+          <</language>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              In the end, <<bHe>> gives up on attacking amid
+            <<option 'CN'>>
+              <<bHe>>最后在
+          <</language>>
+          <<= maplebirch.get('BirdTower').party.length gt 1 ? lanSwitch("the chicks' bizarre chorus","孩子们的古怪合奏") : lanSwitch("<<childname _ID>>'s odd impression act","<<childname _ID>>的古怪模仿秀")>>
+          <<language>>
+            <<option 'EN'>>
+              and <span class="green">flees.</span>
+            <<option 'CN'>>
+              中放弃了袭击的念头，<span class="green">逃走了。</span>
+          <</language>>
+        <</if>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<bHe>> lets out an irritated growl and <span class="red">suddenly lunges at <<childname _ID>>!</span>
+          <<option 'CN'>>
+            <<bHe>>发出一声恼怒的咆哮，<span class="red">猛地扑向了<<childname _ID>>！</span>
+        <</language>>
+        <<if $bestialitydisable is "f">>
+          <<language>>
+            <<option 'EN'>>
+              You instinctively throw yourself in front of <<childname _ID>> and are knocked to the ground by the <<beasttype>>.
+            <<option 'CN'>>
+              你下意识挡在了<<childname _ID>>的面前，被<<beasttype>>扑倒在地。
+          <</language>>
+          <br><br>
+          <<lanLink ["Continue", "继续"] "Deadwood BirdTower Hunt Underbrush Fight">>
+            <<set $fightstart to 1>>
+          <</lanLink>>
+          <br>
+          <<exitAll>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              You quickly take the chicks into the air to avoid the fight.
+            <<option 'CN'>>
+              你连忙带着孩子们飞向空中逃避战斗。
+          <</language>>
+          <<beastescape>>
+          <br><br>
+          <<babyhawk_hunt_return>>
+          <<exitAll>>
+        <</if>>
+      <</if>>
+    <</if>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        You breathe a sigh of relief and hug your <<childname _ID>>. <<babyhawks>> chirp proudly.
+      <<option 'CN'>>
+        你松了一口气，拥抱了一下你的<<childname _ID>>。<<babyhawks>>自豪地唧唧叫。
+    <</language>>
+    <<stress -3>><<lstress>>
+    <br><br>
+    <<earnFeat "Wild Animals">>
+    <<babyhawk_hunt_return>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        A <<beasttype>> lunges at you!
+      <<option 'CN'>>
+        一只<<beasttype>>扑了过来！
+    <</language>>
+    <<if $bestialitydisable is "f">>
+      <br><br>
+      <<lanLink ["Continue", "继续"] "Deadwood BirdTower Hunt Underbrush Fight">>
+        <<set $fightstart to 1>>
+      <</lanLink>>
+      <br>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          You quickly take the chicks into the air to avoid the fight.
+        <<option 'CN'>>
+          你连忙带着孩子们飞向空中逃避战斗。
+      <</language>>
+      <<beastescape>>
+      <br><br>
+      <<babyhawk_hunt_return>>
+    <</if>>
+  <</if>>
+<<else>>
+  <<babyhawk_hunt_return>>
+<</if>>
+
+:: Deadwood BirdTower Hunt Underbrush Fight []
+<<if $fightstart is 1>>
+  <<set $fightstart to 0>>
+  <<violence 1>>
+  <<neutral 1>>
+  <<beastCombatInit>>
+  <<set $enemytrust to -100>>
+  <<set $enemyanger to 200>>
+  <<set $timer to 1>>
+<</if>>
+<<if $timer is 1>>
+  <<language>>
+    <<option 'EN'>>
+      <span class="blue">You see <<babyhawks>> screech and pounce onto the <<beasttype>>.</span>
+    <<option 'CN'>>
+      <span class="blue">你看到<<babyhawks>>尖啸着扑到<<beasttype>>的身上。</span>
+  <</language>>
+  <br><br>
+  <<set $enemyhealth -= maplebirch.get('BirdTower').party.length*10>>
+<<else>>
+  <<set _rng to random(0, maplebirch.get('BirdTower').party.length-1)>>
+  <<switch random(1,4)>>
+    <<case 1>>
+      <<language>>
+        <<option 'EN'>>
+          <span class="blue"><<childname $BirdTower.hunt.ids[_rng]>>'s talons sink into the <<beasttype>>'s fur. <<bHe>> shrieks and attacks you.</span>
+        <<option 'CN'>>
+          <span class="blue"><<childname $BirdTower.hunt.ids[_rng]>>的爪子没入<<beasttype>>的皮毛。<<bHe>>尖叫着攻击你们。</span>
+      <</language>>
+    <<case 2>>
+      <span class="blue"><<childname $BirdTower.hunt.ids[_rng]>><<= $cmonster ? lanSwitch("rips out","扯下了") : lanSwitch("pecks out","啄下了")>>
+      <<language>>
+        <<option 'EN'>>
+          a big tuft of the <<beasttype>>'s fur. <<bHe>> cries out in pain
+        <<option 'CN'>>
+          <<beasttype>>一大撮毛。<<bHe>>吃痛地
+      <</language>>
+      <<if $NPCList[0].type.includes("fox")>>
+        <<language>>
+          <<option 'EN'>>
+            with a yelp
+          <<option 'CN'>>
+            嗷嗷叫
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            with a meow
+          <<option 'CN'>>
+            喵喵叫
+        <</language>>
+      <</if>>
+      <<language>>
+        <<option 'EN'>>
+          .</span>
+        <<option 'CN'>>
+          。</span>
+      <</language>>
+    <<case 3>>
+      <span class="blue"><<childname $BirdTower.hunt.ids[_rng]>><<= $cmonster ? lanSwitch("grabs","抓住") : lanSwitch("bites","叼住")>>
+      <<language>>
+        <<option 'EN'>>
+          the <<beasttype>>'s ear and tugs at it. The <<beasttype>> whips its head around, trying to shake <<childhim $BirdTower.hunt.ids[_rng]>> off.</span>
+        <<option 'CN'>>
+          <<beasttype>>的耳朵撕扯。<<beasttype>>猛地甩头，试图甩开<<childhim $BirdTower.hunt.ids[_rng]>>。</span>
+      <</language>>
+    <<case 4>>
+      <<language>>
+        <<option 'EN'>>
+          <span class="blue"><<childname $BirdTower.hunt.ids[_rng]>> beats their wings and clings tightly to the <<beasttype>>. Feathers and down scatter through the air.</span>
+        <<option 'CN'>>
+          <span class="blue"><<childname $BirdTower.hunt.ids[_rng]>>拍打着翅膀紧紧抓着<<beasttype>>不放。羽毛和绒毛漫天飞散。</span>
+      <</language>>
+  <</switch>>
+  <br><br>
+  <<set $enemyhealth -= maplebirch.get('BirdTower').party.length*20>>
+  <<set $enemytrust to -100>>
+  <<set $enemyanger to 200>>
+<</if>>
+<<effects>>
+<<effectsman>>
+<<if $NPCList[0].type.includes("fox")>>
+  <<alarmstate lanSwitch("<span class=\"red\"><<bHe>> shrieks directly at you, drowning out your own scream.</span>","<span class=\"red\"><<bHe>>直接冲着你发出尖叫，将你的尖叫声淹没。</span>")>>
+<</if>>
+<<beast $enemyno>>
+<br>
+<<stateman>>
+<br><br>
+<<actionsman>>
+<<if _combatend or ($pain gte 100 and $willpowerpain is 0)>>
+  <span id="next"><<lanLink ["Continue", "继续"] "Deadwood BirdTower Hunt Underbrush Fight Finish">><</lanLink>></span><<nexttext>>
+<<else>>
+  <span id="next"><<lanLink ["Continue", "继续"] "Deadwood BirdTower Hunt Underbrush Fight">><</lanLink>></span><<nexttext>>
+<</if>>
+
+:: Deadwood BirdTower Hunt Underbrush Fight Finish []
+<<effects>>
+<<if $enemyarousal gte $enemyarousalmax>>
+  <<beastejaculation>>
+  <<language>>
+    <<option 'EN'>>
+      <<bHe>> snorts smugly, then slips away into the bushes.
+    <<option 'CN'>>
+      <<bHe>>得意地哼着气，然后溜进了灌木丛里。
+  <</language>>
+  <br><br>
+  <<tearful>>
+  <<language>>
+    <<option 'EN'>>
+      You stand up.
+    <<option 'CN'>>
+      你站了起来。
+  <</language>>
+<<elseif $enemyhealth lte 0>>
+  <<language>>
+    <<option 'EN'>>
+      <<bHe>> rolls away from you and lands in the bushes.
+    <<option 'CN'>>
+      <<bHe>>翻滚离开你身边，落进灌木丛里。
+  <</language>>
+  <<earnFeat "Wild Animals">>
+  <br><br>
+  <<tearful>>
+  <<language>>
+    <<option 'EN'>>
+      You pull yourself together.
+    <<option 'CN'>>
+      你振作了起来。
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      The <<beasttype>> leaves your side and slips away into the moor.
+    <<option 'CN'>>
+      <<beasttype>>从你身边离开，溜进了荒原。
+  <</language>>
+<</if>>
+<<clotheson>>
+<<endcombat>>
+<<language>>
+  <<option 'EN'>>
+    You catch <<babyhawks>> as they rush into your arms; <<babyhawksthem>> nuzzle affectionately against your cheeks, trilling worriedly.
+    <br>
+    You comfort and check each other over, resting for a good while before leaving.
+  <<option 'CN'>>
+    你抱住冲进你怀里的<<babyhawks>>，<<babyhawksthem>>亲昵地蹭着你的脸颊，发出担心的颤鸣。
+    <br>
+    你们互相安慰检查着休息了好一会儿才离开。
+<</language>>
+<<ltiredness>><<tiredness -10>><<lpain>><<pain -10>>
+<<bird_pass 10>>
+<br><br>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Flowers []
+<<effects>><<childSelect $BirdTower.hunt.leader>>
+<<language>>
+  <<option 'EN'>>
+    You land among the flowers. <<babyhawks>> land behind you.
+    <br><br>
+    There is nothing especially useful here, but it is certainly beautiful.
+  <<option 'CN'>>
+    你降落在花丛中。<<babyhawks>>落在你身后。
+    <br><br>
+    这里没有什么特别有用的东西，但确实很漂亮。
+<</language>>
+<br>
+<<lanLink ["Rest among the flowers (0:15)", "在花丛中小憩 (0:15)"] "Deadwood BirdTower Hunt Flowers Relax">>
+  <<set $phase to 1>>
+  <<bird_pass 15>>
+  <<stress -6>><<tiredness -2>>
+<</lanLink>>
+<<lstress>><<ltiredness>>
+<br>
+<<if !$daily.birdFlowerCrown>>
+  <<lanLink ["Make a flower crown for your child (0:25)", "为你的孩子做一顶花环 (0:25)"] "Deadwood BirdTower Hunt Flowers Relax">>
+    <<set $phase to 2>>
+    <<bird_pass 25>>
+  <</lanLink>>
+  <<tendingdifficulty 1 300>>
+  <br>
+<</if>>
+<<if $worn.head.name isnot "flower crown">>
+  <<lanLink ["Make a flower crown for yourself (0:25)", "为你自己做一顶花环 (0:25)"] "Deadwood BirdTower Hunt Flowers Relax">>
+    <<set $phase to 3>>
+    <<bird_pass 25>>
+  <</lanLink>>
+  <<tendingdifficulty 1 200>>
+  <br>
+<</if>>
+<<lanLink ["Leave", "离开"] "Deadwood BirdTower Hunt Flowers Leave">><</lanLink>>
+<br>
+:: Deadwood BirdTower Hunt Flowers Leave []
+<<effects>>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Flowers Relax []
+<<effects>>
+<<switch $phase>>
+  <<case 1>>
+    <<language>>
+      <<option 'EN'>>
+        You lie down among the flowers.
+      <<option 'CN'>>
+        你躺在花丛里。
+    <</language>>
+    <br>
+    <<if maplebirch.get('BirdTower').selectTrait("clumsy")>>
+      <<set _multi to _length-1>>
+      <<language>>
+        <<option 'EN'>>
+          <<childrenNames _tempIDs>> look down at you curiously, then lie down beside you. It is not long before
+        <<option 'CN'>>
+          <<childrenNames _tempIDs>>好奇地低头看着你，然后在你身边躺下。没过多久
+      <</language>>
+      <<= _multi ? lanSwitch("They","他们") : "<<childhim _tempIDs>>" >>
+      <<language>>
+        <<option 'EN'>>
+          they crawl into your arms and snuggle against you, relaxed.
+        <<option 'CN'>>
+          就钻到了你的怀里，放松地依偎着你。
+      <</language>>
+      <<lstress>><<stress -6>>
+      <br>
+    <</if>>
+    <<if maplebirch.get('BirdTower').selectTrait("sympathy")>>
+      <<set _multi to _length-1>>
+      <<language>>
+        <<option 'EN'>>
+          <<childrenNames _tempIDs>> scratch at the ground nearby with their talons. You roll over and look at
+        <<option 'CN'>>
+          <<childrenNames _tempIDs>>在一旁用爪子刨着地面。你翻过身看向
+      <</language>>
+      <<= _multi ? lanSwitch("They","他们") : "<<childhim _tempIDs>>">>
+      <<language>>
+        <<option 'EN'>>
+          , and it looks like
+        <<option 'CN'>>
+          ，看起来
+      <</language>>
+      <<= _multi ? lanSwitch("the chicks","小鹰们") : "<<childhim _tempIDs>>">>
+      <<language>>
+        <<option 'EN'>>
+          have found a small column of ants on the ground and are watching them curiously.
+        <<option 'CN'>>
+          在地上找到了一小队蚂蚁，正好奇地观察着它们。
+      <</language>>
+      <<lstress>><<stress -6>>
+      <br>
+    <</if>>
+    <<if maplebirch.get('BirdTower').selectTrait("clever")>>
+      <<language>>
+        <<option 'EN'>>
+          <<childrenNames _tempIDs>> are chasing butterflies among the flowers nearby.
+        <<option 'CN'>>
+          <<childrenNames _tempIDs>>在不远处追逐着花丛里的蝴蝶。
+      <</language>>
+      <<lstress>><<stress -6>>
+      <br>
+    <</if>>
+    <<if maplebirch.get('BirdTower').selectTrait("dominant")>>
+      <<language>>
+        <<option 'EN'>>
+          <<childrenNames _tempIDs>> sit down too and preen their feathers, ruffled from flying.
+        <<option 'CN'>>
+          <<childrenNames _tempIDs>>也坐下来，梳理自己因飞行而翘起的羽毛。
+      <</language>>
+      <<lstress>><<stress -6>>
+      <br>
+    <</if>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        It feels good to clear your mind for a while.
+        <br><br>
+        You decide not to linger here too long.
+      <<option 'CN'>>
+        放空一段时间感觉不错。
+        <br><br>
+        你决定不在这里停留太久。
+    <</language>>
+    <br><br>
+    <<babyhawk_hunt_return>>
+  <<case 2>>
+    <<language>>
+      <<option 'EN'>>
+        You begin picking the prettiest flowers you can find and weave them into a crown. You hold it up to <<childname>>'s head and try to adjust its size.
+      <<option 'CN'>>
+        你开始挑选你能找到的最漂亮的花，然后把它们缠成一个花冠。你把它举到<<childname>>的头上，试着调整它的大小。
+    <</language>>
+    <<if maplebirch.get('BirdTower').leaderTrait is "clever">>
+      <<language>>
+        <<option 'EN'>>
+          <<childHe>> watches you curiously.
+        <<option 'CN'>>
+          <<childHe>>好奇地看着你。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          As you do, <<childHe>> tries to stuff their head into the wreath. You tap <<childhim>> on the forehead and signal for <<childhim>> to give the crown back.
+        <<option 'CN'>>
+          当你这么做时，<<childHe>>试图把脑袋塞进花环里。你轻拍<<childhim>>的额头，示意<<childhim>>把花冠还回来。
+      <</language>>
+    <</if>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        You finish the crown and signal for <<childhim>> to lower their head.
+      <<option 'CN'>>
+        你做好了花冠，并示意<<childhim>>低下头。
+    <</language>>
+    <<if $tendingSuccess>>
+      <<set $daily.birdFlowerCrown to true>>
+      <<language>>
+        <<option 'EN'>>
+          <span class="green">It fits perfectly on their head.</span>
+        <<option 'CN'>>
+          <span class="green">它戴在头上很合适。</span>
+      <</language>>
+      <<if $cmonster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> raises a talon to touch it, and the soft touch of the petals seems to please <<childhim>>.
+          <<option 'CN'>>
+            <<childname>>抬爪去触摸它，花瓣的柔软触感似乎让<<childhim>>很满意。
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> shakes their head a few times, trying to throw it off, but soon gets used to it. <<childHe>> chirps, seeming to like the scent the crown gives off.
+          <<option 'CN'>>
+            <<childname>>晃了几次头，试图甩掉它，但很快就习惯了。<<childHe>>啾啾叫着，似乎很喜欢花冠散发出的香味。
+        <</language>>
+      <</if>>
+      <<trauma -8>><<lltrauma>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          It fits well, <span class="red">but it quickly falls apart.</span>
+        <<option 'CN'>>
+          很合适，<span class="red">但它很快就散架了。</span>
+      <</language>>
+      <<if $cmonster is 1>>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> picks up the fallen petals, and their soft touch seems to please <<childhim>>.
+          <<option 'CN'>>
+            <<childname>>捡起飘落的花瓣，花瓣的柔软触感似乎让<<childhim>>很满意。
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<childname>> tilts their head at you.
+          <<option 'CN'>>
+            <<childname>>冲你歪着头。
+        <</language>>
+      <</if>>
+    <</if>>
+    <<tending 1>><<gtending>>
+    <br><br>
+    <<if maplebirch.get('BirdTower').party.length gt 1>>
+      <<set _hawksIDcopy to $BirdTower.hunt.ids.filter(id => id !== $BirdTower.hunt.leader)>>
+      <<language>>
+        <<option 'EN'>>
+          <<childrenNames _hawksIDcopy>> come over too, chattering at you, wanting a crown of their own.
+        <<option 'CN'>>
+          <<childrenNames _hawksIDcopy>>也凑过来，冲你叽叽喳喳地叫着，想要一个同样的花冠。
+      <</language>>
+      <br><br>
+      <<bird_pass 5*(maplebirch.get('BirdTower').party.length-1)>>
+      <<language>>
+        <<option 'EN'>>
+          You spend a while longer making a crown for each chick,
+        <<option 'CN'>>
+          你又花了些时间给每个孩子做一顶花冠，
+      <</language>>
+      <<if $tendingSuccess>>
+        <<language>>
+          <<option 'EN'>>
+            and in the end they each wear colorful crowns and go off to play cheerfully.
+          <<option 'CN'>>
+            最终，他们各个都戴着五颜六色的花冠，兴高采烈地到一旁玩耍。
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            but every one of them falls apart. Even so, the chicks still look satisfied, balling up the scattered petals with their talons and enjoying their texture and scent.
+          <<option 'CN'>>
+            但无一例外都散架了。尽管如此，孩子们看起来依然很满意，用爪子把散落的花瓣揉成一团，享受着花瓣的触感和香味。
+        <</language>>
+      <</if>>
+      <<trauma -8>><<lltrauma>>
+      <<tending maplebirch.get('BirdTower').party.length-1>><<gtending>>
+      <br><br>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        You decide not to linger here too long.
+      <<option 'CN'>>
+        你决定不在这里停留太久。
+    <</language>>
+    <br><br>
+    <<babyhawk_hunt_return>>
+  <<case 3>>
+    <<language>>
+      <<option 'EN'>>
+        You begin picking the prettiest flowers you can find and weave them into a wreath. A few minutes later, you finish the crown and put it on.
+      <<option 'CN'>>
+        你开始挑选你能找到的最漂亮的花，然后把它们缠成一个花环。几分钟后，你做好花冠戴上。
+    <</language>>
+    <br><br>
+    <<if $tendingSuccess>>
+      <<if isConnectedToHood("head")>>
+        <<toggleHood>>
+      <</if>>
+      <<headwear 14>>
+      <<set $daily.birdFlowerCrown to true>>
+      <<language>>
+        <<option 'EN'>>
+          <span class="green">It is sturdy.</span>
+          <<babyhawks>> watch curiously as you put on new head plumage.
+        <<option 'CN'>>
+          <span class="green">它很牢固。</span>
+          <<babyhawks>>好奇地看着你换上新的冠羽。
+      <</language>>
+      <<trauma -8>><<lltrauma>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <span class="red">It quickly falls apart.</span>
+          <<babyhawks>> watch the scattered petals curiously.
+        <<option 'CN'>>
+          <span class="red">它很快就散架了。</span>
+          <<babyhawks>>好奇地看着这些飘散的花瓣。
+      <</language>>
+    <</if>>
+    <<tending 1>><<gtending>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        You decide not to linger here too long.
+      <<option 'CN'>>
+        你决定不在这里停留太久。
+    <</language>>
+    <br><br>
+    <<babyhawk_hunt_return>>
+<</switch>>
+<!-- 狩猎回去之后再检查是否每个人都吃饱了，没吃饱就吃掉潜伏者，吃饱了就放入战利品堆 -->
+
+:: Deadwood BirdTower Hunt Shiny []
+<<effects>><<flight_distance_check>>
+<<language>>
+  <<option 'EN'>>
+    You land nearby and begin to search.
+  <<option 'CN'>>
+    你在附近降落并开始搜索。
+<</language>>
+<br><br>
+<<rng 7>>
+<<switch $rng>>
+  <<case 1>>
+    <<language>>
+      <<option 'EN'>>
+        You sift a bullet out of some tall grass. It looks old. The museum curator might be willing to buy this.
+      <<option 'CN'>>
+        你在一些高草中筛出了一颗子弹。它看起来有些年头了。博物馆馆长可能会愿意收购这东西。
+    <</language>>
+    <<flight_hunt_get "valuables" 1 "antique bullet">>
+  <<case 2>>
+    <<set _looted to either("watch", "ring", "necklace", "bracelet")>>
+    <<language>>
+      <<option 'EN'>>
+        You find something in a small puddle. It is a
+      <<option 'CN'>>
+        你在一个小水坑里找到了个东西。是一
+    <</language>>
+    <<print _looted.replace("watch", lanSwitch("watch","块手表")).replace("ring", lanSwitch("ring","个指环")).replace("necklace", lanSwitch("necklace","条项链")).replace("bracelet", lanSwitch("bracelet","条手链"))>>
+    <<language>>
+      <<option 'EN'>>
+        . Someone must have lost it while traveling.
+      <<option 'CN'>>
+        。一定是有人在旅游时弄丢了。
+    <</language>>
+    <<flight_hunt_get "valuables" 1 _looted>>
+  <<case 3>>
+    <<language>>
+      <<option 'EN'>>
+        You spot it sticking out of a small patch of sand. You dig it out and find a drink can. Worthless, but pleasantly shiny.
+      <<option 'CN'>>
+        你发现它从一小块沙地里伸出来。你把它挖出来，发现是一个饮料罐。毫无价值，但闪亮得令人愉悦。
+    <</language>>
+    <<flight_hunt_get "junk" 1>>
+  <<case 4>>
+    <<language>>
+      <<option 'EN'>>
+        You easily spot it in a patch of sunken grass. A tin can. Worthless, but pleasantly shiny.
+      <<option 'CN'>>
+        你很容易就在一片凹陷的草地上发现了它。一个锡罐。一文不值，但闪亮得令人愉悦。
+    <</language>>
+    <<flight_hunt_get "junk" 1>>
+  <<case 5>>
+    <<language>>
+      <<option 'EN'>>
+        After searching for a while, you see it again. It is a small heap of metal scrap worn by the weather. Worthless, but pleasantly shiny.
+      <<option 'CN'>>
+        搜索一会儿后，你再次看到了它。这是一小堆因风雨而磨损的金属废料。毫无价值，但闪亮得令人愉悦。
+    <</language>>
+    <<flight_hunt_get "junk" 3>>
+  <<case 6>>
+    <<select_random_clothes_limited "upper">>
+    <<language>>
+      <<option 'EN'>>
+        You see it hanging among the broken branches. It is
+      <<option 'CN'>>
+        你看到它挂在折断的树枝间。是
+    <</language>>
+    <<if _random_clothes isnot "piece of fabric" and setup.clothes[_random_slot][_random_index].type.includes("formal")>>
+      <<language>>
+        <<option 'EN'>>
+          a tattered _random_clothes, its buttons glinting.
+        <<option 'CN'>>
+          一件破烂的_random_clothes，纽扣闪闪发亮。
+      <</language>>
+    <<else>>
+      <<set _random_clothes to "piece of fabric">>
+      <<language>>
+        <<option 'EN'>>
+          a ruined uniform with some glinting buttons. Good scrap fabric and shiny junk can be salvaged from it.
+        <<option 'CN'>>
+          一件坏掉的制服，上面有些闪闪发亮的纽扣。可以分出上好的废布和闪亮的垃圾。
+      <</language>>
+    <</if>>
+    <<if _random_clothes isnot "piece of fabric">>
+      <<set _cursedPrevent to false>>
+      <<if $worn[_random_slot].cursed is 1>>
+        <<set _cursedPrevent to true>>
+      <</if>>
+      <<set _outfitPrimaryWear to setup.clothes[_random_slot][$worn[_random_slot].index].outfitPrimary>>
+      <<if _outfitPrimaryWear isnot undefined>>
+        <<for _outfitSlot, _value range _outfitPrimaryWear>>
+          <<if $worn[_outfitSlot].cursed is 1>>
+            <<set _cursedPrevent to true>>
+          <</if>>
+        <</for>>
+      <</if>>
+      <<if $bird.upgrades.wardrobe is 1>>
+        <<language>>
+          <<option 'EN'>>
+            You could tear it into scrap fabric and shiny junk, or bring it back to the tower.
+          <<option 'CN'>>
+            你可以把它撕成废布和闪闪发光的垃圾，或者带回塔里。
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            There is no room for these things at the tower. Left out in the open for a few hours, they will turn into scrap fabric and shiny junk.
+          <<option 'CN'>>
+            塔上没地方放这些东西。露天堆放几个小时就会变成废布和闪闪发光的垃圾。
+        <</language>>
+      <</if>>
+      <br><br>
+      <<if !_cursedPrevent>>
+        <<set _replace_worn to $worn[_random_slot].name isnot "naked">>
+        <<set _ruin_worn to _replace_worn and $bird.upgrades.wardrobe isnot 1>>
+        <<lanLink ["Wear", "穿上"] "Deadwood BirdTower Hunt Shiny Clothes">>
+          <<set $phase to 1>>
+          <<if _ruin_worn>><<generalRuined _random_slot>><</if>>
+          <<flight_hunt_get "clothing" 1 _random_slot _random_index "wear" "damaged">>
+          <<if _ruin_worn>><<flight_hunt_get "fabric" 1>><</if>>
+        <</lanLink>>
+        <<if _replace_worn>>
+          <<language>>
+            <<option 'EN'>>
+              <span class="blue">Your $worn[_random_slot].cn_name_cap will be replaced.</span>
+            <<option 'CN'>>
+              <span class="blue">你的$worn[_random_slot].cn_name_cap将被替换。</span>
+          <</language>>
+        <</if>>
+      <</if>>
+      <br>
+      <<lanLink ["Tear up", "撕碎"] "Deadwood BirdTower Hunt Shiny Clothes">>
+        <<set $phase to 2>>
+        <<flight_hunt_get "fabric" 1>><<flight_hunt_get "junk" 1>>
+      <</lanLink>>
+      <br>
+      <<if $bird.upgrades.wardrobe is 1>>
+        <<lanLink ["Accept", "接受"] "Deadwood BirdTower Hunt Shiny Clothes">>
+          <<set $phase to 3>>
+          <<flight_hunt_get "clothing" 1 _random_slot _random_index "take" "damaged">>
+        <</lanLink>>
+        <br>
+      <</if>>
+    <<else>>
+      <br><br>
+      <<lanLink ["Accept", "接受"] "Deadwood BirdTower Hunt Shiny Clothes">>
+        <<set $phase to 2>>
+        <<flight_hunt_get "fabric" 1>><<flight_hunt_get "junk" 1>>
+      <</lanLink>>
+      <br>
+    <</if>>
+  <<default>>
+    <<language>>
+      <<option 'EN'>>
+        You see it buried in the dust. Just some broken glass. You bury it deeper so no one steps on it.
+      <<option 'CN'>>
+        你看见它被埋在尘土里。只是一些碎掉的玻璃而已。你将它们埋得更深，以防有人踩中。
+    <</language>>
+    <<set _huntFail to 1>>
+<</switch>>
+<<if $rng isnot 6>>
+  <<language>>
+    <<option 'EN'>>
+      You take off again and return to your children's side.
+    <<option 'CN'>>
+      你重新起飞，回到了你的孩子身边。
+  <</language>>
+  <<if $rng lte 5>>
+    <<if maplebirch.get('BirdTower').selectTrait("clever")>>
+      <<language>>
+        <<option 'EN'>>
+          <<childname _tempIDs[0]>> looks happy about the new shiny.
+        <<option 'CN'>>
+          <<childname _tempIDs[0]>>看起来为新的亮闪闪而感到开心。
+      <</language>>
+    <</if>>
+  <</if>>
+  <br><br>
+  <<babyhawk_hunt_return>>
+<</if>>
+
+:: Deadwood BirdTower Hunt Shiny Clothes []
+<<effects>>
+<<switch $phase>>
+  <<case 1>>
+    <<language>>
+      <<option 'EN'>>
+        You put it on, ignoring how tattered it is.
+      <<option 'CN'>>
+        你穿上了它，无视了它破破烂烂的状态。
+    <</language>>
+  <<case 2>>
+    <<language>>
+      <<option 'EN'>>
+        You quickly tear it up so you can carry it.
+      <<option 'CN'>>
+        你快速将它撕碎，以便携带。
+    <</language>>
+  <<case 3>>
+    <<language>>
+      <<option 'EN'>>
+        You tuck it under your arm.
+      <<option 'CN'>>
+        你将它夹在胳膊底下。
+    <</language>>
+<</switch>>
+<<language>>
+  <<option 'EN'>>
+    You take off again and return to your children's side. <<childname $BirdTower.hunt.leader>> looks happy about your find.
+  <<option 'CN'>>
+    你重新起飞，回到了你的孩子身边。<<childname $BirdTower.hunt.leader>>看起来为你的发现而感到开心。
+<</language>>
+<br><br>
+<<babyhawk_hunt_return>>
+
+:: Deadwood BirdTower Hunt Pond Dive []
+<<effects>>
+<<language>>
+  <<option 'EN'>>
+    You and <<babyhawks>> land at the pond.
+    You can now see that glimmer more clearly. There seems to be more than one thing there. Thanks to your extraordinary eyesight, you can make out a small, faint shiny object next to a larger glimmer. They are both almost entirely buried.
+  <<option 'CN'>>
+    你和<<babyhawks>>降落在池塘前。
+    你现在更清楚地看见了那个闪光。那里似乎有不止一样东西。多亏了你超凡的视力，你看出了那里有一个小小的、微弱的闪光物件，旁边是一个更大的闪光。它们几乎都被埋住了。
+<</language>>
+<br><br>
+<<set _rng to random(0, maplebirch.get('BirdTower').party.length-1)>>
+<<language>>
+  <<option 'EN'>>
+    <<childname $BirdTower.hunt.ids[_rng]>> taps the water's surface with a talon and shivers. <<babyhawksthem>> circle the pond, seeming reluctant to get their feathers wet.
+    <br><br>
+    Getting both things might be a challenge, but it is not impossible.
+  <<option 'CN'>>
+    <<childname $BirdTower.hunt.ids[_rng]>>用爪子点了点水面，颤抖了一下。<<babyhawksthem>>围着池塘转圈，看起来不是很想打湿自己的羽毛。
+    <br><br>
+    要把两个东西都弄到手也许会是个挑战，但并不是不可能的。
+<</language>>
+<br>
+<<lanLink ["Take the large shiny object", "拿那个大的闪光物体"] "Deadwood BirdTower Hunt Pond Dive 2">>
+  <<set $phase to 1>>
+<</lanLink>>
+<<swimmingdifficulty 400 700>>
+<br>
+<<lanLink ["Try to get both objects", "试着把两个物体都拿到手"] "Deadwood BirdTower Hunt Pond Dive 2">>
+  <<set $phase to 2>>
+<</lanLink>>
+<<swimmingdifficulty 600 900>>
+<br>
+:: Deadwood BirdTower Hunt Pond Dive 2 []
+<<effects>>
+<<unset $swimmingSuccess>>
+<<noClothingCheck>>
+<<strip>>
+<<if _nude is false>>
+  <<language>>
+    <<option 'EN'>>
+      You take off your clothes and hide them in a nearby bush.
+    <<option 'CN'>>
+      你脱掉衣服，将它们藏在附近的一丛灌木里。
+  <</language>>
+<</if>>
+<<if $phase is 1>>
+  <<silently>>
+    <<swimmingdifficulty 400 700>>
+  <</silently>>
+  <<language>>
+    <<option 'EN'>>
+      You slip into the pond and swim to just above the glimmer.
+    <<option 'CN'>>
+      你滑进池塘，游到了闪光的正上方。
+  <</language>>
+  <<water>>
+  <<language>>
+    <<option 'EN'>>
+      You take a deep breath and dive. In the dim water, it is hard to tell which way to go.
+    <<option 'CN'>>
+      你深吸一口气，潜了下去。昏暗的水中，你难以辨别方向。
+  <</language>>
+  <<if $swimmingSuccess>>
+    <<language>>
+      <<option 'EN'>>
+        <span class="green">You stay calm and swim deeper methodically.</span> You reach the source of the light. You see
+      <<option 'CN'>>
+        <span class="green">你保持镇静，有条不紊地游得更深。</span>你到了光芒的源头。你看到
+    <</language>>
+    <<if $rng gte 30>>
+      <<language>>
+        <<option 'EN'>>
+          a pile of metal junk, probably someone littering. You quickly grab your spoils and swim back to the surface.
+        <<option 'CN'>>
+          一堆金属垃圾，大概是有人乱扔垃圾。你迅速攫取你的战利品，游回水面。
+      <</language>>
+      <<flight_hunt_get "junk" 2>>
+    <<else>>
+      <<set _looted1 to either("ring", "necklace", "bracelet")>>
+      <<set _looted2 to either("ring", "necklace", "bracelet")>>
+      <<if _looted1 is _looted2>>
+        <<language>>
+          <<option 'EN'>>
+            Two
+          <<option 'CN'>>
+            两
+        <</language>>
+        <<print _looted1.replace("watch", lanSwitch("watch","块手表")).replace("ring", lanSwitch("ring","个指环")).replace("necklace", lanSwitch("necklace","条项链")).replace("bracelet", lanSwitch("bracelet","条手链"))>>
+        <<language>>
+          <<option 'EN'>>
+            , probably lost by someone. You quickly snatch up your spoils and swim back to the surface.
+          <<option 'CN'>>
+            ，大概是有人弄丢了。你迅速抓起你的战利品，游回水面。
+        <</language>>
+        <<flight_hunt_get "valuables" 2 _looted1>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            A
+          <<option 'CN'>>
+            一
+        <</language>>
+        <<print _looted1.replace("watch", lanSwitch("watch","块手表")).replace("ring", lanSwitch("ring","个指环")).replace("necklace", lanSwitch("necklace","条项链")).replace("bracelet", lanSwitch("bracelet","条手链"))>>
+        <<language>>
+          <<option 'EN'>>
+            and a
+          <<option 'CN'>>
+            和一
+        <</language>>
+        <<print _looted2.replace("watch", lanSwitch("watch","块手表")).replace("ring", lanSwitch("ring","个指环")).replace("necklace", lanSwitch("necklace","条项链")).replace("bracelet", lanSwitch("bracelet","条手链"))>>
+        <<language>>
+          <<option 'EN'>>
+            , probably lost by someone. You quickly snatch up your spoils and swim back to the surface.
+          <<option 'CN'>>
+            ，大概是有人弄丢了。你迅速抓起你的战利品，游回水面。
+        <</language>>
+        <<flight_hunt_get "valuables" 1 _looted1>><<flight_hunt_get "valuables" 1 _looted2>>
+      <</if>>
+    <</if>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        After surfacing, you look down again. The silt on the bottom has been stirred up, and it is hard to make out the other object's position now.
+        <br><br>
+        You swim to the shore and leave the water.
+      <<option 'CN'>>
+        冒出水面后，你重新往下看了看。水底的泥土被搅乱，你很难看清另一个物体的位置了。
+        <br><br>
+        你游到岸边，离开了水面。
+    <</language>>
+    <<clotheson>>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawks>> come over to look at your haul.
+      <<option 'CN'>>
+        <<babyhawks>>凑过来查看你的收获。
+    <</language>>
+    <<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
+      <<language>>
+        <<option 'EN'>>
+          <<childname $BirdTower.hunt.leader>> seems very surprised at your swimming skill. You can tell <<childHe $BirdTower.hunt.leader>> is quite envious of it.
+        <<option 'CN'>>
+          <<childname $BirdTower.hunt.leader>>似乎对你游泳的本领非常惊讶。你能看出<<childHe $BirdTower.hunt.leader>>相当羡慕你的游泳技能。
+      <</language>>
+    <<elseif maplebirch.get('BirdTower').leaderTrait is "clever">>
+      <<language>>
+        <<option 'EN'>>
+          <<childname $BirdTower.hunt.leader>> chirps happily, pleased with your new find.
+        <<option 'CN'>>
+          <<childname $BirdTower.hunt.leader>>高兴地唧唧叫着，对你的新发现很满意。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<childname $BirdTower.hunt.leader>> helps you preen your wet flight feathers, and <<childHe $BirdTower.hunt.leader>> seems quite impressed by your ability to shed most of your feathers at will.
+        <<option 'CN'>>
+          <<childname $BirdTower.hunt.leader>>帮你梳理打湿的翅羽，<<childHe $BirdTower.hunt.leader>>似乎相当佩服你能随时脱下大部分羽毛的本领。
+      <</language>>
+    <</if>>
+    <br><br>
+    <<endevent>>
+    <<babyhawk_hunt_return>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        You decide it would be better to make it quick, so you speed up. <span class="red">Your impatience makes you lose track of your target.</span> It takes you a while to locate it again, and by then your oxygen is running out. You swim over quickly and grab the shiny object, but you are already starting to falter. You manage to swim back to the surface, but lose your spoils in the struggle.
+      <<option 'CN'>>
+        你认为速战速决会比较好，于是加快了速度。<span class="red">你的不耐心导致你丢失了目标。</span>你花了多些时间才再次确认它的位置，而此时你的氧气快耗尽了。你迅速游了过去，抓住那个闪光的物体，但你已经开始有些难以坚持了。你想办法游回了水面上，但却在挣扎中弄丢了战利品。
+    <</language>>
+    <<stress 12>><<ggstress>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        When you surface, you spend a while catching your breath, then look below again. All the glimmers are gone; they seem to have been buried by the sand you kicked up in your panic. You swim to the shore and leave the water.
+      <<option 'CN'>>
+        你从水面冒出来时，花了好些时间平稳呼吸，然后再次看向下方。之前那些闪光全都消失不见了，它们似乎被你在恐慌中踢起的沙子掩埋了。你游到岸边，离开了水面。
+    <</language>>
+    <<if maplebirch.get('BirdTower').selectTrait("sympathy")>>
+      <<language>>
+        <<option 'EN'>>
+          <<childrenNames _tempIDs>> come over, chirping soothingly and helping you preen your wet flight feathers.
+        <<option 'CN'>>
+          <<childrenNames _tempIDs>>凑过来，安抚性地叽喳叫着，帮你梳理打湿的翅羽。
+      <</language>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawks>> bob their heads, looking down into the water, seeming to regret that you missed the shinies.
+      <<option 'CN'>>
+        <<babyhawks>>晃头晃脑地看着水下，似乎很遗憾你错失了亮闪闪。
+    <</language>>
+    <<clotheson>>
+    <<endevent>>
+    <<babyhawk_hunt_return>>
+  <</if>>
+<<else>>
+  <<silently>>
+    <<swimmingdifficulty 600 900>>
+  <</silently>>
+  <<language>>
+    <<option 'EN'>>
+      You slip into the pond and swim to just above the glimmer. You take a deep breath and dive. In the dim water, it is hard to tell which way to go.
+    <<option 'CN'>>
+      你滑进池塘，游到了闪光的正上方。你深吸一口气，潜了下去。昏暗的水中，你难以辨别方向。
+  <</language>>
+  <<if $swimmingSuccess>>
+    <<language>>
+      <<option 'EN'>>
+        <span class="green">You stay calm and dive deeper with practiced ease.</span> You reach the source of the glimmer.
+        You see
+      <<option 'CN'>>
+        <span class="green">你维持着镇定，娴熟地潜入更深处。</span>你来到了闪光点的源头。
+        你看见
+    <</language>>
+    <<if $rng gte 30>>
+      <<language>>
+        <<option 'EN'>>
+          a pile of metal junk, probably someone littering. You quickly grab your spoils and swim back to the surface.
+        <<option 'CN'>>
+          一堆金属垃圾，大概是有人乱扔垃圾。你迅速攫取你的战利品，游回水面。
+      <</language>>
+      <<flight_hunt_get "junk" 2>>
+    <<else>>
+      <<set _looted1 to either("ring", "necklace", "bracelet")>>
+      <<set _looted2 to either("ring", "necklace", "bracelet")>>
+      <<if _looted1 is _looted2>>
+        <<language>>
+          <<option 'EN'>>
+            Two
+          <<option 'CN'>>
+            两
+        <</language>>
+        <<print _looted1.replace("watch", lanSwitch("watch","块手表")).replace("ring", lanSwitch("ring","个指环")).replace("necklace", lanSwitch("necklace","条项链")).replace("bracelet", lanSwitch("bracelet","条手链"))>>
+        <<language>>
+          <<option 'EN'>>
+            , probably lost by someone. You quickly snatch up your spoils and swim back to the surface.
+          <<option 'CN'>>
+            ，大概是有人弄丢了。你迅速抓起你的战利品，游回水面。
+        <</language>>
+        <<flight_hunt_get "valuables" 2 _looted1>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            A
+          <<option 'CN'>>
+            一
+        <</language>>
+        <<print _looted1.replace("watch", lanSwitch("watch","块手表")).replace("ring", lanSwitch("ring","个指环")).replace("necklace", lanSwitch("necklace","条项链")).replace("bracelet", lanSwitch("bracelet","条手链"))>>
+        <<language>>
+          <<option 'EN'>>
+            and a
+          <<option 'CN'>>
+            和一
+        <</language>>
+        <<print _looted2.replace("watch", lanSwitch("watch","块手表")).replace("ring", lanSwitch("ring","个指环")).replace("necklace", lanSwitch("necklace","条项链")).replace("bracelet", lanSwitch("bracelet","条手链"))>>
+        <<language>>
+          <<option 'EN'>>
+            , probably lost by someone. You quickly snatch up your spoils and swim back to the surface.
+          <<option 'CN'>>
+            ，大概是有人弄丢了。你迅速抓起你的战利品，游回水面。
+        <</language>>
+        <<flight_hunt_get "valuables" 1 _looted1>><<flight_hunt_get "valuables" 1 _looted2>>
+      <</if>>
+    <</if>>
+    <br><br>
+    <<set _looted3 to either("ring", "necklace", "bracelet")>>
+    <<language>>
+      <<option 'EN'>>
+        After taking them, you begin digging for what is buried underneath. You brush the sand aside and find
+      <<option 'CN'>>
+        拿走它们之后，你开始挖掘埋在下面的东西。你扒开沙子，发现了
+    <</language>>
+    <<if _looted3 is _looted1>>
+      <<language>>
+        <<option 'EN'>>
+          another
+        <<option 'CN'>>
+          又一
+      <</language>>
+      <<print _looted1.replace("watch", lanSwitch("watch","块手表")).replace("ring", lanSwitch("ring","个指环")).replace("necklace", lanSwitch("necklace","条项链")).replace("bracelet", lanSwitch("bracelet","条手链"))>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          A
+        <<option 'CN'>>
+          一
+      <</language>>
+      <<print _looted3.replace("watch", lanSwitch("watch","块手表")).replace("ring", lanSwitch("ring","个指环")).replace("necklace", lanSwitch("necklace","条项链")).replace("bracelet", lanSwitch("bracelet","条手链"))>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        .
+      <<option 'CN'>>
+        。
+    <</language>>
+    <<flight_hunt_get "valuables" 1 _looted3>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        Swimming with both hands full is no easy task, but your excellent technique lets you move through the water without any trouble. You reach the surface and swim back to shore, satisfied with your discovery.
+      <<option 'CN'>>
+        在双手都抓着东西的情况下游泳并不是一件容易的事，但你优秀的技巧使得你没有任何困难地在水中移动。你到达了水面，然后游回了岸边，满足于自己的发现。
+    <</language>>
+    <<clotheson>>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawks>> come over to look at your haul.
+      <<option 'CN'>>
+        <<babyhawks>>凑过来查看你的收获。
+    <</language>>
+    <<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
+      <<language>>
+        <<option 'EN'>>
+          <<childname $BirdTower.hunt.leader>> seems very surprised at your swimming skill. You can tell <<childHe $BirdTower.hunt.leader>> is quite envious of it.
+        <<option 'CN'>>
+          <<childname $BirdTower.hunt.leader>>似乎对你游泳的本领非常惊讶。你能看出<<childHe $BirdTower.hunt.leader>>相当羡慕你的游泳技能。
+      <</language>>
+    <<elseif maplebirch.get('BirdTower').leaderTrait is "clever">>
+      <<language>>
+        <<option 'EN'>>
+          <<childname $BirdTower.hunt.leader>> chirps happily, pleased with your new find.
+        <<option 'CN'>>
+          <<childname $BirdTower.hunt.leader>>高兴地唧唧叫着，对你的新发现很满意。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          <<childname $BirdTower.hunt.leader>> helps you preen your wet flight feathers, and <<childHe $BirdTower.hunt.leader>> seems quite impressed by your ability to shed most of your feathers at will.
+        <<option 'CN'>>
+          <<childname $BirdTower.hunt.leader>>帮你梳理打湿的翅羽，<<childHe $BirdTower.hunt.leader>>似乎相当佩服你能随时脱下大部分羽毛的本领。
+      <</language>>
+    <</if>>
+    <br><br>
+    <<endevent>>
+    <<babyhawk_hunt_return>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        You swim slowly, trying to conserve oxygen. <span class="red">But you are too cautious, and your oxygen gradually runs out.</span> You stick to your plan and start digging at the buried object. As you uncover most of it, you realize you no longer have time to finish the job.
+        <br><br>
+        You try to find the first object you saw, but your hasty searching kicks up sand and clouds your vision, making it hard to see. You have no choice but to surface.
+        <br><br>
+        When you come up out of the water, you take a moment to breathe, then look down again and see no sign of anything you were looking for. You can only swim to the shore and leave the water.
+      <<option 'CN'>>
+        你游得很慢，试图保存氧气。<span class="red">但你太过谨慎，氧气逐渐耗光。</span>你依旧坚持自己的计划，开始挖掘被掩埋的物件。将它的大部分挖掘出来时，你意识到自己已经没有时间完成全部工作了。
+        <br><br>
+        你试图找到你看到的第一个物体，但你的快速搜索激起了沙子扰乱了视线，使它很难看到。你别无选择，只能浮出水面。
+        <br><br>
+        当你从水里出来时，你花了一点时间来呼吸，然后再往下看时，你没有看到任何你要找的东西的迹象。你只得游到岸边离开水面。
+    <</language>>
+    <<if maplebirch.get('BirdTower').selectTrait("sympathy")>>
+      <<language>>
+        <<option 'EN'>>
+          <<childrenNames _tempIDs>> come over, chirping soothingly and helping you preen your wet flight feathers.
+        <<option 'CN'>>
+          <<childrenNames _tempIDs>>凑过来，安抚性地叽喳叫着，帮你梳理打湿的翅羽。
+      <</language>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<babyhawks>> bob their heads, looking down into the water, seeming to regret that you missed the shinies.
+      <<option 'CN'>>
+        <<babyhawks>>晃头晃脑地看着水下，似乎很遗憾你错失了亮闪闪。
+    <</language>>
+    <<clotheson>>
+    <<endevent>>
+    <<babyhawk_hunt_return>>
+  <</if>>
+<</if>>
