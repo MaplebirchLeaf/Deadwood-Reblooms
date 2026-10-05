@@ -3,12 +3,12 @@
 <<set _estate to maplebirch.get("VanillaPlus").realEstate>>
 <<set _property to _estate.current>>
 <<if $sexstart is 1>>
-	<<set _pair to maplebirch.get("LifeSimulation").blackjack.takeIntimacyPair()>>
+	<<set _pair to maplebirch.get("LifeSimulation").casino.blackjack.takeIntimacyPair()>>
 	<<if !_property or !Array.isArray(_pair) or _pair.length isnot 2 or _pair[0] is _pair[1]
 	  or _estate.householdRefusal(_pair)
-	  or !_pair.every(_name => _estate.canIntimate(_name, _property.id))>>
+	  or !_pair.every(name => _estate.canIntimate(name, _property.id))>>
 		<<set $sexstart to 0>>
-		<<run maplebirch.get("LifeSimulation").blackjack.clearIntimacyPair()>>
+		<<run maplebirch.get("LifeSimulation").casino.blackjack.clearIntimacyPair()>>
 		<<run _estate.enter()>><<effects>>
 		<span class='blue'><<lanSwitch 'They have already gone to their own rooms.' '两人已经各自回房了。'>></span><br><br>
 		<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
@@ -17,7 +17,7 @@
 		<<run _estate.enter()>>
 		<<clearnpc>>
 		<<npc _pair[0]>><<npc _pair[1] 2>>
-		<<run _pair.forEach(_name => statusCheck(_name))>>
+		<<run _pair.forEach(name => statusCheck(name))>>
 		<<if _pair.includes('Sydney')>>
 			<<set $corruptionEvent to 1>>
 			<<set $daily.sydney.sex to ($daily.sydney.sex || 0) + 1>>

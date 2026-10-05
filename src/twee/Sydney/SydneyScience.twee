@@ -31,7 +31,6 @@
         <<else>>
           Sydney arranges <<his>> notes into a precise stack, then smiles at you. "I think it will help me focus."
         <</if>>
-        <<endevent>>
       <<option 'CN'>>
         悉尼抱着满怀的书走进教室，在你身边的空位坐下。西里斯从讲台前看过来。“你的换班申请通过了，悉尼。别因为换了教室就分心。”
         <br><br>
@@ -42,8 +41,8 @@
         <<else>>
           悉尼把笔记码成整齐的一摞，然后朝你微笑。“我觉得这样反而更能专心。”
         <</if>>
-        <<endevent>>
     <</language>>
+    <<endevent>>
     <br><br>
   <</if>>
 <</widget>>
@@ -64,6 +63,7 @@
   <<if $sydneyScience is 1 and _sydney_location is 'science'>>
     <<addinlineevent 'scienceSydneyPartner' 2>>
       <<npc Sydney>><<person1>>
+      <<npcincr Sydney love 1>><<scienceskill 1>>
       <<language>>
         <<option 'EN'>>
           Sirris divides the class into pairs for a short experiment. Sydney moves <<his>> equipment beside yours before anyone else can
@@ -79,7 +79,7 @@
           <<else>>
             <<He>> divides the work into a neat list and passes you the more interesting half. Together, you finish before most of the class.
           <</if>>
-          <<npcincr Sydney love 1>><<glove>><<scienceskill 1>><<gscience>>
+          <<glove>><<gscience>>
         <<option 'CN'>>
           西里斯把全班分成两人一组，进行一项简短实验。还没等别人占走座位，悉尼便把实验器材搬到了你旁边。
           <br><br>
@@ -91,7 +91,7 @@
           <<else>>
             <<He>>把工作整理成一张清单，将更有趣的一半分给你。你们比班上大多数人都更早完成。
           <</if>>
-          <<npcincr Sydney love 1>><<glove>><<scienceskill 1>><<gscience>>
+          <<glove>><<gscience>>
       <</language>>
       <br><br>
       <<lanLink '继续' 'Science Lesson'>><<endevent>><</lanLink>>
@@ -121,6 +121,7 @@
 <!-- 课堂保护事件：让 Sydney 按当前状态制止同学骚扰。 -->
 <<widget 'deadwood-reblooms-sydney-science-protect'>>
   <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+  <<stress -6>><<trauma -3>><<npcincr Sydney love 1>>
   <<language>>
     <<option 'EN'>>
       A group of delinquents turn towards you, but Sydney is already out of <<his>> seat.
@@ -136,7 +137,7 @@
           gathering and orders the delinquents back to their seats.
       <</if>>
       Sydney stays close until they have gone.
-      <<stress -6>><<trauma -3>><<lstress>><<ltrauma>><<npcincr Sydney love 1>><<glove>>
+      <<lstress>><<ltrauma>><<glove>>
     <<option 'CN'>>
       一群坏学生转身盯上了你，但悉尼已经离开座位。
       <<if _sydneyStatus.includes('corrupt')>>
@@ -148,7 +149,7 @@
         <<He>>把椅子挪到你旁边，正好挡住他们的去路。“<<pShe>>不是一个人。”悉尼说道。西里斯注意到这边的动静，命令那群坏学生回到座位。
       <</if>>
       悉尼一直守在你身边，直到他们离开。
-      <<stress -6>><<trauma -3>><<lstress>><<ltrauma>><<npcincr Sydney love 1>><<glove>>
+      <<lstress>><<ltrauma>><<glove>>
   <</language>>
   <br><br>
   <<schoolicon 'science'>><<lanLink '继续上课' 'Science Lesson'>><<endevent>><</lanLink>><br>
@@ -234,7 +235,6 @@
     <</if>>
     <br><br>
     Without warning, <<he>> takes your hand and pulls you towards the door.
-    <<takeHandholdingVirginity 'Sydney' `($sydneyromance is 1 ? 'romantic' : 'consensual')`>>
   <<option 'CN'>>
     你摇了摇悉尼的肩膀。<<His>>的眼睛缓缓睁开，<span class='red'>看清时间后猛然睁大</span>。
     <br><br>
@@ -247,14 +247,15 @@
     <</if>>
     <br><br>
     <<He>>不由分说地牵住你的手，把你拉向门口。
-    <<takeHandholdingVirginity 'Sydney' `($sydneyromance is 1 ? 'romantic' : 'consensual')`>>
 <</language>>
 <br><br>
+<<takeHandholdingVirginity 'Sydney' `($sydneyromance is 1 ? 'romantic' : 'consensual')`>>
 <<schoolicon>><<lanLink ['Run to school with Sydney (0:05)', '和悉尼一起跑去学校 (0:05)'] 'Sydney Walk School'>><<set $phase to 2>><</lanLink>>
 <br>
 
 :: Deadwood Reblooms Sydney Science Study []
 <<set $outside to 0>><<set $location to 'school'>><<schooleffects>><<effects>><<towelup>><<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<if _sydneyStatus.includes('corrupt')>><<npcincr Sydney lust 1>><</if>>
 <<language>>
   <<option 'EN'>>
     You move your notes between your desks and compare them with Sydney's.
@@ -262,7 +263,7 @@
     <<if _sydneyStatus.includes('corrupt')>>
       <<He>> has the right answers, but several diagrams have gained <span class='lewd'>suggestive labels</span>. When you point one out, <<he>> covers it with <<his>> hand
         and grins. "That part isn't on the exam."
-      <<npcincr Sydney lust 1>><<gslust>>
+      <<gslust>>
     <<elseif _sydneyStatus.includes('pure')>>
       <<He>> works methodically through every difference, quietly explaining the parts you missed. When your answers finally match, <<he>> gives you
         <span class='green'>a proud smile</span>.
@@ -274,7 +275,7 @@
     <br><br>
     <<if _sydneyStatus.includes('corrupt')>>
       <<He>>的答案都没问题，几张示意图旁却多了些<span class='lewd'>意味暧昧的标注</span>。你指出其中一处时，<<he>>用手遮住它，笑了起来。“这个不在考试范围里。”
-      <<npcincr Sydney lust 1>><<gslust>>
+      <<gslust>>
     <<elseif _sydneyStatus.includes('pure')>>
       <<He>>有条不紊地核对每一处差异，轻声解释你漏掉的部分。等你们的答案终于一致，<<he>>向你露出<span class='green'>自豪的微笑</span>。
     <<else>>
@@ -292,6 +293,7 @@
 
 :: Deadwood Reblooms Sydney Science Chat []
 <<set $outside to 0>><<set $location to 'school'>><<schooleffects>><<effects>><<towelup>><<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<if _sydneyStatus.includes('corrupt')>><<npcincr Sydney lust 1>><</if>>
 <<language>>
   <<option 'EN'>>
     You lean closer and whisper to Sydney while Sirris writes on the board.
@@ -299,7 +301,7 @@
     <<if _sydneyStatus.includes('corrupt')>>
       <<He>> answers with increasingly shameless suggestions for <span class='lewd'>"after-class experiments"</span> until Sirris glances your way. Sydney immediately looks
         down at <<his>> textbook, though <<his>> foot remains pressed against yours beneath the desk.
-      <<npcincr Sydney lust 1>><<gslust>>
+      <<gslust>>
     <<elseif _sydneyStatus.includes('pure')>>
       <<He>> tries to keep <<his>> eyes on the lesson, but still answers each question you ask. Before long, the whispered conversation turns to
         books and temple work, and <<he>> has to hide a smile behind <<his>> notes.
@@ -312,7 +314,7 @@
     <br><br>
     <<if _sydneyStatus.includes('corrupt')>>
       <<He>>提出的<span class='lewd'>“课后实验”</span>一个比一个露骨，直到西里斯朝你们看来。悉尼立刻低头盯住课本，桌下的脚却仍贴着你的脚。
-      <<npcincr Sydney lust 1>><<gslust>>
+      <<gslust>>
     <<elseif _sydneyStatus.includes('pure')>>
       <<He>>努力把目光留在课堂上，却仍会回答你的每个问题。没过多久，悄声交谈的话题便转向书籍和神殿工作，<<he>>只好用笔记遮住笑容。
     <<else>>
@@ -333,19 +335,20 @@
 :: Deadwood Reblooms Sydney Science Tease []
 <<set $outside to 0>><<set $location to 'school'>><<schooleffects>><<effects>><<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
 <<if $phase is 1>>
+  <<arousal 300>><<npcincr Sydney love 1>>
   <<language>>
     <<option 'EN'>>
       You unfold the note. Sydney has drawn a suspiciously detailed diagram of today's "reproductive system," with your name beside one
       part and <<his>> beside another. A dotted line shows exactly how the two are meant to fit together. You add an arrow of your own and return it.
       <br><br>
       <span class="lewd">Sydney bites <<his>> lip, sliding one hand beneath the desk to trace the inside of your thigh.</span>
-      <<arousal 300>><<garousal>><<npcincr Sydney love 1>><<glove>>
+      <<garousal>><<glove>>
     <<option 'CN'>>
       你展开纸条。悉尼画了一张细节可疑的“生殖系统”示意图，在其中一部分旁写了你的名字，另一部分则写着<<his>>名字。
       一条虚线详细标出了两者应该如何结合。你添上一支箭头，把纸条传了回去。
       <br><br>
       <span class="lewd">悉尼咬住嘴唇，将一只手探到桌下，沿着你的大腿内侧轻轻描画。</span>
-      <<arousal 300>><<garousal>><<npcincr Sydney love 1>><<glove>>
+      <<garousal>><<glove>>
   <</language>>
   <<if $settings.bodyWritingLevel gte 2>>
     <br><br>
@@ -354,20 +357,20 @@
       <<language>>
         <<option 'EN'>>
           When Sirris turns to the board, Sydney uncaps <<his>> pen and adds one more "study note" to your <<bodypart _bodypart>>:
-          <<bodywriting_npc_sydney_science _bodypart 'pen'>>
         <<option 'CN'>>
           西里斯转向黑板时，悉尼拔开笔帽，在你的<<bodypart _bodypart>>上又添了一条“学习笔记”：
-          <<bodywriting_npc_sydney_science _bodypart 'pen'>>
       <</language>>
+      <<bodywriting_npc_sydney_science _bodypart 'pen'>>
     <</if>>
   <</if>>
 <<else>>
+  <<scienceskill 1>>
   <<language>>
     <<option 'EN'>>
       You place your textbook over the note and keep working. Sydney withdraws <<his>> foot and returns to the lesson, though <<he>>
-      looks disappointed.<<scienceskill 1>><<gscience>>
+      looks disappointed.<<gscience>>
     <<option 'CN'>>
-      你用课本压住纸条，继续学习。悉尼收回脚，重新把注意力放回课堂，虽然<<he>>看起来有些失望。<<scienceskill 1>><<gscience>>
+      你用课本压住纸条，继续学习。悉尼收回脚，重新把注意力放回课堂，虽然<<he>>看起来有些失望。<<gscience>>
   <</language>>
 <</if>>
 <br><br>
