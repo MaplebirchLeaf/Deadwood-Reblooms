@@ -1,0 +1,55 @@
+:: Deadwood Reblooms Adrian Boundaries Widgets [widget]
+
+<<widget 'deadwood-adrian-boundary'>>
+	<<deadwood-reblooms-adrian-context>>
+	<<set $_adrianReply to _args[0]>>
+	<<if maplebirch.passage.title is 'Deadwood Reblooms Adrian Conversation' and _adrianContext.present and _adrianContext.state.lastChat is Time.days and !_adrianConversation.responseUsed and ['pressure', 'insult', 'queue', 'apologise'].includes($_adrianReply)>>
+		<<if $_adrianReply isnot 'apologise' or (C.npc.Adrian.rage gt 0 and _adrianContext.state.last_offence)>>
+			<<set _adrianConversation.responseUsed to true>>
+			<<set _adrianConversation.offence to _adrianContext.state.last_offence>>
+			<<if $_adrianReply is 'apologise'>>
+				<<set C.npc.Adrian.rage to Math.max(0, C.npc.Adrian.rage - 4)>>
+				<<if C.npc.Adrian.rage is 0>><<set _adrianContext.state.last_offence to ''>><</if>>
+			<<else>>
+				<<set _adrianContext.state.last_offence to $_adrianReply>>
+				<<set C.npc.Adrian.love to Math.max(0, C.npc.Adrian.love - 4)>>
+				<<set C.npc.Adrian.rage to Math.min(30, (C.npc.Adrian.rage ?? 0) + 5)>>
+			<</if>>
+			<<replace '#adrian-response'>>
+				<<switch $_adrianReply>>
+					<<case 'pressure'>>
+						<<language>>
+							<<option 'EN'>>Adrian puts the pen down. "<span class='red'>I won't alter the records or invent terms for you.</span> I can explain the charges, or help you make a payment. Your balance doesn't change what I'm allowed to do." The form is left on your side of the counter.
+							<<option 'CN'>>阿德里安放下了笔。“<span class='red'>我不会替你改记录，也不能凭空给你开条件。</span>费用不明白，我可以解释；需要还款，我也可以帮你办理。你有多少钱，都不影响我能做什么。”表格留在你这侧的柜台上。
+						<</language>>
+					<<case 'insult'>>
+						<<language>>
+							<<option 'EN'>>Adrian folds the sandwich wrapper. "They came here because they needed help. <span class='purple'>I don't find that funny.</span> There are people who have never had a bank account. They're allowed to ask." The cup stays between you. "I should get back to work."
+							<<option 'CN'>>阿德里安折起三明治的包装纸。“他们需要帮助，才会来这里。<span class='purple'>我不觉得这有什么好笑。</span>有人从没开过银行账户，不懂就可以问。”纸杯留在你们之间。“我该回去工作了。”
+						<</language>>
+					<<case 'queue'>>
+						<<language>>
+							<<option 'EN'>>Adrian looks towards the people waiting. "<span class='blue'>They were here first.</span> Take a number, and I'll help when it's your turn." Adrian turns the numbered ticket towards you before calling the next customer. <span class='purple'>The conversation ends there.</span>
+							<<option 'CN'>>阿德里安看向等候的人们。“<span class='blue'>他们比你先来。</span>先取号，轮到你时，我会帮你办理。”阿德里安把号码牌转向你，随后叫来了下一位客户。<span class='purple'>谈话到此为止。</span>
+						<</language>>
+					<<case 'apologise'>>
+						<<language>>
+							<<option 'EN'>>
+								Adrian listens without interrupting.
+								<<if _adrianConversation.offence is 'insult'>>"I've explained those forms more times than I can count. They still have to ask me things. <span class='teal'>Thank you for thinking about what you said.</span>"
+								<<elseif _adrianConversation.offence is 'queue'>>"Thank you. When your number comes up, I'll have time to go through it properly."
+								<<else>>"I can help you understand the terms. I can't change them for you. <span class='teal'>Thank you for understanding.</span>"<</if>>
+								Adrian picks up the pen again. The banking terms on the form remain the same.
+							<<option 'CN'>>
+								阿德里安没有打断你，等你把话说完。
+								<<if _adrianConversation.offence is 'insult'>>“那些表格，我解释过不知道多少遍了。还有人需要问我。<span class='teal'>谢谢你愿意想想自己说过的话。</span>”
+								<<elseif _adrianConversation.offence is 'queue'>>“谢谢。轮到你的号码，我会好好替你核对。”
+								<<else>>“条款不明白，我可以帮你看。专门替你改，就不行。<span class='teal'>谢谢你能理解。</span>”<</if>>
+								阿德里安重新拿起笔，表格上的业务条款仍按原来的规定执行。
+						<</language>>
+				<</switch>>
+				<<if $_adrianReply isnot 'apologise'>><<llove 'Adrian'>><</if>>
+			<</replace>>
+		<</if>>
+	<</if>>
+<</widget>>

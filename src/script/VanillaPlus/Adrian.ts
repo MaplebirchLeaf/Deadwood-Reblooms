@@ -18,9 +18,10 @@ export default function Adrian(maplebirch: typeof window.maplebirch): void {
       hair_sides_length: 200,
       hair_fringe_length: 200
     },
-    { love: { maxValue: 50 }, loveAlias: ['Familiarity', '熟悉'], loveInterest: false },
+    { love: { maxValue: 50 }, loveAlias: ['Familiarity', '熟悉'], rage: { name: 'Displeasure', maxValue: 30 }, loveInterest: false },
     {
       Adrian: { EN: 'Adrian', CN: '阿德里安' },
+      Displeasure: { EN: 'Displeasure', CN: '不满' },
       'bank clerk': { EN: 'bank clerk', CN: '银行职员' },
       'senior bank clerk': { EN: 'senior clerk', CN: '资深柜员' },
       'bank manager': { EN: 'bank manager', CN: '银行经理' }

@@ -1,7 +1,22 @@
 :: Deadwood Reblooms Adrian Widgets [widget]
 
 <<widget 'Adrianrelationshiptext'>>
-	<<if $VanillaPlus.adrian.career is 5 and C.npc.Adrian.love gte 35>>
+	<<if C.npc.Adrian.rage gt 0 and $VanillaPlus.adrian.last_offence is 'pressure'>>
+		<<language>>
+			<<option 'EN'>> is <span class='purple'>unimpressed by your demands</span> for special treatment.
+			<<option 'CN'>>对你要求违规优待的举动<span class='purple'>很不满</span>。
+		<</language>>
+	<<elseif C.npc.Adrian.rage gt 0 and $VanillaPlus.adrian.last_offence is 'insult'>>
+		<<language>>
+			<<option 'EN'>> <span class='purple'>remembers how you spoke</span> about the other customers.
+			<<option 'CN'>>仍<span class='purple'>记着你贬低其他客户的话</span>。
+		<</language>>
+	<<elseif C.npc.Adrian.rage gt 0>>
+		<<language>>
+			<<option 'EN'>> <span class='blue'>keeps your conversations brief</span> after your attempt to jump the queue.
+			<<option 'CN'>>你上次试图插队后，阿德里安<span class='blue'>不再与你多聊</span>。
+		<</language>>
+	<<elseif $VanillaPlus.adrian.career is 5 and C.npc.Adrian.love gte 35>>
 		<<language>>
 			<<option 'EN'>> is <span class='green'>grateful for your help</span> with the promotion.
 			<<option 'CN'>>很<span class='green'>感激你在晋升时的帮助</span>。
@@ -89,7 +104,12 @@
 			<<set _adrianContext.state.visits += 1>>
 		<</if>>
 		<<npc 'Adrian'>><<person1>>
-		<<if (_adrianContext.location is 'financial_centre_property')>>
+		<<if C.npc.Adrian.rage gte 5>>
+			<<language>>
+				<<option 'EN'>>Adrian places a form beside the card reader. The greeting is <span class='blue'>strictly professional</span>. "What service do you need today?"
+				<<option 'CN'>>阿德里安把表格放到读卡器旁。招呼声<span class='blue'>公事公办</span>。“今天需要办理什么业务？”
+			<</language>>
+		<<elseif (_adrianContext.location is 'financial_centre_property')>>
 			<<language>>
 				<<option 'EN'>>Adrian has brought a folder from the bank counter. The estate agent passes over a property leaflet. "I'll go through the funding with you. The agent can arrange the viewing."
 				<<option 'CN'>>阿德里安从银行柜台带来一个文件夹。中介递过房屋介绍。“我来和你核对购房资金。看房的事，中介会安排。”
@@ -193,8 +213,8 @@
 	<<switch _adrianConversation.topic>>
 		<<case 'overdue'>>
 			<<language>>
-				<<option 'EN'>>Adrian lowers the voice usually used for account enquiries. "There's a missed payment on your account. I can go through the statement with you, if you'd like." The paper stays on your side of the glass. "I can't remove it. I can make sure you know what you're being asked to pay."
-				<<option 'CN'>>阿德里安压低了平常办理业务时的声音。“你的账户有一笔逾期款。如果你愿意，我可以陪你看一遍账单。”纸张留在你这侧的玻璃前。“我不能替你免掉它。但我可以让你弄清楚，他们要你付的究竟是什么。”
+				<<option 'EN'>>Adrian lowers the voice usually used for account enquiries. "There's a missed payment on your account. I can go through the statement with you, if you'd like." The paper stays on your side of the glass. "<span class='blue'>I can't remove it.</span> I can make sure you know what you're being asked to pay."
+				<<option 'CN'>>阿德里安压低了平常办理业务时的声音。“你的账户有一笔逾期款。如果你愿意，我可以陪你看一遍账单。”纸张留在你这侧的玻璃前。“<span class='blue'>我不能替你免掉它。</span>但我可以让你弄清楚，他们要你付的究竟是什么。”
 			<</language>>
 		<<case 'concern'>>
 			<<language>>
@@ -208,8 +228,8 @@
 			<</language>>
 		<<case 'account'>>
 			<<language>>
-				<<option 'EN'>>"Your account is open now." Adrian points out the number on your paperwork. "Keep your card details safe. If you borrow anything, check the payment dates too."
-				<<option 'CN'>>“账户已经开好了。”阿德里安指了指文书上的账号。“保管好卡片信息。要是借了钱，也记得留意还款日期。”
+				<<option 'EN'>>"Your account is open now." Adrian points out the number on your paperwork. "<span class='blue'>Keep your card details safe.</span> If you borrow anything, <span class='blue'>check the payment dates</span> too."
+				<<option 'CN'>>“账户已经开好了。”阿德里安指了指文书上的账号。“<span class='blue'>保管好卡片信息。</span>要是借了钱，也记得<span class='blue'>留意还款日期</span>。”
 			<</language>>
 		<<case 'property'>>
 			<<if _adrianConversation.ownsHome>>
@@ -231,8 +251,8 @@
 				<</language>>
 			<<else>>
 				<<language>>
-					<<option 'EN'>>"Thinking about opening a trading account?" Adrian picks out the forms and introduces you to the securities clerk. "I can explain how money moves between the two accounts. Ask the clerk about orders and shares." The introduction ends with a quiet addition. "You don't have to buy anything today."
-					<<option 'CN'>>“想开个交易账户？”阿德里安找出表格，把你介绍给证券职员。“两个账户之间怎么转钱，我可以解释。下单和股票的事，问这位职员。”介绍完，又轻轻补了一句。“今天不一定非得买点什么。”
+					<<option 'EN'>>"Thinking about opening a trading account?" Adrian picks out the forms and introduces you to the securities clerk. "I can explain how money moves between the two accounts. Ask the clerk about orders and shares." The introduction ends with a quiet addition. "<span class='blue'>You don't have to buy anything today.</span>"
+					<<option 'CN'>>“想开个交易账户？”阿德里安找出表格，把你介绍给证券职员。“两个账户之间怎么转钱，我可以解释。下单和股票的事，问这位职员。”介绍完，又轻轻补了一句。“<span class='blue'>今天不一定非得买点什么。</span>”
 				<</language>>
 			<</if>>
 		<<case 'break'>>
@@ -241,7 +261,7 @@
 				<<option 'CN'>>阿德里安挪开纸杯，给你腾出位置。“还有五分钟，我就得回柜台了。”<<He>>折起三明治的包装纸。“今天人真多。午饭都差点没空吃。”
 			<</language>>
 		<<default>>
-			<<if (C.npc.Adrian.love gte 20)>>
+			<<if C.npc.Adrian.love gte 20 and (C.npc.Adrian.rage ?? 0) is 0>>
 				<<language>>
 					<<option 'EN'>>"You don't always need an account question to say hello." Adrian glances at the queue, then back at you. "Though if the manager asks, we were discussing your statement."
 					<<option 'CN'>>“也不是非得有账户问题才能来打招呼。”阿德里安看看等候的队伍，又看回你。“不过经理要是问起，我们就是在讨论你的账单。”
@@ -256,13 +276,26 @@
 	<br><br>
 	<div id='adrian-response'>
 		<<lanLink ['Listen and thank Adrian', '认真听完，向阿德里安道谢']>>
-			<<if !_adrianConversation.responseUsed>>
+			<<deadwood-reblooms-adrian-context>>
+			<<if _adrianContext.present and _adrianContext.state.lastChat is Time.days and !_adrianConversation.responseUsed>>
 				<<set _adrianConversation.responseUsed to true>>
 				<<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) + 2, 0, 50)>>
+				<<set C.npc.Adrian.rage to Math.max(0, (C.npc.Adrian.rage ?? 0) - 1)>>
+				<<if C.npc.Adrian.rage is 0>><<set _adrianContext.state.last_offence to ''>><</if>>
 				<<replace '#adrian-response'>>
 					<<language>>
-						<<option 'EN'>>You listen and thank Adrian. <<He>> gives you a small smile. <<glove 'Adrian'>>
-						<<option 'CN'>>你听完，向阿德里安道谢。<<He>>朝你笑了笑。<<glove 'Adrian'>>
+						<<option 'EN'>>
+							You listen without interrupting, then thank Adrian.
+							<<if C.npc.Adrian.rage gt 0>><<He>> nods, <span class='blue'>still keeping the conversation to your paperwork</span>.
+							<<elseif _adrianConversation.topic is 'overdue'>>"Ask if you need a charge explained." Adrian leaves the statement where you can read it.
+							<<elseif _adrianConversation.topic is 'break'>>Adrian sets the cup down. "It's nice to finish a sentence without a number being called." <span class='teal'><<He>> seems glad of the company.</span>
+							<<else>>Adrian gives you a small smile before setting the next form between you.<</if>> <<glove 'Adrian'>>
+						<<option 'CN'>>
+							你没有打断阿德里安，等<<him>>说完才道了谢。
+							<<if C.npc.Adrian.rage gt 0>><<He>>点点头，<span class='blue'>仍只与你谈手上的业务</span>。
+							<<elseif _adrianConversation.topic is 'overdue'>>“哪笔费用不明白，可以问。”阿德里安把账单留在你能看清的地方。
+							<<elseif _adrianConversation.topic is 'break'>>阿德里安放下杯子。“能说完一句话，不用中途去叫号，倒是挺好。”<span class='teal'><<He>>似乎很乐意有人作伴。</span>
+							<<else>>阿德里安朝你微微一笑，把下一张表格放到你们之间。<</if>> <<glove 'Adrian'>>
 					<</language>>
 				<</replace>>
 			<</if>>
@@ -275,9 +308,12 @@
 			<<default>><<set _adrianFollowup to ['Ask how the day has been', '问问今天工作怎么样']>>
 		<</switch>>
 		<<lanLink _adrianFollowup>>
-			<<if !_adrianConversation.responseUsed>>
+			<<deadwood-reblooms-adrian-context>>
+			<<if _adrianContext.present and _adrianContext.state.lastChat is Time.days and !_adrianConversation.responseUsed>>
 				<<set _adrianConversation.responseUsed to true>>
 				<<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) + 2, 0, 50)>>
+				<<set C.npc.Adrian.rage to Math.max(0, (C.npc.Adrian.rage ?? 0) - 1)>>
+				<<if C.npc.Adrian.rage is 0>><<set _adrianContext.state.last_offence to ''>><</if>>
 				<<replace '#adrian-response'>>
 					<<switch _adrianConversation.topic>>
 						<<case 'overdue'>>
@@ -286,9 +322,10 @@
 								<<option 'CN'>>阿德里安把账单放到你们之间，指了指逾期的那笔款。“先还这一笔。下一期是这个日期。”<<He>>替你把日期写了下来。<<glove 'Adrian'>>
 							<</language>>
 						<<case 'concern'>>
+							<<stress -3>>
 							<<language>>
-								<<option 'EN'>>You sit beside the door. Adrian keeps your forms behind the counter until you are ready. "Take your time." You let your shoulders relax. <<glove 'Adrian'>><<stress -3>><<lstress>>
-								<<option 'CN'>>你在门边坐下。阿德里安把你的表格留在柜台后，等你缓过来。“不着急。”你放松肩膀，慢慢吐出一口气。<<glove 'Adrian'>><<stress -3>><<lstress>>
+								<<option 'EN'>>You sit beside the door. Adrian keeps your forms behind the counter until you are ready. "Take your time." You let your shoulders relax. <<glove 'Adrian'>><<lstress>>
+								<<option 'CN'>>你在门边坐下。阿德里安把你的表格留在柜台后，等你缓过来。“不着急。”你放松肩膀，慢慢吐出一口气。<<glove 'Adrian'>><<lstress>>
 							<</language>>
 						<<case 'home' 'property'>>
 							<<if _adrianConversation.ownsHome>>
@@ -313,7 +350,7 @@
 									<<option 'EN'>>"Two staff off sick, and a drawer that would not balance." Adrian rubs the bridge of <<his>> nose. "I sorted it out. I could do with a quiet afternoon." <<glove 'Adrian'>>
 									<<option 'CN'>>“两个人请病假，还有个钱箱对不上账。”阿德里安揉了揉鼻梁。“都处理好了。只希望下午能清静点。”<<glove 'Adrian'>>
 								<</language>>
-							<<elseif C.npc.Adrian.love gte 20>>
+							<<elseif C.npc.Adrian.love gte 20 and (C.npc.Adrian.rage ?? 0) is 0>>
 								<<language>>
 									<<option 'EN'>>"Someone handed me a shopping list instead of the application form." Adrian laughs. "I nearly asked them to sign it. I needed lunch too." <<glove 'Adrian'>>
 									<<option 'CN'>>“有人把购物清单当申请表递给我了。”阿德里安笑出了声。“我差点还让人签字。看来我也该吃午饭了。”<<glove 'Adrian'>>
@@ -330,30 +367,34 @@
 		<</lanLink>><br>
 		<<if _adrianConversation.topic is 'break' and $money gte 200>>
 			<<lanLink ['Buy Adrian a cup of tea (£2)', '请阿德里安喝杯茶 (£2)']>>
-				<<if !_adrianConversation.responseUsed and $money gte 200>>
-					<<set _adrianConversation.responseUsed to true>><<money -200>>
+				<<deadwood-reblooms-adrian-context>>
+				<<if _adrianContext.present and _adrianContext.state.lastChat is Time.days and !_adrianConversation.responseUsed and $money gte 200>>
+					<<set _adrianConversation.responseUsed to true>><<money -200>><<stress -3>>
 					<<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) + 2, 0, 50)>>
+					<<set C.npc.Adrian.rage to Math.max(0, (C.npc.Adrian.rage ?? 0) - 1)>>
+					<<if C.npc.Adrian.rage is 0>><<set _adrianContext.state.last_offence to ''>><</if>>
 					<<replace '#adrian-response'>>
 						<<language>>
-							<<option 'EN'>>You bring a hot cup back from the cafe. "Thank you. Mine had gone cold." Adrian makes room for you beside the table. You talk while <<he>> drinks. <<glove 'Adrian'>><<stress -3>><<lstress>>
-							<<option 'CN'>>你从咖啡馆带回一杯热茶。“谢谢。我这杯早就凉了。”阿德里安在桌旁给你让出位置。你陪<<him>>喝茶，聊了一会儿。<<glove 'Adrian'>><<stress -3>><<lstress>>
+							<<option 'EN'>>You bring a hot cup back from the cafe. "Thank you. Mine had gone cold." Adrian makes room for you beside the table. You talk while <<he>> drinks. <<glove 'Adrian'>><<lstress>>
+							<<option 'CN'>>你从咖啡馆带回一杯热茶。“谢谢。我这杯早就凉了。”阿德里安在桌旁给你让出位置。你陪<<him>>喝茶，聊了一会儿。<<glove 'Adrian'>><<lstress>>
 						<</language>>
 					<</replace>>
 				<</if>>
 			<</lanLink>><br>
 		<</if>>
-		<<lanLink ['Dismiss the conversation', '不耐烦地打断谈话']>>
-			<<if !_adrianConversation.responseUsed>>
-				<<set _adrianConversation.responseUsed to true>>
-				<<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) - 2, 0, 50)>>
-				<<replace '#adrian-response'>>
-					<<language>>
-						<<option 'EN'>>"Right." Adrian puts the paperwork back on the desk. <<llove 'Adrian'>>
-						<<option 'CN'>>“好吧。”阿德里安把文书放回桌上。<<llove 'Adrian'>>
-					<</language>>
-				<</replace>>
+		<<if C.npc.Adrian.rage gt 0 and _adrianContext.state.last_offence>>
+			<<lanLink ['Apologise for how you spoke last time', '为上次说的话道歉']>><<deadwood-adrian-boundary 'apologise'>><</lanLink>>
+		<<else>>
+			<<if _adrianConversation.topic is 'overdue'>>
+				<<lanLink ['Demand that Adrian erase the missed payment', '要求阿德里安抹掉逾期记录']>><<deadwood-adrian-boundary 'pressure'>><</lanLink>><<llove 'Adrian'>>
+			<<elseif _adrianContext.location is 'financial_centre_break'>>
+				<<lanLink ['Call the other customers too stupid to fill in a form', '嘲笑其他客户连表格都不会填']>><<deadwood-adrian-boundary 'insult'>><</lanLink>><<llove 'Adrian'>>
+			<<elseif ['account', 'securities', 'property', 'home'].includes(_adrianConversation.topic)>>
+				<<lanLink ['Insist your money entitles you to special treatment', '声称自己的钱足够多，理应得到特殊优待']>><<deadwood-adrian-boundary 'pressure'>><</lanLink>><<llove 'Adrian'>>
+			<<else>>
+				<<lanLink ['Tell Adrian to serve you before the people waiting', '让阿德里安把排队的人晾着，先办你的业务']>><<deadwood-adrian-boundary 'queue'>><</lanLink>><<llove 'Adrian'>>
 			<</if>>
-		<</lanLink>>
+		<</if>>
 	</div>
 	<br><br>
 <<else>>
