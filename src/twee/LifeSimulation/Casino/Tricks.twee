@@ -1,0 +1,122 @@
+:: Deadwood Reblooms Casino Tricks Widgets [widget]
+
+<<widget 'deadwood-casino-tricks'>>
+	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
+	<<if $_casino.trick>>
+		<div id='deadwood-casino-tricks'>
+			<<if $_casino.trick.used>>
+				<<deadwood-casino-trick-result>>
+			<<elseif $_casino.canPeek or $_casino.canDistract>>
+				<<lanLink ['Try a little trick', '做点小动作']>>
+					<<replace '#deadwood-casino-tricks'>><<deadwood-casino-trick-choices>><</replace>>
+				<</lanLink>>
+			<</if>>
+		</div><br>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-casino-trick-choices'>>
+	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
+	<<language>>
+		<<option 'EN'>>
+			<<if maplebirch.passage.title is 'Deadwood Reblooms Life Simulation Blackjack'>>Marlow keeps one card face down beside the deck. You would have to lean closer to see it.
+			<<else>>The players keep their hidden cards close to the cloth. You wait for a card to lift, or for someone to look your way.<</if>>
+		<<option 'CN'>>
+			<<if maplebirch.passage.title is 'Deadwood Reblooms Life Simulation Blackjack'>>马洛把一张暗牌留在牌堆旁。你得凑近些，才能看见牌面。
+			<<else>>客人把暗牌贴着绿毡放好。你等着牌角抬起，或有人朝你看过来。<</if>>
+	<</language>><br><br>
+	<<language>>
+		<<option 'EN'>>
+			<span class='blue'>You can make one attempt this hand.</span> If caught, <span class='red'>you forfeit the chips already bet</span>.
+			<<if $LifeSimulation.casino.suspicion gte 90>><span class='red'>Marlow is watching too closely for another peek to go unnoticed.</span>
+			<<elseif $LifeSimulation.casino.suspicion gte 35>><span class='purple'>Marlow is watching your hands. Another clumsy attempt could cost you the hand.</span>
+			<<elseif $LifeSimulation.casino.suspicion gt 0>>Marlow looks towards you whenever the cards move.<</if>>
+			<<if $LifeSimulation.casino.cheating_caught gt 0>><span class='red'>Getting caught again means no more games tonight.</span><</if>>
+		<<option 'CN'>>
+			<span class='blue'>这局只能尝试一次。</span>作弊被抓，<span class='red'>已下注的筹码不会退还</span>。
+			<<if $LifeSimulation.casino.suspicion gte 90>><span class='red'>马洛盯得很紧，再偷看就会被当场抓住。</span>
+			<<elseif $LifeSimulation.casino.suspicion gte 35>><span class='purple'>马洛正盯着你的手。再露出破绽，这局就要算你弃牌了。</span>
+			<<elseif $LifeSimulation.casino.suspicion gt 0>>桌上的牌一动，马洛就朝你这边看。<</if>>
+			<<if $LifeSimulation.casino.cheating_caught gt 0>><span class='red'>再被抓到，今晚就不能继续玩了。</span><</if>>
+	<</language>><br><br>
+	<<if $_casino.canPeek>>
+		<<set $skulduggerydifficulty to $_casino.trickDifficulty>>
+		<<lanLink ['Try to glimpse a hidden hand (0:01)', '趁机偷看暗牌 (0:01)']>><<deadwood-casino-trick 'peek'>><</lanLink>><<skulduggerydifficulty>><br>
+	<</if>>
+	<<if $_casino.canDistract>>
+		<<lanLink ['Flirt across the table (0:01)', '朝对面调情 (0:01)']>><<deadwood-casino-trick 'distract'>><</lanLink>>
+		<<if $_casino.opponent isnot 'Marlow' and !$settings.blindStatsEnabled>>
+			| <span class='lewd'><<lanSwitch 'Seduction' '诱惑'>></span>
+			<<if $settings.skillCheckStyle isnot 'skillname'>>
+				<<set $_grade to Math.clamp(Math.floor($_casino.distractionDifficulty / 2000), 0, 5)>>
+				<<lanSwitch ': requires ' '：需要评级 '>>
+				<span @class="['pink', 'purple', 'blue', 'lblue', 'teal', 'green'][$_grade]"><<print ['F', 'D', 'C', 'B', 'A', 'S'][$_grade]>></span>
+			<</if>>
+		<</if>><br>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-casino-trick'>>
+	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
+	<<set $_trickAction to _args[0]>>
+	<<if ($_trickAction is 'peek' and $_casino.canPeek) or ($_trickAction is 'distract' and $_casino.canDistract)>>
+		<<set $_trickPassage to maplebirch.passage.title>><<set $_trickSuccess to false>>
+		<<if $_trickAction is 'peek'>>
+			<<set $skulduggerydifficulty to $_casino.trickDifficulty>>
+			<<skulduggerycheck 'silent'>><<set $_trickSuccess to $skulduggerysuccess is 1>>
+		<<elseif $_casino.opponent isnot 'Marlow'>>
+			<<set $seductiondifficulty to $_casino.distractionDifficulty>>
+			<<silently>><<seductioncheck>><</silently>><<set $_trickSuccess to $seductionrating gte $seductionrequired>>
+		<</if>>
+		<<if $_casino.attempt($_trickAction, $_trickSuccess)>>
+			<<if $_trickAction is 'peek'>><<skulduggeryuse>>
+			<<elseif $_casino.trick.result isnot 'refused'>><<seductionskilluse>><</if>>
+			<<pass 1>>
+			<<if maplebirch.passage.title is $_trickPassage>><<run maplebirch.SugarCube.Engine.play($_trickPassage)>><</if>>
+		<</if>>
+	<</if>>
+<</widget>>
+
+<<widget 'deadwood-casino-trick-result'>>
+	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
+	<<switch $_casino.trick.result>>
+		<<case 'peek'>>
+			<<language>>
+				<<option 'EN'>>
+					You lean over the cloth as a card lifts from the table.
+					<<if maplebirch.passage.title is 'Deadwood Reblooms Life Simulation Three Card'>><span class='green'>You make out the other player's three cards.</span>
+					<<else>><span class='green'>You make out one hidden card.</span><</if>>
+					You sit back before the cards are covered again. Marlow's eyes follow your hands.
+				<<option 'CN'>>
+					牌角离开桌面时，你向绿毡探了探身。
+					<<if maplebirch.passage.title is 'Deadwood Reblooms Life Simulation Three Card'>><span class='green'>你看清了对方的三张牌。</span>
+					<<else>><span class='green'>你看清了一张暗牌。</span><</if>>
+					牌面重新遮住之前，你坐回了原处。马洛的目光跟着你的手。
+			<</language>>
+		<<case 'distract'>>
+			<<language>>
+				<<option 'EN'>>You hold the other player's gaze and smile. <<if maplebirch.get('LifeSimulation').casino.opponent is 'Wren'>>Wren grins back, taking a moment to answer.<<else>>The player looks up from the chips to return your smile.<</if>> <span class='lewd'>Your flirtation draws attention away from the next bet.</span> The cards stay on the cloth.
+				<<option 'CN'>>你迎着对方的目光，笑了笑。<<if maplebirch.get('LifeSimulation').casino.opponent is 'Wren'>>伦恩也咧嘴一笑，稍迟了片刻才回答。<<else>>对方从筹码间抬起头，回应你的笑容。<</if>><span class='lewd'>对方顾着与你眉来眼去，下一次下注时有些分心。</span>牌仍放在绿毡上。
+			<</language>>
+		<<case 'miss'>>
+			<<language>>
+				<<option 'EN'>>You try to draw the other player's eye. <<if maplebirch.get('LifeSimulation').casino.opponent is 'Wren'>>Wren smiles without looking away from the chips. "Nice try."<<else>>The player gives you a brief smile, then counts the bet.<</if>> <span class='blue'>The game continues.</span>
+				<<option 'CN'>>你试着吸引对方的视线。<<if maplebirch.get('LifeSimulation').casino.opponent is 'Wren'>>伦恩笑了笑，目光仍落在筹码上。“想得不错。”<<else>>对方朝你短暂地笑了笑，又继续数下注的筹码。<</if>><span class='blue'>牌局照常进行。</span>
+			<</language>>
+		<<case 'refused'>>
+			<<language>>
+				<<option 'EN'>>Marlow meets your smile, then taps the cards. "After the hand, perhaps. Hit or stand?" <span class='blue'>The dealer keeps watching the table.</span>
+				<<option 'CN'>>马洛迎着你的笑容，随后敲了敲桌上的牌。“等这局结束再说吧。要牌还是停牌？”<span class='blue'>荷官仍留意着牌桌。</span>
+			<</language>>
+		<<case 'noticed'>>
+			<<language>>
+				<<option 'EN'>>Marlow moves the deck away from your hand. "Sit back. Keep your hands where I can see them." <span class='red'>You have drawn the dealer's attention.</span> You learn nothing about the cards. <span class='purple'>Marlow trusts you a little less.</span>
+				<<option 'CN'>>马洛把牌堆从你手边移开。“坐回去。手放在我能看见的地方。”<span class='red'>荷官已经留意到你的举动。</span>你没能看清暗牌。<span class='purple'>马洛对你多了几分戒心。</span>
+			<</language>>
+		<<case 'caught'>>
+			<<language>>
+				<<option 'EN'>>Marlow stops your hand at the edge of the cards. "I saw that. <span class='red'>Your hand is forfeited.</span>" The dealer pushes your cards into the discard pile. <span class='red'>The chips you have already bet stay in the pot.</span> <<if maplebirch.get('LifeSimulation').casino.barred>>"Again? You're finished for tonight. Take your remaining chips to the cashier."<<else>>"Try it again, and you won't be playing here tonight."<</if>>
+				<<option 'CN'>>马洛在牌边拦住你的手。“我看见了。<span class='red'>这局算你弃牌。</span>”荷官把你的牌推到弃牌堆里。<span class='red'>已经下注的筹码留在底池中。</span><<if maplebirch.get('LifeSimulation').casino.barred>>“又来？今晚到此为止。剩下的筹码去柜台兑。”<<else>>“再来一次，今晚就别玩了。”<</if>>
+			<</language>>
+	<</switch>>
+<</widget>>

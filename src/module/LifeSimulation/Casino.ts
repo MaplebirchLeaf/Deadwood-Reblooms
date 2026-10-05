@@ -4,7 +4,7 @@ import Blackjack, { DEFAULT_BLACKJACK_STATE, type BlackjackState } from './Casin
 import Holdem, { DEFAULT_HOLDEM_STATE, type HoldemState } from './Casino/Holdem';
 import ThreeCard, { DEFAULT_THREE_CARD_STATE, type ThreeCardState } from './Casino/ThreeCard';
 import SlotMachine, { type SlotMachineState } from './Casino/SlotMachine';
-import { DEFAULT_CASINO_OPTIONS, type CasinoOptions } from '../constants/casino';
+import { DEFAULT_CASINO_OPTIONS, type CasinoOptions, type CardTrickState } from '../constants/casino';
 
 export const casinoPassage = 'Deadwood Reblooms Life Simulation Casino';
 export interface CasinoState {
@@ -14,6 +14,9 @@ export interface CasinoState {
   three_card: ThreeCardState;
   slots: SlotMachineState;
   chips: number;
+  suspicion: number;
+  cheating_caught: number;
+  banned_night: number;
   met_dealer: boolean;
   trained: boolean;
   shifts: number;
@@ -24,17 +27,20 @@ export interface CasinoState {
   work_scenario: number | null;
   last_work_correct: boolean | null;
   last_chat_night: number;
-  chat_topic: '' | 'work' | 'past' | 'gambling';
-  chat_reply: '' | 'listen' | 'joke';
+  chat_topic: '' | 'work' | 'past' | 'gambling' | 'off_duty';
+  chat_reply: '' | 'listen' | 'joke' | 'pressure' | 'apologise';
 }
 
 export const DEFAULT_CASINO_STATE: CasinoState = {
   blackjack: DEFAULT_BLACKJACK_STATE,
   holdem: DEFAULT_HOLDEM_STATE,
-  watch: structuredClone(DEFAULT_HOLDEM_STATE),
+  watch: clone(DEFAULT_HOLDEM_STATE),
   three_card: DEFAULT_THREE_CARD_STATE,
   slots: { reels: [0, 1, 2], payout: 0, played: false },
   chips: 0,
+  suspicion: 0,
+  cheating_caught: 0,
+  banned_night: -1,
   met_dealer: false,
   trained: false,
   shifts: 0,
@@ -74,13 +80,30 @@ class Casino {
     return Time.hour >= 18 || Time.hour < 4;
   }
 
-  public get available(): boolean {
+  public get night(): number {
+    return Time.days - (Time.hour < 4 ? 1 : 0);
+  }
+
+  public get barred(): boolean {
+    return this.state.banned_night === this.night;
+  }
+
+  private get present(): boolean {
     return this.open && V.id > 0 && V.location === 'deadwood_casino' && V.exposed <= 0 && V.combat !== 1 && V.stress < V.stressmax;
+  }
+
+  public get available(): boolean {
+    return this.present && !this.barred;
+  }
+
+  public get canReply(): boolean {
+    return this.present && this.state.work_scenario === null && !V.worn.face.type.includes('gag');
   }
 
   public get canWork(): boolean {
     return (
       this.available &&
+      (C.npc.Marlow?.rage ?? 0) < 10 &&
       (Time.hour >= 18 || Time.hour < 3) &&
       !this.holdem.active &&
       this.threeCard.state.phase !== 'player' &&
@@ -92,7 +115,7 @@ class Casino {
   }
 
   public get canTalk(): boolean {
-    return this.available && this.state.work_scenario === null && this.state.last_chat_night !== this.state.guest_night && !V.worn.face.type.includes('gag');
+    return this.canReply && this.state.last_chat_night !== this.state.guest_night;
   }
 
   public get wrenPresent(): boolean {
@@ -105,6 +128,95 @@ class Casino {
 
   public get tableGuest(): string | null {
     return this.wrenPresent ? 'Wren' : null;
+  }
+
+  private get table(): Blackjack | Holdem | ThreeCard | undefined {
+    switch (this.core.passage.title) {
+      case 'Deadwood Reblooms Life Simulation Blackjack':
+        return this.blackjack.state.venue === 'casino' ? this.blackjack : undefined;
+      case 'Deadwood Reblooms Life Simulation Holdem':
+        return this.holdem;
+      case 'Deadwood Reblooms Life Simulation Three Card':
+        return this.threeCard;
+    }
+  }
+
+  public get trick(): CardTrickState | undefined {
+    return this.table?.state.trick;
+  }
+
+  private get target(): number {
+    const game = this.table;
+    if (!game) return -1;
+    if (game === this.blackjack) return 1;
+    return (game as Holdem | ThreeCard).state.seats.findIndex((seat, index) => index > 0 && !seat.folded);
+  }
+
+  private get distractionTarget(): number {
+    if (this.table !== this.holdem) return this.target;
+    return this.holdem.state.seats.findIndex((seat, index) => index > 0 && !seat.folded && seat.stack > 0);
+  }
+
+  public get opponent(): string {
+    const game = this.table;
+    if (this.trick?.used) return this.trick.opponent;
+    if (game === this.blackjack) return 'Marlow';
+    return game ? ((game as Holdem | ThreeCard).state.seats[this.target]?.name ?? '') : '';
+  }
+
+  public get canPeek(): boolean {
+    return !!this.table?.canAct && !this.trick!.used && this.target > 0 && !window.pcAreArmsBound('both');
+  }
+
+  public get canDistract(): boolean {
+    return !!this.table?.canAct && !this.trick!.used && this.distractionTarget > 0 && !V.worn.face.type.includes('gag');
+  }
+
+  public get trickDifficulty(): number {
+    return 400 + Math.floor(this.state.suspicion / 10) * 100 + (['Wren', 'Marlow'].includes(this.opponent) ? 200 : 0);
+  }
+
+  public get distractionDifficulty(): number {
+    const name = this.table === this.holdem ? this.holdem.state.seats[this.distractionTarget]?.name : this.opponent;
+    return (name === 'Wren' ? 6000 : 4000) + Math.floor(this.state.suspicion / 20) * 2000;
+  }
+
+  /** 每手牌共用一次机会；线索不改变牌堆，分心只影响对手的下一次行动。 */
+  public attempt(action: 'peek' | 'distract', success: boolean): boolean {
+    if (action === 'peek' ? !this.canPeek : action !== 'distract' || !this.canDistract) return false;
+    const game = this.table!,
+      trick = game.state.trick,
+      target = action === 'peek' ? this.target : this.distractionTarget;
+    trick.opponent = game === this.blackjack ? 'Marlow' : (game as Holdem | ThreeCard).state.seats[target].name;
+    trick.used = true;
+    if (action === 'distract') {
+      trick.result = game === this.blackjack ? 'refused' : success ? 'distract' : 'miss';
+      if (trick.result === 'distract') trick.distracted = target;
+      return true;
+    }
+    this.state.suspicion = Math.min(100, this.state.suspicion + (success ? 10 : 25));
+    if (this.state.suspicion < 100 && (success || this.state.suspicion < 60)) {
+      trick.result = success ? 'peek' : 'noticed';
+      if (success) trick.peeked = target;
+      else this.displease(1);
+      return true;
+    }
+    // 先按原牌桌规则弃牌结算，再设置禁玩；未下注的筹码仍能取回。
+    if (game === this.blackjack) Object.assign(game.state, { phase: 'done', result: 'loss', paid: true });
+    else if (game === this.threeCard) this.threeCard.act('fold');
+    else this.holdem.act('fold');
+    trick.result = 'caught';
+    this.state.cheating_caught++;
+    this.displease(5);
+    if (this.state.cheating_caught >= 2) this.state.banned_night = this.night;
+    return true;
+  }
+
+  private displease(amount: number): void {
+    const npc = C.npc.Marlow;
+    if (!npc) return;
+    npc.love = Math.max(0, npc.love - amount);
+    npc.rage = Math.min(30, (npc.rage ?? 0) + amount);
   }
 
   public get chips(): number {
@@ -166,9 +278,11 @@ class Casino {
     V.location = 'deadwood_casino';
     V.outside = 0;
     V.bus = 'connudatus';
-    const night = Time.days - (Time.hour < 4 ? 1 : 0);
+    const night = this.night;
     if (this.state.guest_night !== night) {
       this.state.guest_night = night;
+      this.state.suspicion = 0;
+      this.state.cheating_caught = 0;
       this.state.wren_visit = random(1, 100) <= 35;
       this.state.landry_visit = random(1, 100) <= 25;
     }

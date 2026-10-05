@@ -73,7 +73,7 @@
 						<<if $_holdemSeat.folded>><<lanSwitch ' · Folded' ' · 已弃牌'>>
 						<<elseif $_holdemSeat.stack is 0 and $_holdem.active>><<lanSwitch ' · All-in' ' · 已全下'>><</if>>
 					</p>
-					<div class='poker-cards' @data-cards="$_holdemIndex" @data-visible="$_holdemVisible" data-placeholders='2'></div>
+					<div class='poker-cards' @data-cards="$_holdemIndex" @data-visible="$_holdemVisible" @data-peek="!$_holdemWatching and $_holdemState.trick.peeked is $_holdemIndex" data-placeholders='2'></div>
 					<<if $_holdemVisible and $_holdemSeat.cards.length and $_holdemState.board.length gte 3>>
 						<p class='poker-hand-name'><<lanSwitch `$_holdemHandNames[$_holdem.handRank($_holdemIndex)][0]` `$_holdemHandNames[$_holdem.handRank($_holdemIndex)][1]`>></p>
 					<</if>>
@@ -125,7 +125,7 @@
 		<p class='poker-summary'><<lanSwitch 'Ante' '底注'>> £<<print Number(($_threeState.ante / 100).toFixed(2))>> · <<lanSwitch 'Pot' '底池'>> £<<print Number(($_three.pot / 100).toFixed(2))>> · <<lanSwitch 'Rounds' '下注轮数'>> <<print $_threeState.rounds>>/10</p>
 		<<if $_threeState.seats.length>>
 			<<for $_threeIndex, $_threeSeat range $_threeState.seats>>
-				<<set $_threeVisible to $_threeIndex is 0 ? $_threeSeat.seen : $_threeState.compared.includes($_threeIndex) or ($_threeState.phase is 'done' and $_threeState.showdown and !$_threeSeat.folded)>>
+				<<set $_threeVisible to $_threeIndex is 0 ? $_threeSeat.seen : $_threeState.trick.peeked is $_threeIndex or $_threeState.compared.includes($_threeIndex) or ($_threeState.phase is 'done' and $_threeState.showdown and !$_threeSeat.folded)>>
 				<section @class="'poker-seat' + ($_threeSeat.folded ? ' poker-folded' : '')">
 					<strong><<deadwood-poker-name `$_threeSeat.name`>></strong>
 					<p class='poker-seat-detail'><<lanSwitch 'Committed' '累计投入'>> £<<print Number(($_threeSeat.total / 100).toFixed(2))>> ·

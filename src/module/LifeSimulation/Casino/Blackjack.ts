@@ -1,6 +1,6 @@
 // ./src/module/LifeSimulation/Casino/Blackjack.ts
 
-import { DEFAULT_CASINO_OPTIONS, type BlackjackOptions } from '../../constants/casino';
+import { DEFAULT_CARD_TRICK_STATE, DEFAULT_CASINO_OPTIONS, type BlackjackOptions, type CardTrickState } from '../../constants/casino';
 import BlackjackClothes, { type BlackjackClothesState, type BlackjackSeat } from './BlackjackClothes';
 
 export const blackjackPassage = 'Deadwood Reblooms Life Simulation Blackjack';
@@ -12,6 +12,7 @@ export interface PlayingCard {
 }
 
 export interface BlackjackState {
+  trick: CardTrickState;
   venue: 'arcade' | 'casino' | 'home';
   property: string | null;
   companion: string | null;
@@ -35,6 +36,7 @@ export interface BlackjackState {
 }
 
 export const DEFAULT_BLACKJACK_STATE: BlackjackState = {
+  trick: clone(DEFAULT_CARD_TRICK_STATE),
   venue: 'arcade',
   property: null,
   companion: null,
@@ -301,7 +303,7 @@ class Blackjack {
       if (!this.state.clothing) return false;
     }
     const deck = window.shuffle(window.deck());
-    Object.assign(this.state, { deck, player: [], dealer: [], partner_cards: [], phase: 'player', result: null, paid: false, stripped_seats: [] });
+    Object.assign(this.state, { deck, player: [], dealer: [], partner_cards: [], phase: 'player', result: null, paid: false, stripped_seats: [], trick: clone(DEFAULT_CARD_TRICK_STATE) });
     const hands = { player: this.state.player, dealer: this.state.dealer, partner: this.state.partner_cards };
     for (let i = 0; i < 2; i++) for (const seat of this.activeSeats) hands[seat].push(deck.shift()!);
     this.animation = 'deal';
@@ -360,6 +362,7 @@ class Blackjack {
   public leave(): void {
     this.clothes.restore();
     this.state.phase = 'ready';
+    this.state.trick = clone(DEFAULT_CARD_TRICK_STATE);
     this.state.result = null;
     this.state.deck = [];
     this.state.player = [];

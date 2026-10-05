@@ -1,6 +1,6 @@
 // ./src/module/LifeSimulation/Casino/ThreeCard.ts
 
-import { DEFAULT_CASINO_OPTIONS, type ThreeCardOptions } from '../../constants/casino';
+import { DEFAULT_CARD_TRICK_STATE, DEFAULT_CASINO_OPTIONS, type CardTrickState, type ThreeCardOptions } from '../../constants/casino';
 import type { PlayingCard } from './Blackjack';
 import { compareHands, threeCardRank } from './Poker';
 
@@ -13,6 +13,7 @@ interface ThreeSeat {
 }
 
 export interface ThreeCardState {
+  trick: CardTrickState;
   phase: 'ready' | 'player' | 'done';
   ante: number;
   stake: number;
@@ -28,6 +29,7 @@ export interface ThreeCardState {
 }
 
 export const DEFAULT_THREE_CARD_STATE: ThreeCardState = {
+  trick: clone(DEFAULT_CARD_TRICK_STATE),
   phase: 'ready',
   ante: DEFAULT_CASINO_OPTIONS.threeCard.antes[0],
   stake: DEFAULT_CASINO_OPTIONS.threeCard.antes[0],
@@ -96,15 +98,14 @@ class ThreeCard {
   }
 
   public set ante(ante: number) {
-    if (this.state.phase !== 'player' && this.antes.includes(ante) && Number.isSafeInteger(ante) && ante > 0)
-      Object.assign(this.state, structuredClone(DEFAULT_THREE_CARD_STATE), { ante, stake: ante });
+    if (this.state.phase !== 'player' && this.antes.includes(ante) && Number.isSafeInteger(ante) && ante > 0) Object.assign(this.state, clone(DEFAULT_THREE_CARD_STATE), { ante, stake: ante });
   }
 
   public start(): boolean {
     if (!this.canStart) return false;
     const state = this.state,
       deck = window.shuffle(window.deck());
-    Object.assign(state, structuredClone(DEFAULT_THREE_CARD_STATE), { phase: 'player', ante: state.ante, stake: state.ante, paid: false });
+    Object.assign(state, clone(DEFAULT_THREE_CARD_STATE), { phase: 'player', ante: state.ante, stake: state.ante, paid: false });
     state.seats = ['player', this.core.get('LifeSimulation')!.casino.tableGuest ?? 'regular', 'visitor'].map(name => ({ name, cards: [], seen: false, folded: false, total: state.ante }));
     for (let round = 0; round < 3; round++) for (const seat of state.seats) seat.cards.push(deck.shift()!);
     return true;
@@ -153,7 +154,9 @@ class ThreeCard {
     for (let i = 1; i < 3; i++) {
       const seat = state.seats[i];
       if (seat.folded) continue;
-      if (!seat.seen && random(1, 100) <= 55) seat.seen = true;
+      const distracted = state.trick.distracted === i;
+      if (distracted) state.trick.distracted = null;
+      if (!seat.seen && !distracted && random(1, 100) <= 55) seat.seen = true;
       const rank = seat.seen ? threeCardRank(seat.cards) : null;
       const roll = random(1, 100);
       if (rank && rank[0] === 0 && state.stake > state.ante && roll > 45) {
@@ -161,7 +164,7 @@ class ThreeCard {
         state.log.push({ seat: i, action: 'fold', amount: 0 });
         continue;
       }
-      const raise = state.stake < state.ante * 8 && roll < (rank && rank[0] >= 2 ? 22 : 6);
+      const raise = !distracted && state.stake < state.ante * 8 && roll < (rank && rank[0] >= 2 ? 22 : 6);
       if (raise) state.stake *= 2;
       const cost = state.stake * (seat.seen ? 2 : 1);
       seat.total += cost;

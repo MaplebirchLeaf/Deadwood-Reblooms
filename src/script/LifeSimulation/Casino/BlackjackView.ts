@@ -25,7 +25,7 @@ export default class BlackjackView {
     const animation = game.animation;
     game.animation = null;
     const opponent = state.venue === 'home' && state.companion ? lanSwitch(state.companion, names[state.companion] ?? state.companion) : lanSwitch('Dealer', '庄家');
-    table.append(this.hand('dealer', opponent, state.dealer, state.phase === 'player', animation));
+    table.append(this.hand('dealer', opponent, state.dealer, state.phase === 'player' && !(state.venue === 'casino' && state.trick.peeked === 1), animation));
     if (state.partner) table.append(this.hand('partner', lanSwitch(state.partner, names[state.partner] ?? state.partner), state.partner_cards, state.phase === 'player', animation));
     table.append(this.hand('player', lanSwitch('Your hand', '你的牌'), state.player, false, animation));
     this.root.append(table, this.core.SugarCube.Wikifier.wikifyEval('<<deadwood-blackjack-status>>'));

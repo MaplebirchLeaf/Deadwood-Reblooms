@@ -123,6 +123,16 @@
 		<<option 'CN'>>
 			你沿着狭窄的楼梯来到酒吧楼上。一名保安伸出手。“请出示身份证。和楼下一样。”你递出学生证，对方却立刻还了回来。“这里只接受合法身份证。”保安示意你下楼。
 	<</language>><br><br>
+<<elseif _casino.barred>>
+	<<language>>
+		<<option 'EN'>>Marlow points towards the cashier. "<span class='red'>No more cards tonight.</span> You can still collect your remaining chips."
+		<<option 'CN'>>马洛指了指筹码柜台。“<span class='red'>今晚不准再玩了。</span>剩下的筹码，你仍然可以兑回。”
+	<</language>><br><br>
+	<<if _casino.canTalk>>
+		<<lanLink ['Speak to Marlow', '与马洛说话'] 'Deadwood Reblooms Casino Marlow Talk'>><</lanLink>><br><br>
+	<<elseif _casino.canReply and _casino.state.chat_topic and !_casino.state.chat_reply and _casino.state.last_chat_night is _casino.state.guest_night>>
+		<<lanLink ['Finish talking to Marlow', '继续与马洛说话'] 'Deadwood Reblooms Casino Marlow Conversation'>><</lanLink>><br><br>
+	<</if>>
 <<elseif !_casino.available>>
 	<span class='blue'><<language>>
 		<<option 'EN'>>
@@ -146,6 +156,11 @@
 				荷官把一副牌理齐，转向你。“我叫<span class='gold'>马洛</span>。这里用筹码下注，入座前先看清赌注。”马洛敲了敲桌上的说明牌。“别等打完才来争论。”
 		<</language>><br><br>
 		<<set _casino.state.met_dealer to true>>
+	<<elseif C.npc.Marlow.rage gt 0>>
+		<<language>>
+			<<option 'EN'>>Marlow checks the deck before looking up. "You know the rules. <span class='purple'>Keep your hands to your own cards.</span>"
+			<<option 'CN'>>马洛检查完牌堆，才抬起头。“规矩你已经知道了。<span class='purple'>手只碰自己的牌。</span>”
+		<</language>><br><br>
 	<<elseif _casino.state.good_shifts gte 5>>
 		<<language>>
 			<<option 'EN'>>
@@ -228,7 +243,7 @@
 	<<option 'CN'>>
 		马洛把筹码码在牌堆旁。“每人两张底牌，中间五张公共牌。只能用你面前的筹码下注，这局结束前不能再买入。”庄位标记放在牌旁。
 <</language>><br><br>
-<<deadwood-casino-balance>><<deadwood-holdem-table>>
+<<deadwood-casino-balance>><<deadwood-holdem-table>><<deadwood-casino-tricks>>
 <<if !maplebirch.get('LifeSimulation').casino.available>><span class='blue'><<language>>
 	<<option 'EN'>>
 		The table cannot continue. You can still return your remaining chips to the counter.
@@ -248,7 +263,7 @@
 	<<option 'CN'>>
 		马洛在每个座位前放下三张朝下的牌。“可以不看牌就下注。”荷官说。“看过牌以后，要付暗牌注额的两倍。想跟别人比牌，也得先付筹码。”
 <</language>><br><br>
-<<deadwood-casino-balance>><<deadwood-three-card-table>>
+<<deadwood-casino-balance>><<deadwood-three-card-table>><<deadwood-casino-tricks>>
 <<if !maplebirch.get('LifeSimulation').casino.available>><span class='blue'><<language>>
 	<<option 'EN'>>
 		The table cannot continue. You may leave, giving up the chips already committed.

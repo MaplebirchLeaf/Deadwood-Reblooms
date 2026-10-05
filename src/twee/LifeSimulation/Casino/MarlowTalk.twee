@@ -4,12 +4,19 @@
 <<npc 'Marlow'>><<person1>>
 <<if maplebirch.get('LifeSimulation').casino.canTalk>>
 	<<language>>
-		<<option 'EN'>>Marlow sets a fresh deck beside the chip tray. "I've got a few minutes before the next deal. What's on your mind?"
-		<<option 'CN'>>马洛把一副新牌放在筹码托盘旁。“下次发牌前还有几分钟。想聊什么？”
+		<<option 'EN'>>
+			Marlow sets a fresh deck beside the chip tray.
+			<<if C.npc.Marlow.rage gt 0>>"A few minutes. Then I need to get back to the table." Marlow keeps the deck within reach.
+			<<else>>"I've got a few minutes before the next deal. What's on your mind?"<</if>>
+		<<option 'CN'>>
+			马洛把一副新牌放在筹码托盘旁。
+			<<if C.npc.Marlow.rage gt 0>>“只能聊几分钟。我还得回牌桌。”马洛把牌留在手边。
+			<<else>>“下次发牌前还有几分钟。想聊什么？”<</if>>
 	<</language>><br><br>
 	<<socialiseicon>><<lanLink ['Ask about the work (0:05)', '聊聊荷官的工作 (0:05)']>><<deadwood-marlow-talk 'work'>><</lanLink>><br>
 	<<socialiseicon>><<lanLink ['Ask how Marlow learned to deal (0:05)', '问问马洛是怎么入行的 (0:05)']>><<deadwood-marlow-talk 'past'>><</lanLink>><br>
-	<<socialiseicon>><<lanLink ['Talk about gambling (0:05)', '聊聊赌钱的事 (0:05)']>><<deadwood-marlow-talk 'gambling'>><</lanLink>><br><br>
+	<<socialiseicon>><<lanLink ['Talk about gambling (0:05)', '聊聊赌钱的事 (0:05)']>><<deadwood-marlow-talk 'gambling'>><</lanLink>><br>
+	<<socialiseicon>><<lanLink ['Ask about life away from the tables (0:05)', '问问下班后做些什么 (0:05)']>><<deadwood-marlow-talk 'off_duty'>><</lanLink>><br><br>
 <<else>>
 	<<language>>
 		<<option 'EN'>>Marlow is busy with the table. "Another time. I need to count these."
@@ -64,14 +71,25 @@
 						“也是荷官教我的。”马洛说。“后来自己练，先学别把牌面露出来，再练点筹码。我当时觉得自己学会了，其实还差得远。”马洛检查了一下牌边。“发错牌，往往是客人先发现。”
 					<</if>>
 			<</language>>
+		<<case 'off_duty'>>
+			<<language>>
+				<<option 'EN'>>
+					Marlow presses a thumb against the edge of the deck. "By closing time, I've heard enough about cards. I like a <span class='teal'>quiet breakfast</span>. Something hot, and nobody asking what the odds are." A laugh comes from the next table. Marlow waits for it to pass.<br><br>
+					<<if C.npc.Marlow.love gte 10 and (C.npc.Marlow.rage ?? 0) is 0>>"There's a bakery I stop at on the way home. If I'm early, the bread's still warm." Marlow smiles. "That's a better reason to hurry through clearing up than another game."
+					<<else>>"I leave the uniform here. Gives me somewhere to stop thinking about work." Marlow squares the deck and glances towards the waiting players.<</if>>
+				<<option 'CN'>>
+					马洛用拇指抵住牌边。“收工的时候，牌的事早就听够了。我喜欢<span class='teal'>安安静静吃顿早饭</span>。吃点热的，没人追着问胜算有多大。”隔壁牌桌传来一阵笑声，马洛等那声音过去。<br><br>
+					<<if C.npc.Marlow.love gte 10 and (C.npc.Marlow.rage ?? 0) is 0>>“回家路上有家面包店，我常去。去得早，面包还是热的。”马洛笑了笑。“为了这个早点收拾完，比再玩一局有意思。”
+					<<else>>“制服就留在店里。总得有个不用再想工作的地方。”马洛把牌理齐，朝等着的客人看了一眼。<</if>>
+			<</language>>
 		<<case 'gambling'>>
 			<<language>>
 				<<option 'EN'>>
-					Marlow taps the rules card. "I get paid to deal, whether you win or lose. I can't tell you the next card." A customer asks for another drink; Marlow waits until the server has passed.<br><br>
+					Marlow taps the rules card. "Miscount? Call me over. But <span class='red'>peek at someone else's cards, and I'll stop the hand</span>. I won't help you cheat. I get paid to deal, whether you win or lose. I can't tell you the next card." A customer asks for another drink; Marlow waits until the server has passed.<br><br>
 					<<if maplebirch.get('LifeSimulation').casino.chips gte 250000>>"You've got plenty of chips there. <span class='blue'>Decide how much you're willing to lose</span> before you sit down. There's nothing wrong with taking the rest back to the cashier."
 					<<else>>"<span class='teal'>Watching doesn't cost you anything</span>. If you do play, use what you can spare. Don't borrow because you think the next hand will make it back."<</if>>
 				<<option 'CN'>>
-					马洛敲了敲桌上的说明牌。“我拿的是发牌的工资，不管你输还是赢。下一张是什么，我也不能告诉你。”有客人叫了杯酒，马洛等服务员走过，才继续说下去。<br><br>
+					马洛敲了敲桌上的说明牌。“点错筹码，叫我过去就好。但<span class='red'>偷看别人的牌，我就得停下这局</span>。也别指望我帮你作弊。我拿的是发牌的工资，不管你输还是赢。下一张是什么，我也不能告诉你。”有客人叫了杯酒，马洛等服务员走过，才继续说下去。<br><br>
 					<<if maplebirch.get('LifeSimulation').casino.chips gte 250000>>“你手里的筹码不少。坐下之前，<span class='blue'>想好最多能输多少</span>。剩下的拿去柜台兑回，也没什么不好意思的。”
 					<<else>>“<span class='teal'>站在旁边看又不花钱</span>。真要玩，就用你花得起的钱。别想着下一局能赢回来，就去借钱。”<</if>>
 			<</language>>
@@ -79,9 +97,15 @@
 	<div id='marlow-reply'>
 		<<if _marlow.chat_reply>>
 			<<deadwood-marlow-reply-text>>
-		<<elseif maplebirch.get('LifeSimulation').casino.available and _marlow.work_scenario is null and !$worn.face.type.includes('gag')>>
+		<<elseif maplebirch.get('LifeSimulation').casino.canReply>>
 			<<socialiseicon>><<lanLink ['Listen and thank Marlow', '认真听完，向马洛道谢']>><<deadwood-marlow-reply 'listen'>><</lanLink>><br>
 			<<socialiseicon>><<lanLink ['Make a light-hearted remark', '顺着话题开个玩笑']>><<deadwood-marlow-reply 'joke'>><</lanLink>><br>
+			<<if _marlow.chat_topic is 'gambling'>>
+				<<lanLink ['Ask Marlow to overlook a little cheating', '让马洛对作弊睁一只眼闭一只眼']>><<deadwood-marlow-reply 'pressure'>><</lanLink>><<llove 'Marlow'>><br>
+			<</if>>
+			<<if C.npc.Marlow.rage gt 0>>
+				<<lanLink ['Apologise for your behaviour at the table', '为自己在牌桌上的举动道歉']>><<deadwood-marlow-reply 'apologise'>><</lanLink>><br>
+			<</if>>
 		<<else>>
 			<<language>><<option 'EN'>>Marlow goes back to the table. You'll have to finish talking another time.<<option 'CN'>>马洛回到牌桌旁。剩下的话，改天再聊吧。<</language>>
 		<</if>>
@@ -95,7 +119,7 @@
 :: Deadwood Reblooms Casino Marlow Talk Widgets [widget]
 <<widget 'deadwood-marlow-talk'>>
 	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
-	<<if $_casino.canTalk and ['work', 'past', 'gambling'].includes(_args[0])>>
+	<<if $_casino.canTalk and ['work', 'past', 'gambling', 'off_duty'].includes(_args[0])>>
 		<<set $_casino.state.last_chat_night to $_casino.state.guest_night>>
 		<<set $_casino.state.chat_topic to _args[0]>><<set $_casino.state.chat_reply to ''>>
 		<<pass 5>>
@@ -105,35 +129,54 @@
 
 <<widget 'deadwood-marlow-reply'>>
 	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
-	<<if $_casino.available and $_casino.state.work_scenario is null and $_casino.state.last_chat_night is $_casino.state.guest_night and $_casino.state.chat_topic and !$_casino.state.chat_reply and ['listen', 'joke'].includes(_args[0]) and !$worn.face.type.includes('gag')>>
+	<<if $_casino.canReply and $_casino.state.last_chat_night is $_casino.state.guest_night and $_casino.state.chat_topic and !$_casino.state.chat_reply and (['listen', 'joke'].includes(_args[0]) or (_args[0] is 'pressure' and $_casino.state.chat_topic is 'gambling') or (_args[0] is 'apologise' and C.npc.Marlow.rage gt 0)) and !$worn.face.type.includes('gag')>>
 		<<set $_casino.state.chat_reply to _args[0]>>
-		<<set C.npc.Marlow.love to Math.clamp((C.npc.Marlow.love ?? 0) + 1, 0, 30)>>
-		<<replace '#marlow-reply'>><<deadwood-marlow-reply-text>><<glove 'Marlow'>><</replace>>
+		<<if _args[0] is 'pressure'>>
+			<<set C.npc.Marlow.love to Math.max(0, C.npc.Marlow.love - 4)>><<set C.npc.Marlow.rage to Math.min(30, (C.npc.Marlow.rage ?? 0) + 5)>>
+		<<elseif _args[0] is 'apologise'>>
+			<<set C.npc.Marlow.rage to Math.max(0, C.npc.Marlow.rage - 4)>>
+		<<else>>
+			<<set C.npc.Marlow.love to Math.min(30, C.npc.Marlow.love + 1)>><<set C.npc.Marlow.rage to Math.max(0, (C.npc.Marlow.rage ?? 0) - 1)>>
+		<</if>>
+		<<replace '#marlow-reply'>><<deadwood-marlow-reply-text>>
+			<<if _args[0] is 'pressure'>><<llove 'Marlow'>><<elseif _args[0] isnot 'apologise'>><<glove 'Marlow'>><</if>>
+		<</replace>>
 	<</if>>
 <</widget>>
 
 <<widget 'deadwood-marlow-reply-text'>>
-	<<set $_chat to $LifeSimulation.casino>>
 	<<language>>
 		<<option 'EN'>>
-			<<if $_chat.chat_reply is 'listen'>>
-				You listen and thank Marlow. <<if $_chat.chat_topic is 'work'>>"Ask if you need help. That's what I'm here for." Marlow straightens the deck again.
-				<<elseif $_chat.chat_topic is 'past'>>Marlow smiles. "Next time, you can tell me how you spend your evenings."
+			<<if $LifeSimulation.casino.chat_reply is 'pressure'>>
+				Marlow's smile disappears. "<span class='red'>No.</span> The other players paid to sit here too. If you want someone to teach you the rules, ask. If you want someone to help you cheat, find another table."
+			<<elseif $LifeSimulation.casino.chat_reply is 'apologise'>>
+				Marlow pauses before answering. "Then <span class='blue'>show me at the table</span>. Keep your hands to your own cards." <span class='teal'>Marlow sounds less guarded.</span> <<if maplebirch.get('LifeSimulation').casino.barred>><span class='red'>You still cannot play again tonight.</span><</if>>
+			<<elseif $LifeSimulation.casino.chat_reply is 'listen'>>
+				You listen and thank Marlow. <<if $LifeSimulation.casino.chat_topic is 'work'>>"Ask if you need help. That's what I'm here for." Marlow straightens the deck again.
+				<<elseif $LifeSimulation.casino.chat_topic is 'off_duty'>>"A hot breakfast and a walk home. That's usually enough." Marlow nods, keeping the deck to one side.
+				<<elseif $LifeSimulation.casino.chat_topic is 'past'>>Marlow smiles. "Next time, you can tell me how you spend your evenings."
 				<<else>>"Your choice," Marlow says. "I'm happy to explain the game either way."<</if>>
 			<<else>>
-				<<if $_chat.chat_topic is 'work'>>"So shouting louder isn't in the training?" you ask. Marlow laughs. "No. And it doesn't pay extra."
-				<<elseif $_chat.chat_topic is 'past'>>"So you weren't born with a deck in your hand?" you ask. Marlow laughs. "No. I had to learn to stop dropping them first."
+				<<if $LifeSimulation.casino.chat_topic is 'work'>>"So shouting louder isn't in the training?" you ask. Marlow laughs. "No. And it doesn't pay extra."
+				<<elseif $LifeSimulation.casino.chat_topic is 'off_duty'>>"No chips with breakfast, then?" you ask. "Only the kind that comes with eggs," Marlow replies.
+				<<elseif $LifeSimulation.casino.chat_topic is 'past'>>"So you weren't born with a deck in your hand?" you ask. Marlow laughs. "No. I had to learn to stop dropping them first."
 				<<else>>"I'll try not to blame you for the next card," you say. "That'll make a change," Marlow replies, smiling.<</if>>
 			<</if>>
 			 A customer calls from a table. Marlow gives you a nod before returning to the cards.
 		<<option 'CN'>>
-			<<if $_chat.chat_reply is 'listen'>>
-				你认真听完，向马洛道谢。<<if $_chat.chat_topic is 'work'>>“有事就问，我就是做这个的。”马洛又把牌理齐。
-				<<elseif $_chat.chat_topic is 'past'>>马洛笑了笑。“下次也说说你晚上都做什么吧。”
+			<<if $LifeSimulation.casino.chat_reply is 'pressure'>>
+				马洛收起了笑容。“<span class='red'>不行。</span>别人也是花钱坐在这儿的。想学规矩，你可以问我。想找人帮你作弊，就去别的桌子。”
+			<<elseif $LifeSimulation.casino.chat_reply is 'apologise'>>
+				马洛停了一下，才回答。“那就<span class='blue'>在牌桌上做给我看</span>。手只碰自己的牌。”<span class='teal'>马洛的语气缓和了些。</span><<if maplebirch.get('LifeSimulation').casino.barred>><span class='red'>今晚仍不能再玩牌。</span><</if>>
+			<<elseif $LifeSimulation.casino.chat_reply is 'listen'>>
+				你认真听完，向马洛道谢。<<if $LifeSimulation.casino.chat_topic is 'work'>>“有事就问，我就是做这个的。”马洛又把牌理齐。
+				<<elseif $LifeSimulation.casino.chat_topic is 'off_duty'>>“吃顿热早饭，再走回家。平常这样就够了。”马洛点点头，把牌放在一旁。
+				<<elseif $LifeSimulation.casino.chat_topic is 'past'>>马洛笑了笑。“下次也说说你晚上都做什么吧。”
 				<<else>>“看你自己。”马洛说。“想玩的话，不懂的规矩可以问我。”<</if>>
 			<<else>>
-				<<if $_chat.chat_topic is 'work'>>“那培训不教怎么喊得比别人响？”你问。马洛笑出了声。“不教，喊得响也不多发工资。”
-				<<elseif $_chat.chat_topic is 'past'>>“原来你也不是天生就会发牌？”你问。马洛笑了起来。“当然不是，光是学着不掉牌，就练了好久。”
+				<<if $LifeSimulation.casino.chat_topic is 'work'>>“那培训不教怎么喊得比别人响？”你问。马洛笑出了声。“不教，喊得响也不多发工资。”
+				<<elseif $LifeSimulation.casino.chat_topic is 'off_duty'>>“早饭也不配几枚筹码？”你问。“配个鸡蛋就行。”马洛答道。
+				<<elseif $LifeSimulation.casino.chat_topic is 'past'>>“原来你也不是天生就会发牌？”你问。马洛笑了起来。“当然不是，光是学着不掉牌，就练了好久。”
 				<<else>>“下一张牌不好，我尽量不怪你。”你说。“那倒是难得。”马洛笑着回答。<</if>>
 			<</if>>
 			有客人在牌桌旁叫了一声。马洛朝你点点头，继续回去发牌。

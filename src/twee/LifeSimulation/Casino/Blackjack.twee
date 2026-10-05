@@ -107,6 +107,8 @@
 	<<if $_bjState.phase isnot 'done'>>
 		<<if $_bjState.phase is 'player'>><<lanSwitch 'Take another card, or stand on your current hand.' '你可以再要一张牌，或以现有的点数停牌。'>>
 		<<else>><<lanSwitch 'The cards wait on the table.' '牌已经放在桌上。'>><</if>>
+	<<elseif $_bjState.venue is 'casino' and $_bjState.trick.result is 'caught'>>
+		<span class='red'><<lanSwitch 'Hand forfeited. Lost £' '本局弃牌，损失 £'>><<print $_bjState.bet / 100>>.</span>
 	<<else>>
 		<<set $_bjWinners to $_bjGame.winningSeats>>
 		<span @class="!$_bjWinners.length || $_bjGame.playerEliminated ? 'blue' : $_bjState.result === 'loss' ? 'red' : $_bjState.result === 'push' ? 'blue' : 'gold'">
@@ -256,6 +258,7 @@
 		<</if>>
 	<</if>>
 	<<deadwood-blackjack-table>>
+	<<if _blackjackGame.state.venue is 'casino'>><<deadwood-casino-tricks>><</if>>
 	<<if !_blackjackGame.available>>
 		<span class='blue'><<lanSwitch 'You cannot continue here now. Leave the table for another time.' '现在无法继续这场牌局。留到下次再玩吧。'>></span><br><br>
 	<<elseif _blackjackGame.state.venue isnot 'home' and !_blackjackGame.canStart and _blackjackGame.state.phase isnot 'player'>>

@@ -1,6 +1,6 @@
 // ./src/module/LifeSimulation/Casino/Holdem.ts
 
-import { DEFAULT_CASINO_OPTIONS, type HoldemOptions } from '../../constants/casino';
+import { DEFAULT_CARD_TRICK_STATE, DEFAULT_CASINO_OPTIONS, type CardTrickState, type HoldemOptions } from '../../constants/casino';
 import type { PlayingCard } from './Blackjack';
 import { holdemRank, settlePots, type PokerPot } from './Poker';
 
@@ -15,6 +15,7 @@ interface HoldemSeat {
 }
 
 export interface HoldemState {
+  trick: CardTrickState;
   joined: boolean;
   buy_in: number;
   button: number;
@@ -32,6 +33,7 @@ export interface HoldemState {
 }
 
 export const DEFAULT_HOLDEM_STATE: HoldemState = {
+  trick: clone(DEFAULT_CARD_TRICK_STATE),
   joined: false,
   buy_in: DEFAULT_CASINO_OPTIONS.holdem.buyIns[0],
   button: 2,
@@ -128,7 +130,7 @@ class Holdem {
     )
       return false;
     const casino = this.core.get('LifeSimulation')!.casino;
-    Object.assign(this.state, structuredClone(DEFAULT_HOLDEM_STATE), { joined: true, buy_in: amount });
+    Object.assign(this.state, clone(DEFAULT_HOLDEM_STATE), { joined: true, buy_in: amount });
     this.state.seats = (this.watching ? ['regular', 'visitor', 'guest'] : ['player', casino.tableGuest ?? 'regular', 'visitor']).map(name => ({
       name,
       stack: amount,
@@ -146,7 +148,17 @@ class Holdem {
     const state = this.state;
     state.button = (state.button + 1) % 3;
     state.deck = window.shuffle(window.deck());
-    Object.assign(state, { board: [], phase: 'preflop', current_bet: this.bigBlind, last_raise: this.bigBlind, pots: [], fee: 0, log: [], showdown: false });
+    Object.assign(state, {
+      board: [],
+      phase: 'preflop',
+      current_bet: this.bigBlind,
+      last_raise: this.bigBlind,
+      pots: [],
+      fee: 0,
+      log: [],
+      showdown: false,
+      trick: clone(DEFAULT_CARD_TRICK_STATE)
+    });
     state.seats.forEach((seat, index) => {
       if (index === 1 && !this.watching) {
         const name = this.core.get('LifeSimulation')!.casino.tableGuest ?? 'regular';
@@ -273,6 +285,8 @@ class Holdem {
   private opponent(index: number): void {
     const seat = this.state.seats[index],
       state = this.state;
+    const distracted = !this.watching && state.trick.distracted === index;
+    if (distracted) state.trick.distracted = null;
     const values = seat.cards.map(card => card.value).sort((a, b) => b - a);
     // 只看自己的底牌、公开公共牌和下注；不会读取 PC 的牌或未来牌。
     const rank = state.board.length ? holdemRank([...seat.cards, ...state.board]) : null;
@@ -285,7 +299,7 @@ class Holdem {
     }
     const target = state.current_bet + Math.max(state.last_raise, this.bigBlind * 2);
     if (
-      roll < 0.12 + strength * 0.12 &&
+      roll < (0.12 + strength * 0.12) * (distracted ? 0.25 : 1) &&
       this.raiseOpen(index) &&
       seat.stack + seat.street_bet >= target &&
       state.seats.some((other, otherIndex) => otherIndex !== index && !other.folded && other.stack > 0)
@@ -311,7 +325,7 @@ class Holdem {
       this.advance();
     }
     const chips = this.player!.stack;
-    Object.assign(this.state, structuredClone(DEFAULT_HOLDEM_STATE));
+    Object.assign(this.state, clone(DEFAULT_HOLDEM_STATE));
     return chips;
   }
 }

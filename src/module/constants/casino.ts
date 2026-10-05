@@ -15,6 +15,17 @@ export interface HoldemOptions {
   bigBlindDivisor: number;
 }
 
+/** 每手牌只尝试一次小动作；公开线索与分心只属于当前手牌。 */
+export interface CardTrickState {
+  used: boolean;
+  opponent: string;
+  peeked: number | null;
+  distracted: number | null;
+  result: '' | 'peek' | 'distract' | 'miss' | 'noticed' | 'caught' | 'refused';
+}
+
+export const DEFAULT_CARD_TRICK_STATE: CardTrickState = { used: false, opponent: '', peeked: null, distracted: null, result: '' };
+
 export interface CasinoOptions {
   exchanges: readonly number[];
   blackjack: BlackjackOptions;

@@ -6,7 +6,11 @@
 	<<npc 'Marlow'>><<person1>>
 	<<language>>
 		<<option 'EN'>>
-			<<if _casino.state.good_shifts gte 5>>
+			<<if C.npc.Marlow.rage gte 10>>
+				Marlow keeps the deck out of your reach. "You can play by the rules. But <span class='red'>I'm not putting you in charge of a table</span>."
+			<<elseif C.npc.Marlow.rage gt 0>>
+				Marlow leaves a hand on the deck. "What do you need? <span class='purple'>Keep your hands off the cards</span> until it's your turn."
+			<<elseif _casino.state.good_shifts gte 5>>
 				Marlow puts the deck down when you approach. "Good to see you. Here to play, or taking a shift?"
 			<<elseif _casino.state.trained>>
 				Marlow finishes counting a stack of chips. "Back again? There's a table you can take if you want a shift."
@@ -16,7 +20,11 @@
 				Marlow pays out the winning hand, then turns to you. "Need something? I can explain the tables, or show you the work if you're interested."
 			<</if>>
 		<<option 'CN'>>
-			<<if _casino.state.good_shifts gte 5>>
+			<<if C.npc.Marlow.rage gte 10>>
+				马洛把牌留在你够不着的地方。“按规矩玩可以。但<span class='red'>我不会让你照看牌桌</span>。”
+			<<elseif C.npc.Marlow.rage gt 0>>
+				马洛把手留在牌堆上。“有什么事？没轮到你，就<span class='purple'>别碰桌上的牌</span>。”
+			<<elseif _casino.state.good_shifts gte 5>>
 				见你过来，马洛放下牌。“你来了。今晚来玩，还是接个班？”
 			<<elseif _casino.state.trained>>
 				马洛数完一摞筹码。“又来了？想接班的话，有张桌子需要人照看。”
@@ -66,7 +74,12 @@
 			<</lanLink>><br>
 		<</if>>
 	<</if>>
-	<<if !_casino.canWork>>
+	<<if C.npc.Marlow.rage gte 10>>
+		<<language>>
+			<<option 'EN'>>"An honest mistake I can correct," Marlow says. "Cheating is different. <span class='red'>I need to trust you before you deal for me again.</span>"
+			<<option 'CN'>>“点错筹码，我可以帮你纠正。”马洛说。“故意作弊是另一回事。<span class='red'>我得能信得过你，才能再让你发牌。</span>”
+		<</language>><br>
+	<<elseif !_casino.canWork>>
 		<<language>>
 			<<option 'EN'>>
 				You <span class='blue'>cannot take a shift now</span>. Finish any hand you are playing first. You must be able to use your hands and speak, and be rested enough to work for an hour. No new shifts begin after <span class='gold'>03:00</span>.

@@ -26,7 +26,7 @@ class TableView {
     this.root.append(core.SugarCube.Wikifier.wikifyEval(widget));
     for (const spot of this.root.querySelectorAll<HTMLElement>('[data-cards]')) {
       const cards = spot.dataset.cards === 'board' ? (game as Holdem).state.board : (game.state.seats[Number(spot.dataset.cards)]?.cards ?? []);
-      this.cards(spot, cards, spot.dataset.visible === 'true', Number(spot.dataset.placeholders ?? 0));
+      this.cards(spot, cards, spot.dataset.visible === 'true', Number(spot.dataset.placeholders ?? 0), spot.dataset.peek === 'true');
     }
     for (const input of this.root.querySelectorAll<HTMLInputElement>('input[data-disabled]')) input.disabled = input.dataset.disabled === 'true';
     for (const button of this.root.querySelectorAll<HTMLButtonElement>('button[data-action]')) {
@@ -57,10 +57,10 @@ class TableView {
     if (this.core.passage.title === passage) this.core.SugarCube.Engine.play(action === 'cashout' ? casinoPassage : passage);
   }
 
-  private cards(parent: HTMLElement, cards: readonly PlayingCard[], visible: boolean, placeholders = 0): void {
+  private cards(parent: HTMLElement, cards: readonly PlayingCard[], visible: boolean, placeholders = 0, peek = false): void {
     const displayed: (PlayingCard | null)[] = cards.length ? [...cards] : Array.from({ length: placeholders }, () => null);
-    for (const card of displayed) {
-      const { image, ready } = cardImage(card, !visible);
+    for (const [index, card] of displayed.entries()) {
+      const { image, ready } = cardImage(card, !visible && !(peek && index === 0));
       this.loads.push(ready);
       parent.append(image);
       this.images.push(image);
