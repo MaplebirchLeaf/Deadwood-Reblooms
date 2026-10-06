@@ -4,6 +4,7 @@ import paperhangings from './Paperhangings.json';
 import PropertyCatalog, { type Property, type ResidentProfile } from './PropertyCatalog';
 import type Finance from './Finance';
 import Mortgage, { type MortgageState } from './Mortgage';
+import rentalTerms from '../../assets/finance/rentals.json';
 
 type PropertyId = string;
 type PropertyRoom = 'bedroom' | 'bathroom' | 'kitchen' | 'desk' | 'guest' | 'retreat' | 'outdoor' | 'balcony';
@@ -17,6 +18,9 @@ export interface RealEstateState {
   visiting: PropertyId | null;
   floor: number;
   mortgage: MortgageState | null;
+  mortgage_term: number;
+  collateral_property: PropertyId | null;
+  tenant_property: PropertyId | null;
   management: Record<PropertyId, PropertyManagement>;
   last_managed_day: number;
   last_auction: AuctionRecord | null;
@@ -38,6 +42,8 @@ interface PropertyManagement {
   lease_end_day: number | null;
   auction_day: number | null;
   next_settlement_day: number;
+  vacancy_until: number;
+  rental_issue: { type: 'leak' | 'arrears'; rent: number; day: number } | null;
   bed_id: string | null;
   wardrobe_id: string | null;
   furnishings?: Partial<Record<FurnitureKind, string>>;
@@ -50,6 +56,7 @@ interface AuctionRecord {
   proceeds: number;
   debt: number;
   surplus: number;
+  shortfall: number;
   day: number;
 }
 
@@ -59,6 +66,9 @@ export class RealEstate {
     visiting: null,
     floor: 1,
     mortgage: null,
+    mortgage_term: 365,
+    collateral_property: null,
+    tenant_property: null,
     management: {},
     last_managed_day: -1,
     last_auction: null,
@@ -305,11 +315,11 @@ export class RealEstate {
     return 'ok';
   }
 
-  public buyWithMortgage(id: PropertyId, useCredit = false): string {
+  public buyWithMortgage(id: PropertyId, useCredit = false, days = this.mortgage.terms.term_days): string {
     const property = this.properties.find(item => item.id === id);
     if (!property) return 'invalid';
     if (this.owns(id)) return 'owned';
-    const result = this.mortgage.start(id, this.askingPrice(id), useCredit);
+    const result = this.mortgage.start(id, this.askingPrice(id), useCredit, days);
     if (result !== 'ok') return result;
     this.state.owned[id] = true;
     this.state.management[id] = RealEstate.newManagement();
@@ -317,11 +327,29 @@ export class RealEstate {
     return 'ok';
   }
 
+  public appraisal(id: PropertyId): number {
+    const management = this.managementFor(id);
+    return Math.floor(this.askingPrice(id) * (0.8 + management.condition / 500) * (1 + management.renovation * 0.1));
+  }
+
+  public collateralLimit(id: PropertyId): number {
+    if (!this.owns(id) || this.mortgage.current || this.managementFor(id).auction_day !== null || this.isFrozen(id)) return 0;
+    return Math.floor((this.appraisal(id) * this.mortgage.terms.collateral_percent) / 100);
+  }
+
+  public borrowAgainst(id: PropertyId, pounds: number, days = this.mortgage.terms.term_days): string {
+    const maximum = this.collateralLimit(id);
+    if (!maximum) return 'mortgage-ineligible';
+    return this.mortgage.borrowAgainst(id, Math.round(pounds * 100), maximum, days);
+  }
+
   private static newManagement(): PropertyManagement {
     return {
       condition: 100,
       renovation: 0,
       rented: false,
+      vacancy_until: 0,
+      rental_issue: null,
       lease_end_day: null,
       auction_day: null,
       next_settlement_day: RealEstate.today + 7,
@@ -518,7 +546,37 @@ export class RealEstate {
     const management = this.managementFor(id);
     if (management.rented || management.auction_day !== null || management.condition < this.mortgage.terms.rental.minimum_condition) return false;
     management.rented = true;
+    management.vacancy_until = RealEstate.today + rentalTerms.vacancyDays;
+    management.rental_issue = null;
     management.lease_end_day = null;
+    return true;
+  }
+
+  public tenantKey(id: PropertyId): string {
+    return `deadwood_property_tenant_${id}`;
+  }
+
+  public rentalRepairCost(id: PropertyId): number {
+    return Math.ceil(this.askingPrice(id) * rentalTerms.repairPriceRate);
+  }
+
+  public settleRentalIssue(id: PropertyId, choice: 'repair' | 'wait' | 'negotiate'): boolean {
+    if (!this.owns(id)) return false;
+    const management = this.managementFor(id);
+    const issue = management.rental_issue;
+    if (!management.rented || !issue) return false;
+    if (issue.type === 'leak') {
+      if (this.isFrozen(id)) return false;
+      if (choice !== 'repair' || this.finance.payFromBankPennies(this.rentalRepairCost(id)) !== 'ok') return false;
+      management.condition = Math.min(100, management.condition + rentalTerms.neglectedConditionLoss);
+    } else {
+      if (choice === 'wait' && RealEstate.today - issue.day < 7) return false;
+      if (!['wait', 'negotiate'].includes(choice)) return false;
+      const payment = Math.floor(issue.rent * (choice === 'negotiate' ? rentalTerms.arrearsNegotiationRate : 1));
+      if (this.isFrozen(id)) this.mortgage.applySeizedRent(payment);
+      else this.finance.creditBankPennies(payment);
+    }
+    management.rental_issue = null;
     return true;
   }
 
@@ -567,9 +625,21 @@ export class RealEstate {
         const management = this.managementFor(property.id);
         if (day >= management.next_settlement_day) {
           const upkeep = this.maintenanceCost(property.id);
-          if (management.rented && management.condition >= this.mortgage.terms.rental.minimum_condition) {
+          if (management.rented && day < management.vacancy_until) {
+            this.finance.collectBankPennies(upkeep);
+          } else if (management.rented && management.condition >= this.mortgage.terms.rental.minimum_condition) {
             // 租客支付当周租金和维护费。冻结时净租金先抵房贷。
-            const netRent = Math.max(0, this.weeklyRent(property.id) - upkeep);
+            let netRent = Math.max(0, this.weeklyRent(property.id) - upkeep);
+            if (!management.rental_issue && random(1, 100) <= rentalTerms.issueChance) {
+              management.rental_issue = { type: random(0, 1) ? 'leak' : 'arrears', rent: netRent, day };
+            }
+            if (management.rental_issue?.type === 'leak') {
+              netRent = Math.floor(netRent * rentalTerms.leakRentMultiplier);
+              management.condition = Math.max(0, management.condition - rentalTerms.neglectedConditionLoss);
+            } else if (management.rental_issue?.type === 'arrears') {
+              // 只暂扣发生问题的这一周租金，后续正常租金不会继续累积为同一笔欠租。
+              if (management.rental_issue.day === day) netRent = 0;
+            }
             if (this.isFrozen(property.id)) this.mortgage.applySeizedRent(netRent);
             else this.finance.creditBankPennies(netRent);
             management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.condition_loss_per_week);
@@ -585,6 +655,8 @@ export class RealEstate {
         if (management.lease_end_day !== null && day >= management.lease_end_day) {
           management.rented = false;
           management.lease_end_day = null;
+          management.rental_issue = null;
+          delete V.per_npc?.[this.tenantKey(property.id)];
         }
         if (management.auction_day !== null && day >= management.auction_day) this.sellByAuction(property.id, 'voluntary', 0, day);
       }
@@ -598,21 +670,23 @@ export class RealEstate {
     const property = this.properties.find(item => item.id === id);
     if (!property || !this.owns(id)) return;
     const management = this.managementFor(id);
-    const conditionFactor = 0.8 + management.condition / 500;
-    const renovationFactor = 1 + management.renovation * 0.1;
-    const assessedValue = Math.floor(property.price * conditionFactor * renovationFactor);
+    const assessedValue = this.appraisal(id);
     const percent = kind === 'foreclosure' ? this.mortgage.terms.foreclosure_auction_percent : this.mortgage.terms.voluntary_auction_percent;
     const proceeds = Math.floor((assessedValue * percent) / 100);
-    // 拍卖只把抵债后的余额存入银行，房贷状态由 Mortgage 在回调前结束。债务高于拍价时不产生负存款。
+    // 拍卖只返还抵债后的余额，不足部分单独追偿，不清空或透支银行账户。
     const surplus = Math.max(0, proceeds - debt);
+    const shortfall = Math.max(0, debt - proceeds);
     this.finance.creditBankPennies(surplus);
-    this.state.last_auction = { property_id: id, kind, proceeds, debt, surplus, day };
+    this.finance.addCollectionDebt(shortfall, 'mortgage', day);
+    this.state.last_auction = { property_id: id, kind, proceeds, debt, surplus, shortfall, day };
     this.state.owned[id] = false;
     // 地块沿用原版 $plots。产权拍卖后清掉这处房屋的作物，避免重新购买时接手旧存档的苗圃。
     if (V.plots) delete V.plots[id];
     const displaced = this.state.residents?.[id] ?? [];
     if (this.state.residents) this.state.residents[id] = [];
     management.rented = false;
+    management.rental_issue = null;
+    delete V.per_npc?.[this.tenantKey(id)];
     management.lease_end_day = null;
     management.auction_day = null;
     const wardrobe = (V.wardrobes as Record<string, Record<string, unknown>> | undefined)?.[`deadwood_${id}`];

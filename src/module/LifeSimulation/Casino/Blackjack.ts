@@ -87,7 +87,7 @@ class Blackjack {
   }
 
   public get bets(): readonly number[] {
-    return this.options.bets;
+    return this.state.venue === 'casino' ? this.options.bets : this.options.bets.filter(bet => bet <= 50000);
   }
 
   public get funds(): number {

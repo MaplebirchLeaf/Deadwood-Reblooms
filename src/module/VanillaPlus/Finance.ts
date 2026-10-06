@@ -1,8 +1,11 @@
 // ./src/module/VanillaPlus/Finance.ts
 
 import Securities, { type Security } from './Securities';
+import MarginTrading, { type MarginState } from './MarginTrading';
+import tradingTerms from '../../assets/finance/trading.json';
 import securitiesSource from '@/assets/finance/securities.yaml';
 import type { MacroDefinition } from 'twine-sugarcube';
+import type Robin from '../Robin';
 
 export type FinanceResult =
   | 'ok'
@@ -54,12 +57,18 @@ interface BankState {
   loan_next_payment_day: number;
   loan_interest_last_day: number;
   loan_missed_payments: number;
+  loan_project: 'shop' | 'orchard' | null;
 }
 
 interface BrokerageState {
   opened: boolean;
   cash: number;
   holdings: Record<string, number>;
+  costs: Record<string, number>;
+  realised: number;
+  dividends: number;
+  dividend_day: number;
+  margin: MarginState;
 }
 
 interface MarketState {
@@ -68,6 +77,7 @@ interface MarketState {
   day: number;
   prices: Record<string, number>;
   previous_prices: Record<string, number>;
+  history: { day: number; prices: Record<string, number> }[];
   farm_stage?: number;
   farm_attack_damage?: number;
   pending_farm_moves?: Record<string, number>;
@@ -79,6 +89,8 @@ export interface FinanceState {
   bank: BankState;
   brokerage: BrokerageState;
   market: MarketState;
+  collection: { amount: number; due_day: number; source: 'mortgage' | 'margin' | 'bank' | 'mixed'; destination: 'farm' | 'brothel' | null; extended: boolean; encounter_day: number };
+  last_result: string | null;
 }
 
 const PENCE_PER_POUND = 100;
@@ -155,22 +167,32 @@ export const DEFAULT_FINANCE_STATE: FinanceState = {
     loan_due_day: 0,
     loan_next_payment_day: 0,
     loan_interest_last_day: -1,
-    loan_missed_payments: 0
+    loan_missed_payments: 0,
+    loan_project: null
   },
   brokerage: {
     opened: false,
     cash: 0,
-    holdings: {}
+    holdings: {},
+    costs: {},
+    realised: 0,
+    dividends: 0,
+    dividend_day: -1,
+    margin: MarginTrading.defaults
   },
   market: {
     seed: 0,
     day: -1,
     prices: {},
-    previous_prices: {}
-  }
+    previous_prices: {},
+    history: []
+  },
+  collection: { amount: 0, due_day: 0, source: 'mortgage', destination: null, extended: false, encounter_day: -1 },
+  last_result: null
 };
 
 class Finance {
+  public readonly margin = new MarginTrading(this);
   public loanDiscount: () => number = () => 0;
   public constructor(private readonly core: typeof maplebirch) {}
 
@@ -227,16 +249,39 @@ class Finance {
     // 行情仍按游戏时间事件刷新，个人债务由房产结算循环按日期推进。
     Finance.updateAccountTier(this.state.bank);
     Finance.resetAtmLimit(this.state.bank);
-    Securities.updatePrices(this.state, this.securities);
-    Securities.applyEvents(this.state.market, this.securities);
+    this.advanceMarketThrough(Finance.currentDay);
+  }
+
+  private advanceMarketThrough(day: number): void {
+    Securities.updatePrices(
+      this.state,
+      this.securities,
+      day => {
+        this.payDividends(day);
+        this.margin.advance(day);
+      },
+      day
+    );
+    if (day === Finance.currentDay) Securities.applyEvents(this.state.market, this.securities);
+    this.margin.advance(day);
+    const latest = this.state.market.history.at(-1);
+    if (latest?.day === day) latest.prices = { ...this.state.market.prices };
   }
 
   public advanceBankThrough(day: number): void {
     // 每处理完一天的房租和房贷，才处理同一天的存款、个人贷款和信用卡。
+    this.advanceMarketThrough(day);
     const bank = this.state.bank;
     Finance.advanceDepositInterest(bank, day);
-    Finance.advanceLoan(bank, day);
-    Finance.advanceCredit(bank, day);
+    this.advanceLoan(bank, day);
+    this.advanceCredit(bank, day);
+    Finance.updateAccountTier(bank);
+  }
+
+  /** 扣除所有个人金融债务后的银行净存款，用于人物业务资格。 */
+  public get netDeposit(): number {
+    const bank = this.state.bank;
+    return Math.max(0, bank.balance - bank.credit_debt - bank.loan_debt - (V.VanillaPlus.real_estate?.mortgage?.outstanding ?? 0) - this.state.collection.amount);
   }
 
   // 银行业务
@@ -261,6 +306,7 @@ class Finance {
   public issueCreditCard(): FinanceResult {
     const bank = this.state.bank;
     if (!bank.opened) return 'bank-required';
+    if (this.state.collection.amount > 0) return 'credit-overdue';
     if (bank.credit_card) return 'already-owned';
     bank.credit_card = true;
     return 'ok';
@@ -309,7 +355,7 @@ class Finance {
     if (!bank.opened || !Number.isSafeInteger(value) || value <= 0 || !Number.isSafeInteger(keepBalance) || keepBalance < 0 || bank.balance < keepBalance) return false;
     const available = bank.balance - keepBalance;
     if (available >= value) return true;
-    if (!bank.credit_card || bank.credit_missed_payments > 0) return false;
+    if (!bank.credit_card || bank.credit_missed_payments > 0 || this.state.collection.amount > 0) return false;
     return bank.credit_debt + Finance.addPercentage(value - available, CREDIT_FEE_PERCENT) <= this.accountLimits.credit;
   }
 
@@ -323,7 +369,7 @@ class Finance {
     const available = bank.balance - keepBalance;
     if (available >= value) return this.payFromBankPennies(value);
     if (!bank.credit_card) return 'credit-required';
-    if (bank.credit_missed_payments > 0) return 'credit-overdue';
+    if (bank.credit_missed_payments > 0 || this.state.collection.amount > 0) return 'credit-overdue';
     const advance = value - available;
     const debt = Finance.addPercentage(advance, CREDIT_FEE_PERCENT);
     if (bank.credit_debt + debt > this.accountLimits.credit) return 'credit-limit';
@@ -363,7 +409,7 @@ class Finance {
     const bank = this.state.bank;
     if (!bank.opened) return 'bank-required';
     if (!bank.credit_card) return 'credit-required';
-    if (bank.credit_missed_payments > 0) return 'credit-overdue';
+    if (bank.credit_missed_payments > 0 || this.state.collection.amount > 0) return 'credit-overdue';
     const value = Finance.toPennies(amount);
     if (value == null) return 'invalid-amount';
     const debt = Finance.addPercentage(value, CREDIT_FEE_PERCENT);
@@ -391,6 +437,7 @@ class Finance {
   public takeLoan(amount: unknown, term: unknown): FinanceResult {
     const bank = this.state.bank;
     if (!bank.opened) return 'bank-required';
+    if (bank.credit_missed_payments > 0 || this.state.collection.amount > 0) return 'credit-overdue';
     if (bank.loan_debt > 0) return 'loan-outstanding';
     const value = Finance.toPennies(amount);
     if (value == null) return 'invalid-amount';
@@ -408,6 +455,22 @@ class Finance {
     bank.loan_interest_last_day = Finance.currentDay;
     bank.loan_missed_payments = 0;
     return 'ok';
+  }
+
+  public get businessProjects(): { id: 'shop' | 'orchard'; eligible: boolean }[] {
+    const robin = this.core.get('Robin') as Robin | undefined;
+    return [
+      { id: 'shop', eligible: !!robin?.available && V.RobinExpansion.shopStage !== 'none' },
+      { id: 'orchard', eligible: !!this.core.get('Orchard')?.state.unlocked.farm && (V.Orchard.salesIncome > 0 || V.Orchard.contractsCompleted > 0) }
+    ];
+  }
+
+  /** PC 是签约借款人；经营贷款复用银行账单，借来的存款不会被当作经营利润。 */
+  public takeBusinessLoan(project: 'shop' | 'orchard', amount: number): FinanceResult {
+    if (!this.businessProjects.some(item => item.id === project && item.eligible)) return 'invalid-amount';
+    const result = this.takeLoan(amount, 30);
+    if (result === 'ok') this.state.bank.loan_project = project;
+    return result;
   }
 
   public repayLoan(amount: unknown): FinanceResult {
@@ -436,6 +499,7 @@ class Finance {
     if (!bank.opened) return 'bank-required';
     if (brokerage.opened) return 'already-open';
     brokerage.opened = true;
+    brokerage.dividend_day = Finance.currentDay;
     return 'ok';
   }
 
@@ -479,7 +543,7 @@ class Finance {
     const available: Record<PaymentMethod, boolean> = {
       cash: Finance.cashOnHand >= value,
       debit: bank.debit_card && bank.balance >= value,
-      credit: bank.credit_card && bank.credit_missed_payments === 0 && bank.credit_debt + value <= this.accountLimits.credit
+      credit: bank.credit_card && bank.credit_missed_payments === 0 && this.state.collection.amount === 0 && bank.credit_debt + value <= this.accountLimits.credit
     };
     const methods: PaymentMethod[] = [bank.payment_method, 'cash', 'debit', 'credit'];
     return methods.find(method => available[method]) ?? null;
@@ -536,9 +600,12 @@ class Finance {
     const shares = Finance.toShares(amount);
     if (shares == null) return 'invalid-amount';
     const cost = market.prices[item.symbol] * shares;
-    if (cost > brokerage.cash) return 'insufficient-brokerage';
-    brokerage.cash -= cost;
+    if (!Number.isSafeInteger(cost)) return 'invalid-amount';
+    const fee = this.tradingFee(cost);
+    if (cost + fee > brokerage.cash) return 'insufficient-brokerage';
+    brokerage.cash -= cost + fee;
     brokerage.holdings[item.symbol] += shares;
+    brokerage.costs[item.symbol] = (brokerage.costs[item.symbol] ?? 0) + cost + fee;
     // 成交后重置未来行情，避免回退后按已知涨跌交易。
     market.seed = Securities.generateSeed();
     return 'ok';
@@ -552,10 +619,100 @@ class Finance {
     const shares = Finance.toShares(amount);
     if (shares == null) return 'invalid-amount';
     if (shares > brokerage.holdings[item.symbol]) return 'insufficient-shares';
+    const proceeds = market.prices[item.symbol] * shares;
+    if (!Number.isSafeInteger(proceeds)) return 'invalid-amount';
+    const cost = Math.round(((brokerage.costs[item.symbol] ?? 0) * shares) / brokerage.holdings[item.symbol]);
+    const net = proceeds - this.tradingFee(proceeds);
+    if (net < 0) return 'invalid-amount';
     brokerage.holdings[item.symbol] -= shares;
-    brokerage.cash += market.prices[item.symbol] * shares;
+    brokerage.costs[item.symbol] = Math.max(0, (brokerage.costs[item.symbol] ?? 0) - cost);
+    brokerage.realised += net - cost;
+    brokerage.cash += net;
     market.seed = Securities.generateSeed();
     return 'ok';
+  }
+
+  public resetMarketSeed(): void {
+    this.state.market.seed = Securities.generateSeed();
+  }
+
+  public tradingFee(value: number): number {
+    return Math.max(tradingTerms.minimumFee, Math.ceil(value * tradingTerms.feeRate));
+  }
+
+  public maximumShares(symbol: string): number {
+    const price = this.state.market.prices[symbol];
+    if (!price) return 0;
+    const cash = this.state.brokerage.cash;
+    let shares = Math.max(0, Math.floor((cash - tradingTerms.minimumFee) / price));
+    shares = Math.min(shares, Math.floor(cash / (price * (1 + tradingTerms.feeRate))));
+    while (shares > 0 && price * shares + this.tradingFee(price * shares) > cash) shares--;
+    return shares;
+  }
+
+  private payDividends(day: number): void {
+    const { brokerage, market } = this.state;
+    if (!brokerage.opened || brokerage.dividend_day < 0) return;
+    while (brokerage.dividend_day + 7 <= day) {
+      const payment = this.securities.reduce((total, item) => total + Math.floor(brokerage.holdings[item.symbol] * market.prices[item.symbol] * item.weeklyDividendRate), 0);
+      brokerage.cash += payment;
+      brokerage.dividends += payment;
+      brokerage.dividend_day += 7;
+    }
+  }
+
+  /** 交易跳空与拍卖差额不挤进信用卡额度，也不被下一笔贷款覆盖。 */
+  public addCollectionDebt(amount: number, source: FinanceState['collection']['source'], day = Finance.currentDay): void {
+    if (!Number.isSafeInteger(amount) || amount <= 0) return;
+    const debt = this.state.collection;
+    if (debt.amount === 0) {
+      debt.due_day = day + tradingTerms.collectionDays;
+      debt.extended = false;
+      debt.destination = null;
+    }
+    if (!debt.extended) debt.due_day = Math.min(debt.due_day, day + tradingTerms.collectionDays);
+    debt.source = debt.amount > 0 && debt.source !== source ? 'mixed' : source;
+    debt.amount += amount;
+  }
+
+  public repayCollection(): boolean {
+    const debt = this.state.collection;
+    if (debt.amount <= 0) return false;
+    const fromBank = Math.min(this.state.bank.balance, debt.amount);
+    const cash = debt.amount - fromBank;
+    if (V.money < cash) return false;
+    this.state.bank.balance -= fromBank;
+    if (cash > 0) this.core.SugarCube.Wikifier.wikifyEval(`<<money ${-cash} 'deadwoodDebt'>>`);
+    debt.amount = 0;
+    return true;
+  }
+
+  public get canExtendCollection(): boolean {
+    const debt = this.state.collection;
+    return debt.amount > 0 && !debt.extended && this.state.bank.balance >= Math.ceil(debt.amount * 0.05);
+  }
+
+  public extendCollection(): boolean {
+    if (!this.canExtendCollection) return false;
+    const debt = this.state.collection;
+    this.state.bank.balance -= Math.ceil(debt.amount * 0.05);
+    debt.due_day = Math.max(Finance.currentDay, debt.due_day) + 7;
+    debt.extended = true;
+    return true;
+  }
+
+  public get collectionEncounter(): boolean {
+    const debt = this.state.collection;
+    return debt.amount > 0 && Time.days >= debt.due_day && Time.days > debt.encounter_day && !V.statFreeze && V.combat !== 1 && V.exposed <= 0 && V.stress < V.stressmax && !V.possessed;
+  }
+
+  public evadeCollection(): void {
+    this.state.collection.encounter_day = Finance.currentDay;
+  }
+
+  /** 被带走抵偿本次追债，已有其他贷款和原版房租仍按各自账目结算。 */
+  public surrenderCollection(): void {
+    this.state.collection.amount = 0;
   }
 
   // 配置与存档状态
@@ -572,7 +729,8 @@ class Finance {
         symbol: String(security.symbol),
         name: { EN: String(security.name.EN), CN: String(security.name.CN) },
         initialPrice: Math.max(1, Math.floor(security.initialPrice!)),
-        volatility: Math.clamp(Math.floor(security.volatility!), 1, 20)
+        volatility: Math.clamp(Math.floor(security.volatility!), 1, 20),
+        weeklyDividendRate: Math.clamp(Number(security.weeklyDividendRate) || 0, 0, 0.01)
       };
     });
   }
@@ -580,9 +738,11 @@ class Finance {
   private static ensureState(securities: readonly Security[]): FinanceState {
     // 账户和行情始终读取当前 V，不把可变状态放进 setup 或模块实例。
     const finance = V.VanillaPlus.finance as FinanceState;
+    if (finance.market.day < 0) finance.market.day = Finance.currentDay;
     if (!Number.isSafeInteger(finance.market.seed) || finance.market.seed === 0) finance.market.seed = Securities.generateSeed();
     for (const item of securities) {
       finance.brokerage.holdings[item.symbol] ??= 0;
+      finance.brokerage.costs[item.symbol] ??= 0;
       const initialPrice =
         item.symbol === 'ALF' && finance.market.farm_stage === undefined
           ? Math.round(item.initialPrice * (Number(V.farm_stage) >= 12 ? 1.188 : Number(V.farm_stage) >= 9 ? 1.08 : 1))
@@ -652,10 +812,12 @@ class Finance {
 
   private static updateAccountTier(bank: BankState): void {
     if (!bank.opened) return;
-    const netBalance = Math.max(0, bank.balance - bank.credit_debt - bank.loan_debt);
+    const propertyDebt = V.VanillaPlus.real_estate?.mortgage?.outstanding ?? 0;
+    const recoveryDebt = V.VanillaPlus.finance.collection.amount;
+    const netBalance = Math.max(0, bank.balance - bank.credit_debt - bank.loan_debt - propertyDebt - recoveryDebt);
     bank.peak_balance = Math.max(bank.peak_balance, netBalance);
     const age = Math.max(0, Finance.currentDay - bank.opened_day);
-    const cleanRecord = bank.credit_missed_payments === 0 && bank.loan_missed_payments === 0;
+    const cleanRecord = bank.credit_missed_payments === 0 && bank.loan_missed_payments === 0 && recoveryDebt === 0;
     const current = Math.max(
       0,
       ACCOUNT_TIERS.findIndex(tier => tier.id === bank.account_tier)
@@ -679,6 +841,7 @@ class Finance {
   }
 
   private static clearLoan(bank: BankState): void {
+    bank.loan_project = null;
     bank.loan_debt = 0;
     bank.loan_payment = 0;
     bank.loan_rate = 0;
@@ -718,7 +881,7 @@ class Finance {
     }
   }
 
-  private static advanceLoan(bank: BankState, currentDay: number): void {
+  private advanceLoan(bank: BankState, currentDay: number): void {
     // 时间事件仍可每天触发，但银行只在周付款日和最终到期日计息、扣款。
     if (bank.loan_debt <= 0) return;
     while (bank.loan_debt > 0 && bank.loan_next_payment_day <= currentDay) {
@@ -732,6 +895,12 @@ class Finance {
         const unpaid = scheduled - paid;
         bank.loan_debt += Math.max(LOAN_LATE_FEE, Math.ceil((unpaid * LOAN_LATE_PERCENT) / 100));
         bank.loan_missed_payments++;
+        // 两期不足额后转交追偿，原贷款清账，避免继续重复计息和扣款。
+        if (bank.loan_missed_payments >= 2) {
+          this.addCollectionDebt(bank.loan_debt, 'bank', day);
+          Finance.clearLoan(bank);
+          break;
+        }
       }
       bank.loan_next_payment_day = day < bank.loan_due_day ? Math.min(day + 7, bank.loan_due_day) : day + 7;
     }
@@ -746,7 +915,7 @@ class Finance {
     bank.loan_interest_last_day = day;
   }
 
-  private static advanceCredit(bank: BankState, currentDay: number): void {
+  private advanceCredit(bank: BankState, currentDay: number): void {
     if (bank.credit_debt <= 0) {
       if (bank.credit_due_day > 0) Finance.clearCredit(bank);
       return;
@@ -761,6 +930,12 @@ class Finance {
       if (paid < minimum) {
         bank.credit_debt += CREDIT_LATE_FEE;
         bank.credit_missed_payments++;
+        if (bank.credit_missed_payments >= 2) {
+          this.addCollectionDebt(bank.credit_debt, 'bank', bank.credit_due_day);
+          Finance.clearCredit(bank);
+          bank.credit_card = false;
+          break;
+        }
       }
       bank.credit_due_day += CREDIT_BILLING_DAYS;
     }

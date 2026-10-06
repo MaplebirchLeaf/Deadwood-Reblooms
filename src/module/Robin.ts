@@ -62,7 +62,15 @@ class Robin extends Module implements RobinFacade {
       stall * 1200 +
       this.tutoring.income +
       templeIncome +
-      (state.shop ? 1500 + this.shop.staffSales - this.shop.staffWages + this.flowers.salesEstimate + (state.shopPopcorn ? 150 : 0) + (state.shopBalloons ? 75 : 0) : 0) +
+      (state.shop
+        ? 1500 +
+          this.shop.staffSales -
+          this.shop.staffWages +
+          this.flowers.salesEstimate +
+          (this.core.get('Orchard')?.freshSupplySales ?? 0) +
+          (state.shopPopcorn ? 150 : 0) +
+          (state.shopBalloons ? 75 : 0)
+        : 0) +
       this.balloon.income
     );
   }

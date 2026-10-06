@@ -77,6 +77,11 @@ interface OrchardState {
   order: { type: 'lemon' | 'orange'; amount: number; price: number; deadline: number; status: 'pending' | 'fulfilled' | 'cancelled' | 'late' } | null;
   orderDay: number;
   ordersCompleted: number;
+  lastSupplyDay: number;
+  farmContract: { type: OrchardFruit; amount: number; price: number; bond: number; deadline: number; status: 'pending' | 'fulfilled' | 'failed' } | null;
+  contractDay: number;
+  contractsCompleted: number;
+  contractResult: boolean;
   restockCredit: number;
   regularDay: number;
   regularVisits: number;
@@ -117,6 +122,11 @@ const defaults: OrchardState = {
   order: null,
   orderDay: -1,
   ordersCompleted: 0,
+  lastSupplyDay: -1,
+  farmContract: null,
+  contractDay: -1,
+  contractsCompleted: 0,
+  contractResult: false,
   restockCredit: 0,
   regularDay: -1,
   regularVisits: 0,
@@ -241,9 +251,58 @@ class Orchard extends Module {
     V.foodstuff[order.type].amount -= order.amount;
     order.status = 'fulfilled';
     this.state.ordersCompleted++;
+    this.state.lastSupplyDay = Time.days;
     this.state.restockCredit = trade.restockDiscount;
     this.recordSale(order.type, order.amount, income, 'shop');
     this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Robin love 1>>');
+    return true;
+  }
+
+  public get freshSupplySales(): number {
+    return this.state.lastSupplyDay >= 0 && Time.days - this.state.lastSupplyDay <= trade.orderInterval ? trade.freshSupplyWeeklySales : 0;
+  }
+
+  public get contractQuantities(): readonly number[] {
+    return trade.contractQuantities;
+  }
+
+  public get contractFruit(): OrchardFruit[] {
+    return this.state.known.filter(type => typeof setup.foodstuff[type]?.shop?.sell_price === 'number');
+  }
+
+  public get canContract(): boolean {
+    return this.canDeliver && this.state.farmContract?.status !== 'pending' && (this.state.contractDay < 0 || Time.days - this.state.contractDay >= trade.orderInterval);
+  }
+
+  public contractQuote(type: OrchardFruit, amount: number): { price: number; bond: number } | null {
+    if (!fruitTypes.includes(type) || !trade.contractQuantities.includes(amount)) return null;
+    const nativePrice = setup.foodstuff[type]?.shop?.sell_price;
+    if (typeof nativePrice !== 'number' || !Number.isFinite(nativePrice) || nativePrice <= 0) return null;
+    const price = Math.max(1, Math.floor(nativePrice * trade.contractPriceMultiplier));
+    return { price, bond: Math.ceil(price * amount * trade.contractBondRate) };
+  }
+
+  /** 长单锁定单价；押金由玩家实际支付，不预支可反复领走的货款。 */
+  public acceptContract(type: OrchardFruit, amount: number): boolean {
+    const quote = this.contractQuote(type, amount);
+    if (!this.canContract || !this.contractFruit.includes(type) || !quote || V.money < quote.bond) return false;
+    this.core.SugarCube.Wikifier.wikifyEval(`<<money ${-quote.bond} 'farm'>>`);
+    this.state.farmContract = { type, amount, ...quote, deadline: Time.days + trade.contractDays, status: 'pending' };
+    this.state.contractDay = Time.days;
+    return true;
+  }
+
+  public fulfillContract(): boolean {
+    const contract = this.state.farmContract;
+    if (!this.canDeliver || !contract || contract.status !== 'pending' || Time.days > contract.deadline) return false;
+    const item = this.stock.find(fruit => fruit.type === contract.type);
+    if (!item || item.amount - item.reserve < contract.amount) return false;
+    V.foodstuff[contract.type].amount -= contract.amount;
+    contract.status = 'fulfilled';
+    this.state.contractsCompleted++;
+    this.recordSale(contract.type, contract.amount, contract.price * contract.amount, 'farm');
+    this.core.SugarCube.Wikifier.wikifyEval(`<<money ${contract.bond} 'farm'>>`);
+    this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Alex love 2>>');
     return true;
   }
 
@@ -291,7 +350,7 @@ class Orchard extends Module {
 
   public get canDeliver(): boolean {
     return (
-      this.core.passage.title === 'Deadwood Reblooms Orchard Trade' &&
+      ['Deadwood Reblooms Orchard Trade', 'Deadwood Orchard Farm Contract'].includes(this.core.passage.title) &&
       V.location === 'alex_farm' &&
       this.state.site === 'farm' &&
       this.available('farm') &&
@@ -521,6 +580,11 @@ class Orchard extends Module {
     // 回忆与画中场景使用冻结的玩家状态，不能让这些场景的日期影响果园。
     if (!V.Orchard || V.statFreeze) return;
     const state = this.state;
+    if (state.farmContract?.status === 'pending' && Time.days > state.farmContract.deadline) {
+      state.farmContract.status = 'failed';
+      // 合约只在到期时违约一次。押金已经交给收货方，不再从现金重复扣款。
+      this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Alex love -2>>');
+    }
     const today = Math.floor(Time.date.timeStamp / 86400);
     if (state.day < 0) state.day = today;
     // 原版先补算整次 pass 的施工。刚观察到的竣工不能倒推到过去每一天。

@@ -22,6 +22,7 @@
 		<<set _financeBrokerage to $VanillaPlus.finance.brokerage>>
 		<<set _financeMortgage to maplebirch.get("VanillaPlus").realEstate.mortgage.current>>
 		<h1 class='header gold bold'><<lanSwitch 'Finances' '财务'>></h1>
+		<<deadwood-finance-risk-summary>>
 		<ul class='journal'>
 			<li><<lanSwitch 'Bank balance: ' '银行存款：'>><<deadwood-reblooms-finance-money _financeBank.balance>></li>
 			<<if _financeBank.credit_card>>
@@ -757,6 +758,11 @@
 			<span class='blue'><i><<lanSwitch 'Open a securities account before trading.' '交易前需要先开立证券账户。'>></i></span>
 		<<else>>
 			<<deadwood-reblooms-finance-exchange-summary>><br><br>
+			<details><summary><<lanSwitch 'Recent market prices' '最近行情记录'>></summary>
+			<<for $_quoteDay range $VanillaPlus.finance.market.history.slice(-5).reverse()>>
+				<<lanSwitch 'Day ' '第 '>><<= $_quoteDay.day>>：
+				<<for $_quotedSecurity range maplebirch.get('VanillaPlus').finance.securities>><<= $_quotedSecurity.symbol>> £<<= Number((($_quoteDay.prices[$_quotedSecurity.symbol] || 0) / 100).toFixed(2))>> · <</for>><br>
+			<</for>></details><br>
 			<<if $chef_state gte 7 and $chef_state lt 9>>
 				<span class='blue'><<lanSwitch 'Ocean Breeze is closed for expansion. Traders are watching the reopening.' '海风咖啡馆停业扩建，交易员正等待重新开业的消息。'>></span><br>
 			<<elseif $chef_state gte 9>>
@@ -779,13 +785,13 @@
 						<th scope='col'><<lanSwitch 'Daily change' '日涨跌'>></th>
 					</tr>
 					<<for _financeSecurity range maplebirch.get("VanillaPlus").finance.securities>>
-						<<set _financeSymbol to _financeSecurity.symbol>>
-						<<set _financePrice to $VanillaPlus.finance.market.prices[_financeSymbol]>>
-						<<set _financePreviousPrice to $VanillaPlus.finance.market.previous_prices[_financeSymbol]>>
+						<<set _financeBoardSymbol to _financeSecurity.symbol>>
+						<<set _financePrice to $VanillaPlus.finance.market.prices[_financeBoardSymbol]>>
+						<<set _financePreviousPrice to $VanillaPlus.finance.market.previous_prices[_financeBoardSymbol]>>
 						<<set _financeChange to _financePrice - _financePreviousPrice>>
 						<<set _financeChangePercent to _financePreviousPrice gt 0 ? (_financeChange / _financePreviousPrice) * 100 : 0>>
 						<tr>
-							<td><<= _financeSymbol>></td>
+							<td><<= _financeBoardSymbol>></td>
 							<td><<lanSwitch _financeSecurity.name.EN _financeSecurity.name.CN>></td>
 							<td><<deadwood-reblooms-finance-money _financePrice>></td>
 							<td>
@@ -808,23 +814,26 @@
 						<th scope='col'><<lanSwitch 'Symbol' '代码'>></th>
 						<th scope='col'><<lanSwitch 'Shares' '股数'>></th>
 						<th scope='col'><<lanSwitch 'Market value' '市值'>></th>
+						<th scope='col'><<lanSwitch 'Cost / profit' '成本／盈亏'>></th>
 					</tr>
 					<<set _financeHasHoldings to false>>
 					<<for _financeSecurity range maplebirch.get("VanillaPlus").finance.securities>>
-						<<set _financeSymbol to _financeSecurity.symbol>>
-						<<set _financeOwned to $VanillaPlus.finance.brokerage.holdings[_financeSymbol]>>
+						<<set _financeBoardSymbol to _financeSecurity.symbol>>
+						<<set _financeOwned to $VanillaPlus.finance.brokerage.holdings[_financeBoardSymbol]>>
 						<<if _financeOwned gt 0>>
 							<<set _financeHasHoldings to true>>
-							<<set _financeHoldingValue to _financeOwned * $VanillaPlus.finance.market.prices[_financeSymbol]>>
-							<tr><td><<= _financeSymbol>></td><td><<= _financeOwned>></td><td><<deadwood-reblooms-finance-money _financeHoldingValue>></td></tr>
+							<<set _financeHoldingValue to _financeOwned * $VanillaPlus.finance.market.prices[_financeBoardSymbol]>>
+							<tr><td><<= _financeBoardSymbol>></td><td><<= _financeOwned>></td><td><<deadwood-reblooms-finance-money _financeHoldingValue>></td><td><<deadwood-reblooms-finance-money $VanillaPlus.finance.brokerage.costs[_financeBoardSymbol]>> / <<deadwood-reblooms-finance-money `_financeHoldingValue - $VanillaPlus.finance.brokerage.costs[_financeBoardSymbol]`>></td></tr>
 						<</if>>
 					<</for>>
 					<<if !_financeHasHoldings>>
-						<tr><td colspan='3' class='blue'><<lanSwitch 'No securities held.' '暂无持仓。'>></td></tr>
+						<tr><td colspan='4' class='blue'><<lanSwitch 'No securities held.' '暂无持仓。'>></td></tr>
 					<</if>>
 				</table>
 			</div>
 			<br>
+			<<language>><<option 'EN'>>Buying and selling each cost 0.25%, at least £1. Weekly distributions are credited to the securities account.<<option 'CN'>>买卖各收 0.25%，最低 £1。每周分红存入证券账户。<</language>><br>
+			<<lanSwitch 'Realised profit / dividends: ' '已实现盈亏／分红：'>><<deadwood-reblooms-finance-money $VanillaPlus.finance.brokerage.realised>> / <<deadwood-reblooms-finance-money $VanillaPlus.finance.brokerage.dividends>><br><br>
 			<strong><<lanSwitch 'Place an order' '委托交易'>></strong><br>
 			<<set _financeSecurityOptions to {}>>
 			<<for _financeSecurity range maplebirch.get("VanillaPlus").finance.securities>>
@@ -854,7 +863,7 @@
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 				<</lanLink>>
 				<<lanLink ['Buy maximum', '最大数量买入']>>
-					<<set _financeMaximumShares to Math.floor($VanillaPlus.finance.brokerage.cash / $VanillaPlus.finance.market.prices[_financeSymbol])>>
+					<<set _financeMaximumShares to maplebirch.get("VanillaPlus").finance.maximumShares(_financeSymbol)>>
 					<<set _financeResult to maplebirch.get("VanillaPlus").finance.buy(_financeSymbol, _financeMaximumShares)>>
 					<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
 					<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
@@ -895,6 +904,7 @@
 <<set $outside to 0>>
 <<set $location to 'financial_centre'>>
 <<effects>>
+<<deadwood-finance-bank-notice>>
 <<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
 	<strong><<lanSwitch 'Bank counter' '银行柜台'>></strong><br>
 	<<deadwood-reblooms-adrian-greeting>>
@@ -928,6 +938,7 @@
 <<set $outside to 0>>
 <<set $location to 'financial_centre'>>
 <<effects>>
+<<deadwood-finance-bank-notice>>
 <<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
 	<strong><<lanSwitch 'Credit card' '信用卡'>></strong><br>
 	<<deadwood-reblooms-adrian-greeting>>
@@ -943,6 +954,8 @@
 <<set $outside to 0>>
 <<set $location to 'financial_centre'>>
 <<effects>>
+<<deadwood-finance-bank-notice>>
+<<icon 'filing-cabinet.png'>><<lanLink ['Business-purpose loan', '经营用途贷款'] 'Deadwood Reblooms Business Loan'>><</lanLink>><br><br>
 <<if Time.weekDay gte 2 && Time.weekDay lte 6 && Time.hour gte 9 && Time.hour lt 17>>
 	<strong><<lanSwitch 'Personal loan' '个人贷款'>></strong><br>
 	<<deadwood-reblooms-adrian-greeting>>
@@ -978,6 +991,7 @@
 	<</if>>
 	<span><<icon 'filing-cabinet.png'>><<lanLink '证券账户' 'Deadwood Reblooms Financial Centre Securities Account'>><</lanLink>></span><br>
 	<span><<icon 'securities-desk.png'>><<lanLink '证券交易' 'Deadwood Reblooms Financial Centre Securities Trading'>><</lanLink>></span><br>
+	<<if $VanillaPlus.finance.brokerage.opened>><<icon 'securities-desk.png'>><<lanLink ['Margin and futures', '融资与期货'] 'Deadwood Reblooms Financial Centre Margin'>><</lanLink>><br><</if>>
 	<br>
 <<else>>
 	<<deadwood-reblooms-finance-counter-closed>>

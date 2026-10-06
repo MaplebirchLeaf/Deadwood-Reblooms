@@ -1,0 +1,71 @@
+:: Deadwood Orchard Farm Contract []
+<<set $outside to 1>><<set $location to 'alex_farm'>><<farm_work_update>><<effects>>
+<<if $stress gte $stressmax>><<passoutfarmroad>><<exit>><</if>>
+<<set $_orchard to maplebirch.get('Orchard')>>
+<<if !$_orchard or !$_orchard.canDeliver>>
+  <<lanSwitch 'Alex cannot arrange a contract now.' '艾利克斯现在无法安排长单。'>><br>
+  <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Orchard Trade'>><</lanLink>><<exit>>
+<</if>>
+<<npc Alex>><<person1>>
+<<if $Orchard.farmContract?.status is 'pending'>>
+  <<language>>
+    <<option 'EN'>>Alex checks your name against the dispatch sheet. "I've left room on the cart. All of it needs to arrive together."
+    <<option 'CN'>>艾利克斯在发货单上找出你的名字。“车上给你留了位置。这批得一起交齐。”
+  <</language>><br><br>
+  <<foodstufficon $Orchard.farmContract.type>><<= $Orchard.farmContract.amount>> · <<lanSwitch 'Unit price: ' '单价：'>><<printmoney $Orchard.farmContract.price>><br>
+  <<lanSwitch 'Due: ' '交货期限：'>><<set $_contractDate to Time.startDate.addDays($Orchard.farmContract.deadline)>><<= $_contractDate.year>> / <<= $_contractDate.month>> / <<= $_contractDate.day>><br>
+  <<lanSwitch 'Refundable deposit: ' '交货后退回的押金：'>><<printmoney $Orchard.farmContract.bond>><br>
+  <<lanLink ['Deliver the complete order (0:30)', '交齐这批水果 (0:30)'] 'Deadwood Orchard Farm Contract Result'>>
+    <<set $Orchard.contractResult to maplebirch.get('Orchard').fulfillContract()>><<if $Orchard.contractResult>><<pass 30>><</if>>
+  <</lanLink>><br>
+<<else>>
+  <<if $Orchard.farmContract?.status is 'failed'>>
+    <<language>>
+      <<option 'EN'>>Alex folds the old dispatch sheet. "The cart went without yours. I had to fill the space." <<He>> sets it aside. "The deposit covered that. Don't book more than you can bring."
+      <<option 'CN'>>艾利克斯折起旧发货单。“车走了，没等到你的货。我得找别的补上。”<<He>>把单子放到一旁。“押金抵了这笔。能送多少，再订多少。”
+    <</language>><br><br>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>Alex runs a finger down the buyers' list. "A full crate gets a better price. I'll book the space for a week, but I need a deposit. If you miss the cart, I still have to pay for it."
+      <<option 'CN'>>艾利克斯顺着收货人的名单看下去。“整箱的价钱好一些。我能替你留一周的位置，不过要押金。你赶不上车，那位置也得付钱。”
+    <</language>><br><br>
+  <</if>>
+  <<if $_orchard.canContract and $_orchard.contractFruit.length>>
+    <<set _contractFruit to $_orchard.contractFruit[0]>><<set _contractAmount to $_orchard.contractQuantities[0]>>
+    <<set _contractOptions to {}>>
+    <<for $_type range $_orchard.contractFruit>><<set _contractOptions[setup.foodstuff[$_type].name] to $_type>><</for>>
+    <label><<lanSwitch 'Fruit: ' '水果：'>><<listbox '_contractFruit' autoselect>><<optionsfrom _contractOptions>><</listbox>></label><br>
+    <label><<lanSwitch 'Quantity: ' '数量：'>><<listbox '_contractAmount' autoselect>><<optionsfrom $_orchard.contractQuantities>><</listbox>></label><br>
+    <<language>>
+      <<option 'EN'>>The agreed price is 85% of the market-stall price when you sign, fixed for the week. The cash deposit is 20% of the order. Fruit you marked to keep will not be taken.
+      <<option 'CN'>>签单时按集市售价的八五折锁定单价，一周内不变。现金押金为货款的两成。你标记保留的水果不会用于交货。
+    <</language>><br>
+    <<lanLink ['Check the quote', '核对报价']>>
+      <<set $_quote to maplebirch.get('Orchard').contractQuote(_contractFruit, Number(_contractAmount))>>
+      <<replace '#orchard-contract-quote'>>
+        <<if $_quote>><<lanSwitch 'Order value / deposit: ' '货款／押金：'>><<printmoney `$_quote.price * Number(_contractAmount)`>> / <<printmoney $_quote.bond>><</if>>
+      <</replace>>
+    <</lanLink>><div id='orchard-contract-quote'></div>
+    <<lanLink ['Reserve the delivery', '签下这批长单'] 'Deadwood Orchard Farm Contract Result'>>
+      <<set $Orchard.contractResult to maplebirch.get('Orchard').acceptContract(_contractFruit, Number(_contractAmount))>>
+    <</lanLink>><br>
+  <</if>>
+<</if>><br>
+<<if maplebirch.get('VanillaPlus')>><span class='blue'><<lanSwitch 'Your delivery records can support a business-purpose loan application at the financial centre.' '这些交货记录可以带去金融中心，申请经营用途贷款。'>></span><br><</if>>
+<<getouticon>><<lanLink ['Return to the deliveries', '返回交货处'] 'Deadwood Reblooms Orchard Trade'>><</lanLink>>
+
+:: Deadwood Orchard Farm Contract Result []
+<<set $outside to 1>><<set $location to 'alex_farm'>><<effects>>
+<<if $stress gte $stressmax>><<passoutfarmroad>><<exit>><</if>>
+<<npc Alex>><<person1>>
+<<if $Orchard.contractResult>>
+  <<if $Orchard.farmContract.status is 'fulfilled'>>
+    <<language>>
+      <<option 'EN'>>Alex counts the last crate and signs the dispatch sheet. "That's the lot." <<He>> hands over the payment and your deposit. "I'll put you on the list for the next cart." <<glove>>
+      <<option 'CN'>>艾利克斯数完最后一箱，在发货单上签了字。“齐了。”<<He>>把货款和押金交给你。“下趟车，我还把你记在名单上。”<<glove>>
+    <</language>>
+  <<else>>
+    <<lanSwitch 'Alex takes the deposit and writes the quantity beside your name.' '艾利克斯收下押金，在你的名字旁写好数量。'>>
+  <</if>>
+<<else>><span class='red'><<lanSwitch 'The order cannot be completed. Check the deposit, fruit reserved for yourself, deadline and delivery arrangements.' '这次未能办理。检查押金、保留库存、交货期限与发货安排。'>></span><</if>><br><br>
+<<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Orchard Farm Contract'>><</lanLink>>

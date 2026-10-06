@@ -27,6 +27,7 @@ export interface CardTrickState {
 export const DEFAULT_CARD_TRICK_STATE: CardTrickState = { used: false, opponent: '', peeked: null, distracted: null, result: '' };
 
 export interface CasinoOptions {
+  denominations: readonly number[];
   exchanges: readonly number[];
   blackjack: BlackjackOptions;
   threeCard: ThreeCardOptions;
@@ -34,8 +35,9 @@ export interface CasinoOptions {
 }
 
 export const DEFAULT_CASINO_OPTIONS: CasinoOptions = {
-  exchanges: [500, 5000, 50000, 250000, 500000, 1000000],
-  blackjack: { bets: [5000, 25000, 50000] },
-  threeCard: { antes: [1000, 5000, 10000] },
-  holdem: { buyIns: [50000, 250000, 500000], bigBlindDivisor: 50 }
+  denominations: [1000000, 500000, 100000, 10000, 2500, 500, 100, 50, 10, 1],
+  exchanges: [500, 5000, 50000, 250000, 500000, 1000000, 5000000, 10000000],
+  blackjack: { bets: [1000, 5000, 25000, 50000, 100000, 500000, 1000000] },
+  threeCard: { antes: [1000, 5000, 10000, 100000, 500000] },
+  holdem: { buyIns: [50000, 250000, 500000, 2500000, 10000000], bigBlindDivisor: 50 }
 };

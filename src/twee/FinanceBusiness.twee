@@ -1,0 +1,73 @@
+:: Deadwood Reblooms Business Loan []
+<<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
+<<deadwood-reblooms-adrian-greeting 'financial_centre_bank'>>
+<<if Time.weekDay lt 2 or Time.weekDay gt 6 or Time.hour lt 9 or Time.hour gte 17>>
+  <<deadwood-reblooms-finance-counter-closed>>
+  <<getouticon>><<lanLink ['Return to the bank', '返回银行柜台'] 'Deadwood Reblooms Financial Centre Bank'>><</lanLink>><<exit>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    The clerk asks for the shop plans or your delivery records. "This is a personal loan for business expenses. Your name goes on it, even if someone else runs the shop. Thirty days. The instalments come from your account."
+  <<option 'CN'>>
+    柜员要你出示店铺计划或者交货记录。“这是用于经营的个人贷款。即使店铺由别人经营，签的也是你的名字。期限三十天，还款从你的账户扣。”
+<</language>><br><br>
+<<set $_finance to maplebirch.get('VanillaPlus').finance>>
+<<set $_product to $_finance.loanProducts.find(item => item.days === 30)>>
+<<lanSwitch 'Weekly interest: ' '周利率：'>><<= ($_product.weeklyRate * 100).toFixed(3)>>% · <<lanSwitch 'Borrowing limit: ' '贷款额度：'>><<deadwood-reblooms-finance-money $_finance.accountLimits.loan>><br>
+<<set _businessAmount to 2000>>
+<label><<lanSwitch 'Borrow £' '借款 £'>><<numberbox '_businessAmount' 2000>></label><br><br>
+<<for $_project range $_finance.businessProjects>>
+  <<capture $_project>>
+    <<if $_project.eligible>>
+      <<lanLink `$_project.id === 'shop' ? ['Apply for drinks-shop funding', '申请饮品店经营贷款'] : ['Apply for orchard funding', '申请果园经营贷款']` 'Deadwood Reblooms Business Loan Result'>>
+        <<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.takeBusinessLoan($_project.id, Number(_businessAmount))>>
+      <</lanLink>><br>
+    <</if>>
+  <</capture>>
+<</for>>
+<<if !$_finance.businessProjects.some(item => item.eligible)>>
+  <<lanSwitch 'Bring a shop plan or an established farm-orchard sales record.' '需要已有的开店计划，或者农场果园的销售记录。'>><br>
+<</if>><br>
+<<getouticon>><<lanLink ['Return to the bank', '返回银行柜台'] 'Deadwood Reblooms Financial Centre Bank'>><</lanLink>>
+
+:: Deadwood Reblooms Business Loan Result []
+<<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
+<<deadwood-reblooms-finance-result $VanillaPlus.finance.last_result>><br><br>
+<<if $VanillaPlus.finance.last_result is 'ok'>>
+  <<language>>
+    <<option 'EN'>>The bank credits your account. You put the repayment schedule away with your receipts. The shop and orchard will still need the money passed on or spent on their supplies.
+    <<option 'CN'>>银行把借款存进你的账户。你把还款表与收据放在一起。店铺和果园的资金，还需要你实际转交或购置物资。
+  <</language>><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Financial Centre Bank Loan'>><</lanLink>>
+
+:: Deadwood Reblooms Property Tenant []
+<<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
+<<set $_estate to maplebirch.get('VanillaPlus').realEstate>>
+<<set $_id to $VanillaPlus.real_estate.tenant_property>>
+<<set $_management to $_estate.managementFor($_id)>>
+<<if !$_estate.owns($_id) or !$_management.rented or !$_management.rental_issue>>
+  <<lanSwitch 'There are no outstanding messages for this tenancy.' '这份租约没有待处理的消息。'>><br>
+<<else>>
+  <<set $_tenantKey to $_estate.tenantKey($_id)>>
+  <<if !$per_npc[$_tenantKey]>><<generateNPC 1 a>><<saveNPC 0 $_tenantKey>><<else>><<loadNPC 0 $_tenantKey>><</if>><<person1>>
+  <<if $_management.rental_issue.type is 'leak'>>
+    <<language>>
+      <<option 'EN'>>Your tenant sets a damp photograph on the desk. "It comes through when it rains. I've moved the bed away from the wall, but I can't keep paying the full rent for this." The agent adds a repair estimate to the file.
+      <<option 'CN'>>租客把一张受潮的照片放在桌上。“下雨就渗进来。我已经把床挪开了，可总不能这样还照付全租。”中介往档案里加了一份维修报价。
+    <</language>><br><br>
+    <<lanSwitch 'Urgent repair: ' '紧急维修：'>><<deadwood-reblooms-finance-money `$_estate.rentalRepairCost($_id)`>><br>
+    <<lanLink ['Arrange repairs', '安排维修'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('VanillaPlus').realEstate.settleRentalIssue($VanillaPlus.real_estate.tenant_property, 'repair')>><</lanLink>><br>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>"I'm a week behind," your tenant says. "I'll have it next week. Or I can pay most of it now, if you'll let the rest go." The agent waits for your answer.
+      <<option 'CN'>>“我晚了一周。”租客说道。“下周就有钱了。或者现在先付大部分，剩下的你能不能免了？”中介等着你答复。
+    <</language>><br><br>
+    <<lanSwitch 'Net rent withheld: ' '暂未收到的净租金：'>><<deadwood-reblooms-finance-money $_management.rental_issue.rent>><br>
+    <<lanLink ['Accept 80% now', '现在收下八成'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('VanillaPlus').realEstate.settleRentalIssue($VanillaPlus.real_estate.tenant_property, 'negotiate')>><</lanLink>><br>
+    <<if Time.days - $_management.rental_issue.day gte 7>>
+      <<lanLink ['Collect the full overdue rent', '收取全部逾期租金'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('VanillaPlus').realEstate.settleRentalIssue($VanillaPlus.real_estate.tenant_property, 'wait')>><</lanLink>><br>
+    <<else>><<lanSwitch 'The promised payment is due next week.' '约好的补缴日期是下周。'>><br><</if>>
+  <</if>>
+<</if>><br>
+<<getouticon>><<lanLink ['Leave it for now', '暂时离开'] 'Deadwood Reblooms Property Office'>><</lanLink>>

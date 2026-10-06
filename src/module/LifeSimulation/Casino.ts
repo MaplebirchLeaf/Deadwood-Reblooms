@@ -252,6 +252,15 @@ class Casino {
     return this.state.chips;
   }
 
+  public get chipStacks(): { value: number; count: number }[] {
+    let remaining = this.chips;
+    return this.options.denominations.flatMap(value => {
+      const count = Math.floor(remaining / value);
+      remaining %= value;
+      return count > 0 ? [{ value, count }] : [];
+    });
+  }
+
   private get finance() {
     return this.core.get('VanillaPlus')?.finance;
   }

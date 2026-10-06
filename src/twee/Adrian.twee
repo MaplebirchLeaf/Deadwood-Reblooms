@@ -62,8 +62,8 @@
 			financial_centre_property: 'Deadwood Reblooms Property Office',
 			financial_centre_securities: 'Deadwood Reblooms Financial Centre Securities'
 		}[$_location] or '',
-		netDeposit: Math.max(0, $_bank.balance - $_bank.credit_debt - $_bank.loan_debt),
-		goodAccount: $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0
+		netDeposit: maplebirch.get('VanillaPlus').finance.netDeposit,
+		goodAccount: $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0 and $VanillaPlus.finance.collection.amount is 0
 	}>>
 	<<set _adrianContext.present to Boolean(_adrianContext.desk) or $_location is 'financial_centre_break'>>
 	<<set _adrianContext.canChat to _adrianContext.present and $_state.lastChat isnot Time.days>>
@@ -77,8 +77,8 @@
 	<<set $_elapsed to Math.max(0, Time.days - $_state.businessDay)>>
 	<<if $_elapsed gt 0>>
 		<<set $_state.businessDay to Time.days>>
-		<<set $_netDeposit to Math.max(0, $_bank.balance - $_bank.credit_debt - $_bank.loan_debt)>>
-		<<set $_goodAccount to $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0>>
+		<<set $_netDeposit to maplebirch.get('VanillaPlus').finance.netDeposit>>
+		<<set $_goodAccount to $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0 and $VanillaPlus.finance.collection.amount is 0>>
 		<<for $_day to 0; $_day lt Math.min(21, $_elapsed) and $_state.career lt 3; $_day++>>
 			<<set $_target to $_state.career is 1 ? 500000 : 2500000>>
 			<<set $_state.businessDays to $_goodAccount and $_netDeposit gte $_target ? $_state.businessDays + 1 : 0>>

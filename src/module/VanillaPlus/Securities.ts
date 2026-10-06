@@ -7,6 +7,7 @@ export interface Security {
   name: { EN: string; CN: string };
   initialPrice: number;
   volatility: number;
+  weeklyDividendRate: number;
 }
 
 type MarketState = FinanceState['market'];
@@ -83,19 +84,25 @@ export default class Securities {
     if (Number(Time.weekDay) !== 1 && Number(Time.weekDay) !== 7) Securities.applyMoves(market, securities);
   }
 
-  public static updatePrices(finance: FinanceState, securities: readonly Security[]): void {
-    const currentDay = Math.max(0, Math.floor(Number(Time.days) || 0));
+  public static updatePrices(finance: FinanceState, securities: readonly Security[], onDay?: (day: number) => void, targetDay = Math.floor(Time.days)): void {
+    const currentDay = Math.min(Math.floor(Time.days), Math.max(0, Math.floor(targetDay)));
     if (finance.market.day < 0) {
       // 新存档首次跨日时，也要计算刚过去的营业日行情。
       finance.market.day = currentDay - 1;
     }
     if (currentDay <= finance.market.day) return;
     for (let day = finance.market.day + 1; day <= currentDay; day++) {
-      const weekDay = (((((Number(Time.weekDay) || 1) - (currentDay - day) - 1) % 7) + 7) % 7) + 1;
-      if (weekDay === 1 || weekDay === 7) continue;
+      const weekDay = (((((Number(Time.weekDay) || 1) - (Math.floor(Time.days) - day) - 1) % 7) + 7) % 7) + 1;
+      if (weekDay === 1 || weekDay === 7) {
+        onDay?.(day);
+        continue;
+      }
       finance.market.previous_prices = { ...finance.market.prices };
       for (const item of securities) finance.market.prices[item.symbol] = Securities.nextPrice(item, finance.market.prices[item.symbol], day, finance.market.seed);
       Securities.applyMoves(finance.market, securities);
+      finance.market.history.push({ day, prices: { ...finance.market.prices } });
+      if (finance.market.history.length > 30) finance.market.history.shift();
+      onDay?.(day);
     }
     finance.market.day = currentDay;
   }

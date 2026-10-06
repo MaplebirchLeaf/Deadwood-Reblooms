@@ -60,6 +60,6 @@ export default function Adrian(maplebirch: typeof window.maplebirch): void {
   // 财务系统只接收优惠比例，不认识人物或剧情阶段。
   maplebirch.get('VanillaPlus')!.finance.loanDiscount = () => {
     const { adrian, finance } = V.VanillaPlus;
-    return adrian.career === 5 && finance.bank.credit_missed_payments === 0 && finance.bank.loan_missed_payments === 0 ? 0.1 : 0;
+    return adrian.career === 5 && finance.bank.credit_missed_payments === 0 && finance.bank.loan_missed_payments === 0 && finance.collection.amount === 0 ? 0.1 : 0;
   };
 }

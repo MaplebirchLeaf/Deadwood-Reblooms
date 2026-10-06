@@ -8,7 +8,9 @@ const PROPERTY_TERMS = {
   down_payment_percent: 20,
   closing_fee_percent: 2,
   payment_reserve_weeks: 1,
-  term_days: 90,
+  term_days: 365,
+  available_terms: [90, 180, 365, 730],
+  collateral_percent: 60,
   weekly_interest_rate: 0.0035,
   late_fee_pennies: 2000,
   freeze_after_notice_days: 7,
@@ -30,6 +32,7 @@ const PROPERTY_TERMS = {
 };
 
 export interface MortgageState {
+  purpose: 'purchase' | 'cash';
   property_id: string;
   outstanding: number;
   arrears: number;
@@ -63,11 +66,11 @@ class Mortgage {
     V.VanillaPlus.real_estate.mortgage = value;
   }
 
-  public purchaseCosts(price: number): { deposit: number; fee: number; weekly_payment: number; reserve: number } {
+  public purchaseCosts(price: number, days = this.terms.term_days): { deposit: number; fee: number; weekly_payment: number; reserve: number } {
     const deposit = Math.ceil((price * this.terms.down_payment_percent) / 100);
     const principal = price - deposit;
-    const { closing_fee_percent, payment_reserve_weeks, term_days, weekly_interest_rate } = this.terms;
-    const weekly_payment = Mortgage.instalment(principal, Math.ceil(term_days / 7), weekly_interest_rate);
+    const { closing_fee_percent, payment_reserve_weeks, weekly_interest_rate } = this.terms;
+    const weekly_payment = Mortgage.instalment(principal, Math.ceil(days / 7), weekly_interest_rate);
     return {
       deposit,
       fee: Math.ceil((price * closing_fee_percent) / 100),
@@ -81,31 +84,42 @@ class Mortgage {
     return Math.ceil((principal * rate * growth) / (growth - 1));
   }
 
-  public canStart(price: number, useCredit = false): boolean {
+  public canStart(price: number, useCredit = false, days = this.terms.term_days): boolean {
     const bank = V.VanillaPlus.finance.bank;
-    if (!Number.isSafeInteger(price) || price <= 0 || this.current || !bank.opened || !bank.debit_card || bank.loan_missed_payments > 0 || bank.credit_missed_payments > 0) return false;
-    const { deposit, fee, reserve } = this.purchaseCosts(price);
+    if (
+      !Number.isSafeInteger(price) ||
+      price <= 0 ||
+      !this.terms.available_terms.includes(days) ||
+      this.current ||
+      !bank.opened ||
+      !bank.debit_card ||
+      bank.loan_missed_payments > 0 ||
+      bank.credit_missed_payments > 0 ||
+      V.VanillaPlus.finance.collection.amount > 0
+    )
+      return false;
+    const { deposit, fee, reserve } = this.purchaseCosts(price, days);
     const bankReserve = fee + reserve;
     if (bank.balance < bankReserve) return false;
     return useCredit ? this.finance.canPayWithCreditPennies(deposit, bankReserve) : bank.balance >= deposit + bankReserve;
   }
 
-  public start(property_id: string, price: number, useCredit = false): MortgageResult {
+  public start(property_id: string, price: number, useCredit = false, days = this.terms.term_days): MortgageResult {
     if (this.current) return 'mortgage-outstanding';
     const bank = V.VanillaPlus.finance.bank;
     if (!bank.opened) return 'bank-required';
     if (bank.loan_missed_payments > 0 || bank.credit_missed_payments > 0) return 'mortgage-ineligible';
-    if (!this.canStart(price, useCredit)) return 'mortgage-ineligible';
-    const { deposit, fee, weekly_payment, reserve } = this.purchaseCosts(price);
+    if (!this.canStart(price, useCredit, days)) return 'mortgage-ineligible';
+    const { deposit, fee, weekly_payment, reserve } = this.purchaseCosts(price, days);
     const result = useCredit ? this.finance.payWithCreditPennies(deposit, fee + reserve) : this.finance.payFromBankPennies(deposit);
     if (result !== 'ok') return result;
     // canStart() 已检查银行余额。信用卡只补首付，手续费必须从银行账户划走。
     this.finance.payFromBankPennies(fee);
     // 价格、首付、本金和 weekly_payment 全部是便士。信用卡仅补首付差额，不进入房贷本金。
     const principal = price - deposit;
-    const { term_days } = this.terms;
     const today = Mortgage.today;
     this.current = {
+      purpose: 'purchase',
       property_id,
       outstanding: principal,
       arrears: 0,
@@ -113,13 +127,47 @@ class Mortgage {
       next_payment_day: today + 7,
       last_interest_day: today,
       last_day: today,
-      maturity_day: today + term_days,
+      maturity_day: today + days,
       stage: 'current',
       notice_day: null,
       frozen_day: null,
       bailey_pending: false,
       fight_used: false
     };
+    return 'ok';
+  }
+
+  public cashQuote(amount: number, days = this.terms.term_days): { fee: number; weekly_payment: number; net: number } {
+    const weekly_payment = Mortgage.instalment(amount, Math.ceil(days / 7), this.terms.weekly_interest_rate);
+    const fee = Math.ceil((amount * this.terms.closing_fee_percent) / 100);
+    return { fee, weekly_payment, net: amount - fee };
+  }
+
+  public borrowAgainst(property_id: string, amount: number, maximum: number, days = this.terms.term_days): MortgageResult {
+    const bank = V.VanillaPlus.finance.bank;
+    if (!bank.opened || !bank.debit_card || this.current || bank.loan_missed_payments > 0 || bank.credit_missed_payments > 0 || V.VanillaPlus.finance.collection.amount > 0)
+      return 'mortgage-ineligible';
+    if (!Number.isSafeInteger(amount) || amount <= 0 || amount > maximum || !this.terms.available_terms.includes(days)) return 'invalid-amount';
+    const { net, weekly_payment } = this.cashQuote(amount, days);
+    if (net < weekly_payment) return 'mortgage-ineligible';
+    const today = Mortgage.today;
+    this.current = {
+      purpose: 'cash',
+      property_id,
+      outstanding: amount,
+      arrears: 0,
+      weekly_payment,
+      next_payment_day: today + 7,
+      last_interest_day: today,
+      last_day: today,
+      maturity_day: today + days,
+      stage: 'current',
+      notice_day: null,
+      frozen_day: null,
+      bailey_pending: false,
+      fight_used: false
+    };
+    this.finance.creditBankPennies(net);
     return 'ok';
   }
 
@@ -179,7 +227,7 @@ class Mortgage {
     for (let day = loan.last_day + 1; day <= today && this.current === loan; day++) {
       if (day >= loan.next_payment_day || day === loan.maturity_day) {
         this.accrueInterest(loan, day);
-        // 每七天收一笔。第 90 天收取剩余本金和按六天折算的最后一期利息。
+        // 每七天收一笔，到期日收取剩余本金与不足一周的利息。
         const scheduled = Math.min(loan.outstanding, day >= loan.maturity_day ? loan.outstanding : loan.weekly_payment);
         const due = Math.min(loan.outstanding, scheduled + loan.arrears);
         const paid = this.finance.collectBankPennies(due);

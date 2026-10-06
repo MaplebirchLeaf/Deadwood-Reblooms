@@ -141,3 +141,11 @@ Unknown seeds, uncleared ground, occupied plots, remaining moisture, active fert
 - **Ledger**: New shop orders and regular purchases enter the orchard ledger. Other vanilla stall sales remain in vanilla records to avoid double counting.
 
 Repeat fruit orders halve in winter, when hot chocolate is more popular. After three purchases, the regular prefers the first fruit purchased; when it is not displayed or fewer than five remain, another displayed fruit can be chosen. Ledger entries identify farm, shop and regular sales; older entries retain a generic sale label.
+
+### Alex's weekly fruit contracts
+
+Open **fruit inventory and sales** at the farm orchard while Alex can arrange deliveries, then discuss a weekly contract. Choose an unlocked fruit and batch size, check the quote and pay a cash deposit to reserve space for one week. The signed price stays fixed.
+
+Deliver the whole batch together. Reserved fruit is excluded. Timely delivery pays the agreed amount and returns the deposit; missing the deadline forfeits the deposit and affects Alex's trust. Contracts use a separate arrangement from the ordinary daily bulk-buying allowance.
+
+Recent completed supplies to Robin's drinks shop contribute extra weekly sales. That contribution lapses without a fresh delivery. Orchard sales records also support a business-purpose bank loan, with PC responsible for repayment.

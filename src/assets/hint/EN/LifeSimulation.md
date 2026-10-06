@@ -156,7 +156,7 @@ If you have recently taken these tablets or still have a dependence, Harper asks
 
 The gambling room above the bar on Connudatus Street opens from **18:00 to 04:00**. It needs skulduggery at **grade D** and the **formal ID** Briar arranges; a school card is handed straight back.
 
-Exchange cash or use the Financial Centre's **debit card** at the counter, at £1 for £1. Card exchanges require an open account, an issued debit card and enough savings. Every casino table and the slot machine use your casino chip balance. Hold'em chips stay at the table until you return them to that balance. At the cashier, select an amount and cash or bank payment. Exchange chips to keep playing, or redeem your full balance to cash or the same bank account. The maximum exchange is £10,000 at a time. Leaving settles your tables and keeps your chips on the casino account. You must redeem them manually at the cashier for cash or a bank transfer. Redemption remains available after closing.
+Exchange cash or use the Financial Centre's **debit card** at the counter, at £1 for £1. Card exchanges require an open account, an issued debit card and enough savings. Every casino table and the slot machine use your casino chip balance. Hold'em chips stay at the table until you return them to that balance. At the cashier, select an amount and cash or bank payment. Exchange chips to keep playing, or redeem your full balance to cash or the same bank account. The maximum exchange is £100,000 at a time. Leaving settles your tables and keeps your chips on the casino account. You must redeem them manually at the cashier for cash or a bank transfer. Redemption remains available after closing.
 
 You can rest, watch a table or talk to a server in the lounge. Attendants keep watch over the room and its walkways.
 
@@ -206,3 +206,7 @@ Robin needs enough affection and a stable condition; Whitney agrees when your re
 During the party, you can spend time alone. Robin and Sydney's shared branch requires Revelation's **Chaotic Vow** and low Robin trauma. Kylar's shared branch first requires time alone, plus high affection, sufficient lust, low dominance and low jealousy; the other companion must be a willing Robin or Sydney.
 
 <span class="red">Companions react to you approaching others; Kylar reaching the rage tier ends the party.</span> Changing, surrounded and combat states hide voluntary interactions. Bring each of the four lovers to a party to earn the attendance feat.
+
+### Chip denominations and larger stakes
+
+The cashier breaks the balance into denominations, including £100, £1,000, £5,000 and £10,000 chips. Tables and redemption share one account. Larger exchanges and higher blackjack, three-card and hold'em stakes are available at the gambling room. Leaving a table or venue does not automatically redeem the remaining chips.

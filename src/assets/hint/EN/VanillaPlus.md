@@ -61,7 +61,7 @@ The seventh-level exhibitionism trait permits naked travel around town once the 
 | Preferred    | At least 7 days, peak net balance £5,000, clean credit record   | £5,000       | £20,000             | £5,000           |
 | Premier      | At least 30 days, peak net balance £25,000, clean credit record | £15,000      | £50,000             | £10,000          |
 
-Net balance deducts credit and loan debts. Eligibility checks a historical peak, not thirty consecutive days maintaining one deposit figure.
+Net balance deducts credit, personal loan, mortgage and collection debts. Eligibility checks a historical peak, not thirty consecutive days maintaining one deposit figure.
 
 | Charge or interest  | Rule                                                 | What to do                                                                                                                   |
 | ------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -74,18 +74,37 @@ Net balance deducts credit and loan debts. Eligibility checks a historical peak,
 
 Markets respond to farm progress and raids, Ocean Breeze Cafe prices and expansion, and Avery’s company outcomes. Events affect prices after they occur. Reopening the counter does not settle the same event repeatedly.
 
+### Shares, financing and futures
+
+Open a brokerage account and transfer funds at the **securities desk**. Ordinary shares show cost basis, realised profit, distributions and recent quotes. Buying and selling charge a fee; weekly distributions enter brokerage cash.
+
+| Product         | How to trade                                                 | Settlement                                            |
+| --------------- | ------------------------------------------------------------ | ----------------------------------------------------- |
+| Ordinary shares | Choose a security and quantity; sell part or all later       | Fully funded; purchase fees enter cost basis          |
+| Financed shares | Choose shares and leverage                                   | Deposit margin; borrowed funds accrue interest daily  |
+| Futures         | Choose a security or the town index, then open long or short | Cash settlement after fourteen days, or close earlier |
+
+<span class="red">Leverage magnifies losses as well as gains. Positions are closed automatically if equity runs too low.</span> Gap losses exceeding margin first consume idle brokerage cash and bank deposits. Any remaining amount becomes recovery debt. Check the quote before opening a position to see the margin, opening fee and total funds required. Add margin from the positions page; recent settlements distinguish voluntary closes, expiry and forced liquidation.
+
+### Business borrowing and recovery debt
+
+The **business-purpose loan** page at the bank accepts Robin's shop plans or an established farm-orchard sales record. PC signs as the borrower and receives the funds in the bank account. Lending money to Robin remains a separate transfer and debt.
+
+Recovery debt appears in the finance journal with its deadline. Pay it from bank funds and cash, or buy one short extension. Once overdue, Bailey can intercept PC on High Street. Pay, resist or submit; fighting off the collector does not erase the debt. Being taken away can lead to the vanilla underground brothel or Remy’s underground farm. After two insufficient personal-loan or credit-card payments, the remaining balance and accrued charges transfer to collection with fourteen days to pay. The original account stops collecting that debt. A defaulted credit card is withdrawn; a new application is available after the collection debt is cleared.
+
 ### Property running costs and steps
 
 Outright purchases use bank deposits. A mortgage requires a 20% deposit, a 2% fee, and one weekly payment reserved in the bank. Credit may cover the deposit shortfall, but not the bank fee or reserve. Every non-rented, unfrozen home remains usable, and the orphanage room stays available.
-| Home | Price | Layout and use |
-| --------------------------- | -------: | ------------------------------------------------------------------------------------------------------------- |
-| Domus Street cottage | £80,000 | One floor, compact sitting room and kitchen corner, one narrow garden planting bed. No co-resident capacity |
-| Barb Street flat | £150,000 | One floor over the dry canal. A tiny balcony has no planting bed. Upgrade to a double bed for one co-resident |
-| High Street loft | £250,000 | Two levels, upstairs bedroom and desk, small roof planter. Starts with a double bed |
-| Cliff Street sea-view house | £400,000 | Two floors, upstairs sea-view nook and balcony. Salt wind makes planting unsuitable |
-| Danube Street manor | £600,000 | Three floors, guest bedroom, conservatory, walled garden, and upper balcony. Two co-resident places |
 
-1. Choose a property and full payment or mortgage at the counter. Mortgages last 90 days, allow one mortgaged property at a time and charge **0.35% weekly interest**. Credit-funded deposit gaps incur cash-advance fees and cannot replace the fee or payment reserve held in the bank.
+| Home                        |    Price | Layout and use                                                                                                |
+| --------------------------- | -------: | ------------------------------------------------------------------------------------------------------------- |
+| Domus Street cottage        |  £80,000 | One floor, compact sitting room and kitchen corner, one narrow garden planting bed. No co-resident capacity   |
+| Barb Street flat            | £150,000 | One floor over the dry canal. A tiny balcony has no planting bed. Upgrade to a double bed for one co-resident |
+| High Street loft            | £250,000 | Two levels, upstairs bedroom and desk, small roof planter. Starts with a double bed                           |
+| Cliff Street sea-view house | £400,000 | Two floors, upstairs sea-view nook and balcony. Salt wind makes planting unsuitable                           |
+| Danube Street manor         | £600,000 | Three floors, guest bedroom, conservatory, walled garden, and upper balcony. Two co-resident places           |
+
+1. Choose a property and full payment or mortgage at the counter. Choose a mortgage term of 90, 180, 365 or 730 days; the default is 365 days. You can hold one mortgage at a time, with **0.35% weekly interest**. Credit-funded deposit gaps incur cash-advance fees and cannot replace the fee or payment reserve held in the bank.
 2. Enter from that property's street. Any owned, unrented and unfrozen home can be used. The orphanage remains available.
 3. At the furniture-shop entrance, select owned-home furniture and the target property before selecting beds, tables, chairs, desks, wardrobes, ornaments or miscellaneous items. Check the property name so you do not confuse orphanage upgrades with owned-home upgrades.
 4. Use the property counter for tenancy, renovation, repairs or auctions. End a tenancy before using the property as a normal home again.
@@ -102,6 +121,14 @@ Outright purchases use bank deposits. A mortgage requires a 20% deposit, a 2% fe
 Maintenance is **0.105% of price weekly** and condition falls by one weekly. Renting requires condition at least 50. Restoring one condition point costs 0.05% of price. Each renovation costs 5%, with three levels maximum and 60% additional base rent per level. Actual rent also depends on condition.
 
 Voluntary auctions do not pay immediately. They settle after seven days at 75% of listed price. Overdue notices, freezes and forced auctions have separate stages. Frozen homes cannot be entered. **Check arrears before the street entrance disappears.**
+
+### Property-backed borrowing and tenant messages
+
+At the **property counter**, select borrowing against an owned home. Condition and renovation affect the appraisal and lending limit. Only one property loan can be outstanding. Funds enter the bank less the fee; the home can still be occupied or rented, but cannot be auctioned voluntarily while pledged.
+
+New lettings have a tenant-search period. Tenants may pay a week late or report a leak. Read their messages at the property counter. Wait for overdue rent or accept a reduced immediate payment. Leaks reduce net rent and damage condition until repaired.
+
+<span class="red">A foreclosure auction does not erase debt exceeding its proceeds.</span> The report separates proceeds, returned cash and the outstanding shortfall.
 
 ### Where to invite residents
 
@@ -181,7 +208,7 @@ With an open account and visits on at least three different days, ask about work
 3. Retain at least £25,000 in net deposits with current repayments for fourteen consecutive daily settlements to establish the portfolio needed for a management application.
 4. Authorise the use of your account in the application at the bank counter. Maintain the qualifying account for a further week, then ask about the interview result. The assessment also considers Adrian's other customers and work performance.
 
-Net deposits are the bank balance minus credit-card and personal-loan debts. Repeated transfers do not add days, and depositing borrowed money does not increase net deposits. You do not need to borrow or buy shares. A failed daily settlement resets the current accumulation stage, without removing an earned position. During review, it restarts the review week. The work conversation displays your current progress.
+Net deposits are the bank balance minus credit-card, personal-loan, mortgage and collection debts. Repeated transfers do not add days, and depositing borrowed money does not increase net deposits. You do not need to borrow or buy shares. A failed daily settlement resets the current accumulation stage, without removing an earned position. During review, it restarts the review week. The work conversation displays your current progress.
 
 #### Exact rates and eligibility after promotion
 
