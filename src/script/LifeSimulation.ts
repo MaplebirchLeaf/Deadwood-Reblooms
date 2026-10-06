@@ -18,4 +18,5 @@ export default function LifeSimulation(maplebirch: typeof window.maplebirch): vo
   Weapons(maplebirch);
   Medicine(maplebirch);
   Casino(maplebirch);
+  maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-body-growth-clinic-link'], passage: 'Hospital Foyer' });
 }

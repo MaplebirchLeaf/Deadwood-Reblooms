@@ -162,6 +162,10 @@ You can rest, watch a table or talk to a server in the lounge. Attendants keep w
 
 Ask **Marlow** (card dealer, not a love interest) for work. One training hour unlocks regular shifts at £30 base pay, plus £10 for a table handled correctly, and it affects later dialogue.
 
+Marlow's social stats are **Trust** and **Wariness**. Conversation builds trust without erasing trouble at the tables. An apology slightly eases wariness; correctly completed shifts help more. With high wariness, Marlow allows ordinary play but refuses to let you deal.
+
+After being barred for cheating, you can quietly offer cash for one more chance to sit down. Marlow may accept from someone familiar or a worker with several correctly completed shifts, provided your wariness is not severe and you have not repeatedly been caught. The price increases with that night's cheating incidents. Only cash is accepted, refusals cost nothing, and you can try once per night. Acceptance restores seating only: it neither raises trust nor erases cheating records or restores work eligibility. The tables watch you more closely, and another incident bars you again.
+
 | Table        | Stakes and buy-in                     | Notes                                                             |
 | ------------ | ------------------------------------- | ----------------------------------------------------------------- |
 | Blackjack    | £50 / £250 / £500 (arcade and casino) | Vanilla scoring, stands on all seventeens, starting 21 pays 2.5x  |
@@ -184,3 +188,11 @@ At a property you own, invite a resident lover to play blackjack in the sitting 
 ### Troubleshooting the casino
 
 If the room is closed, check the opening hours first. If you cannot enter at all, check skulduggery grade D and the formal ID. If a table is unavailable, check the opening hours, your state of dress and your stress. If the property table has no opponent, check that a resident lover is home and that the pair will not refuse to share the table. If the strip game will not start, check that both you and your lover still have stake garments left.
+
+### Body growth
+
+- **Where**: “Discuss a growth programme” on the gym training floor, with valid admission; “Body growth consultation” in the Hospital Foyer.
+- **Training**: Opt in, then complete strength training, running or coastal running on thirty separate days to increase by one vanilla body size. Running with Doren counts too. Only one credit per day; stretching does not count.
+- **Clinic**: Pay £5,000 for a fourteen-day course. Game days advance its progress; completing it increases body size by one level. Uses your selected payment method. Stopping early gives no refund.
+- **Limits**: One programme at a time, one size per programme, up to the vanilla largest size. Consultation pages show remaining days and allow stopping. Completed growth remains. An external body-size change ends the old programme.
+- **Effects**: Overall size increases. The vanilla size calculation updates physique capacity while preserving your current physique proportion. Other body-part sizes remain unchanged.

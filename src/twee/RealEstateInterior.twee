@@ -225,6 +225,7 @@
 	<<lanLink '返回房产中介' 'Deadwood Reblooms Property Office'>><</lanLink>>
 <<else>>
 	<<run maplebirch.get("VanillaPlus").realEstate.enter()>><<effects>>
+	<<run maplebirch.get("VanillaPlus").realEstate.openWardrobe()>>
 	<<language>>
 		<<option 'EN'>>Your skin is still damp.
 		<<option 'CN'>>你的皮肤仍有些湿润。
@@ -239,10 +240,17 @@
 			<<else>>
 				<<set $wear_lower = 'towel'>>
 			<</if>>
-			<<returnCarried>><<wardrobewear>>
+			<<returnCarried>><<set $wardrobeOption to 'wear'>><<wardrobewear>>
+			<<for _bathSlot range ['upper', 'lower']>>
+				<<if ['towel top', 'towel skirt', 'large towel', 'large towel bottom'].includes($worn[_bathSlot].name)>><<set $worn[_bathSlot].lastTaken to $wardrobe_location>><</if>>
+			<</for>>
 		<</lanLink>>
-		<<if $wardrobe.upper.findIndex(x => x.name == 'bathrobe') >= 0 or $carried.upper.name == 'bathrobe'>>
-			<br><<bathroomicon 'robe'>><<lanLink ['Put on a bathrobe', '穿上浴袍'] 'Deadwood Reblooms Property Bathroom'>><<returnCarried>><<set $wardrobeOption to 'wear'>><<set $wear_upper = $wardrobe.upper.findIndex(x => x.name == 'bathrobe')>><<wardrobewear>><</lanLink>>
+		<<if selectWardrobe().upper.some(item => item.name === 'bathrobe') or $carried.upper.name is 'bathrobe'>>
+			<br><<bathroomicon 'robe'>><<lanLink ['Put on a bathrobe', '穿上浴袍'] 'Deadwood Reblooms Property Bathroom'>>
+				<<if $carried.upper.name is 'bathrobe'>><<set $carried.upper.lastTaken to $wardrobe_location>><</if>>
+				<<returnCarried>><<set $wardrobeOption to 'wear'>>
+				<<set $wear_upper to selectWardrobe().upper.findIndex(item => item.name === 'bathrobe')>><<wardrobewear>>
+			<</lanLink>>
 		<</if>>
 	<</if>>
 <</if>>

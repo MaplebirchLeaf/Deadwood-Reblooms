@@ -17,6 +17,8 @@ export interface CasinoState {
   suspicion: number;
   cheating_caught: number;
   banned_night: number;
+  bribe_night: number;
+  bribe_result: 'accepted' | 'refused' | null;
   met_dealer: boolean;
   trained: boolean;
   shifts: number;
@@ -41,6 +43,8 @@ export const DEFAULT_CASINO_STATE: CasinoState = {
   suspicion: 0,
   cheating_caught: 0,
   banned_night: -1,
+  bribe_night: -1,
+  bribe_result: null,
   met_dealer: false,
   trained: false,
   shifts: 0,
@@ -104,6 +108,7 @@ class Casino {
     return (
       this.available &&
       (C.npc.Marlow?.rage ?? 0) < 10 &&
+      !(this.state.bribe_night === this.night && this.state.bribe_result === 'accepted') &&
       (Time.hour >= 18 || Time.hour < 3) &&
       !this.holdem.active &&
       this.threeCard.state.phase !== 'player' &&
@@ -116,6 +121,30 @@ class Casino {
 
   public get canTalk(): boolean {
     return this.canReply && this.state.last_chat_night !== this.state.guest_night;
+  }
+
+  public get bribeCost(): number {
+    return 10000 + this.state.cheating_caught * 5000;
+  }
+
+  public get canOfferBribe(): boolean {
+    return this.canReply && this.barred && this.state.met_dealer && this.state.bribe_night !== this.night;
+  }
+
+  public get offerBribe(): boolean {
+    if (!this.canOfferBribe || V.money < this.bribeCost) return false;
+    this.state.bribe_night = this.night;
+    const npc = C.npc.Marlow;
+    const familiar = npc && (npc.love >= 10 || this.state.good_shifts >= 3);
+    if (!familiar || npc.rage >= 20 || this.state.cheating_caught > 2) {
+      this.state.bribe_result = 'refused';
+      return true;
+    }
+    V.money -= this.bribeCost;
+    this.state.banned_night = -1;
+    this.state.bribe_result = 'accepted';
+    this.state.suspicion = Math.min(100, this.state.suspicion + 10);
+    return true;
   }
 
   public get wrenPresent(): boolean {
@@ -299,6 +328,7 @@ class Casino {
     if (!this.canWork || this.state.work_scenario === null || ![0, 1].includes(choice)) return 0;
     const correct = choice === [0, 1, 0][this.state.work_scenario];
     Object.assign(this.state, { work_scenario: null, last_work_correct: correct, shifts: this.state.shifts + 1, good_shifts: this.state.good_shifts + (correct ? 1 : 0) });
+    if (correct && C.npc.Marlow) C.npc.Marlow.rage = Math.max(0, (C.npc.Marlow.rage ?? 0) - 2);
     return correct ? 4000 : 3000;
   }
 }

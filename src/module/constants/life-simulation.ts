@@ -5,6 +5,17 @@ import type { SchoolState } from '../LifeSimulation/School';
 import { DEFAULT_SCHOOL_STATE } from '../LifeSimulation/School';
 import { DEFAULT_CASINO_STATE, type CasinoState } from '../LifeSimulation/Casino';
 
+export interface BodyGrowthState {
+  mode: 'gym' | 'clinic' | null;
+  base: number;
+  progress: number;
+  training_day: number;
+  settled_day: number;
+  notice: 'grown' | 'interrupted' | null;
+}
+
+export const DEFAULT_BODY_GROWTH: BodyGrowthState = { mode: null, base: 2, progress: 0, training_day: -1, settled_day: -1, notice: null };
+
 /** 健身房的票种与会员档位。visit 是单次票，其余为按期会员。 */
 export type GymPlan = 'visit' | 'week' | 'month' | 'year' | 'lifetime';
 
@@ -62,6 +73,7 @@ export interface GymState {
 
 // 模块 LifeSimulation 的存档结构，对应 V.LifeSimulation。
 export interface LifeSimulationState {
+  body_growth: BodyGrowthState;
   casino: CasinoState;
   /** 历史课题的进度与证据结果。 */
   historyProject: HistoryProjectState;
@@ -74,6 +86,7 @@ export interface LifeSimulationState {
 
 // 项目进度和证据结果都写入 V.LifeSimulation，重新读档后直接恢复当前阶段。
 export const DEFAULT_LIFE_SIMULATION_STATE: LifeSimulationState = {
+  body_growth: DEFAULT_BODY_GROWTH,
   casino: DEFAULT_CASINO_STATE,
   medicine: { uses: {}, notices: [], review: { day: -1, shared: false, pending: false } },
   historyProject: {

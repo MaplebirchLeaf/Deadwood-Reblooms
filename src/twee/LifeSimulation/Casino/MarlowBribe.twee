@@ -1,0 +1,29 @@
+:: Deadwood Reblooms Casino Marlow Bribe Widgets [widget]
+
+<<widget 'deadwood-marlow-bribe'>>
+	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
+	<<if $_casino.canReply and $_casino.state.bribe_night is $_casino.state.guest_night>>
+		<<language>>
+			<<option 'EN'>>
+				<<if $_casino.state.bribe_result is 'accepted' and !$_casino.barred>>Marlow glances towards the stairs before pocketing the folded notes. "One more seat. That's all." <<nnpc_He 'Marlow'>> taps your cards. "Touch anyone else's, and you're out."
+				<<elseif $_casino.state.cheating_caught gt 2>>Marlow pushes your hand away. "I already gave you another chance. Keep it."
+				<<elseif C.npc.Marlow.rage gte 20>>Marlow leaves the money in your hand. "Too many people saw what you did. I'm not risking my job over you."
+				<<else>>Marlow looks at the notes, then at you. "I don't know you that well. Put it away."<</if>>
+			<<option 'CN'>>
+				<<if $_casino.state.bribe_result is 'accepted' and !$_casino.barred>>马洛往楼梯那边看了一眼，把折好的钞票收进口袋。“再让你坐一次。仅此一次。”<<nnpc_He 'Marlow'>>敲了敲你的牌。“再碰别人的，就出去。”
+				<<elseif $_casino.state.cheating_caught gt 2>>马洛推开你的手。“刚才已经给过你机会了。收起来。”
+				<<elseif C.npc.Marlow.rage gte 20>>马洛没有接钱。“看见你动手脚的人太多了。我可不想为了你丢工作。”
+				<<else>>马洛看了看钞票，又看向你。“我跟你还没这么熟。把钱收起来。”<</if>>
+		<</language>><br><br>
+	<<elseif $_casino.canOfferBribe>>
+		<<set $_bribeCost to $_casino.bribeCost>>
+		<<if $money gte $_bribeCost>>
+			<<set $_bribeLabel to ['Quietly offer Marlow £' + ($_bribeCost / 100).toLocaleString('en-GB'), '悄悄塞给马洛 £' + ($_bribeCost / 100).toLocaleString('en-GB')]>>
+			<<lanLink $_bribeLabel>>
+				<<if maplebirch.get('LifeSimulation').casino.offerBribe>>
+					<<updatesidebarmoney>><<run maplebirch.SugarCube.Engine.show()>>
+				<</if>>
+			<</lanLink>><br><br>
+		<</if>>
+	<</if>>
+<</widget>>

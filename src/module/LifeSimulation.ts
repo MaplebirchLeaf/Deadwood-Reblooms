@@ -7,7 +7,7 @@ import Casino from './LifeSimulation/Casino';
 import Weapons from './LifeSimulation/Weapons';
 import Medicine from './LifeSimulation/Medicine';
 import GymCoach from './LifeSimulation/GymCoach';
-import { DEFAULT_LIFE_SIMULATION_STATE, type GymPlan } from './constants';
+import { DEFAULT_LIFE_SIMULATION_STATE, type BodyGrowthState, type GymPlan } from './constants';
 
 class LifeSimulation extends Module {
   public readonly casino = new Casino(this.core);
@@ -24,6 +24,7 @@ class LifeSimulation extends Module {
   public override preInit(): void {
     super.preInit();
     this.medicine.init();
+    this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-body-growth', { exact: true, action: () => this.settleBodyGrowth() });
     // 只在原版确实跨日时清除到期卡，读档时直接按保存的到期时间判断入场资格。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-gym-membership', {
       exact: true,
@@ -89,6 +90,94 @@ class LifeSimulation extends Module {
     else if (plan === 'month') expiry.addMonths(1);
     else expiry.addYears(1);
     gym.expires_at = expiry.timeStamp;
+  }
+
+  public readonly clinicPrice = 500000;
+
+  public get growth(): BodyGrowthState {
+    return V.LifeSimulation.body_growth;
+  }
+
+  public get growthActive(): boolean {
+    return this.growth.mode !== null;
+  }
+
+  public get growthDuration(): number {
+    return this.growth.mode === 'clinic' ? 14 : 30;
+  }
+
+  public get growthRemaining(): number {
+    return Math.max(0, this.growthDuration - this.growth.progress);
+  }
+
+  private get growthAvailable(): boolean {
+    return V.id > 0 && V.combat !== 1 && V.exposed <= 0 && V.stress < V.stressmax;
+  }
+
+  public get canTrainGrowth(): boolean {
+    return this.growthAvailable && V.location === 'deadwood_gym' && this.has && Time.hour >= 6 && Time.hour < 22;
+  }
+
+  public get canVisitClinic(): boolean {
+    return this.growthAvailable && V.location === 'hospital';
+  }
+
+  public get canGrow(): boolean {
+    return !this.growthActive && Number.isInteger(V.bodysize) && V.bodysize >= 0 && V.bodysize < 3;
+  }
+
+  public get canAffordClinic(): boolean {
+    const finance = this.core.get('VanillaPlus')?.finance;
+    return finance ? finance.canPay(this.clinicPrice, 'hospitalBodyGrowth') : V.money >= this.clinicPrice;
+  }
+
+  public startBodyGrowth(mode: 'gym' | 'clinic'): boolean {
+    if (!this.canGrow || (mode !== 'gym' && mode !== 'clinic')) return false;
+    if (mode === 'gym' ? !this.canTrainGrowth : !this.canVisitClinic || !this.canAffordClinic) return false;
+    if (mode === 'clinic') this.core.SugarCube.Wikifier.wikifyEval(`<<money -${this.clinicPrice} 'hospitalBodyGrowth'>>`);
+    Object.assign(this.growth, { mode, base: V.bodysize, progress: 0, settled_day: Time.days, notice: null });
+    return true;
+  }
+
+  public stopBodyGrowth(): void {
+    this.growth.mode = null;
+    this.growth.progress = 0;
+  }
+
+  /** 只由成功完成的训练调用；同日多个项目或重进页面不能重复累计。 */
+  public trainBodyGrowth(activity: string, day: number): void {
+    if (this.growth.mode !== 'gym' || !['weights', 'run', 'deck-run'].includes(activity) || !this.canTrainGrowth || day <= this.growth.training_day) return;
+    if (day !== Time.days && day !== Time.days - 1) return;
+    this.growth.training_day = day;
+    this.advanceBodyGrowth(1);
+  }
+
+  /** 医美按原版游戏日推进，保存游标使读档与同日事件保持幂等。 */
+  public settleBodyGrowth(): void {
+    if (this.growth.mode !== 'clinic' || Time.days <= this.growth.settled_day) return;
+    const days = Time.days - this.growth.settled_day;
+    this.growth.settled_day = Time.days;
+    this.advanceBodyGrowth(days);
+  }
+
+  private advanceBodyGrowth(amount: number): void {
+    // 原版事件或作弊已改变体型时，不把旧疗程的目标强行覆盖回去。
+    if (V.bodysize !== this.growth.base) {
+      this.stopBodyGrowth();
+      this.growth.notice = 'interrupted';
+      return;
+    }
+    this.growth.progress = Math.min(this.growthDuration, this.growth.progress + amount);
+    if (this.growth.progress < this.growthDuration) return;
+    // 复用原版开局的体型结算，不维护另一份上限表；找不到时保留进度。
+    const calculation = this.core.SugarCube.Story.get('Widgets variablesStart2').text.match(/<<switch \$bodysize>>[\s\S]*?<<\/switch>>/)?.[0];
+    if (!calculation) return;
+    const oldMaximum = V.physiquesize;
+    V.bodysize = this.growth.base + 1;
+    this.core.SugarCube.Wikifier.wikifyEval(calculation);
+    if (oldMaximum > 0) V.physique *= V.physiquesize / oldMaximum;
+    this.stopBodyGrowth();
+    this.growth.notice = 'grown';
   }
 
   public openGymLocker(): void {
