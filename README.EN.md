@@ -27,7 +27,7 @@
 
 `DeadwoodReblooms` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
 
-The current version is **1.3.2**. See the [release notes](.github/release-notes/v1.3.2.md) for the full changes. The bank clerk is now Adrian, with dialogue stat errors fixed. This update expands property decorations, orchard care, Robin's shop and gym interactions, adds native pixel icons and location art, and introduces the Sadomasochism and Trinity traits.
+The current version is **1.4.0**. See the [release notes](.github/release-notes/v1.4.0.md) for the full changes. This update adds the casino chip counter, slots, blackjack, three-card poker and Texas Hold’em, expands dealer and bank-clerk interactions and hawk chick care, and fixes repeated effects when switching languages. Framework **5.4.0** is recommended.
 
 ## Modules and game guide
 
