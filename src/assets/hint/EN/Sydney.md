@@ -1,6 +1,6 @@
 ### Prerequisites and route choice
 
-Enable **Sydney** and reload. School, dorm and estate have separate access rules. **Acquaintance, love-interest selection, dorm invitation and estate address** do not substitute for one another.
+Enable **Sydney** and reload. School, dorm and estate have separate access rules. <span class="teal">Acquaintance, love-interest selection, dorm invitation and estate address do not substitute for one another.</span>
 
 | Route               | Start                                      | Prepare                                                   |
 | ------------------- | ------------------------------------------ | --------------------------------------------------------- |

@@ -1,13 +1,13 @@
 // ./src/module/constants/kylar.ts
 
-// Kylar 模块沿用 V.KylarExpansion 存档字段，保留旧存档进度。
+// Kylar 模块沿用 V.KylarExpansion 存档字段。
 export interface KylarExpansionState {
   /** 是否已接受庄园留宿邀请。 */
   stay_invited: boolean;
   /** 上次澡堂事件的游戏日，-1 表示尚未发生。 */
-  bathDay: number;
+  bath_day: number;
   /** 澡堂遭遇是否已触发，避免重复播放。 */
-  bathEncounter: boolean;
+  bath_encounter: boolean;
   /** 上次游戏厅事件的游戏日。 */
   game_day: number;
   /** 上次茶会事件的游戏日。 */
@@ -26,8 +26,8 @@ export interface KylarExpansionState {
 
 export const DEFAULT_KYLAR_EXPANSION_STATE: KylarExpansionState = {
   stay_invited: false,
-  bathDay: -1,
-  bathEncounter: false,
+  bath_day: -1,
+  bath_encounter: false,
   game_day: -1,
   tea_day: -1,
   notes_day: -1,

@@ -26,6 +26,9 @@ export interface RealEstateState {
   daily_evening: string[];
   daily_night_wake: boolean;
   glide_scared_day: number;
+  furniture_property: PropertyId | null;
+  furniture_category: FurnitureKind;
+  flight_street: string;
 }
 
 interface PropertyManagement {
@@ -64,7 +67,10 @@ export class RealEstate {
     meeting_resident: null,
     daily_evening: [],
     daily_night_wake: false,
-    glide_scared_day: -1
+    glide_scared_day: -1,
+    furniture_property: null,
+    furniture_category: 'bed',
+    flight_street: 'High Street'
   };
   private loadedProperties?: Property[];
   private loadedResidents?: ResidentProfile[];

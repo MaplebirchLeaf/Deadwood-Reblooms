@@ -29,7 +29,7 @@ class MoreLoveInterests {
       },
       cond: () => V.loveInterestList?.length > Math.max(1, this.level) && (this.level < 4 || !V.moreLoveInterest_message)
     });
-    this.core.once(':variable', () => this.sync());
+    this.core.on(':variable', () => this.sync());
     this.core.once(':storyready', () => document.querySelector('.love-interests')?.replaceWith(this.panel));
   }
 
@@ -200,7 +200,7 @@ class MoreLoveInterests {
   private sync(): void {
     // 自定义列表是唯一排序来源，前三项同步给原版三个字段，供原版事件继续读取。
     const stored = Array.isArray(V.loveInterestList) ? V.loveInterestList : Object.values(V.loveInterest ?? {});
-    V.loveInterestList = [...new Set(stored.filter((name): name is string => typeof name === 'string' && name !== 'None'))];
+    V.loveInterestList = [...new Set(stored.filter((name: unknown): name is string => typeof name === 'string' && name !== 'None'))];
     V.loveInterest = {
       primary: V.loveInterestList[0] ?? 'None',
       secondary: V.loveInterestList[1] ?? 'None',

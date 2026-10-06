@@ -24,7 +24,7 @@
 <<stress 4>><<gstress>>
 <br><br>
 <<investigateicon>><<lanLink ['Open the door into the ward', '推开那扇通往病院的门'] 'Deadwood Robin Tentacle Ward'>>
-  <<run maplebirch.get('Robin').asylum.tentacleStart()>><<unset $tentacleAmbush>><<unset $tentacleSteps>>
+  <<run maplebirch.get('Robin').asylum.tentacleStart()>><<set $RobinExpansion.asylum.tentacle_ambush to false>><<set $RobinExpansion.asylum.tentacle_steps to 0>>
 <</lanLink>><br>
 <<getouticon>><<lanLink ['Leave the door alone', '离开那扇门'] 'Tentacle Plains'>><</lanLink>><br>
 
@@ -74,7 +74,7 @@
 
 :: Deadwood Robin Tentacle Crossing []
 <<set $outside to 0>><<location 'tentworld'>><<effects>><<tentacleworldintro>>
-<<set $tentacleSteps to 0>><<set $tentacleAmbush to false>><<set $phase to 0>>
+<<set $RobinExpansion.asylum.tentacle_steps to 0>><<set $RobinExpansion.asylum.tentacle_ambush to false>><<set $phase to 0>>
 <<language>>
   <<option 'EN'>>
     You lead Robin through the door. It closes behind you. Far across the plains,
@@ -154,8 +154,8 @@
     <<lanSwitch 'The tentacles do not catch you off guard.' '触手没有抓到你的破绽。'>>
     <br><br>
   <</if>>
-  <<if $tentacleAmbush>>
-    <<set $tentacleAmbush to false>>
+  <<if $RobinExpansion.asylum.tentacle_ambush>>
+    <<set $RobinExpansion.asylum.tentacle_ambush to false>>
     <<language>>
       <<option 'EN'>>
         The ground tilts without warning. Coils come up out of the silt on both sides at once and
@@ -203,32 +203,32 @@
     <<if $tentnorth lt 5>>
       <<tentacleicon 'north'>><<lanLink ['North (0:10)', '向北 (0:10)'] 'Deadwood Robin Tentacle March'>>
         <<pass 10>><<set $tentnorth += 1>><<set $phase to 1>>
-        <<set $tentacleSteps to $tentacleSteps + 1>>
-        <<set $tentacleAmbush to ($RobinExpansion.asylum.tentacleWave is 0 and $tentacleSteps gte 3) or random(1, 100) lte 40>>
+        <<set $RobinExpansion.asylum.tentacle_steps to $RobinExpansion.asylum.tentacle_steps + 1>>
+        <<set $RobinExpansion.asylum.tentacle_ambush to ($RobinExpansion.asylum.tentacleWave is 0 and $RobinExpansion.asylum.tentacle_steps gte 3) or random(1, 100) lte 40>>
       <</lanLink>>
       <br>
     <</if>>
     <<if $tentnorth gt -5>>
       <<tentacleicon 'south'>><<lanLink ['South (0:10)', '向南 (0:10)'] 'Deadwood Robin Tentacle March'>>
         <<pass 10>><<set $tentnorth -= 1>><<set $phase to 2>>
-        <<set $tentacleSteps to $tentacleSteps + 1>>
-        <<set $tentacleAmbush to ($RobinExpansion.asylum.tentacleWave is 0 and $tentacleSteps gte 3) or random(1, 100) lte 40>>
+        <<set $RobinExpansion.asylum.tentacle_steps to $RobinExpansion.asylum.tentacle_steps + 1>>
+        <<set $RobinExpansion.asylum.tentacle_ambush to ($RobinExpansion.asylum.tentacleWave is 0 and $RobinExpansion.asylum.tentacle_steps gte 3) or random(1, 100) lte 40>>
       <</lanLink>>
       <br>
     <</if>>
     <<if $tenteast lt 5>>
       <<tentacleicon 'east'>><<lanLink ['East (0:10)', '向东 (0:10)'] 'Deadwood Robin Tentacle March'>>
         <<pass 10>><<set $tenteast += 1>><<set $phase to 3>>
-        <<set $tentacleSteps to $tentacleSteps + 1>>
-        <<set $tentacleAmbush to ($RobinExpansion.asylum.tentacleWave is 0 and $tentacleSteps gte 3) or random(1, 100) lte 40>>
+        <<set $RobinExpansion.asylum.tentacle_steps to $RobinExpansion.asylum.tentacle_steps + 1>>
+        <<set $RobinExpansion.asylum.tentacle_ambush to ($RobinExpansion.asylum.tentacleWave is 0 and $RobinExpansion.asylum.tentacle_steps gte 3) or random(1, 100) lte 40>>
       <</lanLink>>
       <br>
     <</if>>
     <<if $tenteast gt -5>>
       <<tentacleicon 'west'>><<lanLink ['West (0:10)', '向西 (0:10)'] 'Deadwood Robin Tentacle March'>>
         <<pass 10>><<set $tenteast -= 1>><<set $phase to 4>>
-        <<set $tentacleSteps to $tentacleSteps + 1>>
-        <<set $tentacleAmbush to ($RobinExpansion.asylum.tentacleWave is 0 and $tentacleSteps gte 3) or random(1, 100) lte 40>>
+        <<set $RobinExpansion.asylum.tentacle_steps to $RobinExpansion.asylum.tentacle_steps + 1>>
+        <<set $RobinExpansion.asylum.tentacle_ambush to ($RobinExpansion.asylum.tentacleWave is 0 and $RobinExpansion.asylum.tentacle_steps gte 3) or random(1, 100) lte 40>>
       <</lanLink>>
       <br>
     <</if>>
@@ -374,7 +374,7 @@
 
 :: Deadwood Robin Tentacle Rest []
 <<set $outside to 0>><<location 'tentworld'>><<effects>>
-<<set $tentacleSteps to 0>><<set $tentacleAmbush to false>>
+<<set $RobinExpansion.asylum.tentacle_steps to 0>><<set $RobinExpansion.asylum.tentacle_ambush to false>>
 <<language>>
   <<option 'EN'>>
     You stop long enough to catch your breath. Robin stays beside you, watching the ground.
@@ -413,7 +413,7 @@
   <<asylumescape>><<badEndTrackingEnd 'Asylum' { reason: 'asylumTentacle' }>>
 <</if>>
 <<run maplebirch.get('Robin').asylum.rescue()>>
-<<endevent>><<tentacleworldend>><<unset $tentacleSteps>><<unset $tentacleAmbush>>
+<<endevent>><<tentacleworldend>><<set $RobinExpansion.asylum.tentacle_steps to 0>><<set $RobinExpansion.asylum.tentacle_ambush to false>>
 <<set $outside to 1>><<location 'forest'>>
 <<set $forest to random(50, 100)>>
 <<language>>
@@ -458,7 +458,7 @@
 <<set $outside to 0>><<location 'asylum'>>
 <<if $suspicion isnot undefined and $asylumstatus isnot undefined>><<asylumeffects>><</if>>
 <<effects>>
-<<run maplebirch.get('Robin').asylum.returnFromTentacles()>><<unset $tentacleSteps>><<unset $tentacleAmbush>>
+<<run maplebirch.get('Robin').asylum.returnFromTentacles()>><<set $RobinExpansion.asylum.tentacle_steps to 0>><<set $RobinExpansion.asylum.tentacle_ambush to false>>
 <<npc Harper>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -520,7 +520,7 @@
 <<if $combat is 1>><<endcombat>><</if>>
 <<set $RobinExpansion.asylum.tentacleFailures += 1>>
 <<run maplebirch.get('Robin').asylum.returnFromTentacles()>>
-<<unset $tentacleSteps>><<unset $tentacleAmbush>>
+<<set $RobinExpansion.asylum.tentacle_steps to 0>><<set $RobinExpansion.asylum.tentacle_ambush to false>>
 <<npcincr Robin trauma 4>><<grtrauma>><<trauma 8>><<gtrauma>>
 <<language>>
   <<option 'EN'>>

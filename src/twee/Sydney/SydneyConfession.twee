@@ -78,7 +78,7 @@
   <<clearnpc>><<npc Sydney>><<person1>>
   <<set $daily.sydney.sex = ($daily.sydney.sex || 0) + 1>>
   <<set $sydney.sexTotal += 1>>
-  <<set $sydneyConfessionIntrusion to 0>>
+  <<set $SydneyExpansion.confession_intrusion to 0>>
   <<set $sexstart to 0>>
   <<consensual>>
   <<set $consensual to 1>>
@@ -107,11 +107,11 @@
 <<actionsman>>
 
 <!-- 告解室中断：亲密行为进行一段时间后，把下一步转入可选择的忏悔者事件。 -->
-<<if $sydneyConfessionIntrusion is 0 and $enemyarousal gte 150 and !_combatend>>
-  <<set $sydneyConfessionIntrusion to 1>>
+<<if $SydneyExpansion.confession_intrusion is 0 and $enemyarousal gte 150 and !_combatend>>
+  <<set $SydneyExpansion.confession_intrusion to 1>>
 <</if>>
 
-<<if $sydneyConfessionIntrusion is 1>>
+<<if $SydneyExpansion.confession_intrusion is 1>>
   <span id="next"><<lanLink '继续' 'Temple Confess Self Sydney Interrupted'>><</lanLink>></span><<nexttext>>
 <<elseif _combatend>>
   <span id="next"><<lanLink '继续' 'Temple Confess Self Sydney Sex Finish'>><</lanLink>></span><<nexttext>>
@@ -155,7 +155,7 @@
 <<if hasSexStat('promiscuity', 3)>>
   <<loveicon>><<lanLink ['Keep teasing Sydney', '继续挑逗悉尼'] 'Temple Confess Self Sydney Interrupted Tease'>><</lanLink>><<promiscuous3>><<garousal>><br>
 <</if>>
-<<getouticon>><<lanLink ['Stop before you are discovered', '在被发现前停下'] 'Temple Confess Self Sydney Sex Finish'>><<set $sydneyConfessionIntrusion to 3>><</lanLink>><<lstress>><br>
+<<getouticon>><<lanLink ['Stop before you are discovered', '在被发现前停下'] 'Temple Confess Self Sydney Sex Finish'>><<set $SydneyExpansion.confession_intrusion to 3>><</lanLink>><<lstress>><br>
 
 :: Temple Confess Self Sydney Interrupted Wait []
 <<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>><<person1>><<run statusCheck('Sydney')>>
@@ -185,7 +185,7 @@
     <br><br>
     忏悔者向悉尼道谢后离开。你们保持安静，直到门外的脚步彻底远去。
 <</language>>
-<<set $sydneyConfessionIntrusion to 2>><<npcincr Sydney love 1>><<glove 'Sydney'>><<stress -3>><<lstress>>
+<<set $SydneyExpansion.confession_intrusion to 2>><<npcincr Sydney love 1>><<glove 'Sydney'>><<stress -3>><<lstress>>
 <br><br>
 <<loveicon>><<lanLink ['Turn back to Sydney', '回身面对悉尼'] 'Temple Confess Self Sydney Sex'>><</lanLink>><br>
 
@@ -219,7 +219,7 @@
     忏悔者终于向悉尼道谢后离开。门扉合拢，悉尼等脚步声远去，才满脸通红地责怪般看向你。
     <span class="lewd">“你绝对是故意的。”<<he>>低声说道，再次把你拉近。</span>
 <</language>>
-<<set $sydneyConfessionIntrusion to 2>><<npcincr Sydney love 1>><<npcincr Sydney purity -2>><<glove 'Sydney'>><<lspurity>><<arousal 300>><<garousal>>
+<<set $SydneyExpansion.confession_intrusion to 2>><<npcincr Sydney love 1>><<npcincr Sydney purity -2>><<glove 'Sydney'>><<lspurity>><<arousal 300>><<garousal>>
 <br><br>
 <<loveicon>><<lanLink '吻悉尼' 'Temple Confess Self Sydney Sex'>><</lanLink>><<kissvirginitywarning>><<NPCvirginitywarning 'Sydney' 'kiss'>><br>
 
@@ -287,7 +287,7 @@
     <<tearful>>你整理好衣服，悉尼则贴在门边倾听。
     <<He>>擦去唇边那场共同“忏悔”留下的痕迹。等走廊恢复安静后，你溜回了自己的隔间。
 <</language>>
-<<unset $sydneyConfessionIntrusion>>
+<<set $SydneyExpansion.confession_intrusion to 0>>
 <<clotheson>>
 <<endcombat>>
 <<npc Sydney>>

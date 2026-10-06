@@ -1,5 +1,7 @@
 // ./src/script/VanillaPlus/Promiscuity.ts
 
+import HandGrip from '../../module/VanillaPlus/HandGrip';
+
 export default function (maplebirch: typeof window.maplebirch) {
   type GuideHand = 'left' | 'right';
   type GuideDestination = 'player-vagina' | 'player-anus' | 'NPC-vagina' | 'NPC-anus';
@@ -45,7 +47,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     return second != null && enabled && state === 'penetrated' && maplebirch.get('VanillaPlus')!.NPCDoublePenetration.canJoinPlayer(target(second), orifice);
   };
   const handTarget = (hand: GuideHand) => target(hand === 'left' ? V.lefttarget : V.righttarget);
-  const handAvailable = (hand: GuideHand) => T?.[`${hand}Options`] === 'free';
+  const handAvailable = (hand: GuideHand) => HandGrip.handFree(hand);
   const canTongueKiss = () => {
     const selected = target(V.mouthtarget);
     const npc = V.NPCList?.[selected];

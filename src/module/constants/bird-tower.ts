@@ -72,6 +72,10 @@ export interface BirdTowerState {
   };
   /** 跨段落成长事件：完整名单用于称呼，参与者在开场时随机选定。 */
   scene: {
+    /** 当前事件位于新巢；跨页面喂食与荒原同行的对象。 */
+    other_nest: boolean;
+    feeding_id: number | null;
+    moor_ids: number[];
     ids: number[];
     actors: number[];
   };
@@ -109,6 +113,9 @@ export const DEFAULT_BIRD_TOWER_STATE: BirdTowerState = {
     hunt_ask: false
   },
   scene: {
+    other_nest: false,
+    feeding_id: null,
+    moor_ids: [],
     ids: [],
     actors: []
   },

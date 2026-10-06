@@ -4,6 +4,7 @@
   <<set _prey to maplebirch.get('BirdTower').prey>>
   <<set _other_hawks to _prey.followers>>
   <<set _caught to _prey.caught.length>>
+  <<set _multi to _other_hawks.length gt 1>>
   <<if _other_hawks.length>>
     <<language>>
       <<option 'EN'>>
@@ -14,24 +15,25 @@
     <<if _caught is 0>>
       <<language>>
         <<option 'EN'>>
-          <<childrenNames _other_hawks>> have empty talons. They whimper softly, looking dejected.
+          <<childrenNames _other_hawks>> <<= _multi ? "have" : "has">> empty talons, <<= _multi ? "and they whimper softly, looking dejected." : "whimpering softly and looking dejected.">>
         <<option 'CN'>>
-          <<childrenNames _other_hawks>>的爪中空空荡荡。他们低声哀鸣着，一副垂头丧气的样子。
+          <<childrenNames _other_hawks>>的爪中<<if _multi>>全都<</if>>空空荡荡的，<<= _multi ? "他们" : "">>低声哀鸣着，一副垂头丧气的样子。
       <</language>>
     <<elseif _caught is _other_hawks.length>>
       <<language>>
         <<option 'EN'>>
-          <<childrenNames _other_hawks>> each hold a lurker in their talons. They circle high in the sky, crying out proudly.
+          <<childrenNames _other_hawks>> <<= _multi ? "each hold a lurker in their talons, and they circle high in the sky, crying out proudly." : "holds a lurker in their talons and circles high in the sky, crying out proudly.">>
         <<option 'CN'>>
-          <<childrenNames _other_hawks>>的爪里各抓着一只潜伏者，正盘旋在高空自豪地高鸣。
+          <<childrenNames _other_hawks>>的爪里<<if _multi>>都各自<</if>>抓着一只潜伏者，<<= _multi ? "他们" : "">>正盘旋在高空自豪地高鸣。
       <</language>>
     <<else>>
       <<set _successful_hawks to _prey.caught>>
+      <<set _multi to _successful_hawks.length gt 1>>
       <<language>>
         <<option 'EN'>>
-          <<childrenNames _successful_hawks>> each hold a lurker in their talons, but the other chicks are not so lucky. The successful hunters cry out triumphantly, while the others can only watch enviously.
+          <<childrenNames _successful_hawks>> <<= _multi ? "each hold a lurker in their talons, but the other chicks are not so lucky. They cry out triumphantly, while the others can only watch enviously." : "holds a lurker in their talons, but the other chicks are not so lucky. They cry out triumphantly, while the others can only watch enviously.">>
         <<option 'CN'>>
-          <<childrenNames _successful_hawks>>的爪里各有一只潜伏者，但其他孩子就没那么幸运了。狩猎成功的孩子耀武扬威地高鸣着，其他孩子只能眼巴巴地看着。
+          <<childrenNames _successful_hawks>>的爪里<<if _multi>>各<</if>>有一只潜伏者，但其他孩子就没那么幸运了。<<= _multi ? "他们" : "">>耀武扬威地高鸣着炫耀自己狩猎成功，而其他孩子只能眼巴巴地看着。
       <</language>>
     <</if>>
     <<if _caught gt 0>><<flight_hunt_get "lurkers" _caught>><</if>>

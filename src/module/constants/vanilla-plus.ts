@@ -117,6 +117,8 @@ export interface VanillaPlusState {
   };
   /** 淫乱相关的场景进度。 */
   promiscuity: {
+    /** 臀部引导动作的 NPC 目标，null 表示未占用。 */
+    bottom_target: number | null;
     /** 五级突破事件已完成。 */
     levelFive: number;
   };
@@ -213,6 +215,7 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
     }
   },
   promiscuity: {
+    bottom_target: null,
     levelFive: 0
   },
   handGrip: {

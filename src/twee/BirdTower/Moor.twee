@@ -142,7 +142,7 @@
   <</if>>
 <</if>>
 <br>
-<<lanLink ['Go home together', '一起回家'] 'Deadwood BirdTower Moor Home'>><</lanLink>>
+<<lanLink ['Go home together', '跟你一起回家'] 'Deadwood BirdTower Moor Home'>><</lanLink>>
 <br>
 <<lanLink ['Just hold each other (0:05)', '只是拥抱 (0:05)'] 'Deadwood BirdTower Moor Hug'>>
   <<transform bird 1>>
@@ -258,7 +258,7 @@
       你带着<<childrenNames _tempIDs>>踏上了返程。
   <</language>>
   <br><br>
-  <<set $tempIDsCopy to clone(_tempIDs)>>
+  <<set $BirdTower.scene.moor_ids to clone(_tempIDs)>>
   <<set _time to (100 - $moor) / 5 * 2>>
   <<lanLink `['Continue (0:' + String(_time).padStart(2, '0') + ')', '继续 (0:' + String(_time).padStart(2, '0') + ')']` 'Deadwood BirdTower Moor Return'>>
     <<HuntTogetherClean>>
@@ -351,7 +351,7 @@
       <</if>>
       <<language>>
         <<option 'EN'>>
-          "Bye bye <<print lanSwitch("Mama", "妈妈")>>," you hear a lisped farewell from your <<childname>>. When did <<childHe>> learn to talk?...
+          "Bye bye <<print _playerRole is "妈妈" ? "Mama" : "Dada">>," you hear a lisped farewell from your <<childname>>. When did <<childHe>> learn to talk?...
         <<option 'CN'>>
           "拜拜<<print _playerRole>>，"你听见一句口齿不清的告别，来自你的<<childname>>。<<childHe>>什么时候学会说话了？……
       <</language>>
@@ -448,7 +448,7 @@
 <<set $location to "tower">>
 <<effects>>
 <<npc "Great Hawk">>
-<<set _hawks to ($tempIDsCopy.length gt 1 ? lanSwitch('the children', '孩子们') : "<<childname $tempIDsCopy[0]>>")>>
+<<set _hawks to ($BirdTower.scene.moor_ids.length gt 1 ? lanSwitch('the children', '孩子们') : "<<childname $BirdTower.scene.moor_ids[0]>>")>>
 <<language>>
   <<option 'EN'>>
     You fly back to the tower with _hawks and land beside the nest.
@@ -480,7 +480,7 @@
   <</language>>
 <</if>>
 <br><br>
-<<run delete $tempIDsCopy>>
+<<set $BirdTower.scene.moor_ids to []>>
 <<lanLink ['Continue', '继续'] 'Bird Tower'>>
   <<endevent>>
 <</lanLink>>

@@ -465,7 +465,7 @@
 <<if $VanillaPlus.real_estate.mortgage>>
 	<<set _loan to maplebirch.get("VanillaPlus").realEstate.mortgage.current>>
 	<strong><<lanSwitch 'Your mortgage' '你的房贷'>></strong>：<<deadwood-reblooms-finance-money _loan.outstanding>><br>
-	<<lanSwitch 'Weekly instalment' '每周应还'>>：<<deadwood-reblooms-finance-money _loan.weekly_payment>> · <<lanSwitch 'Weekly interest' '周利率'>>：<<= (maplebirch.get("VanillaPlus").realEstate.mortgage.terms.weeklyInterestRate * 100).toFixed(2)>>%<br>
+	<<lanSwitch 'Weekly instalment' '每周应还'>>：<<deadwood-reblooms-finance-money _loan.weekly_payment>> · <<lanSwitch 'Weekly interest' '周利率'>>：<<= (maplebirch.get("VanillaPlus").realEstate.mortgage.terms.weekly_interest_rate * 100).toFixed(2)>>%<br>
 	<<lanSwitch 'Next payment on day' '下次还款日'>> <<=_loan.next_payment_day>> · <<lanSwitch 'Final payment on day' '最终还款日'>> <<=_loan.maturity_day>><br>
 	<<lanSwitch 'Overdue balance' '逾期金额'>>：<<deadwood-reblooms-finance-money _loan.arrears>> · <<lanSwitch 'Status' '状态'>>：<<switch _loan.stage>><<case 'notice'>><span class='red'><<lanSwitch 'Payment notice' '催缴中'>></span><<case 'frozen'>><span class='red'><<lanSwitch 'Frozen' '已冻结'>></span><<default>><span class='green'><<lanSwitch 'Current' '正常'>></span><</switch>><br>
 	<<if _loan.stage is 'notice' && _loan.bailey_pending>>
@@ -487,8 +487,8 @@
 		<<if maplebirch.get("VanillaPlus").realEstate.owns(_property.id)>>
 			<<deadwood-reblooms-property-street-icon _property.id>>
 			<<lanLink _property.name.CN 'Deadwood Reblooms Property Furniture Catalogue'>>
-				<<set $deadwoodFurnitureProperty to _property.id>>
-				<<set $deadwoodFurnitureCategory to 'bed'>>
+				<<set $VanillaPlus.real_estate.furniture_property to _property.id>>
+				<<set $VanillaPlus.real_estate.furniture_category to 'bed'>>
 			<</lanLink>><br>
 		<</if>>
 	<</capture>>
@@ -497,7 +497,7 @@
 
 :: Deadwood Reblooms Property Furniture Catalogue []
 <<set $outside to 0>><<set $location to 'shopping_centre'>><<effects>>
-<<set _property to maplebirch.get("VanillaPlus").realEstate.properties.find(item => item.id === $deadwoodFurnitureProperty && maplebirch.get("VanillaPlus").realEstate.owns(item.id))>>
+<<set _property to maplebirch.get("VanillaPlus").realEstate.properties.find(item => item.id === $VanillaPlus.real_estate.furniture_property && maplebirch.get("VanillaPlus").realEstate.owns(item.id))>>
 <<if !_property>>
 	<<lanSwitch 'Choose a home first.' '请先选择住处。'>><br><br>
 	<<getouticon>><<lanLink '返回' 'Deadwood Reblooms Property Furnishings'>><</lanLink>>
@@ -533,11 +533,11 @@
 	<<run _categories.forEach(item => item.label = lanSwitch(item.EN, item.CN))>>
 	<<for _category range _categories>>
 		<<capture _category>>
-			<div @class="$deadwoodFurnitureCategory is _category.id ? 'shopTabSelected' : 'shopTab'">
+			<div @class="$VanillaPlus.real_estate.furniture_category is _category.id ? 'shopTabSelected' : 'shopTab'">
 				<button
-					@class="($deadwoodFurnitureCategory is _category.id ? 'selected' : '')"
+					@class="($VanillaPlus.real_estate.furniture_category is _category.id ? 'selected' : '')"
 					@id="Dynamic.eventBinder(_category.id)"
-					onclick="(id) => $deadwoodFurnitureCategory = id"
+					onclick="(id) => $VanillaPlus.real_estate.furniture_category = id"
 				>_category.label
 				</button>
 			</div>
@@ -547,9 +547,9 @@
 
 :: Deadwood Reblooms Property Furniture List [widget]
 <<widget 'deadwood-reblooms-property-furniture-list'>>
-<<set _property to maplebirch.get("VanillaPlus").realEstate.properties.find(item => item.id === $deadwoodFurnitureProperty && maplebirch.get("VanillaPlus").realEstate.owns(item.id))>>
-	<<set _current to maplebirch.get("VanillaPlus").realEstate.furniture(_property.id, $deadwoodFurnitureCategory)>>
-	<<if ['poster', 'wallpaper'].includes($deadwoodFurnitureCategory)>>
+<<set _property to maplebirch.get("VanillaPlus").realEstate.properties.find(item => item.id === $VanillaPlus.real_estate.furniture_property && maplebirch.get("VanillaPlus").realEstate.owns(item.id))>>
+	<<set _current to maplebirch.get("VanillaPlus").realEstate.furniture(_property.id, $VanillaPlus.real_estate.furniture_category)>>
+	<<if ['poster', 'wallpaper'].includes($VanillaPlus.real_estate.furniture_category)>>
 		<<lanSwitch 'You browse the samples of pre-made designs. A custom design costs twice as much.' '你翻看着预制图案的样品。支付双倍价格，可以定制图案。'>><br><br>
 	<</if>>
 	<<lanSwitch 'Currently installed in this home:' '这处住处当前布置的是：'>>
@@ -557,10 +557,10 @@
 		<<furnitureicon _current.iconFile>> <<= _current.nameCap>><br>
 		<<if _current.description>>
 			<span class='description'><<= _current.description>>
-				<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('organiser')>> <<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
-				<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('spacious')>> <<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
-				<<if $deadwoodFurnitureCategory is 'wardrobe' and _current.type.includes('starter')>> <<lanSwitch 'Can hold 20 of each item type.' '每种物品类别可容纳 20 个。'>><</if>>
-				<<if _current.type.includes('comfy')>> <<if $deadwoodFurnitureCategory is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
+				<<if $VanillaPlus.real_estate.furniture_category is 'wardrobe' and _current.type.includes('organiser')>> <<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
+				<<if $VanillaPlus.real_estate.furniture_category is 'wardrobe' and _current.type.includes('spacious')>> <<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
+				<<if $VanillaPlus.real_estate.furniture_category is 'wardrobe' and _current.type.includes('starter')>> <<lanSwitch 'Can hold 20 of each item type.' '每种物品类别可容纳 20 个。'>><</if>>
+				<<if _current.type.includes('comfy')>> <<if $VanillaPlus.real_estate.furniture_category is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
 				<<if _current.type.includes('double')>> <<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>><</if>>
 			</span>
 		<</if>>
@@ -569,7 +569,7 @@
 	<</if>>
 	<hr>
 	<div id='furnitureContainer'>
-		<<set _offers to maplebirch.get("VanillaPlus").realEstate.furnitureOffers(_property.id, $deadwoodFurnitureCategory)>>
+		<<set _offers to maplebirch.get("VanillaPlus").realEstate.furnitureOffers(_property.id, $VanillaPlus.real_estate.furniture_category)>>
 		<<for _offer range _offers>>
 			<<capture _offer>>
 				<<set _priceLabel to '£' + _offer.cost / 100>>
@@ -583,7 +583,7 @@
 					<<if _offer.item.type.includes('organiser')>><<lanSwitch 'Organiser' '收纳'>> | <</if>>
 					<<if _offer.item.description>>
 						<mouse class='tooltip linkBlue'>(?)<span><<= _offer.item.description>>
-							<<if _offer.item.type.includes('comfy')>><br><<if $deadwoodFurnitureCategory is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
+							<<if _offer.item.type.includes('comfy')>><br><<if $VanillaPlus.real_estate.furniture_category is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
 							<<if _offer.item.type.includes('double')>><br><<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>><</if>>
 							<<if _offer.item.type.includes('spacious')>><br><<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
 							<<if _offer.item.type.includes('organiser')>><br><<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
@@ -591,9 +591,9 @@
 					<</if>>
 					<<if maplebirch.get("VanillaPlus").finance.canPay(_offer.cost, 'furniture')>>
 						<<link _priceLabel 'Deadwood Reblooms Property Furniture Catalogue'>>
-							<<if maplebirch.get("VanillaPlus").realEstate.installFurniture(_property.id, $deadwoodFurnitureCategory, _offer.id, _offer.id is 'custom' ? _customHanging : undefined)>>
+							<<if maplebirch.get("VanillaPlus").realEstate.installFurniture(_property.id, $VanillaPlus.real_estate.furniture_category, _offer.id, _offer.id is 'custom' ? _customHanging : undefined)>>
 								<<money `-_offer.cost` 'furniture'>>
-								<<run Furniture.log(['poster', 'wallpaper'].includes($deadwoodFurnitureCategory) ? $deadwoodFurnitureCategory : _offer.id)>>
+								<<run Furniture.log(['poster', 'wallpaper'].includes($VanillaPlus.real_estate.furniture_category) ? $VanillaPlus.real_estate.furniture_category : _offer.id)>>
 							<</if>>
 						<</link>>
 					<<else>>

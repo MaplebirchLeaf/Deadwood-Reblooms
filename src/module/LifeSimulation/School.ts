@@ -418,6 +418,7 @@ class School {
     // 侧栏可单独关闭。值勤目标仍须遵守原版晨间日程，不能仅凭 NPC 处于 active 状态就召到校门。
     switch (student) {
       case 'Kylar':
+        if (Time.schoolDay && Time.hour >= 7 && Time.hour < 9) return true;
         return SCHOOL_CAMPUS_LOCATIONS.Kylar.includes(window.getKylarLocation().area);
       case 'Sydney':
         return true;

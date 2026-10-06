@@ -71,7 +71,7 @@
 <</lanLink>>
 
 :: Deadwood BirdTower FoodForOne []
-<<set _fedIds to Number.isInteger($passHawkID) ? maplebirch.get('BirdTower').feed($passHawkID) : []>>
+<<set _fedIds to Number.isInteger($BirdTower.scene.feeding_id) ? maplebirch.get('BirdTower').feed($BirdTower.scene.feeding_id) : []>>
 <<if _fedIds.length>>
   <<childSelect _fedIds[0]>>
   <<language>>
@@ -80,7 +80,7 @@
     <<option 'CN'>>
       你把潜伏者喂给了<<childname>>。<<childHe>>接过肉块，<<print either('安静地开始进食', '几乎一下就吞掉了', '开始开心地进食')>>。
   <</language>>
-  <<if maplebirch.get('BirdTower').hungry.some(child => child.childId isnot $passHawkID)>>
+  <<if maplebirch.get('BirdTower').hungry.some(child => child.childId isnot $BirdTower.scene.feeding_id)>>
     <<language>>
       <<option 'EN'>>
         The other children watch you feed <<childhim>>, <<print either('shrieking', 'shoving one another', 'their beaks wide open', 'flapping their wings')>>, and then cry even louder.
@@ -105,13 +105,13 @@
     <<option 'EN'>>
       Some of the children are still waiting to be fed.
     <<option 'CN'>>
-      还有孩子在等待你喂食。
+      其他孩子还在等待你喂食。
   <</language>>
   <br>
   <<birdtower_feeding_options _childrenIds>>
 <</if>>
 <<lanLink ['Continue', '继续'] 'Bird Tower'>>
-  <<unset $passHawkID>>
+  <<set $BirdTower.scene.feeding_id to null>>
   <<endevent>>
 <</lanLink>>
 
@@ -122,7 +122,7 @@
     <<option 'EN'>>
       You tear the lurker into little strips of meat and divide them evenly among the children.
     <<option 'CN'>>
-      你把潜伏者撕成一条一条的小肉条，平均分给孩子们。
+      你把潜伏者撕成一条一条的小肉条，平均地分给了所有孩子。
   <</language>>
   <<if maplebirch.get('BirdTower').hungry.length>>
     <<language>>
@@ -146,7 +146,7 @@
       <<option 'EN'>>
         The children's chirps and screeches quiet down, and they start eating happily.
       <<option 'CN'>>
-        孩子们的唧唧叫和尖鸣安静下来，他们开始开心地进食。
+        孩子们的唧唧叫和尖鸣安静了下来，他们开始开心地进食。
     <</language>>
   <</if>>
   <br><br>
@@ -168,7 +168,7 @@
   <<for _feedId range _args[0]>>
     <<capture _feedId>>
       <<lanLink `['Feed ' + $childRecords[_feedId].name, '给' + $childRecords[_feedId].name + '吃']` 'Deadwood BirdTower FoodForOne'>>
-        <<set $passHawkID to _feedId>>
+        <<set $BirdTower.scene.feeding_id to _feedId>>
       <</lanLink>>
       <br>
     <</capture>>

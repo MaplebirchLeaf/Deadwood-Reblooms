@@ -1,6 +1,6 @@
 // ./src/module/constants/whitney.ts
 
-// Whitney 模块沿用 V.WhitneyExpansion 存档字段，保留旧存档进度。
+// Whitney 模块沿用 V.WhitneyExpansion 存档字段。
 export interface WhitneyExpansionState {
   /**
    * 是否已完成地下营救。

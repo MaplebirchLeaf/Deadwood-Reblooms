@@ -1,9 +1,7 @@
 // ./src/module/Robin/Balloon.ts
 
+import type { BalloonRoute } from '../constants';
 import Shared from './Shared';
-
-/** 气球摊支线的走向。resolved 表示竞争营业日已达标，支线收束。 */
-export type BalloonRoute = 'none' | 'cooperate' | 'compete' | 'resolved';
 
 /** 竞争营业日需要赢下的场次。 */
 const BALLOON_WINS_REQUIRED = 3;

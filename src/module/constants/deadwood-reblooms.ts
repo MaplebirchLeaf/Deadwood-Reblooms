@@ -3,7 +3,7 @@
 export const version = maplebirch.modUtils.getMod('deadwood-reblooms')!.version;
 
 /** 本模组随机数发生器的存档状态，直接取自 maplebirch 的 rand 工具，避免手写重复结构。 */
-export type RandomState = ReturnType<typeof maplebirch.tool.rand.create>['state'];
+type RandomState = ReturnType<typeof maplebirch.tool.rand.create>['state'];
 
 // 模块本体 DeadwoodReblooms 的存档结构，对应 V.DeadwoodReblooms。
 export interface DeadwoodRebloomsState {

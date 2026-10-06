@@ -75,7 +75,7 @@ export default class OrchardView {
   public constructor(
     private readonly orchard: Orchard,
     private readonly site: OrchardSite,
-    private readonly root: HTMLElement
+    root: HTMLElement
   ) {
     this.notice = orchard.notice;
     root.id = 'deadwood-orchard';

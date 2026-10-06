@@ -196,3 +196,13 @@ If the room is closed, check the opening hours first. If you cannot enter at all
 - **Clinic**: Pay £5,000 for a fourteen-day course. Game days advance its progress; completing it increases body size by one level. Uses your selected payment method. Stopping early gives no refund.
 - **Limits**: One programme at a time, one size per programme, up to the vanilla largest size. Consultation pages show remaining days and allow stopping. Completed growth remains. An external body-size change ends the old programme.
 - **Effects**: Overall size increases. The vanilla size calculation updates physique capacity while preserving your current physique proportion. Other body-part sizes remain unchanged.
+
+### Pool party
+
+<span class="teal">Entrance: after hearing about the school pool party and before entering, invite an established lover at the relevant location.</span> Each invitation takes ten minutes.
+
+Robin needs enough affection and a stable condition; Whitney agrees when your relationship is close enough; Kylar needs high affection and an active state. Pure Sydney refuses; corrupted Sydney needs established route progress.
+
+During the party, you can spend time alone. Robin and Sydney's shared branch requires Revelation's **Chaotic Vow** and low Robin trauma. Kylar's shared branch first requires time alone, plus high affection, sufficient lust, low dominance and low jealousy; the other companion must be a willing Robin or Sydney.
+
+<span class="red">Companions react to you approaching others; Kylar reaching the rage tier ends the party.</span> Changing, surrounded and combat states hide voluntary interactions. Bring each of the four lovers to a party to earn the attendance feat.

@@ -238,8 +238,7 @@
   and $KylarExpansion.night_day isnot Time.days
   and $nightmares lte 0 and random(1, 8) is 1>>
 <<if _nightWake>>
-  <!-- 夜醒场景在睡前选定并保存在当前存档，读档后不会换成另一段对白。 -->
-  <<set $KylarExpansion.night_scene to Weather.meteorShower ? 'meteor'
+  <<set _nightScene to Weather.meteorShower ? 'meteor'
     : Weather.precipitation is 'rain' ? 'rain'
     : random(1, 2) is 1 ? 'monitor' : 'wrist'>>
   <<set $sleephour to random(1, Math.min(2, _requestedHours - 1))>>
@@ -255,6 +254,7 @@
     and (Time.hour gte 23 or Time.hour lt 6)>>
   <<if _nightWake>>
     <<set $KylarExpansion.night_day to Time.days>>
+    <<set $KylarExpansion.night_scene to _nightScene>>
     <<set $sleephour to Math.max(1, _requestedHours - $sleepHoursTotal)>>
     <<sleepeffects>>
     <<switch $KylarExpansion.night_scene>>

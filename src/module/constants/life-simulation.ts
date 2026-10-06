@@ -14,7 +14,7 @@ export interface BodyGrowthState {
   notice: 'grown' | 'interrupted' | null;
 }
 
-export const DEFAULT_BODY_GROWTH: BodyGrowthState = { mode: null, base: 2, progress: 0, training_day: -1, settled_day: -1, notice: null };
+const DEFAULT_BODY_GROWTH: BodyGrowthState = { mode: null, base: 2, progress: 0, training_day: -1, settled_day: -1, notice: null };
 
 /** 健身房的票种与会员档位。visit 是单次票，其余为按期会员。 */
 export type GymPlan = 'visit' | 'week' | 'month' | 'year' | 'lifetime';
@@ -71,6 +71,53 @@ export interface GymState {
   doren_interaction_day: number;
 }
 
+/** 泳池派对可携带的恋人，四人与 PC 同校。 */
+export type PoolPartyCompanion = 'Robin' | 'Whitney' | 'Kylar' | 'Sydney';
+
+// 恋人同行走 isLoveInterest，与散装 romance 变量无关。
+export const POOL_PARTY_COMPANIONS: readonly PoolPartyCompanion[] = ['Robin', 'Whitney', 'Kylar', 'Sydney'];
+
+/** 校园泳池派对的恋人同行状态，对应 V.LifeSimulation.pool_party。 */
+export interface PoolPartyState {
+  /** 跨页面邀约与互动的当前对象、答复和返回入口。 */
+  selected: PoolPartyCompanion | null;
+  reply: 'accept' | 'refuse' | 'decline' | 'unavailable' | null;
+  return_passage: string | null;
+  /** 已答应同行的恋人。散场时必须清空，绝不跨周残留。 */
+  companions: PoolPartyCompanion[];
+  /**
+   * 本次派对已经结算过的场次键，避免重复播放或重复扣关系。散场清空。
+   * 凯拉尔的嫉妒不在这里另存一份，直接读写原版 C.npc.Kylar.rage。
+   */
+  scenes: string[];
+  /**
+   * 历史上陪同过 PC 参加派对的恋人。
+   * scenes 每场都会清空，成就必须另存一份跨场记录。
+   */
+  met: PoolPartyCompanion[];
+  /** 上次携带恋人参加派对的游戏日，-1 表示从未。 */
+  last_day: number;
+  /**
+   * 凯拉尔当晚已经提醒过 / 已经发作过的游戏日，-1 表示还没。
+   * 不能存在 scenes 里：breakUp 会清空 scenes，而他的 rage 不会因此回落，
+   * 否则每次进入泳池页都会重播同一段。
+   */
+  kylar_warned_day: number;
+  kylar_broke_day: number;
+}
+
+export const DEFAULT_POOL_PARTY_STATE: PoolPartyState = {
+  selected: null,
+  reply: null,
+  return_passage: null,
+  companions: [],
+  scenes: [],
+  met: [],
+  last_day: -1,
+  kylar_warned_day: -1,
+  kylar_broke_day: -1
+};
+
 // 模块 LifeSimulation 的存档结构，对应 V.LifeSimulation。
 export interface LifeSimulationState {
   body_growth: BodyGrowthState;
@@ -82,6 +129,8 @@ export interface LifeSimulationState {
   school: SchoolState;
   /** 健身房的会员与当日状态。 */
   gym: GymState;
+  /** 校园泳池派对的恋人同行状态。 */
+  pool_party: PoolPartyState;
 }
 
 // 项目进度和证据结果都写入 V.LifeSimulation，重新读档后直接恢复当前阶段。
@@ -116,5 +165,6 @@ export const DEFAULT_LIFE_SIMULATION_STATE: LifeSimulationState = {
     doren_checked_day: -1,
     doren_present: false,
     doren_interaction_day: -1
-  }
+  },
+  pool_party: DEFAULT_POOL_PARTY_STATE
 };

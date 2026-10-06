@@ -1,0 +1,202 @@
+:: Deadwood Reblooms Pool Party Widgets [widget]
+
+<!-- 恋人邀约入口。只在原版 intro 之后、正式进场之前出现。 -->
+<<widget 'deadwood-reblooms-pool-party-invite'>>
+  <<set _pool to maplebirch.get('LifeSimulation').pool_party>>
+  <<set _reachable to _pool.reachable>>
+  <<if _reachable.length gt 0>>
+    <span class='blue'><i><<lanSwitch 'The pool party is tonight. You could ask someone to come with you.' '今晚就是泳池派对。你可以问问谁愿意一起去。'>></i></span><br>
+    <<for _name range _reachable>>
+      <<set _en to 'Ask ' + _name + ' to come with you (0:10)'>>
+      <<set _cn to '邀请' + maplebirch.auto(_name) + '一同前往 (0:10)'>>
+      <!-- 链接体在点击时才执行，循环变量必须 capture，否则拿到的是最后一次的 _name。 -->
+      <<capture _name _pool>>
+        <<lanLink [_en, _cn] 'Deadwood Reblooms Pool Party Invite'>>
+          <<set $LifeSimulation.pool_party.selected to _name>>
+          <<set $LifeSimulation.pool_party.reply to _pool.invite(_name)>>
+          <<set $LifeSimulation.pool_party.return_passage to $passage>>
+          <<pass 10>>
+        <</lanLink>>
+      <</capture>><br>
+    <</for>>
+    <br>
+  <</if>>
+<</widget>>
+
+<!-- 派对现场：同行恋人各自的反应。罗宾只跟着 PC，凯拉尔只会数人。 -->
+<<widget 'deadwood-reblooms-pool-party-company'>>
+  <<set _pool to maplebirch.get('LifeSimulation').pool_party>>
+  <<if _pool.attend()>>
+    <<language>>
+      <<option 'EN'>>
+        <<for _name range _pool.companions>>
+          <<switch _name>>
+            <<case 'Robin'>>
+              Robin stays close enough that your arms keep brushing.<br>
+            <<case 'Whitney'>>
+              Whitney has already claimed the deepest part of the pool and is watching you decide.<br>
+            <<case 'Kylar'>>
+              Kylar has not moved from the doorway. Kylar is counting the people between you.<br>
+            <<case 'Sydney'>>
+              Sydney watches you rather than the water.<br>
+          <</switch>>
+        <</for>>
+      <<option 'CN'>>
+        <<for _name range _pool.companions>>
+          <<switch _name>>
+            <<case 'Robin'>>
+              罗宾贴得很近，近到你们的手臂不断擦到一起。<br>
+            <<case 'Whitney'>>
+              惠特尼已经占住了泳池最深的地方，正看着你打算怎么办。<br>
+            <<case 'Kylar'>>
+              <<set $pronoun to C.npc.Kylar.pronoun>>凯拉尔一直没离开门口。<<he>>在数你身边隔了多少人。<br>
+            <<case 'Sydney'>>
+              悉尼的视线落在你身上的时间，比落在水面上更长。<br>
+          <</switch>>
+        <</for>>
+    <</language>>
+    <br>
+  <</if>>
+  <!-- 原版 30 是 Sus、60 是 Rage；这里在他逼近发作前先给一次提醒。 -->
+  <<if _pool.tonight and _pool.has('Kylar') and _pool.kylarRage gte 50 and _pool.kylarWarned()>>
+    <<set $pronoun to C.npc.Kylar.pronoun>>
+    <<language>>
+      <<option 'EN'>>
+        Kylar's hand closes around your wrist, tighter than Kylar means it to. "Who were you looking at?"<br><br>
+      <<option 'CN'>>
+        凯拉尔的手扣住你的手腕，比<<he>>自己以为的更用力。“你刚才在看谁？”<br><br>
+    <</language>>
+  <</if>>
+  <<if _pool.tonight and _pool.kylarRaging and _pool.kylarBroke()>>
+    <<set $pronoun to C.npc.Kylar.pronoun>>
+    <<run _pool.breakUp()>>
+    <<language>>
+      <<option 'EN'>>
+        Kylar does not shout. Kylar walks to the poolside, picks up your clothes, and holds them out until you take them. "We are leaving," Kylar says. The students nearby fall quiet.<br><br>
+      <<option 'CN'>>
+        凯拉尔没有喊。<<he>>走到池边，把你的衣服捡起来，一直举着，直到你接过去。“我们走。”<<he>>说。附近的学生安静下来。<br><br>
+    <</language>>
+    <<getouticon>><<lanLink ['Leave with Kylar', '和凯拉尔一起离开'] 'Deadwood Reblooms Pool Party Broke Up'>><</lanLink>><br><br><br>
+  <</if>>
+<</widget>>
+
+<!-- 日志记录今晚与谁同行，以及凯拉尔还剩多少耐心。 -->
+<<widget 'deadwood-reblooms-pool-party-journal'>>
+  <!-- 用模块实例而不是原始状态对象，dualPromise 这类判定只挂在实例上。 -->
+  <<set _pool to maplebirch.get('LifeSimulation').pool_party>>
+  <<if _pool.companions.length gt 0>>
+    <h1 class='header gold bold'><<lanSwitch 'Pool party' '泳池派对'>></h1>
+    <ul class='journal'>
+      <li>
+        <<lanSwitch 'Coming with you: ' '与你同行：'>>
+        <span class='green'><<for _index, _name range _pool.companions>><<if _index gt 0>><<lanSwitch ', ' '、'>><</if>><<print maplebirch.auto(_name)>><</for>></span>
+      </li>
+      <<if _pool.companions.includes('Kylar')>>
+        <li>
+          <<lanSwitch "Kylar's jealousy: " '凯拉尔的嫉妒：'>>
+          <span class='red'><<print _pool.kylarRage>>/<<print _pool.kylarRageLimit>></span>
+          <<lanSwitch '. The night ends at the limit.' '。到达上限今晚就结束。'>>
+        </li>
+      <</if>>
+      <<if _pool.has('Robin') and _pool.has('Sydney') and _pool.dualPromise>>
+        <li><<lanSwitch 'Robin and Sydney both share a promise with you.' '罗宾和悉尼都与你立下了承诺。'>></li>
+      <</if>>
+    </ul>
+  <</if>>
+<</widget>>
+
+<!-- 邀请结果。$LifeSimulation.pool_party.selected 是恋人，结果已由 invite() 结算。 -->
+:: Deadwood Reblooms Pool Party Invite []
+<<set $outside to 0>><<effects>>
+<<set _name to $LifeSimulation.pool_party.selected>>
+<<set _result to $LifeSimulation.pool_party.reply>>
+<<set _back to $LifeSimulation.pool_party.return_passage || 'Orphanage'>>
+<<if !_name or !_result>>
+  <span class='blue'><i><<lanSwitch 'Nobody has time to talk right now.' '现在没有人有空。'>></i></span>
+<<elseif _result is 'unavailable'>>
+  <span class='blue'><i><<lanSwitch 'You cannot ask that right now.' '现在没法开口。'>></i></span>
+<<elseif _result is 'decline'>>
+  <<set $pronoun to C.npc[_name].pronoun>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney listens to the whole invitation without interrupting. Then Sydney shakes <<his>> head. "I can't go to a place like that. It isn't that I don't trust you. It's that I'd be betraying something I promised to keep."<br><br>Sydney takes your hand for a moment anyway. "Ask me again about something else. Anything else."
+    <<option 'CN'>>
+      悉尼安静地听你把话说完，中途没有打断。然后<<he>>摇了摇头。“我不能去那种地方。不是我不信你，是我会背弃自己答应过要守住的东西。”<br><br><<He>>还是握了握你的手。“换点别的事问我吧，什么都行。”
+  <</language>>
+<<elseif _result is 'refuse'>>
+  <!-- 只借原版代词，不动 $NPCList 槽位，避免在普通地点页触发 endevent。 -->
+  <<set $pronoun to C.npc[_name].pronoun>>
+  <<language>>
+    <<option 'EN'>>
+      <<switch _name>>
+        <<case 'Robin'>>
+          Robin looks away, then back. "Tonight? I... I don't think I can. Please don't be angry with me."
+        <<case 'Whitney'>>
+          Whitney snorts. "With you? In front of every loser in that school? Not a chance."
+        <<case 'Kylar'>>
+          Kylar's face closes. "A party. With other people. You're asking me that?"
+        <<case 'Sydney'>>
+          Sydney hesitates, and the hesitation is the answer.
+      <</switch>>
+    <<option 'CN'>>
+      <<switch _name>>
+        <<case 'Robin'>>
+          罗宾别开视线，又转回来。“今晚？我……我想我做不到。别生我的气。”
+        <<case 'Whitney'>>
+          惠特尼嗤了一声。“跟你？当着全校那帮废物？想都别想。”
+        <<case 'Kylar'>>
+          凯拉尔的脸色沉了下去。“派对。还有别的人。你问我这个？”
+        <<case 'Sydney'>>
+          悉尼迟疑了一下，而那份迟疑本身就是答案。
+      <</switch>>
+    <</language>>
+<<elseif _result is 'accept'>>
+  <!-- 只借原版代词，不动 $NPCList 槽位，避免在普通地点页触发 endevent。 -->
+  <<set $pronoun to C.npc[_name].pronoun>>
+  <<language>>
+    <<option 'EN'>>
+      <<switch _name>>
+        <<case 'Robin'>>
+          Robin is quiet for a long moment. <<if C.npc.Robin.trauma gte 40>>"I don't want to go," Robin says. "But I don't want you going alone either. So I'll come."<br><br>Robin does not look at you while saying it, and Robin's hands are not quite steady.<<else>>"You're really going?" Robin searches your face, then nods. "Then I'm coming with you. Somebody has to make sure you get home."<</if>>
+        <<case 'Whitney'>>
+          Whitney laughs, short and sharp. "Finally, something worth the walk." Whitney looks you over. "Don't embarrass me."
+        <<case 'Kylar'>>
+          Kylar doesn't answer at first. Kylar just looks at you, and the looking goes on too long. "...Fine. I'll go. But I'm going to be there the whole time."
+        <<case 'Sydney'>>
+          Sydney smiles. "I know exactly what kind of party that is." Sydney holds your gaze. "I'll come."
+      <</switch>>
+    <<option 'CN'>>
+      <<switch _name>>
+        <<case 'Robin'>>
+          罗宾沉默了很久。<<if C.npc.Robin.trauma gte 40>>“我不想去，”<<he>>说，“但我更不想让你一个人去。所以我陪你去。”<br><br><<He>>说这话时没有看你，手也不太稳。<<else>>“你真的要去？”<<He>>在你脸上找了一会儿答案，然后点头。“那我跟你一起。总得有人看着你回家。”<</if>>
+        <<case 'Whitney'>>
+          惠特尼笑了一声，短促又锐利。“总算有点值得跑一趟的事。”<<He>>上下打量你。“别让我丢脸。”
+        <<case 'Kylar'>>
+          凯拉尔一开始没有回答。<<He>>只是看着你，看得太久了。“……行。我去。但我全程都会在。”
+        <<case 'Sydney'>>
+          悉尼笑了笑。“我很清楚那是什么样的派对。”<<He>>迎着你的视线。“我去。”
+      <</switch>>
+    <</language>>
+    <br><br>
+    <<if _name is 'Robin'>><<npcincr Robin love 1>><<glove>><</if>>
+<</if>>
+<br><br>
+<<getouticon>>
+<<lanLink ['Continue', '继续'] _back>>
+  <<set $LifeSimulation.pool_party.selected to null>><<set $LifeSimulation.pool_party.reply to null>><<set $LifeSimulation.pool_party.return_passage to null>>
+<</lanLink>><br>
+
+<!-- 凯拉尔闹翻后的收场。派对已被 breakUp 终止，这里只负责把 PC 送出去。 -->
+:: Deadwood Reblooms Pool Party Broke Up []
+<<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
+<<set _pool to maplebirch.get('LifeSimulation').pool_party>>
+<<if _pool.companions.length gt 0>><<run _pool.settle()>><</if>>
+<<set $pronoun to C.npc.Kylar.pronoun>>
+<<language>>
+  <<option 'EN'>>
+    Kylar pulls you out through the side gate without waiting for an answer. Behind you the party noise thins into complaints, then nothing. Kylar does not let go of your wrist until the school fence is well behind you. "Say it," Kylar says. "Say that was worth it."
+  <<option 'CN'>>
+    凯拉尔没等你回答，就把你从侧门拽了出去。身后的喧闹退成抱怨，再退成什么都没有。直到校墙被远远甩在身后，<<he>>才松开你的手腕。“说啊，”<<he>>说，“说你觉得值。”
+<</language>>
+<br><br>
+<<getouticon>><<lanLink ['Return to the courtyard', '返回庭院'] 'School Front Courtyard'>><<pass 5>><</lanLink>><br>

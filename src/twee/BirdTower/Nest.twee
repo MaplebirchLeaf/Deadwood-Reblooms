@@ -1,7 +1,7 @@
 :: Deadwood BirdTower Childrens Home []
 <<getChildrenIds `{location: "otherNest", excludeUnhatched: true}` "both">>
 <<set _childrenIds to _childrenIds.filter(id => $childRecords[id].species is "hawk")>>
-<<set $otherNest to true>>
+<<set $BirdTower.scene.other_nest to true>>
 <<language>>
   <<option 'EN'>>
     You are near the new nest of <<if _childrenIds.length gte 2>>the children<<else>>the child<</if>>.
@@ -35,7 +35,7 @@
 <<childViewerDisplay _childrenIds>>
 <br><br>
 <<lanLink ["Return", "返回"] "Bird Tower">>
-  <<unset $otherNest>>
+  <<set $BirdTower.scene.other_nest to false>>
 <</lanLink>>
 
 :: Deadwood BirdTower Build OtherNest []
@@ -50,10 +50,15 @@
 <<if !$BirdTower.scene.ids.length>>
   <<language>>
     <<option 'EN'>>
-      BUG: Could not find the matching ID, please report this to the author.
+      The new nest stays empty for now.
     <<option 'CN'>>
-      BUG:无法找到对应ID，请汇报作者。
+      新巢暂时还空着。
   <</language>>
+  <br><br>
+  <<lanLink ["Return", "返回"] "Bird Tower">>
+    <<set $BirdTower.scene.other_nest to false>>
+  <</lanLink>>
+  <<exit>>
 <</if>>
 <<childSelect $BirdTower.scene.actors[0]>>
 <<language>>

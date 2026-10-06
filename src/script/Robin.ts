@@ -241,7 +241,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
       'Rent Robin Fight Finish': [
         {
           src: '<<set _robin to statusCheck("Robin")>>',
-          applyafter: "\n<<run maplebirch.get('Robin').combatFinish()>>",
+          applyafter: "\n<<run maplebirch.get('Robin').rent.combatFinish()>>",
           expected: 1
         }
       ]

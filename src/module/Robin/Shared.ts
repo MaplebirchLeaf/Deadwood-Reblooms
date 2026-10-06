@@ -4,6 +4,10 @@ import type VanillaPlus from '../VanillaPlus';
 import type { RobinExpansionState } from '../constants';
 
 export interface RobinFacade {
+  /** 罗宾是否可正常互动。 */
+  readonly available: boolean;
+  /** 罗宾现金与储备金，单位英镑。 */
+  readonly funds: number;
   /** 当前存档的罗宾拓展状态。 */
   readonly state: RobinExpansionState;
   /** 周收入，单位英镑。 */
@@ -25,7 +29,7 @@ export default abstract class Shared {
 
   /** 罗宾自己持有的现金加上本模组的储备金，单位英镑。 */
   public get funds(): number {
-    return Math.max(0, Number(V.robinmoney) || 0) + this.state.reserve;
+    return this.facade.funds;
   }
 
   /** VanillaPlus 未载入时为空，房产与银行的调用都要先过这一层。 */
@@ -34,7 +38,7 @@ export default abstract class Shared {
   }
 
   protected get robinAvailable(): boolean {
-    return C.npc.Robin?.init === 1 && !V.robinmissing && V.robin.timer.hurt === 0 && this.state.asylum.status !== 'admitted';
+    return this.facade.available;
   }
 
   /** 开销后是否仍留得住下一周房租。protectNextRent 为 false 时只检查余额。 */

@@ -1,6 +1,6 @@
 ### Prerequisites and entrance
 
-Enable **Kylar** and reload. Complete the first vanilla manor stay, progress the relationship and select Kylar as a love interest. Manor invitation and PC-property residency are separate records.
+Enable **Kylar** and reload. Complete the first vanilla manor stay, progress the relationship and select Kylar as a love interest. <span class="teal">Manor invitation and PC-property residency are separate records.</span>
 
 ### Unlocking repeat stays
 

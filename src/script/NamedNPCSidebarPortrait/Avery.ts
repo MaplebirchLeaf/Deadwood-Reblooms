@@ -4,9 +4,7 @@ import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 import { Clothing } from './Clothing';
 
-type DailyCache = { outfit: Map<string, string> };
-
-export default function (maplebirch: MaplebirchCore, colours: DailyCache): void {
+export default function (maplebirch: MaplebirchCore): void {
   maplebirch.npc.addSchedule('Avery', schedule =>
     schedule.when(() => C.npc?.Avery?.init === 1 && C.npc?.Avery?.state !== 'dismissed', location, {
       id: 'avery-location'

@@ -8,6 +8,7 @@ import SchoolNPCs from './LifeSimulation/SchoolNPCs';
 import Weapons from './LifeSimulation/Weapons';
 import Medicine from './LifeSimulation/Medicine';
 import Casino from './LifeSimulation/Casino';
+import PoolParty from './LifeSimulation/PoolParty';
 
 export default function LifeSimulation(maplebirch: typeof window.maplebirch): void {
   AcademicHonours(maplebirch);
@@ -18,5 +19,6 @@ export default function LifeSimulation(maplebirch: typeof window.maplebirch): vo
   Weapons(maplebirch);
   Medicine(maplebirch);
   Casino(maplebirch);
+  PoolParty(maplebirch);
   maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-body-growth-clinic-link'], passage: 'Hospital Foyer' });
 }

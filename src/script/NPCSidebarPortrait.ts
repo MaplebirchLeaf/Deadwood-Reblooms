@@ -68,9 +68,6 @@ export default function (maplebirch: MaplebirchCore) {
   const gwylanColours = {
     outfit: new Map<string, string>()
   };
-  const averyColours = {
-    outfit: new Map<string, string>()
-  };
   const darrylColours = { outfit: new Map<string, string>() };
   const charlieColours = { outfit: new Map<string, string>() };
   const landryColours = { outfit: new Map<string, string>() };
@@ -87,7 +84,7 @@ export default function (maplebirch: MaplebirchCore) {
   KylarSidebar(maplebirch, kylarColours);
   WhitneySidebar(maplebirch, whitneyColours);
   GwylanSidebar(maplebirch, gwylanColours);
-  AverySidebar(maplebirch, averyColours);
+  AverySidebar(maplebirch);
   BaileySidebar(maplebirch);
   BriarSidebar(maplebirch);
   CharlieSidebar(maplebirch, charlieColours);
@@ -138,7 +135,6 @@ export default function (maplebirch: MaplebirchCore) {
       whitneyColours.outfit.clear();
       whitneyColours.clothes.clear();
       gwylanColours.outfit.clear();
-      averyColours.outfit.clear();
       alexColours.outfit.clear();
       charlieColours.outfit.clear();
       darrylColours.outfit.clear();

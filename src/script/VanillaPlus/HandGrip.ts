@@ -1,6 +1,6 @@
 // ./src/script/VanillaPlus/HandGrip.ts
 
-import type { GripHand } from '../../module/VanillaPlus/HandGrip';
+import HandGrip, { type GripHand } from '../../module/VanillaPlus/HandGrip';
 
 export default function (maplebirch: typeof window.maplebirch) {
   const text = (key: string, values: Record<string, string> = {}) => {
@@ -14,9 +14,8 @@ export default function (maplebirch: typeof window.maplebirch) {
     return lanSwitch(npc?.fullDescription, npc?.fullDescription_CN) || npc?.fullDescription || '';
   };
   const active = () => V.combat === 1 && V.enemytype === 'man' && V.walltype !== 'front' && !V.gloryhole;
-  const available = (hand: GripHand) => T?.[`${hand}Options`] === 'free';
   const canStart = (hand: GripHand) =>
-    active() && available(hand) && maplebirch.get('VanillaPlus')!.handGrip.target(hand) == null && maplebirch.get('VanillaPlus')!.handGrip.isPenetrationRecipient(selectedTarget(hand));
+    active() && HandGrip.handFree(hand) && maplebirch.get('VanillaPlus')!.handGrip.target(hand) == null && maplebirch.get('VanillaPlus')!.handGrip.isPenetrationRecipient(selectedTarget(hand));
   const canKeep = (hand: GripHand) => active() && maplebirch.get('VanillaPlus')!.handGrip.target(hand) != null;
   const difficulty = '<<handdifficulty>> <<if $consensual is 0>><<combatpromiscuous6>><<else>><<combatpromiscuous3>><</if>>';
   const keepDifficulty = `<<if $orgasmdown lt 1>>${difficulty}<</if>>`;

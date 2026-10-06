@@ -21,7 +21,7 @@ export interface NPCData {
   };
 }
 
-export interface AvatarStates {
+interface AvatarStates {
   default: string;
   loved?: string;
   disliked?: string;
@@ -53,7 +53,7 @@ export interface AvatarProfile {
   readonly mimicFolder?: string;
 }
 
-export interface AvatarOptions {
+interface AvatarOptions {
   readonly basePath?: string;
   readonly defaults?: boolean;
   readonly loved?: number;

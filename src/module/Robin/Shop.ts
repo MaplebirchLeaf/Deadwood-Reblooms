@@ -2,9 +2,6 @@
 
 import Shared from './Shared';
 
-/** 店铺开办流程的六个阶段，必须按序推进。 */
-export type ShopStage = 'none' | 'planning' | 'applied' | 'site' | 'inspected' | 'permitted';
-
 /** 两个正式职位由外来店员与孤儿院同伴共用。 */
 const MAX_SHOP_STAFF = 2;
 

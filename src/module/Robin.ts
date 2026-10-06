@@ -67,8 +67,8 @@ class Robin extends Module implements RobinFacade {
     );
   }
 
-  /** 罗宾是否可正常互动。供门面自身的 upgrade / repayPcLoan 使用。 */
-  private get available(): boolean {
+  /** 罗宾是否可正常互动。门面与子系统共用。 */
+  public get available(): boolean {
     return C.npc.Robin?.init === 1 && !V.robinmissing && V.robin.timer.hurt === 0 && this.state.asylum.status !== 'admitted';
   }
 

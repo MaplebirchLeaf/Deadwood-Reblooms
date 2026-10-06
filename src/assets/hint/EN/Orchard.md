@@ -12,7 +12,7 @@ Enable the Orchard module. At the temple, become a monk or priest and fully clea
 
 ### Clearing more ground
 
-**Six and twelve plots are the orchards' capacity limits. They are not all ready to plant on your first visit.** The temple starts with five plots and the farm with three. Use the "Continue clearing" link to clear the next adjoining plot, working along the orchard in order.
+<span class="gold">Six and twelve plots are the orchards' capacity limits. They are not all ready to plant on your first visit.</span> The temple starts with five plots and the farm with three. Use the "Continue clearing" link to clear the next adjoining plot, working along the orchard in order.
 
 - Each clearing action takes forty minutes and uses vanilla solo-clearing physique and fatigue effects. A new temple plot needs eighty minutes of work in total, while a farm plot needs two hours. You can complete this over several visits.
 - Each plot saves its own progress. Leaving, sleeping or being interrupted by an event does not erase completed work. Uncleared ground stays out of the map; a new plot appears when the work is finished.

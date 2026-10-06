@@ -1,7 +1,6 @@
 // ./src/script/NamedNPCSidebarPortrait/Sam.ts
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
-import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
 
 export default function (maplebirch: MaplebirchCore): void {
   maplebirch.tool.onInit(() => {
@@ -24,7 +23,6 @@ export default function (maplebirch: MaplebirchCore): void {
     }
 
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
-    const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
     const formal = () => /^Chef Opening(?: |$)/.test(maplebirch.passage.title) || (V.location === 'cafe' && V.chef_state === 8);
     // Ocean Breeze Rework 在 chef_state 8 明写正装，Chef Opening 的开幕及送客分支延续正装。
     wardrobe.wear('Sam', '*', 'tuxedo_formal', () => formal() && C.npc?.Sam?.pronoun === 'm');

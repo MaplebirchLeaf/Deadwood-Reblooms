@@ -152,7 +152,7 @@ class Promiscuity {
     const destinationAvailable = (part: 'mouth' | 'vagina' | 'penis' | 'anus' | 'chest' | 'thigh' | 'bottom', sameAction: boolean) => {
       const state = V as unknown as Record<string, unknown>;
       const use = state[`${part}use`];
-      return !use || (Number(state[`${part}target`]) === target && !sameAction);
+      return !use || (Number(part === 'bottom' ? V.VanillaPlus.promiscuity.bottom_target : state[`${part}target`]) === target && !sameAction);
     };
     const vaginaFree = (sameAction: boolean) => destinationAvailable('vagina', sameAction);
     const penisFree = (sameAction: boolean) => destinationAvailable('penis', sameAction);
@@ -222,7 +222,7 @@ class Promiscuity {
               ? action.replace('mouth-', '')
               : 'mouth';
     const state = V as unknown as Record<string, unknown>;
-    if (Number(state[`${part}target`]) !== target) return;
+    if (Number(part === 'bottom' ? V.VanillaPlus.promiscuity.bottom_target : state[`${part}target`]) !== target) return;
     const use = String(state[`${part}use`] ?? '');
     if (use === '1' || use.includes('hand')) this.releaseHands(target);
     else if (use.includes('mouth') || use === 'kiss') this.releaseMouth(target);
@@ -268,7 +268,7 @@ class Promiscuity {
     if (Number(V.anustarget) === target && V.anususe === 'othermouth') this.clear('anus');
     if (Number(V.chesttarget) === target && V.chestuse === 'mouth') this.clear('chest');
     if (Number(V.thightarget) === target && V.thighuse === 'mouth') this.clear('thigh');
-    if (Number(V.bottomtarget) === target && V.bottomuse === 'mouth') this.clear('bottom');
+    if (Number(V.VanillaPlus.promiscuity.bottom_target) === target && V.bottomuse === 'mouth') this.clear('bottom');
     npc.mouth = 0;
     npc.location ??= {};
     npc.location.head = 0;
@@ -339,6 +339,7 @@ class Promiscuity {
 
   private clear(part: 'mouth' | 'vagina' | 'penis' | 'anus' | 'chest' | 'thigh' | 'bottom'): void {
     const state = V as unknown as Record<string, unknown>;
+    if (part === 'bottom') V.VanillaPlus.promiscuity.bottom_target = null;
     state[`${part}use`] = 0;
     state[`${part}state`] = 0;
     state[`${part}actiondefault`] = 'rest';

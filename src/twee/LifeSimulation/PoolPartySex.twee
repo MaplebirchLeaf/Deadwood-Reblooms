@@ -1,0 +1,264 @@
+:: Deadwood Reblooms Pool Party Sex Widgets [widget]
+
+<<widget 'deadwood-reblooms-pool-party-together'>>
+  <<set _pool to maplebirch.get('LifeSimulation').pool_party>>
+  <<if _pool.canInteract>>
+    <<for _name range _pool.companions>>
+      <<if _pool.canTogether(_name) and !_pool.hasScene('with:' + _name)>>
+        <<set _cn to { Robin: '和罗宾找个灯光照不到的角落', Whitney: '和惠特尼一起下水', Kylar: '把凯拉尔带去远离人群的地方', Sydney: '和悉尼避开人群' }[_name]>>
+        <<set _en to { Robin: 'Find a corner the light does not reach with Robin', Whitney: 'Get in the water with Whitney', Kylar: 'Take Kylar somewhere far from the crowd', Sydney: 'Slip away from the crowd with Sydney' }[_name]>>
+        <<capture _name>><<lanLink [_en, _cn] 'Deadwood Reblooms Pool Party Together'>><<set $LifeSimulation.pool_party.selected to _name>><<pass 20>><</lanLink>><</capture>><br>
+      <</if>>
+    <</for>>
+    <<if _pool.vowReady and !_pool.hasScene('with:Robin:Sydney')>>
+      <<lanLink ['Take Robin and Sydney somewhere private', '带罗宾和悉尼去没人的地方'] 'Deadwood Reblooms Pool Party Vow'>><<pass 20>><</lanLink>><br>
+    <</if>>
+    <<for _mate range _pool.kylarPartners>>
+      <<if !_pool.hasScene('with:Kylar:' + _mate)>>
+        <<set _cn to '要凯拉尔和' + maplebirch.auto(_mate) + '一起'>>
+        <<set _en to 'Have Kylar join you and ' + _mate>>
+        <<capture _mate>>
+          <<lanLink [_en, _cn] 'Deadwood Reblooms Pool Party Kylar Group'>><<set $LifeSimulation.pool_party.selected to _mate>><<pass 20>><</lanLink>><br>
+        <</capture>>
+      <</if>>
+    <</for>>
+    <<if _pool.groupAllowed and !_pool.hasScene('with:Whitney:group')>>
+      <<lanLink ['Stay in the pool with Whitney and the others', '留在泳池里，和惠特尼还有那些人一起'] 'Deadwood Reblooms Pool Party Group'>><<pass 20>><</lanLink>><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-pool-party-sex-loop'>>
+  <<set _loop to _args[0]>>
+  <<effects>><<effectsman>><<man>><<stateman>>
+  <br><br>
+  <<actionsman>>
+  <<if _combatend>>
+    <<endcombat>>
+    <span id='next'><<lanLink ['Next', '继续'] 'School Pool'>><</lanLink>></span><<nexttext>>
+  <<else>>
+    <span id='next'><<lanLink ['Next', '继续'] _loop>><</lanLink>></span><<nexttext>>
+  <</if>>
+  <br>
+<</widget>>
+
+<<widget 'deadwood-reblooms-pool-party-witness'>>
+  <<set _pool to maplebirch.get('LifeSimulation').pool_party>>
+  <<set _scene to _args[0]>>
+  <<set _loop to _args[1]>>
+  <<set _except to _args.slice(2)>>
+  <<set _key to 'jealous:' + _scene + ':' + _except.join(',')>>
+  <<if _pool.once(_key)>>
+    <<set _witnesses to _pool.bystanders(_except)>>
+    <<if _witnesses.includes('Kylar')>>
+      <span class='blue'><i><<if _scene is 'group'>><<lanSwitch 'Kylar watches from the edge of the pool.' '凯拉尔站在池边，盯着你。'>><<else>><<lanSwitch 'Kylar watches you leave with someone else.' '凯拉尔盯着你和别人一起离开。'>><</if>></i></span><br><br>
+    <</if>>
+    <<run _pool.jealous(_witnesses)>>
+  <</if>>
+  <<deadwood-reblooms-pool-party-sex-loop _loop>>
+<</widget>>
+
+:: Deadwood Reblooms Pool Party Together []
+<<set $outside to 0>><<set $location to 'pool'>><<schooleffects>><<effects>>
+<<set _pool to maplebirch.get('LifeSimulation').pool_party>>
+<<set _name to $LifeSimulation.pool_party.selected>>
+<<if !_name or !_pool.canTogether(_name)>>
+  <span class='blue'><i><<lanSwitch 'There is no one here with you.' '这里没有人和你在一起。'>></i></span>
+<<elseif !_pool.once('with:' + _name)>>
+  <span class='blue'><i><<lanSwitch 'You have already spent time together tonight.' '今晚已经一起待过了。'>></i></span>
+<<else>>
+  <<run statusCheck(_name)>>
+  <<set $pronoun to C.npc[_name].pronoun>>
+  <<switch _name>>
+    <<case 'Robin'>>
+      <<language>>
+        <<option 'EN'>>
+          You find a corner the pool light does not quite reach. Robin follows without being asked, and only stops when your back meets the tiles. "Here?" Robin asks. "Wouldn't you rather find somewhere quieter?"
+          <br><br>
+          <<if C.npc.Robin.trauma gte 40>>
+            Robin glances back at the pool, then takes your hand. "Stay close, okay? I don't want to be left on my own here."
+          <<else>>
+            Robin's hand finds yours under the water, and the grip is steadier than the voice. "...I want this. I want you."
+          <</if>>
+        <<option 'CN'>>
+          你找到一个灯光照不到的角落。罗宾没等你开口就跟了上来，一直到你后背抵住瓷砖才停下。“在这里？”<<he>>问，“你不想再找个安静点的地方吗？”
+          <br><br>
+          <<if C.npc.Robin.trauma gte 40>>
+            罗宾回头看了一眼泳池，拉住你的手。“靠近一点，好吗？我不想一个人待在这里。”
+          <<else>>
+            罗宾的手在水下找到你的手，握得比声音稳。“……我想要这个。我想要你。”
+          <</if>>
+      <</language>>
+      <br><br>
+      <<if C.npc.Robin.trauma gte 40>><<npcincr Robin trauma 1>><<npcincr Robin love 1>><<else>><<npcincr Robin love 2>><</if>>
+    <<case 'Whitney'>>
+      <<language>>
+        <<option 'EN'>>
+          Whitney is already waist-deep and waiting. "Took you long enough." Whitney takes you by the wrist and pulls. "You're mine tonight. Everybody here already knows it."
+        <<option 'CN'>>
+          惠特尼已经站在齐腰深的水里等着。“磨蹭够了？”<<he>>拽着你的手腕把你拉下来。“今晚你是我的。这里每个人都知道。”
+      <</language>>
+      <br><br>
+      <<npcincr Whitney dom 1>><<npcincr Whitney lust 2>>
+    <<case 'Kylar'>>
+      <<language>>
+        <<option 'EN'>>
+          You lead Kylar far enough from the pool that the noise thins. Kylar says nothing until you stop, then takes your face in both hands and turns it so you cannot look anywhere else. "Better," Kylar says. "Now I can't see them either."
+        <<option 'CN'>>
+          你把凯拉尔领到离泳池足够远的地方，喧闹稀薄下来。<<he>>一直没说话，直到你停下，然后用双手捧住你的脸，让你没法看向别处。“这样好多了，”<<he>>说，“现在我也看不见他们了。”
+      <</language>>
+      <br><br>
+      <<npcincr Kylar love 2>>
+      <<npcincr Kylar rage -2>><<lksuspicion>>
+    <<case 'Sydney'>>
+      <<language>>
+        <<option 'EN'>>
+          Sydney takes your hand first, and leads. "If we are going to do this," Sydney says, "we are going to do it properly." There is no hesitation left in the voice, only a decision made well before tonight.
+        <<option 'CN'>>
+          悉尼先牵起你的手，由<<he>>带路。“既然要做，”<<he>>说，“就好好做。”声音里已经没有迟疑，只有一个早就做好的决定。
+      <</language>>
+      <br><br>
+      <<npcincr Sydney purity -5>><<lspurity>>
+  <</switch>>
+  <br><br>
+  <<clearnpc>><<npc _name -1>><<person1>>
+  <<consensual>><<set $consensual to 1>><<neutral 1>>
+  <<set $enemyno to 1>><<set $enemynomax to 1>><<maninit>><<npcexpose>>
+  <<set $enemytrust += 800>><<set $enemyarousalmax to 600>>
+  <<deadwood-reblooms-pool-party-witness together 'Deadwood Reblooms Pool Party Together Sex' _name>>
+<</if>>
+<br><br>
+<<if !$combat>>
+  <<getouticon>><<lanLink ['Back to the pool', '回到泳池'] 'School Pool'>><<set $LifeSimulation.pool_party.selected to null>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Pool Party Together Sex []
+<<set $outside to 0>><<set $location to 'pool'>><<schooleffects>><<effects>>
+<<if !$combat>>
+  <span class='blue'><i><<lanSwitch 'It is over.' '已经结束了。'>></i></span><br><br>
+  <<getouticon>><<lanLink ['Back to the pool', '回到泳池'] 'School Pool'>><<set $LifeSimulation.pool_party.selected to null>><</lanLink>>
+<<else>>
+  <<deadwood-reblooms-pool-party-sex-loop 'Deadwood Reblooms Pool Party Together Sex'>>
+<</if>>
+
+:: Deadwood Reblooms Pool Party Vow []
+<<set $outside to 0>><<set $location to 'pool'>><<schooleffects>><<effects>>
+<<set _pool to maplebirch.get('LifeSimulation').pool_party>>
+<<if !_pool.vowReady>>
+  <span class='blue'><i><<lanSwitch 'Not tonight.' '今晚不行。'>></i></span>
+<<elseif !_pool.once('with:Robin:Sydney')>>
+  <span class='blue'><i><<lanSwitch 'You have already spent time together tonight.' '你们三个今晚已经一起待过了。'>></i></span>
+<<else>>
+  <<run statusCheck('Robin')>><<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      A storeroom off the changing rooms, and the door closes behind the three of you. Robin sits beside you and holds your hand. "This is better," Robin says, glancing at the closed door. "It was getting crowded out there."
+      <br><br>
+      Sydney sits on your other side. "We have a little time," Sydney says, smiling at you. "Unless you'd rather go back?"
+    <<option 'CN'>>
+      更衣室旁的一间储藏室，门在你们三人身后关上。罗宾在你身边坐下，握住你的手。“这里好多了，”罗宾看了一眼关上的门，“外面太挤了。”
+      <br><br>
+      悉尼在你另一侧坐下，朝你笑了笑。“我们还有一点时间。还是说，你想回去了？”
+  <</language>>
+  <br><br>
+  <<clearnpc>><<npc Robin 1>><<npc Sydney 2>><<person1>>
+  <<consensual>><<set $consensual to 1>><<neutral 1>>
+  <<set $enemyno to 2>><<set $enemynomax to 2>><<maninit>><<npcexpose>>
+  <<set $enemytrust += 800>><<set $enemyarousalmax to 1000>>
+  <<deadwood-reblooms-pool-party-witness vow 'Deadwood Reblooms Pool Party Vow Sex' Robin Sydney>>
+<</if>>
+<br><br>
+<<if !$combat>>
+  <<getouticon>><<lanLink ['Back to the pool', '回到泳池'] 'School Pool'>><<set $LifeSimulation.pool_party.selected to null>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Pool Party Vow Sex []
+<<set $outside to 0>><<set $location to 'pool'>><<schooleffects>><<effects>>
+<<if !$combat>>
+  <span class='blue'><i><<lanSwitch 'It is over.' '已经结束了。'>></i></span><br><br>
+  <<getouticon>><<lanLink ['Back to the pool', '回到泳池'] 'School Pool'>><</lanLink>>
+<<else>>
+  <<deadwood-reblooms-pool-party-sex-loop 'Deadwood Reblooms Pool Party Vow Sex'>>
+<</if>>
+
+:: Deadwood Reblooms Pool Party Group []
+<<set $outside to 0>><<set $location to 'pool'>><<schooleffects>><<effects>>
+<<set _pool to maplebirch.get('LifeSimulation').pool_party>>
+<<if !_pool.groupAllowed>>
+  <span class='blue'><i><<lanSwitch 'Nobody is in the mood for that now.' '现在没人有这个兴致。'>></i></span>
+<<elseif !_pool.once('with:Whitney:group')>>
+  <span class='blue'><i><<lanSwitch 'You have already done this tonight.' '今晚已经一起待过了。'>></i></span>
+<<else>>
+  <<set $pronoun to C.npc.Whitney.pronoun>>
+  <<language>>
+    <<option 'EN'>>
+      Whitney does not ask. Whitney hooks a foot around your ankle and drags you into the deep end, where the students who came with Whitney are already waiting. "Watch," Whitney tells them, and they do.
+    <<option 'CN'>>
+      惠特尼根本不问。<<he>>用脚勾住你的脚踝，把你拖进深水区，跟<<he>>一起来的那些学生已经等在那里。“看着，”惠特尼对他们说，他们就看着。
+  <</language>>
+  <br><br>
+  <!-- 匿名学生占 0-2，惠特尼占 3，所以传 4。 -->
+  <<clearnpc>><<generatey1>><<generatey2>><<generatey3>><<npc Whitney 4>><<person1>>
+  <<consensual>><<set $consensual to 1>><<neutral 1>>
+  <<set $enemyno to 4>><<set $enemynomax to 4>><<maninit>><<npcexpose>>
+  <<set $enemytrust += 600>><<set $enemyarousalmax to 1200>>
+  <<deadwood-reblooms-pool-party-witness group 'Deadwood Reblooms Pool Party Group Sex' Whitney>>
+<</if>>
+<br><br>
+<<if !$combat>>
+  <<getouticon>><<lanLink ['Back to the pool', '回到泳池'] 'School Pool'>><<set $LifeSimulation.pool_party.selected to null>><</lanLink>>
+<</if>>
+
+<!-- 混场回合循环。 -->
+:: Deadwood Reblooms Pool Party Group Sex []
+<<set $outside to 0>><<set $location to 'pool'>><<schooleffects>><<effects>>
+<<if !$combat>>
+  <span class='blue'><i><<lanSwitch 'It is over.' '已经结束了。'>></i></span><br><br>
+  <<getouticon>><<lanLink ['Back to the pool', '回到泳池'] 'School Pool'>><</lanLink>>
+<<else>>
+  <<deadwood-reblooms-pool-party-sex-loop 'Deadwood Reblooms Pool Party Group Sex'>>
+<</if>>
+
+<!-- 凯拉尔多人场：PC + 凯拉尔 + 另一位恋人。惠特尼被 householdRefusal 硬性排斥，不会出现在这里。 -->
+:: Deadwood Reblooms Pool Party Kylar Group []
+<<set $outside to 0>><<set $location to 'pool'>><<schooleffects>><<effects>>
+<<set _pool to maplebirch.get('LifeSimulation').pool_party>>
+<<set _mate to $LifeSimulation.pool_party.selected>>
+<<if !_mate or !_pool.kylarPartners.includes(_mate)>>
+  <span class='blue'><i><<lanSwitch 'Not tonight.' '今晚不行。'>></i></span>
+<<elseif !_pool.once('with:Kylar:' + _mate)>>
+  <span class='blue'><i><<lanSwitch 'You have already spent time together tonight.' '你们三个今晚已经一起待过了。'>></i></span>
+<<else>>
+  <<run statusCheck('Kylar')>><<run statusCheck(_mate)>>
+  <<language>>
+    <<option 'EN'>>
+      You take Kylar by the wrist and lead Kylar to where the light thins, and you do not let go until the third set of footsteps follows. Kylar looks past you at the other and then back, and Kylar's grip on your sleeve is the only part of Kylar that has stopped shaking.
+      <br><br>
+      "I can do this," Kylar says, to you rather than to the other. "If it is what you want. Tell me what you want and I will do it."
+    <<option 'CN'>>
+      你攥住凯拉尔的手腕，把凯拉尔带到灯光稀薄的地方，直到第三个人的脚步声跟上来，你才松手。凯拉尔越过你看向另一个人，又转回来，唯一不再发抖的地方是抓着你的那只手。
+      <br><br>
+      “我可以做到，”凯拉尔说，这句话是对你说的，不是对另一个人。“只要是你想要的。告诉我，你要我做什么。”
+  <</language>>
+  <br><br>
+  <<clearnpc>><<npc Kylar 1>><<npc _mate 2>><<person1>>
+  <<consensual>><<set $consensual to 1>><<neutral 1>>
+  <<set $enemyno to 2>><<set $enemynomax to 2>><<maninit>><<npcexpose>>
+  <<set $enemytrust += 900>><<set $enemyarousalmax to 1100>>
+  <<npcincr Kylar dom -1>><<ldom>>
+  <<deadwood-reblooms-pool-party-witness kgroup 'Deadwood Reblooms Pool Party Kylar Group Sex' Kylar _mate>>
+<</if>>
+<br><br>
+<<if !$combat>>
+  <<getouticon>><<lanLink ['Back to the pool', '回到泳池'] 'School Pool'>><<set $LifeSimulation.pool_party.selected to null>><</lanLink>>
+<</if>>
+
+<!-- 凯拉尔多人场的回合循环。 -->
+:: Deadwood Reblooms Pool Party Kylar Group Sex []
+<<set $outside to 0>><<set $location to 'pool'>><<schooleffects>><<effects>>
+<<if !$combat>>
+  <span class='blue'><i><<lanSwitch 'It is over.' '已经结束了。'>></i></span><br><br>
+  <<getouticon>><<lanLink ['Back to the pool', '回到泳池'] 'School Pool'>><<set $LifeSimulation.pool_party.selected to null>><</lanLink>>
+<<else>>
+  <<deadwood-reblooms-pool-party-sex-loop 'Deadwood Reblooms Pool Party Kylar Group Sex'>>
+<</if>>

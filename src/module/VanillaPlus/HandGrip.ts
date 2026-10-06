@@ -3,6 +3,10 @@
 export type GripHand = 'left' | 'right';
 
 class HandGrip {
+  public static handFree(hand: GripHand): boolean {
+    return T?.[`${hand}Options`] === 'free';
+  }
+
   private state(): { left: number | null; right: number | null } {
     return (V.VanillaPlus.handGrip ??= { left: null, right: null });
   }

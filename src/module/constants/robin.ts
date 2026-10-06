@@ -7,7 +7,7 @@ export type AsylumStatus = 'home' | 'admitted' | 'recovering';
 /** 罗宾店铺的开办阶段。 */
 export type ShopStage = 'none' | 'planning' | 'applied' | 'site' | 'inspected' | 'permitted';
 
-// Robin 模块沿用 V.RobinExpansion 存档字段，保留旧存档进度。
+// Robin 模块沿用 V.RobinExpansion 存档字段。
 export interface RobinExpansionState {
   /** 柠檬水摊位的改造等级。 */
   lemonade: number;
@@ -80,6 +80,8 @@ export interface RobinExpansionState {
   fishEarningsToday: number;
   /** 本次交付的鱼种、数量与返回地点。 */
   fishSelection: string;
+  /** 鲜花摊当前选中的花种，与 fishSelection 同构，供店铺进货使用。 */
+  flowerSelection: string;
   fishAmount: number;
   fishReturn: 'stall' | 'shop';
   /** 和罗宾在海滩钓鱼的游戏日、进行状态及开始时的累计渔获。 */
@@ -178,6 +180,9 @@ export interface RobinExpansionState {
     tentacleFailures: number;
     /** 已度过的触手遭遇次数，用于区分第一场与之后。 */
     tentacleWave: number;
+    /** 本次平原探索的步数与伏击判定。 */
+    tentacle_steps: number;
+    tentacle_ambush: boolean;
     /** 本次寻找期间已经安慰罗宾的次数，每次遭遇后限一次。 */
     tentacleClose: number;
   };
@@ -219,6 +224,7 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
   fishSoldToday: 0,
   fishEarningsToday: 0,
   fishSelection: '',
+  flowerSelection: '',
   fishAmount: 1,
   fishReturn: 'stall',
   fishDateDay: -1,
@@ -267,6 +273,8 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
     tentacleDay: -1,
     tentacleFailures: 0,
     tentacleWave: 0,
+    tentacle_steps: 0,
+    tentacle_ambush: false,
     tentacleClose: 0
   }
 };

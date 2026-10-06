@@ -1,7 +1,9 @@
 // ./src/module/constants/sydney.ts
 
-// Sydney 模块沿用 V.SydneyExpansion 存档字段，保留旧存档进度。
+// Sydney 模块沿用 V.SydneyExpansion 存档字段。
 export interface SydneyExpansionState {
+  /** 本次告解遭遇的打断阶段。 */
+  confession_intrusion: number;
   /*
    * 年份与日期标记阻止节庆和日常对话重复触发，dormScene 只记录神殿宿舍当前入口。
    * 一律用 -1 表示"尚未发生"，避免与第 0 天混淆。
@@ -89,6 +91,7 @@ export interface SydneyExpansionState {
 
 // 西里斯庄园的邀请、初访、童年对话和每日互动均属于当前存档，不从窗口或 Passage 历史推断。
 export const DEFAULT_SYDNEY_EXPANSION_STATE: SydneyExpansionState = {
+  confession_intrusion: 0,
   robinHalloweenYear: 0,
   whitneyHalloweenYear: 0,
   halloweenYear: 0,

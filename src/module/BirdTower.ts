@@ -95,7 +95,8 @@ class BirdTower extends Module {
     const pool = [...ids];
     const actors: number[] = [];
     for (let i = 0; i < Math.min(ids.length, limit); i++) actors.push(pool.splice(random(0, pool.length - 1), 1)[0]);
-    this.state.scene = { ids: [...ids], actors };
+    this.state.scene.ids = [...ids];
+    this.state.scene.actors = actors;
   }
 
   public resetHunt(): void {

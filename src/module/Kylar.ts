@@ -17,9 +17,8 @@ class Kylar extends Module {
     return this.available && (Time.hour >= 18 || window.getKylarLocation().area === 'manor_bedroom');
   }
 
-  /** 起床后、去公园或街机厅前的空档，不覆盖上学日程。 */
   public get canGarden(): boolean {
-    return this.available && V.KylarExpansion.stay_invited && window.isLoveInterest('Kylar') && !Time.schoolTime && Time.dayState === 'day' && Time.hour >= 8 && Time.hour < 9;
+    return this.available && V.KylarExpansion.stay_invited && window.isLoveInterest('Kylar') && !Time.schoolTime && Time.hour >= 8 && Time.hour < 9;
   }
 
   public openWardrobe(): void {

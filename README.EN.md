@@ -27,7 +27,7 @@
 
 `DeadwoodReblooms` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
 
-The current version is **1.4.3**. This patch restores double beds in the owned-home furniture catalogue. See the [release notes](.github/release-notes/v1.4.3.md). Framework **5.4.2** is recommended.
+The current version is **1.4.4**. This patch fixes an error when retrieving stored clothes in Sydney’s temple dorm and the owned-home intimacy scenes. See the [release notes](.github/release-notes/v1.4.4.md). Framework **5.4.2** is recommended.
 
 ## Modules and game guide
 
