@@ -27,7 +27,7 @@
 
 `DeadwoodReblooms` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
 
-The current version is **1.4.1**. This patch fixes the tower return event running before game startup has initialized its state. See the [release notes](.github/release-notes/v1.4.1.md). Framework **5.4.0** is recommended.
+The current version is **1.4.2**. This patch fixes the tower return event running before game startup has initialized its state. See the [release notes](.github/release-notes/v1.4.2.md). Framework **5.4.1** is recommended.
 
 ## Modules and game guide
 
