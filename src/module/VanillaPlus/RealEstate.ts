@@ -406,9 +406,10 @@ export class RealEstate {
         });
       return offers;
     }
+    // notBedroom 只限制原版孤儿院卧室，自购房仍可选购双人床。
     const stock = setup.furniture as Map<string, PropertyFurniture>;
     return Array.from(stock.entries())
-      .filter(([key, item]) => item.category.includes(kind) && !item.type.includes('starter') && key !== current?.id && !['disabled', 'notBedroom'].includes(item.showCheck ?? ''))
+      .filter(([key, item]) => item.category.includes(kind) && !item.type.includes('starter') && key !== current?.id && item.showCheck !== 'disabled')
       .filter(([, item]) => item.showCheck !== 'isWardrobeHigherTier' || (item.tier ?? 0) > (current?.tier ?? 0))
       .map(([key, item]) => ({ id: key, item, cost: window.Furniture.setPrice(item.cost) }));
   }
