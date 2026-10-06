@@ -1,0 +1,68 @@
+:: Deadwood Orchard Regular Widgets [widget]
+<<widget 'deadwood-orchard-regular-link'>>
+  <<if maplebirch.get('Orchard')?.canMeetRegular and maplebirch.get('Orchard').regularStock.length>>
+    <<socialiseicon>><<lanLink ['Attend to a fruit customer (0:20)', '招待买水果的客人 (0:20)'] 'Deadwood Orchard Regular'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Orchard Regular []
+<<set $location to 'market'>><<set $outside to 0>><<effects>>
+<<set $_orchard to maplebirch.get('Orchard')>>
+<<if $_orchard and $_orchard.canMeetRegular>>
+  <<if !$per_npc.deadwood_orchard_regular>>
+    <<generateNPC 1 a>><<saveNPC 0 'deadwood_orchard_regular'>>
+  <<else>>
+    <<loadNPC 0 'deadwood_orchard_regular'>>
+  <</if>>
+  <<person1>>
+  <div id='orchard-customer'>
+  <<if $Orchard.regularVisits is 0>>
+    <<language>>
+      <<option 'EN'>>
+      A <<person>> stops at your stall and looks over the fruit. "Five, please," <<he>> says, holding out a cloth bag. "The paper ones always split on the way home."
+      <<option 'CN'>>
+      一个<<person>>在你的摊位前停下，打量着水果。“给我五个吧。”<<he>>说着，递来一只布袋。“纸袋总是在回家的路上破掉。”
+    <</language>>
+  <<elseif $Orchard.regularVisits lt 3>>
+    <<language>>
+      <<option 'EN'>>
+      You recognise the cloth bag before the customer speaks. "Those went quickly. What have you brought today?"
+      <<option 'CN'>>
+      客人还没开口，你就认出了那只布袋。“上次的很快就吃完了。今天带了些什么？”
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+      Your regular waits while you straighten the display. "I thought I’d catch you here. Five again, if you have enough." The cloth bag is already open.
+      <<option 'CN'>>
+      熟客等你整理好摊上的水果才开口。“想着在这儿能找到你。够的话，还是五个。”布袋已经撑开了。
+    <</language>>
+  <</if>></div><br><br>
+  <<if $Orchard.regularVisits gte 3 and $Orchard.regularFavourite>>
+    <<language>>
+      <<option 'EN'>>The customer points at <<foodstufficon $Orchard.regularFavourite>>. <<if $_orchard.regularStock.some(item => item.type is $Orchard.regularFavourite)>>"The same as last time, please."<<else>>"None today? I’ll try something else, then."<</if>>
+      <<option 'CN'>>客人指了指<<foodstufficon $Orchard.regularFavourite>>。<<if $_orchard.regularStock.some(item => item.type is $Orchard.regularFavourite)>>“还是上次那种吧。”<<else>>“今天没有？那我尝尝别的。”<</if>>
+    <</language>><br>
+  <</if>>
+  <div id='orchard-customer-choices'>
+  <<for $_fruit range $_orchard.regularStock>>
+    <<capture $_fruit>>
+      <<foodstufficon $_fruit.type>><<lanLink ['Bag five of these', '装五个这种水果']>>
+        <<if maplebirch.get('Orchard').sellRegular($_fruit.type)>>
+          <<pass 20>><<updatesidebarmoney>>
+          <<replace '#orchard-customer'>>
+            <<language>>
+              <<option 'EN'>>
+              The customer counts out the money, takes the bag and makes room for the people behind.
+              <<option 'CN'>>
+              客人数好钱，接过袋子，给身后的人让开了位置。
+            <</language>><</replace>>
+          <<replace '#orchard-customer-choices'>><</replace>>
+        <</if>>
+      <</lanLink>><br>
+    <</capture>>
+  <</for>></div>
+<<else>>
+  <<lanSwitch 'The customer has already moved on.' '客人已经离开了。'>>
+<</if>>
+<br><<getouticon>><<lanLink ['Return to your stall', '返回摊位'] 'Stall Manage'>><</lanLink>>

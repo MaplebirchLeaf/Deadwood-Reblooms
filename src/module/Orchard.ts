@@ -1,6 +1,8 @@
 // ./src/module/Orchard.ts
 
 import Module from './Module';
+import type Robin from './Robin';
+import trade from '../assets/orchard/trade.json';
 import {
   species,
   harvestTiers,
@@ -57,11 +59,36 @@ export interface OrchardReceipt {
   donated?: number;
 }
 
+const fruitTypes = [...Object.keys(species), 'blood_lemon'] as OrchardFruit[];
+
+interface OrchardSale {
+  day: number;
+  source?: 'farm' | 'shop' | 'market';
+  type: OrchardFruit;
+  amount: number;
+  income: number;
+}
+
 interface OrchardState {
   site: OrchardSite;
   tool: OrchardTool;
   selected: number;
   day: number;
+  order: { type: 'lemon' | 'orange'; amount: number; price: number; deadline: number; status: 'pending' | 'fulfilled' | 'cancelled' | 'late' } | null;
+  orderDay: number;
+  ordersCompleted: number;
+  restockCredit: number;
+  regularDay: number;
+  regularVisits: number;
+  regularFavourite: OrchardFruit | null;
+  alexDeliveryDay: number;
+  sales: OrchardSale[];
+  reserve: Partial<Record<OrchardFruit, number>>;
+  soldDay: number;
+  soldToday: number;
+  salesIncome: number;
+  workerExpenses: number;
+  seedExpenses: number;
   seed: OrchardSpecies;
   known: OrchardSpecies[];
   soil: Record<OrchardSite, OrchardSoil[]>;
@@ -87,6 +114,21 @@ const defaults: OrchardState = {
   tool: 'water',
   selected: 0,
   day: -1,
+  order: null,
+  orderDay: -1,
+  ordersCompleted: 0,
+  restockCredit: 0,
+  regularDay: -1,
+  regularVisits: 0,
+  regularFavourite: null,
+  alexDeliveryDay: -1,
+  sales: [],
+  reserve: {},
+  soldDay: -1,
+  soldToday: 0,
+  salesIncome: 0,
+  workerExpenses: 0,
+  seedExpenses: 0,
   seed: 'apple',
   known: [],
   soil: { temple: [], farm: [] },
@@ -122,12 +164,184 @@ class Orchard extends Module {
       action: () => this.advance()
     });
     // 只在跨日时结算生长，单次跨过多天仍由 advance 按日期逐日处理。
-    this.core.dynamic.regTimeEvent('onDay', ':deadwood-orchard-growth', { exact: true, action: () => this.advance() });
+    this.core.dynamic.regTimeEvent('onDay', ':deadwood-orchard-growth', {
+      exact: true,
+      action: () => {
+        this.advance();
+      }
+    });
     this.core.dynamic.regTimeEvent('onHour', ':deadwood-orchard-worker', { exact: true, action: () => this.advance() });
     this.core.dynamic.regTimeEvent('onTimeTravel', ':deadwood-orchard-travel', {
       cond: data => data.direction === 'forward',
       action: () => this.advance()
     });
+  }
+
+  public get canSupplyRobin(): boolean {
+    return (
+      !!this.core.get('Robin') &&
+      !!V.RobinExpansion?.shop &&
+      C.npc.Robin?.init === 1 &&
+      !V.robinmissing &&
+      V.robin.timer.hurt === 0 &&
+      V.RobinExpansion.asylum.status !== 'admitted' &&
+      window.getRobinLocation() === 'shop' &&
+      V.location === 'deadwood_robin_shop' &&
+      Time.hour >= 9 &&
+      Time.hour < 21 &&
+      this.canTrade
+    );
+  }
+
+  public get canOrder(): boolean {
+    return this.canSupplyRobin && this.orderStatus !== 'pending' && (this.state.orderDay < 0 || Time.days - this.state.orderDay >= trade.orderInterval);
+  }
+
+  public get orderStatus(): 'pending' | 'fulfilled' | 'cancelled' | 'late' | null {
+    const order = this.state.order;
+    return order?.status === 'pending' && Time.days > order.deadline ? 'late' : (order?.status ?? null);
+  }
+
+  public get orderQuantity(): number {
+    return this.state.ordersCompleted ? Math.max(1, Math.floor(trade.repeatQuantity * (Time.season === 'winter' ? trade.winterOrderMultiplier : 1))) : trade.trialQuantity;
+  }
+
+  private get canTrade(): boolean {
+    return V.exposed <= 0 && V.stress < V.stressmax && V.combat !== 1 && !V.gag && !window.pcAreArmsBound('both') && (this.available('farm') || this.available('temple'));
+  }
+
+  public requestOrder(type: 'lemon' | 'orange'): boolean {
+    if (!this.canOrder || !['lemon', 'orange'].includes(type)) return false;
+    const price = setup.foodstuff[type]?.shop?.sell_price;
+    if (typeof price !== 'number' || !Number.isFinite(price) || price <= 0) return false;
+    this.state.order = {
+      type,
+      amount: this.orderQuantity,
+      price: Math.max(1, Math.floor(price * trade.bulkPriceMultiplier)),
+      deadline: Time.days + trade.orderDays,
+      status: 'pending'
+    };
+    this.state.orderDay = Time.days;
+    return true;
+  }
+
+  public cancelOrder(): boolean {
+    if (!this.canSupplyRobin || !this.state.order || this.orderStatus !== 'pending') return false;
+    this.state.order.status = 'cancelled';
+    return true;
+  }
+
+  public supplyRobin(): boolean {
+    const order = this.state.order;
+    const shop = (this.core.get('Robin') as Robin | undefined)?.shop;
+    if (!this.canSupplyRobin || !shop || !order || this.orderStatus !== 'pending') return false;
+    if ((V.foodstuff[order.type]?.amount ?? 0) - (this.state.reserve[order.type] ?? 0) < order.amount) return false;
+    const income = order.price * order.amount;
+    if (!shop.spend(income / 100)) return false;
+    V.foodstuff[order.type].amount -= order.amount;
+    order.status = 'fulfilled';
+    this.state.ordersCompleted++;
+    this.state.restockCredit = trade.restockDiscount;
+    this.recordSale(order.type, order.amount, income, 'shop');
+    this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Robin love 1>>');
+    return true;
+  }
+
+  public get canMeetRegular(): boolean {
+    return V.location === 'market' && Time.hour < 21 && Time.dayState !== 'night' && this.canTrade && this.state.regularDay !== Time.days;
+  }
+
+  public get regularStock(): Orchard['stock'] {
+    const displayed = this.stock.filter(item => item.amount >= 5 && V.foodstuff[item.type].marketStall !== false);
+    const preferred = displayed.find(item => item.type === this.state.regularFavourite);
+    return this.state.regularVisits >= 3 && preferred ? [preferred] : displayed;
+  }
+
+  public sellRegular(type: OrchardFruit): boolean {
+    if (this.core.passage.title !== 'Deadwood Orchard Regular' || !this.canMeetRegular || !V.per_npc?.deadwood_orchard_regular) return false;
+    const item = this.regularStock.find(item => item.type === type);
+    if (!item) return false;
+    const price = setup.foodstuff[type]?.shop?.sell_price;
+    if (typeof price !== 'number' || !Number.isFinite(price) || price <= 0) return false;
+    const income = Math.round(price) * 5;
+    V.foodstuff[type].amount -= 5;
+    this.state.regularDay = Time.days;
+    this.state.regularVisits++;
+    this.state.regularFavourite ??= type;
+    this.recordSale(type, 5, income, 'market');
+    return true;
+  }
+
+  private recordSale(type: OrchardFruit, amount: number, income: number, source: 'farm' | 'shop' | 'market'): void {
+    this.core.SugarCube.Wikifier.wikifyEval(`<<money ${income} '${source}'>>`);
+    this.state.salesIncome += income;
+    this.state.sales.push({ day: Time.days, source, type, amount, income });
+    if (this.state.sales.length > trade.ledgerEntries) this.state.sales.shift();
+  }
+
+  /** 直接读取原版食品库存，野外采摘与果园收成都可交货。 */
+  public get stock(): { type: OrchardFruit; amount: number; price: number; reserve: number }[] {
+    return fruitTypes.flatMap(type => {
+      const amount = V.foodstuff[type]?.amount ?? 0;
+      const price = setup.foodstuff[type]?.shop?.sell_price;
+      if (amount < 1 || typeof price !== 'number' || !Number.isFinite(price) || price <= 0) return [];
+      return [{ type, amount, price: Math.max(1, Math.floor(price * trade.bulkPriceMultiplier)), reserve: this.state.reserve[type] ?? 0 }];
+    });
+  }
+
+  public get canDeliver(): boolean {
+    return (
+      this.core.passage.title === 'Deadwood Reblooms Orchard Trade' &&
+      V.location === 'alex_farm' &&
+      this.state.site === 'farm' &&
+      this.available('farm') &&
+      this.canWork &&
+      V.combat !== 1 &&
+      !this.farmInterrupted &&
+      V.farm_work?.alex === 'admin'
+    );
+  }
+
+  public get deliveryRemaining(): number {
+    return Math.max(0, trade.bulkDailyLimit - (this.state.soldDay === Time.days ? this.state.soldToday : 0));
+  }
+
+  public get deliveryMinutes(): number {
+    return trade.deliveryMinutes;
+  }
+
+  public keepFruit(type: OrchardFruit, amount: number): void {
+    if (this.core.passage.title !== 'Deadwood Reblooms Orchard Trade' || !this.available(this.state.site)) return;
+    if (!fruitTypes.includes(type) || !Number.isSafeInteger(amount) || amount < 0) return;
+    this.state.reserve[type] = amount;
+  }
+
+  public displayFruit(type: OrchardFruit): void {
+    if (this.core.passage.title !== 'Deadwood Reblooms Orchard Trade' || !this.available(this.state.site)) return;
+    if (!fruitTypes.includes(type) || !V.foodstuff[type]) return;
+    V.foodstuff[type].marketStall = V.foodstuff[type].marketStall === false;
+  }
+
+  /** 每日收购量有限；只交付超出保留数量的库存，不自动卖掉玩家的水果。 */
+  public deliver(type: OrchardFruit, amount: number): boolean {
+    if (!this.canDeliver || !Number.isSafeInteger(amount) || amount < 1 || amount > this.deliveryRemaining) return false;
+    const item = this.stock.find(item => item.type === type);
+    if (!item || amount > item.amount - item.reserve) return false;
+    const income = item.price * amount;
+    if (!Number.isSafeInteger(income)) return false;
+    V.foodstuff[type].amount -= amount;
+
+    if (this.state.soldDay !== Time.days) {
+      this.state.soldDay = Time.days;
+      this.state.soldToday = 0;
+    }
+    this.state.soldToday += amount;
+    this.recordSale(type, amount, income, 'farm');
+    if (this.state.alexDeliveryDay !== Time.days) {
+      this.state.alexDeliveryDay = Time.days;
+      this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Alex love 1>>');
+    }
+    return true;
   }
 
   /** 果实使用原版食品目录，果树不写入原版作物地块。 */
@@ -217,6 +431,7 @@ class Orchard extends Module {
     if (this.core.passage.title !== 'Deadwood Reblooms Orchard Hire' || !this.available('farm') || !this.candidate || V.money < this.workerWage) return false;
     this.advance();
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${this.workerWage} 'farm'>>`);
+    this.state.workerExpenses += this.workerWage;
     this.state.worker.hired = true;
     this.state.worker.paidFrom = Time.date.timeStamp;
     this.state.worker.paidUntil = Time.date.timeStamp + 7 * 86400;
@@ -227,6 +442,7 @@ class Orchard extends Module {
     if (!this.canPayWorker) return false;
     this.advance();
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${this.workerWage} 'farm'>>`);
+    this.state.workerExpenses += this.workerWage;
     const worker = this.state.worker;
     if (worker.paidUntil <= Time.date.timeStamp) worker.paidFrom = Time.date.timeStamp;
     worker.paidUntil = Math.max(Time.date.timeStamp, worker.paidUntil) + 7 * 86400;
@@ -276,6 +492,7 @@ class Orchard extends Module {
     if (!data || data.seedSource !== 'shop' || !data.seedPrice || !setup.foodstuff[type] || this.state.known.includes(type)) return false;
     if (this.core.passage.title !== 'Supermarket' || Time.dayState === 'night' || Time.hour === 21 || !this.canWork || V.money < data.seedPrice) return false;
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${data.seedPrice} 'shopping'>>`);
+    this.state.seedExpenses += data.seedPrice;
     return this.learn(type);
   }
 

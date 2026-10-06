@@ -197,9 +197,19 @@ export default class RobinShop extends Shared {
     return true;
   }
 
-  /** 补饮品库存。基础饮品原料已从周收入扣除，这三箱只供 PC 与罗宾的额外班次。 */
+  public get restockPrice(): number {
+    return Math.max(0, (V.maths >= 300 ? 25 : 30) - (this.core.get('Orchard')?.state.restockCredit ?? 0));
+  }
+
+  public get canRestock(): boolean {
+    return this.state.shop && this.state.shopStock === 0 && this.robinAvailable && window.getRobinLocation() === 'shop' && this.canSpend(this.restockPrice);
+  }
+
+  /** 补货会扣经营资金、消耗水果抵扣并改变库存，保留显式调用。 */
   public restockDrinks(): boolean {
-    if (!this.state.shop || this.state.shopStock > 0 || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(V.maths >= 300 ? 25 : 30)) return false;
+    if (!this.canRestock || !this.spend(this.restockPrice)) return false;
+    const orchard = this.core.get('Orchard');
+    if (orchard) orchard.state.restockCredit = 0;
     this.state.shopStock = 3;
     return true;
   }

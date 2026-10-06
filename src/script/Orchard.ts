@@ -5,6 +5,8 @@ import { species, type OrchardSpecies } from '../module/Orchard/Species';
 import type { MacroDefinition } from 'twine-sugarcube';
 
 export default function Orchard(maplebirch: typeof window.maplebirch): void {
+  maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-orchard-regular-link'], passage: 'Stall Manage' });
+
   // 回执在本次页面显示完后清除，不能带进稍后的遭遇或下一次进园。
   maplebirch.on(':passagedisplay', () => {
     const orchard = maplebirch.get('Orchard');

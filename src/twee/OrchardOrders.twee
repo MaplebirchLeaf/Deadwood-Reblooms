@@ -1,0 +1,95 @@
+:: Deadwood Orchard Order Widgets [widget]
+<<widget 'deadwood-orchard-shop-entry'>>
+  <<if maplebirch.get('Orchard')?.canSupplyRobin>>
+    <br><<foodstufficon 'lemon'>><<lanLink ['Discuss fruit supplies', '商量水果供货'] 'Deadwood Orchard Robin Order'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Orchard Robin Order []
+<<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
+<<set $_orchard to maplebirch.get('Orchard')>>
+<<if $_orchard and $_orchard.canSupplyRobin>>
+  <<npc Robin>><<person1>>
+  <<if !$Orchard.order>>
+    <<language>>
+      <<option 'EN'>>
+      Robin looks up from the sink. "Hey. You grow fruit, right? I could use some here." <<He>> dries <<his>> hands and finds a pen. "Just a small box to start with."
+      <<option 'CN'>>
+      罗宾从水槽旁抬起头。“嘿，你不是在种水果吗？店里能用上。”<<He>>擦干双手，找出一支笔。“先来一小箱就好。”
+    <</language>>
+  <<elseif $_orchard.orderStatus is 'fulfilled'>>
+    <<language>>
+      <<option 'EN'>>
+      Robin checks the fruit left in the fridge. "Those were good. The customers liked them." <<He>> closes the door. "Could you bring a few more next time?"
+      <<option 'CN'>>
+      罗宾看了看冰箱里剩下的水果。“上次那些不错，客人也喜欢。”<<He>>关上柜门。“下次能多带一点吗？”
+    <</language>>
+  <<elseif $_orchard.orderStatus is 'cancelled'>>
+    <<language>>
+      <<option 'EN'>>
+      Robin crosses out the note. "Thanks for telling me. I’ll put it on the usual delivery."
+      <<option 'CN'>>
+      罗宾划掉纸上的记录。“谢谢你过来说。我加到平时的进货单上。”
+    <</language>>
+  <<elseif $_orchard.orderStatus is 'late'>>
+    <<language>>
+      <<option 'EN'>>
+      Robin pulls the old note from beside the till. "I waited, then ordered from the supplier. Come and tell me next time, all right?" Robin folds it away.
+      <<option 'CN'>>
+      罗宾从收银机旁抽出旧便条。“我等了一阵，后来还是找供货商订了。下次过来说一声，好吗？”罗宾把纸折了起来。
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+      Robin checks the note beside the till. "The empty box is in the back. Have you brought the fruit?"
+      <<option 'CN'>>
+      罗宾查看收银机旁的便条。“空箱在后面。水果带来了吗？”
+    <</language>>
+  <</if>><br><br>
+  <<if $Orchard.order and $_orchard.orderStatus is 'pending'>>
+    <<foodstufficon $Orchard.order.type>><<= $Orchard.order.amount>> — <<printmoney ($Orchard.order.amount * $Orchard.order.price)>><br>
+    <<lanSwitch 'Days left: ' '剩余天数：'>><<= Math.max(0, $Orchard.order.deadline - Time.days)>><br>
+    <<lanSwitch 'Payment comes from the shop’s available funds.' '货款从店铺可用资金支付。'>><br>
+    <<lanLink ['Hand over the fruit (0:10)', '交付水果 (0:10)'] 'Deadwood Orchard Robin Supplied'>><</lanLink>><br>
+    <<lanLink ['Explain that you cannot supply this order', '说明这次无法供货']>>
+      <<run maplebirch.get('Orchard').cancelOrder()>><<run Engine.show()>>
+    <</lanLink>><br>
+  <<elseif $_orchard.canOrder>>
+    <<if Time.season is 'winter'>>
+      <<language>>
+        <<option 'EN'>>"Mostly hot chocolate at the moment," Robin says, glancing at the pot. "I won’t need as much fruit."
+        <<option 'CN'>>“最近大多是来买热巧克力的。”罗宾看了看锅子。“水果不用那么多。”
+      <</language>><br>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>"Could you bring <<= $_orchard.orderQuantity>> fruit within three days?" Robin asks. "That should last until next week."
+      <<option 'CN'>>“三天内能带<<= $_orchard.orderQuantity>>个来吗？”罗宾问道。“应该能用到下周。”
+    <</language>><br>
+
+    <<foodstufficon 'lemon'>><<lanLink ['Agree to supply lemons', '答应送来柠檬']>>
+      <<run maplebirch.get('Orchard').requestOrder('lemon')>><<run Engine.show()>>
+    <</lanLink>><br>
+    <<foodstufficon 'orange'>><<lanLink ['Agree to supply oranges', '答应送来橙子']>>
+      <<run maplebirch.get('Orchard').requestOrder('orange')>><<run Engine.show()>>
+    <</lanLink>><br>
+  <</if>>
+<<else>>
+  <<lanSwitch 'Now is not a good time to discuss supplies.' '现在不方便商量供货。'>>
+<</if>>
+<br><<getouticon>><<lanLink ['Return to the shop', '返回饮品店'] 'Deadwood Robin Shop'>><</lanLink>>
+
+:: Deadwood Orchard Robin Supplied []
+<<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
+<<if maplebirch.get('Orchard')?.supplyRobin()>>
+  <<npc Robin>><<person1>><<pass 10>>
+  <<language>>
+    <<option 'EN'>>
+    Robin counts the fruit while you carry it into the back room. A customer calls from the counter; Robin asks them to wait, then finishes counting your payment. "There. I’ll label these before I forget."
+    <<option 'CN'>>
+    你把水果搬进后间，罗宾逐个清点。柜台有客人叫人，罗宾请对方稍等，先数好给你的货款。“好了。我得趁还记得，给这些贴上日期。”
+  <</language>><<glove 'Robin'>>
+  <br><br><<lanSwitch 'You will spend £5 less on the next drinks restock.' '下次补充饮品原料时，你可以少花 £5。'>>
+<<else>>
+  <<lanSwitch 'You cannot complete the delivery right now.' '你现在无法完成交货。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink ['Return to the shop', '返回饮品店'] 'Deadwood Robin Shop'>><</lanLink>>

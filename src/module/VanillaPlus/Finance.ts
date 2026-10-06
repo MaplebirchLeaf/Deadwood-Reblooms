@@ -482,7 +482,7 @@ class Finance {
       credit: bank.credit_card && bank.credit_missed_payments === 0 && bank.credit_debt + value <= this.accountLimits.credit
     };
     const methods: PaymentMethod[] = [bank.payment_method, 'cash', 'debit', 'credit'];
-    return methods.find((method, index) => methods.indexOf(method) === index && available[method]) ?? null;
+    return methods.find(method => available[method]) ?? null;
   }
 
   private chargeMerchant(amount: unknown, source: unknown): boolean {

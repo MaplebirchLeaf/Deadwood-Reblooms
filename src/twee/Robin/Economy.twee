@@ -779,6 +779,7 @@
     <<lanSwitch 'The shop stays open while Robin is at school or tending a stall. Temporary staff cover the glass counter for now, following Robin’s labelled recipes and numbered orders. Robin has left a hiring notice beside the till.' '罗宾上学或照看摊位时，店铺也照常营业。暂时由临时店员照看玻璃柜台，按罗宾标好的配方和订单号码招待客人。收银机旁放着罗宾写好的招聘启事。'>>
   <</if>>
 <</if>>
+<<deadwood-orchard-shop-entry>>
 <<if maplebirch.get('Robin').shop.attendant>>
   <<set _robinAttendantKey to maplebirch.get('Robin').shop.attendantKey>>
   <br><<language>>
@@ -828,14 +829,9 @@
 <<shopicon 'register'>><<lanLink ['Browse flowers, popcorn and balloons', '查看鲜花、爆米花与气球'] 'Deadwood Robin Shop Other Goods'>><</lanLink>><br>
 <<deadwood-robin-fish-link 'shop'>>
 <span class='blue'><<lanSwitch 'Special ingredient crates remaining:' '新品原料剩余箱数：'>> <<= $RobinExpansion.shopStock>></span><br><br>
-<<if $RobinExpansion.shopStock is 0
-  and getRobinLocation() is 'shop'
-  and maplebirch.get('Robin').canSpend($maths gte 300 ? 25 : 30)>>
-  <<if $maths gte 300>>
-    <<icon 'crate.png'>><<lanLink ['Check the invoice and buy three crates for £25 (0:30)', '核对进货单并采购三箱原料 £25 (0:30)'] 'Deadwood Robin Shop Restock'>><</lanLink>><br>
-  <<else>>
-    <<icon 'crate.png'>><<lanLink ['Buy three crates of special ingredients with Robin for £30 (0:30)', '与罗宾采购三箱新品原料 £30 (0:30)'] 'Deadwood Robin Shop Restock'>><</lanLink>><br>
-  <</if>>
+<<if maplebirch.get('Robin').shop.canRestock>>
+  <<set _robinRestockPrice to maplebirch.get('Robin').shop.restockPrice>>
+  <<icon 'crate.png'>><<lanLink ["Buy three crates of special ingredients (£" + _robinRestockPrice + " 0:30)", '采购三箱新品原料 (£' + _robinRestockPrice + ' 0:30)'] 'Deadwood Robin Shop Restock'>><</lanLink>><br>
 <</if>>
 <<if maplebirch.get('Robin').shop.canWork>>
   <<shopicon 'register'>><<lanLink ['Work a shift with Robin (1:00)', '和罗宾一起看店 (1:00)'] 'Deadwood Robin Shop Shift'>><</lanLink>><br>

@@ -121,3 +121,23 @@ Existing ordinary lemons stay unchanged, and blood lemons remain after sunrise. 
 Check that the module is enabled and the game has been reloaded, then check temple rank, garden clearing or farm progress. The initial farm invitation also requires Alex to be doing paperwork.
 
 Unknown seeds, uncleared ground, occupied plots, remaining moisture, active fertiliser, soil already at its highest quality, insufficient tending skill, no ripe fruit and work restrictions can prevent an action. Only the next adjoining plot can be cleared. Use "Continue clearing" to keep working; a progress bar appears once clearing has begun. The summary lists harvestable trees and trees needing water. Select a cleared plot to inspect its soil. Return to the farm fields when an attack interrupts work.
+
+### Fruit inventory, market stalls and farm deliveries
+
+- **Where**: “Fruit inventory and sales” in an unlocked orchard. Uses the vanilla food inventory, including fruit gathered elsewhere. The temple kitchen’s share never enters your inventory.
+- **Market stall**: Toggle each fruit’s vanilla display setting. Vanilla customers and sales events continue normally. Bulk delivery reserves do not restrict stall sales; keep a type off display if you do not want to sell it there.
+- **Reserves**: Enter a minimum quantity for each fruit and save that row. Farm deliveries only take stock above the reserve.
+- **Bulk delivery**: Available from the farm orchard when Alex handles administration and you can work during daylight. Pays 70% of each fruit’s vanilla selling price, with a shared limit of 100 fruit per day. Each delivery takes thirty minutes and uses the farm income route. Attacks and inability to work block delivery.
+- **Accounts**: Tracks bulk income, seed purchases and worker wages, with the latest forty deliveries. Past expenses are not reconstructed for old saves. Market stall earnings and shared fertiliser purchases are outside this ledger.
+
+### Drinks shop orders and a market regular
+
+- **Shop entry**: Enable Robin Expansion, open the drinks shop and visit while a healthy Robin is there. At least one orchard must be unlocked. Choose “Discuss fruit supplies”.
+- **Trial orders**: Supply lemons or oranges for existing drinks. The first order requests ten fruit, later orders twenty. Delivery is due within three days; agreements are at least seven days apart. The quote locks at 70% of the vanilla selling price.
+- **Payment**: Reserves apply. Robin pays from business funds with the existing rent protection. Insufficient stock or funds does not consume fruit. Delivery takes ten minutes, increases Robin’s love and reduces the next normal drinks restock by £5. This discount does not stack or replace cocoa and other ingredients.
+- **Cancellation**: Tell Robin if you cannot supply an active order. No love penalty applies; cancelling does not bypass the weekly interval. Overdue orders expire and Robin turns to the usual supplier.
+- **Market regular**: In vanilla stall management, attend to a fruit customer. One purchase per game day: five displayed fruit at the vanilla price, taking twenty minutes. The same per_npc character returns, with dialogue based on completed purchases. Reserves only restrict supply deliveries; stall display settings control this purchase.
+- **Farm cooperation**: Alex arranges crates and transport. Only the first successful delivery each day increases love.
+- **Ledger**: New shop orders and regular purchases enter the orchard ledger. Other vanilla stall sales remain in vanilla records to avoid double counting.
+
+Repeat fruit orders halve in winter, when hot chocolate is more popular. After three purchases, the regular prefers the first fruit purchased; when it is not displayed or fewer than five remain, another displayed fruit can be chosen. Ledger entries identify farm, shop and regular sales; older entries retain a generic sale label.
