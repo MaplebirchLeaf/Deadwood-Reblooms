@@ -47,7 +47,8 @@ class BirdTower extends Module {
     // 进入段落先补齐鹰崽数据；onBefore 覆盖同页孵化后立即推进时间的情况。
     this.core.dynamic.regStateEvent('gate', 'deadwood-birdtower-init', { priority: 10, action: init });
     this.core.dynamic.regStateEvent('gate', 'deadwood-birdtower-return', {
-      extra: { passage: ['Bird Tower'] },
+      // 启动时框架尚无当前段落；归巢结算只在鹰塔且存档状态就绪后执行。
+      cond: () => this.core.passage?.title === 'Bird Tower' && !!this.state?.daily,
       action: () => (this.returned = this.returnHunters),
       output: 'deadwood-birdtower-hunters-return'
     });
