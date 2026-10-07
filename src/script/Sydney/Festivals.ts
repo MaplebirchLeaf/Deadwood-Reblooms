@@ -1,20 +1,6 @@
 // ./src/script/Sydney/Festivals.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  maplebirch.tool.onInit(() => {
-    setup.feats['Four Halloween Visits'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:sydney:halloween:feat:title');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:sydney:halloween:feat:description');
-      },
-      difficulty: 3,
-      series: '',
-      filter: ['All', 'General']
-    };
-  });
-
   // 原版的页面宏和时间推进分别调用宏与同名全局函数，两个入口都先运行原版日程。
   maplebirch.once(':storyready', () => {
     const schedule = window.sydneySchedule;

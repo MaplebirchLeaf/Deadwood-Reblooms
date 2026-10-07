@@ -2,18 +2,6 @@
 
 export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.onInit(() => {
-    setup.feats['Beyond Shame'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:exhibitionism:feat:title');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:exhibitionism:feat:description');
-      },
-      difficulty: 3,
-      series: '',
-      filter: ['All', 'Stats']
-    };
-
     // 原版地图移动直接调用 mapMove，不会执行 link_table 中的链接效果。
     if (window.mapMove.deadwoodPublicWalk) return;
     const originalMapMove = window.mapMove;
@@ -28,15 +16,6 @@ export default function (maplebirch: typeof window.maplebirch) {
       originalMapMove(destination);
     };
     window.mapMove.deadwoodPublicWalk = true;
-  });
-
-  maplebirch.dynamic.regStateEvent('gate', 'exhibitionism-unlock', {
-    output: 'deadwood-reblooms-exhibitionism-unlock',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.exhibitionism.unlock
-  });
-  maplebirch.dynamic.regStateEvent('append', 'exhibitionism-max', {
-    output: 'earnFeat "Beyond Shame"',
-    cond: () => V.feats?.currentSave['Beyond Shame'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.exhibitionism.max
   });
 
   // 记录原版裸露挑战结果，并扩展暴露癖上限。

@@ -1,25 +1,6 @@
 // ./src/script/VanillaPlus/Willpower.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  maplebirch.tool.onInit(() => {
-    setup.feats['Sovereign Will'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:willpower:feat:title');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:willpower:feat:description');
-      },
-      difficulty: 3,
-      series: '',
-      filter: ['All', 'Stats']
-    };
-  });
-
-  maplebirch.dynamic.regStateEvent('append', 'willpower-max', {
-    output: 'earnFeat "Sovereign Will"',
-    cond: () => V.feats?.currentSave['Sovereign Will'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.willpower.max
-  });
-
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-willpower-unlock', passage: 'Lake Ruin Prison' });
 
   // 记录原版抗拒成功点，并扩展意志上限与耳液抵抗。

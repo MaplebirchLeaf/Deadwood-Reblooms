@@ -18,6 +18,13 @@ class Exhibitionism {
   public get max(): boolean {
     return V.VanillaPlus.lock.exhibitionism && V.exhibitionism >= this.vanillaPlus.ceiling('exhibitionism');
   }
+
+  public preInit(): void {
+    this.vanillaPlus.core.dynamic.regStateEvent('gate', 'exhibitionism-unlock', {
+      output: 'deadwood-reblooms-exhibitionism-unlock',
+      cond: () => V.VanillaPlus != null && this.unlock
+    });
+  }
 }
 
 export default Exhibitionism;

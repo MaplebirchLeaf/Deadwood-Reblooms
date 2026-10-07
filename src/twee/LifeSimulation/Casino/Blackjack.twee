@@ -99,8 +99,15 @@
 	}>>
 	<<if $_bjState.venue is 'home' and $_bjState.wager is 'strip' and $_bjState.clothing>>
 		<p><<lanSwitch 'Stake garments remaining' '剩余赌注衣物'>>：<<for $_bjIndex, $_bjSeat range ($_bjState.partner ? ['player', 'dealer', 'partner'] : ['player', 'dealer'])>>
-			<<if $_bjIndex gt 0>><<lanSwitch '; ' '；'>><</if>><<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>>
-			<<if $_bjState.match_lost_seats.includes($_bjSeat)>><<lanSwitch 'out' '已出局'>><<else>><<print $_bjGame.remainingClothes($_bjSeat)>><</if>>
+			<<if $_bjIndex gt 0>>
+			  <<lanSwitch '; ' '；'>>
+			<</if>>
+			<<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>>
+			<<if $_bjState.match_lost_seats.includes($_bjSeat)>>
+			  <<lanSwitch 'out' '已出局'>>
+			<<else>>
+			  <<print $_bjGame.remainingClothes($_bjSeat)>>
+			<</if>>
 		<</for>></p>
 	<</if>>
 	<p class='blackjack-result' role='status'>
@@ -122,19 +129,39 @@
 			<</switch>><</if>>
 		</span>
 		<<if $_bjState.partner and $_bjWinners.length>>
-			<span @class="$_bjWinners.length === 1 ? 'gold' : 'blue'"> <<lanSwitch 'Winner' '本局赢家'>>：<<for $_bjIndex, $_bjSeat range $_bjWinners>><<if $_bjIndex gt 0>><<lanSwitch ' and ' '、'>><</if>><<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>></span>
+			<span @class="$_bjWinners.length === 1 ? 'gold' : 'blue'"> <<lanSwitch 'Winner' '本局赢家'>>：<<for $_bjIndex, $_bjSeat range $_bjWinners>>
+			<<if $_bjIndex gt 0>>
+			  <<lanSwitch ' and ' '、'>>
+			<</if>>
+			<<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>></span>
 		<</if>>
 		<<if $_bjState.venue is 'home' and $_bjState.wager is 'strip'>>
 			<<if $_bjState.stripped_seats.length>>
 				<<language>>
 					<<option 'EN'>>
-						<<for $_bjIndex, $_bjSeat range $_bjState.stripped_seats>><<if $_bjIndex gt 0>> and <</if>><<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>>: one stake garment removed this hand.
+						<<for $_bjIndex, $_bjSeat range $_bjState.stripped_seats>>
+						<<if $_bjIndex gt 0>>
+						  and
+						<</if>>
+						<<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>>: one stake garment removed this hand.
 					<<option 'CN'>>
-						这局结束，<<for $_bjIndex, $_bjSeat range $_bjState.stripped_seats>><<if $_bjIndex gt 0>>、<</if>><<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>>已<<if $_bjState.stripped_seats.length gt 1>>各<</if>>脱一件赌注衣物。
+						这局结束，<<for $_bjIndex, $_bjSeat range $_bjState.stripped_seats>>
+						<<if $_bjIndex gt 0>>
+						  、
+						<</if>>
+						<<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>>已
+						<<if $_bjState.stripped_seats.length gt 1>>
+						  各
+						<</if>>
+						脱一件赌注衣物。
 				<</language>>
 			<<else>><<lanSwitch ' No garments removed this hand.' ' 本局无人脱衣。'>><</if>>
 			<<if $_bjState.match_lost_seats.length>>
-				<<lanSwitch ' Out of the game: ' ' 已出局：'>><<for $_bjIndex, $_bjSeat range $_bjState.match_lost_seats>><<if $_bjIndex gt 0>><<lanSwitch ' and ' '、'>><</if>><<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>>.
+				<<lanSwitch ' Out of the game: ' ' 已出局：'>><<for $_bjIndex, $_bjSeat range $_bjState.match_lost_seats>>
+				<<if $_bjIndex gt 0>>
+				  <<lanSwitch ' and ' '、'>>
+				<</if>>
+				<<lanSwitch `$_bjLabels[$_bjSeat][0]` `$_bjLabels[$_bjSeat][1]`>><</for>>.
 			<</if>>
 			<<if $_bjGame.matchEnded>>
 				<<language>>
@@ -158,7 +185,9 @@
 
 <<widget 'deadwood-blackjack-controls'>>
 	<<set $_bjGame to maplebirch.get('LifeSimulation').casino.blackjack>><<set $_bjState to $_bjGame.state>>
-	<<if $_bjState.venue is 'casino'>><<deadwood-casino-balance>><</if>>
+	<<if $_bjState.venue is 'casino'>>
+	  <<deadwood-casino-balance>>
+	<</if>>
 	<<if $_bjState.venue is 'home' and ($_bjState.phase is 'ready' or $_bjGame.matchEnded)>>
 		<div class='blackjack-bets'><<lanSwitch 'Rules' '玩法'>>：
 			<button type='button' data-action='wager' data-value='fun' @aria-pressed="String($_bjState.wager === 'fun')"><<lanSwitch 'Just cards' '只玩牌'>></button>
@@ -181,12 +210,18 @@
 		</button>
 	<</if>>
 	<<if $_bjState.venue is 'home' and $_bjState.wager is 'strip' and $_bjState.phase isnot 'player'>>
-		<<if !$_bjState.intimacy_declined>><button type='button' data-action='decline'><<lanSwitch 'This game is only about clothes; no intimacy' '这场只脱衣，不继续亲密'>></button><</if>>
+		<<if !$_bjState.intimacy_declined>>
+		  <button type='button' data-action='decline'><<lanSwitch 'This game is only about clothes; no intimacy' '这场只脱衣，不继续亲密'>></button>
+		<</if>>
 		<<if $_bjGame.matchEnded>>
 			<<if $_bjGame.pairIntimacyReady>>
 				<button type='button' data-action='pair'><<language>>
 					<<option 'EN'>>Invite <<print [$_bjState.companion, $_bjState.partner].sort().join(' and ')>> to stay, all three of you
-					<<option 'CN'>>邀<<for $_bjIndex, $_bjSeat range [$_bjState.companion, $_bjState.partner].sort()>><<if $_bjIndex gt 0>>和<</if>><<lanSwitch $_bjSeat `({Robin: '罗宾', Whitney: '惠特尼', Kylar: '凯拉尔', Sydney: '悉尼'})[$_bjSeat] || $_bjSeat`>><</for>>一起留下
+					<<option 'CN'>>邀<<for $_bjIndex, $_bjSeat range [$_bjState.companion, $_bjState.partner].sort()>>
+					<<if $_bjIndex gt 0>>
+					  和
+					<</if>>
+					<<lanSwitch $_bjSeat `({Robin: '罗宾', Whitney: '惠特尼', Kylar: '凯拉尔', Sydney: '悉尼'})[$_bjSeat] || $_bjSeat`>><</for>>一起留下
 				<</language>></button>
 			<</if>>
 			<<for $_bjPerson range $_bjGame.intimacyCandidates>>
@@ -205,9 +240,13 @@
 		<<case 'decline'>><<run $_bjChoiceGame.declineIntimacy()>>
 		<<case 'reset'>><<run $_bjChoiceGame.resetMatch()>>
 		<<case 'pair'>>
-			<<if $_bjChoiceGame.beginPairIntimacy()>><<set $sexstart to 1>><<run maplebirch.SugarCube.Engine.play('Deadwood Reblooms Property Pair Intimacy')>><</if>>
+			<<if $_bjChoiceGame.beginPairIntimacy()>>
+			  <<set $sexstart to 1>><<run maplebirch.SugarCube.Engine.play('Deadwood Reblooms Property Pair Intimacy')>>
+			<</if>>
 		<<case 'intimacy'>>
-			<<if $_bjChoiceGame.beginIntimacy(_args[1])>><<set $sexstart to 1>><<run maplebirch.SugarCube.Engine.play('Deadwood Reblooms Property Intimacy')>><</if>>
+			<<if $_bjChoiceGame.beginIntimacy(_args[1])>>
+			  <<set $sexstart to 1>><<run maplebirch.SugarCube.Engine.play('Deadwood Reblooms Property Intimacy')>>
+			<</if>>
 	<</switch>>
 <</widget>>
 
@@ -258,7 +297,9 @@
 		<</if>>
 	<</if>>
 	<<deadwood-blackjack-table>>
-	<<if _blackjackGame.state.venue is 'casino'>><<deadwood-casino-tricks>><</if>>
+	<<if _blackjackGame.state.venue is 'casino'>>
+	  <<deadwood-casino-tricks>>
+	<</if>>
 	<<if !_blackjackGame.available>>
 		<span class='blue'><<lanSwitch 'You cannot continue here now. Leave the table for another time.' '现在无法继续这场牌局。留到下次再玩吧。'>></span><br><br>
 	<<elseif _blackjackGame.state.venue isnot 'home' and !_blackjackGame.canStart and _blackjackGame.state.phase isnot 'player'>>

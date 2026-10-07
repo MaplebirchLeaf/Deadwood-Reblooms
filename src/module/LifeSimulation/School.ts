@@ -1,5 +1,7 @@
 // ./src/module/LifeSimulation/School.ts
 
+import schoolData from '../../assets/life-simulation/school.json';
+
 type SchoolRole = 'student' | 'prefect' | 'president';
 
 export type SchoolDressPolicy = 'uniform' | 'free' | 'revealing' | 'optionalNudity' | 'nudeDay' | 'mandatoryNudity';
@@ -81,31 +83,13 @@ export const DEFAULT_SCHOOL_STATE: SchoolState = {
 const DRESS_POLICIES: readonly SchoolDressPolicy[] = ['uniform', 'free', 'revealing', 'optionalNudity', 'nudeDay', 'mandatoryNudity'];
 
 // 制服政策按此顺序升级，highest 记录已保住的最高等级，active 可在一周试行后回退。
-// prettier-ignore
-const POLICY_REQUIREMENTS: Record<SchoolDressPolicy, SchoolPolicyRequirements> = {
-  uniform        : { studentSupport: 0, staffSupport: 0, corruption: 0, leightonLove: 0 },
-  free           : { studentSupport: 30, staffSupport: 25, corruption: 0, leightonLove: 10 },
-  revealing      : { studentSupport: 40, staffSupport: 30, corruption: 20, leightonLove: 20 },
-  optionalNudity : { studentSupport: 55, staffSupport: 35, corruption: 35, leightonLove: 30 },
-  nudeDay        : { studentSupport: 65, staffSupport: 45, corruption: 50, leightonLove: 40 },
-  mandatoryNudity: { studentSupport: 80, staffSupport: 60, corruption: 70, leightonLove: 50 }
-};
+const POLICY_REQUIREMENTS: Record<SchoolDressPolicy, SchoolPolicyRequirements> = schoolData.policyRequirements;
 
 export const SCHOOL_STUDENT_ROSTER: readonly SchoolStudent[] = ['Robin', 'Sydney', 'Kylar', 'Whitney'];
 
-export const SCHOOL_CAMPUS_LOCATIONS: Record<SchoolStudent, readonly string[]> = {
-  Robin: ['school'],
-  Sydney: ['library', 'science', 'class', 'canteen', 'late'],
-  Kylar: ['school', 'class', 'english', 'canteen', 'rear_courtyard', 'library'],
-  Whitney: ['school']
-};
+export const SCHOOL_CAMPUS_LOCATIONS: Record<SchoolStudent, readonly string[]> = schoolData.campusLocations;
 
-const DUTY_LOVE_CHANGES: Record<SchoolStudent, Record<SchoolDutyOutcome, number>> = {
-  Robin: { enforce: -1, mediate: 2, pressure: -3, overlook: 0, inviteAccepted: 2, inviteRefused: -1 },
-  Sydney: { enforce: -1, mediate: 1, pressure: -2, overlook: 0, inviteAccepted: 2, inviteRefused: -1 },
-  Kylar: { enforce: -2, mediate: 2, pressure: -3, overlook: 0, inviteAccepted: 2, inviteRefused: -1 },
-  Whitney: { enforce: -2, mediate: -1, pressure: -3, overlook: 1, inviteAccepted: 2, inviteRefused: -1 }
-};
+const DUTY_LOVE_CHANGES: Record<SchoolStudent, Record<SchoolDutyOutcome, number>> = schoolData.dutyLoveChanges;
 
 const DUTY_STANDING_CHANGES: Record<SchoolStudent, Record<SchoolDutyOutcome, readonly [number, number, number, number]>> = {
   Robin: { enforce: [2, -1, 2, 0], mediate: [1, 2, 0, -1], pressure: [1, -3, -1, 3], overlook: [-1, 0, -1, 1], inviteAccepted: [-1, 0, -1, 3], inviteRefused: [-1, -1, 0, 1] },
@@ -116,6 +100,7 @@ const DUTY_STANDING_CHANGES: Record<SchoolStudent, Record<SchoolDutyOutcome, rea
 
 class School {
   public readonly policies = DRESS_POLICIES;
+  public readonly policyRequirements = POLICY_REQUIREMENTS;
 
   public constructor(private readonly core: typeof maplebirch) {}
 
@@ -171,24 +156,17 @@ class School {
     return DRESS_POLICIES.indexOf(this.state.dress.active) >= DRESS_POLICIES.indexOf('optionalNudity');
   }
 
-  public requestAttendanceExemption(): boolean {
+  public get canRequestAttendanceExemption(): boolean {
     const topMarks = V.schooltrait >= 4 && V.sciencetrait >= 4 && V.mathstrait >= 4 && V.englishtrait >= 4 && V.historytrait >= 4;
-    if (this.state.attendanceExempt || this.state.leightonApprovalDay >= 0 || !topMarks || (C.npc.Leighton.love < 10 && V.headblackmailed !== 1)) return false;
-    this.state.leightonApprovalDay = Time.days;
-    return true;
+    return !(this.state.attendanceExempt || this.state.leightonApprovalDay >= 0 || !topMarks || (C.npc.Leighton.love < 10 && V.headblackmailed !== 1));
   }
 
-  public signAttendanceExemption(): boolean {
-    if (this.state.attendanceExempt || this.state.baileySigned || this.state.leightonApprovalDay < 0 || (!V.RobinExpansion?.baileyDefeated && V.baileypaychain < 3)) return false;
-    this.state.baileySigned = true;
-    return true;
+  public get canSignAttendanceExemption(): boolean {
+    return !(this.state.attendanceExempt || this.state.baileySigned || this.state.leightonApprovalDay < 0 || (!V.RobinExpansion?.baileyDefeated && V.baileypaychain < 3));
   }
 
-  public grantAttendanceExemption(): boolean {
-    if (this.state.attendanceExempt || this.state.leightonApprovalDay < 0 || !this.state.baileySigned) return false;
-    this.state.attendanceExempt = true;
-    this.state.attendanceDay = Time.days;
-    return true;
+  public get canGrantAttendanceExemption(): boolean {
+    return !(this.state.attendanceExempt || this.state.leightonApprovalDay < 0 || !this.state.baileySigned);
   }
 
   /** 项目约定不覆盖缺席、受伤或收容。校园内协助还要求罗宾实际在校。 */
@@ -227,9 +205,12 @@ class School {
     return true;
   }
 
+  public get canAppointPresident(): boolean {
+    return this.state.role === 'prefect' && this.state.duties.completed >= 5 && this.state.studentSupport >= 25 && this.state.staffSupport >= 25 && this.state.order >= 25;
+  }
+
   public appointPresident(): boolean {
-    const eligible = this.state.role === 'prefect' && this.state.duties.completed >= 5 && this.state.studentSupport >= 25 && this.state.staffSupport >= 25 && this.state.order >= 25;
-    if (!eligible) return false;
+    if (!this.canAppointPresident) return false;
     this.state.role = 'president';
     this.adjustStanding(0, 3, 3);
     return true;
@@ -311,14 +292,6 @@ class School {
     return accepted ? 'accepted' : 'refused';
   }
 
-  public endEncounter(): void {
-    this.state.duties.encounter = null;
-  }
-
-  public policyRequirements(policy: SchoolDressPolicy): SchoolPolicyRequirements {
-    return POLICY_REQUIREMENTS[policy];
-  }
-
   public get canProposePolicy(): boolean {
     const next = DRESS_POLICIES[DRESS_POLICIES.indexOf(this.state.dress.highest) + 1];
     return this.state.role === 'president' && next !== undefined && this.state.dress.proposal === null && this.state.dress.trialUntil === 0 && Time.days >= this.state.dress.cooldownUntil;
@@ -331,12 +304,6 @@ class School {
     return true;
   }
 
-  public withdrawProposal(): boolean {
-    if (!this.state.dress.proposal) return false;
-    this.state.dress.proposal = null;
-    return true;
-  }
-
   public prefersRevealingOutfit(student: SchoolStudent): boolean {
     if (student === 'Whitney') return true;
     return student === 'Sydney' && this.isStudentAvailable(student) && (C.npc.Sydney.corruption ?? 0) >= 30 && (C.npc.Sydney.purity ?? 0) < 50;
@@ -346,7 +313,7 @@ class School {
     const policy = this.state.dress.proposal;
     if (!policy) return false;
 
-    const requirement = this.policyRequirements(policy);
+    const requirement = this.policyRequirements[policy];
     if (this.state.corruption < requirement.corruption || V.world_corruption_soft < requirement.corruption) return false;
 
     switch (route) {
@@ -381,7 +348,7 @@ class School {
   }
 
   public get canKeepPolicy(): boolean {
-    const requirement = this.policyRequirements(this.state.dress.active);
+    const requirement = this.policyRequirements[this.state.dress.active];
     return (
       this.canReviewPolicy &&
       this.state.order >= 10 &&
@@ -441,6 +408,35 @@ class School {
     this.state.corruption = Math.clamp(previous[3] + corruption, 0, 100);
     // Passage 渲染后消费这次实际变化，满值时不显示虚假的收益。
     this.state.feedback = [this.state.order - previous[0], this.state.studentSupport - previous[1], this.state.staffSupport - previous[2], this.state.corruption - previous[3]];
+  }
+
+  public preInit(): void {
+    const missedLessons = new Array<{ total: number; message: number; subjects: Record<string, number> } | null>();
+
+    // 贝利签发的免听凭证只豁免旷课结算，原版每天的成绩变化照常执行。
+    this.core.dynamic.regTimeEvent('onBefore', 'life-simulation-school-attendance-before', {
+      action: () => {
+        if (!V.LifeSimulation?.school?.attendanceExempt) {
+          missedLessons.push(null);
+          return;
+        }
+        missedLessons.push({
+          total: V.lessonmissed,
+          message: V.lessonmissedtext,
+          subjects: { ...V.schoolLessonsMissed }
+        });
+      }
+    });
+
+    this.core.dynamic.regTimeEvent('onThread', 'life-simulation-school-attendance-settle', {
+      action: data => {
+        const previous = missedLessons.pop();
+        if (!previous || !data.exactPoints?.day) return;
+        V.lessonmissed = previous.total;
+        V.lessonmissedtext = 0;
+        Object.assign(V.schoolLessonsMissed, previous.subjects);
+      }
+    });
   }
 }
 

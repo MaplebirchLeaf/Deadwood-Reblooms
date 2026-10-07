@@ -236,6 +236,13 @@ class Finance {
   }
 
   public preInit(): void {
+    // 追债只在小镇街道遇到；神殿、农场、战斗和昏厥流程不插入金融事件。
+    this.core.dynamic.regStateEvent('gate', 'deadwood-finance-collection', {
+      extra: { passage: ['High Street'] },
+      forceExit: true,
+      cond: () => !!V.VanillaPlus?.finance && this.core.get('VanillaPlus')!.finance.collectionEncounter,
+      output: 'deadwood-finance-collection-gate'
+    });
     this.core.tool.onInit(() => void this.securities);
     this.core.once(':storyready', () => this.registerMoneyMacro());
     // 行情在时间事件里刷新。银行周账务由房地产逐日推进，保持批量跳日时的真实顺序。

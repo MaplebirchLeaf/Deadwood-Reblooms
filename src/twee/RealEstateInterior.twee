@@ -9,10 +9,17 @@
 		<<set _hanging to maplebirch.get("VanillaPlus").realEstate.furniture(_property.id, _paperKind)>>
 		<<if _hanging>>
 			<<furnitureicon _hanging.iconFile>>
-			<<if _paperKind is 'poster'>><<lanSwitch 'A poster hangs on the wall:' '墙上挂着一张海报：'>><<else>><<lanSwitch 'The walls are covered with wallpaper:' '墙上贴着壁纸：'>><</if>> <<= _hanging.nameCap>><<lanSwitch '.' '。'>><br>
+			<<if _paperKind is 'poster'>>
+			  <<lanSwitch 'A poster hangs on the wall:' '墙上挂着一张海报：'>>
+			<<else>>
+			  <<lanSwitch 'The walls are covered with wallpaper:' '墙上贴着壁纸：'>>
+			<</if>>
+			<<= _hanging.nameCap>><<lanSwitch '.' '。'>><br>
 		<</if>>
 	<</for>>
-	<<if maplebirch.get("VanillaPlus").realEstate.managementFor(_property.id).paperhangings>><br><</if>>
+	<<if maplebirch.get("VanillaPlus").realEstate.managementFor(_property.id).paperhangings>>
+	  <br>
+	<</if>>
 	<<set _bedroomCompanion to null>>
 	<<if maplebirch.get("VanillaPlus").realEstate.residentsInBedroom(_property.id).length gt 0>>
 		<<set _bedroomCompanion to maplebirch.get("VanillaPlus").realEstate.residentsInBedroom(_property.id)[0]>>
@@ -54,7 +61,9 @@
 			<<undressSleep 'Deadwood Property Bed'>>
 		<</lanLink>><br>
 	<</if>>
-	<<if !($earSlime.event and $earSlime.noSleep)>><<deadwood-reblooms-property-sleep-outfits>><</if>>
+	<<if !($earSlime.event and $earSlime.noSleep)>>
+	  <<deadwood-reblooms-property-sleep-outfits>>
+	<</if>>
 	<<if _bedroomCompanion && maplebirch.get("VanillaPlus").realEstate.canIntimate(_bedroomCompanion.id, _property.id)>>
 		<<loveicon 'kiss'>>
 		<<lanLink ['Invite your lover into bed for intimacy', '邀恋人上床亲密'] 'Deadwood Reblooms Property Intimacy'>>
@@ -118,10 +127,16 @@
 		<<option 'EN'>>You sit at the desk. There is enough room to spread out a book beneath the lamp.
 		<<option 'CN'>>你在书桌前坐下。灯下有足够的地方摊开一本书。
 	<</language>><br><br>
-	<<if _deskFurniture>><<furnitureicon _deskFurniture.iconFile>><<= _deskFurniture.nameCap>><br><</if>>
-	<<if _deskChair>><<furnitureicon _deskChair.iconFile>><<= _deskChair.nameCap>><br><</if>>
+	<<if _deskFurniture>>
+	  <<furnitureicon _deskFurniture.iconFile>><<= _deskFurniture.nameCap>><br>
+	<</if>>
+	<<if _deskChair>>
+	  <<furnitureicon _deskChair.iconFile>><<= _deskChair.nameCap>><br>
+	<</if>>
 	<br>
-	<<if $studyBooks is undefined>><<set $studyBooks to {rented: 'none', stolen: 'none'}>><</if>>
+	<<if $studyBooks is undefined>>
+	  <<set $studyBooks to {rented: 'none', stolen: 'none'}>>
+	<</if>>
 	<<homeStudyOptions>>
 	<<if maplebirch.get('LifeSimulation') and $LifeSimulation.school.role isnot 'student' and $LifeSimulation.school.study_session_day isnot Time.days>>
 		<br><<schoolicon 'library'>><<lanLink ['Prepare student council study notes at home (0:30)', '在家整理学生会的学习资料 (0:30)'] 'Deadwood Reblooms Property School Study'>><<set $phase to 'solo'>><<pass 30>><</lanLink>><br>
@@ -242,12 +257,16 @@
 			<</if>>
 			<<returnCarried>><<set $wardrobeOption to 'wear'>><<wardrobewear>>
 			<<for _bathSlot range ['upper', 'lower']>>
-				<<if ['towel top', 'towel skirt', 'large towel', 'large towel bottom'].includes($worn[_bathSlot].name)>><<set $worn[_bathSlot].lastTaken to $wardrobe_location>><</if>>
+				<<if ['towel top', 'towel skirt', 'large towel', 'large towel bottom'].includes($worn[_bathSlot].name)>>
+				  <<set $worn[_bathSlot].lastTaken to $wardrobe_location>>
+				<</if>>
 			<</for>>
 		<</lanLink>>
 		<<if selectWardrobe().upper.some(item => item.name === 'bathrobe') or $carried.upper.name is 'bathrobe'>>
 			<br><<bathroomicon 'robe'>><<lanLink ['Put on a bathrobe', '穿上浴袍'] 'Deadwood Reblooms Property Bathroom'>>
-				<<if $carried.upper.name is 'bathrobe'>><<set $carried.upper.lastTaken to $wardrobe_location>><</if>>
+				<<if $carried.upper.name is 'bathrobe'>>
+				  <<set $carried.upper.lastTaken to $wardrobe_location>>
+				<</if>>
 				<<returnCarried>><<set $wardrobeOption to 'wear'>>
 				<<set $wear_upper to selectWardrobe().upper.findIndex(item => item.name === 'bathrobe')>><<wardrobewear>>
 			<</lanLink>>
@@ -361,12 +380,16 @@
 	<</if>>
 	<<if _property.id is 'domus'>>
 		<!-- 原版所有苗圃都存于 $plots，时间事件会让这里的单块小苗圃正常生长。 -->
-		<<if !$plots.domus>><<plots_init domus 1 earth 1 small>><</if>>
+		<<if !$plots.domus>>
+		  <<plots_init domus 1 earth 1 small>>
+		<</if>>
 		<<plot_effects>>
 		<<display_plot domus>>
 	<<elseif _property.id is 'high'>>
 		<!-- 店铺上方的浅木箱只容得下一块小苗圃，不与小屋或宅邸共用作物。 -->
-		<<if !$plots.high>><<plots_init high 1 earth 2 small>><</if>>
+		<<if !$plots.high>>
+		  <<plots_init high 1 earth 2 small>>
+		<</if>>
 		<<plot_effects>>
 		<<display_plot high>>
 	<<elseif _property.id is 'danube'>>
@@ -395,7 +418,9 @@
 		'花园露台在你身后。三块苗圃沿着小径排开，高墙挡住了街上的视线。'
 	>><br><br>
 	<!-- 与小屋使用不同的原版种植地点，跨日成长和收获互不覆盖。 -->
-	<<if !$plots.danube>><<plots_init danube 3 earth 3 medium>><</if>>
+	<<if !$plots.danube>>
+	  <<plots_init danube 3 earth 3 medium>>
+	<</if>>
 	<<plot_effects>>
 	<<display_plot danube>>
 	<<getouticon>><<lanLink ['Return to the garden terrace (0:01)', '返回花园露台 (0:01)'] 'Deadwood Reblooms Property Outdoor'>><<pass 1>><</lanLink>>
@@ -580,7 +605,9 @@
 
 :: Deadwood Reblooms Property Flight Land []
 <<set $outside to 1>><<effects>>
-<<if !['Domus Street', 'Barb Street', 'High Street', 'Cliff Street', 'Danube Street'].includes($VanillaPlus.real_estate.flight_street)>><<set $VanillaPlus.real_estate.flight_street to 'High Street'>><</if>>
+<<if !['Domus Street', 'Barb Street', 'High Street', 'Cliff Street', 'Danube Street'].includes($VanillaPlus.real_estate.flight_street)>>
+  <<set $VanillaPlus.real_estate.flight_street to 'High Street'>>
+<</if>>
 <<lanSwitch 'You hold your wings open, ride the air over the roofs and descend toward a clear place on the street.' '你展开翅膀，乘着气流滑过屋顶，朝街上一处空地降下。'>><br><br>
 <<switch $VanillaPlus.real_estate.flight_street>>
 	<<case 'Domus Street'>><<lanSwitch 'The orphanage roof comes into view beyond the garden fences.' '花园围栏后，孤儿院的屋顶映入眼帘。'>><br>

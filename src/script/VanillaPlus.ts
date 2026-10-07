@@ -24,19 +24,6 @@ export default function (maplebirch: typeof window.maplebirch) {
   macro.create('lllwillpower', () => macro.statChange(`${lanSwitch('Willpower', '意志')}`, -3, 'lblue'));
 
   maplebirch.tool.addTo('DegreesBonusDisplay', 'deadwood-reblooms-characteristics-degrees-display');
-  maplebirch.tool.onInit(() => {
-    setup.feats['Every Limit Broken'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:incorrigible:feat:title');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:incorrigible:feat:description');
-      },
-      difficulty: 4,
-      series: '',
-      filter: ['All', 'Stats']
-    };
-  });
   Beauty(maplebirch);
   Deviancy(maplebirch);
   DivineTransformations(maplebirch);
@@ -110,17 +97,4 @@ export default function (maplebirch: typeof window.maplebirch) {
       text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:traits:incorrigible:text')
     }
   );
-
-  maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-traits', {
-    output: 'deadwood-reblooms-trait-unlocks',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.traitsPending
-  });
-  maplebirch.dynamic.regStateEvent('gate', 'vanilla-plus-preserve', {
-    output: 'run maplebirch.get("VanillaPlus").preserve()',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.belowMinimum
-  });
-  maplebirch.dynamic.regStateEvent('append', 'vanilla-plus-all-max-feat', {
-    output: 'earnFeat "Every Limit Broken"',
-    cond: () => V.feats?.currentSave['Every Limit Broken'] === undefined && V.VanillaPlus != null && V.VanillaPlus.traits.incorrigible
-  });
 }

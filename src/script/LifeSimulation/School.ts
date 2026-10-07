@@ -1,39 +1,6 @@
 // ./src/script/LifeSimulation/School.ts
 
 export default function School(maplebirch: typeof window.maplebirch): void {
-  maplebirch.tool.onInit(() => {
-    setup.feats['Student Council President'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:president:name');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:LifeSimulation:school:feat:president:description');
-      },
-      difficulty: 2,
-      series: '',
-      filter: ['All', 'General']
-    };
-    setup.feats['Naked School'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:LifeSimulation:school:feat:naked:title');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:LifeSimulation:school:feat:naked:description');
-      },
-      difficulty: 3,
-      series: '',
-      filter: ['All', 'General']
-    };
-  });
-  maplebirch.dynamic.regStateEvent('append', 'life-simulation-president-feat', {
-    output: 'earnFeat "Student Council President"',
-    cond: () => V.feats?.currentSave['Student Council President'] === undefined && V.LifeSimulation?.school?.role === 'president'
-  });
-  maplebirch.dynamic.regStateEvent('append', 'life-simulation-naked-school-feat', {
-    output: 'earnFeat "Naked School"',
-    cond: () => V.feats?.currentSave['Naked School'] === undefined && V.LifeSimulation?.school?.dress?.highest === 'mandatoryNudity'
-  });
-
   // 包装原版校服判断，保留原函数与其他模组继续串联包装的空间。
   maplebirch.tool.onInit(() => {
     const wearingSchoolOutfit = window.wearingSchoolOutfit;
@@ -52,31 +19,6 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       if (event.name === 'no school') {
         event.text = `<<if $LifeSimulation.school.attendanceExempt and Time.schoolDay>><<lanSwitch 'You may attend lessons today.' '今天你可以自愿上课。'>><<else>>${event.text}<</if>>`;
       }
-    }
-  });
-
-  // 贝利签发的免听凭证只豁免旷课结算，原版每天的成绩变化照常执行。
-  const missedLessons = new Array<{ total: number; message: number; subjects: Record<string, number> } | null>();
-  maplebirch.dynamic.regTimeEvent('onBefore', 'life-simulation-school-attendance-before', {
-    action: () => {
-      if (!V.LifeSimulation?.school?.attendanceExempt) {
-        missedLessons.push(null);
-        return;
-      }
-      missedLessons.push({
-        total: V.lessonmissed,
-        message: V.lessonmissedtext,
-        subjects: { ...V.schoolLessonsMissed }
-      });
-    }
-  });
-  maplebirch.dynamic.regTimeEvent('onThread', 'life-simulation-school-attendance-settle', {
-    action: data => {
-      const previous = missedLessons.pop();
-      if (!previous || !data.exactPoints?.day) return;
-      V.lessonmissed = previous.total;
-      V.lessonmissedtext = 0;
-      Object.assign(V.schoolLessonsMissed, previous.subjects);
     }
   });
 

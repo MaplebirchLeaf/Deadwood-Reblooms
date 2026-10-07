@@ -170,9 +170,17 @@
             <<else>>
               <<language>>
                 <<option 'EN'>>
-                  <<if $RobinExpansion?.baileyDefeated>>Leighton approved the school form. Find Bailey at the Barb Street flats for the guardian signature.<<else>>Leighton approved the school form. After three consecutive rent payments, ask Bailey to sign in the office between 07:00 and 09:00.<</if>>
+                  <<if $RobinExpansion?.baileyDefeated>>
+                    Leighton approved the school form. Find Bailey at the Barb Street flats for the guardian signature.
+                  <<else>>
+                    Leighton approved the school form. After three consecutive rent payments, ask Bailey to sign in the office between 07:00 and 09:00.
+                  <</if>>
                 <<option 'CN'>>
-                  <<if $RobinExpansion?.baileyDefeated>>礼顿已通过学校审核。去倒钩街公寓找贝利签监护人许可。<<else>>礼顿已通过学校审核。连续按时交租三周后，在 07:00–09:00 到办公室找贝利签字。<</if>>
+                  <<if $RobinExpansion?.baileyDefeated>>
+                    礼顿已通过学校审核。去倒钩街公寓找贝利签监护人许可。
+                  <<else>>
+                    礼顿已通过学校审核。连续按时交租三周后，在 07:00–09:00 到办公室找贝利签字。
+                  <</if>>
               <</language>>
             <</if>>
           <<elseif Time.days lt $LifeSimulation.school.attendanceDay + 7>>
@@ -228,7 +236,9 @@
   <<if $LifeSimulation and $LifeSimulation.school>>
     <div class='relation-box'>
       <div class='relation-top-line'>
-        <<if $options.images>><img class='relation-icon' src='img/misc/icon/assignment.png'><</if>>
+        <<if $options.images>>
+          <img class='relation-icon' src='img/misc/icon/assignment.png'>
+        <</if>>
         <span class='relation-name'><<lanSwitch 'School affairs' '校园事务'>></span>
       </div>
       <div class='relation-description'>
@@ -261,7 +271,8 @@
 :: Deadwood Reblooms Life Simulation Attendance Application Result []
 <<set $outside to 0>><<set $location to 'school'>><<schooleffects>><<effects>>
 <<npc Leighton>><<person1>>
-<<if maplebirch.get("LifeSimulation").school.requestAttendanceExemption()>>
+<<if maplebirch.get('LifeSimulation').school.canRequestAttendanceExemption>>
+  <<set $LifeSimulation.school.leightonApprovalDay to Time.days>>
   <<lanSwitch 'Leighton signs the school half of the form. "Bring it back with Bailey’s signature. Until then, lessons are still compulsory."' '礼顿签了学校的那一栏。“拿到贝利的签名再来。在那之前，你还得照常上课。”'>><br><br>
   <span class='gold'><<lanSwitch 'The school review is complete. Bailey’s permission is still required.' '学校审核已通过，还需贝利许可。'>></span><br>
 <<else>>
@@ -305,7 +316,8 @@
         贝利看过礼顿的签名，把表格放在房租账本旁。“连续三周按时交租，我才签。”还没等你解释成绩，<<he>>就把纸推了回来。“听清楚了？”
       <</if>>
   <</language>><br><br>
-  <<if maplebirch.get("LifeSimulation").school.signAttendanceExemption()>>
+  <<if maplebirch.get('LifeSimulation').school.canSignAttendanceExemption>>
+    <<set $LifeSimulation.school.baileySigned to true>>
     <span class='green'><<lanSwitch 'Bailey has signed the guardian section.' '贝利签了监护人的那一栏。'>></span><br>
     <span class='teal'><i><<lanSwitch 'Take the form back to Leighton before skipping any lessons.' '要把表格交回礼顿，上课才能由你自行安排。'>></i></span><br>
   <</if>>
@@ -321,7 +333,9 @@
 :: Deadwood Reblooms Life Simulation Attendance Filing []
 <<set $outside to 0>><<set $location to 'school'>><<schooleffects>><<effects>>
 <<npc Leighton>><<person1>>
-<<if maplebirch.get("LifeSimulation").school.grantAttendanceExemption()>>
+<<if maplebirch.get('LifeSimulation').school.canGrantAttendanceExemption>>
+  <<set $LifeSimulation.school.attendanceExempt to true>>
+  <<set $LifeSimulation.school.attendanceDay to Time.days>>
   <<lanSwitch 'Leighton checks Bailey’s signature, stamps the form, and files it. "The choice to attend is yours now. The exams are not going away."' '礼顿核对贝利的签名，在表格上盖章并归档。“来不来上课由你决定，考试可不会因此取消。”'>><br><br>
   <span class='green'><<lanSwitch 'Missing lessons will no longer count as truancy.' '缺课不再记作旷课。'>></span><br>
   <<lanSwitch 'Keep your marks and reputation high. After seven days, ask Leighton about prefect duties.' '继续保持成绩与声望。七天后可向礼顿申请风纪委员。'>><br>
@@ -499,8 +513,18 @@
 <<person1>>
 <<if maplebirch.get("LifeSimulation").school.appointPrefect($phase is 'pressure')>>
   <<language>>
-    <<option 'EN'>>Leighton slides a prefect badge across the desk. <<if $phase is 'pressure'>>"You have made your point," <<he>> says, looking at the locked drawer. "Keep it out of the register."<<else>>"Keep order before classes and report serious trouble to me."<</if>>
-    <<option 'CN'>>礼顿把一枚风纪委员徽章推到桌前。<<if $phase is 'pressure'>>“你的意思我明白。”<<he>>看向锁住的抽屉，“别把那件事写进值勤簿。”<<else>>“上课前维持秩序，严重的问题交给我处理。”<</if>>
+    <<option 'EN'>>Leighton slides a prefect badge across the desk.
+    <<if $phase is 'pressure'>>
+      "You have made your point," <<he>> says, looking at the locked drawer. "Keep it out of the register."
+    <<else>>
+      "Keep order before classes and report serious trouble to me."
+    <</if>>
+    <<option 'CN'>>礼顿把一枚风纪委员徽章推到桌前。
+    <<if $phase is 'pressure'>>
+      “你的意思我明白。”<<he>>看向锁住的抽屉，“别把那件事写进值勤簿。”
+    <<else>>
+      “上课前维持秩序，严重的问题交给我处理。”
+    <</if>>
   <</language>><br><br>
   <span class='green'><<lanSwitch "You became a prefect." "你成为了风纪委员。">></span>
   <br><<deadwood-reblooms-life-simulation-school-feedback>>
@@ -514,9 +538,6 @@
 <<set $outside to 0>>
 <<set $location to 'school'>>
 <<effects>>
-<<set _school to $LifeSimulation.school>>
-<<set _enoughDuties to _school.duties.completed gte 5>>
-<<set _enoughSupport to _school.order gte 25 and _school.studentSupport gte 25 and _school.staffSupport gte 25>>
 <<npc Leighton>>
 <<person1>>
 <<lanSwitch 'You ask Leighton to make you student council president. ' '你向礼顿申请担任学生会长。'>><<He>><<lanSwitch ' lays your duty reports beside notes from students and staff.' '把你的值勤报告与学生、教职工的意见放在一起。'>><br><br>
@@ -525,7 +546,7 @@
 <<lanSwitch 'Student standing: ' '学生声望：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.studentSupport>><<lanSwitch ' (at least 25)' '（至少 25）'>><br>
 <<lanSwitch 'Staff trust: ' '教职工信任：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.staffSupport>><<lanSwitch ' (at least 25)' '（至少 25）'>><br>
 <<lanSwitch 'School corruption: ' '校内堕落：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.corruption>><br><br>
-<<if _school.role is 'prefect' and _enoughDuties and _enoughSupport>>
+<<if maplebirch.get('LifeSimulation').school.canAppointPresident>>
   <<lanSwitch '"You have earned enough trust to lead them. The final decision is yours," ' '“你已经赢得了足够的信任。要不要接下这份职责，由你决定，”'>><<he>><<lanSwitch ' says.' '说道。'>><br><br>
   <<schoolicon 'building'>><<lanLink ['Accept the presidency', '接受学生会长任命'] 'Deadwood Reblooms Life Simulation President Appointment Result'>><</lanLink>><br>
 <<else>>
@@ -540,7 +561,7 @@
 <<effects>>
 <<npc Leighton>>
 <<person1>>
-<<if maplebirch.get("LifeSimulation").school.appointPresident()>>
+<<if maplebirch.get('LifeSimulation').school.appointPresident()>>
   <<language>>
     <<option 'EN'>>Leighton signs the appointment and slides the student council ledger toward you. "Lead them well. Bring any proposed rules to me before you announce them."
     <<option 'CN'>>礼顿签下任命书，把学生会的记录簿推到你面前。“好好带领他们。新校规宣布前，先亲自拿来给我看。”
@@ -734,7 +755,10 @@
         <<option 'CN'>>你凑近惠特尼，邀对方避开人群。惠特尼坏笑起来：“总算知道那块徽章该怎么用了？”惠特尼叫朋友们让开入口，随后领着你往空教室走。
       <</language>>
   <</switch>>
-  <<if _loveChange gt 0>><<glove _student>><</if>><br>
+  <<if _loveChange gt 0>>
+    <<glove _student>>
+  <</if>>
+  <br>
   <<deadwood-reblooms-life-simulation-school-feedback>><br>
   <<loveicon>><<lanLink ['Go somewhere private together (0:02)', '一起去僻静处 (0:02)'] 'Deadwood Reblooms Life Simulation Morning Duty Encounter'>>
     <<set $sexstart to 1>>
@@ -777,12 +801,17 @@
         <<option 'CN'>>惠特尼笑出了声，却退开一步：“等你不拿那块徽章冲我摆架子，再来问。”惠特尼用肩膀挤开堵着门的人，转身走了。
       <</language>>
   <</switch>>
-  <<if _loveChange lt 0>><<llove _student>><</if>><br>
+  <<if _loveChange lt 0>>
+    <<llove _student>>
+  <</if>>
+  <br>
   <<deadwood-reblooms-life-simulation-school-feedback>><br>
 <<else>>
   <span class='blue'><<lanSwitch 'The student has gone before you can speak in private.' '那名学生已经走了，你没能私下开口。'>></span><br><br>
 <</if>>
-<<entranceicon>><<lanLink '返回前庭' 'School Front Courtyard'>><<run maplebirch.get("LifeSimulation").school.endEncounter()>><</lanLink>>
+<<entranceicon>><<lanLink '返回前庭' 'School Front Courtyard'>>
+  <<set $LifeSimulation.school.duties.encounter to null>>
+<</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Morning Duty Encounter []
 <<set $outside to 0>>
@@ -856,7 +885,7 @@
   <</if>><br><br>
   <<clotheson>>
   <<endcombat>>
-  <<run maplebirch.get("LifeSimulation").school.endEncounter()>>
+  <<set $LifeSimulation.school.duties.encounter to null>>
 <<else>>
   <span class='blue'><<lanSwitch 'The meeting has ended.' '这次约见已经结束。'>></span><br><br>
 <</if>>
@@ -979,8 +1008,12 @@
     <</if>>
   <</if>>
   <<set _loveChange to C.npc[_student].love - _loveBefore>>
-  <<if _loveChange gt 0>><<glove _student>><</if>>
-  <<if _loveChange lt 0>><<llove _student>><</if>>
+  <<if _loveChange gt 0>>
+    <<glove _student>>
+  <</if>>
+  <<if _loveChange lt 0>>
+    <<llove _student>>
+  <</if>>
   <br><<deadwood-reblooms-life-simulation-school-feedback>>
 <<else>>
   <span class='blue'><<lanSwitch "Morning duty has already ended today." "今天的晨间值勤已经结束。">></span>
@@ -997,7 +1030,7 @@
 <<set _policies to maplebirch.get("LifeSimulation").school.policies>>
 <<set _policy to _policies[_policies.indexOf($LifeSimulation.school.dress.highest) + 1]>>
 <<if _policy and maplebirch.get("LifeSimulation").school.canProposePolicy>>
-  <<set _requirements to maplebirch.get("LifeSimulation").school.policyRequirements(_policy)>>
+  <<set _requirements to maplebirch.get('LifeSimulation').school.policyRequirements[_policy]>>
   <<language>>
     <<option 'EN'>>
       You bring the next dress proposal, <span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _policy)>></span>, to Leighton's office.
@@ -1052,7 +1085,9 @@
 <<if !maplebirch.get("LifeSimulation").school.canApprovePolicy('formal') and !maplebirch.get("LifeSimulation").school.canApprovePolicy('petition') and !maplebirch.get("LifeSimulation").school.canApprovePolicy('pressure')>>
   <span class='blue'><<lanSwitch "You lack the support or leverage needed to make Leighton approve this proposal." "目前没有足够的支持，也没有可以迫使礼顿批准的把柄。">></span><br>
 <</if>>
-<<getouticon>><<lanLink ['Withdraw the proposal', '撤回提案'] "Head's Office">><<run maplebirch.get("LifeSimulation").school.withdrawProposal()>><</lanLink>><br>
+<<getouticon>><<lanLink ['Withdraw the proposal', '撤回提案'] "Head's Office">>
+  <<set $LifeSimulation.school.dress.proposal to null>>
+<</lanLink>><br>
 <<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Dress Approval Result []

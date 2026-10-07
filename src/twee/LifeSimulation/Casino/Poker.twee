@@ -8,7 +8,9 @@
 	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
 	<<set $_stakes to _args[0] is 'holdem' ? $_casino.holdem.buyIns : _args[0] is 'three' ? $_casino.threeCard.antes : $_casino.blackjack.bets>>
 	<<for $_index, $_stake range $_stakes>>
-		<<if $_index gt 0>> / <</if>>
+		<<if $_index gt 0>>
+		  /
+		<</if>>
 		<span class='gold'>£<<print Number(($_stake / 100).toFixed(2))>></span>
 		<<if _args[0] is 'holdem'>>
 			(£<<print Number(($_stake / $_casino.holdem.options.bigBlindDivisor / 2 / 100).toFixed(2))>> / £<<print Number(($_stake / $_casino.holdem.options.bigBlindDivisor / 100).toFixed(2))>>)
@@ -32,7 +34,9 @@
 					<<case 'compare'>><<lanSwitch 'compares' '比牌'>>
 					<<default>><<print $_pokerEntry.action>>
 				<</switch>>
-				<<if !['fold', 'check'].includes($_pokerEntry.action)>>£<<print Number(($_pokerEntry.amount / 100).toFixed(2))>><</if>>
+				<<if !['fold', 'check'].includes($_pokerEntry.action)>>
+				  £<<print Number(($_pokerEntry.amount / 100).toFixed(2))>>
+				<</if>>
 			</p>
 		<</for>>
 	</div>
@@ -67,7 +71,11 @@
 			<<for $_holdemIndex, $_holdemSeat range $_holdemState.seats>>
 				<<set $_holdemVisible to (!$_holdemWatching and $_holdemIndex is 0) or ($_holdemState.phase is 'done' and $_holdemState.showdown and !$_holdemSeat.folded)>>
 				<section @class="'poker-seat' + ($_holdemSeat.folded ? ' poker-folded' : '')">
-					<strong><<deadwood-poker-name `$_holdemSeat.name`>><<if $_holdemIndex is $_holdemState.button>><<lanSwitch ' · Button' ' · 庄位'>><</if>></strong>
+					<strong><<deadwood-poker-name `$_holdemSeat.name`>>
+					<<if $_holdemIndex is $_holdemState.button>>
+					  <<lanSwitch ' · Button' ' · 庄位'>>
+					<</if>>
+					</strong>
 					<p class='poker-seat-detail'>
 						<<lanSwitch 'Chips' '筹码'>> £<<print Number(($_holdemSeat.stack / 100).toFixed(2))>> · <<lanSwitch 'This round' '本轮投入'>> £<<print Number(($_holdemSeat.street_bet / 100).toFixed(2))>>
 						<<if $_holdemSeat.folded>><<lanSwitch ' · Folded' ' · 已弃牌'>>
@@ -81,7 +89,9 @@
 			<</for>>
 		<</if>>
 	</div>
-	<<if $_holdemState.joined>><<deadwood-poker-log `$_holdemWatching ? 'watch' : 'holdem'`>><</if>>
+	<<if $_holdemState.joined>>
+	  <<deadwood-poker-log `$_holdemWatching ? 'watch' : 'holdem'`>>
+	<</if>>
 	<div class='poker-controls'>
 		<<if $_holdemWatching>>
 			<<if $_holdem.active>>
@@ -111,7 +121,11 @@
 		<<for $_holdemPotIndex, $_holdemPot range $_holdemState.pots>>
 			<p @class="$_holdemWatching or $_holdemPot.winners.includes(0) ? 'gold' : 'blue'">
 				<<lanSwitch `$_holdemPot.returned ? 'Uncalled chips returned' : $_holdemPotIndex === 0 ? 'Main pot' : 'Side pot'` `$_holdemPot.returned ? '未被跟注的筹码退回' : $_holdemPotIndex === 0 ? '主池' : '边池'`>> £<<print Number((($_holdemPot.amount - $_holdemPot.fee) / 100).toFixed(2))>> →
-				<<for $_holdemWinnerIndex, $_holdemWinner range $_holdemPot.winners>><<if $_holdemWinnerIndex gt 0>> / <</if>><<deadwood-poker-name `$_holdemState.seats[$_holdemWinner].name`>><</for>>
+				<<for $_holdemWinnerIndex, $_holdemWinner range $_holdemPot.winners>>
+				<<if $_holdemWinnerIndex gt 0>>
+				  /
+				<</if>>
+				<<deadwood-poker-name `$_holdemState.seats[$_holdemWinner].name`>><</for>>
 			</p>
 		<</for>>
 		<p class='poker-fee'><<lanSwitch 'Table fee' '本局抽水'>> £<<print Number(($_holdemState.fee / 100).toFixed(2))>></p>
@@ -134,7 +148,9 @@
 						<<else>><<lanSwitch 'Blind' '暗牌'>><</if>>
 					</p>
 					<div class='poker-cards' @data-cards="$_threeIndex" @data-visible="$_threeVisible"></div>
-					<<if $_threeVisible>><p class='poker-hand-name'><<lanSwitch `$_threeHandNames[$_three.handRank($_threeIndex)][0]` `$_threeHandNames[$_three.handRank($_threeIndex)][1]`>></p><</if>>
+					<<if $_threeVisible>>
+					  <p class='poker-hand-name'><<lanSwitch `$_threeHandNames[$_three.handRank($_threeIndex)][0]` `$_threeHandNames[$_three.handRank($_threeIndex)][1]`>></p>
+					<</if>>
 				</section>
 			<</for>>
 		<<else>><div class='poker-cards' data-cards='0' data-visible='false' data-placeholders='3'></div><</if>>

@@ -288,12 +288,20 @@
 						<<deadwood-reblooms-property-street-icon _property.id>><<language>>
 							<<option 'EN'>>
 								<<link _property.name.EN _invitePassage>>
-									<<if _inLesson>><<pass 1>><<else>><<pass 30>><</if>>
+									<<if _inLesson>>
+									  <<pass 1>>
+									<<else>>
+									  <<pass 30>>
+									<</if>>
 									<<run maplebirch.get("VanillaPlus").realEstate.inviteResident(_name, _property.id)>>
 								<</link>>
 							<<option 'CN'>>
 								<<link _property.name.CN _invitePassage>>
-									<<if _inLesson>><<pass 1>><<else>><<pass 30>><</if>>
+									<<if _inLesson>>
+									  <<pass 1>>
+									<<else>>
+									  <<pass 30>>
+									<</if>>
 									<<run maplebirch.get("VanillaPlus").realEstate.inviteResident(_name, _property.id)>>
 								<</link>>
 						<</language>><br>
@@ -326,7 +334,11 @@
 		<<bedicon>><<lanLink ['Guest bedroom (0:01)', '客房 (0:01)'] 'Deadwood Reblooms Property Guest Bedroom'>><<pass 1>><</lanLink>><br>
 	<</if>>
 	<<if maplebirch.get("VanillaPlus").realEstate.floorOf('retreat') is _args[0]>>
-		<<if _roomProperty.id is 'danube'>><<icon 'danube-conservatory.png'>><<else>><<couchicon>><</if>>
+		<<if _roomProperty.id is 'danube'>>
+		  <<icon 'danube-conservatory.png'>>
+		<<else>>
+		  <<couchicon>>
+		<</if>>
 		<<if _roomProperty.outdoor_access is 'retreat'>>
 			<<lanLink `lanSwitch('Sea-view alcove and balcony (0:01)', '观海角与阳台 (0:01)')` 'Deadwood Reblooms Property Outdoor'>><<pass 1>><</lanLink>><br>
 		<<else>>
@@ -391,7 +403,9 @@
 			<<lanSwitch 'Mortgage debt settled from proceeds' '拍卖款抵偿房贷'>>：
 			<<deadwood-reblooms-finance-money _sale.debt>><br>
 		<</if>>
-		<<if _sale.shortfall gt 0>><span class='red'><<lanSwitch 'Debt remaining after auction: ' '拍卖后仍欠：'>><<deadwood-reblooms-finance-money _sale.shortfall>></span><br><</if>>
+		<<if _sale.shortfall gt 0>>
+		  <span class='red'><<lanSwitch 'Debt remaining after auction: ' '拍卖后仍欠：'>><<deadwood-reblooms-finance-money _sale.shortfall>></span><br>
+		<</if>>
 		<<lanSwitch 'Balance returned to your bank account' '返还银行账户'>>：
 		<<deadwood-reblooms-finance-money _sale.surplus>><br><br>
 	<</if>>
@@ -410,30 +424,53 @@
 			<<if maplebirch.get("VanillaPlus").realEstate.owns(_property.id)>>
 				<<set _management to maplebirch.get("VanillaPlus").realEstate.managementFor(_property.id)>>
 				<span class='green'><<lanSwitch 'Owned' '已持有'>></span>
-				<<if !_management.rented>> · <<lanSwitch 'Your home' '你的住所'>><</if>><br>
+				<<if !_management.rented>>
+				  · <<lanSwitch 'Your home' '你的住所'>>
+				<</if>>
+				<br>
 				<<set _upkeep to maplebirch.get("VanillaPlus").realEstate.maintenanceCost(_property.id)>>
-				<<if maplebirch.get('VanillaPlus').realEstate.collateralLimit(_property.id) gt 0>><<lanLink ['Borrow against this property', '以这处房产抵押借款'] 'Deadwood Reblooms Property Collateral'>><<set $VanillaPlus.real_estate.collateral_property to _property.id>><</lanLink>><br><</if>>
+				<<if maplebirch.get('VanillaPlus').realEstate.collateralLimit(_property.id) gt 0>>
+				  <<lanLink ['Borrow against this property', '以这处房产抵押借款'] 'Deadwood Reblooms Property Collateral'>><<set $VanillaPlus.real_estate.collateral_property to _property.id>><</lanLink>><br>
+				<</if>>
 				<<lanSwitch 'Condition' '房屋状况'>>：<<= _management.condition>>/100 · <<lanSwitch 'Renovation' '装修等级'>>：<<= _management.renovation>>/<<= maplebirch.get("VanillaPlus").realEstate.mortgage.terms.rental.max_renovation_level>><br>
 				<<lanSwitch 'Weekly upkeep' '每周维护费'>>：<<deadwood-reblooms-finance-money _upkeep>><br>
 				<<if _management.rented>>
-					<<if Time.days lt _management.vacancy_until>><span class='blue'><<lanSwitch 'Finding a tenant until day ' '寻找租客，预计入住日：'>><<= _management.vacancy_until>></span><br><</if>>
-					<<if _management.rental_issue>><span class='red'><<lanSwitch 'The tenant has left a message.' '租客留下了消息。'>></span> · <<lanLink ['Contact the tenant', '联系租客'] 'Deadwood Reblooms Property Tenant'>><<set $VanillaPlus.real_estate.tenant_property to _property.id>><</lanLink>><br><</if>>
+					<<if Time.days lt _management.vacancy_until>>
+					  <span class='blue'><<lanSwitch 'Finding a tenant until day ' '寻找租客，预计入住日：'>><<= _management.vacancy_until>></span><br>
+					<</if>>
+					<<if _management.rental_issue>>
+					  <span class='red'><<lanSwitch 'The tenant has left a message.' '租客留下了消息。'>></span> · <<lanLink ['Contact the tenant', '联系租客'] 'Deadwood Reblooms Property Tenant'>><<set $VanillaPlus.real_estate.tenant_property to _property.id>><</lanLink>><br>
+					<</if>>
 					<<set _weeklyRent to maplebirch.get("VanillaPlus").realEstate.weeklyRent(_property.id)>>
 					<<lanSwitch 'Rented out; weekly rent before upkeep' '已出租。未扣维护费的周租金'>>：<<deadwood-reblooms-finance-money _weeklyRent>><br>
-					<<if _management.lease_end_day is null>><<lanLink ['Give tenant seven days notice', '通知租客七天后退租'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.endLease(_property.id)>><</lanLink>><br><</if>>
+					<<if _management.lease_end_day is null>>
+					  <<lanLink ['Give tenant seven days notice', '通知租客七天后退租'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.endLease(_property.id)>><</lanLink>><br>
+					<</if>>
 				<<elseif _management.auction_day isnot null>>
 					<<lanSwitch 'Auction closes on day' '拍卖结束日'>> <<=_management.auction_day>> · <<lanLink ['Withdraw listing', '撤回拍卖委托'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.cancelAuction(_property.id)>><</lanLink>><br>
 				<<else>>
 					<<if _management.renovation lt maplebirch.get("VanillaPlus").realEstate.mortgage.terms.rental.max_renovation_level && !maplebirch.get("VanillaPlus").realEstate.isFrozen(_property.id)>>
 						<<set _renovationCost to maplebirch.get("VanillaPlus").realEstate.renovationCost(_property.id)>>
-						<<if $VanillaPlus.finance.bank.balance gte _renovationCost>><<lanLink '装修' 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.renovate(_property.id)>><</lanLink>><<else>><<lanSwitch 'Renovate' '装修'>><</if>>：<<deadwood-reblooms-finance-money _renovationCost>><br>
+						<<if $VanillaPlus.finance.bank.balance gte _renovationCost>>
+						  <<lanLink '装修' 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.renovate(_property.id)>><</lanLink>>
+						<<else>>
+						  <<lanSwitch 'Renovate' '装修'>>
+						<</if>>
+						：<<deadwood-reblooms-finance-money _renovationCost>><br>
 					<</if>>
 					<<if _management.condition lt 100 && !maplebirch.get("VanillaPlus").realEstate.isFrozen(_property.id)>>
 						<<set _repairCost to maplebirch.get("VanillaPlus").realEstate.repairCost(_property.id)>>
-						<<if $VanillaPlus.finance.bank.balance gte _repairCost>><<lanLink '维修' 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.repair(_property.id)>><</lanLink>><<else>><<lanSwitch 'Repair' '维修'>><</if>>：<<deadwood-reblooms-finance-money _repairCost>><br>
+						<<if $VanillaPlus.finance.bank.balance gte _repairCost>>
+						  <<lanLink '维修' 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.repair(_property.id)>><</lanLink>>
+						<<else>>
+						  <<lanSwitch 'Repair' '维修'>>
+						<</if>>
+						：<<deadwood-reblooms-finance-money _repairCost>><br>
 					<</if>>
 					<<if maplebirch.get("VanillaPlus").realEstate.residentsAt(_property.id).length is 0 && !maplebirch.get("VanillaPlus").realEstate.isFrozen(_property.id)>>
-						<<if _management.condition gte maplebirch.get("VanillaPlus").realEstate.mortgage.terms.rental.minimum_condition>><<lanLink '出租' 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.rentOut(_property.id)>><</lanLink>><br><</if>>
+						<<if _management.condition gte maplebirch.get("VanillaPlus").realEstate.mortgage.terms.rental.minimum_condition>>
+						  <<lanLink '出租' 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.rentOut(_property.id)>><</lanLink>><br>
+						<</if>>
 						<<if !$VanillaPlus.real_estate.mortgage || $VanillaPlus.real_estate.mortgage.property_id isnot _property.id>>
 							<<lanLink ['List for auction (7 days)', '委托拍卖（七天）'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.listAuction(_property.id)>><</lanLink>><br>
 						<</if>>
@@ -478,9 +515,15 @@
 		<span class='red'><<lanSwitch 'Bailey is waiting outside the financial centre with the bank notice.' '贝利拿着银行的催缴通知，守在金融中心门外。'>></span><br>
 		<<lanLink ['Confront Bailey', '与贝利对峙'] 'Deadwood Reblooms Mortgage Bailey'>><</lanLink>><br>
 	<</if>>
-	<<if _loan.stage is 'frozen'>><span class='red'><<lanSwitch 'The property is frozen; auction follows in seven days unless the debt is cleared.' '房产已被冻结。若不清偿债务，七天后就会拍卖。'>></span><br><</if>>
-	<<if _loan.arrears gt 0>><<lanLink '补缴逾期款' 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.mortgage.repay('arrears')>><</lanLink>><br><</if>>
-	<<if $VanillaPlus.finance.bank.balance gte _loan.outstanding>><<lanLink ['Pay off mortgage', '还清房贷'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.mortgage.repay('all')>><</lanLink>><br><</if>>
+	<<if _loan.stage is 'frozen'>>
+	  <span class='red'><<lanSwitch 'The property is frozen; auction follows in seven days unless the debt is cleared.' '房产已被冻结。若不清偿债务，七天后就会拍卖。'>></span><br>
+	<</if>>
+	<<if _loan.arrears gt 0>>
+	  <<lanLink '补缴逾期款' 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.mortgage.repay('arrears')>><</lanLink>><br>
+	<</if>>
+	<<if $VanillaPlus.finance.bank.balance gte _loan.outstanding>>
+	  <<lanLink ['Pay off mortgage', '还清房贷'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get("VanillaPlus").realEstate.mortgage.repay('all')>><</lanLink>><br>
+	<</if>>
 <</if>>
 <br>
 <<deadwood-finance-risk-summary>><br>
@@ -564,11 +607,25 @@
 		<<furnitureicon _current.iconFile>> <<= _current.nameCap>><br>
 		<<if _current.description>>
 			<span class='description'><<= _current.description>>
-				<<if $VanillaPlus.real_estate.furniture_category is 'wardrobe' and _current.type.includes('organiser')>> <<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
-				<<if $VanillaPlus.real_estate.furniture_category is 'wardrobe' and _current.type.includes('spacious')>> <<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
-				<<if $VanillaPlus.real_estate.furniture_category is 'wardrobe' and _current.type.includes('starter')>> <<lanSwitch 'Can hold 20 of each item type.' '每种物品类别可容纳 20 个。'>><</if>>
-				<<if _current.type.includes('comfy')>> <<if $VanillaPlus.real_estate.furniture_category is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
-				<<if _current.type.includes('double')>> <<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>><</if>>
+				<<if $VanillaPlus.real_estate.furniture_category is 'wardrobe' and _current.type.includes('organiser')>>
+				  <<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>>
+				<</if>>
+				<<if $VanillaPlus.real_estate.furniture_category is 'wardrobe' and _current.type.includes('spacious')>>
+				  <<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>>
+				<</if>>
+				<<if $VanillaPlus.real_estate.furniture_category is 'wardrobe' and _current.type.includes('starter')>>
+				  <<lanSwitch 'Can hold 20 of each item type.' '每种物品类别可容纳 20 个。'>>
+				<</if>>
+				<<if _current.type.includes('comfy')>>
+				  <<if $VanillaPlus.real_estate.furniture_category is 'bed'>>
+				    <<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>>
+				  <<else>>
+				    <<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>>
+				  <</if>>
+				<</if>>
+				<<if _current.type.includes('double')>>
+				  <<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>>
+				<</if>>
 			</span>
 		<</if>>
 	<<else>>
@@ -582,18 +639,43 @@
 				<<set _priceLabel to '£' + _offer.cost / 100>>
 				<div class='shopBlock no-numberify'>
 					<<furnitureicon _offer.item.iconFile>> <<= _offer.item.nameCap>> |
-					<<if _offer.id is 'custom'>><<textbox '_customHanging' ''>> | <</if>>
-					<<if _offer.item.type.includes('comfy')>><<lanSwitch 'Comfortable' '舒适'>> | <</if>>
-					<<if _offer.item.type.includes('single')>><<lanSwitch 'Single' '单人'>> | <</if>>
-					<<if _offer.item.type.includes('double')>><<lanSwitch 'Double' '双人'>> | <</if>>
-					<<if _offer.item.type.includes('spacious')>><<lanSwitch 'Spacious' '宽敞'>> | <</if>>
-					<<if _offer.item.type.includes('organiser')>><<lanSwitch 'Organiser' '收纳'>> | <</if>>
+					<<if _offer.id is 'custom'>>
+					  <<textbox '_customHanging' ''>> |
+					<</if>>
+					<<if _offer.item.type.includes('comfy')>>
+					  <<lanSwitch 'Comfortable' '舒适'>> |
+					<</if>>
+					<<if _offer.item.type.includes('single')>>
+					  <<lanSwitch 'Single' '单人'>> |
+					<</if>>
+					<<if _offer.item.type.includes('double')>>
+					  <<lanSwitch 'Double' '双人'>> |
+					<</if>>
+					<<if _offer.item.type.includes('spacious')>>
+					  <<lanSwitch 'Spacious' '宽敞'>> |
+					<</if>>
+					<<if _offer.item.type.includes('organiser')>>
+					  <<lanSwitch 'Organiser' '收纳'>> |
+					<</if>>
 					<<if _offer.item.description>>
 						<mouse class='tooltip linkBlue'>(?)<span><<= _offer.item.description>>
-							<<if _offer.item.type.includes('comfy')>><br><<if $VanillaPlus.real_estate.furniture_category is 'bed'>><<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>><<else>><<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>><</if>><</if>>
-							<<if _offer.item.type.includes('double')>><br><<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>><</if>>
-							<<if _offer.item.type.includes('spacious')>><br><<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>><</if>>
-							<<if _offer.item.type.includes('organiser')>><br><<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>><</if>>
+							<<if _offer.item.type.includes('comfy')>>
+							  <br>
+							  <<if $VanillaPlus.real_estate.furniture_category is 'bed'>>
+							    <<lanSwitch 'Improves sleep quality.' '提高睡眠质量。'>>
+							  <<else>>
+							    <<lanSwitch 'Makes working at your desk more effective.' '提高你在书桌前学习的效率。'>>
+							  <</if>>
+							<</if>>
+							<<if _offer.item.type.includes('double')>>
+							  <br><<lanSwitch 'Has enough space for a proper sleepover.' '有足够的空间容纳两个人过夜。'>>
+							<</if>>
+							<<if _offer.item.type.includes('spacious')>>
+							  <br><<lanSwitch 'Can hold 30 of each item type.' '每种物品类别可容纳 30 个。'>>
+							<</if>>
+							<<if _offer.item.type.includes('organiser')>>
+							  <br><<lanSwitch 'Can hold 40 of each item type.' '每种物品类别可容纳 40 个。'>>
+							<</if>>
 						</span></mouse> |
 					<</if>>
 					<<if maplebirch.get("VanillaPlus").finance.canPay(_offer.cost, 'furniture')>>
@@ -629,7 +711,9 @@
 	<<if maplebirch.get("VanillaPlus").realEstate.managementFor(_property.id).renovation gt 0>>
 		<<= lanSwitch(_property.interior.renovated.EN, _property.interior.renovated.CN)>><br><br>
 	<</if>>
-	<<if maplebirch.get("VanillaPlus").realEstate.isFrozen(_property.id)>><span class='red'><<lanSwitch 'The bank has frozen this property.' '银行已经冻结这处房产。'>></span><br><</if>>
+	<<if maplebirch.get("VanillaPlus").realEstate.isFrozen(_property.id)>>
+	  <span class='red'><<lanSwitch 'The bank has frozen this property.' '银行已经冻结这处房产。'>></span><br>
+	<</if>>
 	<span class='green'><<lanSwitch 'This is one of your homes.' '这里也是你的住所。'>></span><br><br>
 	<<for _resident range maplebirch.get("VanillaPlus").realEstate.residentsInCommonRooms(_property.id)>>
 		<<capture _resident>>
@@ -1056,7 +1140,9 @@
 			<br><br>
 			<<bedicon>><<lanLink '睁开眼' 'Deadwood Reblooms Property Night Wake'>><</lanLink>>
 		<<else>>
-			<<if !_wakingEffect and !($nightmares gte 1 and $controlled is 0)>><<lanSwitch 'You wake in your own bed.' '你在自己的床上醒来。'>><</if>>
+			<<if !_wakingEffect and !($nightmares gte 1 and $controlled is 0)>>
+			  <<lanSwitch 'You wake in your own bed.' '你在自己的床上醒来。'>>
+			<</if>>
 			<<if !_wakingEffect and Time.schoolDay and Time.hour gte 6 and Time.hour lt 9
 				and (!$LifeSimulation?.school or ($LifeSimulation.school.role is 'student' and !$LifeSimulation.school.attendanceExempt))>>
 				<br><br><<schoolicon 'building'>><span class='teal'><<lanSwitch 'Today is a school day. Remember your uniform and books before heading out.' '今天有课。出门前记得换好校服，带上课本。'>></span>

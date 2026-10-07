@@ -3,14 +3,6 @@
 export default function Finance(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo('Journal', 'deadwood-reblooms-finance-journal');
 
-  // 追债只在小镇街道遇到；神殿、农场、战斗和昏厥流程不插入金融事件。
-  maplebirch.dynamic.regStateEvent('gate', 'deadwood-finance-collection', {
-    extra: { passage: ['High Street'] },
-    forceExit: true,
-    cond: () => !!V.VanillaPlus?.finance && maplebirch.get('VanillaPlus')!.finance.collectionEncounter,
-    output: 'deadwood-finance-collection-gate'
-  });
-
   // 通过框架补丁注册原版天气侧栏地点，base 元素必须提供 image 字段。
   maplebirch.tool.patch.location.configure(
     'financial_centre',

@@ -235,12 +235,6 @@ class Orchard extends Module {
     return true;
   }
 
-  public cancelOrder(): boolean {
-    if (!this.canSupplyRobin || !this.state.order || this.orderStatus !== 'pending') return false;
-    this.state.order.status = 'cancelled';
-    return true;
-  }
-
   public supplyRobin(): boolean {
     const order = this.state.order;
     const shop = (this.core.get('Robin') as Robin | undefined)?.shop;

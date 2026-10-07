@@ -1,5 +1,6 @@
 // ./src/module/MoreTransformations.ts
 
+import Achievements from './Achievements';
 import Fish from './MoreTransformations/Fish';
 import Horse from './MoreTransformations/Horse';
 import Raven from './MoreTransformations/Raven';
@@ -46,6 +47,9 @@ class MoreTransformations {
   }
 
   public preInit(): void {
+    // 转化会衰减，成就只在首次达到完整形态时授予。
+    Achievements.add(this.core, 'MoreTransformations');
+
     this.core.on(':variable', () => {
       V.MoreTransformations ??= { raven: { met: false, fed: -1, called: -1, preened: -1, action: '', disparaged: 0 } };
     });

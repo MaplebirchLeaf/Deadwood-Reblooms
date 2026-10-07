@@ -31,27 +31,6 @@ export default function (maplebirch: typeof window.maplebirch): void {
     { overwrite: true }
   );
 
-  maplebirch.tool.onInit(() => {
-    for (const [id, difficulty] of [
-      ['Deadwood Robin Independent', 2],
-      ['Deadwood Robin Together', 3],
-      ['Deadwood Robin Free', 3],
-      ['Deadwood Robin Shop Open', 3]
-    ] as const) {
-      setup.feats[id] ??= {
-        get title() {
-          return maplebirch.t(`deadwood-reblooms:robin:feat:${id}:name`);
-        },
-        get desc() {
-          return maplebirch.t(`deadwood-reblooms:robin:feat:${id}:text`);
-        },
-        difficulty,
-        series: '',
-        filter: ['All', 'Social']
-      };
-    }
-  });
-
   maplebirch.tool.patch.traits.add(
     {
       title: 'Special Traits',

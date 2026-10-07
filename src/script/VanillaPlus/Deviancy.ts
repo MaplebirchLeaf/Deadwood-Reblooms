@@ -1,58 +1,6 @@
 // ./src/script/VanillaPlus/Deviancy.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  maplebirch.tool.onInit(() => {
-    setup.feats['Beyond the Mirror'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:feats:Beyond the Mirror:name');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:feats:Beyond the Mirror:text');
-      },
-      difficulty: 2,
-      series: '',
-      filter: ['All', 'General']
-    };
-  });
-
-  maplebirch.tool.onInit(() => {
-    setup.feats['Beyond Nature'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:deviancy:feat:title');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:deviancy:feat:description');
-      },
-      difficulty: 3,
-      series: '',
-      filter: ['All', 'Stats']
-    };
-  });
-
-  maplebirch.dynamic.regStateEvent('gate', 'deviancy-unlock', {
-    output: 'deadwood-reblooms-deviancy-unlock',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.deviancy.unlock
-  });
-  maplebirch.dynamic.regStateEvent('append', 'deviancy-max', {
-    output: 'earnFeat "Beyond Nature"',
-    cond: () => V.feats?.currentSave['Beyond Nature'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.deviancy.max
-  });
-
-  const mirrors: Record<string, 'home' | 'farm' | 'tower' | 'temple'> = {
-    Mirror: 'home',
-    'Eerie Mirror': 'home',
-    'Farm Mirror': 'farm',
-    'Bird Tower Mirror': 'tower',
-    'Temple Mirror': 'temple'
-  };
-  // 到达镜面页就记录发现，无文本输出、不截断页面，也不依赖各页 effects 的写法。
-  maplebirch.dynamic.regStateEvent('gate', 'deviancy-mirror-discovery', {
-    forceExit: false,
-    extra: { passage: Object.keys(mirrors) },
-    cond: () => V.VanillaPlus != null,
-    action: () => maplebirch.get('VanillaPlus')!.deviancy.discover(mirrors[maplebirch.host.sugarcube.passage.title])
-  });
-
   maplebirch.tool.addTo(
     'BeforeLinkZone',
     { widget: 'deadwood-reblooms-deviancy-mirror-exits', passage: 'Tentacle Plains' },
@@ -65,27 +13,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     { widget: [1, 'deadwood-reblooms-deviancy-eerie-mirror-link 1'], passage: 'Eerie Mirror' }
   );
 
-  // 原版镜子入口没有模组来源，清除其它离开方式留下的记录。
-  maplebirch.dynamic.regStateEvent('gate', 'deviancy-mirror-native-entry', {
-    extra: { passage: ['Eerie Mirror Tentacle Plains'] },
-    cond: () => V.VanillaPlus != null,
-    action: () => {
-      V.VanillaPlus.deviancy.mirror = '';
-    }
-  });
-
   // 入口沿用原版 "mirror"；只接管真正离开的页面，导航、鸟瞰与产程保持原样。
-  for (const [passage, arrival] of [
-    ['Passout Tentacle World 4', 'passout'],
-    ['Tentacle Home Return', 'return']
-  ] as const) {
-    maplebirch.dynamic.regStateEvent('gate', `deviancy-mirror-${arrival}`, {
-      output: `deadwood-reblooms-deviancy-mirror-return "${arrival}"`,
-      forceExit: true,
-      extra: { passage: [passage] },
-      cond: () => V.tentacleEntrance === 'mirror' && Boolean(V.VanillaPlus?.deviancy.mirror)
-    });
-  }
 
   // 接入镜面通路与仪式结算，并扩展异种癖上限。
   maplebirch.tool.inject({

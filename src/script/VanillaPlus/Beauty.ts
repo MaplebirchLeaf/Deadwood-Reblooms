@@ -1,33 +1,6 @@
 // ./src/script/VanillaPlus/Beauty.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  maplebirch.tool.onInit(() => {
-    setup.feats['Unadorned'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:beauty:feat:title');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:beauty:feat:description');
-      },
-      difficulty: 3,
-      series: '',
-      filter: ['All', 'Stats']
-    };
-  });
-
-  maplebirch.dynamic.regStateEvent('append', 'beauty-max', {
-    output: 'earnFeat "Unadorned"',
-    cond: () => V.feats?.currentSave['Unadorned'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.beauty.max
-  });
-  maplebirch.dynamic.regStateEvent('gate', 'beauty-unlock', {
-    output: 'deadwood-reblooms-beauty-unlock',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.beauty.unlock
-  });
-  maplebirch.dynamic.regStateEvent('gate', 'beauty-alluring', {
-    output: 'run maplebirch.get("VanillaPlus").beauty.rememberAllure()',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.beauty.alluring && !V.VanillaPlus.beauty.alluring
-  });
-
   // 原版言语动作的结算点各一处，仅增强实际发生的减怒。
   maplebirch.tool.inject({
     widgetPassage: {

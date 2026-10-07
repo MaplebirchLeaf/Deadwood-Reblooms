@@ -18,14 +18,22 @@ class Physique {
     return V.VanillaPlus.traits.physique && !V.VanillaPlus.physique.breakUsed;
   }
 
-  public use(): void {
-    V.VanillaPlus.physique.breakUsed = true;
-  }
-
   public outsideBreak(): boolean {
     if (V.combat === 1 || !V.VanillaPlus.traits.physique) return false;
     V.VanillaPlus.physique.breakUsed = false;
     return window.breakableSoftBinding();
+  }
+
+  public preInit(): void {
+    this.vanillaPlus.core.dynamic.regStateEvent('gate', 'physique-unlock', {
+      output: 'deadwood-reblooms-physique-unlock',
+      cond: () => V.VanillaPlus != null && this.unlock
+    });
+
+    this.vanillaPlus.core.dynamic.regStateEvent('gate', 'physique-break-bindings', {
+      output: 'deadwood-reblooms-physique-break-bindings',
+      cond: () => V.VanillaPlus != null && this.outsideBreak()
+    });
   }
 }
 

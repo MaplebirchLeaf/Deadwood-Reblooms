@@ -64,13 +64,6 @@ class DivineTransformations {
     if (this.state) this.state.prayer[contact] = true;
   }
 
-  public unlock(): void {
-    const state = this.state;
-    if (!state) return;
-    state.trinity = true;
-    state.contact = 'success';
-  }
-
   // 三种完整神圣转化各强化与其内核最贴近的一项数值，不改变原始成长值。
   public skillValue(skill: string, value: number): number {
     if ((skill === 'physique' && this.angel) || (skill === 'willpower' && this.fallenAngel)) return Math.floor(value * DivineTransformations.ATTRIBUTE_MULTIPLIER);
@@ -155,6 +148,15 @@ class DivineTransformations {
 
     state.expungeUsed = true;
     return true;
+  }
+
+  public preInit(core: typeof maplebirch): void {
+    // 先同步转化数值与战斗体液，再让可能输出文本的状态事件接管页面。
+    core.dynamic.regStateEvent('gate', 'divine-transformations', {
+      priority: 100,
+      cond: () => V.VanillaPlus != null,
+      action: () => this.update()
+    });
   }
 }
 

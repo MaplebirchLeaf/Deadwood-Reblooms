@@ -329,9 +329,13 @@
         <<set _ruin_worn to _replace_worn and $bird.upgrades.wardrobe isnot 1>>
         <<lanLink ["Wear", "穿上"] "Deadwood BirdTower Hunt Scavenge Clothes">>
           <<set $phase to 1>>
-          <<if _ruin_worn>><<generalRuined _random_slot>><</if>>
+          <<if _ruin_worn>>
+            <<generalRuined _random_slot>>
+          <</if>>
           <<flight_hunt_get "clothing" 1 _random_slot _random_index "wear">>
-          <<if _ruin_worn>><<flight_hunt_get "fabric" 1>><</if>>
+          <<if _ruin_worn>>
+            <<flight_hunt_get "fabric" 1>>
+          <</if>>
         <</lanLink>>
         <<if _replace_worn>>
           <<language>>
@@ -688,7 +692,11 @@
 <<lanLink ["Climb the tree", "爬树"] "Deadwood BirdTower Hunt Dead Tree 2">>
   <<set $phase to 1>>
 <</lanLink>>
-<<if maplebirch.get('BirdTower').leaderTrait is "clever">><<athleticsdifficulty 400 700>><<else>><<athleticsdifficulty 500 850>><</if>>
+<<if maplebirch.get('BirdTower').leaderTrait is "clever">>
+  <<athleticsdifficulty 400 700>>
+<<else>>
+  <<athleticsdifficulty 500 850>>
+<</if>>
 <br>
 <<lanLink ["Shake the tree", "摇树"] "Deadwood BirdTower Hunt Dead Tree 2">>
   <<set $phase to 2>>
@@ -747,16 +755,35 @@
     <<if maplebirch.get('BirdTower').leaderTrait is "clever">>
       <<language>>
         <<option 'EN'>>
-          <<childname>> jumps over as well, <<if maplebirch.get('BirdTower').party.length gt 1>>calling the other chicks to join in and <</if>>landing on the branch to add <<childhis>> weight and help you.
+          <<childname>> jumps over as well,
+          <<if maplebirch.get('BirdTower').party.length gt 1>>
+            calling the other chicks to join in and
+          <</if>>
+          landing on the branch to add <<childhis>> weight and help you.
         <<option 'CN'>>
-          <<childname>>也跟着跳了过来，<<if maplebirch.get('BirdTower').party.length gt 1>>呼唤其他孩子一起<</if>>落在树枝上并用重量帮助你。
+          <<childname>>也跟着跳了过来，
+          <<if maplebirch.get('BirdTower').party.length gt 1>>
+            呼唤其他孩子一起
+          <</if>>
+          落在树枝上并用重量帮助你。
       <</language>>
     <</if>>
     <<language>>
       <<option 'EN'>>
-        <<if maplebirch.get('BirdTower').leaderTrait is "clever">>A few kicks are all it takes to<<else>>A few kicks<</if>> break the branch off the tree. With a satisfying crack, it falls to the ground.
+        <<if maplebirch.get('BirdTower').leaderTrait is "clever">>
+          A few kicks are all it takes to
+        <<else>>
+          A few kicks
+        <</if>>
+        break the branch off the tree. With a satisfying crack, it falls to the ground.
       <<option 'CN'>>
-        <<if maplebirch.get('BirdTower').leaderTrait is "clever">>你只用了几脚就<</if>><<if maplebirch.get('BirdTower').leaderTrait isnot "clever">>你用了几脚<</if>>把树枝从树上踢断了。伴随着一声令人满意的裂响，树枝掉到了地上。
+        <<if maplebirch.get('BirdTower').leaderTrait is "clever">>
+          你只用了几脚就
+        <</if>>
+        <<if maplebirch.get('BirdTower').leaderTrait isnot "clever">>
+          你用了几脚
+        <</if>>
+        把树枝从树上踢断了。伴随着一声令人满意的裂响，树枝掉到了地上。
     <</language>>
   <</if>>
   <<if _tree_success>>
@@ -800,7 +827,11 @@
         <br><br>
         The tree you just climbed no longer has anything left for you to climb, and you no longer have the strength to try again. At least one of the branches you broke might be of use.
       <<option 'CN'>>
-        你重新恢复视野时，你的孩子<<if maplebirch.get('BirdTower').party.length gt 1>>们<</if>>正站在你的身边，冲你发出担忧的唧唧叫。
+        你重新恢复视野时，你的孩子
+        <<if maplebirch.get('BirdTower').party.length gt 1>>
+          们
+        <</if>>
+        正站在你的身边，冲你发出担忧的唧唧叫。
         <br><br>
         你刚才攀爬的树现在已经没有任何可供你再次攀爬的东西了，再说你也没有力气再爬一次。至少你折断的其中一根树枝可能能派上用场。
     <</language>>
@@ -1109,7 +1140,11 @@
 <br><br>
 <<set $danger to random(1, 10000)>>
 <<if $danger gte (9000 - $allure)>>
-  <<if $rng gte 50>><<beastNEWinit 1 fox>><<else>><<beastNEWinit 1 cat>><</if>>
+  <<if $rng gte 50>>
+    <<beastNEWinit 1 fox>>
+  <<else>>
+    <<beastNEWinit 1 cat>>
+  <</if>>
   <<language>>
     <<option 'EN'>>
       You hear a low growl from the tangled branches. Two glowing eyes stare at you.
@@ -1688,7 +1723,8 @@
           <<childrenNames _hawksIDcopy>>也凑过来，冲你叽叽喳喳地叫着，想要一个同样的花冠。
       <</language>>
       <br><br>
-      <<bird_pass 5*(maplebirch.get('BirdTower').party.length-1)>>
+      <<set $_crown_minutes to 5 * (maplebirch.get('BirdTower').party.length - 1)>>
+      <<bird_pass $_crown_minutes>>
       <<language>>
         <<option 'EN'>>
           You spend a while longer making a crown for each chick,
@@ -1711,7 +1747,8 @@
         <</language>>
       <</if>>
       <<trauma -8>><<lltrauma>>
-      <<tending maplebirch.get('BirdTower').party.length-1>><<gtending>>
+      <<set $_tending_gain to maplebirch.get('BirdTower').party.length - 1>>
+      <<tending $_tending_gain>><<gtending>>
       <br><br>
     <</if>>
     <<language>>
@@ -1885,9 +1922,13 @@
         <<set _ruin_worn to _replace_worn and $bird.upgrades.wardrobe isnot 1>>
         <<lanLink ["Wear", "穿上"] "Deadwood BirdTower Hunt Shiny Clothes">>
           <<set $phase to 1>>
-          <<if _ruin_worn>><<generalRuined _random_slot>><</if>>
+          <<if _ruin_worn>>
+            <<generalRuined _random_slot>>
+          <</if>>
           <<flight_hunt_get "clothing" 1 _random_slot _random_index "wear" "damaged">>
-          <<if _ruin_worn>><<flight_hunt_get "fabric" 1>><</if>>
+          <<if _ruin_worn>>
+            <<flight_hunt_get "fabric" 1>>
+          <</if>>
         <</lanLink>>
         <<if _replace_worn>>
           <<language>>

@@ -1,6 +1,8 @@
 :: Deadwood Orchard Farm Contract []
 <<set $outside to 1>><<set $location to 'alex_farm'>><<farm_work_update>><<effects>>
-<<if $stress gte $stressmax>><<passoutfarmroad>><<exit>><</if>>
+<<if $stress gte $stressmax>>
+  <<passoutfarmroad>><<exit>>
+<</if>>
 <<set $_orchard to maplebirch.get('Orchard')>>
 <<if !$_orchard or !$_orchard.canDeliver>>
   <<lanSwitch 'Alex cannot arrange a contract now.' '艾利克斯现在无法安排长单。'>><br>
@@ -16,7 +18,10 @@
   <<lanSwitch 'Due: ' '交货期限：'>><<set $_contractDate to Time.startDate.addDays($Orchard.farmContract.deadline)>><<= $_contractDate.year>> / <<= $_contractDate.month>> / <<= $_contractDate.day>><br>
   <<lanSwitch 'Refundable deposit: ' '交货后退回的押金：'>><<printmoney $Orchard.farmContract.bond>><br>
   <<lanLink ['Deliver the complete order (0:30)', '交齐这批水果 (0:30)'] 'Deadwood Orchard Farm Contract Result'>>
-    <<set $Orchard.contractResult to maplebirch.get('Orchard').fulfillContract()>><<if $Orchard.contractResult>><<pass 30>><</if>>
+    <<set $Orchard.contractResult to maplebirch.get('Orchard').fulfillContract()>>
+    <<if $Orchard.contractResult>>
+      <<pass 30>>
+    <</if>>
   <</lanLink>><br>
 <<else>>
   <<if $Orchard.farmContract?.status is 'failed'>>
@@ -43,7 +48,9 @@
     <<lanLink ['Check the quote', '核对报价']>>
       <<set $_quote to maplebirch.get('Orchard').contractQuote(_contractFruit, Number(_contractAmount))>>
       <<replace '#orchard-contract-quote'>>
-        <<if $_quote>><<lanSwitch 'Order value / deposit: ' '货款／押金：'>><<printmoney `$_quote.price * Number(_contractAmount)`>> / <<printmoney $_quote.bond>><</if>>
+        <<if $_quote>>
+          <<lanSwitch 'Order value / deposit: ' '货款／押金：'>><<printmoney `$_quote.price * Number(_contractAmount)`>> / <<printmoney $_quote.bond>>
+        <</if>>
       <</replace>>
     <</lanLink>><div id='orchard-contract-quote'></div>
     <<lanLink ['Reserve the delivery', '签下这批长单'] 'Deadwood Orchard Farm Contract Result'>>
@@ -51,12 +58,16 @@
     <</lanLink>><br>
   <</if>>
 <</if>><br>
-<<if maplebirch.get('VanillaPlus')>><span class='blue'><<lanSwitch 'Your delivery records can support a business-purpose loan application at the financial centre.' '这些交货记录可以带去金融中心，申请经营用途贷款。'>></span><br><</if>>
+<<if maplebirch.get('VanillaPlus')>>
+  <span class='blue'><<lanSwitch 'Your delivery records can support a business-purpose loan application at the financial centre.' '这些交货记录可以带去金融中心，申请经营用途贷款。'>></span><br>
+<</if>>
 <<getouticon>><<lanLink ['Return to the deliveries', '返回交货处'] 'Deadwood Reblooms Orchard Trade'>><</lanLink>>
 
 :: Deadwood Orchard Farm Contract Result []
 <<set $outside to 1>><<set $location to 'alex_farm'>><<effects>>
-<<if $stress gte $stressmax>><<passoutfarmroad>><<exit>><</if>>
+<<if $stress gte $stressmax>>
+  <<passoutfarmroad>><<exit>>
+<</if>>
 <<npc Alex>><<person1>>
 <<if $Orchard.contractResult>>
   <<if $Orchard.farmContract.status is 'fulfilled'>>

@@ -4,23 +4,9 @@ import { MEDICINES } from '../../module/LifeSimulation/Medicine';
 
 export default function Medicine(core: typeof maplebirch): void {
   const medicine = () => core.get('LifeSimulation')!.medicine;
-  // 正常推进由时间事件结算，gate 只补结算载入或直接跳时后已经到期的药效。
-  core.dynamic.regStateEvent('gate', 'life-simulation-medicine-expiry', {
-    cond: () => core.get('LifeSimulation')?.medicine?.expired === true,
-    action: () => medicine().tick()
-  });
-  core.dynamic.regStateEvent('gate', 'life-simulation-medicine-notices', {
-    forceExit: false,
-    cond: () => V.combat !== 1 && core.get('LifeSimulation')?.medicine?.pending === true,
-    output: 'print maplebirch.get("LifeSimulation").medicine.flush()'
-  });
+
   core.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-medicine-shop'], passage: 'Pharmacy' });
-  core.dynamic.regStateEvent('gate', 'life-simulation-medicine-sale', {
-    forceExit: true,
-    cond: () => Boolean(core.get('LifeSimulation')) && MEDICINES.some(item => V.pharmacyItem?.type === `deadwood-${item.id}`),
-    output: 'deadwood-medicine-sale',
-    extra: { passage: ['Pharmacy Sale'] }
-  });
+
   core.tool.patch.traits.add(
     ...MEDICINES.flatMap(item => [
       {

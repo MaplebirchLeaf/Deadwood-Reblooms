@@ -599,7 +599,8 @@
 				<<lanSwitch 'Days until next payment' '距下次还款日'>>：<<= Math.max(0, $VanillaPlus.finance.bank.loan_next_payment_day - Time.days)>><br>
 				<<lanSwitch 'Days until due' '距到期日'>>：<<= Math.max(0, $VanillaPlus.finance.bank.loan_due_day - Time.days)>><br>
 				<<lanSwitch 'Missed payments' '未足额还款次数'>>：<<= $VanillaPlus.finance.bank.loan_missed_payments>><br>
-				<<lanSwitch 'Payoff today' '今日结清金额'>>：<<deadwood-reblooms-finance-money maplebirch.get("VanillaPlus").finance.loanPayoff>><br>
+				<<set $_loan_payoff to maplebirch.get("VanillaPlus").finance.loanPayoff>>
+				<<lanSwitch 'Payoff today' '今日结清金额'>>：<<deadwood-reblooms-finance-money $_loan_payoff>><br>
 			<</if>>
 			<<language>>
 				<<option 'EN'>>Scheduled payments are taken weekly from your bank balance. A missed payment adds <span class='red'>£5 or 2% of the unpaid instalment</span>, whichever is greater. After the due date, the <span class='red'>weekly rate doubles</span>.
@@ -775,7 +776,9 @@
 			<<elseif $avery_fate is 'fallen' or $avery_fate is 'kicked'>>
 				<span class='red'><<lanSwitch 'Avery is gone after the tower fire. The company faces an uncertain future.' '高楼火灾后，艾弗里不在了。公司的前景尚不明朗。'>></span><br>
 			<</if>>
-			<<if $chef_state gte 7 or ['ascended', 'saved', 'fallen', 'kicked'].includes($avery_fate)>><br><</if>>
+			<<if $chef_state gte 7 or ['ascended', 'saved', 'fallen', 'kicked'].includes($avery_fate)>>
+			  <br>
+			<</if>>
 			<div class='dr-finance-board'>
 				<table class='dr-finance-quotes' aria-label="<<lanSwitch 'Market quotes' '股票行情'>>">
 					<tr>
@@ -991,7 +994,9 @@
 	<</if>>
 	<span><<icon 'filing-cabinet.png'>><<lanLink '证券账户' 'Deadwood Reblooms Financial Centre Securities Account'>><</lanLink>></span><br>
 	<span><<icon 'securities-desk.png'>><<lanLink '证券交易' 'Deadwood Reblooms Financial Centre Securities Trading'>><</lanLink>></span><br>
-	<<if $VanillaPlus.finance.brokerage.opened>><<icon 'securities-desk.png'>><<lanLink ['Margin and futures', '融资与期货'] 'Deadwood Reblooms Financial Centre Margin'>><</lanLink>><br><</if>>
+	<<if $VanillaPlus.finance.brokerage.opened>>
+	  <<icon 'securities-desk.png'>><<lanLink ['Margin and futures', '融资与期货'] 'Deadwood Reblooms Financial Centre Margin'>><</lanLink>><br>
+	<</if>>
 	<br>
 <<else>>
 	<<deadwood-reblooms-finance-counter-closed>>

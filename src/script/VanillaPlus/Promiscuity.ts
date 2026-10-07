@@ -103,28 +103,6 @@ export default function (maplebirch: typeof window.maplebirch) {
     if (destination === 'player-anus') return text(V.anususe === 'penis' ? 'action:guidePlayerAnusDouble' : 'action:guidePlayerAnus', values);
     return text(destination === 'NPC-vagina' ? 'action:guideNPCVagina' : 'action:guideNPCAnus', values);
   };
-  maplebirch.tool.onInit(() => {
-    setup.feats['Every Inch'] ??= {
-      get title() {
-        return text('feat:title');
-      },
-      get desc() {
-        return text('feat:description');
-      },
-      difficulty: 3,
-      series: '',
-      filter: ['All', 'Stats']
-    };
-  });
-
-  maplebirch.dynamic.regStateEvent('append', 'promiscuity-max', {
-    output: 'earnFeat "Every Inch"',
-    cond: () => V.feats?.currentSave['Every Inch'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.promiscuity.max
-  });
-  maplebirch.dynamic.regStateEvent('gate', 'promiscuity-unlock', {
-    output: 'deadwood-reblooms-promiscuity-unlock',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.promiscuity.unlock
-  });
 
   // PC 主动改变姿势的动作使用框架注册，只有要求 NPC 主动配合的内容保留在 Ask。
   maplebirch.combat.CombatAction.reg(

@@ -49,10 +49,6 @@ class Deviancy {
     );
   }
 
-  public begin(): void {
-    if (this.canConduct) V.VanillaPlus.deviancy.conducting = true;
-  }
-
   public finish(ritual: { purge?: number; sealed?: boolean } | undefined): void {
     if (!V.VanillaPlus.deviancy.conducting) return;
     V.VanillaPlus.deviancy.conducting = false;
@@ -65,6 +61,50 @@ class Deviancy {
 
   public get max(): boolean {
     return V.VanillaPlus.lock.deviancy && V.deviancy >= this.vanillaPlus.ceiling('deviancy');
+  }
+
+  public preInit(): void {
+    const mirrors: Record<string, 'home' | 'farm' | 'tower' | 'temple'> = {
+      Mirror: 'home',
+      'Eerie Mirror': 'home',
+      'Farm Mirror': 'farm',
+      'Bird Tower Mirror': 'tower',
+      'Temple Mirror': 'temple'
+    };
+
+    this.vanillaPlus.core.dynamic.regStateEvent('gate', 'deviancy-unlock', {
+      output: 'deadwood-reblooms-deviancy-unlock',
+      cond: () => V.VanillaPlus != null && this.unlock
+    });
+
+    // 到达镜面页就记录发现，无文本输出、不截断页面，也不依赖各页 effects 的写法。
+    this.vanillaPlus.core.dynamic.regStateEvent('gate', 'deviancy-mirror-discovery', {
+      forceExit: false,
+      extra: { passage: Object.keys(mirrors) },
+      cond: () => V.VanillaPlus != null,
+      action: () => this.discover(mirrors[this.vanillaPlus.core.host.sugarcube.passage.title])
+    });
+
+    // 原版镜子入口没有模组来源，清除其它离开方式留下的记录。
+    this.vanillaPlus.core.dynamic.regStateEvent('gate', 'deviancy-mirror-native-entry', {
+      extra: { passage: ['Eerie Mirror Tentacle Plains'] },
+      cond: () => V.VanillaPlus != null,
+      action: () => {
+        V.VanillaPlus.deviancy.mirror = '';
+      }
+    });
+
+    for (const [passage, arrival] of [
+      ['Passout Tentacle World 4', 'passout'],
+      ['Tentacle Home Return', 'return']
+    ] as const) {
+      this.vanillaPlus.core.dynamic.regStateEvent('gate', `deviancy-mirror-${arrival}`, {
+        output: `deadwood-reblooms-deviancy-mirror-return "${arrival}"`,
+        forceExit: true,
+        extra: { passage: [passage] },
+        cond: () => V.tentacleEntrance === 'mirror' && Boolean(V.VanillaPlus?.deviancy.mirror)
+      });
+    }
   }
 }
 

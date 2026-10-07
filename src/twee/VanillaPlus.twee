@@ -6,9 +6,17 @@
     <<set $outside to 0>><<set $location to 'tentworld'>><<effects>>
     <<language>>
       <<option 'EN'>>
-        <<if _args[0] is 'passout'>>You wake on the floor. The mirror above you is still, and the plain is gone.<<else>>You step through the mirror. The plain falls away behind the glass.<</if>>
+        <<if _args[0] is 'passout'>>
+          You wake on the floor. The mirror above you is still, and the plain is gone.
+        <<else>>
+          You step through the mirror. The plain falls away behind the glass.
+        <</if>>
       <<option 'CN'>>
-        <<if _args[0] is 'passout'>>你在地板上醒来。头顶的镜面纹丝不动，平原已经消失。<<else>>你穿过镜面。平原在镜后褪去。<</if>>
+        <<if _args[0] is 'passout'>>
+          你在地板上醒来。头顶的镜面纹丝不动，平原已经消失。
+        <<else>>
+          你穿过镜面。平原在镜后褪去。
+        <</if>>
     <</language>>
     <br><br>
   <</if>>
@@ -76,7 +84,9 @@
     <</language>>
     <<set _physiqueConfig.maxValue to maplebirch.get("VanillaPlus").ceiling('physique')>>
     <<run _physiqueConfig.states.push({ requiredValue: _physiqueConfig.maxValue, level: 7, color: 'gold', description: $_display_text })>>
-    <<if $physique gte _physiqueConfig.maxValue>><<set _physiqueConfig.percent to 100>><</if>>
+    <<if $physique gte _physiqueConfig.maxValue>>
+      <<set _physiqueConfig.percent to 100>>
+    <</if>>
   <</if>>
 
   <<if $VanillaPlus.lock.willpower>>
@@ -88,7 +98,9 @@
     <</language>>
     <<set _willpowerConfig.maxValue to maplebirch.get("VanillaPlus").ceiling('willpower')>>
     <<run _willpowerConfig.states.push({ requiredValue: _willpowerConfig.maxValue, level: 7, color: 'gold', description: $_display_text })>>
-    <<if $willpower gte _willpowerConfig.maxValue>><<set _willpowerConfig.percent to 100>><</if>>
+    <<if $willpower gte _willpowerConfig.maxValue>>
+      <<set _willpowerConfig.percent to 100>>
+    <</if>>
   <</if>>
 
   <<if $VanillaPlus.lock.beauty>>
@@ -100,7 +112,9 @@
     <</language>>
     <<set _beautyConfig.maxValue to maplebirch.get("VanillaPlus").ceiling('beauty')>>
     <<run _beautyConfig.states.push({ requiredValue: _beautyConfig.maxValue, level: 7, color: 'gold', description: $_display_text })>>
-    <<if $beauty gte _beautyConfig.maxValue>><<set _beautyConfig.percent to 100>><</if>>
+    <<if $beauty gte _beautyConfig.maxValue>>
+      <<set _beautyConfig.percent to 100>>
+    <</if>>
   <</if>>
 
   <<if $VanillaPlus.lock.promiscuity>>
@@ -113,7 +127,9 @@
 
     <<set _promiscuityConfig.maxValue to maplebirch.get("VanillaPlus").ceiling('promiscuity')>>
     <<run _promiscuityConfig.states.push({ requiredValue: _promiscuityConfig.maxValue, level: 7, color: 'lustful', description: $_display_text })>>
-    <<if $promiscuity gte _promiscuityConfig.maxValue>><<set _promiscuityConfig.percent to 100>><</if>>
+    <<if $promiscuity gte _promiscuityConfig.maxValue>>
+      <<set _promiscuityConfig.percent to 100>>
+    <</if>>
   <</if>>
 
   <<if $VanillaPlus.lock.exhibitionism>>
@@ -125,7 +141,9 @@
     <</language>>
     <<set _exhibitionismConfig.maxValue to maplebirch.get("VanillaPlus").ceiling('exhibitionism')>>
     <<run _exhibitionismConfig.states.push({ requiredValue: _exhibitionismConfig.maxValue, level: 7, color: 'lustful', description: $_display_text })>>
-    <<if $exhibitionism gte _exhibitionismConfig.maxValue>><<set _exhibitionismConfig.percent to 100>><</if>>
+    <<if $exhibitionism gte _exhibitionismConfig.maxValue>>
+      <<set _exhibitionismConfig.percent to 100>>
+    <</if>>
   <</if>>
 
   <<if $VanillaPlus.lock.deviancy>>
@@ -137,7 +155,9 @@
     <</language>>
     <<set _deviancyConfig.maxValue to maplebirch.get("VanillaPlus").ceiling('deviancy')>>
     <<run _deviancyConfig.states.push({ requiredValue: _deviancyConfig.maxValue, level: 7, color: 'lustful', description: $_display_text })>>
-    <<if $deviancy gte _deviancyConfig.maxValue>><<set _deviancyConfig.percent to 100>><</if>>
+    <<if $deviancy gte _deviancyConfig.maxValue>>
+      <<set _deviancyConfig.percent to 100>>
+    <</if>>
   <</if>>
 <</widget>>
 
@@ -183,7 +203,9 @@
     <</if>>
     <<for _walkIndex to 0; _walkIndex lt $link_table.length; _walkIndex++>>
       <<set _walkDestination to $link_table[_walkIndex].split('|')[1]>>
-      <<if _walkDestination>><<set _walkDestination to _walkDestination.split(']]')[0]>><</if>>
+      <<if _walkDestination>>
+        <<set _walkDestination to _walkDestination.split(']]')[0]>>
+      <</if>>
       <<if $map.available[$passage].includes(_walkDestination) and $link_table[_walkIndex].includes('<<pass 5>>') and !$link_table[_walkIndex].includes('<<exhibitionism6>>')>>
         <<set $link_table[_walkIndex] to $link_table[_walkIndex].replace('<<pass 5>>', '<<pass 5>><<exhibitionism6>><<fameexhibitionism 5>>')>>
       <</if>>
@@ -243,7 +265,7 @@
 
 <!-- 战斗挣脱结算：消耗体格突破效果并解除指定部位束缚。 -->
 <<widget 'deadwood-reblooms-physique-combat-break'>>
-  <<run maplebirch.get("VanillaPlus").physique.use()>>
+  <<set $VanillaPlus.physique.breakUsed to true>>
   <<switch _args[0]>>
     <<case 'arms'>>
       <<arm_unbind>>
@@ -262,7 +284,11 @@
 <<widget 'deadwood-reblooms-deviancy-eerie-mirror-link'>><<silently>>
   <<set _banishAvailable to !pcAreArmsBound('both') and $angel gte 4 and $angelBanish gte 1>>
   <<set _showMirrorLink to _args[0] is (_banishAvailable ? 1 : 0) and maplebirch.get("VanillaPlus").deviancy.mirrorOpen and maplebirch.get("VanillaPlus").deviancy.discovered('home')>>
-<</silently>><<if _showMirrorLink>><<deadwood-reblooms-deviancy-mirror-enter-link 'home'>><</if>><</widget>>
+<</silently>>
+<<if _showMirrorLink>>
+  <<deadwood-reblooms-deviancy-mirror-enter-link 'home'>>
+<</if>>
+<</widget>>
 
 <<widget 'deadwood-reblooms-deviancy-mirror-enter-link'>>
   <<set $_mirror to _args[0]>>
@@ -270,7 +296,9 @@
     <br>
     <<mirroricon 'blood'>><<lanLink ['Step through the eerie mirror', '穿过诡异镜面'] 'Deadwood Reblooms Deviancy Mirror Enter' >>
       <<set $VanillaPlus.deviancy.mirror to $_mirror is 'property' ? 'property:' + maplebirch.get("VanillaPlus").realEstate.current.id : $_mirror>>
-      <<if $_mirror is 'property'>><<set $VanillaPlus.deviancy.mirror_property to maplebirch.get("VanillaPlus").realEstate.current.id>><</if>>
+      <<if $_mirror is 'property'>>
+        <<set $VanillaPlus.deviancy.mirror_property to maplebirch.get("VanillaPlus").realEstate.current.id>>
+      <</if>>
       <<run maplebirch.get("VanillaPlus").deviancy.enter()>>
     <</lanLink>>
       <<note `lanSwitch('Deviancy', '异种癖')` 'red'>>
@@ -282,7 +310,9 @@
 <<widget 'deadwood-reblooms-deviancy-mirror-hint'>>
   <<set _mirrorLocations to $VanillaPlus.deviancy.mirror_locations>>
   <<set _mirrorTargets to []>>
-  <<if maplebirch.get('Sydney')>><<deadwood-reblooms-sirris-estate-presence>><</if>>
+  <<if maplebirch.get('Sydney')>>
+    <<deadwood-reblooms-sirris-estate-presence>>
+  <</if>>
   <<set _sirrisMirrorReady to maplebirch.get('Sydney')
     and $SydneyExpansion.estate.invited and isLoveInterest('Sydney') and _sydneyAtEstate>>
   <<set _kylarMirrorReady to maplebirch.get('Kylar')

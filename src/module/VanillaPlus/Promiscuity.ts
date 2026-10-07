@@ -358,6 +358,13 @@ class Promiscuity {
   public get max(): boolean {
     return V.VanillaPlus.lock.promiscuity && V.promiscuity >= this.vanillaPlus.ceiling('promiscuity');
   }
+
+  public preInit(): void {
+    this.vanillaPlus.core.dynamic.regStateEvent('gate', 'promiscuity-unlock', {
+      output: 'deadwood-reblooms-promiscuity-unlock',
+      cond: () => V.VanillaPlus != null && this.unlock
+    });
+  }
 }
 
 export default Promiscuity;

@@ -1,5 +1,6 @@
 // ./src/module/Sydney.ts
 
+import Achievements from './Achievements';
 import Module from './Module';
 import { DEFAULT_SYDNEY_EXPANSION_STATE } from './constants';
 
@@ -26,6 +27,11 @@ class Sydney extends Module {
       sydney: T.sydney_location === 'home' && this.available && !V.replayScene && (!property || !housing!.residentsHome(property.id).some(resident => resident.id === 'Sydney')),
       sirris: Time.hour >= 21 || Time.hour < 7 || (Time.weekDay === 1 && !Time.schoolDay)
     };
+  }
+
+  public override preInit(): void {
+    super.preInit();
+    Achievements.add(this.core, 'Sydney');
   }
 }
 

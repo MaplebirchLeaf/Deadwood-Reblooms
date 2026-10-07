@@ -1,5 +1,6 @@
 // ./src/module/BirdTower.ts
 
+import Achievements from './Achievements';
 import Module from './Module';
 import { BIRD_TOWER_HINTS, BIRD_TOWER_MEALS, BIRD_TOWER_STAGES, DEFAULT_BIRD_TOWER_STATE, type BirdTowerStage, type BirdTowerTrait, type BirdTowerState } from './constants';
 
@@ -41,6 +42,7 @@ class BirdTower extends Module {
 
   public override preInit(): void {
     super.preInit();
+    Achievements.add(this.core, 'BirdTower');
     const init = () => {
       for (const child of this.all) this.init(child.childId);
     };

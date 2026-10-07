@@ -1,6 +1,16 @@
 // ./src/module/LifeSimulation/Medicine.ts
 
-export type MedicineId = 'calm' | 'sleep' | 'alert' | 'focus' | 'soothe';
+import catalogue from '../../assets/life-simulation/medicines.json';
+
+interface MedicineDefinition {
+  id: MedicineId;
+  name: readonly string[];
+  description: readonly string[];
+  price: number;
+  hours: number;
+}
+
+export type MedicineId = keyof typeof catalogue;
 
 interface Use {
   owned: number;
@@ -20,25 +30,8 @@ export interface MedicineState {
   review: { day: number; shared: boolean; pending: boolean };
 }
 
-export const MEDICINES = [
-  { id: 'calm', name: ['Calming tablets', '镇静药'], description: ['Temporarily eases stress. Causes drowsiness.', '暂时缓解压力，同时使人困倦。'], price: 1200, hours: 4 },
-  { id: 'sleep', name: ['Sleeping tablets', '助眠药'], description: ['Helps with troubled sleep. Does not prevent every nightmare.', '帮助入睡，不保证阻止所有噩梦。'], price: 1500, hours: 8 },
-  {
-    id: 'alert',
-    name: ['Wakefulness tablets', '提神药'],
-    description: ['Temporarily masks fatigue. Fatigue returns when it wears off.', '暂时压低疲劳，药效消退后疲劳会回升。'],
-    price: 1600,
-    hours: 4
-  },
-  {
-    id: 'focus',
-    name: ['Concentration tablets', '专注药'],
-    description: ['Improves gains from studying while active. Causes tension.', '药效期间提高实际学习收益，同时增加压力。'],
-    price: 1800,
-    hours: 4
-  },
-  { id: 'soothe', name: ['Soothing tablets', '安神药'], description: ['Temporarily eases the burden of trauma. Does not erase memories.', '暂时减轻创伤负担，不抹去经历。'], price: 1400, hours: 4 }
-] as const;
+// 药品目录只保存名称、说明、售价和时长，服药效果仍由本模块结算。
+export const MEDICINES: readonly MedicineDefinition[] = Object.entries(catalogue).map(([id, item]) => ({ id: id as MedicineId, ...item }));
 
 const EMPTY_USE: Use = { owned: 0, last: -1, day: -1, count: 0, streak: 0, dependence: 0, until: 0, rebound: 0, settledDay: -1 };
 const HOURS = 60 * 60;
@@ -240,7 +233,25 @@ export default class Medicine {
     }
   }
 
-  public init(): void {
+  public preInit(): void {
+    // 正常推进由时间事件结算，gate 只补结算载入或直接跳时后已经到期的药效。
+    this.core.dynamic.regStateEvent('gate', 'life-simulation-medicine-expiry', {
+      cond: () => this.core.get('LifeSimulation')?.medicine?.expired === true,
+      action: () => this.tick()
+    });
+
+    this.core.dynamic.regStateEvent('gate', 'life-simulation-medicine-notices', {
+      forceExit: false,
+      cond: () => V.combat !== 1 && this.core.get('LifeSimulation')?.medicine?.pending === true,
+      output: 'print maplebirch.get("LifeSimulation").medicine.flush()'
+    });
+
+    this.core.dynamic.regStateEvent('gate', 'life-simulation-medicine-sale', {
+      forceExit: true,
+      cond: () => Boolean(this.core.get('LifeSimulation')) && MEDICINES.some(item => V.pharmacyItem?.type === `deadwood-${item.id}`),
+      output: 'deadwood-medicine-sale',
+      extra: { passage: ['Pharmacy Sale'] }
+    });
     this.core.on(':variable', () => {
       for (const item of MEDICINES) {
         const use = V.LifeSimulation?.medicine?.uses[item.id];

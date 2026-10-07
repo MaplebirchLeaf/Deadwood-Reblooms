@@ -154,7 +154,9 @@
 	<<if _adrianContext.desk and passage() is _adrianContext.desk and _adrianContext.canChat>>
 		<<socialiseicon 'ask'>><<lanLink ['Talk to Adrian (0:05)', '与阿德里安聊聊 (0:05)'] 'Deadwood Reblooms Adrian Conversation'>><</lanLink>><br>
 	<</if>>
-	<<if _adrianContext.desk and passage() is _adrianContext.desk>><<deadwood-reblooms-adrian-career-link>><</if>>
+	<<if _adrianContext.desk and passage() is _adrianContext.desk>>
+	  <<deadwood-reblooms-adrian-career-link>>
+	<</if>>
 <</widget>>
 
 <<widget 'deadwood-reblooms-adrian-break-link'>>
@@ -183,12 +185,16 @@
 <<set $location to 'financial_centre'>>
 <<effects>>
 <<deadwood-reblooms-adrian-context>>
-<<if _adrianContext.present>><<initnpc 'Adrian'>><</if>>
+<<if _adrianContext.present>>
+  <<initnpc 'Adrian'>>
+<</if>>
 <<set _adrianConversation to { topic: '', ownsHome: false, responseUsed: false }>>
 <<if _adrianContext.canChat>>
 	<<set _adrianContext.state.lastChat to Time.days>>
 	<<for _adrianProperty range maplebirch.get('VanillaPlus').realEstate.properties>>
-		<<if maplebirch.get('VanillaPlus').realEstate.owns(_adrianProperty.id)>><<set _adrianConversation.ownsHome to true>><<break>><</if>>
+		<<if maplebirch.get('VanillaPlus').realEstate.owns(_adrianProperty.id)>>
+		  <<set _adrianConversation.ownsHome to true>><<break>>
+		<</if>>
 	<</for>>
 	<<if _adrianContext.bank.credit_missed_payments gt 0 or _adrianContext.bank.loan_missed_payments gt 0>>
 		<<set _adrianConversation.topic to 'overdue'>>
@@ -281,7 +287,9 @@
 				<<set _adrianConversation.responseUsed to true>>
 				<<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) + 2, 0, 50)>>
 				<<set C.npc.Adrian.rage to Math.max(0, (C.npc.Adrian.rage ?? 0) - 1)>>
-				<<if C.npc.Adrian.rage is 0>><<set _adrianContext.state.last_offence to ''>><</if>>
+				<<if C.npc.Adrian.rage is 0>>
+				  <<set _adrianContext.state.last_offence to ''>>
+				<</if>>
 				<<replace '#adrian-response'>>
 					<<language>>
 						<<option 'EN'>>
@@ -313,7 +321,9 @@
 				<<set _adrianConversation.responseUsed to true>>
 				<<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) + 2, 0, 50)>>
 				<<set C.npc.Adrian.rage to Math.max(0, (C.npc.Adrian.rage ?? 0) - 1)>>
-				<<if C.npc.Adrian.rage is 0>><<set _adrianContext.state.last_offence to ''>><</if>>
+				<<if C.npc.Adrian.rage is 0>>
+				  <<set _adrianContext.state.last_offence to ''>>
+				<</if>>
 				<<replace '#adrian-response'>>
 					<<switch _adrianConversation.topic>>
 						<<case 'overdue'>>
@@ -372,7 +382,9 @@
 					<<set _adrianConversation.responseUsed to true>><<money -200>><<stress -3>>
 					<<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) + 2, 0, 50)>>
 					<<set C.npc.Adrian.rage to Math.max(0, (C.npc.Adrian.rage ?? 0) - 1)>>
-					<<if C.npc.Adrian.rage is 0>><<set _adrianContext.state.last_offence to ''>><</if>>
+					<<if C.npc.Adrian.rage is 0>>
+					  <<set _adrianContext.state.last_offence to ''>>
+					<</if>>
 					<<replace '#adrian-response'>>
 						<<language>>
 							<<option 'EN'>>You bring a hot cup back from the cafe. "Thank you. Mine had gone cold." Adrian makes room for you beside the table. You talk while <<he>> drinks. <<glove 'Adrian'>><<lstress>>

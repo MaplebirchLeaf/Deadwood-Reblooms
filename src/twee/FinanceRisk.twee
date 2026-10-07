@@ -9,7 +9,8 @@
   <</if>>
   <<if $VanillaPlus.finance.brokerage.margin.positions.length>>
     <<lanSwitch 'Margin positions: ' '保证金持仓：'>><<= $VanillaPlus.finance.brokerage.margin.positions.length>> ·
-    <<lanSwitch 'Current equity: ' '当前权益：'>><<deadwood-reblooms-finance-money maplebirch.get('VanillaPlus').finance.margin.equityTotal>><br>
+    <<set $_margin_equity to maplebirch.get('VanillaPlus').finance.margin.equityTotal>>
+    <<lanSwitch 'Current equity: ' '当前权益：'>><<deadwood-reblooms-finance-money $_margin_equity>><br>
   <</if>>
 <</widget>>
 
@@ -18,7 +19,10 @@
     <<lanSwitch 'Order value: ' '合约／股票总值：'>><<deadwood-reblooms-finance-money _args[0].notional>><br>
     <<lanSwitch 'Margin / opening fee: ' '保证金／开仓手续费：'>><<deadwood-reblooms-finance-money _args[0].margin>> / <<deadwood-reblooms-finance-money _args[0].fee>><br>
     <<lanSwitch 'Required funds: ' '本次需划出：'>><<deadwood-reblooms-finance-money _args[0].total>>
-    <<if _args[0].total gt $VanillaPlus.finance.brokerage.cash>> <span class='red'><<lanSwitch 'Insufficient available funds.' '可用资金不足。'>></span><</if>><br>
+    <<if _args[0].total gt $VanillaPlus.finance.brokerage.cash>>
+      <span class='red'><<lanSwitch 'Insufficient available funds.' '可用资金不足。'>></span>
+    <</if>>
+    <br>
   <<else>><span class='red'><<lanSwitch 'Enter a valid quantity to obtain a quote.' '填写有效数量后才能报价。'>></span><br><</if>>
 <</widget>>
 
@@ -104,7 +108,9 @@
     <<lanSwitch 'Leverage / units: ' '杠杆／单位：'>><<= $_position.leverage>>× / <<= $_position.units>> · <<lanSwitch 'Entry / current: ' '开仓／现价：'>><<deadwood-reblooms-finance-money $_position.entry>> / <<deadwood-reblooms-finance-money `$_margin.quote($_position.symbol)`>><br>
     <<lanSwitch 'Margin / equity: ' '保证金／权益：'>><<deadwood-reblooms-finance-money $_position.margin>> / <<deadwood-reblooms-finance-money `$_margin.equity($_position)`>><br>
     <<lanSwitch 'Accrued interest: ' '累计利息：'>><<deadwood-reblooms-finance-money $_position.fees>><br>
-    <<if $_position.expires isnot null>><<lanSwitch 'Expiry: ' '到期：'>><<deadwood-reblooms-finance-date $_position.expires>><br><</if>>
+    <<if $_position.expires isnot null>>
+      <<lanSwitch 'Expiry: ' '到期：'>><<deadwood-reblooms-finance-date $_position.expires>><br>
+    <</if>>
     <<lanLink ['Close position', '平仓'] 'Deadwood Reblooms Financial Centre Margin Result'>><<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.close($_position.id) ? 'closed' : 'rejected'>><</lanLink>> |
     <<lanLink ['Add £1,000 margin', '追加 £1,000 保证金'] 'Deadwood Reblooms Financial Centre Margin Result'>><<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.topUp($_position.id, 1000) ? 'topped-up' : 'rejected'>><</lanLink>><br><br>
   <</capture>>
@@ -125,7 +131,9 @@
 <<elseif $VanillaPlus.finance.last_result is 'closed'>>
   <<lanSwitch 'The clerk stamps the closing slip. The balance after fees has been settled.' '柜员在平仓单上盖了章。扣除费用后的余额已经结算。'>><br>
   <<set $_settlement to maplebirch.get('VanillaPlus').finance.margin.history.at(-1)>>
-  <<if $_settlement>><<lanSwitch 'Profit / loss after fees: ' '扣费后盈亏：'>><<deadwood-reblooms-finance-money $_settlement.profit>><br><</if>>
+  <<if $_settlement>>
+    <<lanSwitch 'Profit / loss after fees: ' '扣费后盈亏：'>><<deadwood-reblooms-finance-money $_settlement.profit>><br>
+  <</if>>
   <<deadwood-finance-risk-summary>>
 <<elseif $VanillaPlus.finance.last_result is 'topped-up'>>
   <<lanSwitch "£1,000 has moved from your available securities funds to the position's margin." '£1,000 已从证券可用资金划入这笔持仓的保证金。'>>
@@ -184,7 +192,10 @@
 <</language>><br><br>
 <<lanSwitch 'Amount due: ' '应还金额：'>><<deadwood-reblooms-finance-money $VanillaPlus.finance.collection.amount>><br>
 <<lanSwitch 'Payment deadline: ' '缴清期限：'>><<deadwood-reblooms-finance-date $VanillaPlus.finance.collection.due_day>><br>
-<<if Time.days gte $VanillaPlus.finance.collection.due_day>><span class='red'><<lanSwitch 'The payment deadline has passed.' '缴款期限已过。'>></span><br><</if>><br>
+<<if Time.days gte $VanillaPlus.finance.collection.due_day>>
+  <span class='red'><<lanSwitch 'The payment deadline has passed.' '缴款期限已过。'>></span><br>
+<</if>>
+<br>
 <<lanLink ['Pay from bank funds and cash', '用银行存款与现金缴清'] 'Deadwood Reblooms Financial Debt Result'>><<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.repayCollection() ? 'ok' : 'rejected'>><</lanLink>><br>
 <<lanSwitch 'Bank funds / cash: ' '银行存款／现金：'>><<deadwood-reblooms-finance-money $VanillaPlus.finance.bank.balance>> / <<deadwood-reblooms-finance-money $money>><br>
 <<if !$VanillaPlus.finance.collection.extended>>
@@ -203,15 +214,37 @@
 <<lanLink ['Return', '返回'] 'Deadwood Reblooms Financial Debt'>><</lanLink>>
 
 :: Deadwood Reblooms Financial Debt Encounter []
-<<if $VanillaPlus.finance.collection.amount lte 0>><<goto 'High Street'>><<exit>><</if>>
+<<if $VanillaPlus.finance.collection.amount lte 0>>
+  <<goto 'High Street'>><<exit>>
+<</if>>
 <<run maplebirch.get('VanillaPlus').finance.evadeCollection()>>
 <<if $VanillaPlus.finance.collection.destination is null>>
   <<set $VanillaPlus.finance.collection.destination to random(0, 1) is 0 ? 'farm' : 'brothel'>>
 <</if>>
 <<set $outside to 1>><<set $location to 'town'>><<effects>><<npc Bailey>><<person1>>
 <<language>>
-  <<option 'EN'>>Bailey steps away from a parked van. A folded notice sticks out of <<his>> pocket. "<<if $VanillaPlus.finance.collection.source is 'mortgage'>>The house is gone. You still owe money.<<elseif $VanillaPlus.finance.collection.source is 'margin'>>Playing the markets with money you didn’t have. And now I have to collect what’s left.<<elseif $VanillaPlus.finance.collection.source is 'bank'>>The bank has waited long enough. Your account is mine now.<<else>>All those unpaid bills. They're my problem now.<</if>>" <<He>> blocks your way. "Money. Now."
-  <<option 'CN'>>贝利从停着的货车旁走来，口袋里露出折好的催缴单。“<<if $VanillaPlus.finance.collection.source is 'mortgage'>>房子没了，钱可没还完。<<elseif $VanillaPlus.finance.collection.source is 'margin'>>没钱还敢玩这么大。到头来，还得我来收尾。<<elseif $VanillaPlus.finance.collection.source is 'bank'>>银行等得够久了。你的账，现在归我管。<<else>>欠了这么多账，还得我来收。<</if>>”<<He>>挡住你的路。“钱。现在给。”
+  <<option 'EN'>>Bailey steps away from a parked van. A folded notice sticks out of <<his>> pocket. "
+  <<if $VanillaPlus.finance.collection.source is 'mortgage'>>
+    The house is gone. You still owe money.
+  <<elseif $VanillaPlus.finance.collection.source is 'margin'>>
+    Playing the markets with money you didn’t have. And now I have to collect what’s left.
+  <<elseif $VanillaPlus.finance.collection.source is 'bank'>>
+    The bank has waited long enough. Your account is mine now.
+  <<else>>
+    All those unpaid bills. They're my problem now.
+  <</if>>
+  " <<He>> blocks your way. "Money. Now."
+  <<option 'CN'>>贝利从停着的货车旁走来，口袋里露出折好的催缴单。“
+  <<if $VanillaPlus.finance.collection.source is 'mortgage'>>
+    房子没了，钱可没还完。
+  <<elseif $VanillaPlus.finance.collection.source is 'margin'>>
+    没钱还敢玩这么大。到头来，还得我来收尾。
+  <<elseif $VanillaPlus.finance.collection.source is 'bank'>>
+    银行等得够久了。你的账，现在归我管。
+  <<else>>
+    欠了这么多账，还得我来收。
+  <</if>>
+  ”<<He>>挡住你的路。“钱。现在给。”
 <</language>><br><br>
 <<lanSwitch 'Debt: ' '欠款：'>><<deadwood-reblooms-finance-money $VanillaPlus.finance.collection.amount>><br>
 <<lanLink ['Pay', '付款'] 'Deadwood Reblooms Financial Debt Encounter Paid'>><<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.repayCollection() ? 'ok' : 'rejected'>><</lanLink>><br>
@@ -259,7 +292,9 @@
   <<option 'CN'>>贝利把头罩拉过你的脑袋。“账结清了。现在你归他们管。”有人把你的胳膊扭到背后。货车的门滑开了。
 <</language>><br><br>
 <<if $VanillaPlus.finance.collection.destination is 'farm'>>
-  <<if $worn.neck.name isnot 'familiar collar' or $worn.neck.cursed isnot 1>><<leash 21>><</if>>
+  <<if $worn.neck.name isnot 'familiar collar' or $worn.neck.cursed isnot 1>>
+    <<leash 21>>
+  <</if>>
   <<lanSwitch 'A stranger pulls you onto a bench. The door slams, and the engine starts.' '陌生人把你拽到长凳上。车门砰地合拢，引擎发动了。'>><br><br>
   <<lanLink ['Continue', '继续'] 'Street Van Bailey'>>
     <<run maplebirch.get('VanillaPlus').finance.surrenderCollection()>>

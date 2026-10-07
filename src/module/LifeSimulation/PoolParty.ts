@@ -207,6 +207,17 @@ class PoolParty {
   private adjust(name: PoolPartyCompanion, stat: 'love' | 'rage' | 'trauma', amount: number): void {
     this.core.SugarCube.Wikifier.wikifyEval(`<<npcincr ${name} ${stat} ${amount}>>`);
   }
+
+  public preInit(): void {
+    // 只在已邀约的派对结束后清场；历史同行记录不受影响。
+    this.core.dynamic.regStateEvent('gate', 'life-simulation-pool-party-settle', {
+      cond: () => {
+        if (!V.LifeSimulation?.pool_party?.companions?.length) return false;
+        return !this.known && !this.tonight;
+      },
+      action: () => this.settle()
+    });
+  }
 }
 
 export default PoolParty;

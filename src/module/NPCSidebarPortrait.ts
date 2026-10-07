@@ -27,6 +27,12 @@ class NPCSidebarPortrait {
     delete clothing.slot;
     this.core.npc.Clothes.wardrobe.apply(clothes, itemSlot as keyof WardrobeItem, clothing);
   }
+
+  public refreshDaily?: () => void;
+
+  public preInit(): void {
+    this.core.dynamic.regTimeEvent('onDay', 'npcsidebar', { action: () => this.refreshDaily?.(), exact: true });
+  }
 }
 
 export default NPCSidebarPortrait;

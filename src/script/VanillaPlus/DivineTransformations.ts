@@ -69,13 +69,6 @@ export default function (maplebirch: typeof window.maplebirch) {
   // 堕天使的清除来自原版仪式剧情中的同名能力，只接入框架已有结算点，不改写遭遇战 passage。
   maplebirch.combat.CombatAction.reg(action('Default'), action('Struggle'), action('Tentacle'));
 
-  // 先同步转化数值与战斗体液，再让可能输出文本的状态事件接管页面。
-  maplebirch.dynamic.regStateEvent('gate', 'divine-transformations', {
-    priority: 100,
-    cond: () => V.VanillaPlus != null,
-    action: () => maplebirch.get('VanillaPlus')!.divineTransformations.update()
-  });
-
   maplebirch.tool.inject({
     widgetPassage: {
       'Transformation Widgets': [

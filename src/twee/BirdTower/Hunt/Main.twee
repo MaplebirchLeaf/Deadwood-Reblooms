@@ -162,7 +162,11 @@
 
 :: Deadwood BirdTower Hunt Direction []
 <<effects>><<flight_effects>><<childSelect $BirdTower.hunt.leader>>
-<<lanSwitch 'You tell ' '你告诉'>><<= $cmonster ? lanSwitch("the little harpy", "小哈比") : lanSwitch("the little hawk", "小鹰")>><<if maplebirch.get('BirdTower').party.length gt 1>><<lanSwitch "s" "们">><</if>><<lanSwitch ' that you want to ' '，你想'>>
+<<lanSwitch 'You tell ' '你告诉'>><<= $cmonster ? lanSwitch("the little harpy", "小哈比") : lanSwitch("the little hawk", "小鹰")>>
+<<if maplebirch.get('BirdTower').party.length gt 1>>
+  <<lanSwitch "s" "们">>
+<</if>>
+<<lanSwitch ' that you want to ' '，你想'>>
 <<switch $bird.hunts.goal>>
   <<case "lurkers">>
     <<lanSwitch 'look for suitable prey to hunt. The mention of prey excites ' '找一些合适的猎物来捕猎。猎物的关键词让'>><<babyhawksthem>><<lanSwitch '.' '激动起来。'>>
@@ -176,7 +180,9 @@
 <br><br>
 <<flight_time_check 20 "silent">>
 <<if $bird.hunts.goal is "babyhawk">>
-  <<if maplebirch.get('BirdTower').party.length gt 1>><<lanSwitch 'The children chatter noisily, and in the end, ' '孩子们唧唧喳喳地吵闹起来，最终，'>><</if>>
+  <<if maplebirch.get('BirdTower').party.length gt 1>>
+    <<lanSwitch 'The children chatter noisily, and in the end, ' '孩子们唧唧喳喳地吵闹起来，最终，'>>
+  <</if>>
   <<set _directionPool to []>>
   <<if $bird.hunts.distanceNorth lt 5 and $bird.hunts.distanceNorth isnot -1>>
     <<run _directionPool.pushUnique("north")>>
@@ -192,11 +198,21 @@
   <</if>>
   <<set $bird.hunts.direction to _directionPool.pluck()>>
   <<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
-    <<childname>><<lanSwitch ' screeches back at you and flies ' '尖鸣着回应你，向'>><<print $bird.hunts.direction.replace("north", lanSwitch("north", "北")).replace("south", lanSwitch("south", "南")).replace("west", lanSwitch("west", "西")).replace("east", lanSwitch("east", "东"))>><<lanSwitch '. ' '飞去。'>><<if maplebirch.get('BirdTower').party.length gt 1>><<lanSwitch 'The other children catch up with ' '其他孩子追上了'>><<childhe>><<lanSwitch '.' '。'>><</if>>
+    <<childname>><<lanSwitch ' screeches back at you and flies ' '尖鸣着回应你，向'>><<print $bird.hunts.direction.replace("north", lanSwitch("north", "北")).replace("south", lanSwitch("south", "南")).replace("west", lanSwitch("west", "西")).replace("east", lanSwitch("east", "东"))>><<lanSwitch '. ' '飞去。'>>
+    <<if maplebirch.get('BirdTower').party.length gt 1>>
+      <<lanSwitch 'The other children catch up with ' '其他孩子追上了'>><<childhe>><<lanSwitch '.' '。'>>
+    <</if>>
   <<elseif maplebirch.get('BirdTower').leaderTrait is "clever">>
-    <<childname>><<lanSwitch ' screeches back at you, ' '尖鸣着回应你，'>><<if maplebirch.get('BirdTower').party.length gt 1>><<childhe>><<lanSwitch ' turns to chatter at the other children, and ' '转过头冲着其他孩子叽喳几声，'>><</if>><<lanSwitch 'then starts flying ' '然后开始向'>><<print $bird.hunts.direction.replace("north", lanSwitch("north", "北")).replace("south", lanSwitch("south", "南")).replace("west", lanSwitch("west", "西")).replace("east", lanSwitch("east", "东"))>><<lanSwitch '.' '飞去。'>>
+    <<childname>><<lanSwitch ' screeches back at you, ' '尖鸣着回应你，'>>
+    <<if maplebirch.get('BirdTower').party.length gt 1>>
+      <<childhe>><<lanSwitch ' turns to chatter at the other children, and ' '转过头冲着其他孩子叽喳几声，'>>
+    <</if>>
+    <<lanSwitch 'then starts flying ' '然后开始向'>><<print $bird.hunts.direction.replace("north", lanSwitch("north", "北")).replace("south", lanSwitch("south", "南")).replace("west", lanSwitch("west", "西")).replace("east", lanSwitch("east", "东"))>><<lanSwitch '.' '飞去。'>>
   <<else>>
-    <<babyhawksthem>><<lanSwitch ' stares back at you blankly. ' '茫然地回望你。'>><<childname>><<lanSwitch ' looks around, then picks the ' '四下张望，随后选中了'>><<print $bird.hunts.direction.replace("north", lanSwitch("north", "北")).replace("south", lanSwitch("south", "南")).replace("west", lanSwitch("west", "西")).replace("east", lanSwitch("east", "东"))>><<lanSwitch ' side. ' '边。'>><<if maplebirch.get('BirdTower').party.length gt 1>><<lanSwitch 'The other children seem fine with it and follow ' '其他孩子看起来没有意见，跟着'>><<childhe>><<lanSwitch ' in flight.' '飞行。'>><</if>>
+    <<babyhawksthem>><<lanSwitch ' stares back at you blankly. ' '茫然地回望你。'>><<childname>><<lanSwitch ' looks around, then picks the ' '四下张望，随后选中了'>><<print $bird.hunts.direction.replace("north", lanSwitch("north", "北")).replace("south", lanSwitch("south", "南")).replace("west", lanSwitch("west", "西")).replace("east", lanSwitch("east", "东"))>><<lanSwitch ' side. ' '边。'>>
+    <<if maplebirch.get('BirdTower').party.length gt 1>>
+      <<lanSwitch 'The other children seem fine with it and follow ' '其他孩子看起来没有意见，跟着'>><<childhe>><<lanSwitch ' in flight.' '飞行。'>>
+    <</if>>
   <</if>>
   <<switch $bird.hunts.direction>>
     <<case "north">>
@@ -220,7 +236,10 @@
   <br>
 <<else>>
   <<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
-    <<babyhawks>><<lanSwitch ' screech back. ' '尖鸣着回应。'>><<if maplebirch.get('BirdTower').party.length gt 1>><<childname>><<lanSwitch "'s cries seem to carry a hint of displeasure." '的鸣叫声中似乎带着些许不满。'>><</if>>
+    <<babyhawks>><<lanSwitch ' screech back. ' '尖鸣着回应。'>>
+    <<if maplebirch.get('BirdTower').party.length gt 1>>
+      <<childname>><<lanSwitch "'s cries seem to carry a hint of displeasure." '的鸣叫声中似乎带着些许不满。'>>
+    <</if>>
   <<elseif maplebirch.get('BirdTower').leaderTrait is "clever">>
     <<childname>><<lanSwitch ' screech back at you, and ' '尖鸣着回应你，'>><<= maplebirch.get('BirdTower').party.length gt 1 ? "<<babyhawks>>" : "<<childhe>>">><<lanSwitch ' wait to see what you do.' '等待着你的行动。'>>
   <<else>>
@@ -299,7 +318,11 @@
 <<else>>
   <<lanSwitch 'You fly together toward the ' '你们一起向'>><<print $bird.hunts.direction.replace("north", lanSwitch("north", "北")).replace("south", lanSwitch("south", "南")).replace("west", lanSwitch("west", "西")).replace("east", lanSwitch("east", "东"))>><<lanSwitch ', hoping to find something.' '飞去，希望能发现什么。'>>
 <</if>>
-<<if Weather.precipitation is "rain">><<lanSwitch 'The rain makes your search harder.' '雨水让你的搜索变得更加困难。'>><<elseif Weather.precipitation is "snow">><<lanSwitch 'The snow makes your search harder.' '雪让你的搜索变得更加困难。'>><</if>>
+<<if Weather.precipitation is "rain">>
+  <<lanSwitch 'The rain makes your search harder.' '雨水让你的搜索变得更加困难。'>>
+<<elseif Weather.precipitation is "snow">>
+  <<lanSwitch 'The snow makes your search harder.' '雪让你的搜索变得更加困难。'>>
+<</if>>
 <<if $daily.birdHuntPhysique is undefined>>
   <<set $daily.birdHuntPhysique to 0>>
   <<physique 1>>
@@ -508,7 +531,10 @@
       <<case 3>>
         <<lanSwitch 'You let your mind wander for a moment, enjoying the feeling of flight.' '你暂时分神了一会，享受着飞翔的感觉。'>>
         <br>
-        <<if maplebirch.get('BirdTower').party.length gt 1>><<lanSwitch "The children chase each other's tails in the air." '孩子们在空中互相追逐彼此的尾巴。'>><<trauma -3>><</if>><<trauma -3>><<ltrauma>>
+        <<if maplebirch.get('BirdTower').party.length gt 1>>
+          <<lanSwitch "The children chase each other's tails in the air." '孩子们在空中互相追逐彼此的尾巴。'>><<trauma -3>>
+        <</if>>
+        <<trauma -3>><<ltrauma>>
     <</switch>>
     <br><br>
     <<endevent>>
@@ -577,7 +603,8 @@
     <</lanLink>>
     <br>
   <</addinlineevent>>
-  <<addinlineevent "babyhawk_hunt_underbrush" (_flight_hunt_chance.materials - Math.floor($bird.hunts.distanceEast / 2))>>
+  <<set $_hunt_weight to _flight_hunt_chance.materials - Math.floor($bird.hunts.distanceEast / 2)>>
+  <<addinlineevent "babyhawk_hunt_underbrush" $_hunt_weight>>
     <<language>>
       <<option 'EN'>>
         You notice a clump of withered branches and leaves. Perhaps materials could be gathered from it easily.
@@ -594,7 +621,8 @@
     <</lanLink>>
     <br>
   <</addinlineevent>>
-  <<addinlineevent "babyhawk_hunt_flowers" (_flight_hunt_chance.materials + Math.floor($bird.hunts.distanceEast / 2))>>
+  <<set $_hunt_weight to _flight_hunt_chance.materials + Math.floor($bird.hunts.distanceEast / 2)>>
+  <<addinlineevent "babyhawk_hunt_flowers" $_hunt_weight>>
     <<language>>
       <<option 'EN'>>
         You notice a brightly coloured patch of flowers.
@@ -650,7 +678,11 @@
     <br>
   <</addinlineevent>>
   <<addinlineevent "babyhawk_hunt_shiny" _flight_hunt_chance.valuables>>
-    <<lanSwitch 'A shining glint in the mire catches your eye' '泥沼里有一个闪光的亮点吸引了你的目光'>><<if maplebirch.get('BirdTower').selectTrait("clever")>><<lanSwitch " and " "和">><<childrenNames _tempIDs>><<lanSwitch "'s attention" "的目光">><</if>><<lanSwitch "." "。">>
+    <<lanSwitch 'A shining glint in the mire catches your eye' '泥沼里有一个闪光的亮点吸引了你的目光'>>
+    <<if maplebirch.get('BirdTower').selectTrait("clever")>>
+      <<lanSwitch " and " "和">><<childrenNames _tempIDs>><<lanSwitch "'s attention" "的目光">>
+    <</if>>
+    <<lanSwitch "." "。">>
     <br><br>
     <<lanLink ["Investigate (0:05)", "调查 (0:05)"] "Deadwood BirdTower Hunt Shiny">>
       <<bird_pass 5>>
@@ -662,7 +694,9 @@
     <br>
   <</addinlineevent>>
   <<addinlineevent "babyhawk_hunt_shiny_pond" _flight_hunt_chance.valuables>>
-    <<if maplebirch.get('BirdTower').selectTrait("clever")>><<childrenNames _tempIDs>><<lanSwitch ' let out a small screech at the ground.' '冲着地面发出一声小小的尖鸣。'>><</if>>
+    <<if maplebirch.get('BirdTower').selectTrait("clever")>>
+      <<childrenNames _tempIDs>><<lanSwitch ' let out a small screech at the ground.' '冲着地面发出一声小小的尖鸣。'>>
+    <</if>>
     <<lanSwitch 'You notice something glinting deep in the pond. Perhaps there is something interesting beneath the surface. ' '你发现池塘深处有东西在一闪一闪。也许水面之下有什么有趣的东西。 '>>
     <br><br>
     <<lanLink ["Investigate (0:05)", "调查 (0:05)"] "Deadwood BirdTower Hunt Pond Dive">>
@@ -675,15 +709,27 @@
     <br>
   <</addinlineevent>>
   <<addinlineevent "babyhawk_hunt_animals_1" _flight_hunt_chance.other>>
-    <<rng 2>><<set _beastGen to ($rng is 1 ? "cat" : "fox")>><<if _beastGen is "cat">><<beastNEWinit 1 cat>><<else>><<beastNEWinit 1 fox>><</if>>
+    <<rng 2>><<set _beastGen to ($rng is 1 ? "cat" : "fox")>>
+    <<if _beastGen is "cat">>
+      <<beastNEWinit 1 cat>>
+    <<else>>
+      <<beastNEWinit 1 fox>>
+    <</if>>
     <<lanSwitch 'You spot a lone ' '你发现下方有只孤零零的'>><<beasttype>><<lanSwitch ' below.' '。'>>
     <<rng 100>>
     <<if $rng gte 60>>
       <<set $phase to 1>>
-      <<bHes>><<if $monster isnot 1>><<lanSwitch " carrying something in their beak." "叼着什么东西。">><<else>><<lanSwitch " holding something." "拿着什么东西。">><</if>>
+      <<bHes>>
+      <<if $monster isnot 1>>
+        <<lanSwitch " carrying something in their beak." "叼着什么东西。">>
+      <<else>>
+        <<lanSwitch " holding something." "拿着什么东西。">>
+      <</if>>
     <</if>>
     <br><br>
-    <<if maplebirch.get('BirdTower').selectTrait("sympathy")>><<childrenNames _tempIDs>><<lanSwitch ' chirp eagerly and circle around you, as if hoping you will stop to watch the ' '热切地叽喳叫，在你身边盘旋飞行，似乎希望你停下来观察'>><<beasttype>><<lanSwitch '.' '。'>><br><br><</if>>
+    <<if maplebirch.get('BirdTower').selectTrait("sympathy")>>
+      <<childrenNames _tempIDs>><<lanSwitch ' chirp eagerly and circle around you, as if hoping you will stop to watch the ' '热切地叽喳叫，在你身边盘旋飞行，似乎希望你停下来观察'>><<beasttype>><<lanSwitch '.' '。'>><br><br>
+    <</if>>
     <<lanLink ["Watch (0:05)", "观察 (0:05)"] "Deadwood BirdTower Hunt Animal Watch">>
       <<trauma -3>>
       <<bird_pass 5>>
@@ -714,7 +760,9 @@
     <</if>>
     <<lanSwitch ' tussle below, but from this height you cannot tell whether they are playing or fighting.' '在下方打闹着，但你无法在这个高度判断那是在玩耍还是打架。'>>
     <br><br>
-    <<if maplebirch.get('BirdTower').selectTrait("sympathy")>><<childrenNames _tempIDs>><<lanSwitch ' stare at them intently, seeming very interested.' '目不转睛地盯着它们，似乎很感兴趣。'>><br><br><</if>>
+    <<if maplebirch.get('BirdTower').selectTrait("sympathy")>>
+      <<childrenNames _tempIDs>><<lanSwitch ' stare at them intently, seeming very interested.' '目不转睛地盯着它们，似乎很感兴趣。'>><br><br>
+    <</if>>
     <<lanLink ["Land to take a closer look (0:05)", "着陆以凑近看 (0:05)"] "Deadwood BirdTower Hunt Foxes Land">>
       <<bird_pass 5>>
     <</lanLink>>
@@ -730,7 +778,8 @@
     <</lanLink>>
     <br>
   <</addinlineevent>>
-  <<addinlineevent "babyhawk_hunt_people_watch" (Math.floor($bird.hunts.distanceNorth / 2))>>
+  <<set $_hunt_weight to Math.floor($bird.hunts.distanceNorth / 2)>>
+  <<addinlineevent "babyhawk_hunt_people_watch" $_hunt_weight>>
     <<language>>
       <<option 'EN'>>
         You spot two people walking across the moor.
@@ -738,7 +787,9 @@
         你发现两个人在荒原上走着。
     <</language>>
     <br><br>
-    <<if maplebirch.get('BirdTower').selectTrait("sympathy")>><<childrenNames _tempIDs>><<lanSwitch ' chirp eagerly at you, as if hoping to observe them closely.' '热切地对你叽喳叫，似乎希望能仔细观察他们。'>><br><br><</if>>
+    <<if maplebirch.get('BirdTower').selectTrait("sympathy")>>
+      <<childrenNames _tempIDs>><<lanSwitch ' chirp eagerly at you, as if hoping to observe them closely.' '热切地对你叽喳叫，似乎希望能仔细观察他们。'>><br><br>
+    <</if>>
     <<lanLink ["Follow (0:10)", "跟上 (0:10)"] "Deadwood BirdTower Hunt People Watching">>
       <<bird_pass 10>>
     <</lanLink>>
@@ -813,7 +864,11 @@
   <<option 'CN'>>
     很快，你就再次看见了城堡。
 <</language>>
-<<lanSwitch 'You land on the perch' '你们降落在栖木上'>><<if $bird.upgrades.decor gte 3>><<lanSwitch ', and ' '，'>><<babyhawks>><<lanSwitch ' follow you through the curtain' '跟在你身后穿过帘子'>><</if>><<lanSwitch ',' '，'>>
+<<lanSwitch 'You land on the perch' '你们降落在栖木上'>>
+<<if $bird.upgrades.decor gte 3>>
+  <<lanSwitch ', and ' '，'>><<babyhawks>><<lanSwitch ' follow you through the curtain' '跟在你身后穿过帘子'>>
+<</if>>
+<<lanSwitch ',' '，'>>
 <<if $bird.hunts.duo is false and $bird.state is "home" and birdEggsReady("Great Hawk")>>
   <<language>>
     <<option 'EN'>>
@@ -827,7 +882,13 @@
   <br><br>
   <<if $bird.state is "home" and $bird.activity isnot "sleep">>
     <<npc "Great Hawk">><<person1>>
-    <<lanSwitch 'Your ' '你的'>><<beasttype>><<if $monster is 1>><<lanSwitch ' walks' '走'>><<else>><<lanSwitch ' leaps' '跃'>><</if>><<lanSwitch ' over to you.' '向你们。'>>
+    <<lanSwitch 'Your ' '你的'>><<beasttype>>
+    <<if $monster is 1>>
+      <<lanSwitch ' walks' '走'>>
+    <<else>>
+      <<lanSwitch ' leaps' '跃'>>
+    <</if>>
+    <<lanSwitch ' over to you.' '向你们。'>>
     <<if $monster is 1>>
       <<lanSwitch '"Glad to see you back." ' '"很高兴看到你们回来。"'>><<bHe>><<lanSwitch ' notices you have brought nothing back. "Not every hunt can succeed." ' '注意到你们没有带来任何东西，"不是每次狩猎都能成功的，"'>><<bhe>><<lanSwitch ' tries to comfort you and ' '试图安慰你和'>><<babyhawks>><<lanSwitch '.' '。'>>
     <<else>>
@@ -858,7 +919,13 @@
     <<case 4>>
       <<lanSwitch 'You are finally home.' '终于回家了。'>><<stress -36>><<trauma -6>><<lllstress>><<ltrauma>>
     <<case 5>>
-      <<lanSwitch 'You are finally home. The silver bars ' '终于回家了。银条'>><<if Time.dayState is "night">><<lanSwitch 'gently reflect the calm moonlight.' '温柔地反射着宁静的月光。'>><<else>><<lanSwitch 'cast a calm reflection over your tower.' '在你的塔上洒下宁静的倒影。'>><</if>><<set $stress to 0>><<trauma -6>><<lllstress>><<ltrauma>>
+      <<lanSwitch 'You are finally home. The silver bars ' '终于回家了。银条'>>
+      <<if Time.dayState is "night">>
+        <<lanSwitch 'gently reflect the calm moonlight.' '温柔地反射着宁静的月光。'>>
+      <<else>>
+        <<lanSwitch 'cast a calm reflection over your tower.' '在你的塔上洒下宁静的倒影。'>>
+      <</if>>
+      <<set $stress to 0>><<trauma -6>><<lllstress>><<ltrauma>>
     <<default>>
   <</switch>>
   <br>

@@ -1,5 +1,6 @@
 // ./src/module/LifeSimulation.ts
 
+import Achievements from './Achievements';
 import Module from './Module';
 import AcademicHonours from './LifeSimulation/AcademicHonours';
 import School from './LifeSimulation/School';
@@ -25,7 +26,11 @@ class LifeSimulation extends Module {
 
   public override preInit(): void {
     super.preInit();
-    this.medicine.init();
+    Achievements.add(this.core, 'LifeSimulation');
+    this.pool_party.preInit();
+    this.school.preInit();
+    this.medicine.preInit();
+
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-body-growth', { exact: true, action: () => this.settleBodyGrowth() });
     // 只在原版确实跨日时清除到期卡，读档时直接按保存的到期时间判断入场资格。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-gym-membership', {

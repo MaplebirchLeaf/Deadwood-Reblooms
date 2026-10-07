@@ -10,19 +10,6 @@ export default function (maplebirch: typeof window.maplebirch): void {
   );
   // 原版开锁选项按巧手显示，最后一个链接始终是返回牢房。
   maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-whitney-cell-link'], passage: 'Underground Cell Lock' });
-  maplebirch.tool.onInit(() => {
-    setup.feats['Deadwood Whitney Rescued'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:whitney:feat:rescued:name');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:whitney:feat:rescued:text');
-      },
-      difficulty: 3,
-      series: '',
-      filter: ['All', 'Social']
-    };
-  });
 
   maplebirch.tool.inject({
     widgetPassage: {

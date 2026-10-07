@@ -22,7 +22,10 @@
 	<</language>><br>
 	<<set $_chipStacks to maplebirch.get('LifeSimulation').casino.chipStacks>>
 	<<for $_index, $_stack range $_chipStacks>>
-		<<if $_index gt 0>> · <</if>><span class='gold'>£<<= Number(($_stack.value / 100).toFixed(2))>></span> × <<= $_stack.count>>
+		<<if $_index gt 0>>
+		  ·
+		<</if>>
+		<span class='gold'>£<<= Number(($_stack.value / 100).toFixed(2))>></span> × <<= $_stack.count>>
 	<</for>><br>
 	<<if maplebirch.get('LifeSimulation').casino.chips gte 1000000>>
 		<<language>>
@@ -44,18 +47,24 @@
 <<widget 'deadwood-casino-cashout'>>
 	<<set $_cashOutMethod to _args[0] || 'cash'>>
 	<<set $_cashOutAmount to maplebirch.get('LifeSimulation').casino.cashOut($_cashOutMethod)>>
-	<<if $_cashOutAmount gt 0>><<money $_cashOutAmount 'deadwoodCasino' `{recordOnly: $_cashOutMethod === 'bank'}`>><</if>>
+	<<if $_cashOutAmount gt 0>>
+	  <<money $_cashOutAmount 'deadwoodCasino' `{recordOnly: $_cashOutMethod === 'bank'}`>>
+	<</if>>
 <</widget>>
 
 <<widget 'deadwood-casino-cashier'>>
 	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
 	<<deadwood-casino-balance>>
 	<<lanSwitch 'Cash: ' '现金：'>><span class='gold'>£<<print Number(($money / 100).toFixed(2))>></span>
-		<<if $_casino.bankAvailable>> · <<lanSwitch 'Bank: ' '银行存款：'>><span class='teal'>£<<print Number(($VanillaPlus.finance.bank.balance / 100).toFixed(2))>></span><</if>>
+		<<if $_casino.bankAvailable>>
+		  · <<lanSwitch 'Bank: ' '银行存款：'>><span class='teal'>£<<print Number(($VanillaPlus.finance.bank.balance / 100).toFixed(2))>></span>
+		<</if>>
 	<br><br>
 	<<set $_methods to {}>>
 	<<set $_methods[lanSwitch('Cash', '现金')] to 'cash'>>
-	<<if $_casino.bankAvailable>><<set $_methods[lanSwitch('Bank account (debit card)', '银行账户（借记卡）')] to 'bank'>><</if>>
+	<<if $_casino.bankAvailable>>
+	  <<set $_methods[lanSwitch('Bank account (debit card)', '银行账户（借记卡）')] to 'bank'>>
+	<</if>>
 	<label><<lanSwitch 'Payment: ' '结算方式：'>>
 		<<listbox '_cashier.method' autoselect>><<optionsfrom $_methods>><</listbox>>
 	</label><br>
@@ -87,14 +96,21 @@
 		<<switch $_turn.action>>
 			<<case 'join'>>
 				<<set $_turn.accepted to $_game.join($_turn.amount)>>
-				<<if $_turn.accepted>><<set $_turn.chips to -$_turn.amount>><</if>>
+				<<if $_turn.accepted>>
+				  <<set $_turn.chips to -$_turn.amount>>
+				<</if>>
 			<<case 'deal'>>
-				<<set $_turn.accepted to $_game.deal()>><<if $_turn.accepted>><<set $_turn.minutes to 2>><</if>>
+				<<set $_turn.accepted to $_game.deal()>>
+				<<if $_turn.accepted>>
+				  <<set $_turn.minutes to 2>>
+				<</if>>
 			<<case 'cashout'>>
 				<<set $_turn.accepted to $_game.state.joined>><<set $_turn.chips to $_game.cashOut()>>
 			<<default>>
 				<<set $_turn.accepted to $_game.act($_turn.action, $_turn.amount)>>
-				<<if $_turn.accepted>><<set $_turn.minutes to 1>><</if>>
+				<<if $_turn.accepted>>
+				  <<set $_turn.minutes to 1>>
+				<</if>>
 		<</switch>>
 	<<elseif $_turn.mode is 'three'>>
 		<<set $_game to maplebirch.get('LifeSimulation').casino.threeCard>>
@@ -103,17 +119,27 @@
 				<<set $_game.ante to $_turn.amount>>
 			<<case 'start'>>
 				<<set $_turn.accepted to $_game.start()>>
-				<<if $_turn.accepted>><<set $_turn.chips to -$_game.state.ante>><<set $_turn.minutes to 2>><</if>>
+				<<if $_turn.accepted>>
+				  <<set $_turn.chips to -$_game.state.ante>><<set $_turn.minutes to 2>>
+				<</if>>
 			<<default>>
 				<<set $_turn.cost to $_game.act($_turn.action, $_turn.amount)>>
 				<<set $_turn.accepted to $_turn.cost gte 0>>
-				<<if $_turn.accepted>><<set $_turn.chips to -$_turn.cost>><<set $_turn.minutes to $_turn.action is 'look' ? 0 : 1>><</if>>
+				<<if $_turn.accepted>>
+				  <<set $_turn.chips to -$_turn.cost>><<set $_turn.minutes to $_turn.action is 'look' ? 0 : 1>>
+				<</if>>
 		<</switch>>
-		<<if $_turn.accepted>><<set $_turn.chips += $_game.collectPayout()>><</if>>
+		<<if $_turn.accepted>>
+		  <<set $_turn.chips += $_game.collectPayout()>>
+		<</if>>
 	<</if>>
 	<<if $_turn.accepted>>
-		<<if $_turn.chips isnot 0>><<run maplebirch.get('LifeSimulation').casino.adjustChips($_turn.chips)>><</if>>
-		<<if $_turn.minutes gt 0>><<pass $_turn.minutes>><</if>>
+		<<if $_turn.chips isnot 0>>
+		  <<run maplebirch.get('LifeSimulation').casino.adjustChips($_turn.chips)>>
+		<</if>>
+		<<if $_turn.minutes gt 0>>
+		  <<pass $_turn.minutes>>
+		<</if>>
 	<</if>>
 <</widget>>
 

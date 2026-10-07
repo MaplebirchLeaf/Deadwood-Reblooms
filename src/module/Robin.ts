@@ -1,5 +1,6 @@
 // ./src/module/Robin.ts
 
+import Achievements from './Achievements';
 import Module from './Module';
 import { DEFAULT_ROBIN_EXPANSION_STATE, type RobinExpansionState } from './constants';
 import type { RobinFacade } from './Robin/Shared';
@@ -225,6 +226,7 @@ class Robin extends Module implements RobinFacade {
 
   public preInit(): void {
     super.preInit();
+    Achievements.add(this.core, 'Robin');
     this.core.on(':passagestart', () => this.sync(), 'Robin Expansion');
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-robin-asylum-daily', {
       action: () => {

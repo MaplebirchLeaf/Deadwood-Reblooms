@@ -17,19 +17,6 @@ export default function (maplebirch: typeof window.maplebirch) {
     };
   });
 
-  maplebirch.dynamic.regStateEvent('gate', 'physique-unlock', {
-    output: 'deadwood-reblooms-physique-unlock',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.physique.unlock
-  });
-  maplebirch.dynamic.regStateEvent('append', 'physique-max', {
-    output: 'earnFeat "Unbreakable"',
-    cond: () => V.feats?.currentSave['Unbreakable'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.physique.max
-  });
-  maplebirch.dynamic.regStateEvent('gate', 'physique-break-bindings', {
-    output: 'deadwood-reblooms-physique-break-bindings',
-    cond: () => V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.physique.outsideBreak()
-  });
-
   const available = () => V.combat === 1 && maplebirch.get('VanillaPlus')!.physique.canBreakBindings;
   maplebirch.combat.CombatAction.reg(
     {

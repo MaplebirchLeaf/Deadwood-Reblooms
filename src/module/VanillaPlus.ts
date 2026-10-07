@@ -1,5 +1,6 @@
 // ./src/module/VanillaPlus.ts
 
+import Achievements from './Achievements';
 import Module from './Module';
 import { DEFAULT_VANILLA_PLUS_STATE, type VanillaPlusAttribute, type VanillaPlusTrait } from './constants';
 import Beauty from './VanillaPlus/Beauty';
@@ -42,6 +43,32 @@ class VanillaPlus extends Module {
 
   public override preInit(): void {
     super.preInit();
+    Achievements.add(this.core, 'VanillaPlus');
+    // 日结只推进已交给阿德里安服务的业务，剧情和条件留在 Twee。
+    this.core.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-adrian-business', {
+      exact: true,
+      priority: -1,
+      cond: () => V.VanillaPlus.adrian.career > 0 && V.VanillaPlus.adrian.career < 5,
+      action: () => this.core.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-adrian-business-day>>')
+    });
+
+    this.beauty.preInit();
+    this.deviancy.preInit();
+    this.divineTransformations.preInit(this.core);
+    this.exhibitionism.preInit();
+    this.physique.preInit();
+    this.promiscuity.preInit();
+
+    this.core.dynamic.regStateEvent('gate', 'vanilla-plus-traits', {
+      output: 'deadwood-reblooms-trait-unlocks',
+      cond: () => V.VanillaPlus != null && this.traitsPending
+    });
+
+    this.core.dynamic.regStateEvent('gate', 'vanilla-plus-preserve', {
+      output: 'run maplebirch.get("VanillaPlus").preserve()',
+      cond: () => V.VanillaPlus != null && this.belowMinimum
+    });
+
     this.finance.preInit();
     this.realEstate.preInit();
   }

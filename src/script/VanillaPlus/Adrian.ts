@@ -49,13 +49,7 @@ export default function Adrian(maplebirch: typeof window.maplebirch): void {
     },
     { widget: [-1, 'deadwood-reblooms-adrian-break-link'], passage: 'Deadwood Reblooms Financial Centre' }
   );
-  // 日结只推进已交给阿德里安服务的业务，剧情和条件留在 Twee。
-  maplebirch.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-adrian-business', {
-    exact: true,
-    priority: -1,
-    cond: () => V.VanillaPlus.adrian.career > 0 && V.VanillaPlus.adrian.career < 5,
-    action: () => maplebirch.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-adrian-business-day>>')
-  });
+
   AdrianPortrait(maplebirch);
   // 财务系统只接收优惠比例，不认识人物或剧情阶段。
   maplebirch.get('VanillaPlus')!.finance.loanDiscount = () => {

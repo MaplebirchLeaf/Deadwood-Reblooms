@@ -117,35 +117,32 @@ export default function (maplebirch: MaplebirchCore) {
     return sidebar.randomColour(setup.clothes.upper[2].colour_options as string[], weights);
   }
 
-  maplebirch.dynamic.regTimeEvent('onDay', 'npcsidebar', {
-    action: () => {
-      for (const npcName of ['Robin', 'Sydney']) pyjamaColours.set(npcName, pyjamaColour(npcName));
-      for (const colours of [robinColours, sydneyColours, kylarColours, whitneyColours]) {
-        colours.school.clear();
-        colours.schoolOutfit.clear();
-      }
-      robinColours.outfit.clear();
-      robinColours.clothes.clear();
-      robinColours.christmas.clear();
-      sydneyColours.swim.clear();
-      sydneyColours.cow = undefined;
-      kylarColours.clothes.clear();
-      kylarColours.christmas.clear();
-      kylarColours.roseEyepatch = undefined;
-      whitneyColours.outfit.clear();
-      whitneyColours.clothes.clear();
-      gwylanColours.outfit.clear();
-      alexColours.outfit.clear();
-      charlieColours.outfit.clear();
-      darrylColours.outfit.clear();
-      landryColours.outfit.clear();
-      sirrisColours.outfit.clear();
-      dorenColours.outfit.clear();
-      masonColours.outfit.clear();
-      nikiColours.outfit.clear();
-    },
-    exact: true
-  });
+  sidebar.refreshDaily = () => {
+    for (const npcName of ['Robin', 'Sydney']) pyjamaColours.set(npcName, pyjamaColour(npcName));
+    for (const colours of [robinColours, sydneyColours, kylarColours, whitneyColours]) {
+      colours.school.clear();
+      colours.schoolOutfit.clear();
+    }
+    robinColours.outfit.clear();
+    robinColours.clothes.clear();
+    robinColours.christmas.clear();
+    sydneyColours.swim.clear();
+    sydneyColours.cow = undefined;
+    kylarColours.clothes.clear();
+    kylarColours.christmas.clear();
+    kylarColours.roseEyepatch = undefined;
+    whitneyColours.outfit.clear();
+    whitneyColours.clothes.clear();
+    gwylanColours.outfit.clear();
+    alexColours.outfit.clear();
+    charlieColours.outfit.clear();
+    darrylColours.outfit.clear();
+    landryColours.outfit.clear();
+    sirrisColours.outfit.clear();
+    dorenColours.outfit.clear();
+    masonColours.outfit.clear();
+    nikiColours.outfit.clear();
+  };
 
   maplebirch.tool.onInit(() => {
     for (const npcName of ['Robin', 'Sydney']) {

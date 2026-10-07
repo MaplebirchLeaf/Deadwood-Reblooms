@@ -18,10 +18,6 @@ class Beauty {
     return V.baseAllure >= 7000 && V.outside === 1 && !Time.isBloodMoon();
   }
 
-  public rememberAllure(): void {
-    if (this.alluring) V.VanillaPlus.beauty.alluring = true;
-  }
-
   public get unlock(): boolean {
     return (
       !V.VanillaPlus.lock.beauty &&
@@ -40,6 +36,20 @@ class Beauty {
   public get floor(): number {
     if (V.VanillaPlus.traits.incorrigible) return this.vanillaPlus.divineTransformations.beautyCeiling(this.vanillaPlus.ceiling('beauty'));
     return V.VanillaPlus.traits.beauty ? this.vanillaPlus.divineTransformations.beautyCeiling(this.vanillaPlus.normalCeiling('beauty')) : 0;
+  }
+
+  public preInit(): void {
+    this.vanillaPlus.core.dynamic.regStateEvent('gate', 'beauty-unlock', {
+      output: 'deadwood-reblooms-beauty-unlock',
+      cond: () => V.VanillaPlus != null && this.unlock
+    });
+
+    this.vanillaPlus.core.dynamic.regStateEvent('gate', 'beauty-alluring', {
+      action: () => {
+        V.VanillaPlus.beauty.alluring = true;
+      },
+      cond: () => V.VanillaPlus != null && this.alluring && !V.VanillaPlus.beauty.alluring
+    });
   }
 }
 

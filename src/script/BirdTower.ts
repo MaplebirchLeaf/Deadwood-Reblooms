@@ -172,39 +172,5 @@ export default function BirdTowerScript(maplebirch: typeof window.maplebirch): v
         bird.activity(childId);
       });
     }
-
-    setup.feats['Our First Flight'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:birdtower:feat:firstFlight:name');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:birdtower:feat:firstFlight:text');
-      },
-      difficulty: 2,
-      series: '',
-      filter: ['All', 'Social']
-    };
-    setup.feats['Wild Animals'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:birdtower:feat:wildAnimals:name');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:birdtower:feat:wildAnimals:text');
-      },
-      difficulty: 2,
-      series: '',
-      filter: ['All', 'Social']
-    };
-    setup.feats['Dances with Fox'] ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:birdtower:feat:dancesWithFox:name');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:birdtower:feat:dancesWithFox:text');
-      },
-      difficulty: 3,
-      series: '',
-      filter: ['All', 'Social']
-    };
   });
 }

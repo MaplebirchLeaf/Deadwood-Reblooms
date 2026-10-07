@@ -11,7 +11,12 @@
 <</if>>
 <<effects>>
 <<if $stress gte $stressmax>>
-  <<if $Orchard.site is 'farm'>><<passoutfarmroad>><<else>><<passouttemple>><</if>><<exit>>
+  <<if $Orchard.site is 'farm'>>
+    <<passoutfarmroad>>
+  <<else>>
+    <<passouttemple>>
+  <</if>>
+  <<exit>>
 <</if>>
 <<if $Orchard.site is 'farm' and $_orchard.farmInterrupted>>
   <<lanSwitch 'There is trouble in the fields. The deliveries will have to wait.' '田地出了事，交货得先放一放。'>><br>
@@ -42,11 +47,13 @@
 <<for $_fruit range $_orchard.stock>>
   <<capture $_fruit>>
     <br><<foodstufficon $_fruit.type>><b><<print setup.foodstuff[$_fruit.type].name>></b> × <<= $_fruit.amount>><br>
-    <<lanLink ($foodstuff[$_fruit.type].marketStall is false ? ['Display at the market stall', '在集市摆出'] : ['Keep off the market stall', '不在集市摆出'])>>
+    <<set $_display_label to $foodstuff[$_fruit.type].marketStall is false ? ['Display at the market stall', '在集市摆出'] : ['Keep off the market stall', '不在集市摆出']>>
+    <<lanLink $_display_label>>
       <<run maplebirch.get('Orchard').displayFruit($_fruit.type)>><<run Engine.show()>>
     <</lanLink>><br>
     <<set _orchardKeep[$_fruit.type] to $_fruit.reserve>>
-    <<lanSwitch 'Keep at least: ' '至少保留：'>><<numberbox ('_orchardKeep.' + $_fruit.type) $_fruit.reserve>>
+    <<set $_reserve_variable to '_orchardKeep.' + $_fruit.type>>
+    <<lanSwitch 'Keep at least: ' '至少保留：'>><<numberbox $_reserve_variable $_fruit.reserve>>
     <<lanLink ['Save', '保存']>>
       <<run maplebirch.get('Orchard').keepFruit($_fruit.type, Number(T.orchardKeep[$_fruit.type]))>><<run Engine.show()>>
     <</lanLink>><br>
@@ -56,7 +63,8 @@
       <<capture $_deliverAmount>>
         <<lanLink ['Deliver the surplus (0:30)', '交付多余水果 (0:30)']>>
           <<if maplebirch.get('Orchard').deliver($_fruit.type, $_deliverAmount)>>
-            <<pass maplebirch.get('Orchard').deliveryMinutes>><<updatesidebarmoney>>
+            <<set $_delivery_minutes to maplebirch.get('Orchard').deliveryMinutes>>
+            <<pass $_delivery_minutes>><<updatesidebarmoney>>
           <</if>>
           <<run Engine.show()>>
         <</lanLink>><<lanSwitch ' Quantity: ' ' 数量：'>><<= $_deliverAmount>><br>
@@ -76,7 +84,19 @@
   此账目记录启用账本后的款项。原版其它集市收入和共用肥料的购买不计入此处。
 <</language>><br><br>
 <<for $_sale range $Orchard.sales.slice().reverse()>>
-  <<lanSwitch 'Day ' '第 '>><<= $_sale.day>><<lanSwitch ': ' ' 天：'>><<if $_sale.source is 'shop'>><<lanSwitch 'Drinks shop' '饮品店'>><<elseif $_sale.source is 'market'>><<lanSwitch 'Market regular' '集市熟客'>><<elseif $_sale.source is 'farm'>><<lanSwitch 'Farm delivery' '农场交货'>><<else>><<lanSwitch 'Sale' '销售'>><</if>> — <<foodstufficon $_sale.type>><<= $_sale.amount>> — <<printmoney $_sale.income>><br>
+  <<lanSwitch 'Day ' '第 '>><<= $_sale.day>><<lanSwitch ': ' ' 天：'>>
+  <<if $_sale.source is 'shop'>>
+    <<lanSwitch 'Drinks shop' '饮品店'>>
+  <<elseif $_sale.source is 'market'>>
+    <<lanSwitch 'Market regular' '集市熟客'>>
+  <<elseif $_sale.source is 'farm'>>
+    <<lanSwitch 'Farm delivery' '农场交货'>>
+  <<else>>
+    <<lanSwitch 'Sale' '销售'>>
+  <</if>>
+  — <<foodstufficon $_sale.type>><<= $_sale.amount>> — <<printmoney $_sale.income>><br>
 <</for>>
-<<if $Orchard.site is 'farm' and $_orchard.canDeliver>><br><<foodstufficon 'apple'>><<lanLink ['Discuss a weekly fruit contract', '商量一周的水果长单'] 'Deadwood Orchard Farm Contract'>><</lanLink>><br><</if>>
+<<if $Orchard.site is 'farm' and $_orchard.canDeliver>>
+  <br><<foodstufficon 'apple'>><<lanLink ['Discuss a weekly fruit contract', '商量一周的水果长单'] 'Deadwood Orchard Farm Contract'>><</lanLink>><br>
+<</if>>
 <br><<getouticon>><<lanLink ['Return to the orchard', '返回果园'] 'Deadwood Reblooms Orchard'>><</lanLink>>
