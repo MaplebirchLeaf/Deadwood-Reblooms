@@ -195,7 +195,7 @@ export default class RobinShop extends Shared {
   }
 
   public get restockPrice(): number {
-    return Math.max(0, (V.maths >= 300 ? 25 : 30) - (this.core.get('Orchard')?.state.restockCredit ?? 0));
+    return Math.max(0, (V.maths >= 300 ? 25 : 30) - (this.core.get('Orchard')?.state.restock_credit ?? 0));
   }
 
   public get canRestock(): boolean {
@@ -206,7 +206,7 @@ export default class RobinShop extends Shared {
   public restockDrinks(): boolean {
     if (!this.canRestock || !this.spend(this.restockPrice)) return false;
     const orchard = this.core.get('Orchard');
-    if (orchard) orchard.state.restockCredit = 0;
+    if (orchard) orchard.state.restock_credit = 0;
     this.state.shopStock = 3;
     return true;
   }

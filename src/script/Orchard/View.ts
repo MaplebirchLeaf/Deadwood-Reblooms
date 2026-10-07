@@ -193,7 +193,7 @@ export default class OrchardView {
       button.dataset.orchardTree = String(index);
       button.className = 'deadwood-orchard-plot';
       button.classList.toggle('watered', !!tree?.moisture);
-      button.classList.toggle('fertilised', !!tree?.fertiliser || soil.quality > soil.baseQuality);
+      button.classList.toggle('fertilised', !!tree?.fertiliser || soil.quality > soil.base_quality);
       button.classList.toggle('ready', this.orchard.ripe(tree));
       button.setAttribute('aria-label', label);
       button.setAttribute('aria-pressed', String(index === this.selected));
@@ -275,7 +275,7 @@ export default class OrchardView {
           this.detail.append(wait);
         }
       }
-      if (tree.fertiliser > 0 || soil.quality > soil.baseQuality) {
+      if (tree.fertiliser > 0 || soil.quality > soil.base_quality) {
         const fertilised = document.createElement('div');
         fertilised.className = 'green';
         fertilised.textContent =

@@ -560,7 +560,7 @@ export class RealEstate {
     return Math.ceil(this.askingPrice(id) * rentalTerms.repairPriceRate);
   }
 
-  public settleRentalIssue(id: PropertyId, choice: 'repair' | 'wait' | 'negotiate'): boolean {
+  public resolveIssue(id: PropertyId, choice: 'repair' | 'wait' | 'negotiate', day = RealEstate.today): boolean {
     if (!this.owns(id)) return false;
     const management = this.managementFor(id);
     const issue = management.rental_issue;
@@ -570,7 +570,7 @@ export class RealEstate {
       if (choice !== 'repair' || this.finance.payFromBankPennies(this.rentalRepairCost(id)) !== 'ok') return false;
       management.condition = Math.min(100, management.condition + rentalTerms.neglectedConditionLoss);
     } else {
-      if (choice === 'wait' && RealEstate.today - issue.day < 7) return false;
+      if (choice === 'wait' && day - issue.day < 7) return false;
       if (!['wait', 'negotiate'].includes(choice)) return false;
       const payment = Math.floor(issue.rent * (choice === 'negotiate' ? rentalTerms.arrearsNegotiationRate : 1));
       if (this.isFrozen(id)) this.mortgage.applySeizedRent(payment);

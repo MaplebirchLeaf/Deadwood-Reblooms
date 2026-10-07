@@ -34,7 +34,7 @@ export interface OrchardTree {
 }
 
 interface OrchardSoil {
-  baseQuality: number;
+  base_quality: number;
   quality: number;
 }
 
@@ -42,12 +42,12 @@ interface OrchardWorkerReport {
   day: number;
   watered: number;
   fertilised: number;
-  noFertiliser: boolean;
+  no_fertiliser: boolean;
   kept: Partial<Record<OrchardFruit, number>>;
   irrigation: boolean;
   rain: boolean;
-  offSeason: boolean;
-  leftFruit: boolean;
+  off_season: boolean;
+  left_fruit: boolean;
 }
 
 export interface OrchardReceipt {
@@ -75,38 +75,38 @@ interface OrchardState {
   selected: number;
   day: number;
   order: { type: 'lemon' | 'orange'; amount: number; price: number; deadline: number; status: 'pending' | 'fulfilled' | 'cancelled' | 'late' } | null;
-  orderDay: number;
-  ordersCompleted: number;
-  lastSupplyDay: number;
-  farmContract: { type: OrchardFruit; amount: number; price: number; bond: number; deadline: number; status: 'pending' | 'fulfilled' | 'failed' } | null;
-  contractDay: number;
-  contractsCompleted: number;
-  contractResult: boolean;
-  restockCredit: number;
-  regularDay: number;
-  regularVisits: number;
-  regularFavourite: OrchardFruit | null;
-  alexDeliveryDay: number;
+  order_day: number;
+  orders_completed: number;
+  last_supply_day: number;
+  farm_contract: { type: OrchardFruit; amount: number; price: number; bond: number; deadline: number; status: 'pending' | 'fulfilled' | 'failed' } | null;
+  contract_day: number;
+  contracts_completed: number;
+  contract_result: boolean;
+  restock_credit: number;
+  regular_day: number;
+  regular_visits: number;
+  regular_favourite: OrchardFruit | null;
+  alex_delivery_day: number;
   sales: OrchardSale[];
   reserve: Partial<Record<OrchardFruit, number>>;
-  soldDay: number;
-  soldToday: number;
-  salesIncome: number;
-  workerExpenses: number;
-  seedExpenses: number;
+  sold_day: number;
+  sold_today: number;
+  sales_income: number;
+  worker_expenses: number;
+  seed_expenses: number;
   seed: OrchardSpecies;
   known: OrchardSpecies[];
   soil: Record<OrchardSite, OrchardSoil[]>;
   unlocked: Record<OrchardSite, boolean>;
   /** 各树位剩余开垦工时。零值的树位才可种植，铲树不会重置。 */
   clearing: Record<OrchardSite, number[]>;
-  helpDay: number;
-  irrigationSince: number;
+  help_day: number;
+  irrigation_since: number;
   worker: {
     hired: boolean;
-    paidFrom: number;
-    paidUntil: number;
-    lastShift: number;
+    paid_from: number;
+    paid_until: number;
+    last_shift: number;
     pick: boolean;
     fertilise: boolean;
   };
@@ -120,33 +120,33 @@ const defaults: OrchardState = {
   selected: 0,
   day: -1,
   order: null,
-  orderDay: -1,
-  ordersCompleted: 0,
-  lastSupplyDay: -1,
-  farmContract: null,
-  contractDay: -1,
-  contractsCompleted: 0,
-  contractResult: false,
-  restockCredit: 0,
-  regularDay: -1,
-  regularVisits: 0,
-  regularFavourite: null,
-  alexDeliveryDay: -1,
+  order_day: -1,
+  orders_completed: 0,
+  last_supply_day: -1,
+  farm_contract: null,
+  contract_day: -1,
+  contracts_completed: 0,
+  contract_result: false,
+  restock_credit: 0,
+  regular_day: -1,
+  regular_visits: 0,
+  regular_favourite: null,
+  alex_delivery_day: -1,
   sales: [],
   reserve: {},
-  soldDay: -1,
-  soldToday: 0,
-  salesIncome: 0,
-  workerExpenses: 0,
-  seedExpenses: 0,
+  sold_day: -1,
+  sold_today: 0,
+  sales_income: 0,
+  worker_expenses: 0,
+  seed_expenses: 0,
   seed: 'apple',
   known: [],
   soil: { temple: [], farm: [] },
   unlocked: { temple: false, farm: false },
   clearing: { temple: [], farm: [] },
-  helpDay: -1,
-  irrigationSince: -1,
-  worker: { hired: false, paidFrom: 0, paidUntil: 0, lastShift: -1, pick: false, fertilise: false },
+  help_day: -1,
+  irrigation_since: -1,
+  worker: { hired: false, paid_from: 0, paid_until: 0, last_shift: -1, pick: false, fertilise: false },
   temple: Array(orchardSites.temple.plots).fill(null),
   farm: Array(orchardSites.farm.plots).fill(null)
 };
@@ -163,6 +163,31 @@ class Orchard extends Module {
   }
 
   public override preInit(): void {
+    // 在默认值填充前改名，保留旧记录里的订单、库存与已付薪期；不保留双套字段。
+    this.core.on(
+      ':variable',
+      () => {
+        const rename = (data: Record<string, unknown> | undefined, keys: readonly string[]) => {
+          if (!data) return;
+          for (const key of keys) {
+            const previous = key.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase());
+            if (previous === key || !Object.hasOwn(data, previous)) continue;
+            if (Object.hasOwn(data, key)) this.migration.utils.remove(data, previous);
+            else this.migration.utils.move(data, previous, key);
+          }
+        };
+        const state = V.Orchard;
+        if (state) {
+          rename(state, Object.keys(defaults));
+          rename(state.worker, Object.keys(defaults.worker));
+          for (const site of ['temple', 'farm'] as const) for (const soil of state.soil?.[site] ?? []) rename(soil, ['base_quality']);
+        }
+        const worker = V.per_npc?.deadwood_orchard_worker;
+        rename(worker, ['orchard_report', 'orchard_shifts']);
+        rename(worker?.orchard_report, ['no_fertiliser', 'off_season', 'left_fruit']);
+      },
+      'Orchard State Naming'
+    );
     super.preInit();
     // 天气变化时及时补水。再次读入同一雨天存档不会重触发 onEnter，推进前仍需核对。
     this.core.dynamic.regWeatherEvent(':deadwood-orchard-rain', {
@@ -204,7 +229,7 @@ class Orchard extends Module {
   }
 
   public get canOrder(): boolean {
-    return this.canSupplyRobin && this.orderStatus !== 'pending' && (this.state.orderDay < 0 || Time.days - this.state.orderDay >= trade.orderInterval);
+    return this.canSupplyRobin && this.orderStatus !== 'pending' && (this.state.order_day < 0 || Time.days - this.state.order_day >= trade.orderInterval);
   }
 
   public get orderStatus(): 'pending' | 'fulfilled' | 'cancelled' | 'late' | null {
@@ -213,7 +238,7 @@ class Orchard extends Module {
   }
 
   public get orderQuantity(): number {
-    return this.state.ordersCompleted ? Math.max(1, Math.floor(trade.repeatQuantity * (Time.season === 'winter' ? trade.winterOrderMultiplier : 1))) : trade.trialQuantity;
+    return this.state.orders_completed ? Math.max(1, Math.floor(trade.repeatQuantity * (Time.season === 'winter' ? trade.winterOrderMultiplier : 1))) : trade.trialQuantity;
   }
 
   private get canTrade(): boolean {
@@ -231,7 +256,7 @@ class Orchard extends Module {
       deadline: Time.days + trade.orderDays,
       status: 'pending'
     };
-    this.state.orderDay = Time.days;
+    this.state.order_day = Time.days;
     return true;
   }
 
@@ -244,16 +269,16 @@ class Orchard extends Module {
     if (!shop.spend(income / 100)) return false;
     V.foodstuff[order.type].amount -= order.amount;
     order.status = 'fulfilled';
-    this.state.ordersCompleted++;
-    this.state.lastSupplyDay = Time.days;
-    this.state.restockCredit = trade.restockDiscount;
+    this.state.orders_completed++;
+    this.state.last_supply_day = Time.days;
+    this.state.restock_credit = trade.restockDiscount;
     this.recordSale(order.type, order.amount, income, 'shop');
     this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Robin love 1>>');
     return true;
   }
 
   public get freshSupplySales(): number {
-    return this.state.lastSupplyDay >= 0 && Time.days - this.state.lastSupplyDay <= trade.orderInterval ? trade.freshSupplyWeeklySales : 0;
+    return this.state.last_supply_day >= 0 && Time.days - this.state.last_supply_day <= trade.orderInterval ? trade.freshSupplyWeeklySales : 0;
   }
 
   public get contractQuantities(): readonly number[] {
@@ -265,7 +290,7 @@ class Orchard extends Module {
   }
 
   public get canContract(): boolean {
-    return this.canDeliver && this.state.farmContract?.status !== 'pending' && (this.state.contractDay < 0 || Time.days - this.state.contractDay >= trade.orderInterval);
+    return this.canDeliver && this.state.farm_contract?.status !== 'pending' && (this.state.contract_day < 0 || Time.days - this.state.contract_day >= trade.orderInterval);
   }
 
   public contractQuote(type: OrchardFruit, amount: number): { price: number; bond: number } | null {
@@ -281,19 +306,19 @@ class Orchard extends Module {
     const quote = this.contractQuote(type, amount);
     if (!this.canContract || !this.contractFruit.includes(type) || !quote || V.money < quote.bond) return false;
     this.core.SugarCube.Wikifier.wikifyEval(`<<money ${-quote.bond} 'farm'>>`);
-    this.state.farmContract = { type, amount, ...quote, deadline: Time.days + trade.contractDays, status: 'pending' };
-    this.state.contractDay = Time.days;
+    this.state.farm_contract = { type, amount, ...quote, deadline: Time.days + trade.contractDays, status: 'pending' };
+    this.state.contract_day = Time.days;
     return true;
   }
 
   public fulfillContract(): boolean {
-    const contract = this.state.farmContract;
+    const contract = this.state.farm_contract;
     if (!this.canDeliver || !contract || contract.status !== 'pending' || Time.days > contract.deadline) return false;
     const item = this.stock.find(fruit => fruit.type === contract.type);
     if (!item || item.amount - item.reserve < contract.amount) return false;
     V.foodstuff[contract.type].amount -= contract.amount;
     contract.status = 'fulfilled';
-    this.state.contractsCompleted++;
+    this.state.contracts_completed++;
     this.recordSale(contract.type, contract.amount, contract.price * contract.amount, 'farm');
     this.core.SugarCube.Wikifier.wikifyEval(`<<money ${contract.bond} 'farm'>>`);
     this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Alex love 2>>');
@@ -301,13 +326,13 @@ class Orchard extends Module {
   }
 
   public get canMeetRegular(): boolean {
-    return V.location === 'market' && Time.hour < 21 && Time.dayState !== 'night' && this.canTrade && this.state.regularDay !== Time.days;
+    return V.location === 'market' && Time.hour < 21 && Time.dayState !== 'night' && this.canTrade && this.state.regular_day !== Time.days;
   }
 
   public get regularStock(): Orchard['stock'] {
     const displayed = this.stock.filter(item => item.amount >= 5 && V.foodstuff[item.type].marketStall !== false);
-    const preferred = displayed.find(item => item.type === this.state.regularFavourite);
-    return this.state.regularVisits >= 3 && preferred ? [preferred] : displayed;
+    const preferred = displayed.find(item => item.type === this.state.regular_favourite);
+    return this.state.regular_visits >= 3 && preferred ? [preferred] : displayed;
   }
 
   public sellRegular(type: OrchardFruit): boolean {
@@ -318,16 +343,16 @@ class Orchard extends Module {
     if (typeof price !== 'number' || !Number.isFinite(price) || price <= 0) return false;
     const income = Math.round(price) * 5;
     V.foodstuff[type].amount -= 5;
-    this.state.regularDay = Time.days;
-    this.state.regularVisits++;
-    this.state.regularFavourite ??= type;
+    this.state.regular_day = Time.days;
+    this.state.regular_visits++;
+    this.state.regular_favourite ??= type;
     this.recordSale(type, 5, income, 'market');
     return true;
   }
 
   private recordSale(type: OrchardFruit, amount: number, income: number, source: 'farm' | 'shop' | 'market'): void {
     this.core.SugarCube.Wikifier.wikifyEval(`<<money ${income} '${source}'>>`);
-    this.state.salesIncome += income;
+    this.state.sales_income += income;
     this.state.sales.push({ day: Time.days, source, type, amount, income });
     if (this.state.sales.length > trade.ledgerEntries) this.state.sales.shift();
   }
@@ -356,7 +381,7 @@ class Orchard extends Module {
   }
 
   public get deliveryRemaining(): number {
-    return Math.max(0, trade.bulkDailyLimit - (this.state.soldDay === Time.days ? this.state.soldToday : 0));
+    return Math.max(0, trade.bulkDailyLimit - (this.state.sold_day === Time.days ? this.state.sold_today : 0));
   }
 
   public get deliveryMinutes(): number {
@@ -384,14 +409,14 @@ class Orchard extends Module {
     if (!Number.isSafeInteger(income)) return false;
     V.foodstuff[type].amount -= amount;
 
-    if (this.state.soldDay !== Time.days) {
-      this.state.soldDay = Time.days;
-      this.state.soldToday = 0;
+    if (this.state.sold_day !== Time.days) {
+      this.state.sold_day = Time.days;
+      this.state.sold_today = 0;
     }
-    this.state.soldToday += amount;
+    this.state.sold_today += amount;
     this.recordSale(type, amount, income, 'farm');
-    if (this.state.alexDeliveryDay !== Time.days) {
-      this.state.alexDeliveryDay = Time.days;
+    if (this.state.alex_delivery_day !== Time.days) {
+      this.state.alex_delivery_day = Time.days;
       this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Alex love 1>>');
     }
     return true;
@@ -418,7 +443,7 @@ class Orchard extends Module {
     this.state.clearing[site] = this.state[site].map((_, index) => (index < data.initialPlots ? 0 : data.clearingMinutes));
     this.state.soil[site] = this.state[site].map(() => {
       const quality = random(1, 3);
-      return { baseQuality: quality, quality };
+      return { base_quality: quality, quality };
     });
     // 神殿首次开放时保留一棵成树，果实仍由正常季节结算生成。
     if (site === 'temple') this.state.temple[0] ??= { species: 'plum', growth: species.plum.matureDays, moisture: moistureDays, fertiliser: 0, harvests: 0, fruiting: 0, fruit: [] };
@@ -443,7 +468,7 @@ class Orchard extends Module {
   }
 
   public get canAskAlex(): boolean {
-    return this.available('farm') && this.canWork && !this.farmInterrupted && V.farm_work?.alex === 'admin' && this.state.helpDay < Math.floor(Time.date.timeStamp / 86400);
+    return this.available('farm') && this.canWork && !this.farmInterrupted && V.farm_work?.alex === 'admin' && this.state.help_day < Math.floor(Time.date.timeStamp / 86400);
   }
 
   public get workerWage(): number {
@@ -455,12 +480,12 @@ class Orchard extends Module {
   }
 
   public get workerActive(): boolean {
-    return this.state.worker.hired && !!V.per_npc?.deadwood_orchard_worker && this.state.worker.paidUntil > Time.date.timeStamp;
+    return this.state.worker.hired && !!V.per_npc?.deadwood_orchard_worker && this.state.worker.paid_until > Time.date.timeStamp;
   }
 
   /** 汇报跟随雇工本人保存，辞退后不会显示上一位的工作记录。 */
   public get workerReport(): OrchardWorkerReport | null {
-    return V.per_npc?.deadwood_orchard_worker?.orchardReport ?? null;
+    return V.per_npc?.deadwood_orchard_worker?.orchard_report ?? null;
   }
 
   public get canTalkWorker(): boolean {
@@ -477,17 +502,17 @@ class Orchard extends Module {
   }
 
   public get canPayWorker(): boolean {
-    return this.available('farm') && this.state.worker.hired && !!V.per_npc?.deadwood_orchard_worker && V.money >= this.workerWage && this.state.worker.paidUntil <= Time.date.timeStamp + 7 * 86400;
+    return this.available('farm') && this.state.worker.hired && !!V.per_npc?.deadwood_orchard_worker && V.money >= this.workerWage && this.state.worker.paid_until <= Time.date.timeStamp + 7 * 86400;
   }
 
   public hire(): boolean {
     if (this.core.passage.title !== 'Deadwood Reblooms Orchard Hire' || !this.available('farm') || !this.candidate || V.money < this.workerWage) return false;
     this.advance();
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${this.workerWage} 'farm'>>`);
-    this.state.workerExpenses += this.workerWage;
+    this.state.worker_expenses += this.workerWage;
     this.state.worker.hired = true;
-    this.state.worker.paidFrom = Time.date.timeStamp;
-    this.state.worker.paidUntil = Time.date.timeStamp + 7 * 86400;
+    this.state.worker.paid_from = Time.date.timeStamp;
+    this.state.worker.paid_until = Time.date.timeStamp + 7 * 86400;
     return true;
   }
 
@@ -495,10 +520,10 @@ class Orchard extends Module {
     if (!this.canPayWorker) return false;
     this.advance();
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${this.workerWage} 'farm'>>`);
-    this.state.workerExpenses += this.workerWage;
+    this.state.worker_expenses += this.workerWage;
     const worker = this.state.worker;
-    if (worker.paidUntil <= Time.date.timeStamp) worker.paidFrom = Time.date.timeStamp;
-    worker.paidUntil = Math.max(Time.date.timeStamp, worker.paidUntil) + 7 * 86400;
+    if (worker.paid_until <= Time.date.timeStamp) worker.paid_from = Time.date.timeStamp;
+    worker.paid_until = Math.max(Time.date.timeStamp, worker.paid_until) + 7 * 86400;
     return true;
   }
 
@@ -545,7 +570,7 @@ class Orchard extends Module {
     if (!data || data.seedSource !== 'shop' || !data.seedPrice || !setup.foodstuff[type] || this.state.known.includes(type)) return false;
     if (this.core.passage.title !== 'Supermarket' || Time.dayState === 'night' || Time.hour === 21 || !this.canWork || V.money < data.seedPrice) return false;
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${data.seedPrice} 'shopping'>>`);
-    this.state.seedExpenses += data.seedPrice;
+    this.state.seed_expenses += data.seedPrice;
     return this.learn(type);
   }
 
@@ -574,16 +599,16 @@ class Orchard extends Module {
     // 回忆与画中场景使用冻结的玩家状态，不能让这些场景的日期影响果园。
     if (!V.Orchard || V.statFreeze) return;
     const state = this.state;
-    if (state.farmContract?.status === 'pending' && Time.days > state.farmContract.deadline) {
-      state.farmContract.status = 'failed';
+    if (state.farm_contract?.status === 'pending' && Time.days > state.farm_contract.deadline) {
+      state.farm_contract.status = 'failed';
       // 合约只在到期时违约一次。押金已经交给收货方，不再从现金重复扣款。
       this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Alex love -2>>');
     }
     const today = Math.floor(Time.date.timeStamp / 86400);
     if (state.day < 0) state.day = today;
     // 原版先补算整次 pass 的施工。刚观察到的竣工不能倒推到过去每一天。
-    if (this.irrigated && state.irrigationSince < 0) state.irrigationSince = Time.date.timeStamp;
-    if (!this.irrigated) state.irrigationSince = -1;
+    if (this.irrigated && state.irrigation_since < 0) state.irrigation_since = Time.date.timeStamp;
+    if (!this.irrigated) state.irrigation_since = -1;
     while (state.day < today) {
       // 先结算这一天的早班，再结算随后的午夜。长时间跳过不能提前采到未来的水果。
       this.workShift(state.day);
@@ -595,7 +620,7 @@ class Orchard extends Module {
           const soil = state.soil[site][index];
           if (!tree) continue;
           const data = species[tree.species];
-          if (site === 'farm' && this.irrigated && state.irrigationSince < midnight.timeStamp) tree.moisture = moistureDays;
+          if (site === 'farm' && this.irrigated && state.irrigation_since < midnight.timeStamp) tree.moisture = moistureDays;
           const wasMature = tree.growth >= data.matureDays;
           if (tree.growth < data.matureDays) {
             if (tree.moisture > 0) tree.growth = Math.min(data.matureDays, tree.growth + (tree.fertiliser > 0 ? 2 : 1));
@@ -611,7 +636,7 @@ class Orchard extends Module {
             }
           }
           tree.moisture = Math.max(0, tree.moisture - 1);
-          if (tree.fertiliser > 0 && --tree.fertiliser === 0 && !V.backgroundTraits.includes('greenthumb')) soil.quality = soil.baseQuality;
+          if (tree.fertiliser > 0 && --tree.fertiliser === 0 && !V.backgroundTraits.includes('greenthumb')) soil.quality = soil.base_quality;
         }
       }
       state.day++;
@@ -632,22 +657,22 @@ class Orchard extends Module {
   private workShift(day: number): void {
     const worker = this.state.worker;
     const morning = day * 86400 + 8 * 3600;
-    if (!worker.hired || day <= worker.lastShift || morning > Time.date.timeStamp) return;
-    worker.lastShift = day;
-    if (morning < worker.paidFrom || morning >= worker.paidUntil || !V.per_npc?.deadwood_orchard_worker || !this.available('farm') || V.farm_assault) return;
+    if (!worker.hired || day <= worker.last_shift || morning > Time.date.timeStamp) return;
+    worker.last_shift = day;
+    if (morning < worker.paid_from || morning >= worker.paid_until || !V.per_npc?.deadwood_orchard_worker || !this.available('farm') || V.farm_assault) return;
     const npc = V.per_npc.deadwood_orchard_worker;
     const season = Time.getSeason(new window.DateTime(morning));
     const report: OrchardWorkerReport = {
       day,
       watered: 0,
       fertilised: 0,
-      noFertiliser: false,
+      no_fertiliser: false,
       kept: {},
-      irrigation: this.irrigated && this.state.irrigationSince <= morning,
+      irrigation: this.irrigated && this.state.irrigation_since <= morning,
       // 跨过八点的 pass 会在结束时结算。只使用当天早班时段的雨水，不倒填历史天气。
       rain: day === Math.floor(Time.date.timeStamp / 86400) && Time.date.hour === 8 && Weather.precipitation === 'rain',
-      offSeason: false,
-      leftFruit: false
+      off_season: false,
+      left_fruit: false
     };
     this.state.farm.forEach((tree, index) => {
       if (!tree || !this.cleared('farm', index)) return;
@@ -657,17 +682,17 @@ class Orchard extends Module {
       }
       if (worker.fertilise && tree.fertiliser === 0 && (this.stage(tree) < 2 || (window.currentSkillValue('tending') >= 400 && this.state.soil.farm[index].quality < 4))) {
         if (this.fertilise(tree, this.state.soil.farm[index])) report.fertilised++;
-        else if (V.fertiliser.current < 1) report.noFertiliser = true;
+        else if (V.fertiliser.current < 1) report.no_fertiliser = true;
       }
-      if (this.stage(tree) === 2 && !species[tree.species].fruitSeasons.includes(season)) report.offSeason = true;
-      if (!worker.pick && this.ripe(tree)) report.leftFruit = true;
+      if (this.stage(tree) === 2 && !species[tree.species].fruitSeasons.includes(season)) report.off_season = true;
+      if (!worker.pick && this.ripe(tree)) report.left_fruit = true;
       if (worker.pick && this.ripe(tree)) {
         const receipt = this.collect('farm', index);
         for (const [type, amount] of Object.entries(receipt?.kept ?? {})) report.kept[type as OrchardFruit] = (report.kept[type as OrchardFruit] ?? 0) + amount!;
       }
     });
-    npc.orchardReport = report;
-    npc.orchardShifts = (npc.orchardShifts ?? 0) + 1;
+    npc.orchard_report = report;
+    npc.orchard_shifts = (npc.orchard_shifts ?? 0) + 1;
   }
 
   /** 返回成功时的耗时。无效操作不扣材料、不增加技能、不推进时间。 */
@@ -684,7 +709,7 @@ class Orchard extends Module {
       const work = Math.min(clearingStepMinutes, clearing[index]);
       const minutes = helped ? work / 2 : work;
       clearing[index] -= work;
-      if (helped) this.state.helpDay = Math.floor(Time.date.timeStamp / 86400);
+      if (helped) this.state.help_day = Math.floor(Time.date.timeStamp / 86400);
       this.notice = { tool, helped, clearing: clearing[index] };
       return minutes;
     }
@@ -706,7 +731,7 @@ class Orchard extends Module {
       case 'water':
         if (!tree || tree.moisture > 0) return 0;
         tree.moisture = moistureDays;
-        if (helped) this.state.helpDay = Math.floor(Time.date.timeStamp / 86400);
+        if (helped) this.state.help_day = Math.floor(Time.date.timeStamp / 86400);
         this.notice = { tool, helped };
         return helped ? 2.5 : 5;
       case 'fertiliser':
@@ -714,7 +739,7 @@ class Orchard extends Module {
       case 'harvest': {
         const receipt = this.collect(site, index);
         if (!receipt) return 0;
-        if (helped) this.state.helpDay = Math.floor(Time.date.timeStamp / 86400);
+        if (helped) this.state.help_day = Math.floor(Time.date.timeStamp / 86400);
         this.notice = { ...receipt, helped };
         return helped ? 5 : 10;
       }
@@ -722,7 +747,7 @@ class Orchard extends Module {
         if (!tree || helped) return 0;
         plots[index] = null;
         // 铲树不能重新抽取这块土地的基础质量。
-        if (!V.backgroundTraits.includes('greenthumb')) soil.quality = soil.baseQuality;
+        if (!V.backgroundTraits.includes('greenthumb')) soil.quality = soil.base_quality;
         return 15;
     }
   }

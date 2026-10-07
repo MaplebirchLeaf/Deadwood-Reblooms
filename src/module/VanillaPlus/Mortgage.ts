@@ -55,7 +55,7 @@ class Mortgage {
 
   public constructor(
     private readonly finance: Finance,
-    private readonly onAuction: (property_id: string, debt: number, day: number) => void
+    private readonly onAuction: (propertyId: string, debt: number, day: number) => void
   ) {}
 
   public get current(): MortgageState | null {

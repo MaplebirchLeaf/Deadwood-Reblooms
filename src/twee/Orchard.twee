@@ -50,7 +50,7 @@
       <<print $per_npc.deadwood_orchard_worker.name>><<lanSwitch ' looks after your orchard.' '受雇照料你的果园。'>><br>
     <</if>>
     <<if $_orchard.workerActive>>
-      <<set $_paidUntil to new DateTime($_worker.paidUntil)>>
+      <<set $_paidUntil to new DateTime($_worker.paid_until)>>
       <<lanSwitch 'Paid until ' '薪资已预付至 '>><span class='gold'><<print getFormattedDate($_paidUntil)>></span> <<ampm $_paidUntil.hour $_paidUntil.minute>><<lanSwitch '.' '。'>><br>
     <<else>>
       <span class='red'><<lanSwitch 'The paid week has ended. Your worker will not work until you pay again.' '预付的薪期已经结束。续付薪资前，雇工不会继续干活。'>></span><br>
@@ -92,7 +92,7 @@
       <<if $_report.fertilised gt 0>>
         <<lanSwitch 'Bags of fertiliser used: ' '使用肥料：'>><span class='green'><<print $_report.fertilised>></span><<lanSwitch '.' ' 袋。'>><br>
       <</if>>
-      <<if $_report.noFertiliser>>
+      <<if $_report.no_fertiliser>>
         <span class='gold'><<lanSwitch 'Fertiliser ran out before every tree could be tended.' '肥料已经用完，有些树还没补肥。'>></span><br>
       <</if>>
       <<if Object.values($_report.kept).some(amount => amount gt 0)>>
@@ -280,7 +280,7 @@
   <<set _orchardReport to maplebirch.get('Orchard').workerReport>>
   <<language>>
     <<option 'EN'>>
-      <<if $per_npc.deadwood_orchard_worker.orchardShifts lt 3>><<person>> puts the watering can down when you approach. "I've been round the trees. Come and have a look."
+      <<if $per_npc.deadwood_orchard_worker.orchard_shifts lt 3>><<person>> puts the watering can down when you approach. "I've been round the trees. Come and have a look."
       <<else>><<person>> greets you by name. "Come to check on the trees?" <<He>> tucks a pair of gloves into <<his>> pocket and walks along the row with you.<</if>>
       <br><br>
       <<if _orchardReport.irrigation>>"Water's reaching the trees fine. I checked the channels this morning."
@@ -289,19 +289,19 @@
       <<else>>"Nothing needed watering this morning. I checked the soil by the roots."<</if>>
       <br><br>
       <<if Object.values(_orchardReport.kept).some(amount => amount gt 0)>>"I've put the ripe fruit away. You can check what came in." <<He>> points to the work record.
-      <<elseif _orchardReport.leftFruit>>"Some fruit is ripe. I've left it on the trees for you, like you asked. Don't leave it too long."
+      <<elseif _orchardReport.left_fruit>>"Some fruit is ripe. I've left it on the trees for you, like you asked. Don't leave it too long."
       <<else>>"No fruit to bring in this morning. I'll keep an eye on it."<</if>>
-      <<if _orchardReport.offSeason>>
+      <<if _orchardReport.off_season>>
         <br><br>"Some of these trees are out of season. Don't expect as much from them until the weather turns."
       <</if>>
       <<if _orchardReport.fertilised gt 0>>
         <br><br>"I've spread the fertiliser where it was due. That should last about a month."
       <</if>>
-      <<if _orchardReport.noFertiliser>>
+      <<if _orchardReport.no_fertiliser>>
         <br><br><span class='gold'>"We're out of fertiliser. I couldn't finish all the trees, but I've kept them watered."</span>
       <</if>>
     <<option 'CN'>>
-      <<if $per_npc.deadwood_orchard_worker.orchardShifts lt 3>><<person>>见你走来，放下水壶。“树都看过一遍了。来看看吧。”
+      <<if $per_npc.deadwood_orchard_worker.orchard_shifts lt 3>><<person>>见你走来，放下水壶。“树都看过一遍了。来看看吧。”
       <<else>><<person>>叫着你的名字打招呼。“来看看树？”<<he>>把手套塞进口袋，陪你沿着树行走过去。<</if>>
       <br><br>
       <<if _orchardReport.irrigation>>“水已经通到果树这边了，我早上检查过水道。”
@@ -310,15 +310,15 @@
       <<else>>“早上没什么需要浇水的，我检查过树根旁的土。”<</if>>
       <br><br>
       <<if Object.values(_orchardReport.kept).some(amount => amount gt 0)>>“成熟的果子都收好了，你可以看看收了多少。”<<he>>指了指工作记录。
-      <<elseif _orchardReport.leftFruit>>“树上有熟果子，按你说的给你留着了。别放太久。”
+      <<elseif _orchardReport.left_fruit>>“树上有熟果子，按你说的给你留着了。别放太久。”
       <<else>>“早上还没果子可收，我再留意着。”<</if>>
-      <<if _orchardReport.offSeason>>
+      <<if _orchardReport.off_season>>
         <br><br>“有几种树现在不当季。等天气转过来之前，别指望它们结太多。”
       <</if>>
       <<if _orchardReport.fertilised gt 0>>
         <br><br>“该补肥的已经补上了，差不多能管一个月。”
       <</if>>
-      <<if _orchardReport.noFertiliser>>
+      <<if _orchardReport.no_fertiliser>>
         <br><br><span class='gold'>“肥料用完了，有几棵还没补上。水都浇过了，先不用担心。”</span>
       <</if>>
   <</language>><<pass 5>><br><br>

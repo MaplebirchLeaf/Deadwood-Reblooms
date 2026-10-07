@@ -468,7 +468,7 @@ class Finance {
     const robin = this.core.get('Robin') as Robin | undefined;
     return [
       { id: 'shop', eligible: !!robin?.available && V.RobinExpansion.shopStage !== 'none' },
-      { id: 'orchard', eligible: !!this.core.get('Orchard')?.state.unlocked.farm && (V.Orchard.salesIncome > 0 || V.Orchard.contractsCompleted > 0) }
+      { id: 'orchard', eligible: !!this.core.get('Orchard')?.state.unlocked.farm && (V.Orchard.sales_income > 0 || V.Orchard.contracts_completed > 0) }
     ];
   }
 
