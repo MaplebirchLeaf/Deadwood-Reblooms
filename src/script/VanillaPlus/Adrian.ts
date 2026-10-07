@@ -45,7 +45,18 @@ export default function Adrian(maplebirch: typeof window.maplebirch): void {
     'CustomLinkZone',
     {
       widget: [-1, 'deadwood-reblooms-adrian-counter-link'],
-      passage: ['Deadwood Reblooms Financial Centre Bank', 'Deadwood Reblooms Property Office', 'Deadwood Reblooms Financial Centre Securities']
+      passage: [
+        'Deadwood Reblooms Financial Centre Bank',
+        'Deadwood Reblooms Property Office',
+        'Deadwood Reblooms Financial Centre Securities',
+        'Deadwood Reblooms Financial Centre Securities Account',
+        'Deadwood Reblooms Financial Centre Securities Trading',
+        'Deadwood Reblooms Financial Centre Margin',
+        'Deadwood Reblooms Business Loan',
+        'Deadwood Reblooms Shop Investment',
+        'Deadwood Reblooms Property Manager',
+        'Deadwood Reblooms Property Collateral'
+      ]
     },
     { widget: [-1, 'deadwood-reblooms-adrian-break-link'], passage: 'Deadwood Reblooms Financial Centre' }
   );

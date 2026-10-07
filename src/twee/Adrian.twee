@@ -53,6 +53,25 @@
 	<<set $_state to $VanillaPlus.adrian>>
 	<<set $_bank to $VanillaPlus.finance.bank>>
 	<<set $_location to maplebirch.npc.Schedule.get('Adrian').location>>
+	<<set $_service to {
+		'Deadwood Reblooms Property Office': 'financial_centre_property',
+		'Deadwood Reblooms Property Manager': 'financial_centre_property',
+		'Deadwood Reblooms Property Collateral': 'financial_centre_property',
+		'Deadwood Reblooms Financial Centre Securities': 'financial_centre_securities',
+		'Deadwood Reblooms Financial Centre Securities Account': 'financial_centre_securities',
+		'Deadwood Reblooms Financial Centre Securities Trading': 'financial_centre_securities',
+		'Deadwood Reblooms Financial Centre Margin': 'financial_centre_securities',
+		'Deadwood Reblooms Shop Investment': 'financial_centre_securities',
+		'Deadwood Reblooms Business Loan': 'financial_centre',
+		'Deadwood Reblooms Financial Centre Bank': 'financial_centre'
+	}[$passage]>>
+	<<set $_working to ['financial_centre', 'financial_centre_property', 'financial_centre_securities'].includes($_location)>>
+	<<if $_working and $_service>>
+		<<set $_state.service_location to $_service>>
+		<<set $_location to $_service>>
+	<<elseif $_working and $passage is 'Deadwood Reblooms Adrian Conversation'>>
+		<<set $_location to $_state.service_location>>
+	<</if>>
 	<<set _adrianContext to {
 		state: $_state,
 		bank: $_bank,
@@ -66,7 +85,8 @@
 		goodAccount: $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0 and $VanillaPlus.finance.collection.amount is 0
 	}>>
 	<<set _adrianContext.present to Boolean(_adrianContext.desk) or $_location is 'financial_centre_break'>>
-	<<set _adrianContext.canChat to _adrianContext.present and $_state.lastChat isnot Time.days>>
+	<<if $_working and $_service>><<set _adrianContext.desk to $passage>><</if>>
+	<<set _adrianContext.canChat to _adrianContext.present and $_state.lastChat isnot Time.days and $combat isnot 1 and $exposed lte 0 and !$worn.face.type.includes('gag')>>
 	<<set _adrianContext.careerAvailable to _adrianContext.present and ($_state.career gt 0 or ($_state.visits gte 3 and $_bank.opened))>>
 	<<set _adrianContext.businessReady to _adrianContext.goodAccount and _adrianContext.netDeposit gte 2500000>>
 <</widget>>
@@ -97,7 +117,7 @@
 
 <<widget 'deadwood-reblooms-adrian-greeting'>>
 	<<deadwood-reblooms-adrian-context>>
-	<<if _adrianContext.location is (_args[0] or 'financial_centre')>>
+	<<if _adrianContext.present and _adrianContext.location isnot 'financial_centre_break'>>
 		<<set $_new to C.npc.Adrian.init isnot 1>>
 		<<if _adrianContext.state.lastVisit isnot Time.days>>
 			<<set _adrianContext.state.lastVisit to Time.days>>
@@ -116,8 +136,8 @@
 			<</language>>
 		<<elseif (_adrianContext.location is 'financial_centre_securities')>>
 			<<language>>
-				<<option 'EN'>>Adrian stands beside the securities clerk, pointing out the account-transfer forms. "Banking on this side. Trades on that one." The market board flickers behind them.
-				<<option 'CN'>>阿德里安站在证券职员旁，指出账户转账的表格。“这一侧办理银行对接。交易在那边。”身后的行情板闪动着。
+				<<option 'EN'>>Adrian stands beside the securities clerk with your account forms. "We can check the transfers, fees and your exposure together. Then I'll pass the order to the desk." The market board flickers behind them.
+				<<option 'CN'>>阿德里安带着账户表格，站在证券职员旁。“划款、费用和持仓风险，我们可以一起核对。委托再交给柜台办理。”身后的行情板闪动着。
 			<</language>>
 		<<elseif _adrianContext.state.career is 5>>
 			<<language>>
@@ -151,10 +171,10 @@
 
 <<widget 'deadwood-reblooms-adrian-counter-link'>>
 	<<deadwood-reblooms-adrian-context>>
-	<<if _adrianContext.desk and passage() is _adrianContext.desk and _adrianContext.canChat>>
+	<<if _adrianContext.desk and $passage is _adrianContext.desk and _adrianContext.canChat>>
 		<<socialiseicon 'ask'>><<lanLink ['Talk to Adrian (0:05)', '与阿德里安聊聊 (0:05)'] 'Deadwood Reblooms Adrian Conversation'>><</lanLink>><br>
 	<</if>>
-	<<if _adrianContext.desk and passage() is _adrianContext.desk>>
+	<<if _adrianContext.desk and $passage is _adrianContext.desk>>
 	  <<deadwood-reblooms-adrian-career-link>>
 	<</if>>
 <</widget>>
@@ -196,10 +216,22 @@
 		  <<set _adrianConversation.ownsHome to true>><<break>>
 		<</if>>
 	<</for>>
-	<<if _adrianContext.bank.credit_missed_payments gt 0 or _adrianContext.bank.loan_missed_payments gt 0>>
+	<<if _adrianContext.bank.credit_missed_payments gt 0 or _adrianContext.bank.loan_missed_payments gt 0 or ($VanillaPlus.finance.collection.amount gt 0 and $VanillaPlus.finance.collection.source isnot 'margin')>>
 		<<set _adrianConversation.topic to 'overdue'>>
 	<<elseif $pain gte 50 or $stress gte 600>>
 		<<set _adrianConversation.topic to 'concern'>>
+	<<elseif $VanillaPlus.finance.collection.amount gt 0>>
+		<<set _adrianConversation.topic to 'margin_debt'>>
+	<<elseif _adrianContext.location is 'financial_centre' and maplebirch.get('LifeSimulation') and $LifeSimulation?.casino.statistics.bank_day gte Time.days - 1 and ($LifeSimulation.casino.statistics.bank_in or $LifeSimulation.casino.statistics.bank_out)>>
+		<<set _adrianConversation.topic to 'casino_transfer'>>
+	<<elseif _adrianContext.location is 'financial_centre_securities' and ($VanillaPlus.finance.brokerage.holdings.RDS gt 0 or $VanillaPlus.finance.brokerage.margin.positions.some(position => position.symbol === 'RDS')) and _adrianContext.state.visits % 2 is 0>>
+		<<set _adrianConversation.topic to 'shop_shares'>>
+	<<elseif _adrianContext.location is 'financial_centre_securities' and maplebirch.get('Robin') and $RobinExpansion?.investment.share gt 0 and _adrianContext.state.visits % 2 is 0>>
+		<<set _adrianConversation.topic to 'partnership'>>
+	<<elseif _adrianContext.location is 'financial_centre' and $VanillaPlus.finance.bank.loan_project>>
+		<<set _adrianConversation.topic to 'business_loan'>>
+	<<elseif _adrianContext.location is 'financial_centre_property' and maplebirch.get('VanillaPlus').realEstate.manager>>
+		<<set _adrianConversation.topic to 'management'>>
 	<<elseif (_adrianContext.location is 'financial_centre_property')>>
 		<<set _adrianConversation.topic to 'property'>>
 	<<elseif (_adrianContext.location is 'financial_centre_securities')>>
@@ -217,6 +249,36 @@
 	<<set C.npc.Adrian.intro to 1>>
 	<<pass 5>>
 	<<switch _adrianConversation.topic>>
+		<<case 'margin_debt'>>
+			<<language>>
+				<<option 'EN'>>Adrian opens the recovery notice. "The position is closed, but <span class='red'>this balance hasn't gone away</span>. Was it a price gap?" <<He>> moves the payment dates beside the statement. "Let's check what is due before you put more money into another trade."
+				<<option 'CN'>>阿德里安展开追偿通知。“持仓已经平掉了，可<span class='red'>这笔欠款还在</span>。遇上跳空了？”<<He>>把付款日期放到账单旁。“先看清哪些钱到期，再考虑下一笔交易吧。”
+			<</language>>
+		<<case 'casino_transfer'>>
+			<<language>>
+				<<option 'EN'>>Adrian turns the statement towards you. "A transfer through the gambling room's cashier. Does this amount look right?" <<He>> waits for you to check. "<span class='blue'>It tells me what moved through the account, not whether you won.</span> Keep the receipt, particularly if you've also been paying in cash."
+				<<option 'CN'>>阿德里安把流水转向你。“有一笔经过赌馆柜台的转账，金额对吗？”<<He>>等你核对。“<span class='blue'>流水只告诉我账户收付了多少，可没写你输还是赢。</span>把收据留好，尤其是还用过现金的时候。”
+			<</language>>
+		<<case 'shop_shares'>>
+			<<language>>
+				<<option 'EN'>>Adrian puts the drinks-shop quote beside your holdings. "You know the person running this one." <<He>> pauses before continuing. "But <span class='blue'>knowing Robin doesn't stop the price falling</span>. A good day at the counter and a good day on the market aren't always the same thing. Check whether this is a share purchase, borrowed shares, or your separate partnership agreement."
+				<<option 'CN'>>阿德里安把饮品店的报价放在你的持仓旁。“这家的经营者，你倒是认识。”<<He>>顿了顿，又说：“可<span class='blue'>认识罗宾也拦不住股价下跌</span>。店里今天生意好，行情也不一定就好。先看清这是普通买股、融券，还是另签的合伙协议。”
+			<</language>>
+		<<case 'partnership'>>
+			<<language>>
+				<<option 'EN'>>Adrian puts your shop agreement beside the account statement. "Robin keeps control. Your share gives you a claim on distributions, not the till." <<He>> checks the signatures. "<span class='blue'>Keep the loan receipts separate.</span> If you decide to leave, the shop needs money to buy you out. A valuation isn't cash in the account."
+				<<option 'CN'>>阿德里安把店铺协议放到账户流水旁。“经营还是由罗宾做主。你的份额可以参与分红，可不代表收银机里的钱都归你。”<<He>>核对了一遍签名。“<span class='blue'>借款收据要分开放。</span>想退出的时候，店里得有钱回购。估值可不是账户里的现金。”
+			<</language>>
+		<<case 'business_loan'>>
+			<<language>>
+				<<option 'EN'>>"How is the business getting on?" Adrian asks. <<He>> leaves a finger beside the next instalment. "The money can go into stock, wages or equipment. <span class='blue'>The repayment date stays the same if sales are slow.</span> Bring the receipts next time; we'll see where the money went."
+				<<option 'CN'>>“生意做得怎么样？”阿德里安问，手指停在下一期还款旁。“进货、发工资、买设备，都可以用这笔钱。可<span class='blue'>生意冷清也不会让还款日期往后挪</span>。下次带上收据，我们一起看看钱花在哪儿了。”
+			<</language>>
+		<<case 'management'>>
+			<<language>>
+				<<option 'EN'>>Adrian separates the managing agent's invoice from the rent receipt. "Someone is handling the calls for you now? Good. But check both pages." <<He>> points to the repair charge. "<span class='blue'>Management fees don't cover every repair</span>, and an empty property can still cost you money."
+				<<option 'CN'>>阿德里安把物业管理的账单与租金收据分开。“现在有人替你接电话了？挺好。不过，两张都看看。”<<He>>指着维修款。“<span class='blue'>管理费不是什么维修都包</span>，房子空着也可能照样花钱。”
+			<</language>>
 		<<case 'overdue'>>
 			<<language>>
 				<<option 'EN'>>Adrian lowers the voice usually used for account enquiries. "There's a missed payment on your account. I can go through the statement with you, if you'd like." The paper stays on your side of the glass. "<span class='blue'>I can't remove it.</span> I can make sure you know what you're being asked to pay."
@@ -309,6 +371,10 @@
 			<</if>>
 		<</lanLink>><br>
 		<<switch _adrianConversation.topic>>
+			<<case 'margin_debt' 'casino_transfer' 'business_loan'>><<set _adrianFollowup to ['Check the transfers and payment dates together', '一起核对收付与到期日']>>
+			<<case 'shop_shares'>><<set _adrianFollowup to ['Go through the drinks-shop holding', '核对饮品店的持仓']>>
+			<<case 'partnership'>><<set _adrianFollowup to ['Check the ownership and buyback clauses', '核对份额与回购条款']>>
+			<<case 'management'>><<set _adrianFollowup to ['Go through the managing agent’s charges', '核对物业管理的收费']>>
 			<<case 'overdue'>><<set _adrianFollowup to ['Go through the statement together', '一起核对账单']>>
 			<<case 'concern'>><<set _adrianFollowup to ['Sit down and catch your breath', '坐下缓口气']>>
 			<<case 'home' 'property'>><<set _adrianFollowup to ['Tell Adrian about your plans for the house', '聊聊你对房子的打算']>>
@@ -326,6 +392,26 @@
 				<</if>>
 				<<replace '#adrian-response'>>
 					<<switch _adrianConversation.topic>>
+						<<case 'margin_debt' 'casino_transfer' 'business_loan'>>
+							<<language>>
+								<<option 'EN'>>You move the receipt beside the statement. Adrian goes through the amounts with you, then writes the next payment date beneath them. "Keep these together. Ask me if a transfer doesn't match." <<glove 'Adrian'>>
+								<<option 'CN'>>你把收据放到账单旁。阿德里安陪你核对各笔金额，又把下一次付款日期写在下面。“放在一起吧。哪笔转账对不上，可以来问我。”<<glove 'Adrian'>>
+							<</language>>
+						<<case 'shop_shares'>>
+							<<language>>
+								<<option 'EN'>>Adrian separates the purchase receipt from the margin statement. "Here is what you own. Here is what you borrowed." <<He>> turns both towards you. "If the shop needs money next week, you don't want to discover that all yours is tied up in its shares." <<glove 'Adrian'>>
+								<<option 'CN'>>阿德里安把买股收据与保证金账单分开。“这边是你买下的，这边是你借的。”<<He>>把两张都转向你。“店里下周要用钱的时候，你可不想才发现自己的钱全压在它的股票里了。”<<glove 'Adrian'>>
+							<</language>>
+						<<case 'partnership'>>
+							<<language>>
+								<<option 'EN'>>Adrian marks the notice period and the buyback discount. "This is the part to discuss with Robin before you need the money." <<He>> leaves the agreement open for you. "It's easier to agree now than over an empty till." <<glove 'Adrian'>>
+								<<option 'CN'>>阿德里安标出了通知期限和回购折价。“这些要在急着用钱之前，先和罗宾谈好。”<<He>>把合同摊着留给你。“现在商量，总比对着空收银机争论容易。”<<glove 'Adrian'>>
+							<</language>>
+						<<case 'management'>>
+							<<language>>
+								<<option 'EN'>>You point out a maintenance charge. Adrian separates it from the management fee. "Two different jobs. Ask for the repair receipt as well." <<He>> puts a note on the file for the agent. <<glove 'Adrian'>>
+								<<option 'CN'>>你指着一笔维护费。阿德里安把它与管理费分开。“这是两件事。维修的收据也要拿到。”<<He>>在交给中介的档案上添了一张便条。<<glove 'Adrian'>>
+							<</language>>
 						<<case 'overdue'>>
 							<<language>>
 								<<option 'EN'>>Adrian puts the statement between you and points out the missed payment. "This one first. Then the next instalment is due here." <<He>> writes down the dates for you. <<glove 'Adrian'>>

@@ -151,7 +151,7 @@ class LifeSimulation extends Module {
     this.growth.progress = 0;
   }
 
-  /** 只由成功完成的训练调用；同日多个项目或重进页面不能重复累计。 */
+  /** 只由成功完成的训练调用，同日多个项目或重进页面不能重复累计。 */
   public trainBodyGrowth(activity: string, day: number): void {
     if (this.growth.mode !== 'gym' || !['weights', 'run', 'deck-run'].includes(activity) || !this.canTrainGrowth || day <= this.growth.training_day) return;
     if (day !== Time.days && day !== Time.days - 1) return;
@@ -176,7 +176,7 @@ class LifeSimulation extends Module {
     }
     this.growth.progress = Math.min(this.growthDuration, this.growth.progress + amount);
     if (this.growth.progress < this.growthDuration) return;
-    // 复用原版开局的体型结算，不维护另一份上限表；找不到时保留进度。
+    // 复用原版开局的体型结算，不维护另一份上限表，找不到时保留进度。
     const calculation = this.core.SugarCube.Story.get('Widgets variablesStart2').text.match(/<<switch \$bodysize>>[\s\S]*?<<\/switch>>/)?.[0];
     if (!calculation) return;
     const oldMaximum = V.physiquesize;

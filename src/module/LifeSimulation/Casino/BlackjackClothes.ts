@@ -29,11 +29,11 @@ export interface BlackjackClothesState {
 
 const storeLocation = 'Deadwood Blackjack';
 // 赌注只用上装、下装和两层内衣，顺序沿用伦恩牌局“由外至内”。原版还会先赌 over_upper／over_lower，
-// 但 Named NPC 的衣物没有这两层，只有 PC 存在；家局不为 NPC 凭空增加栏位，也不收走衣物，离桌时穿回。
+// 但 Named NPC 的衣物没有这两层，只有 PC 存在，家局不为 NPC 凭空增加栏位，也不收走衣物，离桌时穿回。
 const slots = ['upper', 'lower', 'under_upper', 'under_lower'] as const;
 const passages = ['Deadwood Reblooms Life Simulation Blackjack', 'Deadwood Reblooms Life Simulation Blackjack Rules'];
 
-/** 连衣服及其附属部分只算一件；任何相连的锁定衣物都会保护整件。 */
+/** 连衣服及其附属部分只算一件，任何相连的锁定衣物都会保护整件。 */
 function clothingGroups(clothes: ClothingMap): string[][] {
   const groups: string[][] = slots.filter(slot => clothes[slot]?.name && clothes[slot]?.name !== 'naked').map(slot => [slot]);
   const join = (first: string, second: string) => {
@@ -156,7 +156,7 @@ export default class BlackjackClothes {
     this.core.SugarCube.Wikifier.wikifyEval(`<<storeon '${storeLocation}'>><<exposure>>`);
   }
 
-  /** getState 只向本类提供家局脱衣模式；其他页面仍使用角色正常衣柜。 */
+  /** getState 只向本类提供家局脱衣模式，其他页面仍使用角色正常衣柜。 */
   public apply(name: string, clothes: WardrobeItem): void {
     if (!passages.includes(this.core.passage.title)) return;
     const npc = this.getState()?.npcs[name];

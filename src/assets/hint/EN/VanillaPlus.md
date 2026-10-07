@@ -5,7 +5,7 @@ Enable **VanillaPlus** and reload. Banking and property do not require attribute
 | Goal                   | Where                                          | Prepare first                                                       |
 | ---------------------- | ---------------------------------------------- | ------------------------------------------------------------------- |
 | Pay merchants by card  | Financial centre bank counter                  | Account, card, and bank funds or available credit                   |
-| Buy property           | Financial centre property counter              | Bank funds, or eligible deposit, fee and one weekly-payment reserve |
+| Buy property           | Financial centre property counter              | Bank funds, or eligible deposit, fee and capped repayment reserve   |
 | Furnish an owned home  | Furniture-shop entrance → owned-home furniture | A purchased usable home, selected before its furniture category     |
 | Invite a love interest | Their current vanilla location                 | Love-interest selection, usable bed, capacity, no tenancy or freeze |
 | Check bills            | Journal finance section                        | Next game date, days remaining, balances and overdue status         |
@@ -76,15 +76,22 @@ Markets respond to farm progress and raids, Ocean Breeze Cafe prices and expansi
 
 ### Shares, financing and futures
 
-Open a brokerage account and transfer funds at the **securities desk**. Ordinary shares show cost basis, realised profit, distributions and recent quotes. Buying and selling charge a fee; weekly distributions enter brokerage cash.
+Open a brokerage account and transfer funds at the **securities desk**. The shares page shows quotes, cost basis and profit or loss. The finance journal summarises the day’s price movements. Buying and selling charge a fee, and weekly distributions enter brokerage cash.
 
-| Product         | How to trade                                                 | Settlement                                            |
-| --------------- | ------------------------------------------------------------ | ----------------------------------------------------- |
-| Ordinary shares | Choose a security and quantity; sell part or all later       | Fully funded; purchase fees enter cost basis          |
-| Financed shares | Choose shares and leverage                                   | Deposit margin; borrowed funds accrue interest daily  |
-| Futures         | Choose a security or the town index, then open long or short | Cash settlement after fourteen days, or close earlier |
+| Product                    | How to trade                                           | Settlement                                                                                                      |
+| -------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| Ordinary shares            | Choose a security and quantity; sell part or all later | Fully funded; purchase fees enter cost basis                                                                    |
+| Financed shares            | Choose shares and leverage                             | Deposit margin; borrowed funds accrue interest daily                                                            |
+| Borrowed shares sold short | Choose the sell direction                              | Sale proceeds remain locked; fees follow current share value and dividends are compensated; fourteen-day expiry |
+| Futures                    | Choose a company security, then open long or short     | Cash settlement after fourteen days, or close earlier                                                           |
 
-<span class="red">Leverage magnifies losses as well as gains. Positions are closed automatically if equity runs too low.</span> Gap losses exceeding margin first consume idle brokerage cash and bank deposits. Any remaining amount becomes recovery debt. Check the quote before opening a position to see the margin, opening fee and total funds required. Add margin from the positions page; recent settlements distinguish voluntary closes, expiry and forced liquidation.
+<span class="red">Leverage magnifies losses as well as gains. Positions are closed automatically if equity runs too low.</span> Gap losses exceeding margin first consume idle brokerage cash and bank deposits. Any remaining amount becomes recovery debt. Check the quote before opening a position to see the margin, opening fee and total funds required. Add margin from the positions page; closing records show the reason and profit or loss for voluntary closes, expiry and forced liquidation.
+
+Financed shares offer **2×, 3×, 5×, 10×, 20× or 50×**; futures offer **5×, 10×, 20×, 50×, 100× or 200×**. Fees apply to the full traded value and financing interest accrues on borrowed funds. At 200×, a 1% move equals twice the initial margin; a gap against you can consume that margin and create recovery debt. Futures use the company securities listed at the desk.
+
+Most trading days bring small price changes, with occasional 20%–40% gaps. Prices have no fixed floor or ceiling. Frequent trading also incurs fees and financing interest. <span class="red">A sharp fall can consume all your margin and leave a debt.</span>
+
+Set stop-loss and take-profit orders from the positions page. Triggers use a percentage of the deposit when submitted; zero cancels the selected trigger. Topping up does not alter existing trigger amounts. Instructions are checked with each daily quote, with forced liquidation taking priority. A gap settles at the actual price, so a stop does not guarantee a maximum loss.
 
 ### Business borrowing and recovery debt
 
@@ -94,7 +101,7 @@ Recovery debt appears in the finance journal with its deadline. Pay it from bank
 
 ### Property running costs and steps
 
-Outright purchases use bank deposits. A mortgage requires a 20% deposit, a 2% fee, and one weekly payment reserved in the bank. Credit may cover the deposit shortfall, but not the bank fee or reserve. Every non-rented, unfrozen home remains usable, and the orphanage room stays available.
+Outright purchases use bank deposits. A mortgage requires a 20% deposit, a 2% fee, and a bank reserve equal to the lower of one weekly payment or 5% of the price. Credit may cover the deposit shortfall, but not the bank fee or reserve. Every non-rented, unfrozen home remains usable, and the orphanage room stays available.
 
 | Home                        |    Price | Layout and use                                                                                                |
 | --------------------------- | -------: | ------------------------------------------------------------------------------------------------------------- |
@@ -104,7 +111,7 @@ Outright purchases use bank deposits. A mortgage requires a 20% deposit, a 2% fe
 | Cliff Street sea-view house | £400,000 | Two floors, upstairs sea-view nook and balcony. Salt wind makes planting unsuitable                           |
 | Danube Street manor         | £600,000 | Three floors, guest bedroom, conservatory, walled garden, and upper balcony. Two co-resident places           |
 
-1. Choose a property and full payment or mortgage at the counter. Choose a mortgage term of 90, 180, 365 or 730 days; the default is 365 days. You can hold one mortgage at a time, with **0.35% weekly interest**. Credit-funded deposit gaps incur cash-advance fees and cannot replace the fee or payment reserve held in the bank.
+1. Choose a property and full payment or mortgage at the counter. Purchase mortgages and property-backed cash loans offer **7, 30, 60 or 90 days**, defaulting to 30. Weekly interest is **0.20%, 0.25%, 0.30% or 0.35%**, respectively, and stays fixed after signing. You can hold one mortgage at a time. Refresh the quote after choosing a term. Credit-funded deposit gaps incur cash-advance fees and cannot replace the fee or payment reserve held in the bank.
 2. Enter from that property's street. Any owned, unrented and unfrozen home can be used. The orphanage remains available.
 3. At the furniture-shop entrance, select owned-home furniture and the target property before selecting beds, tables, chairs, desks, wardrobes, ornaments or miscellaneous items. Check the property name so you do not confuse orphanage upgrades with owned-home upgrades.
 4. Use the property counter for tenancy, renovation, repairs or auctions. End a tenancy before using the property as a normal home again.
@@ -118,9 +125,15 @@ Outright purchases use bank deposits. A mortgage requires a 20% deposit, a 2% fe
 | Cliff Street sea-view home | £420               | 1                        |
 | Danube Street manor        | £630               | 2                        |
 
-Maintenance is **0.105% of price weekly** and condition falls by one weekly. Renting requires condition at least 50. Restoring one condition point costs 0.05% of price. Each renovation costs 5%, with three levels maximum and 60% additional base rent per level. Actual rent also depends on condition.
+Maintenance is **0.105% of price weekly** and condition falls by one weekly. Renting requires condition at least 50. Restoring one condition point costs 0.05% of price. The three renovations cost 5%, 10% and 15% of the price, respectively, with three levels maximum and 20% additional base rent per level. Actual rent also depends on condition.
 
-Voluntary auctions do not pay immediately. They settle after seven days at 75% of listed price. Overdue notices, freezes and forced auctions have separate stages. Frozen homes cannot be entered. **Check arrears before the street entrance disappears.**
+Voluntary auctions do not pay immediately. They settle after seven days at 75% of the current appraisal. Overdue notices, freezes and forced auctions have separate stages. Frozen homes cannot be entered. **Check arrears before the street entrance disappears.**
+
+### Property management
+
+Hire a property manager at the property desk, using a debit card to authorise payments. The same person can manage several homes; assign each home separately after signing. Assignments start disabled. Ending the agreement cancels all assignments; returning brings back the same person. Weekly fees are 10% of the current assessed weekly rent, at least £5, including vacant and owner-occupied homes. Repairs cost extra at their existing prices. The manager follows up late rent after a week, repairs leaks and restores condition when it reaches 90. Missing staff, an unavailable debit card or insufficient funds suspend the affected work. They never borrow on credit, renovate, renew leases or purchase properties for you. Frozen and auction-listed properties suspend service; a sale cancels it.
+
+Listed rents range from 0.22% to 0.32% of the price per week, before upkeep, repairs, vacancy and tenant problems. Renovation and good condition improve earnings. Management reduces manual work at the cost of lower net returns. The counter displays the latest fee, repair bill and rent recovered.
 
 ### Property-backed borrowing and tenant messages
 
@@ -229,3 +242,17 @@ After the management appointment is confirmed at the counter, **new personal loa
 For a £1,000 seven-day loan, the first week's interest on the principal falls from £10.50 to £9.45. Other terms depend on outstanding debt, instalments and rounding to pennies. Multiplying the first week's interest by the number of weeks does not give the total interest.
 
 The work conversation and application page read current quotes directly from the finance system. The work conversation shows the standard rate, current rate and whether eligibility is suspended. The sidebar portrait and social avatar belong to their respective optional image modules.
+
+### Drinks-shop shares
+
+**RDS: Robin's Drinks Shop** enters the market once the shop opens. It supports ordinary share trading, financed purchases, short sales and futures. It is more volatile than most larger businesses and has a 0.03% weekly dividend rate. Opening, equipment upgrades, staffing changes and the first, fifth and tenth completed orchard orders affect quotes once per milestone. Repeated deliveries cannot raise the price indefinitely. Furniture and tailoring remain part of High Street Shopping Centre rather than separate listings. Securities trades are separate from the direct partnership agreement; they do not add to the shop reserve or transfer management control.
+
+**CSN: Connudatus Street Casino** is available with Life Simulation. **SCB: Connudatus Street Club** and **HSF: Harvest Street Pub** are also listed at the securities desk. The casino and club have higher daily volatility and a 0.03% weekly dividend rate. The PC's gambling results do not directly move the casino quote; chips and securities funds remain separate accounts.
+
+### Drinks-shop partnership and accounts
+
+Once Robin's shop opens, discuss a private partnership at the shop. With Robin's agreement and sufficient familiarity, sign a contract and use a debit card to buy a 10%–40% holding. Robin retains control. Contributions enter the business reserve; existing loans from the PC stay separate. The financial centre handles later contributions and buyback requests.
+
+Distributions are assessed every seven days from estimated operating surplus and ownership, protecting Robin's next rent first. Quiet trade, unexpected losses and closure may pay nothing and reduce the valuation. Give seven days' notice to exit. The holding is bought back at 75% of its value on the payment day, when spare funds permit. Otherwise the request waits, without automatic borrowing or a guaranteed return of capital.
+
+Mod statistics collect realised share and margin-trading results, dividends, partnership contributions and buybacks. Gambling results and chip exchanges are counted separately. Adrian can assist across the financial centre, with conversations responding to the desk, debts, partnership and actual bank transfers through the casino. Transfers do not reveal the results of cash gambling.

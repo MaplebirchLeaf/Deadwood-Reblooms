@@ -73,8 +73,47 @@
       <<lanSwitch 'Owned properties:' '已持有房产：'>>
       <span class='teal'><<= Object.values($VanillaPlus.real_estate?.owned ?? {}).filter(Boolean).length>></span><br>
       <<lanSwitch 'Cohabitants:' '同住者：'>>
-      <span class='teal'><<= Object.values($VanillaPlus.real_estate?.residents ?? {}).flat().length>></span><br><br>
+      <span class='teal'><<= Object.values($VanillaPlus.real_estate?.residents ?? {}).flat().length>></span><br>
+      <<if $VanillaPlus.finance.brokerage?.opened>>
+        <<language>><<option 'EN'>>Realised share-trading profit / loss: <<option 'CN'>>普通股票已实现盈亏：<</language>>
+        <span @class="$VanillaPlus.finance.brokerage.realised < 0 ? 'red' : 'green'"><<printmoney $VanillaPlus.finance.brokerage.realised>></span><br>
+        <<language>><<option 'EN'>>Stock dividends: <<option 'CN'>>股票累计分红：<</language>><<printmoney $VanillaPlus.finance.brokerage.dividends>><br>
+        <<language>><<option 'EN'>>Settled margin trades: <<option 'CN'>>保证金交易累计平仓：<</language>><span class='teal'><<= $VanillaPlus.finance.brokerage.margin.closed ?? 0>></span><br>
+        <<language>><<option 'EN'>>Margin-trading profit / loss after fees: <<option 'CN'>>保证金交易累计扣费盈亏：<</language>><<printmoney `$VanillaPlus.finance.brokerage.margin.realised ?? 0`>><br>
+      <</if>>
+      <<if maplebirch.get('Robin') and $RobinExpansion?.investment?.agreed>>
+        <<language>><<option 'EN'>>Shop partnership contributions: <<option 'CN'>>店铺合伙累计出资：<</language>><<printmoney $RobinExpansion.investment.invested_total>><br>
+        <<language>><<option 'EN'>>Partnership dividends / buybacks: <<option 'CN'>>合伙累计分红／回购所得：<</language>><<printmoney $RobinExpansion.investment.dividends_total>> / <<printmoney $RobinExpansion.investment.returned_total>><br>
+      <</if>><br>
     <</foldout>>
+  <</if>>
+
+  <<if maplebirch.get('Orchard') and $Orchard>>
+    <<foldout false '_deadwoodOrchardAccounts'>>
+      <span class='gold'><<language>><<option 'EN'>>Orchard accounts<<option 'CN'>>果园账目<</language>></span>
+      <<language>><<option 'EN'>>Sales income: <<option 'CN'>>累计销售收入：<</language>><<printmoney `$Orchard.sales_income ?? 0`>><br>
+      <<language>><<option 'EN'>>Staff wages: <<option 'CN'>>累计雇工工资：<</language>><<printmoney `$Orchard.worker_expenses ?? 0`>><br>
+      <<language>><<option 'EN'>>Seed purchases: <<option 'CN'>>累计种苗开销：<</language>><<printmoney `$Orchard.seed_expenses ?? 0`>><br>
+      <<language>><<option 'EN'>>Carrier fees: <<option 'CN'>>累计运输费：<</language>><<printmoney `$Orchard.haul_expenses ?? 0`>><br><br>
+    <</foldout>>
+  <</if>>
+
+  <<if maplebirch.get('LifeSimulation') and $LifeSimulation?.casino?.statistics>>
+    <<set _casinoStats to $LifeSimulation.casino.statistics>>
+    <<if _casinoStats.rounds or _casinoStats.exchanged>>
+      <<foldout false '_deadwoodCasinoAccounts'>>
+        <span class='gold'><<language>><<option 'EN'>>Gambling records<<option 'CN'>>赌馆输赢记录<</language>></span>
+        <<language>><<option 'EN'>>Completed hands and spins: <<option 'CN'>>已结算牌局与转轮：<</language>><span class='teal'><<= _casinoStats.rounds>></span><br>
+        <<language>><<option 'EN'>>Blackjack / three-card poker / hold'em / slots: <<option 'CN'>>二十一点／炸金花／德州扑克／老虎机：<</language>><span class='teal'><<= _casinoStats.games.blackjack ?? 0>> / <<= _casinoStats.games.three_card ?? 0>> / <<= _casinoStats.games.holdem ?? 0>> / <<= _casinoStats.games.slots ?? 0>></span><br>
+        <<language>><<option 'EN'>>Total staked / total paid, including returned stakes: <<option 'CN'>>累计下注／累计派彩（含取回的赌注）：<</language>><<printmoney _casinoStats.staked>> / <<printmoney _casinoStats.paid>><br>
+        <<language>><<option 'EN'>>Net profit / loss: <<option 'CN'>>累计净盈亏：<</language>><span @class="_casinoStats.paid < _casinoStats.staked ? 'red' : 'green'"><<printmoney `_casinoStats.paid - _casinoStats.staked`>></span><br>
+        <<language>><<option 'EN'>>Largest net win / loss in a hand or spin: <<option 'CN'>>单局最大净赢／净亏：<</language>><<printmoney _casinoStats.biggest_win>> / <<printmoney _casinoStats.biggest_loss>><br>
+        <<language>><<option 'EN'>>Longest winning streak in one night: <<option 'CN'>>一晚最长连胜：<</language>><span class='teal'><<= _casinoStats.best_streak>></span><br>
+        <<language>><<option 'EN'>>Highest net profit reached in one night: <<option 'CN'>>一晚最高净赢：<</language>><<printmoney _casinoStats.best_night_profit>><br>
+        <<language>><<option 'EN'>>Chips purchased / redeemed: <<option 'CN'>>累计换入／兑回筹码：<</language>><<printmoney _casinoStats.exchanged>> / <<printmoney _casinoStats.redeemed>><br>
+        <span class='blue'><<language>><<option 'EN'>>Exchanging chips and buying into a table do not count as winning or losing a hand. Records begin when this accounting is enabled.<<option 'CN'>>兑换筹码和买入牌桌不计入牌局输赢。记录从启用这项记账后开始累计。<</language>></span><br><br>
+      <</foldout>>
+    <</if>>
   <</if>>
 
   <<if (maplebirch.get('Robin') and $RobinExpansion)

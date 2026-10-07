@@ -46,7 +46,7 @@ class BirdTower extends Module {
     const init = () => {
       for (const child of this.all) this.init(child.childId);
     };
-    // 进入段落先补齐鹰崽数据；onBefore 覆盖同页孵化后立即推进时间的情况。
+    // 进入段落先补齐鹰崽数据，onBefore 覆盖同页孵化后立即推进时间的情况。
     this.core.dynamic.regStateEvent('gate', 'deadwood-birdtower-init', { priority: 10, action: init });
     this.core.dynamic.regStateEvent('gate', 'deadwood-birdtower-return', {
       extra: { passage: ['Bird Tower'] },
@@ -170,7 +170,7 @@ class BirdTower extends Module {
     return !this.state.daily.hunt_ask && !Weather.bloodMoon && this.at('otherNest').some(child => child.development.activity !== 'hunting');
   }
 
-  /** 请求同行时选择当前可出发的小鹰；在外狩猎的鹰崽不参与。 */
+  /** 请求同行时选择当前可出发的小鹰，在外狩猎的鹰崽不参与。 */
   public startHunt(mode: 'invite' | 'moor' = 'invite'): number[] {
     if (mode === 'invite' && !this.canInvite) return [];
     const ids = this.at('otherNest')
@@ -268,7 +268,7 @@ class BirdTower extends Module {
   public init(childId: number): void {
     const child = V.childRecords[childId] as HawkChild | undefined;
     if (child?.species !== 'hawk' || !childIsBorn(child)) return;
-    // 原版已有的小鹰按每天一顿建立喂食基线；收养的鹰崽从收养日起算。
+    // 原版已有的小鹰按每天一顿建立喂食基线，收养的鹰崽从收养日起算。
     const started = child.development.adopted_date ?? child.bornDate;
     child.development.fed_total ??= started == null ? 0 : Math.clamp(Math.ceil((Time.date.timeStamp - started) / TimeConstants.secondsPerDay), 0, 200);
     child.development.fed_daily ??= 0;
@@ -296,7 +296,7 @@ class BirdTower extends Module {
     child.development.trait = roll < 0.25 ? 'clumsy' : roll < 0.5 ? 'sympathy' : roll < 0.75 ? 'clever' : 'dominant';
   }
 
-  /** 按原版刷新间隔挑选活动；尚未归巢的独自狩猎不会被日常活动覆盖。 */
+  /** 按原版刷新间隔挑选活动，尚未归巢的独自狩猎不会被日常活动覆盖。 */
   public activity(childId: number): void {
     const child = V.childRecords[childId] as HawkChild | undefined;
     if (child?.species !== 'hawk' || !childIsBorn(child)) return;

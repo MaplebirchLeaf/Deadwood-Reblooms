@@ -44,7 +44,7 @@ function predict(seed: number, date: MeteorDate): MeteorShowerStored | null {
 }
 
 function strength(phase: number): number {
-  const progress = Math.min(1, Math.max(0, phase));
+  const progress = Math.clamp(phase, 0, 1);
   if (progress < 0.2) return progress / 0.2;
   if (progress > 0.8) return (1 - progress) / 0.2;
   return 1;

@@ -36,7 +36,7 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
   // 这些原版 Passage 能与 NPC 当面交谈。课堂入口还需由原版出勤状态与考试阶段筛选。
   maplebirch.tool.addTo(
     'BeforeLinkZone',
-    { widget: "deadwood-reblooms-property-invitation-link 'Robin' 'Deadwood Reblooms Property Invite Robin'", passage: 'Robin Options' },
+    { widget: "deadwood-reblooms-property-invitation-link 'Robin' 'Deadwood Reblooms Property Invite Robin'", passage: ["Robin's Room Entrance", 'Robin Options'] },
     { widget: "deadwood-reblooms-property-invitation-link 'Whitney' 'Deadwood Reblooms Property Invite Whitney'", passage: 'Whitney Home Enter' },
     { widget: "deadwood-reblooms-property-invitation-link 'Kylar' 'Deadwood Reblooms Property Invite Kylar'", passage: 'Kylar Library' },
     { widget: "deadwood-reblooms-property-invitation-link 'Kylar' 'Deadwood Reblooms Property Invite Kylar Courtyard'", passage: 'Kylar Courtyard' },

@@ -173,6 +173,10 @@ After being barred for cheating, you can quietly offer cash for one more chance 
 | Three card   | Ante £10 / £50 / £100                 | Play blind or seen, compare or show down                          |
 | Slot machine | £5 a play                             | Three of a kind pays, any two cherries returns the stake          |
 
+Three card uses the **unsuited 235 beats three of a kind** rule. A 235 that is not all one suit beats any three of a kind, but ranks as ordinary high card against other hands. A suited 235 remains a flush. At a multiplayer showdown, first eliminate three-of-a-kind hands beaten by an unsuited 235, then compare the remaining hands normally.
+
+Casino feats: **On a Roll** requires five consecutive profitable card hands in one night. A tie or loss breaks the streak. **A Good Night** requires a net casino profit of **£10,000** in one night. **Steady Hands** requires ten table disputes handled correctly while working as a dealer. Exchanging chips, returned stakes and watching do not count as profit. Slots do not count towards the card streak. Gambling totals and longest streaks appear in Mod Statistics.
+
 **Wren** may appear at the casino on Wednesday and Friday after 22:00. His dialogue reads the vanilla meeting flags but does not add new ones.
 
 ### Strip blackjack at your own property

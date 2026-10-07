@@ -24,6 +24,27 @@ export interface CasinoState {
   shifts: number;
   good_shifts: number;
   guest_night: number;
+  atmosphere: number;
+  statistics: {
+    rounds: number;
+    staked: number;
+    paid: number;
+    biggest_win: number;
+    biggest_loss: number;
+    games: Record<string, number>;
+    exchanged: number;
+    redeemed: number;
+    bank_day: number;
+    bank_in: number;
+    bank_out: number;
+    night: number;
+    night_profit: number;
+    best_night_profit: number;
+    win_streak: number;
+    best_streak: number;
+    wren_hands: number;
+    wren_profit: number;
+  };
   wren_visit: boolean;
   landry_visit: boolean;
   work_scenario: number | null;
@@ -50,6 +71,27 @@ export const DEFAULT_CASINO_STATE: CasinoState = {
   shifts: 0,
   good_shifts: 0,
   guest_night: -1,
+  atmosphere: 0,
+  statistics: {
+    rounds: 0,
+    staked: 0,
+    paid: 0,
+    biggest_win: 0,
+    biggest_loss: 0,
+    games: {},
+    exchanged: 0,
+    redeemed: 0,
+    bank_day: -1,
+    bank_in: 0,
+    bank_out: 0,
+    night: -1,
+    night_profit: 0,
+    best_night_profit: 0,
+    win_streak: 0,
+    best_streak: 0,
+    wren_hands: 0,
+    wren_profit: 0
+  },
   wren_visit: false,
   landry_visit: false,
   work_scenario: null,
@@ -160,7 +202,7 @@ class Casino {
   }
 
   private get table(): Blackjack | Holdem | ThreeCard | undefined {
-    switch (this.core.passage.title) {
+    switch (V.passage) {
       case 'Deadwood Reblooms Life Simulation Blackjack':
         return this.blackjack.state.venue === 'casino' ? this.blackjack : undefined;
       case 'Deadwood Reblooms Life Simulation Holdem':
@@ -210,7 +252,7 @@ class Casino {
     return (name === 'Wren' ? 6000 : 4000) + Math.floor(this.state.suspicion / 20) * 2000;
   }
 
-  /** 每手牌共用一次机会；线索不改变牌堆，分心只影响对手的下一次行动。 */
+  /** 每手牌共用一次机会，线索不改变牌堆，分心只影响对手的下一次行动。 */
   public attempt(action: 'peek' | 'distract', success: boolean): boolean {
     if (action === 'peek' ? !this.canPeek : action !== 'distract' || !this.canDistract) return false;
     const game = this.table!,
@@ -230,9 +272,11 @@ class Casino {
       else this.displease(1);
       return true;
     }
-    // 先按原牌桌规则弃牌结算，再设置禁玩；未下注的筹码仍能取回。
-    if (game === this.blackjack) Object.assign(game.state, { phase: 'done', result: 'loss', paid: true });
-    else if (game === this.threeCard) this.threeCard.act('fold');
+    // 先按原牌桌规则弃牌结算，再设置禁玩，未下注的筹码仍能取回。
+    if (game === this.blackjack) {
+      this.record('blackjack', game.state.bet, 0);
+      Object.assign(game.state, { phase: 'done', result: 'loss', paid: true });
+    } else if (game === this.threeCard) this.threeCard.act('fold');
     else this.holdem.act('fold');
     trick.result = 'caught';
     this.state.cheating_caught++;
@@ -276,11 +320,14 @@ class Casino {
     return method === 'bank' && this.bankAvailable && V.VanillaPlus.finance.bank.balance >= amount;
   }
 
-  /** 现金仍由 money 宏扣除；借记卡复用金融模块的便士接口。 */
+  /** 现金仍由 money 宏扣除，借记卡复用金融模块的便士接口。 */
   public exchange(amount: number, method: 'cash' | 'bank' = 'cash'): boolean {
     if (!this.canExchange(amount, method)) return false;
     if (method === 'bank' && this.finance!.payFromBankPennies(amount) !== 'ok') return false;
-    return this.adjustChips(amount);
+    if (!this.adjustChips(amount)) return false;
+    this.state.statistics.exchanged += amount;
+    if (method === 'bank') this.bankTransfer(amount, false);
+    return true;
   }
 
   /** 下注与领奖共用账户，不允许透支或产生小数便士。 */
@@ -302,14 +349,56 @@ class Casino {
     }
   }
 
-  /** 只有柜台兑换才会清空筹码余额；重复兑换不会再次付款。 */
+  /** 只有柜台兑换才会清空筹码余额，重复兑换不会再次付款。 */
   public cashOut(method: 'cash' | 'bank' = 'cash'): number {
     if (method !== 'cash' && (method !== 'bank' || !this.bankAvailable)) return 0;
     this.leave();
     const amount = this.chips;
     if (method === 'bank') this.finance!.creditBankPennies(amount);
     this.state.chips = 0;
+    this.state.statistics.redeemed += amount;
+    if (method === 'bank' && amount > 0) this.bankTransfer(amount, true);
     return amount;
+  }
+
+  /** 只在手牌或转轮真正结算时记账。买入、换筹码和取回本金不是赢利。 */
+  public record(game: 'blackjack' | 'holdem' | 'three_card' | 'slots', stake: number, payout: number, opponent = ''): void {
+    if (!Number.isSafeInteger(stake) || !Number.isSafeInteger(payout) || stake < 0 || payout < 0) return;
+    const stats = this.state.statistics;
+    stats.rounds++;
+    stats.staked += stake;
+    stats.paid += payout;
+    stats.games[game] = (stats.games[game] ?? 0) + 1;
+    const profit = payout - stake;
+    stats.biggest_win = Math.max(stats.biggest_win, profit);
+    stats.biggest_loss = Math.max(stats.biggest_loss, -profit);
+    if (stats.night !== this.night) {
+      stats.night = this.night;
+      stats.night_profit = 0;
+      stats.win_streak = 0;
+    }
+    stats.night_profit += profit;
+    stats.best_night_profit = Math.max(stats.best_night_profit, stats.night_profit);
+    // 连胜只计算付过赌注的牌局，平局和输局中断，转轮不参与牌局连胜。
+    if (game !== 'slots' && stake > 0) {
+      stats.win_streak = profit > 0 ? stats.win_streak + 1 : 0;
+      stats.best_streak = Math.max(stats.best_streak, stats.win_streak);
+    }
+    if (opponent === 'Wren') {
+      stats.wren_hands++;
+      stats.wren_profit += profit;
+    }
+  }
+
+  /** 银行仅看到柜台转账，不会据此推断客人的现金输赢。 */
+  private bankTransfer(amount: number, incoming: boolean): void {
+    const stats = this.state.statistics;
+    if (stats.bank_day !== Time.days) {
+      stats.bank_day = Time.days;
+      stats.bank_in = stats.bank_out = 0;
+    }
+    if (incoming) stats.bank_in += amount;
+    else stats.bank_out += amount;
   }
 
   public enter(): void {
@@ -323,6 +412,7 @@ class Casino {
       this.state.cheating_caught = 0;
       this.state.wren_visit = random(1, 100) <= 35;
       this.state.landry_visit = random(1, 100) <= 25;
+      this.state.atmosphere = random(0, 9);
     }
   }
 

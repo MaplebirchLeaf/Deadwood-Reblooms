@@ -5,7 +5,7 @@ import apply from './SolarEclipseLayer';
 type StageIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 function progress(current: number, start: number, end: number): number {
-  return Math.min(1, Math.max(0, (current - start) / (end - start)));
+  return Math.clamp((current - start) / (end - start), 0, 1);
 }
 
 export interface SolarEclipseStored {

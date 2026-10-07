@@ -178,7 +178,7 @@ class PoolParty {
     this.settle();
   }
 
-  // met 保留跨场同行记录；嫉妒仍由原版 NPC 属性维护。
+  // met 保留跨场同行记录，嫉妒仍由原版 NPC 属性维护。
   public settle(): void {
     this.store.selected = null;
     this.store.reply = null;
@@ -209,7 +209,7 @@ class PoolParty {
   }
 
   public preInit(): void {
-    // 只在已邀约的派对结束后清场；历史同行记录不受影响。
+    // 只在已邀约的派对结束后清场，历史同行记录不受影响。
     this.core.dynamic.regStateEvent('gate', 'life-simulation-pool-party-settle', {
       cond: () => {
         if (!V.LifeSimulation?.pool_party?.companions?.length) return false;

@@ -1,0 +1,94 @@
+:: Deadwood Robin Shop Partnership []
+<<nobr>>
+<<set $outside to 0>><<effects>>
+<<set _investment to maplebirch.get('Robin').shop.investment>>
+<<if !_investment.canAgree>>
+  <span class='blue'><<language>><<option 'EN'>>You'll need to speak to Robin at the shop, when there is time to go through the accounts together.<<option 'CN'>>需要等罗宾在店里有空时，再一起核对账目。<</language>></span><br><br>
+<<elseif !_investment.contract.agreed>>
+  <<npc 'Robin'>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      Robin draws a line beneath the day's receipts. "You mean owning part of the shop? Not another loan?" <<He>> looks from the ledger to you. "I'd like that. But I want to keep running it myself. And I can't promise you'll make money every week."<br><br>Robin opens a fresh page. "We should put it in writing. So we both know what belongs to whom, even if things go badly."
+    <<option 'CN'>>
+      罗宾在当天的收据下面画了一条线。“你是说，买下店里的一部分？不是再借我钱？”<<He>>从账本上抬起头，看着你。“我愿意。不过，我还是想自己经营这家店。而且，我不能保证每周都让你赚到钱。”<br><br>罗宾翻开新的一页。“还是写清楚吧。就算生意出了问题，我们也知道哪些归谁。”
+  <</language>><br><br>
+  <<lanLink ['Agree to draw up a partnership contract', '同意拟一份合伙合同'] 'Deadwood Robin Shop Partnership'>><<run maplebirch.get('Robin').shop.investment.agree()>><</lanLink>><br><br>
+<<else>>
+  <<npc 'Robin'>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      Robin puts the partnership ledger beside the shop accounts. "Let's check the figures before you decide." <<He>> leaves the pen on your side of the counter.
+    <<option 'CN'>>
+      罗宾把合伙账本放在营业账目旁。“你先看看数字，再决定。”<<He>>把笔留在你这侧的柜台上。
+  <</language>><br><br>
+  <<deadwood-shop-investment>>
+<</if>>
+<<getouticon>><<lanLink ['Return to the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
+<</nobr>>
+
+:: Deadwood Reblooms Shop Investment []
+<<nobr>>
+<<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
+<<deadwood-reblooms-adrian-greeting 'financial_centre_bank'>>
+<<if Time.weekDay lt 2 or Time.weekDay gt 6 or Time.hour lt 9 or Time.hour gte 17>>
+  <<deadwood-reblooms-finance-counter-closed>>
+<<elseif maplebirch.get('Robin')?.shop.investment.contract.agreed>>
+  <<language>>
+    <<option 'EN'>>
+      The clerk checks the signatures on your agreement. "This is your direct partnership with Robin. The small holdings on the price board have their own trading account. We'll keep these contributions and buybacks in a separate ledger."
+    <<option 'CN'>>
+      柜员核对了合同上的签名。“这是你与罗宾直接签的合伙协议。行情板上的小额份额另用证券账户交易。这里的出资与回购，我们另列一份账。”
+  <</language>><br><br>
+  <<deadwood-shop-investment>>
+<<else>>
+  <span class='blue'><<language>><<option 'EN'>>Discuss the partnership with Robin at the shop first. The bank cannot sell you a share without Robin's agreement.<<option 'CN'>>先去店里与罗宾商量合伙。没有罗宾的同意，银行不能把店铺份额卖给你。<</language>></span><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Return to securities services', '返回证券业务台'] 'Deadwood Reblooms Financial Centre Securities'>><</lanLink>>
+<</nobr>>
+
+:: Deadwood Reblooms Shop Investment Widgets [widget]
+<<widget 'deadwood-shop-investment'>>
+<<nobr>>
+<<set _investment to maplebirch.get('Robin').shop.investment>>
+<<set _contract to _investment.contract>>
+<<language>>
+  <<option 'EN'>>
+    Robin keeps at least <span class='gold'>60%</span> of the shop. You can hold <span class='gold'>10%, 20%, 30% or 40%</span>. Money comes from your bank account with a debit card and goes into the business reserve. <span class='blue'>The old loans remain separate.</span><br><br>Every seven days, up to <span class='gold'>10%</span> of the estimated positive operating surplus is available for distribution, divided by ownership. Robin keeps enough for the next rent before paying you. Quiet weeks, closure and unexpected losses can mean <span class='red'>no dividend and a lower valuation</span>.<br><br>To leave, give <span class='gold'>seven days' notice</span>. Robin buys back the whole holding at <span class='gold'>75%</span> of its value on the payment day, if the shop has enough spare cash. Otherwise, the request waits. There is no guaranteed return of your investment.
+  <<option 'CN'>>
+    罗宾至少保留店铺的<span class='gold'>六成份额</span>。你可以持有<span class='gold'>一成、两成、三成或四成</span>。资金通过借记卡从银行账户划入营业储备金，<span class='blue'>原先的借款另算</span>。<br><br>每七天，营业结余估算中有盈利的部分，最多取<span class='gold'>一成</span>，再按持有份额分给你。罗宾先留够下周房租。冷清、停业或意外亏损的一周，可能<span class='red'>没有分红，店铺估值也会下跌</span>。<br><br>退出需要提前<span class='gold'>七天</span>申请。店铺有足够闲钱时，罗宾按付款日份额估值的<span class='gold'>七成五</span>买回你的全部份额。钱不够就继续等。本金不保证全额收回。
+<</language>><br><br>
+<<language>>
+  <<option 'EN'>>
+    Your holding: <span class='teal'><<= _contract.share>>%</span>. Current shop valuation:
+  <<option 'CN'>>
+    你持有<span class='teal'><<= _contract.share>>%</span>。店铺当前估值：
+<</language>> <<printmoney _contract.valuation>><br><br>
+<<if _contract.report>>
+  <<language>>
+    <<option 'EN'>>
+      Latest accounts: <<if _contract.report.event is 'loss'>><span class='red'>unexpected operating losses</span><<elseif _contract.report.event is 'busy'>><span class='green'>an unusually busy week</span><<elseif _contract.report.event is 'closed'>><span class='blue'>the shop could not trade normally</span><<else>>a week of uneven trade<</if>>. Paid into your bank account:
+    <<option 'CN'>>
+      最近一期：<<if _contract.report.event is 'loss'>><span class='red'>经营出现意外亏损</span><<elseif _contract.report.event is 'busy'>><span class='green'>生意格外忙碌</span><<elseif _contract.report.event is 'closed'>><span class='blue'>店铺未能正常营业</span><<else>>生意有好有坏<</if>>。存入你账户的分红：
+  <</language>> <<printmoney _contract.report.dividend>><br><br>
+<</if>>
+<<if _contract.exit_day gte 0>>
+  <span class='blue'><<language>><<option 'EN'>>The buyback request is pending. Today's indicative payment:<<option 'CN'>>份额回购申请正在等待处理。按今天估值，预计付款：<</language>></span> <<printmoney _investment.exitValue>><br>
+  <<lanLink ['Withdraw the buyback request', '撤回回购申请'] $passage>><<run maplebirch.get('Robin').shop.investment.exit(false)>><</lanLink>><br><br>
+<<else>>
+  <<if _contract.share lt _investment.terms.maximumShare>>
+    <<set _shareTarget to _contract.share + _investment.terms.shareStep>>
+    <label><<language>><<option 'EN'>>Total holding after purchase: <<option 'CN'>>购买后总持有份额：<</language>><<listbox '_shareTarget' autoselect>><<optionsfrom [10,20,30,40].filter(share => share > _contract.share)>><</listbox>>%</label><br>
+    <<lanLink ['Check the price', '核对价格']>><<replace '#deadwood-investment-quote'>><<printmoney `maplebirch.get('Robin').shop.investment.quote(Number(_shareTarget)) ?? 0`>><</replace>><</lanLink>>
+    <span id='deadwood-investment-quote' aria-live='polite'><<printmoney `_investment.quote(_shareTarget) ?? 0`>></span><br>
+    <<lanLink ['Buy the additional share with your debit card', '用借记卡购买新增份额']>>
+      <<if maplebirch.get('Robin').shop.investment.invest(Number(_shareTarget))>><<goto $passage>>
+      <<else>><<replace '#deadwood-investment-result'>><span class='red'><<language>><<option 'EN'>>The transfer could not be made. Check your debit card, balance and Robin's availability.<<option 'CN'>>划款未能完成。请核对借记卡、账户余额，以及罗宾是否能正常办理。<</language>></span><</replace>><</if>>
+    <</lanLink>><br>
+    <span id='deadwood-investment-result' aria-live='polite'></span><br>
+  <</if>>
+  <<if _contract.share gt 0>>
+    <<lanLink ['Request a buyback of your whole holding', '申请回购全部份额'] $passage>><<run maplebirch.get('Robin').shop.investment.exit(true)>><</lanLink>><br><br>
+  <</if>>
+<</if>>
+<</nobr>>
+<</widget>>

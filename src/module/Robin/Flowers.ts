@@ -26,7 +26,7 @@ export default class RobinFlowers extends Shared {
   private forEachSold(apply: (type: string, sold: number) => void): void {
     let remaining = FLOWER_DAILY_SALES;
     for (const type of this.types) {
-      const sold = Math.min(remaining, Math.max(0, this.state.flowerStock[type] || 0));
+      const sold = Math.clamp(this.state.flowerStock[type] || 0, 0, remaining);
       if (sold > 0) apply(type, sold);
       remaining -= sold;
       if (remaining === 0) break;

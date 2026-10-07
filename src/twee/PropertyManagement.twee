@@ -1,0 +1,56 @@
+:: Deadwood Reblooms Property Manager []
+<<set $outside to 0>><<set $location to 'financial_centre'>><<effects>><<endevent>>
+<<set _estate to maplebirch.get('VanillaPlus').realEstate>>
+<<if !_estate.properties.some(property => _estate.owns(property.id)) or $exposed gt 0 or $stress gte $stressmax>>
+  <<getouticon>><<lanLink ['Return to the property desk', '返回房产柜台'] 'Deadwood Reblooms Property Office'>><</lanLink>><<exit>>
+<</if>>
+<<if $per_npc.deadwood_property_manager>>
+  <<loadNPC 0 'deadwood_property_manager'>>
+<<else>>
+  <<generate1>>
+<</if>><<person1>>
+<<set _managerMet to $NPCList[0].name_known is 1>>
+<<language>>
+  <<option 'EN'>>
+    <<if _managerMet>>
+      <<print $NPCList[0].name>> looks up from a folder of inspection sheets. A key on a numbered tag lies beside each sheet. <<He>> moves the nearest chair out for you.
+    <<else>>
+      The agent sends you to a smaller desk beside the window. A <<person>> is sorting keys into numbered envelopes. <<He>> finishes one before offering you a seat and introducing <<himself>> as <<print $NPCList[0].name>>.
+    <</if>><br><br>
+    <<if _estate.manager>>
+      "Which house is it?" <<he>> asks, reaching for a pen. "If it's the rent, I can chase it. If it's the roof, I need to book someone who can fix it. They won't come just because I ask nicely."
+    <<else>>
+      "I manage houses for several owners," <<he>> says. "I can inspect yours, chase late rent and book repairs. You choose which ones I look after. You can keep a spare key."
+    <</if>><br><br>
+    <<He>> draws a line beneath the fees. "Each house costs <span class='gold'><<= (_estate.rentalTerms.managementFeeRate * 100).toFixed(0)>>% of its assessed weekly rent</span>, at least <<printmoney _estate.rentalTerms.managementMinimumPennies>> a week. That's charged even if you live there yourself. <span class='gold'>Repairs cost extra.</span> Leave enough in the bank. I don't put your bills on credit."
+  <<option 'CN'>>
+    <<if _managerMet>>
+      <<print $NPCList[0].name>>从一叠房屋检查表中抬起头。每张表旁边都放着一把挂着编号牌的钥匙。<<He>>拉开离你最近的椅子。
+    <<else>>
+      中介让你去窗边的小办公桌。一位<<person>>正把钥匙分别装进写着编号的信封。<<He>>装好手上的那把，请你坐下，告诉你自己叫<<print $NPCList[0].name>>。
+    <</if>><br><br>
+    <<if _estate.manager>>
+      “哪套房子？”<<he>>问，拿起一支笔。“要是租金，我可以去催。要是屋顶，就得找人修。光靠好声好气地说，可请不动维修工。”
+    <<else>>
+      “我替几位房主照看房子，”<<he>>说。“查查房况，催租，安排维修。哪些房子交给我，你来选。备用钥匙你可以留着。”
+    <</if>><br><br>
+    <<He>>在收费条款下划了一道线。“每套房子每周收<span class='gold'>当时应收周租金的 <<= (_estate.rentalTerms.managementFeeRate * 100).toFixed(0)>>%</span>，至少<<printmoney _estate.rentalTerms.managementMinimumPennies>>。自己住的也收。<span class='gold'>维修另算钱。</span>银行里得留够余额，我不会替你刷信用卡。”
+<</language>>
+<<set $NPCList[0].name_known to 1>><<saveNPC 0 'deadwood_property_manager'>><br><br>
+<<language>>
+  <<option 'EN'>>The agreement authorises routine repairs when condition falls to <<= _estate.rentalTerms.repairCondition>>, leak repairs, and following up rent after a week. It does not authorise renovations, new tenancies or purchases. <span class='red'>Unfunded work waits; frozen houses and houses awaiting auction are excluded.</span>
+  <<option 'CN'>>协议允许管理员在房况降至 <<= _estate.rentalTerms.repairCondition>> 时安排修缮、修补漏水，并在租金迟付一周后催收。不包括装修、另找租客或买房。<span class='red'>钱不够，工作就得等。被冻结或等待拍卖的房子暂停管理。</span>
+<</language>><br><br>
+<<if _estate.manager>>
+  <<refuseicon>><<lanLink ['End the management agreement', '解除物业管理协议'] 'Deadwood Reblooms Property Office'>>
+    <<run maplebirch.get('VanillaPlus').realEstate.employManager(false)>><<endevent>>
+  <</lanLink>><br>
+<<elseif $VanillaPlus.finance.bank.debit_card>>
+  <<lanLink ['Hire the manager', '聘请管理员'] 'Deadwood Reblooms Property Office'>>
+    <<run maplebirch.get('VanillaPlus').realEstate.employManager(true)>><<endevent>>
+  <</lanLink>><br>
+  <<lanSwitch 'After signing, assign individual houses at the property desk. Fees begin with their next weekly settlement.' '签约后，在房产柜台逐套指定房源。服务费从各房源的下一次周结算开始收取。'>><br>
+<<else>>
+  <span class='red'><<lanSwitch 'A debit card is required to authorise bank payments.' '需要借记卡才能授权银行付款。'>></span><br>
+<</if>>
+<<getouticon>><<lanLink ['Return to the property desk', '返回房产柜台'] 'Deadwood Reblooms Property Office'>><<endevent>><</lanLink>>

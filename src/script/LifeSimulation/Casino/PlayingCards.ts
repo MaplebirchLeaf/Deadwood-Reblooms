@@ -20,7 +20,7 @@ export function cardImage(card: PlayingCard | null, hidden: boolean) {
   return { image, ready };
 }
 
-/** 顺序等待贴图、入场帧和动画；离开页面时允许动画取消，始终恢复操作。 */
+/** 顺序等待贴图、入场帧和动画，离开页面时允许动画取消，始终恢复操作。 */
 export async function cardReady(controls: HTMLElement, loads: readonly Promise<unknown>[], animate?: () => Animation[]): Promise<void> {
   controls.inert = true;
   try {

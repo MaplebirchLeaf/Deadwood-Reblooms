@@ -55,7 +55,7 @@ class Robin extends Module implements RobinFacade {
     // 旧神殿线的周津贴由本模块统一结算，避免两个模组重复给罗宾发收入。
     const temple = this.core.get('RobinTemple') ? V.RobinTemple : undefined;
     const templeGrace = Number(temple?.grace);
-    const templeIncome = temple && ['member', 'approved', 'promised'].includes(temple.stage) && Number.isFinite(templeGrace) ? Math.max(0, Math.min(100, templeGrace)) * 10 : 0;
+    const templeIncome = temple && ['member', 'approved', 'promised'].includes(temple.stage) && Number.isFinite(templeGrace) ? Math.clamp(templeGrace, 0, 100) * 10 : 0;
     // 基础店铺增收已扣除店租、水电、原料和临时帮工，正式员工的增收与工资单独入账。
     return (
       (V.robin.stayup >= 1 ? 250 : 300) +
@@ -199,7 +199,7 @@ class Robin extends Module implements RobinFacade {
     // 原版先扣房租、检查债务，再发周收入，先入账才可用于当周房租。
     V.robinmoney += Math.max(0, state.weeklyIncome - vanillaIncome);
     if (V.robinpaid !== 1 || state.selfRent) {
-      const reserveTransfer = Math.min(state.reserve, Math.max(0, robinRent - V.robinmoney));
+      const reserveTransfer = Math.clamp(robinRent - V.robinmoney, 0, state.reserve);
       state.reserve -= reserveTransfer;
       V.robinmoney += reserveTransfer;
     }
@@ -283,6 +283,12 @@ class Robin extends Module implements RobinFacade {
         return location;
       };
     });
+  }
+}
+
+declare module '@scml-dol-maplebirch/types' {
+  interface Extensions {
+    readonly Robin: Robin;
   }
 }
 

@@ -18,7 +18,7 @@ interface PenetratorVisual {
   tintStrapon: boolean;
 }
 
-const doubleSize = (size: number) => Math.min(4, Math.max(2, Number(size) || 2));
+const doubleSize = (size: number) => Math.clamp(Number(size) || 2, 2, 4);
 
 // 原版双插底图要求较大的阴茎作为主图，且只提供 2 至 4 号资源。
 function orderNPCDoublePenetrators(playerSize: number, partnerSize: number): OrderedPenetrators {

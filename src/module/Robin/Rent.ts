@@ -75,7 +75,7 @@ export default class RobinRent extends Shared {
     if (!this.state.rebellion || V.fightstart === 1 || V.enemyhealth <= 0) return false;
     const chance = this.state.solidarity ? 90 : this.state.allies ? 80 : 65;
     if (V.rng <= chance) {
-      V.timer = Math.min(4, Math.max(0, V.timer) + 2);
+      V.timer = Math.clamp(V.timer + 2, 2, 4);
       return true;
     }
     C.npc.Robin.trauma = Math.min(100, C.npc.Robin.trauma + 2);

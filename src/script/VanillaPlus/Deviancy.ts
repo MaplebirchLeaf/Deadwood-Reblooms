@@ -13,7 +13,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     { widget: [1, 'deadwood-reblooms-deviancy-eerie-mirror-link 1'], passage: 'Eerie Mirror' }
   );
 
-  // 入口沿用原版 "mirror"；只接管真正离开的页面，导航、鸟瞰与产程保持原样。
+  // 入口沿用原版 "mirror"，只接管真正离开的页面，导航、鸟瞰与产程保持原样。
 
   // 接入镜面通路与仪式结算，并扩展异种癖上限。
   maplebirch.tool.inject({

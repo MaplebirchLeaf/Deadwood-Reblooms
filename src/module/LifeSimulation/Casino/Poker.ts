@@ -48,7 +48,7 @@ export function holdemRank(cards: readonly PlayingCard[]): HandRank {
   return best;
 }
 
-/** 本桌三张牌规则：豹子 > 顺金 > 金花 > 顺子 > 对子 > 单张；A23 最小顺子。 */
+/** 三张牌的常规牌型：豹子 > 顺金 > 金花 > 顺子 > 对子 > 单张，A23 最小顺子。 */
 export function threeCardRank(cards: readonly PlayingCard[]): HandRank {
   const { values, sets, flush } = groups(cards);
   const straight = sets.length === 3 ? (values[0] - values[2] === 2 ? values[0] : values.join(',') === '14,3,2' ? 3 : 0) : 0;
@@ -60,6 +60,13 @@ export function threeCardRank(cards: readonly PlayingCard[]): HandRank {
   return [0, ...values];
 }
 
+/** 杂色 235 只克制豹子，与其余牌型仍按普通单张比较。 */
+export function compareThreeCardHands(a: HandRank, b: HandRank): number {
+  if (a[0] === 0 && a[1] === 5 && a[2] === 3 && a[3] === 2 && b[0] === 5) return 1;
+  if (b[0] === 0 && b[1] === 5 && b[2] === 3 && b[3] === 2 && a[0] === 5) return -1;
+  return compareHands(a, b);
+}
+
 export interface PokerPot {
   amount: number;
   winners: number[];
@@ -67,7 +74,7 @@ export interface PokerPot {
   returned: boolean;
 }
 
-/** 每层底池只让出资且未弃牌的座位争夺；未被跟注的筹码退回，不抽水。 */
+/** 每层底池只让出资且未弃牌的座位争夺，未被跟注的筹码退回，不抽水。 */
 export function settlePots(seats: readonly { total: number; folded: boolean }[], ranks: HandRank[], button: number, feeCap: number) {
   const awards = seats.map(() => 0),
     pots: PokerPot[] = [];

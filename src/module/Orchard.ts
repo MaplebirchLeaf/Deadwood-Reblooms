@@ -48,6 +48,9 @@ interface OrchardWorkerReport {
   rain: boolean;
   off_season: boolean;
   left_fruit: boolean;
+  delivered?: number;
+  income?: number;
+  renewal_failed?: boolean;
 }
 
 export interface OrchardReceipt {
@@ -63,7 +66,7 @@ const fruitTypes = [...Object.keys(species), 'blood_lemon'] as OrchardFruit[];
 
 interface OrchardSale {
   day: number;
-  source?: 'farm' | 'shop' | 'market';
+  source?: 'farm' | 'shop' | 'market' | 'haul';
   type: OrchardFruit;
   amount: number;
   income: number;
@@ -94,6 +97,7 @@ interface OrchardState {
   sales_income: number;
   worker_expenses: number;
   seed_expenses: number;
+  haul_expenses?: number;
   seed: OrchardSpecies;
   known: OrchardSpecies[];
   soil: Record<OrchardSite, OrchardSoil[]>;
@@ -109,6 +113,8 @@ interface OrchardState {
     last_shift: number;
     pick: boolean;
     fertilise: boolean;
+    auto_renew?: boolean;
+    haul?: boolean;
   };
   temple: (OrchardTree | null)[];
   farm: (OrchardTree | null)[];
@@ -163,7 +169,7 @@ class Orchard extends Module {
   }
 
   public override preInit(): void {
-    // 在默认值填充前改名，保留旧记录里的订单、库存与已付薪期；不保留双套字段。
+    // 在默认值填充前改名，保留旧记录里的订单、库存与已付薪期，不保留双套字段。
     this.core.on(
       ':variable',
       () => {
@@ -301,7 +307,7 @@ class Orchard extends Module {
     return { price, bond: Math.ceil(price * amount * trade.contractBondRate) };
   }
 
-  /** 长单锁定单价；押金由玩家实际支付，不预支可反复领走的货款。 */
+  /** 长单锁定单价，押金由玩家实际支付，不预支可反复领走的货款。 */
   public acceptContract(type: OrchardFruit, amount: number): boolean {
     const quote = this.contractQuote(type, amount);
     if (!this.canContract || !this.contractFruit.includes(type) || !quote || V.money < quote.bond) return false;
@@ -350,10 +356,11 @@ class Orchard extends Module {
     return true;
   }
 
-  private recordSale(type: OrchardFruit, amount: number, income: number, source: 'farm' | 'shop' | 'market'): void {
-    this.core.SugarCube.Wikifier.wikifyEval(`<<money ${income} '${source}'>>`);
+  private recordSale(type: OrchardFruit, amount: number, income: number, source: 'farm' | 'shop' | 'market' | 'haul', day = Time.days): void {
+    if (source === 'haul') this.core.get('VanillaPlus')!.finance.creditBankPennies(income);
+    else this.core.SugarCube.Wikifier.wikifyEval(`<<money ${income} '${source}'>>`);
     this.state.sales_income += income;
-    this.state.sales.push({ day: Time.days, source, type, amount, income });
+    this.state.sales.push({ day, source, type, amount, income });
     if (this.state.sales.length > trade.ledgerEntries) this.state.sales.shift();
   }
 
@@ -400,7 +407,7 @@ class Orchard extends Module {
     V.foodstuff[type].marketStall = V.foodstuff[type].marketStall === false;
   }
 
-  /** 每日收购量有限；只交付超出保留数量的库存，不自动卖掉玩家的水果。 */
+  /** 每日收购量有限，只交付超出保留数量的库存，不自动卖掉玩家的水果。 */
   public deliver(type: OrchardFruit, amount: number): boolean {
     if (!this.canDeliver || !Number.isSafeInteger(amount) || amount < 1 || amount > this.deliveryRemaining) return false;
     const item = this.stock.find(item => item.type === type);
@@ -475,6 +482,14 @@ class Orchard extends Module {
     return 25000;
   }
 
+  public get carrier() {
+    return V.per_npc?.deadwood_orchard_carrier ?? null;
+  }
+
+  public get deliveryFee(): number {
+    return trade.haulFee;
+  }
+
   public get candidate(): boolean {
     return !this.state.worker.hired && !!V.per_npc?.deadwood_orchard_worker;
   }
@@ -537,6 +552,14 @@ class Orchard extends Module {
     this.state.worker.fertilise = fertilise;
   }
 
+  public arrangeWorker(task: 'auto_renew' | 'haul', enabled: boolean): void {
+    this.advance();
+    if (!this.state.worker.hired || !this.available('farm')) return;
+    if (enabled && (!this.core.get('VanillaPlus') || !V.VanillaPlus?.finance.bank.debit_card)) return;
+    if (task === 'haul' && enabled && (this.core.passage.title !== 'Deadwood Reblooms Orchard Delivery' || !this.carrier)) return;
+    this.state.worker[task] = enabled;
+  }
+
   public dismissWorker(): boolean {
     if (this.core.passage.title !== 'Deadwood Reblooms Orchard Dismiss') return false;
     this.advance();
@@ -590,28 +613,25 @@ class Orchard extends Module {
     const upper = Math.floor(window.currentSkillValue('tending') / tier.skillDivisor + tier.upperBase);
     const amount = random(10, Math.max(10, upper));
     const data = species[tree.species];
-    const multiplier = data.yieldMultiplier * soilMultipliers[Math.max(0, Math.min(3, quality - 1))] * (data.fruitSeasons.includes(season) ? 1 : offSeasonYieldMultiplier);
+    const multiplier = data.yieldMultiplier * soilMultipliers[Math.clamp(quality - 1, 0, 3)] * (data.fruitSeasons.includes(season) ? 1 : offSeasonYieldMultiplier);
     return Math.trunc(amount * multiplier * (V.backgroundTraits.includes('greenthumb') ? 1.2 : 1) * (V.settings.tendingYieldModifier / 5));
   }
 
   /** 按午夜跨日逐天结算，不能用从开局时刻计算的 Time.days 代替日历日期。 */
-  public advance(): void {
+  public advance(day = Math.floor(Time.days)): void {
     // 回忆与画中场景使用冻结的玩家状态，不能让这些场景的日期影响果园。
-    if (!V.Orchard || V.statFreeze) return;
+    if (!V.Orchard || V.statFreeze || !Number.isInteger(day) || day < 0 || day > Math.floor(Time.days)) return;
     const state = this.state;
-    if (state.farm_contract?.status === 'pending' && Time.days > state.farm_contract.deadline) {
-      state.farm_contract.status = 'failed';
-      // 合约只在到期时违约一次。押金已经交给收货方，不再从现金重复扣款。
-      this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Alex love -2>>');
-    }
-    const today = Math.floor(Time.date.timeStamp / 86400);
+    const current = Math.floor(Time.date.timeStamp / 86400);
+    const today = current - (Math.floor(Time.days) - day);
+    const timestamp = Math.min(Time.date.timeStamp, (today + 1) * 86400 - 1);
     if (state.day < 0) state.day = today;
     // 原版先补算整次 pass 的施工。刚观察到的竣工不能倒推到过去每一天。
     if (this.irrigated && state.irrigation_since < 0) state.irrigation_since = Time.date.timeStamp;
     if (!this.irrigated) state.irrigation_since = -1;
     while (state.day < today) {
       // 先结算这一天的早班，再结算随后的午夜。长时间跳过不能提前采到未来的水果。
-      this.workShift(state.day);
+      this.workShift(state.day, timestamp);
       const midnight = new window.DateTime((state.day + 1) * 86400);
       const season = Time.getSeason(new window.DateTime(midnight).addDays(-1));
       const bloodMoon = Weather.getBloodMoon(midnight);
@@ -641,9 +661,14 @@ class Orchard extends Module {
       }
       state.day++;
     }
-    if (state.day === today) this.workShift(today);
+    if (state.day === today) this.workShift(today, timestamp);
+    // 补算到期前的早班后才判违约，避免一次跳过多天时丢失预留的合约货物。
+    if (state.farm_contract?.status === 'pending' && day > state.farm_contract.deadline) {
+      state.farm_contract.status = 'failed';
+      this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Alex love -2>>');
+    }
     // 只应用当前已知的雨水，不捏造原版未保存的历史降雨。
-    if (state.day !== today) return;
+    if (state.day !== current) return;
     for (const site of ['temple', 'farm'] as const) {
       if (Weather.precipitation !== 'rain' && !(site === 'farm' && this.irrigated)) continue;
       for (const tree of state[site]) {
@@ -654,13 +679,35 @@ class Orchard extends Module {
   }
 
   /** 普通雇员直接照料果树，不载入战斗 NPC 槽，也不消耗玩家时间或授予玩家经验。 */
-  private workShift(day: number): void {
+  private workShift(day: number, timestamp = Time.date.timeStamp): void {
     const worker = this.state.worker;
     const morning = day * 86400 + 8 * 3600;
-    if (!worker.hired || day <= worker.last_shift || morning > Time.date.timeStamp) return;
+    if (!worker.hired || day <= worker.last_shift || morning > timestamp) return;
     worker.last_shift = day;
-    if (morning < worker.paid_from || morning >= worker.paid_until || !V.per_npc?.deadwood_orchard_worker || !this.available('farm') || V.farm_assault) return;
+    if (morning < worker.paid_from || !V.per_npc?.deadwood_orchard_worker || !this.available('farm') || V.farm_assault) return;
     const npc = V.per_npc.deadwood_orchard_worker;
+    const finance = this.core.get('VanillaPlus')?.finance;
+    if (morning >= worker.paid_until) {
+      if (!worker.auto_renew || !finance || !V.VanillaPlus.finance.bank.debit_card || finance.payFromBankPennies(this.workerWage) !== 'ok') {
+        npc.orchard_report = {
+          day,
+          watered: 0,
+          fertilised: 0,
+          no_fertiliser: false,
+          kept: {},
+          irrigation: false,
+          rain: false,
+          off_season: false,
+          left_fruit: false,
+          renewal_failed: !!worker.auto_renew
+        };
+        return;
+      }
+      // 从实际恢复早班起算，不补收停工期间的工资，也不补做停工期间的工作。
+      worker.paid_from = morning;
+      worker.paid_until = morning + 7 * 86400;
+      this.state.worker_expenses += this.workerWage;
+    }
     const season = Time.getSeason(new window.DateTime(morning));
     const report: OrchardWorkerReport = {
       day,
@@ -691,6 +738,37 @@ class Orchard extends Module {
         for (const [type, amount] of Object.entries(receipt?.kept ?? {})) report.kept[type as OrchardFruit] = (report.kept[type as OrchardFruit] ?? 0) + amount!;
       }
     });
+    if (worker.haul && this.carrier && finance && V.VanillaPlus.finance.bank.debit_card) {
+      const gameDay = Math.floor(Time.days) - (Math.floor(Time.date.timeStamp / 86400) - day);
+      let remaining = Math.max(0, trade.bulkDailyLimit - (this.state.sold_day === gameDay ? this.state.sold_today : 0));
+      const cargo = this.stock
+        .filter(item => item.type !== 'blood_lemon')
+        .flatMap(item => {
+          const orders = [this.state.order, this.state.farm_contract];
+          const promised = orders.reduce((total, order) => total + (order?.status === 'pending' && order.deadline >= gameDay && order.type === item.type ? order.amount : 0), 0);
+          const amount = Math.clamp(item.amount - item.reserve - promised, 0, remaining);
+          remaining -= amount;
+          return amount > 0 ? [{ ...item, amount }] : [];
+        });
+      const income = cargo.reduce((total, item) => total + item.amount * item.price, 0);
+      if (income > trade.haulFee) {
+        if (this.state.sold_day !== gameDay) {
+          this.state.sold_day = gameDay;
+          this.state.sold_today = 0;
+        }
+        for (const item of cargo) {
+          V.foodstuff[item.type].amount -= item.amount;
+          this.state.sold_today += item.amount;
+          this.recordSale(item.type, item.amount, item.price * item.amount, 'haul', gameDay);
+        }
+        finance.payFromBankPennies(trade.haulFee);
+        this.state.haul_expenses = (this.state.haul_expenses ?? 0) + trade.haulFee;
+        report.delivered = cargo.reduce((total, item) => total + item.amount, 0);
+        report.income = income - trade.haulFee;
+        this.carrier.orchard_deliveries = (this.carrier.orchard_deliveries ?? 0) + 1;
+      }
+      this.carrier.orchard_delivery = { day, amount: report.delivered ?? 0, income: report.income ?? 0 };
+    }
     npc.orchard_report = report;
     npc.orchard_shifts = (npc.orchard_shifts ?? 0) + 1;
   }

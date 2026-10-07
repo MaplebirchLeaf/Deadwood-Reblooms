@@ -8,7 +8,7 @@
 
 .dr-finance-caption-grid {
   display: grid;
-  grid-template-columns: minmax(0, max-content) max-content;
+  grid-template-columns: minmax(0, max-content) minmax(0, max-content);
   width: max-content;
   max-width: 100%;
   margin-inline: auto;
@@ -17,16 +17,29 @@
   text-align: left;
 }
 
-.dr-finance-caption-grid > span:nth-child(odd) {
+.dr-finance-caption-grid > span {
   overflow-wrap: anywhere;
 }
 
-/* 账户与证券概要统一使用紧凑的名称、金额两列布局。 */
 .dr-finance-summary {
-  display: inline-grid;
-  grid-template-columns: max-content max-content;
-  column-gap: 0.75em;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
   align-items: baseline;
+}
+
+.dr-finance-summary > span {
+  min-width: 0;
+  padding: 0.25em 0.4em;
+  border-bottom: 1px solid var(--700);
+  overflow-wrap: anywhere;
+}
+
+.dr-finance-summary > span:nth-child(even) {
+  text-align: right;
+}
+
+.dr-finance-summary > span:nth-last-child(-n + 2) {
+  border-bottom: 0;
 }
 
 /* 常用金额按资金方向分行，窄屏下允许自然换行。 */
@@ -39,21 +52,42 @@
   grid-template-columns: minmax(8em, max-content) 1fr;
   column-gap: 0.75em;
   align-items: baseline;
+  padding-block: 0.4em;
+}
+
+.dr-finance-quick-row + .dr-finance-quick-row {
+  border-top: 1px solid var(--700);
 }
 
 .dr-finance-quick-label {
   color: var(--gold);
 }
 
-.dr-finance-quick-links,
-.dr-finance-actions {
+.dr-finance-quick-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.2em 0.75em;
+  gap: 0.2em 0.4em;
 }
 
 .dr-finance-quick-links a {
+  display: inline-block;
+  padding: 0.15em 0.35em;
+  line-height: 1.4;
+  border: 1px solid var(--700);
+  background: var(--800);
+  text-align: center;
   white-space: nowrap;
+}
+
+.dr-finance-quick-links a:hover {
+  border-color: var(--100);
+}
+
+.dr-finance-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3em 0.75em;
+  margin-top: 0.5em;
 }
 
 .dr-finance-form {
@@ -76,17 +110,36 @@
   max-width: 100%;
 }
 
-/* 金融中心行情板：保留原版色板，并让窄屏可以横向查看完整报价。 */
-.dr-finance-board {
-  display: block;
-  box-sizing: border-box;
+/* 多项交易参数逐行对齐，窄屏由控件本身换行。 */
+.dr-finance-fields {
+  display: grid;
+  gap: 0.35em;
+}
+
+.dr-finance-fields label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.25em 0.5em;
+}
+
+.dr-finance-fields input,
+.dr-finance-fields select {
+  width: 100%;
+}
+
+.dr-finance-record + .dr-finance-record {
+  margin-top: 0.75em;
+  padding-top: 0.75em;
+  border-top: 1px solid var(--700);
+}
+
+/* 横向滚动只留在表格内，不撑宽页面或金额操作区。 */
+.dr-finance-scroll {
+  min-width: 0;
   max-width: 100%;
-  padding: 0.5em;
   overflow-x: auto;
-  color: var(--100);
-  background: var(--850);
-  border: 2px solid var(--600);
-  box-shadow: inset 0 0 0 1px var(--750);
+  overscroll-behavior-x: contain;
 }
 
 .dr-finance-quotes {

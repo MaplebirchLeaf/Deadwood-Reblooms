@@ -1,6 +1,6 @@
 // ./src/module/constants/casino.ts
 
-/** 金额统一使用便士；配置只决定档位，不写入正在进行的牌局。 */
+/** 金额统一使用便士，配置只决定档位，不写入正在进行的牌局。 */
 export interface BlackjackOptions {
   bets: readonly number[];
 }
@@ -15,7 +15,7 @@ export interface HoldemOptions {
   bigBlindDivisor: number;
 }
 
-/** 每手牌只尝试一次小动作；公开线索与分心只属于当前手牌。 */
+/** 每手牌只尝试一次小动作，公开线索与分心只属于当前手牌。 */
 export interface CardTrickState {
   used: boolean;
   opponent: string;

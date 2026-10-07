@@ -12,7 +12,7 @@ function meteorEffect(rate: number) {
         return maplebirch.get('CelestialAnomalies')!.MeteorShowerStrength;
       },
       visibility(): number {
-        return Math.min(1, Math.max(0.35, 1 - Weather.overcast * 0.4 - Math.max(0, Weather.precipitationIntensity - 1) * 0.1));
+        return Math.clamp(1 - Weather.overcast * 0.4 - Math.max(0, Weather.precipitationIntensity - 1) * 0.1, 0.35, 1);
       }
     }
   };
@@ -44,10 +44,10 @@ export default function applyMeteorShowerLayer(): void {
 
           const width = this.canvas.element.width;
           const height = this.canvas.element.height;
-          const scale = Math.min(2, Math.max(1, Math.sqrt(width / 256)));
+          const scale = Math.clamp(Math.sqrt(width / 256), 1, 2);
           this.emitter = new Weather.Renderer.ParticleEmitter(this.canvas.ctx, {
             origin: { x: 0, y: 0 },
-            maxParticles: Math.min(32, Math.max(8, Math.ceil(this.rate * 4))),
+            maxParticles: Math.clamp(Math.ceil(this.rate * 4), 8, 32),
             spawnRate: this.rate * this.strength * this.visibility,
             animationGroup: this.parentLayer.animationGroup,
             initialSettings: {

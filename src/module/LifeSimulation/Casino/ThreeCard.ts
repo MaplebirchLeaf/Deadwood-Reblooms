@@ -2,7 +2,7 @@
 
 import { DEFAULT_CARD_TRICK_STATE, DEFAULT_CASINO_OPTIONS, type CardTrickState, type ThreeCardOptions } from '../../constants/casino';
 import type { PlayingCard } from './Blackjack';
-import { compareHands, threeCardRank } from './Poker';
+import { compareHands, compareThreeCardHands, threeCardRank } from './Poker';
 
 interface ThreeSeat {
   name: string;
@@ -111,7 +111,7 @@ class ThreeCard {
     return true;
   }
 
-  /** 返回本次需从筹码账户扣除的金额；-1 表示拒绝操作，0 可为免费查看。 */
+  /** 返回本次需从筹码账户扣除的金额，-1 表示拒绝操作，0 可为免费查看。 */
   public act(action: 'look' | 'call' | 'raise' | 'compare' | 'fold', target = 1): number {
     if (!this.canAct) return -1;
     const state = this.state,
@@ -136,7 +136,7 @@ class ThreeCard {
     state.log.push({ seat: 0, action, amount: cost });
     if (action === 'compare') {
       const other = state.seats[target];
-      const wins = compareHands(threeCardRank(player.cards), threeCardRank(other.cards)) > 0;
+      const wins = compareThreeCardHands(threeCardRank(player.cards), threeCardRank(other.cards)) > 0;
       (wins ? other : player).folded = true;
       state.compared.push(target);
       if (!wins || state.seats.filter(seat => !seat.folded).length === 1) {
@@ -180,7 +180,9 @@ class ThreeCard {
     const state = this.state,
       active = state.seats.flatMap((seat, i) => (seat.folded ? [] : [i]));
     const ranks = state.seats.map(seat => threeCardRank(seat.cards));
-    state.winners = active.filter(index => active.every(other => compareHands(ranks[index], ranks[other]) >= 0));
+    // 多人摊牌先淘汰被克制的豹子，再按常规牌型结算，避免 235、豹子和对子形成循环。
+    const eligible = active.filter(index => ranks[index][0] !== 5 || !active.some(other => compareThreeCardHands(ranks[other], ranks[index]) > 0));
+    state.winners = eligible.filter(index => eligible.every(other => compareHands(ranks[index], ranks[other]) >= 0));
     state.fee = Math.min(Math.floor(this.pot * 0.05), state.ante * 3);
     state.payout = state.winners.includes(0) ? Math.ceil((this.pot - state.fee) / state.winners.length) : 0;
     state.phase = 'done';
@@ -189,6 +191,7 @@ class ThreeCard {
   public collectPayout(): number {
     if (this.state.phase !== 'done' || this.state.paid) return 0;
     this.state.paid = true;
+    this.core.get('LifeSimulation')?.casino.record('three_card', this.state.seats[0].total, this.state.payout);
     return this.state.payout;
   }
 

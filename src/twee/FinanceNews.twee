@@ -1,0 +1,36 @@
+:: Deadwood Reblooms Finance News [widget]
+
+<<widget 'deadwood-finance-news'>>
+<<nobr>>
+  <<if $VanillaPlus.finance.market.news?.length>>
+    <span class='gold'><<language>><<option 'EN'>>Business notices<<option 'CN'>>业务消息<</language>></span><br>
+    <<for _news range $VanillaPlus.finance.market.news.slice(-3).reverse()>>
+      <<switch _news.event>>
+        <<case 'farm'>>
+          <<language>><<option 'EN'>>New work at Alex's farm has attracted orders and competition among local suppliers.<<option 'CN'>>艾利克斯农场的新工程带来了订单，本地供应商开始争夺生意。<</language>>
+        <<case 'raid'>>
+          <span class='red'><<language>><<option 'EN'>>Damage at Alex's farm has disrupted deliveries. Competing suppliers are taking orders.<<option 'CN'>>艾利克斯的农场受损，交货受到影响。竞争对手正在接下订单。<</language>></span>
+        <<case 'cafe'>>
+          <<language>>
+            <<option 'EN'>><<if _news.move lt 0>>Ocean Breeze has closed for expansion. Traders are waiting for it to reopen.<<elseif _news.move gte 10>>Ocean Breeze has reopened after its expansion.<<else>>Ocean Breeze has raised its prices.<</if>>
+            <<option 'CN'>><<if _news.move lt 0>>海风咖啡馆停业扩建，交易员正等待重新开业。<<elseif _news.move gte 10>>海风咖啡馆扩建后重新开业。<<else>>海风咖啡馆提高了价格。<</if>>
+          <</language>>
+        <<case 'avery'>>
+          <<language>>
+            <<option 'EN'>><<if _news.move gt 0>>Avery's company has gained the support of influential backers.<<else>>Reports of damage and disruption have unsettled investors in Avery's company.<</if>>
+            <<option 'CN'>><<if _news.move gt 0>>艾弗里的公司得到了一批有权势的支持者。<<else>>有关损失与动荡的消息，让艾弗里公司的投资人不安。<</if>>
+          <</language>>
+        <<case 'shop'>>
+          <span @class="_news.move < 0 ? 'red' : 'teal'"><<language>><<option 'EN'>><<if _news.move lt 0>>Robin's drinks shop has stopped trading. Investors are waiting for news.<<else>>Robin's drinks shop is open, with small holdings available at the securities desk.<</if>><<option 'CN'>><<if _news.move lt 0>>罗宾饮品店停止营业，投资人正在等待消息。<<else>>罗宾饮品店开业了，证券柜台开始提供小额流通份额。<</if>><</language>></span>
+        <<case 'shop_upgrade'>>
+          <<language>><<option 'EN'>>Robin's drinks shop has changed its equipment and menu. Traders are revising their estimates.<<option 'CN'>>罗宾饮品店调整了设备与菜单，交易员正在重新估算生意。<</language>>
+        <<case 'shop_staff'>>
+          <<language>><<option 'EN'>><<if _news.move gt 0>>Robin's drinks shop has taken on staff to handle more customers.<<else>>Robin's drinks shop is working with fewer staff.<</if>><<option 'CN'>><<if _news.move gt 0>>罗宾饮品店聘了新店员，准备接待更多客人。<<else>>罗宾饮品店的店员减少了。<</if>><</language>>
+        <<case 'shop_supply'>>
+          <<language>><<option 'EN'>>Repeated orchard deliveries have helped Robin's drinks shop keep fruit in stock.<<option 'CN'>>果园接连交货，让罗宾饮品店有了更稳定的水果供应。<</language>>
+      <</switch>>
+      <<if _news.symbol>> <span class='blue'>(<<= _news.symbol>>)</span><</if>><br>
+    <</for>><br>
+  <</if>>
+<</nobr>>
+<</widget>>

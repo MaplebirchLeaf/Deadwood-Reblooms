@@ -96,7 +96,7 @@ class Holdem {
   }
 
   public get callAmount(): number {
-    return Math.min(this.player?.stack ?? 0, Math.max(0, this.state.current_bet - (this.player?.street_bet ?? 0)));
+    return Math.clamp(this.state.current_bet - (this.player?.street_bet ?? 0), 0, this.player?.stack ?? 0);
   }
 
   public get minimumRaise(): number {
@@ -167,7 +167,7 @@ class Holdem {
           seat.stack = state.buy_in;
         }
       }
-      // 对手输光后由下一位客人带同档筹码入座；PC 必须自行兑回并重新买入。
+      // 对手输光后由下一位客人带同档筹码入座，PC 必须自行兑回并重新买入。
       if (index > 0 && seat.stack < this.bigBlind) seat.stack = state.buy_in;
       Object.assign(seat, { cards: [], folded: false, street_bet: 0, total: 0, acted_at: null });
     });
@@ -288,7 +288,7 @@ class Holdem {
     const distracted = !this.watching && state.trick.distracted === index;
     if (distracted) state.trick.distracted = null;
     const values = seat.cards.map(card => card.value).sort((a, b) => b - a);
-    // 只看自己的底牌、公开公共牌和下注；不会读取 PC 的牌或未来牌。
+    // 只看自己的底牌、公开公共牌和下注，不会读取 PC 的牌或未来牌。
     const rank = state.board.length ? holdemRank([...seat.cards, ...state.board]) : null;
     const strength = rank ? Math.min(0.95, 0.2 + rank[0] * 0.14 + rank[1] / 80) : values[0] === values[1] ? 0.65 + values[0] / 60 : (values[0] + values[1]) / 40;
     const due = state.current_bet - seat.street_bet,
@@ -309,14 +309,16 @@ class Holdem {
   }
 
   private finish(showdown: boolean): void {
+    if (!this.active) return;
     const state = this.state;
     const ranks = state.seats.map(seat => holdemRank([...seat.cards, ...state.board]));
     const settlement = settlePots(state.seats, ranks, state.button, this.bigBlind * 3);
     settlement.awards.forEach((award, index) => (state.seats[index].stack += award));
     Object.assign(state, { phase: 'done', pending: [], pots: settlement.pots, fee: settlement.fee, showdown });
+    if (!this.watching) this.core.get('LifeSimulation')?.casino.record('holdem', state.seats[0].total, settlement.awards[0], state.seats.some(seat => seat.name === 'Wren') ? 'Wren' : '');
   }
 
-  /** 离席视为弃牌，随后结清已买入的剩余筹码；关闭营业也可兑回。 */
+  /** 离席视为弃牌，随后结清已买入的剩余筹码，关闭营业也可兑回。 */
   public cashOut(): number {
     if (this.watching || !this.state.joined) return 0;
     if (this.active) {

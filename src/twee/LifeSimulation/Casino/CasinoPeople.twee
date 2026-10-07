@@ -57,7 +57,7 @@
 			<<icon 'dealer.png'>><<lanLink ['Take the training shift (1:00)', '跟马洛学做荷官 (1:00)']>>
 				<<if maplebirch.get('LifeSimulation').casino.canWork and !$LifeSimulation.casino.trained>>
 					<<set $LifeSimulation.casino.trained to true>><<money 1000>><<tiredness 4>><<stress 2>><<pass 60>>
-					<<if maplebirch.passage.title is 'Deadwood Reblooms Casino Dealer'>>
+					<<if $passage is 'Deadwood Reblooms Casino Dealer'>>
 					  <<goto 'Deadwood Reblooms Casino Training'>>
 					<</if>>
 				<</if>>
@@ -180,7 +180,7 @@
 			<<stress 2>><<set C.npc.Marlow.love to Math.clamp(C.npc.Marlow.love + 1, 0, 30)>>
 		<<else>><<stress 6>><</if>>
 		<<pass 60>>
-		<<if maplebirch.passage.title is 'Deadwood Reblooms Casino Work'>>
+		<<if $passage is 'Deadwood Reblooms Casino Work'>>
 		  <<goto 'Deadwood Reblooms Casino Work End'>>
 		<</if>>
 	<</if>>
@@ -237,6 +237,16 @@
 			<</if>>
 			伦恩用两根手指把玩着一枚筹码。“来，坐下。看着也行，说不定能学点什么。”洗牌声响起时，伦恩朝马洛看了一眼，随后又去看桌上的赌注。
 	<</language>><br><br>
+	<<if $LifeSimulation.casino.statistics.wren_hands gt 0>>
+		<<language>>
+			<<option 'EN'>>
+				<<if $LifeSimulation.casino.statistics.wren_profit gt 0>>"You did alright at our table," Wren says. "Going to keep it, or give us a chance to get some back?" <<He>> slides a chair out with one foot.
+				<<else>>Wren taps the empty seat. "Back for another? Don't sit down just because you think we owe you." The grin returns. "Sit down because you want to play."<</if>>
+			<<option 'CN'>>
+				<<if $LifeSimulation.casino.statistics.wren_profit gt 0>>“在我们这桌，赚得还不错嘛。”伦恩说。“打算拿走，还是给我们个捞回一点的机会？”<<He>>用脚把一张椅子推了出来。
+				<<else>>伦恩敲了敲空位。“还来？可别想着我们欠你钱，才坐下来。”<<He>>又咧嘴笑了。“想玩，才坐。”<</if>>
+		<</language>><br><br>
+	<</if>>
 	<<icon 'poker-chips.png'>><<lanLink ["Join the hold'em table", '加入德州扑克'] 'Deadwood Reblooms Life Simulation Holdem'>><<endevent>><</lanLink>><br>
 <<else>><<language>>
 	<<option 'EN'>>
@@ -254,9 +264,13 @@
 	<<npc 'Landry'>><<person1>>
 	<<language>>
 		<<option 'EN'>>
-			Landry nods as you approach. The person opposite gets up and heads downstairs. "Just meeting someone," Landry says, turning the glass. "If it's about work, come to the pub. Too many people listening here." Another guest approaches, and Landry turns away.
+			Landry nods as you approach. The person opposite gets up and heads downstairs. "Just meeting someone," Landry says, turning the glass.
+			<<if maplebirch.get('LifeSimulation').casino.chips gte 500000>>Landry glances at your chips. "Keep those out of sight when you go downstairs. People notice."<br><br><</if>>
+			"If it's about work, come to the pub. Too many people listening here." Another guest approaches, and Landry turns away.
 		<<option 'CN'>>
-			见你走近，兰德里点了点头。对面的人起身下楼。“只是来见个人。”兰德里转着酒杯，说道。“想谈工作，来酒吧找我。这里听着的人太多。”另一个客人走近，兰德里转过身去。
+			见你走近，兰德里点了点头。对面的人起身下楼。“只是来见个人。”兰德里转着酒杯，说道。
+			<<if maplebirch.get('LifeSimulation').casino.chips gte 500000>>兰德里瞥了眼你的筹码。“下楼的时候收好。会有人看见的。”<br><br><</if>>
+			“想谈工作，来酒吧找我。这里听着的人太多。”另一个客人走近，兰德里转过身去。
 	<</language>><br><br>
 <<else>><<language>>
 	<<option 'EN'>>

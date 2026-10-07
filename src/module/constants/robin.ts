@@ -1,5 +1,7 @@
 // ./src/module/constants/robin.ts
 
+import investmentTerms from '../../assets/finance/shop-investment.json';
+
 /** 气球摊位的走向，resolved 表示该支线已经收束。 */
 export type BalloonRoute = 'none' | 'cooperate' | 'compete' | 'resolved';
 /** 收容所（精神病院）路线状态。 */
@@ -17,6 +19,18 @@ export interface RobinExpansionState {
   tutor: boolean;
   /** 店铺是否已开张。 */
   shop: boolean;
+  investment: {
+    agreed: boolean;
+    share: number;
+    valuation: number;
+    invested_total: number;
+    returned_total: number;
+    dividends_total: number;
+    last_day: number;
+    next_settlement: number;
+    exit_day: number;
+    report: { day: number; event: 'quiet' | 'busy' | 'loss' | 'closed'; profit: number; dividend: number } | null;
+  };
   /**
    * 摊位与店铺的线索进度。
    * 线索先在对应场景出现，再把话题带回罗宾房间，摊位用等级记录每次改造后的下一条线索。
@@ -193,6 +207,18 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
   chocolate: 0,
   tutor: false,
   shop: false,
+  investment: {
+    agreed: false,
+    share: 0,
+    valuation: investmentTerms.initialValue,
+    invested_total: 0,
+    returned_total: 0,
+    dividends_total: 0,
+    last_day: -1,
+    next_settlement: -1,
+    exit_day: -1,
+    report: null
+  },
   topics: {
     lemonade: 0,
     chocolate: 0,

@@ -15,7 +15,7 @@ export interface SlotMachineState {
   played: boolean;
 }
 
-/** 三轴各自均匀抽取六种图案；奖金含投入，216 种结果每份投入 £5，共返还 £905。 */
+/** 三轴各自均匀抽取六种图案，奖金含投入，216 种结果每份投入 £5，共返还 £905。 */
 function slotPayout(reels: readonly number[]): number {
   if (reels.length !== 3 || reels.some(index => !Number.isInteger(index) || index < 0 || index >= slotSymbols.length)) return 0;
   if (reels.every(index => index === reels[0])) return slotSymbols[reels[0]].payout;
@@ -49,6 +49,7 @@ export default class SlotMachine {
     this.state.reels = reels;
     this.state.payout = slotPayout(reels);
     this.state.played = true;
+    if (V.location === 'deadwood_casino') maplebirch.get('LifeSimulation')?.casino.record('slots', 500, this.state.payout * 100);
     this.animateNext = true;
     return true;
   }

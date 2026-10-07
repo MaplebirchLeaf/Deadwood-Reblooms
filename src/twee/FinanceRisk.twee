@@ -8,7 +8,7 @@
     <<else>><<lanSwitch 'Visit the financial centre to settle the debt.' '到金融中心办理清偿。'>><br><</if>>
   <</if>>
   <<if $VanillaPlus.finance.brokerage.margin.positions.length>>
-    <<lanSwitch 'Margin positions: ' '保证金持仓：'>><<= $VanillaPlus.finance.brokerage.margin.positions.length>> ·
+    <<lanSwitch 'Margin positions: ' '杠杆持仓：'>><<= $VanillaPlus.finance.brokerage.margin.positions.length>> ·
     <<set $_margin_equity to maplebirch.get('VanillaPlus').finance.margin.equityTotal>>
     <<lanSwitch 'Current equity: ' '当前权益：'>><<deadwood-reblooms-finance-money $_margin_equity>><br>
   <</if>>
@@ -16,14 +16,17 @@
 
 <<widget 'deadwood-finance-margin-quote'>>
   <<if _args[0]>>
-    <<lanSwitch 'Order value: ' '合约／股票总值：'>><<deadwood-reblooms-finance-money _args[0].notional>><br>
-    <<lanSwitch 'Margin / opening fee: ' '保证金／开仓手续费：'>><<deadwood-reblooms-finance-money _args[0].margin>> / <<deadwood-reblooms-finance-money _args[0].fee>><br>
-    <<lanSwitch 'Required funds: ' '本次需划出：'>><<deadwood-reblooms-finance-money _args[0].total>>
+    <div class='dr-finance-summary'>
+      <span><<lanSwitch 'Order value' '交易总额'>></span><span><<deadwood-reblooms-finance-money _args[0].notional>></span>
+      <span><<lanSwitch 'Margin / opening fee' '保证金／开仓手续费'>></span><span><<deadwood-reblooms-finance-money _args[0].margin>> / <<deadwood-reblooms-finance-money _args[0].fee>></span>
+      <span><<lanSwitch 'Required funds' '所需资金'>></span><span><<deadwood-reblooms-finance-money _args[0].total>></span>
+    </div>
     <<if _args[0].total gt $VanillaPlus.finance.brokerage.cash>>
       <span class='red'><<lanSwitch 'Insufficient available funds.' '可用资金不足。'>></span>
     <</if>>
-    <br>
-  <<else>><span class='red'><<lanSwitch 'Enter a valid quantity to obtain a quote.' '填写有效数量后才能报价。'>></span><br><</if>>
+  <<else>>
+    <span class='red'><<lanSwitch 'Enter a valid quantity to obtain a quote.' '填写有效数量后才能报价。'>></span>
+  <</if>>
 <</widget>>
 
 <<widget 'deadwood-finance-bank-notice'>>
@@ -39,7 +42,21 @@
   <</if>>
 <</widget>>
 
+<<widget 'deadwood-finance-collateral-quote'>>
+  <<set $_amount to Math.round(Number(_args[0]) * 100)>>
+  <<if !Number.isSafeInteger($_amount) or $_amount lte 0 or $_amount gt maplebirch.get('VanillaPlus').realEstate.collateralLimit($VanillaPlus.real_estate.collateral_property)>>
+    <span class='red'><<lanSwitch 'Enter an amount within the borrowing limit.' '请输入借款上限内的金额。'>></span>
+  <<else>>
+    <<set $_mortgage to maplebirch.get('VanillaPlus').realEstate.mortgage>>
+    <<set $_quote to $_mortgage.cashQuote($_amount, $VanillaPlus.real_estate.mortgage_term)>>
+    <<lanSwitch 'Weekly interest: ' '周利率：'>><span class='gold'><<= ($_mortgage.rate($VanillaPlus.real_estate.mortgage_term) * 100).toFixed(2)>>%</span><br>
+    <<lanSwitch 'Fee / advance after fees: ' '手续费／实际到账：'>><<deadwood-reblooms-finance-money $_quote.fee>> / <<deadwood-reblooms-finance-money $_quote.net>><br>
+    <<lanSwitch 'Weekly instalment: ' '每周应还：'>><<deadwood-reblooms-finance-money $_quote.weekly_payment>>
+  <</if>>
+<</widget>>
+
 :: Deadwood Reblooms Financial Centre Margin []
+<<nobr>>
 <<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
 <<set $_margin to maplebirch.get('VanillaPlus').finance.margin>>
 <<if !$_margin.open or !$VanillaPlus.finance.brokerage.opened>>
@@ -57,69 +74,165 @@
 <<deadwood-finance-risk-summary>>
 <<language>>
   <<option 'EN'>>
-    Each opening and closing costs 0.25% of the traded value, at least £1. Stock financing charges 1.4% weekly on the borrowed amount, accrued daily. Positions close when equity falls to a quarter of the deposited margin. Futures expire after fourteen days, including weekends.
+    Each opening and closing costs <<= ($_margin.terms.feeRate * 100).toFixed(2)>>% of the traded value, at least £1. Stock financing charges <<= ($_margin.terms.borrowWeeklyRate * 100).toFixed(2)>>% weekly on the borrowed money. Borrowing shares to sell short costs <<= ($_margin.terms.shortWeeklyRate * 100).toFixed(2)>>% weekly on their current value, plus any dividends owed to the lender. Charges accrue daily. <span class='red'>A rising price can cost a short seller more than the original margin.</span> Positions close when equity falls to a quarter of the deposited margin. Borrowed shares and futures are settled after <<= $_margin.terms.shortDays>> and <<= $_margin.terms.futuresDays>> days respectively, including weekends.
   <<option 'CN'>>
-    开仓和平仓各收成交金额的 0.25%，最低 £1。融资股票按借款计收每周 1.4% 的利息，逐日累计。权益降至所缴保证金的四分之一时强制平仓。期货十四天后到期，周末也计入期限。
+    开仓和平仓各收成交金额的 <<= ($_margin.terms.feeRate * 100).toFixed(2)>>%，最低 £1。融资股票按借款计收每周 <<= ($_margin.terms.borrowWeeklyRate * 100).toFixed(2)>>% 的利息。融券卖出按股票当前市值收取每周 <<= ($_margin.terms.shortWeeklyRate * 100).toFixed(2)>>% 的借券费，还须补偿出借人的分红。费用逐日累计。<span class='red'>股价上涨时，做空的亏损可能超过原先交的保证金。</span>权益降至所缴保证金的四分之一时强制平仓。融券与期货分别在 <<= $_margin.terms.shortDays>> 天、<<= $_margin.terms.futuresDays>> 天后结算，周末也计入期限。
 <</language>><br><br>
 <<if $VanillaPlus.finance.collection.amount lte 0>>
   <<set _marginSymbol to 'AVY'>>
-  <<set _marginShares to 10>><<set _marginLots to 1>><<set _stockLeverage to 2>><<set _futuresLeverage to 5>>
+  <<set _marginShares to 10>><<set _marginLots to 100>><<set _stockLeverage to 2>><<set _stockSide to 1>><<set _futuresLeverage to 5>>
   <<set _marginOptions to {}>>
   <<for $_security range maplebirch.get('VanillaPlus').finance.securities>>
-    <<set _marginOptions[lanSwitch($_security.name.EN, $_security.name.CN)] to $_security.symbol>>
+    <<set _marginOptions[maplebirch.t($_security.name)] to $_security.symbol>>
   <</for>>
-  <h3><<lanSwitch 'Financed shares' '融资股票'>></h3>
-  <div class='dr-finance-form'>
-  <label><<lanSwitch 'Security: ' '证券：'>><<listbox '_marginSymbol' autoselect>><<optionsfrom _marginOptions>><</listbox>></label><br>
-  <label><<lanSwitch 'Shares: ' '股数：'>><<numberbox '_marginShares' 10>></label><br>
-  <label><<lanSwitch 'Leverage: ' '杠杆：'>><<listbox '_stockLeverage' autoselect>><<optionsfrom $_margin.terms.stockLeverage>><</listbox>></label><br>
-  <<lanLink ['Check the quote', '核对报价']>>
-    <<set $_marginQuote to maplebirch.get('VanillaPlus').finance.margin.orderQuote('stock', _marginSymbol, 1, Number(_marginShares), Number(_stockLeverage))>>
-    <<replace '#deadwood-stock-quote'>><<deadwood-finance-margin-quote $_marginQuote>><</replace>>
-  <</lanLink>><div id='deadwood-stock-quote' aria-live='polite'></div>
-  <<lanLink ['Buy with financing', '融资买入'] 'Deadwood Reblooms Financial Centre Margin Result'>>
-    <<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.place('stock', _marginSymbol, 1, Number(_marginShares), Number(_stockLeverage)) ? 'ok' : 'rejected'>>
-  <</lanLink>><br><br></div>
-  <h3><<lanSwitch 'Futures' '期货'>></h3>
-  <div class='dr-finance-form'>
-  <<set _futureSymbol to 'INDEX'>><<set _futureOptions to Object.assign({}, _marginOptions)>>
-  <<set _futureOptions[lanSwitch('Town index', '小镇指数')] to 'INDEX'>>
-  <label><<lanSwitch 'Underlying: ' '标的：'>><<listbox '_futureSymbol' autoselect>><<optionsfrom _futureOptions>><</listbox>></label><br>
-  <label><<lanSwitch 'Units: ' '数量：'>><<numberbox '_marginLots' 1>></label><br>
-  <label><<lanSwitch 'Leverage: ' '杠杆：'>><<listbox '_futuresLeverage' autoselect>><<optionsfrom $_margin.terms.futuresLeverage>><</listbox>></label><br>
-  <<language>>
-    <<option 'EN'>>One index contract represents 100 index units. A single-security contract represents one share. The current index is
-    <<option 'CN'>>每份指数合约对应 100 个指数单位，个股合约对应一股。当前指数为
-  <</language>> <span class='gold'><<= ($_margin.quote('INDEX') / 100).toFixed(2)>></span>.<br>
-  <<lanLink ['Check the quote', '核对报价']>>
-    <<set $_marginQuote to maplebirch.get('VanillaPlus').finance.margin.orderQuote('futures', _futureSymbol, 1, Number(_marginLots), Number(_futuresLeverage))>>
-    <<replace '#deadwood-futures-quote'>><<deadwood-finance-margin-quote $_marginQuote>><</replace>>
-  <</lanLink>><div id='deadwood-futures-quote' aria-live='polite'></div>
-  <<lanLink ['Open long', '买入开仓'] 'Deadwood Reblooms Financial Centre Margin Result'>>
-    <<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.place('futures', _futureSymbol, 1, Number(_marginLots), Number(_futuresLeverage)) ? 'ok' : 'rejected'>>
-  <</lanLink>> | <<lanLink ['Open short', '卖出开仓'] 'Deadwood Reblooms Financial Centre Margin Result'>>
-    <<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.place('futures', _futureSymbol, -1, Number(_marginLots), Number(_futuresLeverage)) ? 'ok' : 'rejected'>>
-  <</lanLink>><br></div>
+  <div class='deadwood-card-grid'>
+    <<deadwood-card 'Stock financing and short sales' '股票融资与融券'>>
+      <<set $_margin to maplebirch.get('VanillaPlus').finance.margin>>
+      <div class='dr-finance-form dr-finance-fields'>
+        <label><span><<lanSwitch 'Security' '证券'>></span><<listbox '_marginSymbol' autoselect>><<optionsfrom _marginOptions>><</listbox>></label>
+        <label><span><<lanSwitch 'Shares' '股数'>></span><<numberbox '_marginShares' 10>></label>
+        <label><span><<lanSwitch 'Direction' '方向'>></span><<listbox '_stockSide' autoselect>><<option `lanSwitch('Buy with financing', '融资买入')` 1>><<option `lanSwitch('Sell borrowed shares', '融券卖出')` -1>><</listbox>></label>
+        <label><span><<lanSwitch 'Leverage' '杠杆'>></span><<listbox '_stockLeverage' autoselect>><<optionsfrom $_margin.terms.stockLeverage>><</listbox>></label>
+      </div>
+      <<language>>
+        <<option 'EN'>>
+          At <span class='gold'>50×</span>, a 1% move changes the position's value by half your initial margin, before interest and fees. <span class='red'>Borrowing costs rise with the amount financed.</span>
+        <<option 'CN'>>
+          使用<span class='gold'>50 倍杠杆</span>时，股价变动 1%，盈亏就相当于初始保证金的一半，还没扣利息和手续费。<span class='red'>借得越多，融资利息也越多。</span>
+      <</language>><br>
+      <div class='dr-finance-actions'>
+        <<lanLink ['Check the quote', '核对报价']>>
+          <<set $_marginQuote to maplebirch.get('VanillaPlus').finance.margin.orderQuote('stock', _marginSymbol, Number(_stockSide), Number(_marginShares), Number(_stockLeverage))>>
+          <<replace '#deadwood-stock-quote'>><<deadwood-finance-margin-quote $_marginQuote>><</replace>>
+        <</lanLink>>
+        <<lanLink ['Place the stock order', '提交股票委托'] 'Deadwood Reblooms Financial Centre Margin Result'>>
+          <<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.place('stock', _marginSymbol, Number(_stockSide), Number(_marginShares), Number(_stockLeverage)) ? 'ok' : 'rejected'>>
+        <</lanLink>>
+      </div>
+      <div id='deadwood-stock-quote' aria-live='polite'></div>
+    <</deadwood-card>>
+    <<deadwood-card 'Futures' '期货'>>
+      <<set $_margin to maplebirch.get('VanillaPlus').finance.margin>>
+      <<set _futureSymbol to _marginSymbol>>
+      <div class='dr-finance-form dr-finance-fields'>
+        <label><span><<lanSwitch 'Underlying' '标的'>></span><<listbox '_futureSymbol' autoselect>><<optionsfrom _marginOptions>><</listbox>></label>
+        <label><span><<lanSwitch 'Units' '数量'>></span><<numberbox '_marginLots' 100>></label>
+        <label><span><<lanSwitch 'Leverage' '杠杆'>></span><<listbox '_futuresLeverage' autoselect>><<optionsfrom $_margin.terms.futuresLeverage>><</listbox>></label>
+      </div>
+      <<language>>
+        <<option 'EN'>>
+          Each unit follows one share of the chosen company. The clerk rests a finger on <span class='gold'>200×</span>. "A 1% move means twice your initial margin. <span class='red'>On the wrong side, a gap can leave you owing money even after we close the position.</span>" Opening and closing fees are based on the full traded value.
+        <<option 'CN'>>
+          每个单位对应所选公司的一股。柜员把手指停在<span class='gold'>200 倍</span>那一栏。“价格变动 1%，就是两倍的初始保证金。<span class='red'>方向看反了，遇上跳空，平仓后你还可能欠钱。</span>”开仓和平仓的手续费都按全部成交金额计算。
+      <</language>><br>
+      <div class='dr-finance-actions'>
+        <<lanLink ['Check the quote', '核对报价']>>
+          <<set $_marginQuote to maplebirch.get('VanillaPlus').finance.margin.orderQuote('futures', _futureSymbol, 1, Number(_marginLots), Number(_futuresLeverage))>>
+          <<replace '#deadwood-futures-quote'>><<deadwood-finance-margin-quote $_marginQuote>><</replace>>
+        <</lanLink>>
+        <<lanLink ['Open long', '买入开仓'] 'Deadwood Reblooms Financial Centre Margin Result'>>
+          <<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.place('futures', _futureSymbol, 1, Number(_marginLots), Number(_futuresLeverage)) ? 'ok' : 'rejected'>>
+        <</lanLink>>
+        <<lanLink ['Open short', '卖出开仓'] 'Deadwood Reblooms Financial Centre Margin Result'>>
+          <<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.place('futures', _futureSymbol, -1, Number(_marginLots), Number(_futuresLeverage)) ? 'ok' : 'rejected'>>
+        <</lanLink>>
+      </div>
+      <div id='deadwood-futures-quote' aria-live='polite'></div>
+    <</deadwood-card>>
+  </div>
 <</if>>
-<h3><<lanSwitch 'Open positions' '未平仓持仓'>></h3>
-<<for $_position range $_margin.positions>>
-  <<capture $_position>>
-    <strong><<= $_position.symbol>></strong> · <<lanSwitch `$_position.kind === 'stock' ? 'Financed shares' : 'Futures'` `$_position.kind === 'stock' ? '融资股票' : '期货'`>> · <<lanSwitch `$_position.side === 1 ? 'Long' : 'Short'` `$_position.side === 1 ? '多头' : '空头'`>><br>
-    <<lanSwitch 'Leverage / units: ' '杠杆／单位：'>><<= $_position.leverage>>× / <<= $_position.units>> · <<lanSwitch 'Entry / current: ' '开仓／现价：'>><<deadwood-reblooms-finance-money $_position.entry>> / <<deadwood-reblooms-finance-money `$_margin.quote($_position.symbol)`>><br>
-    <<lanSwitch 'Margin / equity: ' '保证金／权益：'>><<deadwood-reblooms-finance-money $_position.margin>> / <<deadwood-reblooms-finance-money `$_margin.equity($_position)`>><br>
-    <<lanSwitch 'Accrued interest: ' '累计利息：'>><<deadwood-reblooms-finance-money $_position.fees>><br>
-    <<if $_position.expires isnot null>>
-      <<lanSwitch 'Expiry: ' '到期：'>><<deadwood-reblooms-finance-date $_position.expires>><br>
-    <</if>>
-    <<lanLink ['Close position', '平仓'] 'Deadwood Reblooms Financial Centre Margin Result'>><<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.close($_position.id) ? 'closed' : 'rejected'>><</lanLink>> |
-    <<lanLink ['Add £1,000 margin', '追加 £1,000 保证金'] 'Deadwood Reblooms Financial Centre Margin Result'>><<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.topUp($_position.id, 1000) ? 'topped-up' : 'rejected'>><</lanLink>><br><br>
-  <</capture>>
-<</for>>
-<h3><<lanSwitch 'Recent settlements' '最近结算'>></h3>
-<<for $_trade range $_margin.history.slice(-10).reverse()>>
-  <<= $_trade.symbol>> · <<lanSwitch `$_trade.reason === 'liquidated' ? 'Forced liquidation' : $_trade.reason === 'expired' ? 'Expired' : 'Closed'` `$_trade.reason === 'liquidated' ? '强制平仓' : $_trade.reason === 'expired' ? '到期交割' : '主动平仓'`>> · <<deadwood-reblooms-finance-money $_trade.profit>><br>
-<</for>><br>
+<<if $_margin.positions.length>>
+  <<deadwood-card 'Stop-loss and take-profit orders' '止盈止损委托'>>
+    <<set $_margin to maplebirch.get('VanillaPlus').finance.margin>>
+    <<language>>
+      <<option 'EN'>>
+        The clerk places an order form beside your statement. "We check these against the daily quotes. <span class='red'>A price jump can take you past your limit.</span> We close at the available price."
+      <<option 'CN'>>
+        柜员把委托单放在账单旁。“我们每天按行情检查。<span class='red'>价格跳过止损线，亏损也可能超出限额。</span>平仓按当时的报价算。”
+    <</language>><br><br>
+    <<language>>
+      <<option 'EN'>>
+        Triggers are set as a percentage of the current margin, before closing fees. Enter zero to cancel a trigger. Adding margin later does not change these amounts.
+      <<option 'CN'>>
+        止盈止损金额按当前保证金的比例设定，不含平仓手续费。填零取消该项，追加保证金不会改变已设金额。
+    <</language>><br>
+    <<set _closing_positions to {}>>
+    <<for $_position range $_margin.positions>><<set _closing_positions[$_position.id + ': ' + $_position.symbol] to $_position.id>><</for>>
+    <<set _closing_id to $_margin.positions[0].id>>
+    <div class='dr-finance-form dr-finance-fields'>
+      <label><span><<lanSwitch 'Position' '持仓'>></span><<listbox '_closing_id' autoselect>><<optionsfrom _closing_positions>><</listbox>></label>
+      <label><span><<lanSwitch 'Loss trigger (0–90%)' '止损比例（0～90%）'>></span><<numberbox '_closing_loss' 50>></label>
+      <label><span><<lanSwitch 'Profit trigger (0–1000%)' '止盈比例（0～1000%）'>></span><<numberbox '_closing_profit' 100>></label>
+    </div>
+    <div class='dr-finance-actions'>
+      <<lanLink ['Submit order', '提交委托'] 'Deadwood Reblooms Financial Centre Margin Result'>>
+        <<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.limits(Number(_closing_id), Number(_closing_loss), Number(_closing_profit)) ? 'limits' : 'rejected'>>
+      <</lanLink>>
+    </div>
+  <</deadwood-card>>
+<</if>>
+<<deadwood-card 'Open positions' '当前持仓'>>
+  <<set $_margin to maplebirch.get('VanillaPlus').finance.margin>>
+  <<if $_margin.positions.length>>
+    <<for $_position range $_margin.positions>>
+      <<capture $_position>>
+        <div class='dr-finance-record'>
+          <strong class='gold'><<= $_position.symbol>></strong> ·
+          <<lanSwitch `$_position.kind === 'stock' ? ($_position.side === -1 ? 'Borrowed shares sold short' : 'Financed shares') : 'Futures'` `$_position.kind === 'stock' ? ($_position.side === -1 ? '融券卖出' : '融资股票') : '期货'`>> ·
+          <<lanSwitch `$_position.side === 1 ? 'Long' : 'Short'` `$_position.side === 1 ? '多头' : '空头'`>>
+          <div class='dr-finance-summary'>
+            <span><<lanSwitch 'Leverage / quantity' '杠杆／数量'>></span><span><<= $_position.leverage>>× / <<= $_position.units>></span>
+            <span><<lanSwitch 'Entry / current price' '开仓价／现价'>></span><span><<deadwood-reblooms-finance-money $_position.entry>> / <<deadwood-reblooms-finance-money `$_margin.quote($_position.symbol)`>></span>
+            <span><<lanSwitch 'Margin / equity' '保证金／权益'>></span><span><<deadwood-reblooms-finance-money $_position.margin>> / <<deadwood-reblooms-finance-money `$_margin.equity($_position)`>></span>
+            <span><<lanSwitch 'Accrued charges' '累计费用'>></span><span><<deadwood-reblooms-finance-money $_position.fees>></span>
+            <<if $_position.stop_loss>>
+              <span><<lanSwitch 'Loss trigger' '止损金额'>></span><span><<deadwood-reblooms-finance-money $_position.stop_loss>></span>
+            <</if>>
+            <<if $_position.take_profit>>
+              <span><<lanSwitch 'Profit trigger' '止盈金额'>></span><span><<deadwood-reblooms-finance-money $_position.take_profit>></span>
+            <</if>>
+            <<if $_position.expires isnot null>>
+              <span><<lanSwitch 'Expiry' '到期'>></span><span><<deadwood-reblooms-finance-date $_position.expires>></span>
+            <</if>>
+          </div>
+          <div class='dr-finance-actions'>
+            <<lanLink ['Close position', '平仓'] 'Deadwood Reblooms Financial Centre Margin Result'>><<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.close($_position.id) ? 'closed' : 'rejected'>><</lanLink>>
+            <<lanLink ['Add £1,000 margin', '追加 £1,000 保证金'] 'Deadwood Reblooms Financial Centre Margin Result'>><<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').finance.margin.topUp($_position.id, 1000) ? 'topped-up' : 'rejected'>><</lanLink>>
+          </div>
+        </div>
+      <</capture>>
+    <</for>>
+  <<else>>
+    <span class='blue'><<lanSwitch 'No open positions.' '暂无持仓。'>></span>
+  <</if>>
+<</deadwood-card>>
+<<deadwood-card 'Closing records' '平仓记录'>>
+  <<set $_margin to maplebirch.get('VanillaPlus').finance.margin>>
+  <<if $_margin.history.length>>
+    <div class='dr-finance-scroll'>
+      <table class='dr-finance-quotes'>
+        <thead><tr>
+          <th scope='col'><<lanSwitch 'Symbol' '代码'>></th>
+          <th scope='col'><<lanSwitch 'Reason' '平仓原因'>></th>
+          <th scope='col'><<lanSwitch 'Profit / loss' '盈亏'>></th>
+        </tr></thead>
+        <tbody>
+          <<for $_trade range $_margin.history.slice(-10).reverse()>>
+            <tr>
+              <td><<= $_trade.symbol>><<if $_trade.side>><br><span class='blue'><<lanSwitch `$_trade.side === 1 ? 'Long' : 'Short'` `$_trade.side === 1 ? '多头' : '空头'`>></span><</if>></td>
+              <td><<lanSwitch `$_trade.reason === 'liquidated' ? 'Forced liquidation' : $_trade.reason === 'expired' ? 'Expired' : $_trade.reason === 'stopped' ? 'Stop-loss' : $_trade.reason === 'target' ? 'Take-profit' : 'Closed'` `$_trade.reason === 'liquidated' ? '强制平仓' : $_trade.reason === 'expired' ? '到期交割' : $_trade.reason === 'stopped' ? '止损' : $_trade.reason === 'target' ? '止盈' : '主动平仓'`>></td>
+              <td><<deadwood-reblooms-finance-money $_trade.profit>></td>
+            </tr>
+          <</for>>
+        </tbody>
+      </table>
+    </div>
+  <<else>>
+    <span class='blue'><<lanSwitch 'No closing records yet.' '暂无平仓记录。'>></span>
+  <</if>>
+<</deadwood-card>>
 <<getouticon>><<lanLink ['Return to securities desk', '返回证券业务台'] 'Deadwood Reblooms Financial Centre Securities'>><</lanLink>>
+<</nobr>>
 
 :: Deadwood Reblooms Financial Centre Margin Result []
 <<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
@@ -135,8 +248,10 @@
     <<lanSwitch 'Profit / loss after fees: ' '扣费后盈亏：'>><<deadwood-reblooms-finance-money $_settlement.profit>><br>
   <</if>>
   <<deadwood-finance-risk-summary>>
+<<elseif $VanillaPlus.finance.last_result is 'limits'>>
+  <<lanSwitch 'The clerk files your instructions. The selected limits are now shown beside the position.' '柜员收好委托单。设定的限额已列在持仓旁。'>>
 <<elseif $VanillaPlus.finance.last_result is 'topped-up'>>
-  <<lanSwitch "£1,000 has moved from your available securities funds to the position's margin." '£1,000 已从证券可用资金划入这笔持仓的保证金。'>>
+  <<lanSwitch "£1,000 has moved from your available securities funds to the position's margin." '已从证券账户追加 £1,000 保证金。'>>
 <<else>>
   <span class='red'><<lanSwitch 'The order was rejected. Check the funds, quantity, trading hours and overdue debts.' '委托未获受理。检查可用资金、数量、营业时间与逾期欠款。'>></span>
 <</if>><br><br>
@@ -158,12 +273,20 @@
   <<lanSwitch 'Appraised value: ' '评估价：'>><<deadwood-reblooms-finance-money `$_estate.appraisal($_id)`>><br>
   <<lanSwitch 'Maximum borrowing (60%): ' '可借上限（60%）：'>><<deadwood-reblooms-finance-money $_limit>><br>
   <<language>>
-    <<option 'EN'>>The bank deducts a 2% fee from the advance. Weekly interest is 0.35%. Keep enough in your account for the first instalment.
-    <<option 'CN'>>银行从放款中扣除 2% 手续费，周利率为 0.35%。记得在账户里留够第一期还款。
+    <<option 'EN'>>The bank deducts a 2% fee from the advance. The term you choose sets the weekly interest rate. Keep enough in your account for the first instalment.
+    <<option 'CN'>>银行从放款中扣除 2% 手续费，周利率随你选择的期限变化。记得在账户里留够第一期还款。
   <</language>><br>
   <<set _collateralAmount to Math.floor($_limit / 100)>>
   <label><<lanSwitch 'Borrow £' '借款 £'>><<numberbox '_collateralAmount' _collateralAmount>></label><br>
-  <label><<lanSwitch 'Term (days): ' '期限（天）：'>><<listbox '$VanillaPlus.real_estate.mortgage_term' autoselect>><<optionsfrom $_estate.mortgage.terms.available_terms>><</listbox>></label><br>
+  <<if !$_estate.mortgage.terms.available_terms.includes($VanillaPlus.real_estate.mortgage_term)>>
+    <<set $VanillaPlus.real_estate.mortgage_term to $_estate.mortgage.terms.term_days>>
+  <</if>>
+  <label><<lanSwitch 'Term (days): ' '期限（天）：'>><<listbox '$VanillaPlus.real_estate.mortgage_term' autoselect>><<optionsfrom $_estate.mortgage.terms.available_terms>><</listbox>></label>
+  <<lanLink ['Update quote', '更新报价']>>
+    <<replace '#deadwood-collateral-quote'>><<deadwood-finance-collateral-quote _collateralAmount>><</replace>>
+  <</lanLink>><br>
+  <div id='deadwood-collateral-quote' aria-live='polite'><<deadwood-finance-collateral-quote _collateralAmount>></div><br>
+
   <<lanLink ['Sign the mortgage', '签订抵押借款合同'] 'Deadwood Reblooms Property Collateral Result'>>
     <<set $VanillaPlus.finance.last_result to maplebirch.get('VanillaPlus').realEstate.borrowAgainst($VanillaPlus.real_estate.collateral_property, Number(_collateralAmount), $VanillaPlus.real_estate.mortgage_term)>>
   <</lanLink>><br>
@@ -183,7 +306,7 @@
 :: Deadwood Reblooms Financial Debt []
 <<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
 <<if $VanillaPlus.finance.collection.amount lte 0>>
-  <<lanSwitch 'There is no outstanding recovery debt.' '没有尚待追偿的欠款。'>><br><br>
+  <<lanSwitch 'There is no outstanding recovery debt.' '没有待追偿的欠款。'>><br><br>
   <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Financial Centre'>><</lanLink>><<exit>>
 <</if>>
 <<language>>

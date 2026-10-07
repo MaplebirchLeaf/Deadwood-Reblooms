@@ -56,7 +56,7 @@ export default class Weapons {
     const target = this.target(hand);
     if (!target) return;
     const weapon = this.weapon!;
-    const skill = Math.max(0, Math.min(1000, V.prof[weapon])) / 1000;
+    const skill = Math.clamp(V.prof[weapon], 0, 1000) / 1000;
     const health = Number.isFinite(target.tentaclehealthstart) ? target.tentaclehealthstart : target.tentaclehealth;
     // 原版单手放逐至少造成 10 点伤害，普通武器的单次伤害保持在它之下。
     const damage = Math.min(9, 2 + Math.floor(Math.max(0, health) * (0.05 + skill * 0.05)));

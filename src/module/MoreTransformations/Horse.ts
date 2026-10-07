@@ -271,7 +271,7 @@ class Horse extends Transformation {
           // 追上马并完成刷毛时结算一次成长，直接挂在唯一的刷毛组件入口。
           {
             src: '<<widget "farm_brush">>',
-            applyafter: '<<if passage() is "Farm Horses Chase" and $maplebirch.transformation.horse.level > 0>><<transform "horse" 1>><</if>>',
+            applyafter: '<<if $passage is "Farm Horses Chase" and $maplebirch.transformation.horse.level > 0>><<transform "horse" 1>><</if>>',
             expected: 1
           }
         ],

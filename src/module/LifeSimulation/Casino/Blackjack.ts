@@ -58,7 +58,7 @@ export const DEFAULT_BLACKJACK_STATE: BlackjackState = {
   intimacy_pair: null
 };
 
-/** 沿用原版计分规则；A 先计 11，超出 21 时逐张改计 1。 */
+/** 沿用原版计分规则，A 先计 11，超出 21 时逐张改计 1。 */
 export function blackjackScore(cards: readonly PlayingCard[]): number {
   let score = 0,
     aces = 0;
@@ -215,7 +215,7 @@ class Blackjack {
     return true;
   }
 
-  /** 三人局把两位恋人的姓名留到亲密场景；leave 会穿回衣物，但不清空这个记录。 */
+  /** 三人局把两位恋人的姓名留到亲密场景，leave 会穿回衣物，但不清空这个记录。 */
   public beginPairIntimacy(): boolean {
     if (!this.pairIntimacyReady) return false;
     this.state.intimacy_pair = [this.state.companion!, this.state.partner!].sort();
@@ -356,10 +356,12 @@ class Blackjack {
   public collectPayout(): number {
     if (this.state.phase !== 'done' || this.state.paid) return 0;
     this.state.paid = true;
+    if (this.state.venue === 'casino') this.core.get('LifeSimulation')?.casino.record('blackjack', this.state.bet, this.payout);
     return this.payout;
   }
 
   public leave(): void {
+    if (this.state.venue === 'casino' && this.state.phase === 'player' && !this.state.paid) this.core.get('LifeSimulation')?.casino.record('blackjack', this.state.bet, 0);
     this.clothes.restore();
     this.state.phase = 'ready';
     this.state.trick = clone(DEFAULT_CARD_TRICK_STATE);

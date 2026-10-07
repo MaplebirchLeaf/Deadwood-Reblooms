@@ -140,7 +140,7 @@ Unknown seeds, uncleared ground, occupied plots, remaining moisture, active fert
 - **Farm cooperation**: Alex arranges crates and transport. Only the first successful delivery each day increases love.
 - **Ledger**: New shop orders and regular purchases enter the orchard ledger. Other vanilla stall sales remain in vanilla records to avoid double counting.
 
-Repeat fruit orders halve in winter, when hot chocolate is more popular. After three purchases, the regular prefers the first fruit purchased; when it is not displayed or fewer than five remain, another displayed fruit can be chosen. Ledger entries identify farm, shop and regular sales; older entries retain a generic sale label.
+Repeat fruit orders halve in winter, when hot chocolate is more popular. Trial quantities remain unchanged. Signed orders retain their agreed quantities and prices. After three purchases, the regular prefers the first fruit purchased; when it is not displayed or fewer than five remain, another displayed fruit can be chosen. Ledger entries identify farm, shop and regular sales; older entries retain a generic sale label.
 
 ### Alex's weekly fruit contracts
 
@@ -149,3 +149,9 @@ Open **fruit inventory and sales** at the farm orchard while Alex can arrange de
 Deliver the whole batch together. Reserved fruit is excluded. Timely delivery pays the agreed amount and returns the deposit; missing the deadline forfeits the deposit and affects Alex's trust. Contracts use a separate arrangement from the ordinary daily bulk-buying allowance.
 
 Recent completed supplies to Robin's drinks shop contribute extra weekly sales. That contribution lapses without a fresh delivery. Orchard sales records also support a business-purpose bank loan, with PC responsible for repayment.
+
+### Standing wage and delivery instructions
+
+With finance enabled and a debit card issued, authorise your orchard worker to collect wages automatically, and meet a separate delivery worker beside the orchard to arrange morning loads. Both start disabled. The same delivery worker returns, charges per load, and keeps the latest collection record; you can stop or resume the arrangement when you meet. After a paid period ends, the first eligible morning charges £250 from the bank before starting a new seven-day period. Missed shifts are not billed retroactively. Insufficient funds or an unavailable card suspend renewal. Dismissing the orchard worker also cancels wage renewal and delivery arrangements.
+
+Deliveries share the manual delivery price (70% of the vanilla price) and the combined limit of 100 fruit per day. Each load costs another £5. Reserved quantities, blood lemons and fruit promised to unexpired pending orders are retained; a load whose gross payment cannot cover the fee is left in storage. Proceeds enter the bank and transport costs appear separately in the ledger. Deliveries grant no PC tending experience or Alex affection. Attacks suspend transport. The worker does not accept contracts, pay bonds or fulfil those contracts for you.

@@ -1,6 +1,6 @@
 // ./src/module/Achievements.ts
 
-import { POOL_PARTY_COMPANIONS } from './constants';
+import { POOL_PARTY_COMPANIONS } from './constants/life-simulation';
 
 type AchievementModule = 'BirdTower' | 'LifeSimulation' | 'MoreTransformations' | 'Robin' | 'Sydney' | 'VanillaPlus' | 'Whitney';
 
@@ -146,6 +146,30 @@ class Achievements {
       filter: ['All', 'General']
     },
     {
+      module: 'LifeSimulation',
+      id: 'Deadwood Winning Streak',
+      title: 'deadwood-reblooms:LifeSimulation:casino:feat:streak:title',
+      description: 'deadwood-reblooms:LifeSimulation:casino:feat:streak:description',
+      difficulty: 2,
+      filter: ['All', 'General']
+    },
+    {
+      module: 'LifeSimulation',
+      id: 'Deadwood Big Night',
+      title: 'deadwood-reblooms:LifeSimulation:casino:feat:profit:title',
+      description: 'deadwood-reblooms:LifeSimulation:casino:feat:profit:description',
+      difficulty: 3,
+      filter: ['All', 'General']
+    },
+    {
+      module: 'LifeSimulation',
+      id: 'Deadwood Steady Dealer',
+      title: 'deadwood-reblooms:LifeSimulation:casino:feat:dealer:title',
+      description: 'deadwood-reblooms:LifeSimulation:casino:feat:dealer:description',
+      difficulty: 2,
+      filter: ['All', 'General']
+    },
+    {
       module: 'Sydney',
       id: 'Four Halloween Visits',
       title: 'deadwood-reblooms:sydney:halloween:feat:title',
@@ -235,7 +259,7 @@ class Achievements {
     }
   ];
 
-  /** 由对应模块 preInit 调用；定义保留动态翻译，授予条件沿用原有判定。 */
+  /** 由对应模块 preInit 调用，定义保留动态翻译，授予条件沿用原有判定。 */
   public static add(maplebirch: typeof window.maplebirch, module: AchievementModule): void {
     maplebirch.tool.onInit(() => {
       for (const entry of Achievements.definitions) {
@@ -280,6 +304,21 @@ class Achievements {
         maplebirch.dynamic.regStateEvent('append', 'life-simulation-naked-school-feat', {
           output: 'earnFeat "Naked School"',
           cond: () => V.feats?.currentSave['Naked School'] === undefined && V.LifeSimulation?.school?.dress?.highest === 'mandatoryNudity'
+        });
+
+        maplebirch.dynamic.regStateEvent('append', 'life-simulation-casino-streak-feat', {
+          output: 'earnFeat "Deadwood Winning Streak"',
+          cond: () => V.feats?.currentSave['Deadwood Winning Streak'] === undefined && (V.LifeSimulation?.casino?.statistics.best_streak ?? 0) >= 5
+        });
+
+        maplebirch.dynamic.regStateEvent('append', 'life-simulation-casino-profit-feat', {
+          output: 'earnFeat "Deadwood Big Night"',
+          cond: () => V.feats?.currentSave['Deadwood Big Night'] === undefined && (V.LifeSimulation?.casino?.statistics.best_night_profit ?? 0) >= 1000000
+        });
+
+        maplebirch.dynamic.regStateEvent('append', 'life-simulation-casino-dealer-feat', {
+          output: 'earnFeat "Deadwood Steady Dealer"',
+          cond: () => V.feats?.currentSave['Deadwood Steady Dealer'] === undefined && (V.LifeSimulation?.casino?.good_shifts ?? 0) >= 10
         });
         break;
       }

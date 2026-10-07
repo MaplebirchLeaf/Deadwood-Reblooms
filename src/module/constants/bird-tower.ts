@@ -26,11 +26,11 @@ export const BIRD_TOWER_HINTS: Partial<Record<BirdTowerStage, 'grow_hint_fledgli
   Immature: 'grow_hint_immature'
 };
 
-/** 每天最多计入两次主动喂食；幼年第二餐可积累体型成长，离巢后两餐折算一天的食量。 */
+/** 每天最多计入两次主动喂食，幼年第二餐可积累体型成长，离巢后两餐折算一天的食量。 */
 export const BIRD_TOWER_MEALS = 2;
 
 // BirdTower 模块的存档结构，对应 V.BirdTower。鹰崽自身的成长数据仍存在原版
-// child.development 上，随孩子一起保存；这里只放模块级的全局标记。
+// child.development 上，随孩子一起保存，这里只放模块级的全局标记。
 export interface BirdTowerState {
   /** 首次事件去重标记。 */
   seen: {
@@ -72,7 +72,7 @@ export interface BirdTowerState {
   };
   /** 跨段落成长事件：完整名单用于称呼，参与者在开场时随机选定。 */
   scene: {
-    /** 当前事件位于新巢；跨页面喂食与荒原同行的对象。 */
+    /** 当前事件位于新巢，跨页面喂食与荒原同行的对象。 */
     other_nest: boolean;
     feeding_id: number | null;
     moor_ids: number[];

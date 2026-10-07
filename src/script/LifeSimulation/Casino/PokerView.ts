@@ -10,7 +10,7 @@ const holdemPassage = 'Deadwood Reblooms Life Simulation Holdem';
 const threeCardPassage = 'Deadwood Reblooms Life Simulation Three Card';
 const watchPassage = 'Deadwood Reblooms Casino Lounge Watch';
 
-/** Twee 负责桌面、文案与选项；这里只加载牌面、处理加注输入及动画。 */
+/** Twee 负责桌面、文案与选项，这里只加载牌面、处理加注输入及动画。 */
 class TableView {
   public readonly root = document.createElement('div');
   private readonly loads: Promise<unknown>[] = [];

@@ -1,11 +1,14 @@
 // ./src/module/Robin/Shop.ts
 
 import Shared from './Shared';
+import Investment from './Investment';
 
 /** 两个正式职位由外来店员与孤儿院同伴共用。 */
 const MAX_SHOP_STAFF = 2;
 
 export default class RobinShop extends Shared {
+  public readonly investment = new Investment(this.core, this.facade);
+
   /** 正式店铺可刷卡，VanillaPlus 未启用时保留原本的现金购买。 */
   public canCustomerPay(pennies: number): boolean {
     if (!Number.isSafeInteger(pennies) || pennies < 0) return false;
@@ -125,7 +128,7 @@ export default class RobinShop extends Shared {
     return true;
   }
 
-  /** 银行是否愿意为开店提供贷款：需已开户、余额足够，且尚未接受过。 */
+  /** PC 是否能从银行账户垫付开店资金。 */
   public get canBorrowLoan(): boolean {
     const stage = this.state.shopStage;
     return (
@@ -139,7 +142,7 @@ export default class RobinShop extends Shared {
     );
   }
 
-  /** 从银行贷款 2000 英镑作为开店资金，同时记入 PC 垫付。 */
+  /** 从 PC 存款划出 2000 英镑，同时记入罗宾向 PC 的借款。 */
   public borrowLoan(): boolean {
     if (!this.canBorrowLoan || this.vanillaPlus?.finance.payFromBankPennies(200000) !== 'ok') return false;
     this.state.reserve += 2000;

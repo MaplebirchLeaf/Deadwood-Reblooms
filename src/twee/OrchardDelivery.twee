@@ -1,0 +1,68 @@
+:: Deadwood Reblooms Orchard Delivery []
+<<set $outside to 1>><<set $location to 'alex_farm'>><<set $bus to 'farm_fields'>><<farm_work_update>><<effects>><<endevent>>
+<<set _orchard to maplebirch.get('Orchard')>>
+<<if !_orchard or !_orchard.available('farm') or !$Orchard.worker.hired or !_orchard.canWork or _orchard.farmInterrupted or $farm_assault or !maplebirch.get('VanillaPlus')>>
+  <<getouticon>><<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>><<exit>>
+<</if>>
+<<if _orchard.carrier>>
+  <<loadNPC 0 'deadwood_orchard_carrier'>>
+<<else>>
+  <<generate1>><<npcClothesName $NPCList[0] 'wildsFlannel'>>
+<</if>><<person1>>
+<<set _carrierMet to $NPCList[0].name_known is 1>>
+<<language>>
+  <<option 'EN'>>
+    <<if _carrierMet>>
+      You find <<print $NPCList[0].name>> checking the lashings on a stack of empty crates. <<He>> tugs a knot tight before turning towards you.
+    <<else>>
+      You ask who takes the farm's produce into town. A <<person>> beside the loading shed raises a hand. <<He>> puts down an empty crate, wipes <<his>> palms on <<his>> trousers, and introduces <<himself>> as <<print $NPCList[0].name>>.
+    <</if>><br><br>
+    <<if ($NPCList[0].orchard_deliveries or 0) gte 3>>
+      "Same arrangement?" <<he>> asks. "Your worker sets the spare fruit aside. I count it, get a receipt and pay the proceeds into your bank. Anything marked for Robin or Alex stays here. I don't want to explain why someone else's order ended up on my truck."
+    <<else>>
+      "I can take yours with the morning load," <<he>> says. "Have your orchard worker set it aside. <span class='gold'>I take <<printmoney _orchard.deliveryFee>> per load</span>, then pay the rest into your bank. No fruit, no charge."
+    <</if>><br><br>
+    <<He>> taps the edge of a crate. "Keep what you need for yourself and your orders. <span class='red'>Blood lemons stay off my truck.</span> If there's fighting at the farm, I stay away. I'm delivering fruit, not getting between someone's fists."
+  <<option 'CN'>>
+    <<if _carrierMet>>
+      你找到<<print $NPCList[0].name>>时，<<he>>正在检查一摞空筐上的绑绳。<<He>>拉紧一个绳结，才转身看向你。
+    <<else>>
+      你打听是谁把农场的货送进镇里。装货棚旁的一位<<person>>朝你举起手。<<He>>放下空筐，在裤子上擦擦手，告诉你自己叫<<print $NPCList[0].name>>。
+    <</if>><br><br>
+    <<if ($NPCList[0].orchard_deliveries or 0) gte 3>>
+      “还是照旧？”<<he>>问。“你的雇工把多余水果留出来，我数好数量，拿收据，把货款存进你的银行。标着给罗宾或者艾利克斯的留下。我可不想解释，别人的订单怎么跑到我车上去了。”
+    <<else>>
+      “早上的货可以带上你的，”<<he>>说。“让果园雇工留出来就行。<span class='gold'>每趟我收<<printmoney _orchard.deliveryFee>></span>，余下的货款存进你的银行。没货，不收钱。”
+    <</if>><br><br>
+    <<He>>拍了拍筐沿。“自己要吃的、订单要交的，都留好。<span class='red'>血柠别往我车上放。</span>农场有人闹事，我就不过来了。我是来送水果的，可不是来挨拳头的。”
+<</language>>
+<<set $NPCList[0].name_known to 1>><<saveNPC 0 'deadwood_orchard_carrier'>><br><br>
+<<if _orchard.carrier.orchard_delivery>>
+  <<set _delivery to _orchard.carrier.orchard_delivery>>
+  <<lanSwitch 'Last collection: ' '最近一次收货：'>><<print getFormattedDate(new DateTime(_delivery.day * 86400 + 8 * 3600))>><br>
+  <<if _delivery.amount gt 0>>
+    <<lanSwitch 'Fruit delivered: ' '送出的水果：'>><span class='green'><<= _delivery.amount>></span> · <<lanSwitch 'Net bank payment: ' '银行净入账：'>><<printmoney _delivery.income>><br>
+  <<else>>
+    <<lanSwitch 'There was no spare load worth taking. No transport fee was charged.' '没有值得运走的多余水果，本次未收运费。'>><br>
+  <</if>><br>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    Deliveries use the usual bulk price and share the daily limit with your own deliveries. Reserved quantities and unexpired pending orders are kept back. Your orchard worker must be on a paid shift; the driver leaves fruit here when its payment would not cover the fee.
+  <<option 'CN'>>
+    运输沿用平常的收购价，与亲自送货共用每日额度。保留库存和未到期订单所需的水果留下。果园雇工必须仍在付薪上工。一趟货款不够抵运费，送货工就不会拉走。
+<</language>><br><br>
+<<if $Orchard.worker.haul>>
+  <<refuseicon>><<lanLink ['End the delivery arrangement', '结束运输安排'] 'Deadwood Reblooms Orchard'>>
+    <<run maplebirch.get('Orchard').arrangeWorker('haul', false)>><<endevent>><<set $Orchard.site to 'farm'>><<set $eventskip to 1>>
+  <</lanLink>><br>
+<<elseif $VanillaPlus.finance.bank.debit_card>>
+  <<lanLink ['Arrange morning deliveries', '委托早班运输'] 'Deadwood Reblooms Orchard'>>
+    <<run maplebirch.get('Orchard').arrangeWorker('haul', true)>><<endevent>><<set $Orchard.site to 'farm'>><<set $eventskip to 1>>
+  <</lanLink>><br>
+<<else>>
+  <span class='red'><<lanSwitch 'A debit card is required for bank settlement.' '需要借记卡才能安排银行结算。'>></span><br>
+<</if>>
+<<getouticon>><<lanLink ['Return to the orchard', '返回果园'] 'Deadwood Reblooms Orchard'>>
+  <<endevent>><<set $Orchard.site to 'farm'>><<set $eventskip to 1>>
+<</lanLink>>

@@ -48,6 +48,8 @@ interface PropertyManagement {
   wardrobe_id: string | null;
   furnishings?: Partial<Record<FurnitureKind, string>>;
   paperhangings?: Partial<Record<PaperKind, { design: string; custom: boolean }>>;
+  managed?: boolean;
+  management_report?: { day: number; fee: number; repairs: number; recovered: number; blocked: boolean };
 }
 
 interface AuctionRecord {
@@ -66,7 +68,7 @@ export class RealEstate {
     visiting: null,
     floor: 1,
     mortgage: null,
-    mortgage_term: 365,
+    mortgage_term: 30,
     collateral_property: null,
     tenant_property: null,
     management: {},
@@ -85,6 +87,7 @@ export class RealEstate {
   private loadedProperties?: Property[];
   private loadedResidents?: ResidentProfile[];
   public readonly mortgage: Mortgage;
+  public readonly rentalTerms = rentalTerms;
 
   public constructor(
     private readonly core: typeof maplebirch,
@@ -580,6 +583,54 @@ export class RealEstate {
     return true;
   }
 
+  public get manager() {
+    const npc = V.per_npc?.deadwood_property_manager;
+    return npc?.property_employed ? npc : null;
+  }
+
+  /** 一名管理员承接多处房源，签约前先结清旧日期，不补做未受雇期间的工作。 */
+  public employManager(enabled: boolean): boolean {
+    const npc = V.per_npc?.deadwood_property_manager;
+    if (this.core.passage.title !== 'Deadwood Reblooms Property Manager' || !npc) return false;
+    if (enabled && (!this.properties.some(property => this.owns(property.id)) || !V.VanillaPlus.finance.bank.debit_card)) return false;
+    this.settleDays();
+    npc.property_employed = enabled;
+    if (!enabled) for (const property of this.properties) this.managementFor(property.id).managed = false;
+    return true;
+  }
+
+  public manage(id: PropertyId, enabled: boolean): boolean {
+    if (!this.owns(id) || (enabled && (!this.manager || this.isFrozen(id) || this.managementFor(id).auction_day !== null))) return false;
+    this.settleDays();
+    this.managementFor(id).managed = enabled;
+    return true;
+  }
+
+  /** 周结算后执行已委托的工作，全部使用当时的存款，不透支、不自动续租或装修。 */
+  private manageWeek(id: PropertyId, day: number): void {
+    const management = this.managementFor(id);
+    if (!management.managed || management.management_report?.day === day || this.isFrozen(id) || management.auction_day !== null) return;
+    const fee = Math.max(rentalTerms.managementMinimumPennies, Math.ceil(this.weeklyRent(id) * rentalTerms.managementFeeRate));
+    const report = { day, fee: 0, repairs: 0, recovered: 0, blocked: false };
+    management.management_report = report;
+    if (!this.manager || this.finance.payFromBankPennies(fee) !== 'ok') {
+      report.blocked = true;
+      return;
+    }
+    report.fee = fee;
+    const issue = management.rental_issue;
+    if (issue?.type === 'leak') {
+      const cost = this.rentalRepairCost(id);
+      if (this.resolveIssue(id, 'repair', day)) report.repairs += cost;
+      else report.blocked = true;
+    } else if (issue?.type === 'arrears' && day - issue.day >= 7 && this.resolveIssue(id, 'wait', day)) report.recovered = issue.rent;
+    if (management.condition <= rentalTerms.repairCondition) {
+      const cost = this.repairCost(id);
+      if (this.repair(id) === 'ok') report.repairs += cost;
+      else report.blocked = true;
+    }
+  }
+
   public endLease(id: PropertyId): boolean {
     const management = this.managementFor(id);
     if (!this.owns(id) || !management.rented || management.lease_end_day !== null) return false;
@@ -626,7 +677,7 @@ export class RealEstate {
         if (day >= management.next_settlement_day) {
           const upkeep = this.maintenanceCost(property.id);
           if (management.rented && day < management.vacancy_until) {
-            this.finance.collectBankPennies(upkeep);
+            if (this.finance.collectBankPennies(upkeep) < upkeep) management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.condition_loss_per_week);
           } else if (management.rented && management.condition >= this.mortgage.terms.rental.minimum_condition) {
             // 租客支付当周租金和维护费。冻结时净租金先抵房贷。
             let netRent = Math.max(0, this.weeklyRent(property.id) - upkeep);
@@ -650,6 +701,7 @@ export class RealEstate {
           } else if (this.finance.collectBankPennies(upkeep) < upkeep) {
             management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.condition_loss_per_week);
           }
+          this.manageWeek(property.id, day);
           management.next_settlement_day = day + 7;
         }
         if (management.lease_end_day !== null && day >= management.lease_end_day) {
@@ -660,6 +712,9 @@ export class RealEstate {
         }
         if (management.auction_day !== null && day >= management.auction_day) this.sellByAuction(property.id, 'voluntary', 0, day);
       }
+      // 各业务按同一历史日期入账，再支付当天到期的债务。
+      this.core.get('Orchard')?.advance(day);
+      this.core.get('Robin')?.shop.investment.advance(day);
       this.mortgage.advanceThrough(day);
       this.finance.advanceBankThrough(day);
     }
@@ -685,6 +740,8 @@ export class RealEstate {
     const displaced = this.state.residents?.[id] ?? [];
     if (this.state.residents) this.state.residents[id] = [];
     management.rented = false;
+    management.managed = false;
+    management.management_report = undefined;
     management.rental_issue = null;
     delete V.per_npc?.[this.tenantKey(id)];
     management.lease_end_day = null;

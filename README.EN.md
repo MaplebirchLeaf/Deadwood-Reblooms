@@ -61,6 +61,19 @@ Each guide entry combines a chapter link and its module checkbox. Checkboxes sha
 
 The audio files and `dynamic-music.json` for `DynamicMusic` live in a separate pack. The main mod only provides the playback controller. After loading the audio pack, enable **Dynamic Music** in mod options and adjust music and ambience volumes separately. Without the audio pack, dynamic music stays silent and the other modules still work.
 
+## Source layout
+
+| Directory                      | Purpose                                                                                            |
+| ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `src/module`                   | Save state, gameplay logic and module registration. Subsystems belong under their parent module    |
+| `src/script`                   | Vanilla integration, patches and page rendering                                                    |
+| `src/assets`                   | Numeric settings, catalogues and guides. Display names in configuration reference translation keys |
+| `public/translations/CN`, `EN` | Names, choices and reusable short text grouped by module                                           |
+| `src/twee`                     | Pages, choices and narrative. Longer bilingual passages use matching `language` branches           |
+| `public/img`, `src/styles`     | Images and page styles                                                                             |
+
+Feat definitions share the static `add` entry in `src/module/Achievements.ts`. Each gameplay subsystem records progress when its actions settle.
+
 ## Acknowledgements and asset sources
 
 Thanks to the following creators for their work and help. You can turn off the corresponding Deadwood Reblooms module when using an overlapping original mod:

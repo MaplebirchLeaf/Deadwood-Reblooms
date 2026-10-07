@@ -4,7 +4,7 @@ import type { MacroContext, MacroDefinition } from 'twine-sugarcube';
 
 /** 原版段落只注入短 widget 调用，玩法逻辑由高塔模块处理。 */
 export default function BirdTowerScript(maplebirch: typeof window.maplebirch): void {
-  // 补丁随模块启用；长叙事放在对应的 Twee widget 中。
+  // 补丁随模块启用，长叙事放在对应的 Twee widget 中。
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Bird': [

@@ -141,24 +141,38 @@
   <<if $LifeSimulation.historyProject.status is 'ongoing'>>
     <hr>
     <h1 class="header gold bold"><<lanSwitch 'Local History Exhibition' '本地历史展览'>></h1>
-    <<set $_historyDays to Math.max(0, $LifeSimulation.historyProject.deadline - Time.days)>>
+    <<set $_historyDays to $LifeSimulation.historyProject.deadline - Time.days>>
     <<if $LifeSimulation.historyProject.draft gt 0>>
       <<language>>
         <<option 'EN'>><span class="blue"><i>The exhibition is ready. Present it at the museum.</i></span>
         <<option 'CN'>><span class="blue"><i>展览已经准备完成。到博物馆开展。</i></span>
       <</language>>
+    <<elseif $_historyDays lt 0>>
+      <<language>>
+        <<option 'EN'>>
+          The preparation deadline has <span class="pink">passed</span>. Take your project to the museum.
+        <<option 'CN'>>
+          展览准备期限<span class="pink">已过</span>。到博物馆提交项目。
+      <</language>>
     <<elseif $_historyDays is 0>>
-      <<lanSwitch 'The exhibition opens ' '展览将在'>><span class="pink"><<lanSwitch 'today' '今天'>></span><<lanSwitch '.' '开始。'>>
+      <<language>>
+        <<option 'EN'>>
+          Your project is due <span class="pink">today</span>. Take it to the museum.
+        <<option 'CN'>>
+          展览准备期限在<span class="pink">今天</span>截止。到博物馆提交项目。
+      <</language>>
     <<else>>
       <<language>>
-        <<option 'EN'>>The exhibition opens in <span class="gold"><<print $_historyDays>></span>
+        <<option 'EN'>>
+          Your project is due in <span class="gold"><<print $_historyDays>></span>
         <<if $_historyDays is 1>>
           day
         <<else>>
           days
         <</if>>
         .
-        <<option 'CN'>>距离展览开始还有 <span class="gold"><<print $_historyDays>></span> 天。
+        <<option 'CN'>>
+          距离展览准备截止还有 <span class="gold"><<print $_historyDays>></span> 天。
       <</language>>
     <</if>>
     <br>

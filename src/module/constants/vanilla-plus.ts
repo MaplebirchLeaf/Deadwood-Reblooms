@@ -40,6 +40,7 @@ export interface VanillaPlusState {
   /** 银行、证券与市场的全部可变状态。 */
   finance: FinanceState;
   adrian: {
+    service_location: string;
     last_offence: '' | 'pressure' | 'insult' | 'queue';
     lastVisit: number;
     visits: number;
@@ -150,7 +151,19 @@ export interface VanillaPlusState {
 }
 
 export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
-  adrian: { last_offence: '', lastVisit: -1, visits: 0, lastChat: -1, accountDiscussed: false, homeDiscussed: false, career: 0, careerReadyDay: 0, businessDay: -1, businessDays: 0 },
+  adrian: {
+    service_location: 'financial_centre',
+    last_offence: '',
+    lastVisit: -1,
+    visits: 0,
+    lastChat: -1,
+    accountDiscussed: false,
+    homeDiscussed: false,
+    career: 0,
+    careerReadyDay: 0,
+    businessDay: -1,
+    businessDays: 0
+  },
   lock: {
     physique: false,
     willpower: false,

@@ -71,7 +71,7 @@ function adaptRobin(core: MaplebirchCore): void {
           V.robinmoney += extraIncome;
           if (!state.baileyDefeated && (state.selfRent || V.robinpaid !== 1)) {
             const owed = state.selfRent ? runtime.ensureRobinStand().owed : 0;
-            const reserveTransfer = Math.min(state.reserve, Math.max(0, robin.rent.due + owed - V.robinmoney));
+            const reserveTransfer = Math.clamp(robin.rent.due + owed - V.robinmoney, 0, state.reserve);
             state.reserve -= reserveTransfer;
             V.robinmoney += reserveTransfer;
           }

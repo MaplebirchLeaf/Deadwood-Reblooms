@@ -7,7 +7,7 @@ import { blackjackPassage, blackjackScore, type PlayingCard } from '../../../mod
 const names: Record<string, string> = { Robin: '罗宾', Whitney: '惠特尼', Kylar: '凯拉尔', Sydney: '悉尼' };
 type Seat = 'player' | 'dealer' | 'partner';
 
-/** Twee 负责提示与选项；这里只处理牌面、动画和防止重复操作。 */
+/** Twee 负责提示与选项，这里只处理牌面、动画和防止重复操作。 */
 export default class BlackjackView {
   public readonly root = document.createElement('div');
   private readonly controls = document.createElement('div');

@@ -14,6 +14,8 @@ export interface RobinFacade {
   readonly income: number;
   /** 房租子系统。canSpend 需要它来保护下周房租。 */
   readonly rent: { readonly due: number };
+  /** 饮品店营业收入与雇工开销，单位英镑。 */
+  readonly shop: { readonly staffSales: number; readonly staffWages: number };
 }
 
 export default abstract class Shared {

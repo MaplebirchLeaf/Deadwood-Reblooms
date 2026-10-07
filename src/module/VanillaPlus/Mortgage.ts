@@ -3,15 +3,22 @@
 import type Finance from './Finance';
 import type { FinanceResult } from './Finance';
 
+const LOAN_TERMS = [
+  { days: 7, weekly_rate: 0.002 },
+  { days: 30, weekly_rate: 0.0025 },
+  { days: 60, weekly_rate: 0.003 },
+  { days: 90, weekly_rate: 0.0035 }
+];
+
 // 房贷和持有成本固定在同一套规则内，房源价格与房间布局仍由 properties.yaml 提供。
 const PROPERTY_TERMS = {
   down_payment_percent: 20,
   closing_fee_percent: 2,
   payment_reserve_weeks: 1,
-  term_days: 365,
-  available_terms: [90, 180, 365, 730],
+  payment_reserve_percent: 5,
+  term_days: 30,
+  available_terms: LOAN_TERMS.map(term => term.days),
   collateral_percent: 60,
-  weekly_interest_rate: 0.0035,
   late_fee_pennies: 2000,
   freeze_after_notice_days: 7,
   auction_after_freeze_days: 7,
@@ -24,7 +31,7 @@ const PROPERTY_TERMS = {
     weekly_maintenance_percent: 0.105,
     minimum_condition: 50,
     condition_loss_per_week: 1,
-    renovation_rent_bonus_percent: 60,
+    renovation_rent_bonus_percent: 20,
     renovation_cost_percent: 5,
     repair_cost_per_condition_percent: 0.05,
     max_renovation_level: 3
@@ -37,6 +44,7 @@ export interface MortgageState {
   outstanding: number;
   arrears: number;
   weekly_payment: number;
+  weekly_rate?: number;
   next_payment_day: number;
   last_interest_day: number;
   last_day: number;
@@ -66,16 +74,20 @@ class Mortgage {
     V.VanillaPlus.real_estate.mortgage = value;
   }
 
+  public rate(days = this.terms.term_days): number {
+    return LOAN_TERMS.find(term => term.days === days)?.weekly_rate ?? LOAN_TERMS[1].weekly_rate;
+  }
+
   public purchaseCosts(price: number, days = this.terms.term_days): { deposit: number; fee: number; weekly_payment: number; reserve: number } {
     const deposit = Math.ceil((price * this.terms.down_payment_percent) / 100);
     const principal = price - deposit;
-    const { closing_fee_percent, payment_reserve_weeks, weekly_interest_rate } = this.terms;
-    const weekly_payment = Mortgage.instalment(principal, Math.ceil(days / 7), weekly_interest_rate);
+    const { closing_fee_percent, payment_reserve_weeks } = this.terms;
+    const weekly_payment = Mortgage.instalment(principal, Math.ceil(days / 7), this.rate(days));
     return {
       deposit,
       fee: Math.ceil((price * closing_fee_percent) / 100),
       weekly_payment,
-      reserve: weekly_payment * payment_reserve_weeks
+      reserve: Math.min(weekly_payment * payment_reserve_weeks, Math.ceil((price * this.terms.payment_reserve_percent) / 100))
     };
   }
 
@@ -124,6 +136,7 @@ class Mortgage {
       outstanding: principal,
       arrears: 0,
       weekly_payment,
+      weekly_rate: this.rate(days),
       next_payment_day: today + 7,
       last_interest_day: today,
       last_day: today,
@@ -138,7 +151,7 @@ class Mortgage {
   }
 
   public cashQuote(amount: number, days = this.terms.term_days): { fee: number; weekly_payment: number; net: number } {
-    const weekly_payment = Mortgage.instalment(amount, Math.ceil(days / 7), this.terms.weekly_interest_rate);
+    const weekly_payment = Mortgage.instalment(amount, Math.ceil(days / 7), this.rate(days));
     const fee = Math.ceil((amount * this.terms.closing_fee_percent) / 100);
     return { fee, weekly_payment, net: amount - fee };
   }
@@ -149,7 +162,7 @@ class Mortgage {
       return 'mortgage-ineligible';
     if (!Number.isSafeInteger(amount) || amount <= 0 || amount > maximum || !this.terms.available_terms.includes(days)) return 'invalid-amount';
     const { net, weekly_payment } = this.cashQuote(amount, days);
-    if (net < weekly_payment) return 'mortgage-ineligible';
+    if (bank.balance + net < weekly_payment) return 'mortgage-ineligible';
     const today = Mortgage.today;
     this.current = {
       purpose: 'cash',
@@ -157,6 +170,7 @@ class Mortgage {
       outstanding: amount,
       arrears: 0,
       weekly_payment,
+      weekly_rate: this.rate(days),
       next_payment_day: today + 7,
       last_interest_day: today,
       last_day: today,
@@ -223,7 +237,7 @@ class Mortgage {
   public advanceThrough(targetDay = Mortgage.today): void {
     const loan = this.current;
     if (!loan) return;
-    const today = Math.min(Mortgage.today, Math.max(0, Math.floor(targetDay)));
+    const today = Math.clamp(Math.floor(targetDay), 0, Mortgage.today);
     for (let day = loan.last_day + 1; day <= today && this.current === loan; day++) {
       if (day >= loan.next_payment_day || day === loan.maturity_day) {
         this.accrueInterest(loan, day);
@@ -233,7 +247,7 @@ class Mortgage {
         const paid = this.finance.collectBankPennies(due);
         loan.outstanding -= paid;
         // 到期应还全部余额，其中已包含旧欠款。逾期标记不能超过剩余债务。
-        loan.arrears = Math.min(loan.outstanding, Math.max(0, loan.arrears + scheduled - paid));
+        loan.arrears = Math.clamp(loan.arrears + scheduled - paid, 0, loan.outstanding);
         if (loan.outstanding === 0) {
           this.current = null;
           break;
@@ -263,7 +277,7 @@ class Mortgage {
   private accrueInterest(loan: MortgageState, day: number): void {
     const elapsedDays = Math.max(0, day - loan.last_interest_day);
     if (elapsedDays === 0) return;
-    loan.outstanding += Math.ceil((loan.outstanding * this.terms.weekly_interest_rate * elapsedDays) / 7);
+    loan.outstanding += Math.ceil((loan.outstanding * (loan.weekly_rate ?? 0.0035) * elapsedDays) / 7);
     loan.last_interest_day = day;
   }
 
