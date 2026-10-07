@@ -25,6 +25,16 @@ class LifeSimulation extends Module {
   }
 
   public override preInit(): void {
+    this.core.on(':variable', () => {
+      const npc = this.coach.npc;
+      if (!npc) return;
+      for (const key of ['gym_advice_day', 'gym_plan', 'gym_guided_day', 'gym_training', 'gym_last_day']) {
+        const previous = key.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase());
+        if (!Object.hasOwn(npc, previous)) continue;
+        if (Object.hasOwn(npc, key)) this.migration.utils.remove(npc, previous);
+        else this.migration.utils.move(npc, previous, key);
+      }
+    });
     super.preInit();
     Achievements.add(this.core, 'LifeSimulation');
     this.pool_party.preInit();
@@ -75,7 +85,7 @@ class LifeSimulation extends Module {
   public meetDoren(train: boolean): boolean {
     const gym = V.LifeSimulation.gym;
     if (!this.dorenPresent || gym.doren_interaction_day === Time.days || V.exposed > 0) return false;
-    if (train && (gym.sessions_today >= 3 || window.pcAreArmsBound('both'))) return false;
+    if (train && (!this.canTrainGrowth || gym.sessions_today >= 3 || window.pcAreArmsBound('both'))) return false;
     gym.doren_interaction_day = Time.days;
     if (train) gym.sessions_today++;
     return true;
@@ -153,7 +163,8 @@ class LifeSimulation extends Module {
 
   /** 只由成功完成的训练调用，同日多个项目或重进页面不能重复累计。 */
   public trainBodyGrowth(activity: string, day: number): void {
-    if (this.growth.mode !== 'gym' || !['weights', 'run', 'deck-run'].includes(activity) || !this.canTrainGrowth || day <= this.growth.training_day) return;
+    // 入场资格在训练开始前检查，完成时不再用营业时间、到期卡或训练后的压力否定结果。
+    if (this.growth.mode !== 'gym' || !['weights', 'run', 'deck-run'].includes(activity) || day <= this.growth.training_day) return;
     if (day !== Time.days && day !== Time.days - 1) return;
     this.growth.training_day = day;
     this.advanceBodyGrowth(1);

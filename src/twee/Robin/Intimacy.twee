@@ -1,9 +1,9 @@
 :: Deadwood Robin Private Invite []
-<<set _site to $RobinExpansion.intimacySite>>
+<<set _site to $RobinExpansion.intimacy_site>>
 <<set _return to _site is 'shop' ? (Time.hour lt 21 ? 'Deadwood Robin Shop' : 'Cliff Street')
   : _site is 'lemonade' ? 'Beach'
   : _site is 'chocolate' ? 'Park'
-  : $RobinExpansion.meteorReturn>>
+  : $RobinExpansion.meteor_return>>
 <<set $outside to _site is 'meteor' ? 1 : 0>>
 <<set $location to _site is 'shop' ? 'deadwood_robin_shop' : _site is 'chocolate' ? 'park' : 'beach'>>
 <<effects>><<npc Robin>><<person1>>
@@ -11,7 +11,7 @@
   or !isLoveInterest('Robin') or C.npc.Robin.trauma gte 50
   or $robinmissing or $robin.timer.hurt gt 0
   or $RobinExpansion.asylum.status is 'admitted'>>
-  <<set $RobinExpansion.intimacySite to null>>
+  <<set $RobinExpansion.intimacy_site to null>>
   <<lanSwitch 'Robin cannot spend time with you now.' '罗宾现在没法陪你。'>>
 <<else>>
   <<switch _site>>
@@ -83,12 +83,12 @@
   <</if>>
 <</if>>
 <br><<getouticon>><<lanLink ['Go back for now', '先回去'] _return>>
-  <<set $RobinExpansion.intimacySite to null>><<endevent>>
+  <<set $RobinExpansion.intimacy_site to null>><<endevent>>
 <</lanLink>>
 
 :: Deadwood Robin Private Sex []
 <!-- 原版罗宾的合意战斗初始化与结束流程。site 保存在当前 V 中，读档或跨回合后仍返回正确地点。 -->
-<<set _site to $RobinExpansion.intimacySite>>
+<<set _site to $RobinExpansion.intimacy_site>>
 <<if !['shop', 'lemonade', 'chocolate', 'meteor'].includes(_site)
   or ($sexstart is 1 and (!isLoveInterest('Robin') or C.npc.Robin.trauma gte 50
     or $robinmissing or $robin.timer.hurt gt 0 or $RobinExpansion.asylum.status is 'admitted'
@@ -163,11 +163,11 @@
 <</if>>
 
 :: Deadwood Robin Private Sex Finish []
-<<set _site to $RobinExpansion.intimacySite>>
+<<set _site to $RobinExpansion.intimacy_site>>
 <<set _return to _site is 'shop' ? 'Cliff Street'
   : _site is 'lemonade' ? 'Beach'
   : _site is 'chocolate' ? 'Park'
-  : $RobinExpansion.meteorReturn>>
+  : $RobinExpansion.meteor_return>>
 <<set $outside to _site is 'meteor' ? 1 : 0>>
 <<set $location to _site is 'shop' ? 'deadwood_robin_shop' : _site is 'chocolate' ? 'park' : 'beach'>>
 <<effects>><<person1>>
@@ -222,5 +222,5 @@
 <br><br>
 <<clotheson>><<endcombat>>
 <<getouticon>><<lanLink '离开' _return>>
-  <<set $RobinExpansion.intimacySite to null>><<endevent>>
+  <<set $RobinExpansion.intimacy_site to null>><<endevent>>
 <</lanLink>>

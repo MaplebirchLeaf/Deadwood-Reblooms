@@ -3,6 +3,8 @@
 import terms from '../../assets/finance/trading.json';
 import type Finance from './Finance';
 
+const indexBasket = ['AVY', 'RMY', 'OBC', 'HSF', 'MER', 'HSC', 'DSP', 'ELK'] as const;
+
 export interface MarginPosition {
   id: number;
   kind: 'stock' | 'futures';
@@ -57,7 +59,7 @@ export default class MarginTrading {
   public quote(symbol: string): number {
     const market = V.VanillaPlus.finance.market;
     if (symbol !== 'INDEX') return market.prices[symbol] ?? 0;
-    const basket = this.finance.securities.filter(item => item.symbol !== 'ALF');
+    const basket = this.finance.securities.filter(item => indexBasket.some(symbol => symbol === item.symbol));
     const sum = basket.reduce((total, item) => total + (market.prices[item.symbol] ?? item.initialPrice) / item.initialPrice, 0);
     return basket.length ? Math.max(1, Math.round((terms.indexBase * sum) / basket.length)) : terms.indexBase;
   }

@@ -14,7 +14,7 @@ export default class RobinFlowers extends Shared {
   }
 
   public get stockTotal(): number {
-    return Object.values(this.state.flowerStock).reduce((total, count) => total + Math.max(0, count), 0);
+    return Object.values(this.state.flower_stock).reduce((total, count) => total + Math.max(0, count), 0);
   }
 
   /** 单支售价，单位英镑。非经营花种返回 0。 */
@@ -26,7 +26,7 @@ export default class RobinFlowers extends Shared {
   private forEachSold(apply: (type: string, sold: number) => void): void {
     let remaining = FLOWER_DAILY_SALES;
     for (const type of this.types) {
-      const sold = Math.clamp(this.state.flowerStock[type] || 0, 0, remaining);
+      const sold = Math.clamp(this.state.flower_stock[type] || 0, 0, remaining);
       if (sold > 0) apply(type, sold);
       remaining -= sold;
       if (remaining === 0) break;
@@ -35,7 +35,7 @@ export default class RobinFlowers extends Shared {
 
   /** 今日预计花卉收入，单位英镑。 */
   public get salesEstimate(): number {
-    if (!this.state.shopFlowers) return 0;
+    if (!this.state.shop_flowers) return 0;
     let sales = 0;
     this.forEachSold((type, sold) => {
       sales += sold * this.price(type);
@@ -45,46 +45,46 @@ export default class RobinFlowers extends Shared {
 
   /** 周结算时扣除当日实际售出的库存。 */
   public settle(): void {
-    if (!this.state.shop || !this.state.shopFlowers) return;
+    if (!this.state.shop || !this.state.shop_flowers) return;
     this.forEachSold((type, sold) => {
-      this.state.flowerStock[type] -= sold;
+      this.state.flower_stock[type] -= sold;
     });
   }
 
   /** 首次添置花架：花 100 便士，附赠 10 支雏菊。 */
   public add(): boolean {
-    if (!this.state.shop || this.state.shopFlowers || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(100)) return false;
-    this.state.shopFlowers = true;
-    this.state.flowerStock.daisy = 10;
+    if (!this.state.shop || this.state.shop_flowers || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(100)) return false;
+    this.state.shop_flowers = true;
+    this.state.flower_stock.daisy = 10;
     return true;
   }
 
   /** 库存见底时补 10 支雏菊，花 15 便士。 */
   public restock(): boolean {
-    if (!this.state.shopFlowers || this.stockTotal > 5 || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(15)) return false;
-    this.state.flowerStock.daisy = (this.state.flowerStock.daisy || 0) + 10;
+    if (!this.state.shop_flowers || this.stockTotal > 5 || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(15)) return false;
+    this.state.flower_stock.daisy = (this.state.flower_stock.daisy || 0) + 10;
     return true;
   }
 
   public sellToShop(type: string): boolean {
-    if (!this.state.shopFlowers || !this.types.includes(type) || this.stockTotal > 20 || !this.robinAvailable || window.getRobinLocation() !== 'shop') return false;
+    if (!this.state.shop_flowers || !this.types.includes(type) || this.stockTotal > 20 || !this.robinAvailable || window.getRobinLocation() !== 'shop') return false;
     if (!V.foodstuff?.[type] || V.foodstuff[type].amount < 10) return false;
     const pounds = (setup.foodstuff[type]?.shop?.sell_price ?? 0) / 10;
     if (pounds <= 0) return false;
     if (!this.spend(pounds)) return false;
     V.foodstuff[type].amount -= 10;
     V.money += pounds * 100;
-    this.state.flowerStock[type] = (this.state.flowerStock[type] || 0) + 10;
+    this.state.flower_stock[type] = (this.state.flower_stock[type] || 0) + 10;
     return true;
   }
 
   /** 玩家从店里买走一支花，营业时间 9:00–21:00，货款进罗宾的储备金。 */
   public buyFromShop(type: string): boolean {
     const price = this.price(type);
-    if (!this.state.shop || !this.state.shopFlowers || Time.hour < 9 || Time.hour >= 21 || !price || !(this.state.flowerStock[type] > 0) || !V.foodstuff?.[type]) return false;
+    if (!this.state.shop || !this.state.shop_flowers || Time.hour < 9 || Time.hour >= 21 || !price || !(this.state.flower_stock[type] > 0) || !V.foodstuff?.[type]) return false;
     if (!(this.vanillaPlus?.finance.canPay(price * 100, 'shopping') ?? V.money >= price * 100)) return false;
     V.foodstuff[type].amount++;
-    this.state.flowerStock[type]--;
+    this.state.flower_stock[type]--;
     this.state.reserve += price;
     return true;
   }

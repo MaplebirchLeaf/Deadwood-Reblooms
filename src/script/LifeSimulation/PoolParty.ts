@@ -1,6 +1,6 @@
 // ./src/script/LifeSimulation/PoolParty.ts
 
-const INVITE_PASSAGES = ['Orphanage', 'Bedroom', 'Hallways', 'Canteen', 'School Library', 'School Front Courtyard', 'School Rear Courtyard', 'Temple', 'Docks', 'Flats'] as const;
+const INVITE_PASSAGES = ["Robin's Room Entrance", 'History Classroom', 'Canteen', 'School Library', 'School Front Courtyard', 'School Rear Courtyard', 'Temple'] as const;
 
 const PARTY_PASSAGES = ['School Pool', 'School Night Pool Party Around', 'School Night Pool Party Socialise'] as const;
 

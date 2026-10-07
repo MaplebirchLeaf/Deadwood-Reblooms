@@ -20,22 +20,22 @@ export default class GymCoach {
       V.stress < V.stressmax &&
       !window.pcAreArmsBound('both') &&
       V.LifeSimulation.gym.sessions_today < 3 &&
-      this.npc?.gymAdviceDay !== Time.days
+      this.npc?.gym_advice_day !== Time.days
     );
   }
 
   /** 疲劳或疼痛时先舒缓，否则补足较少练习的项目。 */
   public get suggestion(): Routine {
-    if (V.tiredness >= V.tirednessmax * 0.6 || V.pain >= 40 || Time.days - (this.npc?.gymLastDay ?? Time.days) >= 7) return 'stretch';
-    const training = this.npc?.gymTraining;
+    if (V.tiredness >= V.tirednessmax * 0.6 || V.pain >= 40 || Time.days - (this.npc?.gym_last_day ?? Time.days) >= 7) return 'stretch';
+    const training = this.npc?.gym_training;
     if ((training?.weights ?? 0) > (training?.run ?? 0)) return 'run';
     return 'weights';
   }
 
   public advise(): boolean {
     if (!this.canAdvise || this.npc?.name_known !== 1) return false;
-    this.npc.gymPlan = this.suggestion;
-    this.npc.gymAdviceDay = Time.days;
+    this.npc.gym_plan = this.suggestion;
+    this.npc.gym_advice_day = Time.days;
     return true;
   }
 
@@ -44,11 +44,11 @@ export default class GymCoach {
     const npc = this.npc;
     if (!npc || !['weights', 'run', 'stretch', 'deck-run'].includes(activity)) return false;
     const routine = activity === 'deck-run' ? 'run' : activity;
-    npc.gymTraining ??= { weights: 0, run: 0, stretch: 0 };
-    npc.gymTraining[routine]++;
-    npc.gymLastDay = day;
-    if (npc.gymAdviceDay !== day || npc.gymPlan !== routine || npc.gymGuidedDay === day) return false;
-    npc.gymGuidedDay = day;
+    npc.gym_training ??= { weights: 0, run: 0, stretch: 0 };
+    npc.gym_training[routine]++;
+    npc.gym_last_day = day;
+    if (npc.gym_advice_day !== day || npc.gym_plan !== routine || npc.gym_guided_day === day) return false;
+    npc.gym_guided_day = day;
     return true;
   }
 }

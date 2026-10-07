@@ -45,16 +45,16 @@ function adaptRobin(core: MaplebirchCore): void {
         if (!V.RobinExpansion || C.npc.Robin?.init !== 1) return sync();
         const state = robin.state;
         const stand = runtime.ensureRobinStand();
-        if (stand.fellBehind === 1 && state.selfRent) {
-          state.selfRent = false;
-          state.bothRent = false;
-          state.rentSeparated = false;
-        } else if (stand.selfSufficient === 1 && !state.selfRent) {
-          state.selfRent = true;
-          state.rentSeparated = true;
+        if (stand.fellBehind === 1 && state.self_rent) {
+          state.self_rent = false;
+          state.both_rent = false;
+          state.rent_separated = false;
+        } else if (stand.selfSufficient === 1 && !state.self_rent) {
+          state.self_rent = true;
+          state.rent_separated = true;
         }
         sync();
-        if (state.selfRent) stand.selfSufficient = 1;
+        if (state.self_rent) stand.selfSufficient = 1;
       }
     },
     settleWeek: {
@@ -69,8 +69,8 @@ function adaptRobin(core: MaplebirchCore): void {
           robin.flowers.settle();
           robin.shop.settle();
           V.robinmoney += extraIncome;
-          if (!state.baileyDefeated && (state.selfRent || V.robinpaid !== 1)) {
-            const owed = state.selfRent ? runtime.ensureRobinStand().owed : 0;
+          if (!state.bailey_defeated && (state.self_rent || V.robinpaid !== 1)) {
+            const owed = state.self_rent ? runtime.ensureRobinStand().owed : 0;
             const reserveTransfer = Math.clamp(robin.rent.due + owed - V.robinmoney, 0, state.reserve);
             state.reserve -= reserveTransfer;
             V.robinmoney += reserveTransfer;
@@ -78,16 +78,16 @@ function adaptRobin(core: MaplebirchCore): void {
         }
         // 原生 DoLX 负责扣租、摊位采购和咖啡工资，不能再运行原版固定 £400/£300 预结算。
         nativeWeekPassed();
-        state.weeklyIncome = state.asylum.status === 'admitted' ? 0 : runtime.ensureRobinStand().lastIncome + (variables().robinCafe?.lastWage ?? 0) + extraIncome;
+        state.weekly_income = state.asylum.status === 'admitted' ? 0 : runtime.ensureRobinStand().lastIncome + (variables().robinCafe?.lastWage ?? 0) + extraIncome;
         if (state.solidarity && state.reserve >= 10) {
           state.reserve -= 10;
-          state.careFund += 10;
+          state.care_fund += 10;
         }
       }
     }
   });
   Object.defineProperties(robin.rent, {
-    due: { configurable: true, get: () => (robin.state.baileyDefeated ? 0 : runtime.robinStandRent()) },
+    due: { configurable: true, get: () => (robin.state.bailey_defeated ? 0 : runtime.robinStandRent()) },
     debt: { configurable: true, get: () => Math.max(0, Number(V.robindebt) || 0) * robin.rent.due + runtime.ensureRobinStand().owed },
     acceptSelfRent: {
       configurable: true,
@@ -122,19 +122,19 @@ export default function DoLX(core: MaplebirchCore): void {
       'time.js': [
         [
           /if \(V\.robinpaid === 1\) \{\n\t\t\tV\.robinPayout = 0;/,
-          "if (V.robinpaid === 1 || (maplebirch.get('Robin') && (V.RobinExpansion?.baileyDefeated || V.RobinExpansion?.asylum?.status === 'admitted'))) {\n\t\t\tV.robinPayout = 0;"
+          "if (V.robinpaid === 1 || (maplebirch.get('Robin') && (V.RobinExpansion?.bailey_defeated || V.RobinExpansion?.asylum?.status === 'admitted'))) {\n\t\t\tV.robinPayout = 0;"
         ],
         [
           /if \(ensureRobinStand\(\)\.selfSufficient === 1\) \{/,
-          "if (ensureRobinStand().selfSufficient === 1 && !(maplebirch.get('Robin') && (V.RobinExpansion?.baileyDefeated || V.RobinExpansion?.asylum?.status === 'admitted'))) {"
+          "if (ensureRobinStand().selfSufficient === 1 && !(maplebirch.get('Robin') && (V.RobinExpansion?.bailey_defeated || V.RobinExpansion?.asylum?.status === 'admitted'))) {"
         ],
         [/V\.robinmoney <= 0 && V\.robindebt >= 0/, "(maplebirch.get('Robin') ? V.robinmoney < 0 : V.robinmoney <= 0) && V.robindebt >= 0"],
         [
           /if \(V\.robinpaid !== 1 && V\.robindebt >= V\.robindebtlimit/,
-          "if (!(maplebirch.get('Robin') && (V.RobinExpansion?.baileyDefeated || V.RobinExpansion?.asylum?.status === 'admitted')) && V.robinpaid !== 1 && V.robindebt >= V.robindebtlimit"
+          "if (!(maplebirch.get('Robin') && (V.RobinExpansion?.bailey_defeated || V.RobinExpansion?.asylum?.status === 'admitted')) && V.robinpaid !== 1 && V.robindebt >= V.robindebtlimit"
         ],
         [/V\.robinmoney \+= robinStandWeeklyTick\(\);/, "if (!(maplebirch.get('Robin') && V.RobinExpansion?.asylum?.status === 'admitted')) V.robinmoney += robinStandWeeklyTick();"],
-        [/const rentPaused = inRentPausedBadEnd\(\);/, "const rentPaused = inRentPausedBadEnd() || (maplebirch.get('Robin') && V.RobinExpansion?.baileyDefeated);"],
+        [/const rentPaused = inRentPausedBadEnd\(\);/, "const rentPaused = inRentPausedBadEnd() || (maplebirch.get('Robin') && V.RobinExpansion?.bailey_defeated);"],
         [
           /V\.xchange\.baseStats\.physique -= decay;/,
           `V.xchange.baseStats.physique = (${floor('physique')}) > 0 ? Math.max(${baseFloor}, V.xchange.baseStats.physique - decay) : V.xchange.baseStats.physique - decay;`

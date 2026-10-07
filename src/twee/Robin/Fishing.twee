@@ -10,11 +10,11 @@
 <br><br><<getouticon>><<lanLink '返回柠檬水摊' "Robin's Lemonade">><</lanLink>>
 
 :: Deadwood Robin Fish Offer []
-<<set $outside to $RobinExpansion.fishReturn is 'shop' ? 0 : 1>><<set $location to $RobinExpansion.fishReturn is 'shop' ? 'deadwood_robin_shop' : 'beach'>><<effects>><<npc Robin>><<person1>>
+<<set $outside to $RobinExpansion.fish_return is 'shop' ? 0 : 1>><<set $location to $RobinExpansion.fish_return is 'shop' ? 'deadwood_robin_shop' : 'beach'>><<effects>><<npc Robin>><<person1>>
 <<set _fishing to maplebirch.get('Robin').fishing>>
-<<set _return to $RobinExpansion.fishReturn is 'shop' ? 'Deadwood Robin Shop' : "Robin's Lemonade">>
+<<set _return to $RobinExpansion.fish_return is 'shop' ? 'Deadwood Robin Shop' : "Robin's Lemonade">>
 <<if _fishing.available and _fishing.types.length gt 0>>
-  <<if !$RobinExpansion.fishCooked>>
+  <<if !$RobinExpansion.fish_cooked>>
     <<lanSwitch 'Robin studies the fish you brought, then pulls out a page of careful notes. "We could try it with lemon. Just one first, so we know what we are making."' '罗宾打量着你带来的鱼，翻出一页记得很仔细的食谱。“可以试着加点柠檬。先做一条，看看味道怎么样。”'>>
   <<else>>
     <<lanSwitch 'Robin checks the catch against the ingredients at the counter. "Shall we cook one for ourselves, or put a small batch on the menu?"' '罗宾核对渔获和柜台上的材料。“要不要做一条自己吃？或者做一小批放进菜单？”'>>
@@ -24,7 +24,7 @@
     <<capture _fish>>
       <<foodstufficon _fish>><span class='green'><<print setup.foodstuff[_fish].singular>></span> × <<= $foodstuff[_fish].amount>>
       <<lanLink '查看做法' 'Deadwood Robin Fish Prepare'>>
-        <<set $RobinExpansion.fishSelection to _fish>>
+        <<set $RobinExpansion.fish_selection to _fish>>
       <</lanLink>><br>
     <</capture>>
   <</for>>
@@ -34,12 +34,12 @@
 <br><br><<getouticon>><<lanLink '返回' _return>><</lanLink>>
 
 :: Deadwood Robin Fish Prepare []
-<<set $outside to $RobinExpansion.fishReturn is 'shop' ? 0 : 1>><<set $location to $RobinExpansion.fishReturn is 'shop' ? 'deadwood_robin_shop' : 'beach'>><<effects>><<npc Robin>><<person1>>
+<<set $outside to $RobinExpansion.fish_return is 'shop' ? 0 : 1>><<set $location to $RobinExpansion.fish_return is 'shop' ? 'deadwood_robin_shop' : 'beach'>><<effects>><<npc Robin>><<person1>>
 <<set _fishing to maplebirch.get('Robin').fishing>>
-<<set _return to $RobinExpansion.fishReturn is 'shop' ? 'Deadwood Robin Shop' : "Robin's Lemonade">>
-<<set _fish to $RobinExpansion.fishSelection>>
+<<set _return to $RobinExpansion.fish_return is 'shop' ? 'Deadwood Robin Shop' : "Robin's Lemonade">>
+<<set _fish to $RobinExpansion.fish_selection>>
 <<if _fishing.canServe(_fish, 1, false)>>
-  <<if !$RobinExpansion.fishCooked>>
+  <<if !$RobinExpansion.fish_cooked>>
     <<lanSwitch 'Robin lays out the lemon, salt and clean utensils. You help prepare the fish while Robin checks the recipe. Nothing goes on the menu until both of you have tasted it.' '罗宾摆好柠檬、盐和干净的厨具。你帮忙处理鱼，罗宾核对食谱。你们先试过味道，才决定要不要写进菜单。'>>
   <<else>>
     <<lanSwitch 'Robin lays out the clean utensils and checks how many portions you brought. The recipe is already in the notebook.' '罗宾摆好干净的厨具，核对你带来的鱼能做几份。食谱已经记在笔记本里。'>>
@@ -47,12 +47,12 @@
   <br><br>
   <<foodstufficon _fish>><<lanLink '和罗宾一起吃一条烤鱼 (0:30)' 'Deadwood Robin Fish Eat'>><</lanLink>><br>
   <<if _fishing.canServe(_fish, 1, true)>>
-    <<shopicon 'register'>><<lanLink '售出一条烤鱼 (0:30)' 'Deadwood Robin Fish Sell'>><<set $RobinExpansion.fishAmount to 1>><</lanLink>> <span class='gold'>£<<print _fishing.price(_fish).toFixed(2)>></span><br>
+    <<shopicon 'register'>><<lanLink '售出一条烤鱼 (0:30)' 'Deadwood Robin Fish Sell'>><<set $RobinExpansion.fish_amount to 1>><</lanLink>> <span class='gold'>£<<print _fishing.price(_fish).toFixed(2)>></span><br>
     <<if _fishing.canServe(_fish, 2, true)>>
-      <<shopicon 'register'>><<lanLink '售出两条烤鱼 (0:30)' 'Deadwood Robin Fish Sell'>><<set $RobinExpansion.fishAmount to 2>><</lanLink>> <span class='gold'>£<<print (_fishing.price(_fish) * 2).toFixed(2)>></span><br>
+      <<shopicon 'register'>><<lanLink '售出两条烤鱼 (0:30)' 'Deadwood Robin Fish Sell'>><<set $RobinExpansion.fish_amount to 2>><</lanLink>> <span class='gold'>£<<print (_fishing.price(_fish) * 2).toFixed(2)>></span><br>
     <</if>>
     <<if _fishing.canServe(_fish, 3, true)>>
-      <<shopicon 'register'>><<lanLink '售出三条烤鱼 (0:30)' 'Deadwood Robin Fish Sell'>><<set $RobinExpansion.fishAmount to 3>><</lanLink>> <span class='gold'>£<<print (_fishing.price(_fish) * 3).toFixed(2)>></span><br>
+      <<shopicon 'register'>><<lanLink '售出三条烤鱼 (0:30)' 'Deadwood Robin Fish Sell'>><<set $RobinExpansion.fish_amount to 3>><</lanLink>> <span class='gold'>£<<print (_fishing.price(_fish) * 3).toFixed(2)>></span><br>
     <</if>>
   <<elseif _fishing.remaining is 0>>
     <span class='blue'><<lanSwitch 'The fish special has sold out for today.' '今天的烤鱼特选已经售完。'>></span><br>
@@ -63,11 +63,11 @@
 <br><br><<getouticon>><<lanLink '返回渔获列表' 'Deadwood Robin Fish Offer'>><</lanLink>>
 
 :: Deadwood Robin Fish Eat []
-<<set $outside to $RobinExpansion.fishReturn is 'shop' ? 0 : 1>><<set $location to $RobinExpansion.fishReturn is 'shop' ? 'deadwood_robin_shop' : 'beach'>><<effects>><<npc Robin>><<person1>>
+<<set $outside to $RobinExpansion.fish_return is 'shop' ? 0 : 1>><<set $location to $RobinExpansion.fish_return is 'shop' ? 'deadwood_robin_shop' : 'beach'>><<effects>><<npc Robin>><<person1>>
 <<set _fishing to maplebirch.get('Robin').fishing>>
-<<set _return to $RobinExpansion.fishReturn is 'shop' ? 'Deadwood Robin Shop' : "Robin's Lemonade">>
-<<set _first to !$RobinExpansion.fishCooked>>
-<<if _fishing.serve($RobinExpansion.fishSelection, 1, false)>>
+<<set _return to $RobinExpansion.fish_return is 'shop' ? 'Deadwood Robin Shop' : "Robin's Lemonade">>
+<<set _first to !$RobinExpansion.fish_cooked>>
+<<if _fishing.serve($RobinExpansion.fish_selection, 1, false)>>
   <<pass 30>>
   <<lanSwitch 'You and Robin share the freshly cooked fish. Robin squeezes lemon over a small piece, tastes it, then offers you the next bite. "That works," <<he>> says, writing the seasoning down before forgetting it.' '你和罗宾分着吃刚烤好的鱼。罗宾往一小块鱼肉上挤了点柠檬汁，尝过之后，把下一块递给你。“这样好吃。”<<he>>赶紧记下调味，免得忘了。'>>
   <<if _first>>
@@ -81,8 +81,8 @@
 
 :: Deadwood Robin Fishing Date []
 <<set $outside to 1>><<set $location to 'beach'>><<effects>><<npc Robin>><<person1>>
-<<if C.npc.Robin.init is 1 and !$robinmissing and $robin.timer.hurt is 0 and $RobinExpansion.asylum.status isnot 'admitted' and getRobinLocation() is 'beach' and Time.hour gte 9 and Time.hour lt 16 and Weather.precipitation is 'none' and $exposed is 0 and C.npc.Robin.love gte 20 and $RobinExpansion.fishDateDay isnot Time.days and canStartFishing()>>
-  <<set $RobinExpansion.fishDateDay to Time.days>><<set $RobinExpansion.fishDateActive to true>><<set $RobinExpansion.fishDateCatchStart to numberOfFishCaught()>>
+<<if C.npc.Robin.init is 1 and !$robinmissing and $robin.timer.hurt is 0 and $RobinExpansion.asylum.status isnot 'admitted' and getRobinLocation() is 'beach' and Time.hour gte 9 and Time.hour lt 16 and Weather.precipitation is 'none' and $exposed is 0 and C.npc.Robin.love gte 20 and $RobinExpansion.fish_date_day isnot Time.days and canStartFishing()>>
+  <<set $RobinExpansion.fish_date_day to Time.days>><<set $RobinExpansion.fish_date_active to true>><<set $RobinExpansion.fish_date_catch_start to numberOfFishCaught()>>
   <<pass 10>>
   <<lanSwitch 'Robin asks another orphan to mind the lemonade stall and pays for the time. You carry the rod to a quieter part of the beach. Robin settles beside you, keeping the bait tin out of the sand. "You do the casting," <<he>> says. "I can watch the line."' '罗宾请另一位孤儿照看柠檬水摊，并付了这段时间的工钱。你带着鱼竿来到海滩较安静的一角。罗宾坐在你身边，把鱼饵盒放在不会沾沙的地方。“你来抛竿，”<<he>>说，“我帮你看着鱼线。”'>>
   <br><br><<fishingRodIcon>><<lanLink '开始钓鱼 (0:05)' 'Fishing Beach Wait'>>
@@ -91,13 +91,13 @@
 <<else>>
   <<lanSwitch 'Robin cannot leave the stall for a fishing trip now.' '罗宾现在没法离开摊位去钓鱼。'>>
 <</if>>
-<br><br><<getouticon>><<lanLink '返回柠檬水摊' "Robin's Lemonade">><<set $RobinExpansion.fishDateActive to false>><</lanLink>>
+<br><br><<getouticon>><<lanLink '返回柠檬水摊' "Robin's Lemonade">><<set $RobinExpansion.fish_date_active to false>><</lanLink>>
 
 :: Deadwood Robin Fishing Widgets [widget]
 <<widget 'deadwood-robin-fishing-wait'>>
-  <<if $RobinExpansion.fishDateActive and $RobinExpansion.fishDateDay is Time.days>>
+  <<if $RobinExpansion.fish_date_active and $RobinExpansion.fish_date_day is Time.days>>
     <<npc Robin>>
-    <<if numberOfFishCaught() gt $RobinExpansion.fishDateCatchStart>>
+    <<if numberOfFishCaught() gt $RobinExpansion.fish_date_catch_start>>
       <<lanSwitch 'Robin glances at the catch you stowed, then back at the line. "There might be another one," <<he>> says, smiling.' '罗宾看了看你收进背包的鱼，又转头盯着鱼线。“说不定还有一条。”<<he>>笑着说。'>><br><br>
     <<else>>
       <<lanSwitch 'Robin sits beside you and watches the line. The quiet does not seem to bother <<him>>.' '罗宾坐在你身边看着鱼线。安静地等着，<<he>>似乎也很开心。'>><br><br>
@@ -106,23 +106,23 @@
 <</widget>>
 
 <<widget 'deadwood-robin-fishing-return'>>
-  <<if $RobinExpansion.fishDateActive>>
+  <<if $RobinExpansion.fish_date_active>>
     <<npc Robin>>
-    <<set $RobinExpansion.fishDateActive to false>>
-    <<if $RobinExpansion.fishDateDay is Time.days and numberOfFishCaught() gt $RobinExpansion.fishDateCatchStart>>
+    <<set $RobinExpansion.fish_date_active to false>>
+    <<if $RobinExpansion.fish_date_day is Time.days and numberOfFishCaught() gt $RobinExpansion.fish_date_catch_start>>
       <<lanSwitch 'Robin walks back with you, talking about the fish that took your line. "If you kept one, bring it by the counter," <<he>> says. You return the bait tin, and Robin goes to relieve the orphan watching the stall.' '罗宾与你一同往回走，聊着刚才咬钩的鱼。“如果你留了一条，拿到摊位给我看看。”<<he>>说。你归还鱼饵盒，罗宾则去接替帮忙看摊的孤儿。'>>
       <<npcincr Robin love 2>><<stress -4>><<glove>><<lstress>><br><br>
-    <<elseif $RobinExpansion.fishDateDay is Time.days>>
+    <<elseif $RobinExpansion.fish_date_day is Time.days>>
       <<lanSwitch 'You put away the rod. Robin returns the bait tin and walks back with you. "We can try again another day," <<he>> says before heading to the stall.' '你收起鱼竿。罗宾放好鱼饵盒，与你一同往回走。“改天可以再试试。”<<he>>说完，朝摊位走去。'>><br><br>
     <</if>>
   <</if>>
 <</widget>>
 
 :: Deadwood Robin Fish Sell []
-<<set $outside to $RobinExpansion.fishReturn is 'shop' ? 0 : 1>><<set $location to $RobinExpansion.fishReturn is 'shop' ? 'deadwood_robin_shop' : 'beach'>><<effects>><<npc Robin>><<person1>>
+<<set $outside to $RobinExpansion.fish_return is 'shop' ? 0 : 1>><<set $location to $RobinExpansion.fish_return is 'shop' ? 'deadwood_robin_shop' : 'beach'>><<effects>><<npc Robin>><<person1>>
 <<set _fishing to maplebirch.get('Robin').fishing>>
-<<set _return to $RobinExpansion.fishReturn is 'shop' ? 'Deadwood Robin Shop' : "Robin's Lemonade">>
-<<set _fish to $RobinExpansion.fishSelection>><<set _amount to $RobinExpansion.fishAmount>>
+<<set _return to $RobinExpansion.fish_return is 'shop' ? 'Deadwood Robin Shop' : "Robin's Lemonade">>
+<<set _fish to $RobinExpansion.fish_selection>><<set _amount to $RobinExpansion.fish_amount>>
 <<set _share to _fishing.share(_fish, _amount)>>
 <<if _fishing.serve(_fish, _amount, true)>>
   <<pass 30>>

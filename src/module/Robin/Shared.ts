@@ -45,7 +45,7 @@ export default abstract class Shared {
 
   /** 开销后是否仍留得住下一周房租。protectNextRent 为 false 时只检查余额。 */
   public canSpend(amount: number, protectNextRent = true): boolean {
-    return this.funds - amount >= (protectNextRent && (this.state.selfRent || V.robinpaid !== 1) ? this.facade.rent.due : 0);
+    return this.funds - amount >= (protectNextRent && (this.state.self_rent || V.robinpaid !== 1) ? this.facade.rent.due : 0);
   }
 
   /** 从储备金优先、罗宾现金其次的顺序扣款。 */

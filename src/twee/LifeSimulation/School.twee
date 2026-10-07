@@ -2,14 +2,14 @@
 
 <!-- 礼顿先审成绩，贝利只签监护人许可。原版连续交租次数作为贝利的条件。 -->
 <<widget 'deadwood-reblooms-life-simulation-attendance-link'>>
-  <<if !$RobinExpansion?.baileyDefeated and !$LifeSimulation.school.attendanceExempt and !$LifeSimulation.school.baileySigned and $LifeSimulation.school.leightonApprovalDay gte 0 and Time.hour gte 7 and Time.hour lte 9>>
+  <<if !$RobinExpansion?.bailey_defeated and !$LifeSimulation.school.attendanceExempt and !$LifeSimulation.school.baileySigned and $LifeSimulation.school.leightonApprovalDay gte 0 and Time.hour gte 7 and Time.hour lte 9>>
     <<schoolicon 'building'>><<lanLink ['Ask Bailey for a class exemption', '请贝利批准免听凭证'] 'Deadwood Reblooms Life Simulation Attendance Approval'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 <!-- 原版 Avery 纸牌路线确认贝利住在倒钩街公寓。反抗成功后只在公寓找他。 -->
 <<widget 'deadwood-reblooms-life-simulation-bailey-flat-link'>>
-  <<if $RobinExpansion?.baileyDefeated and !$LifeSimulation.school.attendanceExempt and !$LifeSimulation.school.baileySigned and $LifeSimulation.school.leightonApprovalDay gte 0 and $exposed lt 1 and Time.hour gte 7 and Time.hour lt 21>>
+  <<if $RobinExpansion?.bailey_defeated and !$LifeSimulation.school.attendanceExempt and !$LifeSimulation.school.baileySigned and $LifeSimulation.school.leightonApprovalDay gte 0 and $exposed lt 1 and Time.hour gte 7 and Time.hour lt 21>>
     <<dooricon>><<lanLink ["Visit Bailey's flat about a class exemption (0:02)", '去贝利的公寓申请免听凭证 (0:02)'] 'Deadwood Reblooms Life Simulation Attendance Approval'>><<pass 2>><</lanLink>><br><br>
   <</if>>
 <</widget>>
@@ -170,13 +170,13 @@
             <<else>>
               <<language>>
                 <<option 'EN'>>
-                  <<if $RobinExpansion?.baileyDefeated>>
+                  <<if $RobinExpansion?.bailey_defeated>>
                     Leighton approved the school form. Find Bailey at the Barb Street flats for the guardian signature.
                   <<else>>
                     Leighton approved the school form. After three consecutive rent payments, ask Bailey to sign in the office between 07:00 and 09:00.
                   <</if>>
                 <<option 'CN'>>
-                  <<if $RobinExpansion?.baileyDefeated>>
+                  <<if $RobinExpansion?.bailey_defeated>>
                     礼顿已通过学校审核。去倒钩街公寓找贝利签监护人许可。
                   <<else>>
                     礼顿已通过学校审核。连续按时交租三周后，在 07:00–09:00 到办公室找贝利签字。
@@ -282,13 +282,13 @@
 
 :: Deadwood Reblooms Life Simulation Attendance Approval []
 <<set $outside to 0>>
-<<set $location to $RobinExpansion?.baileyDefeated ? 'flats' : 'home'>>
+<<set $location to $RobinExpansion?.bailey_defeated ? 'flats' : 'home'>>
 <<effects>>
 <<npc Bailey>><<person1>>
 <<if $LifeSimulation.school.leightonApprovalDay gte 0 and !$LifeSimulation.school.attendanceExempt and !$LifeSimulation.school.baileySigned>>
   <<language>>
     <<option 'EN'>>
-      <<if $RobinExpansion?.baileyDefeated>>
+      <<if $RobinExpansion?.bailey_defeated>>
         Bailey opens the flat's door just far enough to see you. "What now?" You hold out the school form. <<He>> reads Leighton's signature, then looks up. "You wanted me out."
         <br><br>
         "The school still has you down as my guardian." Bailey keeps a hand on the door. You remind <<him>> that the copies of the rent ledger are still safe. For a moment, neither of you moves. Then <<he>> takes the form. "This is the last time."
@@ -302,7 +302,7 @@
         Bailey reads Leighton's signature, then sets your form beside the rent ledger. "Three weeks on time. Then I'll sign." <<He>> pushes the paper back before you can explain your marks. "You heard me."
       <</if>>
     <<option 'CN'>>
-      <<if $RobinExpansion?.baileyDefeated>>
+      <<if $RobinExpansion?.bailey_defeated>>
         贝利只把公寓的门打开一道够看见你的缝。“又怎么了？”你递上学校的表格。<<He>>看过礼顿的签名，抬起头。“不是你们要我走的吗？”
         <br><br>
         “学校那边，你还是我的监护人。”贝利的手仍扶着门。你提醒<<him>>，房租账本的副本还好好留着。你们僵持了片刻，<<he>>才接过表格。“最后一次。”
@@ -327,7 +327,7 @@
   <<lanSwitch 'Bailey has no reason to sign another request.' '贝利没理由再签一份申请。'>><br>
 <</if>>
 <br>
-<<set _return to $RobinExpansion?.baileyDefeated ? 'Flats' : "Bailey's Office">>
+<<set _return to $RobinExpansion?.bailey_defeated ? 'Flats' : "Bailey's Office">>
 <<getouticon>><<lanLink '离开' _return>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Attendance Filing []

@@ -5,7 +5,7 @@ import Shared from './Shared';
 export default class RobinTutoring extends Shared {
   /** 周家教收入，单位英镑。学期外为 0，六节以上提价。 */
   public get income(): number {
-    return this.state.tutor && this.state.tutorLessons > 0 && Time.schoolTerm ? (this.state.tutorLessons >= 6 ? 60 : 40) : 0;
+    return this.state.tutor && this.state.tutor_lessons > 0 && Time.schoolTerm ? (this.state.tutor_lessons >= 6 ? 60 : 40) : 0;
   }
 
   /** 开班条件：已拿到家教线索、摊位至少 1 级、罗宾服从度足够。 */
@@ -13,7 +13,7 @@ export default class RobinTutoring extends Shared {
     if (!this.robinAvailable || !this.state.topics.tutor || this.state.tutor || Math.max(this.state.lemonade, this.state.chocolate) < 1 || C.npc.Robin.dom < 45) return false;
     this.state.tutor = true;
     // 当天尚未到授课时间，罗宾也能自行完成试课，已过授课时间则从下个上课日开始。
-    this.state.tutorDay = Time.hour < 19 ? Time.days - 1 : Time.days;
+    this.state.tutor_day = Time.hour < 19 ? Time.days - 1 : Time.days;
     return true;
   }
 
@@ -22,7 +22,7 @@ export default class RobinTutoring extends Shared {
     return (
       this.state.tutor &&
       Time.schoolDay &&
-      this.state.tutorDay !== Time.days &&
+      this.state.tutor_day !== Time.days &&
       ((Time.hour === 17 && Time.minute >= 30) || (Time.hour === 18 && Time.minute < 30)) &&
       window.getRobinLocation() === 'tutor' &&
       !V.robinmissing &&
@@ -36,12 +36,12 @@ export default class RobinTutoring extends Shared {
     const pupil = V.per_npc?.deadwood_robin_tutor_pupil;
     const parent = V.per_npc?.deadwood_robin_tutor_parent;
     if (!this.canTutorToday || pupil?.name_known !== 1 || parent?.name_known !== 1 || !['lead', 'together', 'skills'].includes(approach)) return false;
-    this.state.tutorDay = Time.days;
-    this.state.tutorLessons++;
-    this.state.tutorSubject = (this.state.tutorLessons - 1) % 3;
+    this.state.tutor_day = Time.days;
+    this.state.tutor_lessons++;
+    this.state.tutor_subject = (this.state.tutor_lessons - 1) % 3;
     // 只记录 PC 真正完成的帮课，进门后离开不会让学生进步或增加家长的信任。
-    pupil.tutorConfidence = Math.min(6, (pupil.tutorConfidence ?? 0) + (approach === 'together' ? 2 : 1));
-    parent.tutorVisits = (parent.tutorVisits ?? 0) + 1;
+    pupil.tutor_confidence = Math.min(6, (pupil.tutor_confidence ?? 0) + (approach === 'together' ? 2 : 1));
+    parent.tutor_visits = (parent.tutor_visits ?? 0) + 1;
     V.money += 750;
     this.state.reserve += 8;
     return true;

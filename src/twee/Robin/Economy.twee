@@ -21,34 +21,34 @@
     <<if $RobinExpansion.topics.tutor and !$RobinExpansion.tutor and $robin.timer.hurt is 0 and ($RobinExpansion.lemonade gt 0 or $RobinExpansion.chocolate gt 0) and C.npc.Robin.dom gte 40>>
       <<schoolicon 'library'>><<lanLink ['Suggest tutoring to Robin', '建议罗宾去做家教'] 'Deadwood Robin Tutor Proposal'>><</lanLink>><br>
     <</if>>
-    <<if $RobinExpansion.topics.shop and !$RobinExpansion.shop and $robin.timer.hurt is 0 and $RobinExpansion.shopStage is 'none' and $RobinExpansion.lemonade gte 2 and $RobinExpansion.chocolate gte 2>>
+    <<if $RobinExpansion.topics.shop and !$RobinExpansion.shop and $robin.timer.hurt is 0 and $RobinExpansion.shop_stage is 'none' and $RobinExpansion.lemonade gte 2 and $RobinExpansion.chocolate gte 2>>
       <<icon 'robin-shop.png'>><<lanLink ['Discuss opening a Cliff Street shop', '与罗宾讨论在峭壁街开店'] 'Deadwood Robin Shop Proposal'>><</lanLink>><br>
     <</if>>
-    <<if $RobinExpansion.lemonade gt 0 or $RobinExpansion.chocolate gt 0 or $RobinExpansion.weeklyIncome gt 0 or $RobinExpansion.shopStage isnot 'none' or $RobinExpansion.shop>>
+    <<if $RobinExpansion.lemonade gt 0 or $RobinExpansion.chocolate gt 0 or $RobinExpansion.weekly_income gt 0 or $RobinExpansion.shop_stage isnot 'none' or $RobinExpansion.shop>>
       <<icon 'robin-ledger.png'>><<lanLink '和罗宾核对账本' 'Deadwood Robin Accounts'>><</lanLink>><br>
     <</if>>
-    <<if $RobinExpansion.shopStage is 'planning'
+    <<if $RobinExpansion.shop_stage is 'planning'
       and Time.hour gte 9 and Time.hour lt 17
       and C.npc.Robin.dom gte 60
       and C.npc.Robin.trauma lt 50
       and maplebirch.get('Robin').canSpend(500)>>
       <<icon 'business-permit.png'>><<lanLink ['Let Robin apply for the shop permit alone (1:00)', '让罗宾独自申请经营许可 (1:00)'] 'Deadwood Robin Shop Application Solo'>><</lanLink>><br>
     <</if>>
-    <<if $RobinExpansion.shopStage is 'applied'
+    <<if $RobinExpansion.shop_stage is 'applied'
       and Time.hour gte 9 and Time.hour lt 18
       and C.npc.Robin.dom gte 70
       and C.npc.Robin.trauma lt 50
       and maplebirch.get('Robin').canSpend(1500)>>
       <<shopicon 'register'>><<lanLink ['Let Robin inspect the shop alone (1:00)', '让罗宾独自去看铺面 (1:00)'] 'Deadwood Robin Shop Site Solo'>><</lanLink>><br>
     <</if>>
-    <<if $RobinExpansion.shopStage is 'inspected'
+    <<if $RobinExpansion.shop_stage is 'inspected'
       and Time.hour gte 9 and Time.hour lt 17
-      and Time.days gt $RobinExpansion.shopInspectionDay
+      and Time.days gt $RobinExpansion.shop_inspection_day
       and C.npc.Robin.dom gte 60
       and C.npc.Robin.trauma lt 50>>
       <<icon 'business-permit.png'>><<lanLink ['Let Robin collect the business permit alone (1:00)', '让罗宾独自去领经营许可 (1:00)'] 'Deadwood Robin Shop Permit Solo'>><</lanLink>><br>
     <</if>>
-    <<if $RobinExpansion.asylum.severeDays gt 0 and $RobinExpansion.asylum.warningVisitDay isnot Time.days and C.npc.Robin.trauma gte 95>>
+    <<if $RobinExpansion.asylum.severe_days gt 0 and $RobinExpansion.asylum.warning_visit_day isnot Time.days and C.npc.Robin.trauma gte 95>>
       <<socialiseicon 'ask'>><<lanLink ['Ask Robin how they are doing', '关心罗宾的近况'] 'Deadwood Robin Trauma Warning'>><</lanLink>><br>
     <</if>>
     <<deadwood-robin-rent-room-links>>
@@ -98,7 +98,7 @@
     and getRobinLocation() is 'beach'
     and Time.hour gte 9 and Time.hour lt 17>>
     <<loveicon 'hug'>><<lanLink ['Tease Robin beneath the lemonade stall (0:02)', '在柠檬水摊下逗罗宾 (0:02)'] 'Deadwood Robin Private Invite'>>
-      <<set $RobinExpansion.intimacySite to 'lemonade'>><<pass 2>>
+      <<set $RobinExpansion.intimacy_site to 'lemonade'>><<pass 2>>
     <</lanLink>><br>
   <</if>>
   <<if maplebirch.get('Robin').balloon.inContest and getRobinLocation() is 'beach' and Weather.precipitation isnot 'rain'>>
@@ -142,7 +142,7 @@
   <<if $RobinExpansion.chocolate gte 1 and isLoveInterest('Robin') and C.npc.Robin.trauma lt 50
     and getRobinLocation() is 'park' and Time.hour gte 9 and Time.hour lt 17>>
     <<loveicon 'hug'>><<lanLink ['Tease Robin beneath the cocoa stall (0:02)', '在热巧克力摊下逗罗宾 (0:02)'] 'Deadwood Robin Private Invite'>>
-      <<set $RobinExpansion.intimacySite to 'chocolate'>><<pass 2>>
+      <<set $RobinExpansion.intimacy_site to 'chocolate'>><<pass 2>>
     <</lanLink>><br>
   <</if>>
 <</widget>>
@@ -152,7 +152,7 @@
     <<set _fishReturn to _args[0]>>
     <<capture _fishReturn>>
       <<foodstufficon 'salmon'>><<lanLink '把鲜鱼拿给罗宾' 'Deadwood Robin Fish Offer'>>
-        <<set $RobinExpansion.fishReturn to _fishReturn>>
+        <<set $RobinExpansion.fish_return to _fishReturn>>
       <</lanLink>><br>
     <</capture>>
   <</if>>
@@ -198,11 +198,11 @@
 <</widget>>
 
 <<widget 'deadwood-robin-shop-link'>>
-  <<if C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and !$RobinExpansion.shop and $RobinExpansion.shopStage is 'applied' and Time.hour gte 9 and Time.hour lt 18>>
+  <<if C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and !$RobinExpansion.shop and $RobinExpansion.shop_stage is 'applied' and Time.hour gte 9 and Time.hour lt 18>>
     <<icon 'robin-shop.png'>><<lanLink ['Inspect a vacant Cliff Street shop with Robin', '和罗宾查看峭壁街空铺'] 'Deadwood Robin Shop Site'>><</lanLink>><br>
-  <<elseif C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and !$RobinExpansion.shop and $RobinExpansion.shopStage is 'site' and Time.hour gte 9 and Time.hour lt 15>>
+  <<elseif C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and !$RobinExpansion.shop and $RobinExpansion.shop_stage is 'site' and Time.hour gte 9 and Time.hour lt 15>>
     <<icon 'robin-shop.png'>><<lanLink ['Prepare the shop for inspection with Robin', '陪罗宾准备店铺检查'] 'Deadwood Robin Shop Inspection'>><</lanLink>><br>
-  <<elseif C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and !$RobinExpansion.shop and $RobinExpansion.shopStage is 'permitted' and Time.hour gte 9 and Time.hour lt 18>>
+  <<elseif C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and !$RobinExpansion.shop and $RobinExpansion.shop_stage is 'permitted' and Time.hour gte 9 and Time.hour lt 18>>
     <<icon 'robin-shop.png'>><<lanLink ['Prepare to open with Robin', '与罗宾准备开业'] 'Deadwood Robin Shop Opening'>><</lanLink>><br>
   <</if>>
   <<if $RobinExpansion.shop and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and Time.hour gte 9 and Time.hour lt 21 and $exposed lte 0>>
@@ -244,56 +244,56 @@
     <li><<lanSwitch 'Robin’s tutoring lessons are paused while Robin is away.' '罗宾不在时，家教课程暂时停了。'>></li>
   <<elseif $RobinExpansion.tutor and !Time.schoolTerm>>
     <li><<lanSwitch 'Robin’s tutoring lessons are paused for the school holidays.' '学校放假期间，罗宾的家教课程暂时停了。'>></li>
-  <<elseif $RobinExpansion.tutor and $RobinExpansion.tutorLessons is 0>>
+  <<elseif $RobinExpansion.tutor and $RobinExpansion.tutor_lessons is 0>>
     <li><<lanSwitch 'Robin has arranged a trial tutoring lesson after school on Danube Street. Robin can teach without you, or you can join the lesson.' '罗宾约好多瑙河街的放学后试课。罗宾可以独自授课，你也可以过去帮忙。'>></li>
-  <<elseif $RobinExpansion.tutor and $RobinExpansion.tutorLessons gt 0>>
+  <<elseif $RobinExpansion.tutor and $RobinExpansion.tutor_lessons gt 0>>
     <li><<lanSwitch 'Robin is tutoring after school on Danube Street.' '罗宾放学后在多瑙河街做家教。'>>
-      <<if $RobinExpansion.tutorLessons gte 6>>
+      <<if $RobinExpansion.tutor_lessons gte 6>>
         <<lanSwitch 'The regular lessons earn £60 each week.' '固定课程每周收入 £60。'>>
       <<else>>
         <<lanSwitch 'The regular lessons earn £40 each week.' '固定课程每周收入 £40。'>>
       <</if>>
     </li>
   <</if>>
-  <<if $RobinExpansion.topics.shop and $RobinExpansion.lemonade gte 2 and $RobinExpansion.chocolate gte 2 and $RobinExpansion.shopStage is 'none'>>
+  <<if $RobinExpansion.topics.shop and $RobinExpansion.lemonade gte 2 and $RobinExpansion.chocolate gte 2 and $RobinExpansion.shop_stage is 'none'>>
     <li><<lanSwitch 'Both stalls are fully equipped. Robin may be ready to discuss a shop on Cliff Street.' '两处摊位都已改造妥当。可以和罗宾谈谈在峭壁街开店。'>></li>
   <</if>>
-  <<if $RobinExpansion.shopStage is 'planning'>>
+  <<if $RobinExpansion.shop_stage is 'planning'>>
     <li><<lanSwitch 'Robin has the stall records ready. The drinks shop permit can be requested at the Cliff Street town hall.' '罗宾已备好摊位账本。你们可以去峭壁街的市政厅申请饮品店许可。'>></li>
     <<if C.npc.Robin.dom lt 60 or C.npc.Robin.trauma gte 50>>
       <li><<lanSwitch 'Robin would rather have you beside them at the town hall counter.' '罗宾希望你陪着去市政厅柜台。'>></li>
     <</if>>
-  <<elseif $RobinExpansion.shopStage is 'applied'>>
+  <<elseif $RobinExpansion.shop_stage is 'applied'>>
     <li><<lanSwitch 'The shop application is accepted. A vacant shop on Cliff Street is waiting for a deposit.' '开店申请已经受理。峭壁街的空铺还等着交押金。'>></li>
     <<if C.npc.Robin.dom lt 70 or C.npc.Robin.trauma gte 50>>
       <li><<lanSwitch 'Robin wants your company when signing for the vacant shop.' '签下空铺前，罗宾想让你一起去看看。'>></li>
     <</if>>
-  <<elseif $RobinExpansion.shopStage is 'site'>>
+  <<elseif $RobinExpansion.shop_stage is 'site'>>
     <li><<lanSwitch 'The Cliff Street shop needs its fittings and inspection.' '峭壁街的店铺还需装好设备并接受检查。'>></li>
-  <<elseif $RobinExpansion.shopStage is 'inspected'>>
+  <<elseif $RobinExpansion.shop_stage is 'inspected'>>
     <li>
-    <<if Time.days gt $RobinExpansion.shopInspectionDay>>
+    <<if Time.days gt $RobinExpansion.shop_inspection_day>>
       <<lanSwitch 'Robin can collect the business permit from the town hall.' '罗宾可以去市政厅领取经营许可。'>>
     <<else>>
       <<lanSwitch 'The town hall will issue the business permit tomorrow.' '市政厅明天才会发放经营许可。'>>
     <</if>>
     </li>
-  <<elseif $RobinExpansion.shopStage is 'permitted' and !$RobinExpansion.shop>>
+  <<elseif $RobinExpansion.shop_stage is 'permitted' and !$RobinExpansion.shop>>
     <li><<lanSwitch 'The shop permit is ready. Robin is saving for the opening stock.' '经营许可已到手。罗宾正在攒开业原料费。'>></li>
   <</if>>
-  <<if $RobinExpansion.pcLoan gt 0>>
-    <li><<lanSwitch 'Robin owes you' '罗宾还欠你'>> <span class='gold'>£<<print $RobinExpansion.pcLoan>></span><<lanSwitch '. The amount is recorded in the shop ledger.' '。这笔借款已经记在店铺账本里。'>></li>
+  <<if $RobinExpansion.pc_loan gt 0>>
+    <li><<lanSwitch 'Robin owes you' '罗宾还欠你'>> <span class='gold'>£<<print $RobinExpansion.pc_loan>></span><<lanSwitch '. The amount is recorded in the shop ledger.' '。这笔借款已经记在店铺账本里。'>></li>
     <li><<lanSwitch 'Check the ledger with Robin to discuss repayment.' '和罗宾核对账本，商量还款。'>></li>
   <</if>>
-  <<if $RobinExpansion.shop and $RobinExpansion.shopStock is 0>>
+  <<if $RobinExpansion.shop and $RobinExpansion.shop_stock is 0>>
     <li><<lanSwitch 'The shop has run out of ingredients for its shared special shifts. Robin can reorder at the shop.' '店里供你们一起做新品班次的原料用完了。罗宾可以在店里重新进货。'>></li>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-robin-shop-permit-link'>>
-  <<if C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and $RobinExpansion.shopStage is 'planning' and Time.hour gte 9 and Time.hour lt 17>>
+  <<if C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and $RobinExpansion.shop_stage is 'planning' and Time.hour gte 9 and Time.hour lt 17>>
     <<icon 'business-permit.png'>><<lanLink ['Apply for the shop permit with Robin', '与罗宾申请饮品店许可'] 'Deadwood Robin Shop Application'>><</lanLink>><br>
-  <<elseif C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and $RobinExpansion.shopStage is 'inspected' and Time.hour gte 9 and Time.hour lt 17>>
+  <<elseif C.npc.Robin.init is 1 and $RobinExpansion.asylum.status isnot 'admitted' and !$robinmissing and $RobinExpansion.shop_stage is 'inspected' and Time.hour gte 9 and Time.hour lt 17>>
     <<icon 'business-permit.png'>><<lanLink '与罗宾领取经营许可' 'Deadwood Robin Shop Permit'>><</lanLink>><br>
   <</if>>
 <</widget>>
@@ -496,27 +496,27 @@
     <<option 'EN'>>
       <<if not _robinTutorMet>>
         The parent opens the door and introduces the family. "I'm <<= $NPCList[2].name>>. This is <<= $NPCList[1].name>>." You follow Robin into a small kitchen.
-        <<if $RobinExpansion.tutorLessons gt 0>>The exercise book is already open. Robin shows you the question they were working on last time, then leaves room for you at the table.
+        <<if $RobinExpansion.tutor_lessons gt 0>>The exercise book is already open. Robin shows you the question they were working on last time, then leaves room for you at the table.
         <<else>>Robin sets the lesson plan beside the exercise book and asks where the homework became difficult.<</if>>
         The parent stays nearby while you settle in.
       <<else>>
         <<= $NPCList[2].name>> lets you in. <<= $NPCList[1].name>> has the exercise book ready.
-        <<if $NPCList[1].tutorConfidence gte 3>>A finger follows the working down the page. "I got this far on my own." Robin checks it before turning to the unfinished question.
+        <<if $NPCList[1].tutor_confidence gte 3>>A finger follows the working down the page. "I got this far on my own." Robin checks it before turning to the unfinished question.
         <<else>>Robin checks the last corrections. The pupil points out a question left blank rather than waiting to be asked.<</if>>
-        <<if $NPCList[2].tutorVisits gte 3>>The parent leaves tea on the table and returns to the next room.
+        <<if $NPCList[2].tutor_visits gte 3>>The parent leaves tea on the table and returns to the next room.
         <<else>>The parent pauses in the doorway, listening as the lesson begins.<</if>>
       <</if>>
     <<option 'CN'>>
       <<if not _robinTutorMet>>
         家长打开门，先介绍了这户人家。“我叫<<= $NPCList[2].name>>，这是<<= $NPCList[1].name>>。”你跟着罗宾走进一间小厨房。
-        <<if $RobinExpansion.tutorLessons gt 0>>练习册已经摊开。罗宾指给你看上回讲到的题，又在桌旁为你腾出位置。
+        <<if $RobinExpansion.tutor_lessons gt 0>>练习册已经摊开。罗宾指给你看上回讲到的题，又在桌旁为你腾出位置。
         <<else>>罗宾把教案放在练习册旁，问起作业是从哪里开始看不懂的。<</if>>
         等你坐下时，家长仍在旁边陪着。
       <<else>>
         <<= $NPCList[2].name>>把你迎进门。<<= $NPCList[1].name>>已经准备好练习册。
-        <<if $NPCList[1].tutorConfidence gte 3>>手指沿着一行行计算往下移。“这些是我自己做的。”罗宾核对过，才翻到还没做完的题。
+        <<if $NPCList[1].tutor_confidence gte 3>>手指沿着一行行计算往下移。“这些是我自己做的。”罗宾核对过，才翻到还没做完的题。
         <<else>>罗宾核对上回改过的题。学生没等罗宾开口，就指了指空着的一道题。<</if>>
-        <<if $NPCList[2].tutorVisits gte 3>>家长把茶水放在桌上，回了隔壁房间。
+        <<if $NPCList[2].tutor_visits gte 3>>家长把茶水放在桌上，回了隔壁房间。
         <<else>>家长在门边停了一会，听着你们开始讲课。<</if>>
       <</if>>
   <</language>>
@@ -526,7 +526,7 @@
   <br><br>
   <<socialiseicon 'ask'>><<lanLink ['Let Robin teach and help when needed', '让罗宾主讲，你适时补充'] 'Deadwood Robin Tutor Lead'>><</lanLink>><br>
   <<socialiseicon>><<lanLink ['Work through the problem with Robin', '与罗宾一起拆解题目'] 'Deadwood Robin Tutor Together'>><</lanLink>>
-  <<set _robinTutorSubject to $RobinExpansion.tutorLessons % 3>>
+  <<set _robinTutorSubject to $RobinExpansion.tutor_lessons % 3>>
   <<if (_robinTutorSubject is 0 and $maths gte 300)
     or (_robinTutorSubject is 1 and $english gte 300)
     or (_robinTutorSubject is 2 and $science gte 300)>>
@@ -553,9 +553,9 @@
 <</if>>
 <<person1>>
 <<if maplebirch.get('Robin').tutoring.teach(_robinTutorApproach)>>
-  <<if $RobinExpansion.tutorSubject is 0>>
+  <<if $RobinExpansion.tutor_subject is 0>>
     <<lanSwitch 'The pupil has lost the thread of a fractions problem. Robin uses cups of different sizes to make the parts visible. The pupil tries again without looking at the answer.' '学生被分数题绕晕了。罗宾拿几只大小不同的杯子比划，让份量变得看得见。学生没偷看答案，又试了一遍。'>>
-  <<elseif $RobinExpansion.tutorSubject is 1>>
+  <<elseif $RobinExpansion.tutor_subject is 1>>
     <<lanSwitch 'The pupil can read the story but cannot explain what the narrator wants. Robin asks for one sentence of evidence, then waits through a long silence until the pupil finds it.' '学生读得懂故事，却说不清叙述者想要什么。罗宾请学生找一句依据，安静地等了好一会，直到学生自己翻到那一页。'>>
   <<else>>
     <<lanSwitch 'The science worksheet lists an experiment without its result. Robin has the pupil predict what will happen, then checks the notes together instead of guessing.' '科学练习只写了实验步骤，漏了结果。罗宾先让学生猜会发生什么，再一起翻笔记核对，没有直接蒙答案。'>>
@@ -565,9 +565,9 @@
     <<lanSwitch 'You point out one missed step quietly. Robin corrects it aloud in Robin’s own words. The parent notices that the pupil can explain the answer by the end.' '你悄悄提醒一个遗漏的步骤，罗宾用自己的话重新讲清。下课时，家长发现孩子已经能自己说明答案。'>>
     <<npcincr Robin dom 2>><<npcincr Robin love 1>><<gdom>><<glove>>
   <<elseif _robinTutorApproach is 'skills'>>
-    <<if $RobinExpansion.tutorSubject is 0>>
+    <<if $RobinExpansion.tutor_subject is 0>>
       <<lanSwitch 'You lay the cups side by side and show how the fractions add up. Robin asks the pupil to solve the next problem with different numbers. The pupil gets it right without your help.' '你把杯子并排摆好，讲清分数怎样相加。罗宾换了一组数字，让学生自己算。学生没再求助，算对了。'>><<mathsskill 1>><<gmaths>>
-    <<elseif $RobinExpansion.tutorSubject is 1>>
+    <<elseif $RobinExpansion.tutor_subject is 1>>
       <<lanSwitch 'You point to a line in the story that changes the narrator’s mind. Robin asks the pupil to find another clue. The pupil reads the next paragraph aloud and finds one.' '你指出故事里一句让叙述者改变主意的话。罗宾请学生再找一处线索。学生把下一段读出声，自己找到了。'>><<englishskill 1>><<genglish>>
     <<else>>
       <<lanSwitch 'You explain what the experiment can actually prove. Robin has the pupil compare that claim with the notes. The missing result becomes clear.' '你讲清这个实验究竟能证明什么。罗宾请学生把结论和笔记对照，遗漏的结果便清楚了。'>><<scienceskill 1>><<gscience>>
@@ -578,11 +578,11 @@
     <<npcincr Robin love 2>><<glove>>
   <</if>>
   <br><br>
-  <<if $RobinExpansion.tutorLessons is 1>>
+  <<if $RobinExpansion.tutor_lessons is 1>>
     <span class='green'><<lanSwitch 'The parent offers Robin two regular after-school lessons a week at £20 each. Robin checks that they will not clash with school before accepting.' '家长提出每周固定上两课，每课 £20。罗宾先确认不会耽误自己的学业，才答应下来。'>></span><br><br>
-  <<elseif $RobinExpansion.tutorLessons is 3>>
+  <<elseif $RobinExpansion.tutor_lessons is 3>>
     <span class='green'><<lanSwitch 'The pupil shows Robin a question solved without help. Robin checks every step, then asks the pupil to explain it to the parent. The parent listens all the way through.' '学生拿出一道独立做出的题。罗宾逐步核对，又请学生讲给家长听。家长从头到尾认真听完。'>></span><<npcincr Robin dom 2>><<gdom>><br><br>
-  <<elseif $RobinExpansion.tutorLessons is 6>>
+  <<elseif $RobinExpansion.tutor_lessons is 6>>
     <span class='green'><<lanSwitch 'The parent says another family asked who taught the pupil. Robin accepts one more £20 lesson each week only after checking school and shop hours. Tutoring income will rise to £60 a week.' '家长说，另一户人家问起是谁教会了孩子。罗宾核对过上学和看店时间，才答应每周再上一堂 £20 的课。家教周收入提升到 £60。'>></span><<npcincr Robin dom 3>><<gdom>><br><br>
   <</if>>
   <span class='blue'><<lanSwitch 'The parent pays you £7.50 for helping. Robin puts £8 from the lesson fee into the shared business reserve.' '家长另付给你 £7.50 帮课报酬。罗宾从课时费中拿出 £8，记入共同营业储备金。'>></span>
@@ -634,7 +634,7 @@
 
 :: Deadwood Robin Shop Application Solo []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.shopStage is 'planning'
+<<if $RobinExpansion.shop_stage is 'planning'
   and C.npc.Robin.dom gte 60
   and C.npc.Robin.trauma lt 50
   and maplebirch.get('Robin').shop.applyForPermit()>>
@@ -690,7 +690,7 @@
 
 :: Deadwood Robin Shop Site Solo []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.shopStage is 'applied'
+<<if $RobinExpansion.shop_stage is 'applied'
   and C.npc.Robin.dom gte 70
   and C.npc.Robin.trauma lt 50
   and maplebirch.get('Robin').shop.secureSite()>>
@@ -706,7 +706,7 @@
 <<lanSwitch 'Robin has measured the back room for a sink and a cold cabinet. The old lemonade press and cocoa burner will fit at separate stations.' '罗宾量好了后间水槽和冷藏柜的位置。原来的榨汁机与可可炉头可以分放在两侧。'>> <span class='blue'><i><<lanSwitch 'The inspector will come after the fittings are finished.' '装好设备后，检查员才会上门。'>></i></span>
 <<lanSwitch 'The sink, cabinet and safe storage cost £1,400. Robin can draw the layout, but fitting the heavy cabinet safely takes two people.' '水槽、冷藏柜和安全储物架共需 £1,400。罗宾能画好布置图，但沉重的冷藏柜得两个人才能安全装妥。'>>
 <br><br>
-<<if Time.days lte $RobinExpansion.shopApplicationDay>>
+<<if Time.days lte $RobinExpansion.shop_application_day>>
   <span class='blue'><<lanSwitch 'The application must be processed overnight.' '申请还需要一晚处理时间。'>></span>
 <<elseif maplebirch.get('Robin').canSpend(1400)>>
   <<shopicon 'register'>><<lanLink ['Fit out the shop and pass inspection for £1,400 (3:00)', '布置店铺并接受检查 £1,400 (3:00)'] 'Deadwood Robin Shop Inspection Result'>><<pass 180>><</lanLink>>
@@ -735,7 +735,7 @@
 <<set $outside to 0>><<set $location to 'townhall'>><<effects>><<npc Robin>><<person1>>
 <<lanSwitch 'The signed inspection form is ready. Robin holds it beside the two stall ledgers at the town hall counter.' '检查表已经签好。罗宾在市政厅柜台前把它与两处摊位的账本放在一起。'>>
 <br><br>
-<<if Time.days gt $RobinExpansion.shopInspectionDay>>
+<<if Time.days gt $RobinExpansion.shop_inspection_day>>
   <<icon 'business-permit.png'>><<lanLink '与罗宾领取经营许可' 'Deadwood Robin Shop Permit Result'>><</lanLink>>
 <<else>>
   <span class='blue'><<lanSwitch 'The town hall will issue the permit tomorrow.' '市政厅明天才会发放许可。'>></span>
@@ -754,7 +754,7 @@
 
 :: Deadwood Robin Shop Permit Solo []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.shopStage is 'inspected'
+<<if $RobinExpansion.shop_stage is 'inspected'
   and C.npc.Robin.dom gte 60
   and C.npc.Robin.trauma lt 50
   and maplebirch.get('Robin').shop.collectPermit()>>
@@ -767,7 +767,7 @@
 
 :: Deadwood Robin Shop Opening []
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.shopStage is 'permitted' and maplebirch.get('Robin').canSpend(4000)>>
+<<if $RobinExpansion.shop_stage is 'permitted' and maplebirch.get('Robin').canSpend(4000)>>
   <<lanSwitch 'The permit is framed beside the counter. Robin has worked out that the final equipment and opening stock will cost £4,000. "We can take this step when the reserve is ready," Robin says. "Then we will have money left for the next week, too."' '经营许可已经装框挂在柜台旁。罗宾算过最后一批设备和开业原料，合计还需 £4,000。“储备金准备好，我们就开门。”罗宾说，“还得给下周留些周转的钱。”'>>
   <br><br><<shopicon 'register'>><<lanLink ['Open the shop with Robin for £4,000 (3:00)', '和罗宾一起开店 £4,000 (3:00)'] 'Deadwood Robin Shop Opening Result'>><<pass 180>><</lanLink>>
 <<else>>
@@ -810,25 +810,25 @@
     <<option 'EN'>>Today's counter shift is covered by <span class='blue'><<= maplebirch.get('Robin').shop.attendant>></span>. You find the same name on the rota beside the till.
     <<option 'CN'>>今天在柜台值班的是<span class='blue'><<= maplebirch.get('Robin').shop.attendant>></span>。收银机旁的班表上也写着这个名字。
   <</language>>
-  <<if $per_npc[_robinAttendantKey].shopOrphan>>
+  <<if $per_npc[_robinAttendantKey].shop_orphan>>
     <br><<language>>
       <<option 'EN'>>
-        <<if $per_npc[_robinAttendantKey].shopExperience lt 2>>You recognise your fellow orphan behind the counter. The recipe card is propped against the jars, its corners already sticky. Each order gets checked twice.
-        <<elseif $per_npc[_robinAttendantKey].shopExperience lt 4>>Your fellow orphan handles the till without calling Robin over. A crossed-out sum on the order pad shows where the change was checked.
+        <<if $per_npc[_robinAttendantKey].shop_experience lt 2>>You recognise your fellow orphan behind the counter. The recipe card is propped against the jars, its corners already sticky. Each order gets checked twice.
+        <<elseif $per_npc[_robinAttendantKey].shop_experience lt 4>>Your fellow orphan handles the till without calling Robin over. A crossed-out sum on the order pad shows where the change was checked.
         <<else>>Your fellow orphan passes a finished drink across the counter, then catches a younger helper reaching for the wrong jar. "That one's cocoa. Look at the label."<</if>>
-        <<if $per_npc[_robinAttendantKey].shopPaidWeeks gt 0 and !$per_npc[_robinAttendantKey].shopWageSeen>>
+        <<if $per_npc[_robinAttendantKey].shop_paid_weeks gt 0 and !$per_npc[_robinAttendantKey].shop_wage_seen>>
           <br><br>A folded payslip lies beside the till. "It's all there," your fellow orphan tells you quietly. "I counted it twice. The others didn't believe me until I showed them."
         <</if>>
       <<option 'CN'>>
-        <<if $per_npc[_robinAttendantKey].shopExperience lt 2>>柜台后是和你同住孤儿院的熟面孔。配方卡支在原料罐旁，边角已经有些发黏。每张订单都要反复核对。
-        <<elseif $per_npc[_robinAttendantKey].shopExperience lt 4>>你的同伴已经不用叫罗宾过来帮忙找零了。订单本上划掉的一道算式，留下核对零钱的痕迹。
+        <<if $per_npc[_robinAttendantKey].shop_experience lt 2>>柜台后是和你同住孤儿院的熟面孔。配方卡支在原料罐旁，边角已经有些发黏。每张订单都要反复核对。
+        <<elseif $per_npc[_robinAttendantKey].shop_experience lt 4>>你的同伴已经不用叫罗宾过来帮忙找零了。订单本上划掉的一道算式，留下核对零钱的痕迹。
         <<else>>你的同伴把做好的饮料递过柜台，又拦住伸手拿错罐子的年幼帮手。“那罐是可可，看一下标签。”<</if>>
-        <<if $per_npc[_robinAttendantKey].shopPaidWeeks gt 0 and !$per_npc[_robinAttendantKey].shopWageSeen>>
+        <<if $per_npc[_robinAttendantKey].shop_paid_weeks gt 0 and !$per_npc[_robinAttendantKey].shop_wage_seen>>
           <br><br>一张折好的工资单放在收银机旁。“真的全给了。”你的同伴压低声音告诉你。“我数了两遍。他们一开始还不信，拿给他们看才信。”
         <</if>>
     <</language>>
-    <<if $per_npc[_robinAttendantKey].shopPaidWeeks gt 0>>
-      <<set $per_npc[_robinAttendantKey].shopWageSeen to true>>
+    <<if $per_npc[_robinAttendantKey].shop_paid_weeks gt 0>>
+      <<set $per_npc[_robinAttendantKey].shop_wage_seen to true>>
     <</if>>
   <</if>>
 <</if>>
@@ -858,7 +858,7 @@
 <<shopicon 'register'>><<lanLink ['See more drinks', '查看更多饮品'] 'Deadwood Robin Shop More Drinks'>><</lanLink>><br>
 <<shopicon 'register'>><<lanLink ['Browse flowers, popcorn and balloons', '查看鲜花、爆米花与气球'] 'Deadwood Robin Shop Other Goods'>><</lanLink>><br>
 <<deadwood-robin-fish-link 'shop'>>
-<span class='blue'><<lanSwitch 'Special ingredient crates remaining:' '新品原料剩余箱数：'>> <<= $RobinExpansion.shopStock>></span><br><br>
+<span class='blue'><<lanSwitch 'Special ingredient crates remaining:' '新品原料剩余箱数：'>> <<= $RobinExpansion.shop_stock>></span><br><br>
 <<if maplebirch.get('Robin').shop.canRestock>>
   <<set _robinRestockPrice to maplebirch.get('Robin').shop.restockPrice>>
   <<icon 'crate.png'>><<lanLink ["Buy three crates of special ingredients (£" + _robinRestockPrice + " 0:30)", '采购三箱新品原料 (£' + _robinRestockPrice + ' 0:30)'] 'Deadwood Robin Shop Restock'>><</lanLink>><br>
@@ -875,12 +875,12 @@
 <<if $RobinExpansion.shop_taste_day isnot Time.days and maplebirch.get('Robin').shop.canCustomerPay(300) and getRobinLocation() is 'shop'>>
   <<shopicon 'register'>><<lanLink ["Try the shop's new special (£3 0:05)", '尝尝店里的新品 (£3 0:05)'] 'Deadwood Robin Shop Taste'>><</lanLink>><br>
 <</if>>
-<<if $RobinExpansion.shopStaff lt 2 and getRobinLocation() is 'shop'>>
+<<if $RobinExpansion.shop_staff lt 2 and getRobinLocation() is 'shop'>>
   <<icon 'staff-applications.png'>><<lanLink ['Review staff applications', '查看店员应聘'] 'Deadwood Robin Shop Staff'>>
-    <<set $RobinExpansion.shopApplicant to 'adult'>>
+    <<set $RobinExpansion.shop_applicant to 'adult'>>
   <</lanLink>><br>
   <<icon 'staff-applications.png'>><<lanLink ['Ask Robin about hiring a fellow orphan', '和罗宾谈谈聘用孤儿院的同伴'] 'Deadwood Robin Shop Staff'>>
-    <<set $RobinExpansion.shopApplicant to 'orphan'>>
+    <<set $RobinExpansion.shop_applicant to 'orphan'>>
   <</lanLink>><br>
 <</if>>
 <<if maplebirch.get('Robin').shop.canTrainStaff>>
@@ -889,7 +889,7 @@
 <<if isLoveInterest('Robin') and C.npc.Robin.trauma lt 50
   and getRobinLocation() is 'shop' and Time.hour gte 19 and Time.hour lt 21>>
   <<loveicon 'hug'>><<lanLink ['Slip into the stockroom with Robin (0:02)', '和罗宾到储藏室偷闲 (0:02)'] 'Deadwood Robin Private Invite'>>
-    <<set $RobinExpansion.intimacySite to 'shop'>><<pass 2>>
+    <<set $RobinExpansion.intimacy_site to 'shop'>><<pass 2>>
   <</lanLink>><br>
 <</if>>
 <<if getRobinLocation() is 'shop'>>
@@ -975,17 +975,17 @@
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
 <<lanSwitch 'The side counter holds goods that need their own suppliers. Robin keeps the flower ledger, popcorn machine and the balloon seller’s orders separate from the drinks.' '侧柜摆着需要另行进货的商品。罗宾把鲜花账、爆米花机和气球摊主的订单与饮品账分开记。'>>
 <br><br><span class='gold'><<lanSwitch 'Flowers' '鲜花'>></span><br>
-<<if !$RobinExpansion.shopFlowers>>
+<<if !$RobinExpansion.shop_flowers>>
   <<if getRobinLocation() is 'shop' and maplebirch.get('Robin').canSpend(100)>>
     <<foodstufficon 'daisy'>><<lanLink ['Set up a flower counter for £100 (0:30)', '布置鲜花柜台 £100 (0:30)'] 'Deadwood Robin Shop Arrange Flowers'>><</lanLink>><br>
   <</if>>
 <<else>>
   <<for _flowerType range maplebirch.get('Robin').flowers.types>>
-    <<if $RobinExpansion.flowerStock[_flowerType] gt 0>>
+    <<if $RobinExpansion.flower_stock[_flowerType] gt 0>>
       <<capture _flowerType>>
         <<foodstufficon _flowerType>><span class='green'> <<print setup.foodstuff[_flowerType].singular>></span>
         <<if maplebirch.get('Robin').shop.canCustomerPay(maplebirch.get('Robin').flowers.price(_flowerType) * 100)>>
-          <<lanLink ['Buy this flower (0:05)', '购买这一枝鲜花 (0:05)'] 'Deadwood Robin Shop Buy Flower'>><<set $RobinExpansion.flowerSelection to _flowerType>><</lanLink>>
+          <<lanLink ['Buy this flower (0:05)', '购买这一枝鲜花 (0:05)'] 'Deadwood Robin Shop Buy Flower'>><<set $RobinExpansion.flower_selection to _flowerType>><</lanLink>>
         <</if>>
         <span class='gold'>£<<print maplebirch.get('Robin').flowers.price(_flowerType)>></span><br>
       <</capture>>
@@ -999,7 +999,7 @@
       <<if $foodstuff[_flowerType].amount gte 10 and maplebirch.get('Robin').canSpend(setup.foodstuff[_flowerType].shop.sell_price / 10)>>
         <<capture _flowerType>>
           <<foodstufficon _flowerType>><span class='green'> <<print setup.foodstuff[_flowerType].singular>></span>
-          <<lanLink ['Supply ten flowers (0:15)', '交付十枝鲜花 (0:15)'] 'Deadwood Robin Shop Supply Flowers'>><<set $RobinExpansion.flowerSelection to _flowerType>><</lanLink>>
+          <<lanLink ['Supply ten flowers (0:15)', '交付十枝鲜花 (0:15)'] 'Deadwood Robin Shop Supply Flowers'>><<set $RobinExpansion.flower_selection to _flowerType>><</lanLink>>
           <span class='gold'>£<<print setup.foodstuff[_flowerType].shop.sell_price / 10>></span><br>
         <</capture>>
       <</if>>
@@ -1007,7 +1007,7 @@
   <</if>>
 <</if>>
 <br><span class='gold'><<lanSwitch 'Popcorn' '爆米花'>></span><br>
-<<if !$RobinExpansion.shopPopcorn>>
+<<if !$RobinExpansion.shop_popcorn>>
   <<if getRobinLocation() is 'shop' and maplebirch.get('Robin').canSpend(150)>>
     <<foodicon 'popcorn'>><<lanLink ['Buy a popcorn machine for £150 (1:00)', '添置爆米花机 £150 (1:00)'] 'Deadwood Robin Shop Arrange Popcorn'>><</lanLink>><br>
   <</if>>
@@ -1017,9 +1017,9 @@
   <<foodicon 'popcorn'>><<lanLink ['Buy popcorn (0:02)', '购买爆米花 (0:02)'] 'Deadwood Robin Shop Buy Popcorn'>><</lanLink>> <span class='gold'>£7</span><br>
 <</if>>
 <br><span class='gold'><<lanSwitch 'Balloons' '气球'>></span><br>
-<<if $RobinExpansion.shopBalloons and Time.dayState isnot 'night'>>
+<<if $RobinExpansion.shop_balloons and Time.dayState isnot 'night'>>
   <<gifticon 'balloons'>><<lanLink ['Browse balloons and handheld toys', '挑选气球和手持玩具'] 'Deadwood Robin Shop Balloon Shelf'>><</lanLink>><br>
-<<elseif $RobinExpansion.shopBalloons>>
+<<elseif $RobinExpansion.shop_balloons>>
   <span class='blue'><<lanSwitch 'The balloon display closes at dusk. The drink counter remains open.' '入夜后气球货架停止选购，饮品柜台仍照常营业。'>></span><br>
 <<elseif ['cooperate', 'resolved'].includes($RobinExpansion.balloon)>>
   <<if getRobinLocation() is 'shop' and maplebirch.get('Robin').canSpend(100)>>
@@ -1047,7 +1047,7 @@
 
 :: Deadwood Robin Shop Supply Flowers []
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
-<<set _flowerType to $RobinExpansion.flowerSelection>>
+<<set _flowerType to $RobinExpansion.flower_selection>>
 <<if maplebirch.get('Robin').flowers.sellToShop(_flowerType)>>
   <<pass 15>><<lanSwitch 'Robin counts ten stems, checks their condition and pays you the same price you could get at the market. <<He>> puts your name beside the batch before placing it in the display.' '罗宾数过十枝花，检查花枝的新鲜程度，按你在市场能拿到的价格付了货款。<<He>>在这批花旁写上你的名字，才把它们放进花柜。'>>
   <br><span class='gold'><<lanSwitch 'The payment is already in your cash.' '货款已计入你的现金。'>></span>
@@ -1056,7 +1056,7 @@
 
 :: Deadwood Robin Shop Buy Flower []
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
-<<set _flowerType to $RobinExpansion.flowerSelection>>
+<<set _flowerType to $RobinExpansion.flower_selection>>
 <<set _flowerPrice to maplebirch.get('Robin').flowers.price(_flowerType) * 100>>
 <<if maplebirch.get('Robin').flowers.buyFromShop(_flowerType)>>
   <<money `-_flowerPrice` 'shopping'>><<pass 5>><<lanSwitch 'The attendant wraps the stem in paper so it will not bruise on the way home. You can find it with your other flowers.' '店员给花枝包上一层纸，免得路上碰伤。它已经放进你的鲜花库存。'>>
@@ -1074,7 +1074,7 @@
 
 :: Deadwood Robin Shop Buy Popcorn []
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
-<<if $RobinExpansion.shop and $RobinExpansion.shopPopcorn and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(700) and ($popcorn or 0) lt 3>>
+<<if $RobinExpansion.shop and $RobinExpansion.shop_popcorn and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(700) and ($popcorn or 0) lt 3>>
   <<money -700 'shopping'>><<set $RobinExpansion.reserve += 7>><<set $popcorn to ($popcorn or 0) + 1>><<pass 2>>
   <<lanSwitch 'The attendant folds the top of a warm bag of popcorn and hands it to you. It is added to the popcorn you carry, so you can eat it later.' '店员把一袋热爆米花封好递给你。它已计入你携带的爆米花，可以稍后再吃。'>>
   <<deadwood-robin-sale-event 'shop'>>
@@ -1091,7 +1091,7 @@
 
 :: Deadwood Robin Shop Balloon Shelf []
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
-<<if $RobinExpansion.shop and $RobinExpansion.shopBalloons and Time.hour gte 9 and Time.hour lt 21 and Time.dayState isnot 'night'>>
+<<if $RobinExpansion.shop and $RobinExpansion.shop_balloons and Time.hour gte 9 and Time.hour lt 21 and Time.dayState isnot 'night'>>
   <<run setup.clothes.handheld.filter(item => item.shop.includes('stall')).forEach(item => item.shop.pushUnique('deadwoodRobin'))>>
   <<lanSwitch 'The balloon seller supplies this shelf. Robin leaves the original tags on the balloons and small handheld toys so you can choose their colours.' '这些气球由海滩摊主供货。罗宾保留了气球与手持玩具的原标签，方便你挑选颜色。'>>
   <div id='tryonstats-div'><<tryOnStats>></div>
@@ -1102,25 +1102,25 @@
 
 :: Deadwood Robin Shop Staff []
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.shop and $RobinExpansion.shopStaff lt 2 and getRobinLocation() is 'shop'
+<<if $RobinExpansion.shop and $RobinExpansion.shop_staff lt 2 and getRobinLocation() is 'shop'
   and Time.hour gte 9 and Time.hour lt 21 and $exposed lte 0 and $stress lt $stressmax
-  and ($RobinExpansion.shopApplicant isnot 'orphan' or !Time.schoolDay or Time.hour gte 16)>>
+  and ($RobinExpansion.shop_applicant isnot 'orphan' or !Time.schoolDay or Time.hour gte 16)>>
   <<set _robinApplicantKey to maplebirch.get('Robin').shop.applicantKey>>
   <<if $per_npc[_robinApplicantKey]>>
     <<loadNPC 1 _robinApplicantKey>>
   <<else>>
-    <<set _robinApplicantAge to $RobinExpansion.shopApplicant is 'orphan' ? 't' : 'a'>>
+    <<set _robinApplicantAge to $RobinExpansion.shop_applicant is 'orphan' ? 't' : 'a'>>
     <<generateNPC 2 _robinApplicantAge>>
-    <<set $NPCList[1].shopOrphan to $RobinExpansion.shopApplicant is 'orphan'>>
+    <<set $NPCList[1].shop_orphan to $RobinExpansion.shop_applicant is 'orphan'>>
     <<set $NPCList[1].name_known to 1>><<saveNPC 1 _robinApplicantKey>>
   <</if>>
-  <<if !$NPCList[1].shopOrphan>>
+  <<if !$NPCList[1].shop_orphan>>
     <<language>>
       <<option 'EN'>>The name at the top of the application is <span class='blue'><<= $NPCList[1].name>></span>.
       <<option 'CN'>>应聘表最上方写着<span class='blue'><<= $NPCList[1].name>></span>的名字。
     <</language>><br>
   <</if>>
-  <<if $NPCList[1].shopOrphan>>
+  <<if $NPCList[1].shop_orphan>>
     <<language>>
       <<option 'EN'>>
         "I asked around at home," Robin says, unfolding a sheet of paper. "<span class='blue'><<= $NPCList[1].name>></span> wanted to come. We used to wash up together in the kitchen."
@@ -1144,12 +1144,12 @@
         <br><br>“贝利还是要收租的。”你的同伴提醒道。罗宾点点头。“我知道。这份工作有工资，钱归你自己。”停了一会儿，应聘表被推到你面前。
     <</language>>
     <br><br><span class='blue'><<lanSwitch 'Training costs £350 once. Weekly wages are £350. Extra weekly sales start at £400 and rise to £700 with experience.' '培训一次需 £350，周薪 £350。起初每周增加 £400 销售额，熟练后提高到 £700。'>></span>
-  <<elseif $RobinExpansion.shopStaff is 0>>
+  <<elseif $RobinExpansion.shop_staff is 0>>
     <<lanSwitch 'Robin shows you an application from an adult who has handled a café counter before. The applicant can cover school hours, keep the till balanced and teach the temporary staff the recipes. Robin checks the references before making an offer.' '罗宾给你看一份应聘表。应聘者是有咖啡馆柜台经验的成年人，能在上学时段看店、核对收银，也能教临时店员照配方出杯。罗宾先核实了推荐人，才准备谈聘用。'>>
   <<else>>
     <<lanSwitch 'The first employee asks for reliable cover on busy days and days off. Robin has interviewed a second adult applicant, shown them the food labels and written down a shift rota that leaves both workers time to rest.' '第一位店员希望忙碌日和休息日有人轮班。罗宾面试了第二位成年应聘者，带对方认过食品标签，又写好让两人都能休息的班表。'>>
   <</if>>
-  <<if !$NPCList[1].shopOrphan>>
+  <<if !$NPCList[1].shop_orphan>>
     <br><br><span class='blue'><<lanSwitch 'Each experienced employee adds £700 in weekly sales and receives £350 in weekly wages. Hiring and training cost £350 once.' '每名有经验的店员每周增加 £700 销售额，领取 £350 周薪。招聘与培训一次需 £350。'>></span>
   <</if>>
   <<if maplebirch.get('Robin').shop.canHireStaff>>
@@ -1158,7 +1158,7 @@
     <br><span class='blue'><<lanSwitch 'Robin needs to keep enough money for training and the next rent bill.' '罗宾得先攒够培训费，还要留出下一次房租。'>></span>
   <</if>>
 <<else>>
-  <<if $RobinExpansion.shopApplicant is 'orphan' and Time.schoolDay and Time.hour lt 16>>
+  <<if $RobinExpansion.shop_applicant is 'orphan' and Time.schoolDay and Time.hour lt 16>>
     <<lanSwitch 'Your fellow orphans are still at school. Ask Robin again after four.' '同伴们还在学校，下午四点后再和罗宾商量。'>>
   <<else>>
     <<lanSwitch 'Review the applications with Robin when Robin is at the shop.' '等罗宾在店里时，再一起查看应聘表。'>>
@@ -1176,7 +1176,7 @@
     <<option 'CN'>><span class='blue'><<= $NPCList[1].name>></span>签好聘用协议。
   <</language>>
   <br>
-  <<if $NPCList[1].shopOrphan>>
+  <<if $NPCList[1].shop_orphan>>
     <<language>>
       <<option 'EN'>>
         Robin ties an apron over your fellow orphan's clothes and runs through a simple order. The first cup has too much syrup. <<person2>>"Sorry," <<he>> says, reaching for it. <<person1>>"We'll use that one to taste the difference," Robin says. "Try the line on the measuring cup."
@@ -1187,7 +1187,7 @@
         <br><br>托盘收空时，最后一杯已经和罗宾做的差不多了。你的同伴把班表仔细折好，放进口袋。“能告诉其他人吗？”
         <br><br>“当然。”罗宾笑了。“还有人想帮忙的话，让他们来问我。”
     <</language>><<ghope>>
-  <<elseif $RobinExpansion.shopStaff is 1>>
+  <<elseif $RobinExpansion.shop_staff is 1>>
     <<lanSwitch 'Robin pays for training and writes the first employee into the rota. The new hire checks the till and copies Robin’s recipe cards before taking a daytime shift. Robin looks relieved to know the counter has steady cover.' '罗宾付了培训费，把第一位店员写进班表。新店员核对收银，抄好罗宾的配方卡，接下白天的班次。柜台终于有人稳定照看，罗宾松了口气。'>>
   <<else>>
     <<lanSwitch 'Robin introduces the new employee and goes over the rota. Afternoon shifts fit around school, and the counter has cover when someone needs a day off.' '罗宾介绍新店员，核对班表。下午的班次避开上课时段，也给需要休息的人留出代班。'>>
@@ -1202,7 +1202,7 @@
 :: Deadwood Robin Shop Staff Training []
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
 <<set _robinTrainingKey to maplebirch.get('Robin').shop.attendantKey>>
-<<set _robinTrainingExperience to _robinTrainingKey ? ($per_npc[_robinTrainingKey].shopExperience or 0) : 0>>
+<<set _robinTrainingExperience to _robinTrainingKey ? ($per_npc[_robinTrainingKey].shop_experience or 0) : 0>>
 <<if maplebirch.get('Robin').shop.trainStaff()>>
   <<loadNPC 1 _robinTrainingKey>>
   <<language>>
@@ -1216,7 +1216,7 @@
       <<else>>
         Robin checks the finished orders and nods. "That's it. Next time, I'll leave these to you."
       <</if>>
-      <<if $per_npc[_robinTrainingKey].shopExperience is 4>>
+      <<if $per_npc[_robinTrainingKey].shop_experience is 4>>
         <br><br><<person2>>"I'll show the others the cups," your fellow orphan says. <<He>> puts the recipe card back where the next helper can see it.
       <</if>>
     <<option 'CN'>>
@@ -1229,7 +1229,7 @@
       <<else>>
         罗宾看过做完的订单，点点头。“就是这样。下次这些交给你。”
       <</if>>
-      <<if $per_npc[_robinTrainingKey].shopExperience is 4>>
+      <<if $per_npc[_robinTrainingKey].shop_experience is 4>>
         <br><br><<person2>>“杯子的事我教他们。”你的同伴说。<<He>>把配方卡放回其他帮手也能看见的位置。
       <</if>>
   <</language>><<person1>><<npcincr Robin love 1>><<glove>><<pass 30>>
@@ -1384,9 +1384,9 @@
   <<language>>
     <<option 'EN'>>
       <<if !_robinRegularMet>>A customer stops at the counter. Robin greets them by name and introduces you. "This is <<= _robinRegular.name>>. They come here quite often."
-      <<elseif (_robinRegular.shopOrders ?? 0) gte 3>><<= _robinRegular.name>> waves to you from the queue. "The usual, please." You reach for a cup before they finish speaking.
+      <<elseif (_robinRegular.shop_orders ?? 0) gte 3>><<= _robinRegular.name>> waves to you from the queue. "The usual, please." You reach for a cup before they finish speaking.
       <<else>><<= _robinRegular.name>> returns to the counter and smiles when they recognise you.<</if>>
-      <<if (_robinRegular.shopOrders ?? 0) lt 3>>
+      <<if (_robinRegular.shop_orders ?? 0) lt 3>>
         They ask for
         <<if _robinRegular.drinkPreference is 'lemonade'>>
           lemonade
@@ -1399,9 +1399,9 @@
       Robin checks the ingredients set aside for the shift. There is enough to try a small batch of a special, but a queue is forming. <<nnpc_He Robin>> asks how you want to divide the work.
     <<option 'CN'>>
       <<if !_robinRegularMet>>一位顾客在柜台前停下。罗宾熟络地叫出对方的名字，又向你介绍。“这位是<<= _robinRegular.name>>，经常来我们这儿。”
-      <<elseif (_robinRegular.shopOrders ?? 0) gte 3>><<= _robinRegular.name>>在队伍里朝你挥手。“还是老样子。”话还没说完，你已经取好了杯子。
+      <<elseif (_robinRegular.shop_orders ?? 0) gte 3>><<= _robinRegular.name>>在队伍里朝你挥手。“还是老样子。”话还没说完，你已经取好了杯子。
       <<else>><<= _robinRegular.name>>又来到柜台前，认出你后笑了笑。<</if>>
-      <<if (_robinRegular.shopOrders ?? 0) lt 3>>
+      <<if (_robinRegular.shop_orders ?? 0) lt 3>>
         对方点了一杯
         <<if _robinRegular.drinkPreference is 'lemonade'>>
           柠檬水
@@ -1444,8 +1444,8 @@
   <<language>>
     <<option 'EN'>>
       <<if _robinShopShift is 'Robin'>>
-        <<if _robinRegular.drinkPreference is 'lemonade'>>Robin crushes mint into the lemonade, keeping the sugar low. <<= _robinRegular.name>> tastes it before answering. "That's refreshing. <<if _robinRegular.shopSpecials gt 1>>You remembered the sugar, too.<<else>>I'd have this again. Still tastes of lemon.<</if>>"
-        <<else>>Robin adds a little cinnamon to the cocoa. <<= _robinRegular.name>> takes a cautious sip. "<<if _robinRegular.shopSpecials gt 1>>That's better. I can taste the cocoa under the spice.<<else>>Nice, though I wouldn't want any more cinnamon.<</if>>" Robin marks the amount beside the recipe.<</if>>
+        <<if _robinRegular.drinkPreference is 'lemonade'>>Robin crushes mint into the lemonade, keeping the sugar low. <<= _robinRegular.name>> tastes it before answering. "That's refreshing. <<if _robinRegular.shop_specials gt 1>>You remembered the sugar, too.<<else>>I'd have this again. Still tastes of lemon.<</if>>"
+        <<else>>Robin adds a little cinnamon to the cocoa. <<= _robinRegular.name>> takes a cautious sip. "<<if _robinRegular.shop_specials gt 1>>That's better. I can taste the cocoa under the spice.<<else>>Nice, though I wouldn't want any more cinnamon.<</if>>" Robin marks the amount beside the recipe.<</if>>
       <<else>>
         You pass <<= _robinRegular.name>> the
         <<if _robinRegular.drinkPreference is 'lemonade'>>
@@ -1454,7 +1454,7 @@
           hot chocolate
         <</if>>
         Robin made with less sugar.
-        <<if _robinRegular.shopOrders gte 3>>
+        <<if _robinRegular.shop_orders gte 3>>
           "You know my order by now." They leave their change beside the till and make room for the next customer.
         <<else>>
           They check the drink, then thank you for remembering.
@@ -1462,8 +1462,8 @@
       <</if>>
     <<option 'CN'>>
       <<if _robinShopShift is 'Robin'>>
-        <<if _robinRegular.drinkPreference is 'lemonade'>>罗宾往柠檬水里压入薄荷，也没多放糖。<<= _robinRegular.name>>尝过才回答。“挺清爽的。<<if _robinRegular.shopSpecials gt 1>>糖也没忘了少放。<<else>>下次还想喝这个，柠檬味还在。<</if>>”
-        <<else>>罗宾给可可加了一点肉桂。<<= _robinRegular.name>>小心地抿了一口。“<<if _robinRegular.shopSpecials gt 1>>这样好多了，还能尝出可可味。<<else>>不错，不过肉桂别再多放了。<</if>>”罗宾把用量记在配方旁。<</if>>
+        <<if _robinRegular.drinkPreference is 'lemonade'>>罗宾往柠檬水里压入薄荷，也没多放糖。<<= _robinRegular.name>>尝过才回答。“挺清爽的。<<if _robinRegular.shop_specials gt 1>>糖也没忘了少放。<<else>>下次还想喝这个，柠檬味还在。<</if>>”
+        <<else>>罗宾给可可加了一点肉桂。<<= _robinRegular.name>>小心地抿了一口。“<<if _robinRegular.shop_specials gt 1>>这样好多了，还能尝出可可味。<<else>>不错，不过肉桂别再多放了。<</if>>”罗宾把用量记在配方旁。<</if>>
       <<else>>
         你把罗宾按口味调好的少糖
         <<if _robinRegular.drinkPreference is 'lemonade'>>
@@ -1472,7 +1472,7 @@
           热巧克力
         <</if>>
         递给<<= _robinRegular.name>>。
-        <<if _robinRegular.shopOrders gte 3>>
+        <<if _robinRegular.shop_orders gte 3>>
           “你已经记住我点什么了。”对方把零钱留在收银机旁，给后面的客人让出位置。
         <<else>>
           对方看了看杯子，谢谢你记得少放糖。
@@ -1623,8 +1623,8 @@
 <<if maplebirch.get('Robin').market.work()>>
   <<lanSwitch 'You keep track of the orders while Robin serves each customer. When the last one leaves, Robin checks the cash against the list and pays you for the shift. You both carry the unused supplies home.' '你记下订单，罗宾逐位招待客人。最后一位顾客离开后，罗宾对照清单清点现金，付给你这班的报酬。你们一起把没用完的原料搬回去。'>>
   <br><br><span class='green'>
-    <<lanSwitch 'Shift pay:' '班次报酬：'>> £<<print $RobinExpansion.marketSales>><br>
-    <<lanSwitch 'Added to the business reserve:' '已记入营业储备金：'>> £<<print $RobinExpansion.marketSales>>
+    <<lanSwitch 'Shift pay:' '班次报酬：'>> £<<print $RobinExpansion.market_sales>><br>
+    <<lanSwitch 'Added to the business reserve:' '已记入营业储备金：'>> £<<print $RobinExpansion.market_sales>>
   </span>
   <<pass 45>><<npcincr Robin love 1>><<glove>>
 <<else>>
@@ -1679,7 +1679,7 @@
 <</if>>
 <br><br>
 <<if $RobinExpansion.lemonade gte 2 and $RobinExpansion.chocolate gte 2
-  and $RobinExpansion.shopStage is 'none' and !$RobinExpansion.topics.shop>>
+  and $RobinExpansion.shop_stage is 'none' and !$RobinExpansion.topics.shop>>
   <<set $RobinExpansion.topics.shop to true>>
   <<lanSwitch 'Robin has circled the busiest days in both ledgers. "We keep turning people away when the carts run out of room," <<he>> says. <<He>> stops at a sketch of a vacant shop on Cliff Street.' '罗宾在两本账上圈出最忙的几天。“车上摆不下，客人只好走了。”<<he>>说着，翻到画着峭壁街空铺的那页。'>>
   <br><span class='blue'><i><<lanSwitch 'You could ask Robin about the shop back in <<his>> room.' '回到罗宾的房间后，你可以问问<<him>>开店的事。'>></i></span><br><br>
@@ -1687,15 +1687,15 @@
 <<shopicon 'register'>><span class='blue'><<lanSwitch 'This week’s estimate' '本周预估'>></span><br>
 <<lanSwitch 'Stalls and existing agreements:' '摊位与现有合作：'>> <span class='gold'>£<<print ($robin.stayup gte 1 ? 250 : 300) + ($robin.moneyModifier or 0)>></span><br>
 <<lanSwitch 'Improved stalls and shop, after wages:' '升级摊位与店铺收入（扣薪后）：'>> <span class='gold'>£<<print Math.max(0, maplebirch.get('Robin').income - ($robin.stayup gte 1 ? 250 : 300) - ($robin.moneyModifier or 0) - maplebirch.get('Robin').tutoring.income - maplebirch.get('Robin').balloon.income)>></span><br>
-<<if $RobinExpansion.shopStaff gt 0>>
-  <span class='blue'><<lanSwitch 'Permanent staff:' '正式店员：'>> <<= $RobinExpansion.shopStaff>></span><br>
+<<if $RobinExpansion.shop_staff gt 0>>
+  <span class='blue'><<lanSwitch 'Permanent staff:' '正式店员：'>> <<= $RobinExpansion.shop_staff>></span><br>
   <<if maplebirch.get('Robin').shop.employees.length gt 0>>
     <<for _robinEmployeeKey range maplebirch.get('Robin').shop.employeeKeys>>
       <<if $per_npc[_robinEmployeeKey]>>
         <<= $per_npc[_robinEmployeeKey].name>> ·
-        <<if $per_npc[_robinEmployeeKey].shopOrphan>>
-          <<if $per_npc[_robinEmployeeKey].shopExperience lt 2>><span class='blue'><<lanSwitch 'Learning' '学习中'>></span>
-          <<elseif $per_npc[_robinEmployeeKey].shopExperience lt 4>><span class='teal'><<lanSwitch 'Independent' '能独立值班'>></span>
+        <<if $per_npc[_robinEmployeeKey].shop_orphan>>
+          <<if $per_npc[_robinEmployeeKey].shop_experience lt 2>><span class='blue'><<lanSwitch 'Learning' '学习中'>></span>
+          <<elseif $per_npc[_robinEmployeeKey].shop_experience lt 4>><span class='teal'><<lanSwitch 'Independent' '能独立值班'>></span>
           <<else>><span class='green'><<lanSwitch 'Experienced' '熟练'>></span><</if>>
         <<else>><span class='green'><<lanSwitch 'Experienced' '熟练'>></span><</if>><br>
       <</if>>
@@ -1704,9 +1704,9 @@
   <<lanSwitch 'Extra shop sales from staff:' '店员带来的额外销售：'>> <span class='gold'>£<<print maplebirch.get('Robin').shop.staffSales>></span><br>
   <<lanSwitch 'Weekly staff wages, included above:' '每周店员工资（已在上方扣除）：'>> <span class='gold'>£<<print maplebirch.get('Robin').shop.staffWages>></span><br>
 <</if>>
-<<if $RobinExpansion.tutor and $RobinExpansion.tutorLessons gt 0 and !Time.schoolTerm>>
+<<if $RobinExpansion.tutor and $RobinExpansion.tutor_lessons gt 0 and !Time.schoolTerm>>
   <<lanSwitch 'Tutoring: school holiday break' '家教：假期暂停'>><br>
-<<elseif $RobinExpansion.tutor and $RobinExpansion.tutorLessons gt 0>>
+<<elseif $RobinExpansion.tutor and $RobinExpansion.tutor_lessons gt 0>>
   <<lanSwitch 'Tutoring:' '家教：'>> <span class='gold'>£<<print maplebirch.get('Robin').tutoring.income>></span><br>
 <<elseif $RobinExpansion.tutor>>
   <<lanSwitch 'Tutoring: trial lesson pending' '家教：待试课'>><br>
@@ -1715,41 +1715,41 @@
   <<lanSwitch 'Balloon stall referrals:' '气球摊互荐：'>> <span class='gold'>£<<print maplebirch.get('Robin').balloon.income>></span><br>
 <</if>>
 <span class='green'><<lanSwitch 'Total expected income:' '预计收入合计：'>></span> <span class='gold'>£<<print maplebirch.get('Robin').income>></span><br>
-<<if $RobinExpansion.fishSoldDay is Time.days and $RobinExpansion.fishEarningsToday gt 0>>
-  <<lanSwitch 'Fish special today, Robin’s share (already in reserve):' '今日烤鱼特选，罗宾所得（已入储备金）：'>> <span class='gold'>£<<print $RobinExpansion.fishEarningsToday>></span><br>
+<<if $RobinExpansion.fish_sold_day is Time.days and $RobinExpansion.fish_earnings_today gt 0>>
+  <<lanSwitch 'Fish special today, Robin’s share (already in reserve):' '今日烤鱼特选，罗宾所得（已入储备金）：'>> <span class='gold'>£<<print $RobinExpansion.fish_earnings_today>></span><br>
 <</if>>
 <<lanSwitch 'Robin’s rent share this week:' '罗宾本周房租份额：'>> <span class='gold'>£<<print maplebirch.get('Robin').rent.due>></span>
-<<if $robinpaid is 1 and !$RobinExpansion.selfRent>>
+<<if $robinpaid is 1 and !$RobinExpansion.self_rent>>
   <span class='blue'><<lanSwitch '(currently included in your doubled bill)' '（目前包含在你的翻倍账单内）'>></span>
 <</if>>
 <br>
 <<if $robindebt gt 0>>
   <<lanSwitch 'Past rent due at the current rate:' '按当前租金额结算的旧欠：'>> <span class='gold'>£<<print maplebirch.get('Robin').rent.debt>></span><br>
 <</if>>
-<<if $RobinExpansion.selfRent and !$RobinExpansion.bothRent>>
+<<if $RobinExpansion.self_rent and !$RobinExpansion.both_rent>>
   <<lanSwitch 'Income needed to promise both rents:' '承诺承担两人房租所需周收入：'>> <span class='gold'>£<<print maplebirch.get('Robin').rent.bothRequirement>></span><br>
 <</if>>
-<<lanSwitch 'Last settled week:' '上次结算周收入：'>> <span class='gold'>£<<print $RobinExpansion.weeklyIncome>></span><br><br>
+<<lanSwitch 'Last settled week:' '上次结算周收入：'>> <span class='gold'>£<<print $RobinExpansion.weekly_income>></span><br><br>
 <span class='blue'><<lanSwitch 'Business reserve:' '营业储备金：'>></span> <span class='gold'>£<<print $RobinExpansion.reserve>></span><br>
 <<if $RobinExpansion.solidarity>>
-  <<lanSwitch 'Orphanage care fund:' '孤儿院照护基金：'>> <span class='gold'>£<<print $RobinExpansion.careFund>></span><br>
+  <<lanSwitch 'Orphanage care fund:' '孤儿院照护基金：'>> <span class='gold'>£<<print $RobinExpansion.care_fund>></span><br>
 <</if>>
 <<lanSwitch 'Robin’s cash:' '罗宾的现金：'>> <span class='gold'>£<<print $robinmoney>></span>
-<<if $RobinExpansion.pcLoan gt 0>>
-  <br><<lanSwitch 'Robin still owes you:' '罗宾还欠你的借款：'>> <span class='gold'>£<<print $RobinExpansion.pcLoan>></span>
-  <<if maplebirch.get('Robin').canSpend($RobinExpansion.pcLoan)>>
+<<if $RobinExpansion.pc_loan gt 0>>
+  <br><<lanSwitch 'Robin still owes you:' '罗宾还欠你的借款：'>> <span class='gold'>£<<print $RobinExpansion.pc_loan>></span>
+  <<if maplebirch.get('Robin').canSpend($RobinExpansion.pc_loan)>>
     <<if ['shop', 'orphanage'].includes(getRobinLocation())>>
       <br><br><<shopicon 'register'>><<lanLink ["Accept Robin's repayment", '收下罗宾归还的借款'] 'Deadwood Robin Loan Repayment'>><</lanLink>>
     <</if>>
   <</if>>
 <</if>>
 <<if $RobinExpansion.shop>>
-  <br><<lanSwitch 'Special ingredient crates:' '新品原料箱数：'>> <<= $RobinExpansion.shopStock>>
+  <br><<lanSwitch 'Special ingredient crates:' '新品原料箱数：'>> <<= $RobinExpansion.shop_stock>>
   <<if maplebirch.get('VanillaPlus')>>
     <br><br><<icon 'robin-ledger.png'>><<lanLink ['Discuss a shop partnership', '商量店铺合伙'] 'Deadwood Robin Shop Partnership'>><</lanLink>>
   <</if>>
 <</if>>
-<<if maplebirch.get('VanillaPlus') and $RobinExpansion.shopStage isnot 'none'>>
+<<if maplebirch.get('VanillaPlus') and $RobinExpansion.shop_stage isnot 'none'>>
   <br><span class='blue'><<lanSwitch 'The shop plans can support a business-purpose loan application at the financial centre.' '这份开店计划可以带去金融中心，申请经营用途贷款。'>></span>
 <</if>>
 <<if maplebirch.get('Robin').shop.canBorrowLoan>>
@@ -1774,7 +1774,7 @@
 
 :: Deadwood Robin Loan Repayment []
 <<set $outside to 0>><<effects>><<npc Robin>><<person1>>
-<<set _robinDebt to $RobinExpansion.pcLoan>>
+<<set _robinDebt to $RobinExpansion.pc_loan>>
 <<if maplebirch.get('Robin').repayPcLoan()>>
   <<lanSwitch 'Robin opens the ledger to the page with your loan. The figures are crossed through one by one, then Robin counts out the full amount and puts it in your hand. "I wanted to do this myself," Robin says. "Thank you for trusting me with the shop."' '罗宾翻开账本上记着借款的那页，逐项划掉数字，然后数清全款，放进你手里。“这次我想自己把钱还清。”罗宾说，“谢谢你信任我能把店开起来。”'>>
   <br><br><span class='gold'><<lanSwitch 'Robin repays' '罗宾归还'>> £<<print _robinDebt>></span>

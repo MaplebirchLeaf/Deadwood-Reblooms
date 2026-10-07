@@ -162,7 +162,7 @@ class School {
   }
 
   public get canSignAttendanceExemption(): boolean {
-    return !(this.state.attendanceExempt || this.state.baileySigned || this.state.leightonApprovalDay < 0 || (!V.RobinExpansion?.baileyDefeated && V.baileypaychain < 3));
+    return !(this.state.attendanceExempt || this.state.baileySigned || this.state.leightonApprovalDay < 0 || (!V.RobinExpansion?.bailey_defeated && V.baileypaychain < 3));
   }
 
   public get canGrantAttendanceExemption(): boolean {
@@ -177,12 +177,12 @@ class School {
   }
 
   public get canSupplyDrinks(): boolean {
-    return this.state.role !== 'student' && V.RobinExpansion?.shop === true && V.RobinExpansion.shopStock > 0 && V.RobinExpansion.school_drinks_day !== Time.days;
+    return this.state.role !== 'student' && V.RobinExpansion?.shop === true && V.RobinExpansion.shop_stock > 0 && V.RobinExpansion.school_drinks_day !== Time.days;
   }
 
   public organiseSchoolDrinks(): boolean {
     if (!this.canSupplyDrinks) return false;
-    V.RobinExpansion.shopStock -= 1;
+    V.RobinExpansion.shop_stock -= 1;
     V.RobinExpansion.reserve += 20;
     V.RobinExpansion.school_drinks_day = Time.days;
     this.adjustStanding(0, 3, 1);

@@ -69,8 +69,8 @@ class Robin extends Module implements RobinFacade {
           this.shop.staffWages +
           this.flowers.salesEstimate +
           (this.core.get('Orchard')?.freshSupplySales ?? 0) +
-          (state.shopPopcorn ? 150 : 0) +
-          (state.shopBalloons ? 75 : 0)
+          (state.shop_popcorn ? 150 : 0) +
+          (state.shop_balloons ? 75 : 0)
         : 0) +
       this.balloon.income
     );
@@ -91,7 +91,7 @@ class Robin extends Module implements RobinFacade {
     return this.flowers.canSpend(amount, protectNextRent);
   }
 
-  /** 把柠檬水或巧克力摊位升一级。usePcMoney 为真时改由 PC 的现金垫付并记入 pcLoan。 */
+  /** 把柠檬水或巧克力摊位升一级。usePcMoney 为真时改由 PC 的现金垫付并记入 pc_loan。 */
   public upgrade(kind: 'lemonade' | 'chocolate', usePcMoney = false): boolean {
     const state = this.state;
     if (!this.available || state[kind] >= 2 || state.topics[kind] <= state[kind]) return false;
@@ -99,18 +99,18 @@ class Robin extends Module implements RobinFacade {
     if (usePcMoney) {
       if ((Number(V.money) || 0) < cost * 100) return false;
       V.money -= cost * 100;
-      state.pcLoan += cost;
+      state.pc_loan += cost;
     } else if (!this.flowers.spend(cost)) return false;
     state[kind]++;
     return true;
   }
 
-  /** 把 PC 垫付的钱还给玩家，清空 pcLoan。 */
+  /** 把 PC 垫付的钱还给玩家，清空 pc_loan。 */
   public repayPcLoan(): boolean {
-    const amount = this.state.pcLoan;
+    const amount = this.state.pc_loan;
     if (!this.available || amount <= 0 || !this.flowers.spend(amount)) return false;
     V.money += amount * 100;
-    this.state.pcLoan = 0;
+    this.state.pc_loan = 0;
     return true;
   }
 
@@ -118,36 +118,36 @@ class Robin extends Module implements RobinFacade {
     if (!V.RobinExpansion || C.npc.Robin?.init !== 1) return;
     const state = this.state;
     if (state.week < 0) state.week = Math.floor(Time.days / 7);
-    if (state.selfRent && !state.rentSeparated) {
+    if (state.self_rent && !state.rent_separated) {
       if (V.robinpaid === 1) V.rentmoney /= 2;
-      state.rentSeparated = true;
+      state.rent_separated = true;
     }
 
     const asylum = state.asylum;
-    if (asylum.checkedDay !== Time.days) {
-      const elapsedDays = asylum.checkedDay < 0 ? 1 : Math.max(1, Time.days - asylum.checkedDay);
-      asylum.checkedDay = Time.days;
+    if (asylum.checked_day !== Time.days) {
+      const elapsedDays = asylum.checked_day < 0 ? 1 : Math.max(1, Time.days - asylum.checked_day);
+      asylum.checked_day = Time.days;
       if (asylum.status === 'home' && (V.robinmissing === 0 || !V.robinmissing) && C.npc.Robin.trauma >= 95) {
-        if (asylum.severeDays === 0) asylum.warningDay = Time.days;
-        asylum.severeDays += elapsedDays;
-        if (asylum.severeDays >= 2 && Time.days > asylum.warningDay) {
+        if (asylum.severe_days === 0) asylum.warning_day = Time.days;
+        asylum.severe_days += elapsedDays;
+        if (asylum.severe_days >= 2 && Time.days > asylum.warning_day) {
           asylum.status = 'admitted';
-          asylum.admittedDay = Time.days;
-          asylum.daysConfined = 0;
+          asylum.admitted_day = Time.days;
+          asylum.days_confined = 0;
           asylum.met = false;
           asylum.plan = 0;
-          asylum.planDay = -1;
-          asylum.visitDay = -1;
-          asylum.savedDebt = Math.max(0, Number(V.robindebt) || 0);
+          asylum.plan_day = -1;
+          asylum.visit_day = -1;
+          asylum.saved_debt = Math.max(0, Number(V.robindebt) || 0);
           V.robindebt = -1;
         }
-      } else if (asylum.status === 'home') asylum.severeDays = 0;
+      } else if (asylum.status === 'home') asylum.severe_days = 0;
       // 原版 PC 可经评估出院，罗宾没有这条既有路径。此处只记录留院的创伤，
       // 罗宾不会在玩家未参与时凭空完成逃离。
-      if (asylum.status === 'admitted' && Time.days > asylum.admittedDay && elapsedDays > 0) {
-        const previousPeriods = Math.floor(asylum.daysConfined / 3);
-        asylum.daysConfined += elapsedDays;
-        const periods = Math.floor(asylum.daysConfined / 3) - previousPeriods;
+      if (asylum.status === 'admitted' && Time.days > asylum.admitted_day && elapsedDays > 0) {
+        const previousPeriods = Math.floor(asylum.days_confined / 3);
+        asylum.days_confined += elapsedDays;
+        const periods = Math.floor(asylum.days_confined / 3) - previousPeriods;
         C.npc.Robin.trauma = Math.min(100, C.npc.Robin.trauma + periods * 2);
         C.npc.Robin.dom = Math.max(0, C.npc.Robin.dom - periods);
       }
@@ -163,15 +163,15 @@ class Robin extends Module implements RobinFacade {
 
     if (state.tutor) {
       // 原版 Robin 17:30 至 18:30 的日程已转到家教。PC 未陪同的上课日照常推进，
-      // 而共同授课已写入 tutorDay，因此不会重复计算。逐日回补睡眠等跨日推进。
+      // 而共同授课已写入 tutor_day，因此不会重复计算。逐日回补睡眠等跨日推进。
       const lastFinishedDay = Time.hour >= 19 ? Time.days : Time.days - 1;
-      for (let day = state.tutorDay + 1; day <= lastFinishedDay; day++) {
+      for (let day = state.tutor_day + 1; day <= lastFinishedDay; day++) {
         const date = new DateTime(Time.date).addDays(day - Time.days);
         if (this.available && C.npc.Robin.trauma < 80 && Time.isSchoolDay(date)) {
-          state.tutorLessons++;
-          state.tutorSubject = (state.tutorLessons - 1) % 3;
+          state.tutor_lessons++;
+          state.tutor_subject = (state.tutor_lessons - 1) % 3;
         }
-        state.tutorDay = day;
+        state.tutor_day = day;
       }
     }
   }
@@ -186,7 +186,7 @@ class Robin extends Module implements RobinFacade {
     const vanillaIncome = (V.robin.stayup >= 1 ? 250 : 300) + (V.robin.moneyModifier || 0);
     const robinRent = this.rent.due;
     state.week++;
-    state.weeklyIncome = this.income;
+    state.weekly_income = this.income;
     if (state.asylum.status === 'admitted') {
       const cashBefore = V.robinmoney;
       V.robindebt = -1;
@@ -197,13 +197,13 @@ class Robin extends Module implements RobinFacade {
     this.flowers.settle();
     this.shop.settle();
     // 原版先扣房租、检查债务，再发周收入，先入账才可用于当周房租。
-    V.robinmoney += Math.max(0, state.weeklyIncome - vanillaIncome);
-    if (V.robinpaid !== 1 || state.selfRent) {
+    V.robinmoney += Math.max(0, state.weekly_income - vanillaIncome);
+    if (V.robinpaid !== 1 || state.self_rent) {
       const reserveTransfer = Math.clamp(robinRent - V.robinmoney, 0, state.reserve);
       state.reserve -= reserveTransfer;
       V.robinmoney += reserveTransfer;
     }
-    if (state.selfRent && V.robinpaid === 1) {
+    if (state.self_rent && V.robinpaid === 1) {
       V.robinmoney -= robinRent;
       if (V.robinmoney < 0) {
         V.robinmoney = 0;
@@ -220,11 +220,29 @@ class Robin extends Module implements RobinFacade {
     state.reserve += Math.max(0, expected - 4000);
     if (state.solidarity && state.reserve >= 10) {
       state.reserve -= 10;
-      state.careFund += 10;
+      state.care_fund += 10;
     }
   }
 
   public preInit(): void {
+    // 先移动字段再填默认值，保留已发布存档的库存、工资与剧情进度，只保存一套名称。
+    this.core.on(':variable', () => {
+      const rename = (data: Record<string, unknown> | undefined, keys: readonly string[]) => {
+        if (!data) return;
+        for (const key of keys) {
+          const previous = key.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase());
+          if (previous === key || !Object.hasOwn(data, previous)) continue;
+          if (Object.hasOwn(data, key)) this.migration.utils.remove(data, previous);
+          else this.migration.utils.move(data, previous, key);
+        }
+      };
+      rename(V.RobinExpansion, Object.keys(DEFAULT_ROBIN_EXPANSION_STATE));
+      rename(V.RobinExpansion?.asylum, Object.keys(DEFAULT_ROBIN_EXPANSION_STATE.asylum));
+      for (const [key, npc] of Object.entries<Record<string, unknown>>(V.per_npc ?? {})) {
+        if (!key.startsWith('deadwood_robin_')) continue;
+        rename(npc, ['shop_experience', 'shop_orphan', 'shop_paid_weeks', 'shop_paid_week', 'shop_training_day', 'shop_orders', 'shop_specials', 'shop_wage_seen', 'tutor_confidence', 'tutor_visits']);
+      }
+    });
     super.preInit();
     Achievements.add(this.core, 'Robin');
     this.core.on(':passagestart', () => this.sync(), 'Robin Expansion');
@@ -232,7 +250,7 @@ class Robin extends Module implements RobinFacade {
       action: () => {
         this.sync();
         // 特质按当前存档的关系阶段生效。罗宾留院或失踪时没有每日陪伴收益。
-        if (V.RobinExpansion && this.available && this.state.selfRent) window.statChange.stress(this.state.bothRent || this.state.baileyDefeated ? -250 : -100, 1);
+        if (V.RobinExpansion && this.available && this.state.self_rent) window.statChange.stress(this.state.both_rent || this.state.bailey_defeated ? -250 : -100, 1);
       },
       exact: true
     });

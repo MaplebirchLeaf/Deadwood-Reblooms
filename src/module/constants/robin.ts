@@ -46,105 +46,105 @@ export interface RobinExpansionState {
     shop: boolean;
   };
   /** 店铺开办所处的阶段。 */
-  shopStage: ShopStage;
+  shop_stage: ShopStage;
   /** 提交开店申请的游戏日。 */
-  shopApplicationDay: number;
+  shop_application_day: number;
   /** 店铺验收的游戏日。 */
-  shopInspectionDay: number;
+  shop_inspection_day: number;
   /** 银行是否已提供开店支持。 */
-  shopBankSupported: boolean;
+  shop_bank_supported: boolean;
   /** 玩家为摊位或店铺垫付的借款（英镑），PC 的 $money 使用便士。 */
-  pcLoan: number;
+  pc_loan: number;
   /** 店铺库存量。 */
-  shopStock: number;
+  shop_stock: number;
   /** 店铺雇员数。 */
-  shopStaff: number;
+  shop_staff: number;
   /** 当前查看的应聘来源，孤儿院应聘者与外来店员分别保存。 */
-  shopApplicant: 'adult' | 'orphan';
+  shop_applicant: 'adult' | 'orphan';
   /** 已聘人员的持久 NPC 键，按聘用顺序保存。 */
-  shopRoster: string[];
+  shop_roster: string[];
   /** 店铺是否经营鲜花。 */
-  shopFlowers: boolean;
+  shop_flowers: boolean;
   /** 各花种的库存，按花名计数。 */
-  flowerStock: Record<string, number>;
+  flower_stock: Record<string, number>;
   /** 店铺是否经营爆米花。 */
-  shopPopcorn: boolean;
+  shop_popcorn: boolean;
   /** 店铺是否经营气球。 */
-  shopBalloons: boolean;
+  shop_balloons: boolean;
   /** 气球支线当前走向。 */
   balloon: BalloonRoute;
   /** 气球小游戏累计胜场。 */
-  balloonWins: number;
+  balloon_wins: number;
   /** 上次气球小游戏发生的游戏日。 */
-  balloonDay: number;
+  balloon_day: number;
   /** 罗宾的储备金（英镑），不计入原版 $robinmoney。 */
   reserve: number;
   /** 关怀基金余额（便士），由玩家存入供罗宾使用。 */
-  careFund: number;
+  care_fund: number;
   /** 本周收入快照（英镑）。 */
-  weeklyIncome: number;
+  weekly_income: number;
   /** 罗宾是否已经和 PC 试做过鲜鱼料理。 */
-  fishCooked: boolean;
+  fish_cooked: boolean;
   /** 柠檬水摊是否添置了便携烤架，店铺使用自身的厨房设备。 */
-  fishGrill: boolean;
+  fish_grill: boolean;
   /** 当日鲜鱼售出数量，供摊位与店铺共用。 */
-  fishSoldDay: number;
-  fishSoldToday: number;
+  fish_sold_day: number;
+  fish_sold_today: number;
   /** 当日烤鱼销售中罗宾的净收入，单位英镑。 */
-  fishEarningsToday: number;
+  fish_earnings_today: number;
   /** 本次交付的鱼种、数量与返回地点。 */
-  fishSelection: string;
-  /** 鲜花摊当前选中的花种，与 fishSelection 同构，供店铺进货使用。 */
-  flowerSelection: string;
-  fishAmount: number;
-  fishReturn: 'stall' | 'shop';
+  fish_selection: string;
+  /** 鲜花摊当前选中的花种，与 fish_selection 同构，供店铺进货使用。 */
+  flower_selection: string;
+  fish_amount: number;
+  fish_return: 'stall' | 'shop';
   /** 和罗宾在海滩钓鱼的游戏日、进行状态及开始时的累计渔获。 */
-  fishDateDay: number;
-  fishDateActive: boolean;
-  fishDateCatchStart: number;
+  fish_date_day: number;
+  fish_date_active: boolean;
+  fish_date_catch_start: number;
   /** 上次结算所在的周序号，-1 表示尚未结算。 */
   week: number;
   /** 罗宾是否开始自己付房租。 */
-  selfRent: boolean;
+  self_rent: boolean;
   /** 房租是否已与玩家分开结算。 */
-  rentSeparated: boolean;
+  rent_separated: boolean;
   /** 是否由双方共同承担房租。 */
-  bothRent: boolean;
+  both_rent: boolean;
   /** 是否已进入反抗贝利的路线。 */
   rebellion: boolean;
   /** 反抗路线累计胜场。 */
   victories: number;
   /** 与贝利冲突的结算游戏日。 */
-  fightResolutionDay: number;
+  fight_resolution_day: number;
   /** 是否已结成同盟。 */
   allies: boolean;
   /** 是否已达成团结结局线。 */
   solidarity: boolean;
   /** 贝利是否已被击败。 */
-  baileyDefeated: boolean;
+  bailey_defeated: boolean;
   /** 流星雨支线触发的游戏日。 */
-  meteorDay: number;
+  meteor_day: number;
   /**
    * 亲密场景的返回目标。
    * 场景入口跨越遭遇战回合后仍要知道该回到哪处摊位或约会地点。
    */
-  intimacySite: 'shop' | 'lemonade' | 'chocolate' | 'meteor' | null;
+  intimacy_site: 'shop' | 'lemonade' | 'chocolate' | 'meteor' | null;
   /** 流星雨场景结束后返回的 Passage 名。 */
-  meteorReturn: string;
+  meteor_return: string;
   /** 上次游泳事件的游戏日。 */
-  swimDay: number;
+  swim_day: number;
   /** 上次家教课的游戏日。 */
-  tutorDay: number;
+  tutor_day: number;
   /** 家教累计课时。 */
-  tutorLessons: number;
+  tutor_lessons: number;
   /** 当前家教科目索引。 */
-  tutorSubject: number;
+  tutor_subject: number;
   /** 上次集市的游戏日。 */
-  marketDay: number;
+  market_day: number;
   /** 上次集市售出数量。 */
-  marketSales: number;
+  market_sales: number;
   /** 上次看店的游戏日。 */
-  shopDay: number;
+  shop_day: number;
   /*
    * 摊位、店铺与校园各自限一次，日期标记由当前存档保存，不占用原版 $daily。
    */
@@ -159,46 +159,46 @@ export interface RobinExpansionState {
   /** 上次校园叫醒事件的游戏日。 */
   school_wake_day: number;
   /** 上次夜间事件的游戏日。 */
-  nightDay: number;
+  night_day: number;
   /** 上次夜间事件结算的游戏日。 */
-  nightOutcomeDay: number;
+  night_outcome_day: number;
   /** 收容所路线的全部进度。 */
   asylum: {
     /** 当前收容所状态。 */
     status: AsylumStatus;
     /** 上次检查罗宾状态的游戏日。 */
-    checkedDay: number;
+    checked_day: number;
     /** 连续处于严重状态的日数，累计到阈值才送医。 */
-    severeDays: number;
+    severe_days: number;
     /** 入院游戏日。 */
-    admittedDay: number;
+    admitted_day: number;
     /** 已被收容的天数。 */
-    daysConfined: number;
+    days_confined: number;
     /** 是否已在收容所探视过。 */
     met: boolean;
     /** 解救计划进度。 */
     plan: number;
     /** 计划推进所在游戏日。 */
-    planDay: number;
+    plan_day: number;
     /** 上次探视的游戏日。 */
-    visitDay: number;
+    visit_day: number;
     /** 上次预警的游戏日。 */
-    warningDay: number;
+    warning_day: number;
     /** 上次预警探视的游戏日。 */
-    warningVisitDay: number;
+    warning_visit_day: number;
     /** 入院前的原版罗宾债务状态，离院后恢复。 */
-    savedDebt: number;
+    saved_debt: number;
     /** 上次从触手平原寻找罗宾的游戏日，用于限制每天一次。 */
-    tentacleDay: number;
+    tentacle_day: number;
     /** 触手平原路线失败的累计次数，用于文案与日志。 */
-    tentacleFailures: number;
+    tentacle_failures: number;
     /** 已度过的触手遭遇次数，用于区分第一场与之后。 */
-    tentacleWave: number;
+    tentacle_wave: number;
     /** 本次平原探索的步数与伏击判定。 */
     tentacle_steps: number;
     tentacle_ambush: boolean;
     /** 本次寻找期间已经安慰罗宾的次数，每次遭遇后限一次。 */
-    tentacleClose: number;
+    tentacle_close: number;
   };
 }
 
@@ -225,82 +225,82 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
     tutor: false,
     shop: false
   },
-  shopStage: 'none',
-  shopApplicationDay: -1,
-  shopInspectionDay: -1,
-  shopBankSupported: false,
-  pcLoan: 0,
-  shopStock: 0,
-  shopStaff: 0,
-  shopApplicant: 'adult',
-  shopRoster: [],
-  shopFlowers: false,
-  flowerStock: {},
-  shopPopcorn: false,
-  shopBalloons: false,
+  shop_stage: 'none',
+  shop_application_day: -1,
+  shop_inspection_day: -1,
+  shop_bank_supported: false,
+  pc_loan: 0,
+  shop_stock: 0,
+  shop_staff: 0,
+  shop_applicant: 'adult',
+  shop_roster: [],
+  shop_flowers: false,
+  flower_stock: {},
+  shop_popcorn: false,
+  shop_balloons: false,
   balloon: 'none',
-  balloonWins: 0,
-  balloonDay: -1,
+  balloon_wins: 0,
+  balloon_day: -1,
   reserve: 0,
-  careFund: 0,
-  weeklyIncome: 0,
-  fishCooked: false,
-  fishGrill: false,
-  fishSoldDay: -1,
-  fishSoldToday: 0,
-  fishEarningsToday: 0,
-  fishSelection: '',
-  flowerSelection: '',
-  fishAmount: 1,
-  fishReturn: 'stall',
-  fishDateDay: -1,
-  fishDateActive: false,
-  fishDateCatchStart: 0,
+  care_fund: 0,
+  weekly_income: 0,
+  fish_cooked: false,
+  fish_grill: false,
+  fish_sold_day: -1,
+  fish_sold_today: 0,
+  fish_earnings_today: 0,
+  fish_selection: '',
+  flower_selection: '',
+  fish_amount: 1,
+  fish_return: 'stall',
+  fish_date_day: -1,
+  fish_date_active: false,
+  fish_date_catch_start: 0,
   week: -1,
-  selfRent: false,
-  rentSeparated: false,
-  bothRent: false,
+  self_rent: false,
+  rent_separated: false,
+  both_rent: false,
   rebellion: false,
   victories: 0,
-  fightResolutionDay: -1,
+  fight_resolution_day: -1,
   allies: false,
   solidarity: false,
-  baileyDefeated: false,
-  meteorDay: -1,
-  intimacySite: null,
-  meteorReturn: 'Orphanage',
-  swimDay: -1,
-  tutorDay: -1,
-  tutorLessons: 0,
-  tutorSubject: 0,
-  marketDay: -1,
-  marketSales: 0,
-  shopDay: -1,
+  bailey_defeated: false,
+  meteor_day: -1,
+  intimacy_site: null,
+  meteor_return: 'Orphanage',
+  swim_day: -1,
+  tutor_day: -1,
+  tutor_lessons: 0,
+  tutor_subject: 0,
+  market_day: -1,
+  market_sales: 0,
+  shop_day: -1,
   stall_taste_day: -1,
   shop_taste_day: -1,
   sale_event_day: -1,
   school_drinks_day: -1,
   school_wake_day: -1,
-  nightDay: -1,
-  nightOutcomeDay: -1,
+  night_day: -1,
+  night_outcome_day: -1,
   asylum: {
     status: 'home',
-    checkedDay: -1,
-    severeDays: 0,
-    admittedDay: -1,
-    daysConfined: 0,
+    checked_day: -1,
+    severe_days: 0,
+    admitted_day: -1,
+    days_confined: 0,
     met: false,
     plan: 0,
-    planDay: -1,
-    visitDay: -1,
-    warningDay: -1,
-    warningVisitDay: -1,
-    savedDebt: 0,
-    tentacleDay: -1,
-    tentacleFailures: 0,
-    tentacleWave: 0,
+    plan_day: -1,
+    visit_day: -1,
+    warning_day: -1,
+    warning_visit_day: -1,
+    saved_debt: 0,
+    tentacle_day: -1,
+    tentacle_failures: 0,
+    tentacle_wave: 0,
     tentacle_steps: 0,
     tentacle_ambush: false,
-    tentacleClose: 0
+    tentacle_close: 0
   }
 };

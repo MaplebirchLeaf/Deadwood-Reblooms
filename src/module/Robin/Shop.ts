@@ -19,13 +19,13 @@ export default class RobinShop extends Shared {
   public get staffSales(): number {
     return this.employeeKeys.reduce((sales, key) => {
       const npc = V.per_npc?.[key];
-      return sales + (npc?.shopOrphan ? 400 + Math.min(2, Math.floor((npc.shopExperience ?? 0) / 2)) * 150 : 700);
+      return sales + (npc?.shop_orphan ? 400 + Math.min(2, Math.floor((npc.shop_experience ?? 0) / 2)) * 150 : 700);
     }, 0);
   }
 
   /** 店员工资，单位英镑。 */
   public get staffWages(): number {
-    return Math.min(MAX_SHOP_STAFF, this.state.shopStaff || 0) * 350;
+    return Math.min(MAX_SHOP_STAFF, this.state.shop_staff || 0) * 350;
   }
 
   public get canHireStaff(): boolean {
@@ -33,24 +33,24 @@ export default class RobinShop extends Shared {
       this.robinAvailable &&
       window.getRobinLocation() === 'shop' &&
       this.state.shop &&
-      this.state.shopStaff < MAX_SHOP_STAFF &&
+      this.state.shop_staff < MAX_SHOP_STAFF &&
       this.canSpend(350) &&
       Time.hour >= 9 &&
       Time.hour < 21 &&
       V.exposed <= 0 &&
       V.stress < V.stressmax &&
-      (this.state.shopApplicant !== 'orphan' || !Time.schoolDay || Time.hour >= 16)
+      (this.state.shop_applicant !== 'orphan' || !Time.schoolDay || Time.hour >= 16)
     );
   }
 
   /** 下一份应聘表对应的人选，离开再查看时仍是同一个人。 */
   public get applicantKey(): string {
-    return `deadwood_robin_shop_${this.state.shopApplicant === 'orphan' ? 'orphan' : 'staff'}_${this.state.shopStaff}`;
+    return `deadwood_robin_shop_${this.state.shop_applicant === 'orphan' ? 'orphan' : 'staff'}_${this.state.shop_staff}`;
   }
 
   /** 名单只含已聘人员，尚未接受的应聘者继续保留自己的记录。 */
   public get employeeKeys(): string[] {
-    return Array.from({ length: Math.min(MAX_SHOP_STAFF, this.state.shopStaff) }, (_, index) => this.state.shopRoster[index] ?? `deadwood_robin_shop_staff_${index}`);
+    return Array.from({ length: Math.min(MAX_SHOP_STAFF, this.state.shop_staff) }, (_, index) => this.state.shop_roster[index] ?? `deadwood_robin_shop_staff_${index}`);
   }
 
   /** 正式雇员名单不包含尚未聘用的应聘者。 */
@@ -60,7 +60,7 @@ export default class RobinShop extends Shared {
 
   /** 两位雇员按日轮班，同一天重复进店不会换人。 */
   public get attendantKey(): string | null {
-    const keys = this.employeeKeys.filter(key => V.per_npc?.[key] && (!V.per_npc[key].shopOrphan || !Time.schoolDay || Time.hour >= 16));
+    const keys = this.employeeKeys.filter(key => V.per_npc?.[key] && (!V.per_npc[key].shop_orphan || !Time.schoolDay || Time.hour >= 16));
     return keys.length ? keys[Time.days % keys.length] : null;
   }
 
@@ -78,12 +78,12 @@ export default class RobinShop extends Shared {
     const key = this.applicantKey;
     const npc = V.per_npc?.[key];
     if (!this.canHireStaff || !npc || !this.spend(350)) return false;
-    this.state.shopRoster = [...this.employeeKeys, key];
-    this.state.shopStaff++;
-    npc.shopExperience ??= npc.shopOrphan ? 0 : 4;
-    npc.shopPaidWeeks = 0;
-    npc.shopPaidWeek = this.state.week;
-    if (npc.shopOrphan) this.core.SugarCube.Wikifier.wikifyEval('<<hope 1>>');
+    this.state.shop_roster = [...this.employeeKeys, key];
+    this.state.shop_staff++;
+    npc.shop_experience ??= npc.shop_orphan ? 0 : 4;
+    npc.shop_paid_weeks = 0;
+    npc.shop_paid_week = this.state.week;
+    if (npc.shop_orphan) this.core.SugarCube.Wikifier.wikifyEval('<<hope 1>>');
     return true;
   }
 
@@ -92,12 +92,12 @@ export default class RobinShop extends Shared {
     if (!this.state.shop || V.statFreeze) return;
     for (const key of this.employeeKeys) {
       const npc = V.per_npc?.[key];
-      if (!npc || npc.shopPaidWeek === this.state.week) continue;
-      npc.shopPaidWeek = this.state.week;
-      npc.shopPaidWeeks = (npc.shopPaidWeeks ?? 0) + 1;
-      if (npc.shopOrphan) {
-        npc.shopExperience = Math.min(4, (npc.shopExperience ?? 0) + 1);
-        if (npc.shopPaidWeeks === 1) this.core.SugarCube.Wikifier.wikifyEval('<<hope 1>>');
+      if (!npc || npc.shop_paid_week === this.state.week) continue;
+      npc.shop_paid_week = this.state.week;
+      npc.shop_paid_weeks = (npc.shop_paid_weeks ?? 0) + 1;
+      if (npc.shop_orphan) {
+        npc.shop_experience = Math.min(4, (npc.shop_experience ?? 0) + 1);
+        if (npc.shop_paid_weeks === 1) this.core.SugarCube.Wikifier.wikifyEval('<<hope 1>>');
       }
     }
   }
@@ -109,9 +109,9 @@ export default class RobinShop extends Shared {
       this.robinAvailable &&
       this.state.shop &&
       window.getRobinLocation() === 'shop' &&
-      !!npc?.shopOrphan &&
-      (npc.shopExperience ?? 0) < 4 &&
-      npc.shopTrainingDay !== Time.days &&
+      !!npc?.shop_orphan &&
+      (npc.shop_experience ?? 0) < 4 &&
+      npc.shop_training_day !== Time.days &&
       Time.hour >= 9 &&
       Time.hour < 20 &&
       V.exposed <= 0 &&
@@ -123,16 +123,16 @@ export default class RobinShop extends Shared {
   public trainStaff(): boolean {
     if (!this.canTrainStaff) return false;
     const npc = V.per_npc[this.attendantKey!];
-    npc.shopTrainingDay = Time.days;
-    npc.shopExperience = (npc.shopExperience ?? 0) + 1;
+    npc.shop_training_day = Time.days;
+    npc.shop_experience = (npc.shop_experience ?? 0) + 1;
     return true;
   }
 
   /** PC 是否能从银行账户垫付开店资金。 */
   public get canBorrowLoan(): boolean {
-    const stage = this.state.shopStage;
+    const stage = this.state.shop_stage;
     return (
-      !this.state.shopBankSupported &&
+      !this.state.shop_bank_supported &&
       stage !== 'none' &&
       !this.state.shop &&
       !!V.VanillaPlus?.finance?.bank?.opened &&
@@ -146,54 +146,54 @@ export default class RobinShop extends Shared {
   public borrowLoan(): boolean {
     if (!this.canBorrowLoan || this.vanillaPlus?.finance.payFromBankPennies(200000) !== 'ok') return false;
     this.state.reserve += 2000;
-    this.state.pcLoan += 2000;
-    this.state.shopBankSupported = true;
+    this.state.pc_loan += 2000;
+    this.state.shop_bank_supported = true;
     return true;
   }
 
   /** 进入规划阶段：两个摊位都要升到 2 级，并已拿到店铺线索。 */
   public plan(): boolean {
-    if (!this.robinAvailable || !this.state.topics.shop || this.state.shopStage !== 'none' || this.state.lemonade < 2 || this.state.chocolate < 2) return false;
-    this.state.shopStage = 'planning';
+    if (!this.robinAvailable || !this.state.topics.shop || this.state.shop_stage !== 'none' || this.state.lemonade < 2 || this.state.chocolate < 2) return false;
+    this.state.shop_stage = 'planning';
     return true;
   }
 
   /** 提交开店申请，花 500 英镑，记录申请日。 */
   public applyForPermit(): boolean {
-    if (!this.robinAvailable || this.state.shopStage !== 'planning' || !this.spend(500)) return false;
-    this.state.shopStage = 'applied';
-    this.state.shopApplicationDay = Time.days;
+    if (!this.robinAvailable || this.state.shop_stage !== 'planning' || !this.spend(500)) return false;
+    this.state.shop_stage = 'applied';
+    this.state.shop_application_day = Time.days;
     return true;
   }
 
   /** 落实店面，花 1500 英镑。 */
   public secureSite(): boolean {
-    if (!this.robinAvailable || this.state.shopStage !== 'applied' || !this.spend(1500)) return false;
-    this.state.shopStage = 'site';
+    if (!this.robinAvailable || this.state.shop_stage !== 'applied' || !this.spend(1500)) return false;
+    this.state.shop_stage = 'site';
     return true;
   }
 
   /** 付费接受验店（1400 英镑），须在申请次日之后。 */
   public payInspection(): boolean {
-    if (!this.robinAvailable || this.state.shopStage !== 'site' || Time.days <= this.state.shopApplicationDay || !this.spend(1400)) return false;
-    this.state.shopStage = 'inspected';
-    this.state.shopInspectionDay = Time.days;
+    if (!this.robinAvailable || this.state.shop_stage !== 'site' || Time.days <= this.state.shop_application_day || !this.spend(1400)) return false;
+    this.state.shop_stage = 'inspected';
+    this.state.shop_inspection_day = Time.days;
     return true;
   }
 
   /** 领取执照，须在验店次日之后领取。 */
   public collectPermit(): boolean {
-    if (!this.robinAvailable || this.state.shopStage !== 'inspected' || Time.days <= this.state.shopInspectionDay) return false;
-    this.state.shopStage = 'permitted';
+    if (!this.robinAvailable || this.state.shop_stage !== 'inspected' || Time.days <= this.state.shop_inspection_day) return false;
+    this.state.shop_stage = 'permitted';
     return true;
   }
 
   /** 正式开张：花 4000 英镑，初始饮品库存 3 箱。 */
   public open(): boolean {
     const state = this.state;
-    if (!this.robinAvailable || state.shop || state.shopStage !== 'permitted' || state.lemonade < 2 || state.chocolate < 2 || !this.spend(4000)) return false;
+    if (!this.robinAvailable || state.shop || state.shop_stage !== 'permitted' || state.lemonade < 2 || state.chocolate < 2 || !this.spend(4000)) return false;
     state.shop = true;
-    state.shopStock = 3;
+    state.shop_stock = 3;
     return true;
   }
 
@@ -202,7 +202,7 @@ export default class RobinShop extends Shared {
   }
 
   public get canRestock(): boolean {
-    return this.state.shop && this.state.shopStock === 0 && this.robinAvailable && window.getRobinLocation() === 'shop' && this.canSpend(this.restockPrice);
+    return this.state.shop && this.state.shop_stock === 0 && this.robinAvailable && window.getRobinLocation() === 'shop' && this.canSpend(this.restockPrice);
   }
 
   /** 补货会扣经营资金、消耗水果抵扣并改变库存，保留显式调用。 */
@@ -210,7 +210,7 @@ export default class RobinShop extends Shared {
     if (!this.canRestock || !this.spend(this.restockPrice)) return false;
     const orchard = this.core.get('Orchard');
     if (orchard) orchard.state.restock_credit = 0;
-    this.state.shopStock = 3;
+    this.state.shop_stock = 3;
     return true;
   }
 
@@ -218,8 +218,8 @@ export default class RobinShop extends Shared {
   public get canWork(): boolean {
     return (
       this.state.shop &&
-      this.state.shopStock > 0 &&
-      this.state.shopDay !== Time.days &&
+      this.state.shop_stock > 0 &&
+      this.state.shop_day !== Time.days &&
       this.robinAvailable &&
       C.npc.Robin.trauma < 80 &&
       window.getRobinLocation() === 'shop' &&
@@ -233,27 +233,27 @@ export default class RobinShop extends Shared {
   public work(special = false): boolean {
     const regular = this.regular;
     if (!this.canWork || regular?.name_known !== 1) return false;
-    this.state.shopDay = Time.days;
-    this.state.shopStock--;
+    this.state.shop_day = Time.days;
+    this.state.shop_stock--;
     V.money += 1000;
     this.state.reserve += 20;
-    regular.shopOrders = (regular.shopOrders ?? 0) + 1;
-    if (special) regular.shopSpecials = (regular.shopSpecials ?? 0) + 1;
+    regular.shop_orders = (regular.shop_orders ?? 0) + 1;
+    if (special) regular.shop_specials = (regular.shop_specials ?? 0) + 1;
     return true;
   }
 
   /** 增设爆米花，花 150 便士。 */
   public addPopcorn(): boolean {
-    if (!this.state.shop || this.state.shopPopcorn || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(150)) return false;
-    this.state.shopPopcorn = true;
+    if (!this.state.shop || this.state.shop_popcorn || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(150)) return false;
+    this.state.shop_popcorn = true;
     return true;
   }
 
   /** 增设气球，花 100 便士，需气球摊已合作或已收束。 */
   public addBalloons(): boolean {
-    if (!this.state.shop || this.state.shopBalloons || !['cooperate', 'resolved'].includes(this.state.balloon) || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(100))
+    if (!this.state.shop || this.state.shop_balloons || !['cooperate', 'resolved'].includes(this.state.balloon) || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(100))
       return false;
-    this.state.shopBalloons = true;
+    this.state.shop_balloons = true;
     return true;
   }
 }

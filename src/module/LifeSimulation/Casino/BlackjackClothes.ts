@@ -93,20 +93,17 @@ export default class BlackjackClothes {
   }
 
   private npcClothes(name: string): WardrobeItem {
-    if (this.core.get('NPCSidebarPortrait')) {
-      const clothes = this.core.npc.Clothes.wardrobe.worn(name);
-      if (slots.some(slot => clothes[slot]?.name && clothes[slot]?.name !== 'naked')) return clone(clothes);
-    }
+    if (this.core.get('NPCSidebarPortrait')) return clone(this.core.npc.Clothes.wardrobe.worn(name));
     return this.nativeClothes(name);
   }
 
   public canPrepare(companion: string, partner: string | null): boolean {
     const names = partner ? [companion, partner] : [companion];
-    return clothingGroups(V.worn as ClothingMap).length > 0 && names.every(name => clothingGroups(this.nativeClothes(name)).length > 0);
+    return clothingGroups(V.worn as ClothingMap).length > 0 && names.every(name => clothingGroups(this.npcClothes(name)).length > 0);
   }
 
   public prepare(companion: string, partner: string | null): BlackjackClothesState | null {
-    if (!this.canPrepare(companion, partner)) return null;
+    if (!clothingGroups(V.worn as ClothingMap).length) return null;
     const npcs: BlackjackClothesState['npcs'] = {};
     for (const name of partner ? [companion, partner] : [companion]) {
       const snapshot = this.npcClothes(name);

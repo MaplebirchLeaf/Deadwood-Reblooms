@@ -272,7 +272,7 @@ class Finance {
         this.state.market,
         this.securities,
         robin?.shop,
-        robin?.shop ? { upgrades: robin.lemonade + robin.chocolate, staff: robin.shopStaff, orders: this.core.get('Orchard')?.state.orders_completed ?? 0 } : undefined
+        robin?.shop ? { upgrades: robin.lemonade + robin.chocolate, staff: robin.shop_staff, orders: this.core.get('Orchard')?.state.orders_completed ?? 0 } : undefined
       );
     }
     this.margin.advance(day);
@@ -472,7 +472,7 @@ class Finance {
   public get businessProjects(): { id: 'shop' | 'orchard'; eligible: boolean }[] {
     const robin = this.core.get('Robin') as Robin | undefined;
     return [
-      { id: 'shop', eligible: !!robin?.available && V.RobinExpansion.shopStage !== 'none' },
+      { id: 'shop', eligible: !!robin?.available && V.RobinExpansion.shop_stage !== 'none' },
       { id: 'orchard', eligible: !!this.core.get('Orchard')?.state.unlocked.farm && (V.Orchard.sales_income > 0 || V.Orchard.contracts_completed > 0) }
     ];
   }

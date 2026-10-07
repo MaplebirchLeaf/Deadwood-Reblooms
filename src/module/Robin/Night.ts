@@ -10,7 +10,7 @@ export default class RobinNight extends Shared {
       (V.robinmissing === 0 || !V.robinmissing) &&
       V.robin.timer.hurt === 0 &&
       this.state.asylum.status !== 'admitted' &&
-      this.state.nightDay !== Time.days &&
+      this.state.night_day !== Time.days &&
       !this.vanillaPlus?.realEstate.residenceOf('Robin') &&
       Time.hour >= 21 &&
       Time.hour <= 22 &&
@@ -24,15 +24,15 @@ export default class RobinNight extends Shared {
   /** 开始今夜探访，记录当晚日期。 */
   public start(): boolean {
     if (!this.canVisit) return false;
-    this.state.nightDay = Time.days;
+    this.state.night_day = Time.days;
     return true;
   }
 
   /** 结算探访。允许跨过午夜：当晚或次日 0 点都算同一次。 */
   public finish(): boolean {
-    const visitDay = this.state.nightDay;
-    if (visitDay < 0 || this.state.nightOutcomeDay === visitDay || (Time.days !== visitDay && (Time.days !== visitDay + 1 || Time.hour !== 0))) return false;
-    this.state.nightOutcomeDay = visitDay;
+    const visitDay = this.state.night_day;
+    if (visitDay < 0 || this.state.night_outcome_day === visitDay || (Time.days !== visitDay && (Time.days !== visitDay + 1 || Time.hour !== 0))) return false;
+    this.state.night_outcome_day = visitDay;
     return true;
   }
 }

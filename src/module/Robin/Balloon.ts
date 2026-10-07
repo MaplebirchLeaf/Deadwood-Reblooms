@@ -15,7 +15,7 @@ export default class RobinBalloon extends Shared {
 
   /** 是否处在竞争路线且尚未赢满。 */
   public get inContest(): boolean {
-    return this.state.balloon === 'compete' && this.state.balloonWins < BALLOON_WINS_REQUIRED && this.state.balloonDay !== Time.days;
+    return this.state.balloon === 'compete' && this.state.balloon_wins < BALLOON_WINS_REQUIRED && this.state.balloon_day !== Time.days;
   }
 
   /** 选择支线走向。两条路线都只选一次，选定后不可更改。 */
@@ -41,16 +41,16 @@ export default class RobinBalloon extends Shared {
     if (
       !this.robinAvailable ||
       this.state.balloon !== 'compete' ||
-      this.state.balloonWins >= BALLOON_WINS_REQUIRED ||
-      this.state.balloonDay === Time.days ||
+      this.state.balloon_wins >= BALLOON_WINS_REQUIRED ||
+      this.state.balloon_day === Time.days ||
       V.balloonStand?.robin?.status !== 'helped' ||
       window.getRobinLocation() !== 'beach' ||
       Weather.precipitation === 'rain'
     )
       return false;
-    this.state.balloonDay = Time.days;
-    this.state.balloonWins++;
-    if (this.state.balloonWins >= BALLOON_WINS_REQUIRED) this.state.balloon = 'resolved';
+    this.state.balloon_day = Time.days;
+    this.state.balloon_wins++;
+    if (this.state.balloon_wins >= BALLOON_WINS_REQUIRED) this.state.balloon = 'resolved';
     return true;
   }
 }

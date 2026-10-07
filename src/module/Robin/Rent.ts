@@ -11,9 +11,9 @@ export default class RobinRent extends Shared {
 
   /** 下一周罗宾应承担的房租，单位英镑。 */
   public get due(): number {
-    if (this.state.baileyDefeated) return 0;
+    if (this.state.bailey_defeated) return 0;
     const pcRentPennies = Math.max(0, Number(V.rentmoney) || 0);
-    const ownSharePennies = V.robinpaid === 1 && !this.state.selfRent ? pcRentPennies / 2 : pcRentPennies;
+    const ownSharePennies = V.robinpaid === 1 && !this.state.self_rent ? pcRentPennies / 2 : pcRentPennies;
     return Math.ceil(ownSharePennies / 100);
   }
 
@@ -25,7 +25,7 @@ export default class RobinRent extends Shared {
   public get canAcceptSelfRent(): boolean {
     return (
       this.robinAvailable &&
-      !this.state.selfRent &&
+      !this.state.self_rent &&
       this.state.lemonade >= 2 &&
       this.state.chocolate >= 2 &&
       this.facade.income >= Math.max(1500, this.due + 50) &&
@@ -38,23 +38,23 @@ export default class RobinRent extends Shared {
   public acceptSelfRent(): boolean {
     if (!this.canAcceptSelfRent) return false;
     this.spend(this.debt, false);
-    this.state.selfRent = true;
+    this.state.self_rent = true;
     if (V.robinpaid === 1) V.rentmoney /= 2;
-    this.state.rentSeparated = true;
+    this.state.rent_separated = true;
     V.robindebt = 0;
     return true;
   }
 
   /** 只登记“两人共同承担”的承诺，实际付款由 payPcRent 完成。 */
   public promiseBothRent(): boolean {
-    if (!this.robinAvailable || !this.state.selfRent || this.state.bothRent || this.facade.income < this.bothRequirement || C.npc.Robin.dom < 80 || C.npc.Robin.love < 60 || C.npc.Robin.trauma > 30)
+    if (!this.robinAvailable || !this.state.self_rent || this.state.both_rent || this.facade.income < this.bothRequirement || C.npc.Robin.dom < 80 || C.npc.Robin.love < 60 || C.npc.Robin.trauma > 30)
       return false;
-    this.state.bothRent = true;
+    this.state.both_rent = true;
     return true;
   }
 
   public get canPayPcRent(): boolean {
-    return this.robinAvailable && this.state.bothRent && (this.funds - this.due) * 100 >= (Number(V.rentmoney) || 0) + (Number(V.babyRent) || 0);
+    return this.robinAvailable && this.state.both_rent && (this.funds - this.due) * 100 >= (Number(V.rentmoney) || 0) + (Number(V.babyRent) || 0);
   }
 
   public payPcRent(): boolean {
@@ -65,7 +65,7 @@ export default class RobinRent extends Shared {
   }
 
   public proposeRebellion(): boolean {
-    if (!this.robinAvailable || this.state.rebellion || !this.state.selfRent || this.facade.income < 4000 || C.npc.Robin.dom < 85 || C.npc.Robin.trauma > 30) return false;
+    if (!this.robinAvailable || this.state.rebellion || !this.state.self_rent || this.facade.income < 4000 || C.npc.Robin.dom < 85 || C.npc.Robin.trauma > 30) return false;
     this.state.rebellion = true;
     return true;
   }
@@ -84,14 +84,14 @@ export default class RobinRent extends Shared {
 
   /** 反抗战结算：胜场累加，败场按是否动用关怀基金扣创伤。 */
   public combatFinish(): void {
-    if (!this.state.rebellion || this.state.fightResolutionDay === Time.days) return;
-    this.state.fightResolutionDay = Time.days;
+    if (!this.state.rebellion || this.state.fight_resolution_day === Time.days) return;
+    this.state.fight_resolution_day = Time.days;
     if (V.enemyhealth <= 0 || V.enemyarousal >= V.enemyarousalmax) {
       this.state.victories++;
       return;
     }
-    const supported = this.state.solidarity && this.state.careFund >= 10;
-    if (supported) this.state.careFund -= 10;
+    const supported = this.state.solidarity && this.state.care_fund >= 10;
+    if (supported) this.state.care_fund -= 10;
     C.npc.Robin.trauma = Math.min(100, C.npc.Robin.trauma + (supported ? 4 : 8));
   }
 }

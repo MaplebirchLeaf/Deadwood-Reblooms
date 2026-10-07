@@ -2,16 +2,16 @@
 <<widget 'deadwood-robin-rent-room-links'>>
   <<if maplebirch.get('Robin').rent.canAcceptSelfRent>>
     <<socialiseicon 'ask'>><<lanLink ["Discuss Robin's own rent", '谈谈罗宾自己的房租'] 'Deadwood Robin Self Rent'>><</lanLink>><br>
-  <<elseif $RobinExpansion.selfRent and !$RobinExpansion.bothRent and maplebirch.get('Robin').income gte maplebirch.get('Robin').rent.bothRequirement and C.npc.Robin.dom gte 80 and C.npc.Robin.love gte 60 and C.npc.Robin.trauma lte 30>>
+  <<elseif $RobinExpansion.self_rent and !$RobinExpansion.both_rent and maplebirch.get('Robin').income gte maplebirch.get('Robin').rent.bothRequirement and C.npc.Robin.dom gte 80 and C.npc.Robin.love gte 60 and C.npc.Robin.trauma lte 30>>
     <<socialiseicon 'ask'>><<lanLink ['Discuss paying both rents', '谈谈分担两人的房租'] 'Deadwood Robin Both Rent'>><</lanLink>><br>
   <</if>>
-  <<if !$RobinExpansion.rebellion and $RobinExpansion.selfRent and maplebirch.get('Robin').income gte 4000 and C.npc.Robin.dom gte 80 and C.npc.Robin.trauma lte 30>>
+  <<if !$RobinExpansion.rebellion and $RobinExpansion.self_rent and maplebirch.get('Robin').income gte 4000 and C.npc.Robin.dom gte 80 and C.npc.Robin.trauma lte 30>>
     <<socialiseicon 'ask'>><<lanLink ['Ask Robin to resist Bailey together', '说服罗宾一起反抗贝利'] 'Deadwood Robin Rebellion'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-robin-rent-links'>>
-  <<if !$RobinExpansion.baileyDefeated and $bus is 'home' and C.npc.Robin.init is 1 and ($robinmissing is 0 or !$robinmissing) and $RobinExpansion.asylum.status isnot 'admitted'>>
+  <<if !$RobinExpansion.bailey_defeated and $bus is 'home' and C.npc.Robin.init is 1 and ($robinmissing is 0 or !$robinmissing) and $RobinExpansion.asylum.status isnot 'admitted'>>
     <<if maplebirch.get('Robin').rent.canPayPcRent>>
       <<robinicon 'lemonade'>><<lanLink ["Ask Robin to pay this week's rent", '请罗宾按约定付这周房租'] 'Deadwood Robin Pays Rent'>><</lanLink>><br>
     <</if>>
@@ -44,7 +44,7 @@
     <<socialiseicon>><<lanLink ['Rally the other orphans with Robin', '与罗宾召集其他孤儿'] 'Deadwood Robin Rally'>><</lanLink>><br>
   <<elseif $RobinExpansion.allies and !$RobinExpansion.solidarity and $RobinExpansion.victories gte 3>>
     <<socialiseicon>><<lanLink ['Face Bailey with the other orphans', '和孤儿们共同面对贝利'] 'Deadwood Robin Solidarity'>><</lanLink>><br>
-  <<elseif $RobinExpansion.solidarity and !$RobinExpansion.baileyDefeated and $RobinExpansion.victories gte 4 and $baileydefeatedchain gte 3 and $RobinExpansion.asylum.status isnot 'admitted'>>
+  <<elseif $RobinExpansion.solidarity and !$RobinExpansion.bailey_defeated and $RobinExpansion.victories gte 4 and $baileydefeatedchain gte 3 and $RobinExpansion.asylum.status isnot 'admitted'>>
     <<socialiseicon>><<lanLink ['Face Bailey with Robin and the orphans', '与罗宾和孤儿们向贝利摊牌'] 'Deadwood Robin Bailey Reckoning'>><</lanLink>><br>
   <</if>>
 <</widget>>
@@ -136,7 +136,7 @@
 
 :: Deadwood Robin Bailey Reckoning []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.solidarity and !$RobinExpansion.baileyDefeated and $RobinExpansion.victories gte 4 and $baileydefeatedchain gte 3>>
+<<if $RobinExpansion.solidarity and !$RobinExpansion.bailey_defeated and $RobinExpansion.victories gte 4 and $baileydefeatedchain gte 3>>
   <<lanSwitch 'Bailey returns to the hall with the rent ledger under one arm. The children have been waiting. No one blocks the door. Instead, they stand in the places you chose together, with room for the youngest to leave.' '贝利夹着房租账本回到大厅。孩子们早就在等着。没人堵住门，只是按先前商量的位置站好，给年幼的孩子留出退路。'>>
   <br><br>
   <<lanSwitch '"You owe me," Bailey says. Robin opens a second ledger: the weeks paid, the days worked, and every time Bailey changed the amount. One child speaks, then another. Bailey looks from face to face, searching for someone willing to stand alone. No one does.' '“你们还欠我钱。”贝利说。罗宾翻开另一本账本，上面记着付过房租的星期、做过的工，还有贝利每次加价的日期。一个孩子开口，另一个也接了话。贝利挨个看过去，想找个落单的人。这里没有。'>>
@@ -151,7 +151,7 @@
 
 :: Deadwood Robin Bailey Reckoning Finish []
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.solidarity and !$RobinExpansion.baileyDefeated and $RobinExpansion.victories gte 4 and $baileydefeatedchain gte 3>>
+<<if $RobinExpansion.solidarity and !$RobinExpansion.bailey_defeated and $RobinExpansion.victories gte 4 and $baileydefeatedchain gte 3>>
   <<if $phase is 1>>
     <<lanSwitch 'Robin takes a breath. "You cannot make us pay for living here," Robin says. The words come out steadily. You stay beside Robin while the others repeat them, one after another.' '罗宾深吸一口气。“你不能因为我们住在这里，就一直向我们要钱。”罗宾的声音很稳。你站在一旁，听其他孩子一个接一个地重复这句话。'>>
     <<npcincr Robin dom 4>><<gdom>>
@@ -162,7 +162,7 @@
   <br><br>
   <<lanSwitch 'Bailey threatens to come back with help. Robin puts a copy of the ledger into another orphan’s hands. More copies are already outside the room. Bailey sees that taking one book will change nothing. At last, Bailey closes their own ledger and leaves. The children stay together until the footsteps have faded.' '贝利威胁要带人回来。罗宾把账本的副本交给另一名孤儿。屋外还留着几份。贝利终于明白，抢走一本也没用。他合上自己的账本，转身离开。孩子们仍站在一起，直到脚步声彻底消失。'>>
   <br><br><span class='green'><<lanSwitch 'Bailey will no longer collect rent from you or Robin.' '贝利不会再向你和罗宾收租。'>></span>
-  <<set $RobinExpansion.baileyDefeated to true>>
+  <<set $RobinExpansion.bailey_defeated to true>>
   <<set $renttime to Math.max(7, $renttime)>>
   <<set $robindebt to 0>>
   <<earnFeat 'Deadwood Robin Free'>>

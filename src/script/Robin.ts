@@ -36,21 +36,21 @@ export default function (maplebirch: typeof window.maplebirch): void {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:robin:trait:solidarity:name'),
       colour: 'green',
-      has: () => Boolean(V.RobinExpansion?.selfRent && !V.RobinExpansion.bothRent && !V.RobinExpansion.baileyDefeated),
+      has: () => Boolean(V.RobinExpansion?.self_rent && !V.RobinExpansion.both_rent && !V.RobinExpansion.bailey_defeated),
       text: () => maplebirch.t('deadwood-reblooms:robin:trait:solidarity:text')
     },
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:robin:trait:protected:name'),
       colour: 'gold',
-      has: () => Boolean(V.RobinExpansion?.bothRent && !V.RobinExpansion.baileyDefeated),
+      has: () => Boolean(V.RobinExpansion?.both_rent && !V.RobinExpansion.bailey_defeated),
       text: () => maplebirch.t('deadwood-reblooms:robin:trait:protected:text')
     },
     {
       title: 'Special Traits',
       name: () => maplebirch.t('deadwood-reblooms:robin:trait:free:name'),
       colour: 'def',
-      has: () => Boolean(V.RobinExpansion?.baileyDefeated),
+      has: () => Boolean(V.RobinExpansion?.bailey_defeated),
       text: () => maplebirch.t('deadwood-reblooms:robin:trait:free:text')
     }
   );
@@ -83,7 +83,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
         {
           src: '<<if !_avery_pay>>',
           applybefore: `<<deadwood-robin-journal>>
-            <<if $RobinExpansion.baileyDefeated>>
+            <<if $RobinExpansion.bailey_defeated>>
               <li><span class='green'><<lanSwitch 'Bailey no longer collects rent from you or Robin.' '贝利不再向你和罗宾收租。'>></span></li>
             <</if>>
             `,
@@ -92,14 +92,14 @@ export default function (maplebirch: typeof window.maplebirch): void {
         // 逼退贝利后不再显示原版欠租说明，其余日志结构照常保留。
         {
           src: '!_avery_pay',
-          applyafter: ' and !$RobinExpansion.baileyDefeated',
+          applyafter: ' and !$RobinExpansion.bailey_defeated',
           expected: 1
         }
       ],
       'Widgets Rent': [
         {
           src: '<<if $robinpaid is 1>>',
-          to: '<<if $robinpaid is 1 and !$RobinExpansion.selfRent>>',
+          to: '<<if $robinpaid is 1 and !$RobinExpansion.self_rent>>',
           expected: 1
         },
         {
@@ -171,7 +171,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
       "Bailey's Office Robin 2": [
         {
           src: '<<set $rentmoney *= 2>>',
-          to: '<<if !$RobinExpansion.selfRent>><<set $rentmoney *= 2>><</if>>',
+          to: '<<if !$RobinExpansion.self_rent>><<set $rentmoney *= 2>><</if>>',
           expected: 1
         }
       ],
@@ -185,7 +185,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
         // 独立交租后排除原版代交租纸条，保留其他判定。
         {
           src: '$robinpaid is 1',
-          applyafter: ' and !$RobinExpansion.selfRent',
+          applyafter: ' and !$RobinExpansion.self_rent',
           expected: 1
         }
       ],

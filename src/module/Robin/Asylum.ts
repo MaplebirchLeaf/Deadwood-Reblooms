@@ -6,8 +6,8 @@ export default class RobinAsylum extends Shared {
   /** 罗宾状态恶化时的宽限探视：创伤已到 95、尚未入院、今天还没探望过。 */
   public comfort(): boolean {
     const asylum = this.state.asylum;
-    if (!this.robinAvailable || asylum.status !== 'home' || asylum.severeDays < 1 || asylum.warningVisitDay === Time.days || C.npc.Robin.trauma < 95) return false;
-    asylum.warningVisitDay = Time.days;
+    if (!this.robinAvailable || asylum.status !== 'home' || asylum.severe_days < 1 || asylum.warning_visit_day === Time.days || C.npc.Robin.trauma < 95) return false;
+    asylum.warning_visit_day = Time.days;
     return true;
   }
 
@@ -22,16 +22,16 @@ export default class RobinAsylum extends Shared {
   public get tentacleOpen(): boolean {
     const asylum = this.state.asylum;
     if (asylum.status !== 'admitted') return false;
-    if (asylum.tentacleDay === Time.days) return false;
+    if (asylum.tentacle_day === Time.days) return false;
     return V.VanillaPlus?.traits?.deviancy === true;
   }
 
   /** 进入平原开始寻找罗宾：当天锁上，并把遭遇计数清零。 */
   public tentacleStart(): void {
     const asylum = this.state.asylum;
-    asylum.tentacleDay = Time.days;
-    asylum.tentacleWave = 0;
-    asylum.tentacleClose = 0;
+    asylum.tentacle_day = Time.days;
+    asylum.tentacle_wave = 0;
+    asylum.tentacle_close = 0;
   }
 
   /** 从触手平原逃进森林：结束收容，不走门禁卡与换班计划。 */
@@ -50,8 +50,8 @@ export default class RobinAsylum extends Shared {
     const asylum = this.state.asylum;
     asylum.status = 'recovering';
     asylum.plan = 0;
-    asylum.severeDays = 0;
-    V.robindebt = asylum.savedDebt;
+    asylum.severe_days = 0;
+    V.robindebt = asylum.saved_debt;
     V.robinReunionScene = undefined;
   }
 }

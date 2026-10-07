@@ -213,7 +213,7 @@
 <<set _gymActivity to $LifeSimulation.gym.activity>>
 <<set _gymTrainingDay to Time.days>>
 <<set $outside to _gymActivity is 'deck-run' ? 1 : 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
-<<if !maplebirch.get("LifeSimulation").has or Time.hour lt 6 or Time.hour gte 22 or $LifeSimulation.gym.sessions_today gte 3 or !['weights', 'run', 'stretch', 'deck-run'].includes(_gymActivity)
+<<if !maplebirch.get("LifeSimulation").canTrainGrowth or $LifeSimulation.gym.sessions_today gte 3 or !['weights', 'run', 'stretch', 'deck-run'].includes(_gymActivity)
 	or $exposed gt 0 or pcAreArmsBound('both') or (_gymActivity is 'deck-run' and (Weather.precipitation is 'rain' or Weather.isFreezing))>>
 	<span class='blue'><<lanSwitch 'The equipment is not available now.' '现在没法继续锻炼。'>></span><br><br>
 <<else>>
@@ -282,9 +282,9 @@
 <<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
 <<if maplebirch.get('LifeSimulation').coach.canAdvise>>
 	<<endevent>><<set _gymCoachMet to !!$per_npc.deadwood_gym_coach>><<deadwood-gym-coach>>
-	<<set _gymCoachTraining to maplebirch.get('LifeSimulation').coach.npc.gymTraining>>
+	<<set _gymCoachTraining to maplebirch.get('LifeSimulation').coach.npc.gym_training>>
 	<<set _gymCoachPlan to maplebirch.get('LifeSimulation').coach.suggestion>>
-	<<set _gymCoachAway to Time.days - (maplebirch.get('LifeSimulation').coach.npc.gymLastDay ?? Time.days) gte 7>>
+	<<set _gymCoachAway to Time.days - (maplebirch.get('LifeSimulation').coach.npc.gym_last_day ?? Time.days) gte 7>>
 	<<if maplebirch.get('LifeSimulation').coach.advise()>>
 		<<language>>
 			<<option 'EN'>>
