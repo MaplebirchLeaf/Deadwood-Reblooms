@@ -32,13 +32,15 @@ The target game version is **0.5.12.13**, with maplebirch framework **5.2.2 or l
 
 ### Basic option effects
 
-| Option                   | How to use                                             | Effect and limits                                                      |
-| ------------------------ | ------------------------------------------------------ | ---------------------------------------------------------------------- |
-| Sidebar control position | Desktop, mobile or hidden                              | Hiding the entrance does not disable modules                           |
-| Custom bodywriting       | Enable, then use the vanilla mirror                    | Set bodywriting text and colours                                       |
-| Bailey rent accumulation | Enable in mod settings                                 | Refused weekly rent increases later bills                              |
-| Hide ear slime parasites | Enable in mod settings                                 | Visual only, with traits and parasite state retained                   |
-| Wardrobe search          | Enter a name in the main wardrobe category and confirm | Filters in the current language. Clear and confirm to restore the list |
+| Option                   | How to use                                             | Effect and limits                                                       |
+| ------------------------ | ------------------------------------------------------ | ----------------------------------------------------------------------- |
+| Sidebar control position | Desktop, mobile or hidden                              | Hiding the entrance does not disable modules                            |
+| Custom bodywriting       | Enable, then use the vanilla mirror                    | Set bodywriting text and colours                                        |
+| Mobile status bars       | Enable in mod settings                                 | Shows vanilla attribute progress in the collapsed sidebar               |
+| Mobile undo button       | Enable in mod settings                                 | Goes back one passage from the collapsed sidebar, within vanilla limits |
+| Bailey rent accumulation | Enable in mod settings                                 | Refused weekly rent increases later bills                               |
+| Hide ear slime parasites | Enable in mod settings                                 | Visual only, with traits and parasite state retained                    |
+| Wardrobe search          | Enter a name in the main wardrobe category and confirm | Filters in the current language. Clear and confirm to restore the list  |
 
 ### Toggles, saves and reloads
 

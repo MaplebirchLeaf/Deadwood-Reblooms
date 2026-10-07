@@ -23,17 +23,62 @@ export default function (maplebirch: MaplebirchCore) {
     },
     'main'
   );
-  maplebirch.tool.addTo('HintMobile', () =>
-    V.options.maplebirch.modhint === 'mobile' && V.options.sidebarStats !== 'disabled'
-      ? "<input type='button' class='saveMenuButton DeadwoodRebloomsHintMobile' onclick='maplebirch.get(\"DeadwoodReblooms\").open()'>"
-      : ''
+  maplebirch.tool.addTo(
+    'HintMobile',
+    () =>
+      V.options.maplebirch.modhint === 'mobile' && V.options.sidebarStats !== 'disabled'
+        ? "<input type='button' class='saveMenuButton DeadwoodRebloomsHintMobile' onclick='maplebirch.get(\"DeadwoodReblooms\").open()'>"
+        : '',
+    () => {
+      if (!V.options.maplebirch.mobile_history || !maplebirch.host.sugarcube.require().Config.history.controls) return '';
+      const backward = document.getElementById('history-backward') as HTMLButtonElement | null;
+      if (!backward) return '';
+      return `<button id="deadwood-mobile-history" type="button" class="stat deadwood-mobile-history"
+        ${backward.disabled ? 'disabled aria-disabled="true"' : ''} onclick="document.getElementById('history-backward')?.click()"><span class="fa" aria-hidden="true">&#xe825;</span></button>`;
+    }
   );
+  maplebirch.tool.addTo('MobileStats', () => {
+    if (!V.options.maplebirch.mobile_status_bars) return '';
+    queueMicrotask(() => {
+      if (!V.options.maplebirch.mobile_status_bars) return;
+      const mobile = document.getElementById('mobileStats');
+      if (!mobile) return;
+      for (const marker of mobile.querySelectorAll<HTMLElement>('mouse[data-deadwood-stat]')) {
+        const stat = marker.parentElement;
+        if (!stat || stat.querySelector('.meter, .rightMeter')) continue;
+        const name = marker.dataset.deadwoodStat === 'fatigue' ? 'tiredness' : marker.dataset.deadwoodStat;
+        const source = document.getElementById(`${name}caption`)?.querySelector<HTMLElement>('.meter, .rightMeter');
+        if (!source) continue;
+        const meter = source.cloneNode(true) as HTMLElement;
+        meter.className = 'meter deadwood-mobile-status-bar';
+        meter.removeAttribute('id');
+        for (const child of meter.querySelectorAll('[id]')) child.removeAttribute('id');
+        meter.setAttribute('role', 'meter');
+        meter.setAttribute('aria-label', marker.querySelector('span')?.textContent?.trim() ?? '');
+        meter.setAttribute('aria-valuemin', '0');
+        meter.setAttribute('aria-valuemax', '100');
+        const width = Number.parseFloat(meter.querySelector<HTMLElement>('div')?.style.width ?? '0');
+        meter.setAttribute('aria-valuenow', String(Number.isFinite(width) ? Math.clamp(width, 0, 100) : 0));
+        stat.append(meter);
+        stat.classList.add('deadwood-mobile-status');
+      }
+    });
+    return '';
+  });
   maplebirch.tool.addTo('MenuBig', () =>
     V.options.maplebirch.modhint === 'desktop' ? "<<lanButton 'Deadwood Reblooms' 'upper'>><<run maplebirch.get(\"DeadwoodReblooms\").open()>><</lanButton>>" : ''
   );
   // 给原版衣柜加入搜索，并把身体涂写设置嵌入镜子界面。
   maplebirch.tool.inject({
     widgetPassage: {
+      // 只给原版移动端属性标记名称，保留显示条件、翻译和数值提示。
+      mobileStats: [
+        {
+          srcmatch: /(<<mobileStatsColor "(pain|arousal|fatigue|stress|innocence|trauma|control|allure|drunk|drugged|hallucinogen)">>[\s\S]*?<mouse class="tooltip-centertop")/g,
+          to: '$1 data-deadwood-stat="$2"',
+          expected: 11
+        }
+      ],
       'Widgets Wardrobe': [
         // 在主衣柜的类型列表初始化前插入双语搜索框，不依赖上一个 if 分支的结尾格式。
         {

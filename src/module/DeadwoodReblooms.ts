@@ -176,6 +176,8 @@ class DeadwoodReblooms extends Module {
     modhint: 'disabled' as 'disabled' | 'mobile' | 'desktop',
     bodywriting: false as boolean,
     baileyRent: false as boolean,
+    mobile_status_bars: false as boolean,
+    mobile_history: false as boolean,
     hideEarSlimeParasites: false as boolean
   };
 
@@ -269,6 +271,8 @@ class DeadwoodReblooms extends Module {
     this.core.var.options.define('modhint', DeadwoodReblooms.options);
     this.core.var.options.define('bodywriting', DeadwoodReblooms.options);
     this.core.var.options.define('baileyRent', DeadwoodReblooms.options);
+    this.core.var.options.define('mobile_status_bars', DeadwoodReblooms.options);
+    this.core.var.options.define('mobile_history', DeadwoodReblooms.options);
     this.core.var.options.define('hideEarSlimeParasites', DeadwoodReblooms.options);
     super.preInit();
   }
