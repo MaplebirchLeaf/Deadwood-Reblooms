@@ -5,7 +5,7 @@ import FinanceCheats from './Finance';
 export default function Cheats(core: typeof maplebirch): void {
   FinanceCheats(core);
   core.tool.addTo('Cheats', () =>
-    core.get('VanillaPlus')
+    core.get('Finance')
       ? `<div class="settingsGrid"><div class="settingsHeader options">${lanSwitch('Deadwood Reblooms', '枯木逢春')}</div><div class="settingsToggleItemWide"><<deadwood-finance-cheats>></div></div>`
       : ''
   );

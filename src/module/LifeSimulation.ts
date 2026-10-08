@@ -144,7 +144,7 @@ class LifeSimulation extends Module {
   }
 
   public get canAffordClinic(): boolean {
-    const finance = this.core.get('VanillaPlus')?.finance;
+    const finance = this.core.get('Finance');
     return finance ? finance.canPay(this.clinicPrice, 'hospitalBodyGrowth') : V.money >= this.clinicPrice;
   }
 

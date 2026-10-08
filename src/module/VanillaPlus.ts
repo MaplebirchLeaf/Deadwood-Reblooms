@@ -7,12 +7,10 @@ import Beauty from './VanillaPlus/Beauty';
 import Deviancy from './VanillaPlus/Deviancy';
 import DivineTransformations from './VanillaPlus/DivineTransformations';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
-import Finance from './VanillaPlus/Finance';
 import HandGrip from './VanillaPlus/HandGrip';
 import NPCDoublePenetration from './VanillaPlus/NPCDoublePenetration';
 import Physique from './VanillaPlus/Physique';
 import Promiscuity from './VanillaPlus/Promiscuity';
-import RealEstate from './VanillaPlus/RealEstate';
 import Willpower from './VanillaPlus/Willpower';
 
 class VanillaPlus extends Module {
@@ -20,8 +18,6 @@ class VanillaPlus extends Module {
   public readonly deviancy: Deviancy;
   public readonly divineTransformations = new DivineTransformations();
   public readonly exhibitionism: Exhibitionism;
-  public readonly finance: Finance;
-  public readonly realEstate: RealEstate;
   public readonly handGrip = new HandGrip();
   public readonly NPCDoublePenetration = new NPCDoublePenetration();
   public readonly physique: Physique;
@@ -34,8 +30,6 @@ class VanillaPlus extends Module {
     this.beauty = new Beauty(this);
     this.deviancy = new Deviancy(this);
     this.exhibitionism = new Exhibitionism(this);
-    this.finance = new Finance(core);
-    this.realEstate = new RealEstate(core, this.finance);
     this.physique = new Physique(this);
     this.promiscuity = new Promiscuity(this);
     this.willpower = new Willpower(this);
@@ -44,14 +38,6 @@ class VanillaPlus extends Module {
   public override preInit(): void {
     super.preInit();
     Achievements.add(this.core, 'VanillaPlus');
-    // 日结只推进已交给阿德里安服务的业务，剧情和条件留在 Twee。
-    this.core.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-adrian-business', {
-      exact: true,
-      priority: -1,
-      cond: () => V.VanillaPlus.adrian.career > 0 && V.VanillaPlus.adrian.career < 5,
-      action: () => this.core.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-adrian-business-day>>')
-    });
-
     this.beauty.preInit();
     this.deviancy.preInit();
     this.divineTransformations.preInit(this.core);
@@ -68,9 +54,6 @@ class VanillaPlus extends Module {
       output: 'run maplebirch.get("VanillaPlus").preserve()',
       cond: () => V.VanillaPlus != null && this.belowMinimum
     });
-
-    this.finance.preInit();
-    this.realEstate.preInit();
   }
 
   public hasTrait(trait: VanillaPlusTrait): boolean {

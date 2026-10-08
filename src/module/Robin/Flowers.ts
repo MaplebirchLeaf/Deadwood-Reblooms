@@ -82,7 +82,7 @@ export default class RobinFlowers extends Shared {
   public buyFromShop(type: string): boolean {
     const price = this.price(type);
     if (!this.state.shop || !this.state.shop_flowers || Time.hour < 9 || Time.hour >= 21 || !price || !(this.state.flower_stock[type] > 0) || !V.foodstuff?.[type]) return false;
-    if (!(this.vanillaPlus?.finance.canPay(price * 100, 'shopping') ?? V.money >= price * 100)) return false;
+    if (!(this.finance?.canPay(price * 100, 'shopping') ?? V.money >= price * 100)) return false;
     V.foodstuff[type].amount++;
     this.state.flower_stock[type]--;
     this.state.reserve += price;

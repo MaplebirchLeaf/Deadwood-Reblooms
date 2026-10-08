@@ -18,6 +18,8 @@ import Hint_MoreTransformations_CN from '@/assets/hint/CN/MoreTransformations.md
 import Hint_MoreTransformations_EN from '@/assets/hint/EN/MoreTransformations.md';
 import Hint_NPCSidebarPortrait_CN from '@/assets/hint/CN/NPCSidebarPortrait.md';
 import Hint_NPCSidebarPortrait_EN from '@/assets/hint/EN/NPCSidebarPortrait.md';
+import Hint_Finance_CN from '@/assets/hint/CN/Finance.md';
+import Hint_Finance_EN from '@/assets/hint/EN/Finance.md';
 import Hint_VanillaPlus_CN from '@/assets/hint/CN/VanillaPlus.md';
 import Hint_VanillaPlus_EN from '@/assets/hint/EN/VanillaPlus.md';
 import Hint_Sydney_CN from '@/assets/hint/CN/Sydney.md';
@@ -52,6 +54,7 @@ const guideSections = {
   CelestialAnomalies:                { EN: Hint_CelestialAnomalies_EN               , CN: Hint_CelestialAnomalies_CN               , title: { EN: 'Celestial anomalies'         , CN: '天体异象' } },
   MoreTransformations:               { EN: Hint_MoreTransformations_EN              , CN: Hint_MoreTransformations_CN              , title: { EN: 'Transformations'             , CN: '更多转化' } },
   NPCSidebarPortrait:                { EN: Hint_NPCSidebarPortrait_EN               , CN: Hint_NPCSidebarPortrait_CN               , title: { EN: 'Sidebar portraits'           , CN: 'NPC 侧边栏立绘' } },
+  Finance:                           { EN: Hint_Finance_EN                          , CN: Hint_Finance_CN                          , title: { EN: 'Finance'                     , CN: '金融系统' } },
   VanillaPlus:                       { EN: Hint_VanillaPlus_EN                      , CN: Hint_VanillaPlus_CN                      , title: { EN: 'Vanilla Plus'                , CN: '原版增强' } },
   Sydney:                            { EN: Hint_Sydney_EN                           , CN: Hint_Sydney_CN                           , title: { EN: 'Sydney'                      , CN: '悉尼拓展' } },
   Robin:                             { EN: Hint_Robin_EN                            , CN: Hint_Robin_CN                            , title: { EN: 'Robin'                       , CN: '罗宾拓展' } },
@@ -73,6 +76,7 @@ const guideOrder = [
   'LifeSimulation',
   'Orchard',
   'BirdTower',
+  'Finance',
   'VanillaPlus',
   'CelestialAnomalies',
   'MoreTransformations',

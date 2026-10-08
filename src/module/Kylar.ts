@@ -9,7 +9,7 @@ class Kylar extends Module {
   }
 
   private get available(): boolean {
-    return C.npc.Kylar.state === 'active' && !this.core.get('VanillaPlus')?.realEstate.residenceOf('Kylar');
+    return C.npc.Kylar.state === 'active' && !this.core.get('Finance')?.realEstate.residenceOf('Kylar');
   }
 
   /** 夜间沿用原版卧室判断，白天使用原版地点查询。 */

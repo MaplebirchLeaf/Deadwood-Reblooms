@@ -49,13 +49,13 @@
     <br><<foodstufficon $_fruit.type>><b><<print setup.foodstuff[$_fruit.type].name>></b> × <<= $_fruit.amount>><br>
     <<set $_display_label to $foodstuff[$_fruit.type].marketStall is false ? ['Display at the market stall', '在集市摆出'] : ['Keep off the market stall', '不在集市摆出']>>
     <<lanLink $_display_label>>
-      <<run maplebirch.get('Orchard').displayFruit($_fruit.type)>><<run Engine.show()>>
+      <<run maplebirch.get('Orchard').displayFruit($_fruit.type)>><<run maplebirch.SugarCube.Engine.show()>>
     <</lanLink>><br>
     <<set _orchardKeep[$_fruit.type] to $_fruit.reserve>>
     <<set $_reserve_variable to '_orchardKeep.' + $_fruit.type>>
     <<lanSwitch 'Keep at least: ' '至少保留：'>><<numberbox $_reserve_variable $_fruit.reserve>>
     <<lanLink ['Save', '保存']>>
-      <<run maplebirch.get('Orchard').keepFruit($_fruit.type, Number(T.orchardKeep[$_fruit.type]))>><<run Engine.show()>>
+      <<run maplebirch.get('Orchard').keepFruit($_fruit.type, Number(T.orchardKeep[$_fruit.type]))>><<run maplebirch.SugarCube.Engine.show()>>
     <</lanLink>><br>
     <<if $_orchard.canDeliver and $_orchard.deliveryRemaining gt 0 and $_fruit.amount gt $_fruit.reserve>>
       <<lanSwitch 'Bulk price per fruit: ' '每个水果收购价：'>><<printmoney $_fruit.price>><br>
@@ -66,7 +66,7 @@
             <<set $_delivery_minutes to maplebirch.get('Orchard').deliveryMinutes>>
             <<pass $_delivery_minutes>><<updatesidebarmoney>>
           <</if>>
-          <<run Engine.show()>>
+          <<run maplebirch.SugarCube.Engine.show()>>
         <</lanLink>><<lanSwitch ' Quantity: ' ' 数量：'>><<= $_deliverAmount>><br>
       <</capture>>
     <</if>>

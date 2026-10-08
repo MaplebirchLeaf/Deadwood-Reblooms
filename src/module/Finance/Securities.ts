@@ -1,6 +1,6 @@
-// ./src/module/VanillaPlus/Securities.ts
+// ./src/module/Finance/Securities.ts
 
-import type { FinanceState } from './Finance';
+import type { FinanceState } from '../Finance';
 import terms from '../../assets/finance/market.json';
 
 export interface Security {

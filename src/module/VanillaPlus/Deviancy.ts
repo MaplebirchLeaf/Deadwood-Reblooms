@@ -30,7 +30,7 @@ class Deviancy {
     V.VanillaPlus.deviancy.mirror_locations = locations;
     const randomLocation = () => ({ north: Math.floor(Math.random() * 9) - 4, east: Math.floor(Math.random() * 9) - 4 });
     for (const mirror of ['home', 'farm', 'tower', 'temple', 'sirris', 'kylar']) locations[mirror] = randomLocation();
-    for (const property of this.vanillaPlus.realEstate.properties) locations[`property:${property.id}`] = randomLocation();
+    for (const property of this.vanillaPlus.core.get('Finance')?.realEstate.properties ?? []) locations[`property:${property.id}`] = randomLocation();
   }
 
   public get mirrorOpen(): boolean {

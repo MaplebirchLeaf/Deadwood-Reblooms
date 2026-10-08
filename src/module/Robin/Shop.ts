@@ -9,10 +9,10 @@ const MAX_SHOP_STAFF = 2;
 export default class RobinShop extends Shared {
   public readonly investment = new Investment(this.core, this.facade);
 
-  /** 正式店铺可刷卡，VanillaPlus 未启用时保留原本的现金购买。 */
+  /** 正式店铺可刷卡，金融模块未启用时保留原本的现金购买。 */
   public canCustomerPay(pennies: number): boolean {
     if (!Number.isSafeInteger(pennies) || pennies < 0) return false;
-    return this.vanillaPlus?.finance.canPay(pennies, 'shopping') ?? V.money >= pennies;
+    return this.finance?.canPay(pennies, 'shopping') ?? V.money >= pennies;
   }
 
   /** 店员带来的额外周销售，单位英镑。 */
@@ -131,20 +131,12 @@ export default class RobinShop extends Shared {
   /** PC 是否能从银行账户垫付开店资金。 */
   public get canBorrowLoan(): boolean {
     const stage = this.state.shop_stage;
-    return (
-      !this.state.shop_bank_supported &&
-      stage !== 'none' &&
-      !this.state.shop &&
-      !!V.VanillaPlus?.finance?.bank?.opened &&
-      V.VanillaPlus.finance.bank.debit_card &&
-      V.VanillaPlus.finance.bank.balance >= 200000 &&
-      !!this.vanillaPlus
-    );
+    return !this.state.shop_bank_supported && stage !== 'none' && !this.state.shop && !!V.Finance?.bank?.opened && V.Finance.bank.debit_card && V.Finance.bank.balance >= 200000 && !!this.finance;
   }
 
   /** 从 PC 存款划出 2000 英镑，同时记入罗宾向 PC 的借款。 */
   public borrowLoan(): boolean {
-    if (!this.canBorrowLoan || this.vanillaPlus?.finance.payFromBankPennies(200000) !== 'ok') return false;
+    if (!this.canBorrowLoan || this.finance?.payFromBankPennies(200000) !== 'ok') return false;
     this.state.reserve += 2000;
     this.state.pc_loan += 2000;
     this.state.shop_bank_supported = true;

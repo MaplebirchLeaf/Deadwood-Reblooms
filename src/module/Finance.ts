@@ -1,12 +1,15 @@
-// ./src/module/VanillaPlus/Finance.ts
+// ./src/module/Finance.ts
 
-import Securities, { type Security } from './Securities';
-import MarginTrading, { type MarginState } from './MarginTrading';
-import tradingTerms from '../../assets/finance/trading.json';
-import bankingTerms from '../../assets/finance/banking.json';
+import Module from './Module';
+import Achievements from './Achievements';
+import RealEstate, { type RealEstateState } from './Finance/RealEstate';
+import Securities, { type Security } from './Finance/Securities';
+import MarginTrading, { type MarginState } from './Finance/MarginTrading';
+import tradingTerms from '../assets/finance/trading.json';
+import bankingTerms from '../assets/finance/banking.json';
 import securitiesSource from '@/assets/finance/securities.yaml';
 import type { MacroDefinition } from 'twine-sugarcube';
-import type Robin from '../Robin';
+import type Robin from './Robin';
 
 export type FinanceResult =
   | 'ok'
@@ -92,6 +95,20 @@ interface MarketState {
 }
 
 export interface FinanceState {
+  real_estate: RealEstateState;
+  adrian: {
+    service_location: string;
+    last_offence: '' | 'pressure' | 'insult' | 'queue';
+    last_visit: number;
+    visits: number;
+    last_chat: number;
+    account_discussed: boolean;
+    home_discussed: boolean;
+    career: number;
+    career_ready_day: number;
+    business_day: number;
+    business_days: number;
+  };
   bank: BankState;
   brokerage: BrokerageState;
   market: MarketState;
@@ -134,7 +151,21 @@ const MERCHANT_SOURCES = new Set([
 ]);
 const MERCHANT_LOCATIONS = new Set(['hospital', 'shopping_centre']);
 
-export const DEFAULT_FINANCE_STATE: FinanceState = {
+const DEFAULT_FINANCE_STATE: FinanceState = {
+  real_estate: RealEstate.defaults,
+  adrian: {
+    service_location: 'financial_centre',
+    last_offence: '',
+    last_visit: -1,
+    visits: 0,
+    last_chat: -1,
+    account_discussed: false,
+    home_discussed: false,
+    career: 0,
+    career_ready_day: 0,
+    business_day: -1,
+    business_days: 0
+  },
   bank: {
     opened: false,
     opened_day: -1,
@@ -182,11 +213,16 @@ export const DEFAULT_FINANCE_STATE: FinanceState = {
   last_result: null
 };
 
-class Finance {
+class Finance extends Module {
   public readonly terms = bankingTerms;
   public readonly margin = new MarginTrading(this);
   public loanDiscount: () => number = () => 0;
-  public constructor(private readonly core: typeof maplebirch) {}
+  public readonly realEstate: RealEstate;
+
+  public constructor(core: typeof maplebirch) {
+    super(core, 'Finance', DEFAULT_FINANCE_STATE);
+    this.realEstate = new RealEstate(core, this);
+  }
 
   public get loanProducts(): readonly { days: number; baseWeeklyRate: number; weeklyRate: number }[] {
     const discount = Math.clamp(this.loanDiscount(), 0, 0.1);
@@ -200,13 +236,13 @@ class Finance {
     const securities = (finance.securities ??= Finance.loadSecurities(this.core));
     return securities.filter(item => {
       if (item.symbol === 'ALF') return Number(V.farm_stage) >= 7;
-      if (item.symbol === 'RDS') return !!this.core.get('Robin')?.state?.shop || (V.VanillaPlus?.finance?.market?.prices?.RDS ?? 0) > 0;
-      if (item.symbol === 'CSN') return !!this.core.get('LifeSimulation')?.casino || (V.VanillaPlus?.finance?.market?.prices?.CSN ?? 0) > 0;
+      if (item.symbol === 'RDS') return !!this.core.get('Robin')?.state?.shop || (V.Finance?.market?.prices?.RDS ?? 0) > 0;
+      if (item.symbol === 'CSN') return !!this.core.get('LifeSimulation')?.casino || (V.Finance?.market?.prices?.CSN ?? 0) > 0;
       return true;
     });
   }
 
-  private get state(): FinanceState {
+  public get state(): FinanceState {
     return Finance.ensureState(this.securities);
   }
 
@@ -232,12 +268,21 @@ class Finance {
     };
   }
 
-  public preInit(): void {
+  public override preInit(): void {
+    super.preInit();
+    Achievements.add(this.core, 'Finance');
+    this.realEstate.preInit();
+    this.core.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-adrian-business', {
+      exact: true,
+      priority: -1,
+      cond: () => V.Finance.adrian.career > 0 && V.Finance.adrian.career < 5,
+      action: () => this.core.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-adrian-business-day>>')
+    });
     // 追债只在小镇街道遇到，神殿、农场、战斗和昏厥流程不插入金融事件。
     this.core.dynamic.regStateEvent('gate', 'deadwood-finance-collection', {
       extra: { passage: ['High Street'] },
       forceExit: true,
-      cond: () => !!V.VanillaPlus?.finance && this.core.get('VanillaPlus')!.finance.collectionEncounter,
+      cond: () => !!V.Finance && this.core.get('Finance')!.collectionEncounter,
       output: 'deadwood-finance-collection-gate'
     });
     this.core.tool.onInit(() => void this.securities);
@@ -293,7 +338,7 @@ class Finance {
   /** 扣除所有个人金融债务后的银行净存款，用于人物业务资格。 */
   public get netDeposit(): number {
     const bank = this.state.bank;
-    return Math.max(0, bank.balance - bank.credit_debt - bank.loan_debt - (V.VanillaPlus.real_estate?.mortgage?.outstanding ?? 0) - this.state.collection.amount);
+    return Math.max(0, bank.balance - bank.credit_debt - bank.loan_debt - (V.Finance.real_estate?.mortgage?.outstanding ?? 0) - this.state.collection.amount);
   }
 
   // 银行业务
@@ -755,7 +800,7 @@ class Finance {
 
   private static ensureState(securities: readonly Security[]): FinanceState {
     // 账户和行情始终读取当前 V，不把可变状态放进 setup 或模块实例。
-    const finance = V.VanillaPlus.finance as FinanceState;
+    const finance = V.Finance as FinanceState;
     if (finance.market.day < 0) finance.market.day = Finance.currentDay;
     if (!Number.isSafeInteger(finance.market.seed) || finance.market.seed === 0) finance.market.seed = Securities.generateSeed();
     for (const item of securities) {
@@ -830,8 +875,8 @@ class Finance {
 
   private static updateAccountTier(bank: BankState): void {
     if (!bank.opened) return;
-    const propertyDebt = V.VanillaPlus.real_estate?.mortgage?.outstanding ?? 0;
-    const recoveryDebt = V.VanillaPlus.finance.collection.amount;
+    const propertyDebt = V.Finance.real_estate?.mortgage?.outstanding ?? 0;
+    const recoveryDebt = V.Finance.collection.amount;
     const netBalance = Math.max(0, bank.balance - bank.credit_debt - bank.loan_debt - propertyDebt - recoveryDebt);
     bank.peak_balance = Math.max(bank.peak_balance, netBalance);
     const age = Math.max(0, Finance.currentDay - bank.opened_day);
@@ -980,6 +1025,12 @@ class Finance {
     else if (target === 'bank') finance.bank.balance += value;
     else finance.brokerage.cash += value;
     return 'ok';
+  }
+}
+
+declare module '@scml-dol-maplebirch/types' {
+  interface Extensions {
+    readonly Finance: Finance;
   }
 }
 

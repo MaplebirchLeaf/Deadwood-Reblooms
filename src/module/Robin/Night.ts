@@ -11,7 +11,7 @@ export default class RobinNight extends Shared {
       V.robin.timer.hurt === 0 &&
       this.state.asylum.status !== 'admitted' &&
       this.state.night_day !== Time.days &&
-      !this.vanillaPlus?.realEstate.residenceOf('Robin') &&
+      !this.finance?.realEstate.residenceOf('Robin') &&
       Time.hour >= 21 &&
       Time.hour <= 22 &&
       C.npc.Robin.love >= 50 &&

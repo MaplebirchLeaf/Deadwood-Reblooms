@@ -95,7 +95,7 @@ class Blackjack {
   }
 
   private get estate() {
-    return this.core.get('VanillaPlus')?.realEstate;
+    return this.core.get('Finance')?.realEstate;
   }
 
   public get homeOpponents() {

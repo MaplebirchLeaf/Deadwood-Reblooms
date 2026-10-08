@@ -57,13 +57,13 @@
     <</foldout>>
   <</if>>
 
-  <<if maplebirch.get('VanillaPlus') and $VanillaPlus>>
+  <<if maplebirch.get('Finance') and $Finance>>
     <<foldout false '_deadwoodFinanceFoldout'>>
       <span class='gold'><<lanSwitch 'Finance and property' '金融与房产'>></span>
-      <<if $VanillaPlus.finance?.bank?.opened>>
-        <<set _deadwoodBankBalance to $VanillaPlus.finance.bank.balance ?? 0>>
-        <<set _deadwoodCreditDebt to $VanillaPlus.finance.bank.credit_debt ?? 0>>
-        <<set _deadwoodLoanDebt to $VanillaPlus.finance.bank.loan_debt ?? 0>>
+      <<if $Finance?.bank?.opened>>
+        <<set _deadwoodBankBalance to $Finance.bank.balance ?? 0>>
+        <<set _deadwoodCreditDebt to $Finance.bank.credit_debt ?? 0>>
+        <<set _deadwoodLoanDebt to $Finance.bank.loan_debt ?? 0>>
         <<lanSwitch 'Bank balance:' '银行余额：'>><<printmoney _deadwoodBankBalance>><br>
         <<lanSwitch 'Credit card debt:' '信用卡欠款：'>><<printmoney _deadwoodCreditDebt>><br>
         <<lanSwitch 'Personal loan debt:' '个人贷款余额：'>><<printmoney _deadwoodLoanDebt>><br>
@@ -71,15 +71,15 @@
         <<lanSwitch 'Bank account not opened' '尚未开立银行账户'>><br>
       <</if>>
       <<lanSwitch 'Owned properties:' '已持有房产：'>>
-      <span class='teal'><<= Object.values($VanillaPlus.real_estate?.owned ?? {}).filter(Boolean).length>></span><br>
+      <span class='teal'><<= Object.values($Finance.real_estate?.owned ?? {}).filter(Boolean).length>></span><br>
       <<lanSwitch 'Cohabitants:' '同住者：'>>
-      <span class='teal'><<= Object.values($VanillaPlus.real_estate?.residents ?? {}).flat().length>></span><br>
-      <<if $VanillaPlus.finance.brokerage?.opened>>
+      <span class='teal'><<= Object.values($Finance.real_estate?.residents ?? {}).flat().length>></span><br>
+      <<if $Finance.brokerage?.opened>>
         <<language>><<option 'EN'>>Realised share-trading profit / loss: <<option 'CN'>>普通股票已实现盈亏：<</language>>
-        <span @class="$VanillaPlus.finance.brokerage.realised < 0 ? 'red' : 'green'"><<printmoney $VanillaPlus.finance.brokerage.realised>></span><br>
-        <<language>><<option 'EN'>>Stock dividends: <<option 'CN'>>股票累计分红：<</language>><<printmoney $VanillaPlus.finance.brokerage.dividends>><br>
-        <<language>><<option 'EN'>>Settled margin trades: <<option 'CN'>>保证金交易累计平仓：<</language>><span class='teal'><<= $VanillaPlus.finance.brokerage.margin.closed ?? 0>></span><br>
-        <<language>><<option 'EN'>>Margin-trading profit / loss after fees: <<option 'CN'>>保证金交易累计扣费盈亏：<</language>><<printmoney `$VanillaPlus.finance.brokerage.margin.realised ?? 0`>><br>
+        <span @class="$Finance.brokerage.realised < 0 ? 'red' : 'green'"><<printmoney $Finance.brokerage.realised>></span><br>
+        <<language>><<option 'EN'>>Stock dividends: <<option 'CN'>>股票累计分红：<</language>><<printmoney $Finance.brokerage.dividends>><br>
+        <<language>><<option 'EN'>>Settled margin trades: <<option 'CN'>>保证金交易累计平仓：<</language>><span class='teal'><<= $Finance.brokerage.margin.closed ?? 0>></span><br>
+        <<language>><<option 'EN'>>Margin-trading profit / loss after fees: <<option 'CN'>>保证金交易累计扣费盈亏：<</language>><<printmoney `$Finance.brokerage.margin.realised ?? 0`>><br>
       <</if>>
       <<if maplebirch.get('Robin') and $RobinExpansion?.investment?.agreed>>
         <<language>><<option 'EN'>>Shop partnership contributions: <<option 'CN'>>店铺合伙累计出资：<</language>><<printmoney $RobinExpansion.investment.invested_total>><br>

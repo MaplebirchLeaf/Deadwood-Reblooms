@@ -1,9 +1,7 @@
-// ./src/module/VanillaPlus/MarginTrading.ts
+// ./src/module/Finance/MarginTrading.ts
 
 import terms from '../../assets/finance/trading.json';
-import type Finance from './Finance';
-
-const indexBasket = ['AVY', 'RMY', 'OBC', 'HSF', 'MER', 'HSC', 'DSP', 'ELK'] as const;
+import type Finance from '../Finance';
 
 export interface MarginPosition {
   id: number;
@@ -40,7 +38,7 @@ export default class MarginTrading {
   public constructor(private readonly finance: Finance) {}
 
   private get state(): MarginState {
-    return V.VanillaPlus.finance.brokerage.margin;
+    return V.Finance.brokerage.margin;
   }
 
   public get positions(): readonly MarginPosition[] {
@@ -55,13 +53,8 @@ export default class MarginTrading {
     return Time.weekDay >= 2 && Time.weekDay <= 6 && Time.hour >= 9 && Time.hour < 17;
   }
 
-  /** 已有指数持仓继续按原篮子报价结算，柜台不再接受新指数合约。 */
   public quote(symbol: string): number {
-    const market = V.VanillaPlus.finance.market;
-    if (symbol !== 'INDEX') return market.prices[symbol] ?? 0;
-    const basket = this.finance.securities.filter(item => indexBasket.some(symbol => symbol === item.symbol));
-    const sum = basket.reduce((total, item) => total + (market.prices[item.symbol] ?? item.initialPrice) / item.initialPrice, 0);
-    return basket.length ? Math.max(1, Math.round((terms.indexBase * sum) / basket.length)) : terms.indexBase;
+    return V.Finance.market.prices[symbol] ?? 0;
   }
 
   public profit(position: MarginPosition): number {
@@ -97,7 +90,7 @@ export default class MarginTrading {
   }
 
   public place(kind: 'stock' | 'futures', symbol: string, side: number, lots: number, leverage: number): boolean {
-    const finance = V.VanillaPlus.finance;
+    const finance = V.Finance;
     if (
       !this.open ||
       !finance.brokerage.opened ||
@@ -153,7 +146,7 @@ export default class MarginTrading {
   public topUp(id: number, pounds: number): boolean {
     const amount = Math.round(pounds * 100);
     const position = this.positions.find(item => item.id === id);
-    const brokerage = V.VanillaPlus.finance.brokerage;
+    const brokerage = V.Finance.brokerage;
     if (!this.open || !position || !Number.isSafeInteger(amount) || amount <= 0 || brokerage.cash < amount || !Number.isSafeInteger(position.margin + amount)) return false;
     brokerage.cash -= amount;
     position.margin += amount;
@@ -185,10 +178,10 @@ export default class MarginTrading {
     const fee = Math.max(terms.minimumFee, Math.ceil(this.quote(position.symbol) * position.units * terms.feeRate));
     const equity = this.equity(position) - fee;
     state.positions.splice(index, 1);
-    if (equity >= 0) V.VanillaPlus.finance.brokerage.cash += equity;
+    if (equity >= 0) V.Finance.brokerage.cash += equity;
     else {
       // 跳空损失可能超过保证金，先扣证券闲置资金和银行存款，差额继续追偿。
-      const brokerage = V.VanillaPlus.finance.brokerage;
+      const brokerage = V.Finance.brokerage;
       const paid = Math.min(brokerage.cash, -equity);
       brokerage.cash -= paid;
       const remainder = -equity - paid;

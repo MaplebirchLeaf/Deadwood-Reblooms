@@ -1,12 +1,12 @@
 :: Deadwood Reblooms Adrian Widgets [widget]
 
 <<widget 'Adrianrelationshiptext'>>
-	<<if C.npc.Adrian.rage gt 0 and $VanillaPlus.adrian.last_offence is 'pressure'>>
+	<<if C.npc.Adrian.rage gt 0 and $Finance.adrian.last_offence is 'pressure'>>
 		<<language>>
 			<<option 'EN'>> is <span class='purple'>unimpressed by your demands</span> for special treatment.
 			<<option 'CN'>>对你要求违规优待的举动<span class='purple'>很不满</span>。
 		<</language>>
-	<<elseif C.npc.Adrian.rage gt 0 and $VanillaPlus.adrian.last_offence is 'insult'>>
+	<<elseif C.npc.Adrian.rage gt 0 and $Finance.adrian.last_offence is 'insult'>>
 		<<language>>
 			<<option 'EN'>> <span class='purple'>remembers how you spoke</span> about the other customers.
 			<<option 'CN'>>仍<span class='purple'>记着你贬低其他客户的话</span>。
@@ -16,12 +16,12 @@
 			<<option 'EN'>> <span class='blue'>keeps your conversations brief</span> after your attempt to jump the queue.
 			<<option 'CN'>>你上次试图插队后，阿德里安<span class='blue'>不再与你多聊</span>。
 		<</language>>
-	<<elseif $VanillaPlus.adrian.career is 5 and C.npc.Adrian.love gte 35>>
+	<<elseif $Finance.adrian.career is 5 and C.npc.Adrian.love gte 35>>
 		<<language>>
 			<<option 'EN'>> is <span class='green'>grateful for your help</span> with the promotion.
 			<<option 'CN'>>很<span class='green'>感激你在晋升时的帮助</span>。
 		<</language>>
-	<<elseif $VanillaPlus.adrian.career gte 2 and C.npc.Adrian.love gte 20>>
+	<<elseif $Finance.adrian.career gte 2 and C.npc.Adrian.love gte 20>>
 		<<language>>
 			<<option 'EN'>> <span class='teal'>values your business</span> with the bank.
 			<<option 'CN'>>很<span class='teal'>重视你交给银行的业务</span>。
@@ -50,8 +50,8 @@
 <</widget>>
 
 <<widget 'deadwood-reblooms-adrian-context'>>
-	<<set $_state to $VanillaPlus.adrian>>
-	<<set $_bank to $VanillaPlus.finance.bank>>
+	<<set $_state to $Finance.adrian>>
+	<<set $_bank to $Finance.bank>>
 	<<set $_location to maplebirch.npc.Schedule.get('Adrian').location>>
 	<<set $_service to {
 		'Deadwood Reblooms Property Office': 'financial_centre_property',
@@ -81,36 +81,36 @@
 			financial_centre_property: 'Deadwood Reblooms Property Office',
 			financial_centre_securities: 'Deadwood Reblooms Financial Centre Securities'
 		}[$_location] or '',
-		netDeposit: maplebirch.get('VanillaPlus').finance.netDeposit,
-		goodAccount: $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0 and $VanillaPlus.finance.collection.amount is 0
+		netDeposit: maplebirch.get('Finance').netDeposit,
+		goodAccount: $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0 and $Finance.collection.amount is 0
 	}>>
 	<<set _adrianContext.present to Boolean(_adrianContext.desk) or $_location is 'financial_centre_break'>>
 	<<if $_working and $_service>><<set _adrianContext.desk to $passage>><</if>>
-	<<set _adrianContext.canChat to _adrianContext.present and $_state.lastChat isnot Time.days and $combat isnot 1 and $exposed lte 0 and !$worn.face.type.includes('gag')>>
+	<<set _adrianContext.canChat to _adrianContext.present and $_state.last_chat isnot Time.days and $combat isnot 1 and $exposed lte 0 and !$worn.face.type.includes('gag')>>
 	<<set _adrianContext.careerAvailable to _adrianContext.present and ($_state.career gt 0 or ($_state.visits gte 3 and $_bank.opened))>>
 	<<set _adrianContext.businessReady to _adrianContext.goodAccount and _adrianContext.netDeposit gte 2500000>>
 <</widget>>
 
 <<widget 'deadwood-reblooms-adrian-business-day'>>
-	<<set $_state to $VanillaPlus.adrian>>
-	<<set $_bank to $VanillaPlus.finance.bank>>
-	<<set $_elapsed to Math.max(0, Time.days - $_state.businessDay)>>
+	<<set $_state to $Finance.adrian>>
+	<<set $_bank to $Finance.bank>>
+	<<set $_elapsed to Math.max(0, Time.days - $_state.business_day)>>
 	<<if $_elapsed gt 0>>
-		<<set $_state.businessDay to Time.days>>
-		<<set $_netDeposit to maplebirch.get('VanillaPlus').finance.netDeposit>>
-		<<set $_goodAccount to $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0 and $VanillaPlus.finance.collection.amount is 0>>
+		<<set $_state.business_day to Time.days>>
+		<<set $_netDeposit to maplebirch.get('Finance').netDeposit>>
+		<<set $_goodAccount to $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0 and $Finance.collection.amount is 0>>
 		<<for $_day to 0; $_day lt Math.min(21, $_elapsed) and $_state.career lt 3; $_day++>>
 			<<set $_target to $_state.career is 1 ? 500000 : 2500000>>
-			<<set $_state.businessDays to $_goodAccount and $_netDeposit gte $_target ? $_state.businessDays + 1 : 0>>
-			<<if $_state.businessDays gte ($_state.career is 1 ? 7 : 14)>>
+			<<set $_state.business_days to $_goodAccount and $_netDeposit gte $_target ? $_state.business_days + 1 : 0>>
+			<<if $_state.business_days gte ($_state.career is 1 ? 7 : 14)>>
 				<<set $_state.career += 1>>
-				<<set $_state.businessDays to 0>>
+				<<set $_state.business_days to 0>>
 				<<set C.npc.Adrian.title to 'senior bank clerk'>>
 				<<set C.npc.Adrian.description to 'senior bank clerk'>>
 			<</if>>
 		<</for>>
 		<<if $_state.career is 4 and (!$_goodAccount or $_netDeposit lt 2500000)>>
-			<<set $_state.careerReadyDay to Time.days + 7>>
+			<<set $_state.career_ready_day to Time.days + 7>>
 		<</if>>
 	<</if>>
 <</widget>>
@@ -119,8 +119,8 @@
 	<<deadwood-reblooms-adrian-context>>
 	<<if _adrianContext.present and _adrianContext.location isnot 'financial_centre_break'>>
 		<<set $_new to C.npc.Adrian.init isnot 1>>
-		<<if _adrianContext.state.lastVisit isnot Time.days>>
-			<<set _adrianContext.state.lastVisit to Time.days>>
+		<<if _adrianContext.state.last_visit isnot Time.days>>
+			<<set _adrianContext.state.last_visit to Time.days>>
 			<<set _adrianContext.state.visits += 1>>
 		<</if>>
 		<<npc 'Adrian'>><<person1>>
@@ -210,36 +210,36 @@
 <</if>>
 <<set _adrianConversation to { topic: '', ownsHome: false, responseUsed: false }>>
 <<if _adrianContext.canChat>>
-	<<set _adrianContext.state.lastChat to Time.days>>
-	<<for _adrianProperty range maplebirch.get('VanillaPlus').realEstate.properties>>
-		<<if maplebirch.get('VanillaPlus').realEstate.owns(_adrianProperty.id)>>
+	<<set _adrianContext.state.last_chat to Time.days>>
+	<<for _adrianProperty range maplebirch.get('Finance').realEstate.properties>>
+		<<if maplebirch.get('Finance').realEstate.owns(_adrianProperty.id)>>
 		  <<set _adrianConversation.ownsHome to true>><<break>>
 		<</if>>
 	<</for>>
-	<<if _adrianContext.bank.credit_missed_payments gt 0 or _adrianContext.bank.loan_missed_payments gt 0 or ($VanillaPlus.finance.collection.amount gt 0 and $VanillaPlus.finance.collection.source isnot 'margin')>>
+	<<if _adrianContext.bank.credit_missed_payments gt 0 or _adrianContext.bank.loan_missed_payments gt 0 or ($Finance.collection.amount gt 0 and $Finance.collection.source isnot 'margin')>>
 		<<set _adrianConversation.topic to 'overdue'>>
 	<<elseif $pain gte 50 or $stress gte 600>>
 		<<set _adrianConversation.topic to 'concern'>>
-	<<elseif $VanillaPlus.finance.collection.amount gt 0>>
+	<<elseif $Finance.collection.amount gt 0>>
 		<<set _adrianConversation.topic to 'margin_debt'>>
 	<<elseif _adrianContext.location is 'financial_centre' and maplebirch.get('LifeSimulation') and $LifeSimulation?.casino.statistics.bank_day gte Time.days - 1 and ($LifeSimulation.casino.statistics.bank_in or $LifeSimulation.casino.statistics.bank_out)>>
 		<<set _adrianConversation.topic to 'casino_transfer'>>
-	<<elseif _adrianContext.location is 'financial_centre_securities' and ($VanillaPlus.finance.brokerage.holdings.RDS gt 0 or $VanillaPlus.finance.brokerage.margin.positions.some(position => position.symbol === 'RDS')) and _adrianContext.state.visits % 2 is 0>>
+	<<elseif _adrianContext.location is 'financial_centre_securities' and ($Finance.brokerage.holdings.RDS gt 0 or $Finance.brokerage.margin.positions.some(position => position.symbol === 'RDS')) and _adrianContext.state.visits % 2 is 0>>
 		<<set _adrianConversation.topic to 'shop_shares'>>
 	<<elseif _adrianContext.location is 'financial_centre_securities' and maplebirch.get('Robin') and $RobinExpansion?.investment.share gt 0 and _adrianContext.state.visits % 2 is 0>>
 		<<set _adrianConversation.topic to 'partnership'>>
-	<<elseif _adrianContext.location is 'financial_centre' and $VanillaPlus.finance.bank.loan_project>>
+	<<elseif _adrianContext.location is 'financial_centre' and $Finance.bank.loan_project>>
 		<<set _adrianConversation.topic to 'business_loan'>>
-	<<elseif _adrianContext.location is 'financial_centre_property' and maplebirch.get('VanillaPlus').realEstate.manager>>
+	<<elseif _adrianContext.location is 'financial_centre_property' and maplebirch.get('Finance').realEstate.manager>>
 		<<set _adrianConversation.topic to 'management'>>
 	<<elseif (_adrianContext.location is 'financial_centre_property')>>
 		<<set _adrianConversation.topic to 'property'>>
 	<<elseif (_adrianContext.location is 'financial_centre_securities')>>
 		<<set _adrianConversation.topic to 'securities'>>
-	<<elseif !_adrianContext.state.homeDiscussed and _adrianConversation.ownsHome>>
-		<<set _adrianConversation.topic to 'home'>><<set _adrianContext.state.homeDiscussed to true>>
-	<<elseif _adrianContext.bank.opened and !_adrianContext.state.accountDiscussed>>
-		<<set _adrianConversation.topic to 'account'>><<set _adrianContext.state.accountDiscussed to true>>
+	<<elseif !_adrianContext.state.home_discussed and _adrianConversation.ownsHome>>
+		<<set _adrianConversation.topic to 'home'>><<set _adrianContext.state.home_discussed to true>>
+	<<elseif _adrianContext.bank.opened and !_adrianContext.state.account_discussed>>
+		<<set _adrianConversation.topic to 'account'>><<set _adrianContext.state.account_discussed to true>>
 	<<else>>
 		<<set _adrianConversation.topic to (_adrianContext.location is 'financial_centre_break') ? 'break' : 'work'>>
 	<</if>>
@@ -312,7 +312,7 @@
 				<</language>>
 			<</if>>
 		<<case 'securities'>>
-			<<if $VanillaPlus.finance.brokerage.opened>>
+			<<if $Finance.brokerage.opened>>
 				<<language>>
 					<<option 'EN'>>Adrian checks the transfer details with the securities clerk. "This money leaves your bank balance when it goes into the trading account. Don't count it twice when you're planning repayments." The clerk turns towards the market board. Adrian stays with your statement. "And don't mistake yesterday's price for tomorrow's."
 					<<option 'CN'>>阿德里安和证券职员核对转账资料。“钱转进交易账户，就会从银行余额里扣走。安排还款时，别把它算上两遍。”职员转向行情板，阿德里安仍看着你的账单。“也别把昨天的价格，当成明天的保证。”
@@ -345,7 +345,7 @@
 	<div id='adrian-response'>
 		<<lanLink ['Listen and thank Adrian', '认真听完，向阿德里安道谢']>>
 			<<deadwood-reblooms-adrian-context>>
-			<<if _adrianContext.present and _adrianContext.state.lastChat is Time.days and !_adrianConversation.responseUsed>>
+			<<if _adrianContext.present and _adrianContext.state.last_chat is Time.days and !_adrianConversation.responseUsed>>
 				<<set _adrianConversation.responseUsed to true>>
 				<<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) + 2, 0, 50)>>
 				<<set C.npc.Adrian.rage to Math.max(0, (C.npc.Adrian.rage ?? 0) - 1)>>
@@ -383,7 +383,7 @@
 		<</switch>>
 		<<lanLink _adrianFollowup>>
 			<<deadwood-reblooms-adrian-context>>
-			<<if _adrianContext.present and _adrianContext.state.lastChat is Time.days and !_adrianConversation.responseUsed>>
+			<<if _adrianContext.present and _adrianContext.state.last_chat is Time.days and !_adrianConversation.responseUsed>>
 				<<set _adrianConversation.responseUsed to true>>
 				<<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) + 2, 0, 50)>>
 				<<set C.npc.Adrian.rage to Math.max(0, (C.npc.Adrian.rage ?? 0) - 1)>>
@@ -464,7 +464,7 @@
 		<<if _adrianConversation.topic is 'break' and $money gte 200>>
 			<<lanLink ['Buy Adrian a cup of tea (£2)', '请阿德里安喝杯茶 (£2)']>>
 				<<deadwood-reblooms-adrian-context>>
-				<<if _adrianContext.present and _adrianContext.state.lastChat is Time.days and !_adrianConversation.responseUsed and $money gte 200>>
+				<<if _adrianContext.present and _adrianContext.state.last_chat is Time.days and !_adrianConversation.responseUsed and $money gte 200>>
 					<<set _adrianConversation.responseUsed to true>><<money -200>><<stress -3>>
 					<<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) + 2, 0, 50)>>
 					<<set C.npc.Adrian.rage to Math.max(0, (C.npc.Adrian.rage ?? 0) - 1)>>
@@ -548,7 +548,7 @@
 	<br><br>
 	<<if _adrianContext.state.career is 5>>
 		<strong class='gold'><<lanSwitch 'Personal-loan weekly rates' '个人贷款周利率'>></strong><br>
-		<<for _adrianLoan range maplebirch.get('VanillaPlus').finance.loanProducts>>
+		<<for _adrianLoan range maplebirch.get('Finance').loanProducts>>
 			<<= _adrianLoan.days>> <<lanSwitch 'days' '天'>>：
 			<<= (_adrianLoan.baseWeeklyRate * 100).toFixed(3)>>% →
 			<span class='blue'><<= (_adrianLoan.weeklyRate * 100).toFixed(3)>>%</span><br>
@@ -570,7 +570,7 @@
 		<<if (_adrianContext.location is 'financial_centre') and _adrianContext.state.career is 0>>
 			<<lanLink ['Choose Adrian as your account contact (0:05)', '指定阿德里安负责账户服务 (0:05)']>>
 				<<if _adrianContext.state.career is 0>>
-					<<set _adrianContext.state.career to 1>><<set _adrianContext.state.businessDay to Time.days>><<set _adrianContext.state.businessDays to 0>>
+					<<set _adrianContext.state.career to 1>><<set _adrianContext.state.business_day to Time.days>><<set _adrianContext.state.business_days to 0>>
 					<<pass 5>>
 					<<replace '#adrian-career-actions'>>
 						<<language>>
@@ -583,7 +583,7 @@
 		<<elseif (_adrianContext.location is 'financial_centre') and _adrianContext.state.career is 3 and _adrianContext.businessReady>>
 			<<lanLink ['Allow Adrian to include your account (0:05)', '同意阿德里安将账户业务列入竞聘材料 (0:05)']>>
 				<<if _adrianContext.state.career is 3>>
-					<<set _adrianContext.state.career to 4>><<set _adrianContext.state.careerReadyDay to Time.days + 7>>
+					<<set _adrianContext.state.career to 4>><<set _adrianContext.state.career_ready_day to Time.days + 7>>
 					<<pass 5>>
 					<<replace '#adrian-career-actions'>>
 						<<language>>
@@ -593,7 +593,7 @@
 					<</replace>>
 				<</if>>
 			<</lanLink>><br>
-		<<elseif (_adrianContext.location is 'financial_centre') and _adrianContext.state.career is 4 and _adrianContext.businessReady and Time.days gte _adrianContext.state.careerReadyDay>>
+		<<elseif (_adrianContext.location is 'financial_centre') and _adrianContext.state.career is 4 and _adrianContext.businessReady and Time.days gte _adrianContext.state.career_ready_day>>
 			<<socialiseicon 'ask'>><<lanLink ['Ask how the interview went (0:05)', '询问面试结果 (0:05)']>>
 				<<if _adrianContext.state.career is 4>>
 					<<set _adrianContext.state.career to 5>>
@@ -609,8 +609,8 @@
 			<</lanLink>><br>
 		<<elseif _adrianContext.state.career is 1 or _adrianContext.state.career is 2>>
 			<<language>>
-				<<option 'EN'>>Qualifying daily settlements: <span class='blue'><<= _adrianContext.state.businessDays>> / <<= _adrianContext.state.career is 1 ? 7 : 14>></span>. Below the deposit requirement or behind on repayments, the current streak starts again.
-				<<option 'CN'>>符合条件的连续日结：<span class='blue'><<= _adrianContext.state.businessDays>> / <<= _adrianContext.state.career is 1 ? 7 : 14>></span>。日结时存款不足或还款逾期，当前阶段重新累计。
+				<<option 'EN'>>Qualifying daily settlements: <span class='blue'><<= _adrianContext.state.business_days>> / <<= _adrianContext.state.career is 1 ? 7 : 14>></span>. Below the deposit requirement or behind on repayments, the current streak starts again.
+				<<option 'CN'>>符合条件的连续日结：<span class='blue'><<= _adrianContext.state.business_days>> / <<= _adrianContext.state.career is 1 ? 7 : 14>></span>。日结时存款不足或还款逾期，当前阶段重新累计。
 			<</language>><br>
 		<<elseif _adrianContext.state.career is 3 or _adrianContext.state.career is 4>>
 			<<language>>

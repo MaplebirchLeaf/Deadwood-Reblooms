@@ -1,10 +1,6 @@
 // ./src/module/constants/vanilla-plus.ts
 
-import type { FinanceState } from '../VanillaPlus/Finance';
-import { DEFAULT_FINANCE_STATE } from '../VanillaPlus/Finance';
 import type { NPCDoublePenetrationData } from '../VanillaPlus/NPCDoublePenetration';
-import type { RealEstateState } from '../VanillaPlus/RealEstate';
-import { RealEstate } from '../VanillaPlus/RealEstate';
 
 /** 六项可突破属性。锁与特质表都以此为准。 */
 export type VanillaPlusAttribute = 'willpower' | 'physique' | 'beauty' | 'exhibitionism' | 'deviancy' | 'promiscuity';
@@ -37,23 +33,6 @@ export interface VanillaPlusState {
     /** 接触入口使用原版意志检定得到的结果。 */
     contactHeld: boolean;
   };
-  /** 银行、证券与市场的全部可变状态。 */
-  finance: FinanceState;
-  adrian: {
-    service_location: string;
-    last_offence: '' | 'pressure' | 'insult' | 'queue';
-    lastVisit: number;
-    visits: number;
-    lastChat: number;
-    accountDiscussed: boolean;
-    homeDiscussed: boolean;
-    career: number;
-    careerReadyDay: number;
-    businessDay: number;
-    businessDays: number;
-  };
-  /** 房产产权、租约、拍卖与同住状态。 */
-  real_estate: RealEstateState;
   /** 体格相关的一次性事件标记。 */
   physique: {
     /** 已触发过恐慌事件。 */
@@ -151,19 +130,6 @@ export interface VanillaPlusState {
 }
 
 export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
-  adrian: {
-    service_location: 'financial_centre',
-    last_offence: '',
-    lastVisit: -1,
-    visits: 0,
-    lastChat: -1,
-    accountDiscussed: false,
-    homeDiscussed: false,
-    career: 0,
-    careerReadyDay: 0,
-    businessDay: -1,
-    businessDays: 0
-  },
   lock: {
     physique: false,
     willpower: false,
@@ -192,8 +158,6 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
     contact: 'none',
     contactHeld: false
   },
-  finance: DEFAULT_FINANCE_STATE,
-  real_estate: RealEstate.defaults,
   physique: {
     panic: false,
     heroic: false,

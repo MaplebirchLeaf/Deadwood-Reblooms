@@ -1,6 +1,6 @@
 // ./src/module/Robin/Shared.ts
 
-import type VanillaPlus from '../VanillaPlus';
+import type Finance from '../Finance';
 import type { RobinExpansionState } from '../constants';
 
 export interface RobinFacade {
@@ -34,9 +34,9 @@ export default abstract class Shared {
     return this.facade.funds;
   }
 
-  /** VanillaPlus 未载入时为空，房产与银行的调用都要先过这一层。 */
-  protected get vanillaPlus(): VanillaPlus | undefined {
-    return this.core.get('VanillaPlus') as VanillaPlus | undefined;
+  /** 金融模块未载入时为空，房产与银行的调用都要先过这一层。 */
+  protected get finance(): Finance | undefined {
+    return this.core.get('Finance');
   }
 
   protected get robinAvailable(): boolean {

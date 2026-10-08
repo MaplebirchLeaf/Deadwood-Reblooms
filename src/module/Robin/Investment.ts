@@ -12,7 +12,7 @@ export default class Investment extends Shared {
   }
 
   public get available(): boolean {
-    return this.state.shop && !!this.vanillaPlus && !V.statFreeze;
+    return this.state.shop && !!this.finance && !V.statFreeze;
   }
 
   public get canAgree(): boolean {
@@ -38,7 +38,7 @@ export default class Investment extends Shared {
   public invest(share: number): boolean {
     const contract = this.contract;
     const amount = this.quote(share);
-    if (!this.available || !this.robinAvailable || !contract.agreed || contract.exit_day >= 0 || amount === null || this.vanillaPlus!.finance.payFromBankPennies(amount) !== 'ok') return false;
+    if (!this.available || !this.robinAvailable || !contract.agreed || contract.exit_day >= 0 || amount === null || this.finance!.payFromBankPennies(amount) !== 'ok') return false;
     this.state.reserve += amount / 100;
     contract.invested_total += amount;
     contract.share = share;
@@ -75,7 +75,7 @@ export default class Investment extends Shared {
         // 先保护下周房租。分红从罗宾已经持有的营业资金中支付，不凭报价凭空造钱。
         let dividend = Math.max(0, Math.floor((profit * terms.distributionRate * contract.share) / 100));
         if (dividend > 0 && !this.spend(dividend / 100)) dividend = 0;
-        if (dividend > 0) this.vanillaPlus!.finance.creditBankPennies(dividend);
+        if (dividend > 0) this.finance!.creditBankPennies(dividend);
         contract.dividends_total += dividend;
         contract.report = { day: current, event: closed ? 'closed' : loss ? 'loss' : busy ? 'busy' : 'quiet', profit, dividend };
         contract.next_settlement = current + 7;
@@ -84,7 +84,7 @@ export default class Investment extends Shared {
         const amount = this.exitValue;
         // 回购需营业资金足够。不自动替罗宾贷款，也不动用房租保底。
         if (this.robinAvailable && this.spend(amount / 100)) {
-          this.vanillaPlus!.finance.creditBankPennies(amount);
+          this.finance!.creditBankPennies(amount);
           contract.returned_total += amount;
           contract.share = 0;
           contract.exit_day = -1;

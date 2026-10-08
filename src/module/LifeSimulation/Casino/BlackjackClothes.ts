@@ -139,7 +139,7 @@ export default class BlackjackClothes {
     const group = clothingGroups(clothes)[0];
     if (!group) return false;
     const slot = group.find(part => !clothes[part]?.outfitSecondary || !group.includes(clothes[part]!.outfitSecondary![0])) ?? group[0];
-    this.core.get('VanillaPlus')?.realEstate.openWardrobe();
+    this.core.get('Finance')?.realEstate.openWardrobe();
     // 每轮仅存一件，清掉原版批量脱衣宏留下的临时跳过标记。
     this.core.SugarCube.Wikifier.wikifyEval(`<<unset _storeItemSkip>><<generalUndress '${storeLocation}' '${slot}'>><<exposure>>`);
     const removed = group.some(part => V.worn[part]?.name === 'naked');
@@ -149,7 +149,7 @@ export default class BlackjackClothes {
 
   public restore(): void {
     if (!this.getState()?.player_stored) return;
-    this.core.get('VanillaPlus')?.realEstate.openWardrobe();
+    this.core.get('Finance')?.realEstate.openWardrobe();
     this.core.SugarCube.Wikifier.wikifyEval(`<<storeon '${storeLocation}'>><<exposure>>`);
   }
 

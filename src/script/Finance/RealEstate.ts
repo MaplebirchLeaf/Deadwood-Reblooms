@@ -1,7 +1,7 @@
-// ./src/script/VanillaPlus/RealEstate.ts
+// ./src/script/Finance/RealEstate.ts
 
 export default function RealEstate(maplebirch: typeof window.maplebirch): void {
-  const realEstate = maplebirch.get('VanillaPlus')!.realEstate;
+  const realEstate = maplebirch.get('Finance')!.realEstate;
   for (const property of realEstate.properties) {
     maplebirch.tool.patch.location.configure(
       `deadwood_home_${property.id}`,
@@ -27,7 +27,7 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.patch.location.configure('deadwood_home', {
     // current 沿用产权、出租和冻结判断，并在切换存档后读取当前房屋。
     customMapping: () => {
-      const property = V.VanillaPlus?.real_estate ? realEstate.current : undefined;
+      const property = V.Finance?.real_estate ? realEstate.current : undefined;
       return property ? `deadwood_home_${property.id}` : 'home';
     }
   });
@@ -77,7 +77,7 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
         {
           src: '<<elseif _robin_location is "sleep">>',
           applybefore:
-            '<<elseif _robin_location is "sleep" and maplebirch.get("VanillaPlus").realEstate.residenceOf("Robin")>>\n' +
+            '<<elseif _robin_location is "sleep" and maplebirch.get("Finance").realEstate.residenceOf("Robin")>>\n' +
             '\t<<lanSwitch "Robin\'s room is empty. A note says Robin has gone home to you." "罗宾的房间空着。门上的纸条写着，罗宾今晚回你们的住处。">><br><br>\n' +
             '\t<<main_hall_icon>><<link [[Main hall (0:01)|Orphanage]]>><<pass 1>><</link>><br>\n',
           expected: 1
@@ -87,7 +87,7 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
         {
           src: '<<elseif Time.dayState is "dawn">>',
           applybefore:
-            '<<elseif maplebirch.get("VanillaPlus").realEstate.residenceOf("Whitney")>>\n' +
+            '<<elseif maplebirch.get("Finance").realEstate.residenceOf("Whitney")>>\n' +
             '\t<<lanSwitch "Whitney has moved in with you. The flat is quiet behind the door." "惠特尼已经搬去与你同住。房门后静悄悄的。">><br><br>\n' +
             '\t<<getouticon>><<link [[Leave (0:02)|Barb Street]]>><<pass 2>><</link>><br>\n',
           expected: 1

@@ -1,8 +1,8 @@
-// ./src/module/VanillaPlus/RealEstate.ts
+// ./src/module/Finance/RealEstate.ts
 
 import paperhangings from './Paperhangings.json';
 import PropertyCatalog, { type Property, type ResidentProfile } from './PropertyCatalog';
-import type Finance from './Finance';
+import type Finance from '../Finance';
 import Mortgage, { type MortgageState } from './Mortgage';
 import rentalTerms from '../../assets/finance/rentals.json';
 
@@ -62,7 +62,7 @@ interface AuctionRecord {
   day: number;
 }
 
-export class RealEstate {
+class RealEstate {
   public static readonly defaults: RealEstateState = {
     owned: {},
     visiting: null,
@@ -114,8 +114,6 @@ export class RealEstate {
       void this.properties;
       void this.residentProfiles;
     });
-    // 读档只恢复 V 中的房产和结算游标，经济结算只由游戏时间跨日触发。
-    // 优先于 Finance 收取其他贷款和信用卡款项，使当天租金能先入账。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-property-management', {
       action: () => this.settleDays(),
       exact: true,
@@ -124,12 +122,10 @@ export class RealEstate {
   }
 
   private get state(): RealEstateState {
-    // 每次从当前 V 取房产状态，切换存档后不会继续操作上一份存档的对象。
-    return V.VanillaPlus.real_estate as RealEstateState;
+    return V.Finance.real_estate as RealEstateState;
   }
 
   public get current(): Property | undefined {
-    // visiting 仅记录当前进入哪处房产，不决定其是否为住所。
     const property = this.properties.find(item => item.id === this.state.visiting);
     return property && this.owns(property.id) && !this.managementFor(property.id).rented && !this.isFrozen(property.id) ? property : undefined;
   }
@@ -592,7 +588,7 @@ export class RealEstate {
   public employManager(enabled: boolean): boolean {
     const npc = V.per_npc?.deadwood_property_manager;
     if (this.core.passage.title !== 'Deadwood Reblooms Property Manager' || !npc) return false;
-    if (enabled && (!this.properties.some(property => this.owns(property.id)) || !V.VanillaPlus.finance.bank.debit_card)) return false;
+    if (enabled && (!this.properties.some(property => this.owns(property.id)) || !V.Finance.bank.debit_card)) return false;
     this.settleDays();
     npc.property_employed = enabled;
     if (!enabled) for (const property of this.properties) this.managementFor(property.id).managed = false;

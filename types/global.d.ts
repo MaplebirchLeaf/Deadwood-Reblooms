@@ -1,5 +1,5 @@
 import type { PlayingCard } from '../src/module/LifeSimulation/Casino/Blackjack';
-import type { Security } from '../src/module/VanillaPlus/Finance';
+import type { Security, FinanceState } from '../src/module/Finance';
 import type { BirdTowerState } from '../src/module/constants';
 
 declare module 'twine-sugarcube' {
@@ -16,6 +16,7 @@ declare module 'twine-sugarcube/userdata' {
   interface SugarCubeStoryVariables {
     /** 鹰塔模块的存档字段。 */
     BirdTower: BirdTowerState;
+    Finance: FinanceState;
   }
 }
 

@@ -1,12 +1,12 @@
 :: Deadwood Reblooms Property Night Wake []
-<<set _property to maplebirch.get("VanillaPlus").realEstate.current>>
-<<set _partner to maplebirch.get("VanillaPlus").realEstate.currentCompanion>>
-<<if !_property || !_partner || !maplebirch.get("VanillaPlus").realEstate.residentsHome(_property.id).some(resident => resident.id === _partner.id)>>
+<<set _property to maplebirch.get("Finance").realEstate.current>>
+<<set _partner to maplebirch.get("Finance").realEstate.currentCompanion>>
+<<if !_property || !_partner || !maplebirch.get("Finance").realEstate.residentsHome(_property.id).some(resident => resident.id === _partner.id)>>
 	<<lanSwitch 'The other side of the bed is empty. You pull the covers close.' '床的另一侧空了。你把被子拉回身上。'>>
 	<br><br>
-	<<getouticon>><<lanLink '起床' 'Deadwood Reblooms Property Bedroom'>><<set $sleephour to 0>><<deadwood-reblooms-property-clothes-on>><</lanLink>>
+	<<getouticon>><<lanLink ["Get up", "起床"] 'Deadwood Reblooms Property Bedroom'>><<set $sleephour to 0>><<deadwood-reblooms-property-clothes-on>><</lanLink>>
 <<else>>
-	<<run maplebirch.get("VanillaPlus").realEstate.enter()>>
+	<<run maplebirch.get("Finance").realEstate.enter()>>
 	<<npc _partner.id>><<person1>><<run statusCheck(_partner.id)>>
 	<<language>>
 		<<option 'EN'>>
@@ -71,30 +71,30 @@
 			<</switch>>
 	<</language>>
 	<br><br>
-	<<if maplebirch.get("VanillaPlus").realEstate.canIntimate(_partner.id, _property.id)>>
+	<<if maplebirch.get("Finance").realEstate.canIntimate(_partner.id, _property.id)>>
 		<<loveicon>>
 		<<lanLink ['Kiss your lover beside you', '亲吻身边的恋人'] 'Deadwood Reblooms Property Intimacy'>>
 			<<set $sleephour to 0>><<set $sexstart to 1>>
 		<</lanLink>><<promiscuous1>><<kissvirginitywarning>><<NPCvirginitywarning _partner.id 'kiss'>><br>
 	<</if>>
 	<<bedicon>>
-	<<lanLink '继续睡觉' 'Deadwood Reblooms Property Sleep'>><</lanLink>><br>
+	<<lanLink ["Go back to sleep", "继续睡觉"] 'Deadwood Reblooms Property Sleep'>><</lanLink>><br>
 	<<getouticon>>
-	<<lanLink '起床' 'Deadwood Reblooms Property Bedroom'>>
+	<<lanLink ["Get up", "起床"] 'Deadwood Reblooms Property Bedroom'>>
 		<<set $sleephour to 0>><<deadwood-reblooms-property-clothes-on>>
 	<</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Property Intimacy []
 <!-- 入口已从当晚在家的同住者中选人。战斗回合跨过起床时间后，继续使用当前存档里选中的同一人。 -->
-<<set _property to maplebirch.get("VanillaPlus").realEstate.current>>
-<<set _partner to maplebirch.get("VanillaPlus").realEstate.currentCompanion>>
-<<if !_property || !_partner || !maplebirch.get("VanillaPlus").realEstate.owns(_property.id) || maplebirch.get("VanillaPlus").realEstate.managementFor(_property.id).rented
-  || ($sexstart is 1 && !maplebirch.get("VanillaPlus").realEstate.canIntimate(_partner.id, _property.id))>>
+<<set _property to maplebirch.get("Finance").realEstate.current>>
+<<set _partner to maplebirch.get("Finance").realEstate.currentCompanion>>
+<<if !_property || !_partner || !maplebirch.get("Finance").realEstate.owns(_property.id) || maplebirch.get("Finance").realEstate.managementFor(_property.id).rented
+  || ($sexstart is 1 && !maplebirch.get("Finance").realEstate.canIntimate(_partner.id, _property.id))>>
 	<<set $sexstart to 0>>
-	<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+	<<lanLink ["Return to the bedroom", "返回卧室"] 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
 <<else>>
-	<<run maplebirch.get("VanillaPlus").realEstate.enter()>>
+	<<run maplebirch.get("Finance").realEstate.enter()>>
 	<!-- 悉尼的临时状态每回合重建，沿用原版 Sydney Shopping Sex 的战斗标记。 -->
 	<<if _partner.id is 'Sydney'>>
 	  <<run statusCheck('Sydney')>><<set $corruptionEvent to 1>>
@@ -228,8 +228,8 @@
 <</if>>
 
 :: Deadwood Reblooms Property Intimacy Finish []
-<<set _partner to maplebirch.get("VanillaPlus").realEstate.currentCompanion>>
-<<run maplebirch.get("VanillaPlus").realEstate.enter()>><<effects>>
+<<set _partner to maplebirch.get("Finance").realEstate.currentCompanion>>
+<<run maplebirch.get("Finance").realEstate.enter()>><<effects>>
 <<if _partner and $combat is 1>>
 	<<person1>>
 	<<if _partner.id is 'Sydney' and $enemyarousal gte $enemyarousalmax>>
@@ -298,4 +298,4 @@
 <<if setup.clothingLayer.all.some(slot => $store[slot]?.some(item => item.location === 'Deadwood Property Bed'))>>
 	<<deadwood-reblooms-property-clothes-on>>
 <</if>>
-<<lanLink '返回卧室' 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+<<lanLink ["Return to the bedroom", "返回卧室"] 'Deadwood Reblooms Property Bedroom'>><</lanLink>>

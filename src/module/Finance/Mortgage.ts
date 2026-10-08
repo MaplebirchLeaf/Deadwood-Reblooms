@@ -1,7 +1,7 @@
-// ./src/module/VanillaPlus/Mortgage.ts
+// ./src/module/Finance/Mortgage.ts
 
-import type Finance from './Finance';
-import type { FinanceResult } from './Finance';
+import type Finance from '../Finance';
+import type { FinanceResult } from '../Finance';
 
 const LOAN_TERMS = [
   { days: 7, weekly_rate: 0.002 },
@@ -44,7 +44,7 @@ export interface MortgageState {
   outstanding: number;
   arrears: number;
   weekly_payment: number;
-  weekly_rate?: number;
+  weekly_rate: number;
   next_payment_day: number;
   last_interest_day: number;
   last_day: number;
@@ -67,11 +67,11 @@ class Mortgage {
   ) {}
 
   public get current(): MortgageState | null {
-    return V.VanillaPlus.real_estate.mortgage as MortgageState | null;
+    return V.Finance.real_estate.mortgage as MortgageState | null;
   }
 
   private set current(value: MortgageState | null) {
-    V.VanillaPlus.real_estate.mortgage = value;
+    V.Finance.real_estate.mortgage = value;
   }
 
   public rate(days = this.terms.term_days): number {
@@ -97,7 +97,7 @@ class Mortgage {
   }
 
   public canStart(price: number, useCredit = false, days = this.terms.term_days): boolean {
-    const bank = V.VanillaPlus.finance.bank;
+    const bank = V.Finance.bank;
     if (
       !Number.isSafeInteger(price) ||
       price <= 0 ||
@@ -107,7 +107,7 @@ class Mortgage {
       !bank.debit_card ||
       bank.loan_missed_payments > 0 ||
       bank.credit_missed_payments > 0 ||
-      V.VanillaPlus.finance.collection.amount > 0
+      V.Finance.collection.amount > 0
     )
       return false;
     const { deposit, fee, reserve } = this.purchaseCosts(price, days);
@@ -118,7 +118,7 @@ class Mortgage {
 
   public start(property_id: string, price: number, useCredit = false, days = this.terms.term_days): MortgageResult {
     if (this.current) return 'mortgage-outstanding';
-    const bank = V.VanillaPlus.finance.bank;
+    const bank = V.Finance.bank;
     if (!bank.opened) return 'bank-required';
     if (bank.loan_missed_payments > 0 || bank.credit_missed_payments > 0) return 'mortgage-ineligible';
     if (!this.canStart(price, useCredit, days)) return 'mortgage-ineligible';
@@ -157,9 +157,8 @@ class Mortgage {
   }
 
   public borrowAgainst(property_id: string, amount: number, maximum: number, days = this.terms.term_days): MortgageResult {
-    const bank = V.VanillaPlus.finance.bank;
-    if (!bank.opened || !bank.debit_card || this.current || bank.loan_missed_payments > 0 || bank.credit_missed_payments > 0 || V.VanillaPlus.finance.collection.amount > 0)
-      return 'mortgage-ineligible';
+    const bank = V.Finance.bank;
+    if (!bank.opened || !bank.debit_card || this.current || bank.loan_missed_payments > 0 || bank.credit_missed_payments > 0 || V.Finance.collection.amount > 0) return 'mortgage-ineligible';
     if (!Number.isSafeInteger(amount) || amount <= 0 || amount > maximum || !this.terms.available_terms.includes(days)) return 'invalid-amount';
     const { net, weekly_payment } = this.cashQuote(amount, days);
     if (bank.balance + net < weekly_payment) return 'mortgage-ineligible';
@@ -277,7 +276,7 @@ class Mortgage {
   private accrueInterest(loan: MortgageState, day: number): void {
     const elapsedDays = Math.max(0, day - loan.last_interest_day);
     if (elapsedDays === 0) return;
-    loan.outstanding += Math.ceil((loan.outstanding * (loan.weekly_rate ?? 0.0035) * elapsedDays) / 7);
+    loan.outstanding += Math.ceil((loan.outstanding * loan.weekly_rate * elapsedDays) / 7);
     loan.last_interest_day = day;
   }
 

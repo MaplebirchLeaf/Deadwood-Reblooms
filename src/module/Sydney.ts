@@ -21,7 +21,7 @@ class Sydney extends Module {
   /** 门前叙事与窗户灯光共用原版日程和现有同住判定。 */
   public get estatePresence(): { sydney: boolean; sirris: boolean } {
     window.sydneySchedule?.();
-    const housing = this.core.get('VanillaPlus')?.realEstate;
+    const housing = this.core.get('Finance')?.realEstate;
     const property = housing?.residenceOf('Sydney');
     return {
       sydney: T.sydney_location === 'home' && this.available && !V.replayScene && (!property || !housing!.residentsHome(property.id).some(resident => resident.id === 'Sydney')),

@@ -41,7 +41,8 @@ The current version is **1.4.4**. This patch fixes an error when retrieving stor
 | `LifeSimulation`                    | Attendance pass, prefect, student president, school reputation, gym, and card tables |
 | `Orchard`                           | Temple and farm orchards, tree care, gradual clearing, and hired help                |
 | `BirdTower`                         | Bird Tower expansion: hawk chick growth, feeding, personality, and hunts             |
-| `VanillaPlus`                       | Stat breakthroughs, homes, financial-centre work, banking, and stocks                |
+| `Finance`                           | Financial centre, banking, securities, loans, property, and property management      |
+| `VanillaPlus`                       | Stat breakthroughs, traits, and hospital services                                    |
 | `CelestialAnomalies`                | Solar eclipses, meteor showers, and changing sky and weather visuals                 |
 | `MoreTransformations`               | Horse, fish, and raven transformations, locations, equipment, and traits             |
 | `LongerCombat`                      | Longer encounters, staged dialogue, and fluid displays                               |

@@ -1,4 +1,4 @@
-// ./src/module/VanillaPlus/PropertyCatalog.ts
+// ./src/module/Finance/PropertyCatalog.ts
 
 import propertiesSource from '@/assets/finance/properties.yaml';
 import residentsSource from '@/assets/finance/residents.yaml';

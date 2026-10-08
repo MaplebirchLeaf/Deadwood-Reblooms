@@ -14,7 +14,7 @@ export default function Tips(core: typeof maplebirch): void {
     ['A familiar face may be elsewhere. Check the time and their usual routine before looking for them.', '熟悉的人也有自己的安排。找不到对方时，先看看时间与日程。']
   );
 
-  if (core.get('VanillaPlus'))
+  if (core.get('Finance'))
     add(
       'general',
       ['You can open a bank account at the financial centre on the High Street.', '商业街的金融中心可以办理银行账户。'],
@@ -26,9 +26,10 @@ export default function Tips(core: typeof maplebirch): void {
       ['A home needs suitable beds and enough room before you can invite someone to move in.', '邀请恋人入住前，住宅需要合适的床位和足够的空间。'],
       ['Living together does not erase old grudges. Not everyone will welcome another housemate.', '住在同一屋檐下不会抹去旧怨。不是所有人都愿意再多一位同住者。'],
       ['A housemate can still leave for work, school or the temple. Their belongings do not mean they are home.', '同住者仍会去工作、上学或神殿。物品留在房里，不代表人也在家。'],
-      ['Look outside from a high home to find its gliding options. Suitable wings are still required.', '从高处住宅查看外面，可以寻找滑翔选项。你仍需要能滑翔的翅膀。'],
-      ['Reaching a stat limit alone may not unlock a breakthrough. Your experiences matter too.', '属性达到上限，不一定就能突破。你经历过什么也很重要。']
+      ['Look outside from a high home to find its gliding options. Suitable wings are still required.', '从高处住宅查看外面，可以寻找滑翔选项。你仍需要能滑翔的翅膀。']
     );
+
+  if (core.get('VanillaPlus')) add('general', ['Reaching a stat limit alone may not unlock a breakthrough. Your experiences matter too.', '属性达到上限，不一定就能突破。你经历过什么也很重要。']);
 
   if (core.get('LifeSimulation'))
     add(

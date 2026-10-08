@@ -292,12 +292,12 @@
 
 <<widget 'deadwood-reblooms-deviancy-mirror-enter-link'>>
   <<set $_mirror to _args[0]>>
-  <<if maplebirch.get("VanillaPlus").deviancy.mirrorOpen and maplebirch.get("VanillaPlus").deviancy.discovered($_mirror, $_mirror is 'property' ? maplebirch.get("VanillaPlus").realEstate.current?.id : undefined)>>
+  <<if maplebirch.get("VanillaPlus").deviancy.mirrorOpen and maplebirch.get("VanillaPlus").deviancy.discovered($_mirror, $_mirror is 'property' ? maplebirch.get("Finance").realEstate.current?.id : undefined)>>
     <br>
     <<mirroricon 'blood'>><<lanLink ['Step through the eerie mirror', '穿过诡异镜面'] 'Deadwood Reblooms Deviancy Mirror Enter' >>
-      <<set $VanillaPlus.deviancy.mirror to $_mirror is 'property' ? 'property:' + maplebirch.get("VanillaPlus").realEstate.current.id : $_mirror>>
+      <<set $VanillaPlus.deviancy.mirror to $_mirror is 'property' ? 'property:' + maplebirch.get("Finance").realEstate.current.id : $_mirror>>
       <<if $_mirror is 'property'>>
-        <<set $VanillaPlus.deviancy.mirror_property to maplebirch.get("VanillaPlus").realEstate.current.id>>
+        <<set $VanillaPlus.deviancy.mirror_property to maplebirch.get("Finance").realEstate.current.id>>
       <</if>>
       <<run maplebirch.get("VanillaPlus").deviancy.enter()>>
     <</lanLink>>
@@ -319,15 +319,15 @@
     and $KylarExpansion.stay_invited and isLoveInterest('Kylar')
     and C.npc.Kylar.state is 'active'
     and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
-    and (!maplebirch.get('VanillaPlus') or !maplebirch.get("VanillaPlus").realEstate.residenceOf('Kylar'))>>
+    and (!maplebirch.get('Finance') or !maplebirch.get("Finance").realEstate.residenceOf('Kylar'))>>
   <<if _mirrorLocations.home and maplebirch.get("VanillaPlus").deviancy.discovered('home')>>
     <<run _mirrorTargets.push({..._mirrorLocations.home, EN: 'your bedroom mirror', CN: '卧室的镜子'})>>
   <</if>>
-  <<for _property range maplebirch.get("VanillaPlus").realEstate.properties>>
+  <<for _property range (maplebirch.get("Finance")?.realEstate.properties ?? [])>>
     <<set _coordinates to _mirrorLocations['property:' + _property.id]>>
     <<if _coordinates and maplebirch.get("VanillaPlus").deviancy.discovered('property', _property.id)
-      and maplebirch.get("VanillaPlus").realEstate.owns(_property.id)
-      and !maplebirch.get("VanillaPlus").realEstate.managementFor(_property.id).rented>>
+      and maplebirch.get("Finance").realEstate.owns(_property.id)
+      and !maplebirch.get("Finance").realEstate.managementFor(_property.id).rented>>
       <<run _mirrorTargets.push({
         north: _coordinates.north,
         east: _coordinates.east,
@@ -388,12 +388,12 @@
       <<mirroricon 'blood'>><<lanLink ['Climb through the bedroom mirror', '从卧室镜子爬出去'] 'Deadwood Reblooms Deviancy Mirror Home'>><</lanLink>>
       <br>
     <</if>>
-    <<for _property range maplebirch.get("VanillaPlus").realEstate.properties>>
+    <<for _property range (maplebirch.get("Finance")?.realEstate.properties ?? [])>>
       <<capture _property>>
         <<set _mirrorCoordinates to _mirrorLocations['property:' + _property.id]>>
         <<if _mirrorCoordinates and maplebirch.get("VanillaPlus").deviancy.discovered('property', _property.id)
-          and maplebirch.get("VanillaPlus").realEstate.owns(_property.id)
-          and !maplebirch.get("VanillaPlus").realEstate.managementFor(_property.id).rented>>
+          and maplebirch.get("Finance").realEstate.owns(_property.id)
+          and !maplebirch.get("Finance").realEstate.managementFor(_property.id).rented>>
           <<if $tentnorth is _mirrorCoordinates.north and $tenteast is _mirrorCoordinates.east>>
             <<language>>
               <<option 'EN'>>

@@ -125,7 +125,7 @@ export default class Medicine {
   public buy(id: MedicineId): boolean {
     const item = MEDICINES.find(item => item.id === id);
     if (!item || V.location !== 'hospital' || V.daily.pharm.closed) return false;
-    const finance = this.core.get('VanillaPlus')?.finance;
+    const finance = this.core.get('Finance');
     if (!(finance ? finance.canPay(item.price, 'shopping') : V.money >= item.price)) return false;
     // 复用原版 money 宏和模组付款路由，所有结算金额均为便士。
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${item.price} 'shopping'>>`);

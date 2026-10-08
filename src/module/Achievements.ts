@@ -2,7 +2,7 @@
 
 import { POOL_PARTY_COMPANIONS } from './constants/life-simulation';
 
-type AchievementModule = 'BirdTower' | 'LifeSimulation' | 'MoreTransformations' | 'Robin' | 'Sydney' | 'VanillaPlus' | 'Whitney';
+type AchievementModule = 'Finance' | 'BirdTower' | 'LifeSimulation' | 'MoreTransformations' | 'Robin' | 'Sydney' | 'VanillaPlus' | 'Whitney';
 
 interface AchievementDefinition {
   module: AchievementModule;
@@ -218,7 +218,7 @@ class Achievements {
       filter: ['All', 'Stats']
     },
     {
-      module: 'VanillaPlus',
+      module: 'Finance',
       id: 'Own Keys',
       title: 'deadwood-reblooms:feats:Own Keys:name',
       description: 'deadwood-reblooms:feats:Own Keys:text',
@@ -226,7 +226,7 @@ class Achievements {
       filter: ['All', 'General']
     },
     {
-      module: 'VanillaPlus',
+      module: 'Finance',
       id: 'Feels Like Home',
       title: 'deadwood-reblooms:feats:Feels Like Home:name',
       description: 'deadwood-reblooms:feats:Feels Like Home:text',
@@ -234,7 +234,7 @@ class Achievements {
       filter: ['All', 'General']
     },
     {
-      module: 'VanillaPlus',
+      module: 'Finance',
       id: 'Leave a Light On',
       title: 'deadwood-reblooms:feats:Leave a Light On:name',
       description: 'deadwood-reblooms:feats:Leave a Light On:text',
@@ -242,7 +242,7 @@ class Achievements {
       filter: ['All', 'Social']
     },
     {
-      module: 'VanillaPlus',
+      module: 'Finance',
       id: 'Ride the Wind',
       title: 'deadwood-reblooms:feats:Ride the Wind:name',
       description: 'deadwood-reblooms:feats:Ride the Wind:text',
@@ -370,11 +370,16 @@ class Achievements {
           cond: () => V.feats?.currentSave['Every Limit Broken'] === undefined && V.VanillaPlus != null && V.VanillaPlus.traits.incorrigible
         });
 
+        break;
+      }
+      case 'Finance': {
         maplebirch.dynamic.regStateEvent('append', 'property-keys-feat', {
           output: 'earnFeat "Own Keys"',
           extra: { passage: ['Deadwood Reblooms Property Office', 'Deadwood Reblooms Property Home'] },
           cond: () =>
-            V.feats?.currentSave['Own Keys'] === undefined && maplebirch.get('VanillaPlus')!.realEstate.properties.some(property => maplebirch.get('VanillaPlus')!.realEstate.owns(property.id))
+            V.feats?.currentSave['Own Keys'] === undefined &&
+            V.Finance?.real_estate != null &&
+            maplebirch.get('Finance')!.realEstate.properties.some(property => maplebirch.get('Finance')!.realEstate.owns(property.id))
         });
 
         maplebirch.dynamic.regStateEvent('append', 'property-furniture-feat', {
@@ -382,7 +387,8 @@ class Achievements {
           extra: { passage: ['Deadwood Reblooms Property Furniture Catalogue', 'Deadwood Reblooms Property Home'] },
           cond: () =>
             V.feats?.currentSave['Feels Like Home'] === undefined &&
-            maplebirch.get('VanillaPlus')!.realEstate.properties.some(property => maplebirch.get('VanillaPlus')!.realEstate.furnished(property.id))
+            V.Finance?.real_estate != null &&
+            maplebirch.get('Finance')!.realEstate.properties.some(property => maplebirch.get('Finance')!.realEstate.furnished(property.id))
         });
         break;
       }

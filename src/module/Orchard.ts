@@ -357,7 +357,7 @@ class Orchard extends Module {
   }
 
   private recordSale(type: OrchardFruit, amount: number, income: number, source: 'farm' | 'shop' | 'market' | 'haul', day = Time.days): void {
-    if (source === 'haul') this.core.get('VanillaPlus')!.finance.creditBankPennies(income);
+    if (source === 'haul') this.core.get('Finance')!.creditBankPennies(income);
     else this.core.SugarCube.Wikifier.wikifyEval(`<<money ${income} '${source}'>>`);
     this.state.sales_income += income;
     this.state.sales.push({ day, source, type, amount, income });
@@ -555,7 +555,7 @@ class Orchard extends Module {
   public arrangeWorker(task: 'auto_renew' | 'haul', enabled: boolean): void {
     this.advance();
     if (!this.state.worker.hired || !this.available('farm')) return;
-    if (enabled && (!this.core.get('VanillaPlus') || !V.VanillaPlus?.finance.bank.debit_card)) return;
+    if (enabled && (!this.core.get('Finance') || !V.Finance?.bank.debit_card)) return;
     if (task === 'haul' && enabled && (this.core.passage.title !== 'Deadwood Reblooms Orchard Delivery' || !this.carrier)) return;
     this.state.worker[task] = enabled;
   }
@@ -686,9 +686,9 @@ class Orchard extends Module {
     worker.last_shift = day;
     if (morning < worker.paid_from || !V.per_npc?.deadwood_orchard_worker || !this.available('farm') || V.farm_assault) return;
     const npc = V.per_npc.deadwood_orchard_worker;
-    const finance = this.core.get('VanillaPlus')?.finance;
+    const finance = this.core.get('Finance');
     if (morning >= worker.paid_until) {
-      if (!worker.auto_renew || !finance || !V.VanillaPlus.finance.bank.debit_card || finance.payFromBankPennies(this.workerWage) !== 'ok') {
+      if (!worker.auto_renew || !finance || !V.Finance.bank.debit_card || finance.payFromBankPennies(this.workerWage) !== 'ok') {
         npc.orchard_report = {
           day,
           watered: 0,
@@ -738,7 +738,7 @@ class Orchard extends Module {
         for (const [type, amount] of Object.entries(receipt?.kept ?? {})) report.kept[type as OrchardFruit] = (report.kept[type as OrchardFruit] ?? 0) + amount!;
       }
     });
-    if (worker.haul && this.carrier && finance && V.VanillaPlus.finance.bank.debit_card) {
+    if (worker.haul && this.carrier && finance && V.Finance.bank.debit_card) {
       const gameDay = Math.floor(Time.days) - (Math.floor(Time.date.timeStamp / 86400) - day);
       let remaining = Math.max(0, trade.bulkDailyLimit - (this.state.sold_day === gameDay ? this.state.sold_today : 0));
       const cargo = this.stock

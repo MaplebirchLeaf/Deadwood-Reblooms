@@ -306,18 +306,18 @@ class Casino {
   }
 
   private get finance() {
-    return this.core.get('VanillaPlus')?.finance;
+    return this.core.get('Finance');
   }
 
   public get bankAvailable(): boolean {
-    const bank = this.finance ? V.VanillaPlus.finance.bank : undefined;
+    const bank = this.finance ? V.Finance.bank : undefined;
     return !!bank?.opened && bank.debit_card;
   }
 
   public canExchange(amount: number, method: 'cash' | 'bank' = 'cash'): boolean {
     if (!this.available || !this.options.exchanges.includes(amount) || !Number.isSafeInteger(amount) || amount <= 0 || !Number.isSafeInteger(this.chips + amount)) return false;
     if (method === 'cash') return V.money >= amount;
-    return method === 'bank' && this.bankAvailable && V.VanillaPlus.finance.bank.balance >= amount;
+    return method === 'bank' && this.bankAvailable && V.Finance.bank.balance >= amount;
   }
 
   /** 现金仍由 money 宏扣除，借记卡复用金融模块的便士接口。 */
