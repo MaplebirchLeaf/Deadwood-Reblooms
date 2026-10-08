@@ -312,7 +312,7 @@ export default class OrchardView {
       plant: species[this.orchard.state.seed].images.seedling,
       water: 'img/misc/icon/watering-can.gif',
       fertiliser: 'img/misc/icon/fertiliser.png',
-      harvest: 'img/misc/icon/orchard-harvest.png',
+      harvest: 'img/misc/icon/orchard/harvest.png',
       shovel: 'img/misc/icon/dig.png'
     };
     return image(paths[tool]);

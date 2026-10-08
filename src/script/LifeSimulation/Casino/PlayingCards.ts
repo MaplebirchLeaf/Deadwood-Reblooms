@@ -13,7 +13,7 @@ export function cardImage(card: PlayingCard | null, hidden: boolean) {
   const face = card && !hidden;
   image.alt = face ? lanSwitch(`${card.name} of ${card.suits}`, `${suits[card.suits] ?? card.suits}${card.name}`) : lanSwitch('Face-down card', '背面朝上的牌');
   const file = face ? `${card.suits.toLowerCase()}-${card.name.toLowerCase()}` : 'back';
-  const ready = Promise.resolve(loadImage(`img/misc/icon/blackjack/${file}.png`)).then(source => {
+  const ready = Promise.resolve(loadImage(`img/misc/icon/casino/cards/${file}.png`)).then(source => {
     if (typeof source !== 'string') throw new Error(`Card image missing: ${file}`);
     image.src = source;
   });

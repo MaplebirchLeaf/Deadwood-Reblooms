@@ -1,7 +1,7 @@
 :: Deadwood Reblooms Life Simulation Casino Widgets [widget]
 <<widget 'deadwood-casino-street'>>
 	<<if $exposed lte 0 and !$possessed>>
-		<<icon 'casino.png'>>
+		<<icon 'casino/casino.png'>>
 		<<if maplebirch.get('LifeSimulation').casino.open>>
 			<<lanLink ['Gambling room (0:02)', '赌馆 (0:02)'] 'Deadwood Reblooms Life Simulation Casino'>><<pass 2>><</lanLink>>
 		<<else>><span class='blue'><<language>>
@@ -14,7 +14,7 @@
 <</widget>>
 
 <<widget 'deadwood-casino-balance'>>
-	<<icon 'casino-chips.png'>><<language>>
+	<<icon 'casino/chips.png'>><<language>>
 		<<option 'EN'>>
 			Chips: <span class='gold'>£<<print Number((maplebirch.get('LifeSimulation').casino.chips / 100).toFixed(2))>></span>.
 		<<option 'CN'>>
@@ -70,7 +70,7 @@
 	</label><br>
 	<<if $_casino.available>>
 		<label><<lanSwitch 'Amount: ' '兑换金额：'>><<listbox '_cashier.amount' autoselect>><<optionsfrom _cashier.amounts>><</listbox>></label><br><br>
-		<<icon 'casino-exchange.png'>><<lanLink ['Exchange for chips', '兑换筹码']>>
+		<<icon 'casino/exchange.png'>><<lanLink ['Exchange for chips', '兑换筹码']>>
 			<<if maplebirch.get('LifeSimulation').casino.canExchange(_cashier.amount, _cashier.method)>>
 				<<deadwood-casino-exchange _cashier.amount _cashier.method>>
 				<<replace '#deadwood-casino-cashier'>><<deadwood-casino-cashier>><</replace>>
@@ -81,7 +81,7 @@
 		<</lanLink>><br>
 	<<else>><br><</if>>
 	<<if $_casino.chips gt 0 or $_casino.holdem.state.joined>>
-		<<icon 'casino-redeem.png'>><<lanLink ['Redeem all chips', '兑回全部筹码']>>
+		<<icon 'casino/redeem.png'>><<lanLink ['Redeem all chips', '兑回全部筹码']>>
 			<<deadwood-casino-cashout _cashier.method>>
 			<<replace '#deadwood-casino-cashier'>><<deadwood-casino-cashier>><</replace>>
 			<<replace '#deadwood-casino-cashier-result'>><span class='green'><<lanSwitch `_cashier.method === 'bank' ? 'Your chips have been returned to your bank account.' : 'The cashier counts your cash into your hand.'` `_cashier.method === 'bank' ? '筹码已兑回你的银行账户。' : '柜台后的人把兑回的现金点到你手里。'`>></span><</replace>>
@@ -234,18 +234,18 @@
 	<</language>><br><br>
 	<<deadwood-casino-atmosphere>>
 	<<deadwood-casino-balance>>
-	<<icon 'casino-cashier.png'>><<lanLink ['Visit the cashier', '前往筹码柜台'] 'Deadwood Reblooms Casino Cashier'>><</lanLink>><br><br>
-	<<icon 'poker-chips.png'>><<lanLink ["Texas hold'em table", '德州扑克牌桌'] 'Deadwood Reblooms Life Simulation Holdem'>><</lanLink>><br>
-	<<icon 'blackjack.png'>><<lanLink ['Three-card poker table', '炸金花牌桌'] 'Deadwood Reblooms Life Simulation Three Card'>><</lanLink>><br>
-	<<icon 'blackjack.png'>><<lanLink ['Blackjack table', '二十一点牌桌'] 'Deadwood Reblooms Life Simulation Blackjack'>>
+	<<icon 'casino/cashier.png'>><<lanLink ['Visit the cashier', '前往筹码柜台'] 'Deadwood Reblooms Casino Cashier'>><</lanLink>><br><br>
+	<<icon 'casino/poker-chips.png'>><<lanLink ["Texas hold'em table", '德州扑克牌桌'] 'Deadwood Reblooms Life Simulation Holdem'>><</lanLink>><br>
+	<<icon 'casino/three-card-poker.png'>><<lanLink ['Three-card poker table', '炸金花牌桌'] 'Deadwood Reblooms Life Simulation Three Card'>><</lanLink>><br>
+	<<icon 'casino/blackjack.png'>><<lanLink ['Blackjack table', '二十一点牌桌'] 'Deadwood Reblooms Life Simulation Blackjack'>>
 		<<run maplebirch.get('LifeSimulation').casino.blackjack.prepare('casino', null, 'Deadwood Reblooms Life Simulation Casino')>>
 	<</lanLink>><br>
-	<<icon 'slot-machine.png'>><<lanLink ['Slot machine', '老虎机'] 'Deadwood Reblooms Casino Slot Machine'>><</lanLink>><br>
-	<<icon 'dealer.png'>><<lanLink ['Talk to Marlow', '与马洛交谈'] 'Deadwood Reblooms Casino Dealer'>><</lanLink>><br><br>
-	<<icon 'casino-lounge.png'>><<lanLink ['Go to the lounge', '前往休息区'] 'Deadwood Reblooms Casino Lounge'>><</lanLink>><br><br>
+	<<icon 'casino/slot-machine.png'>><<lanLink ['Slot machine', '老虎机'] 'Deadwood Reblooms Casino Slot Machine'>><</lanLink>><br>
+	<<icon 'casino/dealer.png'>><<lanLink ['Talk to Marlow', '与马洛交谈'] 'Deadwood Reblooms Casino Dealer'>><</lanLink>><br><br>
+	<<icon 'casino/lounge.png'>><<lanLink ['Go to the lounge', '前往休息区'] 'Deadwood Reblooms Casino Lounge'>><</lanLink>><br><br>
 <</if>>
 <<if !_casino.available and (_casino.chips gt 0 or _casino.holdem.state.joined)>>
-	<<icon 'casino-cashier.png'>><<lanLink ['Visit the cashier', '前往筹码柜台'] 'Deadwood Reblooms Casino Cashier'>><</lanLink>><br><br>
+	<<icon 'casino/cashier.png'>><<lanLink ['Visit the cashier', '前往筹码柜台'] 'Deadwood Reblooms Casino Cashier'>><</lanLink>><br><br>
 <</if>>
 <<if _casino.chips gt 0 or _casino.holdem.state.joined>>
 	<span class='blue'><<language>>
@@ -290,7 +290,7 @@
 	<<option 'CN'>>
 		牌桌现在无法继续。你仍可收回剩余筹码，再去柜台兑回。
 <</language>></span><br><br><</if>>
-<<icon 'dealer.png'>><<lanLink ['Read the table rules', '查看牌桌规则'] 'Deadwood Reblooms Casino Holdem Rules'>><</lanLink>><br>
+<<icon 'casino/dealer.png'>><<lanLink ['Read the table rules', '查看牌桌规则'] 'Deadwood Reblooms Casino Holdem Rules'>><</lanLink>><br>
 <<getouticon>><<lanLink ['Return to the room', '返回赌馆'] 'Deadwood Reblooms Life Simulation Casino'>><</lanLink>><br>
 <</nobr>>
 
@@ -310,7 +310,7 @@
 	<<option 'CN'>>
 		牌桌现在无法继续。你可以离席，放弃已经投入的筹码。
 <</language>></span><br><br><</if>>
-<<icon 'dealer.png'>><<lanLink ['Read the table rules', '查看牌桌规则'] 'Deadwood Reblooms Casino Three Card Rules'>><</lanLink>><br>
+<<icon 'casino/dealer.png'>><<lanLink ['Read the table rules', '查看牌桌规则'] 'Deadwood Reblooms Casino Three Card Rules'>><</lanLink>><br>
 <<getouticon>><<lanLink ['Leave the table', '离开牌桌'] 'Deadwood Reblooms Life Simulation Casino'>><<run maplebirch.get('LifeSimulation').casino.threeCard.leave()>><</lanLink>><br>
 <</nobr>>
 

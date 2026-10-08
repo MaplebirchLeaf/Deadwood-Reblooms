@@ -291,7 +291,7 @@ export default class Medicine {
     for (const item of MEDICINES) {
       const config = {
         cn_name: item.name[1],
-        icon: `img/misc/icon/pill-${item.id}.png`,
+        icon: `img/misc/icon/medicine/pill-${item.id}.png`,
         description: () => lanSwitch(item.description[0], item.description[1]),
         indicators: () => indicators[item.id].map(([en, cn, colour]) => `<span class="${colour}">${lanSwitch(en, cn)}</span>`),
         warning_label: () =>

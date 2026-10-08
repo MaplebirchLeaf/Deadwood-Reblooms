@@ -36,7 +36,7 @@ export default function SlotMachine(core: typeof maplebirch): void {
     root.append(reels, result, spin);
     spin.className = 'slot-spin';
     spin.disabled = true;
-    const images = Promise.all([...slotSymbols.map(symbol => `img/misc/icon/slots/${symbol.image}.png`), 'img/misc/icon/slots/panel.png'].map(path => loadImage(path)));
+    const images = Promise.all([...slotSymbols.map(symbol => `img/misc/icon/casino/slots/${symbol.image}.png`), 'img/misc/icon/casino/slots/panel.png'].map(path => loadImage(path)));
 
     const startAnimations: (() => Animation)[] = [];
     slots.state.reels.forEach((index, axis) => {
