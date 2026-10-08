@@ -57,6 +57,134 @@
   <</if>>
 <</widget>>
 
+<!-- LinkZone 在原版链接渲染后执行，按目标 Passage 判断检查，不依赖“继续”的译文。 -->
+<<widget 'deadwood-reblooms-sydney-science-inspection-leave'>>
+  <<sydneySchedule>>
+  <<if maplebirch.get('Sydney').available and $sydneyScience is 1 and _sydney_location is 'science' and !$replayScene
+    and document.querySelector('#passage-content .macro-link[data-passage="Penis Inspection"], #passage-content .macro-link[data-passage="Pussy Inspection"], #passage-content .macro-link[data-passage="Breast Inspection"]')>>
+    <<language>>
+      <<option 'EN'>>
+        From the doorway, Sirris calls Sydney. "Come and help me with the books." Sydney gathers <<nnpc_his 'Sydney'>> things,
+        glances back at you, and follows Sirris out. The seat beside you is left empty.
+      <<option 'CN'>>
+        西里斯在门口叫了悉尼一声。“来帮我搬一下课本。”悉尼收好东西，回头看了你一眼，跟着西里斯出去了。你身边的座位空了下来。
+    <</language>>
+    <br><br>
+  <</if>>
+<</widget>>
+
+<!-- 解剖示范沿用原版选项与结算，仅在链接区域追加同桌反应，不替换西里斯和学生的 NPC 槽位。 -->
+<<widget 'deadwood-reblooms-sydney-science-anatomy'>>
+  <<sydneySchedule>>
+  <<if maplebirch.get('Sydney').available and $sydneyScience is 1 and _sydney_location is 'science' and !$replayScene>>
+    <<run statusCheck('Sydney')>>
+    <<if $passage is 'Science Refusal'
+      or ($passage is 'Science Undress' and [1, 2, 5].includes($phase))
+      or ($passage is 'Science Undress Desk' and $phase is 3)
+      or ($passage is 'Science Event3' and (($scienceprogression lt 1 and $delinquency lt 400) or $delinquency lt 10))>>
+      <<language>>
+        <<option 'EN'>>
+          Sydney moves <<nnpc_his 'Sydney'>> books aside as you take your seat.
+          <<if $passage is 'Science Refusal'>>
+            <<if _sydneyStatus.includes('corrupt')>>
+              "They can find someone else to stare at," <<nnpc_he 'Sydney'>> mutters, then opens <<nnpc_his 'Sydney'>> notebook between you.
+            <<elseif _sydneyStatus.includes('pure')>>
+              "Are you all right?" <<nnpc_he 'Sydney'>> whispers. "I wrote down the lesson. You haven't missed much."
+            <<else>>
+              "Here," <<nnpc_he 'Sydney'>> whispers, turning <<nnpc_his 'Sydney'>> notebook towards you. "I've kept up with the notes."
+            <</if>>
+          <<elseif $passage is 'Science Event3'>>
+            "I labelled the diagram while you were up there," <<nnpc_he 'Sydney'>> whispers, showing you the page.
+          <<elseif $passage is 'Science Undress' and $phase is 5>>
+            <<if _sydneyStatus.includes('corrupt') and isLoveInterest('Sydney')>>
+              "You enjoyed that, didn't you?" <<nnpc_he 'Sydney'>> whispers with a grin. "I nearly forgot to take notes."
+            <<else>>
+              Sydney looks down at <<nnpc_his 'Sydney'>> notebook, cheeks still pink. "I think I got everything. The notes, I mean."
+            <</if>>
+          <<else>>
+            <<if _sydneyStatus.includes('corrupt')>>
+              Sydney looks over your face, then glances at the students still watching. "Lesson's over," <<nnpc_he 'Sydney'>> tells them.
+              <<nnpc_He 'Sydney'>> pushes <<nnpc_his 'Sydney'>> notebook towards you. "You can copy mine."
+            <<elseif _sydneyStatus.includes('pure')>>
+              Sydney keeps <<nnpc_his 'Sydney'>> eyes on your face. "I-I took notes," <<nnpc_he 'Sydney'>> whispers. "If you'd like them."
+            <<else>>
+              "You can copy what you missed," Sydney whispers, laying <<nnpc_his 'Sydney'>> notebook between you.
+            <</if>>
+          <</if>>
+        <<option 'CN'>>
+          你回到座位时，悉尼把课本往旁边挪了挪。
+          <<if $passage is 'Science Refusal'>>
+            <<if _sydneyStatus.includes('corrupt')>>
+              “想看就找别人去。”<<nnpc_he 'Sydney'>>小声嘀咕，把笔记本摊在你们中间。
+            <<elseif _sydneyStatus.includes('pure')>>
+              “你还好吗？”<<nnpc_he 'Sydney'>>轻声问，“我记了笔记。你没落下多少。”
+            <<else>>
+              “看这里。”<<nnpc_he 'Sydney'>>压低声音，把笔记本转向你，“我一直在记。”
+            <</if>>
+          <<elseif $passage is 'Science Event3'>>
+            “你在前面的时候，我把图上的标注写好了。”<<nnpc_he 'Sydney'>>轻声说，给你看那一页。
+          <<elseif $passage is 'Science Undress' and $phase is 5>>
+            <<if _sydneyStatus.includes('corrupt') and isLoveInterest('Sydney')>>
+              “刚才挺得意的，对吧？”<<nnpc_he 'Sydney'>>笑着低声说，“我差点忘了记笔记。”
+            <<else>>
+              悉尼低头看着笔记本，脸颊还泛着红。“应该都记下来了。我是说，笔记。”
+            <</if>>
+          <<else>>
+            <<if _sydneyStatus.includes('corrupt')>>
+              悉尼打量了一下你的脸，又看向那些还在张望的学生。“讲完了。”<<nnpc_he 'Sydney'>>对他们说，随后把笔记本推向你。“抄我的吧。”
+            <<elseif _sydneyStatus.includes('pure')>>
+              悉尼只看着你的脸。“我、我记了笔记。”<<nnpc_he 'Sydney'>>轻声说，“你想看的话。”
+            <<else>>
+              “没听到的可以抄我的。”悉尼轻声说，把笔记本摊在你们中间。
+            <</if>>
+          <</if>>
+      <</language>>
+      <br><br>
+      <<deadwood-reblooms-sydney-science-borrow-notes>>
+    <<elseif $passage is 'Science Event3' or ($passage is 'Science Undress' and [3, 4].includes($phase))>>
+      <<language>>
+        <<option 'EN'>>
+          You catch Sydney's eye from the front of the room.
+          <<if _sydneyStatus.includes('corrupt') and isLoveInterest('Sydney') and $uncomfortable.nude is false>>
+            <<nnpc_He 'Sydney'>> gives you a quick wink, then looks back at <<nnpc_his 'Sydney'>> notes as Sirris turns towards the class.
+          <<elseif _sydneyStatus.includes('pure')>>
+            Sydney's fingers tighten round <<nnpc_his 'Sydney'>> pen. <<nnpc_He 'Sydney'>> gives you a small, uncertain smile.
+          <<else>>
+            Sydney glances at Sirris, then back at you. <<nnpc_He 'Sydney'>> keeps the seat beside <<nnpc_him 'Sydney'>> clear.
+          <</if>>
+        <<option 'CN'>>
+          你站在教室前面，与悉尼的目光相遇。
+          <<if _sydneyStatus.includes('corrupt') and isLoveInterest('Sydney') and $uncomfortable.nude is false>>
+            <<nnpc_He 'Sydney'>>飞快地朝你眨了一下眼。西里斯转向全班时，<<nnpc_he 'Sydney'>>又低头看起了笔记。
+          <<elseif _sydneyStatus.includes('pure')>>
+            悉尼握紧了手中的笔，朝你露出一个有些不安的微笑。
+          <<else>>
+            悉尼看了看西里斯，又望向你，身边的座位仍为你空着。
+          <</if>>
+      <</language>>
+      <br><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-reblooms-sydney-science-borrow-notes'>>
+  <<if $SydneyExpansion.science_notes_day isnot Time.days>>
+    <<linkreplace `lanSwitch("Borrow Sydney's notes", '借悉尼的笔记')`>>
+      <<if $SydneyExpansion.science_notes_day isnot Time.days>>
+        <<set $SydneyExpansion.science_notes_day to Time.days>>
+        <<scienceskill 1>><<npcincr Sydney love 1>>
+        <<language>>
+          <<option 'EN'>>
+            You thank Sydney and copy the missing notes. <<nnpc_He 'Sydney'>> points out a label you nearly missed, smiling as you add it.
+          <<option 'CN'>>
+            你谢过悉尼，补上没记下的内容。<<nnpc_He 'Sydney'>>指了指你差点漏掉的标注，见你添上后，露出了笑容。
+        <</language>>
+        <<gscience>><<glove 'Sydney'>>
+      <</if>>
+    <</linkreplace>><br><br>
+  <</if>>
+<</widget>>
+
 <!-- 科学课随机事件：注册 Sydney 参与的课堂事件。 -->
 <<widget 'deadwood-reblooms-sydney-science-events'>>
   <<sydneySchedule>><<run statusCheck('Sydney')>>

@@ -20,6 +20,8 @@ Notes support learning, while conversation changes love and stress. Some teasing
 
 <span class="teal">Without the classroom hint, attend science before returning to lunch.</span> Exams, absence and unavailable Sydney are not bypassed by repeatedly visiting lunch.
 
+When Leighton takes over for an inspection, Sirris takes Sydney out to help carry books. Sydney reacts during Sirris's anatomy demonstrations. Back at your seat, you can borrow the notes for science and affection gains <span class="blue">once per day</span>.
+
 ### Temple dorm: invitation and activities
 
 **Unlock**: obtain monk rank and dorm access, then ask beside Sydney's working area while below maximum stress. The bedside entrance follows acceptance. Other temple ranks do not automatically replace this first-invitation requirement.

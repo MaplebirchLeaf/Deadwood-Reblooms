@@ -2,6 +2,11 @@
 
 export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-sydney-science-late-intro', passage: 'Temple' });
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-sydney-science-inspection-leave', passage: 'Science Lesson' });
+  maplebirch.tool.addTo('BeforeLinkZone', {
+    widget: 'deadwood-reblooms-sydney-science-anatomy',
+    passage: ['Science Event3', 'Science Undress', 'Science Refusal', 'Science Undress Desk']
+  });
 
   // 接入科学课事件池、首次同桌剧情和悉尼保护分支。
   maplebirch.tool.inject({

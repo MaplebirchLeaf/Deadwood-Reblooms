@@ -24,6 +24,8 @@ export interface SydneyExpansionState {
   sirrisHalloweenVisitYear: number;
   /** 科学课提示是否已给出。 */
   scienceHint: boolean;
+  /** 上次在解剖示范后借阅课堂笔记的游戏日。 */
+  science_notes_day: number;
   /** 是否已收到神殿宿舍的邀请。 */
   dormInvited: boolean;
   /** 是否已到访过神殿宿舍。 */
@@ -100,6 +102,7 @@ export const DEFAULT_SYDNEY_EXPANSION_STATE: SydneyExpansionState = {
   christmasRestYear: 0,
   sirrisHalloweenVisitYear: 0,
   scienceHint: false,
+  science_notes_day: -1,
   dormInvited: false,
   dormVisited: false,
   dormScene: 'bed',
