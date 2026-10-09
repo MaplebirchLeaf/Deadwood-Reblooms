@@ -23,6 +23,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   });
 
   maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-reblooms-life-simulation-school-office-options'], passage: "Head's Office" });
+  maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-school-council-link'], passage: 'Hallways' });
   maplebirch.tool.addTo('Journal', 'deadwood-reblooms-life-simulation-school-journal');
 
   maplebirch.tool.patch.traits.add(
@@ -30,7 +31,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       title: 'School Traits',
       name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:attendancePass:name'),
       colour: 'green',
-      has: () => V.LifeSimulation.school.attendanceExempt && V.LifeSimulation.school.role === 'student',
+      has: () => V.LifeSimulation.school.attendanceExempt,
       text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:attendancePass:text')
     },
     {

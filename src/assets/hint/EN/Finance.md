@@ -127,6 +127,8 @@ The journal lists each site's work, orders, unpaid invoices and outstanding prob
 
 - **Open for Business:** produce and deliver a factory order, then receive payment. An advance alone does not count.
 - **Where's My Money?:** a delivered factory order defaults when its invoice is settled.
+- **Flying Without a Net:** a losing margin position is forcibly liquidated. Voluntary closing, stop losses and expiry do not count.
+- **Back on My Feet:** After a forced liquidation leaves collection debt, repay it in full and recover the entire loss, including fees, through subsequent net profits from ordinary shares or leveraged trades. Later trading losses reduce your progress; deposits, loans and dividends do not count. Being taken away to settle the debt ends that recovery attempt.
 
 ### Financial Daily
 

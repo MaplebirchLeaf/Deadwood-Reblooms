@@ -203,8 +203,11 @@ export default function DoLX(core: MaplebirchCore): void {
     }
     if (core.get('MoreTransformations')) {
       (passageRules.Widgets ??= []).push(
-        [/<<set \$swimmingskill to amcClamp\(\$swimmingskill, 1000, \$AMCTraits\.swimming, _amcPrev\)>>/, '$&<<if $rng <= 30>><<transform "fish" 1>><</if>>'],
-        [/<<set \$oxygen -= _waterActionTime \* 7>>/, '<<set $oxygen -= _waterActionTime * 7 * ($transformationParts.traits.gills && isPartEnabled($transformationParts.traits.gills) ? 0.25 : 1)>>']
+        [/<<set \$swimmingskill to amcClamp\(\$swimmingskill, 1000, \$AMCTraits\.swimming, _amcPrev\)>>/, '$&<<if $rng <= 30>><<transform "whale" 1>><</if>>'],
+        [
+          /<<set \$oxygen -= _waterActionTime \* 7>>/,
+          '<<set $oxygen -= _waterActionTime * 7 * ($transformationParts.traits.deep_diver && isPartEnabled($transformationParts.traits.deep_diver) ? 0.25 : 1)>>'
+        ]
       );
     }
     for (const [title, replacements] of Object.entries(passageRules)) {

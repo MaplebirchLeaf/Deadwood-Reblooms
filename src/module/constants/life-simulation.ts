@@ -90,11 +90,6 @@ export interface PoolPartyState {
    * 凯拉尔的嫉妒不在这里另存一份，直接读写原版 C.npc.Kylar.rage。
    */
   scenes: string[];
-  /**
-   * 历史上陪同过 PC 参加派对的恋人。
-   * scenes 每场都会清空，成就必须另存一份跨场记录。
-   */
-  met: PoolPartyCompanion[];
   /** 上次携带恋人参加派对的游戏日，-1 表示从未。 */
   last_day: number;
   /**
@@ -112,7 +107,6 @@ export const DEFAULT_POOL_PARTY_STATE: PoolPartyState = {
   return_passage: null,
   companions: [],
   scenes: [],
-  met: [],
   last_day: -1,
   kylar_warned_day: -1,
   kylar_broke_day: -1

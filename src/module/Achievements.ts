@@ -1,8 +1,6 @@
 // ./src/module/Achievements.ts
 
-import { POOL_PARTY_COMPANIONS } from './constants/life-simulation';
-
-type AchievementModule = 'Finance' | 'BirdTower' | 'LifeSimulation' | 'MoreTransformations' | 'Robin' | 'Sydney' | 'VanillaPlus' | 'Whitney';
+type AchievementModule = 'Finance' | 'BirdTower' | 'LifeSimulation' | 'MoreTransformations' | 'Orchard' | 'Robin' | 'Sydney' | 'VanillaPlus' | 'Whitney';
 
 interface AchievementDefinition {
   module: AchievementModule;
@@ -50,9 +48,17 @@ class Achievements {
     },
     {
       module: 'MoreTransformations',
-      id: 'Fish Transformation',
-      title: 'deadwood-reblooms:transformations:fish:feat:title',
-      description: 'deadwood-reblooms:transformations:fish:feat:description',
+      id: 'Whale',
+      title: 'deadwood-reblooms:transformations:whale:feat:title',
+      description: 'deadwood-reblooms:transformations:whale:feat:description',
+      difficulty: 1,
+      filter: ['All', 'Transformation']
+    },
+    {
+      module: 'MoreTransformations',
+      id: 'Raven Transformation',
+      title: 'deadwood-reblooms:transformations:raven:feat:title',
+      description: 'deadwood-reblooms:transformations:raven:feat:description',
       difficulty: 1,
       filter: ['All', 'Transformation']
     },
@@ -87,6 +93,14 @@ class Achievements {
       description: 'deadwood-reblooms:robin:feat:Deadwood Robin Shop Open:text',
       difficulty: 3,
       filter: ['All', 'Social']
+    },
+    {
+      module: 'VanillaPlus',
+      id: 'Unbreakable',
+      title: 'deadwood-reblooms:VanillaPlus:physique:feat:title',
+      description: 'deadwood-reblooms:VanillaPlus:physique:feat:description',
+      difficulty: 3,
+      filter: ['All', 'Stats']
     },
     {
       module: 'VanillaPlus',
@@ -170,6 +184,14 @@ class Achievements {
       filter: ['All', 'General']
     },
     {
+      module: 'LifeSimulation',
+      id: 'Deadwood Giant Killer',
+      title: 'deadwood-reblooms:LifeSimulation:casino:feat:giant_killer:title',
+      description: 'deadwood-reblooms:LifeSimulation:casino:feat:giant_killer:description',
+      difficulty: 3,
+      filter: ['All', 'General']
+    },
+    {
       module: 'Sydney',
       id: 'Four Halloween Visits',
       title: 'deadwood-reblooms:sydney:halloween:feat:title',
@@ -218,11 +240,35 @@ class Achievements {
       filter: ['All', 'Stats']
     },
     {
+      module: 'Orchard',
+      id: 'Deadwood Orchard Supply',
+      title: 'deadwood-reblooms:orchard:feat:supply:title',
+      description: 'deadwood-reblooms:orchard:feat:supply:description',
+      difficulty: 1,
+      filter: ['All', 'General']
+    },
+    {
       module: 'Finance',
       id: 'Deadwood First Factory Payment',
       title: 'deadwood-reblooms:finance:feat:factory_payment:title',
       description: 'deadwood-reblooms:finance:feat:factory_payment:description',
       difficulty: 1,
+      filter: ['All', 'General']
+    },
+    {
+      module: 'Finance',
+      id: 'Deadwood Margin Call',
+      title: 'deadwood-reblooms:finance:feat:margin_call:title',
+      description: 'deadwood-reblooms:finance:feat:margin_call:description',
+      difficulty: 2,
+      filter: ['All', 'General']
+    },
+    {
+      module: 'Finance',
+      id: 'Deadwood Comeback',
+      title: 'deadwood-reblooms:finance:feat:comeback:title',
+      description: 'deadwood-reblooms:finance:feat:comeback:description',
+      difficulty: 3,
       filter: ['All', 'General']
     },
     {
@@ -275,7 +321,7 @@ class Achievements {
     }
   ];
 
-  /** 由对应模块 preInit 调用，定义保留动态翻译，授予条件沿用原有判定。 */
+  /** 各模块注册成就定义，标题与说明随当前语言切换。 */
   public static add(maplebirch: typeof window.maplebirch, module: AchievementModule): void {
     maplebirch.tool.onInit(() => {
       for (const entry of Achievements.definitions) {
@@ -297,19 +343,9 @@ class Achievements {
 
     switch (module) {
       case 'LifeSimulation': {
-        const feat = 'Pool Party Plus Ones';
         maplebirch.dynamic.regStateEvent('append', 'life-simulation-history-feat', {
           output: 'earnFeat "Local History Exhibition"',
           cond: () => V.feats?.currentSave['Local History Exhibition'] === undefined && V.LifeSimulation?.historyProject?.status === 'won'
-        });
-
-        maplebirch.dynamic.regStateEvent('append', 'life-simulation-pool-party-feat', {
-          output: `earnFeat "${feat}"`,
-          cond: () => {
-            if (V.feats?.currentSave[feat] !== undefined) return false;
-            const met = V.LifeSimulation?.pool_party?.met;
-            return POOL_PARTY_COMPANIONS.every(name => met?.includes(name));
-          }
         });
 
         maplebirch.dynamic.regStateEvent('append', 'life-simulation-president-feat', {
@@ -344,9 +380,14 @@ class Achievements {
           cond: () => V.feats?.currentSave['Horse Transformation'] === undefined && (V.maplebirch?.transformation?.horse?.level ?? 0) >= 6
         });
 
-        maplebirch.dynamic.regStateEvent('append', 'fish-transformation-feat', {
-          output: 'earnFeat "Fish Transformation"',
-          cond: () => V.feats?.currentSave['Fish Transformation'] === undefined && (V.maplebirch?.transformation?.fish?.level ?? 0) >= 6
+        maplebirch.dynamic.regStateEvent('append', 'whale-transformation-feat', {
+          output: 'earnFeat "Whale"',
+          cond: () => V.feats?.currentSave['Whale'] === undefined && (V.maplebirch?.transformation?.whale?.level ?? 0) >= 6
+        });
+
+        maplebirch.dynamic.regStateEvent('append', 'raven-transformation-feat', {
+          output: 'earnFeat "Raven Transformation"',
+          cond: () => V.feats?.currentSave['Raven Transformation'] === undefined && (V.maplebirch?.transformation?.raven?.level ?? 0) >= 6
         });
         break;
       }
@@ -389,6 +430,11 @@ class Achievements {
         break;
       }
       case 'Finance': {
+        maplebirch.dynamic.regStateEvent('append', 'finance-comeback-feat', {
+          output: 'earnFeat "Deadwood Comeback"',
+          cond: () => V.feats?.currentSave['Deadwood Comeback'] === undefined && V.Finance?.brokerage?.margin != null && maplebirch.get('Finance')!.margin.recovered
+        });
+
         maplebirch.dynamic.regStateEvent('append', 'property-keys-feat', {
           output: 'earnFeat "Own Keys"',
           extra: { passage: ['Deadwood Reblooms Property Office', 'Deadwood Reblooms Property Home'] },

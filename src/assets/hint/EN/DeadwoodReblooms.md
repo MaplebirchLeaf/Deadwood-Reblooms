@@ -27,7 +27,7 @@ The target game version is **0.5.12.13**, with maplebirch framework **5.2.2 or l
 | Kylar's home life               | Kylar                                  | Manor after the first vanilla stay                                  |
 | School roles and fitness        | LifeSimulation                         | Headteacher's office and Cliff Street gym                           |
 | Banking, homes and residents    | VanillaPlus                            | High Street financial centre and furniture-shop entrance            |
-| Horse and fish forms            | MoreTransformations                    | Riding school and beach rocks pool                                  |
+| Horse and whale forms           | MoreTransformations                    | Riding school and beach rocks pool                                  |
 | Portraits, music and cheats     | Relevant interface chapter             | Settings, vanilla scenes or framework content page                  |
 
 ### Basic option effects

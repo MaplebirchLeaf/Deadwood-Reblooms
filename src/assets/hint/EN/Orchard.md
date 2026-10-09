@@ -132,6 +132,8 @@ Unknown seeds, uncleared ground, occupied plots, remaining moisture, active fert
 
 ### Drinks shop orders and a market regular
 
+Harvest your own lemons or oranges, then fulfil a drinks-shop order for the same fruit to earn **From Branch to Counter**. Accepting an order, buying fruit without harvesting, or a failed delivery does not count.
+
 - **Shop entry**: Enable Robin Expansion, open the drinks shop and visit while a healthy Robin is there. At least one orchard must be unlocked. Choose “Discuss fruit supplies”.
 - **Trial orders**: Supply lemons or oranges for existing drinks. The first order requests ten fruit, later orders twenty. Delivery is due within three days; agreements are at least seven days apart. The quote locks at 70% of the vanilla selling price.
 - **Payment**: Reserves apply. Robin pays from business funds with the existing rent protection. Insufficient stock or funds does not consume fruit. Delivery takes ten minutes, increases Robin’s love and reduces the next normal drinks restock by £5. This discount does not stack or replace cocoa and other ingredients.

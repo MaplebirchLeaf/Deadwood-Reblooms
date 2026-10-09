@@ -135,17 +135,11 @@ class PoolParty {
   }
 
   public attend(): boolean {
-    if (!this.tonight) return false;
+    if (this.stage !== 'party') return false;
     this.store.companions = this.store.companions.filter(name => this.reply(name) === 'accept');
     if (!this.companions.length || !this.once('greeting')) return false;
-    for (const name of this.companions) {
-      if (!this.store.met.includes(name)) this.store.met.push(name);
-    }
+    if (POOL_PARTY_COMPANIONS.every(name => this.companions.includes(name))) this.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Pool Party Plus Ones">>');
     return true;
-  }
-
-  public get met(): readonly PoolPartyCompanion[] {
-    return this.store.met;
   }
 
   public get kylarRage(): number {
@@ -204,7 +198,7 @@ class PoolParty {
     this.settle();
   }
 
-  // met 保留跨场同行记录，嫉妒仍由原版 NPC 属性维护。
+  // 散场清空本次同行名单，嫉妒仍由原版 NPC 属性维护。
   public settle(): void {
     this.store.selected = null;
     this.store.reply = null;
@@ -235,7 +229,7 @@ class PoolParty {
   }
 
   public preInit(): void {
-    // 只在已邀约的派对结束后清场，历史同行记录不受影响。
+    // 只在已邀约的派对结束后清场。
     this.core.dynamic.regStateEvent('gate', 'life-simulation-pool-party-settle', {
       cond: () => {
         if (!V.LifeSimulation?.pool_party?.companions?.length) return false;

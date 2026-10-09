@@ -36,14 +36,13 @@
 <!-- 职位申请与新校规提案都必须当面向礼顿提出。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-office-options'>>
   <<if Time.schoolDay and $schoolstate isnot 'early' and $schoolstate isnot 'late' and $pillory.tenant.special.name isnot 'Leighton' and (wearingSchoolOutfit() or Time.hour gte 14)>>
-    <<if $LifeSimulation.school.role is 'student' and !$LifeSimulation.school.attendanceExempt and $LifeSimulation.school.leightonApprovalDay lt 0>>
+    <<if !$LifeSimulation.school.attendanceExempt and $LifeSimulation.school.leightonApprovalDay lt 0>>
       <<icon 'school/exemption.png'>><<lanLink ['Apply to Leighton for class exemption', '向礼顿申请免听凭证'] 'Deadwood Reblooms Life Simulation Attendance Application'>><</lanLink>><br>
     <</if>>
-    <<if $LifeSimulation.school.role is 'student' and $LifeSimulation.school.baileySigned and !$LifeSimulation.school.attendanceExempt>>
+    <<if $LifeSimulation.school.baileySigned and !$LifeSimulation.school.attendanceExempt>>
       <<icon 'school/exemption.png'>><<lanLink ['Return the signed exemption form', '交回签好的免听申请'] 'Deadwood Reblooms Life Simulation Attendance Filing'>><</lanLink>><br>
     <</if>>
-    <<if $LifeSimulation.school.role is 'student' and $LifeSimulation.school.attendanceExempt
-      and Time.days gte $LifeSimulation.school.attendanceDay + 7>>
+    <<if $LifeSimulation.school.role is 'student'>>
       <<icon 'school/prefect.png'>><<lanLink ['Apply to become a prefect', '申请担任风纪委员'] 'Deadwood Reblooms Life Simulation Prefect Appointment'>><</lanLink>><br>
     <</if>>
     <<if $LifeSimulation.school.role is 'prefect'>>
@@ -131,104 +130,27 @@
   <</language>><br><br>
 <</widget>>
 
-<!-- 数值颜色沿用原版的红、粉、蓝、青、绿等级。 -->
+<!-- 声望沿用原版等级色；堕落为零不显示警告色。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-standing'>>
-  <span @class="maplebirch.get('LifeSimulation').school.standingColour(_args[0])"><<print _args[0]>>/100</span>
+  <span @class="_args[1] ? (_args[0] > 0 ? 'purple' : 'green') : maplebirch.get('LifeSimulation').school.standingColour(_args[0])"><<print _args[0]>>/100</span>
 <</widget>>
 
-<!-- 日志记录现行校规与待办事务，不改变原版学校声望。 -->
-<<widget 'deadwood-reblooms-life-simulation-school-journal'>>
-  <<if $LifeSimulation and $LifeSimulation.school>>
-    <h1 class='header gold bold'><<lanSwitch 'School affairs' '校园事务'>></h1>
-    <ul class='journal'>
-      <li>
-        <<lanSwitch 'School role: ' '校内身份：'>>
-        <<switch $LifeSimulation.school.role>>
-          <<case 'prefect'>><span class='green'><<lanSwitch 'Prefect' '风纪委员'>></span>
-          <<case 'president'>><span class='green'><<lanSwitch 'Student council president' '学生会长'>></span>
-          <<default>><<lanSwitch 'Student' '学生'>>
-        <</switch>><<lanSwitch '.' '。'>>
-      </li>
-      <li>
-        <<lanSwitch 'Current dress policy: ' '现行着装规范：'>>
-        <span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + $LifeSimulation.school.dress.active)>></span>
-        <<lanSwitch '.' '。'>>
-      </li>
-      <li>
-        <<lanSwitch 'School order: ' '校内秩序：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.order>>
-        <<lanSwitch '| student standing: ' '| 学生声望：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.studentSupport>>
-        <<lanSwitch '| staff trust: ' '| 教职工信任：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.staffSupport>>
-        <<lanSwitch '| school corruption: ' '| 校内堕落：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.corruption>><<lanSwitch '.' '。'>>
-      </li>
-      <<if $LifeSimulation.school.role is 'student'>>
-        <li>
-          <<if $LifeSimulation.school.baileySigned and !$LifeSimulation.school.attendanceExempt>>
-            <<lanSwitch 'Bailey has signed. Return the form to Leighton to finish the exemption.' '贝利已签字。把表格交回校长办公室，完成免听手续。'>>
-          <<elseif !$LifeSimulation.school.attendanceExempt>>
-            <<if $LifeSimulation.school.leightonApprovalDay lt 0>>
-              <<lanSwitch 'Take top marks in all four subjects to Leighton for an attendance exemption review.' '四科都达到最高档后，先找礼顿审核免听申请。'>>
-            <<else>>
-              <<language>>
-                <<option 'EN'>>
-                  <<if $RobinExpansion?.bailey_defeated>>
-                    Leighton approved the school form. Find Bailey at the Barb Street flats for the guardian signature.
-                  <<else>>
-                    Leighton approved the school form. After three consecutive rent payments, ask Bailey to sign in the office between 07:00 and 09:00.
-                  <</if>>
-                <<option 'CN'>>
-                  <<if $RobinExpansion?.bailey_defeated>>
-                    礼顿已通过学校审核。去倒钩街公寓找贝利签监护人许可。
-                  <<else>>
-                    礼顿已通过学校审核。连续按时交租三周后，在 07:00–09:00 到办公室找贝利签字。
-                  <</if>>
-              <</language>>
-            <</if>>
-          <<elseif Time.days lt $LifeSimulation.school.attendanceDay + 7>>
-            <<lanSwitch 'Hold your marks and standing for seven days before asking Leighton about prefect duties.' '继续保持成绩与声望。取得免听凭证七天后，再向礼顿申请风纪委员。'>>
-          <<else>>
-            <<lanSwitch 'With top marks, a model teacher record, and at least 160 student standing, ask Leighton for the prefect badge.' '保持最高档成绩，教师评价达到模范学生，同学声望至少 160，再找礼顿申请风纪委员。'>>
-          <</if>>
-        </li>
-      <<elseif $LifeSimulation.school.role is 'prefect'>>
-        <<set _school to $LifeSimulation.school>>
-        <<set _enoughDuties to _school.duties.completed gte 5>>
-        <<set _enoughSupport to _school.order gte 25 and _school.studentSupport gte 25 and _school.staffSupport gte 25>>
-        <li>
-          <<lanSwitch 'Morning duties: ' '晨间值勤：'>><<print Math.min(5, $LifeSimulation.school.duties.completed)>>/5<<lanSwitch '. ' '。'>>
-          <<if _enoughDuties and _enoughSupport>>
-            <<lanSwitch 'Ask Leighton to appoint you as student council president.' '可以向礼顿申请担任学生会长。'>>
-          <<else>>
-            <<lanSwitch 'School order, student standing and staff trust must each reach 25.' '校内秩序、学生声望与教职工信任均需达到 25。'>>
-          <</if>>
-        </li>
-      <</if>>
-      <<if $LifeSimulation.school.attendanceExempt>>
-        <li><<lanSwitch 'Leighton and Bailey approved your exemption. Missing class no longer counts as truancy.' '礼顿与贝利已批准免听凭证。不去上课不会记作旷课。'>></li>
-      <</if>>
-      <<if $LifeSimulation.school.dress.proposal>>
-        <li>
-          <<lanSwitch 'Take your proposal for ' '带着'>><span class='blue'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + $LifeSimulation.school.dress.proposal)>></span>
-          <<lanSwitch ' to Leighton for a decision.' '提案去找礼顿商议。'>>
-        </li>
-      <</if>>
-      <<if $LifeSimulation.school.dress.trialUntil gt Time.days>>
-        <li>
-          <<lanSwitch 'The current rule has ' '现行校规还要试行'>>
-          <span class='blue'><<print $LifeSimulation.school.dress.trialUntil - Time.days>></span>
-          <<lanSwitch ' days left in its trial.' '天。'>>
-        </li>
-      <</if>>
-      <<if maplebirch.get("LifeSimulation").school.canReviewPolicy>>
-        <li><<lanSwitch 'The trial period has ended. Ask Leighton to review the rule.' '试行期已结束，去找礼顿复核校规。'>></li>
-      <</if>>
-      <<if $LifeSimulation.school.role is 'president' and $LifeSimulation.school.dress.cooldownUntil gt Time.days>>
-        <li><<lanSwitch 'You can propose another dress policy in ' '还要等'>>
-          <span class='blue'><<print $LifeSimulation.school.dress.cooldownUntil - Time.days>></span>
-          <<lanSwitch ' days.' '天才能再次提出着装校规。'>></li>
-      <</if>>
-    </ul>
-    <hr>
-  <</if>>
+<<widget 'deadwood-reblooms-life-simulation-school-standing-list'>>
+  <ul class='journal'>
+    <li>
+      <<lanSwitch 'School order: ' '校内秩序：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.order>>
+      <<if _args[0]>><<lanSwitch ' (at least ' '（至少 '>> <span class='gold'><<= _args[0]>></span><<lanSwitch ')' '）'>><</if>>
+    </li>
+    <li>
+      <<lanSwitch 'Student standing: ' '学生声望：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.studentSupport>>
+      <<if _args[0]>><<lanSwitch ' (at least ' '（至少 '>> <span class='gold'><<= _args[0]>></span><<lanSwitch ')' '）'>><</if>>
+    </li>
+    <li>
+      <<lanSwitch 'Staff trust: ' '教职工信任：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.staffSupport>>
+      <<if _args[0]>><<lanSwitch ' (at least ' '（至少 '>> <span class='gold'><<= _args[0]>></span><<lanSwitch ')' '）'>><</if>>
+    </li>
+    <li><<lanSwitch 'School corruption: ' '校内堕落：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.corruption true>></li>
+  </ul>
 <</widget>>
 
 <!-- 社交页追加校规状态，原版“学校”声望仍按原逻辑显示。 -->
@@ -338,7 +260,7 @@
   <<set $LifeSimulation.school.attendanceDay to Time.days>>
   <<lanSwitch 'Leighton checks Bailey’s signature, stamps the form, and files it. "The choice to attend is yours now. The exams are not going away."' '礼顿核对贝利的签名，在表格上盖章并归档。“来不来上课由你决定，考试可不会因此取消。”'>><br><br>
   <span class='green'><<lanSwitch 'Missing lessons will no longer count as truancy.' '缺课不再记作旷课。'>></span><br>
-  <<lanSwitch 'Keep your marks and reputation high. After seven days, ask Leighton about prefect duties.' '继续保持成绩与声望。七天后可向礼顿申请风纪委员。'>><br>
+  <<lanSwitch 'Your exemption remains separate from any student council position.' '免听凭证与学生会职务分别办理。'>><br>
 <<else>>
   <<lanSwitch 'The form still lacks one of the required signatures.' '表格仍缺少必要的签名。'>><br>
 <</if>>
@@ -359,17 +281,20 @@
   <<option 'CN'>>公告栏上贴着通知、值勤记录和着装校规。新告示压在旧告示上，每条校规的末尾都留着礼顿的签名。
 <</language>><br><br>
 <span class='gold'><<lanSwitch 'Student council' '学生会'>></span><br>
-<<lanSwitch "School role" "校内身份">><<lanSwitch ': ' '：'>>
-<<if _school.role is 'student'>>
-  <<lanSwitch 'Student' '学生'>>
-<<else>>
-  <span class='green'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:' + _school.role + ':name')>></span>
-<</if>><br>
-<<lanSwitch "School order" "校内秩序">><<lanSwitch ': ' '：'>><<deadwood-reblooms-life-simulation-school-standing _school.order>><br>
-<<lanSwitch "Student standing" "学生声望">><<lanSwitch ': ' '：'>><<deadwood-reblooms-life-simulation-school-standing _school.studentSupport>><br>
-<<lanSwitch "Staff trust" "教职工信任">><<lanSwitch ': ' '：'>><<deadwood-reblooms-life-simulation-school-standing _school.staffSupport>><br>
-<<lanSwitch "School corruption" "校内堕落">><<lanSwitch ': ' '：'>><<deadwood-reblooms-life-simulation-school-standing _school.corruption>><br>
-<<lanSwitch "Duties completed" "已完成值勤">><<lanSwitch ': ' '：'>><<print _school.duties.completed>><br>
+<ul class='journal'>
+  <li>
+    <<lanSwitch 'School role: ' '校内身份：'>>
+    <<if _school.role is 'student'>>
+      <<lanSwitch 'Student' '学生'>>
+    <<else>>
+      <span class='green'><<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:' + _school.role + ':name')>></span>
+    <</if>>
+  </li>
+  <<if _school.role isnot 'student'>>
+    <li><<lanSwitch 'Duties completed: ' '已完成值勤：'>><span class='teal'><<= _school.duties.completed>></span></li>
+  <</if>>
+</ul>
+<<deadwood-reblooms-life-simulation-school-standing-list>>
 <<if _school.attendanceExempt>>
   <span class='green'><<lanSwitch 'Leighton and Bailey approved your exemption from class attendance.' '礼顿与贝利已批准免听凭证，不上课也不会记缺课。'>></span><br>
 <</if>>
@@ -486,8 +411,11 @@
 <<effects>>
 <<npc Leighton>>
 <<person1>>
-<<lanSwitch 'Leighton sets your attendance form beside the prefect register. <<He>> checks your marks, the staff record, and what your classmates think of you.' '礼顿把你的免听凭证放在风纪委员名册旁。<<He>>核对成绩、教师记录和同学对你的评价。'>><br><br>
-<<if $LifeSimulation.school.attendanceExempt and Time.days gte $LifeSimulation.school.attendanceDay + 7 and $schooltrait gte 4 and $delinquency lte 0 and $cool gte 160>>
+<<language>>
+  <<option 'EN'>>Leighton opens the prefect register. <<He>> checks the staff's reports and your classmates' opinion of you. "This is about keeping order. Your attendance arrangement is a separate matter."
+  <<option 'CN'>>礼顿翻开风纪委员名册，核对教师记录和同学对你的评价。“这份工作要维持校园秩序。至于你怎么安排上课，那是另一回事。”
+<</language>><br><br>
+<<if maplebirch.get('LifeSimulation').school.canRequestPrefect>>
   <<if C.npc.Leighton.love gte 10>>
     <<lanSwitch '"The staff trust you, and the students will listen," ' '“老师信得过你，同学也愿意听你说话，”'>><<he>><<lanSwitch ' says.' '说道。'>><br><br>
     <<schoolicon 'building'>><<lanLink ['Accept the prefect badge', '接受风纪委员徽章'] 'Deadwood Reblooms Life Simulation Prefect Appointment Result'>><<set $phase to 'formal'>><</lanLink>><br>
@@ -500,7 +428,10 @@
     <span class='pink'><<lanSwitch 'Leighton needs a reason to entrust you with the badge.' '礼顿还需要一个把徽章交给你的理由。'>></span><br>
   <</if>>
 <<else>>
-  <span class='pink'><<lanSwitch '"Keep your top marks and let both staff and students see you can be trusted."' '“保持成绩，也让老师和同学都信得过你。”'>></span><br>
+  <span class='pink'><<language>>
+    <<option 'EN'>>"The teachers must consider you <span class='green'>a model student</span>, and your classmates must think you're at least <span class='blue'>cool</span>. A badge means very little if neither side will listen."
+    <<option 'CN'>>“老师要认定你是<span class='green'>模范学生</span>，同学也得至少觉得你<span class='blue'>很酷</span>。两边都不肯听你说话，挂个徽章有什么用？”
+  <</language>></span><br>
 <</if>>
 <br>
 <<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>
@@ -526,6 +457,10 @@
       “上课前维持秩序，严重的问题交给我处理。”
     <</if>>
   <</language>><br><br>
+  <<language>>
+    <<option 'EN'>>Leighton adds your name to the duty rota and hands you a key. "The council room is through the hallways. Use the desk and the rest corner, but leave a record of any complaints you handle. You may excuse yourself from detention. <span class='blue'>Lessons are a separate matter.</span>"
+    <<option 'CN'>>礼顿把你的名字添进值勤表，递来一把钥匙。“学生会室从走廊进去。书桌和休息角可以用，受理申诉要留下记录。留堂你可以自行决定。<span class='blue'>上课另说。</span>”
+  <</language>><br><br>
   <span class='green'><<lanSwitch "You became a prefect." "你成为了风纪委员。">></span>
   <br><<deadwood-reblooms-life-simulation-school-feedback>>
 <<else>>
@@ -541,11 +476,11 @@
 <<npc Leighton>>
 <<person1>>
 <<lanSwitch 'You ask Leighton to make you student council president. ' '你向礼顿申请担任学生会长。'>><<He>><<lanSwitch ' lays your duty reports beside notes from students and staff.' '把你的值勤报告与学生、教职工的意见放在一起。'>><br><br>
-<<lanSwitch 'Morning duties: ' '晨间值勤：'>><<print $LifeSimulation.school.duties.completed>>/5<br>
-<<lanSwitch 'School order: ' '校内秩序：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.order>><<lanSwitch ' (at least 25)' '（至少 25）'>><br>
-<<lanSwitch 'Student standing: ' '学生声望：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.studentSupport>><<lanSwitch ' (at least 25)' '（至少 25）'>><br>
-<<lanSwitch 'Staff trust: ' '教职工信任：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.staffSupport>><<lanSwitch ' (at least 25)' '（至少 25）'>><br>
-<<lanSwitch 'School corruption: ' '校内堕落：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.corruption>><br><br>
+<ul class='journal'>
+  <li><<lanSwitch 'Morning duties: ' '晨间值勤：'>><span class='teal'><<= Math.clamp($LifeSimulation.school.duties.completed, 0, 5)>>/5</span></li>
+</ul>
+<<deadwood-reblooms-life-simulation-school-standing-list 25>>
+<br>
 <<if maplebirch.get('LifeSimulation').school.canAppointPresident>>
   <<lanSwitch '"You have earned enough trust to lead them. The final decision is yours," ' '“你已经赢得了足够的信任。要不要接下这份职责，由你决定，”'>><<he>><<lanSwitch ' says.' '说道。'>><br><br>
   <<schoolicon 'building'>><<lanLink ['Accept the presidency', '接受学生会长任命'] 'Deadwood Reblooms Life Simulation President Appointment Result'>><</lanLink>><br>

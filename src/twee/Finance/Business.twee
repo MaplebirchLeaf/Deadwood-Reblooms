@@ -20,7 +20,7 @@
 <<for $_project range $_finance.businessProjects>>
   <<capture $_project>>
     <<if $_project.eligible>>
-      <<lanLink _business_labels[$_project.id] 'Deadwood Reblooms Business Loan Result'>>
+      <<icon `$_project.id === 'shop' ? 'robin/robin-shop.png' : $_project.id === 'orchard' ? 'orchard/orchard.png' : 'industry/workshop.png'`>><<lanLink _business_labels[$_project.id] 'Deadwood Reblooms Business Loan Result'>>
         <<set $Finance.last_result to maplebirch.get('Finance').takeBusinessLoan($_project.id, Number(_businessAmount))>>
       <</lanLink>><br>
     <</if>>
@@ -51,7 +51,7 @@
 <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Financial Centre Bank Loan'>><</lanLink>>
 
 :: Deadwood Reblooms Property Tenant []
-<<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
+<<set $outside to 0>><<set $location to 'financial_centre'>><<effects>><<endevent>>
 <<set $_estate to maplebirch.get('Finance').realEstate>>
 <<set $_id to $Finance.real_estate.tenant_property>>
 <<set $_management to $_estate.managementFor($_id)>>
@@ -65,23 +65,38 @@
     <<loadNPC 0 $_tenantKey>>
   <</if>>
   <<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $NPCList[0].name_known is 1>>
+        <<print $NPCList[0].name>> waits beside the property desk, holding the same tenancy folder.
+      <<else>>
+        The agent introduces your tenant as <<print $NPCList[0].name>>. <<He>> places a copy of the tenancy agreement on the desk.
+      <</if>>
+    <<option 'CN'>>
+      <<if $NPCList[0].name_known is 1>>
+        <<print $NPCList[0].name>>拿着那份租约档案，在房产柜台旁等你。
+      <<else>>
+        中介介绍租客叫<<print $NPCList[0].name>>。<<He>>把一份租约副本放在桌上。
+      <</if>>
+  <</language>><br><br>
+  <<set $NPCList[0].name_known to 1>><<saveNPC 0 $_tenantKey>>
   <<if $_management.rental_issue.type is 'leak'>>
     <<language>>
       <<option 'EN'>>Your tenant sets a damp photograph on the desk. "It comes through when it rains. I've moved the bed away from the wall, but I can't keep paying the full rent for this." The agent adds a repair estimate to the file.
       <<option 'CN'>>租客把一张受潮的照片放在桌上。“下雨就渗进来。我已经把床挪开了，可总不能这样还照付全租。”中介往档案里加了一份维修报价。
     <</language>><br><br>
     <<lanSwitch 'Urgent repair: ' '紧急维修：'>><<deadwood-reblooms-finance-money `$_estate.rentalRepairCost($_id)`>><br>
-    <<lanLink ['Arrange repairs', '安排维修'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('Finance').realEstate.resolveIssue($Finance.real_estate.tenant_property, 'repair')>><</lanLink>><br>
+    <<lanLink ['Arrange repairs', '安排维修'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('Finance').realEstate.resolveIssue($Finance.real_estate.tenant_property, 'repair')>><<endevent>><</lanLink>><br>
   <<else>>
     <<language>>
       <<option 'EN'>>"I'm a week behind," your tenant says. "I'll have it next week. Or I can pay most of it now, if you'll let the rest go." The agent waits for your answer.
       <<option 'CN'>>“我晚了一周。”租客说道。“下周就有钱了。或者现在先付大部分，剩下的你能不能免了？”中介等着你答复。
     <</language>><br><br>
     <<lanSwitch 'Unpaid net rent: ' '未付净租金：'>><<deadwood-reblooms-finance-money $_management.rental_issue.rent>><br>
-    <<lanLink ['Accept 80% now', '现在收下八成'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('Finance').realEstate.resolveIssue($Finance.real_estate.tenant_property, 'negotiate')>><</lanLink>><br>
+    <<lanLink ['Accept 80% now', '现在收下八成'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('Finance').realEstate.resolveIssue($Finance.real_estate.tenant_property, 'negotiate')>><<endevent>><</lanLink>><br>
     <<if Time.days - $_management.rental_issue.day gte 7>>
-      <<lanLink ['Collect the full overdue rent', '收取全部逾期租金'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('Finance').realEstate.resolveIssue($Finance.real_estate.tenant_property, 'wait')>><</lanLink>><br>
+      <<lanLink ['Collect the full overdue rent', '收取全部逾期租金'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('Finance').realEstate.resolveIssue($Finance.real_estate.tenant_property, 'wait')>><<endevent>><</lanLink>><br>
     <<else>><<lanSwitch 'The promised payment is due next week.' '约好的补缴日期是下周。'>><br><</if>>
   <</if>>
 <</if>><br>
-<<getouticon>><<lanLink ['Leave it for now', '暂时离开'] 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<getouticon>><<lanLink ['Leave it for now', '暂时离开'] 'Deadwood Reblooms Property Office'>><<endevent>><</lanLink>>

@@ -2,14 +2,14 @@
 
 Enable **LifeSimulation** and reload. School uses vanilla grades and social evaluations. The gym is independent, while weapons require vanilla borrowing.
 
-| Feature             | Where                                                  | Start                                               |
-| ------------------- | ------------------------------------------------------ | --------------------------------------------------- |
-| Exemption           | Headteacher and Bailey offices                         | Maximum grades and Leighton's permission            |
-| Prefect             | Office and courtyard                                   | Seven days after exemption, with school evaluations |
-| President and rules | Office and noticeboard                                 | Duties on distinct dates, order and support         |
-| History             | Class, library, museum, lake and home project entrance | Relevant vanilla paintings returned and discussed   |
-| Gym                 | Cliff Street                                           | Admission during opening hours                      |
-| Weapons             | Hand actions against eligible nonanimal tentacles      | Borrowed vanilla whip or baton                      |
+| Feature             | Where                                                  | Start                                             |
+| ------------------- | ------------------------------------------------------ | ------------------------------------------------- |
+| Exemption           | Headteacher and Bailey offices                         | Maximum grades and Leighton's permission          |
+| Prefect             | Office and courtyard                                   | Vanilla teacher and pupil evaluations             |
+| President and rules | Office and noticeboard                                 | Duties on distinct dates, order and support       |
+| History             | Class, library, museum, lake and home project entrance | Relevant vanilla paintings returned and discussed |
+| Gym                 | Cliff Street                                           | Admission during opening hours                    |
+| Weapons             | Hand actions against eligible nonanimal tentacles      | Borrowed vanilla whip or baton                    |
 
 ### Attendance exemption
 
@@ -24,7 +24,7 @@ Exemption avoids truancy penalties, not grade decay or every school responsibili
 
 ### Prefect and morning duty
 
-Wait **seven days** after exemption. Maintain maximum overall performance, vanilla teacher evaluation **Model student** and school popularity at least **Cool**, then apply to Leighton. Winter does not need to recommend you separately.
+Attendance exemption and council appointments are independent: you may pursue either or both. A prefect application needs neither exemption, a seven-day wait nor top grades. Reach vanilla teacher evaluation **Model student** and school popularity at least **Cool**, then apply to Leighton. Leighton must agree or you must possess vanilla leverage; Winter does not need to recommend you separately.
 
 Duty is **07:00–09:00 on schooldays**, once daily. Robin, Sydney, Kylar and Whitney follow their locations rather than all appearing together.
 
@@ -37,11 +37,22 @@ Duty is **07:00–09:00 on schooldays**, once daily. Robin, Sydney, Kylar and Wh
 
 Actual effects appear beside prose. Prefects may decide about detention attendance, not ignore every responsibility.
 
+### Council room: daily privileges and work
+
+Visit from the hallways on **schooldays, 07:00–17:00**. Ordinary students may sort paperwork for **15 minutes once a day**, improving vanilla teacher and pupil evaluations alongside a little council standing. Officeholders gain recurring privileges and decisions:
+
+- **Rest corner**: Once daily, 15 minutes to reduce tiredness and stress.
+- **Study desk**: Once daily, 15 minutes of practice in one of the four subjects. This does not count as lesson attendance.
+- **Complaints**: One case per day. Twenty minutes of mediation favours student standing; fifteen minutes applying the rule and reporting it favours order and staff trust, at the cost of student support.
+- **Presidential delegation**: Before 09:00, spend five minutes arranging cover for morning duty. This replaces your personal duty that day and uses the daily council work slot. It earns neither personal duty credit nor NPC affection, and cannot replace duty you have already started.
+
+Robin, Sydney, Kylar and Whitney may briefly visit before lessons, at lunch or after school, subject to their vanilla state and location.
+
 ### Noticeboard, presidency and dress rules
 
 The corridor noticeboard records order, student standing, staff trust, school corruption and duties. These differ from vanilla teacher/popularity evaluations.
 
-Complete duties on **five distinct schooldays**, build order and both support ratings to application eligibility and ask Leighton for presidency. Reopening one day's scene does not count five days.
+Complete personal duties on **five distinct schooldays**, raise order, student standing and staff trust to **25** each and ask Leighton for presidency. Reopening one day's scene does not count five days.
 
 Policies progress: standard uniform → free dress → revealing dress → optional nudity → nude day → mandatory nudity. Appointment does not immediately unlock the final policy.
 
@@ -177,6 +188,8 @@ After being barred for cheating, you can quietly offer cash for one more chance 
 
 Three card uses the **unsuited 235 beats three of a kind** rule. A 235 that is not all one suit beats any three of a kind, but ranks as ordinary high card against other hands. A suited 235 remains a flush. At a multiplayer showdown, first eliminate three-of-a-kind hands beaten by an unsuited 235, then compare the remaining hands normally.
 
+**Giant Killer**: Beat three of a kind with an unsuited 235 in a comparison or showdown, win the hand and collect your winnings. An ordinary opponent fold does not count.
+
 Casino feats: **On a Roll** requires five consecutive profitable card hands in one night. A tie or loss breaks the streak. **A Good Night** requires a net casino profit of **£10,000** in one night. **Steady Hands** requires ten table disputes handled correctly while working as a dealer. Exchanging chips, returned stakes and watching do not count as profit. Slots do not count towards the card streak. Gambling totals and longest streaks appear in Mod Statistics.
 
 **Wren** may appear at the casino on Wednesday and Friday after 22:00. His dialogue reads the vanilla meeting flags but does not add new ones.
@@ -212,7 +225,7 @@ Robin needs enough affection and a stable condition; Whitney agrees when your re
 
 During the party, you can spend time alone. Robin and Sydney's shared branch requires Revelation's **Chaotic Vow** and low Robin trauma. Kylar's shared branch first requires time alone, plus high affection, sufficient lust, low dominance and low jealousy; the other companion must be a willing Robin or Sydney.
 
-<span class="red">Companions react to you approaching others; Kylar reaching the rage tier ends the party.</span> Changing, surrounded and combat states hide voluntary interactions. Bring each of the four lovers to a party to earn the attendance feat.
+<span class="red">Companions react to you approaching others; Kylar reaching the rage tier ends the party.</span> Changing, surrounded and combat states hide voluntary interactions. Enter one party with all four lovers to earn **Poolside Rendezvous**. Attendance across separate parties does not count.
 
 ### Chip denominations and larger stakes
 

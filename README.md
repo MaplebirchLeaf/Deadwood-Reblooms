@@ -44,7 +44,7 @@
 | `Finance`                           | 金融中心、银行、证券、贷款、房产、同住与泳池亲密         |
 | `VanillaPlus`                       | 属性突破、特质与医院服务                                 |
 | `CelestialAnomalies`                | 日蚀、流星雨与天气画面变化                               |
-| `MoreTransformations`               | 马、鱼与渡鸦转化及相关地点、装备和特质                   |
+| `MoreTransformations`               | 马、鲸与渡鸦转化及相关地点、装备和特质                   |
 | `LongerCombat`                      | 更长的遭遇战、分阶段对白与体液显示                       |
 | `MoreLoveInterestsAndNPCAvatars`    | 更多恋人与社交栏小头像                                   |
 | `NPCSidebarPortrait`                | 场景与侧边栏的 NPC 立绘                                  |

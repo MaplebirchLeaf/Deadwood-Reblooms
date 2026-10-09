@@ -1,0 +1,146 @@
+:: Deadwood Reblooms School Journal Widgets [widget]
+
+<<widget 'deadwood-reblooms-life-simulation-school-journal'>>
+  <<nobr>>
+  <<if !$LifeSimulation?.school>><<exit>><</if>>
+  <<set _school_journal to $LifeSimulation.school>>
+  <h1 class='header gold bold'><<lanSwitch 'School affairs' '校园事务'>></h1>
+  <ul class='journal'>
+    <li>
+      <<lanSwitch 'School role: ' '校内身份：'>>
+      <<switch _school_journal.role>>
+        <<case 'prefect'>><span class='green'><<lanSwitch 'Prefect' '风纪委员'>></span>
+        <<case 'president'>><span class='green'><<lanSwitch 'Student council president' '学生会长'>></span>
+        <<default>><<lanSwitch 'Student' '学生'>>
+      <</switch>>
+    </li>
+    <li><<lanSwitch 'Current dress policy: ' '现行着装规范：'>><span class='blue'><<= maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _school_journal.dress.active)>></span></li>
+  </ul>
+  <br><span class='bold'><<lanSwitch 'Campus standing' '校园评价'>></span>
+  <<deadwood-reblooms-life-simulation-school-standing-list>>
+  <br><span class='bold'><<lanSwitch 'Attendance exemption' '免听凭证'>></span>
+  <ul class='journal'>
+    <li>
+      <<if _school_journal.attendanceExempt>>
+        <<language>>
+          <<option 'EN'>>
+            Your exemption is <span class='green'>approved</span>. You can arrange your own attendance without truancy penalties. Your grades still need attention.
+          <<option 'CN'>>
+            免听凭证已<span class='green'>获批</span>。你可以自行安排上课，缺席不记旷课，成绩仍需自己维持。
+        <</language>>
+      <<elseif _school_journal.baileySigned>>
+        <<language>>
+          <<option 'EN'>>
+            Bailey has <span class='green'>signed</span>. Return the form to <span class='blue'>Leighton in the head's office</span> to activate your exemption.
+          <<option 'CN'>>
+            贝利已<span class='green'>签字</span>。把表格交回<span class='blue'>校长办公室</span>，免听凭证才会生效。
+        <</language>>
+      <<elseif _school_journal.leightonApprovalDay gte 0>>
+        <<language>>
+          <<option 'EN'>>
+            Leighton has <span class='green'>approved the application</span>.
+            <<if $RobinExpansion?.bailey_defeated>>
+              Find Bailey at the <span class='blue'>Barb Street flats</span> for the guardian's signature.
+            <<else>>
+              After <span class='gold'>three consecutive rent payments</span>, ask Bailey to sign in the office between <span class='blue'>07:00 and 09:00</span>.<</if>>
+          <<option 'CN'>>
+            礼顿已<span class='green'>通过学校审核</span>。
+            <<if $RobinExpansion?.bailey_defeated>>
+              去<span class='blue'>倒钩街公寓</span>找贝利签监护人许可。
+            <<else>>
+              连续<span class='gold'>按时交租三周</span>后，在 <span class='blue'>07:00–09:00</span> 到办公室找贝利签字。<</if>>
+        <</language>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            With <span class='gold'>top grades in all four subjects</span>, ask <span class='blue'>Leighton</span> about arranging your own attendance. This permission is separate from a council appointment.
+          <<option 'CN'>>
+            四科都达到<span class='gold'>最高档</span>后，可以找<span class='blue'>礼顿</span>申请自行安排上课。免听许可与学生会职务分别办理。
+        <</language>>
+      <</if>>
+    </li>
+  </ul>
+  <br><span class='bold'><<lanSwitch 'Student council' '学生会职务'>></span>
+  <ul class='journal'>
+    <<if _school_journal.role is 'student'>>
+      <li>
+        <<language>>
+          <<option 'EN'>>
+            You can apply for a <span class='green'>prefect badge</span> when teachers consider you a <span class='green'>model student</span> and classmates think you're at least <span class='blue'>cool</span>. Ask Leighton in the head's office. An attendance exemption and top grades are not required.
+          <<option 'CN'>>
+            教师评价达到<span class='green'>模范学生</span>，同学至少觉得你<span class='blue'>很酷</span>后，可以到校长办公室申请<span class='green'>风纪委员</span>。不要求免听凭证或最高档成绩。
+        <</language>>
+      </li>
+      <li>
+        <<language>>
+          <<option 'EN'>>
+            The <span class='blue'>student council room</span> in the hallways accepts volunteers during school hours. Helping with its paperwork can improve your school reputation.
+          <<option 'CN'>>
+            走廊里的<span class='blue'>学生会室</span>在上学日接受志愿帮手。协助整理事务，可以逐步改善老师和同学对你的评价。
+        <</language>>
+      </li>
+    <<else>>
+      <li>
+        <<language>>
+          <<option 'EN'>>
+            Your badge gives you access to the council's <span class='teal'>rest corner and study desk</span>. You may hear complaints and decide how to handle them. The badge does not exempt you from class.
+          <<option 'CN'>>
+            凭徽章可以使用学生会的<span class='teal'>休息角与自习桌</span>，也能受理同学的申诉，决定处理方式。职务本身不免除上课要求。
+        <</language>>
+      </li>
+      <<if _school_journal.role is 'prefect'>>
+        <li>
+          <<lanSwitch 'Morning duties: ' '晨间值勤：'>><span class='teal'><<= Math.clamp(_school_journal.duties.completed, 0, 5)>>/5</span><br>
+          <<if maplebirch.get('LifeSimulation').school.canAppointPresident>>
+            <<language>>
+              <<option 'EN'>>
+                Ask <span class='blue'>Leighton</span> to appoint you as <span class='green'>student council president</span>.
+              <<option 'CN'>>
+                可以向<span class='blue'>礼顿</span>申请担任<span class='green'>学生会长</span>。
+            <</language>>
+          <<else>>
+            <<language>>
+              <<option 'EN'>>
+                Complete <span class='gold'>five morning duties on different schooldays</span> and raise order, student standing and staff trust to at least <span class='gold'>25</span> each.
+              <<option 'CN'>>
+                完成<span class='gold'>五个不同上学日的晨间值勤</span>，并将秩序、学生声望与教职工信任均提升至 <span class='gold'>25</span>。
+            <</language>>
+          <</if>>
+        </li>
+      <<else>>
+        <li>
+          <<language>>
+            <<option 'EN'>>
+              As president, you can <span class='teal'>delegate morning duty</span> from the council room before <span class='blue'>09:00</span>, or go to the gate yourself. Delegation keeps the routine running but does not earn personal duty credit or NPC affection.
+            <<option 'CN'>>
+              作为会长，你可以在 <span class='blue'>09:00 前</span>到学生会室<span class='teal'>安排其他委员值勤</span>，也可以亲自去校门。委派只维持日常秩序，不计个人值勤次数，也不会获得与同学亲自相处的好感。
+          <</language>>
+        </li>
+      <</if>>
+      <li>
+        <<language>>
+          <<option 'EN'>>
+            Morning duty runs from <span class='blue'>07:00 to 09:00 on schooldays</span>.
+          <<option 'CN'>>
+            晨间值勤时间为<span class='blue'>上学日 07:00–09:00</span>。
+        <</language>>
+        <<if _school_journal.duties.lastDay is Time.days>>
+          <span class='green'><<lanSwitch "Today's duty is covered." '今日值勤已处理。'>></span>
+        <</if>>
+      </li>
+    <</if>>
+    <<if _school_journal.dress.proposal>>
+      <li><<lanSwitch 'Discuss your proposal for ' '与礼顿商议'>><span class='blue'><<= maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _school_journal.dress.proposal)>></span><<lanSwitch ' with Leighton.' '提案。'>></li>
+    <</if>>
+    <<if _school_journal.dress.trialUntil gt Time.days>>
+      <li><<lanSwitch 'Days left in the policy trial: ' '现行校规剩余试行天数：'>><span class='gold'><<= _school_journal.dress.trialUntil - Time.days>></span></li>
+    <<elseif maplebirch.get('LifeSimulation').school.canReviewPolicy>>
+      <li><<language>><<option 'EN'>>The trial has <span class='gold'>ended</span>. Ask <span class='blue'>Leighton</span> to review the rule.<<option 'CN'>>试行期已<span class='gold'>结束</span>，去找<span class='blue'>礼顿</span>复核校规。<</language>></li>
+    <</if>>
+    <<if _school_journal.role is 'president' and _school_journal.dress.cooldownUntil gt Time.days>>
+      <li><<lanSwitch 'You can propose another dress policy in ' '还要等 '>><span class='gold'><<= _school_journal.dress.cooldownUntil - Time.days>></span><<lanSwitch ' days.' ' 天才能再次提出着装校规。'>></li>
+    <</if>>
+  </ul>
+  <hr>
+  <</nobr>>
+<</widget>>

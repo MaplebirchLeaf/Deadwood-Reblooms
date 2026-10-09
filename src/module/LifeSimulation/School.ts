@@ -18,6 +18,12 @@ export interface SchoolState {
   attendanceDay: number;
   // 住宅与西里斯庄园共用每日一次的课后辅导机会。
   study_session_day: number;
+  council: {
+    work_day: number;
+    work: 'records' | 'mediate' | 'enforce' | 'delegate' | null;
+    rest_day: number;
+    study_day: number;
+  };
   leightonApprovalDay: number;
   baileySigned: boolean;
   order: number;
@@ -55,6 +61,7 @@ export const DEFAULT_SCHOOL_STATE: SchoolState = {
   attendanceExempt: false,
   attendanceDay: -1,
   study_session_day: -1,
+  council: { work_day: -1, work: null, rest_day: -1, study_day: -1 },
   leightonApprovalDay: -1,
   baileySigned: false,
   order: 20,
@@ -197,11 +204,57 @@ class School {
   }
 
   public appointPrefect(pressure = false): boolean {
-    if (!(this.state.role === 'student' && this.state.attendanceExempt && Time.days >= this.state.attendanceDay + 7 && V.schooltrait >= 4 && V.delinquency <= 0 && V.cool >= 160)) return false;
+    if (!this.canRequestPrefect) return false;
     if (pressure ? V.headblackmailed !== 1 : C.npc.Leighton.love < 10) return false;
     this.state.role = 'prefect';
     if (pressure) this.adjustStanding(-2, -2, -4, 6);
     else this.adjustStanding(2, 2, 4);
+    return true;
+  }
+
+  public get canRequestPrefect(): boolean {
+    return this.state.role === 'student' && V.delinquency <= 0 && V.cool >= 160;
+  }
+
+  public get councilOpen(): boolean {
+    return Time.schoolDay && Time.hour >= 7 && Time.hour < 17;
+  }
+
+  public get councilGuest(): SchoolStudent | null {
+    if (!this.councilOpen || (Time.hour >= 9 && Time.hour !== 12 && Time.hour < 15)) return null;
+    const students = SCHOOL_STUDENT_ROSTER.filter(student => this.isStudentAvailable(student) && (Time.hour < 9 || !['Sydney', 'Whitney'].includes(student) || this.core.get('NPCSidebarPortrait')));
+    return students.length ? students[Time.days % students.length] : null;
+  }
+
+  public get canDelegate(): boolean {
+    return (
+      this.councilOpen && Time.hour < 9 && this.state.role === 'president' && this.state.duties.lastDay !== Time.days && this.state.duties.target === null && this.state.council.work_day !== Time.days
+    );
+  }
+
+  public resolveCouncil(choice: SchoolState['council']['work']): boolean {
+    if (!choice || !this.councilOpen || V.location !== 'school' || V.combat === 1 || V.statFreeze || this.state.council.work_day === Time.days) return false;
+    if (choice !== 'records' && this.state.role === 'student') return false;
+    switch (choice) {
+      case 'records':
+        this.adjustStanding(1, 1, 1);
+        break;
+      case 'mediate':
+        this.adjustStanding(1, 3, 1);
+        break;
+      case 'enforce':
+        this.adjustStanding(3, -2, 2);
+        break;
+      case 'delegate':
+        if (!this.canDelegate) return false;
+        this.state.duties.lastDay = Time.days;
+        this.adjustStanding(1, 0, 1);
+        break;
+      default:
+        return false;
+    }
+    this.state.council.work_day = Time.days;
+    this.state.council.work = choice;
     return true;
   }
 

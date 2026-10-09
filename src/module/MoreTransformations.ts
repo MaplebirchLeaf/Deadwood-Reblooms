@@ -1,7 +1,7 @@
 // ./src/module/MoreTransformations.ts
 
 import Achievements from './Achievements';
-import Fish from './MoreTransformations/Fish';
+import Whale from './MoreTransformations/Whale';
 import Horse from './MoreTransformations/Horse';
 import Raven from './MoreTransformations/Raven';
 
@@ -13,12 +13,12 @@ interface Tentacle {
 }
 
 class MoreTransformations {
-  public Fish: Fish;
+  public Whale: Whale;
   public Horse: Horse;
   public Raven: Raven;
 
   constructor(readonly core: typeof maplebirch) {
-    this.Fish = new Fish();
+    this.Whale = new Whale();
     this.Horse = new Horse();
     this.Raven = new Raven();
   }
@@ -53,7 +53,7 @@ class MoreTransformations {
     this.core.on(':variable', () => {
       V.MoreTransformations ??= { raven: { met: false, fed: -1, called: -1, preened: -1, action: '', disparaged: 0 } };
     });
-    this.Fish.apply(this.core);
+    this.Whale.apply(this.core);
     this.Horse.apply(this.core);
     this.Raven.apply(this.core);
   }

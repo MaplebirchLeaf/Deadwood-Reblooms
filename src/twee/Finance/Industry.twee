@@ -30,7 +30,7 @@
 
 <<widget 'deadwood-industry-street'>>
   <<if maplebirch.get('Finance').industry.available>>
-    <<factoryicon>><<lanLink ['Workshop yard (0:02)', '厂房院落 (0:02)'] 'Deadwood Reblooms Factory'>><<pass 2>><</lanLink>><br>
+    <<icon 'industry/workshop.png'>><<lanLink ['Workshop yard (0:02)', '厂房院落 (0:02)'] 'Deadwood Reblooms Factory'>><<pass 2>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -217,12 +217,12 @@
       <<option 'CN'>>罗文打开小门，顺手把一根松散的电线拨到旁边。<<He 'Rowan'>>用生着薄茧的手指敲敲告示。“机器可不会附送客户。先看看账，再看开价吧。”
     <</language>><br><br>
     <<if !_factory_state.inspected>>
-      <<lanLink ['Inspect the workshop and books (0:30)', '检查厂房与账本 (0:30)'] 'Deadwood Reblooms Factory Survey'>><<set _factory_state.inspected to true>><<pass 30>><</lanLink>><br>
+      <<icon 'industry/survey.png'>><<lanLink ['Inspect the workshop and books (0:30)', '检查厂房与账本 (0:30)'] 'Deadwood Reblooms Factory Survey'>><<set _factory_state.inspected to true>><<pass 30>><</lanLink>><br>
     <<else>>
-      <<lanLink ['Review the survey', '查看调查记录'] 'Deadwood Reblooms Factory Survey'>><</lanLink>><br>
+      <<icon 'industry/survey.png'>><<lanLink ['Review the survey', '查看调查记录'] 'Deadwood Reblooms Factory Survey'>><</lanLink>><br>
     <</if>>
-    <<lanLink ['Discuss the purchase', '商量购买厂房'] 'Deadwood Reblooms Factory Purchase'>><</lanLink>><br>
-    <<lanLink ['Talk with Rowan', '与罗文交谈'] 'Deadwood Reblooms Factory Rowan'>><</lanLink>><br>
+    <<icon 'industry/workshop.png'>><<lanLink ['Discuss the purchase', '商量购买厂房'] 'Deadwood Reblooms Factory Purchase'>><</lanLink>><br>
+    <<socialiseicon 'ask'>><<lanLink ['Talk with Rowan', '与罗文交谈'] 'Deadwood Reblooms Factory Rowan'>><</lanLink>><br>
   <<else>>
     <<language>><<option 'EN'>>The office is open from <span class='blue'>08:00 to 18:00</span>. You can hear a loose sheet of metal tapping in the yard.<<option 'CN'>>办公室在<span class='blue'>08:00 至 18:00</span>有人。院子里，一块松动的铁皮被风吹得轻轻作响。<</language>><br>
   <</if>>
@@ -246,15 +246,15 @@
   <<if !_factory.available>>
     <<elkicon>><<lanLink ['Leave the yard', '离开院子'] 'Elk Street'>><</lanLink>><br><<exit>>
   <</if>>
-  <<lanLink ['Order book', '订单簿'] 'Deadwood Reblooms Factory Orders'>><</lanLink>><br>
-  <<lanLink ['Working funds', '周转金'] 'Deadwood Reblooms Factory Funds'>><</lanLink>><br>
+  <<icon 'industry/orders.png'>><<lanLink ['Order book', '订单簿'] 'Deadwood Reblooms Factory Orders'>><</lanLink>><br>
+  <<icon 'industry/funds.png'>><<lanLink ['Working funds', '周转金'] 'Deadwood Reblooms Factory Funds'>><</lanLink>><br>
   <<if _factory.open>>
-    <<if _factory.ready>><<lanLink ['Workers, equipment and management', '雇工、设备与管理'] 'Deadwood Reblooms Factory Management'>><</lanLink>><br><</if>>
+    <<if _factory.ready>><<icon 'industry/management.png'>><<lanLink ['Workers, equipment and management', '雇工、设备与管理'] 'Deadwood Reblooms Factory Management'>><</lanLink>><br><</if>>
     <<if _factory_state.issue or _factory_state.wage_arrears gt 0 or _factory_state.overhead_arrears gt 0>>
-      <<lanLink ['Deal with the stoppage', '处理停工问题'] 'Deadwood Reblooms Factory Trouble'>><</lanLink>><br>
+      <<icon 'industry/repairs.png'>><<lanLink ['Deal with the stoppage', '处理停工问题'] 'Deadwood Reblooms Factory Trouble'>><</lanLink>><br>
     <</if>>
-    <<lanLink ['Talk with Rowan', '与罗文交谈'] 'Deadwood Reblooms Factory Rowan'>><</lanLink>><br>
-    <<lanLink ['Wind up this factory', '清算这座工厂'] 'Deadwood Reblooms Factory Sale'>><</lanLink>><br>
+    <<socialiseicon 'ask'>><<lanLink ['Talk with Rowan', '与罗文交谈'] 'Deadwood Reblooms Factory Rowan'>><</lanLink>><br>
+    <<refuseicon>><<lanLink ['Wind up this factory', '清算这座工厂'] 'Deadwood Reblooms Factory Sale'>><</lanLink>><br>
   <</if>>
 <</if>><br>
 <<elkicon>><<lanLink ['Return to Elk Street (0:02)', '返回麋鹿街 (0:02)'] 'Elk Street'>><<pass 2>><</lanLink>><br>
@@ -325,7 +325,7 @@
 <label><<language>><<option 'EN'>>Amount £<<option 'CN'>>金额 £<</language>><<numberbox '_factory_amount' 5000>></label><br>
 <<lanLink ['Transfer from bank', '从银行转入'] 'Deadwood Reblooms Factory Funds'>><<set $Finance.industry.result to maplebirch.get('Finance').industry.fund(Number(_factory_amount)) ? 'ok' : 'failed'>><</lanLink>> |
 <<lanLink ['Transfer to bank', '转回银行'] 'Deadwood Reblooms Factory Funds'>><<set $Finance.industry.result to maplebirch.get('Finance').industry.fund(Number(_factory_amount), true) ? 'ok' : 'failed'>><</lanLink>><br><br>
-<<lanLink ['Ask the bank about a working-capital loan', '到银行申请经营贷款'] 'Deadwood Reblooms Business Loan'>><</lanLink>><br>
+<<icon 'finance/business-loan.png'>><<lanLink ['Ask the bank about a working-capital loan', '到银行申请经营贷款'] 'Deadwood Reblooms Business Loan'>><</lanLink>><br>
 <<deadwood-industry-return>><</nobr>>
 
 :: Deadwood Reblooms Factory Orders []
@@ -355,11 +355,11 @@
 <<if _factory_state.order>>
   <<set _factory_order to _factory_state.order>>
   <<deadwood-card 'Current job' '当前生产'>>
-    <<print maplebirch.t('deadwood-reblooms:industry:' + _factory_order.product)>> · <<print maplebirch.t('deadwood-reblooms:finance:security:' + _factory_order.customer)>><br>
+    <<icon `'industry/' + _factory_order.product + '.png'`>><<print maplebirch.t('deadwood-reblooms:industry:' + _factory_order.product)>> · <<print maplebirch.t('deadwood-reblooms:finance:security:' + _factory_order.customer)>><br>
     <span class='teal'><<= _factory_order.progress>> / <<= _factory_order.batches>></span> <<language>><<option 'EN'>>batches completed<<option 'CN'>>批已完成<</language>><br>
     <<deadwood-reblooms-finance-date _factory_order.deadline>><br>
     <<if _factory_order.progress gte _factory_order.batches and _factory.open>>
-      <<lanLink ['Check and dispatch the goods (0:30)', '验货并安排交付 (0:30)'] 'Deadwood Reblooms Factory Orders'>>
+      <<icon 'industry/dispatch.png'>><<lanLink ['Check and dispatch the goods (0:30)', '验货并安排交付 (0:30)'] 'Deadwood Reblooms Factory Orders'>>
         <<set $Finance.industry.result to maplebirch.get('Finance').industry.deliver() ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 30>><</if>>
       <</lanLink>><br>
     <</if>>
@@ -383,7 +383,7 @@
           <<elseif !_factory.ready or _factory.capacity is 0>>
             <span class='red'><<language>><<option 'EN'>>The floor cannot start work.<<option 'CN'>>车间现在无法开工。<</language>></span>
           <<elseif _factory.open>>
-            <<lanLink ['Accept and order materials (0:15)', '接单并订购原料 (0:15)'] 'Deadwood Reblooms Factory Orders'>>
+            <<icon `'industry/' + _factory_order.product + '.png'`>><<lanLink ['Accept and order materials (0:15)', '接单并订购原料 (0:15)'] 'Deadwood Reblooms Factory Orders'>>
               <<set $Finance.industry.result to maplebirch.get('Finance').industry.take(_factory_order.id) ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 15>><</if>>
             <</lanLink>>
           <</if>>
@@ -451,14 +451,14 @@
 <<deadwood-card 'Equipment and building' '设备与厂房'>>
   <<language>><<option 'EN'>>Each extra production line costs <<deadwood-reblooms-finance-money _factory.terms.lineCost>> and takes two days to install. Another bay costs <<deadwood-reblooms-finance-money _factory.terms.expansionCost>> and takes five days. Work stops during installation; wages and bills continue. No changes can begin while an order is on the floor. The same workers serve all lines.<<option 'CN'>>每添一条产线需要<<deadwood-reblooms-finance-money _factory.terms.lineCost>>，安装两天。扩建一个厂房间需要<<deadwood-reblooms-finance-money _factory.terms.expansionCost>>，工期五天。施工期间停产，工资与费用照付。有订单在做时不能开工改建。各条产线共用工人。<</language>><br><br>
   <<if _factory_state.line_limit lt 3>>
-    <<lanLink ['Add another workshop bay (0:30)', '扩建厂房空间 (0:30)'] 'Deadwood Reblooms Factory'>>
+    <<icon 'industry/workshop.png'>><<lanLink ['Add another workshop bay (0:30)', '扩建厂房空间 (0:30)'] 'Deadwood Reblooms Factory'>>
       <<set $Finance.industry.result to maplebirch.get('Finance').industry.upgrade('space') ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 30>><</if>>
     <</lanLink>><br>
   <</if>>
   <<for _factory_product range _factory.terms.products>>
     <<capture _factory_product>>
       <<if !_factory_state.lines.includes(_factory_product.id) and _factory_state.lines.length lt _factory_state.line_limit>>
-        <<lanLink [`Install ${maplebirch.t(_factory_product.name)} (0:30)`, `安装${maplebirch.t(_factory_product.name)}产线 (0:30)`] 'Deadwood Reblooms Factory'>>
+        <<icon `'industry/' + _factory_product.id + '.png'`>><<lanLink [`Install ${maplebirch.t(_factory_product.name)} (0:30)`, `安装${maplebirch.t(_factory_product.name)}产线 (0:30)`] 'Deadwood Reblooms Factory'>>
           <<set $Finance.industry.result to maplebirch.get('Finance').industry.upgrade(_factory_product.id) ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 30>><</if>>
         <</lanLink>><br>
       <</if>>

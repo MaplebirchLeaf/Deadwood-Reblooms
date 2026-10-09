@@ -1,0 +1,315 @@
+:: Deadwood Reblooms School Council Widgets [widget]
+
+<<widget 'deadwood-school-council-link'>>
+  <<nobr>>
+  <<if maplebirch.get('LifeSimulation').school.councilOpen>>
+    <<icon 'school/council.png'>><<lanLink ['Visit the student council room (0:01)', '前往学生会室 (0:01)'] 'Deadwood Reblooms School Council'>><<pass 1>><</lanLink>><br>
+  <</if>>
+  <</nobr>>
+<</widget>>
+
+<<widget 'deadwood-school-council-study'>>
+  <<if maplebirch.get('LifeSimulation').school.councilOpen and $location is 'school' and $combat isnot 1 and !$statFreeze and $LifeSimulation.school.role isnot 'student' and $LifeSimulation.school.council.study_day isnot Time.days and [1, 2, 3, 4].includes(_args[0])>>
+    <<set $LifeSimulation.school.council.study_day to Time.days, $phase to _args[0]>>
+    <<switch $phase>>
+      <<case 1>><<scienceskill 2>>
+      <<case 2>><<mathsskill 2>>
+      <<case 3>><<englishskill 2>>
+      <<case 4>><<historyskill 2>>
+    <</switch>><<pass 15>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms School Council [nobr]
+<<set $outside to 0, $location to 'school'>><<schooleffects>><<effects>>
+<<lanSwitch 'You are in the student council room.' '你在学生会室里。'>><br>
+<<if !maplebirch.get('LifeSimulation').school.councilOpen>>
+  <<language>>
+    <<option 'EN'>>
+      The ledger has been locked away, and the chairs are stacked against the wall. The council room opens on <span class='blue'>schooldays, from 07:00 to 17:00</span>.
+    <<option 'CN'>>
+      记录簿已经锁进柜子，椅子叠在墙边。学生会室在<span class='blue'>上学日 07:00–17:00</span>开放。
+  <</language>><br><br>
+<<else>>
+  <<set _council to $LifeSimulation.school.council, _council_guest to maplebirch.get('LifeSimulation').school.councilGuest>>
+  <<if Time.hour lt 9>>
+    <<language>>
+      <<option 'EN'>>
+        A student pins up the morning rota, holding spare drawing pins between their teeth. Someone has left a half-eaten slice of toast beside the register.
+      <<option 'CN'>>
+        一名学生正把晨间值勤表钉上墙，嘴里还含着几枚备用图钉。签到簿旁留着一片吃到一半的吐司。
+    <</language>>
+  <<elseif Time.hour is 12>>
+    <<language>>
+      <<option 'EN'>>
+        Bags hang from the chairs, and two students argue over whose turn it is to wash the mugs. The complaint box has acquired a note asking for a bigger complaint box.
+      <<option 'CN'>>
+        椅背上挂着书包，两名学生正在争论今天轮到谁洗杯子。申诉箱上多了张纸条，要求换一个更大的申诉箱。
+    <</language>>
+  <<elseif Time.hour gte 15>>
+    <<language>>
+      <<option 'EN'>>
+        Chairs scrape across the floor as students collect their things. A damp cloth has been left over the sink. There is still a pile of unsigned forms on the table.
+      <<option 'CN'>>
+        学生们收拾着东西，拖动椅子的声音擦过地板。水槽上搭着湿抹布，桌上还有一叠没签名的表格。
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        The room is quiet while lessons are on. A clock ticks above the noticeboard. Through the wall, you can hear a teacher asking the same question twice.
+      <<option 'CN'>>
+        上课时，这里很安静。公告板上方的钟滴答作响，隔着墙能听见老师把同一个问题问了两遍。
+    <</language>>
+  <</if>><br><br>
+  <<language>>
+    <<option 'EN'>>
+      Duty rotas and requests for classroom supplies cover the noticeboard above a long table. A tray marked <span class='blue'>"Council business"</span> holds the day's paperwork.
+    <<option 'CN'>>
+      长桌上方的公告板贴着值勤表和教室用品申请。标着<span class='blue'>“学生会事务”</span>的托盘里放着今天要处理的文件。
+  <</language>><br><br>
+  <<if _council_guest>>
+    <<npc _council_guest>><<person1>>
+    <<switch _council_guest>>
+      <<case 'Robin'>>
+        <<language>>
+          <<option 'EN'>>
+            Robin stops at the door with a loose exercise book. "<span class='teal'>Someone left this in the corridor.</span>" <<He>> checks the name inside before setting it on the lost-property shelf, then hurries back out.
+          <<option 'CN'>>
+            罗宾拿着一本散开的练习册停在门口。“<span class='teal'>有人把它落在走廊了。</span>”<<He>>核对了扉页上的姓名，才放上失物架，随后又匆匆出去了。
+        <</language>>
+      <<case 'Sydney'>>
+        <<language>>
+          <<option 'EN'>>
+            Sydney checks the date on a book request against the copy <<he>> brought from the library. "<span class='teal'>If it goes in today, I can put the books aside.</span>" <<He>> clips both sheets together before leaving them on the table.
+          <<option 'CN'>>
+            悉尼拿图书馆带来的清单核对借书申请的日期。“<span class='teal'>今天交过去，我就能把书留好。</span>”<<He>>把两张纸夹在一起，留在桌上。
+        <</language>>
+      <<case 'Kylar'>>
+        <<language>>
+          <<option 'EN'>>
+            Kylar appears in the doorway and looks past the piled paperwork toward you. "<span class='teal'>Are you staying here long?</span>" <<He>> pretends to read the rota, glancing your way whenever you move.
+          <<option 'CN'>>
+            凯拉尔在门口探出头，越过成堆的文件看向你。“<span class='teal'>你会在这里待很久吗？</span>”<<He>>装作在看值勤表，你一动，<<he>>的目光就跟了过来。
+        <</language>>
+      <<case 'Whitney'>>
+        <<language>>
+          <<option 'EN'>>
+            Whitney taps the complaint box with a knuckle. "<span class='pink'>Bet half of these are about me.</span>" <<He>> laughs, but leaves the lid alone when a student at the next desk looks up.
+          <<option 'CN'>>
+            惠特尼用指节敲了敲申诉箱。“<span class='pink'>这里头一半都是告我的吧。</span>”<<He>>笑了一声，旁边桌上的学生抬起头，<<he>>倒没有真去掀盖子。
+        <</language>>
+    <</switch>><br><br>
+  <</if>>
+  <<if _council.work_day isnot Time.days>>
+    <<if $LifeSimulation.school.role is 'student'>>
+      <<language>>
+        <<option 'EN'>>
+          The student behind the ledger offers you a stack of unsorted forms. "You can help with these if you've got a quarter of an hour. <span class='blue'>Anything needing a decision goes to a prefect.</span>"
+        <<option 'CN'>>
+          守着记录簿的学生递来一叠没分类的表格。“有一刻钟的话，帮忙整理一下吧。<span class='blue'>需要作决定的，交给风纪委员。</span>”
+      <</language>><br><br>
+      <<assignmenticon>><<lanLink ['Help sort the council paperwork (0:15)', '帮学生会整理事务 (0:15)'] 'Deadwood Reblooms School Council Work'>>
+        <<if maplebirch.get('LifeSimulation').school.resolveCouncil('records')>><<cool 1>><<delinquency -1>><<pass 15>><</if>>
+      <</lanLink>><<gcool>><br>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          You unfold the complaint at the top of the tray.<br>
+        <<option 'CN'>>
+          你展开托盘最上面的申诉表。<br>
+      <</language>>
+      <<switch Time.days % 3>>
+        <<case 0>>
+          <<language>>
+            <<option 'EN'>>
+              Two pupils both claim the same seat beside a classroom window. Each says the other moved their bag. Their statements get less alike with every line.
+            <<option 'CN'>>
+              两名学生都说教室窗边的座位是自己的，还都指责对方动过自己的书包。两份说明越往后看，差别就越大。
+          <</language>>
+        <<case 1>>
+          <<language>>
+            <<option 'EN'>>
+              A borrowed notebook has been returned with several pages torn out. The borrower calls it an accident; its owner has circled the missing exercises on the complaint form.
+            <<option 'CN'>>
+              一本借出去的笔记本还回来时少了几页。借书的人说只是意外，主人却在申诉表上把被撕掉的习题一一圈了出来。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              The lunch queue has spilled into the corridor again. A younger pupil says someone keeps pushing them out of line, but the others insist they were saving places for friends.
+            <<option 'CN'>>
+              午餐队伍又堵到了走廊。一名低年级学生说总有人把自己挤出去，其他人却坚持那是替朋友占的位置。
+          <</language>>
+      <</switch>><br><br>
+      <<socialiseicon>><<lanLink ['Hear both sides and find an agreement (0:20)', '听取双方意见，协商解决 (0:20)'] 'Deadwood Reblooms School Council Work'>><<if maplebirch.get('LifeSimulation').school.resolveCouncil('mediate')>><<pass 20>><</if>><</lanLink>><br>
+      <<assignmenticon>><<lanLink ['Apply the posted rule and file a report (0:15)', '按现行规定处理并写入报告 (0:15)'] 'Deadwood Reblooms School Council Work'>><<if maplebirch.get('LifeSimulation').school.resolveCouncil('enforce')>><<pass 15>><</if>><</lanLink>><br>
+      <<if maplebirch.get('LifeSimulation').school.canDelegate>>
+        <br><<icon 'school/duty.png'>><<lanLink ['Arrange for other prefects to cover morning duty (0:05)', '安排其他委员接手晨间值勤 (0:05)'] 'Deadwood Reblooms School Council Work'>><<if maplebirch.get('LifeSimulation').school.resolveCouncil('delegate')>><<pass 5>><</if>><</lanLink>><br>
+        <span class='blue'><i><<lanSwitch 'This uses your council work slot for today. You will not receive personal duty credit.' '这会占用今日的学生会事务机会，不计个人值勤次数。'>></i></span><br>
+      <</if>>
+    <</if>>
+  <<else>>
+    <span class='blue'><i><<lanSwitch "You have finished today's council work." '今天的学生会事务已经处理过了。'>></i></span><br>
+  <</if>>
+  <<if $LifeSimulation.school.role isnot 'student'>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        A low shelf holds the council's study notes: labelled diagrams, worked sums and exercise books filled in by previous members. A cleared corner of the table gives you somewhere to use them.
+      <<option 'CN'>>
+        矮架上放着学生会的自习资料：标好的示意图、解过的算式，还有往届成员写满了的练习册。桌角腾出了一小块地方，可以坐下来翻阅。
+    <</language>><br>
+    <<if _council.study_day isnot Time.days>>
+      <<scienceicon>><<lanLink ['Study science (0:15)', '自习科学 (0:15)'] 'Deadwood Reblooms School Council Study'>><<deadwood-school-council-study 1>><</lanLink>><<gscience>><br>
+      <<mathicon>><<lanLink ['Study maths (0:15)', '自习数学 (0:15)'] 'Deadwood Reblooms School Council Study'>><<deadwood-school-council-study 2>><</lanLink>><<gmaths>><br>
+      <<englishicon>><<lanLink ['Study English (0:15)', '自习语文 (0:15)'] 'Deadwood Reblooms School Council Study'>><<deadwood-school-council-study 3>><</lanLink>><<genglish>><br>
+      <<historyicon>><<lanLink ['Study history (0:15)', '自习历史 (0:15)'] 'Deadwood Reblooms School Council Study'>><<deadwood-school-council-study 4>><</lanLink>><<ghistory>><br>
+      <span class='blue'><i><<lanSwitch 'You can use the notes once a day. This does not count as attending a lesson.' '每天可借资料自习一次，不算正式上课。'>></i></span><br>
+    <<else>>
+      <<lanSwitch 'You have already worked through the notes today.' '你今天已经用这些资料自习过了。'>><br>
+    <</if>>
+    <br>
+    <<language>>
+      <<option 'EN'>>
+        Two worn armchairs stand beside a kettle. A note above the sink reads <span class='blue'>"Wash your own mug"</span>.
+      <<option 'CN'>>
+        水壶旁摆着两张旧扶手椅，水槽上方贴着<span class='blue'>“自己的杯子自己洗”</span>。
+    <</language>><br>
+    <<if _council.rest_day isnot Time.days>>
+      <<relaxicon>><<lanLink ['Take a break (0:15)', '休息一会儿 (0:15)'] 'Deadwood Reblooms School Council Rest'>>
+        <<if maplebirch.get('LifeSimulation').school.councilOpen and $location is 'school' and $combat isnot 1 and !$statFreeze and $LifeSimulation.school.role isnot 'student' and $LifeSimulation.school.council.rest_day isnot Time.days>>
+          <<set $LifeSimulation.school.council.rest_day to Time.days>><<tiredness -150>><<stress -25>><<pass 15>>
+        <</if>>
+      <</lanLink>><<ltiredness>><<lstress>><br>
+    <<else>>
+      <<lanSwitch 'You have taken your break here today. The mugs still need washing.' '你今天已经在这里休息过了。杯子还是得自己洗。'>><br>
+    <</if>>
+  <</if>>
+  <br>
+<</if>>
+<<getouticon>><<lanLink ['Return to the hallways', '返回走廊'] 'Hallways'>><</lanLink>>
+
+:: Deadwood Reblooms School Council Work [nobr]
+<<set $outside to 0, $location to 'school'>><<schooleffects>><<effects>>
+<<if $LifeSimulation.school.council.work_day is Time.days>>
+  <<switch $LifeSimulation.school.council.work>>
+    <<case 'records'>>
+      <<language>>
+        <<option 'EN'>>
+          You separate requests from complaints, copy the dates onto the ledger and find a form that had slipped between two folders. The student at the desk checks your pile before initialling it. "<span class='green'>That'll save us chasing the wrong people.</span>" Your name goes beside the completed work, where the staff will see it.
+        <<option 'CN'>>
+          你把申请和申诉分开，抄好日期，又从两个文件夹之间找出一张漏掉的表格。桌后的学生核对了你的那一叠，才签上名字。“<span class='green'>这下不用追着问错人了。</span>”你的名字写在办完的事务旁，老师翻记录时也能看见。
+      <</language>>
+    <<case 'mediate'>>
+      <<language>>
+        <<option 'EN'>>
+          You ask each pupil to explain without interrupting the other. It takes longer than reading the rule aloud, and neither gets everything they wanted. Eventually they agree on what happens next. <span class='teal'>You write down the agreement, not just their names.</span>
+        <<option 'CN'>>
+          你请双方轮流说明，不许在对方说话时插嘴。这比照着规定念一遍费时，最后也没人完全如愿，但总算对接下来怎么办达成了一致。<span class='teal'>你记下了商议的结果，不只是两个人的名字。</span>
+      <</language>><br><br>
+      <<switch Time.days % 3>>
+        <<case 0>>
+          <<language>>
+            <<option 'EN'>>
+              You suggest alternating the window seat by week. One pupil asks who gets this week; the other immediately points at the calendar. You mark both names against the dates, leaving them with less room to argue tomorrow.
+            <<option 'CN'>>
+              你提议按周轮换窗边的座位。一人立刻问这周归谁，另一人马上指向日历。你把两个人的名字写在对应日期旁，至少明天少了一件可争的事。
+          <</language>>
+        <<case 1>>
+          <<language>>
+            <<option 'EN'>>
+              The borrower agrees to copy the missing exercises before tomorrow's class. The owner insists on keeping the notebook until then. You record both promises and tell them to bring it back if the work is still missing.
+            <<option 'CN'>>
+              借笔记的人答应在明天上课前补抄缺掉的习题，主人坚持在这之前把本子留在自己手里。你记下双方的承诺，交代如果还是没补好，再来找你。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              You make it clear that saving a place does not mean pushing someone else out. The group agrees to join at the back next time. The younger pupil asks you to check the queue at lunch; you add it to the rota before they leave.
+            <<option 'CN'>>
+              你说明，替朋友占位不是把别人挤出去的理由。几个人答应下次从队尾排起，那名低年级学生请你们午休时去队伍旁看看。你在值勤表上添了一笔，才让他们离开。
+          <</language>>
+      <</switch>>
+    <<case 'enforce'>>
+      <<language>>
+        <<option 'EN'>>You open the rules beside the complaint and write a report for the staff. <span class='green'>There is no doubt about the decision</span>, though one pupil folds their arms before you've finished explaining it.
+        <<option 'CN'>>你把规定摊在申诉表旁，将处理结果写进给老师的报告。<span class='green'>结论已经很明确</span>，可你还没解释完，就有一名学生抱起了胳膊。
+      <</language>><br><br>
+      <<switch Time.days % 3>>
+        <<case 0>>
+          <<language>>
+            <<option 'EN'>>
+              The classroom seating plan gives the window seat to one of them. You send the other back to their assigned desk. They say the teacher let them swap last week, but cannot produce a note confirming it.
+            <<option 'CN'>>
+              教室座位表把窗边的位置分给了其中一人，你让另一人回到自己的座位。对方说老师上周准许过调换，却拿不出确认的字条。
+          <</language>>
+        <<case 1>>
+          <<language>>
+            <<option 'EN'>>
+              The borrower must replace the notebook and copy the missing work. They complain that you haven't even looked at how loose the binding is. You attach their objection to the report; it doesn't change what they owe.
+            <<option 'CN'>>
+              借笔记的人必须赔一本新本子，并补抄缺掉的内容。对方抱怨你连松散的装订线都没看一眼。你把异议附在报告后面，该赔的仍然要赔。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              You record the names on the complaint and pass them to the lunch supervisor. One pupil asks why their friends aren't being reported too. The younger pupil keeps their eyes on the floor until the others have gone.
+            <<option 'CN'>>
+              你记下申诉中提到的名字，交给午休值班老师。有人问，为什么自己的朋友没被一起记上。那名低年级学生一直盯着地板，直到其他人都离开。
+          <</language>>
+      <</switch>>
+    <<case 'delegate'>>
+      <<language>>
+        <<option 'EN'>>
+          You check the rota, divide the gate and side entrance between two other prefects, and leave space for their reports. They take the register with them. <span class='teal'>The morning duty is covered</span>, leaving you free to attend class or handle another part of the day yourself.
+        <<option 'CN'>>
+          你核对值勤表，把正门和侧门分给另外两名委员，留好填写报告的位置。两人带着记录簿出去了，<span class='teal'>今天的晨间值勤已经有人接手</span>，你可以照常去上课，或自行安排余下的时间。
+      <</language>>
+  <</switch>><br><br>
+  <<deadwood-reblooms-life-simulation-school-feedback>>
+<<else>>
+  <span class='blue'><<lanSwitch 'There is no completed council work to report.' '目前没有已完成的学生会事务。'>></span>
+<</if>>
+<br><<getouticon>><<lanLink ['Return to the student council room', '返回学生会室'] 'Deadwood Reblooms School Council'>><</lanLink>>
+
+:: Deadwood Reblooms School Council Rest [nobr]
+<<set $outside to 0, $location to 'school'>><<schooleffects>><<effects>>
+<<language>>
+  <<option 'EN'>>You settle into the worn armchair and let the noise of the corridor stay beyond the door. A cup of hot water warms your hands. For a quarter of an hour, the loose papers on the table can wait.
+  <<option 'CN'>>你坐进旧扶手椅，让走廊里的嘈杂留在门外。杯中的热水暖着双手。这一刻钟，桌上那些没理好的纸可以先放着。
+<</language>><<ltiredness>><<lstress>><br><br>
+<<getouticon>><<lanLink ['Return to the student council room', '返回学生会室'] 'Deadwood Reblooms School Council'>><</lanLink>>
+
+:: Deadwood Reblooms School Council Study [nobr]
+<<set $outside to 0, $location to 'school'>><<schooleffects>><<effects>>
+<<switch $phase>>
+  <<case 1>>
+    <<language>>
+      <<option 'EN'>>
+        You spread a labelled diagram beside your exercise book. Several arrows have been rubbed out and redrawn. Following them back to the notes helps you spot where your own answer went wrong. You correct it before putting the sheets away.
+      <<option 'CN'>>
+        你把标好的示意图摊在练习册旁。有几根箭头擦掉重画过，沿着它们核对笔记，你找到了自己答错的地方。你改好答案，才把资料收回去。
+    <</language>><<gscience>>
+  <<case 2>>
+    <<language>>
+      <<option 'EN'>>
+        Someone has circled a sign error in the worked sums. You cover the answers and try the calculations yourself. Your first attempt ends in the same mistake. The second matches the answer written beneath it.
+      <<option 'CN'>>
+        有人在解题步骤里圈出了一个写错的符号。你遮住答案，自己试着算了一遍，第一次竟犯了同样的错。再算一次，总算和下面写的答案对上了。
+    <</language>><<gmaths>>
+  <<case 3>>
+    <<language>>
+      <<option 'EN'>>
+        An old exercise book pairs a passage with two very different interpretations. You read it again, underlining the words each answer relies on. By the time you close the book, you can explain why one has more to support it.
+      <<option 'CN'>>
+        旧练习册里，同一段课文后写着两种截然不同的解读。你重读一遍，把各自依据的词句画出来。合上本子时，你已经能说明哪一种更有根据。
+    <</language>><<genglish>>
+  <<case 4>>
+    <<language>>
+      <<option 'EN'>>
+        You compare a timeline with the account written on the next sheet. The dates fit, but the account leaves out a defeat. You add a note in your own book and check the rest against the textbook before returning the papers.
+      <<option 'CN'>>
+        你把年表和下一页的记述对照着看。日期都对得上，记述却漏掉了一次败仗。你在自己的本子里添了笔记，又拿课本核对余下的内容，才把资料放回去。
+    <</language>><<ghistory>>
+<</switch>><br><br>
+<<getouticon>><<lanLink ['Return to the student council room', '返回学生会室'] 'Deadwood Reblooms School Council'>><</lanLink>>

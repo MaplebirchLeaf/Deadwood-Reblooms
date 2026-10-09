@@ -189,10 +189,22 @@ class ThreeCard {
   }
 
   public collectPayout(): number {
-    if (this.state.phase !== 'done' || this.state.paid) return 0;
-    this.state.paid = true;
-    this.core.get('LifeSimulation')?.casino.record('three_card', this.state.seats[0].total, this.state.payout);
-    return this.state.payout;
+    const state = this.state;
+    if (state.phase !== 'done' || state.paid) return 0;
+    state.paid = true;
+    this.core.get('LifeSimulation')?.casino.record('three_card', state.seats[0].total, state.payout);
+    const rank = threeCardRank(state.seats[0].cards);
+    if (
+      state.winners.includes(0) &&
+      rank[0] === 0 &&
+      state.seats.some((seat, index) => {
+        if (index === 0 || (!state.compared.includes(index) && !(state.showdown && !seat.folded))) return false;
+        const other = threeCardRank(seat.cards);
+        return other[0] === 5 && compareThreeCardHands(rank, other) > 0;
+      })
+    )
+      this.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood Giant Killer">>');
+    return state.payout;
   }
 
   public leave(): void {

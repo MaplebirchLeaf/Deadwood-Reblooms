@@ -1,5 +1,6 @@
 // ./src/module/Orchard.ts
 
+import Achievements from './Achievements';
 import Module from './Module';
 import type Robin from './Robin';
 import trade from '../assets/orchard/trade.json';
@@ -170,6 +171,7 @@ class Orchard extends Module {
 
   public override preInit(): void {
     super.preInit();
+    Achievements.add(this.core, 'Orchard');
     // 天气变化时及时补水。再次读入同一雨天存档不会重触发 onEnter，推进前仍需核对。
     this.core.dynamic.regWeatherEvent(':deadwood-orchard-rain', {
       condition: () => !!V.Orchard && !V.statFreeze,
@@ -254,6 +256,7 @@ class Orchard extends Module {
     this.state.last_supply_day = Time.days;
     this.state.restock_credit = trade.restockDiscount;
     this.recordSale(order.type, order.amount, income, 'shop');
+    if ([...this.state.temple, ...this.state.farm].some(tree => tree?.species === order.type && tree.harvests > 0)) this.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood Orchard Supply">>');
     this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Robin love 1>>');
     return true;
   }

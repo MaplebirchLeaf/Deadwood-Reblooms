@@ -805,6 +805,8 @@ class Finance extends Module {
     if (!debt.extended) debt.due_day = Math.min(debt.due_day, day + tradingTerms.collectionDays);
     debt.source = debt.amount > 0 && debt.source !== source ? 'mixed' : source;
     debt.amount += amount;
+    const recovery = this.state.brokerage.margin.recovery;
+    if (recovery) recovery.repaid = false;
   }
 
   public repayCollection(): boolean {
@@ -816,6 +818,8 @@ class Finance extends Module {
     this.state.bank.balance -= fromBank;
     if (cash > 0) this.core.SugarCube.Wikifier.wikifyEval(`<<money ${-cash} 'deadwoodDebt'>>`);
     debt.amount = 0;
+    const recovery = this.state.brokerage.margin.recovery;
+    if (recovery) recovery.repaid = true;
     return true;
   }
 
@@ -845,6 +849,7 @@ class Finance extends Module {
   /** 被带走抵偿本次追债，已有其他贷款和原版房租仍按各自账目结算。 */
   public surrenderCollection(): void {
     this.state.collection.amount = 0;
+    this.state.brokerage.margin.recovery = null;
   }
 
   // 配置与存档状态

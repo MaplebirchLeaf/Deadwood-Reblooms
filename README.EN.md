@@ -44,7 +44,7 @@ The current version is **1.4.4**. This patch fixes an error when retrieving stor
 | `Finance`                           | Financial centre, banking, securities, loans, property, cohabitation and pool intimacy |
 | `VanillaPlus`                       | Stat breakthroughs, traits, and hospital services                                      |
 | `CelestialAnomalies`                | Solar eclipses, meteor showers, and changing sky and weather visuals                   |
-| `MoreTransformations`               | Horse, fish, and raven transformations, locations, equipment, and traits               |
+| `MoreTransformations`               | Horse, whale, and raven transformations, locations, equipment, and traits              |
 | `LongerCombat`                      | Longer encounters, staged dialogue, and fluid displays                                 |
 | `MoreLoveInterestsAndNPCAvatars`    | More love interests and social sidebar portraits                                       |
 | `NPCSidebarPortrait`                | NPC portraits in scenes and the sidebar                                                |

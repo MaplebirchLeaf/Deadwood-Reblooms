@@ -29,12 +29,13 @@ export interface MarginState {
   history: { day: number; symbol: string; kind: MarginPosition['kind']; side?: 1 | -1; reason: 'closed' | 'liquidated' | 'expired' | 'stopped' | 'target'; profit: number }[];
   realised: number;
   closed: number;
+  recovery: { loss: number; profit_base: number; repaid: boolean } | null;
 }
 
 /** 融资股票和现金交割期货共用保证金结算，持仓与普通股票分开记账。 */
 export default class MarginTrading {
   public readonly terms = terms;
-  public static readonly defaults: MarginState = { next_id: 1, positions: [], history: [], realised: 0, closed: 0 };
+  public static readonly defaults: MarginState = { next_id: 1, positions: [], history: [], realised: 0, closed: 0, recovery: null };
 
   public constructor(private readonly finance: Finance) {}
 
@@ -48,6 +49,11 @@ export default class MarginTrading {
 
   public get history(): readonly MarginState['history'][number][] {
     return this.state.history;
+  }
+
+  public get recovered(): boolean {
+    const recovery = this.state.recovery;
+    return !!recovery && recovery.repaid && V.Finance.collection.amount === 0 && this.state.realised + V.Finance.brokerage.realised - recovery.profit_base >= recovery.loss;
   }
 
   public get open(): boolean {
@@ -184,6 +190,7 @@ export default class MarginTrading {
     if (index < 0) return;
     const fee = Math.max(terms.minimumFee, Math.ceil(this.quote(position.symbol) * position.units * terms.feeRate));
     const equity = this.equity(position) - fee;
+    let debt = 0;
     state.positions.splice(index, 1);
     if (equity >= 0) V.Finance.brokerage.cash += equity;
     else {
@@ -192,11 +199,14 @@ export default class MarginTrading {
       const paid = Math.min(brokerage.cash, -equity);
       brokerage.cash -= paid;
       const remainder = -equity - paid;
-      this.finance.addCollectionDebt(remainder - this.finance.collectBankPennies(remainder), 'margin', day);
+      debt = remainder - this.finance.collectBankPennies(remainder);
+      this.finance.addCollectionDebt(debt, 'margin', day);
     }
     const profit = equity - position.margin - position.opening_fee;
     state.realised += profit;
     state.closed++;
+    if (reason === 'liquidated' && profit < 0 && debt > 0) state.recovery ??= { loss: -profit, profit_base: state.realised + V.Finance.brokerage.realised, repaid: false };
+    if (reason === 'liquidated' && profit < 0) this.finance.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood Margin Call">>');
     state.history.push({ day, symbol: position.symbol, kind: position.kind, side: position.side, reason, profit });
     if (state.history.length > terms.historyLimit) state.history.shift();
   }

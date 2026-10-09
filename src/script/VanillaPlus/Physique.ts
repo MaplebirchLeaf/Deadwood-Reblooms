@@ -3,20 +3,6 @@
 export default function (maplebirch: typeof window.maplebirch) {
   const text = (key: string) => maplebirch.t(`deadwood-reblooms:VanillaPlus:physique:${key}`);
 
-  maplebirch.tool.onInit(() => {
-    setup.feats.Unbreakable ??= {
-      get title() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:physique:feat:title');
-      },
-      get desc() {
-        return maplebirch.t('deadwood-reblooms:VanillaPlus:physique:feat:description');
-      },
-      difficulty: 3,
-      series: '',
-      filter: ['All', 'Stats']
-    };
-  });
-
   const available = () => V.combat === 1 && maplebirch.get('VanillaPlus')!.physique.canBreakBindings;
   maplebirch.combat.CombatAction.reg(
     {
