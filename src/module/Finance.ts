@@ -316,6 +316,9 @@ class Finance extends Module {
     super.preInit();
     Achievements.add(this.core, 'Finance');
     this.realEstate.preInit();
+    this.company.avery.preInit();
+    this.company.suite.preInit();
+    this.company.ascension.preInit();
     this.core.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-adrian-business', {
       exact: true,
       priority: -1,

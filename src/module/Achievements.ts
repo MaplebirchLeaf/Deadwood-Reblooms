@@ -249,6 +249,15 @@ class Achievements {
     },
     {
       module: 'Finance',
+      id: 'Deadwood Black Raven',
+      title: 'deadwood-reblooms:finance:title:black_raven',
+      description: 'deadwood-reblooms:finance:feat:black_raven:description',
+      difficulty: 3,
+      filter: ['All', 'General'],
+      softLockable: true
+    },
+    {
+      module: 'Finance',
       id: 'Deadwood First Factory Payment',
       title: 'deadwood-reblooms:finance:feat:factory_payment:title',
       description: 'deadwood-reblooms:finance:feat:factory_payment:description',
@@ -430,6 +439,11 @@ class Achievements {
         break;
       }
       case 'Finance': {
+        maplebirch.dynamic.regStateEvent('append', 'finance-black-raven-feat', {
+          output: 'earnFeat "Deadwood Black Raven"',
+          cond: () => V.feats?.currentSave['Deadwood Black Raven'] === undefined && V.Finance?.company?.ascension?.recognized === true
+        });
+
         maplebirch.dynamic.regStateEvent('append', 'finance-comeback-feat', {
           output: 'earnFeat "Deadwood Comeback"',
           cond: () => V.feats?.currentSave['Deadwood Comeback'] === undefined && V.Finance?.brokerage?.margin != null && maplebirch.get('Finance')!.margin.recovered

@@ -80,6 +80,23 @@
 			<</if>>
 		<</lanLink>><br>
 	<<else>><br><</if>>
+	<<if $_casino.sprayReward>>
+		<<language>>
+			<<option 'EN'>>
+				The cashier reaches beneath the counter. "Five wins in a row. Take this for the walk home."
+			<<option 'CN'>>
+				柜员伸手探向柜台底下。“连赢五局。这罐喷雾给你，回去路上用得着。”
+		<</language>><br>
+		<<peppersprayicon>><<lanLink ['Take the larger pepper spray canister', '拿取大容量防狼喷雾罐']>>
+			<<if maplebirch.get('LifeSimulation').casino.sprayReward>>
+				<<set $spraymax += 1>>
+				<<spray 5>>
+				<<set $LifeSimulation.casino.spray_reward_claimed to true>>
+				<<replace '#deadwood-casino-cashier'>><<deadwood-casino-cashier>><</replace>>
+				<<replace '#deadwood-casino-cashier-result'>><<gspraymax>><</replace>>
+			<</if>>
+		<</lanLink>><br>
+	<</if>>
 	<<if $_casino.chips gt 0 or $_casino.holdem.state.joined>>
 		<<icon 'casino/redeem.png'>><<lanLink ['Redeem all chips', '兑回全部筹码']>>
 			<<deadwood-casino-cashout _cashier.method>>

@@ -1,0 +1,308 @@
+:: Deadwood Reblooms Company Suite Widgets [widget]
+
+<<widget 'deadwood-company-suite-link'>>
+  <<set _suite to maplebirch.get('Finance').company.suite>>
+  <<if $avery_fate is 'ascended' and maplebirch.get('Finance').company.available>>
+    <<if _suite.occupied>>
+      <<homeicon>><<lanLink ['Take the residents lift (0:02)', '乘住户电梯回套房 (0:02)'] 'Deadwood Reblooms Property Home'>>
+        <<run maplebirch.get('Finance').realEstate.visit('penthouse')>><<pass 2>>
+      <</lanLink>><br>
+    <</if>>
+    <<if _suite.eligible or _suite.state.signed>>
+      <<icon 'company/shareholder-reception.png'>><<lanLink ['Ask about the suite', '询问套房的事'] 'Deadwood Reblooms Company Suite'>><</lanLink>><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-company-suite-home'>>
+  <<if maplebirch.get('Finance').realEstate.current?.id is 'penthouse'>>
+    <<set _suite to maplebirch.get('Finance').company.suite>>
+    <<if _suite.state.notice_day isnot null>>
+      <span class='red'>
+        <<lanSwitch 'The company has issued a notice to vacate on ' '公司要求你在这一天之前搬离：'>>
+        <<deadwood-reblooms-finance-date `_suite.state.notice_day + 7`>>
+      </span><br>
+      <<icon 'company/shareholder-reception.png'>><<lanLink ['Read the accommodation notice', '查看住宿通知'] 'Deadwood Reblooms Company Suite'>><</lanLink>><br>
+    <</if>>
+    <<if _suite.canInvite>>
+      <<socialiseicon 'ask'>><<lanLink ['Invite Avery up for a short visit (0:15)', '请艾弗里上来坐坐 (0:15)'] 'Deadwood Reblooms Company Suite Visit'>>
+        <<if maplebirch.get('Finance').company.suite.invite()>><<pass 15>><</if>>
+      <</lanLink>><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-company-suite-journal'>>
+  <<set _suite to maplebirch.get('Finance').company.suite>>
+  <<if _suite.state.signed>>
+    <<if _suite.occupied>>
+      <<language>>
+        <<option 'EN'>>
+          You hold an accommodation agreement for a private suite in the skyscraper on <span class='teal'>Elk Street</span>.
+          The residents' lift is in the lobby. Weekly upkeep is <<printmoney _suite.upkeep>>.
+        <<option 'CN'>>
+          你签有<span class='teal'>麋鹿街摩天大楼</span>私人套房的住宿协议，住户电梯在大厅里。
+          每周维护费为<<printmoney _suite.upkeep>>。
+      <</language>><br>
+      <<if _suite.state.notice_day isnot null>>
+        <span class='red'>
+          <<lanSwitch 'Vacate by ' '搬离期限：'>>
+          <<deadwood-reblooms-finance-date `_suite.state.notice_day + 7`>>
+        </span><br>
+      <</if>>
+    <<else>>
+      <<lanSwitch 'Your agreement no longer grants access to the suite. Any stored clothes can be collected through the lobby desk.' '套房的住宿权限已撤销。留存的衣物可通过大厅接待处领取。'>><br>
+    <</if>>
+    <<if _suite.state.arrears gt 0>>
+      <span class='red'><<lanSwitch 'Unpaid upkeep: ' '未付维护费：'>><<printmoney _suite.state.arrears>></span><br>
+    <</if>>
+    <br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-company-suite-expired'>>
+  <<set $outside to 0>><<set $location to 'avery_skyscraper'>><<effects>>
+  <<language>>
+    <<option 'EN'>>
+      Your card no longer opens the residents' lift. The accommodation office has left a copy of the notice with security.
+      Any clothes left inside can be collected through the accommodation desk.
+      The guard waits while you collect your things, then directs you to the lobby.
+    <<option 'CN'>>
+      门卡已经无法打开住户电梯。住宿接待处把通知的副本交给了安保台。
+      如果还有衣物留在里面，可以通过住宿接待处领取。
+      保安等你收好随身物品，指了指通向大厅的门。
+  <</language>><br><br>
+  <<getouticon>><<lanLink ['Go to the accommodation desk', '前往住宿接待处'] 'Deadwood Reblooms Company Suite'>>
+    <<set $Finance.real_estate.visiting to null>><<endevent>>
+  <</lanLink>><br>
+  <<getouticon>><<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>>
+    <<set $Finance.real_estate.visiting to null>><<endevent>>
+  <</lanLink>>
+<</widget>>
+
+:: Deadwood Reblooms Company Suite []
+<<set $outside to 0>><<set $location to 'avery_skyscraper'>><<effects>>
+<<set _company to maplebirch.get('Finance').company>>
+<<set _suite to _company.suite>>
+<<if $avery_fate isnot 'ascended'>>
+  <<language>>
+    <<option 'EN'>>
+      There is no completed suite to visit.
+    <<option 'CN'>>
+      这里没有能入住的套房。
+  <</language>><br><br>
+  <<getouticon>><<lanLink ['Return to Elk Street', '返回麋鹿街'] 'Elk Street'>><</lanLink>>
+  <<exit>>
+<</if>>
+<<if _company.state.result is 'suite-signed'>>
+  <<set _company.state.result to null>>
+  <<language>>
+    <<option 'EN'>>
+      The clerk checks your signature, then places a key card on the counter.
+      "The residents' lift is on the left. Your visitors will need to sign in."
+      The card has your name on it, with the suite number beneath.
+    <<option 'CN'>>
+      职员核对你的签名，把门卡放到柜台上。
+      “住户电梯在左边。访客需要登记。”
+      门卡印着你的名字，下面是套房的编号。
+  <</language>><br><br>
+<<elseif _company.state.result is 'suite-failed'>>
+  <<set _company.state.result to null>>
+  <span class='red'><<lanSwitch 'The clerk cannot complete the paperwork. The share register and unpaid bills must be checked first.' '手续没能办成，需要先核对持股记录与未付账单。'>></span><br><br>
+<<elseif !_company.open>>
+  <<language>>
+    <<option 'EN'>>
+      The accommodation desk is shut. A security guard points you towards the residents' lift.
+      "If you've already got a card, you can go up. Paperwork will have to wait until office hours."
+    <<option 'CN'>>
+      住宿接待处已经关门。保安朝住户电梯指了指。
+      “有门卡就能上去，办手续得等工作时间。”
+  <</language>><br><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      The clerk turns to the accommodation register.
+      "There is a private suite beside the upper office wing. The company can make it available to a director or controlling shareholder."
+      <<if C.npc.Avery.state is 'dismissed'>>
+        The clerk checks the register again. "The agreement concerns your position in the company."
+      <</if>>
+    <<option 'CN'>>
+      职员翻开住宿登记簿。
+      “顶层办公区旁有一间私人套房，可以安排给公司的董事或控股股东。”
+      <<if C.npc.Avery.state is 'dismissed'>>
+        职员又核对了一遍记录。“这份协议按您在公司的职务办理。”
+      <</if>>
+  <</language>><br><br>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    The suite has a sitting room, a kitchen, two bedrooms, a bathroom, a study and an indoor pool.
+    Two shallow planting beds stand in a sheltered roof garden. The parking spaces are underground.
+    <br><br>
+    The agreement grants <span class='teal'>use of the suite</span>. You cannot sell it, let it out or pledge it against a loan.
+    The company maintains the building. The suite's weekly upkeep of <<printmoney _suite.upkeep>> comes from your bank account, with any shortfall carried forward.
+    <br><br>
+    If you lose both your board seat and controlling stake, or leave upkeep unpaid, you receive <span class='red'>seven days' notice</span>.
+    Restoring your position and clearing the bill within that period withdraws the notice.
+    Afterwards your card stops working. Clothes left inside are boxed for collection at the lobby desk.
+    Any live-in lovers move together to another suitable empty home you hold, or return to their usual accommodation.
+  <<option 'CN'>>
+    套房有起居室、厨房、两间卧室、浴室、书房与室内泳池。
+    背风的天台花园放着两只浅种植箱，停车位则在地下。
+    <br><br>
+    协议授予你<span class='teal'>套房使用权</span>，不能出售、出租或抵押。
+    大楼由公司维护，套房每周<<printmoney _suite.upkeep>>的维护费从银行账户扣除，扣款不足的部分记为欠费。
+    <br><br>
+    失去董事席位且不再控股，或拖欠维护费时，公司会给你<span class='red'>七天搬离期限</span>。
+    期限内恢复任职或控股，并结清账单，通知便会撤回。
+    到期后门卡失效，留在里面的衣物会装箱，交由大厅接待处保管。
+    同住恋人会一起搬到你名下另一处空置且有足够床位的住处，否则各自回到原来的住所。
+<</language>><br><br>
+<<if _suite.state.notice_day isnot null and _suite.occupied>>
+  <span class='red'>
+    <<lanSwitch 'Your current deadline is ' '你目前的搬离期限为'>>
+    <<deadwood-reblooms-finance-date `_suite.state.notice_day + 7`>>
+  </span><br><br>
+<</if>>
+<<if _suite.state.arrears gt 0>>
+  <span class='red'><<lanSwitch 'Unpaid upkeep: ' '未付维护费：'>><<printmoney _suite.state.arrears>></span><br>
+  <<if _company.available and $Finance.bank.opened and $Finance.bank.debit_card and $Finance.bank.balance gte _suite.state.arrears>>
+    <<shopicon 'register'>><<lanLink ['Clear the upkeep bill', '结清维护费'] 'Deadwood Reblooms Company Suite'>>
+      <<run maplebirch.get('Finance').company.suite.pay()>>
+    <</lanLink>><br>
+  <</if>>
+<</if>>
+<<if _suite.canSign>>
+  <<icon 'company/registration.png'>><<lanLink ['Sign the accommodation agreement (0:10)', '签署住宿协议 (0:10)'] 'Deadwood Reblooms Company Suite'>>
+    <<set $Finance.company.result to maplebirch.get('Finance').company.suite.sign() ? 'suite-signed' : 'suite-failed'>>
+    <<pass 10>>
+  <</lanLink>><br>
+<<elseif !_suite.occupied and !_suite.eligible>>
+  <span class='red'><<lanSwitch 'The current share register does not qualify you for accommodation.' '你目前的持股与任职记录不符合住宿条件。'>></span><br>
+<</if>>
+<<if _suite.occupied and _company.available>>
+  <<homeicon>><<lanLink ['Take the lift up (0:02)', '乘电梯上楼 (0:02)'] 'Deadwood Reblooms Property Home'>>
+    <<run maplebirch.get('Finance').realEstate.visit('penthouse')>><<pass 2>>
+  <</lanLink>><br>
+<<elseif _suite.state.signed and $wardrobes.deadwood_penthouse>>
+  <<furnitureicon 'wardrobe'>><<lanLink ['Collect your stored clothes', '领取寄存衣物'] 'Deadwood Reblooms Company Suite Storage'>><</lanLink>><br>
+<</if>>
+<br><<getouticon>><<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>><</lanLink>>
+
+:: Deadwood Reblooms Company Suite Storage [exitCheckBypass]
+<<set $outside to 0>><<set $location to 'avery_skyscraper'>><<effects>>
+<<if !maplebirch.get('Finance').company.suite.occupied and $Finance.company.suite.signed and $wardrobes.deadwood_penthouse>>
+  <<set $wardrobe_location to 'deadwood_penthouse'>>
+  <<language>>
+    <<option 'EN'>>
+      A member of staff brings out the boxes with your name on them. The clothes have been kept together.
+    <<option 'CN'>>
+      工作人员搬出写有你名字的箱子。衣物都放在一起，没有被丢掉。
+  <</language>><br><br>
+  <<wardrobeSelection>>
+  <div id='wardrobewear'><<wardrobewear>></div>
+  <div id='wardrobeExits'><<wardrobeExits>></div>
+  <<wardrobe>>
+<<else>>
+  <<getouticon>><<lanLink ['Return to the desk', '返回接待处'] 'Deadwood Reblooms Company Suite'>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Company Suite Visit []
+<<set _suite to maplebirch.get('Finance').company.suite>>
+<<if !_suite.occupied or _suite.state.visit_day isnot Math.floor(Time.days)>>
+  <<lanLink ['Return', '返回'] 'Deadwood Reblooms Property Home'>><</lanLink>><<exit>>
+<</if>>
+<<run maplebirch.get('Finance').realEstate.enter()>><<effects>><<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    Avery comes up in the residents' lift. <<He>> pauses in the entrance hall before looking towards the windows.
+    <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+      "I see everything's in place." <<His>> eyes pass over the room, then return to you.
+    <<elseif maplebirch.get('Finance').company.shareholders.controller>>
+      "You've found yourself a good spot." <<He>> looks back at you. "My office has much the same view. I suppose we can compare notes."
+    <<else>>
+      "A much better view than the reception desk." <<He>> smiles. "Have you found everything?"
+    <</if>>
+  <<option 'CN'>>
+    艾弗里乘住户电梯上来，在门厅停了一下，才朝窗边望去。
+    <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+      “东西倒是摆齐了。”<<his>>的目光扫过房间，又落回你身上。
+    <<elseif maplebirch.get('Finance').company.shareholders.controller>>
+      “倒会挑地方。”<<he>>回头看你。“我的办公室，景色也差不多。以后可以聊聊各自看见的东西。”
+    <<else>>
+      “比接待处的景色好多了。”<<he>>笑了笑。“东西都找到了吗？”
+    <</if>>
+<</language>><br><br>
+<<socialiseicon 'chat'>><<lanLink ['Offer a drink and a seat (0:10)', '倒杯饮料，请艾弗里坐下 (0:10)'] 'Deadwood Reblooms Company Suite Visit End'>>
+  <<set $Finance.company.suite.visit_topic to 'personal'>><<npcincr Avery love 1>><<pass 10>>
+<</lanLink>><<glove>><br>
+<<socialiseicon 'ask'>><<lanLink ['Ask Avery to arrange visits with you first (0:05)', '请艾弗里来之前先与你商量 (0:05)'] 'Deadwood Reblooms Company Suite Visit End'>>
+  <<set $Finance.company.suite.visit_topic to 'boundary'>><<def 1>>
+  <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>><<npcincr Avery rage 1>><</if>>
+  <<pass 5>>
+<</lanLink>><br>
+<<getouticon>><<lanLink ['Show the view, then see Avery out (0:05)', '看看窗外，然后送艾弗里离开 (0:05)'] 'Deadwood Reblooms Company Suite Visit End'>>
+  <<set $Finance.company.suite.visit_topic to 'work'>><<pass 5>>
+<</lanLink>>
+
+:: Deadwood Reblooms Company Suite Visit End []
+<<set _suite to maplebirch.get('Finance').company.suite>>
+<<if !_suite.occupied or _suite.state.visit_day isnot Math.floor(Time.days) or !_suite.state.visit_topic>>
+  <<lanLink ['Return', '返回'] 'Deadwood Reblooms Property Home'>><</lanLink>><<exit>>
+<</if>>
+<<run maplebirch.get('Finance').realEstate.enter()>><<effects>><<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    <<if $Finance.company.suite.visit_topic is 'personal'>>
+      Avery takes the armchair you offer. For a while, neither of you mentions the company.
+      <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+        <<He>> turns the glass in <<his>> hand. "How long did you want me to stay?" The glass is still half full when <<he>> sets it down.
+      <<elseif $Finance.company.avery.business_only>>
+        "You wanted a quiet drink," <<he>> says. "I'd better let you get back to your evening."
+      <<elseif C.npc.Avery.lust gte 60>>
+        Avery watches you over the rim of the glass. "There's more space here than we need." <<He>> leaves the chair beside <<him>> free. You can stay where you are.
+      <<elseif $averyromance and C.npc.Avery.love gte 60>>
+        <<He>> rests a hand over yours before leaving. "We should do this somewhere without a clock on the wall."
+      <<else>>
+        "I could get used to this," <<he>> says, setting down the glass. "You'll have to invite me again."
+      <</if>>
+    <<elseif $Finance.company.suite.visit_topic is 'boundary'>>
+      "You invited me," Avery says. <<He>> watches you for a moment.
+      "But I take your point. I'll ask before I come up."
+      <<if C.npc.Avery.rage gte 20>>
+        <<He>> smooths a crease in <<his>> sleeve before turning away.
+      <</if>>
+    <<else>>
+      Avery joins you at the window. <<He>> points out the office entrance below, then falls quiet.
+      When you turn towards the lift, <<he>> follows. "I'll leave you to it."
+    <</if>>
+    <br><br>
+    The lift takes Avery back down. The suite is quiet again.
+  <<option 'CN'>>
+    <<if $Finance.company.suite.visit_topic is 'personal'>>
+      艾弗里坐上你让出的扶手椅。有一阵子，你们谁也没有提公司。
+      <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+        <<He>>转动手里的杯子。“想让我待多久？”放下时，杯子里还剩一半。
+      <<elseif $Finance.company.avery.business_only>>
+        “你想安静喝一杯。”<<he>>说。“那我就不占着你的晚上了。”
+      <<elseif C.npc.Avery.lust gte 60>>
+        艾弗里隔着杯沿看你。“这里倒挺宽敞。”<<he>>把身旁的座位留着，你可以继续坐在原处。
+      <<elseif $averyromance and C.npc.Avery.love gte 60>>
+        离开前，<<he>>把手覆在你的手上。“下次该找个不用盯着钟的地方。”
+      <<else>>
+        “这样倒挺不错。”<<he>>放下杯子。“下次记得再叫我。”
+      <</if>>
+    <<elseif $Finance.company.suite.visit_topic is 'boundary'>>
+      “是你叫我来的。”艾弗里看了你一会。
+      “不过，我明白你的意思。上来之前，我会先问你。”
+      <<if C.npc.Avery.rage gte 20>>
+        <<he>>抚平袖上的一道褶皱，才转过身。
+      <</if>>
+    <<else>>
+      艾弗里与你并肩站在窗前，指了指下方的办公区入口，随后安静下来。
+      你转向电梯时，<<he>>跟着走过来。“我不打扰了。”
+    <</if>>
+    <br><br>
+    电梯送艾弗里下楼，套房重新安静下来。
+<</language>><br><br>
+<<homeicon>><<lanLink ['Return to the sitting room', '返回起居室'] 'Deadwood Reblooms Property Home'>><<endevent>><</lanLink>>

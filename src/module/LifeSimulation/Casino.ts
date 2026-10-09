@@ -20,6 +20,7 @@ export interface CasinoState {
   bribe_night: number;
   bribe_result: 'accepted' | 'refused' | null;
   trained: boolean;
+  spray_reward_claimed: boolean;
   shifts: number;
   good_shifts: number;
   guest_night: number;
@@ -66,6 +67,7 @@ export const DEFAULT_CASINO_STATE: CasinoState = {
   bribe_night: -1,
   bribe_result: null,
   trained: false,
+  spray_reward_claimed: false,
   shifts: 0,
   good_shifts: 0,
   guest_night: -1,
@@ -138,6 +140,10 @@ class Casino {
 
   public get available(): boolean {
     return this.present && !this.barred;
+  }
+
+  public get sprayReward(): boolean {
+    return this.available && !V.replayScene && !V.statFreeze && !V.possessed && !this.state.spray_reward_claimed && this.state.statistics.best_streak >= 5;
   }
 
   public get canReply(): boolean {

@@ -4,6 +4,9 @@ import terms from '../../assets/finance/company.json';
 import type Finance from '../Finance';
 import Shareholders, { type ShareholdersState } from './Shareholders';
 import CompanyStaff, { type CompanyStaffState } from './CompanyStaff';
+import CompanyAvery, { type CompanyAveryState } from './CompanyAvery';
+import CompanySuite, { type CompanySuiteState } from './CompanySuite';
+import CompanyAscension, { type CompanyAscensionState } from './CompanyAscension';
 import type { FactoryState, Order } from './Industry';
 
 export interface CompanyState {
@@ -20,6 +23,9 @@ export interface CompanyState {
   result: string | null;
   staff: CompanyStaffState;
   shareholders: ShareholdersState;
+  avery: CompanyAveryState;
+  suite: CompanySuiteState;
+  ascension: CompanyAscensionState;
   contract: {
     site: number;
     id: number;
@@ -35,6 +41,9 @@ export default class Company {
   public readonly terms = terms;
   public readonly shareholders = new Shareholders(this);
   public readonly staff = new CompanyStaff(this);
+  public readonly avery = new CompanyAvery(this);
+  public readonly suite = new CompanySuite(this);
+  public readonly ascension = new CompanyAscension(this);
   public static readonly defaults: CompanyState = {
     name: null,
     office: false,
@@ -49,6 +58,9 @@ export default class Company {
     result: null,
     staff: CompanyStaff.defaults,
     shareholders: Shareholders.defaults,
+    avery: CompanyAvery.defaults,
+    suite: CompanySuite.defaults,
+    ascension: CompanyAscension.defaults,
     contract: null
   };
 

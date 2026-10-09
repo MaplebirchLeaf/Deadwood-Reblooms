@@ -26,6 +26,11 @@ export default function Tips(core: typeof maplebirch): void {
       ['A home needs suitable beds and enough room before you can invite someone to move in.', '邀请恋人入住前，住宅需要合适的床位和足够的空间。'],
       ['Living together does not erase old grudges. Not everyone will welcome another housemate.', '住在同一屋檐下不会抹去旧怨。不是所有人都愿意再多一位同住者。'],
       ['A housemate can still leave for work, school or the temple. Their belongings do not mean they are home.', '同住者仍会去工作、上学或神殿。物品留在房里，不代表人也在家。'],
+      [
+        'Shareholder meetings and investment offers are handled at the office building. Check your holding and the company accounts before signing.',
+        '股东大会与注资洽谈在办公大楼办理。签字前，先核对持股与公司账目。'
+      ],
+      ['Read the construction papers and visit the site before asking Avery about the tower ceremony.', '询问塔楼仪式前，可以先阅读工程文件，再去工地看看。'],
       ['Look outside from a high home to find its gliding options. Suitable wings are still required.', '从高处住宅查看外面，可以寻找滑翔选项。你仍需要能滑翔的翅膀。']
     );
 
@@ -34,6 +39,10 @@ export default function Tips(core: typeof maplebirch): void {
   if (core.get('LifeSimulation'))
     add(
       'general',
+      [
+        'Five consecutive profitable card hands earn a larger pepper spray canister at the casino cashier. The reward can be collected once.',
+        '连续五局牌桌净赢后，可以到赌馆筹码柜台领取大容量防狼喷雾罐。这份奖励只能领一次。'
+      ],
       ['The school noticeboard records your duties and progress with school affairs.', '学校公告栏会记录值勤与校园事务的进度。'],
       ['Turning in an exemption form matters as much as your grades. Good results alone do not complete the application.', '申请免课不只看成绩。准备好后，还要实际交表。'],
       ['Morning duty counts different school days. Returning to the noticeboard repeatedly will not speed it up.', '晨间值勤按不同上学日累计。同一天反复查看公告栏不会加快进度。'],

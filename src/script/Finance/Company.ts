@@ -1,11 +1,18 @@
 // ./src/script/Finance/Company.ts
 
+import CompanyAvery from './CompanyAvery';
+import CompanySuite from './CompanySuite';
+import CompanyAscension from './CompanyAscension';
+
 export default function Company(maplebirch: typeof window.maplebirch): void {
+  CompanyAvery(maplebirch);
+  CompanySuite(maplebirch);
+  CompanyAscension(maplebirch);
   maplebirch.tool.addTo(
-    'BeforeLinkZone',
-    { widget: 'deadwood-company-registration-link', passage: 'Town Hall Wait' },
-    { widget: 'deadwood-company-office-link', passage: 'Office Lobby' },
-    { widget: 'deadwood-shareholder-lobby-link', passage: 'Office Lobby' }
+    'CustomLinkZone',
+    { widget: [-1, 'deadwood-company-registration-link'], passage: 'Town Hall Wait' },
+    { widget: [-1, 'deadwood-company-office-link'], passage: 'Office Lobby' },
+    { widget: [-1, 'deadwood-shareholder-lobby-link'], passage: 'Office Lobby' }
   );
   maplebirch.tool.addTo('Journal', 'deadwood-company-journal');
   maplebirch.tool.patch.traits.add({

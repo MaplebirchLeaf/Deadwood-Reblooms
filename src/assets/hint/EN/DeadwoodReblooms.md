@@ -1,6 +1,6 @@
 ### Prerequisites
 
-The target game version is **0.5.12.13**, with maplebirch framework **5.2.2 or later**. Install the loader's required dependencies, enable the root and desired submodules, save and reload. Character, location and story prerequisites still apply to each feature.
+The target game version is **0.5.12.13**, with maplebirch framework **5.4.1 or later**. Install the loader's required dependencies, enable the root and desired submodules, save and reload. Character, location and story prerequisites still apply to each feature.
 
 ### Guide, settings and statistics
 
@@ -26,7 +26,8 @@ The target game version is **0.5.12.13**, with maplebirch framework **5.2.2 or l
 | Whitney's rescue or daily life  | Whitney                                | Underground cell, or unlocked dock / flat interactions              |
 | Kylar's home life               | Kylar                                  | Manor after the first vanilla stay                                  |
 | School roles and fitness        | LifeSimulation                         | Headteacher's office and Cliff Street gym                           |
-| Banking, homes and residents    | VanillaPlus                            | High Street financial centre and furniture-shop entrance            |
+| Banking, homes and residents    | Finance                                | High Street financial centre and furniture-shop entrance            |
+| Getting to know Remy            | Orchard                                | Riding school daytime menu after the vanilla introduction           |
 | Horse and whale forms           | MoreTransformations                    | Riding school and beach rocks pool                                  |
 | Portraits, music and cheats     | Relevant interface chapter             | Settings, vanilla scenes or framework content page                  |
 

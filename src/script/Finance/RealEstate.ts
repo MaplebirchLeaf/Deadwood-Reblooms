@@ -3,6 +3,7 @@
 export default function RealEstate(maplebirch: typeof window.maplebirch): void {
   const realEstate = maplebirch.get('Finance')!.realEstate;
   for (const property of realEstate.properties) {
+    if (property.location) continue;
     maplebirch.tool.patch.location.configure(
       `deadwood_home_${property.id}`,
       {
@@ -28,11 +29,11 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
     // current 沿用产权、出租和冻结判断，并在切换存档后读取当前房屋。
     customMapping: () => {
       const property = V.Finance?.real_estate ? realEstate.current : undefined;
-      return property ? `deadwood_home_${property.id}` : 'home';
+      return property ? (property.location ?? `deadwood_home_${property.id}`) : 'home';
     }
   });
 
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-property-furnishings-link', passage: 'Furniture Shop' });
+  maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-reblooms-property-furnishings-link'], passage: 'Furniture Shop' });
   // 这些原版 Passage 能与 NPC 当面交谈。课堂入口还需由原版出勤状态与考试阶段筛选。
   maplebirch.tool.addTo(
     'BeforeLinkZone',
@@ -105,7 +106,7 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
       'Widgets Wardrobe': [
         {
           src: '<<case "Farm Wardrobe">>',
-          applybefore: '<<case "Deadwood Reblooms Property Wardrobe">>\n\t\t\t<<deadwood-reblooms-property-wardrobe-exit>>\n\t\t',
+          applybefore: '<<case "Deadwood Reblooms Property Wardrobe" "Deadwood Reblooms Company Suite Storage">>\n\t\t\t<<deadwood-reblooms-property-wardrobe-exit>>\n\t\t',
           expected: 1
         }
       ]

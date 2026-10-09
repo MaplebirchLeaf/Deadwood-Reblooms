@@ -24,7 +24,7 @@ Exemption avoids truancy penalties, not grade decay or every school responsibili
 
 ### Prefect and morning duty
 
-Attendance exemption and council appointments are independent: you may pursue either or both. A prefect application needs neither exemption, a seven-day wait nor top grades. Reach vanilla teacher evaluation **Model student** and school popularity at least **Cool**, then apply to Leighton. Leighton must agree or you must possess vanilla leverage; Winter does not need to recommend you separately.
+Attendance exemption and council appointments are independent: you may pursue either or both. Reach vanilla teacher evaluation **Model student** and school popularity at least **Cool**, then apply to Leighton. Leighton must agree or you must possess vanilla leverage.
 
 Duty is **07:00–09:00 on schooldays**, once daily. Robin, Sydney, Kylar and Whitney follow their locations rather than all appearing together.
 
@@ -189,6 +189,8 @@ After being barred for cheating, you can quietly offer cash for one more chance 
 Three card uses the **unsuited 235 beats three of a kind** rule. A 235 that is not all one suit beats any three of a kind, but ranks as ordinary high card against other hands. A suited 235 remains a flush. At a multiplayer showdown, first eliminate three-of-a-kind hands beaten by an unsuited 235, then compare the remaining hands normally.
 
 **Giant Killer**: Beat three of a kind with an unsuited 235 in a comparison or showdown, win the hand and collect your winnings. An ordinary opponent fold does not count.
+
+After a five-hand winning streak, collect a larger pepper spray canister at the cashier once. It increases capacity by one use and replenishes your spray.
 
 Casino feats: **On a Roll** requires five consecutive profitable card hands in one night. A tie or loss breaks the streak. **A Good Night** requires a net casino profit of **£10,000** in one night. **Steady Hands** requires ten table disputes handled correctly while working as a dealer. Exchanging chips, returned stakes and watching do not count as profit. Slots do not count towards the card streak. Gambling totals and longest streaks appear in Mod Statistics.
 

@@ -1,0 +1,611 @@
+:: Deadwood Reblooms Company Ascension Widgets [widget]
+
+<<widget 'deadwood-ascension-header'>>
+  <<set _ascension to maplebirch.get('Finance').company.ascension>>
+  <<set _ascension_state to _ascension.state>>
+<</widget>>
+
+<<widget 'deadwood-ascension-return'>>
+  <br><<getouticon>><<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>><<endevent>><</lanLink>><br>
+<</widget>>
+
+<<widget 'deadwood-ascension-preparation-link'>>
+  <<deadwood-ascension-header>>
+  <<if _ascension.canPrepare>>
+    <<socialiseicon 'ask'>><<lanLink ['Ask to share in the ceremony (0:10)', '要求一同参与仪式 (0:10)'] 'Deadwood Reblooms Company Ascension Preparation'>>
+      <<if maplebirch.get('Finance').company.ascension.prepare()>><<pass 10>><</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-ascension-proposal-link'>>
+  <<deadwood-ascension-header>>
+  <<if _ascension.canPropose>>
+    <<socialiseicon 'ask'>><<lanLink ['Raise your terms before going upstairs (0:05)', '上楼前提出你的条件 (0:05)'] 'Deadwood Reblooms Company Ascension Proposal'>>
+      <<if maplebirch.get('Finance').company.ascension.canPropose>><<pass 5>><</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-ascension-terms-room'>>
+  <<deadwood-avery-ceremony-header>><<deadwood-ascension-header>>
+  <<language>>
+    <<option 'EN'>>
+      The lift opens onto the upper room. Red moonlight fills it through the skylight. The elk-masked guests kneel around a table.
+      Remy stands beside it, holding the knife aloft.
+      <br><br>
+      "You who would complete our triumvirate," <<nnpc_he 'Remy'>> begins.
+      <br><br>
+      Avery stops before stepping forward. "There's another matter."
+      Harper takes your elbow. "We spoke downstairs. The fox still brings the stones. The recipient's part may be shared."
+      The chanting has not begun. Remy lowers the knife a little.
+      <br><br>
+      "May?"
+      <br>
+      "We can make the request," Harper says. "We can't answer it."
+      <br><br>
+      Remy looks you over. "And what do you bring?"
+      <br>
+      "You know what I bring," you say. "My part in the company. The work I've put behind it. I won't spend all of that to remain outside the door."
+      <br><br>
+      "A place at the table isn't a pension," Remy says. "There'll be work. Things you won't put in the company minutes. You won't always like who benefits."
+      Harper slips the purple box from <<nnpc_his 'Harper'>> coat. "You still lie beneath the skylight. They'll hold you in place. The knife still rests above your heart."
+      <br><br>
+      "Will it hurt?"
+      <br>
+      "Yes," Harper says. "You may carry it afterwards. Joining us won't spare you that."
+      <br><br>
+      Avery watches you. "And it doesn't take my place away."
+      <br>
+      "Or mine," Remy says. <<nnpc_He 'Remy'>> turns the knife in <<nnpc_his 'Remy'>> hand. "If you're received, we'll make room for a fourth. If you aren't, no vote can force it."
+      <br><br>
+      Harper opens the box. The stones glisten in the moonlight. <<nnpc_He 'Harper'>> holds it where you can reach it.
+      "Your answer. Before we begin."
+    <<option 'CN'>>
+      电梯门在顶层打开。红色月光从天窗倾入室内，戴麋鹿面具的宾客跪在桌子四周。
+      雷米站在桌旁，高举着刀。
+      <br><br>
+      “你，将使我们的三人执政团——”<<nnpc_he 'Remy'>>开口道。
+      <br><br>
+      艾弗里没有马上走过去。“还有一件事。”
+      哈珀扶住你的胳膊。“楼下已经谈过。狐狸仍然献石，受封的部分可以试着由两人承担。”
+      吟唱尚未开始。雷米把刀稍稍放低。
+      <br><br>
+      “试着？”
+      <br>
+      “我们可以请求。”哈珀说。“答复不由我们给。”
+      <br><br>
+      雷米打量着你。“那你带来了什么？”
+      <br>
+      “你知道我带来了什么。”你说。“公司里属于我的部分。为它做的那些事。我不会付出这些，最后还站在门外。”
+      <br><br>
+      “有个席位，不是让你来养老。”雷米说。“会有活干。有些事，不会写进公司会议记录。得利的人，也未必是你喜欢的。”
+      哈珀从外套里取出紫色盒子。“你仍要躺在天窗下。他们会把你固定住，刀仍然要抵在你的心脏上方。”
+      <br><br>
+      “会痛吗？”
+      <br>
+      “会。”哈珀说。“也可能一直留在你身上。加入我们，不会免掉这部分。”
+      <br><br>
+      艾弗里盯着你。“也不许拿走我的位置。”
+      <br>
+      “还有我的。”雷米把刀在手中转了一圈。“如果它接纳了你，我们就为第四人腾个位置。如果没有，多少票也没用。”
+      <br><br>
+      哈珀打开盒子。许愿石在月光中闪烁，<<nnpc_he 'Harper'>>把盒子递到你够得着的地方。
+      “说出你的回答。开始之前。”
+  <</language>><br><br>
+  <<templeicon>><<lanLink ['Accept the terms', '接受这些条件'] 'Skyscraper Party 14'>>
+    <<run maplebirch.get('Finance').company.ascension.accept()>>
+  <</lanLink>><br>
+  <<refuseicon>><<lanLink ['Withdraw your request and keep your original role', '撤回要求，按原来的安排参与'] 'Skyscraper Party 13'>>
+    <<run maplebirch.get('Finance').company.ascension.withdraw()>>
+  <</lanLink>><br>
+<</widget>>
+
+<<widget 'deadwood-ascension-dream'>>
+  <<deadwood-ascension-header>>
+  <<if _ascension_state.accepted and $fake_artefact isnot 'Avery' and !$replayScene and !$statFreeze>>
+    <<language>>
+      <<option 'EN'>>
+        As the garden fades, something black alights on the wall. A bird. Its claws close around the stone, and its head turns towards you.
+        You try to see its face. For a moment, you're looking back at yourself from above.
+        <br><br>
+        The roofs stretch away below. Little shapes move between them. Your chest tightens. Somewhere beneath your feet, something hungry shifts.
+        You fall towards the skylight. The bird is gone before you can decide if it was there at all.
+      <<option 'CN'>>
+        花园消退时，有团黑影落在围墙上。一只鸟。它的爪子扣住石沿，转头望向你。
+        你想看清它的脸。一瞬间，你正从高处回望自己。
+        <br><br>
+        屋顶在下方铺开，小小的身影穿行其间。你的胸口一紧。脚下某处，有个饥饿的东西动了一下。
+        你朝天窗坠去。还没来得及确定那只鸟是否真的存在，它便消失了。
+    <</language>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-ascension-awakening'>>
+  <<deadwood-ascension-header>>
+  <<if _ascension.canAwaken>>
+    <<language>>
+      <<option 'EN'>>
+        The wound pulls at your heart. Then the pull stops, leaving a steady pressure beneath it. You gasp. Your limbs have gone cold.
+        <br><br>
+        A black shape spreads across the ceiling, where no shadow should fall. You blink, and find only moonlight.
+        The ache is still there. You can breathe around it now.
+        <br><br>
+        Harper turns towards you. Remy follows <<nnpc_his 'Harper'>> gaze.
+        You grip the edge of the table and sit up. The stone beneath your hand feels warm.
+      <<option 'CN'>>
+        那道伤口牵扯着你的心脏。接着，拉扯停了，留下胸腔深处持续的压迫。你猛地吸气，四肢冷得发僵。
+        <br><br>
+        天花板上掠开一团黑影，那里本不该有影子。你眨眨眼，只剩月光。
+        伤口仍然疼。现在，你能顺着它呼吸了。
+        <br><br>
+        哈珀转过头，雷米也跟着看向你。
+        你抓住桌沿，坐了起来。手底下的石头是暖的。
+    <</language>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-ascension-recognition'>>
+  <<deadwood-ascension-header>>
+  <<if _ascension.active>>
+    <<language>>
+      <<option 'EN'>>
+        Remy stops beside you as the congratulations begin. Harper is still watching the place above your heart.
+        <br><br>
+        "The Crimson Hound. The Silver Fox. The High Elk," Remy says. <<nnpc_He 'Remy'>> looks from Avery to Harper, then to you.
+        "And the Black Raven. Auriga has received you."
+        <br><br>
+        Harper bows <<nnpc_his 'Harper'>> head. "We'll need to speak about what you felt. Soon."
+        Avery lifts <<nnpc_his 'Avery'>> mask. "Keep the name upstairs. I have enough questions to answer tomorrow."
+        <br><br>
+        Remy holds out a hand. "We'll see what you make of it."
+        You take it. The grip is firm, and slow to release. The nearest guests lower their heads.
+      <<option 'CN'>>
+        宾客上前道贺时，雷米在你身旁停下。哈珀仍盯着你心口的位置。
+        <br><br>
+        “猩红猎犬。银狐狸。高麋鹿。”雷米看过艾弗里，又看过哈珀，最后望向你。
+        “还有黑渡鸦。奥利加接纳了你。”
+        <br><br>
+        哈珀低下头。“你刚才的感觉，得跟我说说。尽快。”
+        艾弗里掀起面具。“这名字留在楼上。明天要回答的问题，已经够多了。”
+        <br><br>
+        雷米伸出手。“看看你能做成什么。”
+        你握住它。那只手握得很紧，迟迟没有松开。站在近处的宾客都垂下了头。
+    <</language>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-ascension-audience-link'>>
+  <<deadwood-ascension-header>>
+  <<if _ascension.canAudience>>
+    <<socialiseicon 'ask'>><<lanLink ['Discuss your place among them', '谈谈你在他们之中的位置'] 'Deadwood Reblooms Company Ascension Audience'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-ascension-jordan-link'>>
+  <<deadwood-ascension-header>>
+  <<if _ascension.canTellJordan>>
+    <<socialiseicon 'ask'>><<lanLink ['Tell Jordan about the tower (0:10)', '向约旦讲述塔楼里的事 (0:10)'] 'Deadwood Reblooms Company Ascension Jordan'>>
+      <<if maplebirch.get('Finance').company.ascension.tellJordan()>><<pass 10>><</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-ascension-gwylan'>>
+  <<deadwood-ascension-header>>
+  <<if _ascension_state.ascended and $auriga_scar and $demon lt 6 and $gwylan>>
+    <<language>>
+      <<option 'EN'>>
+        "The wound doesn't drag me back into it now," you say. "They called me the Black Raven."
+        <br><br>
+        Gwylan studies your face. "And now you're looking down on the hunt?"
+        <<nnpc_He 'Gwylan'>> glances towards the sea. "Take care when you land. They have snares for birds, too."
+        <br><br>
+        <<nnpc_His 'Gwylan'>> hand settles on your shoulder. "You can still come here. Whatever they've called you."
+      <<option 'CN'>>
+        “那道伤口，没再把我往里面拖了。”你说。“他们叫我黑渡鸦。”
+        <br><br>
+        格威岚端详着你的脸。“现在，你在天上俯看他们狩猎了？”
+        <<nnpc_He 'Gwylan'>>望了一眼海面。“落地时小心些。他们也有捕鸟的网。”
+        <br><br>
+        <<nnpc_His 'Gwylan'>>的手搭上你的肩。“你还是可以来这里。无论他们管你叫什么。”
+    <</language>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-ascension-journal'>>
+  <<deadwood-ascension-header>>
+  <<if _ascension_state.ascended>>
+    <h2 class='purple'>
+      <<if _ascension_state.recognized>>
+        <<lanSwitch 'Black Raven' '黑渡鸦'>>
+      <<else>>
+        <<lanSwitch 'Ascended' '飞升'>>
+      <</if>>
+    </h2>
+    <ul class='journal'>
+      <li>
+        <<language>>
+          <<option 'EN'>>
+            You shared in Avery's ascension.
+            <<if _ascension_state.recognized>>
+              Remy and Harper acknowledged a fourth place among them, and called you the Black Raven.
+            <<else>>
+              You feel something steady beneath the new wound. The room has fallen silent.
+            <</if>>
+            The wound above your heart remains, but its lingering ache no longer keeps adding to your trauma as time passes.
+            Tension and fatigue gradually ease. Other suffering can still leave its mark on you.
+          <<option 'CN'>>
+            你与艾弗里一同完成升华。
+            <<if _ascension_state.recognized>>
+              雷米与哈珀承认了第四个位置，称你为黑渡鸦。
+            <<else>>
+              新伤口底下，有股稳定的感觉。四周安静了下来。
+            <</if>>
+            心口的伤痕仍在，余痛却不再随时间不断加深你的创伤。
+            紧绷与疲惫会慢慢散去，别的痛苦仍然会留下伤害。
+        <</language>>
+      </li>
+      <<if !_ascension_state.jordan_told>>
+        <li><<lanSwitch 'You could ask Jordan about what happened to you, if you wish to disclose it.' '如果愿意说出这件事，可以向约旦询问自身的变化。'>></li>
+      <</if>>
+    </ul>
+  <<elseif _ascension_state.prepared_day gte 0 and !$avery_fate>>
+    <h2 class='purple'><<lanSwitch 'Your terms for the ceremony' '参与仪式的条件'>></h2>
+    <ul class='journal'>
+      <li>
+        <<language>>
+          <<option 'EN'>>
+            Avery agreed to pass your request to Harper. From the following day, if your business position still carries weight, you can raise it before entering the lift at the blood-moon gathering.
+            The outcome remains uncertain.
+          <<option 'CN'>>
+            艾弗里答应把你的要求交给哈珀。从次日起，如果你在生意上仍有足够分量，可以在血月聚会乘电梯之前提出条件。
+            最后的结果仍然无法保证。
+        <</language>>
+      </li>
+    </ul>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Company Ascension Preparation []
+<<deadwood-company-header>><<endevent>><<deadwood-ascension-header>>
+<<if _ascension_state.prepared_day lt 0>><<deadwood-shareholder-return>><<exit>><</if>>
+<<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You leave the account papers closed. "That gathering upstairs. I want to take part on my own terms."
+    Avery sets down <<his>> pen. "You've already been invited."
+    <br><br>
+    "To bring you something. To stand where I'm told. I want a share of what you're going there for."
+    Avery sits back. <<His>> fingers tap the arm of the chair.
+    <br><br>
+    "You think the company buys you everything?"
+    <br>
+    "I think it means you have to hear me out."
+    <br><br>
+    For a while, you hear only the noise of a printer outside.
+    "Harper knows the arrangements," Avery says at last. "I'll put it to <<nnpc_him 'Harper'>>. You'll hear the answer there."
+    <br><br>
+    "Before it starts."
+    <br>
+    Avery looks at you again. "Before it starts. Give <<nnpc_him 'Harper'>> time. You aren't asking for another chair in a meeting."
+    <<He>> pulls the account papers towards <<himself>>. "And whatever you ask for, it doesn't come out of my share."
+  <<option 'CN'>>
+    你没有翻开账目。“楼上的那场聚会。我想按自己的条件参与。”
+    艾弗里放下笔。“你已经受邀了。”
+    <br><br>
+    “给你送东西。站在指定的位置。我想分到的，是你要去那里得到的东西。”
+    艾弗里靠向椅背，手指敲着扶手。
+    <br><br>
+    “你觉得，一家公司就能买到一切？”
+    <br>
+    “我觉得，你至少得听我说完。”
+    <br><br>
+    一时间，只有外面打印机的响动。
+    “安排的事，哈珀清楚。”艾弗里终于说。“我会告诉<<nnpc_him 'Harper'>>。到那里，你会听到答复。”
+    <br><br>
+    “开始之前。”
+    <br>
+    艾弗里又看向你。“开始之前。给<<nnpc_him 'Harper'>>一些时间。你要的，可不是会议室里多放把椅子。”
+    <<He>>把账目拉回面前。“还有，无论你想要什么，都不能从我的那份里拿。”
+<</language>><br><br>
+<<deadwood-shareholder-return>>
+
+:: Deadwood Reblooms Company Ascension Proposal []
+<<deadwood-avery-ceremony-header>><<deadwood-ascension-header>>
+<<if !_ascension.canPropose>><<lanLink ['Continue with them', '继续跟着他们'] 'Skyscraper Party 12'>><</lanLink>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    You remain outside the lift. "What did Harper say?"
+    Avery turns towards the last of the guests. They are already on their way up.
+    <br><br>
+    "Your request is possible," Harper says. "Possible isn't certain."
+    <br>
+    "Explain."
+    <br><br>
+    Harper keeps <<nnpc_his 'Harper'>> voice low. "You still bring the stones. You still take the fox's part. Avery still receives the mask. There is a point at which the two of you might be received together."
+    <br><br>
+    "Might?"
+    <br>
+    "The others have to agree. And even if they do, what hears us may not." <<nnpc_He 'Harper'>> glances up the lift shaft. "A second fox has a precedent. What you're asking for goes further."
+    <br><br>
+    Avery's gaze settles on you. "If we go up with this, Remy hears it from us. You don't turn the ceremony into an argument in front of the room."
+    Harper reaches towards the lift's controls. "You'll hear the terms before it starts. You can keep the role you were given instead."
+    <br><br>
+    The lift returns. The doors open without a sound.
+  <<option 'CN'>>
+    你留在电梯外。“哈珀怎么说？”
+    艾弗里看向最后一批宾客。他们已经上去了。
+    <br><br>
+    “你的要求，有可能做到。”哈珀说。“有可能，不等于一定。”
+    <br>
+    “说清楚。”
+    <br><br>
+    哈珀压低声音。“你仍然献石，承担狐狸的部分。艾弗里仍然戴上面具。到了某个时候，可以试着让你们一起被接纳。”
+    <br><br>
+    “试着？”
+    <br>
+    “其他人得同意。即便同意了，听见我们的东西也未必答应。”<<nnpc_he 'Harper'>>往电梯井上方看了一眼。“第二只狐狸有先例。你的要求，还要再往前一步。”
+    <br><br>
+    艾弗里的视线落在你身上。“要带着这个要求上楼，就由我们告诉雷米。别当着所有人的面，把仪式变成吵架。”
+    哈珀伸手靠近电梯按钮。“开始前，你会听到条件。也可以照原来给你的角色参与。”
+    <br><br>
+    电梯回来了，门悄无声息地打开。
+<</language>><br><br>
+<<socialiseicon 'agree'>><<lanLink ['Take your request upstairs', '带着要求上楼'] 'Skyscraper Party 12'>>
+  <<run maplebirch.get('Finance').company.ascension.propose()>>
+<</lanLink>><br>
+<<refuseicon>><<lanLink ['Keep the original arrangement', '按原来的安排参与'] 'Skyscraper Party 12'>>
+  <<run maplebirch.get('Finance').company.ascension.withdraw()>>
+<</lanLink>><br>
+<<getouticon>><<lanLink ['Leave before the lift goes up', '在电梯上去之前离开'] 'Deadwood Reblooms Company Avery Ceremony Leave'>>
+  <<run maplebirch.get('Finance').company.ascension.withdraw()>><<set $Finance.company.avery.decision to 'leave'>><<npcincr Avery rage 3>>
+<</lanLink>><br>
+
+:: Deadwood Reblooms Company Ascension Audience []
+<<deadwood-company-header>><<endevent>><<deadwood-ascension-header>>
+<<if !_ascension.active or !_ascension_state.recognized>><<deadwood-ascension-return>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    The clerk looks up your name in the appointments book and shows you to the reception room. Nobody mentions a Black Raven.
+    Calls to Harper or Remy can be put through from here. Avery can speak in person, when available.
+  <<option 'CN'>>
+    职员在会面登记簿上找到你的名字，把你领到接待室。没人提起“黑渡鸦”。
+    哈珀与雷米可以从这里打电话联系。若艾弗里有空，也能当面交谈。
+<</language>><br><br>
+<<if _ascension.canAudience>>
+  <<if C.npc.Avery.state is 'active' and !$avery_injury and $avery_mansion.schedule isnot 'away'>>
+    <<socialiseicon 'chat'>><<lanLink ['Ask Avery about sharing power (0:15)', '问艾弗里如何分享权力 (0:15)'] 'Deadwood Reblooms Company Ascension Audience Result'>>
+      <<if maplebirch.get('Finance').company.ascension.audience('avery')>><<pass 15>><</if>>
+    <</lanLink>><br>
+  <</if>>
+  <<if C.npc.Harper.state is 'active'>>
+    <<socialiseicon 'ask'>><<lanLink ['Call Harper about the change (0:15)', '打电话向哈珀询问变化 (0:15)'] 'Deadwood Reblooms Company Ascension Audience Result'>>
+      <<if maplebirch.get('Finance').company.ascension.audience('harper')>><<pass 15>><</if>>
+    <</lanLink>><br>
+  <</if>>
+  <<if C.npc.Remy.state is 'active'>>
+    <<socialiseicon 'ask'>><<lanLink ['Call Remy about your place (0:15)', '打电话向雷米询问你的位置 (0:15)'] 'Deadwood Reblooms Company Ascension Audience Result'>>
+      <<if maplebirch.get('Finance').company.ascension.audience('remy')>><<pass 15>><</if>>
+    <</lanLink>><br>
+  <</if>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      No further conversation can be arranged today.
+    <<option 'CN'>>
+      今天没能再安排谈话。
+  <</language>><br><br>
+<</if>>
+<<deadwood-ascension-return>>
+
+:: Deadwood Reblooms Company Ascension Audience Result []
+<<deadwood-company-header>><<endevent>><<deadwood-ascension-header>>
+<<if !_ascension.active or !_ascension_state.recognized or _ascension_state.audience_day isnot Math.floor(Time.days)>><<deadwood-ascension-return>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    <<switch _ascension_state.audience>>
+      <<case 'avery'>>
+        Avery puts a finger between the pages of a report. "You wanted to talk about what happened upstairs?"
+        <br><br>
+        <<if $speech_attitude is 'meek' or $speech_attitude_avery>>
+          "If you have time. I'd like to know what happens now."
+        <<elseif $speech_attitude is 'bratty'>>
+          "I have a place up there now. What are you going to do with that?"
+        <<else>>
+          "About what comes next."
+        <</if>>
+        <br>
+        <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+          "You don't start giving me orders because Remy gave you a name." Avery's finger presses into the report.
+          <br><br>
+          "We agreed on a place," you say.
+          <br>
+          "A place. Not my company. Not my house." <<nnpc_He 'Avery'>> shuts the report. "Put what you want in writing. I'll read it."
+          <br><br>
+          The chair remains beside the desk. Avery waits for you to speak, jaw tight.
+        <<elseif $Finance.company.avery.business_only>>
+          "For the company? More work." Avery turns the report so you can read it.
+          <br><br>
+          You ask whether the new name changes your agreement.
+          "You wanted business. That's what you're getting. If you want something changed, give me a proposal."
+        <<elseif C.npc.Avery.love lt 20>>
+          "Your name doesn't sign contracts." Avery opens the report at a page of figures.
+          <br><br>
+          You ask whether the new place gives you more say.
+          "Upstairs, you'll be heard. Down here, show me what it earns us."
+        <<else>>
+          "For the company? More work. For us?" <<nnpc_He 'Avery'>> looks at you. "That depends what you want."
+          <br><br>
+          You ask whether the new name changes how <<nnpc_he 'Avery'>> sees you.
+          "I was looking at you before Remy put a name to it. Don't flatter yourself that <<nnpc_he 'Remy'>> noticed first."
+          <br><br>
+          <<if C.npc.Avery.lust gte 60>>
+            <<nnpc_His 'Avery'>> gaze drops to your lips, then lower. "The name isn't what I notice when you're sitting this close."
+            You glance at the report. Avery follows your gaze and opens it again.
+          <<elseif C.npc.Avery.love gte 60 and $dateCount.Avery gt 0>>
+            <<nnpc_He 'Avery'>> shifts the report aside. "We'll still have our evenings. I'd rather hear about your plans over dinner."
+            For a moment, <<nnpc_his 'Avery'>> attention stays on you instead of the open pages.
+          <<elseif $dateCount.Avery gt 0>>
+            <<nnpc_He 'Avery'>> holds your gaze. "We'll still have our evenings. Unless you've decided you're too grand for those now."
+          <<else>>
+            <<nnpc_He 'Avery'>> smiles. "Perhaps you'll stop making every invitation sound like a summons from the board."
+          <</if>>
+          <br><br>
+          Avery turns back to the report, keeping your chair beside the desk. "The next meeting still needs you prepared."
+        <</if>>
+      <<case 'harper'>>
+        The clerk closes the reception-room door after connecting your call.
+        "Any change in sleep? Appetite?" Harper asks before you've finished saying hello.
+        <br><br>
+        You tell <<nnpc_him 'Harper'>> about the wound. It still aches, but the ache no longer leaves you caught in what happened.
+        "And your other symptoms?"
+        <br>
+        "I feel less wound up. Less tired, given time."
+        <br><br>
+        You hear a pen scrape across paper. "How long does it take? Has it changed anything else?"
+        <<nnpc_He 'Harper'>> lets you finish, then asks the same questions in a different order.
+        <br><br>
+        "You should come in if the symptoms change," Harper says. "And don't invite it to look again just to see whether it will."
+        The pen stops. "We have enough to observe for now."
+      <<case 'remy'>>
+        Someone answers the number on the clerk's card, then puts the phone down. After a wait, Remy picks it up.
+        "The Raven. What is it?"
+        <br><br>
+        You ask what the new place lets you do.
+        "Keep your business running. Make yourself useful. If something needs moving, I want to know you can move it."
+        <br>
+        "And when we disagree?"
+        <br><br>
+        "Then we disagree." Remy's voice hardens. "You aren't getting my land. Or my people. You want something from me, bring something I want."
+        <br><br>
+        A voice calls from the other end. Remy covers the receiver, speaks, then comes back.
+        "Avery built upwards. You'd better find room to grow without standing on my feet."
+        The line clicks off.
+    <</switch>>
+  <<option 'CN'>>
+    <<switch _ascension_state.audience>>
+      <<case 'avery'>>
+        艾弗里用手指夹住报告的书页。“要谈那晚的事？”
+        <br><br>
+        <<if $speech_attitude is 'meek' or $speech_attitude_avery>>
+          “如果你有空。我想知道，接下来会怎么样。”
+        <<elseif $speech_attitude is 'bratty'>>
+          “我现在也有楼上的席位了。你打算怎么对待这件事？”
+        <<else>>
+          “谈接下来怎么办。”
+        <</if>>
+        <br>
+        <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+          “别因为雷米给你取了个名字，就开始命令我。”艾弗里的手指压进书页。
+          <br><br>
+          “我们说好了，给我一个席位。”你说。
+          <br>
+          “席位。不是我的公司，更不是我的家。”<<nnpc_he 'Avery'>>合上报告。“把要求写下来。我会看。”
+          <br><br>
+          椅子仍在桌旁。艾弗里紧绷着下颌，等你开口。
+        <<elseif $Finance.company.avery.business_only>>
+          “公司的事？继续干活。”艾弗里转过报告，让你能看清。
+          <br><br>
+          你问，新名字是否改变了你们的约定。
+          “你要谈生意，那就谈生意。想改什么，给我一份提案。”
+        <<elseif C.npc.Avery.love lt 20>>
+          “你的名字不能签合同。”艾弗里把报告翻到一页数字。
+          <br><br>
+          你问，新的席位是否让你更有发言权。
+          “在楼上，会有人听你说话。在这里，让我看看你能赚来什么。”
+        <<else>>
+          “公司的事？继续干活。我们的事？”<<nnpc_he 'Avery'>>看向你。“看你想要什么。”
+          <br><br>
+          你问，那个新名字是否改变了<<nnpc_he 'Avery'>>对你的看法。
+          “雷米给你取名字以前，我就已经在看你了。别自作多情，觉得是<<nnpc_he 'Remy'>>先注意到你。”
+          <br><br>
+          <<if C.npc.Avery.lust gte 60>>
+            <<nnpc_he 'Avery'>>的视线落到你的嘴唇，又往下移。“你坐得这么近，我注意的可不是名字。”
+            你看向报告。艾弗里顺着你的目光，把它重新翻开。
+          <<elseif C.npc.Avery.love gte 60 and $dateCount.Avery gt 0>>
+            <<nnpc_he 'Avery'>>把报告移到一旁。“我们的约会还是会有。我更想在晚餐时，听听你的计划。”
+            有一会儿，<<nnpc_he 'Avery'>>只顾看你，没再翻动书页。
+          <<elseif $dateCount.Avery gt 0>>
+            <<nnpc_he 'Avery'>>迎着你的目光。“我们的约会还是会有。除非你现在觉得，自己的身份不适合那些了。”
+          <<else>>
+            <<nnpc_he 'Avery'>>笑了笑。“也许以后，你不会把每次邀约都当作董事会传唤。”
+          <</if>>
+          <br><br>
+          艾弗里重新翻开报告，仍把你的椅子留在桌旁。“下次会议，记得做足准备。”
+        <</if>>
+      <<case 'harper'>>
+        接通电话后，职员替你关上接待室的门。
+        “睡眠有变化吗？食欲呢？”你还没问完好，哈珀便开始发问。
+        <br><br>
+        你说起那道伤口。它仍然疼，却不再让你陷在那晚的事里。
+        “其他症状呢？”
+        <br>
+        “没那么紧绷了。过一阵子，疲惫也会缓下来。”
+        <br><br>
+        电话里传来笔尖擦过纸面的声音。“多久？还有什么别的变化吗？”
+        <<nnpc_he 'Harper'>>让你说完，又换个顺序，把刚才的问题问了一遍。
+        <br><br>
+        “如果症状有变化，就来找我。”哈珀说。“还有，别为了试试它会不会回应，就再请它看过来。”
+        笔声停了。“眼下，已经有足够的东西可以观察。”
+      <<case 'remy'>>
+        职员给的号码有人接了，对方随即把电话放下。等了一会，雷米才拿起听筒。
+        “渡鸦。什么事？”
+        <br><br>
+        你问，有了这个位置，你能做些什么。
+        “经营好你的生意。做点有用的事。需要运东西时，我得知道你能运得动。”
+        <br>
+        “要是我们意见不合呢？”
+        <br><br>
+        “那就不合。”雷米的声音冷了下来。“我的地不会给你，我的人也不会。想从我这里拿东西，就带点我想要的来。”
+        <br><br>
+        电话另一头有人喊话。雷米捂住听筒，说了几句，才回来。
+        “艾弗里往天上盖。你最好也找点地方发展，别踩在我的脚上。”
+        电话挂断了。
+    <</switch>>
+<</language>><br><br>
+<<deadwood-ascension-return>>
+
+:: Deadwood Reblooms Company Ascension Jordan []
+<<set $outside to 0>><<location 'temple'>><<temple_effects>><<effects>><<deadwood-ascension-header>>
+<<if !_ascension_state.ascended or !_ascension_state.jordan_told>>
+  <<getouticon>><<lanLink ['Step away', '走开'] 'Temple'>><<endevent>><</lanLink>><<exit>>
+<</if>>
+<<npc Jordan>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    Jordan listens while you describe the tower, the red light, and the wound that nobody can see.
+    You keep a hand above your heart as you explain how it feels different now.
+    <br><br>
+    "It helps me," you say.
+    <br>
+    Jordan looks at your hand. "How do you feel now?"
+    <br><br>
+    You explain how the ache no longer wears at your thoughts, and how your burdens gradually ease. <<He>> does not interrupt.
+    When you finish, <<he>> rests a hand on your shoulder.
+    <br><br>
+    "You can come here when you're afraid," <<he>> says. "Even if you feel better than you did."
+    <br>
+    "Can you take it away?"
+    <br><br>
+    Jordan pauses. "I won't promise what I don't know. I'll pray with you, if you wish."
+    <<His>> hand stays on your shoulder a little longer. "And if there's pain in your chest, please let a doctor see you."
+  <<option 'CN'>>
+    你讲起塔楼、红光，以及那道谁也看不见的伤口。约旦一直听着。
+    说起如今不同的感觉时，你把手按在心口上方。
+    <br><br>
+    “它能帮我。”你说。
+    <br>
+    约旦看着你的手。“你现在是什么感觉？”
+    <br><br>
+    你解释，余痛不再一点点磨损你的思绪，身上的负担也会慢慢缓下来。<<He>>没有打断。
+    等你说完，<<he>>把手放在你的肩上。
+    <br><br>
+    “害怕时，你可以来这里。”<<he>>说。“即使已经比以前好一些。”
+    <br>
+    “你能把它拿走吗？”
+    <br><br>
+    约旦停了一下。“我不能为自己不清楚的事作保证。如果你愿意，我可以陪你祈祷。”
+    <<His>>的手在你的肩上多留了一会。“还有，如果胸口疼，请让医生看看。”
+<</language>><br><br>
+<<getouticon>><<lanLink ['Step away', '走开'] 'Temple'>><<endevent>><</lanLink>><br>

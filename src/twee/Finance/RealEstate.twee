@@ -36,12 +36,13 @@
 		<<case 'high'>><<highicon>>
 		<<case 'cliff'>><<clifficon>>
 		<<case 'danube'>><<danubeicon>>
+		<<case 'penthouse'>><<elkicon>>
 	<</switch>>
 <</widget>>
 
 <<widget 'deadwood-reblooms-property-outdoor-icon'>>
 	<<switch _args[0]>>
-		<<case 'domus' 'danube'>><<gardenicon>>
+		<<case 'domus' 'danube' 'penthouse'>><<gardenicon>>
 		<<case 'barb'>><<icon 'property/barb-balcony.png'>>
 		<<case 'high'>><<icon 'property/high-roof-terrace.png'>>
 		<<case 'cliff'>><<icon 'property/cliff-sea-balcony.png'>>
@@ -380,7 +381,11 @@
 <</widget>>
 
 <<widget 'deadwood-reblooms-property-wardrobe-exit'>>
-	<<lanLink ["Close the wardrobe", "关上衣柜"] 'Deadwood Reblooms Property Bedroom'>><<cleanupOnWardrobeExit>><</lanLink>>
+	<<if $passage is 'Deadwood Reblooms Company Suite Storage'>>
+		<<lanLink ['Close the storage boxes', '合上寄存箱'] 'Deadwood Reblooms Company Suite'>><<cleanupOnWardrobeExit>><</lanLink>>
+	<<else>>
+		<<lanLink ["Close the wardrobe", "关上衣柜"] 'Deadwood Reblooms Property Bedroom'>><<cleanupOnWardrobeExit>><</lanLink>>
+	<</if>>
 <</widget>>
 
 <<widget 'deadwood-reblooms-property-sleep-outfits'>>
@@ -450,7 +455,7 @@
   <<icon 'property/management.png'>><<lanLink ['Property management', '物业管理'] 'Deadwood Reblooms Property Manager'>><</lanLink>><br><br>
 <</if>>
 <div class='deadwood-card-grid'>
-<<for _property range maplebirch.get("Finance").realEstate.properties>>
+<<for _property range maplebirch.get("Finance").realEstate.properties.filter(property => !property.tenure)>>
 	<<capture _property>>
 		<<set _askingPrice to _property.price>>
 		<<set _baseWeeklyRent to maplebirch.get("Finance").realEstate.baseWeeklyRent(_property.id)>>
@@ -579,6 +584,7 @@
 <</if>>
 <br>
 <<deadwood-finance-risk-summary>><br>
+<<deadwood-reblooms-adrian-counter-link>>
 <<getouticon>><<lanLink ['Return to the financial centre', '返回金融中心'] 'Deadwood Reblooms Financial Centre'>><</lanLink>>
 <</nobr>>
 
@@ -837,6 +843,7 @@
 	<<if maplebirch.get("Finance").realEstate.residentsHome(_property.id).length is 2>>
 		<<socialiseicon>><<lanLink ['Invite both lovers to talk (0:20)', '请两位恋人一起聊聊 (0:20)'] 'Deadwood Reblooms Property Household'>><<pass 20>><</lanLink>><br><br>
 	<</if>>
+	<<deadwood-company-suite-home>>
 	<<deadwood-blackjack-home-entry 'Deadwood Reblooms Property Home'>>
 	<<deadwood-reblooms-property-floor-rooms 1>>
 	<<if _property.floors.length gt 1>>

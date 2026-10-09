@@ -95,6 +95,44 @@ With **settled AVY shares representing at least 5% of the current total**, enter
 
 <span class="blue">Company votes affect accounts, financing and construction. Avery's love, rage, dominance, romantic requirements and ascension story retain their native rules.</span>
 
+### Avery's attitude and private gathering
+
+**Directors and controlling shareholders** who have met Avery can arrange a private conversation through the shareholder reception desk, once per day for **15 minutes**. Talking about work grants one point of affection. Romantic partners can ask how Avery is doing. Separating business from private affairs raises defiance by one, and an Avery whose anger has already shown becomes more annoyed. Replies follow your actual holding, romance status, native anger and ceremony outcome.
+
+After talking about work or personal matters, Avery may propose a **Saturday invitation**, with at least seven days between these approaches. Accept, decline this time, or ask the reception desk to keep future appointments strictly business. You can later welcome private invitations again. Acceptance records the date in your journal and activates the native booking on Saturday, preserving existing dates, unresolved missed dates and Valentine's invitations. Destinations, dress requirements, subsequent events and date counts follow the original game. During ordinary restaurant conversation, discuss your business or private life before continuing the native dinner.
+
+You can also discuss **conflicting interests**. Avery responds to your votes, supply terms and personal relationship. A controlling stake makes company proposals depend on your agreement, while personal choices remain yours and Avery's.
+
+After the original skyscraper project has been introduced, review the **construction and opening files**, taking **15 minutes** on the first reading. After reading, inspect the arrangements at the **skyscraper on Elk Street** for **15 minutes**. Temple protestors, the temporary clinic and outside vans appear only under their original conditions. Your inspection does not change construction progress or establish rumours as fact.
+
+After both enquiries and once the original finishing stage begins, ask Avery to **explain your role before the opening**. This permits an enquiry. The native mansion invitation, blood moon, formal dress and opening journey still apply.
+
+When the original **public reception ends and you wait for the last lift**, an additional option lets you question Harper for **five minutes**. Afterwards, continue or leave before going upstairs. Leaving adds three points of Avery's anger and leaves the ceremony unperformed, without assigning an outcome. Continuing returns to the original masks, wishing stones, dreams and ritual branches.
+
+**After the dream:** the shared vision is recorded only after you actually see it. Once Avery has ascended or been saved and is available, you can discuss it privately. The past shown in that dream is not revealed beforehand. The scar, world changes and consequences involving Gwylan remain part of the native successful ceremony.
+
+### Black Raven and Ascended
+
+After receiving an invitation, reading the construction files and visiting the site, **ask to share in the ceremony** during a private meeting with Avery. You must control the company, or hold a board seat with an active joint-business agreement and three completed supply contracts. This preparation takes ten minutes. You can raise your terms at the blood-moon gathering **from the following day**.
+
+Speak to Avery and Harper before entering the lift, then settle the terms with Remy upstairs. Accept joint ascension, or withdraw your request and keep the original role. Leaving the gathering remains a choice before going upstairs. The wishing stones, restraint, knife, shared dream and native ending still occur. Eligibility does not guarantee success.
+
+With the real stones and a successful ending, you change alongside Avery in **the same ceremony**, receiving the fourth-seat title **Black Raven** and the **Ascended** trait. The counterfeit-stone failure grants neither. There is no second ceremony to obtain them afterwards.
+
+- Ascended prevents the daily trauma increase from the elk scar. The scar remains, and other sources of trauma retain their effects.
+- As time actually passes, stress falls by an additional **60 points per hour** and fatigue by **15 points per hour**. Short actions receive proportional recovery. Replays and frozen stats receive none.
+- The scar's effects on awareness, purity and allure remain, as do the native consequences for world corruption and Gwylan.
+
+After recognition, arrange private conversations through the office-building lobby on weekdays. Avery meets in person, while Harper and Remy speak by telephone. One conversation is available per day and takes fifteen minutes. Selling shares does not remove the title or trait. Penthouse accommodation and company voting rights retain their own share requirements. You may also tell Jordan about the tower, or discuss the change during Gwylan's existing scar conversation.
+
+### Skyscraper penthouse
+
+After Avery's native **ascension ending**, a director or controlling shareholder can sign an accommodation agreement through **the Elk Street skyscraper lobby → Ask about the suite**. Paperwork is handled on weekdays from 09:00 to 17:00 and takes ten minutes. Once issued, the key card opens the residents' lift at any hour. The private suite is separate from Avery's upper office, and Avery retains the original schedule.
+
+The living level has a kitchen, lounge and indoor pool. Upstairs are the main and guest bedrooms, bathroom, study and two small rooftop planting beds. Furniture is provided. Two lovers can live with you, using the existing home systems for sleep, bathing, wardrobes, study, gardening and swimming. Parking is underground. Once you have dated Avery and Avery is available, invite a short visit once per day, with choices to talk, request that future visits be arranged first, or see Avery out.
+
+The agreement grants **company accommodation**, which cannot be bought, sold, rented out or mortgaged. Weekly upkeep is **£150**, deducted from your bank account with any shortfall carried as arrears. Losing both board and controlling status, or leaving upkeep unpaid, starts a seven-day notice period. Restoring your position and clearing arrears within that period withdraws the notice. At expiry, the key card stops working. Resident lovers move together to another suitable empty home you hold, or return to their usual arrangements. Clothes remain in storage and can be collected through the accommodation desk. Ending the personal relationship does not itself revoke company accommodation.
+
 ### Elk Street factory
 
 Enter **Elk Street → Workshop yard**. The office is open **08:00–18:00**. Three sites can be bought separately, allowing three factories at once. Select a site before purchasing, transferring funds or taking orders. Each keeps its own crew, working funds, orders, incidents and debts. Every owned site continues settling its books daily when you leave.
@@ -273,7 +311,7 @@ Choose **Invite both lovers to talk (0:20)** in the sitting room while both resi
 | Leave a Light On | Finish the home companionship conversation while the registered resident is present                      | Belongings in the guest room while the character is absent             |
 | Ride the Wind    | Glide from an owned home and actually land on a different street from its home street                    | Opening the destination list or descending to your own ground floor    |
 
-Achievements record completed actions and do not need a separate purchase. The miscellaneous furniture category is not an extra requirement for Feels Like Home.
+Achievements record completed actions.
 
 ### Adrian and the management application
 
@@ -292,7 +330,7 @@ With an open account and visits on at least three different days, ask about work
 3. Retain at least £25,000 in net deposits with current repayments for fourteen consecutive daily settlements to establish the portfolio needed for a management application.
 4. Authorise the use of your account in the application at the bank counter. Maintain the qualifying account for a further week, then ask about the interview result. The assessment also considers Adrian's other customers and work performance.
 
-Net deposits are the bank balance minus credit-card, personal-loan, mortgage and collection debts. Repeated transfers do not add days, and depositing borrowed money does not increase net deposits. You do not need to borrow or buy shares. A failed daily settlement resets the current accumulation stage, without removing an earned position. During review, it restarts the review week. The work conversation displays your current progress.
+Net deposits are the bank balance minus credit-card, personal-loan, mortgage and collection debts. Repeated transfers do not add days, and depositing borrowed money does not increase net deposits. A failed daily settlement resets the current accumulation stage, without removing an earned position. During review, it restarts the review week. The work conversation displays your current progress.
 
 #### Exact rates and eligibility after promotion
 

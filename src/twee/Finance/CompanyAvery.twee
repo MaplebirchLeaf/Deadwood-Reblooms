@@ -1,0 +1,767 @@
+:: Deadwood Reblooms Company Avery Widgets [widget]
+
+<<widget 'deadwood-avery-header'>>
+  <<if _args[0] is 'result'>>
+    <<deadwood-company-header>>
+    <<set _shareholders to _company.shareholders>>
+  <<else>>
+    <<deadwood-shareholder-header>>
+  <</if>>
+  <<set _avery_business to _company.avery>>
+  <<set _avery_notes to _avery_business.state>>
+<</widget>>
+
+<<widget 'deadwood-avery-site-link'>>
+  <<if maplebirch.get('Finance').company.avery.canVisit>>
+    <<icon 'industry/survey.png'>><<lanLink ['Look into the arrangements (0:15)', '查看现场安排 (0:15)'] 'Deadwood Reblooms Company Avery Site'>>
+      <<if maplebirch.get('Finance').company.avery.canVisit>>
+        <<set $Finance.company.avery.site_visited to true>><<pass 15>>
+      <</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-avery-ceremony-link'>>
+  <<if maplebirch.get('Finance').company.avery.ceremony>>
+    <<socialiseicon 'ask'>><<lanLink ['Ask Harper what your role involves (0:05)', '问哈珀，你要做些什么 (0:05)'] 'Deadwood Reblooms Company Avery Ceremony'>>
+      <<if maplebirch.get('Finance').company.avery.ceremony>><<pass 5>><</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-avery-private-invitation'>>
+  <<if _avery_business.canInvite>>
+    <<set _avery_notes.invitation_day to Math.floor(Time.days)>><<set _avery_notes.invitation_choice to 'pending'>>
+    <<language>>
+      <<option 'EN'>>
+        Before you leave, Avery asks you to wait a moment.
+        <<if $dateCount.Avery gt 0>>
+          "We seem to spend more time over these files than anywhere else." <<He>> looks up. "I have something else in mind for Saturday."
+        <<else>>
+          "We've talked enough about figures for one day." <<He>> smiles. "How about seeing you somewhere else?"
+        <</if>>
+      <<option 'CN'>>
+        你离开前，艾弗里让你再等一会。
+        <<if $dateCount.Avery gt 0>>
+          “我们在这些文件上花的时间，好像比别的地方都多。”<<he>>抬起头。“周六，我有别的打算。”
+        <<else>>
+          “今天的数字，已经聊得够多了。”<<he>>笑了笑。“换个地方见见，怎么样？”
+        <</if>>
+    <</language>><br><br>
+    <<avery_date_approach 'mansion'>>
+    <<socialiseicon 'agree'>><<lanLink ['Accept the Saturday invitation', '接受周六的邀约'] 'Deadwood Reblooms Company Avery Invitation'>>
+      <<if maplebirch.get('Finance').company.avery.canAnswer>>
+        <<set $Finance.company.avery.invitation_choice to 'accepted'>>
+        <<set $Finance.company.avery.date_day to Math.floor(Time.days) + 7 - Time.weekDay>><<set $Finance.company.avery.date_state to 'scheduled'>>
+        <<npcincr Avery love 1>>
+      <</if>>
+    <</lanLink>><<glove>><br>
+    <<refuseicon>><<lanLink ['Decline this time', '这次不去'] 'Deadwood Reblooms Company Avery Invitation'>>
+      <<if maplebirch.get('Finance').company.avery.canAnswer>>
+        <<set $Finance.company.avery.invitation_choice to 'declined'>><<npcincr Avery love -1>><<npcincr Avery rage 2>>
+      <</if>>
+    <</lanLink>><<llove>><<garage>><br>
+    <<socialiseicon 'ask'>><<lanLink ['Keep invitations through the office strictly business', '以后从接待处联系，只谈生意'] 'Deadwood Reblooms Company Avery Invitation'>>
+      <<if maplebirch.get('Finance').company.avery.canAnswer>>
+        <<set $Finance.company.avery.invitation_choice to 'business'>><<set $Finance.company.avery.business_only to true>><<def 1>>
+        <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>><<npcincr Avery rage 1>><</if>>
+      <</if>>
+    <</lanLink>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-avery-dinner-link'>>
+  <<if maplebirch.get('Finance').company.avery.canDinner>>
+    <<socialiseicon 'chat'>><<lanLink ['Give your own view of the business (0:20)', '说说你对生意的看法 (0:20)'] 'Deadwood Reblooms Company Avery Dinner'>>
+      <<if maplebirch.get('Finance').company.avery.canDinner>>
+        <<set $Finance.company.avery.dinner_day to Math.floor(Time.days)>><<set $Finance.company.avery.dinner_topic to 'work'>><<pass 20>>
+      <</if>>
+    <</lanLink>><br>
+    <<socialiseicon 'chat'>><<lanLink ['Ask for an evening together without the company (0:20)', '请艾弗里今晚先放下公司的事 (0:20)'] 'Deadwood Reblooms Company Avery Dinner'>>
+      <<if maplebirch.get('Finance').company.avery.canDinner>>
+        <<set $Finance.company.avery.dinner_day to Math.floor(Time.days)>><<set $Finance.company.avery.dinner_topic to 'personal'>>
+        <<npcincr Avery love 1>><<set $endear += 10>><<pass 20>>
+      <</if>>
+    <</lanLink>><<glove>><<gendear>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-avery-ceremony-header'>>
+  <<set _avery_business to maplebirch.get('Finance').company.avery>>
+  <<set _avery_notes to _avery_business.state>>
+  <<location 'avery_skyscraper'>><<set $outside to 0>><<effects>>
+<</widget>>
+
+<<widget 'deadwood-avery-journal'>>
+  <<set _avery_notes to $Finance.company.avery>>
+  <<if _avery_notes.date_state is 'scheduled'>>
+    <h2 class='gold'><<lanSwitch "Avery's invitation" '艾弗里的邀约'>></h2>
+    <ul class='journal'>
+      <li>
+        <<lanSwitch 'You accepted an invitation for ' '你接受了邀约，日期是'>><<deadwood-reblooms-finance-date _avery_notes.date_day>><<lanSwitch '. ' '。'>>
+        <<language>>
+          <<option 'EN'>>
+            Meet Avery between <<ampm 20 00>> and <<ampm 21 00>>,
+            <<if $avery_mansion>>in the mansion garage<<else>>on Domus Street<</if>>. Wear something formal.
+          <<option 'CN'>>
+            请在<<ampm 20 00>>到<<ampm 21 00>>之间，
+            <<if $avery_mansion>>到宅邸的车库<<else>>到多姆斯街<</if>>见艾弗里。穿正式些。
+        <</language>>
+      </li>
+    </ul>
+  <<elseif _avery_notes.date_state is 'cancelled' and _avery_notes.date_day gte Math.floor(Time.days)>>
+    <h2 class='gold'><<lanSwitch "Avery's invitation" '艾弗里的邀约'>></h2>
+    <ul class='journal'>
+      <li><<lanSwitch 'The invitation through the office could not be confirmed. Any existing arrangement with Avery still takes precedence.' '接待处约下的这次邀约没有得到确认。你与艾弗里原有的安排仍然优先。'>></li>
+    </ul>
+  <</if>>
+  <<if _avery_notes.papers_read or _avery_notes.site_visited or _avery_notes.dream_seen>>
+    <h2 class='gold'><<lanSwitch "Avery's private gathering" '艾弗里的私人聚会'>></h2>
+    <ul class='journal'>
+      <<if _avery_notes.dream_seen>>
+        <li>
+          <<language>>
+            <<option 'EN'>>
+              You shared that vision with Avery.
+              <<if ['ascended', 'saved'].includes($avery_fate) and (maplebirch.get('Finance').company.shareholders.director or maplebirch.get('Finance').company.shareholders.controller)>>
+                As a director or controlling shareholder, you can raise it privately through the reception desk when <<nnpc_he 'Avery'>> is available.
+              <</if>>
+            <<option 'CN'>>
+              你与艾弗里一起经历了那段梦境。
+              <<if ['ascended', 'saved'].includes($avery_fate) and (maplebirch.get('Finance').company.shareholders.director or maplebirch.get('Finance').company.shareholders.controller)>>
+                以董事或控股股东的身份，可以等<<nnpc_he 'Avery'>>能会面时，从接待处约<<nnpc_him 'Avery'>>单独谈谈。
+              <</if>>
+          <</language>>
+        </li>
+      <<elseif _avery_notes.decision is 'leave'>>
+        <li>
+          <<language>>
+            <<option 'EN'>>
+              You left before going upstairs. Avery said you would discuss it later. The ceremony has not taken place.
+            <<option 'CN'>>
+              你在上楼前离开了。艾弗里说，这件事以后再谈。仪式还没有举行。
+          <</language>>
+        </li>
+      <<elseif _avery_notes.invited>>
+        <li>
+          <<language>>
+            <<option 'EN'>>
+              Avery agreed to have Harper explain your role before you go upstairs. Meet Avery at the mansion on the blood moon.
+            <<option 'CN'>>
+              艾弗里答应，上楼前让哈珀向你解释职责。血月期间，到宅邸找艾弗里。
+          <</language>>
+        </li>
+      <<else>>
+        <<if !_avery_notes.papers_read>>
+          <li><<lanSwitch 'The construction and opening files can be reviewed through the shareholder reception desk.' '可从股东接待处查阅施工与开幕安排。'>></li>
+        <</if>>
+        <<if !_avery_notes.site_visited>>
+          <li><<lanSwitch 'The site on Elk Street may tell you more about the arrangements.' '麋鹿街的施工现场或许能让你进一步了解安排。'>></li>
+        <</if>>
+        <<if _avery_notes.papers_read and _avery_notes.site_visited>>
+          <li><<lanSwitch 'Once construction reaches the finishing stage, ask Avery about the private gathering through the reception desk.' '施工进入收尾阶段后，可从接待处约艾弗里，问清私人聚会的安排。'>></li>
+        <</if>>
+      <</if>>
+    </ul>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Company Avery []
+<<deadwood-avery-header>>
+<<if !_shareholder_access or !_avery_business.available>><<deadwood-shareholder-return>><<exit>><</if>>
+<<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    The clerk waits for Avery's call before letting you through. The meeting papers have been put away. Avery leaves a chair free on your side of the desk.
+    <<if $avery_fate is 'ascended'>>
+      The town lies below the windows. Avery watches it a moment longer before turning to you. "You wanted to speak?"
+    <<elseif $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+      "Make it quick," <<he>> says. <<His>> fingers tighten around a pen.
+    <<elseif _shareholders.controller>>
+      "You've made yourself difficult to overlook." <<He>> smiles without rising. "Sit."
+    <<else>>
+      "We aren't in a meeting now," <<he>> says. "You can put the folder down."
+    <</if>>
+  <<option 'CN'>>
+    职员接到艾弗里的电话，才让你进去。会议文件已经收走，艾弗里在办公桌这侧给你留了一把椅子。
+    <<if $avery_fate is 'ascended'>>
+      小镇就在窗下。艾弗里又看了一会，才转向你。“你想谈什么？”
+    <<elseif $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+      “长话短说。”<<he>>握紧了手里的笔。
+    <<elseif _shareholders.controller>>
+      “现在想不注意到你都难了。”<<he>>笑了笑，没有起身。“坐吧。”
+    <<else>>
+      “现在不是开会。”<<he>>说。“文件夹可以放下了。”
+    <</if>>
+<</language>><br><br>
+<<if _avery_business.canTalk>>
+  <<socialiseicon 'chat'>><<lanLink ['Talk about working together (0:15)', '谈谈一起做生意的事 (0:15)'] 'Deadwood Reblooms Company Avery Talk'>>
+    <<if maplebirch.get('Finance').company.avery.canTalk>>
+      <<set $Finance.company.avery.talk_day to Math.floor(Time.days)>><<set $Finance.company.avery.topic to 'work'>>
+      <<npcincr Avery love 1>><<pass 15>>
+    <</if>>
+  <</lanLink>><<glove>><br>
+  <<socialiseicon 'ask'>><<lanLink ['Keep business and your private life separate (0:15)', '把生意与私事分开 (0:15)'] 'Deadwood Reblooms Company Avery Talk'>>
+    <<if maplebirch.get('Finance').company.avery.canTalk>>
+      <<set $Finance.company.avery.talk_day to Math.floor(Time.days)>><<set $Finance.company.avery.topic to 'boundary'>>
+      <<set $Finance.company.avery.business_only to true>>
+      <<def 1>>
+      <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>><<npcincr Avery rage 1>><</if>>
+      <<pass 15>>
+    <</if>>
+  <</lanLink>><br>
+  <<socialiseicon 'chat'>><<lanLink ['Discuss where your interests differ (0:15)', '谈谈你们利益不同的地方 (0:15)'] 'Deadwood Reblooms Company Avery Talk'>>
+    <<if maplebirch.get('Finance').company.avery.canTalk>>
+      <<set $Finance.company.avery.talk_day to Math.floor(Time.days)>><<set $Finance.company.avery.topic to 'competition'>><<pass 15>>
+    <</if>>
+  <</lanLink>><br>
+  <<if isLoveInterest('Avery')>>
+    <<socialiseicon 'chat'>><<lanLink ['Ask how Avery is doing (0:15)', '问问艾弗里最近怎么样 (0:15)'] 'Deadwood Reblooms Company Avery Talk'>>
+      <<if maplebirch.get('Finance').company.avery.canTalk>>
+        <<set $Finance.company.avery.talk_day to Math.floor(Time.days)>><<set $Finance.company.avery.topic to 'personal'>>
+        <<npcincr Avery love 1>><<pass 15>>
+      <</if>>
+    <</lanLink>><<glove>><br>
+  <</if>>
+  <<if _avery_notes.dream_seen and ['ascended', 'saved'].includes($avery_fate)>>
+    <<socialiseicon 'ask'>><<lanLink ['Ask about what you saw together (0:15)', '谈谈你们一起看到的景象 (0:15)'] 'Deadwood Reblooms Company Avery Talk'>>
+      <<if maplebirch.get('Finance').company.avery.canTalk>>
+        <<set $Finance.company.avery.talk_day to Math.floor(Time.days)>><<set $Finance.company.avery.topic to 'dream'>>
+        <<pass 15>>
+      <</if>>
+    <</lanLink>><br>
+  <</if>>
+<<else>>
+  <<lanSwitch 'Avery has other appointments today.' '艾弗里今天还有别的会面。'>><br>
+<</if>>
+<<if _avery_notes.business_only>>
+  <<socialiseicon 'ask'>><<lanLink ['Say private invitations are welcome again', '表示也可以再约你谈私事'] 'Deadwood Reblooms Company Avery'>>
+    <<if maplebirch.get('Finance').company.avery.available>><<set $Finance.company.avery.business_only to false>><</if>>
+  <</lanLink>><br>
+<</if>>
+<<if _avery_business.canResearch>>
+  <<icon 'company/minutes.png'>><<lanLink ['Read the construction and opening files', '查阅施工与开幕安排'] 'Deadwood Reblooms Company Avery Papers'>>
+    <<if maplebirch.get('Finance').company.avery.canResearch and !$Finance.company.avery.papers_read>>
+      <<set $Finance.company.avery.papers_read to true>><<pass 15>>
+    <</if>>
+  <</lanLink>>
+  <<if !_avery_notes.papers_read>> (0:15)<</if>><br>
+<</if>>
+<<if _avery_business.canPrepare>>
+  <<socialiseicon 'ask'>><<lanLink ['Ask to discuss your role at the opening (0:15)', '要求谈清开幕时自己的职责 (0:15)'] 'Deadwood Reblooms Company Avery Talk'>>
+    <<if maplebirch.get('Finance').company.avery.canPrepare>>
+      <<set $Finance.company.avery.talk_day to Math.floor(Time.days)>><<set $Finance.company.avery.topic to 'invitation'>>
+      <<set $Finance.company.avery.invited to true>><<pass 15>>
+    <</if>>
+  <</lanLink>><br>
+<</if>>
+<<deadwood-ascension-preparation-link>>
+<<deadwood-ascension-audience-link>>
+<<deadwood-shareholder-return>>
+
+:: Deadwood Reblooms Company Avery Talk []
+<<deadwood-avery-header 'result'>>
+<<if !_company.available or C.npc.Avery.state isnot 'active' or _avery_notes.talk_day isnot Math.floor(Time.days) or !_avery_notes.topic>><<deadwood-shareholder-return>><<exit>><</if>>
+<<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    <<switch _avery_notes.topic>>
+      <<case 'work'>>
+        You leave the figures on the desk and ask about the next quarter. Avery turns a page back to check it.
+        <<if _shareholders.controller>>
+          "I used to make these decisions without waiting for anyone's signature." <<He>> slides the page towards you. "Have a reason ready when you refuse mine."
+        <<else>>
+          "Your goods arrived. That's more useful than another speech about potential." <<He>> taps the delivery date. "Keep doing that."
+        <</if>>
+        <<if currentSkillValue('maths') gte 400>>
+          You separate the delayed invoices from next quarter's costs. Avery checks your totals, then moves a receipt to the right column.
+        <<else>>
+          Avery points out which figures concern money already owed and which are estimates. You work through the accounts a page at a time.
+        <</if>>
+        When the clerk knocks, Avery asks for another minute.
+      <<case 'boundary'>>
+        <<if $speech_attitude is 'meek' or $speech_attitude_avery>>
+          "I'd like to keep our appointments about the company," you say. "Could we arrange the other things separately?"
+        <<elseif $speech_attitude is 'bratty'>>
+          "Buying into the company doesn't put my whole life on your desk," you say. "Keep the appointments about work."
+        <<else>>
+          "The company is one thing," you say. "What happens between us is another."
+        <</if>>
+        <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+          Avery puts the pen down hard. "I heard you." <<He>> glances at the closed door before picking it up again. "Put the business part in writing."
+        <<elseif isLoveInterest('Avery')>>
+          "You could have told me that over dinner." <<His>> smile thins. "If that's what you want. Now, about the company."
+        <<else>>
+          "Then leave your private life out of the minutes." <<He>> gathers the papers into a neat pile. "I'll do the same."
+        <</if>>
+        The clerk gathers the company papers. Nothing about the two of you goes into the file. You ask for future appointments through this desk to concern the company. Avery tells the clerk to note it.
+      <<case 'competition'>>
+        "My business has its own customers," you say. "A contract with you doesn't mean you get to decide the rest."
+        Avery leans back. "Then I expect you to honour that contract. The rest depends on what you bring to the table."
+        <<if _shareholders.controller>>
+          <<He>> looks at the voting figures beside your name. "And if you use those votes to turn down my proposal, be ready to defend your own." <<He>> slides the agenda towards you, leaving the pen on your side.
+        <<elseif _company_state.policy is 'price'>>
+          "You already made your position clear on prices." <<He>> taps the agreed terms. "I haven't forgotten what I signed."
+        <<else>>
+          "Bring your proposal to the board. I want the figures, not just a seat at the table." <<He>> opens the next set of accounts for you to compare.
+        <</if>>
+        <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+          "And don't mistake your shares for permission to embarrass me." <<His>> voice drops. The clerk is still waiting beyond the door.
+        <<elseif isLoveInterest('Avery')>>
+          "You've never been this interested in my paperwork at dinner." <<He>> smiles, then looks back at the figures. "I suppose I'll have to get used to it."
+        <<else>>
+          "I can work with someone who knows what they want." <<His>> smile returns. "We'll see whether you can do the same."
+        <</if>>
+        You leave with the proposed terms. They will need your agreement as well as Avery's.
+      <<case 'personal'>>
+        You ask about Avery, rather than the company. <<He>> looks up as if you've interrupted a calculation.
+        <<if $avery_fate is 'ascended'>>
+          "Better than ever." <<He>> looks past you towards the windows. "Still so much to do."
+        <<elseif $avery_fate is 'saved'>>
+          "I'm here, aren't I?" <<He>> touches the edge of the desk, then draws <<his>> hand back. "Stay a little longer."
+        <<elseif $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+          "Busy. You can see that." <<He>> turns the papers face down after a moment. "But you're here now."
+        <<else>>
+          "I was beginning to think you'd forgotten how to ask." <<He>> closes the folder. "Tell me about your day."
+        <</if>>
+        <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+          The folder stays between you. Avery checks the time. "Anything else?"
+        <<elseif _avery_notes.business_only>>
+          You keep the conversation to how the day has gone. The clerk knocks before either of you turns back to the company.
+        <<elseif C.npc.Avery.lust gte 60>>
+          Avery's gaze drops to your mouth. <<He>> shifts <<his>> chair closer, leaving the space between your hands untouched.
+          "You could ask me that somewhere without so many interruptions."
+        <<elseif C.npc.Avery.love gte 20>>
+          <<He>> leaves the folder shut and asks about your day. When the clerk knocks, <<he>> takes a moment to answer.
+        <<else>>
+          Avery listens, though <<his>> eyes return to the waiting papers. <<He>> opens the folder again as the next visitor arrives.
+        <</if>>
+      <<case 'invitation'>>
+        You set the opening schedule beside the construction accounts. The public reception ends well before the building closes. You ask what happens afterwards.
+        "They'll be welcoming me into their circle," Avery says. "I need you there."
+        <br><br>
+        "Doing what?"
+        <br><br>
+        Avery starts to answer, then stops. "Meet me at the mansion on the blood moon. Harper will explain your part. I'll tell <<nnpc_him 'Harper'>> you expect an explanation before we go upstairs."
+        <<He>> writes your name beside the private reception. There is no job description beside it.
+      <<case 'dream'>>
+        You mention the balcony, and the fall. Avery stops moving the papers.
+        "You saw that too."
+        <br><br>
+        You nod. For a while, <<he>> looks at the closed office door.
+        <<if $avery_fate is 'ascended'>>
+          "It doesn't belong in the minutes." <<He>> smooths a crease in the page. "And it stays in this room."
+          You can still remember the red light above the table. Avery can close the folder. <<He>> cannot close that memory for you.
+        <<else>>
+          "I couldn't reach them." <<He>> holds <<his>> hand still against the desk. "Either of them."
+          A knock comes at the door. Avery lets it go unanswered for a moment.
+        <</if>>
+    <</switch>>
+  <<option 'CN'>>
+    <<switch _avery_notes.topic>>
+      <<case 'work'>>
+        你把数字留在桌上，问起下个季度。艾弗里翻回前一页核对。
+        <<if _shareholders.controller>>
+          “以前做这些决定，不用等别人签字。”<<he>>把那页推向你。“要否决我的时候，先想好理由。”
+        <<else>>
+          “你的货送到了。比再听一遍有多少潜力管用。”<<he>>敲了敲交货日期。“继续这样做。”
+        <</if>>
+        <<if currentSkillValue('maths') gte 400>>
+          你把延期到账的货款与下个季度的开销分开，艾弗里核对总数，把一张收据移到对应的栏里。
+        <<else>>
+          艾弗里指出哪些款项已经欠下，哪些仍是估算。你们一页页核对账目。
+        <</if>>
+        职员敲门时，艾弗里让对方再等一分钟。
+      <<case 'boundary'>>
+        <<if $speech_attitude is 'meek' or $speech_attitude_avery>>
+          “从这里安排的会面，我想只谈公司的事。”你说。“别的事，可以另约时间吗？”
+        <<elseif $speech_attitude is 'bratty'>>
+          “买公司的股份，可没把我的生活也放到你桌上。”你说。“会面只谈工作。”
+        <<else>>
+          “公司是一回事。”你说。“我们之间的事，是另一回事。”
+        <</if>>
+        <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+          艾弗里重重放下笔。“我听见了。”<<he>>看了一眼关着的门，才重新拿起笔。“生意的部分，写下来。”
+        <<elseif isLoveInterest('Avery')>>
+          “吃晚饭的时候也能跟我说这些。”<<his>>的笑容淡了。“如果你想这样。现在谈公司的事。”
+        <<else>>
+          “那就别把私事写进会议记录。”<<he>>把文件拢成整齐的一叠。“我也一样。”
+        <</if>>
+        职员收好公司文件。你们之间的事没有写进档案。你要求，以后从这个接待处安排的会面，都只谈公司的事。艾弗里让职员记下来。
+      <<case 'competition'>>
+        “我的企业有自己的客户。”你说。“与你签一份合同，不代表剩下的事也由你决定。”
+        艾弗里靠向椅背。“那我希望你履行这份合同。剩下的，要看你拿得出什么。”
+        <<if _shareholders.controller>>
+          <<He>>看着你名字旁的表决票数。“如果你用这些票否决我的提案，就准备好说明自己的。”<<he>>把议程推向你，笔留在你这侧。
+        <<elseif _company_state.policy is 'price'>>
+          “谈价格的时候，你已经说清楚自己的立场了。”<<he>>敲了敲双方谈妥的条款。“我没忘记自己签过什么。”
+        <<else>>
+          “把你的提案带到董事会来。我要看数字，光有一个席位还不够。”<<he>>翻开下一份账目，让你对照。
+        <</if>>
+        <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+          “也别以为手里有股份，就可以让我难堪。”<<his>>的声音低下来。职员还等在门外。
+        <<elseif isLoveInterest('Avery')>>
+          “吃晚饭的时候，你从来没这么关心过我的文件。”<<he>>笑了笑，重新看向数字。“看来，我得习惯一下。”
+        <<else>>
+          “我可以和知道自己想要什么的人合作。”<<he>>重新露出笑容。“看看你能不能也这样。”
+        <</if>>
+        你带着拟好的条款离开。除了艾弗里，还需要你同意。
+      <<case 'personal'>>
+        你问的是艾弗里，而不是公司。<<He>>抬起头，像是被打断了一笔计算。
+        <<if $avery_fate is 'ascended'>>
+          “从没这么好过。”<<he>>越过你，看向窗外。“还有很多事要做。”
+        <<elseif $avery_fate is 'saved'>>
+          “我不是还在这里吗？”<<he>>碰了碰桌沿，又收回手。“再陪我一会。”
+        <<elseif $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+          “忙。你看得到。”过了一会，<<he>>把文件翻了个面。“不过你已经来了。”
+        <<else>>
+          “我还以为你忘了怎么问。”<<he>>合上文件夹。“说说你今天过得怎么样。”
+        <</if>>
+        <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+          文件夹仍隔在你们之间，艾弗里看了看时间。“还有别的事吗？”
+        <<elseif _avery_notes.business_only>>
+          你只问起今天过得如何。还没重新谈到公司，职员便敲了门。
+        <<elseif C.npc.Avery.lust gte 60>>
+          艾弗里的视线落到你的嘴唇上，<<he>>把椅子挪近些，没有碰到你的手。
+          “这些话，可以找个没这么多人打扰的地方问。”
+        <<elseif C.npc.Avery.love gte 20>>
+          <<He>>没有打开文件夹，又问起你今天的事。职员敲门时，<<he>>过了一会才应声。
+        <<else>>
+          艾弗里听着，目光却不时落回待处理的文件。下一位访客到来时，<<he>>重新打开了文件夹。
+        <</if>>
+      <<case 'invitation'>>
+        你把开幕安排放在工程账目旁。公开招待结束后，大楼还会开放很久。你问起之后的安排。
+        “他们要把我迎进他们的圈子。”艾弗里说。“我需要你在场。”
+        <br><br>
+        “做什么？”
+        <br><br>
+        艾弗里刚要回答，又停了下来。“血月那天，到宅邸找我。哈珀会解释你的部分。我会告诉<<nnpc_him 'Harper'>>，上楼之前，你要先听到解释。”
+        <<He>>在私人招待的名单上写下你的名字，旁边没有写职责。
+      <<case 'dream'>>
+        你提起阳台，还有那次坠落。艾弗里停下整理文件的手。
+        “你也看见了。”
+        <br><br>
+        你点点头。<<He>>看着关起的办公室门，许久没有说话。
+        <<if $avery_fate is 'ascended'>>
+          “这不是会议记录该写的东西。”<<he>>抚平纸上的折痕。“也别带出这间屋子。”
+          你还记得桌子上方的红光。艾弗里能合上文件夹，却不能替你合上那段记忆。
+        <<else>>
+          “我碰不到他们。”<<he>>把手按在桌面上，一动不动。“谁都碰不到。”
+          门外传来敲门声。艾弗里又等了一会，才应声。
+        <</if>>
+    <</switch>>
+<</language>><br><br>
+<<deadwood-avery-private-invitation>>
+<<getouticon>><<lanLink ['Return to the reception desk', '返回股东接待处'] 'Deadwood Reblooms Shareholder Office'>><<set $Finance.company.avery.topic to null>><<endevent>><</lanLink>><br>
+
+:: Deadwood Reblooms Company Avery Invitation []
+<<deadwood-avery-header 'result'>>
+<<if !_company.available or C.npc.Avery.state isnot 'active' or _avery_notes.invitation_day isnot Math.floor(Time.days) or !['accepted', 'declined', 'business'].includes(_avery_notes.invitation_choice)>><<deadwood-shareholder-return>><<exit>><</if>>
+<<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    <<if _avery_notes.invitation_choice is 'accepted'>>
+      Avery smiles. "Good. At eight on Saturday. Wear something formal."
+      <<if _shareholders.controller>>
+        "And you can leave the voting papers here." <<He>> watches you put your folder away. "I haven't booked a shareholders' meeting."
+      <<elseif $dateCount.Avery is 0>>
+        "I'll expect you." <<He>> looks you over once more before opening the appointment book again.
+      <<else>>
+        "I'd like some of your attention without a balance sheet between us."
+      <</if>>
+      <br><br>
+      <<if $avery_mansion>>
+        Meet Avery in the mansion garage between <<ampm 20 00>> and <<ampm 21 00>> on Saturday.
+      <<else>>
+        Avery will pick you up on Domus Street between <<ampm 20 00>> and <<ampm 21 00>> on Saturday.
+      <</if>>
+    <<elseif _avery_notes.invitation_choice is 'declined'>>
+      "Not this Saturday," you say.
+      <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+        Avery's fingers close around the pen. "I had something arranged." <<He>> looks at you for a moment, then opens the appointment book. "We're finished here."
+      <<else>>
+        "Suit yourself." <<He>> closes the book. "Let me know when you have a better answer."
+      <</if>>
+      No date has been booked. The clerk takes the business papers from you as you leave.
+    <<else>>
+      "If you contact me through this desk, keep it to business," you say.
+      <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+        Avery presses the pen against the closed book. "You made that clear." <<He>> calls the clerk in and repeats your instruction without looking at you.
+      <<else>>
+        "Very well." <<He>> calls the clerk in. "Company appointments only, unless our guest asks otherwise."
+      <</if>>
+      Your Saturday remains free. You can tell the desk if you want to change that instruction.
+    <</if>>
+  <<option 'CN'>>
+    <<if _avery_notes.invitation_choice is 'accepted'>>
+      艾弗里笑了笑。“好。周六八点。穿正式些。”
+      <<if _shareholders.controller>>
+        “表决文件可以留在这里。”<<he>>看着你收好文件夹。“我订的不是股东大会。”
+      <<elseif $dateCount.Avery is 0>>
+        “我等着你。”<<he>>又打量了你一遍，才重新翻开会面登记簿。
+      <<else>>
+        “我想让你也看看我，别总隔着一张资产负债表。”
+      <</if>>
+      <br><br>
+      <<if $avery_mansion>>
+        周六<<ampm 20 00>>到<<ampm 21 00>>之间，到宅邸的车库见艾弗里。
+      <<else>>
+        艾弗里会在周六<<ampm 20 00>>到<<ampm 21 00>>之间，在多姆斯街接你。
+      <</if>>
+    <<elseif _avery_notes.invitation_choice is 'declined'>>
+      “这个周六不去。”你说。
+      <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+        艾弗里握紧笔。“我已经作了安排。”<<he>>看了你一会，翻开会面登记簿。“今天就到这里。”
+      <<else>>
+        “随你。”<<he>>合上登记簿。“想好了，再给我一个好些的回答。”
+      <</if>>
+      你没有约下这次会面。离开时，职员接过你手里的商务文件。
+    <<else>>
+      “如果从这个接待处联系我，就只谈生意。”你说。
+      <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+        艾弗里把笔按在合起的登记簿上。“你说得很清楚。”<<he>>叫来职员，没有看你，重复了一遍你的要求。
+      <<else>>
+        “可以。”<<he>>叫来职员。“只安排公司会面。除非这位访客自己提出。”
+      <</if>>
+      你没有接下周六的邀约。如果想改变这个安排，可以再告诉接待处。
+    <</if>>
+<</language>><br><br>
+<<getouticon>><<lanLink ['Return to the reception desk', '返回股东接待处'] 'Deadwood Reblooms Shareholder Office'>><<set $Finance.company.avery.topic to null>><<endevent>><</lanLink>><br>
+
+:: Deadwood Reblooms Company Avery Dinner []
+<<effects>><<set _avery_business to maplebirch.get('Finance').company.avery>><<set _avery_notes to _avery_business.state>>
+<<set _shareholders to maplebirch.get('Finance').company.shareholders>>
+<<if !$averydateattended or !$averydatedone or C.npc.Avery.state isnot 'active' or _avery_notes.dinner_day isnot Math.floor(Time.days) or !_avery_notes.dinner_topic or $NPCList[0]?.fullDescription isnot 'Avery'>><<getouticon>><<lanLink ['Continue dinner', '继续晚餐'] 'Avery Date 3'>><</lanLink>><<exit>><</if>>
+<<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    <<if _avery_notes.dinner_topic is 'work'>>
+      You ask which of the delays Avery mentioned actually affects the company. <<He>> pauses with <<his>> glass halfway to <<his>> mouth.
+      "You were listening."
+      <<if _shareholders.controller>>
+        You point out that the next spending proposal needs your vote. Avery puts the glass down. "I didn't bring you here to negotiate across the table." After a moment, <<he>> gives you the figures anyway. "Read the full proposal before you decide."
+      <<else>>
+        You describe the same problem from your own business. Avery asks what it cost you to resolve it, then listens to the answer. For a while, neither of you needs to smile and nod.
+      <</if>>
+      <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+        When you question one of <<his>> estimates, <<his>> smile hardens. "You can disagree without making a spectacle." The waiter passes your table. Avery waits until they're gone to continue.
+      <<else>>
+        "Bring that calculation to the office," <<he>> says. "I want to see how you got it."
+      <</if>>
+    <<else>>
+      "The company can wait until we go back to the office," you say. "I'd like to spend tonight with you."
+      <<if $avery_fate is 'ascended'>>
+        Avery turns away from the other tables. "Then keep my attention." <<He>> sets <<his>> phone face down between the glasses. "Tell me something I haven't heard today."
+      <<elseif $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+        "You're the one who brought those shares to my desk." <<He>> studies you, then sets the phone down. "Go on, then. I'm listening."
+      <<elseif $averyromance>>
+        "I haven't forgotten what you told me." <<His>> voice is lower now. "You could remind me, though." <<He>> leaves <<his>> hand beside your glass and waits. You can keep your own hands in your lap.
+      <<elseif isLoveInterest('Avery')>>
+        "I was wondering how much longer we'd be talking about work." <<He>> puts the phone away. "Tell me what you've been doing."
+      <<else>>
+        "That's a better use of the evening." <<He>> smiles. "I'd like to know what you do when you're not studying my accounts."
+      <</if>>
+      You choose what to tell <<him>>. The company papers stay in the office.
+    <</if>>
+    <br><br>
+    The waiter brings your food. Avery moves the glasses aside to make room.
+  <<option 'CN'>>
+    <<if _avery_notes.dinner_topic is 'work'>>
+      你问起，艾弗里刚提到的几次延误，哪些会影响公司。<<He>>端着酒杯，停在半空。
+      “你听进去了。”
+      <<if _shareholders.controller>>
+        你指出，下一份支出提案还需要你的票。艾弗里放下酒杯。“我带你来这里，可不是为了隔着餐桌谈条件。”过了一会，<<he>>还是报出了数字。“决定之前，把整份提案读完。”
+      <<else>>
+        你说起自己企业遇到的同类问题。艾弗里问你花了多少代价解决，又听完你的回答。你们聊了一阵，谁都不用只是微笑点头。
+      <</if>>
+      <<if $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+        你质疑其中一项估算时，<<his>>的笑容僵了。“不同意，也没必要让人看笑话。”侍者经过餐桌。艾弗里等对方离开，才继续说下去。
+      <<else>>
+        “把那份计算带到办公室来。”<<he>>说。“我想看看你怎么算的。”
+      <</if>>
+    <<else>>
+      “公司的事，可以等我们回办公室再谈。”你说。“今晚，我想和你待一会。”
+      <<if $avery_fate is 'ascended'>>
+        艾弗里从别桌的客人那里收回视线。“那就让我感兴趣。”<<he>>把手机翻过来，放在酒杯之间。“说点我今天没听过的。”
+      <<elseif $averyragerevealed is 1 and C.npc.Avery.rage gte 20>>
+        “拿着股份来和我谈条件的，可是你。”<<he>>打量着你，然后放下手机。“说吧。我听着。”
+      <<elseif $averyromance>>
+        “你对我说过什么，我还记得。”<<his>>的声音低下来。“不过，你可以再提醒我。”<<he>>把手留在你的杯子旁，等着。你可以继续把自己的手放在膝上。
+      <<elseif isLoveInterest('Avery')>>
+        “我刚还在想，你打算聊工作聊到什么时候。”<<he>>收起手机。“说说你最近做了什么。”
+      <<else>>
+        “这样，这个晚上倒更值得了。”<<he>>笑起来。“我想知道，你不看我的账目的时候，都在做什么。”
+      <</if>>
+      你选了些自己愿意告诉<<him>>的事。公司的文件还留在办公室。
+    <</if>>
+    <br><br>
+    侍者送来你们点的食物。艾弗里把酒杯移到一旁，腾出地方。
+<</language>><br><br>
+<<lanLink ['Continue dinner', '继续晚餐'] 'Avery Date 3'>><<set $Finance.company.avery.dinner_topic to null>><</lanLink>><br>
+
+:: Deadwood Reblooms Company Avery Papers []
+<<deadwood-avery-header 'result'>>
+<<if !_company.available or !_avery_business.project or !_avery_notes.papers_read or !(_shareholders.director or _shareholders.controller)>><<deadwood-shareholder-return>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    The clerk sets two folders before you. One contains contractors' invoices. The other contains arrangements for the opening.
+    The dates run beyond the end of the public reception. The upper floor is reserved for a private gathering. Its guest list is not attached.
+    <br><br>
+    <<if currentSkillValue('maths') gte 400>>
+      You add the separate totals. The private reception is charged to Avery, rather than the construction budget. There is no payment for it in the contractor's account.
+    <<else>>
+      You compare the headings. The construction costs and private reception have separate accounts. The clerk points out which invoices belong to the building work.
+    <</if>>
+    <br><br>
+    A note specifies moonlight through the roof, rather than hired lighting. There is no alternative date for bad weather. You turn the sheet over. The back is blank.
+    The clerk offers you a copy of the schedule. "Site arrangements can be checked at the building. Anything about the private gathering goes to Avery."
+  <<option 'CN'>>
+    职员把两个文件夹放在你面前。一份装着承包商的账单，另一份是开幕安排。
+    安排表上的时间延伸到公开招待结束以后。顶层留给私人聚会，没有附上宾客名单。
+    <br><br>
+    <<if currentSkillValue('maths') gte 400>>
+      你把分列的金额加起来。私人招待由艾弗里支付，没有记入施工预算。承包商的账目里也没有这笔款项。
+    <<else>>
+      你对照账目标题。施工与私人招待分别记账。职员指出哪些账单属于大楼施工。
+    <</if>>
+    <br><br>
+    备注要求屋顶透进月光，没有预订灯具，也没有雨天另择日期的安排。你把纸翻过来，背面是空白。
+    职员递给你一份安排表的副本。“现场的事可以到大楼核对。私人聚会的事，要问艾弗里。”
+<</language>><br><br>
+<<lanSwitch 'The construction site is on Elk Street.' '施工现场在麋鹿街。'>><br>
+<<deadwood-shareholder-return>>
+
+:: Deadwood Reblooms Company Avery Site []
+<<set _avery_business to maplebirch.get('Finance').company.avery>>
+<<location 'avery_skyscraper'>><<set $outside to 1>><<effects>>
+<<if !_avery_business.project or !_avery_business.state.site_visited>><<getouticon>><<lanLink ['Leave (0:01)', '离开 (0:01)'] 'Elk Street'>><<pass 1>><</lanLink>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    You walk along the fence, keeping clear of the entrance.
+    <<if $avery_tower.progress gte 80>>
+      The roof shown on the plan is directly above the top-floor room.
+    <<else>>
+      You compare the plan with the unfinished building. The skylight is marked above the top-floor room.
+    <</if>>
+    <<if $avery_tower.effects.includes('temple')>>
+      One of the temple protestors notices your visitor's badge. "Another guest?" they ask. "What have they promised you?"
+      You ask about the plans for the roof. They look up at the building. "Some doors are best left shut. Even in a dream."
+      They turn back to their vigil before you can ask what that means.
+    <<else>>
+      The fence carries the contractor's opening notice. The room upstairs is crossed off the public tour. The separate gathering appears only on your copy of the schedule.
+      <<if Time.dayState is 'night'>>
+        The construction staff have left. You read the notice in the light from the site.
+      <<else>>
+        A worker asks you to move away from the gate.
+      <</if>>
+      The notice tells you who is laying the floor, but nothing about what will happen on it.
+    <</if>>
+    <br><br>
+    <<if $avery_tower.effects.includes('Harper')>>
+      Across the road, the temporary clinic's windows are shut. A thin trail of fumes rises from the grate below them.
+    <</if>>
+    <<if $avery_tower.effects.includes('Remy')>>
+      You pass the parked vans on your way back. Their doors are closed. Nobody offers to show you what's inside.
+    <</if>>
+    You have seen the arrangements for yourself. Whatever the private room is for, it hasn't been put in the construction accounts.
+  <<option 'CN'>>
+    你沿围栏走了一段，避开出入口。
+    <<if $avery_tower.progress gte 80>>
+      图纸上的天窗就在顶层房间上方。
+    <<else>>
+      你把图纸与尚未完工的大楼对照。天窗标在顶层房间上方。
+    <</if>>
+    <<if $avery_tower.effects.includes('temple')>>
+      一名神殿抗议者看到了你的访客牌。“又一位宾客？”对方问。“他们许诺给你什么了？”
+      你问起天窗的安排。对方抬头看着大楼。“有些门还是关着好。即使在梦里。”
+      你还没来得及问清，对方已经转身，继续守候。
+    <<else>>
+      围栏上贴着承包商的开幕告示。公开参观的名单里划去了顶层房间，另一次聚会只写在你那份安排表上。
+      <<if Time.dayState is 'night'>>
+        施工人员已经离开。你借着工地的灯光阅读告示。
+      <<else>>
+        一名工人让你离大门远些。
+      <</if>>
+      告示写清了谁来铺地板，却没写那上面要发生什么。
+    <</if>>
+    <br><br>
+    <<if $avery_tower.effects.includes('Harper')>>
+      马路对面，临时诊所的窗户关着。下面的排水口缓缓冒着烟。
+    <</if>>
+    <<if $avery_tower.effects.includes('Remy')>>
+      你回去时经过停放的货车。车门紧闭，没有人邀你看看里面装着什么。
+    <</if>>
+    你已经亲自看过现场。无论那个私人房间作什么用，都没有记在施工账目里。
+<</language>><br><br>
+<<getouticon>><<lanLink ['Return to the site entrance', '返回施工现场入口'] 'Skyscraper'>><</lanLink>><br>
+
+:: Deadwood Reblooms Company Avery Ceremony []
+<<deadwood-avery-ceremony-header>>
+<<if !_avery_business.ceremony>><<getouticon>><<lanLink ['Go outside', '走到外面'] 'Elk Street'>><<unset $silenceNotifications>><<endevent>><</lanLink>><<exit>><</if>>
+<<set _avery_notes.questioned to true>>
+<<person3>>
+<<language>>
+  <<option 'EN'>>
+    You stop before the lift. "Avery said you would explain. Explain now."
+    Harper looks from you to Avery. <<person1>><<He>> stays beside you. "Answer the question."
+    <br><br>
+    Harper draws a small fox mask halfway from <<person3>><<his>> coat, then pushes it back. "You'll bring the stones to Avery. You stay beneath the skylight. Others will keep you in place while <<nnpc_he 'Avery'>> holds the knife."
+    <br><br>
+    "Against me?"
+    <br><br>
+    "Over your heart." Harper's voice remains quiet. "The stones can bring things to the surface. Things neither of you has chosen to remember. There is a precedent for your part."
+    <br><br>
+    "That wasn't what I asked."
+    <br><br>
+    "You want me to promise nothing will happen to you." <<He>> pauses. "I can't give you that."
+    The lift settles at the ground floor. Avery watches its doors, then you. "You wanted an answer. Now you have one."
+  <<option 'CN'>>
+    你在电梯前停下。“艾弗里说你会解释。现在说清楚。”
+    哈珀看看你，又看看艾弗里。<<person1>><<He>>留在你身旁。“回答这个问题。”
+    <br><br>
+    <<person3>>哈珀从外套里露出一张小狐狸面具，随即又藏了回去。“你把许愿石交给艾弗里，留在天窗下。其他人会让你保持不动，<<nnpc_he 'Avery'>>来拿刀。”
+    <br><br>
+    “抵着我？”
+    <br><br>
+    “在你的心脏上方。”哈珀的声音仍然很轻。“许愿石会把一些东西带到眼前。你们都未必愿意想起的东西。你的部分，有先例可循。”
+    <br><br>
+    “我问的不是这个。”
+    <br><br>
+    “你要我保证，你不会出事。”<<he>>停了一下。“这个我不能保证。”
+    电梯停在一楼。艾弗里看看电梯门，又看看你。“你要一个回答。现在听到了。”
+<</language>><br><br>
+<<deadwood-ascension-proposal-link>>
+<<socialiseicon 'agree'>><<lanLink ['Continue with them', '继续跟着他们'] 'Skyscraper Party 12'>>
+  <<if maplebirch.get('Finance').company.avery.ceremony>><<set $Finance.company.avery.decision to 'continue'>><</if>>
+<</lanLink>><br>
+<<refuseicon>><<lanLink ['Leave before the lift goes up', '在电梯上去之前离开'] 'Deadwood Reblooms Company Avery Ceremony Leave'>>
+  <<if maplebirch.get('Finance').company.avery.ceremony>>
+    <<set $Finance.company.avery.decision to 'leave'>><<npcincr Avery rage 3>>
+  <</if>>
+<</lanLink>><br>
+
+:: Deadwood Reblooms Company Avery Ceremony Leave []
+<<deadwood-avery-ceremony-header>>
+<<if !_avery_business.ceremony or _avery_notes.decision isnot 'leave'>><<getouticon>><<lanLink ['Go outside', '走到外面'] 'Elk Street'>><<unset $silenceNotifications>><<endevent>><</lanLink>><<exit>><</if>>
+<<person1>>
+<<language>>
+  <<option 'EN'>>
+    "Then I'm leaving," you say.
+    Avery catches your wrist. "We need you."
+    <br><br>
+    You look down at <<his>> hand, then at the doors Quinn went through. Harper waits by the open lift. "Not here," <<person3>><<he>> says.
+    Avery's hand loosens. <<person1>><<He>> steps between you and the lift as you move towards the doors. "We'll discuss this later."
+    <br><br>
+    You cross the empty reception room and push through the doors. Behind you, the lift doors remain open. Avery has not stepped inside.
+  <<option 'CN'>>
+    “那我走了。”你说。
+    艾弗里抓住你的手腕。“我们需要你。”
+    <br><br>
+    你低头看着<<his>>的手，又看看奎恩离开时经过的大门。哈珀站在敞开的电梯旁。“别在这里。”<<person3>><<he>>说。
+    艾弗里的手松开了。你走向大门时，<<person1>><<he>>挡在你与电梯之间。“这件事以后再谈。”
+    <br><br>
+    你穿过空荡荡的招待厅，推开大门。身后的电梯门仍然开着，艾弗里还没有上楼。
+<</language>><br><br>
+<<elkicon>><<lanLink ['Go outside (0:05)', '走到外面 (0:05)'] 'Elk Street'>>
+  <<unset $silenceNotifications>><<endevent>><<pass 5>>
+<</lanLink>><br>

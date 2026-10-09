@@ -16,6 +16,8 @@ export interface Property {
   id: PropertyId;
   street: string;
   street_name: LocalizedText;
+  tenure?: 'company';
+  location?: string;
   price: number;
   weekly_rent_percent: number;
   resident_capacity: number;
@@ -83,10 +85,12 @@ export default class PropertyCatalog {
         !localized(property.street_name) ||
         typeof property.price !== 'number' ||
         !Number.isSafeInteger(property.price) ||
-        property.price <= 0 ||
+        (property.tenure === 'company' ? property.price !== 0 : property.price <= 0) ||
         typeof property.weekly_rent_percent !== 'number' ||
         !Number.isFinite(property.weekly_rent_percent) ||
-        property.weekly_rent_percent <= 0 ||
+        (property.tenure === 'company' ? property.weekly_rent_percent !== 0 : property.weekly_rent_percent <= 0) ||
+        (property.tenure !== undefined && property.tenure !== 'company') ||
+        (property.location !== undefined && (typeof property.location !== 'string' || !property.location)) ||
         !Number.isSafeInteger(property.resident_capacity) ||
         property.resident_capacity! < 0 ||
         !property.bed_id ||

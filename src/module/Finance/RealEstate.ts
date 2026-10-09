@@ -377,7 +377,7 @@ class RealEstate {
 
   public buy(id: PropertyId): string {
     const property = this.properties.find(item => item.id === id);
-    if (!property) return 'invalid';
+    if (!property || property.tenure) return 'invalid';
     if (this.owns(id)) return 'owned';
     const result = this.finance.payFromBankPennies(property.price);
     if (result !== 'ok') return result;
@@ -389,7 +389,7 @@ class RealEstate {
 
   public buyWithMortgage(id: PropertyId, useCredit = false, days = this.mortgage.terms.term_days): string {
     const property = this.properties.find(item => item.id === id);
-    if (!property) return 'invalid';
+    if (!property || property.tenure) return 'invalid';
     if (this.owns(id)) return 'owned';
     const result = this.mortgage.start(id, property.price, useCredit, days);
     if (result !== 'ok') return result;
@@ -397,6 +397,21 @@ class RealEstate {
     this.state.management[id] = RealEstate.newManagement();
     if (this.state.last_managed_day < 0) this.state.last_managed_day = RealEstate.today;
     return 'ok';
+  }
+
+  public occupy(id: PropertyId): boolean {
+    const property = this.properties.find(item => item.id === id);
+    if (property?.tenure !== 'company' || this.owns(id)) return false;
+    this.state.owned[id] = true;
+    const management = this.managementFor(id);
+    management.condition = 100;
+    // 公司交付的房间已配齐家具，再次入住保留住户自行添置的物品。
+    management.furnishings ??= {};
+    management.furnishings.table ??= 'marbletable';
+    management.furnishings.chair ??= 'armchair';
+    management.furnishings.decoration ??= 'painting';
+    if (this.state.last_managed_day < 0) this.state.last_managed_day = RealEstate.today;
+    return true;
   }
 
   public appraisal(id: PropertyId): number {
@@ -603,6 +618,7 @@ class RealEstate {
 
   public renovate(id: PropertyId): string {
     if (!this.owns(id)) return 'not-owned';
+    if (this.properties.find(property => property.id === id)?.tenure) return 'unavailable';
     const management = this.managementFor(id);
     if (management.rented || management.auction_day !== null || this.isFrozen(id)) return 'unavailable';
     if (management.renovation >= this.mortgage.terms.rental.max_renovation_level) return 'max-renovation';
@@ -615,6 +631,7 @@ class RealEstate {
 
   public repair(id: PropertyId): string {
     if (!this.owns(id)) return 'not-owned';
+    if (this.properties.find(property => property.id === id)?.tenure) return 'unavailable';
     const management = this.managementFor(id);
     if (management.auction_day !== null || this.isFrozen(id)) return 'unavailable';
     const cost = this.repairCost(id);
@@ -626,7 +643,7 @@ class RealEstate {
   }
 
   public rentOut(id: PropertyId): boolean {
-    if (!this.owns(id) || this.isFrozen(id) || this.residentsAt(id).length > 0) return false;
+    if (!this.owns(id) || this.properties.find(property => property.id === id)?.tenure || this.isFrozen(id) || this.residentsAt(id).length > 0) return false;
     const management = this.managementFor(id);
     if (management.rented || management.auction_day !== null || management.condition < this.mortgage.terms.rental.minimum_condition) return false;
     management.rented = true;
@@ -682,7 +699,8 @@ class RealEstate {
   }
 
   public manage(id: PropertyId, enabled: boolean): boolean {
-    if (!this.owns(id) || (enabled && (!this.manager || this.isFrozen(id) || this.managementFor(id).auction_day !== null))) return false;
+    if (!this.owns(id) || this.properties.find(property => property.id === id)?.tenure || (enabled && (!this.manager || this.isFrozen(id) || this.managementFor(id).auction_day !== null)))
+      return false;
     this.settleDays();
     this.managementFor(id).managed = enabled;
     return true;
@@ -721,7 +739,7 @@ class RealEstate {
   }
 
   public listAuction(id: PropertyId): boolean {
-    if (!this.owns(id) || this.residentsAt(id).length > 0 || this.mortgage.current?.property_id === id) return false;
+    if (!this.owns(id) || this.properties.find(property => property.id === id)?.tenure || this.residentsAt(id).length > 0 || this.mortgage.current?.property_id === id) return false;
     const management = this.managementFor(id);
     if (management.rented || management.auction_day !== null) return false;
     management.auction_day = RealEstate.today + this.mortgage.terms.voluntary_auction_days;
@@ -754,7 +772,7 @@ class RealEstate {
     // 跨日循环只为检查通知、拍卖到期和周结算日期，不会每日扣维护费或收租。
     for (let day = state.last_managed_day + 1; day <= today; day++) {
       for (const property of this.properties) {
-        if (!this.owns(property.id)) continue;
+        if (!this.owns(property.id) || property.tenure) continue;
         const management = this.managementFor(property.id);
         if (day >= management.next_settlement_day) {
           const upkeep = this.maintenanceCost(property.id);
@@ -801,14 +819,15 @@ class RealEstate {
       this.finance.company.advance(day);
       this.mortgage.advanceThrough(day);
       this.finance.advanceBankThrough(day);
+      this.finance.company.suite.advance(day);
     }
     state.last_managed_day = today;
+    this.finance.company.suite.sync();
   }
 
   private sellByAuction(id: PropertyId, kind: 'voluntary' | 'foreclosure', debt: number, day: number): void {
     const property = this.properties.find(item => item.id === id);
     if (!property || !this.owns(id)) return;
-    const management = this.managementFor(id);
     const assessedValue = this.appraisal(id);
     const percent = kind === 'foreclosure' ? this.mortgage.terms.foreclosure_auction_percent : this.mortgage.terms.voluntary_auction_percent;
     const proceeds = Math.floor((assessedValue * percent) / 100);
@@ -818,6 +837,12 @@ class RealEstate {
     this.finance.creditBankPennies(surplus);
     this.finance.addCollectionDebt(shortfall, 'mortgage', day);
     this.state.last_auction = { property_id: id, kind, proceeds, debt, surplus, shortfall, day };
+    this.vacate(id);
+  }
+
+  public vacate(id: PropertyId): void {
+    if (!this.owns(id)) return;
+    const management = this.managementFor(id);
     this.state.owned[id] = false;
     // 地块沿用原版 $plots。产权拍卖后清掉这处房屋的作物，避免重新购买时接手旧存档的苗圃。
     if (V.plots) delete V.plots[id];
@@ -848,7 +873,8 @@ class RealEstate {
       if (alternative) this.state.residents[alternative.id] = displaced;
     }
     if (this.state.visiting === id) {
-      this.state.visiting = alternative?.id ?? null;
+      // 公司套房在下一次住宅入口交代搬离，不把 PC 随同恋人瞬移到另一处住所。
+      if (!this.properties.find(property => property.id === id)?.tenure) this.state.visiting = alternative?.id ?? null;
       this.state.floor = 1;
       this.state.meeting_resident = null;
     }

@@ -6,6 +6,7 @@
 - 零环零幻想：[Dom 罗宾](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod)，为 `Robin` 提供创作方向。
 - 丧心：[模拟人生](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims)，为 `LifeSimulation` 提供校园玩法参考。
 - 元夕：提供马转化贴图。
+- 查查查茶子：雷米恋爱模组原作者。`C1.2_Remy.Love.Mod.mod_v0.5.10-1.zip` 为果园模块中的雷米关系与囚禁差分提供参考。
 
 动态音乐使用 Kresiek The Furry、Augmentality（Brandon Morris）、AdoTheLimey、primbal、Breviceps、Joth、TinyWorlds、isaiah658、SketchMan3 和 rubberduck 的 CC0 音频。逐曲名称、作者与来源见[音频素材记录](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/blob/main/audio-pack/audio/CREDITS.md)。
 
