@@ -152,7 +152,7 @@ class LongerCombat {
     const state = this.npcState(npc);
     const description = state ? this.npcHis(npc.pronouns) + state : '';
     if (Number(V.underwater) > 0 || V.combat_silenced) return description;
-    const character = name === 'Sydney' ? `Sydney.${(C.npc?.Sydney?.corruption ?? 0) >= 10 ? 'corrupt' : 'pure'}` : name;
+    const character = name === 'Sydney' ? `Sydney:${(C.npc?.Sydney?.corruption ?? 0) >= 10 ? 'corrupt' : 'pure'}` : name;
     const space = lanSwitch(' ', '');
     const speech: string[] = [];
     for (const pair of this.npcPairs(npc)) {
@@ -348,7 +348,7 @@ class LongerCombat {
     if (V.enemytype === 'beast') V[`enemyarousal${V.active_enemy + 1}`] = V.enemyarousal;
     T.combatend = false;
 
-    sWikifier(`<br><br><<lanLink '继续' ${JSON.stringify(source)} 'capitalize'>><</lanLink>>`);
+    sWikifier(`<br><br><<lanLink ['Continue', '继续'] ${JSON.stringify(source)} 'capitalize'>><</lanLink>>`);
 
     return fragment;
   }
