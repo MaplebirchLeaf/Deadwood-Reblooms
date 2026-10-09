@@ -25,51 +25,61 @@
 			<<lanSwitch 'Days remaining in the course: ' '疗程剩余天数：'>><<= _growth.growthRemaining>>
 		<</if>><br>
 		<<lanLink ['Stop the programme', '停止当前计划']>>
-			<<run maplebirch.get('LifeSimulation').stopBodyGrowth()>><<run maplebirch.SugarCube.Engine.show()>>
+			<<run maplebirch.get('LifeSimulation').stopBodyGrowth()>>
+			<<run Dynamic.render('deadwood-body-growth-plan')>>
 		<</lanLink>><br>
 	<</if>>
 <</widget>>
 
 :: Deadwood Body Growth Gym []
 <<set $outside to 0>><<set $location to 'deadwood_gym'>><<effects>>
-<<set _growth to maplebirch.get('LifeSimulation')>>
-<<if _growth.canTrainGrowth>>
-	<<lanSwitch 'The trainer checks your measurements and notes them on a card. "Keep coming back. We can adjust the work as you grow."' '教练量过你的尺寸，记在一张卡片上。“坚持过来。等你长大一些，我们再调整训练。”'>>
-	<br><br>
-	<<lanSwitch 'Complete strength or running training on thirty different days to grow one body size. Stretching does not count towards the programme.' '在三十个不同的日子完成力量或跑步训练，可以长大一个体型等级。伸展训练不计入这个计划。'>>
-	<br><br><<deadwood-body-growth-status>>
-	<<if _growth.canGrow>>
-		<<lanLink ['Begin the programme', '开始训练计划']>>
-			<<run maplebirch.get('LifeSimulation').startBodyGrowth('gym')>><<run maplebirch.SugarCube.Engine.show()>>
-		<</lanLink>><br>
+<<dynamicblock 'id=deadwood-body-growth-plan'>>
+	<<set _growth to maplebirch.get('LifeSimulation')>>
+	<<if _growth.canTrainGrowth>>
+		<<lanSwitch 'The trainer checks your measurements and notes them on a card. "Keep coming back. We can adjust the work as you grow."' '教练量过你的尺寸，记在一张卡片上。“坚持过来。等你长大一些，我们再调整训练。”'>>
+		<br><br>
+		<<lanSwitch 'Complete strength or running training on thirty different days to grow one body size. Stretching does not count towards the programme.' '在三十个不同的日子完成力量或跑步训练，可以长大一个体型等级。伸展训练不计入这个计划。'>>
+		<br><br><<deadwood-body-growth-status>>
+		<<if _growth.canGrow>>
+			<<lanLink ['Begin the programme', '开始训练计划']>>
+				<<run maplebirch.get('LifeSimulation').startBodyGrowth('gym')>>
+				<<run Dynamic.render('deadwood-body-growth-plan')>>
+			<</lanLink>><br>
+		<</if>>
+	<<else>>
+		<<lanSwitch 'You cannot begin a training programme right now.' '你现在无法开始训练计划。'>>
 	<</if>>
-<<else>>
-	<<lanSwitch 'You cannot begin a training programme right now.' '你现在无法开始训练计划。'>>
-<</if>>
+<</dynamicblock>>
 <br><<getouticon>><<lanLink ['Return to the training floor', '返回训练区'] 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
 
 :: Deadwood Body Growth Clinic []
 <<set $outside to 0>><<set $location to 'hospital'>><<effects>>
-<<set _growth to maplebirch.get('LifeSimulation')>>
-<<if _growth.canVisitClinic>>
-	<<lanSwitch 'The doctor measures you before going through the course. "Two weeks. You can stop if you change your mind, but the fee is paid in advance."' '医生先替你测量尺寸，再介绍疗程。“两周。改变主意可以停下来，不过费用需要提前支付。”'>>
-	<br><br>
-	<<lanSwitch 'The course increases your body size by one level. The fee is not refundable if you stop early.' '完成疗程后，体型增大一个等级。提前停止不会退还费用。'>>
-	<br><<lanSwitch 'Fee: ' '费用：'>><<printmoney _growth.clinicPrice>>
-	<br><br><<deadwood-body-growth-status>>
-	<<if _growth.canGrow>>
-		<<if _growth.canAffordClinic>>
-			<<lanLink ['Begin the course (0:30)', '开始疗程 (0:30)']>>
-				<<if maplebirch.get('LifeSimulation').startBodyGrowth('clinic')>>
-				  <<pass 30>>
-				<</if>>
-				<<run maplebirch.SugarCube.Engine.show()>>
-			<</lanLink>><br>
-		<<else>>
-			<<lanSwitch 'You cannot afford the course.' '你付不起疗程费用。'>><br>
+<<dynamicblock 'id=deadwood-body-growth-plan'>>
+	<<set _growth to maplebirch.get('LifeSimulation')>>
+	<<if _growth.canVisitClinic>>
+		<<lanSwitch 'The doctor measures you before going through the course. "Two weeks. You can stop if you change your mind, but the fee is paid in advance."' '医生先替你测量尺寸，再介绍疗程。“两周。改变主意可以停下来，不过费用需要提前支付。”'>>
+		<br><br>
+		<<lanSwitch 'The course increases your body size by one level. The fee is not refundable if you stop early.' '完成疗程后，体型增大一个等级。提前停止不会退还费用。'>>
+		<br><<lanSwitch 'Fee: ' '费用：'>><<printmoney _growth.clinicPrice>>
+		<br><br><<deadwood-body-growth-status>>
+		<<if _growth.canGrow>>
+			<<if _growth.canAffordClinic>>
+				<<lanLink ['Begin the course (0:30)', '开始疗程 (0:30)']>>
+					<<set _growth_passage to $passage>>
+					<<if maplebirch.get('LifeSimulation').startBodyGrowth('clinic')>>
+					  <<pass 30>>
+					<</if>>
+					<<if $passage is _growth_passage>>
+						<<updatesidebarmoney>>
+						<<run Dynamic.render('deadwood-body-growth-plan')>>
+					<</if>>
+				<</lanLink>><br>
+			<<else>>
+				<<lanSwitch 'You cannot afford the course.' '你付不起疗程费用。'>><br>
+			<</if>>
 		<</if>>
+	<<else>>
+		<<lanSwitch 'You cannot attend the consultation right now.' '你现在无法接受咨询。'>>
 	<</if>>
-<<else>>
-	<<lanSwitch 'You cannot attend the consultation right now.' '你现在无法接受咨询。'>>
-<</if>>
+<</dynamicblock>>
 <br><<getouticon>><<lanLink ['Return to the foyer', '返回大厅'] 'Hospital Foyer'>><</lanLink>>

@@ -4,12 +4,12 @@
   <<set _suite to maplebirch.get('Finance').company.suite>>
   <<if $avery_fate is 'ascended' and maplebirch.get('Finance').company.available>>
     <<if _suite.occupied>>
-      <<homeicon>><<lanLink ['Take the residents lift (0:02)', '乘住户电梯回套房 (0:02)'] 'Deadwood Reblooms Property Home'>>
+      <<icon 'property/lift.png'>><<lanLink ['Take the residents lift (0:02)', '乘住户电梯回套房 (0:02)'] 'Deadwood Reblooms Property Home'>>
         <<run maplebirch.get('Finance').realEstate.visit('penthouse')>><<pass 2>>
       <</lanLink>><br>
     <</if>>
     <<if _suite.eligible or _suite.state.signed>>
-      <<icon 'company/shareholder-reception.png'>><<lanLink ['Ask about the suite', '询问套房的事'] 'Deadwood Reblooms Company Suite'>><</lanLink>><br>
+      <<icon 'property/concierge.png'>><<lanLink ['Ask about the suite', '询问套房的事'] 'Deadwood Reblooms Company Suite'>><</lanLink>><br>
     <</if>>
   <</if>>
 <</widget>>
@@ -22,7 +22,7 @@
         <<lanSwitch 'The company has issued a notice to vacate on ' '公司要求你在这一天之前搬离：'>>
         <<deadwood-reblooms-finance-date `_suite.state.notice_day + 7`>>
       </span><br>
-      <<icon 'company/shareholder-reception.png'>><<lanLink ['Read the accommodation notice', '查看住宿通知'] 'Deadwood Reblooms Company Suite'>><</lanLink>><br>
+      <<icon 'company/minutes.png'>><<lanLink ['Read the accommodation notice', '查看住宿通知'] 'Deadwood Reblooms Company Suite'>><</lanLink>><br>
     <</if>>
     <<if _suite.canInvite>>
       <<socialiseicon 'ask'>><<lanLink ['Invite Avery up for a short visit (0:15)', '请艾弗里上来坐坐 (0:15)'] 'Deadwood Reblooms Company Suite Visit'>>
@@ -72,7 +72,7 @@
       如果还有衣物留在里面，可以通过住宿接待处领取。
       保安等你收好随身物品，指了指通向大厅的门。
   <</language>><br><br>
-  <<getouticon>><<lanLink ['Go to the accommodation desk', '前往住宿接待处'] 'Deadwood Reblooms Company Suite'>>
+  <<icon 'property/concierge.png'>><<lanLink ['Go to the accommodation desk', '前往住宿接待处'] 'Deadwood Reblooms Company Suite'>>
     <<set $Finance.real_estate.visiting to null>><<endevent>>
   <</lanLink>><br>
   <<getouticon>><<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>>
@@ -94,100 +94,104 @@
   <<getouticon>><<lanLink ['Return to Elk Street', '返回麋鹿街'] 'Elk Street'>><</lanLink>>
   <<exit>>
 <</if>>
-<<if _company.state.result is 'suite-signed'>>
-  <<set _company.state.result to null>>
-  <<language>>
-    <<option 'EN'>>
-      The clerk checks your signature, then places a key card on the counter.
-      "The residents' lift is on the left. Your visitors will need to sign in."
-      The card has your name on it, with the suite number beneath.
-    <<option 'CN'>>
-      职员核对你的签名，把门卡放到柜台上。
-      “住户电梯在左边。访客需要登记。”
-      门卡印着你的名字，下面是套房的编号。
-  <</language>><br><br>
-<<elseif _company.state.result is 'suite-failed'>>
-  <<set _company.state.result to null>>
-  <span class='red'><<lanSwitch 'The clerk cannot complete the paperwork. The share register and unpaid bills must be checked first.' '手续没能办成，需要先核对持股记录与未付账单。'>></span><br><br>
-<<elseif !_company.open>>
-  <<language>>
-    <<option 'EN'>>
-      The accommodation desk is shut. A security guard points you towards the residents' lift.
-      "If you've already got a card, you can go up. Paperwork will have to wait until office hours."
-    <<option 'CN'>>
-      住宿接待处已经关门。保安朝住户电梯指了指。
-      “有门卡就能上去，办手续得等工作时间。”
-  <</language>><br><br>
-<<else>>
-  <<language>>
-    <<option 'EN'>>
-      The clerk turns to the accommodation register.
-      "There is a private suite beside the upper office wing. The company can make it available to a director or controlling shareholder."
-      <<if C.npc.Avery.state is 'dismissed'>>
-        The clerk checks the register again. "The agreement concerns your position in the company."
-      <</if>>
-    <<option 'CN'>>
-      职员翻开住宿登记簿。
-      “顶层办公区旁有一间私人套房，可以安排给公司的董事或控股股东。”
-      <<if C.npc.Avery.state is 'dismissed'>>
-        职员又核对了一遍记录。“这份协议按您在公司的职务办理。”
-      <</if>>
-  <</language>><br><br>
-<</if>>
-<<language>>
-  <<option 'EN'>>
-    The suite has a sitting room, a kitchen, two bedrooms, a bathroom, a study and an indoor pool.
-    Two shallow planting beds stand in a sheltered roof garden. The parking spaces are underground.
-    <br><br>
-    The agreement grants <span class='teal'>use of the suite</span>. You cannot sell it, let it out or pledge it against a loan.
-    The company maintains the building. The suite's weekly upkeep of <<printmoney _suite.upkeep>> comes from your bank account, with any shortfall carried forward.
-    <br><br>
-    If you lose both your board seat and controlling stake, or leave upkeep unpaid, you receive <span class='red'>seven days' notice</span>.
-    Restoring your position and clearing the bill within that period withdraws the notice.
-    Afterwards your card stops working. Clothes left inside are boxed for collection at the lobby desk.
-    Any live-in lovers move together to another suitable empty home you hold, or return to their usual accommodation.
-  <<option 'CN'>>
-    套房有起居室、厨房、两间卧室、浴室、书房与室内泳池。
-    背风的天台花园放着两只浅种植箱，停车位则在地下。
-    <br><br>
-    协议授予你<span class='teal'>套房使用权</span>，不能出售、出租或抵押。
-    大楼由公司维护，套房每周<<printmoney _suite.upkeep>>的维护费从银行账户扣除，扣款不足的部分记为欠费。
-    <br><br>
-    失去董事席位且不再控股，或拖欠维护费时，公司会给你<span class='red'>七天搬离期限</span>。
-    期限内恢复任职或控股，并结清账单，通知便会撤回。
-    到期后门卡失效，留在里面的衣物会装箱，交由大厅接待处保管。
-    同住恋人会一起搬到你名下另一处空置且有足够床位的住处，否则各自回到原来的住所。
-<</language>><br><br>
-<<if _suite.state.notice_day isnot null and _suite.occupied>>
-  <span class='red'>
-    <<lanSwitch 'Your current deadline is ' '你目前的搬离期限为'>>
-    <<deadwood-reblooms-finance-date `_suite.state.notice_day + 7`>>
-  </span><br><br>
-<</if>>
-<<if _suite.state.arrears gt 0>>
-  <span class='red'><<lanSwitch 'Unpaid upkeep: ' '未付维护费：'>><<printmoney _suite.state.arrears>></span><br>
-  <<if _company.available and $Finance.bank.opened and $Finance.bank.debit_card and $Finance.bank.balance gte _suite.state.arrears>>
-    <<shopicon 'register'>><<lanLink ['Clear the upkeep bill', '结清维护费'] 'Deadwood Reblooms Company Suite'>>
-      <<run maplebirch.get('Finance').company.suite.pay()>>
-    <</lanLink>><br>
+<<dynamicblock 'id=deadwood-company-suite-desk'>>
+  <<if _company.state.result is 'suite-signed'>>
+    <<set _company.state.result to null>>
+    <<language>>
+      <<option 'EN'>>
+        The clerk checks your signature, then places a key card on the counter.
+        "The residents' lift is on the left. Your visitors will need to sign in."
+        The card has your name on it, with the suite number beneath.
+      <<option 'CN'>>
+        职员核对你的签名，把门卡放到柜台上。
+        “住户电梯在左边。访客需要登记。”
+        门卡印着你的名字，下面是套房的编号。
+    <</language>><br><br>
+  <<elseif _company.state.result is 'suite-failed'>>
+    <<set _company.state.result to null>>
+    <span class='red'><<lanSwitch 'The clerk cannot complete the paperwork. The share register and unpaid bills must be checked first.' '手续没能办成，需要先核对持股记录与未付账单。'>></span><br><br>
+  <<elseif !_company.open>>
+    <<language>>
+      <<option 'EN'>>
+        The accommodation desk is shut. A security guard points you towards the residents' lift.
+        "If you've already got a card, you can go up. Paperwork will have to wait until office hours."
+      <<option 'CN'>>
+        住宿接待处已经关门。保安朝住户电梯指了指。
+        “有门卡就能上去，办手续得等工作时间。”
+    <</language>><br><br>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        The clerk turns to the accommodation register.
+        "There is a private suite beside the upper office wing. The company can make it available to a director or controlling shareholder."
+        <<if C.npc.Avery.state is 'dismissed'>>
+          The clerk checks the register again. "The agreement concerns your position in the company."
+        <</if>>
+      <<option 'CN'>>
+        职员翻开住宿登记簿。
+        “顶层办公区旁有一间私人套房，可以安排给公司的董事或控股股东。”
+        <<if C.npc.Avery.state is 'dismissed'>>
+          职员又核对了一遍记录。“这份协议按您在公司的职务办理。”
+        <</if>>
+    <</language>><br><br>
   <</if>>
-<</if>>
-<<if _suite.canSign>>
-  <<icon 'company/registration.png'>><<lanLink ['Sign the accommodation agreement (0:10)', '签署住宿协议 (0:10)'] 'Deadwood Reblooms Company Suite'>>
-    <<set $Finance.company.result to maplebirch.get('Finance').company.suite.sign() ? 'suite-signed' : 'suite-failed'>>
-    <<pass 10>>
-  <</lanLink>><br>
-<<elseif !_suite.occupied and !_suite.eligible>>
-  <span class='red'><<lanSwitch 'The current share register does not qualify you for accommodation.' '你目前的持股与任职记录不符合住宿条件。'>></span><br>
-<</if>>
-<<if _suite.occupied and _company.available>>
-  <<homeicon>><<lanLink ['Take the lift up (0:02)', '乘电梯上楼 (0:02)'] 'Deadwood Reblooms Property Home'>>
-    <<run maplebirch.get('Finance').realEstate.visit('penthouse')>><<pass 2>>
-  <</lanLink>><br>
-<<elseif _suite.state.signed and $wardrobes.deadwood_penthouse>>
-  <<furnitureicon 'wardrobe'>><<lanLink ['Collect your stored clothes', '领取寄存衣物'] 'Deadwood Reblooms Company Suite Storage'>><</lanLink>><br>
-<</if>>
-<br><<getouticon>><<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>><</lanLink>>
+  <<language>>
+    <<option 'EN'>>
+      The suite has a sitting room, a kitchen, two bedrooms, a bathroom, a study and an indoor pool.
+      Two shallow planting beds stand in a sheltered roof garden. The parking spaces are underground.
+      <br><br>
+      The agreement grants <span class='teal'>use of the suite</span>. You cannot sell it, let it out or pledge it against a loan.
+      The company maintains the building. The suite's weekly upkeep of <<printmoney _suite.upkeep>> comes from your bank account, with any shortfall carried forward.
+      <br><br>
+      If you lose both your board seat and controlling stake, or leave upkeep unpaid, you receive <span class='red'>seven days' notice</span>.
+      Restoring your position and clearing the bill within that period withdraws the notice.
+      Afterwards your card stops working. Clothes left inside are boxed for collection at the lobby desk.
+      Any live-in lovers move together to another suitable empty home you hold, or return to their usual accommodation.
+    <<option 'CN'>>
+      套房有起居室、厨房、两间卧室、浴室、书房与室内泳池。
+      背风的天台花园放着两只浅种植箱，停车位则在地下。
+      <br><br>
+      协议授予你<span class='teal'>套房使用权</span>，不能出售、出租或抵押。
+      大楼由公司维护，套房每周<<printmoney _suite.upkeep>>的维护费从银行账户扣除，扣款不足的部分记为欠费。
+      <br><br>
+      失去董事席位且不再控股，或拖欠维护费时，公司会给你<span class='red'>七天搬离期限</span>。
+      期限内恢复任职或控股，并结清账单，通知便会撤回。
+      到期后门卡失效，留在里面的衣物会装箱，交由大厅接待处保管。
+      同住恋人会一起搬到你名下另一处空置且有足够床位的住处，否则各自回到原来的住所。
+  <</language>><br><br>
+  <<if _suite.state.notice_day isnot null and _suite.occupied>>
+    <span class='red'>
+      <<lanSwitch 'Your current deadline is ' '你目前的搬离期限为'>>
+      <<deadwood-reblooms-finance-date `_suite.state.notice_day + 7`>>
+    </span><br><br>
+  <</if>>
+  <<if _suite.state.arrears gt 0>>
+    <span class='red'><<lanSwitch 'Unpaid upkeep: ' '未付维护费：'>><<printmoney _suite.state.arrears>></span><br>
+    <<if _company.available and $Finance.bank.opened and $Finance.bank.debit_card and $Finance.bank.balance gte _suite.state.arrears>>
+      <<icon 'company/invoice.png'>><<lanLink ['Clear the upkeep bill', '结清维护费']>>
+        <<run maplebirch.get('Finance').company.suite.pay()>>
+        <<run maplebirch.get('Finance').refreshMoneyUI()>>
+        <<run Dynamic.render('deadwood-company-suite-desk')>>
+      <</lanLink>><br>
+    <</if>>
+  <</if>>
+  <<if _suite.canSign>>
+    <<icon 'company/agreement.png'>><<lanLink ['Sign the accommodation agreement (0:10)', '签署住宿协议 (0:10)'] 'Deadwood Reblooms Company Suite'>>
+      <<set $Finance.company.result to maplebirch.get('Finance').company.suite.sign() ? 'suite-signed' : 'suite-failed'>>
+      <<pass 10>>
+    <</lanLink>><br>
+  <<elseif !_suite.occupied and !_suite.eligible>>
+    <span class='red'><<lanSwitch 'The current share register does not qualify you for accommodation.' '你目前的持股与任职记录不符合住宿条件。'>></span><br>
+  <</if>>
+  <<if _suite.occupied and _company.available>>
+    <<icon 'property/lift.png'>><<lanLink ['Take the lift up (0:02)', '乘电梯上楼 (0:02)'] 'Deadwood Reblooms Property Home'>>
+      <<run maplebirch.get('Finance').realEstate.visit('penthouse')>><<pass 2>>
+    <</lanLink>><br>
+  <<elseif _suite.state.signed and $wardrobes.deadwood_penthouse>>
+    <<furnitureicon 'wardrobe'>><<lanLink ['Collect your stored clothes', '领取寄存衣物'] 'Deadwood Reblooms Company Suite Storage'>><</lanLink>><br>
+  <</if>>
+  <br><<getouticon>><<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>><</lanLink>>
+<</dynamicblock>>
 
 :: Deadwood Reblooms Company Suite Storage [exitCheckBypass]
 <<set $outside to 0>><<set $location to 'avery_skyscraper'>><<effects>>

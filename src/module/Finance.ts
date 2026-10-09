@@ -704,7 +704,7 @@ class Finance extends Module {
     });
   }
 
-  private refreshMoneyUI(): void {
+  public refreshMoneyUI(): void {
     this.core.SugarCube.Wikifier.wikifyEval('<<updatesidebarmoney>>');
     if (document.getElementById('dr-finance-caption')) this.core.SugarCube.Wikifier.wikifyEval('<<replace "#dr-finance-caption">><<deadwood-reblooms-finance-caption-content>><</replace>>');
   }

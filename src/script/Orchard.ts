@@ -6,8 +6,14 @@ import type { MacroDefinition } from 'twine-sugarcube';
 
 export default function Orchard(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-remy-school-link', passage: 'Riding School' }, { widget: 'deadwood-remy-captivity', passage: 'Livestock Cell Remy' });
+  maplebirch.tool.addTo('Journal', 'deadwood-orchard-staff-journal');
 
-  maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-orchard-regular-link'], passage: 'Stall Manage' });
+  maplebirch.tool.addTo(
+    'CustomLinkZone',
+    { widget: [-1, 'deadwood-orchard-staff-link'], passage: 'Farm Still' },
+    { widget: [-1, 'deadwood-orchard-worker-recruitment'], passage: 'Pub' },
+    { widget: [-1, 'deadwood-orchard-regular-link'], passage: 'Stall Manage' }
+  );
 
   // 回执在本次页面显示完后清除，不能带进稍后的遭遇或下一次进园。
   maplebirch.on(':passagedisplay', () => {
@@ -31,14 +37,6 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
         {
           srcmatch: /<<getouticon>>(?=\s*<<link\s+\[\[[^\]\r\n]*\|Farm Work\]\]>>)/,
           applybefore: "<<deadwood-orchard-entry 'farm'>>",
-          expected: 1
-        }
-      ],
-      Pub: [
-        // 招募入口只跟随酒馆的普通菜单显示。
-        {
-          srcmatch: /<<harvesticon>>(?=\s*<<link\s+\[\[[^\]\r\n]*\|Harvest Street\]\]>>)/,
-          applybefore: '<<deadwood-orchard-worker-recruitment>>',
           expected: 1
         }
       ],

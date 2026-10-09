@@ -15,6 +15,14 @@ export default function Industry(maplebirch: typeof window.maplebirch): void {
     }
   });
   maplebirch.tool.addTo('Journal', 'deadwood-industry-journal');
+  maplebirch.tool.addTo('BeforeLinkZone', {
+    widget: 'deadwood-laboratory-contact',
+    passage: ['Riding School', "Doctor Harper's Office Exam"]
+  });
+  maplebirch.tool.addTo('CustomLinkZone', {
+    widget: [-1, 'deadwood-laboratory-contact'],
+    passage: ['Farm Still', 'Adult Shop Approach Sirris', 'Adult Shop Approach Sydney']
+  });
   maplebirch.npc.add(
     {
       nam: 'Rowan',

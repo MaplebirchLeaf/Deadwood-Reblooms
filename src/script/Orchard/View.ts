@@ -418,6 +418,7 @@ export default class OrchardView {
   }
 
   private perform(index: number, tool = this.tool, helped = false): void {
+    const passage = this.orchard.core.passage.title;
     const minutes = this.orchard.act(this.site, index, tool, helped);
     this.pending = null;
     if (!minutes) {
@@ -434,6 +435,10 @@ export default class OrchardView {
     this.orchard.core.SugarCube.Wikifier.wikifyEval(
       `${this.site === 'farm' ? `<<farm_count ${minutes}>>` : ''}${clearing ? `<<physique ${minutes / 10}>><<tiredness ${minutes / 10}>>` : '<<tiredness 1>><<tending 1>>'}${pass}`
     );
+    if (this.orchard.core.passage.title !== passage) {
+      this.orchard.notice = undefined;
+      return;
+    }
     if (this.orchard.notice?.clearing === 0) this.selected = index;
     const interrupted = this.site === 'farm' && this.orchard.farmInterrupted;
     if (interrupted) {

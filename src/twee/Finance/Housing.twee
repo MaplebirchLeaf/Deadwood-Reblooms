@@ -240,6 +240,7 @@
 <<if _management.rented or _management.auction_day isnot null or _estate.isFrozen(_property.id)>>
   <span class='red'><<lanSwitch 'Work cannot begin while the property is occupied by tenants, awaiting auction or frozen.' '房屋出租、等待拍卖或被冻结期间，不能安排扩建。'>></span><br>
 <</if>>
+<<dynamicblock 'id=deadwood-property-extensions'>>
 <div class='deadwood-card-grid'>
   <<for _extension range _property.extensions>>
     <<capture _property _extension>>
@@ -253,7 +254,11 @@
             <span class='blue'><<lanSwitch 'Build the pool first.' '需先建好泳池。'>></span>
           <<elseif !_management.rented and _management.auction_day is null and !_estate.isFrozen(_property.id)>>
             <<if maplebirch.get('Finance').canPay(_extension.cost, 'furniture')>>
-              <<lanLink ['Arrange the work', '安排施工'] 'Deadwood Reblooms Property Extensions'>><<run maplebirch.get('Finance').realEstate.upgrade(_property.id, _extension.id)>><</lanLink>>
+              <<lanLink ['Arrange the work', '安排施工']>>
+                <<run maplebirch.get('Finance').realEstate.upgrade(_property.id, _extension.id)>>
+                <<run maplebirch.get('Finance').refreshMoneyUI()>>
+                <<run Dynamic.render('deadwood-property-extensions')>>
+              <</lanLink>>
             <<else>>
               <span class='red'><<lanSwitch 'You cannot afford this work.' '你付不起这笔工程款。'>></span>
             <</if>>
@@ -264,6 +269,7 @@
     <</capture>>
   <</for>>
 </div>
+<</dynamicblock>>
 <<getouticon>><<lanLink ['Return to the property desk', '返回房产柜台'] 'Deadwood Reblooms Property Office'>><</lanLink>>
 <</nobr>>
 

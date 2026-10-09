@@ -4,6 +4,7 @@ import Achievements from './Achievements';
 import Module from './Module';
 import type Robin from './Robin';
 import Remy from './Orchard/Remy';
+import Staff, { type OrchardStaffState } from './Orchard/Staff';
 import trade from '../assets/orchard/trade.json';
 import {
   species,
@@ -75,6 +76,7 @@ interface OrchardSale {
 }
 
 interface OrchardState {
+  staff: OrchardStaffState;
   remy: typeof Remy.defaults;
   site: OrchardSite;
   tool: OrchardTool;
@@ -119,12 +121,15 @@ interface OrchardState {
     fertilise: boolean;
     auto_renew?: boolean;
     haul?: boolean;
+    quit_day: number;
+    quit_name: string;
   };
   temple: (OrchardTree | null)[];
   farm: (OrchardTree | null)[];
 }
 
 const defaults: OrchardState = {
+  staff: clone(Staff.defaults),
   remy: clone(Remy.defaults),
   site: 'temple',
   tool: 'water',
@@ -158,13 +163,14 @@ const defaults: OrchardState = {
   clearing: { temple: [], farm: [] },
   help_day: -1,
   irrigation_since: -1,
-  worker: { hired: false, paid_from: 0, paid_until: 0, last_shift: -1, pick: false, fertilise: false },
+  worker: { hired: false, paid_from: 0, paid_until: 0, last_shift: -1, pick: false, fertilise: false, quit_day: -1, quit_name: '' },
   temple: Array(orchardSites.temple.plots).fill(null),
   farm: Array(orchardSites.farm.plots).fill(null)
 };
 
 class Orchard extends Module {
   public readonly remy = new Remy(this);
+  public readonly staff = new Staff(this);
   /** 只用于下一次界面的操作回执，不参与存档或生长结算。 */
   public notice?: OrchardReceipt;
   public constructor(core: typeof maplebirch) {
@@ -528,6 +534,8 @@ class Orchard extends Module {
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${this.workerWage} 'farm'>>`);
     this.state.worker_expenses += this.workerWage;
     this.state.worker.hired = true;
+    this.state.worker.quit_day = -1;
+    this.state.worker.quit_name = '';
     this.state.worker.paid_from = Time.date.timeStamp;
     this.state.worker.paid_until = Time.date.timeStamp + 7 * 86400;
     return true;
@@ -536,6 +544,7 @@ class Orchard extends Module {
   public payWorker(): boolean {
     if (!this.canPayWorker) return false;
     this.advance();
+    if (!this.canPayWorker) return false;
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${this.workerWage} 'farm'>>`);
     this.state.worker_expenses += this.workerWage;
     const worker = this.state.worker;
@@ -544,27 +553,10 @@ class Orchard extends Module {
     return true;
   }
 
-  public setWorkerPicking(pick: boolean): void {
-    this.advance();
-    this.state.worker.pick = pick;
-  }
-
-  public setWorkerFertilising(fertilise: boolean): void {
-    this.advance();
-    this.state.worker.fertilise = fertilise;
-  }
-
-  public arrangeWorker(task: 'auto_renew' | 'haul', enabled: boolean): void {
-    this.advance();
-    if (!this.state.worker.hired || !this.available('farm')) return;
-    if (enabled && (!this.core.get('Finance') || !V.Finance?.bank.debit_card)) return;
-    if (task === 'haul' && enabled && (this.core.passage.title !== 'Deadwood Reblooms Orchard Delivery' || !this.carrier)) return;
-    this.state.worker[task] = enabled;
-  }
-
   public dismissWorker(): boolean {
     if (this.core.passage.title !== 'Deadwood Reblooms Orchard Dismiss') return false;
     this.advance();
+    if (!this.state.worker.hired || !V.per_npc?.deadwood_orchard_worker) return false;
     this.core.SugarCube.Wikifier.wikifyEval("<<clearNPC 'deadwood_orchard_worker'>>");
     this.state.worker = clone(defaults.worker);
     return true;
@@ -630,6 +622,7 @@ class Orchard extends Module {
   public advance(day = Math.floor(Time.days)): void {
     // 回忆与画中场景使用冻结的玩家状态，不能让这些场景的日期影响果园。
     if (!V.Orchard || V.statFreeze || !Number.isInteger(day) || day < 0 || day > Math.floor(Time.days)) return;
+    this.staff.advance();
     const state = this.state;
     const current = Math.floor(Time.date.timeStamp / 86400);
     const today = current - (Math.floor(Time.days) - day);
@@ -696,6 +689,14 @@ class Orchard extends Module {
     if (morning < worker.paid_from || !V.per_npc?.deadwood_orchard_worker || !this.available('farm') || V.farm_assault) return;
     const npc = V.per_npc.deadwood_orchard_worker;
     const finance = this.core.get('Finance');
+    if (morning >= worker.paid_until + 7 * 86400) {
+      worker.hired = false;
+      worker.haul = worker.auto_renew = false;
+      worker.quit_day = day;
+      worker.quit_name = npc.name;
+      this.core.SugarCube.Wikifier.wikifyEval("<<clearNPC 'deadwood_orchard_worker'>>");
+      return;
+    }
     if (morning >= worker.paid_until) {
       if (!worker.auto_renew || !finance || !V.Finance.bank.debit_card || finance.payFromBankPennies(this.workerWage) !== 'ok') {
         npc.orchard_report = {
@@ -736,8 +737,9 @@ class Orchard extends Module {
         tree.moisture = moistureDays;
         if (!report.irrigation && !report.rain) report.watered++;
       }
-      if (worker.fertilise && tree.fertiliser === 0 && (this.stage(tree) < 2 || (window.currentSkillValue('tending') >= 400 && this.state.soil.farm[index].quality < 4))) {
-        if (this.fertilise(tree, this.state.soil.farm[index])) report.fertilised++;
+      const skilled = (npc.orchard_shifts ?? 0) >= 14;
+      if (worker.fertilise && tree.fertiliser === 0 && (this.stage(tree) < 2 || (skilled && this.state.soil.farm[index].quality < 4))) {
+        if (this.fertilise(tree, this.state.soil.farm[index], skilled)) report.fertilised++;
         else if (V.fertiliser.current < 1) report.no_fertiliser = true;
       }
       if (this.stage(tree) === 2 && !species[tree.species].fruitSeasons.includes(season)) report.off_season = true;
@@ -861,10 +863,10 @@ class Orchard extends Module {
   }
 
   /** 玩家与雇工共用同一份肥料和肥效规则，雇工不领取玩家经验。 */
-  private fertilise(tree: OrchardTree, soil: OrchardSoil): boolean {
+  private fertilise(tree: OrchardTree, soil: OrchardSoil, skilled = window.currentSkillValue('tending') >= 400): boolean {
     if (tree.fertiliser > 0 || V.fertiliser.current < 1) return false;
     if (this.stage(tree) === 2) {
-      if (window.currentSkillValue('tending') < 400 || soil.quality >= 4) return false;
+      if (!skilled || soil.quality >= 4) return false;
       soil.quality++;
     }
     tree.fertiliser = fertiliserDays;

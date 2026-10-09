@@ -123,14 +123,18 @@
       <<option 'EN'>>
         <<if _factory_report.event is 'delivered'>>The goods have left the yard. The invoice is for <<deadwood-reblooms-finance-money _factory_report.amount>>, <span class='blue'>the payment has not arrived yet</span>.
         <<elseif _factory_report.event is 'default'>>The buyer's promised transfer has not arrived. The debt-recovery agent has returned the file marked <span class='red'>unrecoverable</span>. An invoice for <<deadwood-reblooms-finance-money _factory_report.amount>> is written off.
+        <<elseif _factory_report.event is 'resigned'>>
+          <span class='red'>The crew has left after two weeks of unpaid wages.</span> The machines are idle; automatic production has stopped. The unpaid <<deadwood-reblooms-finance-money _factory_report.amount>> is still owed.
         <<elseif _factory_report.event is 'cancelled'>>You cancel the job. The supplier will not take back the cut material. The <<deadwood-reblooms-finance-money _factory_report.amount>> already spent remains a cost. The cancellation fee has also been paid.
-        <<else>>A payment of <<deadwood-reblooms-finance-money _factory_report.amount>> has arrived in the <span class='gold'>factory account</span>.<<if _factory_report.event is 'late'>> It came a week after delivery.<</if>>
+        <<else>>A payment of <<deadwood-reblooms-finance-money _factory_report.amount>> has arrived in the <span class='gold'>factory account</span>.<<if _factory_report.event is 'late'>> It came later than promised.<</if>>
         <</if>>
       <<option 'CN'>>
         <<if _factory_report.event is 'delivered'>>货物已经离开院子。货款为<<deadwood-reblooms-finance-money _factory_report.amount>>，<span class='blue'>尚未到账</span>。
         <<elseif _factory_report.event is 'default'>>采购方承诺的转账没有到账。收账的人退回了档案，上面写着<span class='red'>无法追回</span>。<<deadwood-reblooms-finance-money _factory_report.amount>>的应收货款被记作坏账。
+        <<elseif _factory_report.event is 'resigned'>>
+          <span class='red'>欠薪持续两周，厂里的雇工已经离职。</span>机器停了，自动生产也已停止。欠下的<<deadwood-reblooms-finance-money _factory_report.amount>>仍需结清。
         <<elseif _factory_report.event is 'cancelled'>>你取消了订单。供货商不肯收回已经裁切的材料，先前投入的<<deadwood-reblooms-finance-money _factory_report.amount>>仍是成本，解约费也已支付。
-        <<else>><<deadwood-reblooms-finance-money _factory_report.amount>>货款已存入<span class='gold'>工厂账户</span>。<<if _factory_report.event is 'late'>>这笔钱在交货一周后才到账。<</if>>
+        <<else>><<deadwood-reblooms-finance-money _factory_report.amount>>货款已存入<span class='gold'>工厂账户</span>。<<if _factory_report.event is 'late'>>这笔钱比约定的时间来得晚。<</if>>
         <</if>>
     <</language>><br>
   <</if>>
@@ -164,6 +168,40 @@
           <</if>>
           <<if _factory_state.order>>
             <li><<language>><<option 'EN'>>Current order: <<option 'CN'>>当前订单：<</language>><<= _factory_state.order.progress>> / <<= _factory_state.order.batches>> · <<deadwood-reblooms-finance-date _factory_state.order.deadline>></li>
+          <</if>>
+          <<if _factory_state.laboratory.installed>>
+            <li>
+              <<language>>
+                <<option 'EN'>>
+                  Processing room: <span class='teal'><<= _factory_state.laboratory.batches.reduce((sum, batch) => sum + (batch.expires_day > Math.floor(Time.days) ? batch.units : 0), 0)>></span> packs on the shelf; <span class='red'><<= _factory_state.laboratory.spoiled>></span> lost to expiry.
+                <<option 'CN'>>
+                  加工间：<span class='teal'><<= _factory_state.laboratory.batches.reduce((sum, batch) => sum + (batch.expires_day > Math.floor(Time.days) ? batch.units : 0), 0)>></span>包在库；<span class='red'><<= _factory_state.laboratory.spoiled>></span>包已过期。
+              <</language>>
+            </li>
+            <<if $Finance.industry.distribution.harper_site is _factory_state.site>>
+              <li><<deadwood-laboratory-harper-status _factory_state>></li>
+            <</if>>
+            <<if _factory_state.laboratory.job>>
+              <li>
+                <<language>>
+                  <<option 'EN'>>
+                    Processing is underway.
+                  <<option 'CN'>>
+                    加工正在进行。
+                <</language>>
+              </li>
+            <</if>>
+            <<if _factory_state.laboratory.invoices.length>>
+              <li>
+                <<language>>
+                  <<option 'EN'>>
+                    Processing invoices outstanding:
+                  <<option 'CN'>>
+                    加工业务待收款：
+                <</language>>
+                <<deadwood-reblooms-finance-money `_factory_state.laboratory.invoices.reduce((sum, invoice) => sum + invoice.total, 0)`>>
+              </li>
+            <</if>>
           <</if>>
           <<if _factory_state.invoices.length>>
             <li><<language>><<option 'EN'>>Unpaid invoices: <<option 'CN'>>待收货款：<</language>><<deadwood-reblooms-finance-money `_factory_state.invoices.reduce((sum, invoice) => sum + invoice.order.total, 0)`>></li>
@@ -247,6 +285,7 @@
     <<elkicon>><<lanLink ['Leave the yard', '离开院子'] 'Elk Street'>><</lanLink>><br><<exit>>
   <</if>>
   <<icon 'industry/orders.png'>><<lanLink ['Order book', '订单簿'] 'Deadwood Reblooms Factory Orders'>><</lanLink>><br>
+  <<if _factory.laboratory.unlocked>><<icon 'industry/laboratory.png'>><<lanLink ['Processing room and sales', '加工间与销售'] 'Deadwood Reblooms Factory Laboratory'>><</lanLink>><br><</if>>
   <<icon 'industry/funds.png'>><<lanLink ['Working funds', '周转金'] 'Deadwood Reblooms Factory Funds'>><</lanLink>><br>
   <<if _factory.open>>
     <<if _factory.ready>><<icon 'industry/management.png'>><<lanLink ['Workers, equipment and management', '雇工、设备与管理'] 'Deadwood Reblooms Factory Management'>><</lanLink>><br><</if>>
@@ -319,12 +358,22 @@
   <<option 'EN'>>The workshop keeps its own cashbook. Money sent here pays suppliers, wages and site bills. Moving it back to your bank account does not create another sale. A loan still needs repaying even if a customer fails to pay.
   <<option 'CN'>>工厂单独记账。存进来的钱用于原料、工资与厂房费用，转回银行也不会多出一笔销售收入。即使客户不给钱，贷款仍要偿还。
 <</language>><br><br>
+<<set _factory_amount to 5000>>
+<<dynamicblock 'id=deadwood-factory-funds'>>
 <<deadwood-industry-result>>
 <<language>><<option 'EN'>>Factory funds: <<option 'CN'>>工厂周转金：<</language>><<deadwood-reblooms-finance-money _factory_state.cash>><br>
-<<set _factory_amount to 5000>>
 <label><<language>><<option 'EN'>>Amount £<<option 'CN'>>金额 £<</language>><<numberbox '_factory_amount' 5000>></label><br>
-<<lanLink ['Transfer from bank', '从银行转入'] 'Deadwood Reblooms Factory Funds'>><<set $Finance.industry.result to maplebirch.get('Finance').industry.fund(Number(_factory_amount)) ? 'ok' : 'failed'>><</lanLink>> |
-<<lanLink ['Transfer to bank', '转回银行'] 'Deadwood Reblooms Factory Funds'>><<set $Finance.industry.result to maplebirch.get('Finance').industry.fund(Number(_factory_amount), true) ? 'ok' : 'failed'>><</lanLink>><br><br>
+<<lanLink ['Transfer from bank', '从银行转入']>>
+  <<set $Finance.industry.result to maplebirch.get('Finance').industry.fund(Number(_factory_amount)) ? 'ok' : 'failed'>>
+  <<run maplebirch.get('Finance').refreshMoneyUI()>>
+  <<run Dynamic.render('deadwood-factory-funds')>>
+<</lanLink>> |
+<<lanLink ['Transfer to bank', '转回银行']>>
+  <<set $Finance.industry.result to maplebirch.get('Finance').industry.fund(Number(_factory_amount), true) ? 'ok' : 'failed'>>
+  <<run maplebirch.get('Finance').refreshMoneyUI()>>
+  <<run Dynamic.render('deadwood-factory-funds')>>
+<</lanLink>><br><br>
+<</dynamicblock>>
 <<icon 'finance/business-loan.png'>><<lanLink ['Ask the bank about a working-capital loan', '到银行申请经营贷款'] 'Deadwood Reblooms Business Loan'>><</lanLink>><br>
 <<deadwood-industry-return>><</nobr>>
 
@@ -457,7 +506,7 @@
   <</if>>
   <<for _factory_product range _factory.terms.products>>
     <<capture _factory_product>>
-      <<if !_factory_state.lines.includes(_factory_product.id) and _factory_state.lines.length lt _factory_state.line_limit>>
+      <<if !_factory_state.lines.includes(_factory_product.id) and _factory_state.lines.length + Number(_factory_state.laboratory.installed) lt _factory_state.line_limit>>
         <<icon `'industry/' + _factory_product.id + '.png'`>><<lanLink [`Install ${maplebirch.t(_factory_product.name)} (0:30)`, `安装${maplebirch.t(_factory_product.name)}产线 (0:30)`] 'Deadwood Reblooms Factory'>>
           <<set $Finance.industry.result to maplebirch.get('Finance').industry.upgrade(_factory_product.id) ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 30>><</if>>
         <</lanLink>><br>

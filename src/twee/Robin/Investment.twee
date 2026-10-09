@@ -1,28 +1,33 @@
 :: Deadwood Robin Shop Partnership []
 <<nobr>>
 <<set $outside to 0>><<effects>>
-<<set _investment to maplebirch.get('Robin').shop.investment>>
-<<if !_investment.canAgree>>
-  <span class='blue'><<language>><<option 'EN'>>You'll need to speak to Robin at the shop, when there is time to go through the accounts together.<<option 'CN'>>需要等罗宾在店里有空时，再一起核对账目。<</language>></span><br><br>
-<<elseif !_investment.contract.agreed>>
-  <<npc 'Robin'>><<person1>>
-  <<language>>
-    <<option 'EN'>>
-      Robin draws a line beneath the day's receipts. "You mean owning part of the shop? Not another loan?" <<He>> looks from the ledger to you. "I'd like that. But I want to keep running it myself. And I can't promise you'll make money every week."<br><br>Robin opens a fresh page. "We should put it in writing. So we both know what belongs to whom, even if things go badly."
-    <<option 'CN'>>
-      罗宾在当天的收据下面画了一条线。“你是说，买下店里的一部分？不是再借我钱？”<<He>>从账本上抬起头，看着你。“我愿意。不过，我还是想自己经营这家店。而且，我不能保证每周都让你赚到钱。”<br><br>罗宾翻开新的一页。“还是写清楚吧。就算生意出了问题，我们也知道哪些归谁。”
-  <</language>><br><br>
-  <<lanLink ['Agree to draw up a partnership contract', '同意拟一份合伙合同'] 'Deadwood Robin Shop Partnership'>><<run maplebirch.get('Robin').shop.investment.agree()>><</lanLink>><br><br>
-<<else>>
-  <<npc 'Robin'>><<person1>>
-  <<language>>
-    <<option 'EN'>>
-      Robin puts the partnership ledger beside the shop accounts. "Let's check the figures before you decide." <<He>> leaves the pen on your side of the counter.
-    <<option 'CN'>>
-      罗宾把合伙账本放在营业账目旁。“你先看看数字，再决定。”<<He>>把笔留在你这侧的柜台上。
-  <</language>><br><br>
-  <<deadwood-shop-investment>>
-<</if>>
+<<dynamicblock 'id=deadwood-shop-partnership'>>
+  <<set _investment to maplebirch.get('Robin').shop.investment>>
+  <<if !_investment.canAgree>>
+    <span class='blue'><<language>><<option 'EN'>>You'll need to speak to Robin at the shop, when there is time to go through the accounts together.<<option 'CN'>>需要等罗宾在店里有空时，再一起核对账目。<</language>></span><br><br>
+  <<elseif !_investment.contract.agreed>>
+    <<npc 'Robin'>><<person1>>
+    <<language>>
+      <<option 'EN'>>
+        Robin draws a line beneath the day's receipts. "You mean owning part of the shop? Not another loan?" <<He>> looks from the ledger to you. "I'd like that. But I want to keep running it myself. And I can't promise you'll make money every week."<br><br>Robin opens a fresh page. "We should put it in writing. So we both know what belongs to whom, even if things go badly."
+      <<option 'CN'>>
+        罗宾在当天的收据下面画了一条线。“你是说，买下店里的一部分？不是再借我钱？”<<He>>从账本上抬起头，看着你。“我愿意。不过，我还是想自己经营这家店。而且，我不能保证每周都让你赚到钱。”<br><br>罗宾翻开新的一页。“还是写清楚吧。就算生意出了问题，我们也知道哪些归谁。”
+    <</language>><br><br>
+    <<lanLink ['Agree to draw up a partnership contract', '同意拟一份合伙合同']>>
+      <<run maplebirch.get('Robin').shop.investment.agree()>>
+      <<run Dynamic.render('deadwood-shop-partnership')>>
+    <</lanLink>><br><br>
+  <<else>>
+    <<npc 'Robin'>><<person1>>
+    <<language>>
+      <<option 'EN'>>
+        Robin puts the partnership ledger beside the shop accounts. "Let's check the figures before you decide." <<He>> leaves the pen on your side of the counter.
+      <<option 'CN'>>
+        罗宾把合伙账本放在营业账目旁。“你先看看数字，再决定。”<<He>>把笔留在你这侧的柜台上。
+    <</language>><br><br>
+    <div id='deadwood-shop-investment-panel'><<deadwood-shop-investment>></div>
+  <</if>>
+<</dynamicblock>>
 <<getouticon>><<lanLink ['Return to the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
 <</nobr>>
 
@@ -39,7 +44,7 @@
     <<option 'CN'>>
       柜员核对了合同上的签名。“这是你与罗宾直接签的合伙协议。行情板上的小额份额另用证券账户交易。这里的出资与回购，我们另列一份账。”
   <</language>><br><br>
-  <<deadwood-shop-investment>>
+  <div id='deadwood-shop-investment-panel'><<deadwood-shop-investment>></div>
 <<else>>
   <span class='blue'><<language>><<option 'EN'>>Discuss the partnership with Robin at the shop first. The bank cannot sell you a share without Robin's agreement.<<option 'CN'>>先去店里与罗宾商量合伙。没有罗宾的同意，银行不能把店铺份额卖给你。<</language>></span><br><br>
 <</if>>
@@ -74,7 +79,12 @@
 <</if>>
 <<if _contract.exit_day gte 0>>
   <span class='blue'><<language>><<option 'EN'>>The buyback request is pending. Today's indicative payment:<<option 'CN'>>份额回购申请正在等待处理。按今天估值，预计付款：<</language>></span> <<printmoney _investment.exitValue>><br>
-  <<lanLink ['Withdraw the buyback request', '撤回回购申请'] $passage>><<run maplebirch.get('Robin').shop.investment.exit(false)>><</lanLink>><br><br>
+  <<lanLink ['Withdraw the buyback request', '撤回回购申请']>>
+    <<run maplebirch.get('Robin').shop.investment.exit(false)>>
+    <<replace '#deadwood-shop-investment-panel'>>
+      <<deadwood-shop-investment>>
+    <</replace>>
+  <</lanLink>><br><br>
 <<else>>
   <<if _contract.share lt _investment.terms.maximumShare>>
     <<set _shareTarget to _contract.share + _investment.terms.shareStep>>
@@ -82,13 +92,22 @@
     <<lanLink ['Check the price', '核对价格']>><<replace '#deadwood-investment-quote'>><<printmoney `maplebirch.get('Robin').shop.investment.quote(Number(_shareTarget)) ?? 0`>><</replace>><</lanLink>>
     <span id='deadwood-investment-quote' aria-live='polite'><<printmoney `_investment.quote(_shareTarget) ?? 0`>></span><br>
     <<lanLink ['Buy the additional share with your debit card', '用借记卡购买新增份额']>>
-      <<if maplebirch.get('Robin').shop.investment.invest(Number(_shareTarget))>><<goto $passage>>
+      <<if maplebirch.get('Robin').shop.investment.invest(Number(_shareTarget))>>
+        <<run maplebirch.get('Finance').refreshMoneyUI()>>
+        <<replace '#deadwood-shop-investment-panel'>>
+          <<deadwood-shop-investment>>
+        <</replace>>
       <<else>><<replace '#deadwood-investment-result'>><span class='red'><<language>><<option 'EN'>>The transfer could not be made. Check your debit card, balance and Robin's availability.<<option 'CN'>>划款未能完成。请核对借记卡、账户余额，以及罗宾是否能正常办理。<</language>></span><</replace>><</if>>
     <</lanLink>><br>
     <span id='deadwood-investment-result' aria-live='polite'></span><br>
   <</if>>
   <<if _contract.share gt 0>>
-    <<lanLink ['Request a buyback of your whole holding', '申请回购全部份额'] $passage>><<run maplebirch.get('Robin').shop.investment.exit(true)>><</lanLink>><br><br>
+    <<lanLink ['Request a buyback of your whole holding', '申请回购全部份额']>>
+      <<run maplebirch.get('Robin').shop.investment.exit(true)>>
+      <<replace '#deadwood-shop-investment-panel'>>
+        <<deadwood-shop-investment>>
+      <</replace>>
+    <</lanLink>><br><br>
   <</if>>
 <</if>>
 <</nobr>>

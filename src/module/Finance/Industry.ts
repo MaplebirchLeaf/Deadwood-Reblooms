@@ -1,7 +1,9 @@
 // ./src/module/Finance/Industry.ts
 
 import terms from '../../assets/finance/industry.json';
+import laboratoryTerms from '../../assets/finance/laboratory.json';
 import Securities from './Securities';
+import Laboratory, { type LaboratoryState, type DistributionState } from './Industry/Laboratory';
 import type Finance from '../Finance';
 
 type Product = 'packaging' | 'crates' | 'metalwork';
@@ -36,6 +38,7 @@ export interface FactoryState {
   rush: boolean;
   morale: number;
   wage_arrears: number;
+  unpaid_days: number;
   overhead_arrears: number;
   manager: boolean;
   security: boolean;
@@ -50,11 +53,13 @@ export interface FactoryState {
   spent: number;
   delivered: number;
   defaults: number;
-  report: { day: number; event: 'paid' | 'default' | 'late' | 'cancelled' | 'delivered'; seen: boolean; amount: number; customer: string } | null;
+  laboratory: LaboratoryState;
+  report: { day: number; event: 'paid' | 'default' | 'late' | 'cancelled' | 'delivered' | 'resigned'; seen: boolean; amount: number; customer: string } | null;
 }
 
 export interface IndustryState {
   selected: number;
+  distribution: DistributionState;
   factories: FactoryState[];
   talk_day: number;
   talk: 'wages' | 'orders' | 'past' | 'off_duty' | null;
@@ -82,6 +87,7 @@ export default class Industry {
     rush: false,
     morale: 60,
     wage_arrears: 0,
+    unpaid_days: 0,
     overhead_arrears: 0,
     manager: false,
     security: false,
@@ -96,11 +102,13 @@ export default class Industry {
     spent: 0,
     delivered: 0,
     defaults: 0,
-    report: null
+    report: null,
+    laboratory: structuredClone(Laboratory.defaults)
   };
 
   public static readonly defaults: IndustryState = {
     selected: 0,
+    distribution: structuredClone(Laboratory.distribution),
     factories: terms.sites.map(site => ({ ...structuredClone(Industry.factory), site: site.id })),
     talk_day: -1,
     talk: null,
@@ -108,7 +116,11 @@ export default class Industry {
     result: null
   };
 
-  public constructor(private readonly finance: Finance) {}
+  public readonly laboratory: Laboratory;
+
+  public constructor(private readonly finance: Finance) {
+    this.laboratory = new Laboratory(finance, this);
+  }
 
   public get state(): FactoryState {
     return V.Finance.industry.factories[V.Finance.industry.selected];
@@ -164,7 +176,8 @@ export default class Industry {
       Math.ceil(state.workers * terms.wage * (state.rush ? 1.5 : 1)) +
       Math.round(terms.overhead * terms.sites[state.site].multiplier) +
       (state.manager ? terms.managerWage : 0) +
-      (state.security ? terms.securityFee : 0)
+      (state.security ? terms.securityFee : 0) +
+      (state.laboratory.technician ? laboratoryTerms.technician_wage : 0)
     );
   }
 
@@ -235,7 +248,7 @@ export default class Industry {
 
   public upgrade(product: Product | 'space' | 'manager'): boolean {
     const state = this.state;
-    if (!this.available || !this.open || !this.ready || state.wage_arrears > 0 || state.overhead_arrears > 0 || state.issue || state.order) return false;
+    if (!this.available || !this.open || !this.ready || state.wage_arrears > 0 || state.overhead_arrears > 0 || state.issue || state.order || state.laboratory.job) return false;
     const cost = product === 'space' ? terms.expansionCost : product === 'manager' ? terms.managerFee : terms.lineCost;
     if (state.cash < cost) return false;
     if (product === 'space') {
@@ -246,7 +259,7 @@ export default class Industry {
       if (state.manager || !this.foreman || C.npc.Rowan.love < 10) return false;
       state.manager = true;
     } else {
-      if (!terms.products.some(item => item.id === product) || state.lines.includes(product) || state.lines.length >= state.line_limit) return false;
+      if (!terms.products.some(item => item.id === product) || state.lines.includes(product) || state.lines.length + Number(state.laboratory.installed) >= state.line_limit) return false;
       state.lines.push(product);
       state.ready_day = Math.floor(Time.days) + 2;
     }
@@ -263,6 +276,7 @@ export default class Industry {
       !this.open ||
       !this.ready ||
       state.order ||
+      state.laboratory.job ||
       !order ||
       !state.lines.includes(order.product) ||
       order.deadline <= Math.floor(Time.days) ||
@@ -371,7 +385,20 @@ export default class Industry {
 
   public liquidate(): boolean {
     const state = this.state;
-    if (!this.available || !this.open || !state.owned || state.issue || this.finance.company.state.contract?.site === state.site || this.saleProceeds < 0) return false;
+    if (
+      !this.available ||
+      !this.open ||
+      !state.owned ||
+      state.issue ||
+      state.laboratory.job ||
+      state.laboratory.raw.phial > 0 ||
+      state.laboratory.raw.flower > 0 ||
+      state.laboratory.batches.length > 0 ||
+      state.laboratory.invoices.length > 0 ||
+      this.finance.company.state.contract?.site === state.site ||
+      this.saleProceeds < 0
+    )
+      return false;
     const proceeds = this.saleProceeds;
     if (!Number.isSafeInteger(this.finance.state.bank.balance + proceeds)) return false;
     state.spent += state.wage_arrears + state.overhead_arrears + state.workers * terms.wage * 3 + Math.ceil((state.order?.total ?? 0) * terms.risks.cancellation);
@@ -394,7 +421,8 @@ export default class Industry {
       order: null,
       invoices: [],
       issue: null,
-      report: null
+      report: null,
+      laboratory: structuredClone(Laboratory.defaults)
     });
     V.Finance.industry.decision = 'sell';
     return true;
@@ -437,18 +465,28 @@ export default class Industry {
       state.report = { day: current, event: order.outcome, seen: false, amount: order.total, customer: order.customer };
     }
     state.invoices = state.invoices.filter(item => item.pay_day > current);
-    const wages = Math.ceil(state.workers * terms.wage * (state.rush ? 1.5 : 1)) + (state.manager ? terms.managerWage : 0);
+    const wages = Math.ceil(state.workers * terms.wage * (state.rush ? 1.5 : 1)) + (state.manager ? terms.managerWage : 0) + (state.laboratory.technician ? laboratoryTerms.technician_wage : 0);
     const paid = Math.min(state.cash, wages);
     state.cash -= paid;
     state.spent += paid;
     state.wage_arrears += wages - paid;
-    const bills = Industry.dailyCost(state) - wages;
+    state.unpaid_days = state.wage_arrears > 0 ? state.unpaid_days + 1 : 0;
+    if (state.unpaid_days >= 14 && (state.workers > 0 || state.manager || state.laboratory.technician)) {
+      state.workers = 0;
+      state.manager = state.automatic = state.laboratory.technician = false;
+      state.laboratory.automatic = null;
+      state.report = { day: current, event: 'resigned', seen: false, amount: state.wage_arrears, customer: '' };
+    }
+    const bills = Math.round(terms.overhead * terms.sites[state.site].multiplier) + (state.security ? terms.securityFee : 0);
     const overhead = Math.min(state.cash, bills);
     state.cash -= overhead;
     state.spent += overhead;
     state.overhead_arrears += bills - overhead;
     state.morale = Math.clamp(state.morale + (state.wage_arrears > 0 ? -5 : state.rush ? -2 : 1), 0, 100);
-    if (current < state.ready_day) return;
+    if (current < state.ready_day) {
+      this.laboratory.advance(state, current, 0);
+      return;
+    }
     const week = Math.floor(current / 7);
     if (state.offer_week !== week) {
       this.offers(state, current);
@@ -463,7 +501,9 @@ export default class Industry {
         state.pressure_day = current + terms.risks.cooldown;
       }
     }
-    if (!Securities.tradingDay(current) || Industry.capacity(state) === 0) return;
+    const processing = !!state.laboratory.job || !!(state.laboratory.automatic && state.laboratory.raw[state.laboratory.automatic] > 0);
+    this.laboratory.advance(state, current, Securities.tradingDay(current) ? Industry.capacity(state) : 0);
+    if (!Securities.tradingDay(current) || Industry.capacity(state) === 0 || processing) return;
     if (state.automatic && state.manager && !state.order) {
       const order = state.offers
         .filter(

@@ -32,6 +32,7 @@ declare global {
   const Links: { enabled: boolean };
 
   interface Window {
+    sexShopOnBuyClick(index: number, inSexShop?: boolean, colour?: string, costsMoney?: boolean): void;
     deck(): PlayingCard[];
     shuffle<T>(items: T[]): T[];
     formatMoney(amount: number): string;

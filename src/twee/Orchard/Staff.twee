@@ -1,0 +1,407 @@
+:: Deadwood Orchard Staff Widgets [widget]
+
+<<widget 'deadwood-orchard-staff-link'>>
+  <<set $_staff_menu to document.querySelector('#passage-content .macro-link[data-passage="Farm Work"]')>>
+  <<if maplebirch.get('Orchard')?.staff.available and $_staff_menu>>
+    <<icon 'orchard/trapper.png'>><<lanLink ['Trapping and laboratory deliveries', '捕捉与原液运输'] 'Deadwood Orchard Staff'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-orchard-trapper-recruitment'>>
+  <<if maplebirch.get('Orchard')?.staff.available and !maplebirch.get('Orchard').staff.employed>>
+    <<icon 'orchard/trapper.png'>><<lanLink ['Ask about a trapper (0:15)', '打听捕捉工 (0:15)'] 'Deadwood Orchard Trapper'>><<endevent>><<pass 15>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-orchard-staff-report'>>
+  <<set _crew to maplebirch.get('Orchard')?.staff>>
+  <<if !_crew>>
+    <<exit>>
+  <</if>>
+  <<set _crew_state to _crew.state>>
+  <<if _crew.npc>>
+    <span class='gold'><<print _crew.npc.name>></span> ·
+    <<set _crew_labels to {vacant: ['Applicant', '应聘者'], hired: ['Employed', '已雇用'], injured: ['Recovering', '养伤中'], missing: ['Missing', '失踪'], quit: ['Employment ended', '已离职']}>>
+    <span @class="['injured', 'missing', 'quit'].includes(_crew_state.status) ? 'red' : 'green'"><<lanSwitch _crew_labels[_crew_state.status][0] _crew_labels[_crew_state.status][1]>></span><br>
+  <</if>>
+  <<if _crew_state.report>>
+    <<language>>
+      <<option 'EN'>>
+        <<switch _crew_state.report>>
+          <<case 'caught'>>
+            The net came back knotted around a struggling lurker. <span class='green'>One creature has been put in Alex's cages.</span>
+          <<case 'escaped'>>
+            The creature wriggled out while the net was being tied. There was nothing to put in the cages.
+          <<case 'empty'>>
+            The traps were checked and brought back empty. There is mud on the boots and no catch on the receipt.
+          <<case 'injured'>>
+            The net is torn, and the worker has come back with a bandaged arm. <span class='red'>No more trips until the injury heals.</span>
+          <<case 'missing'>>
+            An empty sack lies beside the gate. <span class='red'>The worker has not returned from the moor.</span> No one here knows what happened.
+          <<case 'found'>>
+            The searchers brought the worker back alive, exhausted and hurt. <span class='gold'>Five days of rest are needed.</span>
+          <<case 'search_failed'>>
+            The searchers found scraps of netting, but no worker. <span class='red'>The search remains unresolved.</span>
+          <<case 'failed'>>
+            <span class='red'>The instructions could not be accepted.</span> Check the worker, delivery address, debit card and available money.
+          <<case 'unpaid'>>
+            The paid week has ended. The worker waits for renewed wages and does not leave the farm.
+          <<case 'unpaid_quit'>>
+            A note has been left with the cage keys. <span class='red'>After seven days without renewed wages, the worker has left.</span>
+          <<case 'unsafe_quit'>>
+            The worker has healed, but will not take another net. <span class='red'>After repeated injuries, the job has been given up.</span>
+          <<case 'recovered'>>
+            The bandages are off. The worker can go out again tomorrow.
+          <<case 'suspended'>>
+            The nets stay in the shed. No one is sent out during fighting, a blood moon, or while lurker encounters are disabled.
+          <<case 'cages_full'>>
+            There are already three creatures in the cages. The worker stays here until there is room again.
+          <<case 'escort_unpaid'>>
+            The second pair of hands has not been paid. <span class='gold'>The worker waits rather than leaving alone.</span>
+          <<case 'hire'>>
+            The first week's wages have been paid. Choose the work before sending anyone out.
+          <<case 'pay'>>
+            Another week's wages have been entered in the book.
+          <<case 'search'>>
+            A search party has been paid. It will report back in two days; finding the worker is not guaranteed.
+          <<case 'dismiss'>>
+            The keys have been handed back. Prepaid wages are not refunded.
+          <<case 'arranged'>>
+            The instructions have been written beside the names in the work book.
+        <</switch>>
+      <<option 'CN'>>
+        <<switch _crew_state.report>>
+          <<case 'caught'>>
+            网里裹着一只挣扎的潜伏者。<span class='green'>它已经关进艾利克斯的笼子。</span>
+          <<case 'escaped'>>
+            系紧网口时，那东西扭动着钻了出去。笼子里没能添上新的猎物。
+          <<case 'empty'>>
+            陷阱检查过了，带回来的袋子却是空的。靴子上沾满泥，收货单上没有猎物。
+          <<case 'injured'>>
+            网撕破了，雇工回来时胳膊上缠着绷带。<span class='red'>伤好之前，不能再安排外出。</span>
+          <<case 'missing'>>
+            门旁只剩一只空袋子。<span class='red'>雇工去了荒原，还没有回来。</span>这里没人知道发生了什么。
+          <<case 'found'>>
+            搜索的人把雇工活着带回来了，但人已疲惫不堪，还带着伤。<span class='gold'>需要休养五天。</span>
+          <<case 'search_failed'>>
+            搜索的人找到了几块破网，却没有找到人。<span class='red'>失踪的事仍没有结果。</span>
+          <<case 'failed'>>
+            <span class='red'>这项安排没能办妥。</span>请检查雇工、收货地址、借记卡及可用资金。
+          <<case 'unpaid'>>
+            预付的薪期结束了。雇工等着续薪，不再离开农场。
+          <<case 'unpaid_quit'>>
+            笼子钥匙旁留着一张字条。<span class='red'>七天没有续付薪资，雇工已经走了。</span>
+          <<case 'unsafe_quit'>>
+            伤好了，雇工却不肯再拿起网。<span class='red'>反复受伤后，雇工辞去了这份工作。</span>
+          <<case 'recovered'>>
+            绷带已经拆下。明天起，雇工可以再次外出。
+          <<case 'suspended'>>
+            网留在棚子里。农场有人闹事、血月出现，或潜伏者遭遇关闭时，不会派人外出。
+          <<case 'cages_full'>>
+            笼子里已经关了三只潜伏者。雇工留在农场，等笼子重新空出来。
+          <<case 'escort_unpaid'>>
+            帮忙接应的人还没有领到费用。<span class='gold'>雇工留在农场等候，不会独自出发。</span>
+          <<case 'hire'>>
+            首周工资已付。出发前，先把工作安排好。
+          <<case 'pay'>>
+            又一周的薪资已经记在账上。
+          <<case 'search'>>
+            已经付钱请人去搜索。两天后会有回报，但不保证能找到人。
+          <<case 'dismiss'>>
+            钥匙已经交回。预付的工资不退还。
+          <<case 'arranged'>>
+            工作安排已经写在名册旁边。
+        <</switch>>
+    <</language>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Orchard Staff []
+<<set $outside to 0>><<set $location to 'alex_farm'>><<set $bus to 'farm_fields'>><<effects>><<endevent>>
+<<set _crew to maplebirch.get('Orchard')?.staff>>
+<<if !_crew?.available>>
+  <<getouticon>><<lanLink ['Return to the laboratory', '返回实验室'] 'Farm Still'>><</lanLink>><<exit>>
+<</if>>
+<<set _crew_state to _crew.state>>
+<<language>>
+  <<option 'EN'>>
+    A work book rests beside the cages. There is a line for the person checking the nets, and another for the driver taking sealed bottles into town.
+    <br><br>
+    Alex has left a warning beside the first line. <span class='red'>"If it gets onto your face, drop the bag and get help. Don't go chasing it alone."</span>
+  <<option 'CN'>>
+    笼子旁放着一本名册。一栏记谁去检查网，另一栏记谁把封好的瓶子送进镇里。
+    <br><br>
+    艾利克斯在第一栏旁留了句提醒。<span class='red'>“它往脸上扑，就把袋子丢下，赶紧叫人帮忙。别一个人追过去。”</span>
+<</language>><br><br>
+<<dynamicblock 'id=deadwood-orchard-staff-workbook'>>
+<div id='deadwood-orchard-staff-record'><<deadwood-orchard-staff-report>></div><br>
+<<if !_crew.employed>>
+  <<language>>
+    <<option 'EN'>>
+      Ask at the pub for a trapper. Until then, you can still catch lurkers yourself and bring them here.
+    <<option 'CN'>>
+      可以去酒馆打听捕捉工。在那之前，你仍能亲自捕捉潜伏者，把它们带到这里。
+  <</language>><br><br>
+<</if>>
+<<if _crew_state.status is 'missing'>>
+  <<if _crew_state.search_day lt 0>>
+    <<icon 'orchard/search-party.png'>><<lanLink ['Pay a search party', '请人搜索']>>
+      <<if !_crew.act('search')>><<set _crew_state.report to 'failed'>><</if>>
+      <<run maplebirch.get('Finance')?.refreshMoneyUI()>><<run Dynamic.render('deadwood-orchard-staff-workbook')>>
+    <</lanLink>> (<<printmoney _crew.terms.search_fee>>)<br>
+  <<else>>
+    <<lanSwitch 'The search party is still out.' '搜索的人还没有回来。'>><br>
+  <</if>>
+<<elseif _crew.employed>>
+  <<lanSwitch 'Weekly wages: ' '周薪：'>><<printmoney _crew.terms.weekly_wage>> · <<lanSwitch 'Paid until: ' '已付至：'>><<print getFormattedDate(new DateTime(Time.date).addDays(_crew_state.paid_until - Math.floor(Time.days)))>><br>
+  <<if _crew_state.status is 'injured'>>
+    <span class='gold'><<lanSwitch 'Recovering until: ' '养伤至：'>></span><<print getFormattedDate(new DateTime(Time.date).addDays(_crew_state.recover_day - Math.floor(Time.days)))>><br>
+  <</if>>
+  <<if _crew_state.paid_until lte Math.floor(Time.days) + 7>>
+    <<icon 'finance/bank-withdraw.png'>><<lanLink ['Pay another week', '续付一周工资']>><<run _crew.act('pay')>><<run maplebirch.get('Finance')?.refreshMoneyUI()>><<run Dynamic.render('deadwood-orchard-staff-workbook')>><</lanLink>><br>
+  <</if>>
+  <<socialiseicon 'ask'>><<lanLink ['Talk to the worker (0:05)', '与雇工谈谈 (0:05)'] 'Deadwood Orchard Staff Talk'>><<pass 5>><</lanLink>><br>
+  <<refuseicon>><<lanLink ['End the employment', '结束雇用']>><<run _crew.act('dismiss')>><<run Dynamic.render('deadwood-orchard-staff-workbook')>><</lanLink>><br>
+<</if>>
+<br>
+<<language>>
+  <<option 'EN'>>
+    Each trip checks the nets for <span class='gold'>at most one creature</span>. The worker has their own experience; your dancing and athletics do not decide their catch. Farm patrols find fewer lurkers. <span class='red'>Searching the moor is more dangerous, and a worker may fail to return.</span> Injuries stop work; repeated injuries can make someone quit.
+    <br><br>
+    An escort costs <<printmoney _crew.terms.escort_fee>> per trip and reduces the risk. Escorts and automatic wage renewal use your bank and require a debit card. If an authorised escort cannot be paid, the trip is cancelled. A week without renewed wages ends the employment.
+    <br><br>
+    Alex's equipment still takes <span class='gold'>seven days per bottle</span>, consuming one caged lurker. With three waiting in the cages, trapping stops. No one is sent out during farm attacks or a blood moon.
+  <<option 'CN'>>
+    每趟检查网，<span class='gold'>最多带回一只</span>。雇工积累自己的经验，不会借用你的舞蹈和运动技能。农场巡查遇到的潜伏者较少。<span class='red'>荒原搜索更危险，雇工可能一去不回。</span>受伤后停工养伤，反复受伤还可能辞职。
+    <br><br>
+    每趟请人接应收<<printmoney _crew.terms.escort_fee>>，可以降低风险。接应费和自动续薪从银行扣除，需要借记卡。安排好的接应费用付不起，当次外出就取消。薪期结束后一周仍未续薪，雇用也会结束。
+    <br><br>
+    艾利克斯的装置仍需<span class='gold'>七天产出一瓶</span>，消耗一只笼中的潜伏者。笼子里有三只等候时，捕捉暂停。农场遇袭或出现血月时，不会派人外出。
+<</language>><br><br>
+<<set _crew_route to _crew_state.route>><<set _crew_escort to _crew_state.escort>><<set _crew_renew to _crew_state.auto_renew>><<set _crew_destination to _crew_state.destination is null ? -1 : _crew_state.destination>>
+<label>
+  <<lanSwitch 'Trapping: ' '捕捉安排：'>>
+  <<listbox '_crew_route' autoselect>>
+    <<option `lanSwitch('Stay at the farm', '留在农场')` 'rest'>>
+    <<option `lanSwitch('Patrol the farm', '巡查农场')` 'farm'>>
+    <<option `lanSwitch('Search the moor', '搜索荒原')` 'moor'>>
+  <</listbox>>
+</label><br>
+<label><<checkbox '_crew_escort' false true autocheck>><<lanSwitch 'Pay an escort for each trip' '每趟付费请人接应'>></label><br>
+<label><<checkbox '_crew_renew' false true autocheck>><<lanSwitch 'Renew wages from the bank' '从银行自动续付薪资'>></label><br><br>
+<<set _crew_finance to maplebirch.get('Finance')>>
+<<if _crew_finance?.industry.owned.some(factory => factory.laboratory.installed)>>
+  <<language>>
+    <<option 'EN'>>
+      The farm's delivery worker can take up to three <span class='teal'>bottles already extracted here</span> each afternoon. Each load costs <<printmoney _crew.terms.haul_fee>>, paid from the receiving factory's cash above its reserve. Your carried bottles are left alone. A store of ten bottles is enough; further deliveries wait.
+    <<option 'CN'>>
+      农场的送货工每天下午可以运走最多三瓶<span class='teal'>这里已经取出的原液</span>。每趟收<<printmoney _crew.terms.haul_fee>>，由收货工厂用储备金以外的现金支付。你随身带着的瓶子留下。加工间存满十瓶后，运输暂停。
+  <</language>><br>
+  <<if !$per_npc.deadwood_orchard_carrier>>
+    <<icon 'orchard/bottle-delivery.png'>><<lanLink ['Meet the delivery worker (0:05)', '见见送货工 (0:05)'] 'Deadwood Orchard Carrier'>><<pass 5>><</lanLink>><br>
+  <</if>>
+  <label>
+    <<lanSwitch 'Deliver bottles to: ' '原液送往：'>>
+    <<set _crew_addresses to {}>>
+    <<set _crew_addresses[lanSwitch('Leave them here', '留在这里')] to -1>>
+    <<for _crew_factory range _crew_finance.industry.owned.filter(factory => factory.laboratory.installed)>>
+      <<set _crew_addresses[maplebirch.t(_crew_finance.industry.terms.sites[_crew_factory.site].name)] to _crew_factory.site>>
+    <</for>>
+    <<listbox '_crew_destination' autoselect>><<optionsfrom _crew_addresses>><</listbox>>
+  </label><br>
+<</if>>
+<<icon 'company/minutes.png'>><<lanLink ['Write down the instructions', '记下工作安排']>>
+  <<set _crew_target to _crew_destination is -1 ? null : _crew_destination>>
+  <<set _crew_finance to maplebirch.get('Finance')>>
+  <<set _crew_state.report to 'failed'>>
+  <<if _crew.available and ['rest', 'farm', 'moor'].includes(_crew_route) and typeof _crew_escort is 'boolean' and typeof _crew_renew is 'boolean'>>
+    <<if (_crew_route is 'rest' or (_crew.employed and _crew_state.status isnot 'missing' and $settings.bestialityEnabled and $settings.lurkersEnabled)) and ((!_crew_renew and (!_crew_escort or _crew_route is 'rest') and _crew_target is null) or (_crew_finance and $Finance.bank.debit_card))>>
+      <<if _crew_target is null or (Number.isInteger(_crew_target) and maplebirch.get('Orchard').carrier and _crew_finance?.state.industry.factories[_crew_target]?.owned and _crew_finance.state.industry.factories[_crew_target].laboratory.installed)>>
+        <<set _crew_state.route to _crew_route, _crew_state.escort to _crew_escort, _crew_state.auto_renew to _crew_renew, _crew_state.destination to _crew_target, _crew_state.report to 'arranged'>>
+      <</if>>
+    <</if>>
+  <</if>>
+  <<run Dynamic.render('deadwood-orchard-staff-workbook')>>
+<</lanLink>><br><br>
+<<lanSwitch 'Caught / bottles delivered: ' '捕获／运送原液：'>><span class='teal'><<= _crew_state.caught>> / <<= _crew_state.delivered>></span> · <<lanSwitch 'Trapping, escort and search expenses: ' '捕捉、接应及搜索支出：'>><<printmoney _crew_state.spent>><br>
+<</dynamicblock>>
+<<getouticon>><<lanLink ['Return to the laboratory', '返回实验室'] 'Farm Still'>><</lanLink>><br>
+
+:: Deadwood Orchard Trapper []
+<<set $outside to 0>><<set $location to 'pub'>><<set $bus to 'harvest'>><<effects>><<endevent>>
+<<set _crew to maplebirch.get('Orchard')?.staff>>
+<<if !_crew?.available or _crew.employed>>
+  <<getouticon>><<lanLink ['Return to the pub', '返回酒馆'] 'Pub'>><</lanLink>><<exit>>
+<</if>>
+<<if _crew.npc>>
+  <<loadNPC 0 'deadwood_orchard_trapper'>>
+<<else>>
+  <<generateNPC 1 a>><<npcClothesName $NPCList[0] 'wildsFlannel'>>
+<</if>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    <<if _crew.state.status is 'quit'>>
+      <<print $NPCList[0].name>> notices the net in your bag and shakes <<his>> head. "I handed the keys back. Ask somebody else."
+    <<else>>
+      A coil of rope occupies the chair beside <<print $NPCList[0].name>>. <<He>> moves it so you can sit, then listens to your description of the cages.
+      <br><br>
+      "A week's wages in advance. I check the farm, bring back what I can catch. Nothing in the net, you still pay for my time." <<He>> draws a finger along a scar on <<his>> hand. "If you want the moor searched, say so. And pay somebody to watch my back. A torn net is cheaper than a missing person."
+    <</if>>
+  <<option 'CN'>>
+    <<if _crew.state.status is 'quit'>>
+      <<print $NPCList[0].name>>看到你包里的网，摇了摇头。“钥匙我已经还了。找别人吧。”
+    <<else>>
+      <<print $NPCList[0].name>>旁边的椅子上放着一卷绳子。<<He>>挪开绳子让你坐，听你说起那些笼子。
+      <br><br>
+      “一周的工资先付。我去农场查看，能抓到的带回来。网里没东西，也得付我花掉的时间。”<<He>>用手指摸了摸手上的疤。“想去荒原找，就先说清楚。再付钱找个人接应。网破了，总比人没了便宜。”
+    <</if>>
+<</language>><br><br>
+<<set $NPCList[0].name_known to 1>><<saveNPC 0 'deadwood_orchard_trapper'>>
+<<if _crew.state.status is 'vacant'>>
+  <<if (maplebirch.get('Finance')?.canPay(_crew.terms.weekly_wage, 'farm') ?? $money gte _crew.terms.weekly_wage)>>
+    <<icon 'orchard/trapper.png'>><<lanLink ['Hire for a week', '雇用一周'] 'Pub'>><<run _crew.act('hire')>><<endevent>><</lanLink>> (<<printmoney _crew.terms.weekly_wage>>)<br>
+  <<else>>
+    <span class='red'>
+      <<language>>
+        <<option 'EN'>>
+          You cannot afford the first week's wages.
+        <<option 'CN'>>
+          你付不起首周的薪资。
+      <</language>>
+    </span><br>
+  <</if>>
+<<else>>
+  <<lanLink ['Ask about another applicant', '打听另一位应聘者'] 'Pub'>>
+    <<endevent>><<clearNPC 'deadwood_orchard_trapper'>><<set _crew.state.status to 'vacant'>><<set _crew.state.report to ''>>
+  <</lanLink>><br>
+<</if>>
+<<getouticon>><<lanLink ['Leave the table', '离开这张桌子'] 'Pub'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Orchard Carrier []
+<<set $outside to 0>><<set $location to 'alex_farm'>><<set $bus to 'farm_fields'>><<effects>><<endevent>>
+<<if !maplebirch.get('Orchard')?.staff.available>>
+  <<getouticon>><<lanLink ['Return to the laboratory', '返回实验室'] 'Farm Still'>><</lanLink>><<exit>>
+<</if>>
+<<if $per_npc.deadwood_orchard_carrier>>
+  <<loadNPC 0 'deadwood_orchard_carrier'>>
+<<else>>
+  <<generateNPC 1 a>><<npcClothesName $NPCList[0] 'wildsFlannel'>>
+<</if>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    <<print $NPCList[0].name>> sets an empty crate beneath the bench. "Glass bottles? Seal them, put them upright, and write the address down. I'll take them after the fruit. I'm not carrying live creatures, and I'm not driving through a fight."
+    <br><br>
+    <<He>> pats the receipt book. "The receiving factory pays for the load. If they've spent the delivery money, it stays here."
+  <<option 'CN'>>
+    <<print $NPCList[0].name>>把空筐放到工作台下面。“玻璃瓶？封好，竖着放，地址写清楚。水果送完再拉这些。活物我不运，有人打架，我也不会开车硬闯。”
+    <br><br>
+    <<He>>拍拍收据本。“运费收货的厂房出。那边把运费花掉了，东西就留在这里。”
+<</language>><br><br>
+<<set $NPCList[0].name_known to 1>><<saveNPC 0 'deadwood_orchard_carrier'>>
+<<icon 'company/minutes.png'>><<lanLink ['Write down the delivery address', '写下收货地址'] 'Deadwood Orchard Staff'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Orchard Staff Talk []
+<<set $outside to 0>><<set $location to 'alex_farm'>><<set $bus to 'farm_fields'>><<effects>><<endevent>>
+<<set _crew to maplebirch.get('Orchard')?.staff>>
+<<if !_crew?.available or !_crew.npc or !_crew.employed or _crew.state.status is 'missing'>>
+  <<getouticon>><<lanLink ['Return to the work book', '返回工作名册'] 'Deadwood Orchard Staff'>><</lanLink>><<exit>>
+<</if>>
+<<loadNPC 0 'deadwood_orchard_trapper'>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    <<if _crew.state.status is 'injured'>>
+      <<print $NPCList[0].name>> tries to pick up a coil of rope, winces, and leaves it on the bench. "Still pulls when I lift my arm. Don't put my name down for tomorrow."
+      <br><br>
+      <<if _crew.state.injuries gte 2>>
+        "It's happened twice now." <<He>> looks past you at the cages. "Once I'm well enough to travel, I'm finding different work."
+      <<else>>
+        "I'll finish the week when I can. Until then, get somebody else to check the nets."
+      <</if>>
+    <<elseif _crew.state.paid_until lte Math.floor(Time.days)>>
+      <<He>> lays the wage book open. "You paid me through this date. I'll wait a week, but I can't live on promises."
+    <<elseif _crew.state.experience gte 20>>
+      <<He>> shows you where a fresh knot holds the net closed. "They push through the loose corners. Keep this part tight." <<He>> sets it aside. "Knowing that doesn't make the moor safe. I'm still watching for a way back."
+    <<elseif _crew.state.route is 'moor'>>
+      <<He>> checks the buckle on <<his>> bag twice. "Farm's one thing. Out there, you can shout and nobody hears. If I'm late, look for me before it gets dark."
+    <<else>>
+      <<He>> runs a thumb over the mesh, feeling for a broken strand. "Alex says not to chase them. I believe it. Better to come back with an empty bag than not come back."
+    <</if>>
+  <<option 'CN'>>
+    <<if _crew.state.status is 'injured'>>
+      <<print $NPCList[0].name>>试着提起一卷绳子，疼得皱起脸，又把它放回工作台。“胳膊一抬就扯着疼。明天别把我排上。”
+      <br><br>
+      <<if _crew.state.injuries gte 2>>
+        “已经两次了。”<<He>>越过你看向笼子。“等能走远路，我就去找别的活。”
+      <<else>>
+        “能动了，我会把这一周干完。这几天，检查网还是另找人吧。”
+      <</if>>
+    <<elseif _crew.state.paid_until lte Math.floor(Time.days)>>
+      <<He>>摊开工资本。“你只付到这个日期。我再等一周，可承诺不能当饭吃。”
+    <<elseif _crew.state.experience gte 20>>
+      <<He>>给你看网口新打的结。“松的角，它们会往外挤。这儿得扎紧。”<<He>>把网放到一边。“懂这个也不能让荒原变安全。我还得随时留着退路。”
+    <<elseif _crew.state.route is 'moor'>>
+      <<He>>把袋子的搭扣检查了两遍。“农场是一回事。外面喊破嗓子，也可能没人听见。我回来晚了，天黑前就找找我。”
+    <<else>>
+      <<He>>用拇指摸过网眼，寻找断掉的线。“艾利克斯说别追。我信。空着袋子回来，总比回不来好。”
+    <</if>>
+<</language>><br><br>
+<<getouticon>><<lanLink ['Return to the work book', '返回工作名册'] 'Deadwood Orchard Staff'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Orchard Employment Journal [widget]
+<<widget 'deadwood-orchard-staff-journal'>>
+  <<if !maplebirch.get('Orchard')>>
+    <<exit>>
+  <</if>>
+  <<set _crew to maplebirch.get('Orchard').staff>>
+  <<if _crew.npc or _crew.state.destination isnot null or $Orchard.worker.quit_day gte 0>>
+    <h3 class='gold'>
+      <<language>>
+        <<option 'EN'>>
+          Farm workers
+        <<option 'CN'>>
+          农场雇工
+      <</language>>
+    </h3>
+    <ul class='journal'>
+      <<if _crew.npc>>
+        <li><<deadwood-orchard-staff-report>></li>
+      <</if>>
+      <<if _crew.employed and _crew.state.status isnot 'missing'>>
+        <li>
+          <<lanSwitch 'Trapper paid until: ' '捕捉工薪资已付至：'>>
+          <span class='gold'><<print getFormattedDate(new DateTime(Time.date).addDays(_crew.state.paid_until - Math.floor(Time.days)))>></span>
+        </li>
+      <</if>>
+      <<if _crew.state.destination isnot null>>
+        <li>
+          <<language>>
+            <<option 'EN'>>
+              Farm-to-factory deliveries are authorised. Bottles delivered: <span class='teal'><<= _crew.state.delivered>></span>. Your carried bottles stay with you.
+            <<option 'CN'>>
+              已委托把农场原液送往工厂。累计送出<span class='teal'><<= _crew.state.delivered>></span>瓶。随身携带的瓶子仍由你保留。
+          <</language>>
+          <<if maplebirch.get('Orchard').carrier?.laboratory_report is 'unpaid'>>
+            <span class='red'>
+              <<language>>
+                <<option 'EN'>>
+                  The receiving factory lacks delivery funds above its reserve.
+                <<option 'CN'>>
+                  收货工厂的储备金以外，没有足够的运费。
+              <</language>>
+            </span>
+          <</if>>
+        </li>
+      <</if>>
+      <<if $Orchard.worker.quit_day gte 0>>
+        <li class='red'>
+          <<language>>
+            <<option 'EN'>>
+              <<print $Orchard.worker.quit_name>> left the orchard job after a week without renewed wages.
+            <<option 'CN'>>
+              果园一周没有续薪，<<print $Orchard.worker.quit_name>>已经辞职。
+          <</language>>
+        </li>
+      <</if>>
+    </ul>
+  <</if>>
+<</widget>>

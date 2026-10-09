@@ -8,6 +8,7 @@
 :: Deadwood Orchard Robin Order []
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<set $_orchard to maplebirch.get('Orchard')>>
+<<dynamicblock 'id=deadwood-orchard-robin-order'>>
 <<if $_orchard and $_orchard.canSupplyRobin>>
   <<npc Robin>><<person1>>
   <<if !$Orchard.order>>
@@ -56,7 +57,7 @@
       <<if maplebirch.get('Orchard').canSupplyRobin and $Orchard.order and maplebirch.get('Orchard').orderStatus is 'pending'>>
         <<set $Orchard.order.status to 'cancelled'>>
       <</if>>
-      <<run maplebirch.SugarCube.Engine.show()>>
+      <<run Dynamic.render('deadwood-orchard-robin-order')>>
     <</lanLink>><br>
   <<elseif $_orchard.canOrder>>
     <<if Time.season is 'winter'>>
@@ -71,15 +72,16 @@
     <</language>><br>
 
     <<foodstufficon 'lemon'>><<lanLink ['Agree to supply lemons', '答应送来柠檬']>>
-      <<run maplebirch.get('Orchard').requestOrder('lemon')>><<run maplebirch.SugarCube.Engine.show()>>
+      <<run maplebirch.get('Orchard').requestOrder('lemon')>><<run Dynamic.render('deadwood-orchard-robin-order')>>
     <</lanLink>><br>
     <<foodstufficon 'orange'>><<lanLink ['Agree to supply oranges', '答应送来橙子']>>
-      <<run maplebirch.get('Orchard').requestOrder('orange')>><<run maplebirch.SugarCube.Engine.show()>>
+      <<run maplebirch.get('Orchard').requestOrder('orange')>><<run Dynamic.render('deadwood-orchard-robin-order')>>
     <</lanLink>><br>
   <</if>>
 <<else>>
   <<lanSwitch 'Now is not a good time to discuss supplies.' '现在不方便商量供货。'>>
 <</if>>
+<</dynamicblock>>
 <br><<getouticon>><<lanLink ['Return to the shop', '返回饮品店'] 'Deadwood Robin Shop'>><</lanLink>>
 
 :: Deadwood Orchard Robin Supplied []

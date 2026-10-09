@@ -70,7 +70,7 @@ The traits page displays **Avery's Partner** while these privileges are active. 
 
 <span class="blue">The holding is measured against total shares. Unsettled same-day purchases and margin positions do not count. Company progress, rent and overdue invoices appear in the journal.</span>
 
-**Office staff:** an accountant costs **£400 per week**, and a sales representative **£350**. Interview and hire them at your office. Their names and appearances persist. Wages are prepaid weekly from the bank. Unpaid staff suspend work, but wages accrue until dismissal. Ending employment requires overdue wages plus one additional week's pay. Prepaid wages are not refunded. Dismiss staff before ending the office lease.
+**Office staff:** an accountant costs **£400 per week**, and a sales representative **£350**. Interview and hire them at your office. Their names and appearances persist. Wages are prepaid weekly from the bank. Unpaid staff suspend work and resign after two weeks. Wages stop accruing on resignation, but existing arrears remain payable. Ending employment requires overdue wages plus one additional week's pay. Prepaid wages are not refunded. Dismiss staff before ending the office lease.
 
 - An authorised accountant submits company invoice reminders on working days. Full payment follows three days later. They cannot waive debts or collect ordinary factory invoices.
 - A paid sales representative reduces the next standard company quotation interval from **seven days to five**. You still select an available factory and sign. Delivery deadlines do not change.
@@ -386,3 +386,21 @@ Mod statistics collect realised share and margin-trading results, dividends, par
 - **Company:** Robin, Whitney, Kylar and Sydney react differently. Affection increases once per person, room type and day.
 
 Read mortgage balances, rates, payment dates and bank notices in **Journal → Finances**. The property desk retains early repayment and arrears services. Each shed or garage has separate bicycle, motorcycle and motor-vehicle capacities; building one does not add resident beds.
+
+### Processing and supply
+
+After the farm laboratory story unlocks, a factory with a packaging line can fit processing equipment into a spare bay and hire a technician. Original phials and known strange flowers come from the native systems. Handing them over removes them from native stock; unused ingredients can be collected again. The original compound sale remains £1,000 per phial.
+
+Processing uses paid materials and shares the crew with ordinary orders. Larger batches reduce unit material costs. Arrears, construction, weekends and stoppages delay work. Finished packs keep for 28 days; rejected output and expired stock cannot be sold. A manager can process stored ingredients while protecting your working reserve, but collection needs manual approval. Abandoning a batch loses its ingredients and processing costs.
+
+The compound, private wholesalers and the adult shop offer separate orders. Delivery is not payment; private buyers may delay or default. Larger independent sales attract pressure on collections. Exclusive compound supply ends current pressure while closing the other channels. Sirris requires production checks and a flower-based sample, and buys only flower-based stock. Harper charges to inspect the process and reduce batch losses, without guaranteeing buyers.
+
+Taking a pack for yourself removes saleable stock and adds aphrodisiac pills to your inventory. Each pack has three uses; you choose when to carry and take it. Commercial distribution of purple-fluid products contributes native soft corruption in proportion to original phials, rather than multiplying it by the number of packs. Personal collection and flower-based stock do not add this original-fluid sale settlement.
+
+After unlocking Capture, recruit a trapper at the pub and arrange farm patrols or moor searches in Alex's laboratory. Workers use their own experience and bring back at most one creature per trip; trapping stops with three waiting in the cages. Extraction still takes seven days per bottle. Weekly wages are £450; an escort costs £50 per trip. Dangerous work can cause injuries or disappearance. Repeated injuries and prolonged nonpayment can end employment. Missing records are retained; a £600 search is available, without a guaranteed result. Farm attacks and blood moons suspend trips.
+
+The existing delivery worker can take extracted bottles to a chosen processing room each afternoon, up to three per £90 load. The receiving factory pays from funds above its working reserve. Deliveries wait when ten bottles are already stored. Carried bottles and personal food supplies remain with you. Missed trips and deliveries are not filled in retrospectively after a long time skip. Orchard workers leave after seven days without renewed wages; office and factory staff resign after two weeks of arrears, which remain payable. Factory automation stops and unfinished batches remain paused; pay the arrears and recruit again to resume.
+
+**Harper as technical consultant**: after inspection, appoint the workshop technician and clear stoppages and arrears, then negotiate at the hospital. The initial **£10,000** covers seven days at one workshop; each renewal at the same address costs **£3,500** for seven days. A different site requires a new initial fee, and only one workshop can be covered at a time. Payment comes from that workshop in advance. There is no automatic renewal, refund or extension for closures.
+
+Guidance raises processing progress by **50%**, gives a **2%** batch failure chance and successful yields of **95–100%** of nominal output. The on-site technician is still required; guidance pauses when Harper is unavailable. Ingredients, payroll, weekends, stoppages, expiry and bad debts still apply. The journal records the term. Hospital appointments and other native scenes remain in place, with contextual responses during medication review and company enquiries about the transformation.

@@ -26,6 +26,11 @@
 <</widget>>
 
 <<widget 'deadwood-orchard-worker-recruitment'>>
+  <<set $_pub_menu to document.querySelector('#passage-content .macro-link[data-passage="Harvest Street"]')>>
+  <<if !$_pub_menu>>
+    <<exit>>
+  <</if>>
+  <<deadwood-orchard-trapper-recruitment>>
   <<set $_orchard to maplebirch.get('Orchard')>>
   <!-- 普通酒馆菜单才招聘，先结束菜单里的随机 NPC，避免占用同一个人物槽。 -->
   <<if $_orchard and $_orchard.available('farm') and !$_orchard.state.worker.hired and $exposed lte 0 and $stress lt $stressmax and !pcAreArmsBound('both')>>
@@ -33,6 +38,21 @@
       <<endevent>><<pass 30>>
     <</lanLink>><br>
   <</if>>
+<</widget>>
+
+<<widget 'deadwood-orchard-worker-task'>>
+  <<set $_orchard to maplebirch.get('Orchard')>>
+  <<run $_orchard.advance()>>
+  <<if !$_orchard.state.worker.hired or !$_orchard.available('farm') or !['auto_renew', 'haul', 'pick', 'fertilise'].includes(_args[0]) or typeof _args[1] isnot 'boolean'>>
+    <<exit>>
+  <</if>>
+  <<if _args[1] and ['auto_renew', 'haul'].includes(_args[0]) and (!maplebirch.get('Finance') or !$Finance?.bank.debit_card)>>
+    <<exit>>
+  <</if>>
+  <<if _args[0] is 'haul' and _args[1] and (maplebirch.passage.title isnot 'Deadwood Reblooms Orchard Delivery' or !$_orchard.carrier)>>
+    <<exit>>
+  <</if>>
+  <<set $_orchard.state.worker[_args[0]] to _args[1]>>
 <</widget>>
 
 <<widget 'deadwood-orchard-worker'>>
@@ -44,6 +64,16 @@
   <<if $_orchard.irrigated>>
     <<gardenicon 'water'>><span class='green'><<lanSwitch 'The farm irrigation keeps the fruit trees watered.' '农场的灌溉系统为果树补足水分。'>></span><br>
   <</if>>
+  <<if $_orchard.state.worker.quit_day gte 0>>
+    <span class='red'>
+      <<language>>
+        <<option 'EN'>>
+          <<print $_orchard.state.worker.quit_name>> left after a week without renewed wages. The trees need tending again.
+        <<option 'CN'>>
+          续薪中断一周后，<<print $_orchard.state.worker.quit_name>>已经辞职。果树又需要有人照料了。
+      <</language>>
+    </span><br>
+  <</if>>
   <<if $_orchard.state.worker.hired>>
     <<set $_worker to $_orchard.state.worker>>
     <<if $per_npc.deadwood_orchard_worker>>
@@ -53,30 +83,30 @@
       <<set $_paidUntil to new DateTime($_worker.paid_until)>>
       <<lanSwitch 'Paid until ' '薪资已预付至 '>><span class='gold'><<print getFormattedDate($_paidUntil)>></span> <<ampm $_paidUntil.hour $_paidUntil.minute>><<lanSwitch '.' '。'>><br>
     <<else>>
-      <span class='red'><<lanSwitch 'The paid week has ended. Your worker will not work until you pay again.' '预付的薪期已经结束。续付薪资前，雇工不会继续干活。'>></span><br>
+      <span class='red'><<lanSwitch 'The paid week has ended. Your worker waits seven days for renewed wages, then leaves.' '预付的薪期已经结束。雇工暂停工作，七天内仍未续薪就会辞职。'>></span><br>
     <</if>>
     <<if $_worker.pick>>
       <<lanSwitch 'Waters trees when the soil dries and picks ripe fruit.' '土壤干燥时浇水，并采收成熟水果。'>><br>
       <<icon 'orchard/harvest.png'>><<lanLink ['Leave the picking to me', '让我自己采收']>>
-        <<run maplebirch.get('Orchard').setWorkerPicking(false)>>
+        <<deadwood-orchard-worker-task 'pick' `false`>>
         <<replace '#deadwood-orchard-worker'>><<deadwood-orchard-worker>><</replace>>
       <</lanLink>><br>
     <<else>>
       <<lanSwitch 'Waters trees when the soil dries. Leaves the fruit for you.' '土壤干燥时浇水，把水果留给你采收。'>><br>
       <<icon 'orchard/harvest.png'>><<lanLink ['Ask the worker to pick ripe fruit too', '也让雇工采收成熟水果']>>
-        <<run maplebirch.get('Orchard').setWorkerPicking(true)>>
+        <<deadwood-orchard-worker-task 'pick' `true`>>
         <<replace '#deadwood-orchard-worker'>><<deadwood-orchard-worker>><</replace>>
       <</lanLink>><br>
     <</if>>
     <<if $_worker.fertilise>>
       <<lanSwitch 'Uses your fertiliser when the previous application wears off.' '肥效耗尽后，使用你现有的肥料补肥。'>><br>
       <<gardenicon 'fertiliser'>><<lanLink ['Leave fertilising to me', '让我自己施肥']>>
-        <<run maplebirch.get('Orchard').setWorkerFertilising(false)>>
+        <<deadwood-orchard-worker-task 'fertilise' `false`>>
         <<replace '#deadwood-orchard-worker'>><<deadwood-orchard-worker>><</replace>>
       <</lanLink>><br>
     <<else>>
       <<gardenicon 'fertiliser'>><<lanLink ['Allow the worker to use your fertiliser', '允许雇工使用你的肥料']>>
-        <<run maplebirch.get('Orchard').setWorkerFertilising(true)>>
+        <<deadwood-orchard-worker-task 'fertilise' `true`>>
         <<replace '#deadwood-orchard-worker'>><<deadwood-orchard-worker>><</replace>>
       <</lanLink>><br>
     <</if>>
@@ -90,7 +120,7 @@
     <</if>>
     <<if $_worker.auto_renew or (maplebirch.get('Finance') and $Finance.bank.debit_card)>>
       <<lanLink `$_worker.auto_renew ? ['Stop automatic wage renewal', '停止自动续薪'] : ['Renew wages automatically', '自动续付薪资']`>>
-        <<run maplebirch.get('Orchard').arrangeWorker('auto_renew', !maplebirch.get('Orchard').state.worker.auto_renew)>>
+        <<deadwood-orchard-worker-task 'auto_renew' `!maplebirch.get('Orchard').state.worker.auto_renew`>>
         <<replace '#deadwood-orchard-worker'>><<deadwood-orchard-worker>><</replace>>
       <</lanLink>><br>
     <</if>>
@@ -101,7 +131,7 @@
         <span class='red'><<lanSwitch 'The delivery worker is unavailable. Fruit stays in storage.' '送货工不在，水果留在仓库。'>></span><br>
       <</if>>
       <<lanLink ['Stop morning deliveries', '停止早班运输']>>
-        <<run maplebirch.get('Orchard').arrangeWorker('haul', false)>>
+        <<deadwood-orchard-worker-task 'haul' `false`>>
         <<replace '#deadwood-orchard-worker'>><<deadwood-orchard-worker>><</replace>>
       <</lanLink>><br>
     <</if>>

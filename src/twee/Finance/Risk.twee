@@ -297,30 +297,36 @@
 
 :: Deadwood Reblooms Financial Debt []
 <<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
-<<if $Finance.collection.amount lte 0>>
-  <<lanSwitch 'There is no outstanding recovery debt.' '没有待追偿的欠款。'>><br><br>
-  <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Financial Centre'>><</lanLink>><<exit>>
-<</if>>
-<<language>>
-  <<option 'EN'>>The notice lists the sum still owed after settlement. Beneath it is a deadline. After that, the claim passes to a collector.
-  <<option 'CN'>>通知列出了结算后仍需偿还的金额，下面印着缴款期限。超过期限，债权就会转交追债人。
-<</language>><br><br>
-<<lanSwitch 'Amount due: ' '应还金额：'>><<deadwood-reblooms-finance-money $Finance.collection.amount>><br>
-<<lanSwitch 'Payment deadline: ' '缴清期限：'>><<deadwood-reblooms-finance-date $Finance.collection.due_day>><br>
-<<if Time.days gte $Finance.collection.due_day>>
-  <span class='red'><<lanSwitch 'The payment deadline has passed.' '缴款期限已过。'>></span><br>
-<</if>>
-<br>
-<<lanLink ['Pay from bank funds and cash', '用银行存款与现金缴清'] 'Deadwood Reblooms Financial Debt Result'>><<set $Finance.last_result to maplebirch.get('Finance').repayCollection() ? 'ok' : 'rejected'>><</lanLink>><br>
-<<lanSwitch 'Bank funds / cash: ' '银行存款／现金：'>><<deadwood-reblooms-finance-money $Finance.bank.balance>> / <<deadwood-reblooms-finance-money $money>><br>
-<<if !$Finance.collection.extended>>
-  <<set $_extensionFee to Math.ceil($Finance.collection.amount * 0.05)>>
-  <<lanSwitch 'Seven-day extension fee: ' '延期七天的费用：'>><<deadwood-reblooms-finance-money $_extensionFee>><br>
-  <<if maplebirch.get('Finance').canExtendCollection>>
-    <<lanLink ['Pay the extension fee from your bank account', '从银行账户支付延期费用'] 'Deadwood Reblooms Financial Debt'>><<run maplebirch.get('Finance').extendCollection()>><</lanLink>><br>
-  <<else>><span class='red'><<lanSwitch 'Your bank balance cannot cover the extension fee.' '银行存款不足以支付延期费用。'>></span><br><</if>>
-<<else>><span class='blue'><<lanSwitch 'The one extension has already been used.' '这笔欠款已经延期过一次。'>></span><br><</if>><br>
-<<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Financial Centre'>><</lanLink>>
+<<dynamicblock 'id=deadwood-finance-debt'>>
+  <<if $Finance.collection.amount lte 0>>
+    <<lanSwitch 'There is no outstanding recovery debt.' '没有待追偿的欠款。'>><br><br>
+    <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Financial Centre'>><</lanLink>><<exit>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>The notice lists the sum still owed after settlement. Beneath it is a deadline. After that, the claim passes to a collector.
+    <<option 'CN'>>通知列出了结算后仍需偿还的金额，下面印着缴款期限。超过期限，债权就会转交追债人。
+  <</language>><br><br>
+  <<lanSwitch 'Amount due: ' '应还金额：'>><<deadwood-reblooms-finance-money $Finance.collection.amount>><br>
+  <<lanSwitch 'Payment deadline: ' '缴清期限：'>><<deadwood-reblooms-finance-date $Finance.collection.due_day>><br>
+  <<if Time.days gte $Finance.collection.due_day>>
+    <span class='red'><<lanSwitch 'The payment deadline has passed.' '缴款期限已过。'>></span><br>
+  <</if>>
+  <br>
+  <<lanLink ['Pay from bank funds and cash', '用银行存款与现金缴清'] 'Deadwood Reblooms Financial Debt Result'>><<set $Finance.last_result to maplebirch.get('Finance').repayCollection() ? 'ok' : 'rejected'>><</lanLink>><br>
+  <<lanSwitch 'Bank funds / cash: ' '银行存款／现金：'>><<deadwood-reblooms-finance-money $Finance.bank.balance>> / <<deadwood-reblooms-finance-money $money>><br>
+  <<if !$Finance.collection.extended>>
+    <<set $_extensionFee to Math.ceil($Finance.collection.amount * 0.05)>>
+    <<lanSwitch 'Seven-day extension fee: ' '延期七天的费用：'>><<deadwood-reblooms-finance-money $_extensionFee>><br>
+    <<if maplebirch.get('Finance').canExtendCollection>>
+      <<lanLink ['Pay the extension fee from your bank account', '从银行账户支付延期费用']>>
+        <<run maplebirch.get('Finance').extendCollection()>>
+        <<run maplebirch.get('Finance').refreshMoneyUI()>>
+        <<run Dynamic.render('deadwood-finance-debt')>>
+      <</lanLink>><br>
+    <<else>><span class='red'><<lanSwitch 'Your bank balance cannot cover the extension fee.' '银行存款不足以支付延期费用。'>></span><br><</if>>
+  <<else>><span class='blue'><<lanSwitch 'The one extension has already been used.' '这笔欠款已经延期过一次。'>></span><br><</if>><br>
+  <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Financial Centre'>><</lanLink>>
+<</dynamicblock>>
 
 :: Deadwood Reblooms Financial Debt Result []
 <<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
