@@ -5,6 +5,8 @@ import { species, type OrchardSpecies } from '../module/Orchard/Species';
 import type { MacroDefinition } from 'twine-sugarcube';
 
 export default function Orchard(maplebirch: typeof window.maplebirch): void {
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-remy-school-link', passage: 'Riding School' }, { widget: 'deadwood-remy-captivity', passage: 'Livestock Cell Remy' });
+
   maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-orchard-regular-link'], passage: 'Stall Manage' });
 
   // 回执在本次页面显示完后清除，不能带进稍后的遭遇或下一次进园。
@@ -82,7 +84,8 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
       .map(key => {
         const data = species[key];
         const label = [`Buy ${data.name[0].toLowerCase()} seeds (£${data.seedPrice! / 100})`, `购买${data.name[1]}种子 (£${data.seedPrice! / 100})`];
-        return `<<foodstufficon '${key}'>>${V.money >= data.seedPrice! ? `<<lanLink ${JSON.stringify(label)} 'Supermarket'>><<run maplebirch.get('Orchard').buySeed('${key}')>><</lanLink>>` : `<span class='red'>${lanSwitch(...label)}</span>`}<br>`;
+        const affordable = maplebirch.get('Finance')?.canPay(data.seedPrice, 'shopping') ?? V.money >= data.seedPrice!;
+        return `<<foodstufficon '${key}'>>${affordable ? `<<lanLink ${JSON.stringify(label)} 'Supermarket'>><<run maplebirch.get('Orchard').buySeed('${key}')>><</lanLink>>` : `<span class='red'>${lanSwitch(...label)}</span>`}<br>`;
       })
       .join('');
   });

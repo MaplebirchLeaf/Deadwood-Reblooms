@@ -42,7 +42,7 @@ The garden entrance also requires Kylar not registered at a PC-owned home, avoid
 
 At **Park → Kylar**, once vanilla relationship status allows showing the sketch, active Kylar actually at the park offers **ask what they are drawing (0:10)** once daily.
 
-Wait for them to show it, praise the path or stop asking. Responses differ in dialogue and love without forcing the sketchbook away. Completing every manor activity is unnecessary, but vanilla sketch-sharing eligibility still applies.
+Wait for them to show it, praise the path or stop asking. Responses differ in dialogue and love without forcing the sketchbook away. The park interaction uses vanilla sketch-sharing eligibility.
 
 Kylar remembers the last response. Waiting or praising changes how they show the sketchbook next time. Stopping your questions does not reduce love.
 

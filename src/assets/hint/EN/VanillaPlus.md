@@ -13,7 +13,7 @@ Willpower, physique, beauty, exhibitionism, deviancy, and promiscuity can reach 
 | Beauty        | Reach the vanilla cap, meet the outdoor base-allure and modelling-fame breakthrough requirements. At breakthrough, remove all makeup, contact lenses, and face masks                                                                 |
 | Exhibitionism | Reach the vanilla cap, complete at least **5 naked swimming lessons**, earn the naked ballroom feat at Avery's party, and finish the successful High Street photo run with at least **250 flyers**                                   |
 | Deviancy      | Reach the vanilla cap, earn Wildsong with Gwylan, meet the required purification progress, have at least **3** Gwylan sex dates and **3** beast dates, then lead a sealed ritual with sufficient purification progress               |
-| Promiscuity   | Bring promiscuity, exhibitionism, and deviancy to their vanilla caps. Their seventh-level traits are not required first                                                                                                              |
+| Promiscuity   | Bring promiscuity, exhibitionism, and deviancy to their vanilla caps.                                                                                                                                                                |
 
 Willpower, physique, and beauty gain a new ceiling at **125%** of their old ceiling. Exhibitionism, deviancy, and promiscuity reach **150%**. If another mod changes a vanilla ceiling, the game's effective ceiling is used as the baseline. After the story requirements unlock a breakthrough, keep raising the attribute to its new ceiling to gain the trait.
 

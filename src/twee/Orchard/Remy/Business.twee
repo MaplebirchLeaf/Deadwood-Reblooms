@@ -1,0 +1,118 @@
+:: Deadwood Remy Business []
+<<effects>>
+<<set $_remy to maplebirch.get('Orchard')?.remy>>
+<<set $_finance to maplebirch.get('Finance')>>
+<<if $_remy?.available and $_remy.canTalk>>
+  <<npc Remy>><<person1>>
+  <div id='deadwood-remy-business'>
+    <<language>>
+      <<option 'EN'>>
+        Remy puts the lesson register aside. "Something outside the school, then?" <<He>> keeps <<his>> hand on the closed cover.
+      <<option 'CN'>>
+        雷米把课程登记簿挪到一旁。“那么，是学校以外的事？”<<His>>手仍按在合上的封面上。
+    <</language>><br><br>
+    <<if $_remy.farmConflict>>
+      <<lanLink ['Challenge the pressure on Alex’s farm (0:10)', '质问对艾利克斯农场的威胁 (0:10)']>>
+        <<if maplebirch.get('Orchard')?.remy.farmConflict and maplebirch.get('Orchard')?.remy.act('confront')>>
+          <<npcincr Remy love -1>><<pass 10>>
+          <<replace '#deadwood-remy-business'>>
+            <<language>>
+              <<option 'EN'>>
+                "Has Alex sent you?" Remy asks. You say you came yourself. <<He>> draws <<his>> glove tight at the wrist. "Then you ought to know when someone is wasting your time."
+                <br><br>
+                <<if $Orchard.unlocked.farm and $Orchard.farm.some(tree => tree?.species)>>
+                  You mention the trees you planted there. "More work sunk into that place." <<He>> looks unimpressed. "I would have thought you had learned something by now." <span class='purple'><<He>> asks which part of the farm you cleared. You leave the question unanswered.</span>
+                <<else>>
+                  You ask what right <<he>> has to drive Alex off the land. "Alex has had opportunities to make sensible arrangements." <<He>> speaks as if describing a missed lesson. "I suggest you consider your own."
+                <</if>>
+                <br><br>
+                <<if $Orchard.remy.romance>>"You can come here to see me. That doesn't give Alex a place at my desk." <<He>> waits for you to move on.<<elseif $speech_attitude is 'bratty'>>You tell <<him>> you will keep the farm standing. "Then you'd better be there when you're needed."<<elseif $speech_attitude is 'meek'>>You ask <<him>> to leave the farm alone. "Asking nicely won't make it a good investment."<<else>>You tell <<him>> you are staying with Alex. "That is your decision. Don't expect me to share it."<</if>>
+                <br><br><span class='red'>Remy has offered no truce.</span>
+              <<option 'CN'>>
+                “艾利克斯让你来的？”雷米问。你说是自己来的。<<He>>将腕口的手套拉紧。“那你就该看清，是谁在浪费你的时间。”
+                <br><br>
+                <<if $Orchard.unlocked.farm and $Orchard.farm.some(tree => tree?.species)>>
+                  你提起自己在那里种下的果树。“又往那地方搭进去不少工夫。”<<He>>不以为然。“我还以为，你多少该学到点东西了。”<span class='purple'><<He>>问你清理的是农场哪一块。你没有回答。</span>
+                <<else>>
+                  你问<<he>>凭什么逼艾利克斯离开那片土地。“艾利克斯有过机会，作出明智的安排。”<<His>>语气像是在谈一堂错过的课。“我建议你也考虑一下自己的。”
+                <</if>>
+                <br><br>
+                <<if $Orchard.remy.romance>>“你可以来这里见我。可这不代表艾利克斯也能坐到我的桌前。”<<He>>等着你换个话题。<<elseif $speech_attitude is 'bratty'>>你说，你会守住那座农场。“那么，需要你的时候，你最好在那里。”<<elseif $speech_attitude is 'meek'>>你请求<<he>>放过农场。“说几句好话，也不会让它变成一笔好买卖。”<<else>>你告诉<<him>>，你会留在艾利克斯那边。“这是你的决定。别指望我赞同。”<</if>>
+                <br><br><span class='red'>雷米没有答应停手。</span>
+            <</language>><<llove 'Remy'>>
+          <</replace>>
+        <</if>>
+      <</lanLink>><<llove 'Remy'>><br>
+      <<if $_finance and $Finance.bank.loan_project is 'orchard' and $Finance.bank.loan_debt gt 0>>
+        <<lanLink ['Mention the orchard loan (0:10)', '提起果园的贷款 (0:10)']>>
+          <<if maplebirch.get('Finance') and $Finance.bank.loan_project is 'orchard' and $Finance.bank.loan_debt gt 0 and maplebirch.get('Orchard')?.remy.act('confront')>>
+            <<pass 10>>
+            <<replace '#deadwood-remy-business'>>
+              <<language>>
+                <<option 'EN'>>
+                  You ask whether borrowed money changes <<his>> view of your orchard. "It changes whose money you're risking." Remy glances at the register. "Trees take their time. Creditors tend to be less patient."
+                  <br><br>
+                  You ask if <<he>> would rather see the farm fail. "I would rather see Alex recognise when to sell." <<He>> lets the silence last. "You needn't go down with it."
+                  <br><br><span class='purple'><<He>> has turned your debt into another reason to abandon the farm. <<He>> has offered no help with the repayments.</span>
+                <<option 'CN'>>
+                  你问，用贷款种果树，会不会改变<<his>>看法。“改变的是，你在拿谁的钱冒险。”雷米瞥了眼登记簿。“树长得慢，债主通常没那么多耐心。”
+                  <br><br>
+                  你问<<he>>是不是巴不得农场垮掉。“我希望艾利克斯能看清，什么时候该卖了。”<<He>>任由沉默持续了一会儿。“你没必要跟着一起栽进去。”
+                  <br><br><span class='purple'><<He>>又把你的欠债当成了放弃农场的理由，没有提出替你还款。</span>
+              <</language>>
+            <</replace>>
+          <</if>>
+        <</lanLink>><br>
+      <</if>>
+    <</if>>
+    <<if maplebirch.get('Robin') and $Orchard.orders_completed gt 0>>
+      <<lanLink ['Mention supplying Robin’s drinks shop (0:10)', '说起给罗宾饮品店供货 (0:10)']>>
+        <<if maplebirch.get('Robin') and $Orchard.orders_completed gt 0 and maplebirch.get('Orchard')?.remy.act('talk')>>
+          <<pass 10>>
+          <<replace '#deadwood-remy-business'>>
+            <<language>>
+              <<option 'EN'>>
+                You explain where the fruit goes, and that Robin pays for it. "A drinks shop?" Remy asks. "And you carry the boxes yourself?"
+                <br><br>
+                <<if $Orchard.orders_completed gte 3>>You tell <<him>> you have supplied several orders. "Then at least you've found a customer who comes back." <<He>> taps the register. "Keep the price on paper. Familiarity makes people remarkably forgetful."<<else>>You tell <<him>> about the first orders. "A small start. See whether it pays before promising the next one." <<He>> checks the time, as though comparing it with what you have earned.<</if>>
+                <<if maplebirch.get('Orchard').remy.farmConflict>><br><br>"But don't mistake a few boxes for a future in Alex's fields." <span class='purple'>Even this conversation leads back to the farm.</span><</if>>
+              <<option 'CN'>>
+                你说明水果送到了哪里，也说罗宾会付货款。“饮品店？”雷米问。“箱子也是你自己搬？”
+                <br><br>
+                <<if $Orchard.orders_completed gte 3>>你说已经送过几单。“那至少，你找到了一个还会回来的客人。”<<He>>敲了敲登记簿。“价钱写在纸上。越是熟人，越容易忘事。”<<else>>你说起最初的几笔订单。“小生意。先看看赚不赚，再答应下一单。”<<He>>看了看时间，仿佛正在拿它与你挣的钱比较。<</if>>
+                <<if maplebirch.get('Orchard').remy.farmConflict>><br><br>“可别以为，送几箱水果就能在艾利克斯的地里找到前途。”<span class='purple'>话题还是被<<he>>带回了农场。</span><</if>>
+            <</language>>
+          <</replace>>
+        <</if>>
+      <</lanLink>><br>
+    <</if>>
+    <<if $_finance and ($_finance.sellableShares.RMY ?? 0) gt 0>>
+      <<lanLink ['Say you hold shares in Remy’s estate (0:10)', '告诉雷米你持有庄园的股份 (0:10)']>>
+        <<if maplebirch.get('Finance') and (maplebirch.get('Finance').sellableShares.RMY ?? 0) gt 0 and maplebirch.get('Orchard')?.remy.act('talk')>>
+          <<pass 10>>
+          <<replace '#deadwood-remy-business'>>
+            <<language>>
+              <<option 'EN'>>
+                You tell Remy what you bought at the financial centre. <<He>> looks from you to the office door. "I see. Are you here for a lesson, or to count the horses?"
+                <br><br>
+                <<if maplebirch.get('Orchard').remy.farmConflict>>You ask whether investing in <<his>> estate will make <<him>> leave Alex alone. "You bought shares," <<he>> says. "Not my agreement." <<He>> returns <<his>> attention to the register.<<else>>You ask whether this makes you a partner. "It makes you someone who will be watching the figures." <<His>> smile returns. "Lessons still cost the same."<</if>>
+                <br><br><span class='blue'>The shares remain in your brokerage account.</span>
+              <<option 'CN'>>
+                你告诉雷米，自己在金融中心买了什么。<<He>>的视线从你移向办公室的门。“是吗。那你是来上课，还是来数马的？”
+                <br><br>
+                <<if maplebirch.get('Orchard').remy.farmConflict>>你问，投资<<his>>庄园，能不能让<<he>>放过艾利克斯。“你买的是股份。”<<He>>说。“不是我的同意。”<<He>>将注意力转回登记簿。<<else>>你问，这算不算合伙人。“算是多了一个盯着账目的人。”<<His>>笑容又回来了。“课程还是一样的价钱。”<</if>>
+                <br><br><span class='blue'>股份仍由你的证券账户持有。</span>
+            <</language>>
+          <</replace>>
+        <</if>>
+      <</lanLink>><br>
+    <</if>>
+    <br><<lanLink ['Ask about something else', '换个话题'] 'Deadwood Remy Talk'>><</lanLink>><br>
+  </div>
+<<else>>
+  <<language>>
+    <<option 'EN'>>Remy has returned to work. You find no chance for another conversation today.
+    <<option 'CN'>>雷米已经回去做事了。今天没有机会再谈了。
+  <</language>>
+<</if>>
+<<deadwood-remy-return>>

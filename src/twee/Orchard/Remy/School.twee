@@ -1,0 +1,130 @@
+:: Deadwood Remy School Widgets [widget]
+<<widget 'deadwood-remy-school-link'>>
+  <<set $_remy to maplebirch.get('Orchard')?.remy>>
+  <<set $_schoolMenu to document.querySelector('#passage-content .macro-link[data-passage="Farmland"]')>>
+  <<if $_remy?.available and $_schoolMenu>>
+    <<socialiseicon 'ask'>><<lanLink ['Approach Remy', '走近雷米'] 'Deadwood Remy Conversation'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-remy-return'>>
+  <br><br><<getouticon>><<lanLink ['Return to the courtyard', '返回庭院'] 'Riding School'>><<endevent>><</lanLink>><br>
+<</widget>>
+
+:: Deadwood Remy Conversation []
+<<set $_remy to maplebirch.get('Orchard')?.remy>>
+<<effects>>
+<<if $_remy?.available>>
+  <<npc Remy>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      Remy stands beside the office, smoothing a leather glove. A pupil calls from the track. <<He>> points out a loose rein, waits until the rider corrects it, then turns to you. "Can I help you?"
+    <<option 'CN'>>
+      雷米站在办公室旁，拉平皮手套上的褶皱。跑道上的学员叫了<<him>>一声。<<He>>指了指松垮的缰绳，等对方调整好，才转向你。“有什么需要吗？”
+  <</language>><br><br>
+  <<if $remySeen.includes('livestock')>>
+    <<language>>
+      <<option 'EN'>>
+        A latch clicks behind you. You turn before you can help it. Remy is holding the paddock gate for a pupil; the courtyard entrance remains open. <<His>> polite smile tells you little. <span class='purple'>You keep the entrance in sight.</span>
+      <<option 'CN'>>
+        身后传来门闩的咔嗒声。你不由得回过头。雷米只是替学员扶住牧场的门，庭院入口仍开着。<<His>>客气的笑容透露不出什么。<span class='purple'>你留意着入口的位置。</span>
+    <</language>><br><br>
+  <</if>>
+  <<if $Orchard.remy.romance>>
+    <<language>>
+      <<option 'EN'>>
+        "Back again?" <<He>> asks. <<if $Orchard.remy.last_date_day is Time.days>><<He>> glances at the lesson register. "If I'd known you were staying, I would have put the kettle on again."<<elseif $Orchard.remy.last_date_day gte 0 and Time.days - $Orchard.remy.last_date_day gte 7>>"I was beginning to think you had found somewhere more interesting." <<His>> smile stays in place as <<he>> waits for your answer.<<else>><<He>> moves the register to make room for you beside the desk. "I have a little time before the next group."<</if>>
+      <<option 'CN'>>
+        “又来了？”<<He>>问道。<<if $Orchard.remy.last_date_day is Time.days>><<He>>看了眼课程登记簿。“早知道你还要留一会儿，我就再烧壶水了。”<<elseif $Orchard.remy.last_date_day gte 0 and Time.days - $Orchard.remy.last_date_day gte 7>>“我还以为你找到更有趣的地方了。”<<He>>保持着笑容，等你回答。<<else>><<He>>挪开登记簿，让你能在桌旁坐下。“下一批学员过来之前，我还有点时间。”<</if>>
+    <</language>><br><br>
+  <<elseif $Orchard.remy.visits gte 3>>
+    <<language>>
+      <<option 'EN'>>
+        "No lesson today?" <<He>> asks. "Then I assume you've come to see me."
+      <<option 'CN'>>
+        “今天不上课？”<<He>>问道。“那我就当你是来找我的了。”
+    <</language>><br><br>
+  <</if>>
+  <<if $remy_mask and ['saved', 'fallen', 'kicked'].includes($avery_fate)>>
+    <<language>>
+      <<option 'EN'>>
+        The white mask sits flush against <<his>> cheek. <<He>> notices your glance and turns the covered side away.
+      <<option 'CN'>>
+        白色面具贴着<<his>>脸颊。<<He>>察觉到你的视线，将遮住的那一侧转开。
+    <</language>><br><br>
+  <</if>>
+  <<if $_remy.farmConflict>>
+    <<language>>
+      <<option 'EN'>>
+        A pupil approaches, and Remy answers with the same pleasant voice <<he>> uses for you. <span class='purple'>You have heard <<him>> speak to Alex very differently.</span> <<if $farm_attack_timer is 0>><span class='red'>You expect another attack on the farm tonight.</span><</if>>
+      <<option 'CN'>>
+        一名学员走过来，雷米用对你说话时一样的客气语气回答。<span class='purple'>你听过<<he>>对艾利克斯说话，那可是另一回事。</span><<if $farm_attack_timer is 0>><span class='red'>你知道，今晚农场还会遭到袭击。</span><</if>>
+    <</language>><br><br>
+  <</if>>
+  <<if $_remy.canTalk>>
+    <<socialiseicon 'ask'>><<lanLink ['Ask about the riding school', '聊聊骑术学校'] 'Deadwood Remy Talk'>><</lanLink>><br>
+  <<else>>
+    <<language>>
+      <<option 'EN'>><span class='blue'>
+        Remy has returned to the pupils. Another conversation will have to wait until tomorrow.</span>
+      <<option 'CN'>><span class='blue'>
+        雷米已经回去指导学员了。想再找个空当聊聊，得等到明天。</span>
+    <</language>><br>
+  <</if>>
+  <<if $_remy.canGift>>
+    <<foodstufficon 'apple'>><<lanLink ['Offer an apple', '送一个苹果'] 'Deadwood Remy Gift'>><</lanLink>><br>
+  <</if>>
+  <<if $_remy.canDate>>
+    <<socialiseicon 'friendly'>><<lanLink ['Ask for some time together (0:45)', '约雷米单独待一会儿 (0:45)'] 'Deadwood Remy Date'>><</lanLink>><br>
+  <<elseif $Orchard.remy.last_date_day is Time.days>>
+    <<language>>
+      <<option 'EN'>>
+        "I'd best get back to the pupils." <span class='blue'>You have already spent time alone together today.</span>
+      <<option 'CN'>>
+        “我得回去看着学员了。”<span class='blue'>你们今天已经单独相处过了。</span>
+    <</language>><br>
+  <<elseif $Orchard.remy.visits gte 3>>
+    <<language>>
+      <<option 'EN'>>
+        Remy still keeps the gaps between lessons for work. <span class='blue'>Get to know <<him>> better, and come while there is time before closing.</span>
+      <<option 'CN'>>
+        雷米仍把课间的空当留给工作。<span class='blue'>再熟悉一些，并在离关门还有一段时间时过来。</span>
+    <</language>><br>
+  <</if>>
+  <<if $_remy.canCourt>>
+    <<socialiseicon 'flirt'>><<lanLink ['Ask what this relationship means', '谈谈你们的关系'] 'Deadwood Remy Courtship'>><</lanLink>><br>
+  <</if>>
+  <<if $Orchard.remy.romance>>
+    <div id='deadwood-remy-break'>
+      <<lanLink ['Say you want to end the relationship', '提出结束这段关系']>>
+        <<replace '#deadwood-remy-break'>>
+          <<language>>
+            <<option 'EN'>>You can take it back before you say the words.
+            <<option 'CN'>>话还没说出口，你仍可以改变主意。
+          <</language>><br>
+          <<lanLink ['End the relationship', '结束关系']>>
+            <<if maplebirch.get('Orchard')?.remy.act('break')>>
+              <<replace '#deadwood-remy-break'>>
+                <<language>>
+                  <<option 'EN'>>
+                    Remy's smile fades. "Then don't waste my time." <<He>> steps aside to let you pass. <span class='blue'>Your agreement is over.</span>
+                  <<option 'CN'>>
+                    雷米的笑容淡了。“那就别再浪费我的时间。”<<He>>侧身让开道路。<span class='blue'>你们的约定结束了。</span>
+                <</language>>
+              <</replace>>
+            <</if>>
+          <</lanLink>><br>
+          <<lanLink ['Leave it unsaid', '暂时不说'] 'Deadwood Remy Conversation'>><</lanLink>>
+        <</replace>>
+      <</lanLink>>
+    </div>
+  <</if>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      There is no chance to speak to Remy here right now.
+    <<option 'CN'>>
+      现在没机会在这里找雷米交谈。
+  <</language>>
+<</if>>
+<<deadwood-remy-return>>

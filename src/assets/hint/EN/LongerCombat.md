@@ -1,6 +1,6 @@
 ### Prerequisites and entrance
 
-Enable **LongerCombat**, reload and open **Mod settings → Longer combat**. No character or relationship unlock applies. Continuation depends on the resolution used by the encounter.
+Enable **LongerCombat**, reload and open **Mod settings → Longer combat**. Continuation depends on the resolution used by the encounter.
 
 ### What each option controls
 

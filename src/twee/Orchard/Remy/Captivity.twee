@@ -1,0 +1,159 @@
+:: Deadwood Remy Captivity Widgets [widget]
+<<widget 'deadwood-remy-captivity'>>
+  <<set $_remy to maplebirch.get('Orchard')?.remy>>
+  <<if !$_remy?.captive>><<exit>><</if>>
+  <<npc Remy>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $phase is 0>>You can still feel where <<his>> glove disturbed your hair. Remy pauses outside the cell to give a farmhand instructions.<<else>>Remy brushes the last piece of straw from <<his>> glove. <<He>> says something to a farmhand further down the barn, too quietly for you to hear.<</if>>
+    <<option 'CN'>>
+      <<if $phase is 0>>你还能感觉到头发被<<his>>手套揉乱的地方。雷米在栏门外停下，吩咐一名工人做事。<<else>>雷米拂掉手套上最后一根稻草，又向谷仓深处的工人说了些什么。声音太轻，你听不清楚。<</if>>
+  <</language>><br><br>
+  <<if $Orchard.remy.romance>>
+    <<language>>
+      <<option 'EN'>>
+        The footsteps slow beyond your gate. The same gloves rested on the riding school desk when you spoke of being partners. <span class='purple'>Here, the keys hang from Remy's belt.</span>
+      <<option 'CN'>>
+        脚步声在你的栏门外慢下来。谈起交往那天，这双手套就放在骑术学校的桌上。<span class='purple'>在这里，钥匙挂在雷米腰间。</span>
+    <</language>><br><br>
+  <<elseif $Orchard.remy.visits gt 0>>
+    <<language>>
+      <<option 'EN'>>
+        You have heard that voice giving instructions to pupils. You remember the lesson register and the row of cups beside the kettle. <span class='purple'>Here, <<he>> has not asked whether you want to stay.</span>
+      <<option 'CN'>>
+        你听过这个声音指导学员。你想起课程登记簿，以及水壶旁的一排杯子。<span class='purple'>在这里，<<he>>没有问过你想不想留下。</span>
+    <</language>><br><br>
+  <</if>>
+  <div id='deadwood-remy-cell-talk'>
+    <<if $_remy.canTalk>>
+      <<lanLink ['Call after Remy', '叫住雷米']>>
+        <<if maplebirch.get('Orchard')?.remy.captive and maplebirch.get('Orchard')?.remy.canTalk>>
+          <<replace '#deadwood-remy-cell-talk'>>
+            <<language>>
+              <<option 'EN'>>The footsteps stop. "What is it?" Remy asks from beyond the gate. <<He>> stays on the other side.
+              <<option 'CN'>>脚步声停了。“怎么了？”雷米在栏门外问道。<<He>>没有回来开门。
+            <</language>><br><br>
+            <<lanLink ['Ask to leave', '要求离开']>>
+              <<if maplebirch.get('Orchard')?.remy.captive and maplebirch.get('Orchard')?.remy.canTalk>>
+                <<set $Orchard.remy.last_talk_day to Time.days>>
+                <<replace '#deadwood-remy-cell-talk'>>
+                  <<language>>
+                    <<option 'EN'>>
+                    <<if $speech_attitude is 'bratty'>>"Open the gate. I'm going home."<<elseif $speech_attitude is 'meek'>>"Please. I want to go home."<<else>>"I want to leave," you say.<</if>> Remy turns a key between <<his>> fingers. "And I'd like a quiet morning." <<He>> lets it drop against the others.
+                    <br><br>
+                    <<if $livestock.obey gte 80>>"You've been settling in so well. Why spoil it?" <<He>> looks towards the farmhands. "You'll be brought out with the others."<<else>>"You're making this harder than it needs to be. You'll be brought out when it's time." <<He>> waits, as if expecting you to thank <<him>>.<</if>> <<He>> walks away before you can answer.
+                    <<option 'CN'>>
+                    <<if $speech_attitude is 'bratty'>>“开门，我要回家。”<<elseif $speech_attitude is 'meek'>>“求你了，我想回家。”<<else>>“我要离开。”你说。<</if>> 雷米用手指转着一把钥匙。“我倒想要个清静的早上。”钥匙落回那一串金属上。
+                    <br><br>
+                    <<if $livestock.obey gte 80>>“你明明适应得很好，何必弄成这样？”<<He>>看向工人。“到时候，会带你跟其他的一起出去。”<<else>>“非得把事情弄得这么难办。到了时候，自然有人带你出去。”<<He>>等了一下，仿佛还等着你道谢。<</if>> 你还没来得及回答，<<he>>便走远了。
+                  <</language>><br><br>
+                  <<language>>
+                    <<option 'EN'>><span class='red'>Remy has refused to let you leave.</span>
+                    <<option 'CN'>><span class='red'>雷米没有答应放你离开。</span>
+                  <</language>>
+                <</replace>>
+              <</if>>
+            <</lanLink>><br>
+            <<if $Orchard.remy.romance>>
+              <<lanLink ['Ask about your agreement', '追问你们的约定']>>
+                <<if maplebirch.get('Orchard')?.remy.captive and maplebirch.get('Orchard')?.remy.canTalk>>
+                  <<set $Orchard.remy.last_talk_day to Time.days>>
+                  <<replace '#deadwood-remy-cell-talk'>>
+                    <<language>>
+                      <<option 'EN'>>
+                      "You said I could come back because I wanted to." Remy's hand stills on the keys. "And you did come back." You tell <<him>> that this was not the place you agreed to meet.
+                      <br><br>
+                      <<He>> follows your gaze towards the gate. "You have a place here. Everything's provided for." You ask if <<he>> would talk to you like this at the school. A farmhand looks over. Remy waits until they turn away. "Don't make it difficult." <<His>> boots scrape the straw as <<he>> leaves.
+                      <<option 'CN'>>
+                      “你说过，我可以因为自己想来而回来。”雷米摆弄钥匙的手停了。“而你确实回来了。”你告诉<<him>>，你们约好的地方可不是这里。
+                      <br><br>
+                      <<He>>顺着你的目光看向栏门。“这里有你的位置，什么都给你安排好了。”你问，在学校里，<<he>>也会这样跟你说话吗。一名工人望过来。雷米等对方转开视线，才说：“别把事情弄得太难办。”<<He>>走开时，皮靴擦过稻草。
+                    <</language>><br><br>
+                    <<language>>
+                      <<option 'EN'>><span class='purple'>The keys stay on <<his>> belt.</span>
+                      <<option 'CN'>><span class='purple'>钥匙仍挂在<<his>>腰带上。</span>
+                    <</language>>
+                  <</replace>>
+                <</if>>
+              <</lanLink>><br>
+            <<elseif $Orchard.remy.visits gt 0>>
+              <<lanLink ['Mention the riding school', '提起骑术学校']>>
+                <<if maplebirch.get('Orchard')?.remy.captive and maplebirch.get('Orchard')?.remy.canTalk>>
+                  <<set $Orchard.remy.last_talk_day to Time.days>>
+                  <<replace '#deadwood-remy-cell-talk'>>
+                    <<language>>
+                      <<option 'EN'>>
+                      You mention the lessons, and the people waiting in the courtyard. "Different arrangements," Remy says. "They pay for their keep." You ask what you are supposed to be doing here, then. <<He>> glances towards the far end of the barn. "What you're told."
+                      <br><br>
+                      "You didn't speak to me like this there." Remy smooths a fold in <<his>> glove. "You listened rather better there." <<He>> leaves before you can ask another question. The schoolyard comes back to you for a moment: people laughing, unfastened gates, everyone leaving at the end of a lesson.
+                      <<option 'CN'>>
+                      你提起课程，以及在庭院里等候的人们。“安排不一样。”雷米说。“他们付钱。”你问，那你在这里到底算什么。<<He>>朝谷仓另一端瞥了一眼。“照吩咐做事就行。”
+                      <br><br>
+                      “你在那边可不是这样跟我说话的。”雷米理平手套上的一道褶皱。“你在那边也更肯听话。”你还没来得及再问，<<he>>便离开了。庭院一瞬间又浮现在你脑海里：说笑的人，敞开的门，以及上完课就能回家的学员。
+                    <</language>>
+                  <</replace>>
+                <</if>>
+              <</lanLink>><br>
+            <<else>>
+              <<lanLink ['Ask why you are kept here', '问为什么要把你关在这里']>>
+                <<if maplebirch.get('Orchard')?.remy.captive and maplebirch.get('Orchard')?.remy.canTalk>>
+                  <<set $Orchard.remy.last_talk_day to Time.days>>
+                  <<replace '#deadwood-remy-cell-talk'>>
+                    <<language>>
+                      <<option 'EN'>>
+                      Remy tilts <<his>> head. "You've a roof over you, and someone to feed you." <<He>> taps the gate with one gloved finger. "You'd do better thinking about what you can do for me." A worker calls from further down the barn. Remy raises <<his>> hand in answer and leaves. The sound of the keys follows <<him>>.
+                      <<option 'CN'>>
+                      雷米偏了偏头。“你有地方住，也有人喂你。”<<He>>用戴着手套的手指敲了敲栏门。“不如想想，你能为我做些什么。”谷仓深处传来工人的呼喊。雷米抬手回应，走开了。钥匙声也跟着远去。
+                    <</language>>
+                  <</replace>>
+                <</if>>
+              <</lanLink>><br>
+            <</if>>
+            <<lanLink ['Ask what work you will be made to do', '问接下来要做什么']>>
+              <<if maplebirch.get('Orchard')?.remy.captive and maplebirch.get('Orchard')?.remy.canTalk>>
+                <<set $Orchard.remy.last_talk_day to Time.days>>
+                <<replace '#deadwood-remy-cell-talk'>>
+                  <<language>>
+                    <<option 'EN'>>
+                    "You'll be told," Remy says. "Same as everyone else." A farmhand raises a hand further down the barn, holding something <<he>> needs to check. Remy answers with a nod.
+                    <br><br>
+                    <<if $livestock.winter.active>>"It's cold outside. You'll be staying in the barn." You ask whether that means you can rest. "It means the work's inside."<<else>>You glance towards the barn doors. "You'll get some fresh air," <<he>> says, following your gaze. "No need to look so worried."<</if>> <<He>> resumes walking, already calling instructions to someone else.
+                    <<option 'CN'>>
+                    “到时候会告诉你。”雷米说。“跟其他的一样。”谷仓深处的一名工人举起手里的东西，等<<he>>过去查看。雷米点头回应。
+                    <br><br>
+                    <<if $livestock.winter.active>>“外面冷，你会留在谷仓里。”你问，是不是能休息了。“是说活计在里面做。”<<else>>你望向谷仓的大门。“会让你呼吸点新鲜空气的。”<<He>>顺着你的视线看去。“不用那么担心。”<</if>> <<He>>继续往前走，已经在吩咐另一个人做事。
+                  <</language>>
+                <</replace>>
+              <</if>>
+            <</lanLink>><br>
+          <</replace>>
+        <</if>>
+      <</lanLink>><br>
+    <</if>>
+  </div>
+  <<if $Orchard.remy.romance>>
+    <div id='deadwood-remy-cell-break'>
+      <<lanLink ['Say the relationship is over', '提出结束关系']>>
+        <<replace '#deadwood-remy-cell-break'>>
+          <<language>>
+            <<option 'EN'>>You can end the agreement you made outside. <span class='red'>Remy still runs the farm.</span>
+            <<option 'CN'>>你可以结束在外面作出的约定。<span class='red'>雷米仍管着这座农场。</span>
+          <</language>><br>
+          <<lanLink ['End the relationship', '结束关系']>>
+            <<if maplebirch.get('Orchard')?.remy.act('break')>>
+              <<replace '#deadwood-remy-cell-break'>>
+                <<language>>
+                  <<option 'EN'>>"Then we're finished," you call. Remy pauses. "Suit yourself." The keys jingle as <<he>> continues down the barn. <span class='blue'>You no longer consider <<him>> your partner.</span>
+                  <<option 'CN'>>“我们结束了。”你喊道。雷米停了一下。“随你。”钥匙叮当作响，<<he>>继续朝谷仓深处走去。<span class='blue'>你不再把<<him>>当作恋人。</span>
+                <</language>>
+              <</replace>>
+            <</if>>
+          <</lanLink>><br>
+          <<lanLink ['Remain silent', '暂时不说']>>
+            <<replace '#deadwood-remy-cell-break'>><</replace>>
+          <</lanLink>>
+        <</replace>>
+      <</lanLink>><br>
+    </div>
+  <</if>>
+<</widget>>

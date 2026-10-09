@@ -1,6 +1,6 @@
 ### Prerequisites and entrance
 
-Enable **NPCSidebarPortrait** and reload. The vanilla scene must recognise a supported character as present. Romance and a separate portrait-unlock story are unnecessary.
+Enable **NPCSidebarPortrait** and reload. Portraits appear when the vanilla scene recognises a supported character as present.
 
 ### Where and how it appears
 

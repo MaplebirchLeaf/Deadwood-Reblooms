@@ -35,7 +35,7 @@ class PoolParty {
 
   /** 原版围堵与换衣阶段不追加自愿互动。 */
   public get canInteract(): boolean {
-    return this.stage === 'party' && !V.combat && V.exposed <= 0 && V.stress < V.stressmax && !V.gag && !this.kylarRaging;
+    return this.stage === 'party' && !V.replayScene && !V.statFreeze && !V.combat && V.exposed <= 0 && V.stress < V.stressmax && !V.gag && !this.kylarRaging;
   }
 
   public canTogether(name: PoolPartyCompanion): boolean {

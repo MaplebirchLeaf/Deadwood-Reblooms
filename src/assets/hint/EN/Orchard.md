@@ -10,6 +10,14 @@ Enable the Orchard module. At the temple, become a monk or priest and fully clea
 - Both introductions require daylight, unbound arms, suitable clothing and stress below the fainting threshold. Marking out and preparing the ground together takes one hour, using vanilla physique and fatigue effects, and opens five plots at the temple or three at the farm.
 - A previously opened temple orchard stays open when the garden needs clearing again, but you must retain monk or priest rank.
 
+### Time with Alex
+
+In the unlocked farm orchard, invite Alex over while they are doing paperwork during the day. Walk the rows for fifteen minutes to gain a little tending experience, rest by the hedge for twenty minutes to reduce stress and fatigue, or share an unreserved apple for ten minutes. These choices share one daily opportunity and grant a little vanilla affection.
+
+Walks reflect the season and irrigation. Breaks vary with weather, affection and Alex's dominance. Attacks, combat, bound arms and inability to speak block these interactions. They do not produce extra fruit or replace actual orchard work.
+
+Supermarket seeds use the Finance module's merchant payment API and the sidebar payment preference. Without Finance, vanilla cash is used.
+
 ### Clearing more ground
 
 <span class="gold">Six and twelve plots are the orchards' capacity limits. They are not all ready to plant on your first visit.</span> The temple starts with five plots and the farm with three. Use the "Continue clearing" link to clear the next adjoining plot, working along the orchard in order.
@@ -157,3 +165,35 @@ Recent completed supplies to Robin's drinks shop contribute extra weekly sales. 
 With finance enabled and a debit card issued, authorise your orchard worker to collect wages automatically, and meet a separate delivery worker beside the orchard to arrange morning loads. Both start disabled. The same delivery worker returns, charges per load, and keeps the latest collection record; you can stop or resume the arrangement when you meet. After a paid period ends, the first eligible morning charges £250 from the bank before starting a new seven-day period. Missed shifts are not billed retroactively. Insufficient funds or an unavailable card suspend renewal. Dismissing the orchard worker also cancels wage renewal and delivery arrangements.
 
 Deliveries share the manual delivery price (70% of the vanilla price) and the combined limit of 100 fruit per day. Each load costs another £5. Reserved quantities, blood lemons and fruit promised to unexpired pending orders are retained; a load whose gross payment cannot cover the fee is left in storage. Proceeds enter the bank and transport costs appear separately in the ledger. Deliveries grant no PC tending experience or Alex affection. Attacks suspend transport. The worker does not accept contracts, pay bonds or fulfil those contracts for you.
+
+### Remy: riding school and relationship
+
+Remy relationships and captivity dialogue are part of Orchard. Opening orchard land is not required. After the vanilla riding school introduction, **Approach Remy** appears in the normal daytime menu. Closing time, night, combat, fainting and compulsory scenes block the entrance.
+
+- **Conversation:** once daily, ten minutes. Discuss teaching and care after lessons, with vanilla riding skill and speech attitude differences. After witnessing the vanilla farm conflict, challenge Remy's pressure on Alex; planted fruit trees add a response. This costs a little affection and does not count towards courtship conversations. The vanilla mask event unlocks a mask question; captivity unlocks questions about the barn. Enabled, displayed horse ears unlock another topic. Mask, barn and business topics grant no affection. All topics share the daily opportunity.
+- **Apple:** give one unreserved apple from vanilla food storage each day. Ordinary gifts grant a little affection. Mentioning apples grown on Alex's farm after witnessing the conflict grants none. Gifts do not count as conversations or directly unlock romance.
+- **Time together:** after three conversations and twenty vanilla affection, ask for forty-five minutes together. Once daily, with enough time before closing. The weather determines whether you have tea in the office or walk beside the paddock. Talk about the school or enjoy the quiet; after confirming a relationship you may offer your hand. First, later and romantic visits have different dialogue. Responses within the scene spend no additional time and grant no additional affection.
+- **Relationship:** after five conversations, two private visits and thirty affection, you can discuss what you want. Only explicitly accepting the relationship unlocks Remy as a candidate through the framework. Select Remy in Attitudes afterwards if you wish.
+- **Ending the relationship:** available during public visits and captivity visits, with confirmation. This also removes Remy from your selected love interests.
+
+The framework places Remy among important NPCs on the social page, retaining vanilla records and affection. Explicit confirmation still controls romance eligibility. School visits and captivity do not select a love interest for you.
+
+### Business and the farm conflict
+
+**Discuss your other business** reads completed orders for Robin's drinks shop, an outstanding orchard-purpose bank loan and settled ordinary shares in Remy's estate. Topics require the relevant experience. Leveraged positions and unsettled shares do not qualify as holdings. PC chooses to disclose these details; Remy does not know their orders or debts beforehand.
+
+Remy uses the orchard debt to press for a sale, rather than offering to repay it. Estate shares grant neither cheaper lessons nor a truce. Courtesy at the school and a public relationship leave vanilla farm attacks intact. Dates and relationship talks acknowledge the conflict, and gifts do not make Remy support Alex.
+
+After spending time with Remy, tell Alex in the farm orchard. The ten-minute conversation uses the shared daily break opportunity. Promise to keep defending the farm, or insist on choosing your own company; these responses respectively raise or lower affection a little. Alex does not become willing to trust Remy.
+
+### Captivity and returning after escape
+
+After Remy's vanilla cell visit, you can call after them. Prior school acquaintance, a confirmed relationship and whether you pulled away from the petting produce different dialogue. Ask to leave, question the agreement, ask about work or end the relationship. Speech attitude, vanilla obedience and winter arrangements also affect the responses.
+
+Captivity conversations do not count towards school visits or automatically unlock romance. Vanilla obedience, petting, work, locks and escape continue to operate. Ending a relationship does not open the gate.
+
+School visits preserve PC's memories without deciding whether Remy recognises them. A public relationship does not make Remy relinquish control at the farm.
+
+### Reference
+
+The relationship direction draws on `C1.2_Remy.Love.Mod.mod_v0.5.10-1.zip`. Entrances, state and bilingual dialogue are rewritten for the current game and framework. The old package's pregnancy, items and full passage replacements are not imported. Original author: 查查查茶子.

@@ -1,0 +1,129 @@
+:: Deadwood Remy Talk []
+<<effects>>
+<<set $_remy to maplebirch.get('Orchard')?.remy>>
+<<if $_remy?.available and $_remy.canTalk>>
+  <<npc Remy>><<person1>>
+  <div id='deadwood-remy-talk'>
+    <<language>>
+      <<option 'EN'>>
+        "What would you like to know?" Remy asks. <<He>> checks the track before giving you <<his>> attention.
+      <<option 'CN'>>
+        “你想问什么？”雷米问道。<<He>>先看了看跑道，才把注意力转回你身上。
+    <</language>><br><br>
+    <<lanLink ['Ask about nervous riders (0:10)', '问问如何教胆怯的学员 (0:10)']>>
+      <<if maplebirch.get('Orchard')?.remy.act('talk')>>
+        <<npcincr Remy love 1>><<pass 10>>
+        <<replace '#deadwood-remy-talk'>>
+          <<language>>
+            <<option 'EN'>>
+              "Give them something simple to do. Hands here, heels down. Too much thinking makes them pull against the horse." <<He>> straightens a spare rein as <<he>> speaks. "Once they learn to listen, things become much easier." You ask whether <<he>> means the rider or the horse. Remy smiles. "Both."
+              <br><br>
+              <<if currentSkillValue('thighskill') gte 800>>
+                "You've noticed, I imagine. You hardly need the reins these days." <<He>> watches a rider drag their heels up. "Knowing what to do yourself is the easy part. Getting someone else to do it..." <<He>> calls a brief correction across the yard before finishing. "Takes patience."
+              <<else>>
+                <<if $speech_attitude is 'bratty'>>You ask whether the horses ever get tired of being told what to do. "Frequently," Remy says. "Much like their riders."<<elseif $speech_attitude is 'meek'>>You ask what happens if you make a mistake. "Then we correct it," <<he>> says. "It's why you pay for lessons."<<else>>You ask how <<he>> tells when someone is ready. "When I can look away without wondering where they'll end up"<</if>> <<He>> checks the track again, then places the rein back on its hook.
+              <</if>>
+            <<option 'CN'>>
+              “让他们做点简单的事。手放在这里，脚跟向下。想得太多，就会跟马较劲。”<<He>>一边说，一边理直备用的缰绳。“学会听话之后，事情就容易多了。”你问<<he>>说的是学员还是马。雷米笑了。“都一样。”
+              <br><br>
+              <<if currentSkillValue('thighskill') gte 800>>
+                “你应该早就发现了。你现在几乎用不着缰绳。”<<He>>看着一名学员抬起脚跟。“自己知道怎么做，倒是容易。让别人照着做……”<<He>>朝庭院喊了一句简短的纠正，才接着说，“得有耐心。”
+              <<else>>
+                <<if $speech_attitude is 'bratty'>>你问，马难道不会厌烦整天听人发号施令吗。“经常会。”雷米说。“骑马的人也差不多。”<<elseif $speech_attitude is 'meek'>>你问，要是自己做错了怎么办。“那就改过来。”<<He>>说。“不然你付钱上课做什么？”<<else>>你问<<he>>怎么判断学员已经学会了。“我移开视线的时候，不用再担心他们会骑到哪里去。”<</if>> <<He>>又看了一眼跑道，将缰绳挂回钩子上。
+              <</if>>
+          <</language>><<glove 'Remy'>>
+        <</replace>>
+      <</if>>
+    <</lanLink>><br>
+    <<lanLink ['Ask what happens after a lesson (0:10)', '问问下课之后的事 (0:10)']>>
+      <<if maplebirch.get('Orchard')?.remy.act('talk')>>
+        <<npcincr Remy love 1>><<pass 10>>
+        <<replace '#deadwood-remy-talk'>>
+          <<language>>
+            <<option 'EN'>>
+              "The customers go home. The horses don't," Remy says. <<He>> shows you a rub on a saddle flap. "They need brushing, feeding, tack checked. Someone has to do it before the next lot arrive."
+              <br><br>
+              A pupil leaves their reins over the fence. Remy calls them back to put them away. "They always remember the riding. The rest tends to slip their minds." <<He>> looks at you. "If you're interested in keeping animals, learn that part first."
+            <<option 'CN'>>
+              “客人回家，马可不会。”雷米说。<<He>>指给你看鞍翼上磨损的一处。“刷毛、喂食、检查马具。下一批人来之前，总得有人把这些事做完。”
+              <br><br>
+              一名学员把缰绳搭在围栏上。雷米叫住对方，让对方回来收好。“骑马倒是记得，剩下的事就容易忘了。”<<He>>看向你。“真想养动物，就先学会这一部分。”
+          <</language>><<glove 'Remy'>>
+        <</replace>>
+      <</if>>
+    <</lanLink>><br>
+    <<set $_finance to maplebirch.get('Finance')>>
+    <<if $_remy.farmConflict or (maplebirch.get('Robin') and $Orchard.orders_completed gt 0) or ($_finance and ($_finance.sellableShares.RMY ?? 0) gt 0)>>
+      <<lanLink ['Discuss your other business', '谈谈你在别处的事'] 'Deadwood Remy Business'>><</lanLink>><br>
+    <</if>>
+    <<if maplebirch.get('MoreTransformations') and typeof $transformationParts?.horse?.ears is 'string' and isPartEnabled($transformationParts.horse.ears)>>
+      <<lanLink ['Ask about your horse ears (0:10)', '问起自己的马耳朵 (0:10)']>>
+        <<if maplebirch.get('Orchard')?.remy.act('talk')>>
+          <<npcincr Remy love 1>><<pass 10>>
+          <<replace '#deadwood-remy-talk'>>
+            <<language>>
+              <<option 'EN'>>
+                You move your hair aside and ask whether Remy has noticed your ears. <<He>> looks at them, then at you. "I had. I was waiting for you to mention them." A horse nudges the gate behind <<him>>. "Do they turn towards a sound before you notice it?"
+                <br><br>
+                <<if $speech_attitude is 'bratty'>>You ask whether <<he>> charges extra for pupils who come with their own tack. "Only if they chew it."<<elseif $speech_attitude is 'meek'>>You ask whether the other pupils will mind. "They've paid to watch their own horses. Remind them of that if necessary."<<else>>You ask whether it changes anything about the lessons. "Your seat matters more than your ears. We can work on that."<</if>>
+                <<if $remySeen.includes('livestock')>><br><br><span class='purple'>You keep your head beyond the reach of <<his>> glove.</span><</if>>
+              <<option 'CN'>>
+                你拨开头发，问雷米有没有注意到你的耳朵。<<He>>看了看它们，又看向你。“注意到了。我在等你自己提起。”<<His>>身后，一匹马用鼻子拱了拱门。“听见声音时，它们会不会比你先转过去？”
+                <br><br>
+                <<if $speech_attitude is 'bratty'>>你问，自带马具的学员要不要加钱。“只要不把它嚼坏，就不用。”<<elseif $speech_attitude is 'meek'>>你问，其他学员会不会介意。“他们付钱是来看自己骑的马。必要的话，提醒他们一声。”<<else>>你问，这会不会影响上课。“比起耳朵，你坐得稳不稳更要紧。这个我们可以练。”<</if>>
+                <<if $remySeen.includes('livestock')>><br><br><span class='purple'>你没有让脑袋靠近<<his>>手套。</span><</if>>
+            <</language>><<glove 'Remy'>>
+          <</replace>>
+        <</if>>
+      <</lanLink>><br>
+    <</if>>
+    <<if $remy_mask and ['saved', 'fallen', 'kicked'].includes($avery_fate)>>
+      <<lanLink ['Ask whether the mask is uncomfortable (0:10)', '问面具戴着难不难受 (0:10)']>>
+        <<if maplebirch.get('Orchard')?.remy.act('talk')>>
+          <<pass 10>>
+          <<replace '#deadwood-remy-talk'>>
+            <<language>>
+              <<option 'EN'>>
+                Remy touches the lower edge of the mask. "There are worse inconveniences." You wait, but <<he>> offers no explanation. A hoof strikes a stable door, and <<he>> turns towards the sound.
+                <br><br>
+                <<if $speech_attitude is 'bratty'>>"Does it frighten the horses?" you ask. "The horses have better manners than some of my customers."<<elseif $speech_attitude is 'meek'>>You apologise for staring. "Then stop," <<he>> says, before smoothing <<his>> glove.<<else>>You ask if <<he>> would prefer you not mention it. "I would."<</if>> <<if $Orchard.remy.romance>><<His>> voice lowers. "We can talk about something else."<</if>>
+              <<option 'CN'>>
+                雷米碰了碰面具下缘。“比这难受的事还有的是。”你等了一会儿，<<he>>却没有继续解释。马蹄敲响厩门，<<he>>循声转过头。
+                <br><br>
+                <<if $speech_attitude is 'bratty'>>“不会吓着马吗？”你问。“马倒是比某些客人更懂礼貌。”<<elseif $speech_attitude is 'meek'>>你为刚才一直盯着看道歉。“那就别看了。”<<He>>说着，理了理手套。<<else>>你问<<he>>是不是不愿意提起这件事。“是。”<</if>> <<if $Orchard.remy.romance>><<His>>声音低了一些。“换个话题吧。”<</if>>
+            <</language>>
+          <</replace>>
+        <</if>>
+      <</lanLink>><br>
+    <</if>>
+    <<if $remySeen.includes('livestock')>>
+      <<lanLink ['Ask about the barn (0:10)', '问起那座谷仓 (0:10)']>>
+        <<if maplebirch.get('Orchard')?.remy.act('talk')>>
+          <<pass 10>>
+          <<replace '#deadwood-remy-talk'>>
+            <<language>>
+              <<option 'EN'>>
+                You ask whether the gates at <<his>> farm are still kept locked. Remy stops straightening the rein. "We keep quite a few gates. It wouldn't do to leave them all open."
+                <br><br>
+                <<if $speech_attitude is 'bratty'>>"I'm talking about the ones with people behind them."<<elseif $speech_attitude is 'meek'>>"I mean the barn," you say, keeping your voice low.<<else>>You describe the straw and the bucket, watching <<his>> face.<</if>> <<He>> sets the rein down. "This is a riding school. The next lesson starts shortly." <<He>> gestures towards the open courtyard. You hear a group of pupils approaching.
+                <br><br><span class='purple'>Remy has not answered your question.</span>
+              <<option 'CN'>>
+              你问，<<his>>农场的门是不是仍旧锁着。雷米停下整理缰绳的动作。“那里有不少门。总不能全开着。”
+                <br><br>
+                <<if $speech_attitude is 'bratty'>>“我说的是后面关着人的那些。”<<elseif $speech_attitude is 'meek'>>“我指的是谷仓。”你压低声音。<<else>>你提起稻草和水桶，留意着<<his>>表情。<</if>> <<He>>放下缰绳。“这里是骑术学校。下一节课就要开始了。”<<He>>朝敞开的庭院示意。一群学员正走过来。
+                <br><br><span class='purple'>雷米没有回答你的问题。</span>
+            <</language>>
+          <</replace>>
+        <</if>>
+      <</lanLink>><br>
+    <</if>>
+  </div>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      Remy is busy. You have missed the chance to talk today.
+    <<option 'CN'>>
+      雷米正在忙。今天的交谈机会已经过去了。
+  <</language>>
+<</if>>
+<<deadwood-remy-return>>

@@ -25,16 +25,6 @@ class LifeSimulation extends Module {
   }
 
   public override preInit(): void {
-    this.core.on(':variable', () => {
-      const npc = this.coach.npc;
-      if (!npc) return;
-      for (const key of ['gym_advice_day', 'gym_plan', 'gym_guided_day', 'gym_training', 'gym_last_day']) {
-        const previous = key.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase());
-        if (!Object.hasOwn(npc, previous)) continue;
-        if (Object.hasOwn(npc, key)) this.migration.utils.remove(npc, previous);
-        else this.migration.utils.move(npc, previous, key);
-      }
-    });
     super.preInit();
     Achievements.add(this.core, 'LifeSimulation');
     this.pool_party.preInit();

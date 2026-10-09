@@ -2,12 +2,12 @@
 
 import { MEDICINES } from '../../module/LifeSimulation/Medicine';
 
-export default function Medicine(core: typeof maplebirch): void {
-  const medicine = () => core.get('LifeSimulation')!.medicine;
+export default function Medicine(maplebirch: typeof window.maplebirch): void {
+  const medicine = () => maplebirch.get('LifeSimulation')!.medicine;
 
-  core.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-medicine-shop'], passage: 'Pharmacy' });
+  maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-medicine-shop'], passage: 'Pharmacy' });
 
-  core.tool.patch.traits.add(
+  maplebirch.tool.patch.traits.add(
     ...MEDICINES.flatMap(item => [
       {
         title: 'Medicinal Traits',
@@ -34,7 +34,7 @@ export default function Medicine(core: typeof maplebirch): void {
       }
     ])
   );
-  core.tool.inject({
+  maplebirch.tool.inject({
     locationPassage: {
       "Doctor Harper's Office": [
         // 已敲门并载入哈珀，原版诊疗事件尚未开始。中英文共用这个逻辑锚点。

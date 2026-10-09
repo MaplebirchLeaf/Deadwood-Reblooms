@@ -1,6 +1,6 @@
 ### Prerequisites and suggested route
 
-Enable **Robin** and reload. Business begins at vanilla stalls without property ownership or romance. Injuries, disappearance, asylum status and schedules affect availability.
+Enable **Robin** and reload. Business begins at vanilla stalls. Injuries, disappearance, asylum status and schedules affect availability.
 
 Suggested order: **stall clues → bedroom upgrades → both stalls complete → tutoring and reserves → shop application → opening → own rent → shared rent / resistance**. Fishing, balloons and dates have separate unlocks.
 

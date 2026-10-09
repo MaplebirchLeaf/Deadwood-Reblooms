@@ -2,17 +2,17 @@
 
 import { slotSymbols } from '../../../module/LifeSimulation/Casino/SlotMachine';
 
-export default function SlotMachine(core: typeof maplebirch): void {
-  core.tool.inject({
+export default function SlotMachine(maplebirch: typeof window.maplebirch): void {
+  maplebirch.tool.inject({
     locationPassage: {
       Arcade: [{ src: '<<set _kylarLocation to getKylarLocation()>>', applybefore: '<<deadwood-slot-entry>>\n\t\t', expected: 1 }]
     }
   });
 
-  core.tool.macro.defineS('deadwood-slot-machine', () => {
-    const slots = core.get('LifeSimulation')?.casino.slots;
+  maplebirch.tool.macro.defineS('deadwood-slot-machine', () => {
+    const slots = maplebirch.get('LifeSimulation')?.casino.slots;
     if (!slots) return;
-    const currentPassage = core.passage.title;
+    const currentPassage = maplebirch.passage.title;
     const root = document.createElement('div');
     root.id = 'deadwood-slot-machine';
     const reels = document.createElement('div');
@@ -27,9 +27,9 @@ export default function SlotMachine(core: typeof maplebirch): void {
     spin.addEventListener('click', () => {
       if (spin.disabled || !slots.canPlay) return;
       spin.disabled = true;
-      core.SugarCube.Wikifier.wikifyEval('<<deadwood-slot-spin>>');
+      maplebirch.SugarCube.Wikifier.wikifyEval('<<deadwood-slot-spin>>');
       // 时间事件若已带走玩家，不把强制事件覆盖成机台页面。
-      if (core.passage.title === currentPassage) core.SugarCube.Engine.play(currentPassage);
+      if (maplebirch.passage.title === currentPassage) maplebirch.SugarCube.Engine.play(currentPassage);
     });
     const animate = slots.animateNext && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     slots.animateNext = false;
@@ -62,7 +62,7 @@ export default function SlotMachine(core: typeof maplebirch): void {
       }
     });
     const showResult = () => {
-      result.replaceChildren(core.SugarCube.Wikifier.wikifyEval('<<deadwood-slot-result>>'));
+      result.replaceChildren(maplebirch.SugarCube.Wikifier.wikifyEval('<<deadwood-slot-result>>'));
       spin.disabled = !slots.canPlay;
     };
     result.textContent = lanSwitch('The three reels wait behind the glass.', '三条转轮静静地停在玻璃后。');

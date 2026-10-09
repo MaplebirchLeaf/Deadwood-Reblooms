@@ -243,9 +243,9 @@ class Robin extends Module implements RobinFacade {
       const getLocation = window.getRobinLocation;
       window.getRobinLocation = () => {
         const location = getLocation();
+        if (!this.available || V.robinlocationoverride?.during?.includes(Time.hour)) return location;
         if (
           location === 'orphanage' &&
-          !V.robinlocationoverride?.during?.includes(Time.hour) &&
           Weather.precipitation === 'rain' &&
           Time.isWeekEnd() &&
           Time.hour >= 9 &&

@@ -1,0 +1,178 @@
+:: Deadwood Orchard Alex []
+<<set $outside to 1>><<farm_work_update>><<effects>>
+<<set $_orchard to maplebirch.get('Orchard')>>
+<<if $_orchard?.canTalkAlex>>
+  <<npc Alex>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+    Alex comes out with a pencil still tucked behind <<his>> ear. "Everything all right?" <<He>> looks over the trees, then back at you. "Ah. You wanted company. That's a better sort of interruption."
+    <<option 'CN'>>
+    艾利克斯走出来，耳后还夹着一支铅笔。“都还好吧？”<<He>>先看了一圈果树，才回头看你。“噢，你是想找人陪陪。这样打断我倒挺好。”
+  <</language>><br><br>
+  <div id='deadwood-orchard-alex'>
+    <<if $_orchard.remy.farmConflict and ($Orchard.remy.visits gt 0 or $Orchard.remy.dates gt 0 or $Orchard.remy.romance)>>
+      <<lanLink ['Tell Alex you have been seeing Remy (0:10)', '告诉艾利克斯你在与雷米来往 (0:10)']>>
+        <<farm_work_update>>
+        <<if maplebirch.get('Orchard')?.canTalkAlex>>
+          <<set $Orchard.alex_talk_day to Time.days>><<pass 10>>
+          <<set $_alex_remy_answered to false>>
+          <<replace '#deadwood-orchard-alex'>>
+            <<language>>
+              <<option 'EN'>>
+                Alex takes the pencil from behind <<his>> ear. "Remy?" You explain that you met at the riding school. <<if $Orchard.remy.romance>>You tell <<him>> about the relationship, too. Alex looks away, pressing the pencil against <<his>> palm.<<else>>Alex waits until you have finished, without looking back at the trees.<</if>>
+                <br><br>
+                "I know what <<nnpc_he 'Remy'>> looks like when <<nnpc_he 'Remy'>> wants something." <<His>> voice rises, and <<he>> lowers it again. "You were here. You saw what <<nnpc_he 'Remy'>> did. A nice afternoon doesn't wipe that out."
+                <br><br>
+                <<if C.npc.Alex.dom gte 20>>"I'm not having <<nnpc_him 'Remy'>> walk through here because <<nnpc_he 'Remy'>> smiles at you."<<else>>"I've worked too hard to keep this place. Don't let <<nnpc_him 'Remy'>> use you to get at it."<</if>>
+              <<option 'CN'>>
+                艾利克斯取下耳后的铅笔。“雷米？”你解释说，是在骑术学校见的。<<if $Orchard.remy.romance>>你也说了你们正在交往。艾利克斯移开目光，将铅笔抵在掌心。<<else>>艾利克斯等你说完，没有再回头看那些果树。<</if>>
+                <br><br>
+                “<<nnpc_He 'Remy'>>想得到什么的时候，我知道<<nnpc_he 'Remy'>>是什么样。”<<His>>声音扬了起来，又压下去。“你当时在这里。你看见<<nnpc_he 'Remy'>>做过什么。跟你客气一个下午，可抹不掉那些事。”
+                <br><br>
+                <<if C.npc.Alex.dom gte 20>>“我不会因为<<nnpc_he 'Remy'>>对你笑一笑，就放<<nnpc_him 'Remy'>>进来。”<<else>>“我费了那么多工夫才守住这里。别让<<nnpc_him 'Remy'>>利用你打这地方的主意。”<</if>>
+            <</language>><br><br>
+            <<lanLink ['Promise to keep defending the farm', '答应继续守住农场']>>
+              <<if !$_alex_remy_answered>>
+                <<set $_alex_remy_answered to true>><<npcincr Alex love 1>>
+                <<replace '#deadwood-orchard-alex'>>
+                  <<language>>
+                    <<option 'EN'>>
+                      You tell Alex that the land and the orchard are staying here. <<He>> watches your face, then puts the pencil back behind <<his>> ear. "Good. Then that's what we keep doing." <<He>> looks towards the fence. "You'll be here when they come?" You say you will. <span class='green'><<He>> believes you mean it.</span>
+                    <<option 'CN'>>
+                      你告诉艾利克斯，土地和果园都会留在这里。<<He>>看着你的脸，才把铅笔夹回耳后。“好。那我们就继续守着。”<<He>>望向围栏。“他们来的时候，你会在吧？”你说会。<span class='green'><<He>>相信你会说到做到。</span>
+                  <</language>><<glove 'Alex'>>
+                <</replace>>
+              <</if>>
+            <</lanLink>><<glove 'Alex'>><br>
+            <<lanLink ['Insist that you will choose who you see', '坚持自己决定与谁来往']>>
+              <<if !$_alex_remy_answered>>
+                <<set $_alex_remy_answered to true>><<npcincr Alex love -1>>
+                <<replace '#deadwood-orchard-alex'>>
+                  <<language>>
+                    <<option 'EN'>>
+                      "I can't make you choose." Alex turns the pencil between <<his>> fingers. "But don't ask me to trust <<nnpc_him 'Remy'>>." <<He>> heads back towards the farmhouse. <span class='purple'>You have kept your choice. Alex has kept <<his>> doubts.</span>
+                    <<option 'CN'>>
+                      “我没法替你选。”艾利克斯用手指转着铅笔。“但别要我信任<<nnpc_him 'Remy'>>。”<<He>>转身走向农舍。<span class='purple'>你保留了自己的选择，艾利克斯也没有放下疑虑。</span>
+                  <</language>><<llove 'Alex'>>
+                <</replace>>
+              <</if>>
+            <</lanLink>><<llove 'Alex'>><br>
+          <</replace>>
+        <</if>>
+      <</lanLink>><br>
+    <</if>>
+    <<lanLink ['Walk the rows together (0:15)', '一起沿树行走走 (0:15)']>>
+      <<farm_work_update>>
+      <<if maplebirch.get('Orchard')?.canTalkAlex>>
+        <<set $Orchard.alex_talk_day to Time.days>>
+        <<tending 1>><<tiredness 1>><<npcincr Alex love 1>><<pass 15>>
+        <<replace '#deadwood-orchard-alex'>>
+          <<language>>
+            <<option 'EN'>>
+            <<if Time.season is 'winter'>>
+              Alex presses <<his>> boot into the ground beside a tree. "Watch for water sitting here. Roots don't like being cold and wet any more than we do." <<He>> crouches to check the bark, brushing a little soil away with <<his>> thumb.
+            <<elseif Time.season is 'spring'>>
+              Alex lifts a branch between two fingers, careful not to knock the buds. "Plenty of flowers isn't a promise. Weather gets the final say." <<He>> shows you where two branches rub together, and marks the spot to deal with later.
+            <<else>>
+              Alex stops at a fork in the branches. "Heavy crop needs room. Leave everything on, and you'll spend the harvest picking small fruit." <<He>> shows you how to spot a crowded branch without breaking off anything healthy.
+            <</if>>
+            <br><br>
+            <<if maplebirch.get('Orchard').irrigated>>
+              "Glad we got the water sorted. Carrying buckets all day would put anyone off." <<He>> follows the channel with you, clearing a fallen leaf from the opening.
+            <<else>>
+              "We'll want the irrigation out this far eventually. One less job to worry about." <<He>> glances towards the farmhouse. "One less excuse for me to sit at that desk, too."
+            <</if>>
+            <br><br>
+            "Couldn't have got all this going alone," <<he>> adds. <<His>> eyes settle on you for a moment before <<he>> straightens the pencil behind <<his>> ear.
+            <<option 'CN'>>
+            <<if Time.season is 'winter'>>
+              艾利克斯用靴尖踩了踩树旁的土地。“留意这里有没有积水。树根跟我们一样，都不喜欢又冷又湿。”<<He>>蹲下检查树皮，用拇指拨开一点泥土。
+            <<elseif Time.season is 'spring'>>
+              艾利克斯用两根手指托起枝条，小心避开花芽。“花多也不代表一定能丰收。最后还得看天气。”<<He>>指给你看两根互相摩擦的枝条，在那里做了个记号，留待以后处理。
+            <<else>>
+              艾利克斯在枝杈前停下。“果子多，也得长得开。什么都舍不得摘，到时候就只能收一堆小果子。”<<He>>教你辨认过于拥挤的枝条，没有折掉健康的树枝。
+            <</if>>
+            <br><br>
+            <<if maplebirch.get('Orchard').irrigated>>
+              “幸好把水的问题解决了。整天提水桶，谁都会嫌烦。”<<He>>陪你沿水道走，清掉堵在口子上的一片落叶。
+            <<else>>
+              “以后得把灌溉接到这里，能少操一份心。”<<He>>望了眼农舍。“也能让我少找一个坐在书桌前的借口。”
+            <</if>>
+            <br><br>
+            “一个人可弄不出这么大一片。”<<He>>又补了一句。视线在你身上停了一会儿，才抬手扶正耳后的铅笔。
+          <</language>><<gtending>><<gtiredness>><<glove 'Alex'>>
+        <</replace>>
+      <</if>>
+    <</lanLink>><<gtending>><<gtiredness>><br>
+    <<lanLink ['Take a break by the hedge (0:20)', '在树篱旁休息 (0:20)']>>
+      <<farm_work_update>>
+      <<if maplebirch.get('Orchard')?.canTalkAlex>>
+        <<set $Orchard.alex_talk_day to Time.days>>
+        <<stress -6>><<tiredness -40>><<npcincr Alex love 1>><<pass 20>>
+        <<replace '#deadwood-orchard-alex'>>
+          <<language>>
+            <<option 'EN'>>
+            <<if Weather.precipitation is 'rain'>>
+              Rain begins dripping through the hedge before you settle. Alex laughs, catches your sleeve and leads you to the lean-to instead. "Good spot. Shame about the roof." <<He>> brushes water from the bench and leaves the dry end for you.
+            <<else>>
+              Alex spreads an old sack on the ground before sitting. "Don't tell the others. They'll think I'm slacking." <<He>> shifts over to make room, stretching <<his>> legs with a sigh. The farmhouse phone rings in the distance. For once, <<he>> lets it.
+            <</if>>
+            <br><br>
+            <<if C.npc.Alex.love gte 50>>
+              "Stay a bit," <<he>> says when you begin to move. <<if C.npc.Alex.dom lte -30>><<His>> hand hovers beside yours. "If you want."<<else>><<He>> pats the space beside <<him>>. "The trees can manage without us for twenty minutes."<</if>>
+            <<else>>
+              Alex asks which part of the work you like best. "Not the paperwork, I hope. I'd hate to lose my only reason for complaining."
+            <</if>>
+            <<option 'CN'>>
+            <<if Weather.precipitation is 'rain'>>
+              你们还没坐好，雨水便开始穿过树篱往下滴。艾利克斯笑着拉了拉你的衣袖，带你去棚下。“地方不错，可惜没个好屋顶。”<<He>>拂去长凳上的水，把干燥的一端留给你。
+            <<else>>
+              艾利克斯铺好一只旧麻袋，才坐下。“别告诉别人，不然他们要说我偷懒了。”<<He>>往旁边挪出空位，叹着气伸直双腿。远处响起农舍的电话声。这一次，<<he>>没有去接。
+            <</if>>
+            <br><br>
+            <<if C.npc.Alex.love gte 50>>
+              你刚要起身，<<he>>便说：“再待会儿。”<<if C.npc.Alex.dom lte -30>><<His>>手停在你的手旁。“你愿意的话。”<<else>><<He>>拍了拍身旁的空位。“少了我们二十分钟，树也不会跑。”<</if>>
+            <<else>>
+              艾利克斯问你最喜欢哪一部分活计。“希望不是记账，不然我连抱怨的理由都没了。”
+            <</if>>
+          <</language>><<lstress>><<ltiredness>><<glove 'Alex'>>
+        <</replace>>
+      <</if>>
+    <</lanLink>><<lstress>><<ltiredness>><br>
+    <<if ($foodstuff.apple?.amount ?? 0) gt ($Orchard.reserve.apple ?? 0)>>
+      <<foodstufficon 'apple'>><<lanLink ['Share an apple (0:10)', '分一个苹果吃 (0:10)']>>
+        <<farm_work_update>>
+        <<if maplebirch.get('Orchard')?.canTalkAlex and ($foodstuff.apple?.amount ?? 0) gt ($Orchard.reserve.apple ?? 0)>>
+          <<set $Orchard.alex_talk_day to Time.days>><<set $foodstuff.apple.amount-->>
+          <<npcincr Alex love 2>><<pass 10>>
+          <<replace '#deadwood-orchard-alex'>>
+            <<language>>
+              <<option 'EN'>>
+              Alex takes the apple and produces a clean pocketknife. "Half each?" <<He>> cuts it over <<his>> palm, offering you the larger piece. Juice runs over <<his>> thumb. "Could do with more lunches like this."
+              <br><br>
+              <<if $Orchard.farm.some(tree => tree?.species is 'apple' and tree.harvests gt 0)>>
+                "Your trees have been doing well." <<He>> looks along the row. "Doesn't taste like a column of figures, does it?"
+              <<else>>
+                "Worth taking a break now and then." <<He>> nods towards the trees. "Even if the work's still there when we get up."
+              <</if>>
+              <<option 'CN'>>
+              艾利克斯接过苹果，拿出一把干净的折刀。“一人一半？”<<He>>托着苹果切开，把大一些的那块递给你。果汁沿拇指淌下来。“午饭能常这样吃就好了。”
+              <br><br>
+              <<if $Orchard.farm.some(tree => tree?.species is 'apple' and tree.harvests gt 0)>>
+                “你那些树长得不错。”<<He>>沿着树行望过去。“吃起来可不像账本上那一列数字，是吧？”
+              <<else>>
+                “偶尔歇歇也不错。”<<He>>朝果树点点头。“就算站起来以后，活还是一样多。”
+              <</if>>
+            <</language>><<glove 'Alex'>>
+          <</replace>>
+        <</if>>
+      <</lanLink>><br>
+    <</if>>
+  </div>
+<<else>>
+  <<language>>
+    <<option 'EN'>>Alex cannot leave the farm work right now, or you have already spent your break together today.
+    <<option 'CN'>>艾利克斯现在离不开手头的工作，或者你们今天已经一起休息过了。
+  <</language>>
+<</if>>
+<br><br><<lanLink ['Return to the orchard', '返回果园'] 'Deadwood Reblooms Orchard'>><<endevent>><<set $eventskip to 1>><</lanLink>><br>

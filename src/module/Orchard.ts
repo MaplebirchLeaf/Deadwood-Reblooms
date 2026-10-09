@@ -3,6 +3,7 @@
 import Achievements from './Achievements';
 import Module from './Module';
 import type Robin from './Robin';
+import Remy from './Orchard/Remy';
 import trade from '../assets/orchard/trade.json';
 import {
   species,
@@ -74,6 +75,7 @@ interface OrchardSale {
 }
 
 interface OrchardState {
+  remy: typeof Remy.defaults;
   site: OrchardSite;
   tool: OrchardTool;
   selected: number;
@@ -91,6 +93,7 @@ interface OrchardState {
   regular_visits: number;
   regular_favourite: OrchardFruit | null;
   alex_delivery_day: number;
+  alex_talk_day: number;
   sales: OrchardSale[];
   reserve: Partial<Record<OrchardFruit, number>>;
   sold_day: number;
@@ -122,6 +125,7 @@ interface OrchardState {
 }
 
 const defaults: OrchardState = {
+  remy: clone(Remy.defaults),
   site: 'temple',
   tool: 'water',
   selected: 0,
@@ -139,6 +143,7 @@ const defaults: OrchardState = {
   regular_visits: 0,
   regular_favourite: null,
   alex_delivery_day: -1,
+  alex_talk_day: -1,
   sales: [],
   reserve: {},
   sold_day: -1,
@@ -159,6 +164,7 @@ const defaults: OrchardState = {
 };
 
 class Orchard extends Module {
+  public readonly remy = new Remy(this);
   /** 只用于下一次界面的操作回执，不参与存档或生长结算。 */
   public notice?: OrchardReceipt;
   public constructor(core: typeof maplebirch) {
@@ -172,6 +178,7 @@ class Orchard extends Module {
   public override preInit(): void {
     super.preInit();
     Achievements.add(this.core, 'Orchard');
+    this.remy.preInit();
     // 天气变化时及时补水。再次读入同一雨天存档不会重触发 onEnter，推进前仍需核对。
     this.core.dynamic.regWeatherEvent(':deadwood-orchard-rain', {
       condition: () => !!V.Orchard && !V.statFreeze,
@@ -225,7 +232,9 @@ class Orchard extends Module {
   }
 
   private get canTrade(): boolean {
-    return V.exposed <= 0 && V.stress < V.stressmax && V.combat !== 1 && !V.gag && !window.pcAreArmsBound('both') && (this.available('farm') || this.available('temple'));
+    return (
+      !V.statFreeze && !V.replayScene && V.exposed <= 0 && V.stress < V.stressmax && V.combat !== 1 && !V.gag && !window.pcAreArmsBound('both') && (this.available('farm') || this.available('temple'))
+    );
   }
 
   public requestOrder(type: 'lemon' | 'orange'): boolean {
@@ -441,7 +450,7 @@ class Orchard extends Module {
   }
 
   public get canWork(): boolean {
-    return Weather.dayState !== 'night' && V.exposed <= 0 && V.stress < V.stressmax && !window.pcAreArmsBound('both');
+    return !V.statFreeze && !V.replayScene && V.combat !== 1 && Weather.dayState !== 'night' && V.exposed <= 0 && V.stress < V.stressmax && !window.pcAreArmsBound('both');
   }
 
   public get farmInterrupted(): boolean {
@@ -455,6 +464,20 @@ class Orchard extends Module {
 
   public get canAskAlex(): boolean {
     return this.available('farm') && this.canWork && !this.farmInterrupted && V.farm_work?.alex === 'admin' && this.state.help_day < Math.floor(Time.date.timeStamp / 86400);
+  }
+
+  public get canTalkAlex(): boolean {
+    return (
+      this.state.site === 'farm' &&
+      V.location === 'alex_farm' &&
+      C.npc.Alex?.init === 1 &&
+      !V.gag &&
+      this.available('farm') &&
+      this.canWork &&
+      !this.farmInterrupted &&
+      V.farm_work?.alex === 'admin' &&
+      this.state.alex_talk_day !== Time.days
+    );
   }
 
   public get workerWage(): number {
@@ -570,7 +593,14 @@ class Orchard extends Module {
   public buySeed(type: OrchardSpecies): boolean {
     const data = species[type];
     if (!data || data.seedSource !== 'shop' || !data.seedPrice || !setup.foodstuff[type] || this.state.known.includes(type)) return false;
-    if (this.core.passage.title !== 'Supermarket' || Time.dayState === 'night' || Time.hour === 21 || !this.canWork || V.money < data.seedPrice) return false;
+    if (
+      this.core.passage.title !== 'Supermarket' ||
+      Time.dayState === 'night' ||
+      Time.hour === 21 ||
+      !this.canWork ||
+      !(this.core.get('Finance')?.canPay(data.seedPrice, 'shopping') ?? V.money >= data.seedPrice)
+    )
+      return false;
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${data.seedPrice} 'shopping'>>`);
     this.state.seed_expenses += data.seedPrice;
     return this.learn(type);

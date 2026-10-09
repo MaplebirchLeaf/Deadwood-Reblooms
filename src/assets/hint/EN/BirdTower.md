@@ -1,6 +1,6 @@
 ### Requirements
 
-Enable the Bird Tower module. It adds growth, feeding, personality and hunting content for the vanilla Great Hawk and their chicks. Everything happens in the Bird Tower and on the moor, with no extra unlock: earn the Great Hawk's trust and hatch and raise young hawks as usual.
+Enable the Bird Tower module. It adds growth, feeding, personality and hunting content for the vanilla Great Hawk and their chicks. The content takes place in the Bird Tower and on the moor. Earn the Great Hawk's trust, then hatch and raise young hawks to follow their development.
 
 ### Growth stages
 

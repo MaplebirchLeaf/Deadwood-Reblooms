@@ -111,13 +111,13 @@ When the original **public reception ends and you wait for the last lift**, an a
 
 **After the dream:** the shared vision is recorded only after you actually see it. Once Avery has ascended or been saved and is available, you can discuss it privately. The past shown in that dream is not revealed beforehand. The scar, world changes and consequences involving Gwylan remain part of the native successful ceremony.
 
-### Black Raven and Ascended
+### Night Raven and Ascended
 
 After receiving an invitation, reading the construction files and visiting the site, **ask to share in the ceremony** during a private meeting with Avery. You must control the company, or hold a board seat with an active joint-business agreement and three completed supply contracts. This preparation takes ten minutes. You can raise your terms at the blood-moon gathering **from the following day**.
 
 Speak to Avery and Harper before entering the lift, then settle the terms with Remy upstairs. Accept joint ascension, or withdraw your request and keep the original role. Leaving the gathering remains a choice before going upstairs. The wishing stones, restraint, knife, shared dream and native ending still occur. Eligibility does not guarantee success.
 
-With the real stones and a successful ending, you change alongside Avery in **the same ceremony**, receiving the fourth-seat title **Black Raven** and the **Ascended** trait. The counterfeit-stone failure grants neither. There is no second ceremony to obtain them afterwards.
+With the real stones and a successful ending, you change alongside Avery in **the same ceremony**, receiving the fourth-seat title **Night Raven** and the **Ascended** trait. The counterfeit-stone failure grants neither. There is no second ceremony to obtain them afterwards.
 
 - Ascended prevents the daily trauma increase from the elk scar. The scar remains, and other sources of trauma retain their effects.
 - As time actually passes, stress falls by an additional **60 points per hour** and fatigue by **15 points per hour**. Short actions receive proportional recovery. Replays and frozen stats receive none.
