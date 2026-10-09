@@ -42,7 +42,12 @@ export default class Donations {
     V.money -= cash;
     this.finance.core.SugarCube.Wikifier.wikifyEval(`<<money ${-amount} 'deadwoodDonation' \`{recordOnly: true}\`>>`);
     this.state.total[fund] += amount;
-    if (!anonymous) this.state.named[fund] += amount;
+    if (!anonymous) {
+      const before = Math.floor(this.state.named[fund] / 100000);
+      this.state.named[fund] += amount;
+      const after = Math.floor(this.state.named[fund] / 100000);
+      if (after > before) this.finance.recognition.award('good', `donation-${fund}`, 5);
+    }
     this.state.receipts.push({ fund, amount, anonymous, day: Math.floor(Time.days) });
     if (this.state.receipts.length > 12) this.state.receipts.shift();
     return true;

@@ -1,0 +1,61 @@
+:: Deadwood Reblooms Factory Security Widgets [widget]
+
+<<widget 'deadwood-industry-security-environment'>>
+  <<if _factory_state.security and _factory_state.owned>>
+    <<language>>
+      <<option 'EN'>>
+        <<if _factory_state.overhead_arrears gt 0>>
+          The gatehouse is locked. A notice from the security firm has been pushed through the office letterbox.
+        <<elseif _factory.open>>
+          A guard checks a driver's paperwork before opening the loading gate. The next shift's name is written beneath the patrol times.
+        <<else>>
+          A torch moves along the inside of the fence. The guard stops at the loading door before returning to the gatehouse.
+        <</if>>
+      <<option 'CN'>>
+        <<if _factory_state.overhead_arrears gt 0>>
+          门岗锁着。保安公司的催款通知被塞进办公室的信箱。
+        <<elseif _factory.open>>
+          门岗的保安核对司机的单据，才打开装货门。巡查时间下面写着下一班的名字。
+        <<else>>
+          围栏里面，一束手电光缓缓移动。保安在装货门前停了一会，才返回门岗。
+        <</if>>
+    <</language>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-industry-security-management'>>
+  <<deadwood-card 'Gatehouse and patrols' '门岗与巡查'>>
+    <<language>>
+      <<option 'EN'>>
+        The security firm offers a rotating gatehouse and patrol service. Drivers sign in, loading paperwork is checked, and the yard is watched after the workshop closes.
+        The guards can turn away uninvited callers. They will not fight an armed group for you.
+      <<option 'CN'>>
+        保安公司安排轮班门岗和巡查。司机入厂要登记，装货时核对单据，车间关门后也有人照看院落。
+        没有预约的人会被拦在门外。遇上带武器的一群人，保安不会替你拼命。
+    <</language>><br><br>
+    <<lanSwitch 'Daily service fee: ' '每日服务费：'>><<deadwood-reblooms-finance-money _factory.terms.securityFee>><br>
+    <<language>>
+      <<option 'EN'>>
+        The fee comes from this factory's working funds, alongside site bills. Paid patrols reduce the chance of unsolicited protection and transport demands, but do not prevent accidents or guarantee safe deliveries. Unpaid site bills suspend the service.
+      <<option 'CN'>>
+        服务费与厂房费用一起，从这座工厂的周转金支付。正常巡查会降低上门索取保护费与强塞运输差事的概率，但不能防止事故，也不保证送货安全。厂房费用欠付时，服务暂停。
+    <</language>><br><br>
+    <<if _factory_state.security>>
+      <<refuseicon>><<lanLink ['End the security service (0:05)', '停止安保服务 (0:05)'] 'Deadwood Reblooms Factory Management'>>
+        <<set $Finance.industry.result to maplebirch.get('Finance').industry.secure(false) ? 'ok' : 'failed'>>
+        <<if $Finance.industry.result is 'ok'>><<pass 5>><</if>>
+      <</lanLink>><br>
+    <<else>>
+      <<icon 'industry/security.png'>><<lanLink ['Arrange gatehouse cover (0:15)', '安排门岗与巡查 (0:15)'] 'Deadwood Reblooms Factory Management'>>
+        <<set $Finance.industry.result to maplebirch.get('Finance').industry.secure(true) ? 'ok' : 'failed'>>
+        <<if $Finance.industry.result is 'ok'>><<pass 15>><</if>>
+      <</lanLink>><br>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        Ending the service stops future fees. Outstanding bills remain payable.
+      <<option 'CN'>>
+        停止服务后不再产生新费用，已经欠下的账款仍须支付。
+    <</language>>
+  <</deadwood-card>>
+<</widget>>

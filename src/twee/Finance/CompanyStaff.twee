@@ -1,0 +1,217 @@
+:: Deadwood Reblooms Company Staff Widgets [widget]
+
+<<widget 'deadwood-company-staff-environment'>>
+  <<set _staff to _company.staff>>
+  <<language>>
+    <<option 'EN'>>
+      <<if !_company.open>>
+        The telephone is silent. A strip of light from the corridor falls across the closed files.
+      <<elseif _staff.arrears gt 0>>
+        An unpaid wage slip lies on top of the correspondence. The chair behind it is empty.
+      <<elseif !_staff.working>>
+        The files have been stacked away. Nobody has begun the day's calls.
+      <<else>>
+        <<if _staff.accountant>>
+          Your accountant has separated the delivery receipts from the invoices. A pencil rests beside a figure that needs checking.
+        <</if>>
+        <<if _staff.sales>>
+          Your sales representative finishes a telephone call and writes a delivery date in the enquiries book.
+        <</if>>
+        <<if !_staff.employed>>
+          The telephone sits beside a pile of unanswered enquiries. There is nobody here to take calls while you are away.
+        <</if>>
+      <</if>>
+    <<option 'CN'>>
+      <<if !_company.open>>
+        电话静静放着。走廊里透进来的一线光，落在合拢的文件夹上。
+      <<elseif _staff.arrears gt 0>>
+        一张未付的工资单压在来信上。后面的椅子空着。
+      <<elseif !_staff.working>>
+        文件已经收好，今天的电话还没有开始打。
+      <<else>>
+        <<if _staff.accountant>>
+          会计把收货回执与账单分开放好。一支铅笔搁在需要核对的数字旁。
+        <</if>>
+        <<if _staff.sales>>
+          业务员挂断电话，在询价簿里记下一个交货日期。
+        <</if>>
+        <<if !_staff.employed>>
+          电话旁堆着尚未回复的询价。你不在时，这里没有人接电话。
+        <</if>>
+      <</if>>
+  <</language>><br><br>
+<</widget>>
+
+:: Deadwood Reblooms Company Staff []
+<<deadwood-company-header>><<endevent>>
+<<set _staff to _company.staff>>
+<<if !_company.available or !_company.open or !_company_state.office>><<deadwood-company-return>><<exit>><</if>>
+<h3><<lanSwitch 'Office staff' '办公室职员'>></h3>
+<<language>>
+  <<option 'EN'>>
+    There is room for two more desks against the wall. You unfold a payroll sheet beside the rent receipts. The factory's workers and shift managers remain on their own payroll.
+  <<option 'CN'>>
+    靠墙还放得下两张办公桌。你在租金收据旁摊开工资表。工厂的工人和值班经理，仍由各自厂房发薪。
+<</language>><br><br>
+<<if _company_state.result>>
+  <span @class='_company_state.result === "staff-ok" ? "green" : "red"'>
+    <<if _company_state.result is 'staff-ok'>>
+      <<lanSwitch 'The paperwork is signed.' '手续已经办妥。'>>
+    <<else>>
+      <<lanSwitch 'You cannot complete the arrangement. Check the balance and outstanding bills.' '手续没有办成。请检查余额与未付账款。'>>
+    <</if>>
+  </span><br><br>
+  <<set _company_state.result to null>>
+<</if>>
+<<for _role range _staff.roles>>
+  <<capture _role>>
+    <<deadwood-card `_role === 'accountant' ? 'Accountant' : 'Sales representative'` `_role === 'accountant' ? '会计' : '业务员'`>>
+      <<if _staff.state[_role].employed>>
+        <<print $per_npc['deadwood_company_' + _role].name>> · <<lanSwitch 'Employed' '已聘用'>><br>
+        <<lanSwitch 'Next payday: ' '下次发薪：'>><<deadwood-reblooms-finance-date _staff.state[_role].pay_day>><br>
+      <<else>>
+        <<lanSwitch 'Vacant' '空缺'>><br>
+      <</if>>
+      <<lanSwitch 'Weekly wage: ' '周薪：'>><<deadwood-reblooms-finance-money `_company.terms.staff[_role].weeklyWage`>><br>
+      <<if _staff.state[_role].arrears gt 0>>
+        <span class='red'><<lanSwitch 'Unpaid wages: ' '欠薪：'>></span><<deadwood-reblooms-finance-money _staff.state[_role].arrears 'red'>><br>
+      <</if>>
+      <<icon `'company/' + _role + '.png'`>>
+      <<lanLink [`${_staff.state[_role].employed ? 'Talk about the work' : 'Meet the applicant'} (0:05)`, `${_staff.state[_role].employed ? '谈谈工作' : '见见应聘者'} (0:05)`] 'Deadwood Reblooms Company Employee'>>
+        <<set $Finance.company.staff.selected to _role>><<pass 5>>
+      <</lanLink>><br>
+    <</deadwood-card>>
+  <</capture>>
+<</for>>
+<<language>>
+  <<option 'EN'>>
+    Wages are paid from the bank, one week in advance. Unpaid staff suspend their work, but wages continue to accrue until you end the employment. Dismissal requires all overdue wages and one additional week's pay. Paid weeks are not refunded.
+  <<option 'CN'>>
+    工资从银行预付，每次一周。欠薪时职员暂停工作，但正式解雇前，工资仍会累积。解雇须付清欠薪，并另付一周工资。已经支付的周薪不退还。
+<</language>><br><br>
+<<if _staff.arrears gt 0>>
+  <<icon 'finance/bank-withdraw.png'>><<lanLink ['Pay all overdue wages', '付清职员欠薪'] 'Deadwood Reblooms Company Staff'>>
+    <<set $Finance.company.result to maplebirch.get('Finance').company.staff.pay() ? 'staff-ok' : 'staff-failed'>>
+  <</lanLink>><br>
+<</if>>
+<<deadwood-company-return>>
+
+:: Deadwood Reblooms Company Employee []
+<<deadwood-company-header>><<endevent>>
+<<set _staff to _company.staff>>
+<<set _role to _staff.state.selected>>
+<<if !_company.available or !_company.open or !_company_state.office>><<deadwood-company-return>><<exit>><</if>>
+<<set _employee_key to _staff.key>>
+<<if $per_npc[_employee_key]>>
+  <<loadNPC 0 _employee_key>>
+<<else>>
+  <<generateNPC 1 a>><<saveNPC 0 _employee_key>>
+<</if>>
+<<person1>>
+<h3><<lanSwitch `_role === 'accountant' ? 'Accountant' : 'Sales representative'` `_role === 'accountant' ? '会计' : '业务员'`>></h3>
+<<language>>
+  <<option 'EN'>>
+    <<if $NPCList[0].name_known is 1>>
+      <<print $NPCList[0].name>> pulls a chair up to your desk.
+    <<else>>
+      A <<person>> puts a folded application on your desk. "<<print $NPCList[0].name>>," <<he>> says, pointing to the name at the top.
+    <</if>>
+    <br><br>
+    <<if _staff.state[_role].arrears gt 0>>
+      "Before we talk about next week, there's this." <<He>> sets the unpaid wage slip in front of you. "I can't keep working without being paid."
+    <<elseif _staff.state[_role].employed and !_staff.working>>
+      "I can't arrange anything with the buyers while the office is tied up." <<He>> pushes the outstanding notices across the desk. "You'll need to sort these out first."
+    <<elseif _role is 'accountant'>>
+      <<if _staff.state.accountant.employed>>
+        <<if _company_state.contract?.stage is 'disputed'>>
+          <<He>> matches the invoice to the signed delivery receipt. "They've accepted the goods. I'll need both copies when I ask for the money."
+        <<elseif _company_state.contract?.stage is 'waiting'>>
+          "The reminder has gone in." <<He>> taps the promised payment date. "I'll keep the receipt until the money arrives."
+        <<else>>
+          <<He>> draws a line beneath the expenses column. "The advance isn't profit. Materials and wages still have to come out of it."
+        <</if>>
+      <<else>>
+        "I'll check the receipts and chase overdue invoices," <<he>> says. "If they want a discount, they talk to you. I don't give away your money."
+      <</if>>
+    <<else>>
+      <<if _staff.state.sales.employed>>
+        <<if _company_state.contract?.stage is 'production'>>
+          "They asked about delivery again." <<He>> shows you a note beside the factory's name. "I gave them the date we signed for. Don't promise a second order while this one's still on the floor."
+        <<else>>
+          <<He>> turns the enquiries book towards you. "I can get the next quotation ready sooner. You'll still need to choose a factory and sign it."
+        <</if>>
+      <<else>>
+        "I can keep in touch with the buyers and prepare the quotations," <<he>> says. "Give me the factory's capacity. I won't sell them work you can't finish."
+      <</if>>
+    <</if>>
+  <<option 'CN'>>
+    <<if $NPCList[0].name_known is 1>>
+      <<print $NPCList[0].name>>把椅子拉到你的桌边。
+    <<else>>
+      一位<<person>>把折好的应聘表放在桌上。“<<print $NPCList[0].name>>。”<<he>>说，指了指表头的名字。
+    <</if>>
+    <br><br>
+    <<if _staff.state[_role].arrears gt 0>>
+      “下周的事先放一放，还有这个。”<<He>>把未付的工资单摆到你面前。“不给工资，我没法继续干。”
+    <<elseif _staff.state[_role].employed and !_staff.working>>
+      “办公室这边有麻烦，我没法替你跟客户安排什么。”<<He>>把尚未处理的通知推过桌面。“先把这些解决吧。”
+    <<elseif _role is 'accountant'>>
+      <<if _staff.state.accountant.employed>>
+        <<if _company_state.contract?.stage is 'disputed'>>
+          <<He>>把账单与签过字的收货回执对上。“货已经收了。去要钱时，两份都得带着。”
+        <<elseif _company_state.contract?.stage is 'waiting'>>
+          “催款单已经递过去了。”<<He>>敲敲约好的付款日期。“钱到账之前，回执我会留着。”
+        <<else>>
+          <<He>>在支出栏下面划了一条线。“预付款还不算利润。材料和工资，都得从里面出。”
+        <</if>>
+      <<else>>
+        “我核对收据，催逾期的货款。”<<he>>说。“要打折，让他们找你。我不会替你送人情。”
+      <</if>>
+    <<else>>
+      <<if _staff.state.sales.employed>>
+        <<if _company_state.contract?.stage is 'production'>>
+          “他们又问交货的事了。”<<He>>给你看厂房名字旁的记录。“我说了合同上的日期。这批还在做，别急着再答应一批。”
+        <<else>>
+          <<He>>把询价簿转向你。“下次的报价，我能早点备好。哪座厂房来做，合同签不签，还是得你来定。”
+        <</if>>
+      <<else>>
+        “我联系买家，准备报价。”<<he>>说。“你把厂房能做多少告诉我。做不完的活，我不会替你答应下来。”
+      <</if>>
+    <</if>>
+<</language>><br><br>
+<<set $NPCList[0].name_known to 1>><<saveNPC 0 _employee_key>>
+<<lanSwitch 'Weekly wage: ' '周薪：'>><<deadwood-reblooms-finance-money `_company.terms.staff[_role].weeklyWage`>><br>
+<<if _role is 'accountant'>>
+  <<language>>
+    <<option 'EN'>>
+      With your authorisation, the accountant submits a reminder on a working day when a company invoice is overdue. The full payment follows three days later. This does not collect the factory's other invoices.
+    <<option 'CN'>>
+      授权后，会计会在公司货款逾期后的工作日递交催款单，三天后收回全款。不包括工厂的其它账单。
+  <</language>><br>
+  <<if _staff.accountant>>
+    <<icon 'company/invoice.png'>><<lanLink [`${_staff.state.collection ? 'Handle reminders yourself' : 'Authorise invoice reminders'}`, `${_staff.state.collection ? '自己处理催款' : '授权催收货款'}`] 'Deadwood Reblooms Company Staff'>>
+      <<set $Finance.company.result to maplebirch.get('Finance').company.staff.delegate(!$Finance.company.staff.collection) ? 'staff-ok' : 'staff-failed'>><<endevent>>
+    <</lanLink>><br>
+  <</if>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      A paid sales representative prepares the next company quotation after <span class='blue'><<= _company.terms.salesCooldown>> days</span>, instead of <<= _company.terms.orderCooldown>>. Signed prices and delivery deadlines remain binding.
+    <<option 'CN'>>
+      按时领薪的业务员让下次公司询价的间隔从 <<= _company.terms.orderCooldown>> 天缩短至<span class='blue'><<= _company.terms.salesCooldown>> 天</span>。已经签下的价格与交货期限仍须遵守。
+  <</language>><br>
+<</if>>
+<<capture _role>>
+  <<if _staff.state[_role].employed>>
+    <<refuseicon>><<lanLink ['End the employment and settle the wages (0:10)', '解雇并结清工资 (0:10)'] 'Deadwood Reblooms Company Staff'>>
+      <<set $Finance.company.result to maplebirch.get('Finance').company.staff.employ(_role, false) ? 'staff-ok' : 'staff-failed'>>
+      <<if $Finance.company.result is 'staff-ok'>><<pass 10>><</if>><<endevent>>
+    <</lanLink>><br>
+  <<elseif _company.dealing>>
+    <<icon 'company/staff.png'>><<lanLink ['Hire and pay the first week (0:10)', '聘用并支付首周工资 (0:10)'] 'Deadwood Reblooms Company Staff'>>
+      <<set $Finance.company.result to maplebirch.get('Finance').company.staff.employ(_role, true) ? 'staff-ok' : 'staff-failed'>>
+      <<if $Finance.company.result is 'staff-ok'>><<pass 10>><</if>><<endevent>>
+    <</lanLink>><br>
+  <</if>>
+<</capture>>
+<<getouticon>><<lanLink ['Return to the staff list', '返回职员名单'] 'Deadwood Reblooms Company Staff'>><<endevent>><</lanLink>><br>

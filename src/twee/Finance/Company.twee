@@ -1,0 +1,511 @@
+:: Deadwood Reblooms Company Widgets [widget]
+
+<<widget 'deadwood-company-registration-link'>>
+  <<if !maplebirch.get('Finance').company.state.name and maplebirch.get('Finance').company.available and maplebirch.get('Finance').company.open>>
+    <<icon 'company/registration.png'>><<lanLink ['Ask about registering a business', '询问企业登记'] 'Deadwood Reblooms Company Registration'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-company-office-link'>>
+  <<set _company to maplebirch.get('Finance').company>>
+  <<if _company.state.name and _company.available and _company.open and $officecomplaints lt 10 and !($managerLove gte 10 and _avery_available is 'office unlock')>>
+    <<if _company.state.office>>
+      <<icon 'company/office.png'>><<lanLink ['Go to your office (0:01)', '去自己的办公室 (0:01)'] 'Deadwood Reblooms Company Office'>><<pass 1>><</lanLink>>
+    <<else>>
+      <<icon 'company/lease.png'>><<lanLink ['Ask about renting an office (0:05)', '询问办公室租赁 (0:05)'] 'Deadwood Reblooms Company Lease'>><<pass 5>><</lanLink>>
+    <</if>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-company-header'>>
+  <<set _company to maplebirch.get('Finance').company>>
+  <<set _company_state to _company.state>>
+  <<set $outside to 0>>
+  <<if _args[0] is 'town'>>
+    <<location 'townhall'>>
+  <<elseif $avery_fate is 'ascended'>>
+    <<location 'avery_skyscraper'>>
+  <<else>>
+    <<location 'office'>>
+  <</if>>
+  <<effects>>
+<</widget>>
+
+<<widget 'deadwood-company-return'>>
+  <br><<getouticon>>
+  <<if $Finance.company.office>>
+    <<lanLink ['Return to your office', '返回自己的办公室'] 'Deadwood Reblooms Company Office'>><</lanLink>>
+  <<else>>
+    <<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>><</lanLink>>
+  <</if>><br>
+<</widget>>
+
+<<widget 'deadwood-company-journal'>>
+  <<if $Finance.company.name>>
+    <h2 class='gold'><<print $Finance.company.name>></h2>
+    <ul class='journal'>
+      <li>
+        <<if $Finance.company.office>>
+          <<lanSwitch 'Office rent: ' '办公室周租：'>><<deadwood-reblooms-finance-money `maplebirch.get('Finance').company.terms.weeklyRent`>>
+          · <<deadwood-reblooms-finance-date $Finance.company.rent_day>>
+          <<if $Finance.company.rent_arrears gt 0>>
+            <br><span class='red'><<lanSwitch 'Overdue rent: ' '欠租：'>></span><<deadwood-reblooms-finance-money $Finance.company.rent_arrears 'red'>>
+          <</if>>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              You have registered a business. Office enquiries are handled in the office-building lobby.
+            <<option 'CN'>>
+              企业已登记。办公室租赁可到办公大楼大厅询问。
+          <</language>>
+        <</if>>
+      </li>
+      <li><<lanSwitch 'Completed company contracts: ' '已结清公司订单：'>><span class='green'><<= $Finance.company.completed>></span></li>
+      <<if $Finance.company.contract>>
+        <li>
+          <<switch $Finance.company.contract.stage>>
+            <<case 'production'>>
+              <<language>>
+                <<option 'EN'>>
+                  The factory is making the company's shelving order. Arrange delivery at the yard when it is ready.
+                <<option 'CN'>>
+                  工厂正在生产公司的金属货架订单。完工后到厂房院落安排发货。
+              <</language>>
+            <<case 'disputed'>>
+              <span class='red'>
+                <<language>>
+                  <<option 'EN'>>
+                    The company's payment is overdue. Take the invoice to the accounts desk through your office.
+                  <<option 'CN'>>
+                    公司的货款已逾期。可从自己的办公室带账单去财务处催收。
+                <</language>>
+              </span>
+            <<default>>
+              <<lanSwitch 'Outstanding invoice: ' '待收货款：'>><<deadwood-reblooms-finance-money $Finance.company.contract.due>>
+              · <<deadwood-reblooms-finance-date $Finance.company.contract.pay_day>>
+          <</switch>>
+        </li>
+      <</if>>
+      <<if $Finance.company.agreement>>
+        <li @class='maplebirch.get("Finance").company.partner ? "green" : "red"'>
+          <<if maplebirch.get('Finance').company.partner>>
+            <<language>>
+              <<option 'EN'>>
+                Your joint operating agreement is active. New orders pay a larger advance, and changes to the supply terms require your signature.
+              <<option 'CN'>>
+                共同经营协议生效中。新订单提高预付款，供货条件的变更需要你的签字。
+            <</language>>
+          <<else>>
+            <<language>>
+              <<option 'EN'>>
+                The agreement is suspended. Check your settled AVY holding, office rent and debt notices. Signed orders retain their original terms.
+              <<option 'CN'>>
+                协议暂停生效。请检查已结算的 AVY 持股、办公室租金与追偿欠款。已签订单仍按原条款履行。
+            <</language>>
+          <</if>>
+        </li>
+      <</if>>
+    </ul>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Company Registration []
+<<deadwood-company-header 'town'>>
+<<if _company.available and _company.open and !_company_state.name>>
+  <<language>>
+    <<option 'EN'>>
+      The clerk takes a form from a drawer. "Business name, address for correspondence, and identification. Keep the stamped copy. You'll need it when you sign contracts."
+      You put your identification on the counter. The clerk checks the photograph before returning it.
+    <<option 'CN'>>
+      办事员从抽屉里拿出一张表。“企业名称、通信地址，还有身份证明。盖过章的那份留好，签合同要用。”
+      你把身份证明放在柜台上。办事员核对照片，随后还给你。
+  <</language>>
+  <br><br>
+  <<lanSwitch 'Registration fee: ' '登记费用：'>><<deadwood-reblooms-finance-money _company.terms.registrationFee>><br>
+  <label><<lanSwitch 'Business name: ' '企业名称：'>><<textbox '_company_name' ''>></label><br>
+  <span class='blue'><i>
+    <<language>>
+      <<option 'EN'>>
+        Use 2–40 characters, starting with a letter or number. Spaces, apostrophes, dots and hyphens are allowed. Payment comes from your bank account using a debit card.
+      <<option 'CN'>>
+        名称限 2–40 个字，以文字或数字开头，可用空格、撇号、句点与连字符。凭借记卡从银行账户付款。
+    <</language>>
+  </i></span><br><br>
+  <<icon 'company/registration.png'>><<lanLink ['Submit the form (0:10)', '提交表格 (0:10)'] 'Deadwood Reblooms Company Result'>>
+    <<set $Finance.company.result to _company.register(_company_name) ? 'registered' : 'register-failed'>>
+    <<if $Finance.company.result is 'registered'>><<pass 10>><</if>>
+  <</lanLink>><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      The registration window is unavailable. Business enquiries are taken on weekdays, from 9:00 to 17:00.
+    <<option 'CN'>>
+      现在无法办理企业登记。业务受理时间为工作日 9:00 至 17:00。
+  <</language>>
+  <br>
+<</if>>
+<<getouticon>><<lanLink ['Return to the front desk', '返回前台'] 'Town Hall Wait'>><</lanLink>>
+
+:: Deadwood Reblooms Company Lease []
+<<deadwood-company-header>>
+<<if $officejobintro is 1>>
+  <<generateManager>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<office_manager>> stops beside you. "Here for an assignment?" You show your business registration.
+      "Lettings is further along." <<He>> points down the corridor, then goes back to the agency.
+    <<option 'CN'>>
+      <<office_manager>>在你身旁停下。“来接任务？”你拿出企业登记证明。
+      “租赁在前面。”<<He>>朝走廊一指，随后回了临时工任务发放处。
+  <</language>>
+  <br><br>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    A letting agent unlocks a room off the corridor. There is a desk, two chairs and a telephone. The window faces another office.
+    "The deposit is refundable after the accounts are settled. One week's rent in advance. If building management moves the offices, this lease moves with them."
+    The agent waits while you read the smaller print.
+  <<option 'CN'>>
+    租赁代理打开走廊旁的一间屋子。里面有一张桌子、两把椅子和一部电话，窗外正对着另一间办公室。
+    “结清账目后退押金，租金预付一周。如果管理方迁移办公地点，租约跟着迁。”
+    代理等着你读完下方的小字。
+<</language>>
+<br><br>
+<<lanSwitch 'Deposit: ' '押金：'>><<deadwood-reblooms-finance-money _company.terms.officeDeposit>><br>
+<<lanSwitch 'Weekly rent: ' '每周租金：'>><<deadwood-reblooms-finance-money _company.terms.weeklyRent>><br><br>
+<<if _company.available and _company.open and _company_state.name and !_company_state.office>>
+  <<icon 'company/lease.png'>><<lanLink ['Sign the lease (0:10)', '签订租约 (0:10)'] 'Deadwood Reblooms Company Result'>>
+    <<set $Finance.company.result to _company.lease() ? 'leased' : 'failed'>>
+    <<if $Finance.company.result is 'leased'>><<pass 10>><</if>>
+  <</lanLink>><br>
+<</if>>
+<<deadwood-company-return>>
+
+:: Deadwood Reblooms Company Office []
+<<deadwood-company-header>>
+<<if !_company_state.office>><<deadwood-company-return>><<exit>><</if>>
+<h3><<print _company_state.name>></h3>
+<<language>>
+  <<option 'EN'>>
+    Your stamped registration sits in a drawer beside the rent receipts. You put your folder on the desk. <<if _company.open>>Beyond the door, a trolley rattles past with the post.<<else>>The corridor beyond the door is quiet.<</if>>
+  <<option 'CN'>>
+    盖过章的登记表与租金收据一起放在抽屉里。你把文件夹放上桌，<<if _company.open>>门外传来小推车运送邮件的声音。<<else>>门外的走廊静悄悄的。<</if>>
+<</language>>
+<br><br>
+<<deadwood-company-staff-environment>>
+<<if !_company.available or !_company.open>>
+  <span class='blue'>
+    <<language>>
+      <<option 'EN'>>
+        Business enquiries are taken on weekdays, from 9:00 to 17:00. You cannot arrange a meeting now.
+      <<option 'CN'>>
+        业务受理时间为工作日 9:00 至 17:00，现在无法安排会面。
+    <</language>>
+  </span><br>
+<<else>>
+  <<icon 'company/staff.png'>><<lanLink ['Office staff', '办公室职员'] 'Deadwood Reblooms Company Staff'>><</lanLink>><br>
+  <<if _company_state.rent_arrears gt 0>>
+    <span class='red'><<lanSwitch 'Rent arrears: ' '欠租：'>></span><<deadwood-reblooms-finance-money _company_state.rent_arrears 'red'>><br>
+    <<icon 'finance/bank-withdraw.png'>><<lanLink ['Pay the overdue rent', '结清办公室欠租'] 'Deadwood Reblooms Company Result'>>
+      <<set $Finance.company.result to _company.payRent() ? 'rent' : 'failed'>>
+    <</lanLink>><br>
+  <</if>>
+  <<if _company_state.contract>>
+    <<if _company_state.contract.stage is 'production'>>
+      <<language>>
+        <<option 'EN'>>
+          The workshop has the order. You need to arrange delivery at the yard once production is complete.
+        <<option 'CN'>>
+          订单已经交给车间，完工后需要到厂房院落安排发货。
+      <</language>>
+      <br>
+    <<elseif _company_state.contract.stage is 'disputed'>>
+      <<icon 'company/invoice.png'>><<lanLink ['Take the overdue invoice to accounts (0:05)', '带逾期账单去财务处 (0:05)'] 'Deadwood Reblooms Company Collection'>><<pass 5>><</lanLink>><br>
+    <<else>>
+      <<lanSwitch 'Expected payment: ' '预计回款：'>><<deadwood-reblooms-finance-date _company_state.contract.pay_day>><br>
+    <</if>>
+  <<elseif _company.canOrder>>
+    <<icon 'company/supply-contract.png'>><<lanLink ['Discuss a supply order (0:05)', '洽谈供货订单 (0:05)'] 'Deadwood Reblooms Company Contract'>><<pass 5>><</lanLink>><br>
+  <<else>>
+    <span class='blue'>
+      <<language>>
+        <<option 'EN'>>
+          You need a working metalwork line with no active order, paid wages and site bills, and a clear office account. Ordinary enquiries are at least seven days apart, or five days under the reduced-price agreement.
+        <<option 'CN'>>
+          需要有可开工的金属加工产线、空闲订单位，结清工人工资、厂房费用与办公室账款。普通询价至少间隔七天，降价协议下缩短为五天。
+      <</language>>
+    </span><br>
+  <</if>>
+  <<if _company.meeting and (_company.eligible or _company_state.agreement)>>
+    <<icon 'company/agreement.png'>><<lanLink ['Arrange a business meeting with Avery (0:05)', '约艾弗里商谈合作 (0:05)'] 'Deadwood Reblooms Company Agreement'>><<pass 5>><</lanLink>><br>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      A joint operating agreement requires three settled supply contracts and a settled AVY holding of at least 10% of the current total shares. Avery must be available for the meeting.
+    <<option 'CN'>>
+      商谈共同经营协议需要结清三笔供货订单，已结算的 AVY 持股达到当前总股本的 10%，并且艾弗里能够会面。
+  <</language>>
+  <br><br>
+  <<if !_company_state.contract and !_company.staff.employed and _company.staff.arrears is 0>>
+    <<getouticon>><<lanLink ['End the office lease', '退租办公室'] 'Deadwood Reblooms Company Result'>>
+      <<set $Finance.company.result to _company.close() ? 'closed' : 'failed'>>
+    <</lanLink>><br>
+    <span class='blue'><i>
+      <<language>>
+        <<option 'EN'>>
+          The deposit covers overdue rent first. The unused part of the prepaid week is not refunded.
+        <<option 'CN'>>
+          押金先抵欠租，预付周租未用完的部分不退。
+      <</language>>
+    </i></span><br>
+  <</if>>
+<</if>>
+<<getouticon>><<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>><</lanLink>>
+
+:: Deadwood Reblooms Company Contract []
+<<deadwood-company-header>>
+<<if !_company.canOrder>><<deadwood-company-return>><<exit>><</if>>
+<<set _company_quote to _company.quote>>
+<<language>>
+  <<option 'EN'>>
+    <<if _company_state.completed gt 0>>
+      The purchasing clerk pulls a previous delivery receipt from a folder and checks your business name. "Another shelving order? Ten days, as before."
+    <<else>>
+      The purchasing clerk moves a stack of folders to make room for your sample sheet. "Shelving and lockers. Delivery within ten days."
+    <</if>>
+    You ask when the money arrives. The clerk points to two boxes on the form. "An advance, or a higher price on credit. The delivery date is the same."
+  <<option 'CN'>>
+    <<if _company_state.completed gt 0>>
+      采购员从文件夹里抽出先前的送货回执，核对你的企业名称。“还接货架单？跟上次一样，十天。”
+    <<else>>
+      采购员挪开一叠文件夹，给你的样品单腾出地方。“金属货架和储物柜，十天内交货。”
+    <</if>>
+    你问什么时候付款。采购员指了指表上的两个方框。“预付款，或者提高报价、赊账采购。交货日期一样。”
+<</language>>
+<br><br>
+<<deadwood-card 'Supply terms' '供货条款'>>
+  <<lanSwitch 'Batches: ' '批次：'>><span class='blue'><<= _company_quote.batches>></span><br>
+  <<lanSwitch 'Materials paid at signing: ' '签约时采购原料：'>><<deadwood-reblooms-finance-money _company_quote.materials>><br>
+  <<lanSwitch 'Price with advance: ' '预付方案总价：'>><<deadwood-reblooms-finance-money _company_quote.total>><br>
+  <<lanSwitch 'Advance: ' '预付款：'>><<deadwood-reblooms-finance-money _company_quote.advance>><br>
+  <<lanSwitch 'Credit price: ' '赊账方案总价：'>><<deadwood-reblooms-finance-money `Math.round(_company_quote.total * _company.terms.creditPremium)`>><br>
+  <span class='blue'><i>
+    <<language>>
+      <<option 'EN'>>
+        The advance goes into the selected factory's working funds. The balance falls due two days after delivery. Credit orders fall due after seven days. Materials, wages and stoppages remain your responsibility. Late delivery reduces the total by 5% per day, up to half.
+      <<option 'CN'>>
+        预付款进入所选工厂的周转金，余款交货后两天到期。赊账订单交货后七天到期。原料、工资和停工损失由你承担。迟交每天扣总价的 5%，最多扣去一半。
+    <</language>>
+  </i></span><br>
+  <span class='red'><i>
+    <<language>>
+      <<option 'EN'>>
+        Cancelling requires the advance to be returned, as well as the factory's cancellation fee. Materials already bought are not refunded.
+      <<option 'CN'>>
+        取消订单时必须退还预付款，另付工厂的违约金。已经采购的原料款不退。
+    <</language>>
+  </i></span><br>
+<</deadwood-card>>
+<<for _company_factory range _company.factories>>
+  <<capture _company_factory>>
+    <strong><<print maplebirch.t(maplebirch.get('Finance').industry.terms.sites[_company_factory.site].name)>></strong><br>
+    <<icon 'finance/bank-deposit.png'>><<lanLink ['Sign with an advance (0:10)', '签预付款合同 (0:10)'] 'Deadwood Reblooms Company Result'>>
+      <<set $Finance.company.result to _company.take(_company_factory.site, false) ? 'advance' : 'failed'>>
+      <<if $Finance.company.result is 'advance'>><<pass 10>><</if>>
+    <</lanLink>><br>
+    <<icon 'company/supply-contract.png'>><<lanLink ['Accept credit terms (0:10)', '接受赊账合同 (0:10)'] 'Deadwood Reblooms Company Result'>>
+      <<set $Finance.company.result to _company.take(_company_factory.site, true) ? 'credit' : 'failed'>>
+      <<if $Finance.company.result is 'credit'>><<pass 10>><</if>>
+    <</lanLink>><br><br>
+  <</capture>>
+<</for>>
+<<deadwood-company-return>>
+
+:: Deadwood Reblooms Company Collection []
+<<deadwood-company-header>>
+<<if !_company.available or !_company.open or _company_state.contract?.stage isnot 'disputed'>><<deadwood-company-return>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    The accounts clerk compares your invoice with a delivery receipt. "The goods are here. The transfer hasn't been authorised."
+    You point to the payment date. The clerk takes another form from a tray. "I can put a formal reminder through. Allow three days. Or accept eighty-five percent today and close the account."
+    The telephone rings before you answer. The clerk lets it ring.
+  <<option 'CN'>>
+    财务员把你的账单与送货回执放在一起核对。“货到了，转账还没批。”
+    你指出付款日期。财务员从纸盘里抽出另一张表。“可以提交正式催款，等三天。或者今天收八成五，把这笔账结掉。”
+    你还没回答，电话就响了。财务员没有接。
+<</language>>
+<br><br>
+<<lanSwitch 'Overdue invoice: ' '逾期货款：'>><<deadwood-reblooms-finance-money _company_state.contract.due 'red'>><br><br>
+<<icon 'company/invoice.png'>><<lanLink ['Demand the full payment (0:10)', '要求全额付款 (0:10)'] 'Deadwood Reblooms Company Result'>>
+  <<set $Finance.company.result to _company.collect(false) ? 'demand' : 'failed'>>
+  <<if $Finance.company.result is 'demand'>><<pass 10>><<stress 3>><</if>>
+<</lanLink>><br>
+<<icon 'finance/bank-deposit.png'>><<lanLink ['Take 85% and settle (0:05)', '收取八成五并结清 (0:05)'] 'Deadwood Reblooms Company Result'>>
+  <<set $Finance.company.result to _company.collect(true) ? 'discount' : 'failed'>>
+  <<if $Finance.company.result is 'discount'>><<pass 5>><<stress 2>><</if>>
+<</lanLink>><br>
+<<deadwood-company-return>>
+
+:: Deadwood Reblooms Company Agreement []
+<<deadwood-company-header>>
+<<if !_company.meeting>><<deadwood-company-return>><<exit>><</if>>
+<<npc 'Avery'>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    Avery finishes a line on the screen before turning to you. Your folder lies between you on the desk.
+    <<if isLoveInterest('Avery')>>"Business first, then?" <<He>> glances at the folder and draws it closer.<<else>>"You've brought the figures." <<He>> draws the folder closer.<</if>>
+  <<option 'CN'>>
+    艾弗里处理完屏幕上的一行文字，才转向你。你的文件夹放在桌子中央。
+    <<if isLoveInterest('Avery')>>“先谈生意，是吗？”<<He>>瞥了文件夹一眼，将它拉近。<<else>>“账目带来了。”<<He>>将文件夹拉近。<</if>>
+<</language>>
+<br><br>
+<<if !_company_state.agreement and _company.eligible>>
+  <<language>>
+    <<option 'EN'>>
+      You lay the settled invoices beside your share statement. Avery reads them without speaking.
+      "A higher advance. Joint approval of changes to price and volume." <<He>> taps the draft with a pen. "You want more than a supplier's contract."
+      You leave the draft where it is. Avery reads it again, then writes beside the payment clause.
+      "Half in advance. Existing orders stay as signed. Bring your own copy."
+    <<option 'CN'>>
+      你把结清的账单放在持股证明旁边。艾弗里默不作声地看完。
+      “提高预付款，价格和数量的变更共同签字。”<<He>>用笔点了点草案。“你要的超过一份供货合同了。”
+      你没有收回草案。艾弗里又读了一遍，在付款条款旁写了几笔。
+      “预付一半，旧订单照签过的办。你自己留一份。”
+  <</language>>
+  <br><br>
+  <span class='blue'><i>
+    <<language>>
+      <<option 'EN'>>
+        The agreement covers the company's shelving and locker supply programme. It gives you joint approval of supply terms, subject to your holding of the current total shares.
+      <<option 'CN'>>
+        协议范围为公司的金属货架与储物柜供货业务。你取得供货条款的共同审批权，持股要求按当前总股本检查。
+    <</language>>
+  </i></span><br><br>
+  <<icon 'company/agreement.png'>><<lanLink ['Sign the joint operating agreement (0:15)', '签订共同经营协议 (0:15)'] 'Deadwood Reblooms Company Result'>>
+    <<set $Finance.company.result to _company.agree() ? 'agreed' : 'failed'>>
+    <<if $Finance.company.result is 'agreed'>><<pass 15>><</if>>
+  <</lanLink>><br>
+<<elseif _company.partner and !_company_state.contract and Math.floor(Time.days) gte _company_state.review_day>>
+  <<language>>
+    <<option 'EN'>>
+      Avery places two schedules beside the agreement. "More shelving on the same delivery schedule. Or keep the quantity and reduce the price by ten percent. Purchasing will enquire every five days instead of seven."
+      There is an empty space beside <<his>> signature. <<He>> looks up when you keep your pen capped.
+    <<option 'CN'>>
+      艾弗里把两张计划表放在协议旁。“交货日期不变，多送一半货架。或者数量照旧，价格降一成。采购那边每五天询一次价，不必等七天。”
+      <<His>>签名旁还空着一块。你没有打开笔帽，<<He>>抬起头看向你。
+  <</language>>
+  <br><br>
+  <<icon 'industry/metalwork.png'>><<lanLink ['Approve 50% more volume (0:10)', '同意增加一半供货量 (0:10)'] 'Deadwood Reblooms Company Result'>>
+    <<set $Finance.company.result to _company.review('volume') ? 'volume' : 'failed'>>
+    <<if $Finance.company.result is 'volume'>><<pass 10>><</if>>
+  <</lanLink>><br>
+  <<icon 'pound.png'>><<lanLink ['Approve a 10% price cut (0:10)', '同意降价一成 (0:10)'] 'Deadwood Reblooms Company Result'>>
+    <<set $Finance.company.result to _company.review('price') ? 'price' : 'failed'>>
+    <<if $Finance.company.result is 'price'>><<pass 10>><</if>>
+  <</lanLink>><br>
+  <<socialiseicon 'ask'>><<lanLink ['Refuse both changes (0:10)', '否决两项变更 (0:10)'] 'Deadwood Reblooms Company Result'>>
+    <<set $Finance.company.result to _company.review('standard') ? 'veto' : 'failed'>>
+    <<if $Finance.company.result is 'veto'>><<pass 10>><</if>>
+  <</lanLink>><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      The signed order needs to be settled before another review. Reviews are at least a week apart, and the agreement requires your settled holding to remain at 10%.
+    <<option 'CN'>>
+      签过的订单需要先结清，才能再次审议。审议至少间隔一周，协议还要求已结算持股维持在 10%。
+  <</language>>
+  <br>
+<</if>>
+<<deadwood-company-return>>
+
+:: Deadwood Reblooms Company Result []
+<<deadwood-company-header `['registered', 'register-failed'].includes($Finance.company.result) ? 'town' : 'office'`>>
+<<switch _company_state.result>>
+  <<case 'registered'>>
+    <<language>>
+      <<option 'EN'>>
+        The clerk stamps the form and slides your copy across the counter. You check the name once more before putting it away.
+      <<option 'CN'>>
+        办事员盖好章，把你的那份表格推过柜台。你又核对了一遍名称，才把它收好。
+    <</language>>
+  <<case 'leased'>>
+    <<language>>
+      <<option 'EN'>>
+        The agent counts out the keys beside your signed copy. You open the office yourself. The telephone is silent.
+      <<option 'CN'>>
+        代理把钥匙放在你签好的租约旁。你亲手打开办公室的门，电话还没有响过。
+    <</language>>
+  <<case 'advance'>>
+    <<language>>
+      <<option 'EN'>>
+        The purchasing clerk stamps the order. The advance arrives in the workshop account, and the materials are paid for. You telephone the yard with the delivery date.
+      <<option 'CN'>>
+        采购员在订单上盖章。预付款进入工厂账户，原料款已经付出。你打电话到院子里，交代交货日期。
+    <</language>>
+  <<case 'credit'>>
+    <<language>>
+      <<option 'EN'>>
+        You sign beside the higher price. The workshop pays for the materials. Wages will fall due before the invoice does.
+      <<option 'CN'>>
+        你在较高的报价旁签字。工厂付出了原料款，工资会比货款更早到期。
+    <</language>>
+  <<case 'demand'>>
+    <<language>>
+      <<option 'EN'>>
+        The clerk stamps your reminder and returns a copy. Payment is scheduled in three days. You keep the stamped sheet with the delivery receipt.
+      <<option 'CN'>>
+        财务员在催款单上盖章，退给你一份。付款排在三天后，你把盖章的单据和送货回执放在一起。
+    <</language>>
+  <<case 'discount'>>
+    <<language>>
+      <<option 'EN'>>
+        The reduced payment reaches the workshop account. You mark the invoice settled and cross out the remaining amount.
+      <<option 'CN'>>
+        折价后的货款进入工厂账户。你在账单上写下“结清”，划掉剩余的金额。
+    <</language>>
+  <<case 'agreed'>>
+    <<language>>
+      <<option 'EN'>>
+        Avery signs beneath your name and keeps one copy. "Send changes here before you promise anything to purchasing." You take your copy with you.
+      <<option 'CN'>>
+        艾弗里在你的名字下面签字，留下一份。“答应采购那边之前，把变更送来这里。”你带走自己的那份。
+    <</language>>
+  <<case 'volume', 'price', 'veto'>>
+    <<language>>
+      <<option 'EN'>>
+        <<if _company_state.result is 'veto'>>Avery waits, then puts the unsigned schedules back in the folder. "The old terms, then." Your copy of the agreement stays on the desk.
+        <<else>>Avery countersigns the schedule. You take a copy for the workshop. The change applies to new orders.<</if>>
+      <<option 'CN'>>
+        <<if _company_state.result is 'veto'>>艾弗里等了一会儿，将没有签字的计划表放回文件夹。“那就照旧。”你的那份协议仍放在桌上。
+        <<else>>艾弗里在计划表上签字。你带走一份交给车间，变更从新订单开始生效。<</if>>
+    <</language>>
+  <<case 'rent'>>
+    <<language>>
+      <<option 'EN'>>
+        The agent checks the transfer and clears the overdue entry. You put the receipt in the drawer.
+      <<option 'CN'>>
+        代理核对转账，划去欠租记录。你把收据放进抽屉。
+    <</language>>
+  <<case 'closed'>>
+    <<language>>
+      <<option 'EN'>>
+        You return the keys. The agent checks the rent ledger and returns the remaining deposit to your bank account. You carry your business papers out in a folder.
+      <<option 'CN'>>
+        你交回钥匙。代理核对租金账目，把剩余押金退回银行账户。你用文件夹带走企业的单据。
+    <</language>>
+  <<default>>
+    <span class='red'>
+      <<language>>
+        <<option 'EN'>>
+          The arrangement could not be made. Check the opening hours, identification, funds and outstanding obligations.
+        <<option 'CN'>>
+          这笔业务没能办妥。请核对营业时间、身份证明、可用资金与未结清的款项。
+      <</language>>
+    </span>
+<</switch>><br>
+<<if ['registered', 'register-failed'].includes(_company_state.result)>>
+  <<getouticon>><<lanLink ['Return to the front desk', '返回前台'] 'Town Hall Wait'>><</lanLink>>
+<<else>>
+  <<deadwood-company-return>>
+<</if>>
+<<set _company_state.result to null>>

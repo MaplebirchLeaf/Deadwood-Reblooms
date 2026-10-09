@@ -10,6 +10,8 @@ import CompanyEvents from './Finance/CompanyEvents';
 import Industry, { type IndustryState } from './Finance/Industry';
 import Orphanage, { type OrphanageState } from './Finance/Orphanage';
 import Donations, { type DonationsState } from './Finance/Donations';
+import Recognition, { type RecognitionState } from './Finance/Recognition';
+import Company, { type CompanyState } from './Finance/Company';
 import tradingTerms from '../assets/finance/trading.json';
 import bankingTerms from '../assets/finance/banking.json';
 import securitiesSource from '@/assets/finance/securities.yaml';
@@ -127,6 +129,8 @@ export interface FinanceState {
   industry: IndustryState;
   orphanage: OrphanageState;
   donations: DonationsState;
+  company: CompanyState;
+  recognition: RecognitionState;
   collection: { amount: number; due_day: number; source: 'mortgage' | 'margin' | 'bank' | 'mixed'; destination: 'farm' | 'brothel' | null; extended: boolean; encounter_day: number };
   last_result: string | null;
 }
@@ -231,6 +235,8 @@ const DEFAULT_FINANCE_STATE: FinanceState = {
   industry: Industry.defaults,
   orphanage: Orphanage.defaults,
   donations: Donations.defaults,
+  company: Company.defaults,
+  recognition: Recognition.defaults,
   collection: { amount: 0, due_day: 0, source: 'mortgage', destination: null, extended: false, encounter_day: -1 },
   last_result: null
 };
@@ -242,6 +248,8 @@ class Finance extends Module {
   public readonly industry = new Industry(this);
   public readonly orphanage = new Orphanage(this);
   public readonly donations = new Donations(this);
+  public readonly recognition = new Recognition(this);
+  public readonly company = new Company(this);
   public loanDiscount: () => number = () => 0;
   public readonly realEstate: RealEstate;
 
@@ -347,7 +355,8 @@ class Finance extends Module {
     this.advanceMarketThrough(Finance.currentDay);
   }
 
-  private advanceMarketThrough(day: number, content?: ParentNode): void {
+  public advanceMarketThrough(day: number, content?: ParentNode): void {
+    if (V.replayScene || V.statFreeze || !Number.isInteger(day) || day > Finance.currentDay) return;
     Securities.updatePrices(
       this.state,
       this.securities,
@@ -767,14 +776,18 @@ class Finance extends Module {
     const { brokerage, market } = this.state;
     if (!brokerage.opened || brokerage.dividend_day < 0) return;
     while (brokerage.dividend_day + 7 <= day) {
-      const payment = this.securities.reduce((total, item) => total + Math.floor(brokerage.holdings[item.symbol] * market.prices[item.symbol] * item.weeklyDividendRate), 0);
+      const averyRate = this.company.shareholders.dividend(brokerage.dividend_day + 7);
+      const payment = this.securities.reduce(
+        (total, item) => total + Math.floor(brokerage.holdings[item.symbol] * market.prices[item.symbol] * item.weeklyDividendRate * (item.symbol === 'AVY' ? averyRate : 1)),
+        0
+      );
       brokerage.cash += payment;
       brokerage.dividends += payment;
       // 融券卖出的股票仍属于出借人，分红日需补偿对方，不将卖出款当作可用资金。
       for (const position of brokerage.margin.positions) {
         if (position.kind !== 'stock' || position.side !== -1 || position.opened >= brokerage.dividend_day + 7) continue;
         const item = this.securities.find(item => item.symbol === position.symbol);
-        position.fees += Math.floor(position.units * market.prices[position.symbol] * (item?.weeklyDividendRate ?? 0));
+        position.fees += Math.floor(position.units * market.prices[position.symbol] * (item?.weeklyDividendRate ?? 0) * (position.symbol === 'AVY' ? averyRate : 1));
       }
       brokerage.dividend_day += 7;
     }

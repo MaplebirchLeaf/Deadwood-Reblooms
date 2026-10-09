@@ -219,6 +219,22 @@ class Achievements {
     },
     {
       module: 'Finance',
+      id: 'Deadwood First Factory Payment',
+      title: 'deadwood-reblooms:finance:feat:factory_payment:title',
+      description: 'deadwood-reblooms:finance:feat:factory_payment:description',
+      difficulty: 1,
+      filter: ['All', 'General']
+    },
+    {
+      module: 'Finance',
+      id: 'Deadwood Unpaid Invoice',
+      title: 'deadwood-reblooms:finance:feat:unpaid_invoice:title',
+      description: 'deadwood-reblooms:finance:feat:unpaid_invoice:description',
+      difficulty: 2,
+      filter: ['All', 'General']
+    },
+    {
+      module: 'Finance',
       id: 'Own Keys',
       title: 'deadwood-reblooms:feats:Own Keys:name',
       description: 'deadwood-reblooms:feats:Own Keys:text',

@@ -45,6 +45,56 @@ Markets respond to farm progress and raids, Ocean Breeze Cafe prices, adverts, e
 
 Companies can also receive trading-day reports about orders, customers, costs, equipment and delays. These can be positive or negative. Current reports appear at the securities desk, and a read copy of the Financial Daily preserves its printed reports. Routine trading reports pause while the cafe is closed for construction or Robin’s shop is shut.
 
+### Your business and the office building
+
+At **Town hall front desk → Ask about registering a business**, register with identification for **£1,000**, paid from bank deposits using a debit card. Enquiries are taken on weekdays, **09:00–17:00**. Names must be 2–40 characters.
+
+Then visit **Office-building lobby → Ask about renting an office**. The deposit is **£2,000** and rent is **£350 per week**, with the first week paid at signing. Rent is collected from bank deposits weekly. Unpaid amounts become arrears and suspend new business until paid. Ending the lease deducts arrears from the deposit. Prepaid rent is not refunded. An outstanding company contract prevents ending the lease or selling its factory. The entrance follows the vanilla office relocation to Avery's Elk Street skyscraper.
+
+Your office handles **metal shelving and locker orders**. Choose an operating factory with a metalwork line, at least two workers, morale of at least 20, and no active order, incident, unpaid wages or site bills. It uses the existing working funds and production system.
+
+| Choice                | Payment and cost                                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Advance terms         | 30% paid at signing, with materials bought immediately. Balance paid two days after delivery                   |
+| Credit terms          | 12% higher price, materials funded by the workshop. Payment falls due seven days after delivery and is delayed |
+| Formal reminder       | Visit accounts through your office after the due date. Receive the full balance three days later               |
+| Discounted settlement | Receive 85% of the balance immediately and waive the rest                                                      |
+
+Ordinary orders require **8 batches within 10 days**. Late delivery deducts 5% of the total per day, up to half. Cancellation requires returning the advance and paying a 10% cancellation fee. Materials are not refunded. Payments go to the selected factory. Ordinary enquiries are at least seven days apart.
+
+After **three settled company contracts**, a settled AVY holding of **10% of the current total shares**, and an available operating factory, arrange a meeting with Avery through your office to discuss a **joint operating agreement**. Avery must already know you and be available during working hours. The agreement covers the supply programme, grants joint approval of supply terms, and increases prepaid advances to **50%**.
+
+Review terms once a week: **more volume** raises orders to 12 batches with the same deadline. **A price cut** reduces prices by 10% in return for enquiries every five days. **Refusing both changes** restores the standard 8 batches, price and seven-day interval. Signed orders retain their original terms. Selling or dilution below the holding requirement, office arrears or a debt-recovery notice suspends the agreement until the conditions recover. Ending the lease terminates it.
+
+The traits page displays **Avery's Partner** while these privileges are active. It hides the trait while they are suspended and restores it when you qualify again.
+
+<span class="blue">The holding is measured against total shares. Unsettled same-day purchases and margin positions do not count. Company progress, rent and overdue invoices appear in the journal.</span>
+
+**Office staff:** an accountant costs **£400 per week**, and a sales representative **£350**. Interview and hire them at your office. Their names and appearances persist. Wages are prepaid weekly from the bank. Unpaid staff suspend work, but wages accrue until dismissal. Ending employment requires overdue wages plus one additional week's pay. Prepaid wages are not refunded. Dismiss staff before ending the office lease.
+
+- An authorised accountant submits company invoice reminders on working days. Full payment follows three days later. They cannot waive debts or collect ordinary factory invoices.
+- A paid sales representative reduces the next standard company quotation interval from **seven days to five**. You still select an available factory and sign. Delivery deadlines do not change.
+- Office descriptions reflect opening hours, staffing, unpaid wages and suspended business. Persistent staff are loaded only for face-to-face meetings.
+
+**Factory security:** arrange gatehouse cover and patrols in factory management for **£50 per day per site**, paid from that factory's working funds. Funded cover reduces the weekly chance of unsolicited protection or transport demands from **25% to 10%**. Unpaid site bills suspend cover. Cancellation does not erase outstanding fees. Guards rotate rather than becoming fixed characters. Accidents and damaged materials remain possible.
+
+### Shareholder meetings, subscriptions and control
+
+With **settled AVY shares representing at least 5% of the current total**, enter **Shareholder reception** from the office-building lobby on weekdays, **09:00–17:00**, when Avery is available. Bring identification and an open securities account. Recovery debt, combat or being unable to act normally prevents business. The entrance follows the vanilla relocation to the Elk Street skyscraper.
+
+- **Shareholder meetings:** one meeting every seven days, taking thirty minutes. Propose full dividends, half dividends with half retained, or full retention for expansion. A passed resolution permits one new-share subscription before the next meeting. While an unfinished project needs funds, the other represented votes oppose restoring full dividends. A settled majority lets you pass your proposal yourself.
+- **Board membership:** settle three company supply contracts, hold at least **20% of the current total**, and obtain the seat through a passed meeting resolution. Falling below 20% suspends board rights, which resume if the holding recovers.
+- **New-share subscriptions:** pay **110% of the current market quote**, with each issue limited to **25% of the existing total shares**. Only whole shares are allotted. Payment comes from your bank and enters company funds. Unused change stays in the bank. Total and listed shares both increase, changing all existing ownership percentages.
+- **Control negotiations:** directors may arrange transfers from existing holders. Each block is limited to **10% of the current total**, the remaining unlisted shares and the amount still needed for a majority. Written offers fix the price at **125% of that day's quote** for seven days. Changes to total capital or available shares require fresh checks. Payment goes to the sellers, without increasing company funds or total shares.
+
+<span class="blue">Subscribed and transferred shares follow T+1 settlement. They cannot be sold or used to vote on the purchase day. Margin positions and borrowed shares carry no votes. Control requires strictly more than 50%. Exactly 50% is not a majority. Once you control the company, random announcements no longer issue or buy back AVY shares without a vote.</span>
+
+**Skyscraper financing:** once the vanilla project exists, directors or controlling shareholders may review its budget at reception. Allocations use company funds from subscriptions and retained profits, without a second charge to personal deposits. Foundation, structure and finishing reserve **£100,000, £150,000 and £200,000**. Each following working day pays for one extra point of construction, up to ten per stage. The native story milestones at 25%, 60% and 100% still apply. Unspent money returns to company funds when a stage ends or the project closes. The same stage cannot be funded twice.
+
+**Identity and fame:** the first Attributes sentence reflects factory ownership, a trading business, shareholding, board membership or control while preserving the native gender and transformation description. Factory deliveries, orchard contracts, subscriptions and share transfers raise business fame. Cancelling factory orders lowers it. Shareholder meetings raise social fame. Named donations can raise good-deed fame when the cumulative amount crosses each £1,000 threshold. Anonymous donations do not. Each activity can change fame once every seven days, preventing repeated visits from farming it.
+
+<span class="blue">Company votes affect accounts, financing and construction. Avery's love, rage, dominance, romantic requirements and ascension story retain their native rules.</span>
+
 ### Elk Street factory
 
 Enter **Elk Street → Workshop yard**. The office is open **08:00–18:00**. Three sites can be bought separately, allowing three factories at once. Select a site before purchasing, transferring funds or taking orders. Each keeps its own crew, working funds, orders, incidents and debts. Every owned site continues settling its books daily when you leave.
@@ -72,6 +122,11 @@ Rowan can be approached once a day across all sites. Unpaid wages at any factory
 An extra bay costs £90,000 and stops production for five days. A production line costs £20,000 and takes two days, with up to three lines sharing that factory's crew. **Winding up sells the land and equipment for 35% of the original purchase price.** Unpaid wages, site bills, severance and cancellation costs are deducted first, and unpaid invoices pass to the buyer. Resolve incidents before selling and cover any shortfall. Selling cannot erase arrears.
 
 The journal lists each site's work, orders, unpaid invoices and outstanding problems. Cumulative figures appear in mod statistics. Adrian, Marlow and Rowan can have their gender adjusted through vanilla NPC settings.
+
+### Business and trading achievements
+
+- **Open for Business:** produce and deliver a factory order, then receive payment. An advance alone does not count.
+- **Where's My Money?:** a delivered factory order defaults when its invoice is settled.
 
 ### Financial Daily
 

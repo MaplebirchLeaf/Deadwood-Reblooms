@@ -6,7 +6,7 @@ import type Finance from '../Finance';
 
 type Product = 'packaging' | 'crates' | 'metalwork';
 
-interface Order {
+export interface Order {
   id: number;
   product: Product;
   customer: string;
@@ -38,6 +38,7 @@ export interface FactoryState {
   wage_arrears: number;
   overhead_arrears: number;
   manager: boolean;
+  security: boolean;
   automatic: boolean;
   reserve: number;
   maximum_order: number;
@@ -83,6 +84,7 @@ export default class Industry {
     wage_arrears: 0,
     overhead_arrears: 0,
     manager: false,
+    security: false,
     automatic: false,
     reserve: terms.reserve,
     maximum_order: 1500000,
@@ -158,7 +160,12 @@ export default class Industry {
   }
 
   private static dailyCost(state: FactoryState): number {
-    return Math.ceil(state.workers * terms.wage * (state.rush ? 1.5 : 1)) + Math.round(terms.overhead * terms.sites[state.site].multiplier) + (state.manager ? terms.managerWage : 0);
+    return (
+      Math.ceil(state.workers * terms.wage * (state.rush ? 1.5 : 1)) +
+      Math.round(terms.overhead * terms.sites[state.site].multiplier) +
+      (state.manager ? terms.managerWage : 0) +
+      (state.security ? terms.securityFee : 0)
+    );
   }
 
   private static capacity(state: FactoryState): number {
@@ -285,8 +292,12 @@ export default class Industry {
     const order = state.order!;
     const late = Math.max(0, day - order.deadline);
     order.total = Math.round(order.total * Math.clamp(1 - late * 0.05, 0.5, 1));
-    state.invoices.push({ order, pay_day: day + (order.outcome === 'late' ? 7 : 2) });
+    this.finance.company.dispatch(state, order, day);
+    const contract = this.finance.company.state.contract;
+    const payDay = contract?.site === state.site && contract.id === order.id ? contract.pay_day : day + (order.outcome === 'late' ? 7 : 2);
+    state.invoices.push({ order, pay_day: payDay });
     state.delivered++;
+    this.finance.recognition.award('business', 'factory-delivery', 5);
     state.report = { day, event: 'delivered', seen: false, amount: order.total, customer: order.customer };
     state.order = null;
   }
@@ -319,9 +330,12 @@ export default class Industry {
       if (!state.order) return false;
       const order = state.order;
       const penalty = Math.ceil(order.total * terms.risks.cancellation);
-      if (state.cash < penalty) return false;
-      state.cash -= penalty;
+      const refund = this.finance.company.cancellationRefund;
+      if (state.cash < penalty + refund) return false;
+      state.cash -= penalty + refund;
       state.spent += penalty;
+      this.finance.company.cancel(state, order);
+      this.finance.recognition.award('business', 'factory-cancellation', -3);
       state.report = { day: Math.floor(Time.days), event: 'cancelled', seen: false, amount: order.materials, customer: order.customer };
       state.order = null;
       if (state.issue?.type === 'shipment') state.issue = null;
@@ -347,9 +361,17 @@ export default class Industry {
     return true;
   }
 
+  public secure(enabled: boolean): boolean {
+    const state = this.state;
+    if (!this.available || !this.open || !this.ready || typeof enabled !== 'boolean' || state.security === enabled) return false;
+    if (enabled && (state.wage_arrears > 0 || state.overhead_arrears > 0 || state.cash < terms.securityFee)) return false;
+    state.security = enabled;
+    return true;
+  }
+
   public liquidate(): boolean {
     const state = this.state;
-    if (!this.available || !this.open || !state.owned || state.issue || this.saleProceeds < 0) return false;
+    if (!this.available || !this.open || !state.owned || state.issue || this.finance.company.state.contract?.site === state.site || this.saleProceeds < 0) return false;
     const proceeds = this.saleProceeds;
     if (!Number.isSafeInteger(this.finance.state.bank.balance + proceeds)) return false;
     state.spent += state.wage_arrears + state.overhead_arrears + state.workers * terms.wage * 3 + Math.ceil((state.order?.total ?? 0) * terms.risks.cancellation);
@@ -366,6 +388,7 @@ export default class Industry {
       rush: false,
       morale: 60,
       manager: false,
+      security: false,
       automatic: false,
       offers: [],
       order: null,
@@ -402,10 +425,14 @@ export default class Industry {
     if (state.issue?.type === 'haul' && current > state.issue.day + 2) state.issue = null;
     for (const invoice of state.invoices.filter(item => item.pay_day <= current)) {
       const { order } = invoice;
-      if (order.outcome === 'default') state.defaults++;
-      else {
+      if (this.finance.company.settle(state, order)) continue;
+      if (order.outcome === 'default') {
+        state.defaults++;
+        this.finance.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood Unpaid Invoice">>');
+      } else {
         state.cash += order.total;
         state.earned += order.total;
+        this.finance.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood First Factory Payment">>');
       }
       state.report = { day: current, event: order.outcome, seen: false, amount: order.total, customer: order.customer };
     }
@@ -425,7 +452,12 @@ export default class Industry {
     const week = Math.floor(current / 7);
     if (state.offer_week !== week) {
       this.offers(state, current);
-      if (!state.issue && state.workers >= 2 && current >= state.pressure_day && random(1, 100) <= terms.risks.pressureChance) {
+      if (
+        !state.issue &&
+        state.workers >= 2 &&
+        current >= state.pressure_day &&
+        random(1, 100) <= (state.security && state.overhead_arrears === 0 ? terms.risks.guardedPressureChance : terms.risks.pressureChance)
+      ) {
         const type = random(0, 1) === 0 ? 'protection' : 'haul';
         state.issue = { type, cost: type === 'protection' ? terms.risks.protection : 0, day: current, seen: false };
         state.pressure_day = current + terms.risks.cooldown;

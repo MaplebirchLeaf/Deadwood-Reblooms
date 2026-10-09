@@ -300,6 +300,7 @@ class Orchard extends Module {
     V.foodstuff[contract.type].amount -= contract.amount;
     contract.status = 'fulfilled';
     this.state.contracts_completed++;
+    this.core.get('Finance')?.recognition.award('business', 'orchard-contract', 3);
     this.recordSale(contract.type, contract.amount, contract.price * contract.amount, 'farm');
     this.core.SugarCube.Wikifier.wikifyEval(`<<money ${contract.bond} 'farm'>>`);
     this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Alex love 2>>');

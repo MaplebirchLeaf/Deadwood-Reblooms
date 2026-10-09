@@ -3,7 +3,17 @@
 import RowanPortrait from '../NamedNPCSidebarPortrait/Rowan';
 
 export default function Industry(maplebirch: typeof window.maplebirch): void {
-  maplebirch.tool.inject({ locationPassage: { 'Elk Street': [{ src: '<<if $trash_unlocked is 1>>', applybefore: '<<deadwood-industry-street>>\n\t\t', expected: 1 }] } });
+  maplebirch.tool.inject({
+    locationPassage: {
+      'Elk Street': [
+        {
+          src: '<<if $trash_unlocked is 1>>',
+          applybefore: '<<deadwood-industry-street>>\n\t\t',
+          expected: 1
+        }
+      ]
+    }
+  });
   maplebirch.tool.addTo('Journal', 'deadwood-industry-journal');
   maplebirch.npc.add(
     {

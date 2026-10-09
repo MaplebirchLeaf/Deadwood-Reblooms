@@ -798,6 +798,7 @@ class RealEstate {
       this.core.get('Orchard')?.advance(day);
       this.core.get('Robin')?.shop.investment.advance(day);
       this.finance.industry.advance(day);
+      this.finance.company.advance(day);
       this.mortgage.advanceThrough(day);
       this.finance.advanceBankThrough(day);
     }

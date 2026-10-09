@@ -77,6 +77,9 @@ export default class Securities {
       if (item.symbol === 'RDS' && market.robin_shop === false) continue;
       if (CompanyEvents.hash(`capital:${item.symbol}`, day, market.seed) / 0x100000000 >= terms.capitalChance) continue;
       const event = (['share_issue', 'share_buyback', 'share_release', 'share_lockup'] as const)[CompanyEvents.hash(`capital-event:${item.symbol}`, day, market.seed) % 4];
+      const unsettled = finance.brokerage.unsettled;
+      const held = (finance.brokerage.holdings.AVY ?? 0) - (unsettled && day < unsettled.available_day ? (unsettled.shares.AVY ?? 0) : 0);
+      if (item.symbol === 'AVY' && held > finance.market.shares.AVY.total / 2 && (event === 'share_issue' || event === 'share_buyback')) continue;
       // 饮品店的私人合伙份额与罗宾控股约定不因随机公告改变。
       if (item.symbol === 'RDS' && (event === 'share_issue' || event === 'share_buyback')) continue;
       const shares = market.shares[item.symbol];

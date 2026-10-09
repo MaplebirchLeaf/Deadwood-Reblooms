@@ -1,0 +1,330 @@
+:: Deadwood Reblooms Shareholder Widgets [widget]
+
+<<widget 'deadwood-shareholder-lobby-link'>>
+  <<set _shareholders to maplebirch.get('Finance').company.shareholders>>
+  <<if _shareholders.available and maplebirch.get('Finance').company.share gte _shareholders.terms.meetingShare and $officecomplaints lt 10 and !($managerLove gte 10 and _avery_available is 'office unlock')>>
+    <<icon 'company/shareholder-reception.png'>><<lanLink ['Shareholder reception (0:05)', '股东接待处 (0:05)'] 'Deadwood Reblooms Shareholder Office'>><<pass 5>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-company-identity'>>
+  <<if maplebirch.get('Finance') and $Finance>>
+    <<set _identity_company to maplebirch.get('Finance').company>>
+    <<set _identity_board to _identity_company.shareholders>>
+    <<if _identity_board.controller>>
+      <<lanSwitch ', and the ' '，也是'>><span class='green'><<lanSwitch "controlling shareholder of Avery's company" '艾弗里公司的控股股东'>></span>
+    <<elseif _identity_board.director>>
+      <<lanSwitch ', and a ' '，也是'>><span class='teal'><<lanSwitch "director of Avery's company" '艾弗里公司的董事'>></span>
+    <<elseif _identity_company.share gte _identity_board.terms.meetingShare>>
+      <<lanSwitch ', and a ' '，也是'>><span class='blue'><<lanSwitch "shareholder of Avery's company" '艾弗里公司的股东'>></span>
+    <<elseif _identity_company.state.name and (_identity_company.state.office or maplebirch.get('Finance').industry.owned.length)>>
+      <<lanSwitch ', and the owner of ' '，也经营着'>><span class='blue'><<print _identity_company.state.name>></span>
+    <<elseif maplebirch.get('Finance').industry.owned.length>>
+      <<lanSwitch ', and a ' '，也是'>><span class='blue'><<lanSwitch 'factory owner' '厂主'>></span>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-shareholder-header'>>
+  <<deadwood-company-header>><<endevent>>
+  <<set _shareholders to _company.shareholders>>
+  <<set _board_state to _shareholders.state>>
+  <<set _shareholder_access to _shareholders.available and _company.share gte _shareholders.terms.meetingShare>>
+  <<if !_shareholder_access>>
+    <<language>>
+      <<option 'EN'>>
+        <<if !_company.open>>
+          The reception desk is closed.
+        <<else>>
+          The clerk closes the appointments book. "There are no appointments available for you today."
+        <</if>>
+      <<option 'CN'>>
+        <<if !_company.open>>
+          接待处已经关门。
+        <<else>>
+          职员合上会面登记簿。“今天没有能为您安排的会面。”
+        <</if>>
+    <</language>><br><br>
+    <<getouticon>><<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-shareholder-return'>>
+  <br><<getouticon>><<lanLink ['Return to the reception desk', '返回股东接待处'] 'Deadwood Reblooms Shareholder Office'>><<endevent>><</lanLink>><br>
+<</widget>>
+
+<<widget 'deadwood-shareholder-result'>>
+  <<if _company_state.result>>
+    <span @class='_company_state.result === "corporate-ok" ? "green" : "red"'>
+      <<if _company_state.result is 'corporate-ok'>>
+        <<lanSwitch 'The signed documents have been entered in the register.' '签过字的文件已记入登记簿。'>>
+      <<else>>
+        <<lanSwitch 'The transaction could not be completed. Check the funds, approval and current share figures.' '手续未能办成。请检查资金、授权与当前股数。'>>
+      <</if>>
+    </span><br><br>
+    <<set _company_state.result to null>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Shareholder Office []
+<<deadwood-shareholder-header>>
+<<if !_shareholder_access>><<exit>><</if>>
+<h3><<lanSwitch 'Shareholder reception' '股东接待处'>></h3>
+<<language>>
+  <<option 'EN'>>
+    The clerk checks your share statement before giving you a visitor's badge. Behind the desk, folders carry the dates of past meetings. A tray of unsigned papers waits for the next one.
+    <<if _shareholders.controller>>
+      The clerk leaves the budget folder open for your signature. "The chair has been told you've arrived."
+    <<elseif _shareholders.director>>
+      Your name is on the circulation list for the board papers. The clerk hands you a numbered copy.
+    <</if>>
+  <<option 'CN'>>
+    职员核对持股证明，才递给你访客牌。桌后的文件夹标着历次会议的日期，下一次要签的文件放在托盘里。
+    <<if _shareholders.controller>>
+      职员把预算文件摊开，留出签字的位置。“已经通知董事长，您到了。”
+    <<elseif _shareholders.director>>
+      你的名字在董事会文件的传阅名单上。职员递给你一份标着编号的副本。
+    <</if>>
+<</language>><br><br>
+<<deadwood-shareholder-result>>
+<<deadwood-card 'Share register' '股东登记簿'>>
+  <<lanSwitch 'Settled shares: ' '已结算持股：'>><span class='blue'><<= _shareholders.held.toLocaleString()>></span><br>
+  <<lanSwitch 'Current total shares: ' '当前总股本：'>><<= _shareholders.stock.total.toLocaleString()>><br>
+  <<lanSwitch 'Voting share: ' '表决权比例：'>><span class='teal'><<= (_company.share * 100).toFixed(2)>>%</span><br>
+  <<lanSwitch 'Company funds: ' '公司资金：'>><<deadwood-reblooms-finance-money _board_state.treasury>><br>
+  <<language>>
+    <<option 'EN'>>
+      Each ordinary share carries one vote. Borrowed shares and margin positions do not give you votes. Newly acquired shares enter the voting register on the next working day.
+    <<option 'CN'>>
+      每股普通股有一票。借来的股票与保证金仓位不计入你的表决权，新取得的股份在下一工作日结算后才计入。
+  <</language>>
+<</deadwood-card>>
+<<if _shareholders.canMeet>>
+  <<icon 'company/shareholder-meeting.png'>><<lanLink ['Attend the shareholder meeting', '参加股东大会'] 'Deadwood Reblooms Shareholder Meeting'>><</lanLink>><br>
+<<else>>
+  <<lanSwitch 'Next meeting can be arranged on ' '下一次可安排会议的日期：'>><<deadwood-reblooms-finance-date _board_state.next_meeting_day>><br>
+<</if>>
+<<if _board_state.minutes>>
+  <<icon 'company/minutes.png'>><<lanLink ['Read the last meeting minutes', '查看上次会议记录'] 'Deadwood Reblooms Shareholder Minutes'>><</lanLink>><br>
+<</if>>
+<<if _shareholders.canSubscribe>>
+  <<icon 'company/share-subscription.png'>><<lanLink ['Subscribe for new shares', '认购增发股份'] 'Deadwood Reblooms Shareholder Subscription'>><</lanLink>><br>
+<</if>>
+<<if _shareholders.director or _shareholders.controller>>
+  <<icon 'company/tower-budget.png'>><<lanLink ['Skyscraper project budget', '摩天大楼工程预算'] 'Deadwood Reblooms Shareholder Tower'>><</lanLink>><br>
+<</if>>
+<<if _shareholders.canNegotiate>>
+  <<icon 'company/share-transfer.png'>><<lanLink ['Negotiate a share transfer', '洽谈股份转让'] 'Deadwood Reblooms Shareholder Negotiation'>><</lanLink>><br>
+<</if>>
+<<getouticon>><<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>><</lanLink>><br>
+
+:: Deadwood Reblooms Shareholder Meeting []
+<<deadwood-shareholder-header>>
+<<if !_shareholder_access>><<exit>><</if>>
+<<if !_shareholders.canMeet>><<deadwood-shareholder-return>><<exit>><</if>>
+<<set _first_meeting to C.npc.Avery.init isnot 1>>
+<<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    Avery sits at the head of a long table. The clerk reads the names from the share register and puts a financial report in front of each seat.
+    <<if _first_meeting>>
+      "Avery," <<he>> says, offering a hand across the table. "I understand you've taken an interest in my company."
+    <</if>>
+    "The figures are on the first page," Avery says. "Read them before you tell me what to spend."
+    <br><br>
+    <<if _shareholders.controller>>
+      <<He>> pauses at your holding. "You have the votes. I still have a company to run. Put your proposal in writing."
+    <<elseif _company.share gte _shareholders.terms.boardShare and _company_state.completed gte _company.terms.partnerContracts>>
+      Avery puts your delivery record beside the share statement. "A seat on the board. Read the accounts before you turn up."
+    <<else>>
+      "You can ask about the accounts," Avery says. "A holding doesn't make every proposal a decision."
+    <</if>>
+  <<option 'CN'>>
+    艾弗里坐在长桌尽头。职员照着股东登记簿点名，把财务报告放到每个座位前。
+    <<if _first_meeting>>
+      “艾弗里。”<<he>>隔着桌子伸出手。“听说你对我的公司有兴趣。”
+    <</if>>
+    “数字在第一页。”艾弗里说。“先看完，再告诉我该花什么钱。”
+    <br><br>
+    <<if _shareholders.controller>>
+      <<He>>在你的持股数上停了一下。“票在你手里。公司还得有人经营。把提案写下来。”
+    <<elseif _company.share gte _shareholders.terms.boardShare and _company_state.completed gte _company.terms.partnerContracts>>
+      艾弗里把你的交货记录放在持股证明旁。“董事会给你一个位置。来开会之前，把账看完。”
+    <<else>>
+      “账目的事，你可以问。”艾弗里说。“有股份，也不是每份提案都能变成决定。”
+    <</if>>
+<</language>><br><br>
+<<deadwood-card 'Profit and financing proposals' '利润与融资提案'>>
+  <<language>>
+    <<option 'EN'>>
+      The report uses the company's existing weekly dividend basis. Income pays it in full. Reserve pays half and retains half. Expansion retains all of it in company funds.
+      A passed resolution also permits one new-share subscription before the next meeting. The issue is limited to 25% of the current total shares, priced at 110% of the current market quote.
+      <br><br>Avery supports keeping funds for construction. While the unfinished project needs funding, the other represented votes oppose a return to full dividends. A majority holding lets you pass that proposal yourself.
+    <<option 'CN'>>
+      报告沿用公司现有的每周分红基准。分红方案全额派发，储备方案派发一半、留存一半，扩张方案全部留在公司账上。
+      通过决议后，下次会议前可认购一次新股。增发上限为当时总股本的 25%，认购价为当前行情的 110%。
+      <br><br>艾弗里支持为施工留钱。工程尚未完成、仍需筹款时，其余出席股东反对恢复全额分红。取得多数表决权后，你可以让自己的提案通过。
+  <</language>><br><br>
+  <<for _policy range ['reserve', 'expansion', 'income']>>
+    <<capture _policy>>
+      <<icon `_policy === 'expansion' ? 'company/tower-budget.png' : _policy === 'reserve' ? 'industry/funds.png' : 'finance/bank-deposit.png'`>><<lanLink [`Propose ${_policy === 'reserve' ? 'reserves' : _policy === 'expansion' ? 'expansion funding' : 'full dividends'} (0:30)`, `提出${_policy === 'reserve' ? '储备' : _policy === 'expansion' ? '扩张筹资' : '全额分红'}方案 (0:30)`] 'Deadwood Reblooms Shareholder Minutes'>>
+        <<set $Finance.company.result to maplebirch.get('Finance').company.shareholders.meeting(_policy) ? 'corporate-ok' : 'corporate-failed'>>
+        <<if $Finance.company.result is 'corporate-ok'>><<pass 30>><</if>><<endevent>>
+      <</lanLink>><br>
+    <</capture>>
+  <</for>>
+<</deadwood-card>>
+<<deadwood-shareholder-return>>
+
+:: Deadwood Reblooms Shareholder Minutes []
+<<deadwood-shareholder-header>>
+<<if !_shareholder_access>><<exit>><</if>>
+<<deadwood-shareholder-result>>
+<<if _board_state.minutes>>
+  <<set _minutes to _board_state.minutes>>
+  <<lanSwitch 'Meeting date: ' '会议日期：'>><<deadwood-reblooms-finance-date _minutes.day>><br>
+  <<lanSwitch 'Recorded voting share: ' '登记的表决权比例：'>><span class='teal'><<= (_minutes.held / _minutes.total * 100).toFixed(2)>>%</span><br><br>
+  <<lanSwitch 'Proposal: ' '提案：'>>
+  <<if _minutes.policy is 'income'>>
+    <<lanSwitch 'Full dividends' '全额分红'>>
+  <<elseif _minutes.policy is 'reserve'>>
+    <<lanSwitch 'Reserves' '储备'>>
+  <<else>>
+    <<lanSwitch 'Expansion funding' '扩张筹资'>>
+  <</if>><br><br>
+  <<language>>
+    <<option 'EN'>>
+      <<if _minutes.passed>>
+        The clerk has marked the resolution as passed. The finance department will apply it at the next dividend settlement. The new-share subscription authority is attached.
+      <<else>>
+        The votes are recorded beneath your proposal. It did not pass. The previous dividend policy remains in force.
+      <</if>>
+      <<if _shareholders.director>>
+        Your appointment to the board appears in the register. You may review the project budget and negotiate private share transfers while your settled holding remains at least 20%.
+      <</if>>
+    <<option 'CN'>>
+      <<if _minutes.passed>>
+        职员把决议标为通过。财务处会在下次分红结算时执行，后面附着新股认购授权。
+      <<else>>
+        你的提案下面记着表决结果。提案没有通过，继续执行原先的分红方案。
+      <</if>>
+      <<if _shareholders.director>>
+        董事任命已经记入登记簿。已结算持股保持在 20% 以上时，你可以审阅工程预算、洽谈非流通股份转让。
+      <</if>>
+  <</language>><br>
+<</if>>
+<<deadwood-shareholder-return>>
+
+:: Deadwood Reblooms Shareholder Subscription []
+<<deadwood-shareholder-header>>
+<<if !_shareholder_access>><<exit>><</if>>
+<<deadwood-shareholder-result>>
+<<if !_shareholders.canSubscribe>><<deadwood-shareholder-return>><<exit>><</if>>
+<<set _issue_price to _shareholders.placementPrice>>
+<<set _subscription_amount to 100000>>
+<<language>>
+  <<option 'EN'>>
+    The clerk brings out the subscription form. "This money goes into the company. It doesn't buy somebody else's holding. The total number of shares increases, so every existing percentage changes."
+  <<option 'CN'>>
+    职员取出认购表。“这笔钱进公司，不是买走谁手里的股份。总股本会增加，原有持股的比例都会变。”
+<</language>><br><br>
+<<lanSwitch 'Price per new share: ' '每股认购价：'>><<deadwood-reblooms-finance-money _issue_price>><br>
+<<lanSwitch 'Maximum new shares: ' '新股上限：'>><span class='blue'><<= Math.floor(_shareholders.stock.total * _shareholders.terms.placementLimit).toLocaleString()>></span><br>
+<label><<lanSwitch 'Maximum subscription £: ' '认购金额上限 £：'>><<numberbox '_subscription_amount' _subscription_amount>></label><br>
+<<language>>
+  <<option 'EN'>>
+    Payment comes from your bank. Only whole shares are allotted. Any amount insufficient to buy another share stays in your bank. These shares follow the ordinary next-working-day settlement rule.
+  <<option 'CN'>>
+    认购款从你的银行账户支付，只配发整数股。凑不够下一股的零头仍留在银行。股份按普通股票规则，在下一工作日结算。
+<</language>><br><br>
+<<capture _issue_price>>
+  <<icon 'company/share-subscription.png'>><<lanLink ['Sign the subscription (0:15)', '签署认购书 (0:15)'] 'Deadwood Reblooms Shareholder Office'>>
+    <<set $Finance.company.result to maplebirch.get('Finance').company.shareholders.subscribe(Number(_subscription_amount), _issue_price) ? 'corporate-ok' : 'corporate-failed'>>
+    <<if $Finance.company.result is 'corporate-ok'>><<pass 15>><</if>>
+  <</lanLink>><br>
+<</capture>>
+<<deadwood-shareholder-return>>
+
+:: Deadwood Reblooms Shareholder Negotiation []
+<<deadwood-shareholder-header>>
+<<if !_shareholder_access>><<exit>><</if>>
+<<if !_shareholders.canNegotiate>><<deadwood-shareholder-return>><<exit>><</if>>
+<<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    Avery opens a transfer agreement. "The market can't sell you shares that aren't on it. I can ask the existing holders about a private sale. They'll want more than the screen price."
+    <<He>> slides the agreement across the table. "The voting rights are in here. Read the clauses before you sign."
+  <<option 'CN'>>
+    艾弗里翻开股份转让协议。“没挂牌的股份，你在市场上买不到。我可以问问现有股东肯不肯卖。他们要的价，可不止屏幕上的数字。”
+    <<He>>把协议推过来。“表决权写在这里。签字前把条款看完。”
+<</language>><br><br>
+<<if _board_state.offer and Math.floor(Time.days) lte _board_state.offer.expires and _board_state.offer.total is _shareholders.stock.total and _board_state.offer.shares lte _shareholders.stock.total - _shareholders.stock.listed>>
+  <<lanSwitch 'Shares offered: ' '拟转让股份：'>><span class='blue'><<= _board_state.offer.shares.toLocaleString()>></span><br>
+  <<lanSwitch 'Agreed price per share: ' '约定每股价格：'>><<deadwood-reblooms-finance-money _board_state.offer.price>><br>
+  <<lanSwitch 'Purchase price: ' '转让价款：'>><<deadwood-reblooms-finance-money `_board_state.offer.shares * _board_state.offer.price`>><br>
+  <<lanSwitch 'Offer valid through ' '报价有效至：'>><<deadwood-reblooms-finance-date _board_state.offer.expires>><br>
+  <<icon 'company/share-transfer.png'>><<lanLink ['Sign and pay from your bank (0:20)', '签约并从银行付款 (0:20)'] 'Deadwood Reblooms Shareholder Office'>>
+    <<set $Finance.company.result to maplebirch.get('Finance').company.shareholders.accept() ? 'corporate-ok' : 'corporate-failed'>>
+    <<if $Finance.company.result is 'corporate-ok'>><<pass 20>><</if>><<endevent>>
+  <</lanLink>><br>
+<<elseif _board_state.offer>>
+  <span class='red'><<lanSwitch 'This offer has expired or the share register has changed. Request a fresh offer.' '报价已过期，或股东登记簿已有变动。请重新询价。'>></span><br>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    Each offer covers up to 10% of the current total, limited by the remaining unlisted shares and the amount needed for a majority. The price is fixed at 125% of today's quote for seven days. A change in total shares requires a fresh offer.
+    Payment goes to the sellers. The company's total capital and funds do not increase. The shares become transferable after settlement. Selling them later can cost you your majority or board seat.
+  <<option 'CN'>>
+    每次报价最多涉及当前总股本的 10%，受剩余非流通股份与取得多数所需股数限制。价格为当日行情的 125%，固定七天。总股本变化后须重新报价。
+    价款付给卖方，公司的总股本与资金不增加。结算后才能转卖。日后卖出股份，也可能失去控股地位或董事资格。
+<</language>><br><br>
+<<socialiseicon 'ask'>><<lanLink ['Request a written offer (0:15)', '要求书面报价 (0:15)'] 'Deadwood Reblooms Shareholder Negotiation'>><<endevent>>
+  <<set $Finance.company.result to maplebirch.get('Finance').company.shareholders.negotiate() ? 'corporate-ok' : 'corporate-failed'>>
+  <<if $Finance.company.result is 'corporate-ok'>><<pass 15>><</if>>
+<</lanLink>><br>
+<<deadwood-shareholder-result>>
+<<deadwood-shareholder-return>>
+
+:: Deadwood Reblooms Shareholder Tower []
+<<deadwood-shareholder-header>>
+<<if !_shareholder_access>><<exit>><</if>>
+<<deadwood-shareholder-result>>
+<<if !_shareholders.director and !_shareholders.controller>><<deadwood-shareholder-return>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    The project folder smells of damp paper. A site photograph is clipped beside the cost estimates. The invoices cover concrete, steel and the glazing crews, each with a different delivery date.
+  <<option 'CN'>>
+    工程档案带着潮湿纸张的气味。现场照片夹在报价旁边。混凝土、钢材和幕墙施工分别开着账单，交付日期也各不相同。
+<</language>><br><br>
+<<lanSwitch 'Company funds available: ' '公司可用资金：'>><<deadwood-reblooms-finance-money _board_state.treasury>><br>
+<<lanSwitch 'Project expenditure to date: ' '累计工程拨款支出：'>><<deadwood-reblooms-finance-money _board_state.project_spent>><br>
+<<if $avery_tower>>
+  <<lanSwitch 'Construction progress: ' '施工进度：'>><span class='blue'><<= $avery_tower.progress>>%</span><br>
+<</if>>
+<<if _board_state.project>>
+  <<lanSwitch 'Reserved project funds: ' '已预留工程款：'>><<deadwood-reblooms-finance-money _board_state.project.remaining>><br>
+<<elseif _shareholders.towerStage>>
+  <<set _tower_stage to _shareholders.towerStage>>
+  <<lanSwitch 'Current allocation: ' '本阶段拨款：'>><<deadwood-reblooms-finance-money _tower_stage.budget>><br>
+  <<if _shareholders.canFund>>
+    <<icon 'company/tower-budget.png'>><<lanLink ['Approve the project allocation (0:20)', '签署工程拨款 (0:20)'] 'Deadwood Reblooms Shareholder Tower'>>
+      <<set $Finance.company.result to maplebirch.get('Finance').company.shareholders.fund() ? 'corporate-ok' : 'corporate-failed'>>
+      <<if $Finance.company.result is 'corporate-ok'>><<pass 20>><</if>>
+    <</lanLink>><br>
+  <<elseif _board_state.funded_stages.includes(_tower_stage.stage)>>
+    <span class='blue'><<lanSwitch 'This stage has already received its allocation.' '这个施工阶段已经拨过款。'>></span><br>
+  <<elseif _board_state.treasury lt _tower_stage.budget>>
+    <span class='red'><<lanSwitch 'Company funds are short by ' '公司资金还差 '>><<deadwood-reblooms-finance-money `_tower_stage.budget - _board_state.treasury`>></span><br>
+  <</if>>
+<<else>>
+  <span class='blue'><<lanSwitch 'There is no eligible construction stage awaiting an allocation.' '目前没有可拨款的施工阶段。'>></span><br>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    Allocations come from company funds raised through subscriptions or retained profits. You are not charged again personally. Each working day pays for one additional point of construction, up to ten per stage. The foundation, structure and finishing allocations cost £100,000, £150,000 and £200,000.
+    Work waits at the original story milestones. Any unused allocation returns to company funds when a stage ends or the project closes. You cannot fund the same stage twice.
+  <<option 'CN'>>
+    拨款使用认购或留存利润筹集的公司资金，不会再扣一次你的个人存款。每个工作日支付一份施工费用，额外推进一点进度，每阶段最多十点。地基、主体与收尾阶段分别拨款 £100,000、£150,000 与 £200,000。
+    施工不会越过原版的阶段剧情门槛。阶段结束或项目关闭后，未用的工程款退回公司账上。同一阶段不能重复拨款。
+<</language>>
+<<deadwood-shareholder-return>>
