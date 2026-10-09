@@ -1,5 +1,7 @@
 // ./src/script/LifeSimulation/Casino/Marlow.ts
 
+import MarlowPortrait from '../../NamedNPCSidebarPortrait/Marlow';
+
 export default function Marlow(maplebirch: typeof window.maplebirch): void {
   maplebirch.npc.add(
     {
@@ -24,28 +26,12 @@ export default function Marlow(maplebirch: typeof window.maplebirch): void {
     }
   );
 
+  maplebirch.tool.addTo('NPCinit', 'deadwood-marlow-introduction');
+
   maplebirch.npc.addSchedule('Marlow', schedule => {
     schedule.at(0, 'marlow_home');
     schedule.when(date => date.hour >= 18 || date.hour < 4, 'deadwood_casino');
   });
 
-  maplebirch.tool.onInit(() => {
-    if (maplebirch.get('NPCSidebarPortrait')) {
-      const wardrobe = maplebirch.npc.Clothes.wardrobe;
-      wardrobe.wear('Marlow', '*', 'business_suit_male', () => C.npc.Marlow?.gender === 'm');
-      wardrobe.wear('Marlow', '*', 'business_suit_female', () => C.npc.Marlow?.gender !== 'm');
-      wardrobe.modify('Marlow', clothes => {
-        for (const slot of ['upper', 'lower'] as const) if (clothes[slot]) clothes[slot].colour = 'black';
-      });
-    }
-    maplebirch.get('MoreLoveInterestsAndNPCAvatars')?.add('Marlow', {
-      folder: 'marlow',
-      states: { default: 'default' },
-      stateResolver: npc => {
-        const working = maplebirch.get('LifeSimulation')?.casino.state.work_scenario;
-        const state = working != null ? 'working' : 'default';
-        return `${npc.skincolour === 'black' ? 'dark-' : ''}${state}`;
-      }
-    });
-  });
+  MarlowPortrait(maplebirch);
 }

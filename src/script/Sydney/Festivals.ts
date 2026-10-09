@@ -21,9 +21,10 @@ export default function (maplebirch: typeof window.maplebirch) {
         Time.hour < 10;
       const christmasRest =
         V.SydneyExpansion.christmasRestYear === Time.year && ((Time.month === 12 && Time.monthDay === 25 && Time.hour >= 21) || (Time.month === 12 && Time.monthDay === 26 && Time.hour < 6));
+      const estateVisit = (V.SydneyExpansion.estate.visitDay === Time.days && Time.hour >= 21) || (V.SydneyExpansion.estate.visitDay === Time.days - 1 && Time.hour < 6);
 
       if (sydneyActive && !V.replayScene) {
-        // 原版周一 00:00 短暂标为祈祷，留宿日程将这一小时视为睡在神殿。
+        // 原版周日 00:00 短暂标为祈祷，留宿日程将这一小时视为睡在神殿。
         if (T.sydney_location === 'temple' && Time.weekDay === 1 && Time.hour === 0 && V.sydney_templeWork === 'pray') {
           V.sydney_templeWork = 'sleep';
         }
@@ -31,6 +32,9 @@ export default function (maplebirch: typeof window.maplebirch) {
           T.sydney_location = 'temple';
           T.sydney_location_message = 'temple';
           V.sydney_templeWork = (festivalNight && V.SydneyExpansion.halloweenRestYear === Time.year) || christmasRest ? 'sleep' : 'pray';
+        } else if (estateVisit && ['home', 'temple'].includes(T.sydney_location) && V.sydney_templeWork !== 'anguish') {
+          T.sydney_location = 'home';
+          T.sydney_location_message = 'home';
         }
       }
 

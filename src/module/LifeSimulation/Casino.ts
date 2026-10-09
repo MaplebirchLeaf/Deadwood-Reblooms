@@ -19,7 +19,6 @@ export interface CasinoState {
   banned_night: number;
   bribe_night: number;
   bribe_result: 'accepted' | 'refused' | null;
-  met_dealer: boolean;
   trained: boolean;
   shifts: number;
   good_shifts: number;
@@ -66,7 +65,6 @@ export const DEFAULT_CASINO_STATE: CasinoState = {
   banned_night: -1,
   bribe_night: -1,
   bribe_result: null,
-  met_dealer: false,
   trained: false,
   shifts: 0,
   good_shifts: 0,
@@ -170,7 +168,7 @@ class Casino {
   }
 
   public get canOfferBribe(): boolean {
-    return this.canReply && this.barred && this.state.met_dealer && this.state.bribe_night !== this.night;
+    return this.canReply && this.barred && C.npc.Marlow.init === 1 && this.state.bribe_night !== this.night;
   }
 
   public bribe(): boolean {

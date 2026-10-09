@@ -247,7 +247,14 @@
   <<elseif $RobinExpansion.tutor and $RobinExpansion.tutor_lessons is 0>>
     <li><<lanSwitch 'Robin has arranged a trial tutoring lesson after school on Danube Street. Robin can teach without you, or you can join the lesson.' '罗宾约好多瑙河街的放学后试课。罗宾可以独自授课，你也可以过去帮忙。'>></li>
   <<elseif $RobinExpansion.tutor and $RobinExpansion.tutor_lessons gt 0>>
-    <li><<lanSwitch 'Robin is tutoring after school on Danube Street.' '罗宾放学后在多瑙河街做家教。'>>
+    <li><<language>>
+      <<option 'EN'>>
+        Robin tutors on Danube Street on school Tuesdays and Thursdays.
+        <<if $RobinExpansion.tutor_lessons gte 6>>There is also a Friday lesson.<</if>>
+      <<option 'CN'>>
+        罗宾在上学期间的周二、周四，去多瑙河街做家教。
+        <<if $RobinExpansion.tutor_lessons gte 6>>周五也安排了一堂课。<</if>>
+    <</language>>
       <<if $RobinExpansion.tutor_lessons gte 6>>
         <<lanSwitch 'The regular lessons earn £60 each week.' '固定课程每周收入 £60。'>>
       <<else>>
@@ -543,10 +550,7 @@
   <br><br>
   <<socialiseicon 'ask'>><<lanLink ['Let Robin teach and help when needed', '让罗宾主讲，你适时补充'] 'Deadwood Robin Tutor Lead'>><</lanLink>><br>
   <<socialiseicon>><<lanLink ['Work through the problem with Robin', '与罗宾一起拆解题目'] 'Deadwood Robin Tutor Together'>><</lanLink>>
-  <<set _robinTutorSubject to $RobinExpansion.tutor_lessons % 3>>
-  <<if (_robinTutorSubject is 0 and $maths gte 300)
-    or (_robinTutorSubject is 1 and $english gte 300)
-    or (_robinTutorSubject is 2 and $science gte 300)>>
+  <<if maplebirch.get('Robin').tutoring.canTutorWithSkills>>
     <br><<schoolicon 'library'>><<lanLink ['Help Robin teach with your subject knowledge', '用学科知识帮罗宾讲课'] 'Deadwood Robin Tutor Skills'>><</lanLink>>
   <</if>>
 <<else>>
@@ -591,7 +595,7 @@
     <</if>>
     <<npcincr Robin love 2>><<npcincr Robin dom 1>><<glove>><<gdom>>
   <<else>>
-    <<lanSwitch 'You each take one question and compare methods with the pupil. Robin notices a shortcut you missed; you let the pupil hear that being corrected is part of learning.' '你们各讲一道题，让学生比较两种方法。罗宾发现你漏掉的简便做法。你也让学生看见，被纠正本来就是学习的一部分。'>>
+    <<lanSwitch 'You each take one question. Robin spots a shorter way through yours and points to it with the pencil. "Oh. That's quicker," you admit. The pupil rubs out a whole line of working before trying it.' '你们各讲一道题。罗宾发现你那道有更快的解法，用铅笔点给你看。“哦，这样快多了。”你承认。学生擦掉整行计算，重新试了起来。'>>
     <<npcincr Robin love 2>><<glove>>
   <</if>>
   <br><br>
@@ -600,7 +604,15 @@
   <<elseif $RobinExpansion.tutor_lessons is 3>>
     <span class='green'><<lanSwitch 'The pupil shows Robin a question solved without help. Robin checks every step, then asks the pupil to explain it to the parent. The parent listens all the way through.' '学生拿出一道独立做出的题。罗宾逐步核对，又请学生讲给家长听。家长从头到尾认真听完。'>></span><<npcincr Robin dom 2>><<gdom>><br><br>
   <<elseif $RobinExpansion.tutor_lessons is 6>>
-    <span class='green'><<lanSwitch 'The parent says another family asked who taught the pupil. Robin accepts one more £20 lesson each week only after checking school and shop hours. Tutoring income will rise to £60 a week.' '家长说，另一户人家问起是谁教会了孩子。罗宾核对过上学和看店时间，才答应每周再上一堂 £20 的课。家教周收入提升到 £60。'>></span><<npcincr Robin dom 3>><<gdom>><br><br>
+    <span class='green'><<language>>
+      <<option 'EN'>>
+        The parent asks for another lesson before the weekend. Robin checks <<his>> own timetable,
+        then writes Friday beneath Tuesday and Thursday. "Same time. If there's no school, we'll leave it until term starts again."
+        The extra £20 lesson brings the weekly fee to £60.
+      <<option 'CN'>>
+        家长问能不能在周末前再上一课。罗宾核对过自己的课表，在周二、周四下面添上周五。
+        “还是那个时间。学校放假就先停，开学再来。”多出的一堂 £20 课，使每周课时费增加到 £60。
+    <</language>></span><<npcincr Robin dom 3>><<gdom>><br><br>
   <</if>>
   <span class='blue'><<lanSwitch 'The parent pays you £7.50 for helping. Robin puts £8 from the lesson fee into the shared business reserve.' '家长另付给你 £7.50 帮课报酬。罗宾从课时费中拿出 £8，记入共同营业储备金。'>></span>
   <<pass 60>>
@@ -632,7 +644,7 @@
 <<if maplebirch.get('Robin').canSpend(500)>>
   <<icon 'robin/business-permit.png'>><<lanLink ['Let Robin explain the plan to Quinn for £500 (0:20)', '请罗宾向奎恩说明计划 £500 (0:20)'] 'Deadwood Robin Shop Application Robin'>><<pass 20>><</lanLink>><br>
   <<socialiseicon 'ask'>><<lanLink ['Answer Quinn for Robin for £500 (0:20)', '替罗宾回答奎恩 £500 (0:20)'] 'Deadwood Robin Shop Application PC'>><<pass 20>><</lanLink>>
-  <<if $maths gte 300 or $english gte 300>>
+  <<if currentSkillValue('maths') gte 300 or currentSkillValue('english') gte 300>>
     <br><<icon 'robin/business-permit.png'>><<lanLink ['Help Robin check the application for £500 (0:20)', '帮罗宾核对申请材料 £500 (0:20)'] 'Deadwood Robin Shop Application Skills'>><<pass 20>><</lanLink>>
   <</if>>
 <<else>>
@@ -665,12 +677,13 @@
 
 :: Deadwood Robin Shop Application Result []
 <<set $outside to 0>><<set $location to 'townhall'>><<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('Robin').shop.applyForPermit()>>
+<<if (_robinShopSpeaker isnot 'skills' or currentSkillValue('maths') gte 300 or currentSkillValue('english') gte 300)
+  and maplebirch.get('Robin').shop.applyForPermit()>>
   <<if _robinShopSpeaker is 'Robin'>>
     <<lanSwitch 'Robin lays out the menu, accounts and the plan to employ other orphans fairly. Quinn asks a question about the ingredients. Robin checks the ledger and answers it. The clerk stamps the application. Outside, Robin admits, "I thought I would forget everything. You let me finish."' '罗宾把菜单、账目和给其他孤儿结薪的计划摆出来。奎恩追问原料来源，罗宾翻到账本对应的一页，答了上来。职员盖章受理。走出柜台，罗宾才说：“我以为自己会忘光。谢谢你让我说完。”'>>
     <<npcincr Robin dom 3>><<npcincr Robin love 2>><<gdom>><<glove>>
   <<elseif _robinShopSpeaker is 'skills'>>
-    <<if $maths gte 300>>
+    <<if currentSkillValue('maths') gte 300>>
       <<lanSwitch 'You find a mistake in the cost column. Robin corrects it, then explains the figures to Quinn in <<his>> own words. The clerk stamps the application.' '你在成本栏里找出一处算错的数字。罗宾改好后，亲自向奎恩说明账目。职员在申请表上盖了章。'>>
     <<else>>
       <<lanSwitch 'You help Robin put the proposal into clear words. Quinn asks another question; Robin answers without looking to you. The clerk stamps the application.' '你帮罗宾把经营计划写得更明白。奎恩又追问一句，罗宾没有回头求助，自己答了上来。职员在申请表上盖了章。'>>
@@ -736,7 +749,7 @@
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
 <<if maplebirch.get('Robin').shop.payInspection()>>
   <<lanSwitch 'The inspector checks the sink, the cold cabinet and the ingredient labels. Robin shows the temperature log and answers questions about both stalls without looking to you for help. The inspector signs the form. Robin exhales only after the door closes.' '检查员看过水槽、冷藏柜和原料标签。罗宾拿出温度记录，独自答清两处摊位的经验与处理办法。检查员签了字。直到门关上，罗宾才长舒一口气。'>>
-  <<if $science gte 300>>
+  <<if currentSkillValue('science') gte 300>>
     <br><br><span class='green'><<lanSwitch 'You notice the cold cabinet thermometer is too close to the door. You move it before the inspector measures the storage temperature.' '你发现冷藏柜的温度计靠门太近，便在检查员测量储存温度前，把它移到了合适的位置。'>></span>
     <<scienceskill 1>><<gscience>>
   <<else>>
@@ -1280,7 +1293,7 @@
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
 <<if maplebirch.get('Robin').shop.restockDrinks()>>
   <<lanSwitch 'Robin checks the supplier invoice while you carry three small crates into the back room. Fresh fruit goes into the cold cabinet; cocoa and spices take the dry shelf. Robin dates every label before you put the empty boxes away.' '罗宾核对进货单，你把三只小箱搬进后间。新鲜水果放入冷藏柜，可可和香料摆上干燥的架子。罗宾逐一写好日期，才让你收起空箱。'>>
-  <<if $maths gte 300>>
+  <<if currentSkillValue('maths') gte 300>>
     <br><br><span class='green'><<lanSwitch 'You spot a duplicate charge on the invoice. The supplier corrects it and takes £5 off.' '你发现进货单重复计了一项费用。供货商改正后，少收了 £5。'>></span>
   <</if>>
   <br><br><span class='gold'><<lanSwitch 'Three special ingredient crates are ready for shared shifts.' '三箱新品原料已备好，可供你们一起看店时使用。'>></span>
@@ -1454,7 +1467,31 @@
     <<lanSwitch 'Robin writes a small batch on a spare card and asks you to tell the waiting customers the price before they order. The first cup sells; Robin decides to put the recipe in tomorrow’s ledger, not to promise more than the stock can cover.' '罗宾把小批量特饮写在备用卡片上，请你先向排队的人说明价格。第一杯卖了出去。罗宾决定把配方记进明天的账本，但不承诺卖出超过存货的份量。'>>
     <<npcincr Robin dom 2>><<gdom>>
   <<else>>
-    <<lanSwitch 'You count change while Robin fills the numbered orders. When a child from the orphanage comes for a paid shift, Robin explains the till and lets them try with you watching.' '你核对找零，罗宾按订单号码出杯。孤儿院的孩子来接付薪班次时，罗宾讲清收银办法，让孩子在你看顾下试做。'>>
+    <<language>>
+      <<option 'EN'>>
+        You count change while Robin fills the numbered orders.
+        <<if maplebirch.get('Robin').shop.attendantKey and $per_npc[maplebirch.get('Robin').shop.attendantKey].shop_orphan>>
+          Your fellow orphan takes the last tray. Robin points out a spilled drink on the order pad.
+          "Don't charge them twice. I've already made another one."
+        <<elseif maplebirch.get('Robin').shop.attendantKey>>
+          The employee takes over the till. Robin counts the remaining coins with you,
+          then moves a small pile into the float for tomorrow.
+        <<else>>
+          Robin catches you putting a pound coin in with the fifty-pence pieces. "That one's not a tip," <<he>> says,
+          trying not to laugh. You sort it out before the next customer reaches the counter.
+        <</if>>
+      <<option 'CN'>>
+        你核对找零，罗宾按订单号码出杯。
+        <<if maplebirch.get('Robin').shop.attendantKey and $per_npc[maplebirch.get('Robin').shop.attendantKey].shop_orphan>>
+          孤儿院的同伴端走最后一盘饮料。罗宾指了指订单本上洒掉的那杯。
+          “别再收一遍钱，我已经补了一杯。”
+        <<elseif maplebirch.get('Robin').shop.attendantKey>>
+          店员接手收银。罗宾和你数过剩下的硬币，又分出一小堆，留着明天找零。
+        <<else>>
+          罗宾发现你把一英镑的硬币放进了五十便士那堆。“那不是小费。”<<he>>忍着笑说。
+          下一位客人走到柜台前，你赶紧把钱分好。
+        <</if>>
+    <</language>>
     <<npcincr Robin love 2>><<glove>>
   <</if>>
   <br><br>

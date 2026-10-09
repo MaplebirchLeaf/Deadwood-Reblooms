@@ -24,13 +24,16 @@ export default class CompanyEvents {
       suspicion: cafe > 0 ? Number(V.chef_sus) || 0 : 0,
       closed: Number(cafe >= 7 && cafe < 9 && Number(V.chef_rework) <= 30),
       truth: Number(V.chef_speech === 'truth'),
-      model: V.photo_known >= 2 && V.nikiSeen?.includes('photo') ? Number(V.fame?.model) || 0 : 0
+      model: V.photo_known >= 2 && V.nikiSeen?.includes('photo') ? Number(V.fame?.model) || 0 : 0,
+      orphanage_buyout: Number(V.Finance?.orphanage?.pc_bought_out === true || V.Finance?.orphanage?.robin_bought_out === true),
+      orphanage_donation: V.Finance?.donations?.total.orphanage ?? 0,
+      orphanage_dispute: Number(V.RobinExpansion?.bailey_defeated === true)
     };
   }
 
-  public static record(market: MarketState, symbol: string, event: string, move: number, day = Math.floor(Time.days)): void {
+  public static record(market: MarketState, symbol: string, event: string, move: number, day = Math.floor(Time.days), shareChange: number | null = null): void {
     const news = (market.news ??= []);
-    news.push({ day, symbol, event, move });
+    news.push({ day, symbol, event, move, share_change: shareChange });
     if (news.length > 12) news.shift();
   }
 

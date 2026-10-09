@@ -49,9 +49,10 @@
     <<lanSwitch 'Robin heard it too. "I could— I could make a noise, when they come back," Robin whispers through the wall, and then, much smaller: "If that would help. I do not want them to hurt you."' '罗宾也听见了。“我、我可以……他们再过来的时候，弄点动静。”罗宾隔着墙低声说，声音随即又低下去：“如果有用的话。我不想让他们伤害你。”'>>
   <</if>>
   <br><br><span class='blue'>
-    <<lanSwitch 'Skulduggery and physique will help you slip past the guard. Getting caught will hurt.' '巧手和体格能帮你避开守卫。被抓住会付出代价。'>>
+    <<lanSwitch 'You need to move before the guard fastens the leash. Getting caught will hurt.' '你得赶在守卫扣上牵绳前溜出去。被抓住会付出代价。'>>
   </span><br><br>
-  <<investigateicon>><<lanLink ['Wait for the guard to open the door (0:30)', '等守卫开门 (0:30)'] 'Deadwood Whitney Guard'>><<set $undergroundbrothel.timepass to true>><<pass 30>><</lanLink>><br>
+  <<set $skulduggerydifficulty to $undergroundbrothel.robin ? 300 : 400>>
+  <<investigateicon>><<lanLink ['Wait for the guard to open the door (0:30)', '等守卫开门 (0:30)'] 'Deadwood Whitney Guard'>><<set $undergroundbrothel.timepass to true>><<pass 30>><</lanLink>><<skulduggerydifficulty>><br>
   <<getouticon>><<lanLink ['Step back into the cell', '退回牢房'] 'Underground Cell'>><<set $undergroundbrothel.timepass to false>><</lanLink>>
 <</if>>
 
@@ -61,8 +62,9 @@
   <<lanSwitch 'There is no one to follow.' '外面已经没有你要找的人。'>>
   <br><br><<getouticon>><<lanLink '回到牢房' 'Underground Cell'>><</lanLink>>
 <<else>>
-  <<set _chance to Math.clamp(25 + currentSkillValue('skulduggery') / 18 + $physique / 500 + ($undergroundbrothel.robin ? 10 : 0), 25, 90)>>
-  <<if random(1, 100) lte _chance>>
+  <<set $skulduggerydifficulty to $undergroundbrothel.robin ? 300 : 400>>
+  <<skulduggerycheck 'silent'>><<skulduggeryuse>>
+  <<if $skulduggerysuccess is 1>>
     <<language>>
       <<option 'EN'>>
         A guard opens the door to summon you. You move before the leash is fastened. The music covers the scrape of your feet as you slip around the door and into the dark corridor.
@@ -109,21 +111,30 @@
   <br><br><span class='blue'>
     <<lanSwitch 'The clasp can be worked loose. The guard is close enough to grab you.' '搭扣可以撬开。守卫离得很近，随时会抓住你。'>>
   </span><br><br>
-  <<lockicon>><<lanLink ['Unfasten the clasp (0:05)', '撬开搭扣 (0:05)'] 'Deadwood Whitney Rescue Attempt'>><<set $phase to 1>><<pass 5>><</lanLink>><br>
-  <<getouticon>><<lanLink ['Shove the guard aside (0:05)', '撞开守卫 (0:05)'] 'Deadwood Whitney Rescue Attempt'>><<set $phase to 2>><<pass 5>><</lanLink>><br>
+  <<set $skulduggerydifficulty to 600>>
+  <<lockicon>><<lanLink ['Unfasten the clasp (0:05)', '撬开搭扣 (0:05)'] 'Deadwood Whitney Rescue Attempt'>><<set $phase to 1>><<pass 5>><</lanLink>><<skulduggerydifficulty>><br>
+  <<getouticon>><<lanLink ['Shove the guard aside (0:05)', '撞开守卫 (0:05)'] 'Deadwood Whitney Rescue Attempt'>><<set $phase to 2>><<pass 5>><</lanLink>><<physiquedifficulty>><br>
   <<getouticon>><<lanLink '独自离开' 'Deadwood Whitney Leave Behind'>><</lanLink>>
 <</if>>
 
 :: Deadwood Whitney Rescue Attempt []
 <<set $outside to 0>><<set $location to 'underground'>><<effects>>
-<<if !$undergroundbrothel?.active or C.npc.Whitney.state isnot 'dungeon'>>
+<<if !$undergroundbrothel?.active or C.npc.Whitney.state isnot 'dungeon' or ($phase isnot 1 and $phase isnot 2)>>
   <<lanSwitch 'There is no one to free here.' '这里已经没有你要救的人。'>>
   <br><br><<getouticon>><<lanLink '回到牢房' 'Underground Cell'>><</lanLink>>
 <<else>>
   <<npc Whitney>><<person1>>
   <<set _approach to $phase>><<set $phase to 0>>
-  <<set _chance to _approach is 1 ? Math.clamp(30 + currentSkillValue('skulduggery') / 18, 30, 85) : Math.clamp(25 + $physique / 240, 25, 85)>>
-  <<if random(1, 100) lte _chance>>
+  <<if _approach is 1>>
+    <<set $skulduggerydifficulty to 600>>
+    <<skulduggerycheck 'silent'>><<skulduggeryuse>>
+    <<set _whitneyRescueSuccess to $skulduggerysuccess is 1>>
+  <<else>>
+    <<physiquedifficulty 1 $physiquemax true>>
+    <<set _whitneyRescueSuccess to $physiqueSuccess is 1>>
+    <<physique 1>>
+  <</if>>
+  <<if _whitneyRescueSuccess>>
     <<if _approach is 1>>
       <<lanSwitch 'You feel the catch shift beneath your fingers. The collar comes free just as the guard turns. Whitney grabs your wrist and pulls you behind the curtain.' '你摸到了搭扣下的机关。守卫转过头时，项圈正好脱开。惠特尼抓住你的手腕，把你拉到幕布后面。'>>
     <<else>>

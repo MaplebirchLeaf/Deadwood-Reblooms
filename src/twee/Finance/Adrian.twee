@@ -1,5 +1,14 @@
 :: Deadwood Reblooms Adrian Widgets [widget]
 
+<<widget 'deadwood-adrian-introduction'>>
+	<<if _nam is 'Adrian'>>
+		<<language>>
+			<<option 'EN'>>The clerk's <span class='blue'>navy suit</span> is neatly pressed. Brown hair is brushed away from attentive grey eyes. A small badge reads <span class='blue'>Adrian</span>.
+			<<option 'CN'>>柜员穿着熨得平整的<span class='blue'>深蓝色西装</span>，棕色头发整齐地拨开，灰色眼睛留意着周围的人。小小的名牌上写着<span class='blue'>阿德里安</span>。
+		<</language>><br><br>
+	<</if>>
+<</widget>>
+
 <<widget 'Adrianrelationshiptext'>>
 	<<if C.npc.Adrian.rage gt 0 and $Finance.adrian.last_offence is 'pressure'>>
 		<<language>>
@@ -118,7 +127,6 @@
 <<widget 'deadwood-reblooms-adrian-greeting'>>
 	<<deadwood-reblooms-adrian-context>>
 	<<if _adrianContext.present and _adrianContext.location isnot 'financial_centre_break'>>
-		<<set $_new to C.npc.Adrian.init isnot 1>>
 		<<if _adrianContext.state.last_visit isnot Time.days>>
 			<<set _adrianContext.state.last_visit to Time.days>>
 			<<set _adrianContext.state.visits += 1>>
@@ -143,11 +151,6 @@
 			<<language>>
 				<<option 'EN'>>Adrian stands beside the desk marked <span class='gold'>Branch Manager</span>. A member of staff brings over a form for approval. "I'll be with you in a moment."
 				<<option 'CN'>>阿德里安站在标着<span class='gold'>分行经理</span>的办公桌旁。一名职员拿来表格，请经理批准。“稍等，我马上过来。”
-			<</language>>
-		<<elseif $_new>>
-			<<language>>
-				<<option 'EN'>>The clerk straightens a stack of forms before looking up. A small badge reads <span class='blue'>Adrian</span>. "Accounts and personal banking. What can I help you with?"
-				<<option 'CN'>>柜员把一叠表格的边缘理齐，随后抬起头。小小的名牌上写着<span class='blue'>阿德里安</span>。“这里办理账户和个人银行业务。有什么能帮你的？”
 			<</language>>
 		<<elseif (C.npc.Adrian.love gte 20)>>
 			<<language>>
@@ -246,7 +249,6 @@
 <</if>>
 <<if _adrianConversation.topic>>
 	<<npc 'Adrian'>><<person1>>
-	<<set C.npc.Adrian.intro to 1>>
 	<<pass 5>>
 	<<switch _adrianConversation.topic>>
 		<<case 'margin_debt'>>
@@ -325,8 +327,8 @@
 			<</if>>
 		<<case 'break'>>
 			<<language>>
-				<<option 'EN'>>Adrian moves the paper cup to make room for you. "I have five minutes before I need to get back." <<He>> folds the sandwich wrapper. "It has been busy today. I barely had time for lunch."
-				<<option 'CN'>>阿德里安挪开纸杯，给你腾出位置。“还有五分钟，我就得回柜台了。”<<He>>折起三明治的包装纸。“今天人真多。午饭都差点没空吃。”
+				<<option 'EN'>>Adrian moves the paper cup to make room for you. "I have five minutes before I need to get back." A half-finished crossword lies beneath the sandwich wrapper. <<if C.npc.Adrian.love gte 20>>"Seven letters. 'Something you shouldn't put all your money in.'" <<He>> catches your eye. "The answer is 'one basket'. Except that doesn't fit. I may be thinking about work again."<<else>><<He>> folds the wrapper over the puzzle. "One customer counted out a jar of coins this morning. Twice. I admire the patience, but I do wish I'd had breakfast first."<</if>>
+				<<option 'CN'>>阿德里安挪开纸杯，给你腾出位置。“还有五分钟，我就得回柜台了。”三明治包装纸下压着一道没做完的填字题。<<if C.npc.Adrian.love gte 20>>“七个字母，‘不该把所有钱都放进去的东西’。”<<He>>迎上你的目光。“我想填‘同一个篮子’，可格子放不下。大概又想到工作上去了。”<<else>><<He>>把包装纸折到填字题上。“上午有位客户，带了一罐硬币来，数了两遍。这耐心真让人佩服，不过，我倒希望来之前先吃过早饭。”<</if>>
 			<</language>>
 		<<default>>
 			<<if C.npc.Adrian.love gte 20 and (C.npc.Adrian.rage ?? 0) is 0>>
@@ -493,8 +495,7 @@
 				<<lanLink ['Tell Adrian to serve you before the people waiting', '让阿德里安把排队的人晾着，先办你的业务']>><<deadwood-adrian-boundary 'queue'>><</lanLink>><<llove 'Adrian'>>
 			<</if>>
 		<</if>>
-	</div>
-	<br><br>
+	</div><br>
 <<else>>
 	<<language>>
 		<<option 'EN'>>Adrian is occupied, or has already left the counter. You'll have to catch up another time.

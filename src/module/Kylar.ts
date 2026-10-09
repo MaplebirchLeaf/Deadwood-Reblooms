@@ -21,6 +21,11 @@ class Kylar extends Module {
     return this.available && V.KylarExpansion.stay_invited && window.isLoveInterest('Kylar') && !Time.schoolTime && Time.hour >= 8 && Time.hour < 9;
   }
 
+  public get canMeetInBath(): boolean {
+    const state = V.KylarExpansion;
+    return this.atManor && state.stay_invited && state.bath_day === Time.days && state.bath_encounter && Time.hour >= 18 && Time.hour < 23;
+  }
+
   public openWardrobe(): void {
     const wardrobes = V.wardrobes as Record<string, Record<string, unknown>>;
     wardrobes.kylar_manor ??= {

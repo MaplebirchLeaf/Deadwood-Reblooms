@@ -18,29 +18,53 @@
 <<else>>
   <<pass 10>><<set $KylarExpansion.sketch_day to Time.days>>
   <<npc Kylar>><<person1>>
-  <<lanSwitch 'Kylar has been drawing you again. <<He>> notices you looking and shuts the book, then, after a moment, opens it a little way. A few lines show the park path and the place where you stood a moment ago. "It is— it is not finished," <<he>> says.' '凯拉尔又在画你了。<<He>>发现你在看，立刻合上本子，过了一会儿才又稍稍打开。纸上勾出公园的小路，还有你刚才站过的位置。“还没、还没画完。”<<he>>说。'>><br><br>
+  <<language>>
+    <<option 'EN'>>
+      Kylar has been drawing you again.
+      <<if $KylarExpansion.sketch_response is 'praise'>>
+        <<He>> turns the book just enough for you to see. "I did the path again. The bit you liked." <<His>> thumb covers the edge of a drawing of your face.
+      <<elseif $KylarExpansion.sketch_response is 'wait'>>
+        <<He>> catches you looking, but leaves the book open this time. "You can look. Just— don't turn the page."
+      <<else>>
+        <<He>> notices you looking and shuts the book, then, after a moment, opens it a little way.
+      <</if>>
+      A few lines show the park path and the place where you stood a moment ago. "It is— it is not finished," <<he>> says.
+    <<option 'CN'>>
+      凯拉尔又在画你了。
+      <<if $KylarExpansion.sketch_response is 'praise'>>
+        <<He>>把本子转过一点，让你看见。“我又画了那条小路。你上次说喜欢的地方。”<<His>>拇指盖住了画中你的半张脸。
+      <<elseif $KylarExpansion.sketch_response is 'wait'>>
+        <<He>>发现你在看，这次却没合上本子。“可以看。只是、只是别翻页。”
+      <<else>>
+        <<He>>发现你在看，立刻合上本子，过了一会儿才又稍稍打开。
+      <</if>>
+      纸上勾出公园的小路，还有你刚才站过的位置。“还没、还没画完。”<<he>>说。
+  <</language>><br><br>
   <<socialiseicon>><<lanLink ['Wait for Kylar to show you', '等凯拉尔自己展示'] 'Deadwood Reblooms Kylar Sketch Answer'>><<set $phase to 'kylar-sketch-wait'>><</lanLink>><br>
   <<loveicon>><<lanLink ["Praise Kylar's drawing of the path", '称赞凯拉尔画的小路'] 'Deadwood Reblooms Kylar Sketch Answer'>><<set $phase to 'kylar-sketch-praise'>><</lanLink>><br>
-  <<socialiseicon>><<lanLink '不再追问' 'Deadwood Reblooms Kylar Sketch Answer'>><<set $phase to 'kylar-sketch-leave'>><</lanLink>>
+  <<socialiseicon>><<lanLink ['Do not press further', '不再追问'] 'Deadwood Reblooms Kylar Sketch Answer'>><<set $phase to 'kylar-sketch-leave'>><</lanLink>>
 <</if>>
-<br><br><<getouticon>><<lanLink '返回公园' 'Park'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to the park', '返回公园'] 'Park'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Sketch Answer []
 <<set $outside to 1>><<set $location to 'park'>><<effects>>
 <<if !['kylar-sketch-wait', 'kylar-sketch-praise', 'kylar-sketch-leave'].includes($phase)
-  or C.npc.Kylar.state isnot 'active'>>
+  or C.npc.Kylar.state isnot 'active' or getKylarLocation().area isnot 'park'>>
   <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
   <<npc Kylar>><<person1>>
   <<if $phase is 'kylar-sketch-wait'>>
     <<lanSwitch 'You keep your hands to yourself. After a while Kylar opens the book again and points out a detail <<he>> likes. <<He>> keeps hold of the page while you look.' '你没有去碰素描本。过了一会儿，凯拉尔重新翻开它，指给你看<<he>>喜欢的一处细节。你看的时候，<<he>>始终自己拿着画纸。'>>
     <<npcincr Kylar love 1>><<glove>>
+    <<set $KylarExpansion.sketch_response to 'wait'>>
   <<elseif $phase is 'kylar-sketch-praise'>>
     <<lanSwitch 'You tell Kylar the winding path looks just like the one beneath your feet. <<He>> looks from the page to the path, then quickly adds another line. "You noticed, <<kylar_pet_name>>," <<he>> says softly.' '你说纸上弯曲的小路和脚下这条一模一样。凯拉尔在画纸与小路之间看了看，飞快地补上一笔。“你注意到了，<<kylar_pet_name>>。”<<he>>轻声说。'>>
     <<npcincr Kylar love 1>><<glove>>
+    <<set $KylarExpansion.sketch_response to 'praise'>>
   <<else>>
     <<lanSwitch 'You leave the sketchbook closed and change the subject. Kylar loosens <<his>> grip on the cover.' '你没有要求看画，转而聊起别的事。凯拉尔按着封面的手渐渐放松了。'>>
+    <<set $KylarExpansion.sketch_response to 'leave'>>
   <</if>>
   <<unset $phase>>
 <</if>>
-<br><br><<getouticon>><<lanLink '返回公园' 'Park'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to the park', '返回公园'] 'Park'>><</lanLink>>

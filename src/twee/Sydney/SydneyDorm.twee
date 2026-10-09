@@ -328,7 +328,7 @@
       <<case 'cat'>>
         悉尼在毯子上给你腾出位置。你蜷在<<him>>身旁，<<he>>便轻轻挠你的猫耳。<<He>>另一只手里的书没过多久就合上了。
         <br><br>
-        “看来你更喜欢这个故事。”<<he>>低声说。
+        “看来比起故事，你更喜欢这个。”<<he>>低声说。
       <<case 'bird'>>
         你的翅膀上翘起一根羽毛。悉尼先问过你，才小心地替你理顺，另一只手托着翅膀，直到你能舒服地把它收拢。
         <br><br>
@@ -382,7 +382,7 @@
       Sydney points out a line that made <<him>> laugh. You cover your mouth before the other residents can hear you.
     <</if>>
     <br><br>
-    <<if $history gte 400>>
+    <<if currentSkillValue('history') gte 400>>
       You recognise a note in the margin explaining why the rite changed. Sydney shifts close enough to read over your shoulder and asks you to tell <<him>> more.
     <<else>>
       A faded note in the margin stops you both. Sydney turns the page back so you can read it again together.
@@ -398,7 +398,7 @@
       悉尼指给你看一句让<<him>>发笑的话。你赶紧捂住嘴，免得被其他住客听见。
     <</if>>
     <br><br>
-    <<if $history gte 400>>
+    <<if currentSkillValue('history') gte 400>>
       你认出页边一条说明仪式为何改变的注释。<<He>>挨过来，越过你的肩膀看书，又央你多讲几句。
     <<else>>
       页边一行褪色的注释难住了你们。悉尼把书翻回去，陪你又读了一遍。
@@ -457,7 +457,9 @@
 <br><br>
 <<if _sydneyResting>>
   <<socialiseicon>><<lanLink ['Reassure Sydney (0:05)', '安慰悉尼 (0:05)'] 'Deadwood Reblooms Sydney Dorm Reassure'>><<pass 5>><</lanLink>><br>
-  <<loveicon>><<lanLink "牵住悉尼的手 (0:05)" 'Deadwood Reblooms Sydney Dorm Hand'>><<pass 5>><</lanLink>><<handholdingvirginitywarning>><<NPCvirginitywarning 'Sydney' 'handholding'>><br>
+  <<if !pcAreArmsBound('both')>>
+    <<loveicon>><<lanLink "牵住悉尼的手 (0:05)" 'Deadwood Reblooms Sydney Dorm Hand'>><<pass 5>><</lanLink>><<handholdingvirginitywarning>><<NPCvirginitywarning 'Sydney' 'handholding'>><br>
+  <</if>>
   <br>
 <</if>>
 <<lanLink '继续' 'Deadwood Reblooms Sydney Dorm'>><</lanLink>>
@@ -468,29 +470,33 @@
   <<sydneySchedule>>
 <</if>>
 <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    You remind Sydney of the people <<he>> helped today. <<He>> listens without interrupting, then nods as though <<he>> has been trying to remember the same things.
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      "I'll ask how they're doing tomorrow," <<he>> says. "Thank you for reminding me why I came here."
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      "I don't have to agree with them to keep caring about people," <<he>> says. "I'm glad you understand that."
-    <<else>>
-      Sydney breathes out. "Perhaps I don't have to feel certain every minute," <<he>> says. "It's enough to come back and try."
-    <</if>>
-  <<option 'CN'>>
-    你提醒悉尼，今天有多少人得到过<<his>>的帮助。<<He>>静静听完，点了点头，仿佛自己也一直在努力记住这些事。
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      “明天我会问问他们过得怎么样。”<<he>>说，“谢谢你提醒我，自己为什么来到这里。”
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      “就算不认同他们，我也还是能关心别人。”<<he>>说，“你明白这一点，我很高兴。”
-    <<else>>
-      悉尼缓缓呼出一口气。“也许我不需要时时刻刻都有把握。”<<he>>说，“明天继续试就够了。”
-    <</if>>
-<</language>>
-<<npcincr Sydney love 1>><<glove>><<stress -3>><<lstress>>
+<<if _dormAccess and _sydneyResting and maplebirch.get('Sydney').available>>
+  <<language>>
+    <<option 'EN'>>
+      You remind Sydney of the people <<he>> helped today. <<He>> listens without interrupting, then nods as though <<he>> has been trying to remember the same things.
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        "I'll ask how they're doing tomorrow," <<he>> says. "Thank you for reminding me why I came here."
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        "I don't have to agree with them to keep caring about people," <<he>> says. "I'm glad you understand that."
+      <<else>>
+        Sydney breathes out. "Perhaps I don't have to feel certain every minute," <<he>> says. "It's enough to come back and try."
+      <</if>>
+    <<option 'CN'>>
+      你提醒悉尼，今天有多少人得到过<<his>>的帮助。<<He>>静静听完，点了点头，仿佛自己也一直在努力记住这些事。
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        “明天我会问问他们过得怎么样。”<<he>>说，“谢谢你提醒我，自己为什么来到这里。”
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        “就算不认同他们，我也还是能关心别人。”<<he>>说，“你明白这一点，我很高兴。”
+      <<else>>
+        悉尼缓缓呼出一口气。“也许我不需要时时刻刻都有把握。”<<he>>说，“明天继续试就够了。”
+      <</if>>
+  <</language>>
+  <<npcincr Sydney love 1>><<glove>><<stress -3>><<lstress>>
+<<else>>
+  <<lanSwitch 'Sydney is not by the bunks now. You can ask another time.' '悉尼现在不在床铺旁。你可以改天再问。'>>
+<</if>>
 <br><br>
 <<if _shareSydneyBed>>
   <<deadwood-reblooms-sydney-dorm-bed-links>>
@@ -504,29 +510,34 @@
   <<sydneySchedule>>
 <</if>>
 <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
-<<language>>
-  <<option 'EN'>>
-    You take Sydney's hand. <<He>> falls quiet and turns <<his>> palm against yours, holding on as the bells finish ringing.
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      "You make it easier to stay," <<he>> says, looking at your joined hands.
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      "I'd rather have you here than an answer to every question," <<he>> says, moving closer.
-    <<else>>
-      Sydney gives your hand a small squeeze. "I think I'll be all right tomorrow."
-    <</if>>
-  <<option 'CN'>>
-    你牵起悉尼的手。<<He>>安静下来，翻过手掌回握住你。钟声停了，<<he>>也没有松开。
-    <br><br>
-    <<if _sydneyStatus.includes('pure')>>
-      “有你在，我更愿意留下。”<<he>>望着你们相握的手说。
-    <<elseif _sydneyStatus.includes('corrupt')>>
-      “比起找到所有问题的答案，我更想让你陪在这里。”<<he>>靠近了些。
-    <<else>>
-      悉尼轻轻捏了捏你的手。“我想明天会没事的。”
-    <</if>>
-<</language>>
-<<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 2>><<glust>>
+<<if _dormAccess and _sydneyResting and maplebirch.get('Sydney').available and !pcAreArmsBound('both')>>
+  <<language>>
+    <<option 'EN'>>
+      You take Sydney's hand. <<He>> falls quiet and turns <<his>> palm against yours, holding on as the bells finish ringing.
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        "You make it easier to stay," <<he>> says, looking at your joined hands.
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        "I'd rather have you here than an answer to every question," <<he>> says, moving closer.
+      <<else>>
+        Sydney gives your hand a small squeeze. "I think I'll be all right tomorrow."
+      <</if>>
+    <<option 'CN'>>
+      你牵起悉尼的手。<<He>>安静下来，翻过手掌回握住你。钟声停了，<<he>>也没有松开。
+      <br><br>
+      <<if _sydneyStatus.includes('pure')>>
+        “有你在，我更愿意留下。”<<he>>望着你们相握的手说。
+      <<elseif _sydneyStatus.includes('corrupt')>>
+        “比起找到所有问题的答案，我更想让你陪在这里。”<<he>>靠近了些。
+      <<else>>
+        悉尼轻轻捏了捏你的手。“我想明天会没事的。”
+      <</if>>
+  <</language>>
+  <<takeHandholdingVirginity 'Sydney' 'romantic'>>
+  <<npcincr Sydney love 1>><<glove>><<npcincr Sydney lust 2>><<glust>>
+<<else>>
+  <<lanSwitch "You can't hold Sydney's hand here now." '你现在没法在这里牵住悉尼的手。'>>
+<</if>>
 <br><br>
 <<if _shareSydneyBed>>
   <<deadwood-reblooms-sydney-dorm-bed-links>>

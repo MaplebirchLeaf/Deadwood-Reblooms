@@ -85,6 +85,7 @@ export default class MarginTrading {
     if (!['stock', 'futures'].includes(kind) || ![1, -1].includes(side) || !Number.isSafeInteger(lots) || lots <= 0) return null;
     if (!(kind === 'stock' ? terms.stockLeverage : terms.futuresLeverage).includes(leverage)) return null;
     if (!this.finance.securities.some(item => item.symbol === symbol)) return null;
+    if (kind === 'stock' && lots > this.finance.shareSupply[symbol].available) return null;
     const entry = this.quote(symbol);
     const units = lots;
     const notional = entry * units;

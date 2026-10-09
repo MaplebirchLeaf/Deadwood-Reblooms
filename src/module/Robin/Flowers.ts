@@ -2,8 +2,8 @@
 
 import Shared from './Shared';
 
-/** 花摊每日最多售出的支数。估算与周结算共用，改动必须保持一致。 */
-const FLOWER_DAILY_SALES = 10;
+/** 花摊每周最多售出的支数。估算与周结算共用，改动必须保持一致。 */
+const FLOWER_WEEKLY_SALES = 10;
 
 export default class RobinFlowers extends Shared {
   /** 当前可经营的花种：原版食物表里归类为 flower 且有有效售价的。 */
@@ -24,7 +24,7 @@ export default class RobinFlowers extends Shared {
   }
 
   private forEachSold(apply: (type: string, sold: number) => void): void {
-    let remaining = FLOWER_DAILY_SALES;
+    let remaining = FLOWER_WEEKLY_SALES;
     for (const type of this.types) {
       const sold = Math.clamp(this.state.flower_stock[type] || 0, 0, remaining);
       if (sold > 0) apply(type, sold);
@@ -33,7 +33,7 @@ export default class RobinFlowers extends Shared {
     }
   }
 
-  /** 今日预计花卉收入，单位英镑。 */
+  /** 本周预计花卉收入，单位英镑。 */
   public get salesEstimate(): number {
     if (!this.state.shop_flowers) return 0;
     let sales = 0;
@@ -43,7 +43,7 @@ export default class RobinFlowers extends Shared {
     return sales;
   }
 
-  /** 周结算时扣除当日实际售出的库存。 */
+  /** 周结算时扣除实际售出的库存。 */
   public settle(): void {
     if (!this.state.shop || !this.state.shop_flowers) return;
     this.forEachSold((type, sold) => {
@@ -51,7 +51,7 @@ export default class RobinFlowers extends Shared {
     });
   }
 
-  /** 首次添置花架：花 100 便士，附赠 10 支雏菊。 */
+  /** 首次添置花架：花 100 英镑，附赠 10 支雏菊。 */
   public add(): boolean {
     if (!this.state.shop || this.state.shop_flowers || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(100)) return false;
     this.state.shop_flowers = true;
@@ -59,7 +59,7 @@ export default class RobinFlowers extends Shared {
     return true;
   }
 
-  /** 库存见底时补 10 支雏菊，花 15 便士。 */
+  /** 库存见底时补 10 支雏菊，花 15 英镑。 */
   public restock(): boolean {
     if (!this.state.shop_flowers || this.stockTotal > 5 || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(15)) return false;
     this.state.flower_stock.daisy = (this.state.flower_stock.daisy || 0) + 10;

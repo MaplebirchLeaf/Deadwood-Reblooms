@@ -44,11 +44,18 @@
 <<else>>
   <<pass 10>><<set $WhitneyExpansion.music_day to Time.days>>
   <<npc Whitney>><<person1>>
-  <<lanSwitch 'Whitney sits with one earphone in, tapping <<his>> foot to the beat. When you glance at the player, <<he>> pulls the earphone out and holds it towards you, watching your face. "What, want a turn?"' '惠特尼戴着一只耳机，脚尖随着节拍轻点。你瞥向播放器时，<<he>>把耳机扯下来递向你，盯着你的脸。“怎么，也想听听？”'>><br><br>
+  <<language>>
+    <<option 'EN'>>
+      Whitney sits with one earphone in, tapping <<his>> foot to the beat.
+      When you glance at the player, <<he>> pulls the earphone out and winds its wire around a finger. "What, want a turn?"
+    <<option 'CN'>>
+      惠特尼戴着一只耳机，脚尖随着节拍轻点。
+      你瞥向播放器时，<<he>>摘下耳机，把线绕在指头上。“怎么，也想听听？”
+  <</language>><br><br>
   <<socialiseicon>><<lanLink ['Ask Whitney what song this is', '问惠特尼这是什么歌'] 'Deadwood Whitney Music Answer'>><<set $phase to 'whitney-music-ask'>><</lanLink>><br>
   <<loveicon>><<lanLink ['Wait for Whitney to offer the earphone', '等惠特尼把耳机递过来'] 'Deadwood Whitney Music Answer'>><<set $phase to 'whitney-music-wait'>><</lanLink>>
 <</if>>
-<br><br><<getouticon>><<lanLink ['End the conversation', '结束交谈'] 'Whitney Home Enter'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['End the conversation', '结束交谈'] 'Deadwood Whitney Room'>><</lanLink>>
 
 :: Deadwood Whitney Music Answer []
 <<set $outside to 0>><<set $location to 'flats'>><<effects>>
@@ -61,11 +68,35 @@
     <<lanSwitch 'You sit beside Whitney without reaching for the earphone. After the next song starts, <<he>> presses it into your hand and clicks the volume up. "Just this one," <<he>> says, and keeps watching you. "Well? Can you take it or not?"' '你在惠特尼身旁坐下，没有伸手去拿耳机。下一首歌响起时，<<he>>把耳机塞进你手里，顺手调高了音量。“就听这一首。”<<he>>说完仍看着你。“怎么，扛不住？”'>>
     <<npcincr Whitney love 1>><<glove>><<stress -1>><<lstress>>
   <<else>>
-    <<lanSwitch '"You would hate it," Whitney says. <<He>> names the band anyway and lets the next song play for a few seconds. "There. Now stop asking."' '“你肯定不喜欢。”惠特尼说着，却还是报出了乐队的名字，让下一首歌放了几秒。“行了，别再问了。”'>>
+    <<language>>
+      <<option 'EN'>>
+        "You would hate it," Whitney says. <<He>> names the band anyway and lets the next song play for a few seconds.
+        <<if $whitney_home_invite gt 5 and C.npc.Whitney.love gte 30>>
+          "You should know it by now. You're here enough." <<He>> nudges the player out of your reach. "Get your own copy."
+        <<else>>
+          "There. Now stop asking." <<He>> puts the earphone back in, still watching you.
+        <</if>>
+      <<option 'CN'>>
+        “你肯定不喜欢。”惠特尼说着，却还是报出了乐队的名字，让下一首歌放了几秒。
+        <<if $whitney_home_invite gt 5 and C.npc.Whitney.love gte 30>>
+          “来得这么勤，还没听熟？”<<He>>把播放器拨远了些。“想听，自己弄一份。”
+        <<else>>
+          “行了，别再问了。”<<He>>重新戴上耳机，仍看着你。
+        <</if>>
+    <</language>>
   <</if>>
   <<unset $phase>>
 <</if>>
-<br><br><<getouticon>><<lanLink ['Return to the room', '返回房间'] 'Whitney Home Enter'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to the room', '返回房间'] 'Deadwood Whitney Room'>><</lanLink>>
+
+:: Deadwood Whitney Room []
+<<set $outside to 0>><<set $location to 'flats'>><<effects>>
+<<if $whitneyromance is 1 and ['active', 'rescued'].includes(C.npc.Whitney.state)>>
+  <<npc Whitney>><<person1>><<whitneyoptions>>
+<<else>>
+  <<lanSwitch 'Whitney has gone out.' '惠特尼已经出门了。'>><br><br>
+  <<getouticon>><<lanLink ['Leave the flat', '离开公寓'] 'Barb Street'>><</lanLink>>
+<</if>>
 
 :: Deadwood Whitney Aftercare []
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
@@ -112,8 +143,8 @@
   <<npc Whitney>><<person1>>
   <<if $phase is 'whitney-aftercare-walk' and isLoveInterest('Whitney')>>
     <<language>>
-      <<option 'EN'>>You walk beside Whitney until the bell rings. <<He>> keeps close enough that your sleeves touch, then notices and puts a step between you. "Don't make a thing of it, slut," <<he>> says. "I just don't want some creep's hands on what's mine."
-      <<option 'CN'>>你陪惠特尼走到铃声响起。<<He>>靠得很近，袖口不时碰到你，随即像意识到什么，往旁边让开半步。“别大惊小怪的，骚货。”<<he>>说，“我只是不想让哪个变态碰我的东西。”
+      <<option 'EN'>>You walk beside Whitney towards the doors. <<He>> keeps close enough that your sleeves touch, then notices and puts a step between you. "Don't make a thing of it, slut," <<he>> says. "I just don't want some creep's hands on what's mine."
+      <<option 'CN'>>你陪惠特尼往校门里走。<<He>>靠得很近，袖口不时碰到你，随即像意识到什么，往旁边让开半步。“别大惊小怪的，骚货。”<<he>>说，“我只是不想让哪个变态碰我的东西。”
     <</language>>
     <<npcincr Whitney love 2>><<glove>><<stress -2>><<lstress>>
   <<else>>
@@ -137,8 +168,8 @@
   <<pass 10>><<set $WhitneyExpansion.pier_day to Time.days>>
   <<npc Whitney>><<person1>>
   <<language>>
-    <<option 'EN'>>Whitney is sitting on a bollard at the end of the pier, flicking stones into the water. <<He>> does not turn around. "You following me now, slut?"
-    <<option 'CN'>>惠特尼坐在码头尽头的系缆桩上，一颗颗往水里踢石子。<<He>>没有回头。“怎么，现在开始跟踪我了，骚货？”
+    <<option 'EN'>>Whitney is sitting on a bollard at the end of the pier, throwing stones into the water. <<He>> does not turn around. "You following me now, slut?"
+    <<option 'CN'>>惠特尼坐在码头尽头的系缆桩上，一颗颗往水里扔石子。<<He>>没有回头。“怎么，现在开始跟踪我了，骚货？”
   <</language>>
   <br><br>
   <<language>>
@@ -162,7 +193,7 @@
   <<npc Whitney>><<person1>>
   <<language>>
     <<option 'EN'>>You ask what <<he>> comes here for. Whitney keeps throwing stones. "None of your business." A pause. "It's quiet. That's all." <<He>> throws another stone, harder. "Don't look at me like that."
-    <<option 'CN'>>你问<<he>>来这儿做什么。惠特尼继续踢石子。“关你屁事。”停了一下。“这儿安静。就这个。”<<He>>又踢了一颗，比刚才用力。“别用那种眼神看我。”
+    <<option 'CN'>>你问<<he>>来这儿做什么。惠特尼继续扔石子。“关你屁事。”停了一下。“这儿安静。就这个。”<<He>>又扔了一颗，比刚才用力。“别用那种眼神看我。”
   <</language>>
   <<npcincr Whitney love 1>><<glove>><<stress -1>><<lstress>>
   <<unset $phase>>
@@ -178,8 +209,8 @@
 <<else>>
   <<npc Whitney>><<person1>>
   <<language>>
-    <<option 'EN'>>You lean against <<him>>. Whitney goes rigid for a moment, then shifts so your shoulder fits under <<his>> arm. <<He>> does not say anything about it. When a gull cries overhead, <<he>> pulls <<his>> arm back and stands up. "Shift change. Come on."
-    <<option 'CN'>>你靠过去。惠特尼僵了一下，随后挪了挪身子，让你的肩膀正好落在<<his>>臂弯里。<<He>>对此只字不提。头顶有海鸥叫了一声，<<he>>便把手臂抽回去，站了起来。“换班了。走吧。”
+    <<option 'EN'>>You lean against <<him>>. Whitney goes rigid for a moment, then shifts so your shoulder fits under <<his>> arm. <<He>> does not say anything about it. When footsteps sound on the pier, <<he>> pulls <<his>> arm back and stands up. "Too many eyes. Come on."
+    <<option 'CN'>>你靠过去。惠特尼僵了一下，随后挪了挪身子，让你的肩膀正好落在<<his>>臂弯里。<<He>>对此只字不提。码头上传来脚步声，<<he>>便把手臂抽回去，站了起来。“盯着看的人太多。走吧。”
   <</language>>
   <<npcincr Whitney love 2>><<glove>><<npcincr Whitney dom 1>><<gdom>><<stress -2>><<lstress>>
   <<unset $phase>>

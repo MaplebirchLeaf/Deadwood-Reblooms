@@ -32,7 +32,7 @@ Work a stall shift for about 45 minutes once daily while Robin works there. Both
 
 After at least one stall upgrade, notice the orphanage tutoring lead and discuss it in the bedroom. Discussion and actual starting are separate stages requiring further confidence.
 
-Follow the journal to the **Danube Street** trial lesson. Schoolday tutoring is **17:30–18:30**, with accompaniment or eligible independent teaching.
+Follow the journal to the **Danube Street** trial lesson. Regular lessons are **17:30–18:30 on school Tuesdays and Thursdays**, with Fridays added after six lessons. You can help, or Robin can teach alone. Other days retain the usual schedule.
 
 Your first visit introduces the pupil and parent, who remain the same family on later visits. Robin introduces you even if lessons have already taken place without you. Working through problems together helps the pupil attempt more independently. After several completed lessons with you, the parent is comfortable leaving you to teach. Visiting and leaving without teaching does not advance these changes.
 

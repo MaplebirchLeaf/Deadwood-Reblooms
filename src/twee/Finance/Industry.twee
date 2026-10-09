@@ -1,0 +1,650 @@
+:: Deadwood Reblooms Industry Widgets [widget]
+
+<<widget 'deadwood-rowan-introduction'>>
+  <<if _nam is 'Rowan'>>
+    <<language>>
+      <<option 'EN'>>The broad-shouldered supervisor wears a <span class='brown'>checked work shirt</span>. Cropped auburn hair sticks up where a hand has pushed it back. "Rowan. I used to run the floor."
+      <<option 'CN'>>领班肩膀宽厚，身上穿着<span class='brown'>格子工作衬衫</span>，赤褐色短发被手拨得有些翘起。“罗文。以前车间是我管的。”
+    <</language>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'Rowanrelationshiptext'>>
+  <<set _factory_state to maplebirch.get('Finance').industry.state>>
+  <<if _factory_state.wage_arrears gt 0>>
+    <<language>><<option 'EN'>> is waiting for you to <span class='red'>pay the crew what they are owed</span>.<<option 'CN'>>等着你<span class='red'>把欠工人的工资发清</span>。<</language>>
+  <<elseif _factory_state.issue>>
+    <<language>><<option 'EN'>> has stopped the line and <span class='blue'>expects a decision</span> before anyone goes back to work.<<option 'CN'>>已经叫停产线，等你<span class='blue'>处理问题</span>后再开工。<</language>>
+  <<elseif _factory_state.morale lt 20>>
+    <<language>><<option 'EN'>> is <span class='purple'>protective of the exhausted crew</span> and won't ask them for another long shift.<<option 'CN'>>护着<span class='purple'>已经累垮的工人</span>，不肯再催他们加班。<</language>>
+  <<elseif _factory_state.manager and C.npc.Rowan.love gte 20>>
+    <<language>><<option 'EN'>> <span class='teal'>checks the shift manager's reports</span>, and leaves the difficult decisions on your desk.<<option 'CN'>>会替你<span class='teal'>核对值班经理的记录</span>，把需要你拍板的事情留在桌上。<</language>>
+  <<elseif C.npc.Rowan.love gte 20>>
+    <<language>><<option 'EN'>> will <span class='teal'>make room beside the break-room radio</span> when you stop by.<<option 'CN'>>见你过来，会在休息室的收音机旁<span class='teal'>替你腾个位子</span>。<</language>>
+  <<elseif C.npc.Rowan.love gte 10>>
+    <<language>><<option 'EN'>> <span class='blue'>trusts you to listen</span> when there is a problem on the floor.<<option 'CN'>>遇上车间里的麻烦，<span class='blue'>信得过你会听进去</span>。<</language>>
+  <<else>>
+    <<language>><<option 'EN'>> is still deciding whether you will <span class='blue'>keep your promises</span>.<<option 'CN'>>还在看你能不能<span class='blue'>说到做到</span>。<</language>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-industry-street'>>
+  <<if maplebirch.get('Finance').industry.available>>
+    <<factoryicon>><<lanLink ['Workshop yard (0:02)', '厂房院落 (0:02)'] 'Deadwood Reblooms Factory'>><<pass 2>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-industry-return'>>
+  <br><<getouticon>><<lanLink ['Return to the yard', '返回厂房院落'] 'Deadwood Reblooms Factory'>><</lanLink>><br>
+<</widget>>
+
+<<widget 'deadwood-industry-burden'>>
+  <<if _factory.available and _factory.open and _factory_state.owned and _factory_state.worry_day isnot Math.floor(Time.days)>>
+    <<if _factory_state.wage_arrears gt 0 or _factory_state.overhead_arrears gt 0>>
+      <<set _factory_state.worry_day to Math.floor(Time.days)>>
+      <<stress 6>>
+      <<language>>
+        <<option 'EN'>>There is another slip beneath the telephone. The unpaid total has been circled twice. You fold it, but the numbers stay in your head.
+        <<option 'CN'>>电话下面又压着一张账单，未付的总数被圈了两遍。你把纸折起来，数字仍在脑子里打转。
+      <</language>><br><br>
+      <<if _factory_state.wage_arrears gte Math.max(1, _factory_state.workers) * _factory.terms.wage * 30>>
+        <<trauma 2>>
+        <<language>>
+          <<option 'EN'>>A worker's voice carries through the thin wall. "Another month. I can't keep doing this." You sit down without taking your coat off.
+          <<option 'CN'>>一名工人的声音穿过薄薄的墙壁。“又一个月。我不能一直这样。”你连外套都没脱，就坐了下来。
+        <</language>><br><br>
+      <</if>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-industry-header'>>
+  <<set $outside to 0>><<set $location to 'deadwood_factory'>><<effects>>
+  <<set _factory to maplebirch.get('Finance').industry>><<set _factory_state to _factory.state>>
+  <<deadwood-industry-burden>>
+  <<if !_factory.available or !_factory.state.owned>>
+    <<language>><<option 'EN'>>You cannot conduct business here now.<<option 'CN'>>现在无法在这里办理业务。<</language>><br>
+    <<deadwood-industry-return>><<exit>>
+  <</if>>
+  <h3><<= maplebirch.t(_factory.terms.sites[$Finance.industry.selected].name)>></h3>
+  <<if _factory.foreman>><<npc 'Rowan'>><<person1>><</if>>
+<</widget>>
+
+<<widget 'deadwood-industry-result'>>
+  <<if $Finance.industry.result>>
+    <<if $Finance.industry.result is 'ok'>>
+      <span class='green'><<language>><<option 'EN'>>The entry is made in the ledger.<<option 'CN'>>账目已经记下。<</language>></span>
+    <<else>>
+      <span class='red'><<language>><<option 'EN'>>The arrangement could not be made. Check the available funds, opening hours and outstanding obligations.<<option 'CN'>>未能办妥。请核对可用资金、营业时间和未结清的款项。<</language>></span>
+    <</if>><br><br>
+    <<set $Finance.industry.result to null>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-industry-estimate'>>
+  <<if currentSkillValue('maths') gte 400>>
+    <<if _factory.capacity gt 0>>
+      <<set _factory_work_days to Math.ceil(_args[0].batches / _factory.capacity)>>
+      <<set _factory_work_cost to _factory_work_days * _factory.dailyCost>>
+      <<set _factory_remainder to _args[0].total - _args[0].materials - _factory_work_cost>>
+      <<language>>
+        <<option 'EN'>>
+          You work through the figures on a spare order sheet. With the current shifts, this needs at least
+          <span class='blue'><<= _factory_work_days>> working days</span> and
+          <<deadwood-reblooms-finance-money _factory_work_cost>> in wages and site bills.
+          After materials and those costs, the quoted price leaves <<deadwood-reblooms-finance-money _factory_remainder>>.
+          Weekends, stoppages and the wait for payment still cost extra.
+        <<option 'CN'>>
+          你拿一张空白订单纸列出算式。按当前班表，这笔订单至少需要
+          <span class='blue'><<= _factory_work_days>> 个工作日</span>，工资与厂房费用为
+          <<deadwood-reblooms-finance-money _factory_work_cost>>。
+          报价扣去原料和这些开支后，还剩<<deadwood-reblooms-finance-money _factory_remainder>>。
+          周末、停工与等待回款的费用还得另算。
+      <</language>><br>
+    <<else>>
+      <span class='red'><<language>>
+        <<option 'EN'>>You check the shift sheet. The floor cannot run as it stands. Sorting that out comes before any estimate.
+        <<option 'CN'>>你核对了班表。车间目前无法开工，得先处理好，再估算费用。
+      <</language>></span><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-industry-report'>>
+  <<set _factory_state to maplebirch.get('Finance').industry.state>>
+  <<set _factory_report to _factory_state.report>>
+  <<if _factory_report>>
+    <<if !_factory_report.seen and _factory.available and _factory.open>>
+      <<set _factory_report.seen to true>>
+      <<if _factory_report.event is 'default'>><<stress 12>><<trauma 4>>
+      <<elseif _factory_report.event is 'late'>><<stress 4>><</if>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<if _factory_report.event is 'delivered'>>The goods have left the yard. The invoice is for <<deadwood-reblooms-finance-money _factory_report.amount>>, <span class='blue'>the payment has not arrived yet</span>.
+        <<elseif _factory_report.event is 'default'>>The buyer's promised transfer has not arrived. The debt-recovery agent has returned the file marked <span class='red'>unrecoverable</span>. An invoice for <<deadwood-reblooms-finance-money _factory_report.amount>> is written off.
+        <<elseif _factory_report.event is 'cancelled'>>You cancel the job. The supplier will not take back the cut material. The <<deadwood-reblooms-finance-money _factory_report.amount>> already spent remains a cost. The cancellation fee has also been paid.
+        <<else>>A payment of <<deadwood-reblooms-finance-money _factory_report.amount>> has arrived in the <span class='gold'>factory account</span>.<<if _factory_report.event is 'late'>> It came a week after delivery.<</if>>
+        <</if>>
+      <<option 'CN'>>
+        <<if _factory_report.event is 'delivered'>>货物已经离开院子。货款为<<deadwood-reblooms-finance-money _factory_report.amount>>，<span class='blue'>尚未到账</span>。
+        <<elseif _factory_report.event is 'default'>>采购方承诺的转账没有到账。收账的人退回了档案，上面写着<span class='red'>无法追回</span>。<<deadwood-reblooms-finance-money _factory_report.amount>>的应收货款被记作坏账。
+        <<elseif _factory_report.event is 'cancelled'>>你取消了订单。供货商不肯收回已经裁切的材料，先前投入的<<deadwood-reblooms-finance-money _factory_report.amount>>仍是成本，解约费也已支付。
+        <<else>><<deadwood-reblooms-finance-money _factory_report.amount>>货款已存入<span class='gold'>工厂账户</span>。<<if _factory_report.event is 'late'>>这笔钱在交货一周后才到账。<</if>>
+        <</if>>
+    <</language>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-industry-journal'>>
+  <<if $Finance and maplebirch.get('Finance').industry.owned.length>>
+    <<set _factory_daily_costs to maplebirch.get('Finance').industry.dailyCosts>>
+    <h1 class='header gold bold'><<language>><<option 'EN'>>Your factories<<option 'CN'>>你的工厂<</language>></h1>
+    <<for _factory_site range maplebirch.get('Finance').industry.terms.sites>>
+      <<set _factory_state to $Finance.industry.factories[_factory_site.id]>>
+      <<if _factory_state.owned>>
+        <h3><<= maplebirch.t(_factory_site.name)>></h3>
+        <ul class='journal'>
+          <li><<language>><<option 'EN'>>Working funds: <<option 'CN'>>周转金：<</language>><<deadwood-reblooms-finance-money _factory_state.cash>></li>
+          <li><<language>><<option 'EN'>>Daily payroll and bills: <<option 'CN'>>每日工资与费用：<</language>><<deadwood-reblooms-finance-money _factory_daily_costs[_factory_site.id]>></li>
+          <li><<language>><<option 'EN'>>Workers: <<option 'CN'>>工人：<</language>><span class='teal'><<= _factory_state.workers>></span></li>
+          <li><<language>><<option 'EN'>>Crew morale: <<option 'CN'>>工人士气：<</language>><span @class="_factory_state.morale < 20 ? 'red' : 'teal'"><<= _factory_state.morale>> / 100</span></li>
+          <li><<language>><<option 'EN'>>Receipts / operating costs: <<option 'CN'>>累计经营收入／支出：<</language>><<deadwood-reblooms-finance-money _factory_state.earned>> / <<deadwood-reblooms-finance-money _factory_state.spent>></li>
+          <<if Time.days lt _factory_state.ready_day>>
+            <li><<language>><<option 'EN'>>Building work finishes on <<option 'CN'>>工程预计完成于<</language>><<deadwood-reblooms-finance-date _factory_state.ready_day>></li>
+          <</if>>
+          <<if _factory_state.wage_arrears gt 0 or _factory_state.overhead_arrears gt 0>>
+            <li><span class='red'><<language>><<option 'EN'>>Unpaid wages and bills: <<option 'CN'>>欠薪与未付费用：<</language>><<deadwood-reblooms-finance-money `_factory_state.wage_arrears + _factory_state.overhead_arrears`>></span></li>
+          <</if>>
+          <<if _factory_state.issue>>
+            <li><span class='red'><<language>><<option 'EN'>>There is something waiting for your decision at the yard.<<option 'CN'>>院子里有件事等你决定。<</language>></span></li>
+          <</if>>
+          <<if _factory_state.morale lt 20>>
+            <li><span class='red'><<language>><<option 'EN'>>The exhausted crew have stopped work.<<option 'CN'>>工人疲惫不堪，已经停工。<</language>></span></li>
+          <</if>>
+          <<if _factory_state.order>>
+            <li><<language>><<option 'EN'>>Current order: <<option 'CN'>>当前订单：<</language>><<= _factory_state.order.progress>> / <<= _factory_state.order.batches>> · <<deadwood-reblooms-finance-date _factory_state.order.deadline>></li>
+          <</if>>
+          <<if _factory_state.invoices.length>>
+            <li><<language>><<option 'EN'>>Unpaid invoices: <<option 'CN'>>待收货款：<</language>><<deadwood-reblooms-finance-money `_factory_state.invoices.reduce((sum, invoice) => sum + invoice.order.total, 0)`>></li>
+          <</if>>
+        </ul>
+      <</if>>
+    <</for>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-industry-sites'>>
+  <<for _factory_site range maplebirch.get('Finance').industry.terms.sites>>
+    <<capture _factory_site>>
+      <<if $Finance.industry.selected is _factory_site.id>>
+        <b><<= maplebirch.t(_factory_site.name)>></b>
+      <<elseif maplebirch.get('Finance').industry.available>>
+        <<lanLink [maplebirch.t(_factory_site.name), maplebirch.t(_factory_site.name)] 'Deadwood Reblooms Factory'>>
+          <<set $Finance.industry.selected to _factory_site.id>>
+        <</lanLink>>
+      <<else>>
+        <<= maplebirch.t(_factory_site.name)>>
+      <</if>>
+      <<if $Finance.industry.factories[_factory_site.id].owned>>
+        <span class='teal'><<language>><<option 'EN'>> (owned)<<option 'CN'>>（已购入）<</language>></span>
+      <</if>><br>
+    <</capture>>
+  <</for>><br>
+<</widget>>
+
+:: Deadwood Reblooms Factory []
+<<nobr>>
+<<set $outside to 1>><<set $location to 'town'>><<effects>>
+<<set _factory to maplebirch.get('Finance').industry>><<set _factory_state to _factory.state>>
+<<language>>
+  <<option 'EN'>>
+    A narrow road leaves Elk Street between two high fences. At its end, a brick workshop stands beside an empty plot. The larger factories beyond it keep rumbling.<<if !_factory_state.owned>> The selected site has a faded FOR SALE notice behind wired glass.<</if>>
+  <<option 'CN'>>
+    一条窄路从麋鹿街伸入两道高围栏之间。尽头是一间砖砌厂房，旁边留着空地。更远处的大工厂仍在轰鸣。<<if !_factory_state.owned>>你正在看的这处厂房，铁丝玻璃后挂着一张褪色的出售告示。<</if>>
+<</language>><br><br>
+<<deadwood-industry-sites>>
+<<deadwood-industry-burden>>
+<<deadwood-industry-result>>
+<<if _factory.foreman>><<npc 'Rowan'>><<person1>><</if>>
+<<if !_factory.available>>
+  <<language>><<option 'EN'>>The office window stays shut.<<option 'CN'>>办公室的窗口没有打开。<</language>><br>
+<<elseif !_factory.state.owned>>
+  <<if _factory.open>>
+    <<language>>
+      <<option 'EN'>>Rowan opens the small gate, moving a loose cable out of your way. <<He 'Rowan'>> taps the notice with a calloused finger. "The machines don't come with customers. You should look at the books before you look at the asking price."
+      <<option 'CN'>>罗文打开小门，顺手把一根松散的电线拨到旁边。<<He 'Rowan'>>用生着薄茧的手指敲敲告示。“机器可不会附送客户。先看看账，再看开价吧。”
+    <</language>><br><br>
+    <<if !_factory_state.inspected>>
+      <<lanLink ['Inspect the workshop and books (0:30)', '检查厂房与账本 (0:30)'] 'Deadwood Reblooms Factory Survey'>><<set _factory_state.inspected to true>><<pass 30>><</lanLink>><br>
+    <<else>>
+      <<lanLink ['Review the survey', '查看调查记录'] 'Deadwood Reblooms Factory Survey'>><</lanLink>><br>
+    <</if>>
+    <<lanLink ['Discuss the purchase', '商量购买厂房'] 'Deadwood Reblooms Factory Purchase'>><</lanLink>><br>
+    <<lanLink ['Talk with Rowan', '与罗文交谈'] 'Deadwood Reblooms Factory Rowan'>><</lanLink>><br>
+  <<else>>
+    <<language>><<option 'EN'>>The office is open from <span class='blue'>08:00 to 18:00</span>. You can hear a loose sheet of metal tapping in the yard.<<option 'CN'>>办公室在<span class='blue'>08:00 至 18:00</span>有人。院子里，一块松动的铁皮被风吹得轻轻作响。<</language>><br>
+  <</if>>
+<<else>>
+  <<if !_factory.ready>>
+    <<language>><<option 'EN'>>Builders have marked out the work area with tape. Wages and site bills still need paying while production is stopped. The work is due to finish on <<option 'CN'>>工人用胶带划出了施工范围。停产期间，工资与厂房费用仍要支付。工程预计完成于<</language>><<deadwood-reblooms-finance-date _factory_state.ready_day>><br><br>
+  <<elseif !_factory.open>>
+    <<language>><<option 'EN'>>The yard is empty. Light spills over the fence from the neighbouring factory. The office opens again at <span class='blue'>08:00</span>.<<option 'CN'>>院子里空无一人，隔壁工厂的灯光越过围栏。办公室在<span class='blue'>早上八点</span>重新开门。<</language>><br><br>
+  <<elseif _factory_state.workers is 0>>
+    <<language>><<option 'EN'>>The machines are still. There is nobody on the floor; you will need to hire a crew before taking an order.<<option 'CN'>>机器静静停着。车间还没有工人，接单之前得先把人雇齐。<</language>><br><br>
+  <<elseif _factory_state.morale lt 20>>
+    <<language>><<option 'EN'>>A worker sits beneath the clock, too tired to get up. Rowan takes the overtime sheet down. "They're done. Give them shorter shifts and pay what you owe before someone gets hurt."<<option 'CN'>>一名工人坐在时钟下面，累得不想起来。罗文摘下加班表。“干不动了。先缩短工时，把欠的工资发了。别等到有人受伤。”<</language>><br><br>
+  <<elseif _factory_state.order and _factory.capacity gt 0>>
+    <<language>><<option 'EN'>>Fresh material is stacked by the loading door. Someone calls out a measurement; a machine answers with a burst of noise. A handwritten delivery date hangs above the clock.<<option 'CN'>>新材料堆在装货门旁。有人喊出一个尺寸，机器随即响了一阵。时钟上方挂着手写的交货日期。<</language>><br><br>
+  <<elseif _factory_state.wage_arrears gt 0>>
+    <<language>><<option 'EN'>>The workers have gathered by the office. Nobody is touching the machines. "We did the work," one says. "When are we getting paid?"<<option 'CN'>>工人聚在办公室外，没有人碰机器。“活已经干了。”其中一人说。“工资什么时候发？”<</language>><br><br>
+  <<else>>
+    <<language>><<option 'EN'>>The workshop is quiet enough to hear the neighbouring factory through the wall. A worker sweeps around an idle machine. Every empty day still has a place in the expenses column.<<option 'CN'>>车间安静下来，隔壁工厂的声音穿墙而来。一名工人绕着闲置机器扫地。每个没活干的日子，仍会出现在支出栏里。<</language>><br><br>
+  <</if>>
+  <<deadwood-industry-report>>
+  <<if !_factory.available>>
+    <<elkicon>><<lanLink ['Leave the yard', '离开院子'] 'Elk Street'>><</lanLink>><br><<exit>>
+  <</if>>
+  <<lanLink ['Order book', '订单簿'] 'Deadwood Reblooms Factory Orders'>><</lanLink>><br>
+  <<lanLink ['Working funds', '周转金'] 'Deadwood Reblooms Factory Funds'>><</lanLink>><br>
+  <<if _factory.open>>
+    <<if _factory.ready>><<lanLink ['Workers, equipment and management', '雇工、设备与管理'] 'Deadwood Reblooms Factory Management'>><</lanLink>><br><</if>>
+    <<if _factory_state.issue or _factory_state.wage_arrears gt 0 or _factory_state.overhead_arrears gt 0>>
+      <<lanLink ['Deal with the stoppage', '处理停工问题'] 'Deadwood Reblooms Factory Trouble'>><</lanLink>><br>
+    <</if>>
+    <<lanLink ['Talk with Rowan', '与罗文交谈'] 'Deadwood Reblooms Factory Rowan'>><</lanLink>><br>
+    <<lanLink ['Wind up this factory', '清算这座工厂'] 'Deadwood Reblooms Factory Sale'>><</lanLink>><br>
+  <</if>>
+<</if>><br>
+<<elkicon>><<lanLink ['Return to Elk Street (0:02)', '返回麋鹿街 (0:02)'] 'Elk Street'>><<pass 2>><</lanLink>><br>
+<</nobr>>
+
+:: Deadwood Reblooms Factory Survey []
+<<set $outside to 0>><<set $location to 'deadwood_factory'>><<effects>>
+<<set _factory_state to maplebirch.get('Finance').industry.state>>
+<<if _factory_state.inspected>>
+  <<language>>
+    <<option 'EN'>>
+      You read through the notes from your inspection. The floor was stained where a press once stood. The remaining machines turned, but one bearing growled when Rowan ran the motor. A metal shelf held cancelled purchase orders.<br><br>
+      The books showed <span class='red'><<deadwood-reblooms-finance-money `maplebirch.get('Finance').industry.terms.purchase.oldArrears`>> in unpaid wages</span>. The proposed sale makes the new owner responsible for them. You remember Rowan watching you read the clause. "That's three people who kept coming in after the transfers stopped. They won't start again on another promise."<br><br>
+      The empty plot has room for a new building. Construction costs more and takes longer, but the old payroll does not come with it. Neither option guarantees an order.
+    <<option 'CN'>>
+      你翻看检查时记下的内容。以前摆冲压机的地方，地面上还留着油污。剩下的机器能转，不过罗文启动电机时，一处轴承发出了低沉的异响。金属架上放着已经取消的采购单。<br><br>
+      账本上记着<span class='red'><<deadwood-reblooms-finance-money `maplebirch.get('Finance').industry.terms.purchase.oldArrears`>>的欠薪</span>，转让条款要求新厂主接下这笔钱。你记得，罗文见你读到那一条时说：“三个人，转账停了以后还来干活。他们不会再信一句‘过两天就发’。”<br><br>
+      旁边的空地可以盖新厂。施工更贵，也更慢，但不接手旧工资账。两种方案都不保证有订单。
+  <</language>><br><br>
+<<else>>
+  <<language>><<option 'EN'>>You have not inspected the building or its books.<<option 'CN'>>你还没有检查厂房和账本。<</language>><br>
+<</if>>
+<<deadwood-industry-return>>
+
+:: Deadwood Reblooms Factory Purchase []
+<<nobr>>
+<<set $outside to 0>><<set $location to 'deadwood_factory'>><<effects>>
+<<set _factory to maplebirch.get('Finance').industry>><<set _factory_state to _factory.state>>
+<<if !_factory.available or !_factory.open or _factory_state.owned>><<deadwood-industry-return>><<exit>><</if>>
+<h3><<= maplebirch.t(_factory.terms.sites[$Finance.industry.selected].name)>></h3>
+<<npc 'Rowan'>><<person1>>
+<<language>>
+  <<option 'EN'>>Rowan leaves the two plans open on the desk. "Pick the work you want to do first. Adding another line costs money and stops the floor while it's installed." The purchase is paid from your bank account with a debit card. You own <span class='gold'>this whole workshop</span>. The other sites can be bought separately, with their own crews and accounts.
+  <<option 'CN'>>罗文把两份方案摊在桌上。“先选要干什么。以后添产线要花钱，安装时还得停工。”购买款从你的银行账户通过借记卡支付。你将拥有<span class='gold'>这整座工厂</span>。其他厂房可以另外购买，工人和账目各自独立。
+<</language>><br><br>
+<<set _factory_line to 'packaging'>>
+<<set _factory_options to {}>>
+<<for _factory_product range _factory.terms.products>><<set _factory_options[maplebirch.t(_factory_product.name)] to _factory_product.id>><</for>>
+<label><<language>><<option 'EN'>>First production line: <<option 'CN'>>首条生产线：<</language>><<listbox '_factory_line' autoselect>><<optionsfrom _factory_options>><</listbox>></label><br><br>
+<<deadwood-card 'Existing workshop' '收购旧厂'>>
+  <<language>><<option 'EN'>>Three workers stay with the workshop. Handover takes three days. You also assume the <span class='red'><<deadwood-reblooms-finance-money _factory.terms.purchase.oldArrears>> unpaid payroll</span>; it must be cleared before production starts.<<option 'CN'>>原来的三名工人留下，交接需要三天。你还须承担<span class='red'><<deadwood-reblooms-finance-money _factory.terms.purchase.oldArrears>>欠薪</span>，清偿后才能开工。<</language>><br>
+  <<deadwood-reblooms-finance-money _factory.purchasePrice.old>><br>
+  <<lanLink ['Buy the old workshop (0:30)', '收购旧厂 (0:30)'] 'Deadwood Reblooms Factory'>>
+    <<set $Finance.industry.result to maplebirch.get('Finance').industry.acquire('old', _factory_line) ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 30>><</if>>
+  <</lanLink>>
+<</deadwood-card>>
+<<deadwood-card 'New building' '购地建厂'>>
+  <<language>><<option 'EN'>>The price includes the land, construction and one production line. The work takes fourteen days. You will need to hire workers and provide working funds.<<option 'CN'>>价格包含土地、施工和一条生产线，工期十四天。你还需要雇工，并准备周转金。<</language>><br>
+  <<deadwood-reblooms-finance-money _factory.purchasePrice.new>><br>
+  <<lanLink ['Commission the new factory (0:30)', '签约建造新厂 (0:30)'] 'Deadwood Reblooms Factory'>>
+    <<set $Finance.industry.result to maplebirch.get('Finance').industry.acquire('new', _factory_line) ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 30>><</if>>
+  <</lanLink>>
+<</deadwood-card>>
+<<if !$Finance.bank.debit_card>><span class='blue'><<language>><<option 'EN'>>You need a debit card and sufficient bank funds.<<option 'CN'>>需要借记卡与足够的银行存款。<</language>></span><br><</if>>
+<<deadwood-industry-return>>
+<</nobr>>
+
+:: Deadwood Reblooms Factory Funds []
+<<nobr>><<deadwood-industry-header>>
+<<if !_factory.available or !_factory_state.owned>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>The workshop keeps its own cashbook. Money sent here pays suppliers, wages and site bills. Moving it back to your bank account does not create another sale. A loan still needs repaying even if a customer fails to pay.
+  <<option 'CN'>>工厂单独记账。存进来的钱用于原料、工资与厂房费用，转回银行也不会多出一笔销售收入。即使客户不给钱，贷款仍要偿还。
+<</language>><br><br>
+<<deadwood-industry-result>>
+<<language>><<option 'EN'>>Factory funds: <<option 'CN'>>工厂周转金：<</language>><<deadwood-reblooms-finance-money _factory_state.cash>><br>
+<<set _factory_amount to 5000>>
+<label><<language>><<option 'EN'>>Amount £<<option 'CN'>>金额 £<</language>><<numberbox '_factory_amount' 5000>></label><br>
+<<lanLink ['Transfer from bank', '从银行转入'] 'Deadwood Reblooms Factory Funds'>><<set $Finance.industry.result to maplebirch.get('Finance').industry.fund(Number(_factory_amount)) ? 'ok' : 'failed'>><</lanLink>> |
+<<lanLink ['Transfer to bank', '转回银行'] 'Deadwood Reblooms Factory Funds'>><<set $Finance.industry.result to maplebirch.get('Finance').industry.fund(Number(_factory_amount), true) ? 'ok' : 'failed'>><</lanLink>><br><br>
+<<lanLink ['Ask the bank about a working-capital loan', '到银行申请经营贷款'] 'Deadwood Reblooms Business Loan'>><</lanLink>><br>
+<<deadwood-industry-return>><</nobr>>
+
+:: Deadwood Reblooms Factory Orders []
+<<nobr>><<deadwood-industry-header>>
+<<if !_factory.available or !_factory_state.owned>><<exit>><</if>>
+<<if _factory_state.order?.customer is 'RMY'>>
+  <<language>>
+    <<option 'EN'>>The estate's purchase order names a delivery window. The late-delivery deductions are underlined on a separate sheet. The signature line is already waiting for yours.
+    <<option 'CN'>>庄园的采购单指定了送货时段，另附一张扣款表，把迟交的条款画了下划线。签名栏空着，等你填上名字。
+  <</language>><br><br>
+<<elseif _factory_state.order?.customer is 'AVY'>>
+  <<language>>
+    <<option 'EN'>>Avery's purchasing department has stamped the order. There is no personal signature. When you call about payment, the clerk gives you another number. The delivery date stays where it is.
+    <<option 'CN'>>艾弗里公司的采购部门给订单盖了章，没有私人签名。你打电话问付款，对方给了另一个号码。交货日期还是原来那天。
+  <</language>><br><br>
+<<elseif _factory_state.order>>
+  <<language>>
+    <<option 'EN'>>The buyer calls before Rowan has put the kettle on. "Still on schedule?" You can hear another telephone ringing behind the voice. No one asks whether the last transfer arrived.
+    <<option 'CN'>>罗文还没烧上水，采购方的电话就来了。“还是按时交货吧？”话筒里还能听见另一部电话的铃声。对方没问上笔货款到没到账。
+  <</language>><br><br>
+<</if>>
+<<language>>
+  <<option 'EN'>>An order book lies beside the telephone. Paper cups and food sleeves go to the drinks counters; crates go to farms and the shipping offices. Shelving and lockers need heavier material and tie up more money. <span class='blue'>These are enquiries, not money in the bank.</span>
+  <<option 'CN'>>电话旁放着订单簿。纸杯与食品包装送往饮品柜台，货箱卖给农场和航运公司。货架与储物柜需要更重的材料，也占用更多资金。<span class='blue'>这些只是询价，不是已经到账的钱。</span>
+<</language>><br><br>
+<<deadwood-industry-result>>
+<<if _factory_state.order>>
+  <<set _factory_order to _factory_state.order>>
+  <<deadwood-card 'Current job' '当前生产'>>
+    <<print maplebirch.t('deadwood-reblooms:industry:' + _factory_order.product)>> · <<print maplebirch.t('deadwood-reblooms:finance:security:' + _factory_order.customer)>><br>
+    <span class='teal'><<= _factory_order.progress>> / <<= _factory_order.batches>></span> <<language>><<option 'EN'>>batches completed<<option 'CN'>>批已完成<</language>><br>
+    <<deadwood-reblooms-finance-date _factory_order.deadline>><br>
+    <<if _factory_order.progress gte _factory_order.batches and _factory.open>>
+      <<lanLink ['Check and dispatch the goods (0:30)', '验货并安排交付 (0:30)'] 'Deadwood Reblooms Factory Orders'>>
+        <<set $Finance.industry.result to maplebirch.get('Finance').industry.deliver() ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 30>><</if>>
+      <</lanLink>><br>
+    <</if>>
+    <<language>><<option 'EN'>>Late deliveries lose 5% of the price per day, up to half. Cancelling does not refund materials and costs another 10% of the contracted price.<<option 'CN'>>迟交每天扣除货款的 5%，最多扣一半。取消订单不退原料款，另付合同金额 10% 的解约费。<</language>><br>
+    <<lanLink ['Discuss cancelling this job', '商量取消这笔订单'] 'Deadwood Reblooms Factory Cancel'>><</lanLink>>
+  <</deadwood-card>>
+<<else>>
+  <<for _factory_order range _factory_state.offers>>
+    <<capture _factory_order>>
+      <<if _factory_order.deadline gt Time.days>>
+        <<deadwood-card `maplebirch.t('deadwood-reblooms:industry:' + _factory_order.product)` `maplebirch.t('deadwood-reblooms:industry:' + _factory_order.product)`>>
+          <<print maplebirch.t('deadwood-reblooms:finance:security:' + _factory_order.customer)>> · <span class='teal'><<= _factory_order.batches>></span> <<language>><<option 'EN'>>batches<<option 'CN'>>批<</language>><br>
+          <div class='dr-finance-summary'>
+            <span><<language>><<option 'EN'>>Materials paid up front<<option 'CN'>>预付原料款<</language>></span><span><<deadwood-reblooms-finance-money _factory_order.materials>></span>
+            <span><<language>><<option 'EN'>>Invoice before deductions<<option 'CN'>>扣款前货款<</language>></span><span><<deadwood-reblooms-finance-money _factory_order.total>></span>
+          </div>
+          <<deadwood-industry-estimate _factory_order>>
+          <<deadwood-reblooms-finance-date _factory_order.deadline>><br>
+          <<if !_factory_state.lines.includes(_factory_order.product)>>
+            <span class='blue'><<language>><<option 'EN'>>This needs another production line.<<option 'CN'>>需要相应的生产线。<</language>></span>
+          <<elseif !_factory.ready or _factory.capacity is 0>>
+            <span class='red'><<language>><<option 'EN'>>The floor cannot start work.<<option 'CN'>>车间现在无法开工。<</language>></span>
+          <<elseif _factory.open>>
+            <<lanLink ['Accept and order materials (0:15)', '接单并订购原料 (0:15)'] 'Deadwood Reblooms Factory Orders'>>
+              <<set $Finance.industry.result to maplebirch.get('Finance').industry.take(_factory_order.id) ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 15>><</if>>
+            <</lanLink>>
+          <</if>>
+        <</deadwood-card>>
+      <</if>>
+    <</capture>>
+  <</for>>
+  <<if !_factory_state.offers.some(order => order.deadline > Time.days)>>
+    <<language>><<option 'EN'>>There are no open enquiries. New ones come each week; seasonal customers may have nothing to order.<<option 'CN'>>目前没有有效询价。每周会有新消息，季节性客户也可能没有货要订。<</language>><br>
+  <</if>>
+<</if>><br>
+<<if _factory_state.invoices.length>>
+  <span class='gold'><<language>><<option 'EN'>>Awaiting payment<<option 'CN'>>等待付款<</language>></span><br>
+  <<for _factory_invoice range _factory_state.invoices>>
+    <<print maplebirch.t('deadwood-reblooms:finance:security:' + _factory_invoice.order.customer)>> · <<deadwood-reblooms-finance-money _factory_invoice.order.total>> · <<deadwood-reblooms-finance-date _factory_invoice.pay_day>><br>
+  <</for>>
+<</if>>
+<<deadwood-industry-return>><</nobr>>
+
+:: Deadwood Reblooms Factory Cancel []
+<<deadwood-industry-header>>
+<<if !_factory.foreman>><<deadwood-industry-return>><<exit>><</if>>
+<<language>><<option 'EN'>>Rowan puts the order on the desk. "We can stop. The supplier won't pay us back for what we've already cut." <<He 'Rowan'>> waits for your decision.<<option 'CN'>>罗文把订单放在桌上。“可以停。但已经裁切的材料，供货商不会退钱。”<<He 'Rowan'>>等着你作决定。<</language>><br><br>
+<<if _factory_state.order>>
+  <<language>><<option 'EN'>>Cancelling also costs 10% of the contracted price.<<option 'CN'>>解约还须支付合同金额的 10%。<</language>><br>
+  <<lanLink ['Cancel the order', '取消订单'] 'Deadwood Reblooms Factory Orders'>><<set $Finance.industry.result to maplebirch.get('Finance').industry.resolve('cancel') ? 'ok' : 'failed'>><</lanLink>><br>
+<</if>>
+<<lanLink ['Keep the job', '继续这笔订单'] 'Deadwood Reblooms Factory Orders'>><</lanLink>><br>
+
+:: Deadwood Reblooms Factory Management []
+<<nobr>><<deadwood-industry-header>>
+<<if !_factory.available or !_factory_state.owned>><<exit>><</if>>
+<<if !_factory.open or !_factory.ready>><<deadwood-industry-return>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>Rowan has pencilled the shift plan beside the clock. "At least two people on the floor. One person can't run the machine and carry the load safely." <<He 'Rowan'>> points to the payroll. "£45 per worker, every day. If you want longer shifts, pay the extra. Letting someone go costs three days' wages."
+  <<option 'CN'>>罗文把铅笔写的班表贴在时钟旁。“车间至少两个人。一个人顾机器，又搬货，不安全。”<<He 'Rowan'>>指指工资表。“每人每天 £45。要加班，就付加班的钱。辞退一个人，要付三天工资。”
+<</language>><br><br>
+<<deadwood-industry-result>>
+<<set _factory_workers to _factory_state.workers>><<set _factory_rush to _factory_state.rush>><<set _factory_auto to _factory_state.automatic>>
+<<set _factory_reserve to _factory_state.reserve / 100>><<set _factory_limit to _factory_state.maximum_order / 100>>
+<<deadwood-card 'Shift plan' '排班与代管'>>
+  <label><<language>><<option 'EN'>>Workers (up to <<= _factory.terms.sites[$Finance.industry.selected].workers>>): <<option 'CN'>>工人数（最多 <<= _factory.terms.sites[$Finance.industry.selected].workers>> 人）：<</language>><<numberbox '_factory_workers' _factory_workers>></label><br>
+    <label><<checkbox '_factory_rush' false true autocheck>><<language>><<option 'EN'>>Overtime: 50% more wages and output; higher accident risk<<option 'CN'>>加班：工资与产量增加 50%，事故风险提高<</language>></label><br>
+    <span class='blue'><<language>><<option 'EN'>>Long shifts wear the crew down. Below 20 morale, production stops; shorter shifts with wages paid restore morale gradually.<<option 'CN'>>长期加班会拖垮工人。士气低于 20 就会停产，取消加班并按时发薪，士气会逐日恢复。<</language>></span><br>
+  <<if _factory_state.manager>>
+    <label><<checkbox '_factory_auto' false true autocheck>><<language>><<option 'EN'>>Let the shift manager accept orders and dispatch goods<<option 'CN'>>让值班经理接单并安排交货<</language>></label><br>
+    <label><<language>><<option 'EN'>>Minimum cash reserve £<<option 'CN'>>最低现金储备 £<</language>><<numberbox '_factory_reserve' _factory_reserve>></label><br>
+    <label><<language>><<option 'EN'>>Maximum order value £<<option 'CN'>>单笔订单金额上限 £<</language>><<numberbox '_factory_limit' _factory_limit>></label><br>
+    <<language>><<option 'EN'>>The shift manager keeps the reserve and three days' payroll before buying materials. Problems requiring your decision still stop the floor. Management costs £80 per day.<<option 'CN'>>值班经理采购前会留出最低储备与三天工资、费用。需要你决定的问题仍会停工。代管每天另付 £80。<</language>><br>
+  <</if>>
+  <<lanLink ['Agree the shift plan (0:15)', '确认排班 (0:15)'] 'Deadwood Reblooms Factory Management'>>
+    <<set $Finance.industry.result to maplebirch.get('Finance').industry.configure(Number(_factory_workers), _factory_rush, _factory_auto, Math.round(Number(_factory_reserve) * 100), Math.round(Number(_factory_limit) * 100)) ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 15>><</if>>
+  <</lanLink>>
+<</deadwood-card>>
+<<if !_factory_state.manager>>
+  <<language>><<option 'EN'>>Rowan checks the names in an address book. "I can find someone to run this floor. They're going to ask whether you pay on time."<<option 'CN'>>罗文翻着通讯录上的名字。“我可以找个人照看这个车间。不过，人家会问，你发工资准不准时。”<</language>><br>
+  <<deadwood-reblooms-finance-money _factory.terms.managerFee>><br>
+  <<if C.npc.Rowan.love gte 10>>
+    <<lanLink ['Appoint a shift manager (0:30)', '聘请值班经理 (0:30)'] 'Deadwood Reblooms Factory Management'>>
+      <<set $Finance.industry.result to maplebirch.get('Finance').industry.upgrade('manager') ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 30>><</if>>
+    <</lanLink>><br>
+  <</if>>
+<</if>><br>
+<<deadwood-card 'Equipment and building' '设备与厂房'>>
+  <<language>><<option 'EN'>>Each extra production line costs <<deadwood-reblooms-finance-money _factory.terms.lineCost>> and takes two days to install. Another bay costs <<deadwood-reblooms-finance-money _factory.terms.expansionCost>> and takes five days. Work stops during installation; wages and bills continue. No changes can begin while an order is on the floor. The same workers serve all lines.<<option 'CN'>>每添一条产线需要<<deadwood-reblooms-finance-money _factory.terms.lineCost>>，安装两天。扩建一个厂房间需要<<deadwood-reblooms-finance-money _factory.terms.expansionCost>>，工期五天。施工期间停产，工资与费用照付。有订单在做时不能开工改建。各条产线共用工人。<</language>><br><br>
+  <<if _factory_state.line_limit lt 3>>
+    <<lanLink ['Add another workshop bay (0:30)', '扩建厂房空间 (0:30)'] 'Deadwood Reblooms Factory'>>
+      <<set $Finance.industry.result to maplebirch.get('Finance').industry.upgrade('space') ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 30>><</if>>
+    <</lanLink>><br>
+  <</if>>
+  <<for _factory_product range _factory.terms.products>>
+    <<capture _factory_product>>
+      <<if !_factory_state.lines.includes(_factory_product.id) and _factory_state.lines.length lt _factory_state.line_limit>>
+        <<lanLink [`Install ${maplebirch.t(_factory_product.name)} (0:30)`, `安装${maplebirch.t(_factory_product.name)}产线 (0:30)`] 'Deadwood Reblooms Factory'>>
+          <<set $Finance.industry.result to maplebirch.get('Finance').industry.upgrade(_factory_product.id) ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 30>><</if>>
+        <</lanLink>><br>
+      <</if>>
+    <</capture>>
+  <</for>>
+<</deadwood-card>>
+<<deadwood-industry-return>><</nobr>>
+
+:: Deadwood Reblooms Factory Trouble []
+<<nobr>><<deadwood-industry-header>>
+<<if !_factory.available or !_factory_state.owned>><<exit>><</if>>
+<<if !_factory.foreman>><<deadwood-industry-return>><<exit>><</if>>
+<<if _factory_state.wage_arrears gt 0 or _factory_state.overhead_arrears gt 0>>
+  <<language>>
+    <<option 'EN'>>The wage slips are lined up on the desk. Beyond the window, a worker turns a packed lunch over in their hands. Rowan does not raise <<his 'Rowan'>> voice. "They need what you owe them. Another shift plan won't settle this."
+    <<option 'CN'>>工资单在桌上排成一列。窗外，一名工人来回捧着带来的饭盒。罗文没有提高声音。“他们要的是欠下的钱。再排一张班表，解决不了这个。”
+  <</language>><br><br>
+  <<language>><<option 'EN'>>Unpaid wages and bills: <<option 'CN'>>欠薪与未付费用：<</language>><<deadwood-reblooms-finance-money `_factory_state.wage_arrears + _factory_state.overhead_arrears`>><br>
+  <<lanLink ['Pay the outstanding amounts', '结清欠薪与费用'] 'Deadwood Reblooms Factory'>>
+    <<set $Finance.industry.result to maplebirch.get('Finance').industry.resolve('arrears') ? 'ok' : 'failed'>>
+  <</lanLink>><br><br>
+<</if>>
+<<if _factory_state.issue>>
+  <<set _factory_issue to _factory_state.issue>>
+  <<switch _factory_issue.type>>
+    <<case 'machine'>>
+      <<language>><<option 'EN'>>A belt hangs loose beneath the press. The fitter has chalked a cross on the switch. "Run it like this and it can take a hand with it." Rowan puts the repair estimate in front of you.<<option 'CN'>>压机下面的皮带松垮地垂着。维修工在开关上画了个粉笔叉。“这样还开，能把手一起卷进去。”罗文把维修报价放到你面前。<</language>><br><br>
+      <<set _factory_choice to 'repair'>><<set _factory_action to ['Arrange the repair (0:15)', '安排维修 (0:15)']>>
+    <<case 'injury'>>
+      <<language>><<option 'EN'>>A worker sits on a crate with a bandaged hand. Blood has soaked through at the fingertips. A second glove lies beside the press, flattened into the oil. The other workers have left the line. Rowan has arranged treatment. The hospital bill and lost wages are clipped to the work sheet. "It's their hand. Don't tell them the order comes first."<<option 'CN'>>一名工人坐在货箱上，手缠着绷带，血从指尖渗了出来。另一只手套被压扁在冲压机旁的油污里。其他人也离开了产线。罗文已经安排治疗，医院账单和误工工资夹在工作记录上。“伤的是人家的手。别跟人家说订单更重要。”<</language>><br><br>
+      <<set _factory_choice to 'compensate'>><<set _factory_action to ['Cover treatment and lost wages (0:15)', '支付治疗与误工费用 (0:15)']>>
+    <<case 'shipment'>>
+      <<language>>
+        <<option 'EN'>>
+          <<if _factory_state.order?.product is 'metalwork'>>The straps on a pallet have snapped. A worker rolls a bent metal rail on the floor; it wobbles and stops.<<else>>The top layer of the delivery has been soaked through. A worker peels a warped piece from the stack and lets it fall.<</if>> Rowan checks the deadline. "We can replace it, or tell the buyer we can't finish. Sending this just gets the whole load refused."
+        <<option 'CN'>>
+          <<if _factory_state.order?.product is 'metalwork'>>托盘上的绑带断了。一名工人把弯曲的金属条放在地上滚了滚，金属条晃了几下就停住了。<<else>>送来的材料最上层已经泡透。一名工人从里面揭起一块变形的材料，又放了回去。<</if>>罗文核对交货日期。“补材料，或者告诉客户做不完。把这些送去，整批都会被退回来。”
+      <</language>><br><br>
+      <<set _factory_choice to 'replace'>><<set _factory_action to ['Replace the damaged material (0:15)', '补购损坏的材料 (0:15)']>>
+    <<case 'protection'>>
+      <<language>>
+        <<option 'EN'>>
+          Two visitors wait beside the office door. One holds a list of businesses on the street. Yours has been added in pencil.
+          "You have a lot of glass here," the other says. "And people coming home late. We can keep an eye on things."
+          The visitor folds the list before you can read the other names. Rowan stays by the door, a spanner still in hand.
+        <<option 'CN'>>
+          两个人等在办公室门边。其中一个拿着街上商户的名单，你的名字是用铅笔添上去的。
+          “这儿的玻璃不少。”另一个说道。“还有人下班晚。我们可以帮忙照看。”
+          不等你看清其他名字，对方就把名单折了起来。罗文站在门边，手里的扳手还没放下。
+      <</language>><br><br>
+      <<deadwood-reblooms-finance-money _factory_issue.cost>><br>
+      <<lanLink ['Pay them (0:15)', '给他们钱 (0:15)'] 'Deadwood Reblooms Factory Decision'>>
+        <<set $Finance.industry.result to maplebirch.get('Finance').industry.resolve('pay') ? 'ok' : 'failed'>>
+        <<if $Finance.industry.result is 'ok'>><<stress 8>><<pass 15>><</if>>
+      <</lanLink>><br>
+      <<lanLink ['Tell them to leave (0:15)', '让他们离开 (0:15)'] 'Deadwood Reblooms Factory Decision'>>
+        <<set $Finance.industry.result to maplebirch.get('Finance').industry.resolve('refuse') ? 'ok' : 'failed'>>
+        <<if $Finance.industry.result is 'ok'>><<stress 12>><<pass 15>><</if>>
+      <</lanLink>><br>
+    <<case 'haul'>>
+      <<language>>
+        <<option 'EN'>>
+          A van with blacked-out windows is parked across the loading bay. The driver hands you an envelope containing a delivery note and an offer of a large fee.
+          "Store a crate. Let the next driver collect it. No receipt, no questions. You stay to open the gate."
+          An antler-shaped pin catches the light beneath the driver's collar. Beyond the fence, a door <<if $compound?.discovered>>in the compound<<else>>in a high-walled building<</if>> slams shut.
+          <<if $confessorQuestions?.includes('auriga')>>You remember the confessor's warning about <span class='tentacle'>the Children of Auriga</span>.<</if>>
+        <<option 'CN'>>
+          一辆车窗漆黑的面包车横在装货门前。司机递给你一个信封，里面是一张送货单和一笔可观的报酬。
+          “存一个箱子。下一位司机来取。不要收据，也别问。你留下开门。”
+          司机领口下，一枚鹿角形的别针闪了一下。围栏另一头，<<if $compound?.discovered>>神秘大院里<<else>>高墙后<</if>>的一扇门砰地关上。
+          <<if $confessorQuestions?.includes('auriga')>>你想起忏悔神父对<span class='tentacle'>奥里加之子</span>的警告。<</if>>
+      <</language>><br><br>
+      <<language>><<option 'EN'>>Offered fee: <<option 'CN'>>报酬：<</language>><<deadwood-reblooms-finance-money _factory.terms.risks.haulFee>><br>
+      <<lanLink ['Agree to stay for the collection (1:00)', '留下等人取货 (1:00)'] 'Deadwood Reblooms Factory Decision'>>
+        <<set $Finance.industry.result to maplebirch.get('Finance').industry.resolve('haul') ? 'ok' : 'failed'>>
+        <<if $Finance.industry.result is 'ok'>><<stress 18>><<trauma 25>><<pass 60>><</if>>
+      <</lanLink>><br>
+      <<lanLink ['Refuse the job (0:05)', '拒绝这份委托 (0:05)'] 'Deadwood Reblooms Factory Decision'>>
+        <<set $Finance.industry.result to maplebirch.get('Finance').industry.resolve('decline') ? 'ok' : 'failed'>>
+        <<if $Finance.industry.result is 'ok'>><<pass 5>><</if>>
+      <</lanLink>><br>
+  <</switch>>
+  <<if !_factory_issue.seen>>
+    <<set _factory_issue.seen to true>>
+    <<if _factory_issue.type is 'injury'>><<stress 10>><<trauma 8>>
+    <<elseif _factory_issue.type is 'machine' or _factory_issue.type is 'shipment'>><<stress 4>><</if>>
+  <</if>>
+  <<if _factory.available and ['machine', 'injury', 'shipment'].includes(_factory_issue.type)>>
+    <<deadwood-reblooms-finance-money _factory_issue.cost>><br>
+    <<lanLink _factory_action 'Deadwood Reblooms Factory'>>
+      <<set $Finance.industry.result to maplebirch.get('Finance').industry.resolve(_factory_choice) ? 'ok' : 'failed'>><<if $Finance.industry.result is 'ok'>><<pass 15>><</if>>
+    <</lanLink>><br>
+    <<if _factory_issue.type is 'shipment'>><<lanLink ['Cancel the affected order', '取消受影响的订单'] 'Deadwood Reblooms Factory Cancel'>><</lanLink>><br><</if>>
+  <</if>>
+<</if>>
+<<deadwood-industry-return>><</nobr>>
+
+:: Deadwood Reblooms Factory Rowan []
+<<nobr>>
+<<set $outside to 0>><<set $location to 'deadwood_factory'>><<effects>>
+<<set _factory to maplebirch.get('Finance').industry>><<set _factory_state to _factory.state>>
+<<if !_factory.foreman>><<deadwood-industry-return>><<exit>><</if>>
+<<npc 'Rowan'>><<person1>>
+<<language>>
+  <<option 'EN'>>Rowan lays a spanner on the sill and wipes <<his 'Rowan'>> hands. There is an old burn mark near <<his 'Rowan'>> wrist. A carpenter's pencil sits behind one ear. <<if _factory_state.wage_arrears gt 0>><<His 'Rowan'>> eyes go to the wage slips. "We can talk. The payroll doesn't get smaller while we do."<<elseif _factory_state.manager>>"I've left the orders that need your decision on top," <<he 'Rowan'>> says. "The shift manager can handle the ones underneath."<<else>>"What do you want to know?" <<he 'Rowan'>> asks. "I've worked here long enough to have a few answers."<</if>>
+  <<option 'CN'>>罗文把扳手搁在窗台上，擦了擦手。<<his 'Rowan'>>手腕附近有一道旧烫伤，耳后夹着一支木工铅笔。<<if _factory_state.wage_arrears gt 0>><<He 'Rowan'>>看向工资单。“可以聊。不过，聊着天，欠的钱也不会少。”<<elseif _factory_state.manager>>“需要你决定的订单，我放在最上面了。”<<He 'Rowan'>>说。“下面那些，值班经理能处理。”<<else>>“想问什么？”<<He 'Rowan'>>问。“在这儿干了这么久，总能答上几句。”<</if>>
+<</language>><br><br>
+<<if $Finance.industry.talk_day is Math.floor(Time.days)>>
+  <<switch $Finance.industry.talk>>
+    <<case 'wages'>>
+      <<language>><<option 'EN'>>"A full envelope on the promised day," Rowan says. "You'd be surprised how many owners think a speech will do instead." <<He 'Rowan'>> checks the figures with you. "<span class='blue'>Keep money for next week's wages</span> before you buy another machine."<<option 'CN'>>“约好的日子，足额发到手里。”罗文说道。“你可能想不到，有多少厂主觉得讲几句就能顶工资。”<<He 'Rowan'>>和你核对数字。“买下一台机器之前，<span class='blue'>先把下周工资留出来</span>。”<</language>>
+    <<case 'orders'>>
+      <<language>><<option 'EN'>>Rowan turns an enquiry sideways. "Big number at the bottom. Small print here." <<His 'Rowan'>> nail stops beside the payment date. "They get the goods before we get the money. Two good jobs won't save us if both buyers are still promising transfers."<<option 'CN'>>罗文把一张询价单横过来。“下面的数很大。这里的字很小。”<<his 'Rowan'>>指甲停在付款日期旁。“他们先拿到货，我们后拿到钱。两笔好生意都还在等转账，照样能把厂子拖垮。”<</language>>
+    <<case 'off_duty'>>
+      <<language>>
+        <<option 'EN'>>
+          Rowan glances at the clock. "I mend old radios. Easier than this lot; a radio usually tells you where the trouble is." <<He 'Rowan'>> catches your eye and gives a brief, crooked smile.
+          <<if C.npc.Rowan.love gte 20>> "There's one in the break room I brought back from the scrap pile. You can choose the station when you're here. Nothing with people shouting at each other. We get enough of that through the wall."
+          <<else>> "After six, the toolbox stays shut. Took me a while to learn that."<</if>>
+        <<option 'CN'>>
+          罗文看看时钟。“我修旧收音机。比照看这群人容易，收音机有毛病，通常还能查出在哪儿。”<<He 'Rowan'>>迎上你的目光，嘴角短暂地歪了一下。
+          <<if C.npc.Rowan.love gte 20>>“休息室那台，是我从废料堆里捡回来修的。你来了，也可以挑频道。别放那种一群人吵来吵去的节目，隔壁传过来的已经够听了。”
+          <<else>>“六点以后，工具箱就不打开了。这个习惯，我也学了好一阵子。”<</if>>
+      <</language>>
+    <<case 'past'>>
+      <<language>><<option 'EN'>>"I started packing crates," <<he 'Rowan'>> says. "Then the person teaching me left, so I learned the press." <<He 'Rowan'>> looks towards the yard. "The last owner stopped coming in before the wages stopped. I should have taken that as a warning." A moment passes. "I stayed because the others needed someone who knew where everything was."<<option 'CN'>>“一开始，我是装箱的。”<<He 'Rowan'>>说。“后来教我的人走了，我就学着开压机。”<<He 'Rowan'>>望向院子。“上一个厂主，先不来厂里了，后来才不发工资。我早该看出不对。”过了一会儿，<<He 'Rowan'>>又说：“我留下，是因为其他人需要一个知道东西都在哪儿的人。”<</language>>
+  <</switch>><br><br>
+  <<language>><<option 'EN'>>Rowan puts the spanner away. There is still work to sort out today.<<option 'CN'>>罗文收起扳手。今天还有事情要安排。<</language>><br>
+<<else>>
+  <<lanLink ['Ask about wages (0:10)', '聊聊工资 (0:10)'] 'Deadwood Reblooms Factory Rowan'>><<if maplebirch.get('Finance').industry.talk('wages')>><<pass 10>><</if>><</lanLink>><br>
+  <<lanLink ['Go through the order terms (0:10)', '看看订单条款 (0:10)'] 'Deadwood Reblooms Factory Rowan'>><<if maplebirch.get('Finance').industry.talk('orders')>><<pass 10>><</if>><</lanLink>><br>
+  <<lanLink ['Ask how Rowan came to work here (0:10)', '问罗文怎么来这里工作 (0:10)'] 'Deadwood Reblooms Factory Rowan'>><<if maplebirch.get('Finance').industry.talk('past')>><<pass 10>><</if>><</lanLink>><br>
+  <<lanLink ['Ask about life after the shift (0:10)', '问问下班后的生活 (0:10)'] 'Deadwood Reblooms Factory Rowan'>><<if maplebirch.get('Finance').industry.talk('off_duty')>><<pass 10>><</if>><</lanLink>><br>
+<</if>>
+<<deadwood-industry-return>><</nobr>>
+
+:: Deadwood Reblooms Factory Decision []
+<<nobr>>
+<<set $outside to 0>><<set $location to 'deadwood_factory'>><<effects>>
+<<if $Finance.industry.result is 'ok' and $Finance.industry.decision>>
+  <<language>>
+    <<option 'EN'>>
+      <<switch $Finance.industry.decision>>
+        <<case 'pay'>>The visitor counts the notes twice. "A sensible start." Neither visitor gives you a receipt. Your hand keeps closing around the empty envelope.
+        <<case 'refuse'>>The visitors leave without another word. You wait until they have turned the corner before shutting the gate.<<if maplebirch.get('Finance').industry.state.issue>> Later, Rowan finds the machine's wiring cut and a window smashed. The order will have to wait for repairs.<</if>>
+        <<case 'decline'>>The driver puts the envelope away. The van backs out, blocking the street until a car gives way. Rowan watches it go before opening the loading door again.
+        <<case 'haul'>>
+          The first driver leaves. Something shifts inside the crate. You look at the delivery note again. The space for the contents is blank.<br><br>
+          A scratching sound travels along the lid. When you take a step away, it stops. You keep your eyes on the gate until the next van arrives.<br><br>
+          Its passengers load the crate without speaking. One presses a folded note against your chest. "Same arrangement next time." The promised fee is counted onto your desk and entered in the factory books. You can still hear the scratching after the van leaves.
+        <<case 'sell'>>The buyer takes the keys. After the wages, site bills and cancellation costs are paid, the remaining money goes to your bank. The sale includes the unpaid invoices. You will not receive those payments.
+      <</switch>>
+    <<option 'CN'>>
+      <<switch $Finance.industry.decision>>
+        <<case 'pay'>>对方把钞票数了两遍。“算是个明智的开始。”两个人都没给你收据。你的手仍在反复攥着空信封。
+        <<case 'refuse'>>两个人一声不吭地离开了。你等他们转过街角，才把门关上。<<if maplebirch.get('Finance').industry.state.issue>>稍后，罗文发现机器的电线被剪断，窗户也被砸了。订单只能等维修后再做。<</if>>
+        <<case 'decline'>>司机收起信封，倒车退出院子，堵在街上，直到另一辆车让开。罗文看着它开远，才重新打开装货门。
+        <<case 'haul'>>
+          第一位司机走了。箱子里有什么动了一下。你重新看向送货单，填写货物的地方空着。<br><br>
+          抓挠声沿着箱盖移动。你往后退了一步，声音停了。直到下一辆面包车开来，你都盯着大门。<br><br>
+          车上的人默不作声地把箱子抬走。其中一个把折好的纸条抵在你胸前。“下次照旧。”对方把约好的钱数在你桌上，记进工厂账里。车走后，你仍能听见抓挠声。
+        <<case 'sell'>>买家收走钥匙。工资、厂房费用与解约费结清后，余款转入你的银行。未收货款也包含在转让里，之后不会再付给你。
+      <</switch>>
+  <</language>><br><br>
+  <<set $Finance.industry.decision to null>><<set $Finance.industry.result to null>>
+<<else>>
+  <<deadwood-industry-result>>
+<</if>>
+<<deadwood-industry-return>><</nobr>>
+
+:: Deadwood Reblooms Factory Sale []
+<<nobr>><<deadwood-industry-header>>
+<<if !_factory.available or !_factory_state.owned>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    The buyer offers <span class='red'>35% of the original purchase price</span> for the land and equipment, with the unpaid invoices included.
+    Wages owed, site bills, three days' severance per worker and a 10% cancellation fee on the unfinished order are deducted first.
+    An unresolved incident prevents the handover. If the proceeds do not cover the deductions, you must make up the difference before selling.
+  <<option 'CN'>>
+    买家愿意按<span class='red'>原购厂款的 35%</span>接手土地与设备，未收货款一并转让。
+    欠薪、厂房费用、每名工人三天的遣散费，以及未完成订单 10% 的解约费，都会先扣除。
+    事故未处理，不能交接。所得不足支付扣款，就得先把差额补齐。
+<</language>><br><br>
+<<language>><<option 'EN'>>Proceeds after deductions: <<option 'CN'>>扣款后所得：<</language>><<deadwood-reblooms-finance-money `_factory.saleProceeds`>><br>
+<<if _factory.open and !_factory_state.issue and _factory.saleProceeds gte 0>>
+  <<lanLink ['Sign away this factory (0:30)', '签字转让这座工厂 (0:30)'] 'Deadwood Reblooms Factory Decision'>>
+    <<set $Finance.industry.result to maplebirch.get('Finance').industry.liquidate() ? 'ok' : 'failed'>>
+    <<if $Finance.industry.result is 'ok'>><<stress 8>><<pass 30>><</if>>
+  <</lanLink>><br>
+<</if>>
+<<deadwood-industry-return>><</nobr>>

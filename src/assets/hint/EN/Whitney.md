@@ -19,6 +19,8 @@ Enable **Whitney** and reload. Rescue and romantic daily life are independent. R
 
 <span class="red">Escape is not guaranteed.</span> Skills and Robin's help improve chances. Failure returns to the cell with stress, pain and trauma. Retrying remains possible but has costs. The module does not force imprisonment to start the route.
 
+Rescue uses native skulduggery and physique checks and practice gains. Robin lowers the first skulduggery difficulty, while temple burden can still cause failure. Revisiting the resolved rescue attempt does not grant another workout or inflict another injury.
+
 ### Reunion and school life
 
 After rescue, check the courtyard **07:00–18:00 on a schoolday**. Ask how Whitney is doing, with hand-holding responses for lovers. Later daily scenes are once per day and depend on availability and events.

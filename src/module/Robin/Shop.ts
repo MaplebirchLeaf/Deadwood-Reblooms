@@ -190,7 +190,7 @@ export default class RobinShop extends Shared {
   }
 
   public get restockPrice(): number {
-    return Math.max(0, (V.maths >= 300 ? 25 : 30) - (this.core.get('Orchard')?.state.restock_credit ?? 0));
+    return Math.max(0, (window.currentSkillValue('maths') >= 300 ? 25 : 30) - (this.core.get('Orchard')?.state.restock_credit ?? 0));
   }
 
   public get canRestock(): boolean {
@@ -234,14 +234,14 @@ export default class RobinShop extends Shared {
     return true;
   }
 
-  /** 增设爆米花，花 150 便士。 */
+  /** 增设爆米花，花 150 英镑。 */
   public addPopcorn(): boolean {
     if (!this.state.shop || this.state.shop_popcorn || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(150)) return false;
     this.state.shop_popcorn = true;
     return true;
   }
 
-  /** 增设气球，花 100 便士，需气球摊已合作或已收束。 */
+  /** 增设气球，花 100 英镑，需气球摊已合作或已收束。 */
   public addBalloons(): boolean {
     if (!this.state.shop || this.state.shop_balloons || !['cooperate', 'resolved'].includes(this.state.balloon) || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(100))
       return false;

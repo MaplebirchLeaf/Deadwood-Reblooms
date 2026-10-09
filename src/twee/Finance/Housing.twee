@@ -67,10 +67,9 @@
   <<if !_study_facility>><<exit>><</if>>
   <<scienceicon>><<lanLink ['Study science (0:15)', '自习科学 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'science'>><</lanLink>><<gscience>><br>
   <<mathicon>><<lanLink ['Study maths (0:15)', '自习数学 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'maths'>><</lanLink>><<gmaths>><br>
-  <<englishicon>><<lanLink ['Study English (0:15)', '自习英语 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'english'>><</lanLink>><<genglish>><br>
+  <<englishicon>><<lanLink ['Study English (0:15)', '自习语文 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'english'>><</lanLink>><<genglish>><br>
   <<historyicon>><<lanLink ['Study history (0:15)', '自习历史 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'history'>><</lanLink>><<ghistory>><br>
   <<icon _study_facility.icon>><<lanLink ['Read for pleasure (0:15)', '读书放松 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'read'>><</lanLink>><<lstress>><br>
-  <<icon 'property/management.png'>><<lanLink ['Review the property accounts', '查看房产总账'] 'Deadwood Reblooms Property Accounts'>><</lanLink>><br>
 <</widget>>
 
 <<widget 'deadwood-home-study-gain'>>
@@ -321,39 +320,6 @@
 <</language>><br><br>
 <<deadwood-home-reaction 'study'>><br><br>
 <<lanLink ['Close the book', '合上书'] 'Deadwood Reblooms Property Desk'>><</lanLink>>
-
-:: Deadwood Reblooms Property Accounts []
-<<nobr>>
-<<set _estate to maplebirch.get('Finance').realEstate>>
-<<if !_estate.facilities.some(facility => facility.id === 'study')>><<lanLink ['Return to the agency', '返回房产中介'] 'Deadwood Reblooms Property Office'>><</lanLink>><<exit>><</if>>
-<<run _estate.enter('desk')>><<effects>>
-<<language>>
-  <<option 'EN'>>You lay out the bills for each house. These are the expected weekly figures; vacant rooms and unpaid rent can leave you with less.
-  <<option 'CN'>>你把各处房产的账单摊开。这是预计每周的收支；空置或欠租时，真正到账的钱可能更少。
-<</language>><br><br>
-<<set _account_rent to 0, _account_cost to 0>>
-<<deadwood-card 'Property accounts' '房产总账'>>
-  <div class='dr-finance-summary'>
-    <<for _account_property range _estate.properties>>
-      <<if _estate.owns(_account_property.id)>>
-        <<set _account_management to _estate.managementFor(_account_property.id)>>
-        <<set _rent to _account_management.rented and Time.days gte _account_management.vacancy_until ? _estate.weeklyRent(_account_property.id) : 0>>
-        <<set _upkeep to _estate.maintenanceCost(_account_property.id)>>
-        <<set _fee to _account_management.managed ? Math.max(_estate.rentalTerms.managementMinimumPennies, Math.ceil(_estate.weeklyRent(_account_property.id) * _estate.rentalTerms.managementFeeRate)) : 0>>
-        <<set _account_rent += _rent, _account_cost += _upkeep + _fee>>
-        <span><<= lanSwitch(_account_property.name.EN, _account_property.name.CN)>></span>
-        <span><<deadwood-reblooms-finance-money _rent 'green'>> / <<deadwood-reblooms-finance-money `_upkeep + _fee` 'red'>></span>
-      <</if>>
-    <</for>>
-    <<if $Finance.real_estate.mortgage>>
-      <<set _account_cost += $Finance.real_estate.mortgage.weekly_payment>>
-      <span><<lanSwitch 'Mortgage instalment' '房贷周供'>></span><span><<printmoney $Finance.real_estate.mortgage.weekly_payment>></span>
-    <</if>>
-    <span><<lanSwitch 'Expected weekly net' '预计每周净收支'>></span><span><<deadwood-reblooms-finance-money `_account_rent - _account_cost` `_account_rent >= _account_cost ? 'green' : 'red'`>></span>
-  </div>
-<</deadwood-card>>
-<<getouticon>><<lanLink ['Return to the desk', '返回书桌'] 'Deadwood Reblooms Property Desk'>><</lanLink>>
-<</nobr>>
 
 :: Deadwood Reblooms Property Pool []
 <<set _estate to maplebirch.get('Finance').realEstate>>

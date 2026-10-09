@@ -95,7 +95,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
         // 逼退贝利后不再显示原版欠租说明，其余日志结构照常保留。
         {
           src: '!_avery_pay',
-          applyafter: ' and !$RobinExpansion.bailey_defeated',
+          applyafter: ' and !$RobinExpansion.bailey_defeated and !maplebirch.get("Finance")?.orphanage.pcFree',
           expected: 1
         }
       ],

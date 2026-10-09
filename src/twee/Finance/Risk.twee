@@ -3,7 +3,7 @@
   <<if $Finance.collection.amount gt 0>>
     <span class='red'><<lanSwitch 'Outstanding recovery debt: ' '待追偿欠款：'>><<deadwood-reblooms-finance-money $Finance.collection.amount>></span><br>
     <<lanSwitch 'Payment deadline: ' '缴清期限：'>><<deadwood-reblooms-finance-date $Finance.collection.due_day>><br>
-    <<if $location is 'financial_centre'>>
+    <<if $location is 'financial_centre' and !_args[0]>>
       <<lanLink ['Deal with the debt', '处理欠款'] 'Deadwood Reblooms Financial Debt'>><</lanLink>><br>
     <<else>><<lanSwitch 'Visit the financial centre to settle the debt.' '到金融中心办理清偿。'>><br><</if>>
   <</if>>
@@ -25,7 +25,7 @@
       <span class='red'><<lanSwitch 'Insufficient available funds.' '可用资金不足。'>></span>
     <</if>>
   <<else>>
-    <span class='red'><<lanSwitch 'Enter a valid quantity to obtain a quote.' '填写有效数量后才能报价。'>></span>
+    <span class='red'><<lanSwitch 'Check the quantity, leverage and available share supply.' '请核对数量、杠杆与可交易股数。'>></span>
   <</if>>
 <</widget>>
 
@@ -74,11 +74,13 @@
 <<deadwood-finance-risk-summary>>
 <<language>>
   <<option 'EN'>>
+    Stock financing and short sales share the same limited supply as cash purchases. Futures are cash-settled and do not consume shares.<br>
     <span class='blue'>Financed shares, short sales and futures can only close from the next trading day. Stops and forced liquidation follow the same restriction.</span>
     Each opening and closing costs <<= ($_margin.terms.feeRate * 100).toFixed(2)>>% of the traded value, at least £1. Stock financing charges <<= ($_margin.terms.borrowWeeklyRate * 100).toFixed(2)>>% weekly on the borrowed money. Borrowing shares to sell short costs <<= ($_margin.terms.shortWeeklyRate * 100).toFixed(2)>>% weekly on their current value, plus any dividends owed to the lender. Charges accrue daily, including weekends.
     <span class='red'>Losses can grow while a position is locked. A rising price can cost a short seller more than the original margin.</span>
     From the next trading day, positions close when equity falls to a quarter of the deposited margin. Borrowed shares and futures expire after <<= $_margin.terms.shortDays>> and <<= $_margin.terms.futuresDays>> days respectively. If expiry falls on a weekend, settlement waits until the next trading day.
   <<option 'CN'>>
+    融资与融券和现货买入共用有限股数。期货只结算差价，不占用股票。<br>
     <span class='blue'>融资、融券与期货都从下一交易日起才能平仓，止盈止损和强平也遵守这一限制。</span>
     开仓和平仓各收成交金额的 <<= ($_margin.terms.feeRate * 100).toFixed(2)>>%，最低 £1。融资股票按借款计收每周 <<= ($_margin.terms.borrowWeeklyRate * 100).toFixed(2)>>% 的利息。融券卖出按股票当前市值收取每周 <<= ($_margin.terms.shortWeeklyRate * 100).toFixed(2)>>% 的借券费，还须补偿出借人的分红。费用逐日累计，周末也计费。
     <span class='red'>锁定期间亏损仍可能扩大。股价上涨时，做空的亏损可能超过原先交的保证金。</span>
@@ -218,31 +220,7 @@
     <span class='blue'><<lanSwitch 'No open positions.' '暂无持仓。'>></span>
   <</if>>
 <</deadwood-card>>
-<<deadwood-card 'Closing records' '平仓记录'>>
-  <<set $_margin to maplebirch.get('Finance').margin>>
-  <<if $_margin.history.length>>
-    <div class='dr-finance-scroll'>
-      <table class='dr-finance-quotes'>
-        <thead><tr>
-          <th scope='col'><<lanSwitch 'Symbol' '代码'>></th>
-          <th scope='col'><<lanSwitch 'Reason' '平仓原因'>></th>
-          <th scope='col'><<lanSwitch 'Profit / loss' '盈亏'>></th>
-        </tr></thead>
-        <tbody>
-          <<for $_trade range $_margin.history.slice(-10).reverse()>>
-            <tr>
-              <td><<= $_trade.symbol>><<if $_trade.side>><br><span class='blue'><<lanSwitch `$_trade.side === 1 ? 'Long' : 'Short'` `$_trade.side === 1 ? '多头' : '空头'`>></span><</if>></td>
-              <td><<lanSwitch `$_trade.reason === 'liquidated' ? 'Forced liquidation' : $_trade.reason === 'expired' ? 'Expired' : $_trade.reason === 'stopped' ? 'Stop-loss' : $_trade.reason === 'target' ? 'Take-profit' : 'Closed'` `$_trade.reason === 'liquidated' ? '强制平仓' : $_trade.reason === 'expired' ? '到期交割' : $_trade.reason === 'stopped' ? '止损' : $_trade.reason === 'target' ? '止盈' : '主动平仓'`>></td>
-              <td><<deadwood-reblooms-finance-money $_trade.profit>></td>
-            </tr>
-          <</for>>
-        </tbody>
-      </table>
-    </div>
-  <<else>>
-    <span class='blue'><<lanSwitch 'No closing records yet.' '暂无平仓记录。'>></span>
-  <</if>>
-<</deadwood-card>>
+
 <<getouticon>><<lanLink ['Return to securities desk', '返回证券业务台'] 'Deadwood Reblooms Financial Centre Securities'>><</lanLink>>
 <</nobr>>
 

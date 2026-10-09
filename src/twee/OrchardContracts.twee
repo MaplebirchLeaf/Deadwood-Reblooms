@@ -64,19 +64,43 @@
 <<getouticon>><<lanLink ['Return to the deliveries', '返回交货处'] 'Deadwood Reblooms Orchard Trade'>><</lanLink>>
 
 :: Deadwood Orchard Farm Contract Result []
-<<set $outside to 1>><<set $location to 'alex_farm'>><<effects>>
+<<set $outside to 1>><<set $location to 'alex_farm'>><<farm_work_update>><<effects>>
 <<if $stress gte $stressmax>>
   <<passoutfarmroad>><<exit>>
 <</if>>
-<<npc Alex>><<person1>>
+<<set _orchard to maplebirch.get('Orchard')>>
+<<set _alexAtDesk to _orchard and !_orchard.farmInterrupted and $farm_work?.alex is 'admin'>>
+<<if _alexAtDesk>>
+  <<npc Alex>><<person1>>
+<</if>>
 <<if $Orchard.contract_result>>
   <<if $Orchard.farm_contract.status is 'fulfilled'>>
     <<language>>
-      <<option 'EN'>>Alex counts the last crate and signs the dispatch sheet. "That's the lot." <<He>> hands over the payment and your deposit. "I'll put you on the list for the next cart." <<glove>>
-      <<option 'CN'>>艾利克斯数完最后一箱，在发货单上签了字。“齐了。”<<He>>把货款和押金交给你。“下趟车，我还把你记在名单上。”<<glove>>
+      <<option 'EN'>>
+        <<if _alexAtDesk>>
+          Alex counts the last crate and signs the dispatch sheet. "That's the lot." <<He>> hands over the payment and your deposit. "I'll put you on the list for the next cart."
+        <<else>>
+          Your fruit has been handed over. You put the payment and returned deposit away with the signed dispatch sheet.
+        <</if>>
+      <<option 'CN'>>
+        <<if _alexAtDesk>>
+          艾利克斯数完最后一箱，在发货单上签了字。“齐了。”<<He>>把货款和押金交给你。“下趟车，我还把你记在名单上。”
+        <<else>>
+          水果已经交齐。你收好货款和退回的押金，把签好的发货单一并放好。
+        <</if>>
     <</language>>
+    <<glove>>
   <<else>>
-    <<lanSwitch 'Alex takes the deposit and writes the quantity beside your name.' '艾利克斯收下押金，在你的名字旁写好数量。'>>
+    <<if _alexAtDesk>>
+      <<lanSwitch 'Alex takes the deposit and writes the quantity beside your name.' '艾利克斯收下押金，在你的名字旁写好数量。'>>
+    <<else>>
+      <<lanSwitch 'The deposit is paid. Your name and the agreed quantity are written on the dispatch sheet.' '押金已经交清，发货单上记着你的名字和约好的数量。'>>
+    <</if>>
   <</if>>
 <<else>><span class='red'><<lanSwitch 'The order cannot be completed. Check the deposit, fruit reserved for yourself, deadline and delivery arrangements.' '这次未能办理。检查押金、保留库存、交货期限与发货安排。'>></span><</if>><br><br>
-<<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Orchard Farm Contract'>><</lanLink>>
+<<if _orchard and _orchard.farmInterrupted>>
+  <<lanSwitch 'Shouts carry from the fields. The next delivery will have to wait.' '田地那边传来喊声。下趟货的事得先放一放。'>><br><br>
+  <<getouticon>><<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>>
+<<else>>
+  <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Orchard Farm Contract'>><</lanLink>>
+<</if>>

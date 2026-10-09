@@ -1,0 +1,223 @@
+:: Deadwood Reblooms Orphanage Widgets [widget]
+
+<<widget 'deadwood-finance-orphanage-office-link'>>
+  <<if _options is 1 and maplebirch.get('Finance').orphanage.canNegotiate>>
+    <<socialiseicon 'ask'>><<lanLink ['Discuss ending your rent payments (0:05)', '谈谈不再交租的事 (0:05)'] 'Deadwood Reblooms Orphanage Buyout'>>
+      <<pass 5>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-finance-orphanage-robin-link'>>
+  <<if maplebirch.get('Finance').orphanage.canTalkRobin>>
+    <<if $Finance.orphanage.robin_bought_out and !$Finance.orphanage.robin_told>>
+      <<socialiseicon>><<lanLink ['Show Robin the receipt (0:05)', '把回执给罗宾看 (0:05)'] 'Deadwood Reblooms Orphanage Receipt'>>
+        <<pass 5>>
+      <</lanLink>><br>
+    <<elseif $Finance.orphanage.offer isnot null and !$Finance.orphanage.agreed and !$Finance.orphanage.robin_bought_out and !$RobinExpansion?.bailey_defeated>>
+      <<socialiseicon 'ask'>><<lanLink ["Discuss Bailey's offer (0:10)", '和罗宾谈谈贝利的报价 (0:10)'] 'Deadwood Reblooms Orphanage Robin'>>
+        <<pass 10>>
+      <</lanLink>><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-finance-orphanage-name'>>
+  <<if _args[0] is 'pc'>>
+    <<lanSwitch 'You' '你'>>
+  <<elseif _args[0] is 'robin'>>
+    <<lanSwitch 'Robin' '罗宾'>>
+  <<else>>
+    <<lanSwitch 'You and Robin' '你和罗宾'>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Orphanage Buyout []
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Bailey>><<person1>>
+<<if maplebirch.get('Finance').orphanage.canNegotiate>>
+  <<if $Finance.orphanage.offer is null>>
+    <<set $Finance.orphanage.offer to maplebirch.get('Finance').orphanage.prices>>
+    <<language>>
+      <<option 'EN'>>
+        You ask how much Bailey would want to stop collecting rent. <<He>> stops writing.
+        "Yours? Robin's? Both?" <<He>> looks you over, then pulls two sheets from the drawer. "Each name has a price."
+        The pen scratches across the paper. <<He>> turns the sheets towards you, keeping a hand on the corner.
+      <<option 'CN'>>
+        你问贝利，要多少钱才肯不再收租。<<He>>停下笔。
+        “你的？罗宾的？还是两个人？”<<He>>打量了你一会儿，从抽屉里抽出两张纸。“一个名字，一个价。”
+        笔尖在纸上划过。<<He>>把两张纸转向你，一只手仍按着纸角。
+    <</language>>
+  <<elseif !$Finance.orphanage.agreed>>
+    <<language>>
+      <<option 'EN'>>
+        Bailey finds the quotes in <<his>> drawer and pushes them across the desk. "Same prices. If you want Robin's name taken off, I want <<nnpc_his 'Robin'>> signature too."
+      <<option 'CN'>>
+        贝利从抽屉里找出两份报价，推到你面前。“价钱没变。想把罗宾的名字划掉，那份也得由<<nnpc_him 'Robin'>>签。”
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        You put Robin's signed sheet on the desk. Bailey reads the name, then looks at you.
+        "Got the money?"
+      <<option 'CN'>>
+        你把罗宾签过字的那份放在桌上。贝利看过名字，抬眼看你。
+        “钱带来了吗？”
+    <</language>>
+  <</if>>
+  <br><br>
+  <<language>>
+    <<option 'EN'>>
+      "Pay for a name, and I stop collecting from that person. The room stays theirs. Come and go as they like."
+      Bailey taps the figures. "Anything still on the ledger goes on top. Anyone you leave out keeps paying."
+    <<option 'CN'>>
+      “付了谁的钱，就不再收谁的周租。房间留着，住不住随便。”
+      贝利用笔点了点数目。“账上还欠着的，另算。没付到的那个，照旧交租。”
+  <</language>>
+  <br><br>
+  <<deadwood-card 'Rent buyout' '房租买断'>>
+    <<for _orphanage_offer range maplebirch.get('Finance').orphanage.offers>>
+      <<capture _orphanage_offer>>
+        <b><<deadwood-finance-orphanage-name _orphanage_offer.id>></b><br>
+        <<lanSwitch 'Buyout: ' '买断金额：'>><<deadwood-reblooms-finance-money _orphanage_offer.price>><br>
+        <<if _orphanage_offer.arrears gt 0>>
+          <<lanSwitch 'Outstanding rent: ' '未付房租：'>><<deadwood-reblooms-finance-money _orphanage_offer.arrears>><br>
+        <</if>>
+        <<lanSwitch 'Total: ' '合计：'>><<deadwood-reblooms-finance-money _orphanage_offer.total>><br>
+        <<if _orphanage_offer.payable>>
+          <<shopicon 'register'>><<lanLink ['Pay in full (0:10)', '付清 (0:10)'] 'Deadwood Reblooms Orphanage Buyout Finish'>>
+            <<set $Finance.orphanage.choice to _orphanage_offer.id>>
+          <</lanLink>><br>
+        <<elseif _orphanage_offer.id isnot 'pc' and !$Finance.orphanage.agreed>>
+          <span class='blue'><i><<lanSwitch 'Talk to Robin before paying for this.' '先和罗宾谈谈，再付这份钱。'>></i></span><br>
+        <<elseif Time.hour is 9 and Time.minute gte 50>>
+          <span class='blue'><<lanSwitch 'Come back tomorrow morning with time to settle this.' '明早留够时间再来结清。'>></span><br>
+        <<else>>
+          <span class='red'><<lanSwitch 'You cannot settle this payment now.' '你现在没法结清这笔钱。'>></span><br>
+        <</if>>
+        <br>
+      <</capture>>
+    <</for>>
+  <</deadwood-card>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      There is nothing to settle with Bailey now.
+    <<option 'CN'>>
+      现在没法和贝利谈这件事。
+  <</language>><br>
+<</if>>
+<<main_hall_icon>><<lanLink ['Return to the hall (0:01)', '返回大厅 (0:01)'] 'Orphanage'>><<pass 1>><<endevent>><</lanLink>><br>
+
+:: Deadwood Reblooms Orphanage Robin []
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
+<<if maplebirch.get('Finance').orphanage.canTalkRobin and $Finance.orphanage.offer isnot null and !$Finance.orphanage.agreed and !$Finance.orphanage.robin_bought_out>>
+  <<language>>
+    <<option 'EN'>>
+      Robin takes the sheet with <<his>> name on it and reads it twice. "That's a lot of money." <<He>> looks up at you, then back at the figure.
+      "And we could still stay here?"
+      <br><br>
+      You point to the line about your rooms. Robin follows it with a finger.
+      "I'd like that. Not having to count it out every week." <<He>> pauses.
+      "But only if you can afford it. Don't borrow it from someone worse."
+    <<option 'CN'>>
+      罗宾接过写着自己名字的那张纸，看了两遍。“好多钱。”<<He>>抬眼看你，又低头看了一遍数目。
+      “付完之后，还能住在这里？”
+      <br><br>
+      你指给<<him>>看保留房间的那一行。罗宾用手指顺着读下去。
+      “那就好了。不用每周都数一遍钱。”<<He>>停了一会儿。
+      “不过，你得付得起。别为了这件事，去向更糟的人借钱。”
+  <</language>>
+  <br><br>
+  <<socialiseicon>><<lanLink ['Agree to the terms together', '一起同意这份条款'] 'Deadwood Reblooms Orphanage Robin Agree'>><</lanLink>><br>
+<</if>>
+<<getouticon>><<lanLink ["Return to Robin's room", '返回罗宾的房间'] 'Robin Options'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Reblooms Orphanage Robin Agree []
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
+<<if maplebirch.get('Finance').orphanage.canTalkRobin and $Finance.orphanage.offer isnot null and !$Finance.orphanage.agreed and !$Finance.orphanage.robin_bought_out>>
+  <<set $Finance.orphanage.agreed to true>>
+  <<language>>
+    <<option 'EN'>>
+      You pass Robin the pen. <<He>> carefully signs the sheet with <<his>> name on it, then folds it along its old crease.
+      "Keep a copy," <<he>> says, handing it back. "I don't want <<nnpc_him 'Bailey'>> changing it."
+    <<option 'CN'>>
+      你把笔递给罗宾。<<He>>在写着自己名字的那张纸上认真签好字，沿旧折痕把纸折起来。
+      “留一份。”<<He>>把纸递回来。“我不想让<<nnpc_him 'Bailey'>>再改。”
+  <</language>>
+  <<npcincr Robin love 2>><<glove>><br><br>
+<</if>>
+<<getouticon>><<lanLink ["Return to Robin's room", '返回罗宾的房间'] 'Robin Options'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Reblooms Orphanage Buyout Finish []
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Bailey>><<person1>>
+<<if maplebirch.get('Finance').orphanage.buyout($Finance.orphanage.choice)>>
+  <<pass 10>>
+  <<language>>
+    <<option 'EN'>>
+      Bailey checks the payment, then checks it again. You sign the receipt. <<His>> pen draws a line beneath the name you have paid for in the rent ledger.
+      <<if $Finance.orphanage.choice is 'both'>>Another line crosses out the other name.<</if>>
+      "There. We're square." <<He>> signs the sheet, tears off a receipt, and pushes both across the desk.
+      <br><br>
+      You ask about the room. Bailey glances at the receipt. "Keep the keys. That's paid for too."
+      <<He>> pulls the ledger back. The other names are still there.
+    <<option 'CN'>>
+      贝利核过款项，又核了一遍。你在回执上签好字。<<He>>拿起笔，在房租账本上给你付过款的名字划了线。
+      <<if $Finance.orphanage.choice is 'both'>>另一个名字也被划掉了。<</if>>
+      “行了，两清。”<<He>>在纸上签字，撕下一张回执，一起推过桌面。
+      <br><br>
+      你问起房间。贝利瞥了一眼回执。“钥匙留着。房间的钱也付过了。”
+      <<He>>把账本拉回去。其他人的名字还在上面。
+  <</language>>
+  <br><br><span class='green'>
+    <<language>>
+      <<option 'EN'>>
+        <<deadwood-finance-orphanage-name $Finance.orphanage.choice>>: no further rent collection. The original room remains available.
+      <<option 'CN'>>
+        <<deadwood-finance-orphanage-name $Finance.orphanage.choice>>的房租已买断，原房间仍能使用。
+    <</language>>
+  </span><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>The payment cannot go through. You keep the sheet and your money.
+    <<option 'CN'>>这笔款项没能付清。你收好纸，把钱留在自己手里。
+  <</language>><br>
+<</if>>
+<<main_hall_icon>><<lanLink ['Return to the hall (0:01)', '返回大厅 (0:01)'] 'Orphanage'>><<pass 1>><<endevent>><</lanLink>><br>
+
+:: Deadwood Reblooms Orphanage Receipt []
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
+<<if maplebirch.get('Finance').orphanage.canTalkRobin and $Finance.orphanage.robin_bought_out and !$Finance.orphanage.robin_told>>
+  <<set $Finance.orphanage.robin_told to true>>
+  <<language>>
+    <<option 'EN'>>
+      Robin reads Bailey's signature, then the receipt. <<He>> sits on the edge of the bed, still holding both.
+      "So that's it?" <<He>> gives a short laugh, then checks the paper again.
+      <<if $Finance.orphanage.pc_bought_out>>
+        "Both of us. We can stay. Or go."
+      <<else>>
+        "What about yours?" You tell <<him>> that your rent is still due each week. Robin lowers the receipt. "Thank you. I wish yours was on here too."
+      <</if>>
+      <br><br>
+      <<if C.npc.Robin.dom gte 60>>
+        <<He>> puts the receipt safely in a drawer. "Let's keep the keys. I want to leave when we decide to."
+      <<else>>
+        <<He>> looks around the room. "I'd like to stay tonight." <<His>> hand finds yours. "If that's okay."
+      <</if>>
+    <<option 'CN'>>
+      罗宾看过贝利的签名，又看了回执。<<He>>在床沿坐下，仍攥着两张纸。
+      “这样就好了？”<<He>>短促地笑了一声，又低头核了一遍。
+      <<if $Finance.orphanage.pc_bought_out>>
+        “我们两个，想住就住，想走就走。”
+      <<else>>
+        “你那份呢？”你告诉<<him>>，自己的房租还得按周交。罗宾放低了回执。“谢谢。我真希望你的名字也在上面。”
+      <</if>>
+      <br><br>
+      <<if C.npc.Robin.dom gte 60>>
+        <<He>>把回执收进抽屉。“钥匙留着。等我们自己想走了，再走。”
+      <<else>>
+        <<He>>环顾房间。“今晚还是想住这里。”<<He>>握住你的手。“可以吗？”
+      <</if>>
+  <</language>>
+  <<npcincr Robin love 3>><<npcincr Robin trauma -5>><<glove>><<lrtrauma>><br><br>
+<</if>>
+<<getouticon>><<lanLink ["Return to Robin's room", '返回罗宾的房间'] 'Robin Options'>><<endevent>><</lanLink>><br>

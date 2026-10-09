@@ -11,8 +11,7 @@
   <<lanSwitch 'You leave the closed bathroom door alone.' '你没有擅自推开紧闭的浴室门。'>>
 <<else>>
   <<if Time.hour gte 18 and Time.hour lt 23 and $KylarExpansion.bath_day isnot Time.days
-    and C.npc.Kylar.state is 'active'
-    and (!maplebirch.get('Finance') or !maplebirch.get("Finance").realEstate.residenceOf('Kylar'))>>
+    and maplebirch.get('Kylar').atManor>>
     <<set $KylarExpansion.bath_day to Time.days>>
     <<set $KylarExpansion.bath_encounter to random(1, 2) is 1>>
   <</if>>
@@ -21,97 +20,105 @@
     <<option 'CN'>>庄园浴室就在门厅旁。旧水管在墙后轻轻作响，门外的搁板上有人留了一条叠好的毛巾。
   <</language>>
   <br><br>
-  <<if $KylarExpansion.bath_day is Time.days and $KylarExpansion.bath_encounter
-    and C.npc.Kylar.state is 'active'
-    and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
-    and (!maplebirch.get('Finance') or !maplebirch.get("Finance").realEstate.residenceOf('Kylar'))>>
+  <<if maplebirch.get('Kylar').canMeetInBath>>
     <<lanSwitch 'Water is already running. Kylar calls your name from behind the closed door.' '里面已经响起水声。凯拉尔隔着紧闭的门叫了你的名字。'>><br><br>
-    <<socialiseicon 'ask'>><<lanLink '回应凯拉尔' 'Deadwood Reblooms Kylar Manor Bath Meeting'>><</lanLink>><br>
-    <<bathroomicon 'bath'>><<lanLink '等凯拉尔洗完再洗 (0:40)' 'Deadwood Reblooms Kylar Manor Bath Wash'>><<pass 40>><<strip>><</lanLink>><br>
+    <<socialiseicon 'ask'>><<lanLink ['Answer Kylar', '回应凯拉尔'] 'Deadwood Reblooms Kylar Manor Bath Meeting'>><</lanLink>><br>
+    <<bathroomicon 'bath'>><<lanLink ['Wait, then bathe (0:40)', '等凯拉尔洗完再洗 (0:40)'] 'Deadwood Reblooms Kylar Manor Bath Wash'>><<pass 40>><<strip>><</lanLink>><br>
   <<else>>
-    <<bathroomicon 'bath'>><<lanLink '独自洗浴 (0:20)' 'Deadwood Reblooms Kylar Manor Bath Wash'>><<pass 20>><<strip>><</lanLink>><br>
+    <<bathroomicon 'bath'>><<lanLink ['Bathe alone (0:20)', '独自洗浴 (0:20)'] 'Deadwood Reblooms Kylar Manor Bath Wash'>><<pass 20>><<strip>><</lanLink>><br>
   <</if>>
 <</if>>
-<br><br><<getouticon>><<lanLink '返回门厅' 'Manor Hall'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to the hall', '返回门厅'] 'Manor Hall'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Manor Bath Wash []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>><<wash>>
 <<set $KylarExpansion.bath_encounter to false>>
 <<lanSwitch 'The pipes rattle as you wash, but the water stays warm. You dry yourself and put your clothes back on.' '你洗浴时水管仍在轻响，水却一直很暖。你擦干身体，重新穿好衣服。'>><<clotheson>>
-<br><br><<getouticon>><<lanLink '返回门厅' 'Manor Hall'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to the hall', '返回门厅'] 'Manor Hall'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Manor Bath Meeting []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
-<<if !$KylarExpansion.stay_invited or $KylarExpansion.bath_day isnot Time.days
-  or !$KylarExpansion.bath_encounter
-  or C.npc.Kylar.state isnot 'active'
-  or (maplebirch.get('Finance') and maplebirch.get("Finance").realEstate.residenceOf('Kylar'))>>
+<<if !maplebirch.get('Kylar').canMeetInBath>>
   <<lanSwitch 'Kylar has finished bathing and gone back to the bedroom.' '凯拉尔已经洗完，回到房间去了。'>>
 <<else>>
   <<npc Kylar>><<person1>>
   <<language>>
-    <<option 'EN'>>Kylar opens the door a crack after you answer. <<He>> had heard you enter the hall and wondered whether the pipes had frightened you. "They make that noise every time," <<he>> says. A towel is draped around <<his>> shoulders.
-    <<option 'CN'>>你应声后，凯拉尔才把门打开一条缝。<<He>>听见你走进门厅，担心水管的响声吓到了你。“它每次都会这样。”<<he>>说，肩上披着毛巾。
+    <<option 'EN'>>
+      Kylar opens the door a crack after you answer. "I heard you in the hall. I thought you were leaving." <<He>> pulls the towel closer around <<his>> shoulders, looking past you towards the front door.
+    <<option 'CN'>>
+      你应声后，凯拉尔才把门打开一条缝。“我听见你在门厅里。我还以为你要走了。”<<He>>裹紧肩上的毛巾，越过你看向大门。
   <</language>>
   <br><br>
-  <<socialiseicon>><<lanLink '告诉凯拉尔你没事' 'Deadwood Reblooms Kylar Manor Bath Reassure'>><</lanLink>><br>
+  <<socialiseicon>><<lanLink ['Tell Kylar you are not leaving yet', '告诉凯拉尔你还没打算走'] 'Deadwood Reblooms Kylar Manor Bath Reassure'>><</lanLink>><br>
   <<if isLoveInterest('Kylar')>>
-    <<loveicon 'kiss'>><<lanLink '问凯拉尔能否留下' 'Deadwood Reblooms Kylar Manor Bath Together'>><</lanLink>><br>
+    <<loveicon 'kiss'>><<lanLink ['Ask to stay with Kylar', '问凯拉尔能否留下'] 'Deadwood Reblooms Kylar Manor Bath Together'>><</lanLink>><br>
   <</if>>
 <</if>>
-<br><br><<getouticon>><<lanLink '让凯拉尔继续洗浴' 'Manor Hall'>><<set $KylarExpansion.bath_encounter to false>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Leave Kylar to bathe', '让凯拉尔继续洗浴'] 'Manor Hall'>><<set $KylarExpansion.bath_encounter to false>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Manor Bath Reassure []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
-<<if $KylarExpansion.stay_invited and $KylarExpansion.bath_day is Time.days
-  and $KylarExpansion.bath_encounter and C.npc.Kylar.state is 'active'
-  and (!maplebirch.get('Finance') or !maplebirch.get("Finance").realEstate.residenceOf('Kylar'))>>
+<<if maplebirch.get('Kylar').canMeetInBath>>
   <<set $KylarExpansion.bath_encounter to false>>
   <<npc Kylar>><<person1>>
-  <<lanSwitch 'You tell Kylar the pipes did not frighten you. <<He>> relaxes, then points out the dry towel left for you. "Use it if you want to bathe later."' '你告诉凯拉尔，水管的声音没有吓到你。<<He>>松了口气，指了指留给你的干毛巾。“你待会儿想洗的话，可以用它。”'>>
+  <<language>>
+    <<option 'EN'>>
+      You tell Kylar you only came to use the bathroom. "Oh. Right." <<He>> looks at you, then points to the dry towel on the shelf. "I put that there for you. Don't use the other one."
+    <<option 'CN'>>
+      你告诉凯拉尔，你只是过来洗澡。“哦。这样啊。”<<He>>看了看你，又指向搁板上的干毛巾。“那是给你放的。别拿另一条。”
+  <</language>>
   <<npcincr Kylar love 1>><<glove>>
 <<else>>
   <<lanSwitch 'You have already said what you came to say.' '你想说的话已经说过了。'>>
 <</if>>
-<br><br><<getouticon>><<lanLink '返回门厅' 'Manor Hall'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to the hall', '返回门厅'] 'Manor Hall'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Manor Bath Together []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
 <<npc Kylar>><<person1>>
-<<if !$KylarExpansion.stay_invited or !isLoveInterest('Kylar')
-  or $KylarExpansion.bath_day isnot Time.days or !$KylarExpansion.bath_encounter
-  or C.npc.Kylar.state isnot 'active'
-  or (maplebirch.get('Finance') and maplebirch.get("Finance").realEstate.residenceOf('Kylar'))>>
+<<if !maplebirch.get('Kylar').canMeetInBath or !isLoveInterest('Kylar')>>
   <<lanSwitch 'You have already finished here. There is nothing more to do.' '你已经收拾好了。这里没有别的事可做。'>>
 <<else>>
   <<language>>
-    <<option 'EN'>>You ask whether Kylar wants you to stay.
-    <<if C.npc.Kylar.rage gte 50>>
-      <<He>> keeps hold of the door frame and does not step aside. "You only just got here. You are not going anywhere yet." <<He>> waits for your answer without letting go.
-    <<else>>
-      <<He>> blinks, then steps aside to make room. "If— if you want to," <<he>> says. <<He>> waits for your answer, looking at you rather than away.
-    <</if>>
-    <<option 'CN'>>你问凯拉尔是否愿意让你留下。
-    <<if C.npc.Kylar.rage gte 50>>
-      <<He>>抓着门框，没有让开。“你才刚来。哪儿也别想去。”<<He>>等着你回答，手也没有松开。
-    <<else>>
-      <<He>>愣了一下，随后挪开身体。“你、你想的话。”<<he>>说。<<He>>看着你，没有再移开视线，等你回答。
-    <</if>>
+    <<option 'EN'>>
+      You ask whether Kylar wants you to stay.
+      <<if C.npc.Kylar.rage gte 50>>
+        <<He>> grips the door frame. "You mean it? You're not just saying that?" <<He>> looks past you into the hall, then steps back. "Stay with me."
+      <<else>>
+        <<He>> blinks, then steps aside to make room. "If— if you want to," <<he>> says. <<He>> waits for your answer, looking at you rather than away.
+      <</if>>
+      Water drips from <<his>> hair onto the towel. <<He>> keeps watching you, one hand still on the door.
+    <<option 'CN'>>
+      你问凯拉尔是否愿意让你留下。
+      <<if C.npc.Kylar.rage gte 50>>
+        <<He>>攥住门框。“真的？你不是随口说说吧？”<<He>>越过你看向门厅，随后退开一步。“留下来陪我。”
+      <<else>>
+        <<He>>愣了一下，随后挪开身体。“你、你想的话。”<<he>>说。<<He>>看着你，没有再移开视线，等你回答。
+      <</if>>
+      水从<<his>>发梢滴到毛巾上。<<He>>一直看着你，一只手仍搭在门上。
   <</language>>
   <br><br>
-  <span class='lewd'><<lanSwitch 'Kylar watches you undress, then looks away too late.' '凯拉尔看着你脱衣，想移开视线时已经太迟。'>></span><br>
-  <<bathroomicon 'bath'>><<lanLink '一起洗浴 (0:20)' 'Deadwood Reblooms Kylar Manor Bath Together Wash'>><<pass 20>><<strip>><</lanLink>><br>
-  <<loveicon 'kiss'>><<lanLink '吻凯拉尔' 'Deadwood Reblooms Kylar Manor Bath Intimacy'>><<set $sexstart to 1>><<strip>><</lanLink>><<promiscuous1>><<kissvirginitywarning>><<NPCvirginitywarning 'Kylar' 'kiss'>><br>
+  <<bathroomicon 'bath'>><<lanLink ['Bathe together (0:20)', '一起洗浴 (0:20)'] 'Deadwood Reblooms Kylar Manor Bath Together Wash'>><<pass 20>><<strip>><</lanLink>><br>
+  <<loveicon 'kiss'>><<lanLink ['Kiss Kylar', '吻凯拉尔'] 'Deadwood Reblooms Kylar Manor Bath Intimacy'>><<set $sexstart to 1>><<strip>><</lanLink>><<promiscuous1>><<kissvirginitywarning>><<NPCvirginitywarning 'Kylar' 'kiss'>><br>
 <</if>>
-<br><br><<getouticon>><<lanLink '到此为止' 'Manor Hall'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Leave it there', '到此为止'] 'Manor Hall'>><<set $KylarExpansion.bath_encounter to false>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Manor Bath Together Wash []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
 <<set $KylarExpansion.bath_encounter to false>>
 <<npc Kylar>><<person1>><<wash>>
-<<lanSwitch 'Kylar makes room for you by the tap and steadies the loose shower head while you wash. <span class="lewd">He keeps finding excuses to touch you — a hand at your shoulder, at your hip — and each time <<he>> catches himself and looks away, hard against <<his>> own thigh.</span> When you finish, <<he>> offers you the towel <<he>> set aside.' '凯拉尔在水龙头旁为你腾出地方。你洗浴时，<<he>>帮你扶着松动的淋浴喷头。<span class="lewd"><<He>>不断找借口碰你——手搭上你的肩，又滑到腰侧——每次<<he>>都忽然惊醒，别开脸，却已经硬得贴着自己的大腿。</span>洗完后，<<he>>递来先前为你留的毛巾。'>>
+<<language>>
+  <<option 'EN'>>
+    Kylar makes room for you by the tap and steadies the loose shower head while you wash.
+    <span class='lewd'><<He>> keeps finding excuses to touch you — a hand at your shoulder, then your hip. When you look around, <<he>> blushes without quite taking <<his>> hand away.</span>
+    When you finish, <<he>> offers you the towel <<he>> set aside.
+  <<option 'CN'>>
+    凯拉尔在水龙头旁为你腾出地方。你洗浴时，<<he>>帮你扶着松动的淋浴喷头。
+    <span class='lewd'><<He>>不断找借口碰你——手搭上你的肩，又滑到腰侧。你回头看过去，<<he>>红了脸，手却没有完全收回去。</span>
+    洗完后，<<he>>递来先前为你留的毛巾。
+<</language>>
 <<npcincr Kylar love 1>><<glove>><<stress -3>><<lstress>><<clotheson>>
-<br><br><<getouticon>><<lanLink '返回门厅' 'Manor Hall'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to the hall', '返回门厅'] 'Manor Hall'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Manor Bath Intimacy []
 <<set $outside to 0>><<location 'kylarmanor'>>
@@ -124,29 +131,29 @@
   <<consensual>><<set $consensual to 1>><<neutral 1>><<maninit>><<npcexpose>>
   <<set $enemytrust += 100>>
   <<language>>
-    <<option 'EN'>>Kylar asks again if you mean to stay. When you kiss <<him>>, <<he>> folds the towel out of the water's reach, and the heat of <<his>> skin presses against your thigh before <<he>> can think better of it. <span class='lewd'>Water laps between you as <<he>> fits <<his>> hips to yours, already stiff and failing to hide it.</span>
-    <<if C.npc.Kylar.rage gte 50>>
-      <span class='teal'>"Tell me if I'm too close,"</span>
-    <<else>>
-      "I— I can stop,"
-    <</if>>
-    <<he>> says, and then adds, much too quickly: "Not that I want to. Unless you do. Sorry." <<He>> waits for your answer, watching your face, one hand already closed around your waist.
-    <<option 'CN'>>凯拉尔又问了一遍，你是否真的想留下。你吻过来，<<he>>才把毛巾叠好，放到水溅不到的地方，<<his>>皮肤的热度已经贴上了你的大腿，等<<he>>想收回来时已经太晚。<span class='lewd'>水在你们之间晃开，<<he>>把腰贴了上来，硬得藏都藏不住。</span>
-    <<if C.npc.Kylar.rage gte 50>>
-      <span class='teal'>“靠得太近就告诉我。”</span>
-    <<else>>
-      “我、我可以停。”
-    <</if>>
-    <<he>>说，又急急忙忙补上一句：“不是我想停。除非你想。对不起。”<<He>>盯着你的脸，等你回答，一只手已经圈上了你的腰。
+    <<option 'EN'>>
+      You kiss Kylar. <<He>> drops the towel onto the dry shelf and presses closer, one hand closing around your waist.
+      <<if C.npc.Kylar.rage gte 50>>
+        "You came here for me," <<he>> whispers against your lips. "Didn't you?" <<He>> draws back just enough to see your face.
+      <<else>>
+        "I— I can stop," <<he>> says, then adds much too quickly: "Not that I want to. Unless you do. Sorry." <<He>> watches your face, red to the ears.
+      <</if>>
+    <<option 'CN'>>
+      你吻上凯拉尔。<<He>>把毛巾丢到干燥的搁板上，贴得更近，一只手环住你的腰。
+      <<if C.npc.Kylar.rage gte 50>>
+        “你是来找我的。”<<he>>贴着你的嘴唇低声说，“对吧？”<<He>>稍稍退开，看着你的脸。
+      <<else>>
+        “我、我可以停。”<<he>>说，又急急忙忙补上一句：“不是我想停。除非你想。对不起。”<<He>>看着你的脸，连耳根都红了。
+      <</if>>
   <</language>><br><br>
 <</if>>
 <<set $enemyanger to -10>>
 <<effects>><<effectsman>><<man>><<stateman>>
 <br><br><<actionsman>>
 <<if _combatend>>
-  <span id='next'><<lanLink '继续' 'Deadwood Reblooms Kylar Manor Bath Intimacy Finish'>><</lanLink>></span><<nexttext>>
+  <span id='next'><<lanLink ['Continue', '继续'] 'Deadwood Reblooms Kylar Manor Bath Intimacy Finish'>><</lanLink>></span><<nexttext>>
 <<else>>
-  <span id='next'><<lanLink '继续' 'Deadwood Reblooms Kylar Manor Bath Intimacy'>><</lanLink>></span><<nexttext>>
+  <span id='next'><<lanLink ['Continue', '继续'] 'Deadwood Reblooms Kylar Manor Bath Intimacy'>><</lanLink>></span><<nexttext>>
 <</if>>
 
 :: Deadwood Reblooms Kylar Manor Bath Intimacy Finish []
@@ -163,4 +170,4 @@
   <<lanSwitch 'You stop. Kylar passes you a towel and waits while you catch your breath.' '你停了下来。凯拉尔把毛巾递给你，等你平复呼吸。'>>
 <</if>>
 <<wash>><<clotheson>><<endcombat>><<npc Kylar>><<person1>>
-<br><br><<getouticon>><<lanLink '返回门厅' 'Manor Hall'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to the hall', '返回门厅'] 'Manor Hall'>><</lanLink>>

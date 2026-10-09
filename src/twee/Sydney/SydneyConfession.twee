@@ -4,9 +4,9 @@
 <<widget 'deadwood-reblooms-sydney-confession-cross-over'>>
   <<language>>
     <<option 'EN'>>
-      The other side falls silent. You hear someone shift on the bench next door, and then the door between you opens.<span class='red'> It is Sydney.</span>
+      The other side falls silent. A door opens onto the corridor, and someone looks out from the confessor's side.<span class='red'> It is Sydney.</span>
     <<option 'CN'>>
-      另一侧安静下来。你听见隔壁长椅上有人动了动，接着你们之间的门开了。<span class='red'>是悉尼。</span>
+      另一侧安静下来。通向走廊的门开了，告解员从自己的隔间探出头。<span class='red'>是悉尼。</span>
   <</language>>
   <br><br>
   <<getinicon>><<lanLink ["Go to Sydney's side of the booth", '前往悉尼所在的一侧'] 'Temple Confess Self Sydney Cross'>><</lanLink>><br>
@@ -31,7 +31,8 @@
     <<if _sydneyStatus.includes('corrupt')>>
       Sydney glances toward the corridor and moves aside to make room on the bench. "You came all the way around?" <<he>> whispers. "We should keep our voices down."
     <<elseif _sydneyStatus.includes('pure')>>
-      Sydney stares at you, flushed from ear to ear. "Y-you actually came over here? We shouldn't... not in the confessional..." <<He>> gestures toward the bench beside <<him>>. "<span class='teal'>But please don't leave.</span>"
+      Sydney stares at you, flushed from ear to ear. "Y-you actually came over here?" <<He>> glances at the empty corridor.
+      "<span class='teal'>You can sit for a moment.</span> But this is still a confessional. We can't forget why people come here."
     <<else>>
       Sydney glances down the corridor, then leaves the door unlatched. "This is a terrible place to be alone together," <<he>> murmurs, making room for you beside <<him>>.
     <</if>>
@@ -41,7 +42,8 @@
     <<if _sydneyStatus.includes('corrupt')>>
       悉尼看了看走廊，又在长椅上为你让出位置。“你真的绕过来了？”<<he>>轻声说，“我们说话得小声些。”
     <<elseif _sydneyStatus.includes('pure')>>
-      悉尼盯着你，脸一直红到耳根。“你、你真的过来了？我们不应该……不能在告解室里……”<<he>>示意你坐到身边。“<span class='teal'>但请别离开。</span>”
+      悉尼盯着你，脸一直红到耳根。“你、你真的过来了？”<<He>>看了看空荡荡的走廊。
+      “<span class='teal'>可以坐一会儿。</span>但这里还是告解室。不能忘了别人为什么来这里。”
     <<else>>
       悉尼朝走廊看了一眼，没有把门闩上。“这里实在不适合单独待着。”<<he>>低声说，在身旁为你让出位置。
     <</if>>
@@ -61,7 +63,20 @@
 <</if>>
 <br><br>
 
-<<loveicon>><<lanLink '提议与悉尼亲密' 'Temple Confess Self Sydney Sex'>><<set $sexstart to 1>><</lanLink>><<promiscuous3>><br>
+<<socialiseicon>><<linkreplace `lanSwitch('Sit quietly with Sydney (0:05)', '静静陪悉尼坐一会儿 (0:05)')`>>
+  <<pass 5>>
+  <<language>>
+    <<option 'EN'>>
+      You sit beside Sydney. <<He>> leaves <<his>> hand beside yours on the bench.
+      When footsteps sound in the corridor, <<he>> straightens and listens. "I should get back to work," <<he>> whispers.
+    <<option 'CN'>>
+      你挨着悉尼坐下。<<He>>把手留在长椅上，紧靠着你的手。
+      走廊里传来脚步声，<<he>>坐直了，侧耳听着。“我该继续值勤了。”<<he>>低声说。
+  <</language>>
+<</linkreplace>><br>
+<<if _sydneyStatus.includes('corrupt') and hasSexStat('promiscuity', 3)>>
+  <<loveicon>><<lanLink '提议与悉尼亲密' 'Temple Confess Self Sydney Sex'>><<set $sexstart to 1>><</lanLink>><<promiscuous3>><br>
+<</if>>
 <<lanLink ['Return to your side', '回到自己那一侧'] 'Temple Confess Self End Alone'>><</lanLink>><br>
 
 :: Temple Confess Self Sydney Sex []
@@ -70,9 +85,13 @@
 <<if $sexstart is 1>>
   <<language>>
     <<option 'EN'>>
-      There is barely room for two on the bench. Sydney's knees bracket yours, and <<his>> breath is already uneven against your ear. <span class='lewd'><<His>> hand slips under your clothing and finds you slick before <<he>> has said a word.</span> "Quietly," <<he>> whispers, and swallows the sound you make.
+      There is barely room for two on the bench. You ask Sydney if <<he>> wants to continue.
+      <<He>> answers by pulling you closer. <span class='lewd'><<His>> hand slips beneath your clothing, pausing until you guide it.</span>
+      "Quietly," <<he>> whispers against your ear.
     <<option 'CN'>>
-      长椅上挤不下两个人。悉尼的膝盖夹着你，呼吸在你耳边已经乱了。<span class='lewd'><<He>>的手探进你的衣下，还没开口就已经摸到一片湿滑。</span>“小点声。”<<he>>低声说，把你溢出的声音咽了下去。
+      长椅上挤不下两个人。你问悉尼是否想继续，<<he>>把你拉近作为回答。
+      <span class='lewd'><<His>>的手探进你的衣下，停在那里，直到你牵着<<his>>的手继续。</span>
+      “小点声。”<<he>>贴着你的耳边低声说。
   <</language>>
   <br><br>
   <<clearnpc>><<npc Sydney>><<person1>>
@@ -152,7 +171,7 @@
 <<stress 3>><<gstress>>
 <br><br>
 <<templeicon 'confession'>><<lanLink ['Let Sydney hear the confession', '让悉尼听完忏悔'] 'Temple Confess Self Sydney Interrupted Wait'>><</lanLink>><<glove 'Sydney'>><br>
-<<if hasSexStat('promiscuity', 3)>>
+<<if _sydneyStatus.includes('corrupt') and hasSexStat('promiscuity', 3)>>
   <<loveicon>><<lanLink ['Keep teasing Sydney', '继续挑逗悉尼'] 'Temple Confess Self Sydney Interrupted Tease'>><</lanLink>><<promiscuous3>><<garousal>><br>
 <</if>>
 <<getouticon>><<lanLink ['Stop before you are discovered', '在被发现前停下'] 'Temple Confess Self Sydney Sex Finish'>><<set $SydneyExpansion.confession_intrusion to 3>><</lanLink>><<lstress>><br>
@@ -270,10 +289,10 @@
 <<else>>
   <<language>>
     <<option 'EN'>>
-      Sydney reluctantly lets you go, eyes lingering on your body. "We should stop before someone notices both doors are locked." <<He>>
-      gives you one last kiss. "We'll finish this later."
+      Sydney lets you go. "Someone might come looking for me. We should stop." <<He>> gives your hand a squeeze.
+      "We can talk somewhere else later."
     <<option 'CN'>>
-      悉尼恋恋不舍地放开你，目光仍停留在你身上。“趁还没人发现两扇门都锁着，我们该停下了。”<<He>>最后吻了你一下。“晚点再把它做完。”
+      悉尼放开你。“有人可能会找我，我们该停下了。”<<He>>轻轻捏了捏你的手。“晚点找个别的地方说话吧。”
   <</language>>
   <<npcincr Sydney lust 5>><<npcincr Sydney purity 2>><<gglust>><<gspurity>>
 <</if>>

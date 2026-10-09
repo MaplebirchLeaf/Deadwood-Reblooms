@@ -17,9 +17,10 @@ Invitation does not cancel family stories. Moving to a PC home transfers some co
 | ---------- | ------------------------ | ---------------------------------------------------------------------------------------------------- |
 | Bedroom    | Wardrobe, mirror and bed | A place to stay, with separate VanillaPlus eerie-mirror requirements                                 |
 | Computer   | Shared gaming            | Available evening presence, love and stress benefits                                                 |
-| Schoolbook | Repair marked notes      | Once daily, with ability-dependent repair choice                                                     |
+| Schoolbook | Notes and exercises      | Once daily, with ability-dependent repair or review choices                                          |
 | Kitchen    | Tea                      | Once daily, also available alone                                                                     |
 | Garden     | Questions and pruning    | Daytime 08:00 until before 09:00 outside school hours, unexposed and not both arms bound, once daily |
+| Bathroom   | Bathe or answer Kylar    | One possible encounter daily, from 18:00 until before 23:00 while Kylar is at the manor              |
 
 ### Notes choices
 
@@ -28,6 +29,8 @@ Playing together and copying notes require at least one unbound arm. You can sti
 Listen first or repair exercises when English ability qualifies. Listening improves love, while repair also improves English. The school grade letter and this ability check are separate records, so one high exam grade does not guarantee the option.
 
 Prefect or president status changes questions without replacing the ability requirement.
+
+<span class="teal">The repaired page remains in the book.</span> Later visits can cover new exercises. Shared games also resume the previous save, which Kylar leaves untouched while you are away.
 
 ### Garden and jealousy
 
@@ -40,6 +43,8 @@ The garden entrance also requires Kylar not registered at a PC-owned home, avoid
 At **Park → Kylar**, once vanilla relationship status allows showing the sketch, active Kylar actually at the park offers **ask what they are drawing (0:10)** once daily.
 
 Wait for them to show it, praise the path or stop asking. Responses differ in dialogue and love without forcing the sketchbook away. Completing every manor activity is unnecessary, but vanilla sketch-sharing eligibility still applies.
+
+Kylar remembers the last response. Waiting or praising changes how they show the sketchbook next time. Stopping your questions does not reduce love.
 
 ### Sleep versus residency
 

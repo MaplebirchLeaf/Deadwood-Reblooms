@@ -1,0 +1,96 @@
+:: Deadwood Reblooms Donations Widgets [widget]
+
+<<widget 'deadwood-finance-donations-link'>>
+  <<if maplebirch.get('Finance').donations.available>>
+    <<icon 'manila-envelope.png'>><<lanLink ['Ask about the donations desk', '询问募捐处'] 'Deadwood Reblooms Donations'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-finance-donations-projects'>>
+  <<for _donation_project range maplebirch.get('Finance').donations.projects>>
+    <<deadwood-card `maplebirch.t(_donation_project.name)` `maplebirch.t(_donation_project.name)`>>
+      <<print maplebirch.t(_donation_project.project)>><br>
+      <<lanSwitch 'Donated: ' '累计捐款：'>><<deadwood-reblooms-finance-money _donation_project.donated>><br>
+      <<lanSwitch 'Target: ' '目标：'>><<deadwood-reblooms-finance-money _donation_project.goal>><br>
+      <<if _donation_project.funded>>
+        <span class='green'><<lanSwitch 'Target met. Funds are reserved for the listed supplies.' '目标已募足，款项留作所列物资的采购。'>></span><br>
+      <</if>>
+    <</deadwood-card>>
+  <</for>>
+<</widget>>
+
+<<widget 'deadwood-finance-donation-receipts'>>
+  <<if $Finance.donations.receipts.length gt 0>>
+    <<deadwood-card 'Recent donation receipts' '近期捐赠收据'>>
+      <ul class='journal'>
+        <<for _donation_receipt range $Finance.donations.receipts.slice(-4).reverse()>>
+          <li>
+            <<print maplebirch.t('deadwood-reblooms:donations:' + _donation_receipt.fund)>>:
+            <<deadwood-reblooms-finance-money _donation_receipt.amount>>
+            <<if _donation_receipt.anonymous>><i><<lanSwitch ' (anonymous)' '（匿名）'>></i><</if>>
+          </li>
+        <</for>>
+      </ul>
+    <</deadwood-card>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Donations []
+<<set $outside to 0>><<set $location to 'townhall'>><<effects>>
+<<if maplebirch.get('Finance').donations.available>>
+  <b><<lanSwitch 'Donations desk' '募捐处'>></b><br>
+  <<language>>
+    <<option 'EN'>>
+      You are directed to a smaller window beside the front desk. Four forms sit beneath the glass.
+      A clerk pushes one towards you. "Choose where it goes. We give you a receipt, and send it to that fund."
+    <<option 'CN'>>
+      工作人员指给你看前台旁的小窗口。玻璃下摆着四张表格。
+      柜员把一张推到你面前。“选好给哪家。这里开收据，再转到对应的账上。”
+  <</language>>
+  <br><br>
+  <div id='deadwood-donation-projects'><<deadwood-finance-donations-projects>></div>
+  <br>
+  <<set _donation_fund to 'orphanage'>><<set _donation_amount to 100>><<set _donation_anonymous to false>>
+  <label><<lanSwitch 'Fund: ' '捐往：'>>
+    <<listbox '_donation_fund' autoselect>>
+      <<optionsfrom Object.fromEntries(maplebirch.get('Finance').donations.projects.map(project => [maplebirch.t(project.name), project.id]))>>
+    <</listbox>>
+  </label><br>
+  <label><<lanSwitch 'Amount (£): ' '金额 (£)：'>><<numberbox '_donation_amount' 100>></label><br>
+  <label><<checkbox '_donation_anonymous' false true>> <<lanSwitch 'Donate anonymously' '匿名捐款'>></label><br>
+  <span class='blue'><i>
+    <<language>>
+      <<option 'EN'>>
+        Cash is used first. A debit card allows the remainder to be drawn from your bank account. Donations above a target stay with that fund.
+      <<option 'CN'>>
+        先使用随身现金，余款可凭借记卡从银行账户扣除。超过目标的捐款仍留在对应账上。
+    <</language>>
+  </i></span><br><br>
+  <<shopicon 'register'>><<lanLink ['Donate (0:05)', '捐款 (0:05)']>>
+    <<replace '#deadwood-donation-receipt'>>
+      <<if maplebirch.get('Finance').donations.donate(_donation_fund, _donation_amount, _donation_anonymous)>>
+        <<pass 5>>
+        <<replace '#deadwood-donation-projects'>><<deadwood-finance-donations-projects>><</replace>>
+        <<language>>
+          <<option 'EN'>>
+            The clerk stamps your receipt and passes it through the slot. You put it away.
+          <<option 'CN'>>
+            柜员在收据上盖章，从窗口递出来。你把它收好。
+        <</language>><br>
+        <span class='green'><<print maplebirch.t('deadwood-reblooms:donations:' + _donation_fund)>>: <<deadwood-reblooms-finance-money `Math.round(_donation_amount * 100)`>></span>
+      <<else>>
+        <span class='red'><<lanSwitch 'The donation could not be taken. Check the amount, your funds and the opening hours.' '这笔捐款没能受理。请检查金额、可用资金与开放时间。'>></span>
+      <</if>>
+    <</replace>>
+  <</lanLink>><br>
+  <div id='deadwood-donation-receipt'></div>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      You cannot use the donations window now. A notice gives the opening hours: weekdays, 8:00 to 18:00.
+    <<option 'CN'>>
+      你现在无法在募捐窗口办事。告示上写着开放时间：工作日，8:00 至 18:00。
+  <</language>><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Return to the front desk', '返回前台'] 'Town Hall Wait'>><</lanLink>><br>
+<<getouticon>><<lanLink ['Leave', '离开'] 'Cliff Street'>><<endevent>><</lanLink>><br>

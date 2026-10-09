@@ -48,7 +48,7 @@
         <<option 'EN'>><<mirroricon>><<link 'Mirror' 'Deadwood Reblooms Kylar Mirror'>><<preMirror>><</link>>
         <<option 'CN'>><<mirroricon>><<link '镜子' 'Deadwood Reblooms Kylar Mirror'>><<preMirror>><</link>>
       <</language>><br>
-      <<if _kylarAtManor and !pcAreArmsBound('both') and $KylarExpansion.game_day isnot Time.days>>
+      <<if _kylarAtManor and isLoveInterest('Kylar') and !pcAreArmsBound('both') and $KylarExpansion.game_day isnot Time.days>>
         <<language>>
           <<option 'EN'>><<techicon 'monitors'>><<link 'Play a game with Kylar (0:20)' 'Deadwood Reblooms Kylar Game'>><</link>>
           <<option 'CN'>><<techicon 'monitors'>><<link '和凯拉尔玩游戏 (0:20)' 'Deadwood Reblooms Kylar Game'>><</link>>
@@ -179,13 +179,13 @@
   <</if>>
   <<language>>
     <<option 'EN'>>
-      You rinse two cups and put the kettle on. The kitchen still smells faintly of chemicals, but the tea is warm in your hands.
+      You rinse <<if _kylarTeaTogether>>two cups<<else>>a cup<</if>> and put the kettle on. The kitchen still smells faintly of chemicals, but the tea is warm in your hands.
       <<if _kylarTeaTogether>>
         <br><br>
         Kylar peers in from the hall. You offer <<him>> the second cup. <<He>> takes it carefully and stays beside you while it cools.
       <</if>>
     <<option 'CN'>>
-      你洗净两只杯子，烧开一壶水。厨房里仍有淡淡的化学气味，手里的茶却是热的。
+      你洗净<<if _kylarTeaTogether>>两只杯子<<else>>一只杯子<</if>>，烧开一壶水。厨房里仍有淡淡的化学气味，手里的茶却是热的。
       <<if _kylarTeaTogether>>
         <br><br>
         凯拉尔从门厅探头。你把另一只杯子递给<<him>>。<<He>>小心接过，留在你身边等茶稍凉。
@@ -253,9 +253,7 @@
 <<set _autosavehere to true>><<sleep>>
 <<if !_dreaming>>
   <<effects>><<wakingEffects $sleepHoursTotal>>
-  <<set _nightWake to _nightWake and C.npc.Kylar.state is 'active'
-    and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
-    and (!maplebirch.get('Finance') or !maplebirch.get("Finance").realEstate.residenceOf('Kylar'))
+  <<set _nightWake to _nightWake and maplebirch.get('Kylar').atManor
     and !_wakingEffect and $sleepHoursTotal gte 1
     and (Time.hour gte 23 or Time.hour lt 6)>>
   <<if _nightWake>>
@@ -291,8 +289,11 @@
             Daylight falls through the skylights.
           <</if>>
           <br><br>
-          <<if C.npc.Kylar.state is 'active' and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
-            and (!maplebirch.get('Finance') or !maplebirch.get("Finance").realEstate.residenceOf('Kylar'))>>Kylar is still beside you, watching to make sure you are awake.<<else>>Kylar has left the blanket tucked around you.<</if>>
+          <<if maplebirch.get('Kylar').atManor>>
+            Kylar is still beside you, watching to make sure you are awake.
+          <<else>>
+            The other side of the bed is empty. The blanket is still tucked around you.
+          <</if>>
         <<option 'CN'>>
           你在凯拉尔的床上醒来。
           <<if Time.dayState is 'night'>>
@@ -301,8 +302,11 @@
             日光从天窗洒进来。
           <</if>>
           <br><br>
-          <<if C.npc.Kylar.state is 'active' and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
-            and (!maplebirch.get('Finance') or !maplebirch.get("Finance").realEstate.residenceOf('Kylar'))>>凯拉尔还在身边，见你睁眼才放下心。<<else>>凯拉尔离开前替你掖好了被角。<</if>>
+          <<if maplebirch.get('Kylar').atManor>>
+            凯拉尔还在身边，见你睁眼才放下心。
+          <<else>>
+            床的另一侧空着，被角仍掖在你身边。
+          <</if>>
       <</language>><br><br>
     <</if>>
     <<sleepeffects>>

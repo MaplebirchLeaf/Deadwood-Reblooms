@@ -3,12 +3,17 @@
 import Shared from './Shared';
 
 export default class RobinTutoring extends Shared {
-  /** 周家教收入，单位英镑。学期外为 0，六节以上提价。 */
-  public get income(): number {
-    return this.state.tutor && this.state.tutor_lessons > 0 && Time.schoolTerm ? (this.state.tutor_lessons >= 6 ? 60 : 40) : 0;
+  /** 固定课时：周二、周四，六次授课后再加周五。 */
+  public get lessonDays(): number[] {
+    return this.state.tutor_lessons >= 6 ? [3, 5, 6] : [3, 5];
   }
 
-  /** 开班条件：已拿到家教线索、摊位至少 1 级、罗宾服从度足够。 */
+  /** 周家教收入，单位英镑。学期外为 0，六节以上提价。 */
+  public get income(): number {
+    return this.robinAvailable && C.npc.Robin.trauma < 80 && this.state.tutor && this.state.tutor_lessons > 0 && Time.schoolTerm ? (this.state.tutor_lessons >= 6 ? 60 : 40) : 0;
+  }
+
+  /** 开班条件：已拿到家教线索、摊位至少 1 级、罗宾主见足够。 */
   public start(): boolean {
     if (!this.robinAvailable || !this.state.topics.tutor || this.state.tutor || Math.max(this.state.lemonade, this.state.chocolate) < 1 || C.npc.Robin.dom < 45) return false;
     this.state.tutor = true;
@@ -17,11 +22,18 @@ export default class RobinTutoring extends Shared {
     return true;
   }
 
-  /** 今天是否还能与罗宾共同授课：上学日 17:30–18:30，且当日尚未授课。 */
+  /** 今天是否还能与罗宾共同授课：约定的上学日 17:30–18:30，且当日尚未授课。 */
   public get canTutorToday(): boolean {
     return (
       this.state.tutor &&
+      !V.replayScene &&
+      !V.statFreeze &&
+      V.combat !== 1 &&
+      V.exposed <= 0 &&
+      V.stress < V.stressmax &&
+      !V.gag &&
       Time.schoolDay &&
+      this.lessonDays.includes(Time.weekDay) &&
       this.state.tutor_day !== Time.days &&
       ((Time.hour === 17 && Time.minute >= 30) || (Time.hour === 18 && Time.minute < 30)) &&
       window.getRobinLocation() === 'tutor' &&
@@ -31,16 +43,21 @@ export default class RobinTutoring extends Shared {
     );
   }
 
+  public get canTutorWithSkills(): boolean {
+    return this.canTutorToday && window.currentSkillValue(['maths', 'english', 'science'][this.state.tutor_lessons % 3]) >= 300;
+  }
+
   /** 与罗宾共同授课一次，推进科目并结算收益。 */
   public teach(approach: 'lead' | 'together' | 'skills'): boolean {
     const pupil = V.per_npc?.deadwood_robin_tutor_pupil;
     const parent = V.per_npc?.deadwood_robin_tutor_parent;
     if (!this.canTutorToday || pupil?.name_known !== 1 || parent?.name_known !== 1 || !['lead', 'together', 'skills'].includes(approach)) return false;
+    if (approach === 'skills' && !this.canTutorWithSkills) return false;
     this.state.tutor_day = Time.days;
     this.state.tutor_lessons++;
     this.state.tutor_subject = (this.state.tutor_lessons - 1) % 3;
     // 只记录 PC 真正完成的帮课，进门后离开不会让学生进步或增加家长的信任。
-    pupil.tutor_confidence = Math.min(6, (pupil.tutor_confidence ?? 0) + (approach === 'together' ? 2 : 1));
+    pupil.tutor_confidence = Math.min(6, (pupil.tutor_confidence ?? 0) + (approach === 'lead' ? 1 : 2));
     parent.tutor_visits = (parent.tutor_visits ?? 0) + 1;
     V.money += 750;
     this.state.reserve += 8;

@@ -452,10 +452,17 @@
   <<historyicon>><<lanLink '查证最早来源' 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 0>><</lanLink>><<ghistory>><br>
 <</if>>
 <<historyicon>><<lanLink ['Trust the museum catalogue', '相信博物馆目录'] 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 1>><</lanLink>><br>
-<<crimeicon 'documents'>><<lanLink ['Reconcile the accounts', '整合不同说法'] 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 2>><</lanLink>><<skulduggerydifficulty>><br>
+<<if currentSkillValue('english') gte 300>>
+  <<englishicon>><<lanLink ['Compare the wording and keep the disagreements', '对照措辞，保留不同说法'] 'Deadwood Reblooms History Project Archive Finish'>><<set $phase to 3>><</lanLink>><br>
+<</if>>
+<<crimeicon 'documents'>><<lanLink ['Write a single version', '拼成一个版本'] 'Deadwood Reblooms History Project Archive Finish' >><<set $phase to 2>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Archive Finish []
-<<set $LifeSimulation.historyProject.archive to $phase is 0 ? 30 : 18>>
+<<if ($phase is 0 and $historytrait lt 4) or ($phase is 3 and currentSkillValue('english') lt 300)>>
+  <<set $phase to 1>>
+<</if>>
+<<set _historyArchiveNew to $LifeSimulation.historyProject.archive is 0>>
+<<set $LifeSimulation.historyProject.archive to $phase is 0 ? 30 : ($phase is 3 ? 24 : 18)>>
 <<language>>
   <<option 'EN'>>
     <<if $phase is 0>>
@@ -469,6 +476,11 @@
       <</if>>
       <br><br>
       <span class="green">The pile is down to three accounts that do not simply repeat each other.</span>
+    <<elseif $phase is 3>>
+      You underline the words that changed between editions. A certainty in one account is only a rumour in another.
+      You keep both versions, with a reference beside each. The gaps remain, but you can show where they came from.
+      <br><br>
+      <span class="teal">Your notes distinguish what the sources say from what they leave unanswered.</span>
     <<elseif $phase is 1>>
       You copy the museum catalogue.
       Its summary is useful, but several confident statements name nobody.
@@ -492,6 +504,11 @@
       <</if>>
       <br><br>
       <span class="green">庞杂的资料只剩下三份，彼此并非转抄。</span>
+    <<elseif $phase is 3>>
+      你划出不同版本中改过的措辞。一份记载中的定论，在另一份里只是传闻。
+      你把两种说法都留下，各自标明出处。疑点还在，不过现在能看出它们从何而来。
+      <br><br>
+      <span class="teal">笔记分清了记载说过的事，也留下了尚无答案的问题。</span>
     <<elseif $phase is 1>>
       你抄下博物馆目录的概要。
       内容足够使用，其中几句笃定的判断却没写明是谁说的。
@@ -504,6 +521,9 @@
       <span class="teal">稿子很干净，良心是另一回事。</span><<delinquency 10>><<gdelinquency>>
     <</if>>
 <</language>>
+<<if $phase is 3 and _historyArchiveNew>>
+  <<englishskill 1>><<genglish>>
+<</if>>
 <br><br>
 <<schoolicon 'library'>><<lanLink ['Return to the library', '返回图书馆'] 'School Library'>><</lanLink>><br>
 

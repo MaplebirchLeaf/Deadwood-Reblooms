@@ -4,19 +4,34 @@
   or !maplebirch.get('Kylar').atManor or pcAreArmsBound('both') or $KylarExpansion.game_day is Time.days>>
   <<lanSwitch 'You cannot play together right now.' '现在无法一起玩游戏。'>>
 <<else>>
-<<pass 20>><<set $KylarExpansion.game_day to Time.days>>
-<<npc Kylar>><<person1>>
-<<language>>
-  <<option 'EN'>>
-    Kylar makes room for you at the desk and gives you the controller with the working buttons. On one monitor, your characters run through a ruined castle together.
-    <br><br>
-    <<He>> starts to explain every shortcut, then stops when you find one yourself. <span class='teal'>"You saw that before I did,"</span> <<he>> says, and then looks down at <<his>> controller, as though <<he>> has said too much.
-  <<option 'CN'>>
-    凯拉尔在桌前为你腾出位置，把按键完好的手柄交给你。屏幕上，你们操纵的角色一起穿过一座破败的城堡。
-    <br><br>
-    <<He>>正要把每条近路都讲给你听，你却先发现了一条。<span class='teal'>“你比我还早看见。”</span><<he>>说完便低下头去看手柄，像是说得太多了。
-<</language>>
-<<npcincr Kylar love 1>><<glove>><<stress -3>><<lstress>>
+  <<set _kylarPlayedBefore to $KylarExpansion.game_day gte 0>>
+  <<pass 20>><<set $KylarExpansion.game_day to Time.days>>
+  <<npc Kylar>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _kylarPlayedBefore>>
+        Kylar loads the game you played together last time. "I didn't go any further," <<he>> says, handing you the controller. "I was waiting for you."
+      <<else>>
+        Kylar makes room for you at the desk and gives you the controller with the working buttons. On one monitor, your characters run through a ruined castle together.
+      <</if>>
+      <br><br>
+      <<He>> starts to explain every shortcut, then stops when you find one yourself. <span class='teal'>"You saw that before I did,"</span> <<he>> says, and then looks down at <<his>> controller, as though <<he>> has said too much.
+      <<if C.npc.Kylar.rage gte 50>>
+        When the session ends, <<he>> puts the second controller in a drawer. "That's yours. Nobody else gets to use it."
+      <</if>>
+    <<option 'CN'>>
+      <<if _kylarPlayedBefore>>
+        凯拉尔读出你们上次一起玩的存档。“我没往下玩。”<<he>>把手柄递给你，“我在等你。”
+      <<else>>
+        凯拉尔在桌前为你腾出位置，把按键完好的手柄交给你。屏幕上，你们操纵的角色一起穿过一座破败的城堡。
+      <</if>>
+      <br><br>
+      <<He>>正要把每条近路都讲给你听，你却先发现了一条。<span class='teal'>“你比我还早看见。”</span><<he>>说完便低下头去看手柄，像是说得太多了。
+      <<if C.npc.Kylar.rage gte 50>>
+        游戏结束后，<<he>>把另一只手柄收进抽屉。“这是你的。不让别人用。”
+      <</if>>
+  <</language>>
+  <<npcincr Kylar love 1>><<glove>><<stress -3>><<lstress>>
 <</if>>
 <br><br>
 <<language>>
@@ -33,39 +48,80 @@
   <<pass 20>><<set $KylarExpansion.notes_day to Time.days>>
   <<npc Kylar>><<person1>>
   <<language>>
-    <<option 'EN'>>A schoolbook lies open on Kylar's desk. A page has been torn at the corner. Kylar covers the marks with one hand. "Someone wrote on it again. I— I wanted to fix it before you saw. I did not want you to think I—" <<He>> stops and keeps <<his>> hand where it is.
-    <<option 'CN'>>凯拉尔的书摊在桌上，书页一角被撕破了。<<He>>用手遮住上面的涂写。“又有人在上面乱写。我、我本想在你看见之前弄好。我不想让你觉得我——”<<He>>没再说下去，手也没有移开。
+    <<option 'EN'>>
+      <<if $KylarExpansion.notes_repaired>>
+        The page you copied is still tucked into Kylar's schoolbook. <<He>> unfolds it carefully and puts today's exercise beside it. "I checked this one. Twice. Could you look at it?"
+      <<else>>
+        A schoolbook lies open on Kylar's desk. A page has been torn at the corner. Kylar covers the marks with one hand. "Someone wrote on it again. I— I wanted to fix it before you saw. I did not want you to think I—" <<He>> stops and keeps <<his>> hand where it is.
+      <</if>>
+    <<option 'CN'>>
+      <<if $KylarExpansion.notes_repaired>>
+        你誊好的那页纸还夹在凯拉尔的课本里。<<He>>小心展开它，把今天的习题放在旁边。“这次我检查过了。两遍。你能看看吗？”
+      <<else>>
+        凯拉尔的书摊在桌上，书页一角被撕破了。<<He>>用手遮住上面的涂写。“又有人在上面乱写。我、我本想在你看见之前弄好。我不想让你觉得我——”<<He>>没再说下去，手也没有移开。
+      <</if>>
   <</language>><br><br>
-  <<if $LifeSimulation?.school and $LifeSimulation.school.role isnot 'student'>>
+  <<if !$KylarExpansion.notes_repaired and $LifeSimulation?.school and $LifeSimulation.school.role isnot 'student'>>
     <<lanSwitch 'Your badge catches the light. Kylar looks at it, then at the ruined page. "Will you write down what they did?"' '你的徽章反着光。凯拉尔看看它，又看看破损的书页。“你会把他们做的事记下来吗？”'>><br><br>
   <</if>>
   <<if currentSkillValue('english') gte 400 and !pcAreArmsBound('both')>>
-    <<lanSwitch 'You can still read the exercise beneath the ink.' '墨迹下面的习题还看得清。'>><br><br>
-    <<schoolicon 'library'>><<lanLink ['Repair the page with Kylar', '和凯拉尔补好这一页'] 'Deadwood Reblooms Kylar Notes Answer'>><<set $phase to 'kylar-notes-repair'>><</lanLink>><br>
+    <<if !$KylarExpansion.notes_repaired>>
+      <<lanSwitch 'You can still read the exercise beneath the ink.' '墨迹下面的习题还看得清。'>><br><br>
+    <</if>>
+    <<schoolicon 'library'>><<lanLink `[$KylarExpansion.notes_repaired ? 'Check the exercise with Kylar' : 'Repair the page with Kylar', $KylarExpansion.notes_repaired ? '和凯拉尔检查习题' : '和凯拉尔补好这一页']` 'Deadwood Reblooms Kylar Notes Answer'>><<set $phase to 'kylar-notes-repair'>><</lanLink>><br>
   <</if>>
   <<socialiseicon>><<lanLink ['Listen to Kylar first', '先听凯拉尔说完'] 'Deadwood Reblooms Kylar Notes Answer'>><<set $phase to 'kylar-notes-listen'>><</lanLink>><br>
 <</if>>
-<br><<getouticon>><<lanLink '返回凯拉尔的房间' 'Manor Kylar Room'>><</lanLink>>
+<br><<getouticon>><<lanLink ["Return to Kylar's room", '返回凯拉尔的房间'] 'Manor Kylar Room'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Notes Answer []
 <<set $outside to 0>><<location 'kylarmanor'>><<effects>>
 <<if !['kylar-notes-repair', 'kylar-notes-listen'].includes($phase)
-  or C.npc.Kylar.state isnot 'active' or !isLoveInterest('Kylar')
+  or !maplebirch.get('Kylar').atManor or !isLoveInterest('Kylar')
   or ($phase is 'kylar-notes-repair' and (currentSkillValue('english') lt 400 or pcAreArmsBound('both')))>>
   <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
   <<npc Kylar>><<person1>>
   <<if $phase is 'kylar-notes-repair' and currentSkillValue('english') gte 400>>
-    <<lanSwitch 'You copy the exercise onto a clean sheet while Kylar holds the book flat. <<He>> checks each line against yours, then carefully tucks the new page beneath the cover. "Now I can take it back to class."' '你把习题誊到一张干净的纸上，凯拉尔按住书页，逐行与你核对，最后小心把新纸夹进封皮。“这下我能带它去上课了。”'>>
+    <<language>>
+      <<option 'EN'>>
+        <<if $KylarExpansion.notes_repaired>>
+          You point out a word Kylar missed. <<He>> corrects it, then checks the next line with you. When you finish, <<he>> puts both pages away together. "Same time tomorrow?" <<he>> asks before looking down at the book.
+        <<else>>
+          You copy the exercise onto a clean sheet while Kylar holds the book flat. <<He>> checks each line against yours, then carefully tucks the new page beneath the cover. "Now I can take it back to class."
+        <</if>>
+      <<option 'CN'>>
+        <<if $KylarExpansion.notes_repaired>>
+          你指出凯拉尔漏掉的一个词。<<He>>改好它，再与你核对下一行。看完后，<<he>>把两页纸一起收好。“明天也这个时候吗？”<<he>>问完又低头看向课本。
+        <<else>>
+          你把习题誊到一张干净的纸上，凯拉尔按住书页，逐行与你核对，最后小心把新纸夹进封皮。“这下我能带它去上课了。”
+        <</if>>
+    <</language>>
+    <<set $KylarExpansion.notes_repaired to true>>
     <<englishskill 1>><<genglish>><<npcincr Kylar love 2>><<glove>>
   <<else>>
-    <<lanSwitch 'You sit beside Kylar until <<he>> has finished explaining. <<He>> stops hiding the page from you. The book stays open on the desk while you talk.' '你坐在凯拉尔身边，听<<him>>慢慢说完。<<He>>不再遮住书页，你们说话时，那本书始终摊在桌上。'>>
+    <<language>>
+      <<option 'EN'>>
+        You sit beside Kylar until <<he>> has finished explaining.
+        <<if $KylarExpansion.notes_repaired>>
+          <<He>> turns the exercise towards you, pointing to the line that gave <<him>> trouble. After a while, <<he>> stops talking about the book and asks when you will come back.
+        <<else>>
+          <<He>> stops hiding the page from you. The book stays open on the desk while you talk.
+        <</if>>
+      <<option 'CN'>>
+        你坐在凯拉尔身边，听<<him>>慢慢说完。
+        <<if $KylarExpansion.notes_repaired>>
+          <<He>>把习题转向你，指着拿不准的那一行。过了一会儿，<<he>>不再说课本上的事，转而问你什么时候再来。
+        <<else>>
+          <<He>>不再遮住书页，你们说话时，那本书始终摊在桌上。
+        <</if>>
+    <</language>>
     <<npcincr Kylar love 1>><<glove>>
   <</if>>
   <<unset $phase>>
 <</if>>
 <br><br>
-<<getouticon>><<lanLink '返回凯拉尔的房间' 'Manor Kylar Room'>><</lanLink>>
+<<getouticon>><<lanLink ["Return to Kylar's room", '返回凯拉尔的房间'] 'Manor Kylar Room'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Yard []
 <<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
@@ -110,7 +166,7 @@
   <<unset $phase>>
 <</if>>
 <br><br>
-<<getinicon>><<lanLink '继续' 'Manor Hall'>><</lanLink>>
+<<getinicon>><<lanLink ['Continue', '继续'] 'Manor Hall'>><</lanLink>>
 
 :: Deadwood Reblooms Kylar Yard Jealousy []
 <<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
@@ -143,4 +199,4 @@
   <<unset $phase>>
 <</if>>
 <br><br>
-<<getinicon>><<lanLink '继续' 'Manor Hall'>><</lanLink>>
+<<getinicon>><<lanLink ['Continue', '继续'] 'Manor Hall'>><</lanLink>>

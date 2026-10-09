@@ -28,6 +28,8 @@ export default function Adrian(maplebirch: typeof window.maplebirch): void {
     }
   );
 
+  maplebirch.tool.addTo('NPCinit', 'deadwood-adrian-introduction');
+
   maplebirch.npc.addSchedule('Adrian', schedule => {
     schedule.at(0, 'adrian_home');
     schedule.when(

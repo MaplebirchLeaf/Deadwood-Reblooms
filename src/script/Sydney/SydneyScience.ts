@@ -45,7 +45,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 在原版出席条件上追加实际位置检查。
         {
           src: '$sydneyScience is 1',
-          applyafter: ' and _sydney_location is "science"',
+          applyafter: ' and _sydney_location is "science" and maplebirch.get("Sydney").available',
           expected: 1
         },
         // 在普通科学课事件池清空后注册扩展事件，使其参与本次课堂事件抽取。
@@ -63,7 +63,8 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 用事件开头和最后一个动作作为两个短边界，不捕获整段原版事件。
         {
           src: '<<addinlineevent "scienceDelinquents" 2>>',
-          applyafter: '\n\t\t<<if $sydneyScience is 1 and _sydney_location is "science" and isLoveInterest("Sydney")>><<deadwood-reblooms-sydney-science-protect>><<else>>',
+          applyafter:
+            '\n\t\t<<if $sydneyScience is 1 and _sydney_location is "science" and maplebirch.get("Sydney").available and isLoveInterest("Sydney")>><<deadwood-reblooms-sydney-science-protect>><<else>>',
           expected: 1
         },
         {

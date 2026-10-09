@@ -79,6 +79,8 @@ You work alone while Robin is missing, injured or confined. Library assistance i
 | 4     | Home drafting             | One hour  | Archive and museum done, choices affect score                   |
 | 5     | Museum exhibition         | Two hours | Project date reached, answer evidence questions                 |
 
+At **300 effective English**, you can compare the wording of the archive sources while retaining disagreements. This produces better notes than copying the catalogue and grants English practice on the first archive visit. It does not replace the source research available with A\* history.
+
 Lake evidence supplements investigation rather than automatically proving painting claims. Drafting can occur without it, but the full evidence achievement needs recorded recovery.
 
 ### Evidence Matters and honours

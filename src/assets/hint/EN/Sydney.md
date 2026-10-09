@@ -44,6 +44,10 @@ After the vanilla corrupt-room story, ask at the temple while Sydney is a love i
 - Corrupt Sydney refuses, while wavering Sydney has different responses.
 - Refusal does not secretly change belt state or become agreement through repeated clicks.
 
+### Confessional: after recognising Sydney
+
+After revealing Sydney's confessor identity and selecting Sydney in Attitudes, the vanilla confession dialogue offers a visit to the other side. You can sit quietly or return to your compartment. Pure and wavering Sydney still attend to their duties. Suggesting intimacy here requires <span class="purple">corrupt Sydney and the PC's corresponding attitude level</span>. If a penitent arrives, you can wait or stop.
+
 ### Sirris estate: two invitations
 
 | Route          | Requirements                                                                         | Action                                 |
@@ -53,7 +57,7 @@ After the vanilla corrupt-room story, ask at the temple while Sydney is a love i
 
 After invitation, use **Danube Street → Sirris estate** while unexposed. This is not the purchasable Danube manor.
 
-**Evening visit**: ask in the quarters from 17:00 until before 21:00 while Sydney works there, without relevant punishment, maximum PC stress or exposure. Arrive at the estate from 21:00 after agreeing.
+**Evening visit**: ask in the quarters from 17:00 until before 21:00 while Sydney works there, without relevant punishment, maximum PC stress or exposure. Arrive at the estate from 21:00 after agreeing. The usual schedule resumes at 06:00 the next day. Trials, festival stays and punishment still take priority.
 
 ### Estate rooms
 

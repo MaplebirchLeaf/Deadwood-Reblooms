@@ -4,12 +4,17 @@
   before: |
     if (maplebirch.get('MoreTransformations') && amount > 0 && V.maplebirch?.transformation?.horse?.level >= 6) fatigueMod *= 0.75;
 
-- comment: '罗宾与孤儿们逼退贝利后跳过整次原版收租结算，避免 DoLP 继续从押金扣款。'
+- comment: '买断收租或逼退贝利后跳过原版收租结算，避免 DoLP 继续从押金扣款。'
   fileName: 'time.js'
   from: 'function passRentTick() {'
   after: |
 
-    if (maplebirch.get('Robin') && V.RobinExpansion?.bailey_defeated) return;
+    if ((maplebirch.get('Robin') && V.RobinExpansion?.bailey_defeated) || maplebirch.get('Finance')?.orphanage.pcFree) return;
+
+- comment: '两人的房租已买断或贝利被逼退时，罗宾周结算不再扣房租，收入照常发放。'
+  fileName: 'time.js'
+  from: 'if (V.robinpaid === 1) {'
+  to: "if (V.robinpaid === 1 || (maplebirch.get('Robin') && V.RobinExpansion?.bailey_defeated) || maplebirch.get('Finance')?.orphanage.robinFree) {"
 
 - comment: '留院位置接入原版函数内部，避免 statusCheck 的内部调用绕过 window 上的日程扩展。'
   fileName: 'ingame.js'

@@ -10,12 +10,12 @@
 <!-- 科学课提示需先与 Sydney 熟识，随后首次同桌再按纯洁度播放介绍。 -->
 <<widget 'deadwood-reblooms-sydney-science-intro'>>
   <<sydneySchedule>>
-  <<if C.npc.Sydney.init is 1 and C.npc.Sydney.love gte 10 and !$SydneyExpansion.scienceHint and $sydneyScience isnot 1 and Time.weekDay isnot 6>>
+  <<if maplebirch.get('Sydney').available and C.npc.Sydney.love gte 10 and !$SydneyExpansion.scienceHint and $sydneyScience isnot 1 and Time.weekDay isnot 6>>
     <<set $SydneyExpansion.scienceHint to true>>
     <<lanSwitch 'Sirris sets aside a science book with Sydney’s name inside the cover. When you look at it, Sirris says, "Sydney asked about joining this class. There may be room for one more student."' '西里斯把一本封面内写着悉尼名字的科学课本放到一旁。见你望过去，西里斯说：“悉尼问过换班的事。这间教室或许还能坐下一个人。”'>>
     <br><span class='blue'><i><<lanSwitch 'You could ask Sydney about it at lunch.' '午餐时，你可以问问悉尼。'>></i></span><br><br>
   <</if>>
-  <<if $sydneyScience is 1 and _sydney_location is 'science' and !$sydneySeen.includes('science')>>
+  <<if maplebirch.get('Sydney').available and $sydneyScience is 1 and _sydney_location is 'science' and !$sydneySeen.includes('science')>>
     <<run $sydneySeen.pushUnique('science')>>
     <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
     <<language>>
@@ -24,8 +24,10 @@
         class transfer was approved, Sydney. Try not to let the change distract you."
         <br><br>
         <<if _sydneyStatus.includes('corrupt')>>
-          Sydney leans close enough for <<his>> thigh to press against yours. "No promises," <<he>> whispers, opening <<his>> book with an innocent
-            smile.
+          "No promises," Sydney whispers, opening <<his>> book with an innocent smile.
+          <<if isLoveInterest('Sydney')>>
+            <<His>> knee presses against yours beneath the desk.
+          <</if>>
         <<elseif _sydneyStatus.includes('pure')>>
           Sydney straightens <<his>> notes. "I won't. Studying beside a friend should help me focus."
         <<else>>
@@ -35,7 +37,10 @@
         悉尼抱着满怀的书走进教室，在你身边的空位坐下。西里斯从讲台前看过来。“你的换班申请通过了，悉尼。别因为换了教室就分心。”
         <br><br>
         <<if _sydneyStatus.includes('corrupt')>>
-          悉尼贴近过来，<<his>>的大腿紧挨着你的。“我可不敢保证。”<<he>>低声说道，随后带着无辜的笑容翻开课本。
+          “我可不敢保证。”悉尼低声说，带着无辜的笑容翻开课本。
+          <<if isLoveInterest('Sydney')>>
+            桌下，<<his>>的膝盖紧挨着你的。
+          <</if>>
         <<elseif _sydneyStatus.includes('pure')>>
           悉尼理了理笔记。“不会的。和朋友一起学习，应该能让我更专心。”
         <<else>>
@@ -188,7 +193,7 @@
 <!-- 科学课随机事件：注册 Sydney 参与的课堂事件。 -->
 <<widget 'deadwood-reblooms-sydney-science-events'>>
   <<sydneySchedule>><<run statusCheck('Sydney')>>
-  <<if $sydneyScience is 1 and _sydney_location is 'science'>>
+  <<if maplebirch.get('Sydney').available and $sydneyScience is 1 and _sydney_location is 'science'>>
     <<addinlineevent 'scienceSydneyPartner' 2>>
       <<npc Sydney>><<person1>>
       <<npcincr Sydney love 1>><<scienceskill 1>>
@@ -198,9 +203,13 @@
           claim the seat.
           <br><br>
           <<if _sydneyStatus.includes('corrupt')>>
-            <<He>> follows the instructions perfectly, but gives every anatomical term an unnecessary double meaning. When <<he>> describes where you
-              should insert the probe, <<his>> hand settles on your thigh. Sirris praises your results without noticing why you're both struggling
-              not to laugh.
+            <<He>> follows the instructions, then taps the word "insert" with <<his>> pen and glances at you.
+            <<if isLoveInterest('Sydney')>>
+              "Only the probe," <<he>> whispers, brushing <<his>> knee against yours beneath the bench.
+            <<else>>
+              "Careful. That's the part everyone gets wrong," <<he>> says with a grin.
+            <</if>>
+            Sirris asks for the next measurement. Sydney looks back at the apparatus and reads it out correctly.
           <<elseif _sydneyStatus.includes('pure')>>
             <<He>> checks each measurement twice and catches your hand before you add too much reagent. Your final result matches the textbook
               exactly.
@@ -212,8 +221,13 @@
           西里斯把全班分成两人一组，进行一项简短实验。还没等别人占走座位，悉尼便把实验器材搬到了你旁边。
           <br><br>
           <<if _sydneyStatus.includes('corrupt')>>
-            <<He>>完全按照步骤操作，却故意给每个解剖学术语添上多余的双关。讲到探针应该“插入”哪里时，<<his>>的手落在了你的大腿上。
-              西里斯称赞了你们的结果，丝毫没有察觉你们为什么一直忍着笑。
+            <<He>>照着步骤操作，用笔点了点“插入”两个字，又看向你。
+            <<if isLoveInterest('Sydney')>>
+              “我是说探针。”<<he>>低声说，桌下的膝盖轻轻碰了碰你的。
+            <<else>>
+              “小心，这一步最容易弄错。”<<he>>笑着说。
+            <</if>>
+            西里斯问起下一项读数。悉尼重新看向仪器，准确地报了出来。
           <<elseif _sydneyStatus.includes('pure')>>
             <<He>>把每项测量都核对两遍，并在你加入过量试剂前及时握住你的手。最终结果与课本完全一致。
           <<else>>
@@ -255,8 +269,12 @@
       A group of delinquents turn towards you, but Sydney is already out of <<his>> seat.
       <<if _sydneyStatus.includes('corrupt')>>
         <<He>> plants a hand on their desk and uncaps a red marker. "Overdue books," <<he>> says, turning the pen between <<his>> fingers, "I have
-          ways of dealing with those. Do you have a way of dealing with me?" The delinquents remember what Sydney did to Whitney's forehead and look
-          away first.
+          ways of dealing with those. Do you have a way of dealing with me?"
+        <<if $sydneyWhitneyBook gte 1>>
+          You've seen <<him>> use that marker on Whitney. The delinquents glance at it, then look away.
+        <<else>>
+          <<He>> holds their gaze until Sirris looks up. The delinquents turn back to their books.
+        <</if>>
       <<elseif _sydneyStatus.includes('pure')>>
         <<He>> steps between you and them despite <<his>> trembling hands. "Leave <<phim>> alone," <<he>> says, loud enough for Sirris to hear.
           Sirris promptly sends the offenders to the other side of the classroom.
@@ -270,7 +288,12 @@
       一群坏学生转身盯上了你，但悉尼已经离开座位。
       <<if _sydneyStatus.includes('corrupt')>>
         <<He>>一只手按在他们桌上，拔开红色记号笔的笔帽，把笔在指间转了一圈。“逾期的书，”<<he>>说，
-          “我有的是办法。你们有办法对付我吗？”那群坏学生想起悉尼在惠特尼额头上写过什么，率先移开了视线。
+          “我有的是办法。你们有办法对付我吗？”
+        <<if $sydneyWhitneyBook gte 1>>
+          你见过<<him>>拿这支笔对付惠特尼。那群坏学生看了看笔，又移开视线。
+        <<else>>
+          <<He>>一直盯着他们，直到西里斯抬起头。那群坏学生这才转回去看书。
+        <</if>>
       <<elseif _sydneyStatus.includes('pure')>>
         尽管双手还在发抖，<<he>>仍挡在你和他们之间。“别碰<<phim>>。”<<he>>故意说得足够响亮，让西里斯听见。西里斯立刻把那些人赶到了教室另一边。
       <<else>>
@@ -431,8 +454,11 @@
     You lean closer and whisper to Sydney while Sirris writes on the board.
     <br><br>
     <<if _sydneyStatus.includes('corrupt')>>
-      <<He>> answers with increasingly shameless suggestions for <span class='lewd'>"after-class experiments"</span> until Sirris glances your way. Sydney immediately looks
-        down at <<his>> textbook, though <<his>> foot remains pressed against yours beneath the desk.
+      <<He>> answers with increasingly shameless suggestions for <span class='lewd'>"after-class experiments"</span> until Sirris glances your way.
+      Sydney immediately looks down at <<his>> textbook.
+      <<if isLoveInterest('Sydney')>>
+        <<His>> foot remains pressed against yours beneath the desk.
+      <</if>>
       <<gslust>>
     <<elseif _sydneyStatus.includes('pure')>>
       <<He>> tries to keep <<his>> eyes on the lesson, but still answers each question you ask. Before long, the whispered conversation turns to
@@ -445,7 +471,10 @@
     西里斯在黑板上书写时，你向悉尼靠近，压低声音和<<him>>聊天。
     <br><br>
     <<if _sydneyStatus.includes('corrupt')>>
-      <<He>>提出的<span class='lewd'>“课后实验”</span>一个比一个露骨，直到西里斯朝你们看来。悉尼立刻低头盯住课本，桌下的脚却仍贴着你的脚。
+      <<He>>提出的<span class='lewd'>“课后实验”</span>一个比一个露骨，直到西里斯朝你们看来。悉尼立刻低头盯住课本。
+      <<if isLoveInterest('Sydney')>>
+        桌下，<<his>>的脚却仍贴着你的脚。
+      <</if>>
       <<gslust>>
     <<elseif _sydneyStatus.includes('pure')>>
       <<He>>努力把目光留在课堂上，却仍会回答你的每个问题。没过多久，悄声交谈的话题便转向书籍和神殿工作，<<he>>只好用笔记遮住笑容。

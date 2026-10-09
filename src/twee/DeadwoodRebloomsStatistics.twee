@@ -88,6 +88,15 @@
     <</foldout>>
   <</if>>
 
+  <<if maplebirch.get('Finance') and $Finance.industry.factories.some(factory => factory.purchase_price > 0 || factory.earned > 0 || factory.spent > 0)>>
+    <<foldout false '_deadwoodFactoryAccounts'>>
+      <span class='gold'><<language>><<option 'EN'>>Factory accounts<<option 'CN'>>工厂账目<</language>></span>
+      <<language>><<option 'EN'>>Receipts / operating costs: <<option 'CN'>>累计经营收入／支出：<</language>><<printmoney `$Finance.industry.factories.reduce((sum, factory) => sum + factory.earned, 0)`>> / <<printmoney `$Finance.industry.factories.reduce((sum, factory) => sum + factory.spent, 0)`>><br>
+      <<language>><<option 'EN'>>Delivered orders / bad debts: <<option 'CN'>>交付订单／坏账：<</language>><span class='teal'><<= $Finance.industry.factories.reduce((sum, factory) => sum + factory.delivered, 0)>> / <<= $Finance.industry.factories.reduce((sum, factory) => sum + factory.defaults, 0)>></span><br>
+      <span class='blue'><<language>><<option 'EN'>>Fund transfers and loans are not sales. Land and the initial factory purchase are outside operating costs.<<option 'CN'>>资金转入与贷款不算销售收入。土地与初次购厂款不计入经营支出。<</language>></span><br><br>
+    <</foldout>>
+  <</if>>
+
   <<if maplebirch.get('Orchard') and $Orchard>>
     <<foldout false '_deadwoodOrchardAccounts'>>
       <span class='gold'><<language>><<option 'EN'>>Orchard accounts<<option 'CN'>>果园账目<</language>></span>

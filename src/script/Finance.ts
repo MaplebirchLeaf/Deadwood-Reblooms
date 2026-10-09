@@ -2,8 +2,12 @@
 
 import Adrian from './Finance/Adrian';
 import RealEstate from './Finance/RealEstate';
+import Orphanage from './Finance/Orphanage';
+import Donations from './Finance/Donations';
+import Industry from './Finance/Industry';
 
 export default function Finance(maplebirch: typeof window.maplebirch): void {
+  Industry(maplebirch);
   maplebirch.tool.addTo('Journal', 'deadwood-reblooms-finance-journal');
   maplebirch.tool.addTo(
     'BeforeLinkZone',
@@ -535,4 +539,6 @@ export default function Finance(maplebirch: typeof window.maplebirch): void {
 
   Adrian(maplebirch);
   RealEstate(maplebirch);
+  Orphanage(maplebirch);
+  Donations(maplebirch);
 }

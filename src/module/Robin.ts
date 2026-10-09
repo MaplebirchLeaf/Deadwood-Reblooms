@@ -167,7 +167,7 @@ class Robin extends Module implements RobinFacade {
       const lastFinishedDay = Time.hour >= 19 ? Time.days : Time.days - 1;
       for (let day = state.tutor_day + 1; day <= lastFinishedDay; day++) {
         const date = new DateTime(Time.date).addDays(day - Time.days);
-        if (this.available && C.npc.Robin.trauma < 80 && Time.isSchoolDay(date)) {
+        if (this.available && C.npc.Robin.trauma < 80 && Time.isSchoolDay(date) && this.tutoring.lessonDays.includes(date.weekDay)) {
           state.tutor_lessons++;
           state.tutor_subject = (state.tutor_lessons - 1) % 3;
         }
@@ -209,12 +209,12 @@ class Robin extends Module implements RobinFacade {
         V.robinmoney = 0;
         V.robindebt = Math.max(0, V.robindebt) + 1;
       }
-    } else if (V.robinpaid !== 1) V.robinmoney += 400 - robinRent;
+    } else if (V.robinpaid !== 1 && !this.rent.free) V.robinmoney += 400 - robinRent;
     const beforeVanilla = V.robinmoney;
     // 原版用 <= 0 判定欠租，现金恰好 £400 时会误记欠债并可能立刻触发惩罚。
-    const exactRent = V.robinpaid !== 1 && beforeVanilla === 400;
+    const exactRent = V.robinpaid !== 1 && !this.rent.free && beforeVanilla === 400;
     if (exactRent) V.robinmoney++;
-    const expected = (V.robinpaid === 1 ? beforeVanilla : Math.max(0, beforeVanilla - 400)) + vanillaIncome;
+    const expected = (V.robinpaid === 1 || this.rent.free ? beforeVanilla : Math.max(0, beforeVanilla - 400)) + vanillaIncome;
     vanillaWeekPassed();
     if (exactRent && V.robinmoney < 4000) V.robinmoney = Math.max(0, V.robinmoney - 1);
     state.reserve += Math.max(0, expected - 4000);
@@ -262,6 +262,7 @@ class Robin extends Module implements RobinFacade {
           V.RobinExpansion?.tutor &&
           location === 'orphanage' &&
           Time.schoolDay &&
+          this.tutoring.lessonDays.includes(Time.weekDay) &&
           ((Time.hour === 17 && Time.minute >= 30) || (Time.hour === 18 && Time.minute < 30)) &&
           V.robin.timer.hurt === 0 &&
           C.npc.Robin.trauma < 80

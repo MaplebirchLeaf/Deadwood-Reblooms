@@ -79,7 +79,7 @@ export interface RobinExpansionState {
   balloon_day: number;
   /** 罗宾的储备金（英镑），不计入原版 $robinmoney。 */
   reserve: number;
-  /** 关怀基金余额（便士），由玩家存入供罗宾使用。 */
+  /** 照护基金余额（英镑），由营业储备拨入。 */
   care_fund: number;
   /** 本周收入快照（英镑）。 */
   weekly_income: number;

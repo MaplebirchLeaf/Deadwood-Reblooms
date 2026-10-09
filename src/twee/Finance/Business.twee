@@ -7,26 +7,33 @@
 <</if>>
 <<language>>
   <<option 'EN'>>
-    The clerk asks for the shop plans or your delivery records. "This is a personal loan for business expenses. Your name goes on it, even if someone else runs the shop. Thirty days. The instalments come from your account."
+    The clerk asks for the shop plans, delivery records or factory deeds. "This is a personal loan for business expenses. Your name goes on it, even if someone else runs the place. Thirty days. The instalments come from your account."
   <<option 'CN'>>
-    柜员要你出示店铺计划或者交货记录。“这是用于经营的个人贷款。即使店铺由别人经营，签的也是你的名字。期限三十天，还款从你的账户扣。”
+    柜员要你出示店铺计划、交货记录或工厂产权文件。“这是用于经营的个人贷款。即使生意由别人经营，签的也是你的名字。期限三十天，还款从你的账户扣。”
 <</language>><br><br>
 <<set $_finance to maplebirch.get('Finance')>>
 <<set $_product to $_finance.loanProducts.find(item => item.days === 30)>>
 <<lanSwitch 'Weekly interest: ' '周利率：'>><<= ($_product.weeklyRate * 100).toFixed(3)>>% · <<lanSwitch 'Borrowing limit: ' '贷款额度：'>><<deadwood-reblooms-finance-money $_finance.accountLimits.loan>><br>
 <<set _businessAmount to 2000>>
+<<set _business_labels to {shop: ['Apply for drinks-shop funding', '申请饮品店经营贷款'], orchard: ['Apply for orchard funding', '申请果园经营贷款'], factory: ['Apply for factory funding', '申请工厂经营贷款']}>>
 <label><<lanSwitch 'Borrow £' '借款 £'>><<numberbox '_businessAmount' 2000>></label><br><br>
 <<for $_project range $_finance.businessProjects>>
   <<capture $_project>>
     <<if $_project.eligible>>
-      <<lanLink `$_project.id === 'shop' ? ['Apply for drinks-shop funding', '申请饮品店经营贷款'] : ['Apply for orchard funding', '申请果园经营贷款']` 'Deadwood Reblooms Business Loan Result'>>
+      <<lanLink _business_labels[$_project.id] 'Deadwood Reblooms Business Loan Result'>>
         <<set $Finance.last_result to maplebirch.get('Finance').takeBusinessLoan($_project.id, Number(_businessAmount))>>
       <</lanLink>><br>
     <</if>>
   <</capture>>
 <</for>>
 <<if !$_finance.businessProjects.some(item => item.eligible)>>
-  <<lanSwitch 'Bring a shop plan or an established farm-orchard sales record.' '需要已有的开店计划，或者农场果园的销售记录。'>><br>
+  <<language>>
+      <<option 'EN'>>
+        Bring a shop plan, farm-orchard sales records or factory deeds with no unpaid wages.
+      <<option 'CN'>>
+        需要开店计划、农场果园销售记录，或没有欠薪的工厂产权文件。
+    <</language>>
+    <br>
 <</if>><br>
 <<getouticon>><<lanLink ['Return to the bank', '返回银行柜台'] 'Deadwood Reblooms Financial Centre Bank'>><</lanLink>>
 
@@ -35,8 +42,10 @@
 <<deadwood-reblooms-finance-result $Finance.last_result>><br><br>
 <<if $Finance.last_result is 'ok'>>
   <<language>>
-    <<option 'EN'>>The bank credits your account. You put the repayment schedule away with your receipts. The shop and orchard will still need the money passed on or spent on their supplies.
-    <<option 'CN'>>银行把借款存进你的账户。你把还款表与收据放在一起。这笔钱还得由你交给店铺，或用来购置果园物资。
+    <<option 'EN'>>
+      The bank credits your account. You put the repayment schedule away with your receipts. The business will still need the money passed on or spent on supplies. Factory funds must be transferred at the yard.
+    <<option 'CN'>>
+      银行把借款存进你的账户。你把还款表与收据放在一起。这笔钱还得由你交给生意，或用来购置物资。工厂的周转金需要到厂里转入。
   <</language>><br><br>
 <</if>>
 <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Financial Centre Bank Loan'>><</lanLink>>

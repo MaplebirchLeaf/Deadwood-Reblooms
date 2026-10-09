@@ -7,6 +7,9 @@ import Securities, { type Security } from './Finance/Securities';
 import MarginTrading, { type MarginState } from './Finance/MarginTrading';
 import Newspaper, { type NewspaperState } from './Finance/Newspaper';
 import CompanyEvents from './Finance/CompanyEvents';
+import Industry, { type IndustryState } from './Finance/Industry';
+import Orphanage, { type OrphanageState } from './Finance/Orphanage';
+import Donations, { type DonationsState } from './Finance/Donations';
 import tradingTerms from '../assets/finance/trading.json';
 import bankingTerms from '../assets/finance/banking.json';
 import securitiesSource from '@/assets/finance/securities.yaml';
@@ -35,6 +38,7 @@ export type FinanceResult =
   | 'unknown-security'
   | 'insufficient-shares'
   | 'unsettled-shares'
+  | 'share-limit'
   | 'market-closed';
 
 type AccountTier = 'current' | 'preferred' | 'premier';
@@ -65,7 +69,7 @@ interface BankState {
   loan_next_payment_day: number;
   loan_interest_last_day: number;
   loan_missed_payments: number;
-  loan_project: 'shop' | 'orchard' | null;
+  loan_project: 'shop' | 'orchard' | 'factory' | null;
 }
 
 interface BrokerageState {
@@ -86,6 +90,7 @@ interface MarketState {
   day: number;
   prices: Record<string, number>;
   previous_prices: Record<string, number>;
+  shares: Record<string, { total: number; listed: number }>;
   history: { day: number; prices: Record<string, number> }[];
   farm_stage?: number;
   farm_attack_damage?: number;
@@ -97,7 +102,7 @@ interface MarketState {
   robin_staff?: number;
   robin_orders?: number;
   company_events: string[] | null;
-  news?: { day: number; symbol: string; event: string; move: number }[];
+  news?: { day: number; symbol: string; event: string; move: number; share_change?: number | null }[];
 }
 
 export interface FinanceState {
@@ -119,6 +124,9 @@ export interface FinanceState {
   brokerage: BrokerageState;
   market: MarketState;
   newspaper: NewspaperState;
+  industry: IndustryState;
+  orphanage: OrphanageState;
+  donations: DonationsState;
   collection: { amount: number; due_day: number; source: 'mortgage' | 'margin' | 'bank' | 'mixed'; destination: 'farm' | 'brothel' | null; extended: boolean; encounter_day: number };
   last_result: string | null;
 }
@@ -215,10 +223,14 @@ const DEFAULT_FINANCE_STATE: FinanceState = {
     day: -1,
     prices: {},
     previous_prices: {},
+    shares: {},
     history: [],
     company_events: null
   },
   newspaper: Newspaper.defaults,
+  industry: Industry.defaults,
+  orphanage: Orphanage.defaults,
+  donations: Donations.defaults,
   collection: { amount: 0, due_day: 0, source: 'mortgage', destination: null, extended: false, encounter_day: -1 },
   last_result: null
 };
@@ -227,6 +239,9 @@ class Finance extends Module {
   public readonly terms = bankingTerms;
   public readonly margin = new MarginTrading(this);
   public readonly newspaper = new Newspaper(this);
+  public readonly industry = new Industry(this);
+  public readonly orphanage = new Orphanage(this);
+  public readonly donations = new Donations(this);
   public loanDiscount: () => number = () => 0;
   public readonly realEstate: RealEstate;
 
@@ -261,6 +276,10 @@ class Finance extends Module {
     const { holdings, unsettled } = this.state.brokerage;
     const locked = unsettled !== null && Finance.currentDay < unsettled.available_day;
     return Object.fromEntries(Object.entries(holdings).map(([symbol, shares]) => [symbol, Math.max(0, shares - (locked ? (unsettled.shares[symbol] ?? 0) : 0))]));
+  }
+
+  public get shareSupply(): ReturnType<typeof Securities.supply> {
+    return Securities.supply(this.state, this.securities);
   }
 
   public get creditMinimumPayment(): number {
@@ -305,7 +324,12 @@ class Finance extends Module {
     this.core.tool.onInit(() => void this.securities);
     this.core.on(':variable', () => CompanyEvents.capture(this.state.market, this.securities));
     this.core.on(':passageend', (passage, content) => {
-      if (V.replayScene || V.statFreeze || !/^(?:Cliff Street$|Ocean Breeze$|Chef |Photo|Farm |Deadwood Reblooms (?:Robin|Orchard))/.test(passage.title)) return;
+      if (
+        V.replayScene ||
+        V.statFreeze ||
+        !/^(?:Cliff Street$|Ocean Breeze$|Chef |Photo|Farm |Deadwood Robin Bailey Reckoning Finish$|Deadwood Reblooms (?:Robin|Orchard|Orphanage))/.test(passage.title)
+      )
+        return;
       this.advanceMarketThrough(Finance.currentDay, content);
     });
     this.core.once(':storyready', () => this.registerMoneyMacro());
@@ -537,16 +561,17 @@ class Finance extends Module {
     return 'ok';
   }
 
-  public get businessProjects(): { id: 'shop' | 'orchard'; eligible: boolean }[] {
+  public get businessProjects(): { id: 'shop' | 'orchard' | 'factory'; eligible: boolean }[] {
     const robin = this.core.get('Robin') as Robin | undefined;
     return [
       { id: 'shop', eligible: !!robin?.available && V.RobinExpansion.shop_stage !== 'none' },
-      { id: 'orchard', eligible: !!this.core.get('Orchard')?.state.unlocked.farm && (V.Orchard.sales_income > 0 || V.Orchard.contracts_completed > 0) }
+      { id: 'orchard', eligible: !!this.core.get('Orchard')?.state.unlocked.farm && (V.Orchard.sales_income > 0 || V.Orchard.contracts_completed > 0) },
+      { id: 'factory', eligible: this.industry.owned.length > 0 && this.industry.owned.every(factory => factory.wage_arrears === 0) }
     ];
   }
 
   /** PC 是签约借款人，经营贷款复用银行账单，借来的存款不会被当作经营利润。 */
-  public takeBusinessLoan(project: 'shop' | 'orchard', amount: number): FinanceResult {
+  public takeBusinessLoan(project: 'shop' | 'orchard' | 'factory', amount: number): FinanceResult {
     if (!this.businessProjects.some(item => item.id === project && item.eligible)) return 'invalid-amount';
     const result = this.takeLoan(amount, 30);
     if (result === 'ok') this.state.bank.loan_project = project;
@@ -680,6 +705,7 @@ class Finance extends Module {
     if (!item) return 'unknown-security';
     const shares = Finance.toShares(amount);
     if (shares == null) return 'invalid-amount';
+    if (shares > this.shareSupply[item.symbol].available) return 'share-limit';
     const cost = market.prices[item.symbol] * shares;
     if (!Number.isSafeInteger(cost)) return 'invalid-amount';
     const fee = this.tradingFee(cost);
@@ -727,10 +753,11 @@ class Finance extends Module {
   }
 
   public maximumShares(symbol: string): number {
+    const available = this.shareSupply[symbol]?.available ?? 0;
     const price = this.state.market.prices[symbol];
-    if (!price) return 0;
+    if (!price || available <= 0) return 0;
     const cash = this.state.brokerage.cash;
-    let shares = Math.max(0, Math.floor((cash - tradingTerms.minimumFee) / price));
+    let shares = Math.clamp(Math.floor((cash - tradingTerms.minimumFee) / price), 0, available);
     shares = Math.min(shares, Math.floor(cash / (price * (1 + tradingTerms.feeRate))));
     while (shares > 0 && price * shares + this.tradingFee(price * shares) > cash) shares--;
     return shares;
@@ -817,10 +844,21 @@ class Finance extends Module {
       if (!security.symbol || typeof security.name !== 'string' || !security.name.trim() || !Number.isFinite(security.initialPrice) || !Number.isFinite(security.volatility)) {
         throw new Error(`Finance security #${index + 1} is incomplete.`);
       }
+      if (
+        !Number.isSafeInteger(security.totalShares) ||
+        security.totalShares! <= 0 ||
+        !Number.isSafeInteger(security.listedShares) ||
+        security.listedShares! <= 0 ||
+        security.listedShares! > security.totalShares!
+      ) {
+        throw new Error(`Finance security #${index + 1} has an invalid share supply.`);
+      }
       return {
         symbol: String(security.symbol),
         name: security.name,
         initialPrice: Math.max(1, Math.floor(security.initialPrice!)),
+        totalShares: security.totalShares!,
+        listedShares: security.listedShares!,
         volatility: Math.clamp(Math.floor(security.volatility!), 1, 20),
         weeklyDividendRate: Math.clamp(Number(security.weeklyDividendRate) || 0, 0, 0.01)
       };
@@ -835,6 +873,7 @@ class Finance extends Module {
     for (const item of securities) {
       finance.brokerage.holdings[item.symbol] ??= 0;
       finance.brokerage.costs[item.symbol] ??= 0;
+      finance.market.shares[item.symbol] ??= { total: item.totalShares, listed: item.listedShares };
       const initialPrice =
         item.symbol === 'ALF' && finance.market.farm_stage === undefined
           ? Math.round(item.initialPrice * (Number(V.farm_stage) >= 12 ? 1.188 : Number(V.farm_stage) >= 9 ? 1.08 : 1))

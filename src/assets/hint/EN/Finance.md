@@ -2,13 +2,13 @@
 
 Enable **Finance** and reload. Enter the financial centre from High Street and select owned-home furniture at the **furniture-shop entrance**. Cohabitation separately requires the relevant love interest.
 
-| Goal                   | Where                                          | Prepare first                                                       |
-| ---------------------- | ---------------------------------------------- | ------------------------------------------------------------------- |
-| Pay merchants by card  | Financial centre bank counter                  | Account, card, and bank funds or available credit                   |
-| Buy property           | Financial centre property counter              | Bank funds, or eligible deposit, fee and capped repayment reserve   |
-| Furnish an owned home  | Furniture-shop entrance → owned-home furniture | A purchased usable home, selected before its furniture category     |
-| Invite a love interest | Their current vanilla location                 | Love-interest selection, usable bed, capacity, no tenancy or freeze |
-| Check bills            | Journal finance section                        | Next game date, days remaining, balances and overdue status         |
+| Goal                   | Where                                          | Prepare first                                                         |
+| ---------------------- | ---------------------------------------------- | --------------------------------------------------------------------- |
+| Pay merchants by card  | Financial centre bank counter                  | Account, card, and bank funds or available credit                     |
+| Buy property           | Financial centre property counter              | Bank funds, or eligible deposit, fee and capped repayment reserve     |
+| Furnish an owned home  | Furniture-shop entrance → owned-home furniture | A purchased usable home, selected before its furniture category       |
+| Invite a love interest | Their current vanilla location                 | Love-interest selection, usable bed, capacity, no tenancy or freeze   |
+| Check bills            | Journal finance section                        | Accounts, holdings, property totals, payment dates and overdue status |
 
 <span class="teal">Property purchases, loans and recurring bills have their own bank settlement rules. They are not the same as the merchant payment preference.</span>
 
@@ -45,6 +45,34 @@ Markets respond to farm progress and raids, Ocean Breeze Cafe prices, adverts, e
 
 Companies can also receive trading-day reports about orders, customers, costs, equipment and delays. These can be positive or negative. Current reports appear at the securities desk, and a read copy of the Financial Daily preserves its printed reports. Routine trading reports pause while the cafe is closed for construction or Robin’s shop is shut.
 
+### Elk Street factory
+
+Enter **Elk Street → Workshop yard**. The office is open **08:00–18:00**. Three sites can be bought separately, allowing three factories at once. Select a site before purchasing, transferring funds or taking orders. Each keeps its own crew, working funds, orders, incidents and debts. Every owned site continues settling its books daily when you leave.
+
+| Site                 | Existing workshop | New building |
+| -------------------- | ----------------- | ------------ |
+| Street-side workshop | £450,000          | £900,000     |
+| Rail-side workshop   | £675,000          | £1,350,000   |
+| Back-lane workshop   | £900,000          | £1,800,000   |
+
+An existing workshop takes three days to transfer, with three workers and **£3,600 of unpaid wages**. A new factory takes fourteen days, after which you hire a crew. Working funds are extra. Buying a building does not guarantee orders. The three sites accommodate up to 8, 12 and 16 workers respectively. Larger sites receive larger enquiries and have higher site bills. Robin's small shop still orders small batches.
+
+Food packaging serves the drinks shop, pub and factories. Crates serve farms and shipping. Metal shelving and lockers serve the shopping centre and clubs. Crate demand varies by season. Robin's drinks shop only enquires after opening. Avery's company may enquire about shelving and lockers after Avery's ascension opens the Elk Street skyscraper.
+
+At **400 effective maths**, enquiry cards include a cost estimate based on the current shifts: minimum working days, payroll and site bills, and the amount left after materials and those costs. Weekends, stoppages, delayed payment and defaults remain additional risks.
+
+Pay for materials when accepting an order. At least two workers are required. Production advances on working days, while wages and site bills fall due every day. Overtime adds 50% to output and wages and raises accident risk. Morale below 20 stops production. Ending overtime and paying wages restores morale gradually. Arrange delivery when the goods are finished. Buyers may pay late or default. Late delivery deducts 5% per day, up to half. **Cancelling forfeits materials and costs another 10% of the contracted price.**
+
+Factory funds are separate from your bank account and use debit-card transfers. Business loans remain PC's obligation even when buyers default. Broken machinery, injuries, damaged materials and unpaid wages stop the floor. Injury settlement costs £8,000 and ordinary machinery repairs £2,500. Building work, idle days and weekends still cost money. Seeing arrears, injuries or bad debts at the yard adds stress. Prolonged unpaid wages also add trauma. Arrears affect PC once per site per day. Revisiting the same injury or bad-debt report does not apply its effects again.
+
+<span class="red">Visitors may demand a protection payment or offer a sealed-crate transfer without receipts.</span> You may pay or refuse the demand. Refusal can bring damage to the workshop. You may refuse the transfer. Accepting requires PC to remain at the yard and adds stress and trauma, with the fee paid into that site's funds. Offers expire after two days and managers never accept them automatically. Cult names only appear after PC has learnt them from the confessor.
+
+Rowan can be approached once a day across all sites. Unpaid wages at any factory prevent trust gains from chatting. At 10 trust, with that site's arrears cleared, £1,200 hires a shift manager through Rowan. The manager costs £80 a day, accepts ordinary orders and arranges delivery, keeping the cash reserve and three days' costs before buying materials. Incidents still need your decision.
+
+An extra bay costs £90,000 and stops production for five days. A production line costs £20,000 and takes two days, with up to three lines sharing that factory's crew. **Winding up sells the land and equipment for 35% of the original purchase price.** Unpaid wages, site bills, severance and cancellation costs are deducted first, and unpaid invoices pass to the buyer. Resolve incidents before selling and cover any shortfall. Selling cannot erase arrears.
+
+The journal lists each site's work, orders, unpaid invoices and outstanding problems. Cumulative figures appear in mod statistics. Adrian, Marlow and Rowan can have their gender adjusted through vanilla NPC settings.
+
 ### Financial Daily
 
 The Financial Daily prints closing prices, price movements and local business news from the latest completed trading day. Copies remain available on weekends, using the latest trading close. <span class="blue">The journal records the most recent copy you actually read. Its figures do not update automatically on later days.</span>
@@ -58,6 +86,10 @@ Printed figures are a record. Check the securities desk for the price used when 
 ### Shares, financing and futures
 
 Open a brokerage account and transfer funds at the **securities desk**. The shares page shows quotes, held and sellable quantities, cost basis and profit or loss. Buying and selling charge a fee, and weekly distributions enter brokerage cash.
+
+Issued and listed quantities change through trading-day company announcements. New issues increase both totals, while repurchases and cancellations reduce them. Shareholders releasing retained shares or taking long-term holdings only change the listed supply. Notices record the quantity changed. They cannot remove your cash holdings, financed shares or outstanding borrowed shares.
+
+Cash purchases, financed shares and short sales share the available supply. Selling or closing returns shares to it. The quote board combines cash and financed holdings and calculates ownership against the current issued total. A new issue can dilute your percentage without reducing the number of shares you hold. Futures settle in cash and confer no ownership. Robin's drinks shop keeps its issued total unchanged and lists at most 5%. The separate private partnership is capped at 40%, leaving Robin at least 55%.
 
 <span class="blue">No trade can be exited on the day it opens.</span> Newly bought shares, financed shares, short sales and futures become sellable or closable from the next trading day. Weekends are excluded, so a Friday purchase waits until Monday. Previously settled shares remain sellable. **Sell all available** sells only the unlocked quantity.
 
@@ -81,6 +113,18 @@ Set stop-loss and take-profit orders from the positions page. Triggers use a per
 The **business-purpose loan** page at the bank accepts Robin's shop plans or an established farm-orchard sales record. PC signs as the borrower and receives the funds in the bank account. Lending money to Robin remains a separate transfer and debt.
 
 Recovery debt appears in the finance journal with its deadline. Pay it from bank funds and cash, or buy one short extension. Once overdue, Bailey can intercept PC on High Street. Pay, resist or submit; fighting off the collector does not erase the debt. Being taken away can lead to the vanilla underground brothel or Remy’s underground farm. After two insufficient personal-loan or credit-card payments, the remaining balance and accrued charges transfer to collection with fourteen days to pay. The original account stops collecting that debt. A defaulted credit card is withdrawn; a new application is available after the collection debt is cleared.
+
+### Rent buyouts and the donations desk
+
+Visit Bailey's office between **7:00 and 10:00** and choose **Discuss ending your rent payments**. Buy out your own rent, Robin's rent, or both. Robin must read and sign the terms before you pay for that contract. You can settle your own separately. Begin payment **before 9:50**.
+
+Each contract costs at least **£250,000**, or **260 weeks** of that person's current base rent if higher. Unpaid rent is additional. The quoted buyout stays fixed, while arrears are settled at payment. Cash is used first, with the remainder drawn from a bank account with a debit card.
+
+<span class="green">A paid contract ends that person's rent collection. The original room and keys remain available, with the choice to move out.</span> Buying out only one leaves the other paying separately and ends the previous combined-rent arrangement. You can show Robin the receipt for Robin's contract afterwards.
+
+**MSO: Mansion Street Orphanage** is also listed at the securities desk. Large rent settlements, collection disputes, donations and repair bills affect its quotes. Share ownership is an investment and does not alter living arrangements.
+
+The **donations desk** is beside the town-hall front desk. Ask after waiting in line, on weekdays between **8:00 and 18:00**. Choose the orphanage, hospital, school or temple and donate with your name or anonymously. Each project displays its target and cumulative contributions. Recent receipts remain at the desk. Cash and debit-card bank funds pay into the selected project, with that record retained for future purchasing and related content.
 
 ### Property running costs and steps
 
@@ -240,7 +284,7 @@ Mod statistics collect realised share and margin-trading results, dividends, par
 | Danube Street manor  | Conservatory lounge, attic study and two-car garage | Enclosed garden-wing pool                                                |
 
 - **Rest:** fifteen minutes reduces fatigue. The first rest in each house each day also reduces stress. Invite a resident lover who is awake in a common room.
-- **Study:** each of the four subjects takes fifteen minutes and uses the native skill calculation. Reading reduces stress. The property accounts list expected weekly rent, upkeep, management fees and mortgage instalments for all houses.
+- **Study:** each of the four subjects takes fifteen minutes and uses the native skill calculation. Reading reduces stress. The property accounts in your journal list expected weekly rent, upkeep, management fees and mortgage instalments for all houses.
 - **Swimming:** twenty minutes improves native swimming and physique while increasing fatigue. Keep your clothes on, choose a swimwear outfit from the property's wardrobe, or undress. Dry off and put your original clothes back on when leaving. Cursed clothes cannot be forcibly removed.
 - **Pool intimacy:** with a cohabiting lover selected in the common-room menu, the pool page offers **Invite your lover into the water** and enters the encounter wearing whatever you would swim in. If both residents would join a three-way, **Invite both lovers into the water** also appears. The pool scene still needs the promiscuity marker and the lovers' consent, and you dress again according to how you entered the water.
 - **Weather:** the cliffside pool closes in rain and snow, and needs heating in winter. The manor's indoor pool is usable all year. No intimacy entry appears while the pool is closed.
