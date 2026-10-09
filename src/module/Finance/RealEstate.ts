@@ -7,7 +7,7 @@ import Mortgage, { type MortgageState } from './Mortgage';
 import rentalTerms from '../../assets/finance/rentals.json';
 
 type PropertyId = string;
-type PropertyRoom = 'bedroom' | 'bathroom' | 'kitchen' | 'desk' | 'guest' | 'retreat' | 'outdoor' | 'balcony';
+type PropertyRoom = keyof Property['rooms'] | Property['extensions'][number]['id'];
 type PaperKind = 'poster' | 'wallpaper';
 type FurnitureKind = PaperKind | 'bed' | 'table' | 'chair' | 'desk' | 'wardrobe' | 'decoration' | 'windowsill';
 type PropertyFurniture = { id: string; name: string; nameCap: string; cost: number; type: string[]; category: string[]; iconFile: string; description?: string; showCheck?: string; tier?: number };
@@ -33,9 +33,18 @@ export interface RealEstateState {
   furniture_property: PropertyId | null;
   furniture_category: FurnitureKind;
   flight_street: string;
+  room_companion: string | null;
+  pool_clothing: 'clothed' | 'nude' | 'swimwear';
+  /** 单人亲密场景的地点，泳池入口据此把同一段遭遇战放进水里。 */
+  intimacy_place: 'bedroom' | 'pool';
+  /** 已答应一起亲近的两位恋人，连同他们同意的地点，交给亲密场景读取。 */
+  pair_request: { names: string[]; place: 'bedroom' | 'pool' } | null;
 }
 
 interface PropertyManagement {
+  upgrades: string[];
+  rest_day: number;
+  affection_days: Record<string, number>;
   condition: number;
   renovation: number;
   rented: boolean;
@@ -82,7 +91,11 @@ class RealEstate {
     glide_scared_day: -1,
     furniture_property: null,
     furniture_category: 'bed',
-    flight_street: 'High Street'
+    flight_street: 'High Street',
+    room_companion: null,
+    pool_clothing: 'clothed',
+    intimacy_place: 'bedroom',
+    pair_request: null
   };
   private loadedProperties?: Property[];
   private loadedResidents?: ResidentProfile[];
@@ -104,11 +117,6 @@ class RealEstate {
     return (this.loadedResidents ??= PropertyCatalog.loadResidents(this.core));
   }
 
-  public askingPrice(id: PropertyId): number {
-    const property = this.properties.find(item => item.id === id);
-    return property?.price ?? 0;
-  }
-
   public preInit(): void {
     this.core.tool.onInit(() => {
       void this.properties;
@@ -127,7 +135,7 @@ class RealEstate {
 
   public get current(): Property | undefined {
     const property = this.properties.find(item => item.id === this.state.visiting);
-    return property && this.owns(property.id) && !this.managementFor(property.id).rented && !this.isFrozen(property.id) ? property : undefined;
+    return property && this.owns(property.id) && !this.state.management[property.id]?.rented && !this.isFrozen(property.id) ? property : undefined;
   }
 
   public get currentFloor(): number {
@@ -135,7 +143,34 @@ class RealEstate {
   }
 
   public floorOf(room: PropertyRoom): number | undefined {
-    return this.current?.rooms[room];
+    return this.facilities.find(facility => facility.id === (room === 'desk' ? 'study' : room))?.floor ?? this.current?.rooms[room as keyof Property['rooms']];
+  }
+
+  public get facilities(): Property['extensions'] {
+    const property = this.current;
+    if (!property) return [];
+    const upgrades = this.state.management[property.id]?.upgrades ?? [];
+    return property.extensions.filter(extension => extension.cost === 0 || upgrades.includes(extension.id));
+  }
+
+  public get poolOpen(): boolean {
+    const facilities = this.facilities;
+    const pool = facilities.find(facility => facility.id === 'pool');
+    return !!pool && (!pool.outdoor || (!['rain', 'snow'].includes(Weather.precipitation) && (Time.season !== 'winter' || facilities.some(facility => facility.id === 'pool_heating'))));
+  }
+
+  public upgrade(id: PropertyId, extensionId: string): string {
+    const property = this.properties.find(item => item.id === id);
+    if (!property || !this.owns(id)) return 'not-owned';
+    const management = this.managementFor(id);
+    const extension = property.extensions.find(item => item.id === extensionId);
+    if (!extension || extension.cost === 0 || management.upgrades.includes(extensionId)) return 'unavailable';
+    if (management.rented || management.auction_day !== null || this.isFrozen(id)) return 'unavailable';
+    if (extension.requires && !property.extensions.some(item => item.id === extension.requires && (item.cost === 0 || management.upgrades.includes(item.id)))) return 'unavailable';
+    if (!this.finance.canPay(extension.cost, 'furniture')) return 'insufficient-funds';
+    this.core.SugarCube.Wikifier.wikifyEval(`<<money ${-extension.cost} 'furniture'>>`);
+    management.upgrades.push(extensionId);
+    return 'ok';
   }
 
   public setFloor(floor: number): boolean {
@@ -151,18 +186,15 @@ class RealEstate {
 
   // 原版 isLoveInterest 读取当前存档的恋人槽位，模组已将扩展列表接入该函数。
   // 同住只关心是否为当前恋人，不用判断角色是否还能被选为恋人。
-  private filterResidents(): void {
-    const residents = (this.state.residents ??= {});
-    for (const [id, names] of Object.entries(residents)) {
-      residents[id] = names.filter(name => this.owns(id) && !this.managementFor(id).rented && window.isLoveInterest(name) && this.residentProfiles.some(profile => profile.id === name));
-    }
+  private pruneResidents(): void {
+    for (const id of Object.keys(this.state.residents)) this.state.residents[id] = this.residentsAt(id).map(profile => profile.id);
   }
 
   public residentsAt(id: PropertyId): ResidentProfile[] {
-    this.filterResidents();
+    if (!this.owns(id) || this.state.management[id]?.rented) return [];
     return (this.state.residents[id] ?? []).flatMap(name => {
       const profile = this.residentProfiles.find(item => item.id === name);
-      return profile ? [profile] : [];
+      return profile && window.isLoveInterest(name) ? [profile] : [];
     });
   }
 
@@ -210,23 +242,18 @@ class RealEstate {
     });
   }
 
-  public residentsInCommonRooms(id: PropertyId): ResidentProfile[] {
-    const sleeping = [...this.residentsInBedroom(id), ...this.residentsInGuestRoom(id)];
-    return this.residentsHome(id).filter(profile => !sleeping.some(resident => resident.id === profile.id));
-  }
-
-  public residentsInBedroom(id: PropertyId): ResidentProfile[] {
-    const home = this.residentsHome(id);
+  public get household(): Record<'home' | 'bedroom' | 'guest' | 'common', ResidentProfile[]> {
+    const property = this.current;
+    if (!property) return { home: [], bedroom: [], guest: [], common: [] };
+    const home = this.residentsHome(property.id);
     const selected = home.find(profile => profile.id === this.state.meeting_resident);
     // 选中的同住者离开后保持主卧空置，不把客房里的另一人自动换进来。
-    if (this.state.meeting_resident) return selected ? [selected] : [];
-    return Time.hour === 23 || this.residentsAt(id).length > 1 ? [] : home.slice(0, 1);
-  }
-
-  public residentsInGuestRoom(id: PropertyId): ResidentProfile[] {
-    if (!this.properties.find(property => property.id === id)?.rooms.guest || Time.hour === 23) return [];
-    const bedroom = this.residentsInBedroom(id);
-    return this.residentsHome(id).filter(profile => !bedroom.some(resident => resident.id === profile.id));
+    let bedroom: ResidentProfile[] = [];
+    if (this.state.meeting_resident) bedroom = selected ? [selected] : [];
+    else if (Time.hour !== 23 && this.residentsAt(property.id).length < 2) bedroom = home.slice(0, 1);
+    const guest = property.rooms.guest && Time.hour !== 23 ? home.filter(profile => !bedroom.includes(profile)) : [];
+    const common = home.filter(profile => !bedroom.includes(profile) && !guest.includes(profile));
+    return { home, bedroom, guest, common };
   }
 
   // 拒绝来自受霸凌的一方，或不愿与别人分享伴侣的凯拉尔。
@@ -240,7 +267,7 @@ class RealEstate {
   }
 
   public inviteResident(name: string, id: PropertyId): boolean {
-    this.filterResidents();
+    this.pruneResidents();
     const property = this.properties.find(item => item.id === id);
     if (!property || !this.owns(id) || this.managementFor(id).rented || this.isFrozen(id)) return false;
     const profile = this.residentProfiles.find(item => item.id === name);
@@ -283,13 +310,13 @@ class RealEstate {
     return true;
   }
 
-  /** 只在亲密互动开始前检查，进行中的遭遇战不因日程变化换人或中止。 */
-  public canIntimate(name: string, id = this.current?.id): boolean {
+  /** 邀约开始前检查在家时段；卧室要求双人床，进行中的场景不随日程中止。 */
+  public canIntimate(name: string, id = this.current?.id, place: 'bedroom' | 'pool' = 'bedroom'): boolean {
     return (
       !!id &&
       this.owns(id) &&
-      !this.managementFor(id).rented &&
-      this.canShareBed(id) &&
+      !this.state.management[id]?.rented &&
+      (place === 'pool' || this.canShareBed(id)) &&
       window.isLoveInterest(name) &&
       this.residentsHome(id).some(profile => profile.id === name) &&
       (name !== 'Robin' || C.npc.Robin.trauma < 50)
@@ -298,15 +325,61 @@ class RealEstate {
 
   public get currentCompanion(): ResidentProfile | undefined {
     const name = this.state.meeting_resident;
+    const property = this.current;
     // 互动开始时已检查夜间日程。对话或遭遇战跨过日程边界后，仍要认得本次选中的同住者。
-    return name && this.current ? this.residentsAt(this.current.id).find(profile => profile.id === name) : undefined;
+    return name && property ? this.residentsAt(property.id).find(profile => profile.id === name) : undefined;
+  }
+
+  /** 两位同住恋人是否愿意三人局：都在家、不互相拒绝，且属于有相应分支的组合。 */
+  public pairEligible(names: readonly string[], place: 'bedroom' | 'pool' = 'bedroom'): boolean {
+    const pair = [...names].sort();
+    if (pair.length !== 2 || pair[0] === pair[1]) return false;
+    if (this.householdRefusal(pair)) return false;
+    if (!['Robin:Sydney'].some(entry => entry === pair.join(':'))) return false;
+    return pair.every(name => this.canIntimate(name, this.current?.id, place));
+  }
+
+  /** 泳池或卧室能否作为本次亲密地点：泳池还要求已扩建且水可用。 */
+  public placeOpen(place: 'bedroom' | 'pool'): boolean {
+    return place === 'bedroom' || this.poolOpen;
+  }
+
+  /** 记录单人亲密场景的对象与地点；入口一律经此登记，读档或跨回合后仍能返回原处。 */
+  public requestIntimacy(name: string, place: 'bedroom' | 'pool' = 'bedroom'): boolean {
+    if (!this.placeOpen(place)) return false;
+    if (!this.canIntimate(name, this.current?.id, place)) return false;
+    if (!this.meetResident(name, this.current!.id)) return false;
+    this.state.intimacy_place = place;
+    // 单人邀约作废尚未使用的三人局邀请，避免离开牌桌后又进入三人场景。
+    this.state.pair_request = null;
+    return true;
+  }
+
+  public get intimacyPlace(): 'bedroom' | 'pool' {
+    return this.state.intimacy_place ?? 'bedroom';
+  }
+
+  /** 记下已答应三人局的两位恋人及地点，交给亲密场景读取。 */
+  public requestPair(names: readonly string[], place: 'bedroom' | 'pool'): boolean {
+    if (!this.pairEligible(names, place) || !this.placeOpen(place)) return false;
+    this.state.pair_request = { names: [...names].sort(), place };
+    return true;
+  }
+
+  /** 战斗回合跨段落后仍要认得本次地点，因此整段场景只在结束时清空。 */
+  public get pairRequest(): RealEstateState['pair_request'] {
+    return this.state.pair_request;
+  }
+
+  public clearPairRequest(): void {
+    this.state.pair_request = null;
   }
 
   public buy(id: PropertyId): string {
     const property = this.properties.find(item => item.id === id);
     if (!property) return 'invalid';
     if (this.owns(id)) return 'owned';
-    const result = this.finance.payFromBankPennies(this.askingPrice(id));
+    const result = this.finance.payFromBankPennies(property.price);
     if (result !== 'ok') return result;
     this.state.owned[id] = true;
     this.state.management[id] = RealEstate.newManagement();
@@ -318,7 +391,7 @@ class RealEstate {
     const property = this.properties.find(item => item.id === id);
     if (!property) return 'invalid';
     if (this.owns(id)) return 'owned';
-    const result = this.mortgage.start(id, this.askingPrice(id), useCredit, days);
+    const result = this.mortgage.start(id, property.price, useCredit, days);
     if (result !== 'ok') return result;
     this.state.owned[id] = true;
     this.state.management[id] = RealEstate.newManagement();
@@ -327,8 +400,10 @@ class RealEstate {
   }
 
   public appraisal(id: PropertyId): number {
+    const property = this.properties.find(item => item.id === id);
+    if (!property) return 0;
     const management = this.managementFor(id);
-    return Math.floor(this.askingPrice(id) * (0.8 + management.condition / 500) * (1 + management.renovation * 0.1));
+    return Math.floor(property.price * (0.8 + management.condition / 500) * (1 + management.renovation * 0.1));
   }
 
   public collateralLimit(id: PropertyId): number {
@@ -344,6 +419,9 @@ class RealEstate {
 
   private static newManagement(): PropertyManagement {
     return {
+      upgrades: [],
+      rest_day: -1,
+      affection_days: {},
       condition: 100,
       renovation: 0,
       rented: false,
@@ -380,9 +458,9 @@ class RealEstate {
             : `wallpaper-${hanging.design.replaceAll(' ', '-')}`;
       return { ...template, id: hanging.custom ? 'custom' : hanging.design, name, nameCap: name, iconFile, description: undefined, category: [kind] };
     }
+    const desk = property.rooms.desk || property.extensions.some(extension => extension.id === 'study' && (extension.cost === 0 || state.upgrades.includes(extension.id)));
     const installed =
-      state.furnishings?.[kind] ??
-      (kind === 'bed' ? (state.bed_id ?? property.bed_id) : kind === 'wardrobe' ? (state.wardrobe_id ?? property.wardrobe_id) : kind === 'desk' && property.rooms.desk ? 'desk' : null);
+      state.furnishings?.[kind] ?? (kind === 'bed' ? (state.bed_id ?? property.bed_id) : kind === 'wardrobe' ? (state.wardrobe_id ?? property.wardrobe_id) : kind === 'desk' && desk ? 'desk' : null);
     if (!installed) return null;
     const item = window.Furniture.get(installed, true);
     return item ? { ...item, id: installed, category: [] } : null;
@@ -392,7 +470,7 @@ class RealEstate {
     const property = this.properties.find(item => item.id === id);
     if (!property || !this.owns(id)) return false;
     const kinds: FurnitureKind[] = ['bed', 'wardrobe', 'table', 'chair', 'decoration'];
-    if (property.rooms.desk) kinds.push('desk');
+    if (this.furniture(id, 'desk')) kinds.push('desk');
     return kinds.every(kind => this.furniture(id, kind) !== null);
   }
 
@@ -402,7 +480,7 @@ class RealEstate {
 
   public furnitureOffers(id: PropertyId, kind: FurnitureKind): { id: string; item: PropertyFurniture; cost: number }[] {
     const property = this.properties.find(item => item.id === id);
-    if (!property || (kind === 'desk' && !property.rooms.desk)) return [];
+    if (!property || (kind === 'desk' && !this.furniture(id, 'desk'))) return [];
     const current = this.furniture(id, kind);
     if (kind === 'poster' || kind === 'wallpaper') {
       const template = window.Furniture.get(kind, true);
@@ -481,7 +559,9 @@ class RealEstate {
     return true;
   }
 
-  public enter(): void {
+  public enter(room?: PropertyRoom): void {
+    const floor = room && this.floorOf(room);
+    if (floor) this.state.floor = floor;
     V.outside = 0;
     V.location = 'deadwood_home';
     V.bus = 'deadwood_home';
@@ -489,7 +569,12 @@ class RealEstate {
 
   public maintenanceCost(id: PropertyId): number {
     const property = this.properties.find(item => item.id === id);
-    return property ? Math.ceil((property.price * this.mortgage.terms.rental.weekly_maintenance_percent) / 100) : 0;
+    if (!property) return 0;
+    const upgrades = this.managementFor(id).upgrades;
+    return (
+      Math.ceil((property.price * this.mortgage.terms.rental.weekly_maintenance_percent) / 100) +
+      property.extensions.reduce((sum, extension) => sum + (extension.cost === 0 || upgrades.includes(extension.id) ? extension.upkeep : 0), 0)
+    );
   }
 
   public weeklyRent(id: PropertyId): number {
@@ -556,7 +641,8 @@ class RealEstate {
   }
 
   public rentalRepairCost(id: PropertyId): number {
-    return Math.ceil(this.askingPrice(id) * rentalTerms.repairPriceRate);
+    const property = this.properties.find(item => item.id === id);
+    return property ? Math.ceil(property.price * rentalTerms.repairPriceRate) : 0;
   }
 
   public resolveIssue(id: PropertyId, choice: 'repair' | 'wait' | 'negotiate', day = RealEstate.today): boolean {
@@ -656,7 +742,7 @@ class RealEstate {
   }
 
   private settleDays(): void {
-    this.filterResidents();
+    this.pruneResidents();
     const state = this.state;
     state.daily_evening = [];
     state.daily_night_wake = false;

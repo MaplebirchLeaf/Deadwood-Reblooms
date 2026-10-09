@@ -31,8 +31,6 @@ export interface BlackjackState {
   stripped_seats: BlackjackSeat[];
   match_lost_seats: BlackjackSeat[];
   intimacy_declined: boolean;
-  /** 三人局的两位恋人，按姓名字母序保存，离开牌桌后仍由亲密场景读取。 */
-  intimacy_pair: string[] | null;
 }
 
 export const DEFAULT_BLACKJACK_STATE: BlackjackState = {
@@ -54,8 +52,7 @@ export const DEFAULT_BLACKJACK_STATE: BlackjackState = {
   clothing: null,
   stripped_seats: [],
   match_lost_seats: [],
-  intimacy_declined: false,
-  intimacy_pair: null
+  intimacy_declined: false
 };
 
 /** 沿用原版计分规则，A 先计 11，超出 21 时逐张改计 1。 */
@@ -190,48 +187,33 @@ class Blackjack {
     return [this.state.companion, this.state.partner].filter((name): name is string => !!name && !!this.estate?.canIntimate(name, this.state.property ?? undefined));
   }
 
-  // 家局三人局沿用 RealEstateHousehold 的关系：只有罗宾与悉尼有一条愿意一起亲近的分支，
-  // 凯拉尔不肯分享，悉尼不肯与惠特尼同席。其余组合仍可同桌玩牌，但亲密时只会当场拒绝。
-  private static readonly threesomePairs = ['Robin:Sydney'] as const;
-  /** 两位同住恋人是否愿意三人局：都在场能上床、不互相拒绝，且属于有相应分支的组合。 */
+  // 三人局的同意与人物关系由房产模块裁决，牌桌只负责把两位同住恋人送进卧室场景。
+  /** 两位同桌的同住恋人是否愿意三人局：都在场能上床、不互相拒绝，且属于有相应分支的组合。 */
   public get pairIntimacyReady(): boolean {
-    const names = [this.state.companion, this.state.partner].filter((name): name is string => !!name).sort();
     if (this.state.venue !== 'home' || !this.matchEnded || this.state.intimacy_declined) return false;
-    if (names.length !== 2 || names[0] === names[1]) return false;
-    if (this.estate?.householdRefusal(names)) return false;
-    if (!Blackjack.threesomePairs.some(pair => pair === names.join(':'))) return false;
-    return names.every(name => this.estate?.canIntimate(name, this.state.property ?? undefined));
+    if (!this.state.companion || !this.state.partner) return false;
+    return this.estate?.pairEligible([this.state.companion, this.state.partner]) === true;
   }
 
   public declineIntimacy(): void {
     if (this.state.venue === 'home' && this.state.wager === 'strip') this.state.intimacy_declined = true;
-    this.state.intimacy_pair = null;
+    this.estate?.clearPairRequest();
   }
 
   public beginIntimacy(name: string): boolean {
-    if (!this.intimacyCandidates.includes(name) || !this.estate?.meetResident(name, this.state.property!)) return false;
-    this.state.intimacy_pair = null;
+    if (!this.intimacyCandidates.includes(name)) return false;
+    this.estate?.clearPairRequest();
+    if (!this.estate?.requestIntimacy(name, 'bedroom')) return false;
     this.leave();
     return true;
   }
 
-  /** 三人局把两位恋人的姓名留到亲密场景，leave 会穿回衣物，但不清空这个记录。 */
+  /** 三人局把两位恋人交给房产模块记录，leave 会穿回衣物，但不清空这条邀请。 */
   public beginPairIntimacy(): boolean {
-    if (!this.pairIntimacyReady) return false;
-    this.state.intimacy_pair = [this.state.companion!, this.state.partner!].sort();
+    if (!this.pairIntimacyReady || !this.state.companion || !this.state.partner) return false;
+    if (!this.estate?.requestPair([this.state.companion, this.state.partner], 'bedroom')) return false;
     this.leave();
     return true;
-  }
-
-  /** 亲密场景取走这组姓名后立即清空，避免返回牌桌时把旧组合当成新的邀请。 */
-  public takeIntimacyPair(): string[] | null {
-    const pair = this.state.intimacy_pair;
-    this.state.intimacy_pair = null;
-    return pair;
-  }
-
-  public clearIntimacyPair(): void {
-    this.state.intimacy_pair = null;
   }
 
   public setWager(wager: BlackjackState['wager']): boolean {
@@ -279,7 +261,7 @@ class Blackjack {
     // 同一张桌子可继续已保存的牌局，换场地或对手时清理旧牌局。
     if (venue !== this.state.venue || property !== this.state.property || companion !== this.state.companion || partner !== this.state.partner) {
       this.leave();
-      this.state.intimacy_pair = null;
+      this.estate?.clearPairRequest();
     }
     Object.assign(this.state, { venue, property, companion, partner, return_passage: venue === 'arcade' ? 'Arcade' : origin });
     return true;

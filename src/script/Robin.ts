@@ -59,7 +59,6 @@ export default function (maplebirch: typeof window.maplebirch): void {
   // CustomLinkZone 使用固定可见链接序号，不适合这些动态页面。
   maplebirch.tool.addTo(
     'BeforeLinkZone',
-    { widget: 'deadwood-robin-room-links', passage: 'Robin Options' },
     { widget: 'deadwood-robin-lemonade-links', passage: "Robin's Lemonade" },
     { widget: 'deadwood-robin-beach-links', passage: "Robin's Lemonade" },
     { widget: 'deadwood-robin-fishing-wait', passage: 'Fishing Beach Wait' },
@@ -78,6 +77,10 @@ export default function (maplebirch: typeof window.maplebirch): void {
 
   maplebirch.tool.inject({
     widgetPassage: {
+      'Widgets Robin': [
+        // 各房间页面共用普通菜单，上学、就寝和剧情分支不会经过这里。
+        { src: '<<robinbully>>', applybefore: '<<deadwood-robin-room-links>>\n\t\t', expected: 1 }
+      ],
       'Widgets Journal': [
         // 原版先列房租，DoLP 先列押金。在共同房租分支前追加罗宾日志。
         {

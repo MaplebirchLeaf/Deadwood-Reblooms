@@ -25,14 +25,27 @@ export interface Property {
   entry_label: LocalizedText;
   mirror_label: LocalizedText;
   // 庭院、阳台的门从哪一处打开，不用楼层号推断动线。
-  outdoor_access: 'sitting' | 'landing' | 'retreat';
+  outdoor_access: 'sitting' | 'landing' | 'lounge';
   description: LocalizedText;
   floors: PropertyFloor[];
-  rooms: Record<'bedroom' | 'bathroom' | 'kitchen' | 'outdoor', number> & Partial<Record<'desk' | 'guest' | 'retreat' | 'balcony', number>>;
+  rooms: Record<'bedroom' | 'bathroom' | 'kitchen' | 'outdoor', number> & Partial<Record<'desk' | 'guest' | 'balcony', number>>;
+  extensions: {
+    id: 'lounge' | 'study' | 'pool' | 'pool_heating' | 'garage';
+    icon: string;
+    floor: number;
+    access: 'sitting' | 'landing' | 'bedroom' | 'outdoor' | 'lounge';
+    inline?: boolean;
+    cost: number;
+    upkeep: number;
+    name: LocalizedText;
+    description: LocalizedText;
+    requires?: 'pool';
+    outdoor?: boolean;
+    parking?: { bicycle: number; motorcycle: number; motor_vehicle: number };
+  }[];
   interior: {
     bedroom_label: LocalizedText;
     bedroom: LocalizedText;
-    sitting_rest?: LocalizedText;
     bathroom: LocalizedText;
     kitchen_label: LocalizedText;
     kitchen: LocalizedText;
@@ -43,9 +56,6 @@ export interface Property {
     balcony?: LocalizedText;
     balcony_view?: LocalizedText;
     guest?: LocalizedText;
-    retreat_label?: LocalizedText;
-    retreat?: LocalizedText;
-    retreat_rest?: LocalizedText;
     renovated: LocalizedText;
   };
 }
@@ -84,24 +94,51 @@ export default class PropertyCatalog {
         !localized(property.name) ||
         !localized(property.entry_label) ||
         !localized(property.mirror_label) ||
-        !['sitting', 'landing', 'retreat'].includes(property.outdoor_access!) ||
+        !['sitting', 'landing', 'lounge'].includes(property.outdoor_access!) ||
         !localized(property.description) ||
         !Array.isArray(property.floors) ||
         property.floors.length === 0 ||
         property.floors.some(floor => !localized(floor?.name) || !localized(floor?.description)) ||
         !property.rooms ||
+        !Array.isArray(property.extensions) ||
+        new Set(property.extensions.map(extension => extension.id)).size !== property.extensions.length ||
+        property.extensions.some(
+          extension =>
+            !['lounge', 'study', 'pool', 'pool_heating', 'garage'].includes(extension.id) ||
+            typeof extension.icon !== 'string' ||
+            !/^(?:[a-z0-9-]+\/)*[a-z0-9-]+\.png$/.test(extension.icon) ||
+            !Number.isInteger(extension.floor) ||
+            extension.floor < 1 ||
+            extension.floor > property.floors!.length ||
+            !['sitting', 'landing', 'bedroom', 'outdoor', 'lounge'].includes(extension.access) ||
+            (extension.access === 'sitting' && extension.floor !== 1) ||
+            (extension.access === 'landing' && extension.floor === 1) ||
+            (['bedroom', 'outdoor'].includes(extension.access) && extension.floor !== property.rooms![extension.access as 'bedroom' | 'outdoor']) ||
+            (extension.access === 'lounge' &&
+              (extension.id === 'lounge' || !property.extensions!.some(lounge => lounge.id === 'lounge' && lounge.floor === extension.floor && lounge.cost === 0 && !lounge.inline))) ||
+            (extension.inline !== undefined && (typeof extension.inline !== 'boolean' || extension.id !== 'lounge' || extension.cost !== 0)) ||
+            !Number.isSafeInteger(extension.cost) ||
+            extension.cost < 0 ||
+            !Number.isSafeInteger(extension.upkeep) ||
+            extension.upkeep < 0 ||
+            !localized(extension.name) ||
+            !localized(extension.description) ||
+            (extension.requires !== undefined && !property.extensions!.some(required => required.id === extension.requires)) ||
+            (extension.id === 'garage' &&
+              (!extension.parking || (['bicycle', 'motorcycle', 'motor_vehicle'] as const).some(vehicle => !Number.isSafeInteger(extension.parking![vehicle]) || extension.parking![vehicle] < 0)))
+        ) ||
         (['bedroom', 'bathroom', 'kitchen', 'outdoor'] as const).some(
           room => !Number.isInteger(property.rooms?.[room]) || property.rooms![room] < 1 || property.rooms![room] > property.floors!.length
         ) ||
-        (['desk', 'guest', 'retreat', 'balcony'] as const).some(
+        (['desk', 'guest', 'balcony'] as const).some(
           room => property.rooms?.[room] !== undefined && (!Number.isInteger(property.rooms[room]) || property.rooms[room]! < 1 || property.rooms[room]! > property.floors!.length)
         ) ||
         (property.outdoor_access === 'sitting' && property.rooms.outdoor !== 1) ||
         (property.outdoor_access === 'landing' && property.rooms.outdoor === 1) ||
-        (property.outdoor_access === 'retreat' && property.rooms.retreat !== property.rooms.outdoor) ||
+        (property.outdoor_access === 'lounge' &&
+          !property.extensions.some(extension => extension.id === 'lounge' && extension.floor === property.rooms!.outdoor && extension.cost === 0 && !extension.inline)) ||
         !localized(property.interior?.bedroom_label) ||
         !localized(property.interior?.bedroom) ||
-        (property.rooms?.retreat === undefined && !localized(property.interior?.sitting_rest)) ||
         !localized(property.interior?.bathroom) ||
         !localized(property.interior?.kitchen_label) ||
         !localized(property.interior?.kitchen) ||
@@ -110,7 +147,6 @@ export default class PropertyCatalog {
         !localized(property.interior?.outdoor_view) ||
         (property.rooms?.balcony !== undefined && (!localized(property.interior?.balcony_label) || !localized(property.interior?.balcony) || !localized(property.interior?.balcony_view))) ||
         (property.rooms?.guest !== undefined && !localized(property.interior?.guest)) ||
-        (property.rooms?.retreat !== undefined && (!localized(property.interior?.retreat_label) || !localized(property.interior?.retreat) || !localized(property.interior?.retreat_rest))) ||
         !localized(property.interior?.renovated) ||
         ids.has(property.id)
       ) {

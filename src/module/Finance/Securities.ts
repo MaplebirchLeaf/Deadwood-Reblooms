@@ -2,6 +2,7 @@
 
 import type { FinanceState } from '../Finance';
 import terms from '../../assets/finance/market.json';
+import CompanyEvents from './CompanyEvents';
 
 export interface Security {
   symbol: string;
@@ -15,19 +16,29 @@ type MarketState = FinanceState['market'];
 
 /** 证券行情与剧情涨跌，不持有存档，始终操作调用方提供的状态。 */
 export default class Securities {
+  public static tradingDay(day: number): boolean {
+    const weekDay = (((((Number(Time.weekDay) || 1) - (Math.floor(Time.days) - day) - 1) % 7) + 7) % 7) + 1;
+    return weekDay >= 2 && weekDay <= 6;
+  }
+
+  public static nextTradingDay(day: number): number {
+    do day++;
+    while (!Securities.tradingDay(day));
+    return day;
+  }
+
   // 每日行情
-  public static generateSeed(): number {
+  public static generate(): number {
     return Math.floor(Math.random() * 0x100000000) >>> 0 || 1;
   }
 
   public static dailyMove(item: Security, day: number, seed: number): number {
-    let hash = 2166136261 ^ seed;
-    for (const character of `${item.symbol}:${day}`) {
-      hash ^= character.charCodeAt(0);
-      hash = Math.imul(hash, 16777619);
-    }
-    const value = hash >>> 0;
+    const value = CompanyEvents.hash(item.symbol, day, seed);
     const roll = value / 0x100000000;
+    if (roll < terms.extremeChance / 2 || roll >= 1 - terms.extremeChance / 2) {
+      const magnitude = terms.extremeMinPercent + (value % (terms.extremeMaxPercent - terms.extremeMinPercent + 1));
+      return roll < 0.5 ? -magnitude : magnitude;
+    }
     if (roll < terms.shockChance / 2 || roll >= 1 - terms.shockChance / 2) {
       const magnitude = terms.shockMinPercent + (value % (terms.shockMaxPercent - terms.shockMinPercent + 1));
       return roll < 0.5 ? -magnitude : magnitude;
@@ -49,11 +60,9 @@ export default class Securities {
     market.pending_farm_moves = {};
   }
 
-  public static applyEvents(market: MarketState, securities: readonly Security[], shop?: boolean, business?: { upgrades: number; staff: number; orders: number }): void {
-    const news = (market.news ??= []);
-    const record = (symbol: string, event: NonNullable<MarketState['news']>[number]['event'], move: number) => {
-      news.push({ day: Math.floor(Time.days), symbol, event, move });
-      if (news.length > 12) news.shift();
+  public static applyEvents(market: MarketState, securities: readonly Security[], shop?: boolean, business?: { upgrades: number; staff: number; orders: number }, content?: ParentNode): void {
+    const record = (symbol: string, event: string, move: number) => {
+      CompanyEvents.record(market, symbol, event, move);
     };
     const stage = Math.max(0, Math.floor(Number(V.farm_stage) || 0));
     const previousStage = market.farm_stage ?? stage;
@@ -79,7 +88,7 @@ export default class Securities {
     }
     market.farm_attack_damage = damage;
 
-    // 咖啡馆涨价、停业扩建和重新开业都由原版 chef_state 推进，行情只在节点变化时响应一次。
+    // 进入第七阶段时仍营业一周，实际施工停业另按 chef_rework 判断。
     const cafeStage = Math.max(0, Math.floor(Number(V.chef_state) || 0));
     const previousCafeStage = market.cafe_stage ?? cafeStage;
     if (previousCafeStage < 2 && cafeStage >= 2) moves.OBC = (moves.OBC ?? 0) + 3;
@@ -126,6 +135,7 @@ export default class Securities {
       market.robin_staff = staff;
       market.robin_orders = orders;
     }
+    CompanyEvents.capture(market, securities, content);
     if (Number(Time.weekDay) !== 1 && Number(Time.weekDay) !== 7) Securities.applyMoves(market, securities);
   }
 
@@ -137,14 +147,14 @@ export default class Securities {
     }
     if (currentDay <= finance.market.day) return;
     for (let day = finance.market.day + 1; day <= currentDay; day++) {
-      const weekDay = (((((Number(Time.weekDay) || 1) - (Math.floor(Time.days) - day) - 1) % 7) + 7) % 7) + 1;
-      if (weekDay === 1 || weekDay === 7) {
+      if (!Securities.tradingDay(day)) {
         onDay?.(day);
         continue;
       }
       finance.market.previous_prices = { ...finance.market.prices };
       for (const item of securities) finance.market.prices[item.symbol] = Securities.nextPrice(item, finance.market.prices[item.symbol], day, finance.market.seed);
       Securities.applyMoves(finance.market, securities);
+      CompanyEvents.daily(finance.market, securities, day);
       finance.market.history.push({ day, prices: { ...finance.market.prices } });
       if (finance.market.history.length > 30) finance.market.history.shift();
       onDay?.(day);

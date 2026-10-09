@@ -169,31 +169,6 @@ class Orchard extends Module {
   }
 
   public override preInit(): void {
-    // 在默认值填充前改名，保留旧记录里的订单、库存与已付薪期，不保留双套字段。
-    this.core.on(
-      ':variable',
-      () => {
-        const rename = (data: Record<string, unknown> | undefined, keys: readonly string[]) => {
-          if (!data) return;
-          for (const key of keys) {
-            const previous = key.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase());
-            if (previous === key || !Object.hasOwn(data, previous)) continue;
-            if (Object.hasOwn(data, key)) this.migration.utils.remove(data, previous);
-            else this.migration.utils.move(data, previous, key);
-          }
-        };
-        const state = V.Orchard;
-        if (state) {
-          rename(state, Object.keys(defaults));
-          rename(state.worker, Object.keys(defaults.worker));
-          for (const site of ['temple', 'farm'] as const) for (const soil of state.soil?.[site] ?? []) rename(soil, ['base_quality']);
-        }
-        const worker = V.per_npc?.deadwood_orchard_worker;
-        rename(worker, ['orchard_report', 'orchard_shifts']);
-        rename(worker?.orchard_report, ['no_fertiliser', 'off_season', 'left_fruit']);
-      },
-      'Orchard State Naming'
-    );
     super.preInit();
     // 天气变化时及时补水。再次读入同一雨天存档不会重触发 onEnter，推进前仍需核对。
     this.core.dynamic.regWeatherEvent(':deadwood-orchard-rain', {
@@ -336,7 +311,7 @@ class Orchard extends Module {
   }
 
   public get regularStock(): Orchard['stock'] {
-    const displayed = this.stock.filter(item => item.amount >= 5 && V.foodstuff[item.type].marketStall !== false);
+    const displayed = this.stock.filter(item => item.amount - item.reserve >= 5 && V.foodstuff[item.type].marketStall !== false);
     const preferred = displayed.find(item => item.type === this.state.regular_favourite);
     return this.state.regular_visits >= 3 && preferred ? [preferred] : displayed;
   }

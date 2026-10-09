@@ -5,6 +5,11 @@ import RealEstate from './Finance/RealEstate';
 
 export default function Finance(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo('Journal', 'deadwood-reblooms-finance-journal');
+  maplebirch.tool.addTo(
+    'BeforeLinkZone',
+    { widget: 'deadwood-finance-paper-street', passage: ['High Street', 'Danube Street'] },
+    { widget: 'deadwood-finance-paper-loft', passage: 'Orphanage Loft Reading Nook 2' }
+  );
 
   // 通过框架补丁注册原版天气侧栏地点，base 元素必须提供 image 字段。
   maplebirch.tool.patch.location.configure(

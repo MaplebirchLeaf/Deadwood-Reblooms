@@ -2,19 +2,24 @@
 
 <<set _estate to maplebirch.get("Finance").realEstate>>
 <<set _property to _estate.current>>
+<<set _place to _estate.pairRequest ? _estate.pairRequest.place : 'bedroom'>>
 <<if $sexstart is 1>>
-	<<set _pair to maplebirch.get("LifeSimulation").casino.blackjack.takeIntimacyPair()>>
+	<<set _request to _estate.takePairRequest()>>
+	<<set _pair to _request ? _request.names : null>>
+	<<set _place to _request ? _request.place : 'bedroom'>>
 	<<if !_property or !Array.isArray(_pair) or _pair.length isnot 2 or _pair[0] is _pair[1]
 	  or _estate.householdRefusal(_pair)
-	  or !_pair.every(name => _estate.canIntimate(name, _property.id))>>
+	  or !_estate.placeOpen(_place)
+	  or !_pair.every(name => _estate.canIntimate(name, _property.id, _place))>>
 		<<set $sexstart to 0>>
-		<<run maplebirch.get("LifeSimulation").casino.blackjack.clearIntimacyPair()>>
+		<<run _estate.clearPairRequest()>>
 		<<run _estate.enter()>><<effects>>
-		<span class='blue'><<lanSwitch 'They have already gone to their own rooms.' '两人已经各自回房了。'>></span><br><br>
+		<span class='blue'><<lanSwitch 'They have already gone their own way.' '两人已经各自离开了。'>></span><br><br>
 		<<lanLink ["Return to the bedroom", "返回卧室"] 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
 	<<else>>
+		<<set _poolOutdoor to _place is 'pool' and _estate.facilities.find(facility => facility.id === 'pool').outdoor>>
 		<<set $sexstart to 0>>
-		<<run _estate.enter()>>
+		<<run _estate.enter(_place)>><<set $outside to _poolOutdoor ? 1 : 0>>
 		<<clearnpc>>
 		<<npc _pair[0]>><<npc _pair[1] 2>>
 		<<run _pair.forEach(name => statusCheck(name))>>
@@ -25,7 +30,9 @@
 		<</if>>
 		<<person1>>
 		<<consensual>><<set $consensual to 1>><<neutral 1>>
-		<<if $exposed lt 2>>
+		<<if _place is 'pool'>>
+			<<if $Finance.real_estate.pool_clothing is 'nude'>><<strip>><</if>>
+		<<elseif $exposed lt 2>>
 			<span class='lewd'><<lanSwitch 'You slip out of your clothes.' '你脱下衣服。'>></span><<strip>><br><br>
 		<</if>>
 		<<maninit>>
@@ -50,22 +57,36 @@
 		<</if>>
 		<<set $enemytrust += 500>>
 		<<npckiss>>
+		<<if _place is 'pool'>><<water>><br><</if>>
 		<<language>>
 			<<option 'EN'>>
-				You close the bedroom door behind the three of you. Robin sits on the edge of the bed with <<his>> hands folded, glancing at Sydney until Sydney sits down first. "I said I would stay," Robin says quietly. "I meant it."
-				<br><br>
-				Sydney sets <<his>> temple pendant on the bedside table. "Then neither of us has to guess," <<he>> says. <<He>> waits for you to sit between them before reaching for you.
+				<<if _place is 'pool'>>
+					Nobody reaches for a towel or for the clothes left on the deck. The three of you step down into the water together. Robin keeps one hand on the tiled edge, and Sydney waits until you are between them before <<he>> moves.
+					<br><br>
+					The water takes the weight off your legs. Robin watches Sydney over your shoulder until Sydney tilts <<his>> head and holds the look, and neither of them steps back from what they agreed to.
+				<<else>>
+					You close the bedroom door behind the three of you. Robin sits on the edge of the bed with <<his>> hands folded, glancing at Sydney until Sydney sits down first. "I said I would stay," Robin says quietly. "I meant it."
+					<br><br>
+					Sydney sets <<his>> temple pendant on the bedside table. "Then neither of us has to guess," <<he>> says. <<He>> waits for you to sit between them before reaching for you.
+				<</if>>
 			<<option 'CN'>>
-				你关上卧室门。罗宾坐到床边，两手拢在一起，先看了看悉尼，直到悉尼先坐下。“我说过会留下。”罗宾轻声说，“我是认真的。”
-				<br><br>
-				悉尼把神殿吊坠放到床头柜上。“那就不用猜了。”<<he>>说。<<He>>等你坐到两人中间，才伸手碰你。
+				<<if _place is 'pool'>>
+					谁也没有去拿毛巾，也没有去碰平台上叠着的衣服。你们三人一起踏进水里。罗宾一只手扶着瓷砖池沿，悉尼等你站到两人中间，才伸手过来。
+					<br><br>
+					水的浮力托起你的腿。罗宾越过你的肩看向悉尼，直到悉尼偏过头迎上目光，两人谁也没有从答应过的事情上退开。
+				<<else>>
+					你关上卧室门。罗宾坐到床边，两手拢在一起，先看了看悉尼，直到悉尼先坐下。“我说过会留下。”罗宾轻声说，“我是认真的。”
+					<br><br>
+					悉尼把神殿吊坠放到床头柜上。“那就不用猜了。”<<he>>说。<<He>>等你坐到两人中间，才伸手碰你。
+				<</if>>
 		<</language>>
 		<br><br>
 	<</if>>
 <</if>>
 <<if $combat is 1>>
 	<<set _estate to maplebirch.get("Finance").realEstate>>
-	<<run _estate.enter()>>
+	<<run _estate.enter(_place)>>
+	<<if _place is 'pool'>> <<set $outside to _estate.facilities.find(facility => facility.id === 'pool').outdoor ? 1 : 0>> <</if>>
 	<<set $enemyanger to -10>>
 	<<effects>>
 	<<effectsman>>
@@ -82,7 +103,11 @@
 
 :: Deadwood Reblooms Property Pair Intimacy Finish []
 <<set _estate to maplebirch.get("Finance").realEstate>>
-<<run _estate.enter()>><<effects>>
+<<set _request to _estate.pairRequest>>
+<<set _place to _request ? _request.place : 'bedroom'>>
+<<run _estate.enter(_place)>>
+<<if _place is 'pool'>> <<set $outside to _estate.facilities.find(facility => facility.id === 'pool')?.outdoor ? 1 : 0>> <</if>>
+<<effects>>
 <<if $combat is 1>>
 	<<person1>>
 	<<if $enemyarousal gte $enemyarousalmax>>
@@ -94,18 +119,20 @@
 		<br>
 		<<language>>
 			<<option 'EN'>>
-				Robin recovers first, then notices how quiet <<he>> has been and looks at Sydney. "That was... all right," Robin says, testing the words. Sydney answers without mocking <<him>>, and the two of them leave room for you between them.
+				<<if _place is 'pool'>>Robin recovers first, still holding the edge of the pool, then looks at Sydney. "That was... all right," Robin says, testing the words. Sydney answers without mocking <<him>>, and the two of them leave room for you between them.
+				<<else>>Robin recovers first, then notices how quiet <<he>> has been and looks at Sydney. "That was... all right," Robin says, testing the words. Sydney answers without mocking <<him>>, and the two of them leave room for you between them.<</if>>
 			<<option 'CN'>>
-				罗宾先缓过来，随即意识到自己一直太安静，便看向悉尼。“刚才……还可以。”罗宾试着说出口。悉尼没有取笑<<him>>，两人把中间的位置留给你。
+				<<if _place is 'pool'>>罗宾先缓过来，手还扶着池沿，随即看向悉尼。“刚才……还可以。”罗宾试着说出口。悉尼没有取笑<<him>>，两人把中间的位置留给你。
+				<<else>>罗宾先缓过来，随即意识到自己一直太安静，便看向悉尼。“刚才……还可以。”罗宾试着说出口。悉尼没有取笑<<him>>，两人把中间的位置留给你。<</if>>
 		<</language>>
 	<<elseif $enemyarousal lt $enemyarousalmax and $enemyhealth gt 0>>
 		<<llust>>
 		<br>
 		<<language>>
 			<<option 'EN'>>
-				You stop before either of them has to ask. Robin loosens <<his>> grip, and Sydney sits back against the headboard to catch <<his>> breath.
+				You stop before either of them has to ask. Robin loosens <<his>> grip, and Sydney <<if _place is 'pool'>>floats back to the rail<<else>>sits back against the headboard<</if>> to catch <<his>> breath.
 			<<option 'CN'>>
-				不必等谁开口，你先停了下来。罗宾松开手，悉尼靠回床头缓气。
+				不必等谁开口，你先停了下来。罗宾松开手，悉尼<<if _place is 'pool'>>退到池边扶着栏杆<<else>>靠回床头<</if>>缓气。
 		<</language>>
 	<<else>>
 		<<if $enemyarousal gte $enemyarousalmax>>
@@ -113,9 +140,9 @@
 		<</if>>
 		<<language>>
 			<<option 'EN'>>
-				They are both past the point of continuing. Robin pulls the blanket up over the three of you while Sydney catches <<his>> breath.
+				They are both past the point of continuing. <<if _place is 'pool'>>Robin steadies you against the edge of the pool while Sydney catches <<his>> breath.<</if>><<if _place isnot 'pool'>>Robin pulls the blanket up over the three of you while Sydney catches <<his>> breath.<</if>>
 			<<option 'CN'>>
-				两人都没法继续了。罗宾把毯子拉过你们三个人，悉尼还在缓气。
+				两人都没法继续了。<<if _place is 'pool'>>罗宾把你扶在池边，悉尼还在缓气。<</if>><<if _place isnot 'pool'>>罗宾把毯子拉过你们三个人，悉尼还在缓气。<</if>>
 		<</language>>
 	<</if>>
 	<<if $npc.includes('Robin')>>
@@ -130,8 +157,16 @@
 	<</if>>
 	<br><br>
 <</if>>
-<<clotheson>><<endcombat>>
+<<if _place is 'pool'>>
+	<<dry>>
+	<<if $Finance.real_estate.pool_clothing is 'nude'>><<clotheson>>
+	<<elseif $Finance.real_estate.pool_clothing is 'swimwear'>><<run maplebirch.get("Finance").realEstate.openWardrobe()>><<storeon 'Deadwood Property Pool'>><<set $wear_outfit to 'none'>><</if>>
+<<else>>
+	<<clotheson>>
+<</if>>
+<<run _estate.clearPairRequest()>>
+<<endcombat>>
 <<if setup.clothingLayer.all.some(slot => $store[slot]?.some(item => item.location === 'Deadwood Property Bed'))>>
 	<<deadwood-reblooms-property-clothes-on>>
 <</if>>
-<<lanLink ["Return to the bedroom", "返回卧室"] 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+<<getouticon>><<lanLink [_place is 'pool' ? 'Climb out and dry off' : 'Return to the bedroom', _place is 'pool' ? '上岸擦干' : '返回卧室'] _place is 'pool' ? 'Deadwood Reblooms Property Pool' : 'Deadwood Reblooms Property Bedroom'>><</lanLink>>

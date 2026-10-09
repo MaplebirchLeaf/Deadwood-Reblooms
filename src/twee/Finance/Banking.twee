@@ -15,9 +15,9 @@
 	<</nobr>>
 <</widget>>
 
-<!-- 日志保留还款、房产结算提醒与行情日报，银行余额由侧栏显示，持仓在证券柜台查看。 -->
+<!-- 日志记录还款、房产提醒与已经读过的报纸。 -->
 <<widget 'deadwood-reblooms-finance-journal'>>
-	<<if $Finance?.bank?.opened>>
+	<<if $Finance?.bank?.opened or $Finance?.newspaper?.report>>
 		<<set _financeBank to $Finance.bank>>
 		<<set _financeMortgage to maplebirch.get("Finance").realEstate.mortgage.current>>
 		<h1 class='header gold bold'><<lanSwitch 'Finances' '财务'>></h1>
@@ -46,46 +46,8 @@
 					<</if>>
 				</li>
 			<</if>>
-			<<if $Finance.brokerage.opened and $Finance.market.history.length>>
-				<<set $_report_day to Time.startDate.addDays($Finance.market.history.at(-1).day)>>
-				<<set $_rising_security to null, $_falling_security to null, $_largest_rise to 0, $_largest_fall to 0>>
-				<<for $_security range maplebirch.get('Finance').securities>>
-					<<set $_previous_price to $Finance.market.previous_prices[$_security.symbol]>>
-					<<if $_previous_price gt 0>>
-						<<set $_change to ($Finance.market.prices[$_security.symbol] / $_previous_price - 1) * 100>>
-						<<if $_change gt $_largest_rise>>
-							<<set $_rising_security to $_security, $_largest_rise to $_change>>
-						<<elseif $_change lt $_largest_fall>>
-							<<set $_falling_security to $_security, $_largest_fall to $_change>>
-						<</if>>
-					<</if>>
-				<</for>>
-				<li>
-					<strong><<lanSwitch 'Market report' '行情日报'>></strong> ·
-					<span class='blue'><<= lanSwitch(`${$_report_day.day} ${$_report_day.monthName} ${$_report_day.year}`, `${$_report_day.year}年${$_report_day.month}月${$_report_day.day}日`)>></span>
-					<<language>>
-						<<option 'EN'>>
-							<<if $_rising_security>>
-								<br><<= maplebirch.t($_rising_security.name)>> led the gains, up <span class='red'><<= $_largest_rise.toFixed(2)>>%</span>.
-							<</if>>
-							<<if $_falling_security>>
-								<br><<= maplebirch.t($_falling_security.name)>> led the losses, down <span class='green'><<= (-$_largest_fall).toFixed(2)>>%</span>.
-							<</if>>
-							<<if !$_rising_security and !$_falling_security>>
-								<br>Prices were unchanged.
-							<</if>>
-						<<option 'CN'>>
-							<<if $_rising_security>>
-								<br><<= maplebirch.t($_rising_security.name)>>领涨，上涨<span class='red'><<= $_largest_rise.toFixed(2)>>%</span>。
-							<</if>>
-							<<if $_falling_security>>
-								<br><<= maplebirch.t($_falling_security.name)>>领跌，下跌<span class='green'><<= (-$_largest_fall).toFixed(2)>>%</span>。
-							<</if>>
-							<<if !$_rising_security and !$_falling_security>>
-								<br>各证券价格持平。
-							<</if>>
-					<</language>>
-				</li>
+			<<if $Finance.newspaper.report>>
+				<li><<deadwood-finance-paper-summary>></li>
 			<</if>>
 			<<for _financeProperty range maplebirch.get("Finance").realEstate.properties>>
 				<<capture _financeProperty>>
@@ -115,13 +77,21 @@
 								<<= _financePropertyState.lease_end_day>><<lanSwitch '.' ' 天退租。'>></span>
 							<</if>>
 							<<if _financeMortgage?.property_id is _financeProperty.id>>
-								<br><<lanSwitch 'Mortgage balance: ' '房贷余额：'>><<deadwood-reblooms-finance-money _financeMortgage.outstanding>>
-								<<lanSwitch ' on day ' '，第 '>>
-								<span class='blue'><<= _financeMortgage.next_payment_day>></span><<lanSwitch ' is the next payment.' ' 天下次还款。'>>
-								<<if _financeMortgage.stage isnot 'current'>>
-									<span class='red'><<lanSwitch ' Property frozen or under notice.' ' 房产已被催缴或冻结。'>></span>
-								<</if>>
-							<</if>>
+                <br><<lanSwitch 'Mortgage balance: ' '房贷余额：'>><<deadwood-reblooms-finance-money _financeMortgage.outstanding>>
+                · <<lanSwitch 'Weekly interest: ' '周利率：'>><span class='gold'><<= (_financeMortgage.weekly_rate * 100).toFixed(2)>>%</span>
+                <br><<lanSwitch 'Next instalment: ' '下次应还：'>><<deadwood-reblooms-finance-money _financeMortgage.weekly_payment>>
+                · <<deadwood-reblooms-finance-date _financeMortgage.next_payment_day>>
+                <br><<lanSwitch 'Final payment: ' '贷款到期：'>><<deadwood-reblooms-finance-date _financeMortgage.maturity_day>>
+                <<if _financeMortgage.arrears gt 0>>
+                  <br><span class='red'><<lanSwitch 'Overdue: ' '逾期款：'>></span><<deadwood-reblooms-finance-money _financeMortgage.arrears 'red'>>
+                <</if>>
+                <<if _financeMortgage.stage is 'notice'>>
+                  <br><span class='red'><<lanSwitch 'The bank has issued a payment notice.' '银行已发出催缴通知。'>></span>
+                  <<if _financeMortgage.bailey_pending>><<lanSwitch ' Bailey is waiting outside the financial centre.' ' 贝利正在金融中心门外等你。'>><</if>>
+                <<elseif _financeMortgage.stage is 'frozen'>>
+                  <br><span class='red'><<lanSwitch 'The property is frozen. Foreclosure auction: ' '房产已冻结，强制拍卖日期：'>></span><<deadwood-reblooms-finance-date `_financeMortgage.frozen_day + maplebirch.get('Finance').realEstate.mortgage.terms.auction_after_freeze_days`>>
+                <</if>>
+              <</if>>
 						</li>
 					<</if>>
 				<</capture>>
@@ -371,6 +341,10 @@
 			<span class='red'><<lanSwitch 'The selected security is unavailable.' '所选证券不可交易。'>></span>
 		<<case 'insufficient-shares'>>
 			<span class='red'><<lanSwitch 'You do not own enough shares.' '你的持股数量不足。'>></span>
+		<<case 'unsettled-shares'>>
+			<span class='red'><<lanSwitch 'Newly bought shares cannot be sold until the next trading day.' '新买入的股票须等到下一交易日才能卖出。'>></span>
+		<<case 'market-closed'>>
+			<span class='red'><<lanSwitch 'The trading desk is closed.' '证券业务台已经停止营业。'>></span>
 	<</switch>>
 	<<if document.getElementById('dr-finance-caption')>>
 		<<replace '#dr-finance-caption'>><<deadwood-reblooms-finance-caption-content>><</replace>>
@@ -789,11 +763,12 @@
 				</div>
 			<</deadwood-card>>
 			<<deadwood-card 'Holdings' '持仓'>>
+				<<set _financeSellable to maplebirch.get('Finance').sellableShares>>
 				<div class='dr-finance-scroll'>
 					<table class='dr-finance-quotes' @aria-label='lanSwitch("Holdings", "持仓")'>
 						<tr>
 							<th scope='col'><<lanSwitch 'Symbol' '代码'>></th>
-							<th scope='col'><<lanSwitch 'Shares' '股数'>></th>
+							<th scope='col'><<lanSwitch 'Held / sellable' '股数／可卖'>></th>
 							<th scope='col'><<lanSwitch 'Market value' '市值'>></th>
 							<th scope='col'><<lanSwitch 'Cost / profit' '成本／盈亏'>></th>
 						</tr>
@@ -804,7 +779,12 @@
 							<<if _financeOwned gt 0>>
 								<<set _financeHasHoldings to true>>
 								<<set _financeHoldingValue to _financeOwned * $Finance.market.prices[_financeBoardSymbol]>>
-								<tr><td><<= _financeBoardSymbol>></td><td><<= _financeOwned>></td><td><<deadwood-reblooms-finance-money _financeHoldingValue>></td><td><<deadwood-reblooms-finance-money $Finance.brokerage.costs[_financeBoardSymbol]>> / <<deadwood-reblooms-finance-money `_financeHoldingValue - $Finance.brokerage.costs[_financeBoardSymbol]`>></td></tr>
+								<tr>
+									<td><<= _financeBoardSymbol>></td>
+									<td><<= _financeOwned>> / <<= _financeSellable[_financeBoardSymbol]>></td>
+									<td><<deadwood-reblooms-finance-money _financeHoldingValue>></td>
+									<td><<deadwood-reblooms-finance-money $Finance.brokerage.costs[_financeBoardSymbol]>> / <<deadwood-reblooms-finance-money `_financeHoldingValue - $Finance.brokerage.costs[_financeBoardSymbol]`>></td>
+								</tr>
 							<</if>>
 						<</for>>
 						<<if !_financeHasHoldings>>
@@ -814,9 +794,15 @@
 				</div>
 			<</deadwood-card>>
 			<<language>>
-              <<option 'EN'>>Buying and selling each cost <span class='gold'><<= (maplebirch.get('Finance').margin.terms.feeRate * 100).toFixed(2)>>%</span>, at least <<printmoney `maplebirch.get('Finance').margin.terms.minimumFee`>>. Weekly distributions enter the securities account. <span class='red'>Prices can jump sharply in either direction.</span> The desk makes no promise to buy back your shares at their old price.
-              <<option 'CN'>>买卖各收<span class='gold'><<= (maplebirch.get('Finance').margin.terms.feeRate * 100).toFixed(2)>>%</span>，最低<<printmoney `maplebirch.get('Finance').margin.terms.minimumFee`>>。每周分红存入证券账户。<span class='red'>股价可能突然大涨或大跌。</span>柜台不承诺按旧价格收回你的股票。
-            <</language>><br>
+				<<option 'EN'>>
+					<span class='blue'>Newly bought shares become sellable on the next trading day. Weekends do not count.</span>
+					Buying and selling each cost <span class='gold'><<= (maplebirch.get('Finance').margin.terms.feeRate * 100).toFixed(2)>>%</span>, at least <<printmoney `maplebirch.get('Finance').margin.terms.minimumFee`>>. Weekly distributions enter the securities account.
+					<span class='red'>Prices can jump sharply in either direction.</span> The desk makes no promise to buy back your shares at their old price.
+				<<option 'CN'>>
+					<span class='blue'>新买入的股票在下一交易日才能卖出，周末不计入交易日。</span>
+					买卖各收<span class='gold'><<= (maplebirch.get('Finance').margin.terms.feeRate * 100).toFixed(2)>>%</span>，最低<<printmoney `maplebirch.get('Finance').margin.terms.minimumFee`>>。每周分红存入证券账户。
+					<span class='red'>股价可能突然大涨或大跌。</span>柜台不承诺按旧价格收回你的股票。
+			<</language>><br>
 			<<lanSwitch 'Realised profit / dividends: ' '已实现盈亏／分红：'>><<deadwood-reblooms-finance-money $Finance.brokerage.realised>> / <<deadwood-reblooms-finance-money $Finance.brokerage.dividends>><br><br>
 			<<set _financeSecurityOptions to {}>>
 			<<for _financeSecurity range maplebirch.get("Finance").securities>>
@@ -857,9 +843,13 @@
 						<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
 						<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 					<</lanLink>>
-					<<lanLink ['Sell all held', '全部卖出']>>
-						<<set _financeHolding to $Finance.brokerage.holdings[_financeSymbol]>>
-						<<set _financeResult to maplebirch.get("Finance").sell(_financeSymbol, _financeHolding)>>
+					<<lanLink ['Sell all available', '卖出全部可卖股份']>>
+						<<set _financeHolding to maplebirch.get('Finance').sellableShares[_financeSymbol]>>
+						<<if _financeHolding gt 0>>
+							<<set _financeResult to maplebirch.get('Finance').sell(_financeSymbol, _financeHolding)>>
+						<<else>>
+							<<set _financeResult to $Finance.brokerage.holdings[_financeSymbol] gt 0 ? 'unsettled-shares' : 'insufficient-shares'>>
+						<</if>>
 						<<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
 						<<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 					<</lanLink>>
@@ -971,6 +961,7 @@
 	<<deadwood-reblooms-adrian-greeting 'financial_centre_securities'>>
 	<<lanSwitch 'A clerk files account forms beneath the market board while prices crawl across its display.' '行情板下，柜员整理着账户表格，价格在电子屏幕上缓慢滚动。'>><br><br>
 	<<deadwood-finance-news>>
+	<<deadwood-finance-paper-counter>>
 	<span><<icon 'finance/securities-account.png'>><<lanLink ["Securities account", "证券账户"] 'Deadwood Reblooms Financial Centre Securities Account'>><</lanLink>></span><br>
 	<span><<icon 'finance/securities-trading.png'>><<lanLink ["Trading", "证券交易"] 'Deadwood Reblooms Financial Centre Securities Trading'>><</lanLink>></span><br>
 	<<if $Finance.brokerage.opened>>

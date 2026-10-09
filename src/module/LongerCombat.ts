@@ -4,7 +4,7 @@ import type { MacroDefinition } from 'twine-sugarcube';
 
 type FluidPart = Parameters<typeof maplebirch.npc.fluids.add>[1];
 type FluidType = NonNullable<Parameters<typeof maplebirch.npc.fluids.add>[3]>;
-type DialogueHistory = Partial<Record<'m' | 'f', { line: string; namedLine: string }>>;
+type DialogueHistory = Record<string, { line: string; namedLine: string }>;
 
 class LongerCombat {
   static readonly TEXT_KEY = 'deadwood-reblooms:LongerCombat';
@@ -105,6 +105,37 @@ class LongerCombat {
     return this.core.utils.either(choices.length ? choices : lines) ?? lines[0];
   }
 
+  private npcPairs(npc: { [x: string]: any }): string[] {
+    const pairs: string[] = [];
+    const add = (pair: string): void => {
+      if (!pairs.includes(pair)) pairs.push(pair);
+    };
+    for (const field of ['penis', 'vagina'] as const) {
+      const state = typeof npc[field] === 'string' ? npc[field] : '';
+      if (!state) continue;
+      if (state.includes('otheranus')) add('anus:penis');
+      else if (state.includes('anus')) add('penis:anus');
+      else if (state.includes('penis')) add(field === 'penis' ? 'penis:penis' : 'vagina:penis');
+      else if (state.includes('vagina')) add(field === 'penis' ? 'penis:vagina' : 'vagina:vagina');
+    }
+    if (pairs.length === 0) {
+      const hasPenis = npc.penis !== undefined && npc.penis !== 'none';
+      const hasVagina = npc.vagina !== undefined && npc.vagina !== 'none';
+      if (hasPenis) add(V.player?.vaginaExist ? 'penis:vagina' : 'penis:anus');
+      else if (hasVagina) add(V.player?.penisExist ? 'vagina:penis' : 'vagina:vagina');
+    }
+    return pairs.slice(0, 2);
+  }
+
+  private static namedGenders(npc: { [x: string]: any }): ('m' | 'f')[] {
+    const hasPenis = npc.penis !== undefined && npc.penis !== 'none';
+    const hasVagina = npc.vagina !== undefined && npc.vagina !== 'none';
+    const values: ('m' | 'f')[] = [];
+    if (hasPenis) values.push('m');
+    if (hasVagina) values.push('f');
+    return values;
+  }
+
   private npcAgain(npc: { [x: string]: any; pronouns?: { his: string; he: string } }, index: number): string {
     if (!npc.pronouns || (typeof npc.age === 'number' && npc.age < 18)) return '';
     const gender = npc.gender;
@@ -120,17 +151,18 @@ class LongerCombat {
     const lines: DialogueHistory = history?.name === name ? { ...history.lines } : {};
     const state = this.npcState(npc);
     const description = state ? this.npcHis(npc.pronouns) + state : '';
+    if (Number(V.underwater) > 0 || V.combat_silenced) return description;
     const character = name === 'Sydney' ? `Sydney.${(C.npc?.Sydney?.corruption ?? 0) >= 10 ? 'corrupt' : 'pure'}` : name;
     const space = lanSwitch(' ', '');
-    const genders: readonly ('m' | 'f')[] = gender === 'h' ? ['m', 'f'] : [gender];
     const speech: string[] = [];
-    for (const value of genders) {
-      const previous = lines[value];
-      const line = this.npcLine(`${LongerCombat.NPC_KEY}:${value}:${type}:${group}:${stage}`, previous?.line);
+    for (const pair of this.npcPairs(npc)) {
+      const previous = lines[pair];
+      const line = this.npcLine(`${LongerCombat.NPC_KEY}:${pair}:${type}:${group}:${stage}`, previous?.line);
       if (!line) continue;
-      const prefix = `${LongerCombat.NPC_KEY}:named:${character}:${value}:${type}:${stage}`;
+      const named = this.core.utils.either(LongerCombat.namedGenders(npc)) ?? 'f';
+      const prefix = `${LongerCombat.NPC_KEY}:named:${character}:${named}:${type}:${stage}`;
       const namedLine = this.core.services.translator.has(`${prefix}:0`) && Math.random() < 0.6 ? this.npcLine(prefix, previous?.namedLine) : '';
-      lines[value] = { line, namedLine: namedLine || previous?.namedLine || '' };
+      lines[pair] = { line, namedLine: namedLine || previous?.namedLine || '' };
       speech.push('"' + (namedLine ? namedLine + space + line : line) + '"');
     }
     if (speech.length === 0) return description;

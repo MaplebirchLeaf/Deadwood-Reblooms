@@ -37,26 +37,44 @@ Net balance deducts credit, personal loan, mortgage and collection debts. Eligib
 
 **Furniture payment problems**: check the selected home, issued cards, completed reload, sufficient deposits or available credit, and overdue restrictions. A large bank balance does not mean a debit card was issued. A credit limit is not an equal personal-loan entitlement.
 
-Markets respond to farm progress and raids, Ocean Breeze Cafe prices and expansion, and Avery’s company outcomes. Events affect prices after they occur. Reopening the counter does not settle the same event repeatedly.
+Markets respond to farm progress and raids, Ocean Breeze Cafe prices, adverts, expansion, ingredient rumours and police investigations, Avery’s company outcomes, and Robin’s shop opening, improvements, staff and orchard deliveries. Events affect prices after they occur. Reopening the counter does not settle the same event repeatedly. Deliveries move the quote only at the first, fifth and tenth completed order.
+
+<span class="blue">The cafe keeps trading for a week after announcing its expansion. Construction closure is a separate report. Maximum suspicion alone does not mean the police have discovered it. An actual investigation on Cliff Street causes the larger fall.</span> Publicly disclosing the ingredients at reopening also affects the quote.
+
+**Niki’s Photo Studio (NPS)** is tradable, with a **0.04%** weekly distribution. After starting modelling at the studio, first reaching 100, 400 and 1,000 modelling fame affects its quote once at each milestone. The cafe’s advertising campaign also benefits the studio.
+
+Companies can also receive trading-day reports about orders, customers, costs, equipment and delays. These can be positive or negative. Current reports appear at the securities desk, and a read copy of the Financial Daily preserves its printed reports. Routine trading reports pause while the cafe is closed for construction or Robin’s shop is shut.
+
+### Financial Daily
+
+The Financial Daily prints closing prices, price movements and local business news from the latest completed trading day. Copies remain available on weekends, using the latest trading close. <span class="blue">The journal records the most recent copy you actually read. Its figures do not update automatically on later days.</span>
+
+- **Street paper seller:** between 06:00 and 12:00, you may encounter a seller on High Street or Danube Street. A copy costs £1 in cash, with ten minutes to buy and read it. Re-entering the streets does not reroll the day's appearance.
+- **Securities desk:** a communal copy is available in the waiting area, Monday–Friday, 09:00–17:00. Reading is free and takes ten minutes. Reading the same day's copy again takes no additional time.
+- **Orphanage loft reading nook:** choose the native newspaper action to read its business pages during the existing twenty-minute action.
+
+Printed figures are a record. Check the securities desk for the price used when placing an order.
 
 ### Shares, financing and futures
 
-Open a brokerage account and transfer funds at the **securities desk**. The shares page shows quotes, cost basis and profit or loss. The finance journal summarises the day’s price movements. Buying and selling charge a fee, and weekly distributions enter brokerage cash.
+Open a brokerage account and transfer funds at the **securities desk**. The shares page shows quotes, held and sellable quantities, cost basis and profit or loss. Buying and selling charge a fee, and weekly distributions enter brokerage cash.
 
-| Product                    | How to trade                                           | Settlement                                                                                                      |
-| -------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| Ordinary shares            | Choose a security and quantity; sell part or all later | Fully funded; purchase fees enter cost basis                                                                    |
-| Financed shares            | Choose shares and leverage                             | Deposit margin; borrowed funds accrue interest daily                                                            |
-| Borrowed shares sold short | Choose the sell direction                              | Sale proceeds remain locked; fees follow current share value and dividends are compensated; fourteen-day expiry |
-| Futures                    | Choose a company security, then open long or short     | Cash settlement after fourteen days, or close earlier                                                           |
+<span class="blue">No trade can be exited on the day it opens.</span> Newly bought shares, financed shares, short sales and futures become sellable or closable from the next trading day. Weekends are excluded, so a Friday purchase waits until Monday. Previously settled shares remain sellable. **Sell all available** sells only the unlocked quantity.
+
+| Product                    | How to trade                                                   | Settlement                                                                                                      |
+| -------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Ordinary shares            | Choose a security and quantity; sell from the next trading day | Fully funded; purchase fees enter cost basis                                                                    |
+| Financed shares            | Choose shares and leverage                                     | Deposit margin; borrowed funds accrue interest daily                                                            |
+| Borrowed shares sold short | Choose the sell direction                                      | Sale proceeds remain locked; fees follow current share value and dividends are compensated; fourteen-day expiry |
+| Futures                    | Choose a company security, then open long or short             | Cash settlement after fourteen days; earlier closes allowed from the next trading day                           |
 
 <span class="red">Leverage magnifies losses as well as gains. Positions are closed automatically if equity runs too low.</span> Gap losses exceeding margin first consume idle brokerage cash and bank deposits. Any remaining amount becomes recovery debt. Check the quote before opening a position to see the margin, opening fee and total funds required. Add margin from the positions page; closing records show the reason and profit or loss for voluntary closes, expiry and forced liquidation.
 
 Financed shares offer **2×, 3×, 5×, 10×, 20× or 50×**; futures offer **5×, 10×, 20×, 50×, 100× or 200×**. Fees apply to the full traded value and financing interest accrues on borrowed funds. At 200×, a 1% move equals twice the initial margin; a gap against you can consume that margin and create recovery debt. Futures use the company securities listed at the desk.
 
-Most trading days bring small price changes, with occasional 20%–40% gaps. Prices have no fixed floor or ceiling. Frequent trading also incurs fees and financing interest. <span class="red">A sharp fall can consume all your margin and leave a debt.</span>
+Most trading days bring small price changes, with occasional 20%–40% gaps and rare 45%–70% moves in either direction. Business news and story events compound with these moves, so the final change can exceed a single gap’s range. Frequent trading also incurs fees and financing interest. <span class="red">A sharp fall can consume all your margin and leave a debt.</span>
 
-Set stop-loss and take-profit orders from the positions page. Triggers use a percentage of the deposit when submitted; zero cancels the selected trigger. Topping up does not alter existing trigger amounts. Instructions are checked with each daily quote, with forced liquidation taking priority. A gap settles at the actual price, so a stop does not guarantee a maximum loss.
+Set stop-loss and take-profit orders from the positions page. Triggers use a percentage of the deposit when submitted; zero cancels the selected trigger. Topping up does not alter existing trigger amounts. Stops, forced liquidation and expiry all observe the next-trading-day restriction. Charges continue through weekends, and expiry on a closed day waits until the next trading day. Forced liquidation takes priority. <span class="red">Losses can grow while a position is locked.</span> A gap settles at the actual price, so a stop does not guarantee a maximum loss.
 
 ### Business borrowing and recovery debt
 
@@ -137,7 +155,7 @@ Choose **Invite both lovers to talk (0:20)** in the sitting room while both resi
 - Robin and Sydney answer separately. With significant trauma, Robin prefers time alone with you. Sydney has different dialogue for pure and corrupt states. You can cancel after both agree.
 - Kylar’s former friendship with Sydney does not imply agreement to shared intimacy. At lower jealousy, Kylar asks for time alone. At high jealousy, Kylar leaves the conversation for the bedroom.
 - Sydney can refuse closeness with Whitney. Hostile pairs do not agree simply because they share an address.
-- The private moment fades out and is followed by a closing conversation. Stress relief uses each resident’s existing once-per-day allowance, shared with one-to-one evenings.
+- Once **Robin and Sydney both agree to stay**, the conversation page also offers **Take both of them to the bedroom**, which leads into a full three-way encounter. No other pair gets that entry. Stress relief uses each resident’s existing once-per-day allowance, shared with one-to-one evenings.
 
 ### Outdoor spaces and gliding
 
@@ -199,7 +217,7 @@ The work conversation and application page read current quotes directly from the
 
 **RDS: Robin's Drinks Shop** enters the market once the shop opens. It supports ordinary share trading, financed purchases, short sales and futures. It is more volatile than most larger businesses and has a 0.03% weekly dividend rate. Opening, equipment upgrades, staffing changes and the first, fifth and tenth completed orchard orders affect quotes once per milestone. Repeated deliveries cannot raise the price indefinitely. Furniture and tailoring remain part of High Street Shopping Centre rather than separate listings. Securities trades are separate from the direct partnership agreement; they do not add to the shop reserve or transfer management control.
 
-**CSN: Connudatus Street Casino** is available with Life Simulation. **SCB: Connudatus Street Club** and **HSF: Harvest Street Pub** are also listed at the securities desk. The casino and club have higher daily volatility and a 0.03% weekly dividend rate. The PC's gambling results do not directly move the casino quote; chips and securities funds remain separate accounts.
+**CSN: Connudatus Street Casino** is available with Life Simulation. **SCB: Strip Club** and **HSF: Harvest Street Pub** are also listed at the securities desk. The casino and club have higher daily volatility and a 0.03% weekly dividend rate. The PC's gambling results do not directly move the casino quote; chips and securities funds remain separate accounts.
 
 ### Drinks-shop partnership and accounts
 
@@ -208,3 +226,24 @@ Once Robin's shop opens, discuss a private partnership at the shop. With Robin's
 Distributions are assessed every seven days from estimated operating surplus and ownership, protecting Robin's next rent first. Quiet trade, unexpected losses and closure may pay nothing and reduce the valuation. Give seven days' notice to exit. The holding is bought back at 75% of its value on the payment day, when spare funds permit. Otherwise the request waits, without automatic borrowing or a guaranteed return of capital.
 
 Mod statistics collect realised share and margin-trading results, dividends, partnership contributions and buybacks. Gambling results and chip exchanges are counted separately. Adrian can assist across the financial centre, with conversations responding to the desk, debts, partnership and actual bank transfers through the casino. Transfers do not reveal the results of cash gambling.
+
+### Home improvements and rooms
+
+**Home improvements** at the property desk lists each house's existing fittings and available work. Construction uses the merchant payment method selected in the sidebar. Prices include fixed fittings; rented, frozen and auction-listed houses cannot be altered. Additional upkeep enters the existing weekly bill. Property management does not commission extensions automatically.
+
+| Property             | Existing fittings                                   | Available work                                                           |
+| -------------------- | --------------------------------------------------- | ------------------------------------------------------------------------ |
+| Domus Street cottage | Window seat                                         | Foldaway study corner and a bicycle-only garden shed                     |
+| Barb Street flat     | Canal-facing sitting room and bedroom desk          | Soundproof study corner; no private garage or pool                       |
+| High Street loft     | Upper reading alcove and bedroom desk               | Partitioned loft study; no rooftop pool                                  |
+| Cliff Street house   | Sea-view alcove and bedroom desk                    | Sea-view study, open-air cliffside pool, heating and a single-car garage |
+| Danube Street manor  | Conservatory lounge, attic study and two-car garage | Enclosed garden-wing pool                                                |
+
+- **Rest:** fifteen minutes reduces fatigue. The first rest in each house each day also reduces stress. Invite a resident lover who is awake in a common room.
+- **Study:** each of the four subjects takes fifteen minutes and uses the native skill calculation. Reading reduces stress. The property accounts list expected weekly rent, upkeep, management fees and mortgage instalments for all houses.
+- **Swimming:** twenty minutes improves native swimming and physique while increasing fatigue. Keep your clothes on, choose a swimwear outfit from the property's wardrobe, or undress. Dry off and put your original clothes back on when leaving. Cursed clothes cannot be forcibly removed.
+- **Pool intimacy:** with a cohabiting lover selected in the common-room menu, the pool page offers **Invite your lover into the water** and enters the encounter wearing whatever you would swim in. If both residents would join a three-way, **Invite both lovers into the water** also appears. The pool scene still needs the promiscuity marker and the lovers' consent, and you dress again according to how you entered the water.
+- **Weather:** the cliffside pool closes in rain and snow, and needs heating in winter. The manor's indoor pool is usable all year. No intimacy entry appears while the pool is closed.
+- **Company:** Robin, Whitney, Kylar and Sydney react differently. Affection increases once per person, room type and day.
+
+Read mortgage balances, rates, payment dates and bank notices in **Journal → Finances**. The property desk retains early repayment and arrears services. Each shed or garage has separate bicycle, motorcycle and motor-vehicle capacities; building one does not add resident beds.

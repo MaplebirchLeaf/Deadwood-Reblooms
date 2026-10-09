@@ -188,6 +188,7 @@ At a property you own, invite a resident lover to play blackjack in the sitting 
 - If everyone busts, no garments are removed. Tied highest hands mean every tied winner keeps their clothes.
 - Clothes removed at the table are put back on when you leave or when the game ends. Vanilla wardrobes and confiscation are untouched.
 - Before dealing, or between hands, you can declare the game **clothes only**. After that no invitation appears, and losing never counts as consent.
+- When the match ends, each lover at the table can be invited separately. If the table was Robin and Sydney and both still agree, an extra **Invite both of them to stay** entry opens the property's three-way encounter. The household relationship decides consent; the table only provides the entry.
 
 ### Troubleshooting the casino
 

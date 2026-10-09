@@ -32,6 +32,12 @@ class Sydney extends Module {
   public override preInit(): void {
     super.preInit();
     Achievements.add(this.core, 'Sydney');
+    this.core.dynamic.regStateEvent('gate', 'deadwood-sydney-science-inspection', {
+      extra: { passage: ['Science Lesson'] },
+      action: () => {
+        T.deadwood_science_event = V.schoolevent;
+      }
+    });
   }
 }
 

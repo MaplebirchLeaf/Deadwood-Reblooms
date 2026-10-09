@@ -225,24 +225,6 @@ class Robin extends Module implements RobinFacade {
   }
 
   public preInit(): void {
-    // 先移动字段再填默认值，保留已发布存档的库存、工资与剧情进度，只保存一套名称。
-    this.core.on(':variable', () => {
-      const rename = (data: Record<string, unknown> | undefined, keys: readonly string[]) => {
-        if (!data) return;
-        for (const key of keys) {
-          const previous = key.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase());
-          if (previous === key || !Object.hasOwn(data, previous)) continue;
-          if (Object.hasOwn(data, key)) this.migration.utils.remove(data, previous);
-          else this.migration.utils.move(data, previous, key);
-        }
-      };
-      rename(V.RobinExpansion, Object.keys(DEFAULT_ROBIN_EXPANSION_STATE));
-      rename(V.RobinExpansion?.asylum, Object.keys(DEFAULT_ROBIN_EXPANSION_STATE.asylum));
-      for (const [key, npc] of Object.entries<Record<string, unknown>>(V.per_npc ?? {})) {
-        if (!key.startsWith('deadwood_robin_')) continue;
-        rename(npc, ['shop_experience', 'shop_orphan', 'shop_paid_weeks', 'shop_paid_week', 'shop_training_day', 'shop_orders', 'shop_specials', 'shop_wage_seen', 'tutor_confidence', 'tutor_visits']);
-      }
-    });
     super.preInit();
     Achievements.add(this.core, 'Robin');
     this.core.on(':passagestart', () => this.sync(), 'Robin Expansion');

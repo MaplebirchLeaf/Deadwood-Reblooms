@@ -173,7 +173,7 @@ class Casino {
     return this.canReply && this.barred && this.state.met_dealer && this.state.bribe_night !== this.night;
   }
 
-  public get offerBribe(): boolean {
+  public bribe(): boolean {
     if (!this.canOfferBribe || V.money < this.bribeCost) return false;
     this.state.bribe_night = this.night;
     const npc = C.npc.Marlow;

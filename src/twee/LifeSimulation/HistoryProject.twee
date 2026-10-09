@@ -78,11 +78,25 @@
 
 <!-- 湖区入口：满足条件时开启遗迹调查，并区分是否由 Robin 协助。 -->
 <<widget 'deadwood-reblooms-history-project-lake-option'>>
-  <<if $LifeSimulation.historyProject.status is 'ongoing' and Time.days lt $LifeSimulation.historyProject.deadline and $LifeSimulation.historyProject.archive gt 0 and $LifeSimulation.historyProject.museum gt 0 and $LifeSimulation.historyProject.ruin is 0 and !Weather.isFrozen('lake') and Time.hour gte 6 and Time.hour lte 18 >>
-    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
-      <<antiqueicon 'disc'>><<lanLink ['Survey the ruin with Robin (2:00)', '与罗宾勘察湖底废墟 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation' >><<pass 2 hours>><</lanLink>><br>
+  <<if $LifeSimulation.historyProject.status is 'ongoing'
+    and Time.days lt $LifeSimulation.historyProject.deadline
+    and $LifeSimulation.historyProject.archive gt 0
+    and $LifeSimulation.historyProject.museum gt 0
+    and $LifeSimulation.historyProject.ruin is 0>>
+    <<if Weather.isFrozen('lake')>>
+      <span class='blue'>
+        <<lanSwitch 'The lake is frozen. You will have to wait for the ice to thaw before surveying the ruin.' '湖面已经结冰。得等冰融化后，才能下水勘察废墟。'>>
+      </span><br><br>
+    <<elseif Time.hour lt 6 or Time.hour gt 18>>
+      <span class='blue'>
+        <<lanSwitch 'It is too dark to follow your survey notes. Return between 06:00 and 18:00.' '光线太暗，无法依照勘察笔记辨认路线。可以在 06:00 至 18:00 之间再来。'>>
+      </span><br><br>
     <<else>>
-      <<antiqueicon 'disc'>><<lanLink ['Survey the lake ruin (2:00)', '前往湖底废墟进行勘察 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation' >><<pass 2 hours>><</lanLink>><br>
+      <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
+        <<antiqueicon 'disc'>><<lanLink ['Survey the ruin with Robin (2:00)', '与罗宾勘察湖底废墟 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation'>><<pass 2 hours>><</lanLink>><br>
+      <<else>>
+        <<antiqueicon 'disc'>><<lanLink ['Survey the lake ruin (2:00)', '前往湖底废墟进行勘察 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation'>><<pass 2 hours>><</lanLink>><br>
+      <</if>>
     <</if>>
   <</if>>
 <</widget>>
@@ -188,6 +202,10 @@
     <<if $LifeSimulation.historyProject.ruin gt 0>>
       <<antiqueicon 'golden-priestess'>>
       <<lanSwitch 'Forest lake field notes recorded' '已记录森林湖实地笔记'>><br>
+    <<elseif $LifeSimulation.historyProject.archive gt 0 and $LifeSimulation.historyProject.museum gt 0 and Time.days lt $LifeSimulation.historyProject.deadline>>
+      <span class='blue'><i>
+        <<lanSwitch 'Survey the ruin from the forest lake shore between 06:00 and 18:00, when the lake is not frozen. This field trip is optional. You can also prepare your draft at home.' '可在湖面未结冰时，于 06:00 至 18:00 从森林湖岸勘察废墟。实地调查是可选内容，也可以直接在家准备展览稿。'>>
+      </i></span><br>
     <</if>>
     <<lanSwitch 'Exhibition draft' '展览草稿'>><<lanSwitch ': ' '：'>>
       <<= $LifeSimulation.historyProject.draft > 0 ? lanSwitch('complete', '已完成') : lanSwitch('incomplete', '未完成') >><br><br>

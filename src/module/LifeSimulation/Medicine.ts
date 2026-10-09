@@ -205,7 +205,7 @@ export default class Medicine {
     for (const item of MEDICINES) {
       const use = this.state.uses[item.id];
       if (!use || !use.until || use.until > now) continue;
-      if (item.id === 'alert') V.tiredness = Math.min(V.tirednessmax, V.tiredness + use.rebound);
+      if (item.id === 'alert') V.tiredness = Math.min(C.tiredness.max, V.tiredness + use.rebound);
       if (item.id === 'soothe' && V.innocencestate !== 1) V.trauma = Math.min(V.traumamax, V.trauma + use.rebound);
       if (item.id === 'sleep') this.core.SugarCube.Wikifier.wikifyEval('<<tiredness 2>>');
       this.state.notices.push({ id: item.id, kind: 'expiry' });

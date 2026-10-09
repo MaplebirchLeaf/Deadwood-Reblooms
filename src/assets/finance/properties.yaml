@@ -1,10 +1,10 @@
 # 金额单位是便士。floors 从入户层往上排列。rooms 指定功能房间所在的楼层（从 1 开始）。
-# desk、guest 和 retreat 可以省略。outdoor 是各房产的庭院或阳台入口，仍按所在楼层配置。
+# desk、guest 和 balcony 可以省略。outdoor 是各房产的庭院或阳台入口，仍按所在楼层配置。
 # weekly_rent_percent 是各房产的每周挂牌租金率，状况与装修再参与实际租金计算。
 # 床和衣柜的初始 ID 引用原版家具，其余家具由家具店目录选购。每处房产独立保存，不修改孤儿院卧室。
 # resident_capacity 是除 PC 以外可同住的人数。普通住宅共用主卧，宅邸另有一间客房。
 # 镜子坐标在每次进入触手平原时随机生成，房屋配置不保存出口坐标。不同出口可以落在同一格。
-# outdoor_access 指出通向室外的实际房间。sitting 为起居室，landing 为楼梯间，retreat 为休憩室。
+# outdoor_access 指出通向室外的实际房间。extensions.access 指定设施入口，inline 表示原空间内的小憩处。
 - id: domus
   street: Domus Street
   outdoor_access: sitting
@@ -32,14 +32,50 @@
         EN: You step into a small sitting room. Light falls across the worn floorboards; beyond the window, the garden fence separates you from the street.
         CN: 你走进狭小的起居室。阳光落在磨旧的地板上。窗外的庭院围栏隔开了街上的目光。
   rooms: { bedroom: 1, bathroom: 1, kitchen: 1, outdoor: 1 }
+  extensions:
+    - id: lounge
+      icon: couch.png
+      floor: 1
+      access: sitting
+      inline: true
+      cost: 0
+      upkeep: 0
+      name:
+        EN: Window seat
+        CN: 窗边小憩处
+      description:
+        EN: The old armchair fits between the garden window and the sleeping nook. You can put your feet up without blocking the kitchen.
+        CN: 旧扶手椅挤在庭院窗与睡觉的角落之间。你能把脚搁起来，又不挡住去厨房的路。
+    - id: study
+      icon: property/study.png
+      floor: 1
+      access: sitting
+      cost: 300000
+      upkeep: 0
+      name:
+        EN: Foldaway study corner
+        CN: 折叠学习角
+      description:
+        EN: A foldaway desk replaces the shallow cupboard beside the window. When the books are put away, the kitchen door still opens fully.
+        CN: 窗边的浅柜换成了折叠书桌。把书收好、桌板放下，厨房门仍能完全打开。
+    - id: garage
+      icon: property/bicycle-shed.png
+      floor: 1
+      access: outdoor
+      cost: 150000
+      upkeep: 200
+      name:
+        EN: Garden bicycle shed
+        CN: 庭院自行车棚
+      description:
+        EN: A narrow lockable shed stands against the garden wall. There is room for two bicycles and a shelf of tools; a car could never fit down the path.
+        CN: 可上锁的窄棚紧贴庭院围墙，放得下两辆自行车和一架工具。门外的小径根本容不下汽车。
+      parking: { bicycle: 2, motorcycle: 0, motor_vehicle: 0 }
   interior:
     bedroom_label: { EN: Sleeping nook (0:01), CN: 睡觉的角落 (0:01) }
     bedroom:
-      EN: Your bed is tucked against the sitting room wall, with a narrow wardrobe beside it. There is no room for a proper desk; the orphanage roof is visible beyond the garden fence.
-      CN: 床紧贴着起居室的墙，旁边仅摆得下一只窄衣柜。这里没有放书桌的空地。越过庭院围栏还能看见孤儿院的屋顶。
-    sitting_rest:
-      EN: You settle into the old chair beside the garden window. The orphanage roof catches your eye as the noise of the street fades.
-      CN: 你坐进庭院窗边的旧椅子。街上的声音渐渐远了，你的目光停在孤儿院的屋顶上。
+      EN: Your bed is tucked against the sitting room wall, with a narrow wardrobe beside it. There is no room for a full-sized desk; the orphanage roof is visible beyond the garden fence.
+      CN: 床紧贴着起居室的墙，旁边仅摆得下一只窄衣柜。这里没有放大书桌的空地。越过庭院围栏还能看见孤儿院的屋顶。
     bathroom:
       EN: A narrow bath sits under the frosted window. The old pipes knock softly before the water warms.
       CN: 窄浴缸摆在磨砂窗下。水热起来之前，旧水管会轻轻敲响。
@@ -85,14 +121,37 @@
         EN: You climb the stairs to your flat. The sitting room looks out over the empty canal, while traffic rolls past on the far bank.
         CN: 你爬上楼梯，走进自己的公寓。起居室朝着干涸的运河，车流从对岸驶过。
   rooms: { bedroom: 1, bathroom: 1, kitchen: 1, desk: 1, outdoor: 1 }
+  extensions:
+    - id: lounge
+      icon: couch.png
+      floor: 1
+      access: sitting
+      inline: true
+      cost: 0
+      upkeep: 0
+      name:
+        EN: Canal-facing sitting room
+        CN: 运河边起居室
+      description:
+        EN: Two chairs face the canal window. A draught slips under the sill, but the curtain keeps the street lamps out of your eyes.
+        CN: 两把椅子朝着运河边的窗户。窗台下有些漏风，窗帘至少挡住了街灯，不会晃到你的眼睛。
+    - id: study
+      icon: property/study.png
+      floor: 1
+      access: bedroom
+      cost: 600000
+      upkeep: 200
+      name:
+        EN: Soundproof study corner
+        CN: 隔音学习角
+      description:
+        EN: An insulated partition shelters the bedroom desk from canal-side traffic. Shelves stop below the window, leaving daylight over your notes.
+        CN: 隔音板将卧室的书桌与运河边的车声隔开。书架不高过窗台，白天的光仍能落在笔记上。
   interior:
     bedroom_label: { EN: Bedroom (0:01), CN: 卧室 (0:01) }
     bedroom:
       EN: The bedroom door muffles the road noise. A desk fits beneath the window, with the wardrobe against the opposite wall.
       CN: 卧室的门挡住了道路的喧闹。书桌安在窗下，衣柜靠着对面的墙。
-    sitting_rest:
-      EN: You settle into the cushioned window seat. Traffic rolls past the canal, muffled by the closed glass.
-      CN: 你坐进窗边的软垫座位。车流经过运河，声音被关着的玻璃隔得模糊。
     bathroom:
       EN: White tiles line the compact bathroom. Running water drowns out the traffic outside.
       CN: 紧凑的浴室铺着白瓷砖。水声盖过了外面的车流声。
@@ -141,7 +200,33 @@
       description:
         EN: A short staircase leads to the quieter upper level. The sloping roof leaves room for a bedroom and a writing desk.
         CN: 一段短楼梯通向较为安静的上层。倾斜的屋顶下留着卧室与书桌的位置。
-  rooms: { bedroom: 2, bathroom: 1, kitchen: 1, desk: 2, retreat: 2, outdoor: 2 }
+  rooms: { bedroom: 2, bathroom: 1, kitchen: 1, desk: 2, outdoor: 2 }
+  extensions:
+    - id: lounge
+      icon: couch.png
+      floor: 2
+      access: landing
+      inline: true
+      cost: 0
+      upkeep: 0
+      name:
+        EN: Reading alcove
+        CN: 阅读角
+      description:
+        EN: A low bookcase and an armchair sit beneath the upper roof window. Market voices reach you as a distant murmur.
+        CN: 矮书柜与扶手椅摆在上层天窗下。市场的叫卖声传到这里，已成了远处模糊的低语。
+    - id: study
+      icon: property/study.png
+      floor: 2
+      access: bedroom
+      cost: 1000000
+      upkeep: 300
+      name:
+        EN: Loft study
+        CN: 阁楼书房
+      description:
+        EN: A fitted worktop extends the bedroom desk along the slope of the roof. A glazed partition separates it from the bed without shutting out the skylight.
+        CN: 定制台面沿着斜屋顶延伸，扩宽了卧室的书桌。玻璃隔板将书桌与床隔开，却没有挡住天窗的光。
   interior:
     bedroom_label: { EN: Bedroom (0:01), CN: 卧室 (0:01) }
     bedroom:
@@ -161,20 +246,13 @@
     outdoor_view:
       EN: From above, the shoppers seem to move together in little streams. A stallholder calls out a final price.
       CN: 从高处看，逛街的人群像一股股细流。一名摊主喊出了收摊前的价格。
-    retreat_label: { EN: Reading alcove (0:01), CN: 阅读角 (0:01) }
-    retreat:
-      EN: A low bookcase and an armchair sit beneath the upper roof window. The shopkeepers' voices are only a murmur from up here.
-      CN: 矮书柜与扶手椅摆在上层的天窗下。从这里听去，店铺里的人声只剩模糊的低语。
-    retreat_rest:
-      EN: You settle into the armchair and let the noises of the market fade.
-      CN: 你陷进扶手椅里，任由市场的喧闹渐渐远去。
     renovated:
       EN: Thick curtains and a new partition give you a little quiet above the busy shops.
       CN: 厚窗帘和新隔板让你在热闹的店铺上方也能有片刻安静。
 
 - id: cliff
   street: Cliff Street
-  outdoor_access: retreat
+  outdoor_access: lounge
   mirror_label: { EN: Climb through the cliffside mirror, CN: 从峭壁街住宅的镜子爬出去 }
   street_name:
     EN: Cliff Street
@@ -202,7 +280,71 @@
       description:
         EN: The stairs rise towards a sea-facing window. The landing is quiet except for the wind beyond the glass.
         CN: 楼梯向一扇朝海的窗户延伸。除了玻璃外的风声，二层楼梯间一片安静。
-  rooms: { bedroom: 2, bathroom: 1, kitchen: 1, desk: 2, retreat: 2, outdoor: 2 }
+  rooms: { bedroom: 2, bathroom: 1, kitchen: 1, desk: 2, outdoor: 2 }
+  extensions:
+    - id: lounge
+      icon: couch.png
+      floor: 2
+      access: landing
+      cost: 0
+      upkeep: 0
+      name:
+        EN: Sea-view alcove
+        CN: 观海角
+      description:
+        EN: A broad chair faces the sea through a sheltered window. A folded blanket waits on its arm; the glass door leads onto the balcony.
+        CN: 避风的窗前摆着宽椅，正对大海。扶手上叠着厚毯，旁边的玻璃门通向阳台。
+    - id: study
+      icon: property/study.png
+      floor: 2
+      access: bedroom
+      cost: 1200000
+      upkeep: 300
+      name:
+        EN: Sea-view study
+        CN: 观海书房
+      description:
+        EN: Salt-resistant shutters frame a long desk. You can look up from your books to watch the waves without feeling the wind on your fingers.
+        CN: 耐盐的百叶窗围着长书桌。你抬头便能看见海浪，手指却不用挨海风吹。
+    - id: pool
+      icon: property/pool-outdoor.png
+      floor: 1
+      access: sitting
+      cost: 5000000
+      upkeep: 3000
+      name:
+        EN: Cliffside pool
+        CN: 崖边泳池
+      description:
+        EN: A door beside the kitchen leads onto the pool deck. A low wall separates the open-air pool from the cliff edge. Waves break far below the tiled deck. Rain and snow make the uncovered steps unsafe.
+        CN: 厨房旁的门通向池边平台。矮墙将露天泳池与崖缘隔开，海浪在瓷砖平台下方很远的地方碎开。雨雪天，没有遮蔽的台阶会变得湿滑。
+      outdoor: true
+    - id: pool_heating
+      icon: heater.png
+      floor: 1
+      access: sitting
+      cost: 800000
+      upkeep: 1500
+      name:
+        EN: Pool heating
+        CN: 泳池加热
+      description:
+        EN: A heater in the sheltered pump shed keeps the water usable through winter. It cannot make the deck safe in rain or snow.
+        CN: 背风的水泵棚里装上了加热器，冬季的池水也能使用。下雨或下雪时，池边台阶仍不安全。
+      requires: pool
+    - id: garage
+      icon: property/garage.png
+      floor: 1
+      access: sitting
+      cost: 2000000
+      upkeep: 500
+      name:
+        EN: Sheltered garage
+        CN: 背风车库
+      description:
+        EN: A side door leads from the house to a single-car garage opening onto the street behind it. The recessed garage door keeps the worst salt spray off the lock.
+        CN: 住宅的侧门通向单车位车库，车库门朝着屋后的街道。门藏在背风处，锁孔不至于直接挨盐雾吹。
+      parking: { bicycle: 2, motorcycle: 1, motor_vehicle: 1 }
   interior:
     bedroom_label: { EN: Bedroom (0:01), CN: 卧室 (0:01) }
     bedroom:
@@ -222,20 +364,13 @@
     outdoor_view:
       EN: You follow a line of white foam until it breaks against the rocks below.
       CN: 你望着一道白色浪线，直到它撞上峭壁下的礁石。
-    retreat_label: { EN: Sea-view alcove (0:01), CN: 观海角 (0:01) }
-    retreat:
-      EN: A broad chair faces the sea through a sheltered upper window. A thick blanket lies folded over its arm. A glass door opens onto the sea balcony.
-      CN: 二层一扇避风的窗前摆着宽椅，正对大海。扶手上叠着一条厚毯。旁边的玻璃门通向观海阳台。
-    retreat_rest:
-      EN: You draw the blanket over your knees and listen to the waves below.
-      CN: 你把毯子盖在膝上，听着下方的浪声。
     renovated:
       EN: Reinforced windows quiet the wind, leaving the view of the sea undisturbed.
       CN: 加固过的窗户挡住了风声，海景仍然清晰地展现在眼前。
 
 - id: danube
   street: Danube Street
-  outdoor_access: retreat
+  outdoor_access: lounge
   mirror_label: { EN: Climb through the mansion mirror, CN: 从多瑙河街宅邸的镜子爬出去 }
   street_name:
     EN: Danube Street
@@ -267,7 +402,58 @@
       description:
         EN: The last flight of stairs reaches a quiet room beneath the roof. A writing desk stands beside the dormer window.
         CN: 最后一段楼梯通往屋顶下安静的房间。一张书桌摆在老虎窗旁。
-  rooms: { bedroom: 2, bathroom: 2, kitchen: 1, desk: 3, guest: 2, retreat: 1, outdoor: 1, balcony: 2 }
+  rooms: { bedroom: 2, bathroom: 2, kitchen: 1, desk: 3, guest: 2, outdoor: 1, balcony: 2 }
+  extensions:
+    - id: lounge
+      icon: property/danube-conservatory.png
+      floor: 1
+      access: sitting
+      cost: 0
+      upkeep: 0
+      name:
+        EN: Conservatory lounge
+        CN: 温室休息室
+      description:
+        EN: Cane chairs stand among potted plants. Beyond the glass, the garden path winds between the beds and the high boundary wall.
+        CN: 藤椅摆在盆栽之间。玻璃外，花园小径穿过苗圃，一直延伸到高围墙下。
+    - id: study
+      icon: property/study.png
+      floor: 3
+      access: landing
+      cost: 0
+      upkeep: 0
+      name:
+        EN: Attic study
+        CN: 阁楼书房
+      description:
+        EN: The dormer window lights a broad writing desk. Shelves fill the low walls; the floors below are quiet behind a closed door.
+        CN: 老虎窗照亮了宽书桌，矮墙边摆满书架。门一关，下方楼层的声音便远了。
+    - id: garage
+      icon: property/garage-double.png
+      floor: 1
+      access: sitting
+      cost: 0
+      upkeep: 800
+      name:
+        EN: Manor garage
+        CN: 宅邸车库
+      description:
+        EN: A side door off the entrance hall leads to the gravel drive inside the gate and the two parking bays. Along the back wall, hooks and a rack leave bicycles clear of the doors.
+        CN: 门厅旁的侧门通向大门内的碎石车道与两个车位。后墙上的挂钩与车架给自行车留了地方，不会挡住车库门。
+      parking: { bicycle: 4, motorcycle: 2, motor_vehicle: 2 }
+    - id: pool
+      icon: property/pool-indoor.png
+      floor: 1
+      access: lounge
+      cost: 8000000
+      upkeep: 4500
+      name:
+        EN: Garden-wing pool
+        CN: 花园侧室内泳池
+      description:
+        EN: A door in the conservatory opens into the new wing containing the enclosed pool. High windows overlook the garden; warm pipes keep the water comfortable all year.
+        CN: 温室旁的门通向新侧翼里的封闭泳池。高窗朝着花园，暖水管让池水一年四季都保持舒适。
+      outdoor: false
   interior:
     bedroom_label: { EN: Bedroom (0:01), CN: 卧室 (0:01) }
     bedroom:
@@ -297,13 +483,6 @@
     guest:
       EN: The guest bedroom is furnished with a bed, a wardrobe and a washstand. The broad window overlooks the garden.
       CN: 客房备着床、衣柜与洗漱台。宽阔的窗户俯瞰花园。
-    retreat_label: { EN: Conservatory (0:01), CN: 温室 (0:01) }
-    retreat:
-      EN: Glass doors open from the sitting room into a conservatory. Cane chairs stand among potted plants, overlooking the walled garden.
-      CN: 玻璃门从起居室通向温室。藤椅摆在盆栽之间，望得见围墙里的花园。
-    retreat_rest:
-      EN: You sit among the plants, with the garden on one side and the quiet house on the other.
-      CN: 你坐在植物之间，一边是花园，另一边是安静的宅邸。
     renovated:
       EN: Restored woodwork and polished floors make the manor feel cared for again.
       CN: 修复过的木饰与擦亮的地板，让这座宅邸重新有了被悉心照料的样子。

@@ -5,6 +5,8 @@ import Achievements from './Achievements';
 import RealEstate, { type RealEstateState } from './Finance/RealEstate';
 import Securities, { type Security } from './Finance/Securities';
 import MarginTrading, { type MarginState } from './Finance/MarginTrading';
+import Newspaper, { type NewspaperState } from './Finance/Newspaper';
+import CompanyEvents from './Finance/CompanyEvents';
 import tradingTerms from '../assets/finance/trading.json';
 import bankingTerms from '../assets/finance/banking.json';
 import securitiesSource from '@/assets/finance/securities.yaml';
@@ -31,7 +33,9 @@ export type FinanceResult =
   | 'invalid-term'
   | 'no-debt'
   | 'unknown-security'
-  | 'insufficient-shares';
+  | 'insufficient-shares'
+  | 'unsettled-shares'
+  | 'market-closed';
 
 type AccountTier = 'current' | 'preferred' | 'premier';
 type PaymentMethod = 'cash' | 'debit' | 'credit';
@@ -68,6 +72,7 @@ interface BrokerageState {
   opened: boolean;
   cash: number;
   holdings: Record<string, number>;
+  unsettled: { available_day: number; shares: Record<string, number> } | null;
   costs: Record<string, number>;
   realised: number;
   dividends: number;
@@ -91,7 +96,8 @@ interface MarketState {
   robin_upgrades?: number;
   robin_staff?: number;
   robin_orders?: number;
-  news?: { day: number; symbol: string; event: 'farm' | 'raid' | 'cafe' | 'avery' | 'shop' | 'shop_upgrade' | 'shop_staff' | 'shop_supply'; move: number }[];
+  company_events: string[] | null;
+  news?: { day: number; symbol: string; event: string; move: number }[];
 }
 
 export interface FinanceState {
@@ -112,6 +118,7 @@ export interface FinanceState {
   bank: BankState;
   brokerage: BrokerageState;
   market: MarketState;
+  newspaper: NewspaperState;
   collection: { amount: number; due_day: number; source: 'mortgage' | 'margin' | 'bank' | 'mixed'; destination: 'farm' | 'brothel' | null; extended: boolean; encounter_day: number };
   last_result: string | null;
 }
@@ -196,6 +203,7 @@ const DEFAULT_FINANCE_STATE: FinanceState = {
     opened: false,
     cash: 0,
     holdings: {},
+    unsettled: null,
     costs: {},
     realised: 0,
     dividends: 0,
@@ -207,8 +215,10 @@ const DEFAULT_FINANCE_STATE: FinanceState = {
     day: -1,
     prices: {},
     previous_prices: {},
-    history: []
+    history: [],
+    company_events: null
   },
+  newspaper: Newspaper.defaults,
   collection: { amount: 0, due_day: 0, source: 'mortgage', destination: null, extended: false, encounter_day: -1 },
   last_result: null
 };
@@ -216,6 +226,7 @@ const DEFAULT_FINANCE_STATE: FinanceState = {
 class Finance extends Module {
   public readonly terms = bankingTerms;
   public readonly margin = new MarginTrading(this);
+  public readonly newspaper = new Newspaper(this);
   public loanDiscount: () => number = () => 0;
   public readonly realEstate: RealEstate;
 
@@ -244,6 +255,12 @@ class Finance extends Module {
 
   public get state(): FinanceState {
     return Finance.ensureState(this.securities);
+  }
+
+  public get sellableShares(): Record<string, number> {
+    const { holdings, unsettled } = this.state.brokerage;
+    const locked = unsettled !== null && Finance.currentDay < unsettled.available_day;
+    return Object.fromEntries(Object.entries(holdings).map(([symbol, shares]) => [symbol, Math.max(0, shares - (locked ? (unsettled.shares[symbol] ?? 0) : 0))]));
   }
 
   public get creditMinimumPayment(): number {
@@ -286,6 +303,11 @@ class Finance extends Module {
       output: 'deadwood-finance-collection-gate'
     });
     this.core.tool.onInit(() => void this.securities);
+    this.core.on(':variable', () => CompanyEvents.capture(this.state.market, this.securities));
+    this.core.on(':passageend', (passage, content) => {
+      if (V.replayScene || V.statFreeze || !/^(?:Cliff Street$|Ocean Breeze$|Chef |Photo|Farm |Deadwood Reblooms (?:Robin|Orchard))/.test(passage.title)) return;
+      this.advanceMarketThrough(Finance.currentDay, content);
+    });
     this.core.once(':storyready', () => this.registerMoneyMacro());
     // 行情在时间事件里刷新。银行周账务由房地产逐日推进，保持批量跳日时的真实顺序。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-finance-market', {
@@ -301,7 +323,7 @@ class Finance extends Module {
     this.advanceMarketThrough(Finance.currentDay);
   }
 
-  private advanceMarketThrough(day: number): void {
+  private advanceMarketThrough(day: number, content?: ParentNode): void {
     Securities.updatePrices(
       this.state,
       this.securities,
@@ -317,7 +339,8 @@ class Finance extends Module {
         this.state.market,
         this.securities,
         robin?.shop,
-        robin?.shop ? { upgrades: robin.lemonade + robin.chocolate, staff: robin.shop_staff, orders: this.core.get('Orchard')?.state.orders_completed ?? 0 } : undefined
+        robin?.shop ? { upgrades: robin.lemonade + robin.chocolate, staff: robin.shop_staff, orders: this.core.get('Orchard')?.state.orders_completed ?? 0 } : undefined,
+        content
       );
     }
     this.margin.advance(day);
@@ -652,6 +675,7 @@ class Finance extends Module {
   public buy(symbol: unknown, amount: unknown): FinanceResult {
     const { brokerage, market } = this.state;
     if (!brokerage.opened) return 'brokerage-required';
+    if (!this.margin.open) return 'market-closed';
     const item = this.securities.find(security => security.symbol === symbol);
     if (!item) return 'unknown-security';
     const shares = Finance.toShares(amount);
@@ -663,19 +687,24 @@ class Finance extends Module {
     brokerage.cash -= cost + fee;
     brokerage.holdings[item.symbol] += shares;
     brokerage.costs[item.symbol] = (brokerage.costs[item.symbol] ?? 0) + cost + fee;
+    const day = Finance.currentDay;
+    if (brokerage.unsettled === null || day >= brokerage.unsettled.available_day) brokerage.unsettled = { available_day: Securities.nextTradingDay(day), shares: {} };
+    brokerage.unsettled.shares[item.symbol] = (brokerage.unsettled.shares[item.symbol] ?? 0) + shares;
     // 成交后重置未来行情，避免回退后按已知涨跌交易。
-    market.seed = Securities.generateSeed();
+    market.seed = Securities.generate();
     return 'ok';
   }
 
   public sell(symbol: unknown, amount: unknown): FinanceResult {
     const { brokerage, market } = this.state;
     if (!brokerage.opened) return 'brokerage-required';
+    if (!this.margin.open) return 'market-closed';
     const item = this.securities.find(security => security.symbol === symbol);
     if (!item) return 'unknown-security';
     const shares = Finance.toShares(amount);
     if (shares == null) return 'invalid-amount';
     if (shares > brokerage.holdings[item.symbol]) return 'insufficient-shares';
+    if (shares > this.sellableShares[item.symbol]) return 'unsettled-shares';
     const proceeds = market.prices[item.symbol] * shares;
     if (!Number.isSafeInteger(proceeds)) return 'invalid-amount';
     const cost = Math.round(((brokerage.costs[item.symbol] ?? 0) * shares) / brokerage.holdings[item.symbol]);
@@ -685,12 +714,12 @@ class Finance extends Module {
     brokerage.costs[item.symbol] = Math.max(0, (brokerage.costs[item.symbol] ?? 0) - cost);
     brokerage.realised += net - cost;
     brokerage.cash += net;
-    market.seed = Securities.generateSeed();
+    market.seed = Securities.generate();
     return 'ok';
   }
 
   public resetMarketSeed(): void {
-    this.state.market.seed = Securities.generateSeed();
+    this.state.market.seed = Securities.generate();
   }
 
   public tradingFee(value: number): number {
@@ -802,7 +831,7 @@ class Finance extends Module {
     // 账户和行情始终读取当前 V，不把可变状态放进 setup 或模块实例。
     const finance = V.Finance as FinanceState;
     if (finance.market.day < 0) finance.market.day = Finance.currentDay;
-    if (!Number.isSafeInteger(finance.market.seed) || finance.market.seed === 0) finance.market.seed = Securities.generateSeed();
+    if (!Number.isSafeInteger(finance.market.seed) || finance.market.seed === 0) finance.market.seed = Securities.generate();
     for (const item of securities) {
       finance.brokerage.holdings[item.symbol] ??= 0;
       finance.brokerage.costs[item.symbol] ??= 0;

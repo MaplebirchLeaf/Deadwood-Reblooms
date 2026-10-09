@@ -1,0 +1,217 @@
+:: Deadwood Reblooms Newspaper Widgets [widget]
+
+<<widget 'deadwood-finance-paper-date'>>
+  <<set $_date to Time.startDate.addDays(_args[0])>>
+  <span class='blue'><<= lanSwitch(`${$_date.day} ${$_date.monthName} ${$_date.year}`, `${$_date.year}年${$_date.month}月${$_date.day}日`)>></span>
+<</widget>>
+
+<<widget 'deadwood-finance-paper-summary'>>
+  <<set $_report to $Finance.newspaper.report>>
+  <<if $_report>>
+    <strong><<lanSwitch 'Financial Daily' '金融日报'>></strong> · <<deadwood-finance-paper-date $_report.issued_day>>
+    <<if $_report.issued_day lt maplebirch.get('Finance').newspaper.day>>
+      <i class='blue'><<lanSwitch ' (last read copy)' '（上次读过的报纸）'>></i>
+    <</if>>
+    <<set $_rising to null, $_falling to null>>
+    <<for $_quote range $_report.quotes>>
+      <<if $_quote.change isnot null>>
+        <<if $_quote.change gt 0 and (!$_rising or $_quote.change gt $_rising.change)>>
+          <<set $_rising to $_quote>>
+        <<elseif $_quote.change lt 0 and (!$_falling or $_quote.change lt $_falling.change)>>
+          <<set $_falling to $_quote>>
+        <</if>>
+      <</if>>
+    <</for>>
+    <<if $_report.quote_day isnot null>>
+      <br><<lanSwitch 'Closing prices: ' '收盘行情：'>><<deadwood-finance-paper-date $_report.quote_day>>
+    <</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<if $_rising>>
+          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${$_rising.symbol}`)>> led the gains, up <span class='red'><<= $_rising.change.toFixed(2)>>%</span>.
+        <</if>>
+        <<if $_falling>>
+          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${$_falling.symbol}`)>> led the losses, down <span class='green'><<= (-$_falling.change).toFixed(2)>>%</span>.
+        <</if>>
+        <<if !$_rising and !$_falling>>
+          <<if $_report.quotes.some(quote => quote.change !== null)>>
+            <br>Prices closed unchanged.
+          <<else>>
+            <br>The paper lists prices without a comparison with the previous close.
+          <</if>>
+        <</if>>
+      <<option 'CN'>>
+        <<if $_rising>>
+          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${$_rising.symbol}`)>>领涨，上涨<span class='red'><<= $_rising.change.toFixed(2)>>%</span>。
+        <</if>>
+        <<if $_falling>>
+          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${$_falling.symbol}`)>>领跌，下跌<span class='green'><<= (-$_falling.change).toFixed(2)>>%</span>。
+        <</if>>
+        <<if !$_rising and !$_falling>>
+          <<if $_report.quotes.some(quote => quote.change !== null)>>
+            <br>各证券收盘价格持平。
+          <<else>>
+            <br>报上列出了价格，没有注明相较前次收盘的涨跌。
+          <</if>>
+        <</if>>
+    <</language>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-finance-paper-street'>>
+  <<set $_paper to maplebirch.get('Finance').newspaper>>
+  <<if $_paper.streetAvailable and !$_paper.readToday>>
+    <<if $Finance.newspaper.street_day isnot $_paper.day>>
+      <<rng 100>>
+      <<set $Finance.newspaper.street_day to $_paper.day>>
+      <<set $Finance.newspaper.street_passage to $rng lte $_paper.terms.streetChance ? $passage : null>>
+    <</if>>
+    <<if $Finance.newspaper.street_passage is $passage>>
+      <<language>>
+        <<option 'EN'>>
+          <<if Weather.precipitation is 'rain'>>
+            A paper seller shelters in a doorway, a stack of newspapers tucked beneath a coat. "Financial Daily! One pound a copy!"
+          <<elseif Weather.isFreezing>>
+            A paper seller stamps cold feet beside a bundle of newspapers. "Financial Daily! Closing prices and local business!"
+          <<else>>
+            A paper seller holds a folded newspaper above the passing crowd. "Financial Daily! Closing prices and local business!"
+          <</if>>
+        <<option 'CN'>>
+          <<if Weather.precipitation is 'rain'>>
+            报童躲在门廊下，用外套护着一叠报纸。“金融日报！一英镑一份！”
+          <<elseif Weather.isFreezing>>
+            报童站在一捆报纸旁，跺着冻僵的脚。“金融日报！收盘行情，本地商讯！”
+          <<else>>
+            报童把折好的报纸举过往来的人群。“金融日报！收盘行情，本地商讯！”
+          <</if>>
+      <</language>><br>
+      <<lanLink ['Approach the paper seller', '走向报童'] 'Deadwood Reblooms Newspaper Seller'>>
+        <<set $Finance.newspaper.return_passage to $passage>>
+      <</lanLink>><br><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-finance-paper-counter'>>
+  <<set $_paper to maplebirch.get('Finance').newspaper>>
+  <<if $_paper.counterAvailable>>
+    <<if $_paper.readToday>>
+      <<lanLink ['Look through the paper again', '再翻翻报纸'] 'Deadwood Reblooms Newspaper Read'>>
+        <<set $Finance.newspaper.return_passage to $passage>>
+        <<set $Finance.last_result to 'paper-review'>>
+      <</lanLink>><br>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          A copy of the Financial Daily lies beside the waiting chairs. Someone has circled a price in pencil.
+        <<option 'CN'>>
+          等候的座椅旁放着一份金融日报，有人用铅笔圈出了一处报价。
+      <</language>><br>
+      <<lanLink [`Read the Financial Daily (0:${String($_paper.terms.readingMinutes).padStart(2, '0')})`, `阅读金融日报（0:${String($_paper.terms.readingMinutes).padStart(2, '0')}）`] 'Deadwood Reblooms Newspaper Read'>>
+        <<set $Finance.newspaper.return_passage to $passage>>
+        <<set $Finance.last_result to maplebirch.get('Finance').newspaper.read('counter') ? 'paper-read' : 'paper-unavailable'>>
+        <<if $Finance.last_result is 'paper-read'>><<pass `maplebirch.get('Finance').newspaper.terms.readingMinutes`>><</if>>
+      <</lanLink>><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-finance-paper-loft'>>
+  <<if $phase is 'newspaper' and $daily.reading_nook and maplebirch.get('Finance').newspaper.available and !maplebirch.get('Finance').newspaper.readToday>>
+    <<if maplebirch.get('Finance').newspaper.read('loft')>>
+      <<language>>
+        <<option 'EN'>>
+          You turn to the business pages. A crease runs through the prices, but the numbers are still legible.
+        <<option 'CN'>>
+          你翻到财经版。折痕穿过了报价栏，数字还看得清。
+      <</language>><br>
+      <<deadwood-finance-paper-summary>><br><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-finance-paper-return'>>
+  <<set $_return to ['High Street', 'Danube Street', 'Deadwood Reblooms Financial Centre Securities'].includes($Finance.newspaper.return_passage) ? $Finance.newspaper.return_passage : 'High Street'>>
+  <<getouticon>><<lanLink ['Return', '返回'] $_return>>
+    <<if $passage is 'Deadwood Reblooms Newspaper Seller'>>
+      <<set $Finance.newspaper.street_passage to null>>
+    <</if>>
+  <</lanLink>><br>
+<</widget>>
+
+:: Deadwood Reblooms Newspaper Seller []
+<<set $outside to 1>><<set $location to 'town'>><<effects>>
+<<set $_paper to maplebirch.get('Finance').newspaper>>
+<<if !$_paper.streetAvailable>>
+  <span class='blue'><<lanSwitch 'The seller has packed away the papers.' '报童已经收起了报纸。'>></span><br><br>
+<<elseif $_paper.readToday>>
+  <span class='blue'><<lanSwitch 'The seller offers you a copy of the edition you read earlier.' '报童递来的报纸正是你先前读过的那一期。'>></span><br><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      The seller pulls a copy from the bundle. A broad price table covers the back page. "One pound. The numbers don't get any better if you stare at them."
+    <<option 'CN'>>
+      报童从捆扎的报纸里抽出一份。整片报价表占了末版。“一英镑。盯着看，数字也不会变好。”
+  <</language>><br><br>
+  <<if $money gte $_paper.terms.price>>
+    <<lanLink [`Buy and read a copy (£${($_paper.terms.price / 100).toFixed(0)}, 0:${String($_paper.terms.readingMinutes).padStart(2, '0')})`, `买一份，翻翻财经版（£${($_paper.terms.price / 100).toFixed(0)}，0:${String($_paper.terms.readingMinutes).padStart(2, '0')}）`] 'Deadwood Reblooms Newspaper Read'>>
+      <<set $Finance.last_result to maplebirch.get('Finance').newspaper.read('street') ? 'paper-read' : 'paper-unavailable'>>
+      <<if $Finance.last_result is 'paper-read'>><<pass `maplebirch.get('Finance').newspaper.terms.readingMinutes`>><</if>>
+    <</lanLink>><br>
+  <<else>>
+    <span class='red'><<lanSwitch 'You do not have enough cash.' '你的现金不够。'>></span><br>
+  <</if>>
+<</if>>
+<<deadwood-finance-paper-return>>
+
+:: Deadwood Reblooms Newspaper Read []
+<<effects>>
+<<if ['paper-read', 'paper-review'].includes($Finance.last_result) and $Finance.newspaper.report>>
+  <<if $Finance.last_result is 'paper-read'>>
+    <<language>>
+      <<option 'EN'>>
+        The pages smell of ink. Prices run down the columns beside reports of deliveries, repairs and new orders. You make a note of the figures before folding the paper.
+      <<option 'CN'>>
+        纸页带着油墨味。报价一列列排在交货、修缮和新订单的消息旁。你记下数字，折起报纸。
+    <</language>><br><br>
+  <</if>>
+  <<deadwood-finance-paper-summary>><br><br>
+  <<set $_report to $Finance.newspaper.report>>
+  <<deadwood-card 'Printed prices' '报刊报价'>>
+    <div class='dr-finance-scroll'>
+      <table class='dr-finance-quotes'>
+        <thead>
+          <tr>
+            <th scope='col'><<lanSwitch 'Security' '证券'>></th>
+            <th scope='col'><<lanSwitch 'Price' '价格'>></th>
+            <th scope='col'><<lanSwitch 'Change' '涨跌'>></th>
+          </tr>
+        </thead>
+        <tbody>
+          <<for $_quote range $_report.quotes>>
+            <tr>
+              <td><<= maplebirch.t(`deadwood-reblooms:finance:security:${$_quote.symbol}`)>> <span class='blue'>(<<= $_quote.symbol>>)</span></td>
+              <td><<deadwood-reblooms-finance-money $_quote.price>></td>
+              <td>
+                <<if $_quote.change is null>>
+                  <span class='blue'>—</span>
+                <<elseif $_quote.change gt 0>>
+                  <span class='red'>+<<= $_quote.change.toFixed(2)>>%</span>
+                <<elseif $_quote.change lt 0>>
+                  <span class='green'><<= $_quote.change.toFixed(2)>>%</span>
+                <<else>>
+                  <span class='blue'>0.00%</span>
+                <</if>>
+              </td>
+            </tr>
+          <</for>>
+        </tbody>
+      </table>
+    </div>
+  <</deadwood-card>>
+  <<deadwood-finance-news $_report.news>>
+  <i class='blue'><<lanSwitch 'These are printed figures, not a live quote. Check the board at the securities desk before placing an order.' '这是报刊记录，并非实时报价。下单前还须查看证券业务台的行情板。'>></i><br><br>
+<<else>>
+  <span class='blue'><<lanSwitch 'You could not obtain a new copy. No payment was taken.' '你没拿到新的报纸，没有扣款。'>></span><br><br>
+<</if>>
+<<deadwood-finance-paper-return>>

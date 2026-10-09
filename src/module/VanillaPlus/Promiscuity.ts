@@ -201,8 +201,8 @@ class Promiscuity {
   public move(action: PromiscuityAction, index: number): boolean {
     const target = Number(index);
     if (!this.canAsk(action, target)) return false;
-    if (action.startsWith('hand-')) this.releaseHands(target);
-    else if (action.startsWith('mouth-')) this.releaseMouth(target);
+    if (action.includes('hand-')) this.releaseHands(target);
+    else if (action.includes('mouth-')) this.releaseMouth(target);
     else if (action === 'offer-vagina-to-mouth') this.releaseVagina(target);
     else if (action === 'offer-anus-to-mouth') this.releaseAnus(target);
     else this.releasePenis(target);
@@ -212,13 +212,13 @@ class Promiscuity {
 
   private releaseDestination(action: PromiscuityAction, target: number): void {
     const part =
-      action.includes('vagina') && !action.startsWith('offer-vagina')
+      action.includes('vagina') && !action.includes('offer-vagina')
         ? 'vagina'
-        : action.includes('anus') && !action.startsWith('offer-anus')
+        : action.includes('anus') && !action.includes('offer-anus')
           ? 'anus'
-          : action.includes('penis') && !action.startsWith('offer-penis')
+          : action.includes('penis') && !action.includes('offer-penis')
             ? 'penis'
-            : action.startsWith('mouth-') && action !== 'mouth-kiss'
+            : action.includes('mouth-') && action !== 'mouth-kiss'
               ? action.replace('mouth-', '')
               : 'mouth';
     const state = V as unknown as Record<string, unknown>;

@@ -40,12 +40,13 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-history-project-museum-options', passage: 'Museum' });
   maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-reblooms-history-project-library-option'], passage: 'School Library' });
 
-  // 湖岸末尾有多个方向出口，调查动作放在活动区前部。
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-history-project-lake-option', passage: 'Lake Shore' });
-
   // 在原版事件池、日志和画作归还结算点接入历史项目状态。
   maplebirch.tool.inject({
     locationPassage: {
+      'Lake Shore': [
+        // 正常活动分支才有返回路线，继承原版昏厥、追逐与遭遇的排除条件。
+        { src: '<<lakereturnjourney>>', applybefore: '<<deadwood-reblooms-history-project-lake-option>>\n\t', expected: 1 }
+      ],
       Museum: [
         // 在玩家确认讨论博物馆画作后安排历史课题，不因仅浏览画作而提前触发。
         {

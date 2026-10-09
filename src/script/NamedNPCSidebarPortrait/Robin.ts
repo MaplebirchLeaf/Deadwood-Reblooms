@@ -312,7 +312,7 @@ export default function (
       ['Robin Hospital Watch', 'Robin Hospital 2', 'Docks_Robin', 'Underground Robin Hunt Intro'].some(prefix => title.startsWith(prefix)) ||
       (title.startsWith('Robin Unwrap') && !title.startsWith('Robin Unwrap No')) ||
       title.startsWith('Canteen Robin Sex') ||
-      ['Robin Forest Vore Comfort 2', 'Robin Forest Vore Tasty 2', 'Robin Forest Vore Tasty 3'].some(prefix => title.startsWith(prefix))
+      ['Robin Forest Vore Comfort 2', 'Robin Forest Vore Tasty 2', 'Robin Forest Vore Tasty 3'].includes(title)
     )
       return 'naked';
 

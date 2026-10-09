@@ -1,6 +1,7 @@
 // ./src/module/Finance/MarginTrading.ts
 
 import terms from '../../assets/finance/trading.json';
+import Securities from './Securities';
 import type Finance from '../Finance';
 
 export interface MarginPosition {
@@ -51,6 +52,10 @@ export default class MarginTrading {
 
   public get open(): boolean {
     return Time.weekDay >= 2 && Time.weekDay <= 6 && Time.hour >= 9 && Time.hour < 17;
+  }
+
+  public get closablePositions(): readonly MarginPosition[] {
+    return this.open ? this.positions.filter(position => Math.floor(Time.days) > position.opened) : [];
   }
 
   public quote(symbol: string): number {
@@ -126,8 +131,8 @@ export default class MarginTrading {
   }
 
   public close(id: number): boolean {
-    const position = this.positions.find(item => item.id === id);
-    if (!this.open || !position) return false;
+    const position = this.closablePositions.find(item => item.id === id);
+    if (!position) return false;
     this.settle(position, 'closed', Math.floor(Time.days));
     this.finance.resetMarketSeed();
     return true;
@@ -153,7 +158,7 @@ export default class MarginTrading {
     return true;
   }
 
-  /** 每个历史交易日按当日行情检查强平，周末仍累计融资利息并处理到期。 */
+  /** 所有仓位从次一交易日起结算，周末仍累计费用，到期顺延至营业日。 */
   public advance(day: number): void {
     for (const position of this.positions.slice()) {
       if (day < position.opened) continue;
@@ -164,6 +169,7 @@ export default class MarginTrading {
         position.fees += Math.ceil((value * (short ? terms.shortWeeklyRate : terms.borrowWeeklyRate) * elapsed) / 7);
         position.charged_day = day;
       }
+      if (day <= position.opened || !Securities.tradingDay(day)) continue;
       if (this.equity(position) <= position.margin * terms.maintenanceRatio) this.settle(position, 'liquidated', day);
       else if (position.stop_loss && this.profit(position) <= -position.stop_loss) this.settle(position, 'stopped', day);
       else if (position.take_profit && this.profit(position) >= position.take_profit) this.settle(position, 'target', day);
