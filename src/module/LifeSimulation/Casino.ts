@@ -151,18 +151,21 @@ class Casino {
   }
 
   public get canWork(): boolean {
-    return (
-      this.available &&
-      (C.npc.Marlow?.rage ?? 0) < 10 &&
-      !(this.state.bribe_night === this.night && this.state.bribe_result === 'accepted') &&
-      (Time.hour >= 18 || Time.hour < 3) &&
-      !this.holdem.active &&
-      this.threeCard.state.phase !== 'player' &&
-      !(this.blackjack.state.venue === 'casino' && this.blackjack.state.phase === 'player') &&
-      !window.pcAreArmsBound('both') &&
-      !V.worn.face.type.includes('gag') &&
-      V.tiredness < 800
-    );
+    return this.workBlock === null;
+  }
+
+  public get workBlock(): 'unavailable' | 'trust' | 'bribe' | 'late' | 'holdem' | 'three_card' | 'blackjack' | 'bound' | 'gag' | 'tired' | null {
+    if (!this.available) return 'unavailable';
+    if ((C.npc.Marlow?.rage ?? 0) >= 10) return 'trust';
+    if (this.state.bribe_night === this.night && this.state.bribe_result === 'accepted') return 'bribe';
+    if (Time.hour >= 3 && Time.hour < 18) return 'late';
+    if (this.holdem.active) return 'holdem';
+    if (this.threeCard.state.phase === 'player') return 'three_card';
+    if (this.blackjack.state.venue === 'casino' && this.blackjack.state.phase === 'player') return 'blackjack';
+    if (window.pcAreArmsBound('any')) return 'bound';
+    if (V.worn.face.type.includes('gag')) return 'gag';
+    if (V.tiredness >= C.tiredness.max * 0.8) return 'tired';
+    return null;
   }
 
   public get canTalk(): boolean {

@@ -20,6 +20,7 @@ import Robin from './Robin';
 import Whitney from './Whitney';
 import Kylar from './Kylar';
 import BirdTower from './BirdTower';
+import Transport from './Transport';
 
 (function (maplebirch): void {
   'use strict';
@@ -42,5 +43,6 @@ import BirdTower from './BirdTower';
   maplebirch.define('BirdTower', new BirdTower(maplebirch), ['DeadwoodReblooms', 'var', 'char']);
   maplebirch.define('LifeSimulation', new LifeSimulation(maplebirch), ['DeadwoodReblooms', 'var', 'combat']);
   maplebirch.define('Orchard', new Orchard(maplebirch), ['DeadwoodReblooms', 'var', 'npc']);
+  maplebirch.define('Transport', new Transport(maplebirch), ['DeadwoodReblooms', 'var']);
   maplebirch.define('DynamicMusic', new DynamicMusic(maplebirch), ['DeadwoodReblooms', 'audio', 'var']);
 })(maplebirch);

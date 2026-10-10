@@ -261,9 +261,15 @@
 <<else>>
 	<<if _blackjackGame.state.venue is 'arcade'>>
 		<<set $outside to 0>><<set $location to 'arcade'>><<effects>>
-		<<lanSwitch 'A green cloth covers the small card table beside the change counter. The attendant sets a deck between you. "Closest to twenty-one wins. Go over, and you lose."' '换币柜台旁的小牌桌铺着绿毡。店员把一副牌摆在你面前。“谁最接近二十一点，谁就赢。超过了，就算你输。”'>><br><br>
 	<<elseif _blackjackGame.state.venue is 'casino'>>
 		<<run maplebirch.get('LifeSimulation').casino.enter()>><<effects>>
+	<<elseif maplebirch.get('Finance')?.realEstate.current>>
+		<<run maplebirch.get('Finance').realEstate.enter()>><<effects>>
+	<</if>>
+	<<deadwood-dynamicblock 'deadwood-blackjack-panel'>>
+	<<if _blackjackGame.state.venue is 'arcade'>>
+		<<lanSwitch 'A green cloth covers the small card table beside the change counter. The attendant sets a deck between you. "Closest to twenty-one wins. Go over, and you lose."' '换币柜台旁的小牌桌铺着绿毡。店员把一副牌摆在你面前。“谁最接近二十一点，谁就赢。超过了，就算你输。”'>><br><br>
+	<<elseif _blackjackGame.state.venue is 'casino'>>
 		<<language>>
 			<<option 'EN'>>
 				Marlow lays a fresh deck beside the chip rack. "Place your stake first. Hit or stand; I draw below seventeen." A small rules card rests at the edge of the cloth.
@@ -271,9 +277,6 @@
 				马洛把一副新牌摆在筹码托盘旁。“先下注。要牌或者停牌。我不足十七点就要牌。”绿毡边缘放着一张小小的规则卡。
 		<</language>><br><br>
 	<<else>>
-		<<if maplebirch.get('Finance')?.realEstate.current>>
-			<<run maplebirch.get('Finance').realEstate.enter()>><<effects>>
-		<</if>>
 		<<if _blackjackGame.available>>
 			<<if _blackjackGame.state.wager is 'strip'>>
 				<<if _blackjackGame.state.phase is 'ready'>>
@@ -312,6 +315,7 @@
 	<<getouticon>><<lanLink `[_blackjackGame.state.phase === 'player' && _blackjackGame.state.venue !== 'home' ? 'Leave and forfeit this stake' : _blackjackGame.state.venue === 'home' && _blackjackGame.state.wager === 'strip' ? 'Get dressed and leave the table' : 'Leave the table', _blackjackGame.state.phase === 'player' && _blackjackGame.state.venue !== 'home' ? '离开并放弃本局赌注' : _blackjackGame.state.venue === 'home' && _blackjackGame.state.wager === 'strip' ? '穿好衣服，离开牌桌' : '离开牌桌']` `_blackjackGame.state.return_passage`>>
 		<<run maplebirch.get('LifeSimulation').casino.blackjack.leave()>>
 	<</lanLink>><br>
+	<</deadwood-dynamicblock>>
 <</if>>
 <</nobr>>
 

@@ -1,0 +1,200 @@
+:: Deadwood Transport Menu []
+<<nobr>>
+<<deadwood-dynamicblock 'deadwood-transport-menu'>>
+<<set _transport to maplebirch.get('Transport')>>
+<<deadwood-transport-notice>>
+<<if !_transport.point or !_transport.vehicle or !_transport.nearby.includes(_transport.vehicle)>>
+  <<lanSwitch 'Your vehicles are parked elsewhere.' '你的载具停在别处。'>><br><br>
+  <<deadwood-transport-return>>
+<<else>>
+  <<icon `'transport/' + _transport.model.id + '.png'`>><b><<print maplebirch.t(_transport.model.name)>></b> — <<print _transport.catalog.name(_transport.point)>><br><br>
+  <<if _transport.garage>>
+    <<lanSwitch 'Occupied spaces of this type: ' '此类车位已占用：'>><<print _transport.garage.used>> / <<print _transport.garage.capacity>><br>
+    <<if _transport.vehicle.garage>>
+      <<icon `'transport/' + _transport.model.id + '.png'`>><<lanLink ['Take it out', '取车']>>
+        <<run maplebirch.get('Transport').park(false)>>
+        <<run Dynamic.render('deadwood-transport-menu')>>
+      <</lanLink>><br>
+    <<elseif _transport.garage.used lt _transport.garage.capacity>>
+      <<icon 'property/garage.png'>><<lanLink ['Put it in the garage', '存入车库']>>
+        <<run maplebirch.get('Transport').park(true)>>
+        <<run Dynamic.render('deadwood-transport-menu')>>
+      <</lanLink>><br>
+    <<else>>
+      <span class='purple'><<lanSwitch 'These spaces are full.' '此类车位已经停满了。'>></span><br>
+    <</if>><br>
+  <</if>>
+  <<if _transport.fuel.current>>
+    <<lanSwitch 'Stored fuel: ' '储备燃油：'>><span class='teal'><<print _transport.fuel.store.litres.toFixed(1)>> L</span><br>
+    <<if _transport.fuel.refill_amount gt 0>>
+      <<icon 'transport/fuel-can.png'>><<lanLink `lanSwitch('Refuel from a can', '用油桶补油') + ' (' + Math.floor(_transport.fuel.terms.refill_minutes / 60) + ':' + String(_transport.fuel.terms.refill_minutes % 60).padStart(2, '0') + ')'`>>
+        <<if maplebirch.get('Transport').fuel.refill() and $passage is 'Deadwood Transport Menu'>>
+          <<goto 'Deadwood Transport Menu'>>
+        <</if>>
+      <</lanLink>><br>
+    <</if>><br>
+  <</if>>
+  <<if !_transport.canDepart>>
+    <<if _transport.vehicle.condition lte 0>>
+      <span class='red'><<lanSwitch 'It needs repairs before you can use it.' '修好之前，它没法上路。'>></span>
+    <<elseif _transport.vehicle.garage>>
+      <<lanSwitch 'It is parked in the garage.' '它停在车库里。'>>
+    <<elseif !_transport.qualified>>
+      <span class='purple'><<lanSwitch 'You need a licence for this vehicle.' '你需要相应的驾驶资格。'>></span>
+    <<elseif _transport.model.kind is 'motorcycle' and !$Transport.helmet>>
+      <span class='purple'><<lanSwitch 'You need a motorcycle helmet.' '你需要摩托车头盔。'>></span>
+    <<else>>
+      <span class='purple'><<lanSwitch 'You cannot use it in your current condition.' '你现在的状况不适合出行。'>></span>
+    <</if>><br><br>
+  <<else>>
+    <<if _transport.point.startsWith('forest:')>>
+      <<language>>
+        <<option 'EN'>>
+          Roots break through the path. The trail narrows further in, where you would have to leave your bike and continue on foot.
+        <<option 'CN'>>
+          树根拱出了路面。再往里，小径变得更窄，你得把车留在路边，步行穿过树林。
+      <</language>><br><br>
+    <<elseif _transport.point.startsWith('moor:')>>
+      <<language>>
+        <<option 'EN'>>
+          Wheel ruts run through the heather. Beyond them, rocks and wet ground would force you to continue on foot.
+        <<option 'CN'>>
+          石楠间留下了几道车辙。再往前，岩石和湿地会挡住车轮，只能步行过去。
+      <</language>><br><br>
+    <</if>>
+    <<for _destination range _transport.destinations>>
+      <<capture _destination>>
+        <<switch _destination.id.split(':')[0]>>
+          <<case 'farmland'>><<farmicon>>
+          <<case 'forest'>><<foresticon>>
+          <<case 'moor'>><<mooricon>>
+          <<default>><<print '<<' + _destination.id + 'icon>>'>>
+        <</switch>>
+        <<if _destination.affordable>>
+          <<lanLink `_destination.name + ' (' + Math.floor(_destination.minutes / 60) + ':' + String(_destination.minutes % 60).padStart(2, '0') + ')'`>>
+            <<if maplebirch.get('Transport').startTrip(_destination.id)>>
+              <<goto 'Deadwood Transport Travel'>>
+            <</if>>
+          <</lanLink>>
+          <<if _destination.id.includes(':') and _transport.point.includes(':')>>
+            <i>
+              <<if Number(_destination.id.split(':')[1]) gt Number(_transport.point.split(':')[1])>>
+                <<lanSwitch '(further in)' '（向深处）'>>
+              <<else>>
+                <<lanSwitch '(towards the edge)' '（返回边缘）'>>
+              <</if>>
+            </i>
+          <</if>>
+        <<else>>
+          <span class='purple'><<print _destination.name>> — <<lanSwitch 'not enough fuel' '油量不足'>></span>
+        <</if>><br>
+      <</capture>>
+    <</for>><br>
+  <</if>>
+  <<deadwood-transport-return>>
+<</if>>
+
+<</deadwood-dynamicblock>>
+<</nobr>>
+
+:: Deadwood Transport Travel []
+<<nobr>>
+<<set _transport to maplebirch.get('Transport')>>
+<<if $Transport.trip and !$Transport.trip.settled>>
+  <<run _transport.completeTrip()>>
+<</if>>
+<<if $passage is 'Deadwood Transport Travel'>>
+  <<if !$Transport.trip or !$Transport.trip.settled or $Transport.trip.interrupted>>
+    <<lanSwitch 'You cannot complete the journey.' '你没能完成这次行程。'>><br><br>
+    <<getouticon>><<lanLink ['Return', '返回'] $Transport.return_passage>>
+      <<set $Transport.trip to null>>
+    <</lanLink>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        <<if _transport.model.kind is 'bicycle'>>
+          You grip the handlebars and pedal away.
+          <<if $Transport.trip.to.startsWith('forest:')>>
+            You duck under a low branch. The tyres bump over roots before finding a clear stretch of path.
+          <<elseif $Transport.trip.to.startsWith('moor:')>>
+            You follow the wheel ruts through the heather, easing around stones that jut from the ground.
+          <<elseif $Transport.trip.to is 'farmland' or $Transport.trip.from is 'farmland'>>
+            Houses give way to trees, then open fields. The wind catches your clothes as you crest a hill.
+          <<else>>
+            You keep close to the kerb, slowing where pedestrians cross.
+          <</if>>
+        <<elseif _transport.model.kind is 'motorcycle'>>
+          You fasten your helmet and start the engine.
+          <<if $Transport.trip.to.startsWith('moor:')>>
+            The tyres follow the ruts through the heather. You ease off the throttle where stones break through the track.
+          <<else>>
+            You pull into the road. The engine hums beneath you, rising as the traffic thins.
+          <</if>>
+        <<else>>
+          You buckle your seat belt and pull away from the kerb.
+          <<if $Transport.trip.to is 'farmland' or $Transport.trip.from is 'farmland'>>
+            You leave the houses behind. The road climbs between the trees before dropping towards the fields.
+          <<else>>
+            You wait at a crossing, then join the traffic on the other side.
+          <</if>>
+        <</if>>
+        <<if Weather.isSnow>>
+          Snow clings to the road. You take the bends slowly.
+        <<elseif Weather.precipitation is 'rain'>>
+          The wet surface gleams beneath you. You leave extra room to brake.
+        <</if>>
+        You stop at <<print _transport.catalog.name($Transport.trip.to)>> and leave your vehicle at the side.
+      <<option 'CN'>>
+        <<if _transport.model.kind is 'bicycle'>>
+          你握住车把，踩着脚踏板出发。
+          <<if $Transport.trip.to.startsWith('forest:')>>
+            你低头躲过垂下的树枝。车轮颠过几段树根，才重新找到平整的小径。
+          <<elseif $Transport.trip.to.startsWith('moor:')>>
+            你沿着石楠间的车辙前行，绕开凸出地面的石块。
+          <<elseif $Transport.trip.to is 'farmland' or $Transport.trip.from is 'farmland'>>
+            房屋渐渐被树林和田野取代。越过山丘时，风吹得你的衣服贴在身上。
+          <<else>>
+            你贴着路边骑行，在行人过街时放慢速度。
+          <</if>>
+        <<elseif _transport.model.kind is 'motorcycle'>>
+          你扣好头盔，发动了车。
+          <<if $Transport.trip.to.startsWith('moor:')>>
+            轮胎压着石楠间的车辙前行。碰上露出地面的石块，你松开油门，慢慢绕过。
+          <<else>>
+            你驶入道路。发动机在身下嗡嗡作响，等车流稀疏下来，声音才逐渐变高。
+          <</if>>
+        <<else>>
+          你系上安全带，把车驶离路边。
+          <<if $Transport.trip.to is 'farmland' or $Transport.trip.from is 'farmland'>>
+            房屋被甩在身后。公路穿过树林，爬上山丘，又向田野延伸。
+          <<else>>
+            你在路口等了一会儿，随后汇入对面的车流。
+          <</if>>
+        <</if>>
+        <<if Weather.isSnow>>
+          路面上积着雪。你放慢速度，小心转过弯道。
+        <<elseif Weather.precipitation is 'rain'>>
+          湿漉漉的路面泛着光。你留出更长的距离，免得来不及刹车。
+        <</if>>
+        到了<<print _transport.catalog.name($Transport.trip.to)>>，你停下车，把它留在路边。
+    <</language>><br><br>
+    <<getouticon>><<lanLink ['Continue', '继续'] _transport.arrival>>
+      <<set $phase to 0>>
+      <<if $Transport.trip.from.startsWith('forest:') and !$Transport.trip.to.startsWith('forest:')>>
+        <<set $foresthunt to 0>>
+      <<elseif $Transport.trip.from.startsWith('moor:') and !$Transport.trip.to.startsWith('moor:')>>
+        <<set $moor to 0, $forestmod to 1>>
+        <<unset $moor_hunt>>
+      <</if>>
+      <<if $Transport.trip.to.startsWith('forest:')>>
+        <<set $forest to Number($Transport.trip.to.split(':')[1]), $forestmod to 1.5, $forestmove to 0, $eventskip to $Transport.trip.from.startsWith('forest:') ? 0 : 1>>
+        <<if $foresthunt gte 1>><<set $foresthunt += 1>><</if>>
+      <<elseif $Transport.trip.to.startsWith('moor:')>>
+        <<set $moor to Number($Transport.trip.to.split(':')[1]), $forestmod to 1, $eventskip to $Transport.trip.from.startsWith('moor:') ? 0 : 1>>
+        <<unset $moormove>>
+        <<if $moor_hunt gte 1>><<set $moor_hunt += 1>><</if>>
+      <</if>>
+    <</lanLink>>
+  <</if>>
+<</if>>
+<</nobr>>

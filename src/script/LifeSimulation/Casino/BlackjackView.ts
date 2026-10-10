@@ -40,7 +40,14 @@ export default class BlackjackView {
         const action = button.dataset.action!;
         const macro = ['start', 'hit', 'stand'].includes(action) ? 'deadwood-blackjack-action' : 'deadwood-blackjack-choice';
         this.core.SugarCube.Wikifier.wikifyEval(`<<${macro} '${action}' ${JSON.stringify(button.dataset.value ?? '')}>>`);
-        if (this.core.passage.title === blackjackPassage) this.core.SugarCube.Engine.play(blackjackPassage);
+        if (this.core.passage.title === blackjackPassage) {
+          if (['bet', 'wager', 'decline', 'reset'].includes(action)) {
+            this.core.SugarCube.Wikifier.wikifyEval("<<run Dynamic.render('deadwood-blackjack-panel')>>");
+            if (['wager', 'reset'].includes(action)) {
+              this.core.SugarCube.Wikifier.wikifyEval('<<updatesidebarimg>><<updatesidebardescription>><<updateallure>><<updatewarmthscale>><<updatewarmthdescription>>');
+            }
+          } else this.core.SugarCube.Engine.play(blackjackPassage);
+        }
       });
     }
     void cardReady(

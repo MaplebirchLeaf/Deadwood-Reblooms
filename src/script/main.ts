@@ -15,6 +15,7 @@ import Robin from './Robin';
 import Whitney from './Whitney';
 import Kylar from './Kylar';
 import BirdTower from './BirdTower';
+import Transport from './Transport';
 
 (function (maplebirch): void {
   'use strict';
@@ -35,4 +36,5 @@ import BirdTower from './BirdTower';
   if (maplebirch.get('BirdTower')) BirdTower(maplebirch);
   if (maplebirch.get('LifeSimulation')) LifeSimulation(maplebirch);
   if (maplebirch.get('Orchard')) Orchard(maplebirch);
+  if (maplebirch.get('Transport')) Transport(maplebirch);
 })(maplebirch);

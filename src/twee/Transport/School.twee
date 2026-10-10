@@ -1,0 +1,582 @@
+:: Deadwood Transport School []
+<<nobr>>
+<<set $location to 'town', $bus to 'elk', $outside to 0, $Transport.shop to 'school'>>
+<<lanSwitch 'Driving school' '驾校'>><br><br>
+<<deadwood-dynamicblock 'deadwood-transport-school'>>
+<<set _transport to maplebirch.get('Transport'), _school to _transport.school, _school_revision to $Transport.school.revision>>
+<<if Time.weekDay is 1 or Time.hour lt 9 or Time.hour gte 18>>
+  <<language>>
+    <<option 'EN'>>
+      The reception desk is empty. The timetable on the wall lists classes from 09:00 to 18:00, Monday to Saturday.
+    <<option 'CN'>>
+      前台没有人。墙上的课程表写着周一至周六营业，时间为 09:00–18:00。
+  <</language>><br><br>
+  <<if $Transport.school.exam>><<run _school.abandon()>><</if>>
+  <<deadwood-transport-return>>
+<<elseif $id lte 0>>
+  <<language>>
+    <<option 'EN'>>
+      The receptionist looks up from the register. "I'll need to see your ID before I can book you in."
+    <<option 'CN'>>
+      前台从登记簿上抬起头。“预约前得先看你的身份证。”
+  <</language>><br><br>
+  <<deadwood-transport-return>>
+<<elseif _school.examActive>>
+  <<include 'Deadwood Transport Road Test'>>
+<<else>>
+  <<if $Transport.school.exam>><<run _school.abandon()>><</if>>
+  <<language>>
+    <<option 'EN'>>
+      A learner car reverses between cones outside the window. Helmets hang above a row of motorcycle keys behind the counter.
+      The receptionist pushes a form towards you. "Car or motorcycle?"
+    <<option 'CN'>>
+      窗外，一辆教练车正倒入锥筒之间。柜台后挂着几顶头盔，下面是一排摩托车钥匙。
+      前台将表格推到你面前。“汽车，还是摩托车？”
+  <</language>><br><br>
+  <<icon 'transport/commuter-motorcycle.png'>><<lanLink ['Motorcycle training', '摩托车课程']>>
+    <<set $Transport.school.category to 'motorcycle', $Transport.school.result to null, $Transport.school.revision += 1>>
+    <<run Dynamic.render('deadwood-transport-school')>>
+  <</lanLink>><<if $Transport.school.category is 'motorcycle'>> <<lanSwitch '(current course)' '（当前课程）'>><</if>><br>
+  <<icon 'transport/saloon.png'>><<lanLink ['Car training', '汽车课程']>>
+    <<set $Transport.school.category to 'motor_vehicle', $Transport.school.result to null, $Transport.school.revision += 1>>
+    <<run Dynamic.render('deadwood-transport-school')>>
+  <</lanLink>><<if $Transport.school.category is 'motor_vehicle'>> <<lanSwitch '(current course)' '（当前课程）'>><</if>><br><br>
+  <<switch $Transport.school.result>>
+    <<case 'applied'>>
+      <<language>>
+        <<option 'EN'>>
+          The receptionist checks your ID, takes a photograph and puts your signed application in an envelope.
+          "It'll come back here. Come back tomorrow."
+        <<option 'CN'>>
+          前台核对了身份证，拍下你的照片，将签好的申请装进信封。
+          “办好会寄回这里。明天来取。”
+      <</language>><br><br>
+    <<case 'collected'>>
+      <<language>>
+        <<option 'EN'>>
+          The receptionist hands you an envelope. Your photograph is printed on the provisional licence inside.
+          "Bring that to your lessons."
+        <<option 'CN'>>
+          前台递给你一个信封。里面的临时驾照上印着你的照片。
+          “上课时带着它。”
+      <</language>><br><br>
+    <<case 'study'>>
+      <<language>>
+        <<option 'EN'>>
+          You work through road signs and right of way, then watch clips of traffic approaching junctions.
+          The instructor stops the video just before a delivery van pulls out. "There. That's when you need to notice it."
+        <<option 'CN'>>
+          你认过路标，练习判断路权，又看了几段路口的录像。
+          教练在一辆送货车驶出来之前暂停画面。“这里。得在这个时候发现它。”
+      <</language>><br><br>
+    <<case 'theory_passed'>>
+      <<language>>
+        <<option 'EN'>>
+          You answer the questions and mark the developing hazards in the video clips.
+          The examiner checks the result and slides a pass certificate across the desk.
+        <<option 'CN'>>
+          你答完选择题，又在录像中指出正在出现的危险。
+          考官核对成绩，将合格证明推过桌面。
+      <</language>><br><br>
+    <<case 'theory_failed'>>
+      <<language>>
+        <<option 'EN'>>
+          The examiner circles the section you missed. "Revise this before you come back."
+          The receptionist turns to the next available date in the booking diary.
+        <<option 'CN'>>
+          考官圈出你失分的部分。“回去把这里再看一遍。”
+          前台翻了翻预约簿，替你指出下一次能报考的日期。
+      <</language>><br><br>
+    <<case 'lesson'>>
+      <<language>>
+        <<option 'EN'>>
+          <<if _school.record.licensed>>
+            <<if $Transport.school.category is 'motorcycle'>>
+              The instructor takes you through tighter bends and busier junctions. You practise holding a steady line,
+              then return to the yard to work on emergency braking.
+            <<else>>
+              The instructor sets you a route through busy junctions, then asks you to park in a narrow space.
+              You repeat the manoeuvre until you can judge the distance without a reminder.
+            <</if>>
+          <<elseif $Transport.school.category is 'motorcycle'>>
+            You practise slow turns in the yard before following the instructor onto the road.
+            Their voice crackles through the radio when you forget a shoulder check.
+          <<else>>
+            The instructor sits beside you while you practise junctions and parking.
+            "Mirror, signal, then move," they say, tapping the dashboard when you rush the turn.
+          <</if>>
+        <<option 'CN'>>
+          <<if _school.record.licensed>>
+            <<if $Transport.school.category is 'motorcycle'>>
+              教练带你经过更急的弯道和繁忙的路口。你练习保持路线稳定，
+              然后回到院子里，继续练习紧急制动。
+            <<else>>
+              教练让你驶过几个繁忙的路口，再把车停进狭窄的车位。
+              你反复尝试，直到能自己判断好距离。
+            <</if>>
+          <<elseif $Transport.school.category is 'motorcycle'>>
+            你先在院子里练习慢速转弯，然后跟着教练上路。
+            忘记回头检查盲区时，耳机里立刻传来教练的提醒。
+          <<else>>
+            教练坐在副驾驶座上，看你练习过路口和停车。
+            “看后视镜，打灯，再动。”你转得太急时，教练敲了敲仪表台。
+          <</if>>
+      <</language>><br><br>
+    <<case 'cbt'>>
+      <<language>>
+        <<option 'EN'>>
+          The morning starts with helmet fitting and vehicle checks. After practising balance, turns and emergency stops in the yard,
+          you spend the afternoon on the road with the instructor speaking into your earpiece.
+          They sign your basic training certificate before putting the keys away. "Keep the L plates on while you practise. Ride alone."
+        <<option 'CN'>>
+          上午先试戴头盔、检查车辆。你在院子里练习平衡、转弯和紧急停车，
+          下午跟着教练上路，耳机里不时传来指示。
+          收好钥匙前，教练签下基础培训证明。“练习时挂好 L 牌。自己骑。”
+      <</language>><br><br>
+    <<case 'module_1_passed'>>
+      <<language>>
+        <<option 'EN'>>
+          You weave between the cones, make the slow turn and stop inside the marked area.
+          The examiner checks the final box. "That's the manoeuvres done. Bring this for the road test."
+        <<option 'CN'>>
+          你绕过锥筒，完成慢速转弯，将车停进指定区域。
+          考官在最后一栏打勾。“场地这一项过了。路考时带上这张。”
+      <</language>><br><br>
+    <<case 'failed'>>
+      <<language>>
+        <<option 'EN'>>
+          <<if $Transport.school.report?.serious_faults gt 0>>
+            "Stop here." The examiner ends the test early and points out the traffic you put at risk.
+          <<else>>
+            The examiner turns the marked sheet towards you. "A few things to work on before the next test."
+          <</if>>
+          The receptionist marks the earliest date you can return in the booking diary.
+        <<option 'CN'>>
+          <<if $Transport.school.report?.serious_faults gt 0>>
+            “停在这里。”考官提前结束考试，指出了刚才被你危及的车辆。
+          <<else>>
+            考官将写满记号的表格转向你。“下次来之前，先把这几项练好。”
+          <</if>>
+          前台在预约簿上标出最早能复考的日期。
+      <</language>><br><br>
+    <<case 'passed'>>
+      <<language>>
+        <<option 'EN'>>
+          Back in the yard, the examiner puts the clipboard down. "That's a pass."
+          You sign the form and collect the certificate. Your full licence will follow in the post.
+        <<option 'CN'>>
+          回到院子里，考官放下记录板。“通过了。”
+          你签好表格，领到合格证明。正式驾照随后会寄来。
+      <</language>><br><br>
+    <<case 'bribed'>>
+      <<language>>
+        <<option 'EN'>>
+          You leave the folded notes beneath the test sheet. The examiner glances towards reception, then pockets them.
+          A pen scratches across the disputed marks. "Take that to the desk."
+        <<option 'CN'>>
+          你将折好的钞票压在成绩单下面。考官朝前台瞥了一眼，将钱收进口袋。
+          笔尖划掉了几处有争议的记号。“拿去登记吧。”
+      <</language>><br><br>
+    <<case 'tampered'>>
+      <<language>>
+        <<option 'EN'>>
+          While the examiner looks for the next booking, you use the pen beside the diary to alter a few disputed marks.
+          At reception, the clerk checks the signature and stamps the result.
+        <<option 'CN'>>
+          考官查找下一份预约时，你拿起预约簿旁的笔，改掉了几处有争议的记号。
+          前台核对签名，给成绩盖了章。
+      <</language>><br><br>
+    <<case 'refused'>>
+      <<language>>
+        <<option 'EN'>>
+          The examiner pushes the envelope back. "Keep your money."
+          The receptionist makes a note beside your name and calls the police. "We'll take another booking from you in three days."
+        <<option 'CN'>>
+          考官将信封推回来。“把钱收好。”
+          前台在你的名字旁做了记号，拨通警察局的电话。“三天后再来预约。”
+      <</language>><br><br>
+    <<case 'caught'>>
+      <<language>>
+        <<option 'EN'>>
+          The examiner returns before you can put the sheet back. They take it out of your hand and call reception over.
+          Your next booking is struck out. The clerk picks up the phone and asks for the police.
+        <<option 'CN'>>
+          你还没把表格放回去，考官就回来了。考官从你手里抽走成绩单，叫来前台。
+          你的下一次预约被划掉了。前台拿起电话，要求接通警察局。
+      <</language>><br><br>
+    <<case 'interrupted'>>
+      <<language>>
+        <<option 'EN'>>
+          The instructor closes the file. "We'll have to leave it there for today. Come back when you can finish the session."
+        <<option 'CN'>>
+          教练合上档案。“今天先到这里。能把课程上完的时候再来。”
+      <</language>><br><br>
+  <</switch>>
+  <<if $Transport.school.report>>
+    <<lanSwitch 'Driving faults: ' '驾驶小错：'>><span class='lblue'><<print $Transport.school.report.minor_faults>></span><br>
+    <<lanSwitch 'Serious faults: ' '危险错误：'>><span class='red'><<print $Transport.school.report.serious_faults>></span><br><br>
+  <</if>>
+  <<if Time.days lt $Transport.school.penalty_until>>
+    <span class='purple'>
+      <<lanSwitch 'Your bookings are suspended for ' '预约暂停，还需等 '>>
+      <<print $Transport.school.penalty_until - Time.days>><<lanSwitch ' days.' ' 天。'>>
+    </span><br><br>
+  <</if>>
+  <<if !$Transport.school.provisional.issued>>
+    <<language>>
+      <<option 'EN'>>
+        The application form asks for your name, address and ID number. A photograph and the £43 fee go in the same envelope.
+      <<option 'CN'>>
+        申请表要填姓名、住址和身份证号码。照片与 £43 手续费一起装进信封。
+    <</language>><br><br>
+    <<if _school.canApply>>
+      <<capture _school_revision>>
+        <<icon 'transport/licence.png'>><<lanLink ['Apply for a provisional licence (£43, 0:15)', '申请临时驾照（£43，0:15）']>>
+          <<if maplebirch.get('Transport').school.attend('apply', _school_revision) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>>
+      <</capture>><br>
+    <<elseif _school.canCollect>>
+      <<capture _school_revision>>
+        <<icon 'transport/licence.png'>><<lanLink ['Collect your provisional licence (0:15)', '领取临时驾照 (0:15)']>>
+          <<if maplebirch.get('Transport').school.attend('collect', _school_revision) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>>
+      <</capture>><br>
+    <<elseif $Transport.school.provisional.ready_day gt Time.days>>
+      <i><<lanSwitch 'Your application is still being processed. Return in ' '申请还在办理，'>>
+      <<print $Transport.school.provisional.ready_day - Time.days>><<lanSwitch ' days.' ' 天后回来。'>></i><br>
+    <</if>><br>
+  <<else>>
+    <<if _school.record.licensed>>
+      <span class='green'><<lanSwitch 'Full licence obtained' '已取得正式驾驶资格'>></span><br><br>
+    <<else>>
+      <<lanSwitch 'Theory preparation: ' '理论准备：'>><<print _school.record.study>> / 3<br>
+      <<lanSwitch 'Supervised driving lessons: ' '实操课程：'>><<print _school.record.lessons>><br>
+      <<if _school.record.theory>>
+        <span class='green'><<lanSwitch 'Theory test passed' '理论考试已通过'>></span><br>
+      <</if>>
+      <<if $Transport.school.category is 'motorcycle'>>
+        <<if _school.motorcycleLearner>>
+          <span class='lblue'><<lanSwitch 'Basic motorcycle training completed' '摩托车基础培训已完成'>></span><br>
+        <<else>>
+          <<language>>
+            <<option 'EN'>>
+              Basic motorcycle training takes the whole day. A helmet and a learner motorcycle are supplied.
+            <<option 'CN'>>
+              摩托车基础培训要上一整天。驾校提供头盔和练习车辆。
+          <</language>><br>
+        <</if>>
+        <<if $Transport.school.motorcycle.module_1>>
+          <span class='green'><<lanSwitch 'Off-road manoeuvres completed' '场地考试已通过'>></span><br>
+        <</if>>
+      <</if>><br>
+      <<if !_school.practicalWeather>>
+        <<language>>
+          <<option 'EN'>>
+            The instructor looks out at the weather and hangs the keys back up. "We'll keep the vehicles in today. The classroom's still open."
+          <<option 'CN'>>
+            教练看了眼窗外，将钥匙挂回去。“今天先把车留在里面。教室照常开。”
+        <</language>><br><br>
+      <</if>>
+      <<if _school.canStudy>>
+        <<capture _school_revision>>
+          <<icon 'transport/theory.png'>><<lanLink ['Study road rules and hazards (£30, 1:00)', '学习交规与危险判断（£30，1:00）']>>
+            <<if maplebirch.get('Transport').school.attend('study', _school_revision) and $passage is 'Deadwood Transport School'>>
+              <<goto 'Deadwood Transport School'>>
+            <</if>>
+          <</lanLink>>
+        <</capture>><br>
+      <</if>>
+      <<if _school.canTheory>>
+        <<capture _school_revision>>
+          <<icon 'transport/theory-test.png'>><<lanLink ['Take the theory test (£23, 1:30)', '参加理论考试（£23，1:30）']>>
+            <<if maplebirch.get('Transport').school.attend('theory', _school_revision) and $passage is 'Deadwood Transport School'>>
+              <<goto 'Deadwood Transport School'>>
+            <</if>>
+          <</lanLink>>
+        <</capture>><br>
+      <</if>>
+      <<if _school.canCBT>>
+        <<capture _school_revision>>
+          <<icon 'transport/helmet.png'>><<lanLink ['Complete basic motorcycle training (£160, 6:00)', '参加摩托车基础培训（£160，6:00）']>>
+            <<if maplebirch.get('Transport').school.attend('cbt', _school_revision) and $passage is 'Deadwood Transport School'>>
+              <<goto 'Deadwood Transport School'>>
+            <</if>>
+          <</lanLink>>
+        <</capture>><br>
+      <</if>>
+      <<if _school.canModuleOne>>
+        <<capture _school_revision>>
+          <<icon 'transport/road-test.png'>><<lanLink ['Take the off-road test (£15.50, 0:20)', '参加场地考试（£15.50，0:20）']>>
+            <<if maplebirch.get('Transport').school.attend('module_1', _school_revision) and $passage is 'Deadwood Transport School'>>
+              <<goto 'Deadwood Transport School'>>
+            <</if>>
+          <</lanLink>>
+        <</capture>><br>
+      <</if>>
+      <<if _school.canTest>>
+        <<capture _school_revision>>
+          <<icon 'transport/road-test.png'>><<lanLink ['Begin the road test (£' + _school.terms.test_fee / 100 + ', 0:45)', '开始道路考试（£' + _school.terms.test_fee / 100 + '，0:45）']>>
+            <<if maplebirch.get('Transport').school.attend('test', _school_revision) and $passage is 'Deadwood Transport School'>>
+              <<goto 'Deadwood Transport School'>>
+            <</if>>
+          <</lanLink>>
+        <</capture>><br>
+      <<elseif _school.record.theory and _school.record.retest_day lte Time.days and (_school.record.practice lt 200 or $Transport.driving lt 300)>>
+        <i><<lanSwitch 'The instructor suggests some more supervised practice before your test.' '教练建议你先多练习几次，再预约考试。'>></i><br>
+      <</if>>
+      <<if _school.record.theory_retest_day gt Time.days>>
+        <i><<lanSwitch 'Your next theory test can be booked in ' '理论考试还需等 '>>
+        <<print _school.record.theory_retest_day - Time.days>><<lanSwitch ' days.' ' 天。'>></i><br>
+      <</if>>
+      <<if _school.record.retest_day gt Time.days>>
+        <i><<lanSwitch 'Your next practical test can be booked in ' '实操考试还需等 '>>
+        <<print _school.record.retest_day - Time.days>><<lanSwitch ' days.' ' 天。'>></i><br>
+      <</if>>
+      <<if _school.canAlter>>
+        <br>
+        <<language>>
+          <<option 'EN'>>
+            The examiner leaves your sheet beside the booking diary. The disputed marks have been crossed out and written in again.
+            The receptionist is busy with another learner.
+          <<option 'CN'>>
+            考官将你的成绩单留在预约簿旁。有争议的几项被划掉，又重新写上。
+            前台正忙着接待另一位学员。
+        <</language>><br><br>
+        <<if _school.canBribe>>
+          <<capture _school_revision>>
+            <<icon 'pound.png'>><<lanLink ['Offer £' + _school.terms.bribe_fee / 100 + ' to change the result (0:15)', '拿出 £' + _school.terms.bribe_fee / 100 + '，试着改掉成绩 (0:15)']>>
+              <<if maplebirch.get('Transport').school.attend('bribe', _school_revision) and $passage is 'Deadwood Transport School'>>
+                <<goto 'Deadwood Transport School'>>
+              <</if>>
+            <</lanLink>>
+          <</capture>><br>
+        <</if>>
+        <<if _school.canTamper>>
+          <<capture _school_revision>>
+            <<crimeicon 'documents'>><<lanLink ['Alter the test sheet (0:15)', '偷偷改掉成绩单 (0:15)']>>
+              <<if maplebirch.get('Transport').school.attend('tamper', _school_revision) and $passage is 'Deadwood Transport School'>>
+                <<goto 'Deadwood Transport School'>>
+              <</if>>
+            <</lanLink>>
+          <</capture>><br>
+        <</if>>
+        <<lanLink ['Leave the sheet alone', '把成绩单留在原处']>>
+          <<set $Transport.school.attempt.resolved to true, $Transport.school.result to null, $Transport.school.revision += 1>>
+          <<run Dynamic.render('deadwood-transport-school')>>
+        <</lanLink>><br>
+      <</if>>
+      <<if !_school.available and Time.days gte $Transport.school.penalty_until>>
+        <span class='purple'><<lanSwitch 'You are in no condition to take a lesson.' '你现在的状况不适合上课。'>></span><br>
+      <</if>><br>
+    <</if>>
+    <<if _school.canTrain>>
+      <<capture _school_revision>>
+        <<icon `$Transport.school.category === 'motorcycle' ? 'transport/motorcycle-lesson.png' : 'transport/driving-lesson.png'`>><<lanLink [(_school.record.licensed ? 'Advanced driving practice' : 'Take a driving lesson') + ' (£' + _school.terms.lesson_fee / 100 + ', 1:00)', (_school.record.licensed ? '进阶驾驶练习' : '上实操课') + '（£' + _school.terms.lesson_fee / 100 + '，1:00）']>>
+          <<if maplebirch.get('Transport').school.attend('lesson', _school_revision) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>>
+      <</capture>><br>
+    <</if>>
+  <</if>>
+  <<deadwood-transport-return>>
+<</if>>
+
+<</deadwood-dynamicblock>>
+<</nobr>>
+
+:: Deadwood Transport Road Test []
+<<nobr>>
+<<set _school to maplebirch.get('Transport').school, _exam to $Transport.school.exam>>
+<<if _school.examActive and _exam>>
+  <<set _exam_step to _exam.step, _variant to _exam.variants[_exam_step]>>
+  <<lanSwitch 'Road test' '道路考试'>> <<print _exam_step + 1>> / 4<br>
+  <<lanSwitch 'Driving faults: ' '驾驶小错：'>><<print _exam.minor_faults>><br><br>
+  <<if $Transport.school.category is 'motorcycle'>>
+    <<language>>
+      <<option 'EN'>>
+        The examiner follows on another motorcycle. Their next direction comes through your earpiece.
+      <<option 'CN'>>
+        考官骑着另一辆摩托车跟在后面。耳机里传来下一条指示。
+    <</language>><br><br>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        The examiner sits beside you, their pen resting against the clipboard.
+      <<option 'CN'>>
+        考官坐在你身旁，笔尖停在记录板上。
+    <</language>><br><br>
+  <</if>>
+  <<switch _school.scene>>
+    <<case 'junction'>>
+      <<language>>
+        <<option 'EN'>>
+          "Take the next left." A delivery van is parked close to the junction. Its rear doors block part of your view.
+          <<if _school.hazardAware>>
+            <<if _variant is 0>>
+              You can see a car approaching from the right through the van's windows. It is too close to pull out ahead of it.
+            <<else>>
+              The van blocks your view to the right. From a little further forward, you would be able to see down the road.
+            <</if>>
+          <</if>>
+        <<option 'CN'>>
+          “下个路口左转。”一辆送货车停在路口旁，后门挡住了部分视线。
+          <<if _school.hazardAware>>
+            <<if _variant is 0>>
+              透过货车的车窗，你看见右边正有一辆车驶近。距离太近，赶在它前面驶出去很危险。
+            <<else>>
+              货车挡住了右侧的视线。再往前挪一点，就能看清那边的路面。
+            <</if>>
+          <</if>>
+      <</language>><br><br>
+      <<capture _exam_step>>
+        <<lanLink ['Wait at the give-way line (0:10)', '停在让行线前等待 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('wait', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+        <<lanLink ['Edge forward slowly (0:10)', '慢慢向前挪动 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('edge', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+        <<lanLink ['Pull out in one movement (0:10)', '一口气驶出路口 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('go', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+      <</capture>>
+    <<case 'passing'>>
+      <<language>>
+        <<option 'EN'>>
+          A cyclist rides ahead of you. Parked cars narrow the road, and the white line disappears around the bend.
+          <<if _school.hazardAware>>
+            <<if _variant is 0>>
+              An oncoming car is about to reach the narrow stretch. There is room to follow the cyclist until it passes.
+            <<else>>
+              Beyond the bend, the road is clear. You can cross the centre line and leave the cyclist plenty of room.
+            <</if>>
+          <</if>>
+        <<option 'CN'>>
+          一位骑车人走在你前面。路边停放的车辆让道路变窄，白线消失在弯道后面。
+          <<if _school.hazardAware>>
+            <<if _variant is 0>>
+              一辆对向汽车就要驶进这段窄路。先跟在自行车后面，可以等它过去。
+            <<else>>
+              弯道后面的路很空。越过中线时，能与骑车人拉开足够的距离。
+            <</if>>
+          <</if>>
+      <</language>><br><br>
+      <<capture _exam_step>>
+        <<lanLink ['Stay behind the cyclist (0:10)', '继续跟在自行车后面 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('hold', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+        <<lanLink ['Pass with plenty of room (0:10)', '拉开距离后超车 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('pass', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+        <<lanLink ['Squeeze through beside the cyclist (0:10)', '挤到自行车旁边过去 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('squeeze', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+      <</capture>>
+    <<case 'roundabout'>>
+      <<language>>
+        <<option 'EN'>>
+          "Second exit." The lane arrows point straight ahead. A car on your right has its left indicator flashing.
+          <<if _school.hazardAware>>
+            <<if _variant is 0>>
+              Despite the indicator, the car continues around the roundabout towards your entrance.
+            <<else>>
+              The car turns off before your entrance. The lane approaching from the right is now clear.
+            <</if>>
+          <</if>>
+        <<option 'CN'>>
+          “第二个出口。”车道箭头指向正前方。右边一辆车亮着左转向灯。
+          <<if _school.hazardAware>>
+            <<if _variant is 0>>
+              那辆车虽然打着灯，却还在沿环岛驶来，正接近你的入口。
+            <<else>>
+              那辆车在你的入口前驶出了环岛。右边的车道已经空出来了。
+            <</if>>
+          <</if>>
+      <</language>><br><br>
+      <<capture _exam_step>>
+        <<lanLink ['Wait for the car to clear (0:10)', '等那辆车通过 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('wait', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+        <<lanLink ['Enter the roundabout (0:10)', '驶入环岛 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('enter', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+        <<lanLink ['Move into the other lane first (0:10)', '先换到另一条车道 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('outer', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+      <</capture>>
+    <<case 'stopping'>>
+      <<language>>
+        <<option 'EN'>>
+          "Pull up somewhere safe along here." There is a gap between parked cars on the left, and another empty space further ahead.
+          <<if _school.hazardAware>>
+            <<if _variant is 0>>
+              A bus stop sign stands beside the first gap. The space further ahead has no parking restrictions or driveways.
+            <<else>>
+              The first gap has no parking restrictions. The space further ahead sits right on the corner of a junction.
+            <</if>>
+          <</if>>
+        <<option 'CN'>>
+          “在这附近找个安全的地方停下。”左边停放的车辆之间有一段空隙，再往前还有一处空位。
+          <<if _school.hazardAware>>
+            <<if _variant is 0>>
+              第一处空隙旁立着公交站牌。前面的空位没有禁停标志，也没有车道出入口。
+            <<else>>
+              第一处空隙旁没有禁停标志。前面的空位紧挨着路口转角。
+            <</if>>
+          <</if>>
+      <</language>><br><br>
+      <<capture _exam_step>>
+        <<lanLink ['Check behind you and use the first gap (0:10)', '检查后方，停进第一处空隙 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('here', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+        <<lanLink ['Check behind you and stop further ahead (0:10)', '检查后方，继续往前找地方停下 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('ahead', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+        <<lanLink ['Brake sharply and pull straight in (0:10)', '猛踩刹车，直接靠边 (0:10)']>>
+          <<if maplebirch.get('Transport').school.drive('hurry', _exam_step) and $passage is 'Deadwood Transport School'>>
+            <<goto 'Deadwood Transport School'>>
+          <</if>>
+        <</lanLink>><br>
+      <</capture>>
+  <</switch>>
+  <<if !_school.hazardAware>>
+    <<capture _exam_step>>
+      <<lanLink ['Look carefully at the traffic (0:01)', '仔细观察路况 (0:01)']>>
+        <<if maplebirch.get('Transport').school.observe(_exam_step) and $passage is 'Deadwood Transport School'>>
+          <<goto 'Deadwood Transport School'>>
+        <</if>>
+      <</lanLink>><br>
+    <</capture>>
+  <</if>><br>
+  <<getouticon>><<lanLink ['Ask to stop the test', '要求结束考试']>>
+    <<run maplebirch.get('Transport').school.abandon()>>
+    <<run Dynamic.render('deadwood-transport-school')>>
+  <</lanLink>>
+<</if>>
+<</nobr>>

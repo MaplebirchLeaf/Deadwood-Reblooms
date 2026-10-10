@@ -1,0 +1,428 @@
+:: Deadwood Transport Motors []
+<<nobr>>
+<<set _transport to maplebirch.get('Transport')>>
+<<set $Transport.shop to 'motors', $location to 'town', $bus to 'harvest', $outside to 0>>
+<<= maplebirch.t('deadwood-reblooms:transport:place:motors')>><br><br>
+<<if !_transport.shopOpen>>
+  <<language>>
+    <<option 'EN'>>
+      The gates are locked. The sign beside them gives the opening hours: 08:00–18:00.
+    <<option 'CN'>>
+      大门锁着。门边的牌子写着营业时间：08:00–18:00。
+  <</language>><br><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      Cars stand on the forecourt, with motorcycles lined up behind the showroom windows.
+      A mechanic backs a car out of the workshop.
+      The clerk at the desk looks up as you come in. "What can we do for you?"
+    <<option 'CN'>>
+      门前停着一排汽车，展厅橱窗后摆着摩托车。
+      修理工把车倒出车间。
+      你走进来，柜台后的店员抬起头。“想办点什么？”
+  <</language>><br><br>
+  <<icon 'transport/car-showroom.png'>><<lanLink ['Car showroom', '汽车展厅'] 'Deadwood Transport Dealer'>>
+    <<set $Transport.shop to 'car', $Transport.notice to null, $Transport.offer to null>>
+  <</lanLink>><br>
+  <<icon 'transport/motorcycle-showroom.png'>><<lanLink ['Motorcycle showroom', '摩托车展厅'] 'Deadwood Transport Dealer'>>
+    <<set $Transport.shop to 'motorcycle', $Transport.notice to null, $Transport.offer to null>>
+  <</lanLink>><br>
+  <<icon 'transport/service.png'>><<lanLink ['Repairs and collection', '维修与取车'] 'Deadwood Transport Service'>>
+    <<set $Transport.shop to 'garage', $Transport.notice to null>>
+  <</lanLink>><br>
+  <br>
+<</if>>
+<<deadwood-transport-return>>
+<</nobr>>
+
+:: Deadwood Transport Dealer []
+<<nobr>>
+<<set _transport to maplebirch.get('Transport')>>
+<<set $location to 'town', $bus to _transport.shopPoint, $outside to 0>>
+<<= maplebirch.t('deadwood-reblooms:transport:place:' + $Transport.shop)>><br><br>
+<<if !_transport.dealerOpen>>
+  <<language>>
+    <<option 'EN'>>
+      The shutters are down. A sign beside the door gives the opening hours: 08:00–18:00.
+    <<option 'CN'>>
+      卷帘门关着。门边的牌子写着营业时间：08:00–18:00。
+  <</language>><br><br>
+  <<deadwood-transport-return>>
+<<else>>
+  <<deadwood-dynamicblock 'deadwood-transport-dealer-notice'>>
+    <<deadwood-transport-notice>>
+  <</deadwood-dynamicblock>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $Transport.shop is 'bicycle'>>
+        Bicycles line the shop windows. A bell rings above the door as you enter. The shopkeeper puts down a tyre pump and comes over.
+      <<elseif $Transport.shop is 'motorcycle'>>
+        Motorcycles stand in rows beneath the showroom lights. A clerk looks up from the counter. Helmets sit on a shelf behind them.
+      <<else>>
+        Cars fill the forecourt. Inside, a clerk looks up from a stack of registration forms and asks what you are looking for.
+      <</if>>
+    <<option 'CN'>>
+      <<if $Transport.shop is 'bicycle'>>
+        自行车沿着橱窗排开。你推门进来，门上的铃铛响了一声。店主放下打气筒，向你走来。
+      <<elseif $Transport.shop is 'motorcycle'>>
+        摩托车在展厅灯下排成几列。店员从柜台后抬起头，身后的架子上摆着头盔。
+      <<else>>
+        门前停着一排汽车。展厅里，店员从一叠登记表中抬起头，问你想看看什么车。
+      <</if>>
+  <</language>><br><br>
+  <<deadwood-dynamicblock 'deadwood-transport-dealer'>>
+  <<for _model range _transport.models>>
+    <<capture _model>>
+      <<icon `'transport/' + _model.id + '.png'`>>
+      <<if $Transport.vehicles.some(vehicle => vehicle.model === _model.id)>>
+        <<= maplebirch.t(_model.name)>> — <span class='green'><<lanSwitch 'Owned' '已拥有'>></span>
+      <<else>>
+        <<lanLink `maplebirch.t(_model.name)` 'Deadwood Transport Buy'>>
+          <<set $Transport.offer to _model.id, $Transport.notice to null>>
+        <</lanLink>> — <<deadwood-transport-money _model.price>>
+      <</if>><br>
+    <</capture>>
+  <</for>><br>
+  <<if $Transport.shop is 'motorcycle' and !$Transport.helmet>>
+    <<lanSwitch 'Motorcycle helmet: ' '摩托车头盔：'>><<deadwood-transport-money 8000>>
+    <<if _transport.canPay(8000)>>
+      <<icon 'transport/helmet.png'>><<lanLink ['Buy a helmet', '购买头盔']>>
+        <<if maplebirch.get('Transport').service('helmet')>>
+          <<updatesidebarmoney>>
+          <<run Dynamic.render('deadwood-transport-dealer-notice', 'deadwood-transport-dealer')>>
+        <</if>>
+      <</lanLink>>
+    <</if>><br><br>
+  <</if>>
+  <<if $Transport.shop is 'bicycle'>>
+    <<icon 'transport/service.png'>><<lanLink ['Repairs and collection', '维修与取车'] 'Deadwood Transport Service'>>
+      <<set $Transport.notice to null>>
+    <</lanLink>><br>
+  <</if>>
+  <<if _transport.shopVehicles.length>>
+    <br><<lanSwitch 'Your vehicles' '你的载具'>><br>
+    <<for _owned range _transport.shopVehicles>>
+      <<set _model to _transport.catalog.models.find(model => model.id === _owned.model)>>
+      <<capture _owned>>
+        <<if _owned.point is _transport.shopPoint and !_owned.garage>>
+          <<icon `'transport/' + _model.id + '.png'`>><<lanLink `maplebirch.t(_model.name)` 'Deadwood Transport Sell'>>
+            <<set $Transport.selected to _owned.id, $Transport.notice to null>>
+          <</lanLink>> — <<lanSwitch 'sell' '出售'>><br>
+        <<else>>
+          <<icon `'transport/' + _model.id + '.png'`>><<= maplebirch.t(_model.name)>> — <<print _transport.catalog.name(_owned.point)>><br>
+        <</if>>
+      <</capture>>
+    <</for>><br>
+  <</if>>
+  <<deadwood-transport-entry>>
+  <<deadwood-transport-return>>
+  <</deadwood-dynamicblock>>
+<</if>>
+<</nobr>>
+
+:: Deadwood Transport Buy []
+<<nobr>>
+<<set _transport to maplebirch.get('Transport'), _model to _transport.offer>>
+<<if !_model or !_transport.dealerOpen>>
+  <<getouticon>><<lanLink ['Return to the showroom', '返回展厅'] 'Deadwood Transport Dealer'>><</lanLink>><br>
+  <<deadwood-transport-return>>
+<<else>>
+  <<icon `'transport/' + _model.id + '.png'`>><<= maplebirch.t(_model.name)>><br><br>
+  <<language>>
+    <<option 'EN'>>
+      <<if _model.id is 'used_saloon'>>
+        There are scratches around the door handles. The clerk opens the bonnet and lets you hear the engine.
+      <<elseif ['sports_car', 'convertible', 'supercar'].includes(_model.id)>>
+        The low seats hold you close to the floor. The clerk waits beside the open door while you look over the dashboard.
+      <<elseif ['luxury_saloon', 'luxury_suv'].includes(_model.id)>>
+        The door closes with a heavy click. You run your hand over the smooth upholstery. The sounds of the forecourt are muffled inside.
+      <<elseif _model.id is 'van'>>
+        You slide the side door open and look over the rows of seats. The clerk folds the rear seats down to show you the space beneath them.
+      <<elseif _model.id is 'delivery_van'>>
+        The clerk opens the loading doors. The empty cargo compartment smells of rubber and fresh paint.
+      <<elseif _model.kind is 'bicycle'>>
+        You squeeze the brakes and turn the pedals. The shopkeeper adjusts the saddle while you hold the handlebars.
+      <<elseif _model.kind is 'motorcycle'>>
+        You settle onto the saddle with both feet on the ground. The clerk points out the ignition and fuel cap.
+      <<else>>
+        You sit behind the wheel. The clerk shows you the controls and opens the glove compartment to take out the handbook.
+      <</if>>
+    <<option 'CN'>>
+      <<if _model.id is 'used_saloon'>>
+        门把手周围有几道划痕。店员打开引擎盖，让你听了听发动机的声音。
+      <<elseif ['sports_car', 'convertible', 'supercar'].includes(_model.id)>>
+        座椅很低，坐下后几乎贴着车底。店员站在敞开的车门旁，等你看完仪表盘。
+      <<elseif ['luxury_saloon', 'luxury_suv'].includes(_model.id)>>
+        车门沉沉地合上。你摸了摸柔软的座椅，门前的嘈杂声隔着车窗变得很轻。
+      <<elseif _model.id is 'van'>>
+        你拉开侧门，看了看几排座椅。店员放倒后排座椅，让你看看底下腾出的空间。
+      <<elseif _model.id is 'delivery_van'>>
+        店员打开货厢门。空着的货厢里带着橡胶和新漆的味道。
+      <<elseif _model.kind is 'bicycle'>>
+        你捏了捏刹车，转动脚踏板。店主让你扶住车把，替你调整坐垫。
+      <<elseif _model.kind is 'motorcycle'>>
+        你坐上车，双脚撑着地。店员指给你看点火开关和油箱盖。
+      <<else>>
+        你坐到驾驶座上。店员指给你看几个开关，又打开手套箱，取出车主手册。
+      <</if>>
+  <</language>><br><br>
+  <<lanSwitch 'Price: ' '价格：'>><<deadwood-transport-money _model.price>><br>
+  <<if _model.kind isnot 'bicycle'>>
+    <<lanSwitch 'Passenger seats: ' '乘客座位：'>><<print _model.seats>><br>
+    <<lanSwitch 'Fuel tank: ' '油箱容量：'>><<print _model.tank>> L<br>
+    <<language>>
+      <<option 'EN'>>
+        The clerk asks to see your ID before filling out the registration.
+      <<option 'CN'>>
+        填写登记表前，店员让你出示身份证。
+    <</language>><br>
+    <<if _model.learner>>
+      <<language>>
+        <<option 'EN'>>
+          "This one is small enough for a provisional licence," the clerk says. "You'll need to complete basic training too."
+        <<option 'CN'>>
+          “这辆排量小，有临时驾照就能骑。”店员说道。“基础训练也得完成。”
+      <</language>><br>
+    <</if>>
+  <</if>><br>
+  <<if $Transport.vehicles.some(vehicle => vehicle.model === _model.id)>>
+    <span class='green'><<lanSwitch 'You own this model.' '你已拥有这款载具。'>></span><br>
+  <<elseif (_model.kind is 'bicycle' or $id gt 0) and _transport.canPay(_model.price)>>
+    <<shopicon 'register'>><<lanLink `_model.kind is 'bicycle' ? ["Buy (0:05)", "购买 (0:05)"] : ["Buy (0:15)", "购买 (0:15)"]`>>
+      <<if maplebirch.get('Transport').buy() and $passage is 'Deadwood Transport Buy'>>
+        <<goto 'Deadwood Transport Dealer'>>
+      <</if>>
+    <</lanLink>><br>
+  <<elseif _model.kind isnot 'bicycle' and $id lte 0>>
+    <span class='purple'><<lanSwitch 'You need an ID.' '你需要身份证。'>></span><br>
+  <<else>>
+    <span class='purple'><<lanSwitch 'You cannot afford it.' '你买不起。'>></span><br>
+  <</if>>
+  <<getouticon>><<lanLink ['Return to the showroom', '返回展厅'] 'Deadwood Transport Dealer'>>
+    <<set $Transport.offer to null>>
+  <</lanLink>>
+<</if>>
+<</nobr>>
+
+:: Deadwood Transport Service []
+<<nobr>>
+<<set _transport to maplebirch.get('Transport')>>
+<<set $location to 'town', $bus to _transport.shopPoint, $outside to 0>>
+<<= maplebirch.t('deadwood-reblooms:transport:place:' + ($Transport.shop is 'bicycle' ? 'bicycle' : 'garage'))>><br><br>
+<<if !_transport.shopOpen>>
+  <<language>>
+    <<option 'EN'>>
+      The workshop is closed. The sign on the door gives the opening hours: 08:00–18:00.
+    <<option 'CN'>>
+      修理间关门了。门上的牌子写着营业时间：08:00–18:00。
+  <</language>><br><br>
+  <<deadwood-transport-return>>
+<<else>>
+  <<deadwood-dynamicblock 'deadwood-transport-service-notice'>>
+    <<deadwood-transport-notice>>
+  <</deadwood-dynamicblock>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $Transport.shop is 'bicycle'>>
+        The shopkeeper lifts a bicycle onto a stand behind the counter. Spare tyres hang from hooks on the wall.
+      <<else>>
+        A mechanic wipes oil from a spanner. An engine rattles behind the open workshop doors. You wait beside the counter until the mechanic comes over.
+      <</if>>
+    <<option 'CN'>>
+      <<if $Transport.shop is 'bicycle'>>
+        店主把一辆自行车抬上柜台后的支架。墙上的钩子挂着备用轮胎。
+      <<else>>
+        修理工擦着扳手上的油。敞开的车间里传出发动机的声音。你在柜台旁等了一会儿，修理工走了过来。
+      <</if>>
+  <</language>><br><br>
+  <<deadwood-dynamicblock 'deadwood-transport-service'>>
+  <<if _transport.shopVehicles.length>>
+    <<for _owned range _transport.shopVehicles>>
+      <<set _model to _transport.catalog.models.find(model => model.id === _owned.model)>>
+      <<capture _owned>>
+        <<icon `'transport/' + _model.id + '.png'`>><<lanLink `maplebirch.t(_model.name)`>>
+          <<set $Transport.selected to _owned.id, $Transport.notice to null>>
+          <<run Dynamic.render('deadwood-transport-service-notice', 'deadwood-transport-service')>>
+        <</lanLink>> — <<print _transport.catalog.name(_owned.point)>>
+        <<if _owned.garage>><i><<lanSwitch '(in a garage)' '（车库内）'>></i><</if>><br>
+      <</capture>>
+    <</for>><br>
+    <<if _transport.vehicle and _transport.shopVehicles.includes(_transport.vehicle)>>
+      <<icon `'transport/' + _transport.model.id + '.png'`>><<= maplebirch.t(_transport.model.name)>><br>
+      <<lanSwitch 'Condition: ' '车况：'>><<print Math.floor(_transport.vehicle.condition)>>%<br>
+      <<if !_transport.availableAtShop and _transport.recoveryCost gt 0>>
+        <<language>>
+          <<option 'EN'>>
+            You give the vehicle's location to the person at the counter. They check the address and quote a collection fee.
+          <<option 'CN'>>
+            你告诉柜台后的人车停在哪里。对方确认了位置，报出取车的价钱。
+        <</language>><br>
+        <<lanSwitch 'Collection fee: ' '取车费用：'>><<deadwood-transport-money _transport.recoveryCost>><br>
+        <<if _transport.canPay(_transport.recoveryCost)>>
+          <<icon 'transport/recovery.png'>><<lanLink `lanSwitch('Arrange collection', '请人取车') + ' (' + Math.floor(_transport.recoveryMinutes / 60) + ':' + String(_transport.recoveryMinutes % 60).padStart(2, '0') + ')'`>>
+            <<if maplebirch.get('Transport').service('recover') and $passage is 'Deadwood Transport Service'>>
+              <<goto 'Deadwood Transport Service'>>
+            <</if>>
+          <</lanLink>><br>
+        <<else>>
+          <span class='purple'><<lanSwitch 'You cannot afford the collection fee.' '你付不起取车费用。'>></span><br>
+        <</if>>
+      <<elseif _transport.availableAtShop>>
+        <<if _transport.repairCost gt 0>>
+          <<lanSwitch 'Repairs: ' '维修：'>><<deadwood-transport-money _transport.repairCost>><br>
+          <<if _transport.canPay(_transport.repairCost)>>
+            <<icon 'transport/service.png'>><<lanLink `lanSwitch('Repair', '维修') + ' (' + Math.floor(_transport.repairMinutes / 60) + ':' + String(_transport.repairMinutes % 60).padStart(2, '0') + ')'`>>
+              <<if maplebirch.get('Transport').service('repair') and $passage is 'Deadwood Transport Service'>>
+                <<goto 'Deadwood Transport Service'>>
+              <</if>>
+            <</lanLink>><br>
+          <<else>>
+            <span class='purple'><<lanSwitch 'You cannot afford the repairs.' '你付不起维修费用。'>></span><br>
+          <</if>>
+        <<else>>
+          <span class='green'><<lanSwitch 'It is in good condition.' '车况良好。'>></span><br>
+        <</if>>
+      <</if>>
+    <</if>>
+  <<else>>
+    <<lanSwitch 'You have no vehicles to service here.' '你没有需要在这里维修的载具。'>><br>
+  <</if>><br>
+  <<if $Transport.shop is 'bicycle'>>
+    <<getouticon>><<lanLink ['Return to the shop', '返回店里'] 'Deadwood Transport Dealer'>>
+      <<set $Transport.notice to null>>
+    <</lanLink>><br>
+  <</if>>
+  <<deadwood-transport-entry>>
+  <<deadwood-transport-return>>
+  <</deadwood-dynamicblock>>
+<</if>>
+<</nobr>>
+
+:: Deadwood Transport Petrol []
+<<nobr>>
+<<set _transport to maplebirch.get('Transport')>>
+<<set $location to 'town', $bus to _transport.shopPoint, $outside to 1>>
+<<= maplebirch.t('deadwood-reblooms:transport:place:petrol')>><br><br>
+<<if !_transport.shopOpen>>
+  <<deadwood-transport-return>>
+<<else>>
+  <<deadwood-dynamicblock 'deadwood-transport-petrol-notice'>>
+    <<deadwood-transport-notice>>
+  <</deadwood-dynamicblock>>
+  <<language>>
+    <<option 'EN'>>
+      Pumps stand beneath a canopy beside the road. Behind the kiosk window, an attendant follows the meter as a driver fills their tank.
+    <<option 'CN'>>
+      路边的棚下立着几台加油机。一个司机正给车加油，柜亭后的工作人员看着计价器上的数字。
+  <</language>><br><br>
+  <<deadwood-dynamicblock 'deadwood-transport-petrol'>>
+  <<if _transport.shopVehicles.length>>
+    <<for _owned range _transport.shopVehicles>>
+      <<set _model to _transport.catalog.models.find(model => model.id === _owned.model)>>
+      <<capture _owned>>
+        <<icon `'transport/' + _model.id + '.png'`>><<lanLink `maplebirch.t(_model.name)`>>
+          <<set $Transport.selected to _owned.id, $Transport.notice to null>>
+          <<run Dynamic.render('deadwood-transport-petrol-notice', 'deadwood-transport-petrol')>>
+        <</lanLink>><br>
+      <</capture>>
+    <</for>><br>
+    <<if _transport.vehicle and _transport.shopVehicles.includes(_transport.vehicle) and _transport.availableAtShop>>
+      <<icon `'transport/' + _transport.model.id + '.png'`>><<= maplebirch.t(_transport.model.name)>><br>
+      <<lanSwitch 'Fuel: ' '油量：'>><<print _transport.vehicle.fuel.toFixed(1)>> / <<print _transport.model.tank>> L<br>
+      <<if _transport.fuelCost gt 0>>
+        <<lanSwitch 'Fill the tank: ' '加满油箱：'>><<deadwood-transport-money _transport.fuelCost>><br>
+        <<if _transport.canPay(_transport.fuelCost)>>
+          <<icon 'transport/fuel-pump.png'>><<lanLink ['Fill the tank (0:05)', '加满油箱 (0:05)']>>
+            <<if maplebirch.get('Transport').service('fuel') and $passage is 'Deadwood Transport Petrol'>>
+              <<goto 'Deadwood Transport Petrol'>>
+            <</if>>
+          <</lanLink>><br>
+        <<else>>
+          <span class='purple'><<lanSwitch 'You cannot afford the fuel.' '你付不起油钱。'>></span><br>
+        <</if>>
+      <<else>>
+        <span class='green'><<lanSwitch 'The tank is full.' '油箱已经满了。'>></span><br>
+      <</if>>
+    <</if>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        You will need to bring a motor vehicle or motorcycle to the pumps.
+      <<option 'CN'>>
+        你得把汽车或摩托车开到这里，才能加油。
+    <</language>><br>
+  <</if>><br>
+  <<if _transport.fuel.garages.length>>
+    <b><<lanSwitch 'Garage fuel delivery' '车库燃油配送'>></b><br><br>
+    <<language>>
+      <<option 'EN'>>
+        The attendant points out the metal cans behind the kiosk. Each holds <span class='teal'><<print _transport.fuel.terms.can_capacity>> litres</span>.
+        A garage shelf holds <span class='teal'><<print _transport.fuel.terms.garage_cans>> cans</span>. The station can collect and refill your empty cans.
+        Delivery costs <<deadwood-transport-money _transport.fuel.terms.delivery_fee>>.
+      <<option 'CN'>>
+        工作人员指了指柜亭后的金属油桶。每桶能装<span class='teal'><<print _transport.fuel.terms.can_capacity>>升</span>。
+        车库的架子能放<span class='teal'><<print _transport.fuel.terms.garage_cans>>桶</span>，空桶可以交给加油站灌满。
+        每次配送收费<<deadwood-transport-money _transport.fuel.terms.delivery_fee>>。
+    <</language>><br><br>
+    <<for _property range _transport.fuel.garages>>
+      <<capture _property>>
+        <b><<= lanSwitch(_property.name.EN, _property.name.CN)>></b><br>
+        <<set _fuel_store to $Transport.fuel_stores?.[_property.id] or {cans: 0, litres: 0}>>
+        <<lanSwitch 'Petrol cans: ' '油桶：'>><<print _fuel_store.cans>> / <<print _transport.fuel.terms.garage_cans>>
+        — <<lanSwitch 'fuel: ' '燃油：'>><span class='teal'><<print _fuel_store.litres.toFixed(1)>> L</span><br>
+        <<set _order to _transport.fuel.quote(_property.id, true)>>
+        <<if _order>>
+          <<if _transport.canPay(_order.price)>>
+            <<icon 'transport/fuel-can.png'>><<lanLink `lanSwitch('Buy a full can', '买一桶燃油') + ' (' + Math.floor(_transport.fuel.terms.delivery_minutes / 60) + ':' + String(_transport.fuel.terms.delivery_minutes % 60).padStart(2, '0') + ')'`>>
+              <<if maplebirch.get('Transport').fuel.deliver(_property.id, true) and $passage is 'Deadwood Transport Petrol'>>
+                <<goto 'Deadwood Transport Petrol'>>
+              <</if>>
+            <</lanLink>> — <<deadwood-transport-money _order.price>><br>
+          <<else>>
+            <span class='purple'><<lanSwitch 'You cannot afford a full can.' '你买不起一桶燃油。'>></span><br>
+          <</if>>
+        <</if>>
+        <<set _order to _transport.fuel.quote(_property.id, false)>>
+        <<if _order and _transport.canPay(_order.price)>>
+          <<icon 'transport/fuel-can.png'>><<lanLink `lanSwitch('Refill the stored cans', '灌满存放的油桶') + ' (' + Math.floor(_transport.fuel.terms.delivery_minutes / 60) + ':' + String(_transport.fuel.terms.delivery_minutes % 60).padStart(2, '0') + ')'`>>
+            <<if maplebirch.get('Transport').fuel.deliver(_property.id, false) and $passage is 'Deadwood Transport Petrol'>>
+              <<goto 'Deadwood Transport Petrol'>>
+            <</if>>
+          <</lanLink>> — <<deadwood-transport-money _order.price>><br>
+        <</if>><br>
+      <</capture>>
+    <</for>>
+  <</if>>
+  <<deadwood-transport-entry>>
+  <<deadwood-transport-return>>
+  <</deadwood-dynamicblock>>
+<</if>>
+<</nobr>>
+
+:: Deadwood Transport Sell []
+<<nobr>>
+<<set _transport to maplebirch.get('Transport')>>
+<<if _transport.dealerOpen and _transport.vehicle and _transport.shopVehicles.includes(_transport.vehicle) and _transport.availableAtShop>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _transport.model.kind is 'bicycle'>>
+        The shopkeeper checks the chain and tyres, then gives you a price. "Leave it by the counter if you're selling."
+      <<else>>
+        The clerk checks the mileage and looks over the bodywork. "If you want to sell, I'll need the keys."
+      <</if>>
+    <<option 'CN'>>
+      <<if _transport.model.kind is 'bicycle'>>
+        店主检查了链条和轮胎，向你报了个价。“要卖的话，把车靠在柜台边就行。”
+      <<else>>
+        店员检查了里程，又绕着车身看了一圈。“要卖的话，把钥匙给我。”
+      <</if>>
+  <</language>><br><br>
+  <<icon `'transport/' + _transport.model.id + '.png'`>><<= maplebirch.t(_transport.model.name)>> — <<deadwood-transport-money `Math.floor(_transport.model.price * _transport.vehicle.condition / 200)`>><br><br>
+  <<shopicon 'register'>><<lanLink ['Sell', '出售']>>
+    <<if maplebirch.get('Transport').service('sell') and $passage is 'Deadwood Transport Sell'>>
+      <<goto 'Deadwood Transport Dealer'>>
+    <</if>>
+  <</lanLink>><br>
+<</if>>
+<<getouticon>><<lanLink ['Return to the shop', '返回店里'] 'Deadwood Transport Dealer'>><</lanLink>>
+<</nobr>>

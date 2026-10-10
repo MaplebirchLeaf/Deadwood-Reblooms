@@ -16,6 +16,7 @@
 :: Deadwood Reblooms Casino Dealer []
 <<nobr>>
 <<run maplebirch.get('LifeSimulation').casino.enter()>><<effects>>
+<<deadwood-dynamicblock 'deadwood-casino-dealer'>>
 <<set _casino to maplebirch.get('LifeSimulation').casino>>
 <<if _casino.available>>
 	<<npc 'Marlow'>><<person1>>
@@ -93,31 +94,14 @@
 			<</lanLink>><br>
 		<</if>>
 	<</if>>
-	<<if _casino.state.bribe_night is _casino.state.guest_night and _casino.state.bribe_result is 'accepted'>>
-		<<language>>
-			<<option 'EN'>>Marlow rests a hand on the deck. "I said you could sit down. I didn't say you could deal."
-			<<option 'CN'>>马洛把手按在牌堆上。“我说的是让你坐下来玩，可没说让你发牌。”
-		<</language>><br>
-	<<elseif C.npc.Marlow.rage gte 10>>
-		<<language>>
-			<<option 'EN'>>"An honest mistake I can correct," Marlow says. "Cheating is different. <span class='red'>I need to trust you before you deal for me again.</span>"
-			<<option 'CN'>>“点错筹码，我可以帮你纠正。”马洛说。“故意作弊是另一回事。<span class='red'>我得能信得过你，才能再让你发牌。</span>”
-		<</language>><br>
-	<<elseif !_casino.canWork>>
-		<<language>>
-			<<option 'EN'>>
-				You <span class='blue'>cannot take a shift now</span>. Finish any hand you are playing first. You must be able to use your hands and speak, and be rested enough to work for an hour. No new shifts begin after <span class='gold'>03:00</span>.
-			<<option 'CN'>>
-				你<span class='blue'>现在无法上班</span>。先结束正在玩的牌局，并确保双手能自由活动、可以说话，也有精力做满一小时。<span class='gold'>03:00</span> 起不再安排新班次。
-		<</language>><br>
+	<<if !_casino.canWork>>
+		<<deadwood-casino-work-block>><br>
 	<</if>>
-<<else>><span class='blue'><<language>>
-	<<option 'EN'>>
-		Marlow is not taking on staff now.
-	<<option 'CN'>>
-		马洛现在不安排帮工。
-<</language>></span><br><</if>>
+<<else>>
+	<<deadwood-casino-work-block>><br>
+<</if>>
 <<deadwood-marlow-bribe>>
+<</deadwood-dynamicblock>>
 <<getouticon>><<lanLink ['Return to the room', '返回赌馆'] 'Deadwood Reblooms Life Simulation Casino'>><<endevent>><</lanLink>><br>
 <</nobr>>
 
@@ -176,17 +160,84 @@
 			<<lanLink ['Award the pot to the pair of queens', '把底池判给一对 Q']>><<deadwood-casino-work-pay 1>><</lanLink>><br>
 	<</switch>>
 <<else>>
-	<span class='blue'><<language>>
-		<<option 'EN'>>
-			The shift cannot start in your present condition.
-		<<option 'CN'>>
-			你现在的状态无法开始这个班次。
-	<</language>></span><br>
+	<<if _casino.workBlock>>
+		<<deadwood-casino-work-block>><br>
+	<<else>>
+		<<language>>
+			<<option 'EN'>>You have not taken a shift. Speak to Marlow first.
+			<<option 'CN'>>你还没有接班。先去找马洛安排吧。
+		<</language>><br>
+	<</if>>
 <</if>>
 <<getouticon>><<lanLink ['Step away without taking the shift', '不接班，退到一旁'] 'Deadwood Reblooms Life Simulation Casino'>><<set $LifeSimulation.casino.work_scenario to null>><<endevent>><</lanLink>><br>
 <</nobr>>
 
 :: Deadwood Reblooms Casino Work Widgets [widget]
+
+<<widget 'deadwood-casino-work-block'>>
+	<<set $_casino to maplebirch.get('LifeSimulation').casino>>
+	<<switch $_casino.workBlock>>
+		<<case 'trust'>>
+			<<language>>
+				<<option 'EN'>>"An honest mistake I can correct," Marlow says. "Cheating is different. <span class='red'>I need to trust you before you deal for me again.</span>"
+				<<option 'CN'>>“点错筹码，我可以帮你纠正。”马洛说。“故意作弊是另一回事。<span class='red'>我得能信得过你，才能再让你发牌。</span>”
+			<</language>>
+		<<case 'bribe'>>
+			<<language>>
+				<<option 'EN'>>Marlow rests a hand on the deck. "I said you could sit down. I didn't say you could deal. <span class='blue'>No shifts for you tonight.</span>"
+				<<option 'CN'>>马洛把手按在牌堆上。“我说的是让你坐下来玩，可没说让你发牌。<span class='blue'>今晚不安排你的班次。</span>”
+			<</language>>
+		<<case 'late'>>
+			<<language>>
+				<<option 'EN'>>Marlow checks the clock. "We close at four. <span class='blue'>No new shifts after 03:00.</span> Come back tomorrow evening."
+				<<option 'CN'>>马洛看了看钟。“四点就关门了，<span class='blue'>三点起不再安排新班次</span>。明晚再来吧。”
+			<</language>>
+		<<case 'holdem' 'three_card' 'blackjack'>>
+			<<language>>
+				<<option 'EN'>>Marlow glances towards your seat. "<span class='blue'>You're still in a hand.</span> Finish playing, or leave that table, before taking a shift."
+				<<option 'CN'>>马洛朝你的座位看了一眼。“<span class='blue'>你的牌局还没结束</span>。先打完，或者离席，再来接班。”
+			<</language>><br>
+			<<if $_casino.workBlock is 'holdem'>>
+				<<lanLink ["Return to your hold'em table", '返回德州扑克牌桌'] 'Deadwood Reblooms Life Simulation Holdem'>><</lanLink>>
+			<<elseif $_casino.workBlock is 'three_card'>>
+				<<lanLink ['Return to your three-card table', '返回炸金花牌桌'] 'Deadwood Reblooms Life Simulation Three Card'>><</lanLink>>
+			<<else>>
+				<<lanLink ['Return to your blackjack table', '返回二十一点牌桌'] 'Deadwood Reblooms Life Simulation Blackjack'>><</lanLink>>
+			<</if>>
+		<<case 'bound'>>
+			<<language>>
+				<<option 'EN'>>You <span class='purple'>need both hands free</span> to shuffle, deal and count the chips.
+				<<option 'CN'>>洗牌、发牌和点筹码都需要<span class='purple'>双手能自由活动</span>。
+			<</language>>
+		<<case 'gag'>>
+			<<language>>
+				<<option 'EN'>>The gag prevents you from <span class='purple'>calling the bets</span>. You need to remove it before taking a shift.
+				<<option 'CN'>>口中的堵塞物让你无法<span class='purple'>报出赌注</span>。取下来后才能接班。
+			<</language>>
+		<<case 'tired'>>
+			<<language>>
+				<<option 'EN'>>You <span class='purple'>struggle to keep your eyes open</span>. "Get some rest first," Marlow says. "I need you awake enough to count."
+				<<option 'CN'>>你<span class='purple'>困得眼皮直打架</span>。“先去休息吧。”马洛说。“得清醒点，才能把筹码数清楚。”
+			<</language>>
+		<<case 'unavailable'>>
+			<<language>>
+				<<option 'EN'>>
+					<<if !$_casino.open>>The casino is <span class='blue'>closed</span>. Shifts begin at <span class='gold'>18:00</span>.
+					<<elseif $_casino.barred>>Marlow has <span class='red'>barred you for tonight</span>. You cannot take a shift either.
+					<<elseif $id lte 0>>Marlow needs to see your <span class='blue'>ID</span> before arranging a shift.
+					<<elseif $exposed gt 0>>You need to <span class='purple'>cover yourself</span> before Marlow will put you at a table.
+					<<elseif $stress gte $stressmax>>You are <span class='purple'>too overwhelmed</span> to keep track of the cards. Calm down before taking a shift.
+					<<else>>Marlow cannot arrange a shift right now.<</if>>
+				<<option 'CN'>>
+					<<if !$_casino.open>>赌馆已经<span class='blue'>关门</span>。<span class='gold'>18:00</span> 起可以来接班。
+					<<elseif $_casino.barred>>马洛<span class='red'>今晚不准你再上牌桌</span>，也不会让你接班。
+					<<elseif $id lte 0>>安排班次之前，马洛需要先看你的<span class='blue'>身份证</span>。
+					<<elseif $exposed gt 0>>先<span class='purple'>遮好身体</span>，马洛才会让你照看牌桌。
+					<<elseif $stress gte $stressmax>>你<span class='purple'>慌得无法集中注意力</span>。先缓一缓，再来接班吧。
+					<<else>>马洛现在无法安排班次。<</if>>
+			<</language>>
+	<</switch>>
+<</widget>>
 <<widget 'deadwood-casino-work-pay'>>
 	<<set $_wage to maplebirch.get('LifeSimulation').casino.finishWork(_args[0])>>
 	<<if $_wage gt 0>>

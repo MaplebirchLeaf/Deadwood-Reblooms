@@ -1,0 +1,212 @@
+:: Deadwood Transport Widgets [widget]
+
+<<widget 'deadwood-transport-money'>>
+  <span class='gold'><<= formatMoney(_args[0])>></span>
+<</widget>>
+
+<<widget 'deadwood-transport-shop-link'>>
+  <<set _shop to _args[0], _minutes to _args[1], _destination to _args[2]>>
+  <<capture _shop _minutes _destination>>
+    <<icon `'transport/' + (_shop is 'school' ? 'driving-school' : _shop) + '.png'`>><<lanLink `maplebirch.t('deadwood-reblooms:transport:place:' + _shop) + ' (0:' + String(_minutes).padStart(2, '0') + ')'`>>
+      <<if maplebirch.get('Transport').open()>>
+        <<set $Transport.shop to _shop>>
+        <<if _shop is 'school'>>
+          <<set $Transport.school.result to null>>
+        <</if>>
+        <<set _entry_passage to $passage>>
+        <<pass _minutes>>
+        <<if $passage is _entry_passage>>
+          <<goto _destination>>
+        <</if>>
+      <</if>>
+    <</lanLink>><br>
+  <</capture>>
+<</widget>>
+
+<<widget 'deadwood-transport-places'>>
+  <<set _transport to maplebirch.get('Transport')>>
+  <<set _places_position to $passage is 'Harvest Street' and document.querySelector('#passage-content .macro-link[data-passage="Brothel Escort Job Ride"]') ? 1 : 0>>
+  <<if _transport.canApproach and (_args[0] ?? 0) is _places_position>>
+    <<if $passage is 'Shopping Centre' and !_transport.external_bicycle and Time.dayState isnot 'night' and Time.hour isnot 21>>
+      <<deadwood-transport-shop-link 'bicycle' 1 'Deadwood Transport Dealer'>>
+    <<elseif $passage is 'Harvest Street'>>
+      <<deadwood-transport-shop-link 'motors' 2 'Deadwood Transport Motors'>>
+      <<deadwood-transport-shop-link 'petrol' 3 'Deadwood Transport Petrol'>>
+    <<elseif $passage is 'Elk Street'>>
+      <<deadwood-transport-shop-link 'school' 2 'Deadwood Transport School'>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-transport-entry'>>
+  <<set _transport to maplebirch.get('Transport')>>
+  <<if _transport.ready and _transport.nearby.length and (_transport.canApproach or _transport.shopOpen or $passage is 'Deadwood Reblooms Property Garage')>>
+    <br><<lanSwitch 'Available vehicles' '可使用载具'>><br>
+    <<for _available_vehicle range _transport.nearby>>
+      <<set _available_model to _transport.catalog.models.find(model => model.id === _available_vehicle.model)>>
+      <<set _vehicle_source to $passage, _vehicle_minutes to $passage is 'Shopping Centre' ? 2 : 0>>
+      <<capture _available_vehicle _vehicle_source _vehicle_minutes>>
+        <<icon `'transport/' + _available_model.id + '.png'`>><<lanLink `maplebirch.t(_available_model.name) + (_vehicle_minutes ? ' (0:02)' : '')`>>
+          <<if maplebirch.get('Transport').open(_available_vehicle.id)>>
+            <<if _vehicle_minutes>><<pass _vehicle_minutes>><</if>>
+            <<if $passage is _vehicle_source>><<goto 'Deadwood Transport Menu'>><</if>>
+          <</if>>
+        <</lanLink>><br>
+      <</capture>>
+    <</for>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-transport-garage'>>
+  <<set _transport to maplebirch.get('Transport')>>
+  <<if _transport.fuel.current>>
+    <<lanSwitch 'Petrol cans: ' '油桶：'>><span class='teal'><<print _transport.fuel.store.cans>> / <<print _transport.fuel.terms.garage_cans>></span><br>
+    <<if _transport.fuel.store.cans gt 0>>
+      <<lanSwitch 'Stored fuel: ' '储备燃油：'>><span class='teal'><<print _transport.fuel.store.litres.toFixed(1)>> / <<print _transport.fuel.store.cans * _transport.fuel.terms.can_capacity>> L</span><br>
+    <</if>><br>
+  <</if>>
+  <<deadwood-transport-entry>>
+<</widget>>
+
+<<widget 'deadwood-transport-header'>>
+  <<set _transport to maplebirch.get('Transport')>>
+  <<if _transport.vehicle and _transport.model and _transport.nearby.includes(_transport.vehicle)>>
+    <div class='characteristic-box-list'>
+      <<characteristic-box `{name: lanSwitch('Condition', '车况'), currentValue: _transport.vehicle.condition, description: Math.floor(_transport.vehicle.condition) + '%', color: _transport.vehicle.condition >= 50 ? 'green' : _transport.vehicle.condition >= 25 ? 'blue' : 'red', modifier: 100, modTypes: {good: [], bad: []}}`>>
+      <<if _transport.model.tank gt 0>>
+        <<characteristic-box `{name: lanSwitch('Fuel', '油量'), currentValue: _transport.vehicle.fuel / _transport.model.tank * 100, description: _transport.vehicle.fuel.toFixed(1) + ' / ' + _transport.model.tank + ' L', color: _transport.vehicle.fuel >= _transport.model.tank / 4 ? 'blue' : 'red', modifier: 100, modTypes: {good: [], bad: []}}`>>
+      <</if>>
+    </div>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-transport-skill'>>
+  <<characteristic-box `{name: lanSwitch('Driving', '驾驶'), currentValue: maplebirch.get('Transport').state.driving, displayType: 'grade', modifier: 100, modTypes: {good: [], bad: []}, states: [{requiredValue: 0, level: lanSwitch('None', '无'), color: 'red'}, {requiredValue: 1, level: 'F', color: 'red'}, {requiredValue: 100, level: 'E', color: 'pink'}, {requiredValue: 200, level: 'D', color: 'purple'}, {requiredValue: 400, level: 'C', color: 'lblue'}, {requiredValue: 600, level: 'B', color: 'blue'}, {requiredValue: 800, level: 'A', color: 'teal'}, {requiredValue: 1000, level: 'S', color: 'green'}]}`>>
+<</widget>>
+
+<<widget 'deadwood-transport-journal'>>
+  <<set _transport_state to maplebirch.get('Transport').state>>
+  <<if _transport_state.vehicles.length>>
+    <h3><<lanSwitch 'Vehicles' '载具'>></h3>
+    <<for _owned range _transport_state.vehicles>>
+      <<set _owned_model to maplebirch.get('Transport').catalog.models.find(model => model.id === _owned.model)>>
+      <<icon `'transport/' + _owned_model.id + '.png'`>>
+      <<= maplebirch.t(_owned_model.name)>> —
+      <<if _owned.garage>>
+        <<lanSwitch 'In a garage, ' '存放在车库，'>>
+      <</if>>
+      <<print maplebirch.get('Transport').catalog.name(_owned.point)>><br>
+    <</for>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-transport-notice'>>
+  <<set _transport_state to maplebirch.get('Transport').state>>
+  <<switch _transport_state.notice>>
+    <<case 'bought'>>
+      <<language>>
+        <<option 'EN'>>
+          <<if $Transport.shop is 'bicycle'>>
+            The shopkeeper wheels your bicycle to the door and hands you the receipt.
+          <<else>>
+            The clerk hands you the keys and points out your vehicle on the forecourt.
+          <</if>>
+        <<option 'CN'>>
+          <<if $Transport.shop is 'bicycle'>>
+            店主把你的自行车推到门边，将收据递给你。
+          <<else>>
+            店员把钥匙递给你，指了指停在门前的载具。
+          <</if>>
+      <</language>>
+    <<case 'repaired'>>
+      <<language>>
+        <<option 'EN'>>
+          <<if $Transport.shop is 'bicycle'>>
+            The shopkeeper spins the wheels and tests the brakes before taking your bicycle off the stand.
+          <<else>>
+            The mechanic checks the brakes one last time before handing it back.
+          <</if>>
+        <<option 'CN'>>
+          <<if $Transport.shop is 'bicycle'>>
+            店主转了转车轮，又试了一遍刹车，将自行车从支架上放下来。
+          <<else>>
+            修理工最后检查了一遍刹车，把车交还给你。
+          <</if>>
+      <</language>>
+    <<case 'fuelled'>>
+      <<lanSwitch 'The tank is full.' '油箱加满了。'>>
+    <<case 'parked'>>
+      <<lanSwitch 'You leave your vehicle in the garage.' '你把载具停进车库。'>>
+    <<case 'taken'>>
+      <<lanSwitch 'You take your vehicle out of the garage.' '你把载具移出车库。'>>
+    <<case 'sold'>>
+      <<language>>
+        <<option 'EN'>>
+          <<if $Transport.shop is 'bicycle'>>
+            The shopkeeper counts out your payment and props the bicycle beside the counter.
+          <<else>>
+            The clerk counts out your payment and takes the keys.
+          <</if>>
+        <<option 'CN'>>
+          <<if $Transport.shop is 'bicycle'>>
+            店主点清款项，把自行车靠在柜台旁。
+          <<else>>
+            店员点清款项，收走了钥匙。
+          <</if>>
+      <</language>>
+    <<case 'helmet'>>
+      <<lanSwitch 'You try on the helmet and fasten the strap under your chin.' '你戴上头盔，扣好下巴处的系带。'>>
+    <<case 'recovered'>>
+      <<language>>
+        <<option 'EN'>>
+          You wait by the counter. An hour later, your vehicle is brought to the door.
+        <<option 'CN'>>
+          你在柜台旁等着。一小时后，有人把你的载具运到了门前。
+      <</language>>
+    <<case 'delivered'>>
+      <<language>>
+        <<option 'EN'>>
+          You check the delivery address. The attendant seals the cans and loads them onto a van.
+          When the driver returns, they hand you the delivery slip.
+        <<option 'CN'>>
+          你核对了送货地址。工作人员封好油桶，把它们搬到送货车上。
+          等司机回来，送货单也递到了你手里。
+      <</language>>
+    <<case 'refilled'>>
+      <<language>>
+        <<option 'EN'>>
+          You unscrew the fuel cap and pour petrol through a funnel. You cap the can and put it back on the shelf.
+        <<option 'CN'>>
+          你拧开油箱盖，用漏斗倒入燃油。盖好油桶后，你把它放回架子上。
+      <</language>>
+  <</switch>>
+  <<if _transport_state.notice>><br><br><</if>>
+<</widget>>
+
+<<widget 'deadwood-transport-return'>>
+  <<set _return_passage to $Transport.return_passage, _return_source to $passage, _return_minutes to 0>>
+  <<if $passage is 'Deadwood Transport Menu' and $Transport.shop>>
+    <<set _return_passage to maplebirch.get('Transport').shopPassage>>
+  <<elseif $passage is 'Deadwood Transport Menu' and _return_passage is 'Shopping Centre'>>
+    <<set _return_minutes to 2>>
+  <<elseif $passage is 'Deadwood Transport School'>>
+    <<set _return_passage to 'Elk Street', _return_minutes to 2>>
+  <<elseif _return_passage is 'Harvest Street' and ['Deadwood Transport Dealer', 'Deadwood Transport Buy', 'Deadwood Transport Service', 'Deadwood Transport Sell'].includes($passage)>>
+    <<set _return_passage to 'Deadwood Transport Motors'>>
+  <<elseif ['Deadwood Transport Motors', 'Deadwood Transport Dealer', 'Deadwood Transport Buy', 'Deadwood Transport Service', 'Deadwood Transport Sell', 'Deadwood Transport Petrol'].includes($passage)>>
+    <<set _return_minutes to $Transport.shop is 'bicycle' ? 1 : $Transport.shop is 'petrol' ? 3 : 2>>
+  <</if>>
+  <<capture _return_passage _return_source _return_minutes>>
+    <<getouticon>><<lanLink `lanSwitch('Return', '返回') + (_return_minutes ? ' (0:' + String(_return_minutes).padStart(2, '0') + ')' : '')`>>
+      <<if _return_minutes gt 0>>
+        <<pass _return_minutes>>
+      <</if>>
+      <<if $passage is _return_source>>
+        <<if ['Forest', 'Moor'].includes(_return_passage)>>
+          <<set $eventskip to 1>>
+        <</if>>
+        <<goto _return_passage>>
+      <</if>>
+    <</lanLink>>
+  <</capture>>
+<</widget>>

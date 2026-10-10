@@ -38,6 +38,8 @@ import Hint_Orchard_CN from '@/assets/hint/CN/Orchard.md';
 import Hint_Orchard_EN from '@/assets/hint/EN/Orchard.md';
 import Hint_BirdTower_CN from '@/assets/hint/CN/BirdTower.md';
 import Hint_BirdTower_EN from '@/assets/hint/EN/BirdTower.md';
+import Hint_Transport_CN from '@/assets/hint/CN/Transport.md';
+import Hint_Transport_EN from '@/assets/hint/EN/Transport.md';
 import Hint_Credits_CN from '@/assets/hint/CN/Credits.md';
 import Hint_Credits_EN from '@/assets/hint/EN/Credits.md';
 import { defaults } from './constants';
@@ -63,6 +65,7 @@ const guideSections = {
   LifeSimulation:                    { EN: Hint_LifeSimulation_EN                   , CN: Hint_LifeSimulation_CN                   , title: { EN: 'Life Simulation'             , CN: '模拟人生' } },
   Orchard:                           { EN: Hint_Orchard_EN                          , CN: Hint_Orchard_CN                          , title: { EN: 'Orchard'                      , CN: '果园' } },
   BirdTower:                         { EN: Hint_BirdTower_EN                        , CN: Hint_BirdTower_CN                        , title: { EN: 'Bird Tower'                  , CN: '高塔扩展' } },
+  Transport:                         { EN: Hint_Transport_EN                        , CN: Hint_Transport_CN                        , title: { EN: 'Transport'                   , CN: '交通' } },
   DynamicMusic:                      { EN: Hint_DynamicMusic_EN                     , CN: Hint_DynamicMusic_CN                     , title: { EN: 'Dynamic Music'               , CN: '动态音乐' } },
   Credits:                           { EN: Hint_Credits_EN                          , CN: Hint_Credits_CN                          , title: { EN: 'Credits and sources'         , CN: '致谢与素材来源' } }
 } as const;
@@ -76,6 +79,7 @@ const guideOrder = [
   'LifeSimulation',
   'Orchard',
   'BirdTower',
+  'Transport',
   'Finance',
   'VanillaPlus',
   'CelestialAnomalies',
@@ -266,6 +270,23 @@ class DeadwoodReblooms extends Module {
     } catch (error) {
       this.log('Failed to migrate Deadwood module settings', 'ERROR', error);
     }
+    this.core.once(':modLoaderEnd', async () => {
+      const selector = window.addonBeautySelectorAddon;
+      if (!selector) return;
+      try {
+        await selector.iniCustomStore();
+        const saved = await selector.IdbKeyValRef.keyval_get(selector.BeautySelectorAddon_OrderSaveKey, selector.customStore);
+        const packs = selector.getTypeOrder();
+        if (!packs.some(item => item.type === 'Deadwood-Reblooms-Images')) return;
+        const previous = packs.filter(item => item.type === 'Images' || selector.type0ModNameList.includes(item.modRef.name));
+        if (saved != null && saved !== JSON.stringify(previous.map(item => item.type))) return;
+        const order = packs.filter(item => !['Deadwood-Reblooms-Fem-Goose-Compilation', 'Deadwood-Reblooms-Mysterious'].includes(item.type));
+        await selector.saveOrder(order.map(item => item.type));
+        selector.typeOrderUsed = order;
+      } catch (error) {
+        this.log('Failed to initialise the default image pack', 'WARN', error);
+      }
+    });
     this.baileyRent.preInit();
     this.core.tool.onInit(() => setup.maplebirch.hint.push('<<= maplebirch.get("DeadwoodReblooms").wiki>>'));
     this.core.once(':storyready', () => {

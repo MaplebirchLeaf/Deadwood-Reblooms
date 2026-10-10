@@ -240,7 +240,7 @@
 <<if _management.rented or _management.auction_day isnot null or _estate.isFrozen(_property.id)>>
   <span class='red'><<lanSwitch 'Work cannot begin while the property is occupied by tenants, awaiting auction or frozen.' '房屋出租、等待拍卖或被冻结期间，不能安排扩建。'>></span><br>
 <</if>>
-<<dynamicblock 'id=deadwood-property-extensions'>>
+<<deadwood-dynamicblock 'deadwood-property-extensions'>>
 <div class='deadwood-card-grid'>
   <<for _extension range _property.extensions>>
     <<capture _property _extension>>
@@ -269,7 +269,7 @@
     <</capture>>
   <</for>>
 </div>
-<</dynamicblock>>
+<</deadwood-dynamicblock>>
 <<getouticon>><<lanLink ['Return to the property desk', '返回房产柜台'] 'Deadwood Reblooms Property Office'>><</lanLink>>
 <</nobr>>
 
@@ -352,7 +352,7 @@
     <<icon _facility.icon>><<lanLink ['Change into swimwear', '换上泳衣'] 'Deadwood Reblooms Property Pool Outfits'>><</lanLink>><br>
     <<icon _facility.icon>><<lanLink ['Undress and swim (0:20)', '脱衣游泳 (0:20)'] 'Deadwood Reblooms Property Swim'>><<set $Finance.real_estate.pool_clothing to 'nude'>><<deadwood-home-activity 'pool' 'swim'>><</lanLink>><<gswimming>><<gphysique>><<gtiredness>><<lstress>><br>
   <</if>>
-  <<dynamicblock 'id=deadwood-home-pool-invitations'>>
+  <<deadwood-dynamicblock 'deadwood-home-pool-invitations'>>
     <!-- 泳池同时是亲密场合：同住的恋人可以只身赴约，愿意三人局的两人也可以一起下水。 -->
     <<set _pool_companion to _pool_household.home.find(resident => resident.id === $Finance.real_estate.room_companion)>>
     <<if _pool_companion and _estate.canIntimate(_pool_companion.id, _property.id, 'pool')>>
@@ -371,7 +371,7 @@
         <</lanLink>><<promiscuous2>><<kissvirginitywarning>><<for _pool_name range _pool_pair_names>><<NPCvirginitywarning _pool_name 'kiss'>><</for>><br>
       <</capture>>
     <</if>>
-  <</dynamicblock>>
+  <</deadwood-dynamicblock>>
 <</if>>
 <br><<deadwood-home-exit 'pool'>>
 
@@ -426,4 +426,7 @@
   <<option 'EN'>>There is space for <<if _facility.parking.motor_vehicle gt 0>><span class='teal'><<= _facility.parking.motor_vehicle>> <<if _facility.parking.motor_vehicle is 1>>motor vehicle<<else>>motor vehicles<</if>></span>, <</if>><<if _facility.parking.motorcycle gt 0>><span class='teal'><<= _facility.parking.motorcycle>> <<if _facility.parking.motorcycle is 1>>motorcycle<<else>>motorcycles<</if>></span> and <</if>><span class='teal'><<= _facility.parking.bicycle>> bicycles</span>. You keep the doors clear and hang the spare keys inside the house.
   <<option 'CN'>>这里可停放<<if _facility.parking.motor_vehicle gt 0>><span class='teal'><<= _facility.parking.motor_vehicle>>辆机动车</span>、<</if>><<if _facility.parking.motorcycle gt 0>><span class='teal'><<= _facility.parking.motorcycle>>辆摩托车</span>和<</if>><span class='teal'><<= _facility.parking.bicycle>>辆自行车</span>。你没有在门前堆东西，备用钥匙挂在屋里。
 <</language>><br><br>
+<<if maplebirch.get('Transport')>>
+  <<deadwood-transport-garage>><br>
+<</if>>
 <<deadwood-home-exit 'garage'>>

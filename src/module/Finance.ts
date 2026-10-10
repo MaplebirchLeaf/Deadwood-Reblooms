@@ -166,7 +166,8 @@ const MERCHANT_SOURCES = new Set([
   'supermarket',
   'tailor',
   'tattoo',
-  'toyShop'
+  'toyShop',
+  'transport'
 ]);
 const MERCHANT_LOCATIONS = new Set(['hospital', 'shopping_centre']);
 
@@ -272,6 +273,7 @@ class Finance extends Module {
       if (item.symbol === 'ALF') return Number(V.farm_stage) >= 7;
       if (item.symbol === 'RDS') return !!this.core.get('Robin')?.state?.shop || (V.Finance?.market?.prices?.RDS ?? 0) > 0;
       if (item.symbol === 'CSN') return !!this.core.get('LifeSimulation')?.casino || (V.Finance?.market?.prices?.CSN ?? 0) > 0;
+      if (item.symbol === 'HSG') return !!this.core.get('Transport') || (V.Finance?.market?.prices?.[item.symbol] ?? 0) > 0;
       return true;
     });
   }

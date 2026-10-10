@@ -4,6 +4,11 @@ import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 export default function DoLP(core: MaplebirchCore): void {
   core.once(':addon:beforePatch', () => {
+    const transport = core.get('Transport');
+    if (transport) {
+      const passages = core.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map;
+      transport.external_bicycle = passages.has('Bike Depot') && passages.has('Widgets Bike');
+    }
     if (!core.get('VanillaPlus')) return;
     const mirror = core.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Mirror');
     // DoLP 已分别列出各神圣形态的部件，仅原版互斥菜单需要拆分。

@@ -26,7 +26,7 @@ export default class GymCoach {
 
   /** 疲劳或疼痛时先舒缓，否则补足较少练习的项目。 */
   public get suggestion(): Routine {
-    if (V.tiredness >= V.tirednessmax * 0.6 || V.pain >= 40 || Time.days - (this.npc?.gym_last_day ?? Time.days) >= 7) return 'stretch';
+    if (V.tiredness >= C.tiredness.max * 0.6 || V.pain >= 40 || Time.days - (this.npc?.gym_last_day ?? Time.days) >= 7) return 'stretch';
     const training = this.npc?.gym_training;
     if ((training?.weights ?? 0) > (training?.run ?? 0)) return 'run';
     return 'weights';

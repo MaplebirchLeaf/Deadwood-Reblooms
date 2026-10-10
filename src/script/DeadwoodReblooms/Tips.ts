@@ -66,6 +66,14 @@ export default function Tips(core: typeof maplebirch): void {
       ['Fruit set aside for an order may be worth more than a quick sale.', '有订单等着交货时，留下一些水果也许比急着卖掉更划算。']
     );
 
+  if (core.get('Transport'))
+    add(
+      'general',
+      ['Vehicles stay where you park them. A garage can collect one for a fee.', '载具会留在停放的位置。修车厂可以收费替你取车。'],
+      ['A mountain bicycle can follow forest trails that are too narrow for a car.', '山地自行车能沿林间小径前进，汽车只能留在街边。'],
+      ['Familiarity with the roads shortens your journeys. Rain and snow still slow you down.', '驾驶熟练后，路上花的时间会变短。雨雪天仍要慢行。']
+    );
+
   if (core.get('BirdTower')) add('general', ['Hawk chicks grow quickly. There may be something new to see when you return to the nest.', '小鹰长得很快。下次回巢，也许就能看到新的变化。']);
 
   if (core.get('MoreLoveInterestsAndNPCAvatars'))

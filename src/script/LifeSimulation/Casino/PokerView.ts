@@ -54,7 +54,11 @@ class TableView {
     }
     this.core.SugarCube.Wikifier.wikifyEval(`<<deadwood-casino-table-action '${this.mode}' '${action}' ${amount}>>`);
     const passage = this.mode === 'holdem' ? holdemPassage : threeCardPassage;
-    if (this.core.passage.title === passage) this.core.SugarCube.Engine.play(action === 'cashout' ? casinoPassage : passage);
+    if (this.core.passage.title === passage) {
+      if ((this.mode === 'holdem' && action === 'join') || (this.mode === 'three' && ['ante', 'look'].includes(action))) {
+        this.core.SugarCube.Wikifier.wikifyEval(`<<run Dynamic.render('${this.mode === 'holdem' ? 'deadwood-holdem-panel' : 'deadwood-three-card-panel'}')>>`);
+      } else this.core.SugarCube.Engine.play(action === 'cashout' ? casinoPassage : passage);
+    }
   }
 
   private cards(parent: HTMLElement, cards: readonly PlayingCard[], visible: boolean, placeholders = 0, peek = false): void {

@@ -1,6 +1,6 @@
 :: Deadwood Reblooms Orchard Trade []
-<<set $_orchard to maplebirch.get('Orchard')>>
-<<if !$_orchard or !$_orchard.available($Orchard.site)>>
+<<set _orchard to maplebirch.get('Orchard')>>
+<<if !_orchard or !_orchard.available($Orchard.site)>>
   <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Orchard'>><</lanLink>><<exit>>
 <</if>>
 <<set $outside to 1>>
@@ -18,16 +18,16 @@
   <</if>>
   <<exit>>
 <</if>>
-<<if $Orchard.site is 'farm' and $_orchard.farmInterrupted>>
+<<if $Orchard.site is 'farm' and _orchard.farmInterrupted>>
   <<lanSwitch 'There is trouble in the fields. The deliveries will have to wait.' '田地出了事，交货得先放一放。'>><br>
   <<getouticon>><<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>><<exit>>
 <</if>>
 <h3><<lanSwitch 'Fruit inventory and sales' '水果库存与销售'>></h3>
 <<lanSwitch 'You check your fruit and decide what to sell.' '你检查手头的水果，决定拿出哪些去卖。'>><br><br>
-<<dynamicblock 'id=deadwood-orchard-trade-ledger'>>
-<<set $_orchard to maplebirch.get('Orchard')>>
+<<deadwood-dynamicblock 'deadwood-orchard-trade-ledger'>>
+<<set _orchard to maplebirch.get('Orchard')>>
 <<if $Orchard.site is 'farm'>>
-  <<if $_orchard.canDeliver>>
+  <<if _orchard.canDeliver>>
     <<npc Alex>><<person1>>
     <<language>>
       <<option 'EN'>>
@@ -40,39 +40,39 @@
       Bulk deliveries pay less than selling at the market stall. Remaining capacity today:
       <<option 'CN'>>
       批量交货的收购价低于集市售价。今天还能收购：
-    <</language>><<= $_orchard.deliveryRemaining>><br>
+    <</language>><<= _orchard.deliveryRemaining>><br>
   <<else>>
     <<lanSwitch 'Alex cannot arrange a delivery right now.' '艾利克斯现在无法安排交货。'>><br>
   <</if>>
 <</if>>
 <<set _orchardKeep to {}>>
-<<for $_fruit range $_orchard.stock>>
-  <<capture $_fruit>>
-    <br><<foodstufficon $_fruit.type>><b><<print setup.foodstuff[$_fruit.type].name>></b> × <<= $_fruit.amount>><br>
-    <<set $_display_label to $foodstuff[$_fruit.type].marketStall is false ? ['Display at the market stall', '在集市摆出'] : ['Keep off the market stall', '不在集市摆出']>>
-    <<lanLink $_display_label>>
-      <<run maplebirch.get('Orchard').displayFruit($_fruit.type)>><<run Dynamic.render('deadwood-orchard-trade-ledger')>>
+<<for _fruit range _orchard.stock>>
+  <<capture _fruit>>
+    <br><<foodstufficon _fruit.type>><b><<print setup.foodstuff[_fruit.type].name>></b> × <<= _fruit.amount>><br>
+    <<set _display_label to $foodstuff[_fruit.type].marketStall is false ? ['Display at the market stall', '在集市摆出'] : ['Keep off the market stall', '不在集市摆出']>>
+    <<lanLink _display_label>>
+      <<run maplebirch.get('Orchard').displayFruit(_fruit.type)>><<run Dynamic.render('deadwood-orchard-trade-ledger')>>
     <</lanLink>><br>
-    <<set _orchardKeep[$_fruit.type] to $_fruit.reserve>>
-    <<set $_reserve_variable to '_orchardKeep.' + $_fruit.type>>
-    <<lanSwitch 'Keep at least: ' '至少保留：'>><<numberbox $_reserve_variable $_fruit.reserve>>
+    <<set _orchardKeep[_fruit.type] to _fruit.reserve>>
+    <<set _reserve_variable to '_orchardKeep.' + _fruit.type>>
+    <<lanSwitch 'Keep at least: ' '至少保留：'>><<numberbox _reserve_variable _fruit.reserve>>
     <<lanLink ['Save', '保存']>>
-      <<run maplebirch.get('Orchard').keepFruit($_fruit.type, Number(T.orchardKeep[$_fruit.type]))>><<run Dynamic.render('deadwood-orchard-trade-ledger')>>
+      <<run maplebirch.get('Orchard').keepFruit(_fruit.type, Number(T.orchardKeep[_fruit.type]))>><<run Dynamic.render('deadwood-orchard-trade-ledger')>>
     <</lanLink>><br>
-    <<if $_orchard.canDeliver and $_orchard.deliveryRemaining gt 0 and $_fruit.amount gt $_fruit.reserve>>
-      <<lanSwitch 'Bulk price per fruit: ' '每个水果收购价：'>><<printmoney $_fruit.price>><br>
-      <<set $_deliverAmount to Math.min($_fruit.amount - $_fruit.reserve, $_orchard.deliveryRemaining)>>
-      <<capture $_deliverAmount>>
+    <<if _orchard.canDeliver and _orchard.deliveryRemaining gt 0 and _fruit.amount gt _fruit.reserve>>
+      <<lanSwitch 'Bulk price per fruit: ' '每个水果收购价：'>><<printmoney _fruit.price>><br>
+      <<set _deliverAmount to Math.min(_fruit.amount - _fruit.reserve, _orchard.deliveryRemaining)>>
+      <<capture _deliverAmount>>
         <<icon 'orchard/dispatch.png'>><<lanLink ['Deliver the surplus (0:30)', '交付多余水果 (0:30)']>>
-          <<set $_delivery_passage to maplebirch.passage.title>>
-          <<if maplebirch.get('Orchard').deliver($_fruit.type, $_deliverAmount)>>
-            <<set $_delivery_minutes to maplebirch.get('Orchard').deliveryMinutes>>
-            <<pass $_delivery_minutes>><<updatesidebarmoney>>
-            <<if maplebirch.passage.title is $_delivery_passage>><<run maplebirch.SugarCube.Engine.show()>><</if>>
+          <<set _delivery_passage to maplebirch.passage.title>>
+          <<if maplebirch.get('Orchard').deliver(_fruit.type, _deliverAmount)>>
+            <<set _delivery_minutes to maplebirch.get('Orchard').deliveryMinutes>>
+            <<pass _delivery_minutes>><<updatesidebarmoney>>
+            <<if maplebirch.passage.title is _delivery_passage>><<run maplebirch.SugarCube.Engine.show()>><</if>>
           <<else>>
             <<run Dynamic.render('deadwood-orchard-trade-ledger')>>
           <</if>>
-        <</lanLink>><<lanSwitch ' Quantity: ' ' 数量：'>><<= $_deliverAmount>><br>
+        <</lanLink>><<lanSwitch ' Quantity: ' ' 数量：'>><<= _deliverAmount>><br>
       <</capture>>
     <</if>>
   <</capture>>
@@ -89,23 +89,23 @@
   <<option 'CN'>>
   此账目记录启用账本后的款项。原版其它集市收入和共用肥料的购买不计入此处。
 <</language>><br><br>
-<<for $_sale range $Orchard.sales.slice().reverse()>>
-  <<lanSwitch 'Day ' '第 '>><<= $_sale.day>><<lanSwitch ': ' ' 天：'>>
-  <<if $_sale.source is 'shop'>>
+<<for _sale range $Orchard.sales.slice().reverse()>>
+  <<lanSwitch 'Day ' '第 '>><<= _sale.day>><<lanSwitch ': ' ' 天：'>>
+  <<if _sale.source is 'shop'>>
     <<lanSwitch 'Drinks shop' '饮品店'>>
-  <<elseif $_sale.source is 'market'>>
+  <<elseif _sale.source is 'market'>>
     <<lanSwitch 'Market regular' '集市熟客'>>
-  <<elseif $_sale.source is 'haul'>>
+  <<elseif _sale.source is 'haul'>>
     <<lanSwitch 'Morning delivery (bank payment)' '早班运输（银行到账）'>>
-  <<elseif $_sale.source is 'farm'>>
+  <<elseif _sale.source is 'farm'>>
     <<lanSwitch 'Farm delivery' '农场交货'>>
   <<else>>
     <<lanSwitch 'Sale' '销售'>>
   <</if>>
-  — <<foodstufficon $_sale.type>><<= $_sale.amount>> — <<printmoney $_sale.income>><br>
+  — <<foodstufficon _sale.type>><<= _sale.amount>> — <<printmoney _sale.income>><br>
 <</for>>
-<<if $Orchard.site is 'farm' and $_orchard.canDeliver>>
+<<if $Orchard.site is 'farm' and _orchard.canDeliver>>
   <br><<icon 'orchard/contract.png'>><<lanLink ['Discuss a weekly fruit contract', '商量一周的水果长单'] 'Deadwood Orchard Farm Contract'>><</lanLink>><br>
 <</if>>
-<</dynamicblock>>
+<</deadwood-dynamicblock>>
 <br><<getouticon>><<lanLink ['Return to the orchard', '返回果园'] 'Deadwood Reblooms Orchard'>><</lanLink>>
