@@ -2,8 +2,9 @@
 
 <!-- 原版首次借宿会被凯拉尔的父母带走。只有经历过该事件，才出现常规留宿入口。 -->
 <<widget 'deadwood-reblooms-kylar-bedroom-links'>>
-  <<if $kylar_sleep_abduction is 1 and $KylarExpansion>>
-    <<set _kylarAtManor to maplebirch.get('Kylar').atManor>>
+  <<set $_kylarExpansion to maplebirch.get('Kylar')>>
+  <<if $_kylarExpansion and $kylar_sleep_abduction is 1 and $KylarExpansion>>
+    <<set _kylarAtManor to $_kylarExpansion.atManor>>
     <<if !$KylarExpansion.stay_invited and isLoveInterest('Kylar') and _kylarAtManor>>
       <<socialiseicon 'ask'>><<lanLink ['Ask Kylar if you can stay again', '问凯拉尔以后能否留宿'] 'Deadwood Reblooms Kylar Stay Invitation'>><</lanLink>><br><br>
     <<elseif $KylarExpansion.stay_invited>>
@@ -20,7 +21,7 @@
           <<option 'CN'>>
             <<bedicon 'kylar'>><<link '脱衣上床' 'Deadwood Reblooms Kylar Bed'>><<undressSleep 'kylar manor bed'>><</link>>
         <</language>><br>
-        <<run maplebirch.get('Kylar').openWardrobe()>>
+        <<run $_kylarExpansion.openWardrobe()>>
         <<set $storeLocation to 'kylar manor bed'>>
         <<wardrobeSelection true>>
         <<if !$earSlime.alwaysSleepNaked or $hypnosis_traits.silence>>
@@ -61,13 +62,13 @@
 
 <!-- 起床后去公园或街机厅前的花园空档，不覆盖学校日程。 -->
 <<widget 'deadwood-reblooms-kylar-yard-link'>>
-  <<if maplebirch.get('Kylar').canGarden and $exposed lte 0 and !pcAreArmsBound('both')
+  <<if maplebirch.get('Kylar')?.canGarden and $exposed lte 0 and !pcAreArmsBound('both')
     and $KylarExpansion.yard_day isnot Time.days>>
     <<socialiseicon>><<lanLink ['Find Kylar in the garden (0:20)', '到花园找凯拉尔 (0:20)'] 'Deadwood Reblooms Kylar Yard'>><</lanLink>><br><br>
   <</if>>
 <</widget>>
 <<widget 'deadwood-reblooms-kylar-kitchen-link'>>
-  <<if $KylarExpansion?.stay_invited and !pcAreArmsBound('both') and $KylarExpansion.tea_day isnot Time.days>>
+  <<if maplebirch.get('Kylar') and $KylarExpansion?.stay_invited and !pcAreArmsBound('both') and $KylarExpansion.tea_day isnot Time.days>>
     <<kitchenicon 'stove'>><<lanLink ['Make tea (0:10)', '泡一杯茶 (0:10)'] 'Deadwood Reblooms Kylar Kitchen Tea'>><</lanLink>><br><br>
   <</if>>
 <</widget>>
