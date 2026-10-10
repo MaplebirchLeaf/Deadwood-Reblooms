@@ -142,12 +142,40 @@
   <<socialiseicon>><<lanLink ['Ask Kylar what they were planning', '问凯拉尔本来想做什么'] 'Deadwood Reblooms Kylar Yard Ask'>><<set $phase to 'kylar-yard-ask'>><</lanLink>><br>
   <<if isLoveInterest('Kylar')>>
     <<loveicon>><<lanLink ['Kneel and help Kylar trim the hedge', '蹲下来帮凯拉尔一起剪'] 'Deadwood Reblooms Kylar Yard Help'>><<set $phase to 'kylar-yard-help'>><</lanLink>><br>
+    <<if C.npc.Kylar.love gte 40 and $KylarExpansion.yard_intimacy isnot Time.days>>
+      <<loveicon>><<lanLink ['Pull Kylar down into the grass with you', '把凯拉尔按倒在草坪上'] 'Deadwood Reblooms Kylar Yard Intimacy'>><</lanLink>><<promiscuous2>><br>
+    <</if>>
   <</if>>
   <<if C.npc.Kylar.rage gte 50>>
     <<socialiseicon>><<lanLink ['Ask if Kylar is worried you will see someone else', '问凯拉尔是不是担心你会去找别人'] 'Deadwood Reblooms Kylar Yard Jealousy'>><<set $phase to 'kylar-yard-jealousy'>><</lanLink>><br>
   <</if>>
 <</if>>
 <br><br><<getouticon>><<lanLink ['Go back inside', '回到屋内'] 'Manor Hall'>><</lanLink>>
+
+:: Deadwood Reblooms Kylar Yard Intimacy []
+<<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>
+<<if C.npc.Kylar.state isnot 'active' or !isLoveInterest('Kylar') or $KylarExpansion.yard_intimacy is Time.days or pcAreArmsBound('both')>>
+  <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
+  <br><br><<getinicon>><<lanLink ['Go back inside', '回到屋内'] 'Manor Hall'>><</lanLink>>
+<<else>>
+  <<set $KylarExpansion.yard_intimacy to Time.days>>
+  <<npc Kylar>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      You take the shears out of Kylar's hands and set them on the grass. <<He>> lets you, which is the surprising part. When you push <<him>> back onto the lawn <<he>> catches your wrist, then your shirt, and holds on rather than stopping you.
+      <br><br>
+      <span class='lewd'>The grass is damp through and neither of you cares. <<He>> pulls your hips down onto <<his>> and grinds up against you with his jaw clenched, watching your face for the moment it works. "You— you came outside for this," <<he>> says. "Not for the hedge." <<He>> gets a hand under your clothes and does not let go of you with the other one.</span>
+    <<option 'CN'>>
+      你把修枝剪从凯拉尔手里拿走，放到草地上。<<He>>居然由着你——这才是让人意外的地方。你把他推倒在草坪上时，<<he>>先攥住你的手腕，又攥住你的衣角，攥着，却没有推你。
+      <br><br>
+      <span class='lewd'>草地是湿的，你们谁都不管。<<He>>把你的胯按下来贴住自己，咬着牙往上蹭，眼睛一直盯着你的脸，等着看你什么时候受不住。“你、你出来是为了这个。”<<he>>说，“不是为了树篱。”<<He>>一只手探进你的衣服里，另一只手始终没有松开你。</span>
+  <</language>><br><br>
+  <<loveicon 'kiss'>><<lanLink ["Continue in Kylar's room (0:01)", '回凯拉尔的房间继续 (0:01)'] 'Manor Kylar Sex'>>
+    <<pass 1>><<set $outside to 0>><<location 'kylarmanor'>>
+    <<set $sexstart to 1>><<set $enemytrust += 200>><<set $sleephour to 0>><<storeon 'kylar manor bed'>><<loadTempHairStyle>>
+  <</lanLink>><<promiscuous3>><<kissvirginitywarning>><<NPCvirginitywarning 'Kylar' 'kiss'>><br>
+  <<getinicon>><<lanLink ['Go back inside', '回到屋内'] 'Manor Hall'>><</lanLink>>
+<</if>>
 
 :: Deadwood Reblooms Kylar Yard Ask []
 <<set $outside to 1>><<location 'kylarmanor_outside'>><<effects>>

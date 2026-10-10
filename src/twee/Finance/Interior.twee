@@ -245,6 +245,15 @@
 	<<else>>
 		<<bathroomicon 'bath'>><<lanLink ["Have a bath (0:30)", "泡澡 (0:30)"] 'Deadwood Reblooms Property Bath'>><<strip>><<pass 30>><<stress -6>><<set $hygiene to 0>><</lanLink>><<lstress>>
 	<</if>><br>
+	<<if !pcAreArmsBound('both')>>
+		<<bathroomicon 'shower'>><<lanLink ['Take a shower (0:10)', '冲个淋浴 (0:10)'] 'Deadwood Reblooms Property Bath'>><<pass 10>><<stress -3>><<set $hygiene to 0>><</lanLink>><<lstress>><br>
+	<</if>>
+	<<set _bath_companion to maplebirch.get("Finance").realEstate.residentsHome(_property.id).find(profile => maplebirch.get("Finance").realEstate.canIntimate(profile.id, _property.id, 'bath'))>>
+	<<if _bath_companion>>
+		<<loveicon>><<lanLink ['Bathe with your lover (0:20)', '和恋人一起泡澡 (0:20)'] 'Deadwood Reblooms Property Bath Together'>>
+			<<run maplebirch.get("Finance").realEstate.meetResident(_bath_companion.id, _property.id)>><<pass 20>>
+		<</lanLink>><<promiscuous1>><br>
+	<</if>>
 	<<personalUpkeep>>
 	<<pregnancyTest 'Deadwood Reblooms Property Bathroom'>>
 	<br>
@@ -262,6 +271,52 @@
 		<<option 'CN'>>你在自己的浴室里洗了个澡。温水流进下水道，<span class='teal'>也带走了身上的污垢</span>。
 	<</language>><br><br>
 	<<getouticon>><<lanLink ['Get out of the bath', '离开浴缸'] 'Deadwood Reblooms Property Bath Finish'>><</lanLink>>
+<</if>>
+
+:: Deadwood Reblooms Property Bath Together []
+<<set _property to maplebirch.get("Finance").realEstate.current>>
+<<set _companion to maplebirch.get("Finance").realEstate.currentCompanion>>
+<<if !_property or !_companion or !maplebirch.get("Finance").realEstate.owns(_property.id) or maplebirch.get("Finance").realEstate.managementFor(_property.id).rented>>
+	<<lanLink ["Return to the agency", "返回房产中介"] 'Deadwood Reblooms Property Office'>><</lanLink>>
+<<else>>
+	<<run maplebirch.get("Finance").realEstate.enter('bathroom')>><<effects>><<wash>>
+	<<set _bathExposed to $exposed>>
+	<<strip>>
+	<<npc _companion.id>><<person1>>
+	<<language>>
+		<<option 'EN'>>
+			"Get in with me," you say. <<He>> strips off without needing to be told twice.
+			<br><br>
+			The bath is not made for two, and it takes a little shifting before both of you fit. <<He>> works <<himself>> into the corner and pulls your head back against <<his>> knee, then starts on your hair.
+			<br><br>
+			<span class='lewd'>By the time the soap reaches your chest <<his>> hands have stopped pretending it is about washing. <<He>> drags a palm down your stomach, slow enough to feel every inch of it, and presses a knee up between your legs from behind. "Here, or the bedroom," <<he>> says into your ear, still working the soap in circles. "Pick one."</span>
+		<<option 'CN'>>
+			“你和我一起洗吧。”你说。<<He>>不用再说第二遍，就把衣服脱了。
+			<br><br>
+			浴缸不是双人用的，挤下两个人有些勉强。<<He>>往角落里挪了挪，把你的头拢到<<his>>膝盖上，先替你洗起头发。
+			<br><br>
+			<span class='lewd'>等到肥皂抹到胸口，<<his>>手就已经不打算再装作只是洗澡了。<<He>>的手掌压着你的小腹一路往下抹，慢得每一寸都摸得清楚，同时从身后用膝盖顶进你两腿之间。“在这儿，还是回卧室。”<<he>>贴着你的耳朵说，手上仍在打着圈，“挑一个。”</span>
+	<</language>><br><br>
+	<<loveicon 'kiss'>><<lanLink ['Do it here', '就在这里做'] 'Deadwood Reblooms Property Intimacy'>>
+		<<if maplebirch.get("Finance").realEstate.requestIntimacy(_companion.id, 'bath')>>
+			<<set $sexstart to 1>>
+		<</if>>
+	<</lanLink>><<promiscuous1>><<kissvirginitywarning>><<NPCvirginitywarning _companion.id 'kiss'>><br>
+	<<set _bath_residents to maplebirch.get("Finance").realEstate.residentsHome(_property.id).map(profile => profile.id)>>
+	<<set _bath_pair to maplebirch.get("Finance").realEstate.pairEligible(_bath_residents, 'bath') ? _bath_residents.slice().sort() : []>>
+	<<if _bath_pair.length is 2>>
+		<<capture _bath_pair>>
+			<<loveicon>><<lanLink ['Call the other two in', '把另外两人叫进来'] 'Deadwood Reblooms Property Pair Intimacy'>>
+				<<if maplebirch.get("Finance").realEstate.requestPair(_bath_pair, 'bath')>>
+					<<set $sexstart to 1>>
+				<</if>>
+			<</lanLink>><<promiscuous2>><<for _bath_name range _bath_pair>><<NPCvirginitywarning _bath_name 'kiss'>><</for>><br>
+		<</capture>>
+	<</if>>
+	<<towelicon>><<lanLink ['Get out and dry off', '起身擦干'] 'Deadwood Reblooms Property Bath Finish'>><<clotheson>>
+		<<set $exposed to _bathExposed>>
+	<</lanLink>><br><br>
+	<<getouticon>><<lanLink ['Return to the bathroom', '返回浴室'] 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
 <</if>>
 
 :: Deadwood Reblooms Property Bath Finish []
@@ -693,8 +748,8 @@
 				<<socialiseicon>><<lanLink ["Spend time together (0:20)", "一起待一会儿 (0:20)"] 'Deadwood Reblooms Property Evening Together'>>
 					<<run maplebirch.get("Finance").realEstate.meetResident(_guest_resident.id, _property.id)>><<pass 20>>
 				<</lanLink>><br>
-				<<loveicon 'kiss'>><<lanLink ['Ask your lover to join you in the bedroom', '请恋人到主卧陪你'] 'Deadwood Reblooms Property Bedroom'>>
-					<<run maplebirch.get("Finance").realEstate.meetResident(_guest_resident.id, _property.id)>>
+				<<loveicon 'kiss'>><<lanLink ['Take your lover through to the bedroom (0:05)', '带恋人回主卧 (0:05)'] 'Deadwood Reblooms Property Bedroom'>>
+					<<run maplebirch.get("Finance").realEstate.meetResident(_guest_resident.id, _property.id)>><<pass 5>>
 				<</lanLink>><br><br>
 			<</capture>>
 		<</for>>

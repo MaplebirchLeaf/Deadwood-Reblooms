@@ -24,6 +24,8 @@ export interface KylarExpansionState {
   yard_day: number;
   /** 上次在公园谈及凯拉尔素描的游戏日。 */
   sketch_day: number;
+  /** 上次在后院草坪与凯拉尔亲近的游戏日。 */
+  yard_intimacy: number;
   /** 上次查看素描本时的回应。 */
   sketch_response: '' | 'wait' | 'praise' | 'leave';
 }
@@ -39,6 +41,7 @@ export const DEFAULT_KYLAR_EXPANSION_STATE: KylarExpansionState = {
   night_day: -1,
   night_scene: '',
   yard_day: -1,
+  yard_intimacy: -1,
   sketch_day: -1,
   sketch_response: ''
 };

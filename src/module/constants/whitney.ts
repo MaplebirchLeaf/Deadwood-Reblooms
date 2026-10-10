@@ -15,6 +15,8 @@ export interface WhitneyExpansionState {
   flats_day: number;
   /** 上次在公寓里与惠特尼听音乐的游戏日。 */
   music_day: number;
+  /** 上次在公寓里与惠特尼进行亲密互动的游戏日。 */
+  hang_day: number;
 }
 
 export const DEFAULT_WHITNEY_EXPANSION_STATE: WhitneyExpansionState = {
@@ -22,5 +24,6 @@ export const DEFAULT_WHITNEY_EXPANSION_STATE: WhitneyExpansionState = {
   aftercare_day: -1,
   pier_day: -1,
   flats_day: -1,
-  music_day: -1
+  music_day: -1,
+  hang_day: -1
 };

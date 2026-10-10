@@ -96,15 +96,18 @@
 <<set _property to _estate.current>>
 <<set _partner to _estate.currentCompanion>>
 <<set _place to _estate.intimacyPlace>>
+<!-- 三种亲密地点共用同一段遭遇战：泳池、浴室与卧室只在进入、开场白和收尾处分开。 -->
+<<set _placeRoom to _place is 'bath' ? 'bathroom' : _place>>
+<<set _placeBack to _estate.intimacyReturn(_place)>>
+<<set _placeReturn to _estate.intimacyReturnLabel(_place)>>
 <<if !_property || !_partner || !_estate.owns(_property.id) || _estate.managementFor(_property.id).rented
   || !_estate.placeOpen(_place)
   || ($sexstart is 1 && !_estate.canIntimate(_partner.id, _property.id, _place))>>
 	<<set $sexstart to 0>>
-	<<run _estate.enter(_place)>>
-	<<lanLink [_place is 'pool' ? 'Return to the pool' : 'Return to the bedroom', _place is 'pool' ? '返回泳池' : '返回卧室'] _place is 'pool' ? 'Deadwood Reblooms Property Pool' : 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+	<<run _estate.enter(_placeRoom)>>
+	<<getouticon>><<lanLink _placeReturn _placeBack>><</lanLink>>
 <<else>>
-	<<set _poolOutdoor to _place is 'pool' and _estate.facilities.find(facility => facility.id === 'pool').outdoor>>
-	<<run _estate.enter(_place)>><<set $outside to _poolOutdoor ? 1 : 0>>
+	<<run _estate.enter(_placeRoom)>><<set $outside to _estate.intimacyOutside(_place) ? 1 : 0>>
 	<!-- 悉尼的临时状态每回合重建，沿用原版 Sydney Shopping Sex 的战斗标记。 -->
 	<<if _partner.id is 'Sydney'>>
 	  <<run statusCheck('Sydney')>><<set $corruptionEvent to 1>>
@@ -125,6 +128,8 @@
 		<<neutral 1>>
 		<<if _place is 'pool'>>
 			<<if $Finance.real_estate.pool_clothing is 'nude'>><<strip>><</if>>
+		<<elseif _place is 'bath'>>
+			<span class='lewd'><<lanSwitch 'You strip off and step in together.' '你把衣服脱在缸边，两个人一起沉进水里。'>></span><<strip>><br><br>
 		<<elseif $exposed lt 2>>
 			<span class='lewd'><<lanSwitch 'You slip out of your clothes.' '你脱下衣服。'>></span><<strip>><br><br>
 		<</if>>
@@ -153,6 +158,9 @@
 		<<if _place is 'pool'>>
 			<<water>>
 			<span class='lewd'><<lanSwitch 'You step down into the water without reaching for a towel. It carries the two of you back against the tiles.' '你没有去拿毛巾，而是踏进水里。池水把你们两个推向瓷砖池壁。'>></span>
+		<<elseif _place is 'bath'>>
+			<<water>>
+			<span class='lewd'><<lanSwitch 'The water comes up over your knees and you sit back against the slope of the tub. <<He>> follows you down, and there is barely room for the two of you to move at all.' '水面没到膝盖，你靠上浴缸的斜面坐下。<<He>>跟着你往下沉，两个人在里面几乎转不开身。'>></span>
 		<<elseif $passagePrev is 'Deadwood Reblooms Property Night Wake'>>
 			<<lanSwitch 'You turn toward your lover beneath the covers. Their body is already warm and bare against you, and it only takes one shift of a thigh for both of you to understand what this is going to be.' '你在被子下转过身，面向身边的恋人。对方的身体已经赤裸地贴着你，热得发烫，只消挪一下大腿，你们便都明白接下来会是什么。'>>
 		<<else>>
@@ -246,7 +254,9 @@
 <<set _estate to maplebirch.get("Finance").realEstate>>
 <<set _partner to _estate.currentCompanion>>
 <<set _place to _estate.intimacyPlace>>
-<<run _estate.enter(_place)>> <<if _place is 'pool'>><<set $outside to _estate.facilities.find(facility => facility.id === 'pool')?.outdoor ? 1 : 0>><</if>><<effects>>
+<<set _placeBack to _estate.intimacyReturn(_place)>>
+<<set _placeExit to _estate.intimacyExitLabel(_place)>>
+<<run _estate.enter(_place is 'bath' ? 'bathroom' : _place)>><<set $outside to _estate.intimacyOutside(_place) ? 1 : 0>><<effects>>
 <<if _partner and $combat is 1>>
 	<<person1>>
 	<<if _partner.id is 'Sydney' and $enemyarousal gte $enemyarousalmax>>
@@ -261,6 +271,7 @@
 		<<npcincr Sydney love 1>><<glove>><<sydneyFinish>>
 		<br><br>
 		<<if _place is 'pool'>><<lanSwitch 'Sydney keeps one hand on the rail and stays close until your breathing evens out.' '悉尼一只手扶着栏杆，一直贴着你，直到你的呼吸平复。'>>
+		<<elseif _place is 'bath'>><<lanSwitch 'Sydney stays where <<he>> is until your breathing settles, letting the water run over the both of you.' '悉尼没有动，任水从你们两人身上漫过，直到你的呼吸平复。'>>
 		<<else>><<lanSwitch 'Sydney stays beside you and pulls the blanket back over the bed.' '悉尼仍挨着你，把毯子重新拉好。'>><</if>>
 	<<elseif $enemyarousal lt $enemyarousalmax and $enemyhealth gt 0>>
 		<<if _partner.id is 'Sydney'>>
@@ -285,7 +296,18 @@
 			<<npcincr _partner.id love 1>><<glove>>
 				<<language>>
 					<<option 'EN'>>
-						<<if _place is 'pool'>>
+						<<if _place is 'bath'>>
+							<<switch _partner.id>>
+								<<case 'Robin'>>
+									Robin is folded up against the taps with nowhere to put <<his>> legs, still catching <<his>> breath. "<span class='green'>The water is going cold. I don't mind.</span>" <<he>> says, close to your ear.
+								<<case 'Whitney'>>
+									Whitney has one foot up on the rim of the tub and does not move it when you try to sit up. "Where do you think you're going?" <<He>> <span class='green'>pushes your shoulder back against the porcelain</span>, smug and still warm against you.
+								<<case 'Kylar'>>
+									Kylar holds on to the edge of the tub and to you, <<his>> fingers curled around yours. "<span class='teal'>You really meant it,</span>" <<he>> says, quieter than the water draining away.
+								<<case 'Sydney'>>
+									Sydney looks at <<his>> robe where it slid down the tiles, then leaves it there. "<span class='green'>Morning can wait a little longer,</span>" <<he>> says, keeping you between <<him>> and the cold end of the tub.
+							<</switch>>
+						<<elseif _place is 'pool'>>
 							<<switch _partner.id>>
 								<<case 'Robin'>>
 									Robin keeps hold of the rail with one hand and you with the other, still catching <<his>> breath. "<span class='green'>The water is warm. Can we stay in a little longer?</span>" <<he>> asks, close to your ear.
@@ -309,7 +331,18 @@
 							<</switch>>
 						<</if>>
 					<<option 'CN'>>
-						<<if _place is 'pool'>>
+						<<if _place is 'bath'>>
+							<<switch _partner.id>>
+								<<case 'Robin'>>
+									罗宾缩在水龙头那一侧，两条腿没处放，喘息还没平下来。“<span class='green'>水要凉了。我不介意。</span>”<<he>>凑在你耳边说。
+								<<case 'Whitney'>>
+									惠特尼一只脚搭在浴缸边缘，你要坐起来时，<<he>>也没挪开。“你打算去哪儿？”<<He>><span class='green'>按住你的肩膀，把你推回瓷壁上</span>，得意得很，身上仍贴着你。
+								<<case 'Kylar'>>
+									凯拉尔一只手撑着缸沿，另一只手扣着你的手。“<span class='teal'>你是认真的。</span>”<<he>>说，比水流走的声音还轻。
+								<<case 'Sydney'>>
+									悉尼看了看顺着瓷砖滑下去的修道袍，没有去捡。“<span class='green'>早晨还可以再等一会儿。</span>”<<he>>说着，把你留在<<him>>和浴缸偏冷的那一头之间。
+							<</switch>>
+						<<elseif _place is 'pool'>>
 							<<switch _partner.id>>
 								<<case 'Robin'>>
 									罗宾一只手抓着栏杆，另一只手还揽着你，喘息没有平下来。“<span class='green'>水是暖的，我们再待一会儿好吗？</span>”<<he>>凑在你耳边问。
@@ -341,6 +374,8 @@
 	<<dry>>
 	<<if $Finance.real_estate.pool_clothing is 'nude'>><<clotheson>>
 	<<elseif $Finance.real_estate.pool_clothing is 'swimwear'>><<run maplebirch.get("Finance").realEstate.openWardrobe()>><<storeon 'Deadwood Property Pool'>><<set $wear_outfit to 'none'>><</if>>
+<<elseif _place is 'bath'>>
+	<<dry>><<clotheson>>
 <<else>>
 	<<clotheson>>
 <</if>>
@@ -349,4 +384,4 @@
 <<if setup.clothingLayer.all.some(slot => $store[slot]?.some(item => item.location === 'Deadwood Property Bed'))>>
 	<<deadwood-reblooms-property-clothes-on>>
 <</if>>
-<<getouticon>><<lanLink [_place is 'pool' ? 'Climb out and dry off' : 'Return to the bedroom', _place is 'pool' ? '上岸擦干' : '返回卧室'] _place is 'pool' ? 'Deadwood Reblooms Property Pool' : 'Deadwood Reblooms Property Bedroom'>><</lanLink>>
+<<getouticon>><<lanLink _placeExit _placeBack>><</lanLink>>

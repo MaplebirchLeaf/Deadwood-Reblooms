@@ -8,6 +8,8 @@ import rentalTerms from '../../assets/finance/rentals.json';
 
 type PropertyId = string;
 type PropertyRoom = keyof Property['rooms'] | Property['extensions'][number]['id'];
+/** 亲密场景可选的地点。泳池与浴室不需要双人床，卧室仍按家具判断。 */
+export type IntimacyPlace = 'bedroom' | 'pool' | 'bath';
 type PaperKind = 'poster' | 'wallpaper';
 type FurnitureKind = PaperKind | 'bed' | 'table' | 'chair' | 'desk' | 'wardrobe' | 'decoration' | 'windowsill';
 type PropertyFurniture = { id: string; name: string; nameCap: string; cost: number; type: string[]; category: string[]; iconFile: string; description?: string; showCheck?: string; tier?: number };
@@ -35,10 +37,10 @@ export interface RealEstateState {
   flight_street: string;
   room_companion: string | null;
   pool_clothing: 'clothed' | 'nude' | 'swimwear';
-  /** 单人亲密场景的地点，泳池入口据此把同一段遭遇战放进水里。 */
-  intimacy_place: 'bedroom' | 'pool';
+  /** 单人亲密场景的地点，泳池与浴室入口据此把同一段遭遇战放进水里。 */
+  intimacy_place: IntimacyPlace;
   /** 已答应一起亲近的两位恋人，连同他们同意的地点，交给亲密场景读取。 */
-  pair_request: { names: string[]; place: 'bedroom' | 'pool' } | null;
+  pair_request: { names: string[]; place: IntimacyPlace } | null;
 }
 
 interface PropertyManagement {
@@ -310,13 +312,13 @@ class RealEstate {
     return true;
   }
 
-  /** 邀约开始前检查在家时段；卧室要求双人床，进行中的场景不随日程中止。 */
-  public canIntimate(name: string, id = this.current?.id, place: 'bedroom' | 'pool' = 'bedroom'): boolean {
+  /** 邀约开始前检查在家时段；只有卧室要求双人床，进行中的场景不随日程中止。 */
+  public canIntimate(name: string, id = this.current?.id, place: IntimacyPlace = 'bedroom'): boolean {
     return (
       !!id &&
       this.owns(id) &&
       !this.state.management[id]?.rented &&
-      (place === 'pool' || this.canShareBed(id)) &&
+      (place !== 'bedroom' || this.canShareBed(id)) &&
       window.isLoveInterest(name) &&
       this.residentsHome(id).some(profile => profile.id === name) &&
       (name !== 'Robin' || C.npc.Robin.trauma < 50)
@@ -331,7 +333,7 @@ class RealEstate {
   }
 
   /** 两位同住恋人是否愿意三人局：都在家、不互相拒绝，且属于有相应分支的组合。 */
-  public pairEligible(names: readonly string[], place: 'bedroom' | 'pool' = 'bedroom'): boolean {
+  public pairEligible(names: readonly string[], place: IntimacyPlace = 'bedroom'): boolean {
     const pair = [...names].sort();
     if (pair.length !== 2 || pair[0] === pair[1]) return false;
     if (this.householdRefusal(pair)) return false;
@@ -339,13 +341,15 @@ class RealEstate {
     return pair.every(name => this.canIntimate(name, this.current?.id, place));
   }
 
-  /** 泳池或卧室能否作为本次亲密地点：泳池还要求已扩建且水可用。 */
-  public placeOpen(place: 'bedroom' | 'pool'): boolean {
-    return place === 'bedroom' || this.poolOpen;
+  /** 泳池与浴室能否作为本次亲密地点：泳池还要求已扩建且水可用；浴室按房产既有房间判断。 */
+  public placeOpen(place: IntimacyPlace): boolean {
+    if (place === 'pool') return this.poolOpen;
+    if (place === 'bath') return !!this.current && this.floorOf('bathroom') !== undefined;
+    return true;
   }
 
   /** 记录单人亲密场景的对象与地点；入口一律经此登记，读档或跨回合后仍能返回原处。 */
-  public requestIntimacy(name: string, place: 'bedroom' | 'pool' = 'bedroom'): boolean {
+  public requestIntimacy(name: string, place: IntimacyPlace = 'bedroom'): boolean {
     if (!this.placeOpen(place)) return false;
     if (!this.canIntimate(name, this.current?.id, place)) return false;
     if (!this.meetResident(name, this.current!.id)) return false;
@@ -355,12 +359,37 @@ class RealEstate {
     return true;
   }
 
-  public get intimacyPlace(): 'bedroom' | 'pool' {
+  public get intimacyPlace(): IntimacyPlace {
     return this.state.intimacy_place ?? 'bedroom';
   }
 
+  /** 亲密场景结束后回到哪个页面。浴室回浴室，泳池回泳池，卧室回主卧。 */
+  public intimacyReturn(place: IntimacyPlace): string {
+    if (place === 'pool') return 'Deadwood Reblooms Property Pool';
+    if (place === 'bath') return 'Deadwood Reblooms Property Bathroom';
+    return 'Deadwood Reblooms Property Bedroom';
+  }
+
+  public intimacyReturnLabel(place: IntimacyPlace): readonly [string, string] {
+    if (place === 'pool') return ['Return to the pool', '返回泳池'];
+    if (place === 'bath') return ['Return to the bathroom', '返回浴室'];
+    return ['Return to the bedroom', '返回卧室'];
+  }
+
+  public intimacyExitLabel(place: IntimacyPlace): readonly [string, string] {
+    if (place === 'pool') return ['Climb out and dry off', '上岸擦干'];
+    if (place === 'bath') return ['Climb out and towel off', '起身擦干'];
+    return ['Return to the bedroom', '返回卧室'];
+  }
+
+  /** 只有露天泳池会把场景判为室外；浴室与卧室始终在室内。 */
+  public intimacyOutside(place: IntimacyPlace): boolean {
+    if (place !== 'pool') return false;
+    return !!this.facilities.find(facility => facility.id === 'pool')?.outdoor;
+  }
+
   /** 记下已答应三人局的两位恋人及地点，交给亲密场景读取。 */
-  public requestPair(names: readonly string[], place: 'bedroom' | 'pool'): boolean {
+  public requestPair(names: readonly string[], place: IntimacyPlace): boolean {
     if (!this.pairEligible(names, place) || !this.placeOpen(place)) return false;
     this.state.pair_request = { names: [...names].sort(), place };
     return true;
