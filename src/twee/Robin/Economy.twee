@@ -1091,7 +1091,30 @@
 <<if maplebirch.get('Robin').flowers.buyFromShop(_flowerType)>>
   <<money `-_flowerPrice` 'shopping'>><<pass 5>><<lanSwitch 'The attendant wraps the stem in paper so it will not bruise on the way home. You can find it with your other flowers.' '店员给花枝包上一层纸，免得路上碰伤。它已经放进你的鲜花库存。'>>
   <<deadwood-robin-sale-event 'shop'>>
-<<else>><<lanSwitch 'That flower is no longer available.' '这枝花已经卖完了。'>><</if>>
+<<elseif !($RobinExpansion.flower_stock[_flowerType] gt 0)>>
+  <<language>>
+    <<option 'EN'>>
+      That flower has sold out.
+    <<option 'CN'>>
+      这种花已经卖完了。
+  <</language>>
+<<elseif !maplebirch.get('Robin').shop.canCustomerPay(_flowerPrice)>>
+  <span class='red'>
+    <<language>>
+      <<option 'EN'>>
+        You cannot afford this flower.
+      <<option 'CN'>>
+        你买不起这枝花。
+    <</language>>
+  </span>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      The flower counter cannot complete the sale now. Come back during opening hours.
+    <<option 'CN'>>
+      鲜花柜台现在没法完成这笔交易。请在营业时间再来。
+  <</language>>
+<</if>>
 <br><br><<getouticon>><<lanLink ['Back to the other goods', '返回其他商品'] 'Deadwood Robin Shop Other Goods'>><</lanLink>>
 
 :: Deadwood Robin Shop Arrange Popcorn []
@@ -1220,7 +1243,12 @@
   <<elseif $RobinExpansion.shop_staff is 1>>
     <<lanSwitch 'Robin pays for training and writes the first employee into the rota. The new hire checks the till and copies Robin’s recipe cards before taking a daytime shift. Robin looks relieved to know the counter has steady cover.' '罗宾付了培训费，把第一位店员写进班表。新店员核对收银，抄好罗宾的配方卡，接下白天的班次。柜台终于有人稳定照看，罗宾松了口气。'>>
   <<else>>
-    <<lanSwitch 'Robin introduces the new employee and goes over the rota. Afternoon shifts fit around school, and the counter has cover when someone needs a day off.' '罗宾介绍新店员，核对班表。下午的班次避开上课时段，也给需要休息的人留出代班。'>>
+    <<language>>
+      <<option 'EN'>>
+        Robin introduces the new employee and lays out the rota. The two hires compare their shifts, moving one name so neither has to work every day. Robin watches them settle it, then pins the sheet beside the till.
+      <<option 'CN'>>
+        罗宾介绍新店员，摊开班表。两位店员对了对各自的班次，挪动一处名字，给彼此留出休息的日子。罗宾等他们商量好，才把表钉在收银机旁。
+    <</language>>
   <</if>>
   <br><br><span class='gold'><<lanSwitch '£350 goes to hiring and training. The weekly wage is now included in the shop accounts.' '招聘与培训花费 £350。店员的周薪已计入店铺账本。'>></span>
   <<npcincr Robin dom 2>><<npcincr Robin love 1>><<gdom>><<glove>>
@@ -1278,8 +1306,10 @@
   <<if _payment is 'ok' and maplebirch.get("LifeSimulation").school.organiseSchoolDrinks()>>
     <<npc Robin>><<person1>>
     <<language>>
-      <<option 'EN'>>Robin checks the council's order against the stock list. "One crate will cover the meeting. I'll write the price down so no one has to argue over it later." You carry the drinks back to school together. The students notice Robin's name on each label.
-      <<option 'CN'>>罗宾照着存货单核对学生会的订单。“一箱够开会喝。我把价钱写清楚，省得回头有人争。”你们一起把饮品送到学校。学生们看见每张标签上都写着罗宾的名字。
+      <<option 'EN'>>
+        Robin checks the council's order against the stock list. "One crate will cover the meeting. I'll write the price down so no one has to argue over it later." <<He>> secures the bottles and slips the receipt under the lid. The shop's name is printed on the labels. You take the crate, ready for the next council meeting.
+      <<option 'CN'>>
+        罗宾照着存货单核对学生会的订单。“一箱够开会喝。我把价钱写清楚，省得回头有人争。”<<He>>固定好瓶子，把收据塞在箱盖下面。标签上印着店名。你接过箱子，留给下一次学生会会议。
     <</language>><<npcincr Robin love 1>><<glove>><br><br>
     <span class='gold'><<lanSwitch '£20 is paid from your bank account.' '银行账户支付了 £20。'>></span><br>
     <<deadwood-reblooms-life-simulation-school-feedback>>

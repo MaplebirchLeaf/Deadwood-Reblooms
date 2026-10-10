@@ -51,13 +51,22 @@
     <br><<foodstufficon _fruit.type>><b><<print setup.foodstuff[_fruit.type].name>></b> × <<= _fruit.amount>><br>
     <<set _display_label to $foodstuff[_fruit.type].marketStall is false ? ['Display at the market stall', '在集市摆出'] : ['Keep off the market stall', '不在集市摆出']>>
     <<lanLink _display_label>>
-      <<run maplebirch.get('Orchard').displayFruit(_fruit.type)>><<run Dynamic.render('deadwood-orchard-trade-ledger')>>
+      <<set _orchard to maplebirch.get('Orchard')>>
+      <<if maplebirch.passage.title is 'Deadwood Reblooms Orchard Trade' and _orchard.available($Orchard.site) and $foodstuff[_fruit.type]>>
+        <<set $foodstuff[_fruit.type].marketStall to $foodstuff[_fruit.type].marketStall is false>>
+      <</if>>
+      <<run Dynamic.render('deadwood-orchard-trade-ledger')>>
     <</lanLink>><br>
     <<set _orchardKeep[_fruit.type] to _fruit.reserve>>
     <<set _reserve_variable to '_orchardKeep.' + _fruit.type>>
     <<lanSwitch 'Keep at least: ' '至少保留：'>><<numberbox _reserve_variable _fruit.reserve>>
     <<lanLink ['Save', '保存']>>
-      <<run maplebirch.get('Orchard').keepFruit(_fruit.type, Number(T.orchardKeep[_fruit.type]))>><<run Dynamic.render('deadwood-orchard-trade-ledger')>>
+      <<set _orchard to maplebirch.get('Orchard')>>
+      <<set _keep to Number(_orchardKeep[_fruit.type])>>
+      <<if maplebirch.passage.title is 'Deadwood Reblooms Orchard Trade' and _orchard.available($Orchard.site) and Number.isSafeInteger(_keep) and _keep gte 0>>
+        <<set $Orchard.reserve[_fruit.type] to _keep>>
+      <</if>>
+      <<run Dynamic.render('deadwood-orchard-trade-ledger')>>
     <</lanLink>><br>
     <<if _orchard.canDeliver and _orchard.deliveryRemaining gt 0 and _fruit.amount gt _fruit.reserve>>
       <<lanSwitch 'Bulk price per fruit: ' '每个水果收购价：'>><<printmoney _fruit.price>><br>

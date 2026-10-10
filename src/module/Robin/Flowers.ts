@@ -23,32 +23,28 @@ export default class RobinFlowers extends Shared {
     return Math.ceil(((setup.foodstuff[type]?.shop?.sell_price ?? 0) * 1.4) / 100);
   }
 
-  private forEachSold(apply: (type: string, sold: number) => void): void {
+  private get sales(): { type: string; amount: number }[] {
+    const sales: { type: string; amount: number }[] = [];
     let remaining = FLOWER_WEEKLY_SALES;
     for (const type of this.types) {
-      const sold = Math.clamp(this.state.flower_stock[type] || 0, 0, remaining);
-      if (sold > 0) apply(type, sold);
-      remaining -= sold;
+      const amount = Math.clamp(this.state.flower_stock[type] || 0, 0, remaining);
+      if (amount > 0) sales.push({ type, amount });
+      remaining -= amount;
       if (remaining === 0) break;
     }
+    return sales;
   }
 
   /** 本周预计花卉收入，单位英镑。 */
   public get salesEstimate(): number {
     if (!this.state.shop_flowers) return 0;
-    let sales = 0;
-    this.forEachSold((type, sold) => {
-      sales += sold * this.price(type);
-    });
-    return sales;
+    return this.sales.reduce((total, { type, amount }) => total + amount * this.price(type), 0);
   }
 
   /** 周结算时扣除实际售出的库存。 */
   public settle(): void {
     if (!this.state.shop || !this.state.shop_flowers) return;
-    this.forEachSold((type, sold) => {
-      this.state.flower_stock[type] -= sold;
-    });
+    for (const { type, amount } of this.sales) this.state.flower_stock[type] -= amount;
   }
 
   /** 首次添置花架：花 100 英镑，附赠 10 支雏菊。 */

@@ -6,10 +6,7 @@ export default class RobinNight extends Shared {
   /** 今夜是否可以探访：恋人关系或创伤足够高，且罗宾已睡下。 */
   public get canVisit(): boolean {
     return (
-      C.npc.Robin?.init === 1 &&
-      (V.robinmissing === 0 || !V.robinmissing) &&
-      V.robin.timer.hurt === 0 &&
-      this.state.asylum.status !== 'admitted' &&
+      this.robinAvailable &&
       this.state.night_day !== Time.days &&
       !this.finance?.realEstate.residenceOf('Robin') &&
       Time.hour >= 21 &&

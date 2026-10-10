@@ -115,14 +115,6 @@ class School {
     return V.LifeSimulation.school as SchoolState;
   }
 
-  public standingColour(value: number): 'red' | 'pink' | 'blue' | 'teal' | 'green' {
-    if (value < 20) return 'red';
-    if (value < 40) return 'pink';
-    if (value < 60) return 'blue';
-    if (value < 80) return 'teal';
-    return 'green';
-  }
-
   /** 当前穿着是否满足已生效的着装政策。政策为 uniform 时沿用原版判定。 */
   public meetsDressCode(vanillaAccepted: boolean): boolean {
     const policy = V.LifeSimulation?.school?.dress?.active as SchoolDressPolicy | undefined;
@@ -346,12 +338,15 @@ class School {
   }
 
   public get canProposePolicy(): boolean {
-    const next = DRESS_POLICIES[DRESS_POLICIES.indexOf(this.state.dress.highest) + 1];
-    return this.state.role === 'president' && next !== undefined && this.state.dress.proposal === null && this.state.dress.trialUntil === 0 && Time.days >= this.state.dress.cooldownUntil;
+    return this.state.role === 'president' && this.nextPolicy !== undefined && this.state.dress.proposal === null && this.state.dress.trialUntil === 0 && Time.days >= this.state.dress.cooldownUntil;
+  }
+
+  private get nextPolicy(): SchoolDressPolicy | undefined {
+    return DRESS_POLICIES[DRESS_POLICIES.indexOf(this.state.dress.highest) + 1];
   }
 
   public proposePolicy(): boolean {
-    const next = DRESS_POLICIES[DRESS_POLICIES.indexOf(this.state.dress.highest) + 1];
+    const next = this.nextPolicy;
     if (!this.canProposePolicy || !next) return false;
     this.state.dress.proposal = next;
     return true;

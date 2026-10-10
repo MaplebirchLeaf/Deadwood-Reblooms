@@ -11,14 +11,14 @@ export default function Medicine(maplebirch: typeof window.maplebirch): void {
     ...MEDICINES.flatMap(item => [
       {
         title: 'Medicinal Traits',
-        name: () => medicine().name(item.id),
+        name: () => lanSwitch(item.name[0], item.name[1]),
         colour: 'green',
         has: () => medicine().active(item.id),
-        text: () => `${lanSwitch('You have taken ', '你已经服用了')}${medicine().name(item.id)}${lanSwitch('. ', '。')}${lanSwitch(item.description[0], item.description[1])}`
+        text: () => lanSwitch(`You have taken ${item.name[0]}. ${item.description[0]}`, `你已经服用了${item.name[1]}。${item.description[1]}`)
       },
       {
         title: 'Medicinal Traits',
-        name: () => lanSwitch(`${medicine().name(item.id)} dependence`, `${medicine().name(item.id)}依赖`),
+        name: () => lanSwitch(`${item.name[0]} dependence`, `${item.name[1]}依赖`),
         colour: 'purple',
         has: () => medicine().level(item.id) > 0,
         text: () => {

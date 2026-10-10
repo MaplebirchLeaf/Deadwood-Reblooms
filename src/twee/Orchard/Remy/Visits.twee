@@ -17,8 +17,9 @@
         <<He>> offers it back for a moment. "Would you rather have it yourself?" You shake your head. Remy lowers <<his>> hand. <span class='purple'>You remember another apple held just out of reach.</span> A pupil calls to <<him>> from the yard, and the moment passes.
       <<option 'CN'>>
         <<He>>把苹果朝你递回来一点。“还是你自己想吃？”你摇头，雷米便收回了手。<span class='purple'>你想起另一个被拿在手里、够不着的苹果。</span>庭院里的学员叫了<<him>>一声，打断了这个瞬间。
-    <</language>>
-  <<elseif $_farm_apple>>
+    <</language>><br><br>
+  <</if>>
+  <<if $_farm_apple>>
     <<language>>
       <<option 'EN'>>
         You mention your own harvest. "From Alex's land?" Remy puts the apple on the sill. "I hope you kept something for yourself." <span class='purple'><<He>> leaves it beside the feed box, rather than in <<his>> pocket.</span>
@@ -67,8 +68,10 @@
 :: Deadwood Remy Date []
 <<effects>>
 <<if maplebirch.get('Orchard')?.remy.act('date')>>
+  <<set _remy_indoors to Weather.precipitation is 'rain' or Time.season is 'winter'>>
+  <<set $outside to _remy_indoors ? 0 : 1>>
   <<npc Remy>><<person1>><<npcincr Remy love 3>><<pass 45>>
-  <<if Weather.precipitation is 'rain' or Time.season is 'winter'>>
+  <<if _remy_indoors>>
     <<language>>
       <<option 'EN'>>
         Remy leads you into the office. Two mugs sit beside the kettle; <<he>> asks how you take your tea before making either. <<He>> moves the lesson register from the spare chair, but keeps it within reach. Outside, a horse stamps against its stall door.
@@ -108,72 +111,74 @@
     <</language>>
   <</if>>
   <br><br>
-  <div id='deadwood-remy-date-talk'>
-    <<if maplebirch.get('Orchard').remy.farmConflict>>
-      <<lanLink ['Ask whether this changes anything for Alex', '问这是否能改变艾利克斯的处境']>>
-        <<replace '#deadwood-remy-date-talk'>>
-          <<language>>
-            <<option 'EN'>>
-              Remy pulls <<his>> glove tight at the wrist. "Is that why you came?" You say you wanted to know. <<He>> watches you for a moment. "I've given Alex plenty of chances to see reason."
-              <br><br>
+  <<capture _remy_indoors>>
+    <div id='deadwood-remy-date-talk'>
+      <<if maplebirch.get('Orchard').remy.farmConflict>>
+        <<lanLink ['Ask whether this changes anything for Alex', '问这是否能改变艾利克斯的处境']>>
+          <<replace '#deadwood-remy-date-talk'>>
+            <<language>>
+              <<option 'EN'>>
+                Remy pulls <<his>> glove tight at the wrist. "Is that why you came?" You say you wanted to know. <<He>> watches you for a moment. "I've given Alex plenty of chances to see reason."
+                <br><br>
                 You tell <<him>> that you will keep helping at the farm. "Then you have work waiting for you." <<He>> turns towards a call from the track. <span class='purple'>The warmth of the visit has not carried over to Alex.</span>
-            <<option 'CN'>>
-              雷米将腕口的手套拉紧。“你是为了这个才来的？”你说，你想知道。<<He>>看了你一会儿。“我给过艾利克斯不少机会，让<<nnpc_him 'Alex'>>想明白。”
-              <br><br>
-              你告诉<<him>>，自己还会继续帮农场的忙。“那么，你还有活等着做。”<<He>>转向从跑道上传来的呼声。<span class='purple'>刚才的亲近没有让<<he>>对艾利克斯改变态度。</span>
-          <</language>>
-        <</replace>>
-      <</lanLink>><br>
-    <</if>>
-    <<lanLink ['Ask about the school', '聊聊学校的生意']>>
-      <<replace '#deadwood-remy-date-talk'>>
-        <<language>>
-          <<option 'EN'>>
-            "People see a pleasant afternoon," Remy says. "They don't see the feed bills." <<He>> begins listing expenses, then stops when <<he>> catches your expression. "I did say you could ask."
-            <br><br>
-            You ask whether a full school is worth all the trouble. "Of course. A few satisfied customers bring their friends." <<He>> smiles. "A few dissatisfied ones bring considerably more."
-          <<option 'CN'>>
-            “客人看见的是一个悠闲的下午。”雷米说。“可看不见饲料账单。”<<He>>开始列举开支，看到你的表情才停下来。“我确实说过，随你问。”
-            <br><br>
-            你问，办这所学校值不值得费这么多事。“当然。几个满意的客人就会带朋友来。”<<He>>笑了笑。“不满意的，带来的人还要多。”
-        <</language>>
-      <</replace>>
-    <</lanLink>><br>
-    <<lanLink ['Enjoy the quiet together', '安静地陪一会儿']>>
-      <<replace '#deadwood-remy-date-talk'>>
-        <<language>>
-          <<option 'EN'>>
-          <<if Weather.precipitation is 'rain' or Time.season is 'winter'>>
-            Remy rotates <<his>> cup by the handle. The spoon ticks against its edge. For a while, the only conversation comes through the office window. <<He>> glances at the register, then leaves it closed.
-          <<else>>
-            A horse presses its nose between the rails. Remy scratches the bridge of its nose, then watches it wander off. Wind carries a shouted correction from the track. For once, <<he>> leaves someone else to give it.
-          <</if>>
-          <br><br>
-          <<if $Orchard.remy.romance>>"You needn't find something to say every time," <<he>> tells you. "I know why you're here."<<else>>"You make an unusually quiet visitor," <<he>> says. "I could get used to that."<</if>> A bell from the yard eventually ends the break. Remy straightens <<his>> gloves before going back out.
-          <<option 'CN'>>
-          <<if Weather.precipitation is 'rain' or Time.season is 'winter'>>
-            雷米握着杯柄转了转杯子，勺子轻轻碰响杯沿。一时间，只有办公室窗外的人还在交谈。<<He>>瞥了眼登记簿，没有翻开。
-          <<else>>
-            一匹马将鼻子伸到围栏之间。雷米挠了挠它的鼻梁，看着它踱步离开。跑道上有人喊着纠正学员，这一次，<<he>>留给别人去管。
-          <</if>>
-          <br><br>
-          <<if $Orchard.remy.romance>>“不用每次都找话说。”<<He>>告诉你。“我知道你为什么来。”<<else>>“客人很少有你这么安静的。”<<He>>说。“我倒可以慢慢习惯。”<</if>> 庭院的铃声最终结束了这段休息。雷米理好手套，准备出去。
-        <</language>>
-      <</replace>>
-    <</lanLink>><br>
-    <<if $Orchard.remy.romance>>
-      <<lanLink ['Offer your hand', '把手递过去']>>
+              <<option 'CN'>>
+                雷米将腕口的手套拉紧。“你是为了这个才来的？”你说，你想知道。<<He>>看了你一会儿。“我给过艾利克斯不少机会，让<<nnpc_him 'Alex'>>想明白。”
+                <br><br>
+                你告诉<<him>>，自己还会继续帮农场的忙。“那么，你还有活等着做。”<<He>>转向从跑道上传来的呼声。<span class='purple'>刚才的亲近没有让<<he>>对艾利克斯改变态度。</span>
+            <</language>>
+          <</replace>>
+        <</lanLink>><br>
+      <</if>>
+      <<lanLink ['Ask about the school', '聊聊学校的生意']>>
         <<replace '#deadwood-remy-date-talk'>>
           <<language>>
             <<option 'EN'>>
-              Remy looks down at your offered hand before taking it. <<His>> glove is warm at the palm and rough along the seams. <<He>> holds on when someone passes outside, meeting their glance until they move along. "A moment," <<he>> tells them, before turning back to you.
+              "People see a pleasant afternoon," Remy says. "They don't see the feed bills." <<He>> begins listing expenses, then stops when <<he>> catches your expression. "I did say you could ask."
+              <br><br>
+              You ask whether a full school is worth all the trouble. "Of course. A few satisfied customers bring their friends." <<He>> smiles. "A few dissatisfied ones bring considerably more."
             <<option 'CN'>>
-              雷米先低头看了看你递来的手，才握住它。手套掌心温暖，缝线处却有些粗糙。有人从外面经过时，<<he>>也没有松开，直视着对方，直到对方继续往前走。“稍等。”<<He>>对那人说完，才转回你这里。
+              “客人看见的是一个悠闲的下午。”雷米说。“可看不见饲料账单。”<<He>>开始列举开支，看到你的表情才停下来。“我确实说过，随你问。”
+              <br><br>
+              你问，办这所学校值不值得费这么多事。“当然。几个满意的客人就会带朋友来。”<<He>>笑了笑。“不满意的，带来的人还要多。”
           <</language>>
         <</replace>>
       <</lanLink>><br>
-    <</if>>
-  </div>
+      <<lanLink ['Enjoy the quiet together', '安静地陪一会儿']>>
+        <<replace '#deadwood-remy-date-talk'>>
+          <<language>>
+            <<option 'EN'>>
+            <<if _remy_indoors>>
+              Remy rotates <<his>> cup by the handle. The spoon ticks against its edge. For a while, the only conversation comes through the office window. <<He>> glances at the register, then leaves it closed.
+            <<else>>
+              A horse presses its nose between the rails. Remy scratches the bridge of its nose, then watches it wander off. Wind carries a shouted correction from the track. For once, <<he>> leaves someone else to give it.
+            <</if>>
+            <br><br>
+            <<if $Orchard.remy.romance>>"You needn't find something to say every time," <<he>> tells you. "I know why you're here."<<else>>"You make an unusually quiet visitor," <<he>> says. "I could get used to that."<</if>> A bell from the yard eventually ends the break. Remy straightens <<his>> gloves before returning to the pupils.
+            <<option 'CN'>>
+            <<if _remy_indoors>>
+              雷米握着杯柄转了转杯子，勺子轻轻碰响杯沿。一时间，只有办公室窗外的人还在交谈。<<He>>瞥了眼登记簿，没有翻开。
+            <<else>>
+              一匹马将鼻子伸到围栏之间。雷米挠了挠它的鼻梁，看着它踱步离开。跑道上有人喊着纠正学员，这一次，<<he>>留给别人去管。
+            <</if>>
+            <br><br>
+            <<if $Orchard.remy.romance>>“不用每次都找话说。”<<He>>告诉你。“我知道你为什么来。”<<else>>“客人很少有你这么安静的。”<<He>>说。“我倒可以慢慢习惯。”<</if>> 庭院的铃声最终结束了这段休息。雷米理好手套，准备回去指导学员。
+          <</language>>
+        <</replace>>
+      <</lanLink>><br>
+      <<if $Orchard.remy.romance>>
+        <<lanLink ['Offer your hand', '把手递过去']>>
+          <<replace '#deadwood-remy-date-talk'>>
+            <<language>>
+              <<option 'EN'>>
+                Remy looks down at your offered hand before taking it. <<His>> glove is warm at the palm and rough along the seams. A pupil stops <<if _remy_indoors>>in the office doorway<<else>>beside the fence<</if>>. <<He>> looks up without letting go. "A moment," <<he>> tells them. The pupil moves on, and <<he>> turns back to you.
+              <<option 'CN'>>
+                雷米先低头看了看你递来的手，才握住它。手套掌心温暖，缝线处却有些粗糙。一名学员在<<if _remy_indoors>>办公室门口<<else>>围栏旁<</if>>停下来。<<He>>抬起头，却没有松手。“稍等。”<<He>>对那人说。学员继续往前走，<<he>>才转回你这里。
+            <</language>>
+          <</replace>>
+        <</lanLink>><br>
+      <</if>>
+    </div>
+  <</capture>>
 <<else>>
   <<language>>
     <<option 'EN'>>

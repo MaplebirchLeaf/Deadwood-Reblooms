@@ -35,9 +35,10 @@ export const MEDICINES: readonly MedicineDefinition[] = Object.entries(catalogue
 
 const EMPTY_USE: Use = { owned: 0, last: -1, day: -1, count: 0, streak: 0, dependence: 0, until: 0, rebound: 0, settledDay: -1 };
 const HOURS = 60 * 60;
-const key = (id: MedicineId) => MEDICINES.find(item => item.id === id)!.name[0].toLowerCase();
 
 export default class Medicine {
+  public readonly offers = MEDICINES;
+
   public constructor(private readonly core: typeof maplebirch) {}
 
   private get state(): MedicineState {
@@ -46,15 +47,6 @@ export default class Medicine {
 
   private use(id: MedicineId): Use {
     return (this.state.uses[id] ??= { ...EMPTY_USE, settledDay: Time.days });
-  }
-
-  public get offers() {
-    return MEDICINES;
-  }
-
-  public name(id: MedicineId): string {
-    const item = MEDICINES.find(item => item.id === id)!;
-    return lanSwitch(item.name[0], item.name[1]);
   }
 
   /** 最近服用或仍有明显依赖的药片，供哈珀问诊读取。 */
@@ -90,12 +82,6 @@ export default class Medicine {
     return true;
   }
 
-  public reply(): boolean | undefined {
-    if (!this.state.review.pending) return undefined;
-    this.state.review.pending = false;
-    return this.state.review.shared;
-  }
-
   public owned(id: MedicineId): number {
     return this.state.uses[id]?.owned ?? 0;
   }
@@ -117,9 +103,9 @@ export default class Medicine {
     return value >= 60 ? 3 : value >= 30 ? 2 : value >= 12 ? 1 : 0;
   }
 
-  public canTake(id: MedicineId): boolean {
-    const use = this.use(id);
-    return V.statFreeze !== true && V.combat !== 1 && this.owned(id) > 0 && (use.last < 0 || Time.date.timeStamp - use.last >= HOURS);
+  private canTake(id: MedicineId): boolean {
+    const use = this.state.uses[id];
+    return V.statFreeze !== true && V.combat !== 1 && !!use && use.owned > 0 && (use.last < 0 || Time.date.timeStamp - use.last >= HOURS);
   }
 
   public buy(id: MedicineId): boolean {
@@ -154,30 +140,22 @@ export default class Medicine {
     // 重复使用只增加风险，不累积或延长当前药效。
     const fresh = !this.active(id);
     const strength = this.level(id) >= 2 ? 0.5 : 1;
-    let text = lanSwitch('You swallow a tablet with water.', '你就着水服下一片药。');
     if (fresh) {
       use.until = now + item.hours * HOURS;
       const before = id === 'alert' ? V.tiredness : V.trauma;
       const effects: Record<MedicineId, string> = {
-        calm: `<<stress ${-6 * strength}>><<tiredness 4>><<lstress>><<gtiredness>>`,
-        sleep: '<<tiredness 6>><<gtiredness>>',
-        alert: `<<tiredness ${-12 * strength}>><<stress 3>><<ltiredness>><<gstress>>`,
-        focus: '<<stress 3>><<gstress>>',
-        soothe: `<<trauma ${-2 * strength}>><<tiredness 2>><<ltrauma>><<gtiredness>>`
+        calm: `<<stress ${-6 * strength}>><<tiredness 4>>`,
+        sleep: '<<tiredness 6>>',
+        alert: `<<tiredness ${-12 * strength}>><<stress 3>>`,
+        focus: '<<stress 3>>',
+        soothe: `<<trauma ${-2 * strength}>><<tiredness 2>>`
       };
-      this.core.SugarCube.Wikifier.wikifyEval(effects[id].replace(/<<[lg][^>]*>>/g, ''));
+      this.core.SugarCube.Wikifier.wikifyEval(effects[id]);
       if (id === 'alert' || id === 'soothe') use.rebound = Math.max(0, before - (id === 'alert' ? V.tiredness : V.trauma));
-      text += ` ${lanSwitch(item.description[0], item.description[1])} ${effects[id].replace(/<<(stress|tiredness|trauma) [^>]*>>/g, '')}`;
     } else {
       this.core.SugarCube.Wikifier.wikifyEval('<<stress 3>><<tiredness 3>>');
-      text += lanSwitch(
-        ' The previous dose is still active. Another tablet brings no additional benefit. <<gstress>><<gtiredness>>',
-        ' 上一次服药的效果仍未消退，再吃一片并没有带来更多益处。<<gstress>><<gtiredness>>'
-      );
     }
-    if (repeat || use.count > 1) text += lanSwitch(' <span class="red">You have exceeded the directions on the packet.</span>', ' <span class="red">你没有遵守包装上的服用间隔。</span>');
-    if (use.streak >= 7) text += lanSwitch(' <span class="purple">You have been reaching for these tablets every day.</span>', ' <span class="purple">你已经连续多日依靠这些药片。</span>');
-    V.lastPillTakenDescription = text;
+    V.lastPillTakenDescription = `<<deadwood-medicine-dose '${id}' \`${JSON.stringify(item.description)}\` ${fresh} ${repeat} ${use.count > 1} ${use.streak >= 7}>>`;
     this.core.SugarCube.Engine.play('Take Pill From Medicine Drawer');
   }
 
@@ -190,16 +168,7 @@ export default class Medicine {
     return (V.LifeSimulation?.medicine?.notices?.length ?? 0) > 0;
   }
 
-  public flush(): string {
-    const messages = this.state.notices.splice(0).map(({ id, kind }) => {
-      if (kind === 'withdrawal') return `${this.name(id)}：${lanSwitch('Going without leaves you uneasy. <<gstress>>', '停用后，你感到有些不安。<<gstress>>')}`;
-      const result = id === 'alert' ? '<<gtiredness>>' : id === 'soothe' ? '<<gtrauma>>' : id === 'sleep' ? '<<gtiredness>>' : '';
-      return `${this.name(id)}：${lanSwitch('The effect has worn off.', '药效已经消退。')} ${result}`;
-    });
-    return `${messages.join('<br>')}<br><br>`;
-  }
-
-  public tick(): void {
+  private tick(): void {
     if (!V.LifeSimulation?.medicine || V.statFreeze) return;
     const now = Time.date.timeStamp;
     for (const item of MEDICINES) {
@@ -214,7 +183,7 @@ export default class Medicine {
     }
   }
 
-  public day(): void {
+  private day(): void {
     if (!V.LifeSimulation?.medicine || V.statFreeze) return;
     for (const item of MEDICINES) {
       const use = this.state.uses[item.id];
@@ -243,7 +212,7 @@ export default class Medicine {
     this.core.dynamic.regStateEvent('gate', 'life-simulation-medicine-notices', {
       forceExit: false,
       cond: () => V.combat !== 1 && this.core.get('LifeSimulation')?.medicine?.pending === true,
-      output: 'print maplebirch.get("LifeSimulation").medicine.flush()'
+      output: 'deadwood-medicine-notices'
     });
 
     this.core.dynamic.regStateEvent('gate', 'life-simulation-medicine-sale', {
@@ -304,7 +273,7 @@ export default class Medicine {
         canTake: () => !!this.core.get('LifeSimulation') && this.canTake(item.id),
         take: () => this.take(item.id)
       };
-      this.core.tool.patch.require<{ add: (name: string, definition: typeof config) => void }>('pills').add(key(item.id), config);
+      this.core.tool.patch.require<{ add: (name: string, definition: typeof config) => void }>('pills').add(item.name[0].toLowerCase(), config);
     }
   }
 }

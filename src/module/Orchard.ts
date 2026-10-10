@@ -389,18 +389,6 @@ class Orchard extends Module {
     return trade.deliveryMinutes;
   }
 
-  public keepFruit(type: OrchardFruit, amount: number): void {
-    if (this.core.passage.title !== 'Deadwood Reblooms Orchard Trade' || !this.available(this.state.site)) return;
-    if (!fruitTypes.includes(type) || !Number.isSafeInteger(amount) || amount < 0) return;
-    this.state.reserve[type] = amount;
-  }
-
-  public displayFruit(type: OrchardFruit): void {
-    if (this.core.passage.title !== 'Deadwood Reblooms Orchard Trade' || !this.available(this.state.site)) return;
-    if (!fruitTypes.includes(type) || !V.foodstuff[type]) return;
-    V.foodstuff[type].marketStall = V.foodstuff[type].marketStall === false;
-  }
-
   /** 每日收购量有限，只交付超出保留数量的库存，不自动卖掉玩家的水果。 */
   public deliver(type: OrchardFruit, amount: number): boolean {
     if (!this.canDeliver || !Number.isSafeInteger(amount) || amount < 1 || amount > this.deliveryRemaining) return false;
