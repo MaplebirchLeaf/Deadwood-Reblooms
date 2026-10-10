@@ -1,0 +1,133 @@
+:: Deadwood Transport Event Widgets [widget]
+
+<<widget 'deadwood-transport-road-scene'>>
+  <<set _road_scene to $Transport.trip.scene ?? 0>>
+  <<language>>
+    <<option 'EN'>>
+      <<if [$Transport.trip.from, $Transport.trip.to].includes('farmland')>>
+        <<switch _road_scene>>
+          <<case 0>>A lorry loaded with crates passes on the other side. Beyond it, rows of crops run down towards a hedgerow.
+          <<case 1>>A tractor waits at a field entrance. You give it room as it turns onto the road, leaving clods of mud behind its tyres.
+          <<case 2>>The hedges rise above the road for a stretch, then fall away to reveal the fields. A farm gate rattles as you pass.
+        <</switch>>
+      <<elseif $Transport.trip.to.startsWith('forest:')>>
+        <<switch _road_scene>>
+          <<case 0>>A bird bursts from a bush beside the path. You steady the handlebars as it vanishes between the trunks.
+          <<case 1>>Fallen leaves hide a shallow rut. You ease over it, feeling the bump through the saddle.
+          <<case 2>>The trees close over the path. For a while, the tyres and your breathing are the only sounds nearby.
+        <</switch>>
+      <<elseif $Transport.trip.to.startsWith('moor:')>>
+        The track bends around a patch of dark, wet ground. You follow the older wheel marks where the earth is firmer.
+      <<elseif ['cliff', 'starfish'].includes($Transport.trip.to)>>
+        <<if Time.dayState is 'night'>>The seafront lights pass one by one. Between the buildings, the sea is a dark gap beyond the railings.
+        <<else>>A gap between the buildings reveals the sea. A gull rides the wind above the promenade, keeping pace with you for a moment.<</if>>
+      <<elseif [$Transport.trip.from, $Transport.trip.to].includes('harvest')>>
+        <<switch _road_scene>>
+          <<case 0>>A delivery lorry takes a wide turn across the junction. You wait for its trailer to clear before moving on.
+          <<case 1>>A worker wheels a stack of produce crates towards a waiting van. You slow as the trolley bumps over the kerb.
+          <<case 2>>Two lorries squeeze past each other. You keep back from their mirrors until the road opens again.
+        <</switch>>
+      <<else>>
+        <<switch _road_scene>>
+          <<case 0>>A delivery van has stopped beside the kerb. Its driver waves you past while carrying a stack of boxes towards a doorway.
+          <<case 1>>Cones narrow one lane. You leave space for the traffic coming the other way, then pass the repair crew.
+          <<case 2>>A pedestrian hesitates at a crossing. You slow down, and they give you a small nod before crossing.
+        <</switch>>
+      <</if>>
+    <<option 'CN'>>
+      <<if [$Transport.trip.from, $Transport.trip.to].includes('farmland')>>
+        <<switch _road_scene>>
+          <<case 0>>一辆装着货箱的卡车从对面驶过。车身后，一排排作物延伸到田边的树篱。
+          <<case 1>>田地入口停着一辆拖拉机。你让出位置，等它拐上公路。轮胎在身后留下几块泥土。
+          <<case 2>>有一段路的两旁都是高高的树篱，接着田野又露了出来。经过农场大门时，门闩被风吹得轻响。
+        <</switch>>
+      <<elseif $Transport.trip.to.startsWith('forest:')>>
+        <<switch _road_scene>>
+          <<case 0>>路旁的灌木里突然飞出一只鸟。你稳住车把，看着它消失在树干之间。
+          <<case 1>>落叶遮住了一道浅沟。你放慢速度越过去，坐垫还是颠了一下。
+          <<case 2>>树冠在小径上方合拢。有一阵，附近只听得见车轮和你的呼吸声。
+        <</switch>>
+      <<elseif $Transport.trip.to.startsWith('moor:')>>
+        车辙绕过一片发黑的湿地。你沿着旧轮印走，挑着较硬的地面前进。
+      <<elseif ['cliff', 'starfish'].includes($Transport.trip.to)>>
+        <<if Time.dayState is 'night'>>海滨的灯一盏盏从身边过去。楼房之间，栏杆外的海面只剩下一片深黑。
+        <<else>>楼房间的空隙露出海面。一只海鸥乘着风掠过栈道，在你身旁跟了一小段。<</if>>
+      <<elseif [$Transport.trip.from, $Transport.trip.to].includes('harvest')>>
+        <<switch _road_scene>>
+          <<case 0>>一辆送货卡车在路口拐了个大弯。你等拖车尾部完全过去，才继续前进。
+          <<case 1>>工人推着一摞农产品货箱走向面包车。小推车颠下路缘，你也跟着放慢了速度。
+          <<case 2>>两辆卡车贴着身挤过去。你避开它们伸出的后视镜，等道路重新腾出空位。
+        <</switch>>
+      <<else>>
+        <<switch _road_scene>>
+          <<case 0>>一辆送货面包车停在路边。司机抱着一摞纸箱走向店门，腾出一只手示意你先走。
+          <<case 1>>锥桶围窄了一条车道。你给对面的车辆留出位置，随后从维修工人身旁驶过。
+          <<case 2>>有人在人行横道旁犹豫着。你放慢速度，对方朝你点点头，走过了马路。
+        <</switch>>
+      <</if>>
+  <</language>>
+<</widget>>
+
+<<widget 'deadwood-transport-roadside-event'>>
+  <<deadwood-dynamicblock 'deadwood-transport-roadside-event'>>
+    <<set _roadside to $Transport.trip.event>>
+    <<if _roadside and !$Transport.trip.interrupted and (!_roadside.resolved or _roadside.action)>>
+      <<if _roadside.action>>
+        <<language>>
+          <<option 'EN'>>
+            <<if _roadside.action is 'tools'>>You fetch your tools and use a spare connector to secure the loose cable. The engine catches on the next attempt. The driver thanks you while you put your things away.
+            <<elseif _roadside.kind is 'breakdown'>>The driver lends you a phone. You describe the nearest junction to the workshop and arrange for someone to come out. The driver relaxes a little and thanks you.
+            <<else>>You gather the spilled shopping while the passer-by holds the torn bag together. They find a spare bag for the last few things and thank you before heading off.<</if>>
+          <<option 'CN'>>
+            <<if _roadside.action is 'tools'>>你取出工具，用备用接头固定好松脱的线缆。司机再试了一次，发动机终于响了。你收好东西时，对方连声道谢。
+            <<elseif _roadside.kind is 'breakdown'>>司机借给你一部手机。你向修车厂说清最近的路口，约好让人过来看看。对方松了口气，向你道谢。
+            <<else>>你捡起散落的东西，路人则扶住破了的袋子。对方找出一个备用袋子，装好最后几样，向你道谢后离开了。<</if>>
+        <</language>>
+        <<deadwood-transport-roadside-companion>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            <<if _roadside.kind is 'breakdown'>>Near where you stop, a car sits with its bonnet open. The starter clicks once, then falls silent. Its driver looks up as you step away from your vehicle. "You know this area? I'm trying to explain where I am to a garage."
+            <<else>>As you stop, a shopping bag splits beside the pavement. A passer-by bends to catch a rolling tin, leaving the rest scattered by their feet.<</if>>
+          <<option 'CN'>>
+            <<if _roadside.kind is 'breakdown'>>停车处附近，一辆汽车敞着引擎盖。启动机响了一下，便没了动静。你走下车时，司机抬起头。“你熟悉这附近吗？修车厂的人问我在哪儿，我说不清。”
+            <<else>>你刚停下，路旁一个购物袋就裂开了。路人弯腰去追滚走的罐头，剩下的东西散了一地。<</if>>
+        <</language>><br><br>
+        <<if maplebirch.get('Transport').events.available>>
+          <<socialiseicon 'ask'>><<lanLink `_roadside.kind is 'breakdown' ? ['Help arrange repairs (0:05)', '帮忙联系修车厂 (0:05)'] : ['Help pick things up (0:02)', '帮忙捡起来 (0:02)']`>>
+            <<if maplebirch.get('Transport').events.help()>><<run Dynamic.render('deadwood-transport-roadside-event')>><</if>>
+          <</lanLink>><<lstress>>
+          <<if maplebirch.get('Transport').events.canUseTools>>
+            <br>
+            <<icon 'transport/motor-repair-kit.png'>><<lanLink ['Secure the loose connection (0:05)', '用工具固定接头 (0:05)']>>
+              <<if maplebirch.get('Transport').events.help(true)>><<run Dynamic.render('deadwood-transport-roadside-event')>><</if>>
+            <</lanLink>> | <span class='teal'><<lanSwitch 'Repair supplies −1' '维修耗材 −1'>></span>
+          <</if>>
+        <</if>>
+      <</if>><br><br>
+    <</if>>
+  <</deadwood-dynamicblock>>
+<</widget>>
+
+<<widget 'deadwood-transport-roadside-companion'>>
+  <<set _roadside_name to $Transport.trip.passengers?.[0]>>
+  <<if _roadside_name>>
+    <<npc _roadside_name>><<person1>>
+    <<language>>
+      <<option 'EN'>>
+        <<switch _roadside_name>>
+          <<case 'Robin'>> <<if C.npc.Robin.trauma gte 40>>Robin waits in the car until you return. "Everything okay?"<<else>>Robin smiles when you come back. "That was kind of you."<</if>>
+          <<case 'Whitney'>> "Done playing hero?" Whitney asks. <<He>> shifts <<his>> bag out of your way. "Come on, then."
+          <<case 'Kylar'>> Kylar has stayed beside your vehicle. "You know them?" <<He>> seems relieved when you shake your head.
+          <<case 'Sydney'>> Sydney watches you put things away. "I'm glad we stopped."
+        <</switch>>
+      <<option 'CN'>>
+        <<switch _roadside_name>>
+          <<case 'Robin'>> <<if C.npc.Robin.trauma gte 40>>罗宾待在车里，直到你回来。“都没事吧？”<<else>>你回来时，罗宾笑了笑。“你人真好。”<</if>>
+          <<case 'Whitney'>> “英雄当够了？”惠特尼问。<<He>>把挡着你的包挪开。“那就走吧。”
+          <<case 'Kylar'>> 凯拉尔一直待在你的车旁。“你认识那个人？”你摇头后，<<he>>像是松了口气。
+          <<case 'Sydney'>> 悉尼看着你收好东西。“还好我们停下了。”
+        <</switch>>
+    <</language>>
+  <</if>>
+<</widget>>

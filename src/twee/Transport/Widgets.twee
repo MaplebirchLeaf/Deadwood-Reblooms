@@ -40,15 +40,14 @@
 
 <<widget 'deadwood-transport-entry'>>
   <<set _transport to maplebirch.get('Transport')>>
-  <<if _transport.ready and _transport.nearby.length and (_transport.canApproach or _transport.shopOpen or $passage is 'Deadwood Reblooms Property Garage')>>
-    <br><<lanSwitch 'Available vehicles' '可使用载具'>><br>
+  <<if _transport.ready and _transport.nearby.length and ((_transport.canApproach and $passage isnot 'Shopping Centre') or $passage is 'Deadwood Reblooms Property Garage')>>
+    <<if !$passage.endsWith(' Street')>><br><</if>><<lanSwitch 'Available vehicles' '可使用载具'>><br>
     <<for _available_vehicle range _transport.nearby>>
       <<set _available_model to _transport.catalog.models.find(model => model.id === _available_vehicle.model)>>
-      <<set _vehicle_source to $passage, _vehicle_minutes to $passage is 'Shopping Centre' ? 2 : 0>>
-      <<capture _available_vehicle _vehicle_source _vehicle_minutes>>
-        <<icon `'transport/' + _available_model.id + '.png'`>><<lanLink `maplebirch.t(_available_model.name) + (_vehicle_minutes ? ' (0:02)' : '')`>>
+      <<set _vehicle_source to $passage>>
+      <<capture _available_vehicle _vehicle_source>>
+        <<icon `'transport/' + _available_model.id + '.png'`>><<lanLink `maplebirch.t(_available_model.name)`>>
           <<if maplebirch.get('Transport').open(_available_vehicle.id)>>
-            <<if _vehicle_minutes>><<pass _vehicle_minutes>><</if>>
             <<if $passage is _vehicle_source>><<goto 'Deadwood Transport Menu'>><</if>>
           <</if>>
         <</lanLink>><br>
@@ -71,10 +70,11 @@
 <<widget 'deadwood-transport-header'>>
   <<set _transport to maplebirch.get('Transport')>>
   <<if _transport.vehicle and _transport.model and _transport.nearby.includes(_transport.vehicle)>>
-    <div class='characteristic-box-list'>
-      <<characteristic-box `{name: lanSwitch('Condition', '车况'), currentValue: _transport.vehicle.condition, description: Math.floor(_transport.vehicle.condition) + '%', color: _transport.vehicle.condition >= 50 ? 'green' : _transport.vehicle.condition >= 25 ? 'blue' : 'red', modifier: 100, modTypes: {good: [], bad: []}}`>>
+    <div class='characteristic-box-list deadwood-transport-status'>
+      <<characteristic-box `{name: lanSwitch('Condition', '车况'), icon: 'misc/icon/transport/service', currentValue: _transport.vehicle.condition, description: Math.max(_transport.vehicle.condition > 0 ? 1 : 0, Math.round(_transport.vehicle.condition)) + '%', color: _transport.vehicle.condition >= 75 ? 'green' : _transport.vehicle.condition >= 50 ? 'teal' : _transport.vehicle.condition >= 25 ? 'lblue' : 'red', meterColor: _transport.vehicle.condition >= 75 ? 'green' : _transport.vehicle.condition >= 50 ? 'teal' : _transport.vehicle.condition >= 25 ? 'lblue' : 'red', modifier: 100, modTypes: {good: [], bad: []}}`>>
       <<if _transport.model.tank gt 0>>
-        <<characteristic-box `{name: lanSwitch('Fuel', '油量'), currentValue: _transport.vehicle.fuel / _transport.model.tank * 100, description: _transport.vehicle.fuel.toFixed(1) + ' / ' + _transport.model.tank + ' L', color: _transport.vehicle.fuel >= _transport.model.tank / 4 ? 'blue' : 'red', modifier: 100, modTypes: {good: [], bad: []}}`>>
+        <<set _transport_fuel_percent to _transport.vehicle.fuel / _transport.model.tank * 100>>
+        <<characteristic-box `{name: lanSwitch('Fuel', '油量'), icon: 'misc/icon/transport/fuel-pump', currentValue: _transport_fuel_percent, description: _transport.vehicle.fuel.toFixed(1) + ' / ' + _transport.model.tank + ' L', color: _transport_fuel_percent >= 75 ? 'green' : _transport_fuel_percent >= 50 ? 'teal' : _transport_fuel_percent >= 25 ? 'lblue' : 'red', meterColor: _transport_fuel_percent >= 75 ? 'green' : _transport_fuel_percent >= 50 ? 'teal' : _transport_fuel_percent >= 25 ? 'lblue' : 'red', modifier: 100, modTypes: {good: [], bad: []}}`>>
       <</if>>
     </div>
   <</if>>
@@ -85,24 +85,23 @@
 <</widget>>
 
 <<widget 'deadwood-transport-journal'>>
-  <<set _transport_state to maplebirch.get('Transport').state>>
-  <<if _transport_state.vehicles.length>>
+  <<set _transport to maplebirch.get('Transport')>>
+  <<if _transport.state.vehicles.length>>
     <h3><<lanSwitch 'Vehicles' '载具'>></h3>
-    <<for _owned range _transport_state.vehicles>>
-      <<set _owned_model to maplebirch.get('Transport').catalog.models.find(model => model.id === _owned.model)>>
-      <<icon `'transport/' + _owned_model.id + '.png'`>>
-      <<= maplebirch.t(_owned_model.name)>> —
-      <<if _owned.garage>>
-        <<lanSwitch 'In a garage, ' '存放在车库，'>>
-      <</if>>
-      <<print maplebirch.get('Transport').catalog.name(_owned.point)>><br>
-    <</for>>
+    <div class='deadwood-card-grid deadwood-transport-records'>
+      <<for _owned range _transport.state.vehicles>>
+        <<deadwood-transport-vehicle-record _owned>>
+      <</for>>
+    </div>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-transport-notice'>>
   <<set _transport_state to maplebirch.get('Transport').state>>
   <<switch _transport_state.notice>>
+    <<case 'tools'>><<lanSwitch 'You put the repair kit in your bag.' '你把维修工具收进包里。'>>
+    <<case 'parts'>><<lanSwitch 'You restock the repair supplies.' '你补齐了维修耗材。'>>
+    <<case 'patched'>><<lanSwitch 'You put the tools away and check the wheels before setting off.' '你收起工具，出发前又检查了一遍车轮。'>>
     <<case 'bought'>>
       <<language>>
         <<option 'EN'>>
@@ -187,8 +186,6 @@
   <<set _return_passage to $Transport.return_passage, _return_source to $passage, _return_minutes to 0>>
   <<if $passage is 'Deadwood Transport Menu' and $Transport.shop>>
     <<set _return_passage to maplebirch.get('Transport').shopPassage>>
-  <<elseif $passage is 'Deadwood Transport Menu' and _return_passage is 'Shopping Centre'>>
-    <<set _return_minutes to 2>>
   <<elseif $passage is 'Deadwood Transport School'>>
     <<set _return_passage to 'Elk Street', _return_minutes to 2>>
   <<elseif _return_passage is 'Harvest Street' and ['Deadwood Transport Dealer', 'Deadwood Transport Buy', 'Deadwood Transport Service', 'Deadwood Transport Sell'].includes($passage)>>
@@ -207,6 +204,216 @@
         <</if>>
         <<goto _return_passage>>
       <</if>>
-    <</lanLink>>
+    <</lanLink>><br>
   <</capture>>
+<</widget>>
+
+<<widget 'deadwood-transport-condition'>>
+  <<set _condition_vehicle to _args[0]>>
+  <span @class="_condition_vehicle.condition >= 50 ? 'green' : _condition_vehicle.condition >= 25 ? 'blue' : 'red'"><<print Math.max(_condition_vehicle.condition > 0 ? 1 : 0, Math.round(_condition_vehicle.condition))>>%<<if _condition_vehicle.condition lte 0>> <<lanSwitch '(broken)' '（故障）'>><</if>></span>
+<</widget>>
+
+<<widget 'deadwood-transport-vehicle-status'>>
+  <<set _status_model to _args[0], _status_vehicle to _args[1]>>
+  <<set _status_home to maplebirch.get('Finance')?.realEstate.properties.find(property => property.id === _status_vehicle.garage)>>
+  <span><<lanSwitch 'Parked at' '停放地点'>></span><span><<print _status_home ? lanSwitch(_status_home.name.EN, _status_home.name.CN) : maplebirch.get('Transport').catalog.name(_status_vehicle.point)>><<if _status_vehicle.garage>> <i><<lanSwitch '(garage)' '（车库）'>></i><</if>></span>
+  <span><<lanSwitch 'Condition' '车况'>></span><span><<deadwood-transport-condition _status_vehicle>></span>
+  <<if _status_model.tank gt 0>><span><<lanSwitch 'Fuel' '油量'>></span><span @class="_status_vehicle.fuel >= _status_model.tank / 4 ? 'blue' : 'red'"><<print _status_vehicle.fuel.toFixed(1)>> / <<print _status_model.tank>> L</span><</if>>
+  <<if _status_vehicle.arrears gt 0>><span><<lanSwitch 'Unpaid upkeep' '保养欠费'>></span><span class='red'><<= formatMoney(_status_vehicle.arrears)>></span><</if>>
+<</widget>>
+
+<<widget 'deadwood-transport-vehicle-record'>>
+  <<set _record_vehicle to _args[0], _record_model to maplebirch.get('Transport').catalog.models.find(model => model.id === _record_vehicle.model)>>
+  <<set _record_title to '<<icon "transport/' + _record_model.id + '.png">>' + maplebirch.t(_record_model.name)>>
+  <<deadwood-card _record_title _record_title>>
+    <div class='dr-finance-summary'><<deadwood-transport-vehicle-status _record_model _record_vehicle>></div>
+  <</deadwood-card>>
+<</widget>>
+
+<<widget 'deadwood-transport-vehicle-card' 'container'>>
+  <<set _card_model to _args[0], _card_vehicle to _args[1] ?? null, _card_actions to _contents>>
+  <<deadwood-card `maplebirch.t(_card_model.name)` `maplebirch.t(_card_model.name)`>>
+    <div class='deadwood-transport-description'><<icon `'transport/' + _card_model.id + '.png'`>><<= maplebirch.t(_card_model.name.replace(':name', ':description'))>></div>
+    <div class='dr-finance-summary'>
+      <span><<lanSwitch `_card_vehicle ? 'Buyback offer' : 'Price'` `_card_vehicle ? '回购价' : '售价'`>></span><span><<deadwood-transport-money `_card_vehicle ? Math.floor(_card_model.price * _card_vehicle.condition / 200) : _card_model.price`>></span>
+      <span><<lanSwitch 'Weekly upkeep' '每周保养'>></span><span><<deadwood-transport-money _card_model.weekly_upkeep>></span>
+      <span><<lanSwitch 'Road wear' '道路损耗'>></span><span><<= _card_model.wear_per_hour.toFixed(2)>>% / <<lanSwitch 'hour' '小时'>></span>
+      <<if _card_model.trail_wear>><span><<lanSwitch 'Trail wear' '小径损耗'>></span><span><<= maplebirch.get('Transport').journeyWear(_card_model, 60, true).toFixed(2)>>% / <<lanSwitch 'hour' '小时'>></span><</if>>
+      <span><<lanSwitch 'To farmland' '至农田'>></span><span class='blue'><<set _card_minutes to maplebirch.get('Transport').journeyMinutes(_card_model, 160)>><<print Math.floor(_card_minutes / 60)>>:<<print String(_card_minutes % 60).padStart(2, '0')>></span>
+      <span><<lanSwitch 'Terrain' '通行地形'>></span><span><<for _card_terrain range _card_model.terrain>><<if _card_terrain isnot _card_model.terrain[0]>><<lanSwitch ', ' '、'>><</if>><<= maplebirch.t('deadwood-reblooms:transport:terrain:' + _card_terrain)>><</for>></span>
+      <<if _card_model.kind isnot 'bicycle'>>
+        <span><<lanSwitch 'Passengers' '载客'>></span><span><<print _card_model.seats>> <<lanSwitch 'people' '人'>></span>
+        <span><<lanSwitch 'Fuel tank' '油箱'>></span><span class='blue'><<print _card_model.tank>> L</span>
+        <span><<lanSwitch 'Journey fuel' '行程耗油'>></span><span class='blue'><<print (_card_model.fuel_use * 160).toFixed(2)>> L</span>
+      <</if>>
+      <<if _card_vehicle>>
+        <span><<lanSwitch 'Condition' '车况'>></span><span><<deadwood-transport-condition _card_vehicle>></span>
+        <<if _card_model.tank gt 0>><span><<lanSwitch 'Fuel remaining' '剩余油量'>></span><span @class="_card_vehicle.fuel >= _card_model.tank / 4 ? 'blue' : 'red'"><<print _card_vehicle.fuel.toFixed(1)>> L</span><</if>>
+      <</if>>
+    </div>
+    <div class='deadwood-transport-actions'><<print _card_actions>></div>
+  <</deadwood-card>>
+<</widget>>
+
+<<widget 'deadwood-transport-repair-shop'>>
+  <<set _repair_kind to _args[0], _repair_notice to _args[1], _repair_block to _args[2], _repairs to maplebirch.get('Transport').repairs>>
+  <<deadwood-card `_repair_kind is 'bicycle' ? 'Bicycle repair kit' : 'Vehicle repair kit'` `_repair_kind is 'bicycle' ? '自行车维修包' : '随车维修工具'`>>
+    <<icon `'transport/' + _repair_kind + '-repair-kit.png'`>><<language>>
+      <<option 'EN'>>
+        <<if _repair_kind is 'bicycle'>>A tyre pump, patches and small tools fit inside a pouch that straps beneath the saddle.<<else>>A tool roll, spare fuses and sealing tape fit beneath a seat.<</if>>
+        The kit includes three sets of supplies. Each repair uses one. Housekeeping skill improves the repairs, up to 60% condition.
+      <<option 'CN'>>
+        <<if _repair_kind is 'bicycle'>>打气筒、补胎片和小工具装在一个能绑在坐垫下的小包里。<<else>>卷起来的工具袋、备用保险丝和密封胶带可以收在座椅下。<</if>>
+        工具附带三份耗材，每次维修用去一份。家务技能提高修复效果，车况最多修到 60%。
+    <</language>><br>
+    <<if $Transport.repair_tools[_repair_kind]>>
+      <<lanSwitch 'Supplies remaining: ' '剩余耗材：'>><span class='teal'><<print $Transport.repair_parts[_repair_kind]>> / <<print _repairs.terms.parts_capacity>></span><br>
+    <</if>>
+    <<if !$Transport.repair_tools[_repair_kind] or $Transport.repair_parts[_repair_kind] lt _repairs.terms.parts_capacity>>
+      <<deadwood-transport-money `_repairs.price(_repair_kind)`>> —
+      <<if maplebirch.get('Transport').canPay(_repairs.price(_repair_kind))>>
+        <<capture _repair_kind _repair_notice _repair_block>>
+          <<icon `'transport/' + _repair_kind + ($Transport.repair_tools[_repair_kind] ? '-repair-parts.png' : '-repair-kit.png')`>><<lanLink `$Transport.repair_tools[_repair_kind] ? ['Restock supplies', '补充耗材'] : ['Buy', '购买']`>>
+            <<if maplebirch.get('Transport').repairs.buy(_repair_kind)>>
+              <<updatesidebarmoney>><<run Dynamic.render(_repair_notice, _repair_block)>>
+            <</if>>
+          <</lanLink>>
+        <</capture>>
+      <<else>><span class='purple'><<lanSwitch 'You cannot afford it.' '你买不起。'>></span><</if>>
+    <</if>>
+  <</deadwood-card>>
+<</widget>>
+
+<<widget 'deadwood-transport-ride-options'>>
+  <<icon `'transport/' + maplebirch.get('Transport').model.id + '.png'`>><<lanLink ['Keep riding', '继续骑行'] 'Deadwood Transport Menu'>><</lanLink>><br>
+  <<foresticon>><<lanLink ['Dismount and look around', '下车查看四周'] 'Forest'>><<set $eventskip to 1>><</lanLink>><br>
+<</widget>>
+
+<<widget 'deadwood-transport-passenger-reaction'>>
+  <<set _ride_scene to $Transport.trip.scene ?? 0>>
+  <<for _ride_name range ($Transport.trip.passengers ?? [])>>
+    <<npc _ride_name>><<person1>><<if _ride_name is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<switch _ride_name>>
+          <<case 'Alex'>>
+            <<switch _ride_scene>>
+              <<case 0>>
+                Alex keeps the shopping bag between <<his>> feet. A bottle rattles as you take a bend. <<He>> steadies it with one hand. "Don't fancy cleaning that out of your seats."
+              <<case 1>>
+                Alex looks back as the houses thin out. "Got what I needed, anyway. Can't buy everything from the neighbours." <<He>> turns towards the fields, pointing out the track before you reach it.
+              <<case 2>>
+                A tractor edges onto the road ahead. "Give that one room," Alex says. You ease off, and <<he>> settles back as it turns away. "There we go. No rush."
+            <</switch>>
+          <<case 'Robin'>>
+            <<if C.npc.Robin.trauma gte 40>>
+              Robin checks <<his>> seat belt twice. <<He>> watches the pavement for a while, then settles back when the car is moving. "Thanks for taking me."
+            <<else>>
+              <<switch _ride_scene>>
+                <<case 0>>Robin watches the shop windows pass. "It's strange seeing the streets from here." <<He>> points out a window display <<he>> had only seen on foot.
+                <<case 1>>Robin keeps <<his>> bag on <<his>> knees. At a red light, <<he>> glances at you. "This is nice. Going somewhere together, I mean."
+                <<case 2>>Robin checks <<his>> seat belt, then starts talking about a game <<he>> has been playing. <<He>> pauses at each junction, leaving you time to watch the road.
+              <</switch>>
+            <</if>>
+          <<case 'Whitney'>>
+            <<switch _ride_scene>>
+              <<case 0>>Whitney spreads <<his>> knees as far as the seat allows. "Your car, your music. Just don't expect me to be quiet." <<He>> reaches for the volume control, watching you before turning it.
+              <<case 1>>Whitney looks over the dashboard, then at you. "Getting fancy, aren't we?" When you stop at a light, <<he>> catches someone looking in and stares until they look away.
+              <<case 2>>"Come on, then. Show me what you've got." Whitney grins as you pull away, then groans when the next light turns red. "Of fucking course."
+            <</switch>>
+          <<case 'Kylar'>>
+            <<switch _ride_scene>>
+              <<case 0>>Kylar sits close to the door until you ask whether <<he>> is comfortable. "Yes. Very." At a red light, <<he>> offers you <<his>> hand, taking it back when the traffic starts moving.
+              <<case 1>>Kylar looks around the car. "Who else has been in here?" <<He>> stops fiddling with <<his>> sleeve when you remind <<him>> that you invited <<him>> today.
+              <<case 2>>Kylar holds <<his>> bag tightly between <<his>> knees. When you ask if something is wrong, <<he>> shakes <<his>> head. "No. I like being here." <<His>> grip slowly loosens.
+            <</switch>>
+          <<case 'Sydney'>>
+            <<if $Transport.trip.commute is 'school'>>
+              Sydney sets <<his>> school bag by <<his>> feet. <<if _sydneyStatus.includes('corrupt')>>"Better than walking." <<He>> grins. "You can hear about my morning on the way."<<else>>"Thank you. I was going to walk." <<He>> checks that <<his>> books are still tucked safely inside the bag.<</if>>
+            <<elseif $Transport.trip.commute is 'temple'>>
+              Sydney checks the time. <<if _sydneyStatus.includes('corrupt')>>"Still on time. Jordan can't complain about that."<<else>>"We should arrive before I'm needed."<</if>> <<He>> closes <<his>> bag and settles into the seat.
+            <<else>>
+              <<switch _ride_scene>>
+                <<case 0>>Sydney looks out of the window. <<if _sydneyStatus.includes('corrupt')>>"I could get used to this." <<He>> rests <<his>> elbow by the window.<<else>>"Thank you for inviting me." <<He>> smiles when you glance over at a stop.<</if>>
+                <<case 1>>Sydney waits until you stop at a junction to speak. <<if _sydneyStatus.includes('corrupt')>>"Eyes on the road. You can look at me when we get there." <<He>> grins.<<else>>"Tell me if you need some quiet." <<He>> keeps <<his>> hands folded in <<his>> lap.<</if>>
+                <<case 2>>Sydney points out a shop on the other side of the road. <<if _sydneyStatus.includes('corrupt')>>"We should have a look sometime. Just us."<<else>>"I've passed it so often. I've never had a look inside."<</if>>
+              <</switch>>
+            <</if>>
+        <</switch>>
+        <<if maplebirch.get('Transport').model.id is 'convertible'>>
+          <<if Weather.isSnow or Weather.precipitation is 'rain'>>The roof keeps the weather out. <<He>> watches drops run down the side window.
+          <<else>>The breeze catches <<his>> hair. <<He>> holds it out of <<his>> face as you pass between the buildings.<</if>>
+        <</if>>
+        <<switch _ride_name>>
+          <<case 'Robin'>>
+            <<if C.npc.Robin.lust gte 40>>Somewhere past the second junction <<he>> puts <<his>> hand on your thigh, flat and still, and leaves it there until the next turning. "Tell me if that's distracting," <<he>> says, and does not move it.<</if>>
+          <<case 'Whitney'>>
+            <<if C.npc.Whitney.dom gte 10>>Whitney slides <<his>> hand up the inside of your thigh as you change gear, watching your face rather than the road. "Eyes forward, slut."<</if>>
+          <<case 'Kylar'>>
+            <<if C.npc.Kylar.love gte 60>>Kylar keeps <<his>> fingers laced through yours on the gearstick, <<his>> thumb working over your knuckles every time you have to move it.<</if>>
+          <<case 'Sydney'>>
+            <<if _sydneyStatus.includes('corruptLust')>>Sydney's hand finds your knee and stays there, fingers working slow circles through the fabric. "You invited me out for a reason," <<he>> says, looking out of the window.<</if>>
+        <</switch>>
+      <<option 'CN'>>
+        <<switch _ride_name>>
+          <<case 'Alex'>>
+            <<switch _ride_scene>>
+              <<case 0>>
+                艾利克斯把购物袋放在两脚之间。转弯时，袋里的瓶子碰响了。<<He>>伸手扶稳。“可别洒了。回头还得擦你的车座。”
+              <<case 1>>
+                房屋渐渐稀疏，艾利克斯朝后看了一眼。“反正要买的都买到了。也不能什么都找邻居买。”<<He>>转向田野，没等你开过路口就指出了岔道。
+              <<case 2>>
+                前方一辆拖拉机正拐上公路。“给它留点地方。”艾利克斯说。你松开油门，等它转走，<<he>>才重新靠回座椅。“这就对了。不急。”
+            <</switch>>
+          <<case 'Robin'>>
+            <<if C.npc.Robin.trauma gte 40>>
+              罗宾检查了两遍安全带。<<He>>盯着人行道看了一阵，等车开起来后才靠回座椅。“谢谢你带我。”
+            <<else>>
+              <<switch _ride_scene>>
+                <<case 0>>罗宾看着橱窗从车旁过去。“从这里看街道，感觉真奇妙。”<<He>>指给你看一处橱窗，以前步行时才见过里面的陈列。
+                <<case 1>>罗宾把包放在膝上。等红灯时，<<he>>看向你。“这样真好。我是说，一起出门。”
+                <<case 2>>罗宾检查了安全带，开始聊起最近玩的游戏。每到路口，<<he>>就停一下，留给你看路的时间。
+              <</switch>>
+            <</if>>
+          <<case 'Whitney'>>
+            <<switch _ride_scene>>
+              <<case 0>>惠特尼尽可能把膝盖向两边摊开。“你的车，听你的歌。可别指望我安静。”<<He>>伸手去碰音量旋钮，调动前看了你一眼。
+              <<case 1>>惠特尼打量仪表盘，又看向你。“还挺会享受啊？”等红灯时，<<he>>发现有人往车里看，便盯着对方，直到那人转开目光。
+              <<case 2>>“来啊，让我见识见识。”你起步时，惠特尼笑了起来。下个路口刚好转成红灯，<<he>>又哼了一声。“真他妈会挑时候。”
+            <</switch>>
+          <<case 'Kylar'>>
+            <<switch _ride_scene>>
+              <<case 0>>凯拉尔贴着车门坐着，直到你问<<he>>舒不舒服。“舒服。很舒服。”等红灯时，<<he>>向你伸出手；车流开始动了，<<he>>又收了回去。
+              <<case 1>>凯拉尔环顾车里。“还有谁坐过这辆车？”你提醒<<him>>，今天邀请的是<<him>>，<<he>>才不再揉弄袖口。
+              <<case 2>>凯拉尔把包紧紧抱在膝间。你问是不是有什么事，<<he>>摇摇头。“没有。我喜欢待在这里。”<<His>>手慢慢松开了些。
+            <</switch>>
+          <<case 'Sydney'>>
+            <<if $Transport.trip.commute is 'school'>>
+              悉尼把书包放在脚边。<<if _sydneyStatus.includes('corrupt')>>“比走路舒服。”<<He>>笑了笑。“路上正好跟你说说我早上都干了什么。”<<else>>“谢谢，本来准备走过去的。”<<He>>又检查了一下，确认书都妥当地放在包里。<</if>>
+            <<elseif $Transport.trip.commute is 'temple'>>
+              悉尼看了看时间。<<if _sydneyStatus.includes('corrupt')>>“还来得及。约旦总不能为这个挑刺。”<<else>>“应该赶得上神殿的安排。”<</if>><<He>>合好书包，坐稳了些。
+            <<else>>
+              <<switch _ride_scene>>
+                <<case 0>>悉尼望向窗外。<<if _sydneyStatus.includes('corrupt')>>“这样出门，我倒是能习惯。”<<He>>把手肘搭在窗边。<<else>>“谢谢你邀我出来。”你停车时看了<<him>>一眼，<<he>>便笑了笑。<</if>>
+                <<case 1>>悉尼等你在路口停下，才开口。<<if _sydneyStatus.includes('corrupt')>>“看路。到了再看我。”<<He>>笑了起来。<<else>>“想安静一会儿就告诉我。”<<He>>把双手放在膝上。<</if>>
+                <<case 2>>悉尼指了指马路另一边的商店。<<if _sydneyStatus.includes('corrupt')>>“哪天一起去看看吧。就我们两个。”<<else>>“路过那么多次，还没进去看过。”<</if>>
+              <</switch>>
+            <</if>>
+        <</switch>>
+        <<if maplebirch.get('Transport').model.id is 'convertible'>>
+          <<if Weather.isSnow or Weather.precipitation is 'rain'>>车顶挡住了雨雪。<<He>>看着水珠沿侧窗流下来。
+          <<else>>风吹起<<his>>的头发。车子从楼房之间驶过，<<he>>伸手将发丝拢到一旁。<</if>>
+        <</if>>
+        <<switch _ride_name>>
+          <<case 'Robin'>>
+            <<if C.npc.Robin.lust gte 40>>过了第二个路口，<<he>>把手放在你的大腿上，掌心摊平，一直没动，直到下一个转弯才收回去。“要是这样影响你开车，就告诉我。”<<he>>说，手却没有挪开。<</if>>
+          <<case 'Whitney'>>
+            <<if C.npc.Whitney.dom gte 10>>你换挡时，惠特尼的手顺着你大腿内侧往上滑，眼睛盯着你的脸，不看路。“眼睛看前面，骚货。”<</if>>
+          <<case 'Kylar'>>
+            <<if C.npc.Kylar.love gte 60>>凯拉尔把手指扣在你的手背上，压在挡杆上，每次你不得不挪手，<<his>>拇指都会在你指节上蹭一遍。<</if>>
+          <<case 'Sydney'>>
+            <<if _sydneyStatus.includes('corruptLust')>>悉尼的手摸到你的膝盖就停在那儿，隔着布料慢慢打圈。“你约我出来，总有个原因。”<<he>>看着窗外说。<</if>>
+        <</switch>>
+    <</language>><br><br>
+  <</for>>
 <</widget>>

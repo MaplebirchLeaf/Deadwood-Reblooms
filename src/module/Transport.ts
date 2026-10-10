@@ -4,6 +4,11 @@ import Module from './Module';
 import Catalog, { type Vehicle, type VehicleModel, type VehicleOutlet } from './Transport/Catalog';
 import DrivingSchool from './Transport/DrivingSchool';
 import Fuel from './Transport/Fuel';
+import Repairs from './Transport/Repairs';
+import Maintenance from './Transport/Maintenance';
+import Companions from './Transport/Companions';
+import Commute, { type AveryReply, type Ride } from './Transport/Commute';
+import TravelEvents, { type RoadsideEvent } from './Transport/TravelEvents';
 
 interface Journey {
   vehicle: number;
@@ -13,6 +18,15 @@ interface Journey {
   fuel: number;
   settled: boolean;
   interrupted: boolean;
+  passengers: string[];
+  dated: boolean;
+  /** 本次行程已在路边独处过。 */
+  fooled: boolean;
+  /** 车厢亲密场景是否尚未初始化战斗。 */
+  pullstart?: boolean;
+  commute?: Ride['kind'];
+  scene?: number;
+  event?: RoadsideEvent;
 }
 
 export interface TransportState {
@@ -26,9 +40,16 @@ export interface TransportState {
   driving: number;
   helmet: boolean;
   fuel_stores: Record<string, { cans: number; litres: number }>;
+  repair_tools: { bicycle: boolean; motor: boolean };
+  repair_parts: { bicycle: number; motor: number };
+  passengers: string[];
+  affection_days: Record<string, number>;
+  commute: Ride | null;
+  avery_reply: AveryReply | null;
+  event_day: number;
   school: typeof DrivingSchool.defaults;
   trip: Journey | null;
-  notice: 'bought' | 'repaired' | 'fuelled' | 'parked' | 'taken' | 'sold' | 'helmet' | 'recovered' | 'delivered' | 'refilled' | null;
+  notice: 'bought' | 'repaired' | 'fuelled' | 'parked' | 'taken' | 'sold' | 'helmet' | 'recovered' | 'delivered' | 'refilled' | 'tools' | 'parts' | 'patched' | null;
 }
 
 class Transport extends Module {
@@ -43,6 +64,13 @@ class Transport extends Module {
     driving: 0,
     helmet: false,
     fuel_stores: {},
+    repair_tools: { bicycle: false, motor: false },
+    repair_parts: { bicycle: 0, motor: 0 },
+    passengers: [],
+    affection_days: {},
+    commute: null,
+    avery_reply: null,
+    event_day: -1,
     school: clone(DrivingSchool.defaults),
     trip: null,
     notice: null
@@ -51,6 +79,11 @@ class Transport extends Module {
   public readonly catalog = Catalog;
   public readonly school = new DrivingSchool(this);
   public readonly fuel = new Fuel(this);
+  public readonly repairs = new Repairs(this);
+  public readonly maintenance = new Maintenance(this);
+  public readonly companions = new Companions(this);
+  public readonly commute = new Commute(this);
+  public readonly events = new TravelEvents(this);
   public external_bicycle = false;
   private trail_menu = false;
 
@@ -60,9 +93,11 @@ class Transport extends Module {
 
   public override preInit(): void {
     super.preInit();
+    this.core.dynamic.regTimeEvent('onDay', ':deadwood-transport-upkeep', { action: () => this.maintenance.settle() });
     this.core.on(':passagestart', () => {
       V.Transport ??= clone(Transport.defaults);
       const title = this.core.passage.title;
+      this.commute.enterPassage();
       // 原版正文末尾会清空 eventskip，在入口保留普通探索菜单的判定。
       this.trail_menu =
         V.eventskip >= 1 &&
@@ -82,7 +117,7 @@ class Transport extends Module {
   public get point(): string | null {
     if (this.atGarage) {
       const property = this.core.get('Finance')?.realEstate.current;
-      return property ? Catalog.point(property.street) : null;
+      return property ? (property.street === 'Office Lobby' ? 'high' : Catalog.point(property.street)) : null;
     }
     if (this.core.passage.title === 'Shopping Centre') return 'high';
     return Catalog.point(this.core.passage.title) ?? (this.core.passage.title.startsWith('Deadwood Transport') ? this.state.origin : null);
@@ -199,10 +234,37 @@ class Transport extends Module {
   }
 
   public get canDepart(): boolean {
-    if (!this.ready || !this.vehicle || !this.model || !this.nearby.includes(this.vehicle) || this.vehicle.garage !== null || this.vehicle.condition <= 0 || V.worn.feet.type.includes('shackle'))
+    if (
+      !this.ready ||
+      !this.vehicle ||
+      !this.model ||
+      !this.nearby.includes(this.vehicle) ||
+      this.vehicle.garage !== null ||
+      this.vehicle.condition <= 0 ||
+      (this.vehicle.arrears ?? 0) > 0 ||
+      V.worn.feet.type.includes('shackle')
+    )
       return false;
     if (this.model.kind === 'bicycle') return !this.external_bicycle;
-    return V.drunk <= 0 && V.drugged <= 0 && this.qualified && (this.model.kind !== 'motorcycle' || this.state.helmet);
+    return V.drunk <= 0 && V.drugged <= 0 && V.stress < V.stressmax && this.qualified && (this.model.kind !== 'motorcycle' || this.state.helmet);
+  }
+
+  public journeyMinutes(model: VehicleModel, distance: number, trail = false): number {
+    const slow = Weather.isSnow ? 1.5 : Weather.precipitation === 'rain' ? 1.2 : 1;
+    const ratio = trail ? (model.kind === 'bicycle' ? 0.65 : 0.5) : model.travel_ratio;
+    const skill = model.kind === 'bicycle' ? window.currentSkillValue('athletics') : this.state.driving;
+    const proficiency = 1 - (Math.clamp(skill, 0, 1000) / 1000) * (model.kind === 'bicycle' ? 0.2 : trail ? 0.15 : 0.3);
+    const minutes = Math.ceil(distance * ratio * slow) + (model.kind === 'bicycle' ? 1 : 2);
+    return Math.max(2, Math.ceil(minutes * proficiency));
+  }
+
+  public journeyWear(model: VehicleModel, minutes: number, trail = false): number {
+    return (minutes / 60) * model.wear_per_hour * (trail ? (model.trail_wear ?? 1.5) : 1);
+  }
+
+  public get forestRoad(): boolean {
+    const trip = this.state.trip;
+    return !!trip && V.town_projects.road >= 4 && trip.to.startsWith('forest:') && trip.from.startsWith('forest:') && Math.max(Number(trip.from.split(':')[1]), Number(trip.to.split(':')[1])) <= 25;
   }
 
   public get qualified(): boolean {
@@ -235,15 +297,17 @@ class Transport extends Module {
         });
       if (model.kind === 'bicycle' && ['wolf', 'nightingale', 'danube'].includes(from)) choices.push({ id: 'forest:0', distance: 10 });
       if (model.terrain.includes('moor_track') && from === 'farmland' && !Weather.isSnow && Weather.precipitation !== 'rain') choices.push({ id: 'moor:0', distance: 5 });
+      const estate = this.core.get('Finance')?.realEstate;
+      for (const property of estate?.properties ?? []) {
+        if (!estate!.owns(property.id) || estate!.isFrozen(property.id) || estate!.managementFor(property.id).rented) continue;
+        const point = property.street === 'Office Lobby' ? 'high' : Catalog.point(property.street);
+        const distance = point ? Catalog.distance(from, point, model.kind === 'bicycle') : null;
+        if (distance !== null) choices.push({ id: 'home:' + property.id, distance: distance + 2 });
+      }
     }
-    const slow = Weather.isSnow ? 1.5 : Weather.precipitation === 'rain' ? 1.2 : 1;
-    const fitness = model.kind === 'bicycle' ? 1 - Math.min(1000, Math.max(0, window.currentSkillValue('athletics'))) / 5000 : 1;
     return choices.map(({ id, distance }) => {
-      const trail = id.includes(':') || from.includes(':');
-      const ratio = trail ? (model.kind === 'bicycle' ? 0.65 : 0.5) : model.travel_ratio;
-      const proficiency = model.kind === 'bicycle' ? fitness : 1 - (Math.min(1000, Math.max(0, this.state.driving)) / 1000) * (trail ? 0.15 : 0.3);
-      const base_minutes = Math.ceil(distance * ratio * slow) + (model.kind === 'bicycle' ? 1 : 2);
-      const minutes = Math.max(2, Math.ceil(base_minutes * proficiency));
+      const trail = /^(?:forest|moor):/.test(id) || /^(?:forest|moor):/.test(from);
+      const minutes = this.journeyMinutes(model, distance, trail);
       const fuel = Math.ceil(distance * model.fuel_use * 100) / 100;
       return { id, name: Catalog.name(id), minutes, fuel, affordable: fuel <= (this.vehicle?.fuel ?? 0) };
     });
@@ -256,7 +320,7 @@ class Transport extends Module {
   public open(vehicle_id?: number): boolean {
     if (!this.ready || (!this.canApproach && !this.shopOpen && this.core.passage.title !== 'Deadwood Reblooms Property Garage')) return false;
     const vehicle = vehicle_id === undefined ? this.nearby[0] : this.nearby.find(vehicle => vehicle.id === vehicle_id);
-    if (vehicle_id !== undefined && !vehicle) return false;
+    if (vehicle_id !== undefined && (!vehicle || this.core.passage.title === 'Shopping Centre' || this.shopOpen)) return false;
     const shop = this.shopOpen ? this.state.shop : null;
     this.state.origin = this.point;
     if (!shop) this.state.return_passage = this.core.passage.title;
@@ -264,6 +328,8 @@ class Transport extends Module {
     this.state.offer = null;
     this.state.shop = shop;
     this.state.trip = null;
+    this.state.passengers = [];
+    this.state.commute = null;
     this.state.selected = vehicle?.id ?? null;
     return this.state.origin !== null;
   }
@@ -283,7 +349,7 @@ class Transport extends Module {
     this.state.offer = null;
     this.core.SugarCube.Wikifier.wikifyEval(`<<money -${model.price} 'transport'>>`);
     const id = this.state.next_id++;
-    this.state.vehicles.push({ id, model: model.id, point: this.shopPoint, garage: null, condition: 100, fuel: model.tank });
+    this.state.vehicles.push({ id, model: model.id, point: this.shopPoint, garage: null, condition: 100, fuel: model.tank, upkeep_day: Math.floor(Time.days), arrears: 0 });
     this.state.selected = id;
     this.state.notice = 'bought';
     this.core.SugarCube.Wikifier.wikifyEval(`<<pass ${model.kind === 'bicycle' ? 5 : 15}>>`);
@@ -343,6 +409,7 @@ class Transport extends Module {
     }
     if (!this.availableAtShop) return false;
     if (action === 'sell') {
+      if ((vehicle.arrears ?? 0) > 0) return false;
       this.core.SugarCube.Wikifier.wikifyEval(`<<money ${Math.floor((model.price * vehicle.condition) / 200)}>>`);
       this.state.vehicles = this.state.vehicles.filter(item => item.id !== vehicle.id);
       this.state.selected = null;
@@ -372,7 +439,25 @@ class Transport extends Module {
   public startTrip(destination: string): boolean {
     const route = this.destinations.find(route => route.id === destination);
     if (this.core.passage.title !== 'Deadwood Transport Menu' || !this.canDepart || !route?.affordable || (this.state.trip && !this.state.trip.settled)) return false;
-    this.state.trip = { vehicle: this.vehicle!.id, from: this.point!, to: destination, minutes: route.minutes, fuel: route.fuel, settled: false, interrupted: false };
+    const commute = this.state.commute;
+    if (commute && (!this.commute.active || !commute.boarded || destination !== commute.to)) return false;
+    const passengers = this.state.passengers.filter(name => this.companions.available.includes(name)).slice(0, this.model!.seats);
+    if (commute && !passengers.includes(commute.npc)) return false;
+    this.state.trip = {
+      vehicle: this.vehicle!.id,
+      from: this.point!,
+      to: destination,
+      minutes: route.minutes,
+      fuel: route.fuel,
+      settled: false,
+      interrupted: false,
+      passengers,
+      dated: false,
+      fooled: false,
+      commute: commute?.kind,
+      scene: this.core.get('DeadwoodReblooms')!.rand.int(2),
+      event: this.events.roll(destination, route.minutes, !!commute)
+    };
     return true;
   }
 
@@ -382,6 +467,7 @@ class Transport extends Module {
       this.core.passage.title !== 'Deadwood Transport Travel' ||
       !trip ||
       trip.settled ||
+      (trip.commute && (!this.commute.active || !this.state.commute?.boarded || trip.to !== this.state.commute.to || !trip.passengers.includes(this.state.commute.npc))) ||
       !this.canDepart ||
       this.vehicle?.id !== trip.vehicle ||
       this.point !== trip.from ||
@@ -392,24 +478,56 @@ class Transport extends Module {
     const vehicle = this.vehicle;
     const model = this.model!;
     vehicle.fuel = Math.max(0, Math.round((vehicle.fuel - trip.fuel) * 100) / 100);
-    const wear = trip.minutes / (model.kind === 'bicycle' ? 60 : 120);
-    vehicle.condition = Math.max(0, Math.round((vehicle.condition - wear) * 100) / 100);
+    const trail = /^(?:forest|moor):/.test(trip.from) || /^(?:forest|moor):/.test(trip.to);
+    const wear = this.journeyWear(model, trip.minutes, trail && !this.forestRoad);
+    vehicle.condition = Math.max(0, Math.round((vehicle.condition - wear) * 1000) / 1000);
     this.core.SugarCube.Wikifier.wikifyEval(`<<pass ${trip.minutes}>>`);
     if (this.core.passage.title !== 'Deadwood Transport Travel' || !this.ready) {
       trip.interrupted = true;
       return false;
     }
-    vehicle.point = trip.to;
+    const estate = this.core.get('Finance')?.realEstate;
+    const home = trip.to.startsWith('home:') ? estate?.properties.find(property => property.id === trip.to.slice(5)) : null;
+    vehicle.point = home ? (home.street === 'Office Lobby' ? 'high' : Catalog.point(home.street))! : trip.to;
     vehicle.garage = null;
-    this.state.origin = trip.to;
+    this.state.origin = vehicle.point;
     this.state.return_passage = Catalog.passage(trip.to);
+    if (home && !estate!.visit(home.id)) this.state.return_passage = Catalog.passage(vehicle.point);
+    if (trip.from.startsWith('forest:') && !trip.to.startsWith('forest:')) V.foresthunt = 0;
+    if (trip.from.startsWith('moor:') && !trip.to.startsWith('moor:')) {
+      V.moor = 0;
+      V.forestmod = 1;
+      delete V.moor_hunt;
+    }
+    if (trip.to.startsWith('forest:')) {
+      V.forest = Number(trip.to.split(':')[1]);
+      V.forestmod = this.forestRoad ? 1 : 1.5;
+      V.forestmove = 0;
+      V.forest_search = false;
+      V.eventskip = this.forestRoad ? 1 : 0;
+      if (V.foresthunt >= 1) V.foresthunt++;
+      V.location = 'forest';
+      V.bus = 'forest';
+      V.outside = 1;
+    } else if (trip.to.startsWith('moor:')) {
+      V.moor = Number(trip.to.split(':')[1]);
+      V.forestmod = 1;
+      V.eventskip = 0;
+      delete V.moormove;
+      if (V.moor_hunt >= 1) V.moor_hunt++;
+      V.location = 'moor';
+      V.bus = 'moor';
+      V.outside = 1;
+    }
     if (model.kind === 'bicycle') this.core.SugarCube.Wikifier.wikifyEval(`<<tiredness ${Math.max(1, Math.ceil(trip.minutes / 10))}>><<athletics 1>>`);
     else this.state.driving = Math.min(1000, this.state.driving + Math.min(10, Math.ceil(trip.minutes / 5)));
+    this.companions.affection(model.id === 'convertible');
+    this.commute.arrive();
     return true;
   }
 
   public get arrival(): string {
-    return this.state.trip ? Catalog.passage(this.state.trip.to) : this.state.return_passage;
+    return this.state.return_passage;
   }
 }
 

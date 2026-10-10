@@ -14,6 +14,9 @@ export interface VehicleModel {
   outlet: VehicleOutlet;
   learner: boolean;
   price: number;
+  weekly_upkeep: number;
+  wear_per_hour: number;
+  trail_wear?: number;
   travel_ratio: number;
   tank: number;
   fuel_use: number;
@@ -29,6 +32,8 @@ export interface Vehicle {
   garage: string | null;
   condition: number;
   fuel: number;
+  arrears?: number;
+  upkeep_day?: number;
 }
 
 export default class Catalog {
@@ -48,6 +53,10 @@ export default class Catalog {
   }
 
   public static name(point: string): string {
+    if (point.startsWith('home:')) {
+      const property = maplebirch.get('Finance')?.realEstate.properties.find(property => property.id === point.slice(5));
+      if (property) return lanSwitch(property.name.EN, property.name.CN);
+    }
     const route = [...this.routes, ...this.roads].find(route => route.id === point);
     if (route) return maplebirch.t(route.name);
     const [area, depth] = point.split(':');
@@ -56,6 +65,7 @@ export default class Catalog {
   }
 
   public static passage(point: string): string {
+    if (point.startsWith('home:')) return 'Deadwood Reblooms Property Home';
     if (point.startsWith('forest:')) return 'Forest';
     if (point.startsWith('moor:')) return 'Moor';
     return [...this.routes, ...this.roads].find(route => route.id === point)?.passage ?? 'Harvest Street';

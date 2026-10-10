@@ -3,6 +3,26 @@
 import RowanPortrait from '../NamedNPCSidebarPortrait/Rowan';
 
 export default function Industry(maplebirch: typeof window.maplebirch): void {
+  maplebirch.tool.patch.location.configure(
+    'deadwood_factory',
+    {
+      folder: 'workshop',
+      base: {
+        default: { condition: () => !Weather.isSnow && !Weather.lightsOn, image: 'base.png' },
+        snow: { condition: () => Weather.isSnow && !Weather.lightsOn, image: 'snow.png' },
+        night: { condition: () => !Weather.isSnow && Weather.lightsOn, image: 'base-night.png' },
+        snowNight: { condition: () => Weather.isSnow && Weather.lightsOn, image: 'snow-night.png' }
+      },
+      emissive: { image: 'emissive.png', condition: () => Weather.lightsOn && maplebirch.get('Finance')?.industry.open === true, color: '#f6d49edd', size: 3, intensity: 0.65 },
+      weather: {
+        fogDistributionCurve: 1,
+        rainSplashEnabled: true,
+        fogEnabled: true,
+        groundBounds: { splashes: { top: 4, bottom: 0 }, fog: { top: 19, bottom: 0 } }
+      }
+    },
+    { overwrite: true }
+  );
   maplebirch.tool.inject({
     locationPassage: {
       'Elk Street': [

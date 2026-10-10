@@ -8,10 +8,39 @@
   <<deadwood-transport-return>>
 <<else>>
   <<icon `'transport/' + _transport.model.id + '.png'`>><b><<print maplebirch.t(_transport.model.name)>></b> — <<print _transport.catalog.name(_transport.point)>><br><br>
+  <<if (_transport.vehicle.arrears ?? 0) gt 0>>
+    <span class='red'><<lanSwitch 'Unpaid upkeep: ' '保养欠费：'>><<= formatMoney(_transport.vehicle.arrears)>></span><br>
+    <<if maplebirch.get('Finance')?.state.bank.opened and maplebirch.get('Finance').state.bank.balance gte _transport.vehicle.arrears>>
+      <<shopicon 'register'>><<lanLink ['Pay from your bank account', '从银行账户补缴']>>
+        <<if maplebirch.get('Transport').maintenance.pay()>><<updatesidebarmoney>><<run Dynamic.render('deadwood-transport-menu')>><</if>>
+      <</lanLink>><br>
+    <</if>><br>
+  <</if>>
+  <<if _transport.vehicle.condition lt _transport.repairs.terms.condition_limit>>
+    <<if _transport.repairs.amount gt 0>>
+      <<icon `'transport/' + _transport.repairs.kind + '-repair-kit.png'`>><<lanLink `lanSwitch('Make roadside repairs', '应急维修') + ' (0:' + _transport.repairs.terms[_transport.repairs.kind].minutes + ')'`>>
+        <<if maplebirch.get('Transport').repairs.use() and $passage is 'Deadwood Transport Menu'>>
+          <<goto 'Deadwood Transport Repair'>>
+        <</if>>
+      <</lanLink>> | <span class='green'><<lanSwitch 'Condition +' '车况 +'>><<print Math.floor(_transport.repairs.amount)>>%</span><br>
+    <<else>>
+      <i><<lanSwitch 'A repair kit and supplies would help you get moving again.' '备好维修工具和耗材，就能在途中应急修复。'>></i><br>
+    <</if>><br>
+  <</if>>
+  <<if _transport.companions.available.length and !$Transport.commute>>
+    <<lanSwitch 'Invite someone along' '邀请同住恋人同行'>><br>
+    <<for _passenger range _transport.companions.available>>
+      <<capture _passenger>>
+        <<socialiseicon 'ask'>><<lanLink `lanSwitch(_passenger, {Robin: '罗宾', Whitney: '惠特尼', Kylar: '凯拉尔', Sydney: '悉尼'}[_passenger])`>>
+          <<run maplebirch.get('Transport').companions.invite(_passenger)>><<run Dynamic.render('deadwood-transport-menu')>>
+        <</lanLink>><<if $Transport.passengers.includes(_passenger)>> <span class='green'><<lanSwitch '(coming along)' '（一同出发）'>></span><</if>><br>
+      <</capture>>
+    <</for>><br>
+  <</if>>
   <<if _transport.garage>>
     <<lanSwitch 'Occupied spaces of this type: ' '此类车位已占用：'>><<print _transport.garage.used>> / <<print _transport.garage.capacity>><br>
     <<if _transport.vehicle.garage>>
-      <<icon `'transport/' + _transport.model.id + '.png'`>><<lanLink ['Take it out', '取车']>>
+      <<icon `'transport/' + _transport.model.id + '.png'`>><<lanLink ['Move it out of the garage', '移出车库']>>
         <<run maplebirch.get('Transport').park(false)>>
         <<run Dynamic.render('deadwood-transport-menu')>>
       <</lanLink>><br>
@@ -37,6 +66,8 @@
   <<if !_transport.canDepart>>
     <<if _transport.vehicle.condition lte 0>>
       <span class='red'><<lanSwitch 'It needs repairs before you can use it.' '修好之前，它没法上路。'>></span>
+    <<elseif (_transport.vehicle.arrears ?? 0) gt 0>>
+      <span class='red'><<lanSwitch 'Pay the outstanding upkeep before setting off.' '补缴保养费用后才能上路。'>></span>
     <<elseif _transport.vehicle.garage>>
       <<lanSwitch 'It is parked in the garage.' '它停在车库里。'>>
     <<elseif !_transport.qualified>>
@@ -50,9 +81,9 @@
     <<if _transport.point.startsWith('forest:')>>
       <<language>>
         <<option 'EN'>>
-          Roots break through the path. The trail narrows further in, where you would have to leave your bike and continue on foot.
+          Roots break through the path. You look for a way between the trees where the wheels can still pass.
         <<option 'CN'>>
-          树根拱出了路面。再往里，小径变得更窄，你得把车留在路边，步行穿过树林。
+          树根拱出了路面。你在树木间寻找仍能让车轮通过的小径。
       <</language>><br><br>
     <<elseif _transport.point.startsWith('moor:')>>
       <<language>>
@@ -62,12 +93,17 @@
           石楠间留下了几道车辙。再往前，岩石和湿地会挡住车轮，只能步行过去。
       <</language>><br><br>
     <</if>>
-    <<for _destination range _transport.destinations>>
+    <<if $Transport.commute>>
+      <<npc $Transport.commute.npc>><<person1>>
+      <<lanSwitch 'You agreed to give <<him>> a lift.' '你答应了送<<him>>一程。'>><br><br>
+    <</if>>
+    <<for _destination range _transport.destinations.filter(destination => !$Transport.commute || destination.id === $Transport.commute.to)>>
       <<capture _destination>>
         <<switch _destination.id.split(':')[0]>>
           <<case 'farmland'>><<farmicon>>
           <<case 'forest'>><<foresticon>>
           <<case 'moor'>><<mooricon>>
+          <<case 'home'>><<homeicon>>
           <<default>><<print '<<' + _destination.id + 'icon>>'>>
         <</switch>>
         <<if _destination.affordable>>
@@ -118,8 +154,10 @@
             You duck under a low branch. The tyres bump over roots before finding a clear stretch of path.
           <<elseif $Transport.trip.to.startsWith('moor:')>>
             You follow the wheel ruts through the heather, easing around stones that jut from the ground.
-          <<elseif $Transport.trip.to is 'farmland' or $Transport.trip.from is 'farmland'>>
+          <<elseif $Transport.trip.to is 'farmland'>>
             Houses give way to trees, then open fields. The wind catches your clothes as you crest a hill.
+          <<elseif $Transport.trip.from is 'farmland'>>
+            The fields fall behind you. You climb the hill, then follow the road down towards the town.
           <<else>>
             You keep close to the kerb, slowing where pedestrians cross.
           <</if>>
@@ -132,8 +170,10 @@
           <</if>>
         <<else>>
           You buckle your seat belt and pull away from the kerb.
-          <<if $Transport.trip.to is 'farmland' or $Transport.trip.from is 'farmland'>>
+          <<if $Transport.trip.to is 'farmland'>>
             You leave the houses behind. The road climbs between the trees before dropping towards the fields.
+          <<elseif $Transport.trip.from is 'farmland'>>
+            You leave the fields behind. Beyond the hill, the first houses appear between the trees.
           <<else>>
             You wait at a crossing, then join the traffic on the other side.
           <</if>>
@@ -143,6 +183,7 @@
         <<elseif Weather.precipitation is 'rain'>>
           The wet surface gleams beneath you. You leave extra room to brake.
         <</if>>
+        <<deadwood-transport-road-scene>>
         You stop at <<print _transport.catalog.name($Transport.trip.to)>> and leave your vehicle at the side.
       <<option 'CN'>>
         <<if _transport.model.kind is 'bicycle'>>
@@ -151,8 +192,10 @@
             你低头躲过垂下的树枝。车轮颠过几段树根，才重新找到平整的小径。
           <<elseif $Transport.trip.to.startsWith('moor:')>>
             你沿着石楠间的车辙前行，绕开凸出地面的石块。
-          <<elseif $Transport.trip.to is 'farmland' or $Transport.trip.from is 'farmland'>>
+          <<elseif $Transport.trip.to is 'farmland'>>
             房屋渐渐被树林和田野取代。越过山丘时，风吹得你的衣服贴在身上。
+          <<elseif $Transport.trip.from is 'farmland'>>
+            田野渐渐落在身后。你爬上山丘，再沿公路向小镇骑去。
           <<else>>
             你贴着路边骑行，在行人过街时放慢速度。
           <</if>>
@@ -165,8 +208,10 @@
           <</if>>
         <<else>>
           你系上安全带，把车驶离路边。
-          <<if $Transport.trip.to is 'farmland' or $Transport.trip.from is 'farmland'>>
+          <<if $Transport.trip.to is 'farmland'>>
             房屋被甩在身后。公路穿过树林，爬上山丘，又向田野延伸。
+          <<elseif $Transport.trip.from is 'farmland'>>
+            田野被甩在身后。越过山丘，最先一排房屋从树木间露了出来。
           <<else>>
             你在路口等了一会儿，随后汇入对面的车流。
           <</if>>
@@ -176,25 +221,150 @@
         <<elseif Weather.precipitation is 'rain'>>
           湿漉漉的路面泛着光。你留出更长的距离，免得来不及刹车。
         <</if>>
+        <<deadwood-transport-road-scene>>
         到了<<print _transport.catalog.name($Transport.trip.to)>>，你停下车，把它留在路边。
     <</language>><br><br>
-    <<getouticon>><<lanLink ['Continue', '继续'] _transport.arrival>>
-      <<set $phase to 0>>
-      <<if $Transport.trip.from.startsWith('forest:') and !$Transport.trip.to.startsWith('forest:')>>
-        <<set $foresthunt to 0>>
-      <<elseif $Transport.trip.from.startsWith('moor:') and !$Transport.trip.to.startsWith('moor:')>>
-        <<set $moor to 0, $forestmod to 1>>
-        <<unset $moor_hunt>>
+    <<deadwood-transport-passenger-reaction>>
+    <<deadwood-transport-ride-arrival>>
+    <<deadwood-transport-roadside-event>>
+    <<if $Transport.trip.to.startsWith('forest:') and !$nextPassageCheck>>
+      <<if $stress gte $stressmax and !$possessed>><<passoutforest>>
+      <<elseif $foresthunt gte 10 and !$possessed>><<foresthunt>>
+      <<elseif _transport.forestRoad>><<deadwood-transport-ride-options>>
+      <<else>>
+        <<rng>>
+        <<if $rng gte 81>><<eventforestitem>>
+        <<elseif dangerEvent($forestmod)>>
+          <<if $forest lte 20>><<eventforestoutskirts>><<else>><<eventforest>><</if>>
+        <<else>><<deadwood-transport-ride-options>><</if>>
       <</if>>
-      <<if $Transport.trip.to.startsWith('forest:')>>
-        <<set $forest to Number($Transport.trip.to.split(':')[1]), $forestmod to 1.5, $forestmove to 0, $eventskip to $Transport.trip.from.startsWith('forest:') ? 0 : 1>>
-        <<if $foresthunt gte 1>><<set $foresthunt += 1>><</if>>
-      <<elseif $Transport.trip.to.startsWith('moor:')>>
-        <<set $moor to Number($Transport.trip.to.split(':')[1]), $forestmod to 1, $eventskip to $Transport.trip.from.startsWith('moor:') ? 0 : 1>>
-        <<unset $moormove>>
-        <<if $moor_hunt gte 1>><<set $moor_hunt += 1>><</if>>
+    <<else>>
+      <<if _transport.companions.canFoolAround>>
+        <<loveicon>><<lanLink ['Pull over somewhere quiet', '把车停到僻静处']>>
+          <<if maplebirch.get('Transport').companions.foolAround()>>
+            <<set $Transport.trip.pullstart to true>><<goto 'Deadwood Transport Pull Over'>>
+          <</if>>
+        <</lanLink>><<promiscuous2>><br>
       <</if>>
-    <</lanLink>>
+      <<if _transport.companions.canDate>>
+        <<icon `'transport/' + _transport.model.id + '.png'`>><<lanLink ['Spend some time together (0:20)', '一起逛逛 (0:20)']>>
+          <<if maplebirch.get('Transport').companions.date()>><<goto 'Deadwood Transport Date'>><</if>>
+        <</lanLink>><<lstress>><br>
+      <</if>>
+      <<getouticon>><<lanLink ['Continue', '继续'] _transport.arrival>>
+        <<if $Transport.trip.event>><<set $Transport.trip.event.resolved to true>><</if>>
+        <<if $Transport.trip.commute>><<endevent>><<set $eventskip to 1>><<set $Transport.avery_reply to null>><</if>>
+        <<set $phase to 0>>
+      <</lanLink>><br>
+    <</if>>
   <</if>>
 <</if>>
+<</nobr>>
+
+:: Deadwood Transport Repair []
+<<nobr>>
+<<deadwood-transport-notice>><br><br>
+<<getouticon>><<lanLink ['Return to your vehicle', '返回载具旁'] 'Deadwood Transport Menu'>><</lanLink>><br>
+<</nobr>>
+
+
+:: Deadwood Transport Pull Over []
+<<nobr>>
+<<set _transport to maplebirch.get('Transport')>>
+<<set _pull_name to $Transport.trip?.passengers?.[0]>>
+<<set _pull_start to $Transport.trip?.pullstart ? 1 : 0>>
+<<if !$Transport.trip?.fooled or !_pull_name>>
+  <span class='blue'><i><<lanSwitch 'There is nowhere to stop.' '这里没有能停车的地方。'>></i></span><br><br>
+  <<getouticon>><<lanLink ['Continue', '继续'] _transport.arrival>><</lanLink>>
+<<else>>
+  <<if _pull_start is 1>>
+    <<set $Transport.trip.pullstart to false>>
+    <<clearnpc>><<npc _pull_name>><<person1>>
+    <<if _pull_name is 'Sydney'>><<run statusCheck('Sydney')>><<set $corruptionEvent to 1>><</if>>
+    <<consensual>><<set $consensual to 1>><<neutral 1>><<maninit>>
+    <<set $enemytrust += 300>>
+    <<set $enemyarousalmax to 600>>
+    <<if _pull_name is 'Sydney'>>
+      <<if _sydneyStatus.includes('corrupt') and !_sydneyChastity>><<npcexpose>><<set $enemyarousalmax += 100>>
+      <<else>><<npcClothesType $NPCList[0] 'undies'>>
+        <<if _sydneyStatus.includes('corrupt')>><<set $enemyarousalmax += 100>><</if>>
+        <<if _sydneyStatus.includes('pure')>><<set $enemyarousalmax -= 100>><</if>>
+      <</if>>
+    <</if>>
+    <span class='lewd'><<lanSwitch 'You pull off where the trees close over the track and kill the engine. Nobody passes. <<He>> reaches for you before you have finished taking the key out.' '你把车拐进树冠遮住车辙的路肩，熄了火。这段路没人经过。你还没来得及拔钥匙，<<He>>就已经伸手过来了。'>></span><br><br>
+  <</if>>
+  <<effects>><<effectsman>><<man>><<stateman>>
+  <br><br><<actionsman>>
+  <<if _combatend or _controlRegain is 1>>
+    <span id='next'><<lanLink ["Next", '继续'] 'Deadwood Transport Pull Over Finish'>><</lanLink>></span><<nexttext>>
+  <<else>>
+    <span id='next'><<lanLink ["Next", '继续'] 'Deadwood Transport Pull Over'>><</lanLink>></span><<nexttext>>
+  <</if>>
+<</if>>
+<</nobr>>
+
+:: Deadwood Transport Pull Over Finish []
+<<nobr>>
+<<effects>>
+<<set _pull_name to $Transport.trip?.passengers?.[0]>>
+<<if _pull_name>>
+  <<person1>><<npc _pull_name>>
+  <<if $enemyarousal gte $enemyarousalmax>>
+    <<ejaculation>><<npcincr _pull_name lust -20>><<npcincr _pull_name love 1>><<llust>><<glove>>
+    <<lanSwitch 'The windscreen has fogged over on the inside. <<He>> draws a line through it with one finger and leaves it there, still catching <<his>> breath, and neither of you reaches for the ignition yet.' '挡风玻璃内侧蒙了一层雾。<<He>>用一根手指在上面划开一道，手就停在那儿，呼吸还没平下来，你们谁也没去碰钥匙。'>>
+  <<elseif $enemyhealth lte 0 and $enemyarousal lt $enemyarousalmax>>
+    <<npcincr _pull_name love -1>><<llove>>
+    <<lanSwitch '<<He>> straightens <<his>> clothes and looks out of the side window. You give <<him>> room until <<he>> is ready to be looked at again.' '<<He>>理好衣服，转头看向侧窗。你留出空间，等<<he>>愿意再对上目光。'>>
+  <<else>>
+    <<lanSwitch 'You stop and sit back in the driver seat. For a while the only sound is the engine ticking as it cools.' '你停下来，靠回驾驶座。有一阵子，只剩发动机冷却时的轻响。'>>
+  <</if>>
+  <br><br>
+<</if>>
+<<clotheson>>
+<<endcombat>>
+<<getouticon>><<lanLink ['Continue', '继续'] _transport.arrival>><</lanLink>>
+<</nobr>>
+
+:: Deadwood Transport Date []
+<<nobr>>
+<<set _transport to maplebirch.get('Transport')>>
+<<if $Transport.trip?.dated>>
+  <<language>>
+    <<option 'EN'>>
+      <<switch $Transport.trip.to>>
+        <<case 'cliff'>>You park near the cliff and follow the railings above the sea. The wind pulls at your clothes. When a gap opens between the houses, you stop together to watch the water below.
+        <<case 'starfish'>>You leave the car near the promenade. Music spills from the arcade, almost covering the sound of the surf. You walk beside the beach, slowing where the sand has drifted across the paving.
+        <<case 'danube'>>You walk along the dry canal. Footsteps echo beneath a bridge. You pause by the railings, looking down at the weeds that have taken hold between the stones.
+        <<case 'high'>>You wander past the shop windows together. A display changes as you turn the corner, from bright clothes to expensive furniture. You linger over the things you would put in a home.
+      <</switch>>
+    <<option 'CN'>>
+      <<switch $Transport.trip.to>>
+        <<case 'cliff'>>你在峭壁附近停好车，沿着海上方的栏杆走去。风扯动衣角。房屋之间露出空隙时，你们一起停下，望向下方的海水。
+        <<case 'starfish'>>你把车停在海滨栈道附近。游戏厅里的音乐几乎盖住了潮声。你们沿海滩散步，在沙子漫上铺路石的地方放慢脚步。
+        <<case 'danube'>>你们沿着干涸的运河散步。经过桥下时，脚步带出回声。你们靠在栏杆旁，看着从石缝间长出的杂草。
+        <<case 'high'>>你们一起逛过橱窗。转过街角，鲜亮衣服的陈列换成了昂贵家具。你们在那些想带回家的物件前多站了一会儿。
+      <</switch>>
+  <</language>><br><br>
+  <<for _date_name range $Transport.trip.passengers>>
+    <<npc _date_name>><<person1>><<if _date_name is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<switch _date_name>>
+          <<case 'Robin'>>Robin's hand brushes yours. <<He>> smiles when you take it. "We should do this again."
+          <<case 'Whitney'>>Whitney hooks <<his>> fingers through yours. "What? You're the one who asked me out." <<He>> stays beside you as you walk.
+          <<case 'Kylar'>>Kylar keeps turning towards you whenever you speak. "I like being here with you." <<He>> says it quietly, squeezing your hand when you offer it.
+          <<case 'Sydney'>>Sydney walks close beside you. <<if _sydneyStatus.includes('corrupt')>>"We could take the long way back." <<He>> catches your hand and grins.<<else>>"I needed this." <<He>> asks to hold your hand, smiling when you agree.<</if>>
+        <</switch>>
+      <<option 'CN'>>
+        <<switch _date_name>>
+          <<case 'Robin'>>罗宾的手轻轻擦过你的手。你牵住它时，<<he>>笑了。“下次再一起出来吧。”
+          <<case 'Whitney'>>惠特尼勾住你的手指。“怎么？可是你约我出来的。”走动时，<<he>>一直留在你身旁。
+          <<case 'Kylar'>>你每次开口，凯拉尔都会转头看你。“我喜欢和你待在这里。”<<He>>说得很轻，在你伸出手后把它握紧。
+          <<case 'Sydney'>>悉尼靠近你走着。<<if _sydneyStatus.includes('corrupt')>>“回去可以绕远一点。”<<He>>牵住你的手，笑了起来。<<else>>“我正需要这样出来走走。”<<He>>问能否牵你的手，得到同意后露出笑容。<</if>>
+        <</switch>>
+    <</language>><br><br>
+  <</for>>
+  <<lanSwitch 'Back at the vehicle, your companions make their way home while you decide where to go next.' '回到车旁，同行的恋人准备回住处。你则想了想接下来要去哪里。'>><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Continue', '继续'] _transport.arrival>><</lanLink>><br>
 <</nobr>>

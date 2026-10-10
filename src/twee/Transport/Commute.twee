@@ -1,0 +1,156 @@
+:: Deadwood Transport Commute Widgets [widget]
+
+<<widget 'deadwood-transport-ride-link'>>
+  <<set _ride to maplebirch.get('Transport').commute.offer>>
+  <<if _ride>>
+    <<for _ride_car range maplebirch.get('Transport').commute.vehicles(_ride)>>
+      <<set _ride_model to maplebirch.get('Transport').catalog.models.find(model => model.id === _ride_car.model)>>
+      <<set _ride_minutes to _ride.walk + maplebirch.get('Transport').journeyMinutes(_ride_model, maplebirch.get('Transport').catalog.distance(_ride.from, _ride.to))>>
+      <<capture _ride_car>>
+        <<icon `'transport/' + _ride_model.id + '.png'`>><<lanLink `maplebirch.t('deadwood-reblooms:transport:commute:' + _ride.kind) + ' — ' + maplebirch.t(_ride_model.name) + ' (' + Math.floor(_ride_minutes / 60) + ':' + String(_ride_minutes % 60).padStart(2, '0') + ')'`>>
+          <<if maplebirch.get('Transport').commute.prepare(_ride_car.id)>><<goto 'Deadwood Transport Boarding'>><</if>>
+        <</lanLink>><<glove>><br>
+      <</capture>>
+    <</for>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-transport-ride-arrival'>>
+  <<if $Transport.trip.commute>>
+    <<language>>
+      <<option 'EN'>>
+        <<switch $Transport.trip.commute>>
+          <<case 'school'>>
+            You park outside the school. <<if $Transport.commute.npc is 'Sydney'>>Sydney thanks you before hurrying inside.<<elseif $Transport.commute.npc is 'Whitney'>>Whitney spots <<his>> friends by the gate. "See you around, slut." <<He>> joins them on the way inside.<<else>>Robin gathers <<his>> bag and waits for you by the gate.<</if>>
+            <<if Time.hour gte 9>><span class='red'>The morning lessons have already started.</span><</if>>
+          <<case 'home'>>
+            You stop near <<his>> home. <<He>> picks up <<his>> school bag before getting out.
+          <<case 'farm'>>
+            You stop where the track to the farm leaves the road. Alex gathers <<his>> bags, then checks the footwell for anything left behind.
+            <<if $farm_stage gte 7>>
+              "Coming up?" <<He>> smiles at you through the open door. "I'll put the kettle on if you are."
+            <<else>>
+              "Thanks for that. I'd better get these put away." <<He>> lifts the bag a little. "See you at the farm."
+            <</if>>
+            <<He>> closes the door and heads up the track. <span class='blue'>Your car stays by the road.</span>
+          <<case 'temple'>>
+            Sydney checks that <<his>> books are all in the bag. "Thanks. I'd better get inside." <<He>> turns towards the temple.
+        <</switch>>
+      <<option 'CN'>>
+        <<switch $Transport.trip.commute>>
+          <<case 'school'>>
+            你把车停在学校外。<<if $Transport.commute.npc is 'Sydney'>>悉尼向你道谢后，匆匆走进学校。<<elseif $Transport.commute.npc is 'Whitney'>>惠特尼看见了校门旁的朋友。“回头见，荡妇。”<<He>>跟他们一起走进学校。<<else>>罗宾拿好书包，在校门旁等你。<</if>>
+            <<if Time.hour gte 9>><span class='red'>早上的课程已经开始了。</span><</if>>
+          <<case 'home'>>
+            你在<<his>>住处附近停下。<<He>>拿好书包，才打开车门。
+          <<case 'farm'>>
+            你把车停在通往农场的小路口。艾利克斯拿好购物袋，又看了看脚边，确认没落下东西。
+            <<if $farm_stage gte 7>>
+              “一起上来吗？”<<He>>隔着打开的车门朝你笑。“你要来，我就烧壶水。”
+            <<else>>
+              “谢了。我得先把这些放好。”<<He>>提了提袋子。“农场见。”
+            <</if>>
+            <<He>>关好车门，沿小路走去。<span class='blue'>你的车留在公路旁。</span>
+          <<case 'temple'>>
+            悉尼确认书都装进了包里。“谢谢。我该进去了。”<<He>>转身走向神殿。
+        <</switch>>
+    <</language>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-transport-avery-link'>>
+  <<if maplebirch.get('Transport').commute.avery>>
+    <<socialiseicon 'chat'>><<lanLink ['Say you brought your own vehicle', '告诉艾弗里，你今天带了自己的车']>>
+      <<if maplebirch.get('Transport').commute.answerAvery()>><<goto 'Deadwood Transport Avery'>><</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Transport Boarding []
+<<nobr>>
+<<set _commute to maplebirch.get('Transport').commute>><<set _ride to $Transport.commute>>
+<<if _ride and _commute.active and !_ride.boarded>>
+  <<npc _ride.npc>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      You offer to drive <<him>> <<if _ride.kind is 'school'>>to school<<elseif _ride.kind is 'temple'>>to the temple<<elseif _ride.kind is 'farm'>>back to the farm<<else>>home<</if>>.
+      <<switch _ride.npc>>
+        <<case 'Alex'>>
+          <<if $farm_stage gte 7>>Alex grins. "Offering a lift to your own farm? Can't argue with that."<<else>>Alex shifts <<his>> shopping bag to the other hand. "That'd save my feet. Thanks."<</if>>
+          <<He>> lifts the shopping bag. "Got room for these?" You nod, and <<he>> adjusts <<his>> grip, keeping the bottles upright. "Alright, then. Lead the way."
+        <<case 'Robin'>>
+          <<if C.npc.Robin.trauma gte 40>>Robin checks that it will just be the two of you. "Okay. Thanks." <<He>> keeps <<his>> bag close.
+          <<else>>Robin smiles and shoulders <<his>> bag. "Sure. I'll go with you."<</if>>
+        <<case 'Whitney'>>
+          "Your car?" Whitney glances past you. "About fucking time." <<He>> picks up <<his>> bag. "And none of your shit music."
+          <<if _ride.kind is 'school'>>One of <<his>> friends calls from the stairs. "I'll catch up at school," Whitney shouts back.<</if>>
+        <<case 'Kylar'>>
+          "Just us?" Kylar asks. When you nod, <<he>> hugs <<his>> bag to <<his>> chest. "I'd like that."
+        <<case 'Sydney'>>
+          <<if _ride.kind is 'school'>>"As long as we get there before class."<<elseif $bus is 'schoollibrary'>>"Let me put the away sign up first."<<else>>"Let me get my bag first."<</if>> Sydney gathers <<his>> books. "Thank you."
+      <</switch>>
+    <<option 'CN'>>
+      你提出开车送<<him>><<if _ride.kind is 'school'>>去学校<<elseif _ride.kind is 'temple'>>去神殿<<elseif _ride.kind is 'farm'>>回农场<<else>>回家<</if>>。
+      <<switch _ride.npc>>
+        <<case 'Alex'>>
+          <<if $farm_stage gte 7>>艾利克斯笑了。“送我回你自己的农场？那我可不客气了。”<<else>>艾利克斯把购物袋换到另一只手上。“那可省得走了。谢谢。”<</if>>
+          <<He>>提了提购物袋。“这些放得下吧？”你点头后，<<he>>重新握好提手，免得袋里的瓶子倒下。“那就走吧。你带路。”
+        <<case 'Robin'>>
+          <<if C.npc.Robin.trauma gte 40>>罗宾确认车上只会有你们两个人。“好。谢谢。”<<He>>把书包抱在身前。
+          <<else>>罗宾笑着背好书包。“好啊。我跟你一起去。”<</if>>
+        <<case 'Whitney'>>
+          “你的车？”惠特尼朝你身后看了一眼。“早该这样了。”<<He>>拿起书包。“别放你那些烂歌。”
+          <<if _ride.kind is 'school'>>楼梯上有人喊了<<him>>一声。“学校见。”惠特尼朝朋友喊回去。<</if>>
+        <<case 'Kylar'>>
+          “就我们两个？”凯拉尔问。你点头后，<<he>>抱紧书包。“我想去。”
+        <<case 'Sydney'>>
+          <<if _ride.kind is 'school'>>“只要能赶上上课就好。”<<elseif $bus is 'schoollibrary'>>“先等我挂上离岗的牌子。”<<else>>“等我拿上包。”<</if>>悉尼收好书。“谢谢。”
+      <</switch>>
+  <</language>><br><br>
+  <<icon `'transport/' + maplebirch.get('Transport').model.id + '.png'`>><<lanLink `lanSwitch('Walk to the car', '一起走到车旁') + ' (0:0' + _ride.walk + ')'`>>
+    <<if maplebirch.get('Transport').commute.board()>><<goto 'Deadwood Transport Menu'>><</if>>
+  <</lanLink>><br><br>
+  <<getouticon>><<lanLink ['Change your mind', '改变主意'] _ride.source>><<set $Transport.commute to null>><</lanLink>><br>
+<<else>>
+  <<lanSwitch 'You have missed the chance to leave together.' '你错过了一起出发的时机。'>><br><br>
+  <<getouticon>><<lanLink ['Return', '返回'] ` _ride?.source ?? 'Oxford Street' `>><<set $Transport.commute to null>><</lanLink>><br>
+<</if>>
+<</nobr>>
+
+:: Deadwood Transport Avery []
+<<nobr>>
+<<set _avery_reply to maplebirch.get('Transport').commute.averyReply>>
+<<if _avery_reply>>
+<<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    "I brought my own vehicle today," you say, pointing towards where you parked.
+    Avery follows your hand. <<He>> pauses, then looks back at you.
+    <<if _avery_reply.peer>>
+      "You could have mentioned that." <<He>> smooths <<his>> sleeve. "Next time, tell me before I drive across town."
+    <<elseif C.npc.Avery.rage gte 20>>
+      "And you let me come all this way?" <<His>> smile tightens. "Very well. Have it your way."
+    <<else>>
+      "Making your own arrangements now?" <<He>> glances at your vehicle again. "Alright. Be careful on the roads."
+    <</if>>
+    <<if _avery_reply.robin>>Robin stays beside you until Avery pulls away.<</if>>
+    Avery drives off, leaving your vehicle where you parked it.
+  <<option 'CN'>>
+    “我今天带了自己的车。”你指向停车的地方。
+    艾弗里顺着你的手看过去，顿了顿，又转头看你。
+    <<if _avery_reply.peer>>
+      “这事，你可以提前说。”<<He>>抚平袖口。“下次告诉我，省得我开车绕过来。”
+    <<elseif C.npc.Avery.rage gte 20>>
+      “那你还让我跑这一趟？”<<His>>笑容绷紧了。“好吧。随你。”
+    <<else>>
+      “现在有自己的安排了？”<<He>>又瞥了一眼你的车。“好。路上小心。”
+    <</if>>
+    <<if _avery_reply.robin>>罗宾一直站在你身旁，直到艾弗里离开。<</if>>
+    艾弗里开车离去。你的车还停在原处。
+<</language>><br><br>
+<<deadwood-transport-ride-link>>
+<<else>>
+  <<lanSwitch 'Avery has already left.' '艾弗里已经离开了。'>><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Continue', '继续'] 'Oxford Street'>><<endevent>><<set $eventskip to 1>><<set $Transport.avery_reply to null>><</lanLink>><br>
+<</nobr>>
