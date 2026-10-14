@@ -8,18 +8,23 @@
 <</widget>>
 
 <<widget 'deadwood-robin-beach-links'>>
-  <<if C.npc.Robin.init is 1 and !$robinmissing and $robin.timer.hurt is 0 and $RobinExpansion.asylum.status isnot 'admitted' and getRobinLocation() is 'beach' and Time.hour gte 9 and Time.hour lt 16 and Weather.precipitation is 'none' and $exposed is 0 and C.npc.Robin.love gte 20 and $RobinExpansion.fish_date_day isnot Time.days and canStartFishing()>>
-    <<fishingRodIcon>><<lanLink ['Go fishing with Robin (0:10)', '和罗宾一起钓鱼 (0:10)'] 'Deadwood Robin Fishing Date'>><</lanLink>><br>
-  <</if>>
-  <<if maplebirch.get('Robin').available and C.npc.Robin.trauma lt 80 and getRobinLocation() is 'beach'
-    and Time.hour gte 9 and Time.hour lte 16 and Weather.precipitation isnot 'rain'
-    and C.npc.Robin.love gte 20 and $RobinExpansion.swim_day isnot Time.days>>
-    <<loveicon 'hug'>><<lanLink ['Swim with Robin (1:00)', '和罗宾一起游泳 (1:00)'] 'Deadwood Robin Swim Date'>><</lanLink>><br>
-  <</if>>
-  <<if maplebirch.get('Robin').available and ['orphanage', 'beach'].includes(getRobinLocation())
-    and Weather.meteorShower and Time.hour gte 20 and $RobinExpansion.meteor_day isnot Time.days
-    and Weather.precipitation isnot 'rain' and C.npc.Robin.trauma lt 80 and C.npc.Robin.love gte 20>>
-    <<loveicon 'hug'>><<lanLink ['Watch the meteor shower with Robin (0:30)', '和罗宾看流星雨 (0:30)'] 'Deadwood Robin Meteor Date'>><</lanLink>><br>
+  <<silently>>
+    <<set _robinBeachLinks to new maplebirch.tool.link()>><<run _robinBeachLinks.detect()>>
+  <</silently>>
+  <<if _robinBeachLinks.links.some(link => link.getAttribute('data-passage') === 'Beach')>>
+    <<if C.npc.Robin.init is 1 and !$robinmissing and $robin.timer.hurt is 0 and $RobinExpansion.asylum.status isnot 'admitted' and getRobinLocation() is 'beach' and Time.hour gte 9 and Time.hour lt 16 and Weather.precipitation is 'none' and $exposed is 0 and C.npc.Robin.love gte 20 and $RobinExpansion.fish_date_day isnot Time.days and canStartFishing()>>
+      <<fishingRodIcon>><<lanLink ['Go fishing with Robin (0:10)', '和罗宾一起钓鱼 (0:10)'] 'Deadwood Robin Fishing Date'>><</lanLink>><br>
+    <</if>>
+    <<if maplebirch.get('Robin').available and C.npc.Robin.trauma lt 80 and getRobinLocation() is 'beach'
+      and Time.hour gte 9 and Time.hour lte 16 and Weather.precipitation isnot 'rain'
+      and C.npc.Robin.love gte 20 and $RobinExpansion.swim_day isnot Time.days>>
+      <<loveicon 'hug'>><<lanLink ['Swim with Robin (1:00)', '和罗宾一起游泳 (1:00)'] 'Deadwood Robin Swim Date'>><</lanLink>><br>
+    <</if>>
+    <<if maplebirch.get('Robin').available and ['orphanage', 'beach'].includes(getRobinLocation())
+      and Weather.meteorShower and Time.hour gte 20 and $RobinExpansion.meteor_day isnot Time.days
+      and Weather.precipitation isnot 'rain' and C.npc.Robin.trauma lt 80 and C.npc.Robin.love gte 20>>
+      <<loveicon 'hug'>><<lanLink ['Watch the meteor shower with Robin (0:30)', '和罗宾看流星雨 (0:30)'] 'Deadwood Robin Meteor Date'>><</lanLink>><br>
+    <</if>>
   <</if>>
 <</widget>>
 

@@ -1,11 +1,10 @@
 // ./src/script/Sydney/SydneyDorm.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  // 床铺后的可见链接索引通常为 1，打扫选项出现时移到 2，两处只显示其一。
+  // 普通宿舍菜单的最后一项是下楼，不依赖打扫、床铺与找书选项的数量。
   maplebirch.tool.addTo(
     'CustomLinkZone',
-    { widget: [1, 'deadwood-reblooms-sydney-dorm-link 1'], passage: 'Temple Quarters' },
-    { widget: [2, 'deadwood-reblooms-sydney-dorm-link 2'], passage: 'Temple Quarters' },
+    { widget: [-1, 'deadwood-reblooms-sydney-dorm-link'], passage: 'Temple Quarters' },
     { widget: [-1, 'deadwood-reblooms-sydney-dorm-sirris-link'], passage: 'Temple Quarters' }
   );
 }

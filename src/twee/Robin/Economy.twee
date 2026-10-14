@@ -59,92 +59,102 @@
 <</widget>>
 
 <<widget 'deadwood-robin-lemonade-links'>>
-  <<if Weather.precipitation is 'rain' and $RobinExpansion.lemonade gte 1>>
-    <span class='blue'><<lanSwitch 'Rain runs off the reinforced awning while Robin keeps the counter dry.' '雨水顺着加固后的遮雨棚流下，罗宾把柜台守得干干爽爽。'>></span><br><br>
-  <</if>>
-  <<if C.npc.Robin.init is 1 and !$robinmissing and $robin.timer.hurt is 0
-    and $RobinExpansion.lemonade lt 2
-    and $RobinExpansion.topics.lemonade lte $RobinExpansion.lemonade>>
-    <<set $RobinExpansion.topics.lemonade to $RobinExpansion.lemonade + 1>>
-    <<if $RobinExpansion.lemonade is 0>>
-      <<lanSwitch 'The cart rattles when Robin moves it over the sand. Robin steadies the cups before they spill and looks at the wheels.' '罗宾推着小车走过沙地，车轮颠得杯子直晃。<<He>>扶住杯子，看了看磨损的车轮。'>>
-    <<else>>
-      <<lanSwitch 'Robin has written down the flavours customers asked for, but the small cooler is already full. <<He>> folds the list beside the till.' '罗宾记下客人问起的新口味，冰箱却已经塞满了。<<He>>把清单折好，放到钱箱旁。'>>
+  <<silently>>
+    <<set _robinLemonadeLinks to new maplebirch.tool.link()>><<run _robinLemonadeLinks.detect()>>
+  <</silently>>
+  <<if _robinLemonadeLinks.links.some(link => link.getAttribute('data-passage') === 'Beach')>>
+    <<if Weather.precipitation is 'rain' and $RobinExpansion.lemonade gte 1>>
+      <span class='blue'><<lanSwitch 'Rain runs off the reinforced awning while Robin keeps the counter dry.' '雨水顺着加固后的遮雨棚流下，罗宾把柜台守得干干爽爽。'>></span><br><br>
     <</if>>
-    <br><span class='blue'><i><<lanSwitch 'You could talk to Robin about the stall back in <<his>> room.' '回到罗宾的房间后，你可以和<<him>>谈谈摊位的事。'>></i></span><br><br>
-  <</if>>
-  <<if maplebirch.get('Robin').market.canWork>>
-    <<shopicon 'register'>><<lanLink ['Mind Robin\'s stall for the day (0:45)', '帮罗宾照看当日摊位 (0:45)'] 'Deadwood Robin Market Day'>><</lanLink>><br>
-  <</if>>
-  <<if maplebirch.get('Robin').fishing.canAddGrill>>
-    <<kitchenicon 'stove'>><<lanLink ['Get a portable grill with Robin £30 (0:30)', '和罗宾添置便携烤架 £30 (0:30)'] 'Deadwood Robin Fish Grill'>><</lanLink>><br>
-  <</if>>
-  <<deadwood-robin-fish-link 'stall'>>
-  <<if $RobinExpansion.lemonade gte 1 and $RobinExpansion.stall_taste_day isnot Time.days and $money gte ($RobinExpansion.lemonade gte 2 ? 300 : 200)>>
-    <<robinicon 'lemonade'>>
-    <<if $RobinExpansion.lemonade gte 2>>
-      <<lanLink ['Try Robin\'s new item (£3 0:05)', '尝尝罗宾的新品 (£3 0:05)'] 'Deadwood Robin Stall Taste'>><</lanLink>>
-    <<else>>
-      <<lanLink ['Try Robin\'s new item (£2 0:05)', '尝尝罗宾的新品 (£2 0:05)'] 'Deadwood Robin Stall Taste'>><</lanLink>>
+    <<if C.npc.Robin.init is 1 and !$robinmissing and $robin.timer.hurt is 0
+      and $RobinExpansion.lemonade lt 2
+      and $RobinExpansion.topics.lemonade lte $RobinExpansion.lemonade>>
+      <<set $RobinExpansion.topics.lemonade to $RobinExpansion.lemonade + 1>>
+      <<if $RobinExpansion.lemonade is 0>>
+        <<lanSwitch 'The cart rattles when Robin moves it over the sand. Robin steadies the cups before they spill and looks at the wheels.' '罗宾推着小车走过沙地，车轮颠得杯子直晃。<<He>>扶住杯子，看了看磨损的车轮。'>>
+      <<else>>
+        <<lanSwitch 'Robin has written down the flavours customers asked for, but the small cooler is already full. <<He>> folds the list beside the till.' '罗宾记下客人问起的新口味，冰箱却已经塞满了。<<He>>把清单折好，放到钱箱旁。'>>
+      <</if>>
+      <br><span class='blue'><i><<lanSwitch 'You could talk to Robin about the stall back in <<his>> room.' '回到罗宾的房间后，你可以和<<him>>谈谈摊位的事。'>></i></span><br><br>
     <</if>>
-    <br>
-  <</if>>
-  <<if $RobinExpansion.lemonade gte 1 and $money gte 200>>
-    <<foodicon 'mintlemonade'>><<lanLink ['Buy mint lemonade (0:15)', '购买薄荷柠檬水 (0:15)'] 'Deadwood Robin Buy Mint Lemonade'>><</lanLink>> <span class='gold'>£2</span><br>
-  <</if>>
-  <<if $RobinExpansion.lemonade gte 2 and $money gte 300>>
-    <<foodicon 'chilledfruit'>><<lanLink ['Buy chilled fruit (0:15)', '购买冰镇水果 (0:15)'] 'Deadwood Robin Buy Chilled Fruit'>><</lanLink>> <span class='gold'>£3</span><br>
-  <</if>>
-  <<if $RobinExpansion.lemonade gte 1 and isLoveInterest('Robin') and C.npc.Robin.trauma lt 50
-    and getRobinLocation() is 'beach'
-    and Time.hour gte 9 and Time.hour lt 17>>
-    <<loveicon 'hug'>><<lanLink ['Tease Robin beneath the lemonade stall (0:02)', '在柠檬水摊下逗罗宾 (0:02)'] 'Deadwood Robin Private Invite'>>
-      <<set $RobinExpansion.intimacy_site to 'lemonade'>><<pass 2>>
-    <</lanLink>><br>
-  <</if>>
-  <<if maplebirch.get('Robin').balloon.inContest and getRobinLocation() is 'beach' and Weather.precipitation isnot 'rain'>>
-    <<socialiseicon>><<lanLink ['Help Robin compete (1:00)', '帮罗宾完成竞争营业日 (1:00)'] 'Deadwood Robin Balloon Contest'>><</lanLink>><br>
+    <<if maplebirch.get('Robin').market.canWork>>
+      <<shopicon 'register'>><<lanLink ['Mind Robin\'s stall for the day (0:45)', '帮罗宾照看当日摊位 (0:45)'] 'Deadwood Robin Market Day'>><</lanLink>><br>
+    <</if>>
+    <<if maplebirch.get('Robin').fishing.canAddGrill>>
+      <<kitchenicon 'stove'>><<lanLink ['Get a portable grill with Robin £30 (0:30)', '和罗宾添置便携烤架 £30 (0:30)'] 'Deadwood Robin Fish Grill'>><</lanLink>><br>
+    <</if>>
+    <<deadwood-robin-fish-link 'stall'>>
+    <<if $RobinExpansion.lemonade gte 1 and $RobinExpansion.stall_taste_day isnot Time.days and $money gte ($RobinExpansion.lemonade gte 2 ? 300 : 200)>>
+      <<robinicon 'lemonade'>>
+      <<if $RobinExpansion.lemonade gte 2>>
+        <<lanLink ['Try Robin\'s new item (£3 0:05)', '尝尝罗宾的新品 (£3 0:05)'] 'Deadwood Robin Stall Taste'>><</lanLink>>
+      <<else>>
+        <<lanLink ['Try Robin\'s new item (£2 0:05)', '尝尝罗宾的新品 (£2 0:05)'] 'Deadwood Robin Stall Taste'>><</lanLink>>
+      <</if>>
+      <br>
+    <</if>>
+    <<if $RobinExpansion.lemonade gte 1 and $money gte 200>>
+      <<foodicon 'mintlemonade'>><<lanLink ['Buy mint lemonade (0:15)', '购买薄荷柠檬水 (0:15)'] 'Deadwood Robin Buy Mint Lemonade'>><</lanLink>> <span class='gold'>£2</span><br>
+    <</if>>
+    <<if $RobinExpansion.lemonade gte 2 and $money gte 300>>
+      <<foodicon 'chilledfruit'>><<lanLink ['Buy chilled fruit (0:15)', '购买冰镇水果 (0:15)'] 'Deadwood Robin Buy Chilled Fruit'>><</lanLink>> <span class='gold'>£3</span><br>
+    <</if>>
+    <<if $RobinExpansion.lemonade gte 1 and isLoveInterest('Robin') and C.npc.Robin.trauma lt 50
+      and getRobinLocation() is 'beach'
+      and Time.hour gte 9 and Time.hour lt 17>>
+      <<loveicon 'hug'>><<lanLink ['Tease Robin beneath the lemonade stall (0:02)', '在柠檬水摊下逗罗宾 (0:02)'] 'Deadwood Robin Private Invite'>>
+        <<set $RobinExpansion.intimacy_site to 'lemonade'>><<pass 2>>
+      <</lanLink>><br>
+    <</if>>
+    <<if maplebirch.get('Robin').balloon.inContest and getRobinLocation() is 'beach' and Weather.precipitation isnot 'rain'>>
+      <<socialiseicon>><<lanLink ['Help Robin compete (1:00)', '帮罗宾完成竞争营业日 (1:00)'] 'Deadwood Robin Balloon Contest'>><</lanLink>><br>
+    <</if>>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-robin-chocolate-links'>>
-  <<if Weather.precipitation is 'rain' and $RobinExpansion.chocolate gte 1>>
-    <span class='blue'><<lanSwitch 'The insulated canopy keeps the rain out and the cocoa warm.' '保温棚挡住了雨，炉上的热巧克力仍暖着。'>></span><br><br>
-  <</if>>
-  <<if C.npc.Robin.init is 1 and !$robinmissing and $robin.timer.hurt is 0
-    and $RobinExpansion.chocolate lt 2
-    and $RobinExpansion.topics.chocolate lte $RobinExpansion.chocolate>>
-    <<set $RobinExpansion.topics.chocolate to $RobinExpansion.chocolate + 1>>
-    <<if $RobinExpansion.chocolate is 0>>
-      <<lanSwitch 'Robin stirs the cooling pot. A customer leaves before the next cup is warm, and <<he>> watches them go.' '罗宾搅动渐渐凉下来的热巧克力。下一杯还没热好，一位客人已经走了，<<he>>望着那人的背影。'>>
-    <<else>>
-      <<lanSwitch 'Robin shows you two new cocoa recipes. With only one burner, <<he>> cannot try either while the queue is waiting.' '罗宾给你看两张新配方。排队的人还等着，只有一只炉头，<<he>>没法把新口味煮出来。'>>
+  <<silently>>
+    <<set _robinChocolateLinks to new maplebirch.tool.link()>><<run _robinChocolateLinks.detect()>>
+  <</silently>>
+  <<if _robinChocolateLinks.links.some(link => link.getAttribute('data-passage') === 'Park')>>
+    <<if Weather.precipitation is 'rain' and $RobinExpansion.chocolate gte 1>>
+      <span class='blue'><<lanSwitch 'The insulated canopy keeps the rain out and the cocoa warm.' '保温棚挡住了雨，炉上的热巧克力仍暖着。'>></span><br><br>
     <</if>>
-    <br><span class='blue'><i><<lanSwitch 'You could talk to Robin about the stall back in <<his>> room.' '回到罗宾的房间后，你可以和<<him>>谈谈摊位的事。'>></i></span><br><br>
-  <</if>>
-  <<if maplebirch.get('Robin').market.canWork>>
-    <<shopicon 'register'>><<lanLink ['Mind Robin\'s stall for the day (0:45)', '帮罗宾照看当日摊位 (0:45)'] 'Deadwood Robin Market Day'>><</lanLink>><br>
-  <</if>>
-  <<if $RobinExpansion.chocolate gte 1 and $RobinExpansion.stall_taste_day isnot Time.days and $money gte ($RobinExpansion.chocolate gte 2 ? 300 : 200)>>
-    <<robinicon 'cocoa'>>
-    <<if $RobinExpansion.chocolate gte 2>>
-      <<lanLink ['Try Robin\'s new item (£3 0:05)', '尝尝罗宾的新品 (£3 0:05)'] 'Deadwood Robin Stall Taste'>><</lanLink>>
-    <<else>>
-      <<lanLink ['Try Robin\'s new item (£2 0:05)', '尝尝罗宾的新品 (£2 0:05)'] 'Deadwood Robin Stall Taste'>><</lanLink>>
+    <<if C.npc.Robin.init is 1 and !$robinmissing and $robin.timer.hurt is 0
+      and $RobinExpansion.chocolate lt 2
+      and $RobinExpansion.topics.chocolate lte $RobinExpansion.chocolate>>
+      <<set $RobinExpansion.topics.chocolate to $RobinExpansion.chocolate + 1>>
+      <<if $RobinExpansion.chocolate is 0>>
+        <<lanSwitch 'Robin stirs the cooling pot. A customer leaves before the next cup is warm, and <<he>> watches them go.' '罗宾搅动渐渐凉下来的热巧克力。下一杯还没热好，一位客人已经走了，<<he>>望着那人的背影。'>>
+      <<else>>
+        <<lanSwitch 'Robin shows you two new cocoa recipes. With only one burner, <<he>> cannot try either while the queue is waiting.' '罗宾给你看两张新配方。排队的人还等着，只有一只炉头，<<he>>没法把新口味煮出来。'>>
+      <</if>>
+      <br><span class='blue'><i><<lanSwitch 'You could talk to Robin about the stall back in <<his>> room.' '回到罗宾的房间后，你可以和<<him>>谈谈摊位的事。'>></i></span><br><br>
     <</if>>
-    <br>
-  <</if>>
-  <<if $RobinExpansion.chocolate gte 1 and $money gte 300>>
-    <<foodicon 'spicedcocoa'>><<lanLink ['Buy spiced cocoa (0:15)', '购买香料可可 (0:15)'] 'Deadwood Robin Buy Spiced Cocoa'>><</lanLink>> <span class='gold'>£3</span><br>
-  <</if>>
-  <<if $RobinExpansion.chocolate gte 2 and $money gte 400>>
-    <<foodicon 'cocoabiscuit'>><<lanLink ['Buy cocoa biscuits (0:15)', '购买可可饼干 (0:15)'] 'Deadwood Robin Buy Cocoa Biscuit'>><</lanLink>> <span class='gold'>£4</span><br>
-  <</if>>
-  <<if $RobinExpansion.chocolate gte 1 and isLoveInterest('Robin') and C.npc.Robin.trauma lt 50
-    and getRobinLocation() is 'park' and Time.hour gte 9 and Time.hour lt 17>>
-    <<loveicon 'hug'>><<lanLink ['Tease Robin beneath the cocoa stall (0:02)', '在热巧克力摊下逗罗宾 (0:02)'] 'Deadwood Robin Private Invite'>>
-      <<set $RobinExpansion.intimacy_site to 'chocolate'>><<pass 2>>
-    <</lanLink>><br>
+    <<if maplebirch.get('Robin').market.canWork>>
+      <<shopicon 'register'>><<lanLink ['Mind Robin\'s stall for the day (0:45)', '帮罗宾照看当日摊位 (0:45)'] 'Deadwood Robin Market Day'>><</lanLink>><br>
+    <</if>>
+    <<if $RobinExpansion.chocolate gte 1 and $RobinExpansion.stall_taste_day isnot Time.days and $money gte ($RobinExpansion.chocolate gte 2 ? 300 : 200)>>
+      <<robinicon 'cocoa'>>
+      <<if $RobinExpansion.chocolate gte 2>>
+        <<lanLink ['Try Robin\'s new item (£3 0:05)', '尝尝罗宾的新品 (£3 0:05)'] 'Deadwood Robin Stall Taste'>><</lanLink>>
+      <<else>>
+        <<lanLink ['Try Robin\'s new item (£2 0:05)', '尝尝罗宾的新品 (£2 0:05)'] 'Deadwood Robin Stall Taste'>><</lanLink>>
+      <</if>>
+      <br>
+    <</if>>
+    <<if $RobinExpansion.chocolate gte 1 and $money gte 300>>
+      <<foodicon 'spicedcocoa'>><<lanLink ['Buy spiced cocoa (0:15)', '购买香料可可 (0:15)'] 'Deadwood Robin Buy Spiced Cocoa'>><</lanLink>> <span class='gold'>£3</span><br>
+    <</if>>
+    <<if $RobinExpansion.chocolate gte 2 and $money gte 400>>
+      <<foodicon 'cocoabiscuit'>><<lanLink ['Buy cocoa biscuits (0:15)', '购买可可饼干 (0:15)'] 'Deadwood Robin Buy Cocoa Biscuit'>><</lanLink>> <span class='gold'>£4</span><br>
+    <</if>>
+    <<if $RobinExpansion.chocolate gte 1 and isLoveInterest('Robin') and C.npc.Robin.trauma lt 50
+      and getRobinLocation() is 'park' and Time.hour gte 9 and Time.hour lt 17>>
+      <<loveicon 'hug'>><<lanLink ['Tease Robin beneath the cocoa stall (0:02)', '在热巧克力摊下逗罗宾 (0:02)'] 'Deadwood Robin Private Invite'>>
+        <<set $RobinExpansion.intimacy_site to 'chocolate'>><<pass 2>>
+      <</lanLink>><br>
+    <</if>>
   <</if>>
 <</widget>>
 
@@ -251,7 +261,7 @@
 <<else>>
   <<lanSwitch 'Robin is resting now.' '罗宾现在正在休息。'>>
 <</if>>
-<br><br><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
 
 :: Deadwood Robin Trauma Listen
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
@@ -262,7 +272,7 @@
 <<else>>
   <<lanSwitch 'Robin needs rest now.' '罗宾现在需要休息。'>>
 <</if>>
-<br><br><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
 
 :: Deadwood Robin Trauma Ask
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
@@ -273,7 +283,7 @@
 <<else>>
   <<lanSwitch 'Robin needs rest now.' '罗宾现在需要休息。'>>
 <</if>>
-<br><br><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
 
 :: Deadwood Robin Upgrade Lemonade
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
@@ -414,7 +424,7 @@
 <<else>>
   <<lanSwitch 'Robin wants to prepare a little longer.' '罗宾还想多做些准备。'>>
 <</if>>
-<br><br><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><<endevent>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><<endevent>><</lanLink>>
 
 :: Deadwood Robin Tutoring
 <<set $outside to 0>><<set $location to 'town'>><<effects>><<npc Robin>><<person1>>
@@ -549,7 +559,7 @@
 <<if maplebirch.get('Robin').shop.plan()>>
   <<lanSwitch 'Robin sorts receipts from both stalls, writes a drinks list and marks the town hall on a map.' '罗宾整理好两处摊位的收据，写下饮品单，又在地图上标出市政厅。'>> <span class='blue'><i><<lanSwitch 'You can go together, or let Robin handle the application alone once Robin feels ready.' '你可以陪罗宾去，等罗宾准备好，也可以让罗宾独自申请。'>></i></span>
 <</if>>
-<br><br><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
 
 :: Deadwood Robin Shop Application
 <<set $outside to 0>><<set $location to 'townhall'>><<effects>><<npc Robin>><<person1>>
@@ -587,7 +597,7 @@
 <<else>>
   <<lanSwitch 'Robin is not ready to face the counter alone yet.' '罗宾现在还没准备好独自去柜台。'>>
 <</if>>
-<br><br><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
 
 :: Deadwood Robin Shop Application Result
 <<set $outside to 0>><<set $location to 'townhall'>><<effects>><<npc Robin>><<person1>>
@@ -643,7 +653,7 @@
 <<else>>
   <<lanSwitch 'Robin cannot secure the shop alone today.' '罗宾今天还不能独自定下铺面。'>>
 <</if>>
-<br><br><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
 
 :: Deadwood Robin Shop Inspection
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
@@ -707,7 +717,7 @@
 <<else>>
   <<lanSwitch 'The permit is not ready for Robin to collect alone.' '罗宾现在还无法独自领回许可。'>>
 <</if>>
-<br><br><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
 
 :: Deadwood Robin Shop Opening
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
@@ -1250,7 +1260,7 @@
 <<else>>
   <<lanSwitch 'There is no order to place today.' '今天没有需要补的货。'>>
 <</if>>
-<br><br><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
 
 :: Deadwood Robin Shop Buy Classic Lemonade
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
@@ -1352,7 +1362,7 @@
 <<else>>
   <<lanSwitch 'The tasting is over for today.' '今天的试饮已经结束。'>>
 <</if>>
-<br><br><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
 
 :: Deadwood Robin Shop Shift
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
@@ -1399,7 +1409,7 @@
 <<else>>
   <<lanSwitch 'The shop has already closed its shared shift for today.' '今天的共同班次已经结束。'>>
 <</if>>
-<br><br><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
 
 :: Deadwood Robin Shop Shift Robin
 <<set _robinShopShift to 'Robin'>><<include 'Deadwood Robin Shop Shift Result'>>
@@ -1487,7 +1497,7 @@
 <<else>>
   <<lanSwitch 'The shared shift cannot continue now.' '现在无法继续共同班次。'>>
 <</if>>
-<br><br><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
+<br><br><<getouticon>><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
 
 :: Deadwood Robin Market Day
 <<set $outside to 1>><<effects>><<npc Robin>><<person1>>
@@ -1760,9 +1770,9 @@
 <</if>>
 <br><br>
 <<if $RobinExpansion.shop>>
-  <<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
+  <<getouticon>><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
 <<else>>
-  <<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
+  <<getouticon>><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>
 <</if>>
 
 :: Deadwood Robin Bank Support

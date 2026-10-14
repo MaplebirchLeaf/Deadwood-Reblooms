@@ -11,7 +11,7 @@
       <<set _cn to '邀请' + maplebirch.auto(_name) + '一同前往 (0:10)'>>
       <!-- 链接体在点击时才执行，循环变量必须 capture，否则拿到的是最后一次的 _name。 -->
       <<capture _name _pool>>
-        <<lanLink [_en, _cn] 'Deadwood Reblooms Pool Party Invite'>>
+        <<socialiseicon 'ask'>><<lanLink [_en, _cn] 'Deadwood Reblooms Pool Party Invite'>>
           <<set $LifeSimulation.pool_party.selected to _name>>
           <<set $LifeSimulation.pool_party.reply to _pool.invite(_name)>>
           <<set $LifeSimulation.pool_party.return_passage to $passage>>
@@ -26,55 +26,63 @@
 <!-- 派对现场：同行恋人各自的反应。罗宾只跟着 PC，凯拉尔只会数人。 -->
 <<widget 'deadwood-reblooms-pool-party-company'>>
   <<set _pool to maplebirch.get('LifeSimulation').pool_party>>
-  <<if _pool.attend()>>
-    <<language>>
-      <<option 'EN'>>
-        <<for _name range _pool.companions>>
-          <<switch _name>>
-            <<case 'Robin'>>
-              Robin stays close enough that your arms keep brushing.<br>
-            <<case 'Whitney'>>
-              Whitney has already claimed the deepest part of the pool and is watching you decide.<br>
-            <<case 'Kylar'>>
-              Kylar has not moved from the doorway. Kylar is counting the people between you.<br>
-            <<case 'Sydney'>>
-              Sydney watches you rather than the water.<br>
-          <</switch>>
-        <</for>>
-      <<option 'CN'>>
-        <<for _name range _pool.companions>>
-          <<switch _name>>
-            <<case 'Robin'>>
-              罗宾贴得很近，近到你们的手臂不断擦到一起。<br>
-            <<case 'Whitney'>>
-              惠特尼已经占住了泳池最深的地方，正看着你打算怎么办。<br>
-            <<case 'Kylar'>>
-              凯拉尔一直没离开门口。<<nnpc_he 'Kylar'>>在数你身边隔了多少人。<br>
-            <<case 'Sydney'>>
-              悉尼的视线落在你身上的时间，比落在水面上更长。<br>
-          <</switch>>
-        <</for>>
-    <</language>>
-    <br>
-  <</if>>
-  <!-- 原版 30 是 Sus、60 是 Rage，这里在他逼近发作前先给一次提醒。 -->
-  <<if _pool.tonight and _pool.has('Kylar') and _pool.kylarRage gte 50 and _pool.kylarWarned()>>
-    <<language>>
-      <<option 'EN'>>
-        Kylar's hand closes around your wrist, tighter than Kylar means it to. "Who were you looking at?"<br><br>
-      <<option 'CN'>>
-        凯拉尔的手扣住你的手腕，比<<nnpc_he 'Kylar'>>自己以为的更用力。“你刚才在看谁？”<br><br>
-    <</language>>
-  <</if>>
-  <<if _pool.tonight and _pool.kylarRaging and _pool.kylarBroke()>>
-    <<run _pool.breakUp()>>
-    <<language>>
-      <<option 'EN'>>
-        Kylar does not shout. Kylar walks to the poolside, picks up your clothes, and holds them out until you take them. "We are leaving," Kylar says. The students nearby fall quiet.<br><br>
-      <<option 'CN'>>
-        凯拉尔没有喊。<<nnpc_he 'Kylar'>>走到池边，把你的衣服捡起来，一直举着，直到你接过去。“我们走。”<<nnpc_he 'Kylar'>>说。附近的学生安静下来。<br><br>
-    <</language>>
-    <<getouticon>><<lanLink ['Leave with Kylar', '和凯拉尔一起离开'] 'Deadwood Reblooms Pool Party Broke Up'>><</lanLink>><br><br>
+  <<if $weekly.schoolNightPoolParty is 'party' and Time.dayState is 'night'
+    and !$replayScene and !$statFreeze and !$combat>>
+    <<if _pool.attend()>>
+      <<language>>
+        <<option 'EN'>>
+          <<for _name range _pool.companions>>
+            <<switch _name>>
+              <<case 'Robin'>>
+                Robin stays close enough that your arms keep brushing.<br>
+              <<case 'Whitney'>>
+                Whitney has already claimed the deepest part of the pool and is watching you decide.<br>
+              <<case 'Kylar'>>
+                Kylar has not moved from the doorway. Kylar is counting the people between you.<br>
+              <<case 'Sydney'>>
+                Sydney watches you rather than the water.<br>
+            <</switch>>
+          <</for>>
+        <<option 'CN'>>
+          <<for _name range _pool.companions>>
+            <<switch _name>>
+              <<case 'Robin'>>
+                罗宾贴得很近，近到你们的手臂不断擦到一起。<br>
+              <<case 'Whitney'>>
+                惠特尼已经占住了泳池最深的地方，正看着你打算怎么办。<br>
+              <<case 'Kylar'>>
+                凯拉尔一直没离开门口。<<nnpc_he 'Kylar'>>在数你身边隔了多少人。<br>
+              <<case 'Sydney'>>
+                悉尼的视线落在你身上的时间，比落在水面上更长。<br>
+            <</switch>>
+          <</for>>
+      <</language>>
+      <br>
+    <</if>>
+    <!-- 原版 30 是 Sus、60 是 Rage，这里在他逼近发作前先给一次提醒。 -->
+    <<if _pool.has('Kylar') and _pool.kylarRage gte 50 and _pool.kylarWarned()>>
+      <<language>>
+        <<option 'EN'>>
+          Kylar's hand closes around your wrist, tighter than Kylar means it to. "Who were you looking at?"<br><br>
+        <<option 'CN'>>
+          凯拉尔的手扣住你的手腕，比<<nnpc_he 'Kylar'>>自己以为的更用力。“你刚才在看谁？”<br><br>
+      <</language>>
+    <</if>>
+    <<if _pool.kylarRaging>>
+      <<if _pool.kylarBroke()>>
+        <<language>>
+          <<option 'EN'>>
+            Kylar does not shout. Kylar walks to the poolside, picks up your clothes, and holds them out until you take them. "We are leaving," Kylar says. The students nearby fall quiet.<br><br>
+          <<option 'CN'>>
+            凯拉尔没有喊。<<nnpc_he 'Kylar'>>走到池边，把你的衣服捡起来，一直举着，直到你接过去。“我们走。”<<nnpc_he 'Kylar'>>说。附近的学生安静下来。<br><br>
+        <</language>>
+      <</if>>
+      <<getouticon>><<lanLink ['Leave with Kylar', '和凯拉尔一起离开']>>
+        <<if $weekly.schoolNightPoolParty is 'party' and Time.dayState is 'night' and _pool.kylarRaging>>
+          <<run _pool.breakUp()>><<endevent>><<goto 'Deadwood Reblooms Pool Party Broke Up'>>
+        <</if>>
+      <</lanLink>><br><br>
+    <</if>>
   <</if>>
 <</widget>>
 

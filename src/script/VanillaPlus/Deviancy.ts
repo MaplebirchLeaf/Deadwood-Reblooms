@@ -1,11 +1,7 @@
 // ./src/script/VanillaPlus/Deviancy.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  maplebirch.tool.addTo(
-    'BeforeLinkZone',
-    { widget: 'deadwood-reblooms-deviancy-mirror-exits', passage: 'Tentacle Plains' },
-    { widget: 'deadwood-reblooms-deviancy-conduct-link', passage: 'Gwylan Ritual Select' }
-  );
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-deviancy-conduct-link', passage: 'Gwylan Ritual Select' });
   // 诡异镜的“放逐”选项可能占据首位，入口始终紧邻原版“观察”选项。
   maplebirch.tool.addTo(
     'CustomLinkZone',
@@ -18,6 +14,8 @@ export default function (maplebirch: typeof window.maplebirch) {
   // 接入镜面通路与仪式结算，并扩展异种癖上限。
   maplebirch.tool.inject({
     locationPassage: {
+      // 仅在原版正常导航层显示镜面出口，不绕过昏厥或强制遭遇。
+      'Tentacle Plains': [{ src: '<<if $tentnorth is 0 and $tenteast is 0>>', applybefore: '<<deadwood-reblooms-deviancy-mirror-exits>>\n\t', expected: 1 }],
       'Farm Mirror': [
         // 镜子菜单会局部重绘，链接区若插进菜单内部，会在重绘后消失。
         { src: '<<mirror>>', applybefore: '<<deadwood-reblooms-deviancy-mirror-enter-link "farm">>\n', expected: 1 }

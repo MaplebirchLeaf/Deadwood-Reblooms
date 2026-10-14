@@ -163,7 +163,7 @@
 
 <!-- 异种癖仪式入口：满足 Gwylan 与仪式条件时显示主持选项。 -->
 <<widget 'deadwood-reblooms-deviancy-conduct-link'>>
-  <<set $_canConductDeviancy to maplebirch.get("VanillaPlus").deviancy.canConduct and $phase isnot 'no'>>
+  <<set $_canConductDeviancy to maplebirch.get("VanillaPlus").deviancy.canConduct and $phase isnot 'no' and !_ritualFailSafe>>
   <<set $_canConductDeviancy to $_canConductDeviancy and !_gwylanStatus.includes('cautious')>>
   <<set $_canConductDeviancy to $_canConductDeviancy and $settings.tentaclesEnabled and $settings.hypnosisEnabled>>
   <<if $_canConductDeviancy and !playerChastity()>>
@@ -322,7 +322,7 @@
     and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
     and (!maplebirch.get('Finance') or !maplebirch.get("Finance").realEstate.residenceOf('Kylar'))>>
   <<if _mirrorLocations.home and maplebirch.get("VanillaPlus").deviancy.discovered('home')>>
-    <<run _mirrorTargets.push({..._mirrorLocations.home, EN: 'your bedroom mirror', CN: '卧室的镜子'})>>
+    <<run _mirrorTargets.push({...(_mirrorLocations.home), EN: 'your bedroom mirror', CN: '卧室的镜子'})>>
   <</if>>
   <<for _property range (maplebirch.get("Finance")?.realEstate.properties ?? [])>>
     <<set _coordinates to _mirrorLocations['property:' + _property.id]>>
@@ -338,19 +338,19 @@
     <</if>>
   <</for>>
   <<if _mirrorLocations.farm and maplebirch.get("VanillaPlus").deviancy.discovered('farm')>>
-    <<run _mirrorTargets.push({..._mirrorLocations.farm, EN: 'the farm mirror', CN: '农场的镜子'})>>
+    <<run _mirrorTargets.push({...(_mirrorLocations.farm), EN: 'the farm mirror', CN: '农场的镜子'})>>
   <</if>>
   <<if _mirrorLocations.tower and maplebirch.get("VanillaPlus").deviancy.discovered('tower')>>
-    <<run _mirrorTargets.push({..._mirrorLocations.tower, EN: 'the tower mirror', CN: '高塔的镜子'})>>
+    <<run _mirrorTargets.push({...(_mirrorLocations.tower), EN: 'the tower mirror', CN: '高塔的镜子'})>>
   <</if>>
   <<if _mirrorLocations.temple and maplebirch.get("VanillaPlus").deviancy.discovered('temple')>>
-    <<run _mirrorTargets.push({..._mirrorLocations.temple, EN: 'the temple mirror', CN: '神殿宿舍的镜子'})>>
+    <<run _mirrorTargets.push({...(_mirrorLocations.temple), EN: 'the temple mirror', CN: '神殿宿舍的镜子'})>>
   <</if>>
   <<if _mirrorLocations.sirris and _sirrisMirrorReady and maplebirch.get("VanillaPlus").deviancy.discovered('sirris')>>
-    <<run _mirrorTargets.push({..._mirrorLocations.sirris, EN: "Sydney's bedroom mirror", CN: '悉尼卧室的镜子'})>>
+    <<run _mirrorTargets.push({...(_mirrorLocations.sirris), EN: "Sydney's bedroom mirror", CN: '悉尼卧室的镜子'})>>
   <</if>>
   <<if _mirrorLocations.kylar and _kylarMirrorReady and maplebirch.get("VanillaPlus").deviancy.discovered('kylar')>>
-    <<run _mirrorTargets.push({..._mirrorLocations.kylar, EN: "Kylar's bedroom mirror", CN: '凯拉尔卧室的镜子'})>>
+    <<run _mirrorTargets.push({...(_mirrorLocations.kylar), EN: "Kylar's bedroom mirror", CN: '凯拉尔卧室的镜子'})>>
   <</if>>
   <!-- 只提示最近的异地出口。同格出口由下方真实链接显示，无需方向提示。 -->
   <<set _nearestMirror to null>><<set _nearestDistance to 100>>
@@ -530,9 +530,9 @@
   <<if maplebirch.get("VanillaPlus").willpower.unlock>>
     <<language>>
       <<option 'EN'>>
-        <<link [[Dive towards the rune again|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
+        <<swimicon 'down'>><<link [[Dive towards the rune again|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
       <<option 'CN'>>
-        <<link [[再次潜向符文|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
+        <<swimicon 'down'>><<link [[再次潜向符文|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
     <</language>>
     <br>
   <</if>>

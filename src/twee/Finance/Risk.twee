@@ -4,7 +4,7 @@
     <span class='red'><<lanSwitch 'Outstanding recovery debt: ' '待追偿欠款：'>><<deadwood-reblooms-finance-money $Finance.collection.amount>></span><br>
     <<lanSwitch 'Payment deadline: ' '缴清期限：'>><<deadwood-reblooms-finance-date $Finance.collection.due_day>><br>
     <<if $location is 'financial_centre' and !_args[0]>>
-      <<lanLink ['Deal with the debt', '处理欠款'] 'Deadwood Reblooms Financial Debt'>><</lanLink>><br>
+      <<icon 'finance/repayment.png'>><<lanLink ['Deal with the debt', '处理欠款'] 'Deadwood Reblooms Financial Debt'>><</lanLink>><br>
     <<else>><<lanSwitch 'Visit the financial centre to settle the debt.' '到金融中心办理清偿。'>><br><</if>>
   <</if>>
   <<if $Finance.brokerage.margin.positions.length>>
@@ -283,7 +283,7 @@
     <<deadwood-finance-collateral-quote _collateralAmount>>
   <</deadwood-dynamicblock>><br>
 
-  <<lanLink ['Sign the mortgage', '签订抵押借款合同'] 'Deadwood Reblooms Property Collateral Result'>>
+  <<icon 'property/collateral.png'>><<lanLink ['Sign the mortgage', '签订抵押借款合同'] 'Deadwood Reblooms Property Collateral Result'>>
     <<set $Finance.last_result to maplebirch.get('Finance').realEstate.borrowAgainst($Finance.real_estate.collateral_property, Number(_collateralAmount), $Finance.real_estate.mortgage_term)>>
   <</lanLink>><br>
   <<deadwood-reblooms-adrian-counter-link>>
@@ -321,13 +321,13 @@
     <span class='red'><<lanSwitch 'The payment deadline has passed.' '缴款期限已过。'>></span><br>
   <</if>>
   <br>
-  <<lanLink ['Pay from bank funds and cash', '用银行存款与现金缴清'] 'Deadwood Reblooms Financial Debt Result'>><<set $Finance.last_result to maplebirch.get('Finance').repayCollection() ? 'ok' : 'rejected'>><</lanLink>><br>
+  <<icon 'finance/repayment.png'>><<lanLink ['Pay from bank funds and cash', '用银行存款与现金缴清'] 'Deadwood Reblooms Financial Debt Result'>><<set $Finance.last_result to maplebirch.get('Finance').repayCollection() ? 'ok' : 'rejected'>><</lanLink>><br>
   <<lanSwitch 'Bank funds / cash: ' '银行存款／现金：'>><<deadwood-reblooms-finance-money $Finance.bank.balance>> / <<deadwood-reblooms-finance-money $money>><br>
   <<if !$Finance.collection.extended>>
     <<set $_extensionFee to Math.ceil($Finance.collection.amount * 0.05)>>
     <<lanSwitch 'Seven-day extension fee: ' '延期七天的费用：'>><<deadwood-reblooms-finance-money $_extensionFee>><br>
     <<if maplebirch.get('Finance').canExtendCollection>>
-      <<lanLink ['Pay the extension fee from your bank account', '从银行账户支付延期费用']>>
+      <<icon 'finance/rent-extension.png'>><<lanLink ['Pay the extension fee from your bank account', '从银行账户支付延期费用']>>
         <<run maplebirch.get('Finance').extendCollection()>>
         <<run maplebirch.get('Finance').refreshMoneyUI()>>
         <<run Dynamic.render('deadwood-finance-debt')>>

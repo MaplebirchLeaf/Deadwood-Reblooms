@@ -1,9 +1,14 @@
 :: Deadwood Robin Asylum Widgets [widget]
 <<widget 'deadwood-robin-asylum-links'>>
-  <<if $RobinExpansion.asylum.status is 'admitted' and $location is 'asylum' and $asylumstate is 'free' and $stress lt $stressmax and Time.hour gte 7 and Time.hour lt 21>>
-    <<socialiseicon>><<lanLink ['Find Robin inside the asylum', '在院内找罗宾'] 'Deadwood Robin Asylum Meeting'>><</lanLink>><br>
-  <<elseif $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.plan gte 2 and $location is 'asylum' and $asylumstate is 'sleep' and Time.hour isnot 22 and $stress lt $stressmax and $asylumkeycard is 1 and !pcAreArmsBound('any')>>
-    <<getouticon>><<lanLink ['Escape with Robin', '和罗宾一起逃走'] 'Deadwood Robin Asylum Escape'>><</lanLink>><br>
+  <<silently>>
+    <<set _robinAsylumLinks to new maplebirch.tool.link()>><<run _robinAsylumLinks.detect()>>
+  <</silently>>
+  <<if _robinAsylumLinks.links.some(link => link.getAttribute('data-passage') === 'Asylum Cell')>>
+    <<if $RobinExpansion.asylum.status is 'admitted' and $location is 'asylum' and $asylumstate is 'free' and $stress lt $stressmax and Time.hour gte 7 and Time.hour lt 21>>
+      <<socialiseicon>><<lanLink ['Find Robin inside the asylum', '在院内找罗宾'] 'Deadwood Robin Asylum Meeting'>><</lanLink>><br>
+    <<elseif $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.plan gte 2 and $location is 'asylum' and $asylumstate is 'sleep' and Time.hour isnot 22 and $stress lt $stressmax and $asylumkeycard is 1 and !pcAreArmsBound('any')>>
+      <<getouticon>><<lanLink ['Escape with Robin', '和罗宾一起逃走'] 'Deadwood Robin Asylum Escape'>><</lanLink>><br>
+    <</if>>
   <</if>>
 <</widget>>
 

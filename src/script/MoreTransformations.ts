@@ -13,6 +13,10 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
 
   // 只扩展安全事件池，不截断追猎、危险遭遇或原版行进结算。
   maplebirch.tool.inject({
+    locationPassage: {
+      // 五处普通探索菜单内显示入口，避免森林末尾清零 eventskip 后无法显示。
+      Forest: [{ srcmatch: /<<forestsearch>>/g, applybefore: '<<deadwood-raven-link>>\n\t\t', expected: 5 }]
+    },
     widgetPassage: {
       'Widgets Forest': [
         {
@@ -36,5 +40,5 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
       ]
     }
   });
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-raven-link', passage: ['Forest', 'Churchyard'] });
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-raven-link', passage: 'Churchyard' });
 }

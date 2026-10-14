@@ -1,7 +1,6 @@
 // ./src/script/Sydney/SydneyScience.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-sydney-science-late-intro', passage: 'Temple' });
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-sydney-science-inspection-leave', passage: 'Science Lesson' });
   maplebirch.tool.addTo('BeforeLinkZone', {
     widget: 'deadwood-reblooms-sydney-science-anatomy',

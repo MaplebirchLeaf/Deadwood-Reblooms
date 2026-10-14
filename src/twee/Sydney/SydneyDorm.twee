@@ -1,12 +1,11 @@
 :: Deadwood Reblooms Sydney Dorm Widgets [widget]
 <<widget 'deadwood-reblooms-sydney-dorm-link'>>
   <<silently>>
-  <<set _position to _args[0]>>
   <<if _sydneyAvailable is undefined>>
     <<sydneySchedule>>
   <</if>>
-  <<set _cleaningLink to $exposed lt 1 and Time.dayState isnot 'night' and $temple_quarters lt 100 and !pcAreArmsBound('both')>>
-  <<set _showDormLink to _dormAccess and ['monk', 'priest'].includes($temple_rank) and $stress lt $stressmax and _position is (_cleaningLink ? 2 : 1)>>
+  <<set _sydneyDormLinks to new maplebirch.tool.link()>><<run _sydneyDormLinks.detect()>>
+  <<set _showDormLink to _dormAccess and ['monk', 'priest'].includes($temple_rank) and $stress lt $stressmax and _sydneyDormLinks.links.some(link => link.getAttribute('data-passage') === 'Temple')>>
   <</silently>>
   <<if _showDormLink and !$SydneyExpansion.dormInvited and _sydneyWorking>>
     <<icon 'temple/sydney-quarters.png'>><<lanLink ['Ask Sydney to sit by the bunk', '问悉尼能否来床铺旁坐坐'] 'Deadwood Reblooms Sydney Dorm Bunk Invitation'>><</lanLink>><br>
@@ -20,8 +19,9 @@
   <<if _sydneyAvailable is undefined>>
     <<sydneySchedule>>
   <</if>>
+  <<set _sydneySirrisLinks to new maplebirch.tool.link()>><<run _sydneySirrisLinks.detect()>>
   <</silently>>
-  <<if _sirrisMorning>>
+  <<if _sirrisMorning and _sydneySirrisLinks.links.some(link => link.getAttribute('data-passage') === 'Temple')>>
     <<getouticon>><<lanLink ['Go to see Sirris with Sydney', '和悉尼去见西里斯'] 'Deadwood Reblooms Sydney Halloween Morning'>><</lanLink>><br>
   <</if>>
 <</widget>>
@@ -114,7 +114,7 @@
   <<if _sirrisMorning>>
     <<lanSwitch 'Sydney is already outside with Sirris.' '悉尼已经和西里斯在神殿外面了。'>>
     <br><br>
-    <<lanLink ['Go to see Sirris with Sydney', '和悉尼去见西里斯'] 'Deadwood Reblooms Sydney Halloween Morning'>><</lanLink>>
+    <<getouticon>><<lanLink ['Go to see Sirris with Sydney', '和悉尼去见西里斯'] 'Deadwood Reblooms Sydney Halloween Morning'>><</lanLink>>
   <<elseif _sydney_location is 'temple' and $sydney_templeWork is 'pray'>>
     <<lanSwitch "Sydney's bunk is empty. Sydney is praying on a pew downstairs." '悉尼的床铺空着。悉尼正在楼下的长椅上祈祷。'>>
   <<elseif _sydney_location is 'temple' and $sydney_templeWork is 'garden'>>
@@ -283,7 +283,7 @@
   <<lanLink ['Keep the vigil with Sydney until morning', '陪悉尼守夜到早晨'] 'Deadwood Reblooms Sydney Halloween Morning'>><<pass _minutesUntilSirris>><</lanLink>><br>
 <<elseif _sirrisMorning>>
   <br>
-  <<lanLink ['Go to see Sirris with Sydney', '和悉尼去见西里斯'] 'Deadwood Reblooms Sydney Halloween Morning'>><</lanLink>><br>
+  <<getouticon>><<lanLink ['Go to see Sirris with Sydney', '和悉尼去见西里斯'] 'Deadwood Reblooms Sydney Halloween Morning'>><</lanLink>><br>
 <</if>>
 <br>
 <<getouticon>><<lanLink ['Return to the quarters', '返回宿舍'] 'Temple Quarters'>><</lanLink>>
@@ -1184,14 +1184,14 @@
   <<set $wardrobe_location to 'temple'>><<wardrobeSelection true>><<radiooutfits>>
   <br><br>
   <<if _sirrisMorning>>
-    <<lanLink ['Get dressed and go to see Sirris with Sydney', '穿好衣服，和悉尼去见西里斯'] 'Deadwood Reblooms Sydney Halloween Morning'>>
+    <<dressasyouwereicon>><<lanLink ['Get dressed and go to see Sirris with Sydney', '穿好衣服，和悉尼去见西里斯'] 'Deadwood Reblooms Sydney Halloween Morning'>>
       <<deadwood-reblooms-sydney-dorm-dress>>
     <</lanLink>><br>
   <</if>>
-  <<lanLink ['Get dressed and leave the bed', '穿好衣服离开床铺'] 'Deadwood Reblooms Sydney Dorm'>>
+  <<dressasyouwereicon>><<lanLink ['Get dressed and leave the bed', '穿好衣服离开床铺'] 'Deadwood Reblooms Sydney Dorm'>>
     <<deadwood-reblooms-sydney-dorm-dress>>
   <</lanLink>><br>
-  <<lanLink ['Leave the bed without changing clothes', '不换衣服，离开床铺'] 'Deadwood Reblooms Sydney Dorm'>>
+  <<getouticon>><<lanLink ['Leave the bed without changing clothes', '不换衣服，离开床铺'] 'Deadwood Reblooms Sydney Dorm'>>
     <<set $wear_outfit to 'none'>>
   <</lanLink>>
   <</if>>

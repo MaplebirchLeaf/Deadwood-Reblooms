@@ -1,21 +1,39 @@
 // ./src/script/LifeSimulation/PoolParty.ts
 
-const PARTY_PASSAGES = ['School Pool', 'School Night Pool Party Around', 'School Night Pool Party Socialise'] as const;
-
 export default function PoolParty(maplebirch: typeof window.maplebirch): void {
-  maplebirch.tool.addTo(
-    'BeforeLinkZone',
-    ...PARTY_PASSAGES.flatMap(passage => [
-      { widget: 'deadwood-reblooms-pool-party-company', passage },
-      { widget: 'deadwood-reblooms-pool-party-together', passage }
-    ])
-  );
+  maplebirch.tool.addTo('BeforeLinkZone', {
+    widget: 'deadwood-reblooms-pool-party-together',
+    passage: ['School Night Pool Party Around', 'School Night Pool Party Socialise']
+  });
 
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Robin': [{ src: '<<robinbully>>', applybefore: '<<deadwood-reblooms-pool-party-invite>>\n\t\t', expected: 1 }]
     },
     locationPassage: {
+      // 跟随原版派对交谈菜单，换衣拒绝与白天泳池分支不追加互动。
+      'School Pool': [
+        {
+          srcmatch: /<<socialiseicon>><<link \[\[[^\]\n]+\|School Night Pool Party Socialise\]\]>>/,
+          applybefore: '<<deadwood-reblooms-pool-party-company>>\n\t\t\t\t<<deadwood-reblooms-pool-party-together>>\n\t\t\t\t',
+          expected: 1
+        }
+      ],
+      'School Night Pool Party Around': [
+        {
+          // 六点散场的 exit 在这个锚点前执行。
+          src: '<<set $phase2 to random(1,4)>>',
+          applybefore: '<<deadwood-reblooms-pool-party-company>>\n',
+          expected: 1
+        }
+      ],
+      'School Night Pool Party Socialise': [
+        {
+          src: '<<generatey1>><<person1>>',
+          applybefore: '<<deadwood-reblooms-pool-party-company>>\n',
+          expected: 1
+        }
+      ],
       'History Classroom': [
         {
           srcmatch: /<<getouticon>><<link \[\[[^\]\n]+\|Hallways]]>><<\/link>>/,
