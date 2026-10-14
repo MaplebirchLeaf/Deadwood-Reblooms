@@ -11,7 +11,7 @@
   <<if _showDormLink and !$SydneyExpansion.dormInvited and _sydneyWorking>>
     <<icon 'temple/sydney-quarters.png'>><<lanLink ['Ask Sydney to sit by the bunk', '问悉尼能否来床铺旁坐坐'] 'Deadwood Reblooms Sydney Dorm Bunk Invitation'>><</lanLink>><br>
   <<elseif _showDormLink and $SydneyExpansion.dormInvited>>
-    <<icon 'temple/sydney-quarters.png'>><<lanLink ["Sydney's bunk (0:01)", '悉尼的床铺 (0:01)'] 'Deadwood Reblooms Sydney Dorm'>><<pass 1>><</lanLink>><br>
+    <<icon 'temple/sydney-quarters.png'>><<lanLink ["Sydney's bunk", '悉尼的床铺'] 'Deadwood Reblooms Sydney Dorm'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -32,9 +32,13 @@
   <<else>>
     <<icon 'temple/sydney-bed.png'>>
     <<lanLink ['Strip and lie beside Sydney', '脱衣躺到悉尼身旁'] 'Deadwood Reblooms Sydney Dorm Bed'>>
-      <<undressSleep 'Deadwood Sydney Dorm Bed'>>
+      <<set $wear_outfit to 'none'>><<undressSleep 'Deadwood Sydney Dorm Bed'>>
     <</lanLink>><br>
     <<if !$earSlime.alwaysSleepNaked or $hypnosis_traits.silence>>
+      <<icon 'temple/sydney-bed.png'>>
+      <<lanLink ['Lie beside Sydney without changing clothes', '不换衣服，躺到悉尼身旁'] 'Deadwood Reblooms Sydney Dorm Bed'>>
+        <<set $wear_outfit to 'none'>>
+      <</lanLink>><br>
       <<set $storeLocation to 'Deadwood Sydney Dorm Bed'>>
       <<set $wardrobe_location to 'temple'>><<wardrobeSelection true>>
       <<for _index, _outfit range $outfit>>
@@ -43,13 +47,20 @@
             <<icon 'temple/sydney-bed.png'>>
             <<set _outfitname to _outfit.name + (_outfit.colors is false ? '' : ' [C]')>>
             <<lanLink `['Wear ' + _outfitname + ' and lie beside Sydney', '穿上' + _outfitname + '并躺到悉尼身旁']` 'Deadwood Reblooms Sydney Dorm Bed'>>
-              <<set $wear_outfit to _index>><<saveTempHairStyle>>
+              <<set $wear_outfit to _index>><<saveTempHairStyle>><<wearoutfit>>
             <</lanLink>><br>
           <</capture>>
         <</if>>
       <</for>>
     <</if>>
   <</if>>
+<</widget>>
+
+<!-- 睡醒后的原版衣装选择在点击时结算，场景重绘不换衣。 -->
+<<widget 'deadwood-reblooms-sydney-dorm-dress'>>
+  <<set $wardrobe_location to 'temple', $storeLocation to 'Deadwood Sydney Dorm Bed'>>
+  <<if $wear_outfit is 'clotheson'>><<loadTempHairStyle>><</if>>
+  <<wearoutfit>>
 <</widget>>
 
 :: Deadwood Reblooms Sydney Dorm Bunk Invitation
@@ -77,11 +88,12 @@
 
 :: Deadwood Reblooms Sydney Dorm
 <<set $outside to 0>><<set $location to 'temple'>><<sydneySchedule>><<temple_effects>><<effects>>
-<!-- 宿舍床上的衣物单独存放。返回宿舍时按原版床铺的做法取回。 -->
-<<if setup.clothingLayer.all.some(slot => $store[slot]?.some(item => item.location === 'Deadwood Sydney Dorm Bed'))>>
-  <<set $wardrobe_location to 'temple'>>
-  <<storeon 'Deadwood Sydney Dorm Bed'>><<loadTempHairStyle>>
-  <<set $wear_outfit to 'none'>>
+<!-- 床铺暂存沿用原版 store；穿回衣物只在玩家选择时执行。 -->
+<<if !$combat and !$statFreeze and !$replayScene and !pcAreArmsBound('any') and clothingInStorage('Deadwood Sydney Dorm Bed').length gt 0>>
+  <<wardrobeicon>><<lanLink ['Put on the clothes left by the bunk', '穿回床铺旁的衣物'] 'Deadwood Reblooms Sydney Dorm'>>
+    <<set $wardrobe_location to 'temple'>><<storeon 'Deadwood Sydney Dorm Bed'>><<loadTempHairStyle>>
+    <<set $wear_outfit to 'none'>>
+  <</lanLink>><br><br>
 <</if>>
 <!-- 在宿舍场景再次检查权限，避免节日链接绕过入口条件。 -->
 <<if !_dormAccess>>
@@ -737,7 +749,7 @@
 <<lanLink ["Continue","继续"] 'Deadwood Reblooms Sydney Dorm'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Dorm Bed
-<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>><<wearoutfit>>
+<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
 <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
 <<language>>
   <<option 'EN'>>
@@ -1172,9 +1184,16 @@
   <<set $wardrobe_location to 'temple'>><<wardrobeSelection true>><<radiooutfits>>
   <br><br>
   <<if _sirrisMorning>>
-    <<lanLink ['Go to see Sirris with Sydney', '和悉尼去见西里斯'] 'Deadwood Reblooms Sydney Halloween Morning'>><</lanLink>><br>
+    <<lanLink ['Get dressed and go to see Sirris with Sydney', '穿好衣服，和悉尼去见西里斯'] 'Deadwood Reblooms Sydney Halloween Morning'>>
+      <<deadwood-reblooms-sydney-dorm-dress>>
+    <</lanLink>><br>
   <</if>>
-  <<lanLink ["Continue","继续"] 'Deadwood Reblooms Sydney Dorm'>><</lanLink>>
+  <<lanLink ['Get dressed and leave the bed', '穿好衣服离开床铺'] 'Deadwood Reblooms Sydney Dorm'>>
+    <<deadwood-reblooms-sydney-dorm-dress>>
+  <</lanLink>><br>
+  <<lanLink ['Leave the bed without changing clothes', '不换衣服，离开床铺'] 'Deadwood Reblooms Sydney Dorm'>>
+    <<set $wear_outfit to 'none'>>
+  <</lanLink>>
   <</if>>
   <<set $phase to 0>>
 <</if>>

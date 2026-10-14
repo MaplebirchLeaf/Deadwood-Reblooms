@@ -152,6 +152,8 @@ class BirdTower extends Module {
   public feed(target: number | 'all' | 'share' = 'all'): number[] {
     const stock = V.bird.materials.lurkers;
     const children = typeof target === 'number' ? this.hungry.filter(child => child.childId === target) : this.hungry;
+    const receipt: BirdTowerState['feeding'] = { ids: [], spent: 0, remaining: stock, waiting: this.hungry.map(child => child.childId) };
+    this.state.feeding = receipt;
     if (!children.length || !(stock > 0)) return [];
     const cost = typeof target === 'number' || !children.some(child => getChildDays(child.childId) >= 35) ? 1 : children.length;
     if (target !== 'share' && stock < cost) return [];
@@ -167,7 +169,11 @@ class BirdTower extends Module {
       child.development.activityDay = Time.days;
       child.development.activityHour = Time.hour - 3;
     }
-    return children.map(child => child.childId);
+    receipt.ids = children.map(child => child.childId);
+    receipt.spent = spent;
+    receipt.remaining = V.bird.materials.lurkers;
+    receipt.waiting = this.hungry.map(child => child.childId);
+    return receipt.ids;
   }
 
   public get canInvite(): boolean {

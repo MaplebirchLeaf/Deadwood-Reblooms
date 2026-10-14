@@ -208,15 +208,15 @@ export default function (maplebirch: typeof window.maplebirch): void {
   <span class='red'><<lanSwitch "Robin has not come home." '罗宾还没有回来。'>></span><br><br>
   <<lanSwitch "The note says Robin became overwhelmed after several difficult days. Staff took Robin to the hospital; the hospital then transferred Robin to the asylum in the forest. No one has given you a date for Robin's return." '纸条写着，罗宾连着几天状态很差，最后在院里崩溃了。工作人员先送罗宾去了医院，医院随后将罗宾转到森林里的精神病院。没人告诉你罗宾什么时候能回来。'>>
   <br><br>
-  <<main_hall_icon>><<lanLink '返回孤儿院' 'Orphanage'>><<pass 1>><</lanLink>>
+  <<main_hall_icon>><<lanLink ['Return to the orphanage', '返回孤儿院'] 'Orphanage'>><<pass 1>><</lanLink>>
 <<elseif _robin_location is 'tutor'>>
   <<lanSwitch "Robin's note says the tutoring lesson will finish this evening." '罗宾的纸条上写着，家教课今晚才结束。'>>
   <br><br>
-  <<main_hall_icon>><<lanLink '返回孤儿院' 'Orphanage'>><<pass 1>><</lanLink>>
+  <<main_hall_icon>><<lanLink ['Return to the orphanage', '返回孤儿院'] 'Orphanage'>><<pass 1>><</lanLink>>
 <<elseif _robin_location is 'shop'>>
   <<lanSwitch "Robin is minding your shop on Cliff Street." '罗宾正在峭壁街照看你们的店。'>>
   <br><br>
-  <<main_hall_icon>><<lanLink '返回孤儿院' 'Orphanage'>><<pass 1>><</lanLink>>
+  <<main_hall_icon>><<lanLink ['Return to the orphanage', '返回孤儿院'] 'Orphanage'>><<pass 1>><</lanLink>>
 `,
           expected: 1
         }

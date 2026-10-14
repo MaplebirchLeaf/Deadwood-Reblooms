@@ -107,8 +107,12 @@
       <br>
       <<if $bird.materials.lurkers gte 1>>
         <<lanLink ["Feed your child a lurker (0:15)", "给孩子喂食一只潜伏者 (0:15)"] "Deadwood BirdTower Activity Events">>
+          <<set $childActivityEvent to {event:"begHawk", childid:_args[0], roll:random(1,4)}>>
+          <<if $childActivityEvent.roll isnot 4 and !maplebirch.get('BirdTower').feed(_args[0]).length>>
+            <<set $childActivityEvent.roll to 4>>
+          <</if>>
           <<pass 15>>
-          <<set $childActivityEvent to {event:"begHawk", childid:_args[0]}>>
+          <<deadwood-birdtower-resolve-activity>>
         <</lanLink>>
         |
       <<else>>
@@ -129,6 +133,7 @@
             <<lanLink ["Watch them (0:15)", "看看他们 (0:15)"] "Deadwood BirdTower Activity Events">>
               <<pass 15>>
               <<set $childActivityEvent to {event:"Hawk_build", childid:_args[0]}>>
+              <<deadwood-birdtower-resolve-activity>>
             <</lanLink>>
             |
           <<case "brood">>
@@ -151,6 +156,7 @@
             <<lanLink ["Pick your child up (0:15)", "抱起孩子 (0:15)"] "Deadwood BirdTower Activity Events">>
               <<pass 15>>
               <<set $childActivityEvent to {event:"Hawk_brood", childid:_args[0]}>>
+              <<deadwood-birdtower-resolve-activity>>
             <</lanLink>>
             |
           <<case "rest">>
@@ -164,6 +170,7 @@
             <<lanLink ["Observe them (0:15)", "观察他们 (0:15)"] "Deadwood BirdTower Activity Events">>
               <<pass 15>>
               <<set $childActivityEvent to {event:"Hawk_rest", childid:_args[0]}>>
+              <<deadwood-birdtower-resolve-activity>>
             <</lanLink>>
             |
         <</switch>>
@@ -187,6 +194,7 @@
         <<lanLink ["Help keep your child warm (0:15)", "帮孩子保暖 (0:15)"] "Deadwood BirdTower Activity Events">>
           <<pass 15>>
           <<set $childActivityEvent to {event:"Hawk_weather_cold", childid:_args[0]}>>
+          <<deadwood-birdtower-resolve-activity>>
         <</lanLink>>
         |
       <<elseif Weather.temperature gte 30>>
@@ -200,6 +208,7 @@
         <<lanLink ["Help cool your child down (0:15)", "帮孩子降温 (0:15)"] "Deadwood BirdTower Activity Events">>
           <<pass 15>>
           <<set $childActivityEvent to {event:"Hawk_weather_hot", childid:_args[0]}>>
+          <<deadwood-birdtower-resolve-activity>>
         <</lanLink>>
         |
       <<else>>
@@ -213,6 +222,7 @@
         <<lanLink ["Stay with your child (0:15)", "陪伴孩子 (0:15)"] "Deadwood BirdTower Activity Events">>
           <<pass 15>>
           <<set $childActivityEvent to {event:"Hawk_weather_mild", childid:_args[0]}>>
+          <<deadwood-birdtower-resolve-activity>>
         <</lanLink>>
         |
       <</if>>
@@ -234,6 +244,7 @@
       <<lanLink ["Help your child try to fly (0:15)", "帮孩子尝试飞行 (0:15)"] "Deadwood BirdTower Activity Events">>
         <<pass 15>>
         <<set $childActivityEvent to {event:"Fledgling_fly", childid:_args[0]}>>
+        <<deadwood-birdtower-resolve-activity>>
       <</lanLink>>
       |
     <<case "explore">>
@@ -246,7 +257,11 @@
       <br>
       <<lanLink ["Look for your child (0:15)", "寻找孩子 (0:15)"] "Deadwood BirdTower Activity Events">>
         <<pass 15>>
-        <<set $childActivityEvent to {event:"explore", childid:_args[0]}>>
+        <<set $childActivityEvent to {event:"explore", childid:_args[0], roll:random(1,4)}>>
+        <<if $childActivityEvent.roll is 1>>
+          <<set $childActivityEvent.fed to maplebirch.get('BirdTower').feed(_args[0]).length gt 0>>
+        <</if>>
+        <<deadwood-birdtower-resolve-activity>>
       <</lanLink>>
       |
     <<case "Fledgling_preen">>
@@ -260,6 +275,7 @@
       <<lanLink ["Help your child preen (0:15)", "帮孩子整理羽毛 (0:15)"] "Deadwood BirdTower Activity Events">>
         <<pass 15>>
         <<set $childActivityEvent to {event:"Fledgling_preen", childid:_args[0]}>>
+        <<deadwood-birdtower-resolve-activity>>
       <</lanLink>>
       |
     <<case "Fledgling_perch">>
@@ -273,6 +289,7 @@
       <<lanLink ["Take your child to the perch (0:15)", "带孩子去栖木那里 (0:15)"] "Deadwood BirdTower Activity Events">>
         <<pass 15>>
         <<set $childActivityEvent to {event:"Fledgling_perch", childid:_args[0]}>>
+        <<deadwood-birdtower-resolve-activity>>
       <</lanLink>>
       |
     <<case "Subadult_fly">>
@@ -286,6 +303,7 @@
       <<lanLink ["Watch over your child (0:15)", "守望孩子 (0:15)"] "Deadwood BirdTower Activity Events">>
         <<pass 15>>
         <<set $childActivityEvent to {event:"Subadult_fly", childid:_args[0]}>>
+        <<deadwood-birdtower-resolve-activity>>
       <</lanLink>>
       |
     <<case "Subadult_preen">>
@@ -299,6 +317,7 @@
       <<lanLink ["Help your child preen (0:15)", "帮孩子整理羽毛 (0:15)"] "Deadwood BirdTower Activity Events">>
         <<pass 15>>
         <<set $childActivityEvent to {event:"Subadult_preen", childid:_args[0]}>>
+        <<deadwood-birdtower-resolve-activity>>
       <</lanLink>>
       |
     <<case "Subadult_perch">>
@@ -312,6 +331,7 @@
       <<lanLink ["Follow your child (0:15)", "跟上孩子 (0:15)"] "Deadwood BirdTower Activity Events">>
         <<pass 15>>
         <<set $childActivityEvent to {event:"Subadult_perch", childid:_args[0]}>>
+        <<deadwood-birdtower-resolve-activity>>
       <</lanLink>>
       |
     <<case "rest">>

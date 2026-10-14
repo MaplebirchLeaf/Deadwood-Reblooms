@@ -16,19 +16,23 @@
 
 <<widget 'deadwood-robin-doctor-log'>>
   <<set _d to $RobinExpansion.doctor>>
-  <<set _d.day to Time.days>>
-  <<set _d.count += 1>>
-  <<if _d.stage is 0>>
-    <<set _d.stage to 1>>
-  <<elseif _d.stage is 1 and _d.count gte 2>>
-    <<set _d.stage to 2>>
+  <<set _doctorCompleted to false>>
+  <<if _d.active and !$statFreeze and !$replayScene>>
+    <<set _d.active to false>>
+    <<set _doctorCompleted to true>>
+    <<set _d.count += 1>>
+    <<set _d.stage to Math.min(2, _d.count)>>
+    <<pass 5>>
   <</if>>
 <</widget>>
 
 :: Deadwood Robin Doctor Invite
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<pass 30>>
-<<deadwood-robin-doctor-log>>
+<<if $RobinExpansion.doctor.day isnot Time.days and !$statFreeze and !$replayScene>>
+  <<set $RobinExpansion.doctor.day to Time.days>>
+  <<set $RobinExpansion.doctor.active to false>>
+  <<pass 30>>
+<</if>>
 <<if $RobinExpansion.doctor.stage gte 2>>
   <<language>>
     <<option 'EN'>>
@@ -38,20 +42,20 @@
       <br><br>
       <<he>> stretches out flat and lets <<his>> knees fall apart, entirely on purpose. "Go on then, doctor. Examine me."
       <br><br>
-      <<if C.npc.Robin.lust gte 70>>
+      <<if C.npc.Robin.lust gte 70 and C.npc.Robin.penis isnot 'none'>>
         <span class='lewd'><<he>> is already straining against <<his>> trousers before you have touched <<him>>, and <<he>> knows you can see it.</span> Robin grins up at you, no shame in it at all. "What? You are the one who taught me this game."
       <<else>>
         Robin watches you with <<his>> mouth a little open, waiting to see whether you will take the bait.
       <</if>>
     <<option 'CN'>>
-      你进门时罗宾已经躺在床上了，书合着，两手枕在脑后。“才来啊。”他说。
+      你进门时罗宾已经躺在床上了，书合着，两手枕在脑后。“才来啊。”<<he>>说。
       <br><br>
-      <span class='lewd'>“陪我玩医生游戏。”</span>他说得像让你递盐一样随便，一边不急不慢地单手解自己的衬衫扣子。“你当医生。我当那个特别勇敢的病人。”
+      <span class='lewd'>“陪我玩医生游戏。”</span><<he>>说得像让你递盐一样随便，一边不急不慢地单手解自己的衬衫扣子。“你当医生。我当那个特别勇敢的病人。”
       <br><br>
-      他摊平躺好，故意把两边膝盖分开。“来吧医生，检查我。”
+      <<he>>摊平躺好，故意把两边膝盖分开。“来吧医生，检查我。”
       <br><br>
-      <<if C.npc.Robin.lust gte 70>>
-        <span class='lewd'>你还没碰到他，裤子底下就已经支起来了，而他知道你看得见。</span>罗宾仰头冲你笑，一点都不害臊。“怎么？这游戏不还是你教我的。”
+      <<if C.npc.Robin.lust gte 70 and C.npc.Robin.penis isnot 'none'>>
+        <span class='lewd'>你还没碰到<<he>>，裤子底下就已经支起来了，而<<he>>知道你看得见。</span>罗宾仰头冲你笑，一点都不害臊。“怎么？这游戏不还是你教我的。”
       <<else>>
         罗宾微微张着嘴看你，等你上不上钩。
       <</if>>
@@ -71,21 +75,21 @@
         Robin lies back with a nervous laugh. "Fine. But you had better know what you are doing." <<he>> gets <<his>> own shirt off before you ask, then <span class='pink'>turns red about it</span> — which seems to embarrass <<him>> more than being undressed would have.
       <</if>>
       <br><br>
-      <span class='lewd'>The moment your palm lands on bare skin, <<his>> stomach flinches and <<he>> forgets to breathe. <<He>> is already half hard and there is nothing on <<him>> to hide it behind.</span> You do not say anything about it yet. That is half the game.
+      <<if C.npc.Robin.penis isnot 'none'>><span class='lewd'>The moment your palm lands on bare skin, <<his>> stomach flinches and <<he>> forgets to breathe. <<He>> is already half hard and there is nothing on <<him>> to hide it behind.</span><<else>>Robin watches you, waiting for you to decide whether to continue.<</if>> You do not say anything about it yet. That is half the game.
     <<option 'CN'>>
       你在罗宾床边坐下。“你以前玩过医生游戏吗？”
       <br><br>
-      罗宾慢慢摇头，在判断这是不是个玩笑。于是你给他讲——孤儿院的孩子玩这个，一个人当医生，另一个躺下，医生说什么就做什么。
+      罗宾慢慢摇头，在判断这是不是个玩笑。于是你给<<he>>讲——孤儿院的孩子玩这个，一个人当医生，另一个躺下，医生说什么就做什么。
       <br><br>
-      “那医生就……只是看看？”罗宾问。你说医生会检查一些东西，等他躺下来就知道了。
+      “那医生就……只是看看？”罗宾问。你说医生会检查一些东西，等<<he>>躺下来就知道了。
       <br><br>
       <<if C.npc.Robin.trauma gte 30>>
-        罗宾躺下前先看了眼门。“门开着。”他说，然后自己动手解衬衫，一颗一颗，眼睛一直盯着你的手。
+        罗宾躺下前先看了眼门。“门开着。”<<he>>说，然后自己动手解衬衫，一颗一颗，眼睛一直盯着你的手。
       <<else>>
-        罗宾带着紧张的笑躺下去。“行。可你最好知道自己在干嘛。”没等你开口他就自己把衬衫脱了，随即<span class='pink'>脸红起来</span>——对他来说这比被脱光还难受。
+        罗宾带着紧张的笑躺下去。“行。可你最好知道自己在干嘛。”没等你开口<<he>>就自己把衬衫脱了，随即<span class='pink'>脸红起来</span>——对<<he>>来说这比被脱光还难受。
       <</if>>
       <br><br>
-      <span class='lewd'>你的手掌一落到皮肤上，他肚子就缩了一下，连呼吸都忘了。他已经半硬了，身上没东西挡得住。</span>你暂时什么都不说。这也是游戏的一半。
+      <<if C.npc.Robin.penis isnot 'none'>><span class='lewd'>你的手掌一落到皮肤上，<<he>>肚子就缩了一下，连呼吸都忘了。<<he>>已经半硬了，身上没东西挡得住。</span><<else>>罗宾看着你，等你决定要不要继续。<</if>>你暂时什么都不说。这也是游戏的一半。
   <</language>>
 <</if>>
 <br><br>
@@ -102,29 +106,37 @@
     <br><br>
     <span class='lewd'>Then lower, straight past the waistband, no pretending about it. Robin's breath jams in <<his>> throat, but <<he>> does not stop you. <<He>> lifts <<his>> hips to help you get the clothes out of the way, which is not a thing patients do.</span>
     <br><br>
-    <<if $RobinExpansion.doctor.stage gte 2>>
-      <span class='lewd'><<he>> is hard before you get a hand on it, and <<he>> watches your face the whole time you take hold, hunting for a reaction.</span> "Careful, doctor," Robin says, and rolls <<his>> hips up into your fist to make <<his>> point. <span class='lewd'>"I think it might be serious."</span>
-    <<elseif C.npc.Robin.trauma gte 30>>
-      <span class='lewd'>Half hard and twitching against <<his>> own thigh, eyes fixed on the ceiling, one hand braced flat on the mattress — but <<his>> legs have gone slack and open anyway.</span> "This is part of it?" Robin asks. You say yes. Believing you is the hard part, and <<he>> does it.
+    <<if C.npc.Robin.penis isnot 'none'>>
+      <<if $RobinExpansion.doctor.stage gte 2>>
+        <span class='lewd'><<he>> is hard before you get a hand on it, and <<he>> watches your face the whole time you take hold, hunting for a reaction.</span> "Careful, doctor," Robin says, and rolls <<his>> hips up into your fist to make <<his>> point. <span class='lewd'>"I think it might be serious."</span>
+      <<elseif C.npc.Robin.trauma gte 30>>
+        <span class='lewd'>Half hard and twitching against <<his>> own thigh, eyes fixed on the ceiling, one hand braced flat on the mattress — but <<his>> legs have gone slack and open anyway.</span> "This is part of it?" Robin asks. You say yes. Believing you is the hard part, and <<he>> does it.
+      <<else>>
+        <span class='lewd'><<he>> is stiff in your hand before you finish the sentence,</span> and <<he>> laughs, breathless and wobbly. "This is a weird game," Robin says. Nothing in <<his>> voice says stop.
+      <</if>>
     <<else>>
-      <span class='lewd'><<he>> is stiff in your hand before you finish the sentence,</span> and <<he>> laughs, breathless and wobbly. "This is a weird game," Robin says. Nothing in <<his>> voice says stop.
+      Robin watches your hands and waits for you to decide whether to continue.
     <</if>>
     <br><br>
     You get a knee between <<his>> thighs and push them wider, then lean in the way a doctor leans in when <<he>> has found the problem.
   <<option 'CN'>>
-    你按正经流程来。先把耳朵贴在他胸口——那颗心跳得完全不像在做常规检查。然后手掌按在肚子上，感觉他吸气。
+    你按正经流程来。先把耳朵贴在<<his>>胸口——那颗心跳得完全不像在做常规检查。然后手掌按在肚子上，感觉<<he>>吸气。
     <br><br>
-    <span class='lewd'>再往下，越过裤腰，一点也没打算绕弯子。罗宾的呼吸卡在喉咙里，但没拦你。他抬腰帮你把衣服挪开——病人不会这样。</span>
+    <span class='lewd'>再往下，越过裤腰，一点也没打算绕弯子。罗宾的呼吸卡在喉咙里，但没拦你。<<he>>抬腰帮你把衣服挪开——病人不会这样。</span>
     <br><br>
-    <<if $RobinExpansion.doctor.stage gte 2>>
-      <span class='lewd'>你还没碰到，它就已经硬了。你握住的时候他一直看你的脸，在找反应。</span>“小心点，医生。”罗宾说，一边把腰顶进你手里，<span class='lewd'>“我觉得这病可能挺严重。”</span>
-    <<elseif C.npc.Robin.trauma gte 30>>
-      <span class='lewd'>半硬着贴在大腿上一跳一跳，眼睛盯着天花板，一只手按在床垫上撑着——两条腿却已经松软地张开了。</span>“这也是检查的一部分？”罗宾问。你说对。信你对他来说最难，可他还是信了。
+    <<if C.npc.Robin.penis isnot 'none'>>
+      <<if $RobinExpansion.doctor.stage gte 2>>
+        <span class='lewd'>你还没碰到，它就已经硬了。你握住的时候<<he>>一直看你的脸，在找反应。</span>“小心点，医生。”罗宾说，一边把腰顶进你手里，<span class='lewd'>“我觉得这病可能挺严重。”</span>
+      <<elseif C.npc.Robin.trauma gte 30>>
+        <span class='lewd'>半硬着贴在大腿上一跳一跳，眼睛盯着天花板，一只手按在床垫上撑着——两条腿却已经松软地张开了。</span>“这也是检查的一部分？”罗宾问。你说对。信你对<<he>>来说最难，可<<he>>还是信了。
+      <<else>>
+        <span class='lewd'>你话还没说完它就在你手里硬了，</span>罗宾笑出声，气都不匀。“这游戏真怪。”语气里没有半点要停的意思。
+      <</if>>
     <<else>>
-      <span class='lewd'>你话还没说完它就在你手里硬了，</span>罗宾笑出声，气都不匀。“这游戏真怪。”语气里没有半点要停的意思。
+      罗宾看着你的手，等你决定要不要继续。
     <</if>>
     <br><br>
-    你用膝盖顶进他两腿之间，把它们推得更开，然后俯下身去，像个终于找到病灶的医生。
+    你用膝盖顶进<<his>>两腿之间，把它们推得更开，然后俯下身去，像个终于找到病灶的医生。
 <</language>>
 <br><br>
 <<lanLink ['Keep going', '继续下去'] 'Deadwood Robin Doctor Sex'>>
@@ -140,6 +152,7 @@
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
 <<if $sexstart is 1>>
   <<set $sexstart to 0>>
+  <<set $RobinExpansion.doctor.active to true>>
   <<clearnpc>><<npc Robin>><<person1>>
   <<run statusCheck('Robin')>>
   <<consensual>><<set $consensual to 1>><<neutral 1>>
@@ -149,13 +162,13 @@
   <<if $RobinExpansion.doctor.stage gte 2>>
     <<lanSwitch '"About time," Robin says, and <span class="lewd">hooks a leg over your hip to pull you down onto <<him>>. The game is over and neither of you minds.</span>' '“可算来了。”罗宾说着，<span class="lewd">一条腿勾上你的腰，把你拉下来贴住自己。游戏到此为止，两个人都无所谓。</span>'>>
   <<else>>
-    <<lanSwitch '<span class="lewd">Robin waits for the next instruction with <<his>> thighs already shaking,</span> and does exactly what you tell <<him>>, every time.' '<span class="lewd">罗宾大腿已经在抖了，</span>却还是等着你的下一个指令，你说什么他做什么。'>>
+    <<lanSwitch '<span class="lewd">Robin waits for the next instruction with <<his>> thighs already shaking,</span> and does exactly what you tell <<him>>, every time.' '<span class="lewd">罗宾大腿已经在抖了，</span>却还是等着你的下一个指令，你说什么<<he>>做什么。'>>
   <</if>>
   <<if C.npc.Robin.trauma gte 30>>
-    <<lanSwitch 'One hand stays braced on the wall the whole way, but <<he>> never once asks you to stop.' '他一只手始终撑在墙上，却一次也没让你停。'>>
+    <<lanSwitch 'One hand stays braced on the wall the whole way, but <<he>> never once asks you to stop.' '<<he>>一只手始终撑在墙上，却一次也没让你停。'>>
   <</if>>
   <br><br>
-  <<lanSwitch 'Between rounds you check on <<him>>, and Robin is always already looking back, chin up, waiting for you to say whether the game is still on.' '每轮之间你看他一眼，罗宾总是已经抬着下巴在回望你，等着你开口说这局还没完。'>>
+  <<lanSwitch 'Between rounds you check on <<him>>, and Robin is always already looking back, chin up, waiting for you to say whether the game is still on.' '每轮之间你看<<he>>一眼，罗宾总是已经抬着下巴在回望你，等着你开口说这局还没完。'>>
   <br><br>
   <<promiscuous3>>
   <br><br>
@@ -171,35 +184,36 @@
 
 :: Deadwood Robin Doctor Sex Finish
 <<set $outside to 0>><<set $location to 'home'>><<effects>>
-<<set $combat to 0>><<clotheson>>
-<<pass 5>>
+<<deadwood-robin-doctor-log>>
+<<if _doctorCompleted>><<set $combat to 0>><<clotheson>><</if>>
+<<npc Robin>><<person1>>
 <<if $RobinExpansion.doctor.stage gte 2>>
   <<language>>
     <<option 'EN'>>
-      Robin does not move except to breathe. One arm over <<his>> eyes, <span class='lewd'>a mess cooling on <<his>> stomach that <<he>> makes no attempt to deal with.</span>
+      Robin does not move except to breathe. One arm rests over <<his>> eyes while <<he>> catches <<his>> breath.
       <br><br>
       "You always start it the same way," <<he>> says at last. "Ear, stomach, and then straight for it. Every single time."
       <br><br>
       <<he>> rolls onto <<his>> side to look at you, still flushed, still catching <<his>> breath. "Next time I want to be the doctor. I have already decided where I would start."
     <<option 'CN'>>
-      事后罗宾除了喘气一动没动。一条手臂搭在眼睛上，<span class='lewd'>肚子上一片狼藉，他也不打算擦。</span>
+      事后罗宾除了喘气一动没动。罗宾把一条手臂搭在眼睛上，慢慢平复呼吸。
       <br><br>
-      “你每次都这么开头。”他终于说。“先胸口，再肚子，然后就直奔主题。一次都没变过。”
+      “你每次都这么开头。”<<he>>终于说。“先胸口，再肚子，然后就直奔主题。一次都没变过。”
       <br><br>
-      他翻身侧过来看你，脸还红着，气还没喘匀。“下次换我当医生。我已经想好从哪儿开始了。”
+      <<he>>翻身侧过来看你，脸还红着，气还没喘匀。“下次换我当医生。我已经想好从哪儿开始了。”
   <</language>>
-  <span class='green'><<npcincr Robin love 3>><<npcincr Robin dom 2>><<npcincr Robin trauma -2>></span><<glove>>
+  <<if _doctorCompleted>><span class='green'><<npcincr Robin love 3>><<npcincr Robin dom 2>><<npcincr Robin trauma -2>></span><<glove>><</if>>
 <<elseif C.npc.Robin.trauma gte 30>>
   <<language>>
     <<option 'EN'>>
       Robin pulls the blanket up and thanks you in a small voice. It takes <<him>> a while to look at you again — but <<he>> does, and when <<he>> does there is something new in it, badly hidden.
     <<option 'CN'>>
-      罗宾把毯子拉到身上，小声道了谢。他过一会儿才敢重新看你——但他还是看了，而且眼神里多了点新东西，藏得很潦草。
+      罗宾把毯子拉到身上，小声道了谢。<<he>>过一会儿才敢重新看你——但<<he>>还是看了，而且眼神里多了点新东西，藏得很潦草。
   <</language>>
-  <span class='green'><<npcincr Robin love 1>><<npcincr Robin trauma -1>></span><<glove>>
+  <<if _doctorCompleted>><span class='green'><<npcincr Robin love 1>><<npcincr Robin trauma -1>></span><<glove>><</if>>
 <<else>>
-  <<lanSwitch 'Robin laughs at the ceiling, <span class="lewd">sticky and out of breath,</span> and tells you that you make a terrible doctor and that <<he>> would like you to keep practising on <<him>>.' '罗宾对着天花板笑，<span class="lewd">身上黏糊糊的，气还没喘匀，</span>说你这医生当得很差劲，还让你多在他身上练练。'>>
-  <span class='green'><<npcincr Robin love 2>><<npcincr Robin dom 1>></span><<glove>>
+  <<lanSwitch 'Robin laughs at the ceiling, still out of breath, and tells you that you make a terrible doctor and that <<he>> would like you to keep practising on <<him>>.' '罗宾对着天花板笑，气还没喘匀，说你这医生当得很差劲，还让你多在<<his>>身上练练。'>>
+  <<if _doctorCompleted>><span class='green'><<npcincr Robin love 2>><<npcincr Robin dom 1>></span><<glove>><</if>>
 <</if>>
 <br><br>
 <<getouticon>><<lanLink ['Let Robin rest', '让罗宾歇着'] 'Orphanage'>><<endevent>><</lanLink>>
@@ -207,8 +221,11 @@
 
 :: Deadwood Robin Doctor Reversed
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<pass 30>>
-<<deadwood-robin-doctor-log>>
+<<if $RobinExpansion.doctor.day isnot Time.days and !$statFreeze and !$replayScene>>
+  <<set $RobinExpansion.doctor.day to Time.days>>
+  <<set $RobinExpansion.doctor.active to false>>
+  <<pass 30>>
+<</if>>
 <<language>>
   <<option 'EN'>>
     "My turn," Robin says, and <<he>> has clearly been planning this.
@@ -219,13 +236,13 @@
     <br><br>
     <span class='lewd'>Then both hands on your stomach, then straight down past your waistband without any pretence at all — the exact move you always pull on <<him>>, done back at you.</span> "I told you I had been thinking about where to start."
   <<option 'CN'>>
-    “轮到我了。”罗宾说，而且他显然早就盘算好了。
+    “轮到我了。”罗宾说，而且<<he>>显然早就盘算好了。
     <br><br>
-    他让你躺下，跪在你旁边，一边学你说话的语气，一边双手从你胸口往下摸<span class='lewd'>——先隔着衣服，再伸进去，一路把碍事的都往上推。他不着急，也没装多久的医生。</span>
+    <<he>>让你躺下，跪在你旁边，一边学你说话的语气，一边双手从你胸口往下摸<span class='lewd'>——先隔着衣服，再伸进去，一路把碍事的都往上推。<<he>>不着急，也没装多久的医生。</span>
     <br><br>
-    “先听胸口，对吧？”他把耳朵贴实在你身上，趴了明显过久的一会儿，听的根本不是心跳。
+    “先听胸口，对吧？”<<he>>把耳朵贴实在你身上，趴了明显过久的一会儿，听的根本不是心跳。
     <br><br>
-    <span class='lewd'>然后双手按住你的肚子，再毫不掩饰地直接越过了裤腰——就是你每次对他做的那套，原样还给你。</span>“我说过，我一直在想从哪儿开始。”
+    <span class='lewd'>然后双手按住你的肚子，再毫不掩饰地直接越过了裤腰——就是你每次对<<he>>做的那套，原样还给你。</span>“我说过，我一直在想从哪儿开始。”
 <</language>>
 <br><br>
 <<lanLink ['Let Robin keep going', '让罗宾继续'] 'Deadwood Robin Doctor Reversed Sex'>>
@@ -241,18 +258,19 @@
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
 <<if $sexstart is 1>>
   <<set $sexstart to 0>>
+  <<set $RobinExpansion.doctor.active to true>>
   <<clearnpc>><<npc Robin>><<person1>>
   <<run statusCheck('Robin')>>
   <<consensual>><<set $consensual to 1>><<neutral 1>>
   <<maninit>><<set $enemytrust += 500>>
   <<set $enemyarousalmax to 600>>
   <<strip>><<npcexpose>>
-  <span class='lewd'><<lanSwitch 'Robin gets the rest of it off you <<himself>> and then does not bother with <<his>> own, which was already mostly gone.' '剩下的是罗宾自己动手替你脱掉的，他自己的那点衣服早就没了，也懒得管。'>></span>
+  <span class='lewd'><<lanSwitch 'Robin gets the rest of it off you <<himself>> and then does not bother with <<his>> own, which was already mostly gone.' '剩下的是罗宾自己动手替你脱掉的，<<his>>那点衣服早就没了，也懒得管。'>></span>
   <br><br>
-  <<if C.npc.Robin.lust gte 70>>
-    <<lanSwitch '<span class="lewd">"Stay still,"</span> Robin says, and puts a hand flat on your chest to keep you there while <span class="lewd"><<he>> takes you in hand and works you the way you always work <<him>> — slowly, watching your face the entire time.</span>' '<span class="lewd">“别动。”</span>罗宾说着，一只手平按在你胸口把你按住，<span class="lewd">另一只握住你，用你平时弄他的那套手法来弄你——很慢，全程盯着你的脸看。</span>'>>
+  <<if C.npc.Robin.lust gte 70 and $player.penisExist>>
+    <<lanSwitch '<span class="lewd">"Stay still,"</span> Robin says, and puts a hand flat on your chest to keep you there while <span class="lewd"><<he>> takes you in hand and works you the way you always work <<him>> — slowly, watching your face the entire time.</span>' '<span class="lewd">“别动。”</span>罗宾说着，一只手平按在你胸口把你按住，<span class="lewd">另一只握住你，用你平时弄<<his>>那套手法来弄你——很慢，全程盯着你的脸看。</span>'>>
   <<else>>
-    <<lanSwitch 'Robin is not as confident as <<he>> sounds, but <<he>> does not let that stop <<him>>, and <<he>> keeps <<his>> eyes on you to make sure <<he>> is getting it right.' '罗宾没有听起来那么有底，但他没因此停下，一直看着你，确认自己做得对不对。'>>
+    <<lanSwitch 'Robin is not as confident as <<he>> sounds, but <<he>> does not let that stop <<him>>, and <<he>> keeps <<his>> eyes on you to make sure <<he>> is getting it right.' '罗宾没有听起来那么有底，但<<he>>没因此停下，一直看着你，确认自己做得对不对。'>>
   <</if>>
   <br><br>
   <<promiscuous3>>
@@ -269,35 +287,37 @@
 
 :: Deadwood Robin Doctor Reversed Finish
 <<set $outside to 0>><<set $location to 'home'>><<effects>>
-<<set $combat to 0>><<clotheson>>
-<<pass 5>>
+<<deadwood-robin-doctor-log>>
+<<if _doctorCompleted>><<set $combat to 0>><<clotheson>><</if>>
+<<npc Robin>><<person1>>
 <<language>>
   <<option 'EN'>>
-    "There," Robin says, and <<he>> is breathing hard enough that the word comes out uneven. <<He>> has not moved off you. <span class='lewd'>A mess is cooling between you and <<he>> does not seem to have noticed yet.</span>
+    "There," Robin says, and <<he>> is breathing hard enough that the word comes out uneven. <<He>> has not moved off you. <<He>> pauses to catch <<his>> breath.
     <br><br>
     "Was that right? Did I do it the way you do?" <<he>> asks it seriously, which is somehow the most embarrassing part of the whole evening. You tell <<him>> <<he>> did fine. <<he>> looks enormously pleased with <<himself>>.
     <br><br>
     "Good. Then tomorrow I am the doctor again."
   <<option 'CN'>>
-    “好了。”罗宾说，气还没喘匀，两个字都发飘。他还没从你身上挪开。<span class='lewd'>两人之间一片黏腻正在变凉，他似乎还没注意到。</span>
+    “好了。”罗宾说，气还没喘匀，两个字都发飘。<<he>>还没从你身上挪开。罗宾停下来，平复着呼吸。
     <br><br>
-    “这样对吗？我做得跟你一样吗？”他问得很认真——而这大概是整晚最难为情的地方。你说做得很好。他满意得不行。
+    “这样对吗？我做得跟你一样吗？”<<he>>问得很认真——而这大概是整晚最难为情的地方。你说做得很好。<<he>>满意得不行。
     <br><br>
     “那就好。明天还是我当医生。”
 <</language>>
-<<if C.npc.Robin.dom gte 70>>
+<<if _doctorCompleted and C.npc.Robin.dom gte 70>>
   <span class='green'><<npcincr Robin love 4>><<npcincr Robin dom 3>><<npcincr Robin trauma -2>></span><<glove>>
-<<else>>
+<<elseif _doctorCompleted>>
   <span class='green'><<npcincr Robin love 3>><<npcincr Robin dom 2>><<npcincr Robin trauma -2>></span><<glove>>
 <</if>>
 <br><br>
-<<getouticon>><<lanLink ['Let Robin have this one', '这一局就依他'] 'Orphanage'>><<endevent>><</lanLink>>
+<<getouticon>><<lanLink ['Let Robin have this one', '这一局就依罗宾'] 'Orphanage'>><<endevent>><</lanLink>>
 <br>
 
 :: Deadwood Robin Doctor Refuse
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
+<<set $RobinExpansion.doctor.active to false>>
 <<if $RobinExpansion.doctor.stage gte 2>>
-  <<lanSwitch 'You let it go, and Robin does not bother hiding the disappointment. <span class="lewd"><<he>> adjusts <<himself>> through <<his>> trousers without any ceremony at all,</span> and tells you <<he>> will be here tomorrow.' '你不再提了，罗宾也没打算掩饰失望。<span class="lewd">他隔着裤子把自己整理了一下，一点也不避讳，</span>然后说明晚他还在这儿。'>>
+  <<lanSwitch 'You let it go, and Robin does not bother hiding the disappointment. <span class="lewd"><<he>> adjusts <<himself>> through <<his>> trousers without any ceremony at all,</span> and tells you <<he>> will be here tomorrow.' '你不再提了，罗宾也没打算掩饰失望。<span class="lewd"><<he>>隔着裤子把自己整理了一下，一点也不避讳，</span>然后说明晚<<he>>还在这儿。'>>
 <<else>>
   <<lanSwitch 'You let it go. Robin looks relieved, and a little disappointed, and does not say which one it is.' '你不再提了。罗宾看上去松了口气，又有点失落，自己也说不清是哪一种。'>>
 <</if>>

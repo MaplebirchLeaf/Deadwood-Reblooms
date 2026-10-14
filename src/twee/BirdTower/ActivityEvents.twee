@@ -1,12 +1,13 @@
 :: Deadwood BirdTower Activity Events
+<<if !$childActivityEvent?.settled or !$childRecords[$childActivityEvent.childid]>>
+  <<deadwood-birdtower-activity-return>><<exit>>
+<</if>>
 <<effects>>
 <<childSelect $childActivityEvent.childid>>
 <<childAge $childActivityEvent.childid>>
-<<childInteratedWith>>
-<<set $childRecords[$childActivityEvent.childid].development.event to false>>
 <<switch $childActivityEvent.event>>
   <<case "Hawk_weather_cold">>
-    <<set _multi to maplebirch.get('BirdTower').at($childRecords[$childActivityEvent.childid].development.location).some(child => child.childId isnot $childActivityEvent.childid)>>
+    <<set _multi to ($childActivityEvent.ids?.length ?? 1) gt 1>>
     <<language>>
       <<option 'EN'>>
         You pick <<childname>> up and try to warm <<childhim>> with
@@ -36,32 +37,21 @@
         <</if>>
     <</language>>
     <br>
-    <<if ($bird.materials.wood gte 1 or $bird.materials.sticks gte 1) and $bird.upgrades.firepit gte 1>>
+    <<if $childActivityEvent.fuel>>
       <<language>>
         <<option 'EN'>>
-          You look around and dig <<= $bird.materials.wood gte 1 ? "a piece of wood" : "a stick">> out of your pile of spoils and add it to the firepit.
+          You look around and dig <<= $childActivityEvent.fuel is "wood" ? "a piece of wood" : "a stick">> out of your pile of spoils and add it to the firepit.
           The burning firepit gradually warms the whole tower.
           <br><br>
           You sit beside <<= _multi ? "the children" : "<<childname>>">>, holding <<= _multi ? "them" : "<<childhim>>">> and enjoying the warmth of the flames for a while.
         <<option 'CN'>>
-          你环顾四周，从你的战利品堆里翻出了<<= $bird.materials.wood gte 1 ? "一块木头" : "一根木棍">>加入了火坑里。
+          你环顾四周，从你的战利品堆里翻出了<<= $childActivityEvent.fuel is "wood" ? "一块木头" : "一根木棍">>加入了火坑里。
           燃烧的火坑让整个高塔都逐渐暖和了起来。
           <br><br>
           你坐在<<= _multi ? "孩子们" : "<<childname>>">>身边，抱着<<= _multi ? "他们" : "<<childhim>>">>享受了一会儿火焰的温暖。
       <</language>>
-      <<lstress>><<stress -5>>
-      <<if Weather.bodyTemperature lt 37.5>>
-        <<set Weather.bodyTemperature to 37.5>>
-      <</if>>
-      <<if $bird.materials.wood gte 1>>
-        <<set $bird.materials.wood-->>
-        <<run Cooker.addBurnTime($bird.firepit, 240 * 60)>>
-      <<else>>
-        <<set $bird.materials.sticks-->>
-        <<run Cooker.addBurnTime($bird.firepit, 60 * 60)>>
-      <</if>>
-      <<run Weather.Observables.checkForUpdate()>>
-    <<elseif $bird.upgrades.firepit gte 1>>
+      <<lstress>>
+    <<elseif $childActivityEvent.firepit>>
       <<language>>
         <<option 'EN'>>
           Maybe you should light the firepit. You search your pile of spoils and find there is no spare wood or sticks left at home.
@@ -79,7 +69,7 @@
         <<option 'CN'>>
           在这个寒冷又空旷的高塔里，你没有什么能用来取暖的。
       <</language>>
-      <<gstress>><<stress 3>>
+      <<gstress>>
       <<language>>
         <<option 'EN'>>
           <br>
@@ -89,7 +79,6 @@
           你只好再抱了一会儿<<childname>>，期盼着天气能够早日转暖。
       <</language>>
     <</if>>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "sleeping">>
   <<case "Hawk_weather_hot">>
     <<language>>
       <<option 'EN'>>
@@ -107,12 +96,7 @@
           凉爽的水流让你们都舒服了许多。
         <</if>>
     <</language>>
-    <<if Weather.bodyTemperature gt 38>>
-      <<set Weather.bodyTemperature to 38>>
-    <</if>>
-    <<set _otherIDs to maplebirch.get('BirdTower').at($childRecords[$childActivityEvent.childid].development.location).filter(child => child.childId isnot $childActivityEvent.childid and ["batheSelf", "weather"].includes(child.development.activity)).map(child => child.childId)>>
-    <<run _otherIDs.forEach(id => $childRecords[id].development.activity = "rest")>>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+    <<set _otherIDs to ($childActivityEvent.ids ?? []).filter(id => id isnot $childActivityEvent.childid)>>
     <<set _multi to _otherIDs.length gt 0>>
     <<if _multi>>
       <<language>>
@@ -139,7 +123,7 @@
           <<childname>>也用小小的水花泼向你。
         <</if>>
     <</language>>
-    <<lstress>><<stress -5>>
+    <<lstress>>
     <br>
     <<language>>
       <<option 'EN'>>
@@ -182,8 +166,7 @@
             闪电在云层上撕开一道明亮的口子。<<childname>>的羽毛微微炸起，<<childhe>>一眨不眨地盯着乌云，期待着下一声惊雷或是闪电的到来。
         <</switch>>
     <</language>>
-    <<lstress>><<stress -5>>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+    <<lstress>>
   <<case "Hawk_build">>
     <<childSelect $childActivityEvent.childid>>
     <<language>>
@@ -239,8 +222,7 @@
       <<option 'CN'>>
         埋头继续<<bhis>>的筑巢工作。
     <</language>>
-    <<lstress>><<stress -5>>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+    <<lstress>>
   <<case "Hawk_brood">>
     <<if $childRecords[$childActivityEvent.childid].development.location is "tower">>
       <<language>>
@@ -265,8 +247,7 @@
           <br>
           <<childname>>小声叽喳抱怨的声音立刻消失了，<<childhe>>闭上眼睛，舒舒服服地在<<your_bird_text>>身下睡着了。
       <</language>>
-      <<lstress>><<stress -5>>
-      <<set $childRecords[$childActivityEvent.childid].development.activity to "sleepingWithGreatHawk">>
+      <<lstress>>
     <<else>>
       <<language>>
         <<option 'EN'>>
@@ -284,7 +265,7 @@
           <</if>>
           <<your_bird_text>>轻柔地颤鸣，<<= $monster ? "温柔地摸了摸<<childname>>的脑袋" : "温柔地蹭了蹭<<childname>>，看起来和<<childhim>>一样期待新生命的诞生">>。
       <</language>>
-      <<lstress>><<stress -5>>
+      <<lstress>>
       <<language>>
         <<option 'EN'>>
           <br>
@@ -293,11 +274,10 @@
           <br>
           抱了一会儿，你把<<childname>>放回了<<childhimself>>的巢里。
       <</language>>
-      <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
     <</if>>
   <<case "Hawk_rest">>
     /* 受伤和怀孕中的差分 */
-    <<if $bird.injured gt 1>>
+    <<if $childActivityEvent.injured>>
       <<if $monster>>
         <<language>>
           <<option 'EN'>>
@@ -360,19 +340,15 @@
           <br>
           你们围成一团，一起享受了一会儿平静的时光。
       <</language>>
-      <<lstress>><<stress -5>>
+      <<lstress>>
     <</if>>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
   <<case "begHawk">>
-    <<set _begRoll to random(1,4)>>
-    <<if _begRoll isnot 4 and !maplebirch.get('BirdTower').feed($childActivityEvent.childid).length>>
-      <<set _begRoll to 4>>
-    <</if>>
+    <<set _begRoll to $childActivityEvent.roll ?? 4>>
     <<language>>
       <<option 'EN'>>
-        You dig a lurker out of the pile of spoils and tear off pieces of meat with your hands to feed <<childname>>.
+        You go to the pile of spoils to find food for <<childname>>.
       <<option 'CN'>>
-        你从战利品堆里掏出一只潜伏者，用手撕下一块块肉喂给<<childname>>。
+        你走到战利品堆旁，给<<childname>>找些食物。
     <</language>>
     <<switch _begRoll>>
       <<case 1>>
@@ -447,7 +423,6 @@
       <<option 'CN'>>
         在这之后<<childHe>>便满足地睡去了。
     <</language>>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "sleeping">>
   <<case "explore">>
     <<language>>
       <<option 'EN'>>
@@ -456,14 +431,13 @@
         你喊着<<childname>>的名字，在高塔里四处寻找<<childhim>>。
     <</language>>
     <br>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
     <<language>>
       <<option 'EN'>>
         A rustling sound draws you; you look towards it and find
       <<option 'CN'>>
         一阵窸窸窣窣的声音吸引了你，你望向声源，发现
     <</language>>
-    <<switch random(1,4)>>
+    <<switch $childActivityEvent.roll ?? 4>>
       <<case 1>>
         <<language>>
           <<option 'EN'>>
@@ -471,7 +445,7 @@
           <<option 'CN'>>
             <<childname>>从你们的战利品堆里探出了头。
         <</language>>
-        <<if maplebirch.get('BirdTower').feed($childActivityEvent.childid).length>>
+        <<if $childActivityEvent.fed>>
           <<language>>
             <<option 'EN'>>
               Half a lurker is still in <<childhe>>'s mouth.
@@ -532,7 +506,6 @@
             <<option 'CN'>>
               <<childname>>正从活板门下面钻出来，<<childHe>>的羽毛上裹了一层灰尘。
           <</language>>
-          <<set $childRecords[$childActivityEvent.childid].development.activity to "batheSelf">>
         <</if>>
       <<case 4>>
         <<language>>
@@ -571,7 +544,7 @@
       <<option 'CN'>>
         看起来<<childname>>已经不满足于单纯在巢里窝着的日子了。
     <</language>>
-    <<lstress>><<stress -5>>
+    <<lstress>>
   <<case "Fledgling_preen">>
     <<language>>
       <<option 'EN'>>
@@ -607,8 +580,7 @@
         <</if>>
         。也许这个小家伙也在帮你梳理呢。
     <</language>>
-    <<stress -4>><<lstress>>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
+    <<lstress>>
   <<case "Fledgling_fly">>
     <<language>>
       <<option 'EN'>>
@@ -616,7 +588,7 @@
       <<option 'CN'>>
         你靠近<<childname>>，想要帮助<<childhim>>腾空。
     <</language>>
-    <<switch random(1,3)>>
+    <<switch $childActivityEvent.roll ?? 1>>
       <<case 1>>
         <<language>>
           <<option 'EN'>>
@@ -663,9 +635,8 @@
             你用双手把<<childhim>>从巢中抱出来，托到半空中。<<childhim>>跳出你的手掌，试图借助高度差滑翔，但最终只是脸朝下摔在了地面上。
         <</language>>
     <</switch>>
-    <<lstress>><<stress -5>>
+    <<lstress>>
     <br>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
   <<case "Fledgling_perch">>
     <<language>>
       <<option 'EN'>>
@@ -745,7 +716,7 @@
           你深吸一口气，开始唱歌，一音接着一音从你嘴里飘出。这是一首轻柔的小曲，随性地歌唱着天空，你的配偶也加入了你。
           随着你们的哼唱，<<childname>>的啁啾声也加入了进来，尚未成熟的幼稚发音扰乱了旋律，但十足可爱。
       <</language>>
-      <<stress -5>><<lstress>>
+      <<lstress>>
       <<language>>
         <<option 'EN'>>
           <br><br>
@@ -791,7 +762,7 @@
           <</if>>
           <br><br>
           You reach out and snap the leaf off, which sends <<childhe>> straining desperately to reach your arm,
-          <<switch random(1,2)>>
+          <<switch $childActivityEvent.roll ?? 1>>
             <<case 1>>
               but in the end <<childhe>> only loses balance and tumbles into your arms. You laugh and hold <<childhe>> tight, letting the annoyed <<childname>> squirm in your arms.
             <<case 2>>
@@ -815,7 +786,7 @@
           <</if>>
           <br><br>
           你伸手把那片叶子折下，引得<<childhe>>奋力地尝试够到你的手臂，
-          <<switch random(1,2)>>
+          <<switch $childActivityEvent.roll ?? 1>>
             <<case 1>>
               但最终只是失去平衡扑到了你的怀里。你笑了起来，将<<childhe>>紧紧地抱住，任由懊恼的<<childname>>在你怀里挣扎。
             <<case 2>>
@@ -824,9 +795,8 @@
           <br><br>
           你们坐在栖木上享受着风，度过了一段轻松的时光。
       <</language>>
-      <<stress -5>><<lstress>>
+      <<lstress>>
     <</if>>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
   <<case "Subadult_fly">>
     <<language>>
       <<option 'EN'>>
@@ -835,7 +805,7 @@
         你靠在塔的边缘望向天空，观察<<childname>>在空中的动作。
     <</language>>
     <br>
-    <<switch random(1,4)>>
+    <<switch $childActivityEvent.roll ?? 1>>
       <<case 1>>
         <<language>>
           <<option 'EN'>>
@@ -865,7 +835,7 @@
             <<childHe>>似乎追逐着什么东西，你仔细一看，发现是一只慢悠悠的蝴蝶。
         <</language>>
     <</switch>>
-    <<stress -5>><<lstress>>
+    <<lstress>>
     <br>
     <<language>>
       <<option 'EN'>>
@@ -895,7 +865,6 @@
       <<option 'CN'>>
         你轻抚<<childhis>>的羽毛，把<<childhe>>放回了巢里。
     <</language>>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
   <<case "Subadult_preen">>
     <<switch $childRecords[$childActivityEvent.childid].development.trait>>
       <<case "clumsy">>
@@ -925,17 +894,15 @@
         <br>
         你做完后，<<childHe>>高兴地叽喳一声，<<= $monster ? "伸出手帮你梳理" : "转到你身后啄弄">>
     <</language>>
-    <<if $harpy gte 6 and $transformationParts.bird.wings isnot "hidden">>
+    <<if $childActivityEvent.preenHarpy>>
       <<language>>
         <<option 'EN'>>
           your feathers.
         <<option 'CN'>>
           你的羽毛。
       <</language>>
-      <<stress -5>><<lstress>>
-      <<if $daily.birdSelfPreen is undefined>>
-        <<set $daily.birdSelfPreen to 1>>
-        <<set $bird.materials.feathers += 1>>
+      <<lstress>>
+      <<if $childActivityEvent.feather>>
         <<language>>
           <<option 'EN'>>
             Under <<childhis>> grooming, one of your feathers comes loose. <span class="teal">You take it off.</span>
@@ -950,14 +917,13 @@
         <<option 'CN'>>
           你的头发。<<childHe>>拨弄了好一会儿才停下，满意地围着你转悠。
       <</language>>
-      <<if $childRecords[$childActivityEvent.childid].development.stage is "Immature">>
+      <<if $childActivityEvent.hair is "all down">>
         <<language>>
           <<option 'EN'>>
             You reach up and touch your neatly groomed hair.
           <<option 'CN'>>
             你抬手摸了摸自己被梳理整齐的头发。
         <</language>>
-        <<set $hairtype to "all down">>
       <<else>>
         <<language>>
           <<option 'EN'>>
@@ -965,22 +931,13 @@
           <<option 'CN'>>
             你抬手摸了摸自己被搞得一团乱的头发，哭笑不得。
         <</language>>
-        <<set $hairtype to either("ruffled","bedhead")>>
       <</if>>
-      <<stress -5>><<lstress>>
+      <<lstress>>
     <</if>>
-    <<set $childRecords[$childActivityEvent.childid].development.activity to "rest">>
   <<case "Subadult_perch">>
-    <<set _IDs to []>>
-    <<run getBornChildren().forEach(child => {
-        if (child.development?.activity == "Subadult_perch") {
-            T.IDs.push(child.childId);
-            child.development.activity = "rest";
-        }
-    })>>
-    <<set _multi to _IDs.length-1>>
-    <<childSelect _IDs[0]>>
-    <<run _otherIDs = _IDs.filter(item => item !== $childActivityEvent.childid)>>
+    <<set _IDs to ($childActivityEvent.ids ?? [$childActivityEvent.childid]).slice()>>
+    <<set _otherIDs to _IDs.filter(id => id isnot $childActivityEvent.childid)>>
+    <<set _multi to _otherIDs.length gt 0>>
     <<language>>
       <<option 'EN'>>
         You follow behind <<childname>>, wanting to see what <<childhe>> is going to do.
@@ -1022,12 +979,12 @@
       <<npc "Great Hawk">>
       <<language>>
         <<option 'EN'>>
-          <<your_bird_text>> stops <<bhis>> movements and <<= _multi ? "looks at the little flock of young hawks in surprise" : "makes room for you">>. You sit down beside <<GreatHawk>> and watch your <<= _multi ? "child" : "children">>.
+          <<your_bird_text>> stops <<bhis>> movements and <<= _multi ? "looks at the little flock of young hawks in surprise" : "makes room for you">>. You sit down beside <<GreatHawk>> and watch your <<= _multi ? "children" : "child">>.
         <<option 'CN'>>
-          <<your_bird_text>>停下<<bhis>>的动作，<<= _multi ? "惊讶地看着一小群小鹰们" : "为你们腾出位置">>。你在<<GreatHawk>>的身边坐下，看着你的<<= _multi ? "孩子" : "孩子们">>。
+          <<your_bird_text>>停下<<bhis>>的动作，<<= _multi ? "惊讶地看着一小群小鹰们" : "为你们腾出位置">>。你在<<GreatHawk>>的身边坐下，看着你的<<= _multi ? "孩子们" : "孩子">>。
       <</language>>
       <br>
-      <<if $childRecords[$childActivityEvent.childid].development.fed_daily < 2 and $childRecords[$childActivityEvent.childid].development.location is "otherNest">>
+      <<if $childActivityEvent.hunting>>
         <<language>>
           <<option 'EN'>>
             <<childname>> walks to the front edge of the perch and shakes out <<childhis>> feathers facing into the wind.
@@ -1057,8 +1014,6 @@
           <<option 'CN'>>
             <span class="teal"><<childHe>>去狩猎了。</span><<childname>>小小的身影在你们视野里的不远处移动，用自己的身体探索着这片天地。
         <</language>>
-        <<set $childRecords[$childActivityEvent.childid].development.activity to "hunting">>
-        <<set $childRecords[$childActivityEvent.childid].development.timer to 30>>
         <<if _multi>>
           <br><br>
           <<language>>
@@ -1068,7 +1023,7 @@
               <<childrenNames _otherIDs>>停在你们身边，歪着脑袋和你们一起看着<<childsiblings $childActivityEvent.childid>>在空中飞翔。
           <</language>>
         <</if>>
-        <<stress -5>><<lstress>>
+        <<lstress>>
       <<else>>
         <<language>>
           <<option 'EN'>>
@@ -1098,7 +1053,7 @@
             你深吸一口气，开始唱歌，一音接着一音从你嘴里飘出。这是一首轻柔的小曲，随性地歌唱着天空，你的配偶也加入了你。
             随着你们的哼唱，<<childname>>的啁啾声也加入了进来，<<childhis>>清脆的鸣啼声偶有错音，与你们的歌声合奏，组成了一首完美的小曲。
         <</language>>
-        <<stress -5>><<lstress>>
+        <<lstress>>
         <<if _multi>>
           <br><br>
           <<language>>
@@ -1107,7 +1062,7 @@
             <<option 'CN'>>
               <<childrenNames _otherIDs>>也兴奋地加入了你们的合唱，你们的歌声和小鹰们的啁啾交织在一起，形成了一种神奇的和谐。天空本身仿佛也在回应你们的歌唱。
           <</language>>
-          <<trauma -5>><<ltrauma>>
+          <<ltrauma>>
         <</if>>
         <<if $monster is 1>>
           <br><br>
@@ -1120,7 +1075,7 @@
         <</if>>
       <</if>>
     <<else>>
-      <<if $childRecords[$childActivityEvent.childid].development.fed_daily < 2 and $childRecords[$childActivityEvent.childid].development.location is "otherNest">>
+      <<if $childActivityEvent.hunting>>
         <<language>>
           <<option 'EN'>>
             <<childname>> walks to the front edge of the perch and shakes out <<childhis>> feathers facing into the wind.
@@ -1150,8 +1105,6 @@
           <<option 'CN'>>
             <span class="teal"><<childHe>>去狩猎了。</span><<childname>>小小的身影在你的视野的不远处移动，用自己的身体探索着这片天地。
         <</language>>
-        <<set $childRecords[$childActivityEvent.childid].development.activity to "hunting">>
-        <<set $childRecords[$childActivityEvent.childid].development.timer to 30>>
         <<if _multi>>
           <br><br>
           <<language>>
@@ -1161,7 +1114,7 @@
               <<childrenNames _otherIDs>>停在你身边，歪着脑袋和你一起看着<<childsiblings $childActivityEvent.childid>>在空中飞翔。
           <</language>>
         <</if>>
-        <<stress -5>><<lstress>>
+        <<lstress>>
       <<else>>
         <<language>>
           <<option 'EN'>>
@@ -1191,7 +1144,7 @@
             你深吸一口气，开始唱歌，一音接着一音从你嘴里飘出。这是一首轻柔的小曲，随性地歌唱着天空。
             随着你的哼唱，<<childname>>的啁啾声也加入了进来，<<childhis>>清脆的鸣啼声偶有错音，与你的歌声合奏，组成了一首完美的小曲。
         <</language>>
-        <<stress -5>><<lstress>>
+        <<lstress>>
         <br><br>
         <<if _multi>>
           <br><br>
@@ -1201,7 +1154,7 @@
             <<option 'CN'>>
               <<childrenNames _otherIDs>>也兴奋地加入了你们的合唱，你的歌声和小鹰们的啁啾交织在一起，形成了一种神奇的和谐。天空本身仿佛也在回应你们的歌唱。
           <</language>>
-          <<trauma -5>><<ltrauma>>
+          <<ltrauma>>
         <</if>>
         <<language>>
           <<option 'EN'>>

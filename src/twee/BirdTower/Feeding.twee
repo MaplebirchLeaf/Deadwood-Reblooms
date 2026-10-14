@@ -1,8 +1,8 @@
 :: Deadwood BirdTower Hunt End Food
 <<effects>>
-<<set _childrenIds to maplebirch.get('BirdTower').hungry.map(child => child.childId)>>
+<<set _childrenIds to $BirdTower.feeding.waiting>>
 <<set _childrenTotal to _childrenIds.length>>
-<<if _childrenIds.some(id => $childRecords[id].development.grow_hint_fledgling is 1 or $childRecords[id].development.grow_hint_subadult is 1)>>
+<<if $BirdTower.feeding.ids.some(id => $childRecords[id].development.grow_hint_fledgling is 1 or $childRecords[id].development.grow_hint_subadult is 1)>>
   <span class="blue">
     <<language>>
       <<option 'EN'>>
@@ -13,7 +13,7 @@
   </span>
   <br>
 <</if>>
-<<set _fedIds to maplebirch.get('BirdTower').feed()>>
+<<set _fedIds to $BirdTower.feeding.ids>>
 <<if _fedIds.length>>
   <<language>>
     <<option 'EN'>>
@@ -67,7 +67,9 @@
   <</language>>
   <br><br>
   <<birdtower_feeding_options _childrenIds>>
-  <<lanLink ['Divide evenly among all the children', '给所有孩子平均分配'] 'Deadwood BirdTower FoodForAll'>><</lanLink>>
+  <<lanLink ['Divide evenly among all the children', '给所有孩子平均分配'] 'Deadwood BirdTower FoodForAll'>>
+    <<deadwood-birdtower-feed 'share'>>
+  <</lanLink>>
   <br>
 <<else>>
   <<language>>
@@ -78,12 +80,18 @@
   <</language>>
   <br><br>
 <</if>>
+<<if _fedIds.length and maplebirch.get('BirdTower').hungry.length and $bird.materials.lurkers gt 0>>
+  <<lanLink ['Feed another meal', '再喂一餐'] 'Deadwood BirdTower Hunt End Food'>>
+    <<deadwood-birdtower-feed>>
+  <</lanLink>><br>
+<</if>>
+<<deadwood-birdtower-feeding-receipt>>
 <<lanLink ['Continue', '继续'] 'Bird Tower'>>
   <<endevent>>
 <</lanLink>>
 
 :: Deadwood BirdTower FoodForOne
-<<set _fedIds to Number.isInteger($BirdTower.scene.feeding_id) ? maplebirch.get('BirdTower').feed($BirdTower.scene.feeding_id) : []>>
+<<set _fedIds to $BirdTower.feeding.ids>>
 <<if _fedIds.length>>
   <<childSelect _fedIds[0]>>
   <<language>>
@@ -92,14 +100,14 @@
     <<option 'CN'>>
       你把潜伏者喂给了<<childname>>。<<childHe>>接过肉块，<<print either('安静地开始进食', '几乎一下就吞掉了', '开始开心地进食')>>。
   <</language>>
-  <<if maplebirch.get('BirdTower').hungry.some(child => child.childId isnot $BirdTower.scene.feeding_id)>>
+  <<if $BirdTower.feeding.waiting.some(id => id isnot _fedIds[0])>>
     <<language>>
       <<option 'EN'>>
         The other children watch you feed <<childhim>>, <<print either('shrieking', 'shoving one another', 'their beaks wide open', 'flapping their wings')>>, and then cry even louder.
       <<option 'CN'>>
         其他的孩子<<print either('尖叫着', '互相推搡着', '大张着嘴', '扑腾着翅膀')>>看着你喂食<<childhim>>，随后哭闹得更厉害了。
     <</language>>
-    <<stress 3>><<gstress>>
+    <<gstress>>
   <</if>>
   <br><br>
 <<else>>
@@ -115,20 +123,20 @@
 <<if _childrenIds.length and $bird.materials.lurkers gt 0>>
   <<language>>
     <<option 'EN'>>
-      Some of the children are still waiting to be fed.
+      Some children still need another meal.
     <<option 'CN'>>
-      其他孩子还在等待你喂食。
+      有些孩子还需要再吃一餐。
   <</language>>
   <br>
   <<birdtower_feeding_options _childrenIds>>
 <</if>>
+<<deadwood-birdtower-feeding-receipt>>
 <<lanLink ['Continue', '继续'] 'Bird Tower'>>
-  <<set $BirdTower.scene.feeding_id to null>>
   <<endevent>>
 <</lanLink>>
 
 :: Deadwood BirdTower FoodForAll
-<<set _fedIds to maplebirch.get('BirdTower').feed('share')>>
+<<set _fedIds to $BirdTower.feeding.ids>>
 <<if _fedIds.length>>
   <<language>>
     <<option 'EN'>>
@@ -136,14 +144,14 @@
     <<option 'CN'>>
       你把潜伏者撕成一条一条的小肉条，平均地分给了所有孩子。
   <</language>>
-  <<if maplebirch.get('BirdTower').hungry.length>>
+  <<if $BirdTower.feeding.waiting.length>>
     <<language>>
       <<option 'EN'>>
         The children's calls quiet down for a short while, but soon rise again.
       <<option 'CN'>>
         孩子们的鸣叫声短暂地安静了一小会儿，但很快又响了起来。
     <</language>>
-    <<stress 3>><<gstress>>
+    <<gstress>>
     <br><br>
     <span class="blue">
       <<language>>
@@ -171,6 +179,7 @@
   <</language>>
   <br><br>
 <</if>>
+<<deadwood-birdtower-feeding-receipt>>
 <<lanLink ['Continue', '继续'] 'Bird Tower'>>
   <<endevent>>
 <</lanLink>>
@@ -180,9 +189,30 @@
   <<for _feedId range _args[0]>>
     <<capture _feedId>>
       <<lanLink `['Feed ' + $childRecords[_feedId].name, '给' + $childRecords[_feedId].name + '吃']` 'Deadwood BirdTower FoodForOne'>>
-        <<set $BirdTower.scene.feeding_id to _feedId>>
+        <<deadwood-birdtower-feed _feedId>>
       <</lanLink>>
       <br>
     <</capture>>
   <</for>>
+<</widget>>
+
+<<widget 'deadwood-birdtower-feed'>>
+  <!-- 仅用于玩家点击体：正文重绘只显示 feeding 回执。 -->
+  <<run maplebirch.get('BirdTower').feed(_args[0] ?? 'all')>>
+  <<if $BirdTower.feeding.ids.length and ((_args[0] is 'share' and $BirdTower.feeding.waiting.length) or (Number.isInteger(_args[0]) and $BirdTower.feeding.waiting.some(id => id isnot _args[0])))>>
+    <<stress 3>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-birdtower-feeding-receipt'>>
+  <<if $BirdTower.feeding.spent gt 0>>
+    <span class="blue">
+      <<language>>
+        <<option 'EN'>>
+          Lurkers used: <<print $BirdTower.feeding.spent>>. Nest stock after feeding: <<print $BirdTower.feeding.remaining>>.
+        <<option 'CN'>>
+          使用潜伏者：<<print $BirdTower.feeding.spent>>。喂食后巢内剩余：<<print $BirdTower.feeding.remaining>>。
+      <</language>>
+    </span><br><br>
+  <</if>>
 <</widget>>

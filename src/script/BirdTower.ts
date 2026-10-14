@@ -20,7 +20,7 @@ export default function BirdTowerScript(maplebirch: typeof window.maplebirch): v
         },
         {
           srcmatch: /Bird Tower Hunt End Children\]\]>><<set \$bird\.materials\.lurkers -=1>>/g,
-          to: 'Deadwood BirdTower Hunt End Food]]>>',
+          to: 'Deadwood BirdTower Hunt End Food]]>><<deadwood-birdtower-feed>>',
           expected: 2
         },
         {

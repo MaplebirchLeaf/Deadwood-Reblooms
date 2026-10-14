@@ -74,6 +74,8 @@ export interface SydneyExpansionState {
     kylarTalk: string;
     /** 上次书房事件的游戏日。 */
     studyDay: number;
+    /** 最近一次整理讲义时，是否在获得经验前发现了科学错误。 */
+    studyInsight: boolean;
     /** 上次花园事件的游戏日。 */
     gardenDay: number;
     /** 上次厨房事件的游戏日。 */
@@ -127,6 +129,7 @@ export const DEFAULT_SYDNEY_EXPANSION_STATE: SydneyExpansionState = {
     familyTalk: '',
     kylarTalk: '',
     studyDay: -1,
+    studyInsight: false,
     gardenDay: -1,
     kitchenDay: -1,
     roomDay: -1,

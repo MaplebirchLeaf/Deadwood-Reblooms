@@ -17,6 +17,8 @@ Earn the Great Hawk's trust, then hatch and raise chicks at the tower. Bird Towe
 - Extra meals during early growth can help increase their size. Once they hunt independently, they no longer need daily feeding from you.
 - Moulting, first flight and first hunt follow their age. If the weather or the Great Hawk's situation prevents an event, return another day.
 
+Food is consumed when you choose to feed the children. The result shows how many lurkers were used and the stock left after feeding. Reopening the result does not consume another meal; you can still choose to feed hungry children again.
+
 ### Personality and hunting
 
 At 65 days, chicks gain a personality: **clumsy** chicks favour rubbish, **sympathetic** chicks favour other exploration, **clever** chicks favour valuables, and **dominant** chicks favour lurkers. Personality also changes daily dialogue and hunting reactions.

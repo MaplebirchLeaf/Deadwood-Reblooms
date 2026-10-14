@@ -164,10 +164,12 @@ export interface RobinExpansionState {
   doctor: {
     /** 罗宾学到哪一步。 */
     stage: DoctorStage;
-    /** 上次一起玩的游戏日，用于限制每天一次。 */
+    /** 上次提出邀请的游戏日，用于限制每天一次。 */
     day: number;
     /** 累计玩过的次数，玩够两次罗宾就会自己开口。 */
     count: number;
+    /** 已进入互动、尚未结算的这一次游戏。 */
+    active: boolean;
   };
   /** 上次夜间事件的游戏日。 */
   night_day: number;
@@ -295,7 +297,8 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
   doctor: {
     stage: 0,
     day: -1,
-    count: 0
+    count: 0,
+    active: false
   },
   night_day: -1,
   night_outcome_day: -1,

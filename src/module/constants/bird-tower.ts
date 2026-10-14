@@ -70,11 +70,17 @@ export interface BirdTowerState {
     /** 独自狩猎时小鹰请求同行是否已触发。 */
     hunt_ask: boolean;
   };
+  /** 最近一次玩家主动喂食的回执；结果页只读取，不再次消费库存。 */
+  feeding: {
+    ids: number[];
+    spent: number;
+    remaining: number;
+    waiting: number[];
+  };
   /** 跨段落成长事件：完整名单用于称呼，参与者在开场时随机选定。 */
   scene: {
     /** 当前事件位于新巢，跨页面喂食与荒原同行的对象。 */
     other_nest: boolean;
-    feeding_id: number | null;
     moor_ids: number[];
     ids: number[];
     actors: number[];
@@ -112,9 +118,14 @@ export const DEFAULT_BIRD_TOWER_STATE: BirdTowerState = {
     moor_event: false,
     hunt_ask: false
   },
+  feeding: {
+    ids: [],
+    spent: 0,
+    remaining: 0,
+    waiting: []
+  },
   scene: {
     other_nest: false,
-    feeding_id: null,
     moor_ids: [],
     ids: [],
     actors: []

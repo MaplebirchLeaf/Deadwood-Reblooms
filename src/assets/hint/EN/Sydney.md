@@ -10,6 +10,8 @@ First establish the original romance with Sydney. The PC must be a monk, and Syd
 
 Thereafter, enter Sydney's bunk from the temple quarters to read, talk, use the wardrobe and rest. Intimate relationship options also require selecting Sydney on the Attitudes page. Punishments, trials and duties take priority; the invitation does not make Sydney wait by the bed at all times.
 
+Entering the bunk takes no extra time. You can keep your clothes, undress, or choose sleepwear before lying down. Clothes left by the bunk stay there until you choose to put them on again.
+
 ### Visit Sirris at home
 
 Ask Sirris in person at the adult shop through either invitation route:
@@ -18,6 +20,8 @@ Ask Sirris in person at the adult shop through either invitation route:
 - **Familiar employee**: work as an adult shop clerk, have more than 50 affection with Sirris and do not currently select Sydney as a love interest.
 
 After the invitation, enter **Danube Street → Sirris's estate**. It has a hall, study, kitchen, garden and Sydney's room, and is separate from the home sold by the property office.
+
+Moving between rooms inside the estate takes no extra time; garden and street routes retain their walking time.
 
 To visit with Sydney, ask in the temple quarters between 17:00 and before 21:00 while Sydney is doing chores. Go to the estate after 21:00 that night; temple duties or punishment can still take priority.
 
