@@ -2,12 +2,28 @@
 
 import type RealEstate from './RealEstate';
 import type { StaffRole } from './PropertyStaff';
+import type { WineRecipe } from '../Orchard/Winery';
 
 type Activity = 'meal' | 'tea' | 'tidy' | 'music' | 'film' | 'wine';
 
 export interface PropertyLifeState {
   days: Record<string, number>;
-  scene: { property_id: string; action: Activity; partner: string | null; quality: number; first: boolean; item: string | null; origin: string; floor: number } | null;
+  scene: {
+    property_id: string;
+    action: Activity;
+    partner: string | null;
+    quality: number;
+    first: boolean;
+    item: string | null;
+    origin: string;
+    floor: number;
+    at?: number;
+    followup?: 'talk' | 'close';
+    /** 酒局前戏分层：0 未开始，1 已坐到一起，2 已有肢体接触，可转入卧室。 */
+    stage?: number;
+    /** 第二层由玩家选的那条路：嘴或手。 */
+    tone?: 'mouth' | 'hands';
+  } | null;
   daily_day: number;
   daily: {
     day: number;
@@ -121,18 +137,38 @@ export default class PropertyLife {
     if (partner && !this.free(partner, minutes[action])) return false;
     if (['meal', 'tea'].includes(action) && !partner) return false;
     if (action === 'film') return this.estate.facilities.some(room => room.id === 'cinema');
-    if (action === 'wine') return this.estate.facilities.some(room => room.id === 'wine_cellar');
+    if (action === 'wine') {
+      return (
+        ['Home', 'Lounge', 'Kitchen', 'Wine Cellar'].some(room => V.passage === `Deadwood Reblooms Property ${room}`) &&
+        !V.gag &&
+        !V.possessed &&
+        !V.nextPassage &&
+        !V.nextPassageCheck &&
+        V.stress < V.stressmax &&
+        (V.drunk ?? 0) < 240 &&
+        (V.drugged ?? 0) <= 0 &&
+        (V.hallucinogen ?? 0) <= 0
+      );
+    }
     return ['meal', 'tea', 'tidy', 'music'].includes(action);
   }
 
   public begin(action: Activity, item: string | null = null): boolean {
+    // 同一个开酒链接在页面跳转前不能再次消费；返回房间时由酒菜单结束旧场景。
+    if (action === 'wine' && this.scene?.action === 'wine') return false;
     this.state.scene = null;
     if (!this.ready(action)) return false;
     if (['meal', 'tea', 'wine'].includes(action)) {
       const food = item ? setup.foodstuff[item] : undefined;
-      if (!food || (V.foodstuff[item!]?.amount ?? 0) < (action === 'wine' ? 1 : 2)) return false;
-      if (food.food?.tags?.includes('tainted') || (action === 'tea' && food.food?.tags?.includes('alcohol'))) return false;
-      if (action === 'wine' ? !['red_wine', 'white_wine'].includes(item!) : food.category !== 'dish' || (food.food?.tags?.includes('drink') ?? false) !== (action === 'tea')) return false;
+      const winery = action === 'wine' ? this.core.get('Orchard')?.winery : undefined;
+      const recipe = winery?.terms.recipes.find(recipe => recipe.id === item);
+      if (recipe) {
+        if (!winery!.take(recipe.id as WineRecipe)) return false;
+      } else {
+        if (!food || (V.foodstuff[item!]?.amount ?? 0) < (action === 'wine' ? 1 : 2)) return false;
+        if (food.food?.tags?.includes('tainted') || (action === 'tea' && food.food?.tags?.includes('alcohol'))) return false;
+        if (action === 'wine' ? !['red_wine', 'white_wine'].includes(item!) : food.category !== 'dish' || (food.food?.tags?.includes('drink') ?? false) !== (action === 'tea')) return false;
+      }
     }
     const property = this.estate.current!;
     const partner = V.Finance.real_estate.room_companion;
@@ -150,6 +186,7 @@ export default class PropertyLife {
       origin: V.passage,
       floor: this.estate.currentFloor
     };
+    if (action === 'wine') this.state.scene.at = Time.date.timeStamp;
     return true;
   }
 

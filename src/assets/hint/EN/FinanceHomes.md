@@ -144,3 +144,7 @@ After signing and following up, the four institutions take turns sending routine
 | Ride the Wind    | Glide from an owned home and actually land on a different street from its home street                    | Opening the destination list or descending to your own ground floor    |
 
 Achievements record completed actions.
+
+### A drink at home
+
+Open original red or white wine, or your own bottled orchard wine, in the sitting room, lounge, kitchen or cellar. Choose a resident lover who is home before opening a bottle. Each bottle takes 20 minutes. Afterwards, talk, finish, or explicitly agree to spend some time together. If you know you are pregnant or are too drunk to keep sipping, leave the bottle and choose an alcohol-free drink.
