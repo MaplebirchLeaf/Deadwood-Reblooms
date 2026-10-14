@@ -69,6 +69,7 @@ class Robin extends Module implements RobinFacade {
           this.shop.staffWages +
           this.flowers.salesEstimate +
           (this.core.get('Orchard')?.freshSupplySales ?? 0) +
+          (this.core.get('Orchard')?.winery.shopSalesEstimate ?? 0) +
           (state.shop_popcorn ? 150 : 0) +
           (state.shop_balloons ? 75 : 0)
         : 0) +
@@ -237,6 +238,8 @@ class Robin extends Module implements RobinFacade {
     }
     this.flowers.settle();
     this.shop.settle();
+    // 酒柜营业款已计入本周收入；这里只扣实际售出库存，不能再入账一次。
+    this.core.get('Orchard')?.winery.settleShop();
     // 原版先扣房租、检查债务，再发周收入，先入账才可用于当周房租。
     V.robinmoney += Math.max(0, state.weekly_income - vanillaIncome);
     if (V.robinpaid !== 1 || state.self_rent) {

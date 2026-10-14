@@ -5,6 +5,7 @@ import Module from './Module';
 import type Robin from './Robin';
 import Remy from './Orchard/Remy';
 import Staff, { type OrchardStaffState } from './Orchard/Staff';
+import Winery, { type WineryState } from './Orchard/Winery';
 import trade from '../assets/orchard/trade.json';
 import {
   species,
@@ -78,6 +79,7 @@ interface OrchardSale {
 
 interface OrchardState {
   staff: OrchardStaffState;
+  winery: WineryState;
   remy: typeof Remy.defaults;
   site: OrchardSite;
   tool: OrchardTool;
@@ -131,6 +133,7 @@ interface OrchardState {
 
 const defaults: OrchardState = {
   staff: clone(Staff.defaults),
+  winery: clone(Winery.defaults),
   remy: clone(Remy.defaults),
   site: 'temple',
   tool: 'water',
@@ -173,6 +176,7 @@ class Orchard extends Module {
   public readonly species = species;
   public readonly remy = new Remy(this);
   public readonly staff = new Staff(this);
+  public readonly winery = new Winery(this);
   /** 只用于下一次界面的操作回执，不参与存档或生长结算。 */
   public notice?: OrchardReceipt;
   public constructor(core: typeof maplebirch) {
