@@ -4,7 +4,7 @@ import type Finance from '../Finance';
 import type RealEstate from './RealEstate';
 
 export type BanquetGuest = 'Robin' | 'Kylar' | 'Whitney' | 'Sydney' | 'Avery' | 'Remy' | 'Harper' | 'Leighton' | 'Quinn';
-export type BanquetTopic = 'conversation' | 'history' | 'business' | 'service';
+export type BanquetTopic = 'conversation' | 'history' | 'business' | 'service' | 'singing';
 export interface BanquetMemory {
   day: number;
   property: string;
@@ -199,7 +199,7 @@ export default class PropertyBanquet {
   }
 
   public host(topic: BanquetTopic, skill: number): boolean {
-    if (!this.valid || this.state.stage !== 'dinner' || !['conversation', 'history', 'business', 'service'].includes(topic) || !Number.isFinite(skill)) return false;
+    if (!this.valid || this.state.stage !== 'dinner' || !['conversation', 'history', 'business', 'service', 'singing'].includes(topic) || !Number.isFinite(skill)) return false;
     if (topic === 'business' && !this.state.formal) return false;
     this.state.topic = topic;
     const support = this.staff(topic === 'service' ? 'cook' : 'steward') ? 80 : 0;

@@ -2,7 +2,11 @@
 <<widget 'deadwood-reblooms-weapon-hit'>>
   <<set _weaponHit to maplebirch.get('LifeSimulation')?.weapons.hit(_args[0])>>
   <<if _weaponHit>>
-    <<tentacleadvdisable _weaponHit.target>><<tentacle_record 'damage' _weaponHit.damage>>
+    <<if maplebirch.get('TempleDuties')>>
+      <<temple-watch-tentacle _weaponHit.target _weaponHit.damage>>
+      <<set _weaponHit.damage to _watchDamage>>
+    <</if>>
+    <<tentacleadvdisable _weaponHit.target>><<tentacle_record 'damage' _weaponHit.damage _weaponHit.target 'settled'>>
     <<defiance 2>><<tiredness 1>><<prof _weaponHit.weapon 0.2>>
     <<set $attackstat += 1>><<set $speechhit to 1>>
     <<language>>
