@@ -14,6 +14,7 @@ import Recognition, { type RecognitionState } from './Finance/Recognition';
 import Company, { type CompanyState } from './Finance/Company';
 import tradingTerms from '../assets/finance/trading.json';
 import bankingTerms from '../assets/finance/banking.json';
+import migration from '../migrations/Finance';
 import securitiesSource from '@/assets/finance/securities.yaml';
 import type { MacroDefinition } from 'twine-sugarcube';
 import type Robin from './Robin';
@@ -257,6 +258,7 @@ class Finance extends Module {
 
   public constructor(core: typeof maplebirch) {
     super(core, 'Finance', DEFAULT_FINANCE_STATE);
+    migration(this.migration, DEFAULT_FINANCE_STATE);
     this.realEstate = new RealEstate(core, this);
   }
 
