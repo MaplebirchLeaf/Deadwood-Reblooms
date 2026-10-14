@@ -8,9 +8,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 扩展 Sydney 的 switch 分支：已揭露告解且为恋爱对象时先显示越过隔板选项，否则回退原版恋爱判断。
         {
           src: '<<if $sydneyromance gte 1>>',
-          to: `<<if isLoveInterest("Sydney") and $sydneySeen.includes("confessionRevealed")>>
-			<<deadwood-reblooms-sydney-confession-cross-over>>
-		<<elseif $sydneyromance gte 1>>`,
+          to: '<<if isLoveInterest("Sydney") and $sydneySeen.includes("confessionRevealed")>>\n\t\t\t<<deadwood-reblooms-sydney-confession-cross-over>>\n\t\t<<elseif $sydneyromance gte 1>>',
           expected: 1
         }
       ]
