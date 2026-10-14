@@ -50,6 +50,8 @@ After agreeing to work with Grant, the board offers cases according to trust and
 
 After handover, collect payment at the police station between 08:00 and 18:00. Follow the medical handover instructions for a gunshot casualty. Your criminal record may prevent taking or being paid for a case; police work does not erase it.
 
+After confirming the target's identity, you may instead give the verified lead to Grant at the bounty desk while on duty, 08:00–18:00. Police take over the pursuit, paying **20%** of the base reward and increasing trust by 1. This closes your assignment. Lead fees do not count as captures or case-type progress, receive no bounty hunter bonus, and cannot be followed by a capture payment for that same assignment.
+
 **Bounty Hunter** requires at least one actual payment from each of the current twelve case types. The board and journal show completed types and missing names. Repeating one type does not complete another. The final qualifying case pays its base reward; subsequent payments gain **15%** while you remain in cooperation with Grant. Your first verified and paid handover also earns **In the Net**.
 
 You may take Landry's work and hunt wanted targets, but Landry and Grant are not allies. With a serious criminal record, other bounty hunters may pursue you in town. Negotiating, fleeing, driving away and resisting have their own requirements and consequences.
@@ -73,3 +75,9 @@ The target is the **financial centre bank**. Reach at least 50 street standing a
 During preparation, you may contact Grant to report the plan or help apprehend the crew, and may change whom you provide information to. Decisions alter trust and future cooperation. Conflicting demands from the two sides cannot both be completed.
 
 An incident suspends bank counter service for two days without cancelling accounts or loans. Native police consequences remain. A quiet success earns **Quiet as a Mouse** only after escape and the actual split, without raising the alarm or being identified. Entering unnoticed alone is insufficient.
+
+Preparations keep their existing durations: 20 minutes at the bank counter, 20–30 minutes for supplies, 30 minutes for rehearsal, 15 minutes for introductions, and 5 minutes each for negotiation and hiring. Insufficient opening time is explained before work begins. Interrupted work records the time actually spent without charging for or awarding skills from an incomplete arrangement. Every arrangement needs to finish before closing.
+
+After a successful split, the original crew members who remain free and fit for work can introduce ordinary orders at the smuggler's pub. The scout's warehouse supplies order has a <span class="gold">£120</span> base fee; the carrier's harbour delivery has a <span class="gold">£160</span> base fee. Take the actual route to collect and transport the goods, obtain the signed receipt, then collect payment from Landry on Harvest Street.
+
+Your colleague's skill raises the total quote by 0–20%. They receive 25%, and you receive the remaining 75%; the quote is saved when you accept. Each colleague can introduce one order per day, and cancelling still uses that introduction. Late or disputed deliveries reduce both payments as usual. Each successfully paid order adds 10 to the colleague's skill for the corresponding role, up to 1000. This new income does not clear the criminal record from the bank job.

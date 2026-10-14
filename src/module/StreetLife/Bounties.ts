@@ -40,12 +40,13 @@ interface BountiesState {
   day: number;
   board: string[];
   completed: number;
+  leads: number;
   completedTypes: string[];
   earned: number;
   hunterDay: number;
   hunter: Hunter | null;
   arrested: number;
-  last: { id: string; outcome: 'paid' | 'abandoned' | 'released' | 'interrupted'; fee: number } | null;
+  last: { id: string; outcome: 'paid' | 'lead' | 'abandoned' | 'released' | 'interrupted'; fee: number } | null;
 }
 type Action =
   | 'cooperate'
@@ -61,6 +62,7 @@ type Action =
   | 'handover'
   | 'medical-handover'
   | 'pay'
+  | 'report-lead'
   | 'abandon'
   | 'release'
   | 'face'
@@ -81,6 +83,7 @@ export default class Bounties {
     day: -1,
     board: [],
     completed: 0,
+    leads: 0,
     completedTypes: [],
     earned: 0,
     hunterDay: -1,
@@ -110,6 +113,28 @@ export default class Bounties {
   public get payout(): number {
     const fee = this.state.active?.fee ?? this.contract?.fee ?? 0;
     return fee + (this.bountyHunter ? Math.floor((fee * 15) / 100) : 0);
+  }
+
+  public get leadFee(): number {
+    return Math.floor(((this.state.active?.fee ?? this.contract?.fee ?? 0) * terms.lead_fee_percent) / 100);
+  }
+
+  /** 核实身份后可将追缉交给警方；线索报酬不冒充抓捕完成。 */
+  public get canReportLead(): boolean {
+    return (
+      this.street.core.passage.title === 'Deadwood Street Bounties' &&
+      this.available &&
+      this.state.cooperating &&
+      !this.wanted &&
+      !this.busy &&
+      !this.street.heist.inAction &&
+      this.state.active?.stage === 'identified' &&
+      !this.expired &&
+      !!this.target &&
+      Time.hour >= 8 &&
+      Time.hour < 18 &&
+      this.street.core.npc.Schedule.get('Grant').location === 'police_station'
+    );
   }
 
   public get wanted(): boolean {
@@ -390,6 +415,19 @@ export default class Bounties {
     const job = state.active;
     const contract = this.contract;
     if (!job || !contract) return false;
+    if (action === 'report-lead') {
+      if (!this.canReportLead) return false;
+      const fee = this.leadFee;
+      state.last = { id: job.id, outcome: 'lead', fee };
+      state.active = null;
+      state.leads = (state.leads ?? 0) + 1;
+      state.earned += fee;
+      C.npc.Grant.love = Math.clamp(this.trust + 1, 0, 100);
+      // 清除本次演员与委托后才付款，同一线索重绘或重复点击不再领取。
+      if (V.per_npc[job.key]) wiki(`<<endevent>><<clearNPC '${job.key}'>>`);
+      wiki(`<<money ${fee} 'police'>>`);
+      return true;
+    }
     if (action === 'pay') {
       if (title !== 'Deadwood Street Bounties' || job.stage !== 'settlement' || this.wanted || Time.hour < 8 || Time.hour >= 18) return false;
       const fee = this.payout;

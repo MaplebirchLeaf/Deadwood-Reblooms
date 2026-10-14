@@ -6,7 +6,7 @@
   <<if $passage is 'Deadwood Reblooms Financial Centre Bank' and _streetHeist?.available and _streetHeist.state.stage is 'prep' and !_streetHeist.state.preparations.includes('briefing') and !_streetHeist.bankClosed and Time.weekDay gte 2 and Time.weekDay lte 6 and Time.hour gte 9 and Time.hour lt 17>>
     <<icon 'street/source-check.png'>><<lanLink ['Take some time to understand the bank', '花些时间了解银行'] 'Deadwood Street Heist Preparation'>>
       <<if _streetHeist.available and _streetHeist.meetingAvailable and _streetHeist.state.stage is 'prep' and !_streetHeist.state.preparations.includes('briefing') and !_streetHeist.bankClosed and Time.weekDay gte 2 and Time.weekDay lte 6 and Time.hour gte 9 and Time.hour lt 17>>
-        <<endevent>><<set _streetHeist.state.activity to 'briefing'>>
+        <<endevent>><<set _streetHeist.state.activity to 'briefing', _streetHeist.state.feedback to null>>
       <</if>>
     <</lanLink>><br>
   <</if>>
@@ -15,24 +15,33 @@
 <!-- 每次点击重新读取有效选项；质量在动手时保存，增长仅在行动完成后结算。 -->
 <<widget 'deadwood-street-heist-prepare'>>
   <<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
-  <<if $passage isnot 'Deadwood Street Heist Preparation' or !_streetHeist?.available or _streetHeist.state.stage isnot 'prep' or _streetHeist.state.activity isnot _args[0] or _streetHeist.state.preparations.includes(_args[0])>><<exit>><</if>>
+  <<if !_streetHeist>><<exit>><</if>>
+  <<set _streetHeist.state.feedback to {action:'preparation', outcome:'unavailable', minutes:0, cost:0}>>
+  <<if $passage isnot 'Deadwood Street Heist Preparation' or !_streetHeist.available or _streetHeist.state.stage isnot 'prep' or _streetHeist.state.activity isnot _args[0] or _streetHeist.state.preparations.includes(_args[0])>><<exit>><</if>>
   <<set _streetPrep to _streetHeist.preparations.find(item => item.id === _args[0])>>
   <<set _streetOption to _streetPrep?.options.find(item => item.id === _args[1])>>
-  <<if !_streetOption?.available or $money lt _streetOption.cost or (_streetPrep.id is 'rehearsal' and !_streetHeist.crewReady)>><<exit>><</if>>
+  <<if !_streetOption?.available or $money lt _streetOption.cost>><<exit>><</if>>
   <<if _streetPrep.place is 'bank'>>
     <<if $location isnot 'financial_centre' or _streetHeist.bankClosed or Time.weekDay lt 2 or Time.weekDay gt 6 or Time.hour lt 9 or Time.hour gte 17>><<exit>><</if>>
   <<elseif !_streetHeist.atMeeting or !_streetHeist.meetingAvailable>>
     <<exit>>
   <</if>>
   <<set _streetPreparationId to _streetPrep.id, _streetMethodId to _streetOption.id, _streetQuality to _streetOption.quality, _streetCost to _streetOption.cost, _streetMinutes to _streetOption.minutes>>
+  <<set _streetStarted to Time.date.timeStamp, _streetClosing to Time.date.timeStamp + ((_streetPrep.place is 'bank' ? 17 : 18) * 60 - Time.hour * 60 - Time.minute) * 60>>
+  <<if _streetStarted + _streetMinutes * 60 gte _streetClosing>>
+    <<set _streetHeist.state.feedback.outcome to 'too_late'>><<exit>>
+  <</if>>
+  <!-- 先保证整段营业时间；强制事件或跨时中断留下回执，不扣款或计入完成。 -->
   <<endevent>><<pass _streetMinutes>>
-  <<if !_streetHeist.available or _streetHeist.state.stage isnot 'prep' or _streetHeist.state.activity isnot _streetPreparationId or _streetHeist.state.preparations.includes(_streetPreparationId) or $money lt _streetCost>><<exit>><</if>>
-  <<if _streetPrep.place is 'bank' and (_streetHeist.bankClosed or Time.weekDay lt 2 or Time.weekDay gt 6 or Time.hour lt 9 or Time.hour gte 17)>><<exit>><</if>>
+  <<set _streetHeist.state.feedback to {action:'preparation', outcome:'interrupted', minutes:Math.max(0, Math.round((Time.date.timeStamp - _streetStarted) / 60)), cost:0}>>
+  <<if !_streetHeist.available or _streetHeist.state.stage isnot 'prep' or _streetHeist.state.activity isnot _streetPreparationId or _streetHeist.state.preparations.includes(_streetPreparationId) or $money lt _streetCost or Time.date.timeStamp gte _streetClosing>><<exit>><</if>>
+  <<if _streetPrep.place is 'bank' and ($location isnot 'financial_centre' or _streetHeist.bankClosed)>><<exit>><</if>>
   <<set _streetLiveOption to _streetHeist.preparations.find(item => item.id === _streetPreparationId)?.options.find(item => item.id === _streetMethodId)>>
-  <<if !_streetLiveOption?.available or (_streetPreparationId is 'rehearsal' and !_streetHeist.crewReady)>><<exit>><</if>>
+  <<if !_streetLiveOption?.available>><<exit>><</if>>
   <<if _streetCost gt 0>><<money `-_streetCost`>><</if>>
   <<set _streetHeist.state.preparationChoices[_streetPreparationId] to {method: _streetMethodId, quality: _streetQuality}>>
   <<set _streetHeist.state.preparations.push(_streetPreparationId)>>
+  <<set _streetHeist.state.feedback.outcome to 'completed', _streetHeist.state.feedback.cost to _streetCost>>
   <<switch _streetPreparationId + ':' + _streetMethodId>>
     <<case 'briefing:read'>><<mathsskill 5 'no_star'>>
     <<case 'briefing:ask'>><<englishskill 5 'no_star'>>
@@ -45,6 +54,58 @@
   <<endevent>>
 <</widget>>
 
+<<widget 'deadwood-street-heist-feedback'>>
+  <<set _streetFeedback to maplebirch.get('StreetLife')?.heist.state.feedback>>
+  <<if _streetFeedback>>
+    <<switch _streetFeedback.outcome>>
+      <<case 'too_late'>>
+        <span class='blue'><<lanSwitch 'There is not enough opening time left. The work has not started, and no time or money was spent.' '剩余营业时间不足。尚未开始，没有消耗时间或金钱。'>></span>
+      <<case 'interrupted'>>
+        <span class='orange'><<lanSwitch 'The arrangement was interrupted after ' '安排在进行 '>> <<= _streetFeedback.minutes>> <<lanSwitch 'minutes. Nothing was charged or recorded as completed. Return when the conditions allow another meeting.' '分钟后中断。没有收费，也没有计入完成；条件允许时可以重新安排。'>></span>
+      <<case 'unavailable'>>
+        <span class='blue'><<lanSwitch 'The conditions changed before the work could begin. No time or money was spent.' '开始前的条件已改变。这次没有消耗时间或金钱。'>></span>
+      <<case 'completed'>>
+        <span class='green'><<lanSwitch 'The agreed work is complete.' '约定的安排已经完成。'>></span> <<lanSwitch 'Time spent: ' '实际耗时：'>> <<= _streetFeedback.minutes>> <<lanSwitch 'minutes.' '分钟。'>><<if _streetFeedback.cost gt 0>> <<lanSwitch 'Paid: ' '已支付：'>><<printmoney _streetFeedback.cost>><</if>>
+    <</switch>><br><br>
+  <</if>>
+<</widget>>
+
+
+<<widget 'deadwood-street-heist-candidate-action'>>
+  <<set _streetHeist to maplebirch.get('StreetLife')?.heist, _streetAction to _args[0]>>
+  <<if !_streetHeist>><<exit>><</if>>
+  <<set _streetHeist.state.feedback to {action:_streetAction is 'negotiate' ? 'negotiation' : 'recruitment', outcome:'unavailable', minutes:0, cost:0}>>
+  <<set _streetKey to _streetHeist.state.candidate, _streetCandidate to $per_npc[_streetHeist.state.candidate]>>
+  <<if $passage isnot 'Deadwood Street Heist Candidate' or !_streetHeist.available or !_streetHeist.atMeeting or !_streetHeist.meetingAvailable or _streetHeist.state.stage isnot 'prep' or !_streetHeist.state.candidates.includes(_streetKey) or !_streetCandidate?.heist or _streetCandidate.health lte 0 or _streetCandidate.heist.status is 'arrested'>><<exit>><</if>>
+  <<if _streetAction is 'negotiate'>>
+    <<if _streetCandidate.heist.negotiateTried or $worn.face.type.includes('gag')>><<exit>><</if>>
+  <<elseif !['scout', 'carrier'].includes(_streetAction) or _streetHeist.crew.length gte 2 or _streetHeist.crew.some(npc => npc.heist.role === _streetAction) or $money lt _streetCandidate.heist.fee>>
+    <<exit>>
+  <</if>>
+  <<set _streetStarted to Time.date.timeStamp, _streetClosing to Time.date.timeStamp + (18 * 60 - Time.hour * 60 - Time.minute) * 60>>
+  <<if _streetStarted + 5 * 60 gte _streetClosing>>
+    <<set _streetHeist.state.feedback.outcome to 'too_late'>><<exit>>
+  <</if>>
+  <<set _streetFee to _streetCandidate.heist.fee, _streetNegotiated to _streetHeist.skills.english gte 400>>
+  <<endevent>><<pass 5>>
+  <<set _streetHeist.state.feedback to {action:_streetAction is 'negotiate' ? 'negotiation' : 'recruitment', outcome:'interrupted', minutes:Math.max(0, Math.round((Time.date.timeStamp - _streetStarted) / 60)), cost:0}>>
+  <<set _streetCandidate to $per_npc[_streetKey]>>
+  <<if !_streetHeist.available or !_streetHeist.atMeeting or Time.date.timeStamp gte _streetClosing or _streetHeist.state.stage isnot 'prep' or !_streetHeist.state.candidates.includes(_streetKey) or !_streetCandidate?.heist or _streetCandidate.health lte 0 or _streetCandidate.heist.status is 'arrested'>><<exit>><</if>>
+  <<if _streetAction is 'negotiate'>>
+    <<if _streetCandidate.heist.negotiateTried or $worn.face.type.includes('gag')>><<exit>><</if>>
+    <<loadNPC 0 _streetKey>>
+    <<set $NPCList[0].heist.negotiateTried to true, $NPCList[0].heist.discounted to _streetNegotiated>>
+    <<if _streetNegotiated>><<set $NPCList[0].heist.fee to Math.floor(_streetFee * 0.9)>><</if>>
+    <<saveNPC 0 _streetKey>><<englishskill 5 'no_star'>>
+  <<else>>
+    <<if _streetHeist.crew.length gte 2 or _streetHeist.crew.some(npc => npc.heist.role === _streetAction) or $money lt _streetFee>><<exit>><</if>>
+    <<loadNPC 0 _streetKey>><<set $NPCList[0].heist.role to _streetAction>><<saveNPC 0 _streetKey>>
+    <<money `-_streetFee`>><<set _streetHeist.state.candidates.delete(_streetKey)>>
+    <<set _streetHeist.state.crew.push(_streetKey), _streetHeist.state.candidate to '', _streetHeist.state.feedback.cost to _streetFee>>
+  <</if>>
+  <<set _streetHeist.state.feedback.outcome to 'completed'>><<endevent>>
+<</widget>>
+
 :: Deadwood Street Heist Preparation
 <<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
 <<set _streetPrep to _streetHeist?.preparations.find(item => item.id === _streetHeist.state.activity)>>
@@ -55,18 +116,19 @@
 <<elseif _streetPrep?.place isnot 'bank' and !_streetHeist?.atMeeting>><<deadwood-street-heist-meeting-required>><<exit>><</if>>
 <<if _streetPrep?.place is 'bank'>><<set $location to 'financial_centre', $bus to 'high'>><<else>><<set $location to 'underground'>><<unset $bus>><</if>>
 <<effects>>
+<<deadwood-street-heist-feedback>>
 <<if !_streetHeist or !_streetPrep or _streetHeist.state.stage isnot 'prep'>>
   <<lanSwitch 'There is no preparation arranged here.' '这里没有安排中的准备事项。'>><br>
 <<elseif !_streetHeist.available>>
   <span class='blue'><<lanSwitch 'You cannot work through this preparation just now.' '你现在无法落实这项准备。'>></span><br>
-<<elseif _streetPrep.place is 'smuggler' and !_streetHeist.meetingAvailable>>
+<<elseif _streetPrep.place is 'smuggler' and !_streetHeist.meetingAvailable and !_streetHeist.state.preparations.includes(_streetPrep.id)>>
   <<language>>
     <<option 'EN'>>
       The crew has not arranged to work here tonight. Wren has other business, and the remaining preparations will wait until the daytime meeting. Come back between nine in the morning and six in the evening; completed work will still count.
     <<option 'CN'>>
       今晚没有约好在这里准备。伦恩另有自己的事，剩余安排得等白天碰面时再做。请在上午九点至下午六点之间回来，已经完成的准备仍然有效。
   <</language>><br>
-<<elseif _streetPrep.place is 'bank' and (_streetHeist.bankClosed or Time.weekDay lt 2 or Time.weekDay gt 6 or Time.hour lt 9 or Time.hour gte 17)>>
+<<elseif _streetPrep.place is 'bank' and (_streetHeist.bankClosed or Time.weekDay lt 2 or Time.weekDay gt 6 or Time.hour lt 9 or Time.hour gte 17) and !_streetHeist.state.preparations.includes(_streetPrep.id)>>
   <<lanSwitch 'The counter is closed. There is no clerk here to help, and your visit must wait for another opening day.' '柜台已经关闭，没有柜员能够接待你。这次查看得等到下次营业时。'>><br>
 <<elseif _streetHeist.state.preparations.includes(_streetPrep.id)>>
   <<set _streetChoice to _streetHeist.state.preparationChoices[_streetPrep.id]>>
@@ -187,13 +249,14 @@
   <<for _streetOption range _streetPrep.options>>
     <<capture _streetHeist _streetPrep _streetOption>>
       <<icon _streetOption.icon>>
-      <<if _streetOption.available and $money gte _streetOption.cost>>
+      <<set _streetRemaining to (_streetPrep.place is 'bank' ? 17 : 18) * 60 - Time.hour * 60 - Time.minute>>
+      <<if _streetOption.available and $money gte _streetOption.cost and _streetRemaining gt _streetOption.minutes>>
         <<lanLink _streetOption.name 'Deadwood Street Heist Preparation'>>
           <<deadwood-street-heist-prepare _streetPrep.id _streetOption.id>>
         <</lanLink>>
       <<else>>
         <span class='grey'><<= lanSwitch(_streetOption.name[0], _streetOption.name[1])>></span>
-      <</if>> · <span class='teal'><<= _streetOption.minutes>></span> <<lanSwitch 'minutes' '分钟'>><<if _streetOption.cost gt 0>> · <<printmoney _streetOption.cost>><</if>><br>
+      <</if>> · <span class='teal'><<= _streetOption.minutes>></span> <<lanSwitch 'minutes' '分钟'>><<if _streetOption.cost gt 0>> · <<printmoney _streetOption.cost>><</if>><<if _streetRemaining lte _streetOption.minutes>> · <span class='blue'><<lanSwitch 'Not enough opening time left.' '剩余营业时间不足。'>></span><</if>><br>
     <</capture>>
   <</for>>
   <<if $worn.face.type.includes('gag')>>
@@ -210,6 +273,7 @@
 <<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
 <<if !_streetHeist?.atMeeting>><<deadwood-street-heist-meeting-required>><<exit>><</if>>
 <<set $location to 'underground', $outside to 0>><<unset $bus>><<effects>>
+<<deadwood-street-heist-feedback>>
 <<set _streetCandidate to $per_npc[_streetHeist?.state.candidate]>>
 <<if !_streetHeist?.available or !_streetHeist.meetingAvailable or _streetHeist.state.stage isnot 'prep' or !_streetCandidate?.heist or !_streetHeist.state.candidates.includes(_streetHeist.state.candidate)>>
   <<lanSwitch 'This meeting is not available. Return to Landry before making another arrangement.' '这次会面现在无法继续。重新安排前，先回到兰德里那里。'>><br>
@@ -244,22 +308,12 @@
   <</if>><br><br>
   <<lanSwitch 'Advance: ' '定金：'>><<printmoney _streetCandidate.heist.fee>> · <<lanSwitch 'Share: ' '抽成：'>><span class='gold'><<= _streetCandidate.heist.cut>>%</span><br>
   <<if !_streetCandidate.heist.negotiateTried>>
-    <<if !$worn.face.type.includes('gag')>>
+    <<if !$worn.face.type.includes('gag') and 18 * 60 - Time.hour * 60 - Time.minute gt 5>>
       <<socialiseicon 'ask'>><<lanLink ['Discuss the advance (0:05)', '谈谈定金 (0:05)'] 'Deadwood Street Heist Candidate'>>
-        <<set _streetCandidate to $per_npc[_streetHeist.state.candidate]>>
-        <<if _streetHeist.available and _streetHeist.meetingAvailable and _streetHeist.state.stage is 'prep' and _streetHeist.state.candidates.includes(_streetHeist.state.candidate) and _streetCandidate?.heist and !_streetCandidate.heist.negotiateTried and !$worn.face.type.includes('gag')>>
-          <<set _streetNegotiated to _streetHeist.skills.english gte 400>>
-          <<endevent>><<pass 5>>
-          <<if _streetHeist.available and _streetHeist.meetingAvailable and _streetHeist.state.stage is 'prep' and _streetHeist.state.candidates.includes(_streetHeist.state.candidate) and !$per_npc[_streetHeist.state.candidate].heist.negotiateTried and !$worn.face.type.includes('gag')>>
-            <<loadNPC 0 _streetHeist.state.candidate>>
-            <<set $NPCList[0].heist.negotiateTried to true, $NPCList[0].heist.discounted to _streetNegotiated>>
-            <<if _streetNegotiated>><<set $NPCList[0].heist.fee to Math.floor($NPCList[0].heist.fee * 0.9)>><</if>>
-            <<saveNPC 0 _streetHeist.state.candidate>><<englishskill 5 'no_star'>><<endevent>>
-          <</if>>
-        <</if>>
+        <<deadwood-street-heist-candidate-action 'negotiate'>>
       <</lanLink>><br>
     <<else>>
-      <span class='blue'><<lanSwitch 'You cannot negotiate while gagged.' '戴着口塞时无法议价。'>></span><br>
+      <span class='blue'><<= $worn.face.type.includes('gag') ? lanSwitch('You cannot negotiate while gagged.', '戴着口塞时无法议价。') : lanSwitch('Not enough opening time left to discuss the advance.', '剩余营业时间不足，无法谈完定金。')>></span><br>
     <</if>>
   <<elseif _streetCandidate.heist.discounted>>
     <<language>>
@@ -281,20 +335,12 @@
       <<set _streetCandidate to $per_npc[_streetHeist.state.candidate]>>
       <<if _streetHeist.crew.length lt 2 and !_streetHeist.crew.some(npc => npc.heist.role === _streetRole)>>
         <<icon `'street/' + _streetRole + '.png'`>>
-        <<if $money gte _streetCandidate.heist.fee>>
+        <<if $money gte _streetCandidate.heist.fee and _streetCandidate.health gt 0 and _streetCandidate.heist.status isnot 'arrested' and 18 * 60 - Time.hour * 60 - Time.minute gt 5>>
           <<lanLink `_streetRole === 'scout' ? ['Agree on the scout role (0:05)', '约定侦察员的分工 (0:05)'] : ['Agree on the carrier role (0:05)', '约定搬运员的分工 (0:05)']` 'Deadwood Street Heist Plan'>>
-            <<set _streetKey to _streetHeist.state.candidate, _streetCandidate to $per_npc[_streetHeist.state.candidate]>>
-            <<if _streetHeist.available and _streetHeist.meetingAvailable and _streetHeist.state.stage is 'prep' and _streetHeist.state.candidates.includes(_streetKey) and _streetCandidate?.heist and _streetCandidate.health gt 0 and _streetCandidate.heist.status isnot 'arrested' and _streetHeist.crew.length lt 2 and !_streetHeist.crew.some(npc => npc.heist.role === _streetRole) and $money gte _streetCandidate.heist.fee>>
-              <<set _streetFee to _streetCandidate.heist.fee>>
-              <<endevent>><<pass 5>>
-              <<if _streetHeist.available and _streetHeist.meetingAvailable and _streetHeist.state.stage is 'prep' and _streetHeist.state.candidates.includes(_streetKey) and $per_npc[_streetKey]?.health gt 0 and $per_npc[_streetKey]?.heist.status isnot 'arrested' and _streetHeist.crew.length lt 2 and !_streetHeist.crew.some(npc => npc.heist.role === _streetRole) and $money gte _streetFee>>
-                <<endevent>><<loadNPC 0 _streetKey>><<set $NPCList[0].heist.role to _streetRole>><<saveNPC 0 _streetKey>>
-                <<money `-_streetFee`>><<set _streetHeist.state.candidates.delete(_streetKey)>><<set _streetHeist.state.crew.push(_streetKey), _streetHeist.state.candidate to ''>><<endevent>>
-              <</if>>
-            <</if>>
+            <<deadwood-street-heist-candidate-action _streetRole>>
           <</lanLink>><br>
         <<else>>
-          <span class='grey'><<= _streetRole is 'scout' ? lanSwitch('Agree on the scout role', '约定侦察员的分工') : lanSwitch('Agree on the carrier role', '约定搬运员的分工')>></span><br>
+          <span class='grey'><<= _streetRole is 'scout' ? lanSwitch('Agree on the scout role', '约定侦察员的分工') : lanSwitch('Agree on the carrier role', '约定搬运员的分工')>></span><<if 18 * 60 - Time.hour * 60 - Time.minute lte 5>> · <span class='blue'><<lanSwitch 'Not enough opening time left.' '剩余营业时间不足。'>></span><</if>><br>
         <</if>>
       <</if>>
     <</capture>>

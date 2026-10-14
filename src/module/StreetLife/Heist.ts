@@ -37,6 +37,7 @@ interface HeistState {
   outcome: '' | 'success' | 'withdrawn' | 'failed' | 'reported' | 'sting' | 'arrested';
   settled: boolean;
   fight: HeistFight | null;
+  feedback: { action: 'preparation' | 'negotiation' | 'recruitment' | 'meeting' | 'business'; outcome: 'completed' | 'too_late' | 'interrupted' | 'unavailable'; minutes: number; cost: number } | null;
 }
 
 /** 单次银行豪劫；筹备、人员与判定存档，关系仍使用原版 NPC 数据。 */
@@ -70,7 +71,8 @@ export default class Heist {
     betrayed: false,
     outcome: '',
     settled: false,
-    fight: null
+    fight: null,
+    feedback: null
   };
   public readonly terms = terms;
   public readonly catalog = Catalog;
@@ -128,6 +130,12 @@ export default class Heist {
 
   public get candidates() {
     return this.state.candidates.map(key => V.per_npc[key]).filter(npc => !!npc?.heist);
+  }
+
+  /** 成功分账后仍自由、能够工作的原班雇员；接续普通委托，不重开豪劫。 */
+  public get businessCrew() {
+    if (this.state.stage !== 'closed' || !this.state.settled || this.state.outcome !== 'success') return [];
+    return this.crew.filter(npc => npc.health > 0 && npc.heist.status !== 'arrested' && ['scout', 'carrier'].includes(npc.heist.role));
   }
 
   public get crewReady(): boolean {

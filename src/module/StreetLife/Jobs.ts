@@ -3,7 +3,15 @@ import type StreetLife from '../StreetLife';
 import type { TransportState } from '../Transport';
 
 type Site = keyof typeof terms.sites;
-type Contract = (typeof terms.jobs)[number];
+type Contract = (typeof terms.jobs)[number] | (typeof terms.contacts)[number];
+interface CrewQuote {
+  key: string;
+  name: string;
+  role: string;
+  gross: number;
+  share: number;
+  fee: number;
+}
 interface Job {
   id: string;
   stage: 'pickup' | 'carrying' | 'return' | 'settlement';
@@ -14,6 +22,7 @@ interface Job {
   handled: '' | 'checked' | 'waited' | 'negotiated';
   fee: number;
   late: boolean;
+  crew?: CrewQuote;
 }
 interface JobsState {
   active: Job | null;
@@ -25,7 +34,7 @@ interface JobsState {
   completed: number;
   earned: number;
   losses: number;
-  report: { id: string; outcome: 'paid' | 'returned' | 'cancelled' | 'lost'; fee: number; late: boolean } | null;
+  report: { id: string; outcome: 'paid' | 'returned' | 'cancelled' | 'lost'; fee: number; late: boolean; crew?: CrewQuote } | null;
 }
 
 /** 委托只保存本批货物；原版 blackmoney、黑箱与警方记录继续各自结算。 */
@@ -40,12 +49,13 @@ export default class Jobs {
   }
 
   public get contract(): Contract | undefined {
-    return terms.jobs.find(item => item.id === this.state.active?.id);
+    return [...terms.jobs, ...terms.contacts].find(item => item.id === this.state.active?.id);
   }
 
   public get place(): Site | null {
     const title = this.street.core.passage.title;
     if (['Deadwood Street Jobs', 'Deadwood Street Job Offer', 'Deadwood Street Bailey Job'].includes(title)) return 'pub';
+    if (title === 'Deadwood Street Heist Contacts') return 'smuggler';
     if (title === 'Deadwood Street Cargo') return this.state.site;
     return (Object.keys(terms.sites) as Site[]).find(site => terms.sites[site].passage === title) ?? null;
   }
@@ -55,7 +65,7 @@ export default class Jobs {
   }
 
   public get available(): boolean {
-    return this.street.available && !this.street.heist.inAction && !this.street.bounties.busy && !window.pcAreArmsBound('both') && !V.nextPassageCheck;
+    return this.street.available && !this.street.heist.inAction && !this.street.bounties.busy && !window.pcAreArmsBound('both') && !V.nextPassage && !V.nextPassageCheck;
   }
 
   public get offers(): Contract[] {
@@ -73,6 +83,18 @@ export default class Jobs {
       );
     // 当前条件过滤之后取三项合法、一项非法；当天随机顺序由委托页面保存。
     return [...candidates.filter(item => !item.illegal).slice(0, 3), ...candidates.filter(item => item.illegal).slice(0, 1)];
+  }
+
+  /** 原班雇员介绍的普通订单独立展示，不改变日常看板的三合法一非法。 */
+  public get businessOffers() {
+    if (this.state.active) return [];
+    return terms.contacts.flatMap(contract => {
+      const npc = this.street.heist.businessCrew.find(npc => npc.heist.role === contract.role && npc.heist.businessDay !== Math.floor(Time.days));
+      if (!npc) return [];
+      const gross = Math.floor(contract.fee * (1 + (Math.clamp(npc.heist.skill, 0, 1000) / 1000) * terms.business.maximum_skill_bonus));
+      const fee = Math.floor((gross * terms.business.crew_share) / 100);
+      return [{ ...contract, crew: { key: npc.per, name: npc.name, role: contract.role, gross, share: terms.business.crew_share, fee } }];
+    });
   }
 
   public get receiving(): boolean {
@@ -103,7 +125,8 @@ export default class Jobs {
     const job = this.state.active;
     if (!job || !this.contract) return 0;
     if (job.stage === 'settlement') return job.fee;
-    return Math.round(this.contract.fee * (Time.date.timeStamp > job.due ? terms.late_ratio : 1) * (['shortage', 'price'].includes(job.issue) ? terms.dispute_ratio : 1));
+    const gross = Math.round((job.crew?.gross ?? this.contract.fee) * (Time.date.timeStamp > job.due ? terms.late_ratio : 1) * (['shortage', 'price'].includes(job.issue) ? terms.dispute_ratio : 1));
+    return gross - (job.crew ? Math.floor((gross * job.crew.share) / 100) : 0);
   }
 
   public get vehicle() {
@@ -144,12 +167,19 @@ export default class Jobs {
     const state = this.state;
     const title = this.street.core.passage.title;
     if (action === 'accept') {
-      const offer = this.offers.find(item => item.id === value) ?? (value === 'bailey_cargo' ? this.street.bailey.offer : undefined);
-      if (!['Deadwood Street Job Offer', 'Deadwood Street Bailey Job'].includes(title) || !offer || state.offer !== value) return false;
+      const business = title === 'Deadwood Street Heist Contacts';
+      const businessOffer = business ? this.businessOffers.find(item => item.id === value) : undefined;
+      const offer = business ? businessOffer : (this.offers.find(item => item.id === value) ?? (value === 'bailey_cargo' ? this.street.bailey.offer : undefined));
+      if (!['Deadwood Street Job Offer', 'Deadwood Street Bailey Job', 'Deadwood Street Heist Contacts'].includes(title) || !offer || state.offer !== value) return false;
+      if (business && (!this.street.heist.atMeeting || !this.street.heist.meetingAvailable)) return false;
       // 货物问题只在接单时抽取一次；种类与概率留在目录中维护。
       const issue = offer.issues[random(1, offer.issues.length) - 1] as Job['issue'];
       state.active = { id: offer.id, stage: 'pickup', due: Time.date.timeStamp + offer.deadline_hours * 3600, vehicle: null, searches: 0, issue, handled: '', fee: offer.fee, late: false };
-      state.cooldowns[offer.id] = Math.floor(Time.days) + terms.cooldown_days;
+      if (businessOffer) {
+        state.active.crew = { ...businessOffer.crew };
+        state.active.fee = businessOffer.crew.gross - businessOffer.crew.fee;
+        V.per_npc[businessOffer.crew.key].heist.businessDay = Math.floor(Time.days);
+      } else state.cooldowns[offer.id] = Math.floor(Time.days) + terms.cooldown_days;
       state.report = null;
       return true;
     }
@@ -205,6 +235,10 @@ export default class Jobs {
       if (!this.receiving) return false;
       job.late = Time.date.timeStamp > job.due;
       job.fee = this.fee;
+      if (job.crew) {
+        const gross = Math.round(job.crew.gross * (job.late ? terms.late_ratio : 1) * (['shortage', 'price'].includes(job.issue) ? terms.dispute_ratio : 1));
+        job.crew.fee = gross - job.fee;
+      }
       job.stage = 'settlement';
       job.vehicle = null;
       if (job.issue === 'recognised') this.street.core.SugarCube.Wikifier.wikifyEval(`<<crimeUp ${terms.witness_crime} 'thievery'>>`);
@@ -215,7 +249,7 @@ export default class Jobs {
       if (!['Deadwood Street Jobs', 'Deadwood Street Cargo'].includes(title)) return false;
       if (action === 'pay') {
         if (this.place !== 'pub' || job.stage !== 'settlement') return false;
-        state.report = { id: job.id, outcome: 'paid', fee: job.fee, late: job.late };
+        state.report = { id: job.id, outcome: 'paid', fee: job.fee, late: job.late, ...(job.crew ? { crew: { ...job.crew } } : {}) };
         state.active = null;
         state.completed++;
         state.earned += job.fee;
@@ -223,6 +257,16 @@ export default class Jobs {
         this.street.core.SugarCube.Wikifier.wikifyEval(`<<money ${job.fee} 'pub'>>`);
         // 合法委托也建立业务关系；原版宏保留 Landry 的 −100～100 上限。
         this.street.core.SugarCube.Wikifier.wikifyEval(`<<npcincr Landry love ${job.late ? 0 : contract.illegal ? 2 : 1}>>`);
+        const quote = job.crew;
+        const colleague = quote && V.per_npc[quote.key];
+        if (quote && colleague?.heist) {
+          colleague.heist.businessEarned = (colleague.heist.businessEarned ?? 0) + quote.fee;
+          colleague.heist.businessCompleted = (colleague.heist.businessCompleted ?? 0) + 1;
+        }
+        if (quote && this.street.heist.businessCrew.some(npc => npc.per === quote.key && npc.heist.role === quote.role)) {
+          colleague.heist.skill = Math.min(1000, colleague.heist.skill + terms.business.skill_gain);
+          colleague.skills[quote.role === 'scout' ? 'security' : 'athletics'] = colleague.heist.skill;
+        }
       } else {
         const returnSite = job.stage === 'pickup' || this.lost ? 'pub' : contract.return_to;
         if (this.place !== returnSite) return false;

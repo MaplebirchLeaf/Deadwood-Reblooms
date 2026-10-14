@@ -55,13 +55,14 @@
 <</widget>>
 
 <<widget 'deadwood-home-lounge'>>
-  <<set _inline_lounge to maplebirch.get('Finance').realEstate.facilities.find(facility => facility.id === 'lounge' and facility.inline and facility.access === _args[0] and facility.floor === _args[1])>>
+  <<set _inline_estate to maplebirch.get('Finance').realEstate>>
+  <<set _inline_lounge to _inline_estate.facilities.find(facility => facility.id === 'lounge' and facility.inline and facility.access === _args[0] and facility.floor === _args[1])>>
   <<if !_inline_lounge>><<exit>><</if>>
-  <<set _inline_property to maplebirch.get('Finance').realEstate.current>>
+  <<set _inline_property to _inline_estate.current>>
   <<print lanSwitch(_inline_lounge.description.EN, _inline_lounge.description.CN)>><br><br>
   <<deadwood-home-company>>
   <<icon _inline_lounge.icon>><<lanLink ['Sit down and rest (0:15)', '坐下休息 (0:15)'] 'Deadwood Reblooms Property Lounge Rest'>><<deadwood-home-activity 'lounge' 'rest'>><</lanLink>><<ltiredness>>
-  <<if maplebirch.get('Finance').realEstate.managementFor(_inline_property.id).rest_day isnot Time.days>><<lstress>><</if>><br><br>
+  <<if _inline_estate.managementFor(_inline_property.id).rest_day isnot Time.days or (_inline_estate.staff.active('guard') and $per_npc[_inline_estate.staff.key('guard')] and $Finance.real_estate.life.days['guard:rest'] isnot Math.floor(Time.days))>><<lstress>><</if>><br><br>
   <<deadwood-home-life-menu 'lounge' true>>
 <</widget>>
 
@@ -97,6 +98,9 @@
     <<elseif $Finance.real_estate.pool_clothing is 'swimwear'>><<wearoutfit>><</if>>
     <<water>><<swimmingskilluse>><<physique 1>><<tiredness 4>><<stress -2>><<pass 20>>
   <<elseif _args[1] is 'rest'>>
+    <<if !$statFreeze and !$replayScene and !$combat and _activity_estate.staff.active('guard') and $per_npc[_activity_estate.staff.key('guard')] and $Finance.real_estate.life.days['guard:rest'] isnot Math.floor(Time.days)>>
+      <<set $Finance.real_estate.life.days['guard:rest'] to Math.floor(Time.days)>><<stress -1>>
+    <</if>>
     <<tiredness -4>><<pass 15>>
     <<if _activity_management.rest_day isnot Time.days>>
       <<if _activity_estate.staff.active('housekeeper')>><<tiredness -1>><</if>>
@@ -286,7 +290,7 @@
 <<= lanSwitch(_facility.description.EN, _facility.description.CN)>><br><br>
 <<deadwood-home-company>>
 <<icon _facility.icon>><<lanLink ['Sit down and rest (0:15)', '坐下休息 (0:15)'] 'Deadwood Reblooms Property Lounge Rest'>><<deadwood-home-activity 'lounge' 'rest'>><</lanLink>><<ltiredness>>
-<<if _estate.managementFor(_property.id).rest_day isnot Time.days>><<lstress>><</if>><br>
+<<if _estate.managementFor(_property.id).rest_day isnot Time.days or (_estate.staff.active('guard') and $per_npc[_estate.staff.key('guard')] and $Finance.real_estate.life.days['guard:rest'] isnot Math.floor(Time.days))>><<lstress>><</if>><br>
 <<deadwood-home-life-menu 'lounge' true>>
 <<deadwood-banquet-link>>
 <<if _property.outdoor_access is 'lounge'>>
@@ -295,16 +299,19 @@
 <<deadwood-home-facilities 'lounge' _facility.floor>><br><<deadwood-home-exit 'lounge'>>
 
 :: Deadwood Reblooms Property Lounge Rest
-<<if !maplebirch.get('Finance').realEstate.facilities.some(facility => facility.id === 'lounge')>><<lanLink ['Return to the agency', '返回房产中介'] 'Deadwood Reblooms Property Office'>><</lanLink>><<exit>><</if>>
-<<run maplebirch.get('Finance').realEstate.enter('lounge')>><<effects>>
+<<set _rest_estate to maplebirch.get('Finance').realEstate>>
+<<if !_rest_estate.facilities.some(facility => facility.id === 'lounge')>><<lanLink ['Return to the agency', '返回房产中介'] 'Deadwood Reblooms Property Office'>><</lanLink>><<exit>><</if>>
+<<run _rest_estate.enter('lounge')>><<effects>>
 <<language>>
   <<option 'EN'>>
     You ease back into the chair. For a few minutes, you have nowhere else to be. <span class='teal'>The ache in your legs begins to fade.</span>
+    <<if _rest_estate.staff.active('guard') and $per_npc[_rest_estate.staff.key('guard')]>> Someone is on watch at the entrance. You leave the sounds outside to them for a while.<</if>>
   <<option 'CN'>>
     你靠进椅子里。这几分钟，你不用急着赶去别的地方。<span class='teal'>腿上的酸胀慢慢消了些。</span>
+    <<if _rest_estate.staff.active('guard') and $per_npc[_rest_estate.staff.key('guard')]>>入口有人值守。门外的声响，就暂时交给门卫照看。<</if>>
 <</language>><br><br>
 <<deadwood-home-reaction 'lounge'>><br><br>
-<<set _rest_lounge to maplebirch.get('Finance').realEstate.facilities.find(facility => facility.id === 'lounge')>>
+<<set _rest_lounge to _rest_estate.facilities.find(facility => facility.id === 'lounge')>>
 <<set _rest_passage to 'Deadwood Reblooms Property Lounge'>>
 <<if _rest_lounge.inline>><<set _rest_passage to _rest_lounge.access is 'sitting' ? 'Deadwood Reblooms Property Home' : 'Deadwood Reblooms Property Landing'>><</if>>
 <<capture _rest_lounge _rest_passage>>

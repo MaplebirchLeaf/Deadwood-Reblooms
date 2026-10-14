@@ -100,6 +100,8 @@
       <<option 'EN'>>
         <<if _bountyReport.outcome is 'paid'>>
           The receipt for your last case is filed beneath your name. You have collected <<printmoney _bountyReport.fee>>. The officer turns to the remaining notices.
+        <<elseif _bountyReport.outcome is 'lead'>>
+          Grant has taken over the pursuit after checking your report. Your verified lead earned <<printmoney _bountyReport.fee>>. The receipt records information supplied, rather than an arrest.
         <<elseif _bountyReport.outcome is 'released'>>
           "You let them go?" The officer writes your account down. "Then the notice stays up. You'll have to explain that decision to Grant."
         <<elseif _bountyReport.outcome is 'interrupted'>>
@@ -110,6 +112,8 @@
       <<option 'CN'>>
         <<if _bountyReport.outcome is 'paid'>>
           上一份案件的收据归在你的名字下，你已经领到了<<printmoney _bountyReport.fee>>。警员转向余下的告示。
+        <<elseif _bountyReport.outcome is 'lead'>>
+          格兰特核对报告后，接手了后续追缉。你提供的可靠线索获得了<<printmoney _bountyReport.fee>>，收据记的是协查，不算完成抓捕。
         <<elseif _bountyReport.outcome is 'released'>>
           “你把人放了？”警员记下你的说法。“那告示还得贴着。这个决定，你得跟格兰特解释。”
         <<elseif _bountyReport.outcome is 'interrupted'>>
@@ -168,6 +172,12 @@
           <span class='blue'><<lanSwitch 'The target is not here. Bring the assigned vehicle back, or meet them where you left it.' '目标不在这里。请把押送车辆开回来，或回车辆停放的地方接人。'>></span><br>
         <</if>>
       <<else>>
+        <<if _bountyWork.canReportLead>>
+          <<icon 'street/witness-statement.png'>><<lanLink ['Give Grant the verified lead (0:10)', '把核实的线索交给格兰特 (0:10)'] 'Deadwood Street Bounties'>>
+            <<if _bountyWork.act('report-lead')>><<pass 10>><</if>>
+          <</lanLink>> · <<printmoney _bountyWork.leadFee>><br>
+          <span class='blue'><<lanSwitch 'The police take over this case. The fee is 20% of its base reward; it does not count as a completed capture or receive a bounty hunter bonus.' '后续追缉交给警方，获得基础赏金的20%。不计抓捕完成，也不加赏金猎人奖金。'>></span><br>
+        <</if>>
         <<refuseicon>><<lanLink ['Report that you cannot finish this case (0:05)', '回报这次无法完成案件 (0:05)'] 'Deadwood Street Bounties'>>
           <<if _bountyWork.act('abandon')>><<pass 5>><</if>>
         <</lanLink>><br>

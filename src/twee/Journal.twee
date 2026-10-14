@@ -871,6 +871,10 @@
       <<if $Orchard.worker.hired>>
         <li><<lanSwitch 'Orchard worker paid until: ' '果园雇工薪资已付至：'>><span class='blue'><<= getFormattedDate(new DateTime($Orchard.worker.paid_until))>></span><<if $Orchard.worker.paid_until lte Time.date.timeStamp>> · <span class='red'><<lanSwitch 'Work is suspended until wages are renewed.' '续薪后才能恢复工作。'>></span><</if>></li>
       <</if>>
+      <<set _orchardJournalReport to maplebirch.get('Orchard').workerReport>>
+      <<if _orchardJournalReport?.interrupted>>
+        <li class='blue'><<lanSwitch 'The last orchard shift was interrupted by trouble at the farm. Wages and contract renewal still apply; watering, harvesting and deliveries were paused.' '上次果园班次因农场遇袭中断。工资与续薪照常处理，浇水、收获与送货暂停。'>></li>
+      <</if>>
       <<if _crew.npc>>
         <li><<deadwood-orchard-staff-report>></li>
       <</if>>
@@ -1018,6 +1022,10 @@
           <<if _streetReport.outcome is 'paid'>>
             <<lanSwitch 'Last fee collected: ' '上次领取报酬：'>><<printmoney _streetReport.fee>>
             <<if _streetReport.late>><span class='blue'><<lanSwitch ' (late delivery)' '（迟到交货）'>></span><</if>>
+            <<if _streetReport.crew>>
+              <br><<= _streetReport.crew.name>> · <<lanSwitch 'Colleague’s payment: ' '合作人实领：'>><<printmoney _streetReport.crew.fee>>
+              <br><span class='blue'><<lanSwitch 'Your recorded fee is after the agreed colleague’s share.' '你的实收已扣除说好的合作人分成。'>></span>
+            <</if>>
           <<elseif _streetReport.outcome is 'lost'>>
             <span class='red'><<lanSwitch 'You reported a lost shipment. Your street reputation suffered.' '你报告了货物丢失，街头口碑受到影响。'>></span>
           <<else>>
@@ -1065,6 +1073,9 @@
           <<switch _journal_bounty_state.last.outcome>>
             <<case 'paid'>>
               <<lanSwitch 'Last reward collected: ' '上次领取赏金：'>><<printmoney _journal_bounty_state.last.fee>>
+            <<case 'lead'>>
+              <<lanSwitch 'Last verified lead fee: ' '上次核实线索报酬：'>><<printmoney _journal_bounty_state.last.fee>>
+              · <<lanSwitch 'Police are handling the pursuit; this was not a completed capture.' '警方接手后续追缉，本次不计抓捕完成。'>>
             <<case 'released'>>
               <<lanSwitch 'You released the target. The case closed without a reward.' '你放走了目标，这份委托已结束，没有赏金。'>>
             <<case 'interrupted'>>

@@ -40,6 +40,7 @@ export default class SmugglerPub {
         'Deadwood Street Heist Preparation',
         'Deadwood Street Heist Candidate',
         'Deadwood Street Heist Debrief',
+        'Deadwood Street Heist Contacts',
         'Deadwood Street Mickey'
       ].includes(passage) ||
       (passage === 'Deadwood Street Cargo' && V.StreetLife.jobs.site === 'smuggler')

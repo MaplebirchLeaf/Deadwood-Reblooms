@@ -152,6 +152,9 @@
       <<if $_report.renewal_failed>>
         <span class='red'><<lanSwitch 'Wages could not be renewed. No work was done.' '未能续付薪资，本次停工。'>></span><br>
       <</if>>
+      <<if $_report.interrupted>>
+        <span class='red'><<lanSwitch 'Trouble at the farm stopped this shift. No trees were tended and no fruit was collected or transported.' '农场出了事，本次早班暂停，没有照料、采收或运输水果。'>></span><br>
+      <</if>>
       <<if $_report.delivered gt 0>>
         <<lanSwitch 'Fruit sent / bank payment after transport: ' '运输水果／扣除运费后到账：'>><span class='green'><<= $_report.delivered>></span> / <span class='gold'><<printmoney $_report.income>></span><br>
       <</if>>
@@ -163,7 +166,7 @@
       <</if>>
       <<if Object.values($_report.kept).some(amount => amount gt 0)>>
         <<lanSwitch 'Fruit put away: ' '收好的水果：'>><<deadwood-orchard-worker-harvest>><br>
-      <<else>>
+      <<elseif !$_report.interrupted and !$_report.renewal_failed>>
         <<lanSwitch 'No fruit picked.' '没有采收水果。'>><br>
       <</if>>
       <<if $_report.irrigation>>

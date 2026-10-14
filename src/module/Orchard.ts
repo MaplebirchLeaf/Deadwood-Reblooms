@@ -54,6 +54,7 @@ interface OrchardWorkerReport {
   delivered?: number;
   income?: number;
   renewal_failed?: boolean;
+  interrupted?: boolean;
 }
 
 export interface OrchardReceipt {
@@ -387,7 +388,7 @@ class Orchard extends Module {
   }
 
   public get deliveryMinutes(): number {
-    return trade.deliveryMinutes;
+    return this.state.orders_completed >= 3 && this.state.contracts_completed >= 3 ? 20 : trade.deliveryMinutes;
   }
 
   /** 每日收购量有限，只交付超出保留数量的库存，不自动卖掉玩家的水果。 */
@@ -691,7 +692,7 @@ class Orchard extends Module {
     const morning = day * 86400 + 8 * 3600;
     if (!worker.hired || day <= worker.last_shift || morning > timestamp) return;
     worker.last_shift = day;
-    if (morning < worker.paid_from || !V.per_npc?.deadwood_orchard_worker || !this.available('farm') || V.farm_assault) return;
+    if (morning < worker.paid_from || !V.per_npc?.deadwood_orchard_worker) return;
     const npc = V.per_npc.deadwood_orchard_worker;
     const finance = this.core.get('Finance');
     if (morning >= worker.paid_until + 7 * 86400) {
@@ -702,40 +703,39 @@ class Orchard extends Module {
       this.core.SugarCube.Wikifier.wikifyEval("<<clearNPC 'deadwood_orchard_worker'>>");
       return;
     }
-    if (morning >= worker.paid_until) {
-      if (!worker.auto_renew || !finance || !V.Finance.bank.debit_card || finance.payFromBankPennies(this.workerWage) !== 'ok') {
-        npc.orchard_report = {
-          day,
-          watered: 0,
-          fertilised: 0,
-          no_fertiliser: false,
-          kept: {},
-          irrigation: false,
-          rain: false,
-          off_season: false,
-          left_fruit: false,
-          renewal_failed: !!worker.auto_renew
-        };
-        return;
-      }
-      // 从实际恢复早班起算，不补收停工期间的工资，也不补做停工期间的工作。
-      worker.paid_from = morning;
-      worker.paid_until = morning + 7 * 86400;
-      this.state.worker_expenses += this.workerWage;
-    }
-    const season = Time.getSeason(new window.DateTime(morning));
     const report: OrchardWorkerReport = {
       day,
       watered: 0,
       fertilised: 0,
       no_fertiliser: false,
       kept: {},
-      irrigation: this.irrigated && this.state.irrigation_since <= morning,
-      // 跨过八点的 pass 会在结束时结算。只使用当天早班时段的雨水，不倒填历史天气。
-      rain: day === Math.floor(Time.date.timeStamp / 86400) && Time.date.hour === 8 && Weather.precipitation === 'rain',
+      irrigation: false,
+      rain: false,
       off_season: false,
       left_fruit: false
     };
+    if (morning >= worker.paid_until) {
+      if (!worker.auto_renew || !finance || !V.Finance.bank.debit_card || finance.payFromBankPennies(this.workerWage) !== 'ok') {
+        report.renewal_failed = !!worker.auto_renew;
+        npc.orchard_report = report;
+        return;
+      }
+      // 从续薪当天起算，不补收断薪期间的工资，也不补做停工期间的工作。
+      worker.paid_from = morning;
+      worker.paid_until = morning + 7 * 86400;
+      this.state.worker_expenses += this.workerWage;
+    }
+    // 袭击不跳过薪期和离职结算。当前已知的袭击只暂停当天早班，不倒填历史。
+    if (day === Math.floor(Time.date.timeStamp / 86400) && (this.farmInterrupted || V.farm_assault)) {
+      report.interrupted = true;
+      npc.orchard_report = report;
+      return;
+    }
+    if (!this.available('farm')) return;
+    const season = Time.getSeason(new window.DateTime(morning));
+    report.irrigation = this.irrigated && this.state.irrigation_since <= morning;
+    // 跨过八点的 pass 会在结束时结算。只使用当天早班时段的雨水，不倒填历史天气。
+    report.rain = day === Math.floor(Time.date.timeStamp / 86400) && Time.date.hour === 8 && Weather.precipitation === 'rain';
     this.state.farm.forEach((tree, index) => {
       if (!tree || !this.cleared('farm', index)) return;
       if (tree.moisture === 0) {

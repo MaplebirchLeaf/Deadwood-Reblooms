@@ -51,6 +51,17 @@ Voluntary auctions do not pay immediately. They settle after seven days at 75% o
 
 Read mortgage balances, rates, payment dates and bank notices in **Journal → Finances**. The property desk retains early repayment and arrears services. Each shed or garage has separate bicycle, motorcycle and motor-vehicle capacities; building one does not add resident beds.
 
+### Household staff and daily benefits
+
+Arrange household staff at home and pay a week in advance from your bank. Later weeks are renewed from the bank. Insufficient funds suspend work; seven days without renewed wages end employment. All roles except the visiting housekeeper need a staff room.
+
+| Role        | Weekly wage                    | Benefits while on duty                                                                                                     |
+| ----------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Housekeeper | <span class="gold">£90</span>  | Helps with tidying and its fatigue; the first rest at home each day reduces fatigue by 1 more                              |
+| Cook        | <span class="gold">£160</span> | Uses your kitchen stock to improve shared meals and tea                                                                    |
+| Steward     | <span class="gold">£240</span> | Checks guests and helps with private dinners                                                                               |
+| Night guard | <span class="gold">£210</span> | On duty 20:00–08:00; the first chosen rest with a paid guard on duty reduces stress by 1 more, once daily across all homes |
+
 ### Property management
 
 Hire a property manager at the property desk, using a debit card to authorise payments. The same person can manage several homes; assign each home separately after signing. Assignments start disabled. Ending the agreement cancels all assignments; returning brings back the same person. Weekly fees are 10% of the current assessed weekly rent, at least <span class="gold">£5</span>, including vacant and owner-occupied homes. Repairs cost extra at their existing prices. The manager follows up late rent after a week, repairs leaks and restores condition when it reaches 90. Missing staff, an unavailable debit card or insufficient funds suspend the affected work. They never borrow on credit, renovate, renew leases or purchase properties for you. Frozen and auction-listed properties suspend service; a sale cancels it.

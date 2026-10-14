@@ -117,18 +117,22 @@
       <<for _mickeyReview range _mickeyWork.terms.mickey.reviews>>
         <<capture _mickeyWork _mickeyReview>>
           <<icon _mickeyReview.icon>>
-          <<if $money gte _mickeyWork.terms.mickey.cost>>
+          <<if $money gte _mickeyWork.terms.mickey.cost and 18 * 60 - Time.hour * 60 - Time.minute gt _mickeyWork.terms.mickey.minutes>>
             <<lanLink _mickeyReview.name>>
-              <<if _mickeyWork.mickeyAvailable and _mickeyWork.ready and !_mickeyWork.state.mickeyReview and $money gte _mickeyWork.terms.mickey.cost>>
-                <<money `-_mickeyWork.terms.mickey.cost`>><<set _mickeyWork.state.mickeyReview to _mickeyReview.id>><<pass _mickeyWork.terms.mickey.minutes>>
-                <<if $passage is 'Deadwood Street Mickey' and !$nextPassage and !$nextPassageCheck>>
+              <<if _mickeyWork.mickeyAvailable and _mickeyWork.ready and !_mickeyWork.state.mickeyReview and $money gte _mickeyWork.terms.mickey.cost and 18 * 60 - Time.hour * 60 - Time.minute gt _mickeyWork.terms.mickey.minutes>>
+                <<pass _mickeyWork.terms.mickey.minutes>>
+                <<if _mickeyWork.mickeyAvailable and _mickeyWork.ready and !_mickeyWork.state.mickeyReview and $money gte _mickeyWork.terms.mickey.cost and $passage is 'Deadwood Street Mickey' and !$nextPassage and !$nextPassageCheck>>
+                  <<money `-_mickeyWork.terms.mickey.cost`>><<set _mickeyWork.state.mickeyReview to _mickeyReview.id>>
                   <<replace '#deadwood-mickey-response'>><<deadwood-street-mickey-response `_mickeyReview.id === 'crew' ? 'division' : _mickeyReview.id`>><</replace>>
                   <<replace '#deadwood-mickey-plan'>><<lanSwitch 'Mickey has reviewed the agreed part of the plan.' '米奇已经复核过说好的那一部分计划。'>><</replace>>
+                <<elseif $passage is 'Deadwood Street Mickey' and !$nextPassage and !$nextPassageCheck>>
+                  <<replace '#deadwood-mickey-response'>><span class='blue'><<lanSwitch 'The review was interrupted. No fee was taken and the plan has not changed.' '复核被打断，没有收费，计划也没有改变。'>></span><</replace>>
                 <</if>>
               <</if>>
             <</lanLink>>
           <<else>>
             <span class='grey'><<= lanSwitch(_mickeyReview.name[0], _mickeyReview.name[1])>></span>
+            <<if 18 * 60 - Time.hour * 60 - Time.minute lte _mickeyWork.terms.mickey.minutes>> · <span class='blue'><<lanSwitch 'There is not enough time to finish before closing.' '关门前来不及完成复核。'>></span><</if>>
           <</if>> · <<printmoney _mickeyWork.terms.mickey.cost>> · <span class='teal'><<= _mickeyWork.terms.mickey.minutes>></span> <<lanSwitch 'minutes' '分钟'>><br>
         <</capture>>
       <</for>>

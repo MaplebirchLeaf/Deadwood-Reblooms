@@ -172,7 +172,7 @@
 
   <<if maplebirch.get('StreetLife') and $StreetLife>>
     <<set _deadwoodJobs to $StreetLife.jobs, _deadwoodBounties to $StreetLife.bounties, _deadwoodHeist to $StreetLife.heist>>
-    <<if _deadwoodJobs?.completed or _deadwoodJobs?.losses or _deadwoodBounties?.completed or _deadwoodBounties?.arrested or (_deadwoodHeist?.stage is 'closed' and _deadwoodHeist.settled) or $smuggler_pub_known is 1>>
+    <<if _deadwoodJobs?.completed or _deadwoodJobs?.losses or _deadwoodBounties?.completed or _deadwoodBounties?.leads or _deadwoodBounties?.arrested or (_deadwoodHeist?.stage is 'closed' and _deadwoodHeist.settled) or $smuggler_pub_known is 1>>
       <<foldout false '_deadwoodStreetRecords'>>
         <span class='gold'><<lanSwitch 'Street work and cases' '街头差事与案件'>></span>
         <<if $smuggler_pub_known is 1>><<lanSwitch 'Smugglers’ pub discovered' '已发现走私者酒馆'>><br><</if>>
@@ -180,8 +180,15 @@
           <<lanSwitch 'Street jobs paid: ' '已领款的街头委托：'>><span class='teal'><<= _deadwoodJobs.completed ?? 0>></span><br>
           <<lanSwitch 'Street job rewards collected: ' '街头委托累计实收：'>><span class='gold'><<= formatMoney(_deadwoodJobs.earned ?? 0)>></span><br>
           <<lanSwitch 'Cargo losses reported: ' '已结案的货物丢失：'>><span class='red'><<= _deadwoodJobs.losses ?? 0>></span><br>
+          <<set _deadwoodCrewWork to Object.values($per_npc ?? {}).filter(npc => npc.heist?.businessCompleted gt 0)>>
+          <<if _deadwoodCrewWork.length>>
+            <<lanSwitch 'Colleague deliveries paid: ' '已结算的合作人委托：'>><span class='teal'><<= _deadwoodCrewWork.reduce((sum, npc) => sum + npc.heist.businessCompleted, 0)>></span><br>
+            <<lanSwitch 'Colleagues’ shares paid: ' '合作人累计实领：'>><span class='gold'><<= formatMoney(_deadwoodCrewWork.reduce((sum, npc) => sum + (npc.heist.businessEarned ?? 0), 0))>></span><br>
+            <span class='blue'><<lanSwitch 'Street job earnings show your share after colleagues are paid.' '街头委托累计实收统计你扣除合作人分成后的所得。'>></span><br>
+          <</if>>
         <</if>>
         <<if _deadwoodBounties>>
+          <<lanSwitch 'Verified leads paid: ' '已领款的核实线索：'>><span class='teal'><<= _deadwoodBounties.leads ?? 0>></span><br>
           <<set _deadwoodBountyTypes to maplebirch.get('StreetLife').bounties.terms.cases>>
           <<lanSwitch 'Verified bounties paid: ' '已领款的核验悬赏：'>><span class='teal'><<= _deadwoodBounties.completed ?? 0>></span><br>
           <<lanSwitch 'Bounty rewards collected: ' '悬赏累计实收：'>><span class='gold'><<= formatMoney(_deadwoodBounties.earned ?? 0)>></span><br>
@@ -203,7 +210,7 @@
             <span class='blue'><<lanSwitch 'This is your share after the agreed cuts, before your preparation costs and recruitment fees.' '这是按约定分成后领取的款项，尚未扣除你支付的筹备与招募费用。'>></span><br>
           <</if>>
         <</if>>
-        <span class='blue'><<lanSwitch 'Job rewards are recorded when paid. Bounty income includes paid bonuses; bank-operation shares and police statement rewards are separate.' '委托报酬在领款时登记。悬赏实收包含已支付奖金。银行行动分账与警方笔录奖励另计。'>></span><br><br>
+        <span class='blue'><<lanSwitch 'Job rewards are recorded when paid. Bounty income includes capture rewards, paid bonuses and verified lead fees; bank-operation shares and police statement rewards are separate.' '委托报酬在领款时登记。悬赏实收包含抓捕报酬、已支付奖金与核实线索费。银行行动分账与警方笔录奖励另计。'>></span><br><br>
       <</foldout>>
     <</if>>
   <</if>>

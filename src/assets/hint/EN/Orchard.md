@@ -61,13 +61,15 @@ Open **Fruit stock and sales** from an orchard and set how much of each fruit to
 
 Robin must have enough shop funds, and your reserves must allow delivery. Supplying grants <span class="gold">£5</span> off the next drinks restock without stacking. Cancellation or expiry does not immediately reset the seven-day order interval. Harvest your own lemons or oranges and then supply the same fruit to earn **From Branch to Counter**.
 
+Complete **three Robin drinks-shop orders and three Alex standing orders** to earn **Seasoned Supplier**. Ordinary bulk fruit deliveries then take twenty minutes instead of thirty, with the actual duration shown on the link. The shared 100-fruit daily limit, price, reserves and standing-order deposit remain the same.
+
 A new market regular can buy five displayed fruit at the original price once daily. Farm, shop and regular-customer sales have ledger entries; viewing them does not pay twice.
 
 ### Later automation and transport
 
 With Finance enabled and a debit card, authorise bank wage renewal and hire a carrier for morning deliveries. Both require your approval. Insufficient funds pause them, without backdated wages for missed work.
 
-Transport uses the usual 70% purchase price and shared 100-fruit daily limit, charging <span class="gold">£5</span> per trip and depositing net takings into the bank. It only sends fruit beyond reserves and pending orders, excludes blood lemons and does not sign standing orders or pay their deposits. Attacks pause transport; dismissing the orchard worker cancels renewal and transport arrangements.
+Transport uses the usual 70% purchase price and shared 100-fruit daily limit, charging <span class="gold">£5</span> per trip and depositing net takings into the bank. It only sends fruit beyond reserves and pending orders, excludes blood lemons and does not sign standing orders or pay their deposits. A known farm attack stops that day's tending, picking and transport, with a stoppage report. Wage terms and resignation after seven unpaid days still apply. Missed shifts are not made up, and a current attack does not rewrite earlier work. Dismissing the orchard worker cancels renewal and transport arrangements.
 
 ### Remy: begin at the riding school
 

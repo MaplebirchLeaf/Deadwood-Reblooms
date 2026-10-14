@@ -1,0 +1,66 @@
+:: Deadwood Street Heist Contacts
+<<set _crewHeist to maplebirch.get('StreetLife')?.heist, _crewJobs to maplebirch.get('StreetLife')?.jobs>>
+<<if !_crewHeist?.atMeeting>><<deadwood-street-heist-meeting-required>><<exit>><</if>>
+<<set $location to 'underground', $outside to 0>><<unset $bus>><<effects>>
+<<deadwood-street-heist-feedback>>
+<div class='gold bold'><<lanSwitch 'Old colleagues, ordinary work' '老同伙的新差事'>></div>
+<<if !_crewHeist.businessCrew.length>>
+  <<lanSwitch 'There is nobody from the settled crew available for this work. An unsuccessful operation, detention or injuries cannot be replaced by a new introduction here.' '结清行动的原班雇员现在无人能够接这份活。行动失败、被扣留或伤势，都不能在这里换一个新介绍来绕过。'>><br><br>
+<<elseif !_crewHeist.meetingAvailable>>
+  <<lanSwitch 'The daytime contacts have left. Come back between nine in the morning and six in the evening.' '白天接洽的人已经离开。请在上午九点至下午六点之间回来。'>><br><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      The bags from the bank job are gone. One of the people you hired leaves an ordinary delivery note on the table. "That job is finished. This one's a supplier's order. Goods out, receipt back."
+      <br><br>
+      The scout has contacts who check warehouse orders; the carrier knows people arranging harbour deliveries. They are offering work through the people they already know, rather than another trip to the bank. Landry agrees to handle the receipt and payment as usual.
+    <<option 'CN'>>
+      银行那次行动的钱袋早已收走。你雇过的人把一张普通送货单留在桌上。“那桩活已经完了。这份是供应商的订单。送货出去，带收条回来。”
+      <br><br>
+      侦察员认识核对仓库订单的人，搬运员则熟悉安排港口配送的联系人。两人介绍的是各自已有的货路，并不是再去一次银行。兰德里答应照常代收签收凭据，结清报酬。
+  <</language>><br><br>
+  <<for _crewMember range _crewHeist.businessCrew>>
+    <<icon `'street/' + _crewMember.heist.role + '.png'`>><<= _crewMember.name>> · <<lanSwitch 'Skill: ' '熟练：'>><span class='teal'><<= _crewMember.heist.skill>></span> / 1000
+    <<if _crewMember.heist.businessDay is Math.floor(Time.days)>> · <span class='blue'><<lanSwitch 'Today’s introduction has been used.' '今天已经介绍过一单。'>></span><</if>><br>
+  <</for>><br>
+  <<if _crewJobs.state.active>>
+    <<deadwood-street-job-status>>
+    <span class='blue'><<lanSwitch 'Finish or close your current delivery before agreeing to another.' '先完成或结束手头的委托，再接下一单。'>></span><br>
+  <<elseif !_crewJobs.available>>
+    <span class='blue'><<lanSwitch 'You cannot agree to another delivery just now.' '你现在无法接下新的送货委托。'>></span><br>
+  <<else>>
+    <<for _crewOffer range _crewJobs.businessOffers>>
+      <<capture _crewOffer _crewJobs>>
+        <div class='gold bold'><<icon _crewOffer.icon>><<= lanSwitch(_crewOffer.name[0], _crewOffer.name[1])>></div>
+        <<= _crewOffer.crew.name>> · <<= lanSwitch(_crewOffer.goods[0], _crewOffer.goods[1])>><br>
+        <<set _crewFrom to _crewJobs.terms.sites[_crewOffer.source].name, _crewTo to _crewJobs.terms.sites[_crewOffer.target].name>>
+        <<= lanSwitch(_crewFrom[0], _crewFrom[1])>> → <<= lanSwitch(_crewTo[0], _crewTo[1])>><br>
+        <<lanSwitch 'Total fee: ' '总报酬：'>><<printmoney _crewOffer.crew.gross>> · <<lanSwitch 'Colleague’s ' '合作人的 '>><span class='gold'><<= _crewOffer.crew.share>>%</span>：<<printmoney _crewOffer.crew.fee>> · <<lanSwitch 'Your agreed fee: ' '你应得：'>><<printmoney `_crewOffer.crew.gross - _crewOffer.crew.fee`>><br>
+        <<lanSwitch 'Delivery deadline: ' '送货时限：'>><span class='teal'><<= _crewOffer.deadline_hours>></span> <<lanSwitch 'hours.' '小时。'>><br>
+        <<if 18 * 60 - Time.hour * 60 - Time.minute gt 5>>
+          <<icon 'street/job-payment.png'>><<lanLink ['Agree to this delivery (0:05)', '接下这份送货委托 (0:05)'] 'Deadwood Street Heist Contacts'>>
+            <<if _crewJobs.available and _crewHeist.atMeeting and _crewHeist.meetingAvailable and 18 * 60 - Time.hour * 60 - Time.minute gt 5>>
+              <<set _crewStarted to Time.date.timeStamp>>
+              <<set _crewHeist.state.feedback to {action:'business', outcome:'interrupted', minutes:0, cost:0}>>
+              <<endevent>><<pass 5>>
+              <<set _crewHeist.state.feedback.minutes to Math.max(0, Math.round((Time.date.timeStamp - _crewStarted) / 60))>>
+              <<if _crewJobs.available and _crewHeist.atMeeting and _crewHeist.meetingAvailable>>
+                <<set _crewJobs.state.offer to _crewOffer.id>>
+                <<if _crewJobs.act('accept', _crewOffer.id)>><<set _crewHeist.state.feedback.outcome to 'completed'>><</if>>
+              <</if>>
+            <</if>>
+          <</lanLink>><br>
+        <<else>>
+          <span class='grey'><<lanSwitch 'Agree to this delivery' '接下这份送货委托'>></span> · <span class='blue'><<lanSwitch 'Not enough opening time left.' '剩余营业时间不足。'>></span><br>
+        <</if>><br>
+      <</capture>>
+    <</for>>
+    <<if !_crewJobs.businessOffers.length>>
+      <span class='blue'><<lanSwitch 'These contacts have no further work for you today. Come back another day.' '今天没有其它介绍给你的差事了，改天可以再来。'>></span><br>
+    <</if>>
+  <</if>><br>
+  <span class='blue'>
+    <<lanSwitch 'Each colleague can introduce one order per day. Accepting uses that introduction, even if you later cancel. Their skill raises the total fee by up to 20%; the agreed split is saved with the order. Late or disputed deliveries still reduce the payment.' '每名合作人每天介绍一单，接下后即占用当天名额，取消也不会退回。熟练度最多让总报酬增加20%，接案时保存报价与分成；迟到或货物争议仍会扣减报酬。'>>
+  </span><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Return to the smugglers’ pub', '返回走私者酒馆'] 'Smuggler Pub'>><<endevent>><</lanLink>><br>
