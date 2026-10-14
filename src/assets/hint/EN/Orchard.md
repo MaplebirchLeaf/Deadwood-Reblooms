@@ -65,6 +65,29 @@ Complete **three Robin drinks-shop orders and three Alex standing orders** to ea
 
 A new market regular can buy five displayed fruit at the original price once daily. Farm, shop and regular-customer sales have ledger entries; viewing them does not pay twice.
 
+### Orchard winemaking and bottled sales
+
+Once the farm orchard is open, enter the **Orchard winery** from its menu. Equipment costs <span class="gold">£200</span> and holds three barrels at a time.
+
+Each barrel uses **20 matching fruit**, costs <span class="gold">£5</span> to prepare and takes 30 minutes of work. Once fermented, bottle it into **8 bottles** for <span class="gold">£4</span> in glass and 15 minutes of work. Fruit reserves and unexpired delivery commitments stay in stock; matching fruit gathered elsewhere can also be used.
+
+| Wine        | Fermentation | Farm wholesale per bottle       | Robin's shelf price             |
+| ----------- | ------------ | ------------------------------- | ------------------------------- |
+| Apple cider | 3 days       | <span class="gold">£4</span>    | <span class="gold">£6</span>    |
+| Pear cider  | 3 days       | <span class="gold">£4.50</span> | <span class="gold">£6.50</span> |
+| Plum wine   | 5 days       | <span class="gold">£6</span>    | <span class="gold">£9</span>    |
+| Cherry wine | 5 days       | <span class="gold">£7</span>    | <span class="gold">£10</span>   |
+
+You can prepare and bottle indoors at night; farm attacks pause work. Wholesale handovers require daytime and Alex handling administration, with a limit of 24 bottles per day and 15 minutes per handover. Set bottle reserves for each wine: personal use may take reserved bottles, while sales and deliveries only use the surplus. The journal shows fermentation and batches ready to bottle without changing your output.
+
+With Robin present in the open drinks shop, discuss adding a shelf for sealed fruit-wine bottles for <span class="gold">£75</span>. Supply six bottles in 15 minutes at the wholesale price. Robin pays from actual shop funds while keeping next week's rent. The shelf holds 24 bottles and sells at most 12 per week. Sales remove real shelf stock and pay Robin; the PC is paid on delivery. Wine accounts list equipment, processing, glass and actual sales income separately.
+
+### A drink at your property
+
+Keep bottled orchard wine in stock to open it in your property's sitting room, lounge, kitchen or wine cellar. Original red and white wine remain available. Choose a resident lover who is at home, or drink alone. One bottle takes 20 minutes; drunkenness and sensitivity follow the original rules. The first drink with that lover each day adds one affection.
+
+Afterwards, keep talking, put the glasses away, or spend some time close together after both clearly agree. These follow-up choices do not open another bottle, and clothing remains your choice.
+
 ### Later automation and transport
 
 With Finance enabled and a debit card, authorise bank wage renewal and hire a carrier for morning deliveries. Both require your approval. Insufficient funds pause them, without backdated wages for missed work.

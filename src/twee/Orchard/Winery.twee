@@ -1,0 +1,222 @@
+:: Deadwood Orchard Winery Widgets [widget]
+
+<<widget 'deadwood-orchard-wine-shop-entry'>>
+  <<if maplebirch.get('Orchard')?.winery.available and maplebirch.get('Orchard').winery.state.installed and maplebirch.get('Orchard').canSupplyRobin and C.npc.Robin.trauma lt 80>>
+    <br><<icon 'orchard/contract.png'>><<lanLink ['Discuss bottled orchard wine', '商量瓶装果酒供货'] 'Deadwood Orchard Robin Wine'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Orchard Winery
+<<set _winery to maplebirch.get('Orchard')?.winery>>
+<<if _winery?.available>>
+  <<set $Orchard.site to 'farm'>><<set $outside to 0>><<set $location to 'alex_farm'>><<farm_work_update>><<effects>>
+  <h3><<icon 'orchard/winery.png'>><<lanSwitch 'Orchard winery' '果园酿酒间'>></h3>
+  <<if maplebirch.get('Orchard').farmInterrupted or $farm_assault>>
+    <<lanSwitch 'The trouble on the farm has stopped work here. Leave the bottles where they are for now.' '农场的乱子让这里停了工。先把酒瓶留在原处。'>><br>
+  <<else>>
+    <<deadwood-dynamicblock 'deadwood-orchard-winery'>>
+      <<set _winery to maplebirch.get('Orchard').winery>>
+      <<if !_winery.state.installed>>
+        <<language>>
+          <<option 'EN'>>
+            A sheltered corner beside the fruit store has room for a press, clean bottles and three fermentation vessels. You can turn some of your fruit into bottled wine, rather than sending every harvest straight to market.
+          <<option 'CN'>>
+            果料仓旁有一处遮蔽好的空地，能摆下压榨机、干净酒瓶和三个发酵桶。你可以把一部分水果酿成瓶装果酒，不必每批收成都直接拿去卖。
+        <</language>><br><br>
+        <<lanSwitch 'Equipment: ' '设备费用：'>><span class='gold'><<printmoney _winery.terms.equipmentCost>></span><br>
+        <<if maplebirch.get('Orchard').canWork>>
+          <<if maplebirch.get('Finance')?.canPay(_winery.terms.equipmentCost, 'orchard') ?? $money gte _winery.terms.equipmentCost>>
+            <<icon 'orchard/fruit-press.png'>><<lanLink ['Set up the winery (0:30)', '布置果园酿酒间 (0:30)']>>
+              <<set _winery to maplebirch.get('Orchard').winery>>
+              <<if maplebirch.passage.title is 'Deadwood Orchard Winery' and $location is 'alex_farm' and _winery.available and !_winery.state.installed
+                and maplebirch.get('Orchard').canWork and !maplebirch.get('Orchard').farmInterrupted and !$farm_assault
+                and (maplebirch.get('Finance')?.canPay(_winery.terms.equipmentCost, 'orchard') ?? $money gte _winery.terms.equipmentCost)>>
+                <<money `-_winery.terms.equipmentCost` 'orchard'>>
+                <<set _winery.state.installed to true>><<set _winery.state.expenses += _winery.terms.equipmentCost>>
+                <<pass 30>><<updatesidebarmoney>>
+                <<if maplebirch.passage.title is 'Deadwood Orchard Winery'>><<run maplebirch.SugarCube.Engine.show()>><</if>>
+              <<else>>
+                <<replace '#deadwood-orchard-winery-note'>><span class='blue'><<lanSwitch 'You cannot set up the equipment right now.' '现在无法布置设备。'>></span><br><</replace>>
+              <</if>>
+            <</lanLink>><br>
+          <<else>>
+            <span class='blue'><<lanSwitch 'You cannot afford the equipment yet.' '你还付不起设备费用。'>></span><br>
+          <</if>>
+        <<else>>
+          <span class='blue'><<lanSwitch 'Come back when you can work on the farm.' '等你能在农场作业时再来。'>></span><br>
+        <</if>>
+      <<else>>
+        <<language>>
+          <<option 'EN'>>
+            The vessels stand away from the stored fruit. Dates are written on their lids; bottled batches go into separate crates. A work lamp lights the bench after dark. A bottle reserved for your own table stays here until you choose to use it.
+          <<option 'CN'>>
+            发酵桶与储存的水果隔开摆放，桶盖上写着日期。装瓶后的酒按批次收进果箱，天黑后工作灯照着台面。留给自家餐桌的酒，会一直留着，直到你决定取用。
+        <</language>><br><br>
+        <<lanSwitch 'Vessels in use: ' '使用中的发酵桶：'>><span class='blue'><<= _winery.state.batches.length>> / <<= _winery.terms.barrelCapacity>></span><br>
+        <<for _batch range _winery.state.batches>>
+          <<set _recipe to _winery.terms.recipes.find(recipe => recipe.id === _batch.recipe)>>
+          <<capture _batch _recipe>>
+            <<icon _recipe.icon>><<= lanSwitch(_recipe.name[0], _recipe.name[1])>> × <<= _batch.bottles>>
+            <<if _batch.ready_at lte Time.date.timeStamp>>
+              — <span class='green'><<lanSwitch 'Ready to bottle' '可以装瓶'>></span><br>
+              <<lanSwitch 'Bottles and corks: ' '酒瓶与瓶塞：'>><span class='gold'><<printmoney `_batch.bottles * _winery.terms.bottleCost`>></span><br>
+              <<if _winery.canOperate>>
+                <<icon 'orchard/wine-bottling.png'>><<lanLink ['Bottle this batch (0:' + _winery.terms.bottleMinutes + ')', '将这一批装瓶 (0:' + _winery.terms.bottleMinutes + ')']>>
+                  <<if maplebirch.get('Orchard').winery.bottle(_batch.id)>>
+                    <<pass `maplebirch.get('Orchard').winery.terms.bottleMinutes`>><<updatesidebarmoney>>
+                    <<if maplebirch.passage.title is 'Deadwood Orchard Winery'>><<run maplebirch.SugarCube.Engine.show()>><</if>>
+                  <<else>>
+                    <<replace '#deadwood-orchard-winery-note'>><span class='blue'><<lanSwitch 'This batch cannot be bottled right now. Check the bottle cost and whether work is interrupted.' '现在无法装瓶。看看费用是否足够，作业是否中断。'>></span><br><</replace>>
+                  <</if>>
+                <</lanLink>><br>
+              <</if>>
+            <<else>>
+              — <span class='blue'><<lanSwitch 'Still fermenting; ' '仍在发酵；'>><<= Math.ceil((_batch.ready_at - Time.date.timeStamp) / 86400)>><<lanSwitch ' day(s) remaining' '天后可以装瓶'>></span><br>
+            <</if>>
+          <</capture>>
+        <</for>>
+        <br><span class='gold'><<lanSwitch 'Start a batch' '开始酿制'>></span><br>
+        <<lanSwitch 'Each batch uses ' '每批消耗'>><<= _winery.terms.fruitPerBatch>><<lanSwitch ' fruit and yields ' '个水果，酿得'>><<= _winery.terms.bottlesPerBatch>><<lanSwitch ' bottles. Fermentation supplies cost ' '瓶酒。发酵辅料费用'>><span class='gold'><<printmoney _winery.terms.batchCost>></span><<lanSwitch '; bottles are paid for when you fill them.' '；装瓶时再支付酒瓶费用。'>><br>
+        <<lanSwitch 'Reserved fruit and outstanding fruit deliveries are kept aside.' '保留水果和已答应交付的水果不会拿去酿酒。'>><br>
+        <<for _recipe range _winery.terms.recipes>>
+          <<capture _recipe>>
+            <<foodstufficon _recipe.fruit>><<= lanSwitch(_recipe.name[0], _recipe.name[1])>> — <<= _winery.terms.fruitPerBatch>> <<= lanSwitch(maplebirch.get('Orchard').species[_recipe.fruit].name[0], maplebirch.get('Orchard').species[_recipe.fruit].name[1])>>
+            / <<= _winery.terms.bottlesPerBatch>><<lanSwitch ' bottles / ' '瓶 / '>><<= _recipe.days>><<lanSwitch ' days' '天'>><br>
+            <<if _winery.canOperate and _winery.state.batches.length lt _winery.terms.barrelCapacity>>
+              <<icon 'orchard/fermentation.png'>><<lanLink ['Prepare ' + _recipe.name[0] + ' (0:' + _winery.terms.startMinutes + ')', '准备酿制' + _recipe.name[1] + ' (0:' + _winery.terms.startMinutes + ')']>>
+                <<if maplebirch.get('Orchard').winery.begin(_recipe.id)>>
+                  <<pass `maplebirch.get('Orchard').winery.terms.startMinutes`>><<updatesidebarmoney>>
+                  <<if maplebirch.passage.title is 'Deadwood Orchard Winery'>><<run maplebirch.SugarCube.Engine.show()>><</if>>
+                <<else>>
+                  <<replace '#deadwood-orchard-winery-note'>><span class='blue'><<lanSwitch 'You need enough spare fruit, supplies and an empty vessel to start this batch.' '开始这一批需要足够的多余水果、辅料费用与空发酵桶。'>></span><br><</replace>>
+                <</if>>
+              <</lanLink>><br>
+            <</if>>
+          <</capture>>
+        <</for>>
+        <<if _winery.state.batches.length gte _winery.terms.barrelCapacity>>
+          <span class='blue'><<lanSwitch 'All the vessels are occupied. Bottle a finished batch to free one.' '发酵桶都占着。将酿好的酒装瓶，就能腾出一个。'>></span><br>
+        <</if>>
+        <br><span class='gold'><<lanSwitch 'Bottled stock' '瓶装库存'>></span><br>
+        <<lanSwitch 'Wholesale capacity remaining today: ' '今天还能批发：'>><span class='blue'><<= _winery.saleRemaining>></span><<lanSwitch ' bottles' '瓶'>><br>
+        <<if !_winery.canSell>>
+          <span class='blue'><<lanSwitch 'Farm wholesale deliveries are taken during the daytime while Alex handles administration. You can still prepare and bottle wine after dark.' '农场在白天、艾利克斯处理行政事务时收取批发货物。夜里仍能准备发酵和装瓶。'>></span><br>
+        <</if>>
+        <<set _wineKeep to {}>>
+        <<for _recipe range _winery.terms.recipes>>
+          <<capture _recipe>>
+            <br><<icon _recipe.icon>><b><<= lanSwitch(_recipe.name[0], _recipe.name[1])>></b> × <<= _winery.state.stock[_recipe.id]>><br>
+            <<lanSwitch 'Wholesale price per bottle: ' '每瓶批发价：'>><span class='gold'><<printmoney _recipe.wholesale>></span><br>
+            <<set _wineKeep[_recipe.id] to _winery.state.reserve[_recipe.id]>>
+            <<set _wineKeepVariable to '_wineKeep.' + _recipe.id>>
+            <<lanSwitch 'Keep at least: ' '至少保留：'>><<numberbox _wineKeepVariable _winery.state.reserve[_recipe.id]>>
+            <<lanLink ['Save', '保存']>>
+              <<set _winery to maplebirch.get('Orchard').winery>><<set _wineKeepAmount to Number(_wineKeep[_recipe.id])>>
+              <<if _winery.canOperate and Number.isSafeInteger(_wineKeepAmount) and _wineKeepAmount gte 0 and _wineKeepAmount lte _winery.state.stock[_recipe.id]>>
+                <<set _winery.state.reserve[_recipe.id] to _wineKeepAmount>><<run Dynamic.render('deadwood-orchard-winery')>>
+              <<else>>
+                <<replace '#deadwood-orchard-winery-note'>><span class='blue'><<lanSwitch 'Choose a whole number between zero and your current stock.' '请填写零到现有库存之间的整数。'>></span><br><</replace>>
+              <</if>>
+            <</lanLink>><br>
+            <<set _wineSaleAmount to Math.min(_winery.state.stock[_recipe.id] - _winery.state.reserve[_recipe.id], _winery.saleRemaining)>>
+            <<capture _wineSaleAmount>>
+              <<if _winery.canSell and _wineSaleAmount gt 0>>
+                <<icon 'orchard/sales.png'>><<lanLink ['Sell the surplus (' + _wineSaleAmount + ' bottles, 0:' + _winery.terms.saleMinutes + ')', '批发多余库存（' + _wineSaleAmount + '瓶，0:' + _winery.terms.saleMinutes + '）']>>
+                  <<if maplebirch.get('Orchard').winery.sell(_recipe.id, _wineSaleAmount)>>
+                    <<pass `maplebirch.get('Orchard').winery.terms.saleMinutes`>><<updatesidebarmoney>>
+                    <<if maplebirch.passage.title is 'Deadwood Orchard Winery'>><<run maplebirch.SugarCube.Engine.show()>><</if>>
+                  <<else>>
+                    <<replace '#deadwood-orchard-winery-note'>><span class='blue'><<lanSwitch 'That delivery cannot be completed right now.' '现在无法完成这笔交货。'>></span><br><</replace>>
+                  <</if>>
+                <</lanLink>><br>
+              <</if>>
+            <</capture>>
+          <</capture>>
+        <</for>>
+        <br><span class='gold'><<lanSwitch 'Winery accounts' '果酒账目'>></span><br>
+        <<lanSwitch 'Bottles produced: ' '累计装瓶：'>><span class='blue'><<= _winery.state.produced>></span><br>
+        <<lanSwitch 'Sales received: ' '实收货款：'>><span class='gold'><<printmoney _winery.state.income>></span><br>
+        <<lanSwitch 'Equipment and production expenses: ' '设备与生产支出：'>><span class='gold'><<printmoney _winery.state.expenses>></span><br>
+        <<lanSwitch 'Bring your saved bottles to your property to enjoy them.' '保留下来的酒，可以在自家房产里享用。'>><br>
+      <</if>>
+      <div id='deadwood-orchard-winery-note'></div>
+    <</deadwood-dynamicblock>>
+  <</if>>
+  <br><<getouticon>><<lanLink ['Return to the orchard', '返回果园'] 'Deadwood Reblooms Orchard'>><</lanLink>>
+<<else>>
+  <<lanSwitch 'You need a working orchard at Alex’s farm before setting up a winery.' '先在艾利克斯的农场经营果园，才能添置酿酒设备。'>><br><br>
+  <<getouticon>><<lanLink ['Return to the fields', '返回田地'] 'Farm Fields'>><</lanLink>>
+<</if>>
+
+:: Deadwood Orchard Robin Wine
+<<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
+<<deadwood-dynamicblock 'deadwood-orchard-robin-wine'>>
+  <<set _winery to maplebirch.get('Orchard')?.winery>>
+  <<if _winery?.available and _winery.state.installed and maplebirch.get('Orchard').canSupplyRobin and C.npc.Robin.trauma lt 80>>
+    <<npc Robin>><<person1>>
+    <<if !_winery.state.shop_enabled>>
+      <<language>>
+        <<option 'EN'>>
+          Robin looks at the label on your sample bottle, then at the space beside the till. "Bottles, rather than another drink to make? I could try a few." <<He>> brings over the order pad. "They'd need their own cabinet. And dates on the labels. I don't want them mixed up with the lemonade."
+        <<option 'CN'>>
+          罗宾看了看样品的瓶身标签，又看看收银机旁的空处。“卖整瓶，不是多一杯要调的饮料？可以先试几瓶。”<<He>>拿来订单本。“得有单独的柜子，标签上也写好日期。我不想和柠檬水弄混。”
+      <</language>><br><br>
+      <<icon 'orchard/bottle-cabinet.png'>><<lanSwitch 'A cabinet for sealed bottles: ' '封瓶酒柜费用：'>><span class='gold'><<printmoney _winery.terms.shopSetupCost>></span><br>
+      <<if maplebirch.get('Finance')?.canPay(_winery.terms.shopSetupCost, 'orchard') ?? $money gte _winery.terms.shopSetupCost>>
+        <<shopicon 'register'>><<lanLink ['Pay for the bottle cabinet (0:15)', '出钱添置瓶装酒柜 (0:15)']>>
+          <<set _winery to maplebirch.get('Orchard').winery>>
+          <<if maplebirch.passage.title is 'Deadwood Orchard Robin Wine' and _winery.available and _winery.state.installed and !_winery.state.shop_enabled
+            and maplebirch.get('Orchard').canSupplyRobin and C.npc.Robin.trauma lt 80
+            and (maplebirch.get('Finance')?.canPay(_winery.terms.shopSetupCost, 'orchard') ?? $money gte _winery.terms.shopSetupCost)>>
+            <<money `-_winery.terms.shopSetupCost` 'orchard'>>
+            <<set _winery.state.shop_enabled to true>><<set _winery.state.expenses += _winery.terms.shopSetupCost>>
+            <<pass 15>><<updatesidebarmoney>>
+            <<if maplebirch.passage.title is 'Deadwood Orchard Robin Wine'>><<run maplebirch.SugarCube.Engine.show()>><</if>>
+          <<else>>
+            <<replace '#deadwood-orchard-robin-wine-note'>><span class='blue'><<lanSwitch 'You cannot arrange the cabinet right now.' '现在无法添置酒柜。'>></span><br><</replace>>
+          <</if>>
+        <</lanLink>><br>
+      <<else>>
+        <span class='blue'><<lanSwitch 'You cannot afford the cabinet yet.' '你还付不起酒柜费用。'>></span><br>
+      <</if>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          Robin checks the bottle count against the cabinet list. "Six at a time should do. I'll write down what I take, and pay you before they go on the shelf." <<He>> keeps the bottled wine list beside the usual drink orders.
+        <<option 'CN'>>
+          罗宾对照酒柜清单数了数瓶子。“一次六瓶就好。收多少我都记下来，上架之前先付你的货款。”<<He>>把瓶装果酒的清单放在日常饮品订单旁。
+      <</language>><br><br>
+      <<lanSwitch 'Cabinet stock: ' '酒柜库存：'>><span class='blue'><<= _winery.shopStock>> / <<= _winery.terms.shopStockLimit>></span><<lanSwitch ' bottles' '瓶'>><br>
+      <<lanSwitch 'Up to ' '每周最多售出'>><<= _winery.terms.shopWeeklyLimit>><<lanSwitch ' bottles are sold each week. Robin pays for supplies from the shop’s available funds.' '瓶。供货款由罗宾从店铺可用资金中支付。'>><br>
+      <<for _recipe range _winery.terms.recipes>>
+        <<capture _recipe>>
+          <br><<icon _recipe.icon>><b><<= lanSwitch(_recipe.name[0], _recipe.name[1])>></b><br>
+          <<lanSwitch 'Your spare bottles: ' '你可供货的瓶数：'>><span class='blue'><<= Math.max(0, _winery.state.stock[_recipe.id] - _winery.state.reserve[_recipe.id])>></span>
+          <<lanSwitch ' / On the shelf: ' ' / 柜中：'>><span class='blue'><<= _winery.state.shop_stock[_recipe.id]>></span><br>
+          <<lanSwitch 'Payment for ' '交付'>><<= _winery.terms.shopSupplyQuantity>><<lanSwitch ' bottles: ' '瓶的货款：'>><span class='gold'><<printmoney `_recipe.wholesale * _winery.terms.shopSupplyQuantity`>></span><br>
+          <<if _winery.canSupply and _winery.state.stock[_recipe.id] - _winery.state.reserve[_recipe.id] gte _winery.terms.shopSupplyQuantity>>
+            <<if maplebirch.get('Robin').shop.canSpend(_recipe.wholesale * _winery.terms.shopSupplyQuantity / 100)>>
+              <<icon 'orchard/dispatch.png'>><<lanLink ['Deliver ' + _recipe.name[0] + ' (0:' + _winery.terms.supplyMinutes + ')', '交付' + _recipe.name[1] + ' (0:' + _winery.terms.supplyMinutes + ')']>>
+                <<if maplebirch.get('Orchard').winery.supply(_recipe.id)>>
+                  <<pass `maplebirch.get('Orchard').winery.terms.supplyMinutes`>><<updatesidebarmoney>>
+                  <<if maplebirch.passage.title is 'Deadwood Orchard Robin Wine'>><<run maplebirch.SugarCube.Engine.show()>><</if>>
+                <<else>>
+                  <<replace '#deadwood-orchard-robin-wine-note'>><span class='blue'><<lanSwitch 'The stock, cabinet space or available payment has changed. Check the delivery again.' '库存、酒柜空位或可用货款发生了变化。请重新核对交货。'>></span><br><</replace>>
+                <</if>>
+              <</lanLink>><br>
+            <<else>>
+              <span class='blue'><<lanSwitch 'Robin needs to keep the remaining funds for the shop and rent.' '罗宾得把剩下的资金留给经营和房租。'>></span><br>
+            <</if>>
+          <</if>>
+        <</capture>>
+      <</for>>
+      <<if _winery.shopStock + _winery.terms.shopSupplyQuantity gt _winery.terms.shopStockLimit>>
+        <br><span class='blue'><<lanSwitch 'The cabinet has no room for another delivery yet.' '酒柜暂时放不下下一批货。'>></span><br>
+      <</if>>
+    <</if>>
+    <div id='deadwood-orchard-robin-wine-note'></div>
+  <<else>>
+    <<lanSwitch 'Now is not a good time to discuss wine supplies.' '现在不方便商量果酒供货。'>>
+  <</if>>
+<</deadwood-dynamicblock>>
+<br><br><<getouticon>><<lanLink ['Return to the drinks shop', '返回饮品店'] 'Deadwood Robin Shop'>><</lanLink>>

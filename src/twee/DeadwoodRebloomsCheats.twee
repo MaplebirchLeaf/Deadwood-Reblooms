@@ -122,6 +122,20 @@
       }
     }>>
   <</if>>
+  <<if $Orchard.winery?.installed>>
+    <span class='gold'><<lanSwitch 'Bottled fruit wine' '瓶装果酒'>></span><br>
+    <<for _cheatWine range maplebirch.get('Orchard').winery.terms.recipes>>
+      <<numberStepper `lanSwitch(_cheatWine.name[0], _cheatWine.name[1])` $Orchard.winery.stock[_cheatWine.id] {
+        min:0, max:Math.max(10000, $Orchard.winery.stock[_cheatWine.id]), step:1,
+        activeButtons:['single', 'double', 'triple'], percentage:false, values:[_cheatWine.id],
+        callback:(value, arr) => {
+          const winery = V.Orchard?.winery;
+          if (!winery?.installed || !Object.hasOwn(winery.stock, arr[0]) || !Number.isSafeInteger(value) || value < 0) return;
+          winery.stock[arr[0]] = value;
+        }
+      }>>
+    <</for>>
+  <</if>>
   <span class='blue'><<lanSwitch 'Fruit uses the native food inventory and cannot be reduced below the reserved amount. This does not grow trees, finish orders or add sales income.' '果实使用原版食品库存，不能减到预留量以下。这里不催熟果树、不完成订单，也不增加销售收入。'>></span><br>
 <</widget>>
 

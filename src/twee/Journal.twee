@@ -1277,6 +1277,36 @@
   <</if>>
 <</widget>>
 
+<!-- 酿造只读保存的批次与库存；查看日志不装瓶、不出售。 -->
+<<widget 'deadwood-orchard-winery-journal'>>
+  <<set _journal_winery to maplebirch.get('Orchard')?.winery>>
+  <<if _journal_winery?.state.installed>>
+    <<deadwood-card 'Orchard winery' '果园酿酒间'>>
+      <ul class='journal'>
+        <li><<icon 'orchard/winery.png'>><<lanSwitch 'Barrels in use: ' '在用酒桶：'>><span class='teal'><<= _journal_winery.state.batches.length>> / <<= _journal_winery.terms.barrelCapacity>></span></li>
+        <<for _journal_batch range _journal_winery.state.batches>>
+          <<set _journal_wine to _journal_winery.terms.recipes.find(recipe => recipe.id === _journal_batch.recipe)>>
+          <li><<lanSwitch _journal_wine.name[0] _journal_wine.name[1]>> · <<= _journal_batch.bottles>> <<lanSwitch 'bottles' '瓶'>> ·
+            <<if _journal_batch.ready_at lte Time.date.timeStamp>>
+              <span class='green'><<lanSwitch 'Ready to bottle at the winery.' '可到酿酒间装瓶。'>></span>
+            <<else>>
+              <span class='blue'><<lanSwitch 'Fermenting, about ' '发酵中，约剩'>><<= Math.ceil((_journal_batch.ready_at - Time.date.timeStamp) / 3600)>><<lanSwitch ' hours remaining.' '小时。'>></span>
+            <</if>>
+          </li>
+        <</for>>
+        <<for _journal_wine range _journal_winery.terms.recipes>>
+          <<if _journal_winery.state.stock[_journal_wine.id] gt 0>>
+            <li><<lanSwitch _journal_wine.name[0] _journal_wine.name[1]>> · <span class='teal'><<= _journal_winery.state.stock[_journal_wine.id]>></span> <<lanSwitch 'bottles, keep at least: ' '瓶，保留目标：'>><<= _journal_winery.state.reserve[_journal_wine.id]>></li>
+          <</if>>
+        <</for>>
+        <<if _journal_winery.state.shop_enabled>>
+          <li><<lanSwitch "Bottles on Robin's shelf: " '罗宾侧柜存酒：'>><span class='teal'><<= _journal_winery.shopStock>></span> / <<= _journal_winery.terms.shopStockLimit>> · <<lanSwitch 'Weekly sales limit: ' '每周最多售出：'>><<= _journal_winery.terms.shopWeeklyLimit>></li>
+        <</if>>
+      </ul>
+    <</deadwood-card>><hr>
+  <</if>>
+<</widget>>
+
 <!-- 交通：领证与补考日期不依赖玩家是否已经买车。 -->
 <<widget 'deadwood-driving-school-journal'>>
   <<if !maplebirch.get('Transport') or !$Transport?.school>><<exit>><</if>>

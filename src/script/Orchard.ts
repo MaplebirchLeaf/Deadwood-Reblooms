@@ -13,7 +13,7 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
     { widget: 'deadwood-remy-birth-reflection', passage: 'Pregnancy Birth Hospital 4' },
     { widget: 'deadwood-remy-paternity-link', passage: 'Hospital Paternity Test' }
   );
-  maplebirch.tool.addTo('Journal', 'deadwood-orchard-staff-journal', 'deadwood-orchard-orders-journal');
+  maplebirch.tool.addTo('Journal', 'deadwood-orchard-staff-journal', 'deadwood-orchard-orders-journal', 'deadwood-orchard-winery-journal');
   maplebirch.tool.patch.traits.add({
     title: 'Special Traits',
     name: () => maplebirch.t('deadwood-reblooms:orchard:trait:supplier:name'),
