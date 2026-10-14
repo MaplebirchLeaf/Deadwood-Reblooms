@@ -94,7 +94,7 @@ When you meet Alex shopping in town, you can offer a lift back towards the farm.
 
 When Avery arrives to pick you up after school, you can mention that you brought your own vehicle. Avery's response varies with anger and your position in the company. If Robin is there too, you can invite Robin to ride home to the orphanage.
 
-Exposure, bound arms or shackles prevent departure. Drinking, drugs or maximum stress prevent driving motor vehicles.
+You normally need suitable clothing to depart. With Vanilla Enhancement’s exhibitionism ability and comfort at your current exposure level, you may keep your appearance while offering a ride. Taking back school clothes is your choice; rides near the school also offer “Retrieve clothes, then offer the ride”. Departing does not dress you automatically. Bound arms or restrictive shackles still prevent departure; alcohol, drugs and maximum stress still prevent driving motor vehicles.
 
 ## Taxi work
 

@@ -14,7 +14,9 @@ Enter from the corridor at 07:00–17:00 on school days. Ordinary students can o
 
 Propose policies in order through the headteacher: uniform, free dress, revealing dress, optional nudity, nude day and mandatory nudity. Later policies require more support and corruption; pressure does not bypass shared requirements.
 
-A passed proposal starts a seven-day trial before office review. Failure rolls it back with a three-day cooldown. Nude day applies only during Friday school hours. Policies formally retained can be selected again.
+A passed proposal starts a seven-day trial before office review. Failure rolls it back with a three-day cooldown. Nude day's compulsory requirement applies only during Friday school hours. Policies formally retained can be selected again.
+
+Clothing permitted by the current policy allows normal classroom entry; restraints, lateness and lesson times still follow the original rules. When the rule requires undressing, you choose whether to change and take part or keep your clothes and decline. Stored clothes do not automatically return when you leave, at 17:00 or when the policy changes. Retrieve them yourself at the school lockers or student affairs noticeboard; their colours and integrity are preserved. You can dress again while a compulsory rule is active, but must meet its requirements to attend lessons.
 
 Prefects and presidents can also order council drinks at Robin's shop and prepare after-school materials at their home desk or Sirris's study. Personal invitations still need the other person's willingness; a badge is not permission.
 

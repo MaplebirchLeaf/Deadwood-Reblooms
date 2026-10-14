@@ -119,7 +119,7 @@ class Transport extends Module {
   }
 
   public get ready(): boolean {
-    return !V.replayScene && !V.statFreeze && !V.combat && !V.possessed && V.exposed <= 0 && !window.pcAreArmsBound('both');
+    return !V.replayScene && !V.statFreeze && !V.combat && !V.possessed && (V.exposed <= 0 || this.core.get('VanillaPlus')?.exhibitionism.canRoamTown === true) && !window.pcAreArmsBound('both');
   }
 
   public get point(): string | null {

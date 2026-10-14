@@ -23,7 +23,7 @@ export default function PoolParty(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
-      Canteen: [{ src: '<<if def $milkshake and $milkshake gt 0 and $exposed lte 0>>', applybefore: '<<deadwood-reblooms-pool-party-invite>>\n\t\t', expected: 1 }],
+      Canteen: [{ src: '<<if def $milkshake and $milkshake gt 0', applybefore: '<<deadwood-reblooms-pool-party-invite>>\n\t\t', expected: 1 }],
       'School Library': [{ src: '<<projectoptions>>', applybefore: '<<deadwood-reblooms-pool-party-invite>>\n\t\t', expected: 1 }],
       'School Front Courtyard': [{ src: '<<schoolicon "courtyard">>', applybefore: '<<deadwood-reblooms-pool-party-invite>>\n\t\t\t', expected: 1 }],
       'School Rear Courtyard': [{ src: '<<schoolicon "courtyard">>', applybefore: '<<deadwood-reblooms-pool-party-invite>>\n\t\t\t', expected: 1 }],

@@ -122,7 +122,7 @@ class School {
   /** 当前穿着是否满足已生效的着装政策。政策为 uniform 时沿用原版判定。 */
   public meetsDressCode(vanillaAccepted: boolean): boolean {
     const policy = V.LifeSimulation?.school?.dress?.active as SchoolDressPolicy | undefined;
-    if (!policy || policy === 'uniform') return vanillaAccepted;
+    if (!policy || policy === 'uniform' || !['school', 'school_rear_courtyard', 'pool'].includes(V.location)) return vanillaAccepted;
 
     const worn = V.worn as Record<string, { name?: string; type?: string[] } | undefined>;
     const dressed = (slot: string) => worn?.[slot]?.name !== undefined && worn[slot]?.name !== 'naked';
@@ -130,7 +130,8 @@ class School {
 
     if (policy === 'free') return overalls || (dressed('upper') && dressed('lower'));
     if (policy === 'revealing') return overalls || ['upper', 'lower', 'under_upper', 'under_lower'].some(dressed);
-    return true;
+    if (this.requiresNudity) return ['upper', 'lower', 'under_upper', 'under_lower'].every(slot => worn?.[slot]?.name === 'naked');
+    return this.allowsNudity || vanillaAccepted;
   }
 
   public selectPolicy(policy: SchoolDressPolicy): boolean {
@@ -156,7 +157,12 @@ class School {
   }
 
   public get allowsNudity(): boolean {
-    return DRESS_POLICIES.indexOf(this.state.dress.active) >= DRESS_POLICIES.indexOf('optionalNudity');
+    return (
+      ['school', 'school_rear_courtyard', 'pool'].includes(V.location) &&
+      this.councilOpen &&
+      !['earlynoschool', 'latenoschool', 'daynoschool'].includes(V.schoolstate) &&
+      DRESS_POLICIES.indexOf(this.state.dress.active) >= DRESS_POLICIES.indexOf('optionalNudity')
+    );
   }
 
   public get canRequestAttendanceExemption(): boolean {

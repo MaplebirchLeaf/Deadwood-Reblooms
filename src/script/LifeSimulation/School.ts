@@ -23,6 +23,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   });
 
   maplebirch.tool.addTo('Journal', 'deadwood-reblooms-life-simulation-school-journal');
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-life-simulation-school-clothes-link', passage: 'School Lockers' });
 
   maplebirch.tool.patch.traits.add(
     {
@@ -48,8 +49,70 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     }
   );
 
+  // 教室先检查外衣是否缺失，再检查校服。让符合现行校规的穿着进入原版上课分支。
+  const classroomDress = {
+    src: '$worn.upper.type.includes("naked") and $worn.lower.type.includes("naked")',
+    applyafter: ' and !wearingSchoolOutfit()',
+    expected: 1
+  };
+
+  // 校规要求只提供主动更衣选择；原版束缚、课时和耳部史莱姆事件仍先检查。
+  const classroomChoice = {
+    srcmatch: /<<classRoomEarSlime "[^"]+">>(?=\s*<<if \$worn\.upper\.type\.includes\("naked"\))/,
+    applyafter: '<<deadwood-reblooms-life-simulation-school-classroom-dress>><<if !_schoolDressRejected>>',
+    expected: 1
+  };
+
+  // 泳池沿用正常泳课分支，不改变 swimall 所记录的原版全班着装任务。
+  const swimmingDress = [
+    {
+      src: '$exposed gte 2 and $swimall isnot 1',
+      applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
+      expected: 1
+    },
+    {
+      src: '$worn.lower.type.includes("swim")))',
+      applyafter: ' or (maplebirch.get("LifeSimulation").school.allowsNudity and ["upper", "lower", "under_upper", "under_lower"].every(slot => $worn[slot].type.includes("naked")))',
+      expected: 1
+    }
+  ];
+
+  // 合法着装只解除普通通行限制，暴露相关随机事件仍由原版结算。
+  const campusNavigationDress = {
+    srcmatchgroup: /(?<=<<if !\["early", "late", "earlynoschool", "latenoschool", "daynoschool"\]\.includes\(\$schoolstate\) and )\$exposed gte 1(?=>>)/,
+    applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
+    expected: 1
+  };
+
+  // 只匹配开场躲藏叙述的首个 lewdness 宏，遇到其它宏即停止，不触及随机事件分支。
+  const campusHidingDress = {
+    srcmatchgroup: /\$exposed gte 1(?=>>(?:(?!<<)[\s\S])*<<lewdness>>)/,
+    applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
+    expected: 1
+  };
+
   maplebirch.tool.inject({
     locationPassage: {
+      'Science Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoolstate is "morning">>', applybefore: '<</if>>\n', expected: 1 }],
+      'Maths Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoollesson is 1 and ![3, 5].includes(Time.weekDay)>>', applybefore: '<</if>>\n', expected: 1 }],
+      'Housekeeping Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoollesson is 1 and [3, 5].includes(Time.weekDay)>>', applybefore: '<</if>>\n', expected: 1 }],
+      'History Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoolstate is "lunch">>', applybefore: '<</if>>\n', expected: 1 }],
+      'English Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoolstate is "afternoon" and $englishPlay is "ongoing">>', applybefore: '<</if>>\n', expected: 1 }],
+      'School Pool': [
+        ...swimmingDress.map(rule => ({ ...rule })),
+        {
+          src: '<<classRoomEarSlime "swimming">>',
+          applyafter: '<<deadwood-reblooms-life-simulation-school-classroom-dress>>',
+          expected: 1
+        },
+        { src: '<<if $poolroomstate is "own">>', applybefore: '<<if _schoolDressRejected isnot true>>', expected: 1 },
+        { srcmatch: /<<\/if>>\s*$/, applyafter: '<</if>>', expected: 1 }
+      ],
+      'School Swimming Late': swimmingDress.map(rule => ({ ...rule })),
+      'Swimming Lesson': [
+        // 已获批的校规不再触发旧裸体泳课的礼顿惩罚，不修改原版全班任务记录。
+        { src: '$swimnudecounter gte 10 and $swimall isnot 1', applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity', expected: 1 }
+      ],
       "Head's Office": [
         {
           srcmatch: /<<getouticon>><<link \[\[[^\]\n]+\|Hallways]]>>(?=<<endevent>><<pass 1>><<set \$daily\.school\.headInterrupted to 1>>)/,
@@ -76,22 +139,11 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     }
   });
 
-  // 地点由正文写入后再处理衣物，随后仍由原版 effects 计算暴露与服装状态。
-  maplebirch.tool.onInit(() => {
-    const effects = maplebirch.tool.macro.Macro.get('effects')?.handler;
-    if (typeof effects !== 'function') return;
-    maplebirch.tool.macro.define('effects', function () {
-      const school = maplebirch.get('LifeSimulation')?.school;
-      if (school && (V.LifeSimulation?.school?.clothesStored || school.requiresNudity)) {
-        this.output.append(maplebirch.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-life-simulation-school-sync-clothes>>'));
-      }
-      return effects.call(this);
-    });
-  });
-
   maplebirch.tool.inject({
     locationPassage: {
       'School Front Courtyard': [
+        { ...campusNavigationDress },
+        { ...campusHidingDress },
         // 在原版留堂条件上追加学生身份检查，其余限制照常保留。
         {
           srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
@@ -105,12 +157,10 @@ export default function School(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
+      'School Rear Courtyard': [{ ...campusNavigationDress }, { ...campusHidingDress }],
       Hallways: [
-        {
-          srcmatchgroup: /(?<=<<if !\["early", "late", "earlynoschool", "latenoschool", "daynoschool"\]\.includes\(\$schoolstate\) and )\$exposed gte 1(?=>>)/,
-          applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
-          expected: 1
-        },
+        { ...campusNavigationDress },
+        { ...campusHidingDress },
         // 在原版留堂条件上追加学生身份检查，其余限制照常保留。
         {
           srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
@@ -124,15 +174,45 @@ export default function School(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
-      'School Infirmary Kylar Walk': [
+      Canteen: [
         {
-          src: '<<set $location to "arcade">><<set $bus to "starfish">>',
-          applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
+          srcmatchgroup: /\$exposed gte 1(?=>>\s*<<if \$schoolstate is "lunch">>)/,
+          applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
+          expected: 1
+        },
+        // 只开放自己的午餐、普通同学交谈与奶昔，不改罗宾重逢及具名 NPC 剧情。
+        {
+          srcmatchgroup: /(?<=<<(?:if \$daily\.school\.lunchEaten isnot 1|elseif \$daily\.school\.canteenApproach isnot 1|if def \$milkshake and \$milkshake gt 0) and )\$exposed lte 0(?=>>)/g,
+          to: '($exposed lte 0 or maplebirch.get("LifeSimulation").school.allowsNudity)',
+          expected: 3
+        },
+        {
+          src: '$exposed gte 1 and $schoolstate is "lunch"',
+          applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
+          expected: 1
+        }
+      ],
+      'School Library': [
+        {
+          srcmatchgroup: /\$exposed gte 1(?=>>\s*<<if Time.schoolDay and \$schoolstate isnot "early" and \$schoolstate isnot "late">>)/,
+          applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
+          expected: 1
+        },
+        // 校规许可时开放公共区域；礼顿的特殊事件条件与随机遭遇不变。
+        {
+          srcmatchgroup: /\$exposed gte 1(?= and Time.schoolDay and \$schoolstate isnot "early" and \$schoolstate isnot "late">>)/,
+          applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
           expected: 1
         },
         {
-          src: '<<set $location to "park">><<set $bus to "park">>',
-          applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
+          // 两个柜台入口的条件在暴露判断后结束，不匹配礼顿的后续条件。
+          srcmatchgroup: /\$exposed lte 0(?=>>)/g,
+          to: '($exposed lte 0 or maplebirch.get("LifeSimulation").school.allowsNudity)',
+          expected: 2
+        },
+        {
+          srcmatchgroup: /(?<=<<projectoptions>>\s*<<if )\$exposed gte 1(?=>>)/,
+          applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
           expected: 1
         }
       ],
@@ -142,25 +222,6 @@ export default function School(maplebirch: typeof window.maplebirch): void {
           srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
           applyafter: ' and $LifeSimulation.school.role is "student"',
           expected: 1
-        },
-        {
-          src: '<<set $location to "town">>',
-          applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
-          expected: 1
-        }
-      ],
-      'Sydney Walk Shopping': [
-        {
-          src: '<<set $exit to "library">><<set $location to "park">>',
-          applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
-          expected: 1
-        }
-      ],
-      'Sydney Walk Beach': [
-        {
-          src: '<<set $exit to "library">><<set $location to "town">>',
-          applyafter: '<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
-          expected: 1
         }
       ]
     },
@@ -169,14 +230,6 @@ export default function School(maplebirch: typeof window.maplebirch): void {
         {
           srcmatchgroup: /(?<=<<widget "schoolperiod">>\s*<<if )\$exposed lte 0(?=>>)/,
           applyafter: ' or maplebirch.get("LifeSimulation").school.allowsNudity',
-          expected: 1
-        }
-      ],
-      'Widgets Changing Room': [
-        // 四个正常离校链接共用此宏。拦截留堂时也只恢复一次。
-        {
-          src: '<<storeon "school pool girls" "return">>',
-          applyafter: '\n\t<<deadwood-reblooms-life-simulation-school-restore-clothes>>',
           expected: 1
         }
       ],

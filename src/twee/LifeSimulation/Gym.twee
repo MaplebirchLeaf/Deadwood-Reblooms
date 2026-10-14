@@ -124,7 +124,15 @@
 :: Deadwood Reblooms Life Simulation Gym Floor
 <<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>><<endevent>>
 <<if !maplebirch.get("LifeSimulation").has or Time.hour lt 6 or Time.hour gte 22 or $exposed gt 0>>
-  <span class='red'><<lanSwitch 'You need a valid pass to enter the training floor.' '进入训练区需要有效入场资格。'>></span><br><br>
+  <span class='red'>
+    <<if Time.hour lt 6 or Time.hour gte 22>>
+      <<lanSwitch 'The training floor opens from 06:00 to 22:00.' '训练区在06:00–22:00开放。'>>
+    <<elseif $exposed gt 0>>
+      <<lanSwitch 'Put on suitable clothes before entering the training floor.' '进入训练区前，请先穿好合适的衣物。'>>
+    <<else>>
+      <<lanSwitch 'You need a valid pass to enter the training floor.' '进入训练区需要有效入场资格。'>>
+    <</if>>
+  </span><br><br>
 <<else>>
   <<lanSwitch 'The training floor has a row of weights, open mats and a clear strip for running. A coach moves between the equipment, keeping an eye on form rather than rushing anyone.' '训练区摆着一排杠铃、几块空出的软垫和一条跑步通道。教练在器械间巡视，留意每个人的动作，也不催促谁。'>><br><br>
   <<if maplebirch.get('LifeSimulation').coach.npc>>

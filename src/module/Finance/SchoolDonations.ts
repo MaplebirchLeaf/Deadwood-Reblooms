@@ -69,7 +69,7 @@ export default class SchoolDonations {
       window.wearingSchoolOutfit?.() === true &&
       !window.pcAreArmsBound('any') &&
       !V.worn.feet.type.includes('shackle') &&
-      V.exposed <= 0 &&
+      (V.exposed <= 0 || this.donations.finance.core.get('LifeSimulation')?.school.allowsNudity === true) &&
       V.stress < V.stressmax &&
       !V.combat &&
       !V.possessed &&

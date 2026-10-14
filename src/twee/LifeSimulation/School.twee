@@ -30,7 +30,7 @@
 
 <!-- 学校公告栏入口：身份、校园状态与校规集中在同一个面板。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-board-link'>>
-  <<assignmenticon>><<lanLink ['Check the student affairs noticeboard (0:02)', '查看学生事务公告栏 (0:02)'] 'Deadwood Reblooms Life Simulation School Board'>><<pass 2>><</lanLink>><br>
+  <<assignmenticon>><<lanLink ['Check the student affairs noticeboard', '查看学生事务公告栏'] 'Deadwood Reblooms Life Simulation School Board'>><</lanLink>><br>
 <</widget>>
 
 <!-- 职位申请与新校规提案都必须当面向礼顿提出。 -->
@@ -67,71 +67,70 @@
   <</if>>
 <</widget>>
 
-<!-- 仅替代原版中庭通往走廊的入口链接。 -->
+<!-- 仅替代原版中庭通往走廊的入口。更衣由玩家点击，入校步行仍为一分钟。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-entry'>>
-  <<if maplebirch.get("LifeSimulation").school.requiresNudity and !$LifeSimulation.school.clothesStored>>
-    <<language>>
-      <<option 'EN'>>
-        A member of staff points to the rule beside the doors. You must <span class='red'>remove your clothes</span> before entering today.
-      <<option 'CN'>>
-        教职工指了指门旁的校规。今天入校前，你<span class='red'>必须脱下衣服</span>。
-    <</language>><br><br>
-    <<lockericon>><<lanLink ['Obey the rule and enter naked (0:01)', '遵守校规，脱衣入校 (0:01)'] 'Hallways'>>
-      <<undress 'lifeSimulationSchool'>>
-      <<set $LifeSimulation.school.clothesStored to true>>
-      <<pass 1>>
-    <</lanLink>>
+  <<if maplebirch.get("LifeSimulation").school.requiresNudity and !wearingSchoolOutfit()>>
+    <<lanSwitch 'The posted rule requires you to attend without clothing today. You can change before entering, or keep your clothes and leave school.' '今天的校规要求脱衣参加校园活动。你可以主动更衣后入校，也可以保留衣物，选择离校。'>><br><br>
+    <<if $combat isnot 1 and !$statFreeze and !$replayScene and !$possessed and !pcAreArmsBound('both')>>
+      <<lockericon>><<lanLink ['Undress and enter school (0:01)', '脱衣入校 (0:01)'] 'Hallways'>>
+        <<deadwood-reblooms-life-simulation-school-store-clothes>><<pass 1>>
+      <</lanLink>>
+    <</if>>
   <<else>>
     <<entranceicon>><<lanLink ['Enter the school (0:01)', '进入学校 (0:01)'] 'Hallways'>><<pass 1>><</lanLink>>
-    <<if maplebirch.get("LifeSimulation").school.allowsNudity and !$LifeSimulation.school.clothesStored>>
+    <<if maplebirch.get("LifeSimulation").school.allowsNudity and ['upper', 'lower', 'under_upper', 'under_lower'].some(slot => $worn[slot].name isnot 'naked')>>
       <br>
       <<lockericon>><<lanLink ['Undress before entering school (0:01)', '脱衣入校 (0:01)'] 'Hallways'>>
-        <<undress 'lifeSimulationSchool'>>
-        <<set $LifeSimulation.school.clothesStored to true>>
-        <<pass 1>>
+        <<deadwood-reblooms-life-simulation-school-store-clothes>><<pass 1>>
       <</lanLink>>
     <</if>>
   <</if>>
 <</widget>>
 
-<!-- 正文设置实际地点后调用。后庭与泳池仍属于校园。 -->
-<<widget 'deadwood-reblooms-life-simulation-school-sync-clothes'>>
-  <<if $LifeSimulation?.school>>
-    <<if $LifeSimulation.school.clothesStored and !['school', 'school_rear_courtyard', 'pool'].includes($location)>>
-      <<deadwood-reblooms-life-simulation-school-restore-clothes>>
-    <<elseif !$LifeSimulation.school.clothesStored and $location is 'school' and $outside is 0 and $combat isnot 1 and !$statFreeze and maplebirch.get("LifeSimulation").school.requiresNudity>>
-      <<deadwood-reblooms-life-simulation-school-enforce-clothes>>
+<!-- 原版课堂时段与耳部史莱姆事件先执行；保留衣物时不授予上课入口。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-classroom-dress'>>
+  <<set _schoolDressRejected to maplebirch.get('LifeSimulation').school.requiresNudity and !wearingSchoolOutfit()
+    and !pcAreArmsBound('any') and $feetuse isnot 'bound' and !$nextPassage and !$nextPassageCheck>>
+  <<if _schoolDressRejected>>
+    <<lanSwitch 'The current school rule requires you to attend without clothing. You can change to take part, or keep your clothes and return to the hallways.' '现行校规要求脱衣参加课程。你可以主动更衣后上课，也可以保留衣物，返回走廊。'>><br><br>
+    <<if $combat isnot 1 and !$statFreeze and !$replayScene and !$possessed>>
+      <<lockericon>><<lanLink ['Undress and continue', '脱衣后继续'] $passage>>
+        <<deadwood-reblooms-life-simulation-school-store-clothes>>
+      <</lanLink>><br>
     <</if>>
+    <<getouticon>><<lanLink ['Keep your clothes and return to the hallways', '保留衣物，返回走廊'] 'Hallways'>><<endevent>><</lanLink>><br>
   <</if>>
 <</widget>>
 
-<!-- 离校时恢复衣物。收容或战斗中仅归还储物，保留原版的服装与束缚。 -->
-<<widget 'deadwood-reblooms-life-simulation-school-restore-clothes'>>
-  <<if $LifeSimulation?.school?.clothesStored>>
+<!-- 与原版更衣动作一致，不额外推进时间；只在主动选择的点击体调用。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-store-clothes'>>
+  <<if $combat isnot 1 and !$statFreeze and !$replayScene and !$possessed and !pcAreArmsBound('both')>>
     <<silently>>
-      <<if $combat is 1 or $statFreeze or ['hospital', 'asylum', 'prison'].includes($location)>>
-        <<storeon 'lifeSimulationSchool' 'return'>>
-      <<else>>
-        <<storeon 'lifeSimulationSchool'>>
-      <</if>>
+      <<undress 'lifeSimulationSchool'>>
       <<set $LifeSimulation.school.clothesStored to setup.clothingLayer.all.some(slot => $store[slot]?.some(item => item.location === 'lifeSimulationSchool'))>>
       <<exposure>>
     <</silently>>
   <</if>>
 <</widget>>
 
-<!-- 处理从其它入口进入学校的情况，确保强制校规不会只在前庭生效。 -->
-<<widget 'deadwood-reblooms-life-simulation-school-enforce-clothes'>>
-  <<silently>>
-    <<undress 'lifeSimulationSchool'>>
-    <<set $LifeSimulation.school.clothesStored to true>>
-  <</silently>>
-  <<language>>
-    <<option 'EN'>>
-      A member of staff stops you and points to the posted rule. You must <span class='red'>remove your clothes</span> before they let you pass.
-    <<option 'CN'>>
-      一名教职工拦住你，指向墙上的校规。你<span class='red'>脱下衣服</span>后，才被放行。
-  <</language>><br><br>
+<!-- 储物柜与自有公告栏直接显示取衣选择；校规不阻止玩家主动穿回衣物。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-clothes-link'>>
+  <<if $LifeSimulation?.school?.clothesStored and $combat isnot 1 and !$statFreeze and !$replayScene and !$possessed and !pcAreArmsBound('both')>>
+    <<lockericon>><<lanLink ['Retrieve and put on your stored clothes', '取回并穿上暂存衣物'] $passage>>
+      <<deadwood-reblooms-life-simulation-school-restore-clothes>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<!-- 仅供主动取衣使用。原版 storeon 保留颜色、耐久与诅咒衣物的保护。 -->
+<<widget 'deadwood-reblooms-life-simulation-school-restore-clothes'>>
+  <<if $LifeSimulation?.school?.clothesStored and $combat isnot 1 and !$statFreeze and !$replayScene and !$possessed and !pcAreArmsBound('both')>>
+    <<silently>>
+      <<storeon 'lifeSimulationSchool'>>
+      <<set $LifeSimulation.school.clothesStored to setup.clothingLayer.all.some(slot => $store[slot]?.some(item => item.location === 'lifeSimulationSchool'))>>
+      <<exposure>>
+    <</silently>>
+  <</if>>
 <</widget>>
 
 <!-- 声望沿用原版等级色；堕落为零不显示警告色。 -->
@@ -299,6 +298,7 @@
   <<option 'CN'>>
     公告栏上贴着通知、值勤记录和着装校规。新告示压在旧告示上，每条校规的末尾都留着礼顿的签名。
 <</language>><br><br>
+<<deadwood-reblooms-life-simulation-school-clothes-link>>
 <span class='gold'><<lanSwitch 'Student council' '学生会'>></span><br>
 <ul class='journal'>
   <li>
