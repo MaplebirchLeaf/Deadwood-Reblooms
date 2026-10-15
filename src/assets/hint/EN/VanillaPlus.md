@@ -76,7 +76,7 @@ The other side remains the tentacle plains with vanilla dangers and encounters. 
 
 ## Gargantuan size and multiplayer actions
 
-The PC gains **size 7: Gargantuan**, through existing body-size settings and growth routes. The sidebar has the matching appearance, and NPC size settings also gain a corresponding option. Encounter close-ups and X-ray do not gain dedicated new images for this tier; acceptance and growth notifications still apply.
+The PC gains **size 7: Gargantuan**, through existing body-size settings and growth routes. The sidebar has the matching appearance, and NPC size settings also gain a corresponding option. PC size 7 and NPC size 5 use original size-6 images for single-penetration X-ray. Double penetration keeps the vanilla display. Encounter close-ups do not gain dedicated size-7 images. Acceptance and growth notifications still apply.
 
 Growth and fluid recovery continue to follow existing body, drug and transformation rules. Size 7 does not separately grant faster recovery.
 

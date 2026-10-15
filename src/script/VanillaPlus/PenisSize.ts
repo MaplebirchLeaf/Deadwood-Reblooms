@@ -72,6 +72,26 @@ export default function (maplebirch: typeof window.maplebirch) {
     ['combatClosePenis', 'combatCloseVagina']
   );
 
+  maplebirch.char.use(
+    'pre',
+    options => {
+      const penis = options.penis;
+      if (!options.showPcPenis || options.npcDouble || penis?.doublePen || penis?.base !== 'sex') return;
+      if (!['machine', 'tentacle'].includes(penis.penetratedType) && window.playerPenisSize() >= 6) penis.size = 6;
+    },
+    'combatXrayPenis'
+  );
+  maplebirch.char.use(
+    'pre',
+    (options, model) => {
+      const penetrator = options[model?.name === 'combatXrayVagina' ? 'vagina' : 'anus'];
+      if (!options.showNpcPenis || !penetrator?.show || penetrator.doublePen || penetrator.base !== 'sex') return;
+      if (V.NPCList?.[penetrator.npc]?.penissize !== 5) return;
+      if (['human', 'plant'].includes(penetrator.npcType) && ['penis', 'strapon', 'tentacle'].includes(penetrator.penetratorSprite)) penetrator.size = 6;
+    },
+    ['combatXrayVagina', 'combatXrayArse']
+  );
+
   const clamp = { src: 'Math.clamp($player.penissize, 0, 6)', to: 'Math.clamp($player.penissize, 0, 7)', expected: 1 };
   const size = /<<switch \$player\.penissize>>\s*(?=<<case 6>>)/g;
   // 用尺寸分支作锚点，保留原文并避免依赖英文句子。
