@@ -16,7 +16,12 @@ export default function (maplebirch: typeof window.maplebirch) {
   npc_prototype.bodyPartdescription = function () {
     const extended = this.penissize === 5 && (this.penis === 'clothed' || this.penisdesc === 'penis' || (!this.penisdesc && this.penis !== 'none'));
     describe.call(this);
-    if (extended) this.penisdesc = lanSwitch('gargantuan penis', '骇人肉棒');
+    if (extended) {
+      const language = maplebirch.services.translator.language === 'CN' ? 'CN' : 'EN';
+      this.penisdesc = this.descCache[`deadwood_penis_${language}_5`] ||= (
+        language === 'CN' ? ['骇人肉棒', '慑人肉棒', '可怖肉棒'] : ['gargantuan penis', 'intimidating penis', 'terrifying penis']
+      ).either();
+    }
   };
 
   maplebirch.once(':storyready', () => {
@@ -48,9 +53,18 @@ export default function (maplebirch: typeof window.maplebirch) {
   // NPC 第 5 档复用侧栏第 7 档图片；只修改本次渲染参数。
   maplebirch.char.use(
     'pre',
-    options => {
-      for (const nnpc of [options.maplebirch?.nnpc, options.maplebirch?.previous]) {
-        if (!nnpc?.penis || Math.round(nnpc.bodydata?.penissize ?? 1) !== 5) continue;
+    (options, model) => {
+      const sidebar = V.options.maplebirch.npcsidebar;
+      const enabled = sidebar.model && (model?.name === 'main' ? sidebar.show : sidebar.pet?.enabled);
+      for (const slot of ['nnpc', 'previous'] as const) {
+        const nnpc = options.maplebirch?.[slot];
+        if (!nnpc) continue;
+        if (!enabled || !nnpc.show || !nnpc.model || !V.npc?.includes(nnpc.name) || (slot === 'previous' && !sidebar.second_model)) {
+          nnpc.penis = false;
+          nnpc.penis_size = 0;
+          continue;
+        }
+        if (!nnpc.penis || Math.round(nnpc.bodydata?.penissize ?? 1) !== 5) continue;
         const penis = nnpc.penis.replace(/-6$/, '-7');
         const folder = nnpc.balls ? 'penis' : 'penis-no-balls';
         if (maplebirch.host.modLoader.resources.has(`img/body/${folder}/${penis}.png`) !== true) continue;
