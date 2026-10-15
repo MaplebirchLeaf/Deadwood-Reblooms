@@ -55,6 +55,44 @@ export default function Hands(maplebirch: typeof window.maplebirch): void {
     }
   });
 
+  // 副手伞沿用原版遮罩；头发与头饰都需要接收，浮动 PC 模型也保持一致。
+  const secondary_mask = (options: CanvasModelOptionsData) => {
+    const item = options.worn?.handheld_left;
+    if (maplebirch.get('LifeSimulation') && item?.index > 0 && item.setup?.mask_img === 1) return `img/clothes/handheld/${item.setup.variable}/mask.png`;
+  };
+  maplebirch.char.use(
+    'pre',
+    options => {
+      const mask = secondary_mask(options);
+      if (mask && !options.headMask.includes(mask)) options.headMask.push(mask);
+    },
+    ['main', maplebirch.char.pet.modelName]
+  );
+  maplebirch.tool.onInit(() => {
+    const layers = window.Renderer.CanvasModels.main.layers;
+    maplebirch.char.use(
+      Object.fromEntries(
+        ['head', 'head_acc', 'head_detail', 'head_back', 'head_back_acc'].map(name => {
+          const original = layers[name].masksrcfn;
+          return [
+            name,
+            {
+              masksrcfn(this: LayerConfig, options: CanvasModelOptionsData) {
+                const source = original?.call(this, options);
+                const mask = secondary_mask(options);
+                if (!mask || options.worn.over_upper.setup.name === 'kaiju costume') return source;
+                const masks = Array.isArray(source) ? source : source ? [source] : [];
+                return masks.includes(mask) ? masks : [...masks, mask];
+              }
+            }
+          ];
+        })
+      ),
+      'main',
+      { pet: true }
+    );
+  });
+
   // 复用原版持物的全部图层；坐标、姿势、左右素材和遮挡规则交给原版。
   const sources = ['right', 'right_acc', 'right_detail', 'left', 'left_acc', 'left_detail', 'back', 'back_acc'];
   maplebirch.char.use(

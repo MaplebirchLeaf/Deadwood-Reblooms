@@ -42,7 +42,7 @@ Choose the modules you want to play. The in-game guide covers their activities a
 ## Installation and Dependencies
 
 1. Use a game build with **SugarCube 2 ModLoader**. The current target is **DoL 0.5.12.13**.
-2. Install **[Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.4.4 or later** and any clothing, beauty-selector, or other dependencies requested by the loader.
+2. Install **[Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.4.6 or later** and any clothing, beauty-selector, or other dependencies requested by the loader.
 3. Download `deadwood-reblooms-*.modpack` from [**Releases**](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases/latest) and load it through ModLoader.
 4. Choose the modules you want in the framework's module manager, then save and reload.
 

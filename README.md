@@ -42,7 +42,7 @@
 ## 安装与依赖
 
 1. 准备带有 **SugarCube 2 ModLoader** 的游戏。当前以 **DoL 0.5.12.13** 为目标版本。
-2. 安装 **[秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.4.4 或以上版本**，并按加载器提示补齐服装、美化选择器等依赖。
+2. 安装 **[秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.4.6 或以上版本**，并按加载器提示补齐服装、美化选择器等依赖。
 3. 从 [**Releases**](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases/latest) 下载 `deadwood-reblooms-*.modpack`，通过 ModLoader 加载。
 4. 在框架模块管理中选择要启用的内容，保存游戏并重载。
 

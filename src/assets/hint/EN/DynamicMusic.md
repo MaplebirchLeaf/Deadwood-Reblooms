@@ -1,6 +1,6 @@
 ### Start listening
 
-Use matching versions of the main mod and audio pack, with **Maplebirch Framework 5.4.4 or later**.
+Use matching versions of the main mod and audio pack, with **Maplebirch Framework 5.4.6 or later**.
 
 1. Load the separate **Deadwood Reblooms Audio Pack** in the mod loader and enable Dynamic Music.
 2. Tick **Enable Dynamic Music** under **Mod Settings → Dynamic Music**. The page shows whether the audio pack is loaded.
