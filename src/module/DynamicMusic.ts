@@ -231,7 +231,7 @@ class DynamicMusic {
             }
           }
         } catch (error) {
-          this.audio.log('Dynamic ' + layer + ' could not be played', 'WARN', error);
+          this.audio.log(`Dynamic ${layer} could not be played (${desired}): ${String(error)}`, 'WARN', error);
         }
       } while (this.desired[layer] !== desired);
     } finally {
