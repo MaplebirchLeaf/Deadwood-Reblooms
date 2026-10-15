@@ -27,7 +27,7 @@
 
 `DeadwoodReblooms` 是根模块，关闭它会停用所有子模块。检测到功能重叠的外部模组时，枯木逢春会关闭自身对应模块，保留外部模组。角色剧情仍遵循原版的人物关系、地点和日程条件。
 
-当前版本为 **2.1.0**，新增果园酿酒、罗宾果酒供货与房产饮酒互动，修复旧存档金融数据迁徙，并完善校园、同住和街头联动，详见[更新说明](.github/release-notes/v2.1.0.md)。建议配合框架 **5.4.3** 使用。
+当前版本为 **2.2.0**，新增公路赛、老练车手特质与先到一步成就，完善经营跳时结算、剧情说明与大尺寸 X 光显示，详见[更新说明](.github/release-notes/v2.2.0.md)。建议配合框架 **5.4.3** 使用。
 
 ## 模块与游戏指南
 
@@ -42,6 +42,7 @@
 | `Orchard`                           | 神殿与农场果园、果树照料、逐步开垦与雇工                 |
 | `BirdTower`                         | 高塔扩展：鹰崽的成长、喂食、性格与随行狩猎               |
 | `Transport`                         | 载具购买、车库停放、保养与驾校，小镇及郊外分段出行       |
+| `StreetLife`                        | 街头声誉、武器店、货物委托、悬赏、银行豪劫与公路赛       |
 | `Finance`                           | 金融中心、银行、证券、贷款、房产、同住与泳池亲密         |
 | `VanillaPlus`                       | 属性突破、特质与医院服务                                 |
 | `CelestialAnomalies`                | 日蚀、流星雨与天气画面变化                               |
@@ -86,6 +87,7 @@
 - `LifeSimulation`：丧心的[模拟人生](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims)。
 - `BirdTower`：鲤鱼旗🎏的[鹰宝宝模组](https://github.com/koooooiCarp/DOL-BabyHawk-Mod)（润色：行歌）。
 - 马转化贴图：元夕。
+- 第 6 档 X 光贴图：[DoL Xchange 原图](https://gitgud.io/Akoz/dol-xchange/-/tree/697a8ad7b08bd2370acc401e788a8f5090215e00/img/sex/xray)，按原版渲染规则接入，保留原始像素。
 
 动态音乐使用 Kresiek The Furry、Augmentality（Brandon Morris）、AdoTheLimey、primbal、Breviceps、Joth、TinyWorlds、isaiah658、SketchMan3 和 rubberduck 的 CC0 音频。逐曲来源见[音频素材记录](audio-pack/audio/CREDITS.md)。也感谢所有提供建议、测试反馈与帮助的朋友。
 

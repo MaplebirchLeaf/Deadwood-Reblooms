@@ -27,7 +27,7 @@
 
 `DeadwoodReblooms` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
 
-The current version is **2.0.3**, fixing the missing off-hand try-on record that broke checkout in the vanilla clothing shops, and the bilingual option syntax of the loan-type and bodywriting-gender listboxes. See the [release notes](.github/release-notes/v2.0.3.md). Use framework **5.4.3**.
+The current version is **2.2.0**, adding road races, the Seasoned Driver trait and the First Across feat, and improving business settlement after time travel, story explanations and large-size X-ray rendering. See the [release notes](.github/release-notes/v2.2.0.md). Use framework **5.4.3**.
 
 ## Modules and game guide
 
@@ -42,6 +42,7 @@ The current version is **2.0.3**, fixing the missing off-hand try-on record that
 | `Orchard`                           | Temple and farm orchards, tree care, gradual clearing, and hired help                  |
 | `BirdTower`                         | Bird Tower expansion: hawk chick growth, feeding, personality, and hunts               |
 | `Transport`                         | Vehicle purchases, garages, maintenance, driving lessons, and road and trail journeys  |
+| `StreetLife`                        | Street reputation, weapon shop, cargo jobs, bounties, bank heists, and road races      |
 | `Finance`                           | Financial centre, banking, securities, loans, property, cohabitation and pool intimacy |
 | `VanillaPlus`                       | Stat breakthroughs, traits, and hospital services                                      |
 | `CelestialAnomalies`                | Solar eclipses, meteor showers, and changing sky and weather visuals                   |
@@ -86,6 +87,7 @@ Thanks to the following creators for their work and help. You can turn off the c
 - `LifeSimulation`: [DoLSims](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims) by 丧心.
 - `BirdTower`: [BabyHawk](https://github.com/koooooiCarp/DOL-BabyHawk-Mod) by 鲤鱼旗🎏 (polish by 行歌).
 - Horse transformation sprites: 元夕.
+- Size 6 X-ray sprites: [original DoL Xchange assets](https://gitgud.io/Akoz/dol-xchange/-/tree/697a8ad7b08bd2370acc401e788a8f5090215e00/img/sex/xray), used with vanilla rendering rules and unchanged source pixels.
 
 Dynamic music uses CC0 audio by Kresiek The Furry, Augmentality (Brandon Morris), AdoTheLimey, primbal, Breviceps, Joth, TinyWorlds, isaiah658, SketchMan3, and rubberduck. See the [audio source record](audio-pack/audio/CREDITS.md) for individual tracks. Thanks also to everyone who shared ideas, testing feedback, and other help.
 
