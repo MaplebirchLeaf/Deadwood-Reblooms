@@ -153,6 +153,12 @@ class RealEstate {
       exact: true,
       priority: 1
     });
+    // 时间跳转不触发 onDay，仍由原有逐日游标先入账、后偿债。
+    this.core.dynamic.regTimeEvent('onTimeTravel', ':deadwood-reblooms-property-management-travel', {
+      cond: data => data.direction === 'forward',
+      action: () => this.settleDays(),
+      priority: 1
+    });
     // Time.days 从开局时刻起算，原版通常是 07:00。小时事件覆盖跨过
     // 该时刻的活动；paid_until 防止与午夜日结重复扣款。
     this.core.dynamic.regTimeEvent('onHour', ':deadwood-reblooms-household-wages', {
@@ -841,11 +847,14 @@ class RealEstate {
   }
 
   private settleDays(): void {
+    if (!V.Finance?.real_estate || V.replayScene || V.statFreeze || RealEstate.today < this.state.last_managed_day) return;
     this.pruneResidents();
     const state = this.state;
-    state.daily_evening = [];
-    state.daily_night_wake = false;
     const today = RealEstate.today;
+    if (today > state.last_managed_day) {
+      state.daily_evening = [];
+      state.daily_night_wake = false;
+    }
     if (state.last_managed_day < 0) {
       // 没有房产也要推进个人债务。具体到期日仍由各账户自己的 V 游标决定。
       state.last_managed_day = today - 1;

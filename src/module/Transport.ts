@@ -101,6 +101,10 @@ class Transport extends Module {
   public override preInit(): void {
     super.preInit();
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-transport-upkeep', { action: () => this.maintenance.settle() });
+    this.core.dynamic.regTimeEvent('onTimeTravel', ':deadwood-transport-upkeep-travel', {
+      cond: data => data.direction === 'forward' && !!V.Transport,
+      action: () => this.maintenance.settle()
+    });
     this.core.on(':passagestart', () => {
       V.Transport ??= clone(Transport.defaults);
       const title = this.core.passage.title;
