@@ -1041,6 +1041,33 @@
   <</if>>
 <</widget>>
 
+<!-- 公路赛只显示已提交的赛段与回执；读日志不会推进比赛或领取奖金。 -->
+<<widget 'deadwood-street-race-journal'>>
+  <<set _journal_races to maplebirch.get('StreetLife')?.races>>
+  <<if _journal_races and (_journal_races.state.session or _journal_races.state.last)>>
+    <<deadwood-card 'Road racing' '公路赛事'>>
+      <<if _journal_races.state.session>>
+        <<set _journal_race to _journal_races.state.session>>
+        <b><<= lanSwitch(_journal_races.group.name.EN, _journal_races.group.name.CN)>></b><br>
+        <<lanSwitch 'Sections completed: ' '已完成赛段：'>><span class='teal'><<= _journal_race.step>> / <<= _journal_races.terms.stages.length>></span><br>
+        <<if maplebirch.get('Transport')>>
+          <<lanSwitch 'Current location: ' '当前位置：'>><<= maplebirch.get('Transport').catalog.name(_journal_race.point)>><br>
+        <</if>>
+        <<lanSwitch 'Continue from the race scene, or pull over to withdraw.' '在比赛现场继续行驶，或靠边停车退赛。'>>
+      <<else>>
+        <<set _journal_race to _journal_races.state.last>>
+        <<if _journal_race.outcome is 'finished'>>
+          <<lanSwitch 'Last finishing position: ' '上次完赛名次：'>><span class='teal'><<= _journal_race.place>></span><br>
+        <<else>>
+          <<lanSwitch 'The last race ended without a finish.' '上一场比赛未能完赛。'>><br>
+        <</if>>
+        <<lanSwitch 'Prize collected: ' '奖金实收：'>><<printmoney _journal_race.payout>><br>
+        <<lanSwitch 'Fuel used: ' '消耗燃油：'>><span class='teal'><<= _journal_race.fuel.toFixed(2)>> L</span> · <<lanSwitch 'Condition lost: ' '车况损耗：'>><span class='red'><<= _journal_race.wear.toFixed(1)>>%</span><br>
+      <</if>>
+    <</deadwood-card>><hr>
+  <</if>>
+<</widget>>
+
 <!-- 追缉：只读案件、回执与押送车辆；目标生成、追逐和领款由现场选择处理。 -->
 
 <<widget 'deadwood-street-bounty-journal'>>

@@ -177,11 +177,17 @@
   <</if>>
 
   <<if maplebirch.get('StreetLife') and $StreetLife>>
-    <<set _deadwoodJobs to $StreetLife.jobs, _deadwoodBounties to $StreetLife.bounties, _deadwoodHeist to $StreetLife.heist>>
-    <<if _deadwoodJobs?.completed or _deadwoodJobs?.losses or _deadwoodBounties?.completed or _deadwoodBounties?.leads or _deadwoodBounties?.arrested or (_deadwoodHeist?.stage is 'closed' and _deadwoodHeist.settled) or $smuggler_pub_known is 1>>
+    <<set _deadwoodJobs to $StreetLife.jobs, _deadwoodBounties to $StreetLife.bounties, _deadwoodHeist to $StreetLife.heist, _deadwoodRaces to $StreetLife.races>>
+    <<if _deadwoodJobs?.completed or _deadwoodJobs?.losses or _deadwoodBounties?.completed or _deadwoodBounties?.leads or _deadwoodBounties?.arrested or _deadwoodRaces?.started or (_deadwoodHeist?.stage is 'closed' and _deadwoodHeist.settled) or $smuggler_pub_known is 1>>
       <<foldout false '_deadwoodStreetRecords'>>
         <span class='gold'><<lanSwitch 'Street work and cases' '街头差事与案件'>></span>
         <<if $smuggler_pub_known is 1>><<lanSwitch 'Smugglers’ pub discovered' '已发现走私者酒馆'>><br><</if>>
+        <<if _deadwoodRaces?.started>>
+          <<lanSwitch 'Road races entered / finished / won: ' '公路赛报名／完赛／冠军：'>><span class='teal'><<= _deadwoodRaces.started>> / <<= _deadwoodRaces.completed>> / <<= _deadwoodRaces.wins>></span><br>
+          <<lanSwitch 'Race entry fees paid: ' '赛事报名累计支出：'>><span class='gold'><<= formatMoney(_deadwoodRaces.fees)>></span><br>
+          <<lanSwitch 'Race prizes collected: ' '赛事奖金累计实收：'>><span class='gold'><<= formatMoney(_deadwoodRaces.earned)>></span><br>
+          <span class='blue'><<lanSwitch 'Prize income is before entry fees, fuel and repairs.' '奖金实收尚未扣除报名费、燃油和修车费用。'>></span><br>
+        <</if>>
         <<if _deadwoodJobs>>
           <<lanSwitch 'Street jobs paid: ' '已领款的街头委托：'>><span class='teal'><<= _deadwoodJobs.completed ?? 0>></span><br>
           <<lanSwitch 'Street job rewards collected: ' '街头委托累计实收：'>><span class='gold'><<= formatMoney(_deadwoodJobs.earned ?? 0)>></span><br>
