@@ -196,13 +196,13 @@
         <</if>>
       <</lanLink>> | <span class='blue'><<lanSwitch 'Maths' '数学'>></span><br>
     <</if>>
-    <<icon 'school/procurement-audit.png'>><<lanLink ['Read the purchasing summary (0:10)', '查看采购摘要 (0:10)']>>
+    <<icon 'school/procurement-audit.png'>><<lanLink ['Confirm the purchasing summary as it stands (0:10)', '按现有清单确认采购账目 (0:10)']>>
       <<set _temple_source to $passage>>
       <<if maplebirch.get('Finance').donations.aid.audit('temple', false)>>
         <<pass 10>>
         <<if $passage is _temple_source>>
           <<replace '#deadwood-temple-accounts'>>
-            <<lanSwitch 'You read through the list of purchases. Jordan notes that you have seen the records, then gathers them back into their folder.' '你看过采购清单。约旦记下你已经查阅，将记录收回档案夹。'>><br><br>
+            <<lanSwitch 'You read through the purchases and raise no objection to the charges. Jordan records your confirmation and puts the invoices back in the folder.' '你看过采购清单，没有对费用提出异议。约旦记下你的确认，将发票收回档案夹。'>><br><br>
             <<deadwood-temple-donation-progress>>
             <<deadwood-temple-donation-exit>>
           <</replace>><<run updateMoment()>>
@@ -251,13 +251,13 @@
         <</if>>
       <</lanLink>> | <span class='blue'><<lanSwitch 'Maths' '数学'>></span><br>
     <</if>>
-    <<icon 'temple/relief-supplies.png'>><<lanLink ['Check the packages and accept the delivery (0:15)', '检查包装，接受这批交货 (0:15)']>>
+    <<icon 'temple/relief-supplies.png'>><<lanLink ['Accept the delivery as listed (0:15)', '按现有交货单验收物资 (0:15)']>>
       <<set _temple_source to $passage>>
       <<if maplebirch.get('Finance').donations.aid.inspect('temple', 'accept')>>
         <<pass 15>>
         <<if $passage is _temple_source>>
           <<replace '#deadwood-temple-inspection'>>
-            <<lanSwitch 'You check the sealed packages and look over the blankets. Jordan marks the delivery as inspected. The supplies are ready to be signed into the relief stock.' '你检查了密封包装，翻看毯子。约旦记下物资已经点验。这批物资可以办理签收了。'>><br><br>
+            <<lanSwitch 'You check the food packages and look over the blankets, accepting the delivery as listed. Jordan records the inspection. You can now sign the delivery record before distribution is arranged.' '你检查食物的包装，又翻看了毯子，按现有交货单确认验收。约旦记下结果，请你在交付记录上签字后再安排分发。'>><br><br>
             <<deadwood-temple-donation-progress>>
             <<deadwood-temple-donation-exit>>
           <</replace>><<run updateMoment()>>
@@ -279,9 +279,9 @@
   <div id='deadwood-temple-receipt'>
     <<language>>
       <<option 'EN'>>
-        Jordan places the delivery record before you. Food for the soup kitchen is listed separately from the blankets. <<if _temple_aid.state('temple').equipment is 'replaced'>>The additional blankets have arrived, and their quantity is written beneath the original entry.<</if>> "We can send these on," <<he>> says, offering you a pen.
+        Jordan places the delivery record before you. Food for the soup kitchen is listed separately from the blankets. <<if _temple_aid.state('temple').equipment is 'replaced'>>The additional blankets have arrived, and their quantity is written beneath the original entry.<</if>> "Once we sign, we can arrange distribution," <<he>> says, offering you a pen.
       <<option 'CN'>>
-        约旦将交付记录放到你面前。送往施粥处的食物和毯子分开列着。<<if _temple_aid.state('temple').equipment is 'replaced'>>补送的毯子已经到了，数量写在原有记录下方。<</if>>“可以往下送了。”<<he>>说，将笔递给你。
+        约旦将交付记录放到你面前。送往施粥处的食物和毯子分开列着。<<if _temple_aid.state('temple').equipment is 'replaced'>>补送的毯子已经到了，数量写在原有记录下方。<</if>>“签好以后，就可以安排分发了。”<<he>>说，将笔递给你。
     <</language>><br><br>
     <<icon 'school/delivery-receipt.png'>><<lanLink ['Sign the relief delivery record (0:05)', '签署救济物资交付记录 (0:05)']>>
       <<set _temple_source to $passage>>
@@ -332,17 +332,17 @@
           <<replace '#deadwood-temple-followup'>>
             <<language>>
               <<option 'EN'>>
-                <<if _temple_aid.state('temple').accounts is 'corrected' or _temple_aid.state('temple').equipment is 'replaced'>>"Keeping the records properly saved us trouble," Jordan says. "I'll have the next delivery checked against the order before it is put away."<<else>>"It has helped us keep the shelves stocked," Jordan says. "Thank you for seeing it through."<</if>>
+                <<if _temple_aid.state('temple').accounts is 'corrected' or _temple_aid.state('temple').equipment is 'replaced'>>"Keeping the records properly saved us trouble," Jordan says. "I'll have the next delivery checked against the order before it is put away."<<else>>"These supplies will keep us going for a while," Jordan says. "Thank you for seeing it through."<</if>>
                 <<if ['initiate', 'monk', 'priest'].includes($temple_rank)>><<if $grace gte 80>><br><br>"If you notice another need in the course of your duties, tell me. A clear list makes it easier to arrange."<<else>><br><br>"When you're carrying out your duties, you may see something we've missed. You can bring it to me."<</if>><<else>><br><br>"You are welcome to ask about the supplies again," <<he>> adds. "River can show you the kitchen's work."<</if>>
               <<option 'CN'>>
-                <<if _temple_aid.state('temple').accounts is 'corrected' or _temple_aid.state('temple').equipment is 'replaced'>>“把记录做好，替我们省了些麻烦。”约旦说。“下次到货，我会让他们对照订单检查，再收进库里。”<<else>>“有了这批物资，货架上的东西能接得上。”约旦说。“谢谢你一直过问到现在。”<</if>>
+                <<if _temple_aid.state('temple').accounts is 'corrected' or _temple_aid.state('temple').equipment is 'replaced'>>“把记录做好，替我们省了些麻烦。”约旦说。“下次到货，我会让他们对照订单检查，再收进库里。”<<else>>“这批物资够我们再用一阵了。”约旦说。“谢谢你一直过问到现在。”<</if>>
                 <<if ['initiate', 'monk', 'priest'].includes($temple_rank)>><<if $grace gte 80>><br><br>“履行职责时，若发现别处还缺什么，就告诉我。列清楚，也好安排。”<<else>><br><br>“履行职责时，也许你会发现我们遗漏的地方。可以拿来和我说。”<</if>><<else>><br><br>“以后也欢迎你来问物资的情况。”<<he>>补充道。“瑞沃可以让你看看施粥处的工作。”<</if>>
             <</language>><br><br>
             <<language>>
               <<option 'EN'>>
-                Jordan introduces you to the members handling the deliveries as one of the relief fund’s benefactors. Your name is added to their next public update. "If your factory makes suitable storage goods, we can send an enquiry for the regular supplies."
+                Jordan introduces you to the members handling the deliveries as one of the relief fund’s benefactors. Your name is added to their next public update. "If your factory makes suitable storage goods, send us a quote. We need them for our regular supplies too."
               <<option 'CN'>>
-                约旦向经手交货的成员介绍了你的资助，下一次公开简报也会提到你的名字。“你的工厂生产合适的储物用品，我们可以为日常补给发送询价。”
+                约旦向经手交货的成员介绍了你的资助，下一次公开简报也会提到你的名字。“如果你的工厂能生产合用的储物用品，可以送一份报价来。我们日常也用得上。”
             <</language>><br><br>
             <<deadwood-temple-donation-benefits>>
             <<deadwood-temple-donation-exit>>

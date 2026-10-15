@@ -61,6 +61,8 @@ The pharmacy adds calming, sleep, stimulant, focus and soothing pills. Buy them 
 
 Calming pills relieve stress but add fatigue; sleep pills help sleep recovery; stimulants temporarily suppress fatigue; focus pills improve actual learning; soothing pills temporarily ease trauma burden. Temporarily suppressed burdens can return when effects end.
 
+While focus pills are active, the academic section of the characteristics page shows the 15% increase in learning progress. Your existing subject grades still reflect your actual marks.
+
 Taking doses too early or repeatedly over several days can build dependence; repeated doses do not stack the effect. Harper's treatment includes a medication question when you recently used pills or have dependence. You can disclose or conceal it, but consultation does not immediately remove dependence.
 
 ### Temple weapons
@@ -88,6 +90,8 @@ For Sic Bo, choose an amount and place bets. Click the same amount on the same s
 Rest, watch or talk in the lounge. Train as a dealer with Marlow for an hour to take shifts: <span class="gold">£30</span> base pay plus <span class="gold">£10</span> for correctly handling a dispute. No new shifts after 03:00. Finish your own game first, keep hands and mouth usable and avoid high tiredness. High wariness or regaining your seat through a bribe that night prevents dealer work.
 
 Cheating can lose the night's seating permission. Asking Marlow privately for another chance requires sufficient trust or work performance, costs cash and can be attempted once nightly. Even acceptance does not restore permission to work.
+
+One casino night runs from the evening until 4 am the next morning. Midnight does not reset bans, requests for another chance or that night's profit record.
 
 ### Feats and games at home
 

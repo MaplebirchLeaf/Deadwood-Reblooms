@@ -16,7 +16,12 @@ export default function (maplebirch: typeof window.maplebirch) {
   npc_prototype.bodyPartdescription = function () {
     const extended = this.penissize === 5 && (this.penis === 'clothed' || this.penisdesc === 'penis' || (!this.penisdesc && this.penis !== 'none'));
     describe.call(this);
-    if (extended) this.penisdesc = lanSwitch('gargantuan penis', '骇人肉棒');
+    if (extended) {
+      const language = maplebirch.services.translator.language === 'CN' ? 'CN' : 'EN';
+      this.penisdesc = this.descCache[`deadwood_penis_${language}_5`] ||= (
+        language === 'CN' ? ['骇人肉棒', '慑人肉棒', '可怖肉棒'] : ['gargantuan penis', 'intimidating penis', 'terrifying penis']
+      ).either();
+    }
   };
 
   maplebirch.once(':storyready', () => {
@@ -48,9 +53,18 @@ export default function (maplebirch: typeof window.maplebirch) {
   // NPC 第 5 档复用侧栏第 7 档图片；只修改本次渲染参数。
   maplebirch.char.use(
     'pre',
-    options => {
-      for (const nnpc of [options.maplebirch?.nnpc, options.maplebirch?.previous]) {
-        if (!nnpc?.penis || Math.round(nnpc.bodydata?.penissize ?? 1) !== 5) continue;
+    (options, model) => {
+      const sidebar = V.options.maplebirch.npcsidebar;
+      const enabled = sidebar.model && (model?.name === 'main' ? sidebar.show : sidebar.pet?.enabled);
+      for (const slot of ['nnpc', 'previous'] as const) {
+        const nnpc = options.maplebirch?.[slot];
+        if (!nnpc) continue;
+        if (!enabled || !nnpc.show || !nnpc.model || !V.npc?.includes(nnpc.name) || (slot === 'previous' && !sidebar.second_model)) {
+          nnpc.penis = false;
+          nnpc.penis_size = 0;
+          continue;
+        }
+        if (!nnpc.penis || Math.round(nnpc.bodydata?.penissize ?? 1) !== 5) continue;
         const penis = nnpc.penis.replace(/-6$/, '-7');
         const folder = nnpc.balls ? 'penis' : 'penis-no-balls';
         if (maplebirch.host.modLoader.resources.has(`img/body/${folder}/${penis}.png`) !== true) continue;
@@ -70,6 +84,26 @@ export default function (maplebirch: typeof window.maplebirch) {
       if (options.penis?.size === 'chastity-parasite-7') options.penis.size = 'chastity-parasite-6';
     },
     ['combatClosePenis', 'combatCloseVagina']
+  );
+
+  maplebirch.char.use(
+    'pre',
+    options => {
+      const penis = options.penis;
+      if (!options.showPcPenis || options.npcDouble || penis?.doublePen || penis?.base !== 'sex') return;
+      if (!['machine', 'tentacle'].includes(penis.penetratedType) && window.playerPenisSize() >= 6) penis.size = 6;
+    },
+    'combatXrayPenis'
+  );
+  maplebirch.char.use(
+    'pre',
+    (options, model) => {
+      const penetrator = options[model?.name === 'combatXrayVagina' ? 'vagina' : 'anus'];
+      if (!options.showNpcPenis || !penetrator?.show || penetrator.doublePen || penetrator.base !== 'sex') return;
+      if (V.NPCList?.[penetrator.npc]?.penissize !== 5) return;
+      if (['human', 'plant'].includes(penetrator.npcType) && ['penis', 'strapon', 'tentacle'].includes(penetrator.penetratorSprite)) penetrator.size = 6;
+    },
+    ['combatXrayVagina', 'combatXrayArse']
   );
 
   const clamp = { src: 'Math.clamp($player.penissize, 0, 6)', to: 'Math.clamp($player.penissize, 0, 7)', expected: 1 };

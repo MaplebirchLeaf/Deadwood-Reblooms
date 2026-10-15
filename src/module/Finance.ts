@@ -333,7 +333,12 @@ class Finance extends Module {
     this.core.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-adrian-business', {
       exact: true,
       priority: -1,
-      cond: () => V.Finance.adrian.career > 0 && V.Finance.adrian.career < 5,
+      cond: () => !V.replayScene && !V.statFreeze && !!V.Finance?.adrian && V.Finance.adrian.career > 0 && V.Finance.adrian.career < 5,
+      action: () => this.core.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-adrian-business-day>>')
+    });
+    this.core.dynamic.regTimeEvent('onTimeTravel', 'deadwood-reblooms-adrian-business-travel', {
+      priority: -1,
+      cond: data => data.direction === 'forward' && !V.replayScene && !V.statFreeze && !!V.Finance?.adrian && V.Finance.adrian.career > 0 && V.Finance.adrian.career < 5,
       action: () => this.core.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-adrian-business-day>>')
     });
     // 追债只在小镇街道遇到，神殿、农场、战斗和昏厥流程不插入金融事件。
@@ -360,9 +365,14 @@ class Finance extends Module {
       action: () => this.updateDay(),
       exact: true
     });
+    this.core.dynamic.regTimeEvent('onTimeTravel', ':deadwood-reblooms-finance-market-travel', {
+      cond: data => data.direction === 'forward',
+      action: () => this.updateDay()
+    });
   }
 
   private updateDay(): void {
+    if (!V.Finance || V.replayScene || V.statFreeze || Finance.currentDay < V.Finance.market.day) return;
     // 行情仍按游戏时间事件刷新，个人债务由房产结算循环按日期推进。
     Finance.updateAccountTier(this.state.bank);
     Finance.resetAtmLimit(this.state.bank);
@@ -920,8 +930,11 @@ class Finance extends Module {
     finance.market.avery_fate ??= String(V.avery_fate ?? '');
     if (finance.bank.opened && finance.bank.bank_interest_last_day < 0) finance.bank.bank_interest_last_day = Finance.currentDay;
     if (finance.bank.opened && finance.bank.opened_day < 0) finance.bank.opened_day = Finance.currentDay;
-    Finance.updateAccountTier(finance.bank);
-    Finance.resetAtmLimit(finance.bank);
+    // 冻结、回忆及回拨到已处理的日期前，读取状态不更新账户等级与取款额度。
+    if (!V.replayScene && !V.statFreeze && Finance.currentDay >= finance.market.day) {
+      Finance.updateAccountTier(finance.bank);
+      Finance.resetAtmLimit(finance.bank);
+    }
     if (finance.bank.credit_debt > 0 && finance.bank.credit_due_day <= 0) {
       finance.bank.credit_due_day = Finance.currentDay + bankingTerms.creditBillingDays;
     }
@@ -953,15 +966,15 @@ class Finance extends Module {
   }
 
   private static get currentWeek(): number {
-    // 原版 Time.weekDay 是 1=周日 … 7=周六（见 datetime.js 的 weekEnd：7 或 1 为周末）。
-    // 以周日为一周起点回推，否则周日会算出与本周其余六天不同的 id，ATM 额度一周重置两次。
+    // Time.days 按开局时刻换日，weekday 按午夜变化；周额度统一按日历午夜计算。
     const weekDay = Math.clamp(Math.floor(Number(Time.weekDay) || 1), 1, 7);
-    return Finance.currentDay - (weekDay - 1);
+    const day = Math.floor(Time.date.timeStamp / TimeConstants.secondsPerDay) - Math.floor(Time.startDate.timeStamp / TimeConstants.secondsPerDay);
+    return day - (weekDay - 1);
   }
 
   private static resetAtmLimit(bank: BankState): void {
     const week = Finance.currentWeek;
-    if (bank.atm_week === week) return;
+    if (bank.atm_week >= week) return;
     bank.atm_week = week;
     bank.atm_withdrawn = 0;
   }

@@ -72,7 +72,9 @@
 <</widget>>
 
 <<widget 'deadwood-industry-return'>>
-  <br><<getouticon>><<lanLink ['Return to the yard', '返回厂房院落'] 'Deadwood Reblooms Factory'>><</lanLink>><br>
+  <br><<getouticon>><<lanLink ['Return to the yard', '返回厂房院落'] 'Deadwood Reblooms Factory'>>
+    <<if $passage is 'Deadwood Reblooms Factory Decision'>><<set $Finance.industry.decision to null, $Finance.industry.result to null>><</if>>
+  <</lanLink>><br>
 <</widget>>
 
 <<widget 'deadwood-industry-burden'>>
@@ -118,7 +120,7 @@
     <<else>>
       <span class='red'><<lanSwitch "The arrangement could not be made. Check the available funds, opening hours and outstanding obligations." "未能办妥。请核对可用资金、营业时间和未结清的款项。">></span>
     <</if>><br><br>
-    <<set $Finance.industry.result to null>>
+    <<if $passage isnot 'Deadwood Reblooms Factory Decision'>><<set $Finance.industry.result to null>><</if>>
   <</if>>
 <</widget>>
 
@@ -652,7 +654,7 @@
           “这儿的玻璃不少。”另一个说道。“还有人下班晚。我们可以帮忙照看。”
           不等你看清其他名字，对方就把名单折了起来。罗文站在门边，手里的扳手还没放下。
       <</language>><br><br>
-      <<deadwood-reblooms-finance-money _factory_issue.cost>><br>
+      <<lanSwitch 'Payment from factory funds: ' '从工厂周转金支付：'>><<deadwood-reblooms-finance-money _factory_issue.cost>><br>
       <<lanLink ['Pay them (0:15)', '给他们钱 (0:15)'] 'Deadwood Reblooms Factory Decision'>>
         <<set $Finance.industry.result to maplebirch.get('Finance').industry.resolve('pay') ? 'ok' : 'failed'>>
         <<if $Finance.industry.result is 'ok'>><<stress 8>><<pass 15>><</if>>
@@ -664,17 +666,17 @@
     <<case 'haul'>>
       <<language>>
         <<option 'EN'>>
-          A van with blacked-out windows is parked across the loading bay. The driver hands you an envelope containing a delivery note and an offer of a large fee.
+          A van with blacked-out windows is parked across the loading bay. The driver hands you an envelope. A large fee is written on the delivery note inside.
           "Store a crate. Let the next driver collect it. No receipt, no questions. You stay to open the gate."
           An antler-shaped pin catches the light beneath the driver's collar. Beyond the fence, a door <<if $compound?.discovered>>in the compound<<else>>in a high-walled building<</if>> slams shut.
           <<if $confessorQuestions?.includes('auriga')>>You remember the confessor's warning about <span class='tentacle'>the Children of Auriga</span>.<</if>>
         <<option 'CN'>>
-          一辆车窗漆黑的面包车横在装货门前。司机递给你一个信封，里面是一张送货单和一笔可观的报酬。
+          一辆车窗漆黑的面包车横在装货门前。司机递给你一个信封，里面的送货单上写着一笔可观的报酬。
           “存一个箱子。下一位司机来取。不要收据，也别问。你留下开门。”
           司机领口下，一枚鹿角形的别针闪了一下。围栏另一头，<<if $compound?.discovered>>神秘大院里<<else>>高墙后<</if>>的一扇门砰地关上。
           <<if $confessorQuestions?.includes('auriga')>>你想起忏悔神父对<span class='tentacle'>奥利加之子</span>的警告。<</if>>
       <</language>><br><br>
-      <<lanSwitch "Offered fee: " "报酬：">><<deadwood-reblooms-finance-money _factory.terms.risks.haulFee>><br>
+      <<lanSwitch 'Offered fee (paid into factory funds on collection): ' '报酬（取货后付入工厂周转金）：'>><<deadwood-reblooms-finance-money _factory.terms.risks.haulFee>><br>
       <<lanLink ['Agree to stay for the collection (1:00)', '留下等人取货 (1:00)'] 'Deadwood Reblooms Factory Decision'>>
         <<set $Finance.industry.result to maplebirch.get('Finance').industry.resolve('haul') ? 'ok' : 'failed'>>
         <<if $Finance.industry.result is 'ok'>><<stress 18>><<trauma 25>><<pass 60>><</if>>
@@ -781,7 +783,8 @@
         <<case 'sell'>>买家收走钥匙。工资、厂房费用与解约费结清后，余款转入你的银行。未收货款也包含在转让里，之后不会再付给你。
       <</switch>>
   <</language>><br><br>
-  <<set $Finance.industry.decision to null>><<set $Finance.industry.result to null>>
+<<elseif !$Finance.industry.result>>
+  <<lanSwitch 'There is no new decision to review.' '暂无新的处理结果。'>><br>
 <<else>>
   <<deadwood-industry-result>>
 <</if>>

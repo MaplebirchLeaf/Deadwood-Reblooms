@@ -101,6 +101,10 @@ class Transport extends Module {
   public override preInit(): void {
     super.preInit();
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-transport-upkeep', { action: () => this.maintenance.settle() });
+    this.core.dynamic.regTimeEvent('onTimeTravel', ':deadwood-transport-upkeep-travel', {
+      cond: data => data.direction === 'forward' && !!V.Transport,
+      action: () => this.maintenance.settle()
+    });
     this.core.on(':passagestart', () => {
       V.Transport ??= clone(Transport.defaults);
       const title = this.core.passage.title;
@@ -133,6 +137,12 @@ class Transport extends Module {
 
   public get canApproach(): boolean {
     if (!this.ready || (!Catalog.point(this.core.passage.title) && this.core.passage.title !== 'Shopping Centre') || V.nextPassageCheck) return false;
+    // 地图移动会隐藏文字交通链接，原版仍在 link_table 中保留当前可用路线。
+    const travel =
+      !['Shopping Centre', 'Forest', 'Moor'].includes(this.core.passage.title) &&
+      Array.isArray(V.link_table) &&
+      V.link_table.some(entry => entry.includes('|Bus]]') || Catalog.routes.some(route => route.passage !== this.core.passage.title && entry.includes(`|${route.passage}]]`)));
+    if (travel || (this.core.passage.title.endsWith(' Street') && Array.isArray(V.link_table))) return travel;
     const links = new this.core.tool.link('passage-content', '.macro-link', this.core.tool.log);
     if (!links.detect()) return false;
     if (this.core.passage.title === 'Shopping Centre') {
@@ -140,9 +150,6 @@ class Transport extends Module {
     }
     if (['Forest', 'Moor'].includes(this.core.passage.title)) {
       return this.trail_menu && links.links.filter(link => link.getAttribute('data-passage') === this.core.passage.title).length >= 3;
-    }
-    if (this.core.passage.title.endsWith(' Street') && Array.isArray(V.link_table)) {
-      return V.link_table.some(entry => entry.includes('|Bus]]') || Catalog.routes.some(route => route.passage !== this.core.passage.title && entry.includes(`|${route.passage}]]`)));
     }
     return links.links.some(link => {
       const passage = link.getAttribute('data-passage');
@@ -278,7 +285,10 @@ class Transport extends Module {
   }
 
   public journeyWear(model: VehicleModel, minutes: number, trail = false): number {
-    return (minutes / 60) * model.wear_per_hour * (trail ? (model.trail_wear ?? 1.5) : 1);
+    const races = this.core.get('StreetLife')?.races;
+    // 共用基础损耗入口，赛事驾驶方式与事故附加损伤仍由各自场景结算。
+    const reduction = model.kind === 'motor_vehicle' && races?.seasonedDriver ? races.terms.seasoned_driver.wear_reduction : 0;
+    return (minutes / 60) * model.wear_per_hour * (trail ? (model.trail_wear ?? 1.5) : 1) * (1 - reduction);
   }
 
   public get forestRoad(): boolean {

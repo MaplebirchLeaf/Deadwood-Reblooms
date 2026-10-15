@@ -1,0 +1,284 @@
+:: Deadwood Street Race Widgets [widget]
+
+<<widget 'deadwood-street-race-link'>>
+  <<if maplebirch.get('StreetLife')?.races.available and maplebirch.get('StreetLife').races.nightOpen and !Weather.isSnow and maplebirch.get('Transport')?.ready and !$nextPassage and !$nextPassageCheck>>
+    <<roadicon>><<lanLink ['Approach the cars by the roadside', '走近停在路边的赛车']>>
+      <<if maplebirch.get('StreetLife')?.races.open() and $passage is 'Farm Road 1'>>
+        <<goto 'Deadwood Street Races'>>
+      <</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-street-race-reason'>>
+  <<switch _args[0]>>
+    <<case 'closed'>>
+      <<lanSwitch 'The drivers gather here between 8 pm and 4 am.' '车手们在晚上八点到凌晨四点之间聚集在这里。'>>
+    <<case 'snow'>>
+      <<lanSwitch 'Snow has made the course unsafe. There is no race tonight.' '积雪让赛道无法安全通行，今晚不比赛。'>>
+    <<case 'busy'>>
+      <<lanSwitch 'Finish your current journey or commitment before entering a race.' '请先完成当前的行程或约定，再来参赛。'>>
+    <<case 'unfit'>>
+      <<lanSwitch 'You are in no condition to race.' '你现在的状况不适合赛车。'>>
+    <<case 'vehicle'>>
+      <<if _streetRaces.vehicle?.arrears gt 0>>
+        <<lanSwitch 'Settle your car’s unpaid upkeep before entering.' '补缴汽车的保养费用后才能参赛。'>>
+      <<else>>
+        <<lanSwitch 'You need to bring an eligible car here. Vehicles parked elsewhere cannot enter.' '你需要把符合条件的汽车开到这里，停在别处的车不能参赛。'>>
+      <</if>>
+    <<case 'license'>>
+      <<lanSwitch 'You need a car driving licence.' '你需要汽车驾驶执照。'>>
+    <<case 'condition'>>
+      <<lanSwitch 'Your car needs servicing before it can enter.' '你的车需要先做保养维修，才能参赛。'>>
+    <<case 'fuel'>>
+      <<lanSwitch 'You do not have enough fuel to finish the course.' '车里的燃油不足以跑完全程。'>>
+    <<case 'played'>>
+      <<lanSwitch 'You have already entered this class tonight.' '你今晚已经参加过这个组别了。'>>
+    <<case 'skill'>>
+      <<lanSwitch 'You need more driving experience before entering this class.' '你的驾驶经验还不足以参加这个组别。'>>
+    <<case 'money'>>
+      <<lanSwitch 'You do not have enough cash for the entry fee.' '你身上的现金不足以支付报名费。'>>
+  <</switch>>
+<</widget>>
+
+<<widget 'deadwood-street-race-status'>>
+  <<set _raceStatusVehicle to _args[0] ?? _streetRaces.vehicle>>
+  <<set _raceStatusModel to maplebirch.get('Transport').catalog.models.find(item => item.id === _raceStatusVehicle?.model)>>
+  <<if _raceStatusVehicle and _raceStatusModel>>
+    <<icon `'transport/' + _raceStatusModel.id + '.png'`>><b><<= maplebirch.t(_raceStatusModel.name)>></b> · <<lanSwitch 'Condition: ' '车况：'>><<deadwood-transport-condition _raceStatusVehicle>> · <<lanSwitch 'Fuel: ' '油量：'>><span class='teal'><<= _raceStatusVehicle.fuel.toFixed(1)>> L</span><br>
+    <<if _streetRaces.seasonedDriver>>
+      <span class='green'><<lanSwitch 'Seasoned Driver: baseline driving wear on cars is reduced by 10%.' '老练车手：驾驶汽车的基础车况损耗降低10%。'>></span><br>
+    <</if>>
+  <</if>>
+  <<if _streetRaces.state.session>>
+    <<lanSwitch 'Completed sections: ' '已完成赛段：'>><span class='teal'><<= _streetRaces.state.session.step>> / <<= _streetRaces.terms.stages.length>></span> · <<lanSwitch 'Time since entry: ' '报名后经过时间：'>><span class='teal'><<= _streetRaces.state.session.minutes>></span> <<lanSwitch 'minutes' '分钟'>><br>
+  <</if>>
+<</widget>>
+
+<!-- 名次取自已结算的赛段；重绘只显示记录，不重新抽取结果。 -->
+<<widget 'deadwood-street-race-standings'>>
+  <<for _raceStanding range _streetRaces.standings>>
+    <span @class="_raceStanding.id === 'pc' ? 'gold' : ''"><<= _raceStanding.place>>. <<= lanSwitch(_raceStanding.name.EN, _raceStanding.name.CN)>></span><br>
+  <</for>>
+<</widget>>
+
+<<widget 'deadwood-street-race-incident'>>
+  <<switch _args[0]>>
+    <<case 'traffic'>>
+      <<language>>
+        <<option 'EN'>>
+          A slower car held you up. You eased off until there was room to pass.
+        <<option 'CN'>>
+          一辆慢车挡住了去路。你收住油门，等有足够空间才超过去。
+      <</language>><br>
+    <<case 'slide'>>
+      <<language>>
+        <<option 'EN'>>
+          The tyres lose their grip. You wrestle the car back into line, with a fresh scrape to remember it by.
+        <<option 'CN'>>
+          轮胎突然失去抓地力。你费劲把车身拉回正轨，车上留下了一道新的擦痕。
+      <</language>><br>
+    <<case 'clear'>>
+      <<language>>
+        <<option 'EN'>>
+          You make it through the section without incident. The next stretch opens ahead of your headlights.
+        <<option 'CN'>>
+          你顺利跑完这一赛段，车灯照亮了前方的下一段路。
+      <</language>><br>
+  <</switch>>
+<</widget>>
+
+<!-- 停赛或关闭模块时仍按实际抵达节点离开，不把车辆送回起点。 -->
+<<widget 'deadwood-street-race-exit'>>
+  <<set _raceExitPoint to $StreetLife?.races?.session?.point ?? $Transport?.origin ?? $StreetLife?.races?.last?.point ?? 'farmroad1'>>
+  <<set _raceExitPassage to _streetRaces?.exitPassage ?? (_raceExitPoint is 'farmland' ? 'Farmland' : /^farmroad[1-6]$/.test(_raceExitPoint) ? 'Farm Road ' + _raceExitPoint.slice(-1) : 'Farm Road 1')>>
+  <<getouticon>><<lanLink `_raceExitPassage === 'Farmland' ? ['Continue into the farmlands', '走向农田'] : ['Return to the road', '返回公路']` _raceExitPassage>><</lanLink>><br>
+<</widget>>
+
+
+:: Deadwood Street Races
+<<set _streetRaces to maplebirch.get('StreetLife')?.races>>
+<<if _streetRaces and maplebirch.get('Transport')>>
+  <<if _streetRaces.state.session>>
+    <<deadwood-street-race-status>><br>
+    <<roadicon>><<lanLink ['Continue the race', '继续比赛'] 'Deadwood Street Race'>><</lanLink>><br>
+  <<else>>
+    <<if _streetRaces.state.last>>
+      <<set _raceReport to _streetRaces.state.last>>
+      <b><<lanSwitch 'Latest race result' '最近一场比赛的结果'>></b> · <<= lanSwitch(_streetRaces.group.name.EN, _streetRaces.group.name.CN)>><br>
+      <<language>>
+        <<option 'EN'>>
+          <<if _raceReport.outcome is 'finished'>>
+            You ease off after the finish marker and pull into the lay-by. The other engines settle into an uneven rumble as the drivers confirm the finishing order.
+          <<elseif _raceReport.outcome is 'withdrawn'>>
+            You let the other cars go and pull over where there is room. Their tail lights disappear along the road.
+          <<elseif _raceReport.outcome is 'crashed'>>
+            You bring the damaged car to a halt. The race carries on without you.
+          <<else>>
+            Your run has been cut short. You will have to leave this race unfinished.
+          <</if>>
+        <<option 'CN'>>
+          <<if _raceReport.outcome is 'finished'>>
+            驶过终点标记后，你松开油门，拐进路边的停车处。车手们凑在一起确认名次，几台发动机仍在不齐地低鸣。
+          <<elseif _raceReport.outcome is 'withdrawn'>>
+            你让其它车辆先行，找了个宽敞处靠边停下。它们的尾灯沿公路渐渐远去。
+          <<elseif _raceReport.outcome is 'crashed'>>
+            你让受损的汽车停了下来。其它车辆仍在比赛，你已经无法继续。
+          <<else>>
+            你的比赛被意外打断，只能就此结束。
+          <</if>>
+      <</language>><br><br>
+      <<if _raceReport.outcome is 'finished'>>
+        <<if _raceReport.group is 'open' and _raceReport.place is 1 and !$replayScene and !$statFreeze>>
+          <<earnFeat 'Deadwood First Open Win'>>
+        <</if>>
+        <<lanSwitch 'Final standings' '最终名次'>><br>
+        <<deadwood-street-race-standings>><br>
+      <</if>>
+      <<lanSwitch 'Entry fee paid: ' '已付报名费：'>><<printmoney _streetRaces.group.fee>><br>
+      <<lanSwitch 'Prize received: ' '已领奖金：'>><<printmoney _raceReport.payout>><br>
+      <<lanSwitch 'Time spent, including preparations: ' '经过时间（含准备）：'>><span class='teal'><<= _raceReport.minutes>></span> <<lanSwitch 'minutes' '分钟'>> · <<lanSwitch 'Fuel used: ' '消耗燃油：'>><span class='teal'><<= _raceReport.fuel.toFixed(1)>> L</span> · <<lanSwitch 'Condition lost: ' '车况下降：'>><span class='red'><<= _raceReport.wear.toFixed(1)>></span> <<lanSwitch 'percentage points' '个百分点'>><br>
+      <<if _raceReport.noticed>>
+        <span class='red'><<lanSwitch 'Someone got a clear look at your dangerous driving.' '有人看清了你危险驾驶的行为。'>></span><br>
+      <</if>><br>
+      <<if _raceReport.outcome is 'finished'>>
+        <<for _raceRival range _streetRaces.terms.rivals>>
+          <<set _raceRivalReply to _streetRaces.standings.find(item => item.id === _raceRival.id).place gt _raceReport.place ? _raceRival.lose : _raceRival.win>>
+          <<= lanSwitch(_raceRivalReply.EN, _raceRivalReply.CN)>><br>
+        <</for>><br>
+      <</if>>
+      <<deadwood-street-race-status `maplebirch.get('Transport').state.vehicles.find(item => item.id === _raceReport.vehicle)`>>
+    <</if>>
+    <<if $Transport.origin is 'farmroad1'>>
+      <<language>>
+        <<option 'EN'>>
+          A few cars stand off the road, their headlights turned away from the nearby houses. Someone marks down the entrants on a folded sheet of paper. "One run to the fields. Keep going past the crest. You'll see the finish lights before the turn into the farmlands."
+        <<option 'CN'>>
+          几辆车停在路边，车灯避开了附近的房屋。一个人拿着折起的纸，登记参赛者。“一路跑到田边。过了山顶继续走，进农田的岔口前就能看见终点灯。”
+      <</language>><br><br>
+      <<lanSwitch 'Route: town outskirts' '路线：小镇外公路'>><<for _raceRouteStage range _streetRaces.terms.stages>> → <<= lanSwitch(_raceRouteStage.name.EN, _raceRouteStage.name.CN)>><</for>><br>
+      <<language>>
+        <<option 'EN'>>
+          There are <<= _streetRaces.terms.stages.length>> sections, taking about <<= _streetRaces.terms.entry_minutes + _streetRaces.terms.stages.reduce((total, stage) => total + stage.minutes, 0)>> minutes including preparations. This is a one-way race to the farmland entrance. Your car stays where you finish or withdraw.
+        <<option 'CN'>>
+          全程 <<= _streetRaces.terms.stages.length>> 个赛段，连同报名准备约需 <<= _streetRaces.terms.entry_minutes + _streetRaces.terms.stages.reduce((total, stage) => total + stage.minutes, 0)>> 分钟。这是一场通往农田入口的单程比赛，完赛或退赛后，汽车会停在你抵达的地方。
+      <</language>><br><br>
+      <<for _raceRival range _streetRaces.terms.rivals>>
+        <<= lanSwitch(_raceRival.before.EN, _raceRival.before.CN)>><br>
+      <</for>><br>
+      <span class='blue'><<lanSwitch 'Entries are taken from 8 pm to 4 am. Each class can be entered once per night; withdrawing still uses your entry, and the fee is not refunded.' '报名时间为晚上八点至凌晨四点。每个组别每晚只能参加一次，退赛也计入次数，且不退报名费。'>></span><br>
+      <span class='blue'><<lanSwitch 'The road remains open to traffic. Dangerous driving can leave evidence. Fuel and damage are yours to cover.' '公路上仍有其它车辆通行，危险驾驶可能留下罪证。燃油和修车费用由你自己承担。'>></span><br><br>
+      <<if _streetRaces.nearby.length>>
+        <<lanSwitch 'Cars you brought here' '停在这里的汽车'>><br>
+        <<for _raceCar range _streetRaces.nearby>>
+          <<set _raceCarModel to maplebirch.get('Transport').catalog.models.find(item => item.id === _raceCar.model)>>
+          <<capture _raceCar>>
+            <<icon `'transport/' + _raceCarModel.id + '.png'`>>
+            <<if $Transport.selected is _raceCar.id>>
+              <span class='gold'><<= maplebirch.t(_raceCarModel.name)>> · <<lanSwitch 'Selected for the race' '当前参赛车辆'>></span>
+            <<else>>
+              <<lanLink `maplebirch.t(_raceCarModel.name)`>>
+                <<if maplebirch.get('StreetLife')?.races.nearby.some(item => item.id === _raceCar.id)>>
+                  <<set $Transport.selected to _raceCar.id>><<goto 'Deadwood Street Races'>>
+                <</if>>
+              <</lanLink>>
+            <</if>> · <<deadwood-transport-condition _raceCar>> · <span class='teal'><<= _raceCar.fuel.toFixed(1)>> L</span><br>
+          <</capture>>
+        <</for>><br>
+      <</if>>
+      <<if _streetRaces.reason>>
+        <span class='blue'><<deadwood-street-race-reason _streetRaces.reason>></span><br><br>
+      <</if>>
+      <<for _raceEntry range _streetRaces.entries>>
+        <<capture _raceEntry>>
+          <b><<= lanSwitch(_raceEntry.name.EN, _raceEntry.name.CN)>></b> · <<lanSwitch 'Entry: ' '报名费：'>><<printmoney _raceEntry.fee>><br>
+          <<lanSwitch 'Prizes: 1st ' '奖金：第一名 '>><<printmoney _raceEntry.prizes[0]>> · <<lanSwitch '2nd ' '第二名 '>><<printmoney _raceEntry.prizes[1]>> · <<lanSwitch '3rd ' '第三名 '>><<printmoney _raceEntry.prizes[2]>> · <<lanSwitch 'No prize for 4th' '第四名无奖金'>><br>
+          <<if _raceEntry.driving gt 0>>
+            <<lanSwitch 'Driving experience required: ' '所需驾驶熟练度：'>><span class='teal'><<= _raceEntry.driving>></span><br>
+          <</if>>
+          <<if !_raceEntry.reason>>
+            <<roadicon>><<lanLink ['Pay the fee and start (0:02)', '缴费并发车 (0:02)']>>
+              <<if maplebirch.get('StreetLife')?.races.begin(_raceEntry.id) and $passage is 'Deadwood Street Races'>>
+                <<updatesidebarmoney>>
+                <<if maplebirch.get('StreetLife').races.state.session>>
+                  <<goto 'Deadwood Street Race'>>
+                <<else>>
+                  <<goto 'Deadwood Street Races'>>
+                <</if>>
+              <</if>>
+            <</lanLink>>
+          <<elseif _raceEntry.reason isnot _streetRaces.reason>>
+            <span class='blue'><<deadwood-street-race-reason _raceEntry.reason>></span>
+          <</if>><br><br>
+        <</capture>>
+      <</for>>
+      <<if _streetRaces.state.watched is _streetRaces.night>>
+        <<language>>
+          <<option 'EN'>>
+            You have already watched a start tonight. You saw the cars set off one after another, their engines fading towards the hills.
+          <<option 'CN'>>
+            你今晚已经旁观过一次发车。几辆车先后驶向丘陵，引擎的轰鸣渐渐消失在远处。
+        <</language>><br>
+      <<elseif _streetRaces.nightOpen and !Weather.isSnow and maplebirch.get('Transport').ready and !$nextPassage and !$nextPassageCheck>>
+        <<roadicon>><<lanLink ['Watch the cars set off (0:10)', '留在起点观看发车 (0:10)']>>
+          <<if maplebirch.get('StreetLife')?.races.watch() and $passage is 'Deadwood Street Races'>>
+            <<goto 'Deadwood Street Races'>>
+          <</if>>
+        <</lanLink>><br>
+      <</if>>
+    <</if>>
+  <</if>><br>
+  <<deadwood-street-race-exit>>
+<<else>>
+  <<lanSwitch 'There is no race to enter.' '现在没有可以参加的比赛。'>><br>
+  <<deadwood-street-race-exit>>
+<</if>>
+
+
+:: Deadwood Street Race
+<<set _streetRaces to maplebirch.get('StreetLife')?.races>>
+<<if _streetRaces?.state.session and maplebirch.get('Transport')>>
+  <<set _raceRun to _streetRaces.state.session, _raceStep to _raceRun.step, _raceStage to _streetRaces.stage>>
+  <<if _raceStep gt 0>>
+    <b><<lanSwitch 'Previous section: ' '上一赛段：'>><<= lanSwitch(_streetRaces.terms.stages[_raceStep - 1].name.EN, _streetRaces.terms.stages[_raceStep - 1].name.CN)>></b><br>
+    <<deadwood-street-race-incident _raceRun.incident>><br>
+  <</if>>
+  <<deadwood-street-race-status>><br>
+  <<if _raceStep gt 0>>
+    <<lanSwitch 'Current standings' '当前名次'>><br>
+    <<deadwood-street-race-standings>><br>
+  <</if>>
+  <b><<lanSwitch 'Next section: ' '下一赛段：'>><<= _raceStep + 1>> / <<= _streetRaces.terms.stages.length>> · <<= lanSwitch(_raceStage.name.EN, _raceStage.name.CN)>></b><br>
+  <<= lanSwitch(_raceStage.description.EN, _raceStage.description.CN)>><br><br>
+  <<if Weather.precipitation is 'rain'>>
+    <span class='blue'><<lanSwitch 'Rain slicks the road. Losing traction is more likely.' '雨水打湿了路面，轮胎更容易打滑。'>></span><br><br>
+  <</if>>
+  <<for _raceStyle range _streetRaces.terms.styles>>
+    <<capture _raceStyle _raceStep>>
+      <<roadicon>><<lanLink `lanSwitch(_raceStyle.name.EN, _raceStyle.name.CN) + ' (0:' + String(_raceStage.minutes).padStart(2, '0') + ')'`>>
+        <<if maplebirch.get('StreetLife')?.races.advance(_raceStyle.id, _raceStep) and $passage is 'Deadwood Street Race'>>
+          <<if maplebirch.get('StreetLife').races.state.session>>
+            <<goto 'Deadwood Street Race'>>
+          <<else>>
+            <<updatesidebarmoney>><<goto 'Deadwood Street Races'>>
+          <</if>>
+        <</if>>
+      <</lanLink>>
+      <span class='grey'> | <<= lanSwitch(_raceStyle.description.EN, _raceStyle.description.CN)>></span><br>
+    <</capture>>
+  <</for>><br>
+  <<capture _raceStep>>
+    <<refuseicon>><<lanLink ['Pull over and withdraw', '靠边停车，退出比赛']>>
+      <<if maplebirch.get('StreetLife')?.races.withdraw(_raceStep) and $passage is 'Deadwood Street Race'>>
+        <<goto 'Deadwood Street Races'>>
+      <</if>>
+    <</lanLink>><br>
+  <</capture>>
+<<else>>
+  <<lanSwitch 'This run is over.' '这场比赛已经结束了。'>><br>
+  <<if _streetRaces and maplebirch.get('Transport')>>
+    <<getouticon>><<lanLink ['Review the result', '查看比赛结果'] 'Deadwood Street Races'>><</lanLink>><br>
+  <<else>>
+    <<deadwood-street-race-exit>>
+  <</if>>
+<</if>>

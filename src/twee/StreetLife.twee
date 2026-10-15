@@ -1,5 +1,30 @@
 :: Deadwood Street Life Widgets [widget]
 
+<!-- 系数与 deadwood-street-weapon 的 _streetAim 公式保持一致；只读原版练枪统计，不另建技能。 -->
+<<widget 'deadwood-street-firearm-effectiveness'>>
+  <<if maplebirch.get('StreetLife') and ['handheld', 'handheld_left'].some(slot => setup.clothes.handheld[$worn[slot]?.index]?.streetWeapon)>>
+    <<set _streetGunFactor to Math.clamp(0.6 + Math.clamp($stat_shoot / 1000, 0, 1) * 0.4 - Math.clamp($pain / 100, 0, 1) * 0.1, 0.6, 1)>>
+    <<language>>
+      <<option 'EN'>>
+        <<set _streetGunDescription to 'Effective damage: ' + Number((_streetGunFactor * 100).toFixed(2)) + '%<br>Shooting practice: ' + $stat_shoot>>
+      <<option 'CN'>>
+        <<set _streetGunDescription to '有效伤害系数：' + Number((_streetGunFactor * 100).toFixed(2)) + '%<br>射击练习：' + $stat_shoot>>
+    <</language>>
+    <<if $pain gt 0>>
+      <<set _streetGunPainPenalty to Number(((0.6 + Math.clamp($stat_shoot / 1000, 0, 1) * 0.4 - _streetGunFactor) * 100).toFixed(2))>>
+      <<if _streetGunPainPenalty gt 0>>
+        <<language>>
+          <<option 'EN'>>
+            <<set _streetGunDescription += '<br><span class="red">Pain: −' + _streetGunPainPenalty + ' percentage points</span>'>>
+          <<option 'CN'>>
+            <<set _streetGunDescription += '<br><span class="red">疼痛影响：−' + _streetGunPainPenalty + ' 个百分点</span>'>>
+        <</language>>
+      <</if>>
+    <</if>>
+    <<characteristic-box `{name: lanSwitch('Firearm effectiveness', '枪械效能'), icon: 'misc/icon/clothes/street-handgun', currentValue: _streetGunFactor * 100, description: _streetGunDescription, color: 'blue', meterColor: 'blue', modifier: 100, modTypes: {good: [], bad: []}}`>>
+  <</if>>
+<</widget>>
+
 <<widget 'deadwood-street-reputation'>>
   <<set $_streetRep to maplebirch.get('StreetLife').reputation>>
   <<if $_streetRep gte 80>>

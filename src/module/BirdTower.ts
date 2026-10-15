@@ -64,15 +64,18 @@ class BirdTower extends Module {
         this.dayTick(days, midnight);
       }
     });
-    // 狩猎队伍在外时按分钟消耗体力，只有身处鹰塔、荒原或城堡才计时。
-    this.core.dynamic.regTimeEvent('onMin', ':deadwood-birdtower-hunt-timer', {
+    // 狩猎队伍在外时按实际秒数累计，只在身处鹰塔、荒原或城堡时计时。
+    this.core.dynamic.regTimeEvent('onAfter', ':deadwood-birdtower-hunt-timer', {
       action: data => {
-        if (!['tower', 'moor', 'castle'].includes(V.location)) return;
-        const minutes = Number(data.min) || 0;
-        if (minutes <= 0) return;
+        if (V.replayScene || V.statFreeze || !['tower', 'moor', 'castle'].includes(V.location)) return;
+        const seconds = Number(data.diffSeconds);
+        if (!Number.isFinite(seconds) || seconds <= 0) return;
         for (const child of this.all) {
           const { activity, timer } = child.development;
-          if (childIsBorn(child) && activity === 'hunting' && typeof timer === 'number' && Number.isFinite(timer)) child.development.timer = Math.max(0, timer - minutes);
+          if (childIsBorn(child) && activity === 'hunting' && typeof timer === 'number' && Number.isFinite(timer)) {
+            // 存档仍以分钟保存，先还原整数秒，避免逐秒扣除留下正浮点余量。
+            child.development.timer = Math.max(0, Math.round(timer * TimeConstants.secondsPerMinute) - seconds) / TimeConstants.secondsPerMinute;
+          }
         }
       }
     });
@@ -166,8 +169,9 @@ class BirdTower extends Module {
       // 分食累加可能产生浮点误差，整餐份额保持整数。
       child.development.fed_daily = Math.abs(fed - Math.round(fed)) < 1e-9 ? Math.round(fed) : fed;
       child.development.activity = 'lurkerEat';
-      child.development.activityDay = Time.days;
-      child.development.activityHour = Time.hour - 3;
+      const eating = new DateTime(Time.date).addHours(-3);
+      child.development.activityDay = Math.floor((eating.timeStamp - Time.startDate.timeStamp) / TimeConstants.secondsPerDay);
+      child.development.activityHour = eating.hour;
     }
     receipt.ids = children.map(child => child.childId);
     receipt.spent = spent;
@@ -320,7 +324,12 @@ class BirdTower extends Module {
       child.development.timer ??= 30;
       if (Number.isFinite(child.development.timer)) return;
     }
-    const elapsed = Time.hour - activityHour + 24 * Math.clamp(Time.days - activityDay, 0, Infinity);
+    // activityDay 属于从开局时刻起算的 24 小时区间；其边界不是午夜。
+    const dayStart = Time.startDate.timeStamp + activityDay * TimeConstants.secondsPerDay;
+    let activityAt = Math.floor(dayStart / TimeConstants.secondsPerDay) * TimeConstants.secondsPerDay + activityHour * TimeConstants.secondsPerHour;
+    if (activityAt < dayStart) activityAt += TimeConstants.secondsPerDay;
+    // 回拨时间后保留未来记录，不为推进活动而把它强移到过去。
+    const elapsed = Math.max(0, (Time.date.timeStamp - activityAt) / TimeConstants.secondsPerHour);
     if (elapsed < 4 && !(Time.hour === 7 && elapsed >= 2) && activity !== 'noEvent') return;
     const days = getChildDays(childId);
     const night = Time.dayState === 'night' && V.bird.state === 'home' && ['sleep', 'rest', 'brood'].includes(V.bird.activity);

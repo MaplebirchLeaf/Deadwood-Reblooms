@@ -4,96 +4,91 @@
 
 [![Game](https://img.shields.io/badge/Game-Degrees%20of%20Lewdity-purple)](https://gitgud.io/Vrelnir/degrees-of-lewdity)
 [![Framework](https://img.shields.io/badge/Framework-maplebirch-blue)](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)
+[![ModLoader](https://img.shields.io/badge/SC2-ModLoader-blue)](https://github.com/Lyoko-Jeremie/sugarcube-2-ModLoader)
+[![CHS](https://img.shields.io/badge/CHS-DOL--CHS-red)](https://github.com/Eltirosto/Degrees-of-Lewdity-Chinese-Localization)
+[![Release](https://img.shields.io/github/v/release/MaplebirchLeaf/Deadwood-Reblooms?label=release)](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/MaplebirchLeaf/Deadwood-Reblooms/total?label=downloads)](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases/latest)
+[![Stars](https://img.shields.io/github/stars/MaplebirchLeaf/Deadwood-Reblooms?label=stars)](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/stargazers)
 [![Issues](https://img.shields.io/github/issues-raw/MaplebirchLeaf/Deadwood-Reblooms?label=issues)](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/issues)
 
-**Deadwood Reblooms** is a _Degrees of Lewdity_ content mod built on the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). It expands character stories, school life, housing and finance, transformations, encounters, and game UI. Its modules are managed through the framework.
+**Deadwood Reblooms** is a **_Degrees of Lewdity_** content mod built on the **[Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)**. It expands character relationships, school life, finance and business, transport, and street activities, alongside transformations, encounters, and interface features.
+
+Choose the modules you want to play. The in-game guide covers their activities and unlock conditions.
 
 ---
 
 ## Contents
 
-- [Installation and dependencies](#installation-and-dependencies)
-- [Modules and game guide](#modules-and-game-guide)
-- [Optional audio pack](#optional-audio-pack)
-- [Acknowledgements and asset sources](#acknowledgements-and-asset-sources)
-- [Issues and related projects](#issues-and-related-projects)
+- [Overview](#overview)
+- [Installation and Dependencies](#installation-and-dependencies)
+- [Game Guide and Settings](#game-guide-and-settings)
+- [Optional Audio Pack](#optional-audio-pack)
+- [Feedback and Updates](#feedback-and-updates)
+- [Acknowledgements](#acknowledgements)
+- [Links](#links)
 
-## Installation and dependencies
+## Overview
 
-1. Use a **DoL 0.5.12.13** build with SugarCube 2 ModLoader.
-2. Load the [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework). Its version must satisfy the mod package's `maplebirch >= 5.4.3` requirement, together with the other listed dependencies.
-3. From [Releases](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases), load `deadwood-reblooms-*.modpack`. To use dynamic music, also load the corresponding `deadwood-reblooms-audio-*.modpack`.
-4. To change modules, use the framework's module manager and reload when prompted.
+| Area                           | Main Content                                                                                                                  |
+| :----------------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
+| Relationships and Shared Life  | Further scenes with Sydney, Robin, Kylar, and Whitney; dorms, estates, shops, and living together                             |
+| School and Daily Life          | Attendance passes, prefect and student president routes, school reputation, the gym, and casino card tables                   |
+| Orchards and Bird Tower        | Clearing land, caring for trees, hiring workers, Alex and Remy relationship scenes, and raising and hunting with a hawk chick |
+| Finance and Business           | Banking, securities, loans, companies, factories, shareholder roles, property, furniture, and rentals                         |
+| Transport and Street Life      | Vehicles, driving lessons, passenger services, street reputation, weapons, jobs, bounties, bank heists, and road races        |
+| Transformations and Encounters | Horse, whale, and raven transformations, stat breakthroughs, traits, feats, and encounter extensions                          |
+| Visuals and Tools              | Celestial events, NPC portraits and icons, dynamic music, mod statistics, and cheat tools                                     |
 
-`DeadwoodReblooms` is the root module. Turning it off stops every Deadwood Reblooms module. When an installed external mod provides overlapping functionality, Deadwood Reblooms turns off its corresponding module and retains the external mod. Character stories still follow vanilla relationships, locations, and schedules.
+## Installation and Dependencies
 
-The current version is **2.0.3**, fixing the missing off-hand try-on record that broke checkout in the vanilla clothing shops, and the bilingual option syntax of the loan-type and bodywriting-gender listboxes. See the [release notes](.github/release-notes/v2.0.3.md). Use framework **5.4.3**.
+1. Use a game build with **SugarCube 2 ModLoader**. The current target is **DoL 0.5.12.13**.
+2. Install **[Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.4.3 or later** and any clothing, beauty-selector, or other dependencies requested by the loader.
+3. Download `deadwood-reblooms-*.modpack` from [**Releases**](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases/latest) and load it through ModLoader.
+4. Choose the modules you want in the framework's module manager, then save and reload.
 
-## Modules and game guide
+When certain original mods with overlapping features are detected, Deadwood Reblooms disables its corresponding module. The package's dependency declarations and loader messages provide the full requirements.
 
-| Module                              | Content                                                                                |
-| ----------------------------------- | -------------------------------------------------------------------------------------- |
-| `DeadwoodReblooms`                  | Base options, game guide, clothing search, and mod statistics                          |
-| `Sydney`                            | Sydney's dormitory, Sirris estate, and relationship scenes                             |
-| `Robin`                             | Robin's stands, Cliff Street drink shop, shared life, and intimate scenes              |
-| `Whitney`                           | Underground brothel rescue, reunion, and daily interactions                            |
-| `Kylar`                             | Manor stays and room interactions                                                      |
-| `LifeSimulation`                    | Attendance pass, prefect, student president, school reputation, gym, and card tables   |
-| `Orchard`                           | Temple and farm orchards, tree care, gradual clearing, and hired help                  |
-| `BirdTower`                         | Bird Tower expansion: hawk chick growth, feeding, personality, and hunts               |
-| `Transport`                         | Vehicle purchases, garages, maintenance, driving lessons, and road and trail journeys  |
-| `Finance`                           | Financial centre, banking, securities, loans, property, cohabitation and pool intimacy |
-| `VanillaPlus`                       | Stat breakthroughs, traits, and hospital services                                      |
-| `CelestialAnomalies`                | Solar eclipses, meteor showers, and changing sky and weather visuals                   |
-| `MoreTransformations`               | Horse, whale, and raven transformations, locations, equipment, and traits              |
-| `LongerCombat`                      | Longer encounters, staged dialogue, and fluid displays                                 |
-| `MoreLoveInterestsAndNPCAvatars`    | More love interests and social sidebar portraits                                       |
-| `NPCSidebarPortrait`                | NPC portraits in scenes and the sidebar                                                |
-| `UnLockCheatAndCombatStatusDisplay` | Vanilla cheat access and encounter stat values                                         |
-| `IncantationCheatCollection`        | A searchable, importable, and exportable cheat command collection                      |
-| `DynamicMusic`                      | Music selected by combat, time of day, weather, and celestial events                   |
+## Game Guide and Settings
 
-Open **Mod Hints** in the game sidebar for the single-page guide. Its sections and search cover characters, places, unlock conditions, and troubleshooting. **Character → Statistics → Mod Statistics** shows progress for the current save, including stats, school, finance, property, and character routes. Check the journal and the actual scene for the next story step.
+| Entry                              | Purpose                                                                                          |
+| :--------------------------------- | :----------------------------------------------------------------------------------------------- |
+| Mod Hints                          | Search characters, places, and unlock conditions; read the game guide and change module switches |
+| Mod Settings                       | Adjust visuals, music, encounters, and other options                                             |
+| Journal                            | Check current jobs, bills, vehicle locations, and story leads                                    |
+| Statistics → Mod Statistics        | View progress and cumulative results                                                             |
+| Vanilla Cheats → Deadwood Reblooms | Adjust resources and stats for enabled features                                                  |
 
-### Module switches in the contents
+Choose the desktop or mobile position for the guide button in mod settings. Save and reload after changing module switches. Character scenes also depend on their relationships, locations, and schedules.
 
-Each guide entry combines a chapter link and its module checkbox. Checkboxes share the framework manager's settings and apply dependency changes together. A pending-reload list appears after changes: save your game, then choose Reload now. Disabling a module does not roll back existing story progress. Per-save options such as music playback remain in mod settings.
+## Optional Audio Pack
 
-## Optional audio pack
+For dynamic music and ambience, download `deadwood-reblooms-audio-*.modpack` from the same release, load it alongside the main mod, and enable dynamic music in mod settings. Music and ambience have separate switches and volume controls.
 
-The audio files and `dynamic-music.json` for `DynamicMusic` live in a separate pack. The main mod only provides the playback controller. After loading the audio pack, enable **Dynamic Music** in mod options and adjust music and ambience volumes separately. Without the audio pack, dynamic music stays silent and the other modules still work.
+The audio pack is optional. See the [audio source record](audio-pack/audio/CREDITS.md) for track authors, sources, and licences.
 
-## Source layout
+## Feedback and Updates
 
-| Directory                      | Purpose                                                                                            |
-| ------------------------------ | -------------------------------------------------------------------------------------------------- |
-| `src/module`                   | Save state, gameplay logic and module registration. Subsystems belong under their parent module    |
-| `src/script`                   | Vanilla integration, patches and page rendering                                                    |
-| `src/assets`                   | Numeric settings, catalogues and guides. Display names in configuration reference translation keys |
-| `public/translations/CN`, `EN` | Names, choices and reusable short text grouped by module                                           |
-| `src/twee`                     | Pages, choices and narrative. Longer bilingual passages use matching `language` branches           |
-| `public/img`, `src/styles`     | Images and page styles                                                                             |
+- [Issues and suggestions](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/issues): include game, framework, and mod versions, the location, and steps to reproduce the problem.
+- [Releases and update history](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases)
 
-Feat definitions share the static `add` entry in `src/module/Achievements.ts`. Each gameplay subsystem records progress when its actions settle.
+## Acknowledgements
 
-## Acknowledgements and asset sources
+- [Vrelnir](https://vrelnir.blogspot.com/) and the vanilla game's contributors.
+- [Lyoko-Jeremie](https://github.com/Lyoko-Jeremie) for [SugarCube 2 ModLoader](https://github.com/Lyoko-Jeremie/sugarcube-2-ModLoader).
+- 狐千月 for [Longer Encounters](https://github.com/emicoto/DOLMods/).
+- Eudemonism00 for [social sidebar portraits](https://github.com/Eudemonism00/DOL-npcicon-mods/) and 苯环 for [More Love Interests](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod).
+- 零环零幻想 for [Dom Robin](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod).
+- 丧心 for [DoLSims](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims).
+- 鲤鱼旗🎏 for [BabyHawk](https://github.com/koooooiCarp/DOL-BabyHawk-Mod), with text polish by 行歌.
+- 查查查茶子 for Remy Love Mod, which informs Remy's relationship scenes and captivity dialogue in the Orchard module.
+- 元夕 for horse transformation sprites, and [DoL Xchange](https://gitgud.io/Akoz/dol-xchange/-/tree/697a8ad7b08bd2370acc401e788a8f5090215e00/img/sex/xray) for size 6 X-ray sprites.
+- Audio creators including Kresiek The Furry, Augmentality (Brandon Morris), AdoTheLimey, primbal, Breviceps, Joth, TinyWorlds, isaiah658, SketchMan3, and rubberduck. Full credits for the current music and field recordings are in the [audio source record](audio-pack/audio/CREDITS.md).
+- Everyone who shared ideas, testing feedback, and other help.
 
-Thanks to the following creators for their work and help. You can turn off the corresponding Deadwood Reblooms module when using an overlapping original mod:
-
-- `LongerCombat`: [Longer Combat](https://github.com/emicoto/DOLMods/) by 狐千月.
-- `MoreLoveInterestsAndNPCAvatars`: [social sidebar portraits](https://github.com/Eudemonism00/DOL-npcicon-mods/) by Eudemonism00 and [More Love Interests](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod) by 苯环.
-- `Robin`: [Dom Robin](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod) by 零环零幻想.
-- `LifeSimulation`: [DoLSims](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims) by 丧心.
-- `BirdTower`: [BabyHawk](https://github.com/koooooiCarp/DOL-BabyHawk-Mod) by 鲤鱼旗🎏 (polish by 行歌).
-- Horse transformation sprites: 元夕.
-
-Dynamic music uses CC0 audio by Kresiek The Furry, Augmentality (Brandon Morris), AdoTheLimey, primbal, Breviceps, Joth, TinyWorlds, isaiah658, SketchMan3, and rubberduck. See the [audio source record](audio-pack/audio/CREDITS.md) for individual tracks. Thanks also to everyone who shared ideas, testing feedback, and other help.
-
-Social sidebar icons and scene portraits are fan art, not official character depictions. The in-game guide also lists creators and asset sources.
-
-## Issues and related projects
-
-Open an [issue](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/issues) with the game, framework, and mod versions, enabled modules, location, and steps to reproduce. Mention the game branch or localization combination if the problem occurs only there.
+## Links
 
 - [Degrees of Lewdity](https://gitgud.io/Vrelnir/degrees-of-lewdity)
 - [Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)
+- [Revelation: The Book of Return](https://github.com/MaplebirchLeaf/Revelation-The-Book-of-Return)
+- [Chinese localization](https://github.com/Eltirosto/Degrees-of-Lewdity-Chinese-Localization)
+- [ModLoader documentation](https://modloader.pages.dev/)

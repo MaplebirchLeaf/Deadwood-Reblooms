@@ -2,15 +2,32 @@
 
 Enable **Street Life** and reload. Street standing covers the town; the smuggler's pub is one base, not the whole street scene. Police crime records remain separate. Start with Landry at the Harvest Street pub, or meet Detective Grant at the police station.
 
-| Goal                             | Entrance                                       | What you need                                                                          |
-| -------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Deliveries, recovery and fencing | Harvest Street pub → Landry                    | Able to act, with no other cargo job active                                            |
-| Weapons and ammunition           | Discovered smuggler's pub → weapon shop        | Funds through your current merchant payment method; weapons use the handheld catalogue |
-| Police bounties                  | Police station, 08:00–18:00                    | An agreement with Grant and a criminal record that permits payment                     |
-| Ask Mickey to check information  | Smuggler's pub, 09:00–18:00                    | Have met the original Mickey and be able to talk                                       |
-| Plan the bank heist              | Landry → private meeting at the smuggler's pub | Finance, sufficient street standing, and Landry's and Wren's trust                     |
+| Goal                             | Entrance                                                    | What you need                                                                          |
+| -------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Deliveries, recovery and fencing | Harvest Street pub → Landry                                 | Able to act, with no other cargo job active                                            |
+| Weapons and ammunition           | Discovered smuggler's pub → weapon shop                     | Funds through your current merchant payment method; weapons use the handheld catalogue |
+| Police bounties                  | Police station, 08:00–18:00                                 | An agreement with Grant and a criminal record that permits payment                     |
+| Ask Mickey to check information  | Smuggler's pub, 09:00–18:00                                 | Have met the original Mickey and be able to talk                                       |
+| Plan the bank heist              | Landry → private meeting at the smuggler's pub              | Finance, sufficient street standing, and Landry's and Wren's trust                     |
+| Enter a road race                | First farm-road section outside Harvest Street, 20:00–04:00 | Transport, a car parked locally, driving qualifications, enough fuel and cash          |
 
 Check the **journal** for active jobs, cargo locations and next steps. **Statistics** shows actual payments, cargo losses and closed operations. Reading the journal does not reroll work or deliver goods and collect money for you.
+
+## Farm-road races
+
+Visit the first road section outside Harvest Street at night to ask about the races, watch a start or enter your own car. The route follows the road to the farmland, with novice and open classes. Ordinary cars can enter; motorcycles and bicycles do not compete in these classes. Snow cancels racing, while rain makes it easier to lose grip. Deal with any road encounter before approaching the gathering.
+
+Check the entry fee, prizes and your vehicle before paying. Your car must actually be parked near the start; a car left in a garage cannot be summoned. Finish passenger and delivery work first. Driving skill, vehicle performance and decisions on the road all matter, so buying a more expensive car does not guarantee a win.
+
+The novice entry fee is <span class="gold">£25</span>, with prizes of <span class="gold">£90 / £35 / £10</span> for the first three places. The open class requires 300 driving experience and costs <span class="gold">£100</span>, with prizes of <span class="gold">£300 / £150 / £50</span>. Entry takes two minutes, followed by twenty-one minutes for an uninterrupted run. Your car needs at least 45% condition and enough fuel for the whole course.
+
+Choose whether to drive steadily, build speed or push harder at each stage. Steady driving is easier on the car; taking risks may gain places or cause a mistake. Traffic, bends and rain affect those choices. Each class allows one entry per night, including a run you withdraw from. A new racing night begins at 4 am; midnight does not reset the limit.
+
+Finishing pays the prize for your position and records your driving progress. Entry fees, fuel and wear are real costs. Withdrawing does not refund the fee or return you and the car to the start. Being identified while racing can add to your original crime record; cooperating with the police does not cancel those consequences. The **journal** keeps your current race and latest result, while **statistics** records entries, wins, entry fees and prizes collected.
+
+**Seasoned Driver**: Reach 600 driving experience and finish ten races to reduce baseline condition loss from driving cars by **10%**, both on ordinary trips and in road races. Extra wear from hard driving and accidents is unchanged. Bicycles and motorcycles do not receive this benefit. The journal shows your progress towards the trait.
+
+**First Across**: Finish every section of an open-class race and take first place for the first time. This feat records your result without adding a separate cash reward.
 
 ## The smuggler's pub
 
@@ -32,6 +49,8 @@ Weapon actions appear in **combat against human attackers**. The relevant arm mu
 | Shotgun        | 1                 | Shotgun shells     |
 
 With fewer rounds than a full burst, you can still fire; damage uses the number actually fired. Damage combines a fixed amount with a proportion of the target's maximum health. Shooting experience improves effectiveness and pain reduces it, within a 60%–100% range. Firing adds native assault crime, and a wounded bounty target needs medical attention before handover is complete.
+
+While you hold a firearm in either hand, the weapon section of the characteristics page shows your existing shooting practice record and current damage multiplier, including the effect of pain.
 
 ## Landry's jobs
 

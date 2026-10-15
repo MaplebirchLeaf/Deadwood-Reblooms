@@ -34,9 +34,13 @@
 <<widget 'deadwood-company-return'>>
   <br><<getouticon>>
   <<if $Finance.company.office>>
-    <<lanLink ['Return to your office', '返回自己的办公室'] 'Deadwood Reblooms Company Office'>><</lanLink>>
+    <<lanLink ['Return to your office', '返回自己的办公室'] 'Deadwood Reblooms Company Office'>>
+      <<if $passage is 'Deadwood Reblooms Company Result'>><<set $Finance.company.result to null>><</if>>
+    <</lanLink>>
   <<else>>
-    <<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>><</lanLink>>
+    <<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>>
+      <<if $passage is 'Deadwood Reblooms Company Result'>><<set $Finance.company.result to null>><</if>>
+    <</lanLink>>
   <</if>><br>
 <</widget>>
 
@@ -62,10 +66,33 @@
         名称限 2–40 个字，以文字或数字开头，可用空格、撇号、句点与连字符。凭借记卡从银行账户付款。
     <</language>>
   </i></span><br><br>
-  <<icon 'company/registration.png'>><<lanLink ['Submit the form (0:10)', '提交表格 (0:10)'] 'Deadwood Reblooms Company Result'>>
-    <<set $Finance.company.result to _company.register(_company_name) ? 'registered' : 'register-failed'>>
-    <<if $Finance.company.result is 'registered'>><<pass 10>><</if>>
+  <<icon 'company/registration.png'>><<lanLink ['Submit the form (0:10)', '提交表格 (0:10)']>>
+    <<set _company_valid_name to typeof _company_name is 'string' and new RegExp("^[\\p{L}\\p{N}][\\p{L}\\p{N} '’.-]{1,39}$", 'u').test(_company_name.trim())>>
+    <<if _company_valid_name and _company.register(_company_name)>>
+      <<set $Finance.company.result to 'registered'>><<pass 10>><<goto 'Deadwood Reblooms Company Result'>>
+    <<else>>
+      <<replace '#deadwood-company-registration-feedback'>>
+        <span class='red'>
+          <<if !_company_valid_name>>
+            <<lanSwitch 'The clerk points to the business name. "Use 2–40 characters, beginning with a letter or number. Only spaces, apostrophes, dots and hyphens can be added." The form has not been registered, and no fee has been taken.' '办事员指了指企业名称。“写两到四十个字，用文字或数字开头。其他只能加空格、撇号、句点和连字符。”表格尚未登记，也没有扣款。'>>
+          <<elseif _company_state.name>>
+            <<lanSwitch 'Your business is already registered. No further fee has been taken.' '你的企业已经登记，无须再办一次，也没有再次扣款。'>>
+          <<elseif !_company.open>>
+            <<lanSwitch 'The registration window has closed. Return on a weekday between 9:00 and 17:00. No fee has been taken.' '登记窗口已经关闭。请在工作日九点至下午五点回来，没有扣款。'>>
+          <<elseif !_company.available>>
+            <<lanSwitch 'You cannot complete the registration just now. The form has not been registered, and no fee has been taken.' '你眼下无法办完登记。表格尚未登记，也没有扣款。'>>
+          <<elseif !$Finance.bank.opened>>
+            <<lanSwitch 'The registration fee must come from a bank account. Open one at the financial centre first. The business has not been registered.' '登记费须从银行账户支付。请先到金融中心开户，企业尚未登记。'>>
+          <<elseif !$Finance.bank.debit_card>>
+            <<lanSwitch 'You need a debit card to pay the registration fee. Ask for one at the bank. The business has not been registered, and no fee has been taken.' '支付登记费需要借记卡，请先到银行申领。企业尚未登记，也没有扣款。'>>
+          <<else>>
+            <<lanSwitch 'Your bank balance does not cover the registration fee. The business has not been registered, and no fee has been taken.' '你的银行存款不够支付登记费。企业尚未登记，也没有扣款。'>>
+          <</if>>
+        </span>
+      <</replace>>
+    <</if>>
   <</lanLink>><br>
+  <div id='deadwood-company-registration-feedback' role='alert'></div>
 <<else>>
   <<language>>
     <<option 'EN'>>
@@ -161,9 +188,9 @@
     <span class='blue'>
       <<language>>
         <<option 'EN'>>
-          You need a working metalwork line with no active order, paid wages and site bills, and a clear office account. Ordinary enquiries are at least seven days apart, or five days under the reduced-price agreement.
+          You need a working metalwork line with no active order, paid wages and site bills, and a clear office account. Ordinary enquiries are at least seven days apart. A sales employee or the reduced-price agreement shortens this to five days.
         <<option 'CN'>>
-          需要有可开工的金属加工产线、空闲订单位，结清工人工资、厂房费用与办公室账款。普通询价至少间隔七天，降价协议下缩短为五天。
+          需要有可开工的金属加工产线、空闲订单位，结清工人工资、厂房费用与办公室账款。普通询价至少间隔七天；聘用销售职员或签订降价协议后，缩短为五天。
       <</language>>
     </span><br>
   <</if>>
@@ -319,10 +346,10 @@
 <<elseif _company.partner and !_company_state.contract and Math.floor(Time.days) gte _company_state.review_day>>
   <<language>>
     <<option 'EN'>>
-      Avery places two schedules beside the agreement. "More shelving on the same delivery schedule. Or keep the quantity and reduce the price by ten percent. Purchasing will enquire every five days instead of seven."
+      Avery places two schedules beside the agreement. "The first: fifty percent more shelving, at the same unit price and delivery date." <<He>> taps the other sheet. "The second: the same quantity, ten percent off the unit price. <<if _company.staff.sales>>Purchasing will keep enquiring every five days.<<else>>In return, purchasing will enquire every five days instead of seven.<</if>>"
       There is an empty space beside <<his>> signature. <<He>> looks up when you keep your pen capped.
     <<option 'CN'>>
-      艾弗里把两张计划表放在协议旁。“交货日期不变，多送一半货架。或者数量照旧，价格降一成。采购那边每五天询一次价，不必等七天。”
+      艾弗里把两张计划表放在协议旁。“第一份，多供一半货架，单价和交期照旧。”<<He>>敲了敲另一张。“第二份，数量照旧，单价降一成。<<if _company.staff.sales>>采购那边照旧，每五天询一次价。<<else>>作为交换，采购那边每五天询一次价，不必等七天。<</if>>”
       <<His>>签名旁还空着一块。你没有打开笔帽，<<He>>抬起头看向你。
   <</language>>
   <br><br>
@@ -350,7 +377,7 @@
 <<deadwood-company-return>>
 
 :: Deadwood Reblooms Company Result
-<<deadwood-company-header `['registered', 'register-failed'].includes($Finance.company.result) ? 'town' : 'office'`>>
+<<deadwood-company-header `$Finance.company.result === 'registered' ? 'town' : 'office'`>>
 <<switch _company_state.result>>
   <<case 'registered'>>
     <<language>>
@@ -405,10 +432,12 @@
     <<language>>
       <<option 'EN'>>
         <<if _company_state.result is 'veto'>>Avery waits, then puts the unsigned schedules back in the folder. "The old terms, then." Your copy of the agreement stays on the desk.
-        <<else>>Avery countersigns the schedule. You take a copy for the workshop. The change applies to new orders.<</if>>
+        <<elseif _company_state.result is 'volume'>>Avery countersigns the increased-volume schedule. New orders will require fifty percent more shelving, with the unit price and delivery date unchanged. You take a copy for the workshop.
+        <<else>>Avery countersigns the reduced-price schedule. New orders will pay ten percent less per unit, and purchasing will enquire every five days. You take a copy for the workshop.<</if>>
       <<option 'CN'>>
         <<if _company_state.result is 'veto'>>艾弗里等了一会儿，将没有签字的计划表放回文件夹。“那就照旧。”你的那份协议仍放在桌上。
-        <<else>>艾弗里在计划表上签字。你带走一份交给车间，变更从新订单开始生效。<</if>>
+        <<elseif _company_state.result is 'volume'>>艾弗里在增加供货量的计划表上签字。新订单要多供一半货架，单价和交期照旧。你带走一份，准备交给车间。
+        <<else>>艾弗里在降价的计划表上签字。新订单的单价降低一成，采购部门每五天询价。你带走一份，准备交给车间。<</if>>
     <</language>>
   <<case 'rent'>>
     <<language>>
@@ -425,18 +454,21 @@
         你交回钥匙。代理核对租金账目，把剩余押金退回银行账户。你用文件夹带走企业的单据。
     <</language>>
   <<default>>
-    <span class='red'>
-      <<language>>
-        <<option 'EN'>>
-          The arrangement could not be made. Check the opening hours, identification, funds and outstanding obligations.
-        <<option 'CN'>>
-          这笔业务没能办妥。请核对营业时间、身份证明、可用资金与未结清的款项。
-      <</language>>
-    </span>
+    <<if !_company_state.result>>
+      <<lanSwitch 'There is no new business result to review.' '暂无新的办理结果。'>>
+    <<else>>
+      <span class='red'>
+        <<language>>
+          <<option 'EN'>>
+            The arrangement could not be made. Check the opening hours, identification, funds and outstanding obligations.
+          <<option 'CN'>>
+            这笔业务没能办妥。请核对营业时间、身份证明、可用资金与未结清的款项。
+        <</language>>
+      </span>
+    <</if>>
 <</switch>><br>
-<<if ['registered', 'register-failed'].includes(_company_state.result)>>
-  <<getouticon>><<lanLink ['Return to the front desk', '返回前台'] 'Town Hall Wait'>><</lanLink>>
+<<if _company_state.result is 'registered'>>
+  <<getouticon>><<lanLink ['Return to the front desk', '返回前台'] 'Town Hall Wait'>><<set $Finance.company.result to null>><</lanLink>>
 <<else>>
   <<deadwood-company-return>>
 <</if>>
-<<set _company_state.result to null>>

@@ -52,6 +52,8 @@ The “Available vehicles” section appears above the street map and lists each
 
 Each vehicle incurs upkeep every seven days from its purchase, paid automatically from your bank balance if you have an account. An insufficient balance or no account leaves arrears. Pay cash from the vehicle menu or sale page, or pay from an open bank account without needing a debit card. Clear the arrears before driving or selling. Fuel is consumed separately for each journey.
 
+Jumping forward also counts any upkeep weeks that have passed. Settling the same date again does not charge twice, and moving backwards does not refund upkeep already paid.
+
 Bicycle shops, motorcycle showrooms and workshops sell repair kits. Tools can be reused and come with three sets of consumable supplies. A roadside repair takes **15 minutes** for a bicycle or **30 minutes** for a motor vehicle. Housekeeping skill improves the repair, up to **60%** condition. Supplies can be restocked.
 
 Fuel and condition appear in the <span class="blue">vehicle menu header</span>. Check both before a long journey.

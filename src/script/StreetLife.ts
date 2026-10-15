@@ -14,13 +14,22 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
   maplebirch.on(':language', weaponTrait);
   // 服装目录独立于模块开关加载，类型说明常驻；玩法只在模块启用时接入。
   if (!maplebirch.get('StreetLife')) return;
-  maplebirch.tool.patch.traits.add({
-    title: 'Special Traits',
-    name: () => maplebirch.t('deadwood-reblooms:street:trait:bounty_hunter:name'),
-    colour: 'green',
-    has: () => maplebirch.get('StreetLife')?.bounties.bountyHunter === true,
-    text: () => maplebirch.t('deadwood-reblooms:street:trait:bounty_hunter:text')
-  });
+  maplebirch.tool.patch.traits.add(
+    {
+      title: 'Special Traits',
+      name: () => maplebirch.t('deadwood-reblooms:street:trait:bounty_hunter:name'),
+      colour: 'green',
+      has: () => maplebirch.get('StreetLife')?.bounties.bountyHunter === true,
+      text: () => maplebirch.t('deadwood-reblooms:street:trait:bounty_hunter:text')
+    },
+    {
+      title: 'Special Traits',
+      name: () => maplebirch.t('deadwood-reblooms:street:trait:seasoned_driver:name'),
+      colour: 'green',
+      has: () => maplebirch.get('StreetLife')?.races.seasonedDriver === true,
+      text: () => maplebirch.t('deadwood-reblooms:street:trait:seasoned_driver:text')
+    }
+  );
   Detective(maplebirch);
   SmugglerPub(maplebirch);
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-detective-link', passage: 'Police Station' });
@@ -98,11 +107,21 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
     output: 'deadwood-street-hunter-entry'
   });
   maplebirch.tool.addTo('Reputation', 'deadwood-street-reputation');
+  maplebirch.tool.addTo('WeaponBox', 'deadwood-street-firearm-effectiveness');
   maplebirch.tool.addTo('Journal', 'deadwood-street-job-journal');
+  maplebirch.tool.addTo('Journal', 'deadwood-street-race-journal');
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-shop-link', passage: 'Smuggler Pub' });
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-unload', match: / Street$/ });
   maplebirch.tool.inject({
     locationPassage: {
+      'Farm Road 1': [
+        {
+          // 普通公路菜单的进城选项前；避开昏倒、来车逼近与搭便车事件。
+          src: '<<entertownicon>>',
+          applybefore: '<<deadwood-street-race-link>>\n\t',
+          expected: 1
+        }
+      ],
       'Smuggler Pub': [
         {
           // 原版正常菜单的下水道出口前；不插入 Zephyr 强制事件或 Wren 初遇。
