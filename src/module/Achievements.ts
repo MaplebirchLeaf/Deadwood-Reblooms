@@ -359,6 +359,14 @@ class Achievements {
       description: 'deadwood-reblooms:street:feat:bounty:description',
       difficulty: 2,
       filter: ['All', 'General']
+    },
+    {
+      module: 'StreetLife',
+      id: 'Deadwood First Open Win',
+      title: 'deadwood-reblooms:street:feat:open_win:title',
+      description: 'deadwood-reblooms:street:feat:open_win:description',
+      difficulty: 2,
+      filter: ['All', 'General']
     }
   ];
 

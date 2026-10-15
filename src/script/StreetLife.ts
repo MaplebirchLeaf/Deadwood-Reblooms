@@ -14,13 +14,22 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
   maplebirch.on(':language', weaponTrait);
   // 服装目录独立于模块开关加载，类型说明常驻；玩法只在模块启用时接入。
   if (!maplebirch.get('StreetLife')) return;
-  maplebirch.tool.patch.traits.add({
-    title: 'Special Traits',
-    name: () => maplebirch.t('deadwood-reblooms:street:trait:bounty_hunter:name'),
-    colour: 'green',
-    has: () => maplebirch.get('StreetLife')?.bounties.bountyHunter === true,
-    text: () => maplebirch.t('deadwood-reblooms:street:trait:bounty_hunter:text')
-  });
+  maplebirch.tool.patch.traits.add(
+    {
+      title: 'Special Traits',
+      name: () => maplebirch.t('deadwood-reblooms:street:trait:bounty_hunter:name'),
+      colour: 'green',
+      has: () => maplebirch.get('StreetLife')?.bounties.bountyHunter === true,
+      text: () => maplebirch.t('deadwood-reblooms:street:trait:bounty_hunter:text')
+    },
+    {
+      title: 'Special Traits',
+      name: () => maplebirch.t('deadwood-reblooms:street:trait:seasoned_driver:name'),
+      colour: 'green',
+      has: () => maplebirch.get('StreetLife')?.races.seasonedDriver === true,
+      text: () => maplebirch.t('deadwood-reblooms:street:trait:seasoned_driver:text')
+    }
+  );
   Detective(maplebirch);
   SmugglerPub(maplebirch);
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-detective-link', passage: 'Police Station' });

@@ -282,7 +282,10 @@ class Transport extends Module {
   }
 
   public journeyWear(model: VehicleModel, minutes: number, trail = false): number {
-    return (minutes / 60) * model.wear_per_hour * (trail ? (model.trail_wear ?? 1.5) : 1);
+    const races = this.core.get('StreetLife')?.races;
+    // 共用基础损耗入口，赛事驾驶方式与事故附加损伤仍由各自场景结算。
+    const reduction = model.kind === 'motor_vehicle' && races?.seasonedDriver ? races.terms.seasoned_driver.wear_reduction : 0;
+    return (minutes / 60) * model.wear_per_hour * (trail ? (model.trail_wear ?? 1.5) : 1) * (1 - reduction);
   }
 
   public get forestRoad(): boolean {

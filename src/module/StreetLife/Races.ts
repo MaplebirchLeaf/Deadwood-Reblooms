@@ -54,6 +54,10 @@ export default class Races {
     return this.street.core.get('Transport');
   }
 
+  public get seasonedDriver(): boolean {
+    return (this.transport?.state.driving ?? 0) >= terms.seasoned_driver.driving && this.state.completed >= terms.seasoned_driver.completed;
+  }
+
   public get night(): number {
     // 原版 Time.days 从开局时刻计日；赛事按凌晨四点划分同一晚。
     return Math.floor((Time.date.timeStamp - 4 * TimeConstants.secondsPerHour) / TimeConstants.secondsPerDay);

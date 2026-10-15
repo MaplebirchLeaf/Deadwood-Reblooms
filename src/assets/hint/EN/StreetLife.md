@@ -21,9 +21,13 @@ Check the entry fee, prizes and your vehicle before paying. Your car must actual
 
 The novice entry fee is <span class="gold">£25</span>, with prizes of <span class="gold">£90 / £35 / £10</span> for the first three places. The open class requires 300 driving experience and costs <span class="gold">£100</span>, with prizes of <span class="gold">£300 / £150 / £50</span>. Entry takes two minutes, followed by twenty-one minutes for an uninterrupted run. Your car needs at least 45% condition and enough fuel for the whole course.
 
-Choose whether to drive steadily, press the pace or attempt a risky overtake at each stage. Steady driving is easier on the car; taking risks may gain places or cause a mistake. Traffic, bends and rain affect those choices. Each class allows one entry per night, with no immediate reset at midnight.
+Choose whether to drive steadily, build speed or push harder at each stage. Steady driving is easier on the car; taking risks may gain places or cause a mistake. Traffic, bends and rain affect those choices. Each class allows one entry per night, including a run you withdraw from. A new racing night begins at 4 am; midnight does not reset the limit.
 
 Finishing pays the prize for your position and records your driving progress. Entry fees, fuel and wear are real costs. Withdrawing does not refund the fee or return you and the car to the start. Being identified while racing can add to your original crime record; cooperating with the police does not cancel those consequences. The **journal** keeps your current race and latest result, while **statistics** records entries, wins, entry fees and prizes collected.
+
+**Seasoned Driver**: Reach 600 driving experience and finish ten races to reduce baseline condition loss from driving cars by **10%**, both on ordinary trips and in road races. Extra wear from hard driving and accidents is unchanged. Bicycles and motorcycles do not receive this benefit. The journal shows your progress towards the trait.
+
+**First Across**: Finish every section of an open-class race and take first place for the first time. This feat records your result without adding a separate cash reward.
 
 ## The smuggler's pub
 
