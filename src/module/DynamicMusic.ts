@@ -222,7 +222,7 @@ class DynamicMusic {
           } else if (desired === null) {
             if (this.ambient !== null) this.audio.ambience.stop(FADE_MS);
             this.ambient = null;
-          } else if (this.ambient !== desired) {
+          } else {
             const volume = this.options?.ambienceVolume ?? DynamicMusic.options.ambienceVolume;
             if (await this.audio.ambience.play(AUDIO_PACK, desired, volume, FADE_MS)) {
               this.ambient = desired;
@@ -251,10 +251,7 @@ class DynamicMusic {
     const ambience = state && options?.ambienceEnabled !== false ? this.config?.ambience.find(track => track.when(state)) : null;
     this.desired.music = music?.file.slice(6).replace(/\.[^.]+$/, '') ?? null;
     this.desired.ambience = ambience?.file ?? null;
-    if (options) {
-      this.audio.setModVolume(AUDIO_PACK, options.volume);
-      if (this.ambient !== null) this.audio.ambience.setVolume(options.ambienceVolume);
-    }
+    if (options) this.audio.setModVolume(AUDIO_PACK, options.volume);
     if (this.desired.music === null && this.syncing.has('music') && this.audio.ActivePlaylist?.name === AUDIO_PACK) this.audio.stop();
     if (this.desired.ambience === null && this.syncing.has('ambience')) this.audio.ambience.stop(FADE_MS);
     void this.sync('music');
