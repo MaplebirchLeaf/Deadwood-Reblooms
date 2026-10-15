@@ -98,6 +98,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
     output: 'deadwood-street-hunter-entry'
   });
   maplebirch.tool.addTo('Reputation', 'deadwood-street-reputation');
+  maplebirch.tool.addTo('WeaponBox', 'deadwood-street-firearm-effectiveness');
   maplebirch.tool.addTo('Journal', 'deadwood-street-job-journal');
   maplebirch.tool.addTo('Journal', 'deadwood-street-race-journal');
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-shop-link', passage: 'Smuggler Pub' });

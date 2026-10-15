@@ -6,6 +6,7 @@ export default function Medicine(maplebirch: typeof window.maplebirch): void {
   const medicine = () => maplebirch.get('LifeSimulation')!.medicine;
 
   maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-medicine-shop'], passage: 'Pharmacy' });
+  maplebirch.tool.addTo('SchoolMarksText', 'deadwood-medicine-learning-bonus');
 
   maplebirch.tool.patch.traits.add(
     ...MEDICINES.flatMap(item => [
