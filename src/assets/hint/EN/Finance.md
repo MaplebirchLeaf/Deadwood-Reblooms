@@ -23,6 +23,12 @@ Enable **Finance** and reload. Enter the financial centre from High Street and s
 
 Check the **journal** for current accounts and tasks, and **statistics** for cumulative deliveries and payments. Available resource controls appear under native **Cheats → Deadwood Reblooms**. Changing resources does not appoint a director, arrange a loan or settle a case for you.
 
+## Time and accounting periods
+
+Jumping forward to a later date settles property, company, factory, bank and household accounts through their existing billing periods. Orchard and Robin's shop investments keep their existing links to those accounts. Across several days, income for each date is processed before debts due on that date. Vehicle upkeep also counts any whole weeks that have passed.
+
+Settling the same date again does not duplicate payments or charges. Moving the date backwards does not reverse money already booked, and returning to a settled date does not pay it again.
+
 ## Links to street life
 
 With Street Life enabled, the financial centre bank is also the heist target, and a factory packaging line can help with supplies. An incident suspends counter service for two days; existing loans and regular bills still need attention. See **Street Life** for the route and choices.
