@@ -131,7 +131,11 @@ class Casino {
   }
 
   public get night(): number {
-    return Time.days - (Time.hour < 4 ? 1 : 0);
+    // 夜次仍从开局起算，保留禁入、贿赂与当晚统计的索引尺度。
+    // 旧版午夜误写的上一夜值无法与历史记录可靠区分，不猜测重写。
+    const day = TimeConstants.secondsPerDay;
+    const closing = 4 * TimeConstants.secondsPerHour;
+    return Math.floor((Time.date.timeStamp - closing) / day) - Math.floor((Time.startDate.timeStamp - closing) / day);
   }
 
   public get barred(): boolean {
