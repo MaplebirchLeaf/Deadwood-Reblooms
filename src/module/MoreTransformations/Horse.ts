@@ -278,7 +278,7 @@ class Horse extends Transformation {
             to: '<<deadwood-reblooms-action-kick $feettarget>>',
             expected: 2
           },
-          // 原版两个成功踢击分支使用强度 5；蹄足启用时沿用三倍倍率。
+          // 原版两个成功踢击分支使用强度 5，蹄足启用时沿用三倍倍率。
           {
             srcmatchgroup: /<<defiance 5 \$feettarget>>/g,
             to: '<<defiance `5 * (typeof $transformationParts?.traits?.hooves is "string" and isPartEnabled($transformationParts.traits.hooves) ? 3 : 1)` $feettarget>>',

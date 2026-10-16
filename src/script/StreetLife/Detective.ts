@@ -2,7 +2,7 @@
 
 import GrantPortrait from '../NamedNPCSidebarPortrait/Grant';
 
-/** 格兰特只负责案件合作；通缉、判刑与减刑仍使用原版警方规则。 */
+/** 格兰特只负责案件合作，通缉、判刑与减刑仍使用原版警方规则。 */
 export default function Detective(maplebirch: typeof window.maplebirch): void {
   maplebirch.npc.add(
     {

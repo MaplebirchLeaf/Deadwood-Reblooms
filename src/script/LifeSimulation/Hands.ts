@@ -7,7 +7,7 @@ export default function Hands(maplebirch: typeof window.maplebirch): void {
     widgetPassage: {
       'Widgets variablesStatic': [{ src: '<<set setup.wardrobeSkip to', applybefore: '<<run maplebirch.get("LifeSimulation").hands.setup()>>\n', expected: 1 }],
       'Widgets Clothing': [
-        // 损坏主手物品时，只检查该物品；副手鱼竿仍在，不应清除它的鱼饵。
+        // 损坏主手物品时，只检查该物品，副手鱼竿仍在，不应清除它的鱼饵。
         { src: '<<if $worn.handheld.type.includes("fishing_rod")>>', to: '<<if Array.prototype.includes.call($worn.handheld.type, "fishing_rod")>>', expected: 1 }
       ],
       'Widgets Wardrobe': [
@@ -34,7 +34,7 @@ export default function Hands(maplebirch: typeof window.maplebirch): void {
       ]
     },
     locationPassage: {
-      // 中文原文一处分支遗漏了 $；修正标识符，英文继续使用原判断。
+      // 中文原文一处分支遗漏了 $，修正标识符，英文继续使用原判断。
       'Gwylan Walk School Solo': [{ srcmatch: /\$?worn\.handheld\.type\.includes\("bookbag"\)/g, to: '$worn.handheld.type.includes("bookbag")', expected: 2 }],
       // 这里既有裸变量文本，也有 set/if。改物品引用，不接触原版的中英文句子。
       'Gwylan Ocean Breeze': [
@@ -49,13 +49,13 @@ export default function Hands(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
-      // 雨伞在任一手都能遮雨；共同撑伞的原版人物对白和天气规则保持原样。
+      // 雨伞在任一手都能遮雨，共同撑伞的原版人物对白和天气规则保持原样。
       'Mansion Talk Chat 2': [{ srcmatchgroup: /(<<print )\$worn\.handheld\.(name|cn_name_cap)(>>)/g, to: '$1maplebirch.get("LifeSimulation").hands.item("rainproof").$2$3', expected: 1 }],
       'Robin Walk Home': [{ srcmatchgroup: /\$worn\.handheld\.(name|cn_name_cap)\b/g, to: '<<print maplebirch.get("LifeSimulation").hands.item("rainproof").$1>>', expected: 2 }]
     }
   });
 
-  // 副手伞沿用原版遮罩；头发与头饰都需要接收，浮动 PC 模型也保持一致。
+  // 副手伞沿用原版遮罩，头发与头饰都需要接收，浮动 PC 模型也保持一致。
   const secondary_mask = (options: CanvasModelOptionsData) => {
     const item = options.worn?.handheld_left;
     if (maplebirch.get('LifeSimulation') && item?.index > 0 && item.setup?.mask_img === 1) return `img/clothes/handheld/${item.setup.variable}/mask.png`;
@@ -93,7 +93,7 @@ export default function Hands(maplebirch: typeof window.maplebirch): void {
     );
   });
 
-  // 复用原版持物的全部图层；坐标、姿势、左右素材和遮挡规则交给原版。
+  // 复用原版持物的全部图层，坐标、姿势、左右素材和遮挡规则交给原版。
   const sources = ['right', 'right_acc', 'right_detail', 'left', 'left_acc', 'left_detail', 'back', 'back_acc'];
   maplebirch.char.use(
     Object.fromEntries(
@@ -154,7 +154,7 @@ export default function Hands(maplebirch: typeof window.maplebirch): void {
   });
 
   maplebirch.once(':storyready', () => {
-    // 保留原版 handler 的上下文；装备前检查，变更后才刷新功能标签。
+    // 保留原版 handler 的上下文，装备前检查，变更后才刷新功能标签。
     const extend = (name: string, handler: (this: MacroContext, original: () => void) => void) => {
       const macro = maplebirch.SugarCube.Macro.get(name);
       if (!macro?.handler) return;
@@ -209,7 +209,7 @@ export default function Hands(maplebirch: typeof window.maplebirch): void {
       return result;
     });
 
-    // 快捷宏扩展两个槽；刷新由它们调用的通用宏负责，storeon 无需再次包装。
+    // 快捷宏扩展两个槽，刷新由它们调用的通用宏负责，storeon 无需再次包装。
     for (const name of ['handheldstrip', 'handheldundress', 'handheldon', 'storeonhandheld']) {
       extend(name, function (original) {
         const result = original();

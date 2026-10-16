@@ -17,7 +17,7 @@ export interface SchoolDonationState {
   meeting_week: number;
 }
 
-/** 学校使用原募捐账目；这里只保存谈妥的条件与一次采购的验收。 */
+/** 学校使用原募捐账目，这里只保存谈妥的条件与一次采购的验收。 */
 export default class SchoolDonations {
   public static readonly defaults: SchoolDonationState = {
     terms: null,
@@ -53,7 +53,7 @@ export default class SchoolDonations {
   }
 
   public get ready(): boolean {
-    // 旧存档已有足额募资时可直接验收；新募足的一笔在付款动作中记录采购时间。
+    // 旧存档已有足额募资时可直接验收，新募足的一笔在付款动作中记录采购时间。
     return this.funded && (this.due === null || Time.date.timeStamp >= this.due);
   }
 

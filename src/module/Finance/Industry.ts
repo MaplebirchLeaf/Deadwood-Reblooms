@@ -573,7 +573,7 @@ export default class Industry {
         }
       ];
     });
-    // 四处机构轮流发出日常采购询价；每周只交给一处具备相应生产线的工厂。
+    // 四处机构轮流发出日常采购询价，每周只交给一处具备相应生产线的工厂。
     const week = Math.floor(day / 7);
     const fund = (['orphanage', 'temple', 'school', 'hospital'] as const)[((week % 4) + 4) % 4];
     const product = terms.products.find(item => item.id === (fund === 'orphanage' || fund === 'temple' ? 'crates' : 'metalwork'))!;

@@ -56,7 +56,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     expected: 1
   };
 
-  // 校规要求只提供主动更衣选择；原版束缚、课时和耳部史莱姆事件仍先检查。
+  // 校规要求只提供主动更衣选择，原版束缚、课时和耳部史莱姆事件仍先检查。
   const classroomChoice = {
     srcmatch: /<<classRoomEarSlime "[^"]+">>(?=\s*<<if \$worn\.upper\.type\.includes\("naked"\))/,
     applyafter: '<<deadwood-reblooms-life-simulation-school-classroom-dress>><<if !_schoolDressRejected>>',
@@ -198,7 +198,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
           applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
           expected: 1
         },
-        // 校规许可时开放公共区域；礼顿的特殊事件条件与随机遭遇不变。
+        // 校规许可时开放公共区域，礼顿的特殊事件条件与随机遭遇不变。
         {
           srcmatchgroup: /\$exposed gte 1(?= and Time.schoolDay and \$schoolstate isnot "early" and \$schoolstate isnot "late">>)/,
           applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',

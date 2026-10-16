@@ -70,7 +70,7 @@ export interface BirdTowerState {
     /** 独自狩猎时小鹰请求同行是否已触发。 */
     hunt_ask: boolean;
   };
-  /** 最近一次玩家主动喂食的回执；结果页只读取，不再次消费库存。 */
+  /** 最近一次玩家主动喂食的回执，结果页只读取，不再次消费库存。 */
   feeding: {
     ids: number[];
     spent: number;

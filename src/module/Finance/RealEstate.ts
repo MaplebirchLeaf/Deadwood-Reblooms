@@ -160,7 +160,7 @@ class RealEstate {
       priority: 1
     });
     // Time.days 从开局时刻起算，原版通常是 07:00。小时事件覆盖跨过
-    // 该时刻的活动；paid_until 防止与午夜日结重复扣款。
+    // 该时刻的活动，paid_until 防止与午夜日结重复扣款。
     this.core.dynamic.regTimeEvent('onHour', ':deadwood-reblooms-household-wages', {
       action: () => this.staff.advance(RealEstate.today),
       exact: true,
@@ -351,7 +351,7 @@ class RealEstate {
     return true;
   }
 
-  /** 邀约开始前检查在家时段；只有卧室要求双人床，进行中的场景不随日程中止。 */
+  /** 邀约开始前检查在家时段，只有卧室要求双人床，进行中的场景不随日程中止。 */
   public canIntimate(name: string, id = this.current?.id, place: IntimacyPlace = 'bedroom'): boolean {
     return (
       !!id &&
@@ -380,14 +380,14 @@ class RealEstate {
     return pair.every(name => this.canIntimate(name, this.current?.id, place));
   }
 
-  /** 泳池与浴室能否作为本次亲密地点：泳池还要求已扩建且水可用；浴室按房产既有房间判断。 */
+  /** 泳池与浴室能否作为本次亲密地点：泳池还要求已扩建且水可用，浴室按房产既有房间判断。 */
   public placeOpen(place: IntimacyPlace): boolean {
     if (place === 'pool') return this.poolOpen;
     if (place === 'bath') return !!this.current && this.floorOf('bathroom') !== undefined;
     return true;
   }
 
-  /** 记录单人亲密场景的对象与地点；入口一律经此登记，读档或跨回合后仍能返回原处。 */
+  /** 记录单人亲密场景的对象与地点，入口一律经此登记，读档或跨回合后仍能返回原处。 */
   public requestIntimacy(name: string, place: IntimacyPlace = 'bedroom'): boolean {
     if (!this.placeOpen(place)) return false;
     if (!this.canIntimate(name, this.current?.id, place)) return false;
@@ -421,7 +421,7 @@ class RealEstate {
     return ['Return to the bedroom', '返回卧室'];
   }
 
-  /** 只有露天泳池会把场景判为室外；浴室与卧室始终在室内。 */
+  /** 只有露天泳池会把场景判为室外，浴室与卧室始终在室内。 */
   public intimacyOutside(place: IntimacyPlace): boolean {
     if (place !== 'pool') return false;
     return !!this.facilities.find(facility => facility.id === 'pool')?.outdoor;
@@ -523,7 +523,7 @@ class RealEstate {
     return (this.state.management[id] ??= RealEstate.newManagement());
   }
 
-  /** 原版家具数据可能来自中文本体；按稳定 ID 读取当前语言，保留未识别的其他模组家具。 */
+  /** 原版家具数据可能来自中文本体，按稳定 ID 读取当前语言，保留未识别的其他模组家具。 */
   private furnitureText(id: string, item: PropertyFurniture): PropertyFurniture {
     const result = { ...item };
     for (const field of ['nameCap', 'description'] as const) {

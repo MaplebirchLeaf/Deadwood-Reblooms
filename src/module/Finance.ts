@@ -966,7 +966,7 @@ class Finance extends Module {
   }
 
   private static get currentWeek(): number {
-    // Time.days 按开局时刻换日，weekday 按午夜变化；周额度统一按日历午夜计算。
+    // Time.days 按开局时刻换日，weekday 按午夜变化，周额度统一按日历午夜计算。
     const weekDay = Math.clamp(Math.floor(Number(Time.weekDay) || 1), 1, 7);
     const day = Math.floor(Time.date.timeStamp / TimeConstants.secondsPerDay) - Math.floor(Time.startDate.timeStamp / TimeConstants.secondsPerDay);
     return day - (weekDay - 1);

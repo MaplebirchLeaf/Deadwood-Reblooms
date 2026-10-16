@@ -9,7 +9,7 @@ export type VanillaPlusTrait = VanillaPlusAttribute | 'incorrigible';
 
 // 模块 VanillaPlus 的存档结构，对应 V.VanillaPlus。
 export interface VanillaPlusState {
-  /** 孤儿院事件进度；镜子检定按游戏日记录，不借用原版 daily。 */
+  /** 孤儿院事件进度，镜子检定按游戏日记录，不借用原版 daily。 */
   orphanEvents: {
     mirrorDay: number;
     mirrorDone: boolean;

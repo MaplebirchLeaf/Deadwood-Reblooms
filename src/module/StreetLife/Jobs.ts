@@ -37,7 +37,7 @@ interface JobsState {
   report: { id: string; outcome: 'paid' | 'returned' | 'cancelled' | 'lost'; fee: number; late: boolean; crew?: CrewQuote } | null;
 }
 
-/** 委托只保存本批货物；原版 blackmoney、黑箱与警方记录继续各自结算。 */
+/** 委托只保存本批货物，原版 blackmoney、黑箱与警方记录继续各自结算。 */
 export default class Jobs {
   public static readonly defaults: JobsState = { active: null, offer: '', site: 'pub', cooldowns: {}, day: -1, board: [], completed: 0, earned: 0, losses: 0, report: null };
   public readonly terms = terms;
@@ -81,7 +81,7 @@ export default class Jobs {
           (item.requires !== 'underground' || V.smuggler_pub_known === 1) &&
           item.requires !== 'bailey'
       );
-    // 当前条件过滤之后取三项合法、一项非法；当天随机顺序由委托页面保存。
+    // 当前条件过滤之后取三项合法、一项非法，当天随机顺序由委托页面保存。
     return [...candidates.filter(item => !item.illegal).slice(0, 3), ...candidates.filter(item => item.illegal).slice(0, 1)];
   }
 
@@ -161,7 +161,7 @@ export default class Jobs {
     );
   }
 
-  /** 页面仅展示；接货、交货、归还和付款都在点击时验证当前批次及地点。 */
+  /** 页面仅展示，接货、交货、归还和付款都在点击时验证当前批次及地点。 */
   public act(action: 'accept' | 'collect' | 'check' | 'wait' | 'negotiate' | 'load' | 'unload' | 'deliver' | 'return' | 'cancel' | 'pay', value?: string | number): boolean {
     if (!this.available) return false;
     const state = this.state;
@@ -172,7 +172,7 @@ export default class Jobs {
       const offer = business ? businessOffer : (this.offers.find(item => item.id === value) ?? (value === 'bailey_cargo' ? this.street.bailey.offer : undefined));
       if (!['Deadwood Street Job Offer', 'Deadwood Street Bailey Job', 'Deadwood Street Heist Contacts'].includes(title) || !offer || state.offer !== value) return false;
       if (business && (!this.street.heist.atMeeting || !this.street.heist.meetingAvailable)) return false;
-      // 货物问题只在接单时抽取一次；种类与概率留在目录中维护。
+      // 货物问题只在接单时抽取一次，种类与概率留在目录中维护。
       const issue = offer.issues[random(1, offer.issues.length) - 1] as Job['issue'];
       state.active = { id: offer.id, stage: 'pickup', due: Time.date.timeStamp + offer.deadline_hours * 3600, vehicle: null, searches: 0, issue, handled: '', fee: offer.fee, late: false };
       if (businessOffer) {
@@ -187,7 +187,7 @@ export default class Jobs {
     const contract = this.contract;
     if (!job || !contract) return false;
     if (action === 'check' || action === 'wait' || action === 'negotiate') {
-      // 现场问题只在当前地点处理一次；展示页面与日志不会推进事件。
+      // 现场问题只在当前地点处理一次，展示页面与日志不会推进事件。
       if (title !== 'Deadwood Street Cargo' || this.expired || !this.cargoHere || job.handled || !this.receiving) return false;
       const pickup = job.stage === 'pickup' && this.place === contract.source;
       const delivery = job.stage === 'carrying' && this.place === contract.target;
@@ -255,7 +255,7 @@ export default class Jobs {
         state.earned += job.fee;
         this.street.reputation += job.late ? 1 : contract.reputation;
         this.street.core.SugarCube.Wikifier.wikifyEval(`<<money ${job.fee} 'pub'>>`);
-        // 合法委托也建立业务关系；原版宏保留 Landry 的 −100～100 上限。
+        // 合法委托也建立业务关系，原版宏保留 Landry 的 −100～100 上限。
         this.street.core.SugarCube.Wikifier.wikifyEval(`<<npcincr Landry love ${job.late ? 0 : contract.illegal ? 2 : 1}>>`);
         const quote = job.crew;
         const colleague = quote && V.per_npc[quote.key];

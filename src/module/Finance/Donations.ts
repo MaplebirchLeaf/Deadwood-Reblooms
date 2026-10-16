@@ -123,7 +123,7 @@ export default class Donations {
     return true;
   }
 
-  /** 专项捐赠复用付款与收据；救济采购的累计款项仍按原项目结算。 */
+  /** 专项捐赠复用付款与收据，救济采购的累计款项仍按原项目结算。 */
   public sponsor(fund: Fund, pounds: number, purpose: { EN: string; CN: string }): boolean {
     const amount = Math.round(pounds * 100);
     if (

@@ -154,7 +154,7 @@ export default class PropertyLife {
   }
 
   public begin(action: Activity, item: string | null = null): boolean {
-    // 同一个开酒链接在页面跳转前不能再次消费；返回房间时由酒菜单结束旧场景。
+    // 同一个开酒链接在页面跳转前不能再次消费，返回房间时由酒菜单结束旧场景。
     if (action === 'wine' && this.scene?.action === 'wine') return false;
     this.state.scene = null;
     if (!this.ready(action)) return false;

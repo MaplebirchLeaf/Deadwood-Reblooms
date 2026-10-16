@@ -56,7 +56,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
     }
   );
 
-  // 这些入口补充当前场景；各 widget 按人物日程和剧情状态限制显示。
+  // 这些入口补充当前场景，各 widget 按人物日程和剧情状态限制显示。
   maplebirch.tool.addTo(
     'BeforeLinkZone',
     { widget: 'deadwood-robin-lemonade-links', passage: "Robin's Lemonade" },

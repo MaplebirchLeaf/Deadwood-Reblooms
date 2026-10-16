@@ -8,7 +8,7 @@ export default function Donations(maplebirch: typeof window.maplebirch): void {
     { widget: [-1, 'deadwood-school-donation-visit-link'], passage: 'Hallways' },
     { widget: [-1, 'deadwood-hospital-donation-link'], passage: 'Hospital Foyer' }
   );
-  // 办公室各分支共用离开图标；仅插入短 widget，实际会谈条件在 widget 内判断。
+  // 办公室各分支共用离开图标，仅插入短 widget，实际会谈条件在 widget 内判断。
   maplebirch.tool.inject({
     locationPassage: {
       "Head's Office": [{ src: '<<getouticon>>', applybefore: '<<deadwood-school-donation-office>>', expected: 3 }],
@@ -24,7 +24,7 @@ export default function Donations(maplebirch: typeof window.maplebirch): void {
       ]
     }
   });
-  // 已渲染的正常图书馆场景追加项目成果；原版昏厥、对峙等导航仍有优先权。
+  // 已渲染的正常图书馆场景追加项目成果，原版昏厥、对峙等导航仍有优先权。
   maplebirch.dynamic.regStateEvent('append', ':deadwood-school-donation-supplies', {
     extra: { passage: ['School Library'] },
     cond: () => !V.replayScene && !V.statFreeze && !V.combat && !V.possessed && !V.nextPassageCheck && maplebirch.get('Finance')?.donations.school.ready === true,

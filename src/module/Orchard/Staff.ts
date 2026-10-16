@@ -140,7 +140,7 @@ export default class Staff {
       if (day < state.recover_day) return;
       state.status = state.injuries >= 2 ? 'quit' : 'hired';
       state.report = state.status === 'quit' ? 'unsafe_quit' : 'recovered';
-      // 康复当天不再派出；反复受伤的雇工会自行退出危险岗位。
+      // 康复当天不再派出，反复受伤的雇工会自行退出危险岗位。
       return;
     }
     if (state.route === 'rest') return;

@@ -1,6 +1,6 @@
 :: Deadwood Smuggler Pub Widgets [widget]
 
-/* 菜单与点击共用判定；只有本页的小事才使用这份时长和价格。 */
+/* 菜单与点击共用判定，只有本页的小事才使用这份时长和价格。 */
 <<widget 'deadwood-smuggler-pub-check'>>
   <<set _pub to maplebirch.get('StreetLife')?.smugglerPub>>
   <<set _pubTerms to {
@@ -30,7 +30,7 @@
   <<deadwood-smuggler-pub-check _args[0]>>
   <<if !_pubCan or maplebirch.passage.title isnot 'Deadwood Smuggler Pub' or _args[1] isnot Time.date.timeStamp>><<exit>><</if>>
   <<set _pubAt to Time.date.timeStamp, _pubDay to Math.floor(Time.days)>>
-  /* 先登记限额与茶钱；推进时间中途离场，也不会重复接活或白拿茶。 */
+  /* 先登记限额与茶钱，推进时间中途离场，也不会重复接活或白拿茶。 */
   <<switch _args[0]>>
     <<case 'work'>><<set _pub.state.workDay to _pubDay>>
     <<case 'listen'>><<set _pub.state.listenDay to _pubDay>>
@@ -43,7 +43,7 @@
   <<set _pubLast to {action:_args[0], at:_pubAt, outcome:'interrupted'}>>
   <<set _pub.state.last to _pubLast>>
   <<pass _pubTerm.minutes>>
-  /* 重新确认页面、可停留状态和本次记录的引用；强制转场后不结算恢复、工资或技能。 */
+  /* 重新确认页面、可停留状态和本次记录的引用，强制转场后不结算恢复、工资或技能。 */
   <<if !_pub?.available or maplebirch.passage.title isnot 'Deadwood Smuggler Pub' or _pub.state.last isnot _pubLast>><<exit>><</if>>
   <<set _pubLast.outcome to 'done'>>
   <<switch _pubLast.action>>

@@ -149,7 +149,7 @@ class Raven extends Transformation {
     return this.flock.met;
   }
 
-  /** 森林与老教堂墓地的日间鸟群；不打断追猎、昏厥或已排定的场景。 */
+  /** 森林与老教堂墓地的日间鸟群，不打断追猎、昏厥或已排定的场景。 */
   public get available(): boolean {
     return (
       ['forest', 'churchyard'].includes(V.location) &&

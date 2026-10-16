@@ -479,7 +479,7 @@ class Achievements {
         break;
       }
       case 'Finance': {
-        // 董事记录正式任命；控股读取当前已交割股份，未交割股份不算。
+        // 董事记录正式任命，控股读取当前已交割股份，未交割股份不算。
         maplebirch.dynamic.regStateEvent('append', 'finance-board-seat-feat', {
           output: 'earnFeat "Deadwood Board Seat"',
           cond: () => V.feats?.currentSave['Deadwood Board Seat'] === undefined && V.Finance?.company?.shareholders?.board === true

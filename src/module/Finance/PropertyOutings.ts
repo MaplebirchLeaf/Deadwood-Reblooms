@@ -36,7 +36,7 @@ export interface PropertyOutingState {
   memories: Record<string, OutingMemory>;
 }
 
-/** 房屋只保存约定和短暂来访；道路、车辆、费用与正文沿用已有模块。 */
+/** 房屋只保存约定和短暂来访，道路、车辆、费用与正文沿用已有模块。 */
 export default class PropertyOutings {
   public static readonly defaults: PropertyOutingState = { plan: null, visits: {}, note: null, offer_day: -7, memories: {} };
 
@@ -137,7 +137,7 @@ export default class PropertyOutings {
       : null;
   }
 
-  /** 由既有的居家日常入口提出邀约；刷新正文不会重新抽选。 */
+  /** 由既有的居家日常入口提出邀约，刷新正文不会重新抽选。 */
   public propose(): boolean {
     const property = this.estate.current;
     const transport = this.core.get('Transport');
@@ -448,7 +448,7 @@ export default class PropertyOutings {
     return true;
   }
 
-  /** 在原版函数返回位置前应用约定；囚禁、伤病和节庆安排仍有优先权。 */
+  /** 在原版函数返回位置前应用约定，囚禁、伤病和节庆安排仍有优先权。 */
   public location(name: string, original: string): string {
     if (!V.Finance?.real_estate) return original;
     const property = this.estate.residenceOf(name)?.id;
@@ -458,7 +458,7 @@ export default class PropertyOutings {
     if (this.travelling && this.plan!.name === name) return 'deadwood_outing';
     const visit = this.state.visits[name];
     if (visit?.property === property && visit.until > Time.date.timeStamp) {
-      // 接回家只覆盖空闲时段；店铺、家教、排练和神殿事务仍按原日程进行。
+      // 接回家只覆盖空闲时段，店铺、家教、排练和神殿事务仍按原日程进行。
       const free =
         name === 'Robin'
           ? ['orphanage', 'sleep'].includes(original)

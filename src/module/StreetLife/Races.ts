@@ -38,7 +38,7 @@ interface RacesState {
   fees: number;
 }
 
-/** 比赛拥有独立赛段结算；普通交通行程不参与赛事的油耗、计时或车辆移动。 */
+/** 比赛拥有独立赛段结算，普通交通行程不参与赛事的油耗、计时或车辆移动。 */
 export default class Races {
   public static readonly defaults: RacesState = { origin: null, played: {}, watched: -1, session: null, last: null, started: 0, completed: 0, wins: 0, earned: 0, fees: 0 };
   public readonly terms = terms;
@@ -59,7 +59,7 @@ export default class Races {
   }
 
   public get night(): number {
-    // 原版 Time.days 从开局时刻计日；赛事按凌晨四点划分同一晚。
+    // 原版 Time.days 从开局时刻计日，赛事按凌晨四点划分同一晚。
     return Math.floor((Time.date.timeStamp - 4 * TimeConstants.secondsPerHour) / TimeConstants.secondsPerDay);
   }
 
@@ -170,7 +170,7 @@ export default class Races {
     return true;
   }
 
-  /** 离开赛事页面不领奖；强制转场时保留最后已经经过的道路节点。 */
+  /** 离开赛事页面不领奖，强制转场时保留最后已经经过的道路节点。 */
   public enterPassage(): void {
     if (['Deadwood Street Races', 'Deadwood Street Race'].includes(this.street.core.passage.title)) return;
     if (this.state.session) this.finish('interrupted');
@@ -225,7 +225,7 @@ export default class Races {
     }
     if (!this.state.session || this.street.core.passage.title !== 'Deadwood Street Races' || !this.fit) {
       this.finish('interrupted');
-      // 同页中断后刷新回执；原版强制转场或待处理事件继续接管页面。
+      // 同页中断后刷新回执，原版强制转场或待处理事件继续接管页面。
       return this.street.core.passage.title === 'Deadwood Street Races' && !V.nextPassage && !V.nextPassageCheck;
     }
     return true;

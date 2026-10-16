@@ -80,7 +80,7 @@ export function parseDMConfig(value: unknown, hasFile: (file: string) => boolean
       }
       return { key: key as keyof MusicState, values };
     });
-    // 字符串末尾的 * 只表示前缀匹配；配置不能执行代码或注入正则。
+    // 字符串末尾的 * 只表示前缀匹配，配置不能执行代码或注入正则。
     return state =>
       conditions.every(({ key, values }) =>
         values.some(expected => (typeof expected === 'string' && expected.endsWith('*') ? String(state[key]).startsWith(expected.slice(0, -1)) : state[key] === expected))
@@ -138,7 +138,7 @@ class DynamicMusic {
     return V.options?.maplebirch?.DynamicMusic;
   }
 
-  // 分轨倍率由框架管理；声明包尚未发布此接口，边界仅补充这项公开契约。
+  // 分轨倍率由框架管理，声明包尚未发布此接口，边界仅补充这项公开契约。
   private get audio() {
     return this.core.audio as typeof this.core.audio & { setModVolume(modName: string, volume: number): void };
   }

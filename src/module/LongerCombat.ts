@@ -40,7 +40,7 @@ class LongerCombat {
     const story = maplebirch.SugarCube.Story;
     if (!story.has(finish)) return undefined;
     const macro = V.enemytype === 'beast' ? 'beastejaculation' : 'ejaculation';
-    // short 只缩短原版结算文本；knot 等改变流程的参数仍交给剧情处理。
+    // short 只缩短原版结算文本，knot 等改变流程的参数仍交给剧情处理。
     const text = story.get(finish).text;
     if (text.includes(`<<${macro}>>`)) return { name: macro, short: false };
     if (text.includes(`<<${macro} "short">>`) || text.includes(`<<${macro} 'short'>>`)) return { name: macro, short: true };

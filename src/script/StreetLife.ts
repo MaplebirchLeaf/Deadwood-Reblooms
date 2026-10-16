@@ -3,7 +3,7 @@ import SmugglerPub from './StreetLife/SmugglerPub';
 
 export default function StreetLife(maplebirch: typeof window.maplebirch): void {
   const weaponTrait = () => {
-    // 原版 clothingtrait 按 type 读取这张表及同名图标；物品标识不能只有 type 而没有说明。
+    // 原版 clothingtrait 按 type 读取这张表及同名图标，物品标识不能只有 type 而没有说明。
     setup.shopDetails.weapon = {
       name: maplebirch.t('deadwood-reblooms:clothing-type:weapon:name'),
       desc: maplebirch.t('deadwood-reblooms:clothing-type:weapon:description'),
@@ -12,7 +12,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
   };
   maplebirch.tool.onInit(weaponTrait);
   maplebirch.on(':language', weaponTrait);
-  // 服装目录独立于模块开关加载，类型说明常驻；玩法只在模块启用时接入。
+  // 服装目录独立于模块开关加载，类型说明常驻，玩法只在模块启用时接入。
   if (!maplebirch.get('StreetLife')) return;
   maplebirch.tool.patch.traits.add(
     {
@@ -53,7 +53,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       if (!street || !V.StreetLife?.bounties || !V.StreetLife.heist || !V.StreetLife.bailey) return;
       const work = street.bounties;
       const heist = street.heist.state;
-      // 原版逮捕或强制转场可能离开自有页面；在这里收束未结束的行动，保留原版判刑。
+      // 原版逮捕或强制转场可能离开自有页面，在这里收束未结束的行动，保留原版判刑。
       if ((maplebirch.passage.title === 'Police Cell' && (street.heist.inAction || (heist.stage === 'settlement' && heist.loot > 0))) || (work.fightingHeist && !V.combat)) {
         const actor = heist.fight?.key ?? (heist.stage === 'challenge' ? 'deadwood_heist_guard' : undefined);
         if (actor && V.NPCList[0]?.per === actor) maplebirch.SugarCube.Wikifier.wikifyEval('<<endevent>>');
@@ -91,7 +91,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
   });
   maplebirch.dynamic.regStateEvent('append', 'deadwood-street-bounty-hunter', {
     extra: { match: / Street$/ },
-    // 原文及普通街道菜单已完成，才能拦路；强制事件没有当页 Bus 链接。
+    // 原文及普通街道菜单已完成，才能拦路，强制事件没有当页 Bus 链接。
     cond: () => {
       const street = maplebirch.get('StreetLife');
       if (!street || !V.StreetLife?.bounties || !V.StreetLife.heist || !V.StreetLife.bailey) return false;
@@ -116,7 +116,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
     locationPassage: {
       'Farm Road 1': [
         {
-          // 普通公路菜单的进城选项前；避开昏倒、来车逼近与搭便车事件。
+          // 普通公路菜单的进城选项前，避开昏倒、来车逼近与搭便车事件。
           src: '<<entertownicon>>',
           applybefore: '<<deadwood-street-race-link>>\n\t',
           expected: 1
@@ -124,7 +124,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       ],
       'Smuggler Pub': [
         {
-          // 原版正常菜单的下水道出口前；不插入 Zephyr 强制事件或 Wren 初遇。
+          // 原版正常菜单的下水道出口前，不插入 Zephyr 强制事件或 Wren 初遇。
           src: '<<sewericon>>',
           applybefore: '<<deadwood-street-heist-link>>\n<<deadwood-street-mickey-link>>\n',
           expected: 1
@@ -132,7 +132,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       ],
       'Ocean Breeze': [
         {
-          // 普通咖啡馆菜单的离店选项前，避开 Sam 剧情及昏倒；营业状态由货物入口重验。
+          // 普通咖啡馆菜单的离店选项前，避开 Sam 剧情及昏倒，营业状态由货物入口重验。
           src: '<<clifficon>>',
           applybefore: "<<deadwood-street-cargo-link 'cafe'>>\n",
           expected: 1
@@ -140,7 +140,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       ],
       Docks: [
         {
-          // 码头总览的原版衣物检查前；委托入口排除夜间封锁，不进入潜入事件。
+          // 码头总览的原版衣物检查前，委托入口排除夜间封锁，不进入潜入事件。
           src: '<<storeon "docks" "check">>',
           applybefore: "<<deadwood-street-cargo-link 'docks'>>\n",
           expected: 1
@@ -156,7 +156,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       ],
       'Town Hall Wait': [
         {
-          // 已按原版排队二十分钟、轮到前台办理；保留随后出现的原版委托。
+          // 已按原版排队二十分钟、轮到前台办理，保留随后出现的原版委托。
           src: '<<if $hookah_plot is 1>>',
           applybefore: "<<deadwood-street-cargo-link 'townhall'>>\n",
           expected: 1
@@ -172,7 +172,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       ],
       'Hospital Foyer': [
         {
-          // 原版药房入口所在的普通菜单；继承压力、裸露与急救分支，不打断医院事件。
+          // 原版药房入口所在的普通菜单，继承压力、裸露与急救分支，不打断医院事件。
           src: '<<pillicon>>',
           applybefore: "<<deadwood-street-cargo-link 'hospital'>>\n\t\t",
           expected: 1
@@ -180,7 +180,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       ],
       'Industrial Alleyways': [
         {
-          // 原版普通探索分支的梯子选项前；不穿过街头遭遇或泳池聚会的强制入口。
+          // 原版普通探索分支的梯子选项前，不穿过街头遭遇或泳池聚会的强制入口。
           src: '<<laddericon>>',
           applybefore: "<<deadwood-street-cargo-link 'alley'>>\n\t\t",
           expected: 1
@@ -190,7 +190,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
     widgetPassage: {
       'Widgets Pub': [
         {
-          // 与原版兰德里选项一同出现；独占的艾弗里与 Wren 介绍段不调用此 widget。
+          // 与原版兰德里选项一同出现，独占的艾弗里与 Wren 介绍段不调用此 widget。
           src: '<<widget "landryoptions">>',
           applyafter: '\n\t<<deadwood-street-landry-link>>',
           expected: 1
@@ -198,7 +198,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       ],
       'Clothing Shop v2 Widgets': [
         {
-          // 酒馆夜间仍营业；其它商店的闭店偷窃分支维持原样。
+          // 酒馆夜间仍营业，其它商店的闭店偷窃分支维持原样。
           src: '$shopName isnot "forest"',
           to: '!["forest", "deadwoodStreet"].includes($shopName)',
           expected: 1

@@ -324,7 +324,7 @@ class BirdTower extends Module {
       child.development.timer ??= 30;
       if (Number.isFinite(child.development.timer)) return;
     }
-    // activityDay 属于从开局时刻起算的 24 小时区间；其边界不是午夜。
+    // activityDay 属于从开局时刻起算的 24 小时区间，其边界不是午夜。
     const dayStart = Time.startDate.timeStamp + activityDay * TimeConstants.secondsPerDay;
     let activityAt = Math.floor(dayStart / TimeConstants.secondsPerDay) * TimeConstants.secondsPerDay + activityHour * TimeConstants.secondsPerHour;
     if (activityAt < dayStart) activityAt += TimeConstants.secondsPerDay;

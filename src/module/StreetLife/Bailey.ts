@@ -13,7 +13,7 @@ interface BaileyState {
   fight: CargoFight | null;
 }
 
-/** 一批货物、一场争议；运输与报酬仍由 Jobs 处理，战斗共用街头遭遇。 */
+/** 一批货物、一场争议，运输与报酬仍由 Jobs 处理，战斗共用街头遭遇。 */
 export default class Bailey {
   public static readonly defaults: BaileyState = { resolution: '', finished: false, witnessed: false, discussed: false, invitation: '', fight: null };
   public constructor(private readonly street: StreetLife) {}

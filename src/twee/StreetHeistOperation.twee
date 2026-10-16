@@ -1,6 +1,6 @@
 :: Deadwood Street Heist Operation Widgets [widget]
 
-<!-- 只在明确点击时推进阶段；正文、日志和战斗返回文字不结算金钱或关系。 -->
+<!-- 只在明确点击时推进阶段，正文、日志和战斗返回文字不结算金钱或关系。 -->
 <<widget 'deadwood-street-heist-clear-guard'>>
   <<endevent>>
   <<if $per_npc.deadwood_heist_guard>><<clearNPC 'deadwood_heist_guard'>><</if>>
@@ -16,7 +16,7 @@
       <<if _heistState.approach is 'quiet' and _heistState.rolls.entry lte _heistWork.chances.entry>>
         <<set _heistState.stage to 'vault'>>
       <<else>>
-        <!-- 察觉到 PC 后仍可交涉或撤回；生成一次守卫并保存，抵抗才进入原版战斗。 -->
+        <!-- 察觉到 PC 后仍可交涉或撤回，生成一次守卫并保存，抵抗才进入原版战斗。 -->
         <<endevent>><<generateNPC 1 'a'>><<set $NPCList[0].per to 'deadwood_heist_guard'>><<saveNPC 0 'deadwood_heist_guard'>><<endevent>>
         <<if !$per_npc.deadwood_heist_guard>><<exit>><</if>>
         <<set _heistState.raisedAlarm to true, _heistState.stage to 'challenge'>>
@@ -24,7 +24,7 @@
           <<set _heistState.fight to {key: 'deadwood_heist_guard', combatStarted: false, resume: 'vault'}>>
         <</if>>
       <</if>>
-      <!-- 实际实施抢劫后才记罪证与停业；柜台接待仍由金融模块处理。 -->
+      <!-- 实际实施抢劫后才记罪证与停业，柜台接待仍由金融模块处理。 -->
       <<set _heistState.entered to true>>
       <<set _heistState.bankClosedUntil to Math.max(_heistState.bankClosedUntil, Math.floor(Time.days) + _heistWork.terms.bankClosureDays)>>
       <<crimeUp _heistWork.terms.crime.entry 'trespassing'>>
@@ -72,7 +72,7 @@
         <<if !_heistWork.vehicleReady>><<exit>><</if>>
         <<set _heistTransport to maplebirch.get('Transport'), _heistVehicle to _heistWork.vehicle>>
         <<set _heistModel to _heistTransport.catalog.models.find(item => item.id === _heistVehicle.model)>>
-        <!-- 谨慎撤离多用十分钟，实际燃油也必须足够；不能截到零当成已经付清。 -->
+        <!-- 谨慎撤离多用十分钟，实际燃油也必须足够，不能截到零当成已经付清。 -->
         <<if _heistVehicle.fuel lt _heistModel.fuel_use * _heistEscapeMinutes>><<exit>><</if>>
       <<else>>
         <<if $worn.feet.type.includes('shackle')>><<exit>><</if>>
@@ -88,7 +88,7 @@
       <</if>>
       <<set _heistState.outcome to _heistState.rolls.escape lte _heistEscapeChance ? 'success' : 'failed'>>
       <<if _heistState.outcome is 'failed'>><<set _heistState.loot to 0>><</if>>
-      <!-- 先离开可重复点击的阶段，再结算时间；原版强制事件优先。 -->
+      <!-- 先离开可重复点击的阶段，再结算时间，原版强制事件优先。 -->
       <<set _heistState.stage to 'settlement'>><<endevent>><<pass _heistEscapeMinutes>>
       <<if !_heistDriving>>
         <<tiredness 8>>
@@ -196,7 +196,7 @@
   <</if>>
 <</widget>>
 
-<!-- 已确认的分成先读取；领取后才变更关系，避免好感变化反过来改写本单报价。 -->
+<!-- 已确认的分成先读取，领取后才变更关系，避免好感变化反过来改写本单报价。 -->
 <<widget 'deadwood-street-heist-settle'>>
   <<set _heistWork to maplebirch.get('StreetLife')?.heist>>
   <<if !_heistWork?.available or $passage isnot 'Deadwood Street Heist Debrief' or _heistWork.state.stage isnot 'settlement' or _heistWork.state.settled>><<exit>><</if>>
@@ -229,13 +229,13 @@
     <<case 'withdrawn'>>
       <<set maplebirch.get('StreetLife').reputation += _heistWork.terms.withdrawPenalty>>
   <</switch>>
-  <!-- 已实际参与犯罪又放弃约定，也会失去信任；仅会面、入场前退出不视为背叛。 -->
+  <!-- 已实际参与犯罪又放弃约定，也会失去信任，仅会面、入场前退出不视为背叛。 -->
   <<if _heistWork.state.policePlan and _heistWork.state.entered and !['reported', 'sting'].includes(_heistOutcome)>>
     <<set C.npc.Grant.love to Math.clamp(C.npc.Grant.love + _heistWork.terms.favour.grantBetrayal, 0, 100)>>
   <</if>>
 <</widget>>
 
-<!-- 供共享战斗结束页调用；这里只显示结果，战斗状态由 Bounties 的原有终局结算。 -->
+<!-- 供共享战斗结束页调用，这里只显示结果，战斗状态由 Bounties 的原有终局结算。 -->
 <<widget 'deadwood-street-heist-finish'>>
   <<set _heistWork to maplebirch.get('StreetLife')?.heist>>
   <<if !_heistWork>><<exit>><</if>>

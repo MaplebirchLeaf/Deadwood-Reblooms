@@ -267,7 +267,7 @@ export default class Company {
       }
     }
 
-    // 按既有日结游标处理关系收益；营业时间只限制会面，不限制日结。
+    // 按既有日结游标处理关系收益，营业时间只限制会面，不限制日结。
     const shareholders = this.shareholders;
     const brokerage = this.finance.state.brokerage;
     const unsettled = brokerage.unsettled;
@@ -294,7 +294,7 @@ export default class Company {
       if (avery.rage > 0) this.finance.core.SugarCube.Wikifier.wikifyEval('<<npcincr Avery rage -1>>');
       const lastDomDay = shareholders.state.last_dom_day ?? -1;
       const domChange = Math.min(1, Math.max(0, avery.dom - (controller ? 25 : 50)));
-      // 董事与控股共用七天限额；身份升级或暂时失效都不重置，已有低值不会反抬。
+      // 董事与控股共用七天限额，身份升级或暂时失效都不重置，已有低值不会反抬。
       if (domChange > 0 && (lastDomDay < 0 || day >= lastDomDay + 7)) {
         shareholders.state.last_dom_day = day;
         this.finance.core.SugarCube.Wikifier.wikifyEval(`<<npcincr Avery dom ${-domChange}>>`);

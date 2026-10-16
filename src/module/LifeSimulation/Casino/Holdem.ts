@@ -212,7 +212,7 @@ class Holdem {
         if (!seat.folded) seat.cards.push(state.deck.shift()!);
       }
     }
-    // 单挑时庄位下小盲；多人桌从庄位下一位开始，不让输光的座位继续下盲注。
+    // 单挑时庄位下小盲，多人桌从庄位下一位开始，不让输光的座位继续下盲注。
     const small = state.seats.filter(seat => !seat.folded).length === 2 ? state.button : this.order((state.button + 1) % count)[0];
     const big = this.order((small + 1) % count)[0];
     this.put(small, this.bigBlind / 2);

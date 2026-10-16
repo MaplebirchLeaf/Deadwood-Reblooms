@@ -73,7 +73,7 @@ type Action =
   | 'leave'
   | 'arrest';
 
-/** 追缉状态保存目标身份和实际载人车辆；原版罪证、犯罪历史与判刑独立结算。 */
+/** 追缉状态保存目标身份和实际载人车辆，原版罪证、犯罪历史与判刑独立结算。 */
 export default class Bounties {
   public static readonly defaults: BountiesState = {
     cooperating: false,
@@ -119,7 +119,7 @@ export default class Bounties {
     return Math.floor(((this.state.active?.fee ?? this.contract?.fee ?? 0) * terms.lead_fee_percent) / 100);
   }
 
-  /** 核实身份后可将追缉交给警方；线索报酬不冒充抓捕完成。 */
+  /** 核实身份后可将追缉交给警方，线索报酬不冒充抓捕完成。 */
   public get canReportLead(): boolean {
     return (
       this.street.core.passage.title === 'Deadwood Street Bounties' &&
@@ -250,7 +250,7 @@ export default class Bounties {
     });
   }
 
-  /** 装载允许停在原地；追车还需满足交通模块的上路条件，并预留短途燃油。 */
+  /** 装载允许停在原地，追车还需满足交通模块的上路条件，并预留短途燃油。 */
   public get drivers(): Vehicle[] {
     const transport = this.street.core.get('Transport');
     if (!transport?.ready || !transport.state.school.motor_vehicle.licensed || V.drunk > 0 || V.drugged > 0 || V.stress >= V.stressmax || V.worn.feet.type.includes('shackle')) return [];
@@ -280,7 +280,7 @@ export default class Bounties {
     return ((this.point ? Catalog.distance(this.point, 'barb') : null) ?? 30) + 5;
   }
 
-  /** append 确认原版普通街道菜单后调用；先记日期，刷新及强制事件不会重抽。 */
+  /** append 确认原版普通街道菜单后调用，先记日期，刷新及强制事件不会重抽。 */
   public checkHunter(): void {
     if (this.state.hunter || this.state.hunterDay === Math.floor(Time.days) || !this.available || !this.point || this.street.heist.inAction) return;
     const offence = window.crimeSumCurrent();
@@ -300,12 +300,12 @@ export default class Bounties {
     };
   }
 
-  /** 返回 true 表示一次有效选择；失败的追逐也会推进阶段，不能反复点同一选项重抽。 */
+  /** 返回 true 表示一次有效选择，失败的追逐也会推进阶段，不能反复点同一选项重抽。 */
   public act(action: Action, value?: string | number): boolean {
     const state = this.state;
     const title = this.street.core.passage.title;
     const wiki = (source: string) => this.street.core.SugarCube.Wikifier.wikifyEval(source);
-    // 原版 endcombat 会清空遭遇槽；在清理之前保存演员并读取结果，刷新不能再结算。
+    // 原版 endcombat 会清空遭遇槽，在清理之前保存演员并读取结果，刷新不能再结算。
     if (action === 'finish') {
       const fight = this.fight;
       if (title !== 'Deadwood Street Fight Finish' || !fight || !this.combatComplete || V.replayScene || V.statFreeze) return false;
@@ -438,7 +438,7 @@ export default class Bounties {
       C.npc.Grant.love = Math.clamp(this.trust + 3, 0, 100);
       if (V.per_npc[job.key]) wiki(`<<endevent>><<clearNPC '${job.key}'>>`);
       wiki(`<<money ${fee} 'police'>>`);
-      // 先按付款前资格结算；完成最后一种委托的这单不提前获得奖金。
+      // 先按付款前资格结算，完成最后一种委托的这单不提前获得奖金。
       const completedTypes = (state.completedTypes ??= []);
       if (!completedTypes.includes(job.id)) completedTypes.push(job.id);
       return true;
@@ -464,7 +464,7 @@ export default class Bounties {
     }
     if (action === 'medical-handover') {
       if (!['Deadwood Street Bounties', 'Deadwood Street Bounty'].includes(title) || job.stage !== 'escort' || !this.here || !this.wounded || !this.point || job.vehicle !== null) return false;
-      // 伤者由医护和警员接走；PC 留在原地，不借用原版针对 PC 的 ambulance。
+      // 伤者由医护和警员接走，PC 留在原地，不借用原版针对 PC 的 ambulance。
       wiki('<<pass 30>>');
       if (state.active !== job || title !== this.street.core.passage.title || !this.available || !this.here) return false;
       job.stage = 'settlement';

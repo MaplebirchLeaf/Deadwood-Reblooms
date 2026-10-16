@@ -34,7 +34,7 @@ export default function SmugglerPub(maplebirch: typeof window.maplebirch): void 
         default: { condition: () => !Weather.lightsOn, image: 'base.png' },
         night: { condition: () => Weather.lightsOn, image: 'base-night.png' }
       },
-      // 洞内灯笼昼夜点着；两张底图和发光遮罩均为 32×32，坐标一致。
+      // 洞内灯笼昼夜点着，两张底图和发光遮罩均为 32×32，坐标一致。
       emissive: { image: 'emissive.png', condition: () => true, color: '#e8b46b', size: 2, intensity: 0.45, blur: 0.3 },
       weather: { rainSplashEnabled: false, fogEnabled: false, fogDistributionCurve: 1, groundBounds: { splashes: { top: 0, bottom: 0 }, fog: { top: 0, bottom: 0 } } }
     },

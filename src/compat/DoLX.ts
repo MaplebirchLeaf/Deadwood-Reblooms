@@ -113,7 +113,7 @@ export default function DoLX(core: MaplebirchCore): void {
       );
     }
     if (core.get('VanillaPlus')) {
-      // AMC 公式在下方单独处理；只移除对应的原版规则，其余钳制、作弊和战斗补丁照常接入。
+      // AMC 公式在下方单独处理，只移除对应的原版规则，其余钳制、作弊和战斗补丁照常接入。
       const attributes = ['beauty', 'physique', 'willpower'];
       const legacy: Record<string, string[]> = {
         'Widgets Clamp': attributes.map(stat => `Math\\.clamp\\(\\$${stat},`),
@@ -141,13 +141,13 @@ export default function DoLX(core: MaplebirchCore): void {
         { srcmatchgroup: /<<money -25000 (?=["']hospitalParasiteRemoval["']>>)/g, to: '<<money `-maplebirch.get("Finance").donations.aid.fee` ', expected: 2 }
       ];
     }
-    // DoLX 已有独立 NPC 第 5 档；仅移除本模组为原版补缺的三组规则。
+    // DoLX 已有独立 NPC 第 5 档，仅移除本模组为原版补缺的三组规则。
     for (const title of ['Widgets Effects Man', 'Widgets Combat Man-Combat', 'Widgets Ejaculation']) {
       const rules = core.tool.zone.widgetPassage[title];
       if (rules) core.tool.zone.widgetPassage[title] = rules.filter(rule => rule.srcmatch?.source !== npc_size_patch.srcmatch.source || !rule.to?.startsWith('$1<<case 5>><<deadwood-npc-size-five-'));
     }
     if (core.get('LifeSimulation')) {
-      // DoLX 已将书包分到 bag 槽；保留它的原生判断与暂存，不套用原版手持书包规则。
+      // DoLX 已将书包分到 bag 槽，保留它的原生判断与暂存，不套用原版手持书包规则。
       const bookbags = [
         'Widgets Events Science',
         'Widgets Events English',
@@ -166,7 +166,7 @@ export default function DoLX(core: MaplebirchCore): void {
           if (group[title]) group[title] = group[title].filter(rule => !handRule(rule));
         }
       }
-      // 雨伞能力已由手持视图统一处理；这里只修正 DoLX 额外的完整度检查与损耗。
+      // 雨伞能力已由手持视图统一处理，这里只修正 DoLX 额外的完整度检查与损耗。
       core.tool.zone.widgetPassage['Ambient Weather And Seasonal Event Widgets'] = [
         ...(core.tool.zone.widgetPassage['Ambient Weather And Seasonal Event Widgets'] ?? []).filter(rule => !handRule(rule)),
         { srcmatch: /\$worn\.handheld\.integrity/g, to: '(maplebirch.get("LifeSimulation").hands.item("rainproof") ?? $worn.handheld).integrity', expected: 3 }
@@ -234,7 +234,7 @@ export default function DoLX(core: MaplebirchCore): void {
       ]
     };
     if (core.get('VanillaPlus')) {
-      // DoLX 生成和还原身体时使用自己的绝对上限；只扩展 PC 的这一项。
+      // DoLX 生成和还原身体时使用自己的绝对上限，只扩展 PC 的这一项。
       rules['koztools.js'] = [
         [/repairBounds\("penissizemin", "penissizemax", 0, 6\);/, 'repairBounds("penissizemin", "penissizemax", 0, 7);'],
         [/penis: \{ absMax: 6,/, 'penis: { absMax: 7,']
@@ -252,7 +252,7 @@ export default function DoLX(core: MaplebirchCore): void {
 
     // 接入 DoLX 的 AMC 公式与缓存后的诱惑评分，保留特质倍率和作弊控件回调。
     const passageRules: Record<string, Rule[]> = {
-      // DoLX 的兽化称号使用块函数；保留性别感受和 Harpy 判断，只补生理标记。
+      // DoLX 的兽化称号使用块函数，保留性别感受和 Harpy 判断，只补生理标记。
       Traits: [
         [
           /name: \(\) => (\{\s*(?:if \(V\.hallucinations gte 2 \|\| !V\.settings\.bestialityEnabled\) return "Harpy";\s*)?if \(playerFeelsManlike\(\)\) return "(?:Wolf|Cat|Bird)boy";\s*if \(playerFeelsGirllike\(\)\) return "(?:Wolf|Cat|Bird)girl";\s*return "(?:Wolf|Cat|Bird)kin";\s*\}),/g,

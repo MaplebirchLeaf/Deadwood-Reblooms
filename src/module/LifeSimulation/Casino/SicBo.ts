@@ -1,6 +1,6 @@
 import type Casino from '../Casino';
 
-/** 赔率均为净赢倍数，结算另退本金；本桌不使用随机倍率。 */
+/** 赔率均为净赢倍数，结算另退本金，本桌不使用随机倍率。 */
 export const sicBoBets = [
   ...['small', 'big', 'odd', 'even'].map(key => ({ key, odds: 1 })),
   { key: 'triple', odds: 30 },
@@ -36,7 +36,7 @@ export default class SicBo {
     return this.casino.available && !V.replayScene && !V.statFreeze && !V.possessed && this.stake > 0 && this.stake <= this.limit && this.casino.chips >= this.stake;
   }
 
-  /** 布置赌注时不扣筹码；重复选择同一格撤回，开骰后一次扣付并清空布局。 */
+  /** 布置赌注时不扣筹码，重复选择同一格撤回，开骰后一次扣付并清空布局。 */
   public place(key: string, amount: number): boolean {
     if (!this.casino.available || V.replayScene || V.statFreeze || V.possessed || !sicBoBets.some(bet => bet.key === key) || !this.casino.options.blackjack.bets.includes(amount)) return false;
     if (this.state.bets[key] === amount) delete this.state.bets[key];
@@ -47,7 +47,7 @@ export default class SicBo {
     return true;
   }
 
-  /** 单点按出现次数净赢 1/2/3 倍；豹子使大小、单双全部输，合计点数照常结算。 */
+  /** 单点按出现次数净赢 1/2/3 倍，豹子使大小、单双全部输，合计点数照常结算。 */
   public roll(): boolean {
     if (!this.canRoll) return false;
     const dice = Array.from({ length: 3 }, () => random(1, 6));

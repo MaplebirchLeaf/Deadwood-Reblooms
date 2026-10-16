@@ -23,7 +23,7 @@
   <</if>>
 <</widget>>
 
-<!-- 本单的现场选择均重验批次与地点；放行不等于取货，交付和报酬仍由原委托结算。 -->
+<!-- 本单的现场选择均重验批次与地点，放行不等于取货，交付和报酬仍由原委托结算。 -->
 <<widget 'deadwood-street-bailey-resolve'>>
   <<set _baileyWork to maplebirch.get('StreetLife')?.bailey, _baileyAction to _args[0]>>
   <<if _baileyWork?.available and _baileyWork.seized and !_baileyWork.jobs.expired and !_baileyWork.state.finished>>
@@ -31,7 +31,7 @@
       <<if _baileyWork.state.witnessed and $passage is 'Deadwood Street Detective' and Time.hour gte 8 and Time.hour lt 18 and !_baileyWork.jobs.contract.illegal and !maplebirch.get('StreetLife').bounties.wanted and maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
         <<set _baileyWork.jobs.state.report to {id: 'bailey_cargo', outcome: 'cancelled', fee: 0, late: false}>>
         <<set _baileyWork.jobs.state.active to null, _baileyWork.state.resolution to 'reported', _baileyWork.state.finished to true>>
-        <!-- Grant 的信任上限沿用注册数据；原版 npcincr 仅允许原版 NPC 名单。 -->
+        <!-- Grant 的信任上限沿用注册数据，原版 npcincr 仅允许原版 NPC 名单。 -->
         <<set C.npc.Grant.love to Math.clamp(C.npc.Grant.love + 2, 0, 100)>><<pass 10>>
       <</if>>
     <<elseif $passage is 'Deadwood Street Cargo' and _baileyWork.jobs.state.site is 'alley' and _baileyWork.jobs.receiving>>

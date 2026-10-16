@@ -11,7 +11,7 @@ interface PubState {
   cards: typeof SmugglerCards.defaults;
 }
 
-/** 酒馆小事只在点击时推进；日限额随存档保存，正文和侧栏读取不结算。 */
+/** 酒馆小事只在点击时推进，日限额随存档保存，正文和侧栏读取不结算。 */
 export default class SmugglerPub {
   public static readonly defaults: PubState = { workDay: -1, listenDay: -1, restAt: -3600, teaDay: -1, teaCount: 0, last: null, cards: SmugglerCards.defaults };
   public readonly cards: SmugglerCards;

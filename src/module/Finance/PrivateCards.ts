@@ -15,7 +15,7 @@ export interface PrivateCardsState {
   table: HoldemState;
 }
 
-/** 贝利家的四位固定客人共用扑克规则；筹码、座位与结束状态独立于赌场。 */
+/** 贝利家的四位固定客人共用扑克规则，筹码、座位与结束状态独立于赌场。 */
 export default class PrivateCards extends Holdem {
   public static readonly defaults: PrivateCardsState = {
     active: false,
@@ -113,7 +113,7 @@ export default class PrivateCards extends Holdem {
     this.finance.core.get('LifeSimulation')?.casino.record('holdem', stake, payout, '', 'private');
   }
 
-  /** 中断与主动离席均只兑回一次；旁观者没有买入，也不会领取桌上的钱。 */
+  /** 中断与主动离席均只兑回一次，旁观者没有买入，也不会领取桌上的钱。 */
   public close(): boolean {
     if (!this.session.active || V.replayScene || V.statFreeze) return false;
     const amount = this.watching ? 0 : super.cashOut();

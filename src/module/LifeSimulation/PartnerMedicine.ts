@@ -7,7 +7,7 @@ export interface PartnerMedicineState {
   doses: Partial<Record<Partner, { day: number; progress: Partial<Record<Part, number>> }>>;
 }
 
-/** 原版药片库存供双方共用；每人每天只接受一剂，七剂推进一档。 */
+/** 原版药片库存供双方共用，每人每天只接受一剂，七剂推进一档。 */
 export default class PartnerMedicine {
   public constructor(private readonly core: typeof maplebirch) {}
 
@@ -69,7 +69,7 @@ export default class PartnerMedicine {
     npc[key] = (npc[key] ?? 2) + Math.sign(progress);
     if (part === 'breast') npc.breastdesc = npc.breastsize > 0 ? 'breasts' : undefined;
     this.core.npc.NamedNPC.prototype.bodyPartdescription.call(npc);
-    // 当前遭遇记录可能已装载；只同步这个人的尺寸和描述，不重新生成器官。
+    // 当前遭遇记录可能已装载，只同步这个人的尺寸和描述，不重新生成器官。
     for (const loaded of V.NPCList ?? []) {
       if (loaded?.fullDescription !== name) continue;
       loaded[key] = npc[key];

@@ -12,7 +12,7 @@
   <</if>>
 <</widget>>
 
-<!-- 每次点击重新读取有效选项；质量在动手时保存，增长仅在行动完成后结算。 -->
+<!-- 每次点击重新读取有效选项，质量在动手时保存，增长仅在行动完成后结算。 -->
 <<widget 'deadwood-street-heist-prepare'>>
   <<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
   <<if !_streetHeist>><<exit>><</if>>
@@ -31,7 +31,7 @@
   <<if _streetStarted + _streetMinutes * 60 gte _streetClosing>>
     <<set _streetHeist.state.feedback.outcome to 'too_late'>><<exit>>
   <</if>>
-  <!-- 先保证整段营业时间；强制事件或跨时中断留下回执，不扣款或计入完成。 -->
+  <!-- 先保证整段营业时间，强制事件或跨时中断留下回执，不扣款或计入完成。 -->
   <<endevent>><<pass _streetMinutes>>
   <<set _streetHeist.state.feedback to {action:'preparation', outcome:'interrupted', minutes:Math.max(0, Math.round((Time.date.timeStamp - _streetStarted) / 60)), cost:0}>>
   <<if !_streetHeist.available or _streetHeist.state.stage isnot 'prep' or _streetHeist.state.activity isnot _streetPreparationId or _streetHeist.state.preparations.includes(_streetPreparationId) or $money lt _streetCost or Time.date.timeStamp gte _streetClosing>><<exit>><</if>>
@@ -61,7 +61,7 @@
       <<case 'too_late'>>
         <span class='blue'><<lanSwitch 'There is not enough opening time left. The work has not started, and no time or money was spent.' '剩余营业时间不足。尚未开始，没有消耗时间或金钱。'>></span>
       <<case 'interrupted'>>
-        <span class='orange'><<lanSwitch 'The arrangement was interrupted after ' '安排在进行 '>> <<= _streetFeedback.minutes>> <<lanSwitch 'minutes. Nothing was charged or recorded as completed. Return when the conditions allow another meeting.' '分钟后中断。没有收费，也没有计入完成；条件允许时可以重新安排。'>></span>
+        <span class='orange'><<lanSwitch 'The arrangement was interrupted after ' '安排在进行 '>> <<= _streetFeedback.minutes>> <<lanSwitch 'minutes. Nothing was charged or recorded as completed. Return when the conditions allow another meeting.' '分钟后中断。没有收费，也没有计入完成，条件允许时可以重新安排。'>></span>
       <<case 'unavailable'>>
         <span class='blue'><<lanSwitch 'The conditions changed before the work could begin. No time or money was spent.' '开始前的条件已改变。这次没有消耗时间或金钱。'>></span>
       <<case 'completed'>>

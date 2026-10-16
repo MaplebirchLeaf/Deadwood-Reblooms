@@ -40,7 +40,7 @@ interface HeistState {
   feedback: { action: 'preparation' | 'negotiation' | 'recruitment' | 'meeting' | 'business'; outcome: 'completed' | 'too_late' | 'interrupted' | 'unavailable'; minutes: number; cost: number } | null;
 }
 
-/** 单次银行豪劫；筹备、人员与判定存档，关系仍使用原版 NPC 数据。 */
+/** 单次银行豪劫，筹备、人员与判定存档，关系仍使用原版 NPC 数据。 */
 export default class Heist {
   public static readonly defaults: HeistState = {
     stage: 'idle',
@@ -85,7 +85,7 @@ export default class Heist {
   public get contacts() {
     const landry = C.npc.Landry?.love ?? 0;
     const earned = V.moneyStats?.pubStolenGoods?.earned ?? 0;
-    // 旧存档的销赃与黑箱成绩同样有效；已确认的背叛不能靠旧成绩抵消。
+    // 旧存档的销赃与黑箱成绩同样有效，已确认的背叛不能靠旧成绩抵消。
     const landryTier = landry < 0 ? 0 : landry >= 60 || earned >= 800000 || V.pub_task_stat >= 25 ? 2 : landry >= 20 || earned >= 100000 ? 1 : 0;
     const wren = C.npc.Wren?.love ?? 0;
     const grant = C.npc.Grant?.love ?? 0;
@@ -132,7 +132,7 @@ export default class Heist {
     return this.state.candidates.map(key => V.per_npc[key]).filter(npc => !!npc?.heist);
   }
 
-  /** 成功分账后仍自由、能够工作的原班雇员；接续普通委托，不重开豪劫。 */
+  /** 成功分账后仍自由、能够工作的原班雇员，接续普通委托，不重开豪劫。 */
   public get businessCrew() {
     if (this.state.stage !== 'closed' || !this.state.settled || this.state.outcome !== 'success') return [];
     return this.crew.filter(npc => npc.health > 0 && npc.heist.status !== 'arrested' && ['scout', 'carrier'].includes(npc.heist.role));
@@ -142,7 +142,7 @@ export default class Heist {
     return this.crew.length === 2 && ['scout', 'carrier'].every(role => this.crew.some(npc => npc.heist.role === role && npc.health > 0 && npc.heist.status !== 'arrested'));
   }
 
-  /** 原版体能上限随体型变化；其它技能使用原版有效值，统一成 0～1000 参与判定。 */
+  /** 原版体能上限随体型变化，其它技能使用原版有效值，统一成 0～1000 参与判定。 */
   public get skills() {
     return {
       english: Math.clamp(window.currentSkillValue('english'), 0, 1000),

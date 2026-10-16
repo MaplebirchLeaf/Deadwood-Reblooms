@@ -8,7 +8,7 @@ import SmugglerPub from './StreetLife/SmugglerPub';
 import Races from './StreetLife/Races';
 import ammunition from '../assets/street/ammunition.json';
 
-/** 街头口碑独立于警方证据；原版委托的贡献只读取，不重复增加原版计数。 */
+/** 街头口碑独立于警方证据，原版委托的贡献只读取，不重复增加原版计数。 */
 export default class StreetLife extends Module {
   public readonly jobs = new Jobs(this);
   public readonly bounties = new Bounties(this);

@@ -373,7 +373,7 @@ export default function (maplebirch: typeof window.maplebirch) {
           to: '<<if !maplebirch.get("VanillaPlus").NPCDoublePenetration.isPartner(_nn)>><<combatInseminate _nn>><</if>>',
           expected: 1
         },
-        // 保留旧版完整条件链或新版统一分发宏；双插同伴使用独立目标，普通 NPC 原文不变。
+        // 保留旧版完整条件链或新版统一分发宏，双插同伴使用独立目标，普通 NPC 原文不变。
         {
           srcmatch: /^([ \t]*)<<if !!namedNpcEjaculation\(_nn, _args\[0\]\)>>[\s\S]*?^\1<<\/if>>|<<npcEjaculation _nn _args\[0\]>>/m,
           to: '<<if maplebirch.get("VanillaPlus").NPCDoublePenetration.isPartner(_nn)>><<deadwood-reblooms-npc-double-ejaculation>><<else>>$&<</if>>',

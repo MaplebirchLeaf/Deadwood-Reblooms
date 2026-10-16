@@ -131,7 +131,7 @@ export default class Winery {
     return true;
   }
 
-  /** 只有实际装瓶才计产量；玻璃瓶费用是便士，准备时间留给 Twee 的点击结算。 */
+  /** 只有实际装瓶才计产量，玻璃瓶费用是便士，准备时间留给 Twee 的点击结算。 */
   public bottle(id: number): boolean {
     if (!this.canOperate || !Number.isSafeInteger(id)) return false;
     const index = this.state.batches.findIndex(batch => batch.id === id && batch.ready_at <= Time.date.timeStamp);
@@ -167,7 +167,7 @@ export default class Winery {
     const shop = this.orchard.core.get('Robin')?.shop;
     if (!data || !shop || !this.canSupply || this.state.stock[recipe] - this.state.reserve[recipe] < terms.shopSupplyQuantity) return false;
     const income = data.wholesale * terms.shopSupplyQuantity;
-    // 罗宾资金为英镑；先实际付款，才转移瓶装库存并结算 PC 的便士收入。
+    // 罗宾资金为英镑，先实际付款，才转移瓶装库存并结算 PC 的便士收入。
     if (!shop.spend(income / 100)) return false;
     this.state.stock[recipe] -= terms.shopSupplyQuantity;
     this.state.shop_stock[recipe] += terms.shopSupplyQuantity;
@@ -181,7 +181,7 @@ export default class Winery {
     return true;
   }
 
-  /** 自用可取保留的酒；邀请、人物在场与同意由实际互动的 Twee 决定。 */
+  /** 自用可取保留的酒，邀请、人物在场与同意由实际互动的 Twee 决定。 */
   public take(recipe: WineRecipe): boolean {
     if (!terms.recipes.some(item => item.id === recipe) || !V.Orchard?.winery || !this.state.installed || V.statFreeze || V.replayScene || V.combat === 1 || this.state.stock[recipe] < 1) return false;
     this.state.stock[recipe]--;
@@ -207,7 +207,7 @@ export default class Winery {
     return this.shopSales.reduce((income, { recipe, amount }) => income + (terms.recipes.find(item => item.id === recipe)!.retail * amount) / 100, 0);
   }
 
-  /** 由罗宾原有周结算调用；这里只扣实售库存，不能再给罗宾发一笔钱。 */
+  /** 由罗宾原有周结算调用，这里只扣实售库存，不能再给罗宾发一笔钱。 */
   public settleShop(): void {
     if (!V.RobinExpansion?.shop || V.RobinExpansion.asylum.status === 'admitted' || !this.state.shop_enabled || V.statFreeze || V.replayScene || this.state.shop_settled_week === V.RobinExpansion.week)
       return;

@@ -40,9 +40,9 @@ export default class Hands {
     }
   }
 
-  /** 只扩展原版的能力查询；索引、迭代、深拷贝和存档仍得到物品自己的类型。 */
+  /** 只扩展原版的能力查询，索引、迭代、深拷贝和存档仍得到物品自己的类型。 */
   public refresh(): void {
-    // 副手只提供持物功能；从原版暂存流程取回后也不改变模型姿势。
+    // 副手只提供持物功能，从原版暂存流程取回后也不改变模型姿势。
     if (V.worn?.handheld_left) V.worn.handheld_left.holdPosition = undefined;
     if (V.lastWardrobeSlot === 'handheld_left') V.lastWardrobeSlot = 'handheld';
     const types: string[] | undefined = V.worn?.handheld?.type;
@@ -52,7 +52,7 @@ export default class Hands {
     Object.defineProperty(types, 'includes', {
       configurable: true,
       writable: true,
-      // 数组的索引和类型值保持原样；非枚举方法不进入 JSON 或结构化存档。
+      // 数组的索引和类型值保持原样，非枚举方法不进入 JSON 或结构化存档。
       value: function (this: string[], value: string, fromIndex?: number): boolean {
         const own = Array.prototype.includes.call(this, value, fromIndex);
         if (own || !capabilities.has(value) || V.worn?.handheld?.type !== this || !core.get('LifeSimulation')) return own;
@@ -73,7 +73,7 @@ export default class Hands {
     if (!['handheld', 'handheld_left'].includes(slot) || !item || item.name === 'naked') return true;
     const other = V.worn[slot === 'handheld' ? 'handheld_left' : 'handheld'];
     if (other.name !== 'naked' && other.name === item.name) return false;
-    // 场合与外观标签不代表物品功能；查询原始 type，避免能力视图混入另一槽。
+    // 场合与外观标签不代表物品功能，查询原始 type，避免能力视图混入另一槽。
     const common = ['naked', 'normal', 'school', 'formal', 'costume', 'unstealthy'];
     if ((item.type ?? []).some((type: string) => !common.includes(type) && Array.prototype.includes.call(other.type ?? [], type))) return false;
     if (keep && other.name === 'naked' && V.worn[slot].name !== item.name && this.canSwap) this.swap();

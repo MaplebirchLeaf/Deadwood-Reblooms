@@ -103,7 +103,7 @@ function validAdrian(adrian: LegacyState['adrian']): boolean {
   );
 }
 
-/** 将 1.4.4 的金融状态搬到独立模块；由框架 version 保证只执行一次。 */
+/** 将 1.4.4 的金融状态搬到独立模块，由框架 version 保证只执行一次。 */
 export default function migration(runner: Migration, defaults: FinanceState): void {
   for (const from of ['0.0.0', '2.0.0', '2.0.1', '2.0.2', '2.0.3']) {
     runner.add(from, '2.1.0', (data, utils) => {
@@ -152,7 +152,7 @@ export default function migration(runner: Migration, defaults: FinanceState): vo
         Object.assign(state.market, clone(legacy.finance.market));
         state.market.prices = { ...prices, ...clone(legacy.finance.market.prices) };
         state.market.previous_prices = { ...previousPrices, ...clone(legacy.finance.market.previous_prices) };
-        // 1.4.4 未记录持仓成本与价格历史；不推算过去交易，也不补发历史分红。
+        // 1.4.4 未记录持仓成本与价格历史，不推算过去交易，也不补发历史分红。
         state.market.history = clone(legacy.finance.market.history ?? []);
       }
       const estate = state.real_estate;

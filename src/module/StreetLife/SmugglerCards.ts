@@ -54,11 +54,11 @@ class PubHoldem extends Holdem {
     return false;
   }
 
-  // 酒馆不增加赌场账目或人物好感；使用同一套发牌、下注和边池规则。
+  // 酒馆不增加赌场账目或人物好感，使用同一套发牌、下注和边池规则。
   protected override record(): void {}
 }
 
-/** 现金放在独立的酒馆存档中；点击结算一次，重绘与读档只展示牌局。 */
+/** 现金放在独立的酒馆存档中，点击结算一次，重绘与读档只展示牌局。 */
 export default class SmugglerCards {
   public static readonly defaults: PubCardsState = {
     mode: null,
@@ -146,7 +146,7 @@ export default class SmugglerCards {
     if (amount) this.pub.core.SugarCube.Wikifier.wikifyEval(`<<money ${amount}>>`);
   }
 
-  /** 主动离桌或强制转场都清算一次；未完的二十一点作弃局，扑克已下注的钱留在底池。 */
+  /** 主动离桌或强制转场都清算一次，未完的二十一点作弃局，扑克已下注的钱留在底池。 */
   public close(): boolean {
     if (!this.state.mode || V.replayScene || V.statFreeze) return false;
     const game = this.state.mode;
