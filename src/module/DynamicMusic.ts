@@ -1,146 +1,51 @@
 // ./src/module/DynamicMusic.ts
+import Effects from './DynamicMusic/Effects';
+import { parseDMConfig, type DynamicMusicConfig, type DynamicMusicTrack, type MusicState } from './DynamicMusic/Config';
+export { parseDMConfig } from './DynamicMusic/Config';
 
-interface MusicState {
-  combat: number;
-  consensual: boolean;
-  scene: string;
-  action: string;
-  location: string;
-  passage: string;
-  bus: string;
-  outside: boolean;
-  lightning: boolean;
-  solarEclipse: boolean;
-  bloodMoon: boolean;
-  meteorShower: boolean;
-  weather: string;
-  precipitation: string;
-  dayState: string;
-  season: string;
-}
-
-interface DynamicMusicTrack {
-  track: string;
-  file: string;
-  title?: string;
-  artist?: string;
-  priority: number;
-  when: (state: MusicState) => boolean;
-}
-
-interface MusicScene {
-  scene: string;
-  when: (state: MusicState) => boolean;
-}
-
-interface DynamicMusicConfig {
-  scenes: MusicScene[];
-  music: DynamicMusicTrack[];
-  ambience: DynamicMusicTrack[];
-}
-
-const stateTypes: Record<keyof MusicState, string> = {
-  combat: 'number',
-  consensual: 'boolean',
-  scene: 'string',
-  action: 'string',
-  location: 'string',
-  passage: 'string',
-  bus: 'string',
-  outside: 'boolean',
-  lightning: 'boolean',
-  solarEclipse: 'boolean',
-  bloodMoon: 'boolean',
-  meteorShower: 'boolean',
-  weather: 'string',
-  precipitation: 'string',
-  dayState: 'string',
-  season: 'string'
-};
-
-const audioPath = /^audio\/(?!.*(?:^|\/)\.\.\/)[\w/-]+\.(?:ogg|mp3|wav|m4a|flac|webm)$/i;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
-export function parseDMConfig(value: unknown, hasFile: (file: string) => boolean): DynamicMusicConfig {
-  if (!isRecord(value) || value.version !== 2 || !Array.isArray(value.scenes) || !Array.isArray(value.music) || !Array.isArray(value.ambience)) {
-    throw new Error('Invalid dynamic music config header');
-  }
-
-  const parseCondition = (raw: unknown, name: string, sceneRule = false): MusicScene['when'] => {
-    if (!isRecord(raw)) throw new Error('Invalid condition for ' + name);
-    const conditions = Object.entries(raw).map(([key, expected]) => {
-      if (!Object.hasOwn(stateTypes, key) || (sceneRule && key === 'scene')) throw new Error('Unknown music state ' + key);
-      const type = stateTypes[key as keyof MusicState];
-      const values = Array.isArray(expected) ? expected : [expected];
-      if (!values.length || !values.every(item => typeof item === type && (typeof item !== 'number' || Number.isFinite(item)))) {
-        throw new Error('Invalid condition for ' + name);
-      }
-      return { key: key as keyof MusicState, values };
-    });
-    // 字符串末尾的 * 只表示前缀匹配，配置不能执行代码或注入正则。
-    return state =>
-      conditions.every(({ key, values }) =>
-        values.some(expected => (typeof expected === 'string' && expected.endsWith('*') ? String(state[key]).startsWith(expected.slice(0, -1)) : state[key] === expected))
-      );
-  };
-
-  const parseLayer = (layer: unknown[], name: string): DynamicMusicTrack[] => {
-    const names = new Set<string>();
-    return layer
-      .map((raw, index) => {
-        if (!isRecord(raw) || typeof raw.track !== 'string' || !/^[\w-]+$/.test(raw.track) || names.has(raw.track)) {
-          throw new Error('Invalid ' + name + ' track at index ' + index);
-        }
-        if (typeof raw.file !== 'string' || !audioPath.test(raw.file) || !hasFile(raw.file)) throw new Error('Missing or invalid audio file for ' + raw.track);
-        if (typeof raw.priority !== 'number' || !Number.isFinite(raw.priority)) throw new Error('Invalid priority for ' + raw.track);
-        if (raw.title !== undefined && typeof raw.title !== 'string') throw new Error('Invalid title for ' + raw.track);
-        if (raw.artist !== undefined && typeof raw.artist !== 'string') throw new Error('Invalid artist for ' + raw.track);
-        names.add(raw.track);
-        return {
-          track: raw.track,
-          file: raw.file,
-          title: raw.title as string | undefined,
-          artist: raw.artist as string | undefined,
-          priority: raw.priority,
-          when: parseCondition(raw.when, raw.track)
-        };
-      })
-      .sort((left, right) => right.priority - left.priority);
-  };
-
-  const scenes = value.scenes.map((raw, index) => {
-    if (!isRecord(raw) || typeof raw.scene !== 'string' || !/^[\w-]+$/.test(raw.scene)) throw new Error('Invalid scene at index ' + index);
-    return { scene: raw.scene, when: parseCondition(raw.when, raw.scene, true) };
-  });
-  return { scenes, music: parseLayer(value.music, 'music'), ambience: parseLayer(value.ambience, 'ambience') };
-}
-
-type AudioLayer = 'music' | 'ambience';
+type AudioLayer = 'music' | 'place' | 'weather';
 const AUDIO_PACK = 'deadwood-reblooms-audio';
 const FADE_MS = 1500;
 
+interface AudioChannels {
+  setModVolume(modName: string, volume: number): void;
+  ambience: {
+    play(modName: string, path: string, volume?: number, fadeMs?: number, layer?: string): Promise<boolean>;
+    setVolume(volume: number, fadeMs?: number, layer?: string): void;
+    stop(fadeMs?: number, layer?: string): void;
+  };
+  effects: {
+    play(modName: string, path: string, options?: { volume?: number; channel?: string; cooldownMs?: number }): Promise<boolean>;
+    stop(modName?: string, channel?: string): void;
+  };
+}
+
 class DynamicMusic {
-  static readonly options = { enabled: false, musicEnabled: true, ambienceEnabled: true, volume: 0.5, ambienceVolume: 0.25 };
+  static readonly options = { enabled: false, musicEnabled: true, ambienceEnabled: true, effectsEnabled: true, volume: 0.5, ambienceVolume: 0.25, effectsVolume: 0.35 };
 
   private config: DynamicMusicConfig | null = null;
   private loading: Promise<void> | null = null;
   private failed = false;
-  private readonly desired: Record<AudioLayer, string | null> = { music: null, ambience: null };
+  private readonly desired: Record<AudioLayer, DynamicMusicTrack | null> = { music: null, place: null, weather: null };
   private readonly syncing = new Set<AudioLayer>();
-  private ambient: string | null = null;
+  private readonly ambient = new Map<AudioLayer, DynamicMusicTrack>();
+  private readonly variants = new Map<string, number>();
+  private readonly effects: Effects;
 
-  public constructor(private readonly core: typeof maplebirch) {}
-
-  private get options() {
-    return V.options?.maplebirch?.DynamicMusic;
+  public constructor(private readonly core: typeof maplebirch) {
+    this.effects = new Effects(
+      core,
+      () => this.options?.enabled === true && this.options.effectsEnabled !== false && this.installed && this.config !== null,
+      event => this.effect(event)
+    );
   }
 
-  // 分轨倍率由框架管理，声明包尚未发布此接口，边界仅补充这项公开契约。
+  private get options() {
+    return typeof V === 'undefined' ? undefined : V.options?.maplebirch?.DynamicMusic;
+  }
+
   private get audio() {
-    return this.core.audio as typeof this.core.audio & { setModVolume(modName: string, volume: number): void };
+    return this.core.audio as typeof this.core.audio & AudioChannels;
   }
 
   public get installed(): boolean {
@@ -174,7 +79,8 @@ class DynamicMusic {
       weather: Weather.current.name,
       precipitation: Weather.precipitation,
       dayState: Time.dayState,
-      season: Time.season
+      season: Time.season,
+      rainproof: V.worn?.head?.type?.includes('rainproof') === true || V.worn?.handheld?.type?.includes('rainproof') === true
     };
     state.scene = this.config?.scenes.find(rule => rule.when(state))?.scene ?? 'unknown';
     return state;
@@ -208,35 +114,50 @@ class DynamicMusic {
     if (this.syncing.has(layer)) return;
     this.syncing.add(layer);
     try {
-      let desired: string | null;
-      // 两层分别串行收敛。同曲刷新复用正在加载的请求，关闭时也不会启动晚到的音轨。
+      let desired: DynamicMusicTrack | null;
+      // 各层分别收敛。同曲刷新复用请求，关闭后不会启动晚到的音轨。
       do {
         desired = this.desired[layer];
         try {
           if (layer === 'music') {
-            if (desired === null) {
+            const name = desired?.file.slice(6).replace(/\.[^.]+$/, '');
+            if (!name) {
               if (this.audio.CurrentTrack?.modName === AUDIO_PACK) this.audio.stop();
-            } else if (this.audio.CurrentTrack?.modName !== AUDIO_PACK || this.audio.CurrentTrack.audioName !== desired) {
-              if (await this.audio.playFromMod(AUDIO_PACK, desired)) this.audio.PlayMode = 'loop_one';
+            } else if (this.audio.CurrentTrack?.modName !== AUDIO_PACK || this.audio.CurrentTrack.audioName !== name) {
+              if (await this.audio.playFromMod(AUDIO_PACK, name)) this.audio.PlayMode = 'loop_one';
             }
           } else if (desired === null) {
-            if (this.ambient !== null) this.audio.ambience.stop(FADE_MS);
-            this.ambient = null;
+            this.audio.ambience.stop(FADE_MS, `${AUDIO_PACK}:${layer}`);
+            this.ambient.delete(layer);
           } else {
-            const volume = this.options?.ambienceVolume ?? DynamicMusic.options.ambienceVolume;
-            if (await this.audio.ambience.play(AUDIO_PACK, desired, volume, FADE_MS)) {
-              this.ambient = desired;
-              const currentVolume = this.options?.ambienceVolume ?? DynamicMusic.options.ambienceVolume;
-              if (currentVolume !== volume) this.audio.ambience.setVolume(currentVolume);
+            const volume = (this.options?.ambienceVolume ?? DynamicMusic.options.ambienceVolume) * desired.volume;
+            if (await this.audio.ambience.play(AUDIO_PACK, desired.file, volume, FADE_MS, `${AUDIO_PACK}:${layer}`)) {
+              this.ambient.set(layer, desired);
+              const currentVolume = (this.options?.ambienceVolume ?? DynamicMusic.options.ambienceVolume) * desired.volume;
+              if (currentVolume !== volume) this.audio.ambience.setVolume(currentVolume, 100, `${AUDIO_PACK}:${layer}`);
             }
           }
         } catch (error) {
-          this.audio.log(`Dynamic ${layer} could not be played (${desired}): ${String(error)}`, 'WARN', error);
+          this.audio.log(`Dynamic ${layer} could not be played (${desired?.file}): ${String(error)}`, 'WARN', error);
         }
       } while (this.desired[layer] !== desired);
     } finally {
       this.syncing.delete(layer);
     }
+  }
+
+  private effect(event: string): void {
+    const options = this.options;
+    if (!options?.enabled || options.effectsEnabled === false || !this.config || !this.installed) return;
+    const state = this.state;
+    const rule = this.config.effects.find(rule => rule.event === event && rule.when(state));
+    if (!rule) return;
+    const index = this.variants.get(event) ?? 0;
+    this.variants.set(event, (index + 1) % rule.files.length);
+    const file = rule.files[index % rule.files.length];
+    void this.audio.effects
+      .play(AUDIO_PACK, file, { volume: (options.effectsVolume ?? DynamicMusic.options.effectsVolume) * rule.volume, channel: 'action', cooldownMs: rule.cooldown })
+      .catch(error => this.audio.log(`Dynamic effect could not be played (${event}, ${file})`, 'WARN', error));
   }
 
   public refresh(): void {
@@ -247,15 +168,16 @@ class DynamicMusic {
       return;
     }
     const state = enabled ? this.state : null;
-    const music = state && options?.musicEnabled !== false ? this.config?.music.find(track => track.when(state)) : null;
-    const ambience = state && options?.ambienceEnabled !== false ? this.config?.ambience.find(track => track.when(state)) : null;
-    this.desired.music = music?.file.slice(6).replace(/\.[^.]+$/, '') ?? null;
-    this.desired.ambience = ambience?.file ?? null;
+    this.desired.music = state && options?.musicEnabled !== false ? (this.config?.music.find(track => track.when(state)) ?? null) : null;
+    for (const layer of ['place', 'weather'] as const) {
+      this.desired[layer] = state && options?.ambienceEnabled !== false ? (this.config?.ambience.find(track => track.layer === layer && track.when(state)) ?? null) : null;
+      if (!this.desired[layer] && this.syncing.has(layer)) this.audio.ambience.stop(FADE_MS, `${AUDIO_PACK}:${layer}`);
+      void this.sync(layer);
+    }
     if (options) this.audio.setModVolume(AUDIO_PACK, options.volume);
     if (this.desired.music === null && this.syncing.has('music') && this.audio.ActivePlaylist?.name === AUDIO_PACK) this.audio.stop();
-    if (this.desired.ambience === null && this.syncing.has('ambience')) this.audio.ambience.stop(FADE_MS);
+    if (!enabled || options?.effectsEnabled === false) this.audio.effects.stop(AUDIO_PACK);
     void this.sync('music');
-    void this.sync('ambience');
   }
 
   public setVolume(value: number): void {
@@ -269,15 +191,25 @@ class DynamicMusic {
     const options = this.options;
     if (!options) return;
     options.ambienceVolume = Math.clamp(Number(value) || 0, 0, 1);
-    if (this.ambient !== null) this.audio.ambience.setVolume(options.ambienceVolume);
+    for (const [layer, track] of this.ambient) this.audio.ambience.setVolume(options.ambienceVolume * track.volume, 100, `${AUDIO_PACK}:${layer}`);
+  }
+
+  public setEffectsVolume(value: number): void {
+    const options = this.options;
+    if (!options) return;
+    options.effectsVolume = Math.clamp(Number(value) || 0, 0, 1);
+    if (!options.effectsVolume) this.audio.effects.stop(AUDIO_PACK);
   }
 
   public preInit(): void {
     this.core.var.options.define('DynamicMusic', DynamicMusic.options);
+    this.effects.install();
     this.core.tool.onInit(() => {
       setup.maplebirch.content.push('<<deadwood-dynamic-music-player>>');
       if (this.installed) this.loading ??= this.loadConfig();
     });
+    this.core.on(':passageinit', () => this.audio.effects.stop(AUDIO_PACK), 'DynamicMusic effects navigation');
+    this.core.on(':onLoad', () => this.audio.effects.stop(AUDIO_PACK), 'DynamicMusic audio load');
     this.core.on(':passagedisplay', () => this.refresh(), 'DynamicMusic');
   }
 }

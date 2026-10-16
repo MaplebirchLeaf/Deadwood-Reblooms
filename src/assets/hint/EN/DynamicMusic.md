@@ -1,37 +1,42 @@
 ### Start listening
 
-Use matching versions of the main mod and audio pack, with **Maplebirch Framework 5.4.6 or later**.
+Use **Maplebirch Framework 5.4.9 or later** and matching main mod and audio pack versions.
 
-1. Load the separate **Deadwood Reblooms Audio Pack** in the mod loader and enable Dynamic Music.
-2. Tick **Enable Dynamic Music** under **Mod Settings → Dynamic Music**. The page shows whether the audio pack is loaded.
-3. Choose **Music** and **Ambience** separately, then adjust their volumes. The defaults are **50%** and **25%**.
+1. Load the separate **Deadwood Reblooms Audio Pack** and enable the Dynamic Music module.
+2. Tick **Enable Dynamic Music** under **Mod Settings → Dynamic Music**. The page shows whether the pack is loaded.
+3. Choose **Music**, **Ambience** and **Sound Effects** separately. Default volumes are **50% / 25% / 35%**.
 4. Click the game page to allow browser audio, then play normally.
 
 The audio pack is optional. Without it, dynamic audio stays silent and the game remains playable.
 
-### Music and ambience
+### Music, ambience and effects
 
-| Layer    | Contents                                                             | Changes with                                           |
-| -------- | -------------------------------------------------------------------- | ------------------------------------------------------ |
-| Music    | Melodies, rhythm and scene scores                                    | Location, time of day, encounters and celestial events |
-| Ambience | Rain, wind, waves, birds, street sounds and indoor background sounds | Indoors or outdoors, location and weather              |
+| Layer            | Contents                                                          | Playback                              |
+| ---------------- | ----------------------------------------------------------------- | ------------------------------------- |
+| Music            | Location, time of day and encounter scores                        | One track for the current scene       |
+| Place ambience   | Waves, traffic, birds, moor wind, underground water and machinery | Selected by location                  |
+| Weather ambience | Outdoor rain and snow, storms and muffled indoor rain             | Can accompany place ambience          |
+| Sound effects    | Impacts, gunfire and clothing changes                             | Brief feedback after an actual change |
 
-The layers can play together, or you can keep only one. Homes, schools, shops, the financial centre, factories, casinos, pubs, the orchard, forest, coast, temple, hospital, underground and prison have their own scene settings. Heists, pursuits and dangerous encounters take priority with more tense music; consensual interactions do not automatically use a fighting score.
+Waves and rain can coexist on a rainy coast. Dry weather brings wind across the moor and ruined castle. Storm drains have flowing water, while old sewers have quieter dripping. Moving indoors stops outdoor rain, snow and birds.
 
-Moving indoors stops outdoor rain, snow, wind and birds. Dungeons and underground passages will not sound like open streets just because it is raining in town. Fair-weather nature sounds do not override rain ambience. Ambience fades between scenes, and neighbouring pages do not restart an unchanged track.
+The orphanage bedroom and bathroom, and the main temple quarters, can carry muffled rain and distant thunder through their windows. These sounds are limited to those rooms, rather than every indoor scene. Underground passages do not play rain just because it is raining in town. Thunder has natural pauses and does not follow each visible flash of lightning. Neighbouring pages do not restart an unchanged sound, and ambience transitions use fades.
 
-### Adjusting volume
+Heists, pursuits and dangerous encounters take priority with tense music. Consensual interactions do not automatically use a fighting score. With no matching rule, a layer stays silent.
 
-**Music volume** and **Ambience volume** control their respective layers. **Master Volume** in the music player affects both. At zero master volume, or when muted, neither layer can be heard.
+Effects are limited to a few clothing, impact and gunfire sounds. They include no hurt voices, breathing or other vocal recordings. Equipment changes can make a sound without passing time, using either mouse clicks or native number shortcuts. Ordinary interface navigation, history replay, the first screen after loading and repeated redraws do not replay completed feedback. An action selects at most one short effect, with cooldowns limiting rapid repetition.
 
-Lower ambience to hear the score more clearly, or switch off the music layer to keep rain and waves. Switching off Dynamic Music stops its score and ambience without clearing imported files.
+### Volume and music player
 
-### Music player
+**Music volume** controls the score. **Ambience volume** controls both place and weather loops. **Effects volume** controls short action sounds. **Master Volume** and mute in the music player affect all these sounds.
 
-- **Audio Pack** lists only music. Choose, pause, skip or stop tracks manually; the scene selects ambience automatically.
-- **Imported Audio** plays your own local files. **Clear Imported Audio** deletes that imported library, without deleting the bundled audio pack.
-- With dynamic music enabled, a scene change may replace a manually selected track. To keep your imported music playing, switch off the music layer while leaving ambience enabled.
+- Lower ambience and effects to hear the score more clearly.
+- Switch off Music to keep rain and waves.
+- Switching off Dynamic Music stops this module's sounds without clearing imported files.
+- **Audio Pack** lists music only. Scenes and actions select ambience and effects automatically.
+- **Imported Audio** plays your own local files. **Clear Imported Audio** deletes the imported library without deleting the bundled pack.
+- Scene changes may replace manually selected music. To keep your own music playing, switch off Music while leaving Ambience and Sound Effects enabled.
 
 ### If there is no sound
 
-Check that the pack is loaded, Dynamic Music and the desired layer are enabled, and the layer and master volumes are audible. Then check page muting, browser playback permission and whether you have clicked the game page. Some scenes are intentionally quiet. If no ambience matches, the system stays silent instead of using a sound from the wrong setting.
+Check the matching pack, module, layer switches, individual volumes, master volume, page mute and browser playback permission. Some scenes are intentionally quiet. Not every click or combat turn produces a sound.

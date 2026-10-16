@@ -1,8 +1,12 @@
-# Deadwood Reblooms Audio Pack — 2.0.0
+# Deadwood Reblooms Audio Pack
 
-The pack contains 16 instrumental music tracks and 11 independent ambience loops. Music and ambience are selected and played separately; no file combines the two layers. All included material is distributed under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+The pack contains 16 instrumental music tracks and 15 independent ambience loops. Music and ambience are selected and played separately. All recordings use [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) except kurt's `ambience/stream.ogg`, licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
 
 Sources were checked on their original release pages. Musical pieces retain their full loop or song, rather than a repeated 20-second excerpt. The piano and non-looping field recordings have a short end-to-start crossfade. Static gain adjustment keeps music near -20 LUFS and ambience near -29 LUFS where source peaks permit; it does not dynamically pump the volume. Music uses 44.1 kHz stereo OGG Vorbis, ambience 24 kHz mono.
+
+The added moor wind and stream target -33 dBFS RMS with fixed gain. Dripping water preserves its quiet gaps and limits peaks instead of amplifying the silence. Indoor rain and thunder derive from the existing weather loops with a 900 Hz low-pass and -5.19 dB attenuation. Per-file processing and source hashes are recorded in assets.json.
+
+Short effect credits and processing details are listed separately in [SFX-CREDITS.md](SFX-CREDITS.md).
 
 ## Music
 
@@ -27,21 +31,27 @@ Sources were checked on their original release pages. Musical pieces retain thei
 
 ## Ambience
 
-| File                        | Recording                 | Creator                        | Source                                                                           | Length      |
-| --------------------------- | ------------------------- | ------------------------------ | -------------------------------------------------------------------------------- | ----------- |
-| `ambience/day.ogg`          | Morning birds             | Kresiek The Furry              | [Original page](https://opengameart.org/content/amb-morning-sounds-perfect-loop) | 00:00:38.00 |
-| `ambience/night.ogg`        | Cricket ambience          | Augmentality (Brandon Morris)  | [Original page](https://opengameart.org/content/random-sounds-samples)           | 00:00:08.00 |
-| `ambience/rain.ogg`         | Rain loop                 | Kresiek The Furry              | [Original page](https://opengameart.org/content/amb-rain-loop-1)                 | 00:00:38.00 |
-| `ambience/thunderstorm.ogg` | Rain and thunder          | Kresiek The Furry / rubberduck | [Original page](https://opengameart.org/content/100-cc0-sfx-2)                   | 00:00:38.00 |
-| `ambience/wind.ogg`         | Wind whoosh loop          | SketchMan3                     | [Original page](https://opengameart.org/content/wind-whoosh-loop)                | 00:00:05.96 |
-| `ambience/sea.ogg`          | Beach Ocean Waves         | jasinski                       | [Original page](https://opengameart.org/content/beach-ocean-waves)               | 00:00:11.06 |
-| `ambience/machinery.ogg`    | Steamboat Engine Sound    | Spring Spring                  | [Original page](https://opengameart.org/content/steamboat-engine-sound)          | 00:00:07.14 |
-| `ambience/underground.ogg`  | Loopable Dungeon Ambience | JaggedStone                    | [Original page](https://opengameart.org/content/loopable-dungeon-ambience)       | 00:01:34.31 |
-| `ambience/fireplace.ogg`    | Fireplace Sound loop      | PagDev                         | [Original page](https://opengameart.org/content/fireplace-sound-loop)            | 00:00:29.26 |
-| `ambience/crowd.ogg`        | Busy Room Ambience #2     | Breviceps                      | [Original page](https://freesound.org/people/Breviceps/sounds/465699/)           | 00:00:27.21 |
-| `ambience/traffic.ogg`      | High traffic road sounds  | IgnasD                         | [Original page](https://opengameart.org/content/high-traffic-road-sounds)        | 00:00:59.29 |
+| File                               | Recording                   | Creator                        | Source                                                                           | Length      |
+| ---------------------------------- | --------------------------- | ------------------------------ | -------------------------------------------------------------------------------- | ----------- |
+| `ambience/day.ogg`                 | Morning birds               | Kresiek The Furry              | [Original page](https://opengameart.org/content/amb-morning-sounds-perfect-loop) | 00:00:38.00 |
+| `ambience/night.ogg`               | Cricket ambience            | Augmentality (Brandon Morris)  | [Original page](https://opengameart.org/content/random-sounds-samples)           | 00:00:08.00 |
+| `ambience/rain.ogg`                | Rain loop                   | Kresiek The Furry              | [Original page](https://opengameart.org/content/amb-rain-loop-1)                 | 00:00:38.00 |
+| `ambience/thunderstorm.ogg`        | Rain and thunder            | Kresiek The Furry / rubberduck | [Original page](https://opengameart.org/content/100-cc0-sfx-2)                   | 00:00:38.00 |
+| `ambience/wind.ogg`                | Wind whoosh loop            | SketchMan3                     | [Original page](https://opengameart.org/content/wind-whoosh-loop)                | 00:00:05.96 |
+| `ambience/sea.ogg`                 | Beach Ocean Waves           | jasinski                       | [Original page](https://opengameart.org/content/beach-ocean-waves)               | 00:00:11.06 |
+| `ambience/machinery.ogg`           | Steamboat Engine Sound      | Spring Spring                  | [Original page](https://opengameart.org/content/steamboat-engine-sound)          | 00:00:07.14 |
+| `ambience/underground.ogg`         | Loopable Dungeon Ambience   | JaggedStone                    | [Original page](https://opengameart.org/content/loopable-dungeon-ambience)       | 00:01:34.31 |
+| `ambience/fireplace.ogg`           | Fireplace Sound loop        | PagDev                         | [Original page](https://opengameart.org/content/fireplace-sound-loop)            | 00:00:29.26 |
+| `ambience/traffic.ogg`             | High traffic road sounds    | IgnasD                         | [Original page](https://opengameart.org/content/high-traffic-road-sounds)        | 00:00:59.29 |
+| `ambience/moor-wind.ogg`           | Wind 1                      | Luke.RUSTLTD                   | [Original page](https://opengameart.org/content/wind1)                           | 00:00:59.00 |
+| `ambience/stream.ogg`              | Stream 1                    | kurt                           | [Original page](https://opengameart.org/content/stream-sounds)                   | 00:00:31.40 |
+| `ambience/dripping.ogg`            | Dripping water loop         | Independent.nu / qubodup       | [Original page](https://opengameart.org/content/dripping-water-loop)             | 00:00:20.06 |
+| `ambience/rain-indoor.ogg`         | Rain, indoor perspective    | Kresiek The Furry              | [Original page](https://opengameart.org/content/amb-rain-loop-1)                 | 00:00:38.00 |
+| `ambience/thunderstorm-indoor.ogg` | Thunder, indoor perspective | Kresiek The Furry / rubberduck | [Original page](https://opengameart.org/content/100-cc0-sfx-2)                   | 00:00:38.00 |
 
 The thunderstorm recording combines Kresiek The Furry's [rain loop](https://opengameart.org/content/amb-rain-loop-1) with quiet thunder strikes from rubberduck's 100 CC0 SFX #2. The sea loop joins four jasinski wave recordings with short overlaps. Morning and cricket loops retain the existing field-recording edits.
+
+`ambience/stream.ogg` is adapted from **Stream Sounds — stream1.ogg, by kurt**, under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Changes: mono downmix, 24 kHz resampling, fixed gain, 0.5-second loop crossfade and OGG Vorbis re-encoding. No endorsement by the creator is implied.
 
 assets.json records the actual file size, duration, processing and SHA-256 of every packaged audio file.
 
@@ -49,4 +59,4 @@ assets.json records the actual file size, duration, processing and SHA-256 of ev
 
 [Breeze of Lewdity](https://gitgud.io/velvetvillainess/breeze-of-lewdity) informed the separation of music and ambience. [Eternum's music update](https://caribdis.itch.io/eternum/devlog/885311/important-update-changes-to-the-games-music) informed the care taken with source licensing. The pack uses the credited original releases above; neither game's audio archive is included.
 
-All contributors remain credited even when attribution is not required by CC0.
+All contributors remain credited. The stream credit and licence link must be retained when redistributing that recording or an adaptation.
