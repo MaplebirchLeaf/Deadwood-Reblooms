@@ -70,6 +70,10 @@ export default function (maplebirch: MaplebirchCore) {
   );
   // 给原版衣柜加入搜索，并把身体涂写设置嵌入镜子界面。
   maplebirch.tool.inject({
+    locationPassage: {
+      // 从募捐、登记或悬赏现场返回时，原版大厅的临时 NPC 可能已经清理。
+      'Town Hall Wait': [{ src: '<<effects>>', applyafter: '<<deadwood-town-hall-visitors>>', expected: 1 }]
+    },
     widgetPassage: {
       // 只给原版移动端属性标记名称，保留显示条件、翻译和数值提示。
       mobileStats: [

@@ -105,6 +105,32 @@ export default function DoLX(core: MaplebirchCore): void {
   core.once(':addon:preparePatch', () => {
     const data = core.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch();
     if (!data.scriptFileItems.getByNameWithOrWithoutPath('xchange.js')) return;
+    const zone = core.tool.zone;
+    // DoLX 在作弊按钮外又包了一层相同判断，两处都需解除，保留跳舞、战斗和起始页限制。
+    if (zone.locationPassage.StoryCaption) {
+      zone.locationPassage.StoryCaption = zone.locationPassage.StoryCaption.map(rule =>
+        rule.src === ' and $cheatsEnabled is true' ? { srcmatchgroup: / and \$cheatsEnabled is true/g, to: '', expected: 2 } : rule
+      );
+    }
+    if (core.get('VanillaPlus')) {
+      // AMC 公式在下方单独处理；只移除对应的原版规则，其余钳制、作弊和战斗补丁照常接入。
+      const attributes = ['beauty', 'physique', 'willpower'];
+      const legacy: Record<string, string[]> = {
+        'Widgets Clamp': attributes.map(stat => `Math\\.clamp\\(\\$${stat},`),
+        Widgets: ['Math\\.clamp\\(\\$physique,'],
+        Cheats: attributes.map(stat => `\\$${stat} "${stat}"`),
+        'Widgets Difficulty': ['currentSkillValue\\("seductionskill"\\)']
+      };
+      for (const [title, patterns] of Object.entries(legacy)) {
+        if (zone.widgetPassage[title]) {
+          zone.widgetPassage[title] = zone.widgetPassage[title].filter(
+            rule =>
+              !(rule.to ?? rule.applyafter ?? rule.applybefore ?? '').includes('maplebirch.get("VanillaPlus")') ||
+              !patterns.some(pattern => (rule.srcmatch?.source ?? rule.srcmatchgroup?.source ?? '').includes(pattern))
+          );
+        }
+      }
+    }
     if (core.get('Finance')) {
       // 医疗减免沿用 DoLX 的通胀显示、余额判定与两条原生治疗分支。
       const hospital = core.tool.zone.locationPassage['Hospital Parasite'] ?? [];
@@ -224,7 +250,7 @@ export default function DoLX(core: MaplebirchCore): void {
       file.content = manager.replace(file.content, replacements, 'Deadwood DoLX');
     }
 
-    // 主脚本已处理通用 Math.clamp 公式，此处只接入 DoLX 的 AMC 公式与缓存后的诱惑评分。
+    // 接入 DoLX 的 AMC 公式与缓存后的诱惑评分，保留特质倍率和作弊控件回调。
     const passageRules: Record<string, Rule[]> = {
       // DoLX 的兽化称号使用块函数；保留性别感受和 Harpy 判断，只补生理标记。
       Traits: [
