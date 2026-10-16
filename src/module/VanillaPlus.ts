@@ -1,6 +1,7 @@
 // ./src/module/VanillaPlus.ts
 
 import Achievements from './Achievements';
+import progress from '../assets/vanilla-plus/progress.json';
 import Module from './Module';
 import { DEFAULT_VANILLA_PLUS_STATE, type VanillaPlusAttribute, type VanillaPlusTrait } from './constants';
 import Beauty from './VanillaPlus/Beauty';
@@ -14,6 +15,7 @@ import Promiscuity from './VanillaPlus/Promiscuity';
 import Willpower from './VanillaPlus/Willpower';
 
 class VanillaPlus extends Module {
+  public readonly progress = progress;
   public readonly beauty: Beauty;
   public readonly deviancy: Deviancy;
   public readonly divineTransformations = new DivineTransformations();
@@ -56,12 +58,22 @@ class VanillaPlus extends Module {
     });
   }
 
-  public hasTrait(trait: VanillaPlusTrait): boolean {
-    return V.VanillaPlus.traits.incorrigible || V.VanillaPlus.traits[trait];
+  /** 能力判定：全能解锁后，六项属性的能力一并生效。 */
+  public hasTrait(trait: VanillaPlusAttribute): boolean {
+    return V.VanillaPlus.traits.incorrigible || V.VanillaPlus.traits[trait] === true;
+  }
+
+  /** 面板显示：只读取条目自身的突破标记，全能不再代为点亮其余六条。 */
+  public unlocked(trait: VanillaPlusTrait): boolean {
+    return V.VanillaPlus.traits[trait] === true;
   }
 
   public get sadomasochist(): boolean {
     return V.feats?.currentSave?.Sadomasochist != null;
+  }
+
+  public get preserveSadomasochism(): boolean {
+    return this.sadomasochist && V.VanillaPlus.attitudes.sadomasochist;
   }
 
   public get allMax(): boolean {

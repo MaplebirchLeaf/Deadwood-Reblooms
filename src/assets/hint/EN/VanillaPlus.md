@@ -2,30 +2,55 @@
 
 Enable **VanillaPlus** and reload. Banking, property and Adrian have their own Finance chapters; dual handhelds, school life and gifts are in Life Simulation.
 
-| Goal                       | Entrance                                                   | First requirement                                                 |
-| -------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------- |
-| Break an attribute ceiling | Its story challenges; check the character page and journal | Native maximum and the relevant challenge                         |
-| Develop divine forms       | Native transformations and temple prayer                   | Divine transformations enabled and the relevant growth conditions |
-| Use eerie mirrors          | Mirrors you have touched                                   | Deviancy trait, the right hour and tentacles enabled              |
-| Hospital services          | Hospital foyer                                             | Eligible body state and payment                                   |
-| Gargantuan size            | Body-size settings and existing growth routes              | VanillaPlus enabled                                               |
+| Goal                       | Entrance                                                    | First requirement                                                 |
+| -------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------- |
+| Break an attribute ceiling | Its story challenges; check detailed progress in Statistics | Native maximum and the relevant challenge                         |
+| Develop divine forms       | Native transformations and temple prayer                    | Divine transformations enabled and the relevant growth conditions |
+| Use eerie mirrors          | Mirrors you have touched                                    | Deviancy trait, the right hour and tentacles enabled              |
+| Hospital services          | Hospital foyer                                              | Eligible body state and payment                                   |
+| Gargantuan size            | Body-size settings and existing growth routes               | VanillaPlus enabled                                               |
 
 ## Six attribute breakthroughs
 
-Willpower, physique, beauty, exhibitionism, deviancy, and promiscuity can reach a seventh level only after the vanilla cap and a route-specific challenge. Keep raising the attribute to its new cap to receive its trait. Completing all six grants an overall achievement. The character page and journal show progress.
+Reach the normal attribute ceiling and complete its challenges to break through. Then keep training to the new ceiling to earn the trait. **Statistics → Deadwood Reblooms: progress** shows what you have done and what remains. Some challenges only need completing once; others, such as makeup and ear slimes, depend on your condition at the time.
 
-| Attribute     | Exact requirements before breaking through                                                                                                                                                                                           |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Willpower     | Reach the vanilla cap and have slime in both ears. Successfully resist possession in the lake prison, finish the schism ending and the final hour of temple vigil. The wraith prison must be recovering with investigation at step 4 |
-| Physique      | Reach the vanilla cap. Finish a physique or combat outcome during flat infiltration, advance Alex's farm assault to stage 12, experience the relevant farm group or lorry combat, and escape the pound                               |
-| Beauty        | Reach the vanilla cap, meet the outdoor base-allure and modelling-fame breakthrough requirements. At breakthrough, remove all makeup, contact lenses, and face masks                                                                 |
-| Exhibitionism | Reach the vanilla cap, complete at least **5 naked swimming lessons**, earn the naked ballroom feat at Avery's party, and finish the successful High Street photo run with at least **250 flyers**                                   |
-| Deviancy      | Reach the vanilla cap, earn Wildsong with Gwylan, meet the required purification progress, have at least **3** Gwylan sex dates and **3** beast dates, then lead a sealed ritual with sufficient purification progress               |
-| Promiscuity   | Bring promiscuity, exhibitionism, and deviancy to their vanilla caps.                                                                                                                                                                |
+Willpower, physique and beauty rise to **125%** of their normal ceilings; exhibitionism, deviancy and promiscuity rise to **150%**. Reaching all six new ceilings also earns Incorrigible.
 
-Willpower, physique, and beauty gain a new ceiling at **125%** of their old ceiling. Exhibitionism, deviancy, and promiscuity reach **150%**. If another mod changes a vanilla ceiling, the game's effective ceiling is used as the baseline. After the story requirements unlock a breakthrough, keep raising the attribute to its new ceiling to gain the trait.
+### Willpower
 
-The seventh-level exhibitionism trait permits naked travel around town once the PC is comfortable with that degree of exposure. Vanilla exposure, fame, and encounter consequences remain. Deviancy connects to strange mirrors: first visit a given mirror, then at **03:00** enable tentacles and have hallucinations at level 2 or meet the day's mirror-tentacle condition to enter the Tentacle Plains. **Exit coordinates randomise on every entry**; separate mirrors can lead to the same tile. Extra hand and multiplayer actions still require enough NPCs, free body parts, and vanilla combat conditions. The hospital also offers separate virginity restoration services.
+Reach maximum willpower, keep a slime in each ear, successfully resist possession in the lake prison, finish Schism and complete the full temple vigil.
+
+The prison is **the Ivory Wraith’s underwater prison in the lake ruins**. “Recovering” refers to the Wraith, not you. While it is absent, search for a way out, examine the cages, keep searching, then swim down the stairs to reach search step **4**. With every other requirement met, return to the prison’s main page before the Wraith returns and choose **Dive towards the rune again**.
+
+### Physique
+
+Reach maximum physique, escape a flats break-in encounter, experience the farm assault at stage **12** or later and a relevant farm confrontation, then escape the pound.
+
+The break-in takes place in **a locked flat in the native block of flats**, not a home you bought. Picking the lock requires **200 skulduggery**. A successful physique escape, smashing through the obstacle or winning the resulting fight counts. The **pound** is the animal pound, not the asylum.
+
+### Beauty
+
+Reach maximum beauty, once attain **7,000 base allure outdoors outside a blood moon**, and currently have at least **1,000 modelling fame**. Remove all makeup, coloured contacts and face masks before breaking through. Base allure and total allure are different values; Statistics shows which requirements you meet.
+
+### Exhibitionism
+
+Reach maximum exhibitionism and complete these three challenges:
+
+- **School nude swimming:** ask to swim naked, then complete the recorded backstroke stage once the counter reaches **five**. Undressing at the pool alone does not count.
+- **Avery’s party dance:** continue dancing after becoming fully naked during the date’s dance competition. Your own property banquet and the underwear ending do not count.
+- **High Street photo assignment:** complete Niki’s successful run with your face shown while you have at least **250 flyers**, then finish the street ending. A nude studio shoot is unrelated.
+
+After earning the seventh-level exhibitionism trait, you can walk around town naked if you are already comfortable with that degree of exposure. Fame, encounters and other consequences still apply.
+
+### Deviancy
+
+Reach maximum deviancy and obtain **Wildsong** through Gwylan’s ritual. After at least **20 purges** and **three dates of each ritual type**, choose to conduct the ritual yourself from its selection page. Finish with a successful seal and at least **nine purge effectiveness**. Statistics shows your purge and date counts.
+
+The seventh-level deviancy trait, Beyond Taboo, lets you cultivate several animal transformations together. They no longer cancel one another out or naturally fade. Native animal forms and animal forms registered through the framework can each advance when their own growth points meet their usual thresholds. This does not instantly complete any form or affect divine transformations. Choose which parts to show in the mirror.
+
+### Promiscuity
+
+Promiscuity, exhibitionism and deviancy must all reach their **normal ceilings** at the same time. The other two breakthrough traits and increased ceilings are not required.
 
 ## Effects of completed divine forms
 
@@ -41,13 +66,13 @@ These benefits do not complete a form for you. Prayer, growth and side effects s
 
 **Unlock**: Enable VanillaPlus and earn the native **Sadomasochist** feat in the **current save**. The native feat requires both sadism and masochism to reach their highest levels, with normal feat eligibility rules. Saves that already earned it immediately display <span class="def">Taste for Cruelty</span>. No extra scene is required.
 
-**Effects**: <span class="def">Both sadism and masochism stop decaying naturally each day</span>. Positive gains, level calculations and other scene effects still follow vanilla. The trait does not directly increase either inclination or restore deliberate reductions from scenes or other effects.
+**Effects**: <span class="def">Your sadism and masochism can stop fading naturally each day</span>. In Attitudes, leave “Reflecting on the pain you have given and received” unchecked to retain them, or check it to resume natural decay. Positive gains, level calculations and other scene effects still follow vanilla. The trait does not directly increase either inclination or restore deliberate reductions from scenes or other effects.
 
 **Settings**: The hypnosis setting does not affect it. Disabling VanillaPlus restores normal decay. Re-enabling it applies the effect according to this save's feat record.
 
 ## Iron Will
 
-Once your fallen angel form reaches its stable stage, Iron Will prevents willpower decay and caps non-combat arousal at **1 below the orgasm threshold**, preventing accumulated arousal from triggering an orgasm during ordinary travel. Combat retains the native arousal ceiling.
+Once your fallen angel form reaches its stable stage, Iron Will prevents willpower decay. The attitude “Being overwhelmed by pleasure” is checked by default and caps non-combat arousal at **1 below the orgasm threshold**. Uncheck it to allow the normal threshold without losing willpower protection. Combat and Gwylan’s ritual always retain the native threshold.
 
 ## Trinity
 

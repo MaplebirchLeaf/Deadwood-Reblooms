@@ -13,20 +13,21 @@ class Willpower {
     return V.VanillaPlus?.willpower?.painShield;
   }
 
-  public get unlock(): boolean {
+  public get requirements(): boolean[] {
     const parasites = V.parasite ?? {};
-    const earSlimes = Number(parasites.left_ear?.name === 'slime') + Number(parasites.right_ear?.name === 'slime');
-
-    return (
-      !V.VanillaPlus.lock.willpower &&
-      V.willpower >= this.vanillaPlus.normalCeiling('willpower') &&
-      earSlimes >= 2 &&
-      V.VanillaPlus.willpower.wraith &&
-      V.VanillaPlus.willpower.schism &&
-      V.VanillaPlus.willpower.vigil &&
-      V.wraithPrison?.state === 'recovering' &&
+    return [
+      V.willpower >= this.vanillaPlus.normalCeiling('willpower'),
+      parasites.left_ear?.name === 'slime' && parasites.right_ear?.name === 'slime',
+      V.VanillaPlus.willpower.wraith,
+      V.VanillaPlus.willpower.schism,
+      V.VanillaPlus.willpower.vigil,
+      V.wraithPrison?.state === 'recovering',
       V.wraithPrison?.search === 4
-    );
+    ];
+  }
+
+  public get unlock(): boolean {
+    return !V.VanillaPlus.lock.willpower && this.requirements.every(Boolean);
   }
 
   public get max(): boolean {

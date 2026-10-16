@@ -34,21 +34,21 @@ export default function (maplebirch: typeof window.maplebirch): void {
 
   maplebirch.tool.patch.traits.add(
     {
-      title: 'Special Traits',
+      title: 'NPC Traits',
       name: () => maplebirch.t('deadwood-reblooms:robin:trait:solidarity:name'),
       colour: 'green',
       has: () => Boolean(V.RobinExpansion?.self_rent && !V.RobinExpansion.both_rent && !V.RobinExpansion.bailey_defeated),
       text: () => maplebirch.t('deadwood-reblooms:robin:trait:solidarity:text')
     },
     {
-      title: 'Special Traits',
+      title: 'NPC Traits',
       name: () => maplebirch.t('deadwood-reblooms:robin:trait:protected:name'),
-      colour: 'gold',
+      colour: 'teal',
       has: () => Boolean(V.RobinExpansion?.both_rent && !V.RobinExpansion.bailey_defeated),
       text: () => maplebirch.t('deadwood-reblooms:robin:trait:protected:text')
     },
     {
-      title: 'Special Traits',
+      title: 'NPC Traits',
       name: () => maplebirch.t('deadwood-reblooms:robin:trait:free:name'),
       colour: 'def',
       has: () => Boolean(V.RobinExpansion?.bailey_defeated),

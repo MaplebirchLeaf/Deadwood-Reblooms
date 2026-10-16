@@ -10,6 +10,7 @@
       <span class='teal'><<= Object.values($VanillaPlus.lock ?? {}).filter(Boolean).length>> / 6</span><br>
       <<lanSwitch 'Breakthrough traits:' '突破特质：'>>
       <span class='green'><<= Object.values($VanillaPlus.traits ?? {}).filter(Boolean).length>> / 7</span><br>
+      <<deadwood-reblooms-breakthrough-progress>>
     <</if>>
     <<if maplebirch.get('MoreTransformations') and $maplebirch?.transformation>>
       <<lanSwitch 'Raven transformation:' '渡鸦转化：'>>
@@ -261,4 +262,29 @@
       <br>
     <</foldout>>
   <</if>>
+<</widget>>
+
+
+<<widget 'deadwood-reblooms-breakthrough-progress'>>
+  <<set _progressModule to maplebirch.get('VanillaPlus')>>
+  <span class='blue'><<lanSwitch 'A tick marks a requirement you meet. Some challenges only need completing once; others, such as ear slimes and makeup, depend on your condition at the time. After breaking through, reach the new ceiling to earn its trait.' '✓表示你已满足这一项。有些经历只需完成一次，双耳史莱姆、妆容等则要在突破时符合要求。突破后继续练到新上限，才会获得对应特质。'>></span><br>
+  <<for _attribute range _progressModule.progress>>
+    <<set _requirements to _progressModule[_attribute.id].requirements>>
+    <br><span class='gold'><<lanSwitch _attribute.name>></span> —
+    <<if $VanillaPlus.lock[_attribute.id]>><span class='green'><<lanSwitch 'Ceiling unlocked' '已突破'>></span>
+    <<else>><span class='teal'><<= _requirements.filter(Boolean).length>> / <<= _requirements.length>></span><</if>>
+    <<if $VanillaPlus.traits[_attribute.id]>> · <span class='green'><<lanSwitch 'Trait obtained' '已获得特质'>></span><</if>><br>
+    <<lanSwitch 'Current / normal ceiling / new ceiling: ' '当前值／原版上限／突破上限：'>><span class='teal'><<= V[_attribute.id]>> / <<= _progressModule.normalCeiling(_attribute.id)>> / <<= _progressModule.ceiling(_attribute.id)>></span><br>
+    <<for _index, _step range _attribute.steps>>
+      <<if _requirements[_index]>><span class='green'>✓ <<lanSwitch _step.text>></span>
+      <<else>><span class='red'>○ <<lanSwitch _step.text>></span><</if>><br>
+      <span class='small-description'><i><<lanSwitch _step.hint>></i></span><br>
+    <</for>>
+    <<if _attribute.id is 'deviancy'>>
+      <<lanSwitch 'Purges / ritual dates (sex, beast): ' '净化累计／两类仪式约会次数：'>><span class='teal'><<= $gwylan?.purged ?? 0>> / 20 · <<= $dateCount?.GwylanSex ?? 0>> / 3 · <<= $dateCount?.GwylanBeast ?? 0>> / 3</span><br>
+    <</if>>
+    <<if _attribute.id is 'exhibitionism'>>
+      <<lanSwitch 'Nude swimming counter / photo flyers: ' '裸泳计数／拍摄传单数：'>><span class='teal'><<= $swimnudecounter ?? 0>> / 5 · <<= $photo_flyers ?? 0>> / 250</span><br>
+    <</if>>
+  <</for>><br>
 <</widget>>

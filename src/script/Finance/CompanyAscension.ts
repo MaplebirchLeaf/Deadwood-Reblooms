@@ -13,7 +13,7 @@ export default function CompanyAscension(maplebirch: typeof window.maplebirch): 
   maplebirch.tool.patch.traits.add({
     title: 'Special Traits',
     name: () => maplebirch.t('deadwood-reblooms:finance:trait:ascended:name'),
-    colour: 'purple',
+    colour: 'sub',
     has: () => !!V.Finance?.company && maplebirch.get('Finance')!.company.ascension.active,
     text: () => maplebirch.t('deadwood-reblooms:finance:trait:ascended:text')
   });

@@ -5,9 +5,13 @@ import type VanillaPlus from '../VanillaPlus';
 class Physique {
   public constructor(private readonly vanillaPlus: VanillaPlus) {}
 
+  public get requirements(): boolean[] {
+    const state = V.VanillaPlus.physique;
+    return [V.physique >= this.vanillaPlus.normalCeiling('physique'), state.panic, state.heroic, state.farm, state.pound];
+  }
+
   public get unlock(): boolean {
-    const physique = V.VanillaPlus.physique;
-    return !V.VanillaPlus.lock.physique && V.physique >= this.vanillaPlus.normalCeiling('physique') && physique.panic && physique.heroic && physique.farm && physique.pound;
+    return !V.VanillaPlus.lock.physique && this.requirements.every(Boolean);
   }
 
   public get max(): boolean {

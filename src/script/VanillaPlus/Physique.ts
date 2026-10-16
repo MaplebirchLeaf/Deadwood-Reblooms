@@ -78,11 +78,10 @@ export default function (maplebirch: typeof window.maplebirch) {
     },
     widgetPassage: {
       Widgets: [
-        // 通用组件有两处相同钳制公式，作为明确的两处批量替换，避免依赖补丁执行顺序。
+        // 中英文原版分别有一处或两处该公式，批量修改实际出现的位置。
         {
           srcmatchgroup: /Math\.clamp\(\$physique, 0, \$physiquesize( \* \$AMCTraits\.physique)?\)/g,
-          to: 'Math.clamp($physique, maplebirch.get("VanillaPlus").minimum(\'physique\'), $VanillaPlus.lock.physique ? maplebirch.get("VanillaPlus").ceiling(\'physique\') : $physiquesize$1)',
-          expected: 2
+          to: 'Math.clamp($physique, maplebirch.get("VanillaPlus").minimum(\'physique\'), $VanillaPlus.lock.physique ? maplebirch.get("VanillaPlus").ceiling(\'physique\') : $physiquesize$1)'
         }
       ],
       'Widgets Clamp': [

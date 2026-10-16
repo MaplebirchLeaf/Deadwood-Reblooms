@@ -55,8 +55,12 @@ class Deviancy {
     if (ritual?.sealed && (ritual.purge ?? 0) >= 9) V.VanillaPlus.deviancy.conducted = true;
   }
 
+  public get requirements(): boolean[] {
+    return [V.deviancy >= this.vanillaPlus.normalCeiling('deviancy'), V.VanillaPlus.deviancy.wildsong, V.VanillaPlus.deviancy.conducted];
+  }
+
   public get unlock(): boolean {
-    return !V.VanillaPlus.lock.deviancy && V.deviancy >= this.vanillaPlus.normalCeiling('deviancy') && V.VanillaPlus.deviancy.wildsong && V.VanillaPlus.deviancy.conducted;
+    return !V.VanillaPlus.lock.deviancy && this.requirements.every(Boolean);
   }
 
   public get max(): boolean {

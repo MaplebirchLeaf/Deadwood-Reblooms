@@ -69,4 +69,13 @@ export default function Transport(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo('Header', { widget: 'deadwood-transport-header', match: /^Deadwood Transport (?:Menu|Travel|Taxi (?:Dispatch|Pickup))$/ });
   maplebirch.tool.addTo('SkillsBox', 'deadwood-transport-skill');
   maplebirch.tool.addTo('Journal', 'deadwood-transport-journal', 'deadwood-driving-school-journal');
+
+  // 路考资格是赛事、悬赏、劫案、出租车与出游的共同前置，单独列出一条特质。
+  maplebirch.tool.patch.traits.add({
+    title: 'Special Traits',
+    name: () => maplebirch.t('deadwood-reblooms:transport:trait:licence:name'),
+    colour: 'green',
+    has: () => V.Transport?.school?.motor_vehicle?.licensed === true,
+    text: () => maplebirch.t('deadwood-reblooms:transport:trait:licence:text')
+  });
 }

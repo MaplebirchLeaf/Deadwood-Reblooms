@@ -31,9 +31,13 @@ class Exhibitionism {
     );
   }
 
+  public get requirements(): boolean[] {
+    const state = V.VanillaPlus.exhibitionism;
+    return [V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism'), state.swimming, state.ballroom, state.highStreet];
+  }
+
   public get unlock(): boolean {
-    const exhibitionism = V.VanillaPlus.exhibitionism;
-    return !V.VanillaPlus.lock.exhibitionism && V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism') && exhibitionism.swimming && exhibitionism.ballroom && exhibitionism.highStreet;
+    return !V.VanillaPlus.lock.exhibitionism && this.requirements.every(Boolean);
   }
 
   public get max(): boolean {

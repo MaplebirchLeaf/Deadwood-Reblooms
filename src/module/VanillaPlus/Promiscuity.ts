@@ -346,13 +346,19 @@ class Promiscuity {
   }
 
   public get ready(): boolean {
-    return (
-      V.promiscuity >= this.vanillaPlus.normalCeiling('promiscuity') && V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism') && V.deviancy >= this.vanillaPlus.normalCeiling('deviancy')
-    );
+    return this.requirements.every(Boolean);
+  }
+
+  public get requirements(): boolean[] {
+    return [
+      V.promiscuity >= this.vanillaPlus.normalCeiling('promiscuity'),
+      V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism'),
+      V.deviancy >= this.vanillaPlus.normalCeiling('deviancy')
+    ];
   }
 
   public get unlock(): boolean {
-    return !V.VanillaPlus.lock.promiscuity && this.ready;
+    return !V.VanillaPlus.lock.promiscuity && this.requirements.every(Boolean);
   }
 
   public get max(): boolean {

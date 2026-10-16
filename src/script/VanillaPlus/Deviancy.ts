@@ -1,6 +1,9 @@
 // ./src/script/VanillaPlus/Deviancy.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
+  const transformation = maplebirch.char.transformation as typeof maplebirch.char.transformation & { readonly coexistConditions: Array<() => boolean> };
+  transformation.coexistConditions.push(() => maplebirch.get('VanillaPlus')?.hasTrait('deviancy') === true);
+
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-deviancy-conduct-link', passage: 'Gwylan Ritual Select' });
   // 诡异镜的“放逐”选项可能占据首位，入口始终紧邻原版“观察”选项。
   maplebirch.tool.addTo(

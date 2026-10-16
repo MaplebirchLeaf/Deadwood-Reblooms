@@ -18,15 +18,12 @@ class Beauty {
     return V.baseAllure >= 7000 && V.outside === 1 && !Time.isBloodMoon();
   }
 
+  public get requirements(): boolean[] {
+    return [V.beauty >= this.vanillaPlus.normalCeiling('beauty'), V.VanillaPlus.beauty.alluring, V.fame.model >= 1000, this.unadorned, !V.worn.face.type.includes('mask')];
+  }
+
   public get unlock(): boolean {
-    return (
-      !V.VanillaPlus.lock.beauty &&
-      V.beauty >= this.vanillaPlus.normalCeiling('beauty') &&
-      V.VanillaPlus.beauty.alluring &&
-      V.fame.model >= 1000 &&
-      this.unadorned &&
-      !V.worn.face.type.includes('mask')
-    );
+    return !V.VanillaPlus.lock.beauty && this.requirements.every(Boolean);
   }
 
   public get max(): boolean {

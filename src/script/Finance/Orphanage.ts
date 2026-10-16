@@ -26,4 +26,13 @@ export default function Orphanage(maplebirch: typeof window.maplebirch): void {
       }
     });
   }
+
+  // 赎身与打倒贝利是同一结局的两条路，各自记一条特质。
+  maplebirch.tool.patch.traits.add({
+    title: 'Special Traits',
+    name: () => maplebirch.t('deadwood-reblooms:finance:trait:buyout:name'),
+    colour: 'gold',
+    has: () => V.Finance?.orphanage?.pc_bought_out === true,
+    text: () => maplebirch.t('deadwood-reblooms:finance:trait:buyout:text')
+  });
 }
