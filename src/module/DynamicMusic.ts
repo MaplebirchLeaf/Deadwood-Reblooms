@@ -3,8 +3,17 @@ import Effects from './DynamicMusic/Effects';
 import { parseDMConfig, type DynamicMusicConfig, type DynamicMusicTrack, type MusicState } from './DynamicMusic/Config';
 export { parseDMConfig } from './DynamicMusic/Config';
 
-type AudioLayer = 'music' | 'place' | 'weather';
+type AudioLayer = 'music' | 'place' | 'weather' | 'voice';
 const AUDIO_PACK = 'deadwood-reblooms-audio';
+
+function voice(): string {
+  if (Number(V.combat) !== 1) return '';
+  if (Number(V.orgasmdown) >= 1) return 'climax';
+  const max = Number(V.arousalmax) || 1;
+  const ratio = (Number(V.arousal) || 0) / max;
+  const speed = ratio >= 0.75 ? 'vfast' : ratio >= 0.5 ? 'fast' : ratio >= 0.25 ? 'mid' : 'slow';
+  return ratio >= 0.15 ? `moans-${speed}` : `panting-${speed === 'vfast' ? 'fast' : speed}`;
+}
 const FADE_MS = 1500;
 
 interface AudioChannels {
@@ -21,12 +30,22 @@ interface AudioChannels {
 }
 
 class DynamicMusic {
-  static readonly options = { enabled: false, musicEnabled: true, ambienceEnabled: true, effectsEnabled: true, volume: 0.5, ambienceVolume: 0.25, effectsVolume: 0.35 };
+  static readonly options = {
+    enabled: false,
+    musicEnabled: true,
+    ambienceEnabled: true,
+    effectsEnabled: true,
+    voiceEnabled: true,
+    volume: 0.5,
+    ambienceVolume: 0.25,
+    effectsVolume: 0.35,
+    voiceVolume: 0.35
+  };
 
   private config: DynamicMusicConfig | null = null;
   private loading: Promise<void> | null = null;
   private failed = false;
-  private readonly desired: Record<AudioLayer, DynamicMusicTrack | null> = { music: null, place: null, weather: null };
+  private readonly desired: Record<AudioLayer, DynamicMusicTrack | null> = { music: null, place: null, weather: null, voice: null };
   private readonly syncing = new Set<AudioLayer>();
   private readonly ambient = new Map<AudioLayer, DynamicMusicTrack>();
   private readonly variants = new Map<string, number>();
@@ -80,7 +99,9 @@ class DynamicMusic {
       precipitation: Weather.precipitation,
       dayState: Time.dayState,
       season: Time.season,
-      rainproof: V.worn?.head?.type?.includes('rainproof') === true || V.worn?.handheld?.type?.includes('rainproof') === true
+      rainproof: V.worn?.head?.type?.includes('rainproof') === true || V.worn?.handheld?.type?.includes('rainproof') === true,
+      gender: String(V.player?.gender_appearance ?? 'f'),
+      voice: voice()
     };
     state.scene = this.config?.scenes.find(rule => rule.when(state))?.scene ?? 'unknown';
     return state;
@@ -130,10 +151,12 @@ class DynamicMusic {
             this.audio.ambience.stop(FADE_MS, `${AUDIO_PACK}:${layer}`);
             this.ambient.delete(layer);
           } else {
-            const volume = (this.options?.ambienceVolume ?? DynamicMusic.options.ambienceVolume) * desired.volume;
+            const mix = layer === 'voice' ? (this.options?.voiceVolume ?? DynamicMusic.options.voiceVolume) : (this.options?.ambienceVolume ?? DynamicMusic.options.ambienceVolume);
+            const volume = mix * desired.volume;
             if (await this.audio.ambience.play(AUDIO_PACK, desired.file, volume, FADE_MS, `${AUDIO_PACK}:${layer}`)) {
               this.ambient.set(layer, desired);
-              const currentVolume = (this.options?.ambienceVolume ?? DynamicMusic.options.ambienceVolume) * desired.volume;
+              const currentVolume =
+                (layer === 'voice' ? (this.options?.voiceVolume ?? DynamicMusic.options.voiceVolume) : (this.options?.ambienceVolume ?? DynamicMusic.options.ambienceVolume)) * desired.volume;
               if (currentVolume !== volume) this.audio.ambience.setVolume(currentVolume, 100, `${AUDIO_PACK}:${layer}`);
             }
           }
@@ -169,8 +192,9 @@ class DynamicMusic {
     }
     const state = enabled ? this.state : null;
     this.desired.music = state && options?.musicEnabled !== false ? (this.config?.music.find(track => track.when(state)) ?? null) : null;
-    for (const layer of ['place', 'weather'] as const) {
-      this.desired[layer] = state && options?.ambienceEnabled !== false ? (this.config?.ambience.find(track => track.layer === layer && track.when(state)) ?? null) : null;
+    for (const layer of ['place', 'weather', 'voice'] as const) {
+      const audible = layer === 'voice' ? options?.voiceEnabled !== false : options?.ambienceEnabled !== false;
+      this.desired[layer] = state && audible ? (this.config?.ambience.find(track => track.layer === layer && track.when(state)) ?? null) : null;
       if (!this.desired[layer] && this.syncing.has(layer)) this.audio.ambience.stop(FADE_MS, `${AUDIO_PACK}:${layer}`);
       void this.sync(layer);
     }
@@ -191,7 +215,18 @@ class DynamicMusic {
     const options = this.options;
     if (!options) return;
     options.ambienceVolume = Math.clamp(Number(value) || 0, 0, 1);
-    for (const [layer, track] of this.ambient) this.audio.ambience.setVolume(options.ambienceVolume * track.volume, 100, `${AUDIO_PACK}:${layer}`);
+    for (const [layer, track] of this.ambient) {
+      if (layer === 'voice') continue;
+      this.audio.ambience.setVolume(options.ambienceVolume * track.volume, 100, `${AUDIO_PACK}:${layer}`);
+    }
+  }
+
+  public setVoiceVolume(value: number): void {
+    const options = this.options;
+    if (!options) return;
+    options.voiceVolume = Math.clamp(Number(value) || 0, 0, 1);
+    const track = this.ambient.get('voice');
+    if (track) this.audio.ambience.setVolume(options.voiceVolume * track.volume, 100, `${AUDIO_PACK}:voice`);
   }
 
   public setEffectsVolume(value: number): void {

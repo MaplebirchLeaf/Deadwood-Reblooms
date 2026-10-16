@@ -16,6 +16,8 @@ export interface MusicState {
   dayState: string;
   season: string;
   rainproof: boolean;
+  gender: string;
+  voice: string;
 }
 
 export interface DynamicMusicTrack {
@@ -24,7 +26,7 @@ export interface DynamicMusicTrack {
   title?: string;
   artist?: string;
   priority: number;
-  layer: 'place' | 'weather';
+  layer: 'place' | 'weather' | 'voice';
   volume: number;
   when: (state: MusicState) => boolean;
 }
@@ -67,7 +69,9 @@ const stateTypes: Record<keyof MusicState, string> = {
   precipitation: 'string',
   dayState: 'string',
   season: 'string',
-  rainproof: 'boolean'
+  rainproof: 'boolean',
+  gender: 'string',
+  voice: 'string'
 };
 
 const audioPath = /^audio\/(?!.*(?:^|\/)\.\.\/)[\w/-]+\.(?:ogg|mp3|wav|m4a|flac|webm)$/i;
@@ -110,7 +114,7 @@ export function parseDMConfig(value: unknown, hasFile: (file: string) => boolean
         if (typeof raw.priority !== 'number' || !Number.isFinite(raw.priority)) throw new Error('Invalid priority for ' + raw.track);
         if (raw.title !== undefined && typeof raw.title !== 'string') throw new Error('Invalid title for ' + raw.track);
         if (raw.artist !== undefined && typeof raw.artist !== 'string') throw new Error('Invalid artist for ' + raw.track);
-        if (raw.layer !== undefined && !['place', 'weather'].includes(String(raw.layer))) throw new Error('Invalid ambience layer for ' + raw.track);
+        if (raw.layer !== undefined && !['place', 'weather', 'voice'].includes(String(raw.layer))) throw new Error('Invalid ambience layer for ' + raw.track);
         if (raw.volume !== undefined && (typeof raw.volume !== 'number' || !Number.isFinite(raw.volume) || raw.volume < 0 || raw.volume > 1)) throw new Error('Invalid volume for ' + raw.track);
         names.add(raw.track);
         return {
@@ -119,7 +123,7 @@ export function parseDMConfig(value: unknown, hasFile: (file: string) => boolean
           title: raw.title as string | undefined,
           artist: raw.artist as string | undefined,
           priority: raw.priority,
-          layer: (raw.layer ?? 'place') as 'place' | 'weather',
+          layer: (raw.layer ?? 'place') as 'place' | 'weather' | 'voice',
           volume: (raw.volume ?? 1) as number,
           when: parseCondition(raw.when, raw.track)
         };

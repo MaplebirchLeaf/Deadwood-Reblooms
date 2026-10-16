@@ -6,6 +6,13 @@ interface Snapshot {
   worn: string;
   integrity: Record<string, { id: string; value: number }>;
   ammo: Record<string, number>;
+  orgasm: number;
+  arousal: number;
+  partner_max: number;
+  penis: string;
+  anus: string;
+  mouth: string;
+  wet: number;
 }
 
 const number = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) ? value : 0);
@@ -45,7 +52,14 @@ export default class Effects {
       bound: [V.leftarm, V.rightarm, V.leftleg, V.rightleg, V.head].filter(part => ['bound', 'grappled', 'swarmgrappled'].includes(part)).length,
       worn: clothes.map(([slot, item]) => [slot, item.index, item.name, item.colour, item.accessory_colour, item.pattern].join(':')).join('|'),
       integrity: Object.fromEntries(clothes.map(([slot, item]) => [slot, { id: [item.index, item.name].join(':'), value: number(item.integrity) }])),
-      ammo: { ...V.StreetLife?.ammo }
+      ammo: { ...V.StreetLife?.ammo },
+      orgasm: number(V.orgasmcount),
+      arousal: number(V.enemyarousal),
+      partner_max: number(V.enemyarousalmax),
+      penis: String(V.penisstate ?? 'none'),
+      anus: String(V.anusstate ?? 'none'),
+      mouth: String(V.mouthuse ?? 'none'),
+      wet: number(V.vaginaWetness) + number(V.anusWetness)
     };
   }
 
@@ -73,7 +87,9 @@ export default class Effects {
     const combat = before.combat || after.combat;
     const ammo = ['shotgun', 'rifle', 'handgun'].find(kind => Number.isFinite(after.ammo[kind]) && after.ammo[kind] < number(before.ammo[kind]));
     const damage = Object.entries(after.integrity).some(([slot, item]) => item.id === before.integrity[slot]?.id && item.value < before.integrity[slot].value);
-    if (ammo && combat) action = `gun-${ammo}`;
+    const intimate = this.intimate(before, after);
+    if (intimate) action = intimate;
+    else if (ammo && combat) action = `gun-${ammo}`;
     else if (combat && after.attack > before.attack) action = 'impact';
     else if (combat && after.hit > before.hit) action = 'impact';
     else if (combat && after.bound > before.bound) action = 'bind';
@@ -82,16 +98,27 @@ export default class Effects {
     if (action) this.play(action);
   }
 
+  /** 插入、抽送与高潮。只用插槽状态与快感计数判断，不写任何存档标记。 */
+  private intimate(before: Snapshot, after: Snapshot): string | undefined {
+    if (!after.combat) return undefined;
+    if (after.orgasm > before.orgasm) return 'sex-climax';
+    if (before.arousal < before.partner_max && after.arousal >= after.partner_max) return 'sex-climax';
+    const entering = (state: string) => state === 'entrance' || state.endsWith('entrance') || state === 'imminent' || state.endsWith('imminent');
+    const seated = (state: string) => state === 'penetrated' || state === 'doublepenetrated' || state === 'tentacledeep' || state.startsWith('other');
+    if ((entering(after.penis) && !entering(before.penis)) || (entering(after.anus) && !entering(before.anus))) return 'sex-enter';
+    if (after.mouth === 'penetrated' && before.mouth !== 'penetrated') return 'sex-oral';
+    if (seated(after.penis) || seated(after.anus)) return after.wet >= 700 ? 'sex-wet' : 'sex-dry';
+    return undefined;
+  }
+
   public install(): void {
     if (this.installed) return;
     this.installed = true;
     this.core.on(':onLoad', () => this.reset(), 'DynamicMusic effects load');
     this.core.on(':passagestart', () => {
       const state = this.core.SugarCube.State;
-      // 首屏包含存档带回的整段历史，不能把未访问的旧页当作新动作。
       if (!this.previous && this.suppress) for (const past of state.history) this.seen.add(past);
       const moment = state.current;
-      // State.active 在回溯时也会重新克隆，current 才是历史条目本身。
       const repeated = !moment || this.seen.has(moment);
       if (moment) this.seen.add(moment);
       this.rendering = true;
@@ -112,7 +139,6 @@ export default class Effects {
       this.pending ??= before;
       if (this.timer === null) {
         const started = Date.now();
-        // 等目标链接处理完再比较。后台延迟的动作只同步快照，不补播。
         this.timer = setTimeout(() => {
           this.timer = null;
           if (Date.now() - started > 1500 || document.visibilityState === 'hidden') this.suppress = true;

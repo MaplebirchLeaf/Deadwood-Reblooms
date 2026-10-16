@@ -1,6 +1,6 @@
 # Deadwood Reblooms Audio Pack
 
-The pack contains 16 instrumental music tracks and 15 independent ambience loops. Music and ambience are selected and played separately. All recordings use [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) except kurt's `ambience/stream.ogg`, licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+The pack contains 16 instrumental music tracks, 15 independent ambience loops and 27 voice loops. Music, ambience and voice are selected and played separately. The music and ambience recordings use [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) except kurt's `ambience/stream.ogg`, licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Voice and intimate effects are credited separately in [SFX-CREDITS.md](SFX-CREDITS.md).
 
 Sources were checked on their original release pages. Musical pieces retain their full loop or song, rather than a repeated 20-second excerpt. The piano and non-looping field recordings have a short end-to-start crossfade. Static gain adjustment keeps music near -20 LUFS and ambience near -29 LUFS where source peaks permit; it does not dynamically pump the volume. Music uses 44.1 kHz stereo OGG Vorbis, ambience 24 kHz mono.
 

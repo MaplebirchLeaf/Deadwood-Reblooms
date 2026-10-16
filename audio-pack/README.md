@@ -2,9 +2,9 @@
 
 Use Maplebirch Framework 5.4.9 or later and matching main mod and audio pack versions.
 
-Enable Dynamic Music in the game settings, then choose Music, Ambience and Sound Effects independently. Defaults are 50%, 25% and 35%. Master volume and mute affect all layers.
+Enable Dynamic Music in the game settings, then choose Music, Ambience, Sound Effects and Intimate Voice independently. Defaults are 50%, 25%, 35% and 35%. Master volume and mute affect all layers.
 
-The pack provides scene music, place and weather loops, and short effects. Rain can accompany waves or traffic. The moor and ruined castle have open-country wind in dry weather, storm drains have flowing water, and old sewers have quieter dripping. Short effects do not stop or replace the music track.
+The pack provides scene music, place, weather and voice loops, and short effects. Rain can accompany waves or traffic. Voice loops play only during encounters and never mix into the music track. The moor and ruined castle have open-country wind in dry weather, storm drains have flowing water, and old sewers have quieter dripping. Short effects do not stop or replace the music track.
 
 Muffled rain and distant thunder can be heard from the orphanage bedroom and bathroom, and the main temple quarters. These window-side sounds do not extend to every indoor scene or underground passage. Thunder follows stormy weather with natural pauses, rather than sounding for every visible flash of lightning.
 
@@ -12,12 +12,13 @@ Muffled rain and distant thunder can be heard from the orphanage bedroom and bat
 
 - `audio/music/`: tracks shown in the manual music library.
 - `audio/ambience/`: scene and weather loops.
-- `audio/sfx/`: short clothing, impact and gunfire effects.
+- `audio/voice/`: looping breathing and moaning, used only during encounters.
+- `audio/sfx/`: short clothing, impact, gunfire and intimate effects.
 - `dynamic-music.json`: the main mod's selection rules.
 
 To replace a sound, keep its packaged path and a supported audio format, or update all references to its new path in the configuration. Rebuild the ZIP with its original directory structure and mod metadata. Back up the original pack before replacing files.
 
-The pack keeps 7 short clips for impacts, gunfire and clothing feedback. It does not add sounds to every interface click or every combat turn.
+The pack keeps short clips for impacts, gunfire and clothing feedback, plus 50 intimate effects and 27 voice loops. It does not add sounds to every interface click, and effects fire at most once per page.
 
 ## Configuration
 
@@ -27,8 +28,9 @@ The pack keeps 7 short clips for impacts, gunfire and clothing feedback. It does
 
 - `scenes`: ordered classifiers with a `scene` ID and `when`. The first match defines the scene.
 - `music`: entries with unique `track`, packaged `file`, finite `priority` and `when`. `title` and `artist` are optional library metadata.
-- `ambience`: entries with the same core fields, plus `layer: "place"` or `"weather"` and an optional `volume` multiplier from 0 to 1. The default layer is `place` and the default multiplier is 1.
-- Music selects one matching track. Each ambience layer independently selects its highest-priority match, so place and weather can overlap.
+- `ambience`: entries with the same core fields, plus `layer: "place"`, `"weather"` or `"voice"` and an optional `volume` multiplier from 0 to 1. The default layer is `place` and the default multiplier is 1.
+- Music selects one matching track. Each ambience layer independently selects its highest-priority match, so place, weather and voice can overlap.
+- The `voice` layer has its own switch and volume. It selects one loop by `gender` and the arousal-based `voice` state, and stays silent outside combat.
 - An unchanged track keeps playing. Ambience changes fade between loops. No match means silence.
 
 ### Short effect rules
