@@ -27,7 +27,7 @@ export default function OrphanEvents(maplebirch: typeof window.maplebirch): void
       'Widgets Home Events': [
         {
           src: '\t<<switch random(1, 14)>>',
-          to: '\t<<switch random(1, 17)>>',
+          to: '\t<<switch random(1, 18)>>',
           expected: 1
         },
         {

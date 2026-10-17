@@ -21,10 +21,7 @@ export interface VanillaPlusState {
   /** 各属性特质是否已解锁，incorrigible 需六项属性全部满值后才置位。 */
   traits: Record<VanillaPlusTrait, boolean>;
   /** 美貌相关的一次性进度。 */
-  beauty: {
-    /** 是否已经历过"倾城"事件，该事件只发生一次。 */
-    alluring: boolean;
-  };
+  beauty: Record<string, never>;
   /** 神圣转化加成与祈祷室的异常接触。 */
   divineTransformations: {
     /** 转化赋予的额外美貌上限加成，参与 normalCeiling 计算。 */
@@ -42,23 +39,11 @@ export interface VanillaPlusState {
   };
   /** 体格相关的一次性事件标记。 */
   physique: {
-    /** 已触发过恐慌事件。 */
-    panic: boolean;
-    /** 已触发过英勇事件。 */
-    heroic: boolean;
-    /** 已解锁农场劳作路线。 */
-    farm: boolean;
-    /** 已遭遇过围栏/牢笼事件。 */
-    pound: boolean;
     /** 本存档已用过一次"挣脱"，用后不再提供。 */
     breakUsed: boolean;
   };
   /** 露出癖相关的场景进度。 */
   exhibitionism: {
-    /** 泳池露出场景已发生。 */
-    swimming: boolean;
-    /** 舞厅裸舞场景已发生。 */
-    ballroom: boolean;
     /** 商业街裸奔（正式）已发生。 */
     highStreetRun: boolean;
     /** 商业街暴露（初次）已发生。 */
@@ -68,8 +53,6 @@ export interface VanillaPlusState {
   };
   /** 异种癖相关进度与镜子出口坐标。 */
   deviancy: {
-    /** 野性之歌前置已满足。 */
-    wildsong: boolean;
     /** 仪式正在进行中，读档后据此恢复流程。 */
     conducting: boolean;
     /** 仪式已完成，上限已解锁。 */
@@ -122,10 +105,6 @@ export interface VanillaPlusState {
   willpower: {
     /** 亡魂事件已完成。 */
     wraith: boolean;
-    /** 崩解事件已完成。 */
-    schism: boolean;
-    /** 守夜事件已完成。 */
-    vigil: boolean;
     /** 痛苦护盾的当前状态。 */
     painShield: {
       /** 护盾剩余量，归零后失效。 */
@@ -160,9 +139,7 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
     promiscuity: false,
     incorrigible: false
   },
-  beauty: {
-    alluring: false
-  },
+  beauty: {},
   divineTransformations: {
     beautyBonus: 0,
     expungeUsed: false,
@@ -172,21 +149,14 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
     contactHeld: false
   },
   physique: {
-    panic: false,
-    heroic: false,
-    farm: false,
-    pound: false,
     breakUsed: false
   },
   exhibitionism: {
-    swimming: false,
-    ballroom: false,
     highStreetRun: false,
     highStreet: false,
     levelFive: 0
   },
   deviancy: {
-    wildsong: false,
     conducting: false,
     conducted: false,
     levelFive: 0,
@@ -215,8 +185,6 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
   npcDoublePenetration: null,
   willpower: {
     wraith: false,
-    schism: false,
-    vigil: false,
     painShield: {
       remaining: 0,
       ready: true

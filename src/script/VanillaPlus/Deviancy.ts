@@ -34,12 +34,6 @@ export default function (maplebirch: typeof window.maplebirch) {
     },
     widgetPassage: {
       'Gwylan Ritual Sex Widgets': [
-        // 在获得 Wildsong feat 后记录仪式完成标记，作为异种癖突破条件之一。
-        {
-          src: '<<earnFeat "Wildsong">>',
-          applyafter: '<<set $VanillaPlus.deviancy.wildsong to true>>',
-          expected: 1
-        },
         // 在原版清除 $sexRitual 前提交仪式结果，避免状态被 unset 后无法判断过程。
         {
           src: '<<unset $sexRitual>>',

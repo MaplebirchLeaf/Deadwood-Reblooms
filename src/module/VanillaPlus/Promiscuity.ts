@@ -345,10 +345,6 @@ class Promiscuity {
     state[`${part}actiondefault`] = 'rest';
   }
 
-  public get ready(): boolean {
-    return this.requirements.every(Boolean);
-  }
-
   public get requirements(): boolean[] {
     return [
       V.promiscuity >= this.vanillaPlus.normalCeiling('promiscuity'),

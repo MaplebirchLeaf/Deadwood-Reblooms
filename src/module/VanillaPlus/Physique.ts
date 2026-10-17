@@ -6,8 +6,13 @@ class Physique {
   public constructor(private readonly vanillaPlus: VanillaPlus) {}
 
   public get requirements(): boolean[] {
-    const state = V.VanillaPlus.physique;
-    return [V.physique >= this.vanillaPlus.normalCeiling('physique'), state.panic, state.heroic, state.farm, state.pound];
+    return [
+      V.physique >= this.vanillaPlus.normalCeiling('physique'),
+      V.feats?.currentSave?.['Panic Room'] != null,
+      V.feats?.currentSave?.['Heroic Victory'] != null,
+      V.feats?.currentSave?.['Farm Protector'] != null,
+      V.feats?.currentSave?.['Pound Liberator'] != null
+    ];
   }
 
   public get unlock(): boolean {

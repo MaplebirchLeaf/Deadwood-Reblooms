@@ -66,22 +66,6 @@ export default function (maplebirch: typeof window.maplebirch) {
           expected: 1
         }
       ],
-      'Swimming Lesson Naked Backstroke': [
-        // 在裸泳阶段判断后记录累计次数达标结果，保留原版课程阶段控制。
-        {
-          src: '<<if $phase is 1>>',
-          applyafter: '<<if $swimnudecounter gte 5>><<set $VanillaPlus.exhibitionism.swimming to true>><</if>>',
-          expected: 1
-        }
-      ],
-      'Avery Party Dance Naked': [
-        // 在原版授予 Ballroom Show-off feat 后记录宴会裸舞成就，作为突破条件。
-        {
-          src: '<<earnFeat "Ballroom Show-off">>',
-          applyafter: '<<set $VanillaPlus.exhibitionism.ballroom to true>>',
-          expected: 1
-        }
-      ],
       'Photo High Exhibitionism Run Face': [
         // 在场景 effects 后按阶段与传单数记录成功裸奔，避免仅进入 Passage 就算完成。
         {

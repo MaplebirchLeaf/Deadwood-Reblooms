@@ -19,7 +19,13 @@ class Beauty {
   }
 
   public get requirements(): boolean[] {
-    return [V.beauty >= this.vanillaPlus.normalCeiling('beauty'), V.VanillaPlus.beauty.alluring, V.fame.model >= 1000, this.unadorned, !V.worn.face.type.includes('mask')];
+    return [
+      V.beauty >= this.vanillaPlus.normalCeiling('beauty'),
+      Boolean(V.feats?.currentSave?.Alluring != null || this.alluring),
+      V.fame.model >= 1000,
+      this.unadorned,
+      !V.worn.face.type.includes('mask')
+    ];
   }
 
   public get unlock(): boolean {
@@ -39,13 +45,6 @@ class Beauty {
     this.vanillaPlus.core.dynamic.regStateEvent('gate', 'beauty-unlock', {
       output: 'deadwood-reblooms-beauty-unlock',
       cond: () => V.VanillaPlus != null && this.unlock
-    });
-
-    this.vanillaPlus.core.dynamic.regStateEvent('gate', 'beauty-alluring', {
-      action: () => {
-        V.VanillaPlus.beauty.alluring = true;
-      },
-      cond: () => V.VanillaPlus != null && this.alluring && !V.VanillaPlus.beauty.alluring
     });
   }
 }

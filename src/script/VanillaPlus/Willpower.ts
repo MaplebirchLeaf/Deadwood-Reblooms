@@ -221,22 +221,6 @@ export default function (maplebirch: typeof window.maplebirch) {
           applyafter: '<<set $VanillaPlus.willpower.wraith to true>>',
           expected: 1
         }
-      ],
-      'Schism End': [
-        // 在原版 schismEnd 完成结算后记录 schism 结果，避免中途离开也被计为完成。
-        {
-          src: '<<schismEnd>>',
-          applyafter: '<<set $VanillaPlus.willpower.schism to true>>',
-          expected: 1
-        }
-      ],
-      'Temple Vigil 14': [
-        // 在守夜最终一小时推进后记录 vigil 结果，确认玩家完成整段神殿守夜。
-        {
-          src: '<<pass 60>>',
-          applyafter: '<<set $VanillaPlus.willpower.vigil to true>>',
-          expected: 1
-        }
       ]
     },
     widgetPassage: {

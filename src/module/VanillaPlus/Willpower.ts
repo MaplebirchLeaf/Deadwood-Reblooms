@@ -13,21 +13,14 @@ class Willpower {
     return V.VanillaPlus?.willpower?.painShield;
   }
 
-  public get hasSchism(): boolean {
-    return Boolean(V.VanillaPlus?.willpower?.schism || V.feats?.currentSave?.Schism != null || V.feats?.allSaves?.Schism != null || V.wraithPrison?.vision);
-  }
-
   public get requirements(): boolean[] {
     const parasites = V.parasite ?? {};
-    if (V.VanillaPlus?.willpower && !V.VanillaPlus.willpower.schism && this.hasSchism) {
-      V.VanillaPlus.willpower.schism = true;
-    }
     return [
       V.willpower >= this.vanillaPlus.normalCeiling('willpower'),
       parasites.left_ear?.name === 'slime' && parasites.right_ear?.name === 'slime',
       Boolean(V.VanillaPlus?.willpower?.wraith),
-      this.hasSchism,
-      Boolean(V.VanillaPlus?.willpower?.vigil),
+      V.feats?.currentSave?.Schism != null,
+      V.feats?.currentSave?.['Defy the Night'] != null,
       (V.wraithPrison?.search ?? 0) >= 4
     ];
   }

@@ -1,7 +1,7 @@
 // ./src/script/VanillaPlus/Beauty.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  // 原版言语动作的结算点各一处，仅增强实际发生的减怒。
+  // 原版言语动作的结算点各一处，仅增强实际发生的减怒；放宽原版美貌上限与钳制范围。
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Effects Man': [
@@ -24,13 +24,7 @@ export default function (maplebirch: typeof window.maplebirch) {
           applyafter: ' + maplebirch.get("VanillaPlus").beauty.seductionBonus',
           expected: 10
         }
-      ]
-    }
-  });
-
-  // 放宽原版美貌上限与钳制范围。
-  maplebirch.tool.inject({
-    widgetPassage: {
+      ],
       'Widgets Clamp': [
         // 替换全局美貌钳制公式，同时应用特质保底值与突破后的 125% 上限。
         {
