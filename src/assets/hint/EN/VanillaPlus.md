@@ -20,7 +20,7 @@ Willpower, physique and beauty rise to **125%** of their normal ceilings; exhibi
 
 Reach maximum willpower, keep a slime in each ear, successfully resist possession in the lake prison, finish Schism and complete the full temple vigil.
 
-The prison is **the Ivory Wraith’s underwater prison in the lake ruins**. “Recovering” refers to the Wraith, not you. While it is absent, search for a way out, examine the cages, keep searching, then swim down the stairs to reach search step **4**. With every other requirement met, return to the prison’s main page before the Wraith returns and choose **Dive towards the rune again**.
+The prison is **the Ivory Wraith’s underwater prison in the lake ruins**. Search for a way out, examine the cages, keep searching, then swim down the stairs to reach search step **4**. With every other requirement met, return to the prison’s main page and choose **Dive towards the rune again**.
 
 ### Physique
 

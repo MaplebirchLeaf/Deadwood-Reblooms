@@ -214,6 +214,14 @@ export default function (maplebirch: typeof window.maplebirch) {
           expected: 1
         }
       ],
+      'Lake Ruin Prison Masturbation Resist': [
+        // 在湖底监狱自慰型附身抗拒的成功判断入口同样记录 wraith 结果。
+        {
+          src: '<<if $willpowerSuccess>>',
+          applyafter: '<<set $VanillaPlus.willpower.wraith to true>>',
+          expected: 1
+        }
+      ],
       'Schism End': [
         // 在原版 schismEnd 完成结算后记录 schism 结果，避免中途离开也被计为完成。
         {

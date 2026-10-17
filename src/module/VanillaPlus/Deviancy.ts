@@ -37,12 +37,16 @@ class Deviancy {
     return V.VanillaPlus.traits.deviancy && Time.hour === 3 && V.settings.tentaclesEnabled && (V.hallucinations >= 2 || V.daily?.mirrorTentacles === 1);
   }
 
+  public get hasWildsong(): boolean {
+    return Boolean(V.VanillaPlus?.deviancy?.wildsong || V.feats?.currentSave?.Wildsong != null || V.feats?.allSaves?.Wildsong != null);
+  }
+
   public get canConduct(): boolean {
     return (
       !V.VanillaPlus.lock.deviancy &&
       !V.VanillaPlus.deviancy.conducted &&
       V.deviancy >= this.vanillaPlus.normalCeiling('deviancy') &&
-      V.VanillaPlus.deviancy.wildsong &&
+      this.hasWildsong &&
       V.gwylan.purged >= 20 &&
       V.dateCount.GwylanSex >= 3 &&
       V.dateCount.GwylanBeast >= 3
@@ -56,7 +60,10 @@ class Deviancy {
   }
 
   public get requirements(): boolean[] {
-    return [V.deviancy >= this.vanillaPlus.normalCeiling('deviancy'), V.VanillaPlus.deviancy.wildsong, V.VanillaPlus.deviancy.conducted];
+    if (V.VanillaPlus?.deviancy && !V.VanillaPlus.deviancy.wildsong && this.hasWildsong) {
+      V.VanillaPlus.deviancy.wildsong = true;
+    }
+    return [V.deviancy >= this.vanillaPlus.normalCeiling('deviancy'), this.hasWildsong, V.VanillaPlus.deviancy.conducted];
   }
 
   public get unlock(): boolean {
