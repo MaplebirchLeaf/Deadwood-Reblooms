@@ -130,13 +130,10 @@ class LongerCombat {
     return pairs.slice(0, 2);
   }
 
-  private static namedGenders(npc: { [x: string]: any }): ('m' | 'f')[] {
-    const hasPenis = npc.penis !== undefined && npc.penis !== 'none';
-    const hasVagina = npc.vagina !== undefined && npc.vagina !== 'none';
-    const values: ('m' | 'f')[] = [];
-    if (hasPenis) values.push('m');
-    if (hasVagina) values.push('f');
-    return values;
+  private static pairOrgan(pair: string, npc: { [x: string]: any }): 'penis' | 'vagina' {
+    const organ = pair.split(':')[0];
+    if (organ === 'penis' || organ === 'vagina') return organ;
+    return npc.penis !== undefined && npc.penis !== 'none' ? 'penis' : 'vagina';
   }
 
   private npcAgain(npc: { [x: string]: any; pronouns?: { his: string; he: string } }, index: number): string {
@@ -162,8 +159,8 @@ class LongerCombat {
       const previous = lines[pair];
       const line = this.npcLine(`${LongerCombat.NPC_KEY}:${pair}:${type}:${group}:${stage}`, previous?.line);
       if (!line) continue;
-      const named = this.core.utils.either(LongerCombat.namedGenders(npc)) ?? 'f';
-      const prefix = `${LongerCombat.NPC_KEY}:named:${character}:${named}:${type}:${stage}`;
+      const organ = LongerCombat.pairOrgan(pair, npc);
+      const prefix = `${LongerCombat.NPC_KEY}:named:${character}:${organ}:${type}:${stage}`;
       const namedLine = this.core.services.translator.has(`${prefix}:0`) && Math.random() < 0.6 ? this.npcLine(prefix, previous?.namedLine) : '';
       lines[pair] = { line, namedLine: namedLine || previous?.namedLine || '' };
       speech.push('"' + (namedLine ? namedLine + space + line : line) + '"');
