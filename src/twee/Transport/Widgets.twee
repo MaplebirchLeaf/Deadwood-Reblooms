@@ -185,6 +185,38 @@
   <<if _transport_state.notice>><br><br><</if>>
 <</widget>>
 
+<<widget 'deadwood-transport-school-blocked'>>
+  <<set _fee to _args.length gt 0 ? _args[0] : 0>>
+  <<set _school to maplebirch.get('Transport').school, _transport to maplebirch.get('Transport')>>
+  <<set _record to _school.record, _state to $Transport.school>>
+  <<if Time.days lt _state.penalty_until>>
+    <span class='purple'><<lanSwitch 'The receptionist taps the note beside your name. “Come back in ' '前台敲了敲你名字旁的备注。“再过 '>><<print _state.penalty_until - Time.days>><<lanSwitch ' days.”' ' 天再来。”'>></span>
+  <<elseif Time.hour gte 17>>
+    <span class='purple'><<lanSwitch 'The counter is closed for the day. The timetable gives 09:00 to 17:00.' '柜台今天已经关了。课程表上写的是 09:00 到 17:00。'>></span>
+  <<elseif !_transport.ready>>
+    <span class='purple'><<lanSwitch 'The receptionist looks you over, then decides against it.' '前台把你从头到脚看了一遍，还是决定算了。'>></span>
+  <<elseif pcAreArmsBound('both')>>
+    <span class='purple'><<lanSwitch 'The receptionist waits for you to free your hands. Nothing happens.' '前台等你把手松开。什么也没有发生。'>></span>
+  <<elseif _fee and !_transport.canPay(_fee)>>
+    <span class='purple'><<lanSwitch 'You can\u0027t afford it. The fee is ' '你付不起。费用是 '>><<printmoney _fee>><<lanSwitch '.' '。'>></span>
+  <<elseif !_school.practicalWeather>>
+    <span class='purple'><<lanSwitch 'Rain and snow keep the vehicles in. The classroom stays open.' '雨雪天车辆不外借。教室照常开放。'>></span>
+  <<elseif !_record.theory and _record.study gte 3 and Time.hour gte 16>>
+    <span class='purple'><<lanSwitch 'The theory test runs ninety minutes. The last sitting has gone.' '理论考试要九十分钟。今天最后一场已经开过了。'>></span>
+  <<elseif _state.category is 'motorcycle' and !_state.motorcycle.cbt_completed and Time.hour gte 12>>
+    <span class='purple'><<lanSwitch 'Basic training takes the whole day. It only starts in the morning.' '基础培训要一整天。只在上午开始。'>></span>
+  <<elseif !_record.theory and _record.study gte 3>>
+    <span class='purple'><<lanSwitch 'You have read everything the classroom offers. The theory test is next.' '教室里的东西你已经读完了。接下来是理论考试。'>></span>
+  <<elseif _record.theory and (_record.practice lt 200 or $Transport.driving lt 300)>>
+    <span class='purple'><<lanSwitch 'The instructor looks at your hours. “Not yet.”' '教练看了看你的课时。“还不够。”'>></span>
+  <<elseif _state.category is 'motorcycle' and _record.theory and !_state.motorcycle.module_1>>
+    <span class='purple'><<lanSwitch 'The yard comes before the road. Take the off-road test first.' '上路之前先进场地。先考场地。'>></span>
+  <<elseif _record.retest_day gt Time.days>>
+    <span class='purple'><<lanSwitch 'The receptionist turns a page in the booking diary. “' '前台翻过预约簿的一页。“'>><<print _record.retest_day - Time.days>><<lanSwitch ' days.”' ' 天。”'>></span>
+  <<else>>
+    <span class='purple'><<lanSwitch 'The receptionist has nothing to book for you today.' '前台今天没有可以给你安排的东西。'>></span>
+  <</if>>
+<</widget>>
 <<widget 'deadwood-transport-return'>>
   <<set _return_passage to $Transport.return_passage, _return_source to $passage, _return_minutes to 0>>
   <<if $passage is 'Deadwood Transport Menu' and $Transport.shop>>

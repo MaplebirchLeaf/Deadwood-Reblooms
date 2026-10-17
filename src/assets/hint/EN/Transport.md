@@ -24,7 +24,7 @@ Bicycles start at **<span class="gold">£1,500</span>**. Buy them in the <span c
 | Driving school     | Elk Street, 2 minutes on foot     | Driving lessons, theory and practical tests             |
 | Petrol station     | Harvest Street, 3 minutes on foot | Refuelling, petrol cans and fuel delivery, open all day |
 
-The dealership opens **08:00–18:00**. The driving school opens **09:00–18:00, Monday to Saturday**. Purchased motorcycles and cars are parked on Harvest Street. With DoLP, bicycles use its existing depot, durability and parking system.
+The dealership opens **08:00–18:00**. The driving school opens **09:00–17:00, Monday to Saturday**. Purchased motorcycles and cars are parked on Harvest Street. With DoLP, bicycles use its existing depot, durability and parking system.
 
 ## Learning to drive
 

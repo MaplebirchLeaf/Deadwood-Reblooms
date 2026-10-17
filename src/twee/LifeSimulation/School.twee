@@ -18,10 +18,10 @@
 <<widget 'deadwood-reblooms-life-simulation-school-feedback'>>
   <<set _changes to $LifeSimulation.school.feedback>>
   <<if _changes>>
-    <<set _names to [lanSwitch('School order', '校内秩序'), lanSwitch('Student standing', '学生声望'), lanSwitch('Staff trust', '教职工信任'), lanSwitch('School corruption', '校内堕落')]>>
+    <<set _names to [lanSwitch('Student standing', '学生声望'), lanSwitch('Staff trust', '教职工信任'), lanSwitch('School corruption', '校内堕落')]>>
     <<for _index, _change range _changes>>
       <<if _change isnot 0>>
-        <span @class="(_change > 0) === (_index !== 3) ? 'green' : 'red'"><<print _names[_index]>> <<print _change > 0 ? '+' + _change : _change>></span><br>
+        <span @class="(_change > 0) === (_index !== 2) ? 'green' : 'red'"><<print _names[_index]>> <<print _change > 0 ? '+' + _change : _change>></span><br>
       <</if>>
     <</for>>
     <<set $LifeSimulation.school.feedback to null>>
@@ -151,12 +151,33 @@
     <span @class="_colour"><<print _args[0]>>/100</span>
 <</widget>>
 
+<<widget 'deadwood-reblooms-life-simulation-school-policy-status'>>
+  <<set _school to $LifeSimulation.school, _policy to _args[0]>>
+  <<set _slack to _args.length gt 1 ? _args[1] : 0>>
+  <<if _policy>>
+    <<set _need to maplebirch.get('LifeSimulation').school.policyRequirements[_policy]>>
+    <<set _petitionNeed to Math.max(0, _need.studentSupport + 10 - _slack)>>
+    <<set _staffNeed to Math.max(0, _need.staffSupport - _slack)>>
+    <<set _corruptionNeed to Math.max(0, _need.corruption - _slack)>>
+    <<set _loveNeed to Math.max(0, _need.leightonLove - _slack)>>
+    <<set _townCorruption to $world_corruption_soft is undefined ? 0 : $world_corruption_soft>>
+    <ul class='journal'>
+      <li><<lanSwitch 'School corruption: ' '校内堕落：'>><span @class="_school.corruption gte _corruptionNeed ? 'green' : 'red'"><<print _school.corruption>></span><span class='gold'><<print ' / ' + _corruptionNeed>></span></li>
+      <li><<lanSwitch 'Town corruption: ' '城镇堕落：'>><span @class="_townCorruption gte _corruptionNeed ? 'green' : 'red'"><<print _townCorruption>></span><span class='gold'><<print ' / ' + _corruptionNeed>></span></li>
+      <li><<lanSwitch 'Staff trust: ' '教职工信任：'>><span @class="_school.staffSupport gte _staffNeed ? 'green' : 'red'"><<print _school.staffSupport>></span><span class='gold'><<print ' / ' + _staffNeed>></span></li>
+      <li><<lanSwitch 'Affection with Leighton: ' '礼顿好感：'>><span @class="C.npc.Leighton.love gte _loveNeed ? 'green' : 'red'"><<print C.npc.Leighton.love>></span><span class='gold'><<print ' / ' + _loveNeed>></span></li>
+      <li><<lanSwitch 'Student petition: ' '学生联署：'>><span @class="_school.studentSupport gte _petitionNeed ? 'green' : 'red'"><<print _school.studentSupport>></span><span class='gold'><<print ' / ' + _petitionNeed>></span></li>
+    </ul>
+    <<if _slack gt 0>>
+      <i><<lanSwitch 'The review asks for ten points less across the board.' '复核时各项都比新提案低十点。'>></i>
+    <<else>>
+      <i><<lanSwitch 'Support takes one route or the other. Corruption is asked for either way.' '支持只需走通一条路线。堕落两项都要。'>></i>
+    <</if>>
+  <</if>>
+<</widget>>
+
 <<widget 'deadwood-reblooms-life-simulation-school-standing-list'>>
   <ul class='journal'>
-    <li>
-      <<lanSwitch 'School order: ' '校内秩序：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.order>>
-      <<if _args[0]>><<lanSwitch ' (at least ' '（至少 '>> <span class='gold'><<= _args[0]>></span><<lanSwitch ')' '）'>><</if>>
-    </li>
     <li>
       <<lanSwitch 'Student standing: ' '学生声望：'>><<deadwood-reblooms-life-simulation-school-standing $LifeSimulation.school.studentSupport>>
       <<if _args[0]>><<lanSwitch ' (at least ' '（至少 '>> <span class='gold'><<= _args[0]>></span><<lanSwitch ')' '）'>><</if>>
@@ -1094,9 +1115,7 @@
       你把下一项着装提案<span class='blue'>“<<print maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + _policy)>>”</span>带进礼顿的办公室。
       <<He>>扫了一眼标题，问你学生、教职工和眼下的校风是否承受得起这种改变。
   <</language>><br><br>
-  <<lanSwitch "Student standing" "学生声望">><<lanSwitch ': ' '：'>><<print _requirements.studentSupport>><br>
-  <<lanSwitch "Staff trust" "教职工信任">><<lanSwitch ': ' '：'>><<print _requirements.staffSupport>><br>
-  <<lanSwitch "School corruption" "校内堕落">><<lanSwitch ': ' '：'>><<print _requirements.corruption>><br><br>
+  <<deadwood-reblooms-life-simulation-school-policy-status _policy>><br>
   <<schoolicon 'building'>><<lanLink ['Present the proposal to Leighton', '向礼顿呈交提案'] 'Deadwood Reblooms Life Simulation Dress Approval'>><<run maplebirch.get("LifeSimulation").school.proposePolicy()>><</lanLink>><br>
 <<else>>
   <<if $LifeSimulation.school.role isnot 'president'>>
@@ -1139,6 +1158,7 @@
 <</if>>
 <<if !maplebirch.get("LifeSimulation").school.canApprovePolicy('formal') and !maplebirch.get("LifeSimulation").school.canApprovePolicy('petition') and !maplebirch.get("LifeSimulation").school.canApprovePolicy('pressure')>>
   <span class='blue'><<lanSwitch "You lack the support or leverage needed to make Leighton approve this proposal." "目前没有足够的支持，也没有可以迫使礼顿批准的把柄。">></span><br>
+  <<deadwood-reblooms-life-simulation-school-policy-status $LifeSimulation.school.dress.proposal>><br>
 <</if>>
 <<getouticon>><<lanLink ['Withdraw the proposal', '撤回提案'] "Head's Office">>
   <<set $LifeSimulation.school.dress.proposal to null>>
@@ -1194,6 +1214,7 @@
   <<schoolicon 'building'>><<lanLink ['Make the policy permanent', '正式保留校规'] 'Deadwood Reblooms Life Simulation School Board'>><<run maplebirch.get("LifeSimulation").school.reviewPolicy(true)>><</lanLink>><br>
 <<else>>
   <span class='blue'><<lanSwitch "The policy cannot be kept without enough order and support." "秩序或支持度不足，校规无法正式保留。">></span><br>
+  <<deadwood-reblooms-life-simulation-school-policy-status $LifeSimulation.school.dress.active 10>><br>
 <</if>>
 <<getouticon>><<lanLink ['Revoke the policy', '撤销校规'] 'Deadwood Reblooms Life Simulation School Board'>><<run maplebirch.get("LifeSimulation").school.reviewPolicy(false)>><</lanLink>><br>
 <<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>

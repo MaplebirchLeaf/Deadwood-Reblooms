@@ -113,7 +113,7 @@ class DrivingSchool {
       !V.worn.feet.type.includes('shackle') &&
       this.transport.core.passage.title === 'Deadwood Transport School' &&
       Time.hour >= 9 &&
-      Time.hour < 18 &&
+      Time.hour < 17 &&
       Time.weekDay !== 1 &&
       Time.days >= this.state.penalty_until
     );
@@ -292,6 +292,7 @@ class DrivingSchool {
     const minutes = activity === 'cbt' ? 360 : ['study', 'lesson'].includes(activity) ? 60 : activity === 'theory' ? 90 : activity === 'test' ? 5 : activity === 'module_1' ? 20 : 15;
     this.state.revision++;
     this.state.result = null;
+    if (!this.spend(fee, minutes)) return false;
     if (activity === 'apply') {
       this.state.provisional.applied_day = day;
       this.state.provisional.ready_day = day + 1;
@@ -301,7 +302,6 @@ class DrivingSchool {
       this.state.attempt = null;
       this.state.report = null;
     } else if (activity === 'bribe' || activity === 'tamper') this.state.attempt!.resolved = true;
-    if (!this.spend(fee, minutes)) return false;
     if (this.state.category !== category) return false;
     if (activity === 'bribe' && V.money < this.terms.bribe_fee) {
       this.state.result = 'interrupted';

@@ -4,7 +4,7 @@ An **attendance exemption** prevents absences counting as truancy. **Prefect →
 
 - **Attendance exemption**: reach the highest A\* tier in all four subjects and overall results, then apply to Leighton on a school day. You need at least 10 affection with Leighton or to have already blackmailed the headteacher. Obtain Bailey's signature, then return the form to the headteacher's office. Orphanage signing is at 07:00–09:00 and normally needs three consecutive paid rent weeks; visit the Barb Street flat if Bailey has left. Grades can still change.
 - **Prefect**: reach the original **model student** teacher reputation and at least **very cool** school reputation. You also need at least 10 affection with Leighton or to have already blackmailed the headteacher. Apply in the headteacher's office. Grades alone do not satisfy the appointment conditions. Patrol the front courtyard at 07:00–09:00 on school days, once daily. You may decide whether to attend detention after appointment.
-- **President**: personally complete morning duty on five different school days, with order, student reputation and staff trust all at 25, then apply to Leighton.
+- **President**: personally complete morning duty on five different school days, with student reputation and staff trust both at 25, then apply to Leighton.
 
 Enforcement, mediation, pressure and overlooking affect school standing and relationships. Read the action feedback. The corridor noticeboard and journal track the added school progress, while original teacher and student evaluations remain separate.
 

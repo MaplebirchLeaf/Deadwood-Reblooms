@@ -3,21 +3,21 @@
 <<lanSwitch 'Driving school' '驾校'>><br><br>
 <<deadwood-dynamicblock 'deadwood-transport-school'>>
 <<set _transport to maplebirch.get('Transport'), _school to _transport.school, _school_revision to $Transport.school.revision>>
-<<if Time.weekDay is 1 or Time.hour lt 9 or Time.hour gte 18>>
+<<if Time.weekDay is 1 or Time.hour lt 9 or Time.hour gte 17>>
   <<language>>
     <<option 'EN'>>
-      The reception desk is empty. The timetable on the wall lists classes from 09:00 to 18:00, Monday to Saturday.
+      The reception desk is empty. The timetable on the wall lists classes from 09:00 to 17:00, Monday to Saturday.
     <<option 'CN'>>
-      前台没有人。墙上的课程表写着周一至周六营业，时间为 09:00–18:00。
+      前台没有人。墙上的课程表写着周一至周六营业，时间为 09:00–17:00。
   <</language>><br><br>
   <<if $Transport.school.exam>><<run _school.abandon()>><</if>>
   <<deadwood-transport-return>>
 <<elseif $id lte 0>>
   <<language>>
     <<option 'EN'>>
-      The receptionist looks up from the register. "I'll need to see your ID before I can book you in."
+      The receptionist looks up from the register. "I'll need to see your ID before I can book you in. A student card won't do."
     <<option 'CN'>>
-      前台从登记簿上抬起头。“预约前得先看你的身份证。”
+      前台从登记簿上抬起头。“预约前得先看你的身份证。学生证不算。”
   <</language>><br><br>
   <<deadwood-transport-return>>
 <<elseif _school.examActive>>
@@ -385,6 +385,10 @@
         <</lanLink>>
       <</capture>><br>
     <</if>>
+  <</if>>
+  <<set _pending to $Transport.school.provisional.applied_day gte 0 and !$Transport.school.provisional.issued>>
+  <<if !_pending and !_school.record.licensed and !_school.canApply and !_school.canCollect and !_school.canStudy and !_school.canTheory and !_school.canTrain and !_school.canCBT and !_school.canModuleOne and !_school.canTest>>
+    <<deadwood-transport-school-blocked `$Transport.school.provisional.issued ? _school.terms.study_fee : _school.terms.provisional_fee`>>
   <</if>>
   <<deadwood-transport-return>>
 <</if>>

@@ -143,7 +143,6 @@
   <<if !maplebirch.get('LifeSimulation') or !$LifeSimulation?.school>><<exit>><</if>>
   <span class='gold'><<lanSwitch 'School affairs' '校园事务'>></span><br>
   <<for _cheatSchoolField range [
-    {id:'order', name:['School order', '校园秩序']},
     {id:'studentSupport', name:['Student support', '学生声望']},
     {id:'staffSupport', name:['Staff support', '教职工信任']},
     {id:'corruption', name:['School corruption', '校内堕落']}
@@ -151,7 +150,7 @@
     <<numberStepper `lanSwitch(_cheatSchoolField.name[0], _cheatSchoolField.name[1])` $LifeSimulation.school[_cheatSchoolField.id] {
       min:0, max:100, step:1, values:[_cheatSchoolField.id],
       callback:(value, arr) => {
-        if (!maplebirch.get('LifeSimulation') || !V.LifeSimulation?.school || !['order', 'studentSupport', 'staffSupport', 'corruption'].includes(arr[0]) || !Number.isFinite(value)) return;
+        if (!maplebirch.get('LifeSimulation') || !V.LifeSimulation?.school || !['studentSupport', 'staffSupport', 'corruption'].includes(arr[0]) || !Number.isFinite(value)) return;
         V.LifeSimulation.school[arr[0]] = Math.clamp(value, 0, 100);
       }
     }>>
