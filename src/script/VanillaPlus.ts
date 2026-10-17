@@ -5,6 +5,7 @@ import Deviancy from './VanillaPlus/Deviancy';
 import DivineTransformations from './VanillaPlus/DivineTransformations';
 import Exhibitionism from './VanillaPlus/Exhibitionism';
 import HandGrip from './VanillaPlus/HandGrip';
+import HermEjaculation from './VanillaPlus/HermEjaculation';
 import NPCDoublePenetration from './VanillaPlus/NPCDoublePenetration';
 import OrphanEvents from './VanillaPlus/OrphanEvents';
 import PenisSize from './VanillaPlus/PenisSize';
@@ -35,6 +36,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   Trinity(maplebirch);
   Exhibitionism(maplebirch);
   HandGrip(maplebirch);
+  HermEjaculation(maplebirch);
   NPCDoublePenetration(maplebirch);
   OrphanEvents(maplebirch);
   PenisSize(maplebirch);
