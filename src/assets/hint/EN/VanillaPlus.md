@@ -34,17 +34,16 @@ Reach maximum beauty, once attain **7,000 base allure outdoors outside a blood m
 
 ### Exhibitionism
 
-Reach maximum exhibitionism and complete these three challenges:
+Reach maximum exhibitionism and complete these two challenges:
 
 - **School nude swimming:** ask to swim naked, then complete the recorded backstroke stage once the counter reaches **five**. Undressing at the pool alone does not count.
-- **Avery’s party dance:** continue dancing after becoming fully naked during the date’s dance competition. Your own property banquet and the underwear ending do not count.
 - **High Street photo assignment:** complete Niki’s successful run with your face shown while you have at least **250 flyers**, then finish the street ending. A nude studio shoot is unrelated.
 
 After earning the seventh-level exhibitionism trait, you can walk around town naked if you are already comfortable with that degree of exposure. Fame, encounters and other consequences still apply.
 
 ### Deviancy
 
-Reach maximum deviancy and obtain **Wildsong** through Gwylan’s ritual. After at least **20 purges** and **three dates of each ritual type**, choose to conduct the ritual yourself from its selection page. Finish with a successful seal and at least **nine purge effectiveness**. Statistics shows your purge and date counts.
+Reach maximum deviancy and obtain **Wildsong** through Gwylan’s ritual.
 
 The seventh-level deviancy trait, Beyond Taboo, lets you cultivate several animal transformations together. They no longer cancel one another out or naturally fade. Native animal forms and animal forms registered through the framework can each advance when their own growth points meet their usual thresholds. This does not instantly complete any form or affect divine transformations. Choose which parts to show in the mirror.
 

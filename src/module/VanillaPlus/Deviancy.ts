@@ -56,7 +56,7 @@ class Deviancy {
   }
 
   public get requirements(): boolean[] {
-    return [V.deviancy >= this.vanillaPlus.normalCeiling('deviancy'), V.feats?.currentSave?.Wildsong != null, V.VanillaPlus.deviancy.conducted];
+    return [V.deviancy >= this.vanillaPlus.normalCeiling('deviancy'), V.feats?.currentSave?.Wildsong != null];
   }
 
   public get unlock(): boolean {

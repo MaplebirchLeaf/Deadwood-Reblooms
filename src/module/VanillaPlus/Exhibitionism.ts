@@ -33,7 +33,7 @@ class Exhibitionism {
 
   public get requirements(): boolean[] {
     const state = V.VanillaPlus.exhibitionism;
-    return [V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism'), (V.swimnudecounter ?? 0) >= 5, V.feats?.currentSave?.['Ballroom Show-off'] != null, state.highStreet];
+    return [V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism'), (V.swimnudecounter ?? 0) >= 5, state.highStreet];
   }
 
   public get unlock(): boolean {
