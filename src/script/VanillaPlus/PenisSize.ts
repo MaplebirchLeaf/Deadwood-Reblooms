@@ -250,7 +250,8 @@ export default function (maplebirch: typeof window.maplebirch) {
     ['Widgets Home Events', 1],
     ['Widgets Changing Room', 2],
     ['Widgets School Events', 1],
-    ['Widgets Events Swimming', 1]
+    ['Widgets Events Swimming', 1],
+    ['Widgets speech-Whitney', 2]
   ] as const)
     widgetPassage[passage] = [{ ...large, expected }];
 
