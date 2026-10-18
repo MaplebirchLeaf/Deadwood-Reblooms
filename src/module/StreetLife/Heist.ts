@@ -18,6 +18,8 @@ interface HeistState {
   mickeyReview: '' | 'information' | 'crew' | 'risk';
   crew: string[];
   candidates: string[];
+  introduced: boolean;
+  rehearsed: string[];
   vehicle: number | null;
   rolls: Record<'entry' | 'talk' | 'vault' | 'escape', number> | null;
   shares: { landry: number; wren: number; crew: number; pc: number } | null;
@@ -56,6 +58,8 @@ export default class Heist {
     mickeyReview: '',
     crew: [],
     candidates: [],
+    introduced: false,
+    rehearsed: [],
     vehicle: null,
     rolls: null,
     shares: null,
@@ -105,6 +109,7 @@ export default class Heist {
   public get unlocked(): boolean {
     return (
       !!this.street.core.get('Finance') &&
+      this.street.stories.ready &&
       V.smuggler_pub_known === 1 &&
       this.street.reputation >= terms.requiredReputation &&
       C.npc.Landry?.init === 1 &&
@@ -142,6 +147,36 @@ export default class Heist {
   public get businessCrew() {
     if (this.state.stage !== 'closed' || !this.state.settled || this.state.outcome !== 'success') return [];
     return this.crew.filter(npc => npc.health > 0 && npc.heist.status !== 'arrested' && ['scout', 'carrier'].includes(npc.heist.role));
+  }
+
+  /** 普通差事开始前便可认识人手，正在进行的安排不能中途换人。 */
+  public get recruitmentAvailable(): boolean {
+    return (
+      this.available &&
+      this.atMeeting &&
+      this.meetingAvailable &&
+      ['idle', 'prep'].includes(this.state.stage) &&
+      (this.street.stories.unlocked.landry || this.state.stage === 'prep') &&
+      !this.street.stories.busy
+    );
+  }
+
+  /** 分工只读取原版技能；初值和成长记录不反向覆盖当前本领。 */
+  public get roleSkills(): Record<string, { scout: number; carrier: number }> {
+    return Object.fromEntries([...this.crew, ...this.candidates].map(npc => [npc.per, { scout: Math.clamp(npc.skills.security, 0, 1000), carrier: Math.clamp(npc.skills.athletics, 0, 1000) }]));
+  }
+
+  public get roster(): string {
+    return this.crew
+      .map(npc => `${npc.per}:${npc.heist.role}`)
+      .sort()
+      .join('|');
+  }
+
+  public get familiarity(): number {
+    if (this.crew.length !== 2) return 0;
+    const [first, second] = this.crew;
+    return Math.clamp(Math.min(first.heist.familiarity?.[second.per] ?? 0, second.heist.familiarity?.[first.per] ?? 0), 0, 100);
   }
 
   public get crewReady(): boolean {
@@ -203,7 +238,7 @@ export default class Heist {
           available:
             (preparation.place !== 'smuggler' || (this.atMeeting && this.meetingAvailable)) &&
             (!option.requiresFactory || !!factory) &&
-            (!option.requiresCrew || this.crewReady) &&
+            (!option.requiresCrew || (this.crewReady && !this.street.stories.busy)) &&
             (option.skill !== 'english' || !V.worn.face.type.includes('gag')),
           quality: Math.round(Math.clamp(option.qualityBase + ((option.qualityMax - option.qualityBase) * ability) / 1000 - this.conditionPenalty / 10, 0, option.qualityMax))
         };
@@ -272,6 +307,7 @@ export default class Heist {
   public get ready(): boolean {
     return (
       this.state.stage === 'prep' &&
+      this.street.stories.ready &&
       ['quiet', 'loud'].includes(this.state.approach) &&
       terms.preparations.every(prep => this.state.preparations.includes(prep.id)) &&
       this.crewReady &&
@@ -288,9 +324,10 @@ export default class Heist {
     const skills = this.skills;
     const scout = this.crew.find(npc => npc.heist.role === 'scout');
     const carrier = this.crew.find(npc => npc.heist.role === 'carrier');
-    const coordination = this.crewLeader ? 1 + terms.crewLeader.skillBonus : 1;
-    const scoutSkill = scout ? Math.clamp(scout.heist.skill * coordination, 0, 1000) * Math.clamp(scout.health / scout.healthmax, 0, 1) : 0;
-    const carrierSkill = carrier ? Math.clamp(carrier.heist.skill * coordination, 0, 1000) * Math.clamp(carrier.health / carrier.healthmax, 0, 1) : 0;
+    const story = this.street.stories.modifiers;
+    const coordination = 1 + (this.crewLeader ? terms.crewLeader.skillBonus : 0) + (this.familiarity / 100) * terms.crewLeader.familiarityBonus;
+    const scoutSkill = scout ? Math.clamp(this.roleSkills[scout.per].scout * coordination, 0, 1000) * Math.clamp(scout.health / scout.healthmax, 0, 1) : 0;
+    const carrierSkill = carrier ? Math.clamp(this.roleSkills[carrier.per].carrier * coordination, 0, 1000) * Math.clamp(carrier.health / carrier.healthmax, 0, 1) : 0;
     const briefing = this.state.preparationChoices.briefing?.quality ?? 0;
     const equipment = this.state.preparationChoices.equipment?.quality ?? 0;
     const rehearsal = this.state.preparationChoices.rehearsal?.quality ?? 0;
@@ -299,6 +336,7 @@ export default class Heist {
       Math.round(
         Math.clamp(
           25 +
+            story.escape +
             (!driving ? skills.athletics : Math.clamp(this.street.core.get('Transport')?.state.driving ?? 0, 0, 1000)) * 0.04 +
             scoutSkill * 0.015 +
             (this.state.mickeyReview === 'risk' ? terms.mickey.bonus : 0) +
@@ -314,10 +352,16 @@ export default class Heist {
       );
     return {
       entry: Math.round(
-        Math.clamp(25 + skills.skulduggery * 0.03 + skills.willpower * 0.01 + scoutSkill * 0.02 + briefing + (this.state.mickeyReview === 'information' ? terms.mickey.bonus : 0) - penalty, 5, 95)
+        Math.clamp(
+          25 + story.entry + skills.skulduggery * 0.03 + skills.willpower * 0.01 + scoutSkill * 0.02 + briefing + (this.state.mickeyReview === 'information' ? terms.mickey.bonus : 0) - penalty,
+          5,
+          95
+        )
       ),
-      talk: V.worn.face.type.includes('gag') ? 0 : Math.round(Math.clamp(20 + skills.english * 0.04 + skills.willpower * 0.015 + briefing - penalty, 5, 95)),
-      vault: Math.round(Math.clamp(25 + skills.physique * 0.025 + carrierSkill * 0.025 + equipment + rehearsal * 0.5 + (this.state.mickeyReview === 'crew' ? terms.mickey.bonus : 0) - penalty, 5, 95)),
+      talk: V.worn.face.type.includes('gag') ? 0 : Math.round(Math.clamp(20 + story.talk + skills.english * 0.04 + skills.willpower * 0.015 + briefing - penalty, 5, 95)),
+      vault: Math.round(
+        Math.clamp(25 + story.vault + skills.physique * 0.025 + carrierSkill * 0.025 + equipment + rehearsal * 0.5 + (this.state.mickeyReview === 'crew' ? terms.mickey.bonus : 0) - penalty, 5, 95)
+      ),
       escape: escape(this.state.vehicle !== null),
       escapeOnFoot: escape(false),
       escapeByCar: escape(true)

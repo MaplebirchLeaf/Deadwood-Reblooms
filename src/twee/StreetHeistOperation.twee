@@ -230,12 +230,7 @@
       <<npcincr Landry love _heistWork.terms.favour.landrySuccess>>
       <<npcincr Wren love _heistWork.terms.favour.wrenSuccess>>
       <<set maplebirch.get('StreetLife').reputation += _heistWork.terms.successReputation>>
-      <<for _heistCrewKey range _heistWork.state.crew>>
-        <<if $per_npc[_heistCrewKey]?.heist>>
-          <<set $per_npc[_heistCrewKey].heist.skill to Math.min(1000, $per_npc[_heistCrewKey].heist.skill + 50)>>
-          <<set $per_npc[_heistCrewKey].skills.security to $per_npc[_heistCrewKey].heist.skill, $per_npc[_heistCrewKey].skills.athletics to $per_npc[_heistCrewKey].heist.skill>>
-        <</if>>
-      <</for>>
+      <<deadwood-street-crew-gain _heistWork.state.crew 50 5>>
     <<case 'reported' 'sting'>>
       <<money _heistPayout 'police'>>
       <<set C.npc.Grant.love to Math.clamp(C.npc.Grant.love + _heistWork.terms.favour.grantSuccess, 0, 100)>>
@@ -352,7 +347,7 @@
       <<option 'EN'>>
         People still cross the public banking hall on ordinary business. Your agreement calls for something different. The hired pair have joined you; Wren checks that each knows the part agreed at the pub.<br><br>
         <<if _heistWork.state.approach is 'quiet'>>
-          <<if (_heistScout?.heist.skill ?? 0) gte 600>>
+          <<if (_heistScout?.skills.security ?? 0) gte 600>>
             <<= _heistScout.name>> points out a detail that didn't match the earlier account. You take a moment to compare it with what you learned during the preparations.
           <<else>>
             The scout looks to you before committing to the next move. You will have to judge the earlier information for yourself.
@@ -363,7 +358,7 @@
       <<option 'CN'>>
         大厅里仍有人在办理普通业务，你们谈好的却是另一回事。两名雇员已经跟上，伦恩确认各人还记得在酒馆分好的活。<br><br>
         <<if _heistWork.state.approach is 'quiet'>>
-          <<if (_heistScout?.heist.skill ?? 0) gte 600>>
+          <<if (_heistScout?.skills.security ?? 0) gte 600>>
             <<= _heistScout.name>>指出一处与先前说法不符的细节。你停了片刻，将它与筹备时核对过的消息进行比较。
           <<else>>
             侦察员先看向你，才准备跟上下一步。先前的消息是否可信，还得由你自己判断。
@@ -413,7 +408,7 @@
     <<language>>
       <<option 'EN'>>
         The bustle of the hall sounds distant from the back room. The bags are still empty. You must decide how much to have carried out.<br><br>
-        <<if (_heistCarrier?.heist.skill ?? 0) gte 600>>
+        <<if (_heistCarrier?.skills.athletics ?? 0) gte 600>>
           <<= _heistCarrier.name>> checks the handles without being prompted. "Give me something I can keep hold of. More isn't better if it ends up on the floor."
         <<else>>
           The carrier shifts an empty bag between hands. "I can do my part. Just don't expect me to carry everything." You will have to help judge the load.
@@ -427,7 +422,7 @@
         <br><br>Wren has a bag ready. <<if C.npc.Wren.love gte 40>>"It's our money to count afterwards. Let's get it there first."<<else>>"My share is still my share. Decide before it gets too heavy to argue about."<</if>>
       <<option 'CN'>>
         大厅的动静从后面的工作间传来，钱袋仍是空的。现在得决定让人带走多少。<br><br>
-        <<if (_heistCarrier?.heist.skill ?? 0) gte 600>>
+        <<if (_heistCarrier?.skills.athletics ?? 0) gte 600>>
           不用催促，<<= _heistCarrier.name>>便检查了提手。“给我能拿稳的。掉到地上，再多也没用。”
         <<else>>
           搬运员把空袋子换了只手。“我能做自己的那一份，别指望我把所有东西都搬走。”你还得帮着掂量负担。

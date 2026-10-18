@@ -6,6 +6,7 @@ import Bailey from './StreetLife/Bailey';
 import Heist from './StreetLife/Heist';
 import SmugglerPub from './StreetLife/SmugglerPub';
 import Races from './StreetLife/Races';
+import Stories from './StreetLife/Stories';
 import ammunition from '../assets/street/ammunition.json';
 
 /** 街头口碑独立于警方证据，原版委托的贡献只读取，不重复增加原版计数。 */
@@ -16,6 +17,7 @@ export default class StreetLife extends Module {
   public readonly heist = new Heist(this);
   public readonly smugglerPub = new SmugglerPub(this);
   public readonly races = new Races(this);
+  public readonly stories = new Stories(this);
   public readonly ammunition = ammunition;
 
   public constructor(core: typeof maplebirch) {
@@ -27,6 +29,7 @@ export default class StreetLife extends Module {
       heist: Heist.defaults,
       smuggler_pub: SmugglerPub.defaults,
       races: Races.defaults,
+      stories: Stories.defaults,
       ammo: { handgun: 0, shotgun: 0, rifle: 0 }
     });
   }

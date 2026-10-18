@@ -116,6 +116,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo('Reputation', 'deadwood-street-reputation');
   maplebirch.tool.addTo('WeaponBox', 'deadwood-street-firearm-effectiveness');
   maplebirch.tool.addTo('Journal', 'deadwood-street-job-journal');
+  maplebirch.tool.addTo('Journal', 'deadwood-street-story-journal');
   maplebirch.tool.addTo('Journal', 'deadwood-street-race-journal');
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-shop-link', passage: 'Smuggler Pub' });
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-unload', match: / Street$/ });
@@ -133,7 +134,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
         {
           // 原版正常菜单的下水道出口前，不插入 Zephyr 强制事件或 Wren 初遇。
           src: '<<sewericon>>',
-          applybefore: '<<deadwood-street-heist-link>>\n<<deadwood-street-mickey-link>>\n',
+          applybefore: "<<deadwood-street-story-entry 'smuggler'>>\n<<deadwood-street-heist-link>>\n<<deadwood-street-mickey-link>>\n",
           expected: 1
         }
       ],

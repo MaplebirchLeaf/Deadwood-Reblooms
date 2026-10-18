@@ -2,14 +2,15 @@
 
 Enable **Street Life** and reload. Street standing covers the town; the smuggler's pub is one base, not the whole street scene. Police crime records remain separate. Start with Landry at the Harvest Street pub, or meet Detective Grant at the police station.
 
-| Goal                             | Entrance                                                    | What you need                                                                          |
-| -------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Deliveries, recovery and fencing | Harvest Street pub → Landry                                 | Able to act, with no other cargo job active                                            |
-| Weapons and ammunition           | Discovered smuggler's pub → weapon shop                     | Funds through your current merchant payment method; weapons use the handheld catalogue |
-| Police bounties                  | Police station, 08:00–18:00                                 | An agreement with Grant and a criminal record that permits payment                     |
-| Ask Mickey to check information  | Smuggler's pub, 09:00–18:00                                 | Have met the original Mickey and be able to talk                                       |
-| Plan the bank heist              | Landry → private meeting at the smuggler's pub              | Finance, sufficient street standing, and Landry's and Wren's trust                     |
-| Enter a road race                | First farm-road section outside Harvest Street, 20:00–04:00 | Transport, a car parked locally, driving qualifications, enough fuel and cash          |
+| Goal                              | Entrance                                                    | What you need                                                                               |
+| --------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Deliveries, recovery and fencing  | Harvest Street pub → Landry                                 | Able to act, with no other cargo job active                                                 |
+| Weapons and ammunition            | Discovered smuggler's pub → weapon shop                     | Funds through your current merchant payment method; weapons use the handheld catalogue      |
+| Police bounties                   | Police station, 08:00–18:00                                 | An agreement with Grant and a criminal record that permits payment                          |
+| Ask Mickey to check information   | Smuggler's pub, 09:00–18:00                                 | Have met the original Mickey and be able to talk                                            |
+| Find a crew and take smaller jobs | Smuggler's pub, 09:00–18:00 → unfinished business           | 20 street standing, Landry willing to talk, and some delivery or fencing experience         |
+| Plan the bank heist               | Landry → private meeting at the smuggler's pub              | All three earlier arrangements settled, Finance, 70 standing, and Landry's and Wren's trust |
+| Enter a road race                 | First farm-road section outside Harvest Street, 20:00–04:00 | Transport, a car parked locally, driving qualifications, enough fuel and cash               |
 
 Check the **journal** for active jobs, cargo locations and next steps. **Statistics** shows actual payments, cargo losses and closed operations. Reading the journal does not reroll work or deliver goods and collect money for you.
 
@@ -63,6 +64,42 @@ The daily selection aims for three legal jobs and one illegal job. Standing, loc
 
 Late delivery normally pays 75%. Unresolved shortages and price disputes also reduce payment, and both reductions can apply. Theft of a loaded vehicle, seized cargo and an expired grace period can prevent completion.
 
+## Start with smaller jobs
+
+Discover the smuggler's pub, meet Landry and reach 20 street standing to ask about people and work between 09:00 and 18:00. Landry must be willing to talk: at least 20 affection, twenty-five completed original blackbox tasks, or <span class="gold">£1,000</span> actually earned through fencing. You also need any one of these: two paid street jobs, three completed original blackbox tasks, or <span class="gold">£1,000</span> earned through fencing. Old results will not persuade Landry if you have already fallen out.
+
+Ask Landry for introductions and arrange one scout and one carrier, then check **unfinished business** at the pub. The three arrangements follow one another. Make your own way between the locations; the journal keeps your next destination. Meetings at the pub, docks, industrial alleyways and Ocean Breeze café run from 09:00 to 18:00, and each step needs enough time to finish.
+
+| Arrangement                 | Route                                                                  | What you do                                                                            |
+| --------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| **The missing crate**       | Pub → docks → industrial alleyways → pub                               | Check paperwork and seals, resolve a disputed delivery, then settle up                 |
+| **A load worth leaving**    | Pub → industrial alleyways → docks → pub                               | Work with Wren and decide what to do when the load and a companion both need attention |
+| **Where the story started** | Pub → Ocean Breeze café → industrial alleyways or police station → pub | Separate eyewitness accounts from retellings and check another source                  |
+
+After settling Landry's delivery, meet Wren and reach 20 affection to hear about the second job. Having worked with Wren on the original mansion job gives you some shared experience here. That earlier job keeps its own progress; you do not need to repeat it.
+
+Once Wren's arrangement is settled, you can look into the rumours. Mickey can help if you have already met and can speak at the pub; **you can investigate on your own without meeting Mickey**. If you know Grant, have agreed to cooperate and can find the detective on duty, the old case can also be checked at the station. Otherwise, seek an independent source in the alleyways. Asking about the old case does not commit you to reporting another job or remove your own criminal record.
+
+None of these jobs needs a perfect result. A reduced delivery, a load left behind or uncertainty honestly recorded can still bring an arrangement to a close. Your payment and later plans reflect those choices. Return to give your account and settle up; accepting a job alone does not count towards opening the bank operation.
+
+To change the crew, return to **unfinished business** at the pub and spend five minutes choosing **Put the arrangement on hold**. You can pause even if a hire cannot currently take part. Your current step, findings, decisions and expenses are kept. Once you have arranged an available scout and carrier, spend another five minutes choosing **Agree on the crew and continue**, then pick up at the unfinished step. Earlier checks are not rolled again, and payments or experience already earned are not awarded twice. Pausing does not count as completion, and a settled arrangement cannot be reopened.
+
+## The people you work with
+
+Landry introduces the same three people. Their names and appearances, separate starting abilities and individual growth rates are set at that introduction. Looking again does not replace them. Scouting and carrying are separate abilities, so consider both before choosing by price.
+
+| Candidate                 | Starting range for each ability | Growth range for each ability |
+| ------------------------- | ------------------------------- | ----------------------------- |
+| A first-time hire         | 150–300                         | 110%–145%                     |
+| A practiced hand          | 350–550                         | 90%–120%                      |
+| An experienced specialist | 550–750                         | 75%–105%                      |
+
+Work improves each participant's assigned role, up to 1000. Individual growth changes the amount: 10 base experience gives 12 points at a 120% growth rate. The other ability does not increase alongside it. Injuries reduce effectiveness, and someone unable to take part or held in custody cannot gain experience.
+
+**Familiarity belongs to the particular pair**, from 0 to 100. A different partner uses that pair's own experience together; returning to an earlier partner restores the familiarity they already shared. Joint work builds it. In the final heist, it can add up to **15%** to their role contributions, alongside **Crew Leader's 10%**. Your own abilities and condition still affect the checks.
+
+The first hire costs an advance, which is not refunded on dismissal. Someone whose advance is already paid can be invited back without another payment. Changing a person or exchanging roles invalidates the old rehearsal. Their abilities and shared familiarity remain, but rehearsing the same people in the same roles again gives no further experience. Keep the agreed crew during an active arrangement; pause at the pub before changing it.
+
 ## Bounties and being hunted
 
 After agreeing to work with Grant, the board offers cases according to trust and accessible locations. Each lead lasts 72 hours. Investigate the sighting, then confirm the target's identity. Persuade, pursue or enter native combat when a confrontation begins. A car must be nearby, with space, fuel and the required driving qualification; it cannot appear at the station with a target by itself.
@@ -83,11 +120,11 @@ Mickey helps check information, division of work and risks while retaining the o
 
 ## The bank heist
 
-The target is the **financial centre bank**. Reach at least 70 street standing and meet Landry and Wren. Landry must substantially trust your work and Wren needs at least 20 affection. Native blackbox and fencing experience can also establish your credentials with Landry. Arrange a private meeting, then take the normal route to the smuggler's pub and continue preparations between 09:00 and 18:00.
+The target is the **financial centre bank**. Starting a new operation requires all three arrangements above to be completed and settled, Finance enabled and 70 street standing. Meet Landry and Wren; Wren needs at least 20 affection. Landry needs substantial confidence in your work: 60 affection, twenty-five completed original blackbox tasks, or <span class="gold">£8,000</span> actually earned through fencing. Any one qualifies, but a confirmed betrayal still prevents that trust. Arrange a private meeting, then take the normal route to the smuggler's pub and continue preparations between 09:00 and 18:00.
 
 1. Discuss the plan with Landry and Wren, choosing a quiet or openly forceful approach.
 2. Check bank information, prepare equipment and rehearse. English, maths, science, housekeeping, skulduggery and physical condition affect quality. A working factory with a packaging line can help with supplies.
-3. Interview and hire one scout and one carrier. Advances and later shares are separate; withdrawing does not refund pay already given. Ability, injuries and whether a hire stays all matter.
+3. Confirm your scout, carrier, roles and shares. Advances and later shares are separate; withdrawing does not refund pay already given. Ability, injuries and the pair's familiarity all matter.
 4. Check preparation, crew and any selected vehicle before starting. Once there, you may still give up, take less or change your escape choice. Stress, fatigue, pain, alcohol and drugs impair performance.
 5. Settle the split after escape to close the operation. Total loot, your share and preparation expenses are different; the recorded share is not net profit.
 
@@ -107,4 +144,4 @@ Preparations keep their existing durations: 20 minutes at the bank counter, 20�
 
 After a successful split, the original crew members who remain free and fit for work can introduce ordinary orders at the smuggler's pub. The scout's warehouse supplies order has a <span class="gold">£120</span> base fee; the carrier's harbour delivery has a <span class="gold">£160</span> base fee. Take the actual route to collect and transport the goods, obtain the signed receipt, then collect payment from Landry on Harvest Street.
 
-Your colleague's skill raises the total quote by 0–20%. They receive 25%, and you receive the remaining 75%; the quote is saved when you accept. Each colleague can introduce one order per day, and cancelling still uses that introduction. Late or disputed deliveries reduce both payments as usual. Each successfully paid order adds 10 to the colleague's skill for the corresponding role, up to 1000. This new income does not clear the criminal record from the bank job.
+Your colleague's skill raises the total quote by 0–20%. They receive 25%, and you receive the remaining 75%; the quote is saved when you accept. Each colleague can introduce one order per day, and cancelling still uses that introduction. Late or disputed deliveries reduce both payments as usual. Each successfully paid order gives 10 base experience, adjusted by that colleague's individual growth rate, to the assigned role only, up to 1000. This new income does not clear the criminal record from the bank job.

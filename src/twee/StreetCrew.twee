@@ -1,0 +1,249 @@
+:: Deadwood Street Crew Widgets [widget]
+
+<<widget 'deadwood-street-crew-link'>>
+  <<set _crewHeist to maplebirch.get('StreetLife')?.heist>>
+  <<if ['Smuggler Pub', 'Deadwood Street Work'].includes($passage) and _crewHeist?.recruitmentAvailable>>
+    <<socialiseicon 'ask'>><<lanLink ['Ask Landry about people looking for work', '向兰德里打听愿意接活的人'] 'Deadwood Street Crew'>><<endevent>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-street-crew-invalidate'>>
+  <<set _crewHeist to maplebirch.get('StreetLife').heist>>
+  <<set _crewHeist.state.preparations to _crewHeist.state.preparations.filter(id => id !== 'rehearsal')>>
+  <<run delete _crewHeist.state.preparationChoices.rehearsal>>
+<</widget>>
+
+<!-- 调用方先推进任务阶段，再传入实际参加的名单；这里只结算成长，不另掷骰。 -->
+<<widget 'deadwood-street-crew-gain'>>
+  <<if $statFreeze or $replayScene>><<exit>><</if>>
+  <<set _crewGainKeys to [...new Set(_args[0])].filter(key => $per_npc[key]?.heist and $per_npc[key].health gt 0 and $per_npc[key].heist.status isnot 'arrested' and ['scout', 'carrier'].includes($per_npc[key].heist.role))>>
+  <<set _crewBaseGain to Math.max(0, Number(_args[1]) || 0), _crewPairGain to Math.max(0, Number(_args[2]) || 0)>>
+  <<for _crewGainKey range _crewGainKeys>>
+    <<set _crewGainNpc to $per_npc[_crewGainKey], _crewGainRole to $per_npc[_crewGainKey].heist.role>>
+    <<set _crewGainSkill to _crewGainRole is 'scout' ? 'security' : 'athletics'>>
+    <<set _crewGainNpc.skills[_crewGainSkill] to Math.min(1000, _crewGainNpc.skills[_crewGainSkill] + Math.round(_crewBaseGain * (_crewGainNpc.heist.growth?.[_crewGainRole] ?? 100) / 100))>>
+  <</for>>
+  <<if _crewGainKeys.length is 2 and _crewPairGain gt 0>>
+    <<set _crewFirst to $per_npc[_crewGainKeys[0]], _crewSecond to $per_npc[_crewGainKeys[1]]>>
+    <<set _crewBond to Math.min(100, Math.min(_crewFirst.heist.familiarity?.[_crewSecond.per] ?? 0, _crewSecond.heist.familiarity?.[_crewFirst.per] ?? 0) + _crewPairGain)>>
+    <<set _crewFirst.heist.familiarity to _crewFirst.heist.familiarity ?? {}, _crewSecond.heist.familiarity to _crewSecond.heist.familiarity ?? {}>>
+    <<set _crewFirst.heist.familiarity[_crewSecond.per] to _crewBond, _crewSecond.heist.familiarity[_crewFirst.per] to _crewBond>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-street-heist-find-crew'>>
+  <<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
+  <<if !_streetHeist>><<exit>><</if>>
+  <<set _streetHeist.state.feedback to {action:'recruitment', outcome:'unavailable', minutes:0, cost:0}>>
+  <<if $passage isnot 'Deadwood Street Crew' or !_streetHeist.recruitmentAvailable or _streetHeist.state.introduced>><<exit>><</if>>
+  <<set _streetStarted to Time.date.timeStamp, _streetClosing to Time.date.timeStamp + (18 * 60 - Time.hour * 60 - Time.minute) * 60>>
+  <<if _streetStarted + 15 * 60 gte _streetClosing>><<set _streetHeist.state.feedback.outcome to 'too_late'>><<exit>><</if>>
+  <<endevent>><<pass 15>>
+  <<set _streetHeist.state.feedback to {action:'recruitment', outcome:'interrupted', minutes:Math.max(0, Math.round((Time.date.timeStamp - _streetStarted) / 60)), cost:0}>>
+  <<if !_streetHeist.recruitmentAvailable or _streetHeist.state.introduced or Time.date.timeStamp gte _streetClosing>><<exit>><</if>>
+  <<set _streetHeist.state.introduced to true>>
+  <<for _streetRecruit range _streetHeist.terms.recruits>>
+    <<set _streetKey to 'deadwood_street_heist_' + _streetRecruit.id>>
+    <<if !$per_npc[_streetKey]>>
+      <<generateNPC 1 'a'>>
+      <<set _streetBase to {scout: random(_streetRecruit.skills.scout[0], _streetRecruit.skills.scout[1]), carrier: random(_streetRecruit.skills.carrier[0], _streetRecruit.skills.carrier[1])}>>
+      <<set _streetGrowth to {scout: random(_streetRecruit.growth.scout[0], _streetRecruit.growth.scout[1]), carrier: random(_streetRecruit.growth.carrier[0], _streetRecruit.growth.carrier[1])}>>
+      <<set $NPCList[0].per to _streetKey, $NPCList[0].heist to {role: '', base: _streetBase, growth: _streetGrowth, familiarity: {}, paid: false, cut: _streetRecruit.cut, fee: _streetRecruit.fee}>>
+      <<set $NPCList[0].skills.security to _streetBase.scout, $NPCList[0].skills.athletics to _streetBase.carrier>>
+      <<saveNPC 0 _streetKey>><<endevent>>
+    <</if>>
+    <<if !_streetHeist.state.crew.includes(_streetKey) and !_streetHeist.state.candidates.includes(_streetKey)>><<set _streetHeist.state.candidates.push(_streetKey)>><</if>>
+  <</for>>
+  <<set _streetHeist.state.feedback.outcome to 'completed'>>
+<</widget>>
+
+<<widget 'deadwood-street-heist-candidate-action'>>
+  <<set _streetHeist to maplebirch.get('StreetLife')?.heist, _streetAction to _args[0]>>
+  <<if !_streetHeist>><<exit>><</if>>
+  <<set _streetHeist.state.feedback to {action:_streetAction is 'negotiate' ? 'negotiation' : 'recruitment', outcome:'unavailable', minutes:0, cost:0}>>
+  <<set _streetKey to _streetHeist.state.candidate, _streetCandidate to $per_npc[_streetKey]>>
+  <<if $passage isnot 'Deadwood Street Heist Candidate' or !_streetHeist.recruitmentAvailable or !_streetCandidate?.heist>><<exit>><</if>>
+  <<if _streetAction is 'dismiss'>>
+    <<if !_streetHeist.state.crew.includes(_streetKey)>><<exit>><</if>>
+    <<set _streetHeist.state.crew.delete(_streetKey), _streetHeist.state.candidates.push(_streetKey)>>
+    <<set _streetCandidate.heist.role to ''>>
+    <<deadwood-street-crew-invalidate>>
+    <<set _streetHeist.state.feedback.outcome to 'completed'>><<endevent>><<exit>>
+  <</if>>
+  <<if !_streetHeist.state.candidates.includes(_streetKey) or _streetCandidate.health lte 0 or _streetCandidate.heist.status is 'arrested'>><<exit>><</if>>
+  <<if _streetAction is 'negotiate'>>
+    <<if _streetCandidate.heist.paid or _streetCandidate.heist.negotiateTried or $worn.face.type.includes('gag')>><<exit>><</if>>
+  <<elseif !['scout', 'carrier'].includes(_streetAction) or _streetHeist.crew.length gte 2 or _streetHeist.crew.some(npc => npc.heist.role === _streetAction) or (!_streetCandidate.heist.paid and $money lt _streetCandidate.heist.fee)>>
+    <<exit>>
+  <</if>>
+  <<set _streetStarted to Time.date.timeStamp, _streetClosing to Time.date.timeStamp + (18 * 60 - Time.hour * 60 - Time.minute) * 60, _streetRoster to _streetHeist.roster>>
+  <<if _streetStarted + 5 * 60 gte _streetClosing>><<set _streetHeist.state.feedback.outcome to 'too_late'>><<exit>><</if>>
+  <<set _streetFee to _streetCandidate.heist.paid ? 0 : _streetCandidate.heist.fee, _streetNegotiated to _streetHeist.skills.english gte 400>>
+  <<endevent>><<pass 5>>
+  <<set _streetHeist.state.feedback to {action:_streetAction is 'negotiate' ? 'negotiation' : 'recruitment', outcome:'interrupted', minutes:Math.max(0, Math.round((Time.date.timeStamp - _streetStarted) / 60)), cost:0}>>
+  <<set _streetCandidate to $per_npc[_streetKey]>>
+  <<if !_streetHeist.recruitmentAvailable or _streetHeist.roster isnot _streetRoster or Time.date.timeStamp gte _streetClosing or !_streetHeist.state.candidates.includes(_streetKey) or !_streetCandidate?.heist or _streetCandidate.health lte 0 or _streetCandidate.heist.status is 'arrested'>><<exit>><</if>>
+  <<if _streetAction is 'negotiate'>>
+    <<if _streetCandidate.heist.paid or _streetCandidate.heist.negotiateTried or $worn.face.type.includes('gag')>><<exit>><</if>>
+    <<set _streetCandidate.heist.negotiateTried to true, _streetCandidate.heist.discounted to _streetNegotiated>>
+    <<if _streetNegotiated>><<set _streetCandidate.heist.fee to Math.floor(_streetFee * 0.9)>><</if>>
+    <<englishskill 5 'no_star'>>
+  <<else>>
+    <<if _streetHeist.crew.length gte 2 or _streetHeist.crew.some(npc => npc.heist.role === _streetAction) or (!_streetCandidate.heist.paid and $money lt _streetFee)>><<exit>><</if>>
+    <<if !_streetCandidate.heist.paid>><<money `-_streetFee`>><<set _streetHeist.state.spent += _streetFee, _streetCandidate.heist.paid to true>><</if>>
+    <<set _streetCandidate.heist.role to _streetAction>>
+    <<set _streetHeist.state.candidates.delete(_streetKey), _streetHeist.state.crew.push(_streetKey), _streetHeist.state.feedback.cost to _streetFee>>
+    <<deadwood-street-crew-invalidate>>
+  <</if>>
+  <<set _streetHeist.state.feedback.outcome to 'completed'>><<endevent>>
+<</widget>>
+
+<<widget 'deadwood-street-crew-swap'>>
+  <<set _crewHeist to maplebirch.get('StreetLife')?.heist>>
+  <<if $passage isnot 'Deadwood Street Crew' or !_crewHeist?.recruitmentAvailable or !_crewHeist.crewReady>><<exit>><</if>>
+  <<for _crewMember range _crewHeist.crew>>
+    <<set _crewMember.heist.role to _crewMember.heist.role is 'scout' ? 'carrier' : 'scout'>>
+  <</for>>
+  <<deadwood-street-crew-invalidate>>
+<</widget>>
+
+<<widget 'deadwood-street-crew-skills'>>
+  <<set _crewPerson to _args[0], _crewSkillSet to maplebirch.get('StreetLife').heist.roleSkills[_args[0].per]>>
+  <<for _crewRole range ['scout', 'carrier']>>
+    <<icon `'street/' + _crewRole + '.png'`>><<lanSwitch `_crewRole === 'scout' ? 'Scout: ' : 'Carrier: '` `_crewRole === 'scout' ? '侦察：' : '搬运：'`>><span class='teal'><<= _crewSkillSet[_crewRole]>></span> / 1000
+    <span class='grey'>(<<lanSwitch 'initial ' '初值'>><<= _crewPerson.heist.base?.[_crewRole] ?? _crewSkillSet[_crewRole]>> · <<lanSwitch 'growth ' '成长'>><<= _crewPerson.heist.growth?.[_crewRole] ?? 100>>%)</span><br>
+  <</for>>
+<</widget>>
+
+<<widget 'deadwood-street-crew-summary'>>
+  <<set _crewHeist to maplebirch.get('StreetLife').heist>>
+  <<for _crewMember range _crewHeist.crew>>
+    <<icon `'street/' + _crewMember.heist.role + '.png'`>><<= _crewMember.name>> · <<lanSwitch 'Skill: ' '本领：'>><span class='teal'><<= _crewHeist.roleSkills[_crewMember.per][_crewMember.heist.role]>></span> / 1000<br>
+  <</for>>
+  <<if _crewHeist.crew.length is 2>>
+    <<lanSwitch 'This pair’s familiarity: ' '这两人的默契：'>><span class='teal'><<= _crewHeist.familiarity>> / 100</span> · <<lanSwitch 'role contribution bonus ' '分工贡献加成 '>><span class='green'><<= Math.round(_crewHeist.familiarity * _crewHeist.terms.crewLeader.familiarityBonus)>>%</span><br>
+  <<else>><span class='blue'><<lanSwitch 'Choose one scout and one carrier.' '需要一名侦察员与一名搬运员。'>></span><br><</if>>
+<</widget>>
+
+:: Deadwood Street Crew
+<<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
+<<if !_streetHeist?.atMeeting>><<deadwood-street-heist-meeting-required>><<exit>><</if>>
+<<set $location to 'underground', $outside to 0>><<unset $bus>><<effects>>
+<<deadwood-street-heist-feedback>>
+<<if !_streetHeist.recruitmentAvailable>>
+  <<lanSwitch 'The introductions will have to wait. Come back to the pub in the daytime, when the current job is finished.' '介绍人手的事得先等等。等手里的差事结束，再在白天回酒馆谈。'>><br><br>
+<<else>>
+  <<lanSwitch 'Landry looks towards a table by the wall. "People come here looking for work. Agree on the job before you hand over any money." An advance pays for their time; it is not returned if you change your mind.' '兰德里朝墙边的桌子看了一眼。“来这里找活干的人不少。先谈好干什么，再掏钱。”定金付的是对方的时间，改主意也不会退。'>><br><br>
+  <<if !_streetHeist.state.introduced>>
+    <<if 18 * 60 - Time.hour * 60 - Time.minute gt 15>>
+      <<socialiseicon 'ask'>><<lanLink ['Ask for three introductions (0:15)', '请兰德里介绍三个人选 (0:15)'] 'Deadwood Street Crew'>><<deadwood-street-heist-find-crew>><</lanLink>><br>
+    <<else>><span class='blue'><<lanSwitch 'There is not enough time to finish the introductions before closing.' '关门前来不及把三个人都介绍完。'>></span><br><</if>>
+  <<else>>
+    <div class='gold bold'><<lanSwitch 'Agreed crew' '已经约好的人手'>></div>
+    <<deadwood-street-crew-summary>><br>
+    <<for _streetCandidate range _streetHeist.crew.concat(_streetHeist.candidates)>>
+      <<set _streetKey to _streetCandidate.per>>
+      <<capture _streetKey _streetCandidate>>
+        <<socialiseicon 'ask'>><<lanLink `[_streetCandidate.name, _streetCandidate.name]` 'Deadwood Street Heist Candidate'>>
+          <<if maplebirch.get('StreetLife').heist.recruitmentAvailable>>
+            <<endevent>><<set maplebirch.get('StreetLife').heist.state.candidate to _streetKey>><<loadNPC 0 _streetKey>>
+          <</if>>
+        <</lanLink>><<if _streetHeist.state.crew.includes(_streetKey)>> · <span class='green'><<= _streetCandidate.heist.role is 'scout' ? lanSwitch('scout', '侦察员') : lanSwitch('carrier', '搬运员')>></span><</if>><br>
+        <<deadwood-street-crew-skills _streetCandidate>>
+        <<lanSwitch 'Advance: ' '定金：'>><<printmoney _streetCandidate.heist.fee>><<if _streetCandidate.heist.paid>> · <span class='green'><<lanSwitch 'already paid' '已付，再邀不另收费'>></span><</if>> · <<lanSwitch 'Share on a larger job: ' '大单分成：'>><span class='gold'><<= _streetCandidate.heist.cut>>%</span><br><br>
+      <</capture>>
+    <</for>>
+    <<if _streetHeist.crewReady>>
+      <<socialiseicon 'ask'>><<lanLink ['Exchange the two roles', '交换两人的分工'] 'Deadwood Street Crew'>><<deadwood-street-crew-swap>><</lanLink>><br>
+    <</if>>
+    <span class='blue'><<lanSwitch 'Changing either person or their role means rehearsing the plan again. Their skills stay with them; familiarity belongs to each pair. Rehearsing the same arrangement again does not grant more experience.' '换人或换分工后，需要重新排演。学到的本领不会丢，默契则是两个人一起积累的。反复排演同一套安排，不会再获得经验。'>></span><br>
+  <</if>>
+<</if>><br>
+<<if _streetHeist.state.appointment>><<icon 'street/heist-plan.png'>><<lanLink ['Return to the bank plan', '回到银行行动的安排'] 'Deadwood Street Heist Plan'>><<endevent>><</lanLink>><br><</if>>
+<<getouticon>><<lanLink ['Return to the pub', '回到酒馆'] 'Smuggler Pub'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Street Heist Candidate
+<<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
+<<if !_streetHeist?.atMeeting>><<deadwood-street-heist-meeting-required>><<exit>><</if>>
+<<set $location to 'underground', $outside to 0>><<unset $bus>><<effects>>
+<<deadwood-street-heist-feedback>>
+<<set _streetCandidate to $per_npc[_streetHeist?.state.candidate]>>
+<<if !_streetHeist?.recruitmentAvailable or !_streetCandidate?.heist or !_streetHeist.state.candidates.concat(_streetHeist.state.crew).includes(_streetHeist.state.candidate)>>
+  <<lanSwitch 'This meeting is not available. Return to Landry before making another arrangement.' '这次会面现在无法继续。重新安排前，先回到兰德里那里。'>><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      Landry introduces <<= _streetCandidate.name>>, then turns back to the bar. Your visitor pulls out a chair without waiting to be told. "I heard you need two people. Tell me what you're asking of me, and we'll see about the price."
+    <<option 'CN'>>
+      兰德里介绍了 <<= _streetCandidate.name>>，便转身回到吧台。对方不等你招呼，就拉开椅子。“听说你缺两个人。先说说要我做什么，再谈价钱。”
+  <</language>><br><br>
+  <<if Math.max(_streetCandidate.skills.security, _streetCandidate.skills.athletics) gte 600>>
+    <<language>>
+      <<option 'EN'>>
+        The questions come steadily, without much encouragement from you. This is someone accustomed to deciding which offers are worth taking. "An advance for my time. A share for the risk. Don't mix them up."
+      <<option 'CN'>>
+        你还没说几句，对方已经连着问了几个问题，显然习惯了自己判断哪些活值得接。“定金付我的时间，抽成付我的风险。别把两笔混为一谈。”
+    <</language>>
+  <<elseif Math.max(_streetCandidate.skills.security, _streetCandidate.skills.athletics) gte 400>>
+    <<language>>
+      <<option 'EN'>>
+        Your visitor listens before asking about the other hire. "I've done work with people I didn't know before. It helps if they know which part is theirs."
+      <<option 'CN'>>
+        对方听你说了一会儿，才问起另一名人手。“我以前也跟不认识的人搭过伙。各自先弄明白自己该干什么，事情会好办些。”
+    <</language>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        Your visitor rubs a thumb along the edge of the table. "I haven't done something this big. I'm not promising otherwise." After a pause, the question returns to the advance.
+      <<option 'CN'>>
+        对方用拇指摩挲着桌沿。“我没接过这么大的活，这点我不会骗你。”停顿了一会儿，话题又回到定金上。
+    <</language>>
+  <</if>><br><br>
+  <<deadwood-street-crew-skills _streetCandidate>><br>
+  <<lanSwitch 'Advance: ' '定金：'>><<printmoney _streetCandidate.heist.fee>> · <<lanSwitch 'Share: ' '抽成：'>><span class='gold'><<= _streetCandidate.heist.cut>>%</span><br>
+  <<if _streetCandidate.heist.paid>>
+    <span class='green'><<lanSwitch 'The advance has been paid. You can invite this person back without paying it again.' '定金已经付过，再邀回来不另收费。'>></span><br>
+  <<elseif !_streetCandidate.heist.negotiateTried>>
+    <<if !$worn.face.type.includes('gag') and 18 * 60 - Time.hour * 60 - Time.minute gt 5>>
+      <<socialiseicon 'ask'>><<lanLink ['Discuss the advance (0:05)', '谈谈定金 (0:05)'] 'Deadwood Street Heist Candidate'>>
+        <<deadwood-street-heist-candidate-action 'negotiate'>>
+      <</lanLink>><br>
+    <<else>>
+      <span class='blue'><<= $worn.face.type.includes('gag') ? lanSwitch('You cannot negotiate while gagged.', '戴着口塞时无法议价。') : lanSwitch('Not enough opening time left to discuss the advance.', '剩余营业时间不足，无法谈完定金。')>></span><br>
+    <</if>>
+  <<elseif _streetCandidate.heist.discounted>>
+    <<language>>
+      <<option 'EN'>>
+        "All right. I can take a little less up front." Your visitor touches the figure beside the share. "That stays. I'm still taking the same risk."
+      <<option 'CN'>>
+        “好吧，定金可以少一点。”对方点了点抽成旁的数字。“这个不变。我担的风险可没少。”
+    <</language>><br>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        "I heard you. The price is still the price." Your visitor leaves the choice with you, without lowering either figure.
+      <<option 'CN'>>
+        “你的意思我听明白了。价钱还是这个价钱。”对方把决定留给了你，没有降低任何一笔数字。
+    <</language>><br>
+  <</if>><br>
+  <<if _streetHeist.state.crew.includes(_streetCandidate.per)>>
+    <<refuseicon>><<lanLink ['Release this person from the arrangement', '请对方暂时退出安排'] 'Deadwood Street Crew'>><<deadwood-street-heist-candidate-action 'dismiss'>><</lanLink>><br>
+  <<else>>
+  <<for _streetRole range ['scout', 'carrier']>>
+    <<capture _streetHeist _streetRole>>
+      <<set _streetCandidate to $per_npc[_streetHeist.state.candidate]>>
+      <<if _streetHeist.crew.length lt 2 and !_streetHeist.crew.some(npc => npc.heist.role === _streetRole)>>
+        <<icon `'street/' + _streetRole + '.png'`>>
+        <<if (_streetCandidate.heist.paid or $money gte _streetCandidate.heist.fee) and _streetCandidate.health gt 0 and _streetCandidate.heist.status isnot 'arrested' and 18 * 60 - Time.hour * 60 - Time.minute gt 5>>
+          <<lanLink `_streetRole === 'scout' ? ['Agree on the scout role (0:05)', '约定侦察员的分工 (0:05)'] : ['Agree on the carrier role (0:05)', '约定搬运员的分工 (0:05)']` 'Deadwood Street Crew'>>
+            <<deadwood-street-heist-candidate-action _streetRole>>
+          <</lanLink>><br>
+        <<else>>
+          <span class='grey'><<= _streetRole is 'scout' ? lanSwitch('Agree on the scout role', '约定侦察员的分工') : lanSwitch('Agree on the carrier role', '约定搬运员的分工')>></span><<if 18 * 60 - Time.hour * 60 - Time.minute lte 5>> · <span class='blue'><<lanSwitch 'Not enough opening time left.' '剩余营业时间不足。'>></span><</if>><br>
+        <</if>>
+      <</if>>
+    <</capture>>
+  <</for>>
+  <</if>>
+<</if>><br>
+<<getouticon>><<lanLink ['Return to the crew', '回去商量人手'] 'Deadwood Street Crew'>><<endevent>><<if _streetHeist>><<set _streetHeist.state.candidate to ''>><</if>><</lanLink>><br>

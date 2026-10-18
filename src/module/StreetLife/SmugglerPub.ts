@@ -36,6 +36,8 @@ export default class SmugglerPub {
         'Deadwood Smuggler Pub',
         ...Object.values(pubCardPassages),
         'Deadwood Street Weapon Shop',
+        'Deadwood Street Work',
+        'Deadwood Street Crew',
         'Deadwood Street Heist Plan',
         'Deadwood Street Heist Preparation',
         'Deadwood Street Heist Candidate',
@@ -43,6 +45,7 @@ export default class SmugglerPub {
         'Deadwood Street Heist Contacts',
         'Deadwood Street Mickey'
       ].includes(passage) ||
+      /^Deadwood Street (?:Landry|Wren|Mickey) (?:Offer|Debrief)$/.test(passage) ||
       (passage === 'Deadwood Street Cargo' && V.StreetLife.jobs.site === 'smuggler')
     );
   }

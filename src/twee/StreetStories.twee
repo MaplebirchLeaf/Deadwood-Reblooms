@@ -1,0 +1,254 @@
+:: Deadwood Street Story Widgets [widget]
+
+<!-- 原版地点只调用入口。接洽、外出、取舍与结账均在自有页面，重绘只读已保存的结果。 -->
+<<widget 'deadwood-street-story-entry'>>
+  <<set _storyEntryWork to maplebirch.get('StreetLife')?.stories>>
+  <<if !_storyEntryWork?.available>><<exit>><</if>>
+  <<if _args[0] is 'smuggler'>>
+    <<if _storyEntryWork.unlocked.landry or Object.values(_storyEntryWork.state).some(record => record.stage > 0)>>
+      <<icon 'street/crew-briefing.png'>><<lanLink ['Check the crew’s unfinished business', '看看同伙与手头的差事'] 'Deadwood Street Work'>><<endevent>><</lanLink>><br>
+    <</if>>
+  <<else>>
+    <<for _storyEntry range _storyEntryWork.entries.filter(entry => entry.site === _args[0])>>
+      <<icon _storyEntry.icon>><<lanLink _storyEntry.name _storyEntry.passage>><<endevent>><</lanLink>><br>
+    <</for>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-street-story-header'>>
+  <<set _storyPageUnavailable to true, _storyPageWork to maplebirch.get('StreetLife')?.stories>>
+  <<set _storyPageChain to _storyPageWork?.terms.chains[_args[0]], _storyPageStage to _args[1], _storyPageSite to _storyPageWork?.terms.sites[_args[2]]>>
+  <<if !_storyPageChain or !_storyPageSite>><<exit>><</if>>
+  <<set _storyPageTarget to _storyPageChain.stages[_storyPageStage]?.find(target => target.site === _args[2])>>
+  <<if !_storyPageTarget or $passage isnot _storyPageTarget.passage or $location isnot _storyPageSite.location>><<exit>><</if>>
+  <<set $outside to _storyPageSite.outside>>
+  <<if _storyPageSite.point>><<set $bus to _storyPageSite.point>><<else>><<unset $bus>><</if>>
+  <<effects>>
+  <<if !_storyPageWork.available or $passage isnot _storyPageTarget.passage or $location isnot _storyPageSite.location>>
+    <span class='blue'><<lanSwitch 'You cannot deal with this arrangement just now. Take care of what is happening first.' '眼下顾不上这份约定，先把眼前的事处理好。'>></span><br><<exit>>
+  <</if>>
+  <<set _storyPageRecord to _storyPageWork.state[_args[0]]>>
+  <<if _storyPageRecord.paused>>
+    <span class='blue'><<lanSwitch 'This arrangement is on hold. Return to the pub to agree on the crew before continuing.' '这份约定暂缓了。先回酒馆约好人手，再继续办事。'>></span><br><<exit>>
+  <</if>>
+  <<if _storyPageRecord.stage lt _storyPageStage or (_storyPageRecord.stage is 0 and (!_storyPageWork.unlocked[_args[0]] or _storyPageWork.current isnot null)) or (_args[2] is 'police' and !_storyPageWork.policeAvailable)>>
+    <span class='blue'><<lanSwitch 'There is no meeting arranged here yet. Your notes will show what still needs doing.' '这里还没有约好的会面，日志里记着下一件该做的事。'>></span><br><<exit>>
+  <</if>>
+  <<set _storyPageUnavailable to false>>
+  <div class='gold bold'><<lanSwitch _storyPageChain.name[0] _storyPageChain.name[1]>></div><br>
+<</widget>>
+
+<<widget 'deadwood-street-story-leave'>>
+  <<set _storyLeaveSite to maplebirch.get('StreetLife')?.stories.terms.sites[_args[0]]>>
+  <<if _storyLeaveSite and $location is _storyLeaveSite.location and !$nextPassage and !$nextPassageCheck>>
+    <br><<getouticon>><<lanLink `['Return to ' + _storyLeaveSite.name[0], '返回' + _storyLeaveSite.name[1]]` _storyLeaveSite.passage>><<endevent>><</lanLink>><br>
+  <<elseif !$nextPassage and !$nextPassageCheck>>
+    <br><<getouticon>><<back `lanSwitch('Return', '返回')`>><br>
+  <</if>>
+<</widget>>
+
+<!-- 本次风波的骰点在接受时保存；行动前显示的把握与实际使用的数值一致。 -->
+<<widget 'deadwood-street-story-chance'>>
+  <<set _storyChanceWork to maplebirch.get('StreetLife'), _storyChanceRecord to _storyChanceWork.stories.state[_args[0]], _storyChanceAction to _storyChanceWork.stories.terms.chains[_args[0]].actions[_args[1]]>>
+  <<set _storyChanceRole to _storyChanceWork.heist.crew.find(npc => npc.heist.role === _storyChanceAction.role)>>
+  <<set _storyChanceSkill to _storyChanceRole ? (_storyChanceAction.role is 'scout' ? _storyChanceRole.skills.security : _storyChanceRole.skills.athletics) * Math.clamp(_storyChanceRole.health / _storyChanceRole.healthmax, 0, 1) : 0>>
+  <<set _storyChance to Math.round(Math.clamp(25 + (_storyChanceWork.heist.skills[_storyChanceAction.skill] + _storyChanceSkill) / 20 + _storyChanceRecord.quality * 5 + _storyChanceWork.heist.familiarity / 20 - _storyChanceWork.heist.conditionPenalty, 5, 95))>>
+<</widget>>
+
+<<widget 'deadwood-street-story-choice'>>
+  <<set _storyChoiceId to _args[0], _storyChoiceKey to _args[1], _storyChoiceWork to maplebirch.get('StreetLife')?.stories>>
+  <<set _storyChoiceAction to _storyChoiceWork?.terms.chains[_storyChoiceId]?.actions[_storyChoiceKey], _storyChoiceRecord to _storyChoiceWork?.state[_storyChoiceId]>>
+  <<if !_storyChoiceAction or _storyChoiceRecord.paused or _storyChoiceRecord.stage isnot _storyChoiceAction.stage>><<exit>><</if>>
+  <<set _storyChoiceSite to _storyChoiceWork.terms.sites[_storyChoiceAction.site], _storyChoiceHeist to maplebirch.get('StreetLife').heist>>
+  <<set _storyChoiceTarget to _storyChoiceWork.terms.chains[_storyChoiceId].stages[_storyChoiceRecord.stage].find(target => target.site === _storyChoiceAction.site)>>
+  <<if $passage isnot _storyChoiceTarget.passage or $location isnot _storyChoiceSite.location>><<exit>><</if>>
+  <<if _storyChoiceKey is 'assisted' and !_storyChoiceHeist.mickeyAvailable>><<exit>><</if>>
+  <<if _storyChoiceKey is 'police' and !_storyChoiceWork.policeAvailable>><<exit>><</if>>
+  <<capture _storyChoiceId _storyChoiceKey>>
+    <<icon _storyChoiceAction.icon>>
+    <<if _storyChoiceWork.available and _storyChoiceHeist.crewReady and (_storyChoiceWork.current is null or _storyChoiceWork.current is _storyChoiceId) and $money gte _storyChoiceAction.cost and Time.hour gte _storyChoiceSite.open and Time.hour * 60 + Time.minute + _storyChoiceAction.minutes lt _storyChoiceSite.close * 60>>
+      <<lanLink _storyChoiceAction.name>><<deadwood-street-story-action _storyChoiceId _storyChoiceKey>><</lanLink>>
+    <<else>>
+      <span class='grey'><<lanSwitch _storyChoiceAction.name[0] _storyChoiceAction.name[1]>></span>
+    <</if>>
+    <<if _storyChoiceAction.cost gt 0>> · <span class='gold'><<printmoney _storyChoiceAction.cost>></span><</if>>
+    <<if _storyChoiceAction.skill>>
+      <<deadwood-street-story-chance _storyChoiceId _storyChoiceKey>> · <<lanSwitch 'Chance: ' '把握：'>><span class='teal'><<= _storyChance>>%</span>
+    <</if>>
+    <<if _storyChoiceAction.gain gt 0>><span class='green'> | + <<lanSwitch 'Crew experience' '同伙经验'>></span><</if>>
+    <<if _storyChoiceAction.bond gt 0>><span class='green'> | + <<lanSwitch 'Familiarity' '默契'>></span><</if>>
+    <<if _storyChoiceAction.crime gt 0>><span class='red'> | <<lanSwitch 'Crime (trespassing)' '犯罪（非法侵入）'>></span><</if>><br>
+  <</capture>>
+  <<if !_storyChoiceHeist.crewReady>>
+    <span class='blue'><<lanSwitch 'Arrange an available scout and carrier first. You can discuss the crew at the pub.' '先安排好能够参加的侦察员与搬运员，可在酒馆商量人手。'>></span><br>
+  <<elseif Time.hour lt _storyChoiceSite.open or Time.hour * 60 + Time.minute + _storyChoiceAction.minutes gte _storyChoiceSite.close * 60>>
+    <span class='blue'><<lanSwitch 'The people handling this have other work to return to. Come back during the daytime meeting hours, with enough time to finish.' '接洽的人还要忙自己的事，白天约定的时段再来，留些工夫把事情做完。'>></span><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-street-story-action'>>
+  <<set _storyActId to _args[0], _storyActKey to _args[1], _storyActStreet to maplebirch.get('StreetLife')>>
+  <<set _storyActWork to _storyActStreet?.stories, _storyActHeist to _storyActStreet?.heist>>
+  <<set _storyActChain to _storyActWork?.terms.chains[_storyActId], _storyActRecord to _storyActWork?.state[_storyActId], _storyActAction to _storyActChain?.actions[_storyActKey]>>
+  <<if !_storyActAction or !_storyActWork.available or !_storyActHeist.crewReady or _storyActRecord.paused or _storyActRecord.stage isnot _storyActAction.stage or (_storyActWork.current isnot null and _storyActWork.current isnot _storyActId)>><<exit>><</if>>
+  <<set _storyActSite to _storyActWork.terms.sites[_storyActAction.site], _storyActTarget to _storyActChain.stages[_storyActRecord.stage].find(target => target.site === _storyActAction.site)>>
+  <<if $passage isnot _storyActTarget.passage or $location isnot _storyActSite.location or $money lt _storyActAction.cost or Time.hour lt _storyActSite.open>><<exit>><</if>>
+  <<if _storyActRecord.stage is 0 and !_storyActWork.unlocked[_storyActId]>><<exit>><</if>>
+  <<if _storyActKey is 'assisted' and !_storyActHeist.mickeyAvailable>><<exit>><</if>>
+  <<if _storyActKey is 'police' and !_storyActWork.policeAvailable>><<exit>><</if>>
+  <<if _storyActRecord.stage gt 0 and _storyActRecord.crew.slice().sort().join('|') isnot _storyActHeist.state.crew.slice().sort().join('|')>><<exit>><</if>>
+  <<set _storyActClosing to Time.date.timeStamp + (_storyActSite.close * 60 - Time.hour * 60 - Time.minute) * 60, _storyActRoster to _storyActHeist.roster>>
+  <<if Time.date.timeStamp + _storyActAction.minutes * 60 gte _storyActClosing>><<exit>><</if>>
+  <<if _storyActAction.skill>><<deadwood-street-story-chance _storyActId _storyActKey>><<set _storyActSuccess to _storyActRecord.roll lte _storyChance>><<else>><<set _storyActSuccess to true>><</if>>
+  <<endevent>><<pass _storyActAction.minutes>>
+  <<set _storyActRecord.result to 'interrupted'>>
+  <<if !_storyActWork.available or !_storyActHeist.crewReady or _storyActRecord.paused or $passage isnot _storyActTarget.passage or $location isnot _storyActSite.location or _storyActHeist.roster isnot _storyActRoster or Time.date.timeStamp gte _storyActClosing or _storyActRecord.stage isnot _storyActAction.stage or $money lt _storyActAction.cost>><<exit>><</if>>
+  <<if _storyActKey is 'assisted' and !_storyActHeist.mickeyAvailable>><<exit>><</if>>
+  <<if _storyActKey is 'police' and !_storyActWork.policeAvailable>><<exit>><</if>>
+  <<if _storyActAction.cost gt 0>><<money `-_storyActAction.cost`>><<set _storyActRecord.spent += _storyActAction.cost>><</if>>
+  <<set _storyActRecord.stage += 1, _storyActRecord.result to _storyActSuccess ? 'success' : 'setback'>>
+  <<if _storyActAction.kind is 'accept'>>
+    <<set _storyActRecord.crew to _storyActHeist.state.crew.slice(), _storyActRecord.roll to random(1, 100), _storyActRecord.source to _storyActKey>>
+    <<if _storyActId is 'landry' and (_storyActStreet.jobs.state.completed gte 5 or $pub_task_stat gte 10 or ($moneyStats?.pubStolenGoods?.earned ?? 0) gte 400000)>><<set _storyActRecord.quality to 1>><</if>>
+    <<if _storyActId is 'wren' and $wrenSeen?.includes('heist')>><<set _storyActRecord.quality to 1>><</if>>
+  <</if>>
+  <<if _storyActAction.stage is 2>><<set _storyActRecord.choice to _storyActKey>><</if>>
+  <<if _storyActSuccess>><<set _storyActRecord.quality += _storyActAction.quality>><</if>>
+  <!-- 关键取舍当场锁定结局，之后结账中断或重试不会把失手改写成成功。 -->
+  <<if _storyActAction.stage is 2>>
+    <<switch _storyActId>>
+      <<case 'landry'>><<set _storyActRecord.outcome to _storyActKey is 'return' or !_storyActSuccess ? 'short' : 'settled'>>
+      <<case 'wren'>><<set _storyActRecord.outcome to _storyActKey is 'people' ? 'people' : (_storyActKey is 'cargo' and _storyActSuccess ? 'cargo' : 'lost')>>
+      <<case 'mickey'>><<set _storyActRecord.outcome to _storyActKey is 'police' ? 'police' : (_storyActSuccess and _storyActRecord.quality gte 2 ? 'verified' : 'cautious')>>
+    <</switch>>
+  <</if>>
+  <<if _storyActAction.crime gt 0>><<crimeUp _storyActAction.crime 'trespassing'>><</if>>
+  <<if _storyActId is 'wren' and _storyActKey is 'cargo' and !_storyActSuccess>>
+    <<set _storyActCarrier to _storyActHeist.crew.find(npc => npc.heist.role === 'carrier')>>
+    <<if _storyActCarrier>><<set _storyActCarrier.health to Math.max(1, _storyActCarrier.health - Math.ceil(_storyActCarrier.healthmax * 0.1))>><</if>>
+  <</if>>
+  <<if _storyActAction.kind is 'settle'>>
+    <<set _storyActOutcome to _storyActChain.outcomes[_storyActRecord.outcome], _storyActRecord.paid to _storyActOutcome.payment>>
+    <<money _storyActRecord.paid>>
+    <<set _storyActStreet.reputation += _storyActOutcome.reputation>>
+    <<if _storyActId is 'landry'>><<npcincr Landry love _storyActOutcome.favour>><<elseif _storyActId is 'wren'>><<npcincr Wren love _storyActOutcome.favour>><</if>>
+    <<if _storyActId is 'mickey' and _storyActRecord.choice is 'police'>><<set C.npc.Grant.love to Math.clamp(C.npc.Grant.love + 2, 0, 100)>><</if>>
+  <</if>>
+  <<deadwood-street-crew-gain _storyActRecord.crew `Math.round(_storyActAction.gain * (_storyActSuccess ? 1 : 0.5))` `_storyActSuccess ? _storyActAction.bond : Math.floor(_storyActAction.bond / 2)`>>
+  <<updatesidebarmoney>>
+  <<if $passage is _storyActTarget.passage and $location is _storyActSite.location and !$nextPassage and !$nextPassageCheck>><<run Dynamic.render(_storyActTarget.block)>><</if>>
+<</widget>>
+
+<<widget 'deadwood-street-story-result'>>
+  <<set _storyResultWork to maplebirch.get('StreetLife')?.stories, _storyResultId to _args[0], _storyResultRecord to _storyResultWork?.state[_args[0]]>>
+  <<if !_storyResultRecord>><<exit>><</if>>
+  <<if _storyResultRecord.paused>>
+    <span class='blue'><<lanSwitch 'The arrangement is on hold. Your notes and completed work are kept; agree on a new crew at the pub to continue where you left off.' '约定暂缓了。单据和已经做完的事都还算数，在酒馆重新约好人手，就能接着办。'>></span><br><<exit>>
+  <</if>>
+  <<if _storyResultRecord.result is 'interrupted'>>
+    <span class='orange'><<lanSwitch 'The arrangement was interrupted. No payment or training was recorded for that unfinished step.' '事情中途被打断了，没做完的这一步没有收费，也没计入成长。'>></span><br>
+  <<elseif _storyResultRecord.stage gt 0 and _storyResultRecord.stage lt 4>>
+    <<if _storyResultRecord.result is 'setback'>><span class='orange'><<lanSwitch 'The attempt did not go as planned. You will have to make do with what you learned.' '尝试没有按预想进行，只能带着眼下查明的情况继续。'>></span><br><</if>>
+    <<lanSwitch 'Next, make your own way to: ' '接下来沿原路前往：'>>
+    <<for _storyNextIndex, _storyNext range _storyResultWork.terms.chains[_storyResultId].stages[_storyResultRecord.stage]>>
+      <<if _storyNextIndex gt 0>> / <</if>><<lanSwitch _storyResultWork.terms.sites[_storyNext.site].name[0] _storyResultWork.terms.sites[_storyNext.site].name[1]>>
+    <</for>>.<br>
+    <span class='small-description'><i><<lanSwitch 'The two hires have kept the arrangement. To change the crew, put the arrangement on hold at the pub first.' '两名雇员已经按约行动。想调整人手，可以先回酒馆暂缓约定。'>></i></span><br>
+  <<elseif _storyResultRecord.stage is 4>>
+    <<set _storyResultOutcome to _storyResultWork.terms.chains[_storyResultId].outcomes[_storyResultRecord.outcome]>>
+    <span class='green'><<lanSwitch _storyResultOutcome.name[0] _storyResultOutcome.name[1]>></span><br>
+    <<lanSwitch _storyResultOutcome.text[0] _storyResultOutcome.text[1]>><br>
+    <<lanSwitch 'Your payment / expenses: ' '你的报酬／支出：'>><span class='gold'><<printmoney _storyResultRecord.paid>></span> / <span class='gold'><<printmoney _storyResultRecord.spent>></span><br>
+  <</if>>
+<</widget>>
+
+<!-- 暂缓保留进度与取舍；重新约人只更换未完成阶段的参与名单，不重抽、不重领。 -->
+<<widget 'deadwood-street-story-arrangement'>>
+  <<set _storyArrangeWork to maplebirch.get('StreetLife')?.stories, _storyArrangeId to _storyArrangeWork?.current>>
+  <<if !_storyArrangeId or !_storyArrangeWork.available or $passage isnot 'Deadwood Street Work' or $location isnot 'underground'>><<exit>><</if>>
+  <<set _storyArrangeResume to _storyArrangeWork.state[_storyArrangeId].paused, _storyArrangeSite to _storyArrangeWork.terms.sites.smuggler>>
+  <<set _storyArrangeTerms to _storyArrangeWork.terms[_storyArrangeResume ? 'resume' : 'pause']>>
+  <<if Time.hour lt _storyArrangeSite.open or Time.hour * 60 + Time.minute + _storyArrangeTerms.minutes gte _storyArrangeSite.close * 60>><<exit>><</if>>
+  <<if _storyArrangeResume and !maplebirch.get('StreetLife').heist.crewReady>>
+    <span class='blue'><<lanSwitch 'Choose an available scout and carrier, then agree on the new arrangement.' '先选好能够参加的侦察员与搬运员，再重新约好这份差事。'>></span><br><<exit>>
+  <</if>>
+  <<capture _storyArrangeId _storyArrangeResume>>
+    <<socialiseicon 'ask'>><<lanLink _storyArrangeTerms.name>>
+      <<set _storyArrangeWork to maplebirch.get('StreetLife').stories, _storyArrangeHeist to maplebirch.get('StreetLife').heist>>
+      <<set _storyArrangeRecord to _storyArrangeWork.state[_storyArrangeId], _storyArrangeSite to _storyArrangeWork.terms.sites.smuggler, _storyArrangeTerms to _storyArrangeWork.terms[_storyArrangeResume ? 'resume' : 'pause']>>
+      <<if _storyArrangeWork.current isnot _storyArrangeId or !_storyArrangeWork.available or $location isnot 'underground' or $passage isnot 'Deadwood Street Work' or _storyArrangeRecord.paused isnot _storyArrangeResume or (_storyArrangeResume and !_storyArrangeHeist.crewReady) or Time.hour lt _storyArrangeSite.open>><<exit>><</if>>
+      <<set _storyArrangeStage to _storyArrangeRecord.stage, _storyArrangeRoster to _storyArrangeHeist.roster, _storyArrangeClosing to Time.date.timeStamp + (_storyArrangeSite.close * 60 - Time.hour * 60 - Time.minute) * 60>>
+      <<if Time.date.timeStamp + _storyArrangeTerms.minutes * 60 gte _storyArrangeClosing>><<exit>><</if>>
+      <<endevent>><<pass _storyArrangeTerms.minutes>>
+      <<if !_storyArrangeWork.available or _storyArrangeWork.current isnot _storyArrangeId or $location isnot 'underground' or $passage isnot 'Deadwood Street Work' or _storyArrangeRecord.stage isnot _storyArrangeStage or _storyArrangeRecord.paused isnot _storyArrangeResume or Time.date.timeStamp gte _storyArrangeClosing>><<exit>><</if>>
+      <<if _storyArrangeResume and (!_storyArrangeHeist.crewReady or _storyArrangeHeist.roster isnot _storyArrangeRoster)>><<exit>><</if>>
+      <<if _storyArrangeResume>><<set _storyArrangeRecord.crew to _storyArrangeHeist.state.crew.slice()>><</if>>
+      <<set _storyArrangeRecord.paused to !_storyArrangeResume>>
+      <<run Dynamic.render('deadwood-street-work')>>
+    <</lanLink>><br>
+  <</capture>>
+<</widget>>
+
+<<widget 'deadwood-street-story-journal'>>
+  <<set _storyJournalWork to maplebirch.get('StreetLife')?.stories>>
+  <<if !_storyJournalWork or !Object.values(_storyJournalWork.state).some(record => record.stage > 0)>><<exit>><</if>>
+  <<deadwood-card 'The crew’s arrangements' '同伙与手头的差事'>>
+    <<for _storyJournalId range ['landry', 'wren', 'mickey']>>
+      <<set _storyJournalRecord to _storyJournalWork.state[_storyJournalId]>>
+      <<if _storyJournalRecord.stage gt 0>>
+        <div class='gold'><<lanSwitch _storyJournalWork.terms.chains[_storyJournalId].name[0] _storyJournalWork.terms.chains[_storyJournalId].name[1]>></div>
+        <ul class='journal'><li>
+          <<deadwood-street-story-result _storyJournalId>>
+          <<lanSwitch 'Agreed participants: ' '约好的人手：'>><<= _storyJournalRecord.crew.map(key => $per_npc[key]?.name ?? lanSwitch('absent', '缺席')).join(lanSwitch(' and ', '、'))>>
+        </li></ul>
+      <</if>>
+    <</for>>
+    <<if maplebirch.get('StreetLife').heist.state.introduced>>
+      <div class='gold'><<lanSwitch 'Current crew' '眼下的人手'>></div>
+      <<deadwood-street-crew-summary>>
+    <</if>>
+  <</deadwood-card>><hr>
+<</widget>>
+
+<<widget 'deadwood-street-story-statistics'>>
+  <<set _storyStatsWork to maplebirch.get('StreetLife')?.stories>>
+  <<if !_storyStatsWork>><<exit>><</if>>
+  <div class='gold'><<lanSwitch 'Before the big job' '大买卖之前'>></div>
+  <<for _storyStatsId range ['landry', 'wren', 'mickey']>>
+    <<set _storyStatsChain to _storyStatsWork.terms.chains[_storyStatsId], _storyStatsRecord to _storyStatsWork.state[_storyStatsId]>>
+    <<deadwood-reblooms-progress-check `_storyStatsRecord.stage === 4` _storyStatsChain.name `lanSwitch('Completed steps: ', '已完成阶段：') + _storyStatsRecord.stage + ' / 4' + (_storyStatsRecord.paused ? lanSwitch(' (on hold)', '（暂缓）') : '')`>>
+    <<if _storyStatsRecord.stage is 4>><span class='small-description'><i><<lanSwitch _storyStatsChain.outcomes[_storyStatsRecord.outcome].text[0] _storyStatsChain.outcomes[_storyStatsRecord.outcome].text[1]>></i></span><br><</if>>
+  <</for>>
+  <<lanSwitch 'Arrangements paid / expenses: ' '差事累计报酬／支出：'>><span class='gold'><<printmoney `Object.values(_storyStatsWork.state).reduce((total, record) => total + record.paid, 0)`>></span> / <span class='gold'><<printmoney `Object.values(_storyStatsWork.state).reduce((total, record) => total + record.spent, 0)`>></span><br>
+  <<if maplebirch.get('StreetLife').heist.state.introduced>>
+    <<deadwood-street-crew-summary>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Street Work
+<<set _streetStories to maplebirch.get('StreetLife')?.stories>>
+<<if $location isnot 'underground' or !_streetStories>><<getouticon>><<back `lanSwitch('Return', '返回')`>><<exit>><</if>>
+<<set $outside to 0>><<unset $bus>><<effects>>
+<<deadwood-dynamicblock 'deadwood-street-work'>>
+  <<set _streetStories to maplebirch.get('StreetLife').stories>>
+  <<if !_streetStories.available or (!_streetStories.unlocked.landry and !Object.values(_streetStories.state).some(record => record.stage > 0))>>
+    <span class='blue'><<lanSwitch 'There is no arrangement to discuss here just now.' '眼下没有能在这里商量的差事。'>></span><br><<exit>>
+  <</if>>
+  <div class='gold bold'><<lanSwitch 'The people around the table' '围在桌边的人'>></div>
+  <<lanSwitch 'Landry keeps the finished receipts apart from the work still waiting. There is room at the table for two hires; who sits there, and what you have been through together, will matter when a bigger job comes along.' '兰德里把结清的收据收在一边，待办的单子还留在桌上。这里能坐下两名雇员。等到接大买卖时，坐在你身边的是谁、一起经历过什么，都会派上用场。'>><br><br>
+  <<for _storyHubId range ['landry', 'wren', 'mickey']>>
+    <<if _streetStories.unlocked[_storyHubId] or _streetStories.state[_storyHubId].stage gt 0>>
+      <div class='gold'><<icon _streetStories.terms.chains[_storyHubId].icon>><<lanSwitch _streetStories.terms.chains[_storyHubId].name[0] _streetStories.terms.chains[_storyHubId].name[1]>></div>
+      <<if _streetStories.state[_storyHubId].stage gt 0>><<deadwood-street-story-result _storyHubId>><</if>>
+      <<for _storyHubEntry range _streetStories.entries.filter(entry => entry.id === _storyHubId and entry.site === 'smuggler')>>
+        <<socialiseicon 'ask'>><<lanLink ['Discuss this arrangement', '谈谈这份约定'] _storyHubEntry.passage>><<endevent>><</lanLink>><br>
+      <</for>><br>
+    <</if>>
+  <</for>>
+  <<if !_streetStories.busy>><<deadwood-street-crew-link>><</if>>
+  <<deadwood-street-story-arrangement>>
+  <<if _streetStories.ready>>
+    <span class='blue'><<lanSwitch 'These smaller jobs are settled. When Landry and Wren trust you enough, Landry will discuss the larger job at the pub.' '这些小买卖都已经有了交代。等兰德里和伦恩足够信任你，兰德里就会在酒馆和你谈那桩大买卖。'>></span><br>
+  <</if>>
+<</deadwood-dynamicblock>>
+<<deadwood-street-story-leave 'smuggler'>>

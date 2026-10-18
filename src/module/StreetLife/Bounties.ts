@@ -197,7 +197,7 @@ export default class Bounties {
   }
 
   public get offers(): Case[] {
-    if (!this.state.cooperating || this.wanted || this.state.active || this.street.heist.inAction) return [];
+    if (!this.state.cooperating || this.wanted || this.state.active || this.street.heist.inAction || this.street.stories.busy) return [];
     const order = this.state.board.length ? this.state.board : terms.cases.map(item => item.id);
     return order
       .map(id => terms.cases.find(item => item.id === id)!)

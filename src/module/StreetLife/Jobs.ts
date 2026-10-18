@@ -65,7 +65,7 @@ export default class Jobs {
   }
 
   public get available(): boolean {
-    return this.street.available && !this.street.heist.inAction && !this.street.bounties.busy && !window.pcAreArmsBound('both') && !V.nextPassage && !V.nextPassageCheck;
+    return this.street.available && !this.street.stories.busy && !this.street.heist.inAction && !this.street.bounties.busy && !window.pcAreArmsBound('both') && !V.nextPassage && !V.nextPassageCheck;
   }
 
   public get offers(): Contract[] {
@@ -91,7 +91,7 @@ export default class Jobs {
     return terms.contacts.flatMap(contract => {
       const npc = this.street.heist.businessCrew.find(npc => npc.heist.role === contract.role && npc.heist.businessDay !== Math.floor(Time.days));
       if (!npc) return [];
-      const gross = Math.floor(contract.fee * (1 + (Math.clamp(npc.heist.skill, 0, 1000) / 1000) * terms.business.maximum_skill_bonus));
+      const gross = Math.floor(contract.fee * (1 + (Math.clamp(npc.skills[contract.role === 'scout' ? 'security' : 'athletics'], 0, 1000) / 1000) * terms.business.maximum_skill_bonus));
       const fee = Math.floor((gross * terms.business.crew_share) / 100);
       return [{ ...contract, crew: { key: npc.per, name: npc.name, role: contract.role, gross, share: terms.business.crew_share, fee } }];
     });
@@ -264,8 +264,8 @@ export default class Jobs {
           colleague.heist.businessCompleted = (colleague.heist.businessCompleted ?? 0) + 1;
         }
         if (quote && this.street.heist.businessCrew.some(npc => npc.per === quote.key && npc.heist.role === quote.role)) {
-          colleague.heist.skill = Math.min(1000, colleague.heist.skill + terms.business.skill_gain);
-          colleague.skills[quote.role === 'scout' ? 'security' : 'athletics'] = colleague.heist.skill;
+          const skill = quote.role === 'scout' ? 'security' : 'athletics';
+          colleague.skills[skill] = Math.min(1000, colleague.skills[skill] + Math.round((terms.business.skill_gain * (colleague.heist.growth?.[quote.role] ?? 100)) / 100));
         }
       } else {
         const returnSite = job.stage === 'pickup' || this.lost ? 'pub' : contract.return_to;
