@@ -240,12 +240,12 @@ class ThreeCard {
     return state.payout;
   }
 
-  public leave(): void {
+  public leave(): number {
     if (this.state.phase === 'player') {
       this.state.seats[0].folded = true;
       this.finish();
     }
-    this.collectPayout();
+    return this.collectPayout();
   }
 }
 

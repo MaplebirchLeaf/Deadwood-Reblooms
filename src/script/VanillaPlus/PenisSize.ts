@@ -187,6 +187,8 @@ export default function (maplebirch: typeof window.maplebirch) {
       }
     ],
     'Widgets Speech': [clamp, { src: '<<switch Math.clamp($player.penissize, 0, 7)>>', applyafter: '<<case 7>><<deadwood-reblooms-size-seven-speech>>', expected: 1 }],
+    // 中英文此段的判断数量不同；只在对白读取时将第 7 档映射到原版最大档。
+    'Widgets speech-Whitney': [{ srcmatchgroup: /\$player\.penissize\b/g, to: 'Math.min($player.penissize, 6)' }],
     'Widgets Ejaculation-GWYLAN': [{ srcmatch: size, applyafter: '<<case 7>><<deadwood-reblooms-size-seven-gwylan-ejaculation>>', expected: 2 }],
     'Widgets speech-GWYLAN': [{ srcmatch: size, applyafter: '<<case 7>><<deadwood-reblooms-size-seven-gwylan-speech>>', expected: 1 }],
     'Trash Compare Widgets': [{ srcmatchgroup: scene, to: '$1<<case 7>><<deadwood-reblooms-size-seven-trash>>$2', expected: 1 }]
@@ -250,8 +252,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     ['Widgets Home Events', 1],
     ['Widgets Changing Room', 2],
     ['Widgets School Events', 1],
-    ['Widgets Events Swimming', 1],
-    ['Widgets speech-Whitney', 2]
+    ['Widgets Events Swimming', 1]
   ] as const)
     widgetPassage[passage] = [{ ...large, expected }];
 

@@ -96,7 +96,19 @@ export default class Commute {
     const plan = (npc: string, kind: Ride['kind'], from: string, to: string, arrival: string, walk: number): Ride | null => {
       if (!this.healthy(npc) || this.transport.state.affection_days[npc + ':' + kind] === Time.days) return null;
       const home = kind === 'home' ? this.transport.core.get('Finance')?.realEstate.residenceOf(npc)?.id : undefined;
-      return { npc, kind, from, to: home ? 'home:' + home : to, arrival: home ? 'Deadwood Reblooms Property Home' : arrival, source, walk, day: Math.floor(Time.days), boarded: false, home };
+      return {
+        npc,
+        kind,
+        from,
+        to: home ? 'home:' + home : to,
+        arrival: home ? 'Deadwood Reblooms Property Home' : arrival,
+        source,
+        walk,
+        day: Math.floor(Time.days),
+        until: Time.date.timeStamp + (24 * 60 - Time.hour * 60 - Time.minute) * 60,
+        boarded: false,
+        home
+      };
     };
     const from = Catalog.point(source);
     if (from && source.endsWith(' Street') && Time.hour >= 6 && Time.hour < 21 && this.linksTo('Street Alex Cafe')) return plan('Alex', 'farm', from, 'farmland', 'Farmland', 1);

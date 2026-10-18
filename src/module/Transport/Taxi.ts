@@ -78,7 +78,7 @@ export default class Taxi {
   }
 
   private get now(): number {
-    return Math.floor(Time.days) * 1440 + Time.hour * 60 + Time.minute;
+    return Math.floor((Time.date.timeStamp - Time.startDate.timeStamp) / 60) + Time.startDate.hour * 60 + Time.startDate.minute;
   }
 
   public get active(): boolean {

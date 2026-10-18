@@ -28,7 +28,7 @@ class Sydney extends Module {
     const sirrisMorning = active && state.halloweenYear === Time.year && state.sirrisHalloweenVisitYear !== Time.year && Time.month === 11 && Time.monthDay === 1 && Time.hour >= 7 && Time.hour < 10;
     const christmasRest = state.christmasRestYear === Time.year && ((Time.month === 12 && Time.monthDay === 25 && Time.hour >= 21) || (Time.month === 12 && Time.monthDay === 26 && Time.hour < 6));
     const visit = state.estate.visitDay;
-    const estateVisit = visit >= 0 && ((visit === Time.days && Time.hour >= 21) || (visit === Time.days - 1 && Time.hour < 6));
+    const estateVisit = visit >= 0 && visit === Time.days && (Time.hour >= 21 || Time.hour < 6);
 
     if (active && !V.replayScene) {
       // 周日午夜的原版祈祷时段与宿舍留宿衔接。

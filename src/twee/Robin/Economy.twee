@@ -59,10 +59,7 @@
 <</widget>>
 
 <<widget 'deadwood-robin-lemonade-links'>>
-  <<silently>>
-    <<set _robinLemonadeLinks to new maplebirch.tool.link()>><<run _robinLemonadeLinks.detect()>>
-  <</silently>>
-  <<if _robinLemonadeLinks.links.some(link => link.getAttribute('data-passage') === 'Beach')>>
+    <<if ['helped', 'sabotaged'].includes($balloonStand.robin.status) and $balloonStand.robin.talked is false and $robin.timer.customer is 0>><<exit>><</if>>
     <<if Weather.precipitation is 'rain' and $RobinExpansion.lemonade gte 1>>
       <span class='blue'><<lanSwitch 'Rain runs off the reinforced awning while Robin keeps the counter dry.' '雨水顺着加固后的遮雨棚流下，罗宾把柜台守得干干爽爽。'>></span><br><br>
     <</if>>
@@ -109,14 +106,10 @@
     <<if maplebirch.get('Robin').balloon.inContest and getRobinLocation() is 'beach' and Weather.precipitation isnot 'rain'>>
       <<socialiseicon>><<lanLink ['Help Robin compete (1:00)', '帮罗宾完成竞争营业日 (1:00)'] 'Deadwood Robin Balloon Contest'>><</lanLink>><br>
     <</if>>
-  <</if>>
 <</widget>>
 
 <<widget 'deadwood-robin-chocolate-links'>>
-  <<silently>>
-    <<set _robinChocolateLinks to new maplebirch.tool.link()>><<run _robinChocolateLinks.detect()>>
-  <</silently>>
-  <<if _robinChocolateLinks.links.some(link => link.getAttribute('data-passage') === 'Park')>>
+    <<if ['helped', 'sabotaged'].includes($balloonStand.robin.status) and $balloonStand.robin.talked is false and $robin.timer.customer is 0>><<exit>><</if>>
     <<if Weather.precipitation is 'rain' and $RobinExpansion.chocolate gte 1>>
       <span class='blue'><<lanSwitch 'The insulated canopy keeps the rain out and the cocoa warm.' '保温棚挡住了雨，炉上的热巧克力仍暖着。'>></span><br><br>
     <</if>>
@@ -155,7 +148,6 @@
         <<set $RobinExpansion.intimacy_site to 'chocolate'>><<pass 2>>
       <</lanLink>><br>
     <</if>>
-  <</if>>
 <</widget>>
 
 <<widget 'deadwood-robin-fish-link'>>
@@ -1693,14 +1685,15 @@
 
 :: Deadwood Robin Accounts
 <<set $outside to 0>><<effects>><<endevent>>
-<<if getRobinLocation() is 'shop' or $location is 'home'>>
+<<set _robinAccountsTogether to maplebirch.get('Robin').available and (($location is 'deadwood_robin_shop' and getRobinLocation() is 'shop') or ($location is 'home' and getRobinLocation() is 'orphanage'))>>
+<<if _robinAccountsTogether>>
   <<npc Robin>><<person1>>
   <<lanSwitch 'Robin opens the ledger so you can both see the figures. "If a week goes badly, we use the reserve first. Nobody else should have to carry our losses."' '罗宾打开账本，让你们都能看清数字。“某周生意不好，就先动用储备金。不能让别人替我们承担亏损。”'>>
 <<else>>
-  <<lanSwitch 'Robin has left the shop ledger open beside the till. The figures are written clearly enough for you to follow.' '罗宾把店铺账本摊在收银台旁。每笔数字都写得很清楚，你能看明白。'>>
+  <<lanSwitch 'You open the ledger. Each entry is written clearly enough for you to follow.' '你翻开账本。每笔数字都写得很清楚，你能看明白。'>>
 <</if>>
 <br><br>
-<<if $RobinExpansion.lemonade gte 2 and $RobinExpansion.chocolate gte 2
+<<if _robinAccountsTogether and $RobinExpansion.lemonade gte 2 and $RobinExpansion.chocolate gte 2
   and $RobinExpansion.shop_stage is 'none' and !$RobinExpansion.topics.shop>>
   <<set $RobinExpansion.topics.shop to true>>
   <<lanSwitch 'Robin has circled the busiest days in both ledgers. "We keep turning people away when the carts run out of room," <<he>> says. <<He>> stops at a sketch of a vacant shop on Cliff Street.' '罗宾在两本账上圈出最忙的几天。“车上摆不下，客人只好走了。”<<he>>说着，翻到画着峭壁街空铺的那页。'>>
@@ -1767,7 +1760,7 @@
 <</if>>
 <<if $RobinExpansion.shop>>
   <br><<lanSwitch 'Special ingredient crates:' '新品原料箱数：'>> <<= $RobinExpansion.shop_stock>>
-  <<if maplebirch.get('Finance')>>
+  <<if maplebirch.get('Finance') and $location is 'deadwood_robin_shop'>>
     <br><br><<icon 'robin/robin-ledger.png'>><<lanLink ['Discuss a shop partnership', '商量店铺合伙'] 'Deadwood Robin Shop Partnership'>><</lanLink>>
   <</if>>
 <</if>>
@@ -1778,7 +1771,7 @@
   <br><br><<shopicon 'register'>><<lanLink ['Lend Robin £2,000 from your bank account for the shop', '从银行账户借罗宾 £2,000 开店'] 'Deadwood Robin Bank Support'>><</lanLink>>
 <</if>>
 <br><br>
-<<if $RobinExpansion.shop>>
+<<if $location is 'deadwood_robin_shop'>>
   <<getouticon>><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
 <<else>>
   <<getouticon>><<lanLink ['Return to Robin\'s room', '返回罗宾的房间'] 'Robin Options'>><</lanLink>>

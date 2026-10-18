@@ -111,8 +111,6 @@ class School {
   public readonly policies = DRESS_POLICIES;
   public readonly policyRequirements = POLICY_REQUIREMENTS;
 
-  public constructor(private readonly core: typeof maplebirch) {}
-
   private get state(): SchoolState {
     return V.LifeSimulation.school as SchoolState;
   }
@@ -476,33 +474,18 @@ class School {
     this.state.feedback = [this.state.studentSupport - previous[0], this.state.staffSupport - previous[1], this.state.corruption - previous[2]];
   }
 
-  public preInit(): void {
-    const missedLessons = new Array<{ total: number; message: number; subjects: Record<string, number> } | null>();
-
-    // 贝利签发的免听凭证只豁免旷课结算，原版每天的成绩变化照常执行。
-    this.core.dynamic.regTimeEvent('onBefore', 'life-simulation-school-attendance-before', {
-      action: () => {
-        if (!V.LifeSimulation?.school?.attendanceExempt) {
-          missedLessons.push(null);
-          return;
-        }
-        missedLessons.push({
-          total: V.lessonmissed,
-          message: V.lessonmissedtext,
-          subjects: { ...V.schoolLessonsMissed }
-        });
-      }
-    });
-
-    this.core.dynamic.regTimeEvent('onThread', 'life-simulation-school-attendance-settle', {
-      action: data => {
-        const previous = missedLessons.pop();
-        if (!previous || !data.exactPoints?.day) return;
-        V.lessonmissed = previous.total;
-        V.lessonmissedtext = 0;
-        Object.assign(V.schoolLessonsMissed, previous.subjects);
-      }
-    });
+  /** 在原版每次每日学校结算后豁免新增旷课，保留实际出勤消除旧记录的收益。 */
+  public attendance(settle: () => void): void {
+    if (!this.state.attendanceExempt) {
+      settle();
+      return;
+    }
+    const total = V.lessonmissed;
+    const subjects = { ...V.schoolLessonsMissed };
+    settle();
+    V.lessonmissed = Math.min(V.lessonmissed, total);
+    V.lessonmissedtext = 0;
+    Object.assign(V.schoolLessonsMissed, subjects);
   }
 }
 

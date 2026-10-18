@@ -1,17 +1,14 @@
 // ./src/script/Whitney.ts
 
 export default function (maplebirch: typeof window.maplebirch): void {
-  maplebirch.tool.addTo(
-    'BeforeLinkZone',
-    { widget: 'deadwood-whitney-pier-link', passage: 'Docks' },
-    { widget: 'deadwood-whitney-flats-link', passage: 'Whitney Home Knock' },
-    { widget: 'deadwood-whitney-music-link', passage: 'Whitney Chat' }
-  );
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-whitney-pier-link', passage: 'Docks' }, { widget: 'deadwood-whitney-flats-link', passage: 'Whitney Home Knock' });
   // 原版开锁选项按巧手显示，最后一个链接始终是返回牢房。
   maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-whitney-cell-link'], passage: 'Underground Cell Lock' });
 
   maplebirch.tool.inject({
     locationPassage: {
+      // 只接在公寓闲聊的普通菜单前，项链事件仍必须先处理。
+      'Whitney Chat': [{ src: '\t<<whitneyOptions>>\n<<else>>', applybefore: '\t<<deadwood-whitney-music-link>>\n', expected: 1 }],
       'School Front Courtyard': [{ src: '<<schoolicon "courtyard">>', applybefore: '<<deadwood-whitney-aftercare-link>>\n\t\t\t', expected: 1 }]
     },
     widgetPassage: {

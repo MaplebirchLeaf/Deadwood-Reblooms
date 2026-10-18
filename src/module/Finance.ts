@@ -530,7 +530,7 @@ class Finance extends Module {
     return paid;
   }
 
-  // 贝利收租前先从已授权的银行账户补足现金，原版 rentpay 继续负责实际扣款和统计。
+  // 授权后优先用银行付租，不足部分由现金补上。原版 rentpay 继续负责扣款和统计。
   public prepareBaileyRent(amount: unknown): void {
     const total = Math.floor(Number(amount));
     const bank = this.state.bank;

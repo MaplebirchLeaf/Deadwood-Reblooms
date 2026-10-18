@@ -66,7 +66,7 @@
 
 <<widget 'deadwood-school-donation-review-link'>><<silently>>
   <<set _school_links to new maplebirch.tool.link()>><<run _school_links.detect()>>
-  <<set _school_show to $passage is 'Hallways' and _school_links.links.some(link => link.getAttribute('data-passage') === 'School Detention') and maplebirch.get('Finance').donations.school.canFavour and Time.hour * 60 + Time.minute + 6 lte 17 * 60>>
+  <<set _school_show to _school_links.links.some(link => link.getAttribute('data-passage') === 'School Detention') and maplebirch.get('Finance').donations.school.canFavour and Time.hour * 60 + Time.minute + 6 lte 17 * 60>>
 <</silently>><<if _school_show>>
     <<icon 'school/exemption.png'>><<lanLink ['Ask the head to review your detention (0:01)', '请校长复核你的留堂记录 (0:01)']>>
       <<if maplebirch.get('Finance').donations.school.canFavour and Time.hour * 60 + Time.minute + 6 lte 17 * 60>>
@@ -80,7 +80,7 @@
   <<set _school_donation to maplebirch.get('Finance').donations.school>>
   <<set _school_links to new maplebirch.tool.link()>><<run _school_links.detect()>>
   <<set _school_practice to _school_donation.canPractice and Time.hour * 60 + Time.minute + 16 lte 17 * 60>>
-  <<set _school_show to $passage is 'School Library' and !$combat and !$possessed and !$nextPassageCheck and !$replayScene and !$statFreeze and _school_links.links.some(link => link.getAttribute('data-passage') === 'Hallways') and ((_school_donation.funded and _school_donation.ready) or _school_practice)>>
+  <<set _school_show to !$combat and !$possessed and !$nextPassageCheck and !$replayScene and !$statFreeze and _school_links.links.some(link => link.getAttribute('data-passage') === 'Hallways') and ((_school_donation.funded and _school_donation.ready) or _school_practice)>>
 <</silently>><<if _school_show>>
     <<if _school_donation.funded and _school_donation.ready>>
       <<language>>

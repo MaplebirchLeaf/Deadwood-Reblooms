@@ -357,8 +357,7 @@ class Casino {
   public leave(): void {
     this.state.sic_bo.bets = {};
     this.adjustChips(this.holdem.cashOut());
-    this.threeCard.leave();
-    this.adjustChips(this.threeCard.collectPayout());
+    this.adjustChips(this.threeCard.leave());
     if (this.blackjack.state.venue === 'casino') {
       this.adjustChips(this.blackjack.collectPayout());
       this.blackjack.leave();

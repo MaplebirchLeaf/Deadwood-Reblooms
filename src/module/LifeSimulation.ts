@@ -16,7 +16,7 @@ import { DEFAULT_LIFE_SIMULATION_STATE, type BodyGrowthState, type GymPlan } fro
 class LifeSimulation extends Module {
   public readonly casino = new Casino(this.core);
   public readonly academics = new AcademicHonours();
-  public readonly school = new School(this.core);
+  public readonly school = new School();
   public readonly weapons = new Weapons();
   public readonly medicine = new Medicine(this.core);
   public readonly coach = new GymCoach();
@@ -32,7 +32,6 @@ class LifeSimulation extends Module {
     super.preInit();
     Achievements.add(this.core, 'LifeSimulation');
     this.pool_party.preInit();
-    this.school.preInit();
     this.medicine.preInit();
     this.core.on(':variable', () => this.hands.setup());
 

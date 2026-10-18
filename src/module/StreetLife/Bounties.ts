@@ -142,7 +142,7 @@ export default class Bounties {
   }
 
   public get available(): boolean {
-    return this.street.available && !V.nextPassageCheck;
+    return this.street.available && !V.nextPassage && !V.nextPassageCheck;
   }
 
   public get busy(): boolean {

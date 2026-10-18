@@ -16,7 +16,16 @@ export default class Investment extends Shared {
   }
 
   public get canAgree(): boolean {
-    return this.available && this.robinAvailable && window.getRobinLocation() === 'shop' && C.npc.Robin.love >= 20 && V.exposed <= 0 && V.combat !== 1 && V.stress < V.stressmax;
+    return (
+      this.available &&
+      this.robinAvailable &&
+      V.location === 'deadwood_robin_shop' &&
+      window.getRobinLocation() === 'shop' &&
+      C.npc.Robin.love >= 20 &&
+      V.exposed <= 0 &&
+      V.combat !== 1 &&
+      V.stress < V.stressmax
+    );
   }
 
   public agree(): boolean {
