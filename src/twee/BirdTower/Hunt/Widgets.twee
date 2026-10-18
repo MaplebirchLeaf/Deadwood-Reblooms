@@ -33,7 +33,7 @@
   <<if !_huntResult or $combat or $replayScene or $statFreeze>><<exit>><</if>>
   <<if !_huntResult.base>>
     <<set _huntResult.base to true>>
-    <<set _huntTaken to Math.min(_args[0], Math.max(0, Math.floor(3 + maplebirch.get('BirdTower').party.length - $bird.hunts.weight)))>>
+    <<set _huntTaken to Math.min(_args[0], Math.max(0, Math.floor(maplebirch.get('BirdTower').capacity - $bird.hunts.weight)))>>
     <<set _huntResult.left to _args[0] - _huntTaken>>
     <<if _huntTaken gt 0>><<flight_hunt_get 'lurkers' _huntTaken>><</if>>
   <</if>>
@@ -46,8 +46,8 @@
   <<if _huntResult.prey is null>><<set _huntResult.prey to maplebirch.get('BirdTower').prey>><</if>>
   <<set _prey to _huntResult.prey>>
   <<if !_huntResult.companion>>
-    <<set _prey.left to Math.max(0, _prey.caught.length - Math.max(0, Math.floor(3 + maplebirch.get('BirdTower').party.length - $bird.hunts.weight)))>>
-    <<set _prey.caught to _prey.caught.slice(0, Math.max(0, Math.floor(3 + maplebirch.get('BirdTower').party.length - $bird.hunts.weight)))>>
+    <<set _prey.left to Math.max(0, _prey.caught.length - Math.max(0, Math.floor(maplebirch.get('BirdTower').capacity - $bird.hunts.weight)))>>
+    <<set _prey.caught to _prey.caught.slice(0, Math.max(0, Math.floor(maplebirch.get('BirdTower').capacity - $bird.hunts.weight)))>>
   <</if>>
   <<set _other_hawks to _prey.followers>>
   <<set _caught to _prey.caught.length>>
@@ -105,7 +105,7 @@
 <</widget>>
 
 <<widget "birdtower_scavenge_options">>
-  <<if $bird.hunts.weight gte (3+maplebirch.get('BirdTower').party.length) or $stress gte $stressmax or isPregnancyEnding() or $pain gte 90 or $bird.hunts.timer gte 90>>
+  <<if $bird.hunts.weight gte maplebirch.get('BirdTower').capacity or $stress gte $stressmax or isPregnancyEnding() or $pain gte 90 or $bird.hunts.timer gte 90>>
     <<babyhawk_hunt_return>>
   <<elseif $daily.emptyCampLoot lte 0>>
     <<language>>
@@ -625,7 +625,7 @@
 
 <<widget "babyhawk_hunt_return">>
   <<childSelect $BirdTower.hunt.leader>>
-  <<if $bird.hunts.weight gte (3+maplebirch.get('BirdTower').party.length) and $stress lt $stressmax and !isPregnancyEnding()>>
+  <<if $bird.hunts.weight gte maplebirch.get('BirdTower').capacity and $stress lt $stressmax and !isPregnancyEnding()>>
     <<language>>
       <<option 'EN'>>
         You cannot carry any more. You begin to head back to the tower.

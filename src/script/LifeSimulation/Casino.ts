@@ -11,6 +11,14 @@ export default function Casino(maplebirch: typeof window.maplebirch): void {
   Blackjack(maplebirch);
   const open = () => Time.hour >= 18 || Time.hour < 4;
 
+  maplebirch.tool.patch.traits.add({
+    title: 'Special Traits',
+    name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:casino:trait:dealer:name'),
+    colour: 'green',
+    has: () => V.LifeSimulation?.casino?.trained === true && (V.LifeSimulation.casino.good_shifts ?? 0) >= 10,
+    text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:casino:trait:dealer:text')
+  });
+
   maplebirch.tool.inject({
     locationPassage: {
       'Connudatus Street': [{ src: '<<if $skulduggeryDintro is 1 and $exposed lte 0>>', applybefore: '<<deadwood-casino-street>>\n\t\t', expected: 1 }]

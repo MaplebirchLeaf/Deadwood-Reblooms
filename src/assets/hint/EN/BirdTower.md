@@ -27,6 +27,8 @@ Once they can hunt, chicks venture onto the moor alone. You may meet them deep i
 
 Solo hunting counts the actual seconds that pass while you are at the tower, on the moor or in the castle. Several short activities count towards the same remaining time.
 
+Guide your chicks through their first flight and first hunt to gain **Falconer**. When a chick joins your hunt, you can carry one extra piece of loot. Solo hunts keep their usual limit.
+
 When the tower offers a new nest, build and improve it through the upgrade menu. You can keep visiting the children there.
 
 ### Feats

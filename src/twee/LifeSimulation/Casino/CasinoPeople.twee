@@ -255,9 +255,10 @@
   <</switch>>
 <</widget>>
 <<widget 'deadwood-casino-work-pay'>>
+  <<set $_dealerFatigue to ($LifeSimulation.casino.trained and $LifeSimulation.casino.good_shifts gte 10 ? 3 : 4)>>
   <<set $_wage to maplebirch.get('LifeSimulation').casino.finishWork(_args[0])>>
   <<if $_wage gt 0>>
-    <<money $_wage>><<tiredness 4>>
+    <<money $_wage>><<tiredness $_dealerFatigue>>
     <<if $LifeSimulation.casino.last_work_correct>>
       <<stress 2>><<set C.npc.Marlow.love to Math.clamp(C.npc.Marlow.love + 1, 0, 30)>>
     <<else>><<stress 6>><</if>>

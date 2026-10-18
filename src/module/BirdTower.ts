@@ -126,6 +126,11 @@ class BirdTower extends Module {
     return this.hunt.ids.map(id => V.childRecords[id] as HawkChild | undefined).filter((child): child is HawkChild => child?.species === 'hawk' && childIsBorn(child));
   }
 
+  public get capacity(): number {
+    const party = this.party.length;
+    return 3 + party + (party > 0 && this.state.seen.subadult === true && this.state.seen.immature === true ? 1 : 0);
+  }
+
   /** 按性格筛选本次随行队伍，写回原版共享的 _tempIDs 与 _length。 */
   public selectTrait(trait: BirdTowerTrait): number {
     T.tempIDs = this.party.filter(child => child.development.trait === trait).map(child => child.childId);

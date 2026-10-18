@@ -91,6 +91,8 @@ Rest, watch or talk in the lounge. Train as a dealer with Marlow for an hour to 
 
 Cheating can lose the night's seating permission. Asking Marlow privately for another chance requires sufficient trust or work performance, costs cash and can be attempted once nightly. Even acceptance does not restore permission to work.
 
+Complete training and correctly handle ten table disputes to gain **Practised Dealer**. Later regular shifts add 3 tiredness instead of 4, with the usual pay.
+
 One casino night runs from the evening until 4 am the next morning. Midnight does not reset bans, requests for another chance or that night's profit record.
 
 ### Feats and games at home
