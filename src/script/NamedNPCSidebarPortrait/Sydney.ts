@@ -187,10 +187,11 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     });
 
     // 剧情脱衣
-    wardrobe.modify('Sydney', clothes => {
+    wardrobe.modify('Sydney', (clothes, context) => {
       const title = maplebirch.passage.title;
       const all = ['over_head', 'over_upper', 'over_lower', 'upper', 'lower', 'under_upper', 'under_lower', 'head', 'face', 'neck', 'hands', 'legs', 'feet', 'handheld'];
       const naked =
+        context.key === 'naked' ||
         ['RobinTemple Promise Altar', 'RobinTemple Promise End'].includes(title) ||
         title.startsWith('Deadwood Reblooms Sydney Temple Bath') ||
         title.startsWith('Deadwood Reblooms Sirris Estate Sydney Bath') ||

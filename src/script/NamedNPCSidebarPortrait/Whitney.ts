@@ -223,7 +223,6 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     if (title.startsWith('Bully Rob Reversal') || title.startsWith('Bully Alley Rob') || title.startsWith('Bully Alley Sex') || title.startsWith('Bully No Alley Sex')) return 'naked';
 
     // 游泳剧情
-    if (V.location === 'pool') return 'school_swim';
     if (title.startsWith('Whitney Beach')) return 'beach';
 
     // 万圣节剧情
@@ -248,6 +247,7 @@ export default function (maplebirch: MaplebirchCore, colours: { school: Map<stri
     if (whitney.state === 'dungeon' || !['active', 'rescued'].includes(whitney.state)) return '';
     const arranged = scene(maplebirch, 'Whitney');
     if (arranged !== undefined) return arranged;
+    if (V.location === 'pool') return 'school_swim';
 
     // 深夜在家休息，上学日不能让校服日程覆盖凌晨的私人时间。
     if (Time.hour < 7) return 'topless';

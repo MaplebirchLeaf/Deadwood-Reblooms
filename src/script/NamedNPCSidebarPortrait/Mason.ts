@@ -1,6 +1,7 @@
 // ./src/script/NamedNPCSidebarPortrait/Mason.ts
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
+import { poolNudity } from './Common/Scenes';
 
 export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<string, string> }): void {
   maplebirch.tool.onInit(() => {
@@ -24,7 +25,7 @@ export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<stri
       // Lake Mason Swim 揭示裸泳，池塘初见与聊天则明确仍穿泳装。
       if (title.startsWith('Lake Mason')) return 'naked';
       // 礼顿处罚后 swimall 标记裸体教学，普通泳池状态不能据玩家裸泳直接脱掉梅森衣物。
-      if (V.location === 'pool') return V.swimall === 1 ? 'naked' : 'swim';
+      if (V.location === 'pool') return poolNudity(maplebirch) ? 'naked' : 'swim';
       if (title === 'Mason Pond' || title.startsWith('Mason In Pond') || title.startsWith('Mason Beside Pond') || title.startsWith('Mason Pond ')) return 'swim';
       return '';
     }

@@ -27,6 +27,7 @@ export default function SchoolNPCs(maplebirch: typeof window.maplebirch): void {
 
     for (const student of SCHOOL_STUDENT_ROSTER) {
       wardrobe.modify(student, (clothes, context) => {
+        if (context.key === 'naked') return;
         if (!SCHOOL_CAMPUS_LOCATIONS[student].includes(context.location)) return;
         const policy = V.LifeSimulation?.school?.dress?.active as SchoolDressPolicy | undefined;
         if (!policy || policy === 'uniform') return;

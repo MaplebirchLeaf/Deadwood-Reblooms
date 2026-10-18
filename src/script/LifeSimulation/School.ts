@@ -249,6 +249,13 @@ export default function School(maplebirch: typeof window.maplebirch): void {
           applyafter: '\n\t\t\t<<deadwood-reblooms-life-simulation-school-social>>',
           expected: 1
         }
+      ],
+      'Widgets Events Swimming': [
+        {
+          src: '<<widget "destinationpoolchangingroom">>',
+          applyafter: '\n\t<<deadwood-school-pool-private-link>>',
+          expected: 1
+        }
       ]
     }
   });

@@ -6,11 +6,21 @@ const casual: Record<string, string> = { Robin: 'orphanage', Kylar: 'park', Whit
 const school: Record<string, string> = { Robin: 'school', Kylar: 'school', Whitney: 'school', Sydney: 'library' };
 const sleep: Record<string, string> = { Robin: 'sleep', Kylar: 'manor_bedroom', Whitney: 'topless', Sydney: 'sleep' };
 
+export function poolNudity(core: MaplebirchCore): boolean {
+  if (V.location !== 'pool') return false;
+  return (
+    (V.swimall === 1 && Time.schoolDay && V.schoolstate === 'fifth' && V.poolroomstate === 'own') ||
+    (V.weekly?.schoolNightPoolParty === 'party' && Time.dayState === 'night') ||
+    core.get('LifeSimulation')?.school.requiresNudity === true
+  );
+}
+
 /** 只解释模组明确出场的场景，复用各角色已有的服装规则。 */
 export default function scene(core: MaplebirchCore, name: string): string | undefined {
   if (V.replayScene || C.npc[name]?.init !== 1 || !['active', 'rescued'].includes(C.npc[name].state)) return;
   if (name === 'Robin' && (V.robinmissing || V.robin.timer.hurt > 0)) return;
   if (name === 'Sydney' && V.daily.sydney.punish === 1) return;
+  if (V.npc?.includes(name) && Object.hasOwn(school, name) && poolNudity(core)) return 'naked';
   const title = core.passage.title;
   const estate = core.get('Finance')?.realEstate;
   const transport = core.get('Transport');
