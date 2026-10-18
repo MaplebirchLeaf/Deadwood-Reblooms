@@ -1,5 +1,7 @@
 // ./src/script/main.ts
 
+import DoLP from '../compat/DoLP';
+import DoLX from '../compat/DoLX';
 import DeadwoodReblooms from './DeadwoodReblooms';
 import MoreLoveInterestsAndNPCAvatars from './MoreLoveInterestsAndNPCAvatars';
 import CelestialAnomalies from './CelestialAnomalies';
@@ -39,4 +41,8 @@ import StreetLife from './StreetLife';
   if (maplebirch.get('Orchard')) Orchard(maplebirch);
   if (maplebirch.get('Transport')) Transport(maplebirch);
   StreetLife(maplebirch);
+
+  // 各模块的普通注入登记完后，再按当前原版源码选择对应兼容规则。
+  DoLP(maplebirch);
+  DoLX(maplebirch);
 })(maplebirch);

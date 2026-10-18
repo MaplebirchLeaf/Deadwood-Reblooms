@@ -102,9 +102,8 @@ function adaptRobin(core: MaplebirchCore): void {
 }
 
 export default function DoLX(core: MaplebirchCore): void {
-  core.once(':addon:preparePatch', () => {
-    const data = core.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch();
-    if (!data.scriptFileItems.getByNameWithOrWithoutPath('xchange.js')) return;
+  const data = core.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch();
+  if (data.scriptFileItems.getByNameWithOrWithoutPath('xchange.js')) {
     const zone = core.tool.zone;
     // DoLX 在作弊按钮外又包了一层相同判断，两处都需解除，保留跳舞、战斗和起始页限制。
     if (zone.locationPassage.StoryCaption) {
@@ -172,7 +171,7 @@ export default function DoLX(core: MaplebirchCore): void {
         { srcmatch: /\$worn\.handheld\.integrity/g, to: '(maplebirch.get("LifeSimulation").hands.item("rainproof") ?? $worn.handheld).integrity', expected: 3 }
       ];
     }
-  });
+  }
 
   core.once(':addon:beforePatch', () => {
     const manager = core.services.addonPlugin;

@@ -50,10 +50,13 @@
 
 :: Deadwood Whitney Music
 <<set $outside to 0>><<set $location to 'flats'>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<exit>><</if>>
 <<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state) or $WhitneyExpansion.music_day is Time.days>>
   <<lanSwitch 'Whitney has gone out.' '惠特尼已经出门了。'>>
 <<else>>
-  <<pass 10>><<set $WhitneyExpansion.music_day to Time.days>>
+  <<pass 10>>
+  <<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $location isnot 'flats' or $passage isnot 'Deadwood Whitney Music' or !['active', 'rescued'].includes(C.npc.Whitney.state)>><<exit>><</if>>
+  <<set $WhitneyExpansion.music_day to Time.days>>
   <<npc Whitney>><<person1>>
   <<language>>
     <<option 'EN'>>
@@ -113,11 +116,14 @@
 
 :: Deadwood Whitney Aftercare
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<exit>><</if>>
 <<if !$WhitneyExpansion?.rescued or $whitneyReunionScene isnot undefined or !['active', 'rescued'].includes(C.npc.Whitney.state)
   or !Time.schoolDay or Time.hour lt 7 or Time.hour gte 18 or $exposed gt 0 or $WhitneyExpansion.aftercare_day is Time.days>>
   <<lanSwitch 'Whitney has already left the school grounds.' '惠特尼已经离开学校。'>><br><br>
 <<else>>
-  <<pass 10>><<set $WhitneyExpansion.aftercare_day to Time.days>>
+  <<pass 10>>
+  <<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $location isnot 'school' or $passage isnot 'Deadwood Whitney Aftercare' or !['active', 'rescued'].includes(C.npc.Whitney.state)>><<exit>><</if>>
+  <<set $WhitneyExpansion.aftercare_day to Time.days>>
   <<npc Whitney>><<person1>>
   <<switch Time.days % 3>>
     <<case 0>>
@@ -184,11 +190,14 @@
 
 :: Deadwood Whitney Pier
 <<set $outside to 1>><<set $location to 'docks'>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<exit>><</if>>
 <<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state)
   or Time.dayState is 'night' or Time.hour lt 9 or Time.hour gte 17 or $exposed gt 0 or $WhitneyExpansion.pier_day is Time.days>>
   <<lanSwitch 'Whitney is not around.' '惠特尼不在这附近。'>><br><br>
 <<else>>
-  <<pass 10>><<set $WhitneyExpansion.pier_day to Time.days>>
+  <<pass 10>>
+  <<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $location isnot 'docks' or $passage isnot 'Deadwood Whitney Pier' or !['active', 'rescued'].includes(C.npc.Whitney.state)>><<exit>><</if>>
+  <<set $WhitneyExpansion.pier_day to Time.days>>
   <<npc Whitney>><<person1>>
   <<language>>
     <<option 'EN'>>
@@ -251,13 +260,15 @@
 
 :: Deadwood Whitney Flats
 <<set $outside to 0>><<set $location to 'flats'>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<exit>><</if>>
 <<if $whitneyromance isnot 1 or !['active', 'rescued'].includes(C.npc.Whitney.state) or $whitney_home_stage lt 3 or $WhitneyExpansion.flats_day is Time.days
   or !(Time.dayState is 'dawn' or (Time.dayState is 'day' and Weather.precipitation is 'none' and !Time.schoolDay and ![3, 6, 7].includes(Time.weekDay)))>>
   <<lanSwitch 'Whitney has gone back inside.' '惠特尼已经回到屋里。'>><br><br>
 <<else>>
-  <<set $WhitneyExpansion.flats_day to Time.days>>
   <<set _flatWasDawn to Time.dayState is 'dawn'>>
   <<pass 5>>
+  <<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $location isnot 'flats' or $passage isnot 'Deadwood Whitney Flats' or !['active', 'rescued'].includes(C.npc.Whitney.state)>><<exit>><</if>>
+  <<set $WhitneyExpansion.flats_day to Time.days>>
   <<npc Whitney>><<person1>>
   <<if $WhitneyExpansion.rescued>>
     <<language>>

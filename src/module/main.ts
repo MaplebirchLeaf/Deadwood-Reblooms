@@ -1,7 +1,5 @@
 // ./src/module/main.ts
 
-import DoLP from '../compat/DoLP';
-import DoLX from '../compat/DoLX';
 import DeadwoodReblooms from './DeadwoodReblooms';
 import UnLockCheatAndCombatStatusDisplay from './UnLockCheatAndCombatStatusDisplay';
 import LongerCombat from './LongerCombat';
@@ -25,8 +23,6 @@ import StreetLife from './StreetLife';
 
 (function (maplebirch): void {
   'use strict';
-  DoLP(maplebirch);
-  DoLX(maplebirch);
   maplebirch.define('DeadwoodReblooms', new DeadwoodReblooms(maplebirch), ['var']);
   maplebirch.define('UnLockCheatAndCombatStatusDisplay', new UnLockCheatAndCombatStatusDisplay(maplebirch), ['DeadwoodReblooms', 'tool']);
   maplebirch.define('LongerCombat', new LongerCombat(maplebirch), ['DeadwoodReblooms', 'var']);

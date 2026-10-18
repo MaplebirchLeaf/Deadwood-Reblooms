@@ -10,6 +10,23 @@ export default function (maplebirch: MaplebirchCore) {
   Cheats(maplebirch);
   Tips(maplebirch);
 
+  maplebirch.once(':storyready', () => {
+    // 原版 NPC 文本和模组人物会使用这些发色；只补渲染滤镜，不加入染发选项。
+    const hair = setup.colours?.hair_map;
+    if (!hair) return;
+    for (const [key, blend] of Object.entries({ chestnut: '#8b4935', mousy: '#82796d', auburn: '#9b3d2e' })) {
+      hair[key] ??= {
+        variable: key,
+        name: key,
+        name_cap: key.charAt(0).toUpperCase() + key.slice(1),
+        csstext: 'brown',
+        natural: true,
+        dye: false,
+        canvasfilter: { blend, blendMode: 'hard-light', brightness: -0.3 }
+      };
+    }
+  });
+
   maplebirch.tool.addTo('Options', 'Deadwood-Reblooms-Options');
   maplebirch.tool.addTo('Statistics', 'deadwood-reblooms-statistics');
   maplebirch.char.use(
