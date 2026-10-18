@@ -1,0 +1,79 @@
+:: Deadwood Raven Shrine Home Widgets [widget]
+
+<<widget 'deadwood-raven-home-context'>>
+  <<deadwood-raven-shrine-context>>
+  <<set _shrineHomeTravel to !$combat and !$replayScene and !$statFreeze and !$nextPassage and !$nextPassageCheck>>
+  <<set _shrineHomeReady to _shrineSafe and _shrine.stage is 3 and C.npc.Tsukihan?.init is 1 and C.npc.Tsukihan.state is 'active'
+    and ['forest_raven_shrine', 'raven_shrine_house'].includes($location)>>
+  <<set _shrineHome to _shrineHomeReady and _shrine.home_invited and isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 30>>
+  <<set _shrineHomePerson to _shrineHomeReady and (Time.hour lt 9 or Time.hour gte 18)>>
+  <<set _shrineHomeAwake to _shrineHomePerson and Time.hour gte 7 and Time.hour lt 22>>
+  <<set _shrineKnock to _shrineHomeAwake and !pcAreArmsBound('both')>>
+  <<set _shrineHomeMinutes to (Time.hour lt 9 ? 9 : 22) * 60 - Time.hour * 60 - Time.minute>>
+<</widget>>
+
+<<widget 'deadwood-raven-home-presence'>>
+  <<deadwood-raven-home-context>>
+  <<if (!_shrineHomePerson or !_shrineHome) and _shrineHomeTravel and $npc?.includes('Tsukihan')>>
+    <<endnpc 'Tsukihan'>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-raven-home-act'>>
+  <<set _homeChoice to _args[0], _homeSource to $passage>>
+  <<deadwood-raven-home-context>>
+  <<if _homeChoice is 'leave'>>
+    <!-- 离开不要求仍是恋人，也不因邀请失效或压力升高而困住玩家。 -->
+    <<if !_shrineHomeTravel>><<exit>><</if>>
+    <<if $location is 'raven_shrine_house'>>
+      <<pass 1>><<deadwood-raven-home-context>>
+      <<if !_shrineHomeTravel or $passage isnot _homeSource or $location isnot 'raven_shrine_house'>><<exit>><</if>>
+      <<set $location to 'forest_raven_shrine', $outside to 1>>
+    <<elseif $location isnot 'forest_raven_shrine'>><<exit>><</if>>
+    <<if _shrine>><<set _shrine.home_action to ''>><</if>>
+    <<endevent>><<goto 'Deadwood Raven Shrine'>><<exit>>
+  <</if>>
+  <<if !_shrineHomeReady>><<exit>><</if>>
+  <<if _homeChoice is 'knock'>>
+    <<if $passage isnot 'Deadwood Raven Shrine Door' or $location isnot 'forest_raven_shrine' or !_shrineKnock>><<exit>><</if>>
+    <<pass 1>><<deadwood-raven-home-context>>
+    <<if !_shrineHomeReady or $passage isnot _homeSource or $location isnot 'forest_raven_shrine'>><<exit>><</if>>
+    <<if !_shrineKnock>><<goto 'Deadwood Raven Shrine Door'>><<exit>><</if>>
+    <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 30>>
+      <<set _shrine.home_invited to true, _shrine.home_action to 'invite'>>
+    <<else>>
+      <<set _shrine.home_action to 'greet'>>
+    <</if>>
+    <<goto 'Deadwood Raven Shrine Door'>><<exit>>
+  <</if>>
+  <<if _homeChoice is 'enter'>>
+    <<if !_shrineHome or $passage isnot 'Deadwood Raven Shrine Door' or $location isnot 'forest_raven_shrine'>><<exit>><</if>>
+    <<pass 1>><<deadwood-raven-home-context>>
+    <<if !_shrineHome or $passage isnot _homeSource or $location isnot 'forest_raven_shrine'>><<exit>><</if>>
+    <<set $location to 'raven_shrine_house', $outside to 0, _shrine.home_action to ''>>
+    <<endevent>><<goto 'Deadwood Raven Shrine Room'>><<exit>>
+  <</if>>
+  <<if !['talk', 'read', 'tidy'].includes(_homeChoice) or !_shrineHome or !_shrineHomeAwake or $location isnot 'raven_shrine_house'
+    or $passage isnot 'Deadwood Raven Shrine Room' or _shrine.home_time is Math.floor(Time.days) or _shrineHomeMinutes lte 10>><<exit>><</if>>
+  <<if _homeChoice is 'talk' and ($daily.no_sing or $worn.face.type.includes('gag'))>><<exit>><</if>>
+  <<if _homeChoice is 'tidy' and pcAreArmsBound('both')>><<exit>><</if>>
+  <<pass 10>><<deadwood-raven-home-context>>
+  <<if !_shrineHome or !_shrineHomeAwake or $passage isnot _homeSource or $location isnot 'raven_shrine_house'
+    or _shrine.home_time is Math.floor(Time.days)>><<exit>><</if>>
+  <<if _homeChoice is 'talk' and ($daily.no_sing or $worn.face.type.includes('gag'))>><<exit>><</if>>
+  <<if _homeChoice is 'tidy' and pcAreArmsBound('both')>><<exit>><</if>>
+  <<set _shrine.home_time to Math.floor(Time.days), _shrine.home_action to _homeChoice>>
+  <<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 1, 0, 100)>>
+  <<if _homeChoice is 'tidy'>><<housekeeping 2>><<stress -2>><<else>><<stress -4>><</if>>
+  <<goto 'Deadwood Raven Shrine Room'>>
+<</widget>>
+
+<<widget 'deadwood-raven-home-return'>>
+  <<if ['forest_raven_shrine', 'raven_shrine_house'].includes($location)>>
+    <<getouticon>><<lanLink [$location is 'raven_shrine_house' ? 'Return to the courtyard (0:01)' : 'Return to the courtyard', $location is 'raven_shrine_house' ? '返回庭院 (0:01)' : '返回庭院']>>
+      <<deadwood-raven-home-act 'leave'>>
+    <</lanLink>><br>
+  <<else>>
+    <<deadwood-raven-shrine-return>>
+  <</if>>
+<</widget>>

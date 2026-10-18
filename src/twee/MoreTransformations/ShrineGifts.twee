@@ -1,0 +1,167 @@
+:: Deadwood Raven Shrine Gifts
+<<effects>>
+<<if $location is 'raven_shrine_house'>><<deadwood-raven-home-presence>><<else>><<deadwood-raven-shrine-presence>><</if>>
+<<deadwood-raven-gift-context>>
+<<if !_shrineGiftPerson>>
+  <<lanSwitch 'Tsukihan is not available to receive a gift now. You keep it for another visit.' '月羽现在不方便收礼物。你先留着，下次再来吧。'>><br><br>
+  <<deadwood-raven-gift-return>><<exit>>
+<</if>>
+<<npc Tsukihan>><<person1>>
+<<if $daily.giftedFood.Tsukihan isnot undefined>>
+  <<lanSwitch 'You have already given Tsukihan something today. <<He>> makes room beside the things you brought. "Save the rest. I have enough for now."' '你今天已经给月羽送过东西了。<<He>>把你带来的东西安顿好。“别的先留着吧。这些就够了。”'>><br><br>
+<<elseif pcAreArmsBound('both')>>
+  <<lanSwitch 'You cannot get the gift out with both arms bound. Tsukihan notices you struggling. "Leave it for now. It can wait."' '双臂都被绑着，你没法把礼物取出来。月羽留意到你的动作。“先别忙这个。晚些也行。”'>><br><br>
+<<elseif _shrineGiftMinutes lte 5>>
+  <<lanSwitch 'Tsukihan is putting things away. "I have to finish up now. Would you keep it until next time?"' '月羽正在收拾东西。“这会儿快要去准备了。下回再给我吧，别着急。”'>><br><br>
+<<elseif _shrineGiftReady>>
+  <<lanSwitch 'You can give Tsukihan some prepared food, or a flower to keep by the table. What would you like to offer?' '可以送月羽一份做好的食物，也可以带朵花，放在桌边。你想送什么？'>><br><br>
+  <<set _food_gift_found to false, _shrineGiftFlowerFound to false>>
+  <<food_gift_list>>
+  <<for _flower, _flowerConfig range setup.foodstuff>>
+    <<if _flowerConfig.category is 'flower' and ($foodstuff[_flower]?.amount ?? 0) gte 1>>
+      <<if !_shrineGiftFlowerFound>><span class='gold'><<lanSwitch 'Flowers' '花'>>:</span><br><</if>>
+      <label><<foodstufficon _flower>><<recipe_name _flower 'cap'>> (<<= $foodstuff[_flower].amount>>) <<if !_food_gift_found and !_shrineGiftFlowerFound>><<radiobutton '$gift' _flower checked>><<else>><<radiobutton '$gift' _flower>><</if>></label> |
+      <<set _shrineGiftFlowerFound to true>>
+    <</if>>
+  <</for>>
+  <<if _shrineGiftFlowerFound>><br><br><</if>>
+  <<if !_food_gift_found and !_shrineGiftFlowerFound>>
+    <<lanSwitch 'You have no prepared food or flowers with you. There is no need to bring a gift just to visit.' '你手头没有做好的食物，也没有花。只是来坐坐的话，用不着非带礼物不可。'>><br><br>
+  <<elseif setup.foodstuff[$gift] and ['dish', 'flower'].includes(setup.foodstuff[$gift].category) and ($foodstuff[$gift]?.amount ?? 0) gte 1>>
+    <<skinicon 'give'>><<lanLink ['Give the gift (0:05)', '送出礼物 (0:05)']>><<deadwood-raven-gift-give>><</lanLink>><<glove>><br>
+  <</if>>
+<</if>>
+<<deadwood-raven-gift-return>>
+
+:: Deadwood Raven Shrine Gift
+<<effects>>
+<<if $location is 'raven_shrine_house'>><<deadwood-raven-home-presence>><<else>><<deadwood-raven-shrine-presence>><</if>>
+<<deadwood-raven-gift-context>>
+<<set _shrineGift to $daily.giftedFood.Tsukihan, _shrineGiftFood to setup.foodstuff[_shrineGift]>>
+<<if !_shrineGiftPerson or !_shrineGiftFood>>
+  <<lanSwitch 'There is no gift to hand over now. You leave things as they are.' '现在没有要递交的礼物。你暂且收住动作。'>><br><br>
+  <<deadwood-raven-gift-return>><<exit>>
+<</if>>
+<<npc Tsukihan>><<person1>>
+<<if _shrineGift is 'shortbread'>>
+  <<language>>
+    <<option 'EN'>>
+      Tsukihan sets a few papers aside as you offer the shortbread. <<He>> looks at the golden edge of one piece, then takes it with both hands.<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>
+        "Shortbread. Thank you. I like these with tea." <<He>> breaks off a careful piece, but the next bite follows before <<he>> has put it down.
+      <<elseif C.npc.Tsukihan.dom lt 70>>
+        "Those are the ones I pick out first." <<He>> looks pleased, then glances at the piece already missing from the edge. "I was going to put them away. Perhaps after one."
+      <<else>>
+        "This is mine. Not for the offering table, and certainly not for the birds." <<He>> pulls the plate closer. "You can have a piece. I'm keeping the crispest bit." The plate stays between you, within your reach.
+      <</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>"Stay when you have time. I'd like to eat the rest with you." <<He>> sets a second cup beside the first.<<else>>"You've chosen well. Thank you." <<He>> covers what remains and puts it carefully to one side.<</if>>
+    <<option 'CN'>>
+      你递来酥饼，月羽先把几张纸挪开。<<He>>看了看饼干烤得金黄的边沿，双手接过去。<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>
+        “酥饼。谢谢，我喜欢拿这个配茶。”<<He>>仔细掰下一小块，吃完还没放下，又跟着咬了一口。
+      <<elseif C.npc.Tsukihan.dom lt 70>>
+        “每回都是先挑这个吃。”<<He>>很是高兴，又看看边沿已经缺掉的一角。“本来想先收好的。再吃一块吧。”
+      <<else>>
+        “这些是我的。不摆供桌，更不给鸟。”<<He>>把盘子往近处拉了拉。“可以分你一块。最酥的边先给我留着。”盘子仍摆在你也够得着的位置。
+      <</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>“有空时，留下来吧。剩下的想和你一起吃。”<<He>>在杯子旁又添了一只。<<else>>“很会挑呢。谢谢。”<<He>>把剩下的盖好，小心放到一旁。<</if>>
+  <</language>>
+<<elseif _shrineGift is 'valentines_chocolate' and $valentines>>
+  <<language>>
+    <<option 'EN'>>
+      Tsukihan pauses at the heart-shaped box. <<He>> opens the lid, looks over the chocolates and closes it again, a little more carefully than necessary.<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>"For Valentine's Day? Thank you. I will find somewhere safe for these." <<He>> checks that the box is clear of the edge.
+      <<elseif C.npc.Tsukihan.dom lt 70>>"I know what day it is." <<He>> looks at you, then back at the box. "I just wasn't expecting you to bring these."
+      <<else>>"For me? Then I'm not putting them out for everyone." <<He>> rests a hand on the lid, smiling before <<he>> can hide it.<</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>"When we open them, I want you here." <<He>> keeps the box beside <<him>>. "If you'd like that too."<<else>>"That was kind of you. I hope your day goes well." <<He>> puts the box somewhere it will not be knocked over.<</if>>
+    <<option 'CN'>>
+      月羽看着心形盒子，停了一下。<<He>>掀开盒盖，看看里面的巧克力，又小心地盖好，动作比平时还慢一点。<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>“情人节的？谢谢。我得给它们找个稳妥的地方。”<<He>>看看盒子，确认没放在边沿。
+      <<elseif C.npc.Tsukihan.dom lt 70>>“我记得今天是什么日子。”<<He>>看看你，又看看盒子。“只是没想到，你会特意带来。”
+      <<else>>“给我的？那就不摆出去分了。”<<He>>用手护住盒盖，还没来得及藏起笑意，便先笑了出来。<</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>“打开来吃的时候，想让你也在。”<<He>>把盒子留在手边。“你也愿意的话。”<<else>>“谢谢你想着我。今天过得开心些。”<<He>>把盒子安顿在不容易碰倒的地方。<</if>>
+  <</language>>
+<<elseif _shrineGiftFood.category is 'flower'>>
+  <<language>>
+    <<option 'EN'>>
+      You offer the <<recipe_name _shrineGift>>. Tsukihan takes the stem carefully, keeping the petals clear of <<his>> sleeve. <<He>> finds a small glass jar, rinses it and fills it with water.<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>"Thank you. Here, where it won't be brushed off the table." <<He>> turns the jar until the flower stands straight.
+      <<elseif C.npc.Tsukihan.dom lt 70>>"I'll keep it by the book. It will make me clear a space, at least." <<He>> moves the loose papers out of its way.
+      <<else>>"For me, yes? Then it stays on my table." <<He>> tries two places before choosing one. "Here. I can see it from where I sit."<</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>"I like seeing something you've chosen for me when I come home." <<He>> looks from the flower to you.<<else>>"It will brighten up my room." <<He>> checks the water once more before thanking you.<</if>>
+    <<option 'CN'>>
+      你送上<<recipe_name _shrineGift>>。月羽小心接住花茎，没让袖口擦到花瓣。<<He>>找来一只小玻璃罐，洗净，装上水。<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>“谢谢。就放这儿，免得从桌上碰下去。”<<He>>转了转罐子，把花摆正。
+      <<elseif C.npc.Tsukihan.dom lt 70>>“放在书边吧。也算催着我把桌上腾一块地方。”<<He>>将零散的纸张挪开。
+      <<else>>“是给我的，对吧？那就放我自己的桌上。”<<He>>试了两处，才挑好位置。“这里。坐下来就看得见。”<</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>“回来能看见你特意挑的东西，挺好的。”<<He>>看看花，又看看你。<<else>>“回头给屋里添点颜色。”<<He>>又检查一遍水，才转过来道谢。<</if>>
+  <</language>>
+<<elseif _shrineGiftFood.food?.tags?.includes('spicy')>>
+  <<language>>
+    <<option 'EN'>>
+      Tsukihan clears a space for the <<recipe_name _shrineGift>> and takes a first bite. <<He>> stops, reaches for <<his>> cup and takes a long drink.<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>"A little hotter than I expected. It's good. One moment, please." <<He>> waits before taking another bite.
+      <<elseif C.npc.Tsukihan.dom lt 70>>"You could have warned me." <<He>> smiles over the cup. "I'm not giving it back. I just need to go more slowly."
+      <<else>>"I didn't say I couldn't eat it. I said I needed water." <<He>> keeps the cup close this time. "Next bite will be smaller."<</if>><br><br>
+      "Thank you for bringing this." <<He>> makes certain the dish is somewhere it cannot be knocked over before settling down again.
+    <<option 'CN'>>
+      月羽腾出地方放好<<recipe_name _shrineGift>>，尝了第一口。<<He>>忽然停住，去拿自己的杯子，喝下一大口水。<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>“比想的辣一点。味道很好，容我缓缓。”<<He>>等了一下，才又动筷。
+      <<elseif C.npc.Tsukihan.dom lt 70>>“该先提醒我一声的。”<<He>>隔着杯沿笑笑。“没说要退给你。就是得吃慢些。”
+      <<else>>“没说吃不了。是说，要先喝水。”这回，<<he>>把杯子留在了手边。“下一口少一些就好。”<</if>><br><br>
+      “谢谢你想着带来。”<<He>>又将碗盘放稳，才重新坐好。
+  <</language>>
+<<elseif _shrineGiftFood.food?.tags?.includes('drink')>>
+  <<language>>
+    <<option 'EN'>>
+      Tsukihan sets the <<recipe_name _shrineGift>> on a folded cloth. <<He>> tries a small sip before lifting <<his>> eyes to you.<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>"That's good. Thank you." <<He>> moves the papers farther from the cup and takes another sip.
+      <<elseif C.npc.Tsukihan.dom lt 70>>"Usually I'm the one bringing out cups." <<He>> smiles. "I could get used to this."
+      <<else>>"This one is staying beside me. The birds can manage with their own water." <<He>> brings the cup closer to <<his>> place.<</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>"Keep me company when you have time." <<He>> leaves the seat beside <<him>> clear.<<else>>"You needn't bring something every time. I'm glad you thought of it, though."<</if>>
+    <<option 'CN'>>
+      月羽把<<recipe_name _shrineGift>>放在一块折布上。<<He>>先试了一小口，才抬眼看你。<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>“很好喝。谢谢。”<<He>>将纸张挪得离杯子远一些，又喝了一口。
+      <<elseif C.npc.Tsukihan.dom lt 70>>“往常都是我给人端杯子。”<<He>>笑笑。“偶尔换过来，也不错。”
+      <<else>>“这杯留我手边。鸟有它们自己的水喝。”<<He>>把杯子挪近自己坐的位置。<</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>“有空的话，陪我坐着吧。”<<He>>留着身旁的位置。<<else>>“不用回回带东西。不过，知道你想着，也挺高兴的。”<</if>>
+  <</language>>
+<<elseif _shrineGiftFood.food?.tags?.includes('sweet')>>
+  <<language>>
+    <<option 'EN'>>
+      Tsukihan looks over the <<recipe_name _shrineGift>>, then samples it. For a moment <<his>> attention stays on the food; only after another taste does <<he>> look back at you.<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>"Something sweet with a break. Thank you; that's thoughtful." <<He>> seems to be choosing the next bite already.
+      <<elseif C.npc.Tsukihan.dom lt 70>>"I was only going to taste it." <<He>> looks at the portion missing from one side, then back at you. "A proper taste."
+      <<else>>"I want the rest for later. Otherwise there won't be any left by the time I finish my work." <<He>> finds something to cover it, then takes one last taste before doing so.<</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>"Next time you have a quiet moment, come and sit with me. We can have tea with it."<<else>>"Thank you. I'll enjoy that." <<He>> puts it safely out of the birds' reach.<</if>>
+    <<option 'CN'>>
+      月羽看看<<recipe_name _shrineGift>>，尝了一点。<<He>>一时没再分神看别处，接着尝过一些，才抬头望向你。<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>“歇脚时吃点甜的。谢谢，很有心。”<<He>>说着，目光已经在挑下一口。
+      <<elseif C.npc.Tsukihan.dom lt 70>>“本来只想尝尝的。”<<He>>看看一边已经缺了的那块，又看看你。“仔细尝尝。”
+      <<else>>“剩下的留到晚点。不然，活还没干完就吃光了。”<<He>>找东西来盖，盖好以前，又多尝了一口。<</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>“下回闲下来，就来陪我坐坐吧。可以拿这个配茶。”<<else>>“谢谢。我慢慢吃。”<<He>>把它放到鸟够不着的地方。<</if>>
+  <</language>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      Tsukihan puts <<his>> work aside as you offer the <<recipe_name _shrineGift>>. <<He>> finds a clear space, then tries it.<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>"Thank you. You've gone to some trouble." <<He>> keeps <<his>> sleeves well clear of the food as <<he>> settles down to eat.
+      <<elseif C.npc.Tsukihan.dom lt 70>>"I'd have kept working and forgotten to stop." <<He>> glances at the unfinished task, then leaves it alone. "This is a better excuse."
+      <<else>>"Sit down. If you're going to make me take a break, you can keep me company." <<He>> moves a cushion closer, then looks up to see whether you want it.<</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>"It's nice, having you think of me during your day." <<He>> returns <<his>> attention to you before taking another bite.<<else>>"You can come by without a gift as well, you know." <<He>> smiles. "This was kind of you."<</if>>
+    <<option 'CN'>>
+      你送上<<recipe_name _shrineGift>>，月羽先把手头的活搁下。<<He>>腾出一块地方，将食物放好，尝了一口。<br><br>
+      <<if C.npc.Tsukihan.dom lt 30>>“谢谢。特意费心了。”<<He>>把袖口拢好，免得碰着食物，才坐下来慢慢吃。
+      <<elseif C.npc.Tsukihan.dom lt 70>>“再忙下去，又要忘了歇着。”<<He>>看看没做完的活，还是先放下了。“这个由头好些。”
+      <<else>>“坐吧。既然要我歇着，也来陪一会儿。”<<He>>将坐垫挪近，抬眼看看你愿不愿坐。<</if>><br><br>
+      <<if isLoveInterest('Tsukihan')>>“在别处忙的时候，也会想着我。挺好的。”<<He>>先朝你看过来，才又接着吃。<<else>>“平时不带东西，也可以来坐坐。”<<He>>朝你笑了笑。“这份心意，我收到了。”<</if>>
+  <</language>>
+<</if>>
+<<if _shrineGift is 'shortbread' or (_shrineGift is 'valentines_chocolate' and $valentines)>><<gglove>><<else>><<glove>><</if>><br><br>
+<<if $location is 'forest_raven_shrine' and C.npc.Tsukihan.love gte 10 and _shrine.tea isnot Math.floor(Time.days) and _shrineMinutes gt 15
+  and !pcAreArmsBound('both') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+  <<icon 'food/coffee.png'>><<lanLink ['Have tea with Tsukihan (0:15)', '和月羽喝杯茶 (0:15)']>>
+    <<deadwood-raven-shrine-act 'tea'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Tea'>><</if>>
+  <</lanLink>><<lstress>><<ltiredness>><<glove>><br>
+<</if>>
+<<deadwood-raven-gift-return>>

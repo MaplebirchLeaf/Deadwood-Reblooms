@@ -4,6 +4,7 @@ import Achievements from './Achievements';
 import Whale from './MoreTransformations/Whale';
 import Horse from './MoreTransformations/Horse';
 import Raven from './MoreTransformations/Raven';
+import Module from './Module';
 
 interface Tentacle {
   type: string;
@@ -12,12 +13,47 @@ interface Tentacle {
   fullDesc: string;
 }
 
-class MoreTransformations {
+class MoreTransformations extends Module {
   public Whale: Whale;
   public Horse: Horse;
   public Raven: Raven;
 
-  constructor(readonly core: typeof maplebirch) {
+  constructor(core: typeof maplebirch) {
+    super(core, 'MoreTransformations', {
+      raven: { met: false, searched: -1, fed: -1, called: -1, preened: -1, origin: 'Forest', action: '', disparaged: 0 },
+      shrine: {
+        stage: 0,
+        feeds: 0,
+        forest: 30,
+        helped: 0,
+        work: -1,
+        prayer: -1,
+        rest: -1,
+        talk: -1,
+        tea: -1,
+        walk: -1,
+        kiss: -1,
+        sex: -1,
+        sex_total: 0,
+        feelings: -1,
+        close: -1,
+        confessed: false,
+        home_invited: false,
+        home_time: -1,
+        home_action: '',
+        favour: -1,
+        favour_result: '',
+        favour_late: false,
+        promise: -1,
+        walks: 0,
+        topic: 'shrine',
+        scene: '',
+        step: '',
+        memory: '',
+        action: '',
+        donations: 0
+      }
+    });
     this.Whale = new Whale();
     this.Horse = new Horse();
     this.Raven = new Raven();
@@ -46,13 +82,11 @@ class MoreTransformations {
     return { target, damage: splash };
   }
 
-  public preInit(): void {
+  public override preInit(): void {
+    super.preInit();
     // 转化会衰减，成就只在首次达到完整形态时授予。
     Achievements.add(this.core, 'MoreTransformations');
 
-    this.core.on(':variable', () => {
-      V.MoreTransformations ??= { raven: { met: false, searched: -1, fed: -1, called: -1, preened: -1, origin: 'Forest', action: '', disparaged: 0 } };
-    });
     this.Whale.apply(this.core);
     this.Horse.apply(this.core);
     this.Raven.apply(this.core);

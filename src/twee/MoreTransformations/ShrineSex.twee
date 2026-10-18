@@ -1,0 +1,1238 @@
+:: Deadwood Raven Shrine Sex
+<<set _shrineEncounter to $MoreTransformations?.shrine>>
+<<if $sexstart is 1>>
+  <<deadwood-raven-shrine-context>>
+  <<if !_shrinePerson or C.npc.Tsukihan.init isnot 1 or !isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 30
+    or _shrine.scene isnot 'sex' or _shrine.step isnot ''>>
+    <<deadwood-raven-shrine-return>><<exit>>
+  <</if>>
+  <<set _shrineEncounter.step to 'encounter'>>
+  <<npc Tsukihan>><<person1>>
+  <<set $sexstart to 0>>
+  <<consensual>>
+  <<set $consensual to 1>>
+  <<neutral 1>>
+  <<if $exposed lt 2>>
+    <<language>>
+      <<option 'EN'>>
+        You slide the inner screen shut and slip out of your clothes.
+      <<option 'CN'>>
+        你合上内室的纸拉门，褪去了身上的衣物。
+    <</language>>
+    <<strip>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        You slide the inner screen shut, leaving the courtyard behind.
+      <<option 'CN'>>
+        你合上内室的纸拉门，将庭院的动静隔在门外。
+    <</language>>
+  <</if>>
+  <<maninit>>
+  <<set $enemytrust += 500>><<npckiss>>
+  <<set $enemyarousal to Math.clamp((C.npc.Tsukihan.lust || 0) * 5, 0, 500)>>
+  <<set $enemyarousalmax to 600>>
+  <<set $outside to 0>><<set $location to 'forest_raven_shrine'>>
+<<elseif !_shrineEncounter or _shrineEncounter.scene isnot 'sex' or _shrineEncounter.step isnot 'encounter'
+  or $combat isnot 1 or !$npc?.includes('Tsukihan') or $location isnot 'forest_raven_shrine' or $nextPassage or $nextPassageCheck or $replayScene or $statFreeze>>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+
+<<set $enemyanger to 0>>
+<<effects>>
+<<effectsman>>
+<<man>>
+<<stateman>>
+<br><br>
+<<actionsman>>
+
+<<if _combatend>>
+  <span id="next"><<link [[Next|Deadwood Raven Shrine Sex Finish]]>><</link>></span><<nexttext>>
+<<else>>
+  <span id="next"><<link [[Next|Deadwood Raven Shrine Sex]]>><</link>></span><<nexttext>>
+<</if>>
+
+:: Deadwood Raven Shrine Sex Finish
+<<set _shrineEncounter to $MoreTransformations?.shrine>>
+<<if !_shrineEncounter or _shrineEncounter.scene isnot 'sex' or _shrineEncounter.step isnot 'encounter'
+  or $combat isnot 1 or !$npc?.includes('Tsukihan') or $location isnot 'forest_raven_shrine' or $nextPassage or $nextPassageCheck or $replayScene or $statFreeze>>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<set _shrineEncounter.step to 'finished'>>
+<<set $outside to 0>><<set $location to 'forest_raven_shrine'>><<effects>><<deadwood-raven-shrine-context>>
+<<if $enemyarousal gte $enemyarousalmax>>
+  <<ejaculation>>
+  <<set C.npc.Tsukihan.lust to Math.clamp((C.npc.Tsukihan.lust || 0) - 30, 0, 100)>>
+  <<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 2, 0, 100)>>
+  <<set _shrineEncounter.sex_total to (_shrineEncounter.sex_total || 0) + 1>>
+  <<stress -12>><<trauma -2>>
+
+  <<switch true>>
+    <<case C.npc.Tsukihan.dom gte 70>>
+      <<language>>
+        <<option 'EN'>>
+          Tsukihan leans back against the wooden pillar, <<his>> chest heaving with ragged breaths and a flushed, triumphant smile on <<his>> face.
+          <<He>> reaches out with one hand and tugs your wrist, pulling you down against <<his>> warmth.
+          "Did you think I would let you get up so quickly? You distracted me from my duties today... so you're staying right here until my breath comes back."
+        <<option 'CN'>>
+          月羽靠在木柱上急促地喘息着，微红的脸上带着几分得逞与满足的笑意。
+          <<He>>伸手拉住你的手腕，顺势将你拉到自己温热的怀里。
+          “以为这就结束了？今天是你先让我分心的……在我缓过气之前，哪儿也别想去，就在这儿陪着我。”
+      <</language>>
+    <<case C.npc.Tsukihan.dom lte 30>>
+      <<language>>
+        <<option 'EN'>>
+          Tsukihan curls up on the tatami, hiding <<his>> burning face behind the sleeve of <<his>> inner robe as <<his>> body trembles through the aftershocks.
+          "A-are you all right? Did I do okay?" <<He>> looks up through wet, fluttering eyelashes, blushing to <<his>> ears as you take <<his>> hand.
+          "I... I have never felt anything so intense before... thank you for being so patient with me."
+        <<option 'CN'>>
+          月羽在榻榻米上微微蜷着身子，用内袍的衣袖挡住滚烫的脸颊，身躯还在余韵中轻轻颤抖。
+          “你……你还好吗？我刚才做得还可以吗？”<<He>>在微湿的眼睫后小心翼翼地看着你，在你握住<<his>>手时，耳根羞得通红。
+          “我从来没有体会过这么强烈的感觉……谢谢你对我这么耐心。”
+      <</language>>
+    <<default>>
+      <<language>>
+        <<option 'EN'>>
+          Tsukihan lies back upon the soft cushions, eyes closed as <<his>> breathing slowly steadies in the quiet incense of the inner chamber.
+          After a moment, <<he>> opens <<his>> eyes and gazes at you with deep affection, trailing <<his>> fingers softly across your cheek.
+          "The shrine has never felt this warm. To share this quiet moment with you... there is nothing more I could ask for."
+        <<option 'CN'>>
+          月羽仰卧在柔软的垫褥上，闭着眼在静谧的淡香中缓缓平复着呼吸。
+          片刻后，<<he>>睁开眼，目光里满是缱绻的眷恋，指尖轻轻抚过你的脸颊。
+          “神社里从没有像现在这么暖和过。能像这样和你待在一起……我心里再没有别的渴求了。”
+      <</language>>
+  <</switch>>
+  <br><br>
+
+<<elseif $enemyhealth lte 0>>
+  <<language>>
+    <<option 'EN'>>
+      Tsukihan winces and gently catches your hands, shaking <<his>> head with a pained but tender expression.
+      "Let us stop for now... I don't want either of us to get hurt."
+    <<option 'CN'>>
+      月羽吃痛地皱了皱眉，轻轻握住你的双手，脸上带着些许疼惜与歉意，摇了摇头。
+      “先停下来吧……我不想让我们任何一个人受伤。”
+  <</language>><br><br>
+
+<<elseif $finish is 1>>
+  <<language>>
+    <<option 'EN'>>
+      You ease away. Tsukihan stays close for a quiet moment, resting <<his>> forehead lightly against yours before letting you sit up.
+      "It is all right. We can take all the time we need."
+    <<option 'CN'>>
+      你缓缓退开。月羽没有强求，额头轻轻抵着你的额头，静静温存了片刻才让你坐起身来。
+      “没关系的。往后我们有的是时间。”
+  <</language>><br><br>
+<</if>>
+
+<<language>>
+  <<option 'EN'>>
+    You catch your breath together on the clean boards. After a while, Tsukihan helps you gather your clothes before tidying <<his>> own robes.
+  <<option 'CN'>>
+    你们在干净的草席上依偎着平复了心跳。过了一会儿，月羽帮你拾起散落的衣物，随后才仔细整好自己的衣袍。
+<</language>><br><br>
+
+<<clotheson>>
+<<endcombat>>
+<<deadwood-raven-shrine-return>>
+
+:: Widgets Speech-TSUKIHAN [widget]
+<<widget 'speech-tsukihan'>>
+  <<set _npc_speech to true>>
+  <<set _nn to _nn ?? 0>>
+  <<set _tsukihanDom to C.npc.Tsukihan.dom>>
+  <<set _tsukihanLust to C.npc.Tsukihan.lust || 0>>
+  <<set _playerSize to $player.penissize ?? 2>>
+  <<set _npcSize to $NPCList[_nn].penissize ?? 2>>
+
+  <<switch true>>
+    <!-- 1. 初夜与处女/童贞差分 -->
+    <<case $speechNPCPenisVirgin is 1 or $speechNPCVaginaVirgin is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan gasps, holding you tight as <<his>> eyes gleam with possessive warmth. "You are my first... and I gave this to you willingly. Don't you dare ever forget it."
+            <<option 'CN'>>
+              月羽倒吸一口凉气，紧紧搂住你，眼神里满是占有的炽热。“你是我的第一个……是我心甘情愿给你的。你可得给我记一辈子。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan's breath stutters, tears of sweetness welling in the corners of <<his>> eyes. "This is my first time... I am so glad it was with you. Please... be gentle with me."
+            <<option 'CN'>>
+              月羽呼吸一滞，眼角泛起点点甜蜜的泪光。“这是我的第一次……幸好是你。请……一定要对我温柔些。”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan breathes shakily against your cheek, smiling through the sting. "I have stayed pure in this quiet shrine for so long... giving myself to you is everything I could have wished for."
+            <<option 'CN'>>
+              月羽在你颊边颤抖着呼吸，忍着痛意露出柔和的微笑。“在冷清的神社里守了这么久……能把自己交给你，就是我最大的心愿了。”
+          <</language>>
+      <</switch>>
+
+    <<case $speechNPCAnusVirgin is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan groans, claws digging into your shoulder. "It's so tight and strange... but don't stop now, keep moving!"
+            <<option 'CN'>>
+              月羽闷哼一声，指尖用力扣住你的肩头。“又紧又奇怪……但你不准停，继续动！”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan whimpers, trembling in your hold. "It feels so full... please give me a moment to get used to it..."
+            <<option 'CN'>>
+              月羽发出一声轻咽，在你的怀里不住颤抖。“感觉好满……求求你，让我缓一缓……”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan lets out a breathless gasp. "Ah... so this is how it feels... take it slow, all right?"
+            <<option 'CN'>>
+              月羽倒吸一口凉气。“啊……原来是这种感觉……慢一点，好吗？”
+          <</language>>
+      <</switch>>
+
+    <<case $speechNPCKissVirgin is 1>>
+      <<language>>
+        <<option 'EN'>>
+          Tsukihan gazes into your eyes, lips glistening. "That was my first kiss... I didn't know lips could feel so warm."
+        <<option 'CN'>>
+          月羽凝视着你的眼睛，双唇水润。“那是我的初吻……没想到嘴唇能这么温热。”
+      <</language>>
+
+    <<case $speechPenisVirgin is 1 or $speechpenisvirgin is 1 or $speechVaginaVirgin is 1 or $speechvaginavirgin is 1 or $speechAnusVirgin is 1 or $speechanusvirgin is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan smiles proudly, running fingers through your hair. "Your first time belongs to me now. Every single part of you."
+            <<option 'CN'>>
+              月羽得意地微笑，手指穿过你的发丝。“你的第一次现在归我了。从今往后，整个人都是我的。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan looks at you with wide, reverent eyes. "Your first time?! I... I will treat you with the utmost tenderness, I swear!"
+            <<option 'CN'>>
+              月羽睁大双眼，带着几分敬畏看着你。“你的第一次？！我……我发誓一定会竭尽全力温柔待你的！”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan softens, kissing your temple. "To receive your virginity... I will cherish you for the rest of my days."
+            <<option 'CN'>>
+              月羽神情化为一片柔和，亲了亲你的鬓角。“能得到你的初夜……我会用这一生来好好珍惜你。”
+          <</language>>
+      <</switch>>
+
+    <!-- 2. 误唤他人姓名吃醋差分 -->
+    <<case $speechLINameDrop is 1 or $speechnamedrop is 1>>
+      <<set $speechLINameDrop to 0>><<set $speechnamedrop to 0>>
+      <<set _loveInterest to _loveInterest ?? Object.values($loveInterest || {}).filter(li => li && li isnot 'None' && li isnot 'Tsukihan').random()>>
+      <<switch _loveInterest>>
+        <<case 'Robin'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan freezes for a brief moment, looking down at you with a wry, jealous pout. "Robin? The sweet child from the orphanage? ...You dare speak their name while in my arms?"
+            <<option 'CN'>>
+              月羽动作微微一滞，垂眸看着你，眉眼间带着半是吃味半是无奈的神色。“罗宾？孤儿院那个可人的孩子？……在我的怀里，你还敢念着别人的名字？”
+          <</language>>
+        <<case 'Sydney'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan raises an eyebrow, tracing your jawline with a light nip. "The devout temple attendant? It seems you have a fondness for those who serve the divine... but you belong to my shrine right now."
+            <<option 'CN'>>
+              月羽挑起眉尖，指尖抚过你的下颌，轻轻咬了你一下。“神殿那位虔诚的侍奉者？看来你对侍奉神明的人格外偏爱……但现在，你只归我的神社所有。”
+          <</language>>
+        <<case 'Whitney'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan frowns in distaste. "That unruly delinquent from the park? Don't bring their crude name into our sacred sanctuary."
+            <<option 'CN'>>
+              月羽微微蹙眉，眼神里透出一丝不悦。“公园里那个粗鲁的混混？别把那人的名字带进我们清净的社殿里来。”
+          <</language>>
+        <<case 'Kylar'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan glances toward the courtyard shadows with a slight shudder. "That quiet, possessive one...? Look only at me. I won't let anyone else haunt your thoughts here."
+            <<option 'CN'>>
+              月羽下意识朝庭院的阴影看了一眼，轻轻一颤。“那个总是阴郁偏执地盯着你的人……？看着我。在我的地方，我不准你心里想着旁人。”
+          <</language>>
+        <<default>>
+          <<switch true>>
+            <<case _tsukihanDom gte 70>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan nips firmly at your collarbone, eyes narrowing in possessive discipline. "Whose name was that? Look only at me right now. I won't let your mind wander anywhere else."
+                <<option 'CN'>>
+                  月羽惩罚性地在你锁骨上轻轻咬了一口，眼眸微眯带着强烈的占有欲。“刚才叫的是谁的名字？看着我，只准看着我。在我的榻榻米上，休想分心。”
+              <</language>>
+            <<case _tsukihanDom lte 30>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan looks down, wounded and insecure. "Is... is there someone else in your heart? Am I not enough for you...?"
+                <<option 'CN'>>
+                  月羽神情一僵，有些无措与委屈地垂下眼睫。“你……心里还想着别人吗？是我做得不够好吗……”
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan sighs softly, pressing <<his>> forehead to yours. "You have other attachments, don't you? Even so... let me be the only one for you today."
+                <<option 'CN'>>
+                  月羽轻轻叹了一口气，额头贴着你的额头。“你心里还牵挂着别人呢。即便如此……至少今天，只看着我好吗。”
+              <</language>>
+          <</switch>>
+      <</switch>>
+
+    <!-- 3. 玩家肉棒尺寸差分 -->
+    <<case $speechPenisBig is 1 or $speechpenisbig is 1 or ($player.penisExist and _playerSize gte 4 and random(1, 3) is 1)>>
+      <<switch true>>
+        <<case $NPCList[_nn].penis isnot 'none' and _npcSize gte 3>>
+          <<switch true>>
+            <<case _tsukihanDom gte 70>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan glances between your generous length and <<his>> own, grinning with competitive desire. "Look at us... quite a magnificent pair. Let's see who brings the other to their knees first."
+                <<option 'CN'>>
+                  月羽看了看你雄伟的尺寸，又低头看了看自己的，露出争强好胜的笑意。“瞧瞧我们俩……真是一对。那就看看今天谁先让对方求饶。”
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan blushes, eyes wide as <<he>> compares sizes. "We are both so large... this is going to be intensely full..."
+                <<option 'CN'>>
+                  月羽红着脸对比着彼此的尺寸，眼里满是惊叹。“我们都这么大……感觉会激烈得让人吃不消呢……”
+              <</language>>
+          <</switch>>
+        <<case $NPCList[_nn].penis isnot 'none'>>
+          <<switch true>>
+            <<case _tsukihanDom gte 70>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan stares at your massive size, biting <<his>> lip with a glint of challenge. "Such an imposing sight... but I am going to make you shudder all the same."
+                <<option 'CN'>>
+                  月羽盯着你硕大的肉刃，咬着嘴唇，眼里带着挑战的光彩。“真是惊人的尺寸……但我照样能让你舒服得浑身发抖。”
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan's eyes widen in awe. "You are so much bigger than me... I will do my best to please you."
+                <<option 'CN'>>
+                  月羽崇敬地睁大眼睛。“你比我大好多……我会尽全力让你舒服的。”
+              <</language>>
+          <</switch>>
+        <<default>>
+          <<switch true>>
+            <<case _tsukihanDom gte 70>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan traces <<his>> hand along your thick length, gasping at the heat. "You hid something so greedy under your clothes? Lucky for you, I intend to swallow every single inch."
+                <<option 'CN'>>
+                  月羽的手抚过你粗硕的茎身，被滚烫的热度烫得倒吸一口气。“衣服底下藏着这么凶狠的家伙？算你走运，我打算一寸不落地全吃下去。”
+              <</language>>
+            <<case _tsukihanDom lte 30>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan's face flushes crimson, trembling slightly as <<he>> gazes at your massive cock. "It's... so huge... can I really take all of that? Please... be very slow with me..."
+                <<option 'CN'>>
+                  月羽整张脸红得像熟透的果子，看着你那庞大的物事微微发抖。“这、这也太大了……我真的容得下吗？请……请一定慢一点……”
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan swallows softly, looking at your impressive size with breathless awe. "It looks so intimidating... but I want to feel every bit of you inside me."
+                <<option 'CN'>>
+                  月羽轻轻咽了口唾沫，带着敬畏与动情凝视着你。“看着真叫人害怕……但我又想让你整个都进到我身体里。”
+              <</language>>
+          <</switch>>
+      <</switch>>
+
+    <<case $speechPenisSmall is 1 or $speechpenissmall is 1 or ($player.penisExist and _playerSize lte 1 and random(1, 3) is 1)>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan cradles your cute length in <<his>> palm, smiling with tender amusement. "Such an adorable little thing. Don't hide it—I can bring you to bliss with just one hand."
+            <<option 'CN'>>
+              月羽把小巧可爱的物事托在手心里，露出宠溺又促狭的微笑。“这么小巧玲珑的一根。别躲呀——我一只手就能把你弄得舒服到哭出来。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan gently caresses your small cock, kissing your chest softly. "It is so sweet and warm... fits so gently in my embrace. I cherish it dearly."
+            <<option 'CN'>>
+              月羽极其温柔地抚摸着你小巧的茎体，轻吻着你的胸口。“又小巧又温热……在怀里刚好合适。我最喜欢了。”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan smiles warmly, stroking your sensitive tip. "Size doesn't matter between us. It feels so precious and warm to touch."
+            <<option 'CN'>>
+              月羽温和地笑笑，轻触着敏感的顶端。“在彼此面前不用在意这些。握在手里这么温存可爱，我很喜欢。”
+          <</language>>
+      <</switch>>
+
+    <!-- 4. NPC月羽肉棒尺寸差分 -->
+    <<case $NPCList[_nn].penis isnot 'none' and ($NPCList[_nn].penis is 'vagina' or $NPCList[_nn].penis is 'anus') and random(1, 3) is 1>>
+      <<switch true>>
+        <<case _npcSize gte 3>>
+          <<switch true>>
+            <<case _tsukihanDom gte 70>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan pushes <<his>> massive shaft deep, panting forcefully. "Can you feel how full I make you? Every corner of you is stretching around me."
+                <<option 'CN'>>
+                  月羽将粗壮硕大的肉刃深深顶入，粗重地喘息着。“感受到被我填得有多满了吗？你的里面每一寸都在顺着我的形状扩张呢。”
+              <</language>>
+            <<case _tsukihanDom lte 30>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan worries over your expression as <<he>> thrusts carefully. "I know I am on the larger side... does it hurt? Tell me if I am stretching you too much..."
+                <<option 'CN'>>
+                  月羽小心翼翼地抽送着，担忧地观察你的神色。“我知道自己尺寸偏大……会涨得难受吗？要是撑得太紧，一定告诉我……”
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan buries <<his>> large cock to the base, gasping at the tight heat. "You take my full size so well... it feels like heaven."
+                <<option 'CN'>>
+                  月羽将粗长挺直的物事顶至深处，被滚烫紧致的吸附感逼得低吟。“能把你填得这么充实……真的太舒服了。”
+              <</language>>
+          <</switch>>
+        <<case _npcSize lte 1>>
+          <<switch true>>
+            <<case _tsukihanDom gte 70>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan works <<his>> small, agile cock right against your most sensitive spot. "I may not be huge, but I know precisely where to strike to make you scream."
+                <<option 'CN'>>
+                  月羽虽然尺寸小巧，却精准刁钻地碾过你最敏感的凸起。“个头大不大无所谓，只要知道顶在哪里能让你叫出声就行了。”
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan sighs with relief as <<he>> enters smoothly. "It fits so seamlessly inside you... nice and warm."
+                <<option 'CN'>>
+                  月羽顺畅地贴合进去，发出一声安心的叹息。“吻合得刚刚好……好温热。”
+              <</language>>
+          <</switch>>
+      <</switch>>
+
+    <!-- 5. 结合与贯穿差分 -->
+    <<case $speechNPCVaginaPenetrated is 1 or $speechNPCAnusPenetrated is 1 or $speechpenispenetrated is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "You are all the way inside me now," Tsukihan murmurs, hips rolling rhythmically. "Don't even think of pulling out."
+            <<option 'CN'>>
+              “现在你整根都在我里面了，”月羽腰肢有节奏地起伏着低语。“想抽出去？门都没有。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "Ah... you are inside... it feels so hot and tight..." Tsukihan gasps, clinging to your neck.
+            <<option 'CN'>>
+              “啊……你进来了……又热又满……”月羽攀着你的脖子微弱地喘息。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "Having you inside me... makes my entire body shiver with warmth," Tsukihan sighs lovingly.
+            <<option 'CN'>>
+              “能让你进到这里来……整副身子都被融化了一样舒畅，”月羽动情地叹息。
+          <</language>>
+      <</switch>>
+
+    <<case $speechVaginaPenetrated is 1 or $speechAnusPenetrated is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "I am all the way inside you now," Tsukihan whispers passionately, pressing <<his>> weight down. "Hold on tight."
+            <<option 'CN'>>
+              “我已经整根进到你里面了，”月羽沉重地覆下身子，急促地低语。“抱紧我。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "I am inside... does it feel all right? Please tell me if I should slow down..." Tsukihan breathes anxiously.
+            <<option 'CN'>>
+              “我进来了……感觉还可以吗？要慢一点的话，一定告诉我……”月羽小心地喘息着问。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "Being inside you like this... it feels warmer than any hearth in winter," Tsukihan sighs lovingly.
+            <<option 'CN'>>
+              “像这样真正与你相连……比冬日里的火炉还要暖和，”月羽动情地叹息。
+          <</language>>
+      <</switch>>
+
+    <!-- 6. 绝顶与多次绝顶计数差分（必须由玩家高潮标志触发，避免每回合反复循环） -->
+    <<case $speechPlayerOrgasm is 1 or $speechcum is 1>>
+      <<switch $speechorgasmcount>>
+        <<case 1>>
+          <<switch true>>
+            <<case _tsukihanDom gte 70>>
+              <<language>>
+                <<option 'EN'>>
+                  "Look at how beautifully you fell apart for me," Tsukihan purrs, admiring your trembling frame. "Such sweet surrender."
+                <<option 'CN'>>
+                  “瞧瞧你为我沉沦成什么样子了，”月羽带着满足的呢喃，欣赏着你不住发颤的身躯。“真让人着迷。”
+              <</language>>
+            <<case _tsukihanDom lte 30>>
+              <<language>>
+                <<option 'EN'>>
+                  "You came! Ah, you look so lovely like this... let me hold you."
+                <<option 'CN'>>
+                  “到了吗！啊，你现在看起来好动人……快让我抱着你。”
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  "Rest now," Tsukihan whispers soothingly. "You were wonderful."
+                <<option 'CN'>>
+                  “好好歇一歇吧，”月羽温存地吻着你。“你刚才真的太美了。”
+              <</language>>
+          <</switch>>
+        <<case 2>>
+          <<switch true>>
+            <<case _tsukihanDom gte 70>>
+              <<language>>
+                <<option 'EN'>>
+                  "Reaching climax again so quickly?" Tsukihan chuckles wickedly. "You really are insatiable for my touch."
+                <<option 'CN'>>
+                  “这么快又去了一次？”月羽坏心眼地轻笑。“对我身上就这么欲罢不能啊。”
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  "Another one already?" Tsukihan asks softly, stroking your damp hair. "You are so wonderfully sensitive today."
+                <<option 'CN'>>
+                  “又到了一次吗？”月羽轻柔地顺着你微湿的发丝。“今天你真的格外敏感动人呢。”
+              <</language>>
+          <</switch>>
+        <<case 3>>
+          <<language>>
+            <<option 'EN'>>
+              "Three times now," Tsukihan whispers passionately, kissing your tears away. "Let your body go completely. I have got you."
+            <<option 'CN'>>
+              “这都第三回了，”月羽吻去你眼角的泪珠低语。“彻底放松下来吧，有我抱着你呢。”
+          <</language>>
+        <<default>>
+          <<switch true>>
+            <<case _tsukihanDom gte 70>>
+              <<language>>
+                <<option 'EN'>>
+                  "Look at you, melting into a helpless puddle," Tsukihan smiles with pride. "You belong wholly to this shrine now."
+                <<option 'CN'>>
+                  “瞧你，都软成一滩春水了，”月羽神采奕奕地笑着。“现在你整个人都归我这间神社所有了。”
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  "You have given me so much of yourself..." Tsukihan murmurs in reverence, holding you tight against <<his>> chest.
+                <<option 'CN'>>
+                  “你把所有的温存都毫无保留地交给我了……”月羽心怀感激地将你紧紧按在胸前。
+              <</language>>
+          <</switch>>
+      <</switch>>
+
+    <!-- 7. 挑逗与暴露 -->
+    <<case $speechVaginaFlaunt is 1 or $speechExposeGenitals is 1 or $speechExposeBreasts is 1 or $speechpenisflaunt is 1 or $speechvaginaflaunt is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Flaunting yourself so openly?" Tsukihan smirks. "You won't have to wait long before I take full advantage."
+            <<option 'CN'>>
+              “当着我的面这么大胆地卖弄？”月羽勾唇轻笑。“放心，我马上就会让你得偿所愿。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "Showing that to me...?" Tsukihan turns bright pink, unable to look away. "You look so enticing..."
+            <<option 'CN'>>
+              “特意展示给我看……？”月羽脸颊红透，目光却移不开半分。“真的……好迷人……”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "Baring yourself so candidly," Tsukihan smiles with quiet affection. "You look beautiful."
+            <<option 'CN'>>
+              “毫无防备地展现给我看，”月羽露出温柔的笑意。“真美。”
+          <</language>>
+      <</switch>>
+
+    <!-- 8. 玩家语言动作响应 -->
+    <<case $speechChokedWheeze is 1 or $speechwheeze is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Out of breath already?" Tsukihan teases, leaning close to your lips. "And here I was hoping you could keep up with me."
+            <<option 'CN'>>
+              “这就喘不上气了？”月羽戏谑地凑近你的唇角。“我还指望你能多陪我折腾一会儿呢。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "Are you okay? Do you need a pause?" Tsukihan asks anxiously, stroking your chest. "We don't have to hurry..."
+            <<option 'CN'>>
+              “你还好吗？要歇一歇吗？”月羽担忧地抚着你的胸口。“我们不用着急的……”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "Breathe with me," Tsukihan murmurs gently. "Take your time. I am right here."
+            <<option 'CN'>>
+              “跟着我一起呼吸，”月羽温声低语。“慢慢来，我就在你身边。”
+          <</language>>
+      <</switch>>
+
+    <<case $speechApologise is 1 or $speechapologise is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Apologising?" Tsukihan smirks. "Save your apologies. You can make it up to me later."
+            <<option 'CN'>>
+              “道歉？”月羽轻笑一声。“省省吧。待会儿用别的方式好好补偿我就是。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "No, please don't apologise!" Tsukihan shakes <<his>> head. "You haven't done anything wrong at all."
+            <<option 'CN'>>
+              “不，快别道歉！”月羽连忙摇头。“你根本没有做错任何事呀。”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "You don't need to say sorry," Tsukihan whispers, kissing your nose. "Not to me."
+            <<option 'CN'>>
+              “我们之间不需要说对不起，”月羽亲了亲你的鼻尖轻声说。“不用跟我客气。”
+          <</language>>
+      <</switch>>
+
+    <<case $speechApologiseRejected is 1 or $speechApologiseUnforgiving is 1 or $speechapologiseno is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Still defying me?" Tsukihan nips playfully at your collarbone. "I will have to make you yield."
+            <<option 'CN'>>
+              “嘴还这么硬？”月羽带着玩味轻轻咬了咬你的锁骨。“看来得让你彻底服软才行。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan blushes and looks away. "That is fine... as long as you are happy with me."
+            <<option 'CN'>>
+              月羽红着脸挪开目光。“没关系的……只要你和我在一起开心就好。”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan gives you a wry, fond smile. "You never change, do you?"
+            <<option 'CN'>>
+              月羽无奈又宠溺地笑笑。“你这张嘴，真是一点亏都不肯吃。”
+          <</language>>
+      <</switch>>
+
+    <<case $speechAskRough is 1 or $speechaskrough is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Rougher?" Tsukihan's eyes darken with lust. "You asked for this. Don't complain tomorrow if your hips ache."
+            <<option 'CN'>>
+              “粗暴点？”月羽的眼眸因情欲而深邃。“这可是你自己求的。明天要是腰酸得起不来，可别怨我。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "Rougher...? But I... I would hate to hurt you..." Tsukihan stammers, clutching you hesitantly.
+            <<option 'CN'>>
+              “粗暴点……？可我……我怕弄疼你……”月羽有些无措地喃喃着，犹豫着不敢用力。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "If you really want that..." Tsukihan braces <<himself>>, increasing <<his>> rhythm. "Tell me if it becomes too much."
+            <<option 'CN'>>
+              “如果你真想这样的话……”月羽稳了稳气息，加重了手上的力道与节奏。“要是吃不消，随时叫停。”
+          <</language>>
+      <</switch>>
+
+    <<case $speechaskgently is 1 or ($mouthaction is 'ask' and ['novaginal', 'noanal', 'nopenile', 'finish', 'askPullOut'].includes($askAction))>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Slow down? Very well... only because you asked so sweetly."
+            <<option 'CN'>>
+              “慢一点？好吧好吧……看在你求得这么惹人怜爱的份上。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "Of course! Tell me if anything hurts, I will be as gentle as a feather."
+            <<option 'CN'>>
+              “当然！要是哪儿不舒服一定告诉我，我会像羽毛一样轻的。”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "Like this? Slow and steady. We have all the afternoon."
+            <<option 'CN'>>
+              “这样好吗？慢慢来，整个下午都是我们的。”
+          <</language>>
+      <</switch>>
+
+    <<case $speechDemand is 1 or $speechdemand is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Demanding things of me in my own shrine?" Tsukihan chuckles softly. "You have nerve... but I happen to like it."
+            <<option 'CN'>>
+              “在我的神社里反客为主来命令我？”月羽低低地笑了笑。“胆子真不小……不过我正喜欢你这样。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "Yes! Anything you want, I will try my best!" Tsukihan nods obediently.
+            <<option 'CN'>>
+              “好的！只要是你想让我做的，我都会尽力的！”月羽乖巧地点了点头。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "So demanding today?" Tsukihan smiles tenderly. "As you wish."
+            <<option 'CN'>>
+              “今天这么霸道？”月羽温和地笑笑。“就依你的心意吧。”
+          <</language>>
+      <</switch>>
+
+    <<case $speechPlead is 1 or $speechplead is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Hearing you beg like that makes my heart pound... maybe I should make you plead a little more."
+            <<option 'CN'>>
+              “听你这么软声求我，心跳得好快……真想让你再多求我几声。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "Please don't look at me with those eyes... I could never refuse you anything."
+            <<option 'CN'>>
+              “别用那样的眼神看着我……你想要什么，我都绝不会拒绝你的。”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "No need to beg, my love," Tsukihan murmurs, embracing you fully. "I am already completely yours."
+            <<option 'CN'>>
+              “不用求我，傻瓜，”月羽轻柔地环抱住你。“我整个人早就是你的了。”
+          <</language>>
+      <</switch>>
+
+    <<case $speechMoan is 1 or $speechmoan is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Make that sound again," Tsukihan whispers passionately. "I want every raven in the forest to know you are mine."
+            <<option 'CN'>>
+              “再叫一声，”月羽动情地耳语。“我想让整座森林的渡鸦都知道，你现在属于我。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "Does it feel that good?" Tsukihan blushes furiously, delighted by your pleasure.
+            <<option 'CN'>>
+              “感觉有这么舒服吗？”月羽满脸通红，因你的愉悦而雀跃不已。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan lets out a tremulous moan in response, pressing closer to you.
+            <<option 'CN'>>
+              月羽也忍不住随着你的声音发出一声温热的低吟，贴得更紧了些。
+          <</language>>
+      <</switch>>
+
+    <<case $speechNoticeSexToy is 1 or $speechSexToyState is 1 or $speechsextoy is 1>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Bringing worldly toys into a sacred hall?" Tsukihan smirks. "Let us see what kind of sounds it pulls out of you."
+            <<option 'CN'>>
+              “把这种凡尘的玩物带进清净社殿？”月羽挑眉轻笑。“那就让我看看，它能让你叫成什么样。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "I-in the shrine...?" Tsukihan stammers, flushed pink. "If... if it is what pleases you, I don't mind."
+            <<option 'CN'>>
+              “在、在神社里……？”月羽脸颊泛粉，局促地绞着衣角。“但……如果是你想用的话，我不介意的。”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "Quite prepared, aren't you?" Tsukihan smiles. "Show me how it works."
+            <<option 'CN'>>
+              “准备得倒挺充分？”月羽微笑着说。“教教我这该怎么用吧。”
+          <</language>>
+      <</switch>>
+
+    <<case $speechCrossdressAroused is 1 or $speechcrossdressaroused is 1>>
+      <<language>>
+        <<option 'EN'>>
+          "No matter what you wear, your essence is pure and captivating."
+        <<option 'CN'>>
+          “无论你着何种衣裳，于我而言都是那样纯粹而动人。”
+      <</language>>
+
+    <<case $speechHermAroused is 1 or $speechhermaroused is 1>>
+      <<language>>
+        <<option 'EN'>>
+          "To hold both blessings... you are truly wondrous in every way."
+        <<option 'CN'>>
+          “兼备两种身姿……你处处都像神明赐下的奇迹一样不可思议。”
+      <</language>>
+
+    <!-- 9. 随情欲与任性分化的常态娇吟与互动 -->
+    <<case $enemyarousal gte ($enemyarousalmax * 0.7)>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan's breathing grows ragged and forceful. "I am losing control... you had better hold onto me tight!"
+            <<option 'CN'>>
+              月羽的呼吸变得粗重而炽热。“我已经快要克制不住了……你最好抓紧我！”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan trembles all over, eyes glossy with overwhelming pleasure. "Ah... it feels like I am burning up inside... hold me..."
+            <<option 'CN'>>
+              月羽浑身轻颤，眼眸里泛着被快感浸透的水光。“啊……整个人都快要化掉了……抱抱我……”
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan gasps against your neck, hips moving with frantic desire. "Almost... ah, you make me forget everything else..."
+            <<option 'CN'>>
+              月羽贴在你颈间急促地抽吸着，动作带着难耐的渴求。“快了……啊，你真让我把一切都忘光了……”
+          <</language>>
+      <</switch>>
+
+    <<case $enemyarousal gte ($enemyarousalmax * 0.35)>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "Don't stop touching me there," Tsukihan orders with a breathless smile. "I know you want this as much as I do."
+            <<option 'CN'>>
+              “别停下，继续碰我那里，”月羽气息不均却依然强势地笑着。“我知道你跟我一样渴求这个。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "It feels so warm... every touch sends tingles down my spine..." Tsukihan murmurs shyly.
+            <<option 'CN'>>
+              “身上好烫……你的每一次碰触，都让我脊背发麻……”月羽羞怯地轻喃。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "Your skin feels wonderful against mine," Tsukihan sighs contentedly. "Stay close."
+            <<option 'CN'>>
+              “你的肌肤贴着真舒服，”月羽发出一声满足的叹息。“再贴紧一些。”
+          <</language>>
+      <</switch>>
+
+    <<default>>
+      <<switch true>>
+        <<case _tsukihanDom gte 70>>
+          <<language>>
+            <<option 'EN'>>
+              "You started this fire," Tsukihan whispers with an amused gleam in <<his>> eyes. "Now satisfy me."
+            <<option 'CN'>>
+              “火是你挑起来的，”月羽眼中闪着戏谑的光彩。“现在，好好让我满意吧。”
+          <</language>>
+        <<case _tsukihanDom lte 30>>
+          <<language>>
+            <<option 'EN'>>
+              "Tell me if I am too heavy, or if anything feels wrong..." Tsukihan whispers gently.
+            <<option 'CN'>>
+              “要是我压着你沉了，或者哪儿不适，一定要告诉我……”月羽轻声细语地关切着。
+          <</language>>
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              "The courtyard is so quiet today," Tsukihan murmurs, kissing your cheek. "Only the two of us exist here."
+            <<option 'CN'>>
+              “今天外面的院子真安静，”月羽亲了亲你的脸颊。“现在这里只剩下我们两个人了。”
+          <</language>>
+      <</switch>>
+  <</switch>>
+<</widget>>
+
+:: Widgets Ejaculation-TSUKIHAN [widget]
+<<widget 'ejaculation-tsukihan'>>
+  <<set $ejaculating to 1>>
+  <<set _nn to _nn ?? 0>>
+  <<set _tsukihanDom to C.npc.Tsukihan.dom>>
+  <<set _tsukihanLust to C.npc.Tsukihan.lust || 0>>
+  <<set _playerSize to $player.penissize ?? 2>>
+  <<set _npcSize to $NPCList[_nn].penissize ?? 2>>
+
+  <!-- 女性月羽射精与绝顶 -->
+  <<if $NPCList[_nn].vagina isnot 'none' and $NPCList[_nn].penis is 'none'>>
+    <<switch $NPCList[_nn].vagina>>
+      <<case 'mouthentrance' 'mouth' 'mouthimminent'>>
+        <<switch true>>
+          <<case _tsukihanDom gte 70>>
+            <<language>>
+              <<option 'EN'>>
+                Tsukihan gasps loudly, pressing <<his>> hips down hard against your face as <<his>> orgasm crests, slender thighs quivering violently against your cheeks.
+              <<option 'CN'>>
+                月羽短促地惊呼出声，随着高潮的浪潮猛地将腰腹压向你的脸，修长的大腿在你脸颊两侧剧烈地颤抖。
+            <</language>>
+          <<case _tsukihanDom lte 30>>
+            <<language>>
+              <<option 'EN'>>
+                Tsukihan bites <<his>> sleeve to stifle <<his>> whimpers, tears leaking from <<his>> closed eyes as wave after wave of pleasure shakes <<his>> body over your mouth.
+              <<option 'CN'>>
+                月羽死死咬住衣袖试图咽下呻吟，双眼紧闭沁出泪珠，身体在你唇齿上方不住地颤栗抽搐。
+            <</language>>
+          <<default>>
+            <<language>>
+              <<option 'EN'>>
+                Tsukihan arches <<his>> back with a muffled cry, hands clutching your hair as <<he>> cums, sweet juices flowing against your lips.
+              <<option 'CN'>>
+                月羽仰起身子发出一声低哑的娇吟，双手扣住你的头发，温热的蜜液在你唇间肆意流淌。
+            <</language>>
+        <</switch>>
+
+      <<case 'leftarm' 'rightarm'>>
+        <<set _arm to $NPCList[_nn].vagina is 'leftarm' ? 'leftarm' : 'rightarm'>>
+        <<handejacstat>><<ejacstat>><<set $hygiene += 500>><<bodyliquid _arm 'goo'>>
+        <<language>>
+          <<option 'EN'>>
+            Tsukihan shudders and cries out as your fingers bring <<him>> over the edge, clamping <<his>> trembling thighs around your arm as <<his>> intimate fluids coat your hand.
+          <<option 'CN'>>
+            月羽在你的指尖下剧烈颤抖着惊叫出声，颤抖的大腿紧紧夹住你的手臂，溢出的爱液将你的手掌完全浸透。
+        <</language>>
+
+      <<case 'lefthand' 'righthand'>>
+        <<language>>
+          <<option 'EN'>>
+            Tsukihan groans softly, pressing <<his>> own wet fingers against you as <<he>> convulses with pleasure.
+          <<option 'CN'>>
+            月羽低低呻吟着，将自己湿漉漉的指尖贴在你身侧，身子在快感中一阵阵发颤。
+        <</language>>
+
+      <<case 'penis'>>
+        <<ejacstat>><<set $hygiene += 500>><<bodyliquid 'penis' 'goo'>><<thighejacstat>>
+        <<switch true>>
+          <<case _playerSize gte 4>>
+            <<switch true>>
+              <<case _tsukihanDom gte 70>>
+                <<language>>
+                  <<option 'EN'>>
+                    Tsukihan grips your shoulders fiercely as <<his>> inner walls clamp tightly around your massive, throbbing shaft. <<He>> bucks down with wild abandon, crying out as waves of slick nectar soak your generous length and thighs. "You filled me to the brim... I can feel every inch of you stretching me!"
+                  <<option 'CN'>>
+                    月羽紧紧扣住你的双肩，内壁因高潮极力收缩，紧紧绞裹住你那硕大粗长、不住跳动的肉刃。<<He>>彻底放下平日的矜持，疯狂地向下套弄着，滚烫的爱液将你的整个肉茎与腿根尽数浸湿。“被你填得好满……里面每一寸都被你撑开了！”
+                <</language>>
+              <<default>>
+                <<language>>
+                  <<option 'EN'>>
+                    Overwhelmed by your massive size, Tsukihan cries your name through tears of bliss, <<his>> cunt spasming around your thick shaft as hot liquid floods over your lap.
+                  <<option 'CN'>>
+                    被你庞大的尺寸彻底填满，月羽在极致的快感中含泪呼喊着你的名字，内壁在你粗硕的肉刃周围剧烈痉挛，温热的潮吹蜜水喷涌而出，将你的小腹彻底打湿。
+                <</language>>
+            <</switch>>
+          <<case _playerSize lte 1>>
+            <<switch true>>
+              <<case _tsukihanDom gte 70>>
+                <<language>>
+                  <<option 'EN'>>
+                    Tsukihan bears down delightfully over your sweet length, smiling as <<his>> rhythmic spasms squeeze every sensitive nerve along your cock, soaking your lap in warm juices.
+                  <<option 'CN'>>
+                    月羽欢悦地沉下身子，紧密地将你小巧的肉茎包裹在温暖湿热的深处，在连绵的高潮抽搐中榨取着你的敏感，温热的体液浸湿了你的腿部。
+                <</language>>
+              <<default>>
+                <<language>>
+                  <<option 'EN'>>
+                    Tsukihan sighs tenderly, trembling in orgasmic release as <<his>> inner folds cling lovingly around your small, warm shaft.
+                  <<option 'CN'>>
+                    月羽发出柔情似水的叹息，身子在绝顶的快感中不住发颤，温热柔滑的内褶依依不舍地紧贴着你小巧而温热的茎体。
+                <</language>>
+            <</switch>>
+          <<default>>
+            <<switch true>>
+              <<case _tsukihanDom gte 70>>
+                <<language>>
+                  <<option 'EN'>>
+                    Tsukihan bears down forcefully onto your <<penis>>, rocking furiously as <<his>> climax hits, soaking your crotch with hot fluids while panting fiercely in your ear.
+                  <<option 'CN'>>
+                    月羽狠狠压紧在你的<<penis>>上，在极度的高潮中剧烈摇晃着腰肢，滚烫的爱液将你的腿根尽数浸湿，在你耳畔急促地喘息。
+                <</language>>
+              <<case _tsukihanDom lte 30>>
+                <<language>>
+                  <<option 'EN'>>
+                    Tsukihan clings to you for dear life, crying your name as <<his>> walls spasm intensely around your cock, shaking with unrestrained ecstasy.
+                  <<option 'CN'>>
+                    月羽死死攀住你的肩颈，呼喊着你的名字，内壁在你的肉刃周围剧烈痉挛抽搐，整个人沉浸在无法自抑的狂乱快感中。
+                <</language>>
+              <<default>>
+                <<language>>
+                  <<option 'EN'>>
+                    Tsukihan gasps and shivers against you, riding out the powerful waves of orgasm as <<his>> wetness drenches your lap.
+                  <<option 'CN'>>
+                    月羽紧贴着你轻颤娇吟，随着高潮的阵阵余波慢慢平复，温热的潮水湿透了你的大腿。
+                <</language>>
+            <</switch>>
+        <</switch>>
+
+      <<case 'frot'>>
+        <<ejacstat>><<set $hygiene += 500>><<bodyliquid 'penis' 'goo'>>
+        <<language>>
+          <<option 'EN'>>
+            Tsukihan rubs <<his>> clit feverishly against your shaft, crying out as <<he>> cums in a hot rush of slickness over your groin.
+          <<option 'CN'>>
+            月羽狂乱地用私处摩挲着你的根部，在高潮的呼喊中将温热黏滑的爱液喷洒在你的小腹与大腿上。
+        <</language>>
+
+      <<default>>
+        <<switch $NPCList[_nn].mouth>>
+          <<case 'penis'>>
+            <<switch true>>
+              <<case _playerSize gte 4>>
+                <<language>>
+                  <<option 'EN'>>
+                    Tsukihan tears up as <<he>> cums around your massive <<penis>>, <<his>> throat stretching to accommodate your generous length before letting out a breathless moan of sheer bliss.
+                  <<option 'CN'>>
+                    月羽含着你粗硕庞大的<<penis>>高潮了，深喉被你夸张的尺寸撑得微痛发酸，眼角沁出感动的泪花，退开时发出了一声舒坦到极致的微吟。
+                <</language>>
+              <<default>>
+                <<language>>
+                  <<option 'EN'>>
+                    Tsukihan moans around your <<penis>> as orgasm ripples through <<his>> body, <<his>> throat gently tightening around you before pulling away with a flushed, starry-eyed smile.
+                  <<option 'CN'>>
+                    月羽含着你的<<penis>>发出闷哼，快感的波纹掠过<<his>>全身，喉口因绝顶而微微收紧，退开时眼里满是朦胧的星芒与满足。
+                <</language>>
+            <</switch>>
+          <<default>>
+            <<language>>
+              <<option 'EN'>>
+                Tsukihan arches <<his>> back and shudders through a deep, trembling climax, gasping your name against your skin.
+              <<option 'CN'>>
+                月羽弓起脊背，在深切的颤栗中迎来了极致的高潮，伏在你颈窝急促地唤着你的名字。
+            <</language>>
+        <</switch>>
+    <</switch>>
+    <br><br>
+  <</if>>
+
+  <!-- 男性与双性月羽射精 -->
+  <<if $NPCList[_nn].penis isnot 'none'>>
+    <<switch _condomResult>>
+      <<case 'leaked'>>
+        <span class="red"><<lanSwitch 'The condom broke!' '避孕套破了！'>></span><br>
+      <<case 'burst'>>
+        <span class="red"><<lanSwitch 'The tip of the condom bursts, exposing the flushed head of <<his>> penis!' '避孕套的前端破裂，露出了<<his>>充血泛红的阴茎前端！'>></span><br>
+    <</switch>>
+
+    <<if _condomResult is 'contained'>>
+      <<genericCondomEjaculation>>
+
+    <<elseif npcHasStrapon(_nn)>>
+      <<language>>
+        <<option 'EN'>>
+          Tsukihan shivers in pleasure, rubbing the harness against <<his>> groin as <<he>> reaches a breathless climax.
+        <<option 'CN'>>
+          月羽因快感而战栗，安全带摩挲着<<his>>的敏感处，让<<him>>在急促的喘息中迎来了高潮。
+      <</language>>
+
+    <<else>>
+      <<switch $NPCList[_nn].penis>>
+        <<case 'vagina'>>
+          <<vaginalejacstat>><<ejacstat>><<set $hygiene += 500>><<bodyliquid 'vagina' 'semen'>>
+          <<switch true>>
+            <<case _npcSize gte 3>>
+              <<switch true>>
+                <<case _tsukihanDom gte 70>>
+                  <<language>>
+                    <<option 'EN'>>
+                      Tsukihan pins you down with primal intensity, burying <<his>> thick, swollen cock deep into your cervix as <<he>> erupts. Prodigious waves of thick semen pump relentlessly into your womb, overfilling you until warm white liquid oozes past your lips and runs down your thighs. "You are completely full of me now... remember this feeling every time you walk."
+                    <<option 'CN'>>
+                      月羽带着不容抗拒的霸道将你死死按在草席上，将又粗又胀的硕大肉茎彻底顶进你的宫颈深处，凶狠地喷发出来。海量滚烫浓稠的精液如江海倒灌般源源不绝地注入你的子宫，将你娇嫩的生殖腔填得满满当当，甚至溢出阴唇，顺着你的大腿根汩汩流下。“现在你完完全全被我灌满了……以后每次走路，都要记住这个感觉。”
+                  <</language>>
+                <<default>>
+                  <<language>>
+                    <<option 'EN'>>
+                      Tsukihan groans into your neck as <<his>> large cock pulses uncontrollably, pumping an overwhelming volume of thick semen deep into your womb. You feel pleasantly stuffed to the brim as <<he>> holds you in a tight, trembling embrace.
+                    <<option 'CN'>>
+                      月羽贴在你的颈边难耐地低哼，粗大的肉茎在你的子宫深处失控地剧烈搏动，射出超乎想象的海量浓精。整只小腹都被<<his>>的热液填塞得饱胀发烫，<<he>>浑身发抖地将你紧紧按在怀里。
+                  <</language>>
+              <</switch>>
+            <<case _npcSize lte 1>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan gasps with pure joy, thrusting <<his>> small, delicate cock into your depths and releasing warm, gentle pulses of semen that coat your innermost walls.
+                <<option 'CN'>>
+                  月羽发出纯真的喜悦娇喘，将小巧柔和的肉茎稳稳送入最深处，射出一阵阵温热细腻的白浊，将你内壁层层浸润。
+              <</language>>
+            <<default>>
+              <<switch true>>
+                <<case _tsukihanDom gte 70>>
+                  <<language>>
+                    <<option 'EN'>>
+                      Tsukihan groans deeply and thrusts all the way in to the hilt, burying <<his>> cock deep inside your <<pussy>> as <<he>> erupts. Hot ropes of seed pump into your womb, filling you completely. "You are completely mine now... hold every single drop."
+                    <<option 'CN'>>
+                      月羽发出粗重的低吼，一挺到底，将整根坚挺深深埋入你的<<pussy>>最深处，肆意喷发。滚烫的浓精阵阵灌入你的子宫，将你填得满满当当。“现在你完完全全是我的了……一滴都不准漏出来。”
+                  <</language>>
+                <<case _tsukihanDom lte 30>>
+                  <<language>>
+                    <<option 'EN'>>
+                      Tsukihan gasps into your shoulder, trembling as <<he>> empties <<himself>> into your <<pussy>>. Waves of warm semen pulse inside you. "Ah... it is so warm... please forgive me, I couldn't stop myself..."
+                    <<option 'CN'>>
+                      月羽埋首在你的肩头轻喘着，身体不住战栗，将温热的精液全数倾泻进你的<<pussy>>深处。“啊……里面好温暖……原谅我，我实在忍不住了……”
+                  <</language>>
+                <<default>>
+                  <<language>>
+                    <<option 'EN'>>
+                      Tsukihan holds you tightly against <<his>> hips as <<he>> ejaculates, sending thick pulses of semen deep inside your vagina, sighing with pure contentment.
+                    <<option 'CN'>>
+                      月羽紧紧把你按向<<his>>的胯下，在连绵不断的喷发中将滚烫的白浊灌入你的身体，满足地发出由衷的喟叹。
+                  <</language>>
+              <</switch>>
+          <</switch>>
+
+        <<case 'anus'>>
+          <<analejacstat>><<ejacstat>><<set $hygiene += 500>><<bodyliquid 'anus' 'semen'>>
+          <<switch true>>
+            <<case _npcSize gte 3>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan drives <<his>> massive length into your rectum with a guttural grunt, sending torrents of scorching cum pumping deep into your bowels until your belly bulges with warmth.
+                <<option 'CN'>>
+                  月羽发出沉闷的低吼，将硕大的肉刃深深钉入你的直肠深处，大量滚烫的浓稠精浆排山倒海般注入，直把你的腹部充填得微微鼓起，热流翻涌。
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan thrusts deep into your ass with a ragged gasp, pumping thick pulses of warm semen inside you until your belly feels pleasantly full.
+                <<option 'CN'>>
+                  月羽急促喘息着深深顶入你的后穴，滚烫浓稠的精液阵阵灌入你的肠道深处，带来饱胀的暖意。
+              <</language>>
+          <</switch>>
+
+        <<case 'vaginaentrance' 'vaginaimminent'>>
+          <<vaginalentranceejacstat>><<ejacstat>><<set $hygiene += 500>><<bodyliquid 'vaginaoutside' 'semen'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan groans and ejaculates across your labia, thick white strands coating your entrance and pooling down your thighs.
+            <<option 'CN'>>
+              月羽闷哼一声，浓白的精浆喷洒在你的阴唇与花瓣上，顺着腿根缓缓滑落。
+          <</language>>
+
+        <<case 'anusentrance' 'anusimminent'>>
+          <<bottomejacstat>><<ejacstat>><<set $hygiene += 500>><<bodyliquid 'bottom' 'semen'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan strokes <<his>> cock and shoots hot ropes of semen across your buttocks, warm fluid dripping down your crack.
+            <<option 'CN'>>
+              月羽抚弄着挺翘的肉茎，将滚烫的精液一股股喷射在你挺翘的臀丘与股沟间。
+          <</language>>
+
+        <<case 'mouth'>>
+          <<oralejacstat>><<ejacstat>><<cumswallow `$NPCList[_nn].type` null `npcSemenMod($NPCList[_nn].penissize)`>>
+          <<switch true>>
+            <<case _npcSize gte 3>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan thrusts <<his>> huge cock deep into your throat as <<he>> fires, unleashing a flood of warm semen. You swallow desperately, throat bulging as copious seed flows down your gullet without pause.
+                <<option 'CN'>>
+                  月羽将粗长硕大的肉刃死死按在你喉咙深处，如开闸般倾泻出巨量的滚烫精浆。你竭力吞咽着，喉结剧烈滑动，任由大量的白浊顺着食道汹涌滑入腹中。
+              <</language>>
+            <<default>>
+              <<language>>
+                <<option 'EN'>>
+                  Tsukihan holds the back of your head firmly yet tenderly, pulsing hot semen down your throat as you swallow <<his>> seed in sweet surrender.
+                <<option 'CN'>>
+                  月羽温柔却坚定地扶住你的后脑，将灼热的精露汩汩灌入你的喉中，任由你一口口温驯地吞咽下<<his>>的精华。
+              <</language>>
+          <</switch>>
+
+        <<case 'mouthentrance' 'mouthimminent'>>
+          <<faceejacstat>><<ejacstat>><<set $hygiene += 500>><<bodyliquid 'face' 'semen'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan groans as semen spurts across your cheeks and lips, glistening in the soft shrine light.
+            <<option 'CN'>>
+              月羽低喘着射出浓厚的精液，星星点点地飞溅在你泛红的脸颊与唇角上，在殿内的光线中分外晶莹。
+          <</language>>
+
+        <<case 'chest'>>
+          <<chestejacstat>><<ejacstat>><<set $hygiene += 500>><<bodyliquid 'chest' 'semen'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan thrusts between your <<breasts>>, releasing a thick stream of semen over your chest and collarbone with a shudder of bliss.
+            <<option 'CN'>>
+              月羽在你的<<breasts>>间不住抽送，伴随着快感的战栗，将滚烫的白浊尽数喷洒在你的胸口与锁骨上。
+          <</language>>
+
+        <<case 'thighs'>>
+          <<thighejacstat>><<ejacstat>><<set $hygiene += 500>><<bodyliquid 'thigh' 'semen'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan pumps between your thighs, coating your skin in warm, glistening ejaculate.
+            <<option 'CN'>>
+              月羽在你合拢的大腿间急促推进，温热晶亮的精液涂满了你滑腻的大腿内侧。
+          <</language>>
+
+        <<case 'feet'>>
+          <<feetejacstat>><<ejacstat>><<set $hygiene += 500>><<bodyliquid 'feet' 'semen'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan sighs as <<he>> cums over your feet, slickening your toes in warm semen.
+            <<option 'CN'>>
+              月羽在你的双足间叹息着释放出来，黏稠的白液沾满了你的脚趾与脚背。
+          <</language>>
+
+        <<case 'hands' 'leftarm' 'rightarm'>>
+          <<handejacstat>><<ejacstat>><<set $hygiene += 500>><<bodyliquid 'leftarm' 'semen'>><<bodyliquid 'rightarm' 'semen'>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan quivers as <<he>> erupts into your palms, filling your hands with thick, warm seed.
+            <<option 'CN'>>
+              月羽颤抖着在你掌心中喷发，滚烫浓稠的精液填满了你的掌心与指缝。
+          <</language>>
+
+        <<default>>
+          <<language>>
+            <<option 'EN'>>
+              Tsukihan groans as <<he>> ejaculates, white ropes flying through the air before settling on your skin.
+            <<option 'CN'>>
+              月羽沉沉呻吟着释放出压抑的情欲，白浊喷溅在空气中，落在你们温热的肌肤上。
+          <</language>>
+      <</switch>>
+    <</if>>
+    <br><br>
+  <</if>>
+<</widget>>

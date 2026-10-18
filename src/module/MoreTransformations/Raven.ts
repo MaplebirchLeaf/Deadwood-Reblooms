@@ -149,11 +149,13 @@ class Raven extends Transformation {
     return this.flock.met;
   }
 
-  /** 森林与老教堂墓地的日间鸟群，不打断追猎、昏厥或已排定的场景。 */
+  /** 日间鸟群共用每日互动次数，不打断追猎、昏厥或已排定的场景。 */
   public get available(): boolean {
     return (
-      ['forest', 'churchyard'].includes(V.location) &&
+      ['forest', 'churchyard', 'park', 'forest_raven_shrine'].includes(V.location) &&
       V.combat !== 1 &&
+      !V.replayScene &&
+      !V.statFreeze &&
       !V.possessed &&
       V.foresthunt < 1 &&
       V.stress < V.stressmax &&
@@ -169,7 +171,7 @@ class Raven extends Transformation {
   }
 
   public get searchChance(): number {
-    return V.location === 'churchyard' ? 100 : 75;
+    return V.location === 'forest' ? 75 : 100;
   }
 
   public get food(): string | undefined {
@@ -216,6 +218,7 @@ class Raven extends Transformation {
         V.foodstuff[food].amount--;
         gain = this.met ? 2 : 5;
         this.flock.fed = Math.floor(Time.days);
+        V.MoreTransformations.shrine.feeds = Math.min(3, V.MoreTransformations.shrine.feeds + 1);
         break;
       }
       case 'call':
@@ -234,7 +237,8 @@ class Raven extends Transformation {
         return false;
     }
     this.flock.met ||= action !== 'search' || gain > 0;
-    this.flock.origin = V.location === 'churchyard' ? 'Churchyard' : 'Forest';
+    const returns: Record<string, string> = { churchyard: 'Churchyard', park: 'Park', forest_raven_shrine: 'Deadwood Raven Shrine' };
+    this.flock.origin = returns[V.location] ?? 'Forest';
     this.flock.action = action;
     // 使用原版宏，使转化压制、时间事件和森林追猎计时继续正常结算。
     maplebirch.SugarCube.Wikifier.wikifyEval(`<<transform 'raven' ${gain}>><<pass ${minutes}>>${action === 'preen' ? '<<stress -3>>' : action === 'call' ? '<<tiredness 1>>' : ''}`);

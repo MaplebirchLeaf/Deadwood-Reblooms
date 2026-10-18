@@ -1,0 +1,158 @@
+:: Deadwood Raven Shrine Talk
+<<effects>><<deadwood-raven-shrine-presence>>
+<<if !_shrine or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine'>>
+  <<lanSwitch 'You are no longer at the shrine.' '你已经不在神社了。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<if !_shrinePerson>>
+  <<lanSwitch 'The veranda is empty. Tsukihan has other things to do; you can visit another time.' '廊下空着。月羽还有自己的事要忙，改天再来吧。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<set _shrineFirstMeeting to C.npc.Tsukihan.init isnot 1>>
+<<npc Tsukihan>><<person1>>
+<<if _shrineFirstMeeting>>
+  <<language>>
+    <<option 'EN'>>
+      You hand over Gwylan's reply. Tsukihan takes it with a small bow and reads it through before speaking.<br><br>
+      "Thank you. I will see to the rest." <<He>> folds it along the creases, keeping the edges even. A raven catches <<his>> sleeve in its beak. Tsukihan tugs the cloth free and smooths it down again.<br><br>
+      "The courtyard is open to visitors. You may rest on the veranda, if you wish. The living quarters are private." <<He>> puts the letter away, then notices that the bird has left a feather on <<his>> sleeve. <<He>> brushes it off a little too quickly.
+    <<option 'CN'>>
+      你把格威岚的回信交过去。月羽微微颔首接下，看完以后才开口。<br><br>
+      “多谢。余下的事，我来处理。”<<He>>沿原来的折痕收好信，仔细理齐纸边。一只渡鸦叼住了<<his>>的袖口。月羽把布抽回来，重新抚平。<br><br>
+      “庭院对来客开放。想歇脚的话，可以到廊下坐。屋舍是私人的，请留步。”<<He>>收起信，才发现袖子上还粘着根羽毛，抬手掸掉时稍微急了一点。
+  <</language>><br><br>
+<</if>>
+<<if _shrine.scene is 'talk'>>
+  <<switch _shrine.topic>>
+    <<case 'shrine'>>
+      <<language>>
+        <<option 'EN'>>
+          You ask who built the shrine. Tsukihan looks up at the red gate.
+          "Someone who missed home, I think. The oldest papers are mostly accounts and lists of names. No grand revelation, I'm afraid."<br><br>
+          <<He>> shows you a receipt for roof tiles. Someone has added a small bird in the margin.
+          "I learnt the rites from the last person who cared for this place. Before anything else, they taught me where to put the buckets when it rains."
+        <<option 'CN'>>
+          你问起神社是谁建的。月羽抬头看了看红门。
+          “大概是想家的人吧。留下来的旧纸，多是账目和人名。没找到什么惊天动地的秘密。”<br><br>
+          <<He>>给你看一张买瓦的收据，页角还画着只小鸟。
+          “祭仪是跟上一位照料这里的人学的。不过先学会的，是下雨时该把水桶放在哪儿。”
+      <</language>>
+    <<case 'birds'>>
+      <<language>>
+        <<option 'EN'>>
+          You ask whether Tsukihan can tell the ravens apart. "Most of them. That one's missing a claw. That one opens bags. And that one waits for the others to open bags."<br><br>
+          The last bird fluffs itself up. Tsukihan gives it a level look.
+          "Yes, you. I watched you do it." <<He>> turns back to you. "They remember people who feed them. They remember people who throw things, too. I wouldn't try that."
+        <<option 'CN'>>
+          你问月羽能不能分清这些渡鸦。“大多认得。那只少一枚爪子，那只会拆袋子。还有那只，专等别的鸟拆开袋子。”<br><br>
+          最后一只蓬起了毛。月羽看着它。
+          “就是你。我亲眼看见的。”<<He>>转回头，“它们会记住喂过自己的人，也记得拿东西砸过它们的人。后面这件事就别试了。”
+      <</language>>
+    <<case 'town'>>
+      <<language>>
+        <<option 'EN'>>
+          You tell Tsukihan about town. <<He>> listens while folding a shopping list into quarters.
+          "I go down when we need supplies. Usually I get as far as the shop and remember three things I forgot to write down."<br><br>
+          You notice biscuits at the bottom of the list. "For visitors," <<he>> says. Then, after a pause, "And me. They're rather good with tea."
+        <<option 'CN'>>
+          你说起镇上的事。月羽一边听，一边把采购单折成小小的一方。
+          “缺东西时会下山。往往刚到店里，就想起还有三样没写上去。”<br><br>
+          你瞥见单子最下面写着饼干。“给客人的。”<<he>>说，停了一下，又添上一句，“也给我自己。配茶挺好吃。”
+      <</language>>
+    <<case 'personal'>>
+      <<language>>
+        <<option 'EN'>>
+          <<if $speech_attitude is 'bratty'>>You glance at the tools and tease Tsukihan about spending even a quiet afternoon working.
+          <<elseif $speech_attitude is 'meek'>>You tentatively ask what Tsukihan likes doing when there is no work to finish.
+          <<else>>You ask what Tsukihan does with a quiet afternoon.<</if>><br><br>
+          "I mend things. I read. Sometimes I start mending something and spend an hour looking for the tool I put down." Tsukihan pauses.
+          <<if C.npc.Tsukihan.dom lt 30>>"Occasionally. The work does get done." <<He>> squares the cloth on <<his>> knee.
+          <<else>><<He>> smiles at you. "Now you know. I always think I will remember where it is."<</if>><br><br>
+          <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 20>>
+            <<if C.npc.Tsukihan.dom gte 70>>
+              <<He>> sets the cloth down. "Today, I want you to stay for a little while. Just because I have chores doesn’t mean I only want help with them."
+            <<elseif C.npc.Tsukihan.dom gte 30>>
+              "Lately I keep looking up whenever I hear footsteps." <<He>> meets your eyes briefly. "I suppose you know why."
+            <<else>>
+              "There are usually spare cushions." <<He>> straightens the one beside <<him>>. "If you happen to come by."
+            <</if>>
+          <<elseif C.npc.Tsukihan.dom gte 70>>
+            "Your turn. I can’t always be the one finding something to talk about." <<He>> turns the cloth over, then looks up again, waiting for you to begin.
+          <<else>>
+            "What about you?" <<He>> waits for your answer, hands folded neatly on the cloth.
+          <</if>>
+        <<option 'CN'>>
+          <<if $speech_attitude is 'bratty'>>你瞥了眼工具，打趣月羽，难得清闲下来也要找点活做。
+          <<elseif $speech_attitude is 'meek'>>你小心地问起月羽不忙时的消遣。
+          <<else>>你问月羽，清闲的下午一般怎么过。<</if>><br><br>
+          “补补东西，看看书。有时东西没补上，倒花了一个钟头找刚放下的工具。”话一出口，月羽就顿了顿。
+          <<if C.npc.Tsukihan.dom lt 30>>“只是偶尔。该做的事都有做完。”<<He>>把膝上的布叠得更整齐了些。
+          <<else>><<He>>朝你笑了笑。“倒让你听见了。我放东西时明明都记得。”<</if>><br><br>
+          <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 20>>
+            <<if C.npc.Tsukihan.dom gte 70>>
+              <<He>>把布放下。“今天想让你多陪一会儿。我这里有活干，又不是只想让你帮忙。”
+            <<elseif C.npc.Tsukihan.dom gte 30>>
+              “最近一听见脚步声，就会抬头看看。”<<He>>短暂地望进你的眼睛。“为什么，你应该猜得到吧。”
+            <<else>>
+              “廊下的坐垫，平时有空着的。”<<He>>理了理身旁那一只。“要是你恰好路过。”
+            <</if>>
+          <<elseif C.npc.Tsukihan.dom gte 70>>
+            “轮到你了。总不能回回都由我找话说。”<<He>>把布翻过来，又抬眼看看你，等着你开口。
+          <<else>>
+            “你呢？”<<He>>把手整齐地放在布上，等着你的回答。
+          <</if>>
+      <</language>>
+  <</switch>><br><br>
+  <<if _shrine.step is ''>>
+    <<socialiseicon 'ask'>><<lanLink ['Ask a little more', '再多问几句']>><<deadwood-raven-shrine-step 'ask' 'talk'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink ['Tell Tsukihan something about your day', '也说说你今天的事']>><<deadwood-raven-shrine-step 'tell' 'talk'>><</lanLink>><br>
+    <<icon 'raven-shrine/bench.png'>><<lanLink ['Sit and listen for a while', '坐着听一会儿']>><<deadwood-raven-shrine-step 'listen' 'talk'>><</lanLink>><br>
+    <<socialiseicon>><<lanLink ['Keep the conversation to shrine business', '只聊些神社的日常']>><<deadwood-raven-shrine-step 'formal' 'talk'>><</lanLink>><<deadwood-tsukihan-wilfulness-hint -1>><br>
+  <<else>>
+    <<switch _shrine.step>>
+      <<case 'ask'>>
+        <<if _shrine.topic is 'birds'>>
+          <<lanSwitch 'You ask about the letter. "The birds carry things between places they know. Whether the right person gets them is another matter." Tsukihan points at a chewed cord. "We lost two lists before yours. Thank you for bringing it all the way."' '你问起那封信。“它们会把东西带到认识的地方。最后是不是到了该收信的人手里，就得另说了。”月羽指指被啄烂的细绳。“你那封之前，已经丢了两张清单。谢谢你特意送来。”'>>
+        <<elseif _shrine.topic is 'shrine'>>
+          <<lanSwitch 'You ask whether people still leave wishes. "They do. Some want someone to come home; others want the courage to leave." Tsukihan puts the old receipt away. "I keep their names to myself. You can leave yours unwritten, if you prefer."' '你问现在还有没有人来留下心愿。“有。有人盼着谁回家，也有人想有勇气离开。”月羽收起旧收据。“他们的名字，我就不讲了。你若想祈愿，也不必一定写下来。”'>>
+        <<elseif _shrine.topic is 'personal'>>
+          <<lanSwitch 'You ask what Tsukihan has been reading. <<He>> holds up a book with a scrap of cloth tucked between the pages. "Someone left it here. I meant to read a chapter, but it got dark before I noticed." <<He>> turns it over to show you the title. "You can borrow it when I finish. Tell me whether you think the ending will be any good."' '你问月羽最近在看什么书。<<He>>举起一本夹着碎布条的书。“有人落在这儿的。本来只想看一章，回过神来天都黑了。”<<He>>翻过封面，给你看书名。“等我看完，可以借你。先猜猜看，结尾会不会写得好。”'>>
+        <<else>>
+          <<lanSwitch 'Tsukihan answers your questions, then asks a few of <<his>> own. Before long, you have both forgotten the shopping list. "Now I\'ve thought of another thing to put on it," <<he>> says, reaching for a pencil.' '月羽回答了你的问题，也反过来问了几句。聊着聊着，两人都把采购单忘在了一旁。“这下又想起一件该买的了。”<<he>>说着，去拿铅笔。'>>
+        <</if>>
+      <<case 'tell'>>
+        <<lanSwitch 'You tell Tsukihan what your day has been like. <<He>> sets <<his>> work aside and lets you finish. "Would you like advice, or would you rather I just listened?"' '你说起今天过得怎么样。月羽放下手里的东西，等你说完。“想听听我的意见，还是只想找个人说说？”'>><br><br>
+        <<socialiseicon 'ask'>><<lanLink ['Ask what Tsukihan thinks', '想听听月羽的意见']>><<deadwood-raven-shrine-step 'advice' 'talk' '' 'tell'>><</lanLink>><br>
+        <<socialiseicon>><<lanLink ['Just ask Tsukihan to listen', '只想让月羽听一听']>><<deadwood-raven-shrine-step 'listen_more' 'talk' '' 'tell'>><</lanLink>><br>
+      <<case 'advice'>>
+        <<lanSwitch 'Tsukihan thinks before answering. "I’d put off anything that can wait. Mind you, that’s how I ended up fixing six shutters in one afternoon." <<He>> looks ruefully towards the windows. "You can stay here a little longer, if it helps. I’ll try not to give you any more jobs."' '月羽想了想才开口。“我的话，能缓一缓的事，就先放着。虽说也正因为这样，有天下午一口气修了六扇窗。”<<He>>无奈地朝窗户看了一眼。“要是坐着舒服些，就再待会儿吧。我尽量不给你找活干。”'>>
+      <<case 'listen_more'>>
+        <<lanSwitch '"Then I\'ll listen." Tsukihan sets the cloth aside. <<He>> does not interrupt when you lose your place, or ask you to explain the parts you would rather leave alone. Eventually the words come a little more easily.' '“那我就听着。”月羽把布放到一旁。你说到一半卡住时，<<he>>没有打断。你不想细讲的地方，<<he>>也没有追问。后来，话渐渐好说了一些。'>>
+      <<case 'formal'>>
+        <<lanSwitch 'You keep the conversation on the shrine and its visitors. Tsukihan straightens the papers between you and answers in the same measured tone. When you leave a subject alone, <<he>> does too. Soon you are comparing which part of the path needs clearing next.' '你把话题留在神社和来客上。月羽理齐你们中间的纸张，用同样平稳的语调回答。你没再细问的事，<<he>>也没有提起。后来，你们说起了参道上下一处该清理的地方。'>>
+      <<case 'listen'>>
+        <<lanSwitch 'You let the conversation settle. Tsukihan returns to the cloth, occasionally showing you a crooked stitch or a loose thread. You do not have to answer every time. After a while, <<he>> puts it aside. "That was nice. We should do it again."' '你让话头慢慢停下来。月羽继续叠布，偶尔给你看看歪掉的针脚或松开的线头。你不必每次都接话。过了一会儿，<<he>>把布放下。“这样也挺好。下次再坐坐。”'>>
+    <</switch>><<lstress>><<glove>><br><br>
+    <<if _shrine.step isnot 'tell'>>
+      <<getouticon>><<lanLink ['Finish talking', '结束交谈'] 'Deadwood Raven Shrine Talk'>>
+        <<set $MoreTransformations.shrine.scene to '', $MoreTransformations.shrine.step to ''>>
+      <</lanLink>><br>
+    <</if>>
+  <</if>>
+<<elseif _shrine.talk is Math.floor(Time.days)>>
+  <<lanSwitch 'Tsukihan picks up the unfinished cloth again. "I\'d better finish this before I lose the thread. Come and tell me the rest tomorrow."' '月羽重新拿起没收好的布。“趁还记得做到哪儿，先把它弄完吧。剩下的明天再说给我听。”'>><br><br>
+<<elseif _shrineMinutes lte 10>>
+  <<lanSwitch 'Tsukihan checks the fading light. "I\'m about to close up. I can say hello, but a proper chat will have to wait until tomorrow."' '月羽看了看渐暗的天色。“快要收拾关门了。打个招呼还行，细聊得等明天。”'>><br><br>
+<<elseif $daily.no_sing or $worn.face.type.includes('gag')>>
+  <<lanSwitch 'You cannot speak clearly. Tsukihan makes room for you to sit without pressing you for an answer.' '你说不清话。月羽给你腾出坐的位置，没有催着你回答。'>><br><br>
+<<else>>
+  <<lanSwitch 'Tsukihan folds the cloth onto <<his>> knee. "What is it?"' '月羽把布叠在膝上。“怎么了？”'>><br><br>
+  <<for _topic, _label range { shrine: ['Ask about the shrine (0:10)', '问问神社的事 (0:10)'], birds: ['Ask about the ravens (0:10)', '聊聊这些渡鸦 (0:10)'], town: ['Talk about town (0:10)', '说说镇上的事 (0:10)'], personal: ['Ask about Tsukihan (0:10)', '多了解一些月羽 (0:10)'] }>>
+    <<capture _topic _label>>
+      <<socialiseicon 'ask'>><<lanLink _label>>
+        <<deadwood-raven-shrine-act 'talk' _topic>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Talk'>><</if>>
+      <</lanLink>><<lstress>><<glove>><br>
+    <</capture>>
+  <</for>>
+<</if>>
+<br><<deadwood-raven-shrine-return>>

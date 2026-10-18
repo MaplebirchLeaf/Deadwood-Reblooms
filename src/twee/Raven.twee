@@ -2,7 +2,7 @@
 
 <<widget 'deadwood-raven-events'>>
   <<if maplebirch.get('MoreTransformations') and maplebirch.get('MoreTransformations').Raven.available and !maplebirch.get('MoreTransformations').Raven.met>>
-    <<addinlineevent 'deadwood_raven_flock' 1>>
+    <<addinlineevent 'deadwood_raven_flock' 0.75>>
       <<set _raven to maplebirch.get('MoreTransformations').Raven>>
       <<language>>
         <<option 'EN'>>
@@ -32,6 +32,7 @@
 <</widget>>
 
 <<widget 'deadwood-raven-link'>>
+  <<deadwood-raven-shrine-path>>
   <<set _raven to maplebirch.get('MoreTransformations')?.Raven>>
   <<if _raven and _raven.available>>
     <<if _raven.met>>
@@ -53,9 +54,14 @@
 <</widget>>
 
 :: Deadwood Reblooms Raven
-<<set _ravenReturn to $MoreTransformations.raven.origin is 'Churchyard' ? 'Churchyard' : 'Forest'>>
+<<set _ravenReturn to ['Churchyard', 'Park', 'Deadwood Raven Shrine'].includes($MoreTransformations?.raven?.origin) ? $MoreTransformations.raven.origin : 'Forest'>>
 <<if _ravenReturn is 'Churchyard'>>
   <<location 'churchyard'>>
+<<elseif _ravenReturn is 'Park'>>
+  <<location 'park'>>
+<<elseif _ravenReturn is 'Deadwood Raven Shrine'>>
+  <<location 'forest_raven_shrine'>>
+  <<deadwood-raven-shrine-presence>>
 <<else>>
   <<location 'forest'>>
 <</if>>
@@ -167,6 +173,7 @@
       <</language>>
   <</switch>><br><br>
   <<if _raven.available>>
+    <<deadwood-raven-letter-link>>
     <<if _raven.canFeed>>
       <<print _raven.icon>><<lanLink ['Leave some fruit (0:05)', '留下一份水果 (0:05)']>>
         <<set _raven_origin to $passage>>
@@ -207,4 +214,4 @@
       你停下来仔细聆听。风吹动树叶，却没有渡鸦回应。过了一会儿，你转身回到小径。明天可以再来找找。
   <</language>><br><br>
 <</if>>
-<<getouticon>><<lanLink [_ravenReturn is 'Churchyard' ? 'Return to the churchyard' : 'Return to the path', _ravenReturn is 'Churchyard' ? '返回老教堂墓地' : '返回小径'] _ravenReturn>><<set $eventskip to 1>><</lanLink>>
+<<getouticon>><<lanLink [_ravenReturn is 'Churchyard' ? 'Return to the churchyard' : _ravenReturn is 'Park' ? 'Return to the park' : _ravenReturn is 'Deadwood Raven Shrine' ? 'Return to the shrine' : 'Return to the path', _ravenReturn is 'Churchyard' ? '返回老教堂墓地' : _ravenReturn is 'Park' ? '返回公园' : _ravenReturn is 'Deadwood Raven Shrine' ? '返回神社' : '返回小径'] _ravenReturn>><<set $eventskip to 1>><</lanLink>>

@@ -1,0 +1,102 @@
+:: Deadwood Raven Shrine Close
+<<effects>><<deadwood-raven-shrine-presence>>
+<<if !_shrine or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine'>>
+  <<lanSwitch 'You are no longer at the shrine.' '你已经不在神社了。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<if !_shrinePerson or C.npc.Tsukihan.init isnot 1 or !isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 50 or _shrine.scene isnot 'close'>>
+  <<lanSwitch 'There is no invitation waiting for you here now. You can return to the courtyard.' '现在没有人在这里等着与你独处。你可以回到庭院。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<npc Tsukihan>><<person1>>
+<<if _shrine.step is ''>>
+  <<if _shrine.close is Math.floor(Time.days)>>
+    <<lanSwitch 'Tsukihan gives you a small smile. "I enjoyed our time together. I should get back to work for a while."' '月羽对你笑了笑。“刚才那一会儿，很喜欢。不过得先回去干些活了。”'>><br><br>
+  <<elseif _shrineMinutes lte 10>>
+    <<lanSwitch 'Tsukihan glances towards the gate. "It is nearly time to close. Come a little earlier next time. I would rather not rush this."' '月羽朝门口看了看。“快要关门了。下回早些来吧，不想连这点相处的时间都赶着过。”'>><br><br>
+  <<elseif pcAreArmsBound('both')>>
+    <<lanSwitch 'Tsukihan makes room for you on the veranda. "Let us leave it for another time. You can still sit here for a moment."' '月羽给你腾出廊下的位置。“留到下次吧。现在想坐一会儿，也可以。”'>><br><br>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        At the side of the shrine, a wooden screen shelters one corner of the veranda from the gate. You can still hear the courtyard beyond it.
+        Tsukihan stops beside the screen, leaving the way open.<br><br>
+        <<if C.npc.Tsukihan.dom gte 70>>
+          "I want you to myself for ten minutes." <<He>> draws a cushion closer with <<his>> foot. "Will you stay? I can manage without you checking the bell rope."
+        <<elseif C.npc.Tsukihan.dom gte 30>>
+          "Could we sit here, just the two of us?" <<He>> glances towards the courtyard. "Every time I try to talk to you, I notice another job. I would like to stop looking for a while."
+        <<else>>
+          "It is quieter here." Tsukihan straightens a cushion that was already quite straight. "If you have ten minutes, I would like to spend them with you."
+        <</if>><br><br>
+        <<if C.npc.Tsukihan.lust gte 30>>
+          "I would like to hold you," <<he>> adds. "Or have you lean on me for a while." <<He>> waits for your answer rather than reaching for you.
+        <<else>>
+          <<He>> settles one cushion beside the other and looks back to see what you would like to do.
+        <</if>>
+      <<option 'CN'>>
+        神社屋侧有一扇木屏，挡住了门口望来的视线，屏风后的廊角仍听得见庭院里的动静。
+        月羽在旁边停下，没有挡着路。<br><br>
+        <<if C.npc.Tsukihan.dom gte 70>>
+          “想让这十分钟只留给我。”<<He>>用脚把坐垫挪近了一点。“留不留下？这回不用你检查铃绳。”
+        <<elseif C.npc.Tsukihan.dom gte 30>>
+          “就在这里，只有我们两个，坐一会儿好吗？”<<He>>看看庭院。“每次想跟你说话，总又瞥见什么活没做完。想歇一会儿，不找了。”
+        <<else>>
+          “这边安静些。”月羽把已经很平整的坐垫又理了一遍。“你若空得出十分钟，想和你一起待着。”
+        <</if>><br><br>
+        <<if C.npc.Tsukihan.lust gte 30>>
+          “想抱抱你。”<<he>>又添了一句。“或者，让你靠着我坐一会儿。”<<He>>没有先伸手，等着你回答。
+        <<else>>
+          <<He>>把两只坐垫并好，回过头，等你拿主意。
+        <</if>>
+    <</language>><br><br>
+    <<icon 'actions/hug.png'>><<lanLink ['Stay close in private (0:10)', '与月羽私下相伴 (0:10)']>>
+      <<deadwood-raven-shrine-act 'close'>>
+      <<if _shrineDone>>
+        <<set _shrine.step to 'private', C.npc.Tsukihan.lust to Math.clamp(C.npc.Tsukihan.lust - 5, 0, 100)>>
+        <<goto 'Deadwood Raven Shrine Close'>>
+      <</if>>
+    <</lanLink>><<lstress>><<glove>><<llust>><br>
+    <<socialiseicon>><<lanLink ['Just sit and talk (0:10)', '只坐着聊会儿 (0:10)']>>
+      <<deadwood-raven-shrine-act 'close'>>
+      <<if _shrineDone>><<set _shrine.step to 'chat'>><<goto 'Deadwood Raven Shrine Close'>><</if>>
+    <</lanLink>><<lstress>><<glove>><br><br>
+  <</if>>
+<<elseif _shrine.step is 'private'>>
+  <<language>>
+    <<option 'EN'>>
+      You sit beside Tsukihan and make room for <<him>> to come closer. <<He>> opens an arm in invitation, and you accept the embrace.<br><br>
+      For once, Tsukihan leaves the little noises in the courtyard alone. You stay close, letting the conversation fall quiet. Neither of you tries to fill every pause.<br><br>
+      A little later, you step back into the courtyard together. Tsukihan pauses by the screen before returning to <<his>> work.
+      <<if C.npc.Tsukihan.dom gte 70>>"That was worth leaving the bowls for." <<He>> smiles at you. "I will ask again. You can tell me when."
+      <<elseif C.npc.Tsukihan.dom gte 30>>"I liked that." <<He>> looks at you rather than the work waiting on the board. "I hope you did, too."
+      <<else>>"Thank you for staying." <<He>> takes a moment before adding, "I would like to do that again."<</if>>
+    <<option 'CN'>>
+      你在月羽身边坐下，往旁边让了让，示意<<him>>可以靠近。<<He>>朝你张开一只手臂，你迎上去，和<<him>>抱在一起。<br><br>
+      难得这一次，庭院里有些小动静，月羽也没急着去管。你们就这样靠着，话渐渐少了下来。安静时，谁也不急着再找一句来接。<br><br>
+      过了一会儿，你们一起回到庭院。月羽在屏风旁多站了片刻，才回去料理手头的事。
+      <<if C.npc.Tsukihan.dom gte 70>>“那些碗晚些洗，值了。”<<He>>对你笑笑。“下回还要问你。什么时候有空，你说。”
+      <<elseif C.npc.Tsukihan.dom gte 30>>“刚才很喜欢。”<<He>>看看你，没有先去看木板上等着的活。“希望你也是。”
+      <<else>>“谢谢你留下来。”<<He>>停了一下，又添上一句，“还想有下一次。”<</if>>
+  <</language>><<lstress>><<glove>><<llust>><br><br>
+  <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 30 and _shrineMinutes gt 30 and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag') and _shrine.sex isnot Math.floor(Time.days)>>
+    <<icon 'actions/entrance.png'>><<lanLink ['Invite Tsukihan into the inner shrine (0:30)', '邀月羽一起去社内内室 (0:30)']>>
+      <<deadwood-raven-shrine-act 'sex'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Sex'>><<else>><<goto 'Deadwood Raven Shrine'>><</if>>
+    <</lanLink>><<promiscuous1>><<glust>><br>
+  <</if>>
+<<elseif _shrine.step is 'chat'>>
+  <<language>>
+    <<option 'EN'>>
+      You indicate that you would rather just talk. Tsukihan nods and leaves the cushions a comfortable distance apart.<br><br>
+      <<He>> tells you about a visitor who brought a wish plaque back to correct a spelling mistake. Tsukihan had offered a new one, but the visitor insisted on keeping the old wood.
+      "Apparently the first wish worked. They didn't want to spoil their chances."<br><br>
+      You talk about the little things people decide to keep. Tsukihan listens to your answer without turning it into another question about the shrine.<br><br>
+      When you return to the courtyard, <<he>> picks up the cloth <<he>> left behind. "That was nice. We should leave the jobs out of it more often."
+    <<option 'CN'>>
+      你表示只想坐着聊聊。月羽点头，把两只坐垫留在彼此坐着舒服的位置。<br><br>
+      <<He>>讲起有位客人，特意带回一块绘马，只为了改正写错的字。月羽说可以换块新的，对方偏要留着原先那块木头。
+      “说是上回的心愿应验了。怕换了木牌，下回就不灵。”<br><br>
+      你们说起那些舍不得丢的小东西。轮到你讲时，月羽听着，没有又把话头绕回神社的杂事上。<br><br>
+      回到庭院，<<he>>才拿起先前放下的布。“这样也挺好。以后多留点不干活的时间吧。”
+  <</language>><<lstress>><<glove>><br><br>
+<</if>>
+<<deadwood-raven-shrine-return>>

@@ -1,6 +1,25 @@
 // ./src/script/MoreTransformations.ts
 
+import Tsukihan from './MoreTransformations/Tsukihan';
+
 export default function MoreTransformations(maplebirch: typeof window.maplebirch): void {
+  Tsukihan(maplebirch);
+
+  maplebirch.tool.addTo('Journal', 'deadwood-raven-shrine-journal');
+  maplebirch.tool.patch.location.configure('forest_raven_shrine', {
+    folder: 'forest_raven_shrine',
+    base: {
+      default: { condition: () => !Weather.isSnow, image: 'base.png' },
+      snow: { condition: () => Weather.isSnow, image: 'snow.png' }
+    },
+    emissive: { image: 'emissive.png', condition: () => Weather.lightsOn, color: '#fbff86dd', size: 4, intensity: 0.8 },
+    weather: {
+      fogDistributionCurve: 1,
+      rainSplashEnabled: true,
+      fogEnabled: true
+    }
+  });
+  maplebirch.tool.patch.location.configure('raven_shrine_house', { customMapping: () => 'forest_raven_shrine' });
   maplebirch.tool.onInit(() => {
     maplebirch.tool.patch.traits.add({
       title: 'General Traits',
@@ -15,7 +34,9 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
   maplebirch.tool.inject({
     locationPassage: {
       // 五处普通探索菜单内显示入口，避免森林末尾清零 eventskip 后无法显示。
-      Forest: [{ srcmatch: /<<forestsearch>>/g, applybefore: '<<deadwood-raven-link>>\n\t\t', expected: 5 }]
+      Forest: [{ srcmatch: /<<forestsearch>>/g, applybefore: '<<deadwood-raven-link>>\n\t\t', expected: 5 }],
+      Park: [{ src: '<<if $leftleg is "bound" or $rightleg is "bound">>', applybefore: '<<deadwood-raven-link>>\n', expected: 1 }],
+      'Forest Shop Entrance': [{ src: '<<icon "clothing-shop.png">>', applybefore: '<<deadwood-raven-shrine-gwylan-link>>\n', expected: 1 }]
     },
     widgetPassage: {
       'Widgets Forest': [

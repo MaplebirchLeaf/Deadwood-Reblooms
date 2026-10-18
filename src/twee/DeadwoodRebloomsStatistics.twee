@@ -21,6 +21,51 @@
     <<lanSwitch 'Whale transformation:' '鲸转化：'>>
     <span class='lblue'><<= $maplebirch?.transformation?.whale?.level ?? 0>> / 6</span>
     (<span class='lblue'><<= $maplebirch?.transformation?.whale?.build ?? 0>> / 100</span>)<br>
+    <<if $MoreTransformations?.shrine>>
+      <<deadwood-reblooms-progress-check `$MoreTransformations.shrine.stage >= 1` `["Receive the raven’s letter", "接过渡鸦衔来的信"]` `["Feed the birds on three different game days, then find them again.", "在三个不同的游戏日喂食后，再次寻找熟悉的鸟群。"]`>>
+      <<deadwood-reblooms-progress-check `$MoreTransformations.shrine.stage >= 2` `["Take the letter to Gwylan", "把信交给格威岚"]` `["Visit the forest shop while Gwylan is at the counter and willing to talk.", "等森林商店的普通菜单出现，格威岚在柜台且愿意交谈时交信。"]`>>
+      <<deadwood-reblooms-progress-check `$MoreTransformations.shrine.stage >= 3` `["Find the raven shrine", "找到渡鸦神社"]` `["Follow the path from the ordinary exploration menu at forest depth 20–40.", "在森林深度20～40的普通探索菜单中沿参道前往。"]`>>
+      <<lanSwitch 'Raven shrine:' '渡鸦神社：'>>
+      <<switch $MoreTransformations.shrine.stage>>
+        <<case 3>><span class='green'><<lanSwitch 'Discovered' '已发现'>></span>
+        <<case 2>><span class='teal'><<lanSwitch 'Path known' '已知晓参道'>></span>
+        <<case 1>><span class='blue'><<lanSwitch 'Letter for Gwylan' '待交信给格威岚'>></span>
+        <<default>><<lanSwitch 'Bird-feeding days: ' '喂食游戏日：'>><span class='teal'><<= $MoreTransformations.shrine.feeds>> / 3</span>
+      <</switch>><br>
+      <<if $MoreTransformations.shrine.stage is 3>>
+        <<lanSwitch 'Days helping at the shrine: ' '神社帮忙次数：'>><span class='teal'><<= $MoreTransformations.shrine.helped>></span><br>
+        <<lanSwitch 'Offerings left: ' '累计奉纳：'>><span class='gold'><<= formatMoney($MoreTransformations.shrine.donations)>></span><br>
+      <</if>>
+      <<if C.npc.Tsukihan?.init is 1>>
+        <<lanSwitch 'Tsukihan’s affection: ' '月羽好感：'>><span class='pink'><<= C.npc.Tsukihan.love>> / 100</span><br>
+        <<lanSwitch 'Tsukihan’s wilfulness: ' '月羽任性：'>><span class='purple'><<= C.npc.Tsukihan.dom>> / 100</span><br>
+        <<lanSwitch 'Tsukihan’s lust: ' '月羽性欲：'>><span class='lewd'><<= C.npc.Tsukihan.lust>> / 100</span><br>
+        <<lanSwitch 'Gift today: ' '今天的赠礼：'>>
+        <<if $daily.giftedFood?.Tsukihan and setup.foodstuff[$daily.giftedFood.Tsukihan]>><<recipe_name $daily.giftedFood.Tsukihan>>
+        <<else>><<lanSwitch 'Not yet' '尚未送过'>><</if>><br>
+        <<if $foodstuff.shortbread?.knownFavorite?.includes('Tsukihan')>>
+          <<lanSwitch 'Known favourite: ' '已知偏爱：'>><<recipe_name 'shortbread'>><br>
+        <</if>>
+        <<lanSwitch 'Speaking your feelings: ' '互诉心意：'>><<if $MoreTransformations.shrine.confessed>><span class='pink'><<lanSwitch 'Shared' '已向彼此表明'>></span><<else>><<lanSwitch 'Not yet' '尚未'>><</if>><br>
+        <<if $MoreTransformations.shrine.promise gte 0>>
+          <<if Math.floor(Time.days) gt $MoreTransformations.shrine.promise or Math.floor(Time.days) is $MoreTransformations.shrine.promise and (Time.hour gte 18 or Time.hour lt 7)>>
+            <span class='red'><<lanSwitch 'The promised strawberries are overdue.' '答应送给月羽的草莓已经逾期。'>></span>
+          <<else>>
+            <<lanSwitch 'Promised strawberries: ' '答应送给月羽的草莓：'>><span class='blue'><<lanSwitch 'by 18:00 ' '须在'>>
+            <<= $MoreTransformations.shrine.promise is Math.floor(Time.days) ? lanSwitch('today', '今天') : lanSwitch('tomorrow', '明天') >><<lanSwitch '' '18:00前送到'>></span>
+          <</if>><br>
+        <</if>>
+        <<lanSwitch 'Your relationship with Tsukihan: ' '与月羽的关系：'>>
+        <<if isLoveInterest('Tsukihan')>><span class='pink'><<lanSwitch 'Love interest' '恋爱对象'>></span>
+        <<elseif C.npc.Tsukihan.love gte 50>><span class='green'><<lanSwitch 'Close friends' '亲近的朋友'>></span>
+        <<elseif C.npc.Tsukihan.love gte 10>><span class='teal'><<lanSwitch 'Getting to know each other' '逐渐熟悉'>></span>
+        <<else>><span class='blue'><<lanSwitch 'Recently acquainted' '初识'>></span><</if>><br>
+        <<lanSwitch 'Walks with Tsukihan: ' '与月羽散步次数：'>><span class='teal'><<= $MoreTransformations.shrine.walks ?? 0>></span><br>
+        <<if ($MoreTransformations.shrine.sex_total ?? 0) gt 0>>
+          <<lanSwitch 'Times intimate with Tsukihan: ' '与月羽温存次数：'>><span class='pink'><<= $MoreTransformations.shrine.sex_total>></span><br>
+        <</if>>
+      <</if>>
+    <</if>>
     <br>
   <</if>>
 
@@ -268,4 +313,11 @@
       <<lanSwitch 'Nude swimming counter / photo flyers: ' '裸泳计数／拍摄传单数：'>><<set $_flyersCount to Math.clamp($photo_flyers ?? 0, 0, 250)>><span class='teal'><<= $swimnudecounter ?? 0>> / 5 · <<= $_flyersCount>> / 250</span><br>
     <</if>>
   <</for>><br>
+<</widget>>
+
+<!-- 各模块与属性突破共用圈／勾样式；条件由调用处传入，不增加存档标记。 -->
+<<widget 'deadwood-reblooms-progress-check'>>
+  <<if _args[0]>><span class='green'>✓ <<lanSwitch _args[1]>></span>
+  <<else>><span class='red'>○ <<lanSwitch _args[1]>></span><</if>><br>
+  <<if _args[2]>><span class='small-description'><i><<lanSwitch _args[2]>></i></span><br><</if>>
 <</widget>>

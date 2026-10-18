@@ -1,0 +1,130 @@
+:: Deadwood Raven Shrine Feelings
+<<effects>><<deadwood-raven-shrine-presence>>
+<<if !_shrine or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine'>>
+  <<lanSwitch 'You are no longer at the shrine.' '你已经不在神社了。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<if !_shrinePerson or C.npc.Tsukihan.init isnot 1 or _shrine.scene isnot 'feelings'>>
+  <<lanSwitch 'This will have to wait for another visit. The veranda is quiet now.' '这些话得留到下次再说了。廊下现在静悄悄的。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<npc Tsukihan>><<person1>>
+<<set _shrineLoveSlot to $loveInterest.primary is 'None' or $awarelevel gte 2 and $loveInterest.secondary is 'None' or $awarelevel gte 3 and $loveInterest.tertiary is 'None'>>
+<<switch _shrine.step>>
+  <<case ''>>
+    <<language>>
+      <<option 'EN'>>
+        You ask Tsukihan to sit with you. <<He>> finishes winding the loose cord around its spool, sets it beside the tray and gives you <<his>> attention.<br><br>
+        <<if C.npc.Tsukihan.dom lt 30>>
+          "There is something I wanted to tell you, too." <<He>> smooths a crease in <<his>> sleeve, then stops when <<he>> notices <<himself>> doing it.<br><br>
+          "I listen for your footsteps. When I make tea, I keep wondering whether to put out another cup." <<His>> red eyes meet yours for a moment. "I like you. I wanted to say it properly."
+        <<elseif C.npc.Tsukihan.dom lt 70>>
+          Tsukihan moves the tray off the cushion between you. "I've been hoping we'd have a moment like this."<br><br>
+          "I keep thinking of things to tell you when you come back. Then you arrive, and I ask whether you'd like some tea." <<He>> smiles a little at <<himself>>. "I like you. Next time you come through the gate, would you come and find me first?"
+        <<else>>
+          "Good. I wanted a turn with your attention." Tsukihan puts the tray aside, then turns back before you can answer.<br><br>
+          "I like you. I want to see you, and sit with you, and kiss you when you want that too." <<He>> glances down at the cushion <<he>> has cleared. "I've been saving this place for you. You could sit a little closer."
+        <</if>><br><br>
+        <<if isLoveInterest('Tsukihan')>>
+          "You've probably noticed." <<He>> lets the words settle between you. "I still wanted you to hear it from me." <<He>> waits for your answer.
+        <<else>>
+          "Would you like us to be together?" <<He>> leaves the space between you open. "You can take your time."
+        <</if>>
+      <<option 'CN'>>
+        你请月羽陪你坐一会儿。<<He>>先把散开的细绳绕回线轴，搁到托盘旁，才转过来认真听你说话。<br><br>
+        <<if C.npc.Tsukihan.dom lt 30>>
+          “我也有话想告诉你。”<<He>>抚平袖口的一道褶子，察觉自己又在摆弄衣服，便停了手。<br><br>
+          “有时候，会留心门外是不是你的脚步声。泡茶时，也总想着要不要再摆一只杯子。”那双红眼睛短暂地望向你。“我喜欢你。想好好地告诉你一次。”
+        <<elseif C.npc.Tsukihan.dom lt 70>>
+          月羽把你们中间坐垫上的托盘挪开。“一直想着，什么时候能这样坐下来。”<br><br>
+          “平时想了好些话，留着等你来。真见到了，又只会问你喝不喝茶。”<<He>>自己也轻轻笑了一下。“我喜欢你。下回进了门，先来找我，好不好？”
+        <<else>>
+          “正好。也该轮到你听我说了。”月羽放好托盘，没等你接话，就转了回来。<br><br>
+          “我喜欢你。想见你，想和你坐在一起，也想在你愿意的时候亲你。”<<He>>看看特意空出的坐垫。“这里，一直是给你留的。可以再坐近些。”
+        <</if>><br><br>
+        <<if isLoveInterest('Tsukihan')>>
+          “你或许早就看出来了。”<<He>>停了一会儿。“还是想亲口跟你说。”说完，便等着你的回答。
+        <<else>>
+          “你愿意和我在一起吗？”<<He>>没有再往你这边靠，留着中间的空处。“慢慢想也可以。”
+        <</if>>
+    <</language>><br><br>
+    <<socialiseicon>><<lanLink [isLoveInterest('Tsukihan') ? 'Return Tsukihan’s feelings' : _shrineLoveSlot ? 'Return Tsukihan’s feelings and choose them as a love interest' : 'Return Tsukihan’s feelings; choose a love interest later', isLoveInterest('Tsukihan') ? '回应月羽的心意' : _shrineLoveSlot ? '回应心意，并将月羽选为恋爱对象' : '回应心意，稍后再选择恋爱对象']>>
+      <<deadwood-raven-shrine-step 'accept' 'feelings'>>
+    <</lanLink>><<if !_shrine.confessed>><<glove>><</if>><br>
+    <<socialiseicon>><<lanLink ['Ask for a little time', '还想再想一想']>>
+      <<deadwood-raven-shrine-step 'wait' 'feelings'>>
+    <</lanLink>><br>
+    <<if !isLoveInterest('Tsukihan')>>
+      <<socialiseicon>><<lanLink ['Say you would like to stay friends', '告诉月羽，想继续做朋友']>>
+        <<deadwood-raven-shrine-step 'friend' 'feelings'>>
+      <</lanLink>><br>
+      <<if !_shrineLoveSlot>>
+        <span class='subtle'><<lanSwitch 'All your love-interest slots are occupied. You can change your choice in Attitudes.' '恋爱对象的位置已经满了，可以到“态度”里自行调整。'>></span><br>
+      <</if>>
+    <</if>>
+  <<case 'accept'>>
+    <<language>>
+      <<option 'EN'>>
+        You tell Tsukihan that you feel the same. <<He>> looks at you for a moment, as though making certain <<he>> heard it properly.<br><br>
+        <<if C.npc.Tsukihan.dom lt 30>>
+          "I see. I'm glad." <<He>> reaches to straighten the tray, finds it is already straight and lets <<his>> hand rest beside it instead. "Very glad."
+        <<elseif C.npc.Tsukihan.dom lt 70>>
+          "Then I can stop making excuses about the tea." <<He>> smiles, looking at you rather than the cups. "Though I will still make it for you."
+        <<else>>
+          "Say that again." The request slips out at once. Tsukihan presses <<his>> lips together, then smiles. "Once more. I'd like to hear it."
+        <</if>><br><br>
+        You stay beside each other for the rest of the quiet moment. When a raven begins pecking at the cord, Tsukihan puts it out of reach without turning away from you.
+      <<option 'CN'>>
+        你告诉月羽，自己也是一样的心意。<<He>>看了你一会儿，像是要确认真的听清了。<br><br>
+        <<if C.npc.Tsukihan.dom lt 30>>
+          “知道了。我很高兴。”<<He>>伸手去摆托盘，发现本来就放得端正，便把手留在一旁。“真的很高兴。”
+        <<elseif C.npc.Tsukihan.dom lt 70>>
+          “那以后，就不用总拿喝茶当由头了。”<<He>>笑起来，目光留在你身上。“茶还是会给你泡的。”
+        <<else>>
+          “再说一次。”话立刻就出了口。月羽抿了抿嘴，随后又笑了。“就再一次。想听你说。”
+        <</if>><br><br>
+        你们又在彼此身旁坐了一会儿。一只渡鸦开始啄线轴上的绳子，月羽伸手把它挪远，视线却没有从你身上移开。
+    <</language>><br><br>
+    <<if !isLoveInterest('Tsukihan')>>
+      <span class='blue'><<lanSwitch 'Your love-interest slots are full. You can choose Tsukihan in Attitudes when you wish.' '恋爱对象的位置已经满了。你可以自行到“态度”里选择月羽。'>></span><br><br>
+    <</if>>
+  <<case 'wait'>>
+    <<language>>
+      <<option 'EN'>>
+        You ask for a little time to find the right words. Tsukihan nods, leaving the cushion where it is.<br><br>
+        <<if C.npc.Tsukihan.dom gte 70>>
+          "I would like an answer." <<He>> gathers the loose end of the cord. "When you're ready. I can wait."
+        <<else>>
+          "All right. I wanted you to know." <<He>> winds the loose end around the spool. "You don't have to answer today."
+        <</if>><br><br>
+        <<He>> asks whether you would like to keep sitting together, then goes back to winding the cord without pressing you further.
+      <<option 'CN'>>
+        你说还想留点时间，把心里的话想清楚。月羽点点头，没有收走身旁的坐垫。<br><br>
+        <<if C.npc.Tsukihan.dom gte 70>>
+          “我是想听你答复的。”<<He>>拢起散开的绳头。“等你想好了再说。我能等。”
+        <<else>>
+          “好。就是想让你知道。”<<He>>把绳头绕回线轴。“不急着今天就答复。”
+        <</if>><br><br>
+        <<He>>问你还想不想坐一会儿，随后便低头继续理绳子，没有再催你开口。
+    <</language>><br><br>
+  <<case 'friend'>>
+    <<language>>
+      <<option 'EN'>>
+        You tell Tsukihan that you would like to stay friends. <<He>> falls quiet for a moment before nodding.<br><br>
+        <<if C.npc.Tsukihan.dom gte 70>>
+          "That wasn't the answer I was hoping for." <<He>> looks down, then moves the tray back within reach. "But you did answer. Thank you."
+        <<else>>
+          "I understand. Thank you for telling me." <<He>> lays the cord neatly beside the tray, taking a little longer than before.
+        <</if>><br><br>
+        "You can still come for tea." Tsukihan gives you room to stand if you wish, then reaches for the bowls that need putting away.
+      <<option 'CN'>>
+        你告诉月羽，自己想继续做朋友。<<He>>安静了一会儿，才点了点头。<br><br>
+        <<if C.npc.Tsukihan.dom gte 70>>
+          “本来盼的，不是这个答复。”<<He>>垂下眼，又把托盘挪回手边。“不过，你好好告诉我了。谢谢。”
+        <<else>>
+          “明白了。谢谢你告诉我。”<<He>>把细绳整齐地放在托盘旁，动作比先前慢了一点。
+        <</if>><br><br>
+        “以后，还是可以来喝茶。”月羽给你留出起身的地方，又伸手去收还没归好的食碗。
+    <</language>><br><br>
+<</switch>>
+<<deadwood-raven-shrine-return>>

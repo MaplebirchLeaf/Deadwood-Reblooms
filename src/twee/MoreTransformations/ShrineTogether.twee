@@ -1,0 +1,80 @@
+:: Deadwood Raven Shrine Together
+<<effects>><<deadwood-raven-shrine-presence>>
+<<if !_shrine or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine'>>
+  <<lanSwitch 'You are no longer at the shrine.' '你已经不在神社了。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<if !_shrinePerson or _shrine.scene isnot 'kiss'>>
+  <<lanSwitch 'Tsukihan has gone inside. There will be another time to sit together.' '月羽已经回屋了。下次还有一起坐坐的机会。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<npc Tsukihan>><<person1>>
+<<if _shrine.step is ''>>
+  <<language>>
+    <<option 'EN'>>
+      You catch Tsukihan's attention before <<he>> reaches for another bowl and ask for a kiss.<br><br>
+      <<He>> sets the bowl down with both hands.
+      <<if C.npc.Tsukihan.dom gte 70>>"Yes. I was hoping you would ask." <<He>> smiles before <<he>> can finish saying it.
+      <<elseif C.npc.Tsukihan.dom gte 30>>"Here?" <<He>> looks towards the gate, then back at you. "All right. I would like that."
+      <<else>>"I am still working." <<He>> looks down at the bowl, now safely on the boards. After a moment, <<he>> takes a small step closer. "Just one, then."<</if>>
+      <<He>> waits for you to close the remaining distance.
+      <<if C.npc.Tsukihan.lust gte 30>>"I have been wanting to do this too," <<he>> adds, before you have to ask.<</if>>
+    <<option 'CN'>>
+      月羽正要去拿另一只碗，你叫住<<him>>，轻声讨一个吻。<br><br>
+      <<He>>先用双手把碗搁稳。
+      <<if C.npc.Tsukihan.dom gte 70>>“好。刚才就想等你开口。”话还没说完，<<he>>已经先笑了。
+      <<elseif C.npc.Tsukihan.dom gte 30>>“在这里？”<<He>>看看门口，又转回来。“好吧。我也想的。”
+      <<else>>“我还在干活。”<<He>>低头看了眼已经放稳的食碗，过了一会儿，往你这边挪了一小步。“那，就一下。”<</if>>
+      <<He>>等着你走近，留给你最后这一点距离。
+      <<if C.npc.Tsukihan.lust gte 30>>“我也想亲近你。”没等你再问，<<he>>就把话说了出来。<</if>>
+  <</language>><br><br>
+  <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 20 and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+    <<icon 'actions/kiss.png'>><<lanLink ['Kiss Tsukihan', '亲吻月羽']>><<deadwood-raven-shrine-step 'kiss' 'kiss'>><</lanLink>><<kissvirginitywarning>><<glust>><br>
+  <</if>>
+  <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 20 and !pcAreArmsBound('any')>>
+    <<icon 'actions/hug.png'>><<lanLink ['Just hold Tsukihan for a while', '只抱一会儿月羽']>><<deadwood-raven-shrine-step 'hug' 'kiss'>><</lanLink>><<lstress>><<glove>><br>
+  <</if>>
+  <<socialiseicon>><<lanLink ['Smile and leave it for another time', '笑一笑，留到下次吧']>><<deadwood-raven-shrine-step 'stop' 'kiss'>><</lanLink>><br>
+<<elseif _shrine.step is 'kiss'>>
+  <<language>>
+    <<option 'EN'>>
+      You lean close, and Tsukihan meets you halfway. <<His>> hand settles lightly on your arm.
+      The kiss lasts a little longer than either of you meant it to.<br><br>
+      A raven taps its beak against the empty bowl. "Yes, I heard you," Tsukihan tells it.
+      <<He>> stays beside you another moment, then lets <<his>> hand fall away.<br><br>
+      <<if C.npc.Tsukihan.dom gte 70>>"I want another, next time you visit. You heard me." <<He>> looks away only after you smile.
+      <<elseif C.npc.Tsukihan.dom gte 30>>"I suppose the bowls can wait another minute." <<He>> glances at you rather than the bowls.
+      <<else>>"The birds are waiting." <<He>> picks up the empty bowl twice before remembering where it belongs.<</if>>
+    <<option 'CN'>>
+      你凑近，月羽也迎了上来，手轻轻搭在你的臂上。
+      这个吻比原本打算的稍长了一些。<br><br>
+      一只渡鸦用喙敲了敲空碗。“听到了。”月羽对它说。
+      <<He>>仍在你身旁留了一会儿，才松开搭着你的手。<br><br>
+      <<if C.npc.Tsukihan.dom gte 70>>“下次来时，还要这样亲一下。你听到了吧。”等你笑了，<<he>>才移开目光。
+      <<elseif C.npc.Tsukihan.dom gte 30>>“食碗，再放一会儿也没关系。”<<He>>说着，目光却留在你身上。
+      <<else>>“鸟儿还等着呢。”<<He>>端起空碗，又放下，第二次拿起来才想起该摆在哪里。<</if>>
+  <</language>><<lstress>><<glove>><<glust>><br><br>
+  <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 30 and _shrineMinutes gt 30 and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag') and _shrine.sex isnot Math.floor(Time.days)>>
+    <<icon 'actions/entrance.png'>><<lanLink ['Take Tsukihan by the hand into the inner shrine (0:30)', '牵着月羽走进内室 (0:30)']>>
+      <<deadwood-raven-shrine-act 'sex'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Sex'>><<else>><<goto 'Deadwood Raven Shrine'>><</if>>
+    <</lanLink>><<promiscuous1>><<glust>><br>
+  <</if>>
+<<elseif _shrine.step is 'hug'>>
+  <<language>>
+    <<option 'EN'>>
+      You open your arms. Tsukihan steps into them, leaving the bowl safely behind.<br><br>
+      <<if C.npc.Tsukihan.dom gte 70>>"A little longer." <<He>> rests <<his>> cheek against your shoulder. "Tell me when you need to go."
+      <<elseif C.npc.Tsukihan.dom gte 30>>"This is nice." The words are quiet, but <<he>> does not try to take them back.
+      <<else>><<He>> is rather still at first. Then <<his>> arms settle around you. "I wasn't sure whether to ask."<</if>><br><br>
+      When you ease away, Tsukihan lets you go. "Thank you. I needed that."
+    <<option 'CN'>>
+      你张开手臂。月羽把碗留在稳妥的地方，走进你的怀里。<br><br>
+      <<if C.npc.Tsukihan.dom gte 70>>“再抱一会儿。”<<He>>把脸颊靠在你肩上。“要走的时候，跟我说。”
+      <<elseif C.npc.Tsukihan.dom gte 30>>“这样真好。”声音很轻，<<he>>却没有再掩饰。
+      <<else>><<He>>起初有点僵，随后才伸手环住你。“刚才还在想，该不该开口。”<</if>><br><br>
+      你稍稍退开，月羽便松开了手。“谢谢。刚才，就想这样抱一抱。”
+  <</language>><<lstress>><<glove>><br><br>
+<<else>>
+  <<lanSwitch 'You shake your head with a smile. Tsukihan returns the smile without reaching for you. "All right. Stay for a bit, if you like." <<He>> picks up the bowl again, leaving room beside <<him>>.' '你笑着摇摇头。月羽也笑了，没有再向你靠近。“好。想坐一会儿就坐吧。”<<He>>重新端起食碗，给你留出了身旁的位置。'>><br><br>
+<</if>>
+<<deadwood-raven-shrine-return>>

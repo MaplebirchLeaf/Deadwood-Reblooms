@@ -1,0 +1,58 @@
+:: Deadwood Raven Shrine Bed
+<<deadwood-raven-home-presence>>
+<<if !_shrineHome or $location isnot 'raven_shrine_house'>>
+  <<lanSwitch 'You cannot settle into the bedding here now.' '你现在不便在这里睡下。'>><br><br>
+  <<deadwood-raven-home-return>><<exit>>
+<</if>>
+<<set $outside to 0>><<effects>>
+<<if _shrineHomePerson>><<npc Tsukihan>><<person1>><</if>>
+<<language>>
+  <<option 'EN'>>
+    You settle onto the spare bedding. The quilt smells faintly of the wooden cupboard it was stored in.
+    <<if Weather.precipitation is 'rain'>>Rain ticks against the eaves.<<else>>The room is quiet beyond the rustle of the quilt.<</if>>
+  <<option 'CN'>>
+    你在客用被褥里躺好。被子带着木柜里淡淡的气味。
+    <<if Weather.precipitation is 'rain'>>雨点细细地敲着屋檐。<<else>>翻动被褥的窸窣声停下，屋里便安静了。<</if>>
+<</language>><br><br>
+<!-- 沿用原版选时、按小时睡眠与醒来结算，不替玩家脱衣或恢复衣着。 -->
+<<nightmareCheck 'Deadwood Raven Shrine Sleep'>>
+<<generateSleepLinks 'Deadwood Raven Shrine Sleep'>>
+<<getouticon>><<lanLink ['Climb out of bed', '离开被褥']>>
+  <<deadwood-raven-home-presence>>
+  <<if _shrineHomeTravel and $location is 'raven_shrine_house'>><<goto 'Deadwood Raven Shrine Room'>><</if>>
+<</lanLink>><br>
+<<deadwood-raven-home-return>>
+
+:: Deadwood Raven Shrine Sleep
+<<deadwood-raven-home-presence>>
+<<if !_shrineHome or $location isnot 'raven_shrine_house' or !Number.isInteger($sleephour) or ($sleephour isnot -1 and ($sleephour lt 1 or $sleephour gt 10))>>
+  <<lanSwitch 'You are not ready to sleep here.' '你还没有在这里安顿下来。'>><br><br>
+  <<deadwood-raven-home-return>><<exit>>
+<</if>>
+<<set _autosavehere to true, $outside to 0>>
+<!-- 客用被褥与月羽的床铺分开，不沿用上个场景留下的同床对象。 -->
+<<unset $bedGuest>>
+<<sleep>>
+<<if !_dreaming>>
+  <<deadwood-raven-home-presence>>
+  <<if _shrineHomeTravel and $location is 'raven_shrine_house'>>
+    <<effects>><<wakingEffects $sleepHoursTotal>>
+    <<if $nightmares gte 1 and $controlled is 0>>
+      <<nightmareWake>>
+    <<elseif !_wakingEffect>>
+      <<include 'Deadwood Raven Shrine Wake'>>
+    <</if>>
+    <<sleepeffects>><br><br>
+    <<if _shrineHome>>
+      <<bedicon>><<lanLink ['Continue sleeping', '继续睡觉']>>
+        <<deadwood-raven-home-context>>
+        <<if _shrineHome and $location is 'raven_shrine_house'>><<goto 'Deadwood Raven Shrine Bed'>><</if>>
+      <</lanLink>><br>
+    <</if>>
+    <<getouticon>><<lanLink ['Get up', '起床']>>
+      <<deadwood-raven-home-context>>
+      <<if _shrineHomeTravel and $location is 'raven_shrine_house'>><<goto 'Deadwood Raven Shrine Room'>><</if>>
+    <</lanLink>><br>
+    <<deadwood-raven-home-return>>
+  <</if>>
+<</if>>
