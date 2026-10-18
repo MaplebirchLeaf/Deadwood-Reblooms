@@ -9,6 +9,58 @@ const MAX_SHOP_STAFF = 2;
 export default class RobinShop extends Shared {
   public readonly investment = new Investment(this.core, this.facade);
 
+  /** 当面约好当天办手续，原版小时覆盖保留到该处营业结束；不挤掉学校和已有约定。 */
+  public get canArrangeMeeting(): boolean {
+    const outing = this.finance?.realEstate.outings;
+    const ride = this.core.get('Transport')?.state.commute;
+    return (
+      this.robinAvailable &&
+      !this.state.shop &&
+      this.state.shop_stage !== 'none' &&
+      window.getRobinLocation() === 'orphanage' &&
+      !V.replayScene &&
+      !V.statFreeze &&
+      !V.combat &&
+      !V.possessed &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
+      !V.eventforced &&
+      V.exposed <= 0 &&
+      V.stress < V.stressmax &&
+      Time.hour >= 7 &&
+      Time.hour < 17 &&
+      !Time.schoolDay &&
+      !V.robinlocationoverride?.during?.some((hour: number) => hour >= Time.hour) &&
+      !(outing?.live && outing.plan?.name === 'Robin') &&
+      !(ride?.boarded && !ride.arrived && ride.npc === 'Robin') &&
+      !(V.englishPlay === 'ongoing' && V.englishPlayDays === 0) &&
+      !(V.halloween === 1 && Time.monthDay === 31) &&
+      !(this.core.get('RobinTemple') && ['member', 'approved', 'promised'].includes(V.RobinTemple?.stage) && (Time.weekDay === 1 || (!Time.isWeekEnd() && Time.hour < 16)))
+    );
+  }
+
+  /** 只接受双方明确约好的原版地点覆盖，来到街道本身不会把罗宾带来。 */
+  public get meeting(): boolean {
+    const venue = ['planning', 'inspected'].includes(this.state.shop_stage) ? 'townhall' : 'shop';
+    return (
+      this.robinAvailable &&
+      !V.replayScene &&
+      !V.statFreeze &&
+      !V.combat &&
+      !V.possessed &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
+      !V.eventforced &&
+      V.robinlocationoverride?.location === venue &&
+      V.robinlocationoverride.during.includes(Time.hour) &&
+      window.getRobinLocation() === venue
+    );
+  }
+
+  public get canGoAlone(): boolean {
+    return this.canArrangeMeeting && Time.hour >= 9 && Time.hour * 60 + Time.minute + 60 < (this.state.shop_stage === 'applied' ? 18 : 17) * 60;
+  }
+
   /** 正式店铺可刷卡，金融模块未启用时保留原本的现金购买。 */
   public canCustomerPay(pennies: number): boolean {
     if (!Number.isSafeInteger(pennies) || pennies < 0) return false;

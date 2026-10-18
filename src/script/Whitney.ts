@@ -8,7 +8,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.inject({
     locationPassage: {
       // 只接在公寓闲聊的普通菜单前，项链事件仍必须先处理。
-      'Whitney Chat': [{ src: '\t<<whitneyOptions>>\n<<else>>', applybefore: '\t<<deadwood-whitney-music-link>>\n', expected: 1 }],
+      'Whitney Chat': [{ srcmatch: /<<\/switch>>\s*(?:<br\s*\/?>\s*){2}(?=<<whitney[Oo]ptions>>\s*<<else>>)/, applyafter: '\n\t<<deadwood-whitney-music-link>>\n', expected: 1 }],
       'School Front Courtyard': [{ src: '<<schoolicon "courtyard">>', applybefore: '<<deadwood-whitney-aftercare-link>>\n\t\t\t', expected: 1 }]
     },
     widgetPassage: {

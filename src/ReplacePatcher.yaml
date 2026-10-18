@@ -28,8 +28,8 @@
 
 - comment: '两人的房租已买断或贝利被逼退时，罗宾周结算不再扣房租，收入照常发放。'
   fileName: 'time.js'
-  from: 'if (V.robinpaid === 1) {'
-  to: "if (V.robinpaid === 1 || (maplebirch.get('Robin') && V.RobinExpansion?.bailey_defeated) || maplebirch.get('Finance')?.orphanage.robinFree) {"
+  from: 'V.robinpaid === 1'
+  after: " || (maplebirch.get('Robin') && V.RobinExpansion?.bailey_defeated) || maplebirch.get('Finance')?.orphanage.robinFree"
 
 - comment: '罗宾收入与储备金先于原版房租结算，weekPassed 未导出，直接在原版调用点传入回调。'
   fileName: 'time.js'
@@ -43,41 +43,27 @@
 
 - comment: '罗宾日程共用返回入口，统一处理留院、店铺、家教、雨天摊位和明确约好的出行。'
   fileName: 'ingame.js'
-  from: |
-    return T.robin_location;
-    }
-    window.getRobinLocation = getRobinLocation;
-  to: |
+  from: 'return T.robin_location;'
+  before: |
     T.robin_location = maplebirch.get('Robin')?.resolveLocation(T.robin_location)
       ?? maplebirch.get('Finance')?.realEstate.outings.location('Robin', T.robin_location)
       ?? T.robin_location;
-      return T.robin_location;
-    }
-    window.getRobinLocation = getRobinLocation;
 
 - comment: '已约好的短暂居家停留和驾车同行同步到凯拉尔的原版位置查询。'
   fileName: 'kylar-functions.js'
-  from: |
-    return location;
-    }
-    window.getKylarLocation = getKylarLocation;
-  to: |
+  from: 'return location;'
+  before: |
     const arranged = maplebirch.get('Finance')?.realEstate.outings.location('Kylar', location.area) ?? location.area;
       if (arranged !== location.area) location = { area: arranged, state: 'visiting' };
-      return location;
-    }
-    window.getKylarLocation = getKylarLocation;
 
 - comment: '悉尼原版地点与事务先结算，再统一处理节庆、庄园留宿、短暂外出和接送。'
   fileName: 'named-npc.js'
   from: |
     }
     window.sydneySchedule = sydneySchedule;
-  to: |
+  before: |
     if (maplebirch.get('Sydney')) maplebirch.get('Sydney').schedule();
       else T.sydney_location = maplebirch.get('Finance')?.realEstate.outings.location('Sydney', T.sydney_location) ?? T.sydney_location;
-    }
-    window.sydneySchedule = sydneySchedule;
 
 - comment: '意志突破后允许正常增益继续填充扩展后的六级上限。'
   fileName: 'stat-changes.js'
@@ -86,9 +72,8 @@
 
 - comment: '容貌突破后允许原版美容增益继续填充扩展后的六级上限。'
   fileName: 'stat-changes.js'
-  from: 'maxValue = V.beautymax; // Special-case for the $beautymax value'
-  to: |
-    maxValue = maplebirch.get('VanillaPlus') && V.VanillaPlus?.lock?.beauty ? Math.floor(V.beautymax * 1.25) : V.beautymax; // Special-case for the $beautymax value
+  from: 'V.beautymax;'
+  before: "maplebirch.get('VanillaPlus') && V.VanillaPlus?.lock?.beauty ? Math.floor(V.beautymax * 1.25) : "
 
 - comment: '六项属性全满后，原版美容变化不能令容貌从突破后的峰值降低。'
   fileName: 'stat-changes.js'
@@ -110,13 +95,13 @@
 
 - comment: '嗜虐仅阻止每日受虐倾向衰减，后续等级与提示仍由原版结算。'
   fileName: 'time.js'
-  from: 'V.masochism *= 0.985;'
-  to: "if (!maplebirch.get('VanillaPlus')?.preserveSadomasochism) V.masochism *= 0.985;"
+  from: 'V.masochism *='
+  before: "if (!maplebirch.get('VanillaPlus')?.preserveSadomasochism) "
 
 - comment: '嗜虐仅阻止每日施虐倾向衰减，保留 DoLP 条件、成就增益与其他变化。'
   fileName: 'time.js'
-  from: 'V.sadism *= 0.985;'
-  to: "if (!maplebirch.get('VanillaPlus')?.preserveSadomasochism) V.sadism *= 0.985;"
+  from: 'V.sadism *='
+  before: "if (!maplebirch.get('VanillaPlus')?.preserveSadomasochism) "
 
 - comment: '六项属性全满后，每日衰减不能令淫乱从突破后的峰值降低。'
   fileName: 'time.js'
@@ -188,13 +173,13 @@
 
 - comment: '钢铁意志限制非战斗性奋，共用原版钳制，战斗上限与主动剧情结算照常。'
   fileName: 'stat-changes.js'
-  from: 'V.arousal = Math.clamp(V.arousal, minArousal(), V.arousalmax);'
-  to: 'V.arousal = Math.clamp(V.arousal, minArousal(), maplebirch.get("VanillaPlus")?.divineTransformations.arousalLimit ?? V.arousalmax);'
+  from: 'minArousal(), '
+  after: 'maplebirch.get("VanillaPlus")?.divineTransformations.arousalLimit ?? '
 
 - comment: '意志承伤层在疼痛钳制前吸收伤害。'
   fileName: 'stat-changes.js'
-  from: 'V.pain = Math.clamp(V.pain, minPain(), 200);'
-  to: 'V.pain = Math.clamp(maplebirch.get("VanillaPlus")?.willpower.absorbPain(V.pain) ?? V.pain, minPain(), 200);'
+  from: 'V.pain, minPain()'
+  before: 'maplebirch.get("VanillaPlus")?.willpower.absorbPain(V.pain) ?? '
 
 # 尺寸扩展：PC 新增第 7 档，NPC 新增第 5 档，沿用原版接受度及体液分类。
 - comment: 'PC 第七档沿用原版大尺寸不安。'
@@ -221,3 +206,14 @@
   fileName: 'time.js'
   from: 'dailySchoolEffects();'
   to: "maplebirch.get('LifeSimulation') ? maplebirch.get('LifeSimulation').school.attendance(dailySchoolEffects) : dailySchoolEffects();"
+
+# 悉尼沿用原版逐小时劳动；从零开始也有效，PC 同行已结算本人劳动时不重复加算。
+- comment: '悉尼在花园实际工作时维护花园，清洁度封顶一百。'
+  fileName: 'time.js'
+  from: 'V.temple_garden >= 1) V.temple_garden'
+  before: "maplebirch.get('Sydney')?.canMaintain ?? "
+
+- comment: '悉尼在宿舍实际工作时维护宿舍，保留原版日程与每日衰减。'
+  fileName: 'time.js'
+  from: "else if (V.sydney_templeWork === \"quarters\") {\n\t\t\t\t\tif ("
+  after: "maplebirch.get('Sydney')?.canMaintain ?? "

@@ -14,6 +14,13 @@ class Sydney extends Module {
     return C.npc.Sydney.init === 1 && !['prison', 'dungeon'].includes(C.npc.Sydney.state) && V.daily.sydney?.punish !== 1;
   }
 
+  /** 原版小时劳动共用此条件；共同清扫期间已由该行动结算本人贡献。 */
+  public get canMaintain(): boolean {
+    if (!this.available || C.npc.Sydney.state !== 'active' || V.replayScene || V.statFreeze || T.sydneyWorkTogether || V.RobinTemple?.punish?.joint) return false;
+    const value = V.sydney_templeWork === 'garden' ? V.temple_garden : V.sydney_templeWork === 'quarters' ? V.temple_quarters : undefined;
+    return Number.isFinite(value) && value < 100;
+  }
+
   public get canTease(): boolean {
     return V.sydneyromance === 1 && window.hasSexStat('promiscuity', 2) && !window.pcAreArmsBound('both');
   }

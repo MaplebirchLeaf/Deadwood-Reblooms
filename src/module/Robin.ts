@@ -95,7 +95,8 @@ class Robin extends Module implements RobinFacade {
   /** 把柠檬水或巧克力摊位升一级。usePcMoney 为真时改由 PC 的现金垫付并记入 pc_loan。 */
   public upgrade(kind: 'lemonade' | 'chocolate', usePcMoney = false): boolean {
     const state = this.state;
-    if (!this.available || state[kind] >= 2 || state.topics[kind] <= state[kind]) return false;
+    const introduced = kind === 'lemonade' ? V.robinlemonadeintro === 1 : V.robinchocolateintro === 1;
+    if (!this.available || V.replayScene || V.statFreeze || (!introduced && state[kind] === 0) || state[kind] >= 2 || state.topics[kind] <= state[kind]) return false;
     const cost = state[kind] === 0 ? 600 : 400;
     if (usePcMoney) {
       if ((Number(V.money) || 0) < cost * 100) return false;

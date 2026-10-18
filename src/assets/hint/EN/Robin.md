@@ -1,6 +1,6 @@
 ### Start with the two stalls
 
-See the business problems at Robin's beach lemonade stall or winter hot chocolate stall in the park, then discuss improvements in **Orphanage → Robin's room**.
+Meet Robin at the beach lemonade stall or winter hot chocolate stall in the park, then ask about the stall equipment. Once you have seen the business problem, discuss improvements in **Orphanage → Robin's room**. After each upgrade, ask about the equipment at that stall again to discover the next plan.
 
 The first upgrade at each stall costs <span class="gold">£600</span> and the second <span class="gold">£400</span>; fully upgrading both costs <span class="gold">£2,000</span>. Lend PC cash or let Robin pay from funds remaining after rent. PC contributions become a loan owed by Robin.
 
@@ -8,13 +8,15 @@ Upgrades add products and shelter from rain, with tasting and work options. Help
 
 ### Tutoring
 
-After upgrading at least one stall, read the tutoring notice at the orphanage and discuss it in Robin's room. Robin needs enough confidence to start.
+After upgrading at least one stall, read the tutoring notice at the orphanage and discuss it in Robin's room. Robin needs **45 confidence** to begin teaching.
 
 The trial and later visits are on **Danube Street**. During term, accompany Robin on Tuesdays and Thursdays at 17:30–18:30; Fridays are added after six lessons. Completing a lesson gives the PC <span class="gold">£7.50</span> and adds <span class="gold">£8</span> to Robin's business reserves. Robin can also teach alone. Visiting and leaving without teaching does not count.
 
 ### Cliff Street drinks shop
 
 Upgrade both stalls to level two, discuss a proper shop in the room, then follow the journal:
+
+Before handling paperwork together, arrange a same-day meeting while **Robin is free at home on a day without school**. On weekends, ask **07:00–09:00 before the stall opens**, then make your own way to the town hall or vacant Cliff Street shop. Existing commitments take priority. With enough confidence and a free hour before closing, Robin can still apply, inspect the premises or collect the permit alone.
 
 | Order | Action                                                     | Cost                             |
 | ----- | ---------------------------------------------------------- | -------------------------------- |

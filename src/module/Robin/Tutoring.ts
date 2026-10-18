@@ -13,9 +13,13 @@ export default class RobinTutoring extends Shared {
     return this.robinAvailable && C.npc.Robin.trauma < 80 && this.state.tutor && this.state.tutor_lessons > 0 && Time.schoolTerm ? (this.state.tutor_lessons >= 6 ? 60 : 40) : 0;
   }
 
-  /** 开班条件：已拿到家教线索、摊位至少 1 级、罗宾主见足够。 */
+  /** 线索先在主见 40 出现，准备到 45 才能正式接下试课。入口与结算共用。 */
+  public get canStart(): boolean {
+    return this.robinAvailable && !V.replayScene && !V.statFreeze && this.state.topics.tutor && !this.state.tutor && Math.max(this.state.lemonade, this.state.chocolate) >= 1 && C.npc.Robin.dom >= 45;
+  }
+
   public start(): boolean {
-    if (!this.robinAvailable || !this.state.topics.tutor || this.state.tutor || Math.max(this.state.lemonade, this.state.chocolate) < 1 || C.npc.Robin.dom < 45) return false;
+    if (!this.canStart) return false;
     this.state.tutor = true;
     // 当天尚未到授课时间，罗宾也能自行完成试课，已过授课时间则从下个上课日开始。
     this.state.tutor_day = Time.hour < 19 ? Time.days - 1 : Time.days;

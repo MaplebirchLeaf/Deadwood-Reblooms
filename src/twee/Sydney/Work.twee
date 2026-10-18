@@ -1,44 +1,63 @@
 :: Deadwood Reblooms Sydney Work Widgets [widget]
+<!-- 每次点击重新读取日程；结束后复查同场状态，不提前发放共同劳动收益。 -->
+<<widget 'deadwood-reblooms-sydney-work-check'>>
+  <<sydneySchedule>>
+  <<set _workTogether to maplebirch.get('Sydney')?.available and _sydneyAvailable
+    and $location is 'temple' and $sydney_templeWork is _args[0]
+    and $exposed lt 1 and !pcAreArmsBound('both') and $stress lt $stressmax
+    and !$combat and !$possessed and !$replayScene and !$statFreeze
+    and !$nextPassage and !$nextPassageCheck and !$eventforced and !isPregnancyEnding()
+    and $SydneyExpansion[_args[0] + 'Day'] isnot Time.days>>
+  <<if _workTogether and !_args[1]>>
+    <<set _workTogether to Time.dayState isnot 'night' and V['temple_' + _args[0]] lt 100
+      and (_args[0] is 'garden' ? Time.hour gte 7 and Time.hour lt 10 : Time.hour gte 17 and Time.hour lt 20)>>
+  <</if>>
+<</widget>>
+
 <!-- 原版的随机工作事件继续保留，这里仅增加悉尼确实在同一地点时的固定同行选项。 -->
 <<widget 'deadwood-reblooms-sydney-garden-work-link'>><<silently>>
-  <<if _sydneyAvailable is undefined>>
-    <<sydneySchedule>>
-  <</if>>
-  <<set _workTogether to _sydneyAvailable
-    and $sydney_templeWork is 'garden'
-    and Time.hour gte 7 and Time.hour lt 10
-    and Time.dayState isnot 'night'
-    and $exposed lt 1 and $temple_garden lt 100
-    and !pcAreArmsBound('both') and $stress lt $stressmax
-    and $SydneyExpansion.gardenDay isnot Time.days>>
+  <<deadwood-reblooms-sydney-work-check 'garden'>>
 <</silently>><<if _workTogether>>
   <<templeicon 'garden'>>
-  <<lanLink ['Tend the garden with Sydney (1:00)', '和悉尼一起打理花园 (1:00)'] 'Deadwood Reblooms Sydney Garden Work'>>
-    <<set $phase to 'sydney-garden-work'>>
-    <<set $SydneyExpansion.gardenDay to Time.days>>
-    <<set $temple_garden to Math.min(100, $temple_garden + 6)>>
-    <<pass 60>><<grace 1 monk>><<tiredness 6>><<tending 1>>
+  <<lanLink ['Tend the garden with Sydney (1:00)', '和悉尼一起打理花园 (1:00)']>>
+    <<deadwood-reblooms-sydney-work-check 'garden'>>
+    <<if _workTogether>>
+      <<set _cleaningSource to $passage, _cleaningDay to Time.days>>
+      <<set _sydneyWorkTogether to true>>
+      <<pass 60>>
+      <<unset _sydneyWorkTogether>>
+      <<deadwood-reblooms-sydney-work-check 'garden' true>>
+      <<if _workTogether and $passage is _cleaningSource and Time.days is _cleaningDay>>
+        <<set $SydneyExpansion.gardenDay to Time.days>>
+        <<set $temple_garden to Math.min(100, $temple_garden + 6)>>
+        <<grace 1 monk>><<tiredness 6>><<tending 1>>
+        <<set $phase to 'sydney-garden-work'>>
+        <<goto 'Deadwood Reblooms Sydney Garden Work'>>
+      <</if>>
+    <</if>>
   <</lanLink>><<gtending>><<ggrace monk>><<gtiredness>><br>
 <</if>><</widget>>
 
 <<widget 'deadwood-reblooms-sydney-quarters-work-link'>><<silently>>
-  <<if _sydneyAvailable is undefined>>
-    <<sydneySchedule>>
-  <</if>>
-  <<set _workTogether to _sydneyAvailable
-    and $sydney_templeWork is 'quarters'
-    and Time.hour gte 17 and Time.hour lt 20
-    and Time.dayState isnot 'night'
-    and $exposed lt 1 and $temple_quarters lt 100
-    and !pcAreArmsBound('both') and $stress lt $stressmax
-    and $SydneyExpansion.quartersDay isnot Time.days>>
+  <<deadwood-reblooms-sydney-work-check 'quarters'>>
 <</silently>><<if _workTogether>>
   <<choreicon 'sweep'>>
-  <<lanLink ['Tidy the quarters with Sydney (1:00)', '和悉尼一起整理宿舍 (1:00)'] 'Deadwood Reblooms Sydney Quarters Work'>>
-    <<set $phase to 'sydney-quarters-work'>>
-    <<set $SydneyExpansion.quartersDay to Time.days>>
-    <<set $temple_quarters to Math.min(100, $temple_quarters + 6)>>
-    <<pass 60>><<grace 1 monk>><<housekeeping 1 1000>>
+  <<lanLink ['Tidy the quarters with Sydney (1:00)', '和悉尼一起整理宿舍 (1:00)']>>
+    <<deadwood-reblooms-sydney-work-check 'quarters'>>
+    <<if _workTogether>>
+      <<set _cleaningSource to $passage, _cleaningDay to Time.days>>
+      <<set _sydneyWorkTogether to true>>
+      <<pass 60>>
+      <<unset _sydneyWorkTogether>>
+      <<deadwood-reblooms-sydney-work-check 'quarters' true>>
+      <<if _workTogether and $passage is _cleaningSource and Time.days is _cleaningDay>>
+        <<set $SydneyExpansion.quartersDay to Time.days>>
+        <<set $temple_quarters to Math.min(100, $temple_quarters + 6)>>
+        <<grace 1 monk>><<housekeeping 1 1000>>
+        <<set $phase to 'sydney-quarters-work'>>
+        <<goto 'Deadwood Reblooms Sydney Quarters Work'>>
+      <</if>>
+    <</if>>
   <</lanLink>><<ghousekeeping>><<ggrace monk>><br>
 <</if>><</widget>>
 
@@ -62,7 +81,7 @@
   <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
   <<language>>
     <<option 'EN'>>
-      You and Sydney work along the garden's outer edge. <<He>> steadies a basket while you clear the weeds from a flowerbed. By the time the fountain comes into view again, the basket is full and there is soil on both your hands.
+      You and Sydney work along the garden's outer edge, where the last flowerbeds meet the trees. <<He>> steadies a basket on the narrow path while you clear the weeds. You can hear the fountain through the hedge. By the time it comes into view again, the basket is full and there is soil on both your hands.
       <br><br>
       <<if _sydneyStatus.includes('pure')>>
         Sydney sets the tools in a tidy row. "<span class='green'>The plants will have a little more room to grow now</span>," <<he>> says, pleased with what you have done together.
@@ -72,7 +91,7 @@
         Sydney notices a flower you nearly pulled up and catches your hand in time. <span class='teal'>You both laugh</span>, then work your way around it.
       <</if>>
     <<option 'CN'>>
-      你和悉尼从花园外沿开始干活。<<He>>扶稳篮子，你把花坛里的野草一把把拔出来。等你们重新看见喷泉，篮子已经装满，你们的手上也都沾了泥。
+      你和悉尼从花园外沿开始干活，最后几处花坛已经挨着林木。<<He>>在窄路上扶稳篮子，你把野草一把把拔出来。树篱后传来喷泉的水声。等你们重新看见喷泉，篮子已经装满，你们的手上也都沾了泥。
       <br><br>
       <<if _sydneyStatus.includes('pure')>>
         悉尼把工具整齐地排在一边。“<span class='green'>这下花也能长得舒展些了。</span>”<<he>>看着你们一起清理过的花坛，显得很高兴。
@@ -172,7 +191,7 @@
   <<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
   <<language>>
     <<option 'EN'>>
-      Sydney carries the clean laundry from room to room while you sweep the floor and straighten the bunks. Each time you pass in the corridor, one of you makes space for the other's load.
+      Sydney carries the clean laundry between the four rooms off the central hall while you sweep beneath the bunks and straighten the bedding. Dust gathers against the broom; folded robes wait on the shelves. Each time you pass in the corridor, one of you makes space for the other's load.
       <br><br>
       <<if _sydneyStatus.includes('pure')>>
         Sydney folds the last robe with careful, even edges. "<span class='green'>The evening shift can come back to a clean room</span>," <<he>> says.
@@ -182,7 +201,7 @@
         You find a lost bookmark among the sheets. Sydney recognises it at once and tucks it into <<his>> pocket with a relieved smile.
       <</if>>
     <<option 'CN'>>
-      悉尼把洗净的衣物一间间送回去，你则扫净地面，理好床铺。每次在走廊相遇，你们都会侧身给对方手里的东西让路。
+      悉尼把洗净的衣物送进中央大厅周围的四个房间，你则扫过床下，理好铺盖。灰尘聚到扫帚前，叠好的修道袍暂搁在架上。每次在走廊相遇，你们都会侧身给对方手里的东西让路。
       <br><br>
       <<if _sydneyStatus.includes('pure')>>
         悉尼把最后一件修道袍叠得方方正正。“<span class='green'>晚班的人回来，就能住进干净的房间了。</span>”<<he>>说。

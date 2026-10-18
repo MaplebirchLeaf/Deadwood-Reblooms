@@ -4,9 +4,15 @@ Reach 10 affection with Sydney, attend science normally and hear Sirris mention 
 
 Sydney still follows the day's classes and temple duties. Borrowing notes grants learning and affection benefits once daily; skills and Sydney's current state affect additional replies.
 
+### Temple chores
+
+While Sydney is actually working in the garden or quarters, the native hourly settlement improves that area by **1 point per hour, capped at 100**, including from zero. School, prayer, rest and punishment do not count as work.
+
+Join Sydney on duty to tend the garden or tidy the quarters. One hour improves the area by **6 points**, retaining its Tending or Housekeeping practice and grace. Sydney’s own hourly contribution is not counted again during the shared work.
+
 ### Temple bunk
 
-First establish the original romance with Sydney. The PC must be a monk, and Sydney must have monk or priest quarters access. While Sydney is doing chores in the quarters and your stress is below its maximum, ask to sit by the bunk for the first invitation.
+First establish the original romance with Sydney. Both the PC and Sydney must be monks, nuns or priests. While Sydney is doing chores in the quarters and your stress is below its maximum, ask to sit by the bunk for the first invitation.
 
 Thereafter, enter Sydney's bunk from the temple quarters to read, talk, use the wardrobe and rest. Intimate relationship options also require selecting Sydney on the Attitudes page. Punishments, trials and duties take priority; the invitation does not make Sydney wait by the bed at all times.
 
