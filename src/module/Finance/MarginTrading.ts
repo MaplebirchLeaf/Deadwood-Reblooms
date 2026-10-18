@@ -102,6 +102,7 @@ export default class MarginTrading {
   }
 
   public place(kind: 'stock' | 'futures', symbol: string, side: number, lots: number, leverage: number): boolean {
+    this.finance.advanceMarketThrough(Math.floor(Time.days));
     const finance = V.Finance;
     if (
       !this.open ||
@@ -138,6 +139,7 @@ export default class MarginTrading {
   }
 
   public close(id: number): boolean {
+    this.finance.advanceMarketThrough(Math.floor(Time.days));
     const position = this.closablePositions.find(item => item.id === id);
     if (!position) return false;
     this.settle(position, 'closed', Math.floor(Time.days));

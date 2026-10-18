@@ -25,7 +25,7 @@ Net balance deducts credit, personal loan, mortgage and collection debts. Eligib
 
 **Furniture payment problems**: check the selected home, issued cards, completed reload, sufficient deposits or available credit, and overdue restrictions. A large bank balance does not mean a debit card was issued. A credit limit is not an equal personal-loan entitlement.
 
-Markets respond to farm progress and raids, Ocean Breeze Cafe prices, adverts, expansion, ingredient rumours and police investigations, Avery’s company outcomes, and Robin’s shop opening, improvements, staff and orchard deliveries. Events affect prices after they occur. Reopening the counter does not settle the same event repeatedly. Deliveries move the quote only at the first, fifth and tenth completed order.
+Markets respond to farm progress and raids, Ocean Breeze Cafe prices, adverts, expansion, ingredient rumours and police investigations, Avery’s company outcomes, and Robin’s shop opening, improvements, staff and orchard deliveries. Events affect prices after they occur. Reopening the counter does not settle the same event repeatedly. Orchard deliveries to the drinks shop move its quote only at the first, fifth and tenth completed order.
 
 <span class="blue">The cafe keeps trading for a week after announcing its expansion. Construction closure is a separate report. Maximum suspicion alone does not mean the police have discovered it. An actual investigation on Cliff Street causes the larger fall.</span> Publicly disclosing the ingredients at reopening also affects the quote.
 
@@ -114,3 +114,13 @@ After the management appointment is confirmed at the counter, **new personal loa
 For a <span class="gold">£1,000</span> seven-day loan, the first week's interest on the principal falls from <span class="gold">£10.50</span> to <span class="gold">£9.45</span>. Other terms depend on outstanding debt, instalments and rounding to pennies. Multiplying the first week's interest by the number of weeks does not give the total interest.
 
 The work conversation and application page read current quotes directly from the finance system. The work conversation shows the standard rate, current rate and whether eligibility is suspended. The sidebar portrait and social avatar belong to their respective optional image modules.
+
+### Street and business effects on quotes
+
+- An actual bank raid affects the High Street shopping centre (HSC) by **−4%** over concerns about nearby trade. Lifting the emergency counter suspension gives **+2%**. Preparation, conversations and a report before entry do not trigger the loss, and deposits are not reduced.
+- The first paid custody settlement for the loading-bay robbery, casino chip case and cafe intimidation case affects **MER +2%, CSN +2% and OBC +1%**, respectively. Leads, released suspects and repeated cases give no further price boost.
+- Legal deliveries count separately for the cafe, docks and casino. The **3rd, 10th and 25th** complete, on-time deliveries each give that customer's quote **+1%**. Illegal, late or still-disputed loads do not count.
+- A workshop's **1st, 5th and 10th** on-time supply orders for each listed customer each give that customer's quote **+1%**. Its first actual refusal to pay for a delivered order gives **−2%**. Selling and repurchasing a workshop does not reset these market milestones.
+- The **25th and 100th** paid taxi trips each give Harvest Street Motors (HSG) **+1%**, reflecting fuel and servicing demand.
+
+Event effects combine with ordinary market movements; favourable news does not guarantee a positive daily return. **Weekend news waits for the next trading day.** Reopening a journal or counter does not apply an event twice. The securities desk and financial journal show the latest three notices, their effects and any pending pricing. The Financial Daily keeps the historical copy you read.

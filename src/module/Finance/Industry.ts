@@ -52,6 +52,8 @@ export interface FactoryState {
   earned: number;
   spent: number;
   delivered: number;
+  supplied?: Record<string, number>;
+  unpaid_customers?: string[];
   defaults: number;
   laboratory: LaboratoryState;
   report: { day: number; event: 'paid' | 'default' | 'late' | 'overdue' | 'cancelled' | 'delivered' | 'resigned'; seen: boolean; amount: number; customer: string } | null;
@@ -317,6 +319,10 @@ export default class Industry {
     const payDay = contract?.site === state.site && contract.id === order.id ? contract.pay_day : day + (order.outcome === 'late' ? 7 : 2);
     state.invoices.push({ order, pay_day: payDay });
     state.delivered++;
+    if (!late) {
+      const supplied = (state.supplied ??= {});
+      supplied[order.customer] = (supplied[order.customer] ?? 0) + 1;
+    }
     const publicOrder = this.finance.donations.projects.some(project => project.id === order.customer);
     this.finance.recognition.award('business', publicOrder ? `public-delivery-${order.customer}` : 'factory-delivery', publicOrder ? 15 : 5, publicOrder ? 28 : 7);
     state.report = { day, event: 'delivered', seen: false, amount: order.total, customer: order.customer };
@@ -469,6 +475,8 @@ export default class Industry {
       }
       if (order.outcome === 'default') {
         state.defaults++;
+        const customers = (state.unpaid_customers ??= []);
+        if (!customers.includes(order.customer)) customers.push(order.customer);
         this.finance.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood Unpaid Invoice">>');
       } else {
         state.cash += order.total;

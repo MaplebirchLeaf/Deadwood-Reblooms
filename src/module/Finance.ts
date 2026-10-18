@@ -105,7 +105,8 @@ interface MarketState {
   robin_staff?: number;
   robin_orders?: number;
   company_events: string[] | null;
-  news?: { day: number; symbol: string; event: string; move: number; share_change?: number | null }[];
+  linked_events?: string[];
+  news?: { day: number; symbol: string; event: string; move: number; share_change?: number | null; applied_day?: number | null }[];
 }
 
 export interface FinanceState {
@@ -350,11 +351,16 @@ class Finance extends Module {
     });
     this.core.tool.onInit(() => void this.securities);
     this.core.on(':variable', () => CompanyEvents.capture(this.state.market, this.securities));
+    this.core.on(':passagestart', passage => {
+      if (passage.title.startsWith('Deadwood Reblooms Financial Centre')) this.advanceMarketThrough(Finance.currentDay);
+    });
     this.core.on(':passageend', (passage, content) => {
       if (
         V.replayScene ||
         V.statFreeze ||
-        !/^(?:Cliff Street$|Ocean Breeze$|Chef |Photo|Farm |Deadwood Robin Bailey Reckoning Finish$|Deadwood Reblooms (?:Robin|Orchard|Orphanage))/.test(passage.title)
+        !/^(?:Cliff Street$|Ocean Breeze$|Chef |Photo|Farm |Deadwood Robin Bailey Reckoning Finish$|Deadwood Street (?:Cargo|Bount|Heist)|Deadwood Transport Taxi|Deadwood Reblooms (?:Robin|Orchard|Orphanage|Financial Centre|Industry|Company))/.test(
+          passage.title
+        )
       )
         return;
       this.advanceMarketThrough(Finance.currentDay, content);
@@ -380,7 +386,7 @@ class Finance extends Module {
   }
 
   public advanceMarketThrough(day: number, content?: ParentNode): void {
-    if (V.replayScene || V.statFreeze || !Number.isInteger(day) || day > Finance.currentDay) return;
+    if (V.replayScene || V.statFreeze || !Number.isInteger(day) || day > Finance.currentDay || day < this.state.market.day) return;
     Securities.updatePrices(
       this.state,
       this.securities,
@@ -731,6 +737,7 @@ class Finance extends Module {
   }
 
   public buy(symbol: unknown, amount: unknown): FinanceResult {
+    this.advanceMarketThrough(Finance.currentDay);
     const { brokerage, market } = this.state;
     if (!brokerage.opened) return 'brokerage-required';
     if (!this.margin.open) return 'market-closed';
@@ -755,6 +762,7 @@ class Finance extends Module {
   }
 
   public sell(symbol: unknown, amount: unknown): FinanceResult {
+    this.advanceMarketThrough(Finance.currentDay);
     const { brokerage, market } = this.state;
     if (!brokerage.opened) return 'brokerage-required';
     if (!this.margin.open) return 'market-closed';

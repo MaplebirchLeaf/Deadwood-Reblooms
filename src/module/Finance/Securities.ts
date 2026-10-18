@@ -36,7 +36,8 @@ export default class Securities {
   }
 
   public static tradingDay(day: number): boolean {
-    const weekDay = (((((Number(Time.weekDay) || 1) - (Math.floor(Time.days) - day) - 1) % 7) + 7) % 7) + 1;
+    // Time.days 从开局时刻起算，星期必须固定在开局日期，不能随午夜的当前星期偏移。
+    const weekDay = ((((Number(Time.startDate.weekDay) - 1 + day) % 7) + 7) % 7) + 1;
     return weekDay >= 2 && weekDay <= 6;
   }
 
@@ -110,32 +111,37 @@ export default class Securities {
     }
   }
 
-  public static applyMoves(market: MarketState, securities: readonly Security[]): void {
+  public static applyMoves(market: MarketState, securities: readonly Security[], day = Math.floor(Time.days)): void {
     for (const item of securities) {
       const move = market.pending_farm_moves?.[item.symbol] ?? 0;
       if (!move) continue;
       market.prices[item.symbol] = Math.clamp(Math.round((market.prices[item.symbol] * (100 + move)) / 100), 1, Number.MAX_SAFE_INTEGER);
+    }
+    for (const notice of market.news ?? []) {
+      if (notice.applied_day === null && securities.some(item => item.symbol === notice.symbol)) notice.applied_day = day;
     }
     market.pending_farm_moves = {};
   }
 
   public static applyEvents(market: MarketState, securities: readonly Security[], shop?: boolean, business?: { upgrades: number; staff: number; orders: number }, content?: ParentNode): void {
     const record = (symbol: string, event: string, move: number) => {
-      CompanyEvents.record(market, symbol, event, move);
+      CompanyEvents.record(market, symbol, event, move).applied_day = null;
     };
     const stage = Math.max(0, Math.floor(Number(V.farm_stage) || 0));
     const previousStage = market.farm_stage ?? stage;
     const moves = (market.pending_farm_moves ??= {});
-    if (previousStage < 7 && stage >= 7) moves.RMY = (moves.RMY ?? 0) - 2;
-    if (previousStage < 9 && stage >= 9) {
-      moves.ALF = (moves.ALF ?? 0) + 8;
-      moves.RMY = (moves.RMY ?? 0) - 3;
+    for (const [level, symbol, move] of [
+      [7, 'RMY', -2],
+      [9, 'ALF', 8],
+      [9, 'RMY', -3],
+      [12, 'ALF', 10],
+      [12, 'RMY', -4]
+    ] as const) {
+      if (previousStage < level && stage >= level) {
+        moves[symbol] = (moves[symbol] ?? 0) + move;
+        record(symbol, 'farm', move);
+      }
     }
-    if (previousStage < 12 && stage >= 12) {
-      moves.ALF = (moves.ALF ?? 0) + 10;
-      moves.RMY = (moves.RMY ?? 0) - 4;
-    }
-    if (previousStage !== stage && [7, 9, 12].some(level => previousStage < level && stage >= level)) record('ALF', 'farm', moves.ALF ?? 0);
     market.farm_stage = stage;
 
     const damage = Boolean(V.farm_attacked) && Array.isArray(V.fields_damaged) ? V.fields_damaged.length : 0;
@@ -150,10 +156,16 @@ export default class Securities {
     // 进入第七阶段时仍营业一周，实际施工停业另按 chef_rework 判断。
     const cafeStage = Math.max(0, Math.floor(Number(V.chef_state) || 0));
     const previousCafeStage = market.cafe_stage ?? cafeStage;
-    if (previousCafeStage < 2 && cafeStage >= 2) moves.OBC = (moves.OBC ?? 0) + 3;
-    if (previousCafeStage < 7 && cafeStage >= 7) moves.OBC = (moves.OBC ?? 0) - 4;
-    if (previousCafeStage < 9 && cafeStage >= 9) moves.OBC = (moves.OBC ?? 0) + 10;
-    if (previousCafeStage !== cafeStage && [2, 7, 9].some(level => previousCafeStage < level && cafeStage >= level)) record('OBC', 'cafe', cafeStage >= 9 ? 10 : cafeStage >= 7 ? -4 : 3);
+    for (const [level, move] of [
+      [2, 3],
+      [7, -4],
+      [9, 10]
+    ] as const) {
+      if (previousCafeStage < level && cafeStage >= level) {
+        moves.OBC = (moves.OBC ?? 0) + move;
+        record('OBC', 'cafe', move);
+      }
+    }
     market.cafe_stage = cafeStage;
 
     // 原版高楼事件的结局：仪式成功获得麋鹿们支持，救援路线则仍有火灾损失。
@@ -195,7 +207,7 @@ export default class Securities {
       market.robin_orders = orders;
     }
     CompanyEvents.capture(market, securities, content);
-    if (Number(Time.weekDay) !== 1 && Number(Time.weekDay) !== 7) Securities.applyMoves(market, securities);
+    if (Number(Time.weekDay) !== 1 && Number(Time.weekDay) !== 7 && Securities.tradingDay(Math.floor(Time.days))) Securities.applyMoves(market, securities);
   }
 
   public static updatePrices(finance: FinanceState, securities: readonly Security[], onDay?: (day: number) => void, targetDay = Math.floor(Time.days)): void {
@@ -212,7 +224,7 @@ export default class Securities {
       }
       finance.market.previous_prices = { ...finance.market.prices };
       for (const item of securities) finance.market.prices[item.symbol] = Securities.nextPrice(item, finance.market.prices[item.symbol], day, finance.market.seed);
-      Securities.applyMoves(finance.market, securities);
+      Securities.applyMoves(finance.market, securities, day);
       CompanyEvents.daily(finance.market, securities, day);
       Securities.advanceShares(finance, securities, day);
       finance.market.history.push({ day, prices: { ...finance.market.prices } });

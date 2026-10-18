@@ -32,6 +32,7 @@ interface JobsState {
   day: number;
   board: string[];
   completed: number;
+  deliveries?: Record<string, number>;
   earned: number;
   losses: number;
   report: { id: string; outcome: 'paid' | 'returned' | 'cancelled' | 'lost'; fee: number; late: boolean; crew?: CrewQuote } | null;
@@ -241,6 +242,10 @@ export default class Jobs {
       }
       job.stage = 'settlement';
       job.vehicle = null;
+      if (!contract.illegal && !job.late && job.issue === 'none') {
+        const deliveries = (state.deliveries ??= {});
+        deliveries[contract.target] = (deliveries[contract.target] ?? 0) + 1;
+      }
       if (job.issue === 'recognised') this.street.core.SugarCube.Wikifier.wikifyEval(`<<crimeUp ${terms.witness_crime} 'thievery'>>`);
     } else if (action === 'return') {
       if (title !== 'Deadwood Street Cargo' || job.stage !== 'carrying' || !this.cargoHere) return false;
