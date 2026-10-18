@@ -1,7 +1,54 @@
 :: Deadwood BirdTower Hunt Widgets [widget]
 
+<!-- 同一狩猎步只判定、入账一次；跨日或重绘不重新抽取猎物。 -->
+<<widget "birdtower_hunt_result">>
+  <<set _huntResult to null>>
+  <<if !$bird.hunts.loot or $combat or $replayScene or $statFreeze>><<exit>><</if>>
+  <<set _huntMark to [$bird.hunts.timer, $bird.hunts.distanceNorth, $bird.hunts.distanceEast].join(':')>>
+  <<if $BirdTower.hunt.result?.mark isnot _huntMark>>
+    <<set $BirdTower.hunt.result to {mark: _huntMark, prey: null, dance: null, tending: null, base: false, left: 0, companion: false}>>
+  <</if>>
+  <<set _huntResult to $BirdTower.hunt.result>>
+  <<if _args[0] is 'ambush'>>
+    <<if _huntResult.skulduggery is undefined>>
+      <<skulduggerycheck 'silent'>>
+      <<set _huntResult.skulduggery to $skulduggerysuccess>>
+    <</if>>
+    <<set $skulduggerysuccess to _huntResult.skulduggery>>
+  <<elseif _args[0] is 'chase'>>
+    <<if _huntResult.athletics is undefined>><<set _huntResult.athletics to $athleticsSuccess>><</if>>
+    <<set $athleticsSuccess to _huntResult.athletics>>
+  <<elseif _args[0] and _huntResult.dance is null>>
+    <<switch _args[0]>>
+      <<case 'single'>><<dancedifficulty 1 `600 - maplebirch.get('BirdTower').party.length * 50` true>>
+      <<case 'double'>><<dancedifficulty 300 `1200 - maplebirch.get('BirdTower').party.length * 50` true>>
+      <<case 'group'>><<dancedifficulty 600 1200 true>><<tendingdifficulty 1 700 true>>
+    <</switch>>
+    <<set _huntResult.dance to !!$danceSuccess, _huntResult.tending to !!$tendingSuccess>>
+  <</if>>
+  <<if ['single', 'double', 'group'].includes(_args[0])>><<set $danceSuccess to _huntResult.dance, $tendingSuccess to _huntResult.tending>><</if>>
+<</widget>>
+
+<<widget "birdtower_hunt_result_get">>
+  <<if !_huntResult or $combat or $replayScene or $statFreeze>><<exit>><</if>>
+  <<if !_huntResult.base>>
+    <<set _huntResult.base to true>>
+    <<set _huntTaken to Math.min(_args[0], Math.max(0, Math.floor(3 + maplebirch.get('BirdTower').party.length - $bird.hunts.weight)))>>
+    <<set _huntResult.left to _args[0] - _huntTaken>>
+    <<if _huntTaken gt 0>><<flight_hunt_get 'lurkers' _huntTaken>><</if>>
+  <</if>>
+  <<if _huntResult.left gt 0>><<lanSwitch 'You leave behind what you cannot carry.' '你放下了带不走的猎物。'>><</if>>
+<</widget>>
+
 <<widget "birdtower_hunt_companion_loot">>
-  <<set _prey to maplebirch.get('BirdTower').prey>>
+  <<birdtower_hunt_result>>
+  <<if !_huntResult>><<exit>><</if>>
+  <<if _huntResult.prey is null>><<set _huntResult.prey to maplebirch.get('BirdTower').prey>><</if>>
+  <<set _prey to _huntResult.prey>>
+  <<if !_huntResult.companion>>
+    <<set _prey.left to Math.max(0, _prey.caught.length - Math.max(0, Math.floor(3 + maplebirch.get('BirdTower').party.length - $bird.hunts.weight)))>>
+    <<set _prey.caught to _prey.caught.slice(0, Math.max(0, Math.floor(3 + maplebirch.get('BirdTower').party.length - $bird.hunts.weight)))>>
+  <</if>>
   <<set _other_hawks to _prey.followers>>
   <<set _caught to _prey.caught.length>>
   <<set _multi to _other_hawks.length gt 1>>
@@ -48,31 +95,18 @@
           有一只潜伏者，但其他孩子就没那么幸运了。<<= _multi ? "他们" : "">>耀武扬威地高鸣着炫耀自己狩猎成功，而其他孩子只能眼巴巴地看着。
       <</language>>
     <</if>>
-    <<if _caught gt 0>>
-      <<flight_hunt_get "lurkers" _caught>>
+    <<if !_huntResult.companion>>
+      <<set _huntResult.companion to true>>
+      <<if _caught gt 0>><<flight_hunt_get "lurkers" _caught>><</if>>
     <</if>>
+    <<if _prey.left gt 0>><<lanSwitch 'There is no room for the rest of the catch. You leave it behind.' '剩下的猎物已经无处携带，你们只好放下。'>><</if>>
     <br><br>
   <</if>>
 <</widget>>
 
 <<widget "birdtower_scavenge_options">>
-  <<if $bird.hunts.weight gte (3+maplebirch.get('BirdTower').party.length)>>
-    <<language>>
-      <<option 'EN'>>
-        You cannot carry anything more. You take to the air and begin the return to the tower.
-      <<option 'CN'>>
-        你再也拿不下更多东西了。你飞向空中，开始返回高塔。
-    <</language>>
-    <br><br>
-    <<flight_distance_check>>
-    <<flight_time_check _returnTime "silent">>
-    <<lanLink ["Return to the castle (" + getTimeString(_hoursPassed, _minutesPassed) + ")", "回到城堡 (" + getTimeString(_hoursPassed, _minutesPassed) + ")"] "Deadwood BirdTower Hunt Return">>
-      <<set $fatigueMod to _fatigueMod>>
-      <<set $flightTime to _flightTime>>
-      <<bird_pass _flightTime>>
-      <<endevent>>
-    <</lanLink>>
-    <<print _fatigueText>>
+  <<if $bird.hunts.weight gte (3+maplebirch.get('BirdTower').party.length) or $stress gte $stressmax or isPregnancyEnding() or $pain gte 90 or $bird.hunts.timer gte 90>>
+    <<babyhawk_hunt_return>>
   <<elseif $daily.emptyCampLoot lte 0>>
     <<language>>
       <<option 'EN'>>
@@ -121,6 +155,7 @@
 :: Deadwood BirdTower Widget BabyHawk HuntTogether [widget]
 <!-- 清理随行狩猎状态：交给 TS 模块重置队伍、领队与方向提示。 -->
 <<widget "HuntTogetherClean">>
+  <<unset $BirdTower.hunt.result>>
   <<run maplebirch.get("BirdTower").resetHunt()>>
 <</widget>>
 <!-- 选择参与狩猎的小鹰领队：TS 模块内 dominant/clever 优先，否则随机。 -->
@@ -590,7 +625,7 @@
 
 <<widget "babyhawk_hunt_return">>
   <<childSelect $BirdTower.hunt.leader>>
-  <<if $bird.hunts.weight gte (3+maplebirch.get('BirdTower').party.length)>>
+  <<if $bird.hunts.weight gte (3+maplebirch.get('BirdTower').party.length) and $stress lt $stressmax and !isPregnancyEnding()>>
     <<language>>
       <<option 'EN'>>
         You cannot carry any more. You begin to head back to the tower.
