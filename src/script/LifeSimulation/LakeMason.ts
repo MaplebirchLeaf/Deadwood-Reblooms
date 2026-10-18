@@ -7,7 +7,7 @@ export default function LakeMason(maplebirch: MaplebirchCore): void {
     locationPassage: {
       'Lake Mason': [
         {
-          src: '<<link [[Just say hello|Lake Mason Greet]]>><<stress -6>><</link>><<lstress>>\n<br>',
+          srcmatch: /<<link \[\[[^\]\n]+\|Lake Mason Greet]]>><<stress -6>><<\/link>><<lstress>>\s*<br>/,
           applyafter: '\n<<deadwood-lake-mason-options>>',
           expected: 1
         }
@@ -16,7 +16,7 @@ export default function LakeMason(maplebirch: MaplebirchCore): void {
     widgetPassage: {
       'Widgets Mason': [
         {
-          src: '<<link [[Flirt (0:30)|Mason Pond Flirt]]>><<pass 30>><<npcincr Mason love -1>><<npcincr Mason lust 1>><</link>><<promiscuous1>><<llove>><<glust>>\n\t\t<br>',
+          srcmatch: /<<link \[\[[^\]\n]+\|Mason Pond Flirt]]>><<pass 30>><<npcincr Mason love -1>><<npcincr Mason lust 1>><<\/link>><<promiscuous1>><<llove>><<glust>>\s*<br>/,
           applyafter: '\n\t\t<<deadwood-mason-pond-options>>',
           expected: 1
         }
