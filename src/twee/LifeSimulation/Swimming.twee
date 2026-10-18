@@ -1,0 +1,649 @@
+:: Deadwood Reblooms Swimming Lesson Widgets [widget]
+
+<<widget 'deadwood-swimming-lesson-check'>>
+  <<set _swimmingLessonSafe to Boolean(maplebirch.get('LifeSimulation'))
+    and Time.schoolDay and Time.hour is 14 and $schoolstate is 'fifth'
+    and $poolroomstate is 'own' and $location is 'pool'
+    and !$combat and !$statFreeze and !$replayScene and !$possessed
+    and !$nextPassage and !$nextPassageCheck and !$eventforced
+    and $stress lt $stressmax and !isPregnancyEnding()
+    and !($swimnudecounter gte 10 and $swimall isnot 1 and !maplebirch.get('LifeSimulation').school.allowsNudity)>>
+  <<set _swimmingLessonReady to _swimmingLessonSafe and Time.minute lt 59 and $phase is 0>>
+<</widget>>
+
+<!-- 无固定目标的链接先重验课堂；同一个面板的重复点击不排入多次跳转。 -->
+<<widget 'deadwood-swimming-lesson-choice'>>
+  <<set _swimmingChoiceTarget to _args[1], _swimmingChoiceSource to $passage, _swimmingChoiceUsed to false>>
+  <<capture _swimmingChoiceTarget _swimmingChoiceSource _swimmingChoiceUsed>>
+    <<lanLink _args[0]>>
+      <<deadwood-swimming-lesson-check>>
+      <<if !_swimmingChoiceUsed and !_swimmingLessonNavigating and _swimmingLessonReady and $passage is _swimmingChoiceSource>>
+        <<set _swimmingChoiceUsed to true>>
+        <<set _swimmingLessonNavigating to true>>
+        <<goto _swimmingChoiceTarget>>
+      <</if>>
+    <</lanLink>>
+  <</capture>>
+<</widget>>
+
+<<widget 'deadwood-swimming-lesson-link'>>
+  <<deadwood-swimming-lesson-check>>
+  <<if _swimmingLessonReady>>
+    <<swimmingicon>><<deadwood-swimming-lesson-choice `['Adjust your practice', '调整练习内容与互动']` 'Deadwood Reblooms Swimming Practice'>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-school-pool-private-link'>>
+  <<if Time.schoolDay and Time.hour is 14 and (Time.minute gte 45 or $phase is 1)
+    and $location is 'pool'
+    and (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15)
+    and !$daily.masonPrivateSwimming and !$combat and !$statFreeze and !$replayScene>>
+    <<socialiseicon 'ask'>><<link `lanSwitch('Stay behind for private coaching with Mason', '留下来接受梅森的课后单独辅导')` 'Deadwood Reblooms Swimming Private'>><<set $daily.masonPrivateSwimming to true>><</link>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-swimming-lesson-return'>>
+  <<deadwood-swimming-lesson-check>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <<getouticon>><<link `lanSwitch('Continue', '继续')` `$nextPassage || $nextPassageCheck`>><</link>><br>
+  <<elseif _swimmingLessonReady>>
+    <<getouticon>><<lanLink ['Return to the swimming lesson', '返回游泳课'] 'Swimming Lesson'>><</lanLink>><br>
+  <<elseif $location is 'pool'>>
+    <<getouticon>><<lanLink ['Return to the pool', '返回泳池'] 'School Pool'>><</lanLink>><br>
+  <<elseif $safePassage>>
+    <<getouticon>><<lanLink ['Return', '返回'] $safePassage>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<!-- 沿用 swimminglessoneffects 的原生课时、负担和事件宏。
+     课终按 Focus 的互斥更衣分支，避免 exposed 与 swimall 同时成立时重复输出入口。 -->
+<<widget 'deadwood-swimming-lesson-effects'>>
+  <<set _swimmingPractice to _args[0], _swimmingPracticeSource to $passage>>
+  <<advancelesson>>
+  <<stress _lesson_progress>><<tiredness _lesson_progress>>
+  <<deadwood-swimming-lesson-check>>
+  <<if $passage isnot _swimmingPracticeSource>><<exit>><</if>>
+  <<if !_swimmingLessonSafe>>
+    <<lanSwitch 'Your practice is interrupted before you can finish the exercise.' '你还没完成这组练习，就被别的事打断了。'>><br><br>
+    <<deadwood-swimming-lesson-return>>
+    <<exit>>
+  <</if>>
+  <<physique 3>><<swimmingskilluse>>
+  <<if _swimmingPractice is 'mason'>><<stress -1>><<lstress>><<elseif _swimmingPractice is 'handson' or _swimmingPractice is 'flaunt' or _swimmingPractice is 'underwater'>><<stress -2>><<lstress>><<else>><<tiredness 1>><<gtiredness>><</if>>
+  <br><br>
+  <<if $phase is 1>>
+    <<set $phase to 0>>
+    <<lanSwitch 'The bell rings. Mason calls the class out of the water and directs everyone towards the changing rooms.' '下课铃响了。梅森招呼全班上岸，让大家前往更衣室。'>><br><br>
+    <<if (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15) and !$daily.masonPrivateSwimming>>
+      <<socialiseicon 'ask'>><<link `lanSwitch('Stay behind for private coaching with Mason', '留下来接受梅森的课后单独辅导')` 'Deadwood Reblooms Swimming Private'>><<set $daily.masonPrivateSwimming to true>><</link>><br><br>
+    <</if>>
+    <<if $exposed lte 0>><<destinationpoolchangingroom>><<else>><<destinationpoolchangingroom 'towels'>><</if>>
+  <<else>>
+    <<set _mod to $exposed gte 1 ? 1 : 0.2>>
+    <<if dangerEvent(_mod, 8900)>><<eventsswimming>><<else>><<eventsswimmingsafe>><</if>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Swimming Practice
+<<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>>
+  <<lanSwitch 'There is no time for another exercise in this lesson now.' '现在无法在这堂课上开始另一组练习。'>><br><br>
+  <<deadwood-swimming-lesson-return>>
+  <<exit>>
+<</if>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    Water slaps against the lane ropes as the class turns at the far wall. Mason watches from the side, occasionally calling a correction across the pool.
+    <br><br>
+    <<if currentSkillValue('swimmingskill') lte 300>>
+      You can use the next part of the lesson to work on one movement at a time. The wall is close enough to stop and catch your breath.
+    <<elseif currentSkillValue('swimmingskill') gte 700>>
+      You already keep a steady pace. A closer look at your technique might help you stop wasting effort between strokes and turns.
+    <<else>>
+      You can complete a length without stopping, but your breathing and turns do not always fit the rhythm of your strokes.
+    <</if>>
+  <<option 'CN'>>
+    同学们在对面的池壁转身，水波拍打着泳道线。梅森站在池边观察，不时隔着水面提醒谁调整动作。
+    <br><br>
+    <<if currentSkillValue('swimmingskill') lte 300>>
+      接下来的课时可以用来逐个练习动作。池壁就在近处，累了便能停下来喘口气。
+    <<elseif currentSkillValue('swimmingskill') gte 700>>
+      你已经能保持稳定的速度。仔细纠正泳姿，或许能减少划水与转身之间多余的动作。
+    <<else>>
+      你能不停歇地游完一趟，但换气和转身有时还跟不上划水的节奏。
+    <</if>>
+<</language>><br><br>
+
+<<socialiseicon 'ask'>><<deadwood-swimming-lesson-choice `['Ask Mason to correct your technique', '请梅森纠正动作']` 'Deadwood Reblooms Swimming Guidance'>><<lstress>><<gswimming>><br>
+<<swimmingicon>><<deadwood-swimming-lesson-choice `['Practise breathing and turns', '练习换气与转身']` 'Deadwood Reblooms Swimming Turns'>><<gswimming>><<gtiredness>><br>
+<<socialiseicon 'ask'>><<deadwood-swimming-lesson-choice `['Ask Mason about pace and swimming strokes', '向梅森请教配速与泳姿']` 'Deadwood Reblooms Swimming Advice'>><<lstress>><br><br>
+
+<<handholdingicon>><<deadwood-swimming-lesson-choice `['Ask Mason for hands-on posture guidance', '请求梅森下水贴身纠正姿势']` 'Deadwood Reblooms Swimming HandsOn'>><<gswimming>><<glust>><br>
+
+<<if hasSexStat('exhibitionism', 1) or $exposed gte 1 or $swimall is 1>>
+  <<swimicon 'back'>><<deadwood-swimming-lesson-choice `['Flaunt your body and swimwear at the poolside', '在池边向梅森展示身材与泳装']` 'Deadwood Reblooms Swimming Flaunt'>><<exhibitionist1>><<glust>><br>
+<</if>>
+
+<<if hasSexStat('promiscuity', 2) or C.npc.Mason.lust gte 10>>
+  <<swimmingicon>><<deadwood-swimming-lesson-choice `['Dive underwater to stealthily tease Mason', '潜入水下悄悄对梅森恶作剧']` 'Deadwood Reblooms Swimming Underwater'>><<promiscuous2>><<gglust>><br>
+<</if>>
+
+<<if (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15) and !$daily.masonPrivateSwimming>>
+  <<socialiseicon 'ask'>><<deadwood-swimming-lesson-choice `['Ask Mason to stay behind after class for private coaching', '请梅森在下课后留下来单独辅导你']` 'Deadwood Reblooms Swimming Private Request'>><<glove>><<glust>><br>
+<</if>>
+<br>
+<<deadwood-swimming-lesson-return>>
+
+:: Deadwood Reblooms Swimming Advice
+<<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>>
+  <<lanSwitch 'Mason has to attend to the lesson. Your questions will have to wait.' '梅森得先照看课堂，你的问题只能稍后再问。'>><br><br>
+  <<deadwood-swimming-lesson-return>>
+  <<exit>>
+<</if>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    "How fast should I be going?" you ask. Mason glances along the lane before answering, making sure no one is waiting to push off.
+    <br><br>
+    <<if currentSkillValue('swimmingskill') lte 300>>
+      "Fast enough to keep moving. Not so fast that you forget to breathe." <<He>> points to the nearby wall. "Start with a short distance. Stop there when you need to. We can work on speed once you're comfortable."
+    <<elseif currentSkillValue('swimmingskill') gte 700>>
+      "Try keeping the same pace all the way back," <<he>> says. "You start quickly, but your last few strokes get shorter. Save enough for the turn. You're doing well; you don't have to win every length."
+    <<else>>
+      "A pace you can repeat," <<he>> says. "If you need a long rest after every length, ease off a little. I'd rather see you finish the movement properly than rush it."
+    <</if>>
+    <br><br>
+    You ask whether changing strokes would help. Mason starts to demonstrate with <<his>> arms, then draws them in to let a student pass. "Sorry. Not much room here. Each stroke takes practice. Pick one to work on first, and tell me which part is giving you trouble."
+  <<option 'CN'>>
+    “我该游多快？”你问。梅森沿泳道看了一眼，确认没有人在等着蹬壁出发，才回答你。
+    <br><br>
+    <<if currentSkillValue('swimmingskill') lte 300>>
+      “能让身体向前就行，别快到忘了换气。”<<He>>指指近处的池壁。“先游一小段，需要时就在那里停下。等适应了，再练速度。”
+    <<elseif currentSkillValue('swimmingskill') gte 700>>
+      “试着保持同样的速度游回来，”<<he>>说，“你起步很快，但最后几下划水会缩短。给转身留点力气。你游得不错，不用每一趟都争第一。”
+    <<else>>
+      “用你能反复保持的速度，”<<he>>说，“要是每游一趟都得休息很久，就稍微慢点。我宁愿看你把动作做完整，也不想让你一味求快。”
+    <</if>>
+    <br><br>
+    你又问换一种泳姿是否会有帮助。梅森刚抬手准备示范，便收起手臂，让一名同学从旁边经过。“抱歉，这里有点挤。每种泳姿都得练习。先选一种，再告诉我哪个动作让你为难。”
+<</language>><br><br>
+<<swimmingicon>><<deadwood-swimming-lesson-choice `['Return to the practice choices', '返回练习选项']` 'Deadwood Reblooms Swimming Practice'>><br>
+<<deadwood-swimming-lesson-return>>
+
+:: Deadwood Reblooms Swimming Guidance
+<<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>>
+  <<lanSwitch 'Mason has the class move on. You cannot begin that exercise now.' '梅森已经让全班进行下一项安排，现在无法开始这组练习。'>><br><br>
+  <<deadwood-swimming-lesson-return>>
+  <<exit>>
+<</if>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You wait at the wall until Mason looks your way, then ask <<him>> to watch your next length. <<He>> clears a little space beside the lane rope. "Go on. Take your time."
+    <br><br>
+    <<if currentSkillValue('swimmingskill') lte 300>>
+      You lift your head too far when you breathe and lose your balance. Mason has you stay by the wall and practise breathing out into the water before trying a short distance again. This time you reach the wall without rushing the last few strokes.
+    <<elseif currentSkillValue('swimmingskill') gte 700>>
+      Mason follows your strokes, then points out that one hand crosses too far inward as it enters the water. You repeat the length with a straighter reach. The change is small, but you no longer have to correct your direction with every other kick.
+    <<else>>
+      Mason asks you to slow down enough to finish each stroke before starting the next. You try again. The water still catches your face once, but the second length feels less hurried.
+    <</if>>
+    <br><br>
+    "Keep working on that," Mason says before turning to another student. Having one clear correction to follow makes the practice easier to face.
+  <<option 'CN'>>
+    你在池壁边等梅森看过来，请<<him>>观察你接下来这一趟。<<He>>在泳道线旁留出一点空位。“来吧，慢慢游。”
+    <br><br>
+    <<if currentSkillValue('swimmingskill') lte 300>>
+      你换气时把头抬得太高，身体跟着失去平衡。梅森让你留在池壁边，先练习在水里呼气，再重新游一小段。这次你游到池壁时，没有急着划完最后几下。
+    <<elseif currentSkillValue('swimmingskill') gte 700>>
+      梅森看完你的划水，指出一只手入水时向内偏得太多。你伸直手臂，再游一趟。改动很小，却让你不用隔几下打腿便纠正一次方向。
+    <<else>>
+      梅森让你放慢一点，每次划水做完整后再接下一次。你重新试了一趟。水还是呛到脸上一次，但第二趟游得没那么仓促了。
+    <</if>>
+    <br><br>
+    “继续练这个。”梅森说完，转身去看另一名同学。有了明确要改进的地方，练习也没那么让人紧张了。
+<</language>><br><br>
+<<deadwood-swimming-lesson-effects 'mason'>>
+
+:: Deadwood Reblooms Swimming Turns
+<<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>>
+  <<lanSwitch 'The class has moved on. You cannot begin that exercise now.' '课程已经进行到下一项安排，现在无法开始这组练习。'>><br><br>
+  <<deadwood-swimming-lesson-return>>
+  <<exit>>
+<</if>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You choose a quiet stretch beside the lane rope. The wall clock ticks above the changing room doors while water spills into the gutter at the pool's edge.
+    <br><br>
+    <<if currentSkillValue('swimmingskill') lte 300>>
+      You keep one hand on the wall, lower your face and breathe out slowly. Once that feels manageable, you push away for a few strokes, then return to touch the wall and turn. You need several rests, but the last attempt leaves you less breathless than the first.
+    <<elseif currentSkillValue('swimmingskill') gte 700>>
+      You count your last few strokes before the wall and turn without pausing to look up. Your first push sends you slightly off line. On the next length you keep your feet more squarely against the wall, and carry the glide into your opening strokes.
+    <<else>>
+      You concentrate on breathing out before turning your head for air. At the wall you touch, draw your knees in and push back along the lane. You lose the rhythm a few times, but begin to join the movements without a long pause between them.
+    <</if>>
+    <br><br>
+    The repeated pushes leave your legs tired. You ease the pace when Mason calls the next instruction.
+  <<option 'CN'>>
+    你在泳道线旁选了段不拥挤的水面。更衣室门上方的挂钟滴答作响，池水顺着边缘流进排水槽。
+    <br><br>
+    <<if currentSkillValue('swimmingskill') lte 300>>
+      你一手扶着池壁，把脸浸入水里，慢慢呼气。等适应一些后，你蹬壁游出几下，再回来触壁转身。中间休息了好几次，但最后一次尝试不像起初那样喘不过气。
+    <<elseif currentSkillValue('swimmingskill') gte 700>>
+      你数好触壁前最后几次划水，没有抬头停顿便转了身。第一次蹬壁时，方向偏了一点。下一趟你让双脚更稳地抵住池壁，将滑行顺畅地接进最初几次划水。
+    <<else>>
+      你专心在转头吸气前先把气呼出去。到了池壁便触壁、收腿，再蹬回泳道。节奏还是断了几次，但动作之间已经不必停顿那么久。
+    <</if>>
+    <br><br>
+    反复蹬壁让双腿有些发酸。听见梅森发出下一项指令，你便放缓了速度。
+<</language>><br><br>
+<<deadwood-swimming-lesson-effects 'turns'>>
+
+:: Deadwood Reblooms Swimming HandsOn
+<<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>>
+  <<lanSwitch 'Mason has to attend to the class. Hands-on coaching will have to wait.' '梅森得先照看整个班级，贴身指导只能稍后再说了。'>><br><br>
+  <<deadwood-swimming-lesson-return>>
+  <<exit>>
+<</if>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You swim over to Mason and ask if <<he>> can physically support your waist in the water to help correct your hip buoyancy and kick alignment.
+    <br><br>
+    Mason blushes slightly, taken by surprise. "Hands-on? Well... keeping your hips up is crucial. Alright, let me get behind you. Try to stay relaxed."
+    <br><br>
+    Mason slides into the water and positions <<himself>> directly behind you. <<His>> large, firm hands reach around your waist, fingers pressing into the skin just above your hips to lift you into proper alignment. The water swirls around you, slick and warm against your contact points.
+  <<option 'CN'>>
+    你游到梅森近旁，询问<<him>>能否下水用双手托住你的腰身，亲手纠正你下半身的漂浮与打腿姿态。
+    <br><br>
+    梅森微微一怔，耳根泛红。“贴身指导？嗯……保持髋部浮力确实至关重要。好吧，我到你身后去，试着放松身体。”
+    <br><br>
+    梅森滑入水中，来到你正后方。<<His>>宽大而结实的手掌环上你的腰肢，指腹稳稳抵住你腰侧的皮肤，将你向上托平。池水在你们身躯之间翻卷荡漾，相贴的肌肤在水流里滑腻而温热。
+<</language>><br><br>
+
+<<link `lanSwitch('Focus obediently on your kicks with Mason\'s support', '在梅森的托扶下顺从练习打腿')` 'Deadwood Reblooms Swimming HandsOn Focus'>><</link>><<gswimming>><<lstress>><br>
+
+<<if hasSexStat('promiscuity', 1)>>
+  <<link `lanSwitch('Arch your hips and press back against Mason\'s hands', '有意弓起腰身，向后磨蹭梅森的双手')` 'Deadwood Reblooms Swimming HandsOn Arch'>><<promiscuous1>><<glust>><<garousal>><</link>><br>
+<</if>>
+
+<<if hasSexStat('promiscuity', 2)>>
+  <<link `lanSwitch('Reach behind through the water and stroke Mason\'s arm', '反手伸向身后，在水下轻抚梅森结实的手臂')` 'Deadwood Reblooms Swimming HandsOn Touch'>><<promiscuous2>><<gglust>><<ggarousal>><</link>><br>
+<</if>>
+
+:: Deadwood Reblooms Swimming HandsOn Focus
+<<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You follow Mason's instructions, gently fluttering your feet while relying on <<his>> steady palms beneath your waist. Mason guides your hips gently from side to side to keep you level.
+    <br><br>
+    "Good, exactly like that," Mason murmurs, <<his>> voice close to your ear over the gentle lap of the water. "Feel how much easier you move forward when your core is lifted?" Though <<he>> strives for a coach's professionalism, you can feel <<his>> fingers trembling slightly where they grip your wet skin.
+  <<option 'CN'>>
+    你顺从梅森的指导，借着<<his>>托扶腰身的力量轻轻摆动双脚打腿。梅森双手轻微调整着你腰部的平衡，帮你维持流线型。
+    <br><br>
+    “很好，就是这样，”梅森的声音越过水流贴近你的耳畔，“感受到核心抬高时向前滑有多省力了吗？”尽管<<he>>极力维持教练的严谨态度，但按在你湿漉腰肢上的指腹依然透出细微的颤动。
+<</language>><br><br>
+<<npcincr Mason love 1>><<npcincr Mason lust 1>><<deadwood-swimming-lesson-effects 'handson'>>
+
+:: Deadwood Reblooms Swimming HandsOn Arch
+<<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You let your hips sink slightly, then deliberately arch your spine, rubbing the curve of your waist and backside firmly against Mason's wet hands and chest beneath the surface.
+    <br><br>
+    Mason's breath catches audibly in <<his>> throat. <<His>> fingers tighten reflexively against your waist, clutching your flesh with sudden intensity.
+    <br><br>
+    "W-what are you doing... keep your posture straight..." <<he>> stammers in a desperate whisper, <<his>> cheeks glowing bright crimson. Yet despite <<his>> words, <<his>> grip does not release you, and you feel the quickened thumping of <<his>> heart vibrating against your back through the water.
+  <<option 'CN'>>
+    你故意让下半身微沉，随即柔媚地弓起腰背，让腰臀的饱满曲线在水下紧紧贴向梅森湿润的双掌与胸膛。
+    <br><br>
+    梅森喉间蓦地漏出一声急促的吸气。<<His>>手指本能地猛然收紧，指腹深深陷进你柔软滑腻的腰肉中。
+    <br><br>
+    “你、你在干什么……姿势放平稳……”<<he>>压低声音慌乱地轻喘，面颊红得几乎能滴出血来。然而<<his>>双手不仅没有松开，反而在水流的推搡下将你贴得更紧，你能清晰感受到<<he>>透过水波撞在你背上的剧烈心跳。
+<</language>><br><br>
+<<promiscuity1>><<arousal 300>><<npcincr Mason lust 4>><<npcincr Mason dom -1>><<deadwood-swimming-lesson-effects 'handson'>>
+
+:: Deadwood Reblooms Swimming HandsOn Touch
+<<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You reach back with one wet arm, tracing your fingers over Mason's defined forearm, then resting your hand squarely over <<his>> hand where it grips your waist.
+    <br><br>
+    Mason jumps slightly in the water, gasping as your slick fingers entwine with <<his>> own. <<His>> eyes dart frantically toward the other students doing laps on the far side of the pool.
+    <br><br>
+    "P-please... someone will see us..." <<he>> breathes, shivering despite the heated pool. You squeeze <<his>> fingers warmly beneath the water, letting your body lean fully into <<his>> chest before releasing <<him>> with an innocent smile.
+  <<option 'CN'>>
+    你反手伸向身后，指尖沿着梅森线条分明的前臂缓缓抚过，随后握住<<his>>按在你腰侧的大手，与<<his>>湿滑的指节交扣在一起。
+    <br><br>
+    梅森在水下轻颤了一下，惊得呼吸停滞，慌张的目光迅速扫向泳池对侧正在游趟的同学们。
+    <br><br>
+    “别、别这样……有人会看见的……”<<he>>近乎哀求般低声呢喃，在温水里却因为你的触碰而微微发抖。你在水下温柔地捏了捏<<his>>的手指，将整个后背轻轻倚在<<his>>怀中片刻，才带着无辜的微笑松开手。
+<</language>><br><br>
+<<promiscuity2>><<arousal 500>><<npcincr Mason lust 6>><<npcincr Mason dom -1>><<deadwood-swimming-lesson-effects 'handson'>>
+
+:: Deadwood Reblooms Swimming Flaunt
+<<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>>
+  <<lanSwitch 'The class is moving on. You cannot pose by the poolside now.' '课堂正在继续，现在没法在池边展示了。'>><<br><br>
+  <<deadwood-swimming-lesson-return>>
+  <<exit>>
+<</if>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You place your hands on the tiled gutter and hoist your upper body halfway out of the water directly beside Mason's poolside station.
+    <br><br>
+    <<if $swimall is 1 or $exposed gte 2>>
+      Water cascades down your bare shoulders, breasts, and curves, leaving your naked skin glistening under the bright fluorescent ceiling lamps.
+    <<else>>
+      Water streams down your clingy swimwear, the wet fabric hugging every contour of your chest, waist, and thighs like a second skin.
+    <</if>>
+    <br><br>
+    Mason freezes in the middle of writing on <<his>> clipboard. The whistle dangling from <<his>> neck swings loosely as <<his>> eyes lock involuntarily onto your glistening form. <<He>> swallows dryly, <<his>> face turning a vivid shade of scarlet.
+  <<option 'CN'>>
+    你双手撑在溢水沟的池沿上，在梅森巡视站立的池边将半个身子轻盈地托出水面。
+    <br><br>
+    <<if $swimall is 1 or $exposed gte 2>>
+      水珠顺着你赤裸的肩头、胸脯与腰肢倾泻而下，白皙光裸的肌肤在头顶明亮的日光灯下泛着诱人的水光。
+    <<else>>
+      湿漉漉的泳衣紧紧贴在身上，薄薄的面料毫无保留地勾勒出胸口、腰窝与双腿的起伏轮廓。
+    <</if>>
+    <br><br>
+    梅森在记录板上写字的手猛地顿住，挂在颈间的哨子轻轻摇晃。<<His>>视线完全不受控制地落在你湿亮的身段上，喉结狠狠滑动了一下，整张脸瞬间涨得通红。
+<</language>><br><br>
+
+<<link `lanSwitch('Ask Mason to evaluate your swimming figure', '向梅森请教自己的体态是否适合游泳')` 'Deadwood Reblooms Swimming Flaunt Figure'>><<exhibitionist1>><<glust>><</link>><br>
+
+<<if hasSexStat('exhibitionism', 2)>>
+  <<link `lanSwitch('Slowly stroke the water droplets down your chest and belly', '当着梅森的面，将水珠沿着胸口与小腹抚下')` 'Deadwood Reblooms Swimming Flaunt Stroke'>><<exhibitionist2>><<gglust>><<garousal>><</link>><br>
+<</if>>
+
+<<if hasSexStat('promiscuity', 2)>>
+  <<link `lanSwitch('Tease Mason about <<his>> burning blush', '娇笑着调侃梅森通红的脸颊')` 'Deadwood Reblooms Swimming Flaunt Tease'>><<promiscuous2>><<glust>><<garousal>><</link>><br>
+<</if>>
+
+:: Deadwood Reblooms Swimming Flaunt Figure
+<<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    "Coach, do you think my build is streamlined enough for competitive swimming?" you ask sweetly, arching your back and rolling your shoulders back.
+    <br><br>
+    Mason coughs frantically into <<his>> fist, desperately trying to keep <<his>> eyes on your face. "Y-yes! Very streamlined! Excellent shoulder flexibility! Now please... get back in the water before you catch a chill!"
+  <<option 'CN'>>
+    “教练，你觉得我的身段适合练竞技游泳吗？”你甜甜地仰起脸，微微挺起胸膛，向后舒展双肩。
+    <br><br>
+    梅森狼狈地握拳抵在唇边剧烈咳嗽，拼命想把目光固定在你的脸庞上。“适、适合！非常流线型！肩部柔韧性也很好！现在快……快回水里去，别着凉了！”
+<</language>><br><br>
+<<exhibitionism1>><<npcincr Mason lust 2>><<npcincr Mason love 1>><<arousal 200>><<deadwood-swimming-lesson-effects 'flaunt'>>
+
+:: Deadwood Reblooms Swimming Flaunt Stroke
+<<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    Holding Mason's gaze, you raise one dripping hand to your throat and slowly drag your fingers down over your chest and across your belly, brushing away the glistening water droplets in a languid caress.
+    <br><br>
+    Mason's mouth drops slightly open. <<He>> almost drops the clipboard before catching it awkwardly against <<his>> chest, hiding <<his>> lower face behind it like a shield.
+    <br><br>
+    "G-get down! Right this second!" <<he>> squeaks, but <<his>> wide, dilated pupils remain fixed on your wet body until you finally slip back beneath the ripples with a playful splash.
+  <<option 'CN'>>
+    迎着梅森炽热慌乱的目光，你抬起一只带水的手抚上颈项，指尖极尽缓慢地滑过胸口的起伏，掠过小腹，将晶莹的水珠沿着肌肤的弧度轻轻抚散。
+    <br><br>
+    梅森微微张着嘴，手中的写字板差点滑落，被<<he>>慌乱地一把按在胸口，像盾牌一样挡住下半张脸。
+    <br><br>
+    “快、快下去！立刻！”<<he>>的声音都有些发尖，然而那双因动摇而放大的眼眸却始终死死盯着你湿淋淋的身躯，直到你带着得逞的轻笑重新滑入水波之中。
+<</language>><br><br>
+<<exhibitionism2>><<fameexhibitionism 2>><<npcincr Mason lust 4>><<arousal 400>><<deadwood-swimming-lesson-effects 'flaunt'>>
+
+:: Deadwood Reblooms Swimming Flaunt Tease
+<<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    "Is it too hot in here, coach?" you murmur, tilting your head suggestively. "Your face is even redder than your whistle."
+    <br><br>
+    Mason groans in sheer mortification, turning <<his>> head completely away and rubbing the back of <<his>> neck. "The air by the pool is humid, that's all! Stop teasing your teacher and return to your lane!"
+  <<option 'CN'>>
+    “泳池里很热吗，梅森教练？”你歪着头眨眨眼，柔声调笑，“你的脸比脖子上挂的红色哨子还要红呢。”
+    <br><br>
+    梅森羞耻地低哼一声，彻底别过头去，一手用力揉着滚烫的后颈。“这、这是池边湿气重闷的！别调侃你的老师，快回泳道去！”
+<</language>><br><br>
+<<promiscuity2>><<npcincr Mason lust 3>><<npcincr Mason dom -1>><<arousal 300>><<deadwood-swimming-lesson-effects 'flaunt'>>
+
+:: Deadwood Reblooms Swimming Underwater
+<<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>>
+  <<lanSwitch 'The class has moved on. You cannot swim underwater to Mason now.' '课堂正在继续，现在无法潜入水下寻找梅森。'>><br><br>
+  <<deadwood-swimming-lesson-return>>
+  <<exit>>
+<</if>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    While Mason stands waist-deep near the deep end calling out lap times to the class, you take a deep breath and submerge soundlessly beneath the lane rope.
+    <br><br>
+    Gliding like an otter beneath the churned bubbles, you swim straight between the kicking legs of your classmates and approach Mason. Under the sparkling, chlorinated water, Mason's muscular legs, toned thighs, and athletic waist are entirely within your grasp.
+  <<option 'CN'>>
+    趁着梅森站在深水区边缘给游趟的同学们报秒，你深深吸了一口气，无声无息地潜入泳道绳下。
+    <br><br>
+    你在翻腾的水泡间像水獭般灵巧滑行，穿过同学们拍打水花的小腿，悄悄接近梅森。在碧蓝清澈的池水下，梅森肌肉线条清晰的双腿、紧实的大腿与腰胯近在眼前。
+<</language>><br><br>
+
+<<link `lanSwitch('Caress Mason\'s muscular thighs and rear underwater', '在水下温柔抚摸梅森的大腿与臀部')` 'Deadwood Reblooms Swimming Underwater Thighs'>><<promiscuous2>><<glust>><<garousal>><</link>><br>
+
+<<if hasSexStat('promiscuity', 3)>>
+  <<link `lanSwitch('Boldly fondle the swelling bulge in Mason\'s swimwear', '大胆隔着泳裤抚摩梅森隆起的热处')` 'Deadwood Reblooms Swimming Underwater Bulge'>><<promiscuous3>><<gglust>><<ggarousal>><</link>><br>
+<</if>>
+
+:: Deadwood Reblooms Swimming Underwater Thighs
+<<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You glide your palms up Mason's strong, smooth calves and curve your fingers over <<his>> firm swimmer's buttocks beneath the surface.
+    <br><br>
+    Above water, Mason's voice leaps an entire octave: "Keep your—h-hah!—keep your stroke rate steady, everyone!"
+    <br><br>
+    Mason grips the lane divider with white knuckles, looking down through the water in stunned disbelief. <<He>> sees you grinning up at <<him>> through the bubbles before you swim back towards the shallows and surface with an innocent expression.
+  <<option 'CN'>>
+    你的双手攀上梅森结实有力的小腿，掌心贴着肌肉起伏一路向上，在水下轻轻揉捏起<<his>>紧致饱满的臀部。
+    <br><br>
+    水面上，梅森正在喊话的嗓音猛地拔高了一个八度：“大家注意——呃啊！——保持划水频率！”
+    <br><br>
+    梅森的指节死死抠在泳道线上，难以置信地低头望向水底。透过层层气泡，<<he>>正好看见你在水下仰面对<<him>>扬起恶作剧得逞的笑颜，随即灵动地蹬腿游向浅水区，浮出水面装作若无其事。
+<</language>><br><br>
+<<promiscuity2>><<arousal 500>><<npcincr Mason lust 5>><<npcincr Mason dom -1>><<deadwood-swimming-lesson-effects 'underwater'>>
+
+:: Deadwood Reblooms Swimming Underwater Bulge
+<<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You swim directly between Mason's legs underwater, wrapping your fingers firmly around the front of <<his>> swimwear. You can feel the distinct, throbbing heat and firm contours of <<his>> arousal filling your palm through the fabric.
+    <br><br>
+    Above the surface, Mason lets out a choked, muffled groan that <<he>> desperately tries to disguise with a loud cough: "H-hmph! Keep your kicks tight!"
+    <br><br>
+    <<His>> hips twitch helplessly into your grip beneath the water, the contact overwhelming <<his>> resistance. When you finally release <<him>> and break the surface, Mason is trembling and panting softly, <<his>> face burning with crimson fire as <<he>> stares at you in silent shock.
+  <<option 'CN'>>
+    你在水下直接游入梅森双腿之间，手指精准而大胆地扣上<<his>>泳裤前方。隔着薄薄的布料，那处坚挺滚烫、不住搏动的勃起轮廓结结实实地填满了你的掌心。
+    <br><br>
+    水面上，梅森喉咙里溢出一声几乎抑制不住的急喘与闷哼，随即被<<he>>慌乱地用假咳掩饰过去：“咳……咳！打腿动作不要散！”
+    <br><br>
+    在水下，<<his>>腰胯却难以自制地向你的掌心轻轻顶蹭，强烈的快感彻底击溃了<<his>>的防线。当你终于松开手破水而出时，梅森整个人都在微颤，胸口起伏不定，满面赤红地注视着你，眼底满是欲言又止的悸动与震撼。
+<</language>><br><br>
+<<promiscuity3>><<arousal 800>><<npcincr Mason lust 8>><<npcincr Mason dom -2>><<deadwood-swimming-lesson-effects 'underwater'>>
+
+:: Deadwood Reblooms Swimming Private Request
+<<schooleffects>><<effects>>
+<<npc Mason>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You swim to the edge and whisper to Mason, asking if <<he>> would be willing to stay behind after the bell rings to give you private one-on-one coaching in the empty pool.
+    <br><br>
+    Mason's eyes widen. <<He>> nervously glances around the noisy pool before leaning down: "A-after class? Just the two of us? I... well, if you're really determined to improve your technique, I suppose I can stay for a little while once everyone has left."
+  <<option 'CN'>>
+    你游到池边，轻声向梅森提议，希望在下课铃响后单独留下来，让<<him>>在空旷无人的泳池里给你做私密一对一辅导。
+    <br><br>
+    梅森瞪大眼睛，有些局促地环顾着热闹的泳池，随后俯下身低声道：“下、下课后？就我们两个人？我……好吧，如果你真的那么想把泳姿练好，等大家都走了，我可以多留一会儿。”
+<</language>><br><br>
+<<set $daily.masonPrivateSwimming to true>>
+<<npcincr Mason love 1>><<npcincr Mason lust 2>><<deadwood-swimming-lesson-effects 'mason'>>
+
+:: Deadwood Reblooms Swimming Private
+<<effects>>
+<<npc Mason>><<person1>>
+<<set $location to 'pool'>><<set $outside to 0>>
+<<language>>
+  <<option 'EN'>>
+    The heavy fire doors thump shut with a dull echo. The chatter and splashing of the other students have completely faded into the changing rooms.
+    <br><br>
+    The cavernous swimming pool room is suddenly breathtakingly still. Sunlight filters through the high windows, reflecting gentle ripples of turquoise onto the ceiling.
+    <br><br>
+    Mason stacks the last flutterboard onto the metal cart, wipes <<his>> hands on a towel, and turns toward the pool where you wait.
+    <br><br>
+    "They're all gone," <<he>> says softly, <<his>> voice echoing in the empty hall. <<His>> cheeks carry a warm flush. "It's just the two of us now. What did you want to work on?"
+  <<option 'CN'>>
+    沉重的防火门在身后合上，发出沉闷的回响。其他同学的喧闹与泼水声彻底远去，更衣室的方向渐渐安静下来。
+    <br><br>
+    空旷的泳池大厅忽然变得格外静谧，唯有水波轻拍池壁的柔和回音。高窗斜斜透进天光，在穹顶上投下泛着碧蓝光晕的粼粼水纹。
+    <br><br>
+    梅森把最后一块浮板放回收纳车，用毛巾擦了擦手，转过身来看向池中等待的你。
+    <br><br>
+    “大家都走了，”<<he>>轻声说道，温润的嗓音在空旷的大厅里带着细微的回响，面颊微热，“现在只剩我们两个人了……你想从哪里开始练？”
+<</language>><br><br>
+
+<<socialiseicon 'ask'>><<link `lanSwitch('Ask for one-on-one stroke guidance in the quiet pool', '在安静的池水中请梅森近距离辅导泳姿')` 'Deadwood Reblooms Swimming Private Talk'>><</link>><<gswimming>><<lstress>><br>
+
+<<if C.npc.Mason.love gte 20 or C.npc.Mason.lust gte 20 or hasSexStat('promiscuity', 2)>>
+  <<loveicon 'kiss'>><<link `lanSwitch('Pull Mason into the water for an embrace and kiss', '将梅森拉入水中拥抱亲吻')` 'Deadwood Reblooms Swimming Private Kiss'>><<promiscuous2>><<glust>><<garousal>><</link>><br>
+<</if>>
+
+<<if (C.npc.Mason.love gte 30 or C.npc.Mason.lust gte 30) and hasSexStat('promiscuity', 2)>>
+  <<loveicon 'hug'>><<link `lanSwitch('Seduce Mason into the empty pool waters for intimacy', '在无人的泳池中引诱梅森交欢')` 'Deadwood Reblooms Swimming Private Sex'>><<set $sexstart to 1>><<promiscuous3>><</link>><br>
+<</if>>
+
+<br>
+<<if $exposed lte 0>><<destinationpoolchangingroom>><<else>><<destinationpoolchangingroom 'towels'>><</if>>
+
+:: Deadwood Reblooms Swimming Private Talk
+<<effects>>
+<<npc Mason>><<person1>>
+<<pass 20>>
+<<language>>
+  <<option 'EN'>>
+    Mason slides smoothly into the pool beside you. Without the crowd of students, <<he>> is gentle, attentive, and entirely focused on you.
+    <br><br>
+    <<He>> holds your hands in the warm water, demonstrating the sweeping motion of breaststroke before placing <<his>> arms beneath you to support your glide. You practice several lengths together in the peaceful hall, each turn smooth and effortless.
+    <br><br>
+    When you stop at the wall, Mason rests beside you, gazing into your eyes with fond tenderness. <<He>> reaches out and gently brushes a wet strand of hair from your forehead. "You're doing wonderfully. I... I really enjoy spending time with you like this."
+  <<option 'CN'>>
+    梅森轻盈地滑入池水中，来到你身旁。没有了全班学生的注视，<<he>>的神色格外温和专注，眼眸里只有你的身影。
+    <br><br>
+    <<He>>在温热的池水里握住你的双手，耐心地示范着蛙泳划水的弧度，随后伸手托住你的身躯辅助滑行。你们在静谧的大厅中并肩游了几个来回，每一次蹬壁滑行都流畅而惬意。
+    <br><br>
+    停在池壁旁休息时，梅森靠在你身边，目光满含柔意。<<He>>伸手为你轻轻拨开贴在前额的湿发，低声道：“你学得很快……其实，我真的很喜欢像这样和你单独待在一起。”
+<</language>><br><br>
+<<swimmingskilluse 10>><<physique 3>><<npcincr Mason love 3>><<npcincr Mason lust 1>><<stress -10>><<lstress>><br><br>
+<<if $exposed lte 0>><<destinationpoolchangingroom>><<else>><<destinationpoolchangingroom 'towels'>><</if>>
+
+:: Deadwood Reblooms Swimming Private Kiss
+<<effects>>
+<<npc Mason>><<person1>>
+<<pass 25>>
+<<language>>
+  <<option 'EN'>>
+    You swim close to the poolside ladder where Mason is standing and reach up, wrapping your wet arms around <<his>> neck and pulling <<him>> down into the buoyant water.
+    <br><br>
+    Mason's resistance completely dissolves. <<His>> strong arms wrap securely around your waist, pulling your slick, wet body firmly against <<his>> chest.
+    <br><br>
+    "We really shouldn't... anyone could walk in..." <<he>> whispers against your skin, but <<his>> lips eagerly press against yours.
+    <br><br>
+    The kiss is deep, breathless, and tasted with chlorine and sweet warmth. Mason groans softly into your mouth, <<his>> tongue tentatively meeting yours as <<his>> hands roam over your wet back and hips. Water laps gently against the tiles as you share a long, passionate embrace in the empty hall.
+  <<option 'CN'>>
+    你游到梅森站立的下水扶梯旁，伸手环住<<his>>的脖颈，轻轻用力将<<him>>拉入温暖浮泛的池水中。
+    <br><br>
+    梅森仅存的克制在瞬间融化。<<His>>有力的双臂紧紧环抱住你的腰肢，让你湿润滑腻的躯体毫无缝隙地紧贴在<<his>>胸膛前。
+    <br><br>
+    “我们真的不该……随时可能有人进来……”<<he>>贴着你的唇瓣轻喘低语，然而吐出的气息却尽数化为了迫不及待的深吻。
+    <br><br>
+    吻热烈而深沉，混杂着池水的微涩与彼此唇齿间的甘甜。梅森在你口中发出一声压抑的低喘，舌尖羞涩却热切地与你交缠，大手顺着你湿透的背部滑向腰臀。在空无一人的大厅里，水浪轻拍池壁，见证着这绵长而悸动的拥吻。
+<</language>><br><br>
+<<takeKissVirginity 'Mason' 'loveInterest'>>
+<<npcincr Mason love 3>><<npcincr Mason lust 5>><<arousal 1000>><<ggarousal>><br><br>
+<<if $exposed lte 0>><<destinationpoolchangingroom>><<else>><<destinationpoolchangingroom 'towels'>><</if>>
+
+:: Deadwood Reblooms Swimming Private Sex
+<<effects>>
+<<if $sexstart is 1>>
+  <<set $sexstart to 0>>
+  <<clearnpc>><<npc Mason>><<person1>>
+  <<consensual>><<set $consensual to 1>><<neutral 1>>
+  <<if $exposed lt 2>><<strip>><</if>>
+  <<maninit>><<set $enemytrust += 500>>
+  <<set $enemyarousalmax to 600>>
+  <<npcexpose>><<npckiss>>
+  <<language>>
+    <<option 'EN'>>
+      Mason holds you against the tiled wall of the deep end. The water sloshes softly around your chests as <<he>> looks at you with pupils dark with desire.
+      <br><br>
+      "I've thought about this... more than I should have," <<he>> breathes against your lips, <<his>> hands trembling with athletic passion as <<he>> draws your body tight against <<his>> own.
+    <<option 'CN'>>
+      梅森在深水区将你轻柔地抵在池壁瓷砖上，温热的池水在你们胸口泛着涟漪。<<His>>眼眸深沉，满是难以自抑的情欲。
+      <br><br>
+      “我其实想过很多次……比我该想的还要多得多，”<<he>>贴着你的唇瓣沙哑低语，那双常年游泳锻炼的手掌带着炽热的力量，将你的身体紧紧压向<<his>>怀中。
+  <</language>><br><br>
+<</if>>
+<<set $enemyanger to 0>>
+<<effects>><<effectsman>><<man>><<stateman>>
+<br><br><<actionsman>>
+<<if _combatend or $consensual isnot 1>>
+  <span id='next'><<lanLink ["Next","继续"] 'Deadwood Reblooms Swimming Private Sex Finish'>><</lanLink>></span><<nexttext>>
+<<else>>
+  <span id='next'><<lanLink ["Next","继续"] 'Deadwood Reblooms Swimming Private Sex'>><</lanLink>></span><<nexttext>>
+<</if>>
+
+:: Deadwood Reblooms Swimming Private Sex Finish
+<<effects>><<person1>>
+<<if $enemyarousal gte $enemyarousalmax>>
+  <<ejaculation>><<npcincr Mason lust -20>>
+<</if>>
+<<if $consensual isnot 1>>
+  <<lanSwitch 'Mason draws back with an apologetic gasp, breathing heavily as <<he>> floats a short distance away to give you space.' '梅森带着歉意的喘息退开了，胸口剧烈起伏，在水中游开些许距离给你留出空间。'>>
+<<else>>
+  <<takeKissVirginity 'Mason' 'loveInterest'>>
+  <<language>>
+    <<option 'EN'>>
+      The ripples slowly settle against the tiled gutters. Mason holds you close in the water for several long, tender minutes, <<his>> chin resting gently atop your head as your breathing slowly syncs.
+      <br><br>
+      After climbing out, Mason wraps a large, plush towel around your shoulders and gently dries your wet hair. <<His>> cheeks are still deeply flushed, but <<his>> gaze is brimming with love.
+      <br><br>
+      "I never imagined doing something so reckless in this pool," <<he>> smiles softly. "Thank you for staying with me."
+    <<option 'CN'>>
+      翻涌的池水渐渐平息，微澜拍打着排水槽。梅森在水中将你紧紧搂在怀里许久，下巴轻靠在你的发顶，听着彼此的呼吸由急促重归平缓。
+      <br><br>
+      上岸后，梅森取来一条宽大松软的毛巾裹在你的肩头，细致温柔地为你擦拭湿漉的长发。<<His>>脸颊虽依然泛着羞涩的红晕，望向你的眼底却满是深情。
+      <br><br>
+      “我从没想过自己会在这间泳池里做出这么出格的事，”<<he>>唇角含笑，轻声说道，“谢谢你愿意留下来陪我。”
+  <</language>>
+<</if>>
+<br><br>
+<<clotheson>><<endcombat>>
+<<pass 30>>
+<<if $exposed lte 0>><<destinationpoolchangingroom>><<else>><<destinationpoolchangingroom 'towels'>><</if>>

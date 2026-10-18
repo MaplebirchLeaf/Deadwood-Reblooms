@@ -111,7 +111,8 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       'School Swimming Late': swimmingDress.map(rule => ({ ...rule })),
       'Swimming Lesson': [
         // 已获批的校规不再触发旧裸体泳课的礼顿惩罚，不修改原版全班任务记录。
-        { src: '$swimnudecounter gte 10 and $swimall isnot 1', applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity', expected: 1 }
+        { src: '$swimnudecounter gte 10 and $swimall isnot 1', applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity', expected: 1 },
+        { src: '<<swimmingicon>>', applybefore: '<<deadwood-swimming-lesson-link>>', expected: 1 }
       ],
       "Head's Office": [
         {
