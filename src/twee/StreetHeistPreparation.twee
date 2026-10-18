@@ -38,7 +38,7 @@
   <<if _streetPrep.place is 'bank' and ($location isnot 'financial_centre' or _streetHeist.bankClosed)>><<exit>><</if>>
   <<set _streetLiveOption to _streetHeist.preparations.find(item => item.id === _streetPreparationId)?.options.find(item => item.id === _streetMethodId)>>
   <<if !_streetLiveOption?.available>><<exit>><</if>>
-  <<if _streetCost gt 0>><<money `-_streetCost`>><</if>>
+  <<if _streetCost gt 0>><<money `-_streetCost`>><<set _streetHeist.state.spent += _streetCost>><</if>>
   <<set _streetHeist.state.preparationChoices[_streetPreparationId] to {method: _streetMethodId, quality: _streetQuality}>>
   <<set _streetHeist.state.preparations.push(_streetPreparationId)>>
   <<set _streetHeist.state.feedback.outcome to 'completed', _streetHeist.state.feedback.cost to _streetCost>>
@@ -100,7 +100,7 @@
   <<else>>
     <<if _streetHeist.crew.length gte 2 or _streetHeist.crew.some(npc => npc.heist.role === _streetAction) or $money lt _streetFee>><<exit>><</if>>
     <<loadNPC 0 _streetKey>><<set $NPCList[0].heist.role to _streetAction>><<saveNPC 0 _streetKey>>
-    <<money `-_streetFee`>><<set _streetHeist.state.candidates.delete(_streetKey)>>
+    <<money `-_streetFee`>><<set _streetHeist.state.spent += _streetFee>><<set _streetHeist.state.candidates.delete(_streetKey)>>
     <<set _streetHeist.state.crew.push(_streetKey), _streetHeist.state.candidate to '', _streetHeist.state.feedback.cost to _streetFee>>
   <</if>>
   <<set _streetHeist.state.feedback.outcome to 'completed'>><<endevent>>
@@ -256,7 +256,7 @@
         <</lanLink>>
       <<else>>
         <span class='grey'><<= lanSwitch(_streetOption.name[0], _streetOption.name[1])>></span>
-      <</if>> · <span class='teal'><<= _streetOption.minutes>></span> <<lanSwitch 'minutes' '分钟'>><<if _streetOption.cost gt 0>> · <<printmoney _streetOption.cost>><</if>><<if _streetRemaining lte _streetOption.minutes>> · <span class='blue'><<lanSwitch 'Not enough opening time left.' '剩余营业时间不足。'>></span><</if>><br>
+      <</if>> · <<lanSwitch 'Expected quality: ' '预计质量：'>><span class='teal'><<= _streetOption.quality>> / <<= _streetOption.qualityMax>></span> · <span class='teal'><<= _streetOption.minutes>></span> <<lanSwitch 'minutes' '分钟'>><<if _streetOption.cost gt 0>> · <<printmoney _streetOption.cost>><</if>><<if _streetRemaining lte _streetOption.minutes>> · <span class='blue'><<lanSwitch 'Not enough opening time left.' '剩余营业时间不足。'>></span><</if>><br>
     <</capture>>
   <</for>>
   <<if $worn.face.type.includes('gag')>>

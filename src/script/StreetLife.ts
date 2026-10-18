@@ -28,6 +28,13 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       colour: 'green',
       has: () => maplebirch.get('StreetLife')?.races.seasonedDriver === true,
       text: () => maplebirch.t('deadwood-reblooms:street:trait:seasoned_driver:text')
+    },
+    {
+      title: 'Special Traits',
+      name: () => maplebirch.t('deadwood-reblooms:street:trait:crew_leader:name'),
+      colour: 'green',
+      has: () => maplebirch.get('StreetLife')?.heist.crewLeader === true,
+      text: () => maplebirch.t('deadwood-reblooms:street:trait:crew_leader:text')
     }
   );
   Detective(maplebirch);

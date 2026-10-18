@@ -83,7 +83,7 @@ Mickey helps check information, division of work and risks while retaining the o
 
 ## The bank heist
 
-The target is the **financial centre bank**. Reach at least 50 street standing and meet Landry and Wren. Landry must substantially trust your work and Wren needs at least 20 affection. Native blackbox and fencing experience can also establish your credentials with Landry. Arrange a private meeting, then take the normal route to the smuggler's pub and continue preparations between 09:00 and 18:00.
+The target is the **financial centre bank**. Reach at least 70 street standing and meet Landry and Wren. Landry must substantially trust your work and Wren needs at least 20 affection. Native blackbox and fencing experience can also establish your credentials with Landry. Arrange a private meeting, then take the normal route to the smuggler's pub and continue preparations between 09:00 and 18:00.
 
 1. Discuss the plan with Landry and Wren, choosing a quiet or openly forceful approach.
 2. Check bank information, prepare equipment and rehearse. English, maths, science, housekeeping, skulduggery and physical condition affect quality. A working factory with a packaging line can help with supplies.
@@ -91,7 +91,15 @@ The target is the **financial centre bank**. Reach at least 50 street standing a
 4. Check preparation, crew and any selected vehicle before starting. Once there, you may still give up, take less or change your escape choice. Stress, fatigue, pain, alcohol and drugs impair performance.
 5. Settle the split after escape to close the operation. Total loot, your share and preparation expenses are different; the recorded share is not net profit.
 
-During preparation, you may contact Grant to report the plan or help apprehend the crew, and may change whom you provide information to. Decisions alter trust and future cooperation. Conflicting demands from the two sides cannot both be completed.
+Ordinary supplies cost <span class="gold">£1,500</span>, with another <span class="gold">£300</span> for rehearsal. Your own operating packaging factory can reduce supplies to <span class="gold">£750</span>. The three candidates charge advances of <span class="gold">£300 / £900 / £1,800</span>; hire two of them. Each also takes the agreed share after the job. Mickey charges <span class="gold">£600</span> to review one part of the plan. The preparation page keeps recorded expenses, and settlement shows what remains of your share after those costs.
+
+**Crew Leader**: Hire an available scout and carrier, then complete a rehearsal at quality 8 or higher. Their skill contributions to scouting, carrying and escape increase by **10%**. Injuries still reduce their effectiveness; a missing hire or someone in custody cannot provide the bonus. Read the preparation quality and current estimates before deciding who does which job.
+
+A successful operation starts with <span class="gold">£200,000</span> in total loot, or <span class="gold">£240,000</span> for the forceful approach. Landry, Wren and the hires still take their shares. Choosing a lighter load takes 65%; failing to carry everything leaves only 35% and raises the alarm. A careful departure leaves a further 20% of the money behind and takes ten minutes longer, improving the chance of getting clear.
+
+A failed escape loses all the money and can leave you and the hires hurt. A badly failed escape also leaves the carrier in custody. Your expenses, the bank closure and your own criminal evidence remain. Preparation, withdrawal and settlement never open a second bank run; later orders are ordinary deliveries.
+
+During preparation, you may contact Grant to report the plan or help apprehend the crew, and may change whom you provide information to. **An agreement to help is not immunity**: your own outstanding case may still mean detention and prevent collecting police payment. Reporting the crew at the last minute also leaves your own offences intact. Decisions alter trust and future cooperation. Conflicting demands from the two sides cannot both be completed.
 
 An incident suspends bank counter service for two days without cancelling accounts or loans. Native police consequences remain. A quiet success earns **Quiet as a Mouse** only after escape and the actual split, without raising the alarm or being identified. Entering unnoticed alone is insufficient.
 

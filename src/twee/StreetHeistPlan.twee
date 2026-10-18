@@ -99,13 +99,14 @@
           <<if _streetHeist.state.preparations.includes(_streetPrep.id)>>
             <<set _streetChoice to _streetHeist.state.preparationChoices[_streetPrep.id]>>
             <<set _streetMethod to _streetPrep.options.find(item => item.id === _streetChoice?.method)>>
-            <li><span class='green'><<= lanSwitch(_streetPrep.name[0], _streetPrep.name[1])>></span><<if _streetMethod>> · <<= lanSwitch(_streetMethod.name[0], _streetMethod.name[1])>><</if>></li>
+            <li><span class='green'><<= lanSwitch(_streetPrep.name[0], _streetPrep.name[1])>></span><<if _streetMethod>> · <<= lanSwitch(_streetMethod.name[0], _streetMethod.name[1])>><</if>> · <<lanSwitch 'Quality: ' '准备质量：'>><span class='teal'><<= _streetChoice.quality>> / 10</span></li>
           <</if>>
         <</for>>
 
       <</if>>
+      <li><<lanSwitch 'Recorded preparation expenses: ' '已记录的筹备支出：'>><<printmoney _streetHeist.state.spent>></li>
       <<for _streetCrew range _streetHeist.crew>>
-        <li><<icon `'street/' + _streetCrew.heist.role + '.png'`>><<= _streetCrew.heist.role is 'scout' ? lanSwitch('Scout: ', '侦察员：') : lanSwitch('Carrier: ', '搬运员：')>><<= _streetCrew.name>> · <<lanSwitch 'Skill: ' '熟练：'>><span class='teal'><<= _streetCrew.heist.skill>></span> / 1000 · <<lanSwitch 'Share: ' '抽成：'>><span class='gold'><<= _streetCrew.heist.cut>>%</span><<if _streetCrew.heist.status is 'arrested'>> · <span class='red'><<lanSwitch 'in custody' '已被扣留'>></span><</if>></li>
+        <li><<icon `'street/' + _streetCrew.heist.role + '.png'`>><<= _streetCrew.heist.role is 'scout' ? lanSwitch('Scout: ', '侦察员：') : lanSwitch('Carrier: ', '搬运员：')>><<= _streetCrew.name>> · <<lanSwitch 'Skill: ' '熟练：'>><span class='teal'><<= _streetCrew.heist.skill>></span> / 1000 · <<lanSwitch 'Share: ' '抽成：'>><span class='gold'><<= _streetCrew.heist.cut>>%</span> · <<lanSwitch 'Health: ' '身体状况：'>><span class='teal'><<= Math.round(_streetCrew.health / _streetCrew.healthmax * 100)>>%</span><<if _streetCrew.heist.status is 'arrested'>> · <span class='red'><<lanSwitch 'in custody' '已被扣留'>></span><</if>></li>
       <</for>>
       <<if _streetHeist.state.vehicle is null>>
         <li><<lanSwitch 'Departure: on foot.' '撤离方式：徒步。'>></li>
@@ -245,7 +246,7 @@
         <<if _streetHeist.state.preparations.includes(_streetPrep.id)>>
           <<set _streetChoice to _streetHeist.state.preparationChoices[_streetPrep.id]>>
           <<set _streetMethod to _streetPrep.options.find(item => item.id === _streetChoice?.method)>>
-          <span class='green'><<lanSwitch 'completed' '已完成'>></span><<if _streetMethod>> · <<= lanSwitch(_streetMethod.name[0], _streetMethod.name[1])>><</if>>
+          <span class='green'><<lanSwitch 'completed' '已完成'>></span><<if _streetMethod>> · <<= lanSwitch(_streetMethod.name[0], _streetMethod.name[1])>><</if>> · <<lanSwitch 'Quality: ' '准备质量：'>><span class='teal'><<= _streetChoice.quality>> / 10</span>
         <<elseif _streetPrep.place is 'bank'>>
           <span class='blue'><<lanSwitch 'Visit the financial centre bank counter on High Street during its opening hours.' '营业时到商业街金融中心的银行柜台查看。'>></span>
         <<elseif _streetPrep.id is 'rehearsal' and !_streetHeist.crewReady>>
@@ -267,6 +268,26 @@
     <<if _streetHeist.conditionPenalty gte 10>>
       <span class='orange'><<lanSwitch 'You are not at your best. Take care of yourself before committing to the remaining work.' '你现在的状态不太好。落实剩余准备前，先把自己缓过来。'>></span><br><br>
     <</if>>
+
+    <div class='gold bold'><<lanSwitch 'Putting the plan together' '把安排理清'>></div>
+    <<set _streetEquipmentCost to _streetHeist.terms.preparations.find(item => item.id === 'equipment').options[0].cost, _streetRehearsalCost to _streetHeist.terms.preparations.find(item => item.id === 'rehearsal').options[0].cost>>
+    <<lanSwitch 'Ordinary supplies and rehearsal: ' '普通用品与排演：'>><<printmoney `_streetEquipmentCost + _streetRehearsalCost`>> · <<lanSwitch 'Two advances, your equipment and any vehicle costs come on top. Paid advances are not refunded if you stop.' '另需支付两人的定金，并自行准备武器或车辆。中途停手，已付定金也不会退。'>><br>
+    <<if _streetHeist.crewReady>>
+      <<lanSwitch 'With the current crew and your present condition: ' '按目前人手和你的状态：'>><br>
+      <<lanSwitch 'Unnoticed entry ' '隐蔽进入 '>><span class='teal'><<= _streetHeist.chances.entry>>%</span> ·
+      <<lanSwitch 'Talk past a guard ' '交涉 '>><span class='teal'><<= _streetHeist.chances.talk>>%</span> ·
+      <<lanSwitch 'Full haul ' '带出满载 '>><span class='teal'><<= _streetHeist.chances.vault>>%</span> ·
+      <<lanSwitch 'Escape before a full load ' '未负重时脱身 '>>
+      <!-- 筹备时未装钱袋，满载会在实际撤离前追加负重影响，先把差别说清。 -->
+      <span class='teal'><<= _streetHeist.chances.escape>>%</span><br>
+      <span class='blue'><<lanSwitch 'These are the present estimates, before a full load or an alarm makes escape harder. Your skills, the crew’s health and the quality of each preparation all matter. Rest or choose a lighter load if the risk is too high.' '这是尚未负重、尚未惊动守卫时的估计。你的本领、雇员伤势和每项准备的质量都会影响结果。风险太高，可以先休息，也可以少拿一些。'>></span><br>
+    <</if>>
+    <<if _streetHeist.crewLeader>>
+      <span class='green'><<lanSwitch 'The rehearsal has brought the crew together. Crew Leader is active; each hire’s role contributes 10% more skill.' '排演已经让两人配合起来。“知人善任”生效，各自分工中的技能贡献提高10%。'>></span><br>
+    <<else>>
+      <span class='blue'><<lanSwitch 'A full, available crew and a rehearsal quality of at least 8 earn Crew Leader. The bonus improves the hires’ own contributions; it does not replace your skills.' '两种分工都有人能够参加，排演质量达到8，可获得“知人善任”。这份默契能让同伙多发挥一些本领，仍替代不了你自己要做的事。'>></span><br>
+    <</if>>
+    <span class='red'><<lanSwitch 'This is a single final job. Failure can cost the entire haul, injure the crew or leave the carrier in custody. You can stop before entering, or withdraw during the operation. Your own criminal record remains.' '这是一桩只有一次机会的大买卖。失败可能丢掉全部赃款，伤及同伙，甚至让搬运员被扣留。入场前可以停手，行动中也能撤回。你自己的罪证仍会留下。'>></span><br><br>
 
     <div class='gold bold'><<lanSwitch 'Crew' '雇用同伙'>></div>
     <<language>>

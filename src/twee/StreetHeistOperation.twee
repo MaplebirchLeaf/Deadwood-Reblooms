@@ -53,8 +53,11 @@
       <<if _heistState.stage isnot 'vault'>><<exit>><</if>>
       <<set _heistPotential to _heistWork.terms.loot * (_heistState.approach is 'loud' ? _heistWork.terms.loudLootRatio : 1)>>
       <<set _heistFull to _heistAction is 'take-full' and _heistState.rolls.vault lte _heistWork.chances.vault>>
+      <<set _heistState.vaultFailed to _heistAction is 'take-full' and !_heistFull>>
       <<set _heistState.haul to _heistFull ? 'full' : 'light'>>
-      <<set _heistState.loot to Math.floor(_heistPotential * (_heistFull ? 1 : _heistWork.terms.lightRatio)), _heistState.stage to 'escape'>>
+      <<if _heistState.vaultFailed>><<set _heistState.raisedAlarm to true>><</if>>
+      <<set _heistRatio to _heistFull ? 1 : (_heistState.vaultFailed ? _heistWork.terms.vaultFailureRatio : _heistWork.terms.lightRatio)>>
+      <<set _heistState.loot to Math.floor(_heistPotential * _heistRatio), _heistState.stage to 'escape'>>
       <<crimeUp _heistWork.terms.crime.vault 'thievery'>>
       <<if _heistAction is 'take-full'>><<physique 1 'noMessage'>><<tiredness 4>><<else>><<tiredness 1>><</if>>
       <<pass `_heistState.approach is 'loud' ? 5 : 10`>>
@@ -87,9 +90,21 @@
         <<set _heistVehicle.point to 'harvest', _heistTransport.state.driving to Math.min(1000, _heistTransport.state.driving + 4)>>
       <</if>>
       <<set _heistState.outcome to _heistState.rolls.escape lte _heistEscapeChance ? 'success' : 'failed'>>
-      <<if _heistState.outcome is 'failed'>><<set _heistState.loot to 0>><</if>>
-      <!-- 先离开可重复点击的阶段，再结算时间，原版强制事件优先。 -->
-      <<set _heistState.stage to 'settlement'>><<endevent>><<pass _heistEscapeMinutes>>
+      <!-- 判定与人员后果使用开场保存的同一次骰点，先关阶段再记伤势，重绘不会重伤或再扣款。 -->
+      <<set _heistState.stage to 'settlement'>>
+      <<if _heistState.outcome is 'failed'>>
+        <<set _heistSevere to _heistState.rolls.escape - _heistEscapeChance gte _heistWork.terms.failure.severeMargin>>
+        <<set _heistLoss to _heistSevere ? _heistWork.terms.failure.severe : _heistWork.terms.failure.minor>>
+        <<set _heistState.loot to 0, _heistState.escapeFailure to _heistSevere ? 'custody' : 'injury'>>
+        <<for _heistCrewMember range _heistWork.crew>>
+          <<if _heistCrewMember.health gt 0>>
+            <<set _heistCrewMember.health to Math.max(1, _heistCrewMember.health - Math.ceil(_heistCrewMember.healthmax * _heistLoss.crewInjury))>>
+            <<if _heistSevere and _heistCrewMember.heist.role is 'carrier'>><<set _heistCrewMember.heist.status to 'arrested'>><</if>>
+          <</if>>
+        <</for>>
+        <<pain _heistLoss.pain>><<tiredness _heistLoss.fatigue>>
+      <</if>>
+      <<endevent>><<pass _heistEscapeMinutes>>
       <<if !_heistDriving>>
         <<tiredness 8>>
         <<if _heistState.outcome is 'success'>><<athletics 1>><</if>>
@@ -135,13 +150,13 @@
       <<language>>
         <<option 'EN'>>
           <<if _heistWork.state.policePlan>>
-            Grant taps the account you agreed on. "If you change your mind, tell me. Don't go in there and decide afterwards that you were doing me a favour." The notebook stays on the desk. "Your own record is still your own record."
+            Grant taps the account you agreed on. "If you change your mind, tell me. Don't go in there and decide afterwards that you were doing me a favour." The notebook stays on the desk. "This agreement is not immunity. We still deal with your own record before any payment."
           <<else>>
             Grant keeps the conversation low. "I've recorded what you told me. I still need to check it." The notebook stays on the desk. "If you want to help further, we agree on that separately."
           <</if>>
         <<option 'CN'>>
           <<if _heistWork.state.policePlan>>
-            格兰特点了点你们说好的安排。“改主意就告诉我。别等进了银行，才决定自己是在帮我的忙。”记事簿留在桌上。“你自己的记录，还是你自己的记录。”
+            格兰特点了点你们说好的安排。“改主意就告诉我。别等进了银行，才决定自己是在帮我的忙。”记事簿留在桌上。“约定协助，可不是免罪。你自己的案子得先处理，报酬也要等到那之后。”
           <<else>>
             格兰特压低声音。“你说的这些，我记下了，还得核验。”记事簿留在桌上。“如果还想继续帮忙，就另把事情说清楚。”
           <</if>>
@@ -265,6 +280,18 @@
   <</if>>
 <</widget>>
 
+<<widget 'deadwood-street-heist-losses'>>
+  <<set _heistLossState to maplebirch.get('StreetLife')?.heist.state>>
+  <<if _heistLossState?.escapeFailure is 'injury'>>
+    <span class='red'><<lanSwitch 'The haul is gone. You and both hires were hurt getting clear.' '赃款已经丢失。你和两名雇员在脱身时都受了伤。'>></span><br>
+  <<elseif _heistLossState?.escapeFailure is 'custody'>>
+    <span class='red'><<lanSwitch 'The haul is gone. You and the scout escaped hurt; the carrier was taken into custody.' '赃款已经丢失。你与侦察员带伤脱身，搬运员被警方带走了。'>></span><br>
+  <</if>>
+  <<if _heistLossState?.entered>>
+    <span class='orange'><<lanSwitch 'Leaving the bank does not remove the evidence against you. Counter services remain suspended until the bank reopens.' '离开银行不等于消除了罪证。银行恢复营业前，柜台仍会暂停接待。'>></span><br>
+  <</if>>
+<</widget>>
+
 :: Deadwood Street Heist Start
 <<set $location to 'financial_centre', $outside to 1, $bus to 'high'>><<effects>>
 <<set _heistWork to maplebirch.get('StreetLife')?.heist>>
@@ -345,7 +372,7 @@
           你们说好了公开强行推进。也许能多带出一些钱，但抵抗首先落到你身上，没人答应替你面对。
         <</if>>
     <</language>><br><br>
-    <<icon 'street/bank-vault.png'>><<lanLink ['Begin the robbery with the crew', '与同伙开始实施抢劫']>><<deadwood-street-heist-action 'enter'>><</lanLink>><<dangerousText>><br>
+    <<icon 'street/bank-vault.png'>><<lanLink ['Begin the robbery with the crew', '与同伙开始实施抢劫']>><<deadwood-street-heist-action 'enter'>><</lanLink>><<dangerousText>><<if _heistWork.state.approach is 'quiet'>> · <<lanSwitch 'Unnoticed entry: ' '不被察觉：'>><span class='teal'><<= _heistWork.chances.entry>>%</span><</if>><br>
   <<case 'challenge'>>
     <<if $per_npc.deadwood_heist_guard>><<endevent>><<loadNPC 0 'deadwood_heist_guard'>><<person1>><</if>>
     <<language>>
@@ -373,7 +400,7 @@
         <</if>>
     <</language>><br><br>
     <<if !_heistWork.state.talked and !$worn.face.type.includes('gag') and $per_npc.deadwood_heist_guard>>
-      <<socialiseicon 'ask'>><<lanLink ['Try to talk the guard down (0:05)', '试着与守卫交涉 (0:05)']>><<deadwood-street-heist-action 'talk'>><</lanLink>><br>
+      <<socialiseicon 'ask'>><<lanLink ['Try to talk the guard down (0:05)', '试着与守卫交涉 (0:05)']>><<deadwood-street-heist-action 'talk'>><</lanLink>> · <<lanSwitch 'Success: ' '成功率：'>><span class='teal'><<= _heistWork.chances.talk>>%</span><br>
     <<elseif $worn.face.type.includes('gag')>>
       <span class='grey'><<lanSwitch 'You cannot give a clear answer with your mouth obstructed.' '嘴被堵住，你无法清楚地作答。'>></span><br>
     <</if>>
@@ -414,13 +441,15 @@
         <br><br>伦恩已经拿好了袋子。<<if C.npc.Wren.love gte 40>>“出去再数我们的钱，先把它带出去。”<<else>>“我的那一份还是我的。趁还没重得让人吵起来，赶紧决定。”<</if>>
     <</language>><br><br>
     <<icon 'street/cash-bundle.png'>><<lanLink `['Take a manageable share ' + _heistVaultDuration, '带走能稳稳拿住的一份 ' + _heistVaultDuration]`>><<deadwood-street-heist-action 'take-light'>><</lanLink>> · <<printmoney `Math.floor(_heistPotential * _heistWork.terms.lightRatio)`>><br>
-    <<icon 'street/money-holdall.png'>><<lanLink `['Try to carry the full haul ' + _heistVaultDuration, '试着满载带走 ' + _heistVaultDuration]`>><<deadwood-street-heist-action 'take-full'>><</lanLink>> · <<printmoney _heistPotential>><<dangerousText>><br>
-    <span class='blue'><<lanSwitch 'A full load takes more effort and is harder to get away with. If it proves too much, you will leave part behind.' '满载更费力，撤离时也更吃力。带不动时，会留下其中一部分。'>></span><br>
+    <<icon 'street/money-holdall.png'>><<lanLink `['Try to carry the full haul ' + _heistVaultDuration, '试着满载带走 ' + _heistVaultDuration]`>><<deadwood-street-heist-action 'take-full'>><</lanLink>> · <<printmoney _heistPotential>> · <<lanSwitch 'Full haul: ' '满载成功率：'>><span class='teal'><<= _heistWork.chances.vault>>%</span><<dangerousText>><br>
+    <span class='blue'><<lanSwitch 'Taking less by choice keeps 65% of the haul. A failed attempt at a full load leaves only 35% and raises the alarm.' '主动少拿可带走65%。勉强满载失败，则只剩35%，还会惊动外面的人。'>></span><br>
   <<case 'escape'>>
     <<language>>
       <<option 'EN'>>
         The group has reached the street. The scout watches the others as you lift the bag again.
-        <<if _heistWork.state.haul is 'full'>>
+        <<if _heistWork.state.vaultFailed>>
+          The attempt to carry everything went wrong. Most of the money was left behind, and the noise has drawn attention.
+        <<elseif _heistWork.state.haul is 'full'>>
           The full load drags at your arm. Keeping hold of all of it will slow you down.
         <<else>>
           You have left part of the money behind. The bags are easier to carry, though nobody looks relaxed.
@@ -428,7 +457,9 @@
         <br><br>Wren is already moving. <<if C.npc.Wren.love gte 40>>"Stay with it. I'm not counting an empty bag."<<else>>"I'm not waiting for anyone who stops to count it here."<</if>>
       <<option 'CN'>>
         一行人到了街上。你再次提起袋子时，侦察员看着其余人。
-        <<if _heistWork.state.haul is 'full'>>
+        <<if _heistWork.state.vaultFailed>>
+          满载的尝试出了岔子。大半的钱没能带出来，动静也已经引来了注意。
+        <<elseif _heistWork.state.haul is 'full'>>
           满载的钱袋坠着你的手臂，要全部拿稳会拖慢动作。
         <<else>>
           你们留下了一部分钱。袋子轻了些，但没人显得放松。
@@ -436,11 +467,11 @@
         <br><br>伦恩已经动身。<<if C.npc.Wren.love gte 40>>“拿稳了。我可不想最后数个空袋子。”<<else>>“谁在这里停下来数钱，我可不会等。”<</if>>
     <</language>><br><br>
     <<if _heistWork.vehicleReady>>
-      <<icon `'transport/' + _heistWork.vehicle.model + '.png'`>><<lanLink ['Leave in the agreed vehicle (0:20)', '乘约定的车撤离 (0:20)']>><<deadwood-street-heist-action 'drive'>><</lanLink>><br>
+      <<icon `'transport/' + _heistWork.vehicle.model + '.png'`>><<lanLink ['Leave in the agreed vehicle (0:20)', '乘约定的车撤离 (0:20)']>><<deadwood-street-heist-action 'drive'>><</lanLink>> · <<lanSwitch 'Escape: ' '脱身成功率：'>><span class='teal'><<= _heistWork.chances.escapeByCar>>%</span><br>
       <<set _heistTransport to maplebirch.get('Transport'), _heistVehicle to _heistWork.vehicle>>
       <<set _heistModel to _heistTransport.catalog.models.find(item => item.id === _heistVehicle.model)>>
       <<if _heistVehicle.fuel gte _heistModel.fuel_use * (_heistWork.terms.escapeMinutes + _heistWork.terms.carefulMinutes)>>
-        <<icon `'transport/' + _heistWork.vehicle.model + '.png'`>><<lanLink ['Leave part behind and depart more carefully by car (0:30)', '留下部分钱，乘车谨慎撤离 (0:30)']>><<deadwood-street-heist-action 'drive-careful'>><</lanLink>><br>
+        <<icon `'transport/' + _heistWork.vehicle.model + '.png'`>><<lanLink ['Leave part behind and depart more carefully by car (0:30)', '留下部分钱，乘车谨慎撤离 (0:30)']>><<deadwood-street-heist-action 'drive-careful'>><</lanLink>> · <<lanSwitch 'Escape: ' '脱身成功率：'>><span class='teal'><<= Math.min(95, _heistWork.chances.escapeByCar + _heistWork.terms.carefulBonus)>>%</span><br>
       <<else>>
         <span class='grey'><<lanSwitch 'There is not enough fuel for the longer, careful departure.' '车辆的燃油不足以支持更久的谨慎撤离。'>></span><br>
       <</if>>
@@ -448,10 +479,10 @@
       <span class='grey'><<lanSwitch 'The agreed vehicle cannot be used here now.' '约定的车辆现在无法从这里出发。'>></span><br>
     <</if>>
     <<if !$worn.feet.type.includes('shackle')>>
-      <<getouticon>><<lanLink ['Try to get away on foot (0:20)', '试着步行脱身 (0:20)']>><<deadwood-street-heist-action 'run'>><</lanLink>><br>
-      <<getouticon>><<lanLink ['Leave part behind and withdraw more carefully on foot (0:30)', '留下部分钱，步行谨慎撤离 (0:30)']>><<deadwood-street-heist-action 'run-careful'>><</lanLink>><br>
+      <<getouticon>><<lanLink ['Try to get away on foot (0:20)', '试着步行脱身 (0:20)']>><<deadwood-street-heist-action 'run'>><</lanLink>> · <<lanSwitch 'Escape: ' '脱身成功率：'>><span class='teal'><<= _heistWork.chances.escapeOnFoot>>%</span><br>
+      <<getouticon>><<lanLink ['Leave part behind and withdraw more carefully on foot (0:30)', '留下部分钱，步行谨慎撤离 (0:30)']>><<deadwood-street-heist-action 'run-careful'>><</lanLink>> · <<lanSwitch 'Escape: ' '脱身成功率：'>><span class='teal'><<= Math.min(95, _heistWork.chances.escapeOnFoot + _heistWork.terms.carefulBonus)>>%</span><br>
     <</if>>
-    <span class='blue'><<lanSwitch 'A careful departure leaves a fifth of the money behind and takes ten minutes longer.' '谨慎撤离会留下五分之一的钱，并多花十分钟。'>></span><br>
+    <span class='blue'><<lanSwitch 'A careful departure leaves a fifth of the money behind and takes ten minutes longer. Failure loses the whole haul and can leave the crew injured or the carrier in custody.' '谨慎撤离会留下五分之一的钱，并多花十分钟。脱身失败会丢掉全部赃款，同伙也可能受伤，搬运员甚至会被扣留。'>></span><br>
   <<case 'settlement' 'closed'>>
     <<getouticon>><<lanLink ['Review the outcome', '核对结果'] 'Deadwood Street Heist Debrief'>><</lanLink>><br>
     <<exit>>
@@ -525,6 +556,7 @@
       兰德里会在走私者酒馆听你说明结果。请沿熟悉的路线过去，在上午九点至下午六点之间碰面结算。这里还没有分账。
   <</language>><br><br>
 <</if>>
+<<deadwood-street-heist-losses>>
 <<getouticon>><<lanLink ['Continue along Harvest Street', '回到丰收街'] 'Harvest Street'>><<endevent>><</lanLink>><br>
 
 :: Deadwood Street Heist Debrief
@@ -563,7 +595,7 @@
       <<case 'withdrawn'>>
         You have made your way back to the pub. "Then we stop," Landry says after hearing you out. Wren puts an empty bag beneath the table. No one is being paid a share of money you didn't bring back.
       <<case 'failed'>>
-        Landry hears the account without interrupting. "No money, then." Wren leaves a bag beside the chair. "And no second try tonight," Landry adds. There is nothing to divide.
+        Landry hears the account without interrupting. "No money, then." Wren leaves a bag beside the chair. "That job is finished," Landry adds. There is nothing to divide.
       <<case 'arrested'>>
         The operation has ended with you in custody. The station has its own record to deal with; there is no money waiting to be divided at the pub.
     <</switch>>
@@ -591,11 +623,18 @@
       <<case 'withdrawn'>>
         你一路回到了酒馆。听你说完，兰德里回答：“那就停下。”伦恩把空袋子塞到桌下。没有带回来的钱，自然也没法分给任何人。
       <<case 'failed'>>
-        兰德里听完，没有打断。“所以没有钱。”伦恩把袋子留在椅子旁。“今晚别再试第二次了。”兰德里又补了一句。没什么可分的。
+        兰德里听完，没有打断。“所以没有钱。”伦恩把袋子留在椅子旁。“这桩买卖到此为止了。”兰德里又补了一句。没什么可分的。
       <<case 'arrested'>>
         行动以你被捕告终。警局还有你自己的记录要处理，酒馆里没有等着分给你的钱。
     <</switch>>
 <</language>><br><br>
+<<deadwood-street-heist-losses>>
+<<lanSwitch 'Recorded preparation expenses: ' '已记录的筹备支出：'>><<printmoney _heistWork.state.spent>><br>
+<<if _heistWork.state.outcome is 'success'>>
+  <<lanSwitch 'Your share after those expenses: ' '分账扣除上述支出后：'>><<printmoney `_heistWork.payout - _heistWork.state.spent`>><br>
+<<elseif ['reported', 'sting'].includes(_heistWork.state.outcome)>>
+  <<lanSwitch 'Police payment after those expenses, if you can collect: ' '能够领款时，警方报酬扣除上述支出后：'>><<printmoney `_heistWork.terms.reward - _heistWork.state.spent`>><br>
+<</if>><br>
 <<if _heistWork.state.settled>>
   <span class='green'><<lanSwitch 'This operation has been settled.' '这次行动已经结清。'>></span><br><br>
 <<elseif _heistWork.available>>
