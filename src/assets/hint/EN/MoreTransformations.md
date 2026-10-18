@@ -14,14 +14,14 @@ Once you know the flock, finding it again takes 5 minutes. Feeding takes one por
 
 ### The ravens’ letter and shrine
 
-- Feed ravens on **three different game days**, then find the flock and take the letter carried by one bird. Feeding in the park, forest and old churchyard all counts.
-- The letter is addressed to **Gwylan**. Bring it to the normal forest-shop menu while Gwylan is at the counter and willing to talk. Take the reply and directions, with an optional raven feather necklace sent to your wardrobe.
+- Feed ravens on **three different game days**. One will bring a letter after the third feeding. If you leave it for later, the bird also appears in these locations’ ordinary menus during daylight. Feeding in the park, forest and old churchyard all counts.
+- The letter is addressed to **Gwylan**. On your first visit, meet the shopkeeper first. Choose “Look for Gwylan” first, then bring out the letter during your conversation while they are willing to talk. Take the reply and directions, with an optional raven feather necklace sent to your wardrobe.
 - At **forest depth 20–40**, the ordinary exploration menu gains a 15-minute path to the raven shrine. Returning takes another 15 minutes and restores the depth where you entered. The path is unavailable during hunts and blood moons.
 - **Tsukihan**, a shrine maiden or priest, tends this place in a white-and-red kimono and receives visitors from 09:00 to 18:00. Introduce yourself first; later visits can be spent helping, sharing tea and getting to know each other.
-- The courtyard and pond remain accessible at night. Sit quietly for 15 minutes once a day (−6 stress, −1 trauma), or rest by the pond for 10 minutes once a day (−3 stress, −6 tiredness). Leaving <span class="gold">£5</span> is optional and shares the free prayer’s daily use and benefits.
+- The courtyard and pond remain accessible at night. Sit quietly for 15 minutes once a day (−6 stress, −1 trauma), or rest by the pond for 10 minutes once a day (−3 stress, −6 tiredness). Leaving <span class="gold">£5</span> is optional and shares the free prayer’s daily use. After <span class="gold">£25</span> in total offerings, new veranda cushions provide an extra −3 stress when praying. At <span class="gold">£50</span>, a pond bench and shelter provide an extra −3 tiredness when resting. These improvements also benefit free visits; both activities remain once per day.
 - Shrine ravens share feeding, calling and preening limits with other flocks. The shrine offers steady raven growth, without directly granting angel, fallen angel or demon transformations.
 
-The journal records the letter, path and visiting hours. Mod statistics show shrine progress, days helped and offerings. Once you have met Tsukihan, they also show affection, wilfulness, your relationship and walks taken together. If you promise to bring strawberries, statistics also list the outstanding promise and its deadline.
+The journal records the letter, path and visiting hours. Mod statistics show shrine progress, days helped and offerings. Once you have met Tsukihan, they also show your relationship and walks taken together. Affection, wilfulness and lust appear on the relationship page. If you promise to bring strawberries, statistics also list the outstanding promise and its deadline.
 
 After discovering the original orphanage loft and having River install its kitchen, cook white rice there for whale growth: one bowl takes 10 minutes and adds 1 point; three take 30 minutes and add 3. The kitchen costs <span class="gold">£10,000</span> and 3 hours to install, with at least three portions of rice replenished daily thereafter.
 
@@ -37,6 +37,8 @@ Once you have met Tsukihan, you can choose them as a love interest in Attitudes.
 | Take a walk together           | At 20 affection                                              | 20 minutes, −4 stress, −1 trauma, +3 affection; records one walk                                                    |
 | Ask Tsukihan for a kiss        | At 20 affection, when chosen as a love interest in Attitudes | Asking takes 5 minutes; accepting the kiss gives −3 stress and +1 affection                                         |
 
+Visit the veranda during the day to talk, have tea, offer a gift or discuss a promise. Go round to the pond for a walk or a kiss. The courtyard has shrine work, prayer and the path to the living quarters. Browsing these areas takes no time.
+
 Opening the conversation menu takes no time. Choose what you want to ask, then spend 10 minutes talking. You can choose one topic each day, whether it concerns the shrine, the ravens or Tsukihan’s own life.
 
 While tending the shrine, you can mend the bell rope, arrange the offering table or simply keep Tsukihan company. Only hands-on help improves housekeeping and counts towards days helped. Tea and walks also leave room to choose how you respond. These replies take no extra time, and declining closeness does not lower affection. You can still share tea or take walks as friends.
@@ -47,11 +49,11 @@ Each activity is available once per game day, resetting at 07:00. Tsukihan goes 
 
 ### Bringing a small gift
 
-Once you have met Tsukihan, you can bring something to eat in the courtyard, or hand it over in the house while they are awake and you are welcome there. Prepared food comes from the vanilla food inventory; flowers come from your gardening stock. Browsing and reconsidering take no time. Handing over your choice takes 5 minutes.
+Once you have met Tsukihan, you can bring something to eat on the veranda, or hand it over in the house while they are awake and you are welcome there. Prepared food comes from the vanilla food inventory; flowers come from your gardening stock. Browsing and reconsidering take no time. Handing over your choice takes 5 minutes.
 
 An ordinary dish or flower adds 1 affection. Tsukihan especially likes **shortbread** with tea: it adds 3 affection and records the preference in the vanilla food system. Valentine's chocolates also add 3 on Valentine's Day. The kind of food and Tsukihan's wilfulness shape the response. Friends are welcome to give gifts too.
 
-Food and flowers share one gift per day across the courtyard and house, resetting with the vanilla daily record at **midnight**. Any strawberries you have promised still need to be brought separately. You can visit without bringing anything; a gift is never an entry fee.
+Food and flowers share one gift per day across the veranda and house, resetting with the vanilla daily record at **midnight**. Any strawberries you have promised still need to be brought separately. You can visit without bringing anything; a gift is never an entry fee.
 
 ### Visiting the little house
 
@@ -65,7 +67,7 @@ There is separate spare bedding for you. Looking at the bed, choosing a sleep du
 
 ### Saying how you feel
 
-At 20 affection, you can spend 10 minutes talking about your feelings. Tsukihan speaks plainly about their own feelings and waits for your answer. You can accept, ask for more time or, if you have not chosen Tsukihan as a love interest, say you would like to remain friends. The first time you return their feelings adds 2 affection.
+Once affection reaches its maximum of 100, you can spend 10 minutes on the veranda talking about your feelings. Tsukihan speaks plainly about their own feelings and waits for your answer. You can accept, ask for more time or, if you have not chosen Tsukihan as a love interest, say you would like to remain friends.
 
 Accepting also chooses Tsukihan as a love interest if you have an available slot and have not already chosen them. Existing partners are never replaced. If every slot is occupied, you can decide later in Attitudes. If you have already chosen Tsukihan, this is a chance to say the words in person. You can choose Tsukihan in Attitudes as soon as you meet them, and share kisses or private time without completing this conversation first.
 
@@ -73,7 +75,7 @@ Accepting also chooses Tsukihan as a love interest if you have an available slot
 
 Tsukihan’s lust ranges from 0 to 100. Holding hands adds 2 and kissing adds 5. At 30, Tsukihan becomes more direct about wanting closeness with a chosen partner. Wilfulness shapes how they ask, while lust influences their initiative. They still wait for your answer.
 
-At 50 affection, with Tsukihan chosen as a love interest, you can ask for some time alone. Asking and leaving take no time. Agreeing to private company or choosing to sit and talk takes 10 minutes, gives −4 stress and +2 affection, once per day. Private company begins with mutual agreement, then leaves the moment to the two of you before returning to the courtyard. It lowers Tsukihan’s lust by 5. Talking leaves lust unchanged, and putting the visit off carries no penalty.
+At 50 affection, with Tsukihan chosen as a love interest, you can ask for some time alone. Asking and leaving take no time. Agreeing to private company or choosing to sit and talk takes 10 minutes, gives −4 stress and +2 affection, once per day. Private company begins with mutual agreement, then leaves the moment to the two of you before returning to the veranda. It lowers Tsukihan’s lust by 5. Talking leaves lust unchanged, and putting the visit off carries no penalty.
 
 ### Tsukihan’s small requests
 

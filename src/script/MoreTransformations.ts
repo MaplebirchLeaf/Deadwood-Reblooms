@@ -16,7 +16,8 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
     weather: {
       fogDistributionCurve: 1,
       rainSplashEnabled: true,
-      fogEnabled: true
+      fogEnabled: true,
+      groundBounds: { splashes: { top: 4, bottom: 0 }, fog: { top: 19, bottom: 0 } }
     }
   });
   maplebirch.tool.patch.location.configure('raven_shrine_house', { customMapping: () => 'forest_raven_shrine' });
@@ -33,10 +34,9 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
   // 只扩展安全事件池，不截断追猎、危险遭遇或原版行进结算。
   maplebirch.tool.inject({
     locationPassage: {
-      // 五处普通探索菜单内显示入口，避免森林末尾清零 eventskip 后无法显示。
-      Forest: [{ srcmatch: /<<forestsearch>>/g, applybefore: '<<deadwood-raven-link>>\n\t\t', expected: 5 }],
-      Park: [{ src: '<<if $leftleg is "bound" or $rightleg is "bound">>', applybefore: '<<deadwood-raven-link>>\n', expected: 1 }],
-      'Forest Shop Entrance': [{ src: '<<icon "clothing-shop.png">>', applybefore: '<<deadwood-raven-shrine-gwylan-link>>\n', expected: 1 }]
+      // 普通菜单的地点说明后、湖泊等目的地前；最深处没有 forestdeeper，也共用此结构。
+      Forest: [{ srcmatch: /<<elseif \$eventskip gte 1>>[^<]*<br><br>/g, applyafter: '\n\t\t<<deadwood-raven-link>><<deadwood-raven-shrine-path>>\n', expected: 5 }],
+      Park: [{ src: '<<if $leftleg is "bound" or $rightleg is "bound">>', applybefore: '<<deadwood-raven-link>>\n', expected: 1 }]
     },
     widgetPassage: {
       'Widgets Forest': [
@@ -61,5 +61,5 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
       ]
     }
   });
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-raven-link', passage: 'Churchyard' });
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-raven-link', passage: 'Churchyard' }, { widget: 'deadwood-raven-shrine-gwylan-link', passage: 'Gwylan Talk Shop' });
 }

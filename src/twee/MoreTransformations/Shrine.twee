@@ -9,13 +9,15 @@
       There is a black feather caught beneath the string. On the outside, in small, careful handwriting, is a name: <span class='gold'>Gwylan</span>.
       Below it, someone has added: "The bearer has been feeding our birds. Please point them our way. — Tsukihan."
       <br><br>
-      Inside is a short list of supplies, including lamp oil and cord. A raven has pecked a hole through one corner.
+      Inside is a short list of supplies, including lamp oil and cord. A raven has pecked a hole through one corner.<br><br>
+      The forest shop is your next stop. Its owner should know who sent the letter. You fold it along the old creases and tuck it away.
     <<option 'CN'>>
       你接住折好的纸，渡鸦才松开鸟喙。它跳开两步，在树枝上蹭了蹭喙尖。<br><br>
       扎纸的细绳下夹着一片黑羽。纸面上用端正的小字写着一个名字：<span class='gold'>格威岚</span>。
       下方另添了一行：“持信人照顾过这里的鸟。请替我们指路。——月羽。”
       <br><br>
-      信里是一张简短的采购单，列着灯油、绳子等东西。有一角被鸟喙啄破了。
+      信里是一张简短的采购单，列着灯油、绳子等东西。有一角被鸟喙啄破了。<br><br>
+      看来得去一趟森林商店，店主应该认得寄信的人。你沿着原来的折痕把纸叠好，收了起来。
   <</language>><br><br>
 <</if>>
 <<set _letterReturn to ['Churchyard', 'Park', 'Deadwood Raven Shrine'].includes($MoreTransformations?.raven?.origin) ? $MoreTransformations.raven.origin : 'Forest'>>
@@ -55,13 +57,13 @@
       <<He>>写了封回信，将收据折进里面，又在旁边放下一条缀着黑羽的项链。
       “把回信带上去。这个算跑腿的报酬。想留住身上的羽毛，可以戴着。”
   <</language>><br><br>
-  <<icon 'raven-shrine/path.png'>><<lanLink ['Take the reply and send the necklace to your wardrobe', '收下回信，将项链送到衣柜'] 'Forest Shop Entrance'>>
+  <<icon 'clothes/raven-feather-necklace.png'>><<lanLink ['Take the reply and send the necklace to your wardrobe', '收下回信，将项链送到衣柜'] 'Gwylan Talk Shop'>>
     <<deadwood-raven-shrine-context>>
     <<if _shrineGwylan and _shrine.stage is 1>>
       <<necksend 'raven feather necklace' 'wardrobe'>><<set _shrine.stage to 2>>
     <</if>><<endevent>>
   <</lanLink>><br>
-  <<socialiseicon>><<lanLink ['Take only the reply and directions', '只收下回信和路线'] 'Forest Shop Entrance'>>
+  <<icon 'raven-shrine/feather-letter.png'>><<lanLink ['Take only the reply and directions', '只收下回信和路线'] 'Gwylan Talk Shop'>>
     <<deadwood-raven-shrine-context>>
     <<if _shrineGwylan and _shrine.stage is 1>><<set _shrine.stage to 2>><</if>><<endevent>>
   <</lanLink>><br>
@@ -90,10 +92,16 @@
 <<elseif Weather.precipitation is 'rain'>>
   <<lanSwitch 'Rain drips from the eaves into a stone basin. The ravens have crowded onto a dry beam, leaving a space between them.' '檐上的雨滴进石盆。渡鸦挤在干燥的横梁上，中间留着一小段空处。'>>
 <<elseif Time.dayState is 'night'>>
-  <<lanSwitch 'The doors are shut. A covered lamp lights the steps; beyond its reach, the cedars are black against the sky.' '社门关着。一盏有罩的灯照着台阶，灯光之外，杉树在夜空下只剩黑色的轮廓。'>>
+  <<lanSwitch 'A covered lamp lights the steps; beyond its reach, the cedars are black against the sky.' '一盏有罩的灯照着台阶，灯光之外，杉树在夜空下只剩黑色的轮廓。'>>
+<<elseif Time.season is 'autumn'>>
+  <<lanSwitch 'Brown leaves have gathered around the stone ravens. A few more slip through the gate and scrape across the swept paving.' '褐色的落叶积在石鸦脚下，又有几片穿过门架，在扫净的石地上擦过。'>>
 <<else>>
-  <<lanSwitch 'A raven drops onto a stone lantern. Another answers from the trees. Somewhere behind the building, water runs into a pond.' '一只渡鸦落在石灯笼上，树间传来另一只的回应。屋后有水缓缓流进池塘。'>>
+  <<lanSwitch 'A raven drops onto a stone lantern. Another answers from the trees. The path behind the building narrows between two cedars.' '一只渡鸦落在石灯笼上，树间传来另一只的回应。屋后的窄路夹在两棵杉树之间。'>>
 <</if>><br><br>
+<<if _shrine.donations gte 2500>>
+  <<lanSwitch 'A stack of new cushions sits on a low shelf beneath the veranda eaves.' '廊下的矮架上添了一摞新坐垫。'>><br>
+  <span class='subtle'><<lanSwitch 'Quiet prayer reduces stress by an extra 3.' '祈愿时额外缓解3点压力。'>></span><br><br>
+<</if>>
 <<if !_shrineSafe>>
   <<lanSwitch 'You cannot settle here now.' '你现在没法在这里停留。'>><br><br>
 <<else>>
@@ -122,71 +130,20 @@
       <<elseif _shrine.memory is 'bell'>>
         <br><br><<lanSwitch 'The bell cord you worked on hangs straight. Tsukihan follows your glance and gives its knot a careful check.' '你们整理过的铃绳垂得笔直。月羽顺着你的视线看过去，又仔细检查了一遍绳结。'>>
       <</if>>
-      <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 50 and C.npc.Tsukihan.lust gte 30 and _shrine.close isnot Math.floor(Time.days)>>
-        <br><br><<lanSwitch 'When you turn towards the gate, Tsukihan catches your eye. "If you have time, I would like a moment with you. Just us." <<He>> waits for your answer.' '你望向院门时，月羽叫住了你。“要是不赶时间，想和你单独待会儿。”<<He>>看着你，等你回答。'>>
-      <</if>>
     <<else>>
       <<lanSwitch 'Someone in a white robe is sweeping leaves from the veranda. Their black hair is tied back, clear of the broom handle.' '一个穿白衣的人正把落叶扫下回廊，黑发拢在身后，避开了扫帚柄。'>>
     <</if>><br><br>
-    <<socialiseicon 'ask'>><<lanLink [C.npc.Tsukihan.init is 1 ? 'Talk to Tsukihan' : 'Greet the shrine attendant', C.npc.Tsukihan.init is 1 ? '和月羽说说话' : '向那人打招呼'] 'Deadwood Raven Shrine Talk'>><</lanLink>><br>
-    <<deadwood-raven-gift-link>>
-    <<if C.npc.Tsukihan.init is 1 and (_shrine.promise gte 0 or C.npc.Tsukihan.love gte 10 and _shrine.favour isnot Math.floor(Time.days))>>
-      <<socialiseicon 'ask'>><<lanLink [_shrine.promise gte 0 ? 'About the strawberries you promised' : 'See what Tsukihan wants', _shrine.promise gte 0 ? '说说答应带来的草莓' : '看看月羽有什么小要求']>>
-        <<deadwood-raven-shrine-context>>
-        <<if _shrinePerson and C.npc.Tsukihan.init is 1 and (_shrine.promise gte 0 or C.npc.Tsukihan.love gte 10 and _shrine.favour isnot Math.floor(Time.days))>>
-          <<set _shrine.favour_result to ''>><<goto 'Deadwood Raven Shrine Favour'>>
-        <</if>>
-      <</lanLink>><br>
-    <</if>>
+    <<socialiseicon 'ask'>><<lanLink [C.npc.Tsukihan.init is 1 ? 'Join Tsukihan on the veranda' : 'Greet the shrine attendant', C.npc.Tsukihan.init is 1 ? '到廊下找月羽' : '向那人打招呼'] `C.npc.Tsukihan.init is 1 ? 'Deadwood Raven Shrine Veranda' : 'Deadwood Raven Shrine Talk'`>><</lanLink>><br>
     <<if C.npc.Tsukihan.init is 1 and _shrine.work isnot Math.floor(Time.days) and _shrineMinutes gt 15>>
       <<icon 'broom-dustpan.png'>><<lanLink ['Join Tsukihan at work (0:15)', '陪月羽料理神社的事 (0:15)']>>
         <<deadwood-raven-shrine-act 'work'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Work'>><</if>>
       <</lanLink>><br>
     <</if>>
-    <<if C.npc.Tsukihan.init is 1>>
-      <<if !_shrine.confessed and C.npc.Tsukihan.love gte 20 and _shrine.feelings isnot Math.floor(Time.days) and _shrineMinutes gt 10 and !$daily.no_sing and !$worn.face.type.includes('gag')>>
-        <<socialiseicon 'ask'>><<lanLink ['Talk about your feelings (0:10)', '把心里的话告诉月羽 (0:10)']>>
-          <<deadwood-raven-shrine-act 'feelings'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Feelings'>><</if>>
-        <</lanLink>><br>
-      <</if>>
-      <<if C.npc.Tsukihan.love gte 10 and _shrine.tea isnot Math.floor(Time.days) and _shrineMinutes gt 15 and !pcAreArmsBound('both') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
-        <<icon 'food/coffee.png'>><<lanLink ['Have tea with Tsukihan (0:15)', '和月羽喝杯茶 (0:15)']>>
-          <<deadwood-raven-shrine-act 'tea'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Tea'>><</if>>
-        <</lanLink>><<lstress>><<ltiredness>><<glove>><br>
-      <</if>>
-      <<if C.npc.Tsukihan.love gte 20 and _shrine.walk isnot Math.floor(Time.days) and _shrineMinutes gt 20 and !pcAreArmsBound('any') and $leftleg isnot 'bound' and $rightleg isnot 'bound'>>
-        <<icon 'actions/walk.png'>><<lanLink ['Walk around the shrine together (0:20)', '和月羽在神社附近走走 (0:20)']>>
-          <<deadwood-raven-shrine-act 'walk'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Walk'>><</if>>
-        <</lanLink>><<lstress>><<ltrauma>><<glove>><br>
-      <</if>>
-      <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 20 and _shrine.kiss isnot Math.floor(Time.days) and _shrineMinutes gt 5
-        and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
-        <<icon 'actions/kiss.png'>><<lanLink ['Ask Tsukihan for a kiss (0:05)', '向月羽讨一个吻 (0:05)']>>
-          <<deadwood-raven-shrine-act 'kiss'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Together'>><</if>>
-        <</lanLink>><br>
-      <</if>>
-      <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 30 and _shrine.sex isnot Math.floor(Time.days) and _shrineMinutes gt 30
-        and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
-        <<icon 'actions/entrance.png'>><<lanLink ['Spend time together in the inner shrine (0:30)', '去社内内室温存 (0:30)']>>
-          <<deadwood-raven-shrine-act 'sex'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Sex'>><</if>>
-        <</lanLink>><<promiscuous1>><<glust>><br>
-      <</if>>
-      <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 50 and _shrine.close isnot Math.floor(Time.days) and _shrineMinutes gt 10
-        and !pcAreArmsBound('both') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
-        <<icon 'actions/hug.png'>><<lanLink ['Ask for a little time alone', '问月羽，能不能单独待会儿']>>
-          <<deadwood-raven-shrine-context>>
-          <<if _shrinePerson and C.npc.Tsukihan.init is 1 and isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 50 and _shrine.close isnot Math.floor(Time.days)
-            and _shrineMinutes gt 10 and !pcAreArmsBound('both') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
-            <<set _shrine.scene to 'close', _shrine.step to ''>><<goto 'Deadwood Raven Shrine Close'>>
-          <</if>>
-        <</lanLink>><br>
-      <</if>>
-    <</if>>
   <<else>>
-    <<lanSwitch 'The doors to the living quarters are shut. Feeding bowls are stacked beneath the eaves, and the broom rests beside the step. The courtyard remains open; Tsukihan receives visitors between 09:00 and 18:00.' '屋舍的门关着，喂鸟的食碗摞在檐下，扫帚靠在台阶旁。庭院仍可停留，月羽在9:00至18:00之间接待来客。'>><br><br>
+    <<lanSwitch 'The doors to the living quarters are shut. Feeding bowls are stacked beneath the eaves, and the broom rests beside the step. The courtyard remains open; visiting hours are 09:00–18:00.' '屋舍的门关着，喂鸟的食碗摞在檐下，扫帚靠在台阶旁。庭院仍可停留，接待来客的时间是9:00至18:00。'>><br><br>
   <</if>>
   <<if C.npc.Tsukihan.init is 1>>
-    <<icon 'raven-shrine/shrine.png'>><<lanLink ['Go round to the living quarters', '绕到屋舍门前']>>
+    <<icon 'raven-shrine/tsukihan-home.png'>><<lanLink ['Go round to the living quarters', '绕到屋舍门前']>>
       <<deadwood-raven-home-context>>
       <<if _shrineHomeReady and $location is 'forest_raven_shrine'>>
         <<set _shrine.home_action to ''>><<goto 'Deadwood Raven Shrine Door'>>
@@ -198,16 +155,12 @@
       <<deadwood-raven-shrine-act 'prayer'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Daily'>><</if>>
     <</lanLink>><<lstress>><<ltrauma>><br>
     <<if $money gte 500 and !pcAreArmsBound('both')>>
-      <<icon 'raven-shrine/offering.png'>><<lanLink ['Leave <span class="gold">£5</span> and sit quietly (0:15)', '投下<span class="gold">£5</span>，再静坐一会儿 (0:15)']>>
+      <<icon 'raven-shrine/offering.png'>><<lanLink ['Leave £5 and sit quietly (0:15)', '投下£5，再静坐一会儿 (0:15)']>>
         <<deadwood-raven-shrine-act 'donate'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Daily'>><</if>>
       <</lanLink>><<lstress>><<ltrauma>><br>
     <</if>>
   <</if>>
-  <<if _shrine.rest isnot Math.floor(Time.days)>>
-    <<icon 'raven-shrine/pond.png'>><<lanLink ['Rest beside the pond (0:10)', '在池塘边歇一会儿 (0:10)']>>
-      <<deadwood-raven-shrine-act 'rest'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Daily'>><</if>>
-    <</lanLink>><<lstress>><<ltiredness>><br>
-  <</if>>
+  <<icon 'raven-shrine/pond.png'>><<lanLink ['Go round to the pond', '绕到池塘边'] 'Deadwood Raven Shrine Pond'>><</lanLink>><br>
   <<deadwood-raven-link>>
 <</if>>
 <br>
@@ -223,3 +176,107 @@
     <</if>>
   <</if>>
 <</lanLink>><br>
+
+:: Deadwood Raven Shrine Veranda
+<<set $outside to 1>><<effects>><<deadwood-raven-shrine-presence>>
+<<if !_shrine or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine'>>
+  <<lanSwitch 'You are no longer at the shrine.' '你已经不在神社了。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<if !_shrinePerson or C.npc.Tsukihan.init isnot 1>>
+  <<lanSwitch 'The veranda is empty. The cups have been put away, and a folded cloth covers the tray.' '廊下空着。茶杯已经收好，一块叠起的布盖在浅盘上。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<npc Tsukihan>><<person1>>
+<<lanSwitch 'Tsukihan moves a few loose papers off the cushion beside <<him>>. "Sit down, if you have time." A raven hops along the railing, peering at the covered tray.' '月羽把身旁坐垫上的几张散纸挪开。“有空的话，坐吧。”一只渡鸦沿着栏杆跳过来，探头看了看盖着布的浅盘。'>><br><br>
+<<if Weather.precipitation is 'rain'>>
+  <<lanSwitch 'Rain patters just beyond the eaves, leaving a narrow dry strip beside the wall.' '雨点落在檐外，靠墙的廊板留着窄窄的一段干处。'>><br><br>
+<<elseif Weather.isSnow>>
+  <<lanSwitch 'Snow has settled along the outer railing; the boards beneath the eaves have been swept clear.' '外侧栏杆上积着雪，檐下的廊板已经扫干净了。'>><br><br>
+<<elseif Time.dayState is 'dusk'>>
+  <<lanSwitch 'Daylight reaches only the outer edge of the low table now; the boards beside the wall are dim.' '天光只落在矮桌外沿，靠墙的廊板已经暗了下来。'>><br><br>
+<</if>>
+<<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 50 and C.npc.Tsukihan.lust gte 30 and _shrine.close isnot Math.floor(Time.days)>>
+  <<lanSwitch 'When you turn towards the gate, Tsukihan catches your eye. "If you have time, I would like a moment with you. Just us." <<He>> waits for your answer.' '你望向院门时，月羽叫住了你。“要是不赶时间，想和你单独待会儿。”<<He>>看着你，等你回答。'>><br><br>
+<</if>>
+<<socialiseicon 'ask'>><<lanLink ['Talk to Tsukihan', '和月羽说说话'] 'Deadwood Raven Shrine Talk'>><</lanLink>><br>
+<<deadwood-raven-gift-link>>
+<<if C.npc.Tsukihan.init is 1 and (_shrine.promise gte 0 or C.npc.Tsukihan.love gte 10 and _shrine.favour isnot Math.floor(Time.days))>>
+  <<socialiseicon 'ask'>><<lanLink [_shrine.promise gte 0 ? 'About the strawberries you promised' : 'See what Tsukihan wants', _shrine.promise gte 0 ? '说说答应带来的草莓' : '看看月羽有什么小要求']>>
+    <<deadwood-raven-shrine-context>>
+    <<if _shrinePerson and C.npc.Tsukihan.init is 1 and (_shrine.promise gte 0 or C.npc.Tsukihan.love gte 10 and _shrine.favour isnot Math.floor(Time.days))>>
+      <<set _shrine.favour_result to ''>><<goto 'Deadwood Raven Shrine Favour'>>
+    <</if>>
+  <</lanLink>><br>
+<</if>>
+<<if !_shrine.confessed and C.npc.Tsukihan.love gte 100 and _shrine.feelings isnot Math.floor(Time.days) and _shrineMinutes gt 10 and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+  <<socialiseicon 'ask'>><<lanLink ['Talk about your feelings (0:10)', '把心里的话告诉月羽 (0:10)']>>
+    <<deadwood-raven-shrine-act 'feelings'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Feelings'>><</if>>
+  <</lanLink>><br>
+<</if>>
+<<if C.npc.Tsukihan.love gte 10 and _shrine.tea isnot Math.floor(Time.days) and _shrineMinutes gt 15 and !pcAreArmsBound('both') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+  <<icon 'orchard/tea-tray.png'>><<lanLink ['Have tea with Tsukihan (0:15)', '和月羽喝杯茶 (0:15)']>>
+    <<deadwood-raven-shrine-act 'tea'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Tea'>><</if>>
+  <</lanLink>><<lstress>><<ltiredness>><<glove>><br>
+<</if>>
+<<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 30 and _shrine.sex isnot Math.floor(Time.days) and _shrineMinutes gt 30
+  and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+  <<icon 'raven-shrine/inner-room.png'>><<lanLink ['Spend time together in the inner shrine (0:30)', '去社内内室温存 (0:30)']>>
+    <<deadwood-raven-shrine-act 'sex'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Sex'>><</if>>
+  <</lanLink>><<promiscuous1>><<glust>><br>
+<</if>>
+<<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 50 and _shrine.close isnot Math.floor(Time.days) and _shrineMinutes gt 10
+  and !pcAreArmsBound('both') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+  <<icon 'actions/hug.png'>><<lanLink ['Ask for a little time alone', '问月羽，能不能单独待会儿']>>
+    <<deadwood-raven-shrine-context>>
+    <<if _shrinePerson and C.npc.Tsukihan.init is 1 and isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 50 and _shrine.close isnot Math.floor(Time.days)
+      and _shrineMinutes gt 10 and !pcAreArmsBound('both') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+      <<set _shrine.scene to 'close', _shrine.step to ''>><<goto 'Deadwood Raven Shrine Close'>>
+    <</if>>
+  <</lanLink>><br>
+<</if>>
+<br><<deadwood-raven-shrine-return>>
+
+:: Deadwood Raven Shrine Pond
+<<set $outside to 1>><<effects>><<deadwood-raven-shrine-presence>>
+<<if !_shrine or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine'>>
+  <<lanSwitch 'You are no longer at the shrine.' '你已经不在神社了。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<lanSwitch 'A narrow path runs behind the shrine to a small pond. There is room to sit on the low wall, clear of the moss.' '一条窄路从神社后面通向池塘。矮墙上有一段没长苔，可以坐下来歇脚。'>><br><br>
+<<if Weather.isFrozen('lake')>>
+  <<lanSwitch 'Ice covers the pond, with a few leaves caught beneath its cloudy surface.' '池面封着冰，几片落叶冻在浑白的冰层里。'>>
+<<elseif Weather.precipitation is 'rain'>>
+  <<lanSwitch 'Raindrops spread overlapping rings across the water.' '雨点在水面敲出一圈圈重叠的涟漪。'>>
+<<elseif Weather.isSnow>>
+  <<lanSwitch 'Snow lies along the banks, framing a patch of dark, still water.' '积雪围着池岸，中间露出一片暗而平静的水面。'>>
+<<else>>
+  <<lanSwitch 'Water trickles between the stones at the edge, stirring the reeds below.' '水沿着岸边的石缝缓缓流入，带动下方的芦苇轻轻摇晃。'>>
+<</if>><br><br>
+<<if _shrine.donations gte 5000>>
+  <<lanSwitch 'A small canopy now shelters a pair of low stools beside the pond.' '池边添了两张矮凳，上方搭着一顶小雨棚。'>><br>
+  <span class='subtle'><<lanSwitch 'Resting by the pond reduces tiredness by an extra 3.' '池边休息时额外减轻3点疲劳。'>></span><br><br>
+<</if>>
+<<if _shrineSafe>>
+  <<if _shrinePerson and C.npc.Tsukihan.init is 1>>
+    <<npc Tsukihan>><<person1>>
+    <<lanSwitch 'Tsukihan comes round the corner carrying an empty feeding bowl. <<He>> stops beside you, following your gaze across the pond.' '月羽拿着空食碗从屋角转过来，在你身旁停下，也望向池塘。'>><br><br>
+    <<if C.npc.Tsukihan.love gte 20 and _shrine.walk isnot Math.floor(Time.days) and _shrineMinutes gt 20 and !pcAreArmsBound('any') and $leftleg isnot 'bound' and $rightleg isnot 'bound'>>
+      <<icon 'actions/walk.png'>><<lanLink ['Walk around the shrine together (0:20)', '和月羽在神社附近走走 (0:20)']>>
+        <<deadwood-raven-shrine-act 'walk'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Walk'>><</if>>
+      <</lanLink>><<lstress>><<ltrauma>><<glove>><br>
+    <</if>>
+    <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 20 and _shrine.kiss isnot Math.floor(Time.days) and _shrineMinutes gt 5
+      and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+      <<icon 'actions/kiss.png'>><<lanLink ['Ask Tsukihan for a kiss (0:05)', '向月羽讨一个吻 (0:05)']>>
+        <<deadwood-raven-shrine-act 'kiss'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Together'>><</if>>
+      <</lanLink>><br>
+    <</if>>
+  <</if>>
+  <<if _shrine.rest isnot Math.floor(Time.days)>>
+    <<icon 'raven-shrine/pond.png'>><<lanLink ['Rest beside the pond (0:10)', '在池塘边歇一会儿 (0:10)']>>
+      <<deadwood-raven-shrine-act 'rest'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Daily'>><</if>>
+    <</lanLink>><<lstress>><<ltiredness>><br>
+  <</if>>
+<</if>>
+<br><<deadwood-raven-shrine-return>>

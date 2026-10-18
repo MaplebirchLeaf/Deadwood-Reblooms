@@ -30,8 +30,8 @@ export default function Tsukihan(maplebirch: typeof window.maplebirch): void {
       Tsukihan: { EN: 'Tsukihan', CN: '月羽' },
       Wilfulness: { EN: 'Wilfulness', CN: '任性' },
       'shrine attendant': { EN: 'shrine attendant', CN: '神社侍者' },
-      'shrine maiden': { EN: 'shrine maiden', CN: '巫女' },
-      'shrine priest': { EN: 'shrine priest', CN: '神官' }
+      'shrine maiden': { EN: 'shrine maiden', CN: '神社巫女' },
+      'shrine priest': { EN: 'shrine priest', CN: '神社神官' }
     }
   );
 
@@ -42,6 +42,12 @@ export default function Tsukihan(maplebirch: typeof window.maplebirch): void {
       C.npc.Tsukihan.dom = 10;
       C.npc.Tsukihan.lust = 0;
     }
+  });
+
+  maplebirch.on(':npcInject', (name: string) => {
+    if (name !== 'Tsukihan') return;
+    const npc = C.npc.Tsukihan;
+    npc.title = npc.pronoun === 'm' ? 'shrine priest' : npc.pronoun === 'f' ? 'shrine maiden' : 'shrine attendant';
   });
 
   maplebirch.npc.addSchedule('Tsukihan', schedule => {

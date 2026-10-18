@@ -13,7 +13,7 @@
           你停下脚步。鸟群没有飞走，<span class='teal'>其中一只往你这边跳近了些。</span>
       <</language>><br><br>
       <<if _raven.canFeed>>
-        <<print _raven.icon>><<lanLink ['Leave some fruit (0:05)', '留下一份水果 (0:05)']>>
+        <<foodstufficon _raven.food>><<lanLink ['Leave some fruit (0:05)', '留下一份水果 (0:05)']>>
           <<set _raven_origin to $passage>>
           <<if maplebirch.get('MoreTransformations').Raven.act('feed') and $passage is _raven_origin>>
             <<goto 'Deadwood Reblooms Raven'>>
@@ -32,10 +32,11 @@
 <</widget>>
 
 <<widget 'deadwood-raven-link'>>
-  <<deadwood-raven-shrine-path>>
   <<set _raven to maplebirch.get('MoreTransformations')?.Raven>>
   <<if _raven and _raven.available>>
-    <<if _raven.met>>
+    <<if $MoreTransformations.shrine.stage is 0 and $MoreTransformations.shrine.feeds gte 3>>
+      <<deadwood-raven-letter-link>>
+    <<elseif _raven.met>>
       <<print _raven.icon>><<lanLink ['Look for the raven flock (0:05)', '寻找渡鸦群 (0:05)']>>
         <<set _raven_origin to $passage>>
         <<if maplebirch.get('MoreTransformations').Raven.act('visit') and $passage is _raven_origin>>
@@ -60,7 +61,7 @@
 <<elseif _ravenReturn is 'Park'>>
   <<location 'park'>>
 <<elseif _ravenReturn is 'Deadwood Raven Shrine'>>
-  <<location 'forest_raven_shrine'>>
+  <<set $location to 'forest_raven_shrine'>>
   <<deadwood-raven-shrine-presence>>
 <<else>>
   <<location 'forest'>>
@@ -172,10 +173,17 @@
           <</if>>
       <</language>>
   <</switch>><br><br>
+  <<if $MoreTransformations.shrine.stage is 0 and $MoreTransformations.raven.action is 'feed' and $MoreTransformations.shrine.feeds lt 3>>
+    <<if $MoreTransformations.shrine.feeds is 1>>
+      <<lanSwitch 'The birds finish the fruit before you leave. One follows you for a few steps, then returns to the others.' '你还没离开，水果就被吃光了。一只渡鸦跟了你几步，又跳回同伴身边。'>>
+    <<else>>
+      <<lanSwitch 'One bird lands close enough to take the last piece. It lingers after the others have finished eating, tilting its head at you.' '一只渡鸦落到近处，啄走最后一块。其他鸟都吃完了，它还留在你身旁，歪着头打量你。'>>
+    <</if>><br><br>
+  <</if>>
   <<if _raven.available>>
     <<deadwood-raven-letter-link>>
     <<if _raven.canFeed>>
-      <<print _raven.icon>><<lanLink ['Leave some fruit (0:05)', '留下一份水果 (0:05)']>>
+      <<foodstufficon _raven.food>><<lanLink ['Leave some fruit (0:05)', '留下一份水果 (0:05)']>>
         <<set _raven_origin to $passage>>
         <<if maplebirch.get('MoreTransformations').Raven.act('feed') and $passage is _raven_origin>>
           <<goto 'Deadwood Reblooms Raven'>>
@@ -183,7 +191,7 @@
       <</lanLink>><<transform-hint 'raven' 'grey'>><br>
     <</if>>
     <<if _raven.canCall>>
-      <<print _raven.icon>><<lanLink ['Imitate the ravens (0:10)', '模仿渡鸦的叫声 (0:10)']>>
+      <<icon 'sing.png'>><<lanLink ['Imitate the ravens (0:10)', '模仿渡鸦的叫声 (0:10)']>>
         <<set _raven_origin to $passage>>
         <<if maplebirch.get('MoreTransformations').Raven.act('call') and $passage is _raven_origin>>
           <<goto 'Deadwood Reblooms Raven'>>

@@ -16,7 +16,7 @@
         <<if _shrine.action is 'donate'>>You slip a few coins into the offering box before sitting down.<<else>>You sit beside the offering box, smoothing a corner of the cushion.<</if>>
         Someone has tied a small wooden wish plaque to the railing. Its writing has faded beyond reading.
         <br><br>
-        You keep your own wish to yourself. Water knocks softly against the basin. For a while, you let that sound fill the silence.
+        You keep your own wish to yourself. <<if Weather.isFrozen('lake')>>A breeze stirs the bare branches beyond the gate.<<else>>Water knocks softly against the basin.<</if>> For a while, you just listen.
         <<if $fallenangel gte 6 and isPartEnabled($transformationParts?.fallenAngel?.wings ?? 'disabled')>>The weight at your back settles as you lower your shoulders.<<elseif $angel gte 6 and isPartEnabled($transformationParts?.angel?.wings ?? 'disabled')>>Your feathers shift when a breeze reaches the veranda.<<elseif $demon gte 6 and isPartEnabled($transformationParts?.demon?.tail ?? 'disabled')>>You find room for your tail beside the cushion.<</if>>
         <br><br>
         You stay a little longer, then stand when you are ready.
@@ -24,25 +24,31 @@
         <<if _shrine.action is 'donate'>>你把几枚硬币投入奉纳箱，才坐下来。<<else>>你在奉纳箱旁坐下，轻轻抚平坐垫的一角。<</if>>
         栏杆上系着一块小小的绘马，字迹已经褪得认不清了。
         <br><br>
-        你把自己的心愿留在心里。水轻轻碰着石盆，有一阵子，你只听着这个声音。
+        你把自己的心愿留在心里。<<if Weather.isFrozen('lake')>>门外光秃的枝条被风吹得轻轻晃动。<<else>>水轻轻碰着石盆。<</if>>有一阵子，你只听着周围的声音。
         <<if $fallenangel gte 6 and isPartEnabled($transformationParts?.fallenAngel?.wings ?? 'disabled')>>你松下肩膀，背后的重量也渐渐安稳。<<elseif $angel gte 6 and isPartEnabled($transformationParts?.angel?.wings ?? 'disabled')>>微风吹到廊下，你的羽毛轻轻动了动。<<elseif $demon gte 6 and isPartEnabled($transformationParts?.demon?.tail ?? 'disabled')>>你在坐垫旁给尾巴留出了位置。<</if>>
         <br><br>
         你又坐了一会儿，等心绪平静下来才起身。
     <</language>><<lstress>><<ltrauma>>
+    <<if _shrine.donations gte 2500>>
+      <br><br><<lanSwitch 'The new cushion makes it easier to settle. Your offerings have helped make this a comfortable place to return to.' '新换的坐垫坐着很舒服。你留下的奉纳，让这里成了一个更适合歇脚的地方。'>><<lstress>>
+    <</if>>
   <<case 'rest'>>
     <<language>>
       <<option 'EN'>>
-        You sit on a flat stone beside the pond. The overflow runs between two roots and disappears downhill.
-        <<if Weather.precipitation is 'rain'>>You keep beneath the shelter of the cedar branches.<<elseif Weather.isSnow>>The middle of the pond is dark, ringed with thin ice.<<else>>A leaf turns slowly on the water.<</if>>
+        You settle beside the pond.
+        <<if Weather.isFrozen('lake')>>Ice covers the water, with a few leaves caught beneath its cloudy surface.<<elseif Weather.precipitation is 'rain'>>Drops scatter ripples over the surface.<<elseif Weather.isSnow>>Snow rests on the banks; the water between them is dark.<<else>>The overflow runs between two roots and disappears downhill.<</if>>
         <br><br>
-        A raven lands a few paces away. It waits until you stop watching, then takes a drink. You rest your feet until it flies off.
+        A raven lands a few paces away. <<if Weather.isFrozen('lake')>>It taps the ice once, then turns to look at you.<<else>>It waits until you stop watching, then takes a drink.<</if>> You rest your feet until it flies off.
       <<option 'CN'>>
-        你在池边的平石上坐下。溢出的水从两条树根之间流过，往山下去了。
-        <<if Weather.precipitation is 'rain'>>你靠在杉树枝条遮得到的地方。<<elseif Weather.isSnow>>池心还是暗的，周围结着一层薄冰。<<else>>一片叶子在水上慢慢转着。<</if>>
+        你在池边坐下。
+        <<if Weather.isFrozen('lake')>>冰封住了池面，几片叶子冻在浑浊的冰层里。<<elseif Weather.precipitation is 'rain'>>雨滴在水面上打出一圈圈涟漪。<<elseif Weather.isSnow>>岸边积着雪，中间的池水一片深暗。<<else>>溢出的水从两条树根之间流过，往山下去了。<</if>>
         <br><br>
-        一只渡鸦落在几步之外。等你不再盯着它看，它才低头饮水。你歇着脚，直到它飞走。
+        一只渡鸦落在几步之外。<<if Weather.isFrozen('lake')>>它在冰上啄了一下，转过头来看你。<<else>>等你不再盯着它看，它才低头饮水。<</if>>你歇着脚，直到它飞走。
     <</language>><<lstress>><<ltiredness>>
+    <<if _shrine.donations gte 5000>>
+      <br><br><<lanSwitch 'You stretch your legs from the new bench beneath the little shelter. You can rest your legs without balancing on the stone edge.' '你在小雨棚下的新凳子上伸了伸腿。坐稳后，肩背也慢慢松了下来。'>><<ltiredness>>
+    <</if>>
   <<default>>
     <<lanSwitch 'You linger in the courtyard for a moment.' '你在庭院里停留片刻。'>>
 <</switch>><br><br>
-<<deadwood-raven-shrine-return>>
+<<deadwood-raven-shrine-return `_shrine.action is 'rest' ? 'pond' : 'courtyard'`>>
