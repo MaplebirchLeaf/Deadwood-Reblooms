@@ -13,7 +13,7 @@
 
 **Deadwood Reblooms** is a **_Degrees of Lewdity_** content mod built on the **[Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)**. It expands character relationships, school life, finance and business, transport, and street activities, alongside transformations, encounters, and interface features.
 
-**Current version: 2.4.0.** Choose the modules you want to play. The in-game guide covers their activities and unlock conditions.
+**Current version: 2.4.1.** Choose the modules you want to play. The in-game guide covers their activities and unlock conditions.
 
 ---
 
