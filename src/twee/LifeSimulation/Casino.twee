@@ -2,14 +2,7 @@
 <<widget 'deadwood-casino-street'>>
   <<if $exposed lte 0 and !$possessed>>
     <<icon 'casino/casino.png'>>
-    <<if maplebirch.get('LifeSimulation').casino.open>>
-      <<lanLink ['Gambling room (0:02)', '赌馆 (0:02)'] 'Deadwood Reblooms Life Simulation Casino'>><<pass 2>><</lanLink>>
-    <<else>><span class='blue'><<language>>
-      <<option 'EN'>>
-        The gambling room upstairs is closed until 18:00.
-      <<option 'CN'>>
-        楼上的赌馆要到 18:00 才开门。
-    <</language>></span><</if>><br>
+    <<lanLink ['Gambling room (0:02)', '赌馆 (0:02)'] 'Deadwood Reblooms Life Simulation Casino'>><<pass 2>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -30,9 +23,11 @@
   <<if maplebirch.get('LifeSimulation').casino.chips gte 1000000>>
     <<language>>
       <<option 'EN'>>
-        The cashier pushes the smaller piles aside and counts out the high-value chips. A dealer looks up from the nearest table.
+        The cashier pushes the smaller piles aside and counts out the high-value chips.
+        <<if maplebirch.get('LifeSimulation').casino.open>>A dealer looks up from the nearest table.<<else>>The cashier pulls the counter lamp closer to finish the count.<</if>>
       <<option 'CN'>>
-        柜员把零散的筹码推到一旁，点出几枚大额筹码。最近那张桌子的荷官抬头看了你一眼。
+        柜员把零散的筹码推到一旁，点出几枚大额筹码。
+        <<if maplebirch.get('LifeSimulation').casino.open>>最近那张桌子的荷官抬头看了你一眼。<<else>>柜员把台灯拉近，继续清点。<</if>>
     <</language>><br>
   <</if>><br>
 <</widget>>
@@ -169,9 +164,27 @@
 <<if !_casino.open>>
   <<language>>
     <<option 'EN'>>
-      The lights upstairs are off. <span class='blue'>The gambling room is closed.</span> A cleaner carries a bucket through the open door. The room opens at <span class='gold'>18:00</span> and closes at <span class='gold'>04:00</span>.
+      The stairs narrow as you climb above the bar. At the top, a cord is hooked across the doorway, with a small opening-hours board hanging from it.<br><br>
+      <<if Time.hour lt 7>>
+        The last red lamps have been switched off. Beyond the cord, someone stacks empty glasses on a tray while a cleaner works a mop between the chair legs. The smell of spilled beer lingers on the landing.
+      <<elseif Time.hour gte 17>>
+        Light shows beneath the curtain. You hear chairs being pulled into place, then the quick, dry sound of cards being shuffled. Someone reaches through to check the clock on the landing, but leaves the cord where it is.
+      <<else>>
+        Heavy curtains cover the windows inside. The tables are bare, with their covers folded at one end. Traffic from the street below sounds loud in the quiet stairwell.
+      <</if>><br><br>
+      The board reads: <span class='blue'>"Gambling room: 18:00–04:00."</span>
+      <<if _casino.chips gt 0 or _casino.holdem.state.joined>>A small lamp still burns over the cashier's counter beside the stairs. You can settle your remaining chips there.<</if>>
     <<option 'CN'>>
-      楼上的灯已经熄了。<span class='blue'>赌馆已经关门。</span>一名清洁工提着水桶走进敞开的门。赌馆在 <span class='gold'>18:00</span> 开门，<span class='gold'>04:00</span> 关门。
+      你沿着酒吧旁的楼梯上楼，越往上走，楼梯越窄。门口横着一道绳，上面挂着小小的营业牌。<br><br>
+      <<if Time.hour lt 7>>
+        最后几盏红灯已经熄了。绳子后面，有人把空酒杯码上托盘，清洁工正绕着椅腿拖地。楼梯口还留着打翻的啤酒味。
+      <<elseif Time.hour gte 17>>
+        门帘底下透出灯光。里面先传来挪椅子的声音，接着是利落的洗牌声。有人探出来看了一眼楼梯口的钟，却没有解开拦门的绳子。
+      <<else>>
+        窗前的厚帘拉着，牌桌已经清空，桌罩叠在一头。安静的楼道里，楼下街上的车声听得格外清楚。
+      <</if>><br><br>
+      牌上写着：<span class='blue'>“赌馆营业时间：18:00–04:00。”</span>
+      <<if _casino.chips gt 0 or _casino.holdem.state.joined>>楼梯旁的筹码柜台还亮着一盏小灯。剩下的筹码，可以在那里结清。<</if>>
   <</language>><br><br>
 <<elseif $id lte 0>>
   <<language>>

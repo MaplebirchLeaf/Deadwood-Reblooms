@@ -98,6 +98,7 @@
 <<widget 'deadwood-reblooms-property-invitation-link'>>
   <<set $_inviteName to _args[0]>>
   <<set $_invitePassage to _args[1]>>
+  <<if C.npc[$_inviteName]?.init isnot 1 or !['active', 'rescued'].includes(C.npc[$_inviteName].state)>><<exit>><</if>>
   <<if ['Orphanage Bedroom', 'Robin Room', 'Whitney Home Enter', 'Kylar Library', 'Kylar Courtyard', 'Kylar Park', 'Temple Sydney', 'Library Rental Counter'].includes($passage)>>
     <<deadwood-banquet-followup $_inviteName>>
   <</if>>
@@ -454,9 +455,19 @@
 <</if>>
 <<language>>
   <<option 'EN'>>
-  Behind the property desk at the financial centre, <span class='gold'>five deeds</span> stand in a glass display. The agent spreads out the keys and lets you look over the particulars.
+  Behind the property desk at the financial centre, <span class='gold'>five deeds</span> stand in a glass display. Small floor plans are pinned beside the photographs, with labelled keys on hooks below.
+  <<if maplebirch.get('Finance').realEstate.properties.some(property => !property.tenure && maplebirch.get('Finance').realEstate.owns(property.id))>>
+    The agent recognises you and brings out your property file before reaching for the sales particulars.
+  <<else>>
+    The agent takes down the keys and makes room for you to look over the particulars.
+  <</if>>
   <<option 'CN'>>
-  金融中心的房产柜台后，玻璃橱窗里摆着<span class='gold'>五处房产的契据</span>。中介摊开钥匙，让你逐项查看房屋资料。
+  金融中心的房产柜台后，玻璃橱窗里摆着<span class='gold'>五处房产的契据</span>。房屋照片旁钉着小幅平面图，下方挂着带标签的钥匙。
+  <<if maplebirch.get('Finance').realEstate.properties.some(property => !property.tenure && maplebirch.get('Finance').realEstate.owns(property.id))>>
+    中介认出了你，先取出你的房产档案，才去拿待售房屋的资料。
+  <<else>>
+    中介取下钥匙，腾出柜台，让你逐项查看房屋资料。
+  <</if>>
 <</language>><br><br>
 <<if $Finance.bank.opened and !$Finance.bank.debit_card>>
   <span class='blue'><i><<language>>
@@ -864,6 +875,11 @@
 <<else>>
   <<run maplebirch.get("Finance").realEstate.setFloor(1)>><<run maplebirch.get("Finance").realEstate.enter()>><<home_effects>><<effects>>
   <<= lanSwitch(_property.floors[0].description.EN, _property.floors[0].description.CN)>><br><br>
+  <<if Weather.precipitation is 'rain'>>
+    <<lanSwitch 'With the door shut behind you, the rain is a softer sound against the windows.' '关上身后的门，雨声隔在窗外，轻了许多。'>><br><br>
+  <<elseif Time.dayState is 'night'>>
+    <<lanSwitch 'Beyond the windows, the street has grown dark. Inside, you can hear the small sounds of the house.' '窗外的街道已经暗了下来，屋里细小的声响反而清楚起来。'>><br><br>
+  <</if>>
   <<if maplebirch.get("Finance").realEstate.managementFor(_property.id).renovation gt 0>>
     <<= lanSwitch(_property.interior.renovated.EN, _property.interior.renovated.CN)>><br><br>
   <</if>>

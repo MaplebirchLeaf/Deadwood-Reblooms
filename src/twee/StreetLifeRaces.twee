@@ -152,9 +152,21 @@
     <<if $Transport.origin is 'farmroad1'>>
       <<language>>
         <<option 'EN'>>
-          A few cars stand off the road, their headlights turned away from the nearby houses. Someone marks down the entrants on a folded sheet of paper. "One run to the fields. Keep going past the crest. You'll see the finish lights before the turn into the farmlands."
+          <<if Weather.isSnow>>
+            Snow lies in the tyre tracks at the edge of the lay-by. Nobody is taking entries here. Traffic still passes on the road towards the farms.
+          <<elseif !_streetRaces.nightOpen>>
+            The lay-by is quiet. Tyre marks curve back onto the road, where ordinary traffic continues towards the farms. There is nobody here taking race entries yet.
+          <<else>>
+            A few cars stand off the road, their headlights turned away from the nearby houses. <<if Weather.precipitation is 'rain'>>Wipers sweep across the windscreens, and water shines in the shallow ruts beside the cars.<</if>> Someone marks down the entrants on a folded sheet of paper. "One run to the fields. Keep going past the crest. You'll see the finish lights before the turn into the farmlands."
+          <</if>>
         <<option 'CN'>>
-          几辆车停在路边，车灯避开了附近的房屋。一个人拿着折起的纸，登记参赛者。“一路跑到田边。过了山顶继续走，进农田的岔口前就能看见终点灯。”
+          <<if Weather.isSnow>>
+            停车处边沿的轮胎印里积着雪，眼下没有人在这里登记报名。通往农场的公路上，车辆仍在来往。
+          <<elseif !_streetRaces.nightOpen>>
+            路边的停车处很安静，几道轮胎印弯回公路，普通车辆仍往农场那边驶去。现在还没有人来这里登记参赛者。
+          <<else>>
+            几辆车停在路边，车灯避开了附近的房屋。<<if Weather.precipitation is 'rain'>>雨刷扫过挡风玻璃，车旁浅浅的车辙里泛着水光。<</if>>一个人拿着折起的纸，登记参赛者。“一路跑到田边。过了山顶继续走，进农田的岔口前就能看见终点灯。”
+          <</if>>
       <</language>><br><br>
       <<lanSwitch 'Route: town outskirts' '路线：小镇外公路'>><<for _raceRouteStage range _streetRaces.terms.stages>> → <<= lanSwitch(_raceRouteStage.name.EN, _raceRouteStage.name.CN)>><</for>><br>
       <<language>>
@@ -163,9 +175,11 @@
         <<option 'CN'>>
           全程 <<= _streetRaces.terms.stages.length>> 个赛段，连同报名准备约需 <<= _streetRaces.terms.entry_minutes + _streetRaces.terms.stages.reduce((total, stage) => total + stage.minutes, 0)>> 分钟。这是一场通往农田入口的单程比赛，完赛或退赛后，汽车会停在你抵达的地方。
       <</language>><br><br>
-      <<for _raceRival range _streetRaces.terms.rivals>>
-        <<= lanSwitch(_raceRival.before.EN, _raceRival.before.CN)>><br>
-      <</for>><br>
+      <<if _streetRaces.nightOpen and !Weather.isSnow>>
+        <<for _raceRival range _streetRaces.terms.rivals>>
+          <<= lanSwitch(_raceRival.before.EN, _raceRival.before.CN)>><br>
+        <</for>><br>
+      <</if>>
       <span class='blue'><<lanSwitch 'Entries are taken from 8 pm to 4 am. Each class can be entered once per night; withdrawing still uses your entry, and the fee is not refunded.' '报名时间为晚上八点至凌晨四点。每个组别每晚只能参加一次，退赛也计入次数，且不退报名费。'>></span><br>
       <span class='blue'><<lanSwitch 'The road remains open to traffic. Dangerous driving can leave evidence. Fuel and damage are yours to cover.' '公路上仍有其它车辆通行，危险驾驶可能留下罪证。燃油和修车费用由你自己承担。'>></span><br><br>
       <<if _streetRaces.nearby.length>>

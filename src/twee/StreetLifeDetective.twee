@@ -45,8 +45,8 @@
 
 <<widget 'deadwood-street-detective-link'>>
   <<if maplebirch.get('StreetLife').bounties.available>>
-    <<if maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
-      <<icon 'street/detective-notebook.png'>><<lanLink ['Speak with Detective Grant (0:01)', '与格兰特警探交谈 (0:01)'] 'Deadwood Street Detective'>><<endevent>><<pass 1>><</lanLink>><br>
+    <<if C.npc.Grant.state is 'active' and maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
+      <<icon 'street/detective-notebook.png'>><<lanLink `C.npc.Grant.init === 1 ? ['Speak with Detective Grant (0:01)', '与格兰特警探交谈 (0:01)'] : ['Approach the detective by the noticeboard (0:01)', '走近告示板旁的警探 (0:01)']` 'Deadwood Street Detective'>><<endevent>><<pass 1>><</lanLink>><br>
     <</if>>
     <!-- 接案与领款由柜台重验日间营业，夜班仍接收已合作人员带回的目标。 -->
     <<if $StreetLife.bounties.cooperating or $StreetLife.bounties.active>>
@@ -99,7 +99,7 @@
 :: Deadwood Street Detective
 <<set $location to 'police_station'>><<set $outside to 0>><<effects>>
 <<set _detectiveWork to maplebirch.get('StreetLife').bounties>>
-<<if !_detectiveWork.available or maplebirch.npc.Schedule.get('Grant').location isnot 'police_station'>>
+<<if !_detectiveWork.available or C.npc.Grant.state isnot 'active' or maplebirch.npc.Schedule.get('Grant').location isnot 'police_station'>>
   <<language>>
     <<option 'EN'>>
       The desk beside the noticeboard is empty. A member of staff points you back towards reception.

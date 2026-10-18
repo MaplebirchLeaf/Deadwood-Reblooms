@@ -2,11 +2,7 @@
 <!-- 入口随原版峭壁街普通地点列表出现，室外天气只影响门前和临海训练区。 -->
 <<widget 'deadwood-reblooms-life-simulation-gym-street'>>
   <<if $exposed lte 0>>
-    <<if Time.hour gte 6 and Time.hour lt 22>>
-      <<icon 'gym/gym.png'>><<lanLink ['Gym (0:02)', '健身房 (0:02)'] 'Deadwood Reblooms Life Simulation Gym'>><<pass 2>><</lanLink>>
-    <<else>>
-      <<icon 'gym/gym.png'>><span class='blue'><<lanSwitch 'The gym is closed.' '健身房已经关门了。'>></span>
-    <</if>><br>
+    <<icon 'gym/gym.png'>><<lanLink ['Gym (0:02)', '健身房 (0:02)'] 'Deadwood Reblooms Life Simulation Gym'>><<pass 2>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -22,21 +18,29 @@
 <<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
 <<language>>
   <<option 'EN'>>
-    The gym stands just above the sea road. Through its windows you can see the weights, a row of lockers, and a door to the seafront deck. The attendant checks passes at a narrow desk.
+    The gym stands just above the sea road. A narrow reception area separates the entrance from the weights and rows of lockers beyond the glass doors.
     <br><br>
-    <<if Time.hour lt 10>>A few people train before work. Someone quietly counts repetitions while the attendant opens the windows.
+    <<if Time.hour lt 6 or Time.hour gte 22>>
+      The reception light is off. A chain runs through the handles of the inner doors, and the weights have all been returned to their racks. A notice beside the card reader reads <span class='blue'>"Open daily, 06:00–22:00."</span>
+      <<if Weather.precipitation is 'rain'>>Rain rattles against the windows facing the sea.<<else>>In the quiet, you can hear the sea below the road.<</if>>
+    <<elseif Time.hour lt 10>>The attendant checks passes at the desk. A few people train before work. Someone quietly counts repetitions while a window is opened to let out the stuffy air.
     <<elseif Time.hour lt 17>>The floor is busy with students and workers taking a break. Shoes squeak against the mats.
+    <<elseif Time.hour gte 21>>The last few people put their weights away. The attendant takes a stack of returned locker keys from the desk and glances at the clock.
     <<else>>People arriving after their shifts hang their coats by the lockers before heading to the equipment.<</if>>
   <<option 'CN'>>
-    健身房就在临海公路上方。透过窗户，你能看见杠铃、成排的储物柜，还有一扇通向临海平台的门。管理员在狭窄的前台核对入场资格。
+    健身房就在临海公路上方。狭窄的前厅后是一道玻璃门，隔着玻璃能看见杠铃和成排的储物柜。
     <br><br>
-    <<if Time.hour lt 10>>几个人赶在上工前锻炼。有人轻声数着抬举次数，管理员则推开窗户透气。
+    <<if Time.hour lt 6 or Time.hour gte 22>>
+      前台的灯熄着，里门的把手上穿着锁链，杠铃都收回了架上。刷卡器旁贴着通知：<span class='blue'>“每日营业：06:00–22:00。”</span>
+      <<if Weather.precipitation is 'rain'>>雨拍打着朝海的窗户。<<else>>四下安静，公路下方的海声传了上来。<</if>>
+    <<elseif Time.hour lt 10>>管理员在前台核对入场资格。几个人赶在上工前锻炼，有人轻声数着抬举次数，一扇窗刚被推开，散出屋里的闷气。
     <<elseif Time.hour lt 17>>学生和趁空休息的工人挤满训练区。鞋底在软垫上发出吱响。
+    <<elseif Time.hour gte 21>>最后几位客人正把杠铃放回原处。管理员从前台收起一摞退还的储物柜钥匙，又抬头看了看钟。
     <<else>>下工后来的人把外套挂在储物柜旁，才走向训练区。<</if>>
 <</language>><br><br>
 <<deadwood-dynamicblock 'deadwood-gym-admission'>>
   <<if Time.hour lt 6 or Time.hour gte 22>>
-    <span class='blue'><<lanSwitch 'The attendant has locked the training floor for the night.' '管理员已经锁上训练区。'>></span><br>
+    <span class='blue'><<lanSwitch 'The doors to the training floor are locked.' '通往训练区的门已经锁上了。'>></span><br>
   <<elseif $exposed gt 0>>
     <span class='red'><<lanSwitch 'The attendant asks you to dress before entering.' '管理员请你先穿好衣服再进来。'>></span><br>
   <<else>>

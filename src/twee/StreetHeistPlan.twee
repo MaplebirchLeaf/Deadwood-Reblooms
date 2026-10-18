@@ -61,47 +61,6 @@
   <</if>>
 <</widget>>
 
-<<widget 'deadwood-street-contact-status'>>
-  <<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
-  <<if _streetHeist>>
-    <<set _streetContacts to _streetHeist.contacts>>
-    <div class='gold bold'><<lanSwitch 'Street contacts' '街头往来'>></div>
-    <ul class='journal'>
-      <<if C.npc.Landry?.init is 1>>
-        <li><<= maplebirch.auto('Landry')>>：
-          <<if _streetHeist.state.betrayed>><span class='red'><<lanSwitch 'knows you betrayed this venture, and withholds further arrangements.' '已经知道你出卖了这次合作，不肯再透露安排。'>></span>
-          <<elseif _streetContacts.landryTier is 2>><span class='green'><<lanSwitch 'has seen you finish worthwhile work.' '已经见识过你办事的本事。'>></span>
-          <<elseif _streetContacts.landryTier is 1>><span class='teal'><<lanSwitch 'sees a reason to keep doing business with you.' '觉得与你继续做生意有利可图。'>></span>
-          <<else>><<lanSwitch 'is still weighing what you can bring to the table.' '仍在掂量你能带来什么。'>><</if>>
-        </li>
-      <</if>>
-      <<if C.npc.Wren?.init is 1>>
-        <li><<= maplebirch.auto('Wren')>>：
-          <<if _streetHeist.state.betrayed>><span class='red'><<lanSwitch 'knows you betrayed this venture, and no longer trusts your part in it.' '已经知道你出卖了这次合作，不再相信你的承诺。'>></span>
-          <<elseif _streetContacts.wrenTier is 2>><span class='green'><<lanSwitch 'is willing to hear out another joint venture.' '愿意认真听听下一桩合作。'>></span>
-          <<elseif _streetContacts.wrenTier is 1>><span class='teal'><<lanSwitch 'finds the prospect of working with you interesting.' '觉得与你搭伙有些意思。'>></span>
-          <<else>><<lanSwitch 'keeps a little distance when business comes up.' '谈到生意时，仍与你保持着些距离。'>><</if>>
-        </li>
-      <</if>>
-      <<if $mickeyPub gte 2>>
-        <li><<lanSwitch 'Mickey' '米奇'>>：
-          <<if ['hiding', 'hidingKnown'].includes($pubfame?.status)>><span class='orange'><<lanSwitch 'is lying low and cannot meet you at the pub.' '正在避风头，暂时无法在酒馆见你。'>></span>
-          <<elseif _streetHeist.state.betrayed>><<lanSwitch 'will not review another bank arrangement with you.' '不肯再替你复核银行的安排。'>>
-          <<else>><<lanSwitch 'can check information and agreed plans behind the scenes.' '可以在幕后核对消息与谈妥的安排。'>><</if>>
-        </li>
-      <</if>>
-      <<if C.npc.Grant?.init is 1>>
-        <li><<= maplebirch.auto('Grant')>>：
-          <<if _streetHeist.state.settled and _streetHeist.state.policePlan and _streetHeist.state.entered and !['reported', 'sting'].includes(_streetHeist.state.outcome)>><span class='red'><<lanSwitch 'knows you did not honour the agreed handover.' '知道你没有按约完成交接。'>></span>
-          <<elseif _streetContacts.grantTier is 2>><span class='green'><<lanSwitch 'takes your reports seriously, and checks them.' '认真对待你的线索，也会核实。'>></span>
-          <<elseif _streetContacts.grantTier is 1>><span class='teal'><<lanSwitch 'recognises your ability to follow a lead.' '认可你追查线索的本事。'>></span>
-          <<else>><<lanSwitch 'expects you to give an accurate account.' '等着你把事情如实说清。'>><</if>>
-        </li>
-      <</if>>
-    </ul>
-  <</if>>
-<</widget>>
-
 <<widget 'deadwood-street-heist-status'>>
   <<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
   <<if _streetHeist and _streetHeist.state.stage isnot 'idle'>>

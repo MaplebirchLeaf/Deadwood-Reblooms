@@ -307,6 +307,60 @@
     <<deadwood-finance-donation-receipts>>
     <<deadwood-finance-school-donation-journal>>
     <<deadwood-finance-aid-journal>>
+    <!-- 晋升履历只读；不调用柜台情境或每日结算，查日志不会增加来访与业务天数。 -->
+    <<if C.npc.Adrian.init is 1 and $Finance.adrian.career gt 0>>
+      <<deadwood-card "Adrian's promotion" '阿德里安的晋升'>>
+        <<switch $Finance.adrian.career>>
+          <<case 1 2>>
+            <<lanSwitch 'Required net deposits: ' '所需净存款：'>><<printmoney `$Finance.adrian.career === 1 ? 500000 : 2500000`>><br>
+            <<language>>
+              <<option 'EN'>>
+                Qualifying daily settlements: <span class='blue'><<= $Finance.adrian.business_days>> / <<= $Finance.adrian.career is 1 ? 7 : 14>></span>. Below the deposit requirement or behind on repayments, the current streak starts again.
+              <<option 'CN'>>
+                符合条件的连续日结：<span class='blue'><<= $Finance.adrian.business_days>> / <<= $Finance.adrian.career is 1 ? 7 : 14>></span>。日结时存款不足或还款逾期，当前阶段重新累计。
+            <</language>><br>
+          <<case 3>>
+            <<lanSwitch 'The business record is ready. Keep at least ' '业务记录已达标。保持至少 '>><<printmoney 2500000>><<lanSwitch ' in net deposits, a debit card and no overdue repayments. Authorise Adrian to include your account during counter hours.' '净存款、已办借记卡且没有逾期还款，在柜台办公时确认授权，让阿德里安将账户业务列入竞聘材料。'>><br>
+          <<case 4>>
+            <<lanSwitch 'The application is under review. Earliest result: ' '竞聘材料正在审核。最早可询问结果的日期：'>><<deadwood-reblooms-finance-date $Finance.adrian.career_ready_day>><br>
+            <<lanSwitch 'Keep at least ' '保持至少 '>><<printmoney 2500000>><<lanSwitch ' in net deposits, a debit card and no overdue repayments. A failed daily settlement restarts the review week. Ask Adrian at the counter after the review.' '净存款、已办借记卡且没有逾期还款。日结不符合条件时，审核周重新计算。审核结束后，回柜台找阿德里安询问。'>><br>
+          <<case 5>>
+            <span class='green'><<lanSwitch 'Adrian has been appointed branch manager.' '阿德里安已获任分行经理。'>></span><br>
+        <</switch>>
+        <<if $Finance.adrian.career is 5>>
+          <strong class='gold'><<lanSwitch 'Personal-loan weekly rates' '个人贷款周利率'>></strong><br>
+          <<for _adrianLoan range maplebirch.get('Finance').loanProducts>>
+            <<= _adrianLoan.days>> <<lanSwitch 'days' '天'>>：
+            <<= (_adrianLoan.baseWeeklyRate * 100).toFixed(3)>>% →
+            <span class='blue'><<= (_adrianLoan.weeklyRate * 100).toFixed(3)>>%</span><br>
+          <</for>>
+          <<if $Finance.bank.credit_missed_payments gt 0 or $Finance.bank.loan_missed_payments gt 0>>
+            <<language>>
+              <<option 'EN'>>
+                <span class='red'>The discount is currently suspended because of missed repayments.</span> The rates above show your current quote. Clear the affected credit-card or personal-loan debt to reset its missed-payment record.
+              <<option 'CN'>>
+                <span class='red'>当前有逾期记录，优惠已暂停。</span>上方显示的是当前报价。结清有逾期记录的信用卡或个人贷款欠款，才能清除对应的漏还记录。
+            <</language>>
+          <<else>>
+            <<language>>
+              <<option 'EN'>>
+                <span class='green'>The discount is active.</span> A ten-percent reduction means the original rate is multiplied by 0.9. Deposit interest, credit-card interest and mortgages are unaffected.
+              <<option 'CN'>>
+                <span class='green'>优惠已生效。</span>降低一成是原利率乘以 0.9。存款利息、信用卡利息和房贷不受影响。
+            <</language>>
+          <</if>>
+          <br><br>
+        <</if>>
+        <<if $Finance.adrian.career gt 0 and $Finance.adrian.career lt 5>>
+          <<language>>
+            <<option 'EN'>>
+              <i>Net deposits are the balance left after credit-card and personal-loan debts. Repeated transfers do not add business days.</i>
+            <<option 'CN'>>
+              <i>净存款按账户余额扣除信用卡和个人贷款欠款计算。反复存取不会增加业务天数。</i>
+          <</language>><br>
+        <</if>>
+      <</deadwood-card>>
+    <</if>>
     <ul class='journal'>
       <<if $Finance.orphanage.pc_bought_out or $Finance.orphanage.robin_bought_out>>
         <li class='green'>
@@ -976,6 +1030,9 @@
   <<if $RobinExpansion.topics.shop and $RobinExpansion.lemonade gte 2 and $RobinExpansion.chocolate gte 2 and $RobinExpansion.shop_stage is 'none'>>
     <li><<lanSwitch 'Both stalls are fully equipped. Robin may be ready to discuss a shop on Cliff Street.' '两处摊位都已改造妥当。可以和罗宾谈谈在峭壁街开店。'>></li>
   <</if>>
+  <<if !$RobinExpansion.shop and $RobinExpansion.shop_stage isnot 'none' and !maplebirch.get('Robin').shop.meeting>>
+    <li><<lanSwitch 'Before going together, arrange to meet while Robin is free at home. Once Robin feels ready, some paperwork can also be handled alone.' '一起办理开店的事之前，先趁罗宾在家有空时约好当天见面。等罗宾准备好，也能独自办理部分手续。'>></li>
+  <</if>>
   <<if $RobinExpansion.shop_stage is 'planning'>>
     <li><<lanSwitch 'Robin has the stall records ready. The drinks shop permit can be requested at the Cliff Street town hall.' '罗宾已备好摊位账本。你们可以去峭壁街的市政厅申请饮品店许可。'>></li>
     <<if C.npc.Robin.dom lt 60 or C.npc.Robin.trauma gte 50>>
@@ -1005,10 +1062,52 @@
   <</if>>
 <</widget>>
 
+<!-- 街头往来只记已结识人物的合作态度，交谈与行动仍到现场进行。 -->
+
+<<widget 'deadwood-street-contact-status'>>
+  <<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
+  <<if _streetHeist>>
+    <<set _streetContacts to _streetHeist.contacts>>
+    <ul class='journal'>
+      <<if C.npc.Landry?.init is 1>>
+        <li><<= maplebirch.auto('Landry')>>：
+          <<if _streetHeist.state.betrayed>><span class='red'><<lanSwitch 'knows you betrayed this venture, and withholds further arrangements.' '已经知道你出卖了这次合作，不肯再透露安排。'>></span>
+          <<elseif _streetContacts.landryTier is 2>><span class='green'><<lanSwitch 'has seen you finish worthwhile work.' '已经见识过你办事的本事。'>></span>
+          <<elseif _streetContacts.landryTier is 1>><span class='teal'><<lanSwitch 'sees a reason to keep doing business with you.' '觉得与你继续做生意有利可图。'>></span>
+          <<else>><<lanSwitch 'is still weighing what you can bring to the table.' '仍在掂量你能带来什么。'>><</if>>
+        </li>
+      <</if>>
+      <<if C.npc.Wren?.init is 1>>
+        <li><<= maplebirch.auto('Wren')>>：
+          <<if _streetHeist.state.betrayed>><span class='red'><<lanSwitch 'knows you betrayed this venture, and no longer trusts your part in it.' '已经知道你出卖了这次合作，不再相信你的承诺。'>></span>
+          <<elseif _streetContacts.wrenTier is 2>><span class='green'><<lanSwitch 'is willing to hear out another joint venture.' '愿意认真听听下一桩合作。'>></span>
+          <<elseif _streetContacts.wrenTier is 1>><span class='teal'><<lanSwitch 'finds the prospect of working with you interesting.' '觉得与你搭伙有些意思。'>></span>
+          <<else>><<lanSwitch 'keeps a little distance when business comes up.' '谈到生意时，仍与你保持着些距离。'>><</if>>
+        </li>
+      <</if>>
+      <<if $mickeyPub gte 2>>
+        <li><<lanSwitch 'Mickey' '米奇'>>：
+          <<if ['hiding', 'hidingKnown'].includes($pubfame?.status)>><span class='orange'><<lanSwitch 'is lying low and cannot meet you at the pub.' '正在避风头，暂时无法在酒馆见你。'>></span>
+          <<elseif _streetHeist.state.betrayed>><<lanSwitch 'will not review another bank arrangement with you.' '不肯再替你复核银行的安排。'>>
+          <<else>><<lanSwitch 'can check information and agreed plans behind the scenes.' '可以在幕后核对消息与谈妥的安排。'>><</if>>
+        </li>
+      <</if>>
+      <<if C.npc.Grant?.init is 1>>
+        <li><<= maplebirch.auto('Grant')>>：
+          <<if _streetHeist.state.settled and _streetHeist.state.policePlan and _streetHeist.state.entered and !['reported', 'sting'].includes(_streetHeist.state.outcome)>><span class='red'><<lanSwitch 'knows you did not honour the agreed handover.' '知道你没有按约完成交接。'>></span>
+          <<elseif _streetContacts.grantTier is 2>><span class='green'><<lanSwitch 'takes your reports seriously, and checks them.' '认真对待你的线索，也会核实。'>></span>
+          <<elseif _streetContacts.grantTier is 1>><span class='teal'><<lanSwitch 'recognises your ability to follow a lead.' '认可你追查线索的本事。'>></span>
+          <<else>><<lanSwitch 'expects you to give an accurate account.' '等着你把事情如实说清。'>><</if>>
+        </li>
+      <</if>>
+    </ul>
+  <</if>>
+<</widget>>
+
 <!-- 街头委托：只读当前货物、期限和回执，交接与报酬在委托页面结算。 -->
 
 <<widget 'deadwood-street-job-journal'>>
-  <<if $StreetLife.jobs.active or $StreetLife.jobs.report or $StreetLife.jobs.completed or $StreetLife.jobs.losses or $StreetLife.bailey.finished or $StreetLife.heist.appointment or $mickeyPub gte 2>>
+  <<if $StreetLife.jobs.active or $StreetLife.jobs.report or $StreetLife.jobs.completed or $StreetLife.jobs.losses or $StreetLife.bailey.finished or $StreetLife.heist.appointment>>
     <<deadwood-card 'Street work' '街头委托'>>
       <div class='dr-finance-summary'>
         <span><<lanSwitch 'Completed deliveries' '完成委托'>></span><span class='teal'><<= $StreetLife.jobs.completed>></span>
@@ -1034,8 +1133,14 @@
         </li></ul>
       <</if>>
       <<deadwood-street-bailey-journal>>
-      <<deadwood-street-contact-status>>
       <<deadwood-street-heist-status>>
+    <</deadwood-card>>
+    <hr>
+  <</if>>
+
+  <<if maplebirch.get('StreetLife') and (['Landry', 'Wren', 'Grant'].some(name => C.npc[name]?.init === 1) or $mickeyPub gte 2)>>
+    <<deadwood-card 'Street contacts' '街头往来'>>
+      <<deadwood-street-contact-status>>
     <</deadwood-card>>
     <hr>
   <</if>>

@@ -120,10 +120,10 @@
     netDeposit: maplebirch.get('Finance').netDeposit,
     goodAccount: $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0 and $Finance.collection.amount is 0
   }>>
-  <<set _adrianContext.present to Boolean(_adrianContext.desk) or $_location is 'financial_centre_break'>>
+  <<set _adrianContext.present to C.npc.Adrian.state is 'active' and (Boolean(_adrianContext.desk) or $_location is 'financial_centre_break')>>
   <<if $_working and $_service>><<set _adrianContext.desk to $passage>><</if>>
   <<set _adrianContext.canChat to _adrianContext.present and $_state.last_chat isnot Time.days and $combat isnot 1 and $exposed lte 0 and !$worn.face.type.includes('gag')>>
-  <<set _adrianContext.careerAvailable to _adrianContext.present and ($_state.career gt 0 or ($_state.visits gte 3 and $_bank.opened))>>
+  <<set _adrianContext.careerAvailable to _adrianContext.present and C.npc.Adrian.init is 1 and ($_state.career gt 0 or ($_state.visits gte 3 and $_bank.opened))>>
   <<set _adrianContext.businessReady to _adrianContext.goodAccount and _adrianContext.netDeposit gte 2500000>>
 <</widget>>
 
@@ -222,7 +222,7 @@
 
 <<widget 'deadwood-reblooms-adrian-counter-link'>>
   <<deadwood-reblooms-adrian-context>>
-  <<if _adrianContext.desk and $passage is _adrianContext.desk and _adrianContext.canChat>>
+  <<if C.npc.Adrian.init is 1 and _adrianContext.desk and $passage is _adrianContext.desk and _adrianContext.canChat>>
     <<socialiseicon 'ask'>><<lanLink ['Talk to Adrian (0:05)', '与阿德里安聊聊 (0:05)'] 'Deadwood Reblooms Adrian Conversation'>><</lanLink>><br>
   <</if>>
   <<if _adrianContext.desk and $passage is _adrianContext.desk>>
@@ -232,15 +232,15 @@
 
 <<widget 'deadwood-reblooms-adrian-break-link'>>
   <<deadwood-reblooms-adrian-context>>
-  <<if (_adrianContext.location is 'financial_centre_break')>>
+  <<if _adrianContext.present and _adrianContext.location is 'financial_centre_break'>>
     <<language>>
       <<option 'EN'>>
-        Adrian sits beside the entrance with a sandwich and a paper cup. The name badge has been turned face down on the table.
+        <<if C.npc.Adrian.init is 1>>Adrian<<else>>A bank clerk<</if>> sits beside the entrance with a sandwich and a paper cup. The name badge has been turned face down on the table.
       <<option 'CN'>>
-        阿德里安坐在入口旁，面前放着三明治和纸杯。名牌被翻过来，扣在桌面上。
+        <<if C.npc.Adrian.init is 1>>阿德里安<<else>>一名银行职员<</if>>坐在入口旁，面前放着三明治和纸杯。名牌被翻过来，扣在桌面上。
     <</language>><br>
     <<if _adrianContext.canChat>>
-      <<socialiseicon>><<lanLink ['Join Adrian for a moment (0:05)', '和阿德里安坐一会儿 (0:05)'] 'Deadwood Reblooms Adrian Conversation'>><</lanLink>><br>
+      <<socialiseicon>><<lanLink `C.npc.Adrian.init === 1 ? ['Join Adrian for a moment (0:05)', '和阿德里安坐一会儿 (0:05)'] : ['Ask to join the bank clerk (0:05)', '问银行职员能否坐一会儿 (0:05)']` 'Deadwood Reblooms Adrian Conversation'>><</lanLink>><br>
     <</if>>
     <<deadwood-reblooms-adrian-career-link>>
   <</if>>
@@ -680,30 +680,6 @@
       <</language>>
   <</switch>>
   <br><br>
-  <<if _adrianContext.state.career is 5>>
-    <strong class='gold'><<lanSwitch 'Personal-loan weekly rates' '个人贷款周利率'>></strong><br>
-    <<for _adrianLoan range maplebirch.get('Finance').loanProducts>>
-      <<= _adrianLoan.days>> <<lanSwitch 'days' '天'>>：
-      <<= (_adrianLoan.baseWeeklyRate * 100).toFixed(3)>>% →
-      <span class='blue'><<= (_adrianLoan.weeklyRate * 100).toFixed(3)>>%</span><br>
-    <</for>>
-    <<if _adrianContext.bank.credit_missed_payments gt 0 or _adrianContext.bank.loan_missed_payments gt 0>>
-      <<language>>
-        <<option 'EN'>>
-          <span class='red'>The discount is currently suspended because of missed repayments.</span> The rates above show your current quote. Clear the affected credit-card or personal-loan debt to reset its missed-payment record.
-        <<option 'CN'>>
-          <span class='red'>当前有逾期记录，优惠已暂停。</span>上方显示的是当前报价。结清有逾期记录的信用卡或个人贷款欠款，才能清除对应的漏还记录。
-      <</language>>
-    <<else>>
-      <<language>>
-        <<option 'EN'>>
-          <span class='green'>The discount is active.</span> A ten-percent reduction means the original rate is multiplied by 0.9. Deposit interest, credit-card interest and mortgages are unaffected.
-        <<option 'CN'>>
-          <span class='green'>优惠已生效。</span>降低一成是原利率乘以 0.9。存款利息、信用卡利息和房贷不受影响。
-      <</language>>
-    <</if>>
-    <br><br>
-  <</if>>
   <div id='adrian-career-actions'>
     <<if (_adrianContext.location is 'financial_centre') and _adrianContext.state.career is 0>>
       <<lanLink ['Choose Adrian as your account contact (0:05)', '指定阿德里安负责账户服务 (0:05)']>>
@@ -751,13 +727,6 @@
           <</replace>>
         <</if>>
       <</lanLink>><br>
-    <<elseif _adrianContext.state.career is 1 or _adrianContext.state.career is 2>>
-      <<language>>
-        <<option 'EN'>>
-          Qualifying daily settlements: <span class='blue'><<= _adrianContext.state.business_days>> / <<= _adrianContext.state.career is 1 ? 7 : 14>></span>. Below the deposit requirement or behind on repayments, the current streak starts again.
-        <<option 'CN'>>
-          符合条件的连续日结：<span class='blue'><<= _adrianContext.state.business_days>> / <<= _adrianContext.state.career is 1 ? 7 : 14>></span>。日结时存款不足或还款逾期，当前阶段重新累计。
-      <</language>><br>
     <<elseif _adrianContext.state.career is 3 or _adrianContext.state.career is 4>>
       <<language>>
         <<option 'EN'>>
@@ -768,14 +737,6 @@
     <</if>>
   </div>
   <br>
-  <<if _adrianContext.state.career gt 0 and _adrianContext.state.career lt 5>>
-    <<language>>
-      <<option 'EN'>>
-        <i>Net deposits are the balance left after credit-card and personal-loan debts. Repeated transfers do not add business days.</i>
-      <<option 'CN'>>
-        <i>净存款按账户余额扣除信用卡和个人贷款欠款计算。反复存取不会增加业务天数。</i>
-    <</language>><br>
-  <</if>>
 <<else>>
   <<language>>
     <<option 'EN'>>

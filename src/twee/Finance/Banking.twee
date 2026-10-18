@@ -267,6 +267,13 @@
 
 <!-- 非营业时间：柜台关闭，只保留全天开放的 ATM。 -->
 <<widget 'deadwood-reblooms-finance-counter-closed'>>
+  <<if Time.weekDay lt 2 or Time.weekDay gt 6>>
+    <<lanSwitch 'The blinds are down over the banking windows. A notice gives the weekday opening hours; the ATM is still lit beside the entrance.' '银行窗口的百叶帘拉着，告示上写着工作日的营业时间。入口旁的自助取款机仍亮着。'>>
+  <<elseif Time.hour lt 9>>
+    <<lanSwitch 'The banking windows have not opened yet. Forms wait in neat stacks behind the glass.' '银行窗口还没开。玻璃后面，表格已分门别类地摞好。'>>
+  <<else>>
+    <<lanSwitch 'The banking windows are shut for the day. The cash drawers have been put away, leaving only the signs facing the hall.' '银行窗口已经结束了今天的接待。钱箱收起来了，只留下几块朝着大厅的业务牌。'>>
+  <</if>><br><br>
   <span class='blue'><<lanSwitch 'The counters open from 9:00 am to 5:00 pm, Monday to Friday.' '柜台营业时间为周一至周五 09:00–17:00。'>></span><br><br>
   <<icon 'finance/atm.png'>><<lanLink ["ATM", "自助取款机"] 'Deadwood Reblooms Financial Centre ATM'>><</lanLink>><br>
 <</widget>>
@@ -741,10 +748,26 @@
 <strong><<lanSwitch 'Financial Centre' '金融中心'>></strong><br>
 <<language>>
   <<option 'EN'>>
-    Bronze lettering marks the sober stone frontage. Beyond the glass doors, a quiet banking hall opens beneath fluorescent lights. A row of counters occupies one wall, while a smaller securities desk faces a square electronic market board. Property deeds hang behind the estate desk. An ATM hums beside the entrance.
+    Bronze lettering marks the stone frontage. Through the glass doors, a row of banking windows faces the hall. The securities desk sits beneath an electronic market board; property particulars fill the display beside the estate desk. An ATM hums near the entrance.
   <<option 'CN'>>
-    朴素的石砌门面上嵌着青铜字样。玻璃门后，安静的银行大厅笼罩在荧光灯下。一排柜台占据一侧墙面，较小的证券业务台则正对着方形电子行情板。房产柜台后挂着房屋契据。入口旁的 ATM 发出低沉的嗡鸣。
+    石砌门面上嵌着青铜字样。穿过玻璃门，一排银行窗口朝着大厅。证券业务台设在电子行情板下，房产柜台旁的橱窗贴满房源资料。入口附近，自助取款机低低地响着。
 <</language>>
+<<if maplebirch.get('StreetLife')?.heist.bankClosed>>
+  <<lanSwitch 'A notice at the banking windows directs customers to self-service. The chairs in front of them are empty.' '银行窗口贴着转用自助服务的通知，前面的座椅空着。'>>
+<<elseif Time.weekDay gte 2 and Time.weekDay lte 6 and Time.hour gte 9 and Time.hour lt 17>>
+  <<lanSwitch 'A printer rattles behind the glass. People wait with cards and folded paperwork in their hands.' '玻璃后面，打印机响了一阵。等候的人拿着银行卡和折好的文件。'>>
+<<elseif Time.weekDay lt 2 or Time.weekDay gt 6>>
+  <<lanSwitch 'The bank and securities windows are dark for the weekend. There is no queue at either desk.' '周末，银行与证券窗口都没有亮灯，窗口前没有等候的人。'>>
+<<elseif Time.hour lt 9>>
+  <<lanSwitch 'The service windows are still shut. The opening hours are displayed beside the entrance.' '业务窗口还关着，入口旁贴着营业时间。'>>
+<<else>>
+  <<lanSwitch 'The last transaction slips have been cleared from the banking windows. The ATM screen is still bright.' '银行窗口前最后几张业务凭条也收走了，自助取款机的屏幕仍亮着。'>>
+<</if>>
+<<if Weather.precipitation is 'rain'>>
+  <<lanSwitch 'Rain ticks against the glass doors, briefly louder whenever they open.' '雨点敲在玻璃门上，门一开，雨声就清楚一些。'>>
+<<elseif Weather.isSnow>>
+  <<lanSwitch 'Snow is gathering outside the doors. The entrance mat is damp with meltwater.' '门外积着雪，入口的地垫被雪水浸湿了。'>>
+<</if>>
 <br><br>
 <<deadwood-reblooms-finance-navigation>>
 <<if $Finance.bank.opened>>
