@@ -30,7 +30,28 @@ export interface WineryState {
   produced: number;
   supplied: number;
   sold: number;
-  ledger: { day: number; recipe: WineRecipe; amount: number; income: number; source: 'wholesale' | 'robin' }[];
+  ledger: { day: number; recipe: WineRecipe; amount: number; income: number; source: 'wholesale' | 'robin'; fee?: number }[];
+  automation: {
+    installed: boolean;
+    ready_at: number;
+    bottle: boolean;
+    recipe: WineRecipe | null;
+    supply: boolean;
+    day: number;
+    supply_day: number;
+    expenses: number;
+    fees: number;
+    report: {
+      day: number;
+      bottled: number;
+      started: number;
+      supplied: number;
+      expenses: number;
+      bottling: keyof typeof terms.automationStatus;
+      brewing: keyof typeof terms.automationStatus;
+      delivery: keyof typeof terms.automationStatus;
+    };
+  };
 }
 
 export default class Winery {
@@ -53,7 +74,19 @@ export default class Winery {
     produced: 0,
     supplied: 0,
     sold: 0,
-    ledger: []
+    ledger: [],
+    automation: {
+      installed: false,
+      ready_at: 0,
+      bottle: false,
+      recipe: null,
+      supply: false,
+      day: -1,
+      supply_day: -1,
+      expenses: 0,
+      fees: 0,
+      report: { day: -1, bottled: 0, started: 0, supplied: 0, expenses: 0, bottling: 'off', brewing: 'off', delivery: 'off' }
+    }
   };
 
   public constructor(private readonly orchard: Orchard) {}
@@ -74,6 +107,8 @@ export default class Winery {
       V.location === 'alex_farm' &&
       !V.statFreeze &&
       !V.replayScene &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
       V.combat !== 1 &&
       V.stress < V.stressmax &&
       !window.pcAreArmsBound('both') &&
@@ -85,6 +120,14 @@ export default class Winery {
   /** 发酵只读取绝对时间，反复查看、跨日和读档均不会凭空装瓶。 */
   public get ready(): WineBatch[] {
     return this.state.batches.filter(batch => batch.ready_at <= Time.date.timeStamp);
+  }
+
+  public get skilled(): boolean {
+    return this.state.produced >= terms.skilledProduced && this.state.supplied >= terms.skilledSupplied;
+  }
+
+  public get bottleMinutes(): number {
+    return this.skilled ? terms.skilledBottleMinutes : terms.bottleMinutes;
   }
 
   /** 限额按日历午夜重置，不跟随进园或领货次数。 */
@@ -102,6 +145,8 @@ export default class Winery {
       this.available &&
       this.state.installed &&
       this.state.shop_enabled &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
       this.orchard.core.passage.title === 'Deadwood Orchard Robin Wine' &&
       this.orchard.canSupplyRobin &&
       this.shopStock + terms.shopSupplyQuantity <= terms.shopStockLimit
@@ -115,34 +160,43 @@ export default class Winery {
 
   /** 原料保留量与仍有效的水果订单共用，酿酒不会拿走已经答应的货。 */
   public begin(recipe: WineRecipe): boolean {
+    return this.canOperate && this.prepare(recipe, Time.date.timeStamp, Math.floor(Time.days));
+  }
+
+  private spareFruit(recipe: WineRecipe, day: number): number {
     const data = terms.recipes.find(item => item.id === recipe);
-    if (!data || !this.canOperate || this.state.batches.length >= terms.barrelCapacity) return false;
-    const fruit = V.foodstuff?.[data.fruit];
+    if (!data) return 0;
     const promised = [this.orchard.state.order, this.orchard.state.farm_contract].reduce(
-      (total, order) => total + (order?.status === 'pending' && order.deadline >= Math.floor(Time.days) && order.type === data.fruit ? order.amount : 0),
+      (total, order) => total + (order?.status === 'pending' && order.deadline >= day && order.type === data.fruit ? order.amount : 0),
       0
     );
-    const kept = this.orchard.state.reserve[data.fruit as OrchardFruit] ?? 0;
-    if (!fruit || fruit.amount - kept - promised < terms.fruitPerBatch || !(this.orchard.core.get('Finance')?.canPay(terms.batchCost, 'orchard') ?? V.money >= terms.batchCost)) return false;
-    this.orchard.core.SugarCube.Wikifier.wikifyEval(`<<money -${terms.batchCost} 'orchard'>>`);
+    return Math.max(0, (V.foodstuff?.[data.fruit]?.amount ?? 0) - (this.orchard.state.reserve[data.fruit as OrchardFruit] ?? 0) - promised);
+  }
+
+  private prepare(recipe: WineRecipe, timestamp: number, day: number): boolean {
+    const data = terms.recipes.find(item => item.id === recipe);
+    if (!data || this.state.batches.length >= terms.barrelCapacity || this.spareFruit(recipe, day) < terms.fruitPerBatch) return false;
+    const fruit = V.foodstuff?.[data.fruit];
+    if (!fruit || !this.pay(terms.batchCost)) return false;
     fruit.amount -= terms.fruitPerBatch;
-    this.state.expenses += terms.batchCost;
-    this.state.batches.push({ id: this.state.next_id++, recipe, bottles: terms.bottlesPerBatch, ready_at: Time.date.timeStamp + data.days * 86400 });
+    this.state.batches.push({ id: this.state.next_id++, recipe, bottles: terms.bottlesPerBatch, ready_at: timestamp + data.days * 86400 });
     return true;
   }
 
   /** 只有实际装瓶才计产量，玻璃瓶费用是便士，准备时间留给 Twee 的点击结算。 */
   public bottle(id: number): boolean {
     if (!this.canOperate || !Number.isSafeInteger(id)) return false;
-    const index = this.state.batches.findIndex(batch => batch.id === id && batch.ready_at <= Time.date.timeStamp);
+    return this.fill(id, Time.date.timeStamp);
+  }
+
+  private fill(id: number, timestamp: number): boolean {
+    const index = this.state.batches.findIndex(batch => batch.id === id && batch.ready_at <= timestamp);
     if (index < 0) return false;
     const batch = this.state.batches[index];
     const cost = batch.bottles * terms.bottleCost;
-    if (!(this.orchard.core.get('Finance')?.canPay(cost, 'orchard') ?? V.money >= cost)) return false;
-    this.orchard.core.SugarCube.Wikifier.wikifyEval(`<<money -${cost} 'orchard'>>`);
+    if (!this.pay(cost)) return false;
     this.state.batches.splice(index, 1);
     this.state.stock[batch.recipe] += batch.bottles;
-    this.state.expenses += cost;
     this.state.produced += batch.bottles;
     return true;
   }
@@ -163,21 +217,121 @@ export default class Winery {
   }
 
   public supply(recipe: WineRecipe): boolean {
+    if (!this.canSupply || !this.deliver(recipe)) return false;
+    const day = Math.floor(Time.date.timeStamp / 86400);
+    if (this.state.supply_day !== day) {
+      this.state.supply_day = day;
+      this.orchard.core.SugarCube.Wikifier.wikifyEval('<<npcincr Robin love 1>>');
+    }
+    return true;
+  }
+
+  private deliver(recipe: WineRecipe, fee = 0): boolean {
     const data = terms.recipes.find(item => item.id === recipe);
     const shop = this.orchard.core.get('Robin')?.shop;
-    if (!data || !shop || !this.canSupply || this.state.stock[recipe] - this.state.reserve[recipe] < terms.shopSupplyQuantity) return false;
+    if (!data || !shop || this.shopStock + terms.shopSupplyQuantity > terms.shopStockLimit || this.state.stock[recipe] - this.state.reserve[recipe] < terms.shopSupplyQuantity) return false;
     const income = data.wholesale * terms.shopSupplyQuantity;
     // 罗宾资金为英镑，先实际付款，才转移瓶装库存并结算 PC 的便士收入。
     if (!shop.spend(income / 100)) return false;
     this.state.stock[recipe] -= terms.shopSupplyQuantity;
     this.state.shop_stock[recipe] += terms.shopSupplyQuantity;
     this.state.supplied += terms.shopSupplyQuantity;
-    this.recordSale(recipe, terms.shopSupplyQuantity, 'robin');
-    const day = Math.floor(Time.date.timeStamp / 86400);
-    if (this.state.supply_day !== day) {
-      this.state.supply_day = day;
-      this.orchard.core.SugarCube.Wikifier.wikifyEval('<<npcincr Robin love 1>>');
+    this.recordSale(recipe, terms.shopSupplyQuantity, 'robin', fee);
+    return true;
+  }
+
+  /** 与果园八点采收逐日交错，历史装瓶只取当时已熟的桶，不能把未来收成投进过去。 */
+  public advance(day: number, timestamp = Time.date.timeStamp): void {
+    if (!V.Orchard?.winery || !this.state.installed || !this.state.automation.installed || V.statFreeze || V.replayScene || !Number.isInteger(day)) return;
+    const line = this.state.automation;
+    const today = Math.floor(Time.date.timeStamp / 86400);
+    const shift = day * 86400 + terms.automationHour * 3600;
+    if (day > today || shift > timestamp || shift < line.ready_at || day < line.day) return;
+    if (line.report.day !== day) {
+      line.report = {
+        day,
+        bottled: 0,
+        started: 0,
+        supplied: 0,
+        expenses: 0,
+        bottling: line.bottle ? 'scheduled' : 'off',
+        brewing: line.recipe ? 'scheduled' : 'off',
+        delivery: line.supply ? 'deferred' : 'off'
+      };
     }
+    const report = line.report;
+    const expenses = this.state.expenses;
+    const stopped = !this.available ? 'unavailable' : day === today && (this.orchard.farmInterrupted || V.farm_assault) ? 'suspended' : null;
+    if (line.day < day) {
+      line.day = day;
+      if (stopped) {
+        if (line.bottle) report.bottling = stopped;
+        if (line.recipe) report.brewing = stopped;
+      } else {
+        if (line.bottle) {
+          report.bottling = 'waiting';
+          for (const batch of [...this.state.batches].filter(batch => batch.ready_at <= shift)) {
+            if (!this.fill(batch.id, shift)) {
+              report.bottling = 'funds';
+              break;
+            }
+            report.bottled += batch.bottles;
+            report.bottling = 'bottled';
+          }
+        }
+        if (line.recipe) {
+          report.brewing = 'full';
+          const gameDay = Math.floor(Time.days) - (today - day);
+          while (this.state.batches.length < terms.barrelCapacity) {
+            if (this.spareFruit(line.recipe, gameDay) < terms.fruitPerBatch) {
+              report.brewing = 'fruit';
+              break;
+            }
+            if (!this.prepare(line.recipe, shift, gameDay)) {
+              report.brewing = 'funds';
+              break;
+            }
+            report.started++;
+            report.brewing = 'started';
+          }
+        }
+      }
+    }
+    // 只跑实际当天的配送，不把新酒或今天的店铺资金倒填到已经过去的周结算。
+    if (line.supply && day === today && line.supply_day < day) {
+      const robin = this.orchard.core.get('Robin');
+      if (stopped) report.delivery = stopped;
+      else if (!this.state.shop_enabled || !V.RobinExpansion?.shop || !robin) report.delivery = 'shop';
+      else if (!robin.available || C.npc.Robin?.trauma >= 80 || window.getRobinLocation() !== 'shop' || Time.hour < terms.automationHour || Time.hour >= 21) report.delivery = 'absent';
+      else {
+        line.supply_day = day;
+        report.delivery = 'stock';
+        for (let sent = 0; sent < terms.automationSupplyLimit; sent += terms.shopSupplyQuantity) {
+          if (this.shopStock + terms.shopSupplyQuantity > terms.shopStockLimit) {
+            report.delivery = 'cabinet';
+            break;
+          }
+          const recipe = terms.recipes.find(item => this.state.stock[item.id as WineRecipe] - this.state.reserve[item.id as WineRecipe] >= terms.shopSupplyQuantity);
+          if (!recipe) break;
+          if (!this.deliver(recipe.id as WineRecipe, terms.automationHaulFee)) {
+            report.delivery = 'payment';
+            break;
+          }
+          line.fees += terms.automationHaulFee;
+          report.supplied += terms.shopSupplyQuantity;
+          report.delivery = 'delivered';
+        }
+      }
+    }
+    const spent = this.state.expenses - expenses;
+    line.expenses += spent;
+    report.expenses += spent;
+  }
+
+  private pay(cost: number): boolean {
+    if (!(this.orchard.core.get('Finance')?.canPay(cost, 'orchard') ?? V.money >= cost)) return false;
+    this.orchard.core.SugarCube.Wikifier.wikifyEval(`<<money -${cost} 'orchard'>>`);
+    this.state.expenses += cost;
     return true;
   }
 
@@ -216,11 +370,12 @@ export default class Winery {
   }
 
   /** 销售统计只记 PC 实收，罗宾转售与玩家自己喝掉的酒不重复记为 PC 销售。 */
-  private recordSale(recipe: WineRecipe, amount: number, source: 'wholesale' | 'robin'): void {
+  private recordSale(recipe: WineRecipe, amount: number, source: 'wholesale' | 'robin', fee = 0): void {
     const income = terms.recipes.find(item => item.id === recipe)!.wholesale * amount;
-    this.orchard.core.SugarCube.Wikifier.wikifyEval(`<<money ${income} 'orchard'>>`);
+    this.orchard.core.SugarCube.Wikifier.wikifyEval(`<<money ${income - fee} 'orchard'>>`);
     this.state.income += income;
-    this.state.ledger.push({ day: Math.floor(Time.days), recipe, amount, income, source });
+    this.state.expenses += fee;
+    this.state.ledger.push({ day: Math.floor(Time.days), recipe, amount, income: income - fee, source, ...(fee ? { fee } : {}) });
     if (this.state.ledger.length > terms.ledgerEntries) this.state.ledger.shift();
   }
 }

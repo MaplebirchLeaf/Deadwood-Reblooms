@@ -642,6 +642,7 @@ class Orchard extends Module {
     while (state.day < today) {
       // 先结算这一天的早班，再结算随后的午夜。长时间跳过不能提前采到未来的水果。
       this.workShift(state.day, timestamp);
+      this.winery.advance(state.day, timestamp);
       const midnight = new window.DateTime((state.day + 1) * 86400);
       const season = Time.getSeason(new window.DateTime(midnight).addDays(-1));
       const bloodMoon = Weather.getBloodMoon(midnight);
@@ -671,7 +672,10 @@ class Orchard extends Module {
       }
       state.day++;
     }
-    if (state.day === today) this.workShift(today, timestamp);
+    if (state.day === today) {
+      this.workShift(today, timestamp);
+      this.winery.advance(today, timestamp);
+    }
     // 补算到期前的早班后才判违约，避免一次跳过多天时丢失预留的合约货物。
     if (state.farm_contract?.status === 'pending' && day > state.farm_contract.deadline) {
       state.farm_contract.status = 'failed';

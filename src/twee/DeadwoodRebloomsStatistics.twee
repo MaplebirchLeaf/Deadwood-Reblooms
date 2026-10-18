@@ -178,10 +178,15 @@
       <<lanSwitch "Farm supply contracts fulfilled: " "已履行的农场供货合同：">><span class='teal'><<= $Orchard.contracts_completed ?? 0>></span><br>
       <<lanSwitch "Regular-customer sales: " "熟客成交次数：">><span class='teal'><<= $Orchard.regular_visits ?? 0>></span><br>
       <<if $Orchard.winery?.installed>>
+        <<deadwood-reblooms-progress-check `maplebirch.get('Orchard').winery.skilled` `["Cellar Hand", "酿酒熟手"]` `["Bottle 80 bottles of fruit wine and supply 24 bottles to Robin’s drinks shop. Hand bottling then takes 10 minutes per batch.", "装瓶80瓶果酒，并向罗宾饮品店供应24瓶；此后手工装瓶每批只需10分钟。"]`>>
         <<lanSwitch 'Wine bottled: ' '已装瓶果酒：'>><span class='teal'><<= $Orchard.winery.produced>></span><br>
         <<lanSwitch 'Wine sold wholesale / supplied to Robin: ' '批发／供应罗宾的果酒：'>><span class='teal'><<= $Orchard.winery.sold>> / <<= $Orchard.winery.supplied>></span><br>
         <<lanSwitch 'Wine sales income: ' '累计果酒销售收入：'>><span class='gold'><<= formatMoney($Orchard.winery.income)>></span><br>
-        <<lanSwitch 'Winery equipment, processing and bottle costs: ' '酿酒器具、加工与酒瓶开销：'>><span class='gold'><<= formatMoney($Orchard.winery.expenses)>></span><br>
+        <<lanSwitch 'Winery equipment, processing, bottles and delivery costs: ' '酿酒器具、加工、酒瓶与配送开销：'>><span class='gold'><<= formatMoney($Orchard.winery.expenses)>></span><br>
+        <<if $Orchard.winery.automation?.installed>>
+          <<lanSwitch 'Production line: ' '自动生产线：'>><span class='green'><<lanSwitch 'Installed' '已装设'>></span><br>
+          <<lanSwitch 'Automatic delivery fees: ' '累计自动配送费：'>><span class='gold'><<= formatMoney($Orchard.winery.automation.fees)>></span><br>
+        <</if>>
       <</if>>
       <<if $Orchard.staff?.spent>>
         <<lanSwitch "Trapper recruitment, escort and search spending: " "捕手雇佣、护送与搜寻累计支出：">><span class='gold'><<= formatMoney($Orchard.staff.spent)>></span><br>

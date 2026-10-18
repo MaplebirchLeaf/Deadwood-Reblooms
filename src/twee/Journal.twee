@@ -1443,6 +1443,12 @@
           <li><<lanSwitch "Bottles on Robin's shelf: " '罗宾侧柜存酒：'>><span class='teal'><<= _journal_winery.shopStock>></span> / <<= _journal_winery.terms.shopStockLimit>> · <<lanSwitch 'Weekly sales limit: ' '每周最多售出：'>><<= _journal_winery.terms.shopWeeklyLimit>></li>
         <</if>>
       </ul>
+      <<if _journal_winery.state.automation.installed>>
+        <<set _journal_winePlan to _journal_winery.terms.recipes.find(recipe => recipe.id === _journal_winery.state.automation.recipe)>>
+        <<lanSwitch 'Refill recipe: ' '空桶继续酿：'>>
+        <<if _journal_winePlan>><<lanSwitch _journal_winePlan.name[0] _journal_winePlan.name[1]>><<else>><<lanSwitch 'No new batches' '不再投料'>><</if>><br>
+      <</if>>
+      <<deadwood-orchard-winery-automation-status>>
     <</deadwood-card>><hr>
   <</if>>
 <</widget>>
