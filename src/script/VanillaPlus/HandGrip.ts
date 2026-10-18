@@ -92,16 +92,13 @@ export default function (maplebirch: typeof window.maplebirch) {
     { id: 'hand-grip-right-hide-guide', actionType: 'rightaction', value: 'handguide', cond: () => maplebirch.get('VanillaPlus')!.handGrip.target('right') == null }
   );
 
-  // 原版会在 showfn 隐藏右臂前先求值 srcfn，导致受缚时请求不存在的 right-arm-none.png。
-  // 只为资源预解析提供现有的 idle 图片，arm_right 仍为 none，因此该图层不会实际显示。
+  // 隐藏右臂时跳过资源预解析，其余情况保留游戏原生的体型映射与选图。
   maplebirch.char.use(
     {
       rightarm: {
-        srcfn: (options: CanvasModelOptionsData) => {
-          const arm = options.arm_right === 'none' ? 'idle' : options.arm_right;
-          if (options.mannequin) return `img/body/mannequin/right-arm-${arm}.png`;
-          if (arm === 'idle') return `img/body/right-arm-idle-${options.body_type}.png`;
-          return `img/body/right-arm-${arm}.png`;
+        srcfn(options: CanvasModelOptionsData) {
+          if (options.arm_right === 'none') return '';
+          return Renderer.CanvasModels.main.layers.rightarm.srcfn!.call(this, options);
         }
       }
     },

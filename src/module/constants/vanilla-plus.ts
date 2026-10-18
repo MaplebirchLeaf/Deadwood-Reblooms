@@ -101,10 +101,8 @@ export interface VanillaPlusState {
   };
   /** 双人插入遭遇战的进行状态，不在遭遇战中时为 null。 */
   npcDoublePenetration: NPCDoublePenetrationData | null;
-  /** 意志相关的一次性事件与痛苦护盾。 */
+  /** 意志特质的痛苦护盾。 */
   willpower: {
-    /** 亡魂事件已完成。 */
-    wraith: boolean;
     /** 痛苦护盾的当前状态。 */
     painShield: {
       /** 护盾剩余量，归零后失效。 */
@@ -184,7 +182,6 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
   },
   npcDoublePenetration: null,
   willpower: {
-    wraith: false,
     painShield: {
       remaining: 0,
       ready: true

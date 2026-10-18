@@ -45,27 +45,9 @@ export default function (maplebirch: typeof window.maplebirch) {
     ])
   );
 
-  // 记录原版抗拒成功点，并扩展意志上限与耳液抵抗。
+  // 扩展意志上限、疼痛承伤与耳液抵抗，保留原版结算。
   maplebirch.tool.inject({
-    locationPassage: {
-      ...slimeDefyInjections,
-      'Lake Ruin Prison Possession Resist': [
-        // 在湖底监狱附身抗拒的成功判断入口记录 wraith 结果，作为意志突破条件。
-        {
-          src: '<<if $willpowerSuccess>>',
-          applyafter: '<<set $VanillaPlus.willpower.wraith to true>>',
-          expected: 1
-        }
-      ],
-      'Lake Ruin Prison Masturbation Resist': [
-        // 在湖底监狱自慰型附身抗拒的成功判断入口同样记录 wraith 结果。
-        {
-          src: '<<if $willpowerSuccess>>',
-          applyafter: '<<set $VanillaPlus.willpower.wraith to true>>',
-          expected: 1
-        }
-      ]
-    },
+    locationPassage: slimeDefyInjections,
     widgetPassage: {
       Widgets: [
         // 承伤层耗尽后继续执行原版意志检定、文本与失能结算。

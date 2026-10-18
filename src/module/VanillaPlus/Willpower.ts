@@ -18,7 +18,6 @@ class Willpower {
     return [
       V.willpower >= this.vanillaPlus.normalCeiling('willpower'),
       parasites.left_ear?.name === 'slime' && parasites.right_ear?.name === 'slime',
-      Boolean(V.VanillaPlus?.willpower?.wraith),
       V.feats?.currentSave?.Schism != null,
       V.feats?.currentSave?.['Defy the Night'] != null,
       (V.wraithPrison?.search ?? 0) >= 4
