@@ -81,15 +81,6 @@
     <span class='green'><<lanSwitch 'Your membership is active.' '你的会员卡仍然有效。'>></span>
     <<lanSwitch 'Days remaining:' '剩余天数：'>> <span class='gold'><<= Math.ceil(($LifeSimulation.gym.expires_at - Time.date.timeStamp) / 86400)>></span><br>
     <span class='blue'><i><<lanSwitch 'You can upgrade to lifetime now, or choose another term after this card expires.' '现在可以升级终身会员。其他期限仍要等这张卡到期后再选。'>></i></span><br>
-    <<lanSwitch 'Lifetime' '终身会员'>> · <span class='gold'>£2,000</span><br>
-    <<if $money gte 200000 or (maplebirch.get('Finance') and maplebirch.get("Finance").canPay(200000, 'shopping'))>>
-      <<shopicon 'register'>><<lanLink ['Buy a lifetime membership', '购买终身会员卡']>>
-        <<money -200000 'shopping'>>
-        <<run maplebirch.get("LifeSimulation").activate('lifetime')>>
-        <<updatesidebarmoney>>
-        <<run Dynamic.render('deadwood-gym-membership')>>
-      <</lanLink>><br>
-    <</if>>
   <<else>>
     <<if $LifeSimulation.gym.ticket_day is Time.days>>
       <span class='green'><<lanSwitch 'Your single-visit ticket remains valid until you leave today.' '今天离开前，你的单次入场券仍然有效。'>></span><br><br>
@@ -112,6 +103,8 @@
         <<run Dynamic.render('deadwood-gym-membership')>>
       <</lanLink>><br>
     <</if>><br>
+  <</if>>
+  <<if $LifeSimulation.gym.membership isnot 'lifetime'>>
     <<lanSwitch 'Lifetime' '终身会员'>> · <span class='gold'>£2,000</span><br>
     <<if $money gte 200000 or (maplebirch.get('Finance') and maplebirch.get("Finance").canPay(200000, 'shopping'))>>
       <<shopicon 'register'>><<lanLink ['Buy a lifetime membership', '购买终身会员卡']>>

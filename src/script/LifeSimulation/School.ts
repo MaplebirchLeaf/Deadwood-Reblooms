@@ -91,6 +91,13 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     expected: 1
   };
 
+  // 只为学生保留原版留堂要求，中庭和走廊共用同一条规则。
+  const studentDetention = {
+    srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
+    applyafter: ' and $LifeSimulation.school.role is "student"',
+    expected: 2
+  };
+
   maplebirch.tool.inject({
     locationPassage: {
       'Science Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoolstate is "morning">>', applybefore: '<</if>>\n', expected: 1 }],
@@ -145,12 +152,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       'School Front Courtyard': [
         { ...campusNavigationDress },
         { ...campusHidingDress },
-        // 在原版留堂条件上追加学生身份检查，其余限制照常保留。
-        {
-          srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
-          applyafter: ' and $LifeSimulation.school.role is "student"',
-          expected: 2
-        },
+        { ...studentDetention },
         // 仅接管通往 Hallways 的原版一分钟入口，保留中庭其余事件与离校选项。
         {
           srcmatch: /<<entranceicon>><<link \[\[[^\]\n]+\|Hallways]]>><<pass 1>><<\/link>>/,
@@ -162,12 +164,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       Hallways: [
         { ...campusNavigationDress },
         { ...campusHidingDress },
-        // 在原版留堂条件上追加学生身份检查，其余限制照常保留。
-        {
-          srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
-          applyafter: ' and $LifeSimulation.school.role is "student"',
-          expected: 2
-        },
+        { ...studentDetention },
         // 储物柜前的链接数随留堂和特殊事件变化，按原版储物柜定位公告栏。
         {
           srcmatch: /<<lockericon>><<link \[\[[^\]\n]+\|School Lockers]]>/,

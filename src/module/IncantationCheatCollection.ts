@@ -20,7 +20,7 @@ class IncantationCheatCollection {
   }
 
   private escapeCode(code: string): string {
-    return code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\$/g, '&#36;').replace(/\\\$/g, '&#36;');
+    return code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\$/g, '&#36;');
   }
 
   private async refreshCache(): Promise<void> {
