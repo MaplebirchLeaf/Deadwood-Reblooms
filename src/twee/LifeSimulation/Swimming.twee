@@ -1,14 +1,17 @@
 :: Deadwood Reblooms Swimming Lesson Widgets [widget]
 
 <<widget 'deadwood-swimming-lesson-check'>>
-  <<set _swimmingLessonSafe to Boolean(maplebirch.get('LifeSimulation'))
-    and Time.schoolDay and Time.hour is 14 and $schoolstate is 'fifth'
-    and $poolroomstate is 'own' and $location is 'pool'
+  <<set _swimmingPoolSafe to Boolean(maplebirch.get('LifeSimulation')) and $location is 'pool'
     and !$combat and !$statFreeze and !$replayScene and !$possessed
     and !$nextPassage and !$nextPassageCheck and !$eventforced
-    and $stress lt $stressmax and !isPregnancyEnding()
+    and $stress lt $stressmax and !isPregnancyEnding()>>
+  <<set _swimmingLessonSafe to _swimmingPoolSafe
+    and Time.schoolDay and Time.hour is 14 and $schoolstate is 'fifth' and $poolroomstate is 'own'
     and !($swimnudecounter gte 10 and $swimall isnot 1 and !maplebirch.get('LifeSimulation').school.allowsNudity)>>
   <<set _swimmingLessonReady to _swimmingLessonSafe and Time.minute lt 59 and $phase is 0>>
+  <<set _swimmingPrivateReady to _swimmingPoolSafe and Time.schoolDay
+    and ((Time.hour is 14 and Time.minute gte 45) or Time.hour is 15)
+    and ($daily.masonPrivateSwimming or $daily.masonPrivateSwimmingRequested)>>
 <</widget>>
 
 <!-- 无固定目标的链接先重验课堂；同一个面板的重复点击不排入多次跳转。 -->
@@ -34,10 +37,10 @@
 <</widget>>
 
 <<widget 'deadwood-school-pool-private-link'>>
-  <<if Time.schoolDay and Time.hour is 14 and (Time.minute gte 45 or $phase is 1)
-    and $location is 'pool'
-    and (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15)
-    and !$daily.masonPrivateSwimming and !$combat and !$statFreeze and !$replayScene>>
+  <<deadwood-swimming-lesson-check>>
+  <<if _swimmingPoolSafe and Time.schoolDay and ((Time.hour is 14 and Time.minute gte 45) or (Time.hour is 15 and Time.minute lte 10))
+    and (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15 or $daily.masonPrivateSwimmingRequested)
+    and !$daily.masonPrivateSwimming>>
     <<socialiseicon 'ask'>><<lanLink `['Stay behind for private coaching with Mason', '留下来接受梅森的课后单独辅导']` 'Deadwood Reblooms Swimming Private'>><<set $daily.masonPrivateSwimming to true>><</lanLink>><br>
   <</if>>
 <</widget>>
@@ -59,6 +62,8 @@
      课终按 Focus 的互斥更衣分支，避免 exposed 与 swimall 同时成立时重复输出入口。 -->
 <<widget 'deadwood-swimming-lesson-effects'>>
   <<set _swimmingPractice to _args[0], _swimmingPracticeSource to $passage>>
+  <<deadwood-swimming-lesson-check>>
+  <<if !_swimmingLessonReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
   <<advancelesson>>
   <<stress _lesson_progress>><<tiredness _lesson_progress>>
   <<deadwood-swimming-lesson-check>>
@@ -74,9 +79,6 @@
   <<if $phase is 1>>
     <<set $phase to 0>>
     <<lanSwitch 'The bell rings. Mason calls the class out of the water and directs everyone towards the changing rooms.' '下课铃响了。梅森招呼全班上岸，让大家前往更衣室。'>><br><br>
-    <<if (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15) and !$daily.masonPrivateSwimming>>
-      <<socialiseicon 'ask'>><<lanLink `['Stay behind for private coaching with Mason', '留下来接受梅森的课后单独辅导']` 'Deadwood Reblooms Swimming Private'>><<set $daily.masonPrivateSwimming to true>><</lanLink>><br><br>
-    <</if>>
     <<if $exposed lte 0>><<destinationpoolchangingroom>><<else>><<destinationpoolchangingroom 'towels'>><</if>>
   <<else>>
     <<set _mod to $exposed gte 1 ? 1 : 0.2>>
@@ -130,7 +132,7 @@
   <<swimmingicon>><<deadwood-swimming-lesson-choice `['Dive underwater to stealthily tease Mason', '潜入水下悄悄对梅森恶作剧']` 'Deadwood Reblooms Swimming Underwater'>><<promiscuous2>><<gglust>><br>
 <</if>>
 
-<<if (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15) and !$daily.masonPrivateSwimming>>
+<<if (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15) and !$daily.masonPrivateSwimming and !$daily.masonPrivateSwimmingRequested>>
   <<socialiseicon 'ask'>><<deadwood-swimming-lesson-choice `['Ask Mason to stay behind after class for private coaching', '请梅森在下课后留下来单独辅导你']` 'Deadwood Reblooms Swimming Private Request'>><<glove>><<glust>><br>
 <</if>>
 <br>
@@ -284,6 +286,8 @@
 
 :: Deadwood Reblooms Swimming HandsOn Focus
 <<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -299,6 +303,8 @@
 
 :: Deadwood Reblooms Swimming HandsOn Arch
 <<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -318,6 +324,8 @@
 
 :: Deadwood Reblooms Swimming HandsOn Touch
 <<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -379,6 +387,8 @@
 
 :: Deadwood Reblooms Swimming Flaunt Figure
 <<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -394,6 +404,8 @@
 
 :: Deadwood Reblooms Swimming Flaunt Stroke
 <<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -413,6 +425,8 @@
 
 :: Deadwood Reblooms Swimming Flaunt Tease
 <<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -454,6 +468,8 @@
 
 :: Deadwood Reblooms Swimming Underwater Thighs
 <<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -473,6 +489,8 @@
 
 :: Deadwood Reblooms Swimming Underwater Bulge
 <<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -492,6 +510,8 @@
 
 :: Deadwood Reblooms Swimming Private Request
 <<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingLessonReady or $daily.masonPrivateSwimmingRequested or $daily.masonPrivateSwimming>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -503,11 +523,13 @@
     <br><br>
     梅森瞪大眼睛，有些局促地环顾着热闹的泳池，随后俯下身低声道：“下、下课后？就我们两个人？我……好吧，如果你真的那么想把泳姿练好，等大家都走了，我可以多留一会儿。”
 <</language>><br><br>
-<<set $daily.masonPrivateSwimming to true>>
+<<set $daily.masonPrivateSwimmingRequested to true>>
 <<npcincr Mason love 1>><<npcincr Mason lust 2>><<deadwood-swimming-lesson-effects 'mason'>>
 
 :: Deadwood Reblooms Swimming Private
-<<effects>>
+<<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingPrivateReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<set $location to 'pool'>><<set $outside to 0>>
 <<language>>
@@ -543,9 +565,14 @@
 <<if $exposed lte 0>><<destinationpoolchangingroom>><<else>><<destinationpoolchangingroom 'towels'>><</if>>
 
 :: Deadwood Reblooms Swimming Private Talk
-<<effects>>
+<<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingPrivateReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
+<<set _swimmingPrivateSource to $passage, _swimmingPrivateDay to Time.days>>
 <<pass 20>>
+<<schooleffects>><<deadwood-swimming-lesson-check>>
+<<if !_swimmingPoolSafe or $passage isnot _swimmingPrivateSource or Time.days isnot _swimmingPrivateDay>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<language>>
   <<option 'EN'>>
     Mason slides smoothly into the pool beside you. Without the crowd of students, <<he>> is gentle, attentive, and entirely focused on you.
@@ -564,9 +591,14 @@
 <<if $exposed lte 0>><<destinationpoolchangingroom>><<else>><<destinationpoolchangingroom 'towels'>><</if>>
 
 :: Deadwood Reblooms Swimming Private Kiss
-<<effects>>
+<<schooleffects>><<effects>>
+<<deadwood-swimming-lesson-check>>
+<<if !_swimmingPrivateReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
+<<set _swimmingPrivateSource to $passage, _swimmingPrivateDay to Time.days>>
 <<pass 25>>
+<<schooleffects>><<deadwood-swimming-lesson-check>>
+<<if !_swimmingPoolSafe or $passage isnot _swimmingPrivateSource or Time.days isnot _swimmingPrivateDay>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<language>>
   <<option 'EN'>>
     You swim close to the poolside ladder where Mason is standing and reach up, wrapping your wet arms around <<his>> neck and pulling <<him>> down into the buoyant water.
@@ -591,6 +623,12 @@
 
 :: Deadwood Reblooms Swimming Private Sex
 <<effects>>
+<<if $sexstart is 1>>
+  <<schooleffects>><<deadwood-swimming-lesson-check>>
+  <<if !_swimmingPrivateReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
+<<elseif $combat isnot 1 or $enemytype isnot 'man' or !$NPCList.some(npc => npc.fullDescription === 'Mason')>>
+  <<deadwood-swimming-lesson-return>><<exit>>
+<</if>>
 <<if $sexstart is 1>>
   <<set $sexstart to 0>>
   <<clearnpc>><<npc Mason>><<person1>>
@@ -621,6 +659,11 @@
 
 :: Deadwood Reblooms Swimming Private Sex Finish
 <<effects>><<person1>>
+<<if $combat isnot 1 or $enemytype isnot 'man' or $location isnot 'pool'
+  or !$NPCList.some(npc => npc.fullDescription === 'Mason')
+  or $nextPassage or $nextPassageCheck or $possessed or $replayScene or $statFreeze>>
+  <<deadwood-swimming-lesson-return>><<exit>>
+<</if>>
 <<if $enemyarousal gte $enemyarousalmax>>
   <<ejaculation>><<npcincr Mason lust -20>>
 <</if>>
@@ -645,5 +688,8 @@
 <</if>>
 <br><br>
 <<clotheson>><<endcombat>>
+<<set _swimmingPrivateSource to $passage, _swimmingPrivateDay to Time.days>>
 <<pass 30>>
+<<schooleffects>><<deadwood-swimming-lesson-check>>
+<<if !_swimmingPoolSafe or $passage isnot _swimmingPrivateSource or Time.days isnot _swimmingPrivateDay>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<if $exposed lte 0>><<destinationpoolchangingroom>><<else>><<destinationpoolchangingroom 'towels'>><</if>>
