@@ -6,9 +6,9 @@ export default function Tsukihan(maplebirch: typeof window.maplebirch): void {
   maplebirch.npc.add(
     {
       nam: 'Tsukihan',
-      adult: 1,
-      teen: 0,
-      age: 24,
+      adult: 0,
+      teen: 1,
+      age: 19,
       title: 'shrine attendant',
       description: 'shrine attendant',
       hairColour: 'black',

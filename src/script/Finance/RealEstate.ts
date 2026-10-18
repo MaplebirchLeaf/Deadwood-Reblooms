@@ -76,7 +76,7 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
           applybefore:
             '<<elseif _robin_location is "sleep" and maplebirch.get("Finance").realEstate.residenceOf("Robin")>>\n' +
             '\t<<lanSwitch "Robin\'s room is empty. A note says Robin has gone home to you." "罗宾的房间空着。门上的纸条写着，罗宾今晚回你们的住处。">><br><br>\n' +
-            '\t<<main_hall_icon>><<link [[Main hall (0:01)|Orphanage]]>><<pass 1>><</link>><br>\n',
+            '\t<<main_hall_icon>><<lanLink ["Main hall (0:01)", "大厅 (0:01)"] "Orphanage">><<pass 1>><</lanLink>><br>\n',
           expected: 1
         }
       ],
@@ -86,7 +86,7 @@ export default function RealEstate(maplebirch: typeof window.maplebirch): void {
           applybefore:
             '<<elseif maplebirch.get("Finance").realEstate.residenceOf("Whitney")>>\n' +
             '\t<<lanSwitch "Whitney has moved in with you. The flat is quiet behind the door." "惠特尼已经搬去与你同住。房门后静悄悄的。">><br><br>\n' +
-            '\t<<getouticon>><<link [[Leave (0:02)|Barb Street]]>><<pass 2>><</link>><br>\n',
+            '\t<<getouticon>><<lanLink ["Leave (0:02)", "离开 (0:02)"] "Barb Street">><<pass 2>><</lanLink>><br>\n',
           expected: 1
         }
       ]

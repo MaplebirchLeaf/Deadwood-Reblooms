@@ -4,7 +4,6 @@ export default function (maplebirch: typeof window.maplebirch) {
   const transformation = maplebirch.char.transformation as typeof maplebirch.char.transformation & { readonly coexistConditions: Array<() => boolean> };
   transformation.coexistConditions.push(() => maplebirch.get('VanillaPlus')?.hasTrait('deviancy') === true);
 
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-deviancy-conduct-link', passage: 'Gwylan Ritual Select' });
   // 诡异镜的“放逐”选项可能占据首位，入口始终紧邻原版“观察”选项。
   maplebirch.tool.addTo(
     'CustomLinkZone',
@@ -33,14 +32,6 @@ export default function (maplebirch: typeof window.maplebirch) {
       ]
     },
     widgetPassage: {
-      'Gwylan Ritual Sex Widgets': [
-        // 在原版清除 $sexRitual 前提交仪式结果，避免状态被 unset 后无法判断过程。
-        {
-          src: '<<unset $sexRitual>>',
-          applybefore: '<<run maplebirch.get("VanillaPlus").deviancy.finish($sexRitual)>>',
-          expected: 1
-        }
-      ],
       'Gwylan Hypnosis Widgets': [
         // “超越禁忌”只保证格威岚意志检定成功，需求计时与错过惩罚仍完全由原版处理。
         {

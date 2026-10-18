@@ -37,24 +37,6 @@ class Deviancy {
     return V.VanillaPlus.traits.deviancy && Time.hour === 3 && V.settings.tentaclesEnabled && (V.hallucinations >= 2 || V.daily?.mirrorTentacles === 1);
   }
 
-  public get canConduct(): boolean {
-    return (
-      !V.VanillaPlus.lock.deviancy &&
-      !V.VanillaPlus.deviancy.conducted &&
-      V.deviancy >= this.vanillaPlus.normalCeiling('deviancy') &&
-      V.feats?.currentSave?.Wildsong != null &&
-      V.gwylan.purged >= 20 &&
-      V.dateCount.GwylanSex >= 3 &&
-      V.dateCount.GwylanBeast >= 3
-    );
-  }
-
-  public finish(ritual: { purge?: number; sealed?: boolean } | undefined): void {
-    if (!V.VanillaPlus.deviancy.conducting) return;
-    V.VanillaPlus.deviancy.conducting = false;
-    if (ritual?.sealed && (ritual.purge ?? 0) >= 9) V.VanillaPlus.deviancy.conducted = true;
-  }
-
   public get requirements(): boolean[] {
     return [V.deviancy >= this.vanillaPlus.normalCeiling('deviancy'), V.feats?.currentSave?.Wildsong != null];
   }

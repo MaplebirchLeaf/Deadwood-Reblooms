@@ -20,8 +20,6 @@ export interface VanillaPlusState {
   lock: Record<VanillaPlusAttribute, boolean>;
   /** 各属性特质是否已解锁，incorrigible 需六项属性全部满值后才置位。 */
   traits: Record<VanillaPlusTrait, boolean>;
-  /** 美貌相关的一次性进度。 */
-  beauty: Record<string, never>;
   /** 神圣转化加成与祈祷室的异常接触。 */
   divineTransformations: {
     /** 转化赋予的额外美貌上限加成，参与 normalCeiling 计算。 */
@@ -53,10 +51,6 @@ export interface VanillaPlusState {
   };
   /** 异种癖相关进度与镜子出口坐标。 */
   deviancy: {
-    /** 仪式正在进行中，读档后据此恢复流程。 */
-    conducting: boolean;
-    /** 仪式已完成，上限已解锁。 */
-    conducted: boolean;
     /** 五级突破事件已完成。 */
     levelFive: number;
     /** 本次爬镜的出发点类型，决定进入触手平原后返回哪里。 */
@@ -137,7 +131,6 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
     promiscuity: false,
     incorrigible: false
   },
-  beauty: {},
   divineTransformations: {
     beautyBonus: 0,
     expungeUsed: false,
@@ -155,8 +148,6 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
     levelFive: 0
   },
   deviancy: {
-    conducting: false,
-    conducted: false,
     levelFive: 0,
     mirror: '',
     mirror_day: -1,

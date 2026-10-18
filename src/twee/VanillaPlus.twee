@@ -161,22 +161,6 @@
   <</if>>
 <</widget>>
 
-<!-- 异种癖仪式入口：满足 Gwylan 与仪式条件时显示主持选项。 -->
-<<widget 'deadwood-reblooms-deviancy-conduct-link'>>
-  <<set $_canConductDeviancy to maplebirch.get("VanillaPlus").deviancy.canConduct and $phase isnot 'no' and !_ritualFailSafe>>
-  <<set $_canConductDeviancy to $_canConductDeviancy and !_gwylanStatus.includes('cautious')>>
-  <<set $_canConductDeviancy to $_canConductDeviancy and $settings.tentaclesEnabled and $settings.hypnosisEnabled>>
-  <<if $_canConductDeviancy and !playerChastity()>>
-    <<language>>
-      <<option 'EN'>>
-        <<ind>><<link [[Offer to lead the next cleansing|Deadwood Reblooms Deviancy Conduct]]>><</link>> <<note 'Deviancy' 'red'>>
-      <<option 'CN'>>
-        <<ind>><<link [[提出主持下一场净化仪式|Deadwood Reblooms Deviancy Conduct]]>><</link>> <<note '异种癖' 'red'>>
-    <</language>>
-    <br>
-  <</if>>
-<</widget>>
-
 <!-- 露出癖战斗效果：达到特质后调整控制、压力与欲望。 -->
 <<widget 'deadwood-reblooms-exhibitionism-trait-effects'>>
   <<if $VanillaPlus.traits.exhibitionism and !$desperateaction and _args[0] isnot 6>>
@@ -220,21 +204,21 @@
       <<if _deadwoodPublicFullyNaked>>
         Domus Street is busy beyond the door. One step outside, and everyone passing by will see your naked body.
         <br><br>
-        <<dooricon 'orphanage'>><<link [[Walk out with nothing on and let the whole street see you (0:01)|Domus Street]]>><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</link>>
+        <<dooricon 'orphanage'>><<lanLink "Walk out with nothing on and let the whole street see you (0:01)" "Domus Street">><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</lanLink>>
       <<else>>
         People are passing just outside. What you are wearing cannot hide your exposed body from their eyes.
         <br><br>
-        <<dooricon 'orphanage'>><<link [[Walk onto the street exposed and let passers-by stare (0:01)|Domus Street]]>><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</link>>
+        <<dooricon 'orphanage'>><<lanLink "Walk onto the street exposed and let passers-by stare (0:01)" "Domus Street">><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</lanLink>>
       <</if>>
     <<option 'CN'>>
       <<if _deadwoodPublicFullyNaked>>
         门外就是人来人往的宅邸街。只要跨出这道门，过路人就会把你赤裸的身体看个清楚。
         <br><br>
-        <<dooricon 'orphanage'>><<link [[故意一丝不挂地走上街，任所有人看个清楚 (0:01)|Domus Street]]>><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</link>>
+        <<dooricon 'orphanage'>><<lanLink "故意一丝不挂地走上街，任所有人看个清楚 (0:01)" "Domus Street">><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</lanLink>>
       <<else>>
         门外不时有人经过。身上的衣物遮不住暴露的身体。只要走出去，就得迎上那些目光。
         <br><br>
-        <<dooricon 'orphanage'>><<link [[带着暴露的身体走上街，任路人打量 (0:01)|Domus Street]]>><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</link>>
+        <<dooricon 'orphanage'>><<lanLink "带着暴露的身体走上街，任路人打量 (0:01)" "Domus Street">><<pass 1>><<exhibitionism6>><<fameexhibitionism 5>><</lanLink>>
       <</if>>
   <</language>>
   <br>
@@ -398,16 +382,9 @@
           and maplebirch.get("Finance").realEstate.owns(_property.id)
           and !maplebirch.get("Finance").realEstate.managementFor(_property.id).rented>>
           <<if $tentnorth is _mirrorCoordinates.north and $tenteast is _mirrorCoordinates.east>>
-            <<language>>
-              <<option 'EN'>>
-                <<mirroricon 'blood'>><<link _property.mirror_label.EN 'Deadwood Reblooms Deviancy Mirror Property'>>
-                  <<set $VanillaPlus.deviancy.mirror_property to _property.id>>
-                <</link>>
-              <<option 'CN'>>
-                <<mirroricon 'blood'>><<link _property.mirror_label.CN 'Deadwood Reblooms Deviancy Mirror Property'>>
-                  <<set $VanillaPlus.deviancy.mirror_property to _property.id>>
-                <</link>>
-            <</language>>
+            <<mirroricon 'blood'>><<lanLink [_property.mirror_label.EN, _property.mirror_label.CN] 'Deadwood Reblooms Deviancy Mirror Property'>>
+              <<set $VanillaPlus.deviancy.mirror_property to _property.id>>
+            <</lanLink>>
             <br>
           <</if>>
         <</if>>
@@ -438,12 +415,7 @@
       and $tentnorth is _mirrorLocations.sirris.north
       and $tenteast is _mirrorLocations.sirris.east
       and maplebirch.get("VanillaPlus").deviancy.discovered('sirris')>>
-      <<language>>
-        <<option 'EN'>>
-          <<mirroricon 'blood'>><<link "Climb through Sydney's bedroom mirror" 'Deadwood Reblooms Deviancy Mirror Sirris'>><</link>>
-        <<option 'CN'>>
-          <<mirroricon 'blood'>><<link '从悉尼卧室的镜子爬出去' 'Deadwood Reblooms Deviancy Mirror Sirris'>><</link>>
-      <</language>><br>
+      <<mirroricon 'blood'>><<lanLink ["Climb through Sydney's bedroom mirror", '从悉尼卧室的镜子爬出去'] 'Deadwood Reblooms Deviancy Mirror Sirris'>><</lanLink>><br>
     <</if>>
     <<if _mirrorLocations.kylar and _kylarMirrorReady
       and $tentnorth is _mirrorLocations.kylar.north
@@ -472,18 +444,13 @@
   <br><br>
 <</widget>>
 
-<!-- 异种癖突破结算：完成仪式后解锁属性上限。 -->
+<!-- 异种癖突破结算：解锁属性上限。 -->
 <<widget 'deadwood-reblooms-deviancy-unlock'>>
   <<set $VanillaPlus.lock.deviancy to true>>
   <<language>>
     <<option 'EN'>>
-      The last of the poison writhes through your body, following the rhythm you set. The seal closes around it. Gwylan mixed the
-      reagents, but the forest moved to your command, through the body you offered it.
-    <br><br>
     <span class="gold">Your deviancy has broken through its former limits.</span>
     <<option 'CN'>>
-      最后的毒素沿着你定下的节奏，在体内扭动前行。封印随之合拢。格威岚调配了药剂，森林却听从了你的号令，穿行于你主动献上的身体。
-    <br><br>
     <span class="gold">你的异种癖突破了原本的极限。</span>
   <</language>>
   <br><br>
@@ -494,12 +461,12 @@
   <<set $VanillaPlus.lock.exhibitionism to true>>
   <<language>>
     <<option 'EN'>>
-      You remember pool water against your bare skin, the ballroom lights upon your naked dance, and strangers staring in the crowded
+      You remember pool water against your bare skin and strangers staring in the crowded
       high street. The memories send a pleasant heat through you. Shame had every chance to stop you. You showed them more instead.
     <br><br>
     <span class="gold">Your exhibitionism has broken through its former limits.</span>
     <<option 'CN'>>
-      你想起池水抚过赤裸皮肤的触感、舞厅灯光下的裸体舞姿，以及商业街上陌生人投来的目光。回忆令热意在体内升起。羞耻本可以阻止你，
+      你想起池水抚过赤裸皮肤的触感，以及商业街上陌生人投来的目光。回忆令热意在体内升起。羞耻本可以阻止你，
       你却选择向他们展示更多。
     <br><br>
     <span class="gold">你的暴露癖突破了原本的极限。</span>
@@ -528,12 +495,7 @@
 <!-- 意志突破入口：条件满足时允许再次潜向符文。 -->
 <<widget 'deadwood-reblooms-willpower-unlock'>>
   <<if maplebirch.get("VanillaPlus").willpower.unlock>>
-    <<language>>
-      <<option 'EN'>>
-        <<swimicon 'down'>><<link [[Dive towards the rune again|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
-      <<option 'CN'>>
-        <<swimicon 'down'>><<link [[再次潜向符文|Deadwood Reblooms Willpower Unlock 1]]>><<wraith_pass 2>><</link>>
-    <</language>>
+    <<swimicon 'down'>><<lanLink ["Dive towards the rune again", "再次潜向符文"] "Deadwood Reblooms Willpower Unlock 1">><<wraith_pass 2>><</lanLink>>
     <br>
   <</if>>
 <</widget>>
