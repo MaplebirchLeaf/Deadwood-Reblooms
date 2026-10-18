@@ -14,8 +14,10 @@ export default function (maplebirch: typeof window.maplebirch) {
   const npc_prototype = maplebirch.npc.NamedNPC.prototype;
   const describe = npc_prototype.bodyPartdescription;
   npc_prototype.bodyPartdescription = function () {
-    const extended = this.penissize === 5 && (this.penis === 'clothed' || this.penisdesc === 'penis' || (!this.penisdesc && this.penis !== 'none'));
+    const generated = Object.entries(this.descCache ?? {}).some(([key, value]) => key.startsWith('deadwood_penis_') && value === this.penisdesc);
+    if (generated) this.penisdesc = 'penis';
     describe.call(this);
+    const extended = this.penissize === 5 && Object.entries(this.descCache).some(([key, value]) => key.startsWith('penis_') && value === this.penisdesc);
     if (extended) {
       const language = maplebirch.services.translator.language === 'CN' ? 'CN' : 'EN';
       this.penisdesc = this.descCache[`deadwood_penis_${language}_5`] ||= (
