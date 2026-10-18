@@ -3,7 +3,7 @@
 import type Transport from '../Transport';
 
 export interface RoadsideEvent {
-  kind: 'breakdown' | 'bags' | 'roadblock' | 'traffic' | 'puncture' | 'load' | 'molestation';
+  kind: 'breakdown' | 'bags' | 'roadblock' | 'traffic' | 'puncture' | 'load' | 'molestation' | 'police' | 'skid';
   resolved: boolean;
   action?: 'help' | 'tools';
   point?: string;
@@ -11,6 +11,10 @@ export interface RoadsideEvent {
   roll?: number;
   combat?: 'pending' | 'active' | 'finished';
   caught?: boolean;
+  /** 出发时的醉意，不随途中经过时间或界面重绘重新判定。 */
+  drunk?: number;
+  checked?: boolean;
+  handover?: boolean;
   outcome?:
     | 'wait'
     | 'escape'
@@ -28,22 +32,46 @@ export interface RoadsideEvent {
     | 'warned'
     | 'dismissed'
     | 'repelled'
-    | 'assaulted';
+    | 'assaulted'
+    | 'cleared'
+    | 'fined'
+    | 'evaded'
+    | 'arrested';
 }
 
-export type RoadAction = 'wait' | 'escape' | 'observe' | 'force' | 'pay' | 'yield' | 'fight' | 'warn' | 'eject' | 'fix' | 'limp' | 'walk';
+export type RoadAction = 'wait' | 'escape' | 'observe' | 'force' | 'pay' | 'yield' | 'fight' | 'warn' | 'eject' | 'fix' | 'limp' | 'walk' | 'check' | 'fine' | 'surrender';
 
 export default class TravelEvents {
   public constructor(private readonly transport: Transport) {}
 
   public roll(destination: string, minutes: number, commute: boolean): RoadsideEvent | undefined {
-    if (commute || minutes < 5 || this.transport.state.event_day === Math.floor(Time.days)) return;
+    if (commute) return;
     const from = this.transport.point!;
+    if (destination.startsWith('home:')) {
+      const property = this.transport.core.get('Finance')?.realEstate.properties.find(property => property.id === destination.slice(5));
+      if (!property) return;
+      destination = property.street === 'Office Lobby' ? 'high' : (this.transport.catalog.point(property.street) ?? destination);
+    }
     const country = [from, destination].some(point => point === 'farmland' || /^farmroad[1-6]$/.test(point));
     const town = this.transport.catalog.routes.some(route => route.id === destination && route.terrain === 'road');
     if (!town && !country) return;
     if ([from, destination].some(point => /^(?:forest|moor):/.test(point))) return;
     const rand = this.transport.core.get('DeadwoodReblooms')!.rand;
+    const drunk = Math.max(0, V.drunk ?? 0);
+    const motor = this.transport.model?.kind === 'motorcycle' || this.transport.model?.kind === 'motor_vehicle';
+    const position = (point: string) => (point === 'farmland' ? 160 : (this.transport.catalog.roads.find(road => road.id === point)?.position ?? 0));
+    const middle = (position(from) + position(destination)) / 2;
+    const point = country ? [...this.transport.catalog.roads].sort((a, b) => Math.abs(a.position - middle) - Math.abs(b.position - middle))[0].id : from;
+    if (motor) {
+      const evidence = window.crimeSumCurrent();
+      // 临检独立于普通遭遇的每日次数，短途或此前遇过求助也不能保证免检。
+      const policeChance = Math.min(
+        30,
+        2 + Math.min(8, Math.ceil(minutes / 3)) + (Time.dayState === 'night' ? 3 : 0) + Math.min(12, Math.floor(drunk / 120) * 3) + (evidence >= 5000 ? 10 : evidence >= 1000 ? 6 : 0)
+      );
+      if (rand.int(99) < policeChance) return { kind: 'police', point, drunk, roll: rand.int(99), resolved: false };
+    }
+    if (minutes < 5 || this.transport.state.event_day === Math.floor(Time.days)) return;
     const chance = Math.min(country ? 28 : 12, minutes) + (Time.dayState === 'night' ? 8 : 0) + (Weather.isSnow || Weather.precipitation === 'rain' ? 6 : 0);
     if (rand.int(99) >= chance) return;
     this.transport.state.event_day = Math.floor(Time.days);
@@ -55,13 +83,11 @@ export default class TravelEvents {
     }
     if (country || (Time.dayState === 'night' && [from, destination].some(point => ['harvest', 'elk'].includes(point)))) kinds.push('roadblock');
     if ((this.transport.vehicle?.condition ?? 100) < 40) kinds.push('puncture', 'puncture');
+    if (motor && (drunk > 0 || Weather.isSnow || Weather.precipitation === 'rain')) kinds.push('skid');
     if (!this.transport.taxi.active && Time.dayState === 'day' && !Weather.isSnow && Weather.precipitation !== 'rain') kinds.push('breakdown', 'bags');
     const kind = kinds[rand.int(kinds.length - 1)];
-    if (['breakdown', 'bags'].includes(kind)) return { kind, resolved: false };
-    const position = (point: string) => (point === 'farmland' ? 160 : (this.transport.catalog.roads.find(road => road.id === point)?.position ?? 0));
-    const middle = (position(from) + position(destination)) / 2;
-    const point = country ? [...this.transport.catalog.roads].sort((a, b) => Math.abs(a.position - middle) - Math.abs(b.position - middle))[0].id : from;
-    return { kind, point, roll: rand.int(99), resolved: false };
+    if (['breakdown', 'bags'].includes(kind)) return { kind, drunk, resolved: false };
+    return { kind, point, drunk, roll: rand.int(99), resolved: false };
   }
 
   public get pending(): boolean {
@@ -77,6 +103,7 @@ export default class TravelEvents {
       !trip.event.combat &&
       this.transport.core.passage.title === 'Deadwood Transport Travel' &&
       this.transport.ready &&
+      !V.nextPassage &&
       !V.nextPassageCheck &&
       this.transport.vehicle?.id === trip.vehicle
     );
@@ -88,8 +115,13 @@ export default class TravelEvents {
     const fatigue = Math.clamp((V.tiredness ?? 0) / 2000, 0, 1);
     const stress = Math.clamp(V.stress / V.stressmax, 0, 1);
     const nimble = transport.model?.kind !== 'motor_vehicle' ? 8 : (transport.model?.cargo ?? 0) >= 100 ? -10 : 0;
+    const drunk = transport.model?.kind === 'bicycle' ? 0 : Math.min(35, (transport.state.trip?.event?.drunk ?? 0) / 12);
     return Math.round(
-      Math.clamp(25 + skill * 0.06 + (transport.vehicle?.condition ?? 0) * 0.1 + nimble - fatigue * 15 - stress * 15 - (Weather.isSnow ? 20 : Weather.precipitation === 'rain' ? 10 : 0), 10, 95)
+      Math.clamp(
+        25 + skill * 0.06 + (transport.vehicle?.condition ?? 0) * 0.1 + nimble - fatigue * 15 - stress * 15 - drunk - (Weather.isSnow ? 20 : Weather.precipitation === 'rain' ? 10 : 0),
+        10,
+        95
+      )
     );
   }
 
@@ -97,10 +129,33 @@ export default class TravelEvents {
     return Math.round(Math.clamp(30 + window.currentSkillValue('willpower') * 0.04 + window.currentSkillValue('english') * 0.02 - Math.clamp(V.stress / V.stressmax, 0, 1) * 15, 15, 95));
   }
 
+  public get policeFine(): number {
+    const event = this.transport.state.trip?.event;
+    return event?.kind === 'police' && event.checked && !event.resolved && (event.drunk ?? 0) >= 120 && window.crimeSumCurrent() < 1000 ? Math.min(50000, Math.floor(event.drunk! / 120) * 10000) : 0;
+  }
+
+  public get policeArrested(): boolean {
+    const event = this.transport.state.trip?.event;
+    return (
+      ['Deadwood Transport Travel', 'Deadwood Transport Road Fight Finish', 'Deadwood Transport Police Handover'].includes(this.transport.core.passage.title) &&
+      event?.kind === 'police' &&
+      event.resolved &&
+      event.outcome === 'arrested' &&
+      !event.handover
+    );
+  }
+
   public can(action: RoadAction): boolean {
     if (!this.atHazard) return false;
-    const kind = this.transport.state.trip!.event!.kind;
+    const event = this.transport.state.trip!.event!;
+    const kind = event.kind;
     const twoWheels = this.transport.model!.kind !== 'motor_vehicle';
+    if (kind === 'police') {
+      if (action === 'check') return !event.checked;
+      if (action === 'fine') return this.policeFine > 0 && V.money >= this.policeFine;
+      return action === 'escape' || action === 'fight' || (action === 'surrender' && !!event.checked);
+    }
+    if (kind === 'skid') return action === 'wait' || action === 'escape';
     if (kind === 'molestation') return action === 'fight' || action === 'warn' || (action === 'eject' && window.currentSkillValue('physique') >= (V.physiquesize * 4) / 7);
     if (action === 'walk') return true;
     if (kind === 'puncture') {
@@ -129,15 +184,40 @@ export default class TravelEvents {
     const trip = transport.state.trip!;
     const event = trip.event!;
     const vehicle = transport.vehicle!;
-    if (action === 'fight' || (action === 'escape' && event.kind === 'roadblock' && (event.roll ?? 99) >= this.escapeChance) || (action === 'warn' && (event.roll ?? 99) >= this.boundaryChance)) {
-      event.combat = 'pending';
-      event.caught = action === 'escape';
+    if (event.kind === 'police' && action === 'check') {
+      event.checked = true;
+      transport.core.SugarCube.Wikifier.wikifyEval('<<pass 3>>');
+      if (transport.state.trip !== trip) return false;
+      const interrupted = !!V.nextPassage || !!V.nextPassageCheck || transport.core.passage.title !== 'Deadwood Transport Travel';
+      if (!transport.canDepart || interrupted) this.stop(!interrupted);
+      else if (window.crimeSumCurrent() < 1000 && (event.drunk ?? 0) < 120) {
+        // 核查结束时读取当前罪证；醉驾仍按出发快照，不因途中醒酒放行。
+        event.resolved = true;
+        event.outcome = 'cleared';
+      }
       return true;
     }
+    if (
+      action === 'fight' ||
+      (action === 'escape' && ['roadblock', 'police'].includes(event.kind) && (event.roll ?? 99) >= this.escapeChance) ||
+      (action === 'warn' && (event.roll ?? 99) >= this.boundaryChance)
+    ) {
+      event.combat = 'pending';
+      event.caught = action === 'escape';
+      if (event.kind === 'police') transport.core.SugarCube.Wikifier.wikifyEval(action === 'fight' ? '<<crimeUp 200 "assault">>' : '<<crimeUp 200 "resisting">>');
+      return true;
+    }
+    const fine = action === 'fine' ? this.policeFine : 0;
     event.resolved = true;
     let minutes = 0;
     let effects = '';
-    if (action === 'warn') {
+    if (action === 'fine') {
+      // 先读取并消费本次处罚，重绘或重复点击不会再次扣款。
+      event.outcome = 'fined';
+      effects = `<<money -${fine} 'transport'>>`;
+    } else if (action === 'surrender') {
+      event.outcome = 'arrested';
+    } else if (action === 'warn') {
       event.outcome = 'warned';
       effects = '<<willpower 1>>';
       minutes = 1;
@@ -147,8 +227,9 @@ export default class TravelEvents {
       minutes = 3;
     } else if (action === 'escape') {
       if ((event.roll ?? 99) < this.escapeChance) {
-        event.outcome = 'escape';
+        event.outcome = event.kind === 'police' ? 'evaded' : 'escape';
         effects = transport.model!.kind === 'bicycle' ? '<<athletics 2>><<tiredness 3>>' : '';
+        if (event.kind === 'police') effects += '<<crimeUp 200 "resisting">>';
         if (transport.model!.kind !== 'bicycle') transport.state.driving = Math.min(1000, transport.state.driving + 3);
       } else {
         event.outcome = 'scraped';
@@ -187,16 +268,17 @@ export default class TravelEvents {
       effects = `<<money -${transport.model!.kind === 'bicycle' ? 2000 : 5000}>>`;
     } else {
       event.outcome = 'wait';
-      minutes = event.kind === 'roadblock' ? 10 : event.kind === 'load' ? 8 : 4;
+      minutes = event.kind === 'roadblock' ? 10 : event.kind === 'load' ? 8 : event.kind === 'skid' ? 3 : 4;
     }
-    const stop = event.outcome === 'stolen' || event.outcome === 'walk' || event.outcome === 'dismissed';
+    const stop = ['stolen', 'walk', 'dismissed', 'fined', 'arrested'].includes(event.outcome!);
     if (event.outcome === 'stolen') {
       vehicle.stolen = true;
       effects = '<<stress 12>>';
     }
     this.transport.core.SugarCube.Wikifier.wikifyEval(effects + (minutes ? `<<pass ${minutes}>>` : ''));
     if (transport.state.trip !== trip) return false;
-    if (stop || !transport.canDepart || V.nextPassageCheck || transport.core.passage.title !== 'Deadwood Transport Travel') this.stop();
+    const interrupted = !!V.nextPassage || !!V.nextPassageCheck || transport.core.passage.title !== 'Deadwood Transport Travel';
+    if (stop || !transport.canDepart || interrupted) this.stop(!interrupted);
     return true;
   }
 
@@ -216,7 +298,7 @@ export default class TravelEvents {
         V.enemyarousal >= V.enemyarousalmax ||
         (V.alarm === 1 && V.rescue >= 1) ||
         V.finish === 1 ||
-        (this.transport.state.trip!.event!.kind === 'roadblock' && V.pain >= 100 && V.willpowerpain === 0))
+        (['roadblock', 'police'].includes(this.transport.state.trip!.event!.kind) && V.pain >= 100 && V.willpowerpain === 0))
     );
   }
 
@@ -229,6 +311,8 @@ export default class TravelEvents {
       transport.taxi.passengerNPC();
       V.outside = 0;
       transport.core.SugarCube.Wikifier.wikifyEval('<<molested>><<neutral 1>><<maninit>><<set $enemytrust -= 100>>');
+    } else if (transport.state.trip!.event!.kind === 'police') {
+      transport.core.SugarCube.Wikifier.wikifyEval('<<generatePolice 1>><<generatePolice 2>><<neutral 1>><<maninit>><<set $enemytrust -= 100>><<set $enemyanger += 200>><<npcidlegenitals>>');
     } else {
       transport.core.SugarCube.Wikifier.wikifyEval('<<generateNPC 1 a>><<generateNPC 2 a>><<neutral 1>><<maninit>><<set $enemytrust -= 100>><<set $enemyanger += 200>><<npcidlegenitals>>');
     }
@@ -243,16 +327,20 @@ export default class TravelEvents {
     const event = trip.event!;
     const satisfied = V.enemyarousal >= V.enemyarousalmax;
     const molestation = event.kind === 'molestation';
-    if (satisfied) event.outcome = molestation ? 'assaulted' : 'defended';
+    const police = event.kind === 'police';
+    if (police) event.outcome = satisfied || V.enemyhealth <= 0 || (V.alarm === 1 && V.rescue >= 1) ? 'evaded' : 'arrested';
+    else if (satisfied) event.outcome = molestation ? 'assaulted' : 'defended';
     else if (V.enemyhealth <= 0) event.outcome = molestation ? 'repelled' : 'defended';
     else if (V.alarm === 1 && V.rescue >= 1) event.outcome = 'rescued';
     else event.outcome = molestation ? 'assaulted' : 'stolen';
     event.resolved = true;
     event.combat = 'finished';
     if (event.outcome === 'stolen') transport.vehicle!.stolen = true;
-    transport.core.SugarCube.Wikifier.wikifyEval(`<<clotheson>><<endcombat>>${event.outcome === 'stolen' ? '<<stress 12>>' : ''}`);
+    const injury = police && V.enemyhealth < V.enemyhealthmax ? '<<crimeUp 400 "assault">>' : '';
+    transport.core.SugarCube.Wikifier.wikifyEval(`${injury}<<clotheson>><<endcombat>>${event.outcome === 'stolen' ? '<<stress 12>>' : ''}`);
     V.outside = 1;
-    if (transport.state.trip === trip && (molestation || event.outcome === 'stolen' || !transport.canDepart || V.nextPassageCheck)) this.stop();
+    const interrupted = !!V.nextPassage || !!V.nextPassageCheck || transport.core.passage.title !== 'Deadwood Transport Road Fight Finish';
+    if (transport.state.trip === trip && (molestation || event.outcome === 'stolen' || event.outcome === 'arrested' || !transport.canDepart || interrupted)) this.stop(!interrupted);
     return true;
   }
 
@@ -265,19 +353,23 @@ export default class TravelEvents {
     if (vehicle && trip.event!.kind === 'roadblock') vehicle.stolen = true;
     trip.event!.resolved = true;
     trip.event!.combat = 'finished';
-    trip.event!.outcome = trip.event!.kind === 'roadblock' ? 'stolen' : 'assaulted';
+    trip.event!.outcome = trip.event!.kind === 'police' ? 'arrested' : trip.event!.kind === 'roadblock' ? 'stolen' : 'assaulted';
+    // 昏迷、医院或原版拘捕已经接管场景，不再从旧行程补演一次移交。
+    if (trip.event!.kind === 'police') trip.event!.handover = true;
     this.stop(false);
   }
 
   public stop(resetPhase = true): void {
     const transport = this.transport;
-    const trip = transport.state.trip!;
+    const trip = transport.state.trip;
+    if (!trip) return;
     const phase = V.phase;
     const eventskip = V.eventskip;
     trip.interrupted = true;
     trip.settled = true;
     // 载客途中停驶时，释放订单，不结算未送达的车费。
     if (trip.taxi) transport.taxi.interrupt();
+    transport.core.get('Finance')?.realEstate.outings.abandon();
     transport.state.passengers = [];
     transport.state.commute = null;
     if (resetPhase) {

@@ -90,6 +90,9 @@
         <span class='purple'><<lanSwitch 'You cannot use it in your current condition.' '你现在的状况不适合出行。'>></span>
       <</if>><br><br>
     <<else>>
+      <<if _transport.model.kind isnot 'bicycle' and $drunk gt 0>>
+        <span class='purple'><<lanSwitch 'The smell of alcohol still clings to you. Driving now makes the vehicle harder to control, and a police check could stop your journey.' '你身上的酒气还没散。酒后驾驶更难控制载具，警方临检也可能让行程中断。'>></span><br><br>
+      <</if>>
       <<if _transport.point.startsWith('forest:')>>
         <<language>>
           <<option 'EN'>>
@@ -153,7 +156,10 @@
   <<if $passage is 'Deadwood Transport Travel'>><<run Dynamic.render('deadwood-transport-status')>><</if>>
 <</if>>
 <<if $passage is 'Deadwood Transport Travel'>>
-  <<if _transport.events.combatPending or _transport.events.inCombat>>
+  <<if _transport.events.policeArrested>>
+    <<deadwood-transport-hazard-result>>
+    <<skinicon 'manacles'>><<lanLink ['Be taken to the station', '被带往警局'] 'Deadwood Transport Police Handover'>><</lanLink>><br>
+  <<elseif _transport.events.combatPending or _transport.events.inCombat>>
     <<icon 'alert.png'>><<lanLink ['Continue', '继续'] 'Deadwood Transport Road Fight'>><</lanLink>>
   <<elseif _transport.events.atHazard>>
     <<deadwood-street-cargo-travel>>

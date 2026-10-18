@@ -1,19 +1,24 @@
 :: Deadwood Transport Road Fight
 <<set _road_events to maplebirch.get('Transport').events>>
 <<if _road_events.combatPending>>
-  <<set _cab_encounter to $Transport.trip.event.kind is 'molestation'>>
+  <<set _cab_encounter to $Transport.trip.event.kind is 'molestation', _police_encounter to $Transport.trip.event.kind is 'police'>>
   <<if _cab_encounter>><<run maplebirch.get('Transport').taxi.passengerNPC()>><</if>>
   <<language>>
     <<option 'EN'>>
       <<if _cab_encounter>>
         You pull over and switch off the engine. As you turn to push the hand away, the passenger grabs your wrist. <<He>> leans into the front seat, pressing you against the door.
         <<if maplebirch.get('Transport').taxi.state.job.people gt 1>>The other passengers scramble out of the car.<</if>>
+      <<elseif _police_encounter>>
+        <<if $Transport.trip.event.caught>>The police car blocks your path. You brake and climb out as two officers close in.
+        <<else>>You leave the vehicle and shove an officer's reaching hand away. The other steps forward with a pair of handcuffs.<</if>>
+        "Stop resisting."
+        <<if $Transport.trip.passengers.length>>You tell your companion to stay back.<</if>>
       <<elseif $Transport.trip.event.caught>>
         A hand catches you before you clear the gap. You brake hard. By the time you can get moving again, someone has dragged you away from the vehicle.
       <<else>>
         You stop, <<if maplebirch.get('Transport').model.kind is 'bicycle'>>keeping hold of the handlebars<<else>>keeping the keys in your hand<</if>>. "Move." The figure in front lunges for you while the other circles behind.
       <</if>>
-      <<if !_cab_encounter>>You brace yourself against the edge of the road.
+      <<if !_cab_encounter and !_police_encounter>>You brace yourself against the edge of the road.
       <<if $Transport.trip.taxi is 'dropoff'>>Your passenger scrambles back along the verge, out of reach of the two figures.
       <<elseif $Transport.trip.passengers.length>>You shout for your companion to stay back. There is barely room between you and the two figures.<</if>>
       <</if>>
@@ -21,12 +26,17 @@
       <<if _cab_encounter>>
         你靠边停车，关掉发动机。刚转身去推那只手，乘客就攥住了你的手腕。<<He>>探进前座，把你挤向车门。
         <<if maplebirch.get('Transport').taxi.state.job.people gt 1>>其余乘客慌忙下了车。<</if>>
+      <<elseif _police_encounter>>
+        <<if $Transport.trip.event.caught>>警车挡住了去路。你刹车，下了车。两名警员朝你逼近。
+        <<else>>你下了车，推开警员伸来的手。另一名警员拿着手铐走上前。<</if>>
+        “别再反抗。”
+        <<if $Transport.trip.passengers.length>>你让同行的人退开。<</if>>
       <<elseif $Transport.trip.event.caught>>
         你还没穿过空隙，一只手就伸了过来。你急忙刹车，还没来得及重新出发，就被人拖离了载具。
       <<else>>
         你停下，<<if maplebirch.get('Transport').model.kind is 'bicycle'>>握紧车把<<else>>把钥匙攥在手里<</if>>。“让开。”前面的人朝你扑来，另一个绕到了你身后。
       <</if>>
-      <<if !_cab_encounter>>你站稳脚步，背后就是路沿。
+      <<if !_cab_encounter and !_police_encounter>>你站稳脚步，背后就是路沿。
       <<if $Transport.trip.taxi is 'dropoff'>>乘客慌忙沿路肩往后退，躲开那两个人。
       <<elseif $Transport.trip.passengers.length>>你喊同行的人先退开。你和那两个人之间，几乎没有容人挤过的空隙。<</if>>
       <</if>>
@@ -52,7 +62,10 @@
   <<if _road_events.combatComplete and $enemyarousal gte $enemyarousalmax>><<ejaculation "short">><</if>>
   <<run _road_events.finishCombat()>>
 <</if>>
-<<if _road_events.inCombat>>
+<<if _road_events.policeArrested>>
+  <<deadwood-transport-hazard-result>>
+  <<skinicon 'manacles'>><<lanLink ['Be taken to the station', '被带往警局'] 'Deadwood Transport Police Handover'>><</lanLink>><br>
+<<elseif _road_events.inCombat>>
   <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Transport Road Fight'>><</lanLink>></span><<nexttext>>
 <<elseif $Transport.trip?.event?.combat is 'finished'>>
   <<deadwood-transport-hazard-result>>
@@ -68,4 +81,46 @@
   <</if>>
 <<else>>
   <<getouticon>><<lanLink ['Return', '返回'] $Transport.return_passage>><</lanLink>>
+<</if>>
+
+
+:: Deadwood Transport Police Handover
+<<set _road_events to maplebirch.get('Transport').events>>
+<<if _road_events.policeArrested>>
+  <<if !$replayScene and !$statFreeze and !$combat and !$possessed and !$nextPassage and !$nextPassageCheck>>
+    <<set $location to 'police_station', $outside to 0>>
+  <</if>>
+  <<language>>
+    <<option 'EN'>>
+      The officers take you to the station on Barb Street. At reception, one hands over a report while the other leads you downstairs. Your vehicle remains where you stopped; it has not been confiscated.
+      The cell door closes behind you. An officer tells you to wait while they process the case.
+    <<option 'CN'>>
+      警员把你带到警察局。一人在前台递交记录，另一人领着你下楼。你的载具留在停车的地方，没有被没收。
+      牢门在身后关上。警员让你等着，等他们处理你的案子。
+  <</language>><br><br>
+  <!-- 只消费本次移交；不走自首减刑，也不销毁手持物。 -->
+  <<skinicon 'manacles'>><<lanLink ['Wait (1:00)', '等待 (1:00)']>>
+    <<if maplebirch.get('Transport').events.policeArrested and !$Transport.trip.event.handover and !$replayScene and !$statFreeze and !$combat and !$possessed and !$nextPassage and !$nextPassageCheck>>
+      <<set $Transport.trip.event.handover to true>>
+      <<set _road_bounty to maplebirch.get('StreetLife')?.bounties, _road_case to _road_bounty?.state.active>>
+      <<if _road_case?.stage is 'escort' and _road_case.vehicle is $Transport.trip.vehicle>>
+        <<if $per_npc[_road_case.key]>><<clearNPC _road_case.key>><</if>>
+        <<set _road_bounty.state.last to { id: _road_case.id, outcome: 'interrupted', fee: 0 }, _road_bounty.state.active to null>>
+      <</if>>
+      <<endevent>><<pass 60>>
+      <<if $passage is 'Deadwood Transport Police Handover' and !$replayScene and !$statFreeze and !$combat and !$possessed and !$nextPassage and !$nextPassageCheck>>
+        <!-- 警员已确认身份，不应用潜行减免；保证原版处理时至少有一天社区服务。 -->
+        <<if crimeSumCurrent() lt 200>>
+          <<set _road_charge to Math.ceil(200 - crimeSumCurrent())>>
+          <<set C.crime.petty += _road_charge, C.crime.pettyHistory += _road_charge, C.crime.pettyDaily += _road_charge>>
+          <<set C.crime.pettyCount += 1, C.crime.pettyCountHistory += 1>>
+          <<if $averyCrimeTracker neq null>><<set $averyCrimeTracker += _road_charge>><</if>>
+        <</if>>
+        <<goto 'Police Cell'>>
+      <</if>>
+    <</if>>
+  <</lanLink>><br>
+<<else>>
+  <<lanSwitch 'There is no pending arrest to process.' '目前没有等待处理的拘捕记录。'>><br><br>
+  <<getouticon>><<lanLink ['Return to reception', '返回前台'] 'Police Station'>><</lanLink>><br>
 <</if>>

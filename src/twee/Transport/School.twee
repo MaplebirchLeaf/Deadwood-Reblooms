@@ -6,9 +6,17 @@
 <<if Time.weekDay is 1 or Time.hour lt 9 or Time.hour gte 17>>
   <<language>>
     <<option 'EN'>>
-      The reception desk is empty. The timetable on the wall lists classes from 09:00 to 17:00, Monday to Saturday.
+      The glass doors are locked. Through them, you can see a rack of driving manuals and a board covered in road signs.
+      <<if Time.weekDay is 1>>The learner cars stand nose to tail in the yard, with their roof signs stacked inside the reception area. No classes are running today.
+      <<elseif Time.hour lt 9 and Time.dayState isnot 'night'>>The cones are still piled beside the fence. A classroom clock is visible through the window, but no one has opened the reception hatch yet.
+      <<else>>The classroom is dark. A folded high-visibility vest lies on the reception desk, beside the closed appointment book.<</if>><br><br>
+      The timetable on the door lists <span class='blue'>Monday–Saturday, 09:00–17:00.</span>
     <<option 'CN'>>
-      前台没有人。墙上的课程表写着周一至周六营业，时间为 09:00–17:00。
+      玻璃门锁着。隔着门，能看见一架驾驶手册和贴满路标的教学板。
+      <<if Time.weekDay is 1>>教练车首尾相接地停在院里，车顶的标牌被收进了前厅。今天没有开课。
+      <<elseif Time.hour lt 9 and Time.dayState isnot 'night'>>锥筒还堆在围栏旁。从窗外看得见教室里的钟，前台的小窗却还没打开。
+      <<else>>教室已经熄灯。前台放着叠好的反光背心，预约簿也合上了。<</if>><br><br>
+      门上的课表写着：<span class='blue'>“周一至周六，09:00–17:00。”</span>
   <</language>><br><br>
   <<if $Transport.school.exam>><<run _school.abandon()>><</if>>
   <<deadwood-transport-return>>
@@ -26,14 +34,14 @@
   <<if $Transport.school.exam>><<run _school.abandon()>><</if>>
   <<language>>
     <<option 'EN'>>
-      A learner car reverses between cones outside the window. Helmets hang above a row of motorcycle keys behind the counter.
-      <<if Weather.isSnow>>Snow has been cleared from a narrow strip in the yard. An instructor watches the learner through the glass, leaving the road lessons for another day.
-      <<else>>From the next room, you hear an instructor pause a traffic video and ask which driver has right of way.<</if>>
+      Helmets hang above a row of motorcycle keys behind the counter. A rack of scuffed driving manuals stands beside the classroom door.
+      <<if !_school.practicalWeather>>The yard is empty. An instructor puts the outdoor lesson board away and brings out a traffic video for the learners waiting inside.
+      <<else>>A learner car reverses between cones outside the window. From the next room, you hear an instructor pause a traffic video and ask which driver has right of way.<</if>>
       The receptionist pushes a form towards you. "Car or motorcycle?"
     <<option 'CN'>>
-      窗外，一辆教练车正倒入锥筒之间。柜台后挂着几顶头盔，下面是一排摩托车钥匙。
-      <<if Weather.isSnow>>院子里只扫出了一条窄道。教练隔着玻璃看着学员，路上的课程得另找时间。
-      <<else>>隔壁传来教练暂停交通录像的声音，接着问学员该让哪辆车先走。<</if>>
+      柜台后挂着几顶头盔，下面是一排摩托车钥匙。教室门旁的书架上摆着一摞翻旧的驾驶手册。
+      <<if !_school.practicalWeather>>院子里没有车在练习。教练收起室外课程板，替等在屋里的学员找出一盘交通录像。
+      <<else>>窗外，一辆教练车正倒入锥筒之间。隔壁传来教练暂停交通录像的声音，接着问学员该让哪辆车先走。<</if>>
       前台将表格推到你面前。“汽车，还是摩托车？”
   <</language>><br><br>
   <<icon 'transport/motorcycle-lesson.png'>><<lanLink ['Motorcycle training', '摩托车课程']>>
@@ -360,7 +368,7 @@
         <</if>>
         <<if _school.canTamper>>
           <<capture _school_revision>>
-            <<crimeicon 'documents'>><<lanLink ['Alter the test sheet (0:15)', '偷偷改掉成绩单 (0:15)']>>
+            <<icon 'street/forged-signature.png'>><<lanLink ['Alter the test sheet (0:15)', '偷偷改掉成绩单 (0:15)']>>
               <<if maplebirch.get('Transport').school.attend('tamper', _school_revision) and $passage is 'Deadwood Transport School'>>
                 <<goto 'Deadwood Transport School'>>
               <</if>>

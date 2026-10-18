@@ -27,7 +27,7 @@ export default function Transport(maplebirch: typeof window.maplebirch): void {
     motors: shopOpen,
     service: shopOpen,
     petrol: () => true,
-    school: () => Time.weekDay !== 1 && Time.hour >= 9 && Time.hour < 18
+    school: () => Time.weekDay !== 1 && Time.hour >= 9 && Time.hour < 17
   };
   for (const [location, open] of Object.entries(openingHours)) {
     maplebirch.tool.patch.location.configure(
