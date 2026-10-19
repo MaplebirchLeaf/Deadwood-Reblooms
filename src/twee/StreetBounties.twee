@@ -423,10 +423,17 @@
     <<replace '#passage-content'>>
       <<language>>
         <<option 'EN'>>
-          Someone steps into your path, a folded notice held beside a phone. Their gaze moves between the picture and your face. "There you are. The station has a reward out for you." They move when you do, keeping the pavement blocked.
+          Further along the pavement, someone is comparing passers-by with a photograph on a folded notice. You recognise your own face on the paper. They haven't spotted you yet. A side street branches off before you reach them.
         <<option 'CN'>>
-          有人挡住你的去路，手机旁拿着一张折起的告示。目光在照片与你的脸之间来回移动。“找到了。警局可给你开了赏钱。”你挪动脚步，对方也跟着动，始终挡在前方。
+          前方有人拿着一张折起的告示，逐个打量过路的人。你认出纸上印着自己的脸。对方还没注意到你，再往前走几步就是一条岔路。
       <</language>><br><br>
+      <<set $skulduggerydifficulty to _hunterWork.terms.hunter.avoid_difficulty>>
+      <<sneakicon>><<lanLink ['Slip away before you are spotted (0:01)', '趁没被发现，远远绕开 (0:01)']>>
+        <<if _hunterCase.stage is 'approach' and _hunterWork.available>>
+          <<set $skulduggerydifficulty to _hunterWork.terms.hunter.avoid_difficulty>><<skulduggerycheck 'silent'>>
+          <<if _hunterWork.act('hunter-avoid', $skulduggerysuccess)>><<skulduggeryuse>><<pass 1>><<goto 'Deadwood Street Hunter'>><</if>>
+        <</if>>
+      <</lanLink>><<skulduggerydifficulty>><br>
       <<icon 'investigate.png'>><<lanLink ['Face the hunter', '面对赏金猎人']>><<if _hunterWork.act('face')>><<goto 'Deadwood Street Hunter'>><</if>><</lanLink>><br>
     <</replace>>
   <</if>>
@@ -440,7 +447,7 @@
   <<exit>>
 <</if>>
 <<set $location to 'town'>><<set $outside to 1>><<effects>>
-<<if ['confrontation', 'fight', 'escaped', 'caught'].includes(_hunterCase.stage)>>
+<<if $per_npc[_hunterCase.key] and ['confrontation', 'fight', 'escaped', 'caught'].includes(_hunterCase.stage)>>
   <<if $NPCList[0]?.per isnot _hunterCase.key>><<endevent>><<loadNPC 0 _hunterCase.key>><</if>>
   <<person1>>
 <</if>>
@@ -448,9 +455,11 @@
   <<case 'confrontation'>>
     <<language>>
       <<option 'EN'>>
+        <<if _hunterCase.outcome is 'avoid'>>You turn towards the side street, but a shout stops you. "You! Hold on." The hunter catches up before you reach the corner.<br><br><</if>>
         The hunter keeps one hand free. "We can walk back together. Or I can make this difficult." A few passers-by slow down, then continue past you. The notice carries the station's details and a reward of <<printmoney _hunterCase.amount>>.
         <<if _hunterWork.state.cooperating>>The name on your own case file buys you no space on the pavement.<</if>>
       <<option 'CN'>>
+        <<if _hunterCase.outcome is 'avoid'>>你刚转向岔路，身后便传来喊声。“你！站住。”还没走到街角，猎人就追了上来。<br><br><</if>>
         猎人空着一只手。“一起走回去，省点事。要不然，就没那么轻松了。”几个路人放慢脚步，又从你身边继续走过。告示上写着警局的信息，赏金为<<printmoney _hunterCase.amount>>。
         <<if _hunterWork.state.cooperating>>你替警局办事的那份档案，此刻并不能让对方让开道路。<</if>>
     <</language>><br><br>
@@ -483,7 +492,9 @@
   <<case 'escaped'>>
     <<language>>
       <<option 'EN'>>
-        <<if _hunterCase.outcome is 'talk'>>
+        <<if _hunterCase.outcome is 'avoid'>>
+          You keep your face turned away and take the side street without breaking stride. At the next corner, you glance back. The hunter is still watching the main road.
+        <<elseif _hunterCase.outcome is 'talk'>>
           The hunter studies the notice again. The moment of hesitation gives you room to pass. You keep walking until the voice behind you is lost in the traffic.
         <<elseif _hunterCase.outcome is 'fight'>>
           You knock the reaching hand aside and slip past. A shout follows you, but the hunter has to force a way through the people you have already passed.
@@ -491,7 +502,9 @@
           You turn a corner without slowing down. When you look back from the next crossing, the hunter is no longer in sight.
         <</if>>
       <<option 'CN'>>
-        <<if _hunterCase.outcome is 'talk'>>
+        <<if _hunterCase.outcome is 'avoid'>>
+          你侧过脸，顺着步子拐进岔路。走到下一个街角时，你回头看了一眼。猎人还在盯着大路上的行人。
+        <<elseif _hunterCase.outcome is 'talk'>>
           猎人又看了一遍告示。片刻迟疑给了你擦身而过的空隙，你继续向前，直到身后的声音淹没在车流里。
         <<elseif _hunterCase.outcome is 'fight'>>
           你拨开伸来的手，从旁边脱身。身后传来一声叫喊，可猎人还得挤过那些你已经走过的人。

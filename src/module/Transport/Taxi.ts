@@ -113,10 +113,6 @@ export default class Taxi {
     return terms.models.includes(model.id);
   }
 
-  private luxury(model: VehicleModel): boolean {
-    return model.id === 'luxury_saloon';
-  }
-
   public get cars(): Vehicle[] {
     return this.transport.state.vehicles.filter(vehicle => {
       const model = this.transport.catalog.models.find(model => model.id === vehicle.model);
@@ -187,7 +183,7 @@ export default class Taxi {
     const model = this.transport.model!;
     const requests = terms.requests.filter(request => {
       const open = request.start < request.end ? Time.hour >= request.start && Time.hour < request.end : Time.hour >= request.start || Time.hour < request.end;
-      return open && request.people <= model.seats && request.cargo <= model.cargo && (request.kind !== 'appointment' || this.luxury(model));
+      return open && request.people <= model.seats && request.cargo <= model.cargo && (request.kind !== 'appointment' || model.id === 'luxury_saloon');
     });
     const rand = this.transport.core.get('DeadwoodReblooms')!.rand;
     for (let index = 0; index < 3 && requests.length; index++) {

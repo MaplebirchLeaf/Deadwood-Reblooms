@@ -82,33 +82,6 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
     }
   });
 
-  maplebirch.tool.macro.defineS('deadwood-orchard-worker-harvest', () => {
-    const kept = maplebirch.get('Orchard')?.workerReport?.kept;
-    if (!kept) return;
-    return Object.entries(kept)
-      .filter(([, amount]) => amount && amount > 0)
-      .map(([type, amount]) => {
-        const data = species[type as OrchardSpecies];
-        const name = type === 'blood_lemon' ? lanSwitch('Blood lemon', '血柠') : lanSwitch(data.name[0], data.name[1]);
-        return `<<foodstufficon '${type}'>>${name} × ${amount}`;
-      })
-      .join(' / ');
-  });
-
-  maplebirch.tool.macro.defineS('deadwood-orchard-seed-shop', () => {
-    const orchard = maplebirch.get('Orchard');
-    if (!orchard || !orchard.canWork || Time.dayState === 'night' || Time.hour === 21) return;
-    return (Object.keys(species) as OrchardSpecies[])
-      .filter(key => species[key].seedSource === 'shop' && !orchard.state.known.includes(key) && setup.foodstuff[key])
-      .map(key => {
-        const data = species[key];
-        const label = [`Buy ${data.name[0].toLowerCase()} seeds (£${data.seedPrice! / 100})`, `购买${data.name[1]}种子 (£${data.seedPrice! / 100})`];
-        const affordable = maplebirch.get('Finance')?.canPay(data.seedPrice, 'shopping') ?? V.money >= data.seedPrice!;
-        return `<<foodstufficon '${key}'>>${affordable ? `<<lanLink ${JSON.stringify(label)} 'Supermarket'>><<run maplebirch.get('Orchard').buySeed('${key}')>><</lanLink>>` : `<span class='red'>${lanSwitch(...label)}</span>`}<br>`;
-      })
-      .join('');
-  });
-
   maplebirch.once(':storyready', () => {
     // 保留原版宏的参数、输出和逻辑，只在采摘成功或花园取得酸橙后检查种源。
     for (const name of ['tending_pick', 'wearProp'] as const) {

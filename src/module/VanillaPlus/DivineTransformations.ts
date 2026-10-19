@@ -1,15 +1,8 @@
 // ./src/module/VanillaPlus/DivineTransformations.ts
 
-export type DivineEncounter = 'Default' | 'Struggle' | 'Tentacle';
-export type PrayerContact = 'holy' | 'stone' | 'dark';
+import type { VanillaPlusState } from '../constants/vanilla-plus';
 
-interface DivineTransformationState {
-  beautyBonus: number;
-  expungeUsed: boolean;
-  prayer: Record<PrayerContact, boolean>;
-  trinity: boolean;
-  contact: 'none' | 'pending' | 'success' | 'failure' | 'escape';
-}
+export type DivineEncounter = 'Default' | 'Struggle' | 'Tentacle';
 
 interface StruggleEnemy {
   health: number;
@@ -26,7 +19,7 @@ class DivineTransformations {
   private static readonly ATTRIBUTE_MULTIPLIER = 1.1;
   private static readonly ATTRIBUTE_BONUS = 0.1;
 
-  private get state(): DivineTransformationState | undefined {
+  private get state(): VanillaPlusState['divineTransformations'] | undefined {
     return V.VanillaPlus?.divineTransformations;
   }
 
@@ -64,10 +57,6 @@ class DivineTransformations {
     );
   }
 
-  public record(contact: PrayerContact): void {
-    if (this.state) this.state.prayer[contact] = true;
-  }
-
   // 三种完整神圣转化各强化与其内核最贴近的一项数值，不改变原始成长值。
   public skillValue(skill: string, value: number): number {
     if ((skill === 'physique' && this.angel) || (skill === 'willpower' && this.fallenAngel)) return Math.floor(value * DivineTransformations.ATTRIBUTE_MULTIPLIER);
@@ -76,25 +65,6 @@ class DivineTransformations {
 
   public beautyCeiling(value: number): number {
     return this.demon ? Math.floor(value * DivineTransformations.ATTRIBUTE_MULTIPLIER) : value;
-  }
-
-  // 记录恶魔转化提供的容貌部分，转换或解除转化时只增减本模块实际施加的数值。
-  private syncBeauty(): void {
-    const state = this.state;
-    if (!state) return;
-    const previous = Number(state.beautyBonus) || 0;
-    const base = Math.max(0, Number(V.beauty) - previous);
-    const next = this.demon ? Math.floor(base * DivineTransformations.ATTRIBUTE_BONUS) : 0;
-    if (previous === next) return;
-    V.beauty = base + next;
-    state.beautyBonus = next;
-  }
-
-  // 完整恶魔在遭遇战中始终拥有当前容量的体液，容量本身仍由原版转化和成长决定。
-  private restoreFluids(): void {
-    if (!this.demon || V.combat !== 1) return;
-    if (V.player?.penisExist) V.semen_amount = Number(V.semen_volume) || 0;
-    if (Number(V.lactating) >= 1) V.milk_amount = Number(V.milk_volume) || 0;
   }
 
   public fluidChange(value: number): number {
@@ -119,10 +89,23 @@ class DivineTransformations {
   }
 
   public update(): void {
-    this.syncBeauty();
-    this.restoreFluids();
-    if (this.arousalLimit < V.arousalmax) V.arousal = Math.min(V.arousal, this.arousalLimit);
-    if (V.combat !== 1 && this.state) this.state.expungeUsed = false;
+    const state = this.state;
+    if (!state) return;
+    const previous = Number(state.beautyBonus) || 0;
+    const base = Math.max(0, Number(V.beauty) - previous);
+    const next = this.demon ? Math.floor(base * DivineTransformations.ATTRIBUTE_BONUS) : 0;
+    if (previous !== next) {
+      V.beauty = base + next;
+      state.beautyBonus = next;
+    }
+
+    if (this.demon && V.combat === 1) {
+      if (V.player?.penisExist) V.semen_amount = Number(V.semen_volume) || 0;
+      if (Number(V.lactating) >= 1) V.milk_amount = Number(V.milk_volume) || 0;
+    }
+    const limit = this.arousalLimit;
+    if (limit < V.arousalmax) V.arousal = Math.min(V.arousal, limit);
+    if (V.combat !== 1) state.expungeUsed = false;
   }
 
   public canExpunge(encounter: DivineEncounter): boolean {

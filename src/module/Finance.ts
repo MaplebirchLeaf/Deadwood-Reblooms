@@ -349,6 +349,13 @@ class Finance extends Module {
       cond: () => !!V.Finance && this.core.get('Finance')!.collectionEncounter,
       output: 'deadwood-finance-collection-gate'
     });
+    // 明确拒绝艾弗里收养或已买断身份时，拦截强行收养与豪宅绑架剧情，保护玩家自主权
+    this.core.dynamic.regStateEvent('gate', 'deadwood-orphanage-avery-adoption-block', {
+      extra: { passage: ['Mansion Intro Orphanage', 'Mansion Intro'] },
+      forceExit: true,
+      cond: () => !V.replayScene && !V.statFreeze && !!V.Finance?.orphanage && (this.orphanage.averyAdoptionRefused || this.orphanage.pcFree),
+      output: 'deadwood-finance-orphanage-adoption-refused-gate'
+    });
     this.core.tool.onInit(() => void this.securities);
     this.core.on(':variable', () => CompanyEvents.capture(this.state.market, this.securities));
     this.core.on(':passagestart', passage => {

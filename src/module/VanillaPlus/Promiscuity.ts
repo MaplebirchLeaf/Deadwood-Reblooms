@@ -32,10 +32,6 @@ class Promiscuity {
     return Number.isInteger(target) && npc?.active === 'active' && npc.stance !== 'defeated' ? npc : undefined;
   }
 
-  private hasStrapon(index: number): boolean {
-    return window.npcHasStrapon?.(index) ?? false;
-  }
-
   public get expanded(): boolean {
     return V.VanillaPlus.lock.promiscuity && V.promiscuity >= this.vanillaPlus.normalCeiling('promiscuity');
   }
@@ -48,7 +44,7 @@ class Promiscuity {
   public hasPenis(index: number): boolean {
     const target = Number(index);
     const npc = this.npc(target);
-    return !!npc && (npc.penissize > 0 || this.hasStrapon(target));
+    return !!npc && (npc.penissize > 0 || (window.npcHasStrapon?.(target) ?? false));
   }
 
   public penisAvailable(index: number): boolean {

@@ -65,6 +65,11 @@
     if (maplebirch.get('Sydney')) maplebirch.get('Sydney').schedule();
       else T.sydney_location = maplebirch.get('Finance')?.realEstate.outings.location('Sydney', T.sydney_location) ?? T.sydney_location;
 
+- comment: '拒绝收养或买断身份后，Avery 豪宅收养资格评分归零，避免孤儿院强行触发领养。'
+  fileName: 'named-npc.js'
+  from: 'function averyMansionScore() {'
+  after: "\n\t\tif (maplebirch.get('Finance')?.orphanage.averyAdoptionRefused || maplebirch.get('Finance')?.orphanage.pcFree) return 0;"
+
 - comment: '意志突破后允许正常增益继续填充扩展后的六级上限。'
   fileName: 'stat-changes.js'
   from: 'V.willpower = Math.clamp(V.willpower + amount * 2, 0, V.willpowermax'

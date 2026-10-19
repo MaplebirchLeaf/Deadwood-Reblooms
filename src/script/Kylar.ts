@@ -17,8 +17,8 @@ export default function Kylar(maplebirch: typeof window.maplebirch): void {
     locationPassage: {
       'Manor Kylar Room': [
         {
-          src: '<<if _kylar.state isnot "prison">>',
-          to: '<<if _kylar.state isnot "prison" and (!maplebirch.get(\'Finance\') or !maplebirch.get("Finance").realEstate.residenceOf(\'Kylar\'))>>',
+          src: '<<if _kylar.state isnot "prison"',
+          applyafter: " and (!maplebirch.get('Finance') or !maplebirch.get(\"Finance\").realEstate.residenceOf('Kylar'))",
           expected: 1
         }
       ]

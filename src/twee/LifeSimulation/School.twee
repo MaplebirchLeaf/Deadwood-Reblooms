@@ -156,22 +156,31 @@
   <<set _slack to _args.length gt 1 ? _args[1] : 0>>
   <<if _policy>>
     <<set _need to maplebirch.get('LifeSimulation').school.policyRequirements[_policy]>>
-    <<set _petitionNeed to Math.max(0, _need.studentSupport + 10 - _slack)>>
+    <<set _petitionNeed to Math.max(0, _need.studentSupport + (_slack gt 0 ? -_slack : 10))>>
     <<set _staffNeed to Math.max(0, _need.staffSupport - _slack)>>
     <<set _corruptionNeed to Math.max(0, _need.corruption - _slack)>>
     <<set _loveNeed to Math.max(0, _need.leightonLove - _slack)>>
     <<set _townCorruption to $world_corruption_soft is undefined ? 0 : $world_corruption_soft>>
     <ul class='journal'>
-      <li><<lanSwitch 'School corruption: ' '校内堕落：'>><span @class="_school.corruption gte _corruptionNeed ? 'green' : 'red'"><<print _school.corruption>></span><span class='gold'><<print ' / ' + _corruptionNeed>></span></li>
-      <li><<lanSwitch 'Town corruption: ' '城镇堕落：'>><span @class="_townCorruption gte _corruptionNeed ? 'green' : 'red'"><<print _townCorruption>></span><span class='gold'><<print ' / ' + _corruptionNeed>></span></li>
+      <<if _slack is 0>>
+        <li><<lanSwitch 'School corruption: ' '校内堕落：'>><span @class="_school.corruption gte _corruptionNeed ? 'green' : 'red'"><<print _school.corruption>></span><span class='gold'><<print ' / ' + _corruptionNeed>></span></li>
+        <li><<lanSwitch 'Town corruption: ' '城镇堕落：'>><span @class="_townCorruption gte _corruptionNeed ? 'green' : 'red'"><<print _townCorruption>></span><span class='gold'><<print ' / ' + _corruptionNeed>></span></li>
+        <li><<lanSwitch 'Affection with Leighton: ' '礼顿好感：'>><span @class="C.npc.Leighton.love gte _loveNeed ? 'green' : 'red'"><<print C.npc.Leighton.love>></span><span class='gold'><<print ' / ' + _loveNeed>></span></li>
+      <</if>>
       <li><<lanSwitch 'Staff trust: ' '教职工信任：'>><span @class="_school.staffSupport gte _staffNeed ? 'green' : 'red'"><<print _school.staffSupport>></span><span class='gold'><<print ' / ' + _staffNeed>></span></li>
-      <li><<lanSwitch 'Affection with Leighton: ' '礼顿好感：'>><span @class="C.npc.Leighton.love gte _loveNeed ? 'green' : 'red'"><<print C.npc.Leighton.love>></span><span class='gold'><<print ' / ' + _loveNeed>></span></li>
-      <li><<lanSwitch 'Student petition: ' '学生联署：'>><span @class="_school.studentSupport gte _petitionNeed ? 'green' : 'red'"><<print _school.studentSupport>></span><span class='gold'><<print ' / ' + _petitionNeed>></span></li>
+      <li><<if _slack gt 0>><<lanSwitch 'Student support: ' '学生支持：'>><<else>><<lanSwitch 'Student petition: ' '学生联署：'>><</if>><span @class="_school.studentSupport gte _petitionNeed ? 'green' : 'red'"><<print _school.studentSupport>></span><span class='gold'><<print ' / ' + _petitionNeed>></span></li>
     </ul>
     <<if _slack gt 0>>
-      <i><<lanSwitch 'The review asks for ten points less across the board.' '复核时各项都比新提案低十点。'>></i>
+      <i><<lanSwitch 'Both student support and staff trust must qualify. Each threshold is ten below the proposal’s base requirement; corruption and personal affection are not checked again.' '学生支持与教职工信任都要达标，门槛各比提案的基础要求低十点。复核不再检查堕落或个人好感。'>></i>
     <<else>>
-      <i><<lanSwitch 'Support takes one route or the other. Corruption is asked for either way.' '支持只需走通一条路线。堕落两项都要。'>></i>
+      <i><<lanSwitch 'School and town corruption must both meet the requirement. Then choose one route: staff trust and Leighton’s affection, a student petition, or leverage against Leighton.' '校内与城镇堕落都要达标。之后只需走通一条路线：教职工信任加礼顿好感、学生联署，或掌握礼顿的把柄。'>></i><br>
+      <<if _townCorruption lt _corruptionNeed>>
+        <span class='red'><<lanSwitch 'The town is not yet ready for this policy.' '镇上还无法接受这样的校规。'>></span><br>
+      <</if>>
+      <<if C.npc.Leighton.love lt _loveNeed>>
+        <span class='pink'><<lanSwitch 'Leighton is not close enough to you to back the staff proposal. A petition or leverage may offer another route.' '礼顿与你的关系还不足以支持教职工提案，也可以尝试联署或施压。'>></span><br>
+      <</if>>
+      <span @class="$headdrive is 1 or $headblackmailed is 1 ? 'green' : 'red'"><<lanSwitch 'Leverage: ' '把柄：'>><<lanSwitch `($headdrive is 1 or $headblackmailed is 1) ? 'available' : 'not obtained'` `($headdrive is 1 or $headblackmailed is 1) ? '已掌握' : '尚未掌握'`>></span>
     <</if>>
   <</if>>
 <</widget>>
@@ -223,7 +232,12 @@
     <span class='pink'><<lanSwitch 'Leighton has reviewed your marks, but you still need at least 10 affection with Leighton or to have already blackmailed the headteacher.' '礼顿看过成绩，但个人好感还需达到10，或你已经成功勒索过礼顿，才会受理申请。'>></span><br>
   <</if>>
 <<else>>
-  <span class='pink'><<lanSwitch 'Leighton wants the highest grade in science, maths, English, history and overall results before considering the form.' '礼顿要先看到科学、数学、语文、历史和总成绩都达到最高档。'>></span><br>
+  <span class='pink'><<lanSwitch 'Leighton wants A* in all four subjects and overall performance. Even blackmail does not replace the academic requirements.' '礼顿要求四科和总体表现都达到A*。即使握有把柄，也得先满足成绩要求。'>></span><br>
+  <ul class='journal'>
+    <<for _marks range [ ['Overall performance', '总体表现', $schooltrait], ['Science', '科学', $sciencetrait], ['Maths', '数学', $mathstrait], ['English', '语文', $englishtrait], ['History', '历史', $historytrait] ]>>
+      <li><<lanSwitch _marks[0] _marks[1]>>：<span @class="_marks[2] gte 4 ? 'green' : 'red'"><<if _marks[2] gte 4>>A*<<else>><<lanSwitch 'Below A*' '尚未达到A*'>><</if>></span></li>
+    <</for>>
+  </ul>
 <</if>>
 <br><<getouticon>><<lanLink ['Return to the head teacher’s office', '返回校长办公室'] "Head's Office">><</lanLink>>
 
@@ -1152,7 +1166,7 @@
   <<crimeicon>><<lanLink ['Force Leighton to approve', '迫使礼顿批准'] 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'pressure'>><</lanLink>><br>
 <</if>>
 <<if !maplebirch.get("LifeSimulation").school.canApprovePolicy('formal') and !maplebirch.get("LifeSimulation").school.canApprovePolicy('petition') and !maplebirch.get("LifeSimulation").school.canApprovePolicy('pressure')>>
-  <span class='blue'><<lanSwitch "You lack the support or leverage needed to make Leighton approve this proposal." "目前没有足够的支持，也没有可以迫使礼顿批准的把柄。">></span><br>
+  <span class='blue'><<lanSwitch 'Leighton taps the unfinished sections of the form. The requirements below still need to be met; leverage does not replace the corruption requirements.' '礼顿点了点表上尚未满足的几项。下列条件仍需补齐，掌握把柄也不能替代堕落要求。'>></span><br>
   <<deadwood-reblooms-life-simulation-school-policy-status $LifeSimulation.school.dress.proposal>><br>
 <</if>>
 <<getouticon>><<lanLink ['Withdraw the proposal', '撤回提案'] "Head's Office">>

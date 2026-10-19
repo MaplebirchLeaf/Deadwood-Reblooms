@@ -96,8 +96,8 @@ export default function (maplebirch: typeof window.maplebirch): void {
       ],
       'Widgets Rent': [
         {
-          src: '<<if $robinpaid is 1>>',
-          to: '<<if $robinpaid is 1 and !$RobinExpansion.self_rent>>',
+          srcmatch: /<<if \$robinpaid is 1(?=>>)/,
+          applyafter: ' and !$RobinExpansion.self_rent',
           expected: 1
         },
         {

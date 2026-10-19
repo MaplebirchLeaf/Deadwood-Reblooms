@@ -119,7 +119,8 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       'Swimming Lesson': [
         // 已获批的校规不再触发旧裸体泳课的礼顿惩罚，不修改原版全班任务记录。
         { src: '$swimnudecounter gte 10 and $swimall isnot 1', applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity', expected: 1 },
-        { src: '<<swimmingicon>>', applybefore: '<<deadwood-swimming-lesson-link>>', expected: 1 }
+        // 两个练习入口插在 Focus／Socialise 之后、Daydream 之前，和原版课程选项排在一起。
+        { src: '<<daydreamicon>>', applybefore: '<<deadwood-swimming-lesson-link>>', expected: 1 }
       ],
       "Head's Office": [
         {

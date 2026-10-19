@@ -294,8 +294,8 @@ export default function (maplebirch: typeof window.maplebirch) {
       'Combat Demo Widgets': [
         // NPC 目标双插也要创建阴茎 X-ray 画布，画布内部仍由 combatXrayPenis 的框架图层负责。
         {
-          src: '<<if XrayCombatMapper.isPcBlowjobVisible()>>',
-          to: '<<if XrayCombatMapper.isPcBlowjobVisible() or maplebirch.get("VanillaPlus").NPCDoublePenetration.visible>>',
+          src: '<<if XrayCombatMapper.isPcBlowjobVisible()',
+          applyafter: ' or maplebirch.get("VanillaPlus").NPCDoublePenetration.visible',
           expected: 1
         },
         // 双插使用独立缓存槽，保证原版模型的底图和两根阴茎图层同时按扩展配置创建。
@@ -363,8 +363,8 @@ export default function (maplebirch: typeof window.maplebirch) {
       'Widgets Ejaculation': [
         // 双插同伴是第二名受锁者时，原版主动拔出判定也要识别双目标锁定。
         {
-          src: '<<if _nn is $leglocktarget>>',
-          to: '<<if _nn is $leglocktarget or ($VanillaPlus.npcDoublePenetration and $VanillaPlus.npcDoublePenetration.playerLegLock and $VanillaPlus.npcDoublePenetration.playerLegLock.targets.includes(Number(_nn)))>>',
+          src: '<<if _nn is $leglocktarget',
+          applyafter: ' or ($VanillaPlus.npcDoublePenetration and $VanillaPlus.npcDoublePenetration.playerLegLock and $VanillaPlus.npcDoublePenetration.playerLegLock.targets.includes(Number(_nn)))',
           expected: 1
         },
         // 第二名插入者由扩展组件处理，避免原版把其自定义状态误判为射入 PC。

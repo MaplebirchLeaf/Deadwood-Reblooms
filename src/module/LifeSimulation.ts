@@ -36,6 +36,10 @@ class LifeSimulation extends Module {
     this.core.on(':variable', () => this.hands.setup());
 
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-body-growth', { exact: true, action: () => this.settleBodyGrowth() });
+    this.core.dynamic.regTimeEvent('onTimeTravel', ':deadwood-reblooms-body-growth-travel', {
+      cond: data => data.direction === 'forward',
+      action: () => this.settleBodyGrowth()
+    });
     // 只在原版确实跨日时清除到期卡，读档时直接按保存的到期时间判断入场资格。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-gym-membership', {
       exact: true,
@@ -54,7 +58,7 @@ class LifeSimulation extends Module {
 
   public get has(): boolean {
     const gym = V.LifeSimulation.gym;
-    return gym.ticket_day === Time.days || gym.membership === 'lifetime' || (gym.membership !== 'none' && gym.expires_at > Time.date.timeStamp);
+    return gym.ticket_day === Math.floor(Time.date.timeStamp / TimeConstants.secondsPerDay) || gym.membership === 'lifetime' || (gym.membership !== 'none' && gym.expires_at > Time.date.timeStamp);
   }
 
   /** 多伦在工作日放学后、休息日白天才可能来训练。 */
@@ -88,7 +92,7 @@ class LifeSimulation extends Module {
   public activate(plan: GymPlan): void {
     const gym = V.LifeSimulation.gym;
     if (plan === 'visit') {
-      gym.ticket_day = Time.days;
+      gym.ticket_day = Math.floor(Time.date.timeStamp / TimeConstants.secondsPerDay);
       return;
     }
     gym.membership = plan;
@@ -134,7 +138,14 @@ class LifeSimulation extends Module {
   }
 
   public get canGrow(): boolean {
-    return !this.growthActive && Number.isInteger(V.bodysize) && V.bodysize >= 0 && V.bodysize < 3;
+    return !this.growthActive && this.nextBodySize !== undefined;
+  }
+
+  /** 使用当前游戏的实际档位，包含扩展版的负数和半级体型。 */
+  private get nextBodySize(): number | undefined {
+    const calculation = this.core.SugarCube.Story.get('Widgets variablesStart2').text.match(/<<switch \$bodysize>>[\s\S]*?<<\/switch>>/)?.[0];
+    const sizes = [...(calculation?.matchAll(/<<case\s+(-?\d+(?:\.\d+)?)\s*>>/g) ?? [])].map(match => Number(match[1])).sort((a, b) => a - b);
+    return sizes.includes(V.bodysize) ? sizes.find(size => size > V.bodysize) : undefined;
   }
 
   public get canAffordClinic(): boolean {
@@ -183,9 +194,10 @@ class LifeSimulation extends Module {
     if (this.growth.progress < this.growthDuration) return;
     // 复用原版开局的体型结算，不维护另一份上限表，找不到时保留进度。
     const calculation = this.core.SugarCube.Story.get('Widgets variablesStart2').text.match(/<<switch \$bodysize>>[\s\S]*?<<\/switch>>/)?.[0];
-    if (!calculation) return;
+    const next = this.nextBodySize;
+    if (!calculation || next === undefined) return;
     const oldMaximum = V.physiquesize;
-    V.bodysize = this.growth.base + 1;
+    V.bodysize = next;
     this.core.SugarCube.Wikifier.wikifyEval(calculation);
     if (oldMaximum > 0) V.physique *= V.physiquesize / oldMaximum;
     this.stopBodyGrowth();

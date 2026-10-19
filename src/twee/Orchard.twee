@@ -193,6 +193,44 @@
   <</if>>
 <</widget>>
 
+<<widget 'deadwood-orchard-worker-harvest'>>
+  <<set _orchardKept to maplebirch.get('Orchard')?.workerReport?.kept>>
+  <<if _orchardKept>>
+    <<set _orchardSeparator to ''>>
+    <<for _orchardFruit, _orchardAmount range _orchardKept>>
+      <<if _orchardAmount gt 0>>
+        <<= _orchardSeparator>><<foodstufficon _orchardFruit>>
+        <<if _orchardFruit is 'blood_lemon'>>
+          <<lanSwitch 'Blood lemon' '血柠'>>
+        <<else>>
+          <<set _orchardName to maplebirch.get('Orchard').species[_orchardFruit].name>>
+          <<lanSwitch _orchardName[0] _orchardName[1]>>
+        <</if>> × <<= _orchardAmount>>
+        <<set _orchardSeparator to ' / '>>
+      <</if>>
+    <</for>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-orchard-seed-shop'>>
+  <<set _orchard to maplebirch.get('Orchard')>>
+  <<if _orchard and _orchard.canWork and Time.dayState isnot 'night' and Time.hour isnot 21>>
+    <<for _orchardSeed, _orchardData range _orchard.species>>
+      <<if _orchardData.seedSource is 'shop' and !_orchard.state.known.includes(_orchardSeed) and setup.foodstuff[_orchardSeed]>>
+        <<set _orchardLabel to ['Buy ' + _orchardData.name[0].toLowerCase() + ' seeds (£' + (_orchardData.seedPrice / 100) + ')', '购买' + _orchardData.name[1] + '种子 (£' + (_orchardData.seedPrice / 100) + ')']>>
+        <<foodstufficon _orchardSeed>>
+        <<if (maplebirch.get('Finance')?.canPay(_orchardData.seedPrice, 'shopping') ?? ($money gte _orchardData.seedPrice))>>
+          <<capture _orchardSeed>>
+            <<lanLink _orchardLabel 'Supermarket'>><<run maplebirch.get('Orchard').buySeed(_orchardSeed)>><</lanLink>>
+          <</capture>>
+        <<else>>
+          <span class='red'><<lanSwitch _orchardLabel[0] _orchardLabel[1]>></span>
+        <</if>><br>
+      <</if>>
+    <</for>>
+  <</if>>
+<</widget>>
+
 :: Deadwood Reblooms Orchard Opening
 <<if !maplebirch.get('Orchard')>>
   <<getouticon>>

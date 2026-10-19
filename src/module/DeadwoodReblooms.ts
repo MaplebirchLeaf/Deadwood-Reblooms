@@ -152,7 +152,7 @@ class BaileyRent {
   private reconcile(previous: BaileyRentSnapshot): void {
     // 用前后状态差分追踪原版贝利结算，避免覆盖原版多处分支的租金逻辑。
     const current = this.snapshot;
-    if (current.rentStage > previous.rentStage) this.settle();
+    if (current.rentStage > previous.rentStage) V.DeadwoodReblooms.baileyRentDebt = 0;
     else if (current.refusedTotal > previous.refusedTotal) this.accrue();
     if (previous.confiscation && !current.confiscation && V.bailey_confiscation_lost === 1 && Time.days >= previous.confiscation.day + 8) this.offset(previous.confiscation.value);
   }
@@ -170,10 +170,6 @@ class BaileyRent {
     const baseRent = Math.max(0, rent - debt);
     V.DeadwoodReblooms.baileyRentDebt = debt + baseRent + babyRent;
     V.rentmoney = baseRent + V.DeadwoodReblooms.baileyRentDebt;
-  }
-
-  private settle(): void {
-    V.DeadwoodReblooms.baileyRentDebt = 0;
   }
 
   private offset(value: number): void {
@@ -309,12 +305,7 @@ class DeadwoodReblooms extends Module {
       $('#history-backward').ariaClick(() => this.rand.back(1));
       $('#history-forward').ariaClick(() => this.rand.forward(1));
     });
-    this.core.var.options.define('modhint', DeadwoodReblooms.options);
-    this.core.var.options.define('bodywriting', DeadwoodReblooms.options);
-    this.core.var.options.define('baileyRent', DeadwoodReblooms.options);
-    this.core.var.options.define('mobile_status_bars', DeadwoodReblooms.options);
-    this.core.var.options.define('mobile_history', DeadwoodReblooms.options);
-    this.core.var.options.define('hideEarSlimeParasites', DeadwoodReblooms.options);
+    this.core.var.options.define(DeadwoodReblooms.options);
     super.preInit();
   }
 }

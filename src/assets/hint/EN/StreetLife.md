@@ -110,7 +110,7 @@ After confirming the target's identity, you may instead give the verified lead t
 
 **Bounty Hunter** requires at least one actual payment from each of the current twelve case types. The board and journal show completed types and missing names. Repeating one type does not complete another. The final qualifying case pays its base reward; subsequent payments gain **15%** while you remain in cooperation with Grant. Your first verified and paid handover also earns **In the Net**.
 
-You may take Landry's work and hunt wanted targets, but Landry and Grant are not allies. With a serious criminal record, other bounty hunters may pursue you in town. Negotiating, fleeing, driving away and resisting have their own requirements and consequences.
+You may take Landry's work and hunt wanted targets, but Landry and Grant are not allies. With a serious criminal record, other bounty hunters may pursue you in town. Before being spotted, you can try to slip away using skulduggery. If caught, you can still negotiate, run or resist. Evading the hunter leaves your evidence intact, but this street pursuit will not trigger again that day.
 
 ## Bailey and Mickey
 

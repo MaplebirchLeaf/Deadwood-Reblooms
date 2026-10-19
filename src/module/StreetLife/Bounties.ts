@@ -27,7 +27,7 @@ interface Hunter {
   source: string;
   point: string;
   rolls: Record<'talk' | 'run', number>;
-  outcome: '' | 'talk' | 'fight' | 'run' | 'surrender';
+  outcome: '' | 'talk' | 'fight' | 'run' | 'surrender' | 'avoid';
   combatStarted: boolean;
   amount: number;
   offence: number;
@@ -66,6 +66,7 @@ type Action =
   | 'abandon'
   | 'release'
   | 'face'
+  | 'hunter-avoid'
   | 'hunter-talk'
   | 'hunter-run'
   | 'hunter-resist'
@@ -344,14 +345,20 @@ export default class Bounties {
       return true;
     }
     if (!this.available) return false;
-    if (['face', 'hunter-talk', 'hunter-run', 'hunter-resist', 'hunter-surrender', 'leave', 'arrest'].includes(action)) {
+    if (['face', 'hunter-avoid', 'hunter-talk', 'hunter-run', 'hunter-resist', 'hunter-surrender', 'leave', 'arrest'].includes(action)) {
       const hunter = state.hunter;
       if (!hunter || (title !== 'Deadwood Street Hunter' && title !== hunter.source && !(action === 'arrest' && title === 'Deadwood Street Hunter Handover'))) return false;
-      if (action === 'face') {
+      if (action === 'face' || action === 'hunter-avoid') {
         if (hunter.stage !== 'approach') return false;
+        if (action === 'hunter-avoid' && value === 1) {
+          hunter.outcome = 'avoid';
+          hunter.stage = 'escaped';
+          return true;
+        }
         wiki(`<<endevent>><<generateNPC 1 'a'>><<saveNPC 0 '${hunter.key}'>><<endevent>>`);
         if (!V.per_npc[hunter.key]) return false;
         hunter.stage = 'confrontation';
+        if (action === 'hunter-avoid') hunter.outcome = 'avoid';
       } else if (action === 'leave') {
         if (hunter.stage !== 'escaped') return false;
         if (V.per_npc[hunter.key]) wiki(`<<endevent>><<clearNPC '${hunter.key}'>>`);

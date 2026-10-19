@@ -5,7 +5,17 @@
     <<socialiseicon 'ask'>><<lanLink ['Discuss ending your rent payments (0:05)', '谈谈不再交租的事 (0:05)'] 'Deadwood Reblooms Orphanage Buyout'>>
       <<pass 5>>
     <</lanLink>><br>
-  <</if>><<deadwood-orphanage-donation-office>>
+  <</if>>
+  <<if _options is 1 and maplebirch.get('Finance')?.orphanage.canManageAdoption>>
+    <<icon 'school/procurement-audit.png'>><<lanLink ["Check the adoption inquiry file on Bailey's desk (0:05)", '查看贝利桌上的收养意向文件 (0:05)'] 'Deadwood Reblooms Orphanage Adoption'>>
+      <<pass 5>>
+    <</lanLink>><br>
+  <</if>>
+  <<deadwood-orphanage-donation-office>>
+<</widget>>
+
+<<widget 'deadwood-finance-orphanage-adoption-refused-gate'>>
+  <<goto 'Deadwood Reblooms Orphanage Adoption Refused Gate'>>
 <</widget>>
 
 <<widget 'deadwood-finance-orphanage-robin-link'>>
@@ -223,3 +233,84 @@
   <<npcincr Robin love 3>><<npcincr Robin trauma -5>><<glove>><<lrtrauma>><br><br>
 <</if>>
 <<getouticon>><<lanLink ["Return to Robin's room", '返回罗宾的房间'] 'Robin Options'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Reblooms Orphanage Adoption
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Bailey>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    You notice a stiff, heavy envelope embossed with an upscale seal tucked under a brass paperweight on Bailey's desk. It is a formal enquiry memorandum regarding the transfer of your orphanage ward guardianship, bearing Avery's private crest.<br><br>
+    <<if $Finance.orphanage.avery_adoption_refused>>
+      Beside the envelope lies your previous declaration, firmly stamped with Bailey's seal and stating in writing that you reject any adoption or private guardianship transfer by Avery. Bailey taps the desk. "Your note is still on file. If Avery brings another check, I will slide it right back. Have you had second thoughts?"
+    <<else>>
+      Bailey leans back in the desk chair, folding <<his>> arms as <<he>> watches you glance at the paper. "Avery has been asking about your custody papers," Bailey says, tapping the corner of the envelope. "Dropped off an enquiry note and promised another donation. In the usual run of things, I make that choice. <<if $Finance.orphanage.pc_bought_out>>Not that you owe me anything anymore—you bought out your own release, so I have no legal right to sell you off.<<else>>But if you intend to stay here, you had better make up your mind before Avery brings the check.<</if>>"
+    <</if>>
+  <<option 'CN'>>
+    你注意到贝利办公桌的黄铜镇纸下，压着一封盖有高档火漆印的硬质信函。那是来自多瑙河街宅邸的正式文书，上面印着艾弗里的私人纹章，赫然是一份针对你监护权转让与领养的意向备忘录。<br><br>
+    <<if $Finance.orphanage.avery_adoption_refused>>
+      信函旁放着你先前的书面声明，上面盖着孤儿院的公章，清晰写明了你拒绝任何来自艾弗里的私人领养与监护权转让。贝利敲了敲桌面。“你的字条还压在档案里。艾弗里要是再派人拿支票来，我自然会直接退回去。怎么，你想改主意了？”
+    <<else>>
+      贝利靠在椅背上，抱着双臂打量着你的神色。“艾弗里之前打听过你的监护权，”贝利抬手点了点信函一角，“送了这份意向便条过来，还许诺了一笔可观的捐款。换作平时，这事轮不到你多嘴。<<if $Finance.orphanage.pc_bought_out>>不过你早就把自己那份账结清了，我现在可没权拿一个自由人换钱。<<else>>但你要是打算留在孤儿院，最好趁艾弗里还没把支票送来前，自己先拿个主意。<</if>>”
+    <</if>>
+<</language>>
+<br><br>
+<<if !$Finance.orphanage.avery_adoption_refused>>
+  <<refuseicon>><<lanLink ['Sign the formal refusal of Avery\'s adoption', '签字明确拒绝艾弗里的收养提案'] 'Deadwood Reblooms Orphanage Adoption Decision'>>
+    <<set $Finance.orphanage.avery_adoption_refused to true>>
+  <</lanLink>><br>
+<<else>>
+  <<socialiseicon>><<lanLink ['Withdraw your refusal (allow adoption if eligible)', '撤销拒绝，保留艾弗里收养的可能'] 'Deadwood Reblooms Orphanage Adoption Decision'>>
+    <<set $Finance.orphanage.avery_adoption_refused to false>>
+  <</lanLink>><br>
+<</if>>
+<<getouticon>><<lanLink ['Leave the papers as they are', '先不作改动，离开办公室'] 'Bailey\'s Office'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Reblooms Orphanage Adoption Decision
+<<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Bailey>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    <<if $Finance.orphanage.avery_adoption_refused>>
+      You take up the pen and write your name firmly across the refusal declaration. Bailey inspects the ink, presses the orphanage stamp over your signature, and files the paper in the desk drawer. "Suit yourself," Bailey says. "With that on record, no donation from Avery will buy your papers out from under you. I will tell them you refused."
+    <<else>>
+      You ask Bailey to return your earlier refusal note and tear it in half. Bailey shrugs and tosses the scraps into the wastebasket. "Fine. If Avery arrives with a donation to buy custody, don't expect me to turn the money away on your behalf."
+    <</if>>
+  <<option 'CN'>>
+    <<if $Finance.orphanage.avery_adoption_refused>>
+      你拿起笔，在拒绝声明的底栏稳稳签下自己的名字。贝利看了看墨迹，拿起孤儿院的图章重重盖在签名上，随后将文件归入抽屉。“随你的便，”贝利说。“白纸黑字留在这里，不管艾弗里出多少捐款，孤儿院都无权替你转让监护权。等对方找上门，我会明确告诉他们你拒绝了。”
+    <<else>>
+      你从贝利手中要回先前的拒绝字条，当面撕成了两半。贝利耸了耸肩，把纸屑扫进纸篓里。“行。要是艾弗里带着大笔捐赠登门要办收养，可别指望我会替你挡回去。”
+    <</if>>
+<</language>>
+<br><br>
+<<getouticon>><<lanLink ['Return to the office desk', '返回办公桌前'] 'Bailey\'s Office'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Reblooms Orphanage Adoption Refused Gate
+<<set $outside to 0>><<set $location to 'home'>><<effects>>
+<<npc Avery>><<npc Bailey 2>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    Avery stands in Bailey's office with an assured smile, sliding a signed bank draft across the desk. "I believe this donation will more than compensate for the orphanage's care of <<pcpetname 'Avery'>>."<br><br>
+    <<person2>>
+    Bailey glances at the amount on the slip, but does not pick it up. Instead, <<he>> rests two fingers against the corner and slides it straight back across the polished wood.<br><br>
+    <<if $Finance.orphanage.pc_bought_out>>
+      "You're too late," Bailey says coldly. "This one already paid off <<his>> full release in hard cash. I don't hold the custody papers anymore, and I don't sell people who aren't mine to sell."
+    <<else>>
+      "Save your ink," Bailey says flatly. "The kid already filed a signed, witnessed refusal in writing. It's locked in my drawer. I'm keeping my word on that paper. Take your draft and leave."
+    <</if>>
+    <br><br>
+    <<person1>>
+    Avery's polished smile stiffens. <<He>> looks from Bailey's unyielding expression to you, <<his>> jaw tightening as <<he>> realizes the arrangement has failed. Avery retrieves the draft from the desk, folds it into an inner pocket, and turns on <<his>> heel without another word.
+  <<option 'CN'>>
+    艾弗里站在贝利的办公室里，神色从容，带着自信的微笑将一张签好的支票滑过桌面。“我相信这笔赞助，足以补偿孤儿院对<<pcpetname 'Avery'>>的抚养之恩。”<br><br>
+    <<person2>>
+    贝利瞥了一眼支票上的数额，却没有伸手去拿。相反，<<he>>伸出两根手指按住纸角，将支票原封不动地推了回去。<br><br>
+    <<if $Finance.orphanage.pc_bought_out>>
+      “你来晚了，”贝利冷冷地说道。“这孩子早就用真金白银把自己的赎金一次性结清了。我手里没有你的监护权，也没兴趣拿一个不属于我的自由人换赞助。”
+    <<else>>
+      “省省你的墨水吧，”贝利平淡地说道。“这孩子已经在办公室留下了书面签字，明确拒绝由你收养。白纸黑字锁在我的抽屉里。我说过认那张单子，就不会收你的钱。拿着支票走人。”
+    <</if>>
+    <br><br>
+    <<person1>>
+    艾弗里脸上的从容笑意瞬间僵住了。<<He>>看了看贝利冷漠坚决的脸，又看了看你，咬紧了牙关，终于意识到这次势在必得的收养企图彻底落了空。艾弗里收起桌上的支票，折好塞回大衣内袋，一言不发地拂袖而去。
+<</language>>
+<br><br>
+<<main_hall_icon>><<lanLink ['Return to the hall', '返回大厅'] 'Orphanage'>><<endevent>><<set $eventskip to 1>><</lanLink>><br>

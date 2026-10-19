@@ -42,14 +42,6 @@ export default class StreetLife extends Module {
     });
   }
 
-  public Init(): void {
-    this.variable();
-  }
-
-  public loadInit(): void {
-    this.variable();
-  }
-
   public get reputation(): number {
     return Math.clamp(V.StreetLife.reputation + Math.min(100, (Number(V.pub_task_stat) || 0) * 5), 0, 100);
   }

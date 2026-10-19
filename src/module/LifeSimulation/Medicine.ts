@@ -235,6 +235,13 @@ export default class Medicine {
     });
     this.core.dynamic.regTimeEvent('onAfter', 'LifeSimulation Medicine Expiry', { action: () => this.tick() });
     this.core.dynamic.regTimeEvent('onDay', 'LifeSimulation Medicine Dependence', { exact: true, action: () => this.day() });
+    this.core.dynamic.regTimeEvent('onTimeTravel', 'LifeSimulation Medicine Travel', {
+      cond: data => data.direction === 'forward',
+      action: () => {
+        this.tick();
+        this.day();
+      }
+    });
     const indicators: Record<MedicineId, [string, string, string][]> = {
       calm: [
         ['- Stress', '- 压力', 'green'],

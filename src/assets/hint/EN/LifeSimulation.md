@@ -12,7 +12,7 @@ Enforcement, mediation, pressure and overlooking affect school standing and rela
 
 Enter from the corridor at 07:00–17:00 on school days. Ordinary students can organise affairs for 15 minutes daily; officeholders can rest, study and handle appeals. Presidents may delegate duty before 09:00, using the day's affairs opportunity without adding a personal patrol.
 
-Propose policies in order through the headteacher: uniform, free dress, revealing dress, optional nudity, nude day and mandatory nudity. Later policies require more support and corruption; pressure does not bypass shared requirements.
+Propose policies in order through the headteacher: uniform, free dress, revealing dress, optional nudity, nude day and mandatory nudity. Both school and town corruption must qualify. Then choose one route: staff trust plus Leighton's affection, a student petition, or leverage against Leighton. The board lists the requirements. Pressure still requires both corruption conditions.
 
 A passed proposal starts a seven-day trial before office review. Failure rolls it back with a three-day cooldown. Nude day's compulsory requirement applies only during Friday school hours. Policies formally retained can be selected again.
 
@@ -45,7 +45,7 @@ To increase overall body size, actively consult and start a plan:
 - **Training plan**: complete strength or running sessions on 30 different dates to grow one tier. Only one day counts per date; stretching is excluded, while running with Doren counts.
 - **Hospital treatment**: pay <span class="gold">£5,000</span> in the hospital foyer for two weeks of treatment and one tier of growth; stopping early gives no refund.
 
-Only one plan can run at a time, up to the original maximum body size. It changes overall size without increasing other body measurements.
+Only one plan can run at a time. Growth follows the body-size tiers supported by your game, including expansion tiers, up to that version's largest size. It changes overall size without increasing other body measurements.
 
 ### Two handheld items and medicine gifts
 

@@ -12,10 +12,11 @@ export interface OrphanageState {
   pc_bought_out: boolean;
   robin_bought_out: boolean;
   robin_told: boolean;
+  avery_adoption_refused: boolean;
 }
 
 export default class Orphanage {
-  public static readonly defaults: OrphanageState = { offer: null, choice: null, agreed: false, pc_bought_out: false, robin_bought_out: false, robin_told: false };
+  public static readonly defaults: OrphanageState = { offer: null, choice: null, agreed: false, pc_bought_out: false, robin_bought_out: false, robin_told: false, avery_adoption_refused: false };
 
   public constructor(private readonly finance: Finance) {}
 
@@ -33,6 +34,10 @@ export default class Orphanage {
 
   public get robinFree(): boolean {
     return this.state.robin_bought_out;
+  }
+
+  public get averyAdoptionRefused(): boolean {
+    return Boolean(this.state.avery_adoption_refused);
   }
 
   private get weeklyRent(): number {
@@ -73,6 +78,10 @@ export default class Orphanage {
 
   public get canNegotiate(): boolean {
     return !this.boughtOut && !V.RobinExpansion?.bailey_defeated && Time.hour >= 7 && Time.hour < 10 && !V.replayScene && !V.statFreeze;
+  }
+
+  public get canManageAdoption(): boolean {
+    return !V.replayScene && !V.statFreeze && !V.combat && !V.possessed && Time.hour >= 7 && Time.hour < 10 && !V.RobinExpansion?.bailey_defeated;
   }
 
   public get canTalkRobin(): boolean {

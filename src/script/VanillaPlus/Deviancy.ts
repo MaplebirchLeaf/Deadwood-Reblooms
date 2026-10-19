@@ -11,8 +11,6 @@ export default function (maplebirch: typeof window.maplebirch) {
     { widget: [1, 'deadwood-reblooms-deviancy-eerie-mirror-link 1'], passage: 'Eerie Mirror' }
   );
 
-  // 入口沿用原版 "mirror"，只接管真正离开的页面，导航、鸟瞰与产程保持原样。
-
   // 接入镜面通路与仪式结算，并扩展异种癖上限。
   maplebirch.tool.inject({
     locationPassage: {
@@ -35,8 +33,8 @@ export default function (maplebirch: typeof window.maplebirch) {
       'Gwylan Hypnosis Widgets': [
         // “超越禁忌”只保证格威岚意志检定成功，需求计时与错过惩罚仍完全由原版处理。
         {
-          src: '<<if !$hypnosis_traits.devotion or $hypnosis_traits.devotion lt $_level>>',
-          to: '<<if $VanillaPlus.traits.deviancy or !$hypnosis_traits.devotion or $hypnosis_traits.devotion lt $_level>>',
+          src: '!$hypnosis_traits.devotion or $hypnosis_traits.devotion lt $_level',
+          applybefore: '$VanillaPlus.traits.deviancy or ',
           expected: 1
         }
       ],

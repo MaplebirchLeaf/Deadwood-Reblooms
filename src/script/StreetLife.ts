@@ -208,7 +208,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
         {
           // 酒馆夜间仍营业，其它商店的闭店偷窃分支维持原样。
           src: '$shopName isnot "forest"',
-          to: '!["forest", "deadwoodStreet"].includes($shopName)',
+          applyafter: ' and $shopName isnot "deadwoodStreet"',
           expected: 1
         },
         {
