@@ -31,14 +31,30 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
     });
   });
 
-  // 只扩展安全事件池，不截断追猎、危险遭遇或原版行进结算。
   maplebirch.tool.inject({
     locationPassage: {
-      // 普通菜单的地点说明后、湖泊等目的地前；最深处没有 forestdeeper，也共用此结构。
+      // 只扩展安全事件池；普通菜单的地点说明后、湖泊等目的地前，保留原版行进结算。
       Forest: [{ srcmatch: /<<elseif \$eventskip gte 1>>[^<]*<br><br>/g, applyafter: '\n\t\t<<deadwood-raven-link>><<deadwood-raven-shrine-path>>\n', expected: 5 }],
       Park: [{ src: '<<if $leftleg is "bound" or $rightleg is "bound">>', applybefore: '<<deadwood-raven-link>>\n', expected: 1 }]
     },
     widgetPassage: {
+      'Widgets Mirror': [
+        {
+          src: '<<if _animal>>',
+          applyafter: '<<set _mirrorAnimal to _animal>><<for _animal range ["cat", "cow", "wolfgirl", "harpy", "fox"].filter(name => V[name] > 1)>>',
+          expected: 1
+        },
+        {
+          srcmatch: /(<<if \$(cat|cow|wolfgirl|harpy|fox) gt 1)(>>)(?=\s*<<if _(?:cat|cow|wolf|bird|fox)\.)/g,
+          to: '$1 and _animal is "$2"$3',
+          expected: 5
+        },
+        {
+          srcmatch: /(<<set \$_chimeraOptions to \{[\s\S]*?<<set \$_chimeraEnabled[^\r\n]*>>)/,
+          to: `</div><</for>><<set _animal to _mirrorAnimal>>$1<div @class="'settingsToggleItemWide' + $_chimeraEnabled">`,
+          expected: 1
+        }
+      ],
       'Widgets Forest': [
         {
           src: '<<addinlineevent "safeforest_easytrail" 0.33>>',

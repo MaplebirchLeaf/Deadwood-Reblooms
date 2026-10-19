@@ -23,6 +23,14 @@ declare module 'twine-sugarcube/userdata' {
 }
 
 declare global {
+  interface TrinityTransformation {
+    hooks: {
+      change: { add(name: string, callback: (context: { readonly name: string; change: number }) => void): boolean };
+      divine: { add(name: string, callback: (context: { widget?: [string, number] }) => void, order?: number): boolean };
+      update: { add(name: string, callback: (stage: 'before' | 'alter' | 'after') => void): boolean };
+    };
+  }
+
   interface Array<T> {
     either(weights?: readonly number[], allowNull?: boolean): T | null | undefined;
   }
@@ -34,6 +42,7 @@ declare global {
   const Links: { enabled: boolean };
 
   interface Window {
+    dailyTransformationEffects(): void;
     crimeSumCurrent(): number;
     settingValueNameFromValue?: (name: string, value: unknown) => unknown;
     sexShopOnBuyClick(index: number, inSexShop?: boolean, colour?: string, costsMoney?: boolean): void;
