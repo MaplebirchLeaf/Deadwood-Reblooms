@@ -37,7 +37,7 @@ Reach maximum beauty, once attain **7,000 base allure outdoors outside a blood m
 Reach maximum exhibitionism and complete these two challenges:
 
 - **School nude swimming:** ask to swim naked, then complete the recorded backstroke stage once the counter reaches **five**. Undressing at the pool alone does not count.
-- **High Street photo assignment:** complete Niki’s successful run with your face shown while you have at least **250 flyers**, then finish the street ending. A nude studio shoot is unrelated.
+- **Exposed crossings:** earn the native **A Lewd Adventure** feat. Within the same day, cross Connudatus Street, cross High Street into the park, and cross the flyover to the industrial district — the last of the three is the bridge.
 
 After earning the seventh-level exhibitionism trait, you can walk around town naked if you are already comfortable with that degree of exposure. Fame, encounters and other consequences still apply.
 

@@ -35,7 +35,7 @@ class Physique {
 
   public preInit(): void {
     this.vanillaPlus.core.dynamic.regStateEvent('gate', 'physique-unlock', {
-      output: 'deadwood-reblooms-physique-unlock',
+      output: 'deadwood-reblooms-unlock "physique"',
       cond: () => V.VanillaPlus != null && this.unlock
     });
 

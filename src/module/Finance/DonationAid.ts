@@ -220,7 +220,8 @@ export default class DonationAid {
       this.has('temple') &&
       !this.state('temple').privacy &&
       ['initiate', 'monk', 'priest'].includes(V.temple_rank) &&
-      this.donations.finance.core.get('VanillaPlus')?.hasTrait('exhibitionism') === true &&
+      this.donations.finance.core.get('VanillaPlus') != null &&
+      V.VanillaPlus?.traits.exhibitionism === true &&
       V.uncomfortable.nude === false &&
       this.free('temple', 5)
     );

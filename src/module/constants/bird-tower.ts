@@ -42,8 +42,6 @@ export interface BirdTowerState {
     immature: boolean;
     /** 狩猎途中留巢雏鸟遇袭。 */
     nestling_danger: boolean;
-    /** 大鹰第一次尝到熟鱼。 */
-    cooked_fish: boolean;
     /** 遇见独居的孤儿鹰巢。 */
     orphan_nest: boolean;
     /** 给小鹰哺乳。 */
@@ -102,7 +100,6 @@ export const DEFAULT_BIRD_TOWER_STATE: BirdTowerState = {
     subadult: false,
     immature: false,
     nestling_danger: false,
-    cooked_fish: false,
     orphan_nest: false,
     milk: false
   },

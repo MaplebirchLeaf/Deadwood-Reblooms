@@ -203,8 +203,6 @@ export interface RobinExpansionState {
     saved_debt: number;
     /** 上次从触手平原寻找罗宾的游戏日，用于限制每天一次。 */
     tentacle_day: number;
-    /** 触手平原路线失败的累计次数，用于文案与日志。 */
-    tentacle_failures: number;
     /** 已度过的触手遭遇次数，用于区分第一场与之后。 */
     tentacle_wave: number;
     /** 本次平原探索的步数与伏击判定。 */
@@ -316,7 +314,6 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
     warning_visit_day: -1,
     saved_debt: 0,
     tentacle_day: -1,
-    tentacle_failures: 0,
     tentacle_wave: 0,
     tentacle_steps: 0,
     tentacle_ambush: false,

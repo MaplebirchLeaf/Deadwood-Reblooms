@@ -232,10 +232,6 @@ class School {
     return C.npc[guest]?.init === 1 && (C.npc[guest].love ?? 0) >= 30 && (C.npc[guest].trauma ?? 0) < 60 && window.isLoveInterest(guest);
   }
 
-  public get councilPrivatePartner(): SchoolStudent | null {
-    return this.state.council.private_with;
-  }
-
   public recordPrivateMeeting(guest: SchoolStudent): boolean {
     if (!this.canPrivateMeeting || this.councilGuest !== guest) return false;
     this.state.council.private_day = Time.days;

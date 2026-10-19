@@ -43,7 +43,7 @@ class Beauty {
 
   public preInit(): void {
     this.vanillaPlus.core.dynamic.regStateEvent('gate', 'beauty-unlock', {
-      output: 'deadwood-reblooms-beauty-unlock',
+      output: 'deadwood-reblooms-unlock "beauty"',
       cond: () => V.VanillaPlus != null && this.unlock
     });
   }

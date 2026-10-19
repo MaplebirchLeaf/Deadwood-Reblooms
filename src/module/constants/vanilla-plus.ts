@@ -42,10 +42,6 @@ export interface VanillaPlusState {
   };
   /** 露出癖相关的场景进度。 */
   exhibitionism: {
-    /** 商业街裸奔（正式）已发生。 */
-    highStreetRun: boolean;
-    /** 商业街暴露（初次）已发生。 */
-    highStreet: boolean;
     /** 五级突破事件已完成，用于避免重复触发。 */
     levelFive: number;
   };
@@ -143,8 +139,6 @@ export const DEFAULT_VANILLA_PLUS_STATE: VanillaPlusState = {
     breakUsed: false
   },
   exhibitionism: {
-    highStreetRun: false,
-    highStreet: false,
     levelFive: 0
   },
   deviancy: {

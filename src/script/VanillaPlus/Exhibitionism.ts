@@ -57,30 +57,6 @@ export default function (maplebirch: typeof window.maplebirch) {
           applyafter: ' and !maplebirch.get("VanillaPlus").exhibitionism.canRoamTemple',
           expected: 1
         }
-      ],
-      'Photo High Start': [
-        // 在拍摄初始化后清空商业街裸奔临时标记，防止上一次拍摄结果污染新事件。
-        {
-          src: '<<photo_init>>',
-          applyafter: '<<set $VanillaPlus.exhibitionism.highStreetRun to false>>',
-          expected: 1
-        }
-      ],
-      'Photo High Exhibitionism Run Face': [
-        // 在场景 effects 后按阶段与传单数记录成功裸奔，避免仅进入 Passage 就算完成。
-        {
-          src: '<<effects>>',
-          applyafter: '<<if $phase is 2 and $photo_flyers gte 250>><<set $VanillaPlus.exhibitionism.highStreetRun to true>><</if>>',
-          expected: 1
-        }
-      ],
-      'Photo High End Street': [
-        // 在原版清理拍摄变量前把本次裸奔结果写入永久商业街标记。
-        {
-          src: '<<photo_unset>>',
-          applybefore: '<<if $VanillaPlus.exhibitionism.highStreetRun>><<set $VanillaPlus.exhibitionism.highStreet to true>><</if>>',
-          expected: 1
-        }
       ]
     },
     widgetPassage: {

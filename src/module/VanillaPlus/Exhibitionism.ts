@@ -6,7 +6,7 @@ class Exhibitionism {
   public constructor(private readonly vanillaPlus: VanillaPlus) {}
 
   public get comfortable(): boolean {
-    if (!V.VanillaPlus || !this.vanillaPlus.hasTrait('exhibitionism') || V.exposedRaw < 1) return false;
+    if (!V.VanillaPlus || !V.VanillaPlus.traits.exhibitionism || V.exposedRaw < 1) return false;
     return V.exposedRaw >= 2 ? V.uncomfortable.nude === false : V.uncomfortable.underwear === false;
   }
 
@@ -32,8 +32,7 @@ class Exhibitionism {
   }
 
   public get requirements(): boolean[] {
-    const state = V.VanillaPlus.exhibitionism;
-    return [V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism'), (V.swimnudecounter ?? 0) >= 5, state.highStreet];
+    return [V.exhibitionism >= this.vanillaPlus.normalCeiling('exhibitionism'), (V.swimnudecounter ?? 0) >= 5, V.feats?.currentSave?.['A Lewd Adventure'] != null];
   }
 
   public get unlock(): boolean {
@@ -46,7 +45,7 @@ class Exhibitionism {
 
   public preInit(): void {
     this.vanillaPlus.core.dynamic.regStateEvent('gate', 'exhibitionism-unlock', {
-      output: 'deadwood-reblooms-exhibitionism-unlock',
+      output: 'deadwood-reblooms-unlock "exhibitionism"',
       cond: () => V.VanillaPlus != null && this.unlock
     });
   }

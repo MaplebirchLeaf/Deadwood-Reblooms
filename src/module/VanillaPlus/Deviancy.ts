@@ -59,7 +59,7 @@ class Deviancy {
     };
 
     this.vanillaPlus.core.dynamic.regStateEvent('gate', 'deviancy-unlock', {
-      output: 'deadwood-reblooms-deviancy-unlock',
+      output: 'deadwood-reblooms-unlock "deviancy"',
       cond: () => V.VanillaPlus != null && this.unlock
     });
 

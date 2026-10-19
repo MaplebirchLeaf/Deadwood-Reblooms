@@ -363,7 +363,7 @@ class Promiscuity {
 
   public preInit(): void {
     this.vanillaPlus.core.dynamic.regStateEvent('gate', 'promiscuity-unlock', {
-      output: 'deadwood-reblooms-promiscuity-unlock',
+      output: 'deadwood-reblooms-unlock "promiscuity"',
       cond: () => V.VanillaPlus != null && this.unlock
     });
   }
