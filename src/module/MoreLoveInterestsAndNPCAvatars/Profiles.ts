@@ -184,12 +184,7 @@ const rules: Record<string, Pick<AvatarProfile, 'stateResolver' | 'layers' | 'mi
       return '';
     }
   },
-  'Ivory Wraith': { stateResolver: () => (['active', 'despair', 'haunt'].includes(V.wraith?.state) ? V.wraith.state : 'life') },
-  'Night Monster': {
-    layers: npc => ({
-      base: `${avatarBasePath}/night-monster/${V.daily?.nmMonsterRoll ? (npc.pronoun === 'm' ? 'human-m' : 'human-f') : 'beast'}.png`
-    })
-  }
+  'Ivory Wraith': { stateResolver: () => (['active', 'despair', 'haunt'].includes(V.wraith?.state) ? V.wraith.state : 'life') }
 };
 
 const avatarProfiles: Record<string, AvatarProfile> = Object.fromEntries(
