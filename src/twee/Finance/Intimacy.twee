@@ -98,8 +98,9 @@
 <<set _place to _estate.intimacyPlace>>
 <!-- 三种亲密地点共用同一段遭遇战：泳池、浴室与卧室只在进入、开场白和收尾处分开。 -->
 <<set _placeRoom to _place is 'bath' ? 'bathroom' : _place>>
-<<set _placeBack to _estate.intimacyReturn(_place)>>
-<<set _placeReturn to _estate.intimacyReturnLabel(_place)>>
+<<set _placeInfo to Object.hasOwn(_estate.intimacyPlaces, _place) ? _estate.intimacyPlaces[_place] : _estate.intimacyPlaces.bedroom>>
+<<set _placeBack to _placeInfo.passage>>
+<<set _placeReturn to _placeInfo.returnLabel>>
 <<if !_property || !_partner || !_estate.owns(_property.id) || _estate.managementFor(_property.id).rented
   || !_estate.placeOpen(_place)
   || ($sexstart is 1 && !_estate.canIntimate(_partner.id, _property.id, _place))>>
@@ -270,8 +271,9 @@
 <<set _estate to maplebirch.get("Finance").realEstate>>
 <<set _partner to _estate.currentCompanion>>
 <<set _place to _estate.intimacyPlace>>
-<<set _placeBack to _estate.intimacyReturn(_place)>>
-<<set _placeExit to _estate.intimacyExitLabel(_place)>>
+<<set _placeInfo to Object.hasOwn(_estate.intimacyPlaces, _place) ? _estate.intimacyPlaces[_place] : _estate.intimacyPlaces.bedroom>>
+<<set _placeBack to _placeInfo.passage>>
+<<set _placeExit to _placeInfo.exitLabel>>
 <<run _estate.enter(_place is 'bath' ? 'bathroom' : _place)>><<set $outside to _estate.intimacyOutside(_place) ? 1 : 0>><<effects>>
 <<if _partner and $combat is 1>>
   <<person1>>

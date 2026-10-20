@@ -422,7 +422,13 @@ class Finance extends Module {
     // 每处理完一天的房租和房贷，才处理同一天的存款、个人贷款和信用卡。
     this.advanceMarketThrough(day);
     const bank = this.state.bank;
-    Finance.advanceDepositInterest(bank, day);
+    if (!bank.opened || bank.bank_interest_last_day < 0) bank.bank_interest_last_day = day;
+    else {
+      while (bank.bank_interest_last_day + 7 <= day) {
+        if (bank.balance > 0) bank.balance += Math.floor(bank.balance * bankingTerms.depositWeeklyRate);
+        bank.bank_interest_last_day += 7;
+      }
+    }
     this.advanceLoan(bank, day);
     this.advanceCredit(bank, day);
     Finance.updateAccountTier(bank);
@@ -599,7 +605,8 @@ class Finance extends Module {
     bank.loan_debt = value;
     bank.loan_rate = product.weeklyRate;
     bank.loan_term = product.days;
-    bank.loan_payment = Finance.loanPayment(value, Math.ceil(product.days / 7), product.weeklyRate);
+    const growth = Math.pow(1 + product.weeklyRate, Math.ceil(product.days / 7));
+    bank.loan_payment = Math.ceil((value * product.weeklyRate * growth) / (growth - 1));
     bank.loan_due_day = Finance.currentDay + days;
     bank.loan_next_payment_day = Math.min(Finance.currentDay + 7, bank.loan_due_day);
     bank.loan_interest_last_day = Finance.currentDay;
@@ -980,15 +987,11 @@ class Finance extends Module {
     return Math.max(0, Math.floor(Number(Time.days) || 0));
   }
 
-  private static get currentWeek(): number {
+  private static resetAtmLimit(bank: BankState): void {
     // Time.days 按开局时刻换日，weekday 按午夜变化，周额度统一按日历午夜计算。
     const weekDay = Math.clamp(Math.floor(Number(Time.weekDay) || 1), 1, 7);
     const day = Math.floor(Time.date.timeStamp / TimeConstants.secondsPerDay) - Math.floor(Time.startDate.timeStamp / TimeConstants.secondsPerDay);
-    return day - (weekDay - 1);
-  }
-
-  private static resetAtmLimit(bank: BankState): void {
-    const week = Finance.currentWeek;
+    const week = day - (weekDay - 1);
     if (bank.atm_week >= week) return;
     bank.atm_week = week;
     bank.atm_withdrawn = 0;
@@ -1026,11 +1029,6 @@ class Finance extends Module {
     if (bank.payment_method === 'credit' && !bank.credit_card) bank.payment_method = 'cash';
   }
 
-  private static loanPayment(principal: number, weeks: number, weeklyRate: number): number {
-    const growth = Math.pow(1 + weeklyRate, weeks);
-    return Math.ceil((principal * weeklyRate * growth) / (growth - 1));
-  }
-
   private static clearLoan(bank: BankState): void {
     bank.loan_project = null;
     bank.loan_debt = 0;
@@ -1061,23 +1059,17 @@ class Finance extends Module {
     return Math.clamp(Math.ceil((debt * bankingTerms.creditMinimumPercent) / 100), Math.min(debt, bankingTerms.creditMinimumPennies), debt);
   }
 
-  private static advanceDepositInterest(bank: BankState, currentDay: number): void {
-    if (!bank.opened || bank.bank_interest_last_day < 0) {
-      bank.bank_interest_last_day = currentDay;
-      return;
-    }
-    while (bank.bank_interest_last_day + 7 <= currentDay) {
-      if (bank.balance > 0) bank.balance += Math.floor(bank.balance * bankingTerms.depositWeeklyRate);
-      bank.bank_interest_last_day += 7;
-    }
-  }
-
   private advanceLoan(bank: BankState, currentDay: number): void {
     // 时间事件仍可每天触发，但银行只在周付款日和最终到期日计息、扣款。
     if (bank.loan_debt <= 0) return;
     while (bank.loan_debt > 0 && bank.loan_next_payment_day <= currentDay) {
       const day = bank.loan_next_payment_day;
-      Finance.accrueLoanInterest(bank, day);
+      const elapsedDays = Math.max(0, day - bank.loan_interest_last_day);
+      if (elapsedDays !== 0) {
+        const rate = bank.loan_rate * (day > bank.loan_due_day ? bankingTerms.loanOverdueMultiplier : 1);
+        bank.loan_debt += Math.ceil((bank.loan_debt * rate * elapsedDays) / 7);
+        bank.loan_interest_last_day = day;
+      }
       const scheduled = Math.min(day >= bank.loan_due_day ? bank.loan_debt : bank.loan_payment, bank.loan_debt);
       const paid = Math.min(bank.balance, scheduled);
       bank.balance -= paid;
@@ -1096,14 +1088,6 @@ class Finance extends Module {
       bank.loan_next_payment_day = day < bank.loan_due_day ? Math.min(day + 7, bank.loan_due_day) : day + 7;
     }
     if (bank.loan_debt === 0) Finance.clearLoan(bank);
-  }
-
-  private static accrueLoanInterest(bank: BankState, day: number): void {
-    const elapsedDays = Math.max(0, day - bank.loan_interest_last_day);
-    if (elapsedDays === 0) return;
-    const rate = bank.loan_rate * (day > bank.loan_due_day ? bankingTerms.loanOverdueMultiplier : 1);
-    bank.loan_debt += Math.ceil((bank.loan_debt * rate * elapsedDays) / 7);
-    bank.loan_interest_last_day = day;
   }
 
   private advanceCredit(bank: BankState, currentDay: number): void {

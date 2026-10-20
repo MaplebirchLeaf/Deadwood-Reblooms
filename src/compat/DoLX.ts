@@ -69,7 +69,7 @@ function adaptRobin(core: MaplebirchCore): void {
         if (state.asylum.status !== 'admitted') {
           robin.flowers.settle();
           robin.shop.settle();
-          V.robinmoney += extraIncome;
+          state.reserve += extraIncome;
           if (!state.bailey_defeated && (state.self_rent || V.robinpaid !== 1)) {
             const owed = state.self_rent ? runtime.ensureRobinStand().owed : 0;
             const reserveTransfer = Math.clamp(robin.rent.due + owed - V.robinmoney, 0, state.reserve);

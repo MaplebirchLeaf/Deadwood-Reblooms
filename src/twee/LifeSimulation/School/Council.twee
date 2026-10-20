@@ -403,7 +403,6 @@
   <span class='blue'><<lanSwitch 'There is nobody here.' '这里没有人。'>></span><br><br>
   <<getouticon>><<lanLink ['Return to the student council room', '返回学生会室'] 'Deadwood Reblooms School Council'>><</lanLink>>
 <<else>>
-<<npc _guest>><<person1>>
 <<if $sexstart is 1>>
   <<set $sexstart to 0>>
   <<clearnpc>><<npc _guest>><<person1>>
@@ -431,9 +430,13 @@
   <br><br>
   <<promiscuous3>>
   <br><br>
-<<elseif $combat isnot 1>>
-  <<lanSwitch 'There is nothing left to continue here.' '这里已经没有可继续的事了。'>>
+<<elseif $combat isnot 1 or $NPCList[0]?.fullDescription isnot _guest>>
+  <<lanSwitch 'There is nothing left to continue here.' '这里已经没有可继续的事了。'>><br><br>
+  <<set $LifeSimulation.school.council.private_with to null>>
+  <<getouticon>><<lanLink ['Return to the student council room', '返回学生会室'] 'Deadwood Reblooms School Council'>><</lanLink>>
+  <<exit>>
 <</if>>
+<<person1>>
 <<set $enemyanger to 0>>
 <<effects>><<effectsman>><<man>><<stateman>>
 <br><br><<actionsman>>
@@ -447,8 +450,8 @@
 :: Deadwood Reblooms School Council Private Finish
 <<set $outside to 0, $location to 'school'>><<schooleffects>><<effects>>
 <<set _guest to $LifeSimulation.school.council.private_with>>
-<<if _guest>>
-  <<npc _guest>><<person1>>
+<<if _guest and $combat is 1 and $NPCList[0]?.fullDescription is _guest>>
+  <<person1>>
   <<if $enemyarousal gte $enemyarousalmax>>
     <<ejaculation>><<npcincr _guest lust -20>><<npcincr _guest love 1>><<glove>>
   <<elseif $enemyhealth lte 0>>
@@ -494,8 +497,10 @@
         <</language>>
     <</switch>>
   <</if>>
+  <<clotheson>><<endcombat>>
+<<else>>
+  <<lanSwitch 'The private meeting has ended.' '这次私下约见已经结束。'>>
 <</if>>
 <br><br>
-<<clotheson>><<endcombat>>
 <<set $LifeSimulation.school.council.private_with to null>>
 <<getouticon>><<lanLink ['Return to the student council room', '返回学生会室'] 'Deadwood Reblooms School Council'>><</lanLink>>

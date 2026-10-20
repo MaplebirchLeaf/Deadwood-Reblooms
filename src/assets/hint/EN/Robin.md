@@ -4,7 +4,7 @@ Meet Robin at the beach lemonade stall or winter hot chocolate stall in the park
 
 The first upgrade at each stall costs <span class="gold">£600</span> and the second <span class="gold">£400</span>; fully upgrading both costs <span class="gold">£2,000</span>. Lend PC cash or let Robin pay from funds remaining after rent. PC contributions become a loan owed by Robin.
 
-Upgrades add products and shelter from rain, with tasting and work options. Helping takes 45 minutes once daily and requires Robin to be present and available. The ledger separates living money, business reserves and loans owed to the PC, rather than one freely spendable balance.
+Upgrades add products and shelter from rain, with tasting and work options. Helping takes 45 minutes once daily and requires Robin to be present and available. Business income goes into reserves for rent and improvements; Robin’s gifts to the PC come from personal cash. The ledger records loans owed to the PC separately, and spending still leaves enough for the next rent.
 
 ### Tutoring
 
@@ -17,6 +17,8 @@ The trial and later visits are on **Danube Street**. During term, accompany Robi
 Upgrade both stalls to level two, discuss a proper shop in the room, then follow the journal:
 
 Before handling paperwork together, arrange a same-day meeting while **Robin is free at home on a day without school**. On weekends, ask **07:00–09:00 before the stall opens**, then make your own way to the town hall or vacant Cliff Street shop. Existing commitments take priority. With enough confidence and a free hour before closing, Robin can still apply, inspect the premises or collect the permit alone.
+
+Town hall applications and permit collection are available **09:00–17:00**. Choose **Wait in line** after entering to reach the counter. The queue takes 20 minutes and the application takes another 20, so arrive before closing. The permit becomes available the day after inspection.
 
 | Order | Action                                                     | Cost                             |
 | ----- | ---------------------------------------------------------- | -------------------------------- |

@@ -94,6 +94,8 @@ Once your fallen angel form reaches its stable stage, Iron Will prevents willpow
 
 The other side remains the tentacle plains with vanilla dangers and encounters. Discovering one mirror does not replace another mirror's discovery, home access or the time requirement.
 
+The orphanage mirror can occasionally offer **Touch the strange reflection** at other hours. This is a separate event. Its warning mentions lasting consequences, and it only continues if you choose to touch it. You can leave it alone and walk away.
+
 ## Hospital services
 
 **Virginity restoration** is offered in the hospital foyer for eligible anatomy, at <span class="gold">£1,000</span> and about one hour per procedure. Body state and chastity equipment restrict eligibility. It restores the relevant physical record without deleting past relationships or story experiences.

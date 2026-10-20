@@ -211,7 +211,7 @@ class School {
   }
 
   public get canRequestPrefect(): boolean {
-    return this.state.role === 'student' && V.delinquency <= 0 && V.cool >= 160;
+    return this.state.role === 'student' && V.delinquency < 10 && V.cool >= 160;
   }
 
   public get councilOpen(): boolean {
@@ -304,12 +304,12 @@ class School {
 
   public get canInviteStudent(): boolean {
     const student = this.state.duties.target;
-    return this.canPerformDuty && student !== null && window.hasSexStat('promiscuity', 3);
+    return this.canPerformDuty && student !== null && this.isStudentAvailable(student) && window.hasSexStat('promiscuity', 3);
   }
 
   public finishDuty(outcome: SchoolDutyOutcome): boolean {
     const target = this.state.duties.target;
-    if (!this.canPerformDuty || !target || !['enforce', 'mediate', 'pressure', 'overlook', 'inviteAccepted', 'inviteRefused'].includes(outcome)) return false;
+    if (!this.canPerformDuty || !target || !this.isStudentAvailable(target) || !['enforce', 'mediate', 'pressure', 'overlook', 'inviteAccepted', 'inviteRefused'].includes(outcome)) return false;
 
     // 私下谈话的好感结算随各人的亲近或受伤状态变化。
     let loveChange = DUTY_LOVE_CHANGES[target][outcome];
@@ -330,7 +330,8 @@ class School {
 
     this.state.duties.completed += 1;
     this.state.duties.lastDay = Time.days;
-    this.adjustLove(target, loveChange);
+    const npc = C.npc?.[target];
+    if (npc) npc.love = Math.clamp((npc.love ?? 0) + loveChange, 0, target === 'Whitney' ? 30 : target === 'Sydney' ? 150 : 100);
     this.state.duties.target = null;
     return true;
   }
@@ -454,12 +455,6 @@ class School {
       case 'Whitney':
         return Time.schoolDay && Time.hour >= 7 && Time.hour < 17;
     }
-  }
-
-  private adjustLove(student: SchoolStudent, change: number): void {
-    const npc = C.npc?.[student];
-    if (!npc) return;
-    npc.love = Math.clamp((npc.love ?? 0) + change, 0, student === 'Whitney' ? 30 : student === 'Sydney' ? 150 : 100);
   }
 
   private adjustStanding(studentSupport: number, staffSupport: number, corruption = 0): void {

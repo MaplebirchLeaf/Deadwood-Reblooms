@@ -30,6 +30,8 @@ The dealership opens **08:00–18:00**. The driving school opens **09:00–17:00
 
 Take your ID to the driving school and apply for a <span class="teal">provisional licence</span>. Collect it the next day. Cars and motorcycles have separate qualifications, with theory and practical driving taught separately. You can take further revision sessions and driving lessons while the school is open. Practice improves driving proficiency.
 
+Lessons and licence appointments require sobriety. You cannot attend with both arms bound or foot shackles on. Having ID does not allow bookings while alcohol or drugs are still affecting you; reception explains the current obstacle.
+
 - **Cars:** pass the theory test, then prepare for the road test. Its four sections ask you to observe the road and choose suitable actions. Minor faults are recorded. <span class="red">A dangerous fault fails the test.</span>
 - **Motorcycles:** complete six hours of basic training, then prepare for the theory, manoeuvres and road tests. The certificate permits practice on a small scooter. Riding requires a helmet.
 - **At the test centre:** a borderline result caused by minor faults may leave an opportunity to bluff or bribe the examiner. Being caught brings police attention and suspends bookings for **three days**.

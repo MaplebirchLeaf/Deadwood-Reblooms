@@ -10,14 +10,21 @@ export default function (maplebirch: typeof window.maplebirch) {
   // 接入科学课事件池、首次同桌剧情和悉尼保护分支。
   maplebirch.tool.inject({
     locationPassage: {
-      'Canteen Lunch Sydney': [
-        // 午餐已结束的六处分支共用原版结算点，不依赖其他剧情遗留的 phase。
-        {
-          srcmatch: /<<endevent>>/g,
-          applyafter: '\n<<deadwood-reblooms-sydney-science-transfer-link>>',
-          expected: 6
-        }
-      ],
+      // 普通午餐及插曲都在饭后离开选项前接入，不在涂写邀请或打斗中插入换班。
+      ...Object.fromEntries(
+        [
+          'Canteen Lunch Sydney',
+          'Sydney Canteen Bodywriting Stop',
+          'Sydney Canteen Bodywriting Allow',
+          'Sydney Kylar Bodywriting Encourage',
+          'Sydney Kylar Bodywriting Refuse',
+          'Sydney Kylar Bodywriting Ignore',
+          'Sydney Canteen Encourage',
+          'Sydney Canteen Intervene',
+          'Sydney Canteen Fight Finish',
+          'Sydney Canteen Break'
+        ].map((title, index) => [title, [{ srcmatch: /<<historyicon>>/g, applybefore: '<<deadwood-reblooms-sydney-science-transfer-link>>\n', expected: index === 0 ? 6 : 1 }]])
+      ),
       'Science Lesson': [
         // 在原版标记当天科学课出席后追加首次同桌剧情，避免未实际上课时触发。
         {

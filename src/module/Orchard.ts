@@ -174,6 +174,9 @@ const defaults: OrchardState = {
 
 class Orchard extends Module {
   public readonly species = species;
+  public readonly contractQuantities: readonly number[] = trade.contractQuantities;
+  public readonly workerWage = 25000;
+  public readonly deliveryFee = trade.haulFee;
   public readonly remy = new Remy(this);
   public readonly staff = new Staff(this);
   public readonly winery = new Winery(this);
@@ -284,10 +287,6 @@ class Orchard extends Module {
 
   public get freshSupplySales(): number {
     return this.state.last_supply_day >= 0 && Time.days - this.state.last_supply_day <= trade.orderInterval ? trade.freshSupplyWeeklySales : 0;
-  }
-
-  public get contractQuantities(): readonly number[] {
-    return trade.contractQuantities;
   }
 
   public get contractFruit(): OrchardFruit[] {
@@ -480,16 +479,8 @@ class Orchard extends Module {
     );
   }
 
-  public get workerWage(): number {
-    return 25000;
-  }
-
   public get carrier() {
     return V.per_npc?.deadwood_orchard_carrier ?? null;
-  }
-
-  public get deliveryFee(): number {
-    return trade.haulFee;
   }
 
   public get candidate(): boolean {

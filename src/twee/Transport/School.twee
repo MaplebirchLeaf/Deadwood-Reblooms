@@ -380,9 +380,7 @@
           <<run Dynamic.render('deadwood-transport-school')>>
         <</lanLink>><br>
       <</if>>
-      <<if !_school.available and Time.days gte $Transport.school.penalty_until>>
-        <span class='purple'><<lanSwitch 'You are in no condition to take a lesson.' '你现在的状况不适合上课。'>></span><br>
-      <</if>><br>
+      <br>
     <</if>>
     <<if _school.canTrain>>
       <<capture _school_revision>>
@@ -395,7 +393,9 @@
     <</if>>
   <</if>>
   <<set _pending to $Transport.school.provisional.applied_day gte 0 and !$Transport.school.provisional.issued>>
-  <<if !_pending and !_school.record.licensed and !_school.canApply and !_school.canCollect and !_school.canStudy and !_school.canTheory and !_school.canTrain and !_school.canCBT and !_school.canModuleOne and !_school.canTest>>
+  <<if !_school.available and Time.days gte $Transport.school.penalty_until>>
+    <<deadwood-transport-school-blocked>>
+  <<elseif !_pending and !_school.record.licensed and !_school.canApply and !_school.canCollect and !_school.canStudy and !_school.canTheory and !_school.canTrain and !_school.canCBT and !_school.canModuleOne and !_school.canTest>>
     <<deadwood-transport-school-blocked `$Transport.school.provisional.issued ? _school.terms.study_fee : _school.terms.provisional_fee`>>
   <</if>>
   <<deadwood-transport-return>>

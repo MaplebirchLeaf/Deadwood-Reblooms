@@ -4,6 +4,8 @@ import NPCAvatars, { type AvatarOverlay, type AvatarProfile, type NPCData } from
 
 class MoreLoveInterests {
   private partners?: string[];
+  public readonly slots = ['primary', 'secondary', 'tertiary'];
+  public readonly levels: Array<() => number> = [];
 
   public constructor(
     readonly core: typeof maplebirch,
@@ -29,12 +31,12 @@ class MoreLoveInterests {
       },
       cond: () => V.loveInterestList?.length > Math.max(1, this.level) && (this.level < 4 || !V.moreLoveInterest_message)
     });
-    this.core.on(':variable', () => this.sync());
+    this.core.on(':variable', () => this.sync(true));
     this.core.once(':storyready', () => document.querySelector('.love-interests')?.replaceWith(this.panel));
   }
 
   get level(): number {
-    return V.awarelevel ?? 0;
+    return Math.max(V.awarelevel ?? 0, ...this.levels.map(level => level()));
   }
 
   get message(): string {
@@ -58,7 +60,7 @@ class MoreLoveInterests {
 
   public Init(): void {
     const original = window.isLoveInterest;
-    // 原版仍只认识前三个槽位，扩展列表必须参与判断，但不能替换原版其它判定。
+    // 游戏按原生槽位判断，扩展列表也参与判断，并保留各版本的其它判定。
     window.isLoveInterest = (name: string) => V.loveInterestList?.includes(name) || original(name);
   }
 
@@ -197,15 +199,12 @@ class MoreLoveInterests {
     return group;
   }
 
-  private sync(): void {
-    // 自定义列表是唯一排序来源，前三项同步给原版三个字段，供原版事件继续读取。
-    const stored = Array.isArray(V.loveInterestList) ? V.loveInterestList : Object.values(V.loveInterest ?? {});
-    V.loveInterestList = [...new Set(stored.filter((name: unknown): name is string => typeof name === 'string' && name !== 'None'))];
-    V.loveInterest = {
-      primary: V.loveInterestList[0] ?? 'None',
-      secondary: V.loveInterestList[1] ?? 'None',
-      tertiary: V.loveInterestList[2] ?? 'None'
-    };
+  private sync(importNative = false): void {
+    const native = Object.values(V.loveInterest ?? {});
+    const stored = Array.isArray(V.loveInterestList) ? V.loveInterestList : native;
+    const names = importNative ? [...stored, ...native] : stored;
+    V.loveInterestList = [...new Set(names.filter((name: unknown): name is string => typeof name === 'string' && name !== 'None'))];
+    V.loveInterest = Object.fromEntries(this.slots.map((slot, index) => [slot, V.loveInterestList[index] ?? 'None']));
     V.loveInterest_message = 0;
     V.loveInterestAwareMessage = 0;
   }
@@ -213,7 +212,7 @@ class MoreLoveInterests {
 
 class MoreLoveInterestsAndNPCAvatars {
   private readonly avatars: NPCAvatars;
-  private readonly loveInterests: MoreLoveInterests;
+  public readonly loveInterests: MoreLoveInterests;
 
   public constructor(readonly core: typeof maplebirch) {
     this.avatars = new NPCAvatars({

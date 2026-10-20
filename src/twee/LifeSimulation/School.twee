@@ -33,6 +33,48 @@
   <<assignmenticon>><<lanLink ['Check the student affairs noticeboard', '查看学生事务公告栏'] 'Deadwood Reblooms Life Simulation School Board'>><</lanLink>><br>
 <</widget>>
 
+<!-- 徽章免除强制留堂，但不会替玩家决定是否参加。其余条件沿用原版走廊入口。 -->
+<<widget 'deadwood-school-voluntary-detention'>>
+  <<if $LifeSimulation.school.role isnot 'student' and $schoolstate is 'afternoon' and $detention gte 1 and $daily.school.detentionAttended isnot 1 and $pillory.tenant.special.name isnot 'Leighton'>>
+    <<schoolicon 'headdesk'>><<lanLink ['Go to detention anyway', '自愿去留堂'] 'School Detention'>><</lanLink>><br><br>
+  <</if>>
+<</widget>>
+
+<!-- 仅在没有下装可脱、可穿时替换动作短句，检查过程与原版结算不变。 -->
+<<widget 'deadwood-school-inspection-posture'>>
+  <<switch _args[0]>>
+    <<case 'stand'>>
+      <<if $worn.under_lower.name isnot 'naked'>><<lanSwitch 'You pull down your underwear, ' '你拉下内裤，'>>
+      <<else>><<lanSwitch 'You stand as instructed, ' '你按指示站到讲台前，'>><</if>>
+    <<case 'flaunt'>>
+      <<if $worn.under_lower.name isnot 'naked'>><<lanSwitch 'Confident, you pull down your underwear, ' '你自信满满地拉下内裤，'>>
+      <<else>><<lanSwitch 'Confident, you ' '你自信满满，'>><</if>>
+    <<case 'raise'>>
+      <<if $worn.under_lower.name isnot 'naked'>><<lanSwitch ' and you pull your underwear back up' '，你把内裤拉回原位'>><</if>>
+    <<case 'seat'>>
+      <<if $worn.under_lower.name isnot 'naked'>><<lanSwitch 'You pull your underwear back up and ' '你把内裤拉回原位，'>>
+      <<else>><<lanSwitch 'You ' '你'>><</if>>
+    <<case 'desk'>>
+      <<if $worn.under_lower.name isnot 'naked'>>
+        <<lanSwitch 'You pull down your underwear' '你拉下内裤'>>\
+        <<if _args[1] is 'give'>>
+          <<lanSwitch ' and hand it to Leighton.' '，脱下来交给礼顿。'>><<underlowerruined undefined 'given'>>
+        <<else>>
+          <<lanSwitch '.' '。'>>
+        <</if>>
+      <</if>>
+      <<lanSwitch 'You climb onto the desk and face the class.' '你爬到讲台上，面向全班。'>>
+    <<case 'defiant'>>
+      <<if _args[1]>><<lanSwitch 'you ' '你'>><</if>>\
+      <<if $worn.under_lower.name isnot 'naked'>>
+        <<lanSwitch 'pull your underwear aside and face the class.' '拉开内裤，面向全班。'>>
+      <<else>>
+        <<lanSwitch 'turn to face the class without covering yourself.' '转身面向全班，没有再遮挡自己。'>>
+      <</if>>
+    <<case 'notice'>><<lanSwitch "Your face grows warm under your classmates' attention." '同学们的目光让你脸上发烫。'>>
+  <</switch>>
+<</widget>>
+
 <!-- 职位申请与新校规提案都必须当面向礼顿提出。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-office-options'>>
   <<if Time.schoolDay and $schoolstate isnot 'early' and $schoolstate isnot 'late' and $pillory.tenant.special.name isnot 'Leighton' and (wearingSchoolOutfit() or Time.hour gte 14)>>
@@ -506,11 +548,11 @@
 <<else>>
   <span class='pink'><<language>>
     <<option 'EN'>>
-      "The teachers must consider you <span class='green'>a model student</span>, and your classmates must think you're at least <span class='blue'>cool</span>. A badge means very little if neither side will listen."
+      "The teachers must consider you <span class='green'>an ideal student</span>, and your classmates must think you're at least <span class='blue'>cool</span>. A badge means very little if neither side will listen."
     <<option 'CN'>>
       “老师要认定你是<span class='green'>模范学生</span>，同学也得至少觉得你<span class='blue'>很酷</span>。两边都不肯听你说话，挂个徽章有什么用？”
   <</language>></span><br>
-  <span class='blue'><<lanSwitch 'You also need at least 10 affection with Leighton, or to have already blackmailed the headteacher. Good marks and school reputation are separate requirements.' '此外，还需礼顿个人好感达到10，或已经成功勒索过礼顿。成绩、校园评价与礼顿的个人好感分别判定。'>></span><br>
+  <span class='blue'><<lanSwitch 'You also need at least 10 affection with Leighton, or to have already blackmailed the headteacher. Check the teacher and student evaluations in Social; student standing on the noticeboard is separate. Exemption from detention does not erase your delinquency.' '此外，还需礼顿个人好感达到10，或已经成功勒索过礼顿。教师与同学评价以社交栏为准，公告栏的学生声望另算。免留堂不会清除违纪记录。'>></span><br>
 <</if>>
 <br>
 <<getouticon>><<lanLink "返回校长办公室" "Head's Office">><</lanLink>>
@@ -596,6 +638,7 @@
 <<effects>>
 <<set _student to maplebirch.get("LifeSimulation").school.startDuty()>>
 <<if _student>>
+  <<npc _student>><<person1>>
   <<lanSwitch 'Leighton has put you on the morning gate. You check the arrivals and decide how to handle each breach yourself.' '礼顿安排你在校门口值早班。进校的人从你面前经过，如何处理违规者都要由你亲自决定。'>><br><br>
   <<if _student is 'Robin'>>
     <<language>>
@@ -662,7 +705,8 @@
 <<schooleffects>>
 <<effects>>
 <<set _student to $LifeSimulation.school.duties.target>>
-<<if _student and maplebirch.get("LifeSimulation").school.canPerformDuty>>
+<<if _student and maplebirch.get("LifeSimulation").school.startDuty() is _student>>
+  <<npc _student>><<person1>>
   <<switch _student>>
     <<case 'Robin'>>
       <<language>>
@@ -755,6 +799,9 @@
 <<set _kylarClose to _student is 'Kylar' and C.npc.Kylar.love gte 30>>
 <<set _invitation to maplebirch.get("LifeSimulation").school.inviteStudent()>>
 <<set _loveChange to _student ? C.npc[_student].love - _loveBefore : 0>>
+<<if _invitation is 'accepted' or _invitation is 'refused'>>
+  <<npc _student>><<person1>>
+<</if>>
 <<if _invitation is 'accepted'>>
   <<switch _student>>
     <<case 'Robin'>>
@@ -869,7 +916,8 @@
   <<neutral 1>>
   <<maninit>>
 <</if>>
-<<if $LifeSimulation.school.duties.encounter>>
+<<if $LifeSimulation.school.duties.encounter and $combat is 1 and $NPCList[0]?.fullDescription is $LifeSimulation.school.duties.encounter>>
+  <<person1>>
   <<if $LifeSimulation.school.duties.encounter is 'Sydney'>>
     <<run statusCheck('Sydney')>><<set $corruptionEvent to 1>><<set $enemyanger to -10>>
   <</if>>
@@ -886,6 +934,7 @@
   <</if>>
   <<nexttext>>
 <<else>>
+  <<set $LifeSimulation.school.duties.encounter to null>>
   <span class='blue'><<lanSwitch 'There is no private meeting to continue.' '没有尚未结束的私下约见。'>></span><br><br>
   <<entranceicon>><<lanLink ['Return to the front courtyard', '返回前庭'] 'School Front Courtyard'>><</lanLink>>
 <</if>>
@@ -896,7 +945,8 @@
 <<schooleffects>>
 <<effects>>
 <<set _student to $LifeSimulation.school.duties.encounter>>
-<<if _student>>
+<<if _student and $combat is 1 and $NPCList[0]?.fullDescription is _student>>
+  <<person1>>
   <<if $enemyarousal gte $enemyarousalmax>>
     <<ejaculation>><br>
   <</if>>
@@ -936,10 +986,10 @@
   <</if>><br><br>
   <<clotheson>>
   <<endcombat>>
-  <<set $LifeSimulation.school.duties.encounter to null>>
 <<else>>
   <span class='blue'><<lanSwitch 'The meeting has ended.' '这次约见已经结束。'>></span><br><br>
 <</if>>
+<<set $LifeSimulation.school.duties.encounter to null>>
 <<entranceicon>><<lanLink ['Return to the hallways', '返回走廊'] 'Hallways'>><</lanLink>>
 
 :: Deadwood Reblooms Life Simulation Morning Duty Result
@@ -951,6 +1001,7 @@
 <<set _loveBefore to _student ? C.npc[_student].love : 0>>
 <<set _whitneyClose to _student is 'Whitney' and (C.npc.Whitney.love gte 25 or $whitneyromance is 1)>>
 <<if maplebirch.get("LifeSimulation").school.finishDuty($phase)>>
+  <<npc _student>><<person1>>
   <<if _student is 'Robin'>>
     <<if $phase is 'enforce'>>
       <<language>>

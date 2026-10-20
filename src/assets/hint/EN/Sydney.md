@@ -1,6 +1,8 @@
 ### Transfer to science class
 
-Reach 10 affection with Sydney, attend science normally and hear Sirris mention the transfer. Discuss it with Sydney at lunch and accept. Later science lessons offer sitting together, comparing notes and chatting.
+Reach 10 affection with Sydney, attend science normally and hear Sirris mention the transfer. Share lunch that day or later and ask afterwards; finish any bodywriting or other interruption first. The transfer only needs confirming once. Sydney joins your class from the next day, with no need to ask again each lunchtime.
+
+Comparing notes and chatting are available during the ordinary 09:00 science lesson. Sydney sometimes oversleeps under the vanilla schedule, leaving the seat empty; you can wake Sydney at the temple and head to school together. Friday exams, Leighton's inspections and emergencies also replace the ordinary lesson options.
 
 Sydney still follows the day's classes and temple duties. Borrowing notes grants learning and affection benefits once daily; skills and Sydney's current state affect additional replies.
 

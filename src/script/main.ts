@@ -2,6 +2,7 @@
 
 import DoLP from '../compat/DoLP';
 import DoLX from '../compat/DoLX';
+import NewWorld from '../compat/NewWorld';
 import DeadwoodReblooms from './DeadwoodReblooms';
 import MoreLoveInterestsAndNPCAvatars from './MoreLoveInterestsAndNPCAvatars';
 import CelestialAnomalies from './CelestialAnomalies';
@@ -45,4 +46,5 @@ import StreetLife from './StreetLife';
   // 各模块的普通注入登记完后，再按当前原版源码选择对应兼容规则。
   DoLP(maplebirch);
   DoLX(maplebirch);
+  NewWorld(maplebirch);
 })(maplebirch);

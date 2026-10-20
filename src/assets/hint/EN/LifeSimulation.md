@@ -3,7 +3,7 @@
 An **attendance exemption** prevents absences counting as truancy. **Prefect → student council president** opens duties and school affairs. You can obtain both, but one does not replace the other.
 
 - **Attendance exemption**: reach the highest A\* tier in all four subjects and overall results, then apply to Leighton on a school day. You need at least 10 affection with Leighton or to have already blackmailed the headteacher. Obtain Bailey's signature, then return the form to the headteacher's office. Orphanage signing is at 07:00–09:00 and normally needs three consecutive paid rent weeks; visit the Barb Street flat if Bailey has left. Grades can still change.
-- **Prefect**: reach the original **model student** teacher reputation and at least **very cool** school reputation. You also need at least 10 affection with Leighton or to have already blackmailed the headteacher. Apply in the headteacher's office. Grades alone do not satisfy the appointment conditions. Patrol the front courtyard at 07:00–09:00 on school days, once daily. You may decide whether to attend detention after appointment.
+- **Prefect**: reach **ideal student** in the Social panel's teacher evaluation and at least **cool** in its student evaluation; higher student evaluations also qualify. Student standing on the noticeboard is separate. You also need at least 10 affection with Leighton or to have already blackmailed the headteacher. Apply in the headteacher's office. Grades and exemption from detention do not replace the appointment requirements. Patrol the front courtyard at 07:00–09:00 on school days, once daily. You may decide whether to attend detention after appointment.
 - **President**: personally complete morning duty on five different school days, with student reputation and staff trust both at 25, then apply to Leighton.
 
 Enforcement, mediation, pressure and overlooking affect school standing and relationships. Read the action feedback. The corridor noticeboard and journal track the added school progress, while original teacher and student evaluations remain separate.
@@ -13,6 +13,8 @@ Enforcement, mediation, pressure and overlooking affect school standing and rela
 Enter from the corridor at 07:00–17:00 on school days. Ordinary students can organise affairs for 15 minutes daily; officeholders can rest, study and handle appeals. Presidents may delegate duty before 09:00, using the day's affairs opportunity without adding a personal patrol.
 
 Propose policies in order through the headteacher: uniform, free dress, revealing dress, optional nudity, nude day and mandatory nudity. Both school and town corruption must qualify. Then choose one route: staff trust plus Leighton's affection, a student petition, or leverage against Leighton. The board lists the requirements. Pressure still requires both corruption conditions.
+
+Town corruption uses vanilla soft corruption. Vanilla adjusts it each week by hard corruption, and some events change it directly. Raising school support does not also raise town corruption.
 
 A passed proposal starts a seven-day trial before office review. Failure rolls it back with a three-day cooldown. Nude day's compulsory requirement applies only during Friday school hours. Policies formally retained can be selected again.
 
@@ -97,7 +99,7 @@ One casino night runs from the evening until 4 am the next morning. Midnight doe
 
 ### Feats and games at home
 
-**On a Roll** requires five consecutive table profits; draws and losses break it. Slots and Sic Bo do not count. Claim the one-time larger pepper-spray reward at the cashier afterwards. **A Good Night** needs <span class="gold">£10,000</span> net profit in a night; **Steady Hands** needs ten correctly handled shifts; **Giant Killer** needs mixed 235 to actually beat trips in comparison and collect the payout, not an opponent folding.
+**On a Roll** requires five consecutive table profits; draws and losses break it. Slots and Sic Bo do not count. Claim the one-time larger pepper-spray reward at the cashier afterwards. **A Good Night** needs <span class="gold">£10,000</span> net profit in a night; **Steady Hands** needs ten correctly handled shifts. **Giant Killer** is earned in three-card poker: hold a 2, 3 and 5 that are not all the same suit, beat three cards of the same rank in a comparison or showdown, then collect the winnings. An opponent folding does not count.
 
 Invite resident love interests at home to blackjack in the lounge or bedroom, with ordinary or clothing stakes. Clothing stakes go from outer to inner layers, with each loser removing one item; tied winners keep theirs, and leaving restores the clothes. You may explicitly choose **Strip only, nothing more**. Later invitations require separate willingness.
 

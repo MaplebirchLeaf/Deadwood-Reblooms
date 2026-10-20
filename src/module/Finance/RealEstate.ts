@@ -5,6 +5,7 @@ import PropertyCatalog, { type Property, type ResidentProfile } from './Property
 import type Finance from '../Finance';
 import Mortgage, { type MortgageState } from './Mortgage';
 import rentalTerms from '../../assets/finance/rentals.json';
+import intimacyPlaces from '../../assets/finance/intimacy.json';
 import PropertyLife, { type PropertyLifeState } from './PropertyLife';
 import PropertyStaff, { type PropertyStaffState, type StaffRole } from './PropertyStaff';
 import PropertyBanquet, { type PropertyBanquetState } from './PropertyBanquet';
@@ -13,7 +14,7 @@ import PropertyOutings, { type PropertyOutingState } from './PropertyOutings';
 type PropertyId = string;
 type PropertyRoom = keyof Property['rooms'] | Property['extensions'][number]['id'];
 /** 亲密场景可选的地点。泳池与浴室不需要双人床，卧室仍按家具判断。 */
-export type IntimacyPlace = 'bedroom' | 'pool' | 'bath';
+export type IntimacyPlace = keyof typeof intimacyPlaces;
 type PaperKind = 'poster' | 'wallpaper';
 type FurnitureKind = PaperKind | 'bed' | 'table' | 'chair' | 'desk' | 'wardrobe' | 'decoration' | 'windowsill';
 type PropertyFurniture = { id: string; name: string; nameCap: string; cost: number; type: string[]; category: string[]; iconFile: string; description?: string; showCheck?: string; tier?: number };
@@ -120,6 +121,7 @@ class RealEstate {
   public readonly banquet: PropertyBanquet;
   public readonly outings: PropertyOutings;
   public readonly rentalTerms = rentalTerms;
+  public readonly intimacyPlaces = intimacyPlaces;
 
   public constructor(
     private readonly core: typeof maplebirch,
@@ -400,25 +402,6 @@ class RealEstate {
 
   public get intimacyPlace(): IntimacyPlace {
     return this.state.intimacy_place ?? 'bedroom';
-  }
-
-  /** 亲密场景结束后回到哪个页面。浴室回浴室，泳池回泳池，卧室回主卧。 */
-  public intimacyReturn(place: IntimacyPlace): string {
-    if (place === 'pool') return 'Deadwood Reblooms Property Pool';
-    if (place === 'bath') return 'Deadwood Reblooms Property Bathroom';
-    return 'Deadwood Reblooms Property Bedroom';
-  }
-
-  public intimacyReturnLabel(place: IntimacyPlace): readonly [string, string] {
-    if (place === 'pool') return ['Return to the pool', '返回泳池'];
-    if (place === 'bath') return ['Return to the bathroom', '返回浴室'];
-    return ['Return to the bedroom', '返回卧室'];
-  }
-
-  public intimacyExitLabel(place: IntimacyPlace): readonly [string, string] {
-    if (place === 'pool') return ['Climb out and dry off', '上岸擦干'];
-    if (place === 'bath') return ['Climb out and towel off', '起身擦干'];
-    return ['Return to the bedroom', '返回卧室'];
   }
 
   /** 只有露天泳池会把场景判为室外，浴室与卧室始终在室内。 */

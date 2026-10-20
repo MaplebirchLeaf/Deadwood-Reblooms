@@ -80,6 +80,8 @@ Recovery debt appears in the finance journal with its deadline. Pay it from bank
 
 Adrian is the financial centre's bank clerk, handling personal accounts and banking enquiries across the desks. Weekday hours are 09:00–17:00: the estate desk at 11:00–12:00, lunch beside the hall entrance at 12:00–13:00, the securities desk at 15:00–16:00, and the bank counter otherwise. Adrian is absent on weekends and after work. Other staff continue to handle ordinary services.
 
+Meeting Adrian does not require a random encounter. With Finance enabled, visit a financial-centre counter on a weekday, or approach the bank clerk beside the hall entrance at lunchtime.
+
 Follow up on the current topic: go through a statement, discuss your plans for a house, ask about the forms, or ask how work has been. If you are unwell, you can sit and catch your breath; during an ordinary lunch conversation, you can buy Adrian a cup of tea for <span class="gold">£2</span>. These replies increase familiarity. Resting and sharing tea also reduce stress. Only one reply takes effect in each conversation.
 
 You can chat once per day. Visits on different days build familiarity, and listening improves the relationship. Re-entering the counter or moving money repeatedly does not award affection. Banking conversations respond to overdue payments, distress, your first property and your new account. Estate-desk conversations cover funding and household costs, while securities-desk conversations cover opening accounts and transferring money.

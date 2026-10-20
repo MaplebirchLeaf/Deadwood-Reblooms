@@ -98,6 +98,25 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     expected: 2
   };
 
+  // 校规允许裸体后，检查仍照常进行，只为原版的脱衣、穿衣句补上实际衣物判断。
+  const inspectionLower = {
+    srcmatch: /(?:You <<nervously>> pull down your \$worn\.lower\.name as instructed, |你<<nervously>>按照指示(?:拉下了你的\$worn\.lower\.cn_name_cap，|将你的\$worn\.lower\.cn_name_cap拉开，))/g,
+    to: '<<if $worn.lower.name isnot "naked">>$&<<else>><<deadwood-school-inspection-posture "stand">><</if>>'
+  };
+  const inspectionRaise = {
+    srcmatch: /(?: and you pull your \$worn\.lower\.name back up|，而你则把你的\$worn\.lower\.cn_name_cap拉了回来)/,
+    to: '<<if $worn.lower.name isnot "naked">>$&<<else>><<deadwood-school-inspection-posture "raise">><</if>>',
+    expected: 1
+  };
+  const inspectionDesk = {
+    applybefore: '<<if $worn.lower.name is "naked">><<deadwood-school-inspection-posture "desk" "give">><<else>>',
+    expected: 1
+  };
+  const inspectionDressAgain = {
+    srcmatch: /(?:You put your clothes back on and |你重新穿上衣服，并)/g,
+    to: '<<if $worn.lower.name isnot "naked" or $worn.under_lower.name isnot "naked">>$&<<else>><<lanSwitch "You " "你">><</if>>'
+  };
+
   maplebirch.tool.inject({
     locationPassage: {
       'Science Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoolstate is "morning">>', applybefore: '<</if>>\n', expected: 1 }],
@@ -116,6 +135,103 @@ export default function School(maplebirch: typeof window.maplebirch): void {
         { srcmatch: /<<\/if>>\s*$/, applyafter: '<</if>>', expected: 1 }
       ],
       'School Swimming Late': swimmingDress.map(rule => ({ ...rule })),
+      'Penis Inspection Expose': [{ ...inspectionLower, expected: 4 }, { ...inspectionRaise }],
+      'Penis Inspection Flaunt': [
+        {
+          srcmatch: /(?:Confident, you tug down your \$worn\.lower\.name, |你自信满满，扯下了你(?:的|那破旧的)\$worn\.lower\.cn_name_cap，)/g,
+          to: '<<if $worn.lower.name isnot "naked">>$&<<else>><<deadwood-school-inspection-posture "flaunt">><</if>>',
+          expected: 4
+        },
+        { ...inspectionRaise }
+      ],
+      'Penis Inspection Flaunt No Penis': [
+        {
+          srcmatch: /(?:You tug down your \$worn\.lower\.name, |你拽下你的\$worn\.lower\.cn_name_cap，)/,
+          to: '<<if $worn.lower.name isnot "naked">>$&<<else>><<deadwood-school-inspection-posture "stand">><</if>>',
+          expected: 1
+        },
+        {
+          srcmatch: /(?:You pull your \$worn\.lower\.name back up and |你把你的\$worn\.lower\.cn_name_cap拉了回去，)/,
+          to: '<<if $worn.lower.name isnot "naked">>$&<<else>><<deadwood-school-inspection-posture "seat">><</if>>',
+          expected: 1
+        },
+        {
+          srcmatch: /(?:You cover yourself up slowly, |你慢慢地穿好衣服，)/,
+          to: '<<if $worn.lower.name isnot "naked" or $worn.under_lower.name isnot "naked">>$&<<else>><<lanSwitch "You cover yourself with your hands, " "你用手遮住身体，">><</if>>',
+          expected: 1
+        },
+        {
+          srcmatch: /(?: as you finish getting dressed|当你穿完衣服时，)/,
+          to: '<<if $worn.lower.name isnot "naked" or $worn.under_lower.name isnot "naked">>$&<</if>>',
+          expected: 1
+        }
+      ],
+      'Penis Inspection Forced': [
+        { ...inspectionLower, expected: 1 },
+        {
+          srcmatch: /(?:Put your clothes back on and sit down\.|把你的衣服穿上，坐下来吧。)/,
+          to: '<<if $worn.lower.name isnot "naked" or $worn.under_lower.name isnot "naked">>$&<<else>><<lanSwitch "Sit down." "坐下来吧。">><</if>>',
+          expected: 1
+        }
+      ],
+      'Penis Inspection Forced Defiant': [
+        {
+          ...inspectionDesk,
+          src: '<<if !$worn.under_lower.type.includes("naked")>>',
+          applybefore: '<<if $worn.lower.name is "naked">><<deadwood-school-inspection-posture "defiant" true>><<else>>'
+        },
+        { src: '<<exhibitionism4>>', applybefore: '<</if>>', expected: 1 }
+      ],
+      'Penis Inspection 2': [
+        {
+          srcmatch:
+            /(?:Your face flushes as you (?:realise most people already know what is in|think about the secret hidden in) your \$worn\.lower\.name\.|你的脸一下子涨得通红，因为你明白大多数人都知道你的\$worn\.lower\.cn_name_cap下有什么。|当你想到隐藏在你的\$worn\.lower\.cn_name_cap中的秘密时，你的脸红了起来。)/g,
+          to: '<<if $worn.lower.name isnot "naked">>$&<<else>><<deadwood-school-inspection-posture "notice">><</if>>',
+          expected: 4
+        },
+        {
+          srcmatch: /(?:You feel more conscious of the secret beneath your \$worn\.lower\.name as time goes on\.|随着时间的推移，你对自己\$worn\.lower\.cn_name_cap下面的秘密愈加在意起来。)/,
+          to: '<<if $worn.lower.name isnot "naked">>$&<<else>><<deadwood-school-inspection-posture "notice">><</if>>',
+          expected: 1
+        }
+      ],
+      'Pussy Inspection Comply': [
+        { ...inspectionDesk, src: '<<set _crotchlessPantiesId to 17>>' },
+        { src: '<<if maleChance() gt 0>>', applybefore: '<</if>>', expected: 1 }
+      ],
+      'Pussy Inspection Flaunt No Pussy': [
+        { ...inspectionDesk, src: "<<if setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt is 1>>" },
+        { src: '<<exhibitionism4>>', applybefore: '<</if>>', expected: 1 },
+        { ...inspectionDressAgain, expected: 1 }
+      ],
+      'Pussy Inspection Flaunt': [
+        { ...inspectionDesk, src: '<<if $worn.under_lower.name is "naked">>' },
+        { src: '<<exhibitionism4>>', applybefore: '<</if>>', expected: 1 },
+        { src: '!$worn.under_lower.name is "naked"', to: '$worn.under_lower.name isnot "naked"', expected: 1 },
+        { ...inspectionDressAgain, expected: 3 }
+      ],
+      'Pussy Inspection Forced': [
+        { ...inspectionDesk, src: '<<if $worn.under_lower.type.includes("naked")>>', applybefore: '<<if $worn.lower.name is "naked">><<deadwood-school-inspection-posture "desk">><<else>>' },
+        { src: '<<if $inspection.gender_appearance is "f">>', applybefore: '<</if>>', expected: 1 },
+        {
+          srcmatch: /(?:You readjust your clothes and |你重新整理你的衣服，)/,
+          to: '<<if $worn.lower.name isnot "naked" or $worn.under_lower.name isnot "naked">>$&<<else>><<lanSwitch "You " "你">><</if>>',
+          expected: 1
+        }
+      ],
+      'Pussy Inspection Forced Defiant': [
+        {
+          ...inspectionDesk,
+          src: '<<if setup.clothes.lower[clothesIndex(\'lower\', $worn.lower)].skirt is 1 and !$worn.under_lower.type.includes("naked")>>',
+          applybefore: '<<if $worn.lower.name is "naked">><<deadwood-school-inspection-posture "defiant">><<else>>'
+        },
+        { src: '<<exhibitionism4>>', applybefore: '<</if>>', expected: 1 },
+        {
+          srcmatch: /(?:, or if they just weren't expecting what was beneath your \$worn\.lower\.name|，或者他们只是没有想到在你的\$worn\.lower\.cn_name_cap下面是什么)/,
+          to: '<<if $worn.lower.name isnot "naked">>$&<</if>>',
+          expected: 1
+        }
+      ],
       'Swimming Lesson': [
         // 已获批的校规不再触发旧裸体泳课的礼顿惩罚，不修改原版全班任务记录。
         { src: '$swimnudecounter gte 10 and $swimall isnot 1', applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity', expected: 1 },
@@ -165,6 +281,12 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       Hallways: [
         { ...campusNavigationDress },
         { ...campusHidingDress },
+        // 职位免除强制留堂，仍可在原版留堂入口旁主动参加。
+        {
+          src: '<<if $schoolstate is "afternoon" and $detention gte 1 and $daily.school.detentionAttended isnot 1 and $pillory.tenant.special.name isnot "Leighton">>',
+          applybefore: '<<deadwood-school-voluntary-detention>>',
+          expected: 1
+        },
         { ...studentDetention },
         // 储物柜前的链接数随留堂和特殊事件变化，按原版储物柜定位公告栏。
         {
@@ -233,6 +355,18 @@ export default function School(maplebirch: typeof window.maplebirch): void {
         }
       ],
       'Widgets Sydney': [
+        // 免听只解除针对 PC 的逃课警告；悉尼自己的上课与值班安排照常执行。
+        { src: '<<widget "sydneyLibrary">>', applyafter: '<<if $LifeSimulation.school.attendanceExempt>><<unset $daily.sydney.classWarn>><</if>>', expected: 1 },
+        {
+          src: '($sydneyScience isnot 1 and $schoolstate is "first") or ["fourth", "fifth"].includes($schoolstate)',
+          to: '($&) and !$LifeSimulation.school.attendanceExempt',
+          expected: 1
+        },
+        {
+          srcmatch: /(?:We're late for science class!|我们上课要迟到了！)/,
+          to: '<<if $LifeSimulation.school.attendanceExempt>><<lanSwitch "I\'m late for science class!" "我上课要迟到了！">><<else>>$&<</if>>',
+          expected: 1
+        },
         // 在原版留堂条件上追加学生身份检查，其余限制照常保留。
         {
           srcmatchgroup: /\$detention gte 1(?= and \$daily\.school\.detentionAttended isnot 1)/g,
