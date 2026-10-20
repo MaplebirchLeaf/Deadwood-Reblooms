@@ -39,14 +39,14 @@
 
 <<widget 'deadwood-remy-pregnancy-action'>>
   <<deadwood-remy-pregnancy-context>>
-  <<set _remyReward to false>>
+  <<set $_remyReward to false>>
   <<if _remyContext and _remyEntry and _remyEntry.day isnot Time.days>>
     <<set _remyEntry.day to Time.days>><<set _remyEntry.topics to []>>
   <</if>>
   <<if _remyContext and _remyEntry and !_remyEntry.topics.includes(_args[0])>>
-    <<set _remyReward to !_remyEntry.topics.some(topic => topic !== 'sample') and !_remyPregnancy.captive and _args[0] isnot 'sample'>>
+    <<set $_remyReward to !_remyEntry.topics.some(topic => topic !== 'sample') and !_remyPregnancy.captive and _args[0] isnot 'sample'>>
     <<run _remyEntry.topics.push(_args[0])>>
-    <<if _remyReward>><<npcincr Remy love 1>><<stress -2>><</if>>
+    <<if $_remyReward>><<npcincr Remy love 1>><<stress -2>><</if>>
     <<pass 10>>
   <</if>>
 <</widget>>
@@ -339,8 +339,8 @@
 <</if>>
 <<case 'names'>>
 <<if _remyRecord.deliveredDate isnot null>>
-<<set _remyChildren to getChildrenOf(_remyRecord.pregnancyId).filter(child => knowsChild(child.childId, 'pc') && childIsBorn(child))>>
-<<if _remyChildren.length and _remyChildren.every(child => child.name)>>
+<<set $_remyChildren to getChildrenOf(_remyRecord.pregnancyId).filter(child => knowsChild(child.childId, 'pc') && childIsBorn(child))>>
+<<if $_remyChildren.length and $_remyChildren.every(child => child.name)>>
 <<language>>
   <<option 'EN'>>
     You repeat the names already chosen. Remy tries one aloud, less formally the second time. "It sounds different when there is someone to answer it."
@@ -381,13 +381,13 @@
   <</language>>
   <br><br>
 <</if>>
-<<set _remyChildren to getChildrenOf(_remyRecord.pregnancyId).filter(child => knowsChild(child.childId, 'pc') && childIsBorn(child))>>
-<<if _remyChildren.length>>
+<<set $_remyChildren to getChildrenOf(_remyRecord.pregnancyId).filter(child => knowsChild(child.childId, 'pc') && childIsBorn(child))>>
+<<if $_remyChildren.length>>
 <<language>>
   <<option 'EN'>>
-    Remy starts with the costs. You ask about feeding and sleeping before returning to the figures. <<if _remyChildren.length gt 1>>With more than one child, you discuss how to share the work instead of treating every waking as the same child's.<<else>>You ask what happens when the child wakes in the night.<</if>> <<if $Orchard.remy.romance and C.npc.Remy.love gte 50>>"I heard you the first time," <<he>> says, then moves the figures aside long enough to answer.<<else>>Remy looks at the clock. "You'll need to ask the person on duty as well."<</if>>
+    Remy starts with the costs. You ask about feeding and sleeping before returning to the figures. <<if $_remyChildren.length gt 1>>With more than one child, you discuss how to share the work instead of treating every waking as the same child's.<<else>>You ask what happens when the child wakes in the night.<</if>> <<if $Orchard.remy.romance and C.npc.Remy.love gte 50>>"I heard you the first time," <<he>> says, then moves the figures aside long enough to answer.<<else>>Remy looks at the clock. "You'll need to ask the person on duty as well."<</if>>
   <<option 'CN'>>
-    雷米先说起开销。你让<<him>>先谈喂食和睡觉，再回头算账。<<if _remyChildren.length gt 1>>孩子不止一个，你们商量怎么分担，没把每次夜里醒来都当成同一个孩子的事。<<else>>你问起孩子半夜醒了该怎么办。<</if>> <<if $Orchard.remy.romance and C.npc.Remy.love gte 50>>“第一遍就听见了。”<<he>>说，却还是把账目放到一边，先回答你的问题。<<else>>雷米看了眼钟。“还得问当班的人。”<</if>>
+    雷米先说起开销。你让<<him>>先谈喂食和睡觉，再回头算账。<<if $_remyChildren.length gt 1>>孩子不止一个，你们商量怎么分担，没把每次夜里醒来都当成同一个孩子的事。<<else>>你问起孩子半夜醒了该怎么办。<</if>> <<if $Orchard.remy.romance and C.npc.Remy.love gte 50>>“第一遍就听见了。”<<he>>说，却还是把账目放到一边，先回答你的问题。<<else>>雷米看了眼钟。“还得问当班的人。”<</if>>
 <</language>>
 <<else>>
 <<language>>

@@ -51,19 +51,19 @@
 
 <!-- 属性达到第七级上限后，显示本轮实际获得的特质，属性突破提示仍由各自场景负责。 -->
 <<widget 'deadwood-reblooms-trait-unlocks'>>
-  <<set _unlockedTraits to maplebirch.get("VanillaPlus").unlockTraits()>>
-  <<for _trait range _unlockedTraits>>
+  <<set $_unlockedTraits to maplebirch.get("VanillaPlus").unlockTraits()>>
+  <<for _trait range $_unlockedTraits>>
     <<set _traitName to maplebirch.t(`deadwood-reblooms:VanillaPlus:traits:${_trait}:name`)>>
-    <<set _traitNotice to maplebirch.t('deadwood-reblooms:VanillaPlus:traits:unlocked').replace('{name}', _traitName)>>
-    <span @class="_trait is 'incorrigible' ? 'silver' : ['exhibitionism', 'deviancy', 'promiscuity'].includes(_trait) ? 'lustful' : 'gold'"><<= _traitNotice>></span><br>
+    <<set $_traitNotice to maplebirch.t('deadwood-reblooms:VanillaPlus:traits:unlocked').replace('{name}', _traitName)>>
+    <span @class="_trait is 'incorrigible' ? 'silver' : ['exhibitionism', 'deviancy', 'promiscuity'].includes(_trait) ? 'lustful' : 'gold'"><<= $_traitNotice>></span><br>
   <</for>>
 <</widget>>
 
 <!-- 属性突破结算：解锁上限并显示提示。 -->
 <<widget 'deadwood-reblooms-unlock'>>
   <<set $VanillaPlus.lock[_args[0]] to true>>
-  <<set _unlockName to maplebirch.get('VanillaPlus').progress.find(item => item.id is _args[0]).name>>
-  <span class="gold"><<= maplebirch.t('deadwood-reblooms:VanillaPlus:unlock').replace('{name}', window.lanSwitch(_unlockName))>></span><br>
+  <<set $_unlockName to maplebirch.get('VanillaPlus').progress.find(item => item.id is _args[0]).name>>
+  <span class="gold"><<= maplebirch.t('deadwood-reblooms:VanillaPlus:unlock').replace('{name}', window.lanSwitch($_unlockName))>></span><br>
 <</widget>>
 
 <!-- 医院入口：符合条件时提供童贞修复手术。 -->
@@ -255,10 +255,10 @@
 <!-- 诡异镜入口：已发现镜面且通道开放时进入触手平原。 -->
 <<widget 'deadwood-reblooms-deviancy-eerie-mirror-link'>>
   <<silently>>
-    <<set _banishAvailable to !pcAreArmsBound('both') and $angel gte 4 and $angelBanish gte 1>>
-    <<set _showMirrorLink to _args[0] is (_banishAvailable ? 1 : 0) and maplebirch.get("VanillaPlus").deviancy.mirrorOpen and maplebirch.get("VanillaPlus").deviancy.discovered('home')>>
+    <<set $_banishAvailable to !pcAreArmsBound('both') and $angel gte 4 and $angelBanish gte 1>>
+    <<set $_showMirrorLink to _args[0] is ($_banishAvailable ? 1 : 0) and maplebirch.get("VanillaPlus").deviancy.mirrorOpen and maplebirch.get("VanillaPlus").deviancy.discovered('home')>>
   <</silently>>
-  <<if _showMirrorLink>>
+  <<if $_showMirrorLink>>
     <<deadwood-reblooms-deviancy-mirror-enter-link 'home'>>
   <</if>>
 <</widget>>
@@ -282,7 +282,7 @@
 <!-- 诡异镜出口：按触手平原坐标显示已经发现的返回地点。 -->
 <<widget 'deadwood-reblooms-deviancy-mirror-hint'>>
   <<set _mirrorLocations to $VanillaPlus.deviancy.mirror_locations>>
-  <<set _mirrorTargets to []>>
+  <<set $_mirrorTargets to []>>
   <<if maplebirch.get('Sydney')>>
     <<deadwood-reblooms-sirris-estate-presence>>
   <</if>>
@@ -294,59 +294,59 @@
     and (Time.hour gte 18 or getKylarLocation().area is 'manor_bedroom')
     and (!maplebirch.get('Finance') or !maplebirch.get("Finance").realEstate.residenceOf('Kylar'))>>
   <<if _mirrorLocations.home and maplebirch.get("VanillaPlus").deviancy.discovered('home')>>
-    <<run _mirrorTargets.push({...(_mirrorLocations.home), EN: 'your bedroom mirror', CN: '卧室的镜子'})>>
+    <<run $_mirrorTargets.push({...(_mirrorLocations.home), EN: 'your bedroom mirror', CN: '卧室的镜子'})>>
   <</if>>
   <<for _property range (maplebirch.get("Finance")?.realEstate.properties ?? [])>>
-    <<set _coordinates to _mirrorLocations['property:' + _property.id]>>
-    <<if _coordinates and maplebirch.get("VanillaPlus").deviancy.discovered('property', _property.id)
+    <<set $_coordinates to _mirrorLocations['property:' + _property.id]>>
+    <<if $_coordinates and maplebirch.get("VanillaPlus").deviancy.discovered('property', _property.id)
       and maplebirch.get("Finance").realEstate.owns(_property.id)
       and !maplebirch.get("Finance").realEstate.managementFor(_property.id).rented>>
-      <<run _mirrorTargets.push({
-        north: _coordinates.north,
-        east: _coordinates.east,
+      <<run $_mirrorTargets.push({
+        north: $_coordinates.north,
+        east: $_coordinates.east,
         EN: _property.name.EN + ' mirror',
         CN: _property.name.CN + '的镜子'
       })>>
     <</if>>
   <</for>>
   <<if _mirrorLocations.farm and maplebirch.get("VanillaPlus").deviancy.discovered('farm')>>
-    <<run _mirrorTargets.push({...(_mirrorLocations.farm), EN: 'the farm mirror', CN: '农场的镜子'})>>
+    <<run $_mirrorTargets.push({...(_mirrorLocations.farm), EN: 'the farm mirror', CN: '农场的镜子'})>>
   <</if>>
   <<if _mirrorLocations.tower and maplebirch.get("VanillaPlus").deviancy.discovered('tower')>>
-    <<run _mirrorTargets.push({...(_mirrorLocations.tower), EN: 'the tower mirror', CN: '高塔的镜子'})>>
+    <<run $_mirrorTargets.push({...(_mirrorLocations.tower), EN: 'the tower mirror', CN: '高塔的镜子'})>>
   <</if>>
   <<if _mirrorLocations.temple and maplebirch.get("VanillaPlus").deviancy.discovered('temple')>>
-    <<run _mirrorTargets.push({...(_mirrorLocations.temple), EN: 'the temple mirror', CN: '神殿宿舍的镜子'})>>
+    <<run $_mirrorTargets.push({...(_mirrorLocations.temple), EN: 'the temple mirror', CN: '神殿宿舍的镜子'})>>
   <</if>>
   <<if _mirrorLocations.sirris and _sirrisMirrorReady and maplebirch.get("VanillaPlus").deviancy.discovered('sirris')>>
-    <<run _mirrorTargets.push({...(_mirrorLocations.sirris), EN: "Sydney's bedroom mirror", CN: '悉尼卧室的镜子'})>>
+    <<run $_mirrorTargets.push({...(_mirrorLocations.sirris), EN: "Sydney's bedroom mirror", CN: '悉尼卧室的镜子'})>>
   <</if>>
   <<if _mirrorLocations.kylar and _kylarMirrorReady and maplebirch.get("VanillaPlus").deviancy.discovered('kylar')>>
-    <<run _mirrorTargets.push({...(_mirrorLocations.kylar), EN: "Kylar's bedroom mirror", CN: '凯拉尔卧室的镜子'})>>
+    <<run $_mirrorTargets.push({...(_mirrorLocations.kylar), EN: "Kylar's bedroom mirror", CN: '凯拉尔卧室的镜子'})>>
   <</if>>
   <!-- 只提示最近的异地出口。同格出口由下方真实链接显示，无需方向提示。 -->
-  <<set _nearestMirror to null>><<set _nearestDistance to 100>>
-  <<for _target range _mirrorTargets>>
+  <<set $_nearestMirror to null>><<set $_nearestDistance to 100>>
+  <<for _target range $_mirrorTargets>>
     <<set _distance to Math.abs(_target.north - $tentnorth) + Math.abs(_target.east - $tenteast)>>
-    <<if _distance gt 0 and _distance lt _nearestDistance>>
-      <<set _nearestMirror to _target>><<set _nearestDistance to _distance>>
+    <<if _distance gt 0 and _distance lt $_nearestDistance>>
+      <<set $_nearestMirror to _target>><<set $_nearestDistance to _distance>>
     <</if>>
   <</for>>
-  <<if _nearestMirror>>
-    <<set _northStep to Math.sign(_nearestMirror.north - $tentnorth)>>
-    <<set _eastStep to Math.sign(_nearestMirror.east - $tenteast)>>
-    <<set _directionEN to
-      (_northStep gt 0 ? 'north' : _northStep lt 0 ? 'south' : '') +
-      (_eastStep gt 0 ? 'east' : _eastStep lt 0 ? 'west' : '')>>
-    <<set _directionCN to
-      (_eastStep gt 0 ? '东' : _eastStep lt 0 ? '西' : '') +
-      (_northStep gt 0 ? '北' : _northStep lt 0 ? '南' : '')>>
+  <<if $_nearestMirror>>
+    <<set $_northStep to Math.sign($_nearestMirror.north - $tentnorth)>>
+    <<set $_eastStep to Math.sign($_nearestMirror.east - $tenteast)>>
+    <<set $_directionEN to
+      ($_northStep gt 0 ? 'north' : $_northStep lt 0 ? 'south' : '') +
+      ($_eastStep gt 0 ? 'east' : $_eastStep lt 0 ? 'west' : '')>>
+    <<set $_directionCN to
+      ($_eastStep gt 0 ? '东' : $_eastStep lt 0 ? '西' : '') +
+      ($_northStep gt 0 ? '北' : $_northStep lt 0 ? '南' : '')>>
     <span class='purple'>
       <<language>>
         <<option 'EN'>>
-          You feel a faint pull from <<= _nearestMirror.EN>> to the <<= _directionEN>>.
+          You feel a faint pull from <<= $_nearestMirror.EN>> to the <<= $_directionEN>>.
         <<option 'CN'>>
-          你隐约感到<<= _nearestMirror.CN>>在<<= _directionCN>>方牵引着你。
+          你隐约感到<<= $_nearestMirror.CN>>在<<= $_directionCN>>方牵引着你。
       <</language>>
     </span><br><br>
   <</if>>

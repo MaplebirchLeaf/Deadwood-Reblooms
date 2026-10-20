@@ -1,0 +1,46 @@
+:: Deadwood Robin Savings Widgets [widget]
+<<widget 'deadwood-robin-savings-check'>>
+  <<set _robinSavings to maplebirch.get('Robin')?.available and C.npc.Robin.state is 'active'
+    and $location is 'home' and ['Robin\'s Room Entrance', 'Deadwood Robin Savings'].includes($passage)
+    and !maplebirch.get('Finance')?.realEstate.residenceOf('Robin')
+    and !['orphanage', 'bath'].includes(getRobinLocation())
+    and !pcAreArmsBound('both') and $stress lt $stressmax
+    and !$combat and !$possessed and !$replayScene and !$statFreeze
+    and !$nextPassage and !$nextPassageCheck and !$eventforced and !isPregnancyEnding()>>
+<</widget>>
+
+<<widget 'deadwood-robin-savings-link'>>
+  <<deadwood-robin-savings-check>>
+  <<if _robinSavings and $money gte 2000>>
+    <<icon 'robin/savings-note.png'>><<lanLink ['Quietly leave Robin some money', '悄悄给罗宾留些钱'] 'Deadwood Robin Savings'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Robin Savings
+<<set $outside to 0>><<effects>><<deadwood-robin-savings-check>>
+<<if $phase is 'robin-savings'>>
+  <<unset $phase>>
+  <<lanSwitch 'You fold the notes inside a blank sheet and slide it beneath Robin’s door. There is no name on the paper. The money will stay with Robin’s savings for rent and improvements.' '你把纸钞夹进一张空白纸里，折好，从罗宾的门缝下推了进去。纸上没有留名字。这笔钱会留在罗宾的储蓄里，用于房租和改造。'>><br><br>
+<<elseif _robinSavings>>
+  <<if getRobinLocation() is 'sleep'>>
+    <<lanSwitch 'Robin’s door is shut. You hear nothing from inside and leave the handle alone.' '罗宾的房门关着，里面没有动静。你没有去碰门把手。'>><br><br>
+  <<else>>
+    <<lanSwitch 'Robin is out. There is room beneath the door for a folded sheet of paper.' '罗宾出门了。门下留着一道缝，刚好能塞进折好的纸。'>><br><br>
+  <</if>>
+  <<set _robinSavingsTurn to State.turns>>
+  <<for _robinAmount range [20, 50, 100]>>
+    <<if $money gte _robinAmount * 100>>
+      <<capture _robinAmount _robinSavingsTurn>>
+        <<icon 'robin/savings-note.png'>><<lanLink ['Leave £' + _robinAmount, '留下£' + _robinAmount] 'Deadwood Robin Savings'>>
+          <<deadwood-robin-savings-check>>
+          <<if _robinSavings and State.turns is _robinSavingsTurn and [20, 50, 100].includes(_robinAmount) and $money gte _robinAmount * 100>>
+            <<money `-_robinAmount * 100`>><<set $RobinExpansion.reserve += _robinAmount, $phase to 'robin-savings'>>
+          <</if>>
+        <</lanLink>><br>
+      <</capture>>
+    <</if>>
+  <</for>>
+<<else>>
+  <<lanSwitch 'You put the money away. This can wait.' '你把钱收了起来。晚些再说吧。'>><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Return to Robin’s door', '回到罗宾门前'] "Robin's Room Entrance">><</lanLink>><br>

@@ -9,123 +9,123 @@
 <<widget 'deadwood-street-heist-action'>>
   <<set _heistWork to maplebirch.get('StreetLife')?.heist, _heistAction to _args[0]>>
   <<if !_heistWork?.available or $passage isnot 'Deadwood Street Heist' or !_heistWork.state.rolls or _heistWork.state.fight>><<exit>><</if>>
-  <<set _heistState to _heistWork.state>>
+  <<set $_heistState to _heistWork.state>>
   <<switch _heistAction>>
     <<case 'enter'>>
-      <<if _heistState.stage isnot 'entry' or _heistState.entered>><<exit>><</if>>
-      <<if _heistState.approach is 'quiet' and _heistState.rolls.entry lte _heistWork.chances.entry>>
-        <<set _heistState.stage to 'vault'>>
+      <<if $_heistState.stage isnot 'entry' or $_heistState.entered>><<exit>><</if>>
+      <<if $_heistState.approach is 'quiet' and $_heistState.rolls.entry lte _heistWork.chances.entry>>
+        <<set $_heistState.stage to 'vault'>>
       <<else>>
         <!-- 察觉到 PC 后仍可交涉或撤回，生成一次守卫并保存，抵抗才进入原版战斗。 -->
         <<endevent>><<generateNPC 1 'a'>><<set $NPCList[0].per to 'deadwood_heist_guard'>><<saveNPC 0 'deadwood_heist_guard'>><<endevent>>
         <<if !$per_npc.deadwood_heist_guard>><<exit>><</if>>
-        <<set _heistState.raisedAlarm to true, _heistState.stage to 'challenge'>>
-        <<if _heistState.approach is 'loud'>>
-          <<set _heistState.fight to {key: 'deadwood_heist_guard', combatStarted: false, resume: 'vault'}>>
+        <<set $_heistState.raisedAlarm to true, $_heistState.stage to 'challenge'>>
+        <<if $_heistState.approach is 'loud'>>
+          <<set $_heistState.fight to {key: 'deadwood_heist_guard', combatStarted: false, resume: 'vault'}>>
         <</if>>
       <</if>>
       <!-- 实际实施抢劫后才记罪证与停业，柜台接待仍由金融模块处理。 -->
-      <<set _heistState.entered to true>>
-      <<set _heistState.bankClosedUntil to Math.max(_heistState.bankClosedUntil, Math.floor(Time.days) + _heistWork.terms.bankClosureDays)>>
+      <<set $_heistState.entered to true>>
+      <<set $_heistState.bankClosedUntil to Math.max($_heistState.bankClosedUntil, Math.floor(Time.days) + _heistWork.terms.bankClosureDays)>>
       <<crimeUp _heistWork.terms.crime.entry 'trespassing'>>
       <<deadwood-street-heist-bank-incident>>
-      <<if _heistState.fight>>
+      <<if $_heistState.fight>>
         <<crimeUp _heistWork.terms.crime.violence 'assault'>><<goto 'Deadwood Street Fight'>>
       <<else>>
         <<pass 5>>
         <<if _heistWork.available>><<goto 'Deadwood Street Heist'>><</if>>
       <</if>>
     <<case 'talk'>>
-      <<if _heistState.stage isnot 'challenge' or _heistState.talked or $worn.face.type.includes('gag') or !$per_npc.deadwood_heist_guard>><<exit>><</if>>
-      <<set _heistState.talked to true>>
-      <<if _heistState.rolls.talk lte _heistWork.chances.talk>>
-        <<set _heistState.stage to 'vault'>><<deadwood-street-heist-clear-guard>>
+      <<if $_heistState.stage isnot 'challenge' or $_heistState.talked or $worn.face.type.includes('gag') or !$per_npc.deadwood_heist_guard>><<exit>><</if>>
+      <<set $_heistState.talked to true>>
+      <<if $_heistState.rolls.talk lte _heistWork.chances.talk>>
+        <<set $_heistState.stage to 'vault'>><<deadwood-street-heist-clear-guard>>
       <</if>>
       <<pass 5>>
       <<if _heistWork.available>><<goto 'Deadwood Street Heist'>><</if>>
     <<case 'resist'>>
-      <<if _heistState.stage isnot 'challenge' or !$per_npc.deadwood_heist_guard>><<exit>><</if>>
-      <<set _heistState.approach to 'loud', _heistState.raisedAlarm to true>>
-      <<set _heistState.fight to {key: 'deadwood_heist_guard', combatStarted: false, resume: 'vault'}>>
+      <<if $_heistState.stage isnot 'challenge' or !$per_npc.deadwood_heist_guard>><<exit>><</if>>
+      <<set $_heistState.approach to 'loud', $_heistState.raisedAlarm to true>>
+      <<set $_heistState.fight to {key: 'deadwood_heist_guard', combatStarted: false, resume: 'vault'}>>
       <<deadwood-street-heist-bank-incident>>
       <<crimeUp _heistWork.terms.crime.violence 'assault'>><<endevent>><<goto 'Deadwood Street Fight'>>
     <<case 'take-light' 'take-full'>>
-      <<if _heistState.stage isnot 'vault'>><<exit>><</if>>
-      <<set _heistPotential to _heistWork.terms.loot * (_heistState.approach is 'loud' ? _heistWork.terms.loudLootRatio : 1)>>
-      <<set _heistFull to _heistAction is 'take-full' and _heistState.rolls.vault lte _heistWork.chances.vault>>
-      <<set _heistState.vaultFailed to _heistAction is 'take-full' and !_heistFull>>
-      <<set _heistState.haul to _heistFull ? 'full' : 'light'>>
-      <<if _heistState.vaultFailed>><<set _heistState.raisedAlarm to true>><</if>>
-      <<set _heistRatio to _heistFull ? 1 : (_heistState.vaultFailed ? _heistWork.terms.vaultFailureRatio : _heistWork.terms.lightRatio)>>
-      <<set _heistState.loot to Math.floor(_heistPotential * _heistRatio), _heistState.stage to 'escape'>>
+      <<if $_heistState.stage isnot 'vault'>><<exit>><</if>>
+      <<set _heistPotential to _heistWork.terms.loot * ($_heistState.approach is 'loud' ? _heistWork.terms.loudLootRatio : 1)>>
+      <<set $_heistFull to _heistAction is 'take-full' and $_heistState.rolls.vault lte _heistWork.chances.vault>>
+      <<set $_heistState.vaultFailed to _heistAction is 'take-full' and !$_heistFull>>
+      <<set $_heistState.haul to $_heistFull ? 'full' : 'light'>>
+      <<if $_heistState.vaultFailed>><<set $_heistState.raisedAlarm to true>><</if>>
+      <<set $_heistRatio to $_heistFull ? 1 : ($_heistState.vaultFailed ? _heistWork.terms.vaultFailureRatio : _heistWork.terms.lightRatio)>>
+      <<set $_heistState.loot to Math.floor(_heistPotential * $_heistRatio), $_heistState.stage to 'escape'>>
       <<crimeUp _heistWork.terms.crime.vault 'thievery'>>
       <<if _heistAction is 'take-full'>><<physique 1 'noMessage'>><<tiredness 4>><<else>><<tiredness 1>><</if>>
-      <<pass `_heistState.approach is 'loud' ? 5 : 10`>>
+      <<pass `$_heistState.approach is 'loud' ? 5 : 10`>>
       <<if _heistWork.available>><<goto 'Deadwood Street Heist'>><</if>>
     <<case 'withdraw'>>
       <<if !_heistWork.inAction>><<exit>><</if>>
-      <<set _heistState.loot to 0, _heistState.outcome to 'withdrawn', _heistState.stage to 'settlement'>>
+      <<set $_heistState.loot to 0, $_heistState.outcome to 'withdrawn', $_heistState.stage to 'settlement'>>
       <<deadwood-street-heist-clear-guard>><<pass _heistWork.terms.escapeMinutes>><<tiredness 4>>
       <<if _heistWork.available>><<goto 'Deadwood Street Heist Return'>><</if>>
     <<case 'run' 'drive' 'run-careful' 'drive-careful'>>
-      <<if _heistState.stage isnot 'escape'>><<exit>><</if>>
-      <<set _heistDriving to _heistAction.startsWith('drive'), _heistCareful to _heistAction.endsWith('-careful')>>
-      <<set _heistEscapeMinutes to _heistWork.terms.escapeMinutes + (_heistCareful ? _heistWork.terms.carefulMinutes : 0)>>
-      <<if _heistDriving>>
+      <<if $_heistState.stage isnot 'escape'>><<exit>><</if>>
+      <<set $_heistDriving to _heistAction.startsWith('drive'), _heistCareful to _heistAction.endsWith('-careful')>>
+      <<set $_heistEscapeMinutes to _heistWork.terms.escapeMinutes + (_heistCareful ? _heistWork.terms.carefulMinutes : 0)>>
+      <<if $_heistDriving>>
         <<if !_heistWork.vehicleReady>><<exit>><</if>>
         <<set _heistTransport to maplebirch.get('Transport'), _heistVehicle to _heistWork.vehicle>>
         <<set _heistModel to _heistTransport.catalog.models.find(item => item.id === _heistVehicle.model)>>
         <!-- 谨慎撤离多用十分钟，实际燃油也必须足够，不能截到零当成已经付清。 -->
-        <<if _heistVehicle.fuel lt _heistModel.fuel_use * _heistEscapeMinutes>><<exit>><</if>>
+        <<if _heistVehicle.fuel lt _heistModel.fuel_use * $_heistEscapeMinutes>><<exit>><</if>>
       <<else>>
         <<if $worn.feet.type.includes('shackle')>><<exit>><</if>>
-        <<set _heistState.vehicle to null>>
+        <<set $_heistState.vehicle to null>>
       <</if>>
-      <<set _heistState.escapeMode to _heistCareful ? 'careful' : 'normal'>>
-      <<set _heistEscapeChance to Math.min(95, _heistWork.chances.escape + (_heistCareful ? _heistWork.terms.carefulBonus : 0))>>
-      <<if _heistCareful>><<set _heistState.loot to Math.floor(_heistState.loot * _heistWork.terms.carefulRatio)>><</if>>
-      <<if _heistDriving>>
-        <<set _heistVehicle.fuel to Math.max(0, _heistVehicle.fuel - _heistModel.fuel_use * _heistEscapeMinutes)>>
-        <<set _heistVehicle.condition to Math.max(0, _heistVehicle.condition - _heistTransport.journeyWear(_heistModel, _heistEscapeMinutes))>>
+      <<set $_heistState.escapeMode to _heistCareful ? 'careful' : 'normal'>>
+      <<set $_heistEscapeChance to Math.min(95, _heistWork.chances.escape + (_heistCareful ? _heistWork.terms.carefulBonus : 0))>>
+      <<if _heistCareful>><<set $_heistState.loot to Math.floor($_heistState.loot * _heistWork.terms.carefulRatio)>><</if>>
+      <<if $_heistDriving>>
+        <<set _heistVehicle.fuel to Math.max(0, _heistVehicle.fuel - _heistModel.fuel_use * $_heistEscapeMinutes)>>
+        <<set _heistVehicle.condition to Math.max(0, _heistVehicle.condition - _heistTransport.journeyWear(_heistModel, $_heistEscapeMinutes))>>
         <<set _heistVehicle.point to 'harvest', _heistTransport.state.driving to Math.min(1000, _heistTransport.state.driving + 4)>>
       <</if>>
-      <<set _heistState.outcome to _heistState.rolls.escape lte _heistEscapeChance ? 'success' : 'failed'>>
+      <<set $_heistState.outcome to $_heistState.rolls.escape lte $_heistEscapeChance ? 'success' : 'failed'>>
       <!-- 判定与人员后果使用开场保存的同一次骰点，先关阶段再记伤势，重绘不会重伤或再扣款。 -->
-      <<set _heistState.stage to 'settlement'>>
-      <<if _heistState.outcome is 'failed'>>
-        <<set _heistSevere to _heistState.rolls.escape - _heistEscapeChance gte _heistWork.terms.failure.severeMargin>>
-        <<set _heistLoss to _heistSevere ? _heistWork.terms.failure.severe : _heistWork.terms.failure.minor>>
-        <<set _heistState.loot to 0, _heistState.escapeFailure to _heistSevere ? 'custody' : 'injury'>>
+      <<set $_heistState.stage to 'settlement'>>
+      <<if $_heistState.outcome is 'failed'>>
+        <<set $_heistSevere to $_heistState.rolls.escape - $_heistEscapeChance gte _heistWork.terms.failure.severeMargin>>
+        <<set $_heistLoss to $_heistSevere ? _heistWork.terms.failure.severe : _heistWork.terms.failure.minor>>
+        <<set $_heistState.loot to 0, $_heistState.escapeFailure to $_heistSevere ? 'custody' : 'injury'>>
         <<for _heistCrewMember range _heistWork.crew>>
           <<if _heistCrewMember.health gt 0>>
-            <<set _heistCrewMember.health to Math.max(1, _heistCrewMember.health - Math.ceil(_heistCrewMember.healthmax * _heistLoss.crewInjury))>>
-            <<if _heistSevere and _heistCrewMember.heist.role is 'carrier'>><<set _heistCrewMember.heist.status to 'arrested'>><</if>>
+            <<set _heistCrewMember.health to Math.max(1, _heistCrewMember.health - Math.ceil(_heistCrewMember.healthmax * $_heistLoss.crewInjury))>>
+            <<if $_heistSevere and _heistCrewMember.heist.role is 'carrier'>><<set _heistCrewMember.heist.status to 'arrested'>><</if>>
           <</if>>
         <</for>>
-        <<pain _heistLoss.pain>><<tiredness _heistLoss.fatigue>>
+        <<pain $_heistLoss.pain>><<tiredness $_heistLoss.fatigue>>
       <</if>>
-      <<endevent>><<pass _heistEscapeMinutes>>
-      <<if !_heistDriving>>
+      <<endevent>><<pass $_heistEscapeMinutes>>
+      <<if !$_heistDriving>>
         <<tiredness 8>>
-        <<if _heistState.outcome is 'success'>><<athletics 1>><</if>>
+        <<if $_heistState.outcome is 'success'>><<athletics 1>><</if>>
       <</if>>
       <<if _heistWork.available>><<goto 'Deadwood Street Heist Return'>><</if>>
     <<case 'sting' 'contact'>>
       <<if !_heistWork.inAction>><<exit>><</if>>
-      <<if !_heistState.entered>>
+      <<if !$_heistState.entered>>
         <!-- 尚未实施抢劫：交线索并退出，不凭同伙出现在街上就宣称现场抓获。 -->
-        <<set _heistState.informed to true, _heistState.loot to 0, _heistState.outcome to 'reported', _heistState.stage to 'settlement'>>
+        <<set $_heistState.informed to true, $_heistState.loot to 0, $_heistState.outcome to 'reported', $_heistState.stage to 'settlement'>>
         <<deadwood-street-heist-clear-guard>><<pass 20>>
         <<if _heistWork.available>><<goto 'Deadwood Street Heist Debrief'>><</if>>
       <<else>>
-        <<if _heistAction is 'sting' ? !_heistState.policePlan : _heistState.policePlan>><<exit>><</if>>
-        <<set _heistState.lateReport to _heistAction is 'contact', _heistState.informed to true>>
-        <<set _heistState.loot to 0, _heistState.outcome to 'sting', _heistState.stage to 'settlement'>>
-        <<for _heistCrewKey range _heistState.crew>>
+        <<if _heistAction is 'sting' ? !$_heistState.policePlan : $_heistState.policePlan>><<exit>><</if>>
+        <<set $_heistState.lateReport to _heistAction is 'contact', $_heistState.informed to true>>
+        <<set $_heistState.loot to 0, $_heistState.outcome to 'sting', $_heistState.stage to 'settlement'>>
+        <<for _heistCrewKey range $_heistState.crew>>
           <<if $per_npc[_heistCrewKey]?.heist>><<set $per_npc[_heistCrewKey].heist.status to 'arrested'>><</if>>
         <</for>>
-        <<if !_heistState.betrayed>>
-          <<set _heistState.betrayed to true>>
+        <<if !$_heistState.betrayed>>
+          <<set $_heistState.betrayed to true>>
           <<npcincr Landry love _heistWork.terms.favour.landryBetrayal>>
           <<npcincr Wren love _heistWork.terms.favour.wrenBetrayal>>
         <</if>>
@@ -215,24 +215,24 @@
 <<widget 'deadwood-street-heist-settle'>>
   <<set _heistWork to maplebirch.get('StreetLife')?.heist>>
   <<if !_heistWork?.available or $passage isnot 'Deadwood Street Heist Debrief' or _heistWork.state.stage isnot 'settlement' or _heistWork.state.settled>><<exit>><</if>>
-  <<set _heistOutcome to _heistWork.state.outcome, _heistPayout to _heistOutcome is 'success' ? _heistWork.payout : 0>>
-  <<if ['reported', 'sting'].includes(_heistOutcome)>>
+  <<set $_heistOutcome to _heistWork.state.outcome, $_heistPayout to $_heistOutcome is 'success' ? _heistWork.payout : 0>>
+  <<if ['reported', 'sting'].includes($_heistOutcome)>>
     <<if !_heistWork.grantAvailable or maplebirch.npc.Schedule.get('Grant').location isnot 'police_station'>><<exit>><</if>>
-    <<set _heistPayout to _heistWork.terms.reward>>
+    <<set $_heistPayout to _heistWork.terms.reward>>
   <<elseif !_heistWork.atMeeting or !_heistWork.meetingAvailable>>
     <<exit>>
   <</if>>
-  <<if !_heistOutcome>><<exit>><</if>>
+  <<if !$_heistOutcome>><<exit>><</if>>
   <<set _heistWork.state.settled to true, _heistWork.state.stage to 'closed'>>
-  <<switch _heistOutcome>>
+  <<switch $_heistOutcome>>
     <<case 'success'>>
-      <<money _heistPayout 'pubStolenGoods'>>
+      <<money $_heistPayout 'pubStolenGoods'>>
       <<npcincr Landry love _heistWork.terms.favour.landrySuccess>>
       <<npcincr Wren love _heistWork.terms.favour.wrenSuccess>>
       <<set maplebirch.get('StreetLife').reputation += _heistWork.terms.successReputation>>
       <<deadwood-street-crew-gain _heistWork.state.crew 50 5>>
     <<case 'reported' 'sting'>>
-      <<money _heistPayout 'police'>>
+      <<money $_heistPayout 'police'>>
       <<set C.npc.Grant.love to Math.clamp(C.npc.Grant.love + _heistWork.terms.favour.grantSuccess, 0, 100)>>
     <<case 'failed' 'arrested'>>
       <<set maplebirch.get('StreetLife').reputation += _heistWork.terms.failurePenalty>>
@@ -240,7 +240,7 @@
       <<set maplebirch.get('StreetLife').reputation += _heistWork.terms.withdrawPenalty>>
   <</switch>>
   <!-- 已实际参与犯罪又放弃约定，也会失去信任，仅会面、入场前退出不视为背叛。 -->
-  <<if _heistWork.state.policePlan and _heistWork.state.entered and !['reported', 'sting'].includes(_heistOutcome)>>
+  <<if _heistWork.state.policePlan and _heistWork.state.entered and !['reported', 'sting'].includes($_heistOutcome)>>
     <<set C.npc.Grant.love to Math.clamp(C.npc.Grant.love + _heistWork.terms.favour.grantBetrayal, 0, 100)>>
   <</if>>
 <</widget>>
@@ -276,13 +276,13 @@
 <</widget>>
 
 <<widget 'deadwood-street-heist-losses'>>
-  <<set _heistLossState to maplebirch.get('StreetLife')?.heist.state>>
-  <<if _heistLossState?.escapeFailure is 'injury'>>
+  <<set $_heistLossState to maplebirch.get('StreetLife')?.heist.state>>
+  <<if $_heistLossState?.escapeFailure is 'injury'>>
     <span class='red'><<lanSwitch 'The haul is gone. You and both hires were hurt getting clear.' '赃款已经丢失。你和两名雇员在脱身时都受了伤。'>></span><br>
-  <<elseif _heistLossState?.escapeFailure is 'custody'>>
+  <<elseif $_heistLossState?.escapeFailure is 'custody'>>
     <span class='red'><<lanSwitch 'The haul is gone. You and the scout escaped hurt; the carrier was taken into custody.' '赃款已经丢失。你与侦察员带伤脱身，搬运员被警方带走了。'>></span><br>
   <</if>>
-  <<if _heistLossState?.entered>>
+  <<if $_heistLossState?.entered>>
     <span class='orange'><<lanSwitch 'Leaving the bank does not remove the evidence against you. Counter services remain suspended until the bank reopens.' '离开银行不等于消除了罪证。银行恢复营业前，柜台仍会暂停接待。'>></span><br>
   <</if>>
 <</widget>>

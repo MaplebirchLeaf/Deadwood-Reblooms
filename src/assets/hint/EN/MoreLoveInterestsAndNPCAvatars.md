@@ -1,6 +1,6 @@
 ### Choose your love interests
 
-Open **Character → Attitudes → Who do you consider a love interest?** and add eligible people. Each person must first meet their own relationship conditions; meeting them, high affection or a social portrait does not by itself make them eligible.
+Choose people under **Character → Attitudes → Who do you consider a love interest?** Eligibility depends on each person's relationship progress.
 
 | Awareness level shown on the character page | Love interests you can retain     |
 | ------------------------------------------- | --------------------------------- |
@@ -23,4 +23,4 @@ In New World, the **Polyamorous** trait lets you select several eligible partner
 
 ### Social portraits
 
-Social cards gain small portraits whose expressions and outfits follow the person's state. They help identify people without changing relationship values. Larger scene portraits are controlled separately by NPC Sidebar Portrait.
+Social cards gain small portraits whose expressions and outfits follow the person's state. Larger scene portraits are controlled by NPC Sidebar Portrait.

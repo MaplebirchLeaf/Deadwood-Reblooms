@@ -380,6 +380,7 @@ export default class Industry {
     state.spent += cost;
     if (choice === 'arrears') {
       state.wage_arrears = state.overhead_arrears = 0;
+      state.unpaid_days = 0;
       state.morale = Math.clamp(state.morale + 8, 0, 100);
     } else {
       if (issue?.type === 'injury') state.morale = Math.clamp(state.morale + 5, 0, 100);
@@ -488,6 +489,7 @@ export default class Industry {
     state.invoices = state.invoices.filter(item => item.pay_day > current);
     // 普通订单与加工间的到期货款都先到账，再支付今天的工资与厂房费用。
     this.laboratory.advance(state, current, 0);
+    if (state.wage_arrears === 0) state.unpaid_days = 0;
     const wages = Math.ceil(state.workers * terms.wage * (state.rush ? 1.5 : 1)) + (state.manager ? terms.managerWage : 0) + (state.laboratory.technician ? laboratoryTerms.technician_wage : 0);
     const paid = Math.min(state.cash, wages);
     state.cash -= paid;

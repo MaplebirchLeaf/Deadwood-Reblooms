@@ -22,7 +22,7 @@
       <span class='blue'><<lanSwitch 'You cannot bring yourself to drink while you know you are with child.' '知道自己怀孕后，你无法劝服自己喝酒。'>></span><br>
     <<elseif _wine_life.ready('wine') and Object.keys(_home_wine_options).length>>
       <label><<lanSwitch 'Wine: ' '酒：'>><<listbox '_home_wine' autoselect>><<optionsfrom _home_wine_options>><</listbox>></label><br>
-      <<icon 'orchard/wine-bottling.png'>><<lanLink ['Open a bottle and linger (0:20)', '开一瓶酒，坐一会儿 (0:20)']>>
+      <<icon 'tending/red-wine.png'>><<lanLink ['Open a bottle and linger (0:20)', '开一瓶酒，坐一会儿 (0:20)']>>
         <<deadwood-home-life-act 'wine' _home_wine>>
       <</lanLink>><<gdrunk>><<lstress>><span class='blue'> | <<lanSwitch 'One bottle' '一瓶酒'>></span><br>
     <<elseif $drunk gte 240>>
@@ -40,16 +40,16 @@
 <<widget 'deadwood-home-wine-followup-ready'>>
   <<set _wine_estate to maplebirch.get('Finance').realEstate>>
   <<set _wine_scene to _wine_estate.life.scene>>
-  <<set _wine_stage to _wine_scene?.stage ?? (_wine_scene?.followup is 'close' ? 1 : 0)>>
+  <<set $_wine_stage to _wine_scene?.stage ?? (_wine_scene?.followup is 'close' ? 1 : 0)>>
   <<set _wine_duration to _args[2] ?? (_args[0] is 'close' ? 30 : 15)>>
-  <<set _wine_end_hour to _wine_scene?.partner is 'Sydney' ? 6 : 7>>
+  <<set $_wine_end_hour to _wine_scene?.partner is 'Sydney' ? 6 : 7>>
   <<set _wine_followup_ready to $passage is 'Deadwood Reblooms Property Life Finish' and _wine_scene?.action is 'wine'
-    and (!_args[1] ? !_wine_scene.followup : _wine_scene.followup is 'close' and _wine_stage is _args[1])
+    and (!_args[1] ? !_wine_scene.followup : _wine_scene.followup is 'close' and $_wine_stage is _args[1])
     and _wine_estate.current?.id === _wine_scene.property_id and _wine_scene.partner
     and Time.date.timeStamp >= _wine_scene.at and Time.date.timeStamp <= _wine_scene.at + 3600
     and isLoveInterest(_wine_scene.partner)
     and _wine_estate.residentsHome(_wine_scene.property_id).some(resident => resident.id === _wine_scene.partner)
-    and (Time.hour >= _wine_end_hour or Time.hour * 60 + Time.minute + _wine_duration <= _wine_end_hour * 60)
+    and (Time.hour >= $_wine_end_hour or Time.hour * 60 + Time.minute + _wine_duration <= $_wine_end_hour * 60)
     and !$combat and !$replayScene and !$statFreeze and !$possessed and !$nextPassage and !$nextPassageCheck
     and !$gag and ($drugged ?? 0) <= 0 and ($hallucinogen ?? 0) <= 0 and $stress < $stressmax>>
   <<if _args[0] is 'close'>>
@@ -259,30 +259,30 @@
   <<set _wine_scene to maplebirch.get('Finance').realEstate.life.scene>>
   <<if _wine_scene.stage lt 2>><<exit>><</if>>
   <<if _wine_scene.partner is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
-  <<set _wine_tone to _wine_scene.tone ?? 'hands'>>
+  <<set $_wine_tone to _wine_scene.tone ?? 'hands'>>
   <<language>>
     <<option 'EN'>>
       <<switch _wine_scene.partner>>
         <<case 'Robin'>>
-          <<if _wine_tone is 'mouth'>>
+          <<if $_wine_tone is 'mouth'>>
             <span class='lewd'>You get <<his>> collar aside and put your mouth on the side of <<his>> throat.</span> Robin makes a sound that <<he>> immediately tries to swallow, and fails. <<He>> tips <<his>> head back to give you more of it, both hands braced on the arms of the chair, and lets you work down to where <<his>> pulse is fastest. <<if C.npc.Robin.trauma gte 20>>"Wait — slower," <<he>> says, and you slow down, and <<he>> keeps <<his>> head back anyway.<<else>>"You are going to leave a mark," <<he>> says, and does not move away.<</if>> <span class='lewd'>By the time you come back up, <<his>> shirt has come untucked on one side and <<he>> has not noticed.</span>
           <<else>>
             <span class='lewd'>You work a hand under the hem of <<his>> shirt and up the warm line of <<his>> back.</span> Robin goes still, then arches into it without meaning to. <<He>> catches your wrist at <<his>> waistband, and for a moment you think that is the answer — then <<he>> moves your hand lower <<himself>> and holds it there. <<if C.npc.Robin.trauma gte 20>>"This is all right," <<he>> says, more to <<himself>> than to you.<<else>>"I have been thinking about your hands all evening," <<he>> says quietly, and looks away as <<he>> says it.<</if>> <span class='lewd'><<He>> is already hard under your palm and does not pretend otherwise.</span>
           <</if>>
         <<case 'Whitney'>>
-          <<if _wine_tone is 'mouth'>>
+          <<if $_wine_tone is 'mouth'>>
             <span class='lewd'>You take a fistful of <<his>> hair and put your mouth under <<his>> jaw.</span> Whitney allows it for about four seconds, then takes your hair in return and drags your head back so <<he>> can watch your face while <<he>> decides what to do about it. "Cute." <span class='lewd'><<He>> rolls <<his>> hips up against your thigh once, deliberately, so you can feel exactly what you started</span>, and does it again when your breath catches. "Keep going. I did not tell you to stop."
           <<else>>
             <span class='lewd'>You press a hand flat down the front of <<his>> trousers and find <<he>> has been half hard since the first glass.</span> Whitney laughs at you for noticing, then stops laughing when you close your grip. <span class='lewd'><<His>> hand comes down over yours and sets the pace — slow, then slower</span>, watching your face the whole time. "You want to be good at this so badly." <<He>> tips your chin up. "Show me."
           <</if>>
         <<case 'Kylar'>>
-          <<if _wine_tone is 'mouth'>>
+          <<if $_wine_tone is 'mouth'>>
             <span class='lewd'>You push <<his>> shirt off one shoulder, set your teeth to it, then your mouth, and <<he>> stops breathing for a beat.</span> Kylar's hand comes up into your hair and does not pull — just holds, as though letting go would end it. <<if C.npc.Kylar.rage gte 60>>"Again," <<he>> says, and when you do not move fast enough, <<he>> says it again with <<his>> fingers tightening.<<else>><<He>> says your name, once, in a voice you have not heard from <<him>> before.<</if>> <span class='lewd'><<He>> is shaking slightly by the time you come up, and <<he>> pulls you back in for a kiss before you can say anything about it.</span>
           <<else>>
             <span class='lewd'>You slide a hand down the front of <<his>> trousers and <<he>> goes rigid, then melts into you all at once.</span> <<He>> presses <<his>> face into your shoulder while you work <<him>>, and the sounds <<he>> makes go straight into the fabric of your shirt. <<if C.npc.Kylar.rage gte 60>>"If you stop now I will not forgive you," <<he>> says, muffled.<<else>>"Is this — is this what you wanted?" <<he>> asks, and you answer by tightening your grip.<</if>> <span class='lewd'><<He>> is already leaking through <<his>> clothes, and <<his>> hips have started moving without <<his>> permission.</span>
           <</if>>
         <<case 'Sydney'>>
-          <<if _wine_tone is 'mouth'>>
+          <<if $_wine_tone is 'mouth'>>
             <span class='lewd'>You take <<his>> collar in both hands, pull it wide, and put your mouth on the bare line of <<his>> collarbone.</span> Sydney's breath goes in sharply and <<he>> does not stop you. <<if _sydneyStatus.includes('corruptLust')>><<He>> tips <<his>> head back and lets you hear every sound <<he>> makes, while one hand slides up under your shirt to count your ribs. "Turnabout," <<he>> says, and does it back to you hard enough to leave a mark.<<elseif _sydneyStatus.includes('corrupt')>>"That is going to show," <<he>> says, and does not move away.<<else>>"I do not know what to do with my hands," <<he>> admits, and you put them where you want them.<</if>> <span class='lewd'>The pendant is still on the table, face up, and neither of you looks at it.</span>
           <<else>>
             <span class='lewd'>You get a hand under the heavy fabric of <<his>> robe and up the inside of <<his>> thigh.</span> Sydney goes very still, and then, deliberately, parts <<his>> legs to give you more room. <<if _sydneyStatus.includes('corruptLust')>><<He>> catches your wrist and moves it exactly where <<he>> wants it, no longer pretending to have been talked into anything. "There. Do not stop to ask."<<elseif _sydneyStatus.includes('corrupt')>>"Say what you are doing," <<he>> says, and makes you say it out loud before <<he>> lets you continue.<<else>><<He>> stops your hand once, to breathe, then puts it back <<himself>>, and keeps <<his>> own hand over yours as you move.<</if>> <span class='lewd'><<He>> is wet against your fingers and too composed to pretend otherwise.</span>
@@ -294,25 +294,25 @@
     <<option 'CN'>>
       <<switch _wine_scene.partner>>
         <<case 'Robin'>>
-          <<if _wine_tone is 'mouth'>>
+          <<if $_wine_tone is 'mouth'>>
             <span class='lewd'>你把<<his>>衣领拨开，把嘴贴上<<his>>喉咙侧面。</span>罗宾发出一个声音，立刻又想咽回去，没咽住。<<He>>把头往后仰，把更多地方让给你，两只手撑在椅子扶手上，任你一路往下，直到脉搏跳得最快的那一处。<<if C.npc.Robin.trauma gte 20>>“等一下——慢一点。”<<he>>说，你慢下来，<<he>>却还是把头仰着。<<else>>“你要留下印子了。”<<he>>说，身体并没有让开。<</if>><span class='lewd'>你抬起来的时候，<<his>>衣服已经有一边从裤腰里挣出来了，<<he>>自己还没发现。</span>
           <<else>>
             <span class='lewd'>你把手探进<<his>>衣摆，顺着后背那条温热的地方往上摸。</span>罗宾先是一僵，然后不自觉地往你手里弓。你摸到腰际时，<<he>>抓住了你的手腕，你以为这就是答案了——然后<<he>>自己把你的手往下按，按在那里不放。<<if C.npc.Robin.trauma gte 20>>“这样没关系。”<<he>>说，更像是在对<<himself>>说。<<else>>“我一整晚都在想你的手。”<<he>>低声说，说完就把脸偏开了。<</if>><span class='lewd'><<He>>已经硬在你掌心里，也没有再装。</span>
           <</if>>
         <<case 'Whitney'>>
-          <<if _wine_tone is 'mouth'>>
+          <<if $_wine_tone is 'mouth'>>
             <span class='lewd'>你抓了一把<<his>>头发，把嘴凑到<<his>>下颌下面。</span>惠特尼让你咬了大约四秒，然后反手揪住你的头发，把你的头往后拽，好看着你的脸决定怎么处置。“挺可爱。”<span class='lewd'><<He>>故意顶了你大腿一下，让你清楚知道是你挑起来的</span>，你呼吸一乱，<<he>>又顶了一下。“接着来。我没让你停。”
           <<else>>
             <span class='lewd'>你把手按在<<his>>裤子前面，摸到<<he>>从第一杯起就一直半硬着。</span>惠特尼笑你才发现这事，等你的手握紧了，<<he>>就笑不出来了。<span class='lewd'><<His>>手覆上来，替你定节奏——先慢，再更慢</span>，全程盯着你的脸。“你可真想把这活干好。”<<He>>抬起你的下巴。“那就做给我看。”
           <</if>>
         <<case 'Kylar'>>
-          <<if _wine_tone is 'mouth'>>
+          <<if $_wine_tone is 'mouth'>>
             <span class='lewd'>你把<<his>>衣服从一边肩膀推下去，先用牙咬，再用嘴，<<he>>有一拍没喘上气。</span>凯拉尔的手插进你头发里，却没有拽——只是扣着，像是松手这件事就会结束。<<if C.npc.Kylar.rage gte 60>>“再来。”<<he>>说，你慢了半拍，<<he>>又说了一遍，手指跟着收紧。<<else>><<He>>叫了你的名字，一次，用你没听过的声音。<</if>><span class='lewd'>你抬头的时候<<he>>还在轻轻发抖，不等你开口，<<he>>先把你拉回去吻住。</span>
           <<else>>
             <span class='lewd'>你把手探进<<his>>裤子前面，<<he>>整个人先绷紧，然后一下子化在你身上。</span>你动着，<<He>>把脸埋进你肩膀，声音全闷进了你的衣服里。<<if C.npc.Kylar.rage gte 60>>“你现在要是停下，我不会原谅你。”<<he>>闷声说。<<else>>“这是……这是你想要的吗？”<<he>>问，你收紧了手，就算回答。<</if>><span class='lewd'><<He>>已经隔着布料渗出来，腰也不听使唤地开始动。</span>
           <</if>>
         <<case 'Sydney'>>
-          <<if _wine_tone is 'mouth'>>
+          <<if $_wine_tone is 'mouth'>>
             <span class='lewd'>你两手扯开<<his>>衣领，把嘴贴上<<his>>裸露的锁骨那一线。</span>悉尼吸了一口气，没有推开你。<<if _sydneyStatus.includes('corruptLust')>><<He>>把头仰起来，让你把<<he>>发出的每一个声音都听全，一只手顺你衣摆摸上来，一根一根数你的肋骨。“礼尚往来。”<<he>>说完，回头咬在你身上，重得能留印。<<elseif _sydneyStatus.includes('corrupt')>>“这个会被人看见的。”<<he>>说，人并没有挪开。<<else>>“我不知道手该放哪儿。”<<he>>承认，你把<<his>>手按到了你想让<<he>>放的地方。<</if>><span class='lewd'>吊坠还摆在桌上，正面朝上，你们谁也没再看它一眼。</span>
           <<else>>
             <span class='lewd'>你把手探进<<his>>厚重的袍子里，顺着大腿内侧往上。</span>悉尼整个人静住，随后很刻意地把腿分开，给你让出地方。<<if _sydneyStatus.includes('corruptLust')>><<He>>抓住你的手腕，把你的手挪到<<he>>真正要的地方，也不再装成是被人劝服。“就这儿。别停下来问。”<<elseif _sydneyStatus.includes('corrupt')>>“说清楚你在做什么。”<<he>>说，非要你出声说出来，才准你继续。<<else>><<He>>按住你的手停了一次，缓了口气，才自己把<<his>>手放回去，整个过程一直覆在你手背上，跟着你动。<</if>><span class='lewd'><<He>>下面已经湿了你的手指，神态却还端着。</span>

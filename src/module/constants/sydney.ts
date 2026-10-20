@@ -22,7 +22,7 @@ export interface SydneyExpansionState {
   christmasRestYear: number;
   /** 西里斯庄园万圣节探访已发生的年份。 */
   sirrisHalloweenVisitYear: number;
-  /** 科学课提示是否已给出。 */
+  /** 是否已听说科学课换班的消息。 */
   scienceHint: boolean;
   /** 上次在解剖示范后借阅课堂笔记的游戏日。 */
   science_notes_day: number;

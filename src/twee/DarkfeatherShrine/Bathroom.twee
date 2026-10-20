@@ -1,0 +1,160 @@
+:: Deadwood Raven Shrine Bathroom
+<<effects>><<deadwood-raven-home-context>>
+<<if (!_shrineHome and !_shrineHomeSneaking) or $location isnot 'raven_shrine_house'>>
+  <<lanSwitch 'The washroom belongs to the house. You have not been invited to use it now.' '浴室连着月羽的住处。现在还不方便进去。'>><br><br>
+  <<deadwood-raven-home-return>><<exit>>
+<</if>>
+<<if _shrineHomeBathing>>
+  <<lanSwitch 'The sliding door is closed. Water splashes into the tub, then stops while Tsukihan reaches for something inside. A pair of slippers waits outside.' '拉门关着，水声断断续续地响起，又停了一会儿，像是月羽在伸手拿什么东西。门外整齐放着一双拖鞋。'>><br><br>
+  <<loitericon>><<lanLink ['Wait in the bedroom (0:' + String(30 - Time.minute).padStart(2, '0') + ')', '回寝室等一会儿 (0:' + String(30 - Time.minute).padStart(2, '0') + ')'] 'Deadwood Raven Shrine Room'>>
+    <<deadwood-raven-home-context>>
+    <<if (_shrineHome or _shrineHomeSneaking) and _shrineHomeBathing and $location is 'raven_shrine_house'>><<pass `30 - Time.minute`>><</if>>
+  <</lanLink>><br>
+  <<if !$daily.darkfeatherBathIntrusion and !pcAreArmsBound('both')>>
+    <<icon 'raven-shrine/sliding-door.png'>><<lanLink ['Open the door and step inside', '拉开门，走进去'] 'Deadwood Raven Shrine Bath Interrupted'>>
+      <<deadwood-raven-home-context>>
+      <<if (_shrineHome or _shrineHomeSneaking) and _shrineHomeBathing and $location is 'raven_shrine_house' and !$daily.darkfeatherBathIntrusion and !pcAreArmsBound('both')>>
+        <<set $daily.darkfeatherBathIntrusion to 'intruded', _shrine.home_action to 'intrude'>>
+        <<if !_shrineHome>><<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love - 2, 0, 100), C.npc.Tsukihan.dom to Math.clamp(C.npc.Tsukihan.dom + 2, 0, 100)>><</if>>
+      <</if>>
+    <</lanLink>><<if !_shrineHome>><<llove>><<deadwood-tsukihan-wilfulness-hint>><</if>><br>
+  <</if>><br>
+  <<getouticon>><<lanLink ['Return to the bedroom', '回到寝室'] 'Deadwood Raven Shrine Room'>><</lanLink>><br><<exit>>
+<</if>>
+
+<<language>>
+  <<option 'EN'>>
+    Beyond the sliding door, a stool and a washbowl stand beside a deep, narrow tub. The floor slopes towards a drain. Two towels hang from wooden pegs, and a little shelf holds soap and a comb.<br><br>
+    Someone has left a fresh towel on the dry side of the threshold. From here the bedroom is hidden behind the closed door.
+  <<option 'CN'>>
+    拉门后有一只木凳、一只水盆，旁边嵌着窄而深的浴缸。地面朝排水口微微倾斜。木钉上挂着两条毛巾，小架子里放着肥皂和梳子。<br><br>
+    干净的毛巾叠在门槛干燥的一侧。把拉门关上，就看不见外面的寝室了。
+<</language>><br><br>
+<<if _shrineHome and _shrineSafe and !pcAreArmsBound('any')>>
+  <<bathroomicon 'bath'>><<lanLink ['Undress and take a bath (0:20)', '脱衣洗澡 (0:20)'] 'Deadwood Raven Shrine Bath'>>
+    <<deadwood-raven-home-context>>
+    <<if _shrineHome and !_shrineHomeBathing and $location is 'raven_shrine_house' and !pcAreArmsBound('any')>>
+      <<set _bathSource to $passage>><<pass 20>><<deadwood-raven-home-context>>
+      <<if _shrineHome and !_shrineHomeBathing and $passage is _bathSource and $location is 'raven_shrine_house' and !pcAreArmsBound('any')>>
+        <<endevent>><<strip>><<wash>><<set $hygiene to 0, _shrine.home_action to 'bath'>><<stress -4>><<tiredness -3>>
+      <</if>>
+    <</if>>
+  <</lanLink>><<lstress>><<ltiredness>><br>
+<<elseif _shrineHome>>
+  <span class='purple'><<lanSwitch 'You cannot manage a bath in your current condition.' '你现在的状态不方便洗澡。'>></span><br>
+<</if>>
+<br><<getouticon>><<lanLink ['Return to the bedroom', '回到寝室'] 'Deadwood Raven Shrine Room'>><</lanLink>><br>
+
+:: Deadwood Raven Shrine Bath Interrupted
+<<effects>><<deadwood-raven-home-context>>
+<<if _shrineHomeReady and $location is 'raven_shrine_house' and ['intrude', 'apologise'].includes(_shrine.home_action)>>
+  <<npc Tsukihan>><<person1>>
+  <<if _shrine.home_action is 'intrude'>>
+    <<if _shrineHome and _shrineHomeBathing>>
+      <<language>>
+        <<option 'EN'>>
+          Tsukihan looks round at the sound of the door. For a moment <<he>> holds the towel against <<his>> chest, then recognises you.<br><br>
+          <<if C.npc.Tsukihan.dom gte 70>>"Close the door. You're letting the warmth out." <<He>> moves the washbowl to make room beside the tub. "If you're staying, come over here."
+          <<elseif C.npc.Tsukihan.dom gte 30>>"It's you." <<He>> lets out a breath, then shifts the washbowl aside. "Coming in? Shut the door behind you."
+          <<else>>"You startled me." Tsukihan puts the towel within reach. "You could stay, if you like." <<He>> glances at the space beside the tub, then back at you.<</if>>
+        <<option 'CN'>>
+          听见拉门声，月羽回过头，一时把毛巾按在身前，看清是你才松了口气。<br><br>
+          <<if C.npc.Tsukihan.dom gte 70>>“门关上。热气都跑出去了。”<<He>>挪开浴缸旁的水盆。“既然要留，就过来这里。”
+          <<elseif C.npc.Tsukihan.dom gte 30>>“是你啊。”<<He>>缓了口气，把水盆挪开。“要进来么？记得带上门。”
+          <<else>>“吓了一跳。”月羽把毛巾放在手边。“想留下的话，也可以。”<<He>>看看浴缸旁的空处，又看向你。<</if>>
+      <</language>><br><br>
+      <<if !pcAreArmsBound('any')>>
+        <<socialiseicon 'ask'>><<lanLink ['Join Tsukihan', '留下来陪月羽'] 'Deadwood Raven Shrine Bath Together'>>
+          <<deadwood-raven-home-context>>
+          <<if _shrineHome and _shrineHomeBathing and $location is 'raven_shrine_house' and _shrine.home_action is 'intrude' and !pcAreArmsBound('any')>>
+            <<set _shrine.home_action to 'bath_together'>>
+          <</if>>
+        <</lanLink>><br><br>
+      <</if>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          You pull the sliding door open. The water stops at once. Tsukihan draws the curtain across and reaches for the towel hanging beside it.<br><br>
+          <<if C.npc.Tsukihan.dom gte 70>>"Outside. I haven't finished." <<He>> points back through the doorway. "Next time, knock. I will answer."
+          <<elseif C.npc.Tsukihan.love gte 70>>"You could have asked." Tsukihan keeps one hand on the curtain. "Not like this. Please wait outside."
+          <<else>>"Close the door." Tsukihan waits until you step back. "You weren't invited in here."<</if>>
+        <<option 'CN'>>
+          你拉开门，里面的水声立刻停了。月羽一把拉上浴帘，伸手去拿旁边挂着的毛巾。<br><br>
+          <<if C.npc.Tsukihan.dom gte 70>>“出去，还没洗完。”<<He>>指向门外。“下回先敲门。我会应的。”
+          <<elseif C.npc.Tsukihan.love gte 70>>“可以先问我的。”月羽一只手还握着浴帘。“这样不行。先在外面等吧。”
+          <<else>>“把门关上。”月羽等你退开。“没请你进这间屋子。”<</if>>
+      <</language>><<if !isLoveInterest('Tsukihan')>><<llove>><<deadwood-tsukihan-wilfulness-hint>><</if>><br><br>
+      <<if !isLoveInterest('Tsukihan') and $daily.darkfeatherBathIntrusion is 'intruded'>>
+        <<socialiseicon>><<lanLink ['Apologise and step back outside', '道歉，退到门外'] 'Deadwood Raven Shrine Bath Interrupted'>>
+          <<deadwood-raven-home-context>>
+          <<if _shrineHomeReady and !isLoveInterest('Tsukihan') and $location is 'raven_shrine_house' and _shrine.home_action is 'intrude' and $daily.darkfeatherBathIntrusion is 'intruded'>>
+            <<set _shrine.home_action to 'apologise', $daily.darkfeatherBathIntrusion to 'apologised', C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 1, 0, 100)>>
+          <</if>>
+        <</lanLink>><<glove>><br><br>
+      <</if>>
+    <</if>>
+  <<else>>
+    <<lanSwitch 'You step back and draw the door shut. "Thank you," Tsukihan says from inside, after a pause. "I will come out when I am ready." A little later, the water starts again.' '你退出来，把门带好。隔了一会儿，月羽才在里面说：“谢谢。洗好了会出来的。”又过了一会儿，水声重新响起。'>><br><br>
+  <</if>>
+<</if>>
+<<if _shrineHome>>
+  <<getouticon>><<lanLink ['Return to the bedroom', '回到寝室'] 'Deadwood Raven Shrine Room'>><<set $MoreTransformations.shrine.home_action to ''>><<endevent>><</lanLink>><br>
+<<else>>
+  <<deadwood-raven-home-return>>
+<</if>>
+
+:: Deadwood Raven Shrine Bath Together
+<<effects>><<deadwood-raven-home-context>>
+<<if _shrineHome and $location is 'raven_shrine_house' and _shrine.home_action is 'bath_together' and _shrineHomeBathing>>
+  <<npc Tsukihan>><<person1>>
+  <<lanSwitch 'You close the door behind you. Tsukihan shifts over, leaving the soap and a clean towel within reach. <<He>> rests against you for a moment. "This is nice," <<he>> says quietly.' '你把门带好。月羽往旁边挪了挪，把肥皂和干净毛巾留在你够得到的地方。<<He>>靠着你待了一会儿，轻声道：“这样挺好的。”'>><br><br>
+  <<if !pcAreArmsBound('any')>>
+    <<bathroomicon 'bath'>><<lanLink ['Just wash together (0:20)', '只一起洗澡 (0:20)'] 'Deadwood Raven Shrine Bath'>>
+      <<deadwood-raven-home-context>>
+      <<if _shrineHome and _shrineHomeBathing and _shrine.home_action is 'bath_together' and $location is 'raven_shrine_house' and !pcAreArmsBound('any')>>
+        <<pass 20>><<deadwood-raven-home-context>>
+        <<if _shrineHome and $passage is 'Deadwood Raven Shrine Bath Together' and $location is 'raven_shrine_house' and !pcAreArmsBound('any')>>
+          <<strip>><<wash>><<set $hygiene to 0, _shrine.home_action to 'bath', _shrine.bathed_at to Time.date.timeStamp>><<stress -4>><<tiredness -3>>
+        <</if>>
+      <</if>>
+    <</lanLink>><<lstress>><<ltiredness>><br>
+    <<if C.npc.Tsukihan.lust gte 30 and _shrine.sex isnot Math.floor(Time.days) and _shrineHomeMinutes gt 30 and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+      <<loveicon>><<lanLink ['Ask to go further (0:30)', '想和月羽更亲近些 (0:30)'] 'Deadwood Raven Shrine Sex'>>
+        <<deadwood-raven-home-context>>
+        <<if _shrineHome and _shrineHomeBathing and _shrine.home_action is 'bath_together' and $location is 'raven_shrine_house' and C.npc.Tsukihan.lust gte 30
+          and _shrine.sex isnot Math.floor(Time.days) and _shrineHomeMinutes gt 30 and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+          <<pass 30>><<deadwood-raven-home-context>>
+          <<if _shrineHome and _shrineHomePerson and $passage is 'Deadwood Raven Shrine Bath Together' and $location is 'raven_shrine_house'
+            and _shrine.sex isnot Math.floor(Time.days) and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+            <<set _shrine.home_action to 'bath_intimate', _shrine.scene to 'sex', _shrine.step to '', _shrine.sex to Math.floor(Time.days), $sexstart to 1, _shrine.bathed_at to Time.date.timeStamp>>
+            <<stress -8>><<tiredness 10>><<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 2, 0, 100), C.npc.Tsukihan.lust to Math.clamp(C.npc.Tsukihan.lust + 15, 0, 100)>>
+          <</if>>
+        <</if>>
+      <</lanLink>><<promiscuous1>><<glove>><br>
+    <</if>>
+  <</if>><br>
+<</if>>
+<<if _shrineHome>>
+  <<getouticon>><<lanLink ['Return to the bedroom', '回到寝室'] 'Deadwood Raven Shrine Room'>><<set $MoreTransformations.shrine.home_action to ''>><<endevent>><</lanLink>><br>
+<<else>>
+  <<deadwood-raven-home-return>>
+<</if>>
+
+:: Deadwood Raven Shrine Bath
+<<effects>><<deadwood-raven-home-context>>
+<<if $location is 'raven_shrine_house' and _shrine?.home_action is 'bath'>>
+  <<language>>
+    <<option 'EN'>>
+      You rinse the soap away before lowering yourself into the warm water. The tub creaks faintly as you settle. For a while, there is only the sound of water dripping from the tap.<br><br>
+      When the water begins to cool, you climb out and reach for the towel. The bedroom beyond the door is quiet.
+    <<option 'CN'>>
+      你冲去身上的肥皂沫，再慢慢坐进温水里。浴缸轻轻响了一声。安静了一会儿，耳边只剩水龙头落下的水滴声。<br><br>
+      等水渐渐凉了，你起身去拿毛巾。拉门外的寝室很安静。
+  <</language>><br><br>
+  <<dressasyouwereicon>><<lanLink ['Dry off, get dressed and return to the bedroom', '擦干身体，穿好衣服回寝室'] 'Deadwood Raven Shrine Room'>>
+    <<clotheson>><<set $MoreTransformations.shrine.home_action to ''>>
+  <</lanLink>><br>
+<<else>>
+  <<lanSwitch 'You have not settled into the bath.' '你还没有在这里洗澡。'>><br><br>
+  <<deadwood-raven-home-return>>
+<</if>>

@@ -54,68 +54,68 @@
 <</widget>>
 
 <<widget 'deadwood-home-staff-presence'>>
-  <<set _presence_estate to maplebirch.get('Finance').realEstate>>
-  <<set _presence_property to _presence_estate.current>>
-  <<if !_presence_property>><<exit>><</if>>
-  <<set _presence_case to (Math.floor(Time.days) + _presence_property.id.length) % 3>>
-  <<for _presence_role range _presence_estate.staff.roles>>
-    <<set _presence_npc to $per_npc[_presence_estate.staff.key(_presence_role)]>>
-    <<if _presence_estate.staff.active(_presence_role) and _presence_npc>>
-      <<set _presence_name to _presence_npc.name_known is 1 ? _presence_npc.name : ''>>
-      <<set _presence_en to _presence_name ? _presence_name + ', your ' + _presence_role + ',' : 'Your ' + _presence_role>>
+  <<set $_presence_estate to maplebirch.get('Finance').realEstate>>
+  <<set $_presence_property to $_presence_estate.current>>
+  <<if !$_presence_property>><<exit>><</if>>
+  <<set $_presence_case to (Math.floor(Time.days) + $_presence_property.id.length) % 3>>
+  <<for _presence_role range $_presence_estate.staff.roles>>
+    <<set $_presence_npc to $per_npc[$_presence_estate.staff.key(_presence_role)]>>
+    <<if $_presence_estate.staff.active(_presence_role) and $_presence_npc>>
+      <<set $_presence_name to $_presence_npc.name_known is 1 ? $_presence_npc.name : ''>>
+      <<set $_presence_en to $_presence_name ? $_presence_name + ', your ' + _presence_role + ',' : 'Your ' + _presence_role>>
       <<language>>
         <<option 'EN'>>
           <<switch _presence_role>>
             <<case 'housekeeper'>>
-              <<if _presence_case is 0>><<print _presence_en>> spreads the washed cloths out to dry, then puts the bucket and brushes away.
-              <<elseif _presence_case is 1>><<print _presence_en>> wipes the kitchen table, working around the things you have left on it.
-              <<else>><<print _presence_en>> lifts a cushion to brush beneath it. The clean covers wait in a folded pile.<</if>>
+              <<if $_presence_case is 0>><<print $_presence_en>> spreads the washed cloths out to dry, then puts the bucket and brushes away.
+              <<elseif $_presence_case is 1>><<print $_presence_en>> wipes the kitchen table, working around the things you have left on it.
+              <<else>><<print $_presence_en>> lifts a cushion to brush beneath it. The clean covers wait in a folded pile.<</if>>
             <<case 'cook'>>
-              <<if _presence_case is 0>><<print _presence_en>> checks the dates on the food you have stored, moving the older dishes to the front.
-              <<elseif _presence_case is 1>><<print _presence_en>> checks the cupboards and notes what is running low. The list is left beside the kettle for you to read.
-              <<else>><<print _presence_en>> sets clean plates by the stove, then checks which prepared dishes you have put aside for the next meal.<</if>>
+              <<if $_presence_case is 0>><<print $_presence_en>> checks the dates on the food you have stored, moving the older dishes to the front.
+              <<elseif $_presence_case is 1>><<print $_presence_en>> checks the cupboards and notes what is running low. The list is left beside the kettle for you to read.
+              <<else>><<print $_presence_en>> sets clean plates by the stove, then checks which prepared dishes you have put aside for the next meal.<</if>>
             <<case 'steward'>>
-              <<if _presence_case is 0>>
-                <<if $Finance.real_estate.banquet?.invited.length>><<print _presence_en>> checks the names on your invitation list and puts the place cards in order.
-                <<else>><<print _presence_en>> sorts the blank place cards beside the correspondence tray, ready for your next guest list.<</if>>
-              <<elseif _presence_case is 1>><<print _presence_en>> sets a folder of correspondence on your table. Anything needing a signature has been left open for you.
-              <<else>><<print _presence_en>> checks that the guest route is clear, then closes the doors to the private rooms.<</if>>
+              <<if $_presence_case is 0>>
+                <<if $Finance.real_estate.banquet?.invited.length>><<print $_presence_en>> checks the names on your invitation list and puts the place cards in order.
+                <<else>><<print $_presence_en>> sorts the blank place cards beside the correspondence tray, ready for your next guest list.<</if>>
+              <<elseif $_presence_case is 1>><<print $_presence_en>> sets a folder of correspondence on your table. Anything needing a signature has been left open for you.
+              <<else>><<print $_presence_en>> checks that the guest route is clear, then closes the doors to the private rooms.<</if>>
             <<case 'guard'>>
-              <<if _presence_property.id is 'penthouse'>>
-                <<if _presence_case is 0>><<print _presence_en>> checks a caller's name at the residents' service entrance before calling through to ask you.
-                <<elseif _presence_case is 1>><<print _presence_en>> checks the service entrance lock. The building's security team can still be heard over the radio in the corridor.
-                <<else>><<print _presence_en>> goes over the expected visitors with the building's security team, then takes up a position outside your service door.<</if>>
+              <<if $_presence_property.id is 'penthouse'>>
+                <<if $_presence_case is 0>><<print $_presence_en>> checks a caller's name at the residents' service entrance before calling through to ask you.
+                <<elseif $_presence_case is 1>><<print $_presence_en>> checks the service entrance lock. The building's security team can still be heard over the radio in the corridor.
+                <<else>><<print $_presence_en>> goes over the expected visitors with the building's security team, then takes up a position outside your service door.<</if>>
               <<else>>
-                <<if _presence_case is 0>>Someone knocks without an appointment. <<print _presence_en>> asks for a name at the entrance, then waits for your answer before opening the inner door.
-                <<elseif _presence_case is 1>><<print _presence_en>> checks the back door lock and returns to the entrance, keys quiet in one hand.
-                <<else>>A torch moves along the path outside. <<print _presence_en>> checks the side gate before returning to the front door.<</if>>
+                <<if $_presence_case is 0>>Someone knocks without an appointment. <<print $_presence_en>> asks for a name at the entrance, then waits for your answer before opening the inner door.
+                <<elseif $_presence_case is 1>><<print $_presence_en>> checks the back door lock and returns to the entrance, keys quiet in one hand.
+                <<else>>A torch moves along the path outside. <<print $_presence_en>> checks the side gate before returning to the front door.<</if>>
               <</if>>
           <</switch>>
         <<option 'CN'>>
           <<switch _presence_role>>
             <<case 'housekeeper'>>
-              <<if _presence_case is 0>>保洁员<<print _presence_name>>把洗净的抹布展开晾好，将水桶和刷子收回柜里。
-              <<elseif _presence_case is 1>>保洁员<<print _presence_name>>擦着厨房的桌子，小心绕开你留在上面的东西。
-              <<else>>保洁员<<print _presence_name>>掀起坐垫，刷净底下的灰尘。干净的罩子已经叠在旁边。<</if>>
+              <<if $_presence_case is 0>>保洁员<<print $_presence_name>>把洗净的抹布展开晾好，将水桶和刷子收回柜里。
+              <<elseif $_presence_case is 1>>保洁员<<print $_presence_name>>擦着厨房的桌子，小心绕开你留在上面的东西。
+              <<else>>保洁员<<print $_presence_name>>掀起坐垫，刷净底下的灰尘。干净的罩子已经叠在旁边。<</if>>
             <<case 'cook'>>
-              <<if _presence_case is 0>>厨师<<print _presence_name>>检查着储存食物的日期，将放得久些的菜肴挪到前面。
-              <<elseif _presence_case is 1>>厨师<<print _presence_name>>查看橱柜，记下快用完的东西，把清单留在水壶旁等你过目。
-              <<else>>厨师<<print _presence_name>>将干净餐盘放在炉边，查看你为下一顿留好了哪些菜肴。<</if>>
+              <<if $_presence_case is 0>>厨师<<print $_presence_name>>检查着储存食物的日期，将放得久些的菜肴挪到前面。
+              <<elseif $_presence_case is 1>>厨师<<print $_presence_name>>查看橱柜，记下快用完的东西，把清单留在水壶旁等你过目。
+              <<else>>厨师<<print $_presence_name>>将干净餐盘放在炉边，查看你为下一顿留好了哪些菜肴。<</if>>
             <<case 'steward'>>
-              <<if _presence_case is 0>>
-                <<if $Finance.real_estate.banquet?.invited.length>>管家<<print _presence_name>>核对你留下的邀请名单，将座位卡按名字排好。
-                <<else>>管家<<print _presence_name>>把空白座位卡整理到信件托盘旁，等你安排下一份宾客名单。<</if>>
-              <<elseif _presence_case is 1>>管家<<print _presence_name>>把一叠来信放到你的桌上，需要签字的文件都摊开了，等你过目。
-              <<else>>管家<<print _presence_name>>查看客人经过的地方有没有障碍，再合上私人房间的门。<</if>>
+              <<if $_presence_case is 0>>
+                <<if $Finance.real_estate.banquet?.invited.length>>管家<<print $_presence_name>>核对你留下的邀请名单，将座位卡按名字排好。
+                <<else>>管家<<print $_presence_name>>把空白座位卡整理到信件托盘旁，等你安排下一份宾客名单。<</if>>
+              <<elseif $_presence_case is 1>>管家<<print $_presence_name>>把一叠来信放到你的桌上，需要签字的文件都摊开了，等你过目。
+              <<else>>管家<<print $_presence_name>>查看客人经过的地方有没有障碍，再合上私人房间的门。<</if>>
             <<case 'guard'>>
-              <<if _presence_property.id is 'penthouse'>>
-                <<if _presence_case is 0>>门卫<<print _presence_name>>在住户服务入口核对来客姓名，再打电话询问你的意见。
-                <<elseif _presence_case is 1>>门卫<<print _presence_name>>检查着服务入口的门锁。走廊里还能听见大楼保安的对讲机声。
-                <<else>>门卫<<print _presence_name>>与大楼保安核对预约访客，随后回到你家服务入口旁守着。<</if>>
+              <<if $_presence_property.id is 'penthouse'>>
+                <<if $_presence_case is 0>>门卫<<print $_presence_name>>在住户服务入口核对来客姓名，再打电话询问你的意见。
+                <<elseif $_presence_case is 1>>门卫<<print $_presence_name>>检查着服务入口的门锁。走廊里还能听见大楼保安的对讲机声。
+                <<else>>门卫<<print $_presence_name>>与大楼保安核对预约访客，随后回到你家服务入口旁守着。<</if>>
               <<else>>
-                <<if _presence_case is 0>>有人没预约就敲了门。门卫<<print _presence_name>>在入口问起姓名，等你答复后才会开里面的门。
-                <<elseif _presence_case is 1>>门卫<<print _presence_name>>检查过后门的锁，回到入口，握在手里的钥匙没有发出响声。
-                <<else>>一束手电光沿着屋外的小径移动。门卫<<print _presence_name>>检查过侧门，才返回前门。<</if>>
+                <<if $_presence_case is 0>>有人没预约就敲了门。门卫<<print $_presence_name>>在入口问起姓名，等你答复后才会开里面的门。
+                <<elseif $_presence_case is 1>>门卫<<print $_presence_name>>检查过后门的锁，回到入口，握在手里的钥匙没有发出响声。
+                <<else>>一束手电光沿着屋外的小径移动。门卫<<print $_presence_name>>检查过侧门，才返回前门。<</if>>
               <</if>>
           <</switch>>
       <</language>><br><br>

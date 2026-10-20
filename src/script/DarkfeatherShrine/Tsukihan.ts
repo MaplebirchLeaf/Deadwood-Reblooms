@@ -35,8 +35,6 @@ export default function Tsukihan(maplebirch: typeof window.maplebirch): void {
     }
   );
 
-  maplebirch.tool.addTo('NPCinit', 'deadwood-tsukihan-introduction');
-
   maplebirch.on(':npcInit', (name: string) => {
     if (name === 'Tsukihan') {
       C.npc.Tsukihan.dom = 10;
@@ -52,8 +50,40 @@ export default function Tsukihan(maplebirch: typeof window.maplebirch): void {
 
   maplebirch.npc.addSchedule('Tsukihan', schedule => {
     schedule.at(0, 'raven_shrine_house');
-    schedule.when(date => date.hour >= 9 && date.hour < 18, 'forest_raven_shrine');
+    schedule.when(date => {
+      const shrine = V.MoreTransformations?.shrine;
+      if (!shrine || date.minute >= 30) return false;
+      if (date.hour === 18) return shrine.rain_at > shrine.bathed_at;
+      return date.hour === 20 && shrine.bathed_at < Math.floor(date.timeStamp / 86400) * 86400;
+    }, 'raven_shrine_bath');
+    schedule.when(
+      date => date.hour >= 9 && date.hour < 18,
+      date => {
+        if (date.weekDay === 3 && date.hour >= 10 && date.hour < 12) return 'shopping_centre';
+        if (date.hour === 12) return 'raven_shrine_house';
+        if (date.hour === 16) return 'raven_shrine_garden';
+        return 'forest_raven_shrine';
+      }
+    );
   });
+
+  // 只记下实际观察到的雨中劳动；日常沐浴完成后，湿衣状态随之结束。
+  const bathing = () => {
+    const shrine = V.MoreTransformations?.shrine;
+    if (!shrine || C.npc.Tsukihan?.init !== 1 || C.npc.Tsukihan.state !== 'active' || V.replayScene || V.statFreeze) return;
+    const now = Time.date.timeStamp;
+    const midnight = Math.floor(now / 86400) * 86400;
+    const eveningBath = 20 * 3600 + 30 * 60;
+    const regularBath = midnight + eveningBath - (now - midnight < eveningBath ? 86400 : 0);
+    shrine.bathed_at = Math.max(shrine.bathed_at, regularBath);
+    const rainBath = midnight + 18 * 3600 + 30 * 60;
+    if (now >= rainBath && shrine.rain_at < rainBath && shrine.rain_at > shrine.bathed_at) shrine.bathed_at = rainBath;
+    if (Weather.precipitation === 'rain' && ['forest_raven_shrine', 'raven_shrine_garden'].includes(maplebirch.npc.Schedule.location.Tsukihan)) shrine.rain_at = now;
+  };
+  for (const phase of ['onBefore', 'onAfter'] as const) maplebirch.dynamic.regTimeEvent(phase, 'deadwood-tsukihan-bathing', { action: bathing });
+  maplebirch.dynamic.regStateEvent('gate', 'deadwood-tsukihan-bathing', { action: bathing });
+
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-tsukihan-town-link', passage: ['Shopping Centre'] });
 
   TsukihanPortrait(maplebirch);
 }

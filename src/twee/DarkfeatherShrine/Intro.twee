@@ -1,0 +1,91 @@
+:: Deadwood Raven Shrine Intro
+<<if passage() is 'Deadwood Raven Shrine Intro'>>
+  <<set $outside to 1>><<effects>><<deadwood-raven-shrine-presence>>
+<</if>>
+<<if !_shrinePerson or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine' or _shrine.scene isnot 'intro'>>
+  <<lanSwitch 'The veranda is quiet. You can return to the courtyard.' '廊下静悄悄的。你可以回庭院看看。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<if ['polite', 'birds', 'quiet'].includes(_shrine.step)>>
+  <<include 'Deadwood Raven Shrine Welcome'>><<exit>>
+<</if>>
+<<npc Tsukihan>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    The steps end at a faded red gate. As you pass between the two stone ravens, someone on the veranda sets down a broom.
+    Black hair is tied back with a dark cord, above the white collar of a red-and-white kimono. Red eyes settle on the folded reply in your hand.<br><br>
+    "From Gwylan?" <<He>> comes down a step to meet you. "I'm Tsukihan. Mind the stone behind you; it comes loose when it rains."
+    <<if Weather.precipitation is 'rain'>>A drip strikes your shoulder. Tsukihan moves aside, leaving you room beneath the eaves.
+    <<elseif Weather.isSnow>><<He>> brushes snow off the railing before resting a hand on it.
+    <<else>><<He>> pushes the gate a little wider so it will not catch your clothes.<</if>><br><br>
+    <<if pcAreArmsBound('both')>>You indicate the reply in your pocket. Tsukihan waits for your nod before drawing it out.<<else>>You hand over the reply.<</if>> Tsukihan reads it, glances at the raven perched above the gate, then checks the paper once more.
+    "So it reached someone after all. I was about to go down myself." A corner of <<his>> mouth lifts before <<he>> folds the letter away.<br><br>
+    "Thank you for bringing it. Sit down if you need a rest." <<He>> takes a cushion from the shelf and shakes the dust from it. "The birds aren't usually much help with visitors."
+  <<option 'CN'>>
+    石阶在褪色的朱红门架下到了头。你从两只石鸦之间走过，廊下的人便放下了扫帚。
+    黑发用深色绳子束在身后，白红和服的领口拢得整齐。一双红眼睛落在你手中折好的回信上。<br><br>
+    “格威岚的信？”对方走下一级台阶。“我叫月羽。留心身后那块石头，下过雨就容易松。”
+    <<if Weather.precipitation is 'rain'>>一滴檐水落在你肩上。月羽让开身，把檐下的干处留给你。
+    <<elseif Weather.isSnow>><<He>>先拂掉栏杆上的积雪，才把手搭上去。
+    <<else>><<He>>把门推开些，免得衣服挂在门角。<</if>><br><br>
+    <<if pcAreArmsBound('both')>>你示意衣袋里的回信。月羽等你点头，才把纸抽出来。<<else>>你把回信递过去。<</if>>月羽读完，抬头看看门架上的渡鸦，又低头确认了一遍。
+    “总算送到了。我正打算自己下山。”<<His>>嘴角稍稍松下来，才把信折好收起。<br><br>
+    “辛苦你跑这一趟。累了就坐坐吧。”<<He>>从架上取下坐垫，掸了掸灰。“这些鸟，平时可不怎么帮着招待人。”
+<</language>><br><br>
+<<if !$daily.no_sing and !$worn.face.type.includes('gag')>>
+  <<socialiseicon>><<lanLink ['Thank Tsukihan for the welcome', '向月羽道谢'] 'Deadwood Raven Shrine Welcome'>><<deadwood-raven-shrine-step 'polite' 'intro'>><</lanLink>><<glove>><br>
+  <<socialiseicon 'ask'>><<lanLink ['Ask how the raven found you', '问问渡鸦怎么找到自己的'] 'Deadwood Raven Shrine Welcome'>><<deadwood-raven-shrine-step 'birds' 'intro'>><</lanLink>><br>
+<</if>>
+<<lanLink ['Nod and sit for a moment', '点点头，坐一会儿'] 'Deadwood Raven Shrine Welcome'>><<deadwood-raven-shrine-step 'quiet' 'intro'>><</lanLink>><br>
+
+<br><<deadwood-raven-shrine-return>>
+
+:: Deadwood Raven Shrine Welcome
+<<if passage() is 'Deadwood Raven Shrine Welcome'>>
+  <<set $outside to 1>><<effects>><<deadwood-raven-shrine-presence>>
+<</if>>
+<<if !_shrinePerson or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine'
+  or _shrine.scene isnot 'intro' or !['polite', 'birds', 'quiet'].includes(_shrine.step)>>
+  <<lanSwitch 'The veranda is quiet. You can return to the courtyard.' '廊下静悄悄的。你可以回庭院看看。'>><br><br>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<npc Tsukihan>><<person1>>
+<<switch _shrine.step>>
+  <<case 'polite'>>
+    <<language>>
+      <<option 'EN'>>
+        You thank Tsukihan and give your name. "You did the walking. I only put out a cushion." Even so, <<he>> moves the broom away from your feet and sits on the step beside you.<br><br>
+        "Was the path easy to find?" You nod. Tsukihan looks down towards the gate. "It gets overgrown quickly. I'll have to cut it back before the next rain." <<He>> picks a burr from the hem of <<his>> kimono, then notices you watching and folds <<his>> hands.<br><br>
+        "The courtyard is open to visitors. There's a pond round the back, too. Mind the moss on the wall." <<He>> leaves the cushion where it is. "Or you can stay here a little longer."
+      <<option 'CN'>>
+        你道了谢，也报上自己的名字。“走山路的是你。我不过拿了张坐垫。”话虽如此，月羽还是把扫帚挪开，免得挡着你的脚，自己在旁边的台阶上坐下。<br><br>
+        “参道还好找吗？”你点点头。月羽望了望院门。“野草长得快，下场雨前得再修一遍。”<<He>>拈掉和服下摆上的一颗草籽，注意到你在看，又把手放好了。<br><br>
+        “庭院可以随意走走。后面还有个池塘，墙边有苔，留心脚下。”<<He>>没有收走坐垫。“想多歇一会儿，也可以。”
+    <</language>><<glove>>
+  <<case 'birds'>>
+    <<language>>
+      <<option 'EN'>>
+        "It remembers who feeds it." Tsukihan looks towards the gate. "I tied on the note and let it go. I couldn't tell you which way it would fly." The raven wipes its beak on the wood.<br><br>
+        "Gwylan usually sends someone up when the supplies are ready. This time I thought I'd try the birds. We lost two lists before yours." <<He>> takes the reply out again and presses its pecked corner flat.<br><br>
+        "You could have left it where you found it. Thank you for coming all this way." A raven hops down to inspect your empty hands. Tsukihan shifts the tray out of its reach. "There's nothing else for you. Let our guest sit."
+      <<option 'CN'>>
+        “它记得喂过自己的人。”月羽望向门架。“我把纸条系好，就让它走了。至于往哪边飞，我也说不准。”渡鸦在木头上擦了擦喙。<br><br>
+        “平时东西备齐，格威岚会找人带上来。这次想让它们试试。你这封之前，已经丢了两张清单。”<<He>>又取出回信，把被啄皱的纸角抚平。<br><br>
+        “本可以放着不管的。多谢你特意跑来。”一只渡鸦跳下来，伸头看你空着的手。月羽挪开浅盘。“没有别的了，让客人坐会儿。”
+    <</language>>
+  <<case 'quiet'>>
+    <<language>>
+      <<option 'EN'>>
+        You take the cushion and sit. Tsukihan leaves the broom against the wall, then places the folded reply beneath a small stone on the table. Neither of you rushes to speak.<br><br>
+        The ravens shuffle along the railing. One tugs at a loose thread on a cloth; Tsukihan draws it away and folds the corner under. "Not that, either." <<He>> gives the bird a level look until it hops back.<br><br>
+        "I'm usually here during the day," <<he>> says at last. "You needn't bring a letter every time." <<He>> glances at you, then back at the table. "If you're passing, I mean."
+      <<option 'CN'>>
+        你接过坐垫坐下。月羽把扫帚靠到墙边，用一块小石头压好桌上的回信。你们都没有急着开口。<br><br>
+        渡鸦在栏杆上挤来挤去。一只伸喙去扯布边的线头，月羽把布抽回来，将那一角折进里面。“这个也不行。”<<He>>看着那只鸟，直到它往后跳开。<br><br>
+        “白天我一般都在。”最后，<<he>>开了口。“也不用每回都带封信。”<<He>>看你一眼，又低头去理桌上的东西。“我是说，恰好路过的话。”
+    <</language>>
+<</switch>><br><br>
+<<socialiseicon>><<lanLink ['Stay on the veranda', '留在廊下坐坐'] 'Deadwood Raven Shrine Veranda'>>
+  <<set $MoreTransformations.shrine.scene to '', $MoreTransformations.shrine.step to ''>>
+<</lanLink>><br>
+<<deadwood-raven-shrine-return>>

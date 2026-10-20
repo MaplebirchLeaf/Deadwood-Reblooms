@@ -16,10 +16,10 @@
 
 <!-- 用实际结算值显示反馈，达到上限时不会虚报收益。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-feedback'>>
-  <<set _changes to $LifeSimulation.school.feedback>>
-  <<if _changes>>
+  <<set $_changes to $LifeSimulation.school.feedback>>
+  <<if $_changes>>
     <<set _names to [lanSwitch('Student standing', '学生声望'), lanSwitch('Staff trust', '教职工信任'), lanSwitch('School corruption', '校内堕落')]>>
-    <<for _index, _change range _changes>>
+    <<for _index, _change range $_changes>>
       <<if _change isnot 0>>
         <span @class="(_change > 0) === (_index !== 2) ? 'green' : 'red'"><<print _names[_index]>> <<print _change > 0 ? '+' + _change : _change>></span><br>
       <</if>>
@@ -30,13 +30,26 @@
 
 <!-- 学校公告栏入口：身份、校园状态与校规集中在同一个面板。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-board-link'>>
-  <<assignmenticon>><<lanLink ['Check the student affairs noticeboard', '查看学生事务公告栏'] 'Deadwood Reblooms Life Simulation School Board'>><</lanLink>><br>
+  <<icon 'school/noticeboard.png'>><<lanLink ['Check the student affairs noticeboard', '查看学生事务公告栏'] 'Deadwood Reblooms Life Simulation School Board'>><</lanLink>><br>
 <</widget>>
 
-<!-- 徽章免除强制留堂，但不会替玩家决定是否参加。其余条件沿用原版走廊入口。 -->
+<!-- 原留堂由玩家自选；协助整理记录与原版留堂共用当天记录，不伪造处分。 -->
 <<widget 'deadwood-school-voluntary-detention'>>
-  <<if $LifeSimulation.school.role isnot 'student' and $schoolstate is 'afternoon' and $detention gte 1 and $daily.school.detentionAttended isnot 1 and $pillory.tenant.special.name isnot 'Leighton'>>
-    <<schoolicon 'headdesk'>><<lanLink ['Go to detention anyway', '自愿去留堂'] 'School Detention'>><</lanLink>><br><br>
+  <<if ['prefect', 'president'].includes($LifeSimulation.school.role) and Time.schoolDay and $schoolstate is 'afternoon' and $daily.school.detentionAttended isnot 1 and $pillory.tenant.special.name isnot 'Leighton' and !$combat and !$replayScene and !$statFreeze and !$nextPassage and !$nextPassageCheck>>
+    <<if _args[0] is 'help'>>
+      <<set $phase to 0, $daily.school.detentionAttended to 1>>
+      <<pass 20>>
+      <<if !$nextPassage and !$nextPassageCheck and !$combat>>
+        <<npcincr Leighton love 1>><<set $phase to 1>>
+      <</if>>
+    <<else>>
+      <<if $detention gte 1>>
+        <<schoolicon 'headdesk'>><<lanLink ['Go to detention anyway', '自愿去留堂'] 'School Detention'>><</lanLink>><br>
+      <</if>>
+      <<icon 'company/project-files.png'>><<lanLink ['Help Leighton with the detention records (0:20)', '协助礼顿整理留堂记录 (0:20)'] 'Deadwood Reblooms School Detention Help'>>
+        <<set $phase to 0>><<deadwood-school-voluntary-detention 'help'>>
+      <</lanLink>><br><br>
+    <</if>>
   <</if>>
 <</widget>>
 
@@ -195,31 +208,31 @@
 
 <<widget 'deadwood-reblooms-life-simulation-school-policy-status'>>
   <<set _school to $LifeSimulation.school, _policy to _args[0]>>
-  <<set _slack to _args.length gt 1 ? _args[1] : 0>>
+  <<set $_slack to _args.length gt 1 ? _args[1] : 0>>
   <<if _policy>>
-    <<set _need to maplebirch.get('LifeSimulation').school.policyRequirements[_policy]>>
-    <<set _petitionNeed to Math.max(0, _need.studentSupport + (_slack gt 0 ? -_slack : 10))>>
-    <<set _staffNeed to Math.max(0, _need.staffSupport - _slack)>>
-    <<set _corruptionNeed to Math.max(0, _need.corruption - _slack)>>
-    <<set _loveNeed to Math.max(0, _need.leightonLove - _slack)>>
-    <<set _townCorruption to $world_corruption_soft is undefined ? 0 : $world_corruption_soft>>
+    <<set $_need to maplebirch.get('LifeSimulation').school.policyRequirements[_policy]>>
+    <<set $_petitionNeed to Math.max(0, $_need.studentSupport + ($_slack gt 0 ? -$_slack : 10))>>
+    <<set $_staffNeed to Math.max(0, $_need.staffSupport - $_slack)>>
+    <<set $_corruptionNeed to Math.max(0, $_need.corruption - $_slack)>>
+    <<set $_loveNeed to Math.max(0, $_need.leightonLove - $_slack)>>
+    <<set $_townCorruption to $world_corruption_soft is undefined ? 0 : $world_corruption_soft>>
     <ul class='journal'>
-      <<if _slack is 0>>
-        <li><<lanSwitch 'School corruption: ' '校内堕落：'>><span @class="_school.corruption gte _corruptionNeed ? 'green' : 'red'"><<print _school.corruption>></span><span class='gold'><<print ' / ' + _corruptionNeed>></span></li>
-        <li><<lanSwitch 'Town corruption: ' '城镇堕落：'>><span @class="_townCorruption gte _corruptionNeed ? 'green' : 'red'"><<print _townCorruption>></span><span class='gold'><<print ' / ' + _corruptionNeed>></span></li>
-        <li><<lanSwitch 'Affection with Leighton: ' '礼顿好感：'>><span @class="C.npc.Leighton.love gte _loveNeed ? 'green' : 'red'"><<print C.npc.Leighton.love>></span><span class='gold'><<print ' / ' + _loveNeed>></span></li>
+      <<if $_slack is 0>>
+        <li><<lanSwitch 'School corruption: ' '校内堕落：'>><span @class="_school.corruption gte $_corruptionNeed ? 'green' : 'red'"><<print _school.corruption>></span><span class='gold'><<print ' / ' + $_corruptionNeed>></span></li>
+        <li><<lanSwitch 'Town corruption: ' '城镇堕落：'>><span @class="$_townCorruption gte $_corruptionNeed ? 'green' : 'red'"><<print $_townCorruption>></span><span class='gold'><<print ' / ' + $_corruptionNeed>></span></li>
+        <li><<lanSwitch 'Affection with Leighton: ' '礼顿好感：'>><span @class="C.npc.Leighton.love gte $_loveNeed ? 'green' : 'red'"><<print C.npc.Leighton.love>></span><span class='gold'><<print ' / ' + $_loveNeed>></span></li>
       <</if>>
-      <li><<lanSwitch 'Staff trust: ' '教职工信任：'>><span @class="_school.staffSupport gte _staffNeed ? 'green' : 'red'"><<print _school.staffSupport>></span><span class='gold'><<print ' / ' + _staffNeed>></span></li>
-      <li><<if _slack gt 0>><<lanSwitch 'Student support: ' '学生支持：'>><<else>><<lanSwitch 'Student petition: ' '学生联署：'>><</if>><span @class="_school.studentSupport gte _petitionNeed ? 'green' : 'red'"><<print _school.studentSupport>></span><span class='gold'><<print ' / ' + _petitionNeed>></span></li>
+      <li><<lanSwitch 'Staff trust: ' '教职工信任：'>><span @class="_school.staffSupport gte $_staffNeed ? 'green' : 'red'"><<print _school.staffSupport>></span><span class='gold'><<print ' / ' + $_staffNeed>></span></li>
+      <li><<if $_slack gt 0>><<lanSwitch 'Student support: ' '学生支持：'>><<else>><<lanSwitch 'Student petition: ' '学生联署：'>><</if>><span @class="_school.studentSupport gte $_petitionNeed ? 'green' : 'red'"><<print _school.studentSupport>></span><span class='gold'><<print ' / ' + $_petitionNeed>></span></li>
     </ul>
-    <<if _slack gt 0>>
+    <<if $_slack gt 0>>
       <i><<lanSwitch 'Both student support and staff trust must qualify. Each threshold is ten below the proposal’s base requirement; corruption and personal affection are not checked again.' '学生支持与教职工信任都要达标，门槛各比提案的基础要求低十点。复核不再检查堕落或个人好感。'>></i>
     <<else>>
       <i><<lanSwitch 'School and town corruption must both meet the requirement. Then choose one route: staff trust and Leighton’s affection, a student petition, or leverage against Leighton.' '校内与城镇堕落都要达标。之后只需走通一条路线：教职工信任加礼顿好感、学生联署，或掌握礼顿的把柄。'>></i><br>
-      <<if _townCorruption lt _corruptionNeed>>
+      <<if $_townCorruption lt $_corruptionNeed>>
         <span class='red'><<lanSwitch 'The town is not yet ready for this policy.' '镇上还无法接受这样的校规。'>></span><br>
       <</if>>
-      <<if C.npc.Leighton.love lt _loveNeed>>
+      <<if C.npc.Leighton.love lt $_loveNeed>>
         <span class='pink'><<lanSwitch 'Leighton is not close enough to you to back the staff proposal. A petition or leverage may offer another route.' '礼顿与你的关系还不足以支持教职工提案，也可以尝试联署或施压。'>></span><br>
       <</if>>
       <span @class="$headdrive is 1 or $headblackmailed is 1 ? 'green' : 'red'"><<lanSwitch 'Leverage: ' '把柄：'>><<lanSwitch `($headdrive is 1 or $headblackmailed is 1) ? 'available' : 'not obtained'` `($headdrive is 1 or $headblackmailed is 1) ? '已掌握' : '尚未掌握'`>></span>
@@ -259,6 +272,25 @@
   <</if>>
 <</widget>>
 
+:: Deadwood Reblooms School Detention Help
+<<set $outside to 0, $location to 'school'>><<schooleffects>><<effects>>
+<<npc Leighton>><<person1>>
+<<if $phase is 1 and $daily.school.detentionAttended is 1>>
+  <<language>>
+    <<option 'EN'>>
+      Leighton glances at your badge, then slides a stack of papers across the desk. "You aren't here to be punished. Good. Put these in order. Names, dates, then the teachers' notes."
+      <br><br>
+      You sort the records while students come and go. Leighton checks the finished pile, then puts it into a drawer. "That will save me some trouble. Same time another day, if you have nothing better to do."
+    <<option 'CN'>>
+      礼顿看了眼你的徽章，把一叠纸推过桌面。“不是来受罚的？正好。把这些理一理。按姓名、日期排好，再夹上老师的记录。”
+      <br><br>
+      学生陆续进出时，你把记录分门别类整理好。礼顿翻了翻，收进抽屉。“省了我不少事。哪天还有空，可以再来。”
+  <</language>><<glove>><br><br>
+<<else>>
+  <<lanSwitch 'There is no work waiting for you here right now.' '现在没有需要你帮忙的事。'>><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Return to the hallways', '返回走廊'] 'Hallways'>><</lanLink>>
+
 :: Deadwood Reblooms Life Simulation Attendance Application
 <<set $outside to 0>><<set $location to 'school'>><<schooleffects>><<effects>>
 <<npc Leighton>><<person1>>
@@ -266,7 +298,7 @@
 <<if $schooltrait gte 4 and $sciencetrait gte 4 and $mathstrait gte 4 and $englishtrait gte 4 and $historytrait gte 4>>
   <<if C.npc.Leighton.love gte 10>>
     <<lanSwitch '"These marks are hard to argue with," <<he>> says. "You still need your guardian to sign."' '“这样的成绩，倒没什么可反对的。”<<he>>说，“但还要监护人签字。”'>><br><br>
-    <<schoolicon 'building'>><<lanLink ['Ask Leighton to review your marks', '请礼顿审核成绩'] 'Deadwood Reblooms Life Simulation Attendance Application Result'>><</lanLink>><br>
+    <<icon 'school/exemption.png'>><<lanLink ['Ask Leighton to review your marks', '请礼顿审核成绩'] 'Deadwood Reblooms Life Simulation Attendance Application Result'>><</lanLink>><br>
   <<elseif $headblackmailed is 1>>
     <<lanSwitch 'Leighton pauses when you mention the matter you both remember. <<He>> agrees to review your marks, but leaves Bailey’s signature line blank.' '你提起那件彼此都记得的事。礼顿停下笔，答应审核成绩，却把贝利的签名栏留了下来。'>><br><br>
     <<crimeicon>><<lanLink ['Press Leighton to review the form', '要求礼顿审核申请'] 'Deadwood Reblooms Life Simulation Attendance Application Result'>><</lanLink>><br>
@@ -536,7 +568,7 @@
 <<if maplebirch.get('LifeSimulation').school.canRequestPrefect>>
   <<if C.npc.Leighton.love gte 10>>
     <<lanSwitch '"The staff trust you, and the students will listen," ' '“老师信得过你，同学也愿意听你说话，”'>><<he>><<lanSwitch ' says.' '说道。'>><br><br>
-    <<schoolicon 'building'>><<lanLink ['Accept the prefect badge', '接受风纪委员徽章'] 'Deadwood Reblooms Life Simulation Prefect Appointment Result'>><<set $phase to 'formal'>><</lanLink>><br>
+    <<icon 'school/prefect.png'>><<lanLink ['Accept the prefect badge', '接受风纪委员徽章'] 'Deadwood Reblooms Life Simulation Prefect Appointment Result'>><<set $phase to 'formal'>><</lanLink>><br>
   <</if>>
   <<if $headblackmailed is 1>>
     <<lanSwitch 'Leighton notices your glance toward the locked drawer. <<His>> fingers tighten around the application.' '礼顿注意到你看向锁住的抽屉，捏紧了申请书。'>><br><br>
@@ -603,7 +635,7 @@
 <<lanSwitch 'You ask Leighton to make you student council president. ' '你向礼顿申请担任学生会长。'>><<He>><<lanSwitch ' lays your duty reports beside notes from students and staff.' '把你的值勤报告与学生、教职工的意见放在一起。'>><br><br>
 <<if maplebirch.get('LifeSimulation').school.canAppointPresident>>
   <<lanSwitch '"You have earned enough trust to lead them. The final decision is yours," ' '“你已经赢得了足够的信任。要不要接下这份职责，由你决定，”'>><<he>><<lanSwitch ' says.' '说道。'>><br><br>
-  <<schoolicon 'building'>><<lanLink ['Accept the presidency', '接受学生会长任命'] 'Deadwood Reblooms Life Simulation President Appointment Result'>><</lanLink>><br>
+  <<icon 'school/council.png'>><<lanLink ['Accept the presidency', '接受学生会长任命'] 'Deadwood Reblooms Life Simulation President Appointment Result'>><</lanLink>><br>
 <<else>>
   <span class='pink'><<lanSwitch '"I need more duty reports and stronger support before I can approve this."' '“我还需要更多值勤记录，以及学生和教职工更明确的支持。”'>></span><br>
 <</if>>
@@ -650,7 +682,7 @@
         罗宾领着一名低年级学生赶来。那孩子的鞋带散了，罗宾蹲下替他系好，
         才把说明耽搁原因的条子递给你。罗宾的目光在你的徽章和记录簿之间来回。
     <</language>>
-    <br><br><<schoolicon 'building'>><<lanLink ["Record Robin's delay", '记下罗宾耽搁的原因'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <br><br><<icon 'school/duty.png'>><<lanLink ["Record Robin's delay", '记下罗宾耽搁的原因'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
     <<socialiseicon>><<lanLink ['Speak to Robin privately', '私下与罗宾谈谈'] 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
     <<getouticon>><<lanLink ['Wave Robin through without checking', '不查记录，直接放罗宾进去'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
   <<elseif _student is 'Sydney'>>
@@ -663,7 +695,7 @@
         悉尼夹着一叠神殿的文件来到校门。你问起神殿的差事为何耽搁了入校，
         悉尼平静地说明原委，等你决定是否记入值勤簿。
     <</language>>
-    <br><br><<schoolicon 'building'>><<lanLink ["Record Sydney's reason", '记下悉尼的缘由'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <br><br><<icon 'school/duty.png'>><<lanLink ["Record Sydney's reason", '记下悉尼的缘由'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
     <<socialiseicon>><<lanLink ['Speak to Sydney privately', '私下与悉尼谈谈'] 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
     <<getouticon>><<lanLink ['Let Sydney pass without checking', '不查记录，放悉尼过去'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
   <<elseif _student is 'Kylar'>>
@@ -691,7 +723,7 @@
         惠特尼横在入口，讥笑着把下一个学生逼了回去。你挡在惠特尼与队伍之间。
         惠特尼瞥见你的徽章，咧嘴一笑，像是在等你当众出丑。
     <</language>>
-    <br><br><<schoolicon 'building'>><<lanLink ["Write up Whitney's obstruction", '记录惠特尼堵门的行为'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
+    <br><br><<icon 'school/duty.png'>><<lanLink ["Write up Whitney's obstruction", '记录惠特尼堵门的行为'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'enforce'>><</lanLink>><br>
     <<socialiseicon>><<lanLink ['Speak to Whitney privately', '私下与惠特尼谈谈'] 'Deadwood Reblooms Life Simulation Morning Duty Private Talk'>><</lanLink>><br>
     <<getouticon>><<lanLink ['Ignore Whitney', '不理会惠特尼'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'overlook'>><</lanLink>>
   <</if>>
@@ -760,7 +792,7 @@
       <<else>>
         <<lanSwitch 'Kylar looks down at the book before admitting that someone snatched it on the way to school.' '凯拉尔低头看着书，好一会儿才承认有人在上学路上抢走了它。'>>
       <</if>><br><br>
-      <<socialiseicon>><<lanLink ['Record what happened to Kylar', '记下凯拉尔的遭遇'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
+      <<icon 'school/duty.png'>><<lanLink ['Record what happened to Kylar', '记下凯拉尔的遭遇'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'mediate'>><</lanLink>><br>
       <<crimeicon>><<lanLink ['Threaten Kylar with a disciplinary report', '威胁将凯拉尔记作违纪'] 'Deadwood Reblooms Life Simulation Morning Duty Result'>><<set $phase to 'pressure'>><</lanLink>><br>
       <<if maplebirch.get("LifeSimulation").school.canInviteStudent>>
         <<loveicon>><<lanLink ['Invite Kylar to meet in private', '邀凯拉尔单独见面'] 'Deadwood Reblooms Life Simulation Morning Duty Invitation'>><</lanLink>><<promiscuous3>><br>
@@ -1211,7 +1243,7 @@
   <<schoolicon 'building'>><<lanLink ['Present staff support', '提交教职工支持意见'] 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'formal'>><</lanLink>><br>
 <</if>>
 <<if maplebirch.get("LifeSimulation").school.canApprovePolicy('petition')>>
-  <<socialiseicon>><<lanLink ['Present the student petition', '提交学生联署'] 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'petition'>><</lanLink>><br>
+  <<icon 'school/student-petition.png'>><<lanLink ['Present the student petition', '提交学生联署'] 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'petition'>><</lanLink>><br>
 <</if>>
 <<if maplebirch.get("LifeSimulation").school.canApprovePolicy('pressure')>>
   <<crimeicon>><<lanLink ['Force Leighton to approve', '迫使礼顿批准'] 'Deadwood Reblooms Life Simulation Dress Approval Result'>><<set $phase to 'pressure'>><</lanLink>><br>

@@ -7,6 +7,7 @@
 <<npc Tsukihan>><<person1>>
 <<switch _shrine.step>>
   <<case ''>>
+    <<set _shrineWorkSteps to _shrine.memory is 'bell' and Math.floor(Time.days) % 3 isnot 0>>
     <<language>>
       <<option 'EN'>>
         Tsukihan has brought out a coil of cord, a brush and a shallow tray.
@@ -15,9 +16,11 @@
         <<elseif C.npc.Tsukihan.dom lt 70>>
           <<He>> moves the tray out of your way. "Good timing. Would you stay while I finish these?"
         <<else>>
-          "Good. The bell first, then the table." <<He>> puts the brush down and checks that there is room for you beside the board.
+          "Good. <<if _shrineWorkSteps>>The steps and the offering table.<<else>>The bell first, then the table.<</if>>" <<He>> puts the brush down and checks that there is room for you beside the board.
         <</if>>
-        <<if _shrine.memory is 'bell'>>
+        <<if _shrineWorkSteps>>
+          <<He>> tests the knot you tied, then leaves it hanging. "Still holding. We can do the steps today." <<He>> props the stiff brush by the gate.
+        <<elseif _shrine.memory is 'bell'>>
           <<He>> takes down the bell rope you worked on together and checks the knot. "Still holding. Let's tighten this end while it's down."
         <<else>>
           <<He>> eases the bell rope off its hook and lays it across a board, picking loose threads from the knot. "It catches when I pull it. I want to check it before anyone uses it."
@@ -30,9 +33,11 @@
         <<elseif C.npc.Tsukihan.dom lt 70>>
           <<He>>把浅盘往旁边挪开。“来得正好。等我把这点事做完，再走好不好？”
         <<else>>
-          “正好。先弄铃绳，再收供桌。”<<He>>放下刷子，看看木板旁边，给你留出位置。
+          “正好。<<if _shrineWorkSteps>>台阶和供桌都该清一清了。<<else>>先弄铃绳，再收供桌。<</if>>”<<He>>放下刷子，看看木板旁边，给你留出位置。
         <</if>>
-        <<if _shrine.memory is 'bell'>>
+        <<if _shrineWorkSteps>>
+          <<He>>试了试你系过的绳结，没有再解开。“还牢着。今天弄弄台阶吧。”<<He>>把硬刷靠到门边。
+        <<elseif _shrine.memory is 'bell'>>
           <<He>>取下你们先前整理过的铃绳，检查了一下绳结。“还牢着。既然拿下来了，把这头再收紧些吧。”
         <<else>>
           <<He>>把铃绳从挂钩上取下，放到木板上，挑开绳结里夹着的旧线。“拉着有点卡。我想赶在有人用之前看看。”
@@ -40,16 +45,43 @@
         浅盘里还摊着几块小木牌。月羽擦掉边沿一道细细的水痕。“这些也得翻过来晾晾。我一般先收拾供桌，再扫地，省得扫完又弄脏一遍。”<<He>>往旁边挪了一点，给你腾出地方。
     <</language>><br><br>
     <<if !pcAreArmsBound('any')>>
-      <<lanLink ['Help check and secure the bell rope', '帮忙检查、系稳铃绳']>>
-        <<deadwood-raven-shrine-step 'tie' 'work' 'bell'>>
-      <</lanLink>><<ghousekeeping>><<lstress>><<glove>><br>
-      <<lanLink ['Sort the offering table and dry the plaques', '整理供桌，把木牌晾好']>>
+      <<if _shrineWorkSteps>>
+        <<icon 'broom-dustpan.png'>><<lanLink ['Clear the stone steps together', '一起清理石阶'] 'Deadwood Raven Shrine Work'>>
+          <<deadwood-raven-shrine-step 'steps' 'work'>>
+        <</lanLink>><<ghousekeeping>><<lstress>><<glove>><br>
+      <<else>>
+        <<icon 'raven-shrine/bell-rope.png'>><<lanLink ['Help check and secure the bell rope', '帮忙检查、系稳铃绳'] 'Deadwood Raven Shrine Work'>>
+          <<deadwood-raven-shrine-step 'tie' 'work' 'bell'>>
+        <</lanLink>><<ghousekeeping>><<lstress>><<glove>><br>
+      <</if>>
+      <<icon 'raven-shrine/wooden-plaques.png'>><<lanLink ['Sort the offering table and dry the plaques', '整理供桌，把木牌晾好'] 'Deadwood Raven Shrine Work'>>
         <<deadwood-raven-shrine-step 'offerings' 'work'>>
       <</lanLink>><<ghousekeeping>><<lstress>><<glove>><br>
     <</if>>
-    <<lanLink ['Sit nearby and keep Tsukihan company', '坐在旁边陪着月羽']>>
+    <<icon 'raven-shrine/bench.png'>><<lanLink ['Sit nearby and keep Tsukihan company', '坐在旁边陪着月羽'] 'Deadwood Raven Shrine Work'>>
       <<deadwood-raven-shrine-step 'company' 'work'>>
     <</lanLink>><<lstress>><<glove>><br>
+  <<case 'steps'>>
+    <<language>>
+      <<option 'EN'>>
+        The stone steps are clear in the middle, but leaves and grit have packed against their edges. Tsukihan brings a stiff brush and takes the other side.
+        <<if Weather.isSnow>>You push snow away from the handrail while <<he>> clears a channel for the meltwater.
+        <<elseif Weather.precipitation is 'rain'>>Runoff keeps washing fresh grit down. Tsukihan braces a board across the upper step to divert it.
+        <<else>>You scrape moss from the joins and brush it into the tray between you.<</if>><br><br>
+        "Wait. That one's loose." <<He>> touches your wrist before you put weight on the edge. You work around the stone, leaving the centre of the step clear.<br><br>
+        At the bottom, you look back at the clean strip winding up to the gate. Tsukihan rests the brush against a shoulder.
+        <<if C.npc.Tsukihan.dom gte 70 and C.npc.Tsukihan.love gte 20>>"Come and look before the leaves cover it again. I want someone to notice." <<He>> nudges the tray towards you with a foot.
+        <<else>>"That should make coming up easier." <<He>> picks up the tray. "Especially with your hands full."<</if>>
+      <<option 'CN'>>
+        石阶中间还算干净，落叶和沙土却积满了两边。月羽拿来硬刷，到另一侧蹲下。
+        <<if Weather.isSnow>>你把扶手旁的雪推开，<<he>>在下方清出一道排融雪水的细沟。
+        <<elseif Weather.precipitation is 'rain'>>雨水不断冲下新的沙土。月羽横过一块木板，挡住上一级流下来的水。
+        <<else>>你刮去石缝里的苔，把碎屑扫进你们中间的浅盘。<</if>><br><br>
+        “等一下。那块松了。”你正要踩上石阶边缘，<<he>>碰了碰你的手腕。你们绕开那块石头，把正中的落脚处清了出来。<br><br>
+        到了最下面，你们回头看，干净的窄路一路弯到了门架下。月羽把刷子搭在肩边。
+        <<if C.npc.Tsukihan.dom gte 70 and C.npc.Tsukihan.love gte 20>>“趁还没铺满叶子，下次记得看看。总得有人知道我们扫过。”<<He>>用脚把浅盘往你这边推了推。
+        <<else>>“往后上来能好走些。”<<He>>端起浅盘。“尤其手里还提着东西的时候。”<</if>>
+    <</language>><<ghousekeeping>><<lstress>><<glove>><br><br>
   <<case 'tie'>>
     <<language>>
       <<option 'EN'>>
@@ -127,7 +159,7 @@
         <<elseif C.npc.Tsukihan.dom gte 30>>“能不能再坐一会儿？”<<He>>把浅盘挪近些，“想有人陪着收完这点东西。”
         <<else>>“剩下的很快就收好了。”<<He>>没有拿走你身旁的坐垫，“不急着回去的话，可以再坐坐。”<</if>>
     <</language>><br><br>
-<</switch>>
+<</switch>><br>
 <<deadwood-raven-shrine-return>>
 
 :: Deadwood Raven Shrine Tea
@@ -161,13 +193,13 @@
         <<else>>“先看翅膀，这里折得挺好。”<<He>>把短尾巴转开，“别的还没弄完。”<</if>>
         <<if _shrine.memory is 'paper_raven'>><br><br>“上回那只平安带回去了么？”<<he>>问，“看来还得给它们做个出门用的盒子。”<</if>>
     <</language>><br><br>
-    <<lanLink ['Ask Tsukihan to show you how', '请月羽教你折一只']>>
+    <<icon 'raven-shrine/paper-raven.png'>><<lanLink ['Ask Tsukihan to show you how', '请月羽教你折一只'] 'Deadwood Raven Shrine Tea'>>
       <<deadwood-raven-shrine-step 'learn' 'tea'>>
     <</lanLink>><br>
-    <<lanLink ['Tease Tsukihan about the little raven', '拿那只纸鸦逗逗月羽']>>
+    <<lanLink ['Tease Tsukihan about the little raven', '拿那只纸鸦逗逗月羽'] 'Deadwood Raven Shrine Tea'>>
       <<deadwood-raven-shrine-step 'joke' 'tea'>>
     <</lanLink>><<deadwood-tsukihan-wilfulness-hint>><br>
-    <<lanLink ['Drink your tea and watch', '喝着茶，看月羽折']>>
+    <<icon 'orchard/tea-tray.png'>><<lanLink ['Drink your tea and watch', '喝着茶，看月羽折'] 'Deadwood Raven Shrine Tea'>>
       <<deadwood-raven-shrine-step 'watch' 'tea'>>
     <</lanLink>><br>
   <<case 'learn'>>
@@ -193,10 +225,10 @@
         <<else>>有边翅膀高出一截。月羽摆了摆纸鸟的脚，让它站稳。“这边赶上风了。就这么回事。”<</if>><br><br>
         你暂且把自己折的纸鸦放下，准备喝完剩下的茶。月羽把自己那只短尾巴的放到你杯边。“我这只，喜欢就带着吧。留在这儿看饼干也行。”
     <</language>><br><br>
-    <<lanLink ['Keep the paper raven', '收下纸鸦']>>
+    <<icon 'raven-shrine/paper-raven.png'>><<lanLink ['Keep the paper raven', '收下纸鸦'] 'Deadwood Raven Shrine Tea'>>
       <<deadwood-raven-shrine-step 'keep' 'tea' 'paper_raven' 'learn'>>
     <</lanLink>><br>
-    <<lanLink ['Leave it beside the biscuit tin', '把它留在饼干盒旁']>>
+    <<lanLink ['Leave it beside the biscuit tin', '把它留在饼干盒旁'] 'Deadwood Raven Shrine Tea'>>
       <<deadwood-raven-shrine-step 'return_paper' 'tea' '' 'learn'>>
     <</lanLink>><br>
   <<case 'joke'>>
@@ -218,10 +250,10 @@
         <<else>>“就是没站好而已。”月羽举起纸鸟，转了一点，又转回去。“下回你也折一只。哪只更齐整，就把哪只留给我。”<<He>>理好翅膀，才抬眼看你的反应。<</if>><br><br>
         <<He>>把短了一截的尾巴挑出来，搁到你的杯边。“好了。你们两个互相看着吧。要不要？”
     <</language>><br><br>
-    <<lanLink ['Keep the paper raven', '收下纸鸦']>>
+    <<icon 'raven-shrine/paper-raven.png'>><<lanLink ['Keep the paper raven', '收下纸鸦'] 'Deadwood Raven Shrine Tea'>>
       <<deadwood-raven-shrine-step 'keep' 'tea' 'paper_raven' 'joke'>>
     <</lanLink>><br>
-    <<lanLink ['Leave it beside the biscuit tin', '把它留在饼干盒旁']>>
+    <<lanLink ['Leave it beside the biscuit tin', '把它留在饼干盒旁'] 'Deadwood Raven Shrine Tea'>>
       <<deadwood-raven-shrine-step 'return_paper' 'tea' '' 'joke'>>
     <</lanLink>><br>
   <<case 'watch'>>
@@ -235,10 +267,10 @@
         “以前拿收据折过。后来对账可费了好一番功夫。”<<He>>把尾巴压平。“就该挑没写数的纸。”<br><br>
         栏杆上的渡鸦也探过脑袋来看。“没说给你。”<<He>>把小鸟从鸟喙底下挪开，朝你这边放近了些。“你想要么？”
     <</language>><br><br>
-    <<lanLink ['Keep the paper raven', '收下纸鸦']>>
+    <<icon 'raven-shrine/paper-raven.png'>><<lanLink ['Keep the paper raven', '收下纸鸦'] 'Deadwood Raven Shrine Tea'>>
       <<deadwood-raven-shrine-step 'keep' 'tea' 'paper_raven' 'watch'>>
     <</lanLink>><br>
-    <<lanLink ['Leave it beside the biscuit tin', '把它留在饼干盒旁']>>
+    <<lanLink ['Leave it beside the biscuit tin', '把它留在饼干盒旁'] 'Deadwood Raven Shrine Tea'>>
       <<deadwood-raven-shrine-step 'return_paper' 'tea' '' 'watch'>>
     <</lanLink>><br>
   <<case 'keep'>>
@@ -277,7 +309,7 @@
         你把纸鸦留在铁盒旁。月羽转了个方向，让它的喙正对着真渡鸦。<br><br>
         “挺好。待会儿我收杯子，让它看着。”<<He>>把铁盒往离栏杆更远的地方挪了一点，又陪你坐着，把杯里最后一点茶喝完。
     <</language>><br><br>
-<</switch>>
+<</switch>><br>
 <<deadwood-raven-shrine-return 'veranda'>>
 
 :: Deadwood Raven Shrine Walk
@@ -326,14 +358,14 @@
         <</if>>
     <</language>><br><br>
     <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 20>>
-      <<lanLink ['Take Tsukihan’s hand', '握住月羽的手']>>
+      <<loveicon>><<lanLink ['Take Tsukihan’s hand', '握住月羽的手'] 'Deadwood Raven Shrine Walk'>>
         <<deadwood-raven-shrine-step 'hand' 'walk'>>
       <</lanLink>><<handholdingvirginitywarning>><<glust>><br>
     <</if>>
-    <<lanLink ['Walk alongside Tsukihan', '和月羽并肩走']>>
+    <<icon 'actions/walk.png'>><<lanLink ['Walk alongside Tsukihan', '和月羽并肩走'] 'Deadwood Raven Shrine Walk'>>
       <<deadwood-raven-shrine-step 'along' 'walk'>>
     <</lanLink>><br>
-    <<lanLink [Weather.isSnow or Weather.precipitation is 'rain' ? 'Head back under the eaves' : 'Go back and sit on the veranda', Weather.isSnow or Weather.precipitation is 'rain' ? '先回廊下避一避' : '回廊下坐会儿']>>
+    <<lanLink [Weather.isSnow or Weather.precipitation is 'rain' ? 'Head back under the eaves' : 'Go back and sit on the veranda', Weather.isSnow or Weather.precipitation is 'rain' ? '先回廊下避一避' : '回廊下坐会儿'] 'Deadwood Raven Shrine Walk'>>
       <<deadwood-raven-shrine-step 'shelter' 'walk'>>
     <</lanLink>><br>
   <<case 'hand'>>
@@ -395,5 +427,5 @@
         “地方就这么点大，一天也能来来回回走个不停。总有点事。”<<He>>刚要起身，又反应过来，叹口气坐了回去。“另外几个窗户，等会儿再看。”<br><br>
         你们一块儿坐了会儿，听听树叶的响动和鸟叫，没特地找话说。月羽起身去检查窗钩时，把那块干燥的座位留给了你。
     <</language>><br><br>
-<</switch>>
+<</switch>><br>
 <<deadwood-raven-shrine-return 'pond'>>

@@ -18,8 +18,8 @@ interface Job {
   due: number;
   vehicle: number | null;
   searches: number;
-  issue: 'none' | 'shortage' | 'price' | 'recognised' | 'queue' | 'label' | 'seized';
-  handled: '' | 'checked' | 'waited' | 'negotiated';
+  issue: 'none' | 'shortage' | 'price' | 'recognised' | 'queue' | 'label' | 'seized' | 'hassle';
+  handled: '' | 'checked' | 'waited' | 'negotiated' | 'helped' | 'avoided';
   fee: number;
   late: boolean;
   crew?: CrewQuote;
@@ -163,7 +163,7 @@ export default class Jobs {
   }
 
   /** 页面仅展示，接货、交货、归还和付款都在点击时验证当前批次及地点。 */
-  public act(action: 'accept' | 'collect' | 'check' | 'wait' | 'negotiate' | 'load' | 'unload' | 'deliver' | 'return' | 'cancel' | 'pay', value?: string | number): boolean {
+  public act(action: 'accept' | 'collect' | 'check' | 'wait' | 'avoid' | 'negotiate' | 'load' | 'unload' | 'deliver' | 'return' | 'cancel' | 'pay', value?: string | number): boolean {
     if (!this.available) return false;
     const state = this.state;
     const title = this.street.core.passage.title;
@@ -187,7 +187,7 @@ export default class Jobs {
     const job = state.active;
     const contract = this.contract;
     if (!job || !contract) return false;
-    if (action === 'check' || action === 'wait' || action === 'negotiate') {
+    if (action === 'check' || action === 'wait' || action === 'avoid' || action === 'negotiate') {
       // 现场问题只在当前地点处理一次，展示页面与日志不会推进事件。
       if (title !== 'Deadwood Street Cargo' || this.expired || !this.cargoHere || job.handled || !this.receiving) return false;
       const pickup = job.stage === 'pickup' && this.place === contract.source;
@@ -196,8 +196,16 @@ export default class Jobs {
         if (!pickup || !['shortage', 'label'].includes(job.issue)) return false;
         job.handled = 'checked';
       } else if (action === 'wait') {
-        if (job.issue !== 'queue' || !(job.id === 'recovery' ? pickup : delivery)) return false;
-        job.handled = 'waited';
+        if (job.issue === 'hassle') {
+          if (!delivery) return false;
+          job.handled = 'helped';
+        } else {
+          if (job.issue !== 'queue' || !(job.id === 'recovery' ? pickup : delivery)) return false;
+          job.handled = 'waited';
+        }
+      } else if (action === 'avoid') {
+        if (!delivery || job.issue !== 'hassle' || window.currentSkillValue('skulduggery') < 400) return false;
+        job.handled = 'avoided';
       } else {
         if (!delivery || job.issue !== 'price' || window.currentSkillValue('english') < 400) return false;
         job.handled = 'negotiated';
@@ -231,7 +239,14 @@ export default class Jobs {
         job.vehicle = null;
       }
     } else if (action === 'deliver') {
-      if (title !== 'Deadwood Street Cargo' || this.place !== contract.target || job.stage !== 'carrying' || !this.cargoHere || this.expired || ['queue', 'label', 'seized'].includes(job.issue))
+      if (
+        title !== 'Deadwood Street Cargo' ||
+        this.place !== contract.target ||
+        job.stage !== 'carrying' ||
+        !this.cargoHere ||
+        this.expired ||
+        ['queue', 'label', 'seized', 'hassle'].includes(job.issue)
+      )
         return false;
       if (!this.receiving) return false;
       job.late = Time.date.timeStamp > job.due;

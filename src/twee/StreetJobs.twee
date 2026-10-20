@@ -42,7 +42,7 @@
         <<set _streetReturn to _streetJobs.terms.sites[_streetContract.return_to].name>>
         <li class='blue'><<lanSwitch 'Take the goods back to: ' '将货物运回：'>><<= lanSwitch(_streetReturn[0], _streetReturn[1])>><<lanSwitch '. Hand them over there to finish returning the shipment.' '。抵达后交还货物，才算完成退货。'>></li>
       <<else>>
-        <li><<set _streetFrom to _streetJobs.terms.sites[_streetContract.source].name, _streetTo to _streetJobs.terms.sites[_streetContract.target].name>><<= lanSwitch(_streetFrom[0], _streetFrom[1])>> → <<= lanSwitch(_streetTo[0], _streetTo[1])>></li>
+        <li><<set $_streetFrom to _streetJobs.terms.sites[_streetContract.source].name, _streetTo to _streetJobs.terms.sites[_streetContract.target].name>><<= lanSwitch($_streetFrom[0], $_streetFrom[1])>> → <<= lanSwitch(_streetTo[0], _streetTo[1])>></li>
       <</if>>
       <<if _streetJob.crew>>
         <li><<= _streetJob.crew.name>> · <<lanSwitch 'Agreed colleague’s share: ' '合作人约定分成：'>><span class='gold'><<= _streetJob.crew.share>>%</span> · <<lanSwitch 'Quoted total fee: ' '约定总报酬：'>><<printmoney _streetJob.crew.gross>></li>
@@ -53,7 +53,7 @@
       <<else>>
         <<if _streetJob.stage isnot 'return'>>
           <li><<lanSwitch 'Agreed fee: ' '约定报酬：'>><<printmoney `_streetJob.crew ? _streetJob.crew.gross - Math.floor(_streetJob.crew.gross * _streetJob.crew.share / 100) : _streetContract.fee`>> · <<lanSwitch 'Deliver by ' '交货期限：'>>
-            <<set _streetDate to new DateTime(_streetJob.due)>><<= lanSwitch(getFormattedDate(_streetDate), _streetDate.month + '月' + _streetDate.day + '日')>> <<ampm _streetDate.hour _streetDate.minute>>
+            <<set $_streetDate to new DateTime(_streetJob.due)>><<= lanSwitch(getFormattedDate($_streetDate), $_streetDate.month + '月' + $_streetDate.day + '日')>> <<ampm $_streetDate.hour $_streetDate.minute>>
           </li>
           <<if _streetJobs.expired>>
             <li class='red'>
@@ -86,6 +86,8 @@
               <<case 'checked'>><<lanSwitch 'The sender checked the shipment against the paperwork.' '发货人已经核对货物与单据。'>>
               <<case 'waited'>><<lanSwitch 'The delay at collection or delivery has been cleared.' '取货或交接时的等待已经结束。'>>
               <<case 'negotiated'>><<lanSwitch 'The buyer agreed to honour the original fee.' '买家已同意按原定报酬结算。'>>
+              <<case 'helped'>><<lanSwitch 'Staff helped clear the way to the receiving area.' '工作人员已替你解围，可以继续交接。'>>
+              <<case 'avoided'>><<lanSwitch 'You slipped past the person blocking the receiving area.' '你已经绕开收货处纠缠的人。'>>
             <</switch>>
           </li>
         <</if>>
@@ -226,7 +228,7 @@
         <</if>>
         <<if _streetJob.issue is 'queue'>>
           <span class='blue'><<lanSwitch 'The receiver cannot take the goods yet. Wait here, or return the shipment.' '收货人暂时无法接货。可以在这里等待，或退回货物。'>></span><br>
-        <<else>>
+        <<elseif _streetJob.issue isnot 'hassle'>>
           <<icon 'street/cargo-handover.png'>><<lanLink ['Complete the handover (0:10)', '完成交接 (0:10)'] 'Deadwood Street Cargo'>>
             <<if _streetJobs.act('deliver')>><<pass 10>><<tiredness _streetContract.cargo>><</if>>
           <</lanLink>><br>

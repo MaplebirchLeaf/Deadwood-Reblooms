@@ -2,7 +2,7 @@
 <<widget 'deadwood-pregnancy-state'>>
   <<set _pregnancy_name to _args[0]>>
   <<set _pregnancy_record to getLabouringPregnancy(_pregnancy_name) ?? getActivePregnancies(_pregnancy_name)[0]>>
-  <<set _pregnancy_recent to $pregnancies.findLast(record => record.carrier === _pregnancy_name
+  <<set $_pregnancy_recent to $pregnancies.findLast(record => record.carrier === _pregnancy_name
     && record.deliveredDate !== null && Time.date.timeStamp - record.deliveredDate < 7 * TimeConstants.secondsPerDay
     && knowsPregnancy(record.pregnancyId, 'pc'))>>
   <<set _pregnancy_known to !!_pregnancy_record and knowsPregnancy(_pregnancy_record.pregnancyId, 'pc')>>
@@ -11,7 +11,7 @@
   <<set _pregnancy_reveal to _pregnancy_record and !talkedAboutPregnancy(_pregnancy_name, 'pc', _pregnancy_record.pregnancyId)
     and (_pregnancy_known or _pregnancy_aware or npcBellyVisible(_pregnancy_name))>>
   <<if !_pregnancy_birth and !_pregnancy_reveal and !_pregnancy_known>>
-    <<set _pregnancy_record to _pregnancy_recent>>
+    <<set _pregnancy_record to $_pregnancy_recent>>
     <<set _pregnancy_known to !!_pregnancy_record>>
   <</if>>
 <</widget>>
@@ -26,7 +26,7 @@
     <<set _pregnancy_care_passage to _pregnancy_prefix + ' Pregnancy Care'>>
     <<capture _pregnancy_name _pregnancy_record _pregnancy_birth_passage _pregnancy_reveal_passage _pregnancy_care_passage>>
       <<if _pregnancy_birth>>
-        <<loveicon 'hug'>><<lanLink ['Help ' + _pregnancy_name + ' get to hospital', '陪' + maplebirch.auto(_pregnancy_name) + '去医院'] _pregnancy_birth_passage>>
+        <<hospitalicon>><<lanLink ['Help ' + _pregnancy_name + ' get to hospital', '陪' + maplebirch.auto(_pregnancy_name) + '去医院'] _pregnancy_birth_passage>>
           <<set $deadwood_pregnancy to { npc: _pregnancy_name, id: _pregnancy_record.pregnancyId, return_passage: $passage, location: $location, choice: null }>>
         <</lanLink>><br>
       <<elseif _pregnancy_reveal>>
@@ -199,11 +199,11 @@
 <</widget>>
 
 <<widget 'deadwood-pregnancy-property-link'>>
-  <<set _pregnancy_companion to maplebirch.get('Finance')?.realEstate.currentCompanion>>
-  <<set _pregnancy_property to maplebirch.get('Finance')?.realEstate.current>>
-  <<if _pregnancy_companion and _pregnancy_property
-    and maplebirch.get('Finance').realEstate.residentsHome(_pregnancy_property.id).some(resident => resident.id === _pregnancy_companion.id)>>
-    <<switch _pregnancy_companion.id>>
+  <<set $_pregnancy_companion to maplebirch.get('Finance')?.realEstate.currentCompanion>>
+  <<set $_pregnancy_property to maplebirch.get('Finance')?.realEstate.current>>
+  <<if $_pregnancy_companion and $_pregnancy_property
+    and maplebirch.get('Finance').realEstate.residentsHome($_pregnancy_property.id).some(resident => resident.id === $_pregnancy_companion.id)>>
+    <<switch $_pregnancy_companion.id>>
     <<case 'Robin'>>
       <<set _pregnancy_present to maplebirch.get('Robin')?.available>>
       <<deadwood-pregnancy-links 'Robin' 'Deadwood Robin' _pregnancy_present>>

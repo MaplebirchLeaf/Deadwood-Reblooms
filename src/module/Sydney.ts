@@ -11,7 +11,7 @@ class Sydney extends Module {
 
   /** 可正常互动，不代表当前在神殿，位置仍由原版日程判断。 */
   public get available(): boolean {
-    return C.npc.Sydney.init === 1 && !['prison', 'dungeon'].includes(C.npc.Sydney.state) && V.daily.sydney?.punish !== 1;
+    return C.npc.Sydney.init === 1 && C.npc.Sydney.state === 'active' && V.daily.sydney?.punish !== 1;
   }
 
   /** 原版小时劳动共用此条件；共同清扫期间已由该行动结算本人贡献。 */

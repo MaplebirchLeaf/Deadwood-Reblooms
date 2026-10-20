@@ -205,9 +205,9 @@ export default function School(maplebirch: typeof window.maplebirch): void {
         { ...inspectionDressAgain, expected: 1 }
       ],
       'Pussy Inspection Flaunt': [
-        { ...inspectionDesk, src: '<<if $worn.under_lower.name is "naked">>' },
+        { ...inspectionDesk, srcmatch: /<<if \$worn\.under_lower\.(?:name is "naked"|type\.includes\("naked"\))>>/ },
         { src: '<<exhibitionism4>>', applybefore: '<</if>>', expected: 1 },
-        { src: '!$worn.under_lower.name is "naked"', to: '$worn.under_lower.name isnot "naked"', expected: 1 },
+        { srcmatch: /!\$worn\.under_lower\.(name is "naked"|type\.includes\("naked"\))/, to: 'not ($worn.under_lower.$1)', expected: 1 },
         { ...inspectionDressAgain, expected: 3 }
       ],
       'Pussy Inspection Forced': [
@@ -283,7 +283,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
         { ...campusHidingDress },
         // 职位免除强制留堂，仍可在原版留堂入口旁主动参加。
         {
-          src: '<<if $schoolstate is "afternoon" and $detention gte 1 and $daily.school.detentionAttended isnot 1 and $pillory.tenant.special.name isnot "Leighton">>',
+          srcmatch: /<<if \$schoolstate is "afternoon"(?=[^\n]*\$pillory\.tenant\.special\.name)/,
           applybefore: '<<deadwood-school-voluntary-detention>>',
           expected: 1
         },

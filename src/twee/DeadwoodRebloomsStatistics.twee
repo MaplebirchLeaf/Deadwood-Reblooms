@@ -327,15 +327,15 @@
 
 
 <<widget 'deadwood-reblooms-breakthrough-progress'>>
-  <<set _progressModule to maplebirch.get('VanillaPlus')>>
+  <<set $_progressModule to maplebirch.get('VanillaPlus')>>
   <span class='small-description'><i><<lanSwitch 'A tick marks a requirement you meet. Some challenges only need completing once; others, such as ear slimes and makeup, depend on your condition at the time. After breaking through, reach the new ceiling to earn its trait.' '✓表示你已满足这一项。有些经历只需完成一次，双耳史莱姆、妆容等则要在突破时符合要求。突破后继续练到新上限，才会获得对应特质。'>></i></span><br>
-  <<for _attribute range _progressModule.progress>>
-    <<set _requirements to _progressModule[_attribute.id].requirements>>
+  <<for _attribute range $_progressModule.progress>>
+    <<set _requirements to $_progressModule[_attribute.id].requirements>>
     <br><span class='gold'><<lanSwitch _attribute.name>></span> —
     <<if $VanillaPlus.lock[_attribute.id]>><span class='green'><<lanSwitch 'Ceiling unlocked' '已突破'>></span>
     <<else>><span class='teal'><<= _requirements.filter(Boolean).length>> / <<= _requirements.length>></span><</if>>
     <<if $VanillaPlus.traits[_attribute.id]>> · <span class='green'><<lanSwitch 'Trait obtained' '已获得特质'>></span><</if>><br>
-    <<lanSwitch 'Current / normal ceiling / new ceiling: ' '当前值／原版上限／突破上限：'>><span class='teal'><<= V[_attribute.id]>> / <<= _progressModule.normalCeiling(_attribute.id)>> / <<= _progressModule.ceiling(_attribute.id)>></span><br>
+    <<lanSwitch 'Current / normal ceiling / new ceiling: ' '当前值／原版上限／突破上限：'>><span class='teal'><<= V[_attribute.id]>> / <<= $_progressModule.normalCeiling(_attribute.id)>> / <<= $_progressModule.ceiling(_attribute.id)>></span><br>
     <<for _index, _step range _attribute.steps>>
       <<deadwood-reblooms-progress-check _requirements[_index] _step.text _step.hint>>
     <</for>>

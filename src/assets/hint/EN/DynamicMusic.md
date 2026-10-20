@@ -20,11 +20,11 @@ The audio pack is optional. Without it, dynamic audio stays silent and the game 
 
 Waves and rain can coexist on a rainy coast. Dry weather brings wind across the moor and ruined castle. Storm drains have flowing water, while old sewers have quieter dripping. Moving indoors stops outdoor rain, snow and birds.
 
-The orphanage bedroom and bathroom, and the main temple quarters, can carry muffled rain and distant thunder through their windows. These sounds are limited to those rooms, rather than every indoor scene. Underground passages do not play rain just because it is raining in town. Thunder has natural pauses and does not follow each visible flash of lightning. Neighbouring pages do not restart an unchanged sound, and ambience transitions use fades.
+The orphanage bedroom and bathroom, and the main temple quarters, have muffled rain and occasional distant thunder during storms. Ambience plays continuously and fades between scenes.
 
 Heists, pursuits and dangerous encounters take priority with tense music. Consensual interactions do not automatically use a fighting score. With no matching rule, a layer stays silent.
 
-Effects are limited to a few clothing, impact and gunfire sounds. They include no hurt voices, breathing or other vocal recordings. Equipment changes can make a sound without passing time, using either mouse clicks or native number shortcuts. Ordinary interface navigation, history replay, the first screen after loading and repeated redraws do not replay completed feedback. An action selects at most one short effect, with cooldowns limiting rapid repetition.
+Clothing changes, impacts and gunfire have short effects without vocal recordings. Both mouse and number-key actions can trigger them.
 
 ### Volume and music player
 

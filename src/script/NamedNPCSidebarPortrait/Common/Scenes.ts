@@ -60,6 +60,11 @@ export default function scene(core: MaplebirchCore, name: string): string | unde
 
   const property = estate?.current;
   if (!estate || !property || !estate.residentsAt(property.id).some(resident => resident.id === name)) return;
+  if (title.startsWith('Deadwood Reblooms Property Resident Bath')) {
+    const bath = estate.life.bath;
+    if (bath?.partner !== name || bath.hidden) return;
+    return bath.action === 'join' ? 'naked' : 'property_bath_towel';
+  }
   if (title.includes(' Intimacy') || title.includes(' Outing') || title.endsWith(' Return')) return;
   if (title === 'Deadwood Reblooms Property Swim' && V.Finance.real_estate.room_companion === name) return name === 'Sydney' || name === 'Kylar' ? 'swim' : 'school_swim';
   if (title === 'Deadwood Reblooms Property Bed' || Time.hour < (name === 'Sydney' ? 6 : 7)) return sleep[name];

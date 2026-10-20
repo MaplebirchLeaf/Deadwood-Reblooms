@@ -8,20 +8,20 @@
 <</widget>>
 
 <<widget 'deadwood-home-daily-act'>>
-  <<set _day_estate to maplebirch.get('Finance').realEstate>>
-  <<if _args[0] is 'read' and $NPCList[0]?.per isnot _day_estate.staff.key(_day_estate.life.daily?.role)>><<exit>><</if>>
-  <<if !_day_estate.life.finish(_args[0])>><<exit>><</if>>
-  <<set _day_event to _day_estate.life.daily>>
+  <<set $_day_estate to maplebirch.get('Finance').realEstate>>
+  <<if _args[0] is 'read' and $NPCList[0]?.per isnot $_day_estate.staff.key($_day_estate.life.daily?.role)>><<exit>><</if>>
+  <<if !$_day_estate.life.finish(_args[0])>><<exit>><</if>>
+  <<set _day_event to $_day_estate.life.daily>>
   <<switch _day_event.choice>>
     <<case 'join'>>
       <<npcincr _day_event.partner love 1>><<stress -2>><<pass 10>>
     <<case 'help'>>
       <<housekeeping 1 600>><<tiredness 1>><<pass 10>>
     <<case 'read'>>
-      <<set _day_key to _day_estate.staff.key(_day_event.role)>>
+      <<set $_day_key to $_day_estate.staff.key(_day_event.role)>>
       <<set $NPCList[0].deadwood_work to $NPCList[0].deadwood_work ?? { chats: 0, last: null, day: -1 }>>
       <<set $NPCList[0].deadwood_work.last to 'handover', $NPCList[0].deadwood_work.day to _day_event.day>>
-      <<set $NPCList[0].deadwood_work.chats += 1>><<saveNPC 0 _day_key>><<pass 5>>
+      <<set $NPCList[0].deadwood_work.chats += 1>><<saveNPC 0 $_day_key>><<pass 5>>
   <</switch>>
 <</widget>>
 

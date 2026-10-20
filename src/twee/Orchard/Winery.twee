@@ -13,11 +13,11 @@
   <<if _wineLine.ready_at gt Time.date.timeStamp>>
     <span class='blue'><<lanSwitch 'The bottling equipment is being fitted.' '封瓶设备正在安装。'>></span><br>
   <<elseif _wineLine.report.day gte 0>>
-    <<set _wineShift to _wineLine.report>>
-    <<lanSwitch 'Last shift: ' '最近一班：'>><<lanSwitch 'bottled ' '装瓶'>><span class='teal'><<= _wineShift.bottled>></span><<lanSwitch ', started ' '瓶，投料'>><span class='teal'><<= _wineShift.started>></span><<lanSwitch ' batches, delivered ' '桶，配送'>><span class='teal'><<= _wineShift.supplied>></span><<lanSwitch ' bottles.' '瓶。'>><br>
+    <<set $_wineShift to _wineLine.report>>
+    <<lanSwitch 'Last shift: ' '最近一班：'>><<lanSwitch 'bottled ' '装瓶'>><span class='teal'><<= $_wineShift.bottled>></span><<lanSwitch ', started ' '瓶，投料'>><span class='teal'><<= $_wineShift.started>></span><<lanSwitch ' batches, delivered ' '桶，配送'>><span class='teal'><<= $_wineShift.supplied>></span><<lanSwitch ' bottles.' '瓶。'>><br>
     <<for _wineStage range [['bottling', ['Bottling', '装瓶']], ['brewing', ['Fermentation', '投料']], ['delivery', ['Delivery', '配送']]]>>
-      <<set _wineReason to _wineLineModule.terms.automationStatus[_wineShift[_wineStage[0]]]>>
-      <<lanSwitch _wineStage[1][0] _wineStage[1][1]>><<lanSwitch ': ' '：'>><span @class="['bottled', 'started', 'delivered'].includes(_wineShift[_wineStage[0]]) ? 'green' : 'blue'"><<lanSwitch _wineReason[0] _wineReason[1]>></span><br>
+      <<set $_wineReason to _wineLineModule.terms.automationStatus[$_wineShift[_wineStage[0]]]>>
+      <<lanSwitch _wineStage[1][0] _wineStage[1][1]>><<lanSwitch ': ' '：'>><span @class="['bottled', 'started', 'delivered'].includes($_wineShift[_wineStage[0]]) ? 'green' : 'blue'"><<lanSwitch $_wineReason[0] $_wineReason[1]>></span><br>
     <</for>>
   <<else>>
     <span class='blue'><<lanSwitch 'Leave instructions at the winery. The equipment starts at 09:00; changing the instructions after that time waits until the next day.' '可在酿酒间安排要做的事。设备每天09:00开工，过了这个时间再改安排，就从明天开始。'>></span><br>

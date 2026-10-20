@@ -127,21 +127,21 @@
 <<widget 'deadwood-industry-estimate'>>
   <<if currentSkillValue('maths') gte 400>>
     <<if _factory.capacity gt 0>>
-      <<set _factory_work_days to Math.ceil(_args[0].batches / _factory.capacity)>>
-      <<set _factory_work_cost to _factory_work_days * _factory.dailyCost>>
-      <<set _factory_remainder to _args[0].total - _args[0].materials - _factory_work_cost>>
+      <<set $_factory_work_days to Math.ceil(_args[0].batches / _factory.capacity)>>
+      <<set $_factory_work_cost to $_factory_work_days * _factory.dailyCost>>
+      <<set $_factory_remainder to _args[0].total - _args[0].materials - $_factory_work_cost>>
       <<language>>
         <<option 'EN'>>
           You work through the figures on a spare order sheet. With the current shifts, this needs at least
-          <span class='blue'><<= _factory_work_days>> working days</span> and
-          <<deadwood-reblooms-finance-money _factory_work_cost>> in wages and site bills.
-          After materials and those costs, the quoted price leaves <<deadwood-reblooms-finance-money _factory_remainder>>.
+          <span class='blue'><<= $_factory_work_days>> working days</span> and
+          <<deadwood-reblooms-finance-money $_factory_work_cost>> in wages and site bills.
+          After materials and those costs, the quoted price leaves <<deadwood-reblooms-finance-money $_factory_remainder>>.
           Weekends, stoppages and the wait for payment still cost extra.
         <<option 'CN'>>
           你拿一张空白订单纸列出算式。按当前班表，这笔订单至少需要
-          <span class='blue'><<= _factory_work_days>> 个工作日</span>，工资与厂房费用为
-          <<deadwood-reblooms-finance-money _factory_work_cost>>。
-          报价扣去原料和这些开支后，还剩<<deadwood-reblooms-finance-money _factory_remainder>>。
+          <span class='blue'><<= $_factory_work_days>> 个工作日</span>，工资与厂房费用为
+          <<deadwood-reblooms-finance-money $_factory_work_cost>>。
+          报价扣去原料和这些开支后，还剩<<deadwood-reblooms-finance-money $_factory_remainder>>。
           周末、停工与等待回款的费用还得另算。
       <</language>><br>
     <<else>>
@@ -157,33 +157,33 @@
 
 <<widget 'deadwood-industry-report'>>
   <<set _factory_state to maplebirch.get('Finance').industry.state>>
-  <<set _factory_report to _factory_state.report>>
-  <<if _factory_report>>
-    <<if !_factory_report.seen and _factory.available and _factory.open>>
-      <<set _factory_report.seen to true>>
-      <<if _factory_report.event is 'default'>><<stress 12>><<trauma 4>>
-      <<elseif ['late', 'overdue'].includes(_factory_report.event)>><<stress 4>><</if>>
+  <<set $_factory_report to _factory_state.report>>
+  <<if $_factory_report>>
+    <<if !$_factory_report.seen and _factory.available and _factory.open>>
+      <<set $_factory_report.seen to true>>
+      <<if $_factory_report.event is 'default'>><<stress 12>><<trauma 4>>
+      <<elseif ['late', 'overdue'].includes($_factory_report.event)>><<stress 4>><</if>>
     <</if>>
     <<language>>
       <<option 'EN'>>
-        <<if _factory_report.event is 'delivered'>>The goods have left the yard. The invoice is for <<deadwood-reblooms-finance-money _factory_report.amount>>, <span class='blue'>the payment has not arrived yet</span>.
-        <<elseif _factory_report.event is 'default'>>The buyer's promised transfer has not arrived. The debt-recovery agent has returned the file marked <span class='red'>unrecoverable</span>. An invoice for <<deadwood-reblooms-finance-money _factory_report.amount>> is written off.
-        <<elseif _factory_report.event is 'overdue'>>
-          Robin's drinks shop has not covered the invoice for <<deadwood-reblooms-finance-money _factory_report.amount>>. Rowan clips the delivery receipt to it. "They've asked for another week. That doesn't pay our crew." The money remains owed; nothing has reached the factory account.
-        <<elseif _factory_report.event is 'resigned'>>
-          <span class='red'>The crew has left after two weeks of unpaid wages.</span> The machines are idle; automatic production has stopped. The unpaid <<deadwood-reblooms-finance-money _factory_report.amount>> is still owed.
-        <<elseif _factory_report.event is 'cancelled'>>You cancel the job. The supplier will not take back the cut material. The <<deadwood-reblooms-finance-money _factory_report.amount>> already spent remains a cost. The cancellation fee has also been paid.
-        <<else>>A payment of <<deadwood-reblooms-finance-money _factory_report.amount>> has arrived in the <span class='gold'>factory account</span>.<<if _factory_report.event is 'late'>> It came later than promised.<</if>>
+        <<if $_factory_report.event is 'delivered'>>The goods have left the yard. The invoice is for <<deadwood-reblooms-finance-money $_factory_report.amount>>, <span class='blue'>the payment has not arrived yet</span>.
+        <<elseif $_factory_report.event is 'default'>>The buyer's promised transfer has not arrived. The debt-recovery agent has returned the file marked <span class='red'>unrecoverable</span>. An invoice for <<deadwood-reblooms-finance-money $_factory_report.amount>> is written off.
+        <<elseif $_factory_report.event is 'overdue'>>
+          Robin's drinks shop has not covered the invoice for <<deadwood-reblooms-finance-money $_factory_report.amount>>. Rowan clips the delivery receipt to it. "They've asked for another week. That doesn't pay our crew." The money remains owed; nothing has reached the factory account.
+        <<elseif $_factory_report.event is 'resigned'>>
+          <span class='red'>The crew has left after two weeks of unpaid wages.</span> The machines are idle; automatic production has stopped. The unpaid <<deadwood-reblooms-finance-money $_factory_report.amount>> is still owed.
+        <<elseif $_factory_report.event is 'cancelled'>>You cancel the job. The supplier will not take back the cut material. The <<deadwood-reblooms-finance-money $_factory_report.amount>> already spent remains a cost. The cancellation fee has also been paid.
+        <<else>>A payment of <<deadwood-reblooms-finance-money $_factory_report.amount>> has arrived in the <span class='gold'>factory account</span>.<<if $_factory_report.event is 'late'>> It came later than promised.<</if>>
         <</if>>
       <<option 'CN'>>
-        <<if _factory_report.event is 'delivered'>>货物已经离开院子。货款为<<deadwood-reblooms-finance-money _factory_report.amount>>，<span class='blue'>尚未到账</span>。
-        <<elseif _factory_report.event is 'default'>>采购方承诺的转账没有到账。收账的人退回了档案，上面写着<span class='red'>无法追回</span>。<<deadwood-reblooms-finance-money _factory_report.amount>>的应收货款被记作坏账。
-        <<elseif _factory_report.event is 'overdue'>>
-          罗宾的饮品店尚未付足<<deadwood-reblooms-finance-money _factory_report.amount>>货款。罗文把收货回执夹在账单上。“那边想再缓一周。可我们的工人也得拿工资。”这笔钱仍记在应收账里，工厂账户尚未到账。
-        <<elseif _factory_report.event is 'resigned'>>
-          <span class='red'>欠薪持续两周，厂里的雇工已经离职。</span>机器停了，自动生产也已停止。欠下的<<deadwood-reblooms-finance-money _factory_report.amount>>仍需结清。
-        <<elseif _factory_report.event is 'cancelled'>>你取消了订单。供货商不肯收回已经裁切的材料，先前投入的<<deadwood-reblooms-finance-money _factory_report.amount>>仍是成本，解约费也已支付。
-        <<else>><<deadwood-reblooms-finance-money _factory_report.amount>>货款已存入<span class='gold'>工厂账户</span>。<<if _factory_report.event is 'late'>>这笔钱比约定的时间来得晚。<</if>>
+        <<if $_factory_report.event is 'delivered'>>货物已经离开院子。货款为<<deadwood-reblooms-finance-money $_factory_report.amount>>，<span class='blue'>尚未到账</span>。
+        <<elseif $_factory_report.event is 'default'>>采购方承诺的转账没有到账。收账的人退回了档案，上面写着<span class='red'>无法追回</span>。<<deadwood-reblooms-finance-money $_factory_report.amount>>的应收货款被记作坏账。
+        <<elseif $_factory_report.event is 'overdue'>>
+          罗宾的饮品店尚未付足<<deadwood-reblooms-finance-money $_factory_report.amount>>货款。罗文把收货回执夹在账单上。“那边想再缓一周。可我们的工人也得拿工资。”这笔钱仍记在应收账里，工厂账户尚未到账。
+        <<elseif $_factory_report.event is 'resigned'>>
+          <span class='red'>欠薪持续两周，厂里的雇工已经离职。</span>机器停了，自动生产也已停止。欠下的<<deadwood-reblooms-finance-money $_factory_report.amount>>仍需结清。
+        <<elseif $_factory_report.event is 'cancelled'>>你取消了订单。供货商不肯收回已经裁切的材料，先前投入的<<deadwood-reblooms-finance-money $_factory_report.amount>>仍是成本，解约费也已支付。
+        <<else>><<deadwood-reblooms-finance-money $_factory_report.amount>>货款已存入<span class='gold'>工厂账户</span>。<<if $_factory_report.event is 'late'>>这笔钱比约定的时间来得晚。<</if>>
         <</if>>
     <</language>><br>
   <</if>>

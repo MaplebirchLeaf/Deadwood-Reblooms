@@ -13,7 +13,7 @@
 
 **枯木逢春**是基于 **[秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)** 的 **_Degrees of Lewdity_** 内容模组，扩展人物关系、校园生活、金融经营、交通与街头玩法，并提供转化、遭遇战和界面功能。
 
-**当前版本：2.4.2。**各部分可按喜好启用，详细玩法与解锁条件收录在游戏内指南中。
+**当前版本：2.4.3。**各部分可按喜好启用，详细玩法与解锁条件收录在游戏内指南中。
 
 ---
 
@@ -42,7 +42,7 @@
 ## 安装与依赖
 
 1. 准备带有 **SugarCube 2 ModLoader** 的游戏。当前以 **DoL 0.5.12.13** 为目标版本。
-2. 安装 **[秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.4.15 或以上版本**，并按加载器提示补齐服装、美化选择器等依赖。
+2. 安装 **[秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.5.2 或以上版本**，并按加载器提示补齐服装、美化选择器等依赖。
 3. 从 [**Releases**](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases/latest) 下载 `deadwood-reblooms-*.modpack`，通过 ModLoader 加载。
 4. 在框架模块管理中选择要启用的内容，保存游戏并重载。
 

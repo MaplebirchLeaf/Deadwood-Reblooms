@@ -1,0 +1,75 @@
+:: Deadwood Tsukihan Affection Widgets [widget]
+
+<<widget 'deadwood-tsukihan-affection-links'>>
+  <<deadwood-raven-home-context>>
+  <<if _shrine?.stage is 3 and (_shrinePerson or _shrineHome and _shrineHomeAwake and $location is 'raven_shrine_house')
+    and C.npc.Tsukihan?.init is 1 and isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 20
+    and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')
+    and ($location is 'raven_shrine_house' ? _shrineHomeMinutes : _shrineMinutes) gt 5>>
+    <<if _args[0] isnot 'flirt' and _shrine.kiss isnot Math.floor(Time.days)>>
+      <<loveicon 'kiss'>><<lanLink ['Kiss Tsukihan (0:05)', '亲吻月羽 (0:05)'] 'Deadwood Raven Shrine Affection'>><<deadwood-tsukihan-affection 'kiss'>><</lanLink>><<glove>><<glust>><br>
+    <</if>>
+    <<if !$daily.darkfeatherFlirt>>
+      <<brothelicon>><<lanLink ['Flirt with Tsukihan (0:05)', '和月羽调情 (0:05)'] 'Deadwood Raven Shrine Affection'>><<deadwood-tsukihan-affection 'flirt'>><</lanLink>><<glove>><<glust>><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-tsukihan-affection'>>
+  <<set $_affection to _args[0], _affectionSource to $passage, _affectionLocation to $location>>
+  <<deadwood-raven-home-context>>
+  <<if !['kiss', 'flirt'].includes($_affection) or !['Deadwood Raven Shrine Room', 'Deadwood Raven Shrine Veranda'].includes($passage)
+    or !(_shrinePerson or _shrineHome and _shrineHomeAwake and $location is 'raven_shrine_house')
+    or _shrine.stage isnot 3 or C.npc.Tsukihan.init isnot 1 or !isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 20 or pcAreArmsBound('any')
+    or $daily.no_sing or $worn.face.type.includes('gag')
+    or ($_affection is 'kiss' ? _shrine.kiss is Math.floor(Time.days) : $daily.darkfeatherFlirt)
+    or ($location is 'raven_shrine_house' ? _shrineHomeMinutes : _shrineMinutes) lte 5>><<exit>><</if>>
+  <<pass 5>><<deadwood-raven-home-context>>
+  <<if $passage isnot _affectionSource or $location isnot _affectionLocation
+    or !(_shrinePerson or _shrineHome and _shrineHomeAwake and $location is 'raven_shrine_house')
+    or _shrine.stage isnot 3 or C.npc.Tsukihan.init isnot 1 or !isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 20 or pcAreArmsBound('any')
+    or $daily.no_sing or $worn.face.type.includes('gag')
+    or ($_affection is 'kiss' ? _shrine.kiss is Math.floor(Time.days) : $daily.darkfeatherFlirt)>><<exit>><</if>>
+  <<set _shrine.scene to 'affection', _shrine.step to $_affection>>
+  <<if $_affection is 'kiss'>>
+    <<set _shrine.kiss to Math.floor(Time.days)>><<takeKissVirginity 'Tsukihan' 'loveInterest'>>
+  <<else>>
+    <<set $daily.darkfeatherFlirt to true>>
+  <</if>>
+  <<stress -2>><<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 1, 0, 100), C.npc.Tsukihan.lust to Math.clamp((C.npc.Tsukihan.lust || 0) + ($_affection is 'kiss' ? 5 : 3), 0, 100)>>
+<</widget>>
+
+:: Deadwood Raven Shrine Affection
+<<effects>><<deadwood-raven-home-context>>
+<<if _shrine?.scene is 'affection' and (_shrinePerson or _shrineHome and _shrineHomeAwake and $location is 'raven_shrine_house')>>
+  <<npc Tsukihan>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _shrine.step is 'kiss'>>
+        You lean closer. Tsukihan sets the cup down before meeting you halfway. The kiss is brief; when you draw back, <<his>> fingers are still curled around yours.<br><br>
+        <<if C.npc.Tsukihan.dom lt 30>>"You could warn me." <<He>> glances at the cup, then back at you. "I might have dropped that."
+        <<elseif C.npc.Tsukihan.dom lt 70>>"Again, before you go?" <<He>> holds your gaze this time.
+        <<else>>"I was going to ask first." <<He>> draws your hand towards <<him>>, smiling. "Next time, leave me a turn."<</if>>
+      <<else>>
+        You catch Tsukihan looking at you and let your smile linger. When you mention how often <<he>> saves you a seat, <<he>> stops straightening the cushion.<br><br>
+        <<if C.npc.Tsukihan.dom lt 30>>"It would be rude to make a guest stand." A pause. "You aren't just a guest. You know that."
+        <<elseif C.npc.Tsukihan.dom lt 70>>"Well, I can't sit beside you if you aren't here." <<He>> looks pleased to have said it aloud.
+        <<else>>"Of course I do. You're supposed to sit beside me." <<He>> pats the cushion. "Come on, then."<</if>>
+      <</if>>
+    <<option 'CN'>>
+      <<if _shrine.step is 'kiss'>>
+        你靠近一些。月羽先放下杯子，才迎上你的吻。分开时，<<his>>手指还轻轻勾着你的手。<br><br>
+        <<if C.npc.Tsukihan.dom lt 30>>“先说一声嘛。”<<He>>看了看杯子，又看向你。“差点就拿不稳了。”
+        <<elseif C.npc.Tsukihan.dom lt 70>>“走之前，再亲一下？”这次<<he>>没有避开你的目光。
+        <<else>>“刚才还想先亲你的。”<<He>>笑着把你的手拉近，“下回留给我先来。”<</if>>
+      <<else>>
+        你接住月羽望来的目光，笑着没有移开。你提起<<he>>总给你留着座位，<<he>>理坐垫的手便停了下来。<br><br>
+        <<if C.npc.Tsukihan.dom lt 30>>“总不能让客人站着。”停了一下，<<he>>又说，“……你又不只是客人。明明知道的。”
+        <<elseif C.npc.Tsukihan.dom lt 70>>“你不来，怎么坐到你旁边。”说完，<<he>>自己先弯起了嘴角。
+        <<else>>“当然留着。你本来就该坐我旁边。”<<He>>拍了拍坐垫，“还不过来？”<</if>>
+      <</if>>
+  <</language>><<lstress>><<glove>><<glust>><br><br>
+<<else>>
+  <<lanSwitch 'The moment has passed. You can find Tsukihan another time.' '方才的时机已经过去了，改天再找月羽吧。'>><br><br>
+<</if>>
+<<deadwood-raven-gift-return>>

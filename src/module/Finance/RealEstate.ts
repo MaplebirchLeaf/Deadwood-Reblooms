@@ -288,7 +288,7 @@ class RealEstate {
   public get household(): Record<'home' | 'bedroom' | 'guest' | 'common', ResidentProfile[]> {
     const property = this.current;
     if (!property) return { home: [], bedroom: [], guest: [], common: [] };
-    const home = this.residentsHome(property.id);
+    const home = this.residentsHome(property.id).filter(profile => profile.id !== this.life.bathing?.partner);
     const selected = home.find(profile => profile.id === this.state.meeting_resident);
     // 选中的同住者离开后保持主卧空置，不把客房里的另一人自动换进来。
     let bedroom: ResidentProfile[] = [];
@@ -360,6 +360,7 @@ class RealEstate {
       this.owns(id) &&
       !this.state.management[id]?.rented &&
       (place !== 'bedroom' || this.canShareBed(id)) &&
+      (place === 'bath' || id !== this.current?.id || this.life.bathing?.partner !== name) &&
       window.isLoveInterest(name) &&
       this.residentsHome(id).some(profile => profile.id === name) &&
       (name !== 'Robin' || C.npc.Robin.trauma < 50)

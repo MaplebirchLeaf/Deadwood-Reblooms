@@ -90,7 +90,7 @@
     <<if _outings.offer>>
       <<socialiseicon>><<lanLink ['Discuss the invitation', '聊聊这次邀约'] 'Deadwood Reblooms Property Outing Invitation'>><</lanLink>><br><br>
     <</if>>
-    <<icon 'company/minutes.png'>><<lanLink ['Leave a note declining the invitation (0:02)', '留张纸条谢绝邀约 (0:02)']>>
+    <<icon 'property/handwritten-note.png'>><<lanLink ['Leave a note declining the invitation (0:02)', '留张纸条谢绝邀约 (0:02)']>>
       <<set _outing_source to $passage>>
       <<if maplebirch.get('Finance').realEstate.outings.cancel()>><<pass 2>><<if $passage is _outing_source>><<run Dynamic.render('deadwood-home-outing-plan')>><</if>><</if>>
     <</lanLink>><br><br>
@@ -107,7 +107,7 @@
     <<if _outings.weather>>
       <<socialiseicon>><<lanLink ['Discuss the weather and your plans', '商量天气与出门安排'] 'Deadwood Reblooms Property Outing Weather'>><</lanLink>><br><br>
     <</if>>
-    <<icon 'company/minutes.png'>><<lanLink ['Leave a note cancelling the outing (0:02)', '留张纸条取消这次外出 (0:02)']>>
+    <<icon 'property/handwritten-note.png'>><<lanLink ['Leave a note cancelling the outing (0:02)', '留张纸条取消这次外出 (0:02)']>>
       <<set _outing_source to $passage>>
       <<if maplebirch.get('Finance').realEstate.outings.cancel()>><<pass 2>><<if $passage is _outing_source>><<run Dynamic.render('deadwood-home-outing-plan')>><</if>><</if>>
     <</lanLink>><br><br>
@@ -245,7 +245,7 @@
 <<elseif !_outings.canStay>>
   <span class='blue'><<lanSwitch 'Sydney checks the time. You will need to leave now to get back before evening prayers.' '悉尼看了看时间。现在得回去了，才能赶上晚祷。'>></span><br>
 <<elseif maplebirch.get('Finance').canPay(_outing_cost, 'transport')>>
-  <<deadwood-outing-icon _plan.activity>><<lanLink `lanSwitch({meal: 'Order two coffees and two fruit salads', shopping: 'Choose a bookmark together', walk: "Walk at your lover's pace"}[_plan.activity], {meal: '点两杯咖啡与两份水果沙拉', shopping: '一起挑一张书签', walk: '陪恋人慢慢走一段'}[_plan.activity]) + ' (0:20)'`>>
+  <<if _plan.activity is 'shopping'>><<icon 'property/bookmark.png'>><<else>><<deadwood-outing-icon _plan.activity>><</if>><<lanLink `lanSwitch({meal: 'Order two coffees and two fruit salads', shopping: 'Choose a bookmark together', walk: "Walk at your lover's pace"}[_plan.activity], {meal: '点两杯咖啡与两份水果沙拉', shopping: '一起挑一张书签', walk: '陪恋人慢慢走一段'}[_plan.activity]) + ' (0:20)'`>>
     <<set _outing_source to $passage>>
     <<if maplebirch.get('Finance').canPay(_outing_cost, 'transport') and maplebirch.get('Finance').realEstate.outings.back(true)>>
       <<if _outing_cost gt 0>><<money `-_outing_cost` 'transport'>><</if>>
@@ -352,7 +352,7 @@
           <<if _sydneyStatus.includes('corrupt')>>“那就再待一会儿。”悉尼笑着牵住你的手。<<else>>悉尼看了看时间，才牵住你的手。“再待一会儿可以。晚祷之前还是得回去。”<</if>>
       <</switch>>
   <</language>><br><br>
-  <<loveicon>><<lanLink ['Kiss your lover', '亲吻恋人']>>
+  <<loveicon 'kiss'>><<lanLink ['Kiss your lover', '亲吻恋人']>>
     <<if maplebirch.get('Finance').realEstate.outings.canIntimate>>
       <<set $sexstart to 1>><<goto 'Deadwood Reblooms Property Outing Closeness'>>
     <</if>>

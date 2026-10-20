@@ -1,0 +1,59 @@
+:: Deadwood Tsukihan Town Widgets [widget]
+
+<<widget 'deadwood-tsukihan-town-context'>>
+  <<deadwood-raven-shrine-context>>
+  <<set _shrineTownReady to _shrine?.stage is 3 and C.npc.Tsukihan?.init is 1 and C.npc.Tsukihan.state is 'active'
+    and _shrineTsukihanLocation is 'shopping_centre' and $location is 'shopping_centre' and $exposed lte 0
+    and !$combat and !$possessed and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze and $stress lt $stressmax>>
+<</widget>>
+
+<<widget 'deadwood-tsukihan-town-link'>>
+  <<deadwood-tsukihan-town-context>>
+  <<if _shrineTownReady>>
+    <<set _shrineTownLinks to new maplebirch.tool.link()>><<run _shrineTownLinks.detect()>>
+    <<if _shrineTownLinks.links.some(link => link.getAttribute('data-passage') === 'Supermarket')>>
+      <br><<lanSwitch 'You recognise Tsukihan near the supermarket, comparing a shopping list with the packets in a basket. A coil of new cord is tucked beneath one arm.' '你在超市附近看见月羽，正拿着采购单核对篮子里的东西，一只手臂下还夹着新买的绳子。'>><br><br>
+      <<socialiseicon>><<lanLink ['Say hello to Tsukihan', '过去和月羽打招呼'] 'Deadwood Raven Shrine Shopping'>><</lanLink>><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Raven Shrine Shopping
+<<effects>><<deadwood-tsukihan-town-context>>
+<<if !_shrineTownReady and _shrineTravel and $npc?.includes('Tsukihan')>><<endnpc 'Tsukihan'>><</if>>
+<<if _shrineTownReady>>
+  <<npc Tsukihan>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      Tsukihan looks up from the list. "Oh. You're here too." <<He>> moves the basket off the empty bench so you can stand beside <<him>>.<br><br>
+      "Lamp oil, soap, flour. Things always seem to run out together." <<He>> checks the list again. There are biscuits in the basket already.
+    <<option 'CN'>>
+      月羽从采购单上抬起头。“咦，你也在。”<<He>>把篮子从旁边空着的长凳上提起来，给你让了个位置。<br><br>
+      “灯油、肥皂、面粉。每次都是一起用完。”<<He>>又核对了一遍单子。篮子里已经放了一包饼干。
+  <</language>><br><br>
+  <<if $daily.darkfeatherShopping>>
+    <<if $daily.darkfeatherShopping is 'basket'>>
+      <<lanSwitch 'You help check off the remaining supplies. Tsukihan notices the basket has become easier to carry only after reaching for the handle. "Thank you. I did buy rather a lot."' '你帮着把剩下的东西一件件核对完。月羽伸手去拿提柄，才发现篮子已经到了你手里。“谢谢。好像是买得有点多了。”'>><br><br>
+    <<else>>
+      <<lanSwitch 'Tsukihan turns two biscuit packets over, reading the labels. "You liked these last time." <<He>> puts one in the basket. "I want to try the other ones too. We can have both."' '月羽翻过两包饼干，认真看了看。“你上回喜欢这个。”<<He>>把一包放进篮子，又拿起另一包。“这个我也想试。都买吧。”'>><br><br>
+    <</if>>
+  <<elseif Time.hour * 60 + Time.minute lt 11 * 60 + 55 and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+    <<for _shopChoice range ['basket', 'biscuits']>>
+      <<capture _shopChoice>>
+        <<icon `_shopChoice is 'basket' ? 'raven-shrine/shopping-basket.png' : 'tending/rich-biscuit.png'`>><<lanLink [_shopChoice is 'basket' ? 'Help with the shopping basket (0:05)' : 'Choose some biscuits together (0:05)', _shopChoice is 'basket' ? '帮忙提一会儿购物篮 (0:05)' : '一起挑一包饼干 (0:05)'] 'Deadwood Raven Shrine Shopping'>>
+          <<deadwood-tsukihan-town-context>>
+          <<if _shrineTownReady and !$daily.darkfeatherShopping and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+            <<pass 5>><<deadwood-tsukihan-town-context>>
+            <<if _shrineTownReady and $passage is 'Deadwood Raven Shrine Shopping' and !$daily.darkfeatherShopping and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+              <<set $daily.darkfeatherShopping to _shopChoice, C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 1, 0, 100)>>
+              <<if _shopChoice is 'biscuits'>><<set C.npc.Tsukihan.dom to Math.clamp(C.npc.Tsukihan.dom + 1, 0, 100)>><</if>>
+            <</if>>
+          <</if>>
+        <</lanLink>><br>
+      <</capture>>
+    <</for>>
+  <</if>>
+<<else>>
+  <<lanSwitch 'Tsukihan has finished shopping and gone home. The bench outside the supermarket is empty.' '月羽已经买好东西回去了。超市外的长凳空着。'>><br>
+<</if>>
+<br><<getouticon>><<lanLink ['Return to the shopping centre', '回到购物中心'] 'Shopping Centre'>><<endevent>><</lanLink>><br>

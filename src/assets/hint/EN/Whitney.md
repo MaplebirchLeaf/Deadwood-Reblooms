@@ -15,5 +15,3 @@ Other courtyard events, Whitney's recovery, your exposure or having already spen
 - **Dockside walk**: establish Whitney's romance and visit the docks between 09:00 and before 17:00, suitably dressed, once daily.
 - **At the flat door**: advance the original home relationship and romance, then knock while Whitney is at home for added conversation.
 - **Listen to music**: enter the flat and use the original conversation menu, once daily. Sitting down to listen improves affection and relieves stress.
-
-A successful rescue does not complete the flat route or automatically make Whitney your love interest. Original schedules, relationship changes and confinement still affect later meetings.

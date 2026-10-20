@@ -77,34 +77,34 @@
 <</widget>>
 
 <<widget 'deadwood-home-study-gain'>>
-  <<set _study_estate to maplebirch.get('Finance').realEstate>>
-  <<set _study_chair to _study_estate.furniture(_study_estate.current.id, 'chair')>>
-  <<set _study_desk to _study_estate.furniture(_study_estate.current.id, 'desk')>>
-  <<set _studyGain to ({chair: 0.25, stool: 0.5, woodenchair: 0.75, swivelchair: 1, shellchair: 1.25, armchair: 1.5, egg: 1.75})[_study_chair?.id] ?? 0.25>>
-  <<set _studyGain += ({deskGlass: 0.5, deskMidcentury: 1, deskAntique: 1.5})[_study_desk?.id] ?? 0>>
+  <<set $_study_estate to maplebirch.get('Finance').realEstate>>
+  <<set $_study_chair to $_study_estate.furniture($_study_estate.current.id, 'chair')>>
+  <<set $_study_desk to $_study_estate.furniture($_study_estate.current.id, 'desk')>>
+  <<set _studyGain to ({chair: 0.25, stool: 0.5, woodenchair: 0.75, swivelchair: 1, shellchair: 1.25, armchair: 1.5, egg: 1.75})[$_study_chair?.id] ?? 0.25>>
+  <<set _studyGain += ({deskGlass: 0.5, deskMidcentury: 1, deskAntique: 1.5})[$_study_desk?.id] ?? 0>>
 <</widget>>
 
 <<widget 'deadwood-home-activity'>>
-  <<set _activity_estate to maplebirch.get('Finance').realEstate>>
-  <<set _activity_property to _activity_estate.current>>
-  <<if !_activity_property or !_activity_estate.facilities.some(facility => facility.id === _args[0]) or (_args[0] is 'pool' and !_activity_estate.poolOpen)>><<exit>><</if>>
+  <<set $_activity_estate to maplebirch.get('Finance').realEstate>>
+  <<set $_activity_property to $_activity_estate.current>>
+  <<if !$_activity_property or !$_activity_estate.facilities.some(facility => facility.id === _args[0]) or (_args[0] is 'pool' and !$_activity_estate.poolOpen)>><<exit>><</if>>
   <<set $phase to _args[1]>>
-  <<set _activity_management to _activity_estate.managementFor(_activity_property.id)>>
-  <<set _activity_resident to _activity_estate.household.home.find(resident => resident.id === $Finance.real_estate.room_companion)>>
-  <<if !_activity_resident>><<set $Finance.real_estate.room_companion to null>><</if>>
+  <<set $_activity_management to $_activity_estate.managementFor($_activity_property.id)>>
+  <<set $_activity_resident to $_activity_estate.household.home.find(resident => resident.id === $Finance.real_estate.room_companion)>>
+  <<if !$_activity_resident>><<set $Finance.real_estate.room_companion to null>><</if>>
   <<if _args[0] is 'pool'>>
     <<if pcAreArmsBound('both')>><<exit>><</if>>
     <<if $Finance.real_estate.pool_clothing is 'nude'>><<strip>>
     <<elseif $Finance.real_estate.pool_clothing is 'swimwear'>><<wearoutfit>><</if>>
     <<water>><<swimmingskilluse>><<physique 1>><<tiredness 4>><<stress -2>><<pass 20>>
   <<elseif _args[1] is 'rest'>>
-    <<if !$statFreeze and !$replayScene and !$combat and _activity_estate.staff.active('guard') and $per_npc[_activity_estate.staff.key('guard')] and $Finance.real_estate.life.days['guard:rest'] isnot Math.floor(Time.days)>>
+    <<if !$statFreeze and !$replayScene and !$combat and $_activity_estate.staff.active('guard') and $per_npc[$_activity_estate.staff.key('guard')] and $Finance.real_estate.life.days['guard:rest'] isnot Math.floor(Time.days)>>
       <<set $Finance.real_estate.life.days['guard:rest'] to Math.floor(Time.days)>><<stress -1>>
     <</if>>
     <<tiredness -4>><<pass 15>>
-    <<if _activity_management.rest_day isnot Time.days>>
-      <<if _activity_estate.staff.active('housekeeper')>><<tiredness -1>><</if>>
-      <<stress -4>><<set _activity_management.rest_day to Time.days>>
+    <<if $_activity_management.rest_day isnot Time.days>>
+      <<if $_activity_estate.staff.active('housekeeper')>><<tiredness -1>><</if>>
+      <<stress -4>><<set $_activity_management.rest_day to Time.days>>
     <</if>>
   <<elseif _args[1] is 'read'>>
     <<stress -2>><<pass 15>>
@@ -118,19 +118,19 @@
       <<case 'history'>><<historyskill _studyGain>>
     <</switch>>
   <</if>>
-  <<if _activity_resident>>
-    <<set _activity_key to _activity_resident.id + ':' + _args[0]>>
-    <<if _activity_management.affection_days[_activity_key] isnot Time.days>>
-      <<npcincr _activity_resident.id love 1>><<set _activity_management.affection_days[_activity_key] to Time.days>>
+  <<if $_activity_resident>>
+    <<set $_activity_key to $_activity_resident.id + ':' + _args[0]>>
+    <<if $_activity_management.affection_days[$_activity_key] isnot Time.days>>
+      <<npcincr $_activity_resident.id love 1>><<set $_activity_management.affection_days[$_activity_key] to Time.days>>
     <</if>>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-home-reaction'>>
-  <<set _room_resident to $Finance.real_estate.room_companion>>
-  <<if !_room_resident>><<exit>><</if>>
-  <<npc _room_resident>><<person1>>
-  <<switch _room_resident>>
+  <<set $_room_resident to $Finance.real_estate.room_companion>>
+  <<if !$_room_resident>><<exit>><</if>>
+  <<npc $_room_resident>><<person1>>
+  <<switch $_room_resident>>
     <<case 'Robin'>>
       <<if C.npc.Robin.trauma gte 20>>
         <<language>>

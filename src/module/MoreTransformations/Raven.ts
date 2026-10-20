@@ -152,7 +152,8 @@ class Raven extends Transformation {
   /** 日间鸟群共用每日互动次数，不打断追猎、昏厥或已排定的场景。 */
   public get available(): boolean {
     return (
-      ['forest', 'churchyard', 'park', 'forest_raven_shrine'].includes(V.location) &&
+      ['forest', 'churchyard', 'park'].includes(V.location) &&
+      (V.location !== 'park' || (Time.hour >= 7 && Time.hour < 10) || (Time.hour >= 16 && Time.hour < 19)) &&
       V.combat !== 1 &&
       !V.replayScene &&
       !V.statFreeze &&
@@ -299,6 +300,7 @@ class Raven extends Transformation {
     const impact = /<<violence ([1-9]\d*)>>(?=(?:(?!<<violence|<<bruise neck>>)[^\r\n])*<<hitstat>>)/g;
     const armour = "`maplebirch.get('MoreTransformations').Raven.armour`";
     const speech = "maplebirch.get('MoreTransformations').Raven.speech";
+
     maplebirch.tool.inject({
       widgetPassage: {
         'Widgets Combat Man-Combat': [

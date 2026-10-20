@@ -114,7 +114,7 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
     const orchard = maplebirch.get('Orchard');
     if (!orchard) return;
     const site = orchard.state.site;
-    if (!['temple', 'farm'].includes(site) || !orchard.available(site)) return;
+    if (!['temple', 'farm', 'shrine'].includes(site) || !orchard.available(site)) return;
     orchard.advance();
     const root = document.createElement('div');
     new OrchardView(orchard, site, root);

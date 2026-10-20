@@ -1,0 +1,245 @@
+:: Deadwood Reblooms Resident Bath Widgets [widget]
+<<widget 'deadwood-home-bath-occupied'>>
+  <<set _bathing to maplebirch.get('Finance').realEstate.life.bathing>>
+  <<language>>
+    <<option 'EN'>>
+      The bathroom door is closed. You hear running water inside. <<= _bathing.partner>> is having a wash.
+    <<option 'CN'>>
+      浴室的门关着，里面传来水声。<<print ({ Robin: '罗宾', Sydney: '悉尼', Kylar: '凯拉尔', Whitney: '惠特尼' })[_bathing.partner]>>正在洗澡。
+  <</language>><br><br>
+  <<capture _bathing>>
+  <<talkicon>><<lanLink ['Knock (0:01)', '敲门 (0:01)'] 'Deadwood Reblooms Property Resident Bath'>><<deadwood-home-bath-act 'knock' _bathing.partner>><</lanLink>><br>
+  <<if !pcAreArmsBound('any')>>
+    <<towelicon>><<lanLink ['Bring a clean towel (0:02)', '送条干净浴巾 (0:02)'] 'Deadwood Reblooms Property Resident Bath'>><<deadwood-home-bath-act 'towel' _bathing.partner>><</lanLink>><br>
+  <</if>>
+  <<if !pcAreArmsBound('any') and $Finance.real_estate.life.days['bath-intrude:' + maplebirch.get('Finance').realEstate.current.id + ':' + _bathing.partner] isnot Math.floor(Time.days)>>
+    <<set $skulduggerydifficulty to 300>>
+    <<crimeicon>><<lanLink ['Slip in quietly (0:03)', '悄悄溜进去 (0:03)'] 'Deadwood Reblooms Property Resident Bath'>><<deadwood-home-bath-act 'sneak' _bathing.partner>><</lanLink>><<skulduggerydifficulty>><br>
+    <<dooricon>><<lanLink ['Push the door open (0:01)', '直接推门进去 (0:01)'] 'Deadwood Reblooms Property Resident Bath'>><<deadwood-home-bath-act 'barge' _bathing.partner>><</lanLink>><br>
+  <</if>>
+  <<icon 'island-chair.png'>><<lanLink ['Wait outside', '在门外等候'] 'Deadwood Reblooms Property Resident Bath'>><<deadwood-home-bath-act 'wait' _bathing.partner>><</lanLink>>
+  (0:<<print String(_bathing.minutes).padStart(2, '0')>>)<br><br>
+  <</capture>>
+  <<deadwood-home-exit 'bathroom'>>
+<</widget>>
+
+<!-- 时间、洗浴和爱意只在点击回调结算，重绘、读档不重复发放。 -->
+<<widget 'deadwood-home-bath-act'>>
+  <<set _estate to maplebirch.get('Finance').realEstate>>
+  <<set _action to _args[0]>>
+  <<set _bathing to _estate.life.bathing>>
+  <<set $_previous to _estate.life.bath>>
+  <<set $_attempt to 'bath-intrude:' + _estate.current?.id + ':' + _bathing?.partner>>
+  <<set $_offended to 'bath-offended:' + _estate.current?.id + ':' + _bathing?.partner>>
+  <<if !_bathing || _args[1] isnot _bathing.partner || (['ask', 'join', 'greet', 'apologise'].includes(_action) && (!$_previous || $_previous.partner isnot _bathing.partner || $_previous.action is 'join'))>>
+    <<set $Finance.real_estate.life.bath to null>>
+  <<elseif (_action is 'towel' && pcAreArmsBound('any'))
+    || (['sneak', 'barge'].includes(_action) && (pcAreArmsBound('any') || $Finance.real_estate.life.days[$_attempt] is Math.floor(Time.days)))
+    || (_action is 'greet' && !$_previous.hidden)
+    || (_action is 'apologise' && (!$_previous.intruded || $_previous.action is 'apologise'))
+    || (_action is 'ask' && ($_previous.hidden || ($_previous.intruded && $_previous.action isnot 'apologise')))
+    || (_action is 'join' && ($_previous.action isnot 'ask' || !_estate.canIntimate(_bathing.partner, _estate.current.id, 'bath') || pcAreArmsBound('any') || ($_previous.intruded && C.npc[_bathing.partner].love lt 50)))>>
+    <<set $Finance.real_estate.life.bath to null>>
+  <<else>>
+    <<set $Finance.real_estate.life.bath to { property_id: _estate.current.id, partner: _bathing.partner, at: Time.date.timeStamp, until: _bathing.until, action: _action, first: false, intruded: $Finance.real_estate.life.days[$_offended] is Math.floor(Time.days) }>>
+    <<if ['sneak', 'barge'].includes(_action)>><<set $Finance.real_estate.life.days[$_attempt] to Math.floor(Time.days)>><</if>>
+    <<set $_duration to _action is 'wait' ? _bathing.minutes : { knock: 1, towel: 2, ask: 0, join: 10, sneak: 3, barge: 1, greet: 0, apologise: 0 }[_action]>>
+    <<if $_duration gt 0>><<pass $_duration>><</if>>
+    <<set _bath to _estate.life.bath>>
+    <<if _bath && ['sneak', 'barge'].includes(_action)>>
+      <<if Time.date.timeStamp gte _bath.until>>
+        <<set _bath.action to 'wait'>>
+      <<else>>
+        <<if _action is 'sneak'>>
+          <<set $skulduggerydifficulty to 300>><<skulduggerycheck 'silent'>><<skulduggeryuse>>
+          <<set _bath.hidden to $skulduggerysuccess is 1>>
+        <</if>>
+        <<set _bath.intruded to !_bath.hidden && _bath.partner isnot 'Kylar'>>
+        <<if _bath.intruded>>
+          <<set $Finance.real_estate.life.days[$_offended] to Math.floor(Time.days)>>
+          <<npcincr _bath.partner love -2>>
+        <</if>>
+      <</if>>
+    <</if>>
+    <<if _bath && ['towel', 'join'].includes(_action)>>
+      <<set _key to 'bath-help:' + _bath.property_id + ':' + _bath.partner>>
+      <<set _bath.first to $Finance.real_estate.life.days[_key] isnot Math.floor(Time.days)>>
+      <<if _bath.first>>
+        <<set $Finance.real_estate.life.days[_key] to Math.floor(Time.days)>>
+        <<npcincr _bath.partner love 1>><<stress -2>>
+      <</if>>
+      <<if _action is 'join'>>
+        <<strip>><<water>><<wash>><<stress -3>><<set $hygiene to 0>>
+        <<set $Finance.real_estate.life.days['bath-finished:' + _bath.property_id + ':' + _bath.partner] to Math.floor(Time.days)>>
+      <</if>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Property Resident Bath
+<<set _estate to maplebirch.get('Finance').realEstate>>
+<<set _bath to _estate.life.bath>>
+<<if !_bath>>
+  <<lanSwitch 'The water has stopped. There is no answer from the bathroom.' '水声已经停了，浴室里没有人回应。'>><br><br>
+  <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
+<<elseif _bath.hidden>>
+  <<run _estate.enter('bathroom')>><<effects>>
+  <<lanSwitch 'You ease the door open beneath the noise of the running water. The shower curtain is drawn. You stop by the door, unnoticed.' '你借着水声，轻轻推开了门。浴帘拉着，你停在门边，里面的人还没发现你。'>><br><br>
+  <<capture _bath>>
+    <<talkicon>><<lanLink ['Make yourself known', '出声打招呼'] 'Deadwood Reblooms Property Resident Bath'>><<deadwood-home-bath-act 'greet' _bath.partner>><</lanLink>><br>
+  <</capture>>
+  <<getouticon>><<lanLink ['Slip back out', '悄悄退出去'] 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
+<<else>>
+  <<run _estate.enter('bathroom')>><<effects>>
+  <<npc _bath.partner>><<person1>>
+  <<capture _bath>>
+  <<if ['barge', 'sneak'].includes(_bath.action)>>
+    <<if _bath.action is 'barge'>>
+      <<lanSwitch 'You push the bathroom door open without knocking. <<person>> turns sharply and reaches for a towel.' '你没敲门，直接推门走了进去。<<person>>猛地转过头，伸手扯过浴巾裹住身子。'>>
+    <<else>>
+      <<lanSwitch 'Your foot catches the edge of the bath mat. At the sound, <<person>> turns off the water and pulls a towel around <<himself>>.' '你的脚勾到了浴垫边缘。听见动静，<<person>>关掉水，扯过浴巾裹住身子。'>>
+    <</if>>
+  <<elseif _bath.action is 'apologise'>>
+    <<lanSwitch 'You step back to the door and apologise for coming in uninvited. <<person>> keeps the towel around <<himself>> while you speak.' '你退回门边，为没打招呼就进来道歉。<<person>>听着，仍把浴巾裹在身上。'>>
+  <<elseif _bath.action is 'greet'>>
+    <<lanSwitch 'You call out from the doorway. The water stops. A moment later, <<person>> draws the curtain aside, wrapped in a towel.' '你站在门边招呼了一声。水声停了，过了一会儿，<<person>>裹着浴巾拉开帘子。'>>
+  <<elseif _bath.action is 'wait'>>
+    <<language>>
+      <<option 'EN'>>
+        You wait until the water stops. A little later, <<person>> opens the door, wrapped in a towel.
+      <<option 'CN'>>
+        你在门外等了一会儿。水声停下后，<<person>>裹着浴巾走了出来。
+    <</language>>
+  <<elseif _bath.action is 'towel'>>
+    <<language>>
+      <<option 'EN'>>
+        You knock and offer a clean towel. <<person>> opens the door a crack, keeping the old towel wrapped around <<himself>>, and takes it.
+      <<option 'CN'>>
+        你敲了敲门，说自己送来了干净浴巾。<<person>>把门打开一道缝，裹紧身上的旧浴巾，伸手接了过去。
+    <</language>>
+  <<elseif _bath.action is 'ask'>>
+    <<lanSwitch 'You ask whether there is room for you, too.' '你问能不能一起洗。'>>
+  <<else>>
+    <<language>>
+      <<option 'EN'>>
+        You knock. The water stops, and <<person>> opens the door, holding a towel around <<himself>>.
+      <<option 'CN'>>
+        你敲了敲门。水声停了，<<person>>裹着浴巾把门打开。
+    <</language>>
+  <</if>><br><br>
+  <<if (_bath.intruded || ['barge', 'sneak'].includes(_bath.action)) && _bath.action isnot 'ask'>>
+    <<if !['barge', 'sneak', 'apologise'].includes(_bath.action)>>
+      <<lanSwitch '<<person>> keeps the towel close. <<He>> has not forgotten your sudden entrance.' '<<person>>仍把浴巾攥在身前，显然没忘记你刚才突然进门的事。'>>
+    <<else>>
+    <<switch _bath.partner>>
+      <<case 'Robin'>>
+        <<lanSwitch 'Robin grips the towel against <<his>> chest. "Please knock first. You frightened me." <<He>> watches you, still standing close to the bath.' '罗宾把浴巾攥在胸前。“下次先敲门好吗？吓了我一跳。”<<He>>看着你，仍贴着浴缸站着。'>>
+      <<case 'Sydney'>>
+        <<if C.npc.Sydney.corruption lt 10>>
+          <<lanSwitch '"The door was closed," Sydney says, pulling the towel tighter. "You could at least have asked."' '“门关着呢。”悉尼把浴巾拉紧了些。“至少先问一声吧。”'>>
+        <<else>>
+          <<lanSwitch '"Not even a knock?" Sydney looks you over. "Wait by the door while I finish."' '“连门都不敲了？”悉尼打量着你。“在门边等着。我还没洗完。”'>>
+        <</if>>
+      <<case 'Kylar'>>
+        <<lanSwitch 'Kylar startles, then relaxes when <<he>> recognises you. "Oh. It\'s you. You wanted to see me?" <<He>> glances past you to check the corridor.' '凯拉尔吓了一跳，看清是你后才放松下来。“哦，是你。你来找我？”<<He>>又朝你身后的走廊望了望。'>>
+      <<case 'Whitney'>>
+        <<lanSwitch '"Got some nerve." Whitney plants a wet hand against the doorframe. "Forgot how to knock?" <<He>> leaves you standing at the threshold.' '“胆子不小。”惠特尼把湿漉漉的手撑在门框上。“不会敲门？”<<He>>把你挡在了门口。'>>
+    <</switch>>
+    <</if>>
+    <<if ['barge', 'sneak'].includes(_bath.action) and _bath.intruded>><<llove>><</if>><br><br>
+  <<elseif _bath.action isnot 'ask'>>
+  <<switch _bath.partner>>
+    <<case 'Robin'>>
+      <<if C.npc.Robin.trauma >= 50>>
+        <<lanSwitch '"Could you give me a minute?" Robin keeps a hand on the door. You step back to give <<him>> some room.' '“能让我再待一会儿吗？”罗宾扶着门。你往后退了一步，给<<him>>留出些空处。'>>
+      <<elseif _bath.action is 'towel'>>
+        <<lanSwitch '"Thanks. This one is soaked." Robin smiles sheepishly. "I was wondering how to get back to the bedroom. These floors are cold."' '“谢谢。这条都湿透了。”罗宾有些不好意思地笑了。“刚才还在想怎么回卧室呢，地板好凉。”'>>
+      <<else>>
+        <<lanSwitch '"Were you waiting for me?" Robin smiles when <<he>> sees you. "I can move my things if you need the bathroom."' '“你在等我吗？”罗宾见到你，笑了起来。“要用浴室的话，我把东西收一收就好。”'>>
+      <</if>>
+    <<case 'Sydney'>>
+      <<if $sydney?.glasses is 'contacts'>>
+        <<lanSwitch 'Sydney wipes the water from <<his>> face. "Oh. It\'s you. Mind the floor; it\'s slippery." <<He>> hangs a damp cloth over the side of the bath.' '悉尼擦去脸上的水。“哦，是你。地上滑，小心点。”<<He>>把湿毛巾搭在浴缸边。'>>
+      <<elseif C.npc.Sydney.corruption < 10>>
+        <<lanSwitch 'Sydney blinks at you without <<his>> glasses. "Oh. It\'s you." <<He>> relaxes, then adjusts the towel. "I won\'t be long. I left my glasses by the sink. Please don\'t knock them off."' '悉尼没戴眼镜，眯着眼看了看你。“哦，是你。”<<He>>放松下来，又把浴巾拉好。“很快就洗好了。眼镜在洗手池旁边，小心别碰掉了。”'>>
+      <<else>>
+        <<lanSwitch '"You heard the water, didn\'t you?" Sydney smiles. "If you brought a towel, leave it where I can reach it." <<He>> nudges <<his>> glasses away from the wet edge of the sink.' '“听见水声才过来的？”悉尼笑了。“送浴巾的话，放在我够得着的地方就好。”<<He>>把洗手池旁的眼镜往里推了推，避开溅出来的水。'>>
+      <</if>>
+    <<case 'Kylar'>>
+      <<if C.npc.Kylar.rage >= 60>>
+        <<lanSwitch '"Who were you talking to?" Kylar peers past you, then looks back at your face. "Oh. You came to see me?" <<His>> grip on the door loosens.' '“你刚才在跟谁说话？”凯拉尔朝你身后看去，看清是你后才收回目光。“哦。你是来找我的？”<<He>>攥着门的手松开了些。'>>
+      <<else>>
+        <<lanSwitch '"I used the soap you left here." Kylar looks at you, searching your face. "It\'s all right, isn\'t it? I didn\'t use much."' '“我用了你放在这里的肥皂。”凯拉尔看着你的脸色。“可以的吧？没用掉多少。”'>>
+      <</if>>
+    <<case 'Whitney'>>
+      <<if _bath.action is 'towel'>>
+        <<lanSwitch '"About time." Whitney takes the towel. "The other one was soaked." <<He>> catches your wrist for a moment before letting go. "Don\'t get that look. I said thanks."' '“总算来了。”惠特尼接过浴巾。“那条都湿透了。”<<He>>捉住你的手腕，又松开。“看什么。我说谢谢了。”'>>
+      <<else>>
+        <<lanSwitch '"What? Can\'t wait?" Whitney pushes damp hair out of <<his>> face. "There\'s hot water left. Stop looking so surprised."' '“怎么，等不及了？”惠特尼把湿发拨到一边。“热水还没用完。至于这么看着我吗？”'>>
+      <</if>>
+  <</switch>>
+  <<if _bath.first>><<glove>><<lstress>><</if>><br><br>
+  <</if>>
+  <<if _bath.action is 'ask'>>
+    <<if _estate.life.bathing?.partner is _bath.partner && _estate.canIntimate(_bath.partner, _bath.property_id, 'bath') && !pcAreArmsBound('any') && (!_bath.intruded || C.npc[_bath.partner].love gte 50)>>
+      <<switch _bath.partner>>
+        <<case 'Robin'>>
+          <<lanSwitch '"Together?" Robin glances back at the bath. "All right. Let me move my things."' '“一起洗？”罗宾回头看了看浴缸。“好啊。等我把东西挪一挪。”'>>
+        <<case 'Sydney'>>
+          <<lanSwitch '"We can share. Mind the floor; it\'s slippery." Sydney makes room for you.' '“一起洗也行。地上滑，小心些。”悉尼往旁边让了让。'>>
+        <<case 'Kylar'>>
+          <<lanSwitch '"You want to stay with me?" Kylar quickly moves the soap aside. "Of course. Come in."' '“你想陪我？”凯拉尔赶紧把肥皂挪开。“当然可以。进来吧。”'>>
+        <<case 'Whitney'>>
+          <<lanSwitch '"Then get in. You\'re letting the steam out." Whitney steps aside.' '“那就进来。热气都让你放跑了。”惠特尼侧身让开。'>>
+      <</switch>><br><br>
+      <<bathroomicon 'bath'>><<lanLink ['Join <<him>> (0:10)', '一起洗澡 (0:10)'] 'Deadwood Reblooms Property Resident Bath Join'>><<deadwood-home-bath-act 'join' _bath.partner>><</lanLink>><<lstress>><br>
+    <<else>>
+      <<lanSwitch 'You decide to leave <<him>> some privacy.' '你决定让<<him>>一个人再待一会儿。'>><br><br>
+    <</if>>
+  <<elseif _estate.life.bathing?.partner is _bath.partner && !['wait', 'join'].includes(_bath.action)>>
+    <<if _bath.intruded && _bath.action isnot 'apologise'>>
+      <<talkicon>><<lanLink ['Step back and apologise', '退到门边道歉'] 'Deadwood Reblooms Property Resident Bath'>><<deadwood-home-bath-act 'apologise' _bath.partner>><</lanLink>><br>
+    <<else>>
+      <<talkicon>><<lanLink ['Ask to join <<him>>', '问能不能一起洗'] 'Deadwood Reblooms Property Resident Bath'>><<deadwood-home-bath-act 'ask' _bath.partner>><</lanLink>><br>
+    <</if>>
+  <</if>>
+  <<if _estate.life.bathing?.partner is _bath.partner>>
+    <<getouticon>><<lanLink ['Leave <<him>> to it', '让<<him>>继续洗'] 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
+  <<else>>
+    <<getouticon>><<lanLink ['Use the bathroom', '去用浴室'] 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
+  <</if>>
+  <</capture>>
+<</if>>
+
+:: Deadwood Reblooms Property Resident Bath Join
+<<set _estate to maplebirch.get('Finance').realEstate>>
+<<set _bath to _estate.life.bath>>
+<<if !_bath || _bath.action isnot 'join'>>
+  <<lanSwitch 'The bathroom is quiet again.' '浴室里已经安静下来了。'>><br><br>
+  <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Property Bathroom'>><</lanLink>>
+<<else>>
+  <<run _estate.enter('bathroom')>><<effects>>
+  <<npc _bath.partner>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      You leave your clothes somewhere dry and step into the warm water. There is just enough room for both of you.
+    <<option 'CN'>>
+      你把衣服放到干燥的地方，走进温水里。两个人挤了些，倒也容得下。
+  <</language>><br><br>
+  <<switch _bath.partner>>
+    <<case 'Robin'>>
+      <<lanSwitch 'Robin passes you the soap. "No queue," <<he>> says, smiling. "And no one banging on the door." You take turns washing, talking over the sound of the water.' '罗宾把肥皂递给你。“不用排队，也没人催着敲门。”<<He>>笑着说。你们轮流冲洗，隔着水声说了会儿话。'>>
+    <<case 'Sydney'>>
+      <<if C.npc.Sydney.corruption < 10>>
+        <<lanSwitch 'Sydney folds a towel and puts it out of reach of the water before joining you. "We should hang these up when we\'re done." <<He>> catches a bottle before your elbow can knock it over, and laughs.' '悉尼把浴巾叠好，放到水溅不到的地方，才挪到你身边。“洗完得把这些挂起来。”你差点用手肘碰倒瓶子，<<he>>赶忙接住，笑出了声。'>>
+      <<else>>
+        <<lanSwitch 'Sydney steals the soap from your hand, then gives it back when you hold your palm out. "I was using that." <<He>> grins, and moves so you can reach the water.' '悉尼从你手里拿走肥皂，见你摊开手，又放了回来。“刚才是我在用呢。”<<He>>笑着挪开身子，让你也能冲到水。'>>
+      <</if>>
+    <<case 'Kylar'>>
+      <<lanSwitch 'Kylar keeps close, even when there is room to move. "We can do this again, can\'t we?" <<He>> watches you nod, then finally remembers to rinse the soap from <<his>> hair.' '明明还有些空处，凯拉尔却一直挨着你。“以后也能这样吧？”见你点头，<<he>>才想起把头发上的泡沫冲干净。'>>
+    <<case 'Whitney'>>
+      <<lanSwitch 'Whitney reaches past you for the water. "Too cold?" <<He>> turns it warmer before you answer, then settles back. For once, neither of you has anywhere to hurry to.' '惠特尼越过你，拧了拧水龙头。“冷？”还没等你回答，<<he>>就把水调暖了些，靠了回去。眼下谁也不急着去别处。'>>
+  <</switch>>
+  <<if _bath.first>><<glove>><</if>><<lstress>><br><br>
+  <<towelicon>><<lanLink ['Get out and dry off', '起身擦干'] 'Deadwood Reblooms Property Bath Finish'>><</lanLink>>
+<</if>>

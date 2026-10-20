@@ -3,16 +3,16 @@
 <<widget 'deadwood-birdtower-resolve-activity'>>
   <!-- 只由原活动链接调用，记录本次耗材与同伴，结果页不再结算。 -->
   <<if !$childActivityEvent or $childActivityEvent.settled or $statFreeze or $replayScene or $combat or !$childRecords[$childActivityEvent.childid] or !childIsBorn($childRecords[$childActivityEvent.childid])>><<exit>><</if>>
-  <<set _activity_child to $childRecords[$childActivityEvent.childid]>>
-  <<set $childActivityEvent.settled to true, $childActivityEvent.ids to [_activity_child.childId]>>
+  <<set $_activity_child to $childRecords[$childActivityEvent.childid]>>
+  <<set $childActivityEvent.settled to true, $childActivityEvent.ids to [$_activity_child.childId]>>
   <<if !$childActivityEvent.recorded>>
-    <<childInteractedWith _activity_child.childId>><<set $childActivityEvent.recorded to true>>
+    <<childInteractedWith $_activity_child.childId>><<set $childActivityEvent.recorded to true>>
   <</if>>
-  <<set _activity_child.development.event to false>>
-  <<set _activity_stress to -5>>
+  <<set $_activity_child.development.event to false>>
+  <<set $_activity_stress to -5>>
   <<switch $childActivityEvent.event>>
     <<case 'Hawk_weather_cold'>>
-      <<set $childActivityEvent.ids to maplebirch.get('BirdTower').at(_activity_child.development.location).map(child => child.childId)>>
+      <<set $childActivityEvent.ids to maplebirch.get('BirdTower').at($_activity_child.development.location).map(child => child.childId)>>
       <<set $childActivityEvent.firepit to $bird.upgrades.firepit gte 1>>
       <<set $childActivityEvent.fuel to $childActivityEvent.firepit ? ($bird.materials.wood gte 1 ? 'wood' : $bird.materials.sticks gte 1 ? 'sticks' : null) : null>>
       <<if $childActivityEvent.fuel>>
@@ -21,33 +21,33 @@
         <<if Weather.bodyTemperature lt 37.5>><<set Weather.bodyTemperature to 37.5>><</if>>
         <<run Weather.Observables.checkForUpdate()>>
       <<else>>
-        <<set _activity_stress to $childActivityEvent.firepit ? 0 : 3>>
+        <<set $_activity_stress to $childActivityEvent.firepit ? 0 : 3>>
       <</if>>
-      <<set _activity_child.development.activity to 'sleeping'>>
+      <<set $_activity_child.development.activity to 'sleeping'>>
     <<case 'Hawk_weather_hot'>>
-      <<set _activity_others to maplebirch.get('BirdTower').at(_activity_child.development.location).filter(child => child.childId isnot _activity_child.childId and ['batheSelf', 'weather'].includes(child.development.activity))>>
-      <<set $childActivityEvent.ids to [_activity_child.childId].concat(_activity_others.map(child => child.childId))>>
-      <<run _activity_others.forEach(child => child.development.activity = 'rest')>>
+      <<set $_activity_others to maplebirch.get('BirdTower').at($_activity_child.development.location).filter(child => child.childId isnot $_activity_child.childId and ['batheSelf', 'weather'].includes(child.development.activity))>>
+      <<set $childActivityEvent.ids to [$_activity_child.childId].concat($_activity_others.map(child => child.childId))>>
+      <<run $_activity_others.forEach(child => child.development.activity = 'rest')>>
       <<if Weather.bodyTemperature gt 38>><<set Weather.bodyTemperature to 38>><</if>>
-      <<set _activity_child.development.activity to 'rest'>>
+      <<set $_activity_child.development.activity to 'rest'>>
     <<case 'Hawk_brood'>>
-      <<set _activity_child.development.activity to _activity_child.development.location is 'tower' ? 'sleepingWithGreatHawk' : 'rest'>>
+      <<set $_activity_child.development.activity to $_activity_child.development.location is 'tower' ? 'sleepingWithGreatHawk' : 'rest'>>
     <<case 'Hawk_rest'>>
       <<set $childActivityEvent.injured to $bird.injured gt 1>>
-      <<if $childActivityEvent.injured>><<set _activity_stress to 0>><</if>>
-      <<set _activity_child.development.activity to 'rest'>>
+      <<if $childActivityEvent.injured>><<set $_activity_stress to 0>><</if>>
+      <<set $_activity_child.development.activity to 'rest'>>
     <<case 'begHawk'>>
-      <<set _activity_stress to 0, _activity_child.development.activity to 'sleeping'>>
+      <<set $_activity_stress to 0, $_activity_child.development.activity to 'sleeping'>>
     <<case 'explore'>>
-      <<set _activity_child.development.activity to $childActivityEvent.roll is 3 and $bird.upgrades.firepit lt 1 ? 'batheSelf' : 'rest'>>
+      <<set $_activity_child.development.activity to $childActivityEvent.roll is 3 and $bird.upgrades.firepit lt 1 ? 'batheSelf' : 'rest'>>
     <<case 'Fledgling_preen'>>
-      <<set _activity_stress to -4, _activity_child.development.activity to 'rest'>>
+      <<set $_activity_stress to -4, $_activity_child.development.activity to 'rest'>>
     <<case 'Fledgling_fly'>>
-      <<set $childActivityEvent.roll to random(1,3), _activity_child.development.activity to 'rest'>>
+      <<set $childActivityEvent.roll to random(1,3), $_activity_child.development.activity to 'rest'>>
     <<case 'Fledgling_perch'>>
-      <<set $childActivityEvent.roll to random(1,2), _activity_child.development.activity to 'rest'>>
+      <<set $childActivityEvent.roll to random(1,2), $_activity_child.development.activity to 'rest'>>
     <<case 'Subadult_fly'>>
-      <<set $childActivityEvent.roll to random(1,4), _activity_child.development.activity to 'rest'>>
+      <<set $childActivityEvent.roll to random(1,4), $_activity_child.development.activity to 'rest'>>
     <<case 'Subadult_preen'>>
       <<set $childActivityEvent.preenHarpy to $harpy gte 6 and $transformationParts.bird.wings isnot 'hidden'>>
       <<if $childActivityEvent.preenHarpy>>
@@ -56,25 +56,25 @@
           <<set $daily.birdSelfPreen to 1, $bird.materials.feathers += 1>>
         <</if>>
       <<else>>
-        <<set $childActivityEvent.hair to _activity_child.development.stage is 'Immature' ? 'all down' : either('ruffled', 'bedhead')>>
+        <<set $childActivityEvent.hair to $_activity_child.development.stage is 'Immature' ? 'all down' : either('ruffled', 'bedhead')>>
         <<set $hairtype to $childActivityEvent.hair>>
       <</if>>
-      <<set _activity_child.development.activity to 'rest'>>
+      <<set $_activity_child.development.activity to 'rest'>>
     <<case 'Subadult_perch'>>
-      <<set _activity_others to maplebirch.get('BirdTower').at(_activity_child.development.location).filter(child => child.childId isnot _activity_child.childId and child.development.activity is 'Subadult_perch')>>
-      <<set $childActivityEvent.ids to [_activity_child.childId].concat(_activity_others.map(child => child.childId))>>
-      <<run _activity_others.forEach(child => child.development.activity = 'rest')>>
-      <<set $childActivityEvent.hunting to _activity_child.development.fed_daily lt 2 and _activity_child.development.location is 'otherNest'>>
-      <<set _activity_child.development.activity to $childActivityEvent.hunting ? 'hunting' : 'rest'>>
+      <<set $_activity_others to maplebirch.get('BirdTower').at($_activity_child.development.location).filter(child => child.childId isnot $_activity_child.childId and child.development.activity is 'Subadult_perch')>>
+      <<set $childActivityEvent.ids to [$_activity_child.childId].concat($_activity_others.map(child => child.childId))>>
+      <<run $_activity_others.forEach(child => child.development.activity = 'rest')>>
+      <<set $childActivityEvent.hunting to $_activity_child.development.fed_daily lt 2 and $_activity_child.development.location is 'otherNest'>>
+      <<set $_activity_child.development.activity to $childActivityEvent.hunting ? 'hunting' : 'rest'>>
       <<if $childActivityEvent.hunting>>
-        <<set _activity_child.development.timer to 30>>
-      <<elseif _activity_others.length>>
+        <<set $_activity_child.development.timer to 30>>
+      <<elseif $_activity_others.length>>
         <<trauma -5>>
       <</if>>
     <<case 'Hawk_weather_mild' 'Hawk_build'>>
-      <<set _activity_child.development.activity to 'rest'>>
+      <<set $_activity_child.development.activity to 'rest'>>
     <<default>>
-      <<set _activity_stress to 0>>
+      <<set $_activity_stress to 0>>
   <</switch>>
-  <<if _activity_stress>><<stress _activity_stress>><</if>>
+  <<if $_activity_stress>><<stress $_activity_stress>><</if>>
 <</widget>>

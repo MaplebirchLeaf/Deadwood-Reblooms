@@ -62,6 +62,8 @@ The daily selection aims for three legal jobs and one illegal job. Standing, loc
 3. Unload and deliver during the receiver's opening hours, then return for payment where required. Accepting or delivering a job alone is not recorded as money received.
 4. Return the cargo or cancel if you cannot continue, accepting the consequences shown. Illegal cargo may bring searches, seizure or conflict; ordinary deliveries can also go wrong.
 
+Drinks for the upstairs gambling room, pub uniforms, cafe supplies and dockside tools each have a one-in-four chance of someone causing trouble: a patron blocking the stairs, persistent unwanted attention, or a stranger demanding a handling charge. Wait where staff can see you for ten minutes, or use 400 Skulduggery to slip through the crowd in five. You can still leave or return the shipment. Clearing the obstruction does not reduce your fee, though time lost can make a delivery late. The complication is fixed when you accept the job; revisiting does not reroll it or repeat its settlement.
+
 Late delivery normally pays 75%. Unresolved shortages and price disputes also reduce payment, and both reductions can apply. Theft of a loaded vehicle, seized cargo and an expired grace period can prevent completion.
 
 ## Start with smaller jobs

@@ -28,10 +28,10 @@
       <<if _bountyCase.stage is 'settlement'>>
         <li class='green'><<lanSwitch 'The target has been handed over. Collect your reward at the station.' '目标已经移交，请到警局领取赏金。'>></li>
       <<else>>
-        <<set _bountyDate to new DateTime(_bountyCase.due), _bountySiteName to _bountyWork.terms.sites[_bountyCase.site].name>>
+        <<set $_bountyDate to new DateTime(_bountyCase.due), _bountySiteName to _bountyWork.terms.sites[_bountyCase.site].name>>
         <li><<lanSwitch 'Last reported near ' '最近出现于：'>><<= lanSwitch(_bountySiteName[0], _bountySiteName[1])>></li>
         <<if _bountyCase.stage isnot 'escort'>>
-          <li><<lanSwitch 'Follow this lead by ' '线索有效至：'>><<= lanSwitch(getFormattedDate(_bountyDate), _bountyDate.month + '月' + _bountyDate.day + '日')>> <<ampm _bountyDate.hour _bountyDate.minute>></li>
+          <li><<lanSwitch 'Follow this lead by ' '线索有效至：'>><<= lanSwitch(getFormattedDate($_bountyDate), $_bountyDate.month + '月' + $_bountyDate.day + '日')>> <<ampm $_bountyDate.hour $_bountyDate.minute>></li>
         <</if>>
         <<switch _bountyCase.stage>>
           <<case 'search'>>
@@ -547,8 +547,8 @@
 
 <!-- 同一车辆记录对应同一名在押目标，其它车辆及恋人同行不显示此提醒。 -->
 <<widget 'deadwood-street-bounty-transit'>>
-  <<set _transit_bounties to maplebirch.get('StreetLife')?.bounties, _transit_bounty to _transit_bounties?.state.active>>
-  <<if _transit_bounty?.stage is 'escort' and _transit_bounty.vehicle is _args[0] and !_transit_bounties.lost and _transit_bounties.vehicle.garage is null>>
+  <<set $_transit_bounties to maplebirch.get('StreetLife')?.bounties, _transit_bounty to $_transit_bounties?.state.active>>
+  <<if _transit_bounty?.stage is 'escort' and _transit_bounty.vehicle is _args[0] and !$_transit_bounties.lost and $_transit_bounties.vehicle.garage is null>>
     <span class='blue'> · <<lanSwitch 'Target aboard · Barb Street police station' '目标在车内 · 倒钩街警察局'>></span>
   <</if>>
 <</widget>>

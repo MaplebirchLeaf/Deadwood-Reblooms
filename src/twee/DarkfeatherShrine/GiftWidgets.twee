@@ -11,39 +11,33 @@
 <<widget 'deadwood-raven-gift-link'>>
   <<deadwood-raven-gift-context>>
   <<if _shrineGiftPerson>>
-    <<skinicon 'give'>><<lanLink ['Give Tsukihan something', '给月羽带点东西']>>
-      <<deadwood-raven-gift-context>>
-      <<if _shrineGiftPerson>><<goto 'Deadwood Raven Shrine Gifts'>><</if>>
-    <</lanLink>><br>
+    <<skinicon 'give'>><<lanLink ['Give Tsukihan something', '给月羽带点东西'] 'Deadwood Raven Shrine Gifts'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-raven-gift-give'>>
-  <<set _shrineOffered to $gift, _shrineGiftSource to $passage, _shrineGiftLocation to $location>>
+  <<set $_shrineOffered to $gift, _shrineGiftSource to $passage, _shrineGiftLocation to $location>>
   <<deadwood-raven-gift-context>>
   <<if !_shrineGiftReady or $passage isnot 'Deadwood Raven Shrine Gifts'
-    or !['dish', 'flower'].includes(setup.foodstuff[_shrineOffered]?.category) or ($foodstuff[_shrineOffered]?.amount ?? 0) lt 1>><<exit>><</if>>
-  <<if setup.foodstuff[_shrineOffered].category is 'dish' and !canGiftFood('Tsukihan')>><<exit>><</if>>
+    or !['dish', 'flower'].includes(setup.foodstuff[$_shrineOffered]?.category) or ($foodstuff[$_shrineOffered]?.amount ?? 0) lt 1>><<exit>><</if>>
+  <<if setup.foodstuff[$_shrineOffered].category is 'dish' and !canGiftFood('Tsukihan')>><<exit>><</if>>
   <<pass 5>><<deadwood-raven-gift-context>>
   <!-- 点击时与耗时后均检查；赠礼日次、库存扣除和喜好记录沿用原版。 -->
   <<if !_shrineGiftPerson or pcAreArmsBound('both') or $daily.giftedFood.Tsukihan isnot undefined
     or $passage isnot _shrineGiftSource or $location isnot _shrineGiftLocation
-    or !['dish', 'flower'].includes(setup.foodstuff[_shrineOffered]?.category) or ($foodstuff[_shrineOffered]?.amount ?? 0) lt 1>><<exit>><</if>>
-  <<if setup.foodstuff[_shrineOffered].category is 'dish' and !canGiftFood('Tsukihan')>><<exit>><</if>>
-  <<set $gift to _shrineOffered>><<give_gift 'Tsukihan'>>
-  <<set _shrineGiftLove to _shrineOffered is 'shortbread' or (_shrineOffered is 'valentines_chocolate' and $valentines) ? 3 : 1>>
-  <<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + _shrineGiftLove, 0, 100)>>
-  <<if _shrineOffered is 'shortbread'>><<saveFavoriteFood 'Tsukihan' _shrineOffered>><</if>>
-  <<goto 'Deadwood Raven Shrine Gift'>>
+    or !['dish', 'flower'].includes(setup.foodstuff[$_shrineOffered]?.category) or ($foodstuff[$_shrineOffered]?.amount ?? 0) lt 1>><<exit>><</if>>
+  <<if setup.foodstuff[$_shrineOffered].category is 'dish' and !canGiftFood('Tsukihan')>><<exit>><</if>>
+  <<set $gift to $_shrineOffered>><<give_gift 'Tsukihan'>>
+  <<set $_shrineGiftLove to $_shrineOffered is 'shortbread' or ($_shrineOffered is 'valentines_chocolate' and $valentines) ? 3 : 1>>
+  <<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + $_shrineGiftLove, 0, 100)>>
+  <<if $_shrineOffered is 'shortbread'>><<saveFavoriteFood 'Tsukihan' $_shrineOffered>><</if>>
 <</widget>>
 
 <<widget 'deadwood-raven-gift-return'>>
   <<if $location is 'raven_shrine_house'>>
-    <<getouticon>><<lanLink ['Return to the room', '回到房里']>>
-      <<deadwood-raven-home-context>>
-      <<if _shrineHomeTravel and $location is 'raven_shrine_house'>><<goto 'Deadwood Raven Shrine Room'>><</if>>
+    <<getouticon>><<lanLink ['Return to the room', '回到房里'] 'Deadwood Raven Shrine Room'>>
+      <<set $MoreTransformations.shrine.scene to '', $MoreTransformations.shrine.step to ''>>
     <</lanLink>><br>
-    <<deadwood-raven-home-return>>
   <<else>>
     <<deadwood-raven-shrine-return 'veranda'>>
   <</if>>

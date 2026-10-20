@@ -17,9 +17,18 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
 
   maplebirch.tool.inject({
     locationPassage: {
-      // 只扩展安全事件池；普通菜单的地点说明后、湖泊等目的地前，保留原版行进结算。
-      Forest: [{ srcmatch: /<<elseif \$eventskip gte 1>>[^<]*<br><br>/g, applyafter: '\n\t\t<<deadwood-raven-link>><<deadwood-raven-shrine-path>>\n', expected: 5 }],
-      Park: [{ src: '<<if $leftleg is "bound" or $rightleg is "bound">>', applybefore: '<<deadwood-raven-link>>\n', expected: 1 }]
+      // 神社参道接在地点说明后；手动找鸟只放在老教堂墓地的岔路口。
+      Forest: [
+        { srcmatch: /<<elseif \$eventskip gte 1>>[^<]*<br><br>/g, applyafter: '\n\t\t<<deadwood-raven-shrine-path>>\n', expected: 5 },
+        { src: '<<if $forest gte 10 and $forest lte 14>>', applyafter: '\n\t\t<<deadwood-raven-link>>', expected: 1 }
+      ],
+      Park: [
+        {
+          src: '<<if $leftleg is "bound" or $rightleg is "bound">>',
+          applybefore: '<<icon "raven-shrine/bench.png">><<lanLink ["Sit on a park bench", "到公园长椅上坐坐"] "Deadwood Park Bench">><</lanLink>><br>\n',
+          expected: 1
+        }
+      ]
     },
     widgetPassage: {
       'Widgets Mirror': [

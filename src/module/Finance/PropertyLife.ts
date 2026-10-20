@@ -8,6 +8,16 @@ type Activity = 'meal' | 'tea' | 'tidy' | 'music' | 'film' | 'wine';
 
 export interface PropertyLifeState {
   days: Record<string, number>;
+  bath: {
+    property_id: string;
+    partner: string;
+    at: number;
+    until: number;
+    action: 'knock' | 'towel' | 'ask' | 'wait' | 'join' | 'barge' | 'sneak' | 'greet' | 'apologise';
+    first: boolean;
+    hidden?: boolean;
+    intruded?: boolean;
+  } | null;
   scene: {
     property_id: string;
     action: Activity;
@@ -41,7 +51,7 @@ const minutes: Record<Activity, number> = { meal: 20, tea: 15, tidy: 20, music: 
 
 /** 保存居家活动与当天机会，原版食物、技能与时间由点击回调结算。 */
 export default class PropertyLife {
-  public static readonly defaults: PropertyLifeState = { days: {}, scene: null, daily_day: -1, daily: null };
+  public static readonly defaults: PropertyLifeState = { days: {}, bath: null, scene: null, daily_day: -1, daily: null };
 
   public constructor(
     private readonly estate: RealEstate,
@@ -57,8 +67,32 @@ export default class PropertyLife {
 
   public preInit(): void {
     this.core.on(':passagestart', () => {
+      if (!this.core.passage.title.startsWith('Deadwood Reblooms Property Resident Bath') && V.Finance?.real_estate?.life) V.Finance.real_estate.life.bath = null;
       if (this.core.passage.title === 'Deadwood Reblooms Property Home') this.arrive();
     });
+  }
+
+  public get bathing(): { partner: string; until: number; minutes: number } | undefined {
+    const property = this.estate.current;
+    if (!property || V.replayScene || V.statFreeze || V.combat || V.possessed || V.nextPassage || V.nextPassageCheck) return;
+    const now = Time.hour * 60 + Time.minute;
+    const resident = this.estate.residentsHome(property.id).find(profile => {
+      if (C.npc[profile.id]?.init !== 1 || !['active', 'rescued'].includes(C.npc[profile.id].state)) return false;
+      if (profile.id === 'Robin' && (V.robinmissing || V.robin.timer.hurt > 0)) return false;
+      const start = profile.bath.hour * 60 + profile.bath.minute;
+      return now >= start && now < start + profile.bath.duration && this.state.days[`bath-finished:${property.id}:${profile.id}`] !== Math.floor(Time.days);
+    });
+    if (!resident) return;
+    const minutes = resident.bath.hour * 60 + resident.bath.minute + resident.bath.duration - now;
+    return { partner: resident.id, until: Time.date.timeStamp + minutes * 60 - Time.date.second, minutes };
+  }
+
+  public get bath(): PropertyLifeState['bath'] | undefined {
+    const bath = this.state.bath;
+    if (!bath || bath.property_id !== this.estate.current?.id || V.replayScene || V.statFreeze || V.combat || V.possessed || V.nextPassage || V.nextPassageCheck) return;
+    if (C.npc[bath.partner]?.init !== 1 || !['active', 'rescued'].includes(C.npc[bath.partner].state) || (bath.partner === 'Robin' && (V.robinmissing || V.robin.timer.hurt > 0))) return;
+    if (Time.date.timeStamp < bath.at || Time.date.timeStamp > bath.until + 600 || !this.estate.residentsHome(bath.property_id).some(profile => profile.id === bath.partner)) return;
+    return bath;
   }
 
   public get daily(): PropertyLifeState['daily'] {
@@ -73,7 +107,8 @@ export default class PropertyLife {
     if (outings.note || outings.memory || outings.offer || outings.waiting || outings.travelling || this.estate.banquet.active) return false;
     if (this.estate.managementFor(property.id).auction_day !== null) return false;
     if (daily.kind === 'staff') return !!daily.role && this.estate.staff.active(daily.role) && !!V.per_npc?.[this.estate.staff.key(daily.role)];
-    if (daily.kind === 'resident') return !!daily.partner && this.estate.residentsHome(property.id).some(resident => resident.id === daily.partner) && this.free(daily.partner, 10);
+    if (daily.kind === 'resident')
+      return !!daily.partner && daily.partner !== this.bathing?.partner && this.estate.residentsHome(property.id).some(resident => resident.id === daily.partner) && this.free(daily.partner, 10);
     return true;
   }
 
@@ -133,6 +168,7 @@ export default class PropertyLife {
     if (!property || !rooms.includes(V.passage) || V.replayScene || V.statFreeze || V.combat || window.pcAreArmsBound('both') || this.estate.managementFor(property.id).auction_day !== null)
       return false;
     const partner = V.Finance.real_estate.room_companion;
+    if (partner && partner === this.bathing?.partner) return false;
     if (partner && !this.estate.residentsHome(property.id).some(resident => resident.id === partner)) return false;
     if (partner && !this.free(partner, minutes[action])) return false;
     if (['meal', 'tea'].includes(action) && !partner) return false;
@@ -191,6 +227,7 @@ export default class PropertyLife {
   }
 
   public clear(id: string): void {
+    if (this.state.bath?.property_id === id) this.state.bath = null;
     if (this.state.scene?.property_id === id) this.state.scene = null;
     if (this.state.daily?.property === id) this.state.daily = null;
   }

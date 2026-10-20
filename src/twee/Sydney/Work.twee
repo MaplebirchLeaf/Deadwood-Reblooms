@@ -7,7 +7,7 @@
     and $exposed lt 1 and !pcAreArmsBound('both') and $stress lt $stressmax
     and !$combat and !$possessed and !$replayScene and !$statFreeze
     and !$nextPassage and !$nextPassageCheck and !$eventforced and !isPregnancyEnding()
-    and $SydneyExpansion[_args[0] + 'Day'] isnot Time.days>>
+    and (_args[1] is 'followup' ? $SydneyExpansion[_args[0] + 'Day'] is Time.days : $SydneyExpansion[_args[0] + 'Day'] isnot Time.days)>>
   <<if _workTogether and !_args[1]>>
     <<set _workTogether to Time.dayState isnot 'night' and V['temple_' + _args[0]] lt 100
       and (_args[0] is 'garden' ? Time.hour gte 7 and Time.hour lt 10 : Time.hour gte 17 and Time.hour lt 20)>>
@@ -19,7 +19,7 @@
   <<deadwood-reblooms-sydney-work-check 'garden'>>
 <</silently>><<if _workTogether>>
   <<templeicon 'garden'>>
-  <<lanLink ['Tend the garden with Sydney (1:00)', '和悉尼一起打理花园 (1:00)']>>
+  <<lanLink ['Tend the garden with Sydney (1:00)', '和悉尼一起打理花园 (1:00)'] 'Deadwood Reblooms Sydney Garden Work'>>
     <<deadwood-reblooms-sydney-work-check 'garden'>>
     <<if _workTogether>>
       <<set _cleaningSource to $passage, _cleaningDay to Time.days>>
@@ -32,7 +32,6 @@
         <<set $temple_garden to Math.min(100, $temple_garden + 6)>>
         <<grace 1 monk>><<tiredness 6>><<tending 1>>
         <<set $phase to 'sydney-garden-work'>>
-        <<goto 'Deadwood Reblooms Sydney Garden Work'>>
       <</if>>
     <</if>>
   <</lanLink>><<gtending>><<ggrace monk>><<gtiredness>><br>
@@ -42,7 +41,7 @@
   <<deadwood-reblooms-sydney-work-check 'quarters'>>
 <</silently>><<if _workTogether>>
   <<choreicon 'sweep'>>
-  <<lanLink ['Tidy the quarters with Sydney (1:00)', '和悉尼一起整理宿舍 (1:00)']>>
+  <<lanLink ['Tidy the quarters with Sydney (1:00)', '和悉尼一起整理宿舍 (1:00)'] 'Deadwood Reblooms Sydney Quarters Work'>>
     <<deadwood-reblooms-sydney-work-check 'quarters'>>
     <<if _workTogether>>
       <<set _cleaningSource to $passage, _cleaningDay to Time.days>>
@@ -55,7 +54,6 @@
         <<set $temple_quarters to Math.min(100, $temple_quarters + 6)>>
         <<grace 1 monk>><<housekeeping 1 1000>>
         <<set $phase to 'sydney-quarters-work'>>
-        <<goto 'Deadwood Reblooms Sydney Quarters Work'>>
       <</if>>
     <</if>>
   <</lanLink>><<ghousekeeping>><<ggrace monk>><br>
@@ -72,9 +70,9 @@
 <</if>><</widget>>
 
 :: Deadwood Reblooms Sydney Garden Work
-<<set $outside to 1>><<set $location to 'temple'>><<temple_effects>><<effects>>
+<<set $outside to 1>><<set $location to 'temple'>><<temple_effects>><<effects>><<deadwood-reblooms-sydney-work-check 'garden' 'followup'>>
 <<if $phase isnot 'sydney-garden-work'
-  or !maplebirch.get('Sydney').available>>
+  or !_workTogether>>
   <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
   <<unset $phase>>
@@ -102,7 +100,7 @@
       <</if>>
   <</language>>
   <br><br>
-  <<socialiseicon>><<lanLink ['Help Sydney put away the garden tools (0:10)', '帮悉尼收好园艺工具 (0:10)'] 'Deadwood Reblooms Sydney Garden Help'>><<set $phase to 'sydney-garden-help'>><<pass 10>><</lanLink>><br>
+  <<icon 'temple/garden-tools.png'>><<lanLink ['Help Sydney put away the garden tools (0:10)', '帮悉尼收好园艺工具 (0:10)'] 'Deadwood Reblooms Sydney Garden Help'>><<set $phase to 'sydney-garden-help'>><<pass 10>><</lanLink>><br>
   <<if maplebirch.get('Sydney').canTease>>
     <<loveicon>><<lanLink ['Tease Sydney while no one is looking (0:10)', '趁四下无人调戏悉尼 (0:10)'] 'Deadwood Reblooms Sydney Garden Tease'>><<set $phase to 'sydney-garden-tease'>><<pass 10>><</lanLink>><<promiscuous2>><br>
   <</if>>
@@ -111,9 +109,9 @@
 <<lanLink ["Continue","继续"] 'Temple Garden'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Garden Help
-<<set $outside to 1>><<set $location to 'temple'>><<temple_effects>><<effects>>
+<<set $outside to 1>><<set $location to 'temple'>><<temple_effects>><<effects>><<deadwood-reblooms-sydney-work-check 'garden' 'followup'>>
 <<if $phase isnot 'sydney-garden-help'
-  or !maplebirch.get('Sydney').available or pcAreArmsBound('both')>>
+  or !_workTogether or pcAreArmsBound('both')>>
   <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
   <<unset $phase>>
@@ -137,9 +135,9 @@
 <<lanLink ["Continue","继续"] 'Temple Garden'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Garden Tease
-<<set $outside to 1>><<set $location to 'temple'>><<temple_effects>><<effects>>
+<<set $outside to 1>><<set $location to 'temple'>><<temple_effects>><<effects>><<deadwood-reblooms-sydney-work-check 'garden' 'followup'>>
 <<if $phase isnot 'sydney-garden-tease'
-  or !maplebirch.get('Sydney').available or !maplebirch.get('Sydney').canTease>>
+  or !_workTogether or !maplebirch.get('Sydney').canTease>>
   <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
   <<unset $phase>>
@@ -182,9 +180,9 @@
 <<if _sydneyAvailable is undefined>>
   <<sydneySchedule>>
 <</if>>
-<<temple_effects>><<effects>>
+<<temple_effects>><<effects>><<deadwood-reblooms-sydney-work-check 'quarters' 'followup'>>
 <<if $phase isnot 'sydney-quarters-work'
-  or !maplebirch.get('Sydney').available>>
+  or !_workTogether>>
   <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
   <<unset $phase>>
@@ -215,7 +213,7 @@
   <<if _dormAccess>>
     <<wardrobeicon>><<lanLink ['Help Sydney put away the robes', '帮悉尼收好修道袍'] 'Deadwood Reblooms Sydney Dorm Wardrobe'>><</lanLink>><br>
   <<else>>
-    <<socialiseicon>><<lanLink ['Help Sydney put away the laundry (0:10)', '帮悉尼收好衣物 (0:10)'] 'Deadwood Reblooms Sydney Quarters Help'>><<set $phase to 'sydney-quarters-help'>><<pass 10>><</lanLink>><br>
+    <<icon 'temple/folded-laundry.png'>><<lanLink ['Help Sydney put away the laundry (0:10)', '帮悉尼收好衣物 (0:10)'] 'Deadwood Reblooms Sydney Quarters Help'>><<set $phase to 'sydney-quarters-help'>><<pass 10>><</lanLink>><br>
   <</if>>
   <<if maplebirch.get('Sydney').canTease>>
     <<loveicon>><<lanLink ['Tease Sydney in the corridor (0:10)', '在走廊里调戏悉尼 (0:10)'] 'Deadwood Reblooms Sydney Quarters Tease'>><<set $phase to 'sydney-quarters-tease'>><<pass 10>><</lanLink>><<promiscuous2>><br>
@@ -320,9 +318,9 @@
 <<lanLink ["Continue","继续"] 'Temple'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Quarters Help
-<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
+<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>><<deadwood-reblooms-sydney-work-check 'quarters' 'followup'>>
 <<if $phase isnot 'sydney-quarters-help'
-  or !maplebirch.get('Sydney').available or pcAreArmsBound('both')>>
+  or !_workTogether or pcAreArmsBound('both')>>
   <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
   <<unset $phase>>
@@ -342,9 +340,9 @@
 <<lanLink ["Continue","继续"] 'Temple Quarters'>><</lanLink>>
 
 :: Deadwood Reblooms Sydney Quarters Tease
-<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>>
+<<set $outside to 0>><<set $location to 'temple'>><<temple_effects>><<effects>><<deadwood-reblooms-sydney-work-check 'quarters' 'followup'>>
 <<if $phase isnot 'sydney-quarters-tease'
-  or !maplebirch.get('Sydney').available or !maplebirch.get('Sydney').canTease>>
+  or !_workTogether or !maplebirch.get('Sydney').canTease>>
   <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
   <<unset $phase>>

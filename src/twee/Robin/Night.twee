@@ -2,20 +2,25 @@
 <<widget 'deadwood-robin-night-context'>>
   <<set _robinNight to maplebirch.get('Robin')>>
   <<set _robinNightSafe to _robinNight?.available and C.npc.Robin.state is 'active' and $location is 'home'
-    and !$combat and !$replayScene and !$statFreeze and !$nextPassage and !$nextPassageCheck
+    and !$combat and !$possessed and !$replayScene and !$statFreeze and !$nextPassage and !$nextPassageCheck
+    and !$eventforced and !isPregnancyEnding()
     and !maplebirch.get('Finance')?.realEstate.residenceOf('Robin') and getRobinLocation() is 'sleep'>>
   <<set _robinNightPending to _robinNightSafe and $RobinExpansion.night_day gte 0
     and $RobinExpansion.night_outcome_day isnot $RobinExpansion.night_day
     and (Time.days is $RobinExpansion.night_day or (Time.days is $RobinExpansion.night_day + 1 and Time.hour is 0))>>
 <</widget>>
 
+<<widget 'deadwood-robin-night-return'>>
+  <<getouticon>><<lanLink ['Return to the hall', '返回大厅'] 'Orphanage'>><</lanLink>><br>
+<</widget>>
+
 :: Deadwood Robin Night Knock
 <<effects>><<deadwood-robin-night-context>>
-<<if !_robinNightSafe>><<exit>><</if>>
+<<if !_robinNightSafe>><<deadwood-robin-night-return>><<exit>><</if>>
 <<set $outside to 0>>
 <<if _robinNight.night.start()>>
   <<set _robinNightSource to $passage>><<pass 5>><<deadwood-robin-night-context>>
-  <<if !_robinNightSafe or $passage isnot _robinNightSource>><<exit>><</if>>
+  <<if !_robinNightSafe or $passage isnot _robinNightSource>><<deadwood-robin-night-return>><<exit>><</if>>
   <<npc Robin>><<person1>>
   <<lanSwitch 'You knock softly. The note says Robin is sleeping, so you wait without touching the handle. After a moment Robin opens the door just enough to see you.' '你轻轻敲门。纸条上写着罗宾已经睡了，你便等在门外，没有碰门把手。片刻后，罗宾把门打开一条缝。'>>
   <br><br><span class='blue'><<lanSwitch '"Is something wrong?" Robin asks, then steps back to let you speak.' '“出什么事了吗？”罗宾问，然后退开一步，等你开口。'>></span>
@@ -57,7 +62,7 @@
     <<if !pcAreArmsBound('both')>><<handholdingvirginitywarning>><</if>>
   <</if>>
   <<if ($RobinExpansion.shop_stage isnot 'none' or $RobinExpansion.shop) and (!$RobinExpansion.rebellion or $RobinExpansion.bailey_defeated) and C.npc.Robin.trauma lt 50>>
-    <br><<shopicon 'register'>><<lanLink ['Press Robin to keep working (0:10)', '催罗宾继续核账 (0:10)'] 'Deadwood Robin Night Push'>><</lanLink>>
+    <br><<icon 'robin/robin-ledger.png'>><<lanLink ['Press Robin to keep working (0:10)', '催罗宾继续核账 (0:10)'] 'Deadwood Robin Night Push'>><</lanLink>>
   <</if>>
   <br><br><<getouticon>><<lanLink ['Say good night and leave', '道声晚安并离开'] 'Orphanage'>><<endevent>><</lanLink>>
 <<else>>
@@ -67,11 +72,11 @@
 
 :: Deadwood Robin Night Listen
 <<effects>><<deadwood-robin-night-context>>
-<<if !_robinNightSafe>><<exit>><</if>>
+<<if !_robinNightSafe>><<deadwood-robin-night-return>><<exit>><</if>>
 <<set $outside to 0>>
 <<if _robinNightPending>>
   <<set _robinNightSource to $passage>><<pass 15>><<deadwood-robin-night-context>>
-  <<if !_robinNightPending or $passage isnot _robinNightSource or !_robinNight.night.finish()>><<exit>><</if>>
+  <<if !_robinNightPending or $passage isnot _robinNightSource or !_robinNight.night.finish()>><<deadwood-robin-night-return>><<exit>><</if>>
   <<npc Robin>><<person1>>
   <<if C.npc.Robin.trauma gte 50>>
     <<lanSwitch 'You stay by the open door and listen. Robin speaks in short pieces about the day, then asks you to leave the hall light on. You agree.' '你留在敞开的门边听着。罗宾断断续续地讲起今天，随后请你把走廊灯留着。你答应了。'>>
@@ -114,11 +119,11 @@
 
 :: Deadwood Robin Night Tomorrow
 <<effects>><<deadwood-robin-night-context>>
-<<if !_robinNightSafe>><<exit>><</if>>
+<<if !_robinNightSafe>><<deadwood-robin-night-return>><<exit>><</if>>
 <<set $outside to 0>>
 <<if _robinNightPending>>
   <<set _robinNightSource to $passage>><<pass 15>><<deadwood-robin-night-context>>
-  <<if !_robinNightPending or $passage isnot _robinNightSource or !_robinNight.night.finish()>><<exit>><</if>>
+  <<if !_robinNightPending or $passage isnot _robinNightSource or !_robinNight.night.finish()>><<deadwood-robin-night-return>><<exit>><</if>>
   <<npc Robin>><<person1>>
   <<if C.npc.Robin.trauma gte 50>>
     <<lanSwitch 'You ask what would make tomorrow easier. Robin thinks for a moment and chooses just one thing: to start with breakfast together. You write it down and leave the rest for daylight.' '你问明天怎样能轻松些。罗宾想了一会，只挑了一件事：一起吃早饭。你把它记下，其他事情留到天亮再说。'>>
@@ -150,13 +155,13 @@
 
 :: Deadwood Robin Night Stay
 <<effects>><<deadwood-robin-night-context>>
-<<if !_robinNightSafe>><<exit>><</if>>
+<<if !_robinNightSafe>><<deadwood-robin-night-return>><<exit>><</if>>
 <<set $outside to 0>>
 <<if $robinromance is 1 and C.npc.Robin.love gte 50 and C.npc.Robin.trauma lt 50
   and _robinNightPending>>
   <<set _robinNightSource to $passage>><<pass 20>><<deadwood-robin-night-context>>
   <<if !_robinNightPending or $passage isnot _robinNightSource or $robinromance isnot 1
-    or C.npc.Robin.love lt 50 or C.npc.Robin.trauma gte 50 or !_robinNight.night.finish()>><<exit>><</if>>
+    or C.npc.Robin.love lt 50 or C.npc.Robin.trauma gte 50 or !_robinNight.night.finish()>><<deadwood-robin-night-return>><<exit>><</if>>
   <<npc Robin>><<person1>>
   <<language>>
     <<option 'EN'>>
@@ -183,11 +188,11 @@
   <<if !pcAreArmsBound('both')>><<takeHandholdingVirginity 'Robin' 'romantic'>><</if>>
   <<npcincr Robin love 2>><<npcincr Robin trauma -2>><<stress -8>><<glove>><<lrtrauma>><<lstress>>
   <<if !pcAreArmsBound('both')>>
-    <br><br><<loveicon>><<lanLink ['Stay the night with Robin', '今晚留下来陪罗宾']>>
+    <br><br><<loveicon>><<lanLink ['Stay the night with Robin', '今晚留下来陪罗宾'] 'Robin Room Bed Intro'>>
       <<deadwood-robin-night-context>>
-      <<if _robinNightSafe and $passage is 'Deadwood Robin Night Stay' and $robinromance is 1
-        and C.npc.Robin.love gte 50 and C.npc.Robin.trauma lt 50 and !pcAreArmsBound('both')>>
-        <<goto 'Robin Room Bed Intro'>>
+      <<if !_robinNightSafe or $passage isnot 'Deadwood Robin Night Stay' or $robinromance isnot 1
+        or C.npc.Robin.love lt 50 or C.npc.Robin.trauma gte 50 or pcAreArmsBound('both')>>
+        <<if !$nextPassage>><<set $nextPassage to 'Orphanage'>><</if>>
       <</if>>
     <</lanLink>><br>
   <</if>>
@@ -198,11 +203,11 @@
 
 :: Deadwood Robin Night Push
 <<effects>><<deadwood-robin-night-context>>
-<<if !_robinNightSafe>><<exit>><</if>>
+<<if !_robinNightSafe>><<deadwood-robin-night-return>><<exit>><</if>>
 <<set $outside to 0>>
 <<if _robinNightPending>>
   <<set _robinNightSource to $passage>><<pass 10>><<deadwood-robin-night-context>>
-  <<if !_robinNightPending or $passage isnot _robinNightSource or !_robinNight.night.finish()>><<exit>><</if>>
+  <<if !_robinNightPending or $passage isnot _robinNightSource or !_robinNight.night.finish()>><<deadwood-robin-night-return>><<exit>><</if>>
   <<npc Robin>><<person1>>
   <<lanSwitch 'You point to the unfinished figures. Robin tries to work through them, but writes the same number twice.' '你指着尚未算完的数字。罗宾试着继续，却把同一个数抄了两遍。'>>
   <br><br><span class='red'><<lanSwitch '"I can do it in the morning," Robin says, closing the ledger.' '“我早上能做。”罗宾合上账本。'>></span>

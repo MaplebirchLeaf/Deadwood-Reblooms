@@ -39,8 +39,11 @@ class MoreTransformations extends Module {
         close: -1,
         confessed: false,
         home_invited: false,
+        home_sneaking: false,
         home_time: -1,
         home_action: '',
+        rain_at: -1,
+        bathed_at: -1,
         favour: -1,
         favour_result: '',
         favour_late: false,
@@ -51,7 +54,9 @@ class MoreTransformations extends Module {
         step: '',
         memory: '',
         action: '',
-        donations: 0
+        donations: 0,
+        wish: { count: 0, kind: '', day: -1, ready: false, returned: false, shared: false },
+        harvests: 0
       }
     });
     this.Whale = new Whale();

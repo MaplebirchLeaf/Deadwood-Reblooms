@@ -22,7 +22,7 @@ import {
   type OrchardFruit
 } from './Orchard/Species';
 
-export type OrchardSite = 'temple' | 'farm';
+export type OrchardSite = keyof typeof orchardSites;
 export type OrchardTool = 'plant' | 'water' | 'fertiliser' | 'harvest' | 'shovel';
 
 export interface OrchardTree {
@@ -129,6 +129,7 @@ interface OrchardState {
   };
   temple: (OrchardTree | null)[];
   farm: (OrchardTree | null)[];
+  shrine: (OrchardTree | null)[];
 }
 
 const defaults: OrchardState = {
@@ -162,14 +163,15 @@ const defaults: OrchardState = {
   seed_expenses: 0,
   seed: 'apple',
   known: [],
-  soil: { temple: [], farm: [] },
-  unlocked: { temple: false, farm: false },
-  clearing: { temple: [], farm: [] },
+  soil: { temple: [], farm: [], shrine: [] },
+  unlocked: { temple: false, farm: false, shrine: false },
+  clearing: { temple: [], farm: [], shrine: [] },
   help_day: -1,
   irrigation_since: -1,
   worker: { hired: false, paid_from: 0, paid_until: 0, last_shift: -1, pick: false, fertilise: false, quit_day: -1, quit_name: '' },
   temple: Array(orchardSites.temple.plots).fill(null),
-  farm: Array(orchardSites.farm.plots).fill(null)
+  farm: Array(orchardSites.farm.plots).fill(null),
+  shrine: Array(orchardSites.shrine.plots).fill(null)
 };
 
 class Orchard extends Module {
@@ -248,7 +250,14 @@ class Orchard extends Module {
 
   private get canTrade(): boolean {
     return (
-      !V.statFreeze && !V.replayScene && V.exposed <= 0 && V.stress < V.stressmax && V.combat !== 1 && !V.gag && !window.pcAreArmsBound('both') && (this.available('farm') || this.available('temple'))
+      !V.statFreeze &&
+      !V.replayScene &&
+      V.exposed <= 0 &&
+      V.stress < V.stressmax &&
+      V.combat !== 1 &&
+      !V.gag &&
+      !window.pcAreArmsBound('both') &&
+      (this.available('farm') || this.available('temple') || this.available('shrine'))
     );
   }
 
@@ -280,7 +289,8 @@ class Orchard extends Module {
     this.state.last_supply_day = Time.days;
     this.state.restock_credit = trade.restockDiscount;
     this.recordSale(order.type, order.amount, income, 'shop');
-    if ([...this.state.temple, ...this.state.farm].some(tree => tree?.species === order.type && tree.harvests > 0)) this.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood Orchard Supply">>');
+    if ([...this.state.temple, ...this.state.farm, ...this.state.shrine].some(tree => tree?.species === order.type && tree.harvests > 0))
+      this.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood Orchard Supply">>');
     this.core.SugarCube.Wikifier.wikifyEval('<<npcincr Robin love 1>>');
     return true;
   }
@@ -418,10 +428,30 @@ class Orchard extends Module {
 
   /** 果实使用原版食品目录，果树不写入原版作物地块。 */
   public available(site: OrchardSite): boolean {
+    if (site === 'shrine')
+      return (
+        this.state.unlocked.shrine &&
+        !!this.core.get('MoreTransformations') &&
+        V.MoreTransformations?.shrine?.stage === 3 &&
+        C.npc.Tsukihan?.init === 1 &&
+        C.npc.Tsukihan.state === 'active' &&
+        C.npc.Tsukihan.love >= 10
+      );
     return this.state.unlocked[site] && (site === 'farm' ? V.farm_stage >= 12 : ['monk', 'priest'].includes(V.temple_rank));
   }
 
   public ready(site: OrchardSite): boolean {
+    if (site === 'shrine')
+      return (
+        !this.state.unlocked.shrine &&
+        this.canWork &&
+        !!this.core.get('MoreTransformations') &&
+        V.MoreTransformations?.shrine?.stage === 3 &&
+        C.npc.Tsukihan?.init === 1 &&
+        C.npc.Tsukihan.state === 'active' &&
+        C.npc.Tsukihan.love >= 10 &&
+        V.location === 'forest_raven_shrine'
+      );
     return (
       !this.state.unlocked[site] &&
       this.canWork &&
@@ -439,8 +469,11 @@ class Orchard extends Module {
       const quality = random(1, 3);
       return { base_quality: quality, quality };
     });
-    // 神殿首次开放时保留一棵成树，果实仍由正常季节结算生成。
-    if (site === 'temple') this.state.temple[0] ??= { species: 'plum', growth: species.plum.matureDays, moisture: moistureDays, fertiliser: 0, harvests: 0, fruiting: 0, fruit: [] };
+    // 保留地点原有的成树；果实仍由正常生长与季节结算生成。
+    for (const [index, name] of data.initialTrees.entries()) {
+      const type = name as OrchardSpecies;
+      this.state[site][index] ??= { species: type, growth: species[type].matureDays, moisture: moistureDays, fertiliser: 0, harvests: 0, fruiting: 0, fruit: [] };
+    }
     return true;
   }
 
@@ -626,6 +659,7 @@ class Orchard extends Module {
     const current = Math.floor(Time.date.timeStamp / 86400);
     const today = current - (Math.floor(Time.days) - day);
     const timestamp = Math.min(Time.date.timeStamp, (today + 1) * 86400 - 1);
+    const shrineTended = state.unlocked.shrine && C.npc.Tsukihan?.init === 1 && C.npc.Tsukihan.state === 'active';
     if (state.day < 0) state.day = today;
     // 原版先补算整次 pass 的施工。刚观察到的竣工不能倒推到过去每一天。
     if (this.irrigated && state.irrigation_since < 0) state.irrigation_since = Time.date.timeStamp;
@@ -637,12 +671,13 @@ class Orchard extends Module {
       const midnight = new window.DateTime((state.day + 1) * 86400);
       const season = Time.getSeason(new window.DateTime(midnight).addDays(-1));
       const bloodMoon = Weather.getBloodMoon(midnight);
-      for (const site of ['temple', 'farm'] as const) {
+      for (const site of Object.keys(orchardSites) as OrchardSite[]) {
         for (const [index, tree] of state[site].entries()) {
           const soil = state.soil[site][index];
           if (!tree) continue;
           const data = species[tree.species];
           if (site === 'farm' && this.irrigated && state.irrigation_since < midnight.timeStamp) tree.moisture = moistureDays;
+          if (site === 'shrine' && shrineTended) tree.moisture = moistureDays;
           const wasMature = tree.growth >= data.matureDays;
           if (tree.growth < data.matureDays) {
             if (tree.moisture > 0) tree.growth = Math.min(data.matureDays, tree.growth + (tree.fertiliser > 0 ? 2 : 1));
@@ -676,8 +711,8 @@ class Orchard extends Module {
     this.staff.advance(day);
     // 只应用当前已知的雨水，不捏造原版未保存的历史降雨。
     if (state.day !== current) return;
-    for (const site of ['temple', 'farm'] as const) {
-      if (Weather.precipitation !== 'rain' && !(site === 'farm' && this.irrigated)) continue;
+    for (const site of Object.keys(orchardSites) as OrchardSite[]) {
+      if (Weather.precipitation !== 'rain' && !(site === 'farm' && this.irrigated) && !(site === 'shrine' && shrineTended && Time.hour >= 17)) continue;
       for (const tree of state[site]) {
         if (!tree) continue;
         tree.moisture = moistureDays;
@@ -863,6 +898,7 @@ class Orchard extends Module {
     if (donated > 0) this.core.SugarCube.Wikifier.wikifyEval('<<grace 1 monk>>');
     tree.fruit = [];
     tree.harvests++;
+    if (site === 'shrine' && this.core.get('MoreTransformations')) this.core.SugarCube.Wikifier.wikifyEval('<<deadwood-raven-shrine-wish-progress "harvest">>');
     return { tool: 'harvest', kept, donated };
   }
 

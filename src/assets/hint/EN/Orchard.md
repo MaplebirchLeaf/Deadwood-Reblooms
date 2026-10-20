@@ -1,15 +1,16 @@
-### Unlock the two orchards
+### Unlock an orchard
 
 With Orchard enabled, complete the land preparation event by day, suitably dressed, with both arms not simultaneously bound and stress below its maximum:
 
-| Place                    | First requirement                                                                | Initial and maximum plots                    |
-| ------------------------ | -------------------------------------------------------------------------------- | -------------------------------------------- |
-| Behind the temple garden | Monk or priest rank and a fully cleared garden                                   | 5 initially, 6 maximum; one mature plum tree |
-| Alex's farm              | Clear all nine original fields and ask while Alex handles cottage administration | 3 initially, 12 maximum                      |
+| Place                     | First requirement                                                                | Initial and maximum plots                    |
+| ------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------- |
+| Behind the temple garden  | Monk or priest rank and a fully cleared garden                                   | 5 initially, 6 maximum; one mature plum tree |
+| Alex's farm               | Clear all nine original fields and ask while Alex handles cottage administration | 3 initially, 12 maximum                      |
+| Behind Darkfeather Shrine | Meet Tsukihan, reach 10 affection and check the trees together during the day    | 2 fixed plots; a mature apple and plum tree  |
 
-Initial preparation takes an hour. Later, **Continue clearing** works in 40-minute sessions; each new temple plot needs 80 minutes total, and a farm plot 120. Progress can be completed over several visits.
+Initial preparation at the temple or farm takes an hour. Later, **Continue clearing** works in 40-minute sessions; each new temple plot needs 80 minutes total, and a farm plot 120. Progress can be completed over several visits. The shrine ground is already prepared: check the trees with Tsukihan for 10 minutes to begin. There are no further plots to clear there.
 
-About half the temple harvest is yours; the kitchen receives the rest and grants grace. Farm harvests belong to you. Temple access still needs the relevant rank, while farm attacks must be handled first.
+About half the temple harvest is yours; the kitchen receives the rest and grants grace. Farm and shrine harvests belong to you. Temple access still needs the relevant rank, while farm attacks must be handled first. Shrine work requires Tsukihan to remain active and affection to stay at 10 or above.
 
 ### Find seeds, plant and care
 
@@ -17,7 +18,7 @@ Original picking can reveal apple, pear, peach, plum, orange and lemon seeds. Li
 
 Select a species and drag a tool onto a plot; on mobile, tap the tool and then the plot. Plant in cleared empty plots, and tap a plot to check water, fertiliser, soil and growth.
 
-- **Water**: restore seven days of moisture when dry. Rain replenishes it, and irrigating all nine original farm fields also supplies the farm orchard automatically.
+- **Water**: restore seven days of moisture when dry. Rain replenishes it, and irrigating all nine original farm fields also supplies the farm orchard automatically. Tsukihan tends the two shrine plots while active; that care stops during an absence.
 - **Young trees**: one bag of fertiliser lasts 30 days and doubles growth while watered. Dry trees stop growing; fertiliser cannot replace water.
 - **Mature trees**: C-grade plant care allows soil improvement for better yield. It normally expires with the fertiliser, while Green Thumb retains the improvement permanently.
 - **Harvest**: collect all ripe fruit on that tree. Removing a tree requires confirmation and loses its fruit, while cleared land remains available.
@@ -104,7 +105,7 @@ Transport uses the usual 70% purchase price and shared 100-fruit daily limit, ch
 
 ### Remy: begin at the riding school
 
-Remy's route comes with Orchard, **without needing to unlock planting land**. Complete the original first riding-school meeting, then use **Approach Remy** in the ordinary daytime menu. Late closing hours, combat and forced events prevent meetings.
+With Orchard enabled, choose **Approach Remy** at the riding school during the day; **planting land is not required**. Avoid closing time, combat and emergencies.
 
 1. Have an ordinary conversation once daily for 10 minutes. Teaching and care topics build familiarity; confronting farm conflict, the mask or captivity is separate and does not count towards relationship conversations.
 2. Give one stocked dish or fruit daily. Scones are a favourite, and reserved orchard fruit is not gifted.

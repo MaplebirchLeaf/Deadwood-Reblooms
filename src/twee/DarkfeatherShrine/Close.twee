@@ -49,16 +49,15 @@
           <<He>>把两只坐垫并好，回过头，等你拿主意。
         <</if>>
     <</language>><br><br>
-    <<icon 'actions/hug.png'>><<lanLink ['Stay close in private (0:10)', '与月羽私下相伴 (0:10)']>>
+    <<loveicon 'hug'>><<lanLink ['Stay close in private (0:10)', '与月羽私下相伴 (0:10)'] 'Deadwood Raven Shrine Close'>>
       <<deadwood-raven-shrine-act 'close'>>
       <<if _shrineDone>>
         <<set _shrine.step to 'private', C.npc.Tsukihan.lust to Math.clamp(C.npc.Tsukihan.lust - 5, 0, 100)>>
-        <<goto 'Deadwood Raven Shrine Close'>>
       <</if>>
     <</lanLink>><<lstress>><<glove>><<llust>><br>
-    <<socialiseicon>><<lanLink ['Just sit and talk (0:10)', '只坐着聊会儿 (0:10)']>>
+    <<socialiseicon>><<lanLink ['Just sit and talk (0:10)', '只坐着聊会儿 (0:10)'] 'Deadwood Raven Shrine Close'>>
       <<deadwood-raven-shrine-act 'close'>>
-      <<if _shrineDone>><<set _shrine.step to 'chat'>><<goto 'Deadwood Raven Shrine Close'>><</if>>
+      <<if _shrineDone>><<set _shrine.step to 'chat'>><</if>>
     <</lanLink>><<lstress>><<glove>><br><br>
   <</if>>
 <<elseif _shrine.step is 'private'>>
@@ -66,21 +65,40 @@
     <<option 'EN'>>
       You sit beside Tsukihan and make room for <<him>> to come closer. <<He>> opens an arm in invitation, and you accept the embrace.<br><br>
       For once, Tsukihan leaves the little noises in the courtyard alone. You stay close, letting the conversation fall quiet. Neither of you tries to fill every pause.<br><br>
-      A little later, you step back into the courtyard together. Tsukihan pauses by the screen before returning to <<his>> work.
+      The courtyard stays busy beyond the screen. Tsukihan hears a bowl knock against the railing, then lets it be for a moment longer.
       <<if C.npc.Tsukihan.dom gte 70>>"That was worth leaving the bowls for." <<He>> smiles at you. "I will ask again. You can tell me when."
       <<elseif C.npc.Tsukihan.dom gte 30>>"I liked that." <<He>> looks at you rather than the work waiting on the board. "I hope you did, too."
       <<else>>"Thank you for staying." <<He>> takes a moment before adding, "I would like to do that again."<</if>>
     <<option 'CN'>>
       你在月羽身边坐下，往旁边让了让，示意<<him>>可以靠近。<<He>>朝你张开一只手臂，你迎上去，和<<him>>抱在一起。<br><br>
       难得这一次，庭院里有些小动静，月羽也没急着去管。你们就这样靠着，话渐渐少了下来。安静时，谁也不急着再找一句来接。<br><br>
-      过了一会儿，你们一起回到庭院。月羽在屏风旁多站了片刻，才回去料理手头的事。
+      屏风外的庭院依然有些动静。月羽听见食碗碰了一下栏杆，这次却没有急着起身。
       <<if C.npc.Tsukihan.dom gte 70>>“那些碗晚些洗，值了。”<<He>>对你笑笑。“下回还要问你。什么时候有空，你说。”
       <<elseif C.npc.Tsukihan.dom gte 30>>“刚才很喜欢。”<<He>>看看你，没有先去看木板上等着的活。“希望你也是。”
       <<else>>“谢谢你留下来。”<<He>>停了一下，又添上一句，“还想有下一次。”<</if>>
   <</language>><<lstress>><<glove>><<llust>><br><br>
-  <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 30 and _shrineMinutes gt 30 and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag') and _shrine.sex isnot Math.floor(Time.days)>>
-    <<icon 'raven-shrine/inner-room.png'>><<lanLink ['Invite Tsukihan into the inner shrine (0:30)', '邀月羽一起去社内内室 (0:30)']>>
-      <<deadwood-raven-shrine-act 'sex'>><<if _shrineDone>><<goto 'Deadwood Raven Shrine Sex'>><<else>><<goto 'Deadwood Raven Shrine'>><</if>>
+  <<if _shrineMinutes gt 5 and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+    <<loveicon 'kiss'>><<lanLink ['Kiss Tsukihan (0:05)', '亲吻月羽 (0:05)'] 'Deadwood Raven Shrine Close'>>
+      <<deadwood-raven-shrine-context>>
+      <<if _shrinePerson and _shrine.scene is 'close' and _shrine.step is 'private' and isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 50
+        and _shrineMinutes gt 5 and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+        <<pass 5>><<deadwood-raven-shrine-context>>
+        <<if _shrinePerson and _shrine.scene is 'close' and _shrine.step is 'private' and isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 50
+          and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+          <<if _shrine.kiss isnot Math.floor(Time.days)>>
+            <<stress -2>><<set C.npc.Tsukihan.lust to Math.clamp(C.npc.Tsukihan.lust + 5, 0, 100), _shrine.kiss to Math.floor(Time.days)>>
+          <</if>>
+          <<set _shrine.step to 'closer'>><<takeKissVirginity 'Tsukihan' 'loveInterest'>>
+        <</if>>
+      <</if>>
+    <</lanLink>><<if _shrine.kiss isnot Math.floor(Time.days)>><<lstress>><<glust>><</if>><br>
+  <</if>>
+<<elseif _shrine.step is 'closer'>>
+  <<lanSwitch 'Tsukihan turns towards you when you lean closer, and meets your kiss. For a while you stay side by side, hands linked on the cushion. "I had more to say," <<he>> murmurs, then smiles. "It can wait."' '你靠近时，月羽也转过身，迎上你的吻。你们又并肩坐了一会儿，手牵着手，搁在坐垫上。“刚才还有话想说。”<<he>>低声道，随后自己笑了。“待会儿再说吧。”'>><br><br>
+  <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 50 and _shrineMinutes gt 30 and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag') and _shrine.sex isnot Math.floor(Time.days)>>
+    <<icon 'raven-shrine/inner-room.png'>><<lanLink ['Invite Tsukihan into the inner shrine (0:30)', '邀月羽一起去社内内室 (0:30)'] 'Deadwood Raven Shrine Sex'>>
+      <<deadwood-raven-shrine-act 'sex'>>
+      <<if !_shrineDone and !$nextPassage>><<set $nextPassage to 'Deadwood Raven Shrine'>><</if>>
     <</lanLink>><<promiscuous1>><<glust>><br>
   <</if>>
 <<elseif _shrine.step is 'chat'>>

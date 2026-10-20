@@ -19,9 +19,9 @@
 <!-- 左右手共用同一结算，每只手保存自己的目标，所以允许同时抓握。 -->
 <<widget 'deadwood-reblooms-hand-grip'>>
   <<set _handGripHand to _args[0]>>
-  <<set _handGripAction to _args[1]>>
-  <<set _handGripTarget to _handGripAction is 'start' ? Number(_handGripHand is 'left' ? $lefttarget : $righttarget) : maplebirch.get("VanillaPlus").handGrip.target(_handGripHand)>>
-  <<if _handGripAction is 'release'>>
+  <<set $_handGripAction to _args[1]>>
+  <<set _handGripTarget to $_handGripAction is 'start' ? Number(_handGripHand is 'left' ? $lefttarget : $righttarget) : maplebirch.get("VanillaPlus").handGrip.target(_handGripHand)>>
+  <<if $_handGripAction is 'release'>>
     <<run maplebirch.get("VanillaPlus").handGrip.clear(_handGripHand)>>
     <<if _handGripHand is 'left'>>
       <<set $leftactiondefault to 'rest'>>
@@ -30,12 +30,12 @@
     <</if>>
     <<lanSwitch 'You release your grip.' '你松开了手。'>>
   <<elseif _handGripTarget isnot undefined>>
-    <<set _handGripSuccess to $orgasmdown gte 1 or maplebirch.get("VanillaPlus").promiscuity.mastered or $gamemode is 'soft' or $gloryhole>>
-    <<if !_handGripSuccess>>
-      <<set _handGripSuccess to combatSkillCheck('hand', _handGripTarget, $NPCList[_handGripTarget].fullDescription)>>
+    <<set $_handGripSuccess to $orgasmdown gte 1 or maplebirch.get("VanillaPlus").promiscuity.mastered or $gamemode is 'soft' or $gloryhole>>
+    <<if !$_handGripSuccess>>
+      <<set $_handGripSuccess to combatSkillCheck('hand', _handGripTarget, $NPCList[_handGripTarget].fullDescription)>>
     <</if>>
     <<handstat>><<handskilluse>>
-    <<if _handGripSuccess and maplebirch.get("VanillaPlus").handGrip.set(_handGripHand, _handGripTarget)>>
+    <<if $_handGripSuccess and maplebirch.get("VanillaPlus").handGrip.set(_handGripHand, _handGripTarget)>>
       <<if _handGripHand is 'left'>>
         <<set $leftactiondefault to 'VanillaPlusHandGripLeftKeep'>>
       <<else>>
@@ -49,15 +49,15 @@
       <</if>>
       <<personselect _handGripTarget>>
       <span class="lewd">
-      <<if _handGripAction is 'keep' and $orgasmdown gte 1>>
+      <<if $_handGripAction is 'keep' and $orgasmdown gte 1>>
         <<lanSwitch 'As you climax, you tighten your grip on ' '当你高潮时，你更用力地抓紧了'>>
-      <<elseif _handGripAction is 'keep'>>
+      <<elseif $_handGripAction is 'keep'>>
         <<lanSwitch 'You keep your grip on ' '你继续抓住'>>
       <<else>>
         <<lanSwitch 'You grip ' '你抓住'>>
       <</if>>
       <<combatperson>>
-      <<if _handGripAction is 'keep' and $orgasmdown gte 1>>
+      <<if $_handGripAction is 'keep' and $orgasmdown gte 1>>
         <<lanSwitch "'s hips, giving them no chance to escape." '的腰臀，不许对方逃开。'>>
       <<else>>
         <<lanSwitch "'s hips, holding them steady through each thrust." '的腰臀，在抽插中稳住对方。'>>
@@ -70,7 +70,7 @@
       <<else>>
         <<set $rightactiondefault to 'rest'>>
       <</if>>
-      <<if _handGripAction is 'keep'>>
+      <<if $_handGripAction is 'keep'>>
         <<lanSwitch 'You try to keep hold of ' '你试图继续抓住'>>
       <<else>>
         <<lanSwitch 'You try to grab ' '你试图抓住'>>

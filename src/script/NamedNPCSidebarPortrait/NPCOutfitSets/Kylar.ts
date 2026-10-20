@@ -8,6 +8,7 @@ import { addSet, sync } from './Clothes';
 const wardrobeKeys = [
   ...schoolUniformKeys,
   'hoodie_legwarmers',
+  'towel_wrap',
   'male_underwear',
   'female_underwear',
   'english_play_sterling',

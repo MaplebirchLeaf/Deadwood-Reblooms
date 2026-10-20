@@ -1,15 +1,15 @@
 :: Deadwood Transport Event Widgets [widget]
 
 <<widget 'deadwood-transport-hazard'>>
-  <<set _hazard to $Transport.trip.event, _road_events to maplebirch.get('Transport').events>>
-  <<set _road_bicycle to maplebirch.get('Transport').model.kind is 'bicycle'>>
-  <<if _hazard.kind is 'molestation'>><<run maplebirch.get('Transport').taxi.passengerNPC()>><</if>>
+  <<set $_hazard to $Transport.trip.event, _road_events to maplebirch.get('Transport').events>>
+  <<set $_road_bicycle to maplebirch.get('Transport').model.kind is 'bicycle'>>
+  <<if $_hazard.kind is 'molestation'>><<run maplebirch.get('Transport').taxi.passengerNPC()>><</if>>
   <<language>>
     <<option 'EN'>>
-      You reach <<print maplebirch.get('Transport').catalog.name(_hazard.point)>>.
-      <<switch _hazard.kind>>
+      You reach <<print maplebirch.get('Transport').catalog.name($_hazard.point)>>.
+      <<switch $_hazard.kind>>
         <<case 'police'>>
-          <<if _hazard.checked>>
+          <<if $_hazard.checked>>
             <<if crimeSumCurrent() gte 1000>>
               The officer checks your name again, then signals to a colleague. "There's a warrant for you. Switch off the engine and step away from the vehicle."
             <<else>>
@@ -21,8 +21,8 @@
         <<case 'skid'>>
           You turn too sharply, and the tyres begin to slide. You ease off, looking for room to straighten up.
         <<case 'roadblock'>>
-          Someone waves beside a vehicle stopped across part of the road. As you slow, another figure steps out behind it, watching your <<if _road_bicycle>>bicycle<<else>>vehicle<</if>> rather than the traffic.
-          "Stop there. <<if _road_bicycle>>Off the bike.<<else>>Hand over the keys.<</if>>"
+          Someone waves beside a vehicle stopped across part of the road. As you slow, another figure steps out behind it, watching your <<if $_road_bicycle>>bicycle<<else>>vehicle<</if>> rather than the traffic.
+          "Stop there. <<if $_road_bicycle>>Off the bike.<<else>>Hand over the keys.<</if>>"
           There is still room to turn back. A narrow gap remains beside the stopped vehicle.
         <<case 'traffic'>>
           A lorry bears down behind you, its horn drowning out everything else. Its mirror swings close as it tries to squeeze past. Ahead, the road widens beside a gate.
@@ -30,19 +30,19 @@
         <<case 'load'>>
           A van turns the bend ahead. Its back door swings open, spilling crates across your lane. The driver stops farther up the road and runs back. There is a gap between the crates, but little room to brake once you enter it.
         <<case 'puncture'>>
-          <<icon 'transport/flat-tyre.png'>><<if _road_bicycle>>The rear tyre starts to drag. You stop and find a piece of wire embedded in it.<<else>>A tyre begins to thump. You pull over and find a screw sunk through the tread.<</if>>
+          <<icon 'transport/flat-tyre.png'>><<if $_road_bicycle>>The rear tyre starts to drag. You stop and find a piece of wire embedded in it.<<else>>A tyre begins to thump. You pull over and find a screw sunk through the tread.<</if>>
           <<if $Transport.trip.event.point.startsWith('farmroad')>>Beyond the hedge, the fields are empty. The next passing vehicle takes several minutes to appear.<</if>>
         <<case 'molestation'>>
           A hand slides between the front seats, brushing your side. You pull away, but it follows. In the mirror, the passenger meets your eyes and smiles. "Keep driving."
           You slow down, looking for a place to pull over.
       <</switch>>
-      <<if $Transport.trip.taxi is 'dropoff' and _hazard.kind isnot 'molestation'>>Your passenger falls quiet, waiting for you to decide what to do.
+      <<if $Transport.trip.taxi is 'dropoff' and $_hazard.kind isnot 'molestation'>>Your passenger falls quiet, waiting for you to decide what to do.
       <<elseif $Transport.trip.passengers.length>>Your companion looks from the road to you.<</if>>
     <<option 'CN'>>
-      你来到<<print maplebirch.get('Transport').catalog.name(_hazard.point)>>。
-      <<switch _hazard.kind>>
+      你来到<<print maplebirch.get('Transport').catalog.name($_hazard.point)>>。
+      <<switch $_hazard.kind>>
         <<case 'police'>>
-          <<if _hazard.checked>>
+          <<if $_hazard.checked>>
             <<if crimeSumCurrent() gte 1000>>
               警员又核对了一遍你的名字，随后向同事打了个手势。“你有拘捕令在身。熄火，下车。”
             <<else>>
@@ -54,8 +54,8 @@
         <<case 'skid'>>
           你转弯太急，轮胎开始打滑。你放慢速度，寻找能让车身摆正的空隙。
         <<case 'roadblock'>>
-          一辆车横在部分路面上，旁边的人挥手示意。你刚减速，车后又走出一个人。对方盯着你的<<if _road_bicycle>>自行车<<else>>载具<</if>>，没有看往来的车流。
-          “停这儿。<<if _road_bicycle>>从车上下来。<<else>>把钥匙交出来。<</if>>”
+          一辆车横在部分路面上，旁边的人挥手示意。你刚减速，车后又走出一个人。对方盯着你的<<if $_road_bicycle>>自行车<<else>>载具<</if>>，没有看往来的车流。
+          “停这儿。<<if $_road_bicycle>>从车上下来。<<else>>把钥匙交出来。<</if>>”
           后方还有掉头的空间。横着的车辆旁边，也留着一道狭窄的空隙。
         <<case 'traffic'>>
           一辆卡车从身后追上来，喇叭声盖过了别的声音。司机硬挤着超车，后视镜离你越来越近。前面一处大门旁，道路稍微宽了一些。
@@ -63,17 +63,17 @@
         <<case 'load'>>
           前方一辆货车转过弯，后门突然敞开，几只货箱滚进你的车道。司机停在远处，跑了回来。箱子之间有一道空隙，但进去后就没多少刹车的余地了。
         <<case 'puncture'>>
-          <<icon 'transport/flat-tyre.png'>><<if _road_bicycle>>后轮突然变得沉重。你停下车，发现一截铁丝扎进了轮胎。<<else>>轮胎开始一下一下地震动。你靠边停下，发现胎面上扎着一枚螺丝。<</if>>
+          <<icon 'transport/flat-tyre.png'>><<if $_road_bicycle>>后轮突然变得沉重。你停下车，发现一截铁丝扎进了轮胎。<<else>>轮胎开始一下一下地震动。你靠边停下，发现胎面上扎着一枚螺丝。<</if>>
           <<if $Transport.trip.event.point.startsWith('farmroad')>>树篱外的田野空荡荡的。过了好几分钟，才有另一辆车经过。<</if>>
         <<case 'molestation'>>
           一只手从前座之间伸来，摸向你的腰侧。你往旁边避开，那只手却跟了过来。后视镜里，乘客对上你的目光，笑了一下。“继续开。”
           你放慢车速，寻找能靠边停车的地方。
       <</switch>>
-      <<if $Transport.trip.taxi is 'dropoff' and _hazard.kind isnot 'molestation'>>乘客安静下来，等着你决定怎么办。
+      <<if $Transport.trip.taxi is 'dropoff' and $_hazard.kind isnot 'molestation'>>乘客安静下来，等着你决定怎么办。
       <<elseif $Transport.trip.passengers.length>>同行的人看了看路面，又看向你。<</if>>
   <</language>><br><br>
-  <<if _hazard.kind is 'police'>>
-    <<if !_hazard.checked>>
+  <<if $_hazard.kind is 'police'>>
+    <<if !$_hazard.checked>>
       <<deadwood-transport-road-action 'check'>>
     <<else>>
       <<if _road_events.can('fine')>>
@@ -85,14 +85,14 @@
     <</if>>
     <<deadwood-transport-road-action 'escape'>>
     <<if _road_events.can('fight')>><<deadwood-transport-road-action 'fight'>><</if>>
-  <<elseif _hazard.kind is 'skid'>>
+  <<elseif $_hazard.kind is 'skid'>>
     <<deadwood-transport-road-action 'wait'>>
     <<deadwood-transport-road-action 'escape'>>
-  <<elseif _hazard.kind is 'molestation'>>
+  <<elseif $_hazard.kind is 'molestation'>>
     <<deadwood-transport-road-action 'warn'>>
     <<if _road_events.can('eject')>><<deadwood-transport-road-action 'eject'>><</if>>
     <<deadwood-transport-road-action 'fight'>>
-  <<elseif _hazard.kind is 'puncture'>>
+  <<elseif $_hazard.kind is 'puncture'>>
     <<if _road_events.can('fix')>>
       <<deadwood-transport-road-action 'fix'>>
     <</if>>
@@ -106,7 +106,7 @@
     <<if _road_events.can('observe')>><<deadwood-transport-road-action 'observe'>><</if>>
     <<if _road_events.can('force')>><<deadwood-transport-road-action 'force'>><</if>>
     <<deadwood-transport-road-action 'escape'>>
-    <<if _hazard.kind is 'roadblock'>>
+    <<if $_hazard.kind is 'roadblock'>>
       <<if _road_events.can('pay')>><<deadwood-transport-road-action 'pay'>><</if>>
       <<deadwood-transport-road-action 'fight'>>
       <<deadwood-transport-road-action 'yield'>>
@@ -187,40 +187,40 @@
 <</widget>>
 
 <<widget 'deadwood-transport-hazard-result'>>
-  <<set _road_result to $Transport.trip?.event>>
-  <<if _road_result?.outcome and (!_road_result.combat or $passage is 'Deadwood Transport Road Fight Finish')>>
+  <<set $_road_result to $Transport.trip?.event>>
+  <<if $_road_result?.outcome and (!$_road_result.combat or $passage is 'Deadwood Transport Road Fight Finish')>>
     <<language>>
       <<option 'EN'>>
-        <<switch _road_result.outcome>>
+        <<switch $_road_result.outcome>>
           <<case 'wait'>>
-            <<if _road_result.kind is 'skid'>>You slow down and bring the wheels back into line. You wait until your hands are steady before setting off again.
-            <<elseif _road_result.kind is 'roadblock'>>You turn back before they can reach you, following a side road until it joins your route again. The delay costs you ten minutes.
-            <<elseif _road_result.kind is 'load'>>You wait while the driver hauls the crates off the road. When the lane clears, you set off again.
+            <<if $_road_result.kind is 'skid'>>You slow down and bring the wheels back into line. You wait until your hands are steady before setting off again.
+            <<elseif $_road_result.kind is 'roadblock'>>You turn back before they can reach you, following a side road until it joins your route again. The delay costs you ten minutes.
+            <<elseif $_road_result.kind is 'load'>>You wait while the driver hauls the crates off the road. When the lane clears, you set off again.
             <<else>>You ease into the wider stretch and let the lorry pass. Its horn fades ahead of you.<</if>>
           <<case 'escape'>>
-            <<if _road_result.kind is 'skid'>>You ease the wheel back into line, keeping the vehicle clear of the verge. The road straightens ahead.
+            <<if $_road_result.kind is 'skid'>>You ease the wheel back into line, keeping the vehicle clear of the verge. The road straightens ahead.
             <<else>>You keep your eyes on the gap and judge the distance. You pass through before it closes, leaving the obstruction behind you.<</if>>
           <<case 'cleared'>>The officer returns your licence and steps away. "All clear. On your way."
           <<case 'fined'>>The officer takes your payment and hands you a receipt. You leave the vehicle parked beside the road. You will have to return when you are fit to drive.
           <<case 'evaded'>>
-            <<if _road_result.combat>>The officers can no longer keep you there. You pull free and return to your vehicle, still parked beside the road.
+            <<if $_road_result.combat>>The officers can no longer keep you there. You pull free and return to your vehicle, still parked beside the road.
             <<else>>You turn off at the next junction, leaving the police car out of sight.<</if>>
             Escaping has not removed the evidence against you.
           <<case 'arrested'>>The officers take hold of your arms. "You're coming with us." Your vehicle stays beside the road.
           <<case 'scraped'>>You misjudge the gap. <<if maplebirch.get('Transport').model.kind is 'motor_vehicle'>>Metal scrapes against your bodywork.<<else>>You skid against the verge, catching yourself painfully before the vehicle can topple.<</if>> You stop to check the damage.
           <<case 'observe'>>A glance at the figure behind the vehicle tells you where the trap closes. You wait for their attention to shift, then take the other side before they can reach it.
           <<case 'force'>>
-            <<if _road_result.kind is 'load'>>You haul the crates clear one at a time. The driver catches up, breathless, and helps with the last one.
+            <<if $_road_result.kind is 'load'>>You haul the crates clear one at a time. The driver catches up, breathless, and helps with the last one.
             <<else>>You knock the hand away from your handlebars. The figure stumbles, giving you room to push off and leave.<</if>>
           <<case 'paid'>>You hold out the notes. One of them counts the money while the other moves aside. You keep watching them until they fall behind you.
           <<case 'defended'>>They can no longer keep you away from your vehicle. You pull free and reach it before either can stop you.
-          <<case 'rescued'>>Your alarm draws attention from the road. <<if _road_result.kind is 'molestation'>>The passenger lets go and scrambles out. You keep watching until the passenger is out of reach.<<else>>The two figures retreat behind their vehicle, then drive off. Yours is still where you left it.<</if>>
+          <<case 'rescued'>>Your alarm draws attention from the road. <<if $_road_result.kind is 'molestation'>>The passenger lets go and scrambles out. You keep watching until the passenger is out of reach.<<else>>The two figures retreat behind their vehicle, then drive off. Yours is still where you left it.<</if>>
           <<case 'warned'>>You tell the passenger to keep their hands to themselves. Your voice leaves no room for another joke. The hand withdraws. You watch the rear-view mirror until the journey ends.
           <<case 'dismissed'>>You pull over and open the door. When the passenger tries to stay put, you take their arm and force them out. You lock the doors before reaching for the radio.
           <<case 'repelled'>>The passenger backs away from you. You force them out of the car and lock the doors. The keys are still in the ignition; you take them out with an unsteady hand.
           <<case 'assaulted'>>At last, the passenger releases you and gets out. You pull your clothes into place, then sit for a while with both hands gripping the wheel. The engine stays off. You reach for the radio to cancel the journey.
           <<case 'stolen'>>
-            <<if _road_result.combat>>You cannot keep them away from your vehicle. <</if>>
+            <<if $_road_result.combat>>You cannot keep them away from your vehicle. <</if>>
             <<if maplebirch.get('Transport').model.kind is 'bicycle'>>They wrench the bicycle from you and ride off.<<else>>One takes the keys while the other watches you. Your vehicle disappears around the bend.<</if>>
             <<if $Transport.trip.passengers.length>>You and your companion are left beside the road.<</if>>
             <<if $Transport.trip.taxi is 'dropoff'>>Your passenger gets out with you and asks dispatch for another car.<</if>>
@@ -232,36 +232,36 @@
         <</switch>>
         <<if $Transport.trip.taxi and $Transport.trip.interrupted>>Dispatch takes down your position and cancels the booking. <<if maplebirch.get('Transport').taxi.fleet?.stolen>>The dispatcher tells you to stay clear. The company will deal with its missing car.<</if>><</if>>
       <<option 'CN'>>
-        <<switch _road_result.outcome>>
+        <<switch $_road_result.outcome>>
           <<case 'wait'>>
-            <<if _road_result.kind is 'skid'>>你放慢速度，让车轮重新摆正。等双手不再发抖，你才继续上路。
-            <<elseif _road_result.kind is 'roadblock'>>你赶在对方靠近前退回岔口，沿支路绕回原来的方向。前后耽搁了十分钟。
-            <<elseif _road_result.kind is 'load'>>你等司机把货箱拖离路面。车道腾出来后，你才重新出发。
+            <<if $_road_result.kind is 'skid'>>你放慢速度，让车轮重新摆正。等双手不再发抖，你才继续上路。
+            <<elseif $_road_result.kind is 'roadblock'>>你赶在对方靠近前退回岔口，沿支路绕回原来的方向。前后耽搁了十分钟。
+            <<elseif $_road_result.kind is 'load'>>你等司机把货箱拖离路面。车道腾出来后，你才重新出发。
             <<else>>你慢慢靠向较宽的路段，让卡车先过。喇叭声渐渐消失在前方。<</if>>
           <<case 'escape'>>
-            <<if _road_result.kind is 'skid'>>你慢慢修正方向，让载具避开路肩。前方的道路终于平直起来。
+            <<if $_road_result.kind is 'skid'>>你慢慢修正方向，让载具避开路肩。前方的道路终于平直起来。
             <<else>>你盯着空隙，估好距离，赶在它被堵住之前穿了过去。障碍被留在了身后。<</if>>
           <<case 'cleared'>>警员把驾驶执照还给你，退开一步。“没问题了。走吧。”
           <<case 'fined'>>警员收下罚款，把收据递给你。你把载具留在路旁，等能正常驾驶了再回来取。
           <<case 'evaded'>>
-            <<if _road_result.combat>>警员暂时拦不住你。你挣脱束缚，回到仍停在路边的载具旁。
+            <<if $_road_result.combat>>警员暂时拦不住你。你挣脱束缚，回到仍停在路边的载具旁。
             <<else>>你在下一个路口转弯，把警车甩出了视线。<</if>>
             逃脱追捕并没有消除警方掌握的罪证。
           <<case 'arrested'>>警员扣住你的胳膊。“跟我们走。”你的载具留在路旁。
           <<case 'scraped'>>你估错了距离。<<if maplebirch.get('Transport').model.kind is 'motor_vehicle'>>金属刮过车身，发出刺耳的声音。<<else>>车轮滑向路肩。你撑住身体，疼得倒吸一口气，好歹没让车翻倒。<</if>>你停下来检查损伤。
           <<case 'observe'>>你瞥见车后那个人的动作，看清了对方打算在哪边围上来。等他们分神，你从另一侧绕过去，没给他们赶上的机会。
           <<case 'force'>>
-            <<if _road_result.kind is 'load'>>你把货箱一只只搬离车道。司机气喘吁吁地赶来，和你一起挪开最后一只。
+            <<if $_road_result.kind is 'load'>>你把货箱一只只搬离车道。司机气喘吁吁地赶来，和你一起挪开最后一只。
             <<else>>你推开伸向车把的手。对方踉跄了一下，你趁机蹬地出发，冲出了包围。<</if>>
           <<case 'paid'>>你递出钞票。一个人数钱，另一个让开了路。直到把他们甩在身后，你才移开视线。
           <<case 'defended'>>他们已经拦不住你。你挣开束缚，赶在对方再次伸手前回到载具旁。
-          <<case 'rescued'>>警报引来了路上的注意。<<if _road_result.kind is 'molestation'>>乘客松开手，慌忙钻出车门。你一直盯着，直到对方走远。<<else>>那两个人退回横着的车后，很快开走了。你的载具还停在原处。<</if>>
+          <<case 'rescued'>>警报引来了路上的注意。<<if $_road_result.kind is 'molestation'>>乘客松开手，慌忙钻出车门。你一直盯着，直到对方走远。<<else>>那两个人退回横着的车后，很快开走了。你的载具还停在原处。<</if>>
           <<case 'warned'>>你让乘客把手收回去。语气让对方没法再拿玩笑搪塞，那只手终于退开了。余下的行程里，你始终留意着后视镜。
           <<case 'dismissed'>>你靠边停下，打开车门。乘客赖着不动，你就攥住对方的胳膊，把人赶了下去。关门落锁后，你才拿起无线电。
           <<case 'repelled'>>乘客往后退去。你把对方赶出车外，锁好车门。钥匙还插在点火孔里，你伸手拔下，手指有些发抖。
           <<case 'assaulted'>>乘客终于松开你，下了车。你拉好衣服，双手攥着方向盘，坐了好一会儿。发动机一直没开。你伸手拿起无线电，取消了这次行程。
           <<case 'stolen'>>
-            <<if _road_result.combat>>你没能阻止他们靠近载具。<</if>>
+            <<if $_road_result.combat>>你没能阻止他们靠近载具。<</if>>
             <<if maplebirch.get('Transport').model.kind is 'bicycle'>>他们从你手里夺过自行车，骑着它跑了。<<else>>一个人拿走钥匙，另一个盯着你。你的载具消失在弯道后。<</if>>
             <<if $Transport.trip.passengers.length>>你和同行的人被留在路旁。<</if>>
             <<if $Transport.trip.taxi is 'dropoff'>>乘客和你一起下车，请调度另派一辆车。<</if>>
@@ -272,18 +272,18 @@
           <<case 'walk'>>你把载具留在路外，记下附近的地标。之后得回来取，或者去修车厂请人运回。<</switch>>
         <<if $Transport.trip.taxi and $Transport.trip.interrupted>>调度记下你的位置，取消了订单。<<if maplebirch.get('Transport').taxi.fleet?.stolen>>对方让你先顾好自己，丢失的营运车由车行处理。<</if>><</if>>
     <</language>>
-    <<if _road_result.kind is 'roadblock' and $Transport.trip.interrupted and $Transport.trip.passengers.length>>
+    <<if $_road_result.kind is 'roadblock' and $Transport.trip.interrupted and $Transport.trip.passengers.length>>
       <<deadwood-transport-hazard-companion>>
     <</if>><br><br>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-transport-hazard-companion'>>
-  <<set _hazard_npc to $Transport.trip.passengers[0]>>
-  <<npc _hazard_npc>><<person1>>
+  <<set $_hazard_npc to $Transport.trip.passengers[0]>>
+  <<npc $_hazard_npc>><<person1>>
   <<language>>
     <<option 'EN'>>
-      <<switch _hazard_npc>>
+      <<switch $_hazard_npc>>
         <<case 'Robin'>> Robin keeps looking back. <<if C.npc.Robin.trauma gte 40>>"They're not following us?" <<He>> stays close to you.<<else>>"Are you hurt?" <<He>> checks your face before looking towards the road again.<</if>>
         <<case 'Whitney'>> "Bastards," Whitney mutters, watching the bend. "Come on. We'll deal with the car later."
         <<case 'Kylar'>> Kylar catches your sleeve. "You're okay?" <<His>> fingers tighten until you look at <<him>>.
@@ -291,7 +291,7 @@
         <<case 'Alex'>> Alex checks the road behind you. "There's a field gate just ahead. Let's keep away from the bend."
       <</switch>>
     <<option 'CN'>>
-      <<switch _hazard_npc>>
+      <<switch $_hazard_npc>>
         <<case 'Robin'>> 罗宾不住地往后看。<<if C.npc.Robin.trauma gte 40>>“他们没跟上来吧？”<<He>>紧紧跟在你身旁。<<else>>“你受伤了吗？”<<He>>看了看你的脸，才又望向公路。<</if>>
         <<case 'Whitney'>> “混蛋。”惠特尼盯着弯道，低声骂了一句。“走吧。车的事之后再说。”
         <<case 'Kylar'>> 凯拉尔抓住你的袖口。“你没事吧？”直到你转头看<<him>>，<<his>>手指才稍微松开。
@@ -302,17 +302,17 @@
 <</widget>>
 
 <<widget 'deadwood-transport-road-scene'>>
-  <<set _road_scene to $Transport.trip.scene ?? 0>>
+  <<set $_road_scene to $Transport.trip.scene ?? 0>>
   <<language>>
     <<option 'EN'>>
       <<if [$Transport.trip.from, $Transport.trip.to].includes('farmland')>>
-        <<switch _road_scene>>
+        <<switch $_road_scene>>
           <<case 0>>A lorry loaded with crates passes on the other side. Beyond it, rows of crops run down towards a hedgerow.
           <<case 1>>A tractor waits at a field entrance. You give it room as it turns onto the road, leaving clods of mud behind its tyres.
           <<case 2>>The hedges rise above the road for a stretch, then fall away to reveal the fields. A farm gate rattles as you pass.
         <</switch>>
       <<elseif $Transport.trip.to.startsWith('forest:')>>
-        <<switch _road_scene>>
+        <<switch $_road_scene>>
           <<case 0>>A bird bursts from a bush beside the path. You steady the handlebars as it vanishes between the trunks.
           <<case 1>>Fallen leaves hide a shallow rut. You ease over it, feeling the bump through the saddle.
           <<case 2>>The trees close over the path. For a while, the tyres and your breathing are the only sounds nearby.
@@ -323,13 +323,13 @@
         <<if Time.dayState is 'night'>>The seafront lights pass one by one. Between the buildings, the sea is a dark gap beyond the railings.
         <<else>>A gap between the buildings reveals the sea. A gull rides the wind above the promenade, keeping pace with you for a moment.<</if>>
       <<elseif [$Transport.trip.from, $Transport.trip.to].includes('harvest')>>
-        <<switch _road_scene>>
+        <<switch $_road_scene>>
           <<case 0>>A delivery lorry takes a wide turn across the junction. You wait for its trailer to clear before moving on.
           <<case 1>>A worker wheels a stack of produce crates towards a waiting van. You slow as the trolley bumps over the kerb.
           <<case 2>>Two lorries squeeze past each other. You keep back from their mirrors until the road opens again.
         <</switch>>
       <<else>>
-        <<switch _road_scene>>
+        <<switch $_road_scene>>
           <<case 0>>A delivery van has stopped beside the kerb. Its driver waves you past while carrying a stack of boxes towards a doorway.
           <<case 1>>Cones narrow one lane. You leave space for the traffic coming the other way, then pass the repair crew.
           <<case 2>>A pedestrian hesitates at a crossing. You slow down, and they give you a small nod before crossing.
@@ -337,13 +337,13 @@
       <</if>>
     <<option 'CN'>>
       <<if [$Transport.trip.from, $Transport.trip.to].includes('farmland')>>
-        <<switch _road_scene>>
+        <<switch $_road_scene>>
           <<case 0>>一辆装着货箱的卡车从对面驶过。车身后，一排排作物延伸到田边的树篱。
           <<case 1>>田地入口停着一辆拖拉机。你让出位置，等它拐上公路。轮胎在身后留下几块泥土。
           <<case 2>>有一段路的两旁都是高高的树篱，接着田野又露了出来。经过农场大门时，门闩被风吹得轻响。
         <</switch>>
       <<elseif $Transport.trip.to.startsWith('forest:')>>
-        <<switch _road_scene>>
+        <<switch $_road_scene>>
           <<case 0>>路旁的灌木里突然飞出一只鸟。你稳住车把，看着它消失在树干之间。
           <<case 1>>落叶遮住了一道浅沟。你放慢速度越过去，坐垫还是颠了一下。
           <<case 2>>树冠在小径上方合拢。有一阵，附近只听得见车轮和你的呼吸声。
@@ -354,13 +354,13 @@
         <<if Time.dayState is 'night'>>海滨的灯一盏盏从身边过去。楼房之间，栏杆外的海面只剩下一片深黑。
         <<else>>楼房间的空隙露出海面。一只海鸥乘着风掠过栈道，在你身旁跟了一小段。<</if>>
       <<elseif [$Transport.trip.from, $Transport.trip.to].includes('harvest')>>
-        <<switch _road_scene>>
+        <<switch $_road_scene>>
           <<case 0>>一辆送货卡车在路口拐了个大弯。你等拖车尾部完全过去，才继续前进。
           <<case 1>>工人推着一摞农产品货箱走向面包车。小推车颠下路缘，你也跟着放慢了速度。
           <<case 2>>两辆卡车贴着身挤过去。你避开它们伸出的后视镜，等道路重新腾出空位。
         <</switch>>
       <<else>>
-        <<switch _road_scene>>
+        <<switch $_road_scene>>
           <<case 0>>一辆送货面包车停在路边。司机抱着一摞纸箱走向店门，腾出一只手示意你先走。
           <<case 1>>锥桶围窄了一条车道。你给对面的车辆留出位置，随后从维修工人身旁驶过。
           <<case 2>>有人在人行横道旁犹豫着。你放慢速度，对方朝你点点头，走过了马路。
@@ -411,19 +411,19 @@
 <</widget>>
 
 <<widget 'deadwood-transport-roadside-companion'>>
-  <<set _roadside_name to $Transport.trip.passengers?.[0]>>
-  <<if _roadside_name>>
-    <<npc _roadside_name>><<person1>>
+  <<set $_roadside_name to $Transport.trip.passengers?.[0]>>
+  <<if $_roadside_name>>
+    <<npc $_roadside_name>><<person1>>
     <<language>>
       <<option 'EN'>>
-        <<switch _roadside_name>>
+        <<switch $_roadside_name>>
           <<case 'Robin'>> <<if C.npc.Robin.trauma gte 40>>Robin waits in the car until you return. "Everything okay?"<<else>>Robin smiles when you come back. "That was kind of you."<</if>>
           <<case 'Whitney'>> "Done playing hero?" Whitney asks. <<He>> shifts <<his>> bag out of your way. "Come on, then."
           <<case 'Kylar'>> Kylar has stayed beside your vehicle. "You know them?" <<He>> seems relieved when you shake your head.
           <<case 'Sydney'>> Sydney watches you put things away. "I'm glad we stopped."
         <</switch>>
       <<option 'CN'>>
-        <<switch _roadside_name>>
+        <<switch $_roadside_name>>
           <<case 'Robin'>> <<if C.npc.Robin.trauma gte 40>>罗宾待在车里，直到你回来。“都没事吧？”<<else>>你回来时，罗宾笑了笑。“你人真好。”<</if>>
           <<case 'Whitney'>> “英雄当够了？”惠特尼问。<<He>>把挡着你的包挪开。“那就走吧。”
           <<case 'Kylar'>> 凯拉尔一直待在你的车旁。“你认识那个人？”你摇头后，<<he>>像是松了口气。

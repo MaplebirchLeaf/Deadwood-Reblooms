@@ -1,11 +1,14 @@
 :: Deadwood Reblooms Orchard Trade
 <<set _orchard to maplebirch.get('Orchard')>>
+<<set _orchardReturn to $Orchard?.site is 'shrine' ? 'Deadwood Raven Shrine Garden' : 'Deadwood Reblooms Orchard'>>
 <<if !_orchard or !_orchard.available($Orchard.site)>>
-  <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Orchard'>><</lanLink>><<exit>>
+  <<getouticon>><<lanLink ['Return', '返回'] _orchardReturn>><</lanLink>><<exit>>
 <</if>>
 <<set $outside to 1>>
 <<if $Orchard.site is 'farm'>>
   <<set $location to 'alex_farm'>><<farm_work_update>>
+<<elseif $Orchard.site is 'shrine'>>
+  <<set $location to 'forest_raven_shrine'>>
 <<else>>
   <<set $location to 'temple'>>
 <</if>>
@@ -13,6 +16,8 @@
 <<if $stress gte $stressmax>>
   <<if $Orchard.site is 'farm'>>
     <<passoutfarmroad>>
+  <<elseif $Orchard.site is 'shrine'>>
+    <<passoutforest>>
   <<else>>
     <<passouttemple>>
   <</if>>
@@ -117,4 +122,4 @@
   <br><<icon 'orchard/contract.png'>><<lanLink ['Discuss a weekly fruit contract', '商量一周的水果长单'] 'Deadwood Orchard Farm Contract'>><</lanLink>><br>
 <</if>>
 <</deadwood-dynamicblock>>
-<br><<getouticon>><<lanLink ['Return to the orchard', '返回果园'] 'Deadwood Reblooms Orchard'>><</lanLink>>
+<br><<getouticon>><<lanLink ['Return to the orchard', '返回果园'] _orchardReturn>><</lanLink>>

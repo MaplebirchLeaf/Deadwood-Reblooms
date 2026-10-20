@@ -12,6 +12,7 @@ const wardrobeKeys = [
   'leather_jacket_jeans',
   'sweater_sweatpants_sport',
   'tshirt_shorts',
+  'towel_wrap',
   'hoodie_legwarmers',
   'gothic_formal_suit',
   'evening_gown',

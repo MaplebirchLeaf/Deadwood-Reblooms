@@ -1,0 +1,46 @@
+:: Deadwood Park Bench
+<<set $outside to 1>><<effects>>
+<<if $location isnot 'park' or $combat is 1 or $replayScene or $statFreeze or $possessed or $stress gte $stressmax or $nextPassage or $nextPassageCheck>>
+  <<lanSwitch 'You cannot settle on the bench now.' '你现在没法在长椅上坐下来。'>><br><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      A wooden bench stands beside the riverside path, its paint worn smooth along the seat. Someone has left a folded newspaper beneath one leg to stop it rocking.
+      <br><br>
+      <<if Weather.precipitation is 'rain'>>
+        The branches catch some of the rain, but drops still patter on the seat. People hurry past with their collars turned up.
+      <<elseif Weather.precipitation is 'snow'>>
+        You brush snow from one end of the seat. Footprints cross the path, some ending in a dog's paw marks beside the river.
+      <<elseif Time.dayState is 'night'>>
+        A lamp shines through the branches. You can hear traffic beyond the trees, and footsteps now and then on the path behind you.
+      <<else>>
+        Joggers pass along the path. A dog strains towards the river until its owner calls it back; the lead brushes against the end of the bench.
+      <</if>>
+    <<option 'CN'>>
+      河边的小径旁有张木长椅，椅面上的漆已经磨得光滑。一条椅腿下垫着叠好的旧报纸，坐上去倒还稳当。
+      <br><br>
+      <<if Weather.precipitation is 'rain'>>
+        头顶的树枝挡住了些雨，仍有水滴落在椅面上。路人竖起衣领，匆匆走过。
+      <<elseif Weather.precipitation is 'snow'>>
+        你拂去椅子一头的积雪。小径上留着来往的脚印，河边还混着几枚狗爪印。
+      <<elseif Time.dayState is 'night'>>
+        路灯从枝叶间透下来。树外传来车声，身后的小径上偶尔响起脚步。
+      <<else>>
+        慢跑的人沿小径经过。一条狗使劲往河边蹿，被主人叫了回来，牵绳擦过长椅的一头。
+      <</if>>
+  <</language>><br><br>
+  <<if maplebirch.get('MoreTransformations')?.Raven.available>>
+    <<lanSwitch 'Low croaks come from the trees above the bench. A few black birds have gathered on the branches.' '长椅上方传来低哑的鸣叫，几只黑鸟聚在枝头。'>><br><br>
+    <<deadwood-raven-link>>
+  <</if>>
+  <<icon 'raven-shrine/bench.png'>><<lanLink ['Rest a while (0:15)', '歇一会儿 (0:15)'] 'Park'>>
+    <<if $location is 'park' and $combat isnot 1 and !$replayScene and !$statFreeze and !$possessed and $stress lt $stressmax and !$nextPassage and !$nextPassageCheck>>
+      <<set _benchSource to $passage, $eventskip to 0>><<pass 15>>
+      <<if $passage is _benchSource and $location is 'park' and $combat isnot 1 and !$replayScene and !$statFreeze and !$possessed and $stress lt $stressmax and !$nextPassage and !$nextPassageCheck>>
+        <<stress `Weather.precipitation is 'rain' ? -1 : -3`>><<tiredness -1>>
+      <</if>>
+    <</if>>
+  <</lanLink>><<lstress>><<ltiredness>><br>
+<</if>>
+<br>
+<<getouticon>><<lanLink ['Return to the path', '回到小径上'] 'Park'>><</lanLink>><br>

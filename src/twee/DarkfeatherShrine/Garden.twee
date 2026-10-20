@@ -1,0 +1,83 @@
+:: Deadwood Raven Shrine Garden
+<<set $outside to 1>><<effects>><<deadwood-raven-shrine-presence>>
+<<if !_shrine or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine'>>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<set _shrineGardenOrchard to maplebirch.get('Orchard')>>
+<<set _shrineGardenPerson to _shrineSafe and C.npc.Tsukihan?.init is 1 and C.npc.Tsukihan.state is 'active' and _shrineTsukihanLocation is 'raven_shrine_garden'>>
+<<set _shrineGardenGuide to _shrineGardenPerson or _shrinePerson and C.npc.Tsukihan?.init is 1>>
+<<if !_shrineGardenPerson and _shrineTravel and $npc?.includes('Tsukihan')>><<endnpc 'Tsukihan'>><</if>>
+<<language>>
+  <<option 'EN'>>
+    <<if _shrineGardenOrchard?.state.unlocked.shrine>>Behind the house, a sunny strip beside the fence has been divided into two fruit-tree plots. Wooden supports line the edge.
+    <<else>>Behind the house, an apple tree and a plum tree grow in a sunny strip beside the fence. Their lower branches have been tied to wooden supports.<</if>> A worn watering can stands beneath the outside tap.<br><br>
+    <<if Weather.isSnow>>Snow covers the ground. Someone has cleared a path to the tap.
+    <<elseif Weather.precipitation is 'rain'>>Water drips from the fence onto dark soil. An upturned basket waits beneath the eaves.
+    <<else>>A little wind stirs the grass beyond the fence. The ground between the supports is kept clear of weeds.<</if>>
+  <<option 'CN'>>
+    <<if _shrineGardenOrchard?.state.unlocked.shrine>>屋后靠着围栏，向阳的一小片地分成两块，用来栽果树。边上立着木架。
+    <<else>>屋后靠着围栏，向阳的一小片地里长着一棵苹果树和一棵李子树，低垂的枝条用木架托着。<</if>>外面的水龙头下放着一只用旧的浇水壶。<br><br>
+    <<if Weather.isSnow>>地上积着雪，有人清出了通往水龙头的小路。
+    <<elseif Weather.precipitation is 'rain'>>水滴顺着围栏落进深色的泥土，檐下倒扣着一只竹篮。
+    <<else>>风轻轻拨动围栏外的草，木架间的杂草已经除干净了。<</if>>
+<</language>><br><br>
+<<if _shrineGardenPerson>>
+  <<npc Tsukihan>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _shrine.harvests gte 3>>Tsukihan holds up a length of cord when <<he>> sees you. "Would you check this one? You know these branches as well as I do now." <<He>> waits for your opinion before securing it to the support.
+      <<else>>Tsukihan crouches beside a support, pressing its base firmly into the soil. "The wind loosened it again. It seemed quite solid yesterday." <<He>> gives it another push before standing and brushing the soil from <<his>> knees.<</if>><br><br>
+      <<if C.npc.Tsukihan.dom gte 70>>"Come and look. I've been waiting for someone to tell me whether that branch is straight."
+      <<else>>"The afternoon work is mostly out here. It's quieter than the veranda." <<He>> leaves room for you beside the tree.<</if>>
+    <<option 'CN'>>
+      <<if _shrine.harvests gte 3>>看见你，月羽举了举手里的挂绳。“来看看这根吧。这几根枝条，你现在也都摸熟了。”<<He>>等你看过，才把绳子系到木架上。
+      <<else>>月羽蹲在木架旁，把底下的土压实。“又让风吹松了。昨天明明还好好的。”<<He>>又推了推，才站起来，拍去膝上的土。<</if>><br><br>
+      <<if C.npc.Tsukihan.dom gte 70>>“过来看看。还在等人告诉我，那根枝条到底扶正没有。”
+      <<else>>“下午多半在这边忙。比廊下安静些。”<<He>>在树旁给你让出位置。<</if>>
+  <</language>><br><br>
+  <<if _shrine.wish.shared and _shrine.wish.kind is 'harvest'>>
+    <<lanSwitch '"Wasn\'t this what you wrote on your plaque?" Tsukihan looks along the branches. "I hope there will be enough to fill your basket."' '“绘马上写的，是这件事吧？”月羽顺着枝条看过去，“希望够你装满一篮子。”'>><br><br>
+  <</if>>
+<</if>>
+<<if _shrineGardenOrchard>>
+  <<if _shrineGardenOrchard.available('shrine')>>
+    <<set $Orchard.site to 'shrine'>>
+    <<deadwood-orchard-map>><br>
+    <<if _shrineSafe and _shrineGardenOrchard.canWork>>
+      <<for _treeIndex, _tree range $Orchard.shrine>>
+        <<if _shrineGardenOrchard.ripe(_tree)>>
+          <<capture _treeIndex>>
+            <<set _treeName to _shrineGardenOrchard.species[_tree.species].name>>
+            <<foodstufficon _tree.fruit[0].type>><<lanLink ['Pick the ripe fruit from the ' + _treeName[0].toLowerCase() + ' tree (0:10)', '采下' + _treeName[1] + '树上的成熟果实 (0:10)'] 'Deadwood Raven Shrine Garden'>>
+              <<deadwood-raven-shrine-context>>
+              <<if _shrineSafe and $location is 'forest_raven_shrine' and $passage is 'Deadwood Raven Shrine Garden'>>
+                <<set _harvestMinutes to maplebirch.get('Orchard')?.act('shrine', _treeIndex, 'harvest')>>
+                <<if _harvestMinutes>><<tiredness 1>><<tending 1>><<pass _harvestMinutes>><</if>>
+              <</if>>
+            <</lanLink>><<gtiredness>><<gtending>><br>
+          <</capture>>
+        <</if>>
+      <</for>>
+    <</if>>
+    <<if !$Orchard.shrine.some(tree => tree?.fruit.length)>>
+      <span class='subtle'><<lanSwitch 'There is no ripe fruit to pick yet. Watered mature trees set a new crop every seven days.' '枝头还没有成熟的果子。有水的成树每七个生长日结出一批果实。'>></span><br>
+    <</if>>
+    <<icon 'orchard/sales.png'>><<lanLink ['Fruit inventory and sales', '水果库存与销售'] 'Deadwood Reblooms Orchard Trade'>><</lanLink>><br>
+  <<elseif _shrineGardenGuide and _shrineGardenOrchard.ready('shrine') and (_shrineGardenPerson or _shrineMinutes gt 10)>>
+    <<lanSwitch '"I can keep them watered, but another pair of hands would help. When the fruit is ripe, you can pick some too." Tsukihan points out the basket beneath the eaves.' '“浇水我顾得过来，不过有人搭把手就更好了。果子熟了，你也可以来摘。”月羽指了指檐下的竹篮。'>><br><br>
+    <<icon 'temple/garden-tools.png'>><<lanLink ['Help check the trees with Tsukihan (0:10)', '陪月羽检查果树 (0:10)'] 'Deadwood Raven Shrine Garden'>>
+      <<deadwood-raven-shrine-context>>
+      <<if _shrineSafe and (_shrinePerson or _shrineTsukihanLocation is 'raven_shrine_garden') and $location is 'forest_raven_shrine' and maplebirch.get('Orchard').ready('shrine')>>
+        <<pass 10>><<deadwood-raven-shrine-context>>
+        <<if _shrineSafe and (_shrinePerson or _shrineTsukihanLocation is 'raven_shrine_garden') and $passage is 'Deadwood Raven Shrine Garden' and $location is 'forest_raven_shrine'>>
+          <<if maplebirch.get('Orchard').unlock('shrine')>><<set $Orchard.site to 'shrine'>><<tending 1>><</if>>
+        <</if>>
+      <</if>>
+    <</lanLink>><br>
+  <<elseif !$Orchard.unlocked.shrine and C.npc.Tsukihan?.init is 1 and C.npc.Tsukihan.love gte 10>>
+    <span class='subtle'><<lanSwitch 'You can ask Tsukihan about helping with the trees while they are in the courtyard or garden.' '月羽在庭院或果树边时，可以问问一起照料果树的事。'>></span><br>
+  <</if>>
+<<else>>
+  <span class='subtle'><<lanSwitch 'Enable Orchard in Mod Settings to grow and harvest fruit here.' '在模组设置中启用“果园”后，可以在这里照料、采收果树。'>></span><br>
+<</if>>
+<br><<deadwood-raven-shrine-return>>

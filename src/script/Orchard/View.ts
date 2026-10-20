@@ -446,7 +446,7 @@ export default class OrchardView {
       return;
     }
     this.orchard.notice ??= { tool };
-    this.orchard.core.SugarCube.Engine.play('Deadwood Reblooms Orchard');
+    this.orchard.core.SugarCube.Engine.play(this.site === 'shrine' ? 'Deadwood Raven Shrine Garden' : 'Deadwood Reblooms Orchard');
   }
 
   private receipt(receipt: OrchardReceipt): void {

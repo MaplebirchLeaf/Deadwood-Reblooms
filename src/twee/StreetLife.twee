@@ -51,8 +51,8 @@
 
 <!-- 罪证与历史仍由原版两段 relation-text 显示，查案记录不抵消犯罪记录。 -->
 <<widget 'deadwood-street-police-reputation-text'>>
-  <<set _streetPolice to maplebirch.get('StreetLife').bounties>>
-  <<if _streetPolice.wanted>>
+  <<set $_streetPolice to maplebirch.get('StreetLife').bounties>>
+  <<if $_streetPolice.wanted>>
     <<language>>
       <<option 'EN'>>
         <span class='red'>You cannot take new cases or collect rewards while the police have enough evidence for an arrest.</span>
@@ -62,30 +62,30 @@
   <</if>>
   <<language>>
     <<option 'EN'>>
-      <<if _streetPolice.state.cooperating>>
+      <<if $_streetPolice.state.cooperating>>
         You have agreed to assist Grant with enquiries.
-      <<elseif _streetPolice.state.completed gt 0>>
+      <<elseif $_streetPolice.state.completed gt 0>>
         You are no longer taking cases from Grant.
       <<elseif C.npc.Grant.init is 1>>
         You have not agreed to assist Grant with enquiries.
       <<else>>
         The station has no record of you assisting with enquiries.
       <</if>>
-      <<if _streetPolice.state.completed gt 0>>
-        The station has verified <span class='teal'><<= _streetPolice.state.completed>></span> of your completed cases.
+      <<if $_streetPolice.state.completed gt 0>>
+        The station has verified <span class='teal'><<= $_streetPolice.state.completed>></span> of your completed cases.
       <</if>>
     <<option 'CN'>>
-      <<if _streetPolice.state.cooperating>>
+      <<if $_streetPolice.state.cooperating>>
         你已同意协助格兰特查案。
-      <<elseif _streetPolice.state.completed gt 0>>
+      <<elseif $_streetPolice.state.completed gt 0>>
         你已停止接取格兰特的案件。
       <<elseif C.npc.Grant.init is 1>>
         你尚未同意协助格兰特查案。
       <<else>>
         警局还没有你协助查案的记录。
       <</if>>
-      <<if _streetPolice.state.completed gt 0>>
-        警局已核验你完成的<span class='teal'><<= _streetPolice.state.completed>></span>件案件。
+      <<if $_streetPolice.state.completed gt 0>>
+        警局已核验你完成的<span class='teal'><<= $_streetPolice.state.completed>></span>件案件。
       <</if>>
   <</language>>
   <<if $StreetLife.bailey?.resolution is 'reported'>>
@@ -97,22 +97,22 @@
         警局已登记你报告的货物纠纷线索，<span class='blue'>仍待核验。</span>
     <</language>>
   <</if>>
-  <<if _streetPolice.state.cooperating or _streetPolice.state.completed gt 0>>
+  <<if $_streetPolice.state.cooperating or $_streetPolice.state.completed gt 0>>
     <br>
     <<language>>
       <<option 'EN'>>
-        <<if _streetPolice.trust gte 60>>
-          Grant <span @class="_streetPolice.wanted ? 'blue' : 'green'">treats your reports as reliable</span>, while still checking the details.
-        <<elseif _streetPolice.trust gte 20>>
-          Grant <span @class="_streetPolice.wanted ? 'blue' : 'teal'">recognises your ability</span> to follow a lead through town.
+        <<if $_streetPolice.trust gte 60>>
+          Grant <span @class="$_streetPolice.wanted ? 'blue' : 'green'">treats your reports as reliable</span>, while still checking the details.
+        <<elseif $_streetPolice.trust gte 20>>
+          Grant <span @class="$_streetPolice.wanted ? 'blue' : 'teal'">recognises your ability</span> to follow a lead through town.
         <<else>>
           Grant <span class='blue'>expects an accurate account</span> before accepting your work.
         <</if>>
       <<option 'CN'>>
-        <<if _streetPolice.trust gte 60>>
-          格兰特<span @class="_streetPolice.wanted ? 'blue' : 'green'">认为你的报告可靠</span>，仍会逐项核实细节。
-        <<elseif _streetPolice.trust gte 20>>
-          格兰特<span @class="_streetPolice.wanted ? 'blue' : 'teal'">认可你追查线索的本事</span>。
+        <<if $_streetPolice.trust gte 60>>
+          格兰特<span @class="$_streetPolice.wanted ? 'blue' : 'green'">认为你的报告可靠</span>，仍会逐项核实细节。
+        <<elseif $_streetPolice.trust gte 20>>
+          格兰特<span @class="$_streetPolice.wanted ? 'blue' : 'teal'">认可你追查线索的本事</span>。
         <<else>>
           格兰特等着你<span class='blue'>如实说明差事的经过</span>，再核验你的工作。
         <</if>>
@@ -202,37 +202,37 @@
 :: Deadwood Street Weapon Widgets [widget]
 <<widget 'deadwood-street-weapon'>>
   <<if !maplebirch.get('StreetLife').canUse(_args[0])>><<exit>><</if>>
-  <<set _streetHand to _args[0]>><<set _streetTarget to Number(maplebirch.SugarCube.State.variables[_streetHand + 'target'])>>
-  <<set _streetWeapon to setup.clothes.handheld[$worn[_streetHand is 'left' ? 'handheld_left' : 'handheld'].index]>>
-  <<switch _streetWeapon.variable>>
+  <<set $_streetHand to _args[0]>><<set $_streetTarget to Number(maplebirch.SugarCube.State.variables[$_streetHand + 'target'])>>
+  <<set $_streetWeapon to setup.clothes.handheld[$worn[$_streetHand is 'left' ? 'handheld_left' : 'handheld'].index]>>
+  <<switch $_streetWeapon.variable>>
     <<case 'street_knife'>>
-      <<lanSwitch 'You strike with your small knife.' '你用小刀发动攻击。'>><<defiance 3 _streetTarget>><<attackstat>>
+      <<lanSwitch 'You strike with your small knife.' '你用小刀发动攻击。'>><<defiance 3 $_streetTarget>><<attackstat>>
     <<case 'street_crowbar'>>
-      <<lanSwitch 'You swing your crowbar at your attacker.' '你抡起撬棍，砸向袭击者。'>><<defiance _streetWeapon.streetMelee _streetTarget>><<attackstat>>
+      <<lanSwitch 'You swing your crowbar at your attacker.' '你抡起撬棍，砸向袭击者。'>><<defiance $_streetWeapon.streetMelee $_streetTarget>><<attackstat>>
     <<case 'street_machete'>>
-      <<lanSwitch 'You slash at your attacker with your machete.' '你挥动砍刀，劈向袭击者。'>><<defiance _streetWeapon.streetMelee _streetTarget>><<attackstat>>
+      <<lanSwitch 'You slash at your attacker with your machete.' '你挥动砍刀，劈向袭击者。'>><<defiance $_streetWeapon.streetMelee $_streetTarget>><<attackstat>>
     <<case 'street_stunner'>>
       <<lanSwitch 'You press the stun device against your attacker.' '你把电击器抵向袭击者。'>>
-      <<set _thedamage to Math.min(6, $enemyno gte 2 ? $NPCList[_streetTarget].health : $enemyhealth)>>
-      <<if $enemyno gte 2>><<npcdamage _streetTarget>><</if>>
+      <<set _thedamage to Math.min(6, $enemyno gte 2 ? $NPCList[$_streetTarget].health : $enemyhealth)>>
+      <<if $enemyno gte 2>><<npcdamage $_streetTarget>><</if>>
       <<set $enemyhealth -= _thedamage>><<set $enemyanger += 5>><<attackstat>>
     <<case 'street_handgun' 'street_shotgun' 'street_smg' 'street_rifle'>>
-      <<set _streetFirearm to _streetWeapon.streetWeapon>>
-      <<set _streetShots to Math.min(_streetFirearm.shots, $StreetLife.ammo[_streetFirearm.ammo])>>
-      <<set $StreetLife.ammo[_streetFirearm.ammo] -= _streetShots>>
+      <<set $_streetFirearm to $_streetWeapon.streetWeapon>>
+      <<set $_streetShots to Math.min($_streetFirearm.shots, $StreetLife.ammo[$_streetFirearm.ammo])>>
+      <<set $StreetLife.ammo[$_streetFirearm.ammo] -= $_streetShots>>
       <<language>>
         <<option 'EN'>>
-          You fire your <<= _streetWeapon.name>>. <<if _streetShots gt 1>>Shots crack in quick succession, cutting through the struggle.<<else>>The shot cracks through the struggle.<</if>> Your attacker staggers, clutching the wound.
+          You fire your <<= $_streetWeapon.name>>. <<if $_streetShots gt 1>>Shots crack in quick succession, cutting through the struggle.<<else>>The shot cracks through the struggle.<</if>> Your attacker staggers, clutching the wound.
         <<option 'CN'>>
-          你用<<= _streetWeapon.cn_name_cap>>开火。<<if _streetShots gt 1>>枪声接连响起，打断了拉扯。<<else>>枪声骤然响起，打断了拉扯。<</if>>袭击者踉跄了一下，捂住伤处。
+          你用<<= $_streetWeapon.cn_name_cap>>开火。<<if $_streetShots gt 1>>枪声接连响起，打断了拉扯。<<else>>枪声骤然响起，打断了拉扯。<</if>>袭击者踉跄了一下，捂住伤处。
       <</language>>
-      <<set _streetHealthMax to $enemyno gte 2 ? $NPCList[_streetTarget].healthmax : $enemyhealthmax>>
+      <<set $_streetHealthMax to $enemyno gte 2 ? $NPCList[$_streetTarget].healthmax : $enemyhealthmax>>
       <!-- 练枪统计达到 1000 时熟练，伤害系数保持 60%–100%，疼痛最多扣 10 个百分点。 -->
       <<set _streetAim to Math.clamp(0.6 + Math.clamp($stat_shoot / 1000, 0, 1) * 0.4 - Math.clamp($pain / 100, 0, 1) * 0.1, 0.6, 1)>>
-      <<set _thedamage to Math.min((_streetFirearm.damage + _streetHealthMax * _streetFirearm.damage_percent / 100) * _streetShots * _streetAim, $enemyno gte 2 ? $NPCList[_streetTarget].health : $enemyhealth)>>
-      <<if $enemyno gte 2>><<npcdamage _streetTarget>><</if>>
+      <<set _thedamage to Math.min(($_streetFirearm.damage + $_streetHealthMax * $_streetFirearm.damage_percent / 100) * $_streetShots * _streetAim, $enemyno gte 2 ? $NPCList[$_streetTarget].health : $enemyhealth)>>
+      <<if $enemyno gte 2>><<npcdamage $_streetTarget>><</if>>
       <<set $enemyhealth -= _thedamage, $enemyanger += 30>><<attackstat>>
-      <<set $NPCList[_streetTarget].deadwoodGunshot to true>>
-      <<crimeUp _streetFirearm.crime 'assault'>>
+      <<set $NPCList[$_streetTarget].deadwoodGunshot to true>>
+      <<crimeUp $_streetFirearm.crime 'assault'>>
   <</switch>><br>
 <</widget>>

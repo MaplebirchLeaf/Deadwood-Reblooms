@@ -65,6 +65,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
     { widget: 'deadwood-robin-balloon-links', passage: 'Balloon Stand' },
     { widget: 'deadwood-robin-shop-permit-link', passage: 'Town Hall Wait' },
     { widget: 'deadwood-robin-night-link', passage: "Robin's Room Entrance" },
+    { widget: 'deadwood-robin-savings-link', passage: "Robin's Room Entrance" },
     { widget: 'deadwood-robin-tentacle-plains-link', passage: 'Tentacle Plains' },
     { widget: 'deadwood-robin-pregnancy-link', passage: 'Robin Options' }
   );

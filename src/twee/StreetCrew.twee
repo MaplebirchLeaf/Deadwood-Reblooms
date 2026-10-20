@@ -16,18 +16,18 @@
 <!-- 调用方先推进任务阶段，再传入实际参加的名单；这里只结算成长，不另掷骰。 -->
 <<widget 'deadwood-street-crew-gain'>>
   <<if $statFreeze or $replayScene>><<exit>><</if>>
-  <<set _crewGainKeys to [...new Set(_args[0])].filter(key => $per_npc[key]?.heist and $per_npc[key].health gt 0 and $per_npc[key].heist.status isnot 'arrested' and ['scout', 'carrier'].includes($per_npc[key].heist.role))>>
-  <<set _crewBaseGain to Math.max(0, Number(_args[1]) || 0), _crewPairGain to Math.max(0, Number(_args[2]) || 0)>>
-  <<for _crewGainKey range _crewGainKeys>>
-    <<set _crewGainNpc to $per_npc[_crewGainKey], _crewGainRole to $per_npc[_crewGainKey].heist.role>>
-    <<set _crewGainSkill to _crewGainRole is 'scout' ? 'security' : 'athletics'>>
-    <<set _crewGainNpc.skills[_crewGainSkill] to Math.min(1000, _crewGainNpc.skills[_crewGainSkill] + Math.round(_crewBaseGain * (_crewGainNpc.heist.growth?.[_crewGainRole] ?? 100) / 100))>>
+  <<set $_crewGainKeys to [...new Set(_args[0])].filter(key => $per_npc[key]?.heist and $per_npc[key].health gt 0 and $per_npc[key].heist.status isnot 'arrested' and ['scout', 'carrier'].includes($per_npc[key].heist.role))>>
+  <<set $_crewBaseGain to Math.max(0, Number(_args[1]) || 0), _crewPairGain to Math.max(0, Number(_args[2]) || 0)>>
+  <<for _crewGainKey range $_crewGainKeys>>
+    <<set $_crewGainNpc to $per_npc[_crewGainKey], _crewGainRole to $per_npc[_crewGainKey].heist.role>>
+    <<set $_crewGainSkill to _crewGainRole is 'scout' ? 'security' : 'athletics'>>
+    <<set $_crewGainNpc.skills[$_crewGainSkill] to Math.min(1000, $_crewGainNpc.skills[$_crewGainSkill] + Math.round($_crewBaseGain * ($_crewGainNpc.heist.growth?.[_crewGainRole] ?? 100) / 100))>>
   <</for>>
-  <<if _crewGainKeys.length is 2 and _crewPairGain gt 0>>
-    <<set _crewFirst to $per_npc[_crewGainKeys[0]], _crewSecond to $per_npc[_crewGainKeys[1]]>>
-    <<set _crewBond to Math.min(100, Math.min(_crewFirst.heist.familiarity?.[_crewSecond.per] ?? 0, _crewSecond.heist.familiarity?.[_crewFirst.per] ?? 0) + _crewPairGain)>>
-    <<set _crewFirst.heist.familiarity to _crewFirst.heist.familiarity ?? {}, _crewSecond.heist.familiarity to _crewSecond.heist.familiarity ?? {}>>
-    <<set _crewFirst.heist.familiarity[_crewSecond.per] to _crewBond, _crewSecond.heist.familiarity[_crewFirst.per] to _crewBond>>
+  <<if $_crewGainKeys.length is 2 and _crewPairGain gt 0>>
+    <<set $_crewFirst to $per_npc[$_crewGainKeys[0]], _crewSecond to $per_npc[$_crewGainKeys[1]]>>
+    <<set $_crewBond to Math.min(100, Math.min($_crewFirst.heist.familiarity?.[_crewSecond.per] ?? 0, _crewSecond.heist.familiarity?.[$_crewFirst.per] ?? 0) + _crewPairGain)>>
+    <<set $_crewFirst.heist.familiarity to $_crewFirst.heist.familiarity ?? {}, _crewSecond.heist.familiarity to _crewSecond.heist.familiarity ?? {}>>
+    <<set $_crewFirst.heist.familiarity[_crewSecond.per] to $_crewBond, _crewSecond.heist.familiarity[$_crewFirst.per] to $_crewBond>>
   <</if>>
 <</widget>>
 
@@ -46,10 +46,10 @@
     <<set _streetKey to 'deadwood_street_heist_' + _streetRecruit.id>>
     <<if !$per_npc[_streetKey]>>
       <<generateNPC 1 'a'>>
-      <<set _streetBase to {scout: random(_streetRecruit.skills.scout[0], _streetRecruit.skills.scout[1]), carrier: random(_streetRecruit.skills.carrier[0], _streetRecruit.skills.carrier[1])}>>
-      <<set _streetGrowth to {scout: random(_streetRecruit.growth.scout[0], _streetRecruit.growth.scout[1]), carrier: random(_streetRecruit.growth.carrier[0], _streetRecruit.growth.carrier[1])}>>
-      <<set $NPCList[0].per to _streetKey, $NPCList[0].heist to {role: '', base: _streetBase, growth: _streetGrowth, familiarity: {}, paid: false, cut: _streetRecruit.cut, fee: _streetRecruit.fee}>>
-      <<set $NPCList[0].skills.security to _streetBase.scout, $NPCList[0].skills.athletics to _streetBase.carrier>>
+      <<set $_streetBase to {scout: random(_streetRecruit.skills.scout[0], _streetRecruit.skills.scout[1]), carrier: random(_streetRecruit.skills.carrier[0], _streetRecruit.skills.carrier[1])}>>
+      <<set $_streetGrowth to {scout: random(_streetRecruit.growth.scout[0], _streetRecruit.growth.scout[1]), carrier: random(_streetRecruit.growth.carrier[0], _streetRecruit.growth.carrier[1])}>>
+      <<set $NPCList[0].per to _streetKey, $NPCList[0].heist to {role: '', base: $_streetBase, growth: $_streetGrowth, familiarity: {}, paid: false, cut: _streetRecruit.cut, fee: _streetRecruit.fee}>>
+      <<set $NPCList[0].skills.security to $_streetBase.scout, $NPCList[0].skills.athletics to $_streetBase.carrier>>
       <<saveNPC 0 _streetKey>><<endevent>>
     <</if>>
     <<if !_streetHeist.state.crew.includes(_streetKey) and !_streetHeist.state.candidates.includes(_streetKey)>><<set _streetHeist.state.candidates.push(_streetKey)>><</if>>
@@ -78,7 +78,7 @@
   <</if>>
   <<set _streetStarted to Time.date.timeStamp, _streetClosing to Time.date.timeStamp + (18 * 60 - Time.hour * 60 - Time.minute) * 60, _streetRoster to _streetHeist.roster>>
   <<if _streetStarted + 5 * 60 gte _streetClosing>><<set _streetHeist.state.feedback.outcome to 'too_late'>><<exit>><</if>>
-  <<set _streetFee to _streetCandidate.heist.paid ? 0 : _streetCandidate.heist.fee, _streetNegotiated to _streetHeist.skills.english gte 400>>
+  <<set $_streetFee to _streetCandidate.heist.paid ? 0 : _streetCandidate.heist.fee, _streetNegotiated to _streetHeist.skills.english gte 400>>
   <<endevent>><<pass 5>>
   <<set _streetHeist.state.feedback to {action:_streetAction is 'negotiate' ? 'negotiation' : 'recruitment', outcome:'interrupted', minutes:Math.max(0, Math.round((Time.date.timeStamp - _streetStarted) / 60)), cost:0}>>
   <<set _streetCandidate to $per_npc[_streetKey]>>
@@ -86,13 +86,13 @@
   <<if _streetAction is 'negotiate'>>
     <<if _streetCandidate.heist.paid or _streetCandidate.heist.negotiateTried or $worn.face.type.includes('gag')>><<exit>><</if>>
     <<set _streetCandidate.heist.negotiateTried to true, _streetCandidate.heist.discounted to _streetNegotiated>>
-    <<if _streetNegotiated>><<set _streetCandidate.heist.fee to Math.floor(_streetFee * 0.9)>><</if>>
+    <<if _streetNegotiated>><<set _streetCandidate.heist.fee to Math.floor($_streetFee * 0.9)>><</if>>
     <<englishskill 5 'no_star'>>
   <<else>>
-    <<if _streetHeist.crew.length gte 2 or _streetHeist.crew.some(npc => npc.heist.role === _streetAction) or (!_streetCandidate.heist.paid and $money lt _streetFee)>><<exit>><</if>>
-    <<if !_streetCandidate.heist.paid>><<money `-_streetFee`>><<set _streetHeist.state.spent += _streetFee, _streetCandidate.heist.paid to true>><</if>>
+    <<if _streetHeist.crew.length gte 2 or _streetHeist.crew.some(npc => npc.heist.role === _streetAction) or (!_streetCandidate.heist.paid and $money lt $_streetFee)>><<exit>><</if>>
+    <<if !_streetCandidate.heist.paid>><<money `-$_streetFee`>><<set _streetHeist.state.spent += $_streetFee, _streetCandidate.heist.paid to true>><</if>>
     <<set _streetCandidate.heist.role to _streetAction>>
-    <<set _streetHeist.state.candidates.delete(_streetKey), _streetHeist.state.crew.push(_streetKey), _streetHeist.state.feedback.cost to _streetFee>>
+    <<set _streetHeist.state.candidates.delete(_streetKey), _streetHeist.state.crew.push(_streetKey), _streetHeist.state.feedback.cost to $_streetFee>>
     <<deadwood-street-crew-invalidate>>
   <</if>>
   <<set _streetHeist.state.feedback.outcome to 'completed'>><<endevent>>
@@ -108,10 +108,10 @@
 <</widget>>
 
 <<widget 'deadwood-street-crew-skills'>>
-  <<set _crewPerson to _args[0], _crewSkillSet to maplebirch.get('StreetLife').heist.roleSkills[_args[0].per]>>
+  <<set $_crewPerson to _args[0], _crewSkillSet to maplebirch.get('StreetLife').heist.roleSkills[_args[0].per]>>
   <<for _crewRole range ['scout', 'carrier']>>
     <<icon `'street/' + _crewRole + '.png'`>><<lanSwitch `_crewRole === 'scout' ? 'Scout: ' : 'Carrier: '` `_crewRole === 'scout' ? '侦察：' : '搬运：'`>><span class='teal'><<= _crewSkillSet[_crewRole]>></span> / 1000
-    <span class='grey'>(<<lanSwitch 'initial ' '初值'>><<= _crewPerson.heist.base?.[_crewRole] ?? _crewSkillSet[_crewRole]>> · <<lanSwitch 'growth ' '成长'>><<= _crewPerson.heist.growth?.[_crewRole] ?? 100>>%)</span><br>
+    <span class='grey'>(<<lanSwitch 'initial ' '初值'>><<= $_crewPerson.heist.base?.[_crewRole] ?? _crewSkillSet[_crewRole]>> · <<lanSwitch 'growth ' '成长'>><<= $_crewPerson.heist.growth?.[_crewRole] ?? 100>>%)</span><br>
   <</for>>
 <</widget>>
 
@@ -159,8 +159,11 @@
     <span class='blue'><<lanSwitch 'Changing either person or their role means rehearsing the plan again. Their skills stay with them; familiarity belongs to each pair. Rehearsing the same arrangement again does not grant more experience.' '换人或换分工后，需要重新排演。学到的本领不会丢，默契则是两个人一起积累的。反复排演同一套安排，不会再获得经验。'>></span><br>
   <</if>>
 <</if>><br>
-<<if _streetHeist.state.appointment>><<icon 'street/heist-plan.png'>><<lanLink ['Return to the bank plan', '回到银行行动的安排'] 'Deadwood Street Heist Plan'>><<endevent>><</lanLink>><br><</if>>
-<<getouticon>><<lanLink ['Return to the pub', '回到酒馆'] 'Smuggler Pub'>><<endevent>><</lanLink>><br>
+<<if _streetHeist.state.appointment>>
+  <<icon 'street/heist-plan.png'>><<lanLink ['Return to the bank plan', '回到银行行动的安排'] 'Deadwood Street Heist Plan'>><<endevent>><</lanLink>><br>
+<<else>>
+  <<getouticon>><<lanLink ['Return to the pub', '回到酒馆'] 'Smuggler Pub'>><<endevent>><</lanLink>><br>
+<</if>>
 
 :: Deadwood Street Heist Candidate
 <<set _streetHeist to maplebirch.get('StreetLife')?.heist>>
@@ -205,7 +208,7 @@
     <span class='green'><<lanSwitch 'The advance has been paid. You can invite this person back without paying it again.' '定金已经付过，再邀回来不另收费。'>></span><br>
   <<elseif !_streetCandidate.heist.negotiateTried>>
     <<if !$worn.face.type.includes('gag') and 18 * 60 - Time.hour * 60 - Time.minute gt 5>>
-      <<socialiseicon 'ask'>><<lanLink ['Discuss the advance (0:05)', '谈谈定金 (0:05)'] 'Deadwood Street Heist Candidate'>>
+      <<icon 'street/job-payment.png'>><<lanLink ['Discuss the advance (0:05)', '谈谈定金 (0:05)'] 'Deadwood Street Heist Candidate'>>
         <<deadwood-street-heist-candidate-action 'negotiate'>>
       <</lanLink>><br>
     <<else>>

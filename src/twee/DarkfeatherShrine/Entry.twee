@@ -78,11 +78,11 @@
   <<deadwood-raven-shrine-context>>
   <<if _shrineSafe and _shrine.stage is 0 and _shrine.feeds gte 3 and _shrineModule.Raven.available and _shrineModule.Raven.met>>
     <<lanSwitch 'A familiar raven lands nearby, carrying a folded paper tied with string. It holds the paper out towards you.' '一只熟悉的渡鸦落在近处，喙里衔着一张用细绳扎好的折纸。它往前探了探，把纸递向你。'>><br><br>
-    <<icon 'raven-shrine/feather-letter.png'>><<lanLink ['Take the letter from the raven', '接过渡鸦衔来的信']>>
+    <<icon 'raven-shrine/feather-letter.png'>><<lanLink ['Take the letter from the raven', '接过渡鸦衔来的信'] 'Deadwood Raven Letter'>>
       <<deadwood-raven-shrine-context>>
       <<if _shrineSafe and _shrine.stage is 0 and _shrine.feeds gte 3 and _shrineModule.Raven.available and _shrineModule.Raven.met>>
         <<set $MoreTransformations.raven.origin to {park: 'Park', churchyard: 'Churchyard', forest: 'Forest', forest_raven_shrine: 'Deadwood Raven Shrine'}[$location]>>
-        <<set _shrine.stage to 1>><<goto 'Deadwood Raven Letter'>>
+        <<set _shrine.stage to 1>>
       <</if>>
     <</lanLink>><br>
   <</if>>
@@ -91,8 +91,8 @@
 <<widget 'deadwood-raven-shrine-path'>>
   <<deadwood-raven-shrine-context>>
   <<if _shrineSafe and _shrine.stage gte 2 and $location is 'forest' and $forest gte 20 and $forest lte 40 and !Weather.bloodMoon>>
-    <<if _shrine.stage is 2>><<lanSwitch 'A split beech stands beside the path, just as Gwylan described. Beyond it, narrow stone steps climb between the trees.' '小径旁立着一棵分叉的山毛榉，和格威岚说的一样。树后露出一段窄窄的石阶，向林间延伸。'>><br><br><</if>>
-    <<icon 'raven-shrine/shrine.png'>><<lanLink ['Follow the path to Darkfeather Shrine (0:15)', '沿参道前往黯羽神社 (0:15)']>>
+    <<if _shrine.stage is 2>><<lanSwitch 'A split beech stands beside the path, just as Gwylan described. Beyond it, narrow stone steps climb between the trees.' '小径旁立着一棵分叉的山毛榉，和格威岚说的一样。树后露出一段窄窄的石阶，向林间延伸。'>><br><</if>>
+    <<icon 'raven-shrine/shrine.png'>><<lanLink ['Follow the path to Darkfeather Shrine (0:15)', '沿参道前往黯羽神社 (0:15)'] 'Deadwood Raven Shrine'>>
       <<deadwood-raven-shrine-context>>
       <<if _shrineSafe and _shrine.stage gte 2 and $location is 'forest' and $forest gte 20 and $forest lte 40 and !Weather.bloodMoon>>
         <<set _shrineSource to $passage, _shrineDepth to $forest>>
@@ -101,25 +101,23 @@
         <<if _shrineSafe and $passage is _shrineSource and $location is 'forest' and !Weather.bloodMoon>>
           <<set _shrine.forest to _shrineDepth>><<set _shrine.stage to 3>>
           <<set $location to 'forest_raven_shrine'>>
-          <<goto 'Deadwood Raven Shrine'>>
+          <<deadwood-raven-shrine-wish-progress 'peace'>>
         <</if>>
       <</if>>
-    <</lanLink>><br>
+    <</lanLink>><br><br>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-raven-shrine-gwylan-link'>>
   <<deadwood-raven-shrine-context>>
   <<if _shrineGwylan and _shrine.stage is 1>>
-    <<icon 'raven-shrine/feather-letter.png'>><<lanLink ['Show Gwylan the raven’s letter (0:05)', '把渡鸦带来的信交给格威岚 (0:05)']>>
+    <<icon 'raven-shrine/feather-letter.png'>><<lanLink ['Show Gwylan the raven’s letter (0:05)', '把渡鸦带来的信交给格威岚 (0:05)'] 'Deadwood Raven Gwylan'>>
       <<deadwood-raven-shrine-context>>
       <<if _shrineGwylan and _shrine.stage is 1>>
         <<set _shrineSource to $passage>><<pass 5>>
         <<deadwood-raven-shrine-context>>
-        <<if _shrineGwylan and $passage is _shrineSource>>
-          <<goto 'Deadwood Raven Gwylan'>>
-        <<elseif _shrineSafe and $passage is _shrineSource and $location is 'forest_shop'>>
-          <<goto 'Forest Shop Entrance'>>
+        <<if !_shrineGwylan and _shrineSafe and $passage is _shrineSource and $location is 'forest_shop'>>
+          <<set $nextPassage to 'Forest Shop Entrance'>>
         <</if>>
       <</if>>
     <</lanLink>><br>

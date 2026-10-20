@@ -8,19 +8,16 @@
 <<if _shrineHomePerson>><<npc Tsukihan>><<person1>><</if>>
 <<language>>
   <<option 'EN'>>
-    You settle onto the spare bedding. The quilt smells faintly of the wooden cupboard it was stored in.
+    You draw back the quilt and settle onto the broad futon. <<if _shrineBedCompany>>Tsukihan shifts over to leave you room. <<if C.npc.Tsukihan.dom gte 70>>"You took your time." <<He>> pulls the quilt over your shoulder before settling beside you.<<else>>"Comfortable?" <<He>> smooths the quilt between you, then leaves <<his>> hand close to yours.<</if>><<elseif _shrineHomePerson>>Tsukihan is up and about, leaving you to rest.<<elseif _shrineHomeBathing>>Water splashes softly behind the washroom door. The pillow beside yours is cool.<<else>>Tsukihan is working outside. The pillow beside yours is cool.<</if>><br><br>
     <<if Weather.precipitation is 'rain'>>Rain ticks against the eaves.<<else>>The room is quiet beyond the rustle of the quilt.<</if>>
   <<option 'CN'>>
-    你在客用被褥里躺好。被子带着木柜里淡淡的气味。
+    你掀开被角，在宽褥子上躺好。<<if _shrineBedCompany>>月羽往里挪了挪，把身旁的位置让给你。<<if C.npc.Tsukihan.dom gte 70>>“怎么才来。”<<He>>先把被子拉到你的肩头，才在旁边躺稳。<<else>>“这样挤么？”<<He>>理平你们之间的被子，把手留在你的手边。<</if>><<elseif _shrineHomePerson>>月羽已经起来忙自己的事，留你在床上歇着。<<elseif _shrineHomeBathing>>浴室门后传来轻轻的水声，旁边的枕头凉凉的。<<else>>月羽还在外面忙，旁边的枕头凉凉的。<</if>><br><br>
     <<if Weather.precipitation is 'rain'>>雨点细细地敲着屋檐。<<else>>翻动被褥的窸窣声停下，屋里便安静了。<</if>>
 <</language>><br><br>
 <!-- 沿用原版选时、按小时睡眠与醒来结算，不替玩家脱衣或恢复衣着。 -->
 <<nightmareCheck 'Deadwood Raven Shrine Sleep'>>
 <<generateSleepLinks 'Deadwood Raven Shrine Sleep'>>
-<<getouticon>><<lanLink ['Climb out of bed', '离开被褥']>>
-  <<deadwood-raven-home-presence>>
-  <<if _shrineHomeTravel and $location is 'raven_shrine_house'>><<goto 'Deadwood Raven Shrine Room'>><</if>>
-<</lanLink>><br>
+<<getouticon>><<lanLink ['Climb out of bed', '离开被褥'] 'Deadwood Raven Shrine Room'>><</lanLink>><br>
 
 :: Deadwood Raven Shrine Sleep
 <<deadwood-raven-home-presence>>
@@ -29,8 +26,8 @@
   <<deadwood-raven-home-return>><<exit>>
 <</if>>
 <<set _autosavehere to true, $outside to 0>>
-<!-- 客用被褥与月羽的床铺分开，不沿用上个场景留下的同床对象。 -->
-<<unset $bedGuest>>
+<!-- 同床收益沿用原版；月羽不在屋内时独自睡，覆盖上个场景遗留的同床对象。 -->
+<<set $bedGuest to _shrineBedCompany ? 'Tsukihan' : ''>>
 <<sleep>>
 <<if !_dreaming>>
   <<deadwood-raven-home-presence>>
@@ -43,14 +40,8 @@
     <</if>>
     <<sleepeffects>><br><br>
     <<if _shrineHome>>
-      <<bedicon>><<lanLink ['Continue sleeping', '继续睡觉']>>
-        <<deadwood-raven-home-context>>
-        <<if _shrineHome and $location is 'raven_shrine_house'>><<goto 'Deadwood Raven Shrine Bed'>><</if>>
-      <</lanLink>><br>
+      <<icon 'raven-shrine/futon.png'>><<lanLink ['Continue sleeping', '继续睡觉'] 'Deadwood Raven Shrine Bed'>><</lanLink>><br>
     <</if>>
-    <<getouticon>><<lanLink ['Get up', '起床']>>
-      <<deadwood-raven-home-context>>
-      <<if _shrineHomeTravel and $location is 'raven_shrine_house'>><<goto 'Deadwood Raven Shrine Room'>><</if>>
-    <</lanLink>><br>
+    <<getouticon>><<lanLink ['Get up', '起床'] 'Deadwood Raven Shrine Room'>><</lanLink>><br>
   <</if>>
 <</if>>

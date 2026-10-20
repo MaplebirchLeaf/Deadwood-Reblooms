@@ -41,53 +41,96 @@
           <<else>>“你回来了。还在想你什么时候来。”<<He>>让开门口，“要是不赶时间，多陪一会儿吧。”<</if>>
         <</if>>
     <</language>><br><br>
+  <<elseif _shrineHomeBathing>>
+    <<lanSwitch 'Water runs behind the washroom door. Tsukihan has left the bedroom open for you; there is no need to call through the door.' '浴室里传来水声。月羽给你留着寝室的门，不必特意隔着门把人叫出来。'>><br><br>
   <<elseif _shrineHomePerson>>
     <<lanSwitch 'The house is quiet. Tsukihan has said you can come back; you can go in quietly without waking them at the door.' '屋里安安静静的。月羽先前说过你可以来，你放轻脚步进去就好，不必在门口把人叫醒。'>><br><br>
   <<else>>
-    <<lanSwitch 'Tsukihan has gone to work in the courtyard. You have been welcome to come in and rest; there is no need to call them away.' '月羽去庭院忙了，先前已经答应让你自己进来歇脚，不必特意把人叫回来。'>><br><br>
+    <<lanSwitch 'Tsukihan is out <<if _shrineTsukihanLocation is "shopping_centre">>buying supplies<<elseif _shrineTsukihanLocation is "raven_shrine_garden">>tending the trees<<else>>in the courtyard<</if>>. You have been welcome to come in and rest; there is no need to call them away.' '月羽<<if _shrineTsukihanLocation is "shopping_centre">>进镇采购去了<<elseif _shrineTsukihanLocation is "raven_shrine_garden">>在屋后照看果树<<else>>去庭院忙了<</if>>，先前已经答应让你自己进来歇脚，不必特意把人叫回来。'>><br><br>
   <</if>>
-  <<icon 'raven-shrine/tsukihan-home.png'>><<lanLink ['Go into the house (0:01)', '走进小屋 (0:01)']>><<deadwood-raven-home-act 'enter'>><</lanLink>><br>
+  <<icon 'raven-shrine/tsukihan-home.png'>><<lanLink ['Go into the house (0:01)', '走进小屋 (0:01)'] 'Deadwood Raven Shrine Room'>><<deadwood-raven-home-act 'enter'>><</lanLink>><br>
 <<elseif _shrine.home_action is 'greet' and _shrineHomeAwake>>
   <<npc Tsukihan>><<person1>>
-  <<lanSwitch 'Tsukihan opens the door a little and greets you. "Were you looking for something? We can talk in the courtyard <<if Time.hour lt 9>>later<<else>>tomorrow<</if>>." <<He>> stays by the threshold, leaving the room behind them private.' '月羽把门打开一些，向你点头。“找我有事么？<<if Time.hour lt 9>>待会儿<<else>>明天<</if>>可以到庭院聊。”<<He>>留在门槛边，没有让你往屋里走。'>><br><br>
+  <<lanSwitch 'Tsukihan opens the door a little and greets you. "Were you looking for something? We can talk in the courtyard <<if Time.hour lt 16>>later<<else>>tomorrow<</if>>." <<He>> stays by the threshold, leaving the room behind them private.' '月羽把门打开一些，向你点头。“找我有事么？<<if Time.hour lt 16>>待会儿<<else>>明天<</if>>可以到庭院聊。”<<He>>留在门槛边，没有让你往屋里走。'>><br><br>
+<<elseif _shrineHomeBathing>>
+  <<lanSwitch 'Water runs inside. The bedroom beyond the threshold is quiet.' '门里传来水声，寝室里没有别的动静。'>><br><br>
 <<elseif _shrineKnock>>
   <<lanSwitch 'There is a small sound of crockery from inside. You can knock, or leave Tsukihan to the rest of their day.' '门里传来轻轻的碗碟声。你可以敲门，也可以先不打扰月羽。'>><br><br>
-  <<dooricon>><<lanLink ['Knock on the door (0:01)', '敲门 (0:01)']>><<deadwood-raven-home-act 'knock'>><</lanLink>><br>
+  <<icon 'raven-shrine/wooden-door.png'>><<lanLink ['Knock on the door (0:01)', '敲门 (0:01)'] 'Deadwood Raven Shrine Door'>><<deadwood-raven-home-act 'knock'>><</lanLink>><br>
 <<elseif _shrineHomeAwake>>
   <<lanSwitch 'Both your arms are bound. You cannot knock on the door.' '双臂被缚，你现在没法敲门。'>><br><br>
 <<elseif Time.hour lt 7>>
   <<lanSwitch 'The house is quiet. You leave the door alone.' '屋里没有动静。你没有贸然敲门。'>><br><br>
 <<elseif Time.hour gte 9 and Time.hour lt 18>>
-  <<lanSwitch 'Tsukihan is at work in the courtyard. The house is private; you can find them at the shrine instead.' '月羽正在庭院忙。这里是私人的住处，想找人的话，得回神社去。'>><br><br>
+  <<lanSwitch 'Tsukihan is <<if _shrineTsukihanLocation is "shopping_centre">>in town buying supplies<<elseif _shrineTsukihanLocation is "raven_shrine_garden">>tending the fruit trees behind the house<<else>>working in the courtyard<</if>>. The house is closed.' '月羽<<if _shrineTsukihanLocation is "shopping_centre">>进镇采购去了<<elseif _shrineTsukihanLocation is "raven_shrine_garden">>在屋后照看果树<<else>>正在庭院忙<</if>>，小屋的门关着。'>><br><br>
 <<else>>
   <<lanSwitch 'The door is closed. It is too late to call on Tsukihan now.' '屋门关着。这时候再敲门，未免太晚了。'>><br><br>
+<</if>>
+<<if _shrineHomeReady and !_shrineHome and !_shrineHomeAwake and $location is 'forest_raven_shrine' and !$daily.darkfeatherSneak and !pcAreArmsBound('any')>>
+  <br><<sneakicon>><<lanLink ['Slip into the bedroom (0:05)', '悄悄潜入寝室 (0:05)'] 'Deadwood Raven Shrine Sneak'>><<deadwood-raven-home-act 'sneak'>><</lanLink>>
+  <<set $skulduggerydifficulty to _shrineHomePerson ? 500 : 300>><<skulduggerydifficulty>><br>
+<</if>>
+<<deadwood-raven-home-return>>
+
+:: Deadwood Raven Shrine Sneak
+<<effects>><<deadwood-raven-home-context>>
+<<if _shrineHomeSneaking and $location is 'raven_shrine_house'>>
+  <<lanSwitch 'You ease the door shut behind you, leaving the latch untouched. Nothing moves inside. You keep your footsteps light.' '你轻轻带上门，没有碰门闩。屋里没有动静，你放轻了脚步。'>><br><br>
+  <<lanLink ['Look around the bedroom', '看看寝室'] 'Deadwood Raven Shrine Room'>><</lanLink>><br><br>
+<<elseif _shrineHomeReady and _shrine.home_action is 'caught'>>
+  <<if _shrineTsukihanLocation is 'shopping_centre'>>
+    <<lanSwitch 'Your foot catches the brush beneath the eaves. It clatters across the step. A raven cries out above you, and you step away from the door.' '你的脚碰到了檐下的刷子，刷子掉在台阶上，响得格外清楚。头顶的渡鸦叫了一声，你退开门边。'>><br><br>
+  <<else>>
+    <<npc Tsukihan>><<person1>>
+    <<lanSwitch 'The door scrapes across the threshold. "What are you doing?" Tsukihan’s voice stops you before you can slip inside. "Ask me next time." You step away from the door.' '门擦过门槛，响了一声。“你在做什么？”月羽的声音让你停在了门边。“下次先问我。”你退开门边。'>><<llove>><br><br>
+  <</if>>
 <</if>>
 <<deadwood-raven-home-return>>
 
 :: Deadwood Raven Shrine Room
 <<effects>><<deadwood-raven-home-presence>>
-<<if !_shrineHome or $location isnot 'raven_shrine_house'>>
+<<if (!_shrineHome and !_shrineHomeSneaking) or $location isnot 'raven_shrine_house'>>
   <<lanSwitch 'You have not been invited to stay here now. The courtyard is just outside.' '现在还不能留在这里。庭院就在屋外。'>><br><br>
   <<deadwood-raven-home-return>>
   <<exit>>
 <</if>>
-<<if _shrineHomePerson>><<npc Tsukihan>><<person1>><</if>>
+<<if _shrineHomePerson and !_shrineHomeSneaking>><<npc Tsukihan>><<person1>><</if>>
 <<language>>
   <<option 'EN'>>
     Tsukihan's bedroom is small enough that the low table has to stand close to the sleeping mats. A book lies open beneath a smooth stone, with a shopping list tucked between its pages.
     Beside it are a pencil, a dark hair cord and a cup resting on a folded cloth.<br><br>
-    Bedding is stacked neatly against the wall. A second set has been put within reach for you, with its own pillow and room to spread it beside the table.
+    There is one broad futon, with two pillows tucked beneath the folded quilt. A sliding door beyond the table leads to a little washroom.
     <<if Time.dayState is 'night'>>A shaded lamp leaves a warm circle across the table. Beyond the window, the trees have disappeared into the dark.
     <<elseif Weather.precipitation is 'rain'>>Rain ticks against the window frame. There is a faint smell of damp wood near the door.
     <<else>>Light through the small window reaches the edge of the mats. A few black feathers have caught in the brush beside the sill.<</if>>
   <<option 'CN'>>
     月羽的寝室不大，矮桌就摆在铺褥子的地方旁边。桌上摊着一本书，用光滑的石头压着，书页里夹了一张采购单。
     旁边还有铅笔、深色发绳，以及一只垫着折布的杯子。<br><br>
-    被褥整齐地叠在墙边。给你用的另一套已经放到方便拿取的地方，也备了枕头。留宿的话，可以自己铺一床。
+    墙边只铺着一床宽褥子，叠好的被子下面藏着两只枕头。矮桌另一侧有扇拉门，通往小小的浴室。
     <<if Time.dayState is 'night'>>有罩的灯在桌上投下一圈暖光。窗外的树已经隐进了夜色。
     <<elseif Weather.precipitation is 'rain'>>雨点轻敲窗框，门边有一点湿木头的气味。
     <<else>>小窗透进的光落到褥子边沿。窗台旁的刷子上还挂着几根黑羽。<</if>>
 <</language>><br><br>
+<<if _shrineHomeSneaking>>
+  <<if _shrineHomeAwake>>
+    <<npc Tsukihan>><<person1>>
+    <<lanSwitch 'Tsukihan stops in the doorway, then looks from you to the open door. "I didn’t invite you in." <<He>> steps aside, waiting for you to leave.' '月羽在门口停住，看了看你，又看了看没有关严的门。“没请你进来吧。”<<He>>让开门边，等你出去。'>><br><br>
+  <<else>>
+    <<if _shrineHomePerson>>
+      <<lanSwitch 'Tsukihan is asleep under the quilt. You stay near the door, careful of the creaking floorboards.' '月羽正盖着被子睡觉。你留在门边，小心避开会响的地板。'>><br><br>
+    <<elseif _shrineHomeBathing>>
+      <<lanSwitch 'Water runs behind the washroom door. Tsukihan has not heard you come in.' '浴室门后传来水声。月羽还没有听见你进来。'>><br><br>
+    <<elseif _shrineTsukihanLocation is 'shopping_centre'>>
+      <<lanSwitch 'The house is quiet while Tsukihan is in town. You leave the drawers and bedding as you found them.' '月羽下山进镇了，屋里很安静。你没有碰抽屉和被褥。'>><br><br>
+    <<else>>
+      <<lanSwitch 'You can hear Tsukihan going about the day outside. You leave the drawers and bedding as you found them.' '屋外隐约传来月羽忙碌的声音。你没有碰抽屉和被褥。'>><br><br>
+    <</if>>
+    <<if _shrineHomeBathing>>
+      <<icon 'raven-shrine/bathroom.png'>><<lanLink ['Go to the washroom door', '走到浴室门前'] 'Deadwood Raven Shrine Bathroom'>><</lanLink>><br>
+    <</if>>
+  <</if>>
+  <<deadwood-raven-home-return>><<exit>>
+<</if>>
 <<if _shrineHomeAwake>>
   <<switch _shrine.home_action>>
     <<case 'talk'>>
@@ -118,19 +161,6 @@
           <<else>>“等等，这页还没看完。”<<He>>用手指点着最后一段。“下一页让你翻。这页先归我。”<</if>><br><br>
           你们并排看着书，安静里只有偶尔翻动书页的细响。
       <</language>>
-    <<case 'tidy'>>
-      <<language>>
-        <<option 'EN'>>
-          You help put the loose papers in order, keeping the shopping lists separate from the book. Tsukihan picks up the hair cord before it disappears beneath a stack.<br><br>
-          "I was looking for that." <<He>> winds it around two fingers and puts it in a small wooden box.
-          <<if C.npc.Tsukihan.dom gte 70>>"Leave the book out. We might want it later." <<He>> finds a place for the cups, leaving two seats clear at the table.
-          <<else>><<He>> clears the cups to one side. "There. We can actually use the table now."<</if>>
-        <<option 'CN'>>
-          你帮忙把散开的纸张归好，将采购单和书分开放。月羽赶在发绳又被纸压住以前，把它拈了出来。<br><br>
-          “刚才还在找这个。”<<He>>把发绳绕在两根手指上，收进小木盒。
-          <<if C.npc.Tsukihan.dom gte 70>>“书先留着。待会儿也许还要看。”<<He>>把杯子放好，在桌旁空出两个坐的位置。
-          <<else>><<He>>把杯子移到一边。“好了。这下，桌子总算能用了。”<</if>>
-      <</language>>
     <<default>>
       <<language>>
         <<option 'EN'>>
@@ -145,27 +175,25 @@
           <<else>>“来这里。软的坐垫给你留着。”<<He>>伸手压了压，“先陪一会儿，再想要不要走吧。”<</if>>
       <</language>>
   <</switch>><br><br>
+  <<deadwood-tsukihan-affection-links>>
   <<if _shrine.home_time isnot Math.floor(Time.days) and _shrineHomeMinutes gt 10>>
     <<if !$daily.no_sing and !$worn.face.type.includes('gag')>>
-      <<socialiseicon>><<lanLink ['Sit and talk with Tsukihan (0:10)', '和月羽坐着聊聊 (0:10)']>><<deadwood-raven-home-act 'talk'>><</lanLink>><<lstress>><<glove>><br>
+      <<socialiseicon>><<lanLink ['Sit and talk with Tsukihan (0:10)', '和月羽坐着聊聊 (0:10)'] 'Deadwood Raven Shrine Room'>><<deadwood-raven-home-act 'talk'>><</lanLink>><<lstress>><<glove>><br>
     <</if>>
-    <<schoolicon 'library'>><<lanLink ['Read with Tsukihan (0:10)', '和月羽一起看书 (0:10)']>><<deadwood-raven-home-act 'read'>><</lanLink>><<lstress>><<glove>><br>
-    <<if !pcAreArmsBound('both')>>
-      <<icon 'broom-dustpan.png'>><<lanLink ['Tidy the little table together (0:10)', '一起整理小书桌 (0:10)']>><<deadwood-raven-home-act 'tidy'>><</lanLink>><<ghousekeeping>><<lstress>><<glove>><br>
-    <</if>>
+    <<schoolicon 'library'>><<lanLink ['Read with Tsukihan (0:10)', '和月羽一起看书 (0:10)'] 'Deadwood Raven Shrine Room'>><<deadwood-raven-home-act 'read'>><</lanLink>><<lstress>><<glove>><br>
   <<elseif _shrineHomeMinutes lte 10>>
     <<lanSwitch 'Tsukihan puts the loose things away. "I will have to get ready in a moment. You can still rest here."' '月羽把零散的东西收好。“过会儿就得去准备了。你还可以在这里歇着。”'>><br><br>
   <</if>>
 <<elseif _shrineHomePerson>>
-  <<lanSwitch 'Tsukihan is still asleep behind the screen. You keep the room quiet; the table and your own bedding are within reach.' '月羽还在屏风后睡着。你放轻了动静，桌子和自己那套被褥都在手边。'>><br><br>
+  <<lanSwitch 'Tsukihan is asleep under the quilt, one pillow left clear beside them. You tread quietly across the room.' '月羽正盖着被子睡觉，身旁的枕头还空着。你放轻脚步，从褥子旁经过。'>><br><br>
+<<elseif _shrineHomeBathing>>
+  <<lanSwitch 'There is a soft splash behind the washroom door. Tsukihan’s clean clothes are folded on the table; the book beside them is left open at a marked page.' '浴室的门后传来轻轻的水声。月羽把干净衣服叠在桌上，旁边的书还摊在夹着书签的那一页。'>><br><br>
 <<else>>
-  <<lanSwitch 'Tsukihan has left for the courtyard. The book is marked with a strip of cloth, and the bedding has been put neatly to one side. You can hear the occasional call of a raven outside.' '月羽已经去了庭院。书里夹着布条，被褥也整齐地搁在一旁。屋外偶尔传来一声渡鸦的叫声。'>><br><br>
+  <<lanSwitch 'Tsukihan has gone out <<if _shrineTsukihanLocation is "shopping_centre">>for supplies<<elseif _shrineTsukihanLocation is "raven_shrine_garden">>to tend the fruit trees<<else>>to the courtyard<</if>>. The book is marked with a strip of cloth, and the bedding has been put neatly to one side. You can hear the occasional call of a raven outside.' '月羽<<if _shrineTsukihanLocation is "shopping_centre">>下山采购去了<<elseif _shrineTsukihanLocation is "raven_shrine_garden">>去屋后照看果树了<<else>>已经去了庭院<</if>>。书里夹着布条，被褥也整齐地搁在一旁。屋外偶尔传来一声渡鸦的叫声。'>><br><br>
 <</if>>
 <<deadwood-raven-gift-link>>
-<<bedicon>><<lanLink ['Look at your bedding', '看看自己的床铺']>>
-  <<deadwood-raven-home-context>>
-  <<if _shrineHome and $location is 'raven_shrine_house'>><<goto 'Deadwood Raven Shrine Bed'>><</if>>
-<</lanLink>><br>
+<<icon 'raven-shrine/bathroom.png'>><<lanLink ['Go into the washroom', '走进浴室'] 'Deadwood Raven Shrine Bathroom'>><</lanLink>><br>
+<<icon 'raven-shrine/futon.png'>><<lanLink ['Settle into bed', '到床上躺下'] 'Deadwood Raven Shrine Bed'>><</lanLink>><br>
 <<deadwood-raven-home-return>>
 
 :: Deadwood Raven Shrine Wake
@@ -176,12 +204,12 @@
 <<if _shrineHomePerson>><<npc Tsukihan>><<person1>><</if>>
 <<language>>
   <<option 'EN'>>
-    You open your eyes beneath the unfamiliar ceiling. The edge of your own bedding has come untucked, but the pillow is still where you left it.
+    You open your eyes beneath the unfamiliar ceiling. The quilt has slipped from one shoulder, and the pillow beside yours bears the hollow of a head.
     <<if Time.dayState is 'night'>>The window is dark. For a moment you hear only the house settling around you.
     <<elseif Weather.precipitation is 'rain'>>Rain taps the window, and the little room is filled with soft grey light.
     <<else>>Light reaches the low table through the window. The pencil has rolled as far as the folded cloth and stopped.<</if>>
   <<option 'CN'>>
-    你睁开眼，看见还有些陌生的房梁。自己被褥的一角散开了，枕头倒还留在原处。
+    你睁开眼，看见还有些陌生的房梁。被角从肩头滑下去一些，旁边那只枕头还留着压过的凹痕。
     <<if Time.dayState is 'night'>>窗外黑着，有一阵子，你只听见木屋偶尔细微的响动。
     <<elseif Weather.precipitation is 'rain'>>雨点轻敲窗户，淡灰色的天光落在小小的房间里。
     <<else>>窗外的光透进来，照到矮桌上。铅笔滚到了折布边，被拦在那里。<</if>>
@@ -193,20 +221,22 @@
       <<else>>Tsukihan sits at the table with a cup between <<his>> hands. <<He>> looks up as you move.<</if>><br><br>
       <<if C.npc.Tsukihan.dom lt 30>>"Awake? There is water by the table." <<He>> lowers <<his>> voice, giving you a little time to come round.
       <<elseif C.npc.Tsukihan.dom lt 70>>"Did you sleep well? I had to stop a raven from coming in to inspect you." <<He>> glances towards the window.
-      <<else>>"Finally. I wanted to talk to you <<if Time.hour lt 9>>before I went out<<else>>before bed<</if>>." <<He>> pulls the other cushion closer. "Sit with me when you're ready."<</if>>
+      <<else>>"Finally. I wanted to talk to you <<if Time.hour lt 9>>before I went out<<elseif Time.hour is 12>>over lunch<<else>>before bed<</if>>." <<He>> pulls the other cushion closer. "Sit with me when you're ready."<</if>>
       <<if Time.hour lt 9>><br><br>"I have to see to the courtyard at nine." <<He>> leaves the water within reach. "You can take your time getting up."<</if>>
     <<option 'CN'>>
       <<if Time.hour lt 9>>月羽在门边，把一碗早饭放进托盘。听见你翻身，<<he>>转头看过来。
       <<else>>月羽坐在桌边，双手捧着杯子。你一动，<<he>>便抬起头。<</if>><br><br>
       <<if C.npc.Tsukihan.dom lt 30>>“醒了？桌边有水。”<<He>>放轻声音，留着一点时间，让你慢慢清醒。
       <<elseif C.npc.Tsukihan.dom lt 70>>“睡得好吗？刚才还拦了只鸟，差点让它进来看你。”<<He>>朝窗户瞥了一眼。
-      <<else>>“总算醒了。还想<<if Time.hour lt 9>>出门前<<else>>睡前<</if>>，先和你说会儿话。”<<He>>把另一只坐垫挪近，“缓过来就坐这边吧。”<</if>>
+      <<else>>“总算醒了。还想<<if Time.hour lt 9>>出门前<<elseif Time.hour is 12>>吃午饭时<<else>>睡前<</if>>，先和你说会儿话。”<<He>>把另一只坐垫挪近，“缓过来就坐这边吧。”<</if>>
       <<if Time.hour lt 9>><br><br>“九点还得去料理庭院。”<<He>>把水留在你够得着的地方。“起来不用着急。”<</if>>
   <</language>><br><br>
 <<elseif _shrineHomePerson>>
-  <<lanSwitch 'Tsukihan is still asleep behind the screen. You can lie a little longer, or get up quietly without waking them.' '屏风后没有动静，月羽还睡着。你可以再躺一会儿，也可以轻轻起来，不把人叫醒。'>><br><br>
+  <<lanSwitch 'Tsukihan is still asleep beside you, a hand resting near yours on the quilt. You can lie a little longer or slip out quietly.' '月羽还睡在你身旁，一只手搭在被子上，离你的手很近。你可以再躺一会儿，也可以轻轻起身。'>><br><br>
+<<elseif _shrineHomeBathing>>
+  <<lanSwitch 'Water runs behind the washroom door. Tsukihan is already up. A covered cup waits on the table for you.' '浴室门后传来水声，月羽已经起身了。桌上给你留着一只盖好的杯子。'>><br><br>
 <<else>>
-  <<lanSwitch 'Tsukihan has gone to work in the courtyard. A covered cup stands on the table beside a note: "Water. I will be outside." The room is yours to leave at your own pace.' '月羽已经去庭院忙了。桌上放着一只盖好的杯子，旁边留着纸条：“水。我在外面。”你可以慢慢收拾起来。'>><br><br>
+  <<lanSwitch 'Tsukihan has gone out. A covered cup stands on the table beside a note: "Water. Back later." The room is yours to leave at your own pace.' '月羽已经出门了。桌上放着一只盖好的杯子，旁边留着纸条：“水。待会儿回来。”你可以慢慢收拾起来。'>><br><br>
 <</if>>
 
 <</if>>

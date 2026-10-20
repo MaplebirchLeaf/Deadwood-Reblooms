@@ -64,6 +64,7 @@ export interface Property {
 
 export interface ResidentProfile {
   id: string;
+  bath: { hour: number; minute: number; duration: number };
   welcome: LocalizedText;
   evening: LocalizedText;
   together: LocalizedText;
@@ -172,6 +173,21 @@ export default class PropertyCatalog {
       const profile = item as Partial<ResidentProfile> | null;
       if (!profile?.id || ids.has(profile.id) || !localized(profile.welcome) || !localized(profile.evening) || !localized(profile.together)) {
         throw new Error(`Real estate resident #${index + 1} is incomplete or duplicated.`);
+      }
+      const bath = profile.bath;
+      if (
+        !bath ||
+        !Number.isInteger(bath.hour) ||
+        bath.hour < 0 ||
+        bath.hour > 23 ||
+        !Number.isInteger(bath.minute) ||
+        bath.minute < 0 ||
+        bath.minute > 59 ||
+        !Number.isInteger(bath.duration) ||
+        bath.duration <= 0 ||
+        bath.hour * 60 + bath.minute + bath.duration > 1440
+      ) {
+        throw new Error(`Real estate resident ${profile.id} has an invalid bath schedule.`);
       }
       ids.add(profile.id);
       return profile as ResidentProfile;

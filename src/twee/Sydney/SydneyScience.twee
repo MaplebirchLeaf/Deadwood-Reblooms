@@ -1,9 +1,18 @@
 :: Deadwood Reblooms Sydney Science Widgets [widget]
 
-<!-- 原版食堂谈话到 Sydney 好感 10 才会提到转班，入口沿用这道关系门槛。 -->
+<!-- 沿用原版好感门槛；正常午餐结束后也能提起，不必先抽到随机台词。 -->
 <<widget 'deadwood-reblooms-sydney-science-transfer-link'>>
-  <<if $sydneyScience isnot 1 and $SydneyExpansion.scienceHint and C.npc.Sydney.love gte 10>>
-    <<scienceicon>><<lanLink ['Ask about the class transfer', '询问换班的事'] 'Deadwood Reblooms Sydney Science Transfer'>><</lanLink>><br>
+  <<if maplebirch.get('Sydney').available and $sydneyScience isnot 1 and C.npc.Sydney.love gte 10
+    and !$combat and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>>
+    <<if !$SydneyExpansion.scienceHint>>
+      <<set $SydneyExpansion.scienceHint to true>>
+      <br><<lanSwitch 'As you finish eating, Sydney gathers a few science exercises from beneath the lunch tray. "I asked about moving to your class. I think my <<nnpc_mum "Sirris">> has found a place for me."' '吃完饭，悉尼从餐盘下收起几张科学课习题。“我问过能不能换到你那班。我的<<nnpc_mum "Sirris">>好像已经找出一个空位了。”'>><br><br>
+    <</if>>
+    <<scienceicon>><<lanLink ['Ask about the class transfer', '询问换班的事'] 'Deadwood Reblooms Sydney Science Transfer'>>
+      <<if maplebirch.get('Sydney').available and C.npc.Sydney.love gte 10 and !$combat and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>>
+        <<set $sydneyScience to 1>>
+      <</if>>
+    <</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -340,7 +349,11 @@
 <</widget>>
 
 :: Deadwood Reblooms Sydney Science Transfer
-<<set $sydneyScience to 1>><<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
+<<if $sydneyScience isnot 1 or !maplebirch.get('Sydney').available>>
+  <<lanSwitch 'You cannot talk to Sydney about the transfer now.' '现在没法和悉尼谈换班的事。'>><br><br>
+  <<getouticon>><<lanLink ['Return to the canteen', '返回食堂'] 'Canteen'>><</lanLink>><br><<exit>>
+<</if>>
+<<npc Sydney>><<person1>><<run statusCheck('Sydney')>>
 <<language>>
   <<option 'EN'>>
     "<span class='green'>It was approved</span>," Sydney says, brightening. "My <<nnpc_mum 'Sirris'>> arranged the transfer. Starting tomorrow, I'll be in your

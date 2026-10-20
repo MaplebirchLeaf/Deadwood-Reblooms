@@ -2,58 +2,58 @@
 
 <!-- 将原版双插状态中的泛称替换为当前两名 NPC，单插时保留原版措辞。 -->
 <<widget 'deadwood-reblooms-double-penetration-status'>>
-  <<set _NPCDoubleStatusMode to _args[0]>>
-  <<if _NPCDoubleStatusMode.startsWith('player-')>>
-    <<set _NPCDoubleStatusOrifice to _NPCDoubleStatusMode.includes('vagina') ? 'vagina' : 'anus'>>
-    <<set _NPCDoubleStatusFirst to Number(_NPCDoubleStatusOrifice is 'vagina' ? $vaginatarget : $anustarget)>>
-    <<set _NPCDoubleStatusSecond to Number(_NPCDoubleStatusOrifice is 'vagina' ? $vaginadoubletarget : $anusdoubletarget)>>
+  <<set $_NPCDoubleStatusMode to _args[0]>>
+  <<if $_NPCDoubleStatusMode.startsWith('player-')>>
+    <<set $_NPCDoubleStatusOrifice to $_NPCDoubleStatusMode.includes('vagina') ? 'vagina' : 'anus'>>
+    <<set $_NPCDoubleStatusFirst to Number($_NPCDoubleStatusOrifice is 'vagina' ? $vaginatarget : $anustarget)>>
+    <<set $_NPCDoubleStatusSecond to Number($_NPCDoubleStatusOrifice is 'vagina' ? $vaginadoubletarget : $anusdoubletarget)>>
     <<language>>
       <<option 'EN'>>
-        <<personselect _NPCDoubleStatusFirst>><<combatPersons>> and <<personselect _NPCDoubleStatusSecond>><<combatpersons>> penises penetrate your
-        <<if _NPCDoubleStatusOrifice is 'vagina'>>
+        <<personselect $_NPCDoubleStatusFirst>><<combatPersons>> and <<personselect $_NPCDoubleStatusSecond>><<combatpersons>> penises penetrate your
+        <<if $_NPCDoubleStatusOrifice is 'vagina'>>
           <<pussy>>
         <<else>>
           anus
         <</if>>
         .
       <<option 'CN'>>
-        <<personselect _NPCDoubleStatusFirst>><<combatperson>>与<<personselect _NPCDoubleStatusSecond>><<combatperson>>的阴茎插到你的
-        <<if _NPCDoubleStatusOrifice is 'vagina'>>
+        <<personselect $_NPCDoubleStatusFirst>><<combatperson>>与<<personselect $_NPCDoubleStatusSecond>><<combatperson>>的阴茎插到你的
+        <<if $_NPCDoubleStatusOrifice is 'vagina'>>
           <<pussy>>
         <<else>>
           菊穴
         <</if>>
         里。
     <</language>>
-    <<personselect _NPCDoubleStatusFirst>>
+    <<personselect $_NPCDoubleStatusFirst>>
   <<else>>
-    <<set _NPCDoubleStatus to maplebirch.get("VanillaPlus").NPCDoublePenetration.state>>
-    <<set _NPCDoubleStatusOrifice to _NPCDoubleStatusMode.includes('vagina') ? 'vagina' : 'anus'>>
-    <<if maplebirch.get("VanillaPlus").NPCDoublePenetration.visible and _NPCDoubleStatus and _NPCDoubleStatus.recipient is Number($penistarget) and _NPCDoubleStatus.orifice is _NPCDoubleStatusOrifice>>
+    <<set $_NPCDoubleStatus to maplebirch.get("VanillaPlus").NPCDoublePenetration.state>>
+    <<set $_NPCDoubleStatusOrifice to $_NPCDoubleStatusMode.includes('vagina') ? 'vagina' : 'anus'>>
+    <<if maplebirch.get("VanillaPlus").NPCDoublePenetration.visible and $_NPCDoubleStatus and $_NPCDoubleStatus.recipient is Number($penistarget) and $_NPCDoubleStatus.orifice is $_NPCDoubleStatusOrifice>>
       <<language>>
         <<option 'EN'>>
-          <<personselect _NPCDoubleStatus.recipient>><<combatPersons>>
-          <<if _NPCDoubleStatusOrifice is 'vagina'>>
+          <<personselect $_NPCDoubleStatus.recipient>><<combatPersons>>
+          <<if $_NPCDoubleStatusOrifice is 'vagina'>>
             vagina
           <<else>>
             ass
           <</if>>
-          envelops your penis alongside <<personselect _NPCDoubleStatus.partner>><<combatpersons>> penis.
+          envelops your penis alongside <<personselect $_NPCDoubleStatus.partner>><<combatpersons>> penis.
         <<option 'CN'>>
-          <<personselect _NPCDoubleStatus.recipient>><<combatperson>>的
-          <<if _NPCDoubleStatusOrifice is 'vagina'>>
+          <<personselect $_NPCDoubleStatus.recipient>><<combatperson>>的
+          <<if $_NPCDoubleStatusOrifice is 'vagina'>>
             小穴
           <<else>>
             屁股
           <</if>>
-          包裹着你与<<personselect _NPCDoubleStatus.partner>><<combatperson>>的阴茎。
+          包裹着你与<<personselect $_NPCDoubleStatus.partner>><<combatperson>>的阴茎。
       <</language>>
-      <<personselect _NPCDoubleStatus.recipient>>
+      <<personselect $_NPCDoubleStatus.recipient>>
     <<else>>
       <<language>>
         <<option 'EN'>>
           <<combatPersons>>
-          <<if _NPCDoubleStatusOrifice is 'vagina'>>
+          <<if $_NPCDoubleStatusOrifice is 'vagina'>>
             vagina
           <<else>>
             ass
@@ -61,7 +61,7 @@
           envelops your <<penis>>.
         <<option 'CN'>>
           <<combatPersons>>的
-          <<if _NPCDoubleStatusOrifice is 'vagina'>>
+          <<if $_NPCDoubleStatusOrifice is 'vagina'>>
             小穴裹住了
           <<else>>
             屁股包裹着
@@ -89,39 +89,39 @@
 
 <!-- 双腿锁定、持续和解除操作全部插入者，并沿用原版腿部技能与性行为控制判定。 -->
 <<widget 'deadwood-reblooms-double-leglock-effect'>>
-  <<set _NPCDoubleLegLockAction to _args[0]>>
-  <<if ['NPCDoubleLegLockVagina', 'NPCDoubleLegLockAnus', 'NPCDoubleLegLockKeep'].includes(_NPCDoubleLegLockAction)>>
+  <<set $_NPCDoubleLegLockAction to _args[0]>>
+  <<if ['NPCDoubleLegLockVagina', 'NPCDoubleLegLockAnus', 'NPCDoubleLegLockKeep'].includes($_NPCDoubleLegLockAction)>>
     <<set _NPCDoubleLegLockTargets to []>>
-    <<set _NPCDoubleLegLockKeep to _NPCDoubleLegLockAction is 'NPCDoubleLegLockKeep'>>
-    <<thighskilluse>><<set $feetactiondefault to _NPCDoubleLegLockKeep ? 'NPCDoubleLegLockKeep' : _NPCDoubleLegLockAction>>
-    <<if _NPCDoubleLegLockKeep is false>>
+    <<set $_NPCDoubleLegLockKeep to $_NPCDoubleLegLockAction is 'NPCDoubleLegLockKeep'>>
+    <<thighskilluse>><<set $feetactiondefault to $_NPCDoubleLegLockKeep ? 'NPCDoubleLegLockKeep' : $_NPCDoubleLegLockAction>>
+    <<if $_NPCDoubleLegLockKeep is false>>
       <<combatpromiscuity6>>
     <</if>>
-    <<if _NPCDoubleLegLockKeep is false>>
+    <<if $_NPCDoubleLegLockKeep is false>>
       <<set _NPCDoubleLegLockTargets to maplebirch.get("VanillaPlus").NPCDoublePenetration.playerPenetrators()>>
     <<elseif $VanillaPlus.npcDoublePenetration and $VanillaPlus.npcDoublePenetration.playerLegLock>>
       <<set _NPCDoubleLegLockTargets to $VanillaPlus.npcDoublePenetration.playerLegLock.targets>>
     <</if>>
-    <<set _NPCDoubleLegLockSuccess to _NPCDoubleLegLockTargets.length gte 2 and ($VanillaPlus.traits.promiscuity or $gamemode is 'soft' or $gloryhole)>>
-    <<if !_NPCDoubleLegLockSuccess and _NPCDoubleLegLockTargets.length gte 2>>
-      <<set _NPCDoubleLegLockSuccess to true>>
+    <<set $_NPCDoubleLegLockSuccess to _NPCDoubleLegLockTargets.length gte 2 and ($VanillaPlus.traits.promiscuity or $gamemode is 'soft' or $gloryhole)>>
+    <<if !$_NPCDoubleLegLockSuccess and _NPCDoubleLegLockTargets.length gte 2>>
+      <<set $_NPCDoubleLegLockSuccess to true>>
       <<for _NPCDoubleLegLockTarget range _NPCDoubleLegLockTargets>>
-        <<set _NPCDoubleLegLockDifficulty to Math.floor((100 - $NPCList[_NPCDoubleLegLockTarget].pregnancyAvoidance) * (_NPCDoubleLegLockKeep ? 10 : 15))>>
-        <<if !combatSkillCheck('thigh', _NPCDoubleLegLockTarget, $NPCList[_NPCDoubleLegLockTarget].fullDescription, _NPCDoubleLegLockDifficulty)>>
-          <<set _NPCDoubleLegLockSuccess to false>>
+        <<set $_NPCDoubleLegLockDifficulty to Math.floor((100 - $NPCList[_NPCDoubleLegLockTarget].pregnancyAvoidance) * ($_NPCDoubleLegLockKeep ? 10 : 15))>>
+        <<if !combatSkillCheck('thigh', _NPCDoubleLegLockTarget, $NPCList[_NPCDoubleLegLockTarget].fullDescription, $_NPCDoubleLegLockDifficulty)>>
+          <<set $_NPCDoubleLegLockSuccess to false>>
         <</if>>
       <</for>>
     <</if>>
-    <<if _NPCDoubleLegLockSuccess>>
+    <<if $_NPCDoubleLegLockSuccess>>
       <<for _NPCDoubleLegLockTarget range _NPCDoubleLegLockTargets>><<sex 5 'genitals' _NPCDoubleLegLockTarget>><</for>>
-      <<if _NPCDoubleLegLockKeep is false>>
+      <<if $_NPCDoubleLegLockKeep is false>>
         <<brat 2>><<run maplebirch.get("VanillaPlus").NPCDoublePenetration.setPlayerLegLock(_NPCDoubleLegLockTargets)>><<set $leglocktarget to _NPCDoubleLegLockTargets[0]>>
         <<set $feetuse to 'legLock'>><<set $feetactiondefault to 'NPCDoubleLegLockKeep'>><<set $speechleglock to 1>>
       <<else>>
         <<brat 2>><<set $speechleglock to 1>>
       <</if>>
-      <span @class="(_NPCDoubleLegLockKeep ? 'lewd' : 'lblue')">
-        <<if _NPCDoubleLegLockKeep>>
+      <span @class="($_NPCDoubleLegLockKeep ? 'lewd' : 'lblue')">
+        <<if $_NPCDoubleLegLockKeep>>
           <<lanSwitch 'You keep ' '你继续用腿'>>
           <<if $position is 'missionary'>>
             <<lanSwitch 'your legs wrapped around ' '缠住了'>>
@@ -150,14 +150,14 @@
       <</if>>
       <<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch ', preventing any of them from pulling away.' '，不让任何人抽身。'>></span>
     <<else>>
-      <<set $feetactiondefault to _NPCDoubleLegLockAction>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.get("VanillaPlus").NPCDoublePenetration.clearPlayerLegLock()>>
-      <<if _NPCDoubleLegLockKeep>>
+      <<set $feetactiondefault to $_NPCDoubleLegLockAction>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.get("VanillaPlus").NPCDoublePenetration.clearPlayerLegLock()>>
+      <<if $_NPCDoubleLegLockKeep>>
         <span class="blue"><<lanSwitch 'You try to keep hold of ' '你试图继续用腿锁住'>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch ', but your hold fails.' '，但没能继续困住任何人。'>></span>
       <<else>>
         <<lanSwitch 'You try to lock ' '你试图用腿锁住'>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch ', but your hold fails.' '，但没能困住任何人。'>>
       <</if>>
     <</if>>
-  <<elseif _NPCDoubleLegLockAction is 'NPCDoubleLegLockRelease'>>
+  <<elseif $_NPCDoubleLegLockAction is 'NPCDoubleLegLockRelease'>>
     <<set _NPCDoubleLegLockTargets to $VanillaPlus.npcDoublePenetration and $VanillaPlus.npcDoublePenetration.playerLegLock ? $VanillaPlus.npcDoublePenetration.playerLegLock.targets : []>>
     <<set $feetactiondefault to 'NPCDoubleLegLockRelease'>><<set $feetuse to 0>><<set $leglocktarget to undefined>><<run maplebirch.get("VanillaPlus").NPCDoublePenetration.clearPlayerLegLock()>>
     <<lanSwitch 'You release ' '你松开双腿，放开了'>><<deadwood-reblooms-double-leglock-targets _NPCDoubleLegLockTargets>><<lanSwitch '.' '。'>>

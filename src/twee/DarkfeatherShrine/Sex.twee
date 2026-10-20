@@ -1,10 +1,10 @@
 :: Deadwood Raven Shrine Sex
 <<set _shrineEncounter to $MoreTransformations?.shrine>>
 <<if $sexstart is 1>>
-  <<deadwood-raven-shrine-context>>
-  <<if !_shrinePerson or C.npc.Tsukihan.init isnot 1 or !isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 30
+  <<deadwood-raven-home-context>>
+  <<if !(_shrinePerson or _shrineHome and _shrineHomePerson and _shrine.home_action is 'bath_intimate') or C.npc.Tsukihan.init isnot 1 or !isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 30
     or _shrine.scene isnot 'sex' or _shrine.step isnot ''>>
-    <<deadwood-raven-shrine-return>><<exit>>
+    <<deadwood-raven-home-return>><<exit>>
   <</if>>
   <<set _shrineEncounter.step to 'encounter'>>
   <<npc Tsukihan>><<person1>>
@@ -12,7 +12,10 @@
   <<consensual>>
   <<set $consensual to 1>>
   <<neutral 1>>
-  <<if $exposed lt 2>>
+  <<if _shrine.home_action is 'bath_intimate'>>
+    <<lanSwitch 'Tsukihan draws you close. You leave the rest of the evening to each other.' '月羽向你靠近。你们把余下的时间留给彼此。'>><br><br>
+    <<if $exposed lt 2>><<strip>><</if>>
+  <<elseif $exposed lt 2>>
     <<language>>
       <<option 'EN'>>
         You slide the inner screen shut and slip out of your clothes.
@@ -32,10 +35,10 @@
   <<set $enemytrust += 500>><<npckiss>>
   <<set $enemyarousal to Math.clamp((C.npc.Tsukihan.lust || 0) * 5, 0, 500)>>
   <<set $enemyarousalmax to 600>>
-  <<set $outside to 0>><<set $location to 'forest_raven_shrine'>>
+  <<set $outside to 0>>
 <<elseif !_shrineEncounter or _shrineEncounter.scene isnot 'sex' or _shrineEncounter.step isnot 'encounter'
-  or $combat isnot 1 or !$npc?.includes('Tsukihan') or $location isnot 'forest_raven_shrine' or $nextPassage or $nextPassageCheck or $replayScene or $statFreeze>>
-  <<deadwood-raven-shrine-return>><<exit>>
+  or $combat isnot 1 or !$npc?.includes('Tsukihan') or !['forest_raven_shrine', 'raven_shrine_house'].includes($location) or $nextPassage or $nextPassageCheck or $replayScene or $statFreeze>>
+  <<deadwood-raven-home-return>><<exit>>
 <</if>>
 
 <<set $enemyanger to 0>>
@@ -55,11 +58,11 @@
 :: Deadwood Raven Shrine Sex Finish
 <<set _shrineEncounter to $MoreTransformations?.shrine>>
 <<if !_shrineEncounter or _shrineEncounter.scene isnot 'sex' or _shrineEncounter.step isnot 'encounter'
-  or $combat isnot 1 or !$npc?.includes('Tsukihan') or $location isnot 'forest_raven_shrine' or $nextPassage or $nextPassageCheck or $replayScene or $statFreeze>>
-  <<deadwood-raven-shrine-return>><<exit>>
+  or $combat isnot 1 or !$npc?.includes('Tsukihan') or !['forest_raven_shrine', 'raven_shrine_house'].includes($location) or $nextPassage or $nextPassageCheck or $replayScene or $statFreeze>>
+  <<deadwood-raven-home-return>><<exit>>
 <</if>>
 <<set _shrineEncounter.step to 'finished'>>
-<<set $outside to 0>><<set $location to 'forest_raven_shrine'>><<effects>><<deadwood-raven-shrine-context>>
+<<set $outside to 0>><<effects>><<deadwood-raven-home-context>>
 <<if $enemyarousal gte $enemyarousalmax>>
   <<ejaculation>>
   <<set C.npc.Tsukihan.lust to Math.clamp((C.npc.Tsukihan.lust || 0) - 30, 0, 100)>>
@@ -125,6 +128,9 @@
   <</language>><br><br>
 <</if>>
 
+<<if $location is 'raven_shrine_house'>>
+  <<lanSwitch 'Afterwards, you dry off together. Tsukihan finds your clothes beside the door, then walks back to the bedroom with you.' '过后，你们一起擦干身体。月羽把门边的衣物递给你，陪你回到寝室。'>><br><br>
+<<else>>
 <<language>>
   <<option 'EN'>>
     You catch your breath together on the clean boards. After a while, Tsukihan helps you gather your clothes before tidying <<his>> own robes.
@@ -132,9 +138,16 @@
     你们在干净的草席上依偎着平复了心跳。过了一会儿，月羽帮你拾起散落的衣物，随后才仔细整好自己的衣袍。
 <</language>><br><br>
 
+<</if>>
+<<if $location is 'raven_shrine_house'>><<wash>><<set $hygiene to 0>><</if>>
 <<clotheson>>
 <<endcombat>>
-<<deadwood-raven-shrine-return>>
+<<if $location is 'raven_shrine_house'>>
+  <<set _shrineEncounter.bathed_at to Time.date.timeStamp>>
+  <<getouticon>><<lanLink ['Return to the bedroom', '回到寝室'] 'Deadwood Raven Shrine Room'>><<set $MoreTransformations.shrine.home_action to '', $MoreTransformations.shrine.scene to '', $MoreTransformations.shrine.step to ''>><<endevent>><</lanLink>><br>
+<<else>>
+  <<deadwood-raven-shrine-return>>
+<</if>>
 
 :: Widgets Speech-TSUKIHAN [widget]
 <<widget 'speech-tsukihan'>>
@@ -152,9 +165,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              Tsukihan gasps, holding you tight as <<his>> eyes gleam with possessive warmth. "You are my first... and I gave this to you willingly. Don't you dare ever forget it."
+              Tsukihan's breath hitches. <<He>> buries <<his>> burning face against your neck, clinging tightly with stubborn, trembling resolve. "This is... my first time. Before the sacred tree and the ravens, I gave this to you willingly... You had better remember this for the rest of your life, don't you dare forget."
             <<option 'CN'>>
-              月羽倒吸一口凉气，紧紧搂住你，眼神里满是占有的炽热。“你是我的第一个……是我心甘情愿给你的。你可得给我记一辈子。”
+              月羽呼吸急促地滞了一瞬，紧紧抱住你，通红的脸颊埋在你颈侧，声音虽微颤却执拗极了。“……这可是我的第一次。在神树与渡鸦面前，是我心甘情愿交给你的……你可、可得好好记住一辈子，不许忘了。”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -177,9 +190,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              Tsukihan groans, claws digging into your shoulder. "It's so tight and strange... but don't stop now, keep moving!"
+              Tsukihan lets out a stifled groan, fingers clutching awkwardly yet tightly at your robes, <<his>> ears burning crimson. "It feels so strange, tight and aching... but I didn't say stop... j-just go slow, all right?"
             <<option 'CN'>>
-              月羽闷哼一声，指尖用力扣住你的肩头。“又紧又奇怪……但你不准停，继续动！”
+              月羽闷哼了一声，指尖无措又用力地揪紧你的衣角，耳根红得滴血。“……好奇怪的感觉，又酸又涨……但、但我没有要你停下的意思……慢、慢慢来就好……”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -210,9 +223,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              Tsukihan smiles proudly, running fingers through your hair. "Your first time belongs to me now. Every single part of you."
+              Tsukihan's eyes widen. Running <<his>> fingers through your hair with bashful wonder, <<he>> tries to look composed while blushing furiously. "Is this... your first time...? Then I shall treasure it. A promise made here at the quiet shrine isn't something I will let you take back."
             <<option 'CN'>>
-              月羽得意地微笑，手指穿过你的发丝。“你的第一次现在归我了。从今往后，整个人都是我的。”
+              月羽微微睁大眼睛，指尖带着几分羞涩与难掩的欣喜抚过你的发梢，强撑着镇定却脸红得厉害。“这、这是你的初次吗……？那我就好好收下了。在深山社殿里许下的约定，我可不会让你随便反悔的。”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -268,9 +281,9 @@
             <<case `_tsukihanDom gte 70`>>
               <<language>>
                 <<option 'EN'>>
-                  Tsukihan nips firmly at your collarbone, eyes narrowing in possessive discipline. "Whose name was that? Look only at me right now. I won't let your mind wander anywhere else."
+                  Tsukihan nips softly at your earlobe like an agitated, flustered fledgling, <<his>> face burning as <<his>> eyes lock onto yours. "...Whose name was that? I-I don't care who it was... I am the one holding you right now. Don't think about anyone else, just look at me..."
                 <<option 'CN'>>
-                  月羽惩罚性地在你锁骨上轻轻咬了一口，眼眸微眯带着强烈的占有欲。“刚才叫的是谁的名字？看着我，只准看着我。在我的榻榻米上，休想分心。”
+                  月羽像只受惊又委屈的雏鸟般轻咬了下你的耳垂，脸颊滚烫，眼神又羞又急地盯住你。“……刚才唤的是谁的名字？听、听不见，我才不管那是谁……现在抱着的可是我，不准你想旁人，只许看着我……”
               <</language>>
             <<case `_tsukihanDom lte 30`>>
               <<language>>
@@ -297,9 +310,9 @@
             <<case `_tsukihanDom gte 70`>>
               <<language>>
                 <<option 'EN'>>
-                  Tsukihan glances between your generous length and <<his>> own, grinning with competitive desire. "Look at us... quite a magnificent pair. Let's see who brings the other to their knees first."
+                  Tsukihan glances between your generous sizes, <<his>> ears burning red, yet <<he>> stubbornly presses <<his>> lips together. "...How did it grow to be so big? Still, I'm not backing down. Even with you... I can take it properly..."
                 <<option 'CN'>>
-                  月羽看了看你雄伟的尺寸，又低头看了看自己的，露出争强好胜的笑意。“瞧瞧我们俩……真是一对。那就看看今天谁先让对方求饶。”
+                  月羽低头悄悄比了比彼此的尺寸，耳尖滚烫，却有些不服输地抿着嘴唇。“……怎么会长成这样。但、但我可不会认输退缩的，就算是你……我也能好好接纳……”
               <</language>>
             <<default>>
               <<language>>
@@ -357,9 +370,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              Tsukihan cradles your cute length in <<his>> palm, smiling with tender amusement. "Such an adorable little thing. Don't hide it—I can bring you to bliss with just one hand."
+              Tsukihan cradles your member gently in <<his>> palm, blinking shyly with a tender smile. "...There is nothing wrong with being small, don't hide. It feels so warm and cute... I will treat it with all the gentleness in the world. Just leave it to me, all right?"
             <<option 'CN'>>
-              月羽把小巧可爱的物事托在手心里，露出宠溺又促狭的微笑。“这么小巧玲珑的一根。别躲呀——我一只手就能把你弄得舒服到哭出来。”
+              月羽小心翼翼地把温存的物事托在手心里，眼睫微眨，羞赧地弯了弯唇角。“……小巧一点也没关系呀，别躲嘛。很温暖、很可爱……我会很温柔对待它的，放心交给我好不好？”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -385,9 +398,9 @@
             <<case `_tsukihanDom gte 70`>>
               <<language>>
                 <<option 'EN'>>
-                  Tsukihan pushes <<his>> massive shaft deep, panting forcefully. "Can you feel how full I make you? Every corner of you is stretching around me."
+                  Tsukihan's breath turns ragged. Overwhelmed with emotion, <<he>> sinks in deep, panting softly against your ear. "...Can you feel it? It's all the way in... Is it stretching you too much? If it's too overwhelming... just hold onto me tight..."
                 <<option 'CN'>>
-                  月羽将粗壮硕大的肉刃深深顶入，粗重地喘息着。“感受到被我填得有多满了吗？你的里面每一寸都在顺着我的形状扩张呢。”
+                  月羽呼吸蓦地粗重起来，有些局促又情不自禁地深深没入，紧贴着你耳畔小声轻喘。“……感受到了吗？全都在这里了……会不会太涨？要是吃力……一定要抱紧我……”
               <</language>>
             <<case `_tsukihanDom lte 30`>>
               <<language>>
@@ -482,9 +495,9 @@
             <<case `_tsukihanDom gte 70`>>
               <<language>>
                 <<option 'EN'>>
-                  "Look at how beautifully you fell apart for me," Tsukihan purrs, admiring your trembling frame. "Such sweet surrender."
+                  "Breathing so fast..." Tsukihan murmurs, eyes sparkling with bashful delight as <<he>> gathers your shuddering frame close. "...So lovely, like wet raven feathers caught in the rain... Hold onto me, catch your breath slowly."
                 <<option 'CN'>>
-                  “瞧瞧你为我沉沦成什么样子了，”月羽带着满足的呢喃，欣赏着你不住发颤的身躯。“真让人着迷。”
+                  “喘得这么厉害呀……”月羽眼底泛着羞涩又欣喜的光彩，小心翼翼地拢紧你颤抖的身子。“……真可爱，像林子里被雨淋湿的羽毛一样……抱紧我，慢慢缓过来。”
               <</language>>
             <<case `_tsukihanDom lte 30`>>
               <<language>>
@@ -506,9 +519,9 @@
             <<case `_tsukihanDom gte 70`>>
               <<language>>
                 <<option 'EN'>>
-                  "Reaching climax again so quickly?" Tsukihan chuckles wickedly. "You really are insatiable for my touch."
+                  "A-another one already?" Tsukihan's face flushes crimson. Flustered yet thrilled, <<he>> gently rubs your back. "So quickly... it seems you really love it when I touch you..."
                 <<option 'CN'>>
-                  “这么快又去了一次？”月羽坏心眼地轻笑。“对我身上就这么欲罢不能啊。”
+                  “又……又来了一次吗？”月羽脸颊红透，有些手忙脚乱又掩不住欢欣地替你轻抚后背。“这么快就……看来你真的很喜欢我碰你呢……”
               <</language>>
             <<default>>
               <<language>>
@@ -530,9 +543,9 @@
             <<case `_tsukihanDom gte 70`>>
               <<language>>
                 <<option 'EN'>>
-                  "Look at you, melting into a helpless puddle," Tsukihan smiles with pride. "You belong wholly to this shrine now."
+                  "You are completely limp in my arms..." Tsukihan draws you into a protective embrace, eyes full of sweet, youthful devotion. "...You're not going anywhere else today. Rest here with me, I will keep you safe."
                 <<option 'CN'>>
-                  “瞧你，都软成一滩春水了，”月羽神采奕奕地笑着。“现在你整个人都归我这间神社所有了。”
+                  “整个人都软绵绵的了……”月羽收拢手臂，将你护在怀里，眼底满是青涩真挚的温柔。“……哪儿也不许去了，今天就安心留在这儿，有我守着你。”
               <</language>>
             <<default>>
               <<language>>
@@ -550,9 +563,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              "Flaunting yourself so openly?" Tsukihan smirks. "You won't have to wait long before I take full advantage."
+              "Showing that off so boldly right in front of me...?" Tsukihan's breath hitches, <<his>> ears burning red as <<he>> leans closer, trying to look imposing. "...Do you think I'm too shy to touch you? Just watch..."
             <<option 'CN'>>
-              “当着我的面这么大胆地卖弄？”月羽勾唇轻笑。“放心，我马上就会让你得偿所愿。”
+              “当、当着我的面还这么大胆……”月羽呼吸微乱，耳尖红得发烫，强撑着气势凑近，“……你以为我真的不敢碰你吗？看我怎么收拾你……”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -576,9 +589,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              "Out of breath already?" Tsukihan teases, leaning close to your lips. "And here I was hoping you could keep up with me."
+              "Out of breath already?" Tsukihan leans close, <<his>> flushed cheek brushing against yours as <<he>> taps your nose. "...Take a breath, slow down. I wasn't rushing you..."
             <<option 'CN'>>
-              “这就喘不上气了？”月羽戏谑地凑近你的唇角。“我还指望你能多陪我折腾一会儿呢。”
+              “这就喘不过气啦？”月羽泛红的脸颊凑过来，轻碰了碰你的鼻尖，“……先歇一歇，慢慢吸气。我可没催你……”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -601,9 +614,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              "Apologising?" Tsukihan smirks. "Save your apologies. You can make it up to me later."
+              "Why are you apologising...?" Tsukihan turns <<his>> head away awkwardly, ears flaming red. "...I wasn't blaming you. As long as you stay and keep me company, I... I won't mind anything."
             <<option 'CN'>>
-              “道歉？”月羽轻笑一声。“省省吧。待会儿用别的方式好好补偿我就是。”
+              “道什么歉呀……”月羽有些别扭地别过头，耳根红彤彤的，“……又没怪你。只要你肯多陪陪我，我就……什么都不计较了。”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -626,9 +639,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              "Still defying me?" Tsukihan nips playfully at your collarbone. "I will have to make you yield."
+              "Still so stubborn..." Tsukihan presses closer to your neck with a deep blush, rubbing affectionately. "...Your skin is burning hot, couldn't you just be honest with me for once?"
             <<option 'CN'>>
-              “嘴还这么硬？”月羽带着玩味轻轻咬了咬你的锁骨。“看来得让你彻底服软才行。”
+              “嘴还是这么硬……”月羽红着脸轻轻贴近你的颈侧，有些不依不饶地蹭了蹭，“……明明身子都这么热了，就不能老实承认一下嘛。”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -651,9 +664,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              "Rougher?" Tsukihan's eyes darken with lust. "You asked for this. Don't complain tomorrow if your hips ache."
+              "R-rougher...?" Tsukihan's eyes widen with nervous anticipation, <<his>> knuckles whitening as blush rushes to <<his>> cheeks. "...You asked for this yourself. If it becomes too much later, you must tell me right away..."
             <<option 'CN'>>
-              “粗暴点？”月羽的眼眸因情欲而深邃。“这可是你自己求的。明天要是腰酸得起不来，可别怨我。”
+              “重、重一点吗……？”月羽有些紧张地睁大眼睛，指节微微收紧，脸上飞快浮起两朵红云，“……是你自己要求的哦。要是待会儿受不住了，一定要马上喊我……”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -701,9 +714,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              "Demanding things of me in my own shrine?" Tsukihan chuckles softly. "You have nerve... but I happen to like it."
+              "Bossing me around in my own shrine...?" Tsukihan huffs softly, though <<his>> sparkling eyes betray <<his>> fondness. "...Well, since we're here together, I'll let you have your way this time."
             <<option 'CN'>>
-              “在我的神社里反客为主来命令我？”月羽低低地笑了笑。“胆子真不小……不过我正喜欢你这样。”
+              “居然还指挥起我来了……”月羽抿着嘴角轻哼了一声，眼里却满是遮掩不住的欢喜与纵容，“……谁让是在社殿里呢，这次就由着你好了。”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -726,9 +739,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              "Hearing you beg like that makes my heart pound... maybe I should make you plead a little more."
+              "D-don't use that soft voice with me..." Tsukihan looks away with flaming cheeks, <<his>> heart hammering. "...I can never say no to you anyway. If you keep begging like that, I'll lose whatever composure I have left..."
             <<option 'CN'>>
-              “听你这么软声求我，心跳得好快……真想让你再多求我几声。”
+              “你、你别这么软着声音说话……”月羽手忙脚乱地别开通红的脸，心跳如擂鼓，“……本来就拿你没办法，再这样求下去，我什么原则都要丢光了……”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -751,9 +764,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              "Make that sound again," Tsukihan whispers passionately. "I want every raven in the forest to know you are mine."
+              "...That sounded so sweet," Tsukihan murmurs, eyes glistening with tender emotion as <<he>> hugs you close. "...Even the ravens outside might hear. Don't hold it back, let it out as much as you like..."
             <<option 'CN'>>
-              “再叫一声，”月羽动情地耳语。“我想让整座森林的渡鸦都知道，你现在属于我。”
+              “……真好听，”月羽眼底泛起羞怯的水色，有些动容地搂紧你，“……连窗外的渡鸦都要听见了呢。别忍着，想怎么出声都行……”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -818,9 +831,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              Tsukihan's breathing grows ragged and forceful. "I am losing control... you had better hold onto me tight!"
+              Tsukihan's skin burns hot, ragged breaths spilling across your collarbone. "...I can't hold back anymore, I really can't... Hold onto me, don't let go..."
             <<option 'CN'>>
-              月羽的呼吸变得粗重而炽热。“我已经快要克制不住了……你最好抓紧我！”
+              月羽浑身滚烫，急促的喘息扑在你的侧颈。“……忍不住了，真的忍不住了……快抓紧我，别放手……”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -843,9 +856,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              "Don't stop touching me there," Tsukihan orders with a breathless smile. "I know you want this as much as I do."
+              "D-don't stop..." Tsukihan nuzzles against your wrist, eyelashes fluttering. "...Everywhere you touch feels numb and warm, please touch me more..."
             <<option 'CN'>>
-              “别停下，继续碰我那里，”月羽气息不均却依然强势地笑着。“我知道你跟我一样渴求这个。”
+              “别、别停下……”月羽有些难耐地蹭了蹭你的手腕，睫毛轻颤，“……被你碰着的地方又麻又热，再多摸摸我嘛……”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>
@@ -868,9 +881,9 @@
         <<case `_tsukihanDom gte 70`>>
           <<language>>
             <<option 'EN'>>
-              "You started this fire," Tsukihan whispers with an amused gleam in <<his>> eyes. "Now satisfy me."
+              "You were the one who leaned in first..." Tsukihan mumbles, blushing with bashful anticipation. "...Getting me all stirred up like this, you're not allowed to leave me hanging..."
             <<option 'CN'>>
-              “火是你挑起来的，”月羽眼中闪着戏谑的光彩。“现在，好好让我满意吧。”
+              “明明是你先靠过来的……”月羽轻声咕哝着，眼神有些羞恼又带着期待，“……把气氛弄成这样，可不许半途丢下我不管……”
           <</language>>
         <<case `_tsukihanDom lte 30`>>
           <<language>>

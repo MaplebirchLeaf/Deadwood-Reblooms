@@ -254,8 +254,7 @@ class DeadwoodReblooms extends Module {
   }
 
   public async preInit(): Promise<void> {
-    // 根模块先于所有子模块预初始化。框架此时已读入 GUI 状态，可以一次保存全部冲突模块。
-    const enabled = new Set(this.core.services.gui.enabledModules.map(module => module.name));
+    const enabled = new Set(Object.keys(this.core.services.modules.dependencyGraph).filter(name => this.core.get(name)));
     const states = Object.fromEntries([...this.overlapping].filter(name => enabled.has(name)).map(name => [name, false]));
     const legacyNames = { SydneyExpansion: 'Sydney', RobinExpansion: 'Robin', WhitneyExpansion: 'Whitney', KylarExpansion: 'Kylar' } as const;
     const store = this.core.services.indexedDB;

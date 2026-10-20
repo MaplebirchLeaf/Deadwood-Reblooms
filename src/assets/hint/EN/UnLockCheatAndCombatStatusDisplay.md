@@ -11,4 +11,4 @@ Encounters that display NPC status add numbers beside the coloured descriptions:
 - Health, arousal and anger: current value / maximum.
 - Trust: current value.
 
-Use them to follow the encounter. Actions and ending conditions are unchanged, and special scenes with their own interface may not show every value.
+Special scenes with their own interface may not show every value.

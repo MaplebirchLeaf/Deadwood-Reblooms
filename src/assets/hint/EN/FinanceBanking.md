@@ -25,7 +25,7 @@ Net balance deducts credit, personal loan, mortgage and collection debts. Eligib
 
 **Furniture payment problems**: check the selected home, issued cards, completed reload, sufficient deposits or available credit, and overdue restrictions. A large bank balance does not mean a debit card was issued. A credit limit is not an equal personal-loan entitlement.
 
-Markets respond to farm progress and raids, Ocean Breeze Cafe prices, adverts, expansion, ingredient rumours and police investigations, Avery’s company outcomes, and Robin’s shop opening, improvements, staff and orchard deliveries. Events affect prices after they occur. Reopening the counter does not settle the same event repeatedly. Orchard deliveries to the drinks shop move its quote only at the first, fifth and tenth completed order.
+Markets respond to farm progress and raids, Ocean Breeze Cafe prices, adverts, expansion, ingredient rumours and police investigations, Avery’s company outcomes, and Robin’s shop opening, improvements, staff and orchard deliveries. Orchard deliveries to the drinks shop move its quote at the first, fifth and tenth completed order.
 
 <span class="blue">The cafe keeps trading for a week after announcing its expansion. Construction closure is a separate report. Maximum suspicion alone does not mean the police have discovered it. An actual investigation on Cliff Street causes the larger fall.</span> Publicly disclosing the ingredients at reopening also affects the quote.
 
@@ -125,4 +125,4 @@ The work conversation and application page read current quotes directly from the
 - A workshop's **1st, 5th and 10th** on-time supply orders for each listed customer each give that customer's quote **+1%**. Its first actual refusal to pay for a delivered order gives **−2%**. Selling and repurchasing a workshop does not reset these market milestones.
 - The **25th and 100th** paid taxi trips each give Harvest Street Motors (HSG) **+1%**, reflecting fuel and servicing demand.
 
-Event effects combine with ordinary market movements; favourable news does not guarantee a positive daily return. **Weekend news waits for the next trading day.** Reopening a journal or counter does not apply an event twice. The securities desk and financial journal show the latest three notices, their effects and any pending pricing. The Financial Daily keeps the historical copy you read.
+Event effects combine with ordinary market movements; favourable news does not guarantee a positive daily return. **Weekend news waits for the next trading day.** The securities desk and financial journal show the latest three notices, their effects and any pending pricing. The Financial Daily keeps the historical copy you read.

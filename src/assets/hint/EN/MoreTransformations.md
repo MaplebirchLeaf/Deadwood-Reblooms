@@ -6,11 +6,13 @@ Horse, whale and raven transformations each have six stages. Start with the rout
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Horse          | Take a <span class="gold">£25</span> lesson at Remy's riding school. If the grove fruit event appears, pick and eat the fruit for 5 points; it has a drug effect and the event is random | After horse transformation begins, successfully chase a runaway farm horse and groom it for 1 point; successful moor riding also offers growth chances |
 | Whale          | Swim from the beach towards the rocks, climb up and enter the rock pool. Float in the pool for 10 minutes to gain 1 point                                                                | Repeat floating; ordinary swimming and completed underwater actions also offer growth chances                                                          |
-| Raven          | Listen in the forest during daylight or dusk (75% success), or search the park or old churchyard (guaranteed); first contact adds 5 points                                               | After finding the flock again, feed once a day for 2 points; imitate calls and preen existing feathers once a day each for 1 point                     |
+| Raven          | Listen in the forest during daylight or dusk (75% success), or search beside the park bench or in the old churchyard (guaranteed); first contact adds 5 points                           | After finding the flock again, feed once a day for 2 points; imitate calls and preen existing feathers once a day each for 1 point                     |
 
 ### Finding the raven flock
 
-The first search takes 15 minutes. All locations share one search attempt per day. Failure gives no growth and consumes no fruit. Random forest flocks still appear, less often than before; use the park or old churchyard for a reliable start.
+The manual forest search is at the old churchyard turnoff (forest depth 10–14), just above the churchyard option.
+
+The first search takes 15 minutes. All locations share one search attempt per day. Failure gives no growth and consumes no fruit. Random forest flocks still appear, less often than before. Park ravens gather near the riverside bench at **07:00–10:00 and 16:00–19:00**, leaving after dark. You can rest on the bench at other times, too. Resting takes 15 minutes and can lead to the usual park encounters. Try the old churchyard during other daylight hours.
 
 Once you know the flock, finding it again takes 5 minutes. Feeding takes one portion of blackberries, strawberries or apple and 5 minutes; calling and preening take 10 minutes each. All flocks share the same daily limits. Following a random forest flock takes 15 minutes and leads deeper into the woods. You cannot stop at night, during a hunt or blood moon, near fainting, or when a forced scene is pending.
 
@@ -47,10 +49,10 @@ If a transformation decays, abilities requiring its stage pause until you restor
 
 ### The ravens’ letter and shrine
 
-1. Feed ravens on **three different game days**. One will bring a letter after the third feeding. If you leave it for later, the bird also appears in these locations’ ordinary menus during daylight. Feeding in the park, forest and old churchyard all counts.
-2. The letter is addressed to **Gwylan**. On your first visit, meet the shopkeeper first. Choose “Look for Gwylan” first, then bring out the letter during your conversation while they are willing to talk. Take the reply and directions, with an optional raven feather necklace sent to your wardrobe.
-3. At **forest depth 20–40**, the ordinary exploration menu gains a 15-minute path to Darkfeather Shrine. Returning takes another 15 minutes and restores the depth where you entered. The path is unavailable during hunts and blood moons.
-4. **Tsukihan**, a shrine maiden or priest, tends this place in a white-and-red kimono and receives visitors from 09:00 to 18:00. Introduce yourself first; later visits can be spent helping, sharing tea and getting to know each other.
+1. Feed ravens on **three different game days**. One will bring a letter while the flock is still around. If you miss it, collect it the next time you find the birds. In the park, visit the bench during their morning or evening hours. Feeding in the park, forest and old churchyard all counts.
+2. Give the letter to **Gwylan** at the forest shop to receive a reply and directions. You can also accept a raven feather necklace, sent to your wardrobe.
+3. At **forest depth 20–40**, follow the 15-minute path to Darkfeather Shrine. Returning takes 15 minutes and brings you back to the same depth. The path is unavailable during hunts and blood moons.
+4. **Tsukihan**, the shrine maiden or priest in a white-and-red kimono, receives visitors in the morning and afternoon, taking time for meals, shopping and the fruit trees. On your first arrival, Tsukihan takes the reply and welcomes you onto the veranda.
 
 The journal records the letter, path and visiting hours. Mod statistics show shrine progress, days helped and offerings. Once you have met Tsukihan, they also show your relationship and walks taken together. Affection, wilfulness and lust appear on the relationship page. If you promise to bring strawberries, statistics also list the outstanding promise and its deadline.
 
@@ -63,27 +65,41 @@ The courtyard and pond remain accessible at night. Each activity below is availa
 | Sit in prayer    | 15 minutes | −6 stress, −1 trauma    |
 | Rest by the pond | 10 minutes | −3 stress, −6 tiredness |
 
-You can leave <span class="gold">£5</span> when praying. After <span class="gold">£25</span> in total offerings, new veranda cushions give prayer an extra −3 stress. At <span class="gold">£50</span>, a pond bench and shelter give resting an extra −3 tiredness. These improvements also benefit later free visits.
+You can leave <span class="gold">£5</span> when praying. After <span class="gold">£25</span> in total offerings, new veranda cushions give prayer an extra −3 stress. At <span class="gold">£50</span>, pond stools and a shelter give resting an extra −3 tiredness. At <span class="gold">£100</span>, a repaired veranda roof and another lamp also let prayer relieve 3 tiredness. The benefits stack and remain available on later free visits. Tsukihan mentions the improvements during conversations and after offerings.
 
-Shrine ravens share feeding, calling and preening limits with the other flocks.
+### Wish plaques and giving thanks
+
+Write one plaque per game day beside the water basin: <span class="gold">£1</span>, 5 minutes and −2 stress. You can repeat an outstanding wish or choose a different one. The older plaques remain on the rack.
+
+| Wish                           | When you can return to give thanks                                                                                    |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| To come home safely            | After the day you first wrote it, return safely from the forest along the shrine path                                 |
+| For things to go well in class | Finish a vanilla lesson after writing the wish, without sleeping through it; maximum grades do not prevent completion |
+| For a good harvest             | Pick ripe fruit from a shrine tree after writing the wish, using either the orchard map or the direct picking link    |
+
+Return to the rack when the condition is met: 5 minutes and −3 stress, once per wish. After writing, you may choose to tell Tsukihan about it while they are present, gaining 1 affection. They remember what you shared in later conversations. Wishes you keep to yourself remain private.
+
+Writing plaques on **7 different game days** grants **Cherished Wish**: daily prayer relieves an extra 1 trauma, stacking with offering-funded improvements. Free and paid prayer still share one daily use.
+
+Completing **3 actual harvests** from shrine trees grants **Springglow**, increasing effective tending by **7%** for vanilla tending checks and orchard calculations that use the skill. The characteristics page shows the modifier too. Existing tree harvest records count; individual pieces of fruit do not. Removing or replanting trees preserves both your progress and the earned trait. Tsukihan also comes to trust your judgement around the trees.
 
 ### Getting to know Tsukihan
 
 Once you have met Tsukihan, you can choose them as a love interest in Attitudes. Affection has a maximum of 100. Spend time on the veranda, lend a hand or walk through the woods together to grow closer.
 
-| Activity                       | When it becomes available                                    | Time and benefits                                                                                                   |
-| ------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| Choose something to talk about | When Tsukihan is present during visiting hours               | 10 minutes, −2 stress, +1 affection                                                                                 |
-| Tend the shrine together       | After meeting Tsukihan; hands-on work needs both arms free   | 15 minutes, −2 stress; helping improves housekeeping and adds +2 affection, while keeping company adds +1 affection |
-| Share tea                      | At 10 affection                                              | 15 minutes, −5 stress, −3 tiredness, +2 affection                                                                   |
-| Take a walk together           | At 20 affection                                              | 20 minutes, −4 stress, −1 trauma, +3 affection; records one walk                                                    |
-| Ask Tsukihan for a kiss        | At 20 affection, when chosen as a love interest in Attitudes | Asking takes 5 minutes; accepting the kiss gives −3 stress and +1 affection                                         |
+| Activity                 | When it becomes available                                    | Time and benefits                                                                                                   |
+| ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Chat for a while         | When Tsukihan is present during visiting hours               | 10 minutes, −2 stress, +1 affection                                                                                 |
+| Tend the shrine together | After meeting Tsukihan; hands-on work needs both arms free   | 15 minutes, −2 stress; helping improves housekeeping and adds +2 affection, while keeping company adds +1 affection |
+| Share tea                | At 10 affection                                              | 15 minutes, −5 stress, −3 tiredness, +2 affection                                                                   |
+| Take a walk together     | At 20 affection                                              | 20 minutes, −4 stress, −1 trauma, +3 affection; records one walk                                                    |
+| Ask Tsukihan for a kiss  | At 20 affection, when chosen as a love interest in Attitudes | Asking takes 5 minutes; accepting the kiss gives −3 stress and +1 affection                                         |
 
 Visit the veranda during the day to talk, have tea, offer a gift or discuss a promise. Go round to the pond for a walk or a kiss. The courtyard has shrine work, prayer and the path to the living quarters. Browsing the courtyard, veranda and pond options takes no time.
 
-Opening the conversation menu takes no time. Choose what you want to ask, then spend 10 minutes talking. You can choose one topic each day, whether it concerns the shrine, the ravens or Tsukihan’s own life.
+Conversation follows your familiarity and shared experiences. Ask more, share something of your own, or simply keep Tsukihan company.
 
-While tending the shrine, you can mend the bell rope, arrange the offering table or simply keep Tsukihan company. Only hands-on help improves housekeeping and counts towards days helped. Tea and walks also leave room to choose how you respond. These replies take no extra time, and declining closeness does not lower affection. You can still share tea or take walks as friends.
+While tending the shrine, you can mend the bell rope, clear the steps, arrange the offering table or simply keep Tsukihan company. Only hands-on help improves housekeeping and counts towards days helped. Tea and walks also leave room to choose how you respond. These replies take no extra time, and declining closeness does not lower affection. You can still share tea or take walks as friends.
 
 Asking for a kiss uses that day’s opportunity. Afterwards, you can kiss, share a hug or hold back. Kissing and hugging each give −3 stress and +1 affection. Only kissing records a first kiss. Stepping back does not lower affection.
 
@@ -91,33 +107,51 @@ Each activity is available once per game day, resetting at 07:00. Tsukihan goes 
 
 ### Bringing a small gift
 
-Once you have met Tsukihan, you can bring something to eat on the veranda, or hand it over in the house while they are awake and you are welcome there. Prepared food comes from the vanilla food inventory; flowers come from your gardening stock. Browsing and reconsidering take no time. Handing over your choice takes 5 minutes.
+Give Tsukihan a prepared dish or flower on the veranda, or in the house while they are awake and you are welcome there. Gifts come from your existing stock and take 5 minutes to give.
 
 An ordinary dish or flower adds 1 affection. Tsukihan especially likes **shortbread** with tea: it adds 3 affection and records the preference in the vanilla food system. Valentine's chocolates also add 3 on Valentine's Day. The kind of food and Tsukihan's wilfulness shape the response. Friends are welcome to give gifts too.
 
-Food and flowers share one gift per day across the veranda and house, resetting with the vanilla daily record at **midnight**. Any strawberries you have promised still need to be brought separately. You can visit without bringing anything; a gift is never an entry fee.
+Food and flowers share one gift per day across the veranda and house, resetting at **midnight**. Promised strawberries must be brought separately.
+
+### Tsukihan’s day and fruit trees
+
+Tsukihan normally receives visitors at 09:00–12:00, 13:00–16:00 and 17:00–18:00. Tuesdays at 10:00–12:00 are spent buying supplies at the shopping centre. Lunch is at home from 12:00 to 13:00; the fruit trees need attention from 16:00 to 17:00. If the veranda is empty, explore the courtyard or look where Tsukihan actually is.
+
+Once you have met, you can greet Tsukihan at the shopping centre on Tuesday mornings. Helping with the basket or choosing biscuits takes 5 minutes and adds 1 affection; they share one opportunity per shopping trip. Indulging the choice of biscuits also adds 1 wilfulness. Tsukihan pays for the shopping.
+
+The trees behind the house use the actual orchard system: a mature apple and plum tree, with their own plots and save data. At 10 affection, spend 10 minutes checking them with Tsukihan while they are in the courtyard or garden to begin helping. Water, fertilise, plant and harvest through the existing orchard interface. Moisture, fertiliser, seasons, fruit batches and food inventory follow the same rules as the other orchards. The first crop needs seven days of watered growth. Ripe trees have a direct picking link, or you can select Pick in the orchard interface and tap the tree. Tsukihan tends the trees daily while active; absence stops that care. Temple and farm plots remain separate.
 
 ### Visiting the little house
 
-Tsukihan lives in the little house behind the shrine; follow the path from the courtyard to the door. You can knock from 07:00 to 09:00 or 18:00 to 22:00, taking 1 minute. During the day, Tsukihan works in the courtyard. Late at night, let them sleep. Friends can exchange a greeting at the threshold; you decide whether to go inside.
+Tsukihan lives in the little house behind the shrine; follow the path from the courtyard to the door. You can knock at 07:00–09:00, 12:00–13:00 or 18:00–22:00, taking 1 minute. Tsukihan has work and errands during the day. Late at night, let them sleep. Friends can exchange a greeting at the threshold; you decide whether to go inside.
 
 At 30 affection, with Tsukihan chosen as a love interest in Attitudes, they invite you in and welcome you to return when you need a rest. Going inside or returning to the courtyard takes 1 minute each. You can rest alone during the day while Tsukihan works in the courtyard.
 
-When Tsukihan is awake and has time, you can talk, read together or help tidy the little table. Each takes 10 minutes, and the three choices share one daily reward. Talking or reading gives −4 stress; tidying gives −2 stress and +2 housekeeping. All three add 1 affection. Wilfulness shapes how Tsukihan talks and asks you to stay. Leaving carries no affection penalty.
+When Tsukihan is awake and has time, you can talk or read together. Each takes 10 minutes; they share one daily reward of −4 stress and +1 affection. Wilfulness shapes the conversation. Leaving carries no affection penalty.
 
-There is separate spare bedding for you. Looking at the bed, choosing a sleep duration and getting up take no extra time. Sleep uses the vanilla fatigue, nightmare and waking systems. Your clothes stay as you leave them. Tsukihan wears pyjamas at home from 22:00 to 07:00 and returns to the courtyard at 09:00. You can rest a little longer or close the door behind you and leave.
+There is one broad futon, shared with Tsukihan. Sleeping uses the native shared-bed bonus when Tsukihan is home for the night. During the day you rest alone, leaving work and meals uninterrupted. Tsukihan normally bathes at 20:00–20:30. After working in the rain, they bathe at 18:00 instead, then change into dry clothes. Pyjamas are worn from 22:00 to 07:00; courtyard duties resume at 09:00. You choose how long to sleep and when to get up.
+
+The house has a small washroom. A bath takes 20 minutes and uses native undressing, washing and redressing. It removes grime, resets hygiene, and gives −4 stress and −3 tiredness. Mandatory events take priority before clothing changes or rewards.
+
+The courtyard has a water basin and wish plaques. Rinsing your hands takes 2 minutes and cleans only your hands. Writing a plaque costs £1 and 5 minutes, once daily, for −2 stress.
+
+While the washroom is occupied, wait in the bedroom or open the door. A chosen partner can stay, then choose to wash together or go further at 30 lust; the latter shares the inner shrine’s daily limit. Intruding as a non-partner costs 2 affection and adds 2 Wilfulness. An apology restores 1 affection. These consequences apply once daily, without repeating on re-entry.
+
+Without an invitation, you can try to slip into the bedroom while Tsukihan is away, asleep or bathing. This uses the native skulduggery check: difficulty 500 while they sleep, otherwise 300, once per day. Sneaking in does not grant permission to stay, share the bed or use the washroom freely. Tsukihan will ask you to leave if they wake or return.
 
 ### Saying how you feel
 
-Once affection reaches its maximum of 100, you can spend 10 minutes on the veranda talking about your feelings. Tsukihan speaks plainly about their own feelings and waits for your answer. You can accept, ask for more time or, if you have not chosen Tsukihan as a love interest, say you would like to remain friends.
+Once affection reaches its maximum of 100, choose See what Tsukihan wants on the veranda. This time, Tsukihan asks you to sit together for a ten-minute conversation about your feelings. Tsukihan speaks plainly about their own feelings and waits for your answer. You can accept, ask for more time or, if you have not chosen Tsukihan as a love interest, say you would like to remain friends.
 
 Accepting also chooses Tsukihan as a love interest if you have an available slot and have not already chosen them. Existing partners are never replaced. If every slot is occupied, you can decide later in Attitudes. If you have already chosen Tsukihan, this is a chance to say the words in person. You can choose Tsukihan in Attitudes as soon as you meet them, and share kisses or private time without completing this conversation first.
 
 ### Wanting to be close
 
+As lovers with at least 20 affection, you can flirt on the veranda. Once invited inside, you can kiss and flirt in the bedroom too. Each takes 5 minutes and gives +1 affection and −2 stress. Flirting adds 3 lust once daily; kissing adds 5 lust and shares its daily limit with pond kisses. Wilfulness changes the response without automatically increasing.
+
 Tsukihan’s lust ranges from 0 to 100. Holding hands adds 2 and kissing adds 5. At 30, Tsukihan becomes more direct about wanting closeness with a chosen partner. Wilfulness shapes how they ask, while lust influences their initiative. They still wait for your answer.
 
-At 50 affection, with Tsukihan chosen as a love interest, you can ask for some time alone. Asking and leaving take no time. Agreeing to private company or choosing to sit and talk takes 10 minutes, gives −4 stress and +2 affection, once per day. Private company begins with mutual agreement, then leaves the moment to the two of you before returning to the veranda. It lowers Tsukihan’s lust by 5. Talking leaves lust unchanged, and putting the visit off carries no penalty.
+At 50 affection, with Tsukihan chosen as a love interest, ask for some time alone on the veranda. Once per day, spend 10 minutes for −4 stress and +2 affection. You can be close or simply sit and talk; closeness lowers Tsukihan’s lust by 5, while talking leaves it unchanged. After an embrace, you can kiss and decide whether to stay closer. Kissing shares its daily rewards with the other kissing interactions.
 
 ### Tsukihan’s small requests
 

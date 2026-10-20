@@ -1,0 +1,124 @@
+:: Deadwood Raven Shrine Grounds
+<<set $outside to 1>><<effects>><<deadwood-raven-shrine-presence>>
+<<if !_shrine or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine'>>
+  <<deadwood-raven-shrine-return>><<exit>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    A wooden roof shelters a stone basin beside the path. Water runs into it through a bamboo spout. The ladles have been laid across a rack rather than left in the water.<br><br>
+    Farther along, little wooden plaques hang beneath the eaves. Some carry carefully written names; others have only a few hurried words. A box of blank plaques and a pencil sit beside a notice asking for £1 towards their cost.
+  <<option 'CN'>>
+    参道旁的木棚下有一方石槽，清水从竹管流进来。长柄水勺搭在架上，没有泡在水里。<br><br>
+    再往里，檐下挂着一排小木牌。有的认认真真写了名字，有的只匆匆留着几句话。架旁放着空白绘马和铅笔，一张纸条写着：“木牌工本，£1。”
+<</language>><br><br>
+<<if _shrineSafe and !pcAreArmsBound('any')>>
+  <<icon 'raven-shrine/water-basin.png'>><<lanLink ['Rinse your hands (0:02)', '舀水洗手 (0:02)'] 'Deadwood Raven Shrine Hands'>>
+    <<deadwood-raven-shrine-context>>
+    <<if _shrineSafe and _shrine.stage is 3 and $location is 'forest_raven_shrine' and !pcAreArmsBound('any')>>
+      <<set _groundSource to $passage>><<pass 2>><<deadwood-raven-shrine-context>>
+      <<if _shrineSafe and _shrine.stage is 3 and $passage is _groundSource and $location is 'forest_raven_shrine' and !pcAreArmsBound('any')>><<wash_hands>><</if>>
+    <</if>>
+  <</lanLink>><br>
+  <<if _shrine.wish.ready and !_shrine.wish.returned>>
+    <<icon 'raven-shrine/wooden-plaques.png'>><<lanLink ['Come back to give thanks for your wish (0:05)', '回来为实现的心愿还愿 (0:05)'] 'Deadwood Raven Shrine Wish Returned'>>
+      <<deadwood-raven-shrine-write-wish 'return'>>
+    <</lanLink>><<lstress>><br>
+  <<elseif !$daily.darkfeatherWish and $money gte 100>>
+    <<icon 'raven-shrine/wooden-plaques.png'>><<lanLink ['Take a blank wish plaque', '拿起一块空白绘马'] 'Deadwood Raven Shrine Wish'>><</lanLink>><br>
+  <</if>>
+<</if>>
+<br><<deadwood-raven-shrine-return>>
+
+:: Deadwood Raven Shrine Hands
+<<effects>><<deadwood-raven-shrine-context>>
+<<lanSwitch 'You tip the ladle over one hand, then the other. The water is cold enough to make your fingers curl. You rinse the handle before laying it back across the rack.' '你舀起一勺水，轮流洗净双手。水凉得让手指缩了缩。把勺柄也冲过一遍后，你将水勺搭回架上。'>><br><br>
+<<getouticon>><<lanLink ['Step back from the basin', '离开石槽边'] 'Deadwood Raven Shrine Grounds'>><</lanLink>><br>
+
+:: Deadwood Raven Shrine Wish
+<<effects>><<deadwood-raven-shrine-context>>
+<<if _shrineSafe and _shrine.stage is 3 and $location is 'forest_raven_shrine' and !pcAreArmsBound('any') and !$daily.darkfeatherWish and $money gte 100 and (!_shrine.wish.ready or _shrine.wish.returned)>>
+  <<lanSwitch 'The pencil has been sharpened with a knife. You turn a blank plaque over, finding a smooth patch of wood for the first words. What has been on your mind?' '铅笔是用小刀削的。你翻过空白木牌，找了一块平整的地方，准备落下第一笔。最近有什么事，一直惦记着呢？'>><br><br>
+  <<set _wishChoices to [['peace', 'To come home safely', '盼着平安回来'], ['study', 'For things to go well in class', '希望学业顺利'], ['harvest', 'For a good harvest', '盼着果树有个好收成']]>>
+  <<for _wishChoice range _wishChoices>>
+    <<capture _wishChoice>>
+      <<icon 'raven-shrine/wooden-plaques.png'>><<lanLink [_wishChoice[1] + ' (£1, 0:05)', _wishChoice[2] + '（£1，0:05）'] 'Deadwood Raven Shrine Wish Written'>>
+        <<deadwood-raven-shrine-write-wish _wishChoice[0]>>
+      <</lanLink>><<lstress>><br>
+    <</capture>>
+  <</for>>
+  <br>
+<</if>>
+<<getouticon>><<lanLink ['Put the pencil back', '放回铅笔'] 'Deadwood Raven Shrine Grounds'>><</lanLink>><br>
+
+:: Deadwood Raven Shrine Wish Written
+<<effects>><<deadwood-raven-shrine-presence>>
+<<if _shrineSafe and _shrine.stage is 3 and $location is 'forest_raven_shrine' and _shrine.scene is 'wish' and ['written', 'shared'].includes(_shrine.step)>>
+  <<lanSwitch 'You write a few words, then leave the rest of the wood bare. You hang the plaque with the writing turned inward. Its cord settles between two older wishes.' '你写下几句话，把剩下的地方空着。挂上去时，有字的一面朝里，细绳落在两块旧绘马之间。'>><<lstress>><br><br>
+  <<switch _shrine.wish.kind>>
+    <<case 'peace'>><<lanSwitch 'You would like to have somewhere to return to. Another day, if you make it back along the forest path, you can come and stand here again.' '总想有个能平安回来的地方。等过了今天，再走完林间的参道回来，就来这里看看吧。'>>
+    <<case 'study'>><<lanSwitch 'You think of the classroom. Finish a lesson without sleeping through it, then come back to tell your little wooden plaque how it went.' '你想起了教室。认真上完一堂课，再回来，把后来的事也告诉这块小木牌吧。'>>
+    <<case 'harvest'>><<lanSwitch 'You picture the branches behind the house. When you have picked some ripe fruit from those trees, there will be something to come back and give thanks for.' '你想起屋后的枝条。等亲手采下成熟的果子，就有可以回来还愿的好消息了。'>>
+  <</switch>><br><br>
+  <<if _shrine.wish.count gte 7>>
+    <span class='teal'><<lanSwitch 'There is a place here for your worries now. Cherished Wish lets daily prayer relieve an extra 1 trauma.' '这里已经有了安放你心事的位置。「心有所寄」让每日祈愿额外减轻1点创伤。'>></span><br><br>
+  <</if>>
+  <<if _shrinePerson and C.npc.Tsukihan.init is 1>>
+    <<npc Tsukihan>><<person1>>
+    <<if _shrine.step is 'written' and _shrine.wish.count gte 3 and Math.floor(Time.days) % 3 is 0>>
+      <<lanSwitch 'Tsukihan brings over an older plaque, keeping its writing face down. You recognise a mark you made near the edge. "Found this below the steps this morning. The cord had snapped." <<He>> threads a fresh cord through it. "I thought someone might come looking." You hang it beside the new one.' '月羽拿来一块旧绘马，有字的一面朝下。你认出了边沿自己划过的痕迹。“早上在石阶下面找到的。挂绳断了。”<<He>>替它穿上新绳，“想着也许有人会回来找。”你把它挂回新木牌旁边。'>><br><br>
+    <</if>>
+    <<if _shrine.step is 'shared'>>
+      <<lanSwitch 'You tell Tsukihan what you wrote. <<He>> listens without turning the plaque over. "Then come and tell me how it goes, too."' '你把写下的心愿告诉月羽。<<He>>听着，没有把木牌翻过来。“后来怎么样，也回来告诉我吧。”'>><<glove>>
+      <<if isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 20>><br><<lanSwitch '<<His>> fingers linger over yours as <<he>> hands back the pencil. "I would like to know you got home."' '递还铅笔时，<<his>>手指在你的手背上停了一下。“也想知道，你有没有平安到家。”'>><</if>><br><br>
+    <<elseif !_shrine.wish.shared and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+      <<lanSwitch 'Tsukihan steadies the rack while you tie the cord. "You needn\'t show me. But I can listen, if you want."' '月羽替你扶稳木架，让你系好绳子。“不必给我看。愿意说的话，我也可以听听。”'>><br><br>
+      <<socialiseicon>><<lanLink ['Tell Tsukihan about your wish', '和月羽说说这个心愿'] 'Deadwood Raven Shrine Wish Written'>>
+        <<deadwood-raven-shrine-context>>
+        <<if _shrinePerson and C.npc.Tsukihan.init is 1 and _shrine.scene is 'wish' and _shrine.step is 'written' and !_shrine.wish.shared and !$daily.no_sing and !$worn.face.type.includes('gag')>>
+          <<set _shrine.wish.shared to true, _shrine.step to 'shared'>><<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 1, 0, 100)>>
+        <</if>>
+      <</lanLink>><<glove>><br><br>
+    <</if>>
+  <</if>>
+<</if>>
+<<getouticon>><<lanLink ['Step back from the rack', '从绘马架旁退开'] 'Deadwood Raven Shrine Grounds'>><</lanLink>><br>
+
+:: Deadwood Raven Shrine Wish Returned
+<<effects>><<deadwood-raven-shrine-presence>>
+<<if _shrineSafe and _shrine.stage is 3 and $location is 'forest_raven_shrine' and _shrine.scene is 'wish' and _shrine.step is 'returned' and _shrine.wish.returned>>
+  <<lanSwitch 'You find the little plaque again. The words are the same, but you can read them without quite the same knot in your stomach. You straighten its cord and leave it hanging.' '你又找到了那块小木牌。字还是那些字，读起来时，心里却没先前那么绷着了。你把挂绳理正，让它继续留在架上。'>><<lstress>><br><br>
+  <<if _shrinePerson and C.npc.Tsukihan.init is 1>>
+    <<npc Tsukihan>><<person1>>
+    <<if _shrine.wish.shared>>
+      <<lanSwitch '"So it went well?" Tsukihan sets the brush aside and listens to your news. <<He>> smiles before you finish.' '“后来还顺利么？”月羽把刷子搁到一旁，听你说起后来的事。你还没说完，<<he>>已经笑了。'>>
+    <<else>>
+      <<lanSwitch 'Tsukihan brings a fresh length of cord. "This one has frayed. Keep the plaque; I can change the string." <<He>> waits while you hold the wood steady.' '月羽拿来一截新绳。“这根快磨断了。木牌留着，换根绳子就好。”<<He>>等你扶稳木牌，才解开旧结。'>>
+    <</if>><br><br>
+  <</if>>
+<</if>>
+<<getouticon>><<lanLink ['Leave your wish among the others', '把心愿留在这里'] 'Deadwood Raven Shrine Grounds'>><</lanLink>><br>
+
+:: Deadwood Raven Shrine Grounds Widgets [widget]
+
+<<widget 'deadwood-raven-shrine-write-wish'>>
+  <<set $_wishKind to _args[0]>>
+  <<deadwood-raven-shrine-context>>
+  <<if !_shrineSafe or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine' or pcAreArmsBound('any')>><<exit>><</if>>
+  <<if $_wishKind is 'return'>>
+    <<if $passage isnot 'Deadwood Raven Shrine Grounds' or !_shrine.wish.ready or _shrine.wish.returned>><<exit>><</if>>
+  <<elseif !['peace', 'study', 'harvest'].includes($_wishKind) or $passage isnot 'Deadwood Raven Shrine Wish' or $daily.darkfeatherWish or $money lt 100 or _shrine.wish.ready and !_shrine.wish.returned>><<exit>>
+  <</if>>
+  <<set $_wishSource to $passage, _shrine.scene to '', _shrine.step to ''>><<pass 5>><<deadwood-raven-shrine-context>>
+  <<if !_shrineSafe or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine' or $passage isnot $_wishSource or pcAreArmsBound('any')>><<exit>><</if>>
+  <<if $_wishKind is 'return'>>
+    <<if !_shrine.wish.ready or _shrine.wish.returned>><<exit>><</if>>
+    <<set _shrine.wish.returned to true, _shrine.scene to 'wish', _shrine.step to 'returned'>><<stress -3>>
+  <<else>>
+    <<if $daily.darkfeatherWish or $money lt 100 or _shrine.wish.ready and !_shrine.wish.returned>><<exit>><</if>>
+    <<money -100>><<stress -2>><<set $daily.darkfeatherWish to true, _shrine.wish.count += 1>>
+    <<if _shrine.wish.kind isnot $_wishKind or _shrine.wish.returned>>
+      <<set _shrine.wish.kind to $_wishKind, _shrine.wish.day to Math.floor(Time.days), _shrine.wish.ready to false, _shrine.wish.returned to false, _shrine.wish.shared to false>>
+    <</if>>
+    <<set _shrine.scene to 'wish', _shrine.step to 'written'>>
+  <</if>>
+<</widget>>

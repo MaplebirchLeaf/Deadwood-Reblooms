@@ -26,7 +26,7 @@
   <<elseif !_streetHeist.atMeeting or !_streetHeist.meetingAvailable>>
     <<exit>>
   <</if>>
-  <<set _streetPreparationId to _streetPrep.id, _streetMethodId to _streetOption.id, _streetQuality to _streetOption.quality, _streetCost to _streetOption.cost, _streetMinutes to _streetOption.minutes>>
+  <<set $_streetPreparationId to _streetPrep.id, _streetMethodId to _streetOption.id, _streetQuality to _streetOption.quality, _streetCost to _streetOption.cost, _streetMinutes to _streetOption.minutes>>
   <<set _streetRoster to _streetHeist.roster, _streetCrewKeys to _streetHeist.state.crew.slice()>>
   <<set _streetStarted to Time.date.timeStamp, _streetClosing to Time.date.timeStamp + ((_streetPrep.place is 'bank' ? 17 : 18) * 60 - Time.hour * 60 - Time.minute) * 60>>
   <<if _streetStarted + _streetMinutes * 60 gte _streetClosing>>
@@ -35,22 +35,22 @@
   <!-- 先保证整段营业时间，强制事件或跨时中断留下回执，不扣款或计入完成。 -->
   <<endevent>><<pass _streetMinutes>>
   <<set _streetHeist.state.feedback to {action:'preparation', outcome:'interrupted', minutes:Math.max(0, Math.round((Time.date.timeStamp - _streetStarted) / 60)), cost:0}>>
-  <<if !_streetHeist.available or _streetHeist.state.stage isnot 'prep' or _streetHeist.state.activity isnot _streetPreparationId or _streetHeist.state.preparations.includes(_streetPreparationId) or $money lt _streetCost or Time.date.timeStamp gte _streetClosing>><<exit>><</if>>
+  <<if !_streetHeist.available or _streetHeist.state.stage isnot 'prep' or _streetHeist.state.activity isnot $_streetPreparationId or _streetHeist.state.preparations.includes($_streetPreparationId) or $money lt _streetCost or Time.date.timeStamp gte _streetClosing>><<exit>><</if>>
   <<if _streetPrep.place is 'bank' and ($location isnot 'financial_centre' or _streetHeist.bankClosed)>><<exit>><</if>>
-  <<set _streetLiveOption to _streetHeist.preparations.find(item => item.id === _streetPreparationId)?.options.find(item => item.id === _streetMethodId)>>
-  <<if !_streetLiveOption?.available>><<exit>><</if>>
-  <<if _streetPreparationId is 'rehearsal' and (_streetHeist.roster isnot _streetRoster or !_streetHeist.recruitmentAvailable)>><<exit>><</if>>
+  <<set $_streetLiveOption to _streetHeist.preparations.find(item => item.id === $_streetPreparationId)?.options.find(item => item.id === _streetMethodId)>>
+  <<if !$_streetLiveOption?.available>><<exit>><</if>>
+  <<if $_streetPreparationId is 'rehearsal' and (_streetHeist.roster isnot _streetRoster or !_streetHeist.recruitmentAvailable)>><<exit>><</if>>
   <<if _streetCost gt 0>><<money `-_streetCost`>><<set _streetHeist.state.spent += _streetCost>><</if>>
-  <<set _streetHeist.state.preparationChoices[_streetPreparationId] to {method: _streetMethodId, quality: _streetQuality}>>
-  <<set _streetHeist.state.preparations.push(_streetPreparationId)>>
+  <<set _streetHeist.state.preparationChoices[$_streetPreparationId] to {method: _streetMethodId, quality: _streetQuality}>>
+  <<set _streetHeist.state.preparations.push($_streetPreparationId)>>
   <<set _streetHeist.state.feedback.outcome to 'completed', _streetHeist.state.feedback.cost to _streetCost>>
-  <<set _streetNewRehearsal to _streetPreparationId is 'rehearsal' and !_streetHeist.state.rehearsed.includes(_streetRoster)>>
-  <<if _streetNewRehearsal>>
+  <<set $_streetNewRehearsal to $_streetPreparationId is 'rehearsal' and !_streetHeist.state.rehearsed.includes(_streetRoster)>>
+  <<if $_streetNewRehearsal>>
     <<set _streetHeist.state.rehearsed.push(_streetRoster)>>
     <<deadwood-street-crew-gain _streetCrewKeys 10 5>>
   <</if>>
-  <<if _streetPreparationId isnot 'rehearsal' or _streetNewRehearsal>>
-    <<switch _streetPreparationId + ':' + _streetMethodId>>
+  <<if $_streetPreparationId isnot 'rehearsal' or $_streetNewRehearsal>>
+    <<switch $_streetPreparationId + ':' + _streetMethodId>>
       <<case 'briefing:read'>><<mathsskill 5 'no_star'>>
       <<case 'briefing:ask'>><<englishskill 5 'no_star'>>
       <<case 'briefing:observe'>><<skulduggery 2>>
@@ -64,17 +64,17 @@
 <</widget>>
 
 <<widget 'deadwood-street-heist-feedback'>>
-  <<set _streetFeedback to maplebirch.get('StreetLife')?.heist.state.feedback>>
-  <<if _streetFeedback>>
-    <<switch _streetFeedback.outcome>>
+  <<set $_streetFeedback to maplebirch.get('StreetLife')?.heist.state.feedback>>
+  <<if $_streetFeedback>>
+    <<switch $_streetFeedback.outcome>>
       <<case 'too_late'>>
         <span class='blue'><<lanSwitch 'There is not enough opening time left. The work has not started, and no time or money was spent.' '剩余营业时间不足。尚未开始，没有消耗时间或金钱。'>></span>
       <<case 'interrupted'>>
-        <span class='orange'><<lanSwitch 'The arrangement was interrupted after ' '安排在进行 '>> <<= _streetFeedback.minutes>> <<lanSwitch 'minutes. Nothing was charged or recorded as completed. Return when the conditions allow another meeting.' '分钟后中断。没有收费，也没有计入完成，条件允许时可以重新安排。'>></span>
+        <span class='orange'><<lanSwitch 'The arrangement was interrupted after ' '安排在进行 '>> <<= $_streetFeedback.minutes>> <<lanSwitch 'minutes. Nothing was charged or recorded as completed. Return when the conditions allow another meeting.' '分钟后中断。没有收费，也没有计入完成，条件允许时可以重新安排。'>></span>
       <<case 'unavailable'>>
         <span class='blue'><<lanSwitch 'The conditions changed before the work could begin. No time or money was spent.' '开始前的条件已改变。这次没有消耗时间或金钱。'>></span>
       <<case 'completed'>>
-        <span class='green'><<lanSwitch 'The agreed work is complete.' '约定的安排已经完成。'>></span> <<lanSwitch 'Time spent: ' '实际耗时：'>> <<= _streetFeedback.minutes>> <<lanSwitch 'minutes.' '分钟。'>><<if _streetFeedback.cost gt 0>> <<lanSwitch 'Paid: ' '已支付：'>><<printmoney _streetFeedback.cost>><</if>>
+        <span class='green'><<lanSwitch 'The agreed work is complete.' '约定的安排已经完成。'>></span> <<lanSwitch 'Time spent: ' '实际耗时：'>> <<= $_streetFeedback.minutes>> <<lanSwitch 'minutes.' '分钟。'>><<if $_streetFeedback.cost gt 0>> <<lanSwitch 'Paid: ' '已支付：'>><<printmoney $_streetFeedback.cost>><</if>>
     <</switch>><br><br>
   <</if>>
 <</widget>>

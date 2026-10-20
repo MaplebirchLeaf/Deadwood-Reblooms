@@ -23,7 +23,13 @@ export default function (maplebirch: typeof window.maplebirch) {
           'Sydney Canteen Intervene',
           'Sydney Canteen Fight Finish',
           'Sydney Canteen Break'
-        ].map((title, index) => [title, [{ srcmatch: /<<historyicon>>/g, applybefore: '<<deadwood-reblooms-sydney-science-transfer-link>>\n', expected: index === 0 ? 6 : 1 }]])
+        ].map((title, index) => [
+          title,
+          [
+            { srcmatch: /<<historyicon>>/g, applybefore: '<<deadwood-reblooms-sydney-science-transfer-link>>\n', expected: index === 0 ? 6 : 1 },
+            ...(index === 0 ? [{ src: '<<if $sydneyScience is 1>>', applybefore: '<<if $sydneyScience isnot 1>><<set $SydneyExpansion.scienceHint to true>><</if>>', expected: 1 }] : [])
+          ]
+        ])
       ),
       'Science Lesson': [
         // 在原版标记当天科学课出席后追加首次同桌剧情，避免未实际上课时触发。

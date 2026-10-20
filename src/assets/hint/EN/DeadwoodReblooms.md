@@ -1,6 +1,6 @@
 ### Prerequisites
 
-The target game version is **0.5.12.13**, with maplebirch framework **5.4.15 or later**. Install the loader's required dependencies, enable the root and desired submodules, save and reload. Character, location and story prerequisites still apply to each feature.
+For game **0.5.12.13** with maplebirch framework **5.4.15 or later**. Install the loader's required dependencies, enable Deadwood Reblooms and your chosen submodules, then save and reload.
 
 ### Guide, settings and statistics
 
@@ -29,7 +29,7 @@ Tick the modules you want in the guide contents, save and choose Reload now. Use
 | Homes, furniture and residents   | [Homes and living](#deadwood-guide-FinanceHomes)           | Financial centre property counter and furniture shop                |
 | Driving, taxi work and lifts     | [Transport](#deadwood-guide-Transport)                     | Elk Street driving school and Harvest Street dealership             |
 | Weapons, jobs and bounties       | [Street Life](#deadwood-guide-StreetLife)                  | Smuggler pub, Landry at the pub and police station                  |
-| Getting to know Remy             | Orchard                                                    | Riding school daytime menu after the vanilla introduction           |
+| Getting to know Remy             | Orchard                                                    | Riding school during the day                                        |
 | Horse, whale and raven forms     | [Transformations](#deadwood-guide-MoreTransformations)     | Riding school, beach rock pool, park or old churchyard              |
 | Portraits, music and cheats      | Relevant interface chapter                                 | Settings, sidebar cheat entry or original scenes                    |
 

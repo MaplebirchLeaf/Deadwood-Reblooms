@@ -70,20 +70,20 @@
   <<set _home_life to maplebirch.get('Finance').realEstate.life>>
   <<if (_args[0] isnot 'wine' or !(playerIsPregnant() and playerAwareTheyArePregnant())) and _home_life.begin(_args[0], _args[1])>>
     <<set _life_scene to _home_life.scene>>
-    <<set _life_duration to 20>>
+    <<set $_life_duration to 20>>
     <<switch _life_scene.action>>
       <<case 'meal'>>
         <<tending_give _life_scene.item -2>><<stress -3>>
         <<if _life_scene.first and _life_scene.quality gte 2>><<stress -1>><</if>>
       <<case 'tea'>>
-        <<tending_give _life_scene.item -2>><<stress -2>><<set _life_duration to 15>>
+        <<tending_give _life_scene.item -2>><<stress -2>><<set $_life_duration to 15>>
         <<if _life_scene.first and _life_scene.quality gte 2>><<stress -1>><</if>>
       <<case 'tidy'>>
         <<housekeeping 1 600>><<tiredness `_life_scene.quality >= 2 ? 1 : 2`>>
       <<case 'music'>>
         <<stress -2>>
       <<case 'film'>>
-        <<stress -4>><<set _life_duration to 45>>
+        <<stress -4>><<set $_life_duration to 45>>
       <<case 'wine'>>
         <<if ['red_wine', 'white_wine'].includes(_life_scene.item)>><<tending_give _life_scene.item -1>><</if>>
         <<drunk 60>><<stress -3>>
@@ -91,7 +91,7 @@
     <<if _life_scene.partner and _life_scene.first>>
       <<npcincr _life_scene.partner love 1>>
     <</if>>
-    <<pass _life_duration>>
+    <<pass $_life_duration>>
     <<if $Finance.real_estate.life.scene?.action is 'wine' and $passage is $Finance.real_estate.life.scene.origin and !$nextPassage and !$nextPassageCheck>>
       <<goto 'Deadwood Reblooms Property Life Finish'>>
     <</if>>

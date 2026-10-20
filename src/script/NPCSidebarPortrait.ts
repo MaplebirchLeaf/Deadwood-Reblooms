@@ -38,6 +38,18 @@ export default function (maplebirch: MaplebirchCore) {
   const sidebar = maplebirch.get('NPCSidebarPortrait') as SidebarPortrait;
   if (!sidebar) return;
   const wardrobe = maplebirch.npc.Clothes.wardrobe;
+  // 使用 NPC 自己的日程，室内人物不会因为玩家站在雨里就淋湿。专用场景规则随后注册，优先于此处。
+  maplebirch.tool.onInit(() => {
+    const outdoors = new Set(['park', 'beach', 'forest', 'garden', 'hunting', 'firewood', 'woodland', 'pillory', 'moor', 'street', 'docks', 'forest_raven_shrine', 'raven_shrine_garden']);
+    for (const name of new Set([...(setup.NPCNameList ?? []), ...maplebirch.npc.data.keys()])) {
+      if (name === 'Tsukihan') continue;
+      wardrobe.wet(name, 'damp', () => {
+        if (Weather.precipitation !== 'rain' || V.replayScene || C.npc[name]?.init !== 1 || C.npc[name].state !== 'active') return false;
+        const location = maplebirch.npc.Schedule.location[name];
+        return outdoors.has(location) || (name === 'Sydney' && location === 'temple' && V.sydney_templeWork === 'garden');
+      });
+    }
+  });
   // 各角色的颜色缓存只在这次运行中复用，不写入 SugarCube 存档，换装脚本负责按当前剧情重算。
   const pyjamaColours = new Map<string, string>();
   const robinColours = {
@@ -146,6 +158,13 @@ export default function (maplebirch: MaplebirchCore) {
   };
 
   maplebirch.tool.onInit(() => {
+    for (const npcName of ['Robin', 'Sydney', 'Kylar', 'Whitney']) {
+      wardrobe.wear(npcName, 'property_bath_towel', 'towel_wrap');
+      wardrobe.modify(npcName, (clothes, context) => {
+        if (context.location !== 'property_bath_towel') return;
+        wardrobe.strip(clothes, ['over_head', 'over_upper', 'over_lower', 'under_upper', 'under_lower', 'head', 'face', 'neck', 'hands', 'legs', 'feet', 'handheld']);
+      });
+    }
     for (const npcName of ['Robin', 'Sydney']) {
       wardrobe.modify(npcName, (clothes, context) => {
         if (context.key !== 'pyjama') return;

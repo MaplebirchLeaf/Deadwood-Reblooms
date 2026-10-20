@@ -31,23 +31,23 @@
 
 <<widget 'deadwood-blackjack-action'>>
   <<set _blackjackGame to maplebirch.get('LifeSimulation')?.casino.blackjack>>
-  <<set _blackjackActed to false>>
+  <<set $_blackjackActed to false>>
   <<if _blackjackGame>>
     <<switch _args[0]>>
-      <<case 'start'>><<set _blackjackActed to _blackjackGame.start()>>
-      <<case 'hit'>><<set _blackjackActed to _blackjackGame.hit()>>
-      <<case 'stand'>><<set _blackjackActed to _blackjackGame.stand()>>
+      <<case 'start'>><<set $_blackjackActed to _blackjackGame.start()>>
+      <<case 'hit'>><<set $_blackjackActed to _blackjackGame.hit()>>
+      <<case 'stand'>><<set $_blackjackActed to _blackjackGame.stand()>>
     <</switch>>
-    <<if _blackjackActed>>
+    <<if $_blackjackActed>>
       <<if _args[0] is 'start' and _blackjackGame.state.venue isnot 'home'>>
         <<if _blackjackGame.state.venue is 'casino'>>
           <<run maplebirch.get('LifeSimulation').casino.adjustChips(-_blackjackGame.state.bet)>>
         <<else>><<money `-_blackjackGame.state.bet`>><</if>>
       <</if>>
-      <<set _blackjackAward to _blackjackGame.collectPayout()>>
-      <<if _blackjackAward gt 0>>
-        <<if _blackjackGame.state.venue is 'casino'>><<run maplebirch.get('LifeSimulation').casino.adjustChips(_blackjackAward)>>
-        <<else>><<money _blackjackAward>><</if>>
+      <<set $_blackjackAward to _blackjackGame.collectPayout()>>
+      <<if $_blackjackAward gt 0>>
+        <<if _blackjackGame.state.venue is 'casino'>><<run maplebirch.get('LifeSimulation').casino.adjustChips($_blackjackAward)>>
+        <<else>><<money $_blackjackAward>><</if>>
       <</if>>
       <<pass `_args[0] === 'start' ? 2 : 1`>>
     <</if>>
@@ -55,34 +55,34 @@
 <</widget>>
 
 <<widget 'deadwood-blackjack-companion'>>
-  <<set _blackjackState to maplebirch.get('LifeSimulation').casino.blackjack.state>>
-  <<set _blackjackWon to ['win', 'blackjack'].includes(_blackjackState.result)>>
-  <<if _blackjackState.phase is 'player'>>
+  <<set $_blackjackState to maplebirch.get('LifeSimulation').casino.blackjack.state>>
+  <<set $_blackjackWon to ['win', 'blackjack'].includes($_blackjackState.result)>>
+  <<if $_blackjackState.phase is 'player'>>
     <<lanSwitch 'You study your cards. Your partner waits for you to ask for another or turn the hand over.' '你端详着手里的牌。恋人等着你决定再要一张，还是停牌揭晓点数。'>><br><br>
   <<else>>
-  <<switch _blackjackState.companion>>
+  <<switch $_blackjackState.companion>>
     <<case 'Robin'>>
-      <<if _blackjackState.phase is 'done'>>
-        <<if _blackjackWon>><<lanSwitch 'Robin slides the cards together. "You got me. Another hand?"' '罗宾把牌拢到一起。“你赢了。再来一局？”'>>
-        <<elseif _blackjackState.result is 'loss'>><<lanSwitch 'Robin glances at your cards, then gives you a small smile. "We can play again, if you want."' '罗宾看了看你的牌，朝你微微一笑。“想的话，我们可以再玩一局。”'>>
+      <<if $_blackjackState.phase is 'done'>>
+        <<if $_blackjackWon>><<lanSwitch 'Robin slides the cards together. "You got me. Another hand?"' '罗宾把牌拢到一起。“你赢了。再来一局？”'>>
+        <<elseif $_blackjackState.result is 'loss'>><<lanSwitch 'Robin glances at your cards, then gives you a small smile. "We can play again, if you want."' '罗宾看了看你的牌，朝你微微一笑。“想的话，我们可以再玩一局。”'>>
         <<else>><<lanSwitch '"Neither of us, then," Robin says, gathering the cards.' '“那就是谁也没赢。”罗宾说着，把牌收起来。'>><</if>>
       <<else>><<lanSwitch 'Robin brings a chair closer. "No money, right? I can play a few hands." You agree and clear a space for the cards.' '罗宾把椅子挪近了一点。“不赌钱，对吧？我可以陪你玩几局。”你答应下来，腾出一块地方摆牌。'>><</if>>
     <<case 'Whitney'>>
-      <<if _blackjackState.phase is 'done'>>
-        <<if _blackjackWon>><<lanSwitch '"Fine. You won that one," Whitney says, reaching for the deck. "Don\'t get used to it."' '“行，这局你赢。”惠特尼伸手去拿牌。“可别得意太早。”'>>
-        <<elseif _blackjackState.result is 'loss'>><<lanSwitch 'Whitney taps the winning hand. "Told you. Go on, deal again."' '惠特尼敲了敲赢下这局的牌。“我说什么来着？来，再发一局。”'>>
+      <<if $_blackjackState.phase is 'done'>>
+        <<if $_blackjackWon>><<lanSwitch '"Fine. You won that one," Whitney says, reaching for the deck. "Don\'t get used to it."' '“行，这局你赢。”惠特尼伸手去拿牌。“可别得意太早。”'>>
+        <<elseif $_blackjackState.result is 'loss'>><<lanSwitch 'Whitney taps the winning hand. "Told you. Go on, deal again."' '惠特尼敲了敲赢下这局的牌。“我说什么来着？来，再发一局。”'>>
         <<else>><<lanSwitch 'Whitney compares the two hands. "Again. That settles nothing."' '惠特尼对比着两边的牌。“再来，这局不算分出高下。”'>><</if>>
       <<else>><<lanSwitch 'Whitney pulls out a chair. "You\'re not going to change the rules when you lose, are you?" You set the deck between you.' '惠特尼拉开椅子。“你可别输了就改规则。”你把牌放到两人之间。'>><</if>>
     <<case 'Kylar'>>
-      <<if _blackjackState.phase is 'done'>>
-        <<if _blackjackWon>><<lanSwitch 'Kylar looks from your cards to your face. "You won. Do you want to keep playing?"' '凯拉尔的视线从你的牌移到你的脸上。“你赢了。还想继续玩吗？”'>>
-        <<elseif _blackjackState.result is 'loss'>><<lanSwitch '"I won?" Kylar checks the totals again, then smiles. "We could play another."' '“我赢了？”凯拉尔又算了一遍点数，随后笑了。“我们可以再来一局。”'>>
+      <<if $_blackjackState.phase is 'done'>>
+        <<if $_blackjackWon>><<lanSwitch 'Kylar looks from your cards to your face. "You won. Do you want to keep playing?"' '凯拉尔的视线从你的牌移到你的脸上。“你赢了。还想继续玩吗？”'>>
+        <<elseif $_blackjackState.result is 'loss'>><<lanSwitch '"I won?" Kylar checks the totals again, then smiles. "We could play another."' '“我赢了？”凯拉尔又算了一遍点数，随后笑了。“我们可以再来一局。”'>>
         <<else>><<lanSwitch 'Kylar leaves the cards where they are for a moment. "Same score. Another hand?"' '凯拉尔让牌在桌上多停了一会儿。“点数一样。再来一局？”'>><</if>>
       <<else>><<lanSwitch '"Just the two of us?" Kylar asks. You nod. Kylar sits close enough to watch you shuffle, then makes room for the cards.' '“就我们两个？”凯拉尔问。你点点头。凯拉尔坐近了些，看着你洗牌，随后给桌上的牌让出位置。'>><</if>>
     <<case 'Sydney'>>
-      <<if _blackjackState.phase is 'done'>>
-        <<if _blackjackWon>><<lanSwitch 'Sydney checks the totals. "That\'s yours. Nicely played."' '悉尼核对了点数。“这局是你赢。打得不错。”'>>
-        <<elseif _blackjackState.result is 'loss'>><<lanSwitch '"That makes this hand mine," Sydney says, gathering the cards. "Shall we try another?"' '“那这局就是我赢。”悉尼把牌收起来。“再来一局吗？”'>>
+      <<if $_blackjackState.phase is 'done'>>
+        <<if $_blackjackWon>><<lanSwitch 'Sydney checks the totals. "That\'s yours. Nicely played."' '悉尼核对了点数。“这局是你赢。打得不错。”'>>
+        <<elseif $_blackjackState.result is 'loss'>><<lanSwitch '"That makes this hand mine," Sydney says, gathering the cards. "Shall we try another?"' '“那这局就是我赢。”悉尼把牌收起来。“再来一局吗？”'>>
         <<else>><<lanSwitch '"A tie," Sydney says. "We\'ll have to settle it in the next hand."' '“平局。”悉尼说。“看来得等下一局才能分出胜负了。”'>><</if>>
       <<else>><<lanSwitch 'Sydney squares the deck. "Let\'s agree on the rules first." You decide to play without money, and leave the rules beside the cards.' '悉尼把牌理齐。“先说好规则。”你们约定不赌钱，把写好的规则放在牌旁边。'>><</if>>
   <</switch>><br><br>

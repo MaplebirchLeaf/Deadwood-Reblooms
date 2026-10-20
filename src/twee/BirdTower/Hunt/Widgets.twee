@@ -4,9 +4,9 @@
 <<widget "birdtower_hunt_result">>
   <<set _huntResult to null>>
   <<if !$bird.hunts.loot or $combat or $replayScene or $statFreeze>><<exit>><</if>>
-  <<set _huntMark to [$bird.hunts.timer, $bird.hunts.distanceNorth, $bird.hunts.distanceEast].join(':')>>
-  <<if $BirdTower.hunt.result?.mark isnot _huntMark>>
-    <<set $BirdTower.hunt.result to {mark: _huntMark, prey: null, dance: null, tending: null, base: false, left: 0, companion: false}>>
+  <<set $_huntMark to [$bird.hunts.timer, $bird.hunts.distanceNorth, $bird.hunts.distanceEast].join(':')>>
+  <<if $BirdTower.hunt.result?.mark isnot $_huntMark>>
+    <<set $BirdTower.hunt.result to {mark: $_huntMark, prey: null, dance: null, tending: null, base: false, left: 0, companion: false}>>
   <</if>>
   <<set _huntResult to $BirdTower.hunt.result>>
   <<if _args[0] is 'ambush'>>
@@ -33,9 +33,9 @@
   <<if !_huntResult or $combat or $replayScene or $statFreeze>><<exit>><</if>>
   <<if !_huntResult.base>>
     <<set _huntResult.base to true>>
-    <<set _huntTaken to Math.min(_args[0], Math.max(0, Math.floor(maplebirch.get('BirdTower').capacity - $bird.hunts.weight)))>>
-    <<set _huntResult.left to _args[0] - _huntTaken>>
-    <<if _huntTaken gt 0>><<flight_hunt_get 'lurkers' _huntTaken>><</if>>
+    <<set $_huntTaken to Math.min(_args[0], Math.max(0, Math.floor(maplebirch.get('BirdTower').capacity - $bird.hunts.weight)))>>
+    <<set _huntResult.left to _args[0] - $_huntTaken>>
+    <<if $_huntTaken gt 0>><<flight_hunt_get 'lurkers' $_huntTaken>><</if>>
   <</if>>
   <<if _huntResult.left gt 0>><<lanSwitch 'You leave behind what you cannot carry.' '你放下了带不走的猎物。'>><</if>>
 <</widget>>
@@ -44,15 +44,15 @@
   <<birdtower_hunt_result>>
   <<if !_huntResult>><<exit>><</if>>
   <<if _huntResult.prey is null>><<set _huntResult.prey to maplebirch.get('BirdTower').prey>><</if>>
-  <<set _prey to _huntResult.prey>>
+  <<set $_prey to _huntResult.prey>>
   <<if !_huntResult.companion>>
-    <<set _prey.left to Math.max(0, _prey.caught.length - Math.max(0, Math.floor(maplebirch.get('BirdTower').capacity - $bird.hunts.weight)))>>
-    <<set _prey.caught to _prey.caught.slice(0, Math.max(0, Math.floor(maplebirch.get('BirdTower').capacity - $bird.hunts.weight)))>>
+    <<set $_prey.left to Math.max(0, $_prey.caught.length - Math.max(0, Math.floor(maplebirch.get('BirdTower').capacity - $bird.hunts.weight)))>>
+    <<set $_prey.caught to $_prey.caught.slice(0, Math.max(0, Math.floor(maplebirch.get('BirdTower').capacity - $bird.hunts.weight)))>>
   <</if>>
-  <<set _other_hawks to _prey.followers>>
-  <<set _caught to _prey.caught.length>>
-  <<set _multi to _other_hawks.length gt 1>>
-  <<if _other_hawks.length>>
+  <<set $_other_hawks to $_prey.followers>>
+  <<set _caught to $_prey.caught.length>>
+  <<set _multi to $_other_hawks.length gt 1>>
+  <<if $_other_hawks.length>>
     <<language>>
       <<option 'EN'>>
         You look at the other chicks.
@@ -62,33 +62,33 @@
     <<if _caught is 0>>
       <<language>>
         <<option 'EN'>>
-          <<childrenNames _other_hawks>> <<= _multi ? "have" : "has">> empty talons, <<= _multi ? "and they whimper softly, looking dejected." : "whimpering softly and looking dejected.">>
+          <<childrenNames $_other_hawks>> <<= _multi ? "have" : "has">> empty talons, <<= _multi ? "and they whimper softly, looking dejected." : "whimpering softly and looking dejected.">>
         <<option 'CN'>>
-          <<childrenNames _other_hawks>>的爪中
+          <<childrenNames $_other_hawks>>的爪中
           <<if _multi>>
             全都
           <</if>>
           空空荡荡的，<<= _multi ? "他们" : "">>低声哀鸣着，一副垂头丧气的样子。
       <</language>>
-    <<elseif _caught is _other_hawks.length>>
+    <<elseif _caught is $_other_hawks.length>>
       <<language>>
         <<option 'EN'>>
-          <<childrenNames _other_hawks>> <<= _multi ? "each hold a lurker in their talons, and they circle high in the sky, crying out proudly." : "holds a lurker in their talons and circles high in the sky, crying out proudly.">>
+          <<childrenNames $_other_hawks>> <<= _multi ? "each hold a lurker in their talons, and they circle high in the sky, crying out proudly." : "holds a lurker in their talons and circles high in the sky, crying out proudly.">>
         <<option 'CN'>>
-          <<childrenNames _other_hawks>>的爪里
+          <<childrenNames $_other_hawks>>的爪里
           <<if _multi>>
             都各自
           <</if>>
           抓着一只潜伏者，<<= _multi ? "他们" : "">>正盘旋在高空自豪地高鸣。
       <</language>>
     <<else>>
-      <<set _successful_hawks to _prey.caught>>
-      <<set _multi to _successful_hawks.length gt 1>>
+      <<set $_successful_hawks to $_prey.caught>>
+      <<set _multi to $_successful_hawks.length gt 1>>
       <<language>>
         <<option 'EN'>>
-          <<childrenNames _successful_hawks>> <<= _multi ? "each hold a lurker in their talons, but the other chicks are not so lucky. They cry out triumphantly, while the others can only watch enviously." : "holds a lurker in their talons, but the other chicks are not so lucky. They cry out triumphantly, while the others can only watch enviously.">>
+          <<childrenNames $_successful_hawks>> <<= _multi ? "each hold a lurker in their talons, but the other chicks are not so lucky. They cry out triumphantly, while the others can only watch enviously." : "holds a lurker in their talons, but the other chicks are not so lucky. They cry out triumphantly, while the others can only watch enviously.">>
         <<option 'CN'>>
-          <<childrenNames _successful_hawks>>的爪里
+          <<childrenNames $_successful_hawks>>的爪里
           <<if _multi>>
             各
           <</if>>
@@ -99,7 +99,7 @@
       <<set _huntResult.companion to true>>
       <<if _caught gt 0>><<flight_hunt_get "lurkers" _caught>><</if>>
     <</if>>
-    <<if _prey.left gt 0>><<lanSwitch 'There is no room for the rest of the catch. You leave it behind.' '剩下的猎物已经无处携带，你们只好放下。'>><</if>>
+    <<if $_prey.left gt 0>><<lanSwitch 'There is no room for the rest of the catch. You leave it behind.' '剩下的猎物已经无处携带，你们只好放下。'>><</if>>
     <br><br>
   <</if>>
 <</widget>>
@@ -158,15 +158,7 @@
   <<unset $BirdTower.hunt.result>>
   <<run maplebirch.get("BirdTower").resetHunt()>>
 <</widget>>
-<!-- 选择参与狩猎的小鹰领队：TS 模块内 dominant/clever 优先，否则随机。 -->
-<!-- dominant/clever/none -->
-<<widget "hawks_leader_select">>
-  <<run maplebirch.get("BirdTower").pickLeader()>>
-<</widget>>
-<!-- dominant小鹰，目标lurkers的概率最高 -->
-<!-- clever小鹰，目标valuables的概率最高 -->
-<!-- sympathy小鹰，目标other的概率最高 -->
-<!-- clumsy小鹰，目标trash的概率最高 -->
+
 <<widget "babyhawk_loot_select">>
   <<rng>>
   <<if maplebirch.get('BirdTower').leaderTrait is "dominant">>

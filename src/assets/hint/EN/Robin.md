@@ -1,10 +1,12 @@
 ### Start with the two stalls
 
-Meet Robin at the beach lemonade stall or winter hot chocolate stall in the park, then ask about the stall equipment. Once you have seen the business problem, discuss improvements in **Orphanage → Robin's room**. After each upgrade, ask about the equipment at that stall again to discover the next plan.
+Ask Robin about the equipment at the beach lemonade stall or winter hot chocolate stall in the park. Once you have seen the business problem, discuss improvements in **Orphanage → Robin's room**. After each upgrade, ask about the equipment at that stall again to discover the next plan.
 
 The first upgrade at each stall costs <span class="gold">£600</span> and the second <span class="gold">£400</span>; fully upgrading both costs <span class="gold">£2,000</span>. Lend PC cash or let Robin pay from funds remaining after rent. PC contributions become a loan owed by Robin.
 
 Upgrades add products and shelter from rain, with tasting and work options. Helping takes 45 minutes once daily and requires Robin to be present and available. Business income goes into reserves for rent and improvements; Robin’s gifts to the PC come from personal cash. The ledger records loans owed to the PC separately, and spending still leaves enough for the next rent.
+
+When Robin is out or asleep, quietly leave **£20, £50 or £100** beneath the bedroom door. It goes into the existing reserve and is not a loan. Robin does not know who left it, so there is no immediate affection gain. Once Robin lives with you, this option no longer appears at the old orphanage room.
 
 ### Tutoring
 
