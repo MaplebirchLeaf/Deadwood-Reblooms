@@ -24,56 +24,17 @@
   <</if>>
 <</widget>>
 
-<<widget 'deadwood-raven-letter-link'>>
-  <<deadwood-raven-shrine-context>>
-  <<if _shrineSafe and _shrine.stage is 0 and _shrine.feeds gte 3 and _shrineModule.Raven.available and _shrineModule.Raven.met>>
-    <<lanSwitch 'A familiar raven lands nearby, carrying a folded paper tied with string. It holds the paper out towards you.' '一只熟悉的渡鸦落在近处，喙里衔着一张用细绳扎好的折纸。它往前探了探，把纸递向你。'>><br><br>
-    <<icon 'raven-shrine/feather-letter.png'>><<lanLink ['Take the letter from the raven', '接过渡鸦衔来的信']>>
-      <<deadwood-raven-shrine-context>>
-      <<if _shrineSafe and _shrine.stage is 0 and _shrine.feeds gte 3 and _shrineModule.Raven.available and _shrineModule.Raven.met>>
-        <<set $MoreTransformations.raven.origin to {park: 'Park', churchyard: 'Churchyard', forest: 'Forest', forest_raven_shrine: 'Deadwood Raven Shrine'}[$location]>>
-        <<set _shrine.stage to 1>><<goto 'Deadwood Raven Letter'>>
-      <</if>>
-    <</lanLink>><br>
-  <</if>>
-<</widget>>
-
-<<widget 'deadwood-raven-shrine-path'>>
-  <<deadwood-raven-shrine-context>>
-  <<if _shrineSafe and _shrine.stage gte 2 and $location is 'forest' and $forest gte 20 and $forest lte 40 and !Weather.bloodMoon>>
-    <<if _shrine.stage is 2>><<lanSwitch 'A split beech stands beside the path, just as Gwylan described. Beyond it, narrow stone steps climb between the trees.' '小径旁立着一棵分叉的山毛榉，和格威岚说的一样。树后露出一段窄窄的石阶，向林间延伸。'>><br><br><</if>>
-    <<icon 'raven-shrine/shrine.png'>><<lanLink ['Follow the path to the raven shrine (0:15)', '沿参道前往渡鸦神社 (0:15)']>>
-      <<deadwood-raven-shrine-context>>
-      <<if _shrineSafe and _shrine.stage gte 2 and $location is 'forest' and $forest gte 20 and $forest lte 40 and !Weather.bloodMoon>>
-        <<set _shrineSource to $passage, _shrineDepth to $forest>>
-        <<pass 15>>
-        <<deadwood-raven-shrine-context>>
-        <<if _shrineSafe and $passage is _shrineSource and $location is 'forest' and !Weather.bloodMoon>>
-          <<set _shrine.forest to _shrineDepth>><<set _shrine.stage to 3>>
-          <<set $location to 'forest_raven_shrine'>>
-          <<goto 'Deadwood Raven Shrine'>>
-        <</if>>
-      <</if>>
-    <</lanLink>><br>
-  <</if>>
-<</widget>>
-
-<<widget 'deadwood-raven-shrine-gwylan-link'>>
-  <<deadwood-raven-shrine-context>>
-  <<if _shrineGwylan and _shrine.stage is 1>>
-    <<icon 'raven-shrine/feather-letter.png'>><<lanLink ['Show Gwylan the raven’s letter (0:05)', '把渡鸦带来的信交给格威岚 (0:05)']>>
-      <<deadwood-raven-shrine-context>>
-      <<if _shrineGwylan and _shrine.stage is 1>>
-        <<set _shrineSource to $passage>><<pass 5>>
-        <<deadwood-raven-shrine-context>>
-        <<if _shrineGwylan and $passage is _shrineSource>>
-          <<goto 'Deadwood Raven Gwylan'>>
-        <<elseif _shrineSafe and $passage is _shrineSource and $location is 'forest_shop'>>
-          <<goto 'Forest Shop Entrance'>>
-        <</if>>
-      <</if>>
-    <</lanLink>><br>
-  <</if>>
+<<widget 'deadwood-raven-shrine-action-check'>>
+  <<set _shrineCanAct to true>>
+  <<if ['walk', 'kiss', 'sex'].includes(_shrineChoice) and pcAreArmsBound('any')>><<set _shrineCanAct to false>><<exit>><</if>>
+  <<if ['talk', 'tea', 'kiss', 'sex', 'feelings', 'close'].includes(_shrineChoice) and ($daily.no_sing or $worn.face.type.includes('gag'))>><<set _shrineCanAct to false>><<exit>><</if>>
+  <<if _shrineChoice is 'tea' and (C.npc.Tsukihan.love lt 10 or pcAreArmsBound('both'))>><<set _shrineCanAct to false>><<exit>><</if>>
+  <<if _shrineChoice is 'walk' and (C.npc.Tsukihan.love lt 20 or $leftleg is 'bound' or $rightleg is 'bound')>><<set _shrineCanAct to false>><<exit>><</if>>
+  <<if _shrineChoice is 'kiss' and (!isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 20)>><<set _shrineCanAct to false>><<exit>><</if>>
+  <<if _shrineChoice is 'sex' and (!isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 30)>><<set _shrineCanAct to false>><<exit>><</if>>
+  <<if _shrineChoice is 'feelings' and (_shrine.confessed or C.npc.Tsukihan.love lt 100)>><<set _shrineCanAct to false>><<exit>><</if>>
+  <<if _shrineChoice is 'close' and (!isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 50 or pcAreArmsBound('both') or _shrine.scene isnot 'close' or _shrine.step isnot '')>><<set _shrineCanAct to false>><<exit>><</if>>
+  <<if _shrineChoice is 'donate' and ($money lt 500 or pcAreArmsBound('both'))>><<set _shrineCanAct to false>><<exit>><</if>>
 <</widget>>
 
 <<widget 'deadwood-raven-shrine-act'>>
@@ -85,15 +46,8 @@
   <<set _shrineCompany to ['work', 'talk', 'tea', 'walk', 'kiss', 'sex', 'feelings', 'close'].includes(_shrineChoice)>>
   <<if _shrineCompany and !_shrinePerson>><<exit>><</if>>
   <<if _shrineCompany and C.npc.Tsukihan.init isnot 1>><<exit>><</if>>
-  <<if ['walk', 'kiss', 'sex'].includes(_shrineChoice) and pcAreArmsBound('any')>><<exit>><</if>>
-  <<if ['talk', 'tea', 'kiss', 'sex', 'feelings', 'close'].includes(_shrineChoice) and ($daily.no_sing or $worn.face.type.includes('gag'))>><<exit>><</if>>
-  <<if _shrineChoice is 'tea' and (C.npc.Tsukihan.love lt 10 or pcAreArmsBound('both'))>><<exit>><</if>>
-  <<if _shrineChoice is 'walk' and (C.npc.Tsukihan.love lt 20 or $leftleg is 'bound' or $rightleg is 'bound')>><<exit>><</if>>
-  <<if _shrineChoice is 'kiss' and (!isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 20)>><<exit>><</if>>
-  <<if _shrineChoice is 'sex' and (!isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 30)>><<exit>><</if>>
-  <<if _shrineChoice is 'feelings' and (_shrine.confessed or C.npc.Tsukihan.love lt 100)>><<exit>><</if>>
-  <<if _shrineChoice is 'close' and (!isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 50 or pcAreArmsBound('both') or $passage isnot 'Deadwood Raven Shrine Close' or _shrine.scene isnot 'close' or _shrine.step isnot '')>><<exit>><</if>>
-  <<if _shrineChoice is 'donate' and ($money lt 500 or pcAreArmsBound('both'))>><<exit>><</if>>
+  <<deadwood-raven-shrine-action-check>>
+  <<if !_shrineCanAct or (_shrineChoice is 'close' and $passage isnot 'Deadwood Raven Shrine Close')>><<exit>><</if>>
   <<set _shrineDuration to _shrineChoice is 'sex' ? 30 : _shrineChoice is 'kiss' ? 5 : _shrineChoice is 'walk' ? 20 : ['talk', 'rest', 'feelings', 'close'].includes(_shrineChoice) ? 10 : 15>>
   <<if _shrineCompany and _shrineMinutes lte _shrineDuration>><<exit>><</if>>
   <<if _shrineChoice is 'talk' and !['shrine', 'birds', 'town', 'personal'].includes(_args[1])>><<exit>><</if>>
@@ -107,15 +61,8 @@
   <<if _shrineCompany and !_shrinePerson>>
     <<goto 'Deadwood Raven Shrine'>><<exit>>
   <</if>>
-  <<if ['walk', 'kiss', 'sex'].includes(_shrineChoice) and pcAreArmsBound('any')>><<goto 'Deadwood Raven Shrine'>><<exit>><</if>>
-  <<if ['talk', 'tea', 'kiss', 'sex', 'feelings', 'close'].includes(_shrineChoice) and ($daily.no_sing or $worn.face.type.includes('gag'))>><<goto 'Deadwood Raven Shrine'>><<exit>><</if>>
-  <<if _shrineChoice is 'tea' and (C.npc.Tsukihan.love lt 10 or pcAreArmsBound('both'))>><<goto 'Deadwood Raven Shrine'>><<exit>><</if>>
-  <<if _shrineChoice is 'walk' and (C.npc.Tsukihan.love lt 20 or $leftleg is 'bound' or $rightleg is 'bound')>><<goto 'Deadwood Raven Shrine'>><<exit>><</if>>
-  <<if _shrineChoice is 'kiss' and (!isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 20)>><<goto 'Deadwood Raven Shrine'>><<exit>><</if>>
-  <<if _shrineChoice is 'sex' and (!isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 30)>><<goto 'Deadwood Raven Shrine'>><<exit>><</if>>
-  <<if _shrineChoice is 'feelings' and (_shrine.confessed or C.npc.Tsukihan.love lt 100)>><<goto 'Deadwood Raven Shrine'>><<exit>><</if>>
-  <<if _shrineChoice is 'close' and (!isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 50 or pcAreArmsBound('both') or _shrine.scene isnot 'close' or _shrine.step isnot '')>><<goto 'Deadwood Raven Shrine'>><<exit>><</if>>
-  <<if _shrineChoice is 'donate' and ($money lt 500 or pcAreArmsBound('both'))>><<goto 'Deadwood Raven Shrine'>><<exit>><</if>>
+  <<deadwood-raven-shrine-action-check>>
+  <<if !_shrineCanAct>><<goto 'Deadwood Raven Shrine'>><<exit>><</if>>
   <<set _shrine[_shrineKey] to Math.floor(Time.days), _shrine.action to _shrineChoice, _shrineDone to true>>
   <<set _shrine.scene to _shrineChoice, _shrine.step to ''>>
   <<switch _shrineChoice>>
@@ -316,9 +263,9 @@
           <<case 1>>
             <<lanSwitch 'The letter is addressed to Gwylan. Bring it to the forest shop. If this is your first visit, introduce yourself first; then choose “Look for Gwylan” and bring out the letter during your conversation.' '信是给格威岚的。把信带到森林商店；若是第一次去，先认识店主，再选择“寻找格威岚”，交谈时便能提起这封信。'>>
           <<case 2>>
-            <<lanSwitch 'Gwylan marked a side path in the woods a little beyond the outskirts (forest depth 20–40). Follow it to the raven shrine. Tsukihan receives visitors from 09:00 to 18:00.' '格威岚标出了外缘稍深处的岔路（森林深度20～40）。沿参道可到渡鸦神社。月羽在9:00至18:00之间接待来客。'>>
+            <<lanSwitch 'Gwylan marked a side path in the woods a little beyond the outskirts (forest depth 20–40). Follow it to Darkfeather Shrine. Tsukihan receives visitors from 09:00 to 18:00.' '格威岚标出了外缘稍深处的岔路（森林深度20～40）。沿参道可到黯羽神社。月羽在9:00至18:00之间接待来客。'>>
           <<case 3>>
-            <<lanSwitch 'You know the path to the raven shrine (forest depth 20–40). Tsukihan is in the courtyard from 09:00 to 18:00. The ravens share their daily feeding, calling and preening limits with flocks elsewhere.' '你记得前往渡鸦神社的参道（森林深度20～40）。月羽在9:00至18:00之间待在庭院。神社渡鸦与其他地点的鸟群共用每日喂食、鸣叫和梳羽次数。'>>
+            <<lanSwitch 'You know the path to Darkfeather Shrine (forest depth 20–40). Tsukihan is in the courtyard from 09:00 to 18:00. The ravens share their daily feeding, calling and preening limits with flocks elsewhere.' '你记得前往黯羽神社的参道（森林深度20～40）。月羽在9:00至18:00之间待在庭院。神社渡鸦与其他地点的鸟群共用每日喂食、鸣叫和梳羽次数。'>>
             <<if _shrineNote.home_invited and C.npc.Tsukihan?.state is 'active' and isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 30>>
               <br><<lanSwitch 'Tsukihan has invited you to rest in the house behind the shrine, even while they work in the courtyard. There is spare bedding if you want to stay.' '月羽请你到神社后侧的小屋歇脚，自己在庭院忙时，也允许你进屋。屋里备着客用被褥，想留宿时可以睡下。'>>
             <<elseif C.npc.Tsukihan?.init is 1 and isLoveInterest('Tsukihan')>>

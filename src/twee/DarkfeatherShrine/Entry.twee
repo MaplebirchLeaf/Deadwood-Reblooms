@@ -1,0 +1,127 @@
+:: Deadwood Raven Letter
+<<effects>><<deadwood-raven-shrine-context>>
+<<if !_shrine or _shrine.stage lt 1>>
+  <<lanSwitch 'There is no letter in your hands.' '你手中没有那封信。'>><br><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      The raven lets go when you take the folded paper. It hops back, wiping its beak against a branch.<br><br>
+      There is a black feather caught beneath the string. On the outside, in small, careful handwriting, is a name: <span class='gold'>Gwylan</span>.
+      Below it, someone has added: "The bearer has been feeding our birds. Please point them our way. — Tsukihan."
+      <br><br>
+      Inside is a short list of supplies, including lamp oil and cord. A raven has pecked a hole through one corner.<br><br>
+      The forest shop is your next stop. Its owner should know who sent the letter. You fold it along the old creases and tuck it away.
+    <<option 'CN'>>
+      你接住折好的纸，渡鸦才松开鸟喙。它跳开两步，在树枝上蹭了蹭喙尖。<br><br>
+      扎纸的细绳下夹着一片黑羽。纸面上用端正的小字写着一个名字：<span class='gold'>格威岚</span>。
+      下方另添了一行：“持信人照顾过这里的鸟。请替我们指路。——月羽。”
+      <br><br>
+      信里是一张简短的采购单，列着灯油、绳子等东西。有一角被鸟喙啄破了。<br><br>
+      看来得去一趟森林商店，店主应该认得寄信的人。你沿着原来的折痕把纸叠好，收了起来。
+  <</language>><br><br>
+<</if>>
+<<set _letterReturn to ['Churchyard', 'Park', 'Deadwood Raven Shrine'].includes($MoreTransformations?.raven?.origin) ? $MoreTransformations.raven.origin : 'Forest'>>
+<<getouticon>><<lanLink ['Put the letter away', '把信收好'] _letterReturn>><<set $eventskip to 1>><</lanLink>><br>
+
+:: Deadwood Raven Gwylan
+<<set $outside to 0>><<effects>><<deadwood-raven-shrine-context>>
+<<if _shrineGwylan and _shrine.stage is 1>>
+  <<npc Gwylan>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      Gwylan turns the paper over, then plucks the feather from its string. "They still haven't learnt to leave the corners alone."
+      <<He>> reads the list and puts it beneath the counter.<br><br>
+      "Feeding them, have you? They do remember a useful pair of hands." <<He>> draws a branching line on the back of a receipt.
+      "A little past the outskirts. Find the split beech and turn uphill. If you reach the lake, you've gone much too far."
+      <br><br>
+      <<if C.npc.Gwylan.dom gte 120>>
+        <<He>> catches your hand before it settles on a nearby box. "And leave that alone. It isn't for you."
+      <<else>>
+        A box on the counter gives a faint rattle. Gwylan moves it out of your reach without looking down.
+      <</if>>
+      <br><br>
+      <<He>> writes a reply, folds it around the receipt, and lays a dark feather necklace beside it.
+      "Take the reply up. You can have this for the errand. Wear it if you want those feathers of yours to stay."
+    <<option 'CN'>>
+      格威岚翻过那张纸，从细绳下抽出羽毛。“还是学不会放过纸角。”
+      <<He>>看完清单，把它收进柜台下。<br><br>
+      “你喂过它们？它们倒很会记住肯替自己做事的人。”<<He>>拿出一张收据，在背面画了条岔路。
+      “外缘往里一点，找那棵分了叉的山毛榉，往山上拐。走到湖边就过头了。”
+      <br><br>
+      <<if C.npc.Gwylan.dom gte 120>>
+        你正要把手搭在旁边的盒子上，<<he>>先扣住了你的手。“还有，别碰那个。不是给你的。”
+      <<else>>
+        柜台上的盒子轻轻响了一下。格威岚没低头，便把它挪出了你的手能碰到的范围。
+      <</if>>
+      <br><br>
+      <<He>>写了封回信，将收据折进里面，又在旁边放下一条缀着黑羽的项链。
+      “把回信带上去。这个算跑腿的报酬。想留住身上的羽毛，可以戴着。”
+  <</language>><br><br>
+  <<icon 'clothes/raven-feather-necklace.png'>><<lanLink ['Take the reply and send the necklace to your wardrobe', '收下回信，将项链送到衣柜'] 'Gwylan Talk Shop'>>
+    <<deadwood-raven-shrine-context>>
+    <<if _shrineGwylan and _shrine.stage is 1>>
+      <<necksend 'raven feather necklace' 'wardrobe'>><<set _shrine.stage to 2>>
+    <</if>><<endevent>>
+  <</lanLink>><br>
+  <<icon 'raven-shrine/feather-letter.png'>><<lanLink ['Take only the reply and directions', '只收下回信和路线'] 'Gwylan Talk Shop'>>
+    <<deadwood-raven-shrine-context>>
+    <<if _shrineGwylan and _shrine.stage is 1>><<set _shrine.stage to 2>><</if>><<endevent>>
+  <</lanLink>><br>
+<<else>>
+  <<lanSwitch 'Gwylan is not available to discuss the letter now. You keep it for another visit.' '格威岚现在不便谈这封信。你把它留待下次拜访。'>><br><br>
+  <<getouticon>><<lanLink ['Return to the shop entrance', '返回商店门口'] 'Forest Shop Entrance'>><<endevent>><</lanLink>><br>
+<</if>>
+
+:: Deadwood Raven Shrine Entry Widgets [widget]
+
+<<widget 'deadwood-raven-letter-link'>>
+  <<deadwood-raven-shrine-context>>
+  <<if _shrineSafe and _shrine.stage is 0 and _shrine.feeds gte 3 and _shrineModule.Raven.available and _shrineModule.Raven.met>>
+    <<lanSwitch 'A familiar raven lands nearby, carrying a folded paper tied with string. It holds the paper out towards you.' '一只熟悉的渡鸦落在近处，喙里衔着一张用细绳扎好的折纸。它往前探了探，把纸递向你。'>><br><br>
+    <<icon 'raven-shrine/feather-letter.png'>><<lanLink ['Take the letter from the raven', '接过渡鸦衔来的信']>>
+      <<deadwood-raven-shrine-context>>
+      <<if _shrineSafe and _shrine.stage is 0 and _shrine.feeds gte 3 and _shrineModule.Raven.available and _shrineModule.Raven.met>>
+        <<set $MoreTransformations.raven.origin to {park: 'Park', churchyard: 'Churchyard', forest: 'Forest', forest_raven_shrine: 'Deadwood Raven Shrine'}[$location]>>
+        <<set _shrine.stage to 1>><<goto 'Deadwood Raven Letter'>>
+      <</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-raven-shrine-path'>>
+  <<deadwood-raven-shrine-context>>
+  <<if _shrineSafe and _shrine.stage gte 2 and $location is 'forest' and $forest gte 20 and $forest lte 40 and !Weather.bloodMoon>>
+    <<if _shrine.stage is 2>><<lanSwitch 'A split beech stands beside the path, just as Gwylan described. Beyond it, narrow stone steps climb between the trees.' '小径旁立着一棵分叉的山毛榉，和格威岚说的一样。树后露出一段窄窄的石阶，向林间延伸。'>><br><br><</if>>
+    <<icon 'raven-shrine/shrine.png'>><<lanLink ['Follow the path to Darkfeather Shrine (0:15)', '沿参道前往黯羽神社 (0:15)']>>
+      <<deadwood-raven-shrine-context>>
+      <<if _shrineSafe and _shrine.stage gte 2 and $location is 'forest' and $forest gte 20 and $forest lte 40 and !Weather.bloodMoon>>
+        <<set _shrineSource to $passage, _shrineDepth to $forest>>
+        <<pass 15>>
+        <<deadwood-raven-shrine-context>>
+        <<if _shrineSafe and $passage is _shrineSource and $location is 'forest' and !Weather.bloodMoon>>
+          <<set _shrine.forest to _shrineDepth>><<set _shrine.stage to 3>>
+          <<set $location to 'forest_raven_shrine'>>
+          <<goto 'Deadwood Raven Shrine'>>
+        <</if>>
+      <</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-raven-shrine-gwylan-link'>>
+  <<deadwood-raven-shrine-context>>
+  <<if _shrineGwylan and _shrine.stage is 1>>
+    <<icon 'raven-shrine/feather-letter.png'>><<lanLink ['Show Gwylan the raven’s letter (0:05)', '把渡鸦带来的信交给格威岚 (0:05)']>>
+      <<deadwood-raven-shrine-context>>
+      <<if _shrineGwylan and _shrine.stage is 1>>
+        <<set _shrineSource to $passage>><<pass 5>>
+        <<deadwood-raven-shrine-context>>
+        <<if _shrineGwylan and $passage is _shrineSource>>
+          <<goto 'Deadwood Raven Gwylan'>>
+        <<elseif _shrineSafe and $passage is _shrineSource and $location is 'forest_shop'>>
+          <<goto 'Forest Shop Entrance'>>
+        <</if>>
+      <</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>

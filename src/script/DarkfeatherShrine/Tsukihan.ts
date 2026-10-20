@@ -1,4 +1,4 @@
-// ./src/script/MoreTransformations/Tsukihan.ts
+// ./src/script/DarkfeatherShrine/Tsukihan.ts
 
 import TsukihanPortrait from '../NamedNPCSidebarPortrait/Tsukihan';
 

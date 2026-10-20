@@ -49,7 +49,7 @@ If a transformation decays, abilities requiring its stage pause until you restor
 
 1. Feed ravens on **three different game days**. One will bring a letter after the third feeding. If you leave it for later, the bird also appears in these locations’ ordinary menus during daylight. Feeding in the park, forest and old churchyard all counts.
 2. The letter is addressed to **Gwylan**. On your first visit, meet the shopkeeper first. Choose “Look for Gwylan” first, then bring out the letter during your conversation while they are willing to talk. Take the reply and directions, with an optional raven feather necklace sent to your wardrobe.
-3. At **forest depth 20–40**, the ordinary exploration menu gains a 15-minute path to the raven shrine. Returning takes another 15 minutes and restores the depth where you entered. The path is unavailable during hunts and blood moons.
+3. At **forest depth 20–40**, the ordinary exploration menu gains a 15-minute path to Darkfeather Shrine. Returning takes another 15 minutes and restores the depth where you entered. The path is unavailable during hunts and blood moons.
 4. **Tsukihan**, a shrine maiden or priest, tends this place in a white-and-red kimono and receives visitors from 09:00 to 18:00. Introduce yourself first; later visits can be spent helping, sharing tea and getting to know each other.
 
 The journal records the letter, path and visiting hours. Mod statistics show shrine progress, days helped and offerings. Once you have met Tsukihan, they also show your relationship and walks taken together. Affection, wilfulness and lust appear on the relationship page. If you promise to bring strawberries, statistics also list the outstanding promise and its deadline.

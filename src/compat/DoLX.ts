@@ -146,6 +146,12 @@ export default function DoLX(core: MaplebirchCore): void {
       if (rules) core.tool.zone.widgetPassage[title] = rules.filter(rule => rule.srcmatch?.source !== npc_size_patch.srcmatch.source || !rule.to?.startsWith('$1<<case 5>><<deadwood-npc-size-five-'));
     }
     if (core.get('LifeSimulation')) {
+      // DoLX 将换衣槽列表改名；扩展实际列表，后续穿衣与清除待穿状态仍走原生循环。
+      if (data.passageDataItems.map.get('Widgets Wardrobe')?.content.includes('<<set _wardrobeEquipSlots to [')) {
+        zone.widgetPassage['Widgets Wardrobe'] = zone.widgetPassage['Widgets Wardrobe'].map(rule =>
+          rule.applybefore === '<<run _equip.push("handheld_left")>>\n' ? { ...rule, applybefore: '<<run _wardrobeEquipSlots.push("handheld_left")>>\n' } : rule
+        );
+      }
       // DoLX 已将书包分到 bag 槽，保留它的原生判断与暂存，不套用原版手持书包规则。
       const bookbags = [
         'Widgets Events Science',
