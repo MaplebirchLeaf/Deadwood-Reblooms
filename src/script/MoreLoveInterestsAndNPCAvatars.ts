@@ -51,7 +51,7 @@ export default function (maplebirch: MaplebirchCore) {
       'Widgets Attitudes': [
         // 保留原版自动分配条件和关系提示，只把已分配的恋人同步进扩展名单。
         {
-          src: '<<set $_assigned to true>>',
+          srcmatchgroup: /<<set \$_assigned to true>>/g,
           applyafter: '<<run maplebirch.get("MoreLoveInterestsAndNPCAvatars").addLoveInterest($_LI)>>',
           expected: 3
         },

@@ -3,17 +3,6 @@
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 export default function DoLP(maplebirch: MaplebirchCore): void {
-  maplebirch.tool.inject({
-    widgetPassage: {
-      'Widgets Market': [
-        {
-          srcmatch: /<<set _foodstuffKeys to Object.keys\(\$foodstuff\)>>/g,
-          to: '<<set _foodstuffKeys to Object.keys($foodstuff).filter(key => setup.foodstuff[key]?.shop)>>',
-          expected: 2
-        }
-      ]
-    }
-  });
   const effects = maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Effects Man');
   if (maplebirch.get('MoreTransformations') && /<<defiance 10 \$feettarget>>/.test(effects?.content ?? '')) {
     // DoLP 增加了强度 10 的踢击分支，保留两种原生强度及其实际分支数。

@@ -92,6 +92,14 @@ export default function (maplebirch: MaplebirchCore) {
       'Town Hall Wait': [{ src: '<<effects>>', applyafter: '<<deadwood-town-hall-visitors>>', expected: 1 }]
     },
     widgetPassage: {
+      // 原版市场只列出有交易资料的食材，跳过料理等不可交易物品。
+      'Widgets Market': [
+        {
+          srcmatch: /<<set _foodstuffKeys to Object.keys\(\$foodstuff\)>>/g,
+          to: '<<set _foodstuffKeys to Object.keys($foodstuff).filter(key => setup.foodstuff[key]?.shop)>>',
+          expected: 2
+        }
+      ],
       // 只给原版移动端属性标记名称，保留显示条件、翻译和数值提示。
       mobileStats: [
         {

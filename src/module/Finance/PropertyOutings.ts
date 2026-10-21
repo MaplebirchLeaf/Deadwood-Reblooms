@@ -46,10 +46,7 @@ export default class PropertyOutings {
   ) {}
 
   public get state(): PropertyOutingState {
-    const state = (V.Finance.real_estate.outings ??= structuredClone(PropertyOutings.defaults));
-    state.offer_day ??= -7;
-    state.memories ??= {};
-    return state;
+    return V.Finance.real_estate.outings;
   }
 
   public get plan(): PropertyOutingState['plan'] {

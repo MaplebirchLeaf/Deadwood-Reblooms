@@ -70,9 +70,7 @@ export default class PropertyBanquet {
   }
 
   public get state(): PropertyBanquetState {
-    const state = (V.Finance.real_estate.banquet ??= structuredClone(PropertyBanquet.defaults));
-    state.memories ??= {};
-    return state;
+    return V.Finance.real_estate.banquet;
   }
 
   public recall(name: BanquetGuest): BanquetMemory | undefined {

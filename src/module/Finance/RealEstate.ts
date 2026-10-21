@@ -161,10 +161,11 @@ class RealEstate {
       action: () => this.settleDays(),
       priority: 1
     });
-    // Time.days 从开局时刻起算，原版通常是 07:00。小时事件覆盖跨过
-    // 该时刻的活动，paid_until 防止与午夜日结重复扣款。
     this.core.dynamic.regTimeEvent('onHour', ':deadwood-reblooms-household-wages', {
-      action: () => this.staff.advance(RealEstate.today),
+      action: () => {
+        this.settleDays();
+        this.staff.advance(RealEstate.today);
+      },
       exact: true,
       priority: 1
     });

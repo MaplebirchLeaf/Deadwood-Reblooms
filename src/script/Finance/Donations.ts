@@ -8,10 +8,16 @@ export default function Donations(maplebirch: typeof window.maplebirch): void {
     { widget: [-1, 'deadwood-school-donation-visit-link'], passage: 'Hallways' },
     { widget: [-1, 'deadwood-hospital-donation-link'], passage: 'Hospital Foyer' }
   );
-  // 办公室各分支共用离开图标，仅插入短 widget，实际会谈条件在 widget 内判断。
+  // 只接入校长正常办公的离开选项，不依赖其余分支的图标数量。
   maplebirch.tool.inject({
     locationPassage: {
-      "Head's Office": [{ src: '<<getouticon>>', applybefore: '<<deadwood-school-donation-office>>', expected: 3 }],
+      "Head's Office": [
+        {
+          srcmatch: /<<getouticon>><<link \[\[[^\]\n]+\|Hallways]]>>(?=<<endevent>><<pass 1>><<set \$daily\.school\.headInterrupted to 1>>)/,
+          applybefore: '<<deadwood-school-donation-office>>',
+          expected: 1
+        }
+      ],
       'Temple Jordan': [{ src: '<<getouticon>>', applybefore: '<<deadwood-temple-donation-links>>', expected: 1 }],
       'Hospital Parasite': [
         // 金额与支付判断不依赖原版的中英文标签。

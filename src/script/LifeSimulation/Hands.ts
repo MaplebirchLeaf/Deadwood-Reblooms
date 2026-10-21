@@ -19,7 +19,7 @@ export default function Hands(maplebirch: typeof window.maplebirch): void {
           expected: 1
         },
         {
-          src: '<<set _wardrobe_list to _args[0]>>',
+          srcmatchgroup: /<<set _wardrobe_list to _args\[0\]>>/g,
           applyafter: '\n\t<<if _wardrobe_list is "handheld">><<deadwood-hands-wardrobe>><</if>>',
           expected: 2
         }

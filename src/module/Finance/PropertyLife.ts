@@ -59,10 +59,7 @@ export default class PropertyLife {
   ) {}
 
   private get state(): PropertyLifeState {
-    const state = (V.Finance.real_estate.life ??= structuredClone(PropertyLife.defaults));
-    state.daily_day ??= -1;
-    state.daily ??= null;
-    return state;
+    return V.Finance.real_estate.life;
   }
 
   public preInit(): void {

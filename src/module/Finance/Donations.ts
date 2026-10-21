@@ -40,25 +40,7 @@ export default class Donations {
   public constructor(public readonly finance: Finance) {}
 
   public get state(): DonationsState {
-    const state = this.finance.state.donations;
-    state.school ??= structuredClone(SchoolDonations.defaults);
-    state.aid ??= structuredClone(DonationAid.defaults);
-    state.rewards ??= structuredClone(Donations.defaults.rewards);
-    for (const [key, value] of Object.entries(SchoolDonations.defaults)) {
-      if (state.school[key as keyof SchoolDonationState] === undefined) Object.assign(state.school, { [key]: value });
-    }
-    for (const fund of ['orphanage', 'hospital', 'school', 'temple'] as const) {
-      state.rewards[fund] ??= { ...rewards };
-      for (const [key, value] of Object.entries(rewards)) {
-        if (state.rewards[fund][key as keyof Rewards] === undefined) Object.assign(state.rewards[fund], { [key]: value });
-      }
-      if (fund === 'school') continue;
-      state.aid[fund] ??= structuredClone(DonationAid.defaults[fund]);
-      for (const [key, value] of Object.entries(DonationAid.defaults[fund])) {
-        if (state.aid[fund][key as keyof AidState] === undefined) Object.assign(state.aid[fund], { [key]: value });
-      }
-    }
-    return state;
+    return this.finance.state.donations;
   }
 
   public get available(): boolean {
