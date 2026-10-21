@@ -15,11 +15,9 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
       if (rule.to) rule.to = rule.to.replaceAll('$englishtrait', '_speechTrait');
       if (rule.applyafter) rule.applyafter = rule.applyafter.replaceAll('$englishtrait', '_speechTrait');
     }
-    // 鲸化的 AMC 游泳和七点耗氧公式在源码适配中处理，避免重复执行原版公式。
+    // DoLX 的七点耗氧公式在源码适配中处理，避免重复执行原版公式。
     if (zone.widgetPassage.Widgets) {
-      zone.widgetPassage.Widgets = zone.widgetPassage.Widgets.filter(
-        rule => rule.src !== '<<set $oxygen -= _waterActionTime * 10>>' && !rule.srcmatch?.source.startsWith('<<set \\$swimmingskill to Math\\.clamp')
-      );
+      zone.widgetPassage.Widgets = zone.widgetPassage.Widgets.filter(rule => rule.src !== '<<set $oxygen -= _waterActionTime * 10>>');
     }
   }
   const replace = (

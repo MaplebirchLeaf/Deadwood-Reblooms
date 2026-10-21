@@ -321,13 +321,10 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
       ];
     }
     if (maplebirch.get('MoreTransformations')) {
-      (passageRules.Widgets ??= []).push(
-        [/<<set \$swimmingskill to amcClamp\(\$swimmingskill, 1000, \$AMCTraits\.swimming, _amcPrev\)>>/, '$&<<if $rng <= 30>><<transform "whale" 1>><</if>>'],
-        [
-          /<<set \$oxygen -= _waterActionTime \* 7>>/,
-          '<<set $oxygen -= _waterActionTime * 7 * ($transformationParts.traits.deep_diver && isPartEnabled($transformationParts.traits.deep_diver) ? 0.25 : 1)>>'
-        ]
-      );
+      (passageRules.Widgets ??= []).push([
+        /<<set \$oxygen -= _waterActionTime \* 7>>/,
+        '<<set $oxygen -= _waterActionTime * 7 * ($transformationParts.traits.deep_diver && isPartEnabled($transformationParts.traits.deep_diver) ? 0.25 : 1)>>'
+      ]);
     }
     for (const [title, replacements] of Object.entries(passageRules)) {
       const passage = data.passageDataItems.map.get(title);

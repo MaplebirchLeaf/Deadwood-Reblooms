@@ -212,16 +212,16 @@ class Whale extends Transformation {
             to: '<<set $oxygen -= _waterActionTime * 10 * ($transformationParts.traits.deep_diver && isPartEnabled($transformationParts.traits.deep_diver) ? 0.25 : 1)>>',
             expected: 1
           },
-          // 在游泳技能结算完成后追加概率鲸化成长，不改变原版技能上限与增长流程。
+          // 独立于技能是否已满，原版、DoLP 与 DoLX 都从同一游泳动作入口结算鲸化。
           {
-            srcmatch: /<<set \$swimmingskill to Math\.clamp\(\$swimmingskill, 0, 1000(?: \* \$AMCTraits\.swimming)?\)>>/,
-            applyafter: '<<if $rng <= 30>><<transform "whale" 1>><</if>>',
+            src: '<<widget "swimmingskilluse">>',
+            applyafter: '\n<<deadwood-whale-growth "swim">>',
             expected: 1
           },
-          // 在水下动作实际推进时间后追加概率鲸化成长，确保只有完成动作才触发。
+          // 只累计实际完成的水下动作时间，避免反复短动作获得整点成长。
           {
             src: '<<pass _waterActionTime sec>>',
-            applyafter: '<<if $rng <= 20>><<transform "whale" 1>><</if>>',
+            applyafter: '<<deadwood-whale-growth "dive" _waterActionTime>>',
             expected: 1
           }
         ]

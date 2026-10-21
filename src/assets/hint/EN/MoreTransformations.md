@@ -5,7 +5,7 @@ Horse, whale and raven transformations each have six stages. Start with the rout
 | Transformation | Where to start                                                                                                                                                                           | Further growth                                                                                                                                         |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Horse          | Take a <span class="gold">£25</span> lesson at Remy's riding school. If the grove fruit event appears, pick and eat the fruit for 5 points; it has a drug effect and the event is random | After horse transformation begins, successfully chase a runaway farm horse and groom it for 1 point; successful moor riding also offers growth chances |
-| Whale          | Swim from the beach towards the rocks, climb up and enter the rock pool. Float in the pool for 10 minutes to gain 1 point                                                                | Repeat floating; ordinary swimming and completed underwater actions also offer growth chances                                                          |
+| Whale          | Swim from the beach towards the rocks, climb up and enter the rock pool. Float in the pool for 10 minutes to gain 1 point                                                                | Floating, ordinary swimming and underwater actions give steady growth, each with a daily limit                                                         |
 | Raven          | Listen in the forest during daylight or dusk (75% success), or search beside the park bench or in the old churchyard (guaranteed); first contact adds 5 points                           | After finding the flock again, feed once a day for 2 points; imitate calls and preen existing feathers once a day each for 1 point                     |
 
 ### Finding the raven flock
@@ -15,6 +15,18 @@ The manual forest search is at the old churchyard turnoff (forest depth 10–14)
 The first search takes 15 minutes. All locations share one search attempt per day. Failure gives no growth and consumes no fruit. Random forest flocks still appear, less often than before. Park ravens gather near the riverside bench at **07:00–10:00 and 16:00–19:00**, leaving after dark. You can rest on the bench at other times, too. Resting takes 15 minutes and can lead to the usual park encounters. Try the old churchyard during other daylight hours.
 
 Once you know the flock, finding it again takes 5 minutes. Feeding takes one portion of blackberries, strawberries or apple and 5 minutes; calling and preening take 10 minutes each. All flocks share the same daily limits. Following a random forest flock takes 15 minutes and leads deeper into the woods. You cannot stop at night, during a hunt or blood moon, near fainting, or when a forced scene is pending.
+
+### Whale growth in water
+
+Choosing to float or cooking white rice in the loft can start whale transformation. Once you have whale points, ordinary swimming and diving continue that growth without a random roll, even at maximum swimming skill.
+
+| Activity           | Activity needed per point                                   | Daily limit |
+| ------------------ | ----------------------------------------------------------- | ----------- |
+| Rock pool floating | 10 minutes                                                  | 2 points    |
+| Swimming           | One native swimming skill award, including swimming lessons | 2 points    |
+| Diving             | One accumulated minute of completed underwater actions      | 2 points    |
+
+The three activities have separate limits, reset at midnight with the native daily records. Changing locations or reloading does not refresh them. Diving counts only time actually spent on underwater actions; waiting and ordinary rest do not count. After reaching the floating limit, you can still float to reduce stress, but its link no longer shows a whale growth hint. Replay scenes and frozen state do not grant growth from water activities.
 
 ### Whale growth at home
 
