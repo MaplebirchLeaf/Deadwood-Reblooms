@@ -1,0 +1,30 @@
+import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
+
+type ScriptRule = { fileName: string; from: string; to: string };
+type PassageRule = { passage: string; findRegex?: string };
+
+export default function adaptBoot(maplebirch: MaplebirchCore): void {
+  const plugins = maplebirch.services.addonPlugin.info.get('deadwood-reblooms')?.mod.bootJson.addonPlugin;
+  if (!plugins) return;
+  const patcher = plugins.find(plugin => plugin.modName === 'ReplacePatcher' && plugin.addonName === 'ReplacePatcherAddon');
+  const params = patcher?.params as { js?: ScriptRule[] } | undefined;
+  if (params?.js) {
+    const replaced = new Set([
+      'function passRentTick() {',
+      'V.willpower = Math.clamp(V.willpower + amount * 2, 0, V.willpowermax',
+      'V.beautymax;',
+      'V[type] = Math.clamp(V[type] + amount, 0, maxValue);',
+      'V.beauty -= overflow * 0.2;',
+      'if (V.farm_stage >= 6) V.physique = V.physique - V.physique / 3000;',
+      'else V.physique = V.physique - V.physique / 2500;',
+      'V.temple_garden >= 1) V.temple_garden',
+      'else if (V.sydney_templeWork === "quarters") {\n\t\t\t\t\tif ('
+    ]);
+    params.js = params.js.filter(rule => !replaced.has(rule.from));
+  }
+  const replacer = plugins.find(plugin => plugin.modName === 'TweeReplacer' && plugin.addonName === 'TweeReplacerAddon');
+  if (Array.isArray(replacer?.params)) {
+    // DoLX 的称号是块函数，沿用独立兼容规则，避免之后再次执行原版三元表达式规则。
+    replacer.params = (replacer.params as PassageRule[]).filter(rule => rule.passage !== 'Traits' || !rule.findRegex?.startsWith('name: \\(\\) => (V\\.player\\.gender'));
+  }
+}

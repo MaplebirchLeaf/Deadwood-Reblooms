@@ -3,6 +3,9 @@
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type Robin from '../module/Robin';
 import { npc_size_patch } from '../script/VanillaPlus/PenisSize';
+import adaptFinance from './DoLX/Finance';
+import adaptPassages from './DoLX/Passages';
+import adaptBoot from './DoLX/Boot';
 
 type Rule = [RegExp, string];
 type DoLXWindow = typeof window & {
@@ -14,8 +17,8 @@ type DoLXWindow = typeof window & {
   robinCafeShiftWage?(): number;
 };
 
-function adaptRobin(core: MaplebirchCore): void {
-  const robin = core.get('Robin') as Robin | undefined;
+function adaptRobin(maplebirch: MaplebirchCore): void {
+  const robin = maplebirch.get('Robin') as Robin | undefined;
   if (!robin) return;
   const runtime = window as DoLXWindow;
   const variables = () => V as typeof V & { robinCafe?: { weekShifts: number; rainDays: number; lastWage: number } };
@@ -101,17 +104,20 @@ function adaptRobin(core: MaplebirchCore): void {
   });
 }
 
-export default function DoLX(core: MaplebirchCore): void {
-  const data = core.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch();
+export default function DoLX(maplebirch: MaplebirchCore): void {
+  const data = maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch();
   if (data.scriptFileItems.getByNameWithOrWithoutPath('xchange.js')) {
-    const zone = core.tool.zone;
+    adaptBoot(maplebirch);
+    adaptFinance(maplebirch);
+    adaptPassages(maplebirch);
+    const zone = maplebirch.tool.zone;
     // DoLX 在作弊按钮外又包了一层相同判断，两处都需解除，保留跳舞、战斗和起始页限制。
     if (zone.locationPassage.StoryCaption) {
       zone.locationPassage.StoryCaption = zone.locationPassage.StoryCaption.map(rule =>
         rule.src === ' and $cheatsEnabled is true' ? { srcmatchgroup: / and \$cheatsEnabled is true/g, to: '', expected: 2 } : rule
       );
     }
-    if (core.get('VanillaPlus')) {
+    if (maplebirch.get('VanillaPlus')) {
       // AMC 公式在下方单独处理，只移除对应的原版规则，其余钳制、作弊和战斗补丁照常接入。
       const attributes = ['beauty', 'physique', 'willpower'];
       const legacy: Record<string, string[]> = {
@@ -130,10 +136,10 @@ export default function DoLX(core: MaplebirchCore): void {
         }
       }
     }
-    if (core.get('Finance')) {
+    if (maplebirch.get('Finance')) {
       // 医疗减免沿用 DoLX 的通胀显示、余额判定与两条原生治疗分支。
-      const hospital = core.tool.zone.locationPassage['Hospital Parasite'] ?? [];
-      core.tool.zone.locationPassage['Hospital Parasite'] = [
+      const hospital = maplebirch.tool.zone.locationPassage['Hospital Parasite'] ?? [];
+      maplebirch.tool.zone.locationPassage['Hospital Parasite'] = [
         ...hospital.filter(rule => !rule.to?.includes('donations.aid.fee')),
         { srcmatchgroup: /<<printprice 25000>>/g, to: '<<printprice `maplebirch.get("Finance").donations.aid.fee`>>', expected: 4 },
         { srcmatchgroup: /25000(?=, ["']hospitalParasiteRemoval["']\))/g, to: 'maplebirch.get("Finance").donations.aid.fee', expected: 2 },
@@ -142,10 +148,11 @@ export default function DoLX(core: MaplebirchCore): void {
     }
     // DoLX 已有独立 NPC 第 5 档，仅移除本模组为原版补缺的三组规则。
     for (const title of ['Widgets Effects Man', 'Widgets Combat Man-Combat', 'Widgets Ejaculation']) {
-      const rules = core.tool.zone.widgetPassage[title];
-      if (rules) core.tool.zone.widgetPassage[title] = rules.filter(rule => rule.srcmatch?.source !== npc_size_patch.srcmatch.source || !rule.to?.startsWith('$1<<case 5>><<deadwood-npc-size-five-'));
+      const rules = maplebirch.tool.zone.widgetPassage[title];
+      if (rules)
+        maplebirch.tool.zone.widgetPassage[title] = rules.filter(rule => rule.srcmatch?.source !== npc_size_patch.srcmatch.source || !rule.to?.startsWith('$1<<case 5>><<deadwood-npc-size-five-'));
     }
-    if (core.get('LifeSimulation')) {
+    if (maplebirch.get('LifeSimulation')) {
       // DoLX 将换衣槽列表改名；扩展实际列表，后续穿衣与清除待穿状态仍走原生循环。
       if (data.passageDataItems.map.get('Widgets Wardrobe')?.content.includes('<<set _wardrobeEquipSlots to [')) {
         zone.widgetPassage['Widgets Wardrobe'] = zone.widgetPassage['Widgets Wardrobe'].map(rule =>
@@ -163,28 +170,28 @@ export default function DoLX(core: MaplebirchCore): void {
         'Gwylan Ocean Breeze',
         'School Passout Gang Rape'
       ];
-      const handRule = (rule: (typeof core.tool.zone.widgetPassage)[string][number]) =>
+      const handRule = (rule: (typeof maplebirch.tool.zone.widgetPassage)[string][number]) =>
         [rule.to, rule.applybefore, rule.applyafter].some(text => text?.includes('maplebirch.get("LifeSimulation").hands') || text?.includes('_deadwood_bookbag')) ||
         (rule.srcmatch?.source === '\\$?worn\\.handheld\\.type\\.includes\\("bookbag"\\)' && rule.to === '$worn.handheld.type.includes("bookbag")');
       for (const title of bookbags) {
-        for (const group of [core.tool.zone.widgetPassage, core.tool.zone.locationPassage]) {
+        for (const group of [maplebirch.tool.zone.widgetPassage, maplebirch.tool.zone.locationPassage]) {
           if (group[title]) group[title] = group[title].filter(rule => !handRule(rule));
         }
       }
       // 雨伞能力已由手持视图统一处理，这里只修正 DoLX 额外的完整度检查与损耗。
-      core.tool.zone.widgetPassage['Ambient Weather And Seasonal Event Widgets'] = [
-        ...(core.tool.zone.widgetPassage['Ambient Weather And Seasonal Event Widgets'] ?? []).filter(rule => !handRule(rule)),
+      maplebirch.tool.zone.widgetPassage['Ambient Weather And Seasonal Event Widgets'] = [
+        ...(maplebirch.tool.zone.widgetPassage['Ambient Weather And Seasonal Event Widgets'] ?? []).filter(rule => !handRule(rule)),
         { srcmatch: /\$worn\.handheld\.integrity/g, to: '(maplebirch.get("LifeSimulation").hands.item("rainproof") ?? $worn.handheld).integrity', expected: 3 }
       ];
     }
   }
 
-  core.once(':addon:beforePatch', () => {
-    const manager = core.services.addonPlugin;
+  maplebirch.once(':addon:beforePatch', () => {
+    const manager = maplebirch.services.addonPlugin;
     const previous = manager.SC2DataManager.getSC2DataInfoAfterPatch();
     const data = previous.cloneSC2DataInfo();
     if (!data.scriptFileItems.getByNameWithOrWithoutPath('xchange.js')) return;
-    adaptRobin(core);
+    adaptRobin(maplebirch);
     const floor = (stat: string) => `maplebirch.get('VanillaPlus')?.minimum('${stat}') ?? 0`;
     const max = (stat: string, original: string) => {
       const ceiling = `(maplebirch.get('VanillaPlus') && V.VanillaPlus?.lock?.${stat} ? Math.floor(${original} * 1.25) : ${original})`;
@@ -212,7 +219,12 @@ export default function DoLX(core: MaplebirchCore): void {
           "if (!(maplebirch.get('Robin') && (V.RobinExpansion?.bailey_defeated || V.RobinExpansion?.asylum?.status === 'admitted')) && V.robinpaid !== 1 && V.robindebt >= V.robindebtlimit"
         ],
         [/V\.robinmoney \+= robinStandWeeklyTick\(\);/, "if (!(maplebirch.get('Robin') && V.RobinExpansion?.asylum?.status === 'admitted')) V.robinmoney += robinStandWeeklyTick();"],
-        [/const rentPaused = inRentPausedBadEnd\(\);/, "const rentPaused = inRentPausedBadEnd() || (maplebirch.get('Robin') && V.RobinExpansion?.bailey_defeated);"],
+        [
+          /const rentPaused = inRentPausedBadEnd\(\);/,
+          "const rentPaused = inRentPausedBadEnd() || (maplebirch.get('Robin') && V.RobinExpansion?.bailey_defeated) || maplebirch.get('Finance')?.orphanage.pcFree;"
+        ],
+        [/if \(V\.sydney_templeWork === "garden"\) \{/, 'if (V.sydney_templeWork === "garden" && (maplebirch.get(\'Sydney\')?.canMaintain ?? true)) {'],
+        [/else if \(V\.sydney_templeWork === "quarters"\) \{/, 'else if (V.sydney_templeWork === "quarters" && (maplebirch.get(\'Sydney\')?.canMaintain ?? true)) {'],
         [
           /V\.xchange\.baseStats\.physique -= decay;/,
           `V.xchange.baseStats.physique = (${floor('physique')}) > 0 ? Math.max(${baseFloor}, V.xchange.baseStats.physique - decay) : V.xchange.baseStats.physique - decay;`
@@ -238,7 +250,7 @@ export default function DoLX(core: MaplebirchCore): void {
         [/\n\t\tV\.physiquesize,\n\t\tNumber\(V\.AMCTraits\?\.physique\) \|\| 1/, `\n\t\t${max('physique', 'V.physiquesize')},\n\t\tNumber(V.AMCTraits?.physique) || 1`]
       ]
     };
-    if (core.get('VanillaPlus')) {
+    if (maplebirch.get('VanillaPlus')) {
       // DoLX 生成和还原身体时使用自己的绝对上限，只扩展 PC 的这一项。
       rules['koztools.js'] = [
         [/repairBounds\("penissizemin", "penissizemax", 0, 6\);/, 'repairBounds("penissizemin", "penissizemax", 0, 7);'],
@@ -265,7 +277,7 @@ export default function DoLX(core: MaplebirchCore): void {
         ]
       ]
     };
-    if (core.get('VanillaPlus')) {
+    if (maplebirch.get('VanillaPlus')) {
       Object.assign(passageRules, {
         Cheats: [
           [
@@ -308,7 +320,7 @@ export default function DoLX(core: MaplebirchCore): void {
         ]
       ];
     }
-    if (core.get('MoreTransformations')) {
+    if (maplebirch.get('MoreTransformations')) {
       (passageRules.Widgets ??= []).push(
         [/<<set \$swimmingskill to amcClamp\(\$swimmingskill, 1000, \$AMCTraits\.swimming, _amcPrev\)>>/, '$&<<if $rng <= 30>><<transform "whale" 1>><</if>>'],
         [

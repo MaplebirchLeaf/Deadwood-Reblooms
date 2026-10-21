@@ -372,7 +372,7 @@ class Finance extends Module {
         return;
       this.advanceMarketThrough(Finance.currentDay, content);
     });
-    this.core.once(':storyready', () => this.registerMoneyMacro());
+    this.core.once(':storyready', () => this.moneyMacro());
     // 行情在时间事件里刷新。银行周账务由房地产逐日推进，保持批量跳日时的真实顺序。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-finance-market', {
       action: () => this.updateDay(),
@@ -679,12 +679,24 @@ class Finance extends Module {
     return result;
   }
 
-  // 商户先汇总三种可用支付方式，避免页面只按随身现金隐藏商品。
   public canPay(amount: unknown, source?: unknown): boolean {
-    const value = Math.floor(Number(amount));
+    const value = this.purchasePrice(Math.floor(Number(amount)), source);
     if (!Number.isSafeInteger(value) || value < 0) return false;
     if (source != null && !Finance.isMerchantSource(source)) return Finance.cashOnHand >= value;
     return this.choosePayment(value) != null;
+  }
+
+  public purchasePrice(amount: number, _source?: unknown): number {
+    return amount;
+  }
+
+  public paymentBalance(source?: unknown): number {
+    const cash = Finance.cashOnHand;
+    if (source != null && !Finance.isMerchantSource(source)) return cash;
+    const bank = this.state.bank;
+    const debit = bank.debit_card ? bank.balance : 0;
+    const credit = bank.credit_card && bank.credit_missed_payments === 0 && this.state.collection.amount === 0 ? Math.max(0, this.accountLimits.credit - bank.credit_debt) : 0;
+    return Math.max(cash, debit, credit);
   }
 
   public setPaymentMethod(method: unknown): FinanceResult {
@@ -707,37 +719,42 @@ class Finance extends Module {
     return methods.find(method => available[method]) ?? null;
   }
 
-  private chargeMerchant(amount: unknown, source: unknown): boolean {
-    const value = Math.floor(Number(amount));
+  private charge(amount: unknown, source: unknown): number {
+    const value = this.purchasePrice(Math.floor(Number(amount)), source);
     const bank = this.state.bank;
-    if (!Number.isSafeInteger(value) || value <= 0 || !Finance.isMerchantSource(source)) return false;
+    if (!Number.isSafeInteger(value) || value <= 0 || !Finance.isMerchantSource(source)) return 0;
     const method = this.choosePayment(value);
     if (method) bank.payment_method = method;
     if (method === 'debit') bank.balance -= value;
     else if (method === 'credit') Finance.addCreditDebt(bank, value);
-    else return false;
-    return true;
+    else return 0;
+    return value;
   }
 
   // 包装原版 money 宏：银行卡负责扣款，原宏以 recordOnly 保留消费统计。
-  private registerMoneyMacro(): void {
+  private moneyMacro(): void {
     const original = this.core.SugarCube.Macro.get('money') as MacroDefinition | undefined;
     if (!original) return;
-    const chargeMerchant = (amount: unknown, source: unknown) => this.chargeMerchant(amount, source);
-    const refresh = () => this.refreshMoneyUI();
+    const charge = (amount: unknown, source: unknown) => this.charge(amount, source);
+    const refresh = () => this.refreshMoney();
     this.core.tool.macro.define('money', function (this: any, amountArg: unknown, sourceArg: unknown, optionalArg?: unknown) {
       const amount = Number(amountArg);
       const optional = optionalArg;
       const recordOnly = typeof optional === 'object' && optional !== null && 'recordOnly' in optional && optional.recordOnly;
-      if (recordOnly || amount >= 0 || !chargeMerchant(-amount, sourceArg)) {
+      const cashOnly = typeof optional === 'object' && optional !== null && 'cashOnly' in optional && optional.cashOnly;
+      const charged = !recordOnly && !cashOnly && amount < 0 ? charge(-amount, sourceArg) : 0;
+      if (!charged) {
         original.handler.call(this);
         return;
       }
       const argumentCount = this.args.length;
+      const originalAmount = this.args[0];
+      this.args[0] = -charged;
       this.args[2] = { ...(typeof optional === 'object' && optional !== null ? optional : {}), recordOnly: true };
       try {
         original.handler.call(this);
       } finally {
+        this.args[0] = originalAmount;
         if (argumentCount > 2) this.args[2] = optional;
         this.args.length = argumentCount;
       }
@@ -745,7 +762,7 @@ class Finance extends Module {
     });
   }
 
-  public refreshMoneyUI(): void {
+  public refreshMoney(): void {
     this.core.SugarCube.Wikifier.wikifyEval('<<updatesidebarmoney>>');
     if (document.getElementById('dr-finance-caption')) this.core.SugarCube.Wikifier.wikifyEval('<<replace "#dr-finance-caption">><<deadwood-reblooms-finance-caption-content>><</replace>>');
   }

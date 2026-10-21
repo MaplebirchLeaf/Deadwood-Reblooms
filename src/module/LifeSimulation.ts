@@ -36,6 +36,7 @@ class LifeSimulation extends Module {
     this.core.on(':variable', () => this.hands.setup());
 
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-body-growth', { exact: true, action: () => this.settleBodyGrowth() });
+    this.core.dynamic.regTimeEvent('onHour', ':deadwood-school-locker', { exact: true, action: () => this.school.checkLocker() });
     this.core.dynamic.regTimeEvent('onTimeTravel', ':deadwood-reblooms-body-growth-travel', {
       cond: data => data.direction === 'forward',
       action: () => this.settleBodyGrowth()

@@ -124,7 +124,7 @@ export default class PrivateCards extends Holdem {
     this.session.active = false;
     this.session.closed = true;
     this.session.day = Math.floor(Time.days);
-    this.finance.refreshMoneyUI();
+    this.finance.refreshMoney();
     return true;
   }
 }

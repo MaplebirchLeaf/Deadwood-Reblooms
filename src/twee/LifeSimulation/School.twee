@@ -161,28 +161,43 @@
 <<widget 'deadwood-reblooms-life-simulation-school-store-clothes'>>
   <<if $combat isnot 1 and !$statFreeze and !$replayScene and !$possessed and !pcAreArmsBound('both')>>
     <<silently>>
+      <<set $_schoolLockerOccupied to maplebirch.get('LifeSimulation').school.storedClothes>>
       <<undress 'lifeSimulationSchool'>>
-      <<set $LifeSimulation.school.clothesStored to setup.clothingLayer.all.some(slot => $store[slot]?.some(item => item.location === 'lifeSimulationSchool'))>>
+      <<set $LifeSimulation.school.clothesStored to maplebirch.get('LifeSimulation').school.storedClothes>>
+      <<if $LifeSimulation.school.clothesStored and !$_schoolLockerOccupied>>
+        <<set $LifeSimulation.school.locker_stored_at to Time.date.timeStamp>>
+      <</if>>
       <<exposure>>
     <</silently>>
   <</if>>
 <</widget>>
 
-<!-- 储物柜与自有公告栏直接显示取衣选择，校规不阻止玩家主动穿回衣物。 -->
+<!-- 取衣集中在学校储物柜；其他入口只提供前往储物柜的导航。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-clothes-link'>>
-  <<if $LifeSimulation?.school?.clothesStored and $combat isnot 1 and !$statFreeze and !$replayScene and !$possessed and !pcAreArmsBound('both')>>
-    <<lockericon>><<lanLink ['Retrieve and put on your stored clothes', '取回并穿上暂存衣物'] $passage>>
-      <<deadwood-reblooms-life-simulation-school-restore-clothes>>
+  <<if $passage is 'School Lockers' and $LifeSimulation.school.locker_missing>>
+    <span class='red'><<lanSwitch 'Your locker has been forced open. Missing: ' '你的储物柜被撬开过。丢失的衣物：'>><<print lanSwitch($LifeSimulation.school.locker_missing.name, $LifeSimulation.school.locker_missing.cn_name)>></span><br>
+    <<lanLink ['Check the remaining contents', '清点剩余物品'] 'School Lockers'>>
+      <<set $LifeSimulation.school.locker_missing to null>>
     <</lanLink>><br>
+  <</if>>
+  <<if maplebirch.get('LifeSimulation').school.storedClothes and $combat isnot 1 and !$statFreeze and !$replayScene and !$possessed and !pcAreArmsBound('both')>>
+    <span class='blue'><<lanSwitch 'Your clothes are stored in your school locker.' '你的衣物存放在学校储物柜里。'>></span><br>
+    <<if $passage is 'School Lockers'>>
+      <<lockericon>><<lanLink ['Retrieve and put on your stored clothes', '取回并穿上暂存衣物'] 'School Lockers'>>
+        <<deadwood-reblooms-life-simulation-school-restore-clothes>>
+      <</lanLink>><br>
+    <<else>>
+      <<lockericon>><<lanLink ['Go to your locker (0:02)', '前往储物柜 (0:02)'] 'School Lockers'>><<pass 2>><</lanLink>><br>
+    <</if>>
   <</if>>
 <</widget>>
 
 <!-- 仅供主动取衣使用。原版 storeon 保留颜色、耐久与诅咒衣物的保护。 -->
 <<widget 'deadwood-reblooms-life-simulation-school-restore-clothes'>>
-  <<if $LifeSimulation?.school?.clothesStored and $combat isnot 1 and !$statFreeze and !$replayScene and !$possessed and !pcAreArmsBound('both')>>
+  <<if $passage is 'School Lockers' and maplebirch.get('LifeSimulation').school.storedClothes and $combat isnot 1 and !$statFreeze and !$replayScene and !$possessed and !pcAreArmsBound('both')>>
     <<silently>>
       <<storeon 'lifeSimulationSchool'>>
-      <<set $LifeSimulation.school.clothesStored to setup.clothingLayer.all.some(slot => $store[slot]?.some(item => item.location === 'lifeSimulationSchool'))>>
+      <<set $LifeSimulation.school.clothesStored to maplebirch.get('LifeSimulation').school.storedClothes>>
       <<exposure>>
     <</silently>>
   <</if>>

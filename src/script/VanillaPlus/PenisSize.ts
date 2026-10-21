@@ -26,13 +26,6 @@ export default function (maplebirch: typeof window.maplebirch) {
     }
   };
 
-  maplebirch.once(':storyready', () => {
-    const original = window.settingValueNameFromValue;
-    if (typeof original === 'function') {
-      window.settingValueNameFromValue = (name, value) => (value === 7 && ['penissizemin', 'penissizemax'].includes(name) ? lanSwitch('Gargantuan', '骇人') : original(name, value));
-    }
-  });
-
   // 保留原版的体毛尺寸、滤镜与遮挡，只替换侧栏主图及存在的寄生覆盖图。
   maplebirch.char.use(
     'pre',
@@ -157,21 +150,7 @@ export default function (maplebirch: typeof window.maplebirch) {
         srcmatch: /<<set _penisNames to \[[^\]\n]+\]>>/g,
         applyafter: '<<set _penisNames[5] to setup.penisSizes[7].toUpperFirst()>>',
         expected: 3
-      },
-      {
-        src: '"$penissizemin" "$penissizemax" $penissizemin $penissizemax 0 6 1',
-        to: '"$penissizemin" "$penissizemax" $penissizemin $penissizemax 0 7 1',
-        expected: 1
-      },
-      {
-        srcmatch: /<<rangeslider "\$penissizemin" "\$penissizemax" \$penissizemin \$penissizemax 0 7 1[\s\S]*?var name = \[[^\]\n]+\];/,
-        applyafter: 'name.push(lanSwitch("Gargantuan", "骇人"));',
-        expected: 1
       }
-    ],
-    Cheats: [
-      { src: '"$player.penissize" $player.penissize 0 6 1', to: '"$player.penissize" $player.penissize 0 7 1', expected: 1 },
-      { srcmatch: /<<set _penisText to \[[^\]\n]+\]>>/, applyafter: '<<run _penisText.push(lanSwitch("Gargantuan", "骇人"))>>', expected: 1 }
     ],
     'Body Comment Random Flavour Text Widgets': [
       { src: '$player.penissize is 6', to: '$player.penissize gte 6', expected: 1 },

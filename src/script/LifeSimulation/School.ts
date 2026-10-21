@@ -23,7 +23,11 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   });
 
   maplebirch.tool.addTo('Journal', 'deadwood-reblooms-life-simulation-school-journal');
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-life-simulation-school-clothes-link', passage: 'School Lockers' });
+  // 只在储物柜取衣；校门和公告栏只提示衣物去向。
+  maplebirch.tool.addTo('BeforeLinkZone', {
+    widget: 'deadwood-reblooms-life-simulation-school-clothes-link',
+    passage: ['School Front Courtyard', 'School Rear Courtyard', 'School Lockers']
+  });
 
   maplebirch.tool.patch.traits.add(
     {
@@ -119,6 +123,13 @@ export default function School(maplebirch: typeof window.maplebirch): void {
 
   maplebirch.tool.inject({
     locationPassage: {
+      'School Lockers': [
+        {
+          srcmatch: /though thankfully, you've yet to have anything stolen from yours\.|不过值得庆幸的是，你的东西还没有被偷过。/,
+          to: '<<if $LifeSimulation.school.locker_thefts gt 0>><<lanSwitch "and yours has been forced open before." "你的储物柜也曾被人撬开。">><<else>>$&<</if>>',
+          expected: 1
+        }
+      ],
       'Science Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoolstate is "morning">>', applybefore: '<</if>>\n', expected: 1 }],
       'Maths Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoollesson is 1 and ![3, 5].includes(Time.weekDay)>>', applybefore: '<</if>>\n', expected: 1 }],
       'Housekeeping Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoollesson is 1 and [3, 5].includes(Time.weekDay)>>', applybefore: '<</if>>\n', expected: 1 }],

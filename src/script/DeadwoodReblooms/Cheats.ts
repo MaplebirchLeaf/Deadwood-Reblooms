@@ -2,6 +2,37 @@
 
 export default function Cheats(core: typeof maplebirch): void {
   core.tool.addTo('Cheats', 'deadwood-reblooms-cheats');
+  // 关闭原版增强后，旧存档仍可能保留尺寸 7；控件必须能显示现有值。
+  core.tool.inject({
+    widgetPassage: {
+      Cheats: [
+        {
+          src: '"$player.penissize" $player.penissize 0 6 1',
+          to: '"$player.penissize" $player.penissize 0 `maplebirch.get("VanillaPlus") ? 7 : Math.max(6, $player.penissize)` 1',
+          expected: 1
+        },
+        { srcmatch: /<<set _penisText to \[[^\]\n]+\]>>/, applyafter: '<<run _penisText.push(lanSwitch("Gargantuan", "骇人"))>>', expected: 1 }
+      ],
+      'Widgets Settings': [
+        {
+          src: '"$penissizemin" "$penissizemax" $penissizemin $penissizemax 0 6 1',
+          to: '"$penissizemin" "$penissizemax" $penissizemin $penissizemax 0 `maplebirch.get("VanillaPlus") ? 7 : Math.max(6, $penissizemin, $penissizemax)` 1',
+          expected: 1
+        },
+        {
+          srcmatch: /<<rangeslider "\$penissizemin" "\$penissizemax"[\s\S]*?var name = \[[^\]\n]+\];/,
+          applyafter: 'name.push(lanSwitch("Gargantuan", "骇人"));',
+          expected: 1
+        }
+      ]
+    }
+  });
+  core.once(':storyready', () => {
+    const original = window.settingValueNameFromValue;
+    if (typeof original === 'function') {
+      window.settingValueNameFromValue = (name, value) => (value === 7 && ['penissizemin', 'penissizemax'].includes(name) ? lanSwitch('Gargantuan', '骇人') : original(name, value));
+    }
+  });
   if (!core.get('VanillaPlus')) return;
   // 调整原版作弊控件的属性上限，新增模组作弊统一通过 Cheats 区域接入。
   core.tool.inject({

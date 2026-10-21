@@ -120,7 +120,7 @@
     netDeposit: maplebirch.get('Finance').netDeposit,
     goodAccount: $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0 and $Finance.collection.amount is 0
   }>>
-  <<set _adrianContext.present to C.npc.Adrian.state is 'active' and (Boolean(_adrianContext.desk) or $_location is 'financial_centre_break')>>
+  <<set _adrianContext.present to (C.npc.Adrian.init is 0 or C.npc.Adrian.state is 'active') and (Boolean(_adrianContext.desk) or $_location is 'financial_centre_break')>>
   <<if $_working and $_service>><<set _adrianContext.desk to $passage>><</if>>
   <<set _adrianContext.canChat to _adrianContext.present and $_state.last_chat isnot Time.days and $combat isnot 1 and $exposed lte 0 and !$worn.face.type.includes('gag')>>
   <<set _adrianContext.careerAvailable to _adrianContext.present and C.npc.Adrian.init is 1 and ($_state.career gt 0 or ($_state.visits gte 3 and $_bank.opened))>>
@@ -158,6 +158,7 @@
       <<set _adrianContext.state.last_visit to Time.days>>
       <<set _adrianContext.state.visits += 1>>
     <</if>>
+    <<initnpc 'Adrian'>>
     <<npc 'Adrian'>><<person1>>
     <<if maplebirch.get('StreetLife')?.heist.state.identified>>
       <<language>>

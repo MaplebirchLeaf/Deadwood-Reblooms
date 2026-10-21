@@ -50,6 +50,10 @@ export interface SchoolState {
     cooldownUntil: number;
   };
   clothesStored: boolean;
+  locker_stored_at: number;
+  locker_checked_day: number;
+  locker_thefts: number;
+  locker_missing: { name: string; cn_name: string } | null;
 }
 
 interface SchoolPolicyRequirements {
@@ -86,7 +90,11 @@ export const DEFAULT_SCHOOL_STATE: SchoolState = {
     trialUntil: 0,
     cooldownUntil: 0
   },
-  clothesStored: false
+  clothesStored: false,
+  locker_stored_at: 0,
+  locker_checked_day: -1,
+  locker_thefts: 0,
+  locker_missing: null
 };
 
 const DRESS_POLICIES: readonly SchoolDressPolicy[] = ['uniform', 'free', 'revealing', 'optionalNudity', 'nudeDay', 'mandatoryNudity'];
@@ -113,6 +121,40 @@ class School {
 
   private get state(): SchoolState {
     return V.LifeSimulation.school as SchoolState;
+  }
+
+  /** 以原版暂存衣物为准，避免存档中的提示标记失步后无法取衣。 */
+  public get storedClothes(): boolean {
+    return setup.clothingLayer.all.some((slot: string) => V.store[slot]?.some((item: { location?: string }) => item.location === 'lifeSimulationSchool'));
+  }
+
+  /** 上课日存放满一小时后，每天只检定一次，百分之一概率丢失一件完整衣物。 */
+  public checkLocker(): void {
+    if (!Time.schoolDay || Time.hour < 9 || Time.hour >= 17 || V.replayScene || V.statFreeze || !this.storedClothes) return;
+    const state = this.state;
+    if (!state.locker_stored_at) {
+      state.locker_stored_at = Time.date.timeStamp;
+      return;
+    }
+    if (state.locker_checked_day === Time.days || state.locker_missing || Time.date.timeStamp - state.locker_stored_at < 3600) return;
+    state.locker_checked_day = Time.days;
+    if (random(1, 100) !== 1) return;
+    type StoredItem = { name: string; cn_name?: string; cn_name_cap?: string; location: string; temp?: number; outfitPrimary?: Record<string, string>; outfitSecondary?: [string, string] };
+    const candidates = (setup.clothingLayer.all as string[]).flatMap(slot =>
+      ((V.store[slot] as StoredItem[] | undefined) ?? [])
+        .filter(item => item.location === 'lifeSimulationSchool' && item.name !== 'naked' && !item.temp && !item.outfitSecondary)
+        .map(item => ({ slot, item }))
+    );
+    if (!candidates.length) return;
+    const { slot, item } = candidates[random(0, candidates.length - 1)];
+    for (const [part, name] of Object.entries({ ...item.outfitPrimary, [slot]: item.name })) {
+      const stored = V.store[part] as StoredItem[];
+      const index = stored.findIndex(piece => piece.location === 'lifeSimulationSchool' && piece.name === name && (part === slot || piece.outfitSecondary?.[0] === slot));
+      if (index >= 0) stored.splice(index, 1);
+    }
+    state.locker_thefts++;
+    state.locker_missing = { name: item.name, cn_name: item.cn_name_cap ?? item.cn_name ?? item.name };
+    state.clothesStored = this.storedClothes;
   }
 
   /** 当前穿着是否满足已生效的着装政策。政策为 uniform 时沿用原版判定。 */

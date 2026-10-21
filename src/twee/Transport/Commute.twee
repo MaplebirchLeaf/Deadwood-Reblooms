@@ -10,11 +10,8 @@
         <<icon `'transport/' + _ride_model.id + '.png'`>><<lanLink `maplebirch.t('deadwood-reblooms:transport:commute:' + _ride.kind) + ' — ' + maplebirch.t(_ride_model.name) + ' (' + Math.floor(_ride_minutes / 60) + ':' + String(_ride_minutes % 60).padStart(2, '0') + ')'`>>
           <<if maplebirch.get('Transport').commute.prepare(_ride_car.id)>><<goto 'Deadwood Transport Boarding'>><</if>>
         <</lanLink>><<glove>>
-        <<if _ride.from is 'oxford' and $LifeSimulation?.school?.clothesStored>>
-          | <<lockericon>><<lanLink ['Retrieve clothes, then offer the ride', '先取衣，再接送']>>
-            <<deadwood-reblooms-life-simulation-school-restore-clothes>>
-            <<if maplebirch.get('Transport').commute.prepare(_ride_car.id)>><<goto 'Deadwood Transport Boarding'>><</if>>
-          <</lanLink>>
+        <<if _ride.from is 'oxford' and maplebirch.get('LifeSimulation')?.school.storedClothes>>
+          | <<lockericon>><<lanLink ['Visit your school locker first (0:02)', '先去学校储物柜取衣 (0:02)'] 'School Lockers'>><<pass 2>><</lanLink>>
         <</if>><br>
       <</capture>>
     <</for>>
