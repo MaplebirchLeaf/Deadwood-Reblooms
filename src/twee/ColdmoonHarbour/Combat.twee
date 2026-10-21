@@ -1,0 +1,65 @@
+:: Deadwood Coldmoon Harbour Fight
+<<deadwood-harbour-context>>
+<<if !_harbour.fighting and (!_harbourNight or !['hostile', 'chase', 'voice'].includes(_harbour.event))>>
+  <<include 'Deadwood Coldmoon Harbour'>><<exit>>
+<</if>>
+<<location 'seadocks'>><<effects>><<deadwood-harbour-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coldmoon Harbour Fight'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if !_harbour.fighting and _harbourNight and ['hostile', 'chase', 'voice'].includes(_harbour.event) and !$combat>>
+  <<endevent>><<set $_ghostCount to random(1, 3)>>
+  <<for $_ghost to 0; $_ghost lt $_ghostCount; $_ghost++>>
+    <<generateNPC `$_ghost + 1` 'a'>>
+    <<set $NPCList[$_ghost].per to 'deadwood_harbour_ghost', $NPCList[$_ghost].monster to 'monster', $NPCList[$_ghost].skincolour to 'ghost'>>
+    <<npcClothesType $NPCList[$_ghost] 'docker2'>>
+  <</for>>
+  <<person1>><<molested>><<violence 1>><<neutral 1>><<maninit>><<npcidlegenitals>>
+  <<set $enemytrust to -30, $enemyanger to 40, _harbour.fighting to true>>
+  <<if _harbour.scene is 'caught'>><<lanSwitch 'Your foot catches on a wet length of rope, and you lose your footing on the slick timber.' '脚下被湿滑的断绳绊了一下，你在黏湿的木板上没能及时脱身。'>><br><</if>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $enemyno gt 1>>More pale figures emerge from the mist. Ice-cold hands seize your arms from either side, their grip tight and unyielding. You brace yourself against the railing, trying desperately to keep them from surrounding you.
+      <<else>>The figure catches your wrist in a grip cold as seawater. You throw your weight against the railing, trying to tear yourself free.<</if>>
+    <<option 'CN'>>
+      <<if $enemyno gt 1>>雾里又走出几道苍白的人影。冰冷的手从两边死死扣住你的胳膊，寒意透过衣物直浸肌肤。你抵住栏杆，拼命不让他们将你围住。
+      <<else>>那道人影一把抓住你的手腕，皮肤冰冷得如同深海的海水。你抵住栏杆，用力想要挣脱。<</if>>
+  <</language>><br><br>
+<</if>>
+<<if _harbour.fighting and $combat is 1 and $NPCList[0]?.per is 'deadwood_harbour_ghost'>>
+  <<for $_ghost to 0; $_ghost lt $enemynomax; $_ghost++>>
+    <<set $NPCList[$_ghost].role to lanSwitch('undead pirate', '亡灵海盗'), $NPCList[$_ghost].fullDescription to lanSwitch('undead pirate', '亡灵海盗')>>
+  <</for>>
+  <<if _harbourNight>><<effectsman>><<deadwood-harbour-context>><</if>>
+  <<if _harbourNight>>
+    <<alarmstate>><<man>><<stateman>><br><br><<actionsman>>
+  <</if>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coldmoon Harbour Fight'>><</lanLink>></span><<nexttext>>
+  <<elseif !_harbourNight or _combatend>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coldmoon Harbour Fight Finish'>><</lanLink>></span><<nexttext>>
+  <<else>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coldmoon Harbour Fight'>><</lanLink>></span><<nexttext>>
+  <</if>>
+<<else>>
+  <<set _harbour.fighting to false>>
+  <<include 'Deadwood Coldmoon Harbour'>>
+<</if>>
+
+:: Deadwood Coldmoon Harbour Fight Finish
+<<location 'seadocks'>><<effects>><<deadwood-harbour-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coldmoon Harbour Fight'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if _harbour.fighting and $combat is 1 and $NPCList[0]?.per is 'deadwood_harbour_ghost'>>
+  <<if _harbourNight and $enemyhealth gt 0 and $enemyarousal lt $enemyarousalmax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 and !($pain gte 100 and $willpowerpain is 0)>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coldmoon Harbour Fight'>><</lanLink>></span><<nexttext>><<exit>>
+  <</if>>
+  <<set _harbour.scene to !_harbourNight ? 'dawn' : $enemyhealth lte 0 ? 'won' : 'released', _harbour.event to '', _harbour.fighting to false>>
+  <<if _harbourNight and $enemyarousal gte $enemyarousalmax>><<ejaculation 'short'>><</if>>
+  <<clotheson>><<endcombat>>
+<</if>>
+<<deadwood-harbour-result>>
+<<getouticon>><<lanLink ['Return to the harbour steps', '返回港湾石阶'] 'Deadwood Coldmoon Harbour'>>
+  <<set $MoreTransformations.harbour.scene to ''>>
+<</lanLink>><br>

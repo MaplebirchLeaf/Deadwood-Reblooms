@@ -1,0 +1,106 @@
+:: Deadwood Coldmoon Harbour Encounter
+
+<<if !_harbourNight or !_harbour.event>>
+  <<deadwood-harbour-result>>
+<<else>>
+  <<switch _harbour.event>>
+    <<case 'hostile'>>
+      <<language>>
+        <<option 'EN'>>
+          Two soaked figures are forcing open a crate, cold sea-water dripping from their pale fingers. At the sound of your steps, they freeze and slowly turn. Beneath their hoods, bloodless faces stare at you with dull, lifeless eyes. "Empty your pockets." A hand, cold as the sea, reaches for your clothes.
+        <<option 'CN'>>
+          两个浑身湿透的身影正在撬开一只木箱，黑水顺着他们冰冷发白的手指不断滴落。察觉到动静，他们停下动作，缓缓转过头来。兜帽下露出一张毫无血色的面孔，死灰色的眼睛在雾中盯着你。“把值钱的交出来。”冰冷刺骨的手一把抓向你的衣服。
+      <</language>>
+    <<case 'chase'>>
+      <<language>>
+        <<option 'EN'>>
+          "Catch that one!" A harsh, hollow shout carries through the fog. You turn to see a figure drop a stolen sack and lunge towards you. Beside the broken warehouse doors, several more pale shapes look up in unison. Heavy, waterlogged boots thump across the planks, closing in fast.
+        <<option 'CN'>>
+          “抓住那个活人！”雾里传来一声低沉冰冷的呼喊。你猛地回头，只见一个身影扔下抢来的货袋，大步朝你逼近。撞开的仓门旁，另外几具苍白的身影也齐刷刷转过头来。沉重的湿皮靴踩过木板，急促地朝你追来。
+      <</language>>
+    <<case 'voice'>>
+      <<language>>
+        <<option 'EN'>>
+          A dull thump sounds beneath the floorboards. "Hold the rope... don't let it sink..." A hollow whisper rises from beneath the pier, accompanied by churning water. Pale, bruised fingers force their way through the gaps in the wood, and another cold hand grips the edge of the plank, pulling hard. The timber cracks beside your feet.
+        <<option 'CN'>>
+          脚下的木板传来一阵发闷的声响。“拉住……别让它沉了……”声音从码头下幽幽传来，伴随着海水翻涌的声响。几只苍白发青的手指突然探出木板间的缝隙，另一只冰冷的手死死抓住板边，猛力一扯。脚边的木板应声断裂。
+      <</language>>
+    <<case 'lucid'>>
+      <<language>>
+        <<option 'EN'>>
+          A pirate sits atop an overturned chest, sorting tarnished coins into small piles. Water drips from his soaked coat, and his pale skin carries an unnatural chill. "Got anything of value from the water?" A cold hand covers the nearest pile as he looks up with lifeless eyes. "I'll trade. Don't touch anything else."
+        <<option 'CN'>>
+          一名海盗坐在翻倒的箱子上，将硬币分成几小堆。湿透的外套正往下淌水，苍白的皮肤透着一股异样的死寂。“手里有值钱的旧物么？”他把冰冷的手按在最近的那堆钱上，抬起没有生气的眼睛看着你。“拿来换。别动箱子里的别的东西。”
+      <</language>>
+  <</switch>><br><br>
+  <<if _harbour.event is 'lucid'>>
+    <<socialiseicon>><<lanLink ['Ask about the ship (0:05)', '问问那艘船 (0:05)'] 'Deadwood Coldmoon Harbour Sailor'>>
+      <<pass 5>><<deadwood-harbour-context>>
+      <<if _harbourNight and !$nextPassage and !$nextPassageCheck>><<set _harbour.spoke to true>><</if>>
+    <</lanLink>><br>
+  <<else>>
+    <<set $skulduggerydifficulty to 400>>
+    <<sneakicon>><<lanLink ['Slip behind the fishing nets (0:02)', '躲进渔网后 (0:02)'] 'Deadwood Coldmoon Harbour Fight'>>
+      <<pass 2>><<deadwood-harbour-context>>
+      <<if _harbourNight and !$nextPassage and !$nextPassageCheck>>
+        <<set $skulduggerydifficulty to 400>><<skulduggerycheck 'silent'>><<skulduggeryuse>>
+        <<set _harbour.scene to $skulduggerysuccess is 1 ? 'evaded' : 'caught'>>
+        <<if $skulduggerysuccess is 1>><<set _harbour.event to ''>><</if>>
+      <</if>>
+    <</lanLink>><<skulduggerydifficulty>><br>
+    <<runicon>><<lanLink ['Run for the harbour steps (0:02)', '跑向港湾石阶 (0:02)'] 'Deadwood Coldmoon Harbour Fight'>>
+      <<pass 2>><<deadwood-harbour-context>>
+      <<if _harbourNight and !$nextPassage and !$nextPassageCheck>>
+        <<athletics 1>>
+        <<set _harbour.scene to currentSkillValue('athletics') gte random(200, 700) ? 'escaped' : 'caught'>>
+        <<if _harbour.scene is 'escaped'>><<set _harbour.event to ''>><</if>>
+      <</if>>
+    <</lanLink>><<athleticsdifficulty 200 700>><br>
+    <<icon 'alert.png'>><<lanLink ['Stand your ground', '留下来反抗'] 'Deadwood Coldmoon Harbour Fight'>><</lanLink>><br>
+  <</if>>
+<</if>>
+<br><<getouticon>><<lanLink ['Leave the harbour (0:05)', '离开港湾 (0:05)'] 'Mer Street'>>
+  <<set $MoreTransformations.harbour.event to '', $MoreTransformations.harbour.scene to ''>><<pass 5>>
+<</lanLink>><br>
+
+:: Deadwood Coldmoon Harbour Sailor
+<<location 'seadocks'>><<effects>><<deadwood-harbour-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] `passage()`>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if _harbourNight and _harbour.event is 'lucid'>>
+  <<language>>
+    <<option 'EN'>>
+      The pirate turns a coin between his fingers, his pale skin lacking the warmth of the living. "The ship? She carries us wherever there's plunder to be found." He keeps his eyes on the coins. "We come ashore when the fog rolls in, and before dawn breaks the mist, the tide pulls us back to the deep." A heavy thud echoes from the warehouses. The pirate smirks faintly. "Best keep clear of the others. They aren't in the mood for talk."
+    <<option 'CN'>>
+      海盗将一枚硬币放在指间翻转，苍白的手指没有活人的温度。“那艘船？哪儿有油水，她就载着我们漂去哪儿。”海盗头也没抬。“雾漫上来时靠岸，等破晓雾散，潮水就会把我们带回深处。”货仓那边传来一声沉闷的撞击，海盗嘴角扯出一丝冷笑。“离其他人远点。他们可没心思同你做买卖。”
+  <</language>><br><br>
+  <<if _harbour.relics gt 0 and !_harbour.exchanged>>
+    <<icon 'coldmoon-harbour/salvage-trade.png'>><<lanLink ['Trade a recovered trinket for £10 (0:05)', '打捞旧物换£10 (0:05)'] 'Deadwood Coldmoon Harbour Exchange'>>
+      <<pass 5>><<deadwood-harbour-context>>
+      <<if _harbourNight and _harbour.event is 'lucid' and _harbour.relics gt 0 and !_harbour.exchanged and !$nextPassage and !$nextPassageCheck>>
+        <<set _harbour.relics -= 1, _harbour.exchanged to true, $money += 1000>>
+      <</if>>
+    <</lanLink>><br>
+  <</if>>
+<<else>><<deadwood-harbour-result>><</if>>
+<<getouticon>><<lanLink ['Step back towards the lamps', '退回灯光下'] 'Deadwood Coldmoon Harbour'>>
+  <<set $MoreTransformations.harbour.event to '', $MoreTransformations.harbour.scene to ''>>
+<</lanLink>><br>
+
+:: Deadwood Coldmoon Harbour Exchange
+<<location 'seadocks'>><<effects>><<deadwood-harbour-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] `passage()`>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if _harbourNight and _harbour.exchanged>>
+  <<language>>
+    <<option 'EN'>>
+      The pirate scrapes a fingernail across the trinket, inspecting it under the blood moon's dim red light. "Been under the water a good while. Still smells of the sea." Several cold coins slide across the chest toward you. You take them before handing over your find. The pirate slips the keepsake inside his wet coat and closes his hand over the rest of the money.
+    <<option 'CN'>>
+      海盗用指甲刮了刮旧物的表面，迎着血月的暗红微光端详。“在水下泡了挺久，还留着海里的气味。”几枚冰凉的硬币顺着箱盖推到你面前。你收好钱，将旧物递过去。海盗把它收进湿透的内袋，手重新按在剩下的钱币上。
+  <</language>><br><br>
+<<else>><<deadwood-harbour-result>><</if>>
+<<getouticon>><<lanLink ['Return to the harbour steps', '返回港湾石阶'] 'Deadwood Coldmoon Harbour'>>
+  <<set $MoreTransformations.harbour.event to '', $MoreTransformations.harbour.scene to ''>>
+<</lanLink>><br>

@@ -190,3 +190,19 @@ A promise is due **before 18:00 on the next game day**. Leave 5 minutes to hand 
 | Apologise after the deadline                      | No time                                   | −1 affection, −2 wilfulness        |
 
 Delivering the strawberries or explaining and withdrawing the promise settles it. Being late does not cause repeated daily affection losses. You can still deal with an existing promise if affection later falls below 10. Time spent together and strawberry deliveries must finish before 18:00.
+
+## Coldmoon Harbour
+
+A five-minute walk from Mer Street leads to Coldmoon Harbour. Explore the old quay, swim beside the breakwater, or dive among the wreckage. Searches sometimes uncover old trinkets. Underwater salvage can also yield the original Copper Compass and Rusted Cutlass. Repeat finds add their original antique value without resetting museum progress or increasing the collection count again. Swimming and diving use the original skills and oxygen system, including existing whale growth.
+
+On the blood moon night, from 21:00 until 06:00, a ship arrives with the sea fog and its dead pirates plunder the quay. Exploration may bring one to three spirits, a voice beneath the water, or a pirate willing to bargain. You can leave before contact, evade through Skulduggery or Athletics, or stand your ground. Failed evasion leads into an original combat encounter. The undead use the original ghost skin filter and can be hurt with ordinary attacks, angelic banishment, or a borrowed whip or baton. Selecting the single borrowed weapon with both hands still makes only one strike.
+
+Talk to a lucid pirate and trade a recovered trinket for £10. This exchange happens once. The ship and its passengers vanish at dawn; recovered objects and discovered clues remain.
+
+### Zephyr's cargo
+
+After seeing the ghost ship, ask Zephyr about Coldmoon Harbour through the existing conversation menu aboard ship or at the smuggler's pub. You must have met the captain first; this does not bypass the native introduction or island voyage.
+
+Zephyr offers £80 to recover a chest, or £120 if you are already a mate. You can agree outright, or agree and haggle: native skulduggery difficulty is 400, reduced to 300 for a mate. Success adds £40; failure leaves the original price. The agreed fee is saved and cannot be rerolled by reopening the conversation.
+
+During the blood moon, search among the underwater wreckage beneath the harbour steps. Each search has a one-in-three chance to recover the chest while the other night encounters remain possible. The chest and contract survive dawn and save/load. Bring the cargo to Zephyr at either meeting place. Payment and +2 interest happen once; an existing mate also gains +2 pirate respect. This job does not grant a promotion. Afterwards, the harbour gains small daytime scenes with the crew.

@@ -1,9 +1,11 @@
 // ./src/script/MoreTransformations.ts
 
 import DarkfeatherShrine from './DarkfeatherShrine';
+import ColdmoonHarbour from './ColdmoonHarbour';
 
 export default function MoreTransformations(maplebirch: typeof window.maplebirch): void {
   DarkfeatherShrine(maplebirch);
+  ColdmoonHarbour(maplebirch);
 
   maplebirch.tool.onInit(() => {
     maplebirch.tool.patch.traits.add({

@@ -141,7 +141,7 @@
   <<if !_heistWork or $passage isnot 'Deadwood Street Detective'>><<exit>><</if>>
   <<if _heistWork.state.stage is 'prep' and _heistWork.grantAvailable and maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
     <<if !_heistWork.state.informed>>
-      <<icon 'street/detective-notebook.png'>><<lanLink ['Tell Grant about the proposed bank job (0:10)', '告诉格兰特有人在筹划银行豪劫 (0:10)'] 'Deadwood Street Detective'>>
+      <<icon 'street/detective-notebook.png'>><<lanLink ['Tell Grant about bank heist (0:10)', '向格兰特告发劫案 (0:10)'] 'Deadwood Street Detective'>>
         <<if _heistWork.state.stage is 'prep' and !_heistWork.state.informed and _heistWork.grantAvailable and maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
           <<set _heistWork.state.informed to true>><<pass 10>>
         <</if>>
@@ -164,19 +164,19 @@
     <</if>>
     <<if _heistWork.ready>>
       <<if !_heistWork.state.policePlan>>
-        <<policeicon>><<lanLink ['Agree to the verified handover with Grant (0:10)', '与格兰特明确约定核验后的交接 (0:10)'] 'Deadwood Street Detective'>>
+        <<policeicon>><<lanLink ['Agree handover with Grant (0:10)', '与格兰特商定交接 (0:10)'] 'Deadwood Street Detective'>>
           <<if _heistWork.state.stage is 'prep' and _heistWork.ready and !_heistWork.state.policePlan and _heistWork.grantAvailable and maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
             <<set _heistWork.state.informed to true, _heistWork.state.policePlan to true>><<pass 10>>
           <</if>>
         <</lanLink>><br>
       <<else>>
-        <<refuseicon>><<lanLink ['Tell Grant you will not join the police operation', '告诉格兰特，你不再参与警方行动'] 'Deadwood Street Detective'>>
+        <<refuseicon>><<lanLink ['Withdraw from police operation', '向警方退出行动'] 'Deadwood Street Detective'>>
           <<if _heistWork.state.stage is 'prep' and _heistWork.state.policePlan and _heistWork.grantAvailable and maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
             <<set _heistWork.state.policePlan to false>>
           <</if>>
         <</lanLink>><br>
       <</if>>
-      <<icon 'street/witness-statement.png'>><<lanLink ['Submit the preparations and withdraw from the plan (0:10)', '交出筹备线索并退出计划 (0:10)']>>
+      <<icon 'street/witness-statement.png'>><<lanLink ['Submit the preparations and withdraw from the plan (0:10)', '交出线索退出计划 (0:10)']>>
         <<if _heistWork.state.stage is 'prep' and _heistWork.ready and _heistWork.grantAvailable and maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
           <<set _heistWork.state.informed to true, _heistWork.state.outcome to 'reported', _heistWork.state.stage to 'settlement', _heistWork.state.loot to 0>>
           <<endevent>><<pass 10>>

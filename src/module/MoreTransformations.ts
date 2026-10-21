@@ -20,6 +20,18 @@ class MoreTransformations extends Module {
 
   constructor(core: typeof maplebirch) {
     super(core, 'MoreTransformations', {
+      harbour: {
+        mist: false,
+        ship: false,
+        voice: false,
+        spoke: false,
+        exchanged: false,
+        relics: 0,
+        scene: '',
+        event: '',
+        fighting: false,
+        zephyr: { stage: 0, fee: 0, origin: '' }
+      },
       raven: { met: false, searched: -1, fed: -1, called: -1, preened: -1, origin: 'Forest', action: '', disparaged: 0 },
       shrine: {
         stage: 0,

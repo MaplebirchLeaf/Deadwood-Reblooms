@@ -1,0 +1,114 @@
+:: Deadwood Coldmoon Harbour
+<<location 'seadocks'>><<effects>><<deadwood-harbour-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] `passage()`>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if $stress gte $stressmax>><<passoutbeach>><<exit>><</if>>
+<<set $underwater to 0>>
+<<if _harbour.event and _harbourNight>>
+  <<include 'Deadwood Coldmoon Harbour Encounter'>><<exit>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    You are at Coldmoon Harbour, beyond the warehouses on Mer Street. An old breakwater shelters the water. Barnacles crust the foot of a rusted ladder, and strips of seaweed cling to the lower steps.
+  <<option 'CN'>>
+    你在寒月港湾，梅尔街的货仓就在身后。旧防波堤挡住了外面的浪。生锈的梯子下端结满藤壶，低处的石阶上挂着几缕海草。
+<</language>><br><br>
+<<if _harbourNight>>
+  <<language>>
+    <<option 'EN'>>
+      The blood moon casts a dull crimson gleam across the dark water. Cold sea fog rolls over the breakwater, carrying the chill of the deep. A weather-beaten ship rests against the quay beneath ragged sails, its hull encrusted with barnacles.
+      <br><br>
+      Silent figures line the railings, their pale faces half-hidden in the mist. More are already ashore, forcing open crates and dragging sacks towards the gangway. A heavy thud echoes from the warehouses as a door gives way.
+    <<option 'CN'>>
+      血月在海面上铺开一层不祥的暗红。浓雾漫过防波堤，带着深水刺骨的寒意与微腥的气息。一艘陈旧的古船贴着码头停靠，破损的黑帆垂在桅杆上，船身结满藤壶。
+      <br><br>
+      栏杆后立着几道悄无声息的身影，苍白的面孔在雾中若隐若现。上岸的船员正撬开木箱，将货袋拖向跳板。货仓那边传来一声沉闷的撞击，一扇厚重的门被撞开了。
+  <</language>><br><br>
+<<elseif Weather.precipitation is 'rain'>>
+  <<language>>
+    <<option 'EN'>>
+      Rain ticks against the warehouse roofs. Beyond them, loose rigging taps a steady rhythm against a mast.
+    <<option 'CN'>>
+      雨点敲打货仓屋顶。更远处，松脱的索具一下下碰着桅杆。
+  <</language>><br><br>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      A gull lands on a mooring post. Water laps between the rocks below the quay, washing rounded glass and broken crockery into the gaps. The air smells of salt and drying seaweed.
+    <<option 'CN'>>
+      一只海鸥落在系船桩上。浪水拍进码头下的礁石，把磨圆的玻璃和碎瓷片推入石缝。空气里有海水的咸味，混着晾干的海草气味。
+  <</language>><br><br>
+<</if>>
+<<if !_harbourNight and _harbour.zephyr.stage is 4>>
+  <<switch Math.floor(Time.days) % 3>>
+    <<case 0>>
+      <<language>>
+        <<option 'EN'>>
+          Two sailors roll a barrel towards the warehouses. One recognises you and knocks a fist against the lid in greeting, nearly losing his grip. His companion swears and catches the rim before it reaches the steps.
+        <<option 'CN'>>
+          两个水手往货仓那边滚着酒桶。其中一个认出了你，敲敲桶盖当作招呼，险些松了手。另一个骂了一声，赶在桶滚下石阶前抓住了桶沿。
+      <</language>>
+    <<case 1>>
+      <<language>>
+        <<option 'EN'>>
+          A sailor sits beside the mooring post, sewing a torn cuff. You recognise one of Zephyr's crew. He glances at the water when you pass. "Captain got the cargo back, then. Wouldn't stop complaining about it."
+        <<option 'CN'>>
+          一个水手坐在系船桩旁缝破掉的袖口。你认出那是泽菲尔的船员。你经过时，他朝水面看了一眼。“船长拿回货了吧。之前念叨个没完。”
+      <</language>>
+    <<default>>
+      <<language>>
+        <<option 'EN'>>
+          A warehouse worker argues with a sailor over an empty bottle. "Deposit," she insists, holding out her hand. The sailor looks at you for support. You keep walking.
+        <<option 'CN'>>
+          货仓工人正为了一只空瓶同水手争执。“押金。”她伸着手。水手朝你投来求助的目光，你继续往前走。
+      <</language>>
+  <</switch>><br><br>
+<</if>>
+<<deadwood-harbour-result>>
+  <<investigateicon>><<lanLink ['Explore the old quay (0:10)', '探索旧码头 (0:10)'] 'Deadwood Coldmoon Harbour'>>
+    <<pass 10>><<deadwood-harbour-search>>
+  <</lanLink>><br>
+<<if $leftleg isnot 'bound' and $rightleg isnot 'bound' and !pcAreArmsBound('any')>>
+  <<swimicon>><<lanLink ['Swim beside the breakwater (0:10)', '沿防波堤游泳 (0:10)'] 'Deadwood Coldmoon Harbour'>>
+    <<pass 10>><<water>><<swimmingskilluse>><<tiredness 5>><<deadwood-harbour-search>>
+    <<if !$MoreTransformations.harbour.event and !['relic', 'dawn'].includes($MoreTransformations.harbour.scene)>><<set $MoreTransformations.harbour.scene to 'swim'>><</if>>
+  <</lanLink>><<gtiredness>><br>
+  <<swimicon 'down'>><<lanLink ['Dive below the steps', '潜入石阶下的水中'] 'Deadwood Coldmoon Harbour Underwater'>>
+    <<oxygenrefresh>><<wateraction>><<set $MoreTransformations.harbour.scene to '', $MoreTransformations.harbour.event to ''>>
+  <</lanLink>><<loxygen>><br>
+<</if>>
+<br><<getouticon>><<lanLink ['Return to Mer Street (0:05)', '返回梅尔街 (0:05)'] 'Mer Street'>>
+  <<set $MoreTransformations.harbour.event to '', $MoreTransformations.harbour.scene to ''>><<pass 5>>
+<</lanLink>><br>
+
+:: Deadwood Coldmoon Harbour Underwater
+<<set $outside to 0, $location to 'sea'>><<underwater>><<effects>><<deadwood-harbour-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] `passage()`>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if $stress gte $stressmax>><<passoutbeach>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    The water is green beneath the steps. Mussels cluster along a mooring chain, and small fish scatter as you approach. Below them, a broken boat lies half-buried in silt. Weed sways through its ribs.
+  <<option 'CN'>>
+    石阶下的海水泛着绿。系船链上挤着一簇贻贝，几条小鱼在你靠近时散开。下面横着一条半埋在淤泥里的破船，水草从船肋之间轻轻摆动。
+<</language>><br><br>
+<<deadwood-harbour-result>>
+<<if _harbourNight and _harbour.event>>
+  <<set _harbour.voice to true>>
+  <<language>>
+    <<option 'EN'>>
+      "Down here. Give us a hand with the chest." The voice comes from beyond the chain. A pale hand grips a crate beneath the wreck, though no bubbles rise from the darkness. Above you, heavy footsteps cross the pier.
+    <<option 'CN'>>
+      “在下面。搭把手，把箱子抬上去。”声音从铁链另一边传来。一只苍白的手抓着沉船底下的木箱，黑暗中却没有气泡升起。你上方的码头上传来沉重的脚步声。
+  <</language>><br><br>
+<<elseif $oxygen gt 0 and !pcAreArmsBound('any')>>
+  <<icon 'coldmoon-harbour/wreckage.png'>><<lanLink ['Search among the wreckage', '在残骸之间搜寻'] 'Deadwood Coldmoon Harbour Underwater'>>
+    <<wateraction>><<deadwood-harbour-search 'dive'>>
+  <</lanLink>><<loxygen>><br>
+<</if>>
+<<swimicon 'up'>><<lanLink ['Surface at the steps', '浮回石阶边'] 'Deadwood Coldmoon Harbour'>>
+  <<wateraction>><<set $underwater to 0, $nooxygen to 0>>
+  <<deadwood-harbour-context>>
+<</lanLink>><<loxygen>><br>

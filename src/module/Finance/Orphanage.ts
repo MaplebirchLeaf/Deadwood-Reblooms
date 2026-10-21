@@ -81,7 +81,16 @@ export default class Orphanage {
   }
 
   public get canManageAdoption(): boolean {
-    return !V.replayScene && !V.statFreeze && !V.combat && !V.possessed && Time.hour >= 7 && Time.hour < 10 && !V.RobinExpansion?.bailey_defeated;
+    if (V.replayScene || V.statFreeze || V.combat || V.possessed || Time.hour < 7 || Time.hour >= 10 || V.RobinExpansion?.bailey_defeated) {
+      return false;
+    }
+    if (this.state.avery_adoption_refused) return true;
+    if (C.npc.Avery?.init !== 1 || C.npc.Avery.state !== 'active' || V.avery_fate !== undefined || V.avery_mansion !== undefined) {
+      return false;
+    }
+    const dates = (V.avery_date ?? 0) + (V.dateCount?.Avery ?? 0);
+    const score = typeof window.averyMansionScore === 'function' ? window.averyMansionScore() : 0;
+    return dates >= 3 || (C.npc.Avery.love ?? 0) >= 30 || V.auriga_artefact !== undefined || score >= 50;
   }
 
   public get canTalkRobin(): boolean {

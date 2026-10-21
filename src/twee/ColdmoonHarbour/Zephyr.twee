@@ -1,0 +1,189 @@
+:: Deadwood Coldmoon Harbour Zephyr Widgets [widget]
+
+<<widget 'deadwood-harbour-zephyr-link'>>
+  <<if !maplebirch.get('MoreTransformations') or !$MoreTransformations?.harbour?.ship or !C.npc.Zephyr.init
+      or $replayScene or $statFreeze or $frozenValues or $combat or $possessed or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<socialiseicon 'ask'>><<lanLink [
+    $MoreTransformations.harbour.zephyr.stage is 3 ? 'Bring up the recovered cargo' : 'Ask about Coldmoon Harbour',
+    $MoreTransformations.harbour.zephyr.stage is 3 ? '提起找回的货物' : '问问寒月港湾的事'
+  ] 'Deadwood Coldmoon Harbour Zephyr'>>
+    <<set $MoreTransformations.harbour.zephyr.origin to passage()>>
+    <<if $MoreTransformations.harbour.zephyr.stage is 0>><<set $MoreTransformations.harbour.zephyr.stage to 1>><</if>>
+  <</lanLink>><br>
+<</widget>>
+
+:: Deadwood Coldmoon Harbour Zephyr
+<<effects>><<deadwood-harbour-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] `passage()`>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if C.npc.Zephyr.init and _harbour.ship and _harbour.zephyr.stage gt 0>>
+  <<npc 'Zephyr'>><<person1>>
+  <<switch _harbour.zephyr.stage>>
+    <<case 1>>
+      <<language>>
+        <<option 'EN'>>
+          You tell Zephyr about the ship in the fog. <<He>> stops smiling. "Black sails? Crew with more seawater than blood in 'em? Aye. Best keep your pockets shut around that lot."
+          <br><br>
+          <<if $zephyr_seen is 'wraith' or visited('Wraith Snatched Pirate Railing 2') gt 0>>
+            "And if something calls you into the water again, don't go obliging it." <<He>> taps the telescope at <<his>> side. "Don't make me come after ye again."
+          <<else>>
+            "On the night of the blood sea, keep an eye on what climbs aboard. And don't go following every voice ye hear from the water."
+          <</if>>
+          <br><br>
+          "They dragged off a bit of cargo last time. Small chest, red cord round the lid. I've seen 'em haul their takings under the old quay when that ship comes in." <<He>> watches you over the rim of <<his>> mug. "Fetch it back, and I'll make it worth your trouble."
+        <<option 'CN'>>
+          你向泽菲尔说起雾里的船。<<He>>收起笑容。“黑帆？船员身上的海水比血还多？没错。碰上那伙人，把口袋捂紧些。”
+          <br><br>
+          <<if $zephyr_seen is 'wraith' or visited('Wraith Snatched Pirate Railing 2') gt 0>>
+            “还有，下回再有东西叫你下水，别那么听话。”<<He>>敲了敲腰间的望远镜。“别让我再追着你跑一回。”
+          <<else>>
+            “血海之夜，得留意爬上船的东西。水下有什么声音，也别听见了就往下跳。”
+          <</if>>
+          <br><br>
+          “上回他们拖走了我一点货。一只小箱子，箱盖上扎着红绳。那艘船进来时，我见过他们把抢来的东西往旧码头底下拖。”<<He>>隔着杯沿看你。“给我找回来，不让你白忙。”
+      <</language>><br><br>
+      <<if $spear_vessel is 'Zephyr'>>
+        <<language>>
+          <<option 'EN'>>
+            "Ye've a knack for finding things I want. Let's see if that was luck." <<His>> grin widens. "Leave any other treasures of mine where they are."
+          <<option 'CN'>>
+            “你挺会找我想要的东西。让我瞧瞧，上回是不是运气。”<<He>>咧嘴一笑。“我别的宝贝，瞧见了可别乱动。”
+        <</language>><br><br>
+      <</if>>
+      <<set $_zephyrFee to $pirate_rank is 1 ? 12000 : 8000>>
+      <<language>>
+        <<option 'EN'>>
+          <<if $pirate_rank is 1>>"A mate gets a proper share."<<else>>"Don't go thinking this makes ye crew. It's a job."<</if>> <<He>> offers you <<printmoney $_zephyrFee>>.
+        <<option 'CN'>>
+          <<if $pirate_rank is 1>>“船员有船员的份额。”<<else>>“别以为干这一趟就算入伙。一码归一码。”<</if>><<He>>答应给你<<printmoney $_zephyrFee>>。
+      <</language>><br><br>
+      <<icon 'coldmoon-harbour/red-cord-chest.png'>><<lanLink ['Agree to recover the chest', '答应找回箱子'] 'Deadwood Coldmoon Harbour Zephyr Deal'>>
+        <<if $MoreTransformations.harbour.zephyr.stage is 1>>
+          <<set $MoreTransformations.harbour.zephyr.fee to $pirate_rank is 1 ? 12000 : 8000>>
+          <<set $MoreTransformations.harbour.zephyr.stage to 2, $MoreTransformations.harbour.scene to 'zephyrDeal'>>
+        <</if>>
+      <</lanLink>><br>
+      <<set $skulduggerydifficulty to $pirate_rank is 1 ? 300 : 400>>
+      <<socialiseicon>><<lanLink ['Agree and haggle over your share', '答应找箱子，顺便谈谈价'] 'Deadwood Coldmoon Harbour Zephyr Deal'>>
+        <<if $MoreTransformations.harbour.zephyr.stage is 1>>
+          <<set $skulduggerydifficulty to $pirate_rank is 1 ? 300 : 400>>
+          <<skulduggerycheck 'silent'>><<skulduggeryuse>>
+          <<set $MoreTransformations.harbour.zephyr.fee to ($pirate_rank is 1 ? 12000 : 8000) + ($skulduggerysuccess is 1 ? 4000 : 0)>>
+          <<set $MoreTransformations.harbour.zephyr.stage to 2, $MoreTransformations.harbour.scene to $skulduggerysuccess is 1 ? 'zephyrBargain' : 'zephyrRefused'>>
+        <</if>>
+      <</lanLink>><<skulduggerydifficulty>><br>
+    <<case 2>>
+      <<language>>
+        <<option 'EN'>>
+          "Empty-handed?" Zephyr asks. "No chest, no money. Those are the terms."
+          <br><br>
+          <<He>> sets <<his>> mug down. "Look under the steps at Coldmoon Harbour when the blood moon brings that ship in. Follow the mooring chain down. Red cord round the lid. And don't let the crew catch ye poking about."
+        <<option 'CN'>>
+          “空着手来的？”泽菲尔问。“没箱子，就没钱。说好了的。”
+          <br><br>
+          <<He>>搁下杯子。“等血月把那艘船带进来，到寒月港湾的石阶底下找。顺着系船链往下摸，箱盖上扎着红绳。别让那伙船员逮到你翻他们的东西。”
+      <</language>><br><br>
+    <<case 3>>
+      <<language>>
+        <<option 'EN'>>
+          Zephyr's gaze settles on the small chest. <<He>> puts out a hand, but you keep it on your side. "Aye, aye. A bargain's a bargain." <<He>> takes out a roll of notes and counts off <<printmoney _harbour.zephyr.fee>>.
+        <<option 'CN'>>
+          泽菲尔的目光落到小箱子上。<<He>>伸出手，你把箱子往自己这边挪了挪。“行，行。答应过的。”<<He>>掏出一卷钞票，数出<<printmoney _harbour.zephyr.fee>>。
+      <</language>><br><br>
+      <<icon 'coldmoon-harbour/red-cord-chest.png'>><<lanLink ['Hand over the chest', '交出箱子'] 'Deadwood Coldmoon Harbour Zephyr Delivery'>>
+        <<if $MoreTransformations.harbour.zephyr.stage is 3>>
+          <<set $MoreTransformations.harbour.zephyr.stage to 4, $MoreTransformations.harbour.scene to 'zephyrPaid'>>
+          <<money $MoreTransformations.harbour.zephyr.fee>><<npcincr 'Zephyr' love 2>>
+          <<if $pirate_rank is 1>><<pirate_status 2 'mate'>><</if>>
+        <</if>>
+      <</lanLink>><<gglove>><<if $pirate_rank is 1>><<ggrespect>><</if>><br>
+    <<case 4>>
+      <<language>>
+        <<option 'EN'>>
+          "Still nosing round that quay?" Zephyr asks. "There's good money in salvage, if ye know what to leave on the bottom." <<He>> raises <<his>> mug. "Ye brought my cargo back. Remember that part next time someone says ye can't swim."
+          <br><br>
+          <<if $pirate_rank is 1>>"The crew heard about it. Don't let it go to your head."<<else>>"As for joining my crew, ye'll earn that the same way as everyone else."<</if>>
+        <<option 'CN'>>
+          “还在那码头转悠？”泽菲尔问。“打捞是能挣钱，只要你知道哪些东西该留在海底。”<<He>>举了举杯。“我的货，你可是带回来了。下回谁说你不会游泳，记得拿这事堵他的嘴。”
+          <br><br>
+          <<if $pirate_rank is 1>>“船员们听说了。别得意过头。”<<else>>“至于入伙，该挣的份额还得自己挣。谁都一样。”<</if>>
+      <</language>><br><br>
+  <</switch>>
+<<else>>
+  <<lanSwitch 'There is no sign of the captain here.' '这里没有船长的踪影。'>><br><br>
+<</if>>
+<<getouticon>><<lanLink [
+  _harbour.zephyr.origin is 'Pirate Zephyr' ? 'Return to the deck' : 'Return to the pub',
+  _harbour.zephyr.origin is 'Pirate Zephyr' ? '返回甲板' : '回到酒吧'
+] `_harbour.zephyr.origin is 'Pirate Zephyr' ? 'Pirate Deck' : 'Smuggler Pub'`>><<endevent>><<set $eventskip to 1>><</lanLink>><br>
+
+:: Deadwood Coldmoon Harbour Zephyr Deal
+<<effects>><<deadwood-harbour-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] `passage()`>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if C.npc.Zephyr.init and _harbour.zephyr.stage is 2>>
+  <<npc 'Zephyr'>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _harbour.scene is 'zephyrBargain'>>
+        "Charging danger money, are ye?" Zephyr laughs. "Fine. If ye drown, I'll keep your share."
+      <<elseif _harbour.scene is 'zephyrRefused'>>
+        "For a little box?" Zephyr snorts. "The first offer stands. Ye want it or ye don't." You agree to the original price.
+      <<else>>
+        "That's the spirit." Zephyr raises <<his>> mug. "I'd shake on it, but ye might ask for a deposit."
+      <</if>>
+      <br><br>
+      "Bring the chest to me here or aboard ship. I'll pay ye <<printmoney _harbour.zephyr.fee>> when I have it." <<He>> leans back. "And if ye hear knocking from inside, don't go opening it underwater."
+    <<option 'CN'>>
+      <<if _harbour.scene is 'zephyrBargain'>>
+        “还要算上卖命钱，是吧？”泽菲尔笑起来。“行。你要是淹死了，那份钱我替你留着。”
+      <<elseif _harbour.scene is 'zephyrRefused'>>
+        “一个小箱子？”泽菲尔哼了一声。“就刚才那个价。接不接？”你答应按原价办。
+      <<else>>
+        “这才像话。”泽菲尔举起杯。“握手就免了，省得你趁机要定金。”
+      <</if>>
+      <br><br>
+      “带回来，到这儿或者船上找我。箱子到手，<<printmoney _harbour.zephyr.fee>>就是你的。”<<He>>往后一靠。“里面要是有动静，别在水底下开盖。”
+  <</language>><br><br>
+<<else>>
+  <<lanSwitch 'You have no new business to settle.' '眼下没有新的买卖要谈。'>><br><br>
+<</if>>
+<<getouticon>><<lanLink [
+  _harbour.zephyr.origin is 'Pirate Zephyr' ? 'Return to the deck' : 'Return to the pub',
+  _harbour.zephyr.origin is 'Pirate Zephyr' ? '返回甲板' : '回到酒吧'
+] `_harbour.zephyr.origin is 'Pirate Zephyr' ? 'Pirate Deck' : 'Smuggler Pub'`>><<endevent>><<set $eventskip to 1>><</lanLink>><br>
+
+:: Deadwood Coldmoon Harbour Zephyr Delivery
+<<effects>><<deadwood-harbour-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] `passage()`>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if C.npc.Zephyr.init and _harbour.zephyr.stage is 4 and _harbour.scene is 'zephyrPaid'>>
+  <<npc 'Zephyr'>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      You exchange the chest for the notes. Zephyr cuts the red cord, lifts the lid just enough to look inside, then shuts it before you can see much beyond folded cloth and the neck of a dark bottle.
+      <br><br>
+      "Still sealed. Good." <<He>> drums <<his>> fingers against the lid. "What, were ye expecting treasure? This is treasure. Just not yours."
+      <br><br>
+      <<if $pirate_rank is 1>>"I'll tell the crew who brought it back." <<He>> gives your shoulder a firm pat.<<else>>"Good work. If ye ever do make crew, try to keep that talent for coming back alive."<</if>>
+      <br><br>
+      You put away your payment of <<printmoney _harbour.zephyr.fee>>.
+    <<option 'CN'>>
+      你接过钞票，把箱子推过去。泽菲尔割断红绳，掀起一条缝往里看了一眼。你只瞥见叠好的布料和深色瓶口，箱盖就合上了。
+      <br><br>
+      “封得好好的。不错。”<<He>>用手指敲了敲箱盖。“怎么，等着看宝藏？这就是宝藏。只不过没你的份。”
+      <br><br>
+      <<if $pirate_rank is 1>>“我会告诉船员，是谁带回来的。”<<He>>在你肩上重重拍了一下。<<else>>“干得不错。哪天真入了伙，记得把这活着回来的本事留着。”<</if>>
+      <br><br>
+      你收好到手的<<printmoney _harbour.zephyr.fee>>。
+  <</language>><<gglove>><<if $pirate_rank is 1>><<ggrespect>><</if>><br><br>
+<<else>>
+  <<lanSwitch 'The captain has already settled your payment.' '船长已经结清了你的报酬。'>><br><br>
+<</if>>
+<<getouticon>><<lanLink [
+  _harbour.zephyr.origin is 'Pirate Zephyr' ? 'Return to the deck' : 'Return to the pub',
+  _harbour.zephyr.origin is 'Pirate Zephyr' ? '返回甲板' : '回到酒吧'
+] `_harbour.zephyr.origin is 'Pirate Zephyr' ? 'Pirate Deck' : 'Smuggler Pub'`>><<endevent>><<set $eventskip to 1>><</lanLink>><br>

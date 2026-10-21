@@ -1,0 +1,211 @@
+:: Deadwood Coldmoon Harbour Widgets [widget]
+
+<<widget 'deadwood-harbour-link'>>
+  <<if maplebirch.get('MoreTransformations') and $MoreTransformations?.harbour and !$replayScene and !$statFreeze and !$frozenValues>>
+    <<icon 'coldmoon-harbour/harbour.png'>><<lanLink ['Coldmoon Harbour (0:05)', '寒月港湾 (0:05)'] 'Deadwood Coldmoon Harbour'>><<pass 5>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-harbour-attack'>>
+  <<set $_ghostHand to _args[0], $_ghostTarget to Number(maplebirch.SugarCube.State.variables[_args[0] + 'target'])>>
+  <<set $_ghost to $NPCList[$_ghostTarget]>>
+  <<if !$MoreTransformations.harbour.fighting or !Time.isBloodMoon() or $combat isnot 1 or $enemytype isnot 'man' or $enemyhealth lte 0
+    or $consensual isnot 0 or maplebirch.SugarCube.State.variables[$_ghostHand + 'arm'] isnot 0 or $position is 'stalk'
+    or $orgasmdown gt 0 or $dissociation gte 2 or $trance gt 0 or $panicparalysis gt 0 or $panicviolence gt 0 or ($pain gte 100 and $willpowerpain is 0)
+    or $_ghost?.per isnot 'deadwood_harbour_ghost' or $_ghost.active isnot 'active' or $_ghost.stance is 'defeated' or ($enemyno gte 2 and $_ghost.health lte 0)>><<exit>><</if>>
+  <<set $_ghostMaximum to $enemyno gte 2 ? $_ghost.healthmax : $enemyhealthmax>>
+  <<if _args[1] is 'banish'>>
+    <<if $angel lt 4 or $angelBanish lte 0 or $banishDisable>><<exit>><</if>>
+    <<set $angelBanish -= 1, $_ghostDamage to maplebirch.get('VanillaPlus')?.divineTransformations.banishDamage($_ghostMaximum) ?? 10>>
+    <<set $_ghostDamage *= ($purity gte 1000 ? 2 : 1) * (random(1, 100) lte $purity / 20 ? 2 : 1)>>
+    <<set $speechbanish to 1>>
+    <<language>>
+      <<option 'EN'>>
+        You trace a sign in the air. Light breaks across the pirate’s sodden coat, forcing the pale figure back.
+      <<option 'CN'>>
+        你在空中划出手势。光芒穿过海盗湿透的外套，苍白的身影被逼得连连后退。
+    <</language>>
+  <<else>>
+    <<set $_ghostWeapon to maplebirch.get('LifeSimulation')?.weapons.weapon>>
+    <<if !$_ghostWeapon>><<exit>><</if>>
+    <<set $_ghostDamage to Math.min(9, 2 + Math.floor($_ghostMaximum * (0.05 + Math.clamp($prof[$_ghostWeapon], 0, 1000) / 10000)))>>
+    <<set $_ghostOther to $_ghostHand is 'left' ? 'right' : 'left'>>
+    <<if maplebirch.SugarCube.State.variables[$_ghostOther + 'action'] is 'deadwoodHarbourWeapon'>>
+      <<set maplebirch.SugarCube.State.variables[$_ghostOther + 'action'] to 0>>
+    <</if>>
+    <<tiredness 1>><<prof $_ghostWeapon 0.2>><<gtiredness>>
+    <<language>>
+      <<option 'EN'>>
+        <<if $_ghostWeapon is 'whip'>>You lash the pirate with your whip.<<else>>You swing your baton into the pirate’s side.<</if>> The blow catches, despite the pale skin. The figure stumbles back.
+      <<option 'CN'>>
+        <<if $_ghostWeapon is 'whip'>>你挥鞭抽向海盗。<<else>>你挥动短棍，砸向海盗身侧。<</if>>武器打中了那具苍白的身体，逼得对方踉跄着后退。
+    <</language>>
+  <</if>>
+  <<set _thedamage to Math.min($_ghostDamage, $enemyno gte 2 ? $_ghost.health : $enemyhealth)>>
+  <<if $enemyno gte 2>><<npcdamage $_ghostTarget>><</if>>
+  <<set $enemyhealth -= _thedamage>><<attackstat>><br>
+<</widget>>
+
+<<widget 'deadwood-harbour-context'>>
+  <<set _harbour to $MoreTransformations.harbour, _harbourNight to Time.isBloodMoon()>>
+  <<if _harbour.mist and !_harbourNight>>
+    <<set _harbour.mist to false, _harbour.event to '', _harbour.scene to 'dawn'>>
+  <<elseif _harbourNight>>
+    <<set _harbour.mist to true, _harbour.ship to true>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-harbour-search'>>
+  <<if !maplebirch.get('MoreTransformations') or !$MoreTransformations?.harbour or $replayScene or $statFreeze or $frozenValues
+      or $combat or $possessed or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<set $_harbourDawn to $MoreTransformations.harbour.mist and !Time.isBloodMoon()>>
+  <<deadwood-harbour-context>>
+  <<if $_harbourDawn>><<exit>><</if>>
+  <<set $_harbourRoll to random(1, 6)>>
+  <<if _harbourNight and _args[0] is 'dive' and _harbour.zephyr.stage is 2 and $_harbourRoll gte 5>>
+    <<set _harbour.zephyr.stage to 3, _harbour.scene to 'cargo', _harbour.event to ''>>
+  <<elseif _harbourNight and $_harbourRoll lte 3>>
+    <<set _harbour.event to ['hostile', 'chase', 'lucid'][$_harbourRoll - 1], _harbour.scene to ''>>
+  <<elseif _harbourNight and $_harbourRoll is 4>>
+    <<set _harbour.event to 'voice', _harbour.voice to true, _harbour.scene to ''>>
+  <<elseif $_harbourRoll is 5>>
+    <<set _harbour.event to ''>>
+    <<if _args[0] is 'dive' and random(1, 5) is 1>>
+      <<set _harbour.scene to either('antiquecoppercompass', 'antiquerustedcutlass')>>
+      <<set $antiquemoney += _harbour.scene is 'antiquecoppercompass' ? 50 : 10>>
+      <<museumAntiqueStatus _harbour.scene 'found'>>
+    <<else>>
+      <<set _harbour.relics += 1, _harbour.scene to 'relic'>>
+    <</if>>
+  <<else>>
+    <<set _harbour.scene to _args[0] is 'dive' ? 'silt' : 'search', _harbour.event to ''>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-harbour-result'>>
+  <<switch _harbour.scene>>
+    <<case 'cargo'>>
+      <<language>>
+        <<option 'EN'>>
+          A rope catches around your wrist. You follow it beneath the wreck and find a small chest, its lid bound with the red cord Zephyr described. You work it free of the weed. The wet wood is bitterly cold. Keeping hold of the rope, you guide it towards the steps, ready to bring it to the surface.
+        <<option 'CN'>>
+          一根绳子缠上你的手腕。你顺着它摸到残骸底下，找到一只小箱子，箱盖上扎着泽菲尔说过的红绳。你扯开缠住它的水草，湿木头冷得刺手。你攥住绳子，将箱子牵向石阶，准备带回水面。
+      <</language>>
+    <<case 'dawn'>>
+      <<language>>
+        <<option 'EN'>>
+          The fog thins. Between one wave and the next, the ship is gone. Wet footprints end at the edge of the pier; what you recovered remains with you.
+        <<option 'CN'>>
+          海雾散开。两阵浪涛之间，那艘船不见了。湿脚印断在码头边缘，你带回的东西仍在身上。
+      <</language>>
+    <<case 'relic'>>
+      <<language>>
+        <<option 'EN'>>
+          Something catches your eye beneath a tangle of weed. You work the keepsake free and rub away the grit. There are initials scratched into it. You put it away.
+        <<option 'CN'>>
+          一团海草底下露出一点光。你取出压在下面的旧物，擦掉表面的沙粒。上面刻着几个字母。你将它收好。
+      <</language>>
+    <<case 'antiquecoppercompass'>>
+      <<wearProp 'antique copper compass'>>
+      <<language>>
+        <<option 'EN'>>
+          You feel something round beneath the silt. It is a copper compass. You rub the dirt from its glass; the needle still points north. A collector might be interested.
+        <<option 'CN'>>
+          你在淤泥底下摸到一个圆东西，是只铜罗盘。擦去玻璃上的污泥，里面的指针仍指向北方。收藏家或许会对它感兴趣。
+      <</language>>
+    <<case 'antiquerustedcutlass'>>
+      <<wearProp 'antique rusted cutlass'>>
+      <<language>>
+        <<option 'EN'>>
+          A curved blade lies wedged beneath the broken keel. You ease it free. The edge has rusted away and the grip crumbles in your hand, but a collector might still want it.
+        <<option 'CN'>>
+          破船的龙骨底下卡着一把弯刀。你慢慢将它抽出。刀刃已经锈坏，握柄在手里碎了一块，收藏家或许仍会收下它。
+      <</language>>
+    <<case 'search'>>
+      <<language>>
+        <<option 'EN'>>
+          You pick your way around a pool between the rocks. A crab pulls back beneath a stone before you can get close. You find a torn fishing float and a few empty shells, but nothing worth keeping.
+        <<option 'CN'>>
+          你绕过礁石间的一汪积水。一只螃蟹没等你靠近，就缩进石头底下。你找到了破掉的浮漂和几只空贝壳，没有什么值得带走的东西。
+      <</language>>
+    <<case 'silt'>>
+      <<language>>
+        <<option 'EN'>>
+          You reach between the broken planks, keeping clear of their barnacled edges. Silt billows around your hand. When it settles, you see only sand and broken shells.
+        <<option 'CN'>>
+          你避开木板边缘的藤壶，把手探进残骸间。淤泥在手边扬起。等水重新变清，下面仍只有沙子和碎贝壳。
+      <</language>>
+    <<case 'swim'>>
+      <<language>>
+        <<option 'EN'>>
+          You swim along the sheltered side of the breakwater. Dark rocks show beneath the surface, their tops slick with weed. You keep to the clear water and turn back at the last mooring post.
+        <<option 'CN'>>
+          你沿着防波堤内侧游了一段。黑色的礁石隐在水下，上面覆着滑腻的海草。你避开它们，在最后一根系船桩旁折回。
+      <</language>>
+    <<case 'evaded'>>
+      <<language>>
+        <<option 'EN'>>
+          You crouch behind a stack of damp nets, holding your breath. Heavy footsteps pass by and fade into the distance. Once the quay is quiet again, you slip back toward the lamplight.
+        <<option 'CN'>>
+          你伏在一摞湿漉漉的渔网后，屏住呼吸。沉重的脚步声从旁经过，渐渐远去。等周围重新安静下来，你悄悄退回码头有灯光的地方。
+      <</language>>
+    <<case 'escaped'>>
+      <<language>>
+        <<option 'EN'>>
+          You race between the bollards, pulling ahead. The footsteps behind you gradually slow, stopping at the edge of the fog.
+        <<option 'CN'>>
+          你绕过系船柱疾步飞奔，拉开距离。背后的脚步声渐渐慢了下来，最终停在浓雾边缘。
+      <</language>>
+    <<case 'won'>>
+      <<language>>
+        <<option 'EN'>>
+          The cold figure steps back and loosens its grip, fading quietly into the fog. You catch your breath and find your footing on the wet planks.
+        <<option 'CN'>>
+          那道冰冷的身影退后半步，松开手，悄无声息地隐回雾中。你大口喘着气，在湿木板上重新站稳。
+      <</language>>
+    <<case 'released'>>
+      <<language>>
+        <<option 'EN'>>
+          At last, the cold hands release you. You stagger clear of the fog and catch your breath beside the harbour steps.
+        <<option 'CN'>>
+          那些冰冷的手终于松开了你。你踉跄着走出迷雾，在港湾石阶旁惊魂未定地喘着气。
+      <</language>>
+  <</switch>>
+  <<if _harbour.scene>><br><br><</if>>
+<</widget>>
+
+<<widget 'deadwood-harbour-journal'>>
+  <<if $MoreTransformations?.harbour and ($MoreTransformations.harbour.ship or $MoreTransformations.harbour.relics gt 0)>>
+    <br><b><<lanSwitch 'Coldmoon Harbour' '寒月港湾'>></b><br>
+    <<if $MoreTransformations.harbour.relics gt 0>>
+      <<lanSwitch 'Recovered keepsakes: ' '打捞的旧物：'>><<print $MoreTransformations.harbour.relics>><br>
+    <</if>>
+    <<if $MoreTransformations.harbour.ship>><<language>>
+      <<option 'EN'>>
+        A ghost ship comes ashore in the blood moon fog. Pale figures plunder the quay and retreat with the mist at dawn.
+      <<option 'CN'>>
+        血月的海雾里有幽灵船靠岸，苍白的身影在码头搜寻劫掠，天亮时随雾退去。
+    <</language>><</if>>
+    <<if $MoreTransformations.harbour.voice>><br><<lanSwitch 'You heard low voices calling from the dark water beneath the pier.' '你听见码头下的深水里有人低声呼唤。'>><</if>>
+    <<if $MoreTransformations.harbour.spoke>><br><<language>>
+      <<option 'EN'>>
+        A pirate said the crew comes ashore with the blood moon fog, pulled back to the deep before dawn breaks the mist.
+      <<option 'CN'>>
+        一名海盗提到，他们随血雾靠岸劫掠，待到破晓雾散，潮水便会把他们带回深处。
+    <</language>><</if>>
+    <<if $MoreTransformations.harbour.exchanged>><br><<language>>
+      <<option 'EN'>>
+        You traded a recovered keepsake for coins from the plunder.
+      <<option 'CN'>>
+        你用打捞出的旧物，换来了海盗搜寻来的钱币。
+    <</language>><</if>>
+    <<if $MoreTransformations.harbour.zephyr.stage gt 0>><br>
+      <<switch $MoreTransformations.harbour.zephyr.stage>>
+        <<case 1>><<lanSwitch 'Zephyr offered to pay for a chest taken by the raiders.' '泽菲尔愿意出钱找回被海盗劫走的箱子。'>>
+        <<case 2>><<lanSwitch 'Look beneath the harbour steps during the blood moon for a chest bound with red cord.' '血月夜，到港湾石阶下寻找扎着红绳的小箱子。'>>
+        <<case 3>><<lanSwitch 'You recovered the chest. Bring it to Zephyr at the smuggler’s pub or aboard ship.' '箱子已经找回。到走私者酒吧或海盗船上找泽菲尔交付。'>>
+        <<case 4>><<lanSwitch 'Zephyr paid for the recovered cargo.' '泽菲尔已付清找回货物的报酬。'>>
+      <</switch>>
+    <</if>>
+  <</if>>
+<</widget>>
