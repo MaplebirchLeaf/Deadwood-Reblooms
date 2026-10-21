@@ -299,6 +299,11 @@ class DeadwoodReblooms extends Module {
       }
     });
     this.baileyRent.preInit();
+    this.core.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-daily', {
+      exact: true,
+      cond: () => !V.statFreeze && !V.replayScene,
+      action: () => (V.DeadwoodReblooms.daily = clone(defaults.daily))
+    });
     this.core.tool.onInit(() => setup.maplebirch.hint.push('<<= maplebirch.get("DeadwoodReblooms").wiki>>'));
     this.core.once(':storyready', () => {
       $('#history-backward').ariaClick(() => this.rand.back(1));

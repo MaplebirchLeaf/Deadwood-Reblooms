@@ -23,7 +23,7 @@
     <<icon 'raven-shrine/wooden-plaques.png'>><<lanLink ['Come back to give thanks for your wish (0:05)', '回来为实现的心愿还愿 (0:05)'] 'Deadwood Raven Shrine Wish Returned'>>
       <<deadwood-raven-shrine-write-wish 'return'>>
     <</lanLink>><<lstress>><br>
-  <<elseif !$daily.darkfeatherWish and $money gte 100>>
+  <<elseif !$DeadwoodReblooms.daily.shrine.wish and $money gte 100>>
     <<icon 'raven-shrine/wooden-plaques.png'>><<lanLink ['Take a blank wish plaque', '拿起一块空白绘马'] 'Deadwood Raven Shrine Wish'>><</lanLink>><br>
   <</if>>
 <</if>>
@@ -36,7 +36,7 @@
 
 :: Deadwood Raven Shrine Wish
 <<effects>><<deadwood-raven-shrine-context>>
-<<if _shrineSafe and _shrine.stage is 3 and $location is 'forest_raven_shrine' and !pcAreArmsBound('any') and !$daily.darkfeatherWish and $money gte 100 and (!_shrine.wish.ready or _shrine.wish.returned)>>
+<<if _shrineSafe and _shrine.stage is 3 and $location is 'forest_raven_shrine' and !pcAreArmsBound('any') and !$DeadwoodReblooms.daily.shrine.wish and $money gte 100 and (!_shrine.wish.ready or _shrine.wish.returned)>>
   <<lanSwitch 'The pencil has been sharpened with a knife. You turn a blank plaque over, finding a smooth patch of wood for the first words. What has been on your mind?' '铅笔是用小刀削的。你翻过空白木牌，找了一块平整的地方，准备落下第一笔。最近有什么事，一直惦记着呢？'>><br><br>
   <<set _wishChoices to [['peace', 'To come home safely', '盼着平安回来'], ['study', 'For things to go well in class', '希望学业顺利'], ['harvest', 'For a good harvest', '盼着果树有个好收成']]>>
   <<for _wishChoice range _wishChoices>>
@@ -106,7 +106,7 @@
   <<if !_shrineSafe or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine' or pcAreArmsBound('any')>><<exit>><</if>>
   <<if $_wishKind is 'return'>>
     <<if $passage isnot 'Deadwood Raven Shrine Grounds' or !_shrine.wish.ready or _shrine.wish.returned>><<exit>><</if>>
-  <<elseif !['peace', 'study', 'harvest'].includes($_wishKind) or $passage isnot 'Deadwood Raven Shrine Wish' or $daily.darkfeatherWish or $money lt 100 or _shrine.wish.ready and !_shrine.wish.returned>><<exit>>
+  <<elseif !['peace', 'study', 'harvest'].includes($_wishKind) or $passage isnot 'Deadwood Raven Shrine Wish' or $DeadwoodReblooms.daily.shrine.wish or $money lt 100 or _shrine.wish.ready and !_shrine.wish.returned>><<exit>>
   <</if>>
   <<set $_wishSource to $passage, _shrine.scene to '', _shrine.step to ''>><<pass 5>><<deadwood-raven-shrine-context>>
   <<if !_shrineSafe or _shrine.stage isnot 3 or $location isnot 'forest_raven_shrine' or $passage isnot $_wishSource or pcAreArmsBound('any')>><<exit>><</if>>
@@ -114,8 +114,8 @@
     <<if !_shrine.wish.ready or _shrine.wish.returned>><<exit>><</if>>
     <<set _shrine.wish.returned to true, _shrine.scene to 'wish', _shrine.step to 'returned'>><<stress -3>>
   <<else>>
-    <<if $daily.darkfeatherWish or $money lt 100 or _shrine.wish.ready and !_shrine.wish.returned>><<exit>><</if>>
-    <<money -100>><<stress -2>><<set $daily.darkfeatherWish to true, _shrine.wish.count += 1>>
+    <<if $DeadwoodReblooms.daily.shrine.wish or $money lt 100 or _shrine.wish.ready and !_shrine.wish.returned>><<exit>><</if>>
+    <<money -100>><<stress -2>><<set $DeadwoodReblooms.daily.shrine.wish to true, _shrine.wish.count += 1>>
     <<if _shrine.wish.kind isnot $_wishKind or _shrine.wish.returned>>
       <<set _shrine.wish.kind to $_wishKind, _shrine.wish.day to Math.floor(Time.days), _shrine.wish.ready to false, _shrine.wish.returned to false, _shrine.wish.shared to false>>
     <</if>>

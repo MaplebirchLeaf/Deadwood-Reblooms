@@ -11,7 +11,7 @@
   <<set _swimmingLessonReady to _swimmingLessonSafe and Time.minute lt 59 and $phase is 0>>
   <<set _swimmingPrivateReady to _swimmingPoolSafe and Time.schoolDay
     and ((Time.hour is 14 and Time.minute gte 45) or Time.hour is 15)
-    and ($daily.masonPrivateSwimming or $daily.masonPrivateSwimmingRequested)>>
+    and ($DeadwoodReblooms.daily.swimming.coached or $DeadwoodReblooms.daily.swimming.requested)>>
 <</widget>>
 
 <!-- 无固定目标的链接先重验课堂；同一个面板的重复点击不排入多次跳转。 -->
@@ -39,9 +39,9 @@
 <<widget 'deadwood-school-pool-private-link'>>
   <<deadwood-swimming-lesson-check>>
   <<if _swimmingPoolSafe and Time.schoolDay and ((Time.hour is 14 and Time.minute gte 45) or (Time.hour is 15 and Time.minute lte 10))
-    and (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15 or $daily.masonPrivateSwimmingRequested)
-    and !$daily.masonPrivateSwimming>>
-    <<socialiseicon 'ask'>><<lanLink `['Stay behind for private coaching with Mason', '留下来接受梅森的课后单独辅导']` 'Deadwood Reblooms Swimming Private'>><<set $daily.masonPrivateSwimming to true>><</lanLink>><br>
+    and (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15 or $DeadwoodReblooms.daily.swimming.requested)
+    and !$DeadwoodReblooms.daily.swimming.coached>>
+    <<socialiseicon 'ask'>><<lanLink `['Stay behind for private coaching with Mason', '留下来接受梅森的课后单独辅导']` 'Deadwood Reblooms Swimming Private'>><<set $DeadwoodReblooms.daily.swimming.coached to true>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -132,7 +132,7 @@
   <<swimmingicon>><<deadwood-swimming-lesson-choice `['Dive underwater to stealthily tease Mason', '潜入水下悄悄对梅森恶作剧']` 'Deadwood Reblooms Swimming Underwater'>><<promiscuous2>><<gglust>><br>
 <</if>>
 
-<<if (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15) and !$daily.masonPrivateSwimming and !$daily.masonPrivateSwimmingRequested>>
+<<if (C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 15) and !$DeadwoodReblooms.daily.swimming.coached and !$DeadwoodReblooms.daily.swimming.requested>>
   <<socialiseicon 'ask'>><<deadwood-swimming-lesson-choice `['Ask Mason to stay behind after class for private coaching', '请梅森在下课后留下来单独辅导你']` 'Deadwood Reblooms Swimming Private Request'>><<glove>><<glust>><br>
 <</if>>
 <br>
@@ -511,7 +511,7 @@
 :: Deadwood Reblooms Swimming Private Request
 <<schooleffects>><<effects>>
 <<deadwood-swimming-lesson-check>>
-<<if !_swimmingLessonReady or $daily.masonPrivateSwimmingRequested or $daily.masonPrivateSwimming>><<deadwood-swimming-lesson-return>><<exit>><</if>>
+<<if !_swimmingLessonReady or $DeadwoodReblooms.daily.swimming.requested or $DeadwoodReblooms.daily.swimming.coached>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -523,7 +523,7 @@
     <br><br>
     梅森瞪大眼睛，有些局促地环顾着热闹的泳池，随后俯下身低声道：“下、下课后？就我们两个人？我……好吧，如果你真的那么想把泳姿练好，等大家都走了，我可以多留一会儿。”
 <</language>><br><br>
-<<set $daily.masonPrivateSwimmingRequested to true>>
+<<set $DeadwoodReblooms.daily.swimming.requested to true>>
 <<npcincr Mason love 1>><<npcincr Mason lust 2>><<deadwood-swimming-lesson-effects 'mason'>>
 
 :: Deadwood Reblooms Swimming Private

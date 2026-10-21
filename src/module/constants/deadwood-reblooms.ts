@@ -7,6 +7,18 @@ type RandomState = ReturnType<typeof maplebirch.tool.rand.create>['state'];
 
 // 模块本体 DeadwoodReblooms 的存档结构，对应 V.DeadwoodReblooms。
 export interface DeadwoodRebloomsState {
+  daily: {
+    whale: Partial<Record<'swim' | 'dive' | 'rest' | 'seconds', number>>;
+    pregnancy: Record<string, string[]>;
+    shrine: {
+      flirt: boolean;
+      bath_intrusion: '' | 'intruded' | 'apologised';
+      wish: boolean;
+      sneak: boolean;
+      shopping: '' | 'basket' | 'biscuits';
+    };
+    swimming: { coached: boolean; requested: boolean };
+  };
   /** 本模组自带的随机数发生器状态，用于替换原版 Math.random 的调用点。 */
   rand: RandomState;
   /** 贝利房租债务，单位便士。与房贷分开计息，由每周房租事件单独结算。 */
@@ -18,6 +30,12 @@ export interface DeadwoodRebloomsState {
 }
 
 export const defaults: DeadwoodRebloomsState = {
+  daily: {
+    whale: {},
+    pregnancy: {},
+    shrine: { flirt: false, bath_intrusion: '', wish: false, sneak: false, shopping: '' },
+    swimming: { coached: false, requested: false }
+  },
   rand: {
     /** 尚未播种，首次取用随机数时才生成种子。 */
     seed: null,

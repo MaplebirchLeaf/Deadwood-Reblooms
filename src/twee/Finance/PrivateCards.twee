@@ -6,8 +6,8 @@
   <<if $_finance.company.avery.cards.present and $avery_cards and $_finance.company.avery.guest>>
     <<if $passage is 'Avery Cards'>>
       <<refuseicon>><<lanLink ['Say you came as a guest, not to serve drinks (0:05)', '表明自己是来做客的，不是来倒酒的 (0:05)'] 'Deadwood Reblooms Company Cards Drinks'>>
-        <<if !$avery_cards.finance_refused_drinks>>
-          <<set $avery_cards.finance_refused_drinks to true>>
+        <<if !$Finance.company.avery.cards_refused_drinks>>
+          <<set $Finance.company.avery.cards_refused_drinks to true>>
           <<set _privateGuestDrinks to {avery: 'whisky', bailey: 'vodka', leighton: 'gin', quinn: 'brandy'}>>
           <<for _privateGuest, _privateGuestDrink range _privateGuestDrinks>>
             <<set $avery_cards.drink[_privateGuest] to _privateGuestDrink>>
@@ -29,7 +29,7 @@
   <<if maplebirch.get('Finance').company.avery.cards.present and maplebirch.get('Finance').company.avery.guest and $avery_cards?.skill>>
     <<refuseicon>><<lanLink ['Tell Bailey you are not a stake', '告诉贝利，自己不是赌注'] 'Deadwood Reblooms Company Cards Boundary'>>
       <<if maplebirch.get('Finance').company.avery.cards.present and maplebirch.get('Finance').company.avery.guest>>
-        <<set $avery_cards.finance_guest to true>>
+        <<set $Finance.company.avery.cards_guest to true>>
       <</if>>
     <</lanLink>><br>
   <</if>>
@@ -200,7 +200,7 @@
 
 :: Deadwood Reblooms Company Cards Drinks
 <<effects>>
-<<if !$avery_cards?.finance_refused_drinks>><<lanLink ['Return', '返回'] 'Avery Cards'>><</lanLink>><<exit>><</if>>
+<<if !$avery_cards or !$Finance.company.avery.cards_refused_drinks>><<lanLink ['Return', '返回'] 'Avery Cards'>><</lanLink>><<exit>><</if>>
 <<language>>
   <<option 'EN'>>
     You leave the empty glass where Quinn put it. "I came to spend the evening with you. Not to carry the tray."<br><br>
@@ -233,7 +233,7 @@
 
 :: Deadwood Reblooms Company Cards Boundary
 <<effects>>
-<<if !$avery_cards?.finance_guest>><<lanLink ['Return', '返回'] 'Avery Cards 8'>><</lanLink>><<exit>><</if>>
+<<if !$avery_cards or !$Finance.company.avery.cards_guest>><<lanLink ['Return', '返回'] 'Avery Cards 8'>><</lanLink>><<exit>><</if>>
 <<language>>
   <<option 'EN'>>
     You stay off the table. "You don't get to wager me." Bailey's eyes narrow.<br><br>
@@ -270,7 +270,7 @@
 
 :: Deadwood Reblooms Company Cards Quinn Guest
 <<effects>>
-<<if !$avery_cards?.finance_guest>><<lanLink ['Return', '返回'] 'Avery Cards 9'>><</lanLink>><<exit>><</if>>
+<<if !$avery_cards or !$Finance.company.avery.cards_guest>><<lanLink ['Return', '返回'] 'Avery Cards 9'>><</lanLink>><<exit>><</if>>
 <<language>>
   <<option 'EN'>>
     Quinn waits while you collect your things. "A pleasure to have your company." Avery's smile has disappeared by the time the others reach the door.<br><br>

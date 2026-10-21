@@ -19,6 +19,8 @@ export interface CompanyAveryState {
   questioned: boolean;
   decision: 'continue' | 'leave' | null;
   dream_seen: boolean;
+  cards_guest: boolean;
+  cards_refused_drinks: boolean;
   cards: PrivateCardsState;
 }
 
@@ -39,6 +41,8 @@ export default class CompanyAvery {
     questioned: false,
     decision: null,
     dream_seen: false,
+    cards_guest: false,
+    cards_refused_drinks: false,
     cards: PrivateCards.defaults
   };
 
@@ -53,13 +57,13 @@ export default class CompanyAvery {
     // 只有 PC 明确阻止人身下注后才改变结算与离场，默认四条原版赢家路线仍照常运行。
     core.dynamic.regStateEvent('gate', ':deadwood-private-cards-guest-finish', {
       forceExit: true,
-      cond: () => this.cards.present && V.avery_cards?.finance_guest === true,
+      cond: () => this.cards.present && !!V.avery_cards && this.state.cards_guest,
       output: 'deadwood-private-cards-guest-finish',
       extra: { passage: ['Avery Cards 9'] }
     });
     core.dynamic.regStateEvent('gate', ':deadwood-private-cards-bailey-guest', {
       forceExit: true,
-      cond: () => !!V.Finance?.company && !V.replayScene && !V.statFreeze && !V.possessed && V.avery_cards?.finance_guest === true,
+      cond: () => !!V.Finance?.company && !V.replayScene && !V.statFreeze && !V.possessed && !!V.avery_cards && this.state.cards_guest,
       output: 'deadwood-private-cards-bailey-guest',
       extra: { passage: ['Avery Cards Bailey 2'] }
     });
@@ -76,6 +80,10 @@ export default class CompanyAvery {
     });
     core.on(':passagestart', () => {
       if (!V.Finance?.company) return;
+      if (core.passage.title === 'Avery Cards' && !V.replayScene && !V.statFreeze) {
+        this.state.cards_guest = false;
+        this.state.cards_refused_drinks = false;
+      }
       this.advanceDate();
       // 原版继续控制酒类、最后一局及离场，支线中断只结清自带的筹码。
       if (this.cards.session.active && !['Avery Cards 6', 'Deadwood Reblooms Company Cards'].includes(core.passage.title)) this.cards.close();

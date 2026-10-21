@@ -9,7 +9,7 @@
     <<if _args[0] isnot 'flirt' and _shrine.kiss isnot Math.floor(Time.days)>>
       <<loveicon 'kiss'>><<lanLink ['Kiss Tsukihan (0:05)', '亲吻月羽 (0:05)'] 'Deadwood Raven Shrine Affection'>><<deadwood-tsukihan-affection 'kiss'>><</lanLink>><<glove>><<glust>><br>
     <</if>>
-    <<if !$daily.darkfeatherFlirt>>
+    <<if !$DeadwoodReblooms.daily.shrine.flirt>>
       <<brothelicon>><<lanLink ['Flirt with Tsukihan (0:05)', '和月羽调情 (0:05)'] 'Deadwood Raven Shrine Affection'>><<deadwood-tsukihan-affection 'flirt'>><</lanLink>><<glove>><<glust>><br>
     <</if>>
   <</if>>
@@ -22,19 +22,19 @@
     or !(_shrinePerson or _shrineHome and _shrineHomeAwake and $location is 'raven_shrine_house')
     or _shrine.stage isnot 3 or C.npc.Tsukihan.init isnot 1 or !isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 20 or pcAreArmsBound('any')
     or $daily.no_sing or $worn.face.type.includes('gag')
-    or ($_affection is 'kiss' ? _shrine.kiss is Math.floor(Time.days) : $daily.darkfeatherFlirt)
+    or ($_affection is 'kiss' ? _shrine.kiss is Math.floor(Time.days) : $DeadwoodReblooms.daily.shrine.flirt)
     or ($location is 'raven_shrine_house' ? _shrineHomeMinutes : _shrineMinutes) lte 5>><<exit>><</if>>
   <<pass 5>><<deadwood-raven-home-context>>
   <<if $passage isnot _affectionSource or $location isnot _affectionLocation
     or !(_shrinePerson or _shrineHome and _shrineHomeAwake and $location is 'raven_shrine_house')
     or _shrine.stage isnot 3 or C.npc.Tsukihan.init isnot 1 or !isLoveInterest('Tsukihan') or C.npc.Tsukihan.love lt 20 or pcAreArmsBound('any')
     or $daily.no_sing or $worn.face.type.includes('gag')
-    or ($_affection is 'kiss' ? _shrine.kiss is Math.floor(Time.days) : $daily.darkfeatherFlirt)>><<exit>><</if>>
+    or ($_affection is 'kiss' ? _shrine.kiss is Math.floor(Time.days) : $DeadwoodReblooms.daily.shrine.flirt)>><<exit>><</if>>
   <<set _shrine.scene to 'affection', _shrine.step to $_affection>>
   <<if $_affection is 'kiss'>>
     <<set _shrine.kiss to Math.floor(Time.days)>><<takeKissVirginity 'Tsukihan' 'loveInterest'>>
   <<else>>
-    <<set $daily.darkfeatherFlirt to true>>
+    <<set $DeadwoodReblooms.daily.shrine.flirt to true>>
   <</if>>
   <<stress -2>><<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 1, 0, 100), C.npc.Tsukihan.lust to Math.clamp((C.npc.Tsukihan.lust || 0) + ($_affection is 'kiss' ? 5 : 3), 0, 100)>>
 <</widget>>

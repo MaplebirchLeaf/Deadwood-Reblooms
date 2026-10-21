@@ -29,20 +29,19 @@
   <</if>>
 <</widget>>
 
-<!-- 使用原版每日记录，水中活动不改变已有转化进度与技能成长公式。 -->
 <<widget 'deadwood-whale-growth'>>
   <<if !$statFreeze and !$replayScene and !$possessed and (_args[0] is 'rest' or $maplebirch.transformation.whale.build gt 0)>>
-    <<set $_whaleKey to 'deadwoodWhale_' + _args[0]>>
-    <<if ($daily[$_whaleKey] ?? 0) lt 2>>
+    <<set $_whaleDaily to $DeadwoodReblooms.daily.whale>>
+    <<if ($_whaleDaily[_args[0]] ?? 0) lt 2>>
       <<set $_whaleGain to 1>>
       <<if _args[0] is 'dive'>>
-        <<set $daily.deadwoodWhaleSeconds to ($daily.deadwoodWhaleSeconds ?? 0) + _args[1]>>
-        <<set $_whaleGain to Math.floor($daily.deadwoodWhaleSeconds / 60)>>
-        <<set $daily.deadwoodWhaleSeconds %= 60>>
+        <<set $_whaleDaily.seconds to ($_whaleDaily.seconds ?? 0) + _args[1]>>
+        <<set $_whaleGain to Math.floor($_whaleDaily.seconds / 60)>>
+        <<set $_whaleDaily.seconds %= 60>>
       <</if>>
-      <<set $_whaleGain to Math.min($_whaleGain, 2 - ($daily[$_whaleKey] ?? 0))>>
+      <<set $_whaleGain to Math.min($_whaleGain, 2 - ($_whaleDaily[_args[0]] ?? 0))>>
       <<if $_whaleGain gt 0>>
-        <<set $daily[$_whaleKey] to ($daily[$_whaleKey] ?? 0) + $_whaleGain>>
+        <<set $_whaleDaily[_args[0]] to ($_whaleDaily[_args[0]] ?? 0) + $_whaleGain>>
         <<transform 'whale' $_whaleGain>>
       <</if>>
     <</if>>
@@ -52,7 +51,7 @@
 <<widget 'deadwood-whale-rest'>>
   <<iconUi 'whale.png'>><<lanLink ['Float in the pool (0:10)', '在水池里漂浮 (0:10)'] $passage>>
     <<pass 10>><<stress -3>><<deadwood-whale-growth 'rest'>>
-  <</lanLink>><<lstress>><<if ($daily.deadwoodWhale_rest ?? 0) lt 2>><<transform-hint 'whale' 'lblue'>><</if>><br>
+  <</lanLink>><<lstress>><<if ($DeadwoodReblooms.daily.whale.rest ?? 0) lt 2>><<transform-hint 'whale' 'lblue'>><</if>><br>
 <</widget>>
 
 <!-- 瑞沃安装阁楼厨房后，每日送来的米可在此烹成白米饭。 -->

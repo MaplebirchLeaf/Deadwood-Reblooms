@@ -67,6 +67,7 @@ export interface BirdTowerState {
     moor_event: boolean;
     /** 独自狩猎时小鹰请求同行是否已触发。 */
     hunt_ask: boolean;
+    sex_help: boolean;
   };
   /** 最近一次玩家主动喂食的回执，结果页只读取，不再次消费库存。 */
   feeding: {
@@ -113,7 +114,8 @@ export const DEFAULT_BIRD_TOWER_STATE: BirdTowerState = {
   daily: {
     at_tower: false,
     moor_event: false,
-    hunt_ask: false
+    hunt_ask: false,
+    sex_help: false
   },
   feeding: {
     ids: [],

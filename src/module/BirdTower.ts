@@ -384,9 +384,7 @@ class BirdTower extends Module {
       for (let day = 0; day < Math.min(days, 3); day++) this.growSize(child, age);
       this.growStage(child, age);
     }
-    V.BirdTower.daily.at_tower = false;
-    V.BirdTower.daily.moor_event = false;
-    V.BirdTower.daily.hunt_ask = false;
+    V.BirdTower.daily = clone(DEFAULT_BIRD_TOWER_STATE.daily);
   }
 
   /** 小结当天的喂食。PC 不在鹰塔时视为大鹰自行喂饱，按一顿计入。 */
