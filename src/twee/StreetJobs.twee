@@ -42,7 +42,7 @@
         <<set _streetReturn to _streetJobs.terms.sites[_streetContract.return_to].name>>
         <li class='blue'><<lanSwitch 'Take the goods back to: ' '将货物运回：'>><<= lanSwitch(_streetReturn[0], _streetReturn[1])>><<lanSwitch '. Hand them over there to finish returning the shipment.' '。抵达后交还货物，才算完成退货。'>></li>
       <<else>>
-        <li><<set $_streetFrom to _streetJobs.terms.sites[_streetContract.source].name, _streetTo to _streetJobs.terms.sites[_streetContract.target].name>><<= lanSwitch($_streetFrom[0], $_streetFrom[1])>> → <<= lanSwitch(_streetTo[0], _streetTo[1])>></li>
+        <li><<set _streetFrom to _streetJobs.terms.sites[_streetContract.source].name, _streetTo to _streetJobs.terms.sites[_streetContract.target].name>><<= lanSwitch(_streetFrom[0], _streetFrom[1])>> → <<= lanSwitch(_streetTo[0], _streetTo[1])>></li>
       <</if>>
       <<if _streetJob.crew>>
         <li><<= _streetJob.crew.name>> · <<lanSwitch 'Agreed colleague’s share: ' '合作人约定分成：'>><span class='gold'><<= _streetJob.crew.share>>%</span> · <<lanSwitch 'Quoted total fee: ' '约定总报酬：'>><<printmoney _streetJob.crew.gross>></li>
@@ -53,7 +53,7 @@
       <<else>>
         <<if _streetJob.stage isnot 'return'>>
           <li><<lanSwitch 'Agreed fee: ' '约定报酬：'>><<printmoney `_streetJob.crew ? _streetJob.crew.gross - Math.floor(_streetJob.crew.gross * _streetJob.crew.share / 100) : _streetContract.fee`>> · <<lanSwitch 'Deliver by ' '交货期限：'>>
-            <<set $_streetDate to new DateTime(_streetJob.due)>><<= lanSwitch(getFormattedDate($_streetDate), $_streetDate.month + '月' + $_streetDate.day + '日')>> <<ampm $_streetDate.hour $_streetDate.minute>>
+            <<set _streetDate to new DateTime(_streetJob.due)>><<= lanSwitch(getFormattedDate(_streetDate), _streetDate.month + '月' + _streetDate.day + '日')>> <<ampm _streetDate.hour _streetDate.minute>>
           </li>
           <<if _streetJobs.expired>>
             <li class='red'>

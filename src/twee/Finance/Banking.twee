@@ -1,12 +1,12 @@
 :: Deadwood Reblooms Finance Common Widgets [widget]
 
 <<widget 'deadwood-reblooms-finance-date'>>
-  <<set $_financeDate to Time.startDate.addDays(_args[0])>>
-  <span class='blue'><<= lanSwitch(`${$_financeDate.day} ${$_financeDate.monthName} ${$_financeDate.year}`, `${$_financeDate.year}年${$_financeDate.month}月${$_financeDate.day}日`)>></span>
-  <<set $_financeDaysLeft to Math.ceil(_args[0] - Time.days)>>
-  <<if $_financeDaysLeft gt 0>>
-    <<lanSwitch ' (in ' '（还有 '>> <<= $_financeDaysLeft>> <<lanSwitch ' days)' '天）'>>
-  <<elseif $_financeDaysLeft is 0>>
+  <<set _financeDate to Time.startDate.addDays(_args[0])>>
+  <span class='blue'><<= lanSwitch(`${_financeDate.day} ${_financeDate.monthName} ${_financeDate.year}`, `${_financeDate.year}年${_financeDate.month}月${_financeDate.day}日`)>></span>
+  <<set _financeDaysLeft to Math.ceil(_args[0] - Time.days)>>
+  <<if _financeDaysLeft gt 0>>
+    <<lanSwitch ' (in ' '（还有 '>> <<= _financeDaysLeft>> <<lanSwitch ' days)' '天）'>>
+  <<elseif _financeDaysLeft is 0>>
     <<lanSwitch ' (due today)' '（今日到期）'>>
   <<else>>
     <span class='red'><<lanSwitch ' (overdue)' '（已到期）'>></span>
@@ -15,9 +15,9 @@
 
 <!-- 金额沿用原版格式，负值先取绝对值，避免英镑部分向下取整。 -->
 <<widget 'deadwood-reblooms-finance-money'>>
-  <<set $_financeMoneyAmount to Number(_args[0])>>
-  <<if Number.isFinite($_financeMoneyAmount)>>
-    <span @class='_args[1] ? _args[1] : "gold"'><<= ($_financeMoneyAmount < 0 ? '-' : '') + formatMoney(Math.abs($_financeMoneyAmount))>></span>
+  <<set _financeMoneyAmount to Number(_args[0])>>
+  <<if Number.isFinite(_financeMoneyAmount)>>
+    <span @class='_args[1] ? _args[1] : "gold"'><<= (_financeMoneyAmount < 0 ? '-' : '') + formatMoney(Math.abs(_financeMoneyAmount))>></span>
   <<else>>
     <span class='red'>—</span>
   <</if>>
@@ -770,9 +770,6 @@
 <</if>>
 <br><br>
 <<deadwood-reblooms-finance-navigation>>
-<<if $Finance.bank.opened>>
-  <span class='blue'><<lanSwitch 'Account statements, holdings and repayment dates are recorded in your journal.' '账户账目、持仓与还款日期记在日志里。'>></span><br>
-<</if>>
 <br>
 <<deadwood-reblooms-adrian-break-link>>
 <<deadwood-street-cargo-link 'finance'>>

@@ -77,17 +77,29 @@
   <<if maplebirch.get('LifeSimulation') and $LifeSimulation?.school>>
     <<foldout false "_deadwoodSchoolFoldout">>
       <span class='gold'><<lanSwitch 'School life' '校园生活'>></span>
-      <<lanSwitch 'Attendance pass:' '免听凭证：'>>
-      <<if $LifeSimulation.school.attendanceExempt>><span class='green'><<lanSwitch 'Obtained' '已取得'>></span>
-      <<else>><<lanSwitch 'Not obtained' '未取得'>><</if>><br>
+      <<deadwood-reblooms-progress-check `$LifeSimulation.school.attendanceExempt` `["Obtain an attendance pass", "取得免听凭证"]` `["Reach the highest overall and subject grades, then apply to Leighton. You also need 10 affection or successful blackmail. After school approval, obtain Bailey’s signature and return the form.", "总成绩与四科都达到最高档，再找礼顿申请；还需好感达到10或成功勒索。学校审核后取得贝利签字，再交回表格。"]`>>
       <<lanSwitch 'School role:' '校园身份：'>>
       <<switch $LifeSimulation.school.role>>
         <<case 'president'>><span class='gold'><<lanSwitch 'Student president' '学生会长'>></span>
         <<case 'prefect'>><span class='teal'><<lanSwitch 'Prefect' '风纪委员'>></span>
         <<default>><<lanSwitch 'Student' '学生'>>
       <</switch>><br>
-      <<deadwood-reblooms-progress-check `['prefect', 'president'].includes($LifeSimulation.school.role)` `["Become a prefect", "担任风纪委员"]` `["With no delinquency and at least 160 cool, ask Leighton at the office. Approval also requires affection or blackmail.", "不良记录为零、酷至少160时，去办公室找礼顿申请；还需取得其好感或掌握把柄。"]`>>
+      <<deadwood-reblooms-progress-check `['prefect', 'president'].includes($LifeSimulation.school.role)` `["Become a prefect", "担任风纪委员"]` `["Apply to Leighton in the head’s office. Eligibility uses the teacher and student evaluations in Social.", "到校长办公室向礼顿申请，任命按社交栏的教师与同学评价判定。"]`>>
+      <<if $LifeSimulation.school.role is 'student'>>
+        <<for _prefectIndex, _prefectRequirement range [
+          [$delinquency lt 10, ['Teachers consider you an ideal student: delinquency ' + $delinquency + ' (below 10).', '教师评价达到最高档「理想的学生」：当前违纪值 ' + $delinquency + '，需低于10。']],
+          [$cool gte 160, ['Students consider you at least cool: status ' + $cool + '/160.', '同学评价至少「很酷」：当前酷感 ' + $cool + '/160。']],
+          [C.npc.Leighton.love gte 10, ['Leighton affection: ' + C.npc.Leighton.love + '/10.', '礼顿个人好感：' + C.npc.Leighton.love + '/10。']],
+          [$headblackmailed is 1, ['You have successfully blackmailed Leighton.', '已经成功勒索过礼顿。']]
+        ]>>
+          <<if _prefectIndex is 2>><br><<lanSwitch 'Leighton’s approval: meet either of the following.' '礼顿的认可：以下两项满足任意一项即可。'>><br><</if>>
+          <<deadwood-reblooms-progress-check _prefectRequirement[0] _prefectRequirement[1]>>
+        <</for>>
+        <br>
+      <</if>>
       <<deadwood-reblooms-progress-check `$LifeSimulation.school.role === 'president'` `["Become student president", "担任学生会长"]` `["As a prefect, complete five morning duties and reach 25 support with both students and staff.", "成为风纪委员后，完成五次晨间值勤，学生支持和教职工支持均达到25。"]`>>
+      <<lanSwitch 'Current dress policy: ' '现行着装规范：'>><span class='blue'><<= maplebirch.t('deadwood-reblooms:LifeSimulation:school:policy:' + $LifeSimulation.school.dress.active)>></span><br>
+      <<deadwood-reblooms-life-simulation-school-standing-list>>
       <<lanSwitch 'Morning duties:' '晨间值勤：'>>
       <span class='teal'><<= $LifeSimulation.school?.duties?.completed ?? 0>></span><br>
       <<lanSwitch 'History exhibition:' '历史展览：'>>
@@ -252,6 +264,15 @@
         <<deadwood-reblooms-progress-check `(_deadwoodJobs?.completed ?? 0) > 0` `["Collect payment for a street job", "领取一份街头委托的报酬"]` `["Take a job from Landry, deliver the cargo and return for payment.", "找兰德里接单，完成取货和交付后返回领款。"]`>>
         <<deadwood-street-story-statistics>>
         <<if _deadwoodRaces?.started>>
+          <<set _deadwoodRaceWork to maplebirch.get('StreetLife').races>>
+          <<if maplebirch.get('Transport')>>
+            <br><b><<= maplebirch.t('deadwood-reblooms:street:trait:seasoned_driver:name')>></b><br>
+            <<if _deadwoodRaceWork.seasonedDriver>>
+              <span class='green'><<lanSwitch 'Car driving: baseline condition loss −10%.' '驾驶汽车：基础车况损耗减少10%。'>></span>
+            <<else>>
+              <<lanSwitch 'Races finished: ' '累计完赛：'>><<= _deadwoodRaceWork.state.completed>> / <<= _deadwoodRaceWork.terms.seasoned_driver.completed>> · <<lanSwitch 'Driving experience: ' '驾驶熟练度：'>><<= $Transport.driving>> / <<= _deadwoodRaceWork.terms.seasoned_driver.driving>>
+            <</if>>
+          <</if>><br>
           <<lanSwitch 'Road races entered / finished / won: ' '公路赛报名／完赛／冠军：'>><span class='teal'><<= _deadwoodRaces.started>> / <<= _deadwoodRaces.completed>> / <<= _deadwoodRaces.wins>></span><br>
           <<lanSwitch 'Race entry fees paid: ' '赛事报名累计支出：'>><span class='gold'><<= formatMoney(_deadwoodRaces.fees)>></span><br>
           <<lanSwitch 'Race prizes collected: ' '赛事奖金累计实收：'>><span class='gold'><<= formatMoney(_deadwoodRaces.earned)>></span><br>
@@ -271,10 +292,9 @@
         <<if _deadwoodBounties>>
           <<deadwood-reblooms-progress-check `maplebirch.get('StreetLife').bounties.bountyHunter` `["Obtain Bounty Hunter", "取得赏金猎人特质"]` `["Collect the capture reward for every bounty type and maintain cooperation with Grant. Lead fees do not count.", "每类悬赏都实际领取抓捕报酬，并保持与格兰特合作。只领线索费不算。"]`>>
           <<lanSwitch 'Verified leads paid: ' '已领款的核实线索：'>><span class='teal'><<= _deadwoodBounties.leads ?? 0>></span><br>
-          <<set _deadwoodBountyTypes to maplebirch.get('StreetLife').bounties.terms.cases>>
           <<lanSwitch 'Verified bounties paid: ' '已领款的核验悬赏：'>><span class='teal'><<= _deadwoodBounties.completed ?? 0>></span><br>
           <<lanSwitch 'Bounty rewards collected: ' '悬赏累计实收：'>><span class='gold'><<= formatMoney(_deadwoodBounties.earned ?? 0)>></span><br>
-          <<lanSwitch 'Paid bounty types: ' '已领款的悬赏类型：'>><span class='teal'><<= _deadwoodBountyTypes.filter(item => _deadwoodBounties.completedTypes?.includes(item.id)).length>> / <<= _deadwoodBountyTypes.length>></span><br>
+          <<deadwood-street-bounty-type-progress>>
           <<lanSwitch 'Arrests by bounty hunters: ' '被赏金猎人移交拘捕次数：'>><span class='red'><<= _deadwoodBounties.arrested ?? 0>></span><br>
         <</if>>
         <<if _deadwoodHeist?.stage is 'closed' and _deadwoodHeist.settled>>
@@ -327,15 +347,15 @@
 
 
 <<widget 'deadwood-reblooms-breakthrough-progress'>>
-  <<set $_progressModule to maplebirch.get('VanillaPlus')>>
+  <<set _progressModule to maplebirch.get('VanillaPlus')>>
   <span class='small-description'><i><<lanSwitch 'A tick marks a requirement you meet. Some challenges only need completing once; others, such as ear slimes and makeup, depend on your condition at the time. After breaking through, reach the new ceiling to earn its trait.' '✓表示你已满足这一项。有些经历只需完成一次，双耳史莱姆、妆容等则要在突破时符合要求。突破后继续练到新上限，才会获得对应特质。'>></i></span><br>
-  <<for _attribute range $_progressModule.progress>>
-    <<set _requirements to $_progressModule[_attribute.id].requirements>>
+  <<for _attribute range _progressModule.progress>>
+    <<set _requirements to _progressModule[_attribute.id].requirements>>
     <br><span class='gold'><<lanSwitch _attribute.name>></span> —
     <<if $VanillaPlus.lock[_attribute.id]>><span class='green'><<lanSwitch 'Ceiling unlocked' '已突破'>></span>
     <<else>><span class='teal'><<= _requirements.filter(Boolean).length>> / <<= _requirements.length>></span><</if>>
     <<if $VanillaPlus.traits[_attribute.id]>> · <span class='green'><<lanSwitch 'Trait obtained' '已获得特质'>></span><</if>><br>
-    <<lanSwitch 'Current / normal ceiling / new ceiling: ' '当前值／原版上限／突破上限：'>><span class='teal'><<= V[_attribute.id]>> / <<= $_progressModule.normalCeiling(_attribute.id)>> / <<= $_progressModule.ceiling(_attribute.id)>></span><br>
+    <<lanSwitch 'Current / normal ceiling / new ceiling: ' '当前值／原版上限／突破上限：'>><span class='teal'><<= V[_attribute.id]>> / <<= _progressModule.normalCeiling(_attribute.id)>> / <<= _progressModule.ceiling(_attribute.id)>></span><br>
     <<for _index, _step range _attribute.steps>>
       <<deadwood-reblooms-progress-check _requirements[_index] _step.text _step.hint>>
     <</for>>
