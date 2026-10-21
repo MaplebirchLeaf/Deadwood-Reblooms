@@ -62,9 +62,13 @@ jobs:
             exit 1
           fi
           notes_file=".github/release-notes/$RELEASE_TAG.md"
-          if [[ -s "$notes_file" ]]; then
-            gh release create "$RELEASE_TAG" "${packages[@]}" --verify-tag --title "Deadwood Reblooms-$RELEASE_TAG" --notes-file "$notes_file"
-          else
+          if [[ ! -s "$notes_file" ]]; then
             echo "Missing release notes: $notes_file" >&2
             exit 1
+          fi
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "${packages[@]}" --clobber
+            gh release edit "$RELEASE_TAG" --title "Deadwood Reblooms-$RELEASE_TAG" --notes-file "$notes_file"
+          else
+            gh release create "$RELEASE_TAG" "${packages[@]}" --verify-tag --title "Deadwood Reblooms-$RELEASE_TAG" --notes-file "$notes_file"
           fi

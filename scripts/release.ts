@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const pkg = JSON.parse(await Bun.file(`${root}/package.json`).text()) as { version: string; scml: { dependenceInfo: { modName: string; version: string }[] } };
 const releaseTag = `v${pkg.version}`;
+const republish = Bun.argv.includes('--republish');
 
 function git(...args: string[]): string {
   return execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['inherit', 'pipe', 'inherit'] }).trim();
@@ -20,8 +21,14 @@ try {
 } catch {
   // 首次发布时尚未创建标签。
 }
-if (tagged && tagged !== git('rev-parse', 'HEAD')) throw new Error(`${releaseTag} points to a different commit.`);
-if (!tagged) git('tag', '-a', releaseTag, '-m', `Deadwood Reblooms ${releaseTag}`);
+if (tagged && tagged !== git('rev-parse', 'HEAD') && !republish) throw new Error(`${releaseTag} points to a different commit.`);
+const pushOptions = ['--atomic'];
+if (republish) {
+  const tagRef = `refs/tags/${releaseTag}`;
+  const remoteTag = git('ls-remote', '--refs', 'origin', tagRef).split(/\s/)[0];
+  pushOptions.push(`--force-with-lease=${tagRef}:${remoteTag}`);
+  git('tag', '-f', '-a', releaseTag, '-m', `Deadwood Reblooms ${releaseTag}`);
+} else if (!tagged) git('tag', '-a', releaseTag, '-m', `Deadwood Reblooms ${releaseTag}`);
 
-git('push', '--atomic', 'origin', 'refs/heads/main', `refs/tags/${releaseTag}`);
+git('push', ...pushOptions, 'origin', 'refs/heads/main', `refs/tags/${releaseTag}`);
 console.log(`Pushed ${releaseTag}. The release workflow will build DoL 0.5.12.13 and the optional audio package.`);
