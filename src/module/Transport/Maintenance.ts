@@ -5,10 +5,9 @@ import type Transport from '../Transport';
 export default class Maintenance {
   public constructor(private readonly transport: Transport) {}
 
-  public settle(): void {
+  public settle(day = Math.floor(Time.days)): void {
     if (V.replayScene || V.statFreeze) return;
     const bank = this.transport.core.get('Finance')?.state.bank;
-    const day = Math.floor(Time.days);
     for (const vehicle of this.transport.state.vehicles) {
       const model = this.transport.catalog.models.find(model => model.id === vehicle.model);
       if (!model) continue;

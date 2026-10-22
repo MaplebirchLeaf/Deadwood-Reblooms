@@ -2,7 +2,7 @@
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
-import { Clothing } from './Clothing';
+import Clothing from '../../assets/npc-sidebar-portrait/clothing.json';
 import scene from './Common/Scenes';
 
 export default function (maplebirch: MaplebirchCore): void {

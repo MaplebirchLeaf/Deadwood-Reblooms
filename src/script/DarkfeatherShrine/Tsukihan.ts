@@ -67,7 +67,7 @@ export default function Tsukihan(maplebirch: typeof window.maplebirch): void {
     );
   });
 
-  // 只记下实际观察到的雨中劳动；日常沐浴完成后，湿衣状态随之结束。
+  // 只记下实际观察到的雨中劳动。日常沐浴完成后，湿衣状态随之结束。
   const bathing = () => {
     const shrine = V.MoreTransformations?.shrine;
     if (!shrine || C.npc.Tsukihan?.init !== 1 || C.npc.Tsukihan.state !== 'active' || V.replayScene || V.statFreeze) return;

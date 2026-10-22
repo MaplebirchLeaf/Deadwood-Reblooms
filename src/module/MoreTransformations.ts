@@ -4,6 +4,7 @@ import Achievements from './Achievements';
 import Whale from './MoreTransformations/Whale';
 import Horse from './MoreTransformations/Horse';
 import Raven from './MoreTransformations/Raven';
+import Undead from './MoreTransformations/Undead';
 import Module from './Module';
 
 interface Tentacle {
@@ -17,6 +18,7 @@ class MoreTransformations extends Module {
   public Whale: Whale;
   public Horse: Horse;
   public Raven: Raven;
+  public Undead: Undead;
 
   constructor(core: typeof maplebirch) {
     super(core, 'MoreTransformations', {
@@ -30,7 +32,30 @@ class MoreTransformations extends Module {
         scene: '',
         event: '',
         fighting: false,
-        zephyr: { stage: 0, fee: 0, origin: '' }
+        zephyr: { stage: 0, fee: 0, origin: '' },
+        raid: { day: -7, stage: '', outcome: '', approach: '', talked: false, rested: false, needsEffects: false, victories: 0, rescues: 0, encounters: 0 }
+      },
+      treasure: {
+        found: false,
+        room: 'mouth',
+        torch: 0,
+        visited: [],
+        scene: '',
+        inscription: false,
+        journal: false,
+        shortcut: false,
+        guardian: '',
+        coins: 0,
+        zephyrCoins: 0,
+        crewCoins: 0,
+        museumCoins: 0,
+        bound: false,
+        returns: 0,
+        appraised: false,
+        together: false,
+        voyage: false,
+        origin: 'Pirate Zephyr',
+        agreed: false
       },
       raven: { met: false, searched: -1, fed: -1, called: -1, preened: -1, origin: 'Forest', action: '', disparaged: 0 },
       shrine: {
@@ -74,6 +99,7 @@ class MoreTransformations extends Module {
     this.Whale = new Whale();
     this.Horse = new Horse();
     this.Raven = new Raven();
+    this.Undead = new Undead();
   }
 
   public get foxfire(): boolean {
@@ -107,6 +133,7 @@ class MoreTransformations extends Module {
     this.Whale.apply(this.core);
     this.Horse.apply(this.core);
     this.Raven.apply(this.core);
+    this.Undead.apply(this.core);
   }
 }
 

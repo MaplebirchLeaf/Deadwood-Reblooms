@@ -191,7 +191,7 @@ export default class TravelEvents {
       const interrupted = !!V.nextPassage || !!V.nextPassageCheck || transport.core.passage.title !== 'Deadwood Transport Travel';
       if (!transport.canDepart || interrupted) this.stop(!interrupted);
       else if (window.crimeSumCurrent() < 1000 && (event.drunk ?? 0) < 120) {
-        // 核查结束时读取当前罪证；醉驾仍按出发快照，不因途中醒酒放行。
+        // 核查结束时读取当前罪证。醉驾仍按出发快照，不因途中醒酒放行。
         event.resolved = true;
         event.outcome = 'cleared';
       }

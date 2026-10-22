@@ -272,7 +272,7 @@ class Transport extends Module {
     )
       return false;
     if (this.model.kind === 'bicycle') return !this.external_bicycle;
-    // 私人出行允许冒险酒驾；约好的接送与营运仍要求清醒。
+    // 私人出行允许冒险酒驾。约好的接送与营运仍要求清醒。
     return (V.drunk <= 0 || (!this.taxi.active && !this.state.commute)) && V.drugged <= 0 && V.stress < V.stressmax && this.qualified && (this.model.kind !== 'motorcycle' || this.state.helmet);
   }
 

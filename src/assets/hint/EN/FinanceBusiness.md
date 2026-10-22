@@ -97,7 +97,9 @@ With **settled AVY shares representing at least 5% of the current total**, enter
 
 **Board Seat → Controlling Shareholder**: control replaces the board seat trait; their benefits do not stack. A passed shareholder meeting or a reception conversation with Avery starts seven days of benefits from the following day: an additional **1 rage lost per day**, and at most **1 dominance lost every seven days**. Dominance stops decreasing at **50** for directors and **25** for controlling shareholders; values already below those floors are not raised. Upgrading or regaining eligibility does not reset the shared interval. Benefits pause if you lose both qualifications, owe office rent or collection debt, or Avery cannot conduct ordinary business.
 
-Control opens the mansion study to you and reveals how to open the dungeon entrance, without eavesdropping or searching. Your first mansion visit still requires the native invitation. Avery closes the study at 23:00 when at home; permission resumes from 05:00 the following morning. Knowing the entrance does not record a dungeon visit or its scenes.
+Control opens the mansion study to you and reveals how to open the dungeon entrance, without eavesdropping or searching. Avery closes the study at 23:00 when at home; permission resumes from 05:00 the following morning. Knowing the entrance does not record a dungeon visit or its scenes.
+
+**Mansion invitation without adoption:** directors and controlling shareholders can ask Avery about visiting the mansion through the shareholder reception's private conversation menu once the native artefact storyline has progressed far enough to set the artefact's recipient. Accepting takes thirty minutes and opens the native mansion, Sunday parties and subsequent skyscraper progression. The original mansion activities and household expectations remain. Adoption-specific affection, housekeeping, recipe and date requirements do not apply to this business invitation. You can enter after refusing adoption or buying out your own contract; neither decision is withdrawn, and Avery does not take over your rent. Looking at the invitation or leaving does not unlock anything. Existing mansion progress is never reset.
 
 <span class="blue">Company votes affect accounts, financing and construction. Romance requirements and ascension retain their native rules; private interactions can still change Avery's love, rage and dominance.</span>
 
@@ -111,7 +113,7 @@ You can also discuss **conflicting interests**. Avery responds to your votes, su
 
 After the original skyscraper project has been introduced, review the **construction and opening files**, taking **15 minutes** on the first reading. After reading, inspect the arrangements at the **skyscraper on Elk Street** for **15 minutes**. Temple protestors, the temporary clinic and outside vans appear only under their original conditions. Your inspection does not change construction progress or establish rumours as fact.
 
-After both enquiries and once the original finishing stage begins, ask Avery to **explain your role before the opening**. This permits an enquiry. The native mansion invitation, blood moon, formal dress and opening journey still apply.
+After both enquiries and once the original finishing stage begins, ask Avery to **explain your role before the opening**. This permits an enquiry. Mansion access, the blood moon, formal dress and the native opening journey still apply.
 
 When the original **public reception ends and you wait for the last lift**, an additional option lets you question Harper for **five minutes**. Afterwards, continue or leave before going upstairs. Leaving adds three points of Avery's anger and leaves the ceremony unperformed, without assigning an outcome. Continuing returns to the original masks, wishing stones, dreams and ritual branches.
 

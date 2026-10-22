@@ -14,7 +14,7 @@ class Sydney extends Module {
     return C.npc.Sydney.init === 1 && C.npc.Sydney.state === 'active' && V.daily.sydney?.punish !== 1;
   }
 
-  /** 原版小时劳动共用此条件；共同清扫期间已由该行动结算本人贡献。 */
+  /** 原版小时劳动共用此条件。共同清扫期间已由该行动结算本人贡献。 */
   public get canMaintain(): boolean {
     if (!this.available || C.npc.Sydney.state !== 'active' || V.replayScene || V.statFreeze || T.sydneyWorkTogether || V.RobinTemple?.punish?.joint) return false;
     const value = V.sydney_templeWork === 'garden' ? V.temple_garden : V.sydney_templeWork === 'quarters' ? V.temple_quarters : undefined;

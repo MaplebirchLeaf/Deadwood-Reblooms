@@ -13,7 +13,7 @@
 
 **Deadwood Reblooms** is a **_Degrees of Lewdity_** content mod built on the **[Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)**. It expands character relationships, school life, finance and business, transport, and street activities, alongside transformations, encounters, and interface features.
 
-**Current version: 2.4.3.** Choose the modules you want to play. The in-game guide covers their activities and unlock conditions.
+Supports English and Chinese, with modules you can enable individually. The in-game guide covers activities and unlock conditions.
 
 ---
 
@@ -42,7 +42,7 @@
 ## Installation and Dependencies
 
 1. Use a game build with **SugarCube 2 ModLoader**. The current target is **DoL 0.5.12.13**.
-2. Install **[Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.5.2 or later** and any clothing, beauty-selector, or other dependencies requested by the loader.
+2. Install **[Maplebirch Framework](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.5.4 or later** and any clothing, beauty-selector, or other dependencies requested by the loader.
 3. Download `deadwood-reblooms-*.modpack` from [**Releases**](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases/latest) and load it through ModLoader.
 4. Choose the modules you want in the framework's module manager, then save and reload.
 
@@ -58,7 +58,7 @@ When certain original mods with overlapping features are detected, Deadwood Rebl
 | Statistics → Mod Statistics        | View progress and cumulative results                                                             |
 | Vanilla Cheats → Deadwood Reblooms | Adjust resources and stats for enabled features                                                  |
 
-Choose the desktop or mobile position for the guide button in mod settings. Save and reload after changing module switches. Character scenes also depend on their relationships, locations, and schedules.
+Choose the desktop or mobile position for the guide button in mod settings. Character scenes depend on relationships, locations, and schedules.
 
 ## Optional Audio Pack
 
@@ -68,8 +68,11 @@ The audio pack is optional. See the [audio source record](audio-pack/audio/CREDI
 
 ## Feedback and Updates
 
-- [Issues and suggestions](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/issues): include game, framework, and mod versions, the location, and steps to reproduce the problem.
+- [Discord discussion and feedback](https://discord.com/channels/675158131688603721/1553846429884350617)
+- [Issues and suggestions](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/issues)
 - [Releases and update history](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases)
+
+When reporting a problem, include the game, framework, and mod versions, steps to reproduce, and relevant screenshots or error logs.
 
 ## Acknowledgements
 

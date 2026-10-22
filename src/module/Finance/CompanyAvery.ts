@@ -21,6 +21,7 @@ export interface CompanyAveryState {
   dream_seen: boolean;
   cards_guest: boolean;
   cards_refused_drinks: boolean;
+  mansion_guest: boolean;
   cards: PrivateCardsState;
 }
 
@@ -43,6 +44,7 @@ export default class CompanyAvery {
     dream_seen: false,
     cards_guest: false,
     cards_refused_drinks: false,
+    mansion_guest: false,
     cards: PrivateCards.defaults
   };
 
@@ -54,6 +56,23 @@ export default class CompanyAvery {
 
   public preInit(): void {
     const core = this.company.finance.core;
+    core.once(':addon:patchStart', () => {
+      // 兼容层完成缓存合并后再修改脚本，仅改变代付条件，保留缺席记录和书房上锁。
+      const loader = core.host.modLoader;
+      loader.defineTwineAsset(
+        'script',
+        'game\\03-JavaScript\\time.js',
+        source =>
+          loader.replace(
+            source,
+            source.includes('function isAveryPayingBailey()')
+              ? [[/function isAveryPayingBailey\(\) \{/, '$&\n\tif (maplebirch.get("Finance")?.company.avery.state.mansion_guest) return 0;']]
+              : [[/V\.avery_mansion\.rage\.assess >= 9(?= \|\| V\.avery_mansion\.days_absent >= 2)/, 'maplebirch.get("Finance")?.company.avery.state.mansion_guest || $&']],
+            '股东庄园房租'
+          ),
+        'patch'
+      );
+    });
     // 只有 PC 明确阻止人身下注后才改变结算与离场，默认四条原版赢家路线仍照常运行。
     core.dynamic.regStateEvent('gate', ':deadwood-private-cards-guest-finish', {
       forceExit: true,
@@ -101,6 +120,11 @@ export default class CompanyAvery {
 
   public get canTalk(): boolean {
     return this.available && this.state.talk_day !== Math.floor(Time.days);
+  }
+
+  /** 股东以私人来宾身份入场，保留原版古物前置，不要求收养资格。 */
+  public get canEnter(): boolean {
+    return this.available && V.auriga_artefact !== undefined && V.avery_mansion === undefined && V.avery_fate === undefined;
   }
 
   public get peer(): boolean {

@@ -6,11 +6,6 @@ type Wardrobe = MaplebirchCore['npc']['Clothes']['wardrobe'];
 
 export type WardrobeItem = ReturnType<Wardrobe['worn']>;
 
-export interface ClothingItem {
-  slot?: string;
-  [key: string]: unknown;
-}
-
 class NPCSidebarPortrait {
   constructor(readonly core: typeof maplebirch) {}
 

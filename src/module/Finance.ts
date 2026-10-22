@@ -431,7 +431,7 @@ class Finance extends Module {
     }
     this.advanceLoan(bank, day);
     this.advanceCredit(bank, day);
-    Finance.updateAccountTier(bank);
+    Finance.updateAccountTier(bank, day);
   }
 
   /** 扣除所有个人金融债务后的银行净存款，用于人物业务资格。 */
@@ -969,9 +969,9 @@ class Finance extends Module {
     finance.market.avery_fate ??= String(V.avery_fate ?? '');
     if (finance.bank.opened && finance.bank.bank_interest_last_day < 0) finance.bank.bank_interest_last_day = Finance.currentDay;
     if (finance.bank.opened && finance.bank.opened_day < 0) finance.bank.opened_day = Finance.currentDay;
-    // 冻结、回忆及回拨到已处理的日期前，读取状态不更新账户等级与取款额度。
+    // 历史账务未结清时不按最终日期升档，正常交易仍即时记录净存款峰值。
     if (!V.replayScene && !V.statFreeze && Finance.currentDay >= finance.market.day) {
-      Finance.updateAccountTier(finance.bank);
+      if (finance.real_estate.last_managed_day >= Finance.currentDay) Finance.updateAccountTier(finance.bank);
       Finance.resetAtmLimit(finance.bank);
     }
     if (finance.bank.credit_debt > 0 && finance.bank.credit_due_day <= 0) {
@@ -1021,13 +1021,13 @@ class Finance extends Module {
     return MERCHANT_SOURCES.has(name) || name.startsWith('hospital') || name.startsWith('pharmacy');
   }
 
-  private static updateAccountTier(bank: BankState): void {
+  private static updateAccountTier(bank: BankState, day = Finance.currentDay): void {
     if (!bank.opened) return;
     const propertyDebt = V.Finance.real_estate?.mortgage?.outstanding ?? 0;
     const recoveryDebt = V.Finance.collection.amount;
     const netBalance = Math.max(0, bank.balance - bank.credit_debt - bank.loan_debt - propertyDebt - recoveryDebt);
     bank.peak_balance = Math.max(bank.peak_balance, netBalance);
-    const age = Math.max(0, Finance.currentDay - bank.opened_day);
+    const age = Math.max(0, day - bank.opened_day);
     const cleanRecord = bank.credit_missed_payments === 0 && bank.loan_missed_payments === 0 && recoveryDebt === 0;
     const current = Math.max(
       0,

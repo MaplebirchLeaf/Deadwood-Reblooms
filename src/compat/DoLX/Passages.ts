@@ -19,6 +19,18 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
     if (zone.widgetPassage.Widgets) {
       zone.widgetPassage.Widgets = zone.widgetPassage.Widgets.filter(rule => rule.src !== '<<set $oxygen -= _waterActionTime * 10>>');
     }
+    // DoLX 的额外花蜜增长绕过 arousal 宏，仍只缩放实际正增量。
+    (zone.widgetPassage.Widgets ??= []).push({
+      src: '<<set $arousal += _cumNectar>>',
+      to: '<<set $arousal += (maplebirch.get("MoreTransformations")?.Undead.arousal(_cumNectar) ?? _cumNectar)>>',
+      expected: 1
+    });
+    // 分娩选项也直接结算状态值，保留负增量和其它状态的原生效果。
+    (zone.widgetPassage['Widgets Childbirth Effects'] ??= []).push({
+      src: '<<set $arousal += _playline[2][_effects[_i]]>>',
+      to: '<<set $arousal += (maplebirch.get("MoreTransformations")?.Undead.arousal(_playline[2][_effects[_i]]) ?? _playline[2][_effects[_i]])>>',
+      expected: 1
+    });
   }
   const replace = (
     group: 'locationPassage' | 'widgetPassage',
@@ -65,6 +77,58 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
   );
   // 原生双目标动作先确认承受者，再追加本模组的技能成长。
   replace('widgetPassage', 'Widgets Effects Man', '<<set $vaginatarget to _n>>', rule => ({ ...rule, src: '<<set $vaginatarget to _existingVagNpc>>' }));
+  // DoLX 五级动作本身能在原版上限后继续缓慢成长，只有原生结算未增长时才累计模组补偿。
+  if (maplebirch.get('VanillaPlus')) {
+    const deviancy = (zone.widgetPassage['Widgets Deviancy'] ??= []);
+    for (const name of ['deviancyN', 'combatdeviancyN']) {
+      deviancy.push({ src: `<<widget "${name}">>`, applyafter: '<<set $_deadwoodDeviancyBefore to $deviancy>>', expected: 1 });
+    }
+    for (const rule of deviancy) {
+      for (const field of ['applybefore', 'applyafter'] as const) {
+        if (rule[field]?.includes('$VanillaPlus.deviancy.levelFive')) rule[field] = rule[field]!.replace('<<if $_n is 5 and ', '<<if $_n is 5 and $deviancy lte $_deadwoodDeviancyBefore and ');
+      }
+    }
+    const promiscuity = zone.widgetPassage['Widgets Promiscuity'] ?? [];
+    for (const rule of promiscuity) {
+      if (rule.src === '<<combatpromiscuityN 5>>' && rule.applyafter?.includes('$VanillaPlus.promiscuity.levelFive')) {
+        rule.applyafter = rule.applyafter.replace('<<if $VanillaPlus.lock.promiscuity', '<<if $promiscuity lte $_deadwoodPromiscuityBefore and $VanillaPlus.lock.promiscuity');
+      }
+    }
+    promiscuity.push({ src: '<<widget "combatpromiscuity5">>', applyafter: '<<set $_deadwoodPromiscuityBefore to $promiscuity>>', expected: 1 });
+    // 自有 Twee 此时尚未合并到游戏，直接适配待合并缓存，保留原版 widget。
+    const cache = maplebirch.modUtils.getMod('deadwood-reblooms')?.cache;
+    const title = 'Deadwood Reblooms Vanilla Plus Promiscuity Widgets';
+    const widget = cache?.passageDataItems.map.get(title);
+    if (cache && widget?.tags.includes('widget')) {
+      const secondary = '<<set V[$_sexstatSecondary] to Math.min(V[$_sexstatSecondary] + $_sexstatGain, $_sexstatCeiling)>>';
+      const replacements: Array<[string, string]> = [
+        // 亚人的第二项不重复调用动作代价，仍保留阶段上限后 20 点内的缓慢成长。
+        [
+          secondary,
+          secondary + '\n      <<elseif V[$_sexstatSecondary] - 20 lt $_sexstatLimit>>\n        <<set V[$_sexstatSecondary] to Math.min(V[$_sexstatSecondary] + $_sexstatGain / 3, $_sexstatCeiling)>>'
+        ],
+        // 保留 DoLX 原生的反向遭遇、发情及催眠特质成长条件，仅作用于结算入口。
+        [
+          '<<if !$promiscuityIgnore and !$statFreeze and ($consensual is 1 or $_sexstatLevel is 6)>>',
+          '<<if !$promiscuityIgnore and !$statFreeze and ($consensual is 1 or $_sexstatLevel is 6 or $combatExtended.reverseRapeStart is 1 or ($enemytype is "beast" and (playerHeatMinArousal() or playerRutMinArousal() or hypnosisTrait("deviancy"))))>>'
+        ]
+      ];
+      let content = widget.content;
+      for (const [from, to] of replacements) {
+        if (content.includes(to)) continue;
+        const matches = content.split(from).length - 1;
+        if (matches !== 1) {
+          maplebirch.log(`${title}: 匹配 ${matches}，预期 1 (${from})`, 'WARN');
+          break;
+        }
+        content = content.replace(from, () => to);
+      }
+      if (content !== widget.content && replacements.every(([, to]) => content.includes(to))) {
+        widget.content = content;
+        cache.passageDataItems.back2Array();
+      }
+    }
+  }
   replace('widgetPassage', 'Widgets Effects Anus', String(/<<if (\$combatExtended\.reverseRapeStart is 1 or )?combatSkillCheck\("anal", \$anustarget\)>>/), rule => ({
     ...rule,
     srcmatch: /<<if (\$combatExtended\.reverseRapeStart is 1 or )?combatSkillCheck\("anal", \$anustarget\)>>/g,

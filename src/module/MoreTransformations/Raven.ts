@@ -279,10 +279,7 @@ class Raven extends Transformation {
       },
       {
         title: 'General Traits',
-        name: () => {
-          const name = maplebirch.t('deadwood-reblooms:Traits:raven:gender');
-          return name + (V.player.sex === 'h' ? lanSwitch(' (⚥)', '(⚥)') : '');
-        },
+        name: () => maplebirch.t('deadwood-reblooms:Traits:raven:gender'),
         colour: 'black',
         has: () => (V.maplebirch?.transformation?.raven?.level ?? 0) >= 6,
         text: () => maplebirch.t('deadwood-reblooms:Traits:raven:text')

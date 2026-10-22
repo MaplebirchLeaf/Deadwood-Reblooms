@@ -1,6 +1,6 @@
 :: Deadwood Reblooms Statistics [widget]
 
-<!-- 统计与指引只读取当前存档；未开启的模块不显示栏目。各栏沿用原版 foldout。 -->
+<!-- 统计与指引只读取当前存档。未开启的模块不显示栏目。各栏沿用原版 foldout。 -->
 <<widget 'deadwood-reblooms-statistics'>>
   <<if maplebirch.get('VanillaPlus') and $VanillaPlus>>
     <<foldout false "_deadwoodAttributesFoldout">>
@@ -70,6 +70,19 @@
           <</if>>
         <</if>>
       <</if>>
+      <<if $MoreTransformations?.harbour?.raid?.encounters gt 0>>
+        <br><span class='gold'><<lanSwitch 'Undead boarders' '亡灵船袭'>></span><br>
+        <<lanSwitch 'Attacks witnessed: ' '遭遇袭击：'>><span class='teal'><<= $MoreTransformations.harbour.raid.encounters>></span><br>
+        <<lanSwitch 'Boarders repelled or ropes cut: ' '击退登船者或成功断绳：'>><span class='teal'><<= $MoreTransformations.harbour.raid.victories>></span><br>
+        <<lanSwitch 'Sailors rescued: ' '救起船员：'>><span class='teal'><<= $MoreTransformations.harbour.raid.rescues>></span><br>
+      <</if>>
+      <<if $MoreTransformations?.treasure?.found>>
+        <br><span class='gold'><<lanSwitch 'The island gold' '海岛藏金'>></span><br>
+        <<deadwood-reblooms-progress-check `$MoreTransformations.treasure.visited.includes('vault')` `["Find the stone chest", "找到藏金石箱"]` `["Explore the old cavern found on the island. Light a torch at the entrance.", "探索海岛上发现的旧洞窟，可在洞口引燃火把。"]`>>
+        <<deadwood-reblooms-progress-check `$MoreTransformations.treasure.appraised` `["Have the coins examined", "鉴定海岛金币"]` `["Bring a coin to Winter at the museum.", "带上一枚金币，找博物馆的温特鉴定。"]`>>
+        <<lanSwitch 'Curse: ' '诅咒：'>><span @class='$MoreTransformations.treasure.bound ? "purple" : "green"'><<lanSwitch `$MoreTransformations.treasure.bound ? 'Active' : 'Inactive'` `$MoreTransformations.treasure.bound ? '生效中' : '未生效'`>></span><br>
+        <<lanSwitch 'Completed returns: ' '完整归还次数：'>><span class='teal'><<= $MoreTransformations.treasure.returns>></span><br>
+      <</if>>
       <br>
     <</foldout>>
   <</if>>
@@ -77,7 +90,7 @@
   <<if maplebirch.get('LifeSimulation') and $LifeSimulation?.school>>
     <<foldout false "_deadwoodSchoolFoldout">>
       <span class='gold'><<lanSwitch 'School life' '校园生活'>></span>
-      <<deadwood-reblooms-progress-check `$LifeSimulation.school.attendanceExempt` `["Obtain an attendance pass", "取得免听凭证"]` `["Reach the highest overall and subject grades, then apply to Leighton. You also need 10 affection or successful blackmail. After school approval, obtain Bailey’s signature and return the form.", "总成绩与四科都达到最高档，再找礼顿申请；还需好感达到10或成功勒索。学校审核后取得贝利签字，再交回表格。"]`>>
+      <<deadwood-reblooms-progress-check `$LifeSimulation.school.attendanceExempt` `["Obtain an attendance pass", "取得免听凭证"]` `["Reach the highest overall and subject grades, then apply to Leighton. You also need 10 affection or successful blackmail. After school approval, obtain Bailey’s signature and return the form.", "总成绩与四科都达到最高档，再找礼顿申请。还需好感达到10或成功勒索。学校审核后取得贝利签字，再交回表格。"]`>>
       <<lanSwitch 'School role:' '校园身份：'>>
       <<switch $LifeSimulation.school.role>>
         <<case 'president'>><span class='gold'><<lanSwitch 'Student president' '学生会长'>></span>
@@ -190,7 +203,7 @@
       <<lanSwitch "Farm supply contracts fulfilled: " "已履行的农场供货合同：">><span class='teal'><<= $Orchard.contracts_completed ?? 0>></span><br>
       <<lanSwitch "Regular-customer sales: " "熟客成交次数：">><span class='teal'><<= $Orchard.regular_visits ?? 0>></span><br>
       <<if $Orchard.winery?.installed>>
-        <<deadwood-reblooms-progress-check `maplebirch.get('Orchard').winery.skilled` `["Cellar Hand", "酿酒熟手"]` `["Bottle 80 bottles of fruit wine and supply 24 bottles to Robin’s drinks shop. Hand bottling then takes 10 minutes per batch.", "装瓶80瓶果酒，并向罗宾饮品店供应24瓶；此后手工装瓶每批只需10分钟。"]`>>
+        <<deadwood-reblooms-progress-check `maplebirch.get('Orchard').winery.skilled` `["Cellar Hand", "酿酒熟手"]` `["Bottle 80 bottles of fruit wine and supply 24 bottles to Robin’s drinks shop. Hand bottling then takes 10 minutes per batch.", "装瓶80瓶果酒，并向罗宾饮品店供应24瓶。此后手工装瓶每批只需10分钟。"]`>>
         <<lanSwitch 'Wine bottled: ' '已装瓶果酒：'>><span class='teal'><<= $Orchard.winery.produced>></span><br>
         <<lanSwitch 'Wine sold wholesale / supplied to Robin: ' '批发／供应罗宾的果酒：'>><span class='teal'><<= $Orchard.winery.sold>> / <<= $Orchard.winery.supplied>></span><br>
         <<lanSwitch 'Wine sales income: ' '累计果酒销售收入：'>><span class='gold'><<= formatMoney($Orchard.winery.income)>></span><br>
@@ -212,9 +225,9 @@
     <<if _casinoStats.rounds or _casinoStats.exchanged or $LifeSimulation.casino.shifts or $LifeSimulation.casino.cheating_caught>>
       <<foldout false "_deadwoodCasinoFoldout">>
         <span class='gold'><<lanSwitch "Casino records" "赌馆记录">></span>
-        <<deadwood-reblooms-progress-check `(_casinoStats.rounds ?? 0) > 0` `["Finish a casino game", "结算一局赌馆游戏"]` `["Finish a hand, spin or dice round. Buying chips alone does not count.", "完成一局牌局、转轮或骰宝；只兑换筹码不算。"]`>>
+        <<deadwood-reblooms-progress-check `(_casinoStats.rounds ?? 0) > 0` `["Finish a casino game", "结算一局赌馆游戏"]` `["Finish a hand, spin or dice round. Buying chips alone does not count.", "完成一局牌局、转轮或骰宝。只兑换筹码不算。"]`>>
         <<if $LifeSimulation.casino.shifts>>
-          <<deadwood-reblooms-progress-check `$LifeSimulation.casino.trained and $LifeSimulation.casino.good_shifts gte 10` `["Practised Dealer", "熟练荷官"]` `["Complete training and correctly handle ten table disputes. Later regular shifts add 1 less tiredness.", "完成培训，并正确处理十次牌桌争议；此后的正式班次少增加1点疲劳。"]`>>
+          <<deadwood-reblooms-progress-check `$LifeSimulation.casino.trained and $LifeSimulation.casino.good_shifts gte 10` `["Practised Dealer", "熟练荷官"]` `["Complete training and correctly handle ten table disputes. Later regular shifts add 1 less tiredness.", "完成培训，并正确处理十次牌桌争议。此后的正式班次少增加1点疲劳。"]`>>
           <<lanSwitch 'Work shifts completed / successful shifts: ' '已完成班次／表现良好的班次：'>><span class='teal'><<= $LifeSimulation.casino.shifts>> / <<= $LifeSimulation.casino.good_shifts ?? 0>></span><br>
         <</if>>
         <<if $LifeSimulation.casino.cheating_caught>>
@@ -365,7 +378,7 @@
   <</for>><br>
 <</widget>>
 
-<!-- 各模块与属性突破共用圈／勾样式；条件由调用处传入，不增加存档标记。 -->
+<!-- 各模块与属性突破共用圈／勾样式。条件由调用处传入，不增加存档标记。 -->
 <<widget 'deadwood-reblooms-progress-check'>>
   <<if _args[0]>><span class='green'>✓ <<lanSwitch _args[1]>></span>
   <<else>><span class='red'>○ <<lanSwitch _args[1]>></span><</if>><br>

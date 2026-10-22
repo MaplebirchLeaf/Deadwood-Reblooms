@@ -1,5 +1,22 @@
 :: Deadwood Reblooms Company Avery Widgets [widget]
 
+<<widget 'deadwood-avery-guest-housekeeping'>>
+  <<language>>
+    <<option 'EN'>>
+      You tell Avery that you dislike the household expectations that came with the invitation. <<He>> raises an eyebrow.
+      <br><br>
+      "My, my. Is it so bad to have work to do?" <<he>> asks. "You accepted the invitation. I did explain that I expect a little help around the house." <<He>> sets down <<his>> glass. "Our business arrangements haven't changed."
+      <br><br>
+      "Speaking of Bailey, what was it like living with your old caretaker?"
+    <<option 'CN'>>
+      你告诉艾弗里，你不喜欢邀请附带的那些家务要求。<<He>>挑了挑眉。
+      <br><br>
+      “哎呀，有点事做就这么糟吗？”<<he>>问。“邀请是你接受的。我也说过，希望你帮着照料一下屋子。”<<He>>放下杯子。“生意上的安排照旧。”
+      <br><br>
+      “说到贝利，你以前和那位监护人住在一起，过得怎么样？”
+  <</language>>
+<</widget>>
+
 <<widget 'deadwood-avery-controller-access'>>
   <<if !$replayScene and !$statFreeze and $avery_mansion and maplebirch.get('Finance')?.company.shareholders.controller>>
     <<set $avery_mansion.study_secret to Math.max($avery_mansion.study_secret ?? 0, 2)>>
@@ -198,6 +215,51 @@
 <</if>>
 <<deadwood-ascension-preparation-link>>
 <<deadwood-ascension-audience-link>>
+<<if _avery_business.canEnter>>
+  <<socialiseicon 'ask'>><<lanLink ['Ask about visiting the mansion', '询问拜访庄园的事'] 'Deadwood Reblooms Company Avery Mansion'>><</lanLink>><br>
+<</if>>
+<<deadwood-shareholder-return>>
+
+:: Deadwood Reblooms Company Avery Mansion
+<<deadwood-avery-header>>
+<<if !_shareholder_access or !_avery_business.canEnter>><<deadwood-shareholder-return>><<exit>><</if>>
+<<npc Avery>><<person1>>
+<<language>>
+  <<option 'EN'>>
+    "You could visit the house," Avery says. "We entertain there on Sundays. You ought to meet the people you do business with."
+    <<He>> writes the address on a card, then places a key beside it.
+    <br><br>
+    You make it clear that this has nothing to do with Bailey's papers. Avery looks at you for a moment. "An invitation. Nothing more. Your arrangements with Bailey remain yours."
+    <br><br>
+    "There's room if you wish to stay. Suitable clothes, too." <<He>> taps the key. "The house has its rules. Help keep it presentable, and have dinner ready when I return. A hamburger to start with. There are cookbooks in the study, if you need them."
+    <br><br>
+    <span class='blue'>This opens the mansion and its usual activities without adoption. Avery will not take over your payments to Bailey.</span>
+  <<option 'CN'>>
+    “可以来家里坐坐，”艾弗里说。“周日我们会在那里招待客人。你也该见见和你做生意的人。”
+    <<He>>在卡片上写下地址，又在旁边放了一把钥匙。
+    <br><br>
+    你说明，这与贝利手里的文件无关。艾弗里看了你一会。“只是邀请。你和贝利之间的安排，仍由你自己处理。”
+    <br><br>
+    “想住下的话，有地方，也有合适的衣服。”<<He>>点了点钥匙。“不过，家里有家里的规矩。帮着保持整洁，晚饭也要在我回来前准备好。先做个汉堡吧。需要食谱的话，书房里有烹饪书。”
+    <br><br>
+    <span class='blue'>接受后将开放庄园及其日常活动，不会被收养。艾弗里不会代付你交给贝利的钱。</span>
+<</language>><br><br>
+<<getouticon>><<lanLink ['Accept and visit the mansion (0:30)', '接受邀请，前往庄园 (0:30)']>>
+  <<if maplebirch.get('Finance').company.avery.canEnter>>
+    <<avery_mansion_init>>
+    <<set $Finance.company.avery.mansion_guest to true>>
+    /* 沿用原版首次参观的食谱与书房钥匙处理，不直接教会食谱。 */
+    <<if !$foodstuff.hamburger.knows_recipe or !$foodstuff.bread.knows_recipe>>
+      <<set $avery_mansion.study_unlocked to 1>><<set $daily.averyIntroRecipe to true>>
+      <<if !$foodstuff.hamburger.knows_recipe>><<set $avery_mansion.recipe.pushUnique('hamburger')>><</if>>
+      <<if !$foodstuff.bread.knows_recipe>><<set $avery_mansion.recipe.pushUnique('bread')>><</if>>
+    <</if>>
+    <<pass 30>>
+    <<goto 'Mansion Enter'>>
+  <<else>>
+    <<goto 'Deadwood Reblooms Company Avery'>>
+  <</if>>
+<</lanLink>><br>
 <<deadwood-shareholder-return>>
 
 :: Deadwood Reblooms Company Avery Talk

@@ -185,10 +185,35 @@
   <<if $_transport_state.notice>><br><br><</if>>
 <</widget>>
 
+<<widget 'deadwood-transport-school-next'>>
+  <<set _school_next to _school.nextStep>>
+  <<if _school_next>>
+    <span class='blue'><<lanSwitch `_school.record.licensed ? 'Optional: ' : 'Next step: '` `_school.record.licensed ? '可选：' : '下一步：'`>></span>
+    <<switch _school_next>>
+      <<case 'cbt'>>
+        <<lanSwitch 'Complete basic motorcycle training. It takes six hours and starts between 09:00 and 11:00.' '完成摩托车基础培训。课程需六小时，09:00至11:00之间开始。'>>
+      <<case 'study'>>
+        <<lanSwitch 'Continue studying road rules, then take the theory test.' '继续学习交规，再参加理论考试。'>>
+      <<case 'theory'>>
+        <<lanSwitch 'Take the theory test. Revision is complete.' '参加理论考试。理论复习已经完成。'>>
+      <<case 'lesson'>>
+        <<lanSwitch `_school.record.licensed ? 'Take an advanced driving lesson.' : 'Take a supervised driving lesson to build practical preparation and driving skill.'` `_school.record.licensed ? '参加进阶驾驶练习。' : '上实操课，提高本类实操熟练度和驾驶技能。'`>>
+      <<case 'module_1'>>
+        <<lanSwitch 'Take the motorcycle off-road test before booking the road test.' '先参加摩托车场地考试，通过后再预约道路考试。'>>
+      <<case 'test'>>
+        <<lanSwitch 'Take the road test. Allow fifty minutes, including observations.' '参加道路考试。请预留五十分钟，包含观察路况的时间。'>>
+    <</switch>><br>
+    <<if !_school.canBook(_school_next)>>
+      <<deadwood-transport-school-blocked _school.fees[_school_next] _school_next>><br>
+    <</if>><br>
+  <</if>>
+<</widget>>
+
 <<widget 'deadwood-transport-school-blocked'>>
   <<set _fee to _args.length gt 0 ? _args[0] : 0>>
   <<set _school to maplebirch.get('Transport').school, _transport to maplebirch.get('Transport')>>
   <<set _record to _school.record, _state to $Transport.school>>
+  <<set _school_activity to _args[1] ?? _school.nextStep>>
   <<if Time.days lt _state.penalty_until>>
     <span class='purple'><<lanSwitch 'The receptionist taps the note beside your name. “Come back in ' '前台敲了敲你名字旁的备注。“再过 '>><<print _state.penalty_until - Time.days>><<lanSwitch ' days.”' ' 天再来。”'>></span>
   <<elseif Time.hour gte 17>>
@@ -203,22 +228,25 @@
     <span class='purple'><<lanSwitch 'The instructor watches you for a moment. “You are still under the effects of something. We will wait until that has worn off.”' '教练打量了你片刻。“药效还没退吧。等恢复清醒，再来上课。”'>></span>
   <<elseif !_transport.ready>>
     <span class='purple'><<lanSwitch 'The receptionist looks you over. “We cannot book a lesson while you are in this condition.”' '前台把你从头到脚看了一遍。“你现在这个状况，没法安排课程。”'>></span>
-  <<elseif _fee and !_transport.canPay(_fee)>>
-    <span class='purple'><<lanSwitch 'You can\u0027t afford it. The fee is ' '你付不起。费用是 '>><<printmoney _fee>><<lanSwitch '.' '。'>></span>
-  <<elseif !_school.practicalWeather>>
-    <span class='purple'><<lanSwitch 'Rain and snow keep the vehicles in. The classroom stays open.' '雨雪天车辆不外借。教室照常开放。'>></span>
-  <<elseif !_record.theory and _record.study gte 3 and Time.hour gte 16>>
-    <span class='purple'><<lanSwitch 'The theory test runs ninety minutes. The last sitting has gone.' '理论考试要九十分钟。今天最后一场已经开过了。'>></span>
-  <<elseif _state.category is 'motorcycle' and !_state.motorcycle.cbt_completed and Time.hour gte 12>>
-    <span class='purple'><<lanSwitch 'Basic training takes the whole day. It only starts in the morning.' '基础培训要一整天。只在上午开始。'>></span>
-  <<elseif !_record.theory and _record.study gte 3>>
-    <span class='purple'><<lanSwitch 'You have read everything the classroom offers. The theory test is next.' '教室里的东西你已经读完了。接下来是理论考试。'>></span>
-  <<elseif _record.theory and (_record.practice lt 200 or $Transport.driving lt 300)>>
-    <span class='purple'><<lanSwitch 'The instructor looks at your hours. “Not yet.”' '教练看了看你的课时。“还不够。”'>></span>
-  <<elseif _state.category is 'motorcycle' and _record.theory and !_state.motorcycle.module_1>>
-    <span class='purple'><<lanSwitch 'The yard comes before the road. Take the off-road test first.' '上路之前先进场地。先考场地。'>></span>
-  <<elseif _record.retest_day gt Time.days>>
+  <<elseif ['lesson', 'cbt', 'module_1', 'test'].includes(_school_activity) and !_school.practicalWeather>>
+    <span class='purple'>
+      <<if Weather.isSnow or Weather.precipitation is 'snow'>>
+        <<lanSwitch 'Snow or snow-covered roads have stopped driving lessons and practical tests. Return when the roads are clear.' '下雪或路面积雪，驾驶练习与实操考试暂停。等道路恢复后再来。'>>
+      <<else>>
+        <<lanSwitch 'Heavy rain has stopped driving lessons and practical tests. Return when the rain eases.' '雨势过大，驾驶练习与实操考试暂停。等雨势减弱后再来。'>>
+      <</if>>
+      <<if _record.theory>> <<lanSwitch 'Your theory pass is still valid; you do not need to take it again.' '理论成绩仍然有效，不需要重新考试。'>><</if>>
+    </span>
+  <<elseif _school_activity is 'theory' and _record.theory_retest_day gt Time.days>>
+    <span class='purple'><<lanSwitch 'The next theory test can be booked in ' '理论补考还需等 '>><<print _record.theory_retest_day - Time.days>><<lanSwitch ' days.' ' 天。'>></span>
+  <<elseif ['module_1', 'test'].includes(_school_activity) and _record.retest_day gt Time.days>>
     <span class='purple'><<lanSwitch 'The receptionist turns a page in the booking diary. “' '前台翻过预约簿的一页。“'>><<print _record.retest_day - Time.days>><<lanSwitch ' days.”' ' 天。”'>></span>
+  <<elseif ['theory', 'module_1', 'test'].includes(_school_activity) and _state.test_day is Time.days>>
+    <span class='purple'><<lanSwitch 'You have already taken an exam today. Book the next stage on another working day; you can still take lessons today if time permits.' '今天已经参加过考试。下一场需改在其他营业日预约；时间足够时，今天仍可上实操课。'>></span>
+  <<elseif _school_activity and !_school.canFinish(_school_activity)>>
+    <span class='purple'><<lanSwitch 'There is not enough time before the 17:00 closing. This booking needs ' '距离17:00关门已没有足够时间。这项预约需要 '>><<print _school.minutes[_school_activity]>><<lanSwitch ' minutes. Come earlier on a working day.' ' 分钟，请在营业日早点来。'>></span>
+  <<elseif _fee and !_transport.canPay(_fee)>>
+    <span class='purple'><<lanSwitch 'You can\u0027t afford this booking. The fee is ' '你付不起这项预约。费用是 '>><<printmoney _fee>><<lanSwitch '.' '。'>></span>
   <<else>>
     <span class='purple'><<lanSwitch 'The receptionist has nothing to book for you today.' '前台今天没有可以给你安排的东西。'>></span>
   <</if>>

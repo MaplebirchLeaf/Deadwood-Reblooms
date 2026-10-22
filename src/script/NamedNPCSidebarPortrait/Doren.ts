@@ -2,7 +2,7 @@
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
-import { Clothing } from './Clothing';
+import Clothing from '../../assets/npc-sidebar-portrait/clothing.json';
 import trainers from './Common/Trainers';
 
 export default function (maplebirch: MaplebirchCore, colours: { outfit: Map<string, string> }): void {

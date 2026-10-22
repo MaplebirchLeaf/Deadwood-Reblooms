@@ -241,7 +241,7 @@ class Robin extends Module implements RobinFacade {
     this.shop.settle();
     // 酒柜营业款已计入本周收入，这里只扣实际售出库存，不能再入账一次。
     this.core.get('Orchard')?.winery.settleShop();
-    // 营业增收留在储备金，避免原版每周赠钱把开店积蓄一并送出；有房租要付时再转入现金。
+    // 营业增收留在储备金，避免原版每周赠钱把开店积蓄一并送出。有房租要付时再转入现金。
     state.reserve += Math.max(0, state.weekly_income - vanillaIncome);
     if (V.robinpaid !== 1 || state.self_rent) {
       const reserveTransfer = Math.clamp(robinRent - V.robinmoney, 0, state.reserve);

@@ -2,7 +2,7 @@
 
 export default function Cheats(core: typeof maplebirch): void {
   core.tool.addTo('Cheats', 'deadwood-reblooms-cheats');
-  // 关闭原版增强后，旧存档仍可能保留尺寸 7；控件必须能显示现有值。
+  // 关闭原版增强后，旧存档仍可能保留尺寸 7。控件必须能显示现有值。
   core.tool.inject({
     widgetPassage: {
       Cheats: [

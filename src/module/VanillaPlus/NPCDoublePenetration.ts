@@ -92,6 +92,7 @@ class NPCDoublePenetration {
   public canJoinPlayer(index: number, orifice: NPCDoubleOrifice): boolean {
     const target = Number(index);
     const npc = V.NPCList?.[target];
+    if (!(orifice === 'vagina' ? V.settings.vaginalDoubleEnabled : V.settings.analEnabled && V.settings.analDoubleEnabled) || window.playerChastity(orifice)) return false;
     if (!Number.isInteger(target) || !npc || !this.validNPC(target) || npc.penis !== 0 || (npc.penissize <= 0 && !this.hasStrapon(target))) return false;
     if (orifice === 'vagina') {
       const primary = V.NPCList?.[V.vaginatarget];
@@ -108,6 +109,7 @@ class NPCDoublePenetration {
     const npc = V.NPCList[target];
     npc.location ??= {};
     npc.location.genitals = 'genitals';
+    if (V.enemytype === 'beast') npc.stance = 'top';
     // 原版开始双插时会先释放正在占用对应穴位的手，避免部位同时保留两种动作。
     if (V.leftarm === orifice) V.leftarm = 0;
     if (V.rightarm === orifice) V.rightarm = 0;

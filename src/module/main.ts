@@ -30,6 +30,7 @@ import StreetLife from './StreetLife';
   maplebirch.define('IncantationCheatCollection', new IncantationCheatCollection(maplebirch), ['DeadwoodReblooms']);
   maplebirch.define('CelestialAnomalies', new CelestialAnomalies(maplebirch), ['DeadwoodReblooms', 'var']);
   maplebirch.define('MoreTransformations', new MoreTransformations(maplebirch), ['DeadwoodReblooms', 'var', 'char', 'npc']);
+  maplebirch.define('NPCTransformations', {}, ['DeadwoodReblooms', 'npc']);
   maplebirch.define('NPCSidebarPortrait', new NPCSidebarPortrait(maplebirch), ['DeadwoodReblooms', 'npc']);
   maplebirch.define('Finance', new Finance(maplebirch), ['DeadwoodReblooms', 'var', 'char', 'npc']);
   maplebirch.define('VanillaPlus', new VanillaPlus(maplebirch), ['DeadwoodReblooms', 'var', 'char', 'npc']);

@@ -22,6 +22,14 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.tool.inject({
     widgetPassage: {
+      Traits: [
+        // 只扩充原版恶魔的说明，称号与解锁判断仍由原版及兼容层处理。
+        {
+          srcmatch: /(has: \$demon gte 6,\s*text: )[^\r\n]+/,
+          to: '$1maplebirch.t("deadwood-reblooms:VanillaPlus:divineTransformations:trait:demon:text"),',
+          expected: 1
+        }
+      ],
       'Widgets Combat Tentacle Adv': [
         // 沿用原版放逐的命中、双手与满纯洁倍率，只把每层固定伤害扩展为固定值加初始生命百分比。
         {
@@ -37,16 +45,6 @@ export default function (maplebirch: typeof window.maplebirch) {
       ]
     }
   });
-
-  const crossdressing = () => window.isCrossdressing?.() === true;
-  const demonName = () => {
-    const masculine = V.player?.gender_appearance === 'm';
-    const markedSex = (masculine && V.player?.sex === 'f') || (!masculine && V.player?.sex === 'm');
-    const crossdressed = markedSex && crossdressing();
-    const englishName = `${masculine ? 'Incubus' : 'Succubus'}${crossdressed ? ` (${V.player.sex === 'f' ? 'female' : 'male'})` : ''}`;
-    const chineseName = `${masculine ? '魅影' : '魅魔'}${crossdressed ? (masculine ? '(♀)' : '(♂)') : ''}`;
-    return lanSwitch(englishName, chineseName);
-  };
 
   // 复用原版特质名称覆盖其说明，使新增效果与对应转化显示在同一项中。
   maplebirch.tool.patch.traits.add(
@@ -70,13 +68,6 @@ export default function (maplebirch: typeof window.maplebirch) {
       colour: 'silver',
       has: () => maplebirch.get('VanillaPlus')!.divineTransformations.fallenAngel,
       text: () => text('trait:ironWill:text')
-    },
-    {
-      title: 'General Traits',
-      name: demonName,
-      colour: 'red',
-      has: () => maplebirch.get('VanillaPlus')!.divineTransformations.demon,
-      text: () => text('trait:demon:text')
     }
   );
 }

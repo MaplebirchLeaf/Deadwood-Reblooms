@@ -134,6 +134,16 @@ Named contributions earn **5 kindness per accumulated <span class="gold">£1,000
 
 After signing and following up, the four institutions take turns sending routine purchase enquiries to suitable factories. The orphanage and temple buy crates; the school and hospital buy shelving and lockers. At most one enquiry is issued across your factories each week, giving each institution a turn in a four-week cycle. Materials, wages, production, late delivery and invoices follow the existing factory accounts. Actual delivery earns **15 business fame**, with at least 28 days between awards from the same institution. Every **400 business fame** improves ordinary quote quality and reduces default risk, up to five tiers.
 
+### Avery's adoption
+
+**Discuss adoption** in Bailey's office lets you state your wishes in advance. Its appearance does not mean Avery has made an offer. Reading or leaving does not refuse adoption. After signing a refusal, you can return to withdraw it.
+
+Buying out your own contract also blocks Avery from acquiring custody through Bailey. Withdrawing a refusal does not undo that buyout. Buying out only Robin's contract does not block your adoption storyline.
+
+Neither refusal nor buying out your contract blocks the separate **director or controlling shareholder mansion invitation** described in [Business and governance](#deadwood-guide-FinanceBusiness). That route opens the mansion without adoption or Avery paying your rent.
+
+The vanilla invitation also requires progress through Avery's or Landry's artefact storyline, Avery still active, no existing mansion storyline, and a visit to the orphanage outside nighttime. You need at least **50 affection**, **400 housekeeping**, **6 known recipes**, and **6 completed dates**, plus an adoption score of **130**. The score is **housekeeping ÷ 20 + affection ÷ 2 + recipes × 2 + dates × 3**. Meeting only the four minimums gives **75**.
+
 ### Property achievement steps
 
 | Achievement      | Required action                                                                                          | What does not count                                                    |

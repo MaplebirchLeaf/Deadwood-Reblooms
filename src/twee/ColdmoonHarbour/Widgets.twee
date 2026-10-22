@@ -9,10 +9,11 @@
 <<widget 'deadwood-harbour-attack'>>
   <<set $_ghostHand to _args[0], $_ghostTarget to Number(maplebirch.SugarCube.State.variables[_args[0] + 'target'])>>
   <<set $_ghost to $NPCList[$_ghostTarget]>>
-  <<if !$MoreTransformations.harbour.fighting or !Time.isBloodMoon() or $combat isnot 1 or $enemytype isnot 'man' or $enemyhealth lte 0
+  <<set $_ghostEncounter to ($_ghost?.per is 'deadwood_harbour_ghost' and $MoreTransformations?.harbour?.fighting and Time.isBloodMoon()) or ($_ghost?.per is 'deadwood_ship_undead' and $MoreTransformations?.harbour?.raid?.stage is 'fight' and $location is 'pirate_ship' and Weather.dayState is 'night') or ($_ghost?.per is 'deadwood_coin_guard' and $MoreTransformations?.treasure?.guardian is 'fight' and $location is 'island')>>
+  <<if !$_ghostEncounter or !maplebirch.get('MoreTransformations') or $replayScene or $statFreeze or $frozenValues or $possessed or $nextPassage or $nextPassageCheck or $combat isnot 1 or $enemytype isnot 'man' or $enemyhealth lte 0
     or $consensual isnot 0 or maplebirch.SugarCube.State.variables[$_ghostHand + 'arm'] isnot 0 or $position is 'stalk'
     or $orgasmdown gt 0 or $dissociation gte 2 or $trance gt 0 or $panicparalysis gt 0 or $panicviolence gt 0 or ($pain gte 100 and $willpowerpain is 0)
-    or $_ghost?.per isnot 'deadwood_harbour_ghost' or $_ghost.active isnot 'active' or $_ghost.stance is 'defeated' or ($enemyno gte 2 and $_ghost.health lte 0)>><<exit>><</if>>
+    or $_ghost.active isnot 'active' or $_ghost.stance is 'defeated' or ($enemyno gte 2 and $_ghost.health lte 0)>><<exit>><</if>>
   <<set $_ghostMaximum to $enemyno gte 2 ? $_ghost.healthmax : $enemyhealthmax>>
   <<if _args[1] is 'banish'>>
     <<if $angel lt 4 or $angelBanish lte 0 or $banishDisable>><<exit>><</if>>
@@ -21,9 +22,9 @@
     <<set $speechbanish to 1>>
     <<language>>
       <<option 'EN'>>
-        You trace a sign in the air. Light breaks across the pirate’s sodden coat, forcing the pale figure back.
+        You trace a sacred ward in the air. Brilliant dawn-like radiance pierces the pirate’s sodden coat, forcing the hissing corpse to reel backward with charred, smoking skin.
       <<option 'CN'>>
-        你在空中划出手势。光芒穿过海盗湿透的外套，苍白的身影被逼得连连后退。
+        你在空中划出神圣的驱邪印记。破晓般的圣光如利剑般洞穿海盗湿透发黑的外套，逼得那具散发着腐腥的惨白死尸发出尖厉的嘶鸣，连连后退。
     <</language>>
   <<else>>
     <<set $_ghostWeapon to maplebirch.get('LifeSimulation')?.weapons.weapon>>
@@ -36,9 +37,9 @@
     <<tiredness 1>><<prof $_ghostWeapon 0.2>><<gtiredness>>
     <<language>>
       <<option 'EN'>>
-        <<if $_ghostWeapon is 'whip'>>You lash the pirate with your whip.<<else>>You swing your baton into the pirate’s side.<</if>> The blow catches, despite the pale skin. The figure stumbles back.
+        <<if $_ghostWeapon is 'whip'>>You crack your whip through the red mist, the lash biting hard across the pirate’s face.<<else>>You drive your baton violently into the pirate’s sodden ribs.<</if>> The heavy impact rings against the corpse’s rigid frame, staggering the pale figure backward across the slick timber.
       <<option 'CN'>>
-        <<if $_ghostWeapon is 'whip'>>你挥鞭抽向海盗。<<else>>你挥动短棍，砸向海盗身侧。<</if>>武器打中了那具苍白的身体，逼得对方踉跄着后退。
+        <<if $_ghostWeapon is 'whip'>>你猛然甩动皮鞭，鞭梢带着破空声凌厉地抽上海盗的面门。<<else>>你双手握紧短棍，借着腰力狠狠砸上海盗的腰肋。<</if>>沉闷的撞击声在死尸僵硬的躯体上回荡，硬生生逼得那道死冷的身影踉跄着退后半步。
     <</language>>
   <</if>>
   <<set _thedamage to Math.min($_ghostDamage, $enemyno gte 2 ? $_ghost.health : $enemyhealth)>>
@@ -87,16 +88,16 @@
     <<case 'cargo'>>
       <<language>>
         <<option 'EN'>>
-          A rope catches around your wrist. You follow it beneath the wreck and find a small chest, its lid bound with the red cord Zephyr described. You work it free of the weed. The wet wood is bitterly cold. Keeping hold of the rope, you guide it towards the steps, ready to bring it to the surface.
+          A coarse rope brushes against your wrist beneath the surface. Tracing the line into the shadowed ribs of the sunken wreck, your fingers find a small chest half-buried in silt, its lid secured by the distinct crimson cord Zephyr described. Tearing through the foul, clinging weed, you find the saturated wood bitterly freezing to the touch. Clenching the rope firmly, you guide the prize toward the stone steps, ready to haul it clear of the brine.
         <<option 'CN'>>
-          一根绳子缠上你的手腕。你顺着它摸到残骸底下，找到一只小箱子，箱盖上扎着泽菲尔说过的红绳。你扯开缠住它的水草，湿木头冷得刺手。你攥住绳子，将箱子牵向石阶，准备带回水面。
+          一根粗糙的绳索擦过你的手腕。你顺着缆绳探入沉船残骸阴暗的肋骨下方，果然摸到了一只被海泥半掩的小箱子，箱盖上紧紧缠扎着泽菲尔所说的猩红绳结。你奋力扯开纠缠不休的黑腐海藻，浸泡多年的湿木冰冷刺骨。你牢牢抓紧提绳，稳稳地牵引着它游向港湾石阶，准备将其带上水面。
       <</language>>
     <<case 'dawn'>>
       <<language>>
         <<option 'EN'>>
-          The fog thins. Between one wave and the next, the ship is gone. Wet footprints end at the edge of the pier; what you recovered remains with you.
+          The first pale light of dawn cuts through the bloody fog. Between one crashing swell and the next, the colossal derelict dissolves into thin air like a waking nightmare. Only trails of brine-slick footprints ending abruptly at the pier's edge prove they were ever here; whatever you managed to salvage remains securely in your hands.
         <<option 'CN'>>
-          海雾散开。两阵浪涛之间，那艘船不见了。湿脚印断在码头边缘，你带回的东西仍在身上。
+          破晓的第一缕天光刺破海面上的血雾。就在两阵浪涛翻涌的刹那，那艘巍峨可怖的黑色古船竟如同幻影般凭空消散无踪。只有栈桥木板上一串串散发着海腥味的湿脚印突兀地断在码头边缘；你所打捞的一切依然沉甸甸地带在身上。
       <</language>>
     <<case 'relic'>>
       <<language>>
@@ -145,30 +146,30 @@
     <<case 'evaded'>>
       <<language>>
         <<option 'EN'>>
-          You crouch behind a stack of damp nets, holding your breath. Heavy footsteps pass by and fade into the distance. Once the quay is quiet again, you slip back toward the lamplight.
+          You flatten yourself behind a pile of damp, foul-smelling fishing nets, holding your breath until your lungs ache. Heavy, waterlogged footsteps squelch past just inches from your hiding spot before fading into the gloom. Only when the pier falls utterly silent again do you slip through the shadows back toward the safety of the lanterns.
         <<option 'CN'>>
-          你伏在一摞湿漉漉的渔网后，屏住呼吸。沉重的脚步声从旁经过，渐渐远去。等周围重新安静下来，你悄悄退回码头有灯光的地方。
+          你死死伏在一摞湿透发潮的腥臭渔网背后，屏息凝神，甚至不敢发出半点声响。沉重濡湿的靴踏声擦着你的藏身之处缓缓走过，最终在黑暗中渐行渐远。等到整座码头重新回归死寂，你才悄然贴着阴影退回灯火掩映的安全之处。
       <</language>>
     <<case 'escaped'>>
       <<language>>
         <<option 'EN'>>
-          You race between the bollards, pulling ahead. The footsteps behind you gradually slow, stopping at the edge of the fog.
+          You weave frantically between rusted mooring posts, pushing for every ounce of speed across the slick stones. The wet, rhythmic thumping of footsteps behind you gradually falls away, halting at last with a low, thwarted groan at the border of the swirling fog.
         <<option 'CN'>>
-          你绕过系船柱疾步飞奔，拉开距离。背后的脚步声渐渐慢了下来，最终停在浓雾边缘。
+          你绕过生锈的系船铁桩狂奔疾突，在湿滑的石板上拼命拉开距离。身后那杂乱急促的湿靴踩踏声终于逐渐迟滞，在一阵不甘的冰冷低吼中，停驻在翻滚浓雾的边缘。
       <</language>>
     <<case 'won'>>
       <<language>>
         <<option 'EN'>>
-          The cold figure steps back and loosens its grip, fading quietly into the fog. You catch your breath and find your footing on the wet planks.
+          Battered by your resistance, the pale corpse staggers back, its frozen fingers finally uncoiling. Without a word, it dissolves back into the swirling crimson mist. You catch your breath on the slick planks, steadying your shaking legs as quiet returns to the quay.
         <<option 'CN'>>
-          那道冰冷的身影退后半步，松开手，悄无声息地隐回雾中。你大口喘着气，在湿木板上重新站稳。
+          那道惨白僵硬的身影受到重创，颓然倒退数步，冰冷的手指不甘地松开，随后无声无息地融化回冰冷的夜雾中。你在黏湿的栈桥木板上喘息着重新站稳身子，惊魂初定。
       <</language>>
     <<case 'released'>>
       <<language>>
         <<option 'EN'>>
-          At last, the cold hands release you. You stagger clear of the fog and catch your breath beside the harbour steps.
+          At last, the suffocating grip of those icy, dead hands tears away beneath your desperate struggles. You stagger blindly out of the crimson fog and collapse onto the stone harbour steps, gasping for air as your heart hammers in your chest.
         <<option 'CN'>>
-          那些冰冷的手终于松开了你。你踉跄着走出迷雾，在港湾石阶旁惊魂未定地喘着气。
+          纠缠在身上的那些冰冷死手终于在你拼死的挣扎下彻底松开。你跌跌撞撞地冲出浓重的血雾范围，瘫倒在港湾石阶旁大口大口地喘息着，心脏狂跳不止。
       <</language>>
   <</switch>>
   <<if _harbour.scene>><br><br><</if>>
@@ -182,29 +183,29 @@
     <</if>>
     <<if $MoreTransformations.harbour.ship>><<language>>
       <<option 'EN'>>
-        A ghost ship comes ashore in the blood moon fog. Pale figures plunder the quay and retreat with the mist at dawn.
+        A spectral black ship makes port in the blood moon fog; pale, drowned pirates plunder the abandoned quay, retreating into the ocean abyss before dawn breaks the mist.
       <<option 'CN'>>
-        血月的海雾里有幽灵船靠岸，苍白的身影在码头搜寻劫掠，天亮时随雾退去。
+        血月的海雾里有一艘漆黑诡谲的鬼船靠岸，惨白浮肿的死灵海盗在废弃码头上劫掠搜刮，待到破晓天光初显时随雾退回深渊。
     <</language>><</if>>
-    <<if $MoreTransformations.harbour.voice>><br><<lanSwitch 'You heard low voices calling from the dark water beneath the pier.' '你听见码头下的深水里有人低声呼唤。'>><</if>>
+    <<if $MoreTransformations.harbour.voice>><br><<lanSwitch 'You heard low, eerie voices calling from the black depths beneath the pier.' '你听见码头下的深水里有死灵在幽幽呼唤。'>><</if>>
     <<if $MoreTransformations.harbour.spoke>><br><<language>>
       <<option 'EN'>>
-        A pirate said the crew comes ashore with the blood moon fog, pulled back to the deep before dawn breaks the mist.
+        A lucid pirate revealed they drift ashore with the blood moon fog to plunder; once dawn cuts the mist, the ancient sea-curse drags them back into the crushing deep.
       <<option 'CN'>>
-        一名海盗提到，他们随血雾靠岸劫掠，待到破晓雾散，潮水便会把他们带回深处。
+        一名尚存理智的死灵海盗透露，他们随血雾靠岸搜刮战利品；待到破晓雾散，深海的古老诅咒便会把他们强行拖回万丈深渊。
     <</language>><</if>>
     <<if $MoreTransformations.harbour.exchanged>><br><<language>>
       <<option 'EN'>>
-        You traded a recovered keepsake for coins from the plunder.
+        You traded a recovered keepsake for ancient coins from the ghost ship's plunder.
       <<option 'CN'>>
-        你用打捞出的旧物，换来了海盗搜寻来的钱币。
+        你用打捞出的旧物，换来了死灵海盗搜寻来的旧铸硬币。
     <</language>><</if>>
     <<if $MoreTransformations.harbour.zephyr.stage gt 0>><br>
       <<switch $MoreTransformations.harbour.zephyr.stage>>
-        <<case 1>><<lanSwitch 'Zephyr offered to pay for a chest taken by the raiders.' '泽菲尔愿意出钱找回被海盗劫走的箱子。'>>
-        <<case 2>><<lanSwitch 'Look beneath the harbour steps during the blood moon for a chest bound with red cord.' '血月夜，到港湾石阶下寻找扎着红绳的小箱子。'>>
-        <<case 3>><<lanSwitch 'You recovered the chest. Bring it to Zephyr at the smuggler’s pub or aboard ship.' '箱子已经找回。到走私者酒吧或海盗船上找泽菲尔交付。'>>
-        <<case 4>><<lanSwitch 'Zephyr paid for the recovered cargo.' '泽菲尔已付清找回货物的报酬。'>>
+        <<case 1>><<lanSwitch 'Zephyr offered a handsome bounty to recover a sealed chest stolen by the undead raiders.' '泽菲尔开出悬赏，让你找回被死灵劫掠者顺走的密封小箱。'>>
+        <<case 2>><<lanSwitch 'Dive beneath the harbour steps at Coldmoon Harbour during the blood moon to find the chest bound with red cord.' '血月之夜，潜入寒月港湾的石阶水下，搜寻系着红绳的小箱子。'>>
+        <<case 3>><<lanSwitch 'You recovered the chest from the deep. Deliver it to Zephyr at the smuggler’s pub or aboard ship.' '箱子已经打捞出水。带去走私者酒吧或海盗船上向泽菲尔交差。'>>
+        <<case 4>><<lanSwitch 'Zephyr paid the bounty for the recovered cargo.' '泽菲尔已结清找回货物的赏金。'>>
       <</switch>>
     <</if>>
   <</if>>

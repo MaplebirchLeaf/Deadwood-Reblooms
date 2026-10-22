@@ -2,7 +2,7 @@
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
-import { Clothing } from './Clothing';
+import Clothing from '../../assets/npc-sidebar-portrait/clothing.json';
 
 const nakedSlots = ['over_head', 'over_upper', 'over_lower', 'upper', 'lower', 'under_upper', 'under_lower', 'head', 'face', 'neck', 'hands', 'legs', 'feet', 'handheld'] as const;
 

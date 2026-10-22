@@ -16,6 +16,8 @@ import Hint_CelestialAnomalies_CN from '@/assets/hint/CN/CelestialAnomalies.md';
 import Hint_CelestialAnomalies_EN from '@/assets/hint/EN/CelestialAnomalies.md';
 import Hint_MoreTransformations_CN from '@/assets/hint/CN/MoreTransformations.md';
 import Hint_MoreTransformations_EN from '@/assets/hint/EN/MoreTransformations.md';
+import Hint_NPCTransformations_CN from '@/assets/hint/CN/NPCTransformations.md';
+import Hint_NPCTransformations_EN from '@/assets/hint/EN/NPCTransformations.md';
 import Hint_NPCSidebarPortrait_CN from '@/assets/hint/CN/NPCSidebarPortrait.md';
 import Hint_NPCSidebarPortrait_EN from '@/assets/hint/EN/NPCSidebarPortrait.md';
 import Hint_Finance_CN from '@/assets/hint/CN/Finance.md';
@@ -63,6 +65,7 @@ const guideSections = {
   IncantationCheatCollection:        { EN: Hint_IncantationCheatCollection_EN       , CN: Hint_IncantationCheatCollection_CN       , title: { EN: 'Cheat collection'            , CN: '作弊集' } },
   CelestialAnomalies:                { EN: Hint_CelestialAnomalies_EN               , CN: Hint_CelestialAnomalies_CN               , title: { EN: 'Celestial anomalies'         , CN: '天体异象' } },
   MoreTransformations:               { EN: Hint_MoreTransformations_EN              , CN: Hint_MoreTransformations_CN              , title: { EN: 'Transformations'             , CN: '更多转化' } },
+  NPCTransformations:                { EN: Hint_NPCTransformations_EN               , CN: Hint_NPCTransformations_CN               , title: { EN: 'NPC transformations'         , CN: 'NPC 转化' } },
   NPCSidebarPortrait:                { EN: Hint_NPCSidebarPortrait_EN               , CN: Hint_NPCSidebarPortrait_CN               , title: { EN: 'Sidebar portraits'           , CN: 'NPC 侧边栏立绘' } },
   Finance:                           { EN: Hint_Finance_EN                          , CN: Hint_Finance_CN                          , title: { EN: 'Finance'                     , CN: '金融系统' } },
   FinanceBanking:                    { EN: Hint_FinanceBanking_EN                   , CN: Hint_FinanceBanking_CN                   , title: { EN: 'Banking and investing'       , CN: '银行与投资' }, module: undefined },
@@ -100,6 +103,7 @@ const guideOrder = [
   'VanillaPlus',
   'CelestialAnomalies',
   'MoreTransformations',
+  'NPCTransformations',
   'LongerCombat',
   'MoreLoveInterestsAndNPCAvatars',
   'NPCSidebarPortrait',

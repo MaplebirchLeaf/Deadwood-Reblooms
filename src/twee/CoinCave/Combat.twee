@@ -1,0 +1,55 @@
+:: Deadwood Coin Cave Combat Widgets [widget]
+
+<<widget 'deadwood-coin-cave-combat-start'>>
+  <<deadwood-coin-context>>
+  <<if !_coinReady or $combat or $location isnot 'island' or _coinCave.room isnot 'writing' or _coinCave.guardian is 'cleared'>><<exit>><</if>>
+  <<endevent>><<generateNPC 1 'a'>>
+  <<set $NPCList[0].per to 'deadwood_coin_guard', $NPCList[0].skincolour to 'ghost', $NPCList[0].monster to 'monster', $NPCList[0].health to 250, $NPCList[0].healthmax to 250>>
+  <<set $NPCList[0].role to lanSwitch('undead guard', '亡灵守卫'), $NPCList[0].fullDescription to lanSwitch('undead guard', '亡灵守卫')>>
+  <<npcClothesType $NPCList[0] 'docker2'>>
+  <<set $finish to 0, $consensual to 0>>
+  <<person1>><<neutral 1>><<maninit>><<npcidlegenitals>>
+  <<set $enemytrust to -30, $enemyanger to 40, $enemystrength to 16000, _coinCave.guardian to 'fight'>>
+<</widget>>
+
+<<widget 'deadwood-coin-cave-combat-end'>>
+  <<deadwood-coin-context>>
+  <<if !_coinReady or _coinCave.guardian isnot 'fight' or $combat isnot 1 or $NPCList[0]?.per isnot 'deadwood_coin_guard'>><<exit>><</if>>
+  <<if $enemyhealth gt 0 and $enemyarousal lt $enemyarousalmax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 and !($pain gte 100 and $willpowerpain is 0)>><<exit>><</if>>
+  <<if $enemyhealth lte 0>>
+    <<set _coinCave.guardian to 'cleared', _coinCave.room to 'vault', _coinCave.scene to 'won', _coinCave.shortcut to true>>
+    <<set _coinCave.visited.pushUnique('vault')>>
+  <<else>>
+    <<set _coinCave.guardian to '', _coinCave.room to 'mouth', _coinCave.torch to 0, _coinCave.scene to 'retreated'>>
+  <</if>>
+  <<clotheson>><<endcombat>>
+<</widget>>
+
+:: Deadwood Coin Cave Fight
+<<deadwood-coin-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coin Cave Fight'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if !_coinReady or $location isnot 'island' or _coinCave.guardian isnot 'fight' or $combat isnot 1 or $NPCList[0]?.per isnot 'deadwood_coin_guard'>>
+  <<lanSwitch 'The passage is out of reach just now.' '你现在无法进入那条通道。'>><br><br>
+  <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Coin Cave'>><</lanLink>><<exit>>
+<</if>>
+<<set $outside to 0>>
+<<lanSwitch 'The pale, undead sentinel bars the cavern archway, hollow milky eyes locked onto you. You brace your feet against the slick rock and prepare for combat.' '那具惨白的亡灵守卫横在拱门正中，空洞灰白的瞳孔死死锁定着你。你背靠潮湿冰冷的石壁，咬紧架势。'>>
+<br><br>
+<<if _coinCave.together>><<lanSwitch 'Zephyr ducks low, skittering across the loose shale toward the stone coffer. "Keep the bastard occupied—do not let it turn on me!"' '泽菲尔压低重心，踩着碎石悄无声息地绕向石箱。“给老子拖住它，别让它转过头来！”'>>
+<br><br><</if>>
+<<effects>><<deadwood-coin-context>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coin Cave Fight'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if _coinCave.guardian is 'fight' and $combat is 1 and $NPCList[0]?.per is 'deadwood_coin_guard'>>
+  <<effectsman>><<alarmstate>><<man>><<stateman>><br><br><<actionsman>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coin Cave Fight'>><</lanLink>></span><<nexttext>>
+  <<elseif _combatend or $enemyhealth lte 0 or $enemyarousal gte $enemyarousalmax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0)>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coin Cave'>><<deadwood-coin-cave-combat-end>><</lanLink>></span><<nexttext>>
+  <<else>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coin Cave Fight'>><</lanLink>></span><<nexttext>>
+  <</if>>
+<</if>>

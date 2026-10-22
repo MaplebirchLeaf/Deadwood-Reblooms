@@ -21,7 +21,7 @@ export default function adaptFinance(maplebirch: MaplebirchCore): void {
     }
   }
 
-  // 部分商店仍直接比较已涨价的金额；只替换金额判断，保留价格显示和购买动作。
+  // 部分商店仍直接比较已涨价的金额。只替换金额判断，保留价格显示和购买动作。
   const merchants = {
     'Tailor Shop': 'tailor',
     Spa: 'spa',

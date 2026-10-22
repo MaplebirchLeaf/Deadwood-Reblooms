@@ -469,7 +469,7 @@ class Orchard extends Module {
       const quality = random(1, 3);
       return { base_quality: quality, quality };
     });
-    // 保留地点原有的成树；果实仍由正常生长与季节结算生成。
+    // 保留地点原有的成树。果实仍由正常生长与季节结算生成。
     for (const [index, name] of data.initialTrees.entries()) {
       const type = name as OrchardSpecies;
       this.state[site][index] ??= { species: type, growth: species[type].matureDays, moisture: moistureDays, fertiliser: 0, harvests: 0, fruiting: 0, fruit: [] };

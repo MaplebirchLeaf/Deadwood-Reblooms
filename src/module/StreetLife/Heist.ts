@@ -161,7 +161,7 @@ export default class Heist {
     );
   }
 
-  /** 分工只读取原版技能；初值和成长记录不反向覆盖当前本领。 */
+  /** 分工只读取原版技能。初值和成长记录不反向覆盖当前本领。 */
   public get roleSkills(): Record<string, { scout: number; carrier: number }> {
     return Object.fromEntries([...this.crew, ...this.candidates].map(npc => [npc.per, { scout: Math.clamp(npc.skills.security, 0, 1000), carrier: Math.clamp(npc.skills.athletics, 0, 1000) }]));
   }

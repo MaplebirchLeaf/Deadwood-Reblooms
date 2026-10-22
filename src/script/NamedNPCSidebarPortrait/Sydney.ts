@@ -2,7 +2,7 @@
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 import type NPCSidebarPortrait from '../../module/NPCSidebarPortrait';
-import { Clothing } from './Clothing';
+import Clothing from '../../assets/npc-sidebar-portrait/clothing.json';
 import schoolSwim from './Common/SchoolSwim';
 import { preferColours } from './Common/Preference';
 import schoolUniforms, { schoolUniformKeys } from './Common/SchoolUniform';

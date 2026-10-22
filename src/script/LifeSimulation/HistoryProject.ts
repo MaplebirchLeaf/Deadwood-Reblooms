@@ -22,21 +22,6 @@ const schedule = `
         <</if>>`;
 
 export default function (maplebirch: typeof window.maplebirch) {
-  const registerAntique = () => {
-    maplebirch.tool.patch.antiques.add('antiquegoldpriestess', {
-      hint: maplebirch.t('deadwood-reblooms:LifeSimulation:history:antique:hint'),
-      museum: maplebirch.t('deadwood-reblooms:LifeSimulation:history:antique:museum'),
-      name: 'Golden Priestess Statuette',
-      cn_name: '金制女祭司像',
-      journal: maplebirch.t('deadwood-reblooms:LifeSimulation:history:antique:journal'),
-      journalName: maplebirch.t('deadwood-reblooms:LifeSimulation:history:antique:journalName'),
-      icon: 'antiques/antique-golden-priestess.png'
-    });
-  };
-
-  registerAntique();
-  maplebirch.on(':language', registerAntique);
-
   // 在原版事件池、日志和画作归还结算点接入历史项目状态。
   maplebirch.tool.inject({
     locationPassage: {

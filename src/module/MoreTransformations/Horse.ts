@@ -187,10 +187,7 @@ class Horse extends Transformation {
       },
       {
         title: 'General Traits',
-        name: () => {
-          const name = maplebirch.t('deadwood-reblooms:Traits:horse:gender');
-          return name + (V.player.sex === 'h' ? lanSwitch(' (⚥)', '(⚥)') : '');
-        },
+        name: () => maplebirch.t('deadwood-reblooms:Traits:horse:gender'),
         colour: 'softbrown',
         has: () => V.maplebirch.transformation.horse.level >= 6,
         text: () => maplebirch.t('deadwood-reblooms:Traits:horse:text')

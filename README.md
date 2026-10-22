@@ -13,7 +13,7 @@
 
 **枯木逢春**是基于 **[秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework)** 的 **_Degrees of Lewdity_** 内容模组，扩展人物关系、校园生活、金融经营、交通与街头玩法，并提供转化、遭遇战和界面功能。
 
-**当前版本：2.4.3。**各部分可按喜好启用，详细玩法与解锁条件收录在游戏内指南中。
+支持中文与英文，各部分可按需启用。详细玩法与解锁条件见游戏内指南。
 
 ---
 
@@ -42,7 +42,7 @@
 ## 安装与依赖
 
 1. 准备带有 **SugarCube 2 ModLoader** 的游戏。当前以 **DoL 0.5.12.13** 为目标版本。
-2. 安装 **[秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.5.2 或以上版本**，并按加载器提示补齐服装、美化选择器等依赖。
+2. 安装 **[秋枫白桦框架](https://github.com/MaplebirchLeaf/SCML-DOL-maplebirchFramework/releases/latest) 5.5.4 或以上版本**，并按加载器提示补齐服装、美化选择器等依赖。
 3. 从 [**Releases**](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases/latest) 下载 `deadwood-reblooms-*.modpack`，通过 ModLoader 加载。
 4. 在框架模块管理中选择要启用的内容，保存游戏并重载。
 
@@ -58,7 +58,7 @@
 | 统计 → 模组统计         | 查看各玩法的进度与累计成果                           |
 | 原版作弊面板 → 枯木逢春 | 调整已启用玩法的资源与属性                           |
 
-模组提示入口可在模组设置中选择桌面端或移动端位置。修改模块开关后需保存并重载，人物剧情还需满足相应的关系、地点与日程条件。
+模组提示入口可在设置中选择桌面端或移动端位置。人物剧情需满足相应的关系、地点与日程条件。
 
 ## 可选音频包
 
@@ -68,8 +68,12 @@
 
 ## 反馈与更新
 
-- [问题反馈与建议](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/issues)：请附游戏、框架和模组版本，以及发生问题的地点和复现步骤。
+- [Discord 讨论与反馈](https://discord.com/channels/1103864219620884560/1197809298902896731/threads/1553848327660114000)
+- [反馈交流群：1087715891](https://qm.qq.com/q/B4p8vaj1yo)（maplebirchFrameworks）
+- [问题反馈与建议](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/issues)
 - [版本发布与更新记录](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases)
+
+反馈问题时，请附游戏、框架和模组版本、复现步骤，以及相关截图或报错日志。
 
 ## 致谢
 

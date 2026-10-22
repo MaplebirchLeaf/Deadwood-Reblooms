@@ -30,7 +30,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     // 在原版阶段更新前补齐点数，达到门槛的当天即可成长。
     if (snapshot.purity >= 1000 && V.angelbuild <= snapshot.angel) transformation._transform('angel', 1);
     if (snapshot.purity <= 0 && snapshot.fallen >= 2 && V.demonbuild <= snapshot.demon) transformation._transform('demon', 1);
-    // 不硬编码堕天使阶段上限；成长点数交给框架，扩展阶段仍由已加载的原版 widget 判定。
+    // 不硬编码堕天使阶段上限。成长点数交给框架，扩展阶段仍由已加载的原版 widget 判定。
     if (snapshot.purity >= 900 && snapshot.fallen >= 2 && V.fallenbuild <= snapshot.fallenBuild) transformation._transform('fallen', 1);
   });
 

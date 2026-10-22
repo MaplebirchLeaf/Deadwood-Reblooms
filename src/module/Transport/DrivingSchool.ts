@@ -62,6 +62,8 @@ interface SchoolState {
 }
 
 class DrivingSchool {
+  public readonly requirements = { practice: 200, driving: 300 };
+  public readonly minutes: Record<SchoolActivity, number> = { apply: 15, collect: 15, study: 60, theory: 90, lesson: 60, cbt: 360, module_1: 20, test: 50, bribe: 15, tamper: 15 };
   public static readonly defaults: SchoolState = {
     provisional: { applied_day: -1, ready_day: -1, issued: false },
     motorcycle: { theory: false, study: 0, lessons: 0, practice: 0, licensed: false, theory_retest_day: -1, retest_day: -1, cbt_completed: false, module_1: false },
@@ -103,6 +105,40 @@ class DrivingSchool {
     };
   }
 
+  public get fees(): Record<SchoolActivity, number> {
+    const terms = this.terms;
+    return {
+      apply: terms.provisional_fee,
+      collect: 0,
+      study: terms.study_fee,
+      theory: terms.theory_fee,
+      lesson: terms.lesson_fee,
+      cbt: terms.cbt_fee,
+      module_1: terms.module_1_fee,
+      test: terms.test_fee,
+      bribe: 0,
+      tamper: 0
+    };
+  }
+
+  public get practiceReady(): boolean {
+    return this.record.practice >= this.requirements.practice && this.transport.state.driving >= this.requirements.driving;
+  }
+
+  public get nextStep(): Exclude<SchoolActivity, 'bribe' | 'tamper'> | null {
+    if (!this.state.provisional.issued) return this.state.provisional.applied_day < 0 ? 'apply' : 'collect';
+    if (this.record.licensed) return this.record.practice < 1000 || this.transport.state.driving < 1000 ? 'lesson' : null;
+    if (this.state.category === 'motorcycle' && !this.motorcycleLearner) return 'cbt';
+    if (!this.record.theory) return this.record.study < 3 ? 'study' : 'theory';
+    if (!this.practiceReady) return 'lesson';
+    if (this.state.category === 'motorcycle' && !this.state.motorcycle.module_1) return 'module_1';
+    return 'test';
+  }
+
+  public canFinish(activity: SchoolActivity): boolean {
+    return Time.hour * 60 + Time.minute + this.minutes[activity] <= 17 * 60;
+  }
+
   public get available(): boolean {
     return (
       !this.working &&
@@ -120,11 +156,13 @@ class DrivingSchool {
   }
 
   public get canApply(): boolean {
-    return this.available && !this.state.exam && this.state.provisional.applied_day < 0 && !this.state.provisional.issued && Time.hour < 17 && this.transport.canPay(this.terms.provisional_fee);
+    return (
+      this.available && !this.state.exam && this.state.provisional.applied_day < 0 && !this.state.provisional.issued && this.canFinish('apply') && this.transport.canPay(this.terms.provisional_fee)
+    );
   }
 
   public get canCollect(): boolean {
-    return this.available && !this.state.exam && !this.state.provisional.issued && this.state.provisional.ready_day >= 0 && Time.days >= this.state.provisional.ready_day && Time.hour < 17;
+    return this.available && !this.state.exam && !this.state.provisional.issued && this.state.provisional.ready_day >= 0 && Time.days >= this.state.provisional.ready_day && this.canFinish('collect');
   }
 
   public get motorcycleLearner(): boolean {
@@ -139,7 +177,7 @@ class DrivingSchool {
       !this.record.licensed &&
       !this.record.theory &&
       this.record.study < 3 &&
-      Time.hour < 17 &&
+      this.canFinish('study') &&
       this.transport.canPay(this.terms.study_fee)
     );
   }
@@ -153,7 +191,7 @@ class DrivingSchool {
       !this.record.theory &&
       Time.days >= this.record.theory_retest_day &&
       this.state.test_day !== Time.days &&
-      Time.hour < 16 &&
+      this.canFinish('theory') &&
       this.transport.canPay(this.terms.theory_fee)
     );
   }
@@ -165,7 +203,7 @@ class DrivingSchool {
       !this.state.exam &&
       this.state.provisional.issued &&
       (this.record.practice < 1000 || this.transport.state.driving < 1000) &&
-      Time.hour < 17 &&
+      this.canFinish('lesson') &&
       this.transport.canPay(this.terms.lesson_fee)
     );
   }
@@ -179,17 +217,26 @@ class DrivingSchool {
       this.state.provisional.issued &&
       !this.state.motorcycle.licensed &&
       !this.motorcycleLearner &&
-      Time.hour < 12 &&
+      this.canFinish('cbt') &&
       this.transport.canPay(this.terms.cbt_fee)
     );
   }
 
   public get canModuleOne(): boolean {
-    return this.state.category === 'motorcycle' && !this.state.motorcycle.module_1 && this.motorcycleLearner && this.canPractical && this.transport.canPay(this.terms.module_1_fee);
+    return (
+      this.state.category === 'motorcycle' &&
+      !this.state.motorcycle.module_1 &&
+      this.motorcycleLearner &&
+      this.canPractical &&
+      this.canFinish('module_1') &&
+      this.transport.canPay(this.terms.module_1_fee)
+    );
   }
 
   public get canTest(): boolean {
-    return this.canPractical && (this.state.category !== 'motorcycle' || (this.motorcycleLearner && this.state.motorcycle.module_1)) && this.transport.canPay(this.terms.test_fee);
+    return (
+      this.canPractical && this.canFinish('test') && (this.state.category !== 'motorcycle' || (this.motorcycleLearner && this.state.motorcycle.module_1)) && this.transport.canPay(this.terms.test_fee)
+    );
   }
 
   private get canPractical(): boolean {
@@ -200,11 +247,9 @@ class DrivingSchool {
       this.state.provisional.issued &&
       this.record.theory &&
       !this.record.licensed &&
-      this.record.practice >= 200 &&
-      this.transport.state.driving >= 300 &&
+      this.practiceReady &&
       Time.days >= this.record.retest_day &&
-      this.state.test_day !== Time.days &&
-      Time.hour < 17
+      this.state.test_day !== Time.days
     );
   }
 
@@ -219,7 +264,7 @@ class DrivingSchool {
       attempt.close_call &&
       !attempt.resolved &&
       !this.record.licensed &&
-      Time.hour < 17
+      this.canFinish('bribe')
     );
   }
 
@@ -259,9 +304,8 @@ class DrivingSchool {
     }
   }
 
-  public attend(activity: SchoolActivity, revision: number = this.state.revision): boolean {
-    if (revision !== this.state.revision) return false;
-    const allowed = {
+  public canBook(activity: SchoolActivity): boolean {
+    return {
       apply: this.canApply,
       collect: this.canCollect,
       study: this.canStudy,
@@ -272,24 +316,16 @@ class DrivingSchool {
       test: this.canTest,
       bribe: this.canBribe,
       tamper: this.canTamper
-    };
-    if (!allowed[activity]) return false;
+    }[activity];
+  }
+
+  public attend(activity: SchoolActivity, revision: number = this.state.revision): boolean {
+    if (revision !== this.state.revision || !this.canBook(activity)) return false;
     const record = this.record;
     const category = this.state.category;
     const day = Time.days;
-    const fee = {
-      apply: this.terms.provisional_fee,
-      collect: 0,
-      study: this.terms.study_fee,
-      theory: this.terms.theory_fee,
-      lesson: this.terms.lesson_fee,
-      cbt: this.terms.cbt_fee,
-      module_1: this.terms.module_1_fee,
-      test: this.terms.test_fee,
-      bribe: 0,
-      tamper: 0
-    }[activity];
-    const minutes = activity === 'cbt' ? 360 : ['study', 'lesson'].includes(activity) ? 60 : activity === 'theory' ? 90 : activity === 'test' ? 5 : activity === 'module_1' ? 20 : 15;
+    const fee = this.fees[activity];
+    const minutes = activity === 'test' ? 5 : this.minutes[activity];
     this.state.revision++;
     this.state.result = null;
     if (!this.spend(fee, minutes)) return false;

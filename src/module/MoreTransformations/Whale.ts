@@ -134,7 +134,7 @@ class Whale extends Transformation {
       {
         title: 'General Traits',
         name: () => maplebirch.t('deadwood-reblooms:Traits:deep_diver:name'),
-        colour: 'lblue',
+        colour: 'blue',
         has: () => !!V.transformationParts?.traits?.deep_diver && isPartEnabled(V.transformationParts.traits.deep_diver),
         text: () => maplebirch.t('deadwood-reblooms:Traits:deep_diver:text')
       },
@@ -147,10 +147,7 @@ class Whale extends Transformation {
       },
       {
         title: 'General Traits',
-        name: () => {
-          const name = maplebirch.t('deadwood-reblooms:Traits:whale:gender');
-          return name + (V.player.sex === 'h' ? lanSwitch(' (⚥)', '(⚥)') : '');
-        },
+        name: () => maplebirch.t('deadwood-reblooms:Traits:whale:gender'),
         colour: 'lblue',
         has: () => (V.maplebirch?.transformation?.whale?.level ?? 0) >= 6,
         text: () => maplebirch.t('deadwood-reblooms:Traits:whale:text')

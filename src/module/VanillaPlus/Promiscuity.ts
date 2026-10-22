@@ -32,8 +32,20 @@ class Promiscuity {
     return Number.isInteger(target) && npc?.active === 'active' && npc.stance !== 'defeated' ? npc : undefined;
   }
 
-  public get expanded(): boolean {
-    return V.VanillaPlus.lock.promiscuity && V.promiscuity >= this.vanillaPlus.normalCeiling('promiscuity');
+  public attributesFor(index: number): Array<'promiscuity' | 'deviancy'> {
+    const npc = this.npc(index);
+    if (!npc) return [];
+    if (V.enemytype === 'man') {
+      const name = V.npc?.[V.npcrow?.indexOf(Number(index))] ?? npc.fullDescription;
+      return name?.trim() && V.settings.transformAnimalEnabled && this.vanillaPlus.core.npc.Transformation.level(name, 'fox') > 0 ? ['promiscuity', 'deviancy'] : ['promiscuity'];
+    }
+    if (V.enemytype !== 'beast') return [];
+    const type = npc.type === 'centaur' ? 'horse' : npc.type === 'harpy' ? 'hawk' : npc.type === 'creature' ? 'wolf' : String(npc.type).replace(/(?:boy|girl)$/, '');
+    return V.settings.beastSettings?.[type] && window.beastSexEnabledForType(type, npc.monster === 'monster') ? ['deviancy'] : [];
+  }
+
+  public canAdvancedActions(index: number): boolean {
+    return this.attributesFor(index).some(attribute => V.VanillaPlus.lock[attribute] && V[attribute] >= this.vanillaPlus.normalCeiling(attribute));
   }
 
   public get mastered(): boolean {
@@ -44,7 +56,7 @@ class Promiscuity {
   public hasPenis(index: number): boolean {
     const target = Number(index);
     const npc = this.npc(target);
-    return !!npc && (npc.penissize > 0 || (window.npcHasStrapon?.(target) ?? false));
+    return !!npc && ((npc.penis !== 'none' && npc.penissize > 0) || (window.npcHasStrapon?.(target) ?? false));
   }
 
   public penisAvailable(index: number): boolean {
@@ -71,14 +83,15 @@ class Promiscuity {
   public canSwitchPenis(destination: PenisDestination, index: number): boolean {
     const target = Number(index);
     const npc = this.npc(target);
-    if (V.position === 'stalk' || !npc || Number(V.penistarget) !== target) return false;
+    if (V.position === 'stalk' || !npc || Number(V.penistarget) !== target || window.playerChastity('penis')) return false;
 
     if (destination === 'vagina') {
+      if (npc.chastity.vagina.includes('chastity')) return false;
       if (V.penisuse !== 'otheranus' || !['otheranusentrance', 'otheranusimminent', 'otheranus'].includes(V.penisstate)) return false;
       return npc.vagina === 0 || (typeof npc.vagina === 'string' && npc.vagina.includes('otheranus'));
     }
 
-    if (V.penisuse !== 'othervagina' || !['entrance', 'imminent', 'penetrated'].includes(V.penisstate)) return false;
+    if (!V.settings.analEnabled || npc.chastity.anus.includes('chastity') || V.penisuse !== 'othervagina' || !['entrance', 'imminent', 'penetrated'].includes(V.penisstate)) return false;
     const anusOccupied = [npc.penis, npc.vagina].some(value => typeof value === 'string' && value.includes('otheranus'));
     const vaginaOccupiedByPlayer = ['penisentrance', 'penisimminent', 'penis'].includes(String(npc.vagina));
     return !anusOccupied && (npc.penis === 0 || vaginaOccupiedByPlayer);
@@ -98,6 +111,7 @@ class Promiscuity {
     const target = Number(index);
     const npc = this.npc(target);
     if (V.position === 'stalk' || !npc) return false;
+    if (action.endsWith('-to-penis') && (V.penisstate === 'clothed' || window.playerChastity('penis'))) return false;
 
     const handAvailable = npc.lefthand === 0 || npc.righthand === 0;
     const mouthAvailable = npc.mouth === 0;
@@ -144,9 +158,16 @@ class Promiscuity {
     const target = Number(index);
     const npc = this.npc(target);
     if (V.position === 'stalk' || !npc) return false;
+    if (action.includes('anus') && !V.settings.analEnabled) return false;
+    if (action.startsWith('hand-') && npc.lefthand === 'none' && npc.righthand === 'none') return false;
+    if (action.startsWith('mouth-') && npc.mouth === 'none') return false;
+    if ((action === 'penetrate-vagina' || action === 'penetrate-anus' || action === 'offer-penis-to-mouth') && (npc.penis === 'clothed' || npc.chastity.penis.includes('chastity'))) return false;
+    if (action === 'offer-vagina-to-mouth' && (!V.settings.facesitEnabled || npc.vagina === 'clothed' || npc.chastity.vagina.includes('chastity'))) return false;
+    if (action === 'offer-anus-to-mouth' && (!V.settings.analingusGivingEnabled || npc.penis === 'clothed' || npc.vagina === 'clothed' || npc.chastity.anus.includes('chastity'))) return false;
 
     const destinationAvailable = (part: 'mouth' | 'vagina' | 'penis' | 'anus' | 'chest' | 'thigh' | 'bottom', sameAction: boolean) => {
       const state = V as unknown as Record<string, unknown>;
+      if (state[`${part}state`] === 'clothed') return false;
       const use = state[`${part}use`];
       return !use || (Number(part === 'bottom' ? V.VanillaPlus.promiscuity.bottom_target : state[`${part}target`]) === target && !sameAction);
     };
@@ -154,7 +175,7 @@ class Promiscuity {
     const penisFree = (sameAction: boolean) => destinationAvailable('penis', sameAction);
     const anusFree = (sameAction: boolean) => destinationAvailable('anus', sameAction);
     const mouthFree = (sameAction: boolean) => destinationAvailable('mouth', sameAction);
-    const hasVagina = ['f', 'h'].includes(npc.gender);
+    const hasVagina = npc.vagina !== 'none';
 
     switch (action) {
       case 'hand-vagina':

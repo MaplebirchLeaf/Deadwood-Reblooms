@@ -1,0 +1,146 @@
+:: Deadwood Coin Cave Widgets [widget]
+
+<<widget 'deadwood-coin-context'>>
+  <<set _coinCave to $MoreTransformations?.treasure>>
+  <<set _coinReady to !!maplebirch.get('MoreTransformations') and !!_coinCave and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
+<</widget>>
+
+<<widget 'deadwood-coin-cave-discover'>>
+  <<deadwood-coin-context>><<set _coinDiscovered to false>>
+  <<if !_coinReady or $combat or _coinCave.found or $location isnot 'island' or $island.explore_count lt 6 or !$island.explore_locations.includes('shore')>><<exit>><</if>>
+  <<set _coinCave.found to true, _coinDiscovered to true>>
+  <<language>>
+    <<option 'EN'>>
+      Tracing the cliff base along the shoreline, you spot a sequence of weathered steps cut deliberately into the rock. Parting a curtain of tangled roots and hanging moss, you reveal a steep flight of stairs plunging into the cliffside. A heavy, brine-pitted iron mooring ring is embedded firmly into the wall—smugglers or raiders once brought longboats into this secluded cove.
+      <br><br>
+      A dim amber light flickers at the foot of the steps, though not a whisper of human voice stirs the damp air. You notch the surrounding rocks to mark the trail back to camp.
+    <<option 'CN'>>
+      你顺着海崖底部的风化岩壁寻觅，注意到一排明显有人工开凿痕迹的阶石。拨开垂落如帘的厚重藤蔓与树根，几级陡峭阴暗的石阶赫然通向岩体深处。湿漉漉的石壁上镶嵌着一枚生满海蚀锈迹的巨大系船铁环——显然，早年间曾有走私船只在此隐秘靠泊。
+      <br><br>
+      顺着石阶向下望去，深处隐约透出摇曳不定的幽微火光，四周却死寂得听不见半点人声。你在沿途的岩石上刻下记号，标出了回营地的路。
+  <</language>><br><br>
+  <span class='gold'><<lanSwitch 'You have found a secluded sea cavern.' '你发现了一处隐蔽的海蚀石窟。'>></span><br><br>
+  <<deadwood-coin-cave-link>>
+  <<getouticon>><<lanLink ['Return to camp', '回到营地'] 'Island'>><<island_explore_end>><</lanLink>><br>
+<</widget>>
+
+<<widget 'deadwood-coin-cave-link'>>
+  <<deadwood-coin-context>>
+  <<if !_coinReady or $combat or !_coinCave.found or $location isnot 'island' or $stress gte $stressmax or $hunger gte 2000>><<exit>><</if>>
+  <<icon 'coin-cave/old-cavern.png'>><<lanLink ['Walk to the old cavern (0:20)', '前往旧洞窟 (0:20)'] 'Deadwood Coin Cave'>>
+    <<deadwood-coin-context>>
+    <<if _coinReady and !$combat and $location is 'island'>>
+      <<set _coinCave.room to 'mouth', _coinCave.scene to '', _coinCave.voyage to false, _coinCave.together to false>>
+      <<island_pass 20>>
+    <</if>>
+  <</lanLink>><br>
+<</widget>>
+
+<<widget 'deadwood-coin-cave-time'>>
+  <<set $MoreTransformations.treasure.torch to Math.max(0, $MoreTransformations.treasure.torch - _args[0])>>
+  <<island_pass _args[0]>>
+<</widget>>
+
+<<widget 'deadwood-coin-cave-move'>>
+  <<deadwood-coin-context>>
+  <<if !_coinReady or $combat or $location isnot 'island' or !_coinCave.found or !['mouth', 'passage', 'camp', 'water', 'writing', 'vault'].includes(_args[0])>><<exit>><</if>>
+  <<set _coinCave.room to _args[0], _coinCave.scene to ''>>
+  <<if !['mouth', 'vault'].includes(_args[0])>>
+    <<set $_caveRoll to random(1, 8)>>
+    <<if $_caveRoll is 1>>
+      <<set _coinCave.torch to Math.max(0, _coinCave.torch - 10), _coinCave.scene to 'wind'>>
+    <<elseif $_caveRoll is 2>>
+      <<if random(1, 100) lte _coinCave.torch + currentSkillValue('skulduggery') / 25>>
+        <<set _coinCave.scene to 'trap_seen'>>
+      <<else>>
+        <<set _coinCave.scene to 'trip'>><<pain 4>><<stress 6>>
+      <</if>>
+    <<elseif $_caveRoll is 3>>
+      <<set _coinCave.scene to 'whispers'>><<stress 2>>
+    <<elseif $_caveRoll is 4>>
+      <<set _coinCave.scene to _coinCave.together ? 'captain' : 'tracks'>>
+    <</if>>
+  <</if>>
+  <<set _coinCave.visited.pushUnique(_args[0])>>
+  <<if _args[0] is 'vault' and _coinCave.guardian is 'cleared'>><<set _coinCave.shortcut to true>><</if>>
+  <<deadwood-coin-cave-time _args[1]>>
+<</widget>>
+
+<<widget 'deadwood-coin-cave-route'>>
+  <<set $_caveRoute to _args[1], $_caveMinutes to _args[2]>>
+  <<capture $_caveRoute, $_caveMinutes>><<caveicon 'east'>><<lanLink `_args[0]` 'Deadwood Coin Cave'>><<deadwood-coin-cave-move $_caveRoute $_caveMinutes>><</lanLink>><</capture>><br>
+<</widget>>
+
+<<widget 'deadwood-coin-take'>>
+  <<deadwood-coin-context>>
+  <<if !_coinReady or $combat or $location isnot 'island' or _coinCave.room isnot 'vault' or _coinCave.guardian isnot 'cleared' or pcAreArmsBound('both')>><<exit>><</if>>
+  <<if ![1, 3].includes(_args[0])>><<exit>><</if>>
+  <<set $_coinShared to _coinCave.together and !_coinCave.bound and _coinCave.returns is 0 and !(_coinCave.journal or _coinCave.inscription or _coinCave.appraised)>>
+  <<set $_coinAmount to Math.min(_args[0], 882 - _coinCave.coins - _coinCave.zephyrCoins - _coinCave.museumCoins - _coinCave.crewCoins - ($_coinShared ? 3 : 0))>>
+  <<if $_coinAmount lte 0>><<exit>><</if>>
+  <<set _coinCave.coins += $_coinAmount, _coinCave.scene to _coinCave.bound ? 'more_gold' : 'first_gold', _coinCave.bound to true>>
+  <<if $_coinShared>>
+    <<set _coinCave.zephyrCoins to 3, _coinCave.agreed to false>>
+    <<run maplebirch.npc.Transformation.set('Zephyr', 'undead', 1)>>
+  <</if>>
+  <<run maplebirch.char.transformation.setTransform('undead', 1)>>
+<</widget>>
+
+<<widget 'deadwood-coin-return'>>
+  <<deadwood-coin-context>>
+  <<if !_coinReady or $combat or $location isnot 'island' or _coinCave.room isnot 'vault' or _coinCave.guardian isnot 'cleared' or !_coinCave.bound or pcAreArmsBound('both')>><<exit>><</if>>
+  <<set _coinCave.coins to 0, _coinCave.scene to 'part_returned'>>
+  <<if _coinCave.together and _coinCave.agreed>><<set _coinCave.zephyrCoins to 0>><</if>>
+  <<if _coinCave.coins + _coinCave.zephyrCoins + _coinCave.museumCoins + _coinCave.crewCoins is 0>>
+    <<if _coinCave.returns is 0>><<stress -12>><</if>>
+    <<set _coinCave.bound to false, _coinCave.agreed to false, _coinCave.returns += 1, _coinCave.scene to maplebirch.npc.Transformation.level('Zephyr', 'undead') gt 0 ? 'cured_together' : 'cured'>>
+    <<run maplebirch.char.transformation.setTransform('undead', 0)>>
+    <<run maplebirch.npc.Transformation.set('Zephyr', 'undead', 0)>>
+  <</if>>
+  <<deadwood-coin-cave-time 5>>
+<</widget>>
+
+<<widget 'deadwood-coin-journal'>>
+  <<if !maplebirch.get('MoreTransformations') or !$MoreTransformations?.treasure?.found>><<exit>><</if>>
+  <<set _coinCave to $MoreTransformations.treasure>>
+  <div class='gold bold'><<lanSwitch 'The island gold' '海岛藏金'>></div>
+  <ul class='journal'>
+    <<if !_coinCave.visited.includes('vault')>>
+      <li><<lanSwitch 'You marked a path leading from your island camp to the hidden sea cavern. A fire flickers in the depths; search the camp and passages for traces left by earlier visitors.' '你记下了从海岛营地前往那处隐蔽石窟的路径。洞口深处隐隐有火光摇曳，可以在前人遗弃的宿营地与石壁间寻找线索。'>></li>
+    <<elseif !_coinCave.bound and !_coinCave.returns>>
+      <li><<lanSwitch 'A stone chest of ancient gold lies beyond the flooded cavern passage. Carvings on the wall warn against removing its contents.' '涉水穿过石窟深处的积水暗道，一具装满异样金币的古老石箱正静卧在穹顶之下。石壁上的刻字严厉警告来者不要擅动箱中之物。'>></li>
+    <</if>>
+    <<if _coinCave.voyage and !_coinCave.together>>
+      <li><<lanSwitch 'You arranged an island expedition with Zephyr. Follow the voyage aboard ship; the captain will point out your landing on arrival.' '你与泽菲尔约好前往海岛。航程中先在船上等候，抵达时船长会指出留有记号的登陆点。'>></li>
+    <</if>>
+    <<if _coinCave.bound>>
+      <li><<lanSwitch 'Coins in your possession: ' '你持有的金币：'>><span class='gold'><<= _coinCave.coins>></span>
+        <<if _coinCave.museumCoins gt 0>><br><<lanSwitch 'On loan to Winter: ' '借展给温特的金币：'>><span class='gold'><<= _coinCave.museumCoins>></span><</if>>
+        <<if _coinCave.zephyrCoins gt 0>><br><<lanSwitch 'Zephyr’s share: ' '泽菲尔持有的金币：'>><span class='gold'><<= _coinCave.zephyrCoins>></span><</if>>
+        <<if _coinCave.crewCoins gt 0>><br><<lanSwitch 'Distributed to crew: ' '分到船员手中的金币：'>><span class='gold'><<= _coinCave.crewCoins>></span><</if>>
+      </li>
+      <li>
+        <<if _coinCave.inscription or _coinCave.journal or _coinCave.appraised>>
+          <<lanSwitch 'Every coin taken from the vault must be returned to the stone coffer. Parting with them or leaving them elsewhere will not lift the curse.' '所有被带离石室的金币都必须全数放回石箱。遗落在外或转交他人，都无法破除亡灵诅咒。'>>
+        <<else>>
+          <<lanSwitch 'Your pulse ceased the moment you took the gold. Search the cavern for clues about the curse, or take a coin to Winter at the museum.' '取走金币后，你的心跳彻底止息了。可以返回石窟寻找碑记线索，或带一枚金币请温特鉴定。'>>
+        <</if>>
+      </li>
+      <<if _coinCave.zephyrCoins gt 0>>
+        <li><<if _coinCave.agreed>><<lanSwitch 'Zephyr has agreed to return the captain’s entire share. Speak with the captain to arrange a voyage back to the cavern.' '泽菲尔已答应将金币全数带回。只要找船长安排航程，便可一同前往石窟了结此事。'>>
+        <<else>><<lanSwitch 'Zephyr still retains <<his>> cut of the plunder. Speak with the captain aboard ship or at the smugglers’ pub to demand its return.' '泽菲尔手中仍留有分得的金币。必须在船上或走私者酒馆与船长商议归还。'>><</if>></li>
+      <</if>>
+      <<if _coinCave.museumCoins gt 0>><li><<lanSwitch 'Collect all loaned coins from Winter before making the voyage back to the cavern.' '返回石窟前，需要先向温特取回借展的那些金币。'>></li><</if>>
+      <<if _coinCave.crewCoins gt 0>><li><<lanSwitch 'Zephyr distributed two coins among the crew who assisted during the voyage. The captain must recall those shares aboard ship or at the pub before the hoard can be made whole.' '泽菲尔此前将两枚金币赏给了出海的见习水手。必须由船长在船舱或酒馆出面将这两枚收回，金币方能凑齐。'>></li><</if>>
+    <<elseif _coinCave.returns gt 0>>
+      <li class='green'><<lanSwitch 'The stolen gold is back in its chest. The cold grip has faded, and your heartbeat has returned.' '所有取走的金币均已归位。石箱重阖，温热的心跳终于重新回到了你的胸膛。'>></li>
+    <</if>>
+  </ul><hr>
+<</widget>>
+
+<<widget 'deadwood-coin-voyage-cancel'>>
+  <<deadwood-coin-context>>
+  <<if _coinReady and !$combat and _coinCave.voyage and !_coinCave.together>>
+    <<set _coinCave.voyage to false>>
+  <</if>>
+<</widget>>

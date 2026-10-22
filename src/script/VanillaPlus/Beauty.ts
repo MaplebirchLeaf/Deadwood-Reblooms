@@ -1,7 +1,7 @@
 // ./src/script/VanillaPlus/Beauty.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  // 原版言语动作的结算点各一处，仅增强实际发生的减怒；放宽原版美貌上限与钳制范围。
+  // 原版言语动作的结算点各一处，仅增强实际发生的减怒。放宽原版美貌上限与钳制范围。
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Effects Man': [

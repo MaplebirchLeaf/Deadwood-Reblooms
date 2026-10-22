@@ -9,7 +9,7 @@ const MAX_SHOP_STAFF = 2;
 export default class RobinShop extends Shared {
   public readonly investment = new Investment(this.core, this.facade);
 
-  /** 当面约好当天办手续，原版小时覆盖保留到该处营业结束；不挤掉学校和已有约定。 */
+  /** 当面约好当天办手续，原版小时覆盖保留到该处营业结束。不挤掉学校和已有约定。 */
   public get canArrangeMeeting(): boolean {
     const outing = this.finance?.realEstate.outings;
     const ride = this.core.get('Transport')?.state.commute;

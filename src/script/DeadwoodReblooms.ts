@@ -2,6 +2,7 @@
 
 import Cheats from './DeadwoodReblooms/Cheats';
 import Tips from './DeadwoodReblooms/Tips';
+import antiquesData from '../assets/antiques.json';
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 export default function (maplebirch: MaplebirchCore) {
@@ -10,8 +11,23 @@ export default function (maplebirch: MaplebirchCore) {
   Cheats(maplebirch);
   Tips(maplebirch);
 
+  const antiques = () => {
+    for (const [key, { module, translation, ...data }] of Object.entries(antiquesData)) {
+      if (!maplebirch.get(module as 'LifeSimulation' | 'MoreTransformations')) continue;
+      maplebirch.tool.patch.antiques.add(key, {
+        ...data,
+        hint: maplebirch.t(`${translation}:hint`),
+        museum: maplebirch.t(`${translation}:museum`),
+        journal: maplebirch.t(`${translation}:journal`),
+        journalName: maplebirch.t(`${translation}:journalName`)
+      });
+    }
+  };
+  antiques();
+  maplebirch.on(':language', antiques);
+
   maplebirch.once(':storyready', () => {
-    // 原版 NPC 文本和模组人物会使用这些发色；只补渲染滤镜，不加入染发选项。
+    // 原版 NPC 文本和模组人物会使用这些发色。只补渲染滤镜，不加入染发选项。
     const hair = setup.colours?.hair_map;
     if (!hair) return;
     for (const [key, blend] of Object.entries({ chestnut: '#8b4935', mousy: '#82796d', auburn: '#9b3d2e' })) {

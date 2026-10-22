@@ -897,6 +897,7 @@ class RealEstate {
       this.finance.advanceBankThrough(day);
       this.finance.company.suite.advance(day);
       this.staff.advance(day);
+      this.core.get('Transport')?.maintenance.settle(day);
     }
     state.last_managed_day = today;
     this.finance.company.suite.sync();

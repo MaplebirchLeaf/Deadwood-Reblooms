@@ -19,6 +19,31 @@
   before: |
     if (maplebirch.get('MoreTransformations') && amount > 0 && V.maplebirch?.transformation?.horse?.level >= 6) fatigueMod *= 0.75;
 
+- comment: '寡欲缩放性奋正增量，保留原版来源倍率与跟踪结算。'
+  fileName: 'stat-changes.js'
+  from: "paramError(\"arousal\", \"amount\", amount, \"Expected a number.\");\n\t\tamount = Number(amount);"
+  after: "\n\t\tamount = maplebirch.get('MoreTransformations')?.Undead.arousal(amount) ?? amount;"
+
+- comment: '不朽清除疼痛并绕过原版最低疼痛，保留非转化时的承伤结算。'
+  fileName: 'stat-changes.js'
+  from: 'function painClamp() {'
+  after: "\n\t\tif (maplebirch.get('MoreTransformations')?.Undead.active) { V.pain = 0; return; }"
+
+- comment: '亡灵即时免除冷热影响，不改写存档中的原有体温。'
+  fileName: '02-body-temperature.js'
+  from: 'if (isNaN(V.player.bodyTemperature))'
+  before: "if (maplebirch.get('MoreTransformations')?.Undead.active) return settings.baseBodyTemperature;\n\t\t\t"
+
+- comment: '亡灵的体温结算与预计体温共用正常基准，解除后不遗留过热或失温。'
+  fileName: '02-body-temperature.js'
+  from: 'const generation = calculateHeatGeneration('
+  before: "if (maplebirch.get('MoreTransformations')?.Undead.active) return settings.baseBodyTemperature;\n\t\t"
+
+- comment: '亡灵仅清除遗留的冷热昏迷标记，保留其它昏迷与原版场景处理。'
+  fileName: 'passage-override.js'
+  from: 'if (V.passout'
+  before: "if (maplebirch.get('MoreTransformations')?.Undead.active && ['cold', 'heat'].includes(V.passout)) delete V.passout;\n\t\t\t"
+
 - comment: '买断收租或逼退贝利后跳过原版收租结算，避免 DoLP 继续从押金扣款。'
   fileName: 'time.js'
   from: 'function passRentTick() {'
@@ -69,6 +94,18 @@
   fileName: 'named-npc.js'
   from: 'function averyMansionScore() {'
   after: "\n\t\tif (maplebirch.get('Finance')?.orphanage.averyAdoptionRefused || maplebirch.get('Finance')?.orphanage.pcFree) return 0;"
+
+- comment: '原版格威岚状态更新后同步狐化，复用刚算出的部位状态，不额外调用 statusCheck 或监听整页渲染。'
+  fileName: 'named-npc.js'
+  from: |
+    return (T.gwylanStatus = gwylanStatus);
+    }
+    window.gwylanStatusCheck = gwylanStatusCheck;
+  before: |
+    if (maplebirch.get('NPCTransformations')) {
+      const visible = [T.gwylanTF.ears, T.gwylanTF.tail, T.gwylanTF.fangs].some(part => ['visible', 'revealed'].includes(part));
+      maplebirch.npc.Transformation.set('Gwylan', 'fox', visible ? 1 : 0);
+    }
 
 - comment: '意志突破后允许正常增益继续填充扩展后的六级上限。'
   fileName: 'stat-changes.js'
@@ -218,7 +255,7 @@
   from: 'dailySchoolEffects();'
   to: "maplebirch.get('LifeSimulation') ? maplebirch.get('LifeSimulation').school.attendance(dailySchoolEffects) : dailySchoolEffects();"
 
-# 悉尼沿用原版逐小时劳动；从零开始也有效，PC 同行已结算本人劳动时不重复加算。
+# 悉尼沿用原版逐小时劳动。从零开始也有效，PC 同行已结算本人劳动时不重复加算。
 - comment: '悉尼在花园实际工作时维护花园，清洁度封顶一百。'
   fileName: 'time.js'
   from: 'V.temple_garden >= 1) V.temple_garden'

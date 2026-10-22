@@ -118,6 +118,14 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
       );
     }
     if (maplebirch.get('VanillaPlus')) {
+      // DoLX 按生效等级显示恶魔特质，保留原生称号与等级判断，只沿用新增说明。
+      if (zone.widgetPassage.Traits) {
+        zone.widgetPassage.Traits = zone.widgetPassage.Traits.map(rule =>
+          rule.to === '$1maplebirch.t("deadwood-reblooms:VanillaPlus:divineTransformations:trait:demon:text"),'
+            ? { ...rule, srcmatch: /(has: effectiveTransformationLevel\("demon"\) gte 6,\s*text: )[^\r\n]+/ }
+            : rule
+        );
+      }
       // AMC 公式在下方单独处理，只移除对应的原版规则，其余钳制、作弊和战斗补丁照常接入。
       const attributes = ['beauty', 'physique', 'willpower'];
       const legacy: Record<string, string[]> = {
@@ -153,7 +161,7 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
         maplebirch.tool.zone.widgetPassage[title] = rules.filter(rule => rule.srcmatch?.source !== npc_size_patch.srcmatch.source || !rule.to?.startsWith('$1<<case 5>><<deadwood-npc-size-five-'));
     }
     if (maplebirch.get('LifeSimulation')) {
-      // DoLX 将换衣槽列表改名；扩展实际列表，后续穿衣与清除待穿状态仍走原生循环。
+      // DoLX 将换衣槽列表改名。扩展实际列表，后续穿衣与清除待穿状态仍走原生循环。
       if (data.passageDataItems.map.get('Widgets Wardrobe')?.content.includes('<<set _wardrobeEquipSlots to [')) {
         zone.widgetPassage['Widgets Wardrobe'] = zone.widgetPassage['Widgets Wardrobe'].map(rule =>
           rule.applybefore === '<<run _equip.push("handheld_left")>>\n' ? { ...rule, applybefore: '<<run _wardrobeEquipSlots.push("handheld_left")>>\n' } : rule
@@ -250,6 +258,13 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
         [/\n\t\tV\.physiquesize,\n\t\tNumber\(V\.AMCTraits\?\.physique\) \|\| 1/, `\n\t\t${max('physique', 'V.physiquesize')},\n\t\tNumber(V.AMCTraits?.physique) || 1`]
       ]
     };
+    if (maplebirch.get('Finance')) {
+      // 来宾走普通房租结算，沿用 DoLX 的罗宾优先事件；收养停付仍保留原生判断。
+      rules['time.js'].push([
+        /(if \(V\.avery_mansion\.rage\.assess >= 9 \|\| V\.avery_mansion\.days_absent >= 2\) \{\s*V\.renttime--;\s*if \(V\.baileyDeposit >= V\.rentmoney \+ \(V\.babyRent \|\| 0\))\) \{/,
+        '$1 && (!maplebirch.get("Finance")?.company.avery.state.mansion_guest || !robinStandSelfSufficiencyReady())) {'
+      ]);
+    }
     if (maplebirch.get('VanillaPlus')) {
       // DoLX 生成和还原身体时使用自己的绝对上限，只扩展 PC 的这一项。
       rules['koztools.js'] = [
@@ -269,12 +284,12 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
 
     // 接入 DoLX 的 AMC 公式与缓存后的诱惑评分，保留特质倍率和作弊控件回调。
     const passageRules: Record<string, Rule[]> = {
-      // DoLX 的兽化称号使用块函数，保留性别感受和 Harpy 判断，只补生理标记。
+      // DoLX 的兽化称号使用块函数；牛、雌狐和非中性恶魔已由通用补丁处理。
       Traits: [
-        [
-          /name: \(\) => (\{\s*(?:if \(V\.hallucinations gte 2 \|\| !V\.settings\.bestialityEnabled\) return "Harpy";\s*)?if \(playerFeelsManlike\(\)\) return "(?:Wolf|Cat|Bird)boy";\s*if \(playerFeelsGirllike\(\)\) return "(?:Wolf|Cat|Bird)girl";\s*return "(?:Wolf|Cat|Bird)kin";\s*\}),/g,
-          'name: () => (() => $1)() + (V.player.sex is "h" ? "<<lanSwitch \' (⚥)\' \'(⚥)\'>>" : ""),'
-        ]
+        // 部分 DoLX 导出已经带有旧双性后缀，直接收敛为同一标记，避免重复追加。
+        [/return "(Bull|Cow|Vixen|Incubus|Succubus)" \+ \(V\.player\.sex is "h" \? "<<lanSwitch ' \(⚥\)' '\(⚥\)'>>" : ""\);/g, 'return "$1<<deadwood-trait-sex>>";'],
+        [/return "((?:Wolf|Cat|Bird)(?:boy|girl|kin)|(?:Bunny|Bear) (?:boy|girl)|(?:Bunny|Bear)kin|Bovine|Foxboy|Foxkin|Harpy|Demon)";/g, 'return "$1<<deadwood-trait-sex>>";'],
+        [/return "((?:Incubus|Succubus) \(" \+ transGenderLabel \+ "\))";/g, 'return "$1<<deadwood-trait-sex>>";']
       ]
     };
     if (maplebirch.get('VanillaPlus')) {

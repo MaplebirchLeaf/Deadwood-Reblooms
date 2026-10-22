@@ -23,7 +23,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   });
 
   maplebirch.tool.addTo('Journal', 'deadwood-reblooms-life-simulation-school-journal');
-  // 只在储物柜取衣；校门和公告栏只提示衣物去向。
+  // 只在储物柜取衣。校门和公告栏只提示衣物去向。
   maplebirch.tool.addTo('BeforeLinkZone', {
     widget: 'deadwood-reblooms-life-simulation-school-clothes-link',
     passage: ['School Front Courtyard', 'School Rear Courtyard', 'School Lockers']
@@ -366,7 +366,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
         }
       ],
       'Widgets Sydney': [
-        // 免听只解除针对 PC 的逃课警告；悉尼自己的上课与值班安排照常执行。
+        // 免听只解除针对 PC 的逃课警告。悉尼自己的上课与值班安排照常执行。
         { src: '<<widget "sydneyLibrary">>', applyafter: '<<if $LifeSimulation.school.attendanceExempt>><<unset $daily.sydney.classWarn>><</if>>', expected: 1 },
         {
           src: '($sydneyScience isnot 1 and $schoolstate is "first") or ["fourth", "fifth"].includes($schoolstate)',

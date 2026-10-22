@@ -11,27 +11,24 @@ export default function (maplebirch: typeof window.maplebirch) {
     for (const [name, value] of Object.entries(values)) result = result.replaceAll(`{${name}}`, value);
     return result;
   };
-  const target = (index: number) => Number(index);
   // 原版 stalk 包含跟踪和追逐，空闲的手不能用于接触对方。
-  const active = () => V.combat === 1 && V.position !== 'stalk' && maplebirch.get('VanillaPlus')!.promiscuity.expanded && V.enemytype === 'man' && V.walltype !== 'front' && !V.gloryhole;
-  const direct = (action: string, targetVariable: string) =>
-    `<<set _vanillaPlusPromiscuity to true>><<set _vanillaPlusPromiscuityIgnore to $promiscuityIgnore>><<set _vanillaPlusPromiscuityTarget to Number(${targetVariable})>><<set $promiscuityIgnore to true>><<set $${action}>>`;
-  const switchPenis = (destination: 'vagina' | 'anus') => {
-    const action = destination === 'vagina' ? 'penistovagina' : 'penistoanus';
-    return `<<if maplebirch.get("VanillaPlus").promiscuity.preparePenisSwitch("${destination}", Number($penistarget))>>${direct(`penisaction to "${action}"`, '$penistarget')}<</if>>`;
+  const active = (index: number) => V.combat === 1 && V.position !== 'stalk' && maplebirch.get('VanillaPlus')!.promiscuity.canAdvancedActions(Number(index)) && V.walltype !== 'front' && !V.gloryhole;
+  const direct = (destination: 'vagina' | 'anus', changePosition = false) => {
+    const prepare = changePosition ? `preparePenisSwitch("${destination}", Number($penistarget))` : `canDirect("offer-${destination}-to-penis", Number($penistarget))`;
+    return `<<if $combat is 1 and $position isnot "stalk" and $walltype isnot "front" and !$gloryhole and maplebirch.get("VanillaPlus").promiscuity.canAdvancedActions(Number($penistarget)) and maplebirch.get("VanillaPlus").promiscuity.${prepare}>><<set _vanillaPlusPromiscuity to "penis-${destination}">><<set _vanillaPlusPromiscuityIgnore to $promiscuityIgnore>><<set _vanillaPlusPromiscuityTarget to Number($penistarget)>><<set $promiscuityIgnore to true>><<set $penisaction to "penisto${destination}">><</if>>`;
   };
   const targetName = (index: number) => {
-    const npc = V.NPCList?.[target(index)];
+    const npc = V.NPCList?.[Number(index)];
     return lanSwitch(npc?.fullDescription, npc?.fullDescription_CN) || npc?.fullDescription || '';
   };
   const needsExtraAction = (index: number) => {
-    const npc = V.NPCList?.[target(index)];
+    const npc = V.NPCList?.[Number(index)];
     if (!npc || npc.stance === 'topface') return false;
     return ![0, undefined].includes(npc.location?.genitals) || npc.location?.head === 'genitals';
   };
-  const hasDistinctDoubleTargets = (first: number, second: number) => {
-    const primary = target(first);
-    const partner = target(second);
+  const distinctDoubleTargets = (first: number, second: number) => {
+    const primary = Number(first);
+    const partner = Number(second);
     return (
       Number.isInteger(primary) &&
       Number.isInteger(partner) &&
@@ -40,16 +37,16 @@ export default function (maplebirch: typeof window.maplebirch) {
     );
   };
   const canReceiveDouble = (orifice: 'vagina' | 'anus') => {
-    if (!active()) return false;
     const second = orifice === 'vagina' ? V.vaginadoubletarget : V.anusdoubletarget;
+    if (!active(second)) return false;
     const state = orifice === 'vagina' ? V.vaginastate : V.anusstate;
     const enabled = orifice === 'vagina' ? V.settings.vaginalDoubleEnabled : V.settings.analDoubleEnabled;
-    return second != null && enabled && state === 'penetrated' && maplebirch.get('VanillaPlus')!.NPCDoublePenetration.canJoinPlayer(target(second), orifice);
+    return second != null && enabled && state === 'penetrated' && maplebirch.get('VanillaPlus')!.NPCDoublePenetration.canJoinPlayer(Number(second), orifice);
   };
-  const handTarget = (hand: GuideHand) => target(hand === 'left' ? V.lefttarget : V.righttarget);
+  const handTarget = (hand: GuideHand) => Number(hand === 'left' ? V.lefttarget : V.righttarget);
   const handAvailable = (hand: GuideHand) => HandGrip.handFree(hand);
   const canTongueKiss = () => {
-    const selected = target(V.mouthtarget);
+    const selected = Number(V.mouthtarget);
     const npc = V.NPCList?.[selected];
     const faceType = V.worn?.face?.type ?? [];
     return (
@@ -70,7 +67,13 @@ export default function (maplebirch: typeof window.maplebirch) {
   };
   const canGuidePenis = (hand: GuideHand) => {
     const selected = handTarget(hand);
-    return active() && handAvailable(hand) && maplebirch.get('VanillaPlus')!.promiscuity.hasPenis(selected) && !V.NPCList[selected].chastity.penis.includes('chastity');
+    return (
+      active(selected) &&
+      handAvailable(hand) &&
+      maplebirch.get('VanillaPlus')!.promiscuity.hasPenis(selected) &&
+      V.NPCList[selected].penis !== 'clothed' &&
+      !V.NPCList[selected].chastity.penis.includes('chastity')
+    );
   };
   const canGuidePlayerDouble = (selected: number, orifice: 'vagina' | 'anus') => {
     const primary = orifice === 'vagina' ? V.vaginatarget : V.anustarget;
@@ -79,15 +82,15 @@ export default function (maplebirch: typeof window.maplebirch) {
     return enabled && use === 'penis' && Number(primary) !== selected && maplebirch.get('VanillaPlus')!.promiscuity.hasPenis(selected);
   };
   const canGuideToPlayer = (hand: GuideHand, orifice: 'vagina' | 'anus') => {
-    if (!canGuidePenis(hand) || V.walltype === 'front' || window.playerChastity(orifice)) return false;
+    if (!canGuidePenis(hand) || (orifice === 'anus' && !V.settings.analEnabled) || V.walltype === 'front' || window.playerChastity(orifice)) return false;
     const selected = handTarget(hand);
     const action = orifice === 'vagina' ? 'penetrate-vagina' : 'penetrate-anus';
     return maplebirch.get('VanillaPlus')!.promiscuity.canAsk(action, selected) || canGuidePlayerDouble(selected, orifice);
   };
   const canGuideToNPC = (hand: GuideHand, orifice: 'vagina' | 'anus') => {
-    if (!canGuidePenis(hand)) return false;
+    if (!canGuidePenis(hand) || V.enemytype !== 'man') return false;
     const selected = handTarget(hand);
-    const recipient = target(V.penistarget);
+    const recipient = Number(V.penistarget);
     const enabled = orifice === 'vagina' ? V.settings.vaginalDoubleEnabled : V.settings.analDoubleEnabled;
     const correctUse =
       orifice === 'vagina'
@@ -113,10 +116,10 @@ export default function (maplebirch: typeof window.maplebirch) {
       display: () => text('action:straddleVaginal', { name: targetName(V.vaginadoubletarget) }),
       value: () => 'VanillaPlusPromiscuityReceiveVaginal',
       color: 'lustful',
-      difficulty: '<<vaginaldifficulty>> <<combatpromiscuous6>> <<combataware 4>>',
+      difficulty: '<<vaginaldifficulty>> <<deadwood-reblooms-combat-stat-rating $vaginadoubletarget>> <<combataware 4>>',
       order: 2,
       effect:
-        '<<if $vaginastate is "penetrated" and maplebirch.get("VanillaPlus").NPCDoublePenetration.canJoinPlayer(Number($vaginadoubletarget), "vagina")>><<set $vaginaaction to "vaginatopenisdouble">><</if>>'
+        '<<if $settings.vaginalDoubleEnabled and !playerChastity("vagina") and maplebirch.get("VanillaPlus").promiscuity.canAdvancedActions(Number($vaginadoubletarget)) and $vaginastate is "penetrated" and maplebirch.get("VanillaPlus").NPCDoublePenetration.canJoinPlayer(Number($vaginadoubletarget), "vagina")>><<set $vaginaaction to "vaginatopenisdouble">><</if>>'
     },
     {
       id: 'promiscuity-receive-anal',
@@ -125,52 +128,55 @@ export default function (maplebirch: typeof window.maplebirch) {
       display: () => text('action:straddleAnal', { name: targetName(V.anusdoubletarget) }),
       value: () => 'VanillaPlusPromiscuityReceiveAnal',
       color: 'lustful',
-      difficulty: '<<analdifficulty>> <<combatpromiscuous6>> <<combataware 4>>',
+      difficulty: '<<analdifficulty>> <<deadwood-reblooms-combat-stat-rating $anusdoubletarget>> <<combataware 4>>',
       order: 2,
       effect:
-        '<<if $anusstate is "penetrated" and maplebirch.get("VanillaPlus").NPCDoublePenetration.canJoinPlayer(Number($anusdoubletarget), "anus")>><<set $anusaction to "anustopenisdouble">><</if>>'
+        '<<if $settings.analDoubleEnabled and !playerChastity("anus") and maplebirch.get("VanillaPlus").promiscuity.canAdvancedActions(Number($anusdoubletarget)) and $anusstate is "penetrated" and maplebirch.get("VanillaPlus").NPCDoublePenetration.canJoinPlayer(Number($anusdoubletarget), "anus")>><<set $anusaction to "anustopenisdouble">><</if>>'
     },
     {
       id: 'promiscuity-press-vaginal',
       actionType: 'penisaction',
-      cond: () => active() && needsExtraAction(V.penistarget) && maplebirch.get('VanillaPlus')!.promiscuity.canDirect('offer-vagina-to-penis', target(V.penistarget)),
+      cond: () => active(V.penistarget) && needsExtraAction(V.penistarget) && maplebirch.get('VanillaPlus')!.promiscuity.canDirect('offer-vagina-to-penis', Number(V.penistarget)),
       display: () => text('action:pressVagina', { name: targetName(V.penistarget) }),
       value: () => 'VanillaPlusPromiscuityPressVaginal',
       color: 'lustful',
+      difficulty: '<<deadwood-reblooms-combat-stat-rating $penistarget 5>>',
       order: 2,
-      effect: direct('penisaction to "penistovagina"', '$penistarget')
+      effect: direct('vagina')
     },
     {
       id: 'promiscuity-press-anal',
       actionType: 'penisaction',
-      cond: () => active() && needsExtraAction(V.penistarget) && maplebirch.get('VanillaPlus')!.promiscuity.canDirect('offer-anus-to-penis', target(V.penistarget)),
+      cond: () =>
+        active(V.penistarget) && V.settings.analEnabled && needsExtraAction(V.penistarget) && maplebirch.get('VanillaPlus')!.promiscuity.canDirect('offer-anus-to-penis', Number(V.penistarget)),
       display: () => text('action:pressAnus', { name: targetName(V.penistarget) }),
       value: () => 'VanillaPlusPromiscuityPressAnal',
       color: 'lustful',
+      difficulty: '<<deadwood-reblooms-combat-stat-rating $penistarget 5>>',
       order: 2,
-      effect: direct('penisaction to "penistoanus"', '$penistarget')
+      effect: direct('anus')
     },
     {
       id: 'promiscuity-switch-to-vaginal',
       actionType: 'penisaction',
-      cond: () => active() && maplebirch.get('VanillaPlus')!.promiscuity.canSwitchPenis('vagina', target(V.penistarget)),
+      cond: () => active(V.penistarget) && maplebirch.get('VanillaPlus')!.promiscuity.canSwitchPenis('vagina', Number(V.penistarget)),
       display: () => text('action:switchVagina', { name: targetName(V.penistarget) }),
       value: () => 'VanillaPlusPromiscuitySwitchVaginal',
       color: 'sub',
-      difficulty: '<<peniledifficulty>> <<combatpromiscuous5>>',
+      difficulty: '<<peniledifficulty>> <<deadwood-reblooms-combat-stat-rating $penistarget 5>>',
       order: -1,
-      effect: switchPenis('vagina')
+      effect: direct('vagina', true)
     },
     {
       id: 'promiscuity-switch-to-anal',
       actionType: 'penisaction',
-      cond: () => active() && maplebirch.get('VanillaPlus')!.promiscuity.canSwitchPenis('anus', target(V.penistarget)),
+      cond: () => active(V.penistarget) && maplebirch.get('VanillaPlus')!.promiscuity.canSwitchPenis('anus', Number(V.penistarget)),
       display: () => text('action:switchAnus', { name: targetName(V.penistarget) }),
       value: () => 'VanillaPlusPromiscuitySwitchAnal',
       color: 'sub',
-      difficulty: '<<peniledifficulty>> <<combatpromiscuous5>>',
+      difficulty: '<<peniledifficulty>> <<deadwood-reblooms-combat-stat-rating $penistarget 5>>',
       order: -1,
-      effect: switchPenis('anus')
+      effect: direct('anus', true)
     },
     {
       id: 'promiscuity-tongue-kiss',
@@ -179,42 +185,50 @@ export default function (maplebirch: typeof window.maplebirch) {
       display: () => text('action:tongueKiss'),
       value: () => 'VanillaPlusTongueKiss',
       color: 'sub',
-      difficulty: '<<oraldifficulty>> <<combatpromiscuous3>> <<kissvirginitywarning>> <<NPCvirginitywarning $npc[$npcrow.indexOf(_n)] "kiss">>',
+      difficulty: '<<oraldifficulty>> <<deadwood-reblooms-combat-stat-rating $mouthtarget 3>> <<kissvirginitywarning>> <<NPCvirginitywarning $npc[$npcrow.indexOf($mouthtarget)] "kiss">>',
       order: 2,
       effect: '<<deadwood-reblooms-promiscuity-tongue-kiss>>'
     }
   );
 
-  // 满级淫乱时由模组动作提供双插入口，结算仍调用原版双插效果，其他状态保留原版动作。
+  // 突破后由模组动作提供双插入口，结算仍调用原版双插效果，其他状态保留原版动作。
   maplebirch.combat.CombatAction.modify(
     {
       id: 'promiscuity-double-vaginal-straddle-targets',
       actionType: 'vaginaaction',
       value: 'vaginatopenisdouble',
-      cond: () => !active() && hasDistinctDoubleTargets(V.vaginatarget, V.vaginadoubletarget)
+      cond: () => !active(V.vaginadoubletarget) && distinctDoubleTargets(V.vaginatarget, V.vaginadoubletarget)
     },
-    { id: 'promiscuity-double-anal-straddle-targets', actionType: 'anusaction', value: 'anustopenisdouble', cond: () => !active() && hasDistinctDoubleTargets(V.anustarget, V.anusdoubletarget) },
-    { id: 'promiscuity-double-vaginal-offer-targets', actionType: 'penisaction', value: 'penispussydouble', cond: () => hasDistinctDoubleTargets(V.penistarget, V.vaginatarget) },
-    { id: 'promiscuity-double-anal-offer-targets', actionType: ['penisaction', 'vaginaaction'], value: 'penisanusdouble', cond: () => hasDistinctDoubleTargets(V.penistarget, V.anustarget) }
+    {
+      id: 'promiscuity-double-anal-straddle-targets',
+      actionType: 'anusaction',
+      value: 'anustopenisdouble',
+      cond: () => !active(V.anusdoubletarget) && distinctDoubleTargets(V.anustarget, V.anusdoubletarget)
+    },
+    { id: 'promiscuity-double-vaginal-offer-targets', actionType: 'penisaction', value: 'penispussydouble', cond: () => distinctDoubleTargets(V.penistarget, V.vaginatarget) },
+    { id: 'promiscuity-double-anal-offer-targets', actionType: ['penisaction', 'vaginaaction'], value: 'penisanusdouble', cond: () => distinctDoubleTargets(V.penistarget, V.anustarget) }
   );
 
   // 左右手沿用原版目标下拉框，引导所选 NPC 的阴茎，动作结算前会再次检查目标与位置。
   for (const hand of ['left', 'right'] as const) {
-    const registerGuide = (destination: GuideDestination, cond: () => boolean) => ({
+    const guide = (destination: GuideDestination, cond: () => boolean) => ({
       id: `promiscuity-guide-${hand}-${destination}`,
       actionType: hand === 'left' ? ('leftaction' as const) : ('rightaction' as const),
       cond,
       display: () => guideLabel(hand, destination),
       value: () => `VanillaPlusPromiscuityGuide${hand === 'left' ? 'Left' : 'Right'}${destination.replaceAll('-', '')}`,
       color: 'lustful',
-      difficulty: '<<handdifficulty>> <<combatpromiscuous6>>',
+      difficulty: () => {
+        const level = destination.startsWith('NPC-') || (destination === 'player-vagina' ? V.vaginause : V.anususe) === 'penis' ? 6 : 5;
+        return `<<handdifficulty>> <<deadwood-reblooms-combat-stat-rating $${hand}target ${level}>>`;
+      },
       effect: `<<deadwood-reblooms-promiscuity-guide "${hand}" "${destination}">>`
     });
     maplebirch.combat.CombatAction.reg(
-      registerGuide('player-vagina', () => canGuideToPlayer(hand, 'vagina')),
-      registerGuide('player-anus', () => canGuideToPlayer(hand, 'anus')),
-      registerGuide('NPC-vagina', () => canGuideToNPC(hand, 'vagina')),
-      registerGuide('NPC-anus', () => canGuideToNPC(hand, 'anus'))
+      guide('player-vagina', () => canGuideToPlayer(hand, 'vagina')),
+      guide('player-anus', () => canGuideToPlayer(hand, 'anus')),
+      guide('NPC-vagina', () => canGuideToNPC(hand, 'vagina')),
+      guide('NPC-anus', () => canGuideToNPC(hand, 'anus'))
     );
   }
 
@@ -240,52 +254,52 @@ export default function (maplebirch: typeof window.maplebirch) {
           applybefore: '<<deadwood-reblooms-promiscuity-request>>\n\t\t',
           expected: 1
         },
-        // 框架注册的 PC 阴道主动动作执行后恢复临时标记，并只在姿势确实改变时结算六级成长。
+        // 对应动作执行后恢复临时标记，只在姿势确实改变时结算成长。
         {
           src: '<<effectsvaginatopenis>>',
-          applyafter: '<<deadwood-reblooms-promiscuity-direct-result "vagina">>',
+          applyafter: '<<deadwood-reblooms-combat-direct-result "vagina">>',
           expected: 1
         },
         // 框架注册的 PC 肛门主动动作执行后恢复临时标记。
         {
           src: '<<effectsanustopenis>>',
-          applyafter: '<<deadwood-reblooms-promiscuity-direct-result "anus">>',
+          applyafter: '<<deadwood-reblooms-combat-direct-result "anus">>',
           expected: 1
         },
         // 框架注册的 PC 阴茎主动插入动作执行后核对目标状态。
         {
           src: '<<effectspenistovagina>>',
-          applyafter: '<<deadwood-reblooms-promiscuity-direct-result "penis-vagina">>',
+          applyafter: '<<deadwood-reblooms-combat-direct-result "penis-vagina">>',
           expected: 1
         },
         // 框架注册的 PC 阴茎主动肛交动作执行后核对目标状态。
         {
           src: '<<effectspenistoanus>>',
-          applyafter: '<<deadwood-reblooms-promiscuity-direct-result "penis-anus">>',
+          applyafter: '<<deadwood-reblooms-combat-direct-result "penis-anus">>',
           expected: 1
         },
         // 成功切换肛门双插时会写入唯一的双插目标，直接在该状态写入后结算成长。
         {
           src: '<<set $anusdoubletarget to $penistarget>>',
-          applyafter: '<<combatpromiscuity6>>',
+          applyafter: '<<deadwood-reblooms-combat-stat-settle $penistarget>>',
           expected: 1
         },
         // 成功把阴茎从玩家移入阴道双插时，以原版确认承受者的写入为锚点。
         {
           src: '<<set $vaginatarget to _n>>',
-          applyafter: '<<combatpromiscuity6>>',
+          applyafter: '<<deadwood-reblooms-combat-stat-settle _j>>',
           expected: 1
         },
         // 从阴道动作栏成功转入肛门双插后，双插目标写入能唯一标识该成功分支。
         {
           src: '<<set $anusdoubletarget to $vaginatarget>>',
-          applyafter: '<<combatpromiscuity6>>',
+          applyafter: '<<deadwood-reblooms-combat-stat-settle $vaginatarget>>',
           expected: 1
         },
         // 从肛门动作栏成功转入已有阴茎的阴道后，以唯一的新双插目标写入结算。
         {
           src: '<<set $vaginadoubletarget to _npcA>>',
-          applyafter: '<<combatpromiscuity6>>',
+          applyafter: '<<deadwood-reblooms-combat-stat-settle _npcA>>',
           expected: 1
         }
       ],
@@ -301,51 +315,64 @@ export default function (maplebirch: typeof window.maplebirch) {
         // 将阴茎动作中的肛门双插邀请由原版五级标识提升为模组六级标识。
         {
           src: '<<case "penisanusdouble">><<analdifficulty>><<combatpromiscuous5>><<combataware 4>>',
-          to: '<<case "penisanusdouble">><<analdifficulty>><<combatpromiscuous6>><<combataware 4>>',
+          to: '<<case "penisanusdouble">><<analdifficulty>><<deadwood-reblooms-combat-stat-rating _n>><<combataware 4>>',
           expected: 1
         },
         // 将阴道动作中的肛门双插邀请由原版五级标识提升为模组六级标识。
         {
           src: '<<case "penisanusdouble">><<analdifficulty>> <<combatpromiscuous5>> <<combataware 4>>',
-          to: '<<case "penisanusdouble">><<analdifficulty>> <<combatpromiscuous6>> <<combataware 4>>',
+          to: '<<case "penisanusdouble">><<analdifficulty>> <<deadwood-reblooms-combat-stat-rating _n>> <<combataware 4>>',
           expected: 1
         },
         // 阴茎与肛门动作都会生成阴道双插邀请，两处统一显示六级标识。
         {
           srcmatchgroup: /(<<case "penispussydouble">><<vaginaldifficulty>>\s*)<<combatpromiscuous5>>/g,
-          to: '$1<<combatpromiscuous6>>',
+          to: '$1<<deadwood-reblooms-combat-stat-rating _n>>',
           expected: 2
         },
         // 将 PC 主动跨坐第二根阴茎的阴道双插动作提升为六级标识。
         {
           src: '<<case "vaginatopenisdouble">><<vaginaldifficulty>> <<combatpromiscuous5>> <<combataware 4>>',
-          to: '<<case "vaginatopenisdouble">><<vaginaldifficulty>> <<combatpromiscuous6>> <<combataware 4>>',
+          to: '<<case "vaginatopenisdouble">><<vaginaldifficulty>> <<deadwood-reblooms-combat-stat-rating _n>> <<combataware 4>>',
           expected: 1
         },
         // 将 PC 主动维持阴道双插的动作提升为六级标识，童贞警告仍由原版继续输出。
         {
           src: '<<case "vaginapenisdoublefuck">><<vaginaldifficulty>> <<combatpromiscuous5>>',
-          to: '<<case "vaginapenisdoublefuck">><<vaginaldifficulty>> <<combatpromiscuous6>>',
+          to: '<<case "vaginapenisdoublefuck">><<vaginaldifficulty>> <<deadwood-reblooms-combat-stat-rating _n>>',
           expected: 1
         },
         // 将 PC 主动跨坐第二根阴茎的肛门双插动作提升为六级标识。
         {
           src: '<<case "anustopenisdouble">><<analdifficulty>> <<combatpromiscuous5>> <<combataware 4>>',
-          to: '<<case "anustopenisdouble">><<analdifficulty>> <<combatpromiscuous6>> <<combataware 4>>',
+          to: '<<case "anustopenisdouble">><<analdifficulty>> <<deadwood-reblooms-combat-stat-rating _n>> <<combataware 4>>',
           expected: 1
         },
         // 将 PC 主动维持肛门双插的动作提升为六级标识，童贞警告仍由原版继续输出。
         {
           src: '<<case "anuspenisdoublefuck">><<combatpromiscuous5>>',
-          to: '<<case "anuspenisdoublefuck">><<combatpromiscuous6>>',
+          to: '<<case "anuspenisdoublefuck">><<deadwood-reblooms-combat-stat-rating _n>>',
           expected: 1
         }
       ],
       'Widgets Actions Vagina': [
+        // 狐化格威岚仍在人型分支，维持双插时也要接受异种癖突破，衣物和认知门槛不变。
+        {
+          srcmatch: /(<<widget "actionsvaginapenisdoublefuck">>(?:(?!<<\/widget>>)[\s\S])*?)!hasSexStat\("promiscuity", 5\)/,
+          to: '$1!(hasSexStat("promiscuity", 5) or maplebirch.get("VanillaPlus").promiscuity.canAdvancedActions(Number($vaginadoubletarget)))',
+          expected: 1
+        },
         // 原版只用 penis === 0 判断空闲，导致没有阴茎的 NPC 也出现骑乘选项，改为同时检查目标有效、阴茎或绑带阳具存在且未被占用。
         {
           src: '<<if $NPCList[$vaginatarget].penis is 0>>',
           to: '<<if maplebirch.get("VanillaPlus").promiscuity.penisAvailable($vaginatarget)>>',
+          expected: 1
+        }
+      ],
+      'Widgets Actions Anus': [
+        {
+          srcmatch: /(<<widget "actionsanuspenisdoublefuck">>(?:(?!<<\/widget>>)[\s\S])*?)!hasSexStat\("promiscuity", 5\)/,
+          to: '$1!(hasSexStat("promiscuity", 5) or maplebirch.get("VanillaPlus").promiscuity.canAdvancedActions(Number($anusdoubletarget)))',
           expected: 1
         }
       ],
@@ -362,17 +389,27 @@ export default function (maplebirch: typeof window.maplebirch) {
           to: '$1<<if $2$VanillaPlus.traits.promiscuity or combatSkillCheck("vaginal", $vaginatarget, $NPCList[$vaginatarget].fullDescription)>>',
           expected: 1
         },
-        // PC 成功跨坐第二根阴茎、形成阴道双插时，将原版五级成长提升为六级成长。
+        // 双重动作移到成功分支结算，失败不再获得原版五级或模组六级成长。
         {
           src: '<<set $vaginaaction to 0>><<submission 10>><<vaginalskilluse>><<set $vaginaactiondefault to "vaginatopenisdouble">><<combatpromiscuity5>>',
-          to: '<<set $vaginaaction to 0>><<submission 10>><<vaginalskilluse>><<set $vaginaactiondefault to "vaginatopenisdouble">><<combatpromiscuity6>>',
+          to: '<<set $vaginaaction to 0>><<submission 10>><<vaginalskilluse>><<set $vaginaactiondefault to "vaginatopenisdouble">>',
           expected: 1
         },
         // PC 主动维持阴道双插时持续按六级动作成长，不再按原版五级结算。
         {
           src: '<<set $vaginaaction to 0>><<submission 20>><<vaginalskilluse>><<set $vaginaactiondefault to "vaginapenisdoublefuck">><<combatpromiscuity5>>',
-          to: '<<set $vaginaaction to 0>><<submission 20>><<vaginalskilluse>><<set $vaginaactiondefault to "vaginapenisdoublefuck">><<combatpromiscuity6>>',
+          to: '<<set $vaginaaction to 0>><<submission 20>><<vaginalskilluse>><<set $vaginaactiondefault to "vaginapenisdoublefuck">>',
           expected: 1
+        },
+        {
+          src: '<<if $enemytype is "beast">><<set $NPCList[$vaginadoubletarget].stance to "top">><</if>>',
+          applyafter: '<<deadwood-reblooms-combat-stat-settle $vaginadoubletarget>>',
+          expected: 1
+        },
+        {
+          srcmatchgroup: /<<set \$NPCList\[_npcB\]\.penis to "vaginadouble">>/g,
+          applyafter: '<<deadwood-reblooms-combat-stat-settle $vaginadoubletarget>>',
+          expected: 2
         }
       ],
       'Widgets Effects Anus': [
@@ -386,13 +423,23 @@ export default function (maplebirch: typeof window.maplebirch) {
         {
           srcmatch:
             /<<set \$anusaction to 0>><<submission 10>><<analskilluse>><<combatpromiscuity5>>(?=\s*<<if (?:\$combatExtended\.reverseRapeStart is 1 or )?combatSkillCheck\("anal", \$anusdoubletarget\)>>)/,
-          to: '<<set $anusaction to 0>><<submission 10>><<analskilluse>><<combatpromiscuity6>>',
+          to: '<<set $anusaction to 0>><<submission 10>><<analskilluse>>',
           expected: 1
         },
         // PC 主动维持肛门双插时持续按六级动作成长，不再按原版五级结算。
         {
           srcmatch: /<<set \$anusaction to 0>><<submission 20>><<analskilluse>><<combatpromiscuity5>>(?=\s*\/\* Ensure combined)/,
-          to: '<<set $anusaction to 0>><<submission 20>><<analskilluse>><<combatpromiscuity6>>',
+          to: '<<set $anusaction to 0>><<submission 20>><<analskilluse>>',
+          expected: 1
+        },
+        {
+          src: '<<if $enemytype is "beast">><<set $NPCList[$anusdoubletarget].stance to "top">><</if>>',
+          applyafter: '<<deadwood-reblooms-combat-stat-settle $anusdoubletarget>>',
+          expected: 1
+        },
+        {
+          src: '<<set $NPCList[$anusdoubletarget].penis to "anusdouble">>',
+          applyafter: '<<deadwood-reblooms-combat-stat-settle $anusdoubletarget>>',
           expected: 1
         }
       ],

@@ -30,6 +30,15 @@ export default function ColdmoonHarbour(maplebirch: typeof window.maplebirch): v
   });
 
   maplebirch.tool.inject({
+    widgetPassage: {
+      'Widgets Pirates': [
+        {
+          srcmatch: /<<widget "events_pirate_deck">>\s*<<cleareventpool>>/,
+          applyafter: '\n\t<<deadwood-pirate-raid-pool>>',
+          expected: 1
+        }
+      ]
+    },
     locationPassage: {
       'Mer Street': [{ src: '<<merpiericon>>', applybefore: '<<deadwood-harbour-link>>\n\t\t', expected: 1 }],
       'Pirate Zephyr': [{ src: '<<getouticon>>', applybefore: '<<deadwood-harbour-zephyr-link>>\n', expected: 1 }],
@@ -38,12 +47,21 @@ export default function ColdmoonHarbour(maplebirch: typeof window.maplebirch): v
     }
   });
   maplebirch.tool.addTo('Journal', 'deadwood-harbour-journal');
+  maplebirch.tool.addTo('Journal', 'deadwood-pirate-raid-journal');
 
   const ready = (hand: 'left' | 'right') => {
     const target = V.NPCList?.[Number(V[`${hand}target`])];
     return (
-      V.MoreTransformations?.harbour?.fighting &&
-      Time.isBloodMoon() &&
+      !!maplebirch.get('MoreTransformations') &&
+      ((target?.per === 'deadwood_harbour_ghost' && V.MoreTransformations?.harbour?.fighting && Time.isBloodMoon()) ||
+        (target?.per === 'deadwood_ship_undead' && V.MoreTransformations?.harbour?.raid?.stage === 'fight' && V.location === 'pirate_ship' && Weather.dayState === 'night') ||
+        (target?.per === 'deadwood_coin_guard' && V.MoreTransformations?.treasure?.guardian === 'fight' && V.location === 'island')) &&
+      !V.replayScene &&
+      !V.statFreeze &&
+      !V.frozenValues &&
+      !V.possessed &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
       V.combat === 1 &&
       V.enemytype === 'man' &&
       V.enemyhealth > 0 &&
@@ -53,8 +71,7 @@ export default function ColdmoonHarbour(maplebirch: typeof window.maplebirch): v
       !(V.orgasmdown > 0) &&
       V.dissociation < 2 &&
       !(V.trance > 0 || V.panicparalysis > 0 || V.panicviolence > 0 || (V.pain >= 100 && V.willpowerpain === 0)) &&
-      target?.per === 'deadwood_harbour_ghost' &&
-      target.active === 'active' &&
+      target?.active === 'active' &&
       target.stance !== 'defeated' &&
       (V.enemyno < 2 || target.health > 0)
     );

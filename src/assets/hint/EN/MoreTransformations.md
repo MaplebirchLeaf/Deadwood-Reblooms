@@ -206,3 +206,30 @@ After seeing the ghost ship, ask Zephyr about Coldmoon Harbour through the exist
 Zephyr offers £80 to recover a chest, or £120 if you are already a mate. You can agree outright, or agree and haggle: native skulduggery difficulty is 400, reduced to 300 for a mate. Success adds £40; failure leaves the original price. The agreed fee is saved and cannot be rerolled by reopening the conversation.
 
 During the blood moon, search among the underwater wreckage beneath the harbour steps. Each search has a one-in-three chance to recover the chest while the other night encounters remain possible. The chest and contract survive dawn and save/load. Bring the cargo to Zephyr at either meeting place. Payment and +2 interest happen once; an existing mate also gains +2 pirate respect. This job does not grant a promotion. Afterwards, the harbour gains small daytime scenes with the crew.
+
+### Undead boarders
+
+While aboard Zephyr's ship at night, you may encounter an undead boarding party. Blood moons make this more likely, with at least three days between attacks. The encounter does not interrupt an imminent island arrival or a pending forced scene.
+
+On ordinary nights, a bell may sound through the fog, or an unlit ship may creep alongside. Blood moon boarders are stronger, with a warning before you choose to fight. The approach and enemy strength are saved for this encounter and do not reroll when revisited.
+
+- **Hold off the boarder**: enter a regular combat encounter and use your equipped weapons.
+- **Cut the boarding ropes**: check Skulduggery and Physique to help the ship pull away.
+- **Rescue the sailor**: check Swimming and Physique to gain pirate respect and Zephyr's interest.
+- **Take cover below deck**: leave the fighting to the crew.
+
+Defeating the boarder or successfully cutting the ropes also grants a little respect and interest, without an immediate promotion. Crewmates help if a skill action fails. The undead withdraw when daylight arrives.
+
+Angels can banish the undead in combat using their existing daily charges. Borrowed temple weapons work too; selecting the same borrowed weapon with both hands still makes only one strike.
+
+Afterwards, leave immediately or spend five minutes asking Zephyr about the ship or resting by the hatch. Rest relieves 4 stress and 3 tiredness. Each activity is available once per attack, and you can do both. Zephyr mentions Coldmoon Harbour, opening the existing conversation aboard ship or at the smuggler's pub. Accepting the cargo job remains your choice.
+
+## The island gold
+
+Keep exploring the island after discovering its shore to find an old cavern. Light a torch at the entrance brazier. Movement and investigation consume its light; darkness makes hazards harder to spot. Marks let you retrace your path. Swimming, Athletics and Skulduggery offer different routes, with a slower route available without them. Finding the chest opens a shortcut back.
+
+Taking gold grants the undead curse: immunity to pain and temperature effects, and 75% less positive arousal gain. The notebook, carvings and Winter's appraisal explain the return. Every removed coin must go back in its original chest; giving it away does not lift the curse. You can take gold again after returning it.
+
+Tell Zephyr about the cavern to arrange a voyage. Follow the vanilla week-long journey aboard ship; on arrival, the captain anchors at your marked landing and takes a boat ashore with you. Returning from the cavern leaves you aboard ship, where the vanilla return-to-mainland conversation remains available. Sharing the gold before learning its warning curses the captain too, so both shares must be returned. Before understanding the curse, Zephyr may distribute coins among the sailors who helped; the captain must recall those shares. Evidence, crew standing or your relationship, and compensation offer different ways to negotiate. Winter can appraise and borrow coins. Collect every original before returning them; the museum keeps a cast. The research fee is awarded once.
+
+The cavern quest progresses independently of undead ship raids. Your journal tracks missing gold and current leads; statistics retain exploration and return progress.

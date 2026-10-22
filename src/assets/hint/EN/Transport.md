@@ -32,11 +32,13 @@ Take your ID to the driving school and apply for a <span class="teal">provisiona
 
 Lessons and licence appointments require sobriety. You cannot attend with both arms bound or foot shackles on. Having ID does not allow bookings while alcohol or drugs are still affecting you; reception explains the current obstacle.
 
-- **Cars:** pass the theory test, then prepare for the road test. Its four sections ask you to observe the road and choose suitable actions. Minor faults are recorded. <span class="red">A dangerous fault fails the test.</span>
-- **Motorcycles:** complete six hours of basic training, then prepare for the theory, manoeuvres and road tests. The certificate permits practice on a small scooter. Riding requires a helmet.
+- **Cars:** pass the theory test, reach **200** practical preparation in that category and **300** driving skill, then prepare for the road test. Its four sections ask you to observe the road and choose suitable actions. Minor faults are recorded. <span class="red">A dangerous fault fails the test.</span>
+- **Motorcycles:** complete basic training and theory, reach those preparation thresholds, then take the off-road test before the road test. You may pass theory before basic training. Basic training costs **£160**, takes **six hours** and must start by **11:00**. The school supplies a helmet and learner motorcycle. The certificate permits practice on a small scooter while wearing a helmet.
 - **At the test centre:** a borderline result caused by minor faults may leave an opportunity to bluff or bribe the examiner. Being caught brings police attention and suspends bookings for **three days**.
 
-Theory passes, basic training certificates and full driving qualifications are <span class="green">valid for life</span>. After a failed test, you can book again the next day. The school closes on Sundays. Snow and heavy rain suspend driving lessons and practical tests.
+**You do not need to buy a vehicle to practise.** Supervised lessons supply one and take **one hour**, costing **£45** for motorcycles or **£50** for cars. Each adds **70** to both category preparation and driving skill; basic motorcycle training adds **150** to each. Riding or driving your own vehicle improves shared driving skill, but does not replace category preparation from lessons. The school displays both requirements and your next step.
+
+Theory passes, basic training certificates and full driving qualifications are <span class="green">valid for life</span>. You may take only one exam per day; after a failure, book again from the next day. The school closes on Sundays. Falling snow, snow-covered roads and heavy rain suspend practical activities without invalidating theory passes. Bookings need enough time to finish by **17:00**: one-hour lessons start by **16:00**, theory tests by **15:30**, and road tests reserve **fifty minutes**. Reception explains weather, time, fees or waiting dates when the next booking is unavailable.
 
 Driving proficiency appears in your <span class="blue">characteristics</span>. Better handling, braking and awareness can shorten road journeys by up to **30%**, or trail journeys by up to **15%**. Rain and snow still slow you down.
 

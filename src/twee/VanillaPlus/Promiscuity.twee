@@ -1,5 +1,53 @@
 :: Deadwood Reblooms Vanilla Plus Promiscuity Widgets [widget]
 
+<!-- 动作成功后按对应等级调用原版结算。亚人增长两项，但动作代价只执行一次。 -->
+<<widget 'deadwood-reblooms-combat-stat-settle'>>
+  <<set $_sexstatLevel to _args[1] || 6>>
+  <<set $_sexstatAttributes to maplebirch.get('VanillaPlus').promiscuity.attributesFor(Number(_args[0]))>>
+  <<if !$promiscuityIgnore and !$statFreeze and ($consensual is 1 or $_sexstatLevel is 6)>>
+    <<set $_sexstatPrimary to $_sexstatAttributes[0] || 'promiscuity'>>
+    <<set $_sexstatLimit to $_sexstatLevel is 6 and $VanillaPlus.lock.promiscuity ? maplebirch.get('VanillaPlus').ceiling('promiscuity') : Math.min(20 * $_sexstatLevel, maplebirch.get('VanillaPlus').normalCeiling('promiscuity'))>>
+    <<if $_sexstatAttributes.length is 2 and $promiscuity gte $_sexstatLimit and ($consensual is 1 or $_sexstatLevel is 6)>>
+      <<set $_sexstatPrimary to 'deviancy'>>
+    <</if>>
+    <<set $_sexstatSecondary to $_sexstatAttributes.find(attribute => attribute isnot $_sexstatPrimary)>>
+    <<set $_sexstatGain to $control lt $controlmax ? 2 : 1>>
+    <<if $_sexstatPrimary is 'deviancy'>>
+      <<combatdeviancyN $_sexstatLevel>>
+    <<elseif $_sexstatLevel is 5>>
+      <<combatpromiscuity5>>
+    <<else>>
+      <<combatpromiscuityN $_sexstatLevel>>
+    <</if>>
+    <<if $_sexstatSecondary>>
+      <!-- 第二项复用同一动作执行前的原版成长倍率，不再重复施加动作代价。 -->
+      <<set $_sexstatCeiling to $VanillaPlus.lock[$_sexstatSecondary] ? maplebirch.get('VanillaPlus').ceiling($_sexstatSecondary) : maplebirch.get('VanillaPlus').normalCeiling($_sexstatSecondary)>>
+      <<set $_sexstatLimit to $_sexstatLevel is 6 ? $_sexstatCeiling : Math.min(20 * $_sexstatLevel, $_sexstatCeiling)>>
+      <<set $_sexstatBefore to V[$_sexstatSecondary]>>
+      <<if V[$_sexstatSecondary] lt $_sexstatLimit>>
+        <<set V[$_sexstatSecondary] to Math.min(V[$_sexstatSecondary] + $_sexstatGain, $_sexstatCeiling)>>
+      <</if>>
+      <<if $_sexstatLevel is 5 and $consensual is 1 and V[$_sexstatSecondary] lte $_sexstatBefore and $VanillaPlus.lock[$_sexstatSecondary] and V[$_sexstatSecondary] gte maplebirch.get('VanillaPlus').normalCeiling($_sexstatSecondary) and V[$_sexstatSecondary] lt $_sexstatCeiling>>
+        <<set $VanillaPlus[$_sexstatSecondary].levelFive to ($VanillaPlus[$_sexstatSecondary].levelFive || 0) + 1>>
+        <<if $VanillaPlus[$_sexstatSecondary].levelFive gte 4>>
+          <<set $VanillaPlus[$_sexstatSecondary].levelFive -= 4>>
+          <<set V[$_sexstatSecondary] to Math.min(V[$_sexstatSecondary] + 1, $_sexstatCeiling)>>
+        <</if>>
+      <</if>>
+      <<earSlimeSeenActions $_sexstatSecondary $_sexstatLevel 5>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<!-- 按目标适用的属性输出同等级提示，主提示沿用原版战斗分流与隐藏设置。 -->
+<<widget 'deadwood-reblooms-combat-stat-rating'>>
+  <<set $_sexstatRating to _args[1] || 6>>
+  <<combatpromiscuous $_sexstatRating>>
+  <<if $enemytype is 'man' and ($consensual is 1 or $_sexstatRating is 6) and !$promiscuityIgnore and maplebirch.get('VanillaPlus').promiscuity.attributesFor(Number(_args[0])).includes('deviancy')>>
+    <<deviant $_sexstatRating>>
+  <</if>>
+<</widget>>
+
 <!-- 舌吻是独立的深度法式舌吻动作，不覆盖原版普通亲吻。 -->
 <<widget 'deadwood-reblooms-promiscuity-tongue-kiss'>>
   <<set $_promiscuityTongueKissTarget to Number($mouthtarget)>>
@@ -7,12 +55,13 @@
   <<set $_promiscuityTongueKissAvailable to $_promiscuityTongueKissNPC and $mouthuse is 'kiss' and ['kissentrance', 'kissimminent', 'kiss'].includes($mouthstate) and $_promiscuityTongueKissNPC.mouth.toString().includes('kiss') and $_promiscuityTongueKissNPC.location.genitals isnot 'head'>>
   <<if $_promiscuityTongueKissAvailable>>
     <<personselect $_promiscuityTongueKissTarget>>
-    <<combatpromiscuity3>><<oralskilluse>>
+    <<oralskilluse>>
     <<set $_promiscuityTongueKissSuccess to maplebirch.get("VanillaPlus").promiscuity.mastered or $gamemode is 'soft' or combatSkillCheck('oral', $_promiscuityTongueKissTarget, $_promiscuityTongueKissNPC.fullDescription)>>
     <<if $_promiscuityTongueKissSuccess>>
       <<set $mouthuse to 'kiss'>><<set $mouthstate to 'kiss'>>
       <<set $_promiscuityTongueKissNPC.mouth to 'kiss'>>
       <<set $_promiscuityTongueKissNPC.location.head to 'head'>>
+      <<deadwood-reblooms-combat-stat-settle $_promiscuityTongueKissTarget 3>>
       <<submission 3>><<sex 3 'mouth' $_promiscuityTongueKissTarget>>
       <<language>>
         <<option 'EN'>>
@@ -52,14 +101,22 @@
   <<set $_promiscuityGuideNPC to $NPCList[$_promiscuityGuideTarget]>>
   <<set $_promiscuityGuideSuccess to false>>
   <<set $_promiscuityGuideReady to false>>
-  <<if $combat is 1 and $position isnot 'stalk' and $_promiscuityGuideNPC and maplebirch.get("VanillaPlus").promiscuity.hasPenis($_promiscuityGuideTarget) and !$_promiscuityGuideNPC.chastity.penis.includes('chastity')>>
+  <<set $_promiscuityGuideOrifice to $_promiscuityGuideDestination.includes('vagina') ? 'vagina' : 'anus'>>
+  <<set $_promiscuityGuideLevel to $_promiscuityGuideDestination.startsWith('NPC-') or ($_promiscuityGuideOrifice is 'vagina' ? $vaginause : $anususe) is 'penis' ? 6 : 5>>
+  <<set $_promiscuityGuideAllowed to maplebirch.get('VanillaPlus').promiscuity.canAdvancedActions($_promiscuityGuideTarget) and $walltype isnot 'front' and !$gloryhole>>
+  <<set $_promiscuityGuideAllowed to $_promiscuityGuideAllowed and T[$_promiscuityGuideHand + 'Options'] is 'free' and V[$_promiscuityGuideHand + 'arm'] is 0>>
+  <<if $_promiscuityGuideDestination.startsWith('player-')>>
+    <<set $_promiscuityGuideAllowed to $_promiscuityGuideAllowed and !playerChastity($_promiscuityGuideOrifice) and ($_promiscuityGuideOrifice is 'vagina' ? $player.vaginaExist : $settings.analEnabled)>>
+  <<else>>
+    <<set $_promiscuityGuideAllowed to $_promiscuityGuideAllowed and $enemytype is 'man'>>
+  <</if>>
+  <<if $_promiscuityGuideAllowed and $combat is 1 and $position isnot 'stalk' and $_promiscuityGuideNPC and $_promiscuityGuideNPC.penis isnot 'clothed' and maplebirch.get("VanillaPlus").promiscuity.hasPenis($_promiscuityGuideTarget) and !$_promiscuityGuideNPC.chastity.penis.includes('chastity')>>
     <<handstat>><<handskilluse>>
     <<set $_promiscuityGuideSuccess to maplebirch.get("VanillaPlus").promiscuity.mastered or $gamemode is 'soft' or $gloryhole>>
     <<if !$_promiscuityGuideSuccess>>
       <<set $_promiscuityGuideSuccess to combatSkillCheck('hand', $_promiscuityGuideTarget, $_promiscuityGuideNPC.fullDescription)>>
     <</if>>
     <<if $_promiscuityGuideSuccess>>
-      <<set $_promiscuityGuideOrifice to $_promiscuityGuideDestination.includes('vagina') ? 'vagina' : 'anus'>>
       <<if $_promiscuityGuideDestination.startsWith('player-')>>
         <<set $_promiscuityGuideUse to $_promiscuityGuideOrifice is 'vagina' ? $vaginause : $anususe>>
         <<set $_promiscuityGuidePrimary to $_promiscuityGuideOrifice is 'vagina' ? $vaginatarget : $anustarget>>
@@ -80,13 +137,13 @@
         <<set $_promiscuityGuideReady to $VanillaPlus.npcDoublePenetration and Number($VanillaPlus.npcDoublePenetration.partner) is $_promiscuityGuideTarget and $VanillaPlus.npcDoublePenetration.orifice is $_promiscuityGuideOrifice>>
       <</if>>
       <<if $_promiscuityGuideReady>>
-        <<submission 5>><<sexControl 5 `currentSkillValue('handskill')` $_promiscuityGuideTarget>><<combatpromiscuity6>>
+        <<submission 5>><<sexControl 5 `currentSkillValue('handskill')` $_promiscuityGuideTarget>><<deadwood-reblooms-combat-stat-settle $_promiscuityGuideTarget $_promiscuityGuideLevel>>
         <<personselect $_promiscuityGuideTarget>>
         <<language>>
           <<option 'EN'>>
-            <span class="lblue">You take hold of <<combatperson>>'s penis and guide it into position</span>, directing the movement with your hand.
+            <span class="lblue">You take hold of <<combatperson>>'s <<npcPenis $_promiscuityGuideTarget>> and guide it into position.</span>
           <<option 'CN'>>
-            <span class="lblue">你握住<<combatperson>>的肉棒，将它引向合适的位置</span>，用手掌控着它的去向。
+            <span class="lblue">你握住<<combatperson>>的<<npcPenis $_promiscuityGuideTarget>>，将它引向合适的位置。</span>
         <</language>>
       <<else>>
         <span class="red"><<lanSwitch 'The position is no longer available.' '所需的位置已经无法使用。'>></span>
@@ -95,9 +152,9 @@
       <<personselect $_promiscuityGuideTarget>>
       <<language>>
         <<option 'EN'>>
-          You reach for <<combatperson>>'s penis, <span class="blue">but fail to move it where you want.</span>
+          You reach for <<combatperson>>'s <<npcPenis $_promiscuityGuideTarget>>, <span class="blue">but fail to move it where you want.</span>
         <<option 'CN'>>
-          你伸手去抓<<combatperson>>的肉棒，<span class="blue">却没能把它移到想要的位置。</span>
+          你伸手去抓<<combatperson>>的<<npcPenis $_promiscuityGuideTarget>>，<span class="blue">却没能把它移到想要的位置。</span>
       <</language>>
     <</if>>
   <<else>>
@@ -109,11 +166,11 @@
 <<widget 'deadwood-reblooms-promiscuity-request-options'>>
   <<set $_promiscuityTarget to Number($mouthtarget)>>
   <<set $_promiscuityCommands to _askActions>>
-  <<if $position isnot 'stalk' and maplebirch.get("VanillaPlus").promiscuity.expanded and $enemytype is 'man' and $NPCList[$_promiscuityTarget]>>
+  <<if $position isnot 'stalk' and maplebirch.get("VanillaPlus").promiscuity.canAdvancedActions($_promiscuityTarget) and $enemytype is 'man' and $NPCList[$_promiscuityTarget]>>
     <<set $_promiscuityTargetName to lanSwitch( $NPCList[$_promiscuityTarget].fullDescription, $NPCList[$_promiscuityTarget].fullDescription_CN || $NPCList[$_promiscuityTarget].fullDescription )>>
-    <!-- Ask 沿用原版说服难度，双重插入额外显示六级淫乱评级。 -->
+    <!-- Ask 沿用原版说服难度，双重插入按所选对象显示对应属性。 -->
     <<set $_promiscuityDifficulty to _diffText>>
-    <<set $_promiscuityLevel6 to _diffText + ($settings.blindStatsEnabled ? '' : lanSwitch(' - Promiscuity 6', ' - 淫乱 6'))>>
+    <<set $_promiscuityLevel6 to _diffText + ' ' + $('<span>').wiki('<<deadwood-reblooms-combat-stat-rating ' + $_promiscuityTarget + '>>').text().trim()>>
     <<set $_promiscuityLowerExposed to $worn.lower.vagina_exposed gte 1>>
     <<set $_promiscuityLowerExposed to $_promiscuityLowerExposed or setup.clothes.lower[clothesIndex('lower', $worn.lower)].skirt gte 1>>
     <<set $_promiscuityGenitalsExposed to $worn.over_lower.vagina_exposed gte 1>>
@@ -246,7 +303,7 @@
       <<set $_promiscuityAction to $_promiscuityChoice.replace('promiscuity-', '')>>
       <<set $_promiscuityAvailable to maplebirch.get("VanillaPlus").promiscuity.canAsk($_promiscuityAction, $_promiscuityTarget)>>
     <</if>>
-    <<if $position is 'stalk'>>
+    <<if $combat isnot 1 or $position is 'stalk' or $enemytype isnot 'man' or !maplebirch.get('VanillaPlus').promiscuity.canAdvancedActions($_promiscuityTarget)>>
       <<set $_promiscuityAvailable to false>>
     <</if>>
     <<if !$_promiscuityAvailable>>
@@ -422,7 +479,7 @@
           <<set $_promiscuityDoubleSuccess to ($_promiscuityDoubleSuccess or ($_promiscuityChoice is 'promiscuity-penetrate-player-vagina-double' and $vaginause is 'penisdouble' and Number($vaginadoubletarget) is $_promiscuityTarget))>>
           <<set $_promiscuityDoubleSuccess to ($_promiscuityDoubleSuccess or ($_promiscuityChoice is 'promiscuity-penetrate-player-anus-double' and $anususe is 'penisdouble' and Number($anusdoubletarget) is $_promiscuityTarget))>>
           <<if $_promiscuityDoubleSuccess>>
-            <<combatpromiscuity6>>
+            <<deadwood-reblooms-combat-stat-settle $_promiscuityTarget>>
           <</if>>
         <<else>>
           <span class="red"><<lanSwitch 'They cannot reach the position you asked for.' '对方无法调整到你要求的姿势。' >></span>
@@ -446,6 +503,7 @@
   <<set $_promiscuityPart to _args[0]>>
   <<set $_promiscuityTarget to _args[1]>>
   <<personselect $_promiscuityTarget>>
+  <<if $enemytype is 'beast'>><<set $NPCList[$_promiscuityTarget].stance to 'top'>><</if>>
   <<if $_promiscuityPart is 'vagina'>>
     <<set $vaginause to 'penis'>>
     <<set $vaginastate to 'entrance'>>
@@ -474,8 +532,8 @@
 <</widget>>
 
 <!-- 框架动作结果：只有原版姿势确实写入后才结算成长，并恢复临时的判定标记。 -->
-<<widget 'deadwood-reblooms-promiscuity-direct-result'>>
-  <<if _vanillaPlusPromiscuityTarget isnot undefined>>
+<<widget 'deadwood-reblooms-combat-direct-result'>>
+  <<if _vanillaPlusPromiscuity is _args[0] and _vanillaPlusPromiscuityTarget isnot undefined>>
     <<set $_promiscuityDirectSuccess to false>>
     <<switch _args[0]>>
       <<case 'vagina'>>
@@ -493,7 +551,7 @@
     <</switch>>
     <<set $promiscuityIgnore to _vanillaPlusPromiscuityIgnore>>
     <<if $_promiscuityDirectSuccess>>
-      <<combatpromiscuity6>>
+      <<deadwood-reblooms-combat-stat-settle _vanillaPlusPromiscuityTarget 5>>
     <</if>>
     <<unset _vanillaPlusPromiscuity>>
     <<unset _vanillaPlusPromiscuityIgnore>>

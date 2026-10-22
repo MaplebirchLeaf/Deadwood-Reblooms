@@ -2,10 +2,12 @@
 
 import DarkfeatherShrine from './DarkfeatherShrine';
 import ColdmoonHarbour from './ColdmoonHarbour';
+import CoinCave from './CoinCave';
 
 export default function MoreTransformations(maplebirch: typeof window.maplebirch): void {
   DarkfeatherShrine(maplebirch);
   ColdmoonHarbour(maplebirch);
+  CoinCave(maplebirch);
 
   maplebirch.tool.onInit(() => {
     maplebirch.tool.patch.traits.add({
@@ -19,7 +21,7 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
 
   maplebirch.tool.inject({
     locationPassage: {
-      // 神社参道接在地点说明后；手动找鸟只放在老教堂墓地的岔路口。
+      // 神社参道接在地点说明后。手动找鸟只放在老教堂墓地的岔路口。
       Forest: [
         { srcmatch: /<<elseif \$eventskip gte 1>>[^<]*<br><br>/g, applyafter: '\n\t\t<<deadwood-raven-shrine-path>>\n', expected: 5 },
         { src: '<<if $forest gte 10 and $forest lte 14>>', applyafter: '\n\t\t<<deadwood-raven-link>>', expected: 1 }
@@ -33,6 +35,27 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
       ]
     },
     widgetPassage: {
+      Widgets: [
+        {
+          srcmatch: /<<set \$arousal \+= (_args\[0\]|_change)>>/,
+          to: '<<set $arousal += (maplebirch.get("MoreTransformations")?.Undead.arousal($1) ?? $1)>>',
+          expected: 1
+        }
+      ],
+      'Widgets Sleep': [
+        {
+          src: '<<set $arousal += 10>>',
+          to: '<<set $arousal += (maplebirch.get("MoreTransformations")?.Undead.arousal(10) ?? 10)>>',
+          expected: 1
+        }
+      ],
+      'Widgets Wraith': [
+        {
+          src: '<<set $arousal += (_args[0] * 3)>>',
+          to: '<<set $arousal += (maplebirch.get("MoreTransformations")?.Undead.arousal(_args[0] * 3) ?? _args[0] * 3)>>',
+          expected: 1
+        }
+      ],
       'Widgets Mirror': [
         {
           src: '<<if _animal>>',

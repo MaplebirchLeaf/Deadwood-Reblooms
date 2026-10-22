@@ -1,7 +1,7 @@
 // ./src/script/NamedNPCSidebarPortrait/NPCOutfitSets/Alex.ts
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
-import { Clothing } from '../Clothing';
+import Clothing from '../../../assets/npc-sidebar-portrait/clothing.json';
 import inject from './Inject';
 import { addSet, sync, naked } from './Clothes';
 

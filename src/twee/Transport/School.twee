@@ -227,18 +227,12 @@
     <<lanSwitch 'Driving faults: ' '驾驶小错：'>><span class='lblue'><<print $Transport.school.report.minor_faults>></span><br>
     <<lanSwitch 'Serious faults: ' '危险错误：'>><span class='red'><<print $Transport.school.report.serious_faults>></span><br><br>
   <</if>>
-  <<if Time.days lt $Transport.school.penalty_until>>
-    <span class='purple'>
-      <<lanSwitch 'Your bookings are suspended for ' '预约暂停，还需等 '>>
-      <<print $Transport.school.penalty_until - Time.days>><<lanSwitch ' days.' ' 天。'>>
-    </span><br><br>
-  <</if>>
   <<if !$Transport.school.provisional.issued>>
     <<language>>
       <<option 'EN'>>
-        The application form asks for your name, address and ID number. A photograph and the <<printmoney 4300>> fee go in the same envelope.
+        The receptionist taps the application form. "You'll need a provisional licence before either course." It asks for your name, address and ID number. A photograph and the <<printmoney 4300>> fee go in the same envelope.
       <<option 'CN'>>
-        申请表要填姓名、住址和身份证号码。照片与 <<printmoney 4300>> 手续费一起装进信封。
+        前台点了点申请表。“两种课程都得先领到临时驾照。”表上要填姓名、住址和身份证号码。照片与 <<printmoney 4300>> 手续费一起装进信封。
     <</language>><br><br>
     <<if _school.canApply>>
       <<capture _school_revision>>
@@ -263,9 +257,12 @@
   <<else>>
     <<if _school.record.licensed>>
       <span class='green'><<lanSwitch 'Full licence obtained' '已取得正式驾驶资格'>></span><br><br>
+      <<deadwood-transport-school-next>>
     <<else>>
       <<lanSwitch 'Theory preparation: ' '理论准备：'>><<print _school.record.study>> / 3<br>
-      <<lanSwitch 'Supervised driving lessons: ' '实操课程：'>><<print _school.record.lessons>><br>
+      <<lanSwitch 'Completed practical sessions (including basic training): ' '已完成实操训练（含基础培训）：'>><<print _school.record.lessons>><br>
+      <<lanSwitch 'Practical preparation: ' '本类实操熟练度：'>><span @class="_school.record.practice >= _school.requirements.practice ? 'green' : 'lblue'"><<= _school.record.practice>></span> / <<= _school.requirements.practice>><br>
+      <<lanSwitch 'Driving skill: ' '驾驶技能：'>><span @class="$Transport.driving >= _school.requirements.driving ? 'green' : 'lblue'"><<= $Transport.driving>></span> / <<= _school.requirements.driving>><br>
       <<if _school.record.theory>>
         <span class='green'><<lanSwitch 'Theory test passed' '理论考试已通过'>></span><br>
       <</if>>
@@ -275,23 +272,16 @@
         <<else>>
           <<language>>
             <<option 'EN'>>
-              Basic motorcycle training takes the whole day. A helmet and a learner motorcycle are supplied.
+              Basic motorcycle training is still required. A helmet and a learner motorcycle are supplied.
             <<option 'CN'>>
-              摩托车基础培训要上一整天。驾校提供头盔和练习车辆。
+              摩托车基础培训尚未完成。驾校提供头盔和练习车辆。
           <</language>><br>
         <</if>>
         <<if $Transport.school.motorcycle.module_1>>
           <span class='green'><<lanSwitch 'Off-road manoeuvres completed' '场地考试已通过'>></span><br>
         <</if>>
       <</if>><br>
-      <<if !_school.practicalWeather>>
-        <<language>>
-          <<option 'EN'>>
-            The instructor looks out at the weather and hangs the keys back up. "We'll keep the vehicles in today. The classroom's still open."
-          <<option 'CN'>>
-            教练看了眼窗外，将钥匙挂回去。“今天先把车留在里面。教室照常开。”
-        <</language>><br><br>
-      <</if>>
+      <<deadwood-transport-school-next>>
       <<if _school.canStudy>>
         <<capture _school_revision>>
           <<icon 'transport/theory.png'>><<lanLink ['Study road rules and hazards (£30, 1:00)', '学习交规 (£30, 1:00)']>>
@@ -330,22 +320,12 @@
       <</if>>
       <<if _school.canTest>>
         <<capture _school_revision>>
-          <<icon 'transport/road-test.png'>><<lanLink ['Begin the road test (£' + _school.terms.test_fee / 100 + ', 0:45)', '开始道路考试（£' + _school.terms.test_fee / 100 + '，0:45）']>>
+          <<icon 'transport/road-test.png'>><<lanLink ['Begin the road test (£' + _school.terms.test_fee / 100 + ', allow 0:50)', '开始道路考试（£' + _school.terms.test_fee / 100 + '，预留0:50）']>>
             <<if maplebirch.get('Transport').school.attend('test', _school_revision) and $passage is 'Deadwood Transport School'>>
               <<goto 'Deadwood Transport School'>>
             <</if>>
           <</lanLink>>
         <</capture>><br>
-      <<elseif _school.record.theory and _school.record.retest_day lte Time.days and (_school.record.practice lt 200 or $Transport.driving lt 300)>>
-        <i><<lanSwitch 'The instructor suggests some more supervised practice before your test.' '教练建议你先多练习几次，再预约考试。'>></i><br>
-      <</if>>
-      <<if _school.record.theory_retest_day gt Time.days>>
-        <i><<lanSwitch 'Your next theory test can be booked in ' '理论考试还需等 '>>
-        <<print _school.record.theory_retest_day - Time.days>><<lanSwitch ' days.' ' 天。'>></i><br>
-      <</if>>
-      <<if _school.record.retest_day gt Time.days>>
-        <i><<lanSwitch 'Your next practical test can be booked in ' '实操考试还需等 '>>
-        <<print _school.record.retest_day - Time.days>><<lanSwitch ' days.' ' 天。'>></i><br>
       <</if>>
       <<if _school.canAlter>>
         <br>
@@ -392,11 +372,9 @@
       <</capture>><br>
     <</if>>
   <</if>>
-  <<set _pending to $Transport.school.provisional.applied_day gte 0 and !$Transport.school.provisional.issued>>
-  <<if !_school.available and Time.days gte $Transport.school.penalty_until>>
-    <<deadwood-transport-school-blocked>>
-  <<elseif !_pending and !_school.record.licensed and !_school.canApply and !_school.canCollect and !_school.canStudy and !_school.canTheory and !_school.canTrain and !_school.canCBT and !_school.canModuleOne and !_school.canTest>>
-    <<deadwood-transport-school-blocked `$Transport.school.provisional.issued ? _school.terms.study_fee : _school.terms.provisional_fee`>>
+  <<set _pending to $Transport.school.provisional.ready_day gt Time.days and !$Transport.school.provisional.issued>>
+  <<if !$Transport.school.provisional.issued and !_pending and !_school.canApply and !_school.canCollect>>
+    <<deadwood-transport-school-blocked _school.fees[_school.nextStep] _school.nextStep>>
   <</if>>
   <<deadwood-transport-return>>
 <</if>>

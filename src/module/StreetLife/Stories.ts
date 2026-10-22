@@ -19,7 +19,7 @@ interface StoryState {
 
 const story = (): StoryState => ({ stage: 0, choice: '', outcome: '', crew: [], roll: 0, result: '', quality: 0, source: '', paid: 0, spent: 0, paused: false });
 
-/** 三段街头经历只保存实际选择；剧情与结算写在自有 Twee，普通菜单仅接入短入口。 */
+/** 三段街头经历只保存实际选择。剧情与结算写在自有 Twee，普通菜单仅接入短入口。 */
 export default class Stories {
   public static readonly defaults: Record<StreetStory, StoryState> = { landry: story(), wren: story(), mickey: story() };
   public readonly terms = terms;

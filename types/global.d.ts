@@ -42,6 +42,7 @@ declare global {
   const Links: { enabled: boolean };
 
   interface Window {
+    Transformations: { readonly defaults: { readonly demon: { readonly colour: { h: number; s: number; l: number } } } };
     dailyTransformationEffects(): void;
     crimeSumCurrent(): number;
     settingValueNameFromValue?: (name: string, value: unknown) => unknown;
@@ -67,6 +68,7 @@ declare global {
     playerChastity(slots?: string | readonly string[], inAllSlots?: boolean): boolean;
     playerPenisSize(): number;
     npcHasStrapon(index?: number): boolean;
+    beastSexEnabledForType(type: string, beastAlreadyGeneratedAsMonster: boolean): boolean;
     hasSexStat(input: string, required: number, modifiers?: boolean): boolean;
     wearingSchoolOutfit?: () => boolean;
     isCrossdressing?: () => boolean;

@@ -15,9 +15,9 @@
 - passage: Traits
   # 保留原版的称号判断，只在返回名称后补生理标记。
   findRegex: >-
-    name: \(\) => (V\.player\.gender is "n" \? "[^"]+" : "[^"]+"|V\.hallucinations gte 2 \|\| !V\.settings\.bestialityEnabled \? "[^"]+" : V\.player\.gender is "n" \? "[^"]+" : "[^"]+"),
+    name: \(\) => (V\.player\.gender is "n" \? "[^"]+" : "[^"]+"|(?:V\.hallucinations gte 2 \|\| !V\.settings\.bestialityEnabled|resolveIfNamedBeastIsMonster\("greathawk"\)) \? "[^"]+" : V\.player\.gender is "n" \? "[^"]+" : "[^"]+"),
   replace: >-
-    name: () => (() => $1)() + (V.player.sex is "h" ? " (⚥)" : ""),
+    name: () => ($1) + "<<deadwood-trait-sex>>",
   all: true
 
 - passage: Traits
@@ -25,13 +25,13 @@
   findRegex: >-
     return "(Bull(?: <<pcGender>>)?|Cow(?: <<pcGender>>)?|Fox(?: <<pcGender>>)?|Vixen|公牛(?:<<pcGender>>)?|奶牛(?:<<pcGender>>)?|雄狐|狐<<pcGender>>|雌狐)";
   replace: >-
-    return "$1" + (V.player.sex is "h" ? " (⚥)" : "");
+    return "$1<<deadwood-trait-sex>>";
   all: true
 
 - passage: Traits
-  # 原版恶魔称号只给异装男女标注生理性别，双性角色补上对应符号。
+  # 保留原版恶魔的异装称谓，固定生理标签统一为同一标记。
   findRegex: >-
-    return "(Incubus|Succubus|魅影|魅魔)";
+    return "(Incubus|Succubus|魅影|魅魔)(?: \((?:female|male)\)|\([♀♂]\))?";
   replace: >-
-    return "$1" + (V.player.sex is "h" ? " (⚥)" : "");
+    return "$1<<deadwood-trait-sex>>";
   all: true
