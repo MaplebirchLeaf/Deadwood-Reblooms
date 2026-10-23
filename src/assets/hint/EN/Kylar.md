@@ -18,4 +18,4 @@ Choices bring different dialogue, affection and stress changes. Notes and helpin
 
 ### Manor visits and living in your home
 
-Use the housing process in Finance to invite Kylar into a purchased home. Some interactions then move to that home, without a second Kylar appearing at the manor. Jealousy still affects time together and invitations to other residents; overnight permission does not remove those relationship limits.
+Use the housing process in Finance to invite Kylar into a purchased home. Some interactions then move to that home. Jealousy still affects time together and invitations to other residents; overnight permission does not remove those relationship limits.

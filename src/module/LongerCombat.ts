@@ -116,16 +116,11 @@ class LongerCombat {
     for (const field of ['penis', 'vagina'] as const) {
       const state = typeof npc[field] === 'string' ? npc[field] : '';
       if (!state) continue;
-      if (state.includes('otheranus')) add('anus:penis');
-      else if (state.includes('anus')) add('penis:anus');
-      else if (state.includes('penis')) add(field === 'penis' ? 'penis:penis' : 'vagina:penis');
-      else if (state.includes('vagina')) add(field === 'penis' ? 'penis:vagina' : 'vagina:vagina');
-    }
-    if (pairs.length === 0) {
-      const hasPenis = npc.penis !== undefined && npc.penis !== 'none';
-      const hasVagina = npc.vagina !== undefined && npc.vagina !== 'none';
-      if (hasPenis) add(V.player?.vaginaExist ? 'penis:vagina' : 'penis:anus');
-      else if (hasVagina) add(V.player?.penisExist ? 'vagina:penis' : 'vagina:vagina');
+      // 入口、试探与外部摩擦仍由原版描述，不从身体结构推测已经发生的动作。
+      if (state === 'otheranus') add('anus:penis');
+      else if (['anus', 'anusdouble'].includes(state)) add('penis:anus');
+      else if (state === 'penis') add(field === 'penis' ? 'penis:penis' : 'vagina:penis');
+      else if (['vagina', 'vaginadouble'].includes(state)) add(field === 'penis' ? 'penis:vagina' : 'vagina:vagina');
     }
     return pairs.slice(0, 2);
   }
@@ -161,9 +156,10 @@ class LongerCombat {
       if (!line) continue;
       const organ = LongerCombat.pairOrgan(pair, npc);
       const prefix = `${LongerCombat.NPC_KEY}:named:${character}:${organ}:${type}:${stage}`;
-      const namedLine = this.core.services.translator.has(`${prefix}:0`) && Math.random() < 0.6 ? this.npcLine(prefix, previous?.namedLine) : '';
+      const namedLine = this.npcLine(prefix, previous?.namedLine);
       lines[pair] = { line, namedLine: namedLine || previous?.namedLine || '' };
-      speech.push('"' + (namedLine ? namedLine + space + line : line) + '"');
+      // 角色台词独立成句，缺失时才回退通用台词，避免同一句中口吻与意愿相互矛盾。
+      speech.push('"' + (namedLine || line) + '"');
     }
     if (speech.length === 0) return description;
     this.lastLines.set(index, { name, lines });

@@ -25,7 +25,7 @@ At 65 days, chicks gain a personality: **clumsy** chicks favour rubbish, **sympa
 
 Once they can hunt, chicks venture onto the moor alone. You may meet them deep in the moor, or have a child ask to join you when you hunt alone. Watch for events on the journey and divide the loot when you return.
 
-Solo hunting counts the actual seconds that pass while you are at the tower, on the moor or in the castle. Several short activities count towards the same remaining time.
+Solo hunts progress while you are at the tower, on the moor or in the castle. You can spend the wait on several short activities.
 
 Guide your chicks through their first flight and first hunt to gain **Falconer**. When a chick joins your hunt, you can carry one extra piece of loot. Solo hunts keep their usual limit.
 

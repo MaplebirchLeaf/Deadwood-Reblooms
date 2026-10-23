@@ -64,7 +64,7 @@ Robin must have enough shop funds, and your reserves must allow delivery. Supply
 
 Complete **three Robin drinks-shop orders and three Alex standing orders** to earn **Seasoned Supplier**. Ordinary bulk fruit deliveries then take twenty minutes instead of thirty, with the actual duration shown on the link. The shared 100-fruit daily limit, price, reserves and standing-order deposit remain the same.
 
-A new market regular can buy five displayed fruit at the original price once daily. Farm, shop and regular-customer sales have ledger entries; viewing them does not pay twice.
+A new market regular can buy five displayed fruit at the original price once daily. The ledger records farm, shop and regular-customer sales.
 
 ### Orchard winemaking and bottled sales
 

@@ -25,7 +25,7 @@ Review terms once a week: **more volume** raises orders to 12 batches with the s
 
 Board purchasing policy affects new orders under the agreement: **expansion** increases batches by a further 25%, while **reserves** increases the advance by 5 percentage points. Income policy keeps the base terms. Signed orders are unchanged.
 
-The traits page displays **Avery's Partner** while these privileges are active. It hides the trait while they are suspended and restores it when you qualify again.
+The traits page displays **Avery’s Partner** while the agreement is active and hides it while privileges are suspended.
 
 <span class="blue">Supply cooperation depends on paid contracts and requires no shares. Shareholder meetings and board eligibility use settled holdings separately. Company progress, rent and overdue invoices appear in the journal.</span>
 

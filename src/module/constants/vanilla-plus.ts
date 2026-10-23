@@ -4,7 +4,7 @@ import type { NPCDoublePenetrationData } from '../VanillaPlus/NPCDoublePenetrati
 
 /** 六项可突破属性。锁与特质表都以此为准。 */
 export type VanillaPlusAttribute = 'willpower' | 'physique' | 'beauty' | 'exhibitionism' | 'deviancy' | 'promiscuity';
-/** 可解锁的特质：六项属性特质，外加全属性满值后的"不可救药"。 */
+/** 可解锁的特质：六项属性特质，外加全属性满值后的“全能”。 */
 export type VanillaPlusTrait = VanillaPlusAttribute | 'incorrigible';
 
 // 模块 VanillaPlus 的存档结构，对应 V.VanillaPlus。

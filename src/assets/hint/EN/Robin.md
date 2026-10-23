@@ -47,11 +47,11 @@ Enter through **Cliff Street → Robin's drinks shop**, open 09:00–21:00. Open
 
 With both stalls upgraded, sufficient income, confidence and manageable trauma let Robin clear old debts and pay their own rent. Later, discuss paying both rents. Actual payment is selected when Bailey collects, and Robin must retain money for their own next rent.
 
-| Goal             | Main preparation                                                                                                                                                        |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Independent rent | At least <span class="gold">£1,500</span> weekly income, enough for current rent and a buffer; 60 dominance, no more than 40 trauma and enough funds to clear old debts |
-| Shared rent      | At least <span class="gold">£5,000</span> weekly income, rising with larger rent bills; 80 dominance, 60 affection and no more than 30 trauma                           |
-| Joint resistance | Already paying independent rent, at least <span class="gold">£4,000</span> weekly income, 85 dominance and no more than 30 trauma; agree on the plan in the room        |
+| Goal             | Main preparation                                                                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Independent rent | At least <span class="gold">£1,500</span> weekly income, enough for current rent and a buffer; 60 confidence, no more than 40 trauma and enough funds to clear old debts |
+| Shared rent      | At least <span class="gold">£5,000</span> weekly income, rising with larger rent bills; 80 confidence, 60 affection and no more than 30 trauma                           |
+| Joint resistance | Already paying independent rent, at least <span class="gold">£4,000</span> weekly income, 85 confidence and no more than 30 trauma; agree on the plan in the room        |
 
 Joint resistance enters an actual fight at Bailey's next rent collection. After two victories, contact the other orphans; after three, build solidarity. Four victories and the original consecutive-defeat progress lead to the final confrontation through the hall and journal. Defeat can worsen Robin's trauma.
 

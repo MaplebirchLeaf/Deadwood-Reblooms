@@ -12,7 +12,7 @@ While Sydney is actually working in the garden or quarters, the native hourly se
 
 Join Sydney on duty to tend the garden or tidy the quarters. One hour improves the area by **6 points**, retaining its Tending or Housekeeping practice and grace. Sydney’s own hourly contribution is not counted again during the shared work.
 
-The option follows Sydney's current schedule and leaves time to finish the hour. Promotion does not necessarily end quarters duties. An old work assignment will not show the option while Sydney is away from the temple.
+The option follows Sydney's current schedule and leaves time to finish the hour. Promotion does not necessarily end quarters duties.
 
 ### Temple bunk
 

@@ -161,15 +161,15 @@
     <<set _deadwoodCompany to $Finance.company, _deadwoodGovernance to _deadwoodCompany.shareholders>>
     <<foldout false "_deadwoodCompanyFoldout">>
       <span class='gold'><<lanSwitch 'Company and governance records' '企业与治理记录'>></span>
-      <<deadwood-reblooms-progress-check `maplebirch.get('Finance').company.shareholders.director || maplebirch.get('Finance').company.shareholders.controller` `["Secure a board seat", "取得董事席位"]` `["Hold at least 20% of Avery’s company, settle three contracts, then secure the appointment at a shareholders’ meeting.", "持有艾弗里公司至少20%的股份，结清三份合同，再通过股东会取得席位。"]`>>
-      <<deadwood-reblooms-progress-check `maplebirch.get('Finance').company.shareholders.controller` `["Become the controlling shareholder", "成为控股股东"]` `["Hold more than half of Avery’s company shares.", "持有艾弗里公司超过半数的股份。"]`>>
+      <<deadwood-reblooms-progress-check `maplebirch.get('Finance').company.shareholders.director || maplebirch.get('Finance').company.shareholders.controller` `["Secure a board seat", "取得董事席位"]` `["Hold at least 20% of Avery’s company in settled shares, settle three contracts, then secure the appointment at a shareholders’ meeting.", "持有艾弗里公司至少20%的已交割股份，结清三份合同，再通过股东会取得席位。"]`>>
+      <<deadwood-reblooms-progress-check `maplebirch.get('Finance').company.shareholders.controller` `["Become the controlling shareholder", "成为控股股东"]` `["Hold more than half of Avery’s company in settled shares.", "持有艾弗里公司超过半数的已交割股份。"]`>>
       <<lanSwitch 'Settled Avery company contracts: ' '已结清的艾弗里公司合同：'>><span class='teal'><<= _deadwoodCompany.completed ?? 0>></span><br>
       <<if _deadwoodGovernance>>
         <<lanSwitch 'Unlisted shares acquired by negotiation: ' '议价受让的未上市股数：'>><span class='teal'><<= _deadwoodGovernance.transferred ?? 0>></span><br>
         <<lanSwitch 'Tower construction stages funded: ' '已出资的高塔工程阶段：'>><span class='teal'><<= _deadwoodGovernance.funded_stages?.length ?? 0>></span><br>
         <<lanSwitch 'Company funds spent on tower construction: ' '公司资金已支付的高塔工程款：'>><span class='gold'><<= formatMoney(_deadwoodGovernance.project_spent ?? 0)>></span><br>
       <</if>>
-      <span class='small-description'><i><<lanSwitch 'Construction spending comes from the company treasury. Allocated funds still awaiting use are not spending.' '工程款来自公司资金池，已划拨但尚未使用的资金不计为支出。'>></i></span><br><br>
+      <span class='small-description'><i><<lanSwitch 'Only construction costs already paid from company funds count here. Reserved funds are excluded.' '这里只计公司已经支付的工程款，不含尚未动用的预留款。'>></i></span><br><br>
     <</foldout>>
   <</if>>
 
@@ -177,7 +177,7 @@
     <<set _deadwoodFactories to $Finance.industry.factories, _deadwoodDistribution to $Finance.industry.distribution>>
     <<foldout false "_deadwoodFactoriesFoldout">>
       <span class='gold'><<lanSwitch "Factory accounts" "工厂账目">></span>
-      <<deadwood-reblooms-progress-check `_deadwoodFactories.some(factory => factory.owned)` `["Own a factory", "持有一间工厂"]` `["Arrange land and purchase a factory through the financial centre.", "通过金融中心落实土地并购入工厂。"]`>>
+      <<deadwood-reblooms-progress-check `_deadwoodFactories.some(factory => factory.owned)` `["Own a factory", "持有一间工厂"]` `["Visit the workshop yard on Elk Street to buy or build a factory.", "到麋鹿街厂房院落收购旧厂或购地建厂。"]`>>
       <<deadwood-reblooms-progress-check `_deadwoodFactories.some(factory => factory.delivered > 0)` `["Deliver a factory order", "交付一份工厂订单"]` `["Arrange production and transport, then complete the order’s delivery.", "安排生产和运输，再按订单要求完成交货。"]`>>
       <<lanSwitch 'Factories currently owned: ' '当前持有工厂：'>><span class='teal'><<= _deadwoodFactories.filter(factory => factory.owned).length>></span><br>
       <<lanSwitch "Receipts / operating costs: " "累计经营收入／支出：">><span class='gold'><<= formatMoney(_deadwoodFactories.reduce((sum, factory) => sum + (factory.earned ?? 0), 0))>></span> / <span class='gold'><<= formatMoney(_deadwoodFactories.reduce((sum, factory) => sum + (factory.spent ?? 0), 0))>></span><br>

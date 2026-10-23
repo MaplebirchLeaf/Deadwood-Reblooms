@@ -228,7 +228,7 @@ export default class OrchardView {
     label.textContent = lanSwitch(`Plot ${this.selected + 1} (`, `第 ${this.selected + 1} 块土地（`);
     const quality = document.createElement('span');
     quality.className = ['blue', 'lblue', 'teal', 'green'][soil.quality - 1];
-    quality.textContent = lanSwitch(['Poor soil', 'Decent soil', 'Good soil', 'Excellent soil'][soil.quality - 1], ['贫瘠的土壤', '普通的土壤', '肥沃的土壤', '沃腴的土壤'][soil.quality - 1]);
+    quality.textContent = lanSwitch(['Poor soil', 'Decent soil', 'Good soil', 'Excellent soil'][soil.quality - 1], ['贫瘠的土壤', '普通的土壤', '肥沃的土壤', '十分肥沃的土壤'][soil.quality - 1]);
     label.append(quality, document.createTextNode(lanSwitch('):', '）：')));
     this.detail.append(label, document.createElement('br'));
     if (tree) {
@@ -271,7 +271,7 @@ export default class OrchardView {
         } else {
           const wait = document.createElement('div');
           const days = fruitingDays - (tree.fruiting ?? 0);
-          wait.textContent = lanSwitch(`The next batch needs ${days} more days of watered growth.`, `下一批果实还需 ${days} 天有水的生长。`);
+          wait.textContent = lanSwitch(`The next crop needs ${days} more days with enough water.`, `水分充足时，再过 ${days} 天就能结出下一批果实。`);
           this.detail.append(wait);
         }
       }

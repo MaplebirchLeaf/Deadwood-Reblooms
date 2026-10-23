@@ -25,9 +25,7 @@ Check the **journal** for current accounts and tasks, and **statistics** for cum
 
 ## Time and accounting periods
 
-Jumping forward to a later date settles property, company, factory, bank and household accounts through their existing billing periods. Orchard and Robin's shop investments keep their existing links to those accounts. Across several days, income for each date is processed before debts due on that date. Vehicle upkeep also counts any whole weeks that have passed.
-
-Settling the same date again does not duplicate payments or charges. Moving the date backwards does not reverse money already booked, and returning to a settled date does not pay it again.
+When days pass, business and staff accounts settle on their billing dates, including orchard and Robin’s shop investments. Each day’s income comes before debts due that day; vehicle upkeep counts whole weeks. Going back in time does not reverse recorded payments, and settled dates are not paid or charged twice.
 
 ## Links to street life
 

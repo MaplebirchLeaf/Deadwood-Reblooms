@@ -14,7 +14,7 @@ Enable **VanillaPlus** and reload. Banking, property and Adrian have their own F
 
 Reach the normal attribute ceiling and complete its challenges to break through. Then keep training to the new ceiling to earn the trait. **Statistics → Deadwood Reblooms: progress** shows what you have done and what remains. Some challenges only need completing once; others, such as makeup and ear slimes, depend on your condition at the time.
 
-Willpower, physique and beauty rise to **125%** of their normal ceilings; exhibitionism, deviancy and promiscuity rise to **150%**. Reaching all six new ceilings also earns Incorrigible.
+Willpower, physique and beauty rise to **125%** of their normal ceilings; exhibitionism, deviancy and promiscuity rise to **150%**. Reaching all six new ceilings also earns Master of All.
 
 ### Willpower
 

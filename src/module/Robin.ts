@@ -277,8 +277,8 @@ class Robin extends Module implements RobinFacade {
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-robin-asylum-daily', {
       action: () => {
         this.sync();
-        // 特质按当前存档的关系阶段生效。罗宾留院或失踪时没有每日陪伴收益。
-        if (V.RobinExpansion && this.available && this.state.self_rent) window.statChange.stress(this.state.both_rent || this.state.bailey_defeated ? -250 : -100, 1);
+        // 恋人能够正常互动时，按当前关系阶段给予每日陪伴收益。
+        if (V.RobinExpansion && this.available && window.isLoveInterest('Robin') && this.state.self_rent) window.statChange.stress(this.state.both_rent || this.state.bailey_defeated ? -250 : -100, 1);
       },
       exact: true
     });

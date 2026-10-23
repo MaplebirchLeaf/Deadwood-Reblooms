@@ -12,7 +12,7 @@ Outright purchases use bank deposits. A mortgage requires a 20% deposit, a 2% fe
 | Cliff Street sea-view house | <span class="gold">£400,000</span> | Two floors, upstairs sea-view nook and balcony. Salt wind makes planting unsuitable                           |
 | Danube Street manor         | <span class="gold">£600,000</span> | Three floors, guest bedroom, conservatory, walled garden, and upper balcony. Two co-resident places           |
 
-1. Choose a property and full payment or mortgage at the counter. Purchase mortgages and property-backed cash loans offer **7, 30, 60 or 90 days**, defaulting to 30. Weekly interest is **0.20%, 0.25%, 0.30% or 0.35%**, respectively, and stays fixed after signing. You can hold one mortgage at a time. Refresh the quote after choosing a term. Credit-funded deposit gaps incur cash-advance fees and cannot replace the fee or payment reserve held in the bank.
+1. Choose a property and full payment or mortgage at the counter. Purchase mortgages and property-backed cash loans offer **7, 30, 60 or 90 days**, defaulting to 30. Weekly interest is **0.20%, 0.25%, 0.30% or 0.35%**, respectively, and stays fixed after signing. You can hold one mortgage at a time. Choosing a term updates the deposit and weekly payment immediately. Credit-funded deposit gaps incur cash-advance fees and cannot replace the fee or payment reserve held in the bank.
 2. Enter from that property's street. Any owned, unrented and unfrozen home can be used. The orphanage remains available.
 3. At the furniture-shop entrance, select owned-home furniture and the target property before selecting beds, tables, chairs, desks, wardrobes, ornaments or miscellaneous items. Check the property name so you do not confuse orphanage upgrades with owned-home upgrades.
 4. Use the property counter for tenancy, renovation, repairs or auctions. End a tenancy before using the property as a normal home again.
@@ -26,7 +26,7 @@ Outright purchases use bank deposits. A mortgage requires a 20% deposit, a 2% fe
 | Cliff Street sea-view home | <span class="gold">£420</span>    | 1                        |
 | Danube Street manor        | <span class="gold">£630</span>    | 2                        |
 
-Maintenance is **0.105% of price weekly** and condition falls by one weekly. Renting requires condition at least 50. Restoring one condition point costs 0.05% of price. The three renovations cost 5%, 10% and 15% of the price, respectively, with three levels maximum and 20% additional base rent per level. Actual rent also depends on condition.
+Maintenance is **0.105% of price weekly**. While rented, or if upkeep is not paid in full, condition falls by one per week. Unrepaired leaks cause further damage. Renting requires condition at least 50. Restoring one condition point costs 0.05% of price. The three renovations cost 5%, 10% and 15% of the price, respectively, with three levels maximum and 20% additional base rent per level. Actual rent also depends on condition.
 
 Voluntary auctions do not pay immediately. They settle after seven days at 75% of the current appraisal. Overdue notices, freezes and forced auctions have separate stages. Frozen homes cannot be entered. **Check arrears before the street entrance disappears.**
 
@@ -89,7 +89,7 @@ Meet the character at one of these entrances, choose the residency invitation an
 
 ### Why a resident is absent
 
-Registration does not keep a character permanently at home. School, work, temple duties and vanilla stories still take priority. Belongings in a guest room establish residency, not current presence.
+Residents still leave for school, work, temple duties and story events. Their belongings in a guest room do not mean they are there.
 
 Check the living room first, then chat or invite one person upstairs. A double bed holds the PC and one partner. The other stays in the living or guest room according to the time. Joint conversation requires both residents currently present.
 
@@ -109,7 +109,7 @@ Choose **Invite both lovers to talk (0:20)** in the sitting room while both resi
 
 ### Outdoor spaces and gliding
 
-**Gliding** begins inside a high home's outside-view page. Suitable heights at Barb, Commercial, Cliff and Danube Street have entrances. Complete harpy form (stage six) can glide directly. Angel or demon stage six and fallen angel stage two require pain low enough to glide and learned flying or gliding. An untrained divine form with sufficient willpower can attempt a descent, but failure blocks another attempt that day and does not immediately unlock town flight. Town destinations and descending to ground level are separate choices, commonly taking ten and two minutes respectively. Exposure and vanilla exposure tolerance still restrict street landings.
+**Gliding** begins inside a high home's outside-view page. Suitable heights at Barb, High, Cliff and Danube Street have entrances. Complete harpy form (stage six) can glide directly. Angel or demon stage six and fallen angel stage two require pain low enough to glide and learned flying or gliding. An untrained divine form with sufficient willpower can attempt a descent, but failure blocks another attempt that day and does not immediately unlock town flight. Town destinations and descending to ground level are separate choices, commonly taking ten and two minutes respectively. Exposure and vanilla exposure tolerance still restrict street landings.
 
 **Planting** varies by property: one plot at the cottage, one loft planter and three manor growing spaces. Barb and Cliff Street homes do not provide equivalent plots. Check actual outdoor options rather than assuming every balcony supports planting.
 
@@ -121,7 +121,7 @@ Each contract costs at least **<span class="gold">£250,000</span>**, or **260 w
 
 <span class="green">A paid contract ends that person's rent collection. The original room and keys remain available, with the choice to move out.</span> Buying out only one leaves the other paying separately and ends the previous combined-rent arrangement. You can show Robin the receipt for Robin's contract afterwards.
 
-**MSO: Mansion Street Orphanage** is also listed at the securities desk. Large rent settlements, collection disputes, donations and repair bills affect its quotes. Share ownership is an investment and does not alter living arrangements.
+**MSO: Domus Street Orphanage** is also listed at the securities desk. Large rent settlements, collection disputes, donations and repair bills affect its quotes. Share ownership is an investment and does not alter living arrangements.
 
 The **donations desk** is beside the town-hall front desk. Ask after waiting in line, on weekdays between **8:00 and 18:00**. Choose the orphanage, hospital, school or temple and donate with your name or anonymously. Each project displays its target and cumulative contributions. Recent receipts remain at the desk. Cash and debit-card bank funds pay into the selected project, with that record retained for future purchasing and related content.
 

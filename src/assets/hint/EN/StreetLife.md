@@ -12,7 +12,7 @@ Enable **Street Life** and reload. Street standing covers the town; the smuggler
 | Plan the bank heist               | Landry → private meeting at the smuggler's pub              | All three earlier arrangements settled, Finance, 70 standing, and Landry's and Wren's trust |
 | Enter a road race                 | First farm-road section outside Harvest Street, 20:00–04:00 | Transport, a car parked locally, driving qualifications, enough fuel and cash               |
 
-Check the **journal** for active jobs, cargo locations and next steps. **Statistics** shows actual payments, cargo losses and closed operations. Reading the journal does not reroll work or deliver goods and collect money for you.
+Check the **journal** for active jobs, cargo locations and next steps. **Statistics** shows actual payments, cargo losses and closed operations.
 
 ## Farm-road races
 
@@ -78,7 +78,7 @@ Ask Landry for introductions and arrange one scout and one carrier, then check *
 | **A load worth leaving**    | Pub → industrial alleyways → docks → pub                               | Work with Wren and decide what to do when the load and a companion both need attention |
 | **Where the story started** | Pub → Ocean Breeze café → industrial alleyways or police station → pub | Separate eyewitness accounts from retellings and check another source                  |
 
-After settling Landry's delivery, meet Wren and reach 20 affection to hear about the second job. Having worked with Wren on the original mansion job gives you some shared experience here. That earlier job keeps its own progress; you do not need to repeat it.
+After settling Landry's delivery, meet Wren and reach 20 affection to hear about the second job. Having worked with Wren on the original mansion job gives you some shared experience here.
 
 Once Wren's arrangement is settled, you can look into the rumours. Mickey can help if you have already met and can speak at the pub; **you can investigate on your own without meeting Mickey**. If you know Grant, have agreed to cooperate and can find the detective on duty, the old case can also be checked at the station. Otherwise, seek an independent source in the alleyways. Asking about the old case does not commit you to reporting another job or remove your own criminal record.
 

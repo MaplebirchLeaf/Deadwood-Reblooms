@@ -29,7 +29,7 @@ Buy preservation accessories upstairs in the shopping centre and **wear them** t
 
 Feed ravens on **three different days**, then collect their letter while the flock remains; a missed letter can be collected next time. Take it to Gwylan for a reply and directions. You can also accept a raven feather necklace, sent to your wardrobe. The shrine path appears at forest depth 20–40. Each journey takes 15 minutes and returns to the same depth; hunts and blood moons close it.
 
-On your first visit you meet Tsukihan, a 19-year-old shrine priest, maiden or attendant according to the character settings. You can then choose them in Attitudes. The journal tracks letters, directions and current tasks; mod statistics record offerings and days helped, while the relationship page shows personal stats.
+On your first visit you meet Tsukihan, a 19-year-old shrine priest, maiden or attendant according to the character settings. The journal tracks letters, directions and current tasks; mod statistics record offerings and days helped, while the relationship page shows personal stats.
 
 ### Daily life with Tsukihan
 

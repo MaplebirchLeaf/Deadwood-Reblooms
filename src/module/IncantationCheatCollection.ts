@@ -84,9 +84,9 @@ class IncantationCheatCollection {
     T.IncantationCheatCollectionNamebox ??= '';
     T.IncantationCheatCollectionCodebox ??= '';
     let html: string = `<div class='input-row cheat-main-row'>`;
-    html += `<span class='gold cheat-label'><<lanSwitch 'NAME' '命名'>></span>`;
+    html += `<span class='gold cheat-label'><<lanSwitch 'Name' '名称'>></span>`;
     html += `<<textbox '_IncantationCheatCollectionNamebox' _IncantationCheatCollectionNamebox>>`;
-    html += `<span class='gold cheat-label'><<lanSwitch 'CODE' '编码'>></span>`;
+    html += `<span class='gold cheat-label'><<lanSwitch 'Command' '命令'>></span>`;
     html += `<<textbox '_IncantationCheatCollectionCodebox' _IncantationCheatCollectionCodebox>>`;
     html += `<span class='cheat-action-row'>`;
     const isExisting: CheatItem | undefined = this.cache.find(item => item.name === T.IncantationCheatCollectionNamebox);
@@ -340,7 +340,7 @@ class IncantationCheatCollection {
       this.updateContainer('maplebirch-cheat-panel', this.panel);
       this.updateContainer('maplebirch-cheat-search', this.search);
       this.updateContainer('maplebirch-cheat-content', this.content);
-      this.showStatus(true, `Imported ${importedItems.length} codes`, `已导入 ${importedItems.length} 个命令`);
+      this.showStatus(true, `Imported ${importedItems.length} commands`, `已导入 ${importedItems.length} 个命令`);
       return true;
     } catch (err) {
       console.error(err);
@@ -359,7 +359,7 @@ class IncantationCheatCollection {
     } else {
       const confirmHtml: string = `
         <div class='settingsToggleItem'>
-          <span class='red'><<lanSwitch 'Are you sure to clear' '确认清空'>> ${removableCount} <<lanSwitch 'codes' '个命令'>>?</span><br>
+          <span class='red'><<lanSwitch 'Clear' '确认清空'>> ${removableCount} <<lanSwitch 'commands' '个命令'>>?</span><br>
           <<lanLink '确认' 'capitalize' 'class:teal'>><<run maplebirch.get("IncantationCheatCollection").clearForm('confirm')>>
           <</lanLink>>|<<lanLink '取消' 'capitalize' 'class:blue'>><<run maplebirch.get("IncantationCheatCollection").clearForm('cancel')>><</lanLink>>
         </div>
@@ -404,7 +404,7 @@ class IncantationCheatCollection {
       setup.maplebirch.content.push(`
         <div id='ConsoleCheat'>
           <details class='cheat-section' open>
-            <summary class='cheat-section'><span class='gold'><<lanSwitch 'Cheating Collection' '作弊集'>></span></summary>
+            <summary class='cheat-section'><span class='gold'><<lanSwitch 'Cheat Collection' '作弊集'>></span></summary>
             <div id='maplebirch-cheat-panel' class='searchButtons'><<= maplebirch.get("IncantationCheatCollection").panel>></div>
             <div id='maplebirch-cheat-search' class='searchButtons'><<= maplebirch.get("IncantationCheatCollection").search>></div>
             <div id='maplebirch-cheat-status' class=''></div><div id='maplebirch-cheat-content' class='settingsGrid'><<= maplebirch.get("IncantationCheatCollection").content>></div>

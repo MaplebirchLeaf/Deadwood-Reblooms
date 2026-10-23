@@ -35,6 +35,10 @@ Companies can also receive trading-day reports about orders, customers, costs, e
 
 Ordinary quotes include expected business growth of **0.02%–0.08% per trading day**, depending on risk, with two-way moves of **0.5%–2%** around that expectation. Routine business reports move quotes by **1%–4%**. Larger market shocks occur occasionally, while major story reports follow the actual events. Weekly distributions use current market value: **0.14%** for Mer Shipping, **0.10%** for Elk Industries and the shopping centre, **0.08%** for Avery's company, and **0.03%–0.07%** for the other businesses. Avery's actual payout also follows the shareholder resolution. The orphanage's donated supplies produce their favourable operating report once, after delivery.
 
+**RDS: Robin’s Drinks Shop** is listed after the shop opens, with ordinary shares, financed purchases, short sales and futures available. It is more volatile than most large businesses and pays a weekly distribution of 0.03%. The separate private partnership does not turn share trades into operating reserves or change Robin’s control. The furniture and tailor shops belong to High Street Shopping Centre rather than listing separately.
+
+**CSN: Connudatus Street Casino** becomes available with Life Simulation. **SCB: Strip Club** and **HSF: Harvest Street Pub** are also listed. The casino and club have relatively high day-to-day volatility and weekly distributions of 0.03%. Your gambling results do not directly change their prices; chips and brokerage cash remain separate.
+
 ### Shares, financing and futures
 
 Open a brokerage account and transfer funds at the **securities desk**. The shares page shows quotes, held and sellable quantities, cost basis and profit or loss. Buying and selling charge a fee, and weekly distributions enter brokerage cash.
@@ -115,7 +119,7 @@ After the management appointment is confirmed at the counter, **new personal loa
 
 For a <span class="gold">£1,000</span> seven-day loan, the first week's interest on the principal falls from <span class="gold">£10.50</span> to <span class="gold">£9.45</span>. Other terms depend on outstanding debt, instalments and rounding to pennies. Multiplying the first week's interest by the number of weeks does not give the total interest.
 
-The work conversation and application page read current quotes directly from the finance system. The work conversation shows the standard rate, current rate and whether eligibility is suspended. The sidebar portrait and social avatar belong to their respective optional image modules.
+The work conversation shows the standard rate, current rate and discount eligibility. The loan application lists the actual quote.
 
 ### Street and business effects on quotes
 
