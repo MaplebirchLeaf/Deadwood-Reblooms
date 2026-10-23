@@ -1,0 +1,21 @@
+:: Deadwood Reblooms Medicine Cheat Widgets [widget]
+
+<<widget 'deadwood-medicine-cheats'>>
+  <<if !maplebirch.get('LifeSimulation') or !$LifeSimulation?.medicine>><<exit>><</if>>
+  <span class='gold'><<lanSwitch 'Tablets' '药片'>></span><br>
+  <<for $_medicineCheat range maplebirch.get('LifeSimulation').medicine.offers>>
+    <<numberStepper `lanSwitch($_medicineCheat.name)` `maplebirch.get('LifeSimulation').medicine.owned($_medicineCheat.id)` {
+      min:0, max:Math.max(1000, maplebirch.get('LifeSimulation').medicine.owned($_medicineCheat.id)), step:1,
+      activeButtons:['single', 'double', 'triple'], percentage:false, values:[$_medicineCheat.id],
+      callback:(value, arr) => {
+        const medicine = maplebirch.get('LifeSimulation')?.medicine;
+        if (!medicine || !V.LifeSimulation?.medicine || !medicine.offers.some(item => item.id === arr[0]) || !Number.isSafeInteger(value) || value < 0) return;
+        /* 仅在调整库存时建立原有服药记录，不触发服药、耐受或依赖。 */
+        const use = V.LifeSimulation.medicine.uses[arr[0]] ??= {
+          owned:0, last:-1, day:-1, count:0, streak:0, dependence:0, until:0, rebound:0, settledDay:Time.days
+        };
+        use.owned = value;
+      }
+    }>>
+  <</for>>
+<</widget>>

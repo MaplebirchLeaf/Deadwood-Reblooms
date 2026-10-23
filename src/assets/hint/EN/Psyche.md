@@ -11,7 +11,7 @@
 | 0 to below 150   | Dazed        | 90%            |
 | 150 to below 600 | Unsettled    | 100%           |
 | 600 to below 900 | Clear-headed | 110%           |
-| 900 and above    | Lucid        | 120%           |
+| 900 and above    | Focused      | 120%           |
 
 The multiplier applies to progress in science, maths, English and history earned in class, through reading and similar activities. It does not affect skill training, recipes or money. Full sanity reduces fear gained from a fright by 25%, while minimum sanity increases it by 25%.
 

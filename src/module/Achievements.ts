@@ -63,6 +63,22 @@ class Achievements {
       filter: ['All', 'Transformation']
     },
     {
+      module: 'MoreTransformations',
+      id: 'Deadwood Cursed Flesh',
+      title: 'deadwood-reblooms:transformations:undead:feat:title',
+      description: 'deadwood-reblooms:transformations:undead:feat:description',
+      difficulty: 1,
+      filter: ['All', 'Transformation']
+    },
+    {
+      module: 'MoreTransformations',
+      id: 'Deadwood Back Among the Living',
+      title: 'deadwood-reblooms:transformations:undead:cure:feat:title',
+      description: 'deadwood-reblooms:transformations:undead:cure:feat:description',
+      difficulty: 2,
+      filter: ['All', 'Transformation']
+    },
+    {
       module: 'Robin',
       id: 'Deadwood Robin Independent',
       title: 'deadwood-reblooms:robin:feat:Deadwood Robin Independent:name',
@@ -437,6 +453,21 @@ class Achievements {
         maplebirch.dynamic.regStateEvent('append', 'raven-transformation-feat', {
           output: 'earnFeat "Raven Transformation"',
           cond: () => V.feats?.currentSave['Raven Transformation'] === undefined && (V.maplebirch?.transformation?.raven?.level ?? 0) >= 6
+        });
+
+        maplebirch.dynamic.regStateEvent('append', 'undead-transformation-feat', {
+          output: 'earnFeat "Deadwood Cursed Flesh"',
+          cond: () =>
+            V.feats?.currentSave['Deadwood Cursed Flesh'] === undefined &&
+            !V.statFreeze &&
+            !V.replayScene &&
+            !V.frozenValues &&
+            ((V.MoreTransformations?.treasure?.bound && maplebirch.get('MoreTransformations')?.Undead.active) || (V.MoreTransformations?.treasure?.returns ?? 0) > 0)
+        });
+
+        maplebirch.dynamic.regStateEvent('append', 'undead-cure-feat', {
+          output: 'earnFeat "Deadwood Back Among the Living"',
+          cond: () => V.feats?.currentSave['Deadwood Back Among the Living'] === undefined && !V.statFreeze && !V.replayScene && !V.frozenValues && (V.MoreTransformations?.treasure?.returns ?? 0) > 0
         });
         break;
       }

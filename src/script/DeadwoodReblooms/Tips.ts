@@ -16,12 +16,17 @@ export default function Tips(core: typeof maplebirch): void {
       ['A debit card spends your bank savings. A credit card leaves a bill to pay.', '借记卡用的是银行存款。信用卡花出去的钱，之后还得还。'],
       ['A home comes with bills. Leave something in the bank for its upkeep.', '房子买下来，账单也跟着来了。银行里最好留些维护费。'],
       ['A spare bed can make room for someone you care about.', '多一张合适的床，也许就能让在意的人住下来。'],
-      ['A housemate may still be at work, school or the temple when you get home.', '回到家时，同住的人可能还在工作、学校或神殿。'],
-      ['You can agree on a weekend outing at home. The journal keeps the date and meeting time.', '在家可以约好周末一起出门。日志会记下日期和碰面时间。'],
-      ['Your housemate still has a timetable. A lift from home can help with an early start.', '同住恋人仍有自己的日程。清晨从家里送一程，也许能让出门轻松些。'],
+      ['Unpaid wages, overdue bills or accidents can stop production, even when morale is high.', '欠薪、欠费或出了事故，士气再高也可能停工。'],
       ['Company accounts can tell you more than a rising share price.', '公司的账目，有时比上涨的股价更值得看。'],
       ['Avery keeps papers about the tower in the office. The construction site may answer other questions.', '艾弗里的办公室留着塔楼的文件。有些疑问，去工地看看或许能找到答案。'],
       ['High windows offer a view of the town, and a way down for those with suitable wings.', '高处的窗外是小镇。长着合适翅膀的人，也许能从那里滑翔出去。']
+    );
+
+  if (core.get('Finance') && core.get('Transport'))
+    add(
+      'general',
+      ['Make plans for the weekend at home. Check your journal for the time.', '周末想一起出门，可以在家约好。别忘了看看日志里的时间。'],
+      ['You can give your live-in lover a lift when you drive out.', '开车出门时，也可以捎上同住的恋人。']
     );
 
   if (core.get('VanillaPlus')) add('general', ['Pushing your limits takes more than practice. Some experiences leave a lasting change.', '想突破极限，光练习还不够。有些经历会留下长久的改变。']);
@@ -41,6 +46,21 @@ export default function Tips(core: typeof maplebirch): void {
     );
     add('tentacles', ['A whip or baton borrowed from the temple can help against tentacles. Keep a hand free to use it.', '神殿借来的鞭子或短棍，可以用来对付触手。记得留出一只空闲的手。']);
   }
+
+  if (core.get('Psyche'))
+    add(
+      'general',
+      ['A clear head makes studying easier. Some strange encounters can unsettle your mind.', '头脑清醒时，学习也更轻松。有些怪事却会动摇你的理智。'],
+      ['Fear can weaken your willpower. Catch your breath in your bedroom or at the temple.', '害怕时，意志也会动摇。回卧室或去神殿缓一缓。'],
+      ['Sleep, prayer and a little writing can help restore your sanity.', '睡上一觉、做些祈祷，或写写东西，都能帮你恢复理智。']
+    );
+
+  if (core.get('StreetLife'))
+    add(
+      'general',
+      ['Ask Landry at the Harvest Street pub if you need some extra money.', '想挣点外快，可以问问丰收街酒馆的兰德里。'],
+      ['Once the goods are delivered, collect your pay at the pub.', '货送到了，别忘了回酒馆领钱。']
+    );
 
   if (core.get('Robin'))
     add(
@@ -85,6 +105,14 @@ export default function Tips(core: typeof maplebirch): void {
       ['The order of your lovers matters. Some encounters recognise those at the front of the list.', '恋人名单的顺序也有影响。有些场合会先认出排在前面的人。']
     );
 
-  if (core.get('MoreTransformations')) add('animalTFs', ['Some jewellery can help you keep an animal form.', '有些饰品能帮助你维持动物形态。']);
+  if (core.get('MoreTransformations')) {
+    add(
+      'animalTFs',
+      ['Some jewellery can help you keep an animal form.', '有些饰品能帮助你维持动物形态。'],
+      ['Once your whale transformation begins, swimming and diving can further it even after you master swimming.', '鲸化开始后，即使游泳技巧已经练满，游泳和潜水仍能促进成长。']
+    );
+    add('general', ['Keep feeding the ravens fruit. They may bring you a letter.', '多喂几天水果，渡鸦也许会衔来一封信。']);
+  }
+  if (core.get('NPCTransformations')) add('general', ['Changes in Sydney take time. Purity and vows matter too.', '悉尼身上的变化不会立刻显现。纯洁与誓言同样重要。']);
   if (core.get('CelestialAnomalies')) add('weather', ['The sky sometimes changes in unexpected ways. It may be worth watching.', '天空有时会出现意料之外的变化。可以抬头看看。']);
 }

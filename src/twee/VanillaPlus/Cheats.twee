@@ -1,0 +1,22 @@
+:: Deadwood Reblooms Breakthrough Cheat Widgets [widget]
+
+<<widget 'deadwood-breakthrough-cheats'>>
+  <<if !maplebirch.get('VanillaPlus') or !$VanillaPlus>><<exit>><</if>>
+  <span class='gold'><<lanSwitch 'Attribute breakthroughs' '属性突破'>></span><br>
+  <<for $_breakthrough range maplebirch.get('VanillaPlus').progress>>
+    <<lanSwitch $_breakthrough.name>><<lanSwitch ': ' '：'>>
+    <<if $VanillaPlus.lock[$_breakthrough.id]>>
+      <span class='green'><<lanSwitch 'Unlocked' '已突破'>></span>
+    <<else>>
+      <<capture $_breakthrough>>
+        <<lanLink ['Unlock', '突破']>>
+          <<if maplebirch.get('VanillaPlus') and $VanillaPlus and Object.hasOwn($VanillaPlus.lock, $_breakthrough.id)>>
+            <<set $VanillaPlus.lock[$_breakthrough.id] to true>>
+            <<replace '#deadwood-breakthrough-cheats'>><<deadwood-breakthrough-cheats>><</replace>>
+          <</if>>
+        <</lanLink>>
+      <</capture>>
+    <</if>><br>
+  <</for>>
+  <span class='blue'><<lanSwitch 'Adjust values in the player cheats. Reach the new ceiling to obtain the trait.' '数值可在玩家属性作弊中调整。达到新上限后获得对应特质。'>></span><br>
+<</widget>>

@@ -46,5 +46,31 @@
       <</capture>>
     <</for>>
   <</if>>
-  <span class='blue'><<lanSwitch 'Bank balance changes are recorded as cheats. They do not count as business income or pay off debts.' '银行存款变更记入作弊统计，不计为经营收入，也不代你结清债务。'>></span><br>
+  <<if maplebirch.get('Finance').industry.owned.length>>
+    <br><span class='gold'><<lanSwitch 'Factories' '工厂'>></span><br>
+    <<for $_cheatFactory range maplebirch.get('Finance').industry.owned>>
+      <b><<= maplebirch.t(maplebirch.get('Finance').industry.terms.sites[$_cheatFactory.site].name)>></b><br>
+      <<numberStepper `lanSwitch('Working capital', '周转金')` $_cheatFactory.cash {
+        activeButtons:['single', 'double', 'triple'], step:1000, min:0, max:10000000000,
+        colorArr:['--yellow'], percentage:false, values:[$_cheatFactory.site],
+        valueFormat:value => `<b class='gold'>${formatMoney(value)}</b>`,
+        callback:(value, arr) => {
+          const industry = maplebirch.get('Finance')?.industry;
+          if (!industry || !Number.isSafeInteger(value) || value < 0 || value > 10000000000) return;
+          const factory = industry.owned.find(item => item.site === arr[0]);
+          if (!factory) return;
+          V.moneyStats.cheats.earned += value - factory.cash;
+          factory.cash = value;
+        }
+      }>>
+      <<numberStepper `lanSwitch('Morale', '士气')` $_cheatFactory.morale {
+        min:0, max:100, step:1, values:[$_cheatFactory.site],
+        callback:(value, arr) => {
+          const factory = maplebirch.get('Finance')?.industry.owned.find(item => item.site === arr[0]);
+          if (factory && Number.isFinite(value)) factory.morale = Math.clamp(value, 0, 100);
+        }
+      }>>
+    <</for>>
+  <</if>>
+  <span class='blue'><<lanSwitch 'Money added here is recorded as cheating income.' '这里增加的钱记入作弊收入。'>></span><br>
 <</widget>>
