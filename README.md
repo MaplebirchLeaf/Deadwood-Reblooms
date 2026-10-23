@@ -46,6 +46,8 @@
 3. 从 [**Releases**](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases/latest) 下载 `deadwood-reblooms-*.modpack`，通过 ModLoader 加载。
 4. 在框架模块管理中选择要启用的内容，保存游戏并重载。
 
+本体包含基础图片。使用 Fem Goose Compilation 或 Mysterious 美化时，另加载同一发布页对应的 `deadwood-reblooms-fem-goose-*.modpack` 或 `deadwood-reblooms-mysterious-*.modpack`，并在美化选择器中启用对应图片组。
+
 检测到部分功能重叠的原模组时，枯木逢春会停用自身对应模块。完整依赖以安装包的声明和加载器提示为准。
 
 ## 游戏指南与设置

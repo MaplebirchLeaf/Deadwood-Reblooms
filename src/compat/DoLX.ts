@@ -254,6 +254,10 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
         [/\n\t\tV\.physiquesize,\n\t\tNumber\(V\.AMCTraits\?\.physique\) \|\| 1/, `\n\t\t${max('physique', 'V.physiquesize')},\n\t\tNumber(V.AMCTraits?.physique) || 1`]
       ]
     };
+    // 原生搜索在分页前筛选，只补目录中的中文名，共用原有控件与手提包筛选。
+    if (data.scriptFileItems.getByNameWithOrWithoutPath('x_wardrobes.js')?.content.includes('function wardrobeItemMatches(item)')) {
+      rules['x_wardrobes.js'] = [[/\[item\.name, item\.colour, item\.pattern\]/, '[item.name, setup.clothes[item.slot]?.[clothesIndex(item.slot, item)]?.cn_name_cap, item.colour, item.pattern]']];
+    }
     if (maplebirch.get('Finance')) {
       // 来宾走普通房租结算，沿用 DoLX 的罗宾优先事件。收养停付仍保留原生判断。
       rules['time.js'].push([
@@ -280,11 +284,12 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
 
     // 接入 DoLX 的 AMC 公式与缓存后的诱惑评分，保留特质倍率和作弊控件回调。
     const passageRules: Record<string, Rule[]> = {
-      // DoLX 的兽化称号使用块函数。牛、雌狐和非中性恶魔已由通用补丁处理。
+      // DoLX 的称号使用块函数，统一普通返回值与旧版双性后缀，保留异装称谓。
       Traits: [
-        // 部分 DoLX 导出已经带有旧双性后缀，直接收敛为同一标记，避免重复追加。
-        [/return "(Bull|Cow|Vixen|Incubus|Succubus)" \+ \(V\.player\.sex is "h" \? "<<lanSwitch ' \(⚥\)' '\(⚥\)'>>" : ""\);/g, 'return "$1<<deadwood-trait-sex>>";'],
-        [/return "((?:Wolf|Cat|Bird)(?:boy|girl|kin)|(?:Bunny|Bear) (?:boy|girl)|(?:Bunny|Bear)kin|Bovine|Foxboy|Foxkin|Harpy|Demon)";/g, 'return "$1<<deadwood-trait-sex>>";'],
+        [
+          /return "((?:Wolf|Cat|Bird)(?:boy|girl|kin)|(?:Bunny|Bear) (?:boy|girl)|(?:Bunny|Bear)kin|Bull|Cow|Bovine|Foxboy|Foxkin|Vixen|Harpy|Incubus|Succubus|Demon)(?: \((?:female|male)\))?"(?: \+ \(V\.player\.sex is "h" \? "<<lanSwitch ' \(⚥\)' '\(⚥\)'>>" : ""\))?;/g,
+          'return "$1<<deadwood-trait-sex>>";'
+        ],
         [/return "((?:Incubus|Succubus) \(" \+ transGenderLabel \+ "\))";/g, 'return "$1<<deadwood-trait-sex>>";']
       ]
     };

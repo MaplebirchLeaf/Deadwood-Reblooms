@@ -26,7 +26,6 @@ export default function (maplebirch: typeof window.maplebirch) {
     }
   };
 
-  // 保留原版的体毛尺寸、滤镜与遮挡，只替换侧栏主图及存在的寄生覆盖图。
   maplebirch.char.use(
     'pre',
     options => {
@@ -35,11 +34,6 @@ export default function (maplebirch: typeof window.maplebirch) {
       if (V.worn.genitals.name === 'chastity parasite' && options.penis_parasite?.includes('ear-slime')) {
         options.ear_slime_size = 3;
         options.penis_parasite = 'ear-slime-3';
-      }
-      if (!options.penis_parasite?.endsWith('-7')) return;
-      const folder = options.penis_parasite.includes('ear-slime') ? `body/${options.balls ? 'penis' : 'penis-no-balls'}` : 'body/parasites';
-      if (maplebirch.host.modLoader.resources.has(`img/${folder}/${options.penis_parasite}.png`) !== true) {
-        options.penis_parasite = options.penis_parasite.replace(/-7$/, '-6');
       }
     },
     'main'
@@ -60,11 +54,8 @@ export default function (maplebirch: typeof window.maplebirch) {
           continue;
         }
         if (!nnpc.penis || Math.round(nnpc.bodydata?.penissize ?? 1) !== 5) continue;
-        const penis = nnpc.penis.replace(/-6$/, '-7');
-        const folder = nnpc.balls ? 'penis' : 'penis-no-balls';
-        if (maplebirch.host.modLoader.resources.has(`img/body/${folder}/${penis}.png`) !== true) continue;
         nnpc.penis_size = 7;
-        nnpc.penis = penis;
+        nnpc.penis = nnpc.penis.replace(/-6$/, '-7');
       }
     },
     ['main', 'npc-pet-nnpc', 'npc-pet-previous']

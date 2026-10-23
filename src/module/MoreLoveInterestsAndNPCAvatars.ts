@@ -216,7 +216,6 @@ class MoreLoveInterestsAndNPCAvatars {
 
   public constructor(readonly core: typeof maplebirch) {
     this.avatars = new NPCAvatars({
-      exists: path => this.core.host.modLoader.resources.has(path),
       load: async path => {
         const image = await loadImage(path);
         return typeof image === 'string' ? image : undefined;

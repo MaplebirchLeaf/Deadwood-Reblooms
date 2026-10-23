@@ -483,7 +483,7 @@ export async function createZip(rootDir: string): Promise<Buffer> {
   ]);
 
   const [publicFiles, sourceTweeFiles, sourceStyleFiles, distFiles, tweePatcherRulesRaw, replacePatcherRaw] = await Promise.all([
-    scan(publicDir),
+    scan(publicDir, { excludes: ['Fem Goose Compilation', 'Mysterious'] }),
     scan(path.join(rootDir, 'src', 'twee')),
     scan(path.join(rootDir, 'src', 'styles')),
     scan(distDir, {
@@ -577,6 +577,49 @@ export async function createZipPackage(rootDir: string): Promise<PackageAsset> {
     fileName: `${info.baseName}.mod.zip`,
     buffer: await createZip(rootDir)
   };
+}
+
+async function createImagePack(rootDir: string, suffix: string, variant: (typeof BEAUTY_SELECTOR_TYPES)[number]): Promise<PackageAsset> {
+  const pkg = (await readPackageJSON(rootDir)) as RootPackage;
+  const info = await modPackageInfo(rootDir);
+  const files = await scan(path.join(rootDir, 'public', variant.sourceDir), { prefix: variant.sourceDir });
+  const selector = BeautySelectorParams(collectImageFiles([...files.keys()]));
+  if (!selector) throw new Error(`Image pack is empty: ${suffix}`);
+  const zip = new AdmZip();
+  files.forEach((buffer, filePath) => zip.addFile(filePath, buffer));
+  selector.lists.forEach((images, filePath) => zip.addFile(filePath, Buffer.from(JSON.stringify(images, null, 2))));
+  zip.addFile(
+    'boot.json',
+    Buffer.from(
+      JSON.stringify(
+        {
+          name: `${pkg.name}-${suffix}`,
+          nickName: { en: `Deadwood Reblooms: ${variant.sourceDir.slice(0, -1)}`, cn: `枯木逢春：${variant.sourceDir.slice(0, -1)}兼容图片` },
+          alias: [],
+          version: pkg.version,
+          imgFileList: [],
+          styleFileList: [],
+          tweeFileList: [],
+          additionFile: [...selector.lists.keys()],
+          scriptFileList: [],
+          scriptFileList_preload: [],
+          scriptFileList_earlyload: [],
+          scriptFileList_inject_early: [],
+          additionDir: [variant.sourceDir.slice(0, -1)],
+          additionBinaryFile: [],
+          addonPlugin: [{ modName: 'BeautySelectorAddon', addonName: 'BeautySelectorAddon', modVersion: '^2.0.0', params: selector.params }],
+          dependenceInfo: [{ modName: pkg.name, version: `>=${pkg.version}` }, ...pkg.scml.dependenceInfo.filter(dep => ['BeautySelectorAddon', 'ModLoader', 'GameVersion'].includes(dep.modName))]
+        },
+        null,
+        2
+      )
+    )
+  );
+  return { fileName: `${pkg.name}-${suffix}-${info.gameVersion}-v${info.version}.mod.zip`, buffer: zip.toBuffer() };
+}
+
+export async function createImagePackPackages(rootDir: string): Promise<PackageAsset[]> {
+  return Promise.all([createImagePack(rootDir, 'fem-goose', BEAUTY_SELECTOR_TYPES[1]), createImagePack(rootDir, 'mysterious', BEAUTY_SELECTOR_TYPES[2])]);
 }
 
 export async function createAudioPackPackage(rootDir: string): Promise<PackageAsset> {

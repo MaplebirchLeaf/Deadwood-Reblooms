@@ -46,6 +46,8 @@ Supports English and Chinese, with modules you can enable individually. The in-g
 3. Download `deadwood-reblooms-*.modpack` from [**Releases**](https://github.com/MaplebirchLeaf/Deadwood-Reblooms/releases/latest) and load it through ModLoader.
 4. Choose the modules you want in the framework's module manager, then save and reload.
 
+The main mod includes its base images. If you use Fem Goose Compilation or Mysterious, also load the matching `deadwood-reblooms-fem-goose-*.modpack` or `deadwood-reblooms-mysterious-*.modpack` from the same release and enable its image group in the beauty selector.
+
 When certain original mods with overlapping features are detected, Deadwood Reblooms disables its corresponding module. The package's dependency declarations and loader messages provide the full requirements.
 
 ## Game Guide and Settings

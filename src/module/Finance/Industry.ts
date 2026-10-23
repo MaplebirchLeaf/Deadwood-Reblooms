@@ -638,7 +638,7 @@ export default class Industry {
     const index = state.offers.findIndex(item => item.id === id);
     const previous = state.offers[index];
     const product = terms.products.find(item => item.id === previous.product)!;
-    // 只替换本份询价，保留交期；报价和付款风险沿用普通订单，联系不等于签约。
+    // 只替换本份询价，保留交期，报价和付款风险沿用普通订单，联系不等于签约。
     state.offers[index] = { ...this.quote(state, product, Math.floor(Time.days), customer, id), deadline: previous.deadline, contacted: true };
     return true;
   }

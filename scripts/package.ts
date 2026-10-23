@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { mkdir, readFile } from 'node:fs/promises';
 import { createModPackPackage } from './modpack';
-import { createAudioPackPackage, createZipPackage, type PackageAsset } from './zip';
+import { createAudioPackPackage, createImagePackPackages, createZipPackage, type PackageAsset } from './zip';
 
 interface PackageOptions {
   force: boolean;
@@ -46,6 +46,7 @@ export async function createModPackage(rootDir: string, options: PackageOptions 
   if (options.zip) {
     await writeChanged(packageDir, zipPackage, options.force);
     await writeChanged(packageDir, await createAudioPackPackage(rootDir), options.force);
+    for (const imagePack of await createImagePackPackages(rootDir)) await writeChanged(packageDir, imagePack, options.force);
   }
   if (options.modpack) await writeChanged(packageDir, await createModPackPackage(rootDir, zipPackage.buffer), options.force);
 }

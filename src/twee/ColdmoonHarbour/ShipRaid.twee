@@ -68,7 +68,7 @@
       <<lanSwitch 'A crewmate holds out a rope. "Help at the rail, mate! Keep them off the deck!"' '一个船员递来绳子。“去船边帮忙，伙计！别让他们上来！”'>>
     <</if>><br><br>
   <<else>>
-    <<lanSwitch 'A sailor shoves past you. "Get below if ye can\'t fight, scum!" The way to the hatch is still clear.' '一个水手推开你。“不会打就滚到底舱去，渣滓！”通往舱口的路还没有被堵住。'>><br><br>
+    <<lanSwitch 'A sailor shoves past you. "Get below if ye can\'t fight, scum!" The way to the hatch is still clear.' '一个水手推开你。“不会打就滚到底舱去，奴工！”通往舱口的路还没有被堵住。'>><br><br>
   <</if>>
   <<icon 'alert.png'>><<lanLink ['Hold off the boarder', '挡住登船者'] 'Deadwood Pirate Raid Fight'>>
     <<if $MoreTransformations.harbour.raid.stage is 'choice' and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
@@ -145,28 +145,30 @@
 <<widget 'deadwood-pirate-raid-journal'>>
   <<set _shipRaid to $MoreTransformations?.harbour?.raid>>
   <<if ['choice', 'fight_pending', 'fight', 'resolved'].includes(_shipRaid?.stage)>>
-    <div class='purple bold'><<lanSwitch 'Boarders in the fog' '雾中的登船者'>></div>
+    <div class='bold'><<lanSwitch 'Boarders in the fog' '雾中的登船者'>></div>
     <ul class='journal'><li>
       <<if $location is 'pirate_ship' and !(_shipRaid.stage is 'fight' and !($combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead'))>>
         <<if _shipRaid.stage is 'resolved'>>
-          <<lanSwitch 'The dead boarders have been driven off. You can return to the deck.' '登船的亡灵已被击退，你可以返回甲板了。'>>
+          <<lanSwitch 'The dead boarders have been driven off. The sailors are clearing the deck.' '登船的亡灵已被击退，水手们正在清理甲板。'>>
         <<else>>
           <<lanSwitch "A ghost ship drew alongside Zephyr's vessel. The crew are fighting off the boarders. You have not seen how it ends." '一艘鬼船靠近了泽菲尔的船，船员们正在抵抗登船者。你还不知道这场袭击会如何结束。'>>
         <</if>>
-        <<if !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
-          <br><<lanLink ['Return to the deck', '返回甲板'] 'Deadwood Pirate Raid'>><</lanLink>>
-        <</if>>
+        <br><<lanSwitch 'You can look for the crew when you return to the deck.' '回到甲板后，可以去船员那边看看。'>>
       <<else>>
         <<lanSwitch 'You left before the raid was over. You did not see how the crew drove the boarders off.' '袭击结束前你就离开了，没有看到船员们如何击退登船者。'>>
-        <<if !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
-          <br><<linkreplace `lanSwitch('Close this entry', '不再追记')`>>
-            <<if !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
-              <<set $MoreTransformations.harbour.raid.stage to '', $MoreTransformations.harbour.raid.outcome to '', $MoreTransformations.harbour.raid.needsEffects to false>>
-            <</if>>
-          <</linkreplace>>
-        <</if>>
       <</if>>
     </li></ul><hr>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-pirate-raid-link'>>
+  <<if !maplebirch.get('MoreTransformations') or !['choice', 'fight_pending', 'fight', 'resolved'].includes($MoreTransformations?.harbour?.raid?.stage)
+      or $passage isnot 'Pirate Deck' or $location isnot 'pirate_ship' or $combat or $replayScene or $statFreeze or $frozenValues
+      or $possessed or $eventforced or $nextPassage or $nextPassageCheck or $stress gte $stressmax>><<exit>><</if>>
+  <!-- 船舱导航只出现在原版普通菜单中，到港和强制事件先处理完才恢复袭击。 -->
+  <<set $_raidDeckMenu to Array.from(document.querySelectorAll('#passage-content [data-passage]')).some(link => link.dataset.passage is 'Pirate Cabin')>>
+  <<if $_raidDeckMenu>>
+    <<icon 'coldmoon-harbour/ghost-ship.png'>><<lanLink ['See how the crew are doing', '去船员那边看看'] 'Deadwood Pirate Raid'>><</lanLink>><br>
   <</if>>
 <</widget>>
 

@@ -192,7 +192,7 @@
 <<widget 'deadwood-street-story-journal'>>
   <<set _storyJournalWork to maplebirch.get('StreetLife')?.stories>>
   <<if !_storyJournalWork or !Object.values(_storyJournalWork.state).some(record => record.stage > 0)>><<exit>><</if>>
-  <<deadwood-card 'The crew’s arrangements' '同伙与手头的差事'>>
+  <div class='bold'><<lanSwitch 'The crew’s arrangements' '同伙与手头的差事'>></div>
     <<for _storyJournalId range ['landry', 'wren', 'mickey']>>
       <<set $_storyJournalRecord to _storyJournalWork.state[_storyJournalId]>>
       <<if $_storyJournalRecord.stage gt 0>>
@@ -207,22 +207,14 @@
       <div class='gold'><<lanSwitch 'Current crew' '眼下的人手'>></div>
       <<deadwood-street-crew-summary>>
     <</if>>
-  <</deadwood-card>><hr>
+  <hr>
 <</widget>>
 
 <<widget 'deadwood-street-story-statistics'>>
   <<set $_storyStatsWork to maplebirch.get('StreetLife')?.stories>>
   <<if !$_storyStatsWork>><<exit>><</if>>
-  <div class='gold'><<lanSwitch 'Before the big job' '大买卖之前'>></div>
-  <<for _storyStatsId range ['landry', 'wren', 'mickey']>>
-    <<set $_storyStatsChain to $_storyStatsWork.terms.chains[_storyStatsId], _storyStatsRecord to $_storyStatsWork.state[_storyStatsId]>>
-    <<deadwood-reblooms-progress-check `_storyStatsRecord.stage === 4` $_storyStatsChain.name `lanSwitch('Completed steps: ', '已完成阶段：') + _storyStatsRecord.stage + ' / 4' + (_storyStatsRecord.paused ? lanSwitch(' (on hold)', '（暂缓）') : '')`>>
-    <<if _storyStatsRecord.stage is 4>><span class='small-description'><i><<lanSwitch $_storyStatsChain.outcomes[_storyStatsRecord.outcome].text[0] $_storyStatsChain.outcomes[_storyStatsRecord.outcome].text[1]>></i></span><br><</if>>
-  <</for>>
+  <<lanSwitch 'Arrangements completed: ' '已完成的差事：'>><<= Object.values($_storyStatsWork.state).filter(record => record.stage === 4).length>> / 3<br>
   <<lanSwitch 'Arrangements paid / expenses: ' '差事累计报酬／支出：'>><span class='gold'><<printmoney `Object.values($_storyStatsWork.state).reduce((total, record) => total + record.paid, 0)`>></span> / <span class='gold'><<printmoney `Object.values($_storyStatsWork.state).reduce((total, record) => total + record.spent, 0)`>></span><br>
-  <<if maplebirch.get('StreetLife').heist.state.introduced>>
-    <<deadwood-street-crew-summary>>
-  <</if>>
 <</widget>>
 
 :: Deadwood Street Work

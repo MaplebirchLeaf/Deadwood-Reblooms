@@ -123,7 +123,6 @@ class MeteorShower {
   private current(date = new DateTime(Time.date)) {
     if (!this.enabled) return null;
 
-    // 流星雨可能在午夜后继续，所以当前日与前一日都要查。
     const previous = new DateTime(date.midnight).addDays(-1);
     const event = [this.build(previous), this.build(date.midnight)].find(item => item && date.timeStamp >= item.start && date.timeStamp <= item.end);
     if (!event) return null;
@@ -142,7 +141,6 @@ class MeteorShower {
       .sort((a, b) => a.start - b.start)
       .slice(0, count);
 
-    // 仅保存将来的几场预报，且用开始时间去重，避免多次跨日刷新重复写入存档。
     const known = new Set(state.stored.map(event => event.start));
     for (let date = now.midnight, searched = 0; state.stored.length < count && searched < MeteorShower.config.searchDays; date = new DateTime(date).addDays(1), searched++) {
       const event = this.build(date);

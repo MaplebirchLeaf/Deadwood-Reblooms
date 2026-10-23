@@ -59,7 +59,6 @@ interface AvatarOptions {
   readonly loved?: number;
   readonly lustful?: number;
   readonly load?: (path: string) => Promise<string | undefined>;
-  readonly exists?: (path: string) => boolean | undefined;
 }
 
 class NPCAvatars {
@@ -121,15 +120,14 @@ class NPCAvatars {
     const states: AvatarStates = profile.states
       ? { default: 'default', ...profile.states }
       : { default: 'default', lustful: 'lustful', dominant: 'dominant', loved: 'loved', submissive: 'submissive', disliked: 'disliked' };
-    const available = (state?: string): boolean => !!state && this.options.exists?.(this.path(npc, profile, state)) !== false;
     const love = npc.love ?? 0;
     const lust = npc.lust ?? 0;
     const dom = npc.dom ?? 0;
-    if (lust >= (this.options.lustful ?? 60) && available(states.lustful)) return states.lustful;
-    if (dom >= Number(V.npcdomhigh ?? 50) && available(states.dominant)) return states.dominant;
-    if (love >= (this.options.loved ?? 50) && available(states.loved)) return states.loved;
-    if (dom <= Number(V.npcdomlow ?? -50) && available(states.submissive)) return states.submissive;
-    if (love <= Number(V.npclovelow ?? 0) && available(states.disliked)) return states.disliked;
+    if (lust >= (this.options.lustful ?? 60) && states.lustful) return states.lustful;
+    if (dom >= Number(V.npcdomhigh ?? 50) && states.dominant) return states.dominant;
+    if (love >= (this.options.loved ?? 50) && states.loved) return states.loved;
+    if (dom <= Number(V.npcdomlow ?? -50) && states.submissive) return states.submissive;
+    if (love <= Number(V.npclovelow ?? 0) && states.disliked) return states.disliked;
     return states.default;
   }
 

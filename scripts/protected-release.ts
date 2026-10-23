@@ -7,7 +7,7 @@ const rootDir = path.join(import.meta.dir, '..');
 const tool = path.join(rootDir, 'tools/dol-mod-protection-tools/src/zip-to-modpack.ts');
 const packageDir = path.join(rootDir, 'package');
 const info = await modPackageInfo(rootDir);
-const zipNames = [`${info.baseName}.mod.zip`, `${info.name}-audio-${info.gameVersion}-v${info.version}.mod.zip`];
+const zipNames = [info.baseName, ...['audio', 'fem-goose', 'mysterious'].map(suffix => `${info.name}-${suffix}-${info.gameVersion}-v${info.version}`)].map(name => `${name}.mod.zip`);
 const temporaryDir = await mkdtemp(path.join(os.tmpdir(), 'deadwood-protected-release-'));
 
 try {

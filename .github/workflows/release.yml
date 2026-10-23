@@ -43,7 +43,7 @@ jobs:
           bun run check
           bunx tsc --noEmit --pretty false
 
-      - name: Build mod and audio package
+      - name: Build mod, audio and image packages
         run: bun run build:all
 
       - name: Encrypt without player credentials
@@ -57,8 +57,8 @@ jobs:
         run: |
           shopt -s nullglob
           packages=(package/*.modpack)
-          if [[ "${#packages[@]}" -ne 2 ]]; then
-            echo "Expected two encrypted modpacks, found ${#packages[@]}" >&2
+          if [[ "${#packages[@]}" -ne 4 ]]; then
+            echo "Expected four encrypted modpacks, found ${#packages[@]}" >&2
             exit 1
           fi
           notes_file=".github/release-notes/$RELEASE_TAG.md"

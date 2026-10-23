@@ -61,6 +61,55 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
     if (zone[group][title]) zone[group][title] = zone[group][title].map(rule => (String(rule.src ?? rule.srcmatch ?? rule.srcmatchgroup) === original ? patch(rule) : rule));
   };
 
+  // DoLX 分开保存航程总天数与剩余天数，仍只在原生开启新航程时取消金币航线。
+  replace('locationPassage', 'Pirate Zephyr Island Ask', '<<set $pirate_journey to 7>>', rule => ({ ...rule, src: '<<set $pirate_journey_total to 7>>' }));
+  if (maplebirch.get('MoreTransformations')) {
+    // 自有航线沿用 DoLX 的出航与登陆状态，避免旧倒计时让再次远航立即抵达。
+    const cache = maplebirch.modUtils.getMod('deadwood-reblooms')?.cache;
+    for (const [title, from, to] of [
+      [
+        'Deadwood Coin Zephyr',
+        '<<set $pirate_journey to 7>>',
+        '<<unset $pirate_journey_done>><<set $pirate_journey_total to 7>><<set $pirate_journey_startDay to Time.days>><<set $pirate_journey to $pirate_journey_total>>'
+      ],
+      [
+        'Deadwood Coin Voyage Arrival',
+        '<<unset $pirate_journey>>',
+        '<<set $pirate_journey_done to true>><<unset $pirate_journey>><<unset $pirate_journey_total>><<unset $pirate_journey_startDay>><<unset $pirate_journey_startStamp>>'
+      ]
+    ]) {
+      const passage = cache?.passageDataItems.map.get(title);
+      if (!passage || passage.content.includes(to)) continue;
+      const matches = passage.content.split(from).length - 1;
+      if (matches !== 1) {
+        maplebirch.log(`${title}: 匹配 ${matches}，预期 1 (${from})`, 'WARN');
+        continue;
+      }
+      passage.content = passage.content.replace(from, () => to);
+    }
+    // DoLX 将兴奋与快感分开，只有原生高潮终局使用快感，保留其它兴奋判定。
+    if (maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Actions Man')?.content.includes('$enemypleasure gte $enemypleasuremax')) {
+      for (const [title, expected] of [
+        ['Deadwood Pirate Raid Widgets', 2],
+        ['Deadwood Pirate Raid Fight', 1],
+        ['Deadwood Coin Cave Combat Widgets', 1],
+        ['Deadwood Coin Cave Fight', 1],
+        ['Deadwood Coldmoon Harbour Fight Finish', 2]
+      ] as const) {
+        const passage = cache?.passageDataItems.map.get(title);
+        if (!passage || passage.content.includes('$enemypleasure')) continue;
+        const climax = /\$enemyarousal (gte|lt) \$enemyarousalmax/g;
+        const matches = Array.from(passage.content.matchAll(climax)).length;
+        if (matches !== expected) {
+          maplebirch.log(`${title}: 匹配 ${matches}，预期 ${expected} (${climax})`, 'WARN');
+          continue;
+        }
+        passage.content = passage.content.replace(climax, '$enemypleasure $1 $enemypleasuremax');
+      }
+    }
+    cache?.passageDataItems.back2Array();
+  }
+
   // 森林地图和公寓菜单的排版不同，仍接在同一普通导航分支内。
   replace('locationPassage', 'Forest', String(/<<elseif \$eventskip gte 1>>[^<]*<br><br>/g), rule => ({ ...rule, srcmatch: /<<elseif \$eventskip gte 1>>\s*<<forest_map>>/g }));
   replace('locationPassage', 'Whitney Chat', String(/<<\/switch>>\s*(?:<br\s*\/?>\s*){2}(?=<<whitney[Oo]ptions>>\s*<<else>>)/), rule => ({
@@ -80,6 +129,23 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
     to: '($exposed lte 0 or maplebirch.get("LifeSimulation").school.allowsNudity)'
   }));
   replace('widgetPassage', 'Widgets Rent', String(/<<if \$robinpaid is 1(?=>>)/), rule => ({ ...rule, srcmatch: /<<if \$robinpaid is 1(?= and \$robinStand\?\.selfSufficient isnot 1>>)/ }));
+  // 普通换身梦也会清除 activeNightmare，醒后余悸只接在噩梦恢复现实状态之后。
+  replace('widgetPassage', 'Widgets Nightmares', '<<unset $activeNightmare>>', rule => ({
+    ...rule,
+    src: undefined,
+    srcmatch: /<<widget "nightmareEnd">>(?:(?!<<\/widget>>)[\s\S])*?<<unset \$activeNightmare>>/
+  }));
+  // 新版 DoLX 在分页前统一搜索衣柜与手提包，移除重复控件及分页后的二次过滤。
+  if (maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Wardrobe')?.content.includes('<<textbox "_wardrobeSearch" _wardrobeSearch>>')) {
+    zone.widgetPassage['Widgets Wardrobe'] = (zone.widgetPassage['Widgets Wardrobe'] ?? []).filter(
+      rule => ![rule.applybefore, rule.applyafter].some(text => text?.includes('$DeadwoodReblooms.wardrobeSearch'))
+    );
+    zone.widgetPassage['Widgets Wardrobe'].push({
+      src: '<label>Search: <<textbox "_wardrobeSearch" _wardrobeSearch>></label>',
+      to: '<label><<lanSwitch "Search: " "搜索：">><<textbox "_wardrobeSearch" _wardrobeSearch>></label>',
+      expected: 1
+    });
+  }
 
   // DoLX 使用自己的言语特质和道歉倍率，容貌加成接在最终公式之后。
   replace('widgetPassage', 'Widgets Effects Man', String(/<<meek `(?:1 \+ \$englishtrait|\(1 \+ \$englishtrait\) \* maplebirch\.get\('MoreTransformations'\)\.Raven\.speech)`>>/), rule => ({

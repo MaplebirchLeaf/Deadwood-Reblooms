@@ -1,10 +1,5 @@
 // ./src/module/constants/bird-tower.ts
 
-/**
- * 鹰崽的成长阶段。阶段只由年龄决定，换羽提示由独立的 grow 标记控制。
- * Hatchling 雏鸟（无羽）→ Nestling 雏鸟（绒羽）→ Fledgling 幼鸟（离巢）
- * → Subadult 亚成鸟（初次飞行）→ Immature 亚成鸟（初次狩猎）。
- */
 export type BirdTowerStage = 'Hatchling' | 'Nestling' | 'Fledgling' | 'Subadult' | 'Immature' | 'ERROR';
 
 /** 离巢后随机分配的性格，参考原版狐狸的性格特质。 */

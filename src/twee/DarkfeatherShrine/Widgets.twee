@@ -268,8 +268,8 @@
 <<widget 'deadwood-raven-shrine-journal'>>
   <<if maplebirch.get('MoreTransformations') and $MoreTransformations?.shrine>>
     <<set $_shrineNote to $MoreTransformations.shrine>>
-    <<if $_shrineNote.stage gt 0 or $_shrineNote.feeds gt 0>>
-      <div class='purple bold'><<lanSwitch 'The ravens’ letter' '渡鸦的来信'>></div>
+    <<if $_shrineNote.stage lt 3 and ($_shrineNote.stage gt 0 or $_shrineNote.feeds gt 0) or $_shrineNote.promise gte 0 or ($_shrineNote.wish.ready and !$_shrineNote.wish.returned)>>
+      <div class='bold'><<lanSwitch `$_shrineNote.stage < 3 ? 'The ravens’ letter' : 'Darkfeather Shrine'` `$_shrineNote.stage < 3 ? '渡鸦的来信' : '黯羽神社'`>></div>
       <ul class='journal'><li>
         <<switch $_shrineNote.stage>>
           <<case 0>>
@@ -282,28 +282,22 @@
           <<case 1>>
             <<lanSwitch 'The letter is addressed to Gwylan at the forest shop.' '信是给森林商店的格威岚的。'>>
           <<case 2>>
-            <<lanSwitch 'Gwylan marked a side path in the woods a little beyond the outskirts (forest depth 20–40). Follow it to Darkfeather Shrine. Tsukihan receives visitors at 09:00–12:00, 13:00–16:00 and 17:00–18:00; on Tuesdays, 10:00–12:00 is spent shopping in town.' '格威岚标出了外缘稍深处的岔路（森林深度20～40）。沿参道可到黯羽神社。月羽在9:00～12:00、13:00～16:00和17:00～18:00接待来客。周二10:00～12:00会进镇采购。'>>
+            <<lanSwitch 'Gwylan marked a side path in the woods a little beyond the outskirts (forest depth 20–40). Follow it to Darkfeather Shrine.' '格威岚标出了外缘稍深处的岔路（森林深度20～40）。沿参道可到黯羽神社。'>>
           <<case 3>>
-            <<lanSwitch 'The path to Darkfeather Shrine lies at forest depth 20–40. Tsukihan receives visitors at 09:00–12:00, 13:00–16:00 and 17:00–18:00; on Tuesdays, 10:00–12:00 is spent shopping in town.' '黯羽神社的参道在森林深度20～40。月羽在9:00～12:00、13:00～16:00和17:00～18:00接待来客。周二10:00～12:00会进镇采购。'>>
-            <<if $_shrineNote.home_invited and C.npc.Tsukihan?.state is 'active' and isLoveInterest('Tsukihan') and C.npc.Tsukihan.love gte 30>>
-              <br><<lanSwitch 'Tsukihan has invited you into the house behind the shrine, even while they work in the courtyard. You share the bedroom, and there is a small washroom inside.' '月羽请你到神社后侧的小屋歇脚，自己在庭院忙时，也允许你进屋。你们共用寝室里的床铺，屋里还有一间小浴室。'>>
-            <<elseif C.npc.Tsukihan?.init is 1 and isLoveInterest('Tsukihan')>>
-              <br><<lanSwitch 'Tsukihan lives in the little house behind the shrine. You can call at the door at 07:00–09:00, 12:00–13:00 or 18:00–22:00.' '月羽住在神社后侧的小屋。7:00～9:00、12:00～13:00或18:00～22:00，可以到门前拜访。'>>
-            <</if>>
             <<if $_shrineNote.promise gte 0>>
-              <br><<if Math.floor(Time.days) gt $_shrineNote.promise>>
+              <<if Math.floor(Time.days) gt $_shrineNote.promise>>
                 <span class='red'><<lanSwitch 'The day you promised to bring strawberries has passed. Speak with Tsukihan at the shrine.' '约好送草莓的日子已经过了。去神社和月羽说说吧。'>></span>
               <<else>>
                 <<language>>
                   <<option 'EN'>>
-                    You promised to bring Tsukihan a portion of strawberries by 18:00 on <span class='blue'><<deadwood-journal-date $MoreTransformations.shrine.promise>></span>.
+                    You promised to bring Tsukihan a portion of strawberries by 18:00 on <span @class='$_shrineNote.promise is Math.floor(Time.days) ? "pink" : "gold"'><<deadwood-journal-date $_shrineNote.promise>></span>.
                   <<option 'CN'>>
-                    你答应在<span class='blue'><<deadwood-journal-date $MoreTransformations.shrine.promise>></span>18:00前给月羽带一份草莓。
+                    你答应在<span @class='$_shrineNote.promise is Math.floor(Time.days) ? "pink" : "gold"'><<deadwood-journal-date $_shrineNote.promise>></span>18:00前给月羽带一份草莓。
                 <</language>>
               <</if>>
             <</if>>
             <<if $_shrineNote.wish.ready and !$_shrineNote.wish.returned>>
-              <br><<lanSwitch 'Your wish has come true. You can return to the shrine to give thanks.' '绘马上的心愿已实现，可以回神社还愿。'>>
+              <<if $_shrineNote.promise gte 0>><br><</if>><<lanSwitch 'Your wish has come true. You can return to the shrine to give thanks.' '绘马上的心愿已实现，可以回神社还愿。'>>
             <</if>>
         <</switch>>
       </li></ul><hr>

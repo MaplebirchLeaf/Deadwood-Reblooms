@@ -2,17 +2,17 @@
 
 Enable **VanillaPlus** and reload. Banking, property and Adrian have their own Finance chapters; dual handhelds, school life and gifts are in Life Simulation.
 
-| Goal                       | Entrance                                                    | First requirement                                                 |
-| -------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------- |
-| Break an attribute ceiling | Its story challenges; check detailed progress in Statistics | Native maximum and the relevant challenge                         |
-| Develop divine forms       | Native transformations and temple prayer                    | Divine transformations enabled and the relevant growth conditions |
-| Use eerie mirrors          | Mirrors you have touched                                    | Deviancy trait, the right hour and tentacles enabled              |
-| Hospital services          | Hospital foyer                                              | Eligible body state and payment                                   |
-| Gargantuan size            | Body-size settings and existing growth routes               | VanillaPlus enabled                                               |
+| Goal                       | Entrance                                                   | First requirement                                                 |
+| -------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------- |
+| Break an attribute ceiling | Its story challenges; check attribute growth in Statistics | Native maximum and the relevant challenge                         |
+| Develop divine forms       | Native transformations and temple prayer                   | Divine transformations enabled and the relevant growth conditions |
+| Use eerie mirrors          | Mirrors you have touched                                   | Deviancy trait, the right hour and tentacles enabled              |
+| Hospital services          | Hospital foyer                                             | Eligible body state and payment                                   |
+| Gargantuan size            | Body-size settings and existing growth routes              | VanillaPlus enabled                                               |
 
 ## Six attribute breakthroughs
 
-Reach the normal attribute ceiling and complete its challenges to break through. Then keep training to the new ceiling to earn the trait. **Statistics → Deadwood Reblooms: progress** shows what you have done and what remains. Some challenges only need completing once; others, such as makeup and ear slimes, depend on your condition at the time.
+Reach the normal attribute ceiling and complete its challenges to break through. Then keep training to the new ceiling to earn the trait. **Statistics → Mod statistics → Attribute breakthroughs** shows current values, ceilings and the number of requirements met. The requirements are listed below. Some challenges only need completing once; others, such as makeup and ear slimes, depend on your condition at the time.
 
 Willpower, physique and beauty rise to **125%** of their normal ceilings; exhibitionism, deviancy and promiscuity rise to **150%**. Reaching all six new ceilings also earns Master of All.
 
@@ -30,7 +30,7 @@ The break-in takes place in **a locked flat in the native block of flats**, not 
 
 ### Beauty
 
-Reach maximum beauty, once attain **7,000 base allure outdoors outside a blood moon**, and currently have at least **1,000 modelling fame**. Remove all makeup, coloured contacts and face masks before breaking through. Base allure and total allure are different values; Statistics shows which requirements you meet.
+Reach maximum beauty, once attain **7,000 base allure outdoors outside a blood moon**, and currently have at least **1,000 modelling fame**. Remove all makeup, coloured contacts and face masks before breaking through. The requirement uses base allure, rather than total allure.
 
 ### Exhibitionism
 

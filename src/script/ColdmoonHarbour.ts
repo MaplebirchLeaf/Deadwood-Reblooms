@@ -48,6 +48,7 @@ export default function ColdmoonHarbour(maplebirch: typeof window.maplebirch): v
   });
   maplebirch.tool.addTo('Journal', 'deadwood-harbour-journal');
   maplebirch.tool.addTo('Journal', 'deadwood-pirate-raid-journal');
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-pirate-raid-link', passage: 'Pirate Deck' });
 
   const ready = (hand: 'left' | 'right') => {
     const target = V.NPCList?.[Number(V[`${hand}target`])];

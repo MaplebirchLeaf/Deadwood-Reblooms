@@ -1,7 +1,7 @@
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
 type ScriptRule = { fileName: string; from: string; to: string };
-type PassageRule = { passage: string; findRegex?: string };
+type PassageRule = { passage: string; replace?: string };
 
 export default function adaptBoot(maplebirch: MaplebirchCore): void {
   const plugins = maplebirch.services.addonPlugin.info.get('deadwood-reblooms')?.mod.bootJson.addonPlugin;
@@ -32,7 +32,7 @@ export default function adaptBoot(maplebirch: MaplebirchCore): void {
   }
   const replacer = plugins.find(plugin => plugin.modName === 'TweeReplacer' && plugin.addonName === 'TweeReplacerAddon');
   if (Array.isArray(replacer?.params)) {
-    // DoLX 的称号是块函数，沿用独立兼容规则，避免之后再次执行原版三元表达式规则。
-    replacer.params = (replacer.params as PassageRule[]).filter(rule => rule.passage !== 'Traits' || !rule.findRegex?.startsWith('name: \\(\\) => (V\\.player\\.gender'));
+    // DoLX 的块函数称号已统一处理，避免之后再次追加生理标记。
+    replacer.params = (replacer.params as PassageRule[]).filter(rule => rule.passage !== 'Traits' || !rule.replace?.includes('<<deadwood-trait-sex>>'));
   }
 }
