@@ -75,8 +75,10 @@
       <<set _harbour.scene to either('antiquecoppercompass', 'antiquerustedcutlass')>>
       <<set $antiquemoney += _harbour.scene is 'antiquecoppercompass' ? 50 : 10>>
       <<museumAntiqueStatus _harbour.scene 'found'>>
-    <<else>>
+    <<elseif !_harbour.exchanged and _harbour.relics lt 1>>
       <<set _harbour.relics += 1, _harbour.scene to 'relic'>>
+    <<else>>
+      <<set _harbour.scene to _args[0] is 'dive' ? 'silt' : 'search'>>
     <</if>>
   <<else>>
     <<set _harbour.scene to _args[0] is 'dive' ? 'silt' : 'search', _harbour.event to ''>>
@@ -190,7 +192,7 @@
 <<widget 'deadwood-harbour-journal'>>
   <<if $MoreTransformations?.harbour and ($MoreTransformations.harbour.ship or $MoreTransformations.harbour.relics gt 0)>>
     <br><b><<lanSwitch 'Coldmoon Harbour' '寒月港湾'>></b><br>
-    <<if $MoreTransformations.harbour.relics gt 0>>
+    <<if $MoreTransformations.harbour.relics gt 0 and !$MoreTransformations.harbour.exchanged>>
       <<lanSwitch 'Recovered keepsakes: ' '打捞的旧物：'>><<print $MoreTransformations.harbour.relics>><br>
     <</if>>
     <<if $MoreTransformations.harbour.ship>><<language>>
