@@ -11,9 +11,9 @@ export default class Recognition {
 
   public constructor(private readonly finance: Finance) {}
 
-  public award(kind: 'business' | 'good' | 'social', key: string, amount: number, interval = 7): void {
+  // 逐日补算传入实际日期，手动互动默认使用当前日期。
+  public award(kind: 'business' | 'good' | 'social', key: string, amount: number, interval = 7, day = Math.floor(Time.days)): void {
     if (V.replayScene || V.statFreeze) return;
-    const day = Math.floor(Time.days);
     const awarded = this.finance.state.recognition.awarded;
     if (awarded[key] != null && day - awarded[key] < interval) return;
     awarded[key] = day;

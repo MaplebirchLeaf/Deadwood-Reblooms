@@ -26,7 +26,7 @@ export default function CompanyAvery(maplebirch: typeof window.maplebirch): void
     widgetPassage: {
       'Widgets Sleep': [
         {
-          // 保留原版收养保护；庄园来宾身份本身不提供对贝利的豁免。
+          // 保留原版收养保护。庄园来宾身份本身不提供对贝利的豁免。
           src: '!($avery_mansion and',
           applyafter: ' !maplebirch.get("Finance")?.company.avery.state.mansion_guest and',
           expected: 1

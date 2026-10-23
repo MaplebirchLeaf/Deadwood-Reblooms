@@ -6,36 +6,38 @@
     <<option 'EN'>>
       <<if !_company.open>>
         The telephone is silent. A strip of light from the corridor falls across the closed files.
-      <<elseif _staff.arrears gt 0>>
-        An unpaid wage slip lies on top of the correspondence. The chair behind it is empty.
       <<elseif !_staff.working>>
-        The files have been stacked away. Nobody has begun the day's calls.
+        The files have been stacked away. The notices on the desk must be settled before work can resume.
       <<else>>
+        <<if _staff.arrears gt 0>>
+          An unpaid wage slip lies on top of the correspondence. Its owner's desk is empty.
+        <</if>>
         <<if _staff.accountant and $per_npc.deadwood_company_accountant>>
           <<print $per_npc.deadwood_company_accountant.name>>, your accountant, has separated the delivery receipts from the invoices. A pencil rests beside a figure that needs checking.
         <</if>>
         <<if _staff.sales and $per_npc.deadwood_company_sales>>
           <<print $per_npc.deadwood_company_sales.name>>, your sales representative, finishes a telephone call and writes a delivery date in the enquiries book.
         <</if>>
-        <<if !_staff.employed>>
+        <<if !_staff.employed and _staff.arrears is 0>>
           The telephone sits beside a pile of unanswered enquiries. There is nobody here to take calls while you are away.
         <</if>>
       <</if>>
     <<option 'CN'>>
       <<if !_company.open>>
         电话静静放着。走廊里透进来的一线光，落在合拢的文件夹上。
-      <<elseif _staff.arrears gt 0>>
-        一张未付的工资单压在来信上。后面的椅子空着。
       <<elseif !_staff.working>>
-        文件已经收好，今天的电话还没有开始打。
+        文件已经收好。桌上的通知还没处理，工作也暂时停下了。
       <<else>>
+        <<if _staff.arrears gt 0>>
+          一张未付的工资单压在来信上。领薪人的办公桌空着。
+        <</if>>
         <<if _staff.accountant and $per_npc.deadwood_company_accountant>>
           会计<<print $per_npc.deadwood_company_accountant.name>>把收货回执与账单分开放好。一支铅笔搁在需要核对的数字旁。
         <</if>>
         <<if _staff.sales and $per_npc.deadwood_company_sales>>
           业务员<<print $per_npc.deadwood_company_sales.name>>挂断电话，在询价簿里记下一个交货日期。
         <</if>>
-        <<if !_staff.employed>>
+        <<if !_staff.employed and _staff.arrears is 0>>
           电话旁堆着尚未回复的询价。你不在时，这里没有人接电话。
         <</if>>
       <</if>>
@@ -56,13 +58,18 @@
 <<deadwood-dynamicblock 'deadwood-company-staff-payroll'>>
 <<set _staff to _company.staff>>
 <<if _company_state.result>>
-  <span @class='_company_state.result === "staff-ok" ? "green" : "red"'>
-    <<if _company_state.result is 'staff-ok'>>
-      <<lanSwitch 'The paperwork is signed.' '手续已经办妥。'>>
-    <<else>>
-      <<lanSwitch 'You cannot complete the arrangement. Check the balance and outstanding bills.' '手续没有办成。请检查余额与未付账款。'>>
-    <</if>>
-  </span><br><br>
+  <<if _company_state.result is 'staff-paid'>>
+    <<language>>
+      <<option 'EN'>>
+        <span class='green'>The overdue wages are paid.</span> <<if _staff.employed and _staff.working>>The receipts go into the payroll folder, and the remaining staff return to their desks.<<elseif _staff.employed>>The receipts go into the payroll folder. The office's other outstanding notices still need settling.<<else>>The receipts go into the payroll folder. Anyone who resigned will need to be hired again.<</if>>
+      <<option 'CN'>>
+        <span class='green'>欠薪已经付清。</span><<if _staff.employed and _staff.working>>收据放进工资夹，留下的职员回到各自的桌边。<<elseif _staff.employed>>收据放进工资夹，办公室的其它欠款仍需处理。<<else>>收据放进工资夹。已经辞职的人，需要重新聘用。<</if>>
+    <</language>>
+  <<elseif _company_state.result is 'staff-ok'>>
+    <span class='green'><<lanSwitch 'The paperwork is signed.' '手续已经办妥。'>></span>
+  <<else>>
+    <span class='red'><<lanSwitch 'You cannot complete the arrangement. Check the balance and outstanding bills.' '手续没有办成。请检查余额与未付账款。'>></span>
+  <</if>><br><br>
   <<set _company_state.result to null>>
 <</if>>
 <<for _role range _staff.roles>>
@@ -103,8 +110,8 @@
 <</language>><br><br>
 <<if _staff.arrears gt 0>>
   <<icon 'finance/bank-withdraw.png'>><<lanLink ['Pay all overdue wages', '付清职员欠薪']>>
-    <<set $Finance.company.result to maplebirch.get('Finance').company.staff.pay() ? 'staff-ok' : 'staff-failed'>>
-    <<run maplebirch.get('Finance').refreshMoney()>>
+    <<set $Finance.company.result to maplebirch.get('Finance').company.staff.pay() ? 'staff-paid' : 'staff-failed'>>
+    <<run maplebirch.get('Finance').refresh()>>
     <<run Dynamic.render('deadwood-company-staff-payroll')>>
   <</lanLink>><br>
 <</if>>
@@ -127,12 +134,14 @@
 <<language>>
   <<option 'EN'>>
     <<if $NPCList[0].name_known is 1>>
-      <<print $NPCList[0].name>> pulls a chair up to your desk.
+      <<if _staff.state[_role].quit>><<print $NPCList[0].name>> lays a copy of the old contract on your desk.<<else>><<print $NPCList[0].name>> pulls a chair up to your desk.<</if>>
     <<else>>
       A <<person>> puts a folded application on your desk. "<<print $NPCList[0].name>>," <<he>> says, pointing to the name at the top.
     <</if>>
     <br><br>
-    <<if _staff.state[_role].arrears gt 0>>
+    <<if _staff.state[_role].quit>>
+      "I handed in my notice." <<He>> leaves the chair where it is. <<if _staff.state[_role].arrears gt 0>>"Settle what you owe before we discuss another contract."<<else>>"The wages are settled. If you want me back, we'll need a new agreement."<</if>>
+    <<elseif _staff.state[_role].arrears gt 0>>
       "Before we talk about next week, there's this." <<He>> sets the unpaid wage slip in front of you. "I can't keep working without being paid."
     <<elseif _staff.state[_role].employed and !_staff.working>>
       "I can't arrange anything with the buyers while the office is tied up." <<He>> pushes the outstanding notices across the desk. "You'll need to sort these out first."
@@ -142,6 +151,14 @@
           <<He>> matches the invoice to the signed delivery receipt. "They've accepted the goods. I'll need both copies when I ask for the money."
         <<elseif _company_state.contract?.stage is 'waiting'>>
           "The reminder has gone in." <<He>> taps the promised payment date. "I'll keep the receipt until the money arrives."
+        <<elseif _company_state.contract?.stage is 'invoice'>>
+          <<He>> files the signed receipt beside the payment date. "Delivered doesn't mean paid. Leave the money in the receivables column until it clears."
+        <<elseif _company_state.shareholders.project>>
+          <<He>> keeps the board papers apart from your payroll. "That's AVY's building budget. Don't count it towards the wages we owe here."
+        <<elseif _company_state.completed gte _company.terms.partnerContracts>>
+          <<He>> lays the settled invoices beside the new quotation. "These have all been paid. If they ask for credit again, compare the dates they promised with the dates the money arrived."
+        <<elseif _company_state.completed gt 0>>
+          <<He>> turns a paid invoice towards you. "Money received. Now we can put the materials and wages against it and see what the job actually made."
         <<else>>
           <<He>> draws a line beneath the expenses column. "The advance isn't profit. Materials and wages still have to come out of it."
         <</if>>
@@ -152,6 +169,14 @@
       <<if _staff.state.sales.employed>>
         <<if _company_state.contract?.stage is 'production'>>
           "They asked about delivery again." <<He>> shows you a note beside the factory's name. "I gave them the date we signed for. Don't promise a second order while this one's still on the floor."
+        <<elseif _company_state.contract>>
+          "They've asked when we can take another job." <<He>> leaves the quotation unsigned. "I'll wait for this payment before promising anything."
+        <<elseif _company.partner and _company_state.policy is 'volume'>>
+          <<He>> circles the larger quantity on the next quotation. "More pieces, same delivery window. Check the factory's other work before you sign."
+        <<elseif _company.partner and _company_state.policy is 'price'>>
+          "They want another quotation already." <<He>> shows you the discounted price. "We can ask again sooner on these terms. Keep an eye on the margin."
+        <<elseif _company_state.completed gt 0>>
+          <<He>> finds the buyer's last order in the enquiries book. "They know our work now. I'll ask what they need next. You still choose the quantity and terms."
         <<else>>
           <<He>> turns the enquiries book towards you. "I can get the next quotation ready sooner. You'll still need to choose a factory and sign it."
         <</if>>
@@ -161,12 +186,14 @@
     <</if>>
   <<option 'CN'>>
     <<if $NPCList[0].name_known is 1>>
-      <<print $NPCList[0].name>>把椅子拉到你的桌边。
+      <<if _staff.state[_role].quit>><<print $NPCList[0].name>>把之前的合同副本放到你桌上。<<else>><<print $NPCList[0].name>>把椅子拉到你的桌边。<</if>>
     <<else>>
       一位<<person>>把折好的应聘表放在桌上。“<<print $NPCList[0].name>>。”<<he>>说，指了指表头的名字。
     <</if>>
     <br><br>
-    <<if _staff.state[_role].arrears gt 0>>
+    <<if _staff.state[_role].quit>>
+      “我已经辞职了。”<<He>>没有把椅子拉过来。<<if _staff.state[_role].arrears gt 0>>“先结清之前欠的工资，再谈新合同吧。”<<else>>“之前的工资已经结清了。要我回来，得再签一份协议。”<</if>>
+    <<elseif _staff.state[_role].arrears gt 0>>
       “下周的事先放一放，还有这个。”<<He>>把未付的工资单摆到你面前。“不给工资，我没法继续干。”
     <<elseif _staff.state[_role].employed and !_staff.working>>
       “办公室这边有麻烦，我没法替你跟客户安排什么。”<<He>>把尚未处理的通知推过桌面。“先把这些解决吧。”
@@ -176,6 +203,14 @@
           <<He>>把账单与签过字的收货回执对上。“货已经收了。去要钱时，两份都得带着。”
         <<elseif _company_state.contract?.stage is 'waiting'>>
           “催款单已经递过去了。”<<He>>敲敲约好的付款日期。“钱到账之前，回执我会留着。”
+        <<elseif _company_state.contract?.stage is 'invoice'>>
+          <<He>>把签好的回执放到付款日期旁。“交了货，不代表收到了钱。到账之前，先记在应收账款里。”
+        <<elseif _company_state.shareholders.project>>
+          <<He>>把董事会的文件与工资表分开放好。“那是艾弗里公司的工程预算，别拿来抵这里要发的工资。”
+        <<elseif _company_state.completed gte _company.terms.partnerContracts>>
+          <<He>>把结清的账单排在新报价旁。“这些钱都收到了。下次再谈赊账，先比比他们答应哪天付，钱又是哪天来的。”
+        <<elseif _company_state.completed gt 0>>
+          <<He>>把已结清的账单转向你。“钱收到了。把材料和工资扣出去，才知道这单到底挣了多少。”
         <<else>>
           <<He>>在支出栏下面划了一条线。“预付款还不算利润。材料和工资，都得从里面出。”
         <</if>>
@@ -186,6 +221,14 @@
       <<if _staff.state.sales.employed>>
         <<if _company_state.contract?.stage is 'production'>>
           “他们又问交货的事了。”<<He>>给你看厂房名字旁的记录。“我说了合同上的日期。这批还在做，别急着再答应一批。”
+        <<elseif _company_state.contract>>
+          “他们问我们什么时候还能接活。”<<He>>没有在报价上签字。“这笔钱先到账，再答应下一单吧。”
+        <<elseif _company.partner and _company_state.policy is 'volume'>>
+          <<He>>圈出下次报价上增加的数量。“件数多了，交货的时间没变。签字前，看看厂里还有什么活要做。”
+        <<elseif _company.partner and _company_state.policy is 'price'>>
+          “他们又来问报价了。”<<He>>给你看打过折的价格。“按这条件，下次能早点再谈。利润得盯着点。”
+        <<elseif _company_state.completed gt 0>>
+          <<He>>从询价簿里翻出买家上次的订单。“他们知道咱们做出来的东西什么样了。我再问问他们缺什么。数量和条件，还是你来定。”
         <<else>>
           <<He>>把询价簿转向你。“下次的报价，我能早点备好。哪座厂房来做，合同签不签，还是得你来定。”
         <</if>>
@@ -194,6 +237,22 @@
       <</if>>
     <</if>>
 <</language>><br><br>
+<<if $NPCList[0].name_known is 1 and _staff.state[_role].employed and _staff.state[_role].arrears is 0 and _staff.working and Time.hour gte 12 and Time.hour lt 14>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _role is 'accountant'>>
+        A folded newspaper lies beneath the ledger. You point to an unfinished crossword. "That one's been bothering me all morning," <<he>> admits. You try a few words together before <<he>> folds the paper away again.
+      <<else>>
+        A creased bus timetable falls from the enquiries book. <<He>> catches it before it reaches the floor. "Missed the last one yesterday. Had to walk." For a moment the talk turns to the long way home, before the telephone rings again.
+      <</if>>
+    <<option 'CN'>>
+      <<if _role is 'accountant'>>
+        账本下面压着一张折起的报纸。你指指没填完的字谜。“这一格难了我一早上。”<<he>>承认。你们凑着想了几个词，<<he>>才把报纸重新折好。
+      <<else>>
+        一张皱巴巴的公交时刻表从询价簿里滑出来。<<He>>赶在它落地前接住。“昨天没赶上末班车，只能走回来。”你们聊了一会儿回家要绕的路，电话便又响了。
+      <</if>>
+  <</language>><br><br>
+<</if>>
 <<set $NPCList[0].name_known to 1>><<saveNPC 0 _employee_key>>
 <<lanSwitch 'Weekly wage: ' '周薪：'>><<deadwood-reblooms-finance-money `_company.terms.staff[_role].weeklyWage`>><br>
 <<if _role is 'accountant'>>

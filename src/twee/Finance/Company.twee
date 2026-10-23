@@ -33,15 +33,50 @@
 
 <<widget 'deadwood-company-return'>>
   <br><<getouticon>>
-  <<if $Finance.company.office>>
-    <<lanLink ['Return to your office', '返回自己的办公室'] 'Deadwood Reblooms Company Office'>>
-      <<if $passage is 'Deadwood Reblooms Company Result'>><<set $Finance.company.result to null>><</if>>
-    <</lanLink>>
-  <<else>>
-    <<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>>
-      <<if $passage is 'Deadwood Reblooms Company Result'>><<set $Finance.company.result to null>><</if>>
-    <</lanLink>>
-  <</if>><br>
+  <<lanLink `$Finance.company.office ? ['Return to your office', '返回自己的办公室'] : ['Return to the lobby', '返回大厅']` `$Finance.company.office ? 'Deadwood Reblooms Company Office' : 'Office Lobby'`>>
+    <<if $passage is 'Deadwood Reblooms Company Agreement' and $NPCList[0]?.fullDescription is 'Avery'>><<endevent>><</if>>
+    <<if $passage is 'Deadwood Reblooms Company Result'>><<set $Finance.company.result to null>><</if>>
+  <</lanLink>><br>
+<</widget>>
+
+<!-- 签约前按所选厂房估算，复用生产日历与迟交扣款，不写入合同或存档进度。 -->
+<<widget 'deadwood-company-estimate'>>
+  <<if currentSkillValue('maths') lt 400>><<exit>><</if>>
+  <<set $_factory to _args[0], $_quote to _args[1]>>
+  <<set $_company to maplebirch.get('Finance').company, $_industry to maplebirch.get('Finance').industry>>
+  <<set $_today to Math.floor(Time.days), $_deadline to $_today + $_company.terms.deliveryDays>>
+  <<set $_order to Object.assign({}, $_quote, { progress: 0, deadline: $_deadline })>>
+  <<set $_advance to $_industry.estimate($_order, $_factory)>>
+  <<set $_credit to $_industry.estimate(Object.assign({}, $_order, { total: Math.round($_quote.total * $_company.terms.creditPremium) }), $_factory)>>
+  <<if !$_advance or !$_credit>><<exit>><</if>>
+  <<set $_finish to $_today + $_advance.days - 2>>
+  <<set $_due to $_finish + $_company.terms.creditDays, $_visit to $_due>>
+  <<for new DateTime(Time.startDate).addDays($_visit).weekEnd>><<set $_visit += 1>><</for>>
+  <<set $_plans to [
+    { name: ['Advance terms', '预付合同'], day: $_finish + 2, total: $_advance.total, balance: $_advance.total - $_quote.advance },
+    { name: ['Credit, settle for 85%', '赊账，收取八成五结清'], day: $_visit, total: Math.floor($_credit.total * $_company.terms.settlementRate), balance: Math.floor($_credit.total * $_company.terms.settlementRate) },
+    { name: ['Credit, submit the reminder yourself', '赊账，亲自递交催款单'], day: $_visit + $_company.terms.reminderDays, total: $_credit.total, balance: $_credit.total }
+  ]>>
+  <<if $_company.staff.accountant and $_company.staff.state.collection>>
+    <<set $_automatic to $_due + 1>>
+    <<for new DateTime(Time.startDate).addDays($_automatic).weekEnd>><<set $_automatic += 1>><</for>>
+    <<run $_plans.push({ name: ['Credit, accountant submits the reminder', '赊账，由会计递交催款单'], day: $_automatic + $_company.terms.reminderDays, total: $_credit.total, balance: $_credit.total })>>
+  <</if>>
+  <<lanSwitch 'Estimated completion: ' '预计完工：'>><<deadwood-reblooms-finance-date $_finish>><br>
+  <<if $_finish gt $_deadline>>
+    <span class='red'><<lanSwitch 'Expected late delivery: ' '预计迟交：'>><<= $_finish - $_deadline>><<lanSwitch ' days. The figures below include the delivery deduction.' ' 天。以下金额已扣除迟交罚款。'>></span><br>
+  <</if>>
+  <<lanSwitch 'Credit invoice due: ' '赊账货款到期：'>><<deadwood-reblooms-finance-date $_due>><br>
+  <ul class='journal'>
+    <<for $_plan range $_plans>>
+      <<set $_cost to $_advance.cost + ($_plan.day - $_finish - 2) * $_industry.dailyCosts[$_factory.site]>>
+      <<set $_surplus to $_plan.total - $_quote.materials - $_cost>>
+      <li><b><<lanSwitch $_plan.name[0] $_plan.name[1]>></b><br>
+        <<lanSwitch 'Expected payment: ' '预计到账：'>><<deadwood-reblooms-finance-money $_plan.balance>> · <<deadwood-reblooms-finance-date $_plan.day>><br>
+        <<lanSwitch 'Payroll and site bills: ' '工资与厂房费用：'>><<deadwood-reblooms-finance-money $_cost>> · <<lanSwitch 'Order surplus: ' '订单结余：'>><<deadwood-reblooms-finance-money $_surplus `$_surplus < 0 ? 'red' : 'green'`>>
+      </li>
+    <</for>>
+  </ul>
 <</widget>>
 
 :: Deadwood Reblooms Company Registration
@@ -199,9 +234,9 @@
   <</if>>
   <<language>>
     <<option 'EN'>>
-      A joint operating agreement requires three settled supply contracts and a settled AVY holding of at least 10% of the current total shares. Avery must be available for the meeting.
+      After three supply contracts have been paid, you can discuss a supply agreement with Avery. Keep your office account clear and a working metalwork line available. If you have not met Avery, the purchasing clerk can introduce you at this meeting. Avery must be available during working hours.
     <<option 'CN'>>
-      商谈共同经营协议需要结清三笔供货订单，已结算的 AVY 持股达到当前总股本的 10%，并且艾弗里能够会面。
+      三笔供货订单收到货款后，就可以与艾弗里商谈供货合作。需要结清办公室账款，备好能接单的金属加工产线，艾弗里能在工作时间会面时，采购员也可以在这里为你们初次引见。
   <</language>>
   <br><br>
   <<if !_company_state.contract and !_company.staff.employed and _company.staff.arrears is 0>>
@@ -226,23 +261,50 @@
 <<set _company_quote to _company.quote>>
 <<language>>
   <<option 'EN'>>
-    <<if _company_state.completed gt 0>>
+    <<if _company.partner>>
+      The purchasing clerk recognises your business name and opens the agreed schedule. A sample shelf stands beside the desk, its joints marked in pencil. "The workshop used these last time. Keep the holes lined up, and send the same fittings."
+    <<elseif _company_state.completed gt 0>>
       The purchasing clerk pulls a previous delivery receipt from a folder and checks your business name. "Another shelving order? Ten days, as before."
     <<else>>
       The purchasing clerk moves a stack of folders to make room for your sample sheet. "Shelving and lockers. Delivery within ten days."
+      The clerk runs a finger down the drawing. "The first shipment goes to one store. If the fit is wrong, we find out there, before anybody orders another."
     <</if>>
     You ask when the money arrives. The clerk points to two boxes on the form. "An advance, or a higher price on credit. The delivery date is the same."
   <<option 'CN'>>
-    <<if _company_state.completed gt 0>>
+    <<if _company.partner>>
+      采购员认出你的企业名称，翻开双方签过的计划表。桌旁立着一截样品货架，接缝处画着铅笔记号。“上次车间用的就是这种。孔位对齐，配件也照旧。”
+    <<elseif _company_state.completed gt 0>>
       采购员从文件夹里抽出先前的送货回执，核对你的企业名称。“还接货架单？跟上次一样，十天。”
     <<else>>
       采购员挪开一叠文件夹，给你的样品单腾出地方。“金属货架和储物柜，十天内交货。”
+      采购员沿着图纸划了一下。“第一批先送一间店。尺寸不对，在那里就能发现，不会接着订下一批。”
     <</if>>
     你问什么时候付款。采购员指了指表上的两个方框。“预付款，或者提高报价、赊账采购。交货日期一样。”
 <</language>>
 <br><br>
+<<if _company.partner>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _company_state.shareholders.policy is 'expansion'>>
+        A second delivery address is clipped to the schedule. "The board wants the new premises fitted out. A quarter more than your agreed quantity, at the same unit price. We still need it within ten days."
+      <<elseif _company_state.shareholders.policy is 'reserve'>>
+        The clerk has amended the advance box. "Accounts approved another five percent up front. The total stays the same. Keep the delivery date."
+      <<else>>
+        The clerk checks the existing quantity and advance without altering either. "These are the terms we agreed."
+      <</if>>
+    <<option 'CN'>>
+      <<if _company_state.shareholders.policy is 'expansion'>>
+        计划表上夹着第二个收货地址。“董事会要给新场地添置设备。比约好的数量多四分之一，单价照旧，还是十天内要货。”
+      <<elseif _company_state.shareholders.policy is 'reserve'>>
+        采购员改过了预付款那一栏。“财务处同意多预付总价的百分之五。总价不变，按期交货。”
+      <<else>>
+        采购员核对原来的数量与预付款，没有更改。“就照我们约好的来。”
+      <</if>>
+  <</language>><br><br>
+<</if>>
 <<deadwood-card 'Supply terms' '供货条款'>>
   <<lanSwitch 'Batches: ' '批次：'>><span class='blue'><<= _company_quote.batches>></span><br>
+  <<lanSwitch 'Delivery deadline: ' '交货期限：'>><<deadwood-reblooms-finance-date `Math.floor(Time.days) + _company.terms.deliveryDays`>><br>
   <<lanSwitch 'Materials paid at signing: ' '签约时采购原料：'>><<deadwood-reblooms-finance-money _company_quote.materials>><br>
   <<lanSwitch 'Price with advance: ' '预付方案总价：'>><<deadwood-reblooms-finance-money _company_quote.total>><br>
   <<lanSwitch 'Advance: ' '预付款：'>><<deadwood-reblooms-finance-money _company_quote.advance>><br>
@@ -264,9 +326,18 @@
     <</language>>
   </i></span><br>
 <</deadwood-card>>
+<<if currentSkillValue('maths') gte 400>>
+  <span class='blue'><i><<language>>
+    <<option 'EN'>>
+      You allow for production from tomorrow, immediate dispatch on completion, and unchanged shifts without stoppages. Costs include weekends and the payment day's payroll and site bills. Factory funds must cover wages before payment. The advance is counted once in the full order price. Office rent, office staff wages and unexpected stoppages are excluded. Credit invoices are not paid automatically when due: the manual options assume you visit accounts as soon as it opens. Full collection takes another three days after the reminder. An authorised accountant can submit it on the following working day if still working then.
+    <<option 'CN'>>
+      你按明天起生产、完工立即交货、排班不变且不停工来算，计入周末及回款当天的工资与厂房费用，回款前须备足工厂周转金。订单结余已将预付款计入总收入，不再另加。不含办公室租金、办公室职员工资与意外停工。赊账到期不等于到账，人工办理按财务处开门后立即前往估算，催款后还需等三天。已授权的会计若届时仍在岗，会在到期后的下一个工作日递单。
+  <</language>></i></span><br><br>
+<</if>>
 <<for _company_factory range _company.factories>>
   <<capture _company_factory>>
     <strong><<print maplebirch.t(maplebirch.get('Finance').industry.terms.sites[_company_factory.site].name)>></strong><br>
+    <<deadwood-company-estimate _company_factory _company_quote>>
     <<icon 'finance/bank-deposit.png'>><<lanLink ['Sign with an advance (0:10)', '签预付款合同 (0:10)'] 'Deadwood Reblooms Company Result'>>
       <<set $Finance.company.result to _company.take(_company_factory.site, false) ? 'advance' : 'failed'>>
       <<if $Finance.company.result is 'advance'>><<pass 10>><</if>>
@@ -306,26 +377,67 @@
 
 :: Deadwood Reblooms Company Agreement
 <<deadwood-company-header>>
-<<if !_company.meeting>><<deadwood-company-return>><<exit>><</if>>
+<<if !_company.meeting or (!_company_state.agreement and !_company.eligible)>><<deadwood-company-return>><<exit>><</if>>
+<<set _company_first_meeting to C.npc.Avery.init isnot 1>>
 <<npc 'Avery'>><<person1>>
 <<language>>
   <<option 'EN'>>
-    Avery finishes a line on the screen before turning to you. Your folder lies between you on the desk.
-    <<if isLoveInterest('Avery')>>"Business first, then?" <<He>> glances at the folder and draws it closer.<<else>>"You've brought the figures." <<He>> draws the folder closer.<</if>>
+    <<if _company_first_meeting>>
+      The purchasing clerk takes you to an office further along the corridor, your paid invoices tucked inside a folder. The person behind the desk finishes typing before looking up.
+      "Your supplier," the clerk says, putting the folder down. "Three orders settled."
+      "Avery." <<He>> offers a hand across the desk. "I understand you've kept the workshop busy." <<His>> eyes move to the folder. "Let's see what you're proposing."
+    <<else>>
+      Avery finishes a line on the screen before turning to you. Your folder lies between you on the desk.
+      <<if isLoveInterest('Avery')>>"Business first, then?" <<He>> glances at the folder and draws it closer.<<else>>"You've brought the figures." <<He>> draws the folder closer.<</if>>
+    <</if>>
   <<option 'CN'>>
-    艾弗里处理完屏幕上的一行文字，才转向你。你的文件夹放在桌子中央。
-    <<if isLoveInterest('Avery')>>“先谈生意，是吗？”<<He>>瞥了文件夹一眼，将它拉近。<<else>>“账目带来了。”<<He>>将文件夹拉近。<</if>>
+    <<if _company_first_meeting>>
+      采购员领你来到走廊深处的办公室，已经结清的账单收在文件夹里。桌后的人敲完最后几个字，才抬头看你。
+      “给我们供货的。”采购员放下文件夹。“三笔供货都结清了。”
+      “艾弗里。”<<He>>隔着桌子伸出手。“听说你的车间一直没闲着。”<<His>>目光转向文件夹。“说说看，你想怎么合作。”
+    <<else>>
+      艾弗里处理完屏幕上的一行文字，才转向你。你的文件夹放在桌子中央。
+      <<if isLoveInterest('Avery')>>“先谈生意，是吗？”<<He>>瞥了文件夹一眼，将它拉近。<<else>>“账目带来了。”<<He>>将文件夹拉近。<</if>>
+    <</if>>
 <</language>>
 <br><br>
+<<if _company.partner>>
+  <<language>>
+    <<option 'EN'>>
+      Avery pulls the purchasing instructions from beneath your agreement.
+      <<if _company_state.shareholders.policy is 'expansion'>>
+        "More premises need fitting out. Purchasing will add a quarter to whatever quantity we agree here. Check your workshop's schedule before signing for more."
+      <<elseif _company_state.shareholders.policy is 'reserve'>>
+        "Accounts has kept money back. Prepaid orders get another five percent of the total up front. It comes off the balance, of course."
+      <<else>>
+        "Purchasing is on the ordinary schedule. Any change to your terms still needs both our signatures."
+      <</if>>
+    <<option 'CN'>>
+      艾弗里从协议下面抽出采购安排。
+      <<if _company_state.shareholders.policy is 'expansion'>>
+        “还有新场地要添设备。我们在这里定下数量，采购那边再加四分之一。签字增量之前，先看看你车间的排期。”
+      <<elseif _company_state.shareholders.policy is 'reserve'>>
+        “财务处留了钱。预付订单再多给总价的百分之五，当然，要从尾款里扣。”
+      <<else>>
+        “采购照普通计划执行。你这边的条款要改，还是得我们两个签字。”
+      <</if>>
+  <</language>><br><br>
+  <<deadwood-card 'Current supply schedule' '当前供货安排'>>
+    <<lanSwitch 'Batches per new order: ' '新订单批次：'>><span class='blue'><<= _company.quote.batches>></span><br>
+    <<lanSwitch 'Advance per new order: ' '新订单预付款：'>><<deadwood-reblooms-finance-money _company.quote.advance>><br>
+    <<lanSwitch 'Price per new order: ' '新订单总价：'>><<deadwood-reblooms-finance-money _company.quote.total>><br>
+    <<lanSwitch 'Signed orders keep their original quantity, price and advance.' '已签订单的数量、总价与预付款照旧。'>>
+  <</deadwood-card>>
+<</if>>
 <<if !_company_state.agreement and _company.eligible>>
   <<language>>
     <<option 'EN'>>
-      You lay the settled invoices beside your share statement. Avery reads them without speaking.
+      You lay the paid invoices beside the delivery receipts. Avery checks the dates against each other.
       "A higher advance. Joint approval of changes to price and volume." <<He>> taps the draft with a pen. "You want more than a supplier's contract."
       You leave the draft where it is. Avery reads it again, then writes beside the payment clause.
       "Half in advance. Existing orders stay as signed. Bring your own copy."
     <<option 'CN'>>
-      你把结清的账单放在持股证明旁边。艾弗里默不作声地看完。
+      你把收到货款的账单放在送货回执旁边。艾弗里逐张核对日期。
       “提高预付款，价格和数量的变更共同签字。”<<He>>用笔点了点草案。“你要的超过一份供货合同了。”
       你没有收回草案。艾弗里又读了一遍，在付款条款旁写了几笔。
       “预付一半，旧订单照签过的办。你自己留一份。”
@@ -334,12 +446,12 @@
   <span class='blue'><i>
     <<language>>
       <<option 'EN'>>
-        The agreement covers the company's shelving and locker supply programme. It gives you joint approval of supply terms, subject to your holding of the current total shares.
+        The agreement covers the company's shelving and locker supply programme. It gives you joint approval of future supply terms and a 50% advance. Your office must remain paid up, with no debt-recovery claim outstanding. Shareholder votes and board appointments still depend on settled shares.
       <<option 'CN'>>
-        协议范围为公司的金属货架与储物柜供货业务。你取得供货条款的共同审批权，持股要求按当前总股本检查。
+        协议范围为公司的金属货架与储物柜供货业务。你取得后续供货条款的共同审批权，预付款提高到五成。办公室不能欠租，也不能有待处理的追偿款。股东表决权与董事任命仍按已结算持股判断。
     <</language>>
   </i></span><br><br>
-  <<icon 'company/agreement.png'>><<lanLink ['Sign the joint operating agreement (0:15)', '签订共同经营协议 (0:15)'] 'Deadwood Reblooms Company Result'>>
+  <<icon 'company/agreement.png'>><<lanLink ['Sign the supply agreement (0:15)', '签订供货合作协议 (0:15)'] 'Deadwood Reblooms Company Result'>>
     <<set $Finance.company.result to _company.agree() ? 'agreed' : 'failed'>>
     <<if $Finance.company.result is 'agreed'>><<pass 15>><</if>>
   <</lanLink>><br>
@@ -368,15 +480,16 @@
 <<else>>
   <<language>>
     <<option 'EN'>>
-      The signed order needs to be settled before another review. Reviews are at least a week apart, and the agreement requires your settled holding to remain at 10%.
+      The signed order needs to be settled before another review. Reviews are at least a week apart. Office arrears or an outstanding debt-recovery claim suspend the agreement.
     <<option 'CN'>>
-      签过的订单需要先结清，才能再次审议。审议至少间隔一周，协议还要求已结算持股维持在 10%。
+      签过的订单需要先结清，才能再次审议。审议至少间隔一周。办公室欠租或有待处理的追偿款时，协议暂停。
   <</language>>
   <br>
 <</if>>
 <<deadwood-company-return>>
 
 :: Deadwood Reblooms Company Result
+<<if $NPCList[0]?.fullDescription is 'Avery'>><<endevent>><</if>>
 <<deadwood-company-header `$Finance.company.result === 'registered' ? 'town' : 'office'`>>
 <<switch _company_state.result>>
   <<case 'registered'>>

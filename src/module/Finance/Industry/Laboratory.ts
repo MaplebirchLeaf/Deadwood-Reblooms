@@ -280,7 +280,7 @@ export default class Laboratory {
       !state.technician ||
       state.job ||
       factory.order ||
-      factory.issue ||
+      (factory.issue && factory.issue.type !== 'haul') ||
       factory.workers < 2 ||
       factory.morale < 20 ||
       factory.wage_arrears > 0 ||
@@ -334,13 +334,12 @@ export default class Laboratory {
         factory.earned += invoice.total;
         this.finance.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood First Factory Payment">>');
       }
-      factory.report = {
+      this.industry.report(factory, {
         day,
         event: invoice.outcome,
-        seen: false,
         amount: invoice.total,
         customer: invoice.buyer === 'shop' ? 'Adult shop' : invoice.buyer === 'compound' ? 'Elk compound' : 'Private buyer'
-      };
+      });
     }
     state.invoices = state.invoices.filter(sale => sale.pay_day > day);
     for (const batch of state.batches.filter(batch => batch.expires_day <= day)) state.spoiled += batch.units;
@@ -363,7 +362,7 @@ export default class Laboratory {
       });
       if (this.trade.exclusive) state.offers = state.offers.filter(sale => sale.buyer === 'compound');
     }
-    if (capacity <= 0 || !state.technician || factory.issue || day < factory.ready_day || factory.order) return false;
+    if (capacity <= 0 || !state.technician || (factory.issue && factory.issue.type !== 'haul') || day < factory.ready_day || factory.order) return false;
     if (!state.job && state.automatic && factory.manager) {
       const amount = Math.min(state.raw[state.automatic], terms.maximum_batch);
       if (amount && factory.cash - this.cost(state.automatic, amount) >= factory.reserve + this.industry.dailyCosts[factory.site] * 3) this.start(factory, state.automatic, amount);

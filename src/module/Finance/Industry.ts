@@ -20,6 +20,14 @@ export interface Order {
   progress: number;
 }
 
+export interface FactoryReport {
+  day: number;
+  event: 'paid' | 'default' | 'late' | 'overdue' | 'cancelled' | 'delivered' | 'resigned';
+  seen: boolean;
+  amount: number;
+  customer: string;
+}
+
 export interface FactoryState {
   site: number;
   owned: 'old' | 'new' | null;
@@ -53,10 +61,12 @@ export interface FactoryState {
   spent: number;
   delivered: number;
   supplied?: Record<string, number>;
+  paid?: Record<string, number>;
   unpaid_customers?: string[];
   defaults: number;
   laboratory: LaboratoryState;
-  report: { day: number; event: 'paid' | 'default' | 'late' | 'overdue' | 'cancelled' | 'delivered' | 'resigned'; seen: boolean; amount: number; customer: string } | null;
+  report: FactoryReport | null;
+  reports?: FactoryReport[];
 }
 
 export interface IndustryState {
@@ -65,7 +75,7 @@ export interface IndustryState {
   distribution: DistributionState;
   factories: FactoryState[];
   talk_day: number;
-  talk: 'wages' | 'orders' | 'past' | 'off_duty' | null;
+  talk: 'wages' | 'orders' | 'past' | 'off_duty' | 'radio' | null;
   decision: 'pay' | 'refuse' | 'haul' | 'decline' | 'sell' | null;
   result: string | null;
 }
@@ -193,6 +203,33 @@ export default class Industry {
     return state.workers < 2 || state.morale < 20 || state.wage_arrears > 0 || state.overhead_arrears > 0 || (state.issue && state.issue.type !== 'haul')
       ? 0
       : Math.floor(state.workers * (state.rush ? 1.5 : 1));
+  }
+
+  public report(state: FactoryState, report: Omit<FactoryReport, 'seen'>): void {
+    const pending = (state.reports ??= []);
+    if (state.report && !state.report.seen) pending.push(state.report);
+    // 只保留待读通知，普通回款不能挤掉同日的坏账或离职。长期未查看时限制积压。
+    if (pending.length > 12) {
+      const routine = pending.findIndex(item => !['default', 'resigned', 'overdue'].includes(item.event));
+      pending.splice(routine < 0 ? 0 : routine, 1);
+    }
+    state.report = { ...report, seen: false };
+  }
+
+  public estimate(order: Order, state = this.state, start = Math.floor(Time.days) + 1): { days: number; cost: number; total: number; profit: number } | null {
+    const capacity = Industry.capacity(state);
+    if (!capacity) return null;
+    let work = Math.ceil((order.batches - order.progress) / capacity);
+    let finish = start - 1;
+    while (work > 0) {
+      finish++;
+      if (Securities.tradingDay(finish)) work--;
+    }
+    const total = Math.round(order.total * Math.clamp(1 - Math.max(0, finish - order.deadline) * 0.05, 0.5, 1));
+    // 按约定交货后两天回款估算，不读取尚未发生的拖欠或坏账结果。
+    const days = Math.max(1, finish - start + 3);
+    const cost = days * Industry.dailyCost(state);
+    return { days, cost, total, profit: total - order.materials - cost };
   }
 
   public get foreman(): boolean {
@@ -324,8 +361,8 @@ export default class Industry {
       supplied[order.customer] = (supplied[order.customer] ?? 0) + 1;
     }
     const publicOrder = this.finance.donations.projects.some(project => project.id === order.customer);
-    this.finance.recognition.award('business', publicOrder ? `public-delivery-${order.customer}` : 'factory-delivery', publicOrder ? 15 : 5, publicOrder ? 28 : 7);
-    state.report = { day, event: 'delivered', seen: false, amount: order.total, customer: order.customer };
+    this.finance.recognition.award('business', publicOrder ? `public-delivery-${order.customer}` : 'factory-delivery', publicOrder ? 15 : 5, publicOrder ? 28 : 7, day);
+    this.report(state, { day, event: 'delivered', amount: order.total, customer: order.customer });
     state.order = null;
   }
 
@@ -363,7 +400,7 @@ export default class Industry {
       state.spent += penalty;
       this.finance.company.cancel(state, order);
       this.finance.recognition.award('business', 'factory-cancellation', -3);
-      state.report = { day: Math.floor(Time.days), event: 'cancelled', seen: false, amount: order.materials, customer: order.customer };
+      this.report(state, { day: Math.floor(Time.days), event: 'cancelled', amount: order.materials, customer: order.customer });
       state.order = null;
       if (state.issue?.type === 'shipment') state.issue = null;
       return true;
@@ -436,6 +473,7 @@ export default class Industry {
       invoices: [],
       issue: null,
       report: null,
+      reports: [],
       laboratory: structuredClone(Laboratory.defaults)
     });
     V.Finance.industry.decision = 'sell';
@@ -443,7 +481,8 @@ export default class Industry {
   }
 
   public talk(topic: NonNullable<IndustryState['talk']>): boolean {
-    if (!this.foreman || !['wages', 'orders', 'past', 'off_duty'].includes(topic) || V.Finance.industry.talk_day === Math.floor(Time.days)) return false;
+    if (!this.foreman || !['wages', 'orders', 'past', 'off_duty', 'radio'].includes(topic) || V.Finance.industry.talk_day === Math.floor(Time.days)) return false;
+    if (topic === 'radio' && (!this.state.owned || C.npc.Rowan.love < 20 || Time.hour !== 17 || Time.minute >= 45 || this.owned.some(factory => factory.wage_arrears > 0))) return false;
     V.Finance.industry.talk_day = Math.floor(Time.days);
     V.Finance.industry.talk = topic;
     C.npc.Rowan.love = Math.clamp(C.npc.Rowan.love + (this.owned.some(factory => factory.wage_arrears > 0) ? 0 : 2), 0, 50);
@@ -471,7 +510,7 @@ export default class Industry {
       if (order.customer === 'RDS' && !(this.finance.core.get('Robin')?.shop.spend(order.total / 100) ?? false)) {
         invoice.pay_day = current + 7;
         order.outcome = 'late';
-        state.report = { day: current, event: 'overdue', seen: false, amount: order.total, customer: order.customer };
+        this.report(state, { day: current, event: 'overdue', amount: order.total, customer: order.customer });
         continue;
       }
       if (order.outcome === 'default') {
@@ -482,9 +521,11 @@ export default class Industry {
       } else {
         state.cash += order.total;
         state.earned += order.total;
+        const paid = (state.paid ??= {});
+        paid[order.customer] = (paid[order.customer] ?? 0) + 1;
         this.finance.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood First Factory Payment">>');
       }
-      state.report = { day: current, event: order.outcome, seen: false, amount: order.total, customer: order.customer };
+      this.report(state, { day: current, event: order.outcome, amount: order.total, customer: order.customer });
     }
     state.invoices = state.invoices.filter(item => item.pay_day > current);
     // 普通订单与加工间的到期货款都先到账，再支付今天的工资与厂房费用。
@@ -500,7 +541,7 @@ export default class Industry {
       state.workers = 0;
       state.manager = state.automatic = state.laboratory.technician = false;
       state.laboratory.automatic = null;
-      state.report = { day: current, event: 'resigned', seen: false, amount: state.wage_arrears, customer: '' };
+      this.report(state, { day: current, event: 'resigned', amount: state.wage_arrears, customer: '' });
     }
     const bills = Math.round(terms.overhead * terms.sites[state.site].multiplier) + (state.security ? terms.securityFee : 0);
     const overhead = Math.min(state.cash, bills);
@@ -527,15 +568,17 @@ export default class Industry {
     if (!Securities.tradingDay(current) || Industry.capacity(state) === 0 || processing) return;
     if (state.automatic && state.manager && !state.order) {
       const order = state.offers
+        .map(item => ({ order: item, estimate: this.estimate(item, state, current) }))
         .filter(
           item =>
-            state.lines.includes(item.product) &&
-            item.total <= state.maximum_order &&
-            item.total > item.materials &&
-            state.cash - item.materials >= state.reserve + Industry.dailyCost(state) * 3 &&
-            item.deadline > current
+            state.lines.includes(item.order.product) &&
+            item.order.total <= state.maximum_order &&
+            item.order.deadline > current &&
+            item.estimate &&
+            item.estimate.profit > 0 &&
+            state.cash - item.order.materials >= state.reserve + Math.max(item.estimate.cost, Industry.dailyCost(state) * 3)
         )
-        .sort((a, b) => (b.total - b.materials) / b.batches - (a.total - a.materials) / a.batches)[0];
+        .sort((a, b) => b.estimate!.profit / b.estimate!.days - a.estimate!.profit / a.estimate!.days)[0]?.order;
       if (order) this.accept(state, order);
     }
     if (!state.order) return;
@@ -568,7 +611,8 @@ export default class Industry {
       );
       const roll = random(1, 100);
       const reputation = this.reputation;
-      const multiplier = random(1, 100) > 94 - reputation * 2 ? random(150, 220) : random(80, 120) + reputation * 2;
+      const repeat = Math.min(3, state.paid?.[customer] ?? 0);
+      const multiplier = (random(1, 100) > 94 - reputation * 2 ? random(150, 220) : random(80, 120) + reputation * 2) + repeat * 2;
       return [
         {
           id: state.next_id++,
@@ -578,7 +622,7 @@ export default class Industry {
           materials: product.materials * batches,
           total: Math.round((product.price * batches * multiplier) / 100),
           deadline: day + random(5, 10),
-          outcome: roll <= 8 - reputation && customer !== 'RDS' ? ('default' as const) : roll <= 25 - reputation ? ('late' as const) : ('paid' as const),
+          outcome: roll <= 8 - reputation - repeat && customer !== 'RDS' ? ('default' as const) : roll <= 25 - reputation - repeat * 2 ? ('late' as const) : ('paid' as const),
           progress: 0
         }
       ];

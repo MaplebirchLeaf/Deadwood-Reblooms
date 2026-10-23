@@ -563,7 +563,7 @@
             <<if $Finance.bank.opened and $Finance.bank.debit_card and $Finance.bank.balance gte _renovationCost>>
               <<icon 'property/improvements.png'>><<lanLink ["Renovate", "装修"]>>
                 <<run maplebirch.get("Finance").realEstate.renovate(_property.id)>>
-                <<run maplebirch.get('Finance').refreshMoney()>>
+                <<run maplebirch.get('Finance').refresh()>>
                 <<run Dynamic.render('deadwood-property-office-properties')>>
               <</lanLink>>
             <<else>>
@@ -576,7 +576,7 @@
             <<if $Finance.bank.opened and $Finance.bank.debit_card and $Finance.bank.balance gte _repairCost>>
               <<icon 'property/repair.png'>><<lanLink ["Repair", "维修"]>>
                 <<run maplebirch.get("Finance").realEstate.repair(_property.id)>>
-                <<run maplebirch.get('Finance').refreshMoney()>>
+                <<run maplebirch.get('Finance').refresh()>>
                 <<run Dynamic.render('deadwood-property-office-properties')>>
               <</lanLink>>
             <<else>>
@@ -605,7 +605,7 @@
         <<if $Finance.bank.debit_card and $Finance.bank.balance gte _askingPrice>>
           <<icon 'property/estate-agency.png'>><<lanLink ['Buy outright', '全款购买']>>
             <<run maplebirch.get("Finance").realEstate.buy(_property.id)>>
-            <<run maplebirch.get('Finance').refreshMoney()>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<run Dynamic.render('deadwood-property-office-properties')>>
           <</lanLink>><br>
         <</if>>
@@ -623,14 +623,14 @@
           <<if maplebirch.get("Finance").realEstate.mortgage.canStart(_askingPrice, false, $Finance.real_estate.mortgage_term)>>
             <<icon 'property/collateral.png'>><<lanLink ['Buy with mortgage', '申请房贷购买']>>
               <<run maplebirch.get("Finance").realEstate.buyWithMortgage(_property.id, false, $Finance.real_estate.mortgage_term)>>
-              <<run maplebirch.get('Finance').refreshMoney()>>
+              <<run maplebirch.get('Finance').refresh()>>
               <<run Dynamic.render('deadwood-property-mortgage-terms')>>
               <<run Dynamic.render('deadwood-property-office-properties')>>
             <</lanLink>><br>
           <<elseif maplebirch.get("Finance").realEstate.mortgage.canStart(_askingPrice, true, $Finance.real_estate.mortgage_term)>>
             <<icon 'property/collateral.png'>><<lanLink ['Mortgage with credit card advance for down payment', '刷信用卡凑首付办房贷']>>
               <<run maplebirch.get("Finance").realEstate.buyWithMortgage(_property.id, true, $Finance.real_estate.mortgage_term)>>
-              <<run maplebirch.get('Finance').refreshMoney()>>
+              <<run maplebirch.get('Finance').refresh()>>
               <<run Dynamic.render('deadwood-property-mortgage-terms')>>
               <<run Dynamic.render('deadwood-property-office-properties')>>
             <</lanLink>><br>
@@ -659,7 +659,7 @@
     <<if $Finance.bank.opened and $Finance.bank.debit_card and $Finance.bank.balance gte _loan.arrears>>
       <<icon 'finance/repayment.png'>><<lanLink ['Pay overdue balance', '补缴逾期款']>>
         <<run maplebirch.get('Finance').realEstate.mortgage.repay('arrears')>>
-        <<run maplebirch.get('Finance').refreshMoney()>>
+        <<run maplebirch.get('Finance').refresh()>>
         <<run Dynamic.render('deadwood-property-mortgage-terms')>>
         <<run Dynamic.render('deadwood-property-office-properties')>>
       <</lanLink>>
@@ -668,7 +668,7 @@
   <<if $Finance.bank.opened and $Finance.bank.debit_card and $Finance.bank.balance gte _loan.outstanding>>
     <<icon 'finance/repayment.png'>><<lanLink ['Pay off mortgage', '还清房贷']>>
       <<set $phase to maplebirch.get('Finance').realEstate.mortgage.repay('all')>>
-      <<run maplebirch.get('Finance').refreshMoney()>>
+      <<run maplebirch.get('Finance').refresh()>>
       <<run Dynamic.render('deadwood-property-mortgage-terms')>>
       <<run Dynamic.render('deadwood-property-office-properties')>>
     <</lanLink>>

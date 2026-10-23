@@ -331,17 +331,6 @@ class Finance extends Module {
     this.company.avery.preInit();
     this.company.suite.preInit();
     this.company.ascension.preInit();
-    this.core.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-adrian-business', {
-      exact: true,
-      priority: -1,
-      cond: () => !V.replayScene && !V.statFreeze && !!V.Finance?.adrian && V.Finance.adrian.career > 0 && V.Finance.adrian.career < 5,
-      action: () => this.core.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-adrian-business-day>>')
-    });
-    this.core.dynamic.regTimeEvent('onTimeTravel', 'deadwood-reblooms-adrian-business-travel', {
-      priority: -1,
-      cond: data => data.direction === 'forward' && !V.replayScene && !V.statFreeze && !!V.Finance?.adrian && V.Finance.adrian.career > 0 && V.Finance.adrian.career < 5,
-      action: () => this.core.SugarCube.Wikifier.wikifyEval('<<deadwood-reblooms-adrian-business-day>>')
-    });
     // 追债只在小镇街道遇到，神殿、农场、战斗和昏厥流程不插入金融事件。
     this.core.dynamic.regStateEvent('gate', 'deadwood-finance-collection', {
       extra: { passage: ['High Street'] },
@@ -365,7 +354,7 @@ class Finance extends Module {
       if (
         V.replayScene ||
         V.statFreeze ||
-        !/^(?:Cliff Street$|Ocean Breeze$|Chef |Photo|Farm |Deadwood Robin Bailey Reckoning Finish$|Deadwood Street (?:Cargo|Bount|Heist)|Deadwood Transport Taxi|Deadwood Reblooms (?:Robin|Orchard|Orphanage|Financial Centre|Industry|Company))/.test(
+        !/^(?:Cliff Street$|Ocean Breeze$|Chef |Photo|Farm |Deadwood Robin Bailey Reckoning Finish$|Deadwood Street (?:Cargo|Bount|Heist)|Deadwood Transport Taxi|Deadwood Reblooms (?:Robin|Orchard|Orphanage|Financial Centre|Factory|Company))/.test(
           passage.title
         )
       )
@@ -736,7 +725,7 @@ class Finance extends Module {
     const original = this.core.SugarCube.Macro.get('money') as MacroDefinition | undefined;
     if (!original) return;
     const charge = (amount: unknown, source: unknown) => this.charge(amount, source);
-    const refresh = () => this.refreshMoney();
+    const refresh = () => this.refresh();
     this.core.tool.macro.define('money', function (this: any, amountArg: unknown, sourceArg: unknown, optionalArg?: unknown) {
       const amount = Number(amountArg);
       const optional = optionalArg;
@@ -762,7 +751,7 @@ class Finance extends Module {
     });
   }
 
-  public refreshMoney(): void {
+  public refresh(): void {
     this.core.SugarCube.Wikifier.wikifyEval('<<updatesidebarmoney>>');
     if (document.getElementById('dr-finance-caption')) this.core.SugarCube.Wikifier.wikifyEval('<<replace "#dr-finance-caption">><<deadwood-reblooms-finance-caption-content>><</replace>>');
   }

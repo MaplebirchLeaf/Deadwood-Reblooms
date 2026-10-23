@@ -130,12 +130,12 @@
 <<widget 'deadwood-reblooms-adrian-business-day'>>
   <<set $_state to $Finance.adrian>>
   <<set $_bank to $Finance.bank>>
-  <<set $_elapsed to Math.max(0, Time.days - $_state.business_day)>>
-  <<if $_elapsed gt 0>>
-    <<set $_state.business_day to Time.days>>
+  <<set $_day to _args[0]>>
+  <<if Number.isInteger($_day) and $_day lte Time.days and $_day gt $_state.business_day>>
+    <<set $_state.business_day to $_day>>
     <<set $_netDeposit to maplebirch.get('Finance').netDeposit>>
     <<set $_goodAccount to $_bank.opened and $_bank.debit_card and $_bank.credit_missed_payments is 0 and $_bank.loan_missed_payments is 0 and $Finance.collection.amount is 0>>
-    <<for $_day to 0; $_day lt Math.min(21, $_elapsed) and $_state.career lt 3; $_day++>>
+    <<if $_state.career is 1 or $_state.career is 2>>
       <<set $_target to $_state.career is 1 ? 500000 : 2500000>>
       <<set $_state.business_days to $_goodAccount and $_netDeposit gte $_target ? $_state.business_days + 1 : 0>>
       <<if $_state.business_days gte ($_state.career is 1 ? 7 : 14)>>
@@ -144,9 +144,9 @@
         <<set C.npc.Adrian.title to 'senior bank clerk'>>
         <<set C.npc.Adrian.description to 'senior bank clerk'>>
       <</if>>
-    <</for>>
+    <</if>>
     <<if $_state.career is 4 and (!$_goodAccount or $_netDeposit lt 2500000)>>
-      <<set $_state.career_ready_day to Time.days + 7>>
+      <<set $_state.career_ready_day to $_day + 7>>
     <</if>>
   <</if>>
 <</widget>>
@@ -586,6 +586,7 @@
         <<deadwood-reblooms-adrian-context>>
         <<if _adrianContext.present and _adrianContext.state.last_chat is Time.days and !_adrianConversation.responseUsed and $money gte 200>>
           <<set _adrianConversation.responseUsed to true>><<money -200>><<stress -3>>
+          <<run maplebirch.get('Finance').refresh()>>
           <<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) + 2, 0, 50)>>
           <<set C.npc.Adrian.rage to Math.max(0, (C.npc.Adrian.rage ?? 0) - 1)>>
           <<if C.npc.Adrian.rage is 0>>

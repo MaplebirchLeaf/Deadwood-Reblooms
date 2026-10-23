@@ -119,7 +119,6 @@
       <<else>>
         <<set _financeResult to maplebirch.get("Finance").withdraw(Math.abs($_financeQuickAmount))>>
       <</if>>
-      <<updatesidebarmoney>>
       <<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
     <<case 'atm'>>
       <<if $_financeQuickAmount gt 0>>
@@ -127,7 +126,6 @@
       <<else>>
         <<set _financeResult to maplebirch.get("Finance").withdraw(Math.abs($_financeQuickAmount), true)>>
       <</if>>
-      <<updatesidebarmoney>>
       <<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
     <<case 'brokerage'>>
       <<if $_financeQuickAmount gt 0>>
@@ -151,6 +149,7 @@
       <</if>>
       <<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
   <</switch>>
+  <<run maplebirch.get('Finance').refresh()>>
   <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
 <</widget>>
 
@@ -297,6 +296,7 @@
         <br><br>
         <<icon 'finance/bank-counter.png'>><<lanLink ["Open a bank account", "开立银行账户"]>>
           <<set _financeResult to maplebirch.get("Finance").openBankAccount()>>
+          <<run maplebirch.get('Finance').refresh()>>
           <<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
           <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
         <</lanLink>>
@@ -318,6 +318,7 @@
       <<if !$Finance.bank.debit_card>>
         <<icon 'finance/bank-debit-card.png'>><<lanLink ["Apply for a debit card", "申请借记卡"]>>
           <<set _financeResult to maplebirch.get("Finance").issueDebitCard()>>
+          <<run maplebirch.get('Finance').refresh()>>
           <<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
           <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
         <</lanLink>><br>
@@ -337,25 +338,25 @@
         <div class='dr-finance-actions'>
           <<lanLink ["Deposit", "存款"]>>
             <<set _financeResult to maplebirch.get("Finance").deposit(_financeBankAmount)>>
-            <<updatesidebarmoney>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
           <<lanLink ["Withdraw", "取款"]>>
             <<set _financeResult to maplebirch.get("Finance").withdraw(_financeBankAmount)>>
-            <<updatesidebarmoney>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
           <<lanLink ["Deposit all cash", "存入全部现金"]>>
             <<set _financeResult to maplebirch.get("Finance").deposit($money / 100)>>
-            <<updatesidebarmoney>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
           <<lanLink ['Withdraw all', '全部取出']>>
             <<set _financeResult to maplebirch.get("Finance").withdraw($Finance.bank.balance / 100)>>
-            <<updatesidebarmoney>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-bank-debit-panel'>><<deadwood-reblooms-finance-bank-debit-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
@@ -384,6 +385,7 @@
       <<if !$Finance.bank.credit_card>>
         <<icon 'finance/bank-credit-card.png'>><<lanLink ["Apply for a credit card", "申请信用卡"]>>
           <<set _financeResult to maplebirch.get("Finance").issueCreditCard()>>
+          <<run maplebirch.get('Finance').refresh()>>
           <<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
           <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
         <</lanLink>>
@@ -405,16 +407,19 @@
           <div class='dr-finance-actions'>
             <<lanLink ["Take a cash advance", "信用卡取现"]>>
               <<set _financeResult to maplebirch.get("Finance").creditAdvance(_financeCreditAmount)>>
+              <<run maplebirch.get('Finance').refresh()>>
               <<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
               <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
             <</lanLink>>
             <<lanLink ["Repay credit card", "偿还信用卡"]>>
               <<set _financeResult to maplebirch.get("Finance").repayCredit(_financeCreditAmount)>>
+              <<run maplebirch.get('Finance').refresh()>>
               <<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
               <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
             <</lanLink>>
             <<lanLink ['Repay credit in full', '还清信用卡']>>
               <<set _financeResult to maplebirch.get("Finance").repayCredit($Finance.bank.credit_debt / 100)>>
+              <<run maplebirch.get('Finance').refresh()>>
               <<replace '#deadwood-reblooms-finance-bank-credit-panel'>><<deadwood-reblooms-finance-bank-credit-panel>><</replace>>
               <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
             <</lanLink>>
@@ -468,16 +473,19 @@
         <div class='dr-finance-actions'>
         <<lanLink ["Take out a loan", "申请贷款"]>>
           <<set _financeResult to maplebirch.get("Finance").takeLoan(_financeLoanAmount, _financeLoanTerm)>>
+          <<run maplebirch.get('Finance').refresh()>>
           <<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
           <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
         <</lanLink>>
         <<lanLink ["Repay loan", "偿还贷款"]>>
           <<set _financeResult to maplebirch.get("Finance").repayLoan(_financeLoanAmount)>>
+          <<run maplebirch.get('Finance').refresh()>>
           <<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
           <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
         <</lanLink>>
         <<lanLink ['Repay loan in full', '还清贷款']>>
           <<set _financeResult to maplebirch.get("Finance").repayLoan(maplebirch.get("Finance").loanPayoff / 100)>>
+          <<run maplebirch.get('Finance').refresh()>>
           <<replace '#deadwood-reblooms-finance-bank-loan-panel'>><<deadwood-reblooms-finance-bank-loan-panel>><</replace>>
           <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
         <</lanLink>>
@@ -507,19 +515,19 @@
         <div class='dr-finance-actions'>
           <<lanLink ["Deposit", "存款"]>>
             <<set _financeResult to maplebirch.get("Finance").deposit(_financeAtmAmount, true)>>
-            <<updatesidebarmoney>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
           <<lanLink ["Withdraw", "取款"]>>
             <<set _financeResult to maplebirch.get("Finance").withdraw(_financeAtmAmount, true)>>
-            <<updatesidebarmoney>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
           <<lanLink ["Deposit all cash", "存入全部现金"]>>
             <<set _financeResult to maplebirch.get("Finance").deposit($money / 100, true)>>
-            <<updatesidebarmoney>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
@@ -527,7 +535,7 @@
           <<if _financeAtmMaximum gt 0>>
             <<lanLink ['Withdraw maximum', '按限额取款']>>
               <<set _financeResult to maplebirch.get("Finance").withdraw(_financeAtmMaximum / 100, true)>>
-              <<updatesidebarmoney>>
+              <<run maplebirch.get('Finance').refresh()>>
               <<replace '#deadwood-reblooms-finance-atm-panel'>><<deadwood-reblooms-finance-atm-panel>><</replace>>
               <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
             <</lanLink>>
@@ -565,6 +573,7 @@
       <<lanSwitch 'You do not have a securities account.' '你还没有证券账户。'>><br>
       <<icon 'finance/securities-account.png'>><<lanLink ["Open a securities account", "开立证券账户"]>>
         <<set _financeResult to maplebirch.get("Finance").openBrokerageAccount()>>
+        <<run maplebirch.get('Finance').refresh()>>
         <<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
         <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
       <</lanLink>>
@@ -575,21 +584,25 @@
         <div class='dr-finance-actions'>
           <<lanLink ['Transfer to securities account', '转入证券账户']>>
             <<set _financeResult to maplebirch.get("Finance").transferToBrokerage(_financeTransferAmount)>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
           <<lanLink ['Transfer to bank account', '转回银行账户']>>
             <<set _financeResult to maplebirch.get("Finance").transferFromBrokerage(_financeTransferAmount)>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
           <<lanLink ['Transfer all from bank', '银行余额全部转入']>>
             <<set _financeResult to maplebirch.get("Finance").transferToBrokerage($Finance.bank.balance / 100)>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
           <<lanLink ['Transfer all to bank', '证券资金全部转回']>>
             <<set _financeResult to maplebirch.get("Finance").transferFromBrokerage($Finance.brokerage.cash / 100)>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-exchange-account-panel'>><<deadwood-reblooms-finance-exchange-account-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
@@ -705,6 +718,7 @@
         <div class='dr-finance-actions'>
           <<lanLink ["Buy", "买入"]>>
             <<set _financeResult to maplebirch.get("Finance").buy(_financeSymbol, _financeShares)>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
@@ -712,6 +726,7 @@
             <<set _financeMaximumShares to maplebirch.get("Finance").maximumShares(_financeSymbol)>>
             <<if _financeMaximumShares gt 0>>
               <<set _financeResult to maplebirch.get('Finance').buy(_financeSymbol, _financeMaximumShares)>>
+              <<run maplebirch.get('Finance').refresh()>>
             <<elseif maplebirch.get('Finance').shareSupply[_financeSymbol].available lte 0>>
               <<set _financeResult to 'share-limit'>>
             <<else>>
@@ -722,6 +737,7 @@
           <</lanLink>>
           <<lanLink ["Sell", "卖出"]>>
             <<set _financeResult to maplebirch.get("Finance").sell(_financeSymbol, _financeShares)>>
+            <<run maplebirch.get('Finance').refresh()>>
             <<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
@@ -729,6 +745,7 @@
             <<set _financeHolding to maplebirch.get('Finance').sellableShares[_financeSymbol]>>
             <<if _financeHolding gt 0>>
               <<set _financeResult to maplebirch.get('Finance').sell(_financeSymbol, _financeHolding)>>
+              <<run maplebirch.get('Finance').refresh()>>
             <<else>>
               <<set _financeResult to $Finance.brokerage.holdings[_financeSymbol] gt 0 ? 'unsettled-shares' : 'insufficient-shares'>>
             <</if>>

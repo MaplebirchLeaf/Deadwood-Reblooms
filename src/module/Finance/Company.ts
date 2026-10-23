@@ -105,23 +105,33 @@ export default class Company {
   }
 
   public get eligible(): boolean {
-    return this.dealing && this.state.completed >= terms.partnerContracts && this.share >= terms.partnerShare && this.factories.length > 0;
+    return this.dealing && this.state.completed >= terms.partnerContracts && this.factories.length > 0;
   }
 
   public get partner(): boolean {
-    return this.state.agreement && this.state.office && this.state.rent_arrears === 0 && this.finance.state.collection.amount === 0 && this.share >= terms.partnerShare;
+    return this.state.agreement && this.state.office && this.state.rent_arrears === 0 && this.finance.state.collection.amount === 0;
   }
 
   public get meeting(): boolean {
-    return this.dealing && C.npc.Avery?.init === 1 && C.npc.Avery.state === 'active' && !V.avery_injury && V.avery_mansion?.schedule !== 'away' && !['fallen', 'kicked'].includes(V.avery_fate);
+    const avery = C.npc.Avery;
+    return (
+      this.dealing &&
+      ((avery?.init === 1 && avery.state === 'active') || (avery?.init === 0 && avery.state === '' && this.eligible)) &&
+      !V.avery_injury &&
+      V.avery_mansion?.schedule !== 'away' &&
+      !['fallen', 'kicked'].includes(V.avery_fate)
+    );
   }
 
   public get quote(): { batches: number; materials: number; total: number; advance: number } {
     const product = this.finance.industry.terms.products.find(item => item.id === 'metalwork')!;
     const policy = this.partner ? this.state.policy : 'standard';
-    const batches = Math.round(terms.batches * (policy === 'volume' ? terms.volumeMultiplier : 1));
+    const boardPolicy = this.shareholders.state.policy;
+    const batches = Math.round(terms.batches * (policy === 'volume' ? terms.volumeMultiplier : 1) * (this.partner && boardPolicy === 'expansion' ? terms.governance.supplyExpansionMultiplier : 1));
     const total = Math.round(product.price * batches * (policy === 'price' ? terms.priceMultiplier : 1));
-    return { batches, materials: product.materials * batches, total, advance: Math.floor(total * (this.partner ? terms.partnerAdvanceRate : terms.advanceRate)) };
+    // 采购政策只影响新签订单，不改已经约定的数量、货款或预付款。
+    const advanceRate = this.partner ? terms.partnerAdvanceRate + (boardPolicy === 'reserve' ? terms.governance.supplyReserveAdvance : 0) : terms.advanceRate;
+    return { batches, materials: product.materials * batches, total, advance: Math.floor(total * advanceRate) };
   }
 
   public get canOrder(): boolean {
@@ -222,6 +232,9 @@ export default class Company {
     if (!Number.isSafeInteger(factory.cash + amount)) return false;
     factory.cash += amount;
     factory.earned += amount;
+    factory.paid ??= {};
+    factory.paid.AVY = (factory.paid.AVY ?? 0) + 1;
+    this.finance.industry.report(factory, { day: Math.floor(Time.days), event: 'paid', amount, customer: 'AVY' });
     this.state.completed++;
     this.state.contract = null;
     this.finance.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood First Factory Payment">>');
@@ -260,7 +273,9 @@ export default class Company {
       if (Number.isSafeInteger(factory.cash + contract.due)) {
         factory.cash += contract.due;
         factory.earned += contract.due;
-        factory.report = { day, event: 'paid', seen: false, amount: contract.due, customer: 'AVY' };
+        factory.paid ??= {};
+        factory.paid.AVY = (factory.paid.AVY ?? 0) + 1;
+        this.finance.industry.report(factory, { day, event: 'paid', amount: contract.due, customer: 'AVY' });
         state.completed++;
         state.contract = null;
         this.finance.core.SugarCube.Wikifier.wikifyEval('<<earnFeat "Deadwood First Factory Payment">>');

@@ -46,13 +46,13 @@
       <<capture _heistRepaymentMode>>
         <<icon 'finance/repayment.png'>><<lanLink ['Make a repayment', '偿还欠款']>>
           <<set _financeResult to _heistRepaymentMode is 'credit' ? maplebirch.get('Finance').repayCredit(_heistRepaymentAmount) : maplebirch.get('Finance').repayLoan(_heistRepaymentAmount)>>
-          <<updatesidebarmoney>>
+          <<run maplebirch.get('Finance').refresh()>>
           <<replace '#deadwood-street-heist-repayments'>><<deadwood-street-heist-repayments _heistRepaymentMode>><</replace>>
           <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
         <</lanLink>><br>
         <<icon 'finance/repayment.png'>><<lanLink ['Repay in full', '还清欠款']>>
           <<set _financeResult to _heistRepaymentMode is 'credit' ? maplebirch.get('Finance').repayCredit($Finance.bank.credit_debt / 100) : maplebirch.get('Finance').repayLoan(maplebirch.get('Finance').loanPayoff / 100)>>
-          <<updatesidebarmoney>>
+          <<run maplebirch.get('Finance').refresh()>>
           <<replace '#deadwood-street-heist-repayments'>><<deadwood-street-heist-repayments _heistRepaymentMode>><</replace>>
           <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
         <</lanLink>><br>

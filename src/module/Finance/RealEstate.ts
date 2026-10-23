@@ -889,15 +889,18 @@ class RealEstate {
       }
       // 各业务按同一历史日期入账，再支付当天到期的债务。
       this.core.get('Orchard')?.advance(day);
-      this.core.get('Robin')?.shop.investment.advance(day);
       // 已催收的公司货款先结清，才能承担对应工厂当天的工资。
       this.finance.company.advance(day);
       this.finance.industry.advance(day);
+      // 店铺先支付到期供货款，再用剩余营业资金分红或回购份额。
+      this.core.get('Robin')?.shop.investment.advance(day);
       this.mortgage.advanceThrough(day);
       this.finance.advanceBankThrough(day);
       this.finance.company.suite.advance(day);
       this.staff.advance(day);
       this.core.get('Transport')?.maintenance.settle(day);
+      // 晋升只检查当天真实结算后的账户，不用跳日终点的余额补算过去。
+      if (this.finance.state.adrian.career > 0 && this.finance.state.adrian.career < 5) this.core.SugarCube.Wikifier.wikifyEval(`<<deadwood-reblooms-adrian-business-day ${day}>>`);
     }
     state.last_managed_day = today;
     this.finance.company.suite.sync();
