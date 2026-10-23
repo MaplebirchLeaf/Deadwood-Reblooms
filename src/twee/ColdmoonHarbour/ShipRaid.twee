@@ -16,6 +16,7 @@
   <<set _shipRaid to $MoreTransformations?.harbour?.raid>>
   <<if !_shipRaid or !maplebirch.get('MoreTransformations') or $location isnot 'pirate_ship' or $combat or $replayScene or $statFreeze or $frozenValues or $possessed or $nextPassage or $nextPassageCheck>><<exit>><</if>>
   <<if !_shipRaid.stage>>
+    <<run maplebirch.get('Psyche')?.change(-15, 180)>>
     <<set _shipRaid.day to Math.floor(Time.days), _shipRaid.stage to 'choice', _shipRaid.outcome to '', _shipRaid.approach to Weather.bloodMoon ? 'blood' : either('bell', 'dark'), _shipRaid.talked to false, _shipRaid.rested to false, _shipRaid.needsEffects to false, _shipRaid.encounters += 1>>
   <</if>>
   <<if _shipRaid.stage isnot 'choice'>><<exit>><</if>>
@@ -237,6 +238,7 @@
 <</if>>
 <<if _shipRaid.needsEffects and !$replayScene and !$statFreeze and !$frozenValues and !$possessed>>
   <<set _shipRaid.needsEffects to false>><<effects>>
+  <<if _shipRaid.outcome is 'fight_won'>><<run maplebirch.get('Psyche')?.change(15, -150)>><</if>>
   <<if $nextPassage or $nextPassageCheck>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Pirate Raid Finish'>><</lanLink>></span><<nexttext>><<exit>>
   <</if>>
@@ -294,7 +296,7 @@
         <br><br>
         Fortunately, an experienced hand casts a line with a weighted knot from the stern, and the thrashing sailor catches it. You collapse beside the cargo hatch, battered and drenched, while the crew drag the sailor over the rail and shove the spectral hull away into the dark.
       <<option 'CN'>>
-        你系上绳索翻落船舷，但海面下冰冷刺骨的暗流远比肉眼所见狂暴。你拼力朝落水者伸手，一道突如其来的巨浪却狠狠将你拍回船壁。<<if maplebirch.get('MoreTransformations')?.Undead.active>>船员们发力将你猛拽上去，麻绳深深陷入你冰冷死寂的皮肉中；你感受不到任何痛觉，但死人的僵冷肢体终究无法与狂暴的大海争夺猎物。<<else>>甲板上的船员们急忙将你往回拉，粗粝的麻绳深深勒进你的腰侧，疼得你几乎窒息。<</if>>
+        你系上绳索翻落船舷，但海面下冰冷刺骨的暗流远比肉眼所见狂暴。你拼力朝落水者伸手，一道突如其来的巨浪却狠狠将你拍回船壁。<<if maplebirch.get('MoreTransformations')?.Undead.active>>船员们发力将你猛拽上去，麻绳深深陷入你冰冷死寂的皮肉中。你感受不到任何痛觉，但死人的僵冷肢体终究无法与狂暴的大海争夺猎物。<<else>>甲板上的船员们急忙将你往回拉，粗粝的麻绳深深勒进你的腰侧，疼得你几乎窒息。<</if>>
         <br><br>
         万幸的是，另一名老练的水手从船尾精准地抛下一道救生索，落水者在浪头里抓住了它。你浑身湿冷透骨，瘫倒在货舱木盖旁急促喘息，看着船员们合力把落水者拉上甲板，并用长杆彻底推开那艘擦碰而过的鬼船。
     <</language>><<gpain>><<gstress>>

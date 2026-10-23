@@ -78,6 +78,7 @@
   <<set $_coinShared to _coinCave.together and !_coinCave.bound and _coinCave.returns is 0 and !(_coinCave.journal or _coinCave.inscription or _coinCave.appraised)>>
   <<set $_coinAmount to Math.min(_args[0], 882 - _coinCave.coins - _coinCave.zephyrCoins - _coinCave.museumCoins - _coinCave.crewCoins - ($_coinShared ? 3 : 0))>>
   <<if $_coinAmount lte 0>><<exit>><</if>>
+  <<if !_coinCave.bound>><<run maplebirch.get('Psyche')?.change(-90, 300)>><</if>>
   <<set _coinCave.coins += $_coinAmount, _coinCave.scene to _coinCave.bound ? 'more_gold' : 'first_gold', _coinCave.bound to true>>
   <<if $_coinShared>>
     <<set _coinCave.zephyrCoins to 3, _coinCave.agreed to false>>
@@ -92,7 +93,7 @@
   <<set _coinCave.coins to 0, _coinCave.scene to 'part_returned'>>
   <<if _coinCave.together and _coinCave.agreed>><<set _coinCave.zephyrCoins to 0>><</if>>
   <<if _coinCave.coins + _coinCave.zephyrCoins + _coinCave.museumCoins + _coinCave.crewCoins is 0>>
-    <<if _coinCave.returns is 0>><<stress -12>><</if>>
+    <<if _coinCave.returns is 0>><<stress -12>><<run maplebirch.get('Psyche')?.change(120, -350)>><</if>>
     <<set _coinCave.bound to false, _coinCave.agreed to false, _coinCave.returns += 1, _coinCave.scene to maplebirch.npc.Transformation.level('Zephyr', 'undead') gt 0 ? 'cured_together' : 'cured'>>
     <<run maplebirch.char.transformation.setTransform('undead', 0)>>
     <<run maplebirch.npc.Transformation.set('Zephyr', 'undead', 0)>>
