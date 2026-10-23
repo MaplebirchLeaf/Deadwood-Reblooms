@@ -83,9 +83,9 @@ You can prepare and bottle indoors at night; farm attacks pause work. Wholesale 
 
 With Robin present in the open drinks shop, discuss adding a shelf for sealed fruit-wine bottles for <span class="gold">£75</span>. Supply six bottles in 15 minutes at the wholesale price. Robin pays from actual shop funds while keeping next week's rent. The shelf holds 24 bottles and sells at most 12 per week. Sales remove real shelf stock and pay Robin; the PC is paid on delivery. Wine accounts list equipment, processing, glass and actual sales income separately.
 
-Bottle **80 bottles** and supply **24 bottles** to Robin's drinks shop to earn **Cellar Hand**. Bottling a batch by hand then takes ten minutes, as shown on the link. Ingredients, bottle costs and output stay the same.
+Bottle **80 bottles** and either sell **80 bottles wholesale** or supply **24 bottles** to Robin's drinks shop to earn **Cellar Hand**. Bottling a batch by hand then takes ten minutes, as shown on the link. Ingredients, bottle costs and output stay the same.
 
-Once you know the work, spend <span class="gold">£600</span> on a powered press and bottling bench, with one hour to fit them. Choose **automatic bottling**, **one recipe for new batches** and **regular deliveries to Robin** separately. Leave the instructions to start, or turn off any part of the work.
+After earning Cellar Hand, spend <span class="gold">£600</span> on a powered press and bottling bench, with one hour to fit them. Choose **automatic bottling**, **one recipe for new batches** and **regular deliveries to Robin** separately. Leave the instructions to start, or turn off any part of the work.
 
 The equipment works once a day at **09:00**, bottling mature wine before refilling empty vessels with your chosen recipe. There are still only three vessels. Each batch still uses twenty fruit, <span class="gold">£5</span> of processing supplies and <span class="gold">£4</span> of bottles. Fruit reserves, unexpired orders and bottle reserves stay untouched. Shortages of money, spare fruit or barrel space wait until the next shift. The orchard worker's 08:00 harvest enters stock first, and fermentation takes its usual time. Leaving for several days does not skip ingredients or create extra batches.
 

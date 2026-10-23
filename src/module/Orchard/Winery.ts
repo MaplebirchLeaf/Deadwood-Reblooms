@@ -123,7 +123,7 @@ export default class Winery {
   }
 
   public get skilled(): boolean {
-    return this.state.produced >= terms.skilledProduced && this.state.supplied >= terms.skilledSupplied;
+    return this.state.produced >= terms.skilledProduced && (this.state.supplied >= terms.skilledSupplied || this.state.sold >= terms.skilledSold);
   }
 
   public get bottleMinutes(): number {
