@@ -153,9 +153,9 @@
     <<lanSwitch 'The search party is still out.' '搜索的人还没有回来。'>><br>
   <</if>>
 <<elseif _crew.employed>>
-  <<lanSwitch 'Weekly wages: ' '周薪：'>><<printmoney _crew.terms.weekly_wage>> · <<lanSwitch 'Paid until: ' '已付至：'>><<print getFormattedDate(new DateTime(Time.date).addDays(_crew_state.paid_until - Math.floor(Time.days)))>><br>
+  <<lanSwitch 'Weekly wages: ' '周薪：'>><<printmoney _crew.terms.weekly_wage>> · <<lanSwitch 'Paid until: ' '已付至：'>><<deadwood-journal-date _crew_state.paid_until>><br>
   <<if _crew_state.status is 'injured'>>
-    <span class='gold'><<lanSwitch 'Recovering until: ' '养伤至：'>></span><<print getFormattedDate(new DateTime(Time.date).addDays(_crew_state.recover_day - Math.floor(Time.days)))>><br>
+    <span class='gold'><<lanSwitch 'Recovering until: ' '养伤至：'>></span><<deadwood-journal-date _crew_state.recover_day>><br>
   <</if>>
   <<if _crew_state.paid_until lte Math.floor(Time.days) + 7>>
     <<icon 'industry/payroll.png'>><<lanLink ['Pay another week', '续付一周工资']>><<run _crew.act('pay')>><<run maplebirch.get('Finance')?.refresh()>><<run Dynamic.render('deadwood-orchard-staff-workbook')>><</lanLink>><br>

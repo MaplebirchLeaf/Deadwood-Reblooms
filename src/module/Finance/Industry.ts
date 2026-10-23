@@ -644,7 +644,7 @@ export default class Industry {
   }
 
   private quote(state: FactoryState, product: (typeof terms.products)[number], day: number, customer: string, id: number): Order {
-    const season = Time.getSeason(new DateTime(Time.date).addDays(day - Math.floor(Time.days)));
+    const season = Time.getSeason(new DateTime(Time.startDate).addDays(day));
     const index = ['winter', 'spring', 'summer', 'autumn'].indexOf(season);
     const batches = Math.clamp(
       Math.round((random(6, 15) * product.seasons[Math.max(0, index)] * terms.sites[state.site].multiplier) / 100),
@@ -669,7 +669,7 @@ export default class Industry {
   }
 
   private offers(state: FactoryState, day: number): void {
-    const season = Time.getSeason(new DateTime(Time.date).addDays(day - Math.floor(Time.days)));
+    const season = Time.getSeason(new DateTime(Time.startDate).addDays(day));
     const index = ['winter', 'spring', 'summer', 'autumn'].indexOf(season);
     state.offers = terms.products.flatMap(product => {
       const customers = product.customers.filter(

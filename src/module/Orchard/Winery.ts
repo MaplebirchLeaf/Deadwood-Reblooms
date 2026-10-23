@@ -281,7 +281,7 @@ export default class Winery {
         }
         if (line.recipe) {
           report.brewing = 'full';
-          const gameDay = Math.floor(Time.days) - (today - day);
+          const gameDay = Math.floor((shift - Time.startDate.timeStamp) / 86400);
           while (this.state.batches.length < terms.barrelCapacity) {
             if (this.spareFruit(line.recipe, gameDay) < terms.fruitPerBatch) {
               report.brewing = 'fruit';

@@ -789,7 +789,7 @@ class Orchard extends Module {
       }
     });
     if (worker.haul && this.carrier && finance && V.Finance.bank.debit_card) {
-      const gameDay = Math.floor(Time.days) - (Math.floor(Time.date.timeStamp / 86400) - day);
+      const gameDay = Math.floor((morning - Time.startDate.timeStamp) / 86400);
       let remaining = Math.max(0, trade.bulkDailyLimit - (this.state.sold_day === gameDay ? this.state.sold_today : 0));
       const cargo = this.stock
         .filter(item => item.type !== 'blood_lemon')

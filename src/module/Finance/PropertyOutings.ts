@@ -85,26 +85,28 @@ export default class PropertyOutings {
   }
 
   public get days(): number[] {
-    return Array.from({ length: 7 }, (_, index) => Math.floor(Time.days) + index + 1).filter(day => [1, 7].includes(((Time.weekDay - 1 + day - Math.floor(Time.days)) % 7) + 1));
+    return Array.from({ length: 7 }, (_, index) => Math.floor(Time.days) + index + 1).filter(day => [1, 7].includes(new DateTime(Time.startDate).addDays(day).weekDay));
   }
 
   public hour(name: string, day: number): number | null {
-    const weekDay = ((Time.weekDay - 1 + day - Math.floor(Time.days)) % 7) + 1;
+    const date = new DateTime(this.at(day, 18));
+    const weekDay = date.weekDay;
     if (name === 'Robin' && this.core.get('Robin') && V.RobinExpansion?.shop) return 21;
     if (name !== 'Sydney') return 18;
-    const date = new DateTime(this.at(day, 18));
     if ((date.month === 10 && date.day === 31) || (date.month === 12 && date.day === 25)) return null;
     if ((weekDay === 7 && V.adultshopopeningsydney) || (weekDay === 1 && V.sydney.rank === 'initiate')) return null;
     return weekDay === 7 ? 20 : 19;
   }
 
   private at(day: number, hour: number): number {
-    return Time.date.timeStamp + (day - Math.floor(Time.days)) * 86400 + (hour * 60 - Time.hour * 60 - Time.minute) * 60 - Time.date.second;
+    const date = new DateTime(Time.startDate).addDays(day);
+    return new DateTime(date.year, date.month, date.day, hour).timeStamp;
   }
 
   private day(at: number): number {
-    const midnight = new DateTime(Time.year, Time.month, Time.monthDay).timeStamp;
-    return Math.floor(Time.days) + Math.floor((at - midnight) / 86400);
+    const start = Time.startDate;
+    const midnight = new DateTime(start.year, start.month, start.day).timeStamp;
+    return Math.floor((at - midnight) / 86400);
   }
 
   private present(name: string, property: string): boolean {
