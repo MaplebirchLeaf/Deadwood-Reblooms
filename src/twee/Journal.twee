@@ -312,7 +312,7 @@
     <<deadwood-finance-aid-journal>>
     <!-- 晋升履历只读。不调用柜台情境或每日结算，查日志不会增加来访与业务天数。 -->
     <<if C.npc.Adrian.init is 1 and $Finance.adrian.career gt 0>>
-      <div class='bold'><<lanSwitch "Adrian's promotion" '阿德里安的晋升'>></div>
+      <<deadwood-card "Adrian's promotion" '阿德里安的晋升'>>
         <<switch $Finance.adrian.career>>
           <<case 1 2>>
             <<lanSwitch 'Required net deposits: ' '所需净存款：'>><<printmoney `$Finance.adrian.career === 1 ? 500000 : 2500000`>><br>
@@ -362,7 +362,7 @@
               <i>净存款为银行余额扣除信用卡、个人贷款、房贷与追偿欠款。</i>
           <</language>><br>
         <</if>>
-
+      <</deadwood-card>>
     <</if>>
     <ul class='journal'>
       <<if $Finance.orphanage.pc_bought_out or $Finance.orphanage.robin_bought_out>>
@@ -411,7 +411,7 @@
         <<if maplebirch.get('Finance').realEstate.owns(_finance_property.id) or (_finance_property.tenure is 'company' and $Finance.company.suite.signed and ($Finance.company.suite.arrears gt 0 or Object.values($wardrobes.deadwood_penthouse ?? {}).some(items => Array.isArray(items) and items.length gt 0)))>>
           <<set _finance_property_state to maplebirch.get('Finance').realEstate.managementFor(_finance_property.id)>>
           <<set _finance_property_upkeep to maplebirch.get('Finance').realEstate.maintenanceCost(_finance_property.id)>>
-          <div class='bold'><<lanSwitch _finance_property.name.EN _finance_property.name.CN>></div>
+          <<deadwood-card _finance_property.name.EN _finance_property.name.CN>>
             <<if _finance_property.tenure is 'company'>><<deadwood-property-suite-record>><</if>>
             <<if maplebirch.get('Finance').realEstate.owns(_finance_property.id)>>
               <<if _finance_property_state.rented>>
@@ -465,7 +465,7 @@
                 <</if>>
               <</if>>
             <</if>>
-
+          <</deadwood-card>>
         <</if>>
       <</capture>>
     <</for>>
@@ -473,11 +473,11 @@
       <<set _finance_auction to $Finance.real_estate.last_auction>>
       <<set _finance_auction_property to maplebirch.get('Finance').realEstate.properties.find(item => item.id === _finance_auction.property_id)>>
       <<if _finance_auction_property>>
-        <div class='bold'><<lanSwitch 'Last auction' '最近一次拍卖'>></div>
+        <<deadwood-card 'Last auction' '最近一次拍卖'>>
           <span class='gold'><<= lanSwitch(_finance_auction_property.name.EN, _finance_auction_property.name.CN)>></span><br>
           <<lanSwitch 'Proceeds returned to bank: ' '返还银行账户：'>>
           <<deadwood-reblooms-finance-money _finance_auction.surplus>>
-
+        <</deadwood-card>>
       <</if>>
     <</if>>
     <hr>
@@ -488,15 +488,15 @@
   <<set _finance_statement_bank to $Finance.bank>>
   <<if !_finance_statement_bank.opened>><<exit>><</if>>
   <<set _finance_statement_limits to maplebirch.get('Finance').accountLimits>>
-  <div class='bold'><<lanSwitch 'Bank account' '银行账户'>></div>
+  <<deadwood-card 'Bank account' '银行账户'>>
     <div class='dr-finance-summary'>
       <span><<lanSwitch 'Bank balance' '银行余额'>></span><span><<deadwood-reblooms-finance-money _finance_statement_bank.balance>></span>
       <span><<lanSwitch 'Borrowing limit' '贷款额度'>></span><span><<deadwood-reblooms-finance-money _finance_statement_limits.loan>></span>
       <span><<lanSwitch 'Outstanding loan balance' '贷款未偿余额'>></span><span><<deadwood-reblooms-finance-money _finance_statement_bank.loan_debt `_finance_statement_bank.loan_debt > 0 ? 'red' : 'gold'`>></span>
     </div>
-
+  <</deadwood-card>>
   <<if _finance_statement_bank.credit_card>>
-    <div class='bold'><<lanSwitch 'Credit card' '信用卡'>></div>
+    <<deadwood-card 'Credit card' '信用卡'>>
       <div class='dr-finance-summary'>
         <span><<lanSwitch 'Credit limit' '信用额度'>></span><span><<deadwood-reblooms-finance-money _finance_statement_limits.credit>></span>
         <span><<lanSwitch 'Available credit' '可用额度'>></span><span><<deadwood-reblooms-finance-money `Math.max(0, _finance_statement_limits.credit - _finance_statement_bank.credit_debt)`>></span>
@@ -513,10 +513,10 @@
           <</if>>
         </ul>
       <</if>>
-
+    <</deadwood-card>>
   <</if>>
   <<if _finance_statement_bank.loan_debt gt 0>>
-    <div class='bold'><<lanSwitch 'Personal loan' '个人贷款'>></div>
+    <<deadwood-card 'Personal loan' '个人贷款'>>
       <<set $_loanRate to _finance_statement_bank.loan_rate * (_finance_statement_bank.loan_next_payment_day gt _finance_statement_bank.loan_due_day ? maplebirch.get('Finance').terms.loanOverdueMultiplier : 1)>>
       <<set $_loanDue to _finance_statement_bank.loan_debt + Math.ceil(_finance_statement_bank.loan_debt * $_loanRate * Math.max(0, _finance_statement_bank.loan_next_payment_day - _finance_statement_bank.loan_interest_last_day) / 7)>>
       <<if _finance_statement_bank.loan_next_payment_day lt _finance_statement_bank.loan_due_day>><<set $_loanDue to Math.min($_loanDue, _finance_statement_bank.loan_payment)>><</if>>
@@ -533,12 +533,12 @@
       <<elseif _finance_statement_bank.balance lt $_loanDue>>
         <span class='red'><<lanSwitch 'Bank funds are insufficient for the next payment.' '银行余额不足以支付下次还款。'>></span>
       <</if>>
-
+    <</deadwood-card>>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-finance-holdings'>>
-  <div class='bold'><<lanSwitch 'Holdings' '持仓'>></div>
+  <<deadwood-card 'Holdings' '持仓'>>
     <<lanSwitch 'Securities funds: ' '证券资金：'>><<deadwood-reblooms-finance-money $Finance.brokerage.cash>><br>
     <<set _finance_sellable to maplebirch.get('Finance').sellableShares>>
     <div class='dr-finance-scroll'>
@@ -570,11 +570,11 @@
       </table>
     </div>
     <<lanSwitch 'Realised profit / dividends: ' '已实现盈亏／分红：'>><<deadwood-reblooms-finance-money $Finance.brokerage.realised `$Finance.brokerage.realised >= 0 ? 'green' : 'red'`>> / <<deadwood-reblooms-finance-money $Finance.brokerage.dividends>>
-
+  <</deadwood-card>>
 <</widget>>
 
 <<widget 'deadwood-finance-closing-records'>>
-  <div class='bold'><<lanSwitch 'Closing records' '平仓记录'>></div>
+  <<deadwood-card 'Closing records' '平仓记录'>>
     <<set _margin to maplebirch.get('Finance').margin>>
     <<if _margin.history.length>>
       <div class='dr-finance-scroll'>
@@ -598,13 +598,13 @@
     <<else>>
       <span class='blue'><<lanSwitch 'No closing records yet.' '暂无平仓记录。'>></span>
     <</if>>
-
+  <</deadwood-card>>
 <</widget>>
 
 <<widget 'deadwood-finance-property-accounts'>>
   <<set _estate to maplebirch.get('Finance').realEstate>>
   <<set _account_rent to 0, _account_cost to 0>>
-  <div class='bold'><<lanSwitch 'Property accounts' '房产总账'>></div>
+  <<deadwood-card 'Property accounts' '房产总账'>>
     <<language>>
       <<option 'EN'>>
         Expected weekly figures; vacant rooms and unpaid rent can leave you with less.
@@ -630,7 +630,7 @@
       <</if>>
       <span><<lanSwitch 'Expected weekly net' '预计每周净收支'>></span><span><<deadwood-reblooms-finance-money `_account_rent - _account_cost` `_account_rent >= _account_cost ? 'green' : 'red'`>></span>
     </div>
-
+  <</deadwood-card>>
 <</widget>>
 
 <!-- 经营账目与待办 -->
@@ -646,7 +646,7 @@
   <<if ['disputed', 'waiting'].includes(_operations_company.state.contract?.stage)>>
     <<set _operations_receivables += _operations_company.state.contract.due>>
   <</if>>
-  <div class='bold'><<lanSwitch 'Business accounts' '经营总账'>></div>
+  <<deadwood-card 'Business accounts' '经营总账'>>
     <<set $_operationsRefunds to _operations_factories.reduce((sum, factory) => sum + factory.invoices.reduce((total, invoice) => total + Math.max(0, -invoice.order.total), 0), 0)>>
     <div class='dr-finance-summary'>
       <span><<lanSwitch 'Factory working funds' '工厂周转金'>></span><span><<deadwood-reblooms-finance-money `_operations_factories.reduce((sum, factory) => sum + factory.cash, 0)`>></span>
@@ -662,7 +662,7 @@
         <span><<lanSwitch 'Weekly office rent and employed staff' '办公室每周租金与在职职员工资'>></span><span><<deadwood-reblooms-finance-money `_operations_company.terms.weeklyRent + _operations_company.staff.roles.reduce((sum, role) => sum + (_operations_company.staff.state[role].employed ? _operations_company.terms.staff[role].weeklyWage : 0), 0)`>></span>
       <</if>>
     </div>
-
+  <</deadwood-card>>
 <</widget>>
 
 <!-- 本地历史展览 -->
@@ -1005,7 +1005,7 @@
 
 <<widget 'deadwood-street-job-journal'>>
   <<if $StreetLife.jobs.active or $StreetLife.jobs.report or $StreetLife.bailey.finished or $StreetLife.heist.appointment>>
-    <div class='bold'><<lanSwitch 'Street work' '街头委托'>></div>
+    <<deadwood-card 'Street work' '街头委托'>>
       <<deadwood-street-job-status>>
       <<if !$StreetLife.jobs.active and $StreetLife.jobs.report>>
         <<set _streetReport to $StreetLife.jobs.report>>
@@ -1029,14 +1029,14 @@
         <ul class='journal'><li><<lanSwitch 'Landry has arranged a meeting about the bank job. Meet the crew at the smugglers’ pub, 09:00–18:00.' '兰德里约好了商议银行豪劫的会面。去走私者酒馆与同伙碰面，09:00–18:00。'>></li></ul>
       <</if>>
       <<deadwood-street-heist-status>>
-
+    <</deadwood-card>>
     <hr>
   <</if>>
 
   <<if maplebirch.get('StreetLife') and (['Landry', 'Wren', 'Grant'].some(name => C.npc[name]?.init === 1) or $mickeyPub gte 2)>>
-    <div class='bold'><<lanSwitch 'Street contacts' '街头往来'>></div>
+    <<deadwood-card 'Street contacts' '街头往来'>>
       <<deadwood-street-contact-status>>
-
+    <</deadwood-card>>
     <hr>
   <</if>>
 <</widget>>
@@ -1045,7 +1045,7 @@
 <<widget 'deadwood-street-race-journal'>>
   <<set _journal_races to maplebirch.get('StreetLife')?.races>>
   <<if _journal_races and (_journal_races.state.session or _journal_races.state.last)>>
-    <div class='bold'><<lanSwitch 'Road racing' '公路赛事'>></div>
+    <<deadwood-card 'Road racing' '公路赛事'>>
       <<if _journal_races.state.session>>
         <<set _journal_race to _journal_races.state.session>>
         <b><<= lanSwitch(_journal_races.group.name.EN, _journal_races.group.name.CN)>></b><br>
@@ -1064,7 +1064,7 @@
         <<lanSwitch 'Prize collected: ' '奖金实收：'>><<printmoney _journal_race.payout>><br>
         <<lanSwitch 'Fuel used: ' '消耗燃油：'>><span class='teal'><<= _journal_race.fuel.toFixed(2)>> L</span> · <<lanSwitch 'Condition lost: ' '车况下降：'>><span class='red'><<= _journal_race.wear.toFixed(1)>></span> <<lanSwitch 'percentage points' '个百分点'>><br>
       <</if>>
-<hr>
+    <</deadwood-card>><hr>
   <</if>>
 <</widget>>
 
@@ -1075,7 +1075,7 @@
   <<if !_journal_bounties>><<exit>><</if>>
   <<set _journal_bounty_state to _journal_bounties.state>>
   <<if C.npc.Grant.init is 0 or C.npc.Grant.state is 'active' or _journal_bounty_state.active or _journal_bounty_state.last or _journal_bounty_state.hunter or _journal_bounties.wanted>>
-    <div class='bold'><<lanSwitch 'Cases and bounties' '案件与悬赏'>></div>
+    <<deadwood-card 'Cases and bounties' '案件与悬赏'>>
       <<if C.npc.Grant.init is 0 or C.npc.Grant.state is 'active'>>
         <ul class='journal'>
           <li>
@@ -1135,7 +1135,7 @@
       <<elseif _journal_bounty_state.active?.stage is 'settlement'>>
         <span class='blue'><<lanSwitch 'Reward collection: police station, 08:00–18:00.' '赏金领取：警察局，08:00–18:00。'>></span><br>
       <</if>>
-
+    <</deadwood-card>>
     <hr>
   <</if>>
 <</widget>>
@@ -1145,7 +1145,7 @@
 <<widget 'deadwood-street-ammunition-journal'>>
   <<set _journal_street to maplebirch.get('StreetLife')>>
   <<if _journal_street and (Object.values($StreetLife.ammo).some(count => count > 0) or ['handheld', 'handheld_left'].some(slot => setup.clothes.handheld[$worn[slot]?.index]?.streetWeapon))>>
-    <div class='bold'><<lanSwitch 'Ammunition' '弹药'>></div>
+    <<deadwood-card 'Ammunition' '弹药'>>
       <div class='dr-finance-summary'>
         <<for _journal_ammo_id, _journal_ammo range _journal_street.ammunition>>
           <span><<icon _journal_ammo.icon>><<= lanSwitch(_journal_ammo.name[0], _journal_ammo.name[1])>></span><span class='teal'><<= $StreetLife.ammo[_journal_ammo_id]>><<lanSwitch ' rounds' ' 发'>></span>
@@ -1155,7 +1155,7 @@
         <li><<lanSwitch 'The weapon seller at the smugglers’ pub stocks ammunition.' '走私者酒馆的武器卖家也出售弹药。'>></li>
         <li><<lanSwitch 'Practice with Eden improves your aim; pain makes it harder to keep steady.' '与伊甸练枪有助于瞄准。疼痛会让你更难保持稳定。'>></li>
       </ul>
-<hr>
+    <</deadwood-card>><hr>
   <</if>>
 <</widget>>
 
@@ -1164,14 +1164,14 @@
 <<widget 'deadwood-taxi-journal'>>
   <<set _journal_taxi to maplebirch.get('Transport').taxi>>
   <<if _journal_taxi.active>>
-    <div class='bold'><<lanSwitch 'Taxi work' '出租车工作'>></div>
+    <<deadwood-card 'Taxi work' '出租车工作'>>
       <div class='dr-finance-summary'>
         <span><<lanSwitch 'This shift' '本班车辆'>></span><span><<lanSwitch `_journal_taxi.state.shift.mode is 'fleet' ? 'Company car' : 'Own car'` `_journal_taxi.state.shift.mode is 'fleet' ? '车行营运车' : '自备汽车'`>></span>
         <<if _journal_taxi.state.shift.mode is 'fleet'>>
           <span><<lanSwitch 'Awaiting collection' '待结算收入'>></span><span><<deadwood-transport-money _journal_taxi.state.shift.earned>></span>
         <</if>>
       </div>
-
+    <</deadwood-card>>
     <hr>
   <</if>>
 <</widget>>
@@ -1183,7 +1183,7 @@
   <<deadwood-taxi-journal>>
   <<if _transport.state.vehicles.length>>
     <h1 class='header gold bold'><<lanSwitch 'Vehicles' '载具'>></h1>
-    <div class='deadwood-transport-records'>
+    <div class='deadwood-card-grid deadwood-transport-records'>
       <<for _owned range _transport.state.vehicles>>
         <<deadwood-transport-vehicle-record _owned>>
       <</for>>
@@ -1197,7 +1197,7 @@
   <<set _journal_robin to maplebirch.get('Robin')>>
   <<if !_journal_robin or C.npc.Robin.init isnot 1 or !$RobinExpansion?.shop>><<exit>><</if>>
   <<set _journal_shop to _journal_robin.shop, _journal_contract to _journal_shop.investment.contract>>
-  <div class='bold'><<lanSwitch "Robin's drinks shop" '罗宾饮品店'>></div>
+  <<deadwood-card "Robin's drinks shop" '罗宾饮品店'>>
     <<lanSwitch 'Cliff Street · 09:00–21:00' '峭壁街 · 09:00–21:00'>>
     <div class='dr-finance-summary'>
       <span><<lanSwitch "Robin's cash and reserve" '罗宾的现金与储备金'>></span><span><<printmoney `_journal_robin.funds * 100`>></span>
@@ -1248,7 +1248,7 @@
         <</if>>
       </ul>
     <</if>>
-
+  <</deadwood-card>>
   <hr>
 <</widget>>
 
@@ -1295,7 +1295,7 @@
   <<set _journal_orchard to maplebirch.get('Orchard')>>
   <<if !_journal_orchard or !$Orchard>><<exit>><</if>>
   <<if _journal_orchard.orderStatus is 'pending' or ($Orchard.farm_contract?.status is 'pending' and Time.days lte $Orchard.farm_contract.deadline)>>
-    <div class='bold'><<lanSwitch 'Fruit deliveries' '水果供货'>></div>
+    <<deadwood-card 'Fruit deliveries' '水果供货'>>
       <ul class='journal'>
         <<if _journal_orchard.orderStatus is 'pending'>>
           <li><<lanSwitch "Robin's drinks shop: " '罗宾饮品店：'>><<foodstufficon $Orchard.order.type>><<= setup.foodstuff[$Orchard.order.type].singular>> × <<= $Orchard.order.amount>> · <<lanSwitch 'Payment: ' '货款：'>><<printmoney `$Orchard.order.price * $Orchard.order.amount`>> · <span class='blue'><<deadwood-journal-date $Orchard.order.deadline>></span></li>
@@ -1304,7 +1304,7 @@
           <li><<lanSwitch "Alex's farm: " '艾利克斯的农场：'>><<foodstufficon $Orchard.farm_contract.type>><<= setup.foodstuff[$Orchard.farm_contract.type].singular>> × <<= $Orchard.farm_contract.amount>> · <<lanSwitch 'Payment: ' '货款：'>><<printmoney `$Orchard.farm_contract.price * $Orchard.farm_contract.amount`>> · <span class='blue'><<deadwood-journal-date $Orchard.farm_contract.deadline>></span></li>
         <</if>>
       </ul>
-
+    <</deadwood-card>>
     <hr>
   <</if>>
 <</widget>>
@@ -1313,7 +1313,7 @@
 <<widget 'deadwood-orchard-winery-journal'>>
   <<set _journal_winery to maplebirch.get('Orchard')?.winery>>
   <<if _journal_winery?.state.installed>>
-    <div class='bold'><<lanSwitch 'Orchard winery' '果园酿酒间'>></div>
+    <<deadwood-card 'Orchard winery' '果园酿酒间'>>
       <ul class='journal'>
         <li><<icon 'orchard/winery.png'>><<lanSwitch 'Barrels in use: ' '在用酒桶：'>><span class='teal'><<= _journal_winery.state.batches.length>> / <<= _journal_winery.terms.barrelCapacity>></span></li>
         <<for _journal_batch range _journal_winery.state.batches>>
@@ -1341,7 +1341,7 @@
         <<if _journal_winePlan>><<lanSwitch _journal_winePlan.name[0] _journal_winePlan.name[1]>><<else>><<lanSwitch 'No new batches' '不再投料'>><</if>><br>
       <</if>>
       <<deadwood-orchard-winery-automation-status>>
-<hr>
+    <</deadwood-card>><hr>
   <</if>>
 <</widget>>
 
@@ -1380,7 +1380,7 @@
 
 <<widget 'deadwood-finance-donation-receipts'>>
   <<if $Finance.donations.receipts.length gt 0>>
-    <div class='bold'><<lanSwitch 'Recent donation receipts' '近期捐赠收据'>></div>
+    <<deadwood-card 'Recent donation receipts' '近期捐赠收据'>>
       <ul class='journal'>
         <<for _donation_receipt range $Finance.donations.receipts.slice(-4).reverse()>>
           <li>
@@ -1390,7 +1390,7 @@
           </li>
         <</for>>
       </ul>
-
+    <</deadwood-card>>
   <</if>>
 <</widget>>
 
@@ -1402,7 +1402,7 @@
 <<widget 'deadwood-finance-school-donation-journal'>>
   <<if $Finance.donations.total.school gt 0>>
     <<set _school_fund to maplebirch.get('Finance').donations.school>>
-    <div class='bold'><<lanSwitch 'School funding' '学校资助'>></div>
+    <<deadwood-card 'School funding' '学校资助'>>
       <div class='dr-finance-summary'>
         <span><<lanSwitch 'Total donated' '累计捐款'>></span><span><<deadwood-reblooms-finance-money $Finance.donations.total.school>></span>
         <span><<lanSwitch 'Named contributions' '实名资助'>></span><span><<deadwood-reblooms-finance-money $Finance.donations.named.school>></span>
@@ -1437,7 +1437,7 @@
           <</if>>
         <</if>>
       <</if>>
-
+    <</deadwood-card>>
   <</if>>
 <</widget>>
 
@@ -1445,7 +1445,7 @@
   <<set _aid to maplebirch.get('Finance').donations.aid>>
   <<for _aid_project range maplebirch.get('Finance').donations.projects.filter(project => project.id !== 'school' && project.donated > 0)>>
     <<set _aid_state to _aid.state(_aid_project.id)>>
-    <div class='bold'><<lanSwitch `maplebirch.t(_aid_project.name)` `maplebirch.t(_aid_project.name)`>></div>
+    <<deadwood-card `maplebirch.t(_aid_project.name)` `maplebirch.t(_aid_project.name)`>>
       <div class='dr-finance-summary'>
         <span><<lanSwitch 'Total donated' '累计捐款'>></span><span><<deadwood-reblooms-finance-money _aid_project.donated>></span>
         <span><<lanSwitch 'Named contributions' '实名资助'>></span><span><<deadwood-reblooms-finance-money `$Finance.donations.named[_aid_project.id]`>></span>
@@ -1492,16 +1492,16 @@
           <br><<lanSwitch 'Return on a later day to hear how the supplies are being used.' '之后可回来了解物资投入使用的情况。'>>
         <</if>>
       <</if>>
-
+    <</deadwood-card>>
   <</for>>
 <</widget>>
 
 <<widget 'deadwood-transport-vehicle-record'>>
   <<set _record_vehicle to _args[0], _record_model to maplebirch.get('Transport').catalog.models.find(model => model.id === _record_vehicle.model)>>
   <<set _record_title to '<<icon "transport/' + _record_model.id + '.png">>' + maplebirch.t(_record_model.name)>>
-  <div class='bold'><<lanSwitch _record_title _record_title>></div>
+  <<deadwood-card _record_title _record_title>>
     <div class='dr-finance-summary'><<deadwood-transport-vehicle-status _record_model _record_vehicle>></div>
-
+  <</deadwood-card>>
 <</widget>>
 
 <<widget 'deadwood-outing-record'>>
