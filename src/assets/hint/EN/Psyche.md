@@ -4,14 +4,16 @@
 
 ## Sanity and learning
 
-| Sanity range     | State        | Learning gains |
-| ---------------- | ------------ | -------------- |
-| Below −200       | Confused     | 60% of vanilla |
-| −200 to below 0  | Troubled     | 75%            |
-| 0 to below 150   | Dazed        | 90%            |
-| 150 to below 600 | Unsettled    | 100%           |
-| 600 to below 900 | Clear-headed | 110%           |
-| 900 and above    | Focused      | 120%           |
+| Sanity range       | State        | Learning gains |
+| ------------------ | ------------ | -------------- |
+| Below −350         | Confused     | 60% of vanilla |
+| −350 to below −200 | Muddled      | 70%            |
+| −200 to below 0    | Troubled     | 75%            |
+| 0 to below 150     | Dazed        | 90%            |
+| 150 to below 400   | Unsettled    | 100%           |
+| 400 to below 600   | Settled      | 105%           |
+| 600 to below 900   | Clear-headed | 110%           |
+| 900 and above      | Focused      | 120%           |
 
 The multiplier applies to progress in science, maths, English and history earned in class, through reading and similar activities. It does not affect skill training, recipes or money. Full sanity reduces fear gained from a fright by 25%, while minimum sanity increases it by 25%.
 
