@@ -200,9 +200,25 @@ export default class Company {
     order.total = contract.due;
   }
 
-  public settle(factory: FactoryState, order: Order): boolean {
+  public settle(factory: FactoryState, order: Order, day = Math.floor(Time.days)): boolean {
     const contract = this.state.contract;
     if (!contract || contract.site !== factory.site || contract.id !== order.id || contract.stage !== 'invoice') return false;
+    // 迟交扣款可能超过尚未结算的尾款。只退出现有周转金，余款仍留在原发票中。
+    if (contract.due < 0) {
+      const refund = Math.min(Math.max(0, factory.cash), -contract.due);
+      if (refund > 0) {
+        factory.cash -= refund;
+        factory.earned -= refund;
+        contract.due += refund;
+        order.total = contract.due;
+        this.finance.industry.report(factory, { day, event: 'refunded', amount: refund, customer: 'AVY' });
+      }
+      if (contract.due === 0) {
+        this.state.completed++;
+        this.state.contract = null;
+      } else contract.pay_day = day + 1;
+      return true;
+    }
     if (contract.credit) {
       contract.stage = 'disputed';
       return true;

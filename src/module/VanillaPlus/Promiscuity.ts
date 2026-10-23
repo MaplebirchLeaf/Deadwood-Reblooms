@@ -203,7 +203,8 @@ class Promiscuity {
       case 'offer-vagina-to-mouth':
         return mouthFree(V.mouthuse === 'facesit' && V.mouthstate === 'vagina') && hasVagina;
       case 'offer-anus-to-mouth':
-        return mouthFree(V.mouthuse === 'facesit' && V.mouthstate === 'anal');
+        // 原版借用 vagina 槽记录 facesitanal，只能使用空槽或收回 PC 对同一对象的肛交占用。
+        return mouthFree(V.mouthuse === 'facesit' && V.mouthstate === 'anal') && (npc.vagina === 0 || String(npc.vagina).includes('otheranus'));
       case 'penetrate-vagina':
         return !!V.player?.vaginaExist && vaginaFree(String(V.vaginause).includes('penis')) && this.hasPenis(target);
       case 'penetrate-anus':

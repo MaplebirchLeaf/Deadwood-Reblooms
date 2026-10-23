@@ -7,6 +7,8 @@ type RandomState = ReturnType<typeof maplebirch.tool.rand.create>['state'];
 
 // 模块本体 DeadwoodReblooms 的存档结构，对应 V.DeadwoodReblooms。
 export interface DeadwoodRebloomsState {
+  /** 最近一次展示吊坠及回应，供当天重绘与后续相处读取。 */
+  locket: Record<string, { last_day: number; photo: string; familiar: boolean; choice: '' | 'affection' | 'explain' | 'reassure' | 'private' }>;
   daily: {
     whale: Partial<Record<'swim' | 'dive' | 'rest' | 'seconds', number>>;
     pregnancy: Record<string, string[]>;
@@ -30,6 +32,7 @@ export interface DeadwoodRebloomsState {
 }
 
 export const defaults: DeadwoodRebloomsState = {
+  locket: {},
   daily: {
     whale: {},
     pregnancy: {},

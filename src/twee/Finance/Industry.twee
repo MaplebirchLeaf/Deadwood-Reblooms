@@ -175,24 +175,26 @@
     <</if>>
     <<language>>
       <<option 'EN'>>
-        <<if $_factory_report.event is 'delivered'>>The goods have left the yard. The invoice is for <<deadwood-reblooms-finance-money $_factory_report.amount>>, <span class='blue'>the payment has not arrived yet</span>.
+        <<if $_factory_report.event is 'delivered'>>The goods have left the yard. <<if $_factory_report.amount lt 0>>The delivery deduction exceeds the balance. <span class='red'>You must return <<deadwood-reblooms-finance-money `-$_factory_report.amount`>> of the advance.</span><<else>>The invoice is for <<deadwood-reblooms-finance-money $_factory_report.amount>>, <span class='blue'>the payment has not arrived yet</span>.<</if>>
+        <<elseif $_factory_report.event is 'refunded'>>The factory has returned <<deadwood-reblooms-finance-money $_factory_report.amount>> of the advance. Rowan files the transfer slip with the late-delivery notice. This is money returned to the buyer, not another sale.
         <<elseif $_factory_report.event is 'default'>>The buyer's promised transfer has not arrived. The debt-recovery agent has returned the file marked <span class='red'>unrecoverable</span>. An invoice for <<deadwood-reblooms-finance-money $_factory_report.amount>> is written off.
         <<elseif $_factory_report.event is 'overdue'>>
           Robin's drinks shop has not covered the invoice for <<deadwood-reblooms-finance-money $_factory_report.amount>>. Rowan clips the delivery receipt to it. "They've asked for another week. That doesn't pay our crew." The money remains owed; nothing has reached the factory account.
         <<elseif $_factory_report.event is 'resigned'>>
           <span class='red'>The crew has left after two weeks of unpaid wages.</span> The machines are idle; automatic production has stopped. The unpaid <<deadwood-reblooms-finance-money $_factory_report.amount>> is still owed.
         <<elseif $_factory_report.event is 'cancelled'>>You cancel the job. The supplier will not take back the cut material. The <<deadwood-reblooms-finance-money $_factory_report.amount>> already spent remains a cost. The cancellation fee has also been paid.
-        <<else>>A payment of <<deadwood-reblooms-finance-money $_factory_report.amount>> has arrived in the <span class='gold'>factory account</span>.<<if $_factory_report.event is 'late'>> It came later than promised.<</if>><<if (_factory_state.paid?.[$_factory_report.customer] ?? 0) is 1>> The buyer has signed off your first paid job. Rowan files the receipt behind the enquiry.<<elseif (_factory_state.paid?.[$_factory_report.customer] ?? 0) gt 1>> A familiar purchasing clerk has attached next week's requirements. Rowan sets them beside the order book.<</if>>
+        <<else>>A payment of <<deadwood-reblooms-finance-money $_factory_report.amount>> has arrived in the <span class='gold'>factory account</span>.<<if $_factory_report.event is 'late'>> It came later than promised.<</if>><<if (_factory_state.paid?.[$_factory_report.customer] ?? 0) gte 3>> Rowan puts the receipt beside the earlier paid invoices. "They know the work now. Check the price and dates anyway. A familiar name doesn't pay the wages."<<elseif (_factory_state.paid?.[$_factory_report.customer] ?? 0) is 1>> The buyer has signed off your first paid job. Rowan files the receipt behind the enquiry.<<elseif (_factory_state.paid?.[$_factory_report.customer] ?? 0) gt 1>> A familiar purchasing clerk has attached next week's requirements. Rowan sets them beside the order book.<</if>>
         <</if>>
       <<option 'CN'>>
-        <<if $_factory_report.event is 'delivered'>>货物已经离开院子。货款为<<deadwood-reblooms-finance-money $_factory_report.amount>>，<span class='blue'>尚未到账</span>。
+        <<if $_factory_report.event is 'delivered'>>货物已经离开院子。<<if $_factory_report.amount lt 0>>迟交扣款超过尾款，<span class='red'>须退回<<deadwood-reblooms-finance-money `-$_factory_report.amount`>>预付款。</span><<else>>货款为<<deadwood-reblooms-finance-money $_factory_report.amount>>，<span class='blue'>尚未到账</span>。<</if>>
+        <<elseif $_factory_report.event is 'refunded'>>工厂已退回<<deadwood-reblooms-finance-money $_factory_report.amount>>预付款。罗文把转账回执和迟交通知夹在一起。这是还给客户的钱，不是新收入。
         <<elseif $_factory_report.event is 'default'>>采购方承诺的转账没有到账。收账的人退回了档案，上面写着<span class='red'>无法追回</span>。<<deadwood-reblooms-finance-money $_factory_report.amount>>的应收货款被记作坏账。
         <<elseif $_factory_report.event is 'overdue'>>
           罗宾的饮品店尚未付足<<deadwood-reblooms-finance-money $_factory_report.amount>>货款。罗文把收货回执夹在账单上。“那边想再缓一周。可我们的工人也得拿工资。”这笔钱仍记在应收账里，工厂账户尚未到账。
         <<elseif $_factory_report.event is 'resigned'>>
           <span class='red'>欠薪持续两周，厂里的雇工已经离职。</span>机器停了，自动生产也已停止。欠下的<<deadwood-reblooms-finance-money $_factory_report.amount>>仍需结清。
         <<elseif $_factory_report.event is 'cancelled'>>你取消了订单。供货商不肯收回已经裁切的材料，先前投入的<<deadwood-reblooms-finance-money $_factory_report.amount>>仍是成本，解约费也已支付。
-        <<else>><<deadwood-reblooms-finance-money $_factory_report.amount>>货款已存入<span class='gold'>工厂账户</span>。<<if $_factory_report.event is 'late'>>这笔钱比约定的时间来得晚。<</if>><<if (_factory_state.paid?.[$_factory_report.customer] ?? 0) is 1>>采购方签清了你们之间的第一笔货款。罗文把回执收在询价单后。<<elseif (_factory_state.paid?.[$_factory_report.customer] ?? 0) gt 1>>熟识的采购人员附上了下周的用货要求。罗文把纸放到订单簿旁。<</if>>
+        <<else>><<deadwood-reblooms-finance-money $_factory_report.amount>>货款已存入<span class='gold'>工厂账户</span>。<<if $_factory_report.event is 'late'>>这笔钱比约定的时间来得晚。<</if>><<if (_factory_state.paid?.[$_factory_report.customer] ?? 0) gte 3>>罗文把回执放到之前结清的账单旁。“他们认得咱们的活了。价格和日期还是得看，老交情不能拿来发工资。”<<elseif (_factory_state.paid?.[$_factory_report.customer] ?? 0) is 1>>采购方签清了你们之间的第一笔货款。罗文把回执收在询价单后。<<elseif (_factory_state.paid?.[$_factory_report.customer] ?? 0) gt 1>>熟识的采购人员附上了下周的用货要求。罗文把纸放到订单簿旁。<</if>>
         <</if>>
     <</language>><br>
   <</for>>
@@ -541,10 +543,16 @@
   <</if>>
 <</if>><br>
 <<if _factory_state.invoices.length>>
-  <span class='gold'><<lanSwitch "Awaiting payment" "等待付款">></span><br>
+  <span class='gold'><<lanSwitch "Outstanding accounts" "未结账款">></span><br>
   <<for _factory_invoice range _factory_state.invoices>>
-    <<print maplebirch.get('Finance').donations.customer(_factory_invoice.order.customer)>> · <<deadwood-reblooms-finance-money _factory_invoice.order.total>> · <<deadwood-reblooms-finance-date _factory_invoice.pay_day>><br>
+    <<print maplebirch.get('Finance').donations.customer(_factory_invoice.order.customer)>> · <<if _factory_invoice.order.total lt 0>><span class='red'><<lanSwitch 'Advance to return: ' '应退预付款：'>></span><<deadwood-reblooms-finance-money `-_factory_invoice.order.total` 'red'>><<else>><<deadwood-reblooms-finance-money _factory_invoice.order.total>><</if>> · <<deadwood-reblooms-finance-date _factory_invoice.pay_day>><br>
   <</for>>
+  <<if _factory.open and _factory.ready and _factory_state.automatic and _factory_state.manager and !_factory_state.order and !_factory_state.laboratory.job and _factory_state.invoices.some(invoice => invoice.order.total > 0)>>
+    <br><<icon 'industry/management.png'>><<lanLink ['Tell the manager to wait for payment before taking more orders (0:05)', '让经理先等账款结清，别再接新单 (0:05)'] 'Deadwood Reblooms Factory Orders'>>
+      <<if maplebirch.get('Finance').industry.configure(_factory_state.workers, _factory_state.rush, false, _factory_state.reserve, _factory_state.maximum_order)>><<pass 5>><</if>>
+    <</lanLink>><br>
+    <span class='blue'><<lanSwitch 'This pauses automatic ordinary orders until you enable them again in management. Wages and site bills continue.' '普通订单的自动安排会暂停，要到管理页重新开启。工资和厂房费用照付。'>></span><br>
+  <</if>>
 <</if>>
 <<deadwood-industry-return>>
 

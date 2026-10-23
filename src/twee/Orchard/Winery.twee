@@ -192,7 +192,7 @@
             <<set _wineSaleAmount to Math.min(_winery.state.stock[_recipe.id] - _winery.state.reserve[_recipe.id], _winery.saleRemaining)>>
             <<capture _wineSaleAmount>>
               <<if _winery.canSell and _wineSaleAmount gt 0>>
-                <<icon 'orchard/sales.png'>><<lanLink ['Sell the surplus (' + _wineSaleAmount + ' bottles, 0:' + _winery.terms.saleMinutes + ')', '批发多余库存（' + _wineSaleAmount + '瓶，0:' + _winery.terms.saleMinutes + '）']>>
+                <<icon 'company/sales.png'>><<lanLink ['Sell the surplus (' + _wineSaleAmount + ' bottles, 0:' + _winery.terms.saleMinutes + ')', '批发多余库存（' + _wineSaleAmount + '瓶，0:' + _winery.terms.saleMinutes + '）']>>
                   <<if maplebirch.get('Orchard').winery.sell(_recipe.id, _wineSaleAmount)>>
                     <<pass `maplebirch.get('Orchard').winery.terms.saleMinutes`>><<updatesidebarmoney>>
                     <<if maplebirch.passage.title is 'Deadwood Orchard Winery' and $location is 'alex_farm' and !$nextPassage and !$nextPassageCheck>><<run maplebirch.SugarCube.Engine.show()>><</if>>
@@ -268,7 +268,7 @@
           <<lanSwitch 'Payment for ' '交付'>><<= _winery.terms.shopSupplyQuantity>><<lanSwitch ' bottles: ' '瓶的货款：'>><span class='gold'><<printmoney `_recipe.wholesale * _winery.terms.shopSupplyQuantity`>></span><br>
           <<if _winery.canSupply and _winery.state.stock[_recipe.id] - _winery.state.reserve[_recipe.id] gte _winery.terms.shopSupplyQuantity>>
             <<if maplebirch.get('Robin').shop.canSpend(_recipe.wholesale * _winery.terms.shopSupplyQuantity / 100)>>
-              <<icon 'orchard/dispatch.png'>><<lanLink ['Deliver ' + _recipe.name[0] + ' (0:' + _winery.terms.supplyMinutes + ')', '交付' + _recipe.name[1] + ' (0:' + _winery.terms.supplyMinutes + ')']>>
+              <<icon 'orchard/wine-delivery.png'>><<lanLink ['Deliver ' + _recipe.name[0] + ' (0:' + _winery.terms.supplyMinutes + ')', '交付' + _recipe.name[1] + ' (0:' + _winery.terms.supplyMinutes + ')']>>
                 <<if maplebirch.get('Orchard').winery.supply(_recipe.id)>>
                   <<pass `maplebirch.get('Orchard').winery.terms.supplyMinutes`>><<updatesidebarmoney>>
                   <<if maplebirch.passage.title is 'Deadwood Orchard Robin Wine' and $location is 'deadwood_robin_shop' and !$nextPassage and !$nextPassageCheck>><<run maplebirch.SugarCube.Engine.show()>><</if>>

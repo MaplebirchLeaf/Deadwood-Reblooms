@@ -56,13 +56,22 @@ export default function Sydney(maplebirch: MaplebirchCore): void {
 
   maplebirch.once(':storyready', () => {
     const macros = maplebirch.SugarCube.Macro;
-    for (const name of ['combatInseminate', 'npcPregnancyRoll'] as const) {
+    for (const name of ['takeNPCVirginity', 'combatInseminate', 'npcPregnancyRoll'] as const) {
       const original = macros.get(name);
       if (!original) continue;
       macros.delete(name);
       macros.add(name, {
         ...original,
         handler(this: MacroContext) {
+          if (name === 'takeNPCVirginity') {
+            const npcName = typeof this.args[0] === 'string' ? this.args[0] : V.NPCList[this.args[0]]?.fullDescription;
+            if (npcName !== 'Sydney') return original.handler.call(this);
+            const vow = C.npc.Sydney?.virginity.temple === true;
+            const result = original.handler.call(this);
+            // 原版先判断誓约对象、梦境与身体部位，形态迁移只读取它结算后的悉尼本人状态。
+            maplebirch.SugarCube.Wikifier.wikifyEval(`<<deadwood-sydney-fall ${vow}>>`);
+            return result;
+          }
           if (V.consensual !== 1) return original.handler.call(this);
           const npc = name === 'combatInseminate' ? V.NPCList[this.args[0]] : undefined;
           const applies =

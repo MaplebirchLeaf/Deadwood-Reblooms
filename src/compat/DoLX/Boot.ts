@@ -22,6 +22,14 @@ export default function adaptBoot(maplebirch: MaplebirchCore): void {
     ]);
     params.js = params.js.filter(rule => !replaced.has(rule.from));
   }
+  // DoLX 抗焦虑片复用原版服药效果数组，不改写创伤或过量结算。
+  if (maplebirch.get('Psyche')) {
+    maplebirch.once(':storyready', () => {
+      const pill = setup.pills.find((item: { type: string }) => item.type === 'calmoryl');
+      if (!pill) return;
+      pill.effects.push('<<run maplebirch.get("Psyche")?.change(0, -150)>>');
+    });
+  }
   const replacer = plugins.find(plugin => plugin.modName === 'TweeReplacer' && plugin.addonName === 'TweeReplacerAddon');
   if (Array.isArray(replacer?.params)) {
     // DoLX 的称号是块函数，沿用独立兼容规则，避免之后再次执行原版三元表达式规则。

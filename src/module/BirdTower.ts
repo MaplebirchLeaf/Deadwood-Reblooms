@@ -381,7 +381,8 @@ class BirdTower extends Module {
       this.init(id);
       const age = getChildDays(id);
       this.settleFeeding(child, days, midnight);
-      for (let day = 0; day < Math.min(days, 3); day++) this.growSize(child, age);
+      // 阶段年龄封顶 200 天，营养盈余仍按真实年龄比较，不能把正常供食算成过量。
+      for (let day = 0; day < Math.min(days, 3); day++) this.growSize(child, Math.max(0, window.childAgeOf(child)));
       this.growStage(child, age);
     }
     V.BirdTower.daily = clone(DEFAULT_BIRD_TOWER_STATE.daily);

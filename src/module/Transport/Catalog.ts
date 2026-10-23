@@ -44,6 +44,7 @@ export default class Catalog {
     id: `farmroad${index + 1}`,
     passage: `Farm Road ${index + 1}`,
     name: `deadwood-reblooms:transport:route:farmroad${index + 1}`,
+    terrain: 'road' as const,
     position: 5 + index * 30
   }));
 

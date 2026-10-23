@@ -22,7 +22,7 @@ export interface Order {
 
 export interface FactoryReport {
   day: number;
-  event: 'paid' | 'default' | 'late' | 'overdue' | 'cancelled' | 'delivered' | 'resigned';
+  event: 'paid' | 'default' | 'late' | 'overdue' | 'cancelled' | 'delivered' | 'refunded' | 'resigned';
   seen: boolean;
   amount: number;
   customer: string;
@@ -506,7 +506,12 @@ export default class Industry {
     if (state.issue?.type === 'haul' && current > state.issue.day + 2) state.issue = null;
     for (const invoice of state.invoices.filter(item => item.pay_day <= current)) {
       const { order } = invoice;
-      if (this.finance.company.settle(state, order)) continue;
+      if (this.finance.company.settle(state, order, current)) {
+        const contract = this.finance.company.state.contract;
+        // 应退预付不足时逐日重试，不能清掉发票，也不能把退款记为客户回款。
+        if (contract?.site === state.site && contract.id === order.id && contract.due < 0) invoice.pay_day = contract.pay_day;
+        continue;
+      }
       if (order.customer === 'RDS' && !(this.finance.core.get('Robin')?.shop.spend(order.total / 100) ?? false)) {
         invoice.pay_day = current + 7;
         order.outcome = 'late';
@@ -532,7 +537,7 @@ export default class Industry {
     this.laboratory.advance(state, current, 0);
     if (state.wage_arrears === 0) state.unpaid_days = 0;
     const wages = Math.ceil(state.workers * terms.wage * (state.rush ? 1.5 : 1)) + (state.manager ? terms.managerWage : 0) + (state.laboratory.technician ? laboratoryTerms.technician_wage : 0);
-    const paid = Math.min(state.cash, wages);
+    const paid = Math.min(Math.max(0, state.cash), wages);
     state.cash -= paid;
     state.spent += paid;
     state.wage_arrears += wages - paid;
@@ -544,7 +549,7 @@ export default class Industry {
       this.report(state, { day: current, event: 'resigned', amount: state.wage_arrears, customer: '' });
     }
     const bills = Math.round(terms.overhead * terms.sites[state.site].multiplier) + (state.security ? terms.securityFee : 0);
-    const overhead = Math.min(state.cash, bills);
+    const overhead = Math.min(Math.max(0, state.cash), bills);
     state.cash -= overhead;
     state.spent += overhead;
     state.overhead_arrears += bills - overhead;

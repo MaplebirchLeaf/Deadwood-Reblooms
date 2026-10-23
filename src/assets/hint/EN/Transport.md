@@ -94,7 +94,7 @@ Picking up spilled shopping takes **2 minutes**; arranging workshop help takes *
 
 ## Companions and homes
 
-Depart from a garage or street to reach bus-stop streets and accessible owned homes. When leaving a garage, invite cohabiting partners who are currently at home. Passenger capacity depends on the seats. A convertible ride grants extra affection once per partner each day. Cliff, Starfish, Danube and High Streets offer a short outing together, rewarded once per partner each day.
+Depart from a garage or street to reach bus-stop streets and accessible owned homes. When leaving a garage, invite cohabiting partners who are currently at home. Passenger capacity depends on the seats. They can stay with you for further journeys in the same car, and you drop them off when you return home. Changing cars, leaving the street where it is parked or an interrupted journey ends the ride together. A convertible ride grants extra affection once per partner each day. Cliff, Starfish, Danube and High Streets offer a short outing together, rewarded once per partner each day.
 
 On school days, offer to drive when Robin, Whitney or Sydney is ready to walk to school with you. After lessons, offer a lift home when you meet Robin or Whitney by the school gate, or Kylar in the rear courtyard; Kylar's home must already be unlocked. When Sydney is leaving the library or rehearsal for the temple, you can offer a lift there. Your car must be parked nearby, with a passenger seat and enough fuel. Each type of lift grants affection once per partner each day.
 

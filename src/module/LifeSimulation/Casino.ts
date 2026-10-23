@@ -441,7 +441,21 @@ class Casino {
   }
 
   public finishWork(choice: number): number {
-    if (!this.canWork || this.state.work_scenario === null || ![0, 1].includes(choice)) return 0;
+    // 接班条件由点击时检查。完成一小时后即使已停止接新班，也照常结算这班。
+    if (
+      this.core.passage.title !== 'Deadwood Reblooms Casino Work' ||
+      this.state.work_scenario === null ||
+      ![0, 1, 2].includes(this.state.work_scenario) ||
+      ![0, 1].includes(choice) ||
+      V.replayScene ||
+      V.statFreeze ||
+      V.frozenValues ||
+      V.possessed ||
+      V.combat ||
+      V.nextPassage ||
+      V.nextPassageCheck
+    )
+      return 0;
     const correct = choice === [0, 1, 0][this.state.work_scenario];
     Object.assign(this.state, { work_scenario: null, last_work_correct: correct, shifts: this.state.shifts + 1, good_shifts: this.state.good_shifts + (correct ? 1 : 0) });
     if (correct && C.npc.Marlow) C.npc.Marlow.rage = Math.max(0, (C.npc.Marlow.rage ?? 0) - 2);

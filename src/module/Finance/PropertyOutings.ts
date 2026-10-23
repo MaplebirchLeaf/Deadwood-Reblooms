@@ -64,7 +64,9 @@ export default class PropertyOutings {
     if (name === 'Sydney') {
       const expansion = this.core.get('Sydney') ? V.SydneyExpansion : undefined;
       const festival = (Time.month === 10 && Time.monthDay === 31) || (Time.month === 12 && Time.monthDay === 25);
-      return V.daily.sydney.punish !== 1 && !festival && !(expansion?.estate?.visitDay >= 0 && expansion.estate.visitDay === Time.days);
+      const visit = expansion?.estate?.visitDay ?? -1;
+      const estateVisit = visit >= 0 && (visit === Time.days || (visit === Time.days - 1 && Time.hour < 6));
+      return V.daily.sydney.punish !== 1 && !festival && !estateVisit;
     }
     return ['Whitney', 'Kylar'].includes(name);
   }
@@ -432,6 +434,7 @@ export default class PropertyOutings {
     const plan = this.plan;
     if (!this.valid(name, property)) return null;
     if (this.travelling && plan!.name === name) return false;
+    if (this.core.get('Transport')?.companions.aboard.includes(name)) return false;
     const visit = this.state.visits[name];
     const held = visit?.property === property && visit.until > Time.date.timeStamp;
     if (held && visit.at !== 'deadwood_home') return false;
@@ -453,6 +456,7 @@ export default class PropertyOutings {
     const ride = this.core.get('Transport')?.state.commute;
     if (ride?.boarded && !ride.arrived && ride.npc === name && ride.property === property) return 'deadwood_outing';
     if (this.travelling && this.plan!.name === name) return 'deadwood_outing';
+    if (this.core.get('Transport')?.companions.aboard.includes(name)) return 'deadwood_outing';
     const visit = this.state.visits[name];
     if (visit?.property === property && visit.until > Time.date.timeStamp) {
       // 接回家只覆盖空闲时段，店铺、家教、排练和神殿事务仍按原日程进行。

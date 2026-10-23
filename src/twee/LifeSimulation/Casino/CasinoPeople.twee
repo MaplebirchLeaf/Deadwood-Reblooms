@@ -75,11 +75,12 @@
         “头一个小时，我会教你怎么做，给你 <span class='gold'><<printmoney 1000>></span>。学会以后，每小时底薪 <span class='gold'><<printmoney 3000>></span>，没有出错，再加 <span class='gold'><<printmoney 1000>></span>。”马洛把一副牌放在空位前。
     <</language>><br><br>
     <<if _casino.canWork>>
-      <<icon 'casino/dealer.png'>><<lanLink ['Take the training shift (1:00)', '跟马洛学做荷官 (1:00)']>>
-        <<if maplebirch.get('LifeSimulation').casino.canWork and !$LifeSimulation.casino.trained>>
-          <<set $LifeSimulation.casino.trained to true>><<money 1000>><<tiredness 4>><<stress 2>><<pass 60>>
-          <<if $passage is 'Deadwood Reblooms Casino Dealer'>>
-            <<goto 'Deadwood Reblooms Casino Training'>>
+      <<icon 'casino/dealer.png'>><<lanLink ['Take the training shift (1:00)', '跟马洛学做荷官 (1:00)'] 'Deadwood Reblooms Casino Training'>>
+        <<if maplebirch.get('LifeSimulation').casino.canWork and !$LifeSimulation.casino.trained and !$statFreeze and !$replayScene and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
+          <<set $_trainingEnd to Time.date.timeStamp + 3600>>
+          <<pass 60>>
+          <<if $passage is 'Deadwood Reblooms Casino Dealer' and !$nextPassage and !$nextPassageCheck and !$combat and !$possessed and !$statFreeze and !$replayScene and !$frozenValues and Time.date.timeStamp gte $_trainingEnd>>
+            <<set $LifeSimulation.casino.trained to true>><<money 1000>><<tiredness 4>><<stress 2>>
           <</if>>
         <</if>>
       <</lanLink>><br>
@@ -111,6 +112,7 @@
 
 :: Deadwood Reblooms Casino Training
 <<set $outside to 0>><<set $location to 'deadwood_casino'>><<effects>>
+<<if $LifeSimulation.casino.trained>>
 <<language>>
   <<option 'EN'>>
     Marlow lets you practise with a deck before putting you at a quiet table. You catch a card with your finger while dealing. Marlow stops you and demonstrates again. You learn to set discarded cards aside, announce the bets, and keep the chips where everyone can see them.<br><br>
@@ -118,7 +120,10 @@
   <<option 'CN'>>
     马洛先让你拿一副牌练习，再带你到一张客人不多的牌桌旁。发牌时，你的手指勾住了牌角。马洛叫你停下，又示范了一次。你学会了把弃牌放到一旁，报出赌注，让所有人都能看清桌上的筹码。<br><br>
     一小时结束后，马洛把 <span class='gold'><<printmoney 1000>></span> 交给你。“<span class='green'>下次就可以来上班了</span>。不确定谁赢，先问我，再把筹码交出去。”
-<</language>><br><br>
+<</language>>
+<<else>>
+  <<lanSwitch 'You did not finish the training shift.' '你没能完成这次培训。'>>
+<</if>><br><br>
 <<getouticon>><<lanLink ['Return to the room', '返回赌馆'] 'Deadwood Reblooms Life Simulation Casino'>><<endevent>><</lanLink>><br>
 
 :: Deadwood Reblooms Casino Work
@@ -139,8 +144,8 @@
         <<option 'CN'>>
           一个客人已在面前放了 <<printmoney 2000>>。下一位把总注额加到 <<printmoney 6000>>。前者指着自己的筹码。“我还要补多少？”
       <</language>><br><br>
-      <<lanLink ['£40', '£40']>><<deadwood-casino-work-pay 0>><</lanLink>><br>
-      <<lanLink ['£60', '£60']>><<deadwood-casino-work-pay 1>><</lanLink>><br>
+      <<lanLink ['£40', '£40'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 0>><</lanLink>><br>
+      <<lanLink ['£60', '£60'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 1>><</lanLink>><br>
     <<case 1>>
       <<language>>
         <<option 'EN'>>
@@ -148,8 +153,8 @@
         <<option 'CN'>>
           一位客人把仅剩的 <<printmoney 5000>> 全部下注，另外两人各投入 <<printmoney 10000>>。筹码较少的客人牌最好，伸手要拿走底池里的全部 <<printmoney 25000>>。
       <</language>><br><br>
-      <<lanLink ['Pay all £250 to the best hand', '把 £250 全付给最大牌']>><<deadwood-casino-work-pay 0>><</lanLink>><br>
-      <<lanLink ['Award the £150 main pot; settle the £100 side pot separately', '判定 £150 主池，结算 £100 边池']>><<deadwood-casino-work-pay 1>><</lanLink>><br>
+      <<lanLink ['Pay all £250 to the best hand', '把 £250 全付给最大牌'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 0>><</lanLink>><br>
+      <<lanLink ['Award the £150 main pot; settle the £100 side pot separately', '判定 £150 主池，结算 £100 边池'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 1>><</lanLink>><br>
     <<case 2>>
       <<language>>
         <<option 'EN'>>
@@ -157,8 +162,8 @@
         <<option 'CN'>>
           五张公共牌已经组成皇家同花顺，两人的底牌都无法让它更强。其中一人坚称自己的一对 Q 应当赢。
       <</language>><br><br>
-      <<lanLink ['Split the pot', '平分底池']>><<deadwood-casino-work-pay 0>><</lanLink>><br>
-      <<lanLink ['Award the pot to the pair of queens', '把底池判给一对 Q']>><<deadwood-casino-work-pay 1>><</lanLink>><br>
+      <<lanLink ['Split the pot', '平分底池'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 0>><</lanLink>><br>
+      <<lanLink ['Award the pot to the pair of queens', '把底池判给一对 Q'] 'Deadwood Reblooms Casino Work End'>><<deadwood-casino-work-pay 1>><</lanLink>><br>
   <</switch>>
 <<else>>
   <<if _casino.workBlock>>
@@ -255,16 +260,20 @@
   <</switch>>
 <</widget>>
 <<widget 'deadwood-casino-work-pay'>>
-  <<set $_dealerFatigue to ($LifeSimulation.casino.trained and $LifeSimulation.casino.good_shifts gte 10 ? 3 : 4)>>
-  <<set $_wage to maplebirch.get('LifeSimulation').casino.finishWork(_args[0])>>
-  <<if $_wage gt 0>>
-    <<money $_wage>><<tiredness $_dealerFatigue>>
-    <<if $LifeSimulation.casino.last_work_correct>>
-      <<stress 2>><<set C.npc.Marlow.love to Math.clamp(C.npc.Marlow.love + 1, 0, 30)>>
-    <<else>><<stress 6>><</if>>
+  <<set $_casino to maplebirch.get('LifeSimulation').casino>>
+  <<if $_casino.canWork and [0, 1].includes(_args[0]) and [0, 1, 2].includes($_casino.state.work_scenario) and !$statFreeze and !$replayScene and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
+    <<set $_dealerFatigue to ($_casino.state.trained and $_casino.state.good_shifts gte 10 ? 3 : 4), $_dealerScenario to $_casino.state.work_scenario, $_dealerEnd to Time.date.timeStamp + 3600>>
+    <<set $_casino.state.work_scenario to null, $_casino.state.last_work_correct to null>>
     <<pass 60>>
-    <<if $passage is 'Deadwood Reblooms Casino Work'>>
-      <<goto 'Deadwood Reblooms Casino Work End'>>
+    <<if $passage is 'Deadwood Reblooms Casino Work' and !$nextPassage and !$nextPassageCheck and !$combat and !$possessed and !$statFreeze and !$replayScene and !$frozenValues and Time.date.timeStamp gte $_dealerEnd and $_casino.state.work_scenario is null>>
+      <<set $_casino.state.work_scenario to $_dealerScenario>>
+      <<set $_wage to $_casino.finishWork(_args[0])>>
+      <<if $_wage gt 0>>
+        <<money $_wage>><<tiredness $_dealerFatigue>>
+        <<if $_casino.state.last_work_correct>>
+          <<stress 2>><<set C.npc.Marlow.love to Math.clamp(C.npc.Marlow.love + 1, 0, 30)>>
+        <<else>><<stress 6>><</if>>
+      <</if>>
     <</if>>
   <</if>>
 <</widget>>

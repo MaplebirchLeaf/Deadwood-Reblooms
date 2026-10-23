@@ -17,13 +17,13 @@
 <<if _harbourNight>>
   <<language>>
     <<option 'EN'>>
-      The blood moon casts an ominous, oil-slick crimson sheen across the churning dark water. Freezing sea fog spills over the old breakwater, thick with the stench of stagnant brine and rot from fifty fathoms down. A towering, spectral derelict rests silent against the stone quay—its black sails hang like shredded funeral shrouds from rotted masts, and its blackened hull is crusted thick with sharp barnacles and swaying kelp.
+      The blood moon stains the water red. Fog spills over the breakwater, carrying the smell of salt and rot. A ship rests against the old quay. Torn black sails hang from its masts, and barnacles and weed cover the hull.
       <br><br>
-      Silent, rigid figures line the decaying bulwarks, their sunken, pale faces half-veiled by the crimson mist. More soaked figures have already clambered ashore, relentlessly prying open crates with rusted iron and hauling cargo sacks toward the gangway. A hollow boom echoes from the old warehouses as a reinforced oak door gives way beneath heavy blows.
+      Pale figures stand along the rail. Others have already come ashore. They prise open crates and drag sacks towards the gangway. A crash comes from the warehouses. One of the doors has given way.
     <<option 'CN'>>
-      血月在翻涌的墨黑海面上铺开一层不祥的腥红油光。刺骨的浓重海雾漫过旧防波堤，空气中弥漫着深海腐殖质与陈年咸腥的寒气。一艘巍峨而残破的黑影无声地贴死在废弃码头边——破烂如裹尸布般的黑帆垂挂在腐朽的桅杆上，漆黑的吃水线处密密麻麻结满了厚重的藤壶与湿滑的海藻。
+      血月将海面染成暗红。雾气漫过防波堤，带来海水与腐木的气味。一艘船停在旧码头旁，桅杆上挂着破烂的黑帆，船身结满藤壶和海草。
       <br><br>
-      残破的船舷旁肃立着几道死寂的身影，惨白空洞的面孔在红雾中若隐若现。更多浑身湿透的亡灵已然爬上石阶，机械而狂乱地撬开岸边的旧木箱，将沉重的货袋往跳板上拖拽。货仓方向冷不丁传来一声巨响，一扇厚重的橡木大门在粗暴的撞击下轰然洞开。
+      几道苍白的身影站在船舷边，另一些已经上了岸。他们撬开木箱，将货袋拖向跳板。货仓那边传来一声巨响，一扇门被撞开了。
   <</language>><br><br>
 <<elseif Weather.precipitation is 'rain'>>
   <<language>>
@@ -40,6 +40,7 @@
       一只海鸥落在系船桩上。浪水拍进码头下的礁石，把磨圆的玻璃和碎瓷片推入石缝。空气里有海水的咸味，混着晾干的海草气味。
   <</language>><br><br>
 <</if>>
+<<deadwood-undead-moon>>
 <<if !_harbourNight and _harbour.zephyr.stage is 4>>
   <<switch Math.floor(Time.days) % 3>>
     <<case 0>>
@@ -96,17 +97,28 @@
 <</language>><br><br>
 <<deadwood-harbour-result>>
 <<if _harbourNight and _harbour.event>>
-  <<set _harbour.voice to true>>
   <<language>>
     <<option 'EN'>>
-      "...Down below... lend a hand with the cargo..." An unnatural voice carries directly through the freezing, murky brine without the release of a single bubble. Beyond the rusted mooring chain, a swollen, pale arm reaches from beneath the ribs of the sunken wreck, iron fingers locked around a wooden chest. Above the waterline, heavy, sodden footsteps vibrate through the pier timbers overhead.
+      "...Down here... help with the chest..." The words reach you clearly through the water. A swollen arm reaches from beneath the wreck, fingers hooked around a wooden chest. No bubbles rise from it. Overhead, footsteps thump across the pier.
     <<option 'CN'>>
-      “……在底下……搭把手，把箱子抬上去……”诡异的人声竟直接穿透冰冷死寂的海水，在铁链另一侧的幽暗中回荡。你凝神望去，只见沉船残骸阴影下伸出一只惨白浮肿的死人手臂，死死扣住一只水下木箱，然而黑暗中却没有半个气泡升腾。上方码头的栈桥木板上，隐约传来沉重而杂乱的涉水脚步震动。
+      “……在底下……搭把手，把箱子抬上去……”人声清清楚楚地穿过海水。沉船底下伸出一只浮肿的手臂，手指扣着木箱，却不见一个气泡冒出来。头顶传来脚步踩过栈桥的震动。
   <</language>><br><br>
 <<elseif $oxygen gt 0 and !pcAreArmsBound('any')>>
   <<icon 'coldmoon-harbour/wreckage.png'>><<lanLink ['Search among the wreckage', '在残骸之间搜寻'] 'Deadwood Coldmoon Harbour Underwater'>>
     <<wateraction>><<deadwood-harbour-search 'dive'>>
   <</lanLink>><<loxygen>><br>
+<</if>>
+<<if _harbourNight and _harbour.voice and _harbour.zephyr.stage is 2 and $oxygen gt 0 and !pcAreArmsBound('any') and maplebirch.get('Psyche')?.active>>
+  <<swimicon 'down'>><<lanLink ['Follow the voice beneath the wreck', '循着呼唤游进残骸下面'] 'Deadwood Coldmoon Harbour Underwater'>>
+    <<if maplebirch.get('Psyche')?.active and $MoreTransformations.harbour.zephyr.stage is 2 and $MoreTransformations.harbour.voice and Time.isBloodMoon()
+      and $oxygen gt 0 and !pcAreArmsBound('any') and !$combat and !$possessed and !$nextPassage and !$nextPassageCheck>>
+      <<wateraction>><<deadwood-harbour-context>>
+      <<if _harbourNight and _harbour.zephyr.stage is 2 and $oxygen gt 0 and !pcAreArmsBound('any') and !$combat and !$possessed and !$nextPassage and !$nextPassageCheck>>
+        <<set _harbour.zephyr.stage to 3, _harbour.scene to 'cargo_voice', _harbour.event to ''>>
+        <<run maplebirch.get('Psyche')?.change(-150, 200)>><<tiredness 3>>
+      <</if>>
+    <</if>>
+  <</lanLink>><<lllsanity>><<ggfear>><<loxygen>><<gtiredness>><br>
 <</if>>
 <<swimicon 'up'>><<lanLink ['Surface at the steps', '浮回石阶边'] 'Deadwood Coldmoon Harbour'>>
   <<wateraction>><<set $underwater to 0, $nooxygen to 0>>

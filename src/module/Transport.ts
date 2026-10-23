@@ -110,6 +110,12 @@ class Transport extends Module {
       const title = this.core.passage.title;
       this.events.enterPassage();
       this.commute.enterPassage();
+      const trip = this.state.trip;
+      // 普通随车可在停车的街道继续下一程，进入别的场景或离开车辆所在街道便结束同行。
+      if (trip && !trip.commute && !trip.taxi && !this.core.get('Finance')?.realEstate.outings.travelling && !title.startsWith('Deadwood Transport') && Catalog.point(title) !== this.vehicle?.point) {
+        this.state.passengers = [];
+        trip.passengers = [];
+      }
       // 原版正文末尾会清空 eventskip，在入口保留普通探索菜单的判定。
       this.trail_menu =
         V.eventskip >= 1 &&
@@ -319,7 +325,7 @@ class Transport extends Module {
       }
       if (depth === 0) choices.push(...(forest ? ['nightingale', 'wolf', 'danube'] : ['farmland']).map(id => ({ id, distance: forest ? 10 : 5 })));
     } else {
-      choices = Catalog.routes
+      choices = [...Catalog.routes, ...Catalog.roads]
         .filter(
           route =>
             (route.id !== from || this.state.commute?.to === route.id || this.core.get('Finance')?.realEstate.outings.target === route.id) && model.terrain.includes(route.terrain as 'road' | 'park')
@@ -358,13 +364,14 @@ class Transport extends Module {
     const vehicle = vehicle_id === undefined ? this.nearby[0] : this.nearby.find(vehicle => vehicle.id === vehicle_id);
     if (vehicle_id !== undefined && (!vehicle || this.core.passage.title === 'Shopping Centre' || this.shopOpen)) return false;
     const shop = this.shopOpen ? this.state.shop : null;
+    const passengers = vehicle?.id === this.state.trip?.vehicle && this.state.trip?.settled ? this.companions.aboard : [];
     this.state.origin = this.point;
     if (!shop) this.state.return_passage = this.core.passage.title;
     this.state.notice = null;
     this.state.offer = null;
     this.state.shop = shop;
-    this.state.trip = null;
-    this.state.passengers = [];
+    if (!passengers.length) this.state.trip = null;
+    this.state.passengers = passengers;
     this.state.commute = null;
     this.state.selected = vehicle?.id ?? null;
     return this.state.origin !== null;
@@ -492,6 +499,7 @@ class Transport extends Module {
     if (outings?.travelling && (destination !== outings.target || outings.plan?.stage === 'visit' || this.vehicle?.id !== outings.plan?.vehicle)) return false;
     const passengers = this.state.passengers.filter(name => this.companions.available.includes(name)).slice(0, this.model!.seats);
     if (commute && !passengers.includes(commute.npc)) return false;
+    this.state.passengers = passengers;
     this.state.trip = {
       vehicle: this.vehicle!.id,
       from: this.point!,
@@ -540,6 +548,16 @@ class Transport extends Module {
     const wear = this.journeyWear(model, minutes, trail && !this.forestRoad);
     vehicle.condition = Math.max(0, Math.round((vehicle.condition - wear) * 1000) / 1000);
     this.core.SugarCube.Wikifier.wikifyEval(`<<pass ${minutes}>>`);
+    // 强制转场先接管，不能再把地点写回路边或结算旧行程的送达。
+    if (this.state.trip !== trip || this.core.passage.title !== 'Deadwood Transport Travel' || !this.ready || V.nextPassage || V.nextPassageCheck) {
+      trip.interrupted = true;
+      trip.settled = true;
+      if (this.state.trip === trip) {
+        this.state.passengers = [];
+        if (pending) this.events.stop(false);
+      }
+      return false;
+    }
     if (pending) {
       vehicle.point = trip.event!.point!;
       vehicle.garage = null;
@@ -548,14 +566,8 @@ class Transport extends Module {
       V.bus = vehicle.point;
       V.outside = 1;
       V.location = vehicle.point === 'farmroad3' ? 'forest' : vehicle.point === 'farmroad6' ? 'farm' : /^farmroad[245]$/.test(vehicle.point) ? 'moor' : 'town';
-    }
-    if (this.core.passage.title !== 'Deadwood Transport Travel' || !this.ready || V.nextPassageCheck) {
-      trip.interrupted = true;
-      trip.settled = true;
-      if (pending) this.events.stop();
       return false;
     }
-    if (pending) return false;
     const estate = this.core.get('Finance')?.realEstate;
     const home = trip.to.startsWith('home:') ? estate?.properties.find(property => property.id === trip.to.slice(5)) : null;
     vehicle.point = home ? (home.street === 'Office Lobby' ? 'high' : Catalog.point(home.street))! : trip.to;
@@ -592,6 +604,12 @@ class Transport extends Module {
     if (model.kind === 'bicycle') this.core.SugarCube.Wikifier.wikifyEval(`<<tiredness ${Math.max(1, Math.ceil(trip.minutes / 10))}>><<athletics 1>>`);
     else this.state.driving = Math.min(1000, this.state.driving + Math.min(10, Math.ceil(trip.minutes / 5)));
     this.companions.affection(model.id === 'convertible');
+    if (home && estate && !trip.commute && !trip.taxi && !estate.outings.travelling) {
+      const returned = trip.passengers.filter(name => estate.residenceOf(name)?.id === home.id);
+      trip.passengers = trip.passengers.filter(name => !returned.includes(name));
+      this.state.passengers = this.state.passengers.filter(name => !returned.includes(name));
+      for (const name of returned) estate.outings.receive(name, home.id, 'ride');
+    }
     this.commute.arrive();
     this.core.get('Finance')?.realEstate.outings.arrive(trip.to);
     if (trip.taxi) this.taxi.arrive(trip.taxi);

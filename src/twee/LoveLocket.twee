@@ -1,0 +1,341 @@
+:: Deadwood Love Locket Widgets [widget]
+
+<<widget 'deadwood-locket-context'>>
+  <<set _locket_name to _args[0], _locket_photo to $worn.neck.photo || ''>>
+  <<set _locket_id to 'deadwood-locket-' + _locket_name.replaceAll(' ', '-')>>
+  <<set _locket_entry to $DeadwoodReblooms.locket[_locket_name]>>
+  <<set _locket_selected to isLoveInterest(_locket_name), _locket_formal to false>>
+  <<set _locket_available to !!maplebirch.get('DeadwoodReblooms') and C.npc[_locket_name]?.init is 1
+    and ['active', 'rescued'].includes(C.npc[_locket_name]?.state)
+    and $npc.includes(_locket_name) and $worn.neck.name is 'love locket'
+    and !$combat and !$possessed and !$eventforced and !$nextPassage and !$nextPassageCheck
+    and !$statFreeze and !$frozenValues and !$replayScene and !$gag
+    and $stress lt $stressmax and !pcAreArmsBound('both')>>
+  <<switch _locket_name>>
+    <<case 'Sydney'>>
+      <<set _locket_formal to $sydneyromance is 1>>
+    <<case 'Kylar'>>
+      <<set _locket_formal to C.npc.Kylar.love gte 50 and $syndromekylar isnot 1>>
+    <<case 'Remy'>>
+      <<set _locket_available to _locket_available and !!maplebirch.get('Orchard')?.remy.available and !maplebirch.get('Orchard')?.remy.inLabour>>
+      <<set _locket_formal to !!$Orchard?.remy.romance and !$Orchard.remy.syndrome and !$Orchard.remy.ended>>
+    <<case 'Robin'>><<set _locket_formal to $robinromance is 1>>
+    <<case 'Whitney'>><<set _locket_formal to $whitneyromance is 1>>
+    <<case 'Gwylan'>>
+      <<set _locket_available to _locket_available and !isGwylanAbsent()>>
+      <<set _locket_formal to _locket_selected and isPossibleLoveInterest(_locket_name)>>
+    <<case 'Tsukihan'>>
+      <<deadwood-raven-home-context>>
+      <<set _locket_available to _locket_available and _shrine?.stage is 3 and !$daily.no_sing and !$worn.face.type.includes('gag')
+        and (_shrinePerson or $location is 'raven_shrine_house' and _shrineHome and _shrineHomeAwake
+          or _shrineSafe and ($location is 'shopping_centre' and _shrineTsukihanLocation is 'shopping_centre' and $exposed lte 0
+            or $location is 'forest_raven_shrine' and _shrineTsukihanLocation is 'raven_shrine_garden'))>>
+      <<set _locket_formal to _locket_selected and isPossibleLoveInterest(_locket_name)>>
+    <<default>><<set _locket_formal to _locket_selected and isPossibleLoveInterest(_locket_name)>>
+  <</switch>>
+  <<set _locket_familiar to _locket_entry?.familiar ?? false>>
+<</widget>>
+
+<<widget 'deadwood-locket-link'>>
+  <<deadwood-locket-context _args[0]>>
+  <<if !_locket_available>><<exit>><</if>>
+  <div @id="_locket_id">
+    <<if _locket_entry?.last_day is Time.days>>
+      <<if !_locket_entry.choice and _locket_entry.photo is _locket_photo>>
+        <<deadwood-locket-conversation _locket_name>>
+      <</if>>
+    <<else>>
+      <<capture _locket_name>>
+        <<icon 'locket.png'>><<lanLink ['Show your love locket', '展示同心吊坠']>>
+          <<deadwood-locket-context _locket_name>>
+          <<if _locket_available and _locket_entry?.last_day isnot Time.days>>
+            <<set $DeadwoodReblooms.locket[_locket_name] to {
+              last_day: Time.days, photo: _locket_photo,
+              familiar: !!_locket_entry?.choice and _locket_entry.photo is _locket_photo, choice: ''
+            }>>
+            <<replace `'#' + _locket_id`>><<deadwood-locket-conversation _locket_name>><</replace>>
+          <</if>>
+        <</lanLink>><br>
+      <</capture>>
+    <</if>>
+  </div>
+<</widget>>
+
+<<widget 'deadwood-locket-conversation'>>
+  <<deadwood-locket-context _args[0]>>
+  <<if !_locket_available or !_locket_entry or _locket_entry.photo isnot _locket_photo or _locket_entry.choice>><<exit>><</if>>
+  <<deadwood-locket-text 'intro'>>
+  <br><br>
+  <<if _locket_photo is _locket_name and _locket_selected and _locket_formal>>
+    <<deadwood-locket-choice 'affection' `['Say you like keeping the photo close', '说你喜欢把这张照片带在身边']`>>
+  <<elseif _locket_selected and _locket_photo isnot _locket_name>>
+    <<deadwood-locket-choice 'reassure' `['Say you came to spend time together', '说你今天是来陪对方的']`>>
+  <</if>>
+  <<deadwood-locket-choice 'explain' `_locket_photo ? ['Talk about what the photo means to you', '说说这张照片对你的意义'] : ['Explain that you also like it as jewellery', '说你也喜欢把它当作饰品']`>>
+  <<deadwood-locket-choice 'private' `['Close the locket and change the subject', '合上吊坠，换个话题']`>>
+<</widget>>
+
+<<widget 'deadwood-locket-choice'>>
+  <<set _locket_action to _args[0]>>
+  <<capture _locket_name, _locket_action>>
+    <<lanLink `_args[1]`>>
+      <<deadwood-locket-context _locket_name>>
+      <<if _locket_available and _locket_entry?.last_day is Time.days and !_locket_entry.choice
+        and _locket_entry.photo is _locket_photo
+        and (_locket_action isnot 'affection' or (_locket_selected and _locket_formal and _locket_photo is _locket_name))
+        and (_locket_action isnot 'reassure' or (_locket_selected and _locket_photo isnot _locket_name))>>
+        <!-- 先锁定回应，正文、语言切换和存读档均不再发放收益。 -->
+        <<set _locket_entry.choice to _locket_action>>
+        <<if _locket_action is 'affection'>>
+          <<npcincr `_locket_name` love 1>><<stress -2>>
+          <<if _locket_name is 'Kylar'>><<npcincr Kylar rage -1>><</if>>
+        <<elseif _locket_action is 'reassure' and _locket_name is 'Kylar'>>
+          <<npcincr Kylar rage -1>>
+        <</if>>
+        <<replace `'#' + _locket_id`>>
+          <<deadwood-locket-text _locket_action>>
+          <<if _locket_action is 'affection'>><<glove `_locket_name`>><<lstress>><</if>>
+          <<if _locket_name is 'Kylar' and ['affection', 'reassure'].includes(_locket_action)>><<lksuspicion>><</if>>
+          <br><br>
+        <</replace>>
+      <</if>>
+    <</lanLink>><br>
+  <</capture>>
+<</widget>>
+
+<<widget 'deadwood-locket-text'>>
+  <<switch _locket_name>>
+    <<case 'Sydney'>><<deadwood-locket-sydney-text _args[0]>>
+    <<case 'Kylar'>><<deadwood-locket-kylar-text _args[0]>>
+    <<case 'Remy'>><<deadwood-locket-remy-text _args[0]>>
+    <<case 'Robin'>><<deadwood-locket-robin-text _args[0]>>
+    <<case 'Whitney'>><<deadwood-locket-whitney-text _args[0]>>
+    <<case 'Avery'>><<deadwood-locket-avery-text _args[0]>>
+    <<case 'Alex'>><<deadwood-locket-alex-text _args[0]>>
+    <<case 'Gwylan'>><<deadwood-locket-gwylan-text _args[0]>>
+    <<case 'Tsukihan'>><<deadwood-locket-tsukihan-text _args[0]>>
+    <<default>>
+      <<language>>
+        <<option 'EN'>>
+          <<if _args[0] is 'intro'>>
+            You open the locket for <<= maplebirch.auto(_locket_name)>> to see.
+            <<if !_locket_photo>>There is room for a small photograph inside.
+            <<elseif _locket_photo is _locket_name>>You turn it so <<nnpc_he _locket_name>> can see <<nnpc_his _locket_name>> own photograph.
+            <<else>>You point out the photograph you have kept inside.<</if>>
+          <<elseif _args[0] is 'affection'>>
+            You explain why you chose the photograph. <<nnpc_He _locket_name>> looks from it to your face. You close the locket and let it rest against your chest again.
+          <<elseif _args[0] is 'private'>>
+            You close the locket and turn the conversation to something else.
+          <<elseif _args[0] is 'reassure'>>
+            You leave the photograph where it is and say you came to spend time together. You do not offer to change it.
+          <<else>>
+            <<if _locket_photo>>You explain what you wanted to remember when you chose this photograph.<<else>>You turn the empty locket in your hand and explain that you like the necklace itself.<</if>>
+            You close it when you have finished.
+          <</if>>
+        <<option 'CN'>>
+          <<if _args[0] is 'intro'>>
+            你打开吊坠，给<<= maplebirch.auto(_locket_name)>>看。
+            <<if !_locket_photo>>里面留着放一张小照片的位置。
+            <<elseif _locket_photo is _locket_name>>你将吊坠转过一点，让<<nnpc_he _locket_name>>看清自己的照片。
+            <<else>>你指了指一直放在里面的照片。<</if>>
+          <<elseif _args[0] is 'affection'>>
+            你说起挑选这张照片的原因。<<nnpc_He _locket_name>>看看照片，又看看你的脸。你合上吊坠，让它重新贴在胸前。
+          <<elseif _args[0] is 'private'>>
+            你合上吊坠，把话题转向别的事情。
+          <<elseif _args[0] is 'reassure'>>
+            你没有动里面的照片，只说自己今天是来陪对方的。你没有答应更换照片。
+          <<else>>
+            <<if _locket_photo>>你说起挑选这张照片时，想要留住什么。<<else>>你翻转着手里空空的吊坠，解释自己也喜欢这条项链本身。<</if>>
+            说完，你将它合上。
+          <</if>>
+      <</language>>
+  <</switch>>
+<</widget>>
+
+<<widget 'deadwood-locket-memory'>>
+  <<set _locket_memory_name to $carried.neck.photo>>
+  <<if !_locket_memory_name or !C.npc[_locket_memory_name]>><<exit>><</if>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _locket_memory_name is 'Robin' and $robinmissing isnot 0>>
+        You keep thinking about Robin. The little photograph is unchanged, but it cannot give you the answer you want to hear.
+      <<elseif _locket_memory_name is 'Kylar' and C.npc.Kylar.state is 'prison'>>
+        You run a thumb along the edge of Kylar's photograph. Seeing <<nnpc_him 'Kylar'>> again is no longer as simple as opening this little case.
+      <<elseif _locket_memory_name is 'Remy' and $Orchard?.remy?.ended>>
+        You still have the photograph. Your thumb pauses beside the clasp while you think about the last time you spoke.
+      <<elseif _locket_memory_name is 'Avery' and C.npc.Avery.state is 'dismissed'>>
+        Avery's expression has not changed. You turn the locket towards the light, trying to fit the face in the photograph to the person you saw last.
+      <<elseif $stress gte $stressmax * 0.6>>
+        Your thoughts keep dragging your eyes away from the picture. You notice the chain pressing into your fingers and loosen your grip.
+      <<elseif $trauma gte $traumamax * 0.6>>
+        The face in the photograph seems very far away. You keep looking, one finger resting against the little frame.
+      <<elseif $tiredness gte C.tiredness.max * 0.8>>
+        Your eyelids grow heavy. You find yourself staring at the same small detail without remembering what you had meant to look for.
+      <<elseif !isLoveInterest(_locket_memory_name)>>
+        You have kept the photograph all this time. You study it for a moment, your thumb resting beside the clasp.
+      <<else>>
+        You tilt the locket towards the light. For a moment, you think about what you would say if you were sitting together.
+      <</if>>
+    <<option 'CN'>>
+      <<if _locket_memory_name is 'Robin' and $robinmissing isnot 0>>
+        你总惦记着罗宾的处境。小小的照片没有变化，却不能给你想听的答复。
+      <<elseif _locket_memory_name is 'Kylar' and C.npc.Kylar.state is 'prison'>>
+        你的拇指擦过凯拉尔照片的边缘。如今再见<<nnpc_him 'Kylar'>>一面，远没有翻开这个小盒子这么容易。
+      <<elseif _locket_memory_name is 'Remy' and $Orchard?.remy?.ended>>
+        你仍留着这张照片。拇指停在搭扣旁，你想起了上次说话时的情形。
+      <<elseif _locket_memory_name is 'Avery' and C.npc.Avery.state is 'dismissed'>>
+        艾弗里的神情没有变化。你把吊坠转向光亮，试着将这张脸与上次见到的人对上。
+      <<elseif $stress gte $stressmax * 0.6>>
+        纷乱的念头不住地扯开你的视线。察觉链子已经勒进指缝，你才松了松手。
+      <<elseif $trauma gte $traumamax * 0.6>>
+        照片里的面孔显得很远。你仍看着它，一根手指抵在小相框上。
+      <<elseif $tiredness gte C.tiredness.max * 0.8>>
+        眼皮沉沉的。你盯着同一个小地方看了半天，才发现自己早忘了要看什么。
+      <<elseif !isLoveInterest(_locket_memory_name)>>
+        照片一直留在盒里。你看了一会儿，拇指停在搭扣旁。
+      <<else>>
+        你把吊坠稍稍转向光亮，想着下次坐在一起时，可以说些什么。
+      <</if>>
+  <</language>>
+<</widget>>
+
+<<widget 'deadwood-locket-sydney-text'>>
+  <<set _locket_sydney_corrupt to C.npc.Sydney.corruption gte 10>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _args[0] is 'intro'>>
+        Sydney stops what <<he>> is doing when you hold out the open locket.
+        <<if ['broken', 'playerbroken'].includes($sydney.glasses)>>
+          <<He>> leans forward, then admits, "I can't quite make it out." You describe the photograph, keeping the locket in your own hand.
+        <</if>>
+        <<if _locket_photo is 'Sydney'>>
+          <<if _locket_familiar>>"Still that one?" <<He>> recognises it, and the question comes with a smile.
+          <<elseif _locket_sydney_corrupt>>"You keep me there?" <<He>> glances from the photograph to where the locket rests against your chest. "I hope I look less solemn in person."
+          <<else>>"That's me." <<His>> fingers stop just short of the clasp. "I didn't realise you had that photograph."<</if>>
+          <<if !_locket_selected or !$sydneyromance>> <<He>> waits for you to explain rather than deciding what it means.<</if>>
+        <<elseif !_locket_photo>>
+          <<if _locket_sydney_corrupt>>"An empty locket?" <<He>> tilts <<his>> head. "Are you asking my opinion about someone?"
+          <<else>>Sydney studies the little space inside. "Were you planning to put a photograph in it?"<</if>>
+        <<elseif _locket_photo is 'Robin' and $RobinTemple?.dual_promise>>
+          "Robin." Sydney smiles, then looks back at you. "Does <<nnpc_he 'Robin'>> know you chose that one?"
+        <<else>>
+          <<if _locket_selected and $sydneyromance>>Sydney's smile falters for a moment. "I see." <<He>> looks at you rather than the photograph. "Was there something you wanted to tell me?"
+          <<else>>"Someone important to you?" Sydney asks. <<He>> leaves you room to answer.<</if>>
+        <</if>>
+      <<elseif _args[0] is 'affection'>>
+        You say you like having the photograph with you, even when you are apart.
+        <<if _locket_sydney_corrupt>>"You could have said so." <<He>> smiles and offers <<his>> hand beside yours. "I'll try not to keep you waiting so long next time."
+        <<else>>Sydney looks down, visibly pleased. "I'd like that." <<He>> sets <<his>> hand beside yours, leaving you to close the small clasp.<</if>>
+      <<elseif _args[0] is 'reassure'>>
+        You say you came to see Sydney and want to spend this time with <<him>>. You keep the photograph where it is.
+        <<if _locket_photo is 'Robin' and $RobinTemple?.dual_promise>>"Then stay a little," <<he>> says. "We can talk to Robin later."
+        <<else>>"All right." Sydney takes a moment before returning your smile. "Thank you for telling me."<</if>>
+      <<elseif _args[0] is 'private'>>
+        You close the locket. Sydney withdraws <<his>> hand. "You don't have to show me." <<He>> lets you choose the next subject.
+      <<else>>
+        <<if !_locket_photo>>You explain that you like the necklace even without a photograph. "It suits you," Sydney says, looking at the clasp once more.
+        <<elseif _locket_photo is 'Sydney' and !_locket_selected>>You explain that you wanted to keep the photograph. Sydney listens, a little flushed, without calling it a promise.
+        <<else>>You explain what the photograph means to you. Sydney listens to the end. "I'm glad you told me."<</if>>
+      <</if>>
+    <<option 'CN'>>
+      <<if _args[0] is 'intro'>>
+        你托起打开的吊坠，悉尼停下手里的事。
+        <<if ['broken', 'playerbroken'].includes($sydney.glasses)>>
+          <<He>>凑近一些，随后承认：“我看不太清。”你仍把吊坠拿在自己手里，向<<him>>描述照片。
+        <</if>>
+        <<if _locket_photo is 'Sydney'>>
+          <<if _locket_familiar>>“还是这一张？”<<He>>认出了它，问话时带着笑。
+          <<elseif _locket_sydney_corrupt>>“你把我放在这里？”<<He>>看看照片，又看看吊坠平时贴在你胸前的位置。“希望我本人没这么严肃。”
+          <<else>>“这是我。”<<His>>手指停在搭扣旁，没有碰上去。“我不知道你有这张照片。”<</if>>
+          <<if !_locket_selected or !$sydneyromance>><<He>>等着你解释，没有替你决定这意味着什么。<</if>>
+        <<elseif !_locket_photo>>
+          <<if _locket_sydney_corrupt>>“空着的吊坠？”<<He>>偏了偏头。“想问问我，该把谁放进去吗？”
+          <<else>>悉尼端详着里面的一小块空位。“你打算放张照片吗？”<</if>>
+        <<elseif _locket_photo is 'Robin' and $RobinTemple?.dual_promise>>
+          “罗宾。”悉尼笑了笑，重新望向你。“<<nnpc_He 'Robin'>>知道你挑了这张吗？”
+        <<else>>
+          <<if _locket_selected and $sydneyromance>>悉尼的笑容停了一下。“这样啊。”<<He>>看着你，没有再看照片。“你有话想告诉我吗？”
+          <<else>>“对你很重要的人？”悉尼问，等着你回答。<</if>>
+        <</if>>
+      <<elseif _args[0] is 'affection'>>
+        你说，不在一起的时候，也想把这张照片带在身边。
+        <<if _locket_sydney_corrupt>>“早说嘛。”<<He>>笑着把手递到你手边。“下回尽量不让你等那么久。”
+        <<else>>悉尼低下头，藏不住脸上的喜悦。“我很高兴。”<<He>>把手放在你手边，等你合好小小的搭扣。<</if>>
+      <<elseif _args[0] is 'reassure'>>
+        你说，自己今天就是来见悉尼，想陪<<him>>待一会儿。里面的照片仍留在原处。
+        <<if _locket_photo is 'Robin' and $RobinTemple?.dual_promise>>“那就再待一会儿。”<<he>>说，“晚些时候再找罗宾说话。”
+        <<else>>“好。”悉尼停了一会儿，才重新对你微笑。“谢谢你告诉我。”<</if>>
+      <<elseif _args[0] is 'private'>>
+        你合上吊坠。悉尼收回手。“不用勉强给我看。”<<He>>等你说起下一个话题。
+      <<else>>
+        <<if !_locket_photo>>你解释，就算不放照片，你也喜欢这条项链。“很适合你。”悉尼又看了一眼搭扣。
+        <<elseif _locket_photo is 'Sydney' and !_locket_selected>>你解释，自己想留着这张照片。悉尼听着，脸有些红，没有把这当成誓言。
+        <<else>>你说起照片对自己的意义。悉尼听你说完。“谢谢你愿意告诉我。”<</if>>
+      <</if>>
+  <</language>>
+<</widget>>
+
+<<widget 'deadwood-locket-kylar-text'>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _args[0] is 'intro'>>
+        Kylar bends towards the locket before remembering to look at your face.
+        <<if _locket_photo is 'Kylar'>>
+          <<if _locket_familiar>>"You kept it." <<He>> sounds relieved, then watches your hand. "Do you wear it when I'm not there?"
+          <<else>>"Me?" <<He>> looks again. "It's really me." <<His>> smile grows before <<he>> can hide it.<</if>>
+          <<if !_locket_selected>>You have not said what keeping the photograph means. Kylar seems to be waiting for more.<</if>>
+        <<elseif !_locket_photo>>
+          "Nothing in it?" <<He>> looks at the empty space for a little too long. "I could..." <<He>> stops. "If you wanted."
+        <<else>>
+          <<if _locket_photo is 'Whitney'>>"Whitney?" Kylar's shoulders tighten. "Why would you want to carry <<nnpc_him 'Whitney'>> around?"
+          <<elseif _locket_photo is 'Sydney'>>"Sydney." <<He>> says the name quietly, then looks back at you. "You see <<nnpc_him 'Sydney'>> a lot."
+          <<else>>"Who is that?" Kylar asks, still studying the photograph.<</if>>
+          <<if C.npc.Kylar.rage gte 60>>"Take it out." The words come quickly. You keep the locket in your own hand.
+          <<elseif C.npc.Kylar.rage gte 30>>"Do you like that picture better than..." <<He>> leaves the question unfinished.
+          <<else>>The smile slips from <<his>> face. "I didn't know you kept that."<</if>>
+        <</if>>
+      <<elseif _args[0] is 'affection'>>
+        You say you like carrying Kylar's photograph. "Even when I'm not there?" <<He>> asks. You nod.
+        <<He>> smiles down at the locket, then back at you. "I like that." For a while, <<he>> stops asking you to explain it again.
+      <<elseif _args[0] is 'reassure'>>
+        You keep the photograph and tell Kylar that you came to spend time with <<him>>.
+        "With me?" <<His>> gaze returns to your face. "Then stay a little." <<He>> still glances at the locket, but stops asking you to remove the photograph.
+      <<elseif _args[0] is 'private'>>
+        You close the locket before Kylar can look any closer. "I was only asking," <<he>> says. You keep hold of the clasp until <<he>> draws back.
+      <<else>>
+        <<if !_locket_photo>>You explain that you also like it as a necklace. "Oh." Kylar looks down, then asks what sort of photograph would fit.
+        <<elseif _locket_photo is 'Kylar' and !_locket_selected>>You explain that you kept the photograph, without promising a relationship. Kylar listens very carefully. "You still kept it," <<he>> says at last.
+        <<else>>You explain why you chose the photograph. Kylar listens, though <<his>> eyes keep returning to it. You do not offer to throw it away.<</if>>
+      <</if>>
+    <<option 'CN'>>
+      <<if _args[0] is 'intro'>>
+        凯拉尔低头凑向吊坠，随后才想起看你的脸。
+        <<if _locket_photo is 'Kylar'>>
+          <<if _locket_familiar>>“你还留着。”<<He>>松了口气，又看向你的手。“我不在的时候，你也戴着吗？”
+          <<else>>“我？”<<He>>又看了一遍。“真的是我。”<<His>>笑容越来越明显，藏也藏不住。<</if>>
+          <<if !_locket_selected>>你还没有说，留着照片意味着什么。凯拉尔似乎仍在等你往下说。<</if>>
+        <<elseif !_locket_photo>>
+          “什么都没有？”<<He>>盯着那块空位看了好一会儿。“我可以……”<<He>>停住了。“如果你想的话。”
+        <<else>>
+          <<if _locket_photo is 'Whitney'>>“惠特尼？”凯拉尔绷紧了肩膀。“你为什么要把<<nnpc_him 'Whitney'>>带在身边？”
+          <<elseif _locket_photo is 'Sydney'>>“悉尼。”<<He>>轻声念出名字，重新看向你。“你经常去找<<nnpc_him 'Sydney'>>。”
+          <<else>>“这是谁？”凯拉尔问，仍盯着照片。<</if>>
+          <<if C.npc.Kylar.rage gte 60>>“拿出来。”这句话脱口而出。你仍把吊坠握在自己手里。
+          <<elseif C.npc.Kylar.rage gte 30>>“你更喜欢这张，还是……”<<He>>没有问完。
+          <<else>><<His>>笑容慢慢消失了。“我不知道你还留着这个。”<</if>>
+        <</if>>
+      <<elseif _args[0] is 'affection'>>
+        你说，自己喜欢把凯拉尔的照片带在身边。“我不在的时候也一样？”<<He>>问。你点了点头。
+        <<He>>低头朝吊坠笑了笑，又看向你。“我很高兴。”好一会儿，<<he>>都没有再让你解释一遍。
+      <<elseif _args[0] is 'reassure'>>
+        你留着里面的照片，告诉凯拉尔，自己今天是来陪<<him>>的。
+        “陪我？”<<His>>视线回到你的脸上。“那就再待一会儿。”<<He>>仍会瞥向吊坠，但没有继续要求你取出照片。
+      <<elseif _args[0] is 'private'>>
+        没等凯拉尔凑得更近，你便合上了吊坠。“我只是问问。”<<he>>说。你一直握着搭扣，直到<<he>>退开一些。
+      <<else>>
+        <<if !_locket_photo>>你解释，自己也喜欢把它当作项链戴着。“噢。”凯拉尔低下头，随后问起什么样的照片才能放进去。
+        <<elseif _locket_photo is 'Kylar' and !_locket_selected>>你解释，自己留着照片，但没有许诺交往。凯拉尔听得格外认真。“你还是留着它了。”<<he>>最后说。
+        <<else>>你说起挑选这张照片的原因。凯拉尔听着，视线却总往照片上落。你没有答应把它扔掉。<</if>>
+      <</if>>
+  <</language>>
+<</widget>>

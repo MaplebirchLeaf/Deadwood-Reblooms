@@ -9,8 +9,8 @@ export default function CoinCave(maplebirch: typeof window.maplebirch): void {
       'Pirate Zephyr Island Ask': [{ src: '<<set $pirate_journey to 7>>', applybefore: '<<deadwood-coin-voyage-cancel>>', expected: 1 }],
       'Pirate Deck': [
         {
-          srcmatch: /<<link \[\[([^\]|]+)\|Pirate End\]\]>>/,
-          to: '<<link "$1" `V.MoreTransformations?.treasure?.voyage ? "Deadwood Coin Voyage Arrival" : "Pirate End"`>>',
+          srcmatch: /<<link \[\[([^\]|]+)\|Pirate End\]\]>>([\s\S]*?)<<\/link>>/,
+          to: '<<lanLink "$1" `V.MoreTransformations?.treasure?.voyage ? "Deadwood Coin Voyage Arrival" : "Pirate End"`>>$2<</lanLink>>',
           expected: 1
         }
       ]

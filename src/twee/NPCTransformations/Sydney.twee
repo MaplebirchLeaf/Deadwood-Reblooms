@@ -1,6 +1,19 @@
 :: Deadwood Sydney Transformation Widgets [widget]
 
+<<widget 'deadwood-sydney-fall'>>
+  <!-- 失誓当次迁移形态，旧档和按日入口共用检查，不推进成长或日期。 -->
+  <<if maplebirch.get('NPCTransformations') and $settings.transformDivineEnabled and !$statFreeze and !$frozenValues and !$replayScene and C.npc.Sydney?.init is 1 and C.npc.Sydney.state is 'active'>>
+    <<set $_angel to maplebirch.npc.Transformation.get('Sydney', 'angel')>>
+    <<if (_args[0] is true or $_angel.vow is true) and C.npc.Sydney.virginity.temple is false and $_angel.level gt 0>>
+      <<if $_angel.level gte 6>><<run maplebirch.npc.Transformation.set('Sydney', 'fallen', 1)>><</if>>
+      <<run maplebirch.npc.Transformation.set('Sydney', 'angel', 0)>>
+    <</if>>
+    <<set $_angel.vow to C.npc.Sydney.virginity.temple>>
+  <</if>>
+<</widget>>
+
 <<widget 'deadwood-sydney-angelic'>>
+  <<deadwood-sydney-fall>>
   <!-- 悉尼自身的天使能力，直接读取当前形态，不另存玩家特质或派生标记。 -->
   <<if maplebirch.get('NPCTransformations') and $settings.transformDivineEnabled and !$statFreeze and !$replayScene and $combat is 1 and $consensual is 1 and $trauma gt 0 and C.npc.Sydney?.init is 1 and C.npc.Sydney.state is 'active' and maplebirch.npc.Transformation.level('Sydney', 'angel') gte 6>>
     <!-- 沿用原版创伤结算，保留下限、创伤状态和幻觉的更新。 -->
@@ -34,6 +47,7 @@
 
 <<widget 'deadwood-sydney-divine'>>
   <<if maplebirch.get('NPCTransformations') and $settings.transformDivineEnabled and !$statFreeze and !$replayScene and C.npc.Sydney?.init is 1 and C.npc.Sydney.state is 'active' and Number.isInteger(_args[0]) and Number.isInteger(_args[1])>>
+    <<deadwood-sydney-fall>>
     <<set $_tf to maplebirch.npc.Transformation>>
     <<set $_angel to $_tf.get('Sydney', 'angel')>>
     <!-- 不追补安装前或停用期间的天数，同一日范围重复执行也不会再加点。 -->
@@ -42,11 +56,6 @@
       <<set $_fallen to $_tf.get('Sydney', 'fallen')>>
       <<set $_demon to $_tf.get('Sydney', 'demon')>>
       <<set $_pureMax to $_sydney.virginity.vaginal is true and $_sydney.virginity.penile is true ? 100 : 99>>
-      <!-- 检查失败和 PC 失誓不代表悉尼失誓。只处理悉尼自身誓言的变化。 -->
-      <<if $_angel.vow is true and $_sydney.virginity.temple is false and $_angel.level gt 0>>
-        <<if $_angel.level gte 6>><<run $_tf.set('Sydney', 'fallen', 1)>><</if>>
-        <<run $_tf.set('Sydney', 'angel', 0)>>
-      <</if>>
       <<if $_fallen.level gte 3>>
         <!-- 原版获得宽恕后的黑翼不会再因低纯洁直接降为恶魔。 -->
         <<if $_demon.build gt 0>><<run $_tf.set('Sydney', 'demon', 0)>><</if>>
@@ -63,7 +72,6 @@
       <<else>>
         <<run $_tf.build('Sydney', 'angel', $_sydney.purity gte $_pureMax ? 1 : -1)>>
       <</if>>
-      <<set $_angel.vow to $_sydney.virginity.temple>>
       <<set $_angel.day to $_day>>
     <</for>>
   <</if>>

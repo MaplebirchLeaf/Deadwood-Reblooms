@@ -109,7 +109,7 @@
     工资从银行预付，每次一周。欠薪时职员暂停工作，两周后辞职。辞职后不再新增工资，之前的欠薪仍需结清。解雇须付清欠薪，并另付一周工资。已经支付的周薪不退还。
 <</language>><br><br>
 <<if _staff.arrears gt 0>>
-  <<icon 'finance/bank-withdraw.png'>><<lanLink ['Pay all overdue wages', '付清职员欠薪']>>
+  <<icon 'industry/payroll.png'>><<lanLink ['Pay all overdue wages', '付清职员欠薪']>>
     <<set $Finance.company.result to maplebirch.get('Finance').company.staff.pay() ? 'staff-paid' : 'staff-failed'>>
     <<run maplebirch.get('Finance').refresh()>>
     <<run Dynamic.render('deadwood-company-staff-payroll')>>
@@ -147,7 +147,9 @@
       "I can't arrange anything with the buyers while the office is tied up." <<He>> pushes the outstanding notices across the desk. "You'll need to sort these out first."
     <<elseif _role is 'accountant'>>
       <<if _staff.state.accountant.employed>>
-        <<if _company_state.contract?.stage is 'disputed'>>
+        <<if _company_state.contract?.stage is 'invoice' and _company_state.contract.due lt 0>>
+          <<He>> sets the late-delivery statement beside the advance receipt. "We received more than the final price. This is a refund we owe, not a bill I can chase. Keep the factory funded, and leave something for the crew."
+        <<elseif _company_state.contract?.stage is 'disputed'>>
           <<He>> matches the invoice to the signed delivery receipt. "They've accepted the goods. I'll need both copies when I ask for the money."
         <<elseif _company_state.contract?.stage is 'waiting'>>
           "The reminder has gone in." <<He>> taps the promised payment date. "I'll keep the receipt until the money arrives."
@@ -171,6 +173,8 @@
           "They asked about delivery again." <<He>> shows you a note beside the factory's name. "I gave them the date we signed for. Don't promise a second order while this one's still on the floor."
         <<elseif _company_state.contract>>
           "They've asked when we can take another job." <<He>> leaves the quotation unsigned. "I'll wait for this payment before promising anything."
+        <<elseif _company.partner and _company_state.shareholders.policy is 'expansion'>>
+          <<He>> lays a second delivery address beside the quotation. "The board added another quarter to the quantity. This one is <<print _company.quote.batches>> batches, still due in ten days. Check the shifts before signing."
         <<elseif _company.partner and _company_state.policy is 'volume'>>
           <<He>> circles the larger quantity on the next quotation. "More pieces, same delivery window. Check the factory's other work before you sign."
         <<elseif _company.partner and _company_state.policy is 'price'>>
@@ -199,7 +203,9 @@
       “办公室这边有麻烦，我没法替你跟客户安排什么。”<<He>>把尚未处理的通知推过桌面。“先把这些解决吧。”
     <<elseif _role is 'accountant'>>
       <<if _staff.state.accountant.employed>>
-        <<if _company_state.contract?.stage is 'disputed'>>
+        <<if _company_state.contract?.stage is 'invoice' and _company_state.contract.due lt 0>>
+          <<He>>把迟交结算单放到预付款回执旁。“先前收的钱超过了最后的货价。这笔是我们该退，不能拿去催款。给厂里留够钱，也别忘了工人的工资。”
+        <<elseif _company_state.contract?.stage is 'disputed'>>
           <<He>>把账单与签过字的收货回执对上。“货已经收了。去要钱时，两份都得带着。”
         <<elseif _company_state.contract?.stage is 'waiting'>>
           “催款单已经递过去了。”<<He>>敲敲约好的付款日期。“钱到账之前，回执我会留着。”
@@ -223,6 +229,8 @@
           “他们又问交货的事了。”<<He>>给你看厂房名字旁的记录。“我说了合同上的日期。这批还在做，别急着再答应一批。”
         <<elseif _company_state.contract>>
           “他们问我们什么时候还能接活。”<<He>>没有在报价上签字。“这笔钱先到账，再答应下一单吧。”
+        <<elseif _company.partner and _company_state.shareholders.policy is 'expansion'>>
+          <<He>>把第二个送货地址放到报价旁。“董事会又加了四分之一的数量。这回是<<print _company.quote.batches>>批，还是十天内交。先看班表，再签字。”
         <<elseif _company.partner and _company_state.policy is 'volume'>>
           <<He>>圈出下次报价上增加的数量。“件数多了，交货的时间没变。签字前，看看厂里还有什么活要做。”
         <<elseif _company.partner and _company_state.policy is 'price'>>
@@ -263,6 +271,14 @@
       授权后，会计会在公司货款逾期后的工作日递交催款单，三天后收回全款。不包括工厂的其它账单。
   <</language>><br>
   <<if _staff.accountant>>
+    <<if _company_state.contract?.stage is 'disputed'>>
+      <<icon 'company/invoice.png'>><<lanLink ['Ask the accountant to submit this reminder now (0:10)', '请会计现在递交这笔催款单 (0:10)'] 'Deadwood Reblooms Company Staff'>>
+        <<set $Finance.company.result to 'staff-failed'>>
+        <<if maplebirch.get('Finance').company.staff.accountant and maplebirch.get('Finance').company.collect(false)>>
+          <<set $Finance.company.result to 'staff-ok'>><<pass 10>>
+        <</if>><<endevent>>
+      <</lanLink>><br>
+    <</if>>
     <<icon 'company/invoice.png'>><<lanLink [`${_staff.state.collection ? 'Handle reminders yourself' : 'Authorise invoice reminders'}`, `${_staff.state.collection ? '自己处理催款' : '授权催收货款'}`] 'Deadwood Reblooms Company Staff'>>
       <<set $Finance.company.result to 'staff-failed'>>
       <<if maplebirch.get('Finance').company.dealing and maplebirch.get('Finance').company.staff.accountant>>

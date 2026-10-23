@@ -57,6 +57,7 @@
       <</if>>
     <<elseif $_caveRoll is 3>>
       <<set _coinCave.scene to 'whispers'>><<stress 2>>
+      <<run maplebirch.get('Psyche')?.change(0, _coinCave.torch lt 20 ? 80 : 40)>>
     <<elseif $_caveRoll is 4>>
       <<set _coinCave.scene to _coinCave.together ? 'captain' : 'tracks'>>
     <</if>>
@@ -78,7 +79,7 @@
   <<set $_coinShared to _coinCave.together and !_coinCave.bound and _coinCave.returns is 0 and !(_coinCave.journal or _coinCave.inscription or _coinCave.appraised)>>
   <<set $_coinAmount to Math.min(_args[0], 882 - _coinCave.coins - _coinCave.zephyrCoins - _coinCave.museumCoins - _coinCave.crewCoins - ($_coinShared ? 3 : 0))>>
   <<if $_coinAmount lte 0>><<exit>><</if>>
-  <<if !_coinCave.bound>><<run maplebirch.get('Psyche')?.change(-90, 300)>><</if>>
+  <<if !_coinCave.bound and _coinCave.returns is 0>><<run maplebirch.get('Psyche')?.change(-150, 350)>><</if>>
   <<set _coinCave.coins += $_coinAmount, _coinCave.scene to _coinCave.bound ? 'more_gold' : 'first_gold', _coinCave.bound to true>>
   <<if $_coinShared>>
     <<set _coinCave.zephyrCoins to 3, _coinCave.agreed to false>>
@@ -93,7 +94,7 @@
   <<set _coinCave.coins to 0, _coinCave.scene to 'part_returned'>>
   <<if _coinCave.together and _coinCave.agreed>><<set _coinCave.zephyrCoins to 0>><</if>>
   <<if _coinCave.coins + _coinCave.zephyrCoins + _coinCave.museumCoins + _coinCave.crewCoins is 0>>
-    <<if _coinCave.returns is 0>><<stress -12>><<run maplebirch.get('Psyche')?.change(120, -350)>><</if>>
+    <<if _coinCave.returns is 0>><<stress -12>><<run maplebirch.get('Psyche')?.change(100, -350)>><</if>>
     <<set _coinCave.bound to false, _coinCave.agreed to false, _coinCave.returns += 1, _coinCave.scene to maplebirch.npc.Transformation.level('Zephyr', 'undead') gt 0 ? 'cured_together' : 'cured'>>
     <<run maplebirch.char.transformation.setTransform('undead', 0)>>
     <<run maplebirch.npc.Transformation.set('Zephyr', 'undead', 0)>>
@@ -101,11 +102,52 @@
   <<deadwood-coin-cave-time 5>>
 <</widget>>
 
+<!-- 三种读法共用证据转换，完成用时后再结算，旧线索不因重新进洞重复生效。 -->
+<<widget 'deadwood-coin-read'>>
+  <<set $_coinEvidence to _args[0], $_coinReading to _args[1]>>
+  <<deadwood-coin-context>>
+  <<if !_coinReady or $combat or $location isnot 'island' or !['journal', 'inscription'].includes($_coinEvidence) or !['plain', 'careful', 'deep'].includes($_coinReading)
+    or _coinCave[$_coinEvidence] or _coinCave.room isnot ($_coinEvidence is 'journal' ? 'camp' : 'writing') or _coinCave.torch lt 20>><<exit>><</if>>
+  <<set $_coinPsyche to maplebirch.get('Psyche'), $_coinRoom to _coinCave.room>>
+  <<if $_coinReading isnot 'plain' and !$_coinPsyche?.active>><<exit>><</if>>
+  <<if $_coinReading is 'careful' and $_coinPsyche.state.sanity lt 600>><<exit>><</if>>
+  <<set $_coinSanity to $_coinReading is 'deep' ? -100 : -30, $_coinFear to $_coinReading is 'deep' ? 150 : 60>>
+  <<if $_coinReading is 'careful'>>
+    <<if $_coinPsyche.state.sanity gte 900>>
+      <<set $_coinSanity to -15, $_coinFear to 30>>
+    <<else>>
+      <<willpowerdifficulty 400 400 'silent'>>
+      <<if $willpowerSuccess>><<set $_coinSanity to -15, $_coinFear to 30>><</if>>
+    <</if>>
+  <</if>>
+  <<deadwood-coin-cave-time `$_coinReading is 'careful' ? 20 : 10`>>
+  <<deadwood-coin-context>>
+  <<if !_coinReady or $combat or $location isnot 'island' or _coinCave.room isnot $_coinRoom or _coinCave[$_coinEvidence]>><<exit>><</if>>
+  <<set _coinCave[$_coinEvidence] to true, _coinCave.scene to ($_coinEvidence is 'journal' ? 'notes' : 'writing') + ($_coinReading is 'deep' ? '_deep' : $_coinSanity is -15 ? '_careful' : '')>>
+  <!-- 异常读法的线索沿用探索记录，普通读法仍可完成整个调查。 -->
+  <<if $_coinReading is 'deep'>>
+    <<run _coinCave.visited.pushUnique($_coinEvidence + '_deep')>>
+    <<if $_coinEvidence is 'journal'>><<set _coinCave.shortcut to true>><</if>>
+  <</if>>
+  <<if $_coinEvidence is 'inscription' and currentSkillValue('history') gte 500>><<set _coinCave.shortcut to true>><</if>>
+  <<run maplebirch.get('Psyche')?.change($_coinSanity, $_coinFear)>>
+  <<if _coinCave.journal and _coinCave.inscription and !_coinCave.visited.includes('understood')>>
+    <<run _coinCave.visited.pushUnique('understood')>>
+    <<run maplebirch.get('Psyche')?.change(40, -100)>>
+  <</if>>
+<</widget>>
+
 <<widget 'deadwood-coin-journal'>>
   <<if !maplebirch.get('MoreTransformations') or !$MoreTransformations?.treasure?.found>><<exit>><</if>>
   <<set _coinCave to $MoreTransformations.treasure>>
   <div class='gold bold'><<lanSwitch 'The island gold' '海岛藏金'>></div>
   <ul class='journal'>
+    <<if _coinCave.shortcut and !_coinCave.visited.includes('vault')>>
+      <li><<lanSwitch 'You found a dry passage from the entrance to the carved arch. It avoids the flooded crossing.' '你找到了洞口通往石刻拱门的干路，可以绕过积水。'>></li>
+    <</if>>
+    <<if _coinCave.visited.includes('inscription_deep') and _coinCave.guardian isnot 'cleared'>>
+      <li><<lanSwitch 'The carved figures approach with open hands. The guard may recognise the same gesture.' '石刻中的人影摊着双手走向石箱。守卫也许还认得这个手势。'>></li>
+    <</if>>
     <<if !_coinCave.visited.includes('vault')>>
       <li><<lanSwitch 'You marked a path leading from your island camp to the hidden sea cavern. A fire flickers in the depths; search the camp and passages for traces left by earlier visitors.' '你记下了从海岛营地前往那处隐蔽石窟的路径。洞口深处隐隐有火光摇曳，可以在前人遗弃的宿营地与石壁间寻找线索。'>></li>
     <<elseif !_coinCave.bound and !_coinCave.returns>>

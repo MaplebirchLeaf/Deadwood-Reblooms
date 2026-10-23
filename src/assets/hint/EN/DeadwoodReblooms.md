@@ -1,64 +1,34 @@
-### Prerequisites
+# Getting started
 
-For game **0.5.12.13** with maplebirch framework **5.4.15 or later**. Install the loader's required dependencies, enable Deadwood Reblooms and your chosen submodules, then save and reload.
+Requires game **0.5.12.13 or later**, maplebirch framework **5.5.4 or later**, and the other dependencies listed by the loader.
 
-### Guide, settings and statistics
+Choose modules in the guide contents, save the game and reload. Disabling a parent disables its dependants. Enabling a child enables the modules it needs. Module choices are saved in this browser. Character progress and assets are stored in your save.
 
-| Entrance                    | Contents                                                                                  | Use it to                                    |
-| --------------------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Sidebar mod hints           | Search chapters and toggle modules                                                        | Find features and requirements               |
-| Mod settings                | Rent, visual, music and encounter options                                                 | Configure gameplay and presentation          |
-| Statistics → Mod statistics | Breakthroughs, transformations, school, finance, orchard, transport and street records    | Check recorded milestones and settled totals |
-| Game journal                | Current jobs, bills, vehicle locations and next leads                                     | Progress stories and manage everyday tasks   |
-| Original cheat panel        | Bank balance, driving, vehicle condition, ammunition, orchard supplies and school ratings | Adjust existing resources and attributes     |
+## Where to look
 
-### Where to start
+| Entrance                    | Use                                                               |
+| --------------------------- | ----------------------------------------------------------------- |
+| Sidebar → Mod guide         | Find features and requirements, search chapters or toggle modules |
+| Settings → Mod settings     | Adjust interface, rent, music and encounter options               |
+| Journal                     | Check current jobs, bills, vehicle locations and story leads      |
+| Statistics → Mod statistics | Review milestones, earnings and cumulative records                |
+| Original cheat panel        | Adjust funds, vehicles, ammunition and stock for enabled modules  |
 
-Tick the modules you want in the guide contents, save and choose Reload now. Use the table below to find a starting point; each chapter explains the relationship, skill and story requirements. The journal tracks what you are doing, while mod statistics records completed milestones.
+Use the journal for your next step and statistics to review what you have done. Order and bounty earnings are recorded only after payment. Company-car earnings are recorded after the shift. Heist shares and preparation costs are recorded separately.
 
-| Goal                             | Chapter                                                    | Starting point                                                      |
-| -------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------- |
-| Multiple love interests          | More love interests and social avatars                     | Character → Attitudes, checking awareness and candidate eligibility |
-| Robin's business                 | Robin                                                      | Beach lemonade cart and park cocoa stand                            |
-| Sydney's class, dorm and estate  | Sydney                                                     | Science, lunch, temple and adult shop                               |
-| Whitney's rescue or daily life   | Whitney                                                    | Underground cell, or unlocked dock / flat interactions              |
-| Kylar's home life                | Kylar                                                      | Manor after the first vanilla stay                                  |
-| School roles and fitness         | LifeSimulation                                             | Headteacher's office and Cliff Street gym                           |
-| Banking and investing            | [Banking and investing](#deadwood-guide-FinanceBanking)    | High Street financial centre                                        |
-| Companies and shareholder status | [Business and governance](#deadwood-guide-FinanceBusiness) | Financial centre upper floor and Elk Street factory                 |
-| Homes, furniture and residents   | [Homes and living](#deadwood-guide-FinanceHomes)           | Financial centre property counter and furniture shop                |
-| Driving, taxi work and lifts     | [Transport](#deadwood-guide-Transport)                     | Elk Street driving school and Harvest Street dealership             |
-| Weapons, jobs and bounties       | [Street Life](#deadwood-guide-StreetLife)                  | Smuggler pub, Landry at the pub and police station                  |
-| Getting to know Remy             | Orchard                                                    | Riding school during the day                                        |
-| Horse, whale and raven forms     | [Transformations](#deadwood-guide-MoreTransformations)     | Riding school, beach rock pool, park or old churchyard              |
-| Portraits, music and cheats      | Relevant interface chapter                                 | Settings, sidebar cheat entry or original scenes                    |
+## Common settings
 
-### Basic option effects
+- **Sidebar buttons**: choose desktop, mobile or hidden. Hiding a button does not disable its features.
+- **Custom bodywriting**: enable it, then use the vanilla mirror to set text and colours.
+- **Mobile status bars and undo**: check attributes or return to the previous passage from the collapsed sidebar. Vanilla undo limits still apply.
+- **Bailey rent accumulation**: unpaid weekly rent carries over to later bills.
+- **Hide ear slimes**: hides their appearance without removing the parasites or their effects.
+- **Wardrobe search**: enter a clothing name in the current language and confirm. Clear the field and confirm again to restore the list.
 
-| Option                   | How to use                                             | Effect and limits                                                       |
-| ------------------------ | ------------------------------------------------------ | ----------------------------------------------------------------------- |
-| Sidebar control position | Desktop, mobile or hidden                              | Hiding the entrance does not disable modules                            |
-| Custom bodywriting       | Enable, then use the vanilla mirror                    | Set bodywriting text and colours                                        |
-| Mobile status bars       | Enable in mod settings                                 | Shows vanilla attribute progress in the collapsed sidebar               |
-| Mobile undo button       | Enable in mod settings                                 | Goes back one passage from the collapsed sidebar, within vanilla limits |
-| Bailey rent accumulation | Enable in mod settings                                 | Refused weekly rent increases later bills                               |
-| Hide ear slime parasites | Enable in mod settings                                 | Visual only, with traits and parasite state retained                    |
-| Wardrobe search          | Enter a name in the main wardrobe category and confirm | Filters in the current language. Clear and confirm to restore the list  |
+Cheat-panel number changes apply immediately. Bank adjustments count as cheat income. Orchard stock cannot fall below reserved quantities, and fuel and vehicle condition cannot be changed during a journey.
 
-### Progress and earnings
+## Missing options
 
-Use the **journal** for your next step, bills, cargo, vehicles and payments waiting to be collected. **Mod statistics** summarises completed activity: orders and bounties count money actually paid, and company-car taxi income counts at the end of a shift. Heist shares and preparation spending are recorded separately, so include the costs when checking your return.
+Check that the module is enabled and the game has been reloaded. Then check the location, NPC schedule, story progress, affection or skills, funds, time and weather, and daily limits. Each chapter lists its requirements.
 
-The Deadwood Reblooms section in the original cheat panel follows your enabled modules. Number controls take effect immediately; bank balance adjustments count as cheat income. Orchard stock cannot fall below reserved quantities, and vehicle condition and fuel cannot be changed during a journey.
-
-### Toggles, saves and reloads
-
-Disabling the root disables its submodules. Disabling a parent disables dependants, and enabling a child enables required dependencies. Re-enable the root through framework module management.
-
-Module choices belong to this browser's framework settings rather than each individual save. Save-specific music and other options remain separate. Past stories and their records are retained.
-
-<span class="teal">Remember to save before reloading.</span> Character and achievement chapters include later story details.
-
-### Missing entrances
-
-Check **module and reload → location → schedule → previous stage → relationship / skill / funds → time and weather → daily limits**. For errors include game, framework and mod versions, the exact entrance, text before and after clicking and the complete error.
+When reporting an error, include the game, framework and mod versions, the location, what happened before and after clicking, and the full error text.

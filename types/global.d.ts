@@ -19,6 +19,8 @@ declare module 'twine-sugarcube/userdata' {
     BirdTower: BirdTowerState;
     Finance: FinanceState;
     Transport: TransportState;
+    /** DoLX 原生咖啡馆工作记录，仅兼容层读取。 */
+    robinCafe?: { weekShifts: number; rainDays: number; lastWage: number };
   }
 }
 
@@ -52,6 +54,13 @@ declare global {
     isLoveInterest(name: string): boolean;
     isPossibleLoveInterest(name: string): boolean;
     getRobinLocation(): string | undefined;
+    // DoLX 原生摊位结算接口，仅在检测到该分支后调用。
+    ensureRobinStand(): { selfSufficient: number; fellBehind: number; owed: number; missedWeeks: number; lastIncome: number };
+    robinStandRent(): number;
+    robinStandBaseIncome(): number;
+    robinStandWeatherModifier(): number;
+    robinCafeStandModifier?(): number;
+    robinCafeShiftWage?(): number;
     getKylarLocation(): { area: string; state: string };
     averyMansionScore?: () => number;
     mapMove: ((destination: string) => void) & { deadwoodPublicWalk?: boolean };
@@ -83,6 +92,7 @@ declare global {
     NpcCombatMapper: { getNpcPenetratorFilter(npc: unknown): unknown };
     XrayCombatMapper: { mapXrayPlayerPenis(options: unknown, penetrator: unknown): void };
     sydneySchedule?: () => void;
+    childAgeOf(child: { bornDate?: number }): number;
   }
 
   function wearingCondom(who: number | 'player'): boolean;

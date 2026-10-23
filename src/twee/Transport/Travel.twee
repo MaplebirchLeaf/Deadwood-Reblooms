@@ -114,7 +114,8 @@
       <</if>>
       <<for _destination range _transport.destinations.filter(destination => (!$Transport.commute || destination.id === $Transport.commute.to) && (!maplebirch.get('Finance')?.realEstate.outings.travelling || destination.id === maplebirch.get('Finance').realEstate.outings.target))>>
         <<capture _destination>>
-          <<switch _destination.id.split(':')[0]>>
+          <<switch _destination.id.startsWith('farmroad') ? 'road' : _destination.id.split(':')[0]>>
+            <<case 'road'>><<roadicon>>
             <<case 'farmland'>><<farmicon>>
             <<case 'forest'>><<foresticon>>
             <<case 'moor'>><<mooricon>>
@@ -406,6 +407,6 @@
       <</if>>
     <</lanLink>><<promiscuous2>><br><br>
   <</if>>
-  <<lanSwitch 'Back at the vehicle, your companions make their way home while you decide where to go next.' '回到车旁，同行的恋人准备回住处。你则想了想接下来要去哪里。'>><br><br>
+  <<lanSwitch 'You return to the vehicle together and decide where to go next.' '你们一起回到车旁，商量接下来去哪儿。'>><br><br>
 <</if>>
 <<getouticon>><<lanLink ['Continue', '继续'] _transport.arrival>><</lanLink>><br>

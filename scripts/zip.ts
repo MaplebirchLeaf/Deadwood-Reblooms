@@ -57,6 +57,7 @@ interface ReplacePatcherRule {
   from: string;
   to: string;
   fileName: string;
+  all?: boolean;
 }
 
 interface BootFileLists {
@@ -203,6 +204,7 @@ function buildRules(content: string, type: 'twee' | 'patcher'): Array<TweePatche
         to: typeof item.to === 'string' ? item.to : (relative ?? ''),
         fileName: String(item.fileName ?? '')
       };
+      if (item.all === true) rule.all = true;
       return rule.from && rule.to && rule.fileName ? rule : null;
     }
 

@@ -47,7 +47,14 @@ class Remy {
 
   public preInit(): void {
     this.orchard.core.npc.Pregnancy.add('Remy', { canBePregnant: true, canImpregnatePlayer: true });
-    this.orchard.core.npc.add({ nam: 'Remy' }, { important: true, loveInterest: true, romance: [() => V.Orchard?.remy?.romance === true] });
+    this.orchard.core.npc.add(
+      { nam: 'Remy' },
+      {
+        important: () => !!V.Orchard?.remy && this.stage !== 'new',
+        loveInterest: true,
+        romance: [() => V.Orchard?.remy?.romance === true]
+      }
+    );
   }
 
   public get state(): typeof Remy.defaults {

@@ -14,7 +14,7 @@ Earn the Great Hawk's trust, then hatch and raise chicks at the tower. Bird Towe
 
 - Check their daily activities and hunger when viewing your children, then feed them lurkers brought back to the tower.
 - While they remain nestlings, one lurker feeds all the children. After fledging, each chick needs two meals a day. Feed a particular chick or divide the food evenly, then return with more if needed.
-- Extra meals during early growth can help increase their size. Once they hunt independently, they no longer need daily feeding from you.
+- Regular feeding maintains growth; extra meals can help increase their size. Once they hunt independently, they no longer need daily feeding from you.
 - Moulting, first flight and first hunt follow their age. If the weather or the Great Hawk's situation prevents an event, return another day.
 
 After feeding, check how much food was used and how much remains. You can feed hungry children again.

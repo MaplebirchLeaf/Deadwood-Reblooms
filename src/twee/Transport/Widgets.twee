@@ -185,6 +185,26 @@
   <<if $_transport_state.notice>><br><br><</if>>
 <</widget>>
 
+<<widget 'deadwood-transport-school-book'>>
+  <<set _school_booking_action to _args[0], _school_booking_revision to _args[1]>>
+  <<set _school_booking_stale to _school_booking_revision isnot $Transport.school.revision>>
+  <<if maplebirch.get('Transport').school.attend(_school_booking_action, _school_booking_revision) and maplebirch.passage.title is 'Deadwood Transport School'>>
+    <<goto 'Deadwood Transport School'>>
+  <<elseif maplebirch.passage.title is 'Deadwood Transport School' and !$nextPassage and !$nextPassageCheck and !$combat and !$possessed and !$replayScene and !$statFreeze>>
+    <!-- 预约失效时重新核对当前条件，避免保留一个没有回应的旧按钮。 -->
+    <<run Dynamic.render('deadwood-transport-school')>>
+    <<replace '#deadwood-transport-school-notice'>>
+      <<if _school_booking_stale>>
+        <span class='purple'><<lanSwitch 'The receptionist checks the booking again. "The arrangements have changed. Please choose again."' '前台重新核对预约。“安排已经变了，请重新选一项。”'>></span>
+      <<elseif _school_booking_revision isnot $Transport.school.revision>>
+        <span class='purple'><<lanSwitch 'The instructor closes the file. "That session was interrupted. Come back to the desk when you can continue."' '教练合上档案。“刚才那项没能办完。能继续的时候，再来前台安排。”'>></span>
+      <<elseif _school_booking_action isnot _school.nextStep>>
+        <<deadwood-transport-school-blocked _school.fees[_school_booking_action] _school_booking_action>>
+      <</if>><br><br>
+    <</replace>>
+  <</if>>
+<</widget>>
+
 <<widget 'deadwood-transport-school-next'>>
   <<set _school_next to _school.nextStep>>
   <<if _school_next>>

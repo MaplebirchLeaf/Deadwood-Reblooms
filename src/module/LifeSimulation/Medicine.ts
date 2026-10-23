@@ -8,6 +8,7 @@ interface MedicineDefinition {
   description: readonly string[];
   price: number;
   hours: number;
+  fear?: number;
 }
 
 export type MedicineId = keyof typeof catalogue;
@@ -30,7 +31,7 @@ export interface MedicineState {
   review: { day: number; shared: boolean; pending: boolean };
 }
 
-// 药品目录只保存名称、说明、售价和时长，服药效果仍由本模块结算。
+// 药品目录保存展示与效果参数，服药结算复用已有剂量、耐受与有效期。
 export const MEDICINES: readonly MedicineDefinition[] = Object.entries(catalogue).map(([id, item]) => ({ id: id as MedicineId, ...item }));
 
 const EMPTY_USE: Use = { owned: 0, last: -1, day: -1, count: 0, streak: 0, dependence: 0, until: 0, rebound: 0, settledDay: -1 };
@@ -140,6 +141,7 @@ export default class Medicine {
     // 重复使用只增加风险，不累积或延长当前药效。
     const fresh = !this.active(id);
     const strength = this.level(id) >= 2 ? 0.5 : 1;
+    const fearBefore = this.core.get('Psyche')?.state.fear ?? 0;
     if (fresh) {
       use.until = now + item.hours * HOURS;
       const before = id === 'alert' ? V.tiredness : V.trauma;
@@ -151,11 +153,13 @@ export default class Medicine {
         soothe: `<<trauma ${-2 * strength}>><<tiredness 2>>`
       };
       this.core.SugarCube.Wikifier.wikifyEval(effects[id]);
+      if (item.fear) this.core.get('Psyche')?.change(0, item.fear * strength);
       if (id === 'alert' || id === 'soothe') use.rebound = Math.max(0, before - (id === 'alert' ? V.tiredness : V.trauma));
     } else {
       this.core.SugarCube.Wikifier.wikifyEval('<<stress 3>><<tiredness 3>>');
     }
-    V.lastPillTakenDescription = `<<deadwood-medicine-dose '${id}' \`${JSON.stringify(item.description)}\` ${fresh} ${repeat} ${use.count > 1} ${use.streak >= 7}>>`;
+    const fearReduced = (this.core.get('Psyche')?.state.fear ?? fearBefore) < fearBefore;
+    V.lastPillTakenDescription = `<<deadwood-medicine-dose '${id}' \`${JSON.stringify(item.description)}\` ${fresh} ${repeat} ${use.count > 1} ${use.streak >= 7} ${fearReduced}>>`;
     this.core.SugarCube.Engine.play('Take Pill From Medicine Drawer');
   }
 

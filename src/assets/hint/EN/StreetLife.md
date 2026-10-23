@@ -18,7 +18,7 @@ Check the **journal** for active jobs, cargo locations and next steps. **Statist
 
 Visit the first road section outside Harvest Street at night to ask about the races, watch a start or enter your own car. The route follows the road to the farmland, with novice and open classes. Ordinary cars can enter; motorcycles and bicycles do not compete in these classes. Snow cancels racing, while rain makes it easier to lose grip. Deal with any road encounter before approaching the gathering.
 
-Check the entry fee, prizes and your vehicle before paying. Your car must actually be parked near the start; a car left in a garage cannot be summoned. Finish passenger and delivery work first. Driving skill, vehicle performance and decisions on the road all matter, so buying a more expensive car does not guarantee a win.
+Check the entry fee, prizes and your vehicle before paying. Choose **Road out of town** in your car's travel menu and drive to the start before approaching the racers. A car left on Harvest Street or in a garage cannot enter remotely. Finish passenger and delivery work first. Driving skill, vehicle performance and decisions on the road all matter, so buying a more expensive car does not guarantee a win.
 
 The novice entry fee is <span class="gold">£25</span>, with prizes of <span class="gold">£90 / £35 / £10</span> for the first three places. The open class requires 300 driving experience and costs <span class="gold">£100</span>, with prizes of <span class="gold">£300 / £150 / £50</span>. Entry takes two minutes, followed by twenty-one minutes for an uninterrupted run. Your car needs at least 45% condition and enough fuel for the whole course.
 

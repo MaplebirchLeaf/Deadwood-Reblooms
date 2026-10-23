@@ -6,7 +6,27 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
   for (const rule of zone.widgetPassage['Widgets State Man'] ?? []) {
     if (rule.applybefore?.includes('Math.round($enemyarousal)')) rule.expected = 17;
   }
+  if (maplebirch.get('Psyche')) {
+    // DoLX 在天气活动后才推进一小时，恢复移到实际睡满后，跨午夜按新的一天计入额度。
+    const recovery = zone.widgetPassage['Widgets Sleep']?.find(
+      rule => rule.src === '<<set Weather.BodyTemperature.addActivity("sleep")>>' && rule.applyafter?.includes('maplebirch.get("Psyche")?.rest(')
+    );
+    if (recovery && maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Sleep')?.content.includes('<<set $sleepTimePassing to false>>')) {
+      recovery.src = '<<set $sleepTimePassing to false>>';
+    }
+  }
   if (maplebirch.get('MoreTransformations')) {
+    // DoLX 在时间推进后扣除缓存恢复量，保留其原生倍率、取整和防停滞检查。
+    const sleep = zone.widgetPassage['Widgets Sleep']?.find(rule => rule.to?.includes('$_undeadSleepStart'));
+    if (
+      sleep &&
+      maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Sleep')?.content.includes('<<set $tiredness -= _sleepTirednessRecovery>>')
+    ) {
+      delete sleep.srcmatch;
+      sleep.src = '<<set $tiredness -= _sleepTirednessRecovery>>';
+      sleep.to = '<<set $tiredness -= _sleepTirednessRecovery * (maplebirch.get("MoreTransformations")?.Undead.active ? 0.5 : 1)>>';
+    }
+
     // 鸦化使用 DoLX 本次实际生效的言语特质，保留药物和道歉倍率。
     for (const rule of zone.widgetPassage['Widgets Effects Man'] ?? []) {
       if (![rule.to, rule.applyafter].some(text => text?.includes("maplebirch.get('MoreTransformations').Raven.speech"))) continue;

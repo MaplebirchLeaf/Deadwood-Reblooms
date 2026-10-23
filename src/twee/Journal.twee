@@ -44,7 +44,7 @@
                 <</language>>
               </span>
             <<default>>
-              <<lanSwitch 'Outstanding invoice: ' '待收货款：'>><<deadwood-reblooms-finance-money $Finance.company.contract.due>>
+              <<lanSwitch `$Finance.company.contract.due < 0 ? 'Advance to return: ' : 'Outstanding invoice: '` `$Finance.company.contract.due < 0 ? '应退预付款：' : '待收货款：'`>><<deadwood-reblooms-finance-money `Math.abs($Finance.company.contract.due)` `$Finance.company.contract.due < 0 ? 'red' : 'gold'`>>
               · <<deadwood-reblooms-finance-date $Finance.company.contract.pay_day>>
           <</switch>>
         </li>
@@ -273,7 +273,9 @@
             <</if>>
           <</if>>
           <<if _factory_state.invoices.length>>
-            <li><<lanSwitch "Unpaid invoices: " "待收货款：">><<deadwood-reblooms-finance-money `_factory_state.invoices.reduce((sum, invoice) => sum + invoice.order.total, 0)`>></li>
+            <<set $_factoryReceivables to _factory_state.invoices.reduce((sum, invoice) => sum + Math.max(0, invoice.order.total), 0), $_factoryRefunds to _factory_state.invoices.reduce((sum, invoice) => sum + Math.max(0, -invoice.order.total), 0)>>
+            <<if $_factoryReceivables gt 0>><li><<lanSwitch 'Unpaid invoices: ' '待收货款：'>><<deadwood-reblooms-finance-money $_factoryReceivables>></li><</if>>
+            <<if $_factoryRefunds gt 0>><li class='red'><<lanSwitch 'Advances to return: ' '应退预付款：'>><<deadwood-reblooms-finance-money $_factoryRefunds 'red'>></li><</if>>
           <</if>>
           <<if _factory_state.automatic or _factory_state.laboratory.automatic>>
             <<if !_factory_state.manager>>
@@ -638,14 +640,18 @@
   <<if !_operations_company.state.office and !_operations_factories.length and !_operations_company.state.contract>><<exit>><</if>>
   <<set _operations_staff_debt to _operations_company.staff.arrears>>
   <<set _operations_arrears to _operations_company.state.rent_arrears + _operations_staff_debt + _operations_factories.reduce((sum, factory) => sum + factory.wage_arrears + factory.overhead_arrears, 0)>>
-  <<set _operations_receivables to _operations_factories.reduce((sum, factory) => sum + factory.invoices.reduce((total, invoice) => total + invoice.order.total, 0) + factory.laboratory.invoices.reduce((total, invoice) => total + invoice.total, 0), 0)>>
+  <<set _operations_receivables to _operations_factories.reduce((sum, factory) => sum + factory.invoices.reduce((total, invoice) => total + Math.max(0, invoice.order.total), 0) + factory.laboratory.invoices.reduce((total, invoice) => total + invoice.total, 0), 0)>>
   <<if ['disputed', 'waiting'].includes(_operations_company.state.contract?.stage)>>
     <<set _operations_receivables += _operations_company.state.contract.due>>
   <</if>>
   <<deadwood-card 'Business accounts' '经营总账'>>
+    <<set $_operationsRefunds to _operations_factories.reduce((sum, factory) => sum + factory.invoices.reduce((total, invoice) => total + Math.max(0, -invoice.order.total), 0), 0)>>
     <div class='dr-finance-summary'>
       <span><<lanSwitch 'Factory working funds' '工厂周转金'>></span><span><<deadwood-reblooms-finance-money `_operations_factories.reduce((sum, factory) => sum + factory.cash, 0)`>></span>
       <span><<lanSwitch 'Outstanding customer payments' '待收客户货款'>></span><span><<deadwood-reblooms-finance-money _operations_receivables>></span>
+      <<if $_operationsRefunds gt 0>>
+        <span><<lanSwitch 'Advances to return' '应退预付款'>></span><span><<deadwood-reblooms-finance-money $_operationsRefunds 'red'>></span>
+      <</if>>
       <span><<lanSwitch 'Unpaid business wages and bills' '经营欠薪与未付费用'>></span><span><<deadwood-reblooms-finance-money _operations_arrears `_operations_arrears > 0 ? 'red' : 'gold'`>></span>
       <<if _operations_factories.length>>
         <span><<lanSwitch "Seven days' factory payroll and bills" '工厂七天工资与日常费用'>></span><span><<deadwood-reblooms-finance-money `_operations_factories.reduce((sum, factory) => sum + _operations_finance.industry.dailyCosts[factory.site] * 7, 0)`>></span>

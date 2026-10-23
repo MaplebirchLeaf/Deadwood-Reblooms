@@ -16,12 +16,12 @@
   <<set _shipRaid to $MoreTransformations?.harbour?.raid>>
   <<if !_shipRaid or !maplebirch.get('MoreTransformations') or $location isnot 'pirate_ship' or $combat or $replayScene or $statFreeze or $frozenValues or $possessed or $nextPassage or $nextPassageCheck>><<exit>><</if>>
   <<if !_shipRaid.stage>>
-    <<run maplebirch.get('Psyche')?.change(-15, 180)>>
+    <<run maplebirch.get('Psyche')?.change(-30, 250)>>
     <<set _shipRaid.day to Math.floor(Time.days), _shipRaid.stage to 'choice', _shipRaid.outcome to '', _shipRaid.approach to Weather.bloodMoon ? 'blood' : either('bell', 'dark'), _shipRaid.talked to false, _shipRaid.rested to false, _shipRaid.needsEffects to false, _shipRaid.encounters += 1>>
   <</if>>
   <<if _shipRaid.stage isnot 'choice'>><<exit>><</if>>
   <<if Weather.dayState isnot 'night'>>
-    <<lanSwitch 'Morning light spreads across the deck. The crew are already hacking away the last trailing hemp lines, and there is no trace of the black vessel in the mist. There is nothing left for you to do here.' '晨光漫上甲板。船员们正用短斧砍断最后几根拖在海里的残索，迷雾中早已不见那艘古怪黑船的踪影。甲板上已经没有需要你帮忙的地方了。'>><br><br>
+    <<lanSwitch 'Morning light spreads across the deck. The crew cut the last trailing ropes. There is no sign of the other ship.' '晨光洒上甲板。船员们砍断最后几根绳索，那艘船已经不见了。'>><br><br>
     <<getouticon>><<lanLink ['Return to the deck', '返回甲板'] 'Pirate Deck'>>
       <<if $MoreTransformations.harbour.raid.stage is 'choice' and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
         <<set $MoreTransformations.harbour.raid.stage to '', $MoreTransformations.harbour.raid.outcome to '', $MoreTransformations.harbour.raid.needsEffects to false, $eventskip to 1>>
@@ -30,51 +30,59 @@
   <</if>>
   <<switch _shipRaid.approach>>
     <<case 'dark'>>
-      <<lanSwitch 'A sodden rope slaps wetly against the hull. Peering over the bulwark into the pitch black, you see no lanterns—yet another ship is already drawing alongside in utter silence. Its rotting, barnacle-encrusted timbers grind hard against your vessel, and a rusted iron grapple bites into the rail right beside your knuckles.' '黑沉沉的海面上传来绳索破水拍击船壳的湿响。你探头望向船舷之外，不见任何航灯，一道庞大而死寂的轮廓却已无声地贴了上来。生满藤壶与烂苔的腐朽湿木狠狠擦过船舷，一只锈迹斑斑的铁钩骤然咬住你手边的栏杆，木屑飞溅。'>>
+      <<lanSwitch 'A wet rope strikes the hull. You lean over the rail. An unlit ship is drawing alongside, its barnacled hull scraping yours. A hook catches the wood beside your hand.' '一根湿绳拍在船身上。你探头望向船边，一艘没有航灯的船正靠过来，结满藤壶的船身擦过你们的船。一只铁钩扣住你手边的栏杆。'>>
     <<case 'blood'>>
-      <<lanSwitch 'The blood moon turns the black swell into churning, oily crimson. Through the red-tinted fog loom torn, shroud-like sails and a blackened hull crusted thick with barnacles. As the battered derelict grinds alongside, rusted grappling hooks whistling through the scarlet mist snag the railing, the wet lines groaning as they pull sickeningly taut.' '血月将翻涌的墨黑海面染成粘稠不祥的暗红。透过猩红的雾气，几张破烂如裹尸布般的残帆与结满厚重藤壶的漆黑船身陡然逼近。铁钩呼啸着越过船舷，死死扣入木质栏杆，粗粝的浸水麻绳在血色微光下骤然绷紧，发出尖锐的呻吟。'>>
+      <<lanSwitch 'The blood moon stains the waves red. Torn sails appear through the fog. A ship grinds alongside, barnacles scraping the hull. Hooks catch the rail, and the ropes pull tight.' '血月将浪头染成暗红。雾里露出几张破帆，一艘船擦着你们的船身靠了过来，藤壶刮得木头吱吱作响。铁钩扣上栏杆，绳子绷紧了。'>>
     <<default>>
-      <<lanSwitch "A ship's bell tolls through the sea mist—a dull, muffled clang, like an echo from beneath fifty fathoms of water. No running lights flicker in the murk, but a towering derelict drifts alongside, so close you can smell stagnant bilge and rot. A rusted grapple clatters onto the timber inches from your hand, the wet rope instantly vibrating taut." '浓雾深处荡来一声沉闷发扁的船钟，仿佛隔着几十寻深的死寂海水在敲击。漆黑的夜雾中没有一丝灯火，一道庞大破败的黑影却已悄无声息地逼近，近得能闻到它身上散发的污浊积水与腐朽咸腥。一只生锈的铁钩猛地砸在你手边的木栏上，湿漉漉的粗绳瞬间吃劲绷紧。'>>
+      <<lanSwitch "A ship's bell sounds through the fog. You see no lights, but a ship is already close enough to smell the rotten wood. A hook lands beside your hand. The rope snaps taut." '雾里传来一声船钟。你看不见航灯，却已经闻到腐木的气味。一只铁钩砸在你手边，连着的绳索猛地绷紧。'>>
   <</switch>><br><br>
   <<language>>
     <<option 'EN'>>
-      Livid, waterlogged fingers haul themselves over the railing. A sailor swings a heavy belaying pin down with all their might—you hear bones splinter with a sickening crack, yet the dead grip doesn't even flinch. Another silent figure pulls itself over the bulwark, sea-soaked clothes dumping stagnant black water onto the deck.
+      Pale fingers grip the rail. A sailor brings a belaying pin down on them. Bone cracks, but the hand holds fast. Another figure climbs aboard, dripping seawater onto the deck.
       <br><br>
-      <<if _shipRaid.encounters gt 1>>"Back again, are ye?" Zephyr roars over the crashing swell. "Mind the ropes, ye bilge rats! Keep them off me cargo!"
-      <<else>>"Boarders!" Zephyr bellows, pistol drawn. "Guard the hatch! I ain't losing me cargo to a bunch of drowned thieves!"<</if>>
-      The crew rush forward with cutlasses and belaying pins. A violent swell slams the two hulls together with a grinding crunch, and one of your sailors pitches headlong into the black, churning water below. Desperate splashing echoes amidst the waves.
+      <<if _shipRaid.encounters gt 1>>"Back again?" Zephyr shouts. "Cut the ropes! Keep them off me cargo!"
+      <<else>>"Boarders!" Zephyr draws a pistol. "Guard the hatch! Don’t let those drowned thieves near me cargo!"<</if>>
+      The crew rush forward with cutlasses and belaying pins. A wave slams the hulls together. A sailor loses their footing and falls between the ships. You hear splashing below.
     <<option 'CN'>>
-      几根惨白浮肿的手指死死扣住船舷。一名水手抡起厚重的插销棒狠狠砸下去——骨骼碎裂的闷响令人牙酸，但那只死人手甚至没有一丝抽搐，依旧紧紧扣在木头上。紧接着，另一道湿冷死寂的身影翻过栏杆，破烂的衣服往甲板上淌着散发海腥的黑水。
+      苍白的手指扣住船舷。一名水手用插销棒砸了下去，骨头咔嚓一响，那只手却还抓着木头。另一个人翻上甲板，衣服往下淌着海水。
       <br><br>
-      <<if _shipRaid.encounters gt 1>>“又阴魂不散了是吧？”泽菲尔迎着浪涛放声怒吼，“看紧缆绳，你们这群底舱耗子！把他们从老子的货上轰下去！”
-      <<else>>“敌袭！有人登船！”泽菲尔大吼道，拔出腰间的佩枪，“守住货舱！老子可不想让这帮淹死的死鬼把货搬空！”<</if>>
-      船员们抄起水手刀与木棍蜂拥扑向船舷。一个猛浪将两艘巨船狠狠砸在一起，船板发出刺耳的悲鸣，一名水手脚下一滑，失足摔进两船之间翻滚的黑浪中。冰冷刺骨的水下传来急促慌乱的拍水声。
+      <<if _shipRaid.encounters gt 1>>“又来了？”泽菲尔喊道。“给老子砍断绳子！别让他们碰货！”
+      <<else>>“有人登船！”泽菲尔拔出手枪。“守住舱口！别让那帮淹死的贼搬走老子的货！”<</if>>
+      船员们拿着水手刀和插销棒冲上前。一个浪头将两艘船撞在一起，一名水手脚下不稳，跌进两船之间。下面传来挣扎的水声。
   <</language>><br><br>
   <<if _shipRaid.encounters gt 1>>
-    <<lanSwitch 'You remember how those dead hands held fast even under bone-crushing blows. Straining crewmates are already rushing forward with a heavy wooden spar to pry them off the bulwark.' '你还清楚地记得那些死人手挨了重击也绝不松开的可怖韧性。水手们已经合力抬起一根粗重的木桅长杆，急促地冲向船舷。'>><br><br>
+    <<lanSwitch 'You remember how those dead hands refused to let go. The crew bring a spar to prise them off the rail.' '你记得那些死人手怎么砸都不肯松开。船员们抬来一根长杆，要把它们撬下去。'>><br><br>
   <</if>>
   <<if _shipRaid.approach is 'blood'>>
-    <span class='purple'><<lanSwitch 'One of the boarders looms unnaturally massive, wrapped in rotting shrouds and seaweed. It hauls its waterlogged bulk aboard with a single pale hand, the thick oak railing groaning and bending under its dead weight.' '其中一个登船者身形畸形高大，浑身挂满腐朽的裹尸布条与湿烂海草。它仅凭单手便将沉重蓄水的身躯硬生生拽上甲板，厚重的橡木栏杆在它的压迫下发出吃紧的呻吟。'>></span><br><br>
+    <span class='purple'><<lanSwitch 'One boarder is much larger than the others. It hauls itself aboard with one hand, weed trailing from its clothes. The railing bends under its weight.' '其中一个登船者比其他人高大得多。它单手撑上船舷，衣服上拖着海草，栏杆被它压得弯了下去。'>></span><br><br>
   <</if>>
   <<if maplebirch.get('MoreTransformations')?.Undead.active>>
-    <<lanSwitch 'The drowned creature pauses as its milky, sunken eyes meet yours. It seems to sense the cold, unliving stillness within your flesh—yet the mechanical curse of the sea drives it onward, and its lifeless grip clamps only tighter onto the rail.' '那名亡灵登船者在对上你的视线时微微一顿。它似乎在你的皮肉中感受到了同样的冰冷与死寂，但深海的死律驱策着它，毫无知觉的手指并未退缩，反而更加用力地抓紧了栏杆。'>><br><br>
+    <<lanSwitch 'The boarder pauses when its eyes meet yours, as though it recognises something. Then it pulls itself closer, fingers tightening around the rail.' '登船者与你对上视线时停了一下，仿佛认出了什么。随后它又往上爬，手指更紧地扣住栏杆。'>><br><br>
   <<elseif $angel gte 3 or $fallenangel gte 1>>
-    <<lanSwitch 'A primal aversion stirs in your blood as the sodden corpse approaches. The radiant power beneath your skin hums with warning; the creature recoils with a low, wet hiss from the holy light, yet its dead fingers refuse to release the timber.' '惨白的尸骸逼近时，你体内的异样神能本能地躁动起来。熟悉的光芒在皮肤下悄然流转，亡灵被逼得发出一声沉闷的湿冷嘶鸣，身躯微微后仰，却依然死死抠住木板不肯放手。'>><br><br>
+    <<lanSwitch 'A familiar light stirs beneath your skin. The corpse hisses and leans away, but its fingers stay hooked over the rail.' '熟悉的光芒在你皮肤下流动。尸体嘶叫着向后躲，手指却还扣在栏杆上。'>><br><br>
   <</if>>
   <<if $pirate_rank gte 1>>
     <<if _shipRaid.encounters gt 1>>
-      <<lanSwitch 'A crewmate thrusts a coil of rough hemp into your hands. "Ye know what to do, mate! Watch out for the damned hooks!"' '身旁的水手塞给你一卷粗麻绳。“知道该怎么干吧，伙计！小心那些铁钩！”'>>
+      <<lanSwitch 'A crewmate thrusts a coil of rope into your hands. "Ye know what to do, mate. Watch those hooks!"' '一个船员将绳子塞进你手里。“知道该怎么干吧，伙计。小心铁钩！”'>>
     <<else>>
-      <<lanSwitch 'A crewmate beside you holds out a coil of rope. "Help at the rail, mate! Keep those drowned bastards off our deck!"' '身旁的水手递来一卷绳子。“去船边顶住，伙计！别让这帮淹死的死鬼占了甲板！”'>>
+      <<lanSwitch 'A crewmate holds out a rope. "Help at the rail, mate! Keep them off the deck!"' '一个船员递来绳子。“去船边帮忙，伙计！别让他们上来！”'>>
     <</if>><br><br>
   <<else>>
-    <<lanSwitch 'A sailor frantically shoves past you. "Get below if ye can\'t fight, scum!" The companionway hatch is still clear.' '一名神色慌乱的水手粗暴地将你推开。“帮不上忙就滚回底舱去，底层渣滓！”通往舱门的通道还没有被堵死。'>><br><br>
+    <<lanSwitch 'A sailor shoves past you. "Get below if ye can\'t fight, scum!" The way to the hatch is still clear.' '一个水手推开你。“不会打就滚到底舱去，渣滓！”通往舱口的路还没有被堵住。'>><br><br>
   <</if>>
   <<icon 'alert.png'>><<lanLink ['Hold off the boarder', '挡住登船者'] 'Deadwood Pirate Raid Fight'>>
     <<if $MoreTransformations.harbour.raid.stage is 'choice' and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
       <<set $MoreTransformations.harbour.raid.stage to 'fight_pending'>>
     <</if>>
   <</lanLink>><br>
+  <<if maplebirch.get('Psyche')?.active>>
+    <<icon 'coldmoon-harbour/ghost-ship.png'>><<lanLink ['Go closer to hear the dead captain', '走近船舷，听清死者的号令'] 'Deadwood Pirate Raid Fight'>>
+      <<if $MoreTransformations.harbour.raid.stage is 'choice' and maplebirch.get('Psyche')?.active and !$combat and !$possessed and !$nextPassage and !$nextPassageCheck>>
+        <<set $MoreTransformations.harbour.raid.stage to 'fight_pending', $MoreTransformations.harbour.raid.outcome to 'contact'>>
+        <<run maplebirch.get('Psyche')?.change(-150, 200)>>
+      <</if>>
+    <</lanLink>><<lllsanity>><<ggfear>><br>
+  <</if>>
   <<if !pcAreArmsBound('any')>>
     <<set $skulduggerydifficulty to 400>>
     <<icon 'coldmoon-harbour/cut-boarding-ropes.png'>><<lanLink ['Cut the boarding ropes (0:03)', '斩断登船绳 (0:03)'] 'Deadwood Pirate Raid Finish'>>
@@ -84,7 +92,7 @@
         <<set _shipRaid.outcome to $skulduggerysuccess is 1 and currentSkillValue('physique') gte random(Math.ceil($physiquemax * 0.15), Math.ceil($physiquemax * 0.45)) ? 'ropes' : 'ropes_failed', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
         <<skulduggeryuse>><<physique 1 'noMessage'>><<tiredness 5>>
         <<if _shipRaid.outcome is 'ropes'>>
-          <<set _shipRaid.victories += 1>><<pirate_status 2>><<npcincr Zephyr love 1>>
+          <<set _shipRaid.victories += 1>><<pirate_status 2>><<npcincr Zephyr love 1>><<run maplebirch.get('Psyche')?.change(10, -150)>>
         <<else>>
           <<pain 4>><<stress 4>>
         <</if>>
@@ -101,7 +109,7 @@
         <<set _shipRaid.outcome to currentSkillValue('swimmingskill') gte random(200, 600) and currentSkillValue('physique') gte random(Math.ceil($physiquemax * 0.1), Math.ceil($physiquemax * 0.35)) ? 'rescue' : 'rescue_failed', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
         <<swimmingskilluse>><<physique 1 'noMessage'>><<tiredness 10>><<water>>
         <<if _shipRaid.outcome is 'rescue'>>
-          <<set _shipRaid.rescues += 1>><<pirate_status 3>><<npcincr Zephyr love 1>>
+          <<set _shipRaid.rescues += 1>><<pirate_status 3>><<npcincr Zephyr love 1>><<run maplebirch.get('Psyche')?.change(10, -150)>>
         <<else>>
           <<pain 4>><<stress 6>>
         <</if>>
@@ -123,9 +131,11 @@
 <<widget 'deadwood-pirate-raid-end'>>
   <<set _shipRaid to $MoreTransformations?.harbour?.raid>>
   <<if _shipRaid?.stage is 'fight' and $combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead' and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck and (Weather.dayState isnot 'night' or $enemyhealth lte 0 or $enemyarousal gte $enemyarousalmax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0))>>
-    <<set _shipRaid.outcome to $enemyhealth lte 0 ? 'fight_won' : Weather.dayState isnot 'night' ? 'dawn' : $pain gte 100 and $willpowerpain is 0 ? 'fight_lost' : 'escaped', _shipRaid.stage to 'resolved'>>
+    <<set _shipRaid.outcome to $enemyhealth lte 0 ? 'fight_won' : Weather.dayState isnot 'night' ? 'dawn' : $pain gte 100 and $willpowerpain is 0 ? 'fight_lost' : 'escaped', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
     <<if _shipRaid.outcome is 'fight_won'>>
-      <<set _shipRaid.victories += 1>><<pirate_status 3>><<npcincr Zephyr love 1>>
+      <<set _shipRaid.victories += 1>><<pirate_status 3>><<npcincr Zephyr love 1>><<run maplebirch.get('Psyche')?.change(10, -150)>>
+    <<elseif _shipRaid.outcome is 'escaped'>>
+      <<run maplebirch.get('Psyche')?.change(0, -100)>>
     <</if>>
     <<if $enemyarousal gte $enemyarousalmax>><<ejaculation 'short'>><</if>>
     <<clotheson>><<endcombat>>
@@ -139,15 +149,15 @@
     <ul class='journal'><li>
       <<if $location is 'pirate_ship' and !(_shipRaid.stage is 'fight' and !($combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead'))>>
         <<if _shipRaid.stage is 'resolved'>>
-          <<lanSwitch 'The undead boarders have been driven back into the sea. You can return to the deck once you are ready.' '登船的亡灵已被击退。准备妥当后，你可以重新回到甲板上。'>>
+          <<lanSwitch 'The dead boarders have been driven off. You can return to the deck.' '登船的亡灵已被击退，你可以返回甲板了。'>>
         <<else>>
-          <<lanSwitch "A spectral derelict pulled alongside Zephyr's vessel. The crew are fighting desperately to repel the drowned boarders. You have not yet seen how the raid ends." '一艘腐朽诡谲的鬼船贴近了泽菲尔的战船，船员们正在甲板边缘殊死抵抗那些淹不死的亡灵登船者。你尚未见证这场袭击的最终结局。'>>
+          <<lanSwitch "A ghost ship drew alongside Zephyr's vessel. The crew are fighting off the boarders. You have not seen how it ends." '一艘鬼船靠近了泽菲尔的船，船员们正在抵抗登船者。你还不知道这场袭击会如何结束。'>>
         <</if>>
         <<if !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
           <br><<lanLink ['Return to the deck', '返回甲板'] 'Deadwood Pirate Raid'>><</lanLink>>
         <</if>>
       <<else>>
-        <<lanSwitch 'Your encounter with the spectral ship was cut short. You did not see how the crew drove off the drowned boarders.' '鬼船袭来时，你没能留在甲板上。你没有看到船员们是如何将那群淹不死的亡灵轰下船去的。'>>
+        <<lanSwitch 'You left before the raid was over. You did not see how the crew drove the boarders off.' '袭击结束前你就离开了，没有看到船员们如何击退登船者。'>>
         <<if !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
           <br><<linkreplace `lanSwitch('Close this entry', '不再追记')`>>
             <<if !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
@@ -177,7 +187,7 @@
 <<elseif $location is 'pirate_ship' and _shipRaid?.stage is 'resolved' and !$combat>>
   <<include 'Deadwood Pirate Raid Finish'>>
 <<else>>
-  <<lanSwitch 'There are no boarders left here to confront. If the attack continued after you left, the crew had to deal with the drowned raiders themselves.' '这里已经没有需要你应付的亡灵登船者。在你离开之后，船员们只能自行设法将那帮死鬼轰下船去。'>><br><br>
+  <<lanSwitch 'There are no boarders here. You did not see how the raid ended.' '这里已经没有登船者了，你没能看到袭击如何结束。'>><br><br>
   <<if $location is 'pirate_ship' and !$combat>>
     <<getouticon>><<lanLink ['Return to the deck', '返回甲板'] 'Pirate Deck'>>
       <<if $MoreTransformations?.harbour?.raid and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
@@ -202,12 +212,20 @@
 <</if>>
 <<set $outside to 1>>
 <<if _shipRaid.stage is 'fight_pending' and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed>>
+  <<if _shipRaid.outcome is 'contact'>>
+    <<language>>
+      <<option 'EN'>>
+        You lean towards the other ship. A voice is calling for hands at the capstan. You can hear it beneath the shouting, though the figure giving orders has no jaw. Before you can step away, a dead hand catches your sleeve. You brace against the rail as the boarder hauls itself closer.
+      <<option 'CN'>>
+        你向另一艘船探过身。一个声音正叫人去推绞盘。甲板上吵成一片，你却听得清清楚楚，发号施令的身影没有下颌。还没等你退开，一只死人手已经攥住了你的袖口。你抵住栏杆，那名登船者又爬近了一些。
+    <</language>><br><br>
+  <</if>>
   <<endevent>><<generateNPC 1 'a'>>
   <<set $finish to 0, $consensual to 0, $NPCList[0].per to 'deadwood_ship_undead', $NPCList[0].skincolour to 'ghost', $NPCList[0].health to _shipRaid.approach is 'blood' ? 360 : 300, $NPCList[0].healthmax to $NPCList[0].health, $NPCList[0].role to lanSwitch('undead pirate', '亡灵海盗'), $NPCList[0].fullDescription to lanSwitch('undead pirate', '亡灵海盗')>>
   <<npcClothesType $NPCList[0] 'docker2'>>
   <<person1>><<neutral 1>><<maninit>><<npcidlegenitals>>
   <<set $enemytrust to -30, $enemyanger to 40, $enemystrength to _shipRaid.approach is 'blood' ? 20000 : 18000, _shipRaid.stage to 'fight'>>
-  <<lanSwitch 'The drowned boarder lunges straight for you, its brine-soaked sleeves gushing freezing seawater thick with the stench of sunken silt. You knock the stiff, unyielding hands aside and brace your boots firmly against the rolling deck.' '登船者伸出惨白浮肿的双手直逼你而来，湿透的黑烂袖管中不断涌出冰冷的海水，散发着深海泥沼的死寂腥气。你猛地架开那双僵冷的手掌，咬紧牙关抵在剧烈摇晃的船栏上站稳脚步。'>><br><br>
+  <<lanSwitch 'The dead pirate reaches for you, water streaming from its sleeves. You knock its hands aside and brace yourself on the swaying deck.' '亡灵海盗伸手抓向你，袖口不断淌着海水。你架开它的手，在摇晃的甲板上站稳。'>><br><br>
 <</if>>
 <<if _shipRaid.stage is 'fight' and $combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead'>>
   <<effects>>
@@ -238,7 +256,6 @@
 <</if>>
 <<if _shipRaid.needsEffects and !$replayScene and !$statFreeze and !$frozenValues and !$possessed>>
   <<set _shipRaid.needsEffects to false>><<effects>>
-  <<if _shipRaid.outcome is 'fight_won'>><<run maplebirch.get('Psyche')?.change(15, -150)>><</if>>
   <<if $nextPassage or $nextPassageCheck>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Pirate Raid Finish'>><</lanLink>></span><<nexttext>><<exit>>
   <</if>>
@@ -248,110 +265,118 @@
   <<case 'fight_won'>>
     <<language>>
       <<option 'EN'>>
-        The undead boarder is smashed back against the bulwark under your furious assault. Before the rigid corpse can rise again, two sailors lunge forward with a heavy wooden spar, heaving together to hoist the creature bodily over the rail! A heavy splash resounds in the black swell, but a pale, livid hand immediately claws onto the trailing lines below, fingers still flexing with mindless persistence.
+        You drive the corpse back against the rail. Two sailors catch it with a spar and tip it overboard. It hits the water, but a hand immediately catches one of the trailing ropes.
         <br><br>
-        "Sever the lines, every last one of 'em!" Zephyr bellows at the top of <<his 'Zephyr'>> lungs. The final hawser snaps under a boarding axe, and the battered derelict drifts silently back into the swirling fog. The captain checks the iron latch on the cargo hatch, then turns to you with a wolfish grin. "Mighty fine work! Seems ye've got some salt in ye after all."
+        "Cut every last rope!" Zephyr shouts at the top of <<his 'Zephyr'>> lungs. An axe severs the final line, and the other ship falls back into the fog. The captain checks the cargo hatch, then grins at you. "Good work. Ye’ve got some fight in ye."
       <<option 'CN'>>
-        登船者被你击溃，重重撞在木栏杆上。还没等那具僵硬的躯体再次爬起，两名水手合力抬起粗重的木桅长杆，一鼓作气将它撬出船舷！落水声在暗涌中炸响，但转眼间，下方又有一只苍白发青的手死死攀住了挂缆，手指依然痉挛般地抓挠着。
+        你将尸体逼退到栏杆旁。两个水手抬起长杆，合力将它掀下船舷。水花刚溅起来，一只手又攀住了拖在海里的绳子。
         <br><br>
-        “把缆绳全给老子砍断！”泽菲尔扯着嗓子大吼。最后一道粗麻绳在利斧下应声崩断，怪船漆黑的残破身躯终于无声地滑脱开去，没入翻滚的浓雾之中。船长确认了货舱上的铁锁完好，这才转过头打量你，咧开嘴笑了起来：“干得漂亮！看来你小子骨子里还真有两分海盗的硬气。”
+        “把绳子全砍断！”泽菲尔喊道。短斧砍断最后一根缆绳，那艘船退入海雾。船长检查过货舱的锁，才转头朝你笑了笑。“干得漂亮，你小子有两下子。”
     <</language>><<ggrespect>><<glove 'Zephyr'>>
   <<case 'ropes'>>
     <<language>>
       <<option 'EN'>>
-        You snatch a boarding axe from beside the hatch. Dodging the iron claws hooking the rails, you sprint along the bulwark, hacking through the creaking, groaning hemp. With a sharp whip-crack, the last taut line parts, whipping violently past your shoulder. As the hulls wrench apart, a climbing corpse loses its purchase and plunges silently into the churning maw between the grinding timbers.
+        You take an axe from beside the hatch and run along the rail, dodging hooks as you cut the ropes. The last line parts and whips past your shoulder. The ships pull apart. A pirate clinging to the hull loses its grip and falls between them.
         <br><br>
-        A gust of cold wind catches the mainsail. The crew use spars and belaying pins to smash the remaining pale hands from the wood as the ghost ship falls astern. "That's the way, ye bilge rats! Keep her moving!" Zephyr roars above the swell. The captain catches your eye with an approving nod before wheeling around to the helmsman.
+        Wind fills the mainsail. The crew knock the remaining hands off the rail with spars and belaying pins. "That’s it! Keep her moving!" Zephyr shouts. The captain nods to you, then turns towards the helm.
       <<option 'CN'>>
-        你一把抓起舱口旁别着的短斧，侧身闪过一道刺来的铁钩，沿着船舷疯狂挥砍那些绷得宛如铁索般的登船绳。随着数声尖锐的崩裂巨响，最后一根粗缆抽打着从你肩侧弹飞。吃重的两船骤然拉开，一名正要翻上来的亡灵海盗瞬间失去借力点，无声地跌入两船相撞的狭窄激流与粉碎的泡沫中。
+        你抓起舱口旁的短斧，避开铁钩，沿着船舷砍断绳索。最后一根缆绳从你肩旁弹过，两艘船拉开了距离。一个攀在船边的海盗抓了个空，跌进下面的海水中。
         <br><br>
-        海风鼓满主帆。船员们用木棒与长杆将最后几只扒在船舷上的死白断手挑入海中，那艘腐朽的鬼船终于被甩在翻滚的尾波之后。“就是这样，你们这群底舱耗子！别停下！”泽菲尔迎着风浪放声大喝。船长朝你投来一道赞许的目光，用力点了点头，随即转身大步跨向舵轮。
+        海风鼓满主帆。船员们用长杆和插销棒打落剩下的手。“就这样！继续开！”泽菲尔喊道。船长朝你点点头，转身走向舵轮。
     <</language>><<ggrespect>><<glove 'Zephyr'>>
   <<case 'ropes_failed'>>
     <<language>>
       <<option 'EN'>>
-        You seize the axe by the hatch, but the violent heave of the swell yanks the hooked line taut before your swing can land. The brine-slick handle slips through your grip; the heavy oak bulwark smashes brutally against your shoulder, sending you stumbling backward across the pitching planks with a burst of pain.
+        You take the axe, but a wave pulls the hooked rope tight before you can strike. The wet handle slips from your hand. You fall against the rail, striking your shoulder.
         <br><br>
-        A cursing sailor dives in to take your place, hacking feverishly through the line while another roughly drags you clear of the fray. By the time you catch your breath and struggle to your feet, the crew have beaten the last boarder over the side. The dark derelict drifts away into the mist.
+        A sailor swears and takes the axe while another pulls you clear. By the time you get to your feet, the crew have driven the last boarder over the side. The other ship drifts back into the fog.
       <<option 'CN'>>
-        你抄起舱口边的短斧，但缆绳上的铁钩在两船剧烈颠簸中骤然一扯。斧柄在满是海水与冷汗的手掌中猛地滑脱，沉重的木栏杆狠狠撞在你的肩头，将你撞得连连踉跄跌退，半边身子阵阵发麻。
+        你拿起短斧，还没挥下去，一个浪头便扯紧了绳索。湿滑的斧柄从手中滑脱，你撞上栏杆，肩头一阵发麻。
         <br><br>
-        一名健壮的水手破口大骂着冲上前夺过短斧，疯狂劈断吃紧的缆绳，另一人则粗暴地将你拽出危险区域。等你捂着淤青挣扎着站稳时，船员们已经用插销棒将最后的亡灵逼下船舷，那道漆黑可怖的残船渐渐被冰冷的海雾吞没。
+        一名水手骂了一声，接过斧头，另一人将你拉到旁边。等你站稳，船员们已经把最后一个登船者赶下船。那艘船退回了雾里。
     <</language>><<gpain>><<gstress>>
   <<case 'rescue'>>
     <<language>>
       <<option 'EN'>>
-        You knot a thick hemp line securely around your waist and pitch yourself over the bulwark into the freezing brine. The capsized sailor is flailing helplessly in the churning, grinding crush between the two vessels. Before the next crest can smash them against the hull, you lunge forward, grabbing their sodden collar and heaving their face clear of the black water until their shaking hands lock around the rope.
+        You tie a rope around your waist and climb over the rail. The sailor is struggling between the hulls. You catch their collar and lift their head above the water. They cough and grab the rope.
         <br><br>
-        Straining hands on deck haul you both up over the rail. The drenched sailor collapses on the planks, hacking up bitter seawater, and clutches your sleeve in breathless gratitude. Behind you, the final boarding line snaps. "Catch your breath and get back to your stations, the lot of ye!" Zephyr barks, but a coarse, dry wool blanket is tossed roughly across your shivering shoulders.
+        The crew haul you both aboard. The sailor coughs up seawater, still clutching your sleeve. Behind you, the last rope parts. "Get yer breath back, then back to work!" Zephyr orders. Someone throws a blanket over your shoulders.
       <<option 'CN'>>
-        你把粗麻绳往腰间迅速绕紧打结，不顾刺骨寒意纵身翻过船舷。落水的水手正在两艘巨船相互碾压的阴影中拼死挣扎。在下一道冰冷翻卷的狂浪将人拍沉之前，你死死捞住了对方被浸透的外套，用尽全身力气托起对方的脑袋露出水面，直到对方呛咳着本能地死死抓住了救援绳索。
+        你将绳子系在腰间，翻过船舷。落水的水手正在两船之间挣扎。你抓住衣领，将对方的头托出水面。水手呛咳着抓住了绳子。
         <br><br>
-        甲板上的水手们齐心协力将你们二人一把拉了上来。获救的船员瘫软在地，大口大口咳出带着海腥的苦涩咸水，紧紧捏住你的胳膊，眼中满是劫后余生的感激。身后传来最后一声缆绳崩断的脆响与海怪般退去的浪声。“喘够了气就给老子滚回去干活！”泽菲尔粗声粗气地吼着，但一条带着烟草味的粗毛毯紧接着被扔到了你湿透发抖的身上。
+        船员们将你们一起拉上甲板。获救的水手咳出海水，还紧紧抓着你的袖子。身后最后一根缆绳断了。“喘够了就回去干活！”泽菲尔喊道。一条毯子搭上了你的肩膀。
     <</language>><<ggrespect>><<glove 'Zephyr'>>
   <<case 'rescue_failed'>>
     <<language>>
       <<option 'EN'>>
-        You tie off the rope and scramble down the hull, but the freezing riptide beneath the hulls is far more violent than it looked from the deck. You strain your arm toward the drowning mariner, but a crashing swell slams you against the timber. <<if maplebirch.get('MoreTransformations')?.Undead.active>>The crew heave you back aboard, the rope digging deep into your numb, unyielding flesh. You feel no pain, yet your dead limbs cannot overcome the sea's fury.<<else>>The crew haul frantically on the line, the rough hemp biting mercilessly into your waist as you choke on salt spray.<</if>>
+        You tie the rope and climb over the side. The current is stronger than you expected. You reach for the sailor, but a wave throws you against the hull. <<if maplebirch.get('MoreTransformations')?.Undead.active>>The crew haul you back. The rope digs into your waist. You feel no pain, but you still cannot fight the current.<<else>>The crew haul you back, the rope biting into your waist as you cough up seawater.<</if>>
         <br><br>
-        Fortunately, an experienced hand casts a line with a weighted knot from the stern, and the thrashing sailor catches it. You collapse beside the cargo hatch, battered and drenched, while the crew drag the sailor over the rail and shove the spectral hull away into the dark.
+        Another sailor throws a line from the stern. The person in the water catches it. You sit beside the hatch while the crew pull them aboard and push the other ship away with spars.
       <<option 'CN'>>
-        你系上绳索翻落船舷，但海面下冰冷刺骨的暗流远比肉眼所见狂暴。你拼力朝落水者伸手，一道突如其来的巨浪却狠狠将你拍回船壁。<<if maplebirch.get('MoreTransformations')?.Undead.active>>船员们发力将你猛拽上去，麻绳深深陷入你冰冷死寂的皮肉中。你感受不到任何痛觉，但死人的僵冷肢体终究无法与狂暴的大海争夺猎物。<<else>>甲板上的船员们急忙将你往回拉，粗粝的麻绳深深勒进你的腰侧，疼得你几乎窒息。<</if>>
+        你系好绳子翻下船舷，水流却比想象中急得多。你朝落水者伸出手，一个浪头将你拍回船身。<<if maplebirch.get('MoreTransformations')?.Undead.active>>船员们将你拉了回去。绳子勒进腰间，你感受不到疼痛，却也没法抵住水流。<<else>>船员们将你拉了回去，绳子勒得腰间生疼。你咳了几口海水。<</if>>
         <br><br>
-        万幸的是，另一名老练的水手从船尾精准地抛下一道救生索，落水者在浪头里抓住了它。你浑身湿冷透骨，瘫倒在货舱木盖旁急促喘息，看着船员们合力把落水者拉上甲板，并用长杆彻底推开那艘擦碰而过的鬼船。
+        另一名水手从船尾抛下绳子，落水者抓住了它。你坐在舱口旁，看着船员们将人拉上来，又用长杆推开那艘船。
     <</language>><<gpain>><<gstress>>
   <<case 'shelter'>>
     <<language>>
       <<option 'EN'>>
-        You slam the heavy hatch shut and bolt it from within. Above your head, boots pound frantically across the deck, punctuated by guttural shouts and the unnatural, dragging scrape of sodden weight across the oak. A flurry of steel, a heavy crunch, and a massive splash follow. You huddle in the dark belly of the ship, heart pounding, until the commotion finally dies.
+        You close the hatch and bolt it. Boots pound overhead. You hear shouts, blows and something being dragged across the deck, followed by a splash. You wait in the dark until the noise dies down.
         <br><br>
-        "They're off the deck!" someone shouts from above. When you cautiously crack open the hatch, sailors are hauling a shivering crewmate aboard, while the silent, lanternless silhouette dissolves back into the freezing mist. Zephyr is already pacing near the cargo hold with arms folded, nudging the crates with <<his 'Zephyr'>> boot to ensure nothing was lost.
+        "They’re gone!" someone calls. You open the hatch. Sailors are pulling a crewmate over the rail, and the unlit ship is fading into the fog. Zephyr stands beside the cargo hold, arms folded, checking the crates with <<his 'Zephyr'>> boot.
       <<option 'CN'>>
-        你猛地拉上底舱厚重的木盖，将门栓死死别紧。头顶甲板上传来震耳欲聋的奔跑与惨叫，某种异常沉重、湿冷的重物在木板上拖曳摩擦，伴随着粗暴的咒骂、钢铁碰撞与巨大的落水轰响。你屏住呼吸退在阴暗的角落，心脏狂跳，直到上面的厮杀声逐渐平息。
+        你关上舱盖，插好门栓。头顶传来奔跑、喊叫与打斗的声音，有什么东西被拖过甲板，随后落进水里。你在黑暗中等着，直到上面的动静平息。
         <br><br>
-        “他们滚下去了！”外面终于传来一声粗豪的呼喊。当你小心翼翼推开舱盖探出头时，两名水手正将浑身湿透的同伴从船舷拽上来，那艘没有航灯的黑色帆影已然退回冰冷的浓雾中。泽菲尔早已叉着腰站在货舱旁，神情冷峻地用脚尖清点着木箱。
+        “他们走了！”外面有人喊。你推开舱盖，看见水手们正将同伴拉上船。没有航灯的船退入雾里。泽菲尔抱着双臂站在货舱边，用脚拨着木箱，检查有没有丢东西。
     <</language>><<gstress>>
   <<case 'dawn'>>
-    <<lanSwitch 'Pale morning light cuts through the dense fog, washing over the slick deck. The undead boarder freezes, its milky eyes losing whatever dim malice drove it, and its cold hands unclamp like severed puppet strings. Without a whisper, it pitches over the bulwark into the waves. The crew hack through the trailing ropes. As the mist burns off, the derelict is gone as though it never existed. Zephyr barks orders for everyone to inspect the hold and hull before collapsing into their hammocks.' '苍白的晨光撕开天际的浓云，洒在潮湿冰冷的甲板上。正在纠缠的亡灵海盗空洞发灰的眼珠微微一滞，僵硬的手指如同失去牵引的傀儡般松开，一声不吭地翻下船舷，坠入翻滚的浪涛中。水手们飞快地斩断拖在水里的残存绳索。海雾在朝阳下迅速淡去，那艘诡异的古船彻底消失得无影无踪。泽菲尔大声下令，让所有人先清点货舱与船体破损，再去底舱补觉。'>>
+    <<lanSwitch 'Morning light reaches the deck. The dead pirate lets go and drops over the rail. Sailors cut the trailing ropes. As the fog clears, the other ship is gone. Zephyr orders the crew to check the cargo and hull before getting any sleep.' '晨光洒上甲板。亡灵海盗松开手，翻下船舷。水手们砍断拖在海里的绳子。雾气散去，那艘船已经不见了。泽菲尔让船员们先检查货物和船身，再去睡觉。'>>
   <<case 'fight_lost'>>
-    <<lanSwitch 'Your strength gives out completely; your knees buckle and you slump against the salt-encrusted railing. Before the drowned creature can drag you across the bulwark into the abyss, a heavy wooden spar smashes violently into its chest with a sickening crunch. Two burly sailors grab your collar and haul you bodily toward the hatch as a heavy splash echoes behind. By the time your vision clears, the nightmare vessel has fallen behind into the dark swell.' '剧痛撕扯着你的意识，你的双腿一软，顺着冰冷的木栏杆滑倒在地。那具亡灵正要伸出青白僵硬的双手将你拖入深海，一根粗重的木桅长杆裹挟着风声狠狠砸在它胸口，骨骼碎裂声令人齿冷。两名满脸横肉的水手一把揪住你的衣领，将你拖向后方的舱门。身后传来重物落水的闷响。等你的视线重新聚焦时，那艘令人胆寒的鬼船已被甩在了翻腾的夜浪之后。'>>
+    <<lanSwitch 'Your legs give way and you slump against the rail. Before the corpse can drag you overboard, a spar strikes it in the chest. Two sailors pull you towards the hatch. You hear a splash behind you. When you look back, the other ship is falling astern.' '你双腿一软，倒在栏杆旁。尸体正要将你拖下海，一根长杆打中了它的胸口。两个水手将你拉向舱口。身后传来落水声，等你回头，那艘船已经落在后面。'>>
   <<case 'escaped'>>
-    <<lanSwitch 'You wrench free of the icy, vice-like grip with a frantic heave, stumbling backward toward the companionway. The crew immediately close the breach with a roar, driving spars and belaying pins into the boarder until the pale corpse is smashed over the side into the dark water. Zephyr bellows orders to sever the remaining lines. As the ship gathers headway and surges forward, you slump against the bulkhead, shivering as the adrenaline fades.' '你拼尽全力挣开那双冰冷如铁箍的死人手，跌跌撞撞地退向舱门。后方的船员们立刻大吼着合围上去，粗重的长杆与插销棒如雨点般砸向船舷，将那具惨白的躯体硬生生轰落冰冷的海水中。泽菲尔高声下令斩断所有纠缠的缆绳。海盗船吃风加速破浪前行，你靠在舱壁边剧烈喘息，浑身发抖地看着危机过去。'>>
+    <<lanSwitch 'You wrench free and stumble towards the hatch. The crew close in with spars and belaying pins, knocking the corpse overboard. Zephyr orders them to cut the ropes. The ship picks up speed, and you lean against the bulkhead to catch your breath.' '你挣脱出来，跌跌撞撞地退向舱口。船员们拿着长杆和插销棒围上去，将尸体赶下海。泽菲尔下令砍断绳索。船渐渐加速，你靠着舱壁喘气。'>>
   <<default>>
-    <<lanSwitch 'The clamour has faded into the night. You did not see how the boarding ended.' '周围的风浪与厮杀声已经平息。你没能看到这场袭击究竟如何收尾。'>>
+    <<lanSwitch 'The fighting is over. You did not see how it ended.' '打斗声已经平息，你没看到这场袭击如何结束。'>>
 <</switch>><br><br>
 <<if maplebirch.get('MoreTransformations')?.Undead.active and _shipRaid.outcome isnot 'shelter'>>
-  <<lanSwitch 'You glance down to inspect your unfeeling flesh for damage; the complete absence of pain makes it difficult to tell where you\'ve been struck. A passing sailor instinctively reaches out to steady you, only to recoil with a sudden shiver upon touching your icy, dead fingers.' '你低头检查自己身上是否受损。失去痛觉的肉躯让你很难察觉伤痕，唯有破损的衣料在海风中摆动。一名水手下意识伸手想搀扶你一把，却在触碰到你那冰冷坚硬的手掌时猛地打了个寒战，惊疑不定地缩了回去。'>><br><br>
+  <<lanSwitch 'You check yourself for injuries. Without pain, it is hard to tell where you were hit. A sailor reaches to steady you, then pulls back at the touch of your cold hand.' '你低头检查身上的伤。没有痛觉，你很难察觉自己挨了几下。一个水手伸手想扶你，碰到冰冷的手掌后，又缩了回去。'>><br><br>
 <</if>>
 <</if>>
 <<if _shipRaid.talked>>
   <<language>>
     <<option 'EN'>>
-      "They've plundered me off Coldmoon Harbour before," Zephyr says, kicking a splintered crate into place. "Drowned thieves that can't rest easy. Where their curse came from, or what sunken pit spawned 'em, I couldn't tell ye."
-      <<if $MoreTransformations.harbour.zephyr.stage is 2>>"And don't ye go forgetting that chest ye promised to recover. Red cord tied round the lid."
-      <<elseif $MoreTransformations.harbour.zephyr.stage is 3>>"Ye've still got me chest, haven't ye? Bring it to me once we're done clearing this mess."<</if>>
+      "They stole from me at Coldmoon Harbour, too," Zephyr says, kicking a broken crate into place. "Drowned thieves. Don’t ask me where their curse came from."
+      <<if $MoreTransformations.harbour.zephyr.stage is 2>>"Remember that chest ye promised to find. Red cord round the lid."
+      <<elseif $MoreTransformations.harbour.zephyr.stage is 3>>"Still got me chest? Bring it over once we’ve cleared this mess."<</if>>
     <<option 'CN'>>
-      “先前在寒月港湾劫老子货的，也是这帮阴魂不散的杂种，”泽菲尔说着，一脚把一只被撞裂的木箱踢回原位。“淹死在深水里也不消停的死鬼。至于他们身上沾的什么诅咒，还是哪处海底乱坟堆爬出来的，老子可不知道。”
-      <<if $MoreTransformations.harbour.zephyr.stage is 2>>“还有，你小子答应替我找回来的箱子，可别抛到脑后了。箱盖上扎着红绳。”
-      <<elseif $MoreTransformations.harbour.zephyr.stage is 3>>“老子的箱子还在你手里吧？等收拾完甲板上这摊烂摊子，赶紧给老子送过来。”<</if>>
+      “先前在寒月港湾抢我货的也是他们，”泽菲尔说着，将破木箱踢回原位。“淹死了还改不了偷抢。至于什么诅咒，我可不知道。”
+      <<if $MoreTransformations.harbour.zephyr.stage is 2>>“记得答应替我找的箱子，箱盖上扎着红绳。”
+      <<elseif $MoreTransformations.harbour.zephyr.stage is 3>>“箱子还在你手里吧？收拾完这里就送过来。”<</if>>
   <</language>><br><br>
 <<elseif !$replayScene and !$statFreeze and !$frozenValues and !$possessed>>
   <<icon 'coldmoon-harbour/ghost-ship.png'>><<lanLink ["Ask Zephyr about the ship (0:05)", '问泽菲尔那艘船的事 (0:05)'] 'Deadwood Pirate Raid Finish'>>
     <<if $MoreTransformations.harbour.raid.stage is 'resolved' and !$MoreTransformations.harbour.raid.talked and $location is 'pirate_ship' and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
-      <<set $MoreTransformations.harbour.raid.talked to true, $MoreTransformations.harbour.raid.needsEffects to true, $MoreTransformations.harbour.ship to true>>
       <<pass 5>>
+      <<if $MoreTransformations.harbour.raid.stage is 'resolved' and !$MoreTransformations.harbour.raid.talked and $passage is 'Deadwood Pirate Raid Finish' and $location is 'pirate_ship'
+        and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
+        <<set $MoreTransformations.harbour.raid.talked to true, $MoreTransformations.harbour.raid.needsEffects to true, $MoreTransformations.harbour.ship to true>>
+        <<run maplebirch.get('Psyche')?.change(0, -100)>>
+      <</if>>
     <</if>>
   <</lanLink>><br>
 <</if>>
 <<if _shipRaid.rested>>
-  <<lanSwitch 'You slump against the bulkhead in the shadow of the hatch, out of the way of the bustling crew. After a few quiet minutes, your breath returns and you feel steady enough to rise again.' '你靠着舱壁坐在木箱阴影下，避开甲板上来往忙碌的水手。喘息了几分钟后，你渐渐缓过劲来，感觉能够重新站稳了。'>><br><br>
+  <<lanSwitch 'You sit against the bulkhead, out of the crew’s way. After a few minutes, your breathing settles and you get to your feet.' '你靠着舱壁坐下，避开来往的船员。过了几分钟，你缓过气来，重新站起身。'>><br><br>
 <<elseif !$replayScene and !$statFreeze and !$frozenValues and !$possessed>>
   <<relaxicon>><<lanLink ['Rest by the hatch (0:05)', '在舱口缓一缓 (0:05)'] 'Deadwood Pirate Raid Finish'>>
     <<if $MoreTransformations.harbour.raid.stage is 'resolved' and !$MoreTransformations.harbour.raid.rested and $location is 'pirate_ship' and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
-      <<set $MoreTransformations.harbour.raid.rested to true, $MoreTransformations.harbour.raid.needsEffects to true>>
-      <<stress -4>><<tiredness -3>><<pass 5>>
+      <<pass 5>>
+      <<if $MoreTransformations.harbour.raid.stage is 'resolved' and !$MoreTransformations.harbour.raid.rested and $passage is 'Deadwood Pirate Raid Finish' and $location is 'pirate_ship'
+        and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
+        <<set $MoreTransformations.harbour.raid.rested to true, $MoreTransformations.harbour.raid.needsEffects to true>>
+        <<stress -4>><<tiredness -3>><<run maplebirch.get('Psyche')?.change(0, -200)>>
+      <</if>>
     <</if>>
-  <</lanLink>><<lstress>><<ltiredness>><br>
+  <</lanLink>><<lstress>><<ltiredness>><<if maplebirch.get('Psyche')?.active>><<llfear>><</if>><br>
 <</if>>
 <br>
 <<getouticon>><<lanLink ['Return to the deck', '返回甲板'] 'Pirate Deck'>>

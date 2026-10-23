@@ -143,6 +143,8 @@ class DrivingSchool {
     return (
       !this.working &&
       this.transport.ready &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
       V.id > 0 &&
       V.drunk <= 0 &&
       V.drugged <= 0 &&
@@ -298,7 +300,7 @@ class DrivingSchool {
     this.working = true;
     try {
       this.transport.core.SugarCube.Wikifier.wikifyEval(`<<money -${fee} 'transport'>><<pass ${minutes}>>`);
-      return this.transport.core.passage.title === passage && Time.days === day && this.transport.ready;
+      return this.transport.core.passage.title === passage && Time.days === day && this.transport.ready && !V.nextPassage && !V.nextPassageCheck;
     } finally {
       this.working = false;
     }

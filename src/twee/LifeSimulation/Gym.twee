@@ -233,8 +233,9 @@
 :: Deadwood Reblooms Life Simulation Gym Training
 <<set _gymActivity to $LifeSimulation.gym.activity>>
 <<set _gymTrainingDay to Time.days>>
+<<if !$statFreeze and !$replayScene and !$frozenValues>><<set $LifeSimulation.gym.activity to ''>><</if>>
 <<set $outside to _gymActivity is 'deck-run' ? 1 : 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>
-<<if !maplebirch.get("LifeSimulation").canTrainGrowth or $LifeSimulation.gym.sessions_today gte 3 or !['weights', 'run', 'stretch', 'deck-run'].includes(_gymActivity)
+<<if $statFreeze or $replayScene or $frozenValues or $possessed or $nextPassage or $nextPassageCheck or !maplebirch.get("LifeSimulation").canTrainGrowth or $LifeSimulation.gym.sessions_today gte 3 or !['weights', 'run', 'stretch', 'deck-run'].includes(_gymActivity)
   or $exposed gt 0 or pcAreArmsBound('both') or (_gymActivity is 'deck-run' and (Weather.precipitation is 'rain' or Weather.isFreezing))>>
   <span class='blue'><<lanSwitch 'The equipment is not available now.' '现在没法继续锻炼。'>></span><br><br>
 <<else>>
@@ -248,21 +249,26 @@
     <</language>><br><br>
   <</if>>
   <<set $LifeSimulation.gym.sessions_today += 1>>
+  <<set _gymTrainingMinutes to _gymActivity is 'weights' ? 60 : _gymActivity is 'stretch' ? 20 : 30>>
+  <<set _gymTrainingEnd to Time.date.timeStamp + _gymTrainingMinutes * 60>>
+  <<pass _gymTrainingMinutes>>
+  <<if $passage isnot 'Deadwood Reblooms Life Simulation Gym Training' or $nextPassage or $nextPassageCheck or $combat or $possessed or $statFreeze or $replayScene or $frozenValues or Time.date.timeStamp lt _gymTrainingEnd>>
+    <<if $passage is 'Deadwood Reblooms Life Simulation Gym Training'>>
+      <span class='blue'><<lanSwitch 'You could not finish the session.' '你没能完成这次训练。'>></span><br><br>
+      <<getinicon>><<lanLink ['Return to the training floor', '返回训练区'] 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
+    <</if>><<exit>>
+  <</if>>
   <<switch _gymActivity>>
     <<case 'weights'>>
-      <<pass 60>>
       <<lanSwitch 'You work through a set of lifts. Your arms shake by the last repetition, but you put the weights back under control.' '你完成一组举重。最后几次抬举时双臂发颤，仍稳稳地把杠铃放回架上。'>>
       <<physique 6>><<tiredness 6>><<stress -2>><<gphysique>><<gtiredness>><<lstress>>
     <<case 'run'>>
-      <<pass 30>>
       <<lanSwitch 'You keep pace along the indoor track. The sea flashes between the window frames whenever you turn.' '你沿室内跑道来回奔跑。每次转身，都能从窗框间瞥见海面。'>>
       <<athletics 2>><<physique 2>><<tiredness 3>><<stress -2>><<gathletics>><<gphysique>><<gtiredness>><<lstress>>
     <<case 'stretch'>>
-      <<pass 20>>
       <<lanSwitch 'The coach reminds you to slow down and hold each stretch. Your breathing settles while the noise of the room recedes.' '教练提醒你放慢动作，保持每一次伸展。呼吸渐渐平稳，周围的器械声也远了些。'>>
       <<tiredness 1>><<stress -3>><<gtiredness>><<lstress>>
     <<case 'deck-run'>>
-      <<pass 30>>
       <<lanSwitch 'You follow the fenced path at an even pace. Wind comes in from the sea and cools your face before you turn back towards the building.' '你沿着围栏小径匀速慢跑。海风吹凉了脸颊，你转身跑回建筑门前。'>>
       <<athletics 3>><<tiredness 4>><<stress -2>><<gathletics>><<gtiredness>><<lstress>>
   <</switch>>
@@ -301,7 +307,6 @@
 <<else>>
   <<getinicon>><<lanLink ['Return to the training floor', '返回训练区'] 'Deadwood Reblooms Life Simulation Gym Floor'>><</lanLink>>
 <</if>>
-<<set $LifeSimulation.gym.activity to ''>>
 
 :: Deadwood Reblooms Life Simulation Gym Coach
 <<set $outside to 0>><<set $location to 'deadwood_gym'>><<set $bus to 'cliff'>><<effects>>

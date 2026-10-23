@@ -138,6 +138,16 @@ export default class Laboratory {
     return Math.round(terms[`${ingredient}_cost`] * amount * (1 - Math.clamp((amount - 1) * terms.bulk_discount, 0, terms.maximum_discount)));
   }
 
+  /** 页面与日结共用可负担批量，整批资金不足时先加工小批，仍保留储备和三天费用。 */
+  public batch(factory: FactoryState): number {
+    const ingredient = factory.laboratory.automatic;
+    if (!ingredient) return 0;
+    let amount = Math.min(factory.laboratory.raw[ingredient], terms.maximum_batch);
+    const reserve = factory.reserve + this.industry.dailyCosts[factory.site] * 3;
+    while (amount > 0 && factory.cash - this.cost(ingredient, amount) < reserve) amount--;
+    return amount;
+  }
+
   public act(action: 'install' | 'technician' | 'phial' | 'flower' | 'return_phial' | 'return_flower' | 'produce_phial' | 'produce_flower' | 'take' | 'dispatch', amount = 1): boolean {
     const factory = this.industry.state;
     const state = this.state;
@@ -364,8 +374,8 @@ export default class Laboratory {
     }
     if (capacity <= 0 || !state.technician || (factory.issue && factory.issue.type !== 'haul') || day < factory.ready_day || factory.order) return false;
     if (!state.job && state.automatic && factory.manager) {
-      const amount = Math.min(state.raw[state.automatic], terms.maximum_batch);
-      if (amount && factory.cash - this.cost(state.automatic, amount) >= factory.reserve + this.industry.dailyCosts[factory.site] * 3) this.start(factory, state.automatic, amount);
+      const amount = this.batch(factory);
+      if (amount) this.start(factory, state.automatic, amount);
     }
     if (!state.job) return false;
     const supervised = this.trade.harper_site === factory.site && day < this.trade.harper_until && C.npc.Harper?.state === 'active';

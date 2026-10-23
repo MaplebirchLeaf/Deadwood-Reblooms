@@ -79,3 +79,37 @@
     <br>
   <</if>>
 <</widget>>
+
+<!-- 仅包住味觉带来的收益或描述，费用、药效、任务与陪伴收益留在调用处。 -->
+<<widget 'deadwood-taste' 'container'>>
+  <<if !maplebirch.get('MoreTransformations')?.Undead.active>>
+    <<print _contents>>
+  <<elseif _args[0]>>
+    <<language>>
+      <<option 'EN'>>
+        You swallow, but there is no flavour. Neither sweetness nor bitterness reaches you, and the familiar comfort never comes.
+      <<option 'CN'>>
+        你咽了下去，却尝不出滋味。甜与苦都离你很远，熟悉的慰藉迟迟没有到来。
+    <</language>>
+  <</if>>
+<</widget>>
+
+<!-- 沿用原版晴夜与月相，不依赖天气立绘，也不写入新进度。 -->
+<<widget 'deadwood-undead-moon'>>
+  <<if !maplebirch.get('MoreTransformations')?.Undead.active or !$outside or $underwater or $combat or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<if Time.dayState isnot 'night' or Weather.precipitation isnot 'none' or Weather.isOvercast or Time.currentMoonPhase is 'new'>><<exit>><</if>>
+  <<language>>
+    <<option 'EN'>>
+      Moonlight falls across your hand. The skin seems to thin beneath it, exposing the pale bones of your fingers. You draw your hand back into shadow. Flesh covers it once more, cold and bloodless.
+    <<option 'CN'>>
+      月光落上手背，皮肤在光下渐渐淡去，露出指间苍白的骨节。你把手缩回阴影里。血肉又覆了上来，依旧冰凉，没有血色。
+  <</language>>
+  <<if $passage is 'Pirate Deck' and $MoreTransformations?.treasure?.together and $MoreTransformations.treasure.zephyrCoins gt 0>>
+    <br><br><<language>>
+      <<option 'EN'>>
+        Zephyr catches you looking. The captain draws a sleeve over a bare wrist, then glances at your hand. "Best keep that out of sight. Crew's jumpy enough."
+      <<option 'CN'>>
+        泽菲尔察觉了你的目光，拉下袖子遮住手腕，又瞥了眼你的手。“收着点。船上那帮人已经够疑神疑鬼了。”
+    <</language>>
+  <</if>><br><br>
+<</widget>>

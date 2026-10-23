@@ -36,6 +36,12 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
     },
     widgetPassage: {
       Widgets: [
+        // 共用反抗结算在最终多人分流前缩放一次，保留各版本的伤害上限、精通、格挡与过杀处理。
+        {
+          srcmatch: /(<<widget "defiance">>(?:(?!<<\/widget>>)[\s\S])*?)(?=<<if \$enemyno gte 2>>\s*<<npcdamage _args\[1\]>>)/,
+          applyafter: '<<if maplebirch.get("MoreTransformations")?.Undead.active>><<set _thedamage *= 0.5>><</if>>',
+          expected: 1
+        },
         {
           srcmatch: /<<set \$arousal \+= (_args\[0\]|_change)>>/,
           to: '<<set $arousal += (maplebirch.get("MoreTransformations")?.Undead.arousal($1) ?? $1)>>',
@@ -43,6 +49,18 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
         }
       ],
       'Widgets Sleep': [
+        // 诅咒与原有噩梦只结算一次，冻结和回放不额外触发诅咒压力。
+        {
+          src: '<<if $nightmares gte 1 and $controlled is 0>>',
+          to: '<<if ($nightmares gte 1 and $controlled is 0) or (maplebirch.get("MoreTransformations")?.Undead.active and !$statFreeze and !$replayScene and !$frozenValues)>>',
+          expected: 1
+        },
+        // 原版逐项扣除疲劳，合计本小时恢复后乘 0.5，时间推进与其它睡眠结算不变。
+        {
+          srcmatch: /(<<set \$tiredness -= 200>>[\s\S]*?<<set \$tiredness -= \$_bonusFatigueLoss>>)/,
+          to: '<<set $_undeadSleepStart to $tiredness>>$1<<if maplebirch.get("MoreTransformations")?.Undead.active>><<set $tiredness to $_undeadSleepStart - ($_undeadSleepStart - $tiredness) * 0.5>><</if>>',
+          expected: 1
+        },
         {
           src: '<<set $arousal += 10>>',
           to: '<<set $arousal += (maplebirch.get("MoreTransformations")?.Undead.arousal(10) ?? 10)>>',
@@ -96,4 +114,5 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
     }
   });
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-raven-link', passage: 'Churchyard' });
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-undead-moon', passage: ['Pirate Deck', 'Beach'] });
 }

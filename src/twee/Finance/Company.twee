@@ -72,7 +72,7 @@
       <<set $_cost to $_advance.cost + ($_plan.day - $_finish - 2) * $_industry.dailyCosts[$_factory.site]>>
       <<set $_surplus to $_plan.total - $_quote.materials - $_cost>>
       <li><b><<lanSwitch $_plan.name[0] $_plan.name[1]>></b><br>
-        <<lanSwitch 'Expected payment: ' '预计到账：'>><<deadwood-reblooms-finance-money $_plan.balance>> · <<deadwood-reblooms-finance-date $_plan.day>><br>
+        <<lanSwitch `$_plan.balance < 0 ? 'Advance to return: ' : 'Expected payment: '` `$_plan.balance < 0 ? '应退预付款：' : '预计到账：'`>><<deadwood-reblooms-finance-money `Math.abs($_plan.balance)` `$_plan.balance < 0 ? 'red' : 'gold'`>> · <<deadwood-reblooms-finance-date $_plan.day>><br>
         <<lanSwitch 'Payroll and site bills: ' '工资与厂房费用：'>><<deadwood-reblooms-finance-money $_cost>> · <<lanSwitch 'Order surplus: ' '订单结余：'>><<deadwood-reblooms-finance-money $_surplus `$_surplus < 0 ? 'red' : 'green'`>>
       </li>
     <</for>>
@@ -212,6 +212,16 @@
           订单已经交给车间，完工后需要到厂房院落安排发货。
       <</language>>
       <br>
+    <<elseif _company_state.contract.stage is 'invoice' and _company_state.contract.due lt 0>>
+      <span class='red'><<lanSwitch 'Advance still to return: ' '尚需退还预付款：'>><<deadwood-reblooms-finance-money `-_company_state.contract.due` 'red'>></span><br>
+      <<language>>
+        <<option 'EN'>>
+          Accounts has returned the delivery statement. The deduction exceeds the balance: part of the advance must go back. Returns come from the factory before its daily payroll; leave enough for wages too. Any unpaid refund remains owed.
+        <<option 'CN'>>
+          财务处退回了送货结算单。扣款超过尾款，多收的预付款也得还。这笔钱从承接工厂的周转金退回，先于当天发薪，记得另留工资。不够退的部分仍记在账上。
+      <</language>><br>
+      <<lanSwitch 'Next account check: ' '下次核账：'>><<deadwood-reblooms-finance-date _company_state.contract.pay_day>><br>
+      <<lanSwitch 'Factory responsible: ' '承接厂房：'>><<print maplebirch.t(maplebirch.get('Finance').industry.terms.sites[_company_state.contract.site].name)>><br>
     <<elseif _company_state.contract.stage is 'disputed'>>
       <<icon 'company/invoice.png'>><<lanLink ['Take the overdue invoice to accounts (0:05)', '带逾期账单去财务处 (0:05)'] 'Deadwood Reblooms Company Collection'>><<pass 5>><</lanLink>><br>
     <<else>>
@@ -320,9 +330,9 @@
   <span class='red'><i>
     <<language>>
       <<option 'EN'>>
-        Cancelling requires the advance to be returned, as well as the factory's cancellation fee. Materials already bought are not refunded.
+        Cancelling requires the advance to be returned, as well as the factory's cancellation fee. Materials already bought are not refunded. If late-delivery deductions exceed the unpaid balance, the excess advance must also be returned; that order remains open until it is settled.
       <<option 'CN'>>
-        取消订单时必须退还预付款，另付工厂的违约金。已经采购的原料款不退。
+        取消订单时必须退还预付款，另付工厂的违约金，原料款不退。迟交扣款若超过尾款，多收的预付款也须退回，退清前不能结单。
     <</language>>
   </i></span><br>
 <</deadwood-card>>

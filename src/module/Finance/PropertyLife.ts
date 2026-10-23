@@ -64,6 +64,7 @@ export default class PropertyLife {
 
   public preInit(): void {
     this.core.on(':passagestart', () => {
+      if (V.replayScene || V.statFreeze || V.frozenValues) return;
       if (!this.core.passage.title.startsWith('Deadwood Reblooms Property Resident Bath') && V.Finance?.real_estate?.life) V.Finance.real_estate.life.bath = null;
       if (this.core.passage.title === 'Deadwood Reblooms Property Home') this.arrive();
     });

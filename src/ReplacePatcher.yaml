@@ -211,13 +211,16 @@
   after: |
     if (maplebirch.get('MoreTransformations') && (V.MoreTransformations?.shrine?.harvests ?? 0) >= 3) result = Math.floor(result * 1.07);
 
-- comment: '将神圣转化加成接入当前技能值。'
+- comment: '神圣转化与恐惧共用有效技能入口，保留原值查询与原版修正。'
   fileName: 'ingame.js'
   from: 'window.currentSkillValue = currentSkillValue;'
   to: |
     window.currentSkillValue = ((original) => function (skill, ...args) {
       const result = original.call(this, skill, ...args);
-      return maplebirch.get('VanillaPlus')?.divineTransformations.skillValue(skill, result) ?? result;
+      if (args[0] >= 2) return result;
+      const value = maplebirch.get('VanillaPlus')?.divineTransformations.skillValue(skill, result) ?? result;
+      const modifier = skill === 'willpower' ? maplebirch.get('Psyche')?.willpower ?? 1 : 1;
+      return modifier === 1 ? value : Math.floor(value * modifier);
     })(currentSkillValue);
 
 - comment: '飞升抵消麋鹿疤痕的每日创伤输入。'

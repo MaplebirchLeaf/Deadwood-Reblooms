@@ -1,9 +1,11 @@
 # Deadwood Reblooms · Game guide
 
-Choose a feature from the contents below. Chapters explain entrances, requirements and steps. Character and achievement sections contain spoilers. Search by character, place or feature.
+Choose a chapter below, or search by character, place or activity. The guide contains story and character spoilers.
 
-- First visit: read [Core features](#deadwood-guide-DeadwoodReblooms), choose modules, save and reload.
-- Everyday life and business: [Life Simulation](#deadwood-guide-LifeSimulation), [Orchard](#deadwood-guide-Orchard) and [Finance](#deadwood-guide-Finance).
-- Travel and street work: [Transport](#deadwood-guide-Transport) and [Street Life](#deadwood-guide-StreetLife).
+- **Getting started**: [Core features](#deadwood-guide-DeadwoodReblooms)
+- **Business and property**: [Finance](#deadwood-guide-Finance) · [Banking and investment](#deadwood-guide-FinanceBanking) · [Companies and factories](#deadwood-guide-FinanceBusiness) · [Homes and residents](#deadwood-guide-FinanceHomes) · [Orchard](#deadwood-guide-Orchard)
+- **Everyday life**: [Life Simulation](#deadwood-guide-LifeSimulation) · [Transport](#deadwood-guide-Transport) · [Street Life](#deadwood-guide-StreetLife)
+- **Characters**: [Robin](#deadwood-guide-Robin) · [Sydney](#deadwood-guide-Sydney) · [Whitney](#deadwood-guide-Whitney) · [Kylar](#deadwood-guide-Kylar) · [Multiple love interests](#deadwood-guide-MoreLoveInterestsAndNPCAvatars)
+- **Exploration and transformations**: [Animal transformations, Darkfeather Shrine and Coldmoon Harbour](#deadwood-guide-MoreTransformations) · [Bird Tower](#deadwood-guide-BirdTower) · [Celestial Anomalies](#deadwood-guide-CelestialAnomalies) · [Psyche](#deadwood-guide-Psyche)
 
-The journal holds current jobs, bills and next leads; Statistics → Mod statistics shows recorded results. Right-hand checkboxes toggle modules and require a reload after changes.
+The **journal** tracks current jobs, bills and leads. **Statistics → Mod statistics** records your results. Use the checkboxes beside the contents to toggle modules, then save and reload.

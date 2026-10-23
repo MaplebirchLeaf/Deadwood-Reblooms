@@ -1,3 +1,59 @@
+- passage: Widgets Sydney
+  # 普通交谈菜单主动展示吊坠，原版的偶遇反应照常。
+  findString: '<<widget "sydneyOptionsTalk">>'
+  after: "\n\t<<deadwood-locket-link 'Sydney'>>"
+
+- passage: Widgets Kylar
+  findString: '<<if _lewdIdea>>'
+  before: "<<deadwood-locket-link 'Kylar'>>\n\t\t"
+
+- passage: Widgets Robin
+  findString: '<<robinbully>>'
+  before: "<<deadwood-locket-link 'Robin'>>\n\t\t"
+
+- passage: Widgets Whitney
+  findString: '<<if !_noOptions>>'
+  after: "\n\t\t\t<<deadwood-locket-link 'Whitney'>>"
+
+- passage: Mansion Talk
+  findString: '<<if isLoveInterest("Avery") and !$daily.avery.talk.flirt and $avery_pool isnot "swim">>'
+  before: "<<deadwood-locket-link 'Avery'>>\n\t\t"
+
+- passage: Farm Widgets
+  findString: '<<couchicon>>'
+  before: "<<deadwood-locket-link 'Alex'>>\n\t\t\t"
+
+- passage: Gwylan Widgets
+  findString: '<<gwylanOptionsRequest>>'
+  before: "<<deadwood-locket-link 'Gwylan'>>\n\t\t"
+
+- passage: Mirror Locket
+  # 模组扩展的恋人照片只补文字，图片仍沿用原版缺图回退。
+  findString: '<<switch $carried.neck.photo>>'
+  after: |-
+
+    <<case 'Remy'>>
+      <<set _locket_text to lanSwitch('A photograph of Remy looks back at you.', '照片里的雷米正望向你。')>>
+    <<case 'Tsukihan'>>
+      <<set _locket_text to lanSwitch('Tsukihan smiles back at you in the photograph.', '照片里的月羽正对你微笑。')>>
+
+- passage: Mirror Locket 2
+  findString: '<<switch $carried.neck.photo>>'
+  after: |-
+
+    <<case 'Remy'>>
+      <<lanSwitch 'You insert a small photograph of Remy.' '你放入一张雷米的小照片。'>>
+    <<case 'Tsukihan'>>
+      <<lanSwitch 'You insert a small photograph of Tsukihan.' '你放入一张月羽的小照片。'>>
+
+- passage: Mirror Locket
+  # 只追加查看照片的心境，原版图片、换照与幻象仍在原处处理。
+  findString: '<<if $options.images>>'
+  before: |-
+    <<if $carried.neck.photo and !_noLocketPhoto>>
+      <<set _locket_text += '<br><br><<deadwood-locket-memory>>'>>
+    <</if>>
+
 - passage: Widgets NPCs
   # 补充恋人首次发现异装的入口，后续反应仍由原版处理。
   findRegex: >-

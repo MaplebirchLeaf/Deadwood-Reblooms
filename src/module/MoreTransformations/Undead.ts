@@ -9,7 +9,6 @@ class Undead extends Transformation {
       'undead',
       'curse',
       {
-        icon: 'undead.png',
         parts: [],
         build: 1,
         level: 1,
@@ -49,7 +48,7 @@ class Undead extends Transformation {
     core.char.use('pre', Undead.skin, name => name.startsWith('combatClose') || name.startsWith('combatXray'));
 
     core.tool.patch.traits.add(
-      ...['undying', 'desire', 'undead'].map(trait => ({
+      ...['undying', 'desire', 'restless', 'undead'].map(trait => ({
         title: 'Transformation Traits',
         name: () => core.t(`deadwood-reblooms:Traits:${trait}:name`),
         colour: 'silver',
@@ -60,7 +59,7 @@ class Undead extends Transformation {
 
     // 游戏时间推进后清除直接赋值的疼痛，即时伤害仍由原版 painClamp 兜底。
     core.dynamic.regTimeEvent('onSec', 'deadwood-undead-pain', {
-      cond: () => this.active,
+      cond: () => this.active && !V.statFreeze && !V.replayScene && !V.frozenValues,
       action: () => (V.pain = 0)
     });
   }

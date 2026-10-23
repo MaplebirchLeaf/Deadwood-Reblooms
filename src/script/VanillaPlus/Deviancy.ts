@@ -39,6 +39,12 @@ export default function (maplebirch: typeof window.maplebirch) {
         }
       ],
       'Widgets Deviancy': [
+        // 满自控分支读取自身等级，六级仍增加创伤，但没有可恢复的自控。
+        {
+          srcmatch: /(<<elseif _combat_deviancy_max_control>>\s*<br>\s*<<if )_combat_deviancy_success( is 6>>[\s\S]*?)<<gggcontrol>>/,
+          to: '$1_combat_deviancy_max_control$2',
+          expected: 1
+        },
         // 两处相同的阶段上限作为明确的批量替换，避免依赖补丁先后顺序。
         {
           srcmatchgroup: /<<set \$_scaledDeviancyMax to 20 \* \$_n>>/g,

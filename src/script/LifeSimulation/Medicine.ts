@@ -49,8 +49,9 @@ export default function Medicine(maplebirch: typeof window.maplebirch): void {
     widgetPassage: {
       Widgets: [
         {
-          src: '<<set $_gain to _args[1] || 1>>',
-          applyafter: '\n\t\t<<if $_gain gt 0 and maplebirch.get("LifeSimulation")>><<set $_gain *= maplebirch.get("LifeSimulation").medicine.focus>><</if>>',
+          // 与理智共用最终学习收益位置，保留 DoLX 等版本对原始增量的判断。
+          src: '<<set V[$_subject + "_exam"] to Math.clamp(',
+          applybefore: '<<if $_gain gt 0 and maplebirch.get("LifeSimulation")>><<set $_gain *= maplebirch.get("LifeSimulation").medicine.focus>><</if>>',
           expected: 1
         }
       ],

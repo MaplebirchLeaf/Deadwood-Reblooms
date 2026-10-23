@@ -107,6 +107,8 @@ Transport uses the usual 70% purchase price and shared 100-fruit daily limit, ch
 
 With Orchard enabled, choose **Approach Remy** at the riding school during the day; **planting land is not required**. Avoid closing time, combat and emergencies.
 
+After three ordinary conversations, familiarity moves Remy into the important relationships section of Social. Established and ended relationships keep their records; love-interest eligibility still requires explicitly agreeing to the relationship.
+
 1. Have an ordinary conversation once daily for 10 minutes. Teaching and care topics build familiarity; confronting farm conflict, the mask or captivity is separate and does not count towards relationship conversations.
 2. Give one stocked dish or fruit daily. Scones are a favourite, and reserved orchard fruit is not gifted.
 3. After three conversations and 20 affection, arrive early to suggest 45 minutes alone, once daily. Tea is indoors, with a walk by the fence in warm clear weather.

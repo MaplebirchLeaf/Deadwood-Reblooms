@@ -3,6 +3,7 @@
 <<lanSwitch 'Driving school' '驾校'>><br><br>
 <<deadwood-dynamicblock 'deadwood-transport-school'>>
 <<set _transport to maplebirch.get('Transport'), _school to _transport.school, _school_revision to $Transport.school.revision>>
+<div id='deadwood-transport-school-notice'></div>
 <<if Time.weekDay is 1 or Time.hour lt 9 or Time.hour gte 17>>
   <<language>>
     <<option 'EN'>>
@@ -237,17 +238,13 @@
     <<if _school.canApply>>
       <<capture _school_revision>>
         <<icon 'transport/licence.png'>><<lanLink ['Apply for a provisional licence (£43, 0:15)', '申领临时驾照 (£43, 0:15)']>>
-          <<if maplebirch.get('Transport').school.attend('apply', _school_revision) and $passage is 'Deadwood Transport School'>>
-            <<goto 'Deadwood Transport School'>>
-          <</if>>
+          <<deadwood-transport-school-book 'apply' _school_revision>>
         <</lanLink>>
       <</capture>><br>
     <<elseif _school.canCollect>>
       <<capture _school_revision>>
         <<icon 'transport/licence.png'>><<lanLink ['Collect your provisional licence (0:15)', '领取临时驾照 (0:15)']>>
-          <<if maplebirch.get('Transport').school.attend('collect', _school_revision) and $passage is 'Deadwood Transport School'>>
-            <<goto 'Deadwood Transport School'>>
-          <</if>>
+          <<deadwood-transport-school-book 'collect' _school_revision>>
         <</lanLink>>
       <</capture>><br>
     <<elseif $Transport.school.provisional.ready_day gt Time.days>>
@@ -285,45 +282,35 @@
       <<if _school.canStudy>>
         <<capture _school_revision>>
           <<icon 'transport/theory.png'>><<lanLink ['Study road rules and hazards (£30, 1:00)', '学习交规 (£30, 1:00)']>>
-            <<if maplebirch.get('Transport').school.attend('study', _school_revision) and $passage is 'Deadwood Transport School'>>
-              <<goto 'Deadwood Transport School'>>
-            <</if>>
+            <<deadwood-transport-school-book 'study' _school_revision>>
           <</lanLink>>
         <</capture>><br>
       <</if>>
       <<if _school.canTheory>>
         <<capture _school_revision>>
           <<icon 'transport/theory-test.png'>><<lanLink ['Take the theory test (£23, 1:30)', '参加理论考试 (£23, 1:30)']>>
-            <<if maplebirch.get('Transport').school.attend('theory', _school_revision) and $passage is 'Deadwood Transport School'>>
-              <<goto 'Deadwood Transport School'>>
-            <</if>>
+            <<deadwood-transport-school-book 'theory' _school_revision>>
           <</lanLink>>
         <</capture>><br>
       <</if>>
       <<if _school.canCBT>>
         <<capture _school_revision>>
           <<icon 'transport/motorcycle-lesson.png'>><<lanLink ['Complete basic motorcycle training (£160, 6:00)', '摩托车基础培训 (£160, 6:00)']>>
-            <<if maplebirch.get('Transport').school.attend('cbt', _school_revision) and $passage is 'Deadwood Transport School'>>
-              <<goto 'Deadwood Transport School'>>
-            <</if>>
+            <<deadwood-transport-school-book 'cbt' _school_revision>>
           <</lanLink>>
         <</capture>><br>
       <</if>>
       <<if _school.canModuleOne>>
         <<capture _school_revision>>
           <<icon 'transport/road-test.png'>><<lanLink ['Take the off-road test (£15.50, 0:20)', '参加场地考试 (£15.50, 0:20)']>>
-            <<if maplebirch.get('Transport').school.attend('module_1', _school_revision) and $passage is 'Deadwood Transport School'>>
-              <<goto 'Deadwood Transport School'>>
-            <</if>>
+            <<deadwood-transport-school-book 'module_1' _school_revision>>
           <</lanLink>>
         <</capture>><br>
       <</if>>
       <<if _school.canTest>>
         <<capture _school_revision>>
           <<icon 'transport/road-test.png'>><<lanLink ['Begin the road test (£' + _school.terms.test_fee / 100 + ', allow 0:50)', '开始道路考试（£' + _school.terms.test_fee / 100 + '，预留0:50）']>>
-            <<if maplebirch.get('Transport').school.attend('test', _school_revision) and $passage is 'Deadwood Transport School'>>
-              <<goto 'Deadwood Transport School'>>
-            <</if>>
+            <<deadwood-transport-school-book 'test' _school_revision>>
           <</lanLink>>
         <</capture>><br>
       <</if>>
@@ -340,18 +327,14 @@
         <<if _school.canBribe>>
           <<capture _school_revision>>
             <<icon 'pound.png'>><<lanLink ['Offer £' + _school.terms.bribe_fee / 100 + ' to change the result (0:15)', '拿出 £' + _school.terms.bribe_fee / 100 + '，试着改掉成绩 (0:15)']>>
-              <<if maplebirch.get('Transport').school.attend('bribe', _school_revision) and $passage is 'Deadwood Transport School'>>
-                <<goto 'Deadwood Transport School'>>
-              <</if>>
+              <<deadwood-transport-school-book 'bribe' _school_revision>>
             <</lanLink>>
           <</capture>><br>
         <</if>>
         <<if _school.canTamper>>
           <<capture _school_revision>>
             <<icon 'street/forged-signature.png'>><<lanLink ['Alter the test sheet (0:15)', '偷偷改掉成绩单 (0:15)']>>
-              <<if maplebirch.get('Transport').school.attend('tamper', _school_revision) and $passage is 'Deadwood Transport School'>>
-                <<goto 'Deadwood Transport School'>>
-              <</if>>
+              <<deadwood-transport-school-book 'tamper' _school_revision>>
             <</lanLink>>
           <</capture>><br>
         <</if>>
@@ -365,9 +348,7 @@
     <<if _school.canTrain>>
       <<capture _school_revision>>
         <<icon `$Transport.school.category === 'motorcycle' ? 'transport/motorcycle-lesson.png' : 'transport/driving-lesson.png'`>><<lanLink [(_school.record.licensed ? 'Advanced driving practice' : 'Take a driving lesson') + ' (£' + _school.terms.lesson_fee / 100 + ', 1:00)', (_school.record.licensed ? '进阶驾驶练习' : '上实操课') + '（£' + _school.terms.lesson_fee / 100 + '，1:00）']>>
-          <<if maplebirch.get('Transport').school.attend('lesson', _school_revision) and $passage is 'Deadwood Transport School'>>
-            <<goto 'Deadwood Transport School'>>
-          <</if>>
+          <<deadwood-transport-school-book 'lesson' _school_revision>>
         <</lanLink>>
       <</capture>><br>
     <</if>>
@@ -426,17 +407,17 @@
       <</language>><br><br>
       <<capture _exam_step>>
         <<icon 'transport/give-way.png'>><<lanLink ['Wait at the give-way line (0:10)', '停在让行线前等待 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('wait', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('wait', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
         <<icon `$Transport.school.category is 'motorcycle' ? 'transport/motorcycle-lesson.png' : 'transport/driving-lesson.png'`>><<lanLink ['Edge forward slowly (0:10)', '慢慢向前挪动 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('edge', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('edge', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
         <<icon `$Transport.school.category is 'motorcycle' ? 'transport/motorcycle-lesson.png' : 'transport/driving-lesson.png'`>><<lanLink ['Pull out in one movement (0:10)', '一口气驶出路口 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('go', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('go', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
@@ -464,17 +445,17 @@
       <</language>><br><br>
       <<capture _exam_step>>
         <<icon 'transport/town-bicycle.png'>><<lanLink ['Stay behind the cyclist (0:10)', '继续跟在自行车后面 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('hold', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('hold', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
         <<icon 'transport/overtake.png'>><<lanLink ['Pass with plenty of room (0:10)', '拉开距离后超车 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('pass', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('pass', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
         <<icon 'transport/overtake.png'>><<lanLink ['Squeeze through beside the cyclist (0:10)', '挤到自行车旁边过去 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('squeeze', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('squeeze', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
@@ -502,17 +483,17 @@
       <</language>><br><br>
       <<capture _exam_step>>
         <<icon 'transport/give-way.png'>><<lanLink ['Wait for the car to clear (0:10)', '等那辆车通过 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('wait', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('wait', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
         <<icon 'transport/roundabout.png'>><<lanLink ['Enter the roundabout (0:10)', '驶入环岛 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('enter', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('enter', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
         <<icon 'transport/overtake.png'>><<lanLink ['Move into the other lane first (0:10)', '先换到另一条车道 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('outer', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('outer', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
@@ -540,17 +521,17 @@
       <</language>><br><br>
       <<capture _exam_step>>
         <<icon 'transport/rear-view-mirror.png'>><<lanLink ['Check behind you and use the first gap (0:10)', '观察后方，停进第一处空隙 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('here', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('here', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
         <<icon 'transport/parking.png'>><<lanLink ['Check behind you and stop further ahead (0:10)', '观察后方，往前找地方停下 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('ahead', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('ahead', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
         <<icon 'transport/parking.png'>><<lanLink ['Brake sharply and pull straight in (0:10)', '猛踩刹车，直接靠边 (0:10)']>>
-          <<if maplebirch.get('Transport').school.drive('hurry', _exam_step) and $passage is 'Deadwood Transport School'>>
+          <<if maplebirch.get('Transport').school.drive('hurry', _exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
             <<goto 'Deadwood Transport School'>>
           <</if>>
         <</lanLink>><br>
@@ -559,7 +540,7 @@
   <<if !_school.hazardAware>>
     <<capture _exam_step>>
       <<icon 'transport/traffic-check.png'>><<lanLink ['Look carefully at the traffic (0:01)', '仔细观察路况 (0:01)']>>
-        <<if maplebirch.get('Transport').school.observe(_exam_step) and $passage is 'Deadwood Transport School'>>
+        <<if maplebirch.get('Transport').school.observe(_exam_step) and maplebirch.passage.title is 'Deadwood Transport School'>>
           <<goto 'Deadwood Transport School'>>
         <</if>>
       <</lanLink>><br>
