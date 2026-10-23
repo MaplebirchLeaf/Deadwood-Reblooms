@@ -18,6 +18,7 @@ export interface Order {
   deadline: number;
   outcome: 'paid' | 'late' | 'default';
   progress: number;
+  contacted?: boolean;
 }
 
 export interface FactoryReport {
@@ -600,6 +601,73 @@ export default class Industry {
     if (state.automatic && state.manager && state.order.progress >= state.order.batches) this.dispatch(state, current);
   }
 
+  public contacts(id: number, site = this.state.site, week = this.state.offer_week): string[] {
+    const state = this.state;
+    const order = state.offers.find(item => item.id === id);
+    const product = terms.products.find(item => item.id === order?.product);
+    if (
+      !this.foreman ||
+      !this.ready ||
+      V.nextPassage ||
+      V.nextPassageCheck ||
+      state.site !== site ||
+      state.offer_week !== week ||
+      week !== Math.floor(Time.days / 7) ||
+      state.order ||
+      !order ||
+      order.contacted ||
+      order.deadline <= Math.floor(Time.days) ||
+      !state.lines.includes(order.product) ||
+      !product?.customers.includes(order.customer)
+    )
+      return [];
+    return product.customers.filter(
+      symbol =>
+        symbol !== order.customer &&
+        (state.paid?.[symbol] ?? 0) >= 3 &&
+        this.finance.securities.some(item => item.symbol === symbol) &&
+        (symbol !== 'RDS' || this.finance.core.get('Robin')?.state.shop) &&
+        (symbol !== 'AVY' || V.avery_fate === 'ascended') &&
+        (symbol !== 'OBC' || !(V.chef_state >= 7 && V.chef_state < 9 && Number(V.chef_rework) <= 30))
+    );
+  }
+
+  public contact(id: number, customer: string, site: number, week: number): boolean {
+    if (!this.contacts(id, site, week).includes(customer)) return false;
+    const state = this.state;
+    const index = state.offers.findIndex(item => item.id === id);
+    const previous = state.offers[index];
+    const product = terms.products.find(item => item.id === previous.product)!;
+    // 只替换本份询价，保留交期；报价和付款风险沿用普通订单，联系不等于签约。
+    state.offers[index] = { ...this.quote(state, product, Math.floor(Time.days), customer, id), deadline: previous.deadline, contacted: true };
+    return true;
+  }
+
+  private quote(state: FactoryState, product: (typeof terms.products)[number], day: number, customer: string, id: number): Order {
+    const season = Time.getSeason(new DateTime(Time.date).addDays(day - Math.floor(Time.days)));
+    const index = ['winter', 'spring', 'summer', 'autumn'].indexOf(season);
+    const batches = Math.clamp(
+      Math.round((random(6, 15) * product.seasons[Math.max(0, index)] * terms.sites[state.site].multiplier) / 100),
+      3,
+      customer === 'RDS' ? 5 : Math.round(24 * terms.sites[state.site].multiplier)
+    );
+    const roll = random(1, 100);
+    const reputation = this.reputation;
+    const repeat = Math.min(3, state.paid?.[customer] ?? 0);
+    const multiplier = (random(1, 100) > 94 - reputation * 2 ? random(150, 220) : random(80, 120) + reputation * 2) + repeat * 2;
+    return {
+      id,
+      product: product.id as Product,
+      customer,
+      batches,
+      materials: product.materials * batches,
+      total: Math.round((product.price * batches * multiplier) / 100),
+      deadline: day + random(5, 10),
+      outcome: roll <= 8 - reputation - repeat && customer !== 'RDS' ? 'default' : roll <= 25 - reputation - repeat * 2 ? 'late' : 'paid',
+      progress: 0
+    };
+  }
+
   private offers(state: FactoryState, day: number): void {
     const season = Time.getSeason(new DateTime(Time.date).addDays(day - Math.floor(Time.days)));
     const index = ['winter', 'spring', 'summer', 'autumn'].indexOf(season);
@@ -609,28 +677,7 @@ export default class Industry {
       );
       if (!customers.length || random(1, 100) > product.seasons[Math.max(0, index)]) return [];
       const customer = customers[random(0, customers.length - 1)];
-      const batches = Math.clamp(
-        Math.round((random(6, 15) * product.seasons[Math.max(0, index)] * terms.sites[state.site].multiplier) / 100),
-        3,
-        customer === 'RDS' ? 5 : Math.round(24 * terms.sites[state.site].multiplier)
-      );
-      const roll = random(1, 100);
-      const reputation = this.reputation;
-      const repeat = Math.min(3, state.paid?.[customer] ?? 0);
-      const multiplier = (random(1, 100) > 94 - reputation * 2 ? random(150, 220) : random(80, 120) + reputation * 2) + repeat * 2;
-      return [
-        {
-          id: state.next_id++,
-          product: product.id as Product,
-          customer,
-          batches,
-          materials: product.materials * batches,
-          total: Math.round((product.price * batches * multiplier) / 100),
-          deadline: day + random(5, 10),
-          outcome: roll <= 8 - reputation - repeat && customer !== 'RDS' ? ('default' as const) : roll <= 25 - reputation - repeat * 2 ? ('late' as const) : ('paid' as const),
-          progress: 0
-        }
-      ];
+      return [this.quote(state, product, day, customer, state.next_id++)];
     });
     // 四处机构轮流发出日常采购询价，每周只交给一处具备相应生产线的工厂。
     const week = Math.floor(day / 7);

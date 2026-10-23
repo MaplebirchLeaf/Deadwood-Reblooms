@@ -25,6 +25,8 @@ Net balance deducts credit, personal loan, mortgage and collection debts. Eligib
 
 **Furniture payment problems**: check the selected home, issued cards, completed reload, sufficient deposits or available credit, and overdue restrictions. A large bank balance does not mean a debit card was issued. A credit limit is not an equal personal-loan entitlement.
 
+Before borrowing, enter an amount and term and choose **Calculate repayments** to see the first payment date, weekly instalment, final payment and total. The estimate uses the current rate and assumes every instalment is paid on time. Recalculate after changing either input. Checking does not borrow money or advance time. The journal's next payment amount includes the remaining days of a final partial week.
+
 Markets respond to farm progress and raids, Ocean Breeze Cafe prices, adverts, expansion, ingredient rumours and police investigations, Avery’s company outcomes, and Robin’s shop opening, improvements, staff and orchard deliveries. Orchard deliveries to the drinks shop move its quote at the first, fifth and tenth completed order.
 
 <span class="blue">The cafe keeps trading for a week after announcing its expansion. Construction closure is a separate report. Maximum suspicion alone does not mean the police have discovered it. An actual investigation on Cliff Street causes the larger fall.</span> Publicly disclosing the ingredients at reopening also affects the quote.
@@ -76,7 +78,7 @@ Printed figures are a record. Check the securities desk for the price used when 
 
 ### Business borrowing and recovery debt
 
-The **business-purpose loan** page at the bank accepts Robin's shop plans or an established farm-orchard sales record. PC signs as the borrower and receives the funds in the bank account. Lending money to Robin remains a separate transfer and debt.
+The **business-purpose loan** page at the bank accepts Robin's shop plans, an established farm-orchard sales record, or factory deeds with no unpaid wages. PC signs as the borrower and receives the funds in the bank account. Shop funding must be passed to Robin, orchard supplies purchased separately, and factory working funds transferred at the yard. For factories, the application lists current working funds, unpaid wages and bills, and three days of wages and site bills. Materials need a separate allowance.
 
 Recovery debt appears in the finance journal with its deadline. Pay it from bank funds and cash, or buy one short extension. Once overdue, Bailey can intercept PC on High Street. Pay, resist or submit; fighting off the collector does not erase the debt. Being taken away can lead to the vanilla underground brothel or Remy’s underground farm. After two insufficient personal-loan or credit-card payments, the remaining balance and accrued charges transfer to collection with fourteen days to pay. The original account stops collecting that debt. A defaulted credit card is withdrawn; a new application is available after the collection debt is cleared.
 

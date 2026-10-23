@@ -430,6 +430,41 @@
   </div>
 <</widget>>
 
+<!-- 只推算按期足额还款，不改账户、账期或实际借款资格。末期按剩余天数计息。 -->
+<<widget 'deadwood-finance-loan-quote'>>
+  <<set $_principal to Math.round(Number(_args[0]) * 100)>>
+  <<set $_product to maplebirch.get('Finance').loanProducts.find(product => product.days === Number(_args[1]))>>
+  <<if !Number.isSafeInteger($_principal) or $_principal lte 0 or $_principal gt maplebirch.get('Finance').accountLimits.loan or !$_product>>
+    <span class='blue'><<lanSwitch 'Enter an amount within your borrowing limit to calculate repayments.' '输入贷款额度内的金额，即可计算还款。'>></span>
+    <<exit>>
+  <</if>>
+  <<set $_growth to Math.pow(1 + $_product.weeklyRate, Math.ceil($_product.days / 7))>>
+  <<set $_weekly to Math.ceil($_principal * $_product.weeklyRate * $_growth / ($_growth - 1))>>
+  <<set $_debt to $_principal, $_elapsed to 0, $_total to 0, $_today to Math.max(0, Math.floor(Time.days))>>
+  <<for ; $_debt gt 0; >>
+    <<set $_day to Math.min($_elapsed + 7, $_product.days)>>
+    <<set $_debt += Math.ceil($_debt * $_product.weeklyRate * ($_day - $_elapsed) / 7)>>
+    <<set $_payment to $_day is $_product.days ? $_debt : Math.min($_weekly, $_debt)>>
+    <<if $_elapsed is 0>><<set $_first to $_payment>><</if>>
+    <<set $_debt -= $_payment, $_total += $_payment, $_elapsed to $_day>>
+  <</for>>
+  <section class='deadwood-card'>
+    <div class='deadwood-card-title bold'><<lanSwitch 'Repayment estimate' '还款估算'>></div>
+    <div class='deadwood-card-body'>
+      <div class='dr-finance-summary'>
+        <span><<lanSwitch 'Paid into your bank account' '存入银行账户'>></span><span><<deadwood-reblooms-finance-money $_principal>></span>
+        <span><<lanSwitch 'First payment' '首期还款'>></span><span><<deadwood-reblooms-finance-money $_first>> · <<deadwood-reblooms-finance-date `$_today + Math.min(7, $_product.days)`>></span>
+        <<if $_elapsed gt 7>>
+          <span><<lanSwitch 'Weekly payment' '每周应还'>></span><span><<deadwood-reblooms-finance-money $_weekly>></span>
+          <span><<lanSwitch 'Final payment' '末期还款'>></span><span><<deadwood-reblooms-finance-money $_payment>> · <<deadwood-reblooms-finance-date `$_today + $_elapsed`>></span>
+        <</if>>
+        <span><<lanSwitch 'Total repaid' '合计还款'>></span><span><<deadwood-reblooms-finance-money $_total>></span>
+      </div>
+      <span class='blue'><<lanSwitch 'At the current rate, with every payment made on time. Early repayment or arrears will change these figures.' '按当前利率及每期按时足额还款估算。提前还款或逾期会改变这些金额。'>></span>
+    </div>
+  </section>
+<</widget>>
+
 <!-- 贷款业务：借款、计划还款信息与主动还款。 -->
 <<widget 'deadwood-reblooms-finance-bank-loan-panel'>>
   <div id='deadwood-reblooms-finance-bank-loan-panel'>
@@ -469,6 +504,10 @@
           <</lanListbox>>
           </label>
         </div>
+        <<if $Finance.bank.loan_debt lte 0>>
+          <<lanLink ['Calculate repayments', '计算还款']>><<replace '#deadwood-finance-loan-quote'>><<deadwood-finance-loan-quote _financeLoanAmount _financeLoanTerm>><</replace>><</lanLink>>
+          <div id='deadwood-finance-loan-quote'></div>
+        <</if>>
         <<deadwood-reblooms-finance-quick-transfers 'loan' 100 1000 5000>>
         <div class='dr-finance-actions'>
         <<lanLink ["Take out a loan", "申请贷款"]>>

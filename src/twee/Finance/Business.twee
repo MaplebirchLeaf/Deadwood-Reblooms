@@ -20,6 +20,24 @@
 <<set _businessAmount to 2000>>
 <<set _business_labels to {shop: ['Apply for drinks-shop funding', '申请饮品店经营贷款'], orchard: ['Apply for orchard funding', '申请果园经营贷款'], factory: ['Apply for factory funding', '申请工厂经营贷款']}>>
 <label><<lanSwitch 'Borrow £' '借款 £'>><<numberbox '_businessAmount' 2000>></label><br><br>
+<<if $Finance.bank.loan_debt lte 0>>
+  <<lanLink ['Calculate repayments', '计算还款']>><<replace '#deadwood-business-loan-quote'>><<deadwood-finance-loan-quote _businessAmount 30>><</replace>><</lanLink>>
+  <div id='deadwood-business-loan-quote'><<deadwood-finance-loan-quote _businessAmount 30>></div>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    The loan goes into your bank account. Shop funding must still be passed to Robin, orchard supplies bought separately, and factory working funds transferred at the yard. Factory materials need a separate allowance.
+  <<option 'CN'>>
+    借款会存入你的银行账户。饮品店的资金仍需交给罗宾，果园物资另行采购，工厂周转金到厂里转入。工厂原料款另行预留。
+<</language>><br><br>
+<<if $_finance.businessProjects.some(project => project.id is 'factory' and project.eligible)>>
+  <<for $_factory range $_finance.industry.owned>>
+    <b><<= maplebirch.t($_finance.industry.terms.sites[$_factory.site].name)>></b>：
+    <<lanSwitch 'Working funds ' '周转金 '>><<deadwood-reblooms-finance-money $_factory.cash>> ·
+    <<lanSwitch 'Unpaid wages and bills ' '欠薪与欠费 '>><<deadwood-reblooms-finance-money `$_factory.wage_arrears + $_factory.overhead_arrears`>> ·
+    <<lanSwitch 'Three days of wages and site bills ' '三天工资与厂房费用 '>><<deadwood-reblooms-finance-money `$_finance.industry.dailyCosts[$_factory.site] * 3`>><br>
+  <</for>><br>
+<</if>>
 <<for $_project range $_finance.businessProjects>>
   <<capture $_project>>
     <<if $_project.eligible>>

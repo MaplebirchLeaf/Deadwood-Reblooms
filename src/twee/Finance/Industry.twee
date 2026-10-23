@@ -115,7 +115,14 @@
 
 <<widget 'deadwood-industry-result'>>
   <<if $Finance.industry.result>>
-    <<if $Finance.industry.result is 'ok'>>
+    <<if $Finance.industry.result is 'contacted'>>
+      <<language>>
+        <<option 'EN'>>
+          Rowan puts down the receiver and writes out the quote. "Here. Read it through. Don't just look at the price."
+        <<option 'CN'>>
+          罗文放下话筒，把报价写在纸上。“拿来了。仔细看看，别光盯着总价。”
+      <</language>>
+    <<elseif $Finance.industry.result is 'ok'>>
       <span class='green'><<lanSwitch "The entry is made in the ledger." "账目已经记下。">></span>
     <<else>>
       <span class='red'><<lanSwitch "The arrangement could not be made. Check the available funds, opening hours and outstanding obligations." "未能办妥。请核对可用资金、营业时间和未结清的款项。">></span>
@@ -525,6 +532,26 @@
           <</if>>
           <<deadwood-industry-estimate _factory_order>>
           <<deadwood-reblooms-finance-date _factory_order.deadline>><br>
+          <<if _factory_order.contacted>>
+            <span class='blue'><<lanSwitch 'Rowan has already called a regular buyer about this enquiry.' '罗文已经为这份询价联系过熟客。'>></span><br>
+          <<else>>
+            <<set $_factory_site to _factory_state.site>>
+            <<set $_factory_week to _factory_state.offer_week>>
+            <<for $_factory_customer range _factory.contacts(_factory_order.id)>>
+              <<capture $_factory_site $_factory_week $_factory_customer>>
+                <<socialiseicon 'ask'>><<lanLink `['Ask Rowan to call ' + maplebirch.get('Finance').donations.customer($_factory_customer) + ' (0:15)', '请罗文联系' + maplebirch.get('Finance').donations.customer($_factory_customer) + ' (0:15)']` 'Deadwood Reblooms Factory Orders'>>
+                  <<if maplebirch.get('Finance').industry.contacts(_factory_order.id, $_factory_site, $_factory_week).includes($_factory_customer)>>
+                    <<pass 15>>
+                    <<if !$nextPassage and !$nextPassageCheck>>
+                      <<set $Finance.industry.result to maplebirch.get('Finance').industry.contact(_factory_order.id, $_factory_customer, $_factory_site, $_factory_week) ? 'contacted' : 'failed'>>
+                    <</if>>
+                  <<else>>
+                    <<set $Finance.industry.result to 'failed'>>
+                  <</if>>
+                <</lanLink>><br>
+              <</capture>>
+            <</for>>
+          <</if>>
           <<if !_factory_state.lines.includes(_factory_order.product)>>
             <span class='blue'><<lanSwitch "This needs another production line." "需要相应的生产线。">></span>
           <<elseif !_factory.ready or _factory.capacity is 0>>
