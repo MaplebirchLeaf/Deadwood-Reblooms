@@ -61,15 +61,15 @@
           <<else>>
             <<language>>
               <<option 'EN'>>
-                The agreement is suspended. Check your settled AVY holding, office rent and debt notices. Signed orders retain their original terms.
+                The agreement is suspended. Check your office rent and debt notices. Signed orders retain their original terms.
               <<option 'CN'>>
-                协议暂停生效。请检查已结算的 AVY 持股、办公室租金与追偿欠款。已签订单仍按原条款履行。
+                协议暂停生效。请检查办公室租金与追偿欠款。已签订单仍按原条款履行。
             <</language>>
           <</if>>
         </li>
       <</if>>
       <<if maplebirch.get('Finance').company.staff.arrears gt 0>>
-        <li class='red'><<lanSwitch 'Unpaid staff wages: ' '职员欠薪：'>><<printmoney `maplebirch.get('Finance').company.staff.arrears`>> · <<lanSwitch 'Staff services are suspended. Settle wages at your office.' '职员服务暂停，请到办公室结清工资。'>></li>
+        <li class='red'><<lanSwitch 'Unpaid staff wages: ' '职员欠薪：'>><<printmoney `maplebirch.get('Finance').company.staff.arrears`>> · <<lanSwitch 'Unpaid staff have suspended their services. Settle wages at your office.' '欠薪职员已暂停工作，请到办公室结清工资。'>></li>
       <</if>>
     </ul>
     <hr>
@@ -1066,8 +1066,26 @@
   <<set _journal_bounties to maplebirch.get('StreetLife')?.bounties>>
   <<if !_journal_bounties>><<exit>><</if>>
   <<set _journal_bounty_state to _journal_bounties.state>>
-  <<if _journal_bounty_state.active or _journal_bounty_state.last or _journal_bounty_state.hunter or _journal_bounties.wanted>>
+  <<if C.npc.Grant.init is 0 or C.npc.Grant.state is 'active' or _journal_bounty_state.active or _journal_bounty_state.last or _journal_bounty_state.hunter or _journal_bounties.wanted>>
     <<deadwood-card 'Cases and bounties' '案件与悬赏'>>
+      <<if C.npc.Grant.init is 0 or C.npc.Grant.state is 'active'>>
+        <ul class='journal'>
+          <li>
+            <<if C.npc.Grant.init is 1>>
+              <<lanSwitch 'Grant receives visitors beside the noticeboard in the Barb Street police station every day, 08:00–18:00.' '格兰特每天08:00–18:00在倒钩街警察局的告示板旁接待来访。'>>
+            <<else>>
+              <<lanSwitch 'A detective receives visitors beside the noticeboard in the Barb Street police station every day, 08:00–18:00.' '一位警探每天08:00–18:00在倒钩街警察局的告示板旁接待来访。'>>
+            <</if>>
+          </li>
+          <<if !_journal_bounty_state.active and !_journal_bounties.wanted>>
+            <<if _journal_bounty_state.cooperating>>
+              <li><<lanSwitch 'Visit the bounty desk during those hours to look over the open cases.' '可在这段时间前往悬赏柜台，查看待办案件。'>></li>
+            <<else>>
+              <li><<lanSwitch 'Speak with the detective about helping with enquiries before taking a case.' '先与警探谈谈协助查案，再接取案件。'>></li>
+            <</if>>
+          <</if>>
+        </ul>
+      <</if>>
       <<deadwood-street-bounty-status>>
       <<if _journal_bounty_state.active?.stage is 'escort' and _journal_bounty_state.active.vehicle isnot null and !_journal_bounties.lost and maplebirch.get('Transport')>>
         <<set _journal_bounty_vehicle to _journal_bounties.vehicle, _journal_bounty_transport to maplebirch.get('Transport')>>
@@ -1105,7 +1123,7 @@
         </li></ul>
       <</if>>
       <<if _journal_bounties.wanted>>
-        <ul class='journal'><li class='red'><<lanSwitch 'The police have enough evidence to arrest you. New assignments and reward payments are suspended.' '警方已有足够罪证拘捕你，新委托与赏金发放暂时停止。'>></li></ul>
+        <ul class='journal'><li class='red'><<lanSwitch 'The police have enough evidence to arrest you. New assignments and reward payments are suspended. Ask at reception about your own record first; helping with enquiries does not clear it.' '警方已有足够罪证拘捕你，新委托与赏金发放暂时停止。先到前台处理你自己的记录。协助查案不会消除罪证。'>></li></ul>
       <<elseif _journal_bounty_state.active?.stage is 'settlement'>>
         <span class='blue'><<lanSwitch 'Reward collection: police station, 08:00–18:00.' '赏金领取：警察局，08:00–18:00。'>></span><br>
       <</if>>
