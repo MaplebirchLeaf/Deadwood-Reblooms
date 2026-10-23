@@ -132,21 +132,21 @@ class Whale extends Transformation {
 
     maplebirch.tool.patch.traits.add(
       {
-        title: 'General Traits',
+        title: 'Transformation Traits',
         name: () => maplebirch.t('deadwood-reblooms:Traits:deep_diver:name'),
         colour: 'blue',
         has: () => !!V.transformationParts?.traits?.deep_diver && isPartEnabled(V.transformationParts.traits.deep_diver),
         text: () => maplebirch.t('deadwood-reblooms:Traits:deep_diver:text')
       },
       {
-        title: 'General Traits',
+        title: 'Transformation Traits',
         name: () => maplebirch.t('deadwood-reblooms:Traits:finned_limbs:name'),
         colour: 'lblue',
         has: () => !!V.transformationParts?.traits?.finned_limbs && isPartEnabled(V.transformationParts.traits.finned_limbs),
         text: () => maplebirch.t('deadwood-reblooms:Traits:finned_limbs:text')
       },
       {
-        title: 'General Traits',
+        title: 'Transformation Traits',
         name: () => maplebirch.t('deadwood-reblooms:Traits:whale:gender'),
         colour: 'lblue',
         has: () => (V.maplebirch?.transformation?.whale?.level ?? 0) >= 6,

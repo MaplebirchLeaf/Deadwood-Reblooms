@@ -11,7 +11,7 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
 
   maplebirch.tool.onInit(() => {
     maplebirch.tool.patch.traits.add({
-      title: 'General Traits',
+      title: 'Transformation Traits',
       name: () => maplebirch.t('deadwood-reblooms:Traits:foxfire:name'),
       colour: 'teal',
       has: () => maplebirch.get('MoreTransformations')!.foxfire,

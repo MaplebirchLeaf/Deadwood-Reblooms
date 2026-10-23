@@ -259,16 +259,18 @@ class DeadwoodReblooms extends Module {
 
   public async preInit(): Promise<void> {
     const enabled = new Set(Object.keys(this.core.services.modules.dependencyGraph).filter(name => this.core.get(name)));
-    const states = Object.fromEntries([...this.overlapping].filter(name => enabled.has(name)).map(name => [name, false]));
     const legacyNames = { SydneyExpansion: 'Sydney', RobinExpansion: 'Robin', WhitneyExpansion: 'Whitney', KylarExpansion: 'Kylar' } as const;
     const store = this.core.services.indexedDB;
     const modulesRecord = (await store.with('settings', 'readonly', tx => tx.objectStore('settings').get('Modules'))) as
       | { key: string; value: { disabled: { name: string; source: string }[] } }
       | undefined;
+    const initialized = await store.with('settings', 'readonly', tx => tx.objectStore('settings').get('DeadwoodReblooms'));
+    const states = Object.fromEntries((initialized ? [] : [...this.overlapping]).filter(name => enabled.has(name)).map(name => [name, false]));
     const oldDisabled = new Set(modulesRecord?.value.disabled.map(module => module.name) ?? []);
     for (const [oldName, name] of Object.entries(legacyNames)) if (oldDisabled.has(oldName) && enabled.has(name)) states[name] = false;
     try {
       const changed = Object.keys(states).length ? await this.core.services.gui.setModuleStates(states) : false;
+      if (!initialized) await store.with('settings', 'readwrite', tx => tx.objectStore('settings').put({ key: 'DeadwoodReblooms', value: true }));
       if (modulesRecord && Object.keys(legacyNames).some(name => oldDisabled.has(name))) {
         await store.with('settings', 'readwrite', async tx => {
           const settings = tx.objectStore('settings');

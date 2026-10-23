@@ -2,6 +2,8 @@
 
 Horse, whale and raven transformations each have six stages. Start with the routes below, then check the abilities and preservation accessories. The letter, shrine and Tsukihan follow later in this chapter. Track growth on the character page and choose your appearance at a mirror; hiding a part keeps its growth.
 
+Vanilla and mod transformation identities and abilities appear together under **Traits → Transformation Traits**, retaining their existing unlock conditions and effects.
+
 | Transformation | Where to start                                                                                                                                                                           | Further growth                                                                                                                                         |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Horse          | Take a <span class="gold">£25</span> lesson at Remy's riding school. If the grove fruit event appears, pick and eat the fruit for 5 points; it has a drug effect and the event is random | After horse transformation begins, successfully chase a runaway farm horse and groom it for 1 point; successful moor riding also offers growth chances |

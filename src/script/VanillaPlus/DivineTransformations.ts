@@ -49,22 +49,25 @@ export default function (maplebirch: typeof window.maplebirch) {
   // 复用原版特质名称覆盖其说明，使新增效果与对应转化显示在同一项中。
   maplebirch.tool.patch.traits.add(
     {
-      title: 'General Traits',
+      title: 'Transformation Traits',
       name: () => text('trait:angel:name'),
+      replace: 'Angel',
       colour: 'gold',
       has: () => maplebirch.get('VanillaPlus')!.divineTransformations.angel,
-      text: () => text('trait:angel:text')
+      text: () => text('trait:angel:text') + (maplebirch.get('VanillaPlus')!.divineTransformations.trinity ? '' : ' ' + text('trait:angel:warning'))
     },
     {
-      title: 'General Traits',
+      title: 'Transformation Traits',
       name: () => text('trait:fallenAngel:name'),
+      replace: 'Fallen Angel',
       colour: 'black',
       has: () => maplebirch.get('VanillaPlus')!.divineTransformations.fallenAngel,
       text: () => text('trait:fallenAngel:text')
     },
     {
-      title: 'General Traits',
+      title: 'Transformation Traits',
       name: () => text('trait:ironWill:name'),
+      replace: 'Iron Will',
       colour: 'silver',
       has: () => maplebirch.get('VanillaPlus')!.divineTransformations.fallenAngel,
       text: () => text('trait:ironWill:text')

@@ -73,7 +73,7 @@ export default function Sydney(maplebirch: MaplebirchCore): void {
             return original.handler.call(this);
           const demon = maplebirch.npc.Transformation.get('Sydney', 'demon');
           if (demon.level < 6 || demon.build < 90) return original.handler.call(this);
-          // 临时复用双方自愿场景的原版标记；防护、开关及受孕资格仍由原处理器判断。
+          // 临时复用双方自愿场景的原版标记。防护、开关及受孕资格仍由原处理器判断。
           const variables = name === 'combatInseminate' ? V : T;
           const overrides = name === 'combatInseminate' ? { vaginaaction: 'forceImpregnation', anusaction: 'forceImpregnation' } : { npcForceImpregnation: true };
           const previous = Object.keys(overrides).map(key => [key, Object.getOwnPropertyDescriptor(variables, key)] as const);

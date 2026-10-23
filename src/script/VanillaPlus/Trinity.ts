@@ -21,32 +21,6 @@ export default function (maplebirch: typeof window.maplebirch) {
     100
   );
 
-  let growth: { purity: number; angel: number; demon: number; fallen: number; fallenBuild: number } | undefined;
-  transformation.hooks.update.add('deadwood-trinity-growth', stage => {
-    if (stage !== 'before' || !growth) return;
-    const snapshot = growth;
-    growth = undefined;
-    if (!active()) return;
-    // 在原版阶段更新前补齐点数，达到门槛的当天即可成长。
-    if (snapshot.purity >= 1000 && V.angelbuild <= snapshot.angel) transformation._transform('angel', 1);
-    if (snapshot.purity <= 0 && snapshot.fallen >= 2 && V.demonbuild <= snapshot.demon) transformation._transform('demon', 1);
-    // 不硬编码堕天使阶段上限。成长点数交给框架，扩展阶段仍由已加载的原版 widget 判定。
-    if (snapshot.purity >= 900 && snapshot.fallen >= 2 && V.fallenbuild <= snapshot.fallenBuild) transformation._transform('fallen', 1);
-  });
-
-  maplebirch.once(':storyready', () => {
-    const daily = window.dailyTransformationEffects;
-    window.dailyTransformationEffects = () => {
-      if (!active()) return daily();
-      growth = { purity: V.purity, angel: V.angelbuild, demon: V.demonbuild, fallen: V.fallenangel, fallenBuild: V.fallenbuild };
-      try {
-        return daily();
-      } finally {
-        growth = undefined;
-      }
-    };
-  });
-
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Mirror': [
@@ -120,7 +94,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   });
 
   maplebirch.tool.patch.traits.add({
-    title: 'Special Traits',
+    title: 'Transformation Traits',
     name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:divineTransformations:trait:trinity:name'),
     colour: 'deadwood-trinity',
     has: () => maplebirch.get('VanillaPlus')!.divineTransformations.trinity,

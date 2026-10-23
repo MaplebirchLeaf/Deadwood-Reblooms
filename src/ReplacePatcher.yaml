@@ -44,6 +44,22 @@
   from: 'if (V.passout'
   before: "if (maplebirch.get('MoreTransformations')?.Undead.active && ['cold', 'heat'].includes(V.passout)) delete V.passout;\n\t\t\t"
 
+- comment: '三位一体只补堕天使原本排除的自然增长，仍由原版每日结算与阶段更新处理。'
+  fileName: 'time.js'
+  from: 'function dailyTransformationEffects() {'
+  after: |
+
+    const trinity = V.settings.transformDivineEnabled && maplebirch.get('VanillaPlus')?.divineTransformations.trinity;
+    if (trinity && V.fallenangel >= 2) {
+      if (V.purity <= 0) wikifier("transform", "demon", 1);
+      if (V.purity >= 900 && V.fallenangel >= 4) wikifier("transform", "fallen", 1);
+    }
+
+- comment: '三位一体免除堕天使每日纯洁流失，其余纯洁来源与天使增长沿用原版。'
+  fileName: 'time.js'
+  from: 'dailyPurity -= 10;'
+  before: 'if (!trinity) '
+
 - comment: '买断收租或逼退贝利后跳过原版收租结算，避免 DoLP 继续从押金扣款。'
   fileName: 'time.js'
   from: 'function passRentTick() {'

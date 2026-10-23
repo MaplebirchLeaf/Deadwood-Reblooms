@@ -172,21 +172,21 @@ class Horse extends Transformation {
   protected override extend(maplebirch: MaplebirchCore): void {
     maplebirch.tool.patch.traits.add(
       {
-        title: 'General Traits',
+        title: 'Transformation Traits',
         name: () => maplebirch.t('deadwood-reblooms:Traits:hooves:name'),
         colour: 'def',
         has: () => !['disabled', 'hidden'].includes(V.transformationParts.traits.hooves),
         text: () => maplebirch.t('deadwood-reblooms:Traits:hooves:text')
       },
       {
-        title: 'General Traits',
+        title: 'Transformation Traits',
         name: () => maplebirch.t('deadwood-reblooms:Traits:sweatblood:name'),
         colour: 'tealhair',
         has: () => !['disabled', 'hidden'].includes(V.transformationParts.traits.sweatblood),
         text: () => maplebirch.t('deadwood-reblooms:Traits:sweatblood:text')
       },
       {
-        title: 'General Traits',
+        title: 'Transformation Traits',
         name: () => maplebirch.t('deadwood-reblooms:Traits:horse:gender'),
         colour: 'softbrown',
         has: () => V.maplebirch.transformation.horse.level >= 6,

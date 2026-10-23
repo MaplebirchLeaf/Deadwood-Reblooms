@@ -268,7 +268,7 @@ class Raven extends Transformation {
   protected override extend(maplebirch: MaplebirchCore): void {
     maplebirch.tool.patch.traits.add(
       {
-        title: 'General Traits',
+        title: 'Transformation Traits',
         name: () => maplebirch.t('deadwood-reblooms:Traits:ravenFeathers:name'),
         colour: 'black',
         has: () => {
@@ -278,14 +278,14 @@ class Raven extends Transformation {
         text: () => maplebirch.t('deadwood-reblooms:Traits:ravenFeathers:text')
       },
       {
-        title: 'General Traits',
+        title: 'Transformation Traits',
         name: () => maplebirch.t('deadwood-reblooms:Traits:raven:gender'),
         colour: 'black',
         has: () => (V.maplebirch?.transformation?.raven?.level ?? 0) >= 6,
         text: () => maplebirch.t('deadwood-reblooms:Traits:raven:text')
       },
       {
-        title: 'General Traits',
+        title: 'Transformation Traits',
         name: () => maplebirch.t('deadwood-reblooms:Traits:ominousVoice:name'),
         colour: 'black',
         has: () => this.omen,

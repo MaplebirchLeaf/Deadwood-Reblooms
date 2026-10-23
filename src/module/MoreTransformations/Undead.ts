@@ -50,7 +50,7 @@ class Undead extends Transformation {
 
     core.tool.patch.traits.add(
       ...['undying', 'desire', 'undead'].map(trait => ({
-        title: 'General Traits',
+        title: 'Transformation Traits',
         name: () => core.t(`deadwood-reblooms:Traits:${trait}:name`),
         colour: 'silver',
         has: () => this.active,

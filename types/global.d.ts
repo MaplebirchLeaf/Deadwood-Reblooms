@@ -27,7 +27,6 @@ declare global {
     hooks: {
       change: { add(name: string, callback: (context: { readonly name: string; change: number }) => void): boolean };
       divine: { add(name: string, callback: (context: { widget?: [string, number] }) => void, order?: number): boolean };
-      update: { add(name: string, callback: (stage: 'before' | 'alter' | 'after') => void): boolean };
     };
   }
 
@@ -43,7 +42,6 @@ declare global {
 
   interface Window {
     Transformations: { readonly defaults: { readonly demon: { readonly colour: { h: number; s: number; l: number } } } };
-    dailyTransformationEffects(): void;
     crimeSumCurrent(): number;
     settingValueNameFromValue?: (name: string, value: unknown) => unknown;
     sexShopOnBuyClick(index: number, inSexShop?: boolean, colour?: string, costsMoney?: boolean): void;

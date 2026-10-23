@@ -1,0 +1,16 @@
+:: Deadwood Reblooms Trait Widgets [widget]
+
+<<widget 'deadwood-transformation-traits'>>
+  <<set _deadwoodTransformationTitle to maplebirch.auto('Transformation Traits')>>
+  <<set _deadwoodTransformationCategory to _traitLists.find(category => ['Transformation Traits', '转化特质', _deadwoodTransformationTitle].includes(category.title))>>
+  <<if !_deadwoodTransformationCategory>>
+    <<set _deadwoodTransformationCategory to { title: 'Transformation Traits', traits: [] }>>
+    <<run _traitLists.splice(1, 0, _deadwoodTransformationCategory)>>
+  <</if>>
+  <<for _deadwoodTraitCategory range _traitLists>>
+    <<if _deadwoodTraitCategory isnot _deadwoodTransformationCategory>>
+      <<set _deadwoodTransformationCategory.traits to _deadwoodTransformationCategory.traits.concat(_deadwoodTraitCategory.traits.filter(trait => trait.deadwoodTransformation))>>
+      <<set _deadwoodTraitCategory.traits to _deadwoodTraitCategory.traits.filter(trait => !trait.deadwoodTransformation)>>
+    <</if>>
+  <</for>>
+<</widget>>

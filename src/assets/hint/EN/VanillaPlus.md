@@ -81,7 +81,9 @@ Once your fallen angel form reaches its stable stage, Iron Will prevents willpow
 
 **Choices**: Choose **Embrace** to take a vanilla willpower check. Higher willpower makes it easier to remain conscious, and the option displays the difficulty. Success still causes pain, stress and trauma, increases awareness and grants **Trinity**. Failure brings a stronger shock and reduces control. You can try again during a later eclipse. **Snap out of it** lets you leave, gaining a little stress, awareness and willpower.
 
-**Trait and mirror**: Trinity allows angel, fallen angel and demon forms to coexist and prevents their development points from decaying. Starting the daily settlement at full purity grants angel points; starting at zero purity grants demon points. The fallen angel form no longer blocks either gain or gets forcibly replaced. Transformation side effects, including purity loss, remain. Forms you have not gained still need to be developed, and the mirror shows the existing forms' native settings together.
+**Trait**: Trinity lets angel, fallen angel and demon forms coexist, prevents their development points from decaying and removes the fallen angel’s daily purity loss. At daily settlement, maximum purity grants angel points and zero purity grants demon points. Other transformation side effects remain.
+
+**Mirror and abilities**: Existing forms can be configured separately; changing one does not hide the others. New forms still need to be developed, and abilities still require the corresponding stage. Banishing still spends its daily uses.
 
 ## Eerie mirrors: entry and return
 

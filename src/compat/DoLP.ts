@@ -1,9 +1,13 @@
 // ./src/compat/DoLP.ts
 
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
+import adaptBike from './Bike';
 
 export default function DoLP(maplebirch: MaplebirchCore): void {
-  const effects = maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Effects Man');
+  const data = maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch();
+  const passages = data.passageDataItems.map;
+  if (passages.get('Widgets Version Info')?.content.includes('Degrees of Lewdity Plus') && !data.scriptFileItems.getByNameWithOrWithoutPath('xchange.js')) adaptBike(maplebirch);
+  const effects = passages.get('Widgets Effects Man');
   if (maplebirch.get('MoreTransformations') && /<<defiance 10 \$feettarget>>/.test(effects?.content ?? '')) {
     // DoLP 增加了强度 10 的踢击分支，保留两种原生强度及其实际分支数。
     const rule = maplebirch.tool.zone.widgetPassage['Widgets Effects Man']?.find(

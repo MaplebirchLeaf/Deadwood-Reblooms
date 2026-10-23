@@ -2,6 +2,7 @@
 
 import Cheats from './DeadwoodReblooms/Cheats';
 import Tips from './DeadwoodReblooms/Tips';
+import Traits from './DeadwoodReblooms/Traits';
 import antiquesData from '../assets/antiques.json';
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
@@ -10,6 +11,7 @@ export default function (maplebirch: MaplebirchCore) {
 
   Cheats(maplebirch);
   Tips(maplebirch);
+  Traits(maplebirch);
 
   const antiques = () => {
     for (const [key, { module, translation, ...data }] of Object.entries(antiquesData)) {
@@ -108,6 +110,14 @@ export default function (maplebirch: MaplebirchCore) {
       'Town Hall Wait': [{ src: '<<effects>>', applyafter: '<<deadwood-town-hall-visitors>>', expected: 1 }]
     },
     widgetPassage: {
+      // 停用副手模块后保留存档中的副手物品，等待重新启用。原版不能读取已停用的衣物目录。
+      'Widgets Clothing': [
+        {
+          src: 'Object.keys($carried).forEach(slot => {',
+          to: 'Object.keys($carried).filter(slot => slot !== "handheld_left" || setup.clothes[slot]?.[0]).forEach(slot => {',
+          expected: 1
+        }
+      ],
       // 原版市场只列出有交易资料的食材，跳过料理等不可交易物品。
       'Widgets Market': [
         {

@@ -6,6 +6,8 @@ import { npc_size_patch } from '../script/VanillaPlus/PenisSize';
 import adaptFinance from './DoLX/Finance';
 import adaptPassages from './DoLX/Passages';
 import adaptBoot from './DoLX/Boot';
+import adaptTrinity from './DoLX/Trinity';
+import adaptBike from './Bike';
 
 type Rule = [RegExp, string];
 type DoLXWindow = typeof window & {
@@ -110,6 +112,8 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
     adaptBoot(maplebirch);
     adaptFinance(maplebirch);
     adaptPassages(maplebirch);
+    adaptTrinity(maplebirch);
+    adaptBike(maplebirch);
     const zone = maplebirch.tool.zone;
     // DoLX 在作弊按钮外又包了一层相同判断，两处都需解除，保留跳舞、战斗和起始页限制。
     if (zone.locationPassage.StoryCaption) {
@@ -118,11 +122,15 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
       );
     }
     if (maplebirch.get('VanillaPlus')) {
-      // DoLX 按生效等级显示恶魔特质，保留原生称号与等级判断，只沿用新增说明。
+      // DoLX 按生效等级显示恶魔特质，保留原生称号、收益及副作用说明，只追加新增效果。
       if (zone.widgetPassage.Traits) {
         zone.widgetPassage.Traits = zone.widgetPassage.Traits.map(rule =>
           rule.to === '$1maplebirch.t("deadwood-reblooms:VanillaPlus:divineTransformations:trait:demon:text"),'
-            ? { ...rule, srcmatch: /(has: effectiveTransformationLevel\("demon"\) gte 6,\s*text: )[^\r\n]+/ }
+            ? {
+                ...rule,
+                srcmatch: /(has: effectiveTransformationLevel\("demon"\) gte 6,\s*text: )([^\r\n]+),/,
+                to: '$1$2 + " " + maplebirch.t("deadwood-reblooms:VanillaPlus:divineTransformations:trait:demon:bonus"),'
+              }
             : rule
         );
       }
@@ -259,7 +267,7 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
       ]
     };
     if (maplebirch.get('Finance')) {
-      // 来宾走普通房租结算，沿用 DoLX 的罗宾优先事件；收养停付仍保留原生判断。
+      // 来宾走普通房租结算，沿用 DoLX 的罗宾优先事件。收养停付仍保留原生判断。
       rules['time.js'].push([
         /(if \(V\.avery_mansion\.rage\.assess >= 9 \|\| V\.avery_mansion\.days_absent >= 2\) \{\s*V\.renttime--;\s*if \(V\.baileyDeposit >= V\.rentmoney \+ \(V\.babyRent \|\| 0\))\) \{/,
         '$1 && (!maplebirch.get("Finance")?.company.avery.state.mansion_guest || !robinStandSelfSufficiencyReady())) {'
@@ -284,7 +292,7 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
 
     // 接入 DoLX 的 AMC 公式与缓存后的诱惑评分，保留特质倍率和作弊控件回调。
     const passageRules: Record<string, Rule[]> = {
-      // DoLX 的兽化称号使用块函数；牛、雌狐和非中性恶魔已由通用补丁处理。
+      // DoLX 的兽化称号使用块函数。牛、雌狐和非中性恶魔已由通用补丁处理。
       Traits: [
         // 部分 DoLX 导出已经带有旧双性后缀，直接收敛为同一标记，避免重复追加。
         [/return "(Bull|Cow|Vixen|Incubus|Succubus)" \+ \(V\.player\.sex is "h" \? "<<lanSwitch ' \(⚥\)' '\(⚥\)'>>" : ""\);/g, 'return "$1<<deadwood-trait-sex>>";'],
