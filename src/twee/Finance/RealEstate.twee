@@ -522,6 +522,10 @@
         <span><<lanSwitch 'Base weekly rent' '基础周租金'>></span><span><<deadwood-reblooms-finance-money _baseWeeklyRent>></span>
       </div>
       <p><<= lanSwitch(_property.description.EN, _property.description.CN)>></p>
+      <<set _management to $Finance.real_estate.management[_property.id]>>
+      <<if _management?.rental_issue and ((_management.rented and maplebirch.get('Finance').realEstate.owns(_property.id)) or _management.rental_issue.type is 'arrears')>>
+        <span class='red'><<lanSwitch `_management.rented ? 'The tenant has left a message.' : 'The former tenant still owes rent.'` `_management.rented ? '租客留下了消息。' : '原租客仍有欠租未付。'`>></span> · <<lanLink `[_management.rented ? 'Contact the tenant' : 'Contact the former tenant', _management.rented ? '联系租客' : '联系原租客']` 'Deadwood Reblooms Property Tenant'>><<set $Finance.real_estate.tenant_property to _property.id>><</lanLink>><br>
+      <</if>>
       <<if maplebirch.get("Finance").realEstate.owns(_property.id)>>
         <<set _management to maplebirch.get("Finance").realEstate.managementFor(_property.id)>>
         <span class='green'><<lanSwitch 'Owned' '已持有'>></span>
@@ -543,9 +547,6 @@
         <<if _management.rented>>
           <<if Time.days lt _management.vacancy_until>>
             <span class='blue'><<lanSwitch 'Finding a tenant until day ' '寻找租客，预计入住日：'>><<= _management.vacancy_until>></span><br>
-          <</if>>
-          <<if _management.rental_issue>>
-            <span class='red'><<lanSwitch 'The tenant has left a message.' '租客留下了消息。'>></span> · <<lanLink ['Contact the tenant', '联系租客'] 'Deadwood Reblooms Property Tenant'>><<set $Finance.real_estate.tenant_property to _property.id>><</lanLink>><br>
           <</if>>
           <<set _weeklyRent to maplebirch.get("Finance").realEstate.weeklyRent(_property.id)>>
           <<lanSwitch 'Rented out; weekly rent before upkeep' '已出租。未扣维护费的周租金'>>：<<deadwood-reblooms-finance-money _weeklyRent>><br>
@@ -585,7 +586,9 @@
             ：<<deadwood-reblooms-finance-money _repairCost>><br>
           <</if>>
           <<if maplebirch.get("Finance").realEstate.residentsAt(_property.id).length is 0 && !maplebirch.get("Finance").realEstate.isFrozen(_property.id)>>
-            <<if _management.condition gte maplebirch.get("Finance").realEstate.mortgage.terms.rental.minimum_condition>>
+            <<if _management.rental_issue?.type is 'arrears'>>
+              <span class='red'><<lanSwitch 'Settle the former tenant’s unpaid rent before arranging a new tenancy.' '先结清原租客的欠租，再安排新的租约。'>></span><br>
+            <<elseif _management.condition gte maplebirch.get("Finance").realEstate.mortgage.terms.rental.minimum_condition>>
               <<icon 'company/lease.png'>><<lanLink ["Rent out", "出租"]>>
                 <<run maplebirch.get("Finance").realEstate.rentOut(_property.id)>>
                 <<run Dynamic.render('deadwood-property-office-properties')>>

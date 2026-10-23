@@ -21,7 +21,6 @@ interface HawkDevelopment {
   size_hint?: number;
   hunt_loot?: string;
   timer?: number;
-  adopted_date?: number;
 }
 
 interface HawkChild {
@@ -291,9 +290,8 @@ class BirdTower extends Module {
   public init(childId: number): void {
     const child = V.childRecords[childId] as HawkChild | undefined;
     if (child?.species !== 'hawk' || !childIsBorn(child)) return;
-    // 原版已有的小鹰按每天一顿建立喂食基线，收养的鹰崽从收养日起算。
-    const started = child.development.adopted_date ?? child.bornDate;
-    child.development.fed_total ??= started == null ? 0 : Math.clamp(Math.ceil((Time.date.timeStamp - started) / TimeConstants.secondsPerDay), 0, 200);
+    // 缺失累计按真实出生年龄建立每天一顿的基线，收养日期不改变营养年龄。
+    child.development.fed_total ??= child.bornDate == null ? 0 : Math.max(0, window.childAgeOf(child));
     child.development.fed_daily ??= 0;
     const days = getChildDays(childId);
     child.development.stage ??= BIRD_TOWER_STAGES.find(entry => days >= entry.from && days <= entry.to)?.stage ?? 'ERROR';
@@ -311,7 +309,7 @@ class BirdTower extends Module {
     if (child.features.size === 'large') roll += 0.2;
     else if (child.features.size === 'small') roll -= 0.1;
     else if (child.features.size === 'tiny') roll -= 0.2;
-    const surplus = fed - days;
+    const surplus = fed - Math.max(0, window.childAgeOf(child));
     if (surplus > 5) roll += 0.1;
     if (surplus > 10) roll += 0.1;
     if (surplus < -5) roll -= 0.1;

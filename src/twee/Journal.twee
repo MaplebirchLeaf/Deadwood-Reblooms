@@ -518,17 +518,20 @@
   <</if>>
   <<if _finance_statement_bank.loan_debt gt 0>>
     <<deadwood-card 'Personal loan' '个人贷款'>>
+      <<set $_loanRate to _finance_statement_bank.loan_rate * (_finance_statement_bank.loan_next_payment_day gt _finance_statement_bank.loan_due_day ? maplebirch.get('Finance').terms.loanOverdueMultiplier : 1)>>
+      <<set $_loanDue to _finance_statement_bank.loan_debt + Math.ceil(_finance_statement_bank.loan_debt * $_loanRate * Math.max(0, _finance_statement_bank.loan_next_payment_day - _finance_statement_bank.loan_interest_last_day) / 7)>>
+      <<if _finance_statement_bank.loan_next_payment_day lt _finance_statement_bank.loan_due_day>><<set $_loanDue to Math.min($_loanDue, _finance_statement_bank.loan_payment)>><</if>>
       <div class='dr-finance-summary'>
         <span><<lanSwitch 'Loan term' '贷款期限'>></span><span><<= _finance_statement_bank.loan_term>> <<lanSwitch 'days' '天'>></span>
         <span><<lanSwitch 'Weekly interest' '周利率'>></span><span class='gold'><<= (_finance_statement_bank.loan_rate * (Time.days gt _finance_statement_bank.loan_due_day ? 200 : 100)).toFixed(2)>>%</span>
         <span><<lanSwitch 'Weekly payment' '每周应还'>></span><span><<deadwood-reblooms-finance-money _finance_statement_bank.loan_payment>></span>
-        <span><<lanSwitch 'Next payment' '下次还款'>></span><span><<deadwood-reblooms-finance-date _finance_statement_bank.loan_next_payment_day>></span>
+        <span><<lanSwitch 'Next payment' '下次还款'>></span><span><<deadwood-reblooms-finance-money $_loanDue>> · <<deadwood-reblooms-finance-date _finance_statement_bank.loan_next_payment_day>></span>
         <span><<lanSwitch 'Final payment' '贷款到期'>></span><span><<deadwood-reblooms-finance-date _finance_statement_bank.loan_due_day>></span>
         <span><<lanSwitch 'Missed payments' '未足额还款次数'>></span><span @class="_finance_statement_bank.loan_missed_payments > 0 ? 'red' : 'teal'"><<= _finance_statement_bank.loan_missed_payments>></span>
       </div>
       <<if _finance_statement_bank.loan_missed_payments gt 0 or _finance_statement_bank.loan_due_day lt Time.days>>
         <span class='red'><<lanSwitch 'Overdue. Visit the bank counter to repay.' '已逾期，请到银行柜台还款。'>></span>
-      <<elseif _finance_statement_bank.balance lt _finance_statement_bank.loan_payment>>
+      <<elseif _finance_statement_bank.balance lt $_loanDue>>
         <span class='red'><<lanSwitch 'Bank funds are insufficient for the next payment.' '银行余额不足以支付下次还款。'>></span>
       <</if>>
     <</deadwood-card>>

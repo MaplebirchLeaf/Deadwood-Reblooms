@@ -59,7 +59,7 @@
 <<set $_estate to maplebirch.get('Finance').realEstate>>
 <<set $_id to $Finance.real_estate.tenant_property>>
 <<set $_management to $_estate.managementFor($_id)>>
-<<if !$_estate.owns($_id) or !$_management.rented or !$_management.rental_issue>>
+<<if !$_management.rental_issue or ((!$_estate.owns($_id) or !$_management.rented) and $_management.rental_issue.type isnot 'arrears')>>
   <<lanSwitch 'There are no outstanding messages for this tenancy.' '这份租约没有待处理的消息。'>><br>
 <<else>>
   <<set $_tenantKey to $_estate.tenantKey($_id)>>
@@ -74,13 +74,13 @@
       <<if $NPCList[0].name_known is 1>>
         <<print $NPCList[0].name>> waits beside the property desk, holding the same tenancy folder.
       <<else>>
-        The agent introduces your tenant as <<print $NPCList[0].name>>. <<He>> places a copy of the tenancy agreement on the desk.
+        The agent introduces <<if $_management.rented>>your tenant<<else>>your former tenant<</if>> as <<print $NPCList[0].name>>. <<He>> places a copy of the tenancy agreement on the desk.
       <</if>>
     <<option 'CN'>>
       <<if $NPCList[0].name_known is 1>>
         <<print $NPCList[0].name>>拿着那份租约档案，在房产柜台旁等你。
       <<else>>
-        中介介绍租客叫<<print $NPCList[0].name>>。<<He>>把一份租约副本放在桌上。
+        中介介绍<<if $_management.rented>>租客<<else>>原租客<</if>>叫<<print $NPCList[0].name>>。<<He>>把一份租约副本放在桌上。
       <</if>>
   <</language>><br><br>
   <<set $NPCList[0].name_known to 1>><<saveNPC 0 $_tenantKey>>
@@ -96,9 +96,9 @@
   <<else>>
     <<language>>
       <<option 'EN'>>
-        "I'm a week behind," <<personname>> says. "I'll have it next week. Or I can pay most of it now, if you'll let the rest go." The agent waits for your answer.
+        <<if !$_management.rented>>The agent opens the old tenancy file. The unpaid rent remains on the statement.<<else>>"I'm a week behind," <<personname>> says.<</if>> "I can pay most of it now, if you'll let the rest go." The agent waits for your answer.
       <<option 'CN'>>
-        “我晚了一周。”<<personname>>说道。“下周就有钱了。或者现在先付大部分，剩下的你能不能免了？”中介等着你答复。
+        <<if !$_management.rented>>中介打开已经结束的租约档案。账单上仍记着未付的租金。<<else>>“我晚了一周。”<<personname>>说道。<</if>>“现在先付大部分，剩下的你能不能免了？”中介等着你答复。
     <</language>><br><br>
     <<lanSwitch 'Unpaid net rent: ' '未付净租金：'>><<deadwood-reblooms-finance-money $_management.rental_issue.rent>><br>
     <<lanLink ['Accept 80% now', '现在收下八成'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('Finance').realEstate.resolveIssue($Finance.real_estate.tenant_property, 'negotiate')>><<endevent>><</lanLink>><br>

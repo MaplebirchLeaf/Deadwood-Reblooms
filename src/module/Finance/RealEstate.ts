@@ -435,7 +435,9 @@ class RealEstate {
     const result = this.finance.payFromBankPennies(property.price);
     if (result !== 'ok') return result;
     this.state.owned[id] = true;
+    const arrears = this.state.management[id]?.rental_issue;
     this.state.management[id] = RealEstate.newManagement();
+    if (arrears?.type === 'arrears') this.state.management[id].rental_issue = arrears;
     if (this.state.last_managed_day < 0) this.state.last_managed_day = RealEstate.today;
     return 'ok';
   }
@@ -447,7 +449,9 @@ class RealEstate {
     const result = this.mortgage.start(id, property.price, useCredit, days);
     if (result !== 'ok') return result;
     this.state.owned[id] = true;
+    const arrears = this.state.management[id]?.rental_issue;
     this.state.management[id] = RealEstate.newManagement();
+    if (arrears?.type === 'arrears') this.state.management[id].rental_issue = arrears;
     if (this.state.last_managed_day < 0) this.state.last_managed_day = RealEstate.today;
     return 'ok';
   }
@@ -709,7 +713,7 @@ class RealEstate {
   public rentOut(id: PropertyId): boolean {
     if (!this.owns(id) || this.properties.find(property => property.id === id)?.tenure || this.isFrozen(id) || this.residentsAt(id).length > 0) return false;
     const management = this.managementFor(id);
-    if (management.rented || management.auction_day !== null || management.condition < this.mortgage.terms.rental.minimum_condition) return false;
+    if (management.rented || management.rental_issue?.type === 'arrears' || management.auction_day !== null || management.condition < this.mortgage.terms.rental.minimum_condition) return false;
     management.rented = true;
     this.staff.clear(id);
     this.life.clear(id);
@@ -731,12 +735,11 @@ class RealEstate {
   }
 
   public resolveIssue(id: PropertyId, choice: 'repair' | 'wait' | 'negotiate', day = RealEstate.today): boolean {
-    if (!this.owns(id)) return false;
     const management = this.managementFor(id);
     const issue = management.rental_issue;
-    if (!management.rented || !issue) return false;
+    if (!issue) return false;
     if (issue.type === 'leak') {
-      if (this.isFrozen(id)) return false;
+      if (!this.owns(id) || !management.rented || this.isFrozen(id)) return false;
       if (choice !== 'repair' || this.finance.payFromBankPennies(this.rentalRepairCost(id)) !== 'ok') return false;
       management.condition = Math.min(100, management.condition + rentalTerms.neglectedConditionLoss);
     } else {
@@ -747,6 +750,7 @@ class RealEstate {
       else this.finance.creditBankPennies(payment);
     }
     management.rental_issue = null;
+    if (!management.rented) delete V.per_npc?.[this.tenantKey(id)];
     return true;
   }
 
@@ -872,6 +876,10 @@ class RealEstate {
             if (management.condition < this.mortgage.terms.rental.minimum_condition) {
               management.rented = false;
               management.lease_end_day = null;
+              if (management.rental_issue?.type !== 'arrears') {
+                management.rental_issue = null;
+                delete V.per_npc?.[this.tenantKey(property.id)];
+              }
             }
           } else if (this.finance.collectBankPennies(upkeep) < upkeep) {
             management.condition = Math.max(0, management.condition - this.mortgage.terms.rental.condition_loss_per_week);
@@ -882,8 +890,11 @@ class RealEstate {
         if (management.lease_end_day !== null && day >= management.lease_end_day) {
           management.rented = false;
           management.lease_end_day = null;
-          management.rental_issue = null;
-          delete V.per_npc?.[this.tenantKey(property.id)];
+          // 租约结束不免除旧欠租，保留同一租客直到收款或协商结清。
+          if (management.rental_issue?.type !== 'arrears') {
+            management.rental_issue = null;
+            delete V.per_npc?.[this.tenantKey(property.id)];
+          }
         }
         if (management.auction_day !== null && day >= management.auction_day) this.sellByAuction(property.id, 'voluntary', 0, day);
       }
@@ -936,8 +947,11 @@ class RealEstate {
     management.rented = false;
     management.managed = false;
     management.management_report = undefined;
-    management.rental_issue = null;
-    delete V.per_npc?.[this.tenantKey(id)];
+    // 产权转移不免除旧租约欠款，清掉其它管理状态后仍由原租客结清。
+    if (management.rental_issue?.type !== 'arrears') {
+      management.rental_issue = null;
+      delete V.per_npc?.[this.tenantKey(id)];
+    }
     management.lease_end_day = null;
     management.auction_day = null;
     const wardrobe = (V.wardrobes as Record<string, Record<string, unknown>> | undefined)?.[`deadwood_${id}`];
