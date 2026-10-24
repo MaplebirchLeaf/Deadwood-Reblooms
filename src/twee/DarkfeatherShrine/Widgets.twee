@@ -1,5 +1,20 @@
 :: Deadwood Raven Shrine Widgets [widget]
 
+<<widget 'deadwood-raven-clothes-init'>>
+  <!-- 沿用森林商店的特殊服装解锁，不另存一份解锁状态。 -->
+  <<run setup.specialClothes.push({
+    name: 'raven feather necklace', sets: [],
+    requirements: () => (V.MoreTransformations?.shrine?.stage ?? 0) >= 2,
+    get hint() { return lanSwitch('deliver the ravens’ letter to Gwylan', '将渡鸦的信交给格威岚'); }
+  })>>
+<</widget>>
+
+<<widget 'deadwood-raven-clothes-state'>>
+  <<if $specialClothes and !$specialClothes.some(item => item.name is 'raven feather necklace')>>
+    <<run $specialClothes.push({ name: 'raven feather necklace', unlocked: ($MoreTransformations?.shrine?.stage ?? 0) >= 2 ? 3 : 0 })>>
+  <</if>>
+<</widget>>
+
 <!-- 神社属于更多转化。原版地点只插入入口，自己的剧情、条件与结算留在 Twee。 -->
 <<widget 'deadwood-raven-shrine-context'>>
   <<set _shrineModule to maplebirch.get('MoreTransformations')>>

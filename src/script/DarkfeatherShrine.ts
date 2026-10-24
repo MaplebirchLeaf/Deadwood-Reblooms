@@ -5,6 +5,8 @@ import Tsukihan from './DarkfeatherShrine/Tsukihan';
 export default function DarkfeatherShrine(maplebirch: typeof window.maplebirch): void {
   Tsukihan(maplebirch);
 
+  maplebirch.tool.onInit('deadwood-raven-clothes-init');
+  maplebirch.tool.addTo('State', 'deadwood-raven-clothes-state');
   maplebirch.tool.addTo('Journal', 'deadwood-raven-shrine-journal');
   maplebirch.tool.addTo('SkillsBonusDisplay', 'deadwood-raven-shrine-skill');
   maplebirch.tool.patch.traits.add(

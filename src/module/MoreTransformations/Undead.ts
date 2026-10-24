@@ -57,10 +57,15 @@ class Undead extends Transformation {
       }))
     );
 
-    // 游戏时间推进后清除直接赋值的疼痛，即时伤害仍由原版 painClamp 兜底。
-    core.dynamic.regTimeEvent('onSec', 'deadwood-undead-pain', {
+    // 按实际耗时结算诅咒代价，短时行动与整夜睡眠共用一次时间回调。
+    core.dynamic.regTimeEvent('onSec', 'deadwood-undead-curse', {
       cond: () => this.active && !V.statFreeze && !V.replayScene && !V.frozenValues,
-      action: () => (V.pain = 0)
+      action: data => {
+        V.pain = 0;
+        const hours = (data.passed ?? 0) / 3600;
+        core.get('Psyche')?.change(-2 * hours);
+        window.statChange.stress(hours);
+      }
     });
   }
 }

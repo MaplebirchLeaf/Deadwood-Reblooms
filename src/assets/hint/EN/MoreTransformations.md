@@ -20,7 +20,7 @@ Each water activity has a separate daily limit of 2 whale points: floating gives
 | Whale          | Stage 2 **Deep Diver**: oxygen use −75%. Stage 3 **Finned Limbs**: effective Swimming +10%. Ear fins form at 4; a tail at 6 halves underwater action time, to a minimum of 1 second.                     |
 | Raven          | Stage 2 **Sharp Eyes**: effective Skulduggery +5%, without stacking with the same animal trait. Stage 4 **Dark Plumage**: new pain from blows −15%. Wings form at 6, with encounter speech effects +25%. |
 
-Buy preservation accessories upstairs in the shopping centre and **wear them** to prevent decay and suppression by other animal transformations: a mane ribbon or golden carrot pendant for horse, pearl shell hair clip for whale, and £45 raven feather necklace for raven. To preserve horse and whale together, use horse neckwear and whale headwear. Once both parts form, horse/demon tails and raven/divine wings have mixed mirror appearances. Falling below an ability's required stage suspends it.
+**Wear** preservation accessories to prevent decay and suppression by other animal transformations. The shopping centre's upper floor sells the mane ribbon and golden carrot pendant for horse, and the pearl shell hair clip for whale. Deliver the ravens’ letter to Gwylan to unlock the £45 raven feather necklace in the forest shop. To preserve horse and whale together, use horse neckwear and whale headwear. Once both parts form, horse/demon tails and raven/divine wings have mixed mirror appearances. Falling below an ability's required stage suspends it.
 
 - **Ominous Prophecy**: full raven transformation and fallen angel **Disparage**. Use Disparage twice per encounter, with doubled control recovery and trauma relief, plus 15% relief of current pain each time.
 - **Foxfire**: full angel and fox transformations. Successful Banish deals one quarter of the primary target's actual damage to another living tentacle, without another charge.
@@ -96,6 +96,7 @@ After discovering the island shore, keep exploring to find an old cavern. Light 
 Taking gold curses you with undeath:
 
 - Pain and temperature immunity, with positive arousal gains reduced by 75%.
+- Each hour costs 2 Sanity and adds 1 stress, whether awake or asleep. Stress uses the native multipliers and overflow handling.
 - Sleep fatigue recovery ×0.5, with native nightmare stress each hour, without stacking an existing nightmare.
 - Defiance damage −50%, including borrowed melee weapon strikes. Spray and tentacle-health damage are separate; stored Physique and escape checks remain unchanged.
 - Robin's drinks, shrine tea and similar mod scenes lose the comfort of taste, while company still helps. Vanilla meals remain unchanged. Clear moonlight reveals your bones beside the sea or on deck.
