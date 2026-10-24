@@ -62,6 +62,24 @@ export default class PropertyLife {
     return V.Finance.real_estate.life;
   }
 
+  // 居家相处不使用企业柜台的身份证与着装限制。
+  private get available(): boolean {
+    const property = this.estate.current;
+    return (
+      !!property &&
+      !V.replayScene &&
+      !V.statFreeze &&
+      !V.frozenValues &&
+      !V.combat &&
+      !V.possessed &&
+      !V.eventforced &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
+      V.stress < V.stressmax &&
+      this.estate.managementFor(property.id).auction_day === null
+    );
+  }
+
   public preInit(): void {
     this.core.on(':passagestart', () => {
       if (V.replayScene || V.statFreeze || V.frozenValues) return;
@@ -100,10 +118,9 @@ export default class PropertyLife {
   public get pending(): boolean {
     const daily = this.daily;
     const property = this.estate.current;
-    if (!daily || daily.choice || !property || daily.property !== property.id || daily.day !== Math.floor(Time.days) || !this.core.get('Finance')?.company.available) return false;
+    if (!daily || daily.choice || !property || daily.property !== property.id || daily.day !== Math.floor(Time.days) || !this.available) return false;
     const outings = this.estate.outings;
     if (outings.note || outings.memory || outings.offer || outings.waiting || outings.travelling || this.estate.banquet.active) return false;
-    if (this.estate.managementFor(property.id).auction_day !== null) return false;
     if (daily.kind === 'staff') return !!daily.role && this.estate.staff.active(daily.role) && !!V.per_npc?.[this.estate.staff.key(daily.role)];
     if (daily.kind === 'resident')
       return !!daily.partner && daily.partner !== this.bathing?.partner && this.estate.residentsHome(property.id).some(resident => resident.id === daily.partner) && this.free(daily.partner, 10);
@@ -112,17 +129,7 @@ export default class PropertyLife {
 
   public arrive(): void {
     const property = this.estate.current;
-    if (
-      !property ||
-      !this.core.get('Finance')?.company.available ||
-      this.estate.managementFor(property.id).auction_day !== null ||
-      V.replayScene ||
-      V.statFreeze ||
-      V.combat ||
-      V.possessed ||
-      V.nextPassageCheck
-    )
-      return;
+    if (!property || !this.available) return;
     const outings = this.estate.outings;
     if (outings.note || outings.memory || outings.offer || outings.waiting || outings.travelling || this.estate.banquet.active || outings.propose()) return;
     if (this.state.daily_day >= Math.floor(Time.days)) return;
@@ -148,6 +155,7 @@ export default class PropertyLife {
   public finish(choice: NonNullable<PropertyLifeState['daily']>['choice']): boolean {
     if (!this.pending || !choice || !['join', 'help', 'read', 'leave'].includes(choice)) return false;
     if (choice !== 'leave' && choice !== ({ resident: 'join', staff: 'read', house: 'help' } as const)[this.daily!.kind]) return false;
+    if (choice === 'help' && window.pcAreArmsBound('both')) return false;
     this.daily!.choice = choice;
     return true;
   }
@@ -162,9 +170,8 @@ export default class PropertyLife {
   }
 
   public ready(action: Activity): boolean {
-    const property = this.estate.current;
-    if (!property || !rooms.includes(V.passage) || V.replayScene || V.statFreeze || V.combat || window.pcAreArmsBound('both') || this.estate.managementFor(property.id).auction_day !== null)
-      return false;
+    if (!this.available || !rooms.includes(this.core.passage.title) || window.pcAreArmsBound('both')) return false;
+    const property = this.estate.current!;
     const partner = V.Finance.real_estate.room_companion;
     if (partner && partner === this.bathing?.partner) return false;
     if (partner && !this.estate.residentsHome(property.id).some(resident => resident.id === partner)) return false;
@@ -173,12 +180,8 @@ export default class PropertyLife {
     if (action === 'film') return this.estate.facilities.some(room => room.id === 'cinema');
     if (action === 'wine') {
       return (
-        ['Home', 'Lounge', 'Kitchen', 'Wine Cellar'].some(room => V.passage === `Deadwood Reblooms Property ${room}`) &&
+        ['Home', 'Lounge', 'Kitchen', 'Wine Cellar'].some(room => this.core.passage.title === `Deadwood Reblooms Property ${room}`) &&
         !V.gag &&
-        !V.possessed &&
-        !V.nextPassage &&
-        !V.nextPassageCheck &&
-        V.stress < V.stressmax &&
         (V.drunk ?? 0) < 240 &&
         (V.drugged ?? 0) <= 0 &&
         (V.hallucinogen ?? 0) <= 0
@@ -190,7 +193,6 @@ export default class PropertyLife {
   public begin(action: Activity, item: string | null = null): boolean {
     // 同一个开酒链接在页面跳转前不能再次消费，返回房间时由酒菜单结束旧场景。
     if (action === 'wine' && this.scene?.action === 'wine') return false;
-    this.state.scene = null;
     if (!this.ready(action)) return false;
     if (['meal', 'tea', 'wine'].includes(action)) {
       const food = item ? setup.foodstuff[item] : undefined;
@@ -217,10 +219,10 @@ export default class PropertyLife {
       quality: Math.min(2, Number(this.estate.managementFor(property.id).condition >= 60) + Number(supported)),
       first,
       item,
-      origin: V.passage,
-      floor: this.estate.currentFloor
+      origin: this.core.passage.title,
+      floor: this.estate.currentFloor,
+      at: Time.date.timeStamp
     };
-    if (action === 'wine') this.state.scene.at = Time.date.timeStamp;
     return true;
   }
 

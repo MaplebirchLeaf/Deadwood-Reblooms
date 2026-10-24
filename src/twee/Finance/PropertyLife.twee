@@ -79,7 +79,7 @@
         <<tending_give _life_scene.item -2>><<stress -2>><<set $_life_duration to 15>>
         <<if _life_scene.first and _life_scene.quality gte 2>><<stress -1>><</if>>
       <<case 'tidy'>>
-        <<housekeeping 1 600>><<tiredness `_life_scene.quality >= 2 ? 1 : 2`>>
+        <<housekeeping 1 600>><<tiredness `_life_scene.quality >= 2 || currentSkillValue('housekeeping') >= 500 ? 1 : 2`>>
       <<case 'music'>>
         <<stress -2>>
       <<case 'film'>>
@@ -91,6 +91,9 @@
     <<if _life_scene.partner and _life_scene.first>>
       <<npcincr _life_scene.partner love 1>>
     <</if>>
+    <<if _life_scene.first and ['meal', 'tea', 'music', 'film'].includes(_life_scene.action)>>
+      <<run maplebirch.get('Psyche')?.rest(2, _life_scene.action is 'film' ? -60 : -40)>>
+    <</if>>
     <<pass $_life_duration>>
     <<if $Finance.real_estate.life.scene?.action is 'wine' and $passage is $Finance.real_estate.life.scene.origin and !$nextPassage and !$nextPassageCheck>>
       <<goto 'Deadwood Reblooms Property Life Finish'>>
@@ -99,6 +102,8 @@
     <<replace '#deadwood-home-wine-message'>>
       <span class='blue'><<lanSwitch 'You cannot open that bottle right now.' '现在没法打开这瓶酒。'>></span>
     <</replace>>
+  <<elseif !$nextPassage and !$nextPassageCheck>>
+    <<set $nextPassage to maplebirch.passage.title>>
   <</if>>
 <</widget>>
 
@@ -228,6 +233,87 @@
   <</if>>
 <</widget>>
 
+<!-- 复用本次活动的时间与回应记录，不延长人物在家日程。 -->
+<<widget 'deadwood-home-life-followup-ready'>>
+  <<set _home_estate to maplebirch.get('Finance').realEstate, _home_scene to _home_estate.life.scene>>
+  <<set _home_departure to _home_scene?.partner is 'Sydney' ? 6 : 7>>
+  <<set _home_followup_ready to maplebirch.passage.title is 'Deadwood Reblooms Property Life Finish'
+    and _home_scene?.action isnot 'wine' and _home_scene?.first and !_home_scene.followup
+    and _home_estate.current?.id is _home_scene.property_id and _home_scene.partner
+    and Number.isFinite(_home_scene.at) and Time.date.timeStamp gte _home_scene.at and Time.date.timeStamp lte _home_scene.at + 3600
+    and isLoveInterest(_home_scene.partner) and _home_estate.life.bathing?.partner isnot _home_scene.partner
+    and _home_estate.residentsHome(_home_scene.property_id).some(resident => resident.id === _home_scene.partner)
+    and (Time.hour gte _home_departure or Time.hour * 60 + Time.minute + 10 lte _home_departure * 60)
+    and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$eventforced
+    and !$nextPassage and !$nextPassageCheck and $stress lt $stressmax>>
+<</widget>>
+
+<<widget 'deadwood-home-life-followup-act'>>
+  <<deadwood-home-life-followup-ready>>
+  <<if !_home_followup_ready or _home_scene isnot _args[1] or !['talk', 'close'].includes(_args[0])>><<exit>><</if>>
+  <<if _args[0] is 'talk' and ($gag or $worn.face.type.includes('gag'))>><<exit>><</if>>
+  <!-- 先记录选择，另一链接、重绘和读档不会再次结算。 -->
+  <<set _home_scene.followup to _args[0]>>
+  <<if _args[0] is 'talk'>>
+    <<stress -2>><<run maplebirch.get('Psyche')?.rest(2, -40)>>
+  <<else>>
+    <<stress -1>><<tiredness -1>><<run maplebirch.get('Psyche')?.rest(0, -80)>>
+  <</if>>
+  <<pass 10>>
+<</widget>>
+
+<<widget 'deadwood-home-life-followup'>>
+  <<deadwood-home-life-followup-ready>>
+  <<if _home_scene.followup>>
+    <<language>>
+      <<option 'EN'>>
+        <<if _home_scene.followup is 'talk'>>
+          <<if currentSkillValue('english') gte 500>>You find the words for something that has been bothering you.<<else>>You pause a few times, trying to explain the part that has stayed with you.<</if>>
+          <<switch _home_scene.partner>>
+            <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>Robin listens with both feet tucked beneath the chair. "I'm glad you told me." <<nnpc_He 'Robin'>> asks you to stay a little longer.<<elseif C.npc.Robin.dom gte 40>>"You could have told me sooner." Robin moves the cups aside and waits for you to finish.<<else>>Robin listens without interrupting. "Want to hear about mine?" <<nnpc_He 'Robin'>> smiles when you nod.<</if>>
+            <<case 'Whitney'>>"What a fucking day." Whitney leans back, then looks at you when you stop talking. "Go on. I'm listening." <<nnpc_He 'Whitney'>> lets you finish before telling you about the walk home.
+            <<case 'Kylar'>><<if C.npc.Kylar.rage gte 60>>Kylar wants to know who was there. You finish explaining what happened before answering. <<nnpc_He 'Kylar'>> listens, though <<nnpc_his 'Kylar'>> fingers keep turning against the edge of the seat.<<else>>Kylar remembers a detail you mentioned earlier and asks about it. "You can tell me these things." <<nnpc_He 'Kylar'>> sounds pleased that you did.<</if>>
+            <<case 'Sydney'>>Sydney puts the book out of reach. "Which part is still bothering you?" <<nnpc_He 'Sydney'>> leaves you time to answer, then tells you about something that went wrong at the library.
+          <</switch>>
+        <<else>>
+          You stay where you are, leaving the conversation for another time.
+          <<switch _home_scene.partner>>
+            <<case 'Robin'>>Robin draws the other chair nearer. <<if C.npc.Robin.trauma gte 20>><<nnpc_His 'Robin'>> eyes follow a sound in the hallway, then return to you.<<else>><<nnpc_He 'Robin'>> smiles when you glance over.<</if>> Neither of you gets up yet.
+            <<case 'Whitney'>>"Tired?" Whitney moves <<nnpc_his 'Whitney'>> feet off the spare seat. "Sit, then." <<nnpc_He 'Whitney'>> leans back beside you, letting the conversation drop.
+            <<case 'Kylar'>>Kylar watches you settle back. <<if C.npc.Kylar.rage gte 60>>"You're staying?" <<nnpc_He 'Kylar'>> waits for your nod before sitting still.<<else>><<nnpc_He 'Kylar'>> sits close enough for your sleeves to touch, smiling to <<nnpc_himself 'Kylar'>>.<</if>>
+            <<case 'Sydney'>>Sydney leaves the bookmark in place. "We don't have to talk." <<nnpc_He 'Sydney'>> settles into the next chair, letting <<nnpc_his 'Sydney'>> shoulders drop.
+          <</switch>>
+        <</if>>
+      <<option 'CN'>>
+        <<if _home_scene.followup is 'talk'>>
+          <<if currentSkillValue('english') gte 500>>你总算想好该怎么说起那件烦心事。<<else>>你停顿了几次，试着说清心里一直惦记的那一段。<</if>>
+          <<switch _home_scene.partner>>
+            <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>罗宾将双脚收在椅子底下，听着你说。“谢谢你愿意告诉我。”<<nnpc_he 'Robin'>>问你能不能再待一会儿。<<elseif C.npc.Robin.dom gte 40>>“早些告诉我就好了。”罗宾把杯子挪开，等你说完。<<else>>罗宾没有打断你。“想听听我今天的事吗？”你点头时，<<nnpc_he 'Robin'>>便笑了。<</if>>
+            <<case 'Whitney'>>“真他妈够呛。”惠特尼往后一靠，见你不说了，又望过来。“接着说。我听着呢。”等你说完，<<nnpc_he 'Whitney'>>才讲起回家路上的事。
+            <<case 'Kylar'>><<if C.npc.Kylar.rage gte 60>>凯拉尔想知道当时还有谁。你先讲清事情的经过，再回答这个问题。<<nnpc_he 'Kylar'>>听着，手指仍不住地拧着椅子边缘。<<else>>凯拉尔记得你先前提过的细节，又追问了一句。“这些事，你可以告诉我。”你肯说给<<nnpc_him 'Kylar'>>听，似乎让<<nnpc_him 'Kylar'>>很高兴。<</if>>
+            <<case 'Sydney'>>悉尼把书放到一旁。“哪一件事还让你放不下？”<<nnpc_he 'Sydney'>>等你慢慢说完，随后也提起今天在图书馆犯的一点小错。
+          <</switch>>
+        <<else>>
+          你没有起身，把想说的话留到稍后。
+          <<switch _home_scene.partner>>
+            <<case 'Robin'>>罗宾将另一把椅子挪近了些。<<if C.npc.Robin.trauma gte 20>><<nnpc_his 'Robin'>>视线跟着走廊里的声响转了转，又回到你身上。<<else>>你望过去时，<<nnpc_he 'Robin'>>便朝你笑。<</if>>谁也没有急着离开。
+            <<case 'Whitney'>>“累了？”惠特尼把脚从空座上挪开。“那就坐着。”<<nnpc_he 'Whitney'>>在你身旁靠回椅背，没有再催你说话。
+            <<case 'Kylar'>>凯拉尔看着你靠回椅背。<<if C.npc.Kylar.rage gte 60>>“你不走了？”等你点头，<<nnpc_he 'Kylar'>>才坐稳。<<else>><<nnpc_he 'Kylar'>>挨着你坐下，衣袖贴在一起，嘴角带着笑。<</if>>
+            <<case 'Sydney'>>悉尼没有抽出书签。“不说话也可以。”<<nnpc_he 'Sydney'>>在旁边的椅子里坐稳，放松了肩膀。
+          <</switch>>
+        <</if>>
+    <</language>><br><br>
+  <<elseif _home_followup_ready>>
+    <<capture _home_scene>>
+      <<if !$gag and !$worn.face.type.includes('gag')>>
+        <<lanLink ['Talk about your day (0:10)', '聊聊今天的事 (0:10)'] 'Deadwood Reblooms Property Life Finish'>><<deadwood-home-life-followup-act 'talk' _home_scene>><</lanLink>><<lstress>><br>
+      <</if>>
+      <<lanLink ['Sit quietly together (0:10)', '安静坐一会儿 (0:10)'] 'Deadwood Reblooms Property Life Finish'>><<deadwood-home-life-followup-act 'close' _home_scene>><</lanLink>><<lstress>><<ltiredness>><br>
+    <</capture>>
+    <br>
+  <</if>>
+<</widget>>
+
 :: Deadwood Reblooms Property Life Finish
 <<set _estate to maplebirch.get('Finance').realEstate>>
 <<set _life_scene to _estate.life.scene>>
@@ -235,6 +321,9 @@
   <<lanLink ['Return to the agency', '返回房产中介'] 'Deadwood Reblooms Property Office'>><</lanLink>><<exit>>
 <</if>>
 <<effects>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Continue', '继续'] 'Deadwood Reblooms Property Life Finish'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
 <<set _life_wine_recipe to maplebirch.get('Orchard')?.winery.terms.recipes.find(recipe => recipe.id === _life_scene.item)>>
 <<if _life_scene.action is 'wine' and _life_scene.followup>>
   <<deadwood-home-wine-aftermath>>
@@ -269,9 +358,10 @@
 <</language>><br><br>
 <<if _life_scene.partner>>
   <<deadwood-home-life-reaction>>
-  <<if _life_scene.first>><<glove>><</if>><br><br>
+  <<if _life_scene.first and !_life_scene.followup>><<glove>><</if>><br><br>
 <</if>>
 <</if>>
+<<if _life_scene.partner and _life_scene.action isnot 'wine'>><<deadwood-home-life-followup>><</if>>
 <<switch _life_scene.action>>
   <<case 'meal' 'tea'>>
     <<getouticon>><<lanLink ['Clear the table', '收好餐桌'] 'Deadwood Reblooms Property Kitchen'>><</lanLink>><br>

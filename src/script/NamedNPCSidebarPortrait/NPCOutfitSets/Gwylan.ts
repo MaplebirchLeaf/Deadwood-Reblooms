@@ -18,7 +18,7 @@ export default function (maplebirch: MaplebirchCore): void {
     if (ritual) addSet(maplebirch, outfitNames, 'gwylan_ritual_robes', ritual, { gender: 'n' });
 
     wardrobe.modify('Gwylan', (clothes, context) => {
-      const name = context.key === 'naked' ? 'naked' : context.key === 'exorcist_cassock' ? 'gwylan_ritual_robes' : `gwylan_${context.key}`;
+      const name = context.key === 'naked' ? 'naked' : ['exorcist_cassock', 'exorcist_habit'].includes(context.key) ? 'gwylan_ritual_robes' : `gwylan_${context.key}`;
       sync('Gwylan', name, clothes);
     });
 

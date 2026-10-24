@@ -50,7 +50,8 @@ export default class BlackjackView {
           if (['bet', 'wager', 'decline', 'reset'].includes(action)) {
             this.core.SugarCube.Wikifier.wikifyEval("<<run Dynamic.render('deadwood-blackjack-panel')>>");
             if (['wager', 'reset'].includes(action)) {
-              this.core.SugarCube.Wikifier.wikifyEval('<<updatesidebarimg>><<updatesidebardescription>><<updateallure>><<updatewarmthscale>><<updatewarmthdescription>>');
+              // 牌桌只刷新侧栏，衣柜的保暖预览节点不在当前页面。
+              this.core.SugarCube.Wikifier.wikifyEval('<<updatesidebarimg>><<updatesidebardescription>><<updateallure>>');
             }
           } else this.core.SugarCube.Engine.play(blackjackPassage);
         }

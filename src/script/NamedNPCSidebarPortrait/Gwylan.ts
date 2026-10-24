@@ -86,7 +86,8 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
     wardrobe.wear('Gwylan', ['brown_fox', 'brown_fox_unmasked'], 'brown_fox');
     wardrobe.wear('Gwylan', 'formal', 'vintage_pantsuit_formal', () => C.npc?.Gwylan?.pronoun === 'm');
     wardrobe.wear('Gwylan', 'formal', 'vintage_skirtsuit_formal', () => C.npc?.Gwylan?.pronoun !== 'm');
-    wardrobe.wear('Gwylan', 'ritual', 'exorcist_cassock');
+    wardrobe.wear('Gwylan', 'ritual', 'exorcist_cassock', () => C.npc?.Gwylan?.pronoun === 'm');
+    wardrobe.wear('Gwylan', 'ritual', 'exorcist_habit', () => C.npc?.Gwylan?.pronoun !== 'm');
     // 睡眠与普通裸体状态不保留衣物或饰品，仪式裸体另行保留帽子。
     wardrobe.wear('Gwylan', ['sleep', 'naked', 'ritual_naked'], 'naked');
 
@@ -103,9 +104,9 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       }
 
       // 只给格威岚的仪式袍主体加绿色滤镜，保留配饰各自的颜色。
-      if (context.key === 'exorcist_cassock') {
+      if (['exorcist_cassock', 'exorcist_habit'].includes(context.key)) {
         for (const slot of ['upper', 'lower'] as const) {
-          if (clothes[slot]) clothes[slot].colour = 'green';
+          if (clothes[slot]) clothes[slot].colour = 'light green';
         }
       }
 
