@@ -268,7 +268,18 @@ export default class RobinShop extends Shared {
       C.npc.Robin.trauma < 80 &&
       window.getRobinLocation() === 'shop' &&
       Time.hour >= 9 &&
-      Time.hour < 21 &&
+      Time.hour * 60 + Time.minute + 60 <= 21 * 60 &&
+      (Time.hour >= 17 ||
+        Time.hour * 60 + Time.minute + 60 <= 16 * 60 + 30 ||
+        (V.daily.robin.bath &&
+          !(
+            V.robin.autoWater &&
+            C.npc.Robin.trauma < 50 &&
+            Weather.precipitation !== 'rain' &&
+            (Weather.precipitation !== 'snow' || V.alex_greenhouse >= 3) &&
+            orphanagePlotsPlanted() &&
+            !orphanagePlotsWatered()
+          ))) &&
       V.exposed <= 0 &&
       V.stress < V.stressmax
     );

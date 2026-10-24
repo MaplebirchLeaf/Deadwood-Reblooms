@@ -229,9 +229,9 @@
     <<if !_winery.state.shop_enabled>>
       <<language>>
         <<option 'EN'>>
-          Robin looks at the label on your sample bottle, then at the space beside the till. "Bottles, rather than another drink to make? I could try a few." <<He>> brings over the order pad. "They'd need their own cabinet. And dates on the labels. I don't want them mixed up with the lemonade."
+          You tell Robin about the orchard wine. <<He>> looks at the space beside the till. "Bottles, rather than another drink to make? I could try a few." <<He>> brings over the order pad. "They'd need their own cabinet. And dates on the labels. I don't want them mixed up with the lemonade."
         <<option 'CN'>>
-          罗宾看了看样品的瓶身标签，又看看收银机旁的空处。“卖整瓶，不是多一杯要调的饮料？可以先试几瓶。”<<He>>拿来订单本。“得有单独的柜子，标签上也写好日期。我不想和柠檬水弄混。”
+          你向罗宾提起果园酿的酒。<<He>>看了看收银机旁的空处。“卖整瓶，不是多一杯要调的饮料？可以先试几瓶。”<<He>>拿来订单本。“得有单独的柜子，标签上也写好日期。我不想和柠檬水弄混。”
       <</language>><br><br>
       <<icon 'orchard/bottle-cabinet.png'>><<lanSwitch 'A cabinet for sealed bottles: ' '封瓶酒柜费用：'>><span class='gold'><<printmoney _winery.terms.shopSetupCost>></span><br>
       <<if maplebirch.get('Finance')?.canPay(_winery.terms.shopSetupCost, 'orchard') ?? $money gte _winery.terms.shopSetupCost>>
@@ -254,12 +254,57 @@
     <<else>>
       <<language>>
         <<option 'EN'>>
-          Robin checks the bottle count against the cabinet list. "Six at a time should do. I'll write down what I take, and pay you before they go on the shelf." <<He>> keeps the bottled wine list beside the usual drink orders.
+          <<if _winery.state.supplied is 0>>
+            Robin opens the new cabinet and checks that the door clears the counter. "Six bottles to start with? Let's see how they go." <<He>> leaves a space for the delivery on the order pad.
+          <<elseif _winery.shopStock is 0>>
+            Robin slides open the empty cabinet. "That was the last of them. I've still got the labels here, so I won't forget which is which." <<He>> moves the bottle list beside the order pad.
+          <<elseif _winery.state.supplied is _winery.terms.shopSupplyQuantity>>
+            Robin straightens the first few bottles behind the glass. "There. Let's give these a chance before filling the whole cabinet." <<He>> checks the label once more before closing the door.
+          <<elseif _winery.skilled>>
+            Robin checks the cabinet list, then holds the door while you look inside. "I've kept the different ones apart. Much easier than taking them all out when someone asks." <<He>> runs a finger down the list. "I can see which ones need replacing, too."
+          <<else>>
+            Robin checks the bottle count against the cabinet list. "Six at a time should do. I'll write down what I take, and pay you before they go on the shelf." <<He>> keeps the bottled wine list beside the usual drink orders.
+          <</if>>
         <<option 'CN'>>
-          罗宾对照酒柜清单数了数瓶子。“一次六瓶就好。收多少我都记下来，上架之前先付你的货款。”<<He>>把瓶装果酒的清单放在日常饮品订单旁。
+          <<if _winery.state.supplied is 0>>
+            罗宾打开新酒柜，试了试柜门会不会碰到柜台。“先来六瓶？看看卖得怎么样。”<<He>>在订单本上空出一行，等着记下这批货。
+          <<elseif _winery.shopStock is 0>>
+            罗宾拉开空酒柜。“最后几瓶也卖掉了。标签我还留着，不会把它们弄混。”<<He>>把果酒清单挪到订单本旁。
+          <<elseif _winery.state.supplied is _winery.terms.shopSupplyQuantity>>
+            罗宾把头一批酒瓶在玻璃后摆正。“好了。先看看这几瓶卖得怎么样，不急着把柜子塞满。”<<He>>又确认了一遍标签，才关好柜门。
+          <<elseif _winery.skilled>>
+            罗宾核对过清单，扶着柜门让你往里看。“不同的都分开放了。有人问，也不用全搬出来找。”<<He>>沿着清单往下看。“哪种该补了，也看得清楚。”
+          <<else>>
+            罗宾对照酒柜清单数了数瓶子。“一次六瓶就好。收多少我都记下来，上架之前先付你的货款。”<<He>>把瓶装果酒的清单放在日常饮品订单旁。
+          <</if>>
       <</language>><br><br>
+      <<set $_wineDelivery to _winery.state.ledger.slice().reverse().find(sale => sale.source === 'robin')>>
+      <<if $_wineDelivery and _winery.state.shop_stock[$_wineDelivery.recipe] gt 0>>
+        <<set _shopWine to _winery.terms.recipes.find(recipe => recipe.id === $_wineDelivery.recipe)>>
+        <<language>>
+          <<option 'EN'>>
+            <<switch _shopWine.id>>
+              <<case 'cider'>>Robin turns an apple cider label towards the glass. "That should save me explaining what's in it."
+              <<case 'perry'>>Robin points at the pear cider label. "Pear cider. I'll make sure I say that when someone asks. The bottles all look alike."
+              <<case 'plum_wine'>>Robin checks the plum wine label. "I've had to point out that it's wine. Better not put it beside the fruit juice."
+              <<case 'cherry_wine'>>Robin moves a cherry wine bottle away from the edge. "The label caught my eye. I don't want it getting knocked off while I'm making drinks."
+            <</switch>>
+            <<if Time.season is 'winter'>>"Mostly hot drinks today. These can stay sealed until someone takes them home."<<elseif maplebirch.get('Orchard').species[_shopWine.fruit].fruitSeasons.includes(Time.season)>>"There's a lot more to keep track of when the fruit comes in, isn't there?"<</if>>
+          <<option 'CN'>>
+            <<switch _shopWine.id>>
+              <<case 'cider'>>罗宾把一瓶苹果酒的标签转向玻璃。“这样就不用每次都解释是什么酿的了。”
+              <<case 'perry'>>罗宾指指梨酒的标签。“梨酒。得记得说清楚，瓶子看着可都一样。”
+              <<case 'plum_wine'>>罗宾看了看李子酒的标签。“还得提醒人这是酒。可不能放在果汁旁边。”
+              <<case 'cherry_wine'>>罗宾把一瓶樱桃酒往里挪了挪。“刚才看标签才注意到。调饮料的时候，可别碰下去了。”
+            <</switch>>
+            <<if Time.season is 'winter'>>“今天大多是来买热饮的。这些封着口，等人买回家就好。”<<elseif maplebirch.get('Orchard').species[_shopWine.fruit].fruitSeasons.includes(Time.season)>>“到了收水果的时候，要操心的事也多起来了，是吧？”<</if>>
+        <</language>><br><br>
+      <</if>>
       <<lanSwitch 'Cabinet stock: ' '酒柜库存：'>><span class='blue'><<= _winery.shopStock>> / <<= _winery.terms.shopStockLimit>></span><<lanSwitch ' bottles' '瓶'>><br>
       <<lanSwitch 'Up to ' '每周最多售出'>><<= _winery.terms.shopWeeklyLimit>><<lanSwitch ' bottles are sold each week. Robin pays for supplies from the shop’s available funds.' '瓶。供货款由罗宾从店铺可用资金中支付。'>><br>
+      <<if !_winery.terms.recipes.some(recipe => _winery.state.stock[recipe.id] - _winery.state.reserve[recipe.id] gte _winery.terms.shopSupplyQuantity)>>
+        <span class='blue'><<lanSwitch 'You do not have six spare bottles of any one wine. Reserved bottles are kept aside.' '你没有哪种果酒能凑出六瓶余货。保留的瓶装果酒不会用于供货。'>></span><br>
+      <</if>>
       <<for _recipe range _winery.terms.recipes>>
         <<capture _recipe>>
           <br><<icon _recipe.icon>><b><<= lanSwitch(_recipe.name[0], _recipe.name[1])>></b><br>

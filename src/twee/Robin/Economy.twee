@@ -264,7 +264,9 @@
 
 <<widget 'deadwood-robin-tutor-link'>>
   <<if maplebirch.get('Robin').tutoring.canTutorToday and $exposed lte 0>>
-    <<schoolicon 'library'>><<lanLink ["Join Robin's tutoring lesson (1:00)", '陪罗宾做家教 (1:00)'] 'Deadwood Robin Tutoring'>><</lanLink>><br>
+    <<set $_robinTutorMinutes to 18 * 60 + 30 - (Time.hour * 60 + Time.minute)>>
+    <<set $_robinTutorTime to Math.floor($_robinTutorMinutes / 60) + ':' + String($_robinTutorMinutes % 60).padStart(2, '0')>>
+    <<schoolicon 'library'>><<lanLink ["Join Robin's tutoring lesson (" + $_robinTutorTime + ')', '陪罗宾做家教 (' + $_robinTutorTime + ')'] 'Deadwood Robin Tutoring'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -576,7 +578,7 @@
     <</language>></span><<npcincr Robin dom 3>><<gdom>><br><br>
   <</if>>
   <span class='blue'><<lanSwitch 'The parent pays you <<printmoney 750>> for helping. Robin puts <<printmoney 800>> from the lesson fee into the shared business reserve.' '家长另付给你 <<printmoney 750>> 帮课报酬。罗宾从课时费中拿出 <<printmoney 800>>，记入共同营业储备金。'>></span>
-  <<pass 60>>
+  <<pass `18 * 60 + 30 - (Time.hour * 60 + Time.minute)`>>
 <<else>>
   <<lanSwitch 'This lesson cannot continue now.' '现在无法继续这堂课。'>>
 <</if>>

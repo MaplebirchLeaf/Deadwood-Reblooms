@@ -23,6 +23,13 @@
       <<option 'CN'>>
       一个<<person>>在你的摊位前停下，打量着水果。“给我五个吧。”<<he>>说着，递来一只布袋。“纸袋总是在回家的路上破掉。”<<He>>问你哪几天来摆摊，又告诉你自己叫<<personname>>。
     <</language>>
+  <<elseif $Orchard.regular_visits is 0>>
+    <<language>>
+      <<option 'EN'>>
+      <<personname>> returns to the counter with the same cloth bag. "Found you again. What have you got?"
+      <<option 'CN'>>
+      <<personname>>又提着那只布袋来到柜台前。“又找到你了。今天卖些什么？”
+    <</language>>
   <<elseif $Orchard.regular_visits lt 3>>
     <<language>>
       <<option 'EN'>>
@@ -37,38 +44,57 @@
       <<option 'CN'>>
       <<personname>>等你整理好摊上的水果才开口。“想着在这儿能找到你。够的话，还是五个。”布袋已经撑开了。
     <</language>>
-  <</if>></div><br><br>
+  <</if>>
   <<set $NPCList[0].name_known to 1>><<saveNPC 0 'deadwood_orchard_regular'>>
   <<if $Orchard.regular_visits gte 3 and $Orchard.regular_favourite>>
     <<language>>
       <<option 'EN'>>
-        <<personname>> points at <<foodstufficon $Orchard.regular_favourite>>.
         <<if $_orchard.regularStock.some(item => item.type is $Orchard.regular_favourite)>>
-          "The same as last time, please."
+          <<personname>> spots the fruit <<he>> bought before. "The same as last time, please."
         <<else>>
-          "None today? I'll try something else, then."
+          <<personname>> looks along the display. "None of the ones I usually buy? I'll try something else, then."
         <</if>>
       <<option 'CN'>>
-        <<personname>>指了指<<foodstufficon $Orchard.regular_favourite>>。
         <<if $_orchard.regularStock.some(item => item.type is $Orchard.regular_favourite)>>
-          “还是上次那种吧。”
+          <<personname>>找到了以前买过的水果。“还是上次那种吧。”
         <<else>>
-          “今天没有？那我尝尝别的。”
+          <<personname>>扫了一眼摊上的水果。“平时买的那种没有？那我尝尝别的。”
         <</if>>
     <</language>><br>
-  <</if>>
+  <</if>></div><br><br>
   <div id='orchard-customer-choices'>
   <<for $_fruit range $_orchard.regularStock>>
     <<capture $_fruit>>
       <<foodstufficon $_fruit.type>><<lanLink ['Bag five of these', '装五个这种水果']>>
         <<if maplebirch.get('Orchard').sellRegular($_fruit.type)>>
+          <<set _regularFruit to $_fruit.type>>
           <<pass 20>><<updatesidebarmoney>>
           <<replace '#orchard-customer'>>
             <<language>>
               <<option 'EN'>>
-              <<personname>> counts out the money, takes the bag and makes room for the people behind.
+              <<if $Orchard.regular_visits is 1>>
+                <<personname>> counts out the money while you fill the bag. "That'll do nicely. Much better than carrying them loose." <<He>> gathers the handles and steps away from the counter.
+              <<elseif _regularFruit isnot $Orchard.regular_favourite>>
+                <<personname>> holds the bag open for the different fruit. "A change won't hurt. I'll try these after dinner." <<He>> pays, gives the bag a gentle shake to settle its contents and makes room for the next customer.
+              <<elseif Time.season is 'winter'>>
+                <<personname>> tucks the bag beneath <<his>> coat while finding the money. "That's breakfast sorted. Now I'd better get out of this cold." <<He>> thanks you and heads along the market stalls.
+              <<elseif maplebirch.get('Orchard').species[_regularFruit is 'blood_lemon' ? 'lemon' : _regularFruit].fruitSeasons.includes(Time.season)>>
+                <<personname>> turns one of the fruit in <<his>> hand before putting it in the bag. "This is the time of year for them, isn't it?" <<He>> counts out the money, leaving the display as tidy as <<he>> found it.
+              <<else>>
+                <<personname>> pays and lifts the bag off the counter. "Still got them, then. I had a look before I came over." <<He>> gives you a nod before making room for the people behind.
+              <</if>>
               <<option 'CN'>>
-              <<personname>>数好钱，接过袋子，给身后的人让开了位置。
+              <<if $Orchard.regular_visits is 1>>
+                你装好水果，<<personname>>也数好了钱。“这样就好了，比抱着回去省事。”<<He>>拢起布袋的提手，从柜台前让开。
+              <<elseif _regularFruit isnot $Orchard.regular_favourite>>
+                <<personname>>撑开袋子，接住换来的水果。“换换口味也好，晚饭后尝尝。”<<He>>付过钱，轻轻晃了晃袋子，将水果放稳，给下一位客人让出位置。
+              <<elseif Time.season is 'winter'>>
+                <<personname>>将布袋拢在外套下，腾出手来数钱。“明天早饭有了，我也该找地方暖和暖和了。”<<He>>向你道谢，沿着摊位走去。
+              <<elseif maplebirch.get('Orchard').species[_regularFruit is 'blood_lemon' ? 'lemon' : _regularFruit].fruitSeasons.includes(Time.season)>>
+                <<personname>>拿起一个水果转了转，才放进袋里。“就是这时候吃这个，对吧？”<<He>>数好钱，把翻动过的水果也摆了回去。
+              <<else>>
+                <<personname>>付了钱，从柜台上提起袋子。“还有得卖啊，过来之前我还特意看了一眼。”<<He>>朝你点点头，给身后的人让开了位置。
+              <</if>>
             <</language>><</replace>>
           <<replace '#orchard-customer-choices'>><</replace>>
         <</if>>

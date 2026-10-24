@@ -208,7 +208,7 @@ class Robin extends Module implements RobinFacade {
       } else if (
         V.RobinExpansion?.shop &&
         location === 'orphanage' &&
-        (Time.hour > 18 || (Time.hour === 18 && Time.minute >= 30)) &&
+        ((!Time.schoolDay && !Time.isWeekEnd() && Time.hour >= 9) || Time.hour > 18 || (Time.hour === 18 && Time.minute >= 30)) &&
         Time.hour < 21 &&
         V.robin.timer.hurt === 0 &&
         C.npc.Robin.trauma < 80

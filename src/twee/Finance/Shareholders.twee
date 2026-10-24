@@ -222,6 +222,14 @@
       <<if _shareholders.director>>
         Your appointment to the board appears in the register. You may review the project budget and negotiate private share transfers while your settled holding remains at least 20%.
       <</if>>
+      <<if _minutes.passed and _company.partner>>
+        <br><br>
+        <<if _company_state.contract>>
+          The purchasing clerk checks the signed contract before putting it back in its folder. "These quantities and payment terms stay. The resolution applies to the next quotation."
+        <<else>>
+          The purchasing clerk brings you the revised supply sheet: <<= _company.quote.batches>> batches, due in <<= _company.terms.deliveryDays>> days, with <<deadwood-reblooms-finance-money _company.quote.advance>> payable in advance if you accept those terms. The signature line is still blank.
+        <</if>>
+      <</if>>
     <<option 'CN'>>
       <<if _minutes.passed>>
         职员把决议标为通过。财务处会在下次分红结算时执行，后面附着新股认购授权。
@@ -239,6 +247,14 @@
       <</if>>
       <<if _shareholders.director>>
         董事任命已经记入登记簿。已结算持股保持在 20% 以上时，你可以审阅工程预算、洽谈非流通股份转让。
+      <</if>>
+      <<if _minutes.passed and _company.partner>>
+        <br><br>
+        <<if _company_state.contract>>
+          采购员核对签好的合同，放回文件夹。“这一份的数量和付款条件照旧。决议从下一次报价开始算。”
+        <<else>>
+          采购员送来改过的供货单：共 <<= _company.quote.batches>> 批，交期 <<= _company.terms.deliveryDays>> 天，按预付条件签约可先收<<deadwood-reblooms-finance-money _company.quote.advance>>。签字栏还空着。
+        <</if>>
       <</if>>
   <</language>><br>
 <</if>>
@@ -321,9 +337,43 @@
 <<if !_shareholders.director and !_shareholders.controller>><<deadwood-shareholder-return>><<exit>><</if>>
 <<language>>
   <<option 'EN'>>
-    The project folder smells of damp paper. A site photograph is clipped beside the cost estimates. The invoices cover concrete, steel and the glazing crews, each with a different delivery date.
+    The project folder smells of damp paper. A site photograph is clipped beside the cost estimates.
+    <<if !$avery_tower>>
+      The clerk leaves the allocation form in its tray. There is no current construction estimate to sign.
+    <<elseif $avery_tower.progress gte 100>>
+      The finished tower fills the photograph. The last page lists the construction costs, with the earlier estimates filed behind it. There are no further construction allocations to approve.
+    <<elseif ['fallen', 'kicked', 'saved', 'ascended'].includes($avery_fate)>>
+      The construction estimates have been set aside. The clerk is checking the payments already made and any money still reserved for the site.
+    <<elseif $avery_tower.progress gte 80>>
+      The building's frame is complete. Bare openings remain where the windows will go. The glazing crew's measurements lie on top of the folder, next to the finishing estimates.
+    <<elseif $avery_tower.progress gte 60>>
+      The tower rises above the neighbouring roofs. The project manager has marked the exposed steel in the photograph and attached the next delivery schedule.
+    <<elseif $avery_tower.progress gte 40>>
+      The first floors stand above the foundations. Concrete deliveries and steelwork occupy separate columns, with the dates underlined where the crews will share the site.
+    <<elseif $avery_tower.progress gte 20>>
+      The foundations are in place. The project manager has put the groundworks photographs behind the plans for the building itself.
+    <<else>>
+      Mud clings to the sides of the excavation. A pump hose crosses the foreground of the photograph. The first estimates cover digging, concrete and getting the foundations in place.
+    <</if>>
   <<option 'CN'>>
-    工程档案带着潮湿纸张的气味。现场照片夹在报价旁边。混凝土、钢材和幕墙施工分别开着账单，交付日期也各不相同。
+    工程档案带着潮湿纸张的气味，现场照片夹在报价旁边。
+    <<if !$avery_tower>>
+      职员把拨款表留在托盘里，目前没有待签的施工报价。
+    <<elseif $avery_tower.progress gte 100>>
+      完工的大楼占满了照片。最后一页列着施工支出，之前的报价依次归在后面。已经没有需要审批的施工拨款了。
+    <<elseif ['fallen', 'kicked', 'saved', 'ascended'].includes($avery_fate)>>
+      施工报价被搁在一旁。职员正核对已经付出的款项，以及仍为工地留着的钱。
+    <<elseif $avery_tower.progress gte 80>>
+      大楼的主体框架已经完工，窗户的位置还空着。玻璃安装的尺寸单压在文件最上面，旁边是收尾工程的报价。
+    <<elseif $avery_tower.progress gte 60>>
+      大楼已经高过周围的屋顶。工程经理在照片上标出了裸露的钢架，附上下一批材料的到货日期。
+    <<elseif $avery_tower.progress gte 40>>
+      地基上方已经立起几层楼。混凝土与钢材各占一栏，需要两班工人共用工地的日期被划了出来。
+    <<elseif $avery_tower.progress gte 20>>
+      地基已经就位。工程经理把挖掘时的照片收在后面，翻出了大楼主体的图纸。
+    <<else>>
+      挖开的土坑边缘沾着泥，抽水的软管横在照片近处。最早的几份报价列着挖掘、混凝土与铺设地基的费用。
+    <</if>>
 <</language>><br><br>
 <<lanSwitch 'Company funds available: ' '公司可用资金：'>><<deadwood-reblooms-finance-money _board_state.treasury>><br>
 <<lanSwitch 'Project expenditure to date: ' '累计工程拨款支出：'>><<deadwood-reblooms-finance-money _board_state.project_spent>><br>
@@ -332,6 +382,12 @@
 <</if>>
 <<if _board_state.project>>
   <<lanSwitch 'Reserved project funds: ' '已预留工程款：'>><<deadwood-reblooms-finance-money _board_state.project.remaining>><br>
+  <<language>>
+    <<option 'EN'>>
+      The signed allocation has been separated from the estimates. Each paid day's work is entered beneath it, with the amount still reserved pencilled in the margin.
+    <<option 'CN'>>
+      签过字的拨款单与报价分开放着，每天付费施工的记录列在下面，余款也单独记着。
+  <</language>><br>
 <<elseif _shareholders.towerStage>>
   <<set _tower_stage to _shareholders.towerStage>>
   <<lanSwitch 'Current allocation: ' '本阶段拨款：'>><<deadwood-reblooms-finance-money _tower_stage.budget>><br>
@@ -341,7 +397,7 @@
       <<if $Finance.company.result is 'corporate-ok'>><<pass 20>><</if>>
     <</lanLink>><br>
   <<elseif _board_state.funded_stages.includes(_tower_stage.stage)>>
-    <span class='blue'><<lanSwitch 'This stage has already received its allocation.' '这个施工阶段已经拨过款。'>></span><br>
+    <span class='blue'><<lanSwitch 'This stage has already received its allocation. The payment record is filed with the construction estimates.' '这个施工阶段已经拨过款，支出记录与施工报价一并归档。'>></span><br>
   <<elseif _board_state.treasury lt _tower_stage.budget>>
     <span class='red'><<lanSwitch 'Company funds are short by ' '公司资金还差 '>><<deadwood-reblooms-finance-money `_tower_stage.budget - _board_state.treasury`>></span><br>
   <</if>>

@@ -23,20 +23,54 @@
 <<if !_shrineTownReady and _shrineTravel and $npc?.includes('Tsukihan')>><<endnpc 'Tsukihan'>><</if>>
 <<if _shrineTownReady>>
   <<npc Tsukihan>><<person1>>
+  <!-- 依当前待采的果实准备包装，不让累计采收记录永久遮住其它采购对白。 -->
+  <<set _shrineFruitBags to !!maplebirch.get('Orchard') and ($Orchard?.shrine ?? []).some(tree => tree?.fruit.length)>>
   <<language>>
     <<option 'EN'>>
       Tsukihan looks up from the list. "Oh. You're here too." <<He>> moves the basket off the empty bench so you can stand beside <<him>>.<br><br>
-      "Lamp oil, soap, flour. Things always seem to run out together." <<He>> checks the list again. There are biscuits in the basket already.
+      <<if _shrineFruitBags>>
+        "Lamp oil, soap, bags for the fruit." <<He>> holds a paper bag open to check its seams. "I'd rather find out here if the bottom gives way."
+      <<elseif _shrine.wish.count gte 3>>
+        "Cord, pencils. Someone's taken to sharpening them right down to the end." <<He>> compares two bundles of cord, then puts the softer one in the basket.
+      <<elseif Weather.isSnow>>
+        "Lamp oil, soap, flour. I don't want to carry it all up those steps twice." <<He>> presses a thumb against a packet's damp corner before putting it back.
+      <<else>>
+        "Lamp oil, soap, flour. Things always seem to run out together." <<He>> checks the list again.
+      <</if>> There are biscuits in the basket already.
     <<option 'CN'>>
       月羽从采购单上抬起头。“咦，你也在。”<<He>>把篮子从旁边空着的长凳上提起来，给你让了个位置。<br><br>
-      “灯油、肥皂、面粉。每次都是一起用完。”<<He>>又核对了一遍单子。篮子里已经放了一包饼干。
+      <<if _shrineFruitBags>>
+        “灯油、肥皂，还有装果子的袋子。”<<He>>撑开一只纸袋，检查底下的接缝。“要漏，最好在这里就看出来。”
+      <<elseif _shrine.wish.count gte 3>>
+        “挂绳，铅笔。有人总用到最后一点才肯换。”<<He>>比较过两捆绳子，把较软的一捆放进篮子。
+      <<elseif Weather.isSnow>>
+        “灯油、肥皂、面粉。不想再爬一趟那些台阶了。”<<He>>用拇指按了按一包东西受潮的边角，把它放了回去。
+      <<else>>
+        “灯油、肥皂、面粉。每次都是一起用完。”<<He>>又核对了一遍单子。
+      <</if>>篮子里已经放了一包饼干。
   <</language>><br><br>
   <<deadwood-locket-link 'Tsukihan'>>
   <<if $DeadwoodReblooms.daily.shrine.shopping>>
     <<if $DeadwoodReblooms.daily.shrine.shopping is 'basket'>>
-      <<lanSwitch 'You help check off the remaining supplies. Tsukihan notices the basket has become easier to carry only after reaching for the handle. "Thank you. I did buy rather a lot."' '你帮着把剩下的东西一件件核对完。月羽伸手去拿提柄，才发现篮子已经到了你手里。“谢谢。好像是买得有点多了。”'>><br><br>
+      <<language>>
+        <<option 'EN'>>
+          You help check off the remaining supplies. Tsukihan notices the basket has become easier to carry only after reaching for the handle. "Thank you. I did buy rather a lot."
+          <<if _shrineFruitBags>><<He>> lays the empty fruit bags on top, where the soap cannot crush them.
+          <<elseif _shrine.donations gte 10000>>"The cloths can stay dry under the new roof now." <<He>> folds the list around the receipt.<</if>>
+        <<option 'CN'>>
+          你帮着把剩下的东西一件件核对完。月羽伸手去拿提柄，才发现篮子已经到了你手里。“谢谢。好像是买得有点多了。”
+          <<if _shrineFruitBags>><<He>>把装果子的空纸袋放到最上面，没让肥皂盒压住。
+          <<elseif _shrine.donations gte 10000>>“换了屋顶，擦干净的布总算不会又淋湿了。”<<He>>把收据夹进采购单。<</if>>
+      <</language>><br><br>
     <<else>>
-      <<lanSwitch 'Tsukihan turns two biscuit packets over, reading the labels. "You liked these last time." <<He>> puts one in the basket. "I want to try the other ones too. We can have both."' '月羽翻过两包饼干，认真看了看。“你上回喜欢这个。”<<He>>把一包放进篮子，又拿起另一包。“这个我也想试。都买吧。”'>><br><br>
+      <<language>>
+        <<option 'EN'>>
+          Tsukihan turns two biscuit packets over, reading the labels. "These won't crumble as much." <<He>> puts one in the basket, then picks up the other. "But I want to try these. We can have both."
+          <<if _shrine.wish.count gte 3>>"I'll keep the tin away from the pencils this time." <<He>> brushes a little graphite from the shopping list.<</if>>
+        <<option 'CN'>>
+          月羽翻过两包饼干，认真看了看。“这包不容易碎。”<<He>>放进一包，又拿起另一包。“不过，这个我也想试。都买吧。”
+          <<if _shrine.wish.count gte 3>>“这回把饼干盒放得离铅笔远些。”<<He>>拍掉采购单上蹭到的一点铅灰。<</if>>
+      <</language>><br><br>
     <</if>>
   <<elseif Time.hour * 60 + Time.minute lt 11 * 60 + 55 and !pcAreArmsBound('any') and !$daily.no_sing and !$worn.face.type.includes('gag')>>
     <<for _shopChoice range ['basket', 'biscuits']>>

@@ -110,6 +110,7 @@
         <<set $Orchard.alex_talk_day to Time.days>>
         <<stress -6>><<tiredness -40>><<npcincr Alex love 1>><<pass 20>>
         <<replace '#deadwood-orchard-alex'>>
+          <<set _alexWine to maplebirch.get('Orchard').winery.terms.recipes.find(recipe => $Orchard.winery.stock[recipe.id] gt 0)>>
           <<language>>
             <<option 'EN'>>
             <<if Weather.precipitation is 'rain'>>
@@ -123,6 +124,15 @@
             <<else>>
               Alex asks which part of the work you like best. "Not the paperwork, I hope. I'd hate to lose my only reason for complaining."
             <</if>>
+            <<if _alexWine>>
+              <br><br>You mention the <<= _alexWine.name[0].toLowerCase()>> bottled at the winery.
+              <<switch _alexWine.id>>
+                <<case 'cider'>>"Cider, eh?" Alex grins. "You get much else going in there and I'll need another sheet for the accounts."
+                <<case 'perry'>>"Pear cider? I'd have got that mixed up with the apple." Alex chuckles. "Best leave the labels to you."
+                <<case 'plum_wine'>>"Good thing you put dates on the barrels." Alex stretches <<his>> legs. "I'd lose track before the first lot was ready."
+                <<case 'cherry_wine'>>"Cherry wine? I'll keep the paperwork away from those crates, then." Alex laughs. "Don't fancy finding out how well it stains."
+              <</switch>>
+            <</if>>
             <<option 'CN'>>
             <<if Weather.precipitation is 'rain'>>
               你们还没坐好，雨水便开始穿过树篱往下滴。艾利克斯笑着拉了拉你的衣袖，带你去棚下。“地方不错，可惜没个好屋顶。”<<He>>拂去长凳上的水，把干燥的一端留给你。
@@ -134,6 +144,15 @@
               你刚要起身，<<he>>便说：“再待会儿。”<<if C.npc.Alex.dom lte -30>><<His>>手停在你的手旁。“你愿意的话。”<<else>><<He>>拍了拍身旁的空位。“少了我们二十分钟，树也不会跑。”<</if>>
             <<else>>
               艾利克斯问你最喜欢哪一部分活计。“希望不是记账，不然我连抱怨的理由都没了。”
+            <</if>>
+            <<if _alexWine>>
+              <br><br>你说起酿酒间装好的<<= _alexWine.name[1]>>。
+              <<switch _alexWine.id>>
+                <<case 'cider'>>“苹果酒啊。”艾利克斯咧嘴笑了。“你再多弄几样，我记账就得多备一张纸了。”
+                <<case 'perry'>>“梨酒？换我就和苹果酒弄混了。”艾利克斯轻笑一声。“标签还是交给你吧。”
+                <<case 'plum_wine'>>“幸好你在桶上写了日期。”艾利克斯伸了伸腿。“换我，头一批还没酿好，就该忘了。”
+                <<case 'cherry_wine'>>“樱桃酒？那我可得让账本离酒箱远点。”艾利克斯笑了。“沾上酒，可就看不清字了。”
+              <</switch>>
             <</if>>
           <</language>><<lstress>><<ltiredness>><<glove 'Alex'>>
         <</replace>>

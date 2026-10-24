@@ -12,7 +12,7 @@ When Robin is out or asleep, quietly leave **£20, £50 or £100** beneath the b
 
 After upgrading at least one stall, read the tutoring notice at the orphanage and discuss it in Robin's room. Robin needs **45 confidence** to begin teaching.
 
-The trial and later visits are on **Danube Street**. During term, accompany Robin on Tuesdays and Thursdays at 17:30–18:30; Fridays are added after six lessons. Completing a lesson gives the PC <span class="gold">£7.50</span> and adds <span class="gold">£8</span> to Robin's business reserves. Robin can also teach alone. Visiting and leaving without teaching does not count.
+The trial and later visits are on **Danube Street**. During term, accompany Robin on Tuesdays and Thursdays at 17:30–18:30; Fridays are added after six lessons. Arriving late means helping for the remaining lesson time, still finishing at 18:30. The link shows the actual duration. Completing a lesson gives the PC <span class="gold">£7.50</span> and adds <span class="gold">£8</span> to Robin's business reserves. Robin can also teach alone. Visiting and leaving without teaching does not count.
 
 ### Cliff Street drinks shop
 
@@ -32,11 +32,11 @@ Town hall applications and permit collection are available **09:00–17:00**. Ch
 
 Opening costs <span class="gold">£7,400,</span> separate from stall upgrades. With an account, debit card and enough deposits, lend Robin <span class="gold">£2,000</span> from PC savings once during preparations; it remains part of the loan.
 
-Enter through **Cliff Street → Robin's drinks shop**, open 09:00–21:00. Opening earns **Honeyhole Ice City**. A relief attendant may cover Robin's absence, but spending time and tasting with Robin requires Robin to be at the shop.
+Enter through **Cliff Street → Robin's drinks shop**, open 09:00–21:00. Opening earns **Honeyhole Ice City**. Robin usually works **18:30–21:00** each day, starting at **09:00 on weekdays during school holidays**. Weekend daytime stalls remain at the beach or park, and bathing, watering the garden, temple duties and existing arrangements still take priority. Staff cover Robin's absence. Spending time and tasting with Robin requires Robin to be at the shop.
 
 ### Restocking, employees and side businesses
 
-- **Shop work**: once daily, using one crate of new-product ingredients. The PC gets <span class="gold">£10</span> and reserves gain <span class="gold">£20</span>. Replace three exhausted crates for <span class="gold">£30,</span> reduced to <span class="gold">£25</span> with enough maths skill.
+- **Shop work**: once daily, leaving a full hour before Robin's bath, garden watering or closing time. Uses one crate of new-product ingredients. The PC gets <span class="gold">£10</span> and reserves gain <span class="gold">£20</span>. Replace three exhausted crates for <span class="gold">£30,</span> reduced to <span class="gold">£25</span> with enough maths skill.
 - **Employees**: two positions shared by outside staff and orphanage companions. Each costs <span class="gold">£350</span> to train and <span class="gold">£350</span> per week. Applicants and the rota persist and can be checked in the ledger.
 - **Orphanage companions**: discuss hiring after 16:00 on school days. Help Robin train an inexperienced companion on duty for half an hour once daily. Experience improves sales, and wages are already included in the weekly accounts.
 - **Flowers and popcorn**: pay <span class="gold">£100</span> for a flower counter or <span class="gold">£150</span> for a popcorn machine after opening. Flowers need restocking, and popcorn retains the original carrying limit.
