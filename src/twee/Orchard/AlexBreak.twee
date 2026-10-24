@@ -1,0 +1,169 @@
+:: Deadwood Alex Break Widgets [widget]
+
+<!-- 入口和点击回调共用本人在场检查。_alexFree 跨 widget 使用，不改为宏内变量。 -->
+<<widget 'deadwood-alex-available'>><<silently>>
+  <<farm_work_update>>
+  <<set _alexFree to !!maplebirch.get('Orchard') and C.npc.Alex?.init is 1 and C.npc.Alex.state is 'active' and $farm_stage gte 7
+    and ['alex_farm', 'alex_cottage'].includes($location) and ['admin', 'relax'].includes($farm_work.alex)
+    and Time.hour gte 6 and Time.hour lt 21 and !$statFreeze and !$replayScene and !$frozenValues and $combat isnot 1
+    and !$gag and !$possessed and !$eventforced and !$nextPassage and !$nextPassageCheck and $exposed lte 0 and $stress lt $stressmax and !pcAreArmsBound('both')
+    and !maplebirch.get('Orchard').farmInterrupted and !isPregnancyEnding() and !npcPregnancyEnding('Alex')
+    and !(playerIsPregnant() and playerBellyVisible() and !talkedAboutPregnancy('pc', 'Alex'))
+    and !(npcIsPregnant('Alex') and npcBellySize('Alex') gte 1 and !talkedAboutPregnancy('Alex', 'pc'))>>
+<</silently>><</widget>>
+
+<<widget 'deadwood-alex-break-link'>>
+  <<set $_alexMenu to $passage is 'Farm Cottage'
+    ? document.querySelector('#passage-content .macro-link[data-passage="Farm Bedroom"]')
+    : document.querySelector('#passage-content .macro-link[data-passage="Farm Rest"]')
+      and document.querySelector('#passage-content .macro-link[data-passage="Farm Work"]')>>
+  <<if !$_alexMenu>><<exit>><</if>>
+  <<deadwood-alex-available>>
+  <<if _alexFree and ($Orchard.alex_talk_day isnot Time.days or canGiftFood('Alex'))>>
+    <<socialiseicon>><<lanLink ['Spend some time with Alex', '陪艾利克斯待一会儿'] 'Deadwood Alex Break'>><</lanLink>><br>
+  <</if>>
+  <<if $passage is 'Farm Rest' and _alexFree>>
+    <<deadwood-alex-ride-link>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-alex-ride-link'>>
+  <<if $farm_work.alex is 'relax' and $farm_work.alex_relax lt 3 and C.npc.Alex.love gte 60 and $phase isnot 5
+    and Weather.precipitation isnot 'rain' and !$daily.alexMeadowDate>>
+    <<lanSwitch 'Alex looks across the yard. "Want to go for a walk?"' '艾利克斯望向院子。“要不要出去走走？”'>><br><br>
+    <<animalicon 'horse'>><<lanLink ['Go for a walk with Alex (0:20)', '和艾利克斯出去走走 (0:20)'] 'Farm Meadow Date'>>
+      <<deadwood-alex-available>>
+      <<if _alexFree and $farm_work.alex is 'relax' and $farm_work.alex_relax lt 3 and C.npc.Alex.love gte 60 and $phase isnot 5
+        and Weather.precipitation isnot 'rain' and !$daily.alexMeadowDate>>
+        <!-- 原版骑行结尾推进二十分钟，邀请不再重复耗时或重复结算休息奖励。 -->
+        <<set $daily.alexMeadowDate to true>><<npcincr Alex love 1>><<npc Alex>><<person1>>
+      <<elseif !$nextPassage>>
+        <<set $nextPassage to $nextPassageCheck || 'Farm Work'>>
+      <</if>>
+    <</lanLink>><<glove 'Alex'>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-alex-gift-response'>>
+  <<if maplebirch.get('Orchard') and $farm_stage gte 7 and $daily.giftedFood.Alex is $gift>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        <<if $farm_work.alex is 'relax'>>
+          Alex rubs the back of <<his>> neck. "Good timing. Nearly spent the whole break flat on my back." <<He>> stretches, looking a little more inclined to get up.
+        <<elseif $farm_work.alex is 'admin'>>
+          "Nearly forgot to stop for food," Alex admits. "Easy enough to remember when it's the pigs squealing at you." <<He>> laughs.
+        <<else>>
+          Alex looks out towards the yard. "That'll keep me going. Something out there always needs feeding, too."
+        <</if>>
+        <<if isLoveInterest('Alex')>>
+          "You can stay, you know." <<He>> nudges a chair towards you with <<his>> boot. <<if C.npc.Alex.dom lte -10>>"I'd like that."<<else>>"Haven't had a chance to ask what you've been up to."<</if>>
+        <<elseif isPossibleLoveInterest('Alex')>>
+          "Thanks, partner. Don't go hungry looking after me."
+        <<else>>
+          "Thanks for thinking of me."
+        <</if>>
+      <<option 'CN'>>
+        <<if $farm_work.alex is 'relax'>>
+          艾利克斯揉了揉后颈。“来得正好。差点就这么躺到该干活了。”<<He>>伸了个懒腰，看着比刚才愿意动弹一些了。
+        <<elseif $farm_work.alex is 'admin'>>
+          “差点忘了该吃东西了。”艾利克斯承认。“喂猪倒是忘不了，它们会叫唤。”<<He>>笑了。
+        <<else>>
+          艾利克斯望向院子。“吃了才有力气干活。外头那些也总等着喂呢。”
+        <</if>>
+        <<if isLoveInterest('Alex')>>
+          “你也可以留下啊。”<<He>>用靴子将一张椅子推向你。<<if C.npc.Alex.dom lte -10>>“我挺想让你陪着的。”<<else>>“还没来得及问你，最近都忙些什么呢。”<</if>>
+        <<elseif isPossibleLoveInterest('Alex')>>
+          “谢了，搭档。别光顾着我，饿着自己。”
+        <<else>>
+          “谢谢你还想着我。”
+        <</if>>
+    <</language>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Alex Break
+<<effects>><<deadwood-alex-available>>
+<<if _alexFree>>
+  <<npc Alex>><<person1>>
+  <<set $outside to $farm_work.alex is 'relax' ? 1 : 0>>
+  <<set $location to $outside ? 'alex_farm' : 'alex_cottage'>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $farm_work.alex is 'relax'>>
+        Alex pushes <<his>> hat back when you approach. "Room here," <<he>> says, shifting against the trunk. <<if Weather.precipitation is 'rain'>>The ground beyond the branches is dark with rain.<<else>>A hen scratches through the grass on the other side of the yard.<</if>>
+      <<else>>
+        You call through the open bedroom door. Alex looks up from <<his>> desk, then follows you downstairs. "Could use a break. You'd think all that writing would be easier on the hands than farm work." <<He>> flexes <<his>> fingers on the way to the table.
+      <</if>>
+    <<option 'CN'>>
+      <<if $farm_work.alex is 'relax'>>
+        你走近时，艾利克斯抬起帽檐。“这里有地方。”<<He>>靠着树干挪了挪。<<if Weather.precipitation is 'rain'>>枝叶外的泥地被雨水浸成了深色。<<else>>院子另一头，一只母鸡正在草丛里刨食。<</if>>
+      <<else>>
+        你在敞开的卧室门口叫了一声。艾利克斯从书桌前抬起头，跟着你下楼。“正好歇歇。写几个字，手倒不比干农活轻松。”走向餐桌时，<<he>>活动着手指。
+      <</if>>
+  <</language>><br><br>
+  <div id='deadwood-alex-break'>
+    <<if canGiftFood('Alex')>>
+      <<lanSwitch 'You have brought something to eat. What would you like to offer?' '你带了些吃的，想给艾利克斯尝尝什么？'>><br><br>
+      <<set _food_gift_found to false>><<food_gift_list>>
+      <<skinicon 'give'>><<lanLink ['Go upstairs with Alex and offer the food (0:05)', '和艾利克斯上楼，送上食物 (0:05)'] 'Alex Gifts'>>
+        <<deadwood-alex-available>>
+        <<if _alexFree and canGiftFood('Alex') and setup.foodstuff[$gift]?.category is 'dish' and ($foodstuff[$gift]?.amount ?? 0) gt 0>>
+          <<pass 5>><<deadwood-alex-available>>
+          <<if _alexFree and $passage is 'Deadwood Alex Break' and canGiftFood('Alex')
+            and setup.foodstuff[$gift]?.category is 'dish' and ($foodstuff[$gift]?.amount ?? 0) gt 0>>
+            <!-- 消耗和日限由原版宏记账，喜好、好感与成就由原版 Alex Gifts 结算一次。 -->
+            <<give_gift 'Alex'>><<set $outside to 0, $location to 'alex_cottage'>><<endevent>><<set $phase to 1>>
+          <<elseif !$nextPassage>>
+            <<set $nextPassage to $nextPassageCheck || 'Farm Cottage'>>
+          <</if>>
+        <<elseif !$nextPassage>>
+          <<set $nextPassage to $nextPassageCheck || 'Farm Cottage'>>
+        <</if>>
+      <</lanLink>><br><br>
+    <</if>>
+    <<if $Orchard.alex_talk_day isnot Time.days>>
+      <<socialiseicon>><<lanLink ['Keep Alex company (0:15)', '陪艾利克斯坐一会儿 (0:15)']>>
+        <<deadwood-alex-available>>
+        <<if _alexFree and $Orchard.alex_talk_day isnot Time.days>>
+          <<set $Orchard.alex_talk_day to Time.days>><<pass 15>><<deadwood-alex-available>>
+          <<if !$nextPassage and $nextPassageCheck>><<set $nextPassage to $nextPassageCheck>><</if>>
+          <<replace '#deadwood-alex-break'>>
+            <<if _alexFree>>
+              <<npcincr Alex love 1>><<stress -2>>
+              <<language>>
+                <<option 'EN'>>
+                  You sit with Alex, chatting while <<he>> works a stiff shoulder. <<if $farm_stage lt 12>>"Another field getting cleared, another reason to get out of bed." <<He>> laughs. "Sometimes I think the weeds grow back behind us."<<else>>"Takes a while to get used to seeing all the fields again." <<He>> smiles. "Worth the work, though."<</if>>
+                  <br><br>
+                  <<if isLoveInterest('Alex')>>
+                    <<if $outside>>Alex shifts closer against the trunk.<<else>>Alex moves <<his>> chair closer to yours.<</if>> "Glad you stayed." <<if C.npc.Alex.dom lte -10>><<He>> looks down with a smile, then back at you.<<else>><<He>> grins. "I was starting to bore myself."<</if>>
+                  <<else>>
+                    Alex asks what you have been doing in town, listening until you have finished before telling you what the animals have been up to. "At least you've had less mud to deal with. I hope."
+                  <</if>>
+                <<option 'CN'>>
+                  你陪艾利克斯坐着聊天，<<he>>揉着发僵的肩膀。<<if $farm_stage lt 12>>“又有一块田等着清，又多一个起床的理由。”<<He>>笑了。“有时候都觉得，咱们前脚走，杂草后脚就长回来了。”<<else>>“这么多田都清出来了，反倒还没看惯。”<<He>>笑了笑。“不过，这些力气花得值。”<</if>>
+                  <br><br>
+                  <<if isLoveInterest('Alex')>>
+                    <<if $outside>>艾利克斯靠着树干，往你身旁挪了挪。<<else>>艾利克斯把椅子往你这边挪了挪。<</if>>“幸好你没急着走。”<<if C.npc.Alex.dom lte -10>><<He>>低头笑了笑，又望向你。<<else>><<He>>咧嘴一笑。“我都快闷坏了。”<</if>>
+                  <<else>>
+                    艾利克斯问起你在镇上的事，等你说完，才讲起农场的牲口又闹了些什么。“至少，你那儿的泥巴没这么多吧。希望没有。”
+                  <</if>>
+              <</language>><<glove 'Alex'>><<lstress>>
+            <<else>>
+              <<lanSwitch 'Alex has to get back to work. You leave the rest for another time.' '艾利克斯得回去忙了。剩下的话，留到下次再聊。'>>
+            <</if>>
+          <</replace>>
+        <</if>>
+      <</lanLink>><<glove 'Alex'>><<lstress>><br>
+    <</if>>
+  </div>
+<<else>>
+  <<lanSwitch 'Alex cannot stop to spend time with you right now.' '艾利克斯现在没空陪你。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink ['Return', '返回'] `$outside ? 'Farm Work' : 'Farm Cottage'`>>
+  <<if $nextPassageCheck>>
+    <<set $nextPassage to $nextPassageCheck>>
+  <<elseif !$eventforced>>
+    <<endevent>>
+  <</if>>
+<</lanLink>><br>

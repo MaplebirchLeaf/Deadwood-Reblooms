@@ -7,7 +7,13 @@ import type { MacroDefinition } from 'twine-sugarcube';
 
 export default function Orchard(maplebirch: typeof window.maplebirch): void {
   Remy(maplebirch);
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-remy-school-link', passage: 'Riding School' }, { widget: 'deadwood-remy-captivity', passage: 'Livestock Cell Remy' });
+  maplebirch.tool.addTo(
+    'BeforeLinkZone',
+    { widget: 'deadwood-remy-school-link', passage: 'Riding School' },
+    { widget: 'deadwood-remy-captivity', passage: 'Livestock Cell Remy' },
+    { widget: 'deadwood-remy-estate-link', passage: 'Estate Approach' },
+    { widget: 'deadwood-alex-gift-response', passage: 'Alex Gifts' }
+  );
   maplebirch.tool.addTo(
     'BeforeLinkZone',
     { widget: 'deadwood-remy-birth-reflection', passage: 'Pregnancy Birth Hospital 4' },
@@ -31,6 +37,7 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
 
   maplebirch.tool.addTo(
     'CustomLinkZone',
+    { widget: 'deadwood-alex-break-link', passage: ['Farm Cottage', 'Farm Rest'] },
     { widget: [-1, 'deadwood-orchard-staff-link'], passage: 'Farm Still' },
     { widget: [-1, 'deadwood-orchard-worker-recruitment'], passage: 'Pub' },
     { widget: [-1, 'deadwood-orchard-regular-link'], passage: 'Stall Manage' }

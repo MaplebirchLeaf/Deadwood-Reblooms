@@ -43,7 +43,9 @@ New fruit produced by a lemon tree during a blood moon becomes **blood lemons**.
 
 ### Alex and orchard help
 
-When Alex handles administration by day, tour the orchard, rest or share an apple once daily. You can separately ask for clearing, watering or harvesting help once daily to shorten the work.
+Once the orchard is open, tour it, rest or share an apple while Alex handles administration by day. After you begin running the farm together, when Alex is doing paperwork or relaxing, you can also spend 15 minutes together from the cottage or resting place; this shares the orchard's once-daily time together. You can separately ask for clearing, watering or harvesting help once daily to shorten the work.
+
+If you have a prepared dish, take five minutes to go upstairs with Alex and offer the food; the usual daily food-gift limit and favourites apply. At 60 affection, while Alex is resting and it is not raining, you can agree to go for a walk, followed by a ride together, once daily. Work, attacks on the farm or urgent matters can keep Alex occupied until another time.
 
 After opening the farm orchard, spend 30 minutes seeking a worker at the pub. Wages are <span class="gold">£250</span> weekly, with seven days paid on hiring and up to fourteen days prepaid. Unpaid work pauses; dismissing the worker does not refund wages.
 
@@ -115,6 +117,12 @@ After three ordinary conversations, familiarity moves Remy into the important re
 4. After at least five conversations, two dates and 30 affection, discuss dating explicitly. Agreement makes Remy eligible; select Remy on the Attitudes page afterwards.
 
 Once familiar, spend another 15 minutes daily resting, checking tack or reviewing lessons. After dating and two dates, warm clear weather allows a pasture picnic. Ending the relationship requires confirmation and removes the selected love interest; ordinary conversation and food gifts remain possible.
+
+### Visiting Remy's house
+
+After beginning an ordinary relationship, visit the estate at night once the riding school has closed and ask the guard to announce you. Leave at least 20 minutes to finish before eleven. The gate remains closed to you after a refusal or while security is on alert. Remy also cannot receive visitors while away at your banquet or when either of you is going into labour.
+
+Keep Remy company in the drawing room, discuss work in the study, or ask Remy to leave Alex alone once you know about the farm conflict. These choices share the riding school's once-daily activity, add 1 affection, and drawing-room company also relieves stress. Visits do not add dates or stop attacks on Alex's farm.
 
 ### Captivity route and farm conflict
 
