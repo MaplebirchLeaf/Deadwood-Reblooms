@@ -6,6 +6,7 @@ export default function Tsukihan(maplebirch: typeof window.maplebirch): void {
   maplebirch.npc.add(
     {
       nam: 'Tsukihan',
+      fullDescription: 'Tsukihan',
       adult: 0,
       teen: 1,
       age: 19,

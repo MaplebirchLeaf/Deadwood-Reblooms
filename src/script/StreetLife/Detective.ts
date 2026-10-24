@@ -7,6 +7,7 @@ export default function Detective(maplebirch: typeof window.maplebirch): void {
   maplebirch.npc.add(
     {
       nam: 'Grant',
+      fullDescription: 'Grant',
       adult: 1,
       teen: 0,
       age: 39,

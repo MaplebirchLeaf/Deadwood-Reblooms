@@ -291,23 +291,6 @@ class DeadwoodReblooms extends Module {
     } catch (error) {
       this.log('Failed to migrate Deadwood module settings', 'ERROR', error);
     }
-    this.core.once(':modLoaderEnd', async () => {
-      const selector = window.addonBeautySelectorAddon;
-      if (!selector) return;
-      try {
-        await selector.iniCustomStore();
-        const saved = await selector.IdbKeyValRef.keyval_get(selector.BeautySelectorAddon_OrderSaveKey, selector.customStore);
-        const packs = selector.getTypeOrder();
-        if (!packs.some(item => item.type === 'Deadwood-Reblooms-Images')) return;
-        const previous = packs.filter(item => item.type === 'Images' || selector.type0ModNameList.includes(item.modRef.name));
-        if (saved != null && saved !== JSON.stringify(previous.map(item => item.type))) return;
-        const order = packs.filter(item => !['Deadwood-Reblooms-Fem-Goose-Compilation', 'Deadwood-Reblooms-Mysterious'].includes(item.type));
-        await selector.saveOrder(order.map(item => item.type));
-        selector.typeOrderUsed = order;
-      } catch (error) {
-        this.log('Failed to initialise the default image pack', 'WARN', error);
-      }
-    });
     this.baileyRent.preInit();
     this.core.dynamic.regTimeEvent('onDay', 'deadwood-reblooms-daily', {
       exact: true,
@@ -316,6 +299,8 @@ class DeadwoodReblooms extends Module {
     });
     this.core.tool.onInit(() => setup.maplebirch.hint.push('<<= maplebirch.get("DeadwoodReblooms").wiki>>'));
     this.core.once(':storyready', () => {
+      // 保留各分支的原生总列表，衣物插件追加的上下装只补入一次。
+      for (const item of [...setup.clothes.upper, ...setup.clothes.lower]) if (!setup.clothes.all.includes(item)) setup.clothes.all.push(item);
       $('#history-backward').ariaClick(() => this.rand.back(1));
       $('#history-forward').ariaClick(() => this.rand.forward(1));
     });

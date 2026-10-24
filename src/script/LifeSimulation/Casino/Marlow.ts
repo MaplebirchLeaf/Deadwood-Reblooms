@@ -6,6 +6,7 @@ export default function Marlow(maplebirch: typeof window.maplebirch): void {
   maplebirch.npc.add(
     {
       nam: 'Marlow',
+      fullDescription: 'Marlow',
       adult: 1,
       teen: 0,
       age: 36,

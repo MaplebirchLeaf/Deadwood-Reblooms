@@ -6,6 +6,7 @@ export default function Adrian(maplebirch: typeof window.maplebirch): void {
   maplebirch.npc.add(
     {
       nam: 'Adrian',
+      fullDescription: 'Adrian',
       adult: 1,
       teen: 0,
       age: 28,

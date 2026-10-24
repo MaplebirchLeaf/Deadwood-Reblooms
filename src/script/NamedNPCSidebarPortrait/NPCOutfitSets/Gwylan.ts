@@ -14,11 +14,11 @@ export default function (maplebirch: MaplebirchCore): void {
       const template = wardrobe.get(key);
       if (template) addSet(maplebirch, outfitNames, `gwylan_${key}`, template);
     }
-    const ritual = wardrobe.get('exorcist_habit');
+    const ritual = wardrobe.get('exorcist_cassock');
     if (ritual) addSet(maplebirch, outfitNames, 'gwylan_ritual_robes', ritual, { gender: 'n' });
 
     wardrobe.modify('Gwylan', (clothes, context) => {
-      const name = context.key === 'naked' ? 'naked' : context.key === 'exorcist_cassock' || context.key === 'exorcist_habit' ? 'gwylan_ritual_robes' : `gwylan_${context.key}`;
+      const name = context.key === 'naked' ? 'naked' : context.key === 'exorcist_cassock' ? 'gwylan_ritual_robes' : `gwylan_${context.key}`;
       sync('Gwylan', name, clothes);
     });
 

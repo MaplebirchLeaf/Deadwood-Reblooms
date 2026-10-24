@@ -1,12 +1,16 @@
 :: Deadwood Raven Shrine Widgets [widget]
 
 <<widget 'deadwood-raven-clothes-init'>>
-  <!-- 沿用森林商店的特殊服装解锁，不另存一份解锁状态。 -->
+  <!-- 服装组由原版生成展示对话，并结算好感与每日交谈次数。 -->
   <<run setup.specialClothes.push({
-    name: 'raven feather necklace', sets: [],
-    requirements: () => (V.MoreTransformations?.shrine?.stage ?? 0) >= 2,
-    get hint() { return lanSwitch('deliver the ravens’ letter to Gwylan', '将渡鸦的信交给格威岚'); }
+    name: 'raven feather necklace', sets: ['raven_necklace']
   })>>
+  <<set setup.specialClothesSets.raven_necklace to {
+    get text() { return lanSwitch('raven feather necklace', '鸦羽项链'); },
+    requirements: () => (V.MoreTransformations?.shrine?.stage ?? 0) >= 2,
+    get hint() { return lanSwitch('deliver the ravens’ letter to Gwylan', '将渡鸦的信交给格威岚'); },
+    shop: ['forest'], feat: false, icon: 'clothes/raven-feather-necklace.png'
+  }>>
 <</widget>>
 
 <<widget 'deadwood-raven-clothes-state'>>
@@ -284,7 +288,7 @@
   <<if maplebirch.get('MoreTransformations') and $MoreTransformations?.shrine>>
     <<set $_shrineNote to $MoreTransformations.shrine>>
     <<if $_shrineNote.stage lt 3 and ($_shrineNote.stage gt 0 or $_shrineNote.feeds gt 0) or $_shrineNote.promise gte 0 or ($_shrineNote.wish.ready and !$_shrineNote.wish.returned)>>
-      <div class='bold'><<lanSwitch `$_shrineNote.stage < 3 ? 'The ravens’ letter' : 'Darkfeather Shrine'` `$_shrineNote.stage < 3 ? '渡鸦的来信' : '黯羽神社'`>></div>
+      <div class='bold'><<lanSwitch `$_shrineNote.stage < 3 ? 'The ravens\' letter' : 'Darkfeather Shrine'` `$_shrineNote.stage < 3 ? '渡鸦的来信' : '黯羽神社'`>></div>
       <ul class='journal'><li>
         <<switch $_shrineNote.stage>>
           <<case 0>>

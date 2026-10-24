@@ -343,6 +343,9 @@ export default function (
     // 万圣节剧情
     if (title.startsWith('Robin Trick')) return 'halloween';
 
+    // 散场后已离开后台，回家途中仍穿便服。
+    if (['English Play Leave Robin', 'English Play Robin Normal', 'English Play Robin Reassure', 'English Play Robin Lewd'].includes(title)) return 'orphanage';
+
     // 圣诞礼物服装
     if (V.christmas === 1 && Time.monthDay === 25 && V.christmas_gift_robin_given === true && Time.dayState !== 'night') return 'christmas';
 

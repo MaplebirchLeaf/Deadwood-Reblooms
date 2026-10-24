@@ -46,6 +46,7 @@ export default function Industry(maplebirch: typeof window.maplebirch): void {
   maplebirch.npc.add(
     {
       nam: 'Rowan',
+      fullDescription: 'Rowan',
       adult: 1,
       teen: 0,
       age: 42,
