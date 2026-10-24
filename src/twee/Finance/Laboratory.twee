@@ -99,18 +99,18 @@
     <span class='red'>
       <<language>>
         <<option 'EN'>>
-          Technical guidance is suspended: Harper or your on-site technician is unavailable. The prepaid period still ends on <<deadwood-reblooms-finance-date $_lab_trade.harper_until>>.
+          Technical guidance is suspended: Harper or your on-site technician is unavailable. The prepaid period still ends on <<deadwood-reblooms-finance-date $Finance.industry.distribution.harper_until>>.
         <<option 'CN'>>
-          技术指导暂停：哈珀或驻厂技术员不在岗。预付的顾问期仍截至<<deadwood-reblooms-finance-date $_lab_trade.harper_until>>。
+          技术指导暂停：哈珀或驻厂技术员不在岗。预付的顾问期仍截至<<deadwood-reblooms-finance-date $Finance.industry.distribution.harper_until>>。
       <</language>>
     </span>
   <<else>>
     <span class='green'>
       <<language>>
         <<option 'EN'>>
-          Harper reviews this workshop's batch records. The prepaid consultancy ends on <<deadwood-reblooms-finance-date $_lab_trade.harper_until>>.
+          Harper reviews this workshop's batch records. The prepaid consultancy ends on <<deadwood-reblooms-finance-date $Finance.industry.distribution.harper_until>>.
         <<option 'CN'>>
-          哈珀负责审阅这间厂房的批次记录，预付的顾问期截至<<deadwood-reblooms-finance-date $_lab_trade.harper_until>>。
+          哈珀负责审阅这间厂房的批次记录，预付的顾问期截至<<deadwood-reblooms-finance-date $Finance.industry.distribution.harper_until>>。
       <</language>>
     </span>
   <</if>>
@@ -429,7 +429,8 @@
       <br>
     <</if>>
     <<if _lab_state.automatic and !_lab_state.job>>
-      <<set $_lab_batch to _lab.batch(_factory_state)>>
+      <!-- Dynamic 重绘直接执行内容，不再处于初次输出的 widget 局部帧中。 -->
+      <<set _laboratoryAutoBatch to _lab.batch(_factory_state)>>
       <span class='blue'>
         <<if !_factory_state.manager or !_lab_state.technician>>
           <<lanSwitch 'Automatic processing needs both a shift manager and a technician.' '自动加工需要值班经理和技术员都在岗。'>>
@@ -447,10 +448,10 @@
           <<lanSwitch 'The ordinary order has the crew. Processing waits until it is delivered or cancelled.' '工人在做普通订单，交货或取消后才能加工。'>>
         <<elseif _lab_state.raw[_lab_state.automatic] lt 1>>
           <<lanSwitch 'There are no ingredients for the selected process. Store some before the next shift.' '指定的原料已经用完，先往加工间存些原料。'>>
-        <<elseif !$_lab_batch>>
+        <<elseif !_laboratoryAutoBatch>>
           <<lanSwitch 'Even one lot would leave too little for the reserve and three days of bills. Short by ' '哪怕只做一份，也留不够底金和三天费用，还差'>><<deadwood-reblooms-finance-money `Math.max(0, _factory_state.reserve + _factory.dailyCost * 3 + _lab.cost(_lab_state.automatic, 1) - _factory_state.cash)` 'red'>>
         <<else>>
-          <<lanSwitch 'Current funds cover up to ' '按现有周转金，最多能安排'>><<= $_lab_batch>><<lanSwitch ' lots, costing ' '份，材料费为'>><<deadwood-reblooms-finance-money `_lab.cost(_lab_state.automatic, $_lab_batch)`>>
+          <<lanSwitch 'Current funds cover up to ' '按现有周转金，最多能安排'>><<= _laboratoryAutoBatch>><<lanSwitch ' lots, costing ' '份，材料费为'>><<deadwood-reblooms-finance-money `_lab.cost(_lab_state.automatic, _laboratoryAutoBatch)`>>
           <<if new DateTime(Time.startDate).addDays(Math.floor(Time.days)).weekEnd>><<lanSwitch '. The next shift is after the weekend.' '。周末休息，等下个工作日开工。'>><</if>>
         <</if>>
       </span><br>

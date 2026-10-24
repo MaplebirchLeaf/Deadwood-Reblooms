@@ -219,8 +219,8 @@
 
 :: Deadwood Reblooms History Project Begin
 <<set $outside to 0>><<set $location to 'school'>><<schooleffects>><<effects>>
-<<set $_historySource to $LifeSimulation.historyProject.source>>
-<<set $LifeSimulation.historyProject to { status: 'ongoing', source: $_historySource, availableDay: 0, deadline: Time.days + 25, assistant: $phase is 1, kylar: $phase is 1 ? 'sabotage' : 'help', kylarStreet: false, kylarPrepared: false, archive: 0, museum: 0, recovery: 'none', ruin: 0, draft: 0, final: 0 }>>
+<<set _historySource to $LifeSimulation.historyProject.source>>
+<<set $LifeSimulation.historyProject to { status: 'ongoing', source: _historySource, availableDay: 0, deadline: Time.days + 25, assistant: $phase is 1, kylar: $phase is 1 ? 'sabotage' : 'help', kylarStreet: false, kylarPrepared: false, archive: 0, museum: 0, recovery: 'none', ruin: 0, draft: 0, final: 0 }>>
 <<language>>
   <<option 'EN'>>
     <<if $phase is 1>>
@@ -992,19 +992,19 @@
 <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
   <<npc Robin>><<person1>>
 <</if>>
-<<set $_historyKylarCompromised to $LifeSimulation.historyProject.kylar is 'sabotage' and $LifeSimulation.historyProject.kylarStreet and !$LifeSimulation.historyProject.kylarPrepared >>
-<<set $LifeSimulation.historyProject.ruin to $LifeSimulation.historyProject.recovery is 'recorded' and !$_historyKylarCompromised ? 2 : 1 >>
+<<set _historyKylarCompromised to $LifeSimulation.historyProject.kylar is 'sabotage' and $LifeSimulation.historyProject.kylarStreet and !$LifeSimulation.historyProject.kylarPrepared >>
+<<set $LifeSimulation.historyProject.ruin to $LifeSimulation.historyProject.recovery is 'recorded' and !_historyKylarCompromised ? 2 : 1 >>
 <<language>>
   <<option 'EN'>>
     Back on the shore, you seal the golden statuette inside its padded pouch
     and lay the wet slates out beneath the trees.
     <br><br>
-    <<if $LifeSimulation.historyProject.recovery is 'recorded' and !$_historyKylarCompromised>>
+    <<if $LifeSimulation.historyProject.recovery is 'recorded' and !_historyKylarCompromised>>
       Your position sketch,
       measurements and recovery notes remain legible.
       <br><br>
       <span class="green">You know where the statuette was lying, and you wrote it down in time.</span>
-    <<elseif $_historyKylarCompromised>>
+    <<elseif _historyKylarCompromised>>
       Robin corrected the altered route,
       but the detour disturbed the entrance before you could record it.
       <br><br>
@@ -1023,11 +1023,11 @@
     回到湖岸后，你把金制女祭司像封进内衬软垫的回收袋，
     又将湿透的记录板摊在树下。
     <br><br>
-    <<if $LifeSimulation.historyProject.recovery is 'recorded' and !$_historyKylarCompromised >>你的位置草图、测量数据
+    <<if $LifeSimulation.historyProject.recovery is 'recorded' and !_historyKylarCompromised >>你的位置草图、测量数据
       和回收记录仍然清晰可辨。
       <br><br>
       <span class="green">你记下了女祭司像原本躺着的位置，而且赶在痕迹消失之前。</span>
-    <<elseif $_historyKylarCompromised>>
+    <<elseif _historyKylarCompromised>>
       罗宾修正了被篡改的路线，
       绕路却在记录前搅乱了入口处的淤泥。
       <br><br>
@@ -1200,8 +1200,8 @@
     “这些标签里，哪几块你愿意替它辩护，哪几块你会亲手摘下来？”
 <</language>>
 <br><br>
-<<set $_historyCorrectAnswer to $LifeSimulation.historyProject.source is 'paintingward' ? ['Say the painting was there, and later people decided what it meant', '画就在那里，是后来的人替它定下了含义'] : ['Say the painting is old, but the story about it is not', '画是旧的，画上的故事不是']>>
-<<historyicon>><<lanLink $_historyCorrectAnswer 'Deadwood Reblooms History Project Result'>>
+<<set _historyCorrectAnswer to $LifeSimulation.historyProject.source is 'paintingward' ? ['Say the painting was there, and later people decided what it meant', '画就在那里，是后来的人替它定下了含义'] : ['Say the painting is old, but the story about it is not', '画是旧的，画上的故事不是']>>
+<<historyicon>><<lanLink _historyCorrectAnswer 'Deadwood Reblooms History Project Result'>>
   <<set $LifeSimulation.historyProject.final to 15>>
   <<if $LifeSimulation.historyProject.archive + $LifeSimulation.historyProject.museum + $LifeSimulation.historyProject.draft + $LifeSimulation.historyProject.final is 100 >>
     <<set $LifeSimulation.historyProject.status to 'won'>>
@@ -1223,7 +1223,7 @@
 <<if ['done', 'won'].includes($LifeSimulation.historyProject.status) and $LifeSimulation.historyProject.archive is 30 and $LifeSimulation.historyProject.museum is 30 and $LifeSimulation.historyProject.draft is 25 and $LifeSimulation.historyProject.final is 15 and $LifeSimulation.historyProject.recovery is 'recorded'>>
   <<earnFeat 'Evidence Matters'>>
 <</if>>
-<<set $_historyScore to $LifeSimulation.historyProject.archive + $LifeSimulation.historyProject.museum + $LifeSimulation.historyProject.draft + $LifeSimulation.historyProject.final >>
+<<set _historyScore to $LifeSimulation.historyProject.archive + $LifeSimulation.historyProject.museum + $LifeSimulation.historyProject.draft + $LifeSimulation.historyProject.final >>
 <<language>>
   <<option 'EN'>>
     <<if $LifeSimulation.historyProject.status is 'won'>>
@@ -1240,12 +1240,12 @@
       "The exhibit holds because it stops where the paperwork stops."
       The questions that follow are directed to you rather than Winter.
       <span class="green">You answer each one without needing to look at your notes.</span>
-    <<elseif $_historyScore gte 75>>
+    <<elseif _historyScore gte 75>>
       Winter studies your display before nodding.
       "<span class="green">Not bad.</span> Two of these labels are guessing. A visitor will find them."
       <br><br>
       The visitors remain to examine your reconstruction.
-    <<elseif $_historyScore gte 50>>
+    <<elseif _historyScore gte 50>>
       "This is a <span class="teal">good story</span>," Winter says.
       "Next time, separate it from the cards before you put it on a wall."
       <br><br>
@@ -1269,12 +1269,12 @@
       <<He>>转向参观者。
       “这场展览站得住，是因为它在档案停下的地方也停下了。”
       接下来的问题全都抛向你，而非温特。<span class="green">你不必查看笔记，便逐一作出回答。</span>
-    <<elseif $_historyScore gte 75>>
+    <<elseif _historyScore gte 75>>
       温特审视展板片刻，随后点了点头。
       “<span class="green">还行。</span>这两块是猜的。参观者会揪出来。”
       <br><br>
       参观者仍留在原地，继续查看你的复原图。
-    <<elseif $_historyScore gte 50>>
+    <<elseif _historyScore gte 50>>
       “这是个<span class="teal">好故事</span>。”温特说道，
       “下次记得先把它和目录卡分开，再挂到墙上。”
       <br><br>

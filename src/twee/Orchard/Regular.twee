@@ -7,8 +7,8 @@
 
 :: Deadwood Orchard Regular
 <<set $location to 'market'>><<set $outside to 0>><<effects>><<endevent>>
-<<set $_orchard to maplebirch.get('Orchard')>>
-<<if $_orchard and $_orchard.canMeetRegular>>
+<<set _regularOrchard to maplebirch.get('Orchard')>>
+<<if _regularOrchard and _regularOrchard.canMeetRegular>>
   <<if !$per_npc.deadwood_orchard_regular>>
     <<generateNPC 1 a>><<saveNPC 0 'deadwood_orchard_regular'>>
   <<else>>
@@ -49,13 +49,13 @@
   <<if $Orchard.regular_visits gte 3 and $Orchard.regular_favourite>>
     <<language>>
       <<option 'EN'>>
-        <<if $_orchard.regularStock.some(item => item.type is $Orchard.regular_favourite)>>
+        <<if _regularOrchard.regularStock.some(item => item.type is $Orchard.regular_favourite)>>
           <<personname>> spots the fruit <<he>> bought before. "The same as last time, please."
         <<else>>
           <<personname>> looks along the display. "None of the ones I usually buy? I'll try something else, then."
         <</if>>
       <<option 'CN'>>
-        <<if $_orchard.regularStock.some(item => item.type is $Orchard.regular_favourite)>>
+        <<if _regularOrchard.regularStock.some(item => item.type is $Orchard.regular_favourite)>>
           <<personname>>找到了以前买过的水果。“还是上次那种吧。”
         <<else>>
           <<personname>>扫了一眼摊上的水果。“平时买的那种没有？那我尝尝别的。”
@@ -63,11 +63,11 @@
     <</language>><br>
   <</if>></div><br><br>
   <div id='orchard-customer-choices'>
-  <<for $_fruit range $_orchard.regularStock>>
-    <<capture $_fruit>>
-      <<foodstufficon $_fruit.type>><<lanLink ['Bag five of these', '装五个这种水果']>>
-        <<if maplebirch.get('Orchard').sellRegular($_fruit.type)>>
-          <<set _regularFruit to $_fruit.type>>
+  <<for _regularItem range _regularOrchard.regularStock>>
+    <<capture _regularItem>>
+      <<foodstufficon _regularItem.type>><<lanLink ['Bag five of these', '装五个这种水果']>>
+        <<if maplebirch.get('Orchard').sellRegular(_regularItem.type)>>
+          <<set _regularFruit to _regularItem.type>>
           <<pass 20>><<updatesidebarmoney>>
           <<replace '#orchard-customer'>>
             <<language>>

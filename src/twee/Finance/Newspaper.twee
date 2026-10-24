@@ -6,49 +6,50 @@
 <</widget>>
 
 <<widget 'deadwood-finance-paper-summary'>>
-  <<set $_report to $Finance.newspaper.report>>
-  <<if $_report>>
-    <strong><<lanSwitch 'Financial Daily' '金融日报'>></strong> · <<deadwood-finance-paper-date $_report.issued_day>>
-    <<if $_report.issued_day lt maplebirch.get('Finance').newspaper.day>>
+  <!-- 语言切换在 widget 退出后重绘，摘要快照须保留到本页结束。 -->
+  <<set _newspaperSummaryReport to $Finance.newspaper.report>>
+  <<if _newspaperSummaryReport>>
+    <strong><<lanSwitch 'Financial Daily' '金融日报'>></strong> · <<deadwood-finance-paper-date _newspaperSummaryReport.issued_day>>
+    <<if _newspaperSummaryReport.issued_day lt maplebirch.get('Finance').newspaper.day>>
       <i class='blue'><<lanSwitch ' (last read copy)' '（上次读过的报纸）'>></i>
     <</if>>
-    <<set $_rising to null, $_falling to null>>
-    <<for $_quote range $_report.quotes>>
+    <<set _newspaperSummaryRising to null, _newspaperSummaryFalling to null>>
+    <<for $_quote range _newspaperSummaryReport.quotes>>
       <<if $_quote.change isnot null>>
-        <<if $_quote.change gt 0 and (!$_rising or $_quote.change gt $_rising.change)>>
-          <<set $_rising to $_quote>>
-        <<elseif $_quote.change lt 0 and (!$_falling or $_quote.change lt $_falling.change)>>
-          <<set $_falling to $_quote>>
+        <<if $_quote.change gt 0 and (!_newspaperSummaryRising or $_quote.change gt _newspaperSummaryRising.change)>>
+          <<set _newspaperSummaryRising to $_quote>>
+        <<elseif $_quote.change lt 0 and (!_newspaperSummaryFalling or $_quote.change lt _newspaperSummaryFalling.change)>>
+          <<set _newspaperSummaryFalling to $_quote>>
         <</if>>
       <</if>>
     <</for>>
-    <<if $_report.quote_day isnot null>>
-      <br><<lanSwitch 'Closing prices: ' '收盘行情：'>><<deadwood-finance-paper-date $_report.quote_day>>
+    <<if _newspaperSummaryReport.quote_day isnot null>>
+      <br><<lanSwitch 'Closing prices: ' '收盘行情：'>><<deadwood-finance-paper-date _newspaperSummaryReport.quote_day>>
     <</if>>
     <<language>>
       <<option 'EN'>>
-        <<if $_rising>>
-          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${$_rising.symbol}`)>> led the gains, up <span class='red'><<= $_rising.change.toFixed(2)>>%</span>.
+        <<if _newspaperSummaryRising>>
+          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${_newspaperSummaryRising.symbol}`)>> led the gains, up <span class='red'><<= _newspaperSummaryRising.change.toFixed(2)>>%</span>.
         <</if>>
-        <<if $_falling>>
-          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${$_falling.symbol}`)>> led the losses, down <span class='green'><<= (-$_falling.change).toFixed(2)>>%</span>.
+        <<if _newspaperSummaryFalling>>
+          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${_newspaperSummaryFalling.symbol}`)>> led the losses, down <span class='green'><<= (-_newspaperSummaryFalling.change).toFixed(2)>>%</span>.
         <</if>>
-        <<if !$_rising and !$_falling>>
-          <<if $_report.quotes.some(quote => quote.change !== null)>>
+        <<if !_newspaperSummaryRising and !_newspaperSummaryFalling>>
+          <<if _newspaperSummaryReport.quotes.some(quote => quote.change !== null)>>
             <br>Prices closed unchanged.
           <<else>>
             <br>The paper lists prices without a comparison with the previous close.
           <</if>>
         <</if>>
       <<option 'CN'>>
-        <<if $_rising>>
-          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${$_rising.symbol}`)>>领涨，上涨<span class='red'><<= $_rising.change.toFixed(2)>>%</span>。
+        <<if _newspaperSummaryRising>>
+          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${_newspaperSummaryRising.symbol}`)>>领涨，上涨<span class='red'><<= _newspaperSummaryRising.change.toFixed(2)>>%</span>。
         <</if>>
-        <<if $_falling>>
-          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${$_falling.symbol}`)>>领跌，下跌<span class='green'><<= (-$_falling.change).toFixed(2)>>%</span>。
+        <<if _newspaperSummaryFalling>>
+          <br><<= maplebirch.t(`deadwood-reblooms:finance:security:${_newspaperSummaryFalling.symbol}`)>>领跌，下跌<span class='green'><<= (-_newspaperSummaryFalling.change).toFixed(2)>>%</span>。
         <</if>>
-        <<if !$_rising and !$_falling>>
-          <<if $_report.quotes.some(quote => quote.change !== null)>>
+        <<if !_newspaperSummaryRising and !_newspaperSummaryFalling>>
+          <<if _newspaperSummaryReport.quotes.some(quote => quote.change !== null)>>
             <br>各证券收盘价格持平。
           <<else>>
             <br>报上列出了价格，没有注明相较前次收盘的涨跌。
@@ -141,10 +142,10 @@
 
 :: Deadwood Reblooms Newspaper Seller
 <<set $outside to 1>><<set $location to 'town'>><<effects>>
-<<set $_paper to maplebirch.get('Finance').newspaper>>
-<<if !$_paper.streetAvailable>>
+<<set _newspaperSeller to maplebirch.get('Finance').newspaper>>
+<<if !_newspaperSeller.streetAvailable>>
   <span class='blue'><<lanSwitch 'The seller has packed away the papers.' '报童已经收起了报纸。'>></span><br><br>
-<<elseif $_paper.readToday>>
+<<elseif _newspaperSeller.readToday>>
   <span class='blue'><<lanSwitch 'The seller offers you a copy of the edition you read earlier.' '报童递来的报纸正是你先前读过的那一期。'>></span><br><br>
 <<else>>
   <<language>>
@@ -153,8 +154,8 @@
     <<option 'CN'>>
       报童从捆扎的报纸里抽出一份。整片报价表占了末版。“一英镑。盯着看，数字也不会变好。”
   <</language>><br><br>
-  <<if $money gte $_paper.terms.price>>
-    <<icon 'finance/financial-daily.png'>><<lanLink [`Buy and read a copy (£${($_paper.terms.price / 100).toFixed(0)}, 0:${String($_paper.terms.readingMinutes).padStart(2, '0')})`, `买一份，翻翻财经版（£${($_paper.terms.price / 100).toFixed(0)}，0:${String($_paper.terms.readingMinutes).padStart(2, '0')}）`] 'Deadwood Reblooms Newspaper Read'>>
+  <<if $money gte _newspaperSeller.terms.price>>
+    <<icon 'finance/financial-daily.png'>><<lanLink [`Buy and read a copy (£${(_newspaperSeller.terms.price / 100).toFixed(0)}, 0:${String(_newspaperSeller.terms.readingMinutes).padStart(2, '0')})`, `买一份，翻翻财经版（£${(_newspaperSeller.terms.price / 100).toFixed(0)}，0:${String(_newspaperSeller.terms.readingMinutes).padStart(2, '0')}）`] 'Deadwood Reblooms Newspaper Read'>>
       <<set $Finance.last_result to maplebirch.get('Finance').newspaper.read('street') ? 'paper-read' : 'paper-unavailable'>>
       <<if $Finance.last_result is 'paper-read'>><<pass `maplebirch.get('Finance').newspaper.terms.readingMinutes`>><</if>>
     <</lanLink>><br>

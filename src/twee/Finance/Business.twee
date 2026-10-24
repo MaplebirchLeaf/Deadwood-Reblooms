@@ -14,9 +14,9 @@
   <<option 'CN'>>
     柜台尽头，柜员在计算器旁给你的文件腾出一块地方，要你出示店铺计划、交货记录或工厂产权文件。“这是用于经营的个人贷款。即使生意由别人经营，签的也是你的名字。期限三十天，还款从你的账户扣。”
 <</language>><br><br>
-<<set $_finance to maplebirch.get('Finance')>>
-<<set $_product to $_finance.loanProducts.find(item => item.days === 30)>>
-<<lanSwitch 'Weekly interest: ' '周利率：'>><<= ($_product.weeklyRate * 100).toFixed(3)>>% · <<lanSwitch 'Borrowing limit: ' '贷款额度：'>><<deadwood-reblooms-finance-money $_finance.accountLimits.loan>><br>
+<<set _businessFinance to maplebirch.get('Finance')>>
+<<set _businessProduct to _businessFinance.loanProducts.find(item => item.days === 30)>>
+<<lanSwitch 'Weekly interest: ' '周利率：'>><<= (_businessProduct.weeklyRate * 100).toFixed(3)>>% · <<lanSwitch 'Borrowing limit: ' '贷款额度：'>><<deadwood-reblooms-finance-money _businessFinance.accountLimits.loan>><br>
 <<set _businessAmount to 2000>>
 <<set _business_labels to {shop: ['Apply for drinks-shop funding', '申请饮品店经营贷款'], orchard: ['Apply for orchard funding', '申请果园经营贷款'], factory: ['Apply for factory funding', '申请工厂经营贷款']}>>
 <label><<lanSwitch 'Borrow £' '借款 £'>><<numberbox '_businessAmount' 2000>></label><br><br>
@@ -30,24 +30,24 @@
   <<option 'CN'>>
     借款会存入你的银行账户。饮品店的资金仍需交给罗宾，果园物资另行采购，工厂周转金到厂里转入。工厂原料款另行预留。
 <</language>><br><br>
-<<if $_finance.businessProjects.some(project => project.id is 'factory' and project.eligible)>>
-  <<for $_factory range $_finance.industry.owned>>
-    <b><<= maplebirch.t($_finance.industry.terms.sites[$_factory.site].name)>></b>：
-    <<lanSwitch 'Working funds ' '周转金 '>><<deadwood-reblooms-finance-money $_factory.cash>> ·
-    <<lanSwitch 'Unpaid wages and bills ' '欠薪与欠费 '>><<deadwood-reblooms-finance-money `$_factory.wage_arrears + $_factory.overhead_arrears`>> ·
-    <<lanSwitch 'Three days of wages and site bills ' '三天工资与厂房费用 '>><<deadwood-reblooms-finance-money `$_finance.industry.dailyCosts[$_factory.site] * 3`>><br>
+<<if _businessFinance.businessProjects.some(project => project.id is 'factory' and project.eligible)>>
+  <<for _businessFactory range _businessFinance.industry.owned>>
+    <b><<= maplebirch.t(_businessFinance.industry.terms.sites[_businessFactory.site].name)>></b>：
+    <<lanSwitch 'Working funds ' '周转金 '>><<deadwood-reblooms-finance-money _businessFactory.cash>> ·
+    <<lanSwitch 'Unpaid wages and bills ' '欠薪与欠费 '>><<deadwood-reblooms-finance-money `_businessFactory.wage_arrears + _businessFactory.overhead_arrears`>> ·
+    <<lanSwitch 'Three days of wages and site bills ' '三天工资与厂房费用 '>><<deadwood-reblooms-finance-money `_businessFinance.industry.dailyCosts[_businessFactory.site] * 3`>><br>
   <</for>><br>
 <</if>>
-<<for $_project range $_finance.businessProjects>>
-  <<capture $_project>>
-    <<if $_project.eligible>>
-      <<icon `$_project.id === 'shop' ? 'robin/robin-shop.png' : $_project.id === 'orchard' ? 'orchard/orchard.png' : 'industry/workshop.png'`>><<lanLink _business_labels[$_project.id] 'Deadwood Reblooms Business Loan Result'>>
-        <<set $Finance.last_result to maplebirch.get('Finance').takeBusinessLoan($_project.id, Number(_businessAmount))>>
+<<for _businessProject range _businessFinance.businessProjects>>
+  <<capture _businessProject>>
+    <<if _businessProject.eligible>>
+      <<icon `_businessProject.id === 'shop' ? 'robin/robin-shop.png' : _businessProject.id === 'orchard' ? 'orchard/orchard.png' : 'industry/workshop.png'`>><<lanLink _business_labels[_businessProject.id] 'Deadwood Reblooms Business Loan Result'>>
+        <<set $Finance.last_result to maplebirch.get('Finance').takeBusinessLoan(_businessProject.id, Number(_businessAmount))>>
       <</lanLink>><br>
     <</if>>
   <</capture>>
 <</for>>
-<<if !$_finance.businessProjects.some(item => item.eligible)>>
+<<if !_businessFinance.businessProjects.some(item => item.eligible)>>
   <<language>>
       <<option 'EN'>>
         Bring a shop plan, farm-orchard sales records or factory deeds with no unpaid wages.
@@ -74,17 +74,17 @@
 
 :: Deadwood Reblooms Property Tenant
 <<set $outside to 0>><<set $location to 'financial_centre'>><<effects>><<endevent>>
-<<set $_estate to maplebirch.get('Finance').realEstate>>
-<<set $_id to $Finance.real_estate.tenant_property>>
-<<set $_management to $_estate.managementFor($_id)>>
-<<if !$_management.rental_issue or ((!$_estate.owns($_id) or !$_management.rented) and $_management.rental_issue.type isnot 'arrears')>>
+<<set _businessTenantEstate to maplebirch.get('Finance').realEstate>>
+<<set _businessTenantProperty to $Finance.real_estate.tenant_property>>
+<<set _businessTenantManagement to _businessTenantEstate.managementFor(_businessTenantProperty)>>
+<<if !_businessTenantManagement.rental_issue or ((!_businessTenantEstate.owns(_businessTenantProperty) or !_businessTenantManagement.rented) and _businessTenantManagement.rental_issue.type isnot 'arrears')>>
   <<lanSwitch 'There are no outstanding messages for this tenancy.' '这份租约没有待处理的消息。'>><br>
 <<else>>
-  <<set $_tenantKey to $_estate.tenantKey($_id)>>
-  <<if !$per_npc[$_tenantKey]>>
-    <<generateNPC 1 a>><<saveNPC 0 $_tenantKey>>
+  <<set _businessTenantKey to _businessTenantEstate.tenantKey(_businessTenantProperty)>>
+  <<if !$per_npc[_businessTenantKey]>>
+    <<generateNPC 1 a>><<saveNPC 0 _businessTenantKey>>
   <<else>>
-    <<loadNPC 0 $_tenantKey>>
+    <<loadNPC 0 _businessTenantKey>>
   <</if>>
   <<person1>>
   <<language>>
@@ -101,15 +101,15 @@
         中介介绍<<if $Finance.real_estate.management[$Finance.real_estate.tenant_property].rented>>租客<<else>>原租客<</if>>叫<<print $NPCList[0].name>>。<<He>>把一份租约副本放在桌上。
       <</if>>
   <</language>><br><br>
-  <<set $NPCList[0].name_known to 1>><<saveNPC 0 $_tenantKey>>
-  <<if $_management.rental_issue.type is 'leak'>>
+  <<set $NPCList[0].name_known to 1>><<saveNPC 0 _businessTenantKey>>
+  <<if _businessTenantManagement.rental_issue.type is 'leak'>>
     <<language>>
       <<option 'EN'>>
         <<personname>> sets a damp photograph on the desk. "It comes through when it rains. I've moved the bed away from the wall, but I can't keep paying the full rent for this." The agent adds a repair estimate to the file.
       <<option 'CN'>>
         <<personname>>把一张受潮的照片放在桌上。“下雨就渗进来。我已经把床挪开了，可总不能这样还照付全租。”中介往档案里加了一份维修报价。
     <</language>><br><br>
-    <<lanSwitch 'Urgent repair: ' '紧急维修：'>><<deadwood-reblooms-finance-money `$_estate.rentalRepairCost($_id)`>><br>
+    <<lanSwitch 'Urgent repair: ' '紧急维修：'>><<deadwood-reblooms-finance-money `_businessTenantEstate.rentalRepairCost(_businessTenantProperty)`>><br>
     <<icon 'property/repair.png'>><<lanLink ['Arrange repairs', '安排维修'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('Finance').realEstate.resolveIssue($Finance.real_estate.tenant_property, 'repair')>><<endevent>><</lanLink>><br>
   <<else>>
     <<language>>
@@ -118,9 +118,9 @@
       <<option 'CN'>>
         <<if !$Finance.real_estate.management[$Finance.real_estate.tenant_property].rented>>中介打开已经结束的租约档案。账单上仍记着未付的租金。<<else>>“我晚了一周。”<<personname>>说道。<</if>>“现在先付大部分，剩下的你能不能免了？”中介等着你答复。
     <</language>><br><br>
-    <<lanSwitch 'Unpaid net rent: ' '未付净租金：'>><<deadwood-reblooms-finance-money $_management.rental_issue.rent>><br>
+    <<lanSwitch 'Unpaid net rent: ' '未付净租金：'>><<deadwood-reblooms-finance-money _businessTenantManagement.rental_issue.rent>><br>
     <<lanLink ['Accept 80% now', '现在收下八成'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('Finance').realEstate.resolveIssue($Finance.real_estate.tenant_property, 'negotiate')>><<endevent>><</lanLink>><br>
-    <<if Time.days - $_management.rental_issue.day gte 7>>
+    <<if Time.days - _businessTenantManagement.rental_issue.day gte 7>>
       <<lanLink ['Collect the full overdue rent', '收取全部逾期租金'] 'Deadwood Reblooms Property Office'>><<run maplebirch.get('Finance').realEstate.resolveIssue($Finance.real_estate.tenant_property, 'wait')>><<endevent>><</lanLink>><br>
     <<else>><<lanSwitch 'The promised payment is due next week.' '约好的补缴日期是下周。'>><br><</if>>
   <</if>>

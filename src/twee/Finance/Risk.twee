@@ -57,8 +57,8 @@
 
 :: Deadwood Reblooms Financial Centre Margin
 <<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
-<<set $_margin to maplebirch.get('Finance').margin>>
-<<if !$_margin.open or !$Finance.brokerage.opened>>
+<<set _riskMargin to maplebirch.get('Finance').margin>>
+<<if !_riskMargin.open or !$Finance.brokerage.opened>>
   <<lanSwitch 'The trading desk is unavailable.' '现在无法办理交易。'>><br>
   <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Financial Centre Securities'>><</lanLink>><<exit>>
 <</if>>
@@ -75,22 +75,22 @@
   <<option 'EN'>>
     Stock financing and short sales share the same limited supply as cash purchases. Futures are cash-settled and do not consume shares.<br>
     <span class='blue'>Financed shares, short sales and futures can only close from the next trading day. Stops and forced liquidation follow the same restriction.</span>
-    Each opening and closing costs <<= ($_margin.terms.feeRate * 100).toFixed(2)>>% of the traded value, at least <<printmoney 100>>. Stock financing charges <<= ($_margin.terms.borrowWeeklyRate * 100).toFixed(2)>>% weekly on the borrowed money. Borrowing shares to sell short costs <<= ($_margin.terms.shortWeeklyRate * 100).toFixed(2)>>% weekly on their current value, plus any dividends owed to the lender. Charges accrue daily, including weekends.
+    Each opening and closing costs <<= (_riskMargin.terms.feeRate * 100).toFixed(2)>>% of the traded value, at least <<printmoney 100>>. Stock financing charges <<= (_riskMargin.terms.borrowWeeklyRate * 100).toFixed(2)>>% weekly on the borrowed money. Borrowing shares to sell short costs <<= (_riskMargin.terms.shortWeeklyRate * 100).toFixed(2)>>% weekly on their current value, plus any dividends owed to the lender. Charges accrue daily, including weekends.
     <span class='red'>Losses can grow while a position is locked. A rising price can cost a short seller more than the original margin.</span>
-    From the next trading day, positions close when equity falls to a quarter of the deposited margin. Borrowed shares and futures expire after <<= $_margin.terms.shortDays>> and <<= $_margin.terms.futuresDays>> days respectively. If expiry falls on a weekend, settlement waits until the next trading day.
+    From the next trading day, positions close when equity falls to a quarter of the deposited margin. Borrowed shares and futures expire after <<= _riskMargin.terms.shortDays>> and <<= _riskMargin.terms.futuresDays>> days respectively. If expiry falls on a weekend, settlement waits until the next trading day.
   <<option 'CN'>>
     融资与融券和现货买入共用有限股数。期货只结算差价，不占用股票。<br>
     <span class='blue'>融资、融券与期货都从下一交易日起才能平仓，止盈止损和强平也遵守这一限制。</span>
-    开仓和平仓各收成交金额的 <<= ($_margin.terms.feeRate * 100).toFixed(2)>>%，最低 <<printmoney 100>>。融资股票按借款计收每周 <<= ($_margin.terms.borrowWeeklyRate * 100).toFixed(2)>>% 的利息。融券卖出按股票当前市值收取每周 <<= ($_margin.terms.shortWeeklyRate * 100).toFixed(2)>>% 的借券费，还须补偿出借人的分红。费用逐日累计，周末也计费。
+    开仓和平仓各收成交金额的 <<= (_riskMargin.terms.feeRate * 100).toFixed(2)>>%，最低 <<printmoney 100>>。融资股票按借款计收每周 <<= (_riskMargin.terms.borrowWeeklyRate * 100).toFixed(2)>>% 的利息。融券卖出按股票当前市值收取每周 <<= (_riskMargin.terms.shortWeeklyRate * 100).toFixed(2)>>% 的借券费，还须补偿出借人的分红。费用逐日累计，周末也计费。
     <span class='red'>锁定期间亏损仍可能扩大。股价上涨时，做空的亏损可能超过原先交的保证金。</span>
-    从下一交易日起，权益降至所缴保证金的四分之一时强制平仓。融券与期货分别在 <<= $_margin.terms.shortDays>> 天、<<= $_margin.terms.futuresDays>> 天后到期，遇到周末顺延至下一交易日结算。
+    从下一交易日起，权益降至所缴保证金的四分之一时强制平仓。融券与期货分别在 <<= _riskMargin.terms.shortDays>> 天、<<= _riskMargin.terms.futuresDays>> 天后到期，遇到周末顺延至下一交易日结算。
 <</language>><br><br>
 <<if $Finance.collection.amount lte 0>>
   <<set _marginSymbol to 'AVY'>>
   <<set _marginShares to 10>><<set _marginLots to 100>><<set _stockLeverage to 2>><<set _stockSide to 1>><<set _futuresLeverage to 5>>
   <<set _marginOptions to {}>>
-  <<for $_security range maplebirch.get('Finance').securities>>
-    <<set _marginOptions[maplebirch.t($_security.name)] to $_security.symbol>>
+  <<for _riskSecurity range maplebirch.get('Finance').securities>>
+    <<set _marginOptions[maplebirch.t(_riskSecurity.name)] to _riskSecurity.symbol>>
   <</for>>
   <div class='deadwood-card-grid'>
     <<deadwood-card 'Stock financing and short sales' '股票融资与融券'>>
@@ -109,8 +109,9 @@
       <</language>><br>
       <div class='dr-finance-actions'>
         <<lanLink ['Check the quote', '核对报价']>>
-          <<set $_marginQuote to maplebirch.get('Finance').margin.orderQuote('stock', _marginSymbol, Number(_stockSide), Number(_marginShares), Number(_stockLeverage))>>
-          <<replace '#deadwood-stock-quote'>><<deadwood-finance-margin-quote $_marginQuote>><</replace>>
+          <!-- 点击时卡片 widget 已退出，报价须传过随后的嵌套宏调用。 -->
+          <<set _riskMarginQuote to maplebirch.get('Finance').margin.orderQuote('stock', _marginSymbol, Number(_stockSide), Number(_marginShares), Number(_stockLeverage))>>
+          <<replace '#deadwood-stock-quote'>><<deadwood-finance-margin-quote _riskMarginQuote>><</replace>>
         <</lanLink>>
         <<lanLink ['Place the stock order', '提交股票委托'] 'Deadwood Reblooms Financial Centre Margin Result'>>
           <<set $Finance.last_result to maplebirch.get('Finance').margin.place('stock', _marginSymbol, Number(_stockSide), Number(_marginShares), Number(_stockLeverage)) ? 'ok' : 'rejected'>>
@@ -134,8 +135,8 @@
       <</language>><br>
       <div class='dr-finance-actions'>
         <<lanLink ['Check the quote', '核对报价']>>
-          <<set $_marginQuote to maplebirch.get('Finance').margin.orderQuote('futures', _futureSymbol, 1, Number(_marginLots), Number(_futuresLeverage))>>
-          <<replace '#deadwood-futures-quote'>><<deadwood-finance-margin-quote $_marginQuote>><</replace>>
+          <<set _riskMarginQuote to maplebirch.get('Finance').margin.orderQuote('futures', _futureSymbol, 1, Number(_marginLots), Number(_futuresLeverage))>>
+          <<replace '#deadwood-futures-quote'>><<deadwood-finance-margin-quote _riskMarginQuote>><</replace>>
         <</lanLink>>
         <<lanLink ['Open long', '买入开仓'] 'Deadwood Reblooms Financial Centre Margin Result'>>
           <<set $Finance.last_result to maplebirch.get('Finance').margin.place('futures', _futureSymbol, 1, Number(_marginLots), Number(_futuresLeverage)) ? 'ok' : 'rejected'>>
@@ -148,7 +149,7 @@
     <</deadwood-card>>
   </div>
 <</if>>
-<<if $_margin.positions.length>>
+<<if _riskMargin.positions.length>>
   <<deadwood-card 'Stop-loss and take-profit orders' '止盈止损委托'>>
     <<set $_margin to maplebirch.get('Finance').margin>>
     <<language>>
@@ -234,9 +235,9 @@
   <</language>>
 <<elseif $Finance.last_result is 'closed'>>
   <<lanSwitch 'The clerk stamps the closing slip. The balance after fees has been settled.' '柜员在平仓单上盖了章。扣除费用后的余额已经结算。'>><br>
-  <<set $_settlement to maplebirch.get('Finance').margin.history.at(-1)>>
-  <<if $_settlement>>
-    <<lanSwitch 'Profit / loss after fees: ' '扣费后盈亏：'>><<deadwood-reblooms-finance-money $_settlement.profit>><br>
+  <<set _riskSettlement to maplebirch.get('Finance').margin.history.at(-1)>>
+  <<if _riskSettlement>>
+    <<lanSwitch 'Profit / loss after fees: ' '扣费后盈亏：'>><<deadwood-reblooms-finance-money _riskSettlement.profit>><br>
   <</if>>
   <<deadwood-finance-risk-summary>>
 <<elseif $Finance.last_result is 'limits'>>
@@ -250,10 +251,10 @@
 
 :: Deadwood Reblooms Property Collateral
 <<set $outside to 0>><<set $location to 'financial_centre'>><<effects>>
-<<set $_estate to maplebirch.get('Finance').realEstate>>
-<<set $_id to $Finance.real_estate.collateral_property>>
-<<set $_limit to $_estate.collateralLimit($_id)>>
-<<if $_limit lte 0>>
+<<set _riskEstate to maplebirch.get('Finance').realEstate>>
+<<set _riskProperty to $Finance.real_estate.collateral_property>>
+<<set _riskLimit to _riskEstate.collateralLimit(_riskProperty)>>
+<<if _riskLimit lte 0>>
   <<lanSwitch 'This deed is not available as collateral.' '这份房契现在无法用于抵押。'>><br>
 <<else>>
   <<deadwood-reblooms-adrian-greeting 'financial_centre_property'>>
@@ -263,21 +264,21 @@
     <<option 'CN'>>
       中介把房契与查验记录核对了一遍。“你可以继续住，也可以继续收租。停了还款，我们就收房。拍卖不一定能把欠款全部抵清。”
   <</language>><br><br>
-  <<lanSwitch 'Appraised value: ' '评估价：'>><<deadwood-reblooms-finance-money `$_estate.appraisal($_id)`>><br>
-  <<lanSwitch 'Maximum borrowing (60%): ' '可借上限（60%）：'>><<deadwood-reblooms-finance-money $_limit>><br>
+  <<lanSwitch 'Appraised value: ' '评估价：'>><<deadwood-reblooms-finance-money `_riskEstate.appraisal(_riskProperty)`>><br>
+  <<lanSwitch 'Maximum borrowing (60%): ' '可借上限（60%）：'>><<deadwood-reblooms-finance-money _riskLimit>><br>
   <<language>>
     <<option 'EN'>>
       The bank deducts a 2% fee from the advance. The term you choose sets the weekly interest rate. Keep enough in your account for the first instalment.
     <<option 'CN'>>
       银行从放款中扣除 2% 手续费，周利率随你选择的期限变化。记得在账户里留够第一期还款。
   <</language>><br>
-  <<set _collateralAmount to Math.floor($_limit / 100)>>
+  <<set _collateralAmount to Math.floor(_riskLimit / 100)>>
   <div onchange="Dynamic.render('deadwood-collateral-quote')">
     <label><<lanSwitch 'Borrow £' '借款 £'>><<numberbox '_collateralAmount' _collateralAmount>></label><br>
-    <<if !$_estate.mortgage.terms.available_terms.includes($Finance.real_estate.mortgage_term)>>
-      <<set $Finance.real_estate.mortgage_term to $_estate.mortgage.terms.term_days>>
+    <<if !_riskEstate.mortgage.terms.available_terms.includes($Finance.real_estate.mortgage_term)>>
+      <<set $Finance.real_estate.mortgage_term to _riskEstate.mortgage.terms.term_days>>
     <</if>>
-    <label><<lanSwitch 'Term (days): ' '期限（天）：'>><<listbox '$Finance.real_estate.mortgage_term' autoselect>><<optionsfrom $_estate.mortgage.terms.available_terms>><</listbox>></label>
+    <label><<lanSwitch 'Term (days): ' '期限（天）：'>><<listbox '$Finance.real_estate.mortgage_term' autoselect>><<optionsfrom _riskEstate.mortgage.terms.available_terms>><</listbox>></label>
   </div>
   <<deadwood-dynamicblock 'deadwood-collateral-quote'>>
     <<deadwood-finance-collateral-quote _collateralAmount>>
@@ -324,8 +325,8 @@
   <<icon 'finance/repayment.png'>><<lanLink ['Pay from bank funds and cash', '用银行存款与现金缴清'] 'Deadwood Reblooms Financial Debt Result'>><<set $Finance.last_result to maplebirch.get('Finance').repayCollection() ? 'ok' : 'rejected'>><</lanLink>><br>
   <<lanSwitch 'Bank funds / cash: ' '银行存款／现金：'>><<deadwood-reblooms-finance-money $Finance.bank.balance>> / <<deadwood-reblooms-finance-money $money>><br>
   <<if !$Finance.collection.extended>>
-    <<set $_extensionFee to Math.ceil($Finance.collection.amount * 0.05)>>
-    <<lanSwitch 'Seven-day extension fee: ' '延期七天的费用：'>><<deadwood-reblooms-finance-money $_extensionFee>><br>
+    <<set _riskExtensionFee to Math.ceil($Finance.collection.amount * 0.05)>>
+    <<lanSwitch 'Seven-day extension fee: ' '延期七天的费用：'>><<deadwood-reblooms-finance-money _riskExtensionFee>><br>
     <<if maplebirch.get('Finance').canExtendCollection>>
       <<icon 'finance/rent-extension.png'>><<lanLink ['Pay the extension fee from your bank account', '从银行账户支付延期费用']>>
         <<run maplebirch.get('Finance').extendCollection()>>

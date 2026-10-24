@@ -1,8 +1,8 @@
 :: Deadwood Remy Business
 <<effects>>
-<<set $_remy to maplebirch.get('Orchard')?.remy>>
-<<set $_finance to maplebirch.get('Finance')>>
-<<if $_remy?.available and $_remy.canTalk>>
+<<set _remyBusiness to maplebirch.get('Orchard')?.remy>>
+<<set _remyBusinessFinance to maplebirch.get('Finance')>>
+<<if _remyBusiness?.available and _remyBusiness.canTalk>>
   <<npc Remy>><<person1>>
   <div id='deadwood-remy-business'>
     <<language>>
@@ -11,7 +11,7 @@
       <<option 'CN'>>
         雷米把课程登记簿挪到一旁。“那么，是学校以外的事？”<<His>>手仍按在合上的封面上。
     <</language>><br><br>
-    <<if $_remy.farmConflict>>
+    <<if _remyBusiness.farmConflict>>
       <<lanLink ['Challenge threats to farm (0:10)', '质问对农场的威胁 (0:10)']>>
         <<if maplebirch.get('Orchard')?.remy.farmConflict and maplebirch.get('Orchard')?.remy.act('confront')>>
           <<npcincr Remy love -1>><<pass 10>>
@@ -43,7 +43,7 @@
           <</replace>>
         <</if>>
       <</lanLink>><<llove 'Remy'>><br>
-      <<if $_finance and $Finance.bank.loan_project is 'orchard' and $Finance.bank.loan_debt gt 0>>
+      <<if _remyBusinessFinance and $Finance.bank.loan_project is 'orchard' and $Finance.bank.loan_debt gt 0>>
         <<lanLink ['Mention the orchard loan (0:10)', '提起果园的贷款 (0:10)']>>
           <<if maplebirch.get('Finance') and $Finance.bank.loan_project is 'orchard' and $Finance.bank.loan_debt gt 0 and maplebirch.get('Orchard')?.remy.act('confront')>>
             <<pass 10>>
@@ -86,7 +86,7 @@
         <</if>>
       <</lanLink>><br>
     <</if>>
-    <<if $_finance and ($_finance.sellableShares.RMY ?? 0) gt 0>>
+    <<if _remyBusinessFinance and (_remyBusinessFinance.sellableShares.RMY ?? 0) gt 0>>
       <<lanLink ['Mention estate shares (0:10)', '表明持有庄园股份 (0:10)']>>
         <<if maplebirch.get('Finance') and (maplebirch.get('Finance').sellableShares.RMY ?? 0) gt 0 and maplebirch.get('Orchard')?.remy.act('talk')>>
           <<pass 10>>

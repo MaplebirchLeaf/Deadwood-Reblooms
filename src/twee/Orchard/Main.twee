@@ -456,7 +456,7 @@
   <<generateNPC 1 a>><<npcClothesName $NPCList[0] 'wildsFlannel'>>
 <</if>><<person1>>
 <<set _orchardWorkerMet to $NPCList[0].name_known is 1>>
-<<set $_worker_wage to maplebirch.get('Orchard').workerWage>>
+<<set _orchardWorkerWage to maplebirch.get('Orchard').workerWage>>
 <<language>>
   <<option 'EN'>>
     <<if _orchardWorkerMet>>You find <<print $NPCList[0].name>> at the same table by the window. <<He>> recognises you and moves a glass aside to make room.
@@ -467,7 +467,7 @@
     <<if not _orchardWorkerMet>>
       <<He>> gives you <<his>> name: <<print $NPCList[0].name>>.
     <</if>>
-    "A week's work costs <<printmoney $_worker_wage>>. Pay first, and I'll come by in the mornings."
+    "A week's work costs <<printmoney _orchardWorkerWage>>. Pay first, and I'll come by in the mornings."
   <<option 'CN'>>
     <<if _orchardWorkerMet>>你在窗边同一张桌子找到<<print $NPCList[0].name>>。<<He>>认出你，把杯子挪开，让你坐下。
     <<else>>你向酒馆老板打听有没有人能帮忙照料果树。老板指向窗边的一位<<person>>。你在<<him>>对面的空位坐下。<</if>>
@@ -477,15 +477,15 @@
     <<if not _orchardWorkerMet>>
       <<He>>告诉你自己的名字：<<print $NPCList[0].name>>。
     <</if>>
-    “干一周收<<printmoney $_worker_wage>>。先付钱，我每天早上过去。”
+    “干一周收<<printmoney _orchardWorkerWage>>。先付钱，我每天早上过去。”
 <</language>>
 <<set $NPCList[0].name_known to 1>><<saveNPC 0 'deadwood_orchard_worker'>><br><br>
-<<if maplebirch.get('Finance')?.canPay($_worker_wage, 'orchard') ?? $money gte $_worker_wage>>
+<<if maplebirch.get('Finance')?.canPay(_orchardWorkerWage, 'orchard') ?? $money gte _orchardWorkerWage>>
   <<icon 'orchard/worker.png'>><<lanLink ['Hire for a week', '雇用一周'] 'Pub'>>
     <<run maplebirch.get('Orchard').hire()>><<endevent>>
-  <</lanLink>> (<<printmoney $_worker_wage>>)<br>
+  <</lanLink>> (<<printmoney _orchardWorkerWage>>)<br>
 <<else>>
-  <span class='red'><<lanSwitch 'You cannot afford a week of work.' '你付不起一周的薪资。'>></span> (<<printmoney $_worker_wage>>)<br>
+  <span class='red'><<lanSwitch 'You cannot afford a week of work.' '你付不起一周的薪资。'>></span> (<<printmoney _orchardWorkerWage>>)<br>
 <</if>>
 <<getouticon>><<lanLink ['Refuse', '拒绝'] 'Pub'>>
   <<endevent>>

@@ -3,8 +3,8 @@
 <<if $stress gte $stressmax>>
   <<passoutfarmroad>><<exit>>
 <</if>>
-<<set $_orchard to maplebirch.get('Orchard')>>
-<<if !$_orchard or !$_orchard.canDeliver>>
+<<set _contractOrchard to maplebirch.get('Orchard')>>
+<<if !_contractOrchard or !_contractOrchard.canDeliver>>
   <<lanSwitch 'Alex cannot arrange a contract now.' '艾利克斯现在无法安排长单。'>><br>
   <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Reblooms Orchard Trade'>><</lanLink>><<exit>>
 <</if>>
@@ -17,7 +17,7 @@
       艾利克斯在发货单上找出你的名字。“车上给你留了位置。这批得一起交齐。”
   <</language>><br><br>
   <<foodstufficon $Orchard.farm_contract.type>><<= $Orchard.farm_contract.amount>> · <<lanSwitch 'Unit price: ' '单价：'>><<printmoney $Orchard.farm_contract.price>><br>
-  <<lanSwitch 'Due: ' '交货期限：'>><<set $_contractDate to Time.startDate.addDays($Orchard.farm_contract.deadline)>><<= $_contractDate.year>> / <<= $_contractDate.month>> / <<= $_contractDate.day>><br>
+  <<lanSwitch 'Due: ' '交货期限：'>><<set _contractDate to Time.startDate.addDays($Orchard.farm_contract.deadline)>><<= _contractDate.year>> / <<= _contractDate.month>> / <<= _contractDate.day>><br>
   <<lanSwitch 'Refundable deposit: ' '交货后退回的押金：'>><<printmoney $Orchard.farm_contract.bond>><br>
   <<icon 'orchard/dispatch.png'>><<lanLink ['Deliver the complete order (0:30)', '交齐这批水果 (0:30)'] 'Deadwood Orchard Farm Contract Result'>>
     <<set $Orchard.contract_result to maplebirch.get('Orchard').fulfillContract()>>
@@ -41,21 +41,21 @@
         艾利克斯顺着收货人的名单看下去。“整箱的价钱好一些。我能替你留一周的位置，不过要押金。你赶不上车，那位置也得付钱。”
     <</language>><br><br>
   <</if>>
-  <<if $_orchard.canContract and $_orchard.contractFruit.length>>
-    <<set _contractFruit to $_orchard.contractFruit[0]>><<set _contractAmount to $_orchard.contractQuantities[0]>>
+  <<if _contractOrchard.canContract and _contractOrchard.contractFruit.length>>
+    <<set _contractFruit to _contractOrchard.contractFruit[0]>><<set _contractAmount to _contractOrchard.contractQuantities[0]>>
     <label><<lanSwitch 'Fruit: ' '水果：'>>
       <<language>>
         <<option 'EN'>>
           <<set _contractOptions to {}>>
-          <<for $_type range $_orchard.contractFruit>><<set _contractOptions[$_type is 'blood_lemon' ? 'Blood lemon' : $_orchard.species[$_type].name[0]] to $_type>><</for>>
+          <<for _contractType range _contractOrchard.contractFruit>><<set _contractOptions[_contractType is 'blood_lemon' ? 'Blood lemon' : _contractOrchard.species[_contractType].name[0]] to _contractType>><</for>>
           <<listbox '_contractFruit' autoselect>><<optionsfrom _contractOptions>><</listbox>>
         <<option 'CN'>>
           <<set _contractOptions to {}>>
-          <<for $_type range $_orchard.contractFruit>><<set _contractOptions[$_type is 'blood_lemon' ? '血柠' : $_orchard.species[$_type].name[1]] to $_type>><</for>>
+          <<for _contractType range _contractOrchard.contractFruit>><<set _contractOptions[_contractType is 'blood_lemon' ? '血柠' : _contractOrchard.species[_contractType].name[1]] to _contractType>><</for>>
           <<listbox '_contractFruit' autoselect>><<optionsfrom _contractOptions>><</listbox>>
       <</language>>
     </label><br>
-    <label><<lanSwitch 'Quantity: ' '数量：'>><<listbox '_contractAmount' autoselect>><<optionsfrom $_orchard.contractQuantities>><</listbox>></label><br>
+    <label><<lanSwitch 'Quantity: ' '数量：'>><<listbox '_contractAmount' autoselect>><<optionsfrom _contractOrchard.contractQuantities>><</listbox>></label><br>
     <<language>>
       <<option 'EN'>>
         The agreed price is 85% of the market-stall price when you sign, fixed for the week. The deposit is 20% of the order. Fruit you marked to keep will not be taken.
@@ -63,10 +63,10 @@
         签单时按集市售价的八五折锁定单价，一周内不变。押金为货款的两成。你标记保留的水果不会用于交货。
     <</language>><br>
     <<icon 'finance/quote.png'>><<lanLink ['Check the quote', '核对报价']>>
-      <<set $_quote to maplebirch.get('Orchard').contractQuote(_contractFruit, Number(_contractAmount))>>
+      <<set _contractQuote to maplebirch.get('Orchard').contractQuote(_contractFruit, Number(_contractAmount))>>
       <<replace '#orchard-contract-quote'>>
-        <<if $_quote>>
-          <<lanSwitch 'Order value / deposit: ' '货款／押金：'>><<printmoney `$_quote.price * Number(_contractAmount)`>> / <<printmoney $_quote.bond>>
+        <<if _contractQuote>>
+          <<lanSwitch 'Order value / deposit: ' '货款／押金：'>><<printmoney `_contractQuote.price * Number(_contractAmount)`>> / <<printmoney _contractQuote.bond>>
         <</if>>
       <</replace>>
     <</lanLink>><div id='orchard-contract-quote'></div>

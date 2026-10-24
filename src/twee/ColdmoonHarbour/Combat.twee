@@ -8,11 +8,11 @@
   <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coldmoon Harbour Fight'>><</lanLink>></span><<nexttext>><<exit>>
 <</if>>
 <<if !_harbour.fighting and _harbourNight and ['hostile', 'chase', 'voice'].includes(_harbour.event) and !$combat>>
-  <<endevent>><<set $_ghostCount to random(1, 3)>>
-  <<for $_ghost to 0; $_ghost lt $_ghostCount; $_ghost++>>
-    <<generateNPC `$_ghost + 1` 'a'>>
-    <<set $NPCList[$_ghost].per to 'deadwood_harbour_ghost', $NPCList[$_ghost].monster to 'monster', $NPCList[$_ghost].skincolour to 'ghost'>>
-    <<npcClothesType $NPCList[$_ghost] 'docker2'>>
+  <<endevent>><<set _harbourGhostCount to random(1, 3)>>
+  <<for _harbourGhost to 0; _harbourGhost lt _harbourGhostCount; _harbourGhost++>>
+    <<generateNPC `_harbourGhost + 1` 'a'>>
+    <<set $NPCList[_harbourGhost].per to 'deadwood_harbour_ghost', $NPCList[_harbourGhost].monster to 'monster', $NPCList[_harbourGhost].skincolour to 'ghost'>>
+    <<npcClothesType $NPCList[_harbourGhost] 'docker2'>>
   <</for>>
   <<person1>><<molested>><<violence 1>><<neutral 1>><<maninit>><<npcidlegenitals>>
   <<set $enemytrust to -30, $enemyanger to 40, _harbour.fighting to true>>
@@ -31,8 +31,8 @@
   <</language>><br><br>
 <</if>>
 <<if _harbour.fighting and $combat is 1 and $NPCList[0]?.per is 'deadwood_harbour_ghost'>>
-  <<for $_ghost to 0; $_ghost lt $enemynomax; $_ghost++>>
-    <<set $NPCList[$_ghost].role to lanSwitch('undead pirate', '亡灵海盗'), $NPCList[$_ghost].fullDescription to lanSwitch('undead pirate', '亡灵海盗')>>
+  <<for _harbourGhost to 0; _harbourGhost lt $enemynomax; _harbourGhost++>>
+    <<set $NPCList[_harbourGhost].role to lanSwitch('undead pirate', '亡灵海盗'), $NPCList[_harbourGhost].fullDescription to lanSwitch('undead pirate', '亡灵海盗')>>
   <</for>>
   <<if _harbourNight>><<effectsman>><<deadwood-harbour-context>><</if>>
   <<if _harbourNight>>
