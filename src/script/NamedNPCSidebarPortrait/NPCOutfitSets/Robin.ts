@@ -32,6 +32,7 @@ const wardrobeKeys = [
   'christmas_dress',
   'jingle_bell_christmas_dress',
   'gift_wrap',
+  'christmas_tree',
   'rags'
 ] as const;
 

@@ -1,0 +1,67 @@
+:: Deadwood Forest Outfits Widgets [widget]
+
+<<widget 'deadwood-forest-outfits-init'>>
+  <<set setup.specialClothesSets.forest_tunic to {
+    get text() { return lanSwitch('forest tunic outfit', '森林长衫套装'); },
+    requirements: () => V.gwylanSeen?.includes('clothes_intro'),
+    get hint() { return lanSwitch('ask Gwylan about special clothing', '向格威岚了解特殊服装'); },
+    shop: ['forest'], feat: false, icon: 'clothes/forest-tunic.png'
+  }>>
+  <<set setup.specialClothesSets.christmas_tree to {
+    get text() { return lanSwitch('Christmas tree stage costume', '圣诞树戏服'); },
+    requirements: () => !!V.englishPlayRobinWatch || (!!V.englishPlayRolePlayed && V.englishPlayRolePlayed !== 'none'),
+    get hint() { return lanSwitch('perform in the English play, or watch Robin perform', '参加英语剧，或观看罗宾的演出'); },
+    shop: ['forest'], feat: false, icon: 'clothes/christmas-tree-costume.png'
+  }>>
+  <<for _forestOutfitEntry range [
+    { name: 'forest tunic', sets: ['forest_tunic'] },
+    { name: 'forest skirt', sets: ['forest_tunic'] },
+    { name: 'christmas tree costume', sets: ['christmas_tree'] },
+    { name: 'christmas tree costume skirt', sets: ['christmas_tree'] }
+  ]>>
+    <<if !setup.specialClothes.some(item => item.name === _forestOutfitEntry.name)>>
+      <<run setup.specialClothes.push(_forestOutfitEntry)>>
+    <</if>>
+  <</for>>
+<</widget>>
+
+<<widget 'deadwood-forest-outfits-state'>>
+  <!-- 向旧存档补入原版解锁记录；不覆盖已解锁、成就解锁或作弊解锁的等级。 -->
+  <<if Array.isArray($specialClothes)>>
+    <<for _forestOutfitName range ['forest tunic', 'forest skirt', 'christmas tree costume', 'christmas tree costume skirt']>>
+      <<if !$specialClothes.some(item => item.name === _forestOutfitName)>>
+        <<run $specialClothes.push({ name: _forestOutfitName, unlocked: 0 })>>
+      <</if>>
+    <</for>>
+  <</if>>
+<</widget>>
+
+:: Gwylan Talk Clothes Forest Tunic
+<<effects>><<run statusCheck('Gwylan')>>
+<<if !$gwylanTalked.includes('forest_tunic')>>
+  <<set $daily.gwylan.clothesTalk++>><<run $gwylanTalked.pushUnique('forest_tunic')>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    You point out the green tunic and russet skirt. Gwylan lifts the hem, showing you the pale lining.<br><br>
+    "They belong together. The belt carries the weight of the pouches. Keep it clear of the skirt when you fasten it." <<He>> lays both pieces back on the counter.
+  <<option 'CN'>>
+    你指了指绿长衫和红棕长裙。格威岚提起裙边，让你看里面的浅色衬裙。<br><br>
+    “这两件是一套。腰包的分量由腰带承着，系的时候别把裙子夹进去。”<<He>>将两件衣服重新铺在柜台上。
+<</language>><br><br>
+<<gwylanOptions>>
+
+:: Gwylan Talk Clothes Christmas Tree
+<<effects>><<run statusCheck('Gwylan')>>
+<<if !$gwylanTalked.includes('christmas_tree')>>
+  <<set $daily.gwylan.clothesTalk++>><<run $gwylanTalked.pushUnique('christmas_tree')>>
+<</if>>
+<<language>>
+  <<option 'EN'>>
+    You describe the Christmas tree costume from the English play. Gwylan parts the layered green cloth to show you the lining beneath.<br><br>
+    "Cloth branches. Much kinder to the wearer than real ones." <<He>> straightens a ribbon. "Let it hang before the performance, and don't shut the baubles in a drawer."
+  <<option 'CN'>>
+    你说起英语剧里的圣诞树戏服。格威岚拨开层层绿布，让你看看下面的内衬。<br><br>
+    “布做的树枝，可比真树枝穿着舒服。”<<He>>理顺一截彩带。“演出前挂一阵，别把彩球夹进抽屉里。”
+<</language>><br><br>
+<<gwylanOptions>>

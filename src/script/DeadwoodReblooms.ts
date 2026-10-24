@@ -13,6 +13,9 @@ export default function (maplebirch: MaplebirchCore) {
   Tips(maplebirch);
   Traits(maplebirch);
 
+  maplebirch.tool.onInit('deadwood-forest-outfits-init');
+  maplebirch.tool.addTo('State', 'deadwood-forest-outfits-state');
+
   const antiques = () => {
     for (const [key, { module, translation, ...data }] of Object.entries(antiquesData)) {
       if (!maplebirch.get(module as 'LifeSimulation' | 'MoreTransformations')) continue;

@@ -65,7 +65,7 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
       applySignatureAccessories(clothes, context.location);
     });
 
-    // 森林商店常服：暂用绿色露肩毛衣与束腰还原束腰外衣
+    // 森林商店常服与 PC 共用专属长衫、长裙，配饰仍独立穿戴。
     const tunicLocations = ['shop', 'garden', 'forest'];
     wardrobe.wear('Gwylan', tunicLocations, 'gwylan_tunic');
 
@@ -105,14 +105,6 @@ export default function (maplebirch: MaplebirchCore, colours: DailyCache): void 
         return;
       }
 
-      if (context.key === 'gwylan_tunic') {
-        const variants = ['standard', 'off_shoulder_sweater_dress'] as const;
-        colours.outfit.set('gwylan_tunic.variant', colours.outfit.get('gwylan_tunic.variant') ?? variants[Math.floor(Math.random() * variants.length)]);
-        if (colours.outfit.get('gwylan_tunic.variant') === 'off_shoulder_sweater_dress') {
-          sidebar.apply(clothes, Clothing.off_shoulder_sweater_dress_upper);
-          sidebar.apply(clothes, Clothing.off_shoulder_sweater_dress_lower);
-        }
-      }
       if (context.key === 'turtleneck_slacks') {
         const variants = ['standard', 'cable_knit_turtleneck'] as const;
         colours.outfit.set('turtleneck_slacks.variant', colours.outfit.get('turtleneck_slacks.variant') ?? variants[Math.floor(Math.random() * variants.length)]);

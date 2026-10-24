@@ -262,8 +262,8 @@ export default function (
       if (clothes.head?.name === Clothing.flower_crown.name) delete clothes.head;
     });
 
-    // 英语剧：罗宾扮演圣诞树，原版没有圣诞树服装，没招
-    wardrobe.wear('Robin', 'englishPlay', 'naked');
+    // 英语剧：罗宾扮演圣诞树，沿用演出日程。
+    wardrobe.wear('Robin', 'englishPlay', 'christmas_tree');
 
     // 万圣节
     wardrobe.wear('Robin', 'halloween', 'witch', () => V.halloween_robin_costume === 'witch');
