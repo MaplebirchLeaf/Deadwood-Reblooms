@@ -40,8 +40,7 @@ class Promiscuity {
       return name?.trim() && V.settings.transformAnimalEnabled && this.vanillaPlus.core.npc.Transformation.level(name, 'fox') > 0 ? ['promiscuity', 'deviancy'] : ['promiscuity'];
     }
     if (V.enemytype !== 'beast') return [];
-    const type = npc.type === 'centaur' ? 'horse' : npc.type === 'harpy' ? 'hawk' : npc.type === 'creature' ? 'wolf' : String(npc.type).replace(/(?:boy|girl)$/, '');
-    return V.settings.beastSettings?.[type] && window.beastSexEnabledForType(type, npc.monster === 'monster') ? ['deviancy'] : [];
+    return V.settings.bestialityEnabled || npc.monster === 'monster' ? ['deviancy'] : [];
   }
 
   public canAdvancedActions(index: number): boolean {

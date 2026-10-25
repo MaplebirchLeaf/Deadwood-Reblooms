@@ -1,4 +1,4 @@
-/** 超自然场景显式结算，完整休息与药柜复用原有入口。 */
+/** 遭遇与噩梦沿用原版结算，完整休息与药柜复用原有入口。 */
 export default function Psyche(maplebirch: typeof window.maplebirch): void {
   const psyche = maplebirch.get('Psyche');
   if (!psyche) return;
@@ -75,7 +75,15 @@ export default function Psyche(maplebirch: typeof window.maplebirch): void {
         {
           // 现实状态恢复后只结算一次醒后的余悸，梦中演绎不会改动现实理智。
           src: '<<unset $activeNightmare>>',
-          applyafter: '<<run maplebirch.get("Psyche")?.change(0, 120)>>',
+          applyafter: '<<run maplebirch.get("Psyche")?.change(-10, 120)>>',
+          expected: 1
+        }
+      ],
+      'Widgets End Combat': [
+        {
+          // 沿用本场实际创伤记录，清理战斗前结算一次余悸，不影响原版治疗与特质。
+          src: '<<unset $enemytype>>',
+          applybefore: '<<psyche-combat-end>>',
           expected: 1
         }
       ]

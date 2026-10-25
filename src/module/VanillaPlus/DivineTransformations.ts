@@ -32,7 +32,7 @@ class DivineTransformations {
   }
 
   public get arousalLimit(): number {
-    return this.fallenAngel && V.VanillaPlus.attitudes.ironWill && V.combat !== 1 && !V.sexRitual ? V.arousalmax - 1 : V.arousalmax;
+    return this.fallenAngel && V.VanillaPlus.attitudes.ironWill && V.combat !== 1 && !V.masturbating && !V.sexRitual ? V.arousalmax - 1 : V.arousalmax;
   }
 
   public get demon(): boolean {

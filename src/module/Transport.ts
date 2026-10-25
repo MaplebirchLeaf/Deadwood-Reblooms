@@ -106,21 +106,21 @@ class Transport extends Module {
       action: () => this.maintenance.settle()
     });
     this.core.on(':passagestart', () => {
-      V.Transport ??= clone(Transport.defaults);
       const title = this.core.passage.title;
-      this.events.enterPassage();
       this.commute.enterPassage();
+      // 原版正文末尾会清空 eventskip，在入口保留普通探索菜单的判定。
+      this.trail_menu =
+        V.eventskip >= 1 &&
+        !V.nextPassageCheck &&
+        (title === 'Forest' ? ![1, 3].includes(V.town_projects.road) && (V.foresthunt ?? 0) < 10 : title === 'Moor' && (V.moor_hunt ?? 0) < 10 && V.moormove !== 'horse');
+      if (V.replayScene || V.statFreeze || V.frozenValues) return;
+      this.events.enterPassage();
       const trip = this.state.trip;
       // 普通随车可在停车的街道继续下一程，进入别的场景或离开车辆所在街道便结束同行。
       if (trip && !trip.commute && !trip.taxi && !this.core.get('Finance')?.realEstate.outings.travelling && !title.startsWith('Deadwood Transport') && Catalog.point(title) !== this.vehicle?.point) {
         this.state.passengers = [];
         trip.passengers = [];
       }
-      // 原版正文末尾会清空 eventskip，在入口保留普通探索菜单的判定。
-      this.trail_menu =
-        V.eventskip >= 1 &&
-        !V.nextPassageCheck &&
-        (title === 'Forest' ? ![1, 3].includes(V.town_projects.road) && (V.foresthunt ?? 0) < 10 : title === 'Moor' && (V.moor_hunt ?? 0) < 10 && V.moormove !== 'horse');
     });
   }
 

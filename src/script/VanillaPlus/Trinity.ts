@@ -96,7 +96,7 @@ export default function (maplebirch: typeof window.maplebirch) {
   maplebirch.tool.patch.traits.add({
     title: 'Transformation Traits',
     name: () => maplebirch.t('deadwood-reblooms:VanillaPlus:divineTransformations:trait:trinity:name'),
-    colour: 'deadwood-trinity',
+    colour: () => `deadwood-trinity${V.options.textAnimsAll ? ' deadwood-trinity-animated' : ''}`,
     has: () => maplebirch.get('VanillaPlus')!.divineTransformations.trinity,
     text: () => maplebirch.t('deadwood-reblooms:VanillaPlus:divineTransformations:trait:trinity:text')
   });

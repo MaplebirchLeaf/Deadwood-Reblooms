@@ -122,7 +122,7 @@ class MoreLoveInterests {
 
     if (!selected && names.length === 0 && count > 0) {
       const complete = document.createElement('div');
-      complete.className = 'love-interests-complete';
+      complete.className = `love-interests-complete${V.options.textAnimsAll ? ' love-interests-complete-animated' : ''}`;
       complete.textContent = this.core.t('deadwood-reblooms:loveInterests:allSelected');
       group.append(complete);
       return group;

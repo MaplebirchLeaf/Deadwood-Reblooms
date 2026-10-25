@@ -1,5 +1,12 @@
 :: Deadwood Psyche Widgets [widget]
 
+<<widget 'psyche-combat-end'>>
+  <!-- 这些原版战斗入口会清零创伤记录。梦中遭遇只在醒后结算。 -->
+  <<if $combat is 1 and ['man', 'beast', 'plant'].includes($enemytype) and !$activeNightmare and $consensual is 0 and $traumagain gt 0>>
+    <<run maplebirch.get('Psyche')?.change(-Math.min(10, $traumagain / 10), Math.min(150, $traumagain * 2))>>
+  <</if>>
+<</widget>>
+
 <<widget 'psyche-attribute'>>
   <<set $_psyche to maplebirch.get('Psyche')>>
   <<if $_psyche?.active>>
@@ -119,10 +126,15 @@
     <</language>><br>
     <<icon 'actions/relax.png'>><<lanLink ['Stop and steady your breathing (0:05)', '停下来调整呼吸 (0:05)'] 'Deadwood Psyche Recovery'>>
       <<if maplebirch.get('Psyche')?.canCalm>>
-        <<set $Psyche.episode to { passage: $passage, needsEffects: true }>>
-        <<run maplebirch.get('Psyche').change(0, -200)>><<stress -1>>
+        <<set _psyche_origin to $passage>>
         <<pass 5>>
-        <<set $Psyche.cooldown_until to Time.date.timeStamp + 1800>>
+        <<if maplebirch.get('Psyche')?.canCalm and $passage is _psyche_origin>>
+          <<set $Psyche.episode to { passage: _psyche_origin, needsEffects: true }>>
+          <<run maplebirch.get('Psyche').change(0, -200)>><<stress -1>>
+          <<set $Psyche.cooldown_until to Time.date.timeStamp + 1800>>
+        <<else>>
+          <<set $nextPassage to $nextPassage || $nextPassageCheck || _psyche_origin>>
+        <</if>>
       <</if>>
     <</lanLink>><<llfear>><<lstress>><br><br>
   <</if>>

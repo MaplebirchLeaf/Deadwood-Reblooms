@@ -60,10 +60,10 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     expected: 1
   };
 
-  // 校规要求只提供主动更衣选择，原版束缚、课时和耳部史莱姆事件仍先检查。
+  // 更衣提示结束当前页面，不跨过原版课时分支包裹后续内容。
   const classroomChoice = {
     srcmatch: /<<classRoomEarSlime "[^"]+">>(?=\s*<<if \$worn\.upper\.type\.includes\("naked"\))/,
-    applyafter: '<<deadwood-reblooms-life-simulation-school-classroom-dress>><<if !_schoolDressRejected>>',
+    applyafter: '<<deadwood-reblooms-life-simulation-school-classroom-dress>><<if _schoolDressRejected>><<exit>><</if>>',
     expected: 1
   };
 
@@ -130,11 +130,11 @@ export default function School(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
-      'Science Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoolstate is "morning">>', applybefore: '<</if>>\n', expected: 1 }],
-      'Maths Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoollesson is 1 and ![3, 5].includes(Time.weekDay)>>', applybefore: '<</if>>\n', expected: 1 }],
-      'Housekeeping Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoollesson is 1 and [3, 5].includes(Time.weekDay)>>', applybefore: '<</if>>\n', expected: 1 }],
-      'History Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoolstate is "lunch">>', applybefore: '<</if>>\n', expected: 1 }],
-      'English Classroom': [{ ...classroomDress }, { ...classroomChoice }, { src: '<<elseif $schoolstate is "afternoon" and $englishPlay is "ongoing">>', applybefore: '<</if>>\n', expected: 1 }],
+      'Science Classroom': [{ ...classroomDress }, { ...classroomChoice }],
+      'Maths Classroom': [{ ...classroomDress }, { ...classroomChoice }],
+      'Housekeeping Classroom': [{ ...classroomDress }, { ...classroomChoice }],
+      'History Classroom': [{ ...classroomDress }, { ...classroomChoice }],
+      'English Classroom': [{ ...classroomDress }, { ...classroomChoice }],
       'School Pool': [
         ...swimmingDress.map(rule => ({ ...rule })),
         {

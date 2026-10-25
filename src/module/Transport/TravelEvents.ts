@@ -214,7 +214,7 @@ export default class TravelEvents {
     if (action === 'fine') {
       // 先读取并消费本次处罚，重绘或重复点击不会再次扣款。
       event.outcome = 'fined';
-      effects = `<<money -${fine} 'transport'>>`;
+      effects = `<<money -${fine} 'transport' {cashOnly: true}>>`;
     } else if (action === 'surrender') {
       event.outcome = 'arrested';
     } else if (action === 'warn') {

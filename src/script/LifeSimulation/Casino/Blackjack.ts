@@ -22,6 +22,7 @@ export default function Blackjack(maplebirch: typeof window.maplebirch): void {
   });
 
   maplebirch.on(':passagestart', passage => {
+    if (V.replayScene || V.statFreeze || V.frozenValues) return;
     const game = maplebirch.get('LifeSimulation')?.casino.blackjack;
     if (game?.state.clothing && !['Deadwood Reblooms Life Simulation Blackjack', 'Deadwood Reblooms Life Simulation Blackjack Rules'].includes(passage.title)) game.leave();
   });

@@ -78,7 +78,7 @@ These benefits do not complete a form for you. Prayer, growth and side effects s
 
 ## Iron Will
 
-Once your fallen angel form reaches its stable stage, Iron Will prevents willpower decay. The attitude “Being overwhelmed by pleasure” is checked by default and caps non-combat arousal at **1 below the orgasm threshold**. Uncheck it to allow the normal threshold without losing willpower protection. Combat and Gwylan’s ritual always retain the native threshold.
+Once your fallen angel form reaches its stable stage, Iron Will prevents willpower decay. The attitude “Being overwhelmed by pleasure” is checked by default and caps arousal accumulated during everyday activities at **1 below the orgasm threshold**, preventing an unexpected climax. Uncheck it to allow the normal threshold without losing willpower protection. Masturbation, combat and Gwylan’s ritual always retain the native threshold.
 
 ## Trinity
 

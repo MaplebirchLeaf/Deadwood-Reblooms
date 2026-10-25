@@ -17,7 +17,7 @@
 
 The multiplier applies to progress in science, maths, English and history earned in class, through reading and similar activities. It does not affect skill training, recipes or money. Full sanity reduces fear gained from a fright by 25%, while minimum sanity increases it by 25%.
 
-The Ivory Wraith, undead raids and curses can affect sanity. When investigating the cavern or harbour, you can pursue strange sights and sounds, examine them cautiously or leave. The cavern's stranger readings cause more fear, but can reveal a dry route around the flooded crossing or a gesture the guard recognises. Ordinary readings still let you complete the investigation. Breaking a curse or dealing with a raid can help you recover. Ordinary injuries do not cause extra sanity loss, and treating trauma does not restore sanity.
+A non-consensual encounter with people, beasts or plants that causes trauma leaves you shaken, with a small sanity loss and fear gain based on the actual trauma recorded, capped at 10 sanity and 150 base fear per encounter. Waking from a special nightmare costs 10 sanity. The Ivory Wraith, undead raids and curses can also affect sanity. When investigating the cavern or harbour, you can pursue strange sights and sounds, examine them cautiously or leave. The cavern's stranger readings cause more fear, but can reveal a dry route around the flooded crossing or a gesture the guard recognises. Ordinary readings still let you complete the investigation. Breaking a curse or dealing with a raid can help you recover. Ordinary injuries do not cause extra sanity loss, and treating trauma does not restore sanity.
 
 ## Easing fear
 

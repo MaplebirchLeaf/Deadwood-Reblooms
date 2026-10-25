@@ -249,6 +249,23 @@ export default class Jobs {
       )
         return false;
       if (!this.receiving) return false;
+      const end = Time.date.timeStamp + 10 * 60;
+      this.street.core.SugarCube.Wikifier.wikifyEval('<<pass 10>>');
+      // 完成交接后才结算，同一批货物在中断、超时或柜台关闭后仍由玩家保管。
+      if (
+        this.state.active !== job ||
+        this.contract !== contract ||
+        this.street.core.passage.title !== title ||
+        !this.available ||
+        this.place !== contract.target ||
+        job.stage !== 'carrying' ||
+        !this.cargoHere ||
+        this.expired ||
+        !this.receiving ||
+        Time.date.timeStamp < end ||
+        ['queue', 'label', 'seized', 'hassle'].includes(job.issue)
+      )
+        return false;
       job.late = Time.date.timeStamp > job.due;
       job.fee = this.fee;
       if (job.crew) {
