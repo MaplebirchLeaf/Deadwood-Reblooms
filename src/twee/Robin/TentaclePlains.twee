@@ -6,7 +6,10 @@
   <<set $_robinTentacleMenu to document.querySelector('#passage-content [data-passage="Tentacle Plains"]')>>
   <<if $_robinTentacleMenu>>
     <<if maplebirch.get('Robin').asylum.tentacleOpen>>
-      <<investigateicon>><<lanLink ['Search the surrounding plains (0:10)', '搜索附近的平原 (0:10)'] 'Deadwood Robin Tentacle Trail'>><<pass 10>><</lanLink>><br>
+      <<investigateicon>><<lanLink ['Search the surrounding plains (0:10)', '搜索附近的平原 (0:10)'] 'Deadwood Robin Tentacle Trail'>>
+        <<pass 10>>
+        <<if !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>><<stress 4>><</if>>
+      <</lanLink>><br>
     <</if>>
   <</if>>
 <</widget>>
@@ -25,10 +28,14 @@
     <br><br>
     <span class='red'>是罗宾。</span>你走近，喊了一声。门后的声音停了下来。
 <</language>>
-<<stress 4>><<gstress>>
+<<gstress>>
 <br><br>
 <<investigateicon>><<lanLink ['Open the door into the ward', '推开那扇通往病院的门'] 'Deadwood Robin Tentacle Ward'>>
-  <<run maplebirch.get('Robin').asylum.tentacleStart()>><<set $RobinExpansion.asylum.tentacle_ambush to false>><<set $RobinExpansion.asylum.tentacle_steps to 0>>
+  <<if maplebirch.get('Robin').asylum.tentacleOpen and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>>
+    <<run maplebirch.get('Robin').asylum.tentacleStart()>><<set $RobinExpansion.asylum.tentacle_ambush to false>><<set $RobinExpansion.asylum.tentacle_steps to 0>>
+    <<if C.npc.Robin.trauma lt 80 and C.npc.Robin.dom gte 60>><<npcincr Robin dom 1>><</if>>
+    <<npcincr Robin trauma -2>><<npcincr Robin love 2>><<stress -6>>
+  <</if>>
 <</lanLink>><br>
 <<getouticon>><<lanLink ['Leave the door alone', '离开那扇门'] 'Tentacle Plains'>><</lanLink>><br>
 
@@ -71,18 +78,20 @@
     另一扇门外传来脚步声。你告诉罗宾，你们可以试着从平原离开，再找到通往森林的门。
     <<nnpc_He 'Robin'>>看了看外面的触须，握住你的手。
 <</language>>
-<<if C.npc.Robin.trauma lt 80 and C.npc.Robin.dom gte 60>>
-  <<npcincr Robin dom 1>><<gdom 'Robin'>>
-<</if>>
-<<npcincr Robin trauma -2>><<lrtrauma>><<npcincr Robin love 2>><<glove 'Robin'>>
-<<stress -6>><<lstress>>
+<<lrtrauma>><<glove 'Robin'>><<lstress>>
 <br><br>
-<<getinicon>><<lanLink ['Take Robin through the door', '带罗宾穿过那扇门'] 'Deadwood Robin Tentacle Crossing'>><</lanLink>><br>
+<<getinicon>><<lanLink ['Take Robin through the door', '带罗宾穿过那扇门'] 'Deadwood Robin Tentacle Crossing'>>
+  <<if $RobinExpansion.asylum.status is 'admitted' and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>>
+    <<set $phase to 'robin_tentacle_crossing'>><<npcincr Robin lust 3>><<npcincr Robin trauma 3>><<stress 8>>
+  <</if>>
+<</lanLink>><br>
 <<getouticon>><<lanLink ['Leave Robin here and go back alone', '留下罗宾独自回去'] 'Tentacle Plains'>><<npcincr Robin trauma 2>><<grtrauma>><</lanLink>><br>
 
 :: Deadwood Robin Tentacle Crossing
-<<set $outside to 0>><<location 'tentworld'>><<effects>><<tentacleworldintro>>
-<<set $RobinExpansion.asylum.tentacle_steps to 0>><<set $RobinExpansion.asylum.tentacle_ambush to false>><<set $phase to 0>>
+<<set $outside to 0>><<location 'tentworld'>><<effects>>
+<<if $phase is 'robin_tentacle_crossing'>>
+  <<tentacleworldintro>><<set $RobinExpansion.asylum.tentacle_steps to 0>><<set $RobinExpansion.asylum.tentacle_ambush to false>><<set $phase to 0>>
+<</if>>
 <<language>>
   <<option 'EN'>>
     You lead Robin through the door. It closes behind you. Far across the plains,
@@ -107,23 +116,24 @@
       “你认得路，对吧？”罗宾问，仍然握着你的手。
     <</if>>
 <</language>>
-<<npcincr Robin lust 3>><<glust 'Robin'>><<npcincr Robin trauma 3>><<grtrauma>>
-<<stress 8>><<gstress>>
+<<glust 'Robin'>><<grtrauma>><<gstress>>
 <br><br>
-<<getinicon>><<lanLink ['Step out onto the plains', '走进平原'] 'Deadwood Robin Tentacle March'>><</lanLink>><br>
+<<getinicon>><<lanLink ['Step out onto the plains', '走进平原'] 'Deadwood Robin Tentacle March'>><<set $phase to 'robin_tentacle_march'>><</lanLink>><br>
 
 :: Deadwood Robin Tentacle March
 <<set $outside to 0>><<location 'tentworld'>><<effects>>
 <<if $tentacleorgasmignore is undefined>>
   <<set $tentacleorgasmignore to 0>>
 <</if>>
+<<set _robin_tentacle_walked to [1, 2, 3, 4].includes($phase)>>
+<<set _robin_tentacle_entered to (_robin_tentacle_walked or $phase is 'robin_tentacle_march') and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>>
 <<language>>
   <<option 'EN'>>
     Tendrils reach for you as you walk. The air is sweet. Robin grips your hand more tightly.
   <<option 'CN'>>
     你走过时，触须伸向你，空气散发着甜味。罗宾把你的手握得更紧了。
 <</language>>
-<<drugs 10>><<ggarousal>><<arousal 1200>>
+<<if _robin_tentacle_entered>><<drugs 10>><<ggarousal>><<arousal 1200>><</if>>
 <br><br>
 <<switch $phase>>
   <<case 1>>
@@ -140,13 +150,13 @@
     <br><br>
 <</switch>>
 <<set $phase to 0>>
-<<if random(1, 100) lte 50 and C.npc.Robin.trauma lt 80>>
+<<if _robin_tentacle_entered and _robin_tentacle_walked and random(1, 100) lte 50 and C.npc.Robin.trauma lt 80>>
   <<npcincr Robin trauma 1>><<grtrauma>>
 <</if>>
 <<if $stress gte $stressmax>>
   <<lanSwitch 'You cannot keep walking.' '你再也走不动了。'>>
   <br><br>
-  <<getouticon>><<lanLink ['Continue', '继续'] 'Deadwood Robin Tentacle Failed'>><</lanLink>><br>
+  <<getouticon>><<lanLink ['Continue', '继续'] 'Deadwood Robin Tentacle Failed'>><<set $phase to 'robin_tentacle_failed'>><</lanLink>><br>
 <<elseif $arousal gte $arousalmax and $eventskip isnot 1 and $tentacleorgasmignore lte 0>>
   <<orgasm>>
   <<language>>
@@ -191,7 +201,7 @@
           通往病院的门就在这里。罗宾停在门旁，迟迟没有上前。
         <</language>>
       <br>
-      <<asylumicon 'door'>><<lanLink ['Go back through the ward door', '从病院的门回去'] 'Deadwood Robin Tentacle Handover'>><</lanLink>>
+      <<asylumicon 'door'>><<lanLink ['Go back through the ward door', '从病院的门回去'] 'Deadwood Robin Tentacle Handover'>><<set $phase to 'robin_tentacle_handover'>><</lanLink>>
       <br><br>
     <</if>>
     <<if $tentnorth is $tentportalnorth and $tenteast is $tentportaleast>>
@@ -305,7 +315,7 @@
 <<actionsOmni>>
 
 <<if $stress gte $stressmax>>
-  <span id='next'><<lanLink ["Next", '继续'] 'Deadwood Robin Tentacle Failed'>><</lanLink>></span><<nexttext>>
+  <span id='next'><<lanLink ["Next", '继续'] 'Deadwood Robin Tentacle Failed'>><<set $phase to 'robin_tentacle_failed'>><</lanLink>></span><<nexttext>>
 <<elseif $tentacles.active lte ($tentacles.max / 2)>>
   <span id='next'><<lanLink ["Next", '继续'] 'Deadwood Robin Tentacle Combat Finish'>><</lanLink>></span><<nexttext>>
 <<else>>
@@ -315,7 +325,6 @@
 
 :: Deadwood Robin Tentacle Close
 <<set $outside to 0>><<location 'tentworld'>>
-<<set $RobinExpansion.asylum.tentacle_close += 1>>
 <<language>>
   <<option 'EN'>>
     You put an arm around Robin and wait.
@@ -344,14 +353,14 @@
       <<nnpc_He 'Robin'>>重新握住你的手。
     <</if>>
 <</language>>
-<<npcincr Robin trauma -2>><<lrtrauma>><<npcincr Robin love 1>><<glove 'Robin'>>
-<<stress -6>><<lstress>>
+<<lrtrauma>><<glove 'Robin'>><<lstress>>
 <br><br>
-<<getinicon>><<lanLink ['Keep moving across the plains', '继续穿过平原'] 'Deadwood Robin Tentacle March'>><</lanLink>><br>
+<<getinicon>><<lanLink ['Keep moving across the plains', '继续穿过平原'] 'Deadwood Robin Tentacle March'>><<set $phase to 'robin_tentacle_march'>><</lanLink>><br>
 
 :: Deadwood Robin Tentacle Combat Finish
 <<set $outside to 0>><<location 'tentworld'>><<effects>>
-<<set $RobinExpansion.asylum.tentacle_wave += 1>>
+<<set _robin_tentacle_finished to $combat is 1 and $tentacles.active lte $tentacles.max / 2 and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>>
+<<if _robin_tentacle_finished>><<set $RobinExpansion.asylum.tentacle_wave += 1>><</if>>
 <<language>>
   <<option 'EN'>>
     The tentacles loosen their grip and sink into the ground. You pull Robin away from them.
@@ -376,13 +385,20 @@
       “结束了吗？”罗宾问。你带<<nnpc_him 'Robin'>>离开，<<nnpc_he 'Robin'>>紧跟着你。
     <</if>>
 <</language>>
-<<npcincr Robin love 1>><<glove 'Robin'>><<stress 6>><<gstress>><<pain 4>><<gpain>>
+<<if _robin_tentacle_finished>>
+  <<npcincr Robin love 1>><<glove 'Robin'>><<stress 6>><<gstress>><<pain 4>><<gpain>>
+  <<endcombat>><<set $phase to 'robin_tentacle_rest'>>
+<</if>>
 <br><br>
-<<endcombat>>
 <<if $stress gte $stressmax>>
-  <<getouticon>><<lanLink ['Continue', '继续'] 'Deadwood Robin Tentacle Failed'>><</lanLink>><br>
+  <<getouticon>><<lanLink ['Continue', '继续'] 'Deadwood Robin Tentacle Failed'>><<set $phase to 'robin_tentacle_failed'>><</lanLink>><br>
 <<else>>
-  <<getinicon>><<lanLink ['Catch your breath', '喘口气'] 'Deadwood Robin Tentacle Rest'>><</lanLink>><br>
+  <<getinicon>><<lanLink ['Catch your breath', '喘口气'] 'Deadwood Robin Tentacle Rest'>>
+    <<if $phase is 'robin_tentacle_rest' and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>>
+      <<set $phase to 0>><<stress -2>>
+      <<if C.npc.Robin.trauma lt 80 and C.npc.Robin.dom gte 60>><<npcincr Robin dom 1>><</if>>
+    <</if>>
+  <</lanLink>><br>
 <</if>>
 
 :: Deadwood Robin Tentacle Rest
@@ -412,25 +428,33 @@
       <<nnpc_He 'Robin'>>点点头，握住你的手。
     <</if>>
 <</language>>
-<<stress -2>><<lstress>>
-<<if C.npc.Robin.trauma lt 80 and C.npc.Robin.dom gte 60>>
-  <<npcincr Robin dom 1>><<gdom 'Robin'>>
-<</if>>
+<<lstress>>
 <br><br>
 <<if $RobinExpansion.asylum.tentacle_close lt $RobinExpansion.asylum.tentacle_wave>>
-  <<loveicon>><<lanLink ['Comfort Robin (0:05)', '安慰罗宾 (0:05)'] 'Deadwood Robin Tentacle Close'>><<pass 5>><</lanLink>><br>
+  <<loveicon>><<lanLink ['Comfort Robin (0:05)', '安慰罗宾 (0:05)'] 'Deadwood Robin Tentacle Close'>>
+    <<pass 5>>
+    <<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.tentacle_close lt $RobinExpansion.asylum.tentacle_wave and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>>
+      <<set $RobinExpansion.asylum.tentacle_close += 1>>
+      <<npcincr Robin trauma -2>><<npcincr Robin love 1>><<stress -6>>
+    <</if>>
+  <</lanLink>><br>
 <</if>>
-<<getinicon>><<lanLink ['Keep moving across the plains', '继续穿过平原'] 'Deadwood Robin Tentacle March'>><</lanLink>><br>
+<<getinicon>><<lanLink ['Keep moving across the plains', '继续穿过平原'] 'Deadwood Robin Tentacle March'>><<set $phase to 'robin_tentacle_march'>><</lanLink>><br>
 
 :: Deadwood Robin Tentacle Escape
-<<set $outside to 0>><<location 'tentworld'>><<effects>>
-<<if $tentacleEntrance is 'asylum'>>
-  <<asylumescape>><<badEndTrackingEnd 'Asylum' { reason: 'asylumTentacle' }>>
+<<if $nextPassage or $nextPassageCheck or $replayScene or $statFreeze>><<deadwood-robin-asylum-next 'Forest'>><<exit>><</if>>
+<<set _robin_tentacle_rescued to $RobinExpansion.asylum.status is 'admitted'>>
+<<if _robin_tentacle_rescued>>
+  <<set $outside to 0>><<location 'tentworld'>><<effects>>
+  <<if $nextPassage or $nextPassageCheck>><<deadwood-robin-asylum-next 'Forest'>><<exit>><</if>>
+  <<if $tentacleEntrance is 'asylum'>>
+    <<asylumescape>><<badEndTrackingEnd 'Asylum' { reason: 'asylumTentacle' }>>
+  <</if>>
+  <<run maplebirch.get('Robin').asylum.rescue()>>
+  <<endevent>><<tentacleworldend>><<set $RobinExpansion.asylum.tentacle_steps to 0>><<set $RobinExpansion.asylum.tentacle_ambush to false>>
+  <<set $forest to random(50, 100)>>
 <</if>>
-<<run maplebirch.get('Robin').asylum.rescue()>>
-<<endevent>><<tentacleworldend>><<set $RobinExpansion.asylum.tentacle_steps to 0>><<set $RobinExpansion.asylum.tentacle_ambush to false>>
 <<set $outside to 1>><<location 'forest'>>
-<<set $forest to random(50, 100)>>
 <<language>>
   <<option 'EN'>>
     You lead Robin through the open door. It closes behind you. Trees surround you,
@@ -464,12 +488,15 @@
     <br><br>
     <span class='blue'>罗宾逃出了精神病院。</span><<nnpc_He 'Robin'>>仍需要时间恢复。
 <</language>>
-<<npcincr Robin trauma -12>><<lrtrauma>><<npcincr Robin love 3>><<glove 'Robin'>>
-<<stress -20>><<lstress>>
+<<if _robin_tentacle_rescued and $RobinExpansion.asylum.status is 'recovering'>>
+  <<npcincr Robin trauma -12>><<lrtrauma>><<npcincr Robin love 3>><<glove 'Robin'>><<stress -20>><<lstress>>
+<</if>>
 <br><br>
 <<getouticon>><<lanLink ['Keep walking into the forest', '继续往森林里走'] 'Forest'>><</lanLink>><br>
 
 :: Deadwood Robin Tentacle Handover
+<<set _robin_tentacle_handover to $phase is 'robin_tentacle_handover' and !$replayScene and !$statFreeze>>
+<<if _robin_tentacle_handover>><<set $phase to 0>><</if>>
 <<set $outside to 0>><<location 'asylum'>>
 <<if $suspicion isnot undefined and $asylumstatus isnot undefined>>
   <<asylumeffects>>
@@ -520,7 +547,9 @@
     <br><br>
     <span class='red'>罗宾仍被收容，你也被关进了精神病院。</span>
   <</language>>
-<<npcincr Robin trauma 8>><<grtrauma true>><<trauma 12>><<gtrauma>><<stress 12>><<gstress>>
+<<if _robin_tentacle_handover>>
+  <<npcincr Robin trauma 8>><<grtrauma true>><<trauma 12>><<gtrauma>><<stress 12>><<gstress>>
+<</if>>
 <br><br>
 <<set _robinAsylumRecord to $badEndStats.last()>>
 <<if _robinAsylumRecord?.source is 'Asylum' and !_robinAsylumRecord.trackedEnd>>
@@ -533,13 +562,15 @@
 <</if>>
 
 :: Deadwood Robin Tentacle Failed
+<<set _robin_tentacle_failed to $phase is 'robin_tentacle_failed' and !$replayScene and !$statFreeze>>
+<<if _robin_tentacle_failed>><<set $phase to 0>><</if>>
 <<set $outside to 0>><<location 'tentworld'>>
 <<if $combat is 1>>
   <<endcombat>>
 <</if>>
 <<run maplebirch.get('Robin').asylum.returnFromTentacles()>>
 <<set $RobinExpansion.asylum.tentacle_steps to 0>><<set $RobinExpansion.asylum.tentacle_ambush to false>>
-<<npcincr Robin trauma 4>><<grtrauma>><<trauma 8>><<gtrauma>>
+<<if _robin_tentacle_failed>><<npcincr Robin trauma 4>><<grtrauma>><<trauma 8>><<gtrauma>><</if>>
 <<language>>
   <<option 'EN'>>
     Your legs give way. Robin catches your hand, but cannot keep you standing.

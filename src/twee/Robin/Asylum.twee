@@ -1,8 +1,14 @@
 :: Deadwood Robin Asylum Widgets [widget]
+<!-- 强制遭遇由原版链接跳转接管，退出当前正文前仍须留下可继续的链接。 -->
+<<widget 'deadwood-robin-asylum-next'>>
+  <span id='next'><<lanLink ['Next', '继续'] _args[0]>><</lanLink>></span><<nexttext>>
+<</widget>>
+
 <<widget 'deadwood-robin-asylum-links'>>
+  <<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<exit>><</if>>
   <<set $_robinAsylumMenu to document.querySelector('#passage-content [data-passage="Asylum Cell"]')>>
   <<if $_robinAsylumMenu>>
-    <<if $RobinExpansion.asylum.status is 'admitted' and $location is 'asylum' and $asylumstate is 'free' and $stress lt $stressmax and Time.hour gte 7 and Time.hour lt 21>>
+    <<if $RobinExpansion.asylum.status is 'admitted' and $location is 'asylum' and $asylumstate is 'free' and $stress lt $stressmax>>
       <<socialiseicon>><<lanLink ['Find Robin inside the asylum', '在院内找罗宾'] 'Deadwood Robin Asylum Meeting'>><</lanLink>><br>
     <<elseif $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.plan gte 2 and $location is 'asylum' and $asylumstate is 'sleep' and Time.hour isnot 22 and $stress lt $stressmax and $asylumkeycard is 1 and !pcAreArmsBound('any')>>
       <<getouticon>><<lanLink ['Escape with Robin', '和罗宾一起逃走'] 'Deadwood Robin Asylum Escape'>><</lanLink>><br>
@@ -11,9 +17,11 @@
 <</widget>>
 
 :: Deadwood Robin Asylum Meeting
-<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.asylum.status isnot 'admitted'>>
-  <<lanSwitch 'You should not be on this ward.' '你不该出现在这个病区。'>>
+<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<deadwood-robin-asylum-next 'Asylum'>><<exit>><</if>>
+<<npc Robin>><<person1>>
+<<if $RobinExpansion.asylum.status isnot 'admitted' or $asylumstate isnot 'free' or $stress gte $stressmax>>
+  <<lanSwitch 'You cannot meet Robin here right now. An orderly points you back down the corridor.' '现在没法在这里与罗宾见面。护工指了指走廊，催你回去。'>>
 <<else>>
   <<set $RobinExpansion.asylum.met to true>>
   <<if $RobinExpansion.asylum.plan is 0>>
@@ -23,7 +31,7 @@
     <<if C.npc.Robin.trauma lt 80 and C.npc.Robin.dom gte 60>>
       <br><<lanSwitch '"I kept looking for a way out," Robin says. "I did not find one. But I am not going to just sit here until they let me go, either."' '“我一直在找出去的路。”罗宾说，“我没找到。但我也不会就这么坐着，等他们放我走。”'>>
     <<else>>
-      <br><<lanSwitch '"I thought I would never see you again," Robin whispers. You promise not to leave Robin behind. After a moment, Robin begins telling you what has been happening on this ward.' '“我还以为再也见不到你了。”罗宾低声说。你答应不会把罗宾留在这里。过了一会儿，罗宾开始告诉你病区这段时间发生的事。'>>
+      <br><<lanSwitch '"I thought I would never see you again," Robin whispers. You lower your voice as an orderly passes. After a moment, Robin begins telling you what has been happening on this ward.' '“我还以为再也见不到你了。”罗宾低声说。护工从旁边走过，你压低了声音。过了一会儿，罗宾开始告诉你病区这段时间发生的事。'>>
     <</if>>
     <<if $RobinExpansion.asylum.days_confined gte 7>>
       <br><<lanSwitch 'Robin has learned the treatment schedule too well. A distant bell makes Robin flinch before either of you sees the orderlies coming.' '罗宾对治疗时间已经熟悉得过头了。远处铃声一响，还没看见护工，罗宾便先缩了一下。'>>
@@ -44,6 +52,9 @@
   <br><br>
   <<if $RobinExpansion.asylum.visit_day isnot Time.days>>
     <<socialiseicon>><<lanLink ['Spend time with Robin (0:30)', '陪罗宾待一会儿 (0:30)'] 'Deadwood Robin Asylum Visit'>><</lanLink>><br>
+    <<if $exposed is 0 or ($exposed is 1 and hasSexStat('exhibitionism', 3)) or ($exposed is 2 and hasSexStat('exhibitionism', 5))>>
+      <<exerciseicon>><<lanLink ['Exercise outside with Robin (0:30)', '和罗宾到外面锻炼 (0:30)'] 'Deadwood Robin Asylum Exercise'>><</lanLink>><<gathletics>><<gtiredness>><br>
+    <</if>>
   <</if>>
   <<if $RobinExpansion.asylum.plan lt 2 and $RobinExpansion.asylum.plan_day isnot Time.days>>
     <<socialiseicon>><<lanLink ['Plan an escape with Robin (0:20)', '和罗宾计划逃离 (0:20)'] 'Deadwood Robin Asylum Plan'>><</lanLink>>
@@ -60,30 +71,72 @@
 <br><br><<getouticon>><<lanLink ['Back into the yard', '回到院内'] 'Asylum'>><</lanLink>>
 
 :: Deadwood Robin Asylum Visit
-<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.visit_day isnot Time.days and $asylumstate is 'free'>>
+<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<deadwood-robin-asylum-next 'Asylum'>><<exit>><</if>>
+<<npc Robin>><<person1>>
+<<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.visit_day isnot Time.days and $asylumstate is 'free' and $stress lt $stressmax>>
+  <<pass 30>>
+  <<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $location isnot 'asylum' or $passage isnot 'Deadwood Robin Asylum Visit' or $RobinExpansion.asylum.status isnot 'admitted'>><<deadwood-robin-asylum-next 'Asylum'>><<exit>><</if>>
   <<set $RobinExpansion.asylum.visit_day to Time.days>>
-  <<set _robinVisit to random(1, 4)>>
-  <<switch _robinVisit>>
+  <<set _robin_visit to random(1, 4)>>
+  <<switch _robin_visit>>
     <<case 1>>
       <<lanSwitch 'Robin slides a book across the table. The page is open to a drawing of the town. "I have been trying to remember which way the streets turn," Robin says. You trace the route back to the orphanage together.' '罗宾把一本书推到你面前，摊开的那页画着城镇。“我一直在想，街道到底朝哪边拐。”罗宾说。你们一起顺着纸上的路，找回孤儿院。'>>
     <<case 2>>
-      <<lanSwitch 'A trolley rattles past the recreation room. Robin grips the edge of the table until the sound fades. You move your hand close, leaving Robin room to choose whether to take it. After a moment, Robin does.' '推车从活动室门外经过。罗宾攥着桌沿，直到车轮声远去。你把手放近一些，留给罗宾自己选择。过了一会，罗宾握住了它。'>>
+      <<lanSwitch 'A trolley rattles past the recreation room. Robin grips the edge of the table until the sound fades. You hold out your hand across the table. After a moment, Robin takes it.' '推车从活动室门外经过。罗宾攥着桌沿，直到车轮声远去。你隔着桌子伸出手。过了一会儿，罗宾握住了它。'>>
     <<case 3>>
       <<lanSwitch 'Robin has saved half a biscuit from lunch. "I was not sure they would let us sit together," Robin says. You break it in two before the orderly returns.' '罗宾从午餐里留了半块饼干。“我不知道他们会不会让我们坐在一起。”罗宾说。趁护工回来之前，你把饼干掰成两半。'>>
-    <<default>>
-      <<lanSwitch 'You and Robin talk about the drinks stall. Robin names the ingredients from memory, then pauses. "Do you think it will still be there?" You remind Robin that the stall can wait for its owner.' '你和罗宾聊起饮品摊。罗宾凭记忆数着原料，数到一半却停住了。“它还会在吗？”你告诉罗宾，摊位会等它的主人回来。'>>
+    <<case 4>>
+      <<if $RobinExpansion.lemonade gt 0 or $RobinExpansion.chocolate gt 0>>
+        <<lanSwitch 'You and Robin talk about the drinks stall. Robin names the ingredients from memory, then pauses. "Do you think it will still be there?" You work out what <<he>> would need to get it running again. Robin starts counting the cups on <<his>> fingers.' '你和罗宾聊起饮品摊。罗宾凭记忆数着原料，数到一半却停住了。“它还会在吗？”你们算了算，重新出摊还需要些什么。罗宾开始扳着指头数杯子。'>>
+      <<else>>
+        <<lanSwitch 'You talk about the games you used to play at the orphanage. Robin remembers one you had forgotten. For a little while, neither of you mentions the locked doors.' '你们聊起从前在孤儿院玩过的游戏。罗宾还记得一种连你都忘了的玩法。有一会儿，你们谁也没提那些上锁的门。'>>
+      <</if>>
   <</switch>>
+  <<if isLoveInterest('Robin')>>
+    <br><br><<lanSwitch 'Robin rests against your shoulder. "I missed this," <<he>> whispers. At the sound of keys, <<he>> sits straight again, but stays beside you.' '罗宾靠在你肩上。“我好想这样。”<<he>>小声说。钥匙声响起时，<<he>>重新坐直了，却没有挪开。'>>
+  <<elseif C.npc.Robin.dom gte 60 and C.npc.Robin.trauma lt 80>>
+    <br><br><<lanSwitch '"How are you holding up?" Robin asks. This time <<he>> waits for your answer instead of asking when you can come back.' '“你还好吗？”罗宾问。这一次，<<he>>没有急着问你什么时候再来，而是等着你回答。'>>
+  <</if>>
   <br><br><span class='green'><<lanSwitch 'Robin seems a little steadier with you nearby.' '有你在身边，罗宾稍微安定了一些。'>></span>
-  <<pass 30>><<npcincr Robin trauma -2>><<npcincr Robin love 1>><<lrtrauma>><<glove>>
+  <<npcincr Robin trauma -2>><<npcincr Robin love 1>><<lrtrauma>><<glove>>
 <<else>>
   <<lanSwitch 'Robin needs some quiet now.' '罗宾现在需要安静一会。'>>
 <</if>>
 <br><br><<getouticon>><<lanLink ['Back into the yard', '回到院内'] 'Asylum'>><</lanLink>>
 
+:: Deadwood Robin Asylum Exercise
+<<set $outside to 1>><<set $location to 'asylum'>><<asylumeffects>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<deadwood-robin-asylum-next 'Asylum'>><<exit>><</if>>
+<<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.visit_day isnot Time.days and $asylumstate is 'free' and $stress lt $stressmax and ($exposed is 0 or ($exposed is 1 and hasSexStat('exhibitionism', 3)) or ($exposed is 2 and hasSexStat('exhibitionism', 5)))>>
+  <<pass 30>>
+  <<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $location isnot 'asylum' or $passage isnot 'Deadwood Robin Asylum Exercise' or $RobinExpansion.asylum.status isnot 'admitted'>><<deadwood-robin-asylum-next 'Asylum'>><<exit>><</if>>
+  <<set $RobinExpansion.asylum.visit_day to Time.days>>
+  <<npc Robin>><<person1>>
+  <<lanSwitch 'You join Robin on the path around the grounds. An orderly watches from the door. You start at a walk, then pick up the pace whenever the path turns away from the building.' '你和罗宾走上绕院子的小路。护工站在门口盯着。你们先慢慢走，等小路拐向楼后的时候，再加快脚步。'>>
+  <br><br>
+  <<if C.npc.Robin.trauma gte 80>>
+    <<lanSwitch 'Robin stops when a whistle sounds across the yard. You stop too. It was meant for another patient. You wait until <<he>> looks up, then start the next lap together.' '院子另一头传来哨声，罗宾停住了脚步。你也停下来。那声哨子是在叫别人。你等到<<he>>抬起头，再陪<<him>>走下一圈。'>>
+  <<elseif C.npc.Robin.dom gte 60>>
+    <<lanSwitch 'Robin starts counting laps under <<his>> breath. "One more?" <<he>> asks. <<He>> is breathing hard, but waits for you before starting again.' '罗宾小声数着圈数。“再跑一圈？”<<he>>问，喘得厉害，却还是等着你一起迈步。'>>
+  <<else>>
+    <<lanSwitch 'Robin falls a few paces behind. You slow down until <<he>> catches up. By the last lap, <<he>> is keeping pace without watching your feet.' '罗宾落下了几步。你放慢脚步，等<<he>>追上来。到了最后一圈，<<he>>已经不必盯着你的脚，也能跟上了。'>>
+  <</if>>
+  <br><br><<lanSwitch 'The two of you finish out of breath. When the orderly calls you back inside, Robin asks whether you can do this again.' '你们两个都跑得气喘吁吁。护工叫你们回去时，罗宾问，以后还能不能一起跑。'>>
+  <<if $exposed is 2>><<exhibitionism5>><<elseif $exposed is 1>><<exhibitionism3>><</if>>
+  <<athletics 2>><<tiredness 3>><<stress -6>><<npcincr Robin trauma -1>><<gathletics>><<gtiredness>><<lstress>><<lrtrauma>>
+<<else>>
+  <<lanSwitch 'Robin cannot join you outside right now.' '罗宾现在没法陪你到外面去。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink ['Back into the yard', '回到院内'] 'Asylum'>><</lanLink>>
+
 :: Deadwood Robin Asylum Plan
-<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.plan lt 2 and $RobinExpansion.asylum.plan_day isnot Time.days and $asylumstate is 'free'>>
+<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<deadwood-robin-asylum-next 'Asylum'>><<exit>><</if>>
+<<npc Robin>><<person1>>
+<<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.plan lt 2 and $RobinExpansion.asylum.plan_day isnot Time.days and $asylumstate is 'free' and $stress lt $stressmax>>
+  <<pass 20>>
+  <<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $location isnot 'asylum' or $passage isnot 'Deadwood Robin Asylum Plan' or $RobinExpansion.asylum.status isnot 'admitted'>><<deadwood-robin-asylum-next 'Asylum'>><<exit>><</if>>
   <<set $RobinExpansion.asylum.plan_day to Time.days>>
   <<set $RobinExpansion.asylum.plan += 1>>
   <<if $RobinExpansion.asylum.plan is 1>>
@@ -99,23 +152,25 @@
       <<lanSwitch 'Robin describes the service corridor beyond the staff door a second time, in the same words, to be sure of it. You work out the route to the fence and where the guards change. Robin follows your finger along it and nods, then hides the scrap of paper before an orderly enters.' '罗宾把员工通道后的侧廊又描述了一遍，用的还是同样的措辞，生怕说错。通往围栏的路线和守卫换班的位置由你推出来。罗宾顺着你的手指看过去，点了点头，随后赶在护工进门前把纸片藏好。'>>
     <</if>>
   <</if>>
-  <<pass 20>><<npcincr Robin love 1>><<glove>>
+  <<npcincr Robin love 1>><<glove>>
 <<else>>
   <<lanSwitch 'There is nothing more to plan here.' '这里已经没有更多需要商量的事。'>>
 <</if>>
 <br><br><<getouticon>><<lanLink ['Back into the yard', '回到院内'] 'Asylum'>><</lanLink>>
 
 :: Deadwood Robin Asylum Escape
-<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>><<npc Robin>><<person1>>
-<<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.plan gte 2 and $asylumkeycard is 1 and $asylumstate is 'sleep' and !pcAreArmsBound('any')>>
-  <<set _escapeChance to Math.clamp(45 + currentSkillValue('skulduggery') / 8 + $asylumstatus / 4 - $suspicion / 3, 20, 90)>>
+<<set $outside to 0>><<set $location to 'asylum'>><<asylumeffects>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<deadwood-robin-asylum-next 'Asylum'>><<exit>><</if>>
+<<npc Robin>><<person1>>
+<<if $RobinExpansion.asylum.status is 'admitted' and $RobinExpansion.asylum.met and $RobinExpansion.asylum.plan gte 2 and $asylumkeycard is 1 and $asylumstate is 'sleep' and Time.hour isnot 22 and $stress lt $stressmax and !pcAreArmsBound('any')>>
+  <<set _escape_chance to Math.clamp(45 + currentSkillValue('skulduggery') / 8 + $asylumstatus / 4 - $suspicion / 3, 20, 90)>>
   <<lanSwitch 'You open the staff door with Harper\'s keycard. Robin meets you beyond the corner, pale but ready. The sound of a trolley approaching forces you both against the wall. You wait for it to pass, then make for the outer gate.' '你用哈珀的门禁卡打开员工通道。罗宾在转角后与你会合，脸色苍白，却已经准备好了。一辆推车的声音逼得你们贴紧墙面。等车过去，才赶向外门。'>>
   <br><br>
-  <<if random(1, 100) lte _escapeChance>>
+  <<if random(1, 100) lte _escape_chance>>
     <<lanSwitch 'A guard turns just as you reach the gate. Robin pulls you behind the supply trolley; its wheels squeal loudly enough to mask the card reader. You squeeze through, cross the grounds and climb the fence together. Only when the trees hide the asylum do you stop running. Robin is still holding your hand.' '你们刚到大门，一名守卫就转过头来。罗宾把你拉到运货车后，车轮的吱呀声正好盖过读卡器的响动。你们挤过门，穿过院子，一起翻越围栏。直到树林遮住精神病院，你们才敢停下。罗宾还握着你的手。'>>
     <br><br><span class='green'><<lanSwitch 'You both made it beyond the fence.' '你们两个都翻出了围栏。'>></span>
     <<asylumescape>><<run maplebirch.get('Robin').asylum.escape()>><<badEndTrackingEnd 'Asylum' { reason: 'asylumSabotage' }>>
-    <<stress -12>><<trauma -6>><<npcincr Robin trauma -15>><<npcincr Robin love 3>><<lstress>><<ltrauma>><<lrtrauma>><<glove>>
+    <<stress -12>><<trauma -6>><<npcincr Robin trauma -15>><<npcincr Robin love 5>><<lstress>><<ltrauma>><<lrtrauma>><<glove>>
     <br><br><<lanLink ["Continue","继续"] 'Deadwood Robin Asylum Reunion'>><</lanLink>>
   <<else>>
     <<lanSwitch 'The guard hears the card reader and shouts. Robin shoves you toward the nearer exit, but the orderlies block it. You refuse to leave Robin behind. They seize the card and drag you apart. Robin cries out as they take Robin back to the ward.' '守卫听见读卡器的声音，厉声喊人。罗宾推你朝近处的出口跑，护工却堵住了路。你不肯丢下罗宾。他们夺走门禁卡，将你们强行分开。罗宾被带回病区时，喊了你的名字。'>>
@@ -130,25 +185,36 @@
 
 :: Deadwood Robin Asylum Reunion
 <<set $outside to 1>><<set $location to 'forest'>><<effects>><<npc Robin>><<person1>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $RobinExpansion.asylum.status isnot 'recovering'>><<deadwood-robin-asylum-next 'Forest'>><<exit>><</if>>
 <<lanSwitch 'The trees hide the lights of the asylum. Robin lets go of your hand only long enough to check the marks left by the fence. "We are really out," Robin says, as if saying it aloud might make it true.' '树木遮住了精神病院的灯光。罗宾松开你的手，查看围栏留下的擦伤。“我们真的出来了。”罗宾说，仿佛说出口才能相信。'>>
 <br><br>
-<<loveicon 'hug'>><<lanLink ['Hold Robin close', '抱紧罗宾'] 'Deadwood Robin Asylum Reunion Hug'>><<npcincr Robin love 2>><<glove>><</lanLink>><br>
+<<loveicon 'hug'>><<lanLink ['Hold Robin close', '抱紧罗宾'] 'Deadwood Robin Asylum Reunion Hug'>><</lanLink>><br>
 <<socialiseicon 'ask'>><<lanLink ['Ask Robin what comes next', '问罗宾今后的打算'] 'Deadwood Robin Asylum Reunion Talk'>><</lanLink>><br>
 <<getouticon>><<lanLink ['Keep moving together', '一起继续赶路'] 'Deadwood Robin Asylum Reunion Move'>><</lanLink>>
 
 :: Deadwood Robin Asylum Reunion Hug
 <<set $outside to 1>><<set $location to 'forest'>><<effects>><<npc Robin>><<person1>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $RobinExpansion.asylum.status isnot 'recovering'>><<deadwood-robin-asylum-next 'Forest'>><<exit>><</if>>
 <<lanSwitch 'You draw Robin close. For a moment Robin stands rigid, listening for footsteps. Then Robin leans into you and begins to shake. You stay until Robin can breathe evenly again. When you step apart, Robin reaches for your hand.' '你把罗宾拉进怀里。罗宾僵着身子，仍在听身后有没有脚步声。过了一会，罗宾靠向你，浑身发抖。你没有催，直到罗宾的呼吸慢慢平稳。分开时，罗宾重新握住你的手。'>>
 <br><br><span class='green'><<lanSwitch 'You are leaving together.' '你们一起离开。'>></span>
 <br><br><<getouticon>><<lanLink ['Enter the forest', '进入森林'] 'Forest'>><<set $forest to 100>><<endevent>><</lanLink>>
 
 :: Deadwood Robin Asylum Reunion Talk
 <<set $outside to 1>><<set $location to 'forest'>><<effects>><<npc Robin>><<person1>>
-<<lanSwitch '"What will you do when we get back?" you ask. Robin glances toward the town. "Sleep somewhere I can open the door myself," Robin says. "Then see what is left of the stall. We can decide the rest when it is light."' '“回去以后，你打算怎么办？”你问。罗宾朝城镇的方向看了一眼。“先找个能自己开门的地方睡觉。”罗宾说，“再去看看摊位。其他的，天亮后再商量。”'>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $RobinExpansion.asylum.status isnot 'recovering'>><<deadwood-robin-asylum-next 'Forest'>><<exit>><</if>>
+<<lanSwitch '"What will you do when we get back?" you ask. Robin glances toward the town. "Sleep somewhere I can open the door myself," <<he>> says.' '“回去以后，你打算怎么办？”你问。罗宾朝城镇的方向看了一眼。“先找个能自己开门的地方睡觉。”<<he>>说。'>>
+<<if $RobinExpansion.shop>>
+  <<lanSwitch '"Then see what happened to the shop. The rest can wait until it is light."' '“再去看看店里怎么样。其他的，天亮后再商量。”'>>
+<<elseif $RobinExpansion.lemonade gt 0 or $RobinExpansion.chocolate gt 0>>
+  <<lanSwitch '"Then see what is left of the stall. The rest can wait until it is light."' '“再去看看摊位。其他的，天亮后再商量。”'>>
+<<else>>
+  <<lanSwitch '"I want to go home. The rest can wait until it is light."' '“我想回家。其他的，天亮后再商量。”'>>
+<</if>>
 <br><br><span class='blue'><<lanSwitch 'Robin does not pretend the last few days have been easy.' '罗宾没有假装这几天的事都已经过去。'>></span>
 <br><br><<getouticon>><<lanLink ['Enter the forest', '进入森林'] 'Forest'>><<set $forest to 100>><<endevent>><</lanLink>>
 
 :: Deadwood Robin Asylum Reunion Move
 <<set $outside to 1>><<set $location to 'forest'>><<effects>><<npc Robin>><<person1>>
+<<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $RobinExpansion.asylum.status isnot 'recovering'>><<deadwood-robin-asylum-next 'Forest'>><<exit>><</if>>
 <<lanSwitch 'You gesture toward the path. Robin nods and follows, keeping close enough that your shoulders brush. Neither of you speaks until the asylum lights are far behind you.' '你指向林间小路。罗宾点点头，紧跟在你身侧，肩膀偶尔碰到一起。直到精神病院的灯光被远远甩在身后，你们才重新开口。'>>
 <br><br><<getouticon>><<lanLink ['Enter the forest', '进入森林'] 'Forest'>><<set $forest to 100>><<endevent>><</lanLink>>

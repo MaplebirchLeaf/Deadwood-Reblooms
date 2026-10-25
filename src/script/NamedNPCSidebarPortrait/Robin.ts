@@ -40,6 +40,8 @@ export default function (
 
     const sidebar = maplebirch.get('NPCSidebarPortrait') as NPCSidebarPortrait;
     const wardrobe = maplebirch.npc.Clothes.wardrobe;
+    // 院内与营救途中保持病号服。
+    wardrobe.wear('Robin', 'asylum', 'patient_gown');
 
     // 基层内衣：男性使用男性内衣，其他性别使用女性内衣
     wardrobe.base('Robin', (clothes, context) => {
@@ -50,7 +52,7 @@ export default function (
       }
 
       // 基层发饰：佩戴花环
-      if (context.key !== 'naked') sidebar.apply(clothes, Clothing.flower_crown);
+      if (context.key !== 'naked' && context.location !== 'asylum') sidebar.apply(clothes, Clothing.flower_crown);
 
       // 神殿贞操器具和剧情里的实际穿戴状态一致。
       const chastity = C.npc?.Robin?.chastity;
@@ -296,6 +298,9 @@ export default function (
     const title = maplebirch.passage.title;
     // 未解锁 Robin，不参与日程
     if (C.npc?.Robin?.init !== 1) return '';
+
+    // 住院与刚逃出的连续场景优先于上学、睡觉和约好的外出。
+    if (V.RobinExpansion?.asylum?.status === 'admitted' || title.startsWith('Deadwood Robin Asylum') || title.startsWith('Deadwood Robin Tentacle')) return 'asylum';
 
     // 历史项目湖底勘察
     if (title.startsWith('Deadwood Reblooms History Project Lake') && V.LifeSimulation?.historyProject?.assistant) return 'historyDive';

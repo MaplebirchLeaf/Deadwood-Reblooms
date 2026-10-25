@@ -20,6 +20,7 @@ const wardrobeKeys = [
   'school_swimsuit',
   'diving_suit',
   'pyjama',
+  'patient_gown',
   'towel_wrap',
   ...templeKeys,
   'witch',

@@ -14,7 +14,6 @@ export default class RobinAsylum extends Shared {
   /** 带罗宾一起逃离：需已入院、计划推进到位且已探视过。 */
   public escape(): void {
     const asylum = this.state.asylum;
-    if (asylum.status === 'admitted') V.robinReunionScene = undefined;
     if (asylum.status !== 'admitted' || asylum.plan < 2 || !asylum.met) return;
     this.release();
   }
@@ -48,6 +47,7 @@ export default class RobinAsylum extends Shared {
   /** 收容结束：进入恢复期、清空计划，恢复原有债务并清除重复重逢标记。 */
   private release(): void {
     const asylum = this.state.asylum;
+    if (V.replayScene || V.statFreeze || asylum.status !== 'admitted') return;
     asylum.status = 'recovering';
     asylum.plan = 0;
     asylum.severe_days = 0;
