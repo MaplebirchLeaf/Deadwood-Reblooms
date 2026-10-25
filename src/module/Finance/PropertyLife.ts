@@ -203,7 +203,9 @@ export default class PropertyLife {
       } else {
         if (!food || (V.foodstuff[item!]?.amount ?? 0) < (action === 'wine' ? 1 : 2)) return false;
         if (food.food?.tags?.includes('tainted') || (action === 'tea' && food.food?.tags?.includes('alcohol'))) return false;
-        if (action === 'wine' ? !['red_wine', 'white_wine'].includes(item!) : food.category !== 'dish' || (food.food?.tags?.includes('drink') ?? false) !== (action === 'tea')) return false;
+        if (action === 'wine' ? !['red_wine', 'white_wine'].includes(item!) : food.category !== 'dish' || (food.food?.tags?.includes('drink') ?? false) !== (action === 'tea')) {
+          return false;
+        }
       }
     }
     const property = this.estate.current!;
