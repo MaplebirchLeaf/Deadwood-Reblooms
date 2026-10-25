@@ -72,7 +72,8 @@ export default class RobinFishing extends Shared {
       this.state.fish_sold_today += amount;
       const sharePennies = this.basePricePennies(type) * amount;
       V.money += sharePennies;
-      this.state.reserve = Math.round(this.state.reserve * 100 + sharePennies) / 100;
+      if (V.location === 'deadwood_robin_shop') this.facade.shop.partnership.receive(sharePennies);
+      else this.state.reserve = Math.round(this.state.reserve * 100 + sharePennies) / 100;
       this.state.fish_earnings_today = Math.round(this.state.fish_earnings_today * 100 + sharePennies) / 100;
     }
     return true;

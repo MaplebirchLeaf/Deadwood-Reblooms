@@ -88,8 +88,10 @@
 <<if $Finance.collection.amount lte 0>>
   <<set _marginSymbol to 'AVY'>>
   <<set _marginShares to 10>><<set _marginLots to 100>><<set _stockLeverage to 2>><<set _stockSide to 1>><<set _futuresLeverage to 5>>
+  <<if ['ALF', 'RDS'].includes(_marginSymbol)>><<set _marginSymbol to 'AVY'>><</if>>
+  <<if ['ALF', 'RDS'].includes(_futuresSymbol)>><<set _futuresSymbol to 'AVY'>><</if>>
   <<set _marginOptions to {}>>
-  <<for _riskSecurity range maplebirch.get('Finance').securities>>
+  <<for _riskSecurity range maplebirch.get('Finance').securities.filter(item => !['ALF', 'RDS'].includes(item.symbol))>>
     <<set _marginOptions[maplebirch.t(_riskSecurity.name)] to _riskSecurity.symbol>>
   <</for>>
   <div class='deadwood-card-grid'>

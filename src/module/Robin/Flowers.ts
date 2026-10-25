@@ -49,7 +49,7 @@ export default class RobinFlowers extends Shared {
 
   /** 首次添置花架：花 100 英镑，附赠 10 支雏菊。 */
   public add(): boolean {
-    if (!this.state.shop || this.state.shop_flowers || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(100)) return false;
+    if (!this.state.shop || this.state.shop_flowers || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.facade.shop.spend(100)) return false;
     this.state.shop_flowers = true;
     this.state.flower_stock.daisy = 10;
     return true;
@@ -57,7 +57,7 @@ export default class RobinFlowers extends Shared {
 
   /** 库存见底时补 10 支雏菊，花 15 英镑。 */
   public restock(): boolean {
-    if (!this.state.shop_flowers || this.stockTotal > 5 || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.spend(15)) return false;
+    if (!this.state.shop_flowers || this.stockTotal > 5 || !this.robinAvailable || window.getRobinLocation() !== 'shop' || !this.facade.shop.spend(15)) return false;
     this.state.flower_stock.daisy = (this.state.flower_stock.daisy || 0) + 10;
     return true;
   }
@@ -67,7 +67,7 @@ export default class RobinFlowers extends Shared {
     if (!V.foodstuff?.[type] || V.foodstuff[type].amount < 10) return false;
     const pounds = (setup.foodstuff[type]?.shop?.sell_price ?? 0) / 10;
     if (pounds <= 0) return false;
-    if (!this.spend(pounds)) return false;
+    if (!this.facade.shop.spend(pounds)) return false;
     V.foodstuff[type].amount -= 10;
     V.money += pounds * 100;
     this.state.flower_stock[type] = (this.state.flower_stock[type] || 0) + 10;
@@ -81,7 +81,7 @@ export default class RobinFlowers extends Shared {
     if (!(this.finance?.canPay(price * 100, 'shopping') ?? V.money >= price * 100)) return false;
     V.foodstuff[type].amount++;
     this.state.flower_stock[type]--;
-    this.state.reserve += price;
+    this.facade.shop.partnership.receive(Math.round(price * 100));
     return true;
   }
 }

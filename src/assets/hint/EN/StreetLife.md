@@ -66,7 +66,7 @@ Drinks for the upstairs gambling room, pub uniforms, cafe supplies and dockside 
 
 Late delivery normally pays 75%. Unresolved shortages and price disputes also reduce payment, and both reductions can apply. Theft of a loaded vehicle, seized cargo and an expired grace period can prevent completion.
 
-## Start with smaller jobs
+## The three smaller arrangements
 
 Discover the smuggler's pub, meet Landry and reach 20 street standing to ask about people and work between 09:00 and 18:00. Landry must be willing to talk: at least 20 affection, twenty-five completed original blackbox tasks, or <span class="gold">£1,000</span> actually earned through fencing. You also need any one of these: two paid street jobs, three completed original blackbox tasks, or <span class="gold">£1,000</span> earned through fencing. Old results will not persuade Landry if you have already fallen out.
 
@@ -86,7 +86,7 @@ None of these jobs needs a perfect result. A reduced delivery, a load left behin
 
 To change the crew, return to **unfinished business** at the pub and spend five minutes choosing **Put the arrangement on hold**. You can pause even if a hire cannot currently take part. Your current step, findings, decisions and expenses are kept. Once you have arranged an available scout and carrier, spend another five minutes choosing **Agree on the crew and continue**, then pick up at the unfinished step. Earlier checks are not rolled again, and payments or experience already earned are not awarded twice. Pausing does not count as completion, and a settled arrangement cannot be reopened.
 
-## The people you work with
+## Crew and ongoing work
 
 Landry introduces the same three people. Their names and appearances, separate starting abilities and individual growth rates are set at that introduction. Looking again does not replace them. Scouting and carrying are separate abilities, so consider both before choosing by price.
 

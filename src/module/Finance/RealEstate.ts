@@ -903,8 +903,6 @@ class RealEstate {
       // 已催收的公司货款先结清，才能承担对应工厂当天的工资。
       this.finance.company.advance(day);
       this.finance.industry.advance(day);
-      // 店铺先支付到期供货款，再用剩余营业资金分红或回购份额。
-      this.core.get('Robin')?.shop.investment.advance(day);
       this.mortgage.advanceThrough(day);
       this.finance.advanceBankThrough(day);
       this.finance.company.suite.advance(day);

@@ -166,13 +166,11 @@
 <<deadwood-card 'Profit and financing proposals' '利润与融资提案'>>
   <<language>>
     <<option 'EN'>>
-      The report uses the company's existing weekly dividend basis. Income pays it in full. Reserve pays half and retains half. Expansion retains all of it in company funds.
-      Purchasing follows the same resolution. Reserve adds five percentage points to supply partners' advances. Expansion requires 25% more goods, at the agreed unit price and deadline. Income restores the ordinary supply schedule. Signed orders are unchanged.
+      The clerk has set out three proposals using the same weekly dividend basis. Purchasing will follow the resolution; signed orders stay as agreed.
       A passed resolution also permits one new-share subscription before the next meeting. The issue is limited to 25% of the current total shares, priced at 110% of the current market quote.
       <br><br>Avery supports keeping funds for construction. While the unfinished project needs funding, the other represented votes oppose a return to full dividends. A majority holding lets you pass that proposal yourself.
     <<option 'CN'>>
-      报告沿用公司现有的每周分红基准。分红方案全额派发，储备方案派发一半、留存一半，扩张方案全部留在公司账上。
-      采购部门也按决议调整。储备方案将合作供货商的预付款比例提高五个百分点，扩张方案按约定单价增加四分之一的货物，交期不变。分红方案恢复普通供货安排，已签订单照旧。
+      职员按同一份每周分红基准，列出了三份提案。采购部门会按决议调整，已经签下的订单照旧。
       通过决议后，下次会议前可认购一次新股。增发上限为当时总股本的 25%，认购价为当前行情的 110%。
       <br><br>艾弗里支持为施工留钱。工程尚未完成、仍需筹款时，其余出席股东反对恢复全额分红。取得多数表决权后，你可以让自己的提案通过。
   <</language>><br><br>
@@ -182,6 +180,20 @@
         <<set $Finance.company.result to maplebirch.get('Finance').company.shareholders.meeting(_policy) ? 'corporate-ok' : 'corporate-failed'>>
         <<if $Finance.company.result is 'corporate-ok'>><<pass 30>><</if>><<endevent>>
       <</lanLink>><br>
+      <span class='blue'><<language>>
+        <<option 'EN'>>
+          <<switch _policy>>
+            <<case 'reserve'>>Pay <<print (_shareholders.terms.retainedRate * 100).toFixed(0)>>% of the usual dividend and retain the rest. Supply partners receive an extra <<print (_shareholders.terms.supplyReserveAdvance * 100).toFixed(0)>> percentage points in advance.
+            <<case 'expansion'>>Retain the whole dividend. New supply orders require <<print ((_shareholders.terms.supplyExpansionMultiplier - 1) * 100).toFixed(0)>>% more goods at the same unit price and deadline.
+            <<case 'income'>>Pay the full dividend. New supply orders return to the ordinary quantities and advances.
+          <</switch>>
+        <<option 'CN'>>
+          <<switch _policy>>
+            <<case 'reserve'>>派发原分红的<<print (_shareholders.terms.retainedRate * 100).toFixed(0)>>%，余下留存。合作供货商的预付款比例提高<<print (_shareholders.terms.supplyReserveAdvance * 100).toFixed(0)>>个百分点。
+            <<case 'expansion'>>分红全部留存。新供货订单增加<<print ((_shareholders.terms.supplyExpansionMultiplier - 1) * 100).toFixed(0)>>%货物，单价与交期不变。
+            <<case 'income'>>全额派发分红。新供货订单恢复普通的数量与预付款安排。
+          <</switch>>
+      <</language>></span><br><br>
     <</capture>>
   <</for>>
 <</deadwood-card>>

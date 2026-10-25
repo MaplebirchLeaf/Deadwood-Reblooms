@@ -757,6 +757,7 @@ class Finance extends Module {
   }
 
   public buy(symbol: unknown, amount: unknown): FinanceResult {
+    if (symbol === 'ALF' || symbol === 'RDS') return 'share-limit';
     this.advanceMarketThrough(Finance.currentDay);
     const { brokerage, market } = this.state;
     if (!brokerage.opened) return 'brokerage-required';
@@ -814,6 +815,7 @@ class Finance extends Module {
   }
 
   public maximumShares(symbol: string): number {
+    if (symbol === 'ALF' || symbol === 'RDS') return 0;
     const available = this.shareSupply[symbol]?.available ?? 0;
     const price = this.state.market.prices[symbol];
     if (!price || available <= 0) return 0;
@@ -830,7 +832,9 @@ class Finance extends Module {
     while (brokerage.dividend_day + 7 <= day) {
       const averyRate = this.company.shareholders.dividend(brokerage.dividend_day + 7);
       const payment = this.securities.reduce(
-        (total, item) => total + Math.floor(brokerage.holdings[item.symbol] * market.prices[item.symbol] * item.weeklyDividendRate * (item.symbol === 'AVY' ? averyRate : 1)),
+        (total, item) =>
+          total +
+          (['ALF', 'RDS'].includes(item.symbol) ? 0 : Math.floor(brokerage.holdings[item.symbol] * market.prices[item.symbol] * item.weeklyDividendRate * (item.symbol === 'AVY' ? averyRate : 1))),
         0
       );
       brokerage.cash += payment;
@@ -838,6 +842,7 @@ class Finance extends Module {
       // 融券卖出的股票仍属于出借人，分红日需补偿对方，不将卖出款当作可用资金。
       for (const position of brokerage.margin.positions) {
         if (position.kind !== 'stock' || position.side !== -1 || position.opened >= brokerage.dividend_day + 7) continue;
+        if (position.symbol === 'ALF' || position.symbol === 'RDS') continue;
         const item = this.securities.find(item => item.symbol === position.symbol);
         position.fees += Math.floor(position.units * market.prices[position.symbol] * (item?.weeklyDividendRate ?? 0) * (position.symbol === 'AVY' ? averyRate : 1));
       }

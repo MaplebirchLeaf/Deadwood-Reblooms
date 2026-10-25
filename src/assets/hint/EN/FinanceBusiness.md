@@ -159,10 +159,12 @@ The agreement grants **company accommodation**, which cannot be bought, sold, re
 - **Flying Without a Net:** a losing margin position is forcibly liquidated. Voluntary closing, stop losses and expiry do not count.
 - **Back on My Feet:** After a forced liquidation leaves collection debt, repay it in full and recover the entire loss, including fees, through subsequent net profits from ordinary shares or leveraged trades. Later trading losses reduce your progress; deposits, loans and dividends do not count. Being taken away to settle the debt ends that recovery attempt.
 
-### Drinks-shop partnership and accounts
+### Private farm and drinks-shop partnerships
 
-Once Robin's shop opens, discuss a private partnership at the shop. With Robin's agreement and sufficient familiarity, sign a contract and use a debit card to buy a 10%–40% holding. Robin retains control. Contributions enter the business reserve; existing loans from the PC stay separate. The financial centre handles later contributions and buyback requests.
+You and Alex or Robin own half of the relevant business each. Confirm the farm agreement after Alex’s vanilla offer to share control; the shop partnership begins when it opens. Founder shares are not traded at the securities desk.
 
-Distributions are assessed every seven days from estimated operating surplus and ownership, protecting Robin's next rent first. Due factory invoices are settled before dividends or buybacks are considered. Quiet trade, unexpected losses and closure may pay nothing and reduce the valuation. Give seven days' notice to exit. The holding is bought back at 75% of its value on the payment day, when spare funds permit. Otherwise the request waits, without automatic borrowing or a guaranteed return of capital.
+Working money and personal funds are separate. Shop weekly income and counter receipts enter the joint accounts, which also pay for stock and equipment. Robin’s tutoring, allowances and personal rent remain separate. Surplus farm produce can be sold into the farm accounts to fund queued construction. Every seven days, cash left after outstanding advances and the working reserve is shared equally. The reserve starts at £1,000 and can be adjusted in the ledger. Extra cash is a repayable advance, not a larger share. Vanilla farm wages and produce you collect yourself remain unchanged.
+
+Farm construction uses working money first; cash shortfalls become advances from you. Unrecovered earlier private shop investments become advances, retaining contribution, repayment and dividend history. Robin’s existing reserve moved into the shop is also recorded as an advance owed to Robin. Earlier exchange positions remain available for sale or closing, but accept no new positions or duplicate exchange dividends.
 
 Mod statistics collect realised share and margin-trading results, dividends, partnership contributions and buybacks. Gambling results and chip exchanges are counted separately. Adrian can assist across the financial centre, with conversations responding to the desk, debts, partnership and actual bank transfers through the casino. Transfers do not reveal the results of cash gambling.

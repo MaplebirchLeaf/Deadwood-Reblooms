@@ -191,11 +191,19 @@
 
 <<widget 'deadwood-street-story-journal'>>
   <<set _storyJournalWork to maplebirch.get('StreetLife')?.stories>>
-  <<if !_storyJournalWork or !Object.values(_storyJournalWork.state).some(record => record.stage > 0)>><<exit>><</if>>
+  <<if !_storyJournalWork>><<exit>><</if>>
+  <<if !Object.values(_storyJournalWork.state).some(record => record.stage > 0 && record.stage < 4)>>
+    <<if _storyJournalWork.ready and $StreetLife.heist.stage is 'idle' and !$StreetLife.heist.appointment>>
+      <<deadwood-card 'The next arrangement' '下一桩买卖'>>
+        <ul class='journal'><li><<lanSwitch 'The three smaller jobs are settled. Speak to Landry at the Harvest Street pub about the larger venture. Landry and Wren still need to trust you enough to proceed.' '三件小买卖已经结清。可以到丰收街酒馆，找兰德里谈那桩更大的买卖；继续之前，仍需取得兰德里与伦恩的信任。'>></li></ul>
+      <</deadwood-card>><hr>
+    <</if>>
+    <<exit>>
+  <</if>>
   <<deadwood-card 'The crew’s arrangements' '同伙与手头的差事'>>
     <<for _storyJournalId range ['landry', 'wren', 'mickey']>>
       <<set $_storyJournalRecord to _storyJournalWork.state[_storyJournalId]>>
-      <<if $_storyJournalRecord.stage gt 0>>
+      <<if $_storyJournalRecord.stage gt 0 and $_storyJournalRecord.stage lt 4>>
         <div class='gold'><<lanSwitch _storyJournalWork.terms.chains[_storyJournalId].name[0] _storyJournalWork.terms.chains[_storyJournalId].name[1]>></div>
         <ul class='journal'><li>
           <<deadwood-street-story-result _storyJournalId>>

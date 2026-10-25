@@ -1,4 +1,10 @@
 :: Deadwood Robin Economy Widgets [widget]
+<!-- 正式店铺货款入共同营业账，季节摊位仍属于罗宾个人。金额沿用原页面的英镑。 -->
+<<widget 'deadwood-robin-sale'>>
+  <<if $RobinExpansion.shop and $location is 'deadwood_robin_shop'>>
+    <<run maplebirch.get('Robin').shop.partnership.receive(Math.round(_args[0] * 100))>>
+  <<else>><<set $RobinExpansion.reserve += _args[0]>><</if>>
+<</widget>>
 <<widget 'deadwood-robin-tutor-clue'>>
   <<if C.npc.Robin.init is 1 and !$robinmissing and $robin.timer.hurt is 0
     and !$RobinExpansion.topics.tutor and !$RobinExpansion.tutor
@@ -909,6 +915,7 @@
   <<earnFeat 'Deadwood Robin Shop Open'>>
   <<lanSwitch 'You carry the last crate through the door as Robin turns the sign to OPEN. Lemonade and hot chocolate share the menu; a second notice lists paid shifts for the other orphans.' '你抱着最后一箱货走进店里时，罗宾把招牌翻到“营业”。菜单上并列着柠檬水与热巧克力。另一张告示写着其他孤儿可以帮工，按班结薪。'>>
   <br><br><span class='green'><<lanSwitch 'Robin hands you the second key. "Ready, partner?"' '罗宾把第二把钥匙递给你。“准备好了吗，合伙人？”'>></span>
+  <br><span class='gold'><<lanSwitch 'You and Robin own half of the shop each.' '你与罗宾各持有店铺的一半。'>></span>
   <<npcincr Robin love 5>><<npcincr Robin dom 5>><<hope 3>><<glove>><<gdom>><<ghope>>
 <<else>>
   <<lanSwitch 'The shop is not ready to open yet.' '开店的准备还没完成。'>>
@@ -1062,7 +1069,7 @@
 :: Deadwood Robin Shop Buy Strawberry Lemonade
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(400)>>
-  <<money -400 'shopping'>><<set $RobinExpansion.reserve += 4>><<pass 15>><<wearProp 'strawberry lemonade'>>
+  <<money -400 'shopping'>><<deadwood-robin-sale 4>><<pass 15>><<wearProp 'strawberry lemonade'>>
   <<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
   <<if Weather.bodyTemperature gte 36.5>>
     <<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>>
@@ -1079,7 +1086,7 @@
 :: Deadwood Robin Shop Buy Orange Juice
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(400)>>
-  <<money -400 'shopping'>><<set $RobinExpansion.reserve += 4>><<pass 15>>
+  <<money -400 'shopping'>><<deadwood-robin-sale 4>><<pass 15>>
   <<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
   <<if Weather.bodyTemperature gte 36.5>>
     <<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>>
@@ -1096,7 +1103,7 @@
 :: Deadwood Robin Shop Buy Coffee
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(400)>>
-  <<money -400 'shopping'>><<set $RobinExpansion.reserve += 4>><<pass 15>><<wearProp 'coffee'>>
+  <<money -400 'shopping'>><<deadwood-robin-sale 4>><<pass 15>><<wearProp 'coffee'>>
   <<deadwood-taste>><<stress -6>><<lstress>><</deadwood-taste>>
   <<if Weather.bodyTemperature lte 39>>
     <<set Weather.bodyTemperature to Weather.bodyTemperature + 1>>
@@ -1112,7 +1119,7 @@
 :: Deadwood Robin Shop Buy Milkshake
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(500)>>
-  <<money -500 'shopping'>><<set $RobinExpansion.reserve += 5>><<pass 15>><<wearProp 'milkshake'>>
+  <<money -500 'shopping'>><<deadwood-robin-sale 5>><<pass 15>><<wearProp 'milkshake'>>
   <<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
   <<if Weather.bodyTemperature gte 36.5>>
     <<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>>
@@ -1131,7 +1138,7 @@
 <<lanSwitch 'The side counter holds goods that need their own suppliers. Robin keeps the flower ledger, popcorn machine and the balloon seller\'s orders separate from the drinks.' '侧柜摆着需要另行进货的商品。罗宾把鲜花账、爆米花机和气球摊主的订单与饮品账分开记。'>>
 <br><br><span class='gold'><<lanSwitch 'Flowers' '鲜花'>></span><br>
 <<if !$RobinExpansion.shop_flowers>>
-  <<if getRobinLocation() is 'shop' and maplebirch.get('Robin').canSpend(100)>>
+  <<if getRobinLocation() is 'shop' and maplebirch.get('Robin').shop.canSpend(100)>>
     <<foodstufficon 'daisy'>><<lanLink ['Set up a flower counter for £100 (0:30)', '布置鲜花柜台 £100 (0:30)'] 'Deadwood Robin Shop Arrange Flowers'>><</lanLink>><br>
   <</if>>
 <<else>>
@@ -1146,12 +1153,12 @@
       <</capture>>
     <</if>>
   <</for>>
-  <<if maplebirch.get('Robin').flowers.stockTotal lte 5 and getRobinLocation() is 'shop' and maplebirch.get('Robin').canSpend(15)>>
+  <<if maplebirch.get('Robin').flowers.stockTotal lte 5 and getRobinLocation() is 'shop' and maplebirch.get('Robin').shop.canSpend(15)>>
     <<icon 'robin/flower-supply.png'>><<lanLink ['Order ten daisies for £15 (0:30)', '向花商补进十枝雏菊 £15 (0:30)'] 'Deadwood Robin Shop Restock Flowers'>><</lanLink>><br>
   <</if>>
   <<if maplebirch.get('Robin').flowers.stockTotal lte 20 and getRobinLocation() is 'shop'>>
     <<for _flowerType range maplebirch.get('Robin').flowers.types>>
-      <<if $foodstuff[_flowerType].amount gte 10 and maplebirch.get('Robin').canSpend(setup.foodstuff[_flowerType].shop.sell_price / 10)>>
+      <<if $foodstuff[_flowerType].amount gte 10 and maplebirch.get('Robin').shop.canSpend(setup.foodstuff[_flowerType].shop.sell_price / 10)>>
         <<capture _flowerType>>
           <<foodstufficon _flowerType>><span class='green'> <<print setup.foodstuff[_flowerType].singular>></span>
           <<lanLink ['Supply ten flowers (0:15)', '交付十枝鲜花 (0:15)'] 'Deadwood Robin Shop Supply Flowers'>><<set $RobinExpansion.flower_selection to _flowerType>><</lanLink>>
@@ -1163,7 +1170,7 @@
 <</if>>
 <br><span class='gold'><<lanSwitch 'Popcorn' '爆米花'>></span><br>
 <<if !$RobinExpansion.shop_popcorn>>
-  <<if getRobinLocation() is 'shop' and maplebirch.get('Robin').canSpend(150)>>
+  <<if getRobinLocation() is 'shop' and maplebirch.get('Robin').shop.canSpend(150)>>
     <<icon 'robin/popcorn-machine.png'>><<lanLink ['Buy a popcorn machine for £150 (1:00)', '添置爆米花机 £150 (1:00)'] 'Deadwood Robin Shop Arrange Popcorn'>><</lanLink>><br>
   <</if>>
 <<elseif ($popcorn or 0) gte 3>>
@@ -1177,7 +1184,7 @@
 <<elseif $RobinExpansion.shop_balloons>>
   <span class='blue'><<lanSwitch 'The balloon display closes at dusk. The drink counter remains open.' '入夜后气球货架停止选购，饮品柜台仍照常营业。'>></span><br>
 <<elseif ['cooperate', 'resolved'].includes($RobinExpansion.balloon)>>
-  <<if getRobinLocation() is 'shop' and maplebirch.get('Robin').canSpend(100)>>
+  <<if getRobinLocation() is 'shop' and maplebirch.get('Robin').shop.canSpend(100)>>
     <<gifticon 'balloons'>><<lanLink ['Agree balloon supplies for £100 (0:30)', '与气球摊约定供货 £100 (0:30)'] 'Deadwood Robin Shop Arrange Balloons'>><</lanLink>><br>
   <</if>>
 <<else>>
@@ -1259,7 +1266,7 @@
 :: Deadwood Robin Shop Buy Popcorn
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and $RobinExpansion.shop_popcorn and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(700) and ($popcorn or 0) lt 3>>
-  <<money -700 'shopping'>><<set $RobinExpansion.reserve += 7>><<set $popcorn to ($popcorn or 0) + 1>><<pass 2>>
+  <<money -700 'shopping'>><<deadwood-robin-sale 7>><<set $popcorn to ($popcorn or 0) + 1>><<pass 2>>
   <<lanSwitch 'The attendant folds the top of a warm bag of popcorn and hands it to you. It is added to the popcorn you carry, so you can eat it later.' '店员把一袋热爆米花封好递给你。它已计入你携带的爆米花，可以稍后再吃。'>>
   <<deadwood-robin-sale-event 'shop'>>
 <<else>>
@@ -1478,7 +1485,7 @@
 :: Deadwood Robin Shop Buy Classic Lemonade
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(200)>>
-  <<money -200 'shopping'>><<set $RobinExpansion.reserve += 2>><<pass 15>><<wearProp 'lemonade'>>
+  <<money -200 'shopping'>><<deadwood-robin-sale 2>><<pass 15>><<wearProp 'lemonade'>>
   <<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
   <<if Weather.bodyTemperature gte 36.5>>
     <<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>>
@@ -1494,7 +1501,7 @@
 :: Deadwood Robin Shop Buy Hot Chocolate
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(300)>>
-  <<money -300 'shopping'>><<set $RobinExpansion.reserve += 3>><<pass 15>><<wearProp 'hot cocoa'>>
+  <<money -300 'shopping'>><<deadwood-robin-sale 3>><<pass 15>><<wearProp 'hot cocoa'>>
   <<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
   <<if Weather.bodyTemperature lte 39>>
     <<set Weather.bodyTemperature to Weather.bodyTemperature + 1>>
@@ -1510,7 +1517,7 @@
 :: Deadwood Robin Shop Buy Lemonade
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(300)>>
-  <<money -300 'shopping'>><<set $RobinExpansion.reserve += 3>><<pass 15>><<wearProp 'lemonade'>>
+  <<money -300 'shopping'>><<deadwood-robin-sale 3>><<pass 15>><<wearProp 'lemonade'>>
   <<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
   <<if Weather.bodyTemperature gte 36.5>>
     <<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>>
@@ -1526,7 +1533,7 @@
 :: Deadwood Robin Shop Buy Fruit
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(400)>>
-  <<money -400 'shopping'>><<set $RobinExpansion.reserve += 4>><<pass 15>>
+  <<money -400 'shopping'>><<deadwood-robin-sale 4>><<pass 15>>
   <<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
   <<if Weather.bodyTemperature gte 36.5>>
     <<set Weather.bodyTemperature to Math.max(Weather.bodyTemperature - 1, 36.5)>>
@@ -1542,7 +1549,7 @@
 :: Deadwood Robin Shop Buy Cocoa
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(400)>>
-  <<money -400 'shopping'>><<set $RobinExpansion.reserve += 4>><<pass 15>><<wearProp 'hot cocoa'>>
+  <<money -400 'shopping'>><<deadwood-robin-sale 4>><<pass 15>><<wearProp 'hot cocoa'>>
   <<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
   <<if Weather.bodyTemperature lte 39>>
     <<set Weather.bodyTemperature to Weather.bodyTemperature + 1>>
@@ -1558,7 +1565,7 @@
 :: Deadwood Robin Shop Buy Biscuit
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
 <<if $RobinExpansion.shop and Time.hour gte 9 and Time.hour lt 21 and maplebirch.get('Robin').shop.canCustomerPay(500)>>
-  <<money -500 'shopping'>><<set $RobinExpansion.reserve += 5>><<pass 15>>
+  <<money -500 'shopping'>><<deadwood-robin-sale 5>><<pass 15>>
   <<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
   <<lanSwitch 'You buy a cocoa biscuit from the winter tray. Its centre is soft, and the attendant checks the date on the tin before serving it.' '你从冬季托盘买下一块可可饼干。内馅还是软的，店员端上来前又核对了一遍盒上的日期。'>>
   <<if maplebirch.get('MoreTransformations')?.Undead.active>><br><br><<deadwood-taste true>><</deadwood-taste>><</if>>
@@ -1571,7 +1578,7 @@
 :: Deadwood Robin Shop Taste
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
 <<if $RobinExpansion.shop and $RobinExpansion.shop_taste_day isnot Time.days and maplebirch.get('Robin').shop.canCustomerPay(300) and getRobinLocation() is 'shop'>>
-  <<set $RobinExpansion.shop_taste_day to Time.days>><<money -300 'shopping'>><<set $RobinExpansion.reserve += 3>><<pass 5>>
+  <<set $RobinExpansion.shop_taste_day to Time.days>><<money -300 'shopping'>><<deadwood-robin-sale 3>><<pass 5>>
   <<if maplebirch.get('MoreTransformations')?.Undead.active>>
     <<language>>
       <<option 'EN'>>
@@ -1746,7 +1753,7 @@
     <<set $daily.robin.freeDrink to 1>>
     <<lanSwitch 'Robin pushes your coins back. "You already help me with Bailey. Let me get this one."' '罗宾把你的钱推回来。“你已经帮我应付贝利了。这杯让我请你。”'>>
   <<else>>
-    <<money -200>><<set $RobinExpansion.reserve += 2>>
+    <<money -200>><<deadwood-robin-sale 2>>
     <<lanSwitch 'You pay £2 for Robin\'s mint lemonade.' '你付了 £2，买下罗宾的薄荷柠檬水。'>>
   <</if>>
   <<pass 15>><<wearProp 'lemonade'>><<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
@@ -1768,7 +1775,7 @@
     <<set $daily.robin.freeDrink to 1>>
     <<lanSwitch 'Robin refuses your coins this time. "I can spare one cup for you."' '罗宾这回不肯收钱。“给你留一杯，我还是做得到的。”'>>
   <<else>>
-    <<money -300>><<set $RobinExpansion.reserve += 3>>
+    <<money -300>><<deadwood-robin-sale 3>>
     <<lanSwitch 'You pay £3 for a cup of chilled fruit.' '你付了 £3，买了一杯冰镇水果。'>>
   <</if>>
   <<pass 15>><<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
@@ -1790,7 +1797,7 @@
     <<set $daily.robin.freeDrink to 1>>
     <<lanSwitch 'Robin slides your coins back. "You have already done enough for me today."' '罗宾把钱推回来。“你今天已经帮我够多了。”'>>
   <<else>>
-    <<money -300>><<set $RobinExpansion.reserve += 3>>
+    <<money -300>><<deadwood-robin-sale 3>>
     <<lanSwitch 'You pay £3 for spiced cocoa.' '你付了 £3，买了一杯香料可可。'>>
   <</if>>
   <<pass 15>><<wearProp 'hot cocoa'>><<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
@@ -1812,7 +1819,7 @@
     <<set $daily.robin.freeDrink to 1>>
     <<lanSwitch 'Robin gives you the biscuit and waves away your money. "This batch turned out well. Try it."' '罗宾把饼干递给你，摆手不收钱。“这一炉做得不错，你尝尝。”'>>
   <<else>>
-    <<money -400>><<set $RobinExpansion.reserve += 4>>
+    <<money -400>><<deadwood-robin-sale 4>>
     <<lanSwitch 'You pay £4 for a cocoa biscuit.' '你付了 £4，买下一块可可饼干。'>>
   <</if>>
   <<pass 15>><<deadwood-taste>><<stress -6>><<trauma -1>><<lstress>><<ltrauma>><</deadwood-taste>>
@@ -1832,9 +1839,9 @@
     or (Time.season isnot 'winter' and $RobinExpansion.lemonade gte 1))>>
   <<set $RobinExpansion.stall_taste_day to Time.days>>
   <<if (Time.season is 'winter' ? $RobinExpansion.chocolate : $RobinExpansion.lemonade) gte 2>>
-    <<money -300>><<set $RobinExpansion.reserve += 3>>
+    <<money -300>><<deadwood-robin-sale 3>>
   <<else>>
-    <<money -200>><<set $RobinExpansion.reserve += 2>>
+    <<money -200>><<deadwood-robin-sale 2>>
   <</if>>
   <<pass 5>>
   <<if maplebirch.get('MoreTransformations')?.Undead.active>>
@@ -1886,7 +1893,7 @@
 <<set $outside to 1>><<set $location to 'beach'>><<effects>><<npc Robin>><<person1>>
 <<lanSwitch 'The balloon seller points out that the customer referrals you arranged are working. Robin checks both ledgers. "We could make the arrangement more visible," Robin says, "or try a friendly sales contest for three days. We would keep sending customers to each other either way." Robin looks to you for an answer.' '气球摊主说起你们原先约好的互荐，来客的确多了。罗宾核对两边的账本。“可以把合作做得更显眼，”罗宾说，“也可以比三天营业额。无论选哪种，原来的互荐都照常。”罗宾望向你，等你拿主意。'>>
 <br><br>
-<<socialiseicon>><<lanLink ['Expand the balloon stall partnership', '深化气球摊合作'] 'Deadwood Robin Balloon Cooperate'>><</lanLink>><br>
+<<icon 'robin/balloon-partnership.png'>><<lanLink ['Expand the balloon stall partnership', '深化气球摊合作'] 'Deadwood Robin Balloon Cooperate'>><</lanLink>><br>
 <<socialiseicon>><<lanLink ['Hold a friendly sales contest', '举办友好竞争'] 'Deadwood Robin Balloon Compete'>><</lanLink>>
 <br><br><<getouticon>><<lanLink ['Return to the balloon stall', '返回气球摊'] 'Balloon Stand'>><</lanLink>>
 
@@ -1937,7 +1944,7 @@
 <</if>>
 <<shopicon 'register'>><span class='blue'><<lanSwitch 'This week\'s estimate' '本周预估'>></span><br>
 <<lanSwitch 'Stalls and existing agreements:' '摊位与现有合作：'>> <span class='gold'>£<<print ($robin.stayup gte 1 ? 250 : 300) + ($robin.moneyModifier or 0)>></span><br>
-<<lanSwitch 'Improved stalls and shop, after wages:' '升级摊位与店铺收入（扣薪后）：'>> <span class='gold'>£<<print Math.max(0, maplebirch.get('Robin').income - ($robin.stayup gte 1 ? 250 : 300) - ($robin.moneyModifier or 0) - maplebirch.get('Robin').tutoring.income - maplebirch.get('Robin').balloon.income)>></span><br>
+<<lanSwitch 'Other expected personal income:' '其它预计个人收入：'>> <span class='gold'>£<<print Math.max(0, maplebirch.get('Robin').income - ($robin.stayup gte 1 ? 250 : 300) - ($robin.moneyModifier or 0) - maplebirch.get('Robin').tutoring.income - maplebirch.get('Robin').balloon.income)>></span><br>
 <<if $RobinExpansion.shop_staff gt 0>>
   <span class='blue'><<lanSwitch 'Permanent staff: ' '正式店员：'>><<print $RobinExpansion.shop_staff>></span><br>
   <<if maplebirch.get('Robin').shop.employees.length gt 0>>
@@ -1981,8 +1988,8 @@
   <<lanSwitch 'Income needed to promise both rents:' '承诺承担两人房租所需周收入：'>> <span class='gold'>£<<print maplebirch.get('Robin').rent.bothRequirement>></span><br>
 <</if>>
 <<lanSwitch 'Last settled week:' '上次结算周收入：'>> <span class='gold'>£<<print $RobinExpansion.weekly_income>></span><br><br>
-<span class='blue'><<lanSwitch 'Business reserve:' '营业储备金：'>></span> <span class='gold'>£<<print $RobinExpansion.reserve>></span><br>
-<span class='grey'><i><<lanSwitch 'Business income stays here for rent and improvements. Robin\'s gifts come from the cash below.' '营业增收留在这里，用于房租和改造。罗宾送你的钱只从下面的现金里支出。'>></i></span><br>
+<span class='blue'><<lanSwitch 'Personal reserve:' '个人储备金：'>></span> <span class='gold'>£<<print $RobinExpansion.reserve>></span><br>
+<span class='grey'><i><<lanSwitch 'Personal earnings and dividends stay here for rent. Shop working money is kept in the joint accounts.' '个人收入和分红留作房租，店铺周转金另记在共同账里。'>></i></span><br>
 <<if $RobinExpansion.solidarity>>
   <<lanSwitch 'Orphanage care fund:' '孤儿院照护基金：'>> <span class='gold'>£<<print $RobinExpansion.care_fund>></span><br>
 <</if>>
@@ -1996,9 +2003,11 @@
   <</if>>
 <</if>>
 <<if $RobinExpansion.shop>>
+  <br><<lanSwitch 'Shop working money: ' '店铺周转金：'>><<printmoney $RobinExpansion.investment.treasury>><br>
+  <<lanSwitch 'Weekly net trading income: ' '每周净营业收入：'>><<printmoney `maplebirch.get('Robin').shop.weeklyProfit * 100`>>
   <br><<lanSwitch 'Special ingredient crates: ' '新品原料箱数：'>><<print $RobinExpansion.shop_stock>>
-  <<if maplebirch.get('Finance') and $location is 'deadwood_robin_shop'>>
-    <br><br><<icon 'robin/robin-ledger.png'>><<lanLink ['Discuss a shop partnership', '商量店铺合伙'] 'Deadwood Robin Shop Partnership'>><</lanLink>>
+  <<if $location is 'deadwood_robin_shop'>>
+    <br><br><<icon 'robin/robin-ledger.png'>><<lanLink ['Check the joint shop accounts', '核对店铺共同账目'] 'Deadwood Robin Shop Partnership'>><</lanLink>>
   <</if>>
 <</if>>
 <<if $RobinExpansion.tutor_lessons gte 6>>

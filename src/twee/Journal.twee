@@ -67,6 +67,14 @@
             <</language>>
           <</if>>
         </li>
+      <<elseif $Finance.company.office and !$Finance.company.contract>>
+        <li>
+          <<if $Finance.company.completed gte maplebirch.get('Finance').company.terms.partnerContracts>>
+            <<lanSwitch 'You have settled enough supply orders to discuss closer cooperation. Return to your office to arrange a meeting with Avery.' '已结清足够的供货订单，可以商议进一步合作。回自己的办公室，安排与艾弗里会面。'>>
+          <<else>>
+            <<lanSwitch 'Supply orders can be arranged through your office. Further cooperation requires three settled company orders.' '可从自己的办公室安排供货订单。结清三笔公司供货后，再商议进一步合作。'>>
+          <</if>>
+        </li>
       <</if>>
       <<if maplebirch.get('Finance').company.staff.arrears gt 0>>
         <li class='red'><<lanSwitch 'Unpaid staff wages: ' '职员欠薪：'>><<printmoney `maplebirch.get('Finance').company.staff.arrears`>> · <<lanSwitch 'Unpaid staff have suspended their services. Settle wages at your office.' '欠薪职员已暂停工作，请到办公室结清工资。'>></li>
@@ -708,6 +716,15 @@
       <</language>>
     <</if>>
     <br>
+    <<if $LifeSimulation.historyProject.draft is 0 and _historyDays gt 0>>
+      <<if $LifeSimulation.historyProject.archive is 0>>
+        <<lanSwitch 'Read the town records at the school library next.' '下一步可以到学校图书馆查阅小镇史料。'>><br>
+      <<elseif $LifeSimulation.historyProject.museum is 0>>
+        <<lanSwitch 'Visit the museum to examine and compare the painting.' '下一步到博物馆，检查、比对画作。'>><br>
+      <<else>>
+        <<lanSwitch 'You have enough material for a draft. Write at your desk at home; the lake survey is optional.' '已有足够材料动笔。可以回家在书桌前准备展览稿，湖泊实地调查可自行选择。'>><br>
+      <</if>>
+    <</if>>
     <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
       <<lanSwitch 'Robin is helping you organise the project.' '罗宾正在协助你整理项目。'>><br>
     <</if>>
@@ -941,7 +958,11 @@
       <li><<lanSwitch 'Robin wants your company when signing for the vacant shop.' '签下空铺前，罗宾想让你一起去看看。'>></li>
     <</if>>
   <<elseif $RobinExpansion.shop_stage is 'site'>>
-    <li><<lanSwitch 'The Cliff Street shop needs its fittings and inspection.' '峭壁街的店铺还需装好设备并接受检查。'>></li>
+    <<if Time.days lte $RobinExpansion.shop_application_day>>
+      <li><<lanSwitch 'The inspection can be arranged from tomorrow. Meet Robin at the vacant shop on Cliff Street.' '明天起才能安排检查。和罗宾约好，到峭壁街的空铺碰面。'>></li>
+    <<else>>
+      <li><<lanSwitch 'Meet Robin at the vacant shop on Cliff Street to pay for the fittings and inspection.' '和罗宾约好，到峭壁街的空铺支付设备与检查费用。'>></li>
+    <</if>>
   <<elseif $RobinExpansion.shop_stage is 'inspected'>>
     <li>
     <<if Time.days gt $RobinExpansion.shop_inspection_day>>
@@ -951,7 +972,7 @@
     <</if>>
     </li>
   <<elseif $RobinExpansion.shop_stage is 'permitted' and !$RobinExpansion.shop>>
-    <li><<lanSwitch 'The shop permit is ready. Robin is saving for the opening stock.' '经营许可已到手。罗宾正在攒开业原料费。'>></li>
+    <li><<lanSwitch 'The permit is ready. Discuss opening with Robin at the Cliff Street shop; the equipment and first stock cost £4,000.' '经营许可已到手。到峭壁街的店铺和罗宾商量开业，还需准备£4,000添置设备和首批原料。'>></li>
   <</if>>
   <<if $RobinExpansion.pc_loan gt 0 and !$RobinExpansion.shop>>
     <li><<lanSwitch 'Robin owes you' '罗宾还欠你'>> <span class='gold'>£<<print $RobinExpansion.pc_loan>></span><<lanSwitch '. The amount is recorded in the shop ledger.' '。这笔借款已经记在店铺账本里。'>></li>
@@ -1004,31 +1025,16 @@
 <!-- 街头委托：只读当前货物、期限和回执，交接与报酬在委托页面结算。 -->
 
 <<widget 'deadwood-street-job-journal'>>
-  <<if $StreetLife.jobs.active or $StreetLife.jobs.report or $StreetLife.bailey.finished or $StreetLife.heist.appointment>>
+  <<if $StreetLife.jobs.active or $StreetLife.bailey.finished and !$StreetLife.bailey.discussed
+      or $StreetLife.heist.appointment and $StreetLife.heist.stage is 'idle'
+      or !['idle', 'closed'].includes($StreetLife.heist.stage)>>
     <<deadwood-card 'Street work' '街头委托'>>
       <<deadwood-street-job-status>>
-      <<if !$StreetLife.jobs.active and $StreetLife.jobs.report>>
-        <<set _streetReport to $StreetLife.jobs.report>>
-        <ul class='journal'><li>
-          <<if _streetReport.outcome is 'paid'>>
-            <<lanSwitch 'Last fee collected: ' '上次领取报酬：'>><<printmoney _streetReport.fee>>
-            <<if _streetReport.late>><span class='blue'><<lanSwitch ' (late delivery)' '（迟到交货）'>></span><</if>>
-            <<if _streetReport.crew>>
-              <br><<= _streetReport.crew.name>> · <<lanSwitch 'Colleague\'s payment: ' '合作人实领：'>><<printmoney _streetReport.crew.fee>>
-              <br><span class='blue'><<lanSwitch 'Your recorded fee is after the agreed colleague\'s share.' '你的实收已扣除说好的合作人分成。'>></span>
-            <</if>>
-          <<elseif _streetReport.outcome is 'lost'>>
-            <span class='red'><<lanSwitch 'You reported a lost shipment. Your street reputation suffered.' '你报告了货物丢失，街头口碑受到影响。'>></span>
-          <<else>>
-            <<lanSwitch 'You returned or declined the last job. No fee was paid.' '上一份委托已退回或取消，没有领取报酬。'>>
-          <</if>>
-        </li></ul>
-      <</if>>
       <<deadwood-street-bailey-journal>>
       <<if $StreetLife.heist.appointment and $StreetLife.heist.stage is 'idle'>>
         <ul class='journal'><li><<lanSwitch 'Landry has arranged a meeting about the bank job. Meet the crew at the smugglers\' pub, 09:00–18:00.' '兰德里约好了商议银行豪劫的会面。去走私者酒馆与同伙碰面，09:00–18:00。'>></li></ul>
       <</if>>
-      <<deadwood-street-heist-status>>
+      <<if $StreetLife.heist.stage isnot 'closed'>><<deadwood-street-heist-status>><</if>>
     <</deadwood-card>>
     <hr>
   <</if>>
@@ -1044,26 +1050,15 @@
 <!-- 公路赛只显示已提交的赛段与回执，读日志不会推进比赛或领取奖金。 -->
 <<widget 'deadwood-street-race-journal'>>
   <<set _journal_races to maplebirch.get('StreetLife')?.races>>
-  <<if _journal_races and (_journal_races.state.session or _journal_races.state.last)>>
+  <<if _journal_races?.state.session>>
     <<deadwood-card 'Road racing' '公路赛事'>>
-      <<if _journal_races.state.session>>
-        <<set _journal_race to _journal_races.state.session>>
-        <b><<= lanSwitch(_journal_races.group.name.EN, _journal_races.group.name.CN)>></b><br>
-        <<lanSwitch 'Sections completed: ' '已完成赛段：'>><span class='teal'><<= _journal_race.step>> / <<= _journal_races.terms.stages.length>></span><br>
-        <<if maplebirch.get('Transport')>>
-          <<lanSwitch 'Current location: ' '当前位置：'>><<= maplebirch.get('Transport').catalog.name(_journal_race.point)>><br>
-        <</if>>
-        <<lanSwitch 'Continue from the race scene, or pull over to withdraw.' '在比赛现场继续行驶，或靠边停车退赛。'>>
-      <<else>>
-        <<set _journal_race to _journal_races.state.last>>
-        <<if _journal_race.outcome is 'finished'>>
-          <<lanSwitch 'Last finishing position: ' '上次完赛名次：'>><span class='teal'><<= _journal_race.place>></span><br>
-        <<else>>
-          <<lanSwitch 'The last race ended without a finish.' '上一场比赛未能完赛。'>><br>
-        <</if>>
-        <<lanSwitch 'Prize collected: ' '奖金实收：'>><<printmoney _journal_race.payout>><br>
-        <<lanSwitch 'Fuel used: ' '消耗燃油：'>><span class='teal'><<= _journal_race.fuel.toFixed(2)>> L</span> · <<lanSwitch 'Condition lost: ' '车况下降：'>><span class='red'><<= _journal_race.wear.toFixed(1)>></span> <<lanSwitch 'percentage points' '个百分点'>><br>
+      <<set _journal_race to _journal_races.state.session>>
+      <b><<= lanSwitch(_journal_races.group.name.EN, _journal_races.group.name.CN)>></b><br>
+      <<lanSwitch 'Sections completed: ' '已完成赛段：'>><span class='teal'><<= _journal_race.step>> / <<= _journal_races.terms.stages.length>></span><br>
+      <<if maplebirch.get('Transport')>>
+        <<lanSwitch 'Current location: ' '当前位置：'>><<= maplebirch.get('Transport').catalog.name(_journal_race.point)>><br>
       <</if>>
+      <<lanSwitch 'Continue from the race scene, or pull over to withdraw.' '在比赛现场继续行驶，或靠边停车退赛。'>>
     <</deadwood-card>><hr>
   <</if>>
 <</widget>>
@@ -1101,23 +1096,6 @@
         <ul class='journal'>
           <li><<lanSwitch 'Escort vehicle: ' '押送车辆：'>><span class='teal'><<= maplebirch.t(_journal_bounty_model.name)>></span> · <<= _journal_bounty_transport.catalog.name(_journal_bounty_vehicle.point)>></li>
         </ul>
-      <</if>>
-      <<if !_journal_bounty_state.active and _journal_bounty_state.last>>
-        <ul class='journal'><li>
-          <<switch _journal_bounty_state.last.outcome>>
-            <<case 'paid'>>
-              <<lanSwitch 'Last reward collected: ' '上次领取赏金：'>><<printmoney _journal_bounty_state.last.fee>>
-            <<case 'lead'>>
-              <<lanSwitch 'Last verified lead fee: ' '上次核实线索报酬：'>><<printmoney _journal_bounty_state.last.fee>>
-              · <<lanSwitch 'Police are handling the pursuit; this was not a completed capture.' '警方接手后续追缉，本次不计抓捕完成。'>>
-            <<case 'released'>>
-              <<lanSwitch 'You released the target. The case closed without a reward.' '你放走了目标，这份委托已结束，没有赏金。'>>
-            <<case 'interrupted'>>
-              <<lanSwitch 'Your arrest interrupted the last assignment. No reward was paid.' '你被拘捕，上一份追查委托随之中断，没有领取赏金。'>>
-            <<default>>
-              <<lanSwitch 'Your last assignment closed without a reward.' '上一份追查委托已结束，没有领取赏金。'>>
-          <</switch>>
-        </li></ul>
       <</if>>
       <<if _journal_bounty_state.hunter>>
         <ul class='journal'><li @class='_journal_bounty_state.hunter.stage === "escaped" ? "green" : "red"'>
@@ -1196,7 +1174,7 @@
 <<widget 'deadwood-robin-shop-journal'>>
   <<set _journal_robin to maplebirch.get('Robin')>>
   <<if !_journal_robin or C.npc.Robin.init isnot 1 or !$RobinExpansion?.shop>><<exit>><</if>>
-  <<set _journal_shop to _journal_robin.shop, _journal_contract to _journal_shop.investment.contract>>
+  <<set _journal_shop to _journal_robin.shop, _journal_contract to _journal_shop.partnership.state>>
   <<deadwood-card "Robin's drinks shop" '罗宾饮品店'>>
     <<lanSwitch 'Cliff Street · 09:00–21:00' '峭壁街 · 09:00–21:00'>>
     <div class='dr-finance-summary'>
@@ -1213,30 +1191,24 @@
         <span><<lanSwitch 'Flowers in stock' '鲜花库存'>></span><span class='teal'><<= _journal_robin.flowers.stockTotal>></span>
       <</if>>
       <<if _journal_contract.agreed>>
-        <span><<lanSwitch 'Your private holding' '你的私人份额'>></span><span class='teal'><<= _journal_contract.share>>%</span>
-        <<if _journal_contract.share gt 0 and _journal_contract.next_settlement gte 0>>
+        <span><<lanSwitch 'Private partnership' '私人合伙份额'>></span><span class='teal'><<lanSwitch 'You 50% / Robin 50%' '你50%／罗宾50%'>></span>
+        <span><<lanSwitch 'Shop working money' '店铺周转金'>></span><span><<printmoney _journal_contract.treasury>></span>
+        <<if _journal_contract.next_settlement gte 0>>
           <span><<lanSwitch 'Next settlement' '下次结算'>></span><span class='blue'><<deadwood-journal-date _journal_contract.next_settlement>></span>
         <</if>>
       <</if>>
     </div>
-    <<if _journal_shop.employees.length or _journal_contract.report or _journal_contract.exit_day gte 0 or maplebirch.get('Orchard')?.freshSupplySales gt 0 or $RobinExpansion.shop_stock is 0 or $RobinExpansion.pc_loan gt 0>>
+    <<if _journal_shop.employees.length or _journal_contract.report or maplebirch.get('Orchard')?.freshSupplySales gt 0 or $RobinExpansion.shop_stock is 0 or $RobinExpansion.pc_loan gt 0>>
       <ul class='journal'>
         <<if _journal_shop.employees.length>>
           <li><<lanSwitch 'Staff: ' '店员：'>><span class='blue'><<= _journal_shop.employees.join(lanSwitch(', ', '、'))>></span></li>
         <</if>>
         <<if _journal_contract.report>>
           <li><<lanSwitch 'Latest accounts: ' '上期经营：'>>
-          <<switch _journal_contract.report.event>>
-            <<case 'loss'>><span class='red'><<lanSwitch 'Unexpected loss' '意外亏损'>></span>
-            <<case 'busy'>><span class='green'><<lanSwitch 'Busy trade' '生意兴旺'>></span>
-            <<case 'closed'>><span class='blue'><<lanSwitch 'Normal trade interrupted' '未能正常营业'>></span>
-            <<default>><<lanSwitch 'Uneven trade' '生意有好有坏'>>
-          <</switch>>
+          <<lanSwitch 'Recorded business income: ' '已入账经营收入：'>><<printmoney _journal_contract.report.income>>
           · <<lanSwitch 'Dividend paid: ' '已付分红：'>><<printmoney _journal_contract.report.dividend>></li>
         <</if>>
-        <<if _journal_contract.exit_day gte 0>>
-          <li><span class='blue'><<lanSwitch 'Buyback available from ' '最早回购日期：'>><<deadwood-journal-date _journal_contract.exit_day>><<lanSwitch '. Payment waits if Robin cannot afford it.' '。罗宾的资金不足时，付款会延后。'>></span></li>
-        <</if>>
+
         <<if maplebirch.get('Orchard')?.freshSupplySales gt 0>>
           <li><span class='teal'><<lanSwitch 'Your recent fruit delivery is supplying the shop.' '你最近送来的水果正在供应店铺。'>></span></li>
         <</if>>
@@ -1348,30 +1320,47 @@
 <!-- 交通：领证与补考日期不依赖玩家是否已经买车。 -->
 <<widget 'deadwood-driving-school-journal'>>
   <<if !maplebirch.get('Transport') or !$Transport?.school>><<exit>><</if>>
-  <<set _journal_school to $Transport.school>>
-  <<if (!_journal_school.provisional.issued and _journal_school.provisional.ready_day gte 0) or _journal_school.penalty_until gt Time.days or (!_journal_school.motor_vehicle.licensed and (_journal_school.motor_vehicle.theory_retest_day gte 0 or _journal_school.motor_vehicle.retest_day gte 0)) or (!_journal_school.motorcycle.licensed and (_journal_school.motorcycle.theory_retest_day gte 0 or _journal_school.motorcycle.retest_day gte 0))>>
-    <div class='bold'><<lanSwitch 'Driving school' '驾校'>></div>
-    <ul class='journal'>
-      <<if !_journal_school.provisional.issued and _journal_school.provisional.ready_day gte 0>>
-        <li><<lanSwitch 'Your provisional licence can be collected from ' '临时驾照可于'>><span class='blue'><<deadwood-journal-date _journal_school.provisional.ready_day>></span><<lanSwitch ' at the driving school.' '起到驾校领取。'>></li>
+  <<set _journal_driving to maplebirch.get('Transport').school, _journal_school to $Transport.school>>
+  <<if !_journal_school.provisional.issued and _journal_school.provisional.applied_day lt 0
+      or _journal_driving.record.licensed>><<exit>><</if>>
+  <div class='bold'><<lanSwitch 'Driving school' '驾校'>></div>
+  <ul class='journal'>
+    <li><<lanSwitch 'Harvest Street driving school, 09:00–17:00, closed on Sundays. Lessons and exams must finish before closing.' '丰收街驾校，09:00–17:00，周日休息。课程与考试须在关门前结束。'>></li>
+    <<if _journal_school.penalty_until gt Time.days>>
+      <li class='red'><<lanSwitch 'The school will accept you again from ' '驾校暂停受理，恢复日期：'>><<deadwood-journal-date _journal_school.penalty_until>></li>
+    <<elseif _journal_school.exam>>
+      <li><<lanSwitch 'Your road test is underway. Continue with the examiner at the driving school.' '路考尚未结束，回驾校继续听考官的指示。'>></li>
+    <<else>>
+      <li>
+        <<lanSwitch `_journal_school.category === 'motorcycle' ? 'Motorcycle course: ' : 'Car course: '` `_journal_school.category === 'motorcycle' ? '摩托车课程：' : '汽车课程：'`>>
+        <<switch _journal_driving.nextStep>>
+          <<case 'collect'>>
+            <<lanSwitch 'Collect your provisional licence from ' '临时驾照可于'>><<deadwood-journal-date _journal_school.provisional.ready_day>><<lanSwitch ' at the school.' '起到前台领取。'>>
+          <<case 'cbt'>>
+            <<lanSwitch 'Book basic training. Allow six hours and arrive by 11:00 on a day with suitable weather.' '下一步预约基础培训。需六小时，在天气合适的日子于11:00前到校。'>>
+          <<case 'study'>>
+            <<lanSwitch 'You can revise for the theory test or sit it when ready.' '可以继续复习理论，准备好后参加理论考试。'>>
+          <<case 'theory'>>
+            <<lanSwitch 'Take the theory test at the front desk.' '到前台申请参加理论考试。'>>
+          <<case 'lesson'>>
+            <<lanSwitch 'Take practical lessons at the school. Training cars are provided; you do not need to buy one.' '继续在驾校上实操课。驾校提供练习车辆，不必先买车。'>>
+          <<case 'module_1'>>
+            <<lanSwitch 'Your training is sufficient for the motorcycle manoeuvring test.' '练习已经达标，可以申请摩托车场地考试。'>>
+          <<case 'test'>>
+            <<lanSwitch 'Your training is sufficient for the road test. Leave fifty minutes before closing.' '练习已经达标，可以申请路考，关门前需留足五十分钟。'>>
+        <</switch>>
+      </li>
+      <<if !_journal_driving.record.theory and _journal_driving.record.theory_retest_day gt Time.days>>
+        <li><<lanSwitch 'Theory retest available from: ' '理论最早补考日期：'>><<deadwood-journal-date _journal_driving.record.theory_retest_day>></li>
       <</if>>
-      <<if _journal_school.penalty_until gt Time.days>>
-        <li class='red'><<lanSwitch 'The driving school will accept you again from ' '驾校暂停受理你的业务，恢复日期：'>><<deadwood-journal-date _journal_school.penalty_until>></li>
+      <<if _journal_driving.record.retest_day gt Time.days>>
+        <li><<lanSwitch 'Practical retest available from: ' '实操最早补考日期：'>><<deadwood-journal-date _journal_driving.record.retest_day>></li>
       <</if>>
-      <<for _journal_category range ['motor_vehicle', 'motorcycle']>>
-        <<set _journal_record to _journal_school[_journal_category]>>
-        <<if !_journal_record.licensed>>
-          <<if _journal_record.theory_retest_day gte 0>>
-            <li><<lanSwitch `_journal_category === 'motor_vehicle' ? 'Car theory retest available from: ' : 'Motorcycle theory retest available from: '` `_journal_category === 'motor_vehicle' ? '汽车理论最早补考日期：' : '摩托车理论最早补考日期：'`>><span class='blue'><<deadwood-journal-date _journal_record.theory_retest_day>></span></li>
-          <</if>>
-          <<if _journal_record.retest_day gte 0>>
-            <li><<lanSwitch `_journal_category === 'motor_vehicle' ? 'Car practical retest available from: ' : 'Motorcycle practical retest available from: '` `_journal_category === 'motor_vehicle' ? '汽车实操最早补考日期：' : '摩托车实操最早补考日期：'`>><span class='blue'><<deadwood-journal-date _journal_record.retest_day>></span></li>
-          <</if>>
-        <</if>>
-      <</for>>
-    </ul>
-    <hr>
-  <</if>>
+      <<if _journal_school.test_day is Time.days>>
+        <li><<lanSwitch 'You have taken an exam today. Another can be booked from tomorrow.' '今天已经参加过考试，明天起才能再约一场。'>></li>
+      <</if>>
+    <</if>>
+  </ul><hr>
 <</widget>>
 
 <<widget 'deadwood-journal-date'>>

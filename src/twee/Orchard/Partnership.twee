@@ -1,0 +1,91 @@
+:: Deadwood Farm Partnership Widgets [widget]
+<<widget 'deadwood-farm-partnership-link'>>
+  <<set $_menu to document.querySelector('#passage-content a[data-passage="Farm Alex Bedroom"], #passage-content a[data-passage="Farm Cottage"]')>>
+  <<if $Orchard?.partnership and $farm_fields_intro is 1 and C.npc.Alex.init is 1
+    and !$statFreeze and !$replayScene and !$frozenValues
+    and $_menu>>
+    <<farmicon>><<lanLink ['Look through the farm accounts', '查看农场账目'] 'Deadwood Farm Partnership'>><</lanLink>><br><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Farm Partnership
+<<set $location to 'alex_cottage'>><<set $outside to 0>><<effects>><<farm_work_update>>
+<<if $nextPassage or $nextPassageCheck or $combat>><<exit>><</if>>
+<<if !$Orchard?.partnership or $farm_fields_intro isnot 1 or C.npc.Alex.init isnot 1>>
+  <<lanSwitch 'There are no joint accounts to look through.' '这里还没有共同经营的账目。'>>
+<<else>>
+  <<set _farmPartnership to maplebirch.get('Orchard').partnership>>
+  <<deadwood-dynamicblock 'deadwood-farm-partnership'>>
+    <<if !_farmPartnership.state.agreed>>
+      <<if C.npc.Alex.state is 'active' and $farm_work.alex is 'admin' and !maplebirch.get('Orchard').farmInterrupted and !$statFreeze and !$replayScene and !$frozenValues>>
+        <<npc Alex>><<person1>>
+        <<language>>
+          <<option 'EN'>>
+            Alex puts down the pen. "Meant what I said about sharing this place. You helped get it back on its feet." <<He>> pulls a sheet towards you. "Half each. We keep enough here to carry on working, then split what we take out."
+          <<option 'CN'>>
+            艾利克斯放下笔。“说好一起管这地方，我是认真的。农场能重新撑起来，也有你的份。”<<He>>把一张纸推到你面前。“一人一半。先留够干活的钱，拿出来的再平分。”
+        <</language>><br><br>
+        <<lanLink ['Agree to run the farm together', '约定共同经营农场'] 'Deadwood Farm Partnership'>>
+          <<farm_work_update>>
+          <<if C.npc.Alex.state is 'active' and $farm_work.alex is 'admin' and !maplebirch.get('Orchard').farmInterrupted and !$nextPassage and !$nextPassageCheck>>
+            <<run maplebirch.get('Orchard').partnership.agree()>>
+          <</if>>
+        <</lanLink>><br>
+      <<else>>
+        <<lanSwitch 'You leave the accounts on the desk. You can discuss them when Alex is here doing the paperwork.' '你把账本留在桌上。等艾利克斯回来处理账目时，再一起商量。'>><br>
+      <</if>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          The farm belongs to you and Alex in equal shares. Working money stays in the farm accounts. Your old wages and produce you take for yourself are recorded separately.
+        <<option 'CN'>>
+          你与艾利克斯各持有农场的一半。周转金留在农场账里，原有的农活报酬和自行领走的农产品另算。
+      <</language>><br><br>
+      <<deadwood-partnership-accounts 'farm'>>
+      <<if $Orchard.partnership.partner_cash gt 0 and C.npc.Alex.state is 'active' and $farm_work.alex is 'admin'>>
+        <<lanSwitch "Alex's dividends: " '艾利克斯持有的分红：'>><<printmoney $Orchard.partnership.partner_cash>><br>
+        <<lanLink ["Ask Alex to put the dividends back into the farm", '请艾利克斯把分红垫回农场']>>
+          <<farm_work_update>>
+          <<if C.npc.Alex.state is 'active' and $farm_work.alex is 'admin' and !$nextPassage and !$nextPassageCheck and !$combat>>
+            <<run maplebirch.get('Orchard').partnership.reinvest()>>
+          <</if>>
+          <<run Dynamic.render('deadwood-farm-partnership')>>
+        <</lanLink>><br><br>
+      <</if>>
+      <<set _stock to { truffles: 'truffle', eggs: 'chicken_egg', milk: 'bottle_of_milk', cream: 'cream' }>>
+      <<set _value to Object.entries(_stock).reduce((sum, [key, type]) => sum + Math.floor($farm.stock?.[key] || 0) * (setup.foodstuff[type]?.shop?.sell_price || 0), 0)>>
+      <<if _value gt 0 and !maplebirch.get('Orchard').farmInterrupted and !$statFreeze and !$replayScene and !$frozenValues>>
+        <<lanSwitch 'Available surplus produce: ' '可出售的剩余农产品：'>><<printmoney _value>><br>
+        <<lanLink ['Sell the surplus for the farm (0:10)', '把剩余农产品售出，货款留给农场 (0:10)'] 'Deadwood Farm Partnership'>>
+          <<if !maplebirch.get('Orchard').farmInterrupted and !$statFreeze and !$replayScene and !$frozenValues and !$nextPassage and !$nextPassageCheck>>
+            <<pass 10>>
+            <<if !maplebirch.get('Orchard').farmInterrupted and !$statFreeze and !$replayScene and !$frozenValues and !$nextPassage and !$nextPassageCheck and !$combat>>
+              <<set _stock to { truffles: 'truffle', eggs: 'chicken_egg', milk: 'bottle_of_milk', cream: 'cream' }>>
+              <<set _value to Object.entries(_stock).reduce((sum, [key, type]) => sum + Math.floor($farm.stock?.[key] || 0) * (setup.foodstuff[type]?.shop?.sell_price || 0), 0)>>
+              <<if maplebirch.get('Orchard').partnership.receive(_value)>>
+                <<for _key range Object.keys(_stock)>><<set $farm.stock[_key] to 0>><</for>>
+              <</if>>
+            <</if>>
+          <</if>>
+        <</lanLink>><br><br>
+      <</if>>
+      <<farmicon>><<lanLink ['Arrange further construction', '安排后续工程'] 'Deadwood Farm Projects'>><</lanLink>><br>
+    <</if>>
+  <</deadwood-dynamicblock>>
+<</if>>
+<br><<getouticon>><<lanLink ['Close the accounts', '合上账本'] 'Farm Upgrades'>><</lanLink>>
+
+:: Deadwood Farm Partnership Journal [widget]
+<<widget 'deadwood-farm-partnership-journal'>>
+  <<if $Orchard?.partnership.agreed>>
+    <<deadwood-card 'Farm partnership' '农场合伙'>>
+      <<lanSwitch 'You and Alex own 50% each.' '你与艾利克斯各持50%。'>><br>
+      <<lanSwitch 'Working money: ' '经营周转金：'>><<printmoney $Orchard.partnership.treasury>><br>
+      <<lanSwitch 'Advances owed to you: ' '尚欠你的垫款：'>><<printmoney $Orchard.partnership.loans.pc>><br>
+      <<lanSwitch 'Dividends received: ' '已领分红：'>><<printmoney $Orchard.partnership.dividends>><br>
+      <<if $Orchard.projects.queue.length>>
+        <<lanSwitch 'Further jobs planned: ' '待办工程：'>><<print $Orchard.projects.queue.length>>
+      <</if>>
+    <</deadwood-card>><hr>
+  <</if>>
+<</widget>>

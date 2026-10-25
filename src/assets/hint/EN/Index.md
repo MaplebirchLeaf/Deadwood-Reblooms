@@ -8,4 +8,4 @@ Choose a chapter below, or search by character, place or activity. The guide con
 - **Characters**: [Robin](#deadwood-guide-Robin) · [Sydney](#deadwood-guide-Sydney) · [Whitney](#deadwood-guide-Whitney) · [Kylar](#deadwood-guide-Kylar) · [Multiple love interests](#deadwood-guide-MoreLoveInterestsAndNPCAvatars)
 - **Exploration and transformations**: [Animal transformations, Darkfeather Shrine and Coldmoon Harbour](#deadwood-guide-MoreTransformations) · [Bird Tower](#deadwood-guide-BirdTower) · [Celestial Anomalies](#deadwood-guide-CelestialAnomalies) · [Psyche](#deadwood-guide-Psyche)
 
-The **journal** tracks current jobs, bills and leads. **Statistics → Mod statistics** records your results. Use the checkboxes beside the contents to toggle modules, then save and reload.
+The **journal** tracks current jobs, next steps, waiting dates and accounts. **Statistics → Mod statistics** retains outcomes and totals. Use the checkboxes beside the contents to toggle modules, then save and reload.

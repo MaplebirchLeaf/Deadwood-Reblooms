@@ -7,6 +7,8 @@ import Remy from './Orchard/Remy';
 import Staff, { type OrchardStaffState } from './Orchard/Staff';
 import Winery, { type WineryState } from './Orchard/Winery';
 import trade from '../assets/orchard/trade.json';
+import projects from '../assets/orchard/projects.json';
+import Partnership, { type PartnershipState } from './Finance/Partnership';
 import {
   species,
   harvestTiers,
@@ -78,6 +80,8 @@ interface OrchardSale {
 }
 
 interface OrchardState {
+  partnership: PartnershipState;
+  projects: { queue: { id: string; level: number }[]; paused: boolean; day: number };
   staff: OrchardStaffState;
   winery: WineryState;
   remy: typeof Remy.defaults;
@@ -133,6 +137,8 @@ interface OrchardState {
 }
 
 const defaults: OrchardState = {
+  partnership: clone(Partnership.defaults),
+  projects: { queue: [], paused: false, day: -1 },
   staff: clone(Staff.defaults),
   winery: clone(Winery.defaults),
   remy: clone(Remy.defaults),
@@ -175,6 +181,8 @@ const defaults: OrchardState = {
 };
 
 class Orchard extends Module {
+  public readonly projects = projects;
+  public readonly partnership = new Partnership(this.core, () => this.state.partnership);
   public readonly species = species;
   public readonly contractQuantities: readonly number[] = trade.contractQuantities;
   public readonly workerWage = 25000;
@@ -210,6 +218,14 @@ class Orchard extends Module {
       exact: true,
       action: () => {
         this.advance();
+        if (!V.Orchard) return;
+        $.wiki('<<deadwood-farm-projects-day>>');
+        // 已安排的工程款先保留，不能先分红再因施工资金不足要求 PC 重新垫钱。
+        const committed = this.state.projects.queue.reduce((total, job) => {
+          const project = this.projects.find(item => item.id === job.id);
+          return total + (project && (V.farm?.[project.field] ?? 0) < job.level ? project.cost : 0);
+        }, 0);
+        this.partnership.settle(Math.floor(Time.days), committed);
       }
     });
     this.core.dynamic.regTimeEvent('onHour', ':deadwood-orchard-worker', { exact: true, action: () => this.advance() });

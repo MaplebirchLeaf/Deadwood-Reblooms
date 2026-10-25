@@ -2,6 +2,8 @@
 
 import type Finance from '../Finance';
 import type { RobinExpansionState } from '../constants';
+import type RobinShop from './Shop';
+import type RobinFlowers from './Flowers';
 
 export interface RobinFacade {
   /** 罗宾是否可正常互动。 */
@@ -15,7 +17,8 @@ export interface RobinFacade {
   /** 房租子系统。canSpend 需要它来保护下周房租。 */
   readonly rent: { readonly due: number };
   /** 饮品店营业收入与雇工开销，单位英镑。 */
-  readonly shop: { readonly staffSales: number; readonly staffWages: number };
+  readonly shop: RobinShop;
+  readonly flowers: RobinFlowers;
 }
 
 export default abstract class Shared {

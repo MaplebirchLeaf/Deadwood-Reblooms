@@ -9,6 +9,8 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
   Remy(maplebirch);
   maplebirch.tool.addTo(
     'BeforeLinkZone',
+    { widget: 'deadwood-farm-projects-link', passage: 'Farm Upgrades' },
+    { widget: 'deadwood-farm-partnership-link', passage: ['Farm Upgrades', 'Farm Stock'] },
     { widget: 'deadwood-remy-school-link', passage: 'Riding School' },
     { widget: 'deadwood-remy-captivity', passage: 'Livestock Cell Remy' },
     { widget: 'deadwood-remy-estate-link', passage: 'Estate Approach' },
@@ -19,7 +21,7 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
     { widget: 'deadwood-remy-birth-reflection', passage: 'Pregnancy Birth Hospital 4' },
     { widget: 'deadwood-remy-paternity-link', passage: 'Hospital Paternity Test' }
   );
-  maplebirch.tool.addTo('Journal', 'deadwood-orchard-staff-journal', 'deadwood-orchard-orders-journal', 'deadwood-orchard-winery-journal');
+  maplebirch.tool.addTo('Journal', 'deadwood-orchard-staff-journal', 'deadwood-orchard-orders-journal', 'deadwood-orchard-winery-journal', 'deadwood-farm-partnership-journal');
   maplebirch.tool.patch.traits.add({
     title: 'Special Traits',
     name: () => maplebirch.t('deadwood-reblooms:orchard:trait:supplier:name'),

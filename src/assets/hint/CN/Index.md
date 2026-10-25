@@ -8,4 +8,4 @@
 - **人物互动**：[罗宾](#deadwood-guide-Robin) · [悉尼](#deadwood-guide-Sydney) · [惠特尼](#deadwood-guide-Whitney) · [凯拉尔](#deadwood-guide-Kylar) · [多位恋人](#deadwood-guide-MoreLoveInterestsAndNPCAvatars)
 - **探索与转化**：[动物转化、黯羽神社与寒月港湾](#deadwood-guide-MoreTransformations) · [巨鹰之塔](#deadwood-guide-BirdTower) · [天象](#deadwood-guide-CelestialAnomalies) · [心智](#deadwood-guide-Psyche)
 
-**日志**记录进行中的任务、账单和线索，**统计 → 模组统计**记录累计成果。目录右侧的复选框可开关模块，更改后保存并重新加载。
+**日志**记录当前任务的下一步、等待日期与账务，**统计 → 模组统计**保留结案与累计成果。目录右侧的复选框可开关模块，更改后保存并重新加载。

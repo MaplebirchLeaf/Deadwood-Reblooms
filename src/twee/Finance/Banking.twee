@@ -690,7 +690,7 @@
               <th scope='col'><<lanSwitch 'Available / issued' '可买／总股数'>></th>
               <th scope='col'><<lanSwitch 'Ownership' '持股比例'>></th>
             </tr>
-            <<for _financeSecurity range maplebirch.get("Finance").securities>>
+            <<for _financeSecurity range maplebirch.get("Finance").securities.filter(item => !['ALF', 'RDS'].includes(item.symbol) || ($Finance.brokerage.holdings[item.symbol] || 0) > 0 || $Finance.brokerage.margin.positions.some(position => position.symbol === item.symbol))>>
               <<set _financeBoardSymbol to _financeSecurity.symbol>>
               <<set _financePrice to $Finance.market.prices[_financeBoardSymbol]>>
               <<set _financePreviousPrice to $Finance.market.previous_prices[_financeBoardSymbol]>>
@@ -698,7 +698,7 @@
               <<set _financeChangePercent to _financePreviousPrice gt 0 ? (_financeChange / _financePreviousPrice) * 100 : 0>>
               <tr>
                 <td><<= _financeBoardSymbol>></td>
-                <td><<print maplebirch.t(_financeSecurity.name)>></td>
+                <td><<print maplebirch.t(_financeSecurity.name)>><<if ['ALF', 'RDS'].includes(_financeBoardSymbol)>> <span class='blue'>(<<lanSwitch 'legacy position' '旧持仓'>>)</span><</if>></td>
                 <td><<deadwood-reblooms-finance-money _financePrice>></td>
                 <td>
                   <<if _financeChange gt 0>>
@@ -729,8 +729,9 @@
           买卖各收<span class='gold'><<= (maplebirch.get('Finance').margin.terms.feeRate * 100).toFixed(2)>>%</span>，最低<<printmoney `maplebirch.get('Finance').margin.terms.minimumFee`>>。每周分红存入证券账户。
           <span class='red'>股价可能突然大涨或大跌。</span>柜台不承诺按旧价格收回你的股票。
       <</language>><br>
+      <span class='blue'><<lanSwitch 'The farm and drinks shop are private partnerships, owned equally by their founders. Earlier exchange positions can be sold or closed, but cannot be increased and receive no further exchange dividends.' '农场与饮品店由两位创始人各持一半，属于私人合伙。旧版证券持仓仍可卖出或平仓，不能加仓，也不再另发证券分红。'>></span><br><br>
       <<set _financeSecurityOptions to {}>>
-      <<for _financeSecurity range maplebirch.get("Finance").securities>>
+      <<for _financeSecurity range maplebirch.get("Finance").securities.filter(item => !['ALF', 'RDS'].includes(item.symbol) || ($Finance.brokerage.holdings[item.symbol] || 0) > 0 || $Finance.brokerage.margin.positions.some(position => position.symbol === item.symbol))>>
         <<set _financeSecurityLabel to maplebirch.t(_financeSecurity.name)>>
         <<set _financeSecurityOptions[_financeSecurityLabel] to _financeSecurity.symbol>>
       <</for>>
@@ -755,6 +756,7 @@
           </div>
         </div>
         <div class='dr-finance-actions'>
+          <<if !['ALF', 'RDS'].includes(_financeSymbol)>>
           <<lanLink ["Buy", "买入"]>>
             <<set _financeResult to maplebirch.get("Finance").buy(_financeSymbol, _financeShares)>>
             <<run maplebirch.get('Finance').refresh()>>
@@ -774,6 +776,7 @@
             <<replace '#deadwood-reblooms-finance-exchange-trade-panel'>><<deadwood-reblooms-finance-exchange-trade-panel>><</replace>>
             <<replace '#deadwood-reblooms-finance-result'>><<deadwood-reblooms-finance-result _financeResult>><</replace>>
           <</lanLink>>
+          <</if>>
           <<lanLink ["Sell", "卖出"]>>
             <<set _financeResult to maplebirch.get("Finance").sell(_financeSymbol, _financeShares)>>
             <<run maplebirch.get('Finance').refresh()>>

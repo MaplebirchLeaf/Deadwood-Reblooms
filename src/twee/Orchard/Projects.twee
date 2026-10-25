@@ -1,0 +1,147 @@
+:: Deadwood Farm Projects Widgets [widget]
+<!-- 这两个临时量跨本文件的显示与操作宏共用。预计等级包含当前施工和待办，实际竣工仍由原版处理。 -->
+<<widget 'deadwood-farm-projects-state'>><<silently>>
+  <<set _farmProjectsReady to !!$Orchard?.projects and !!$farm and $farm_stage gte 7
+    and C.npc.Alex.init is 1 and !$statFreeze and !$replayScene and !$frozenValues
+    and !$possessed and !$farm_assault and !maplebirch.get('Orchard').farmInterrupted>>
+  <<set _farmProjectsLevels to {}>>
+  <<if $farm and $Orchard?.projects>>
+    <<for $_project range maplebirch.get('Orchard').projects>>
+      <<if _farmProjectsLevels[$_project.field] is undefined>><<set _farmProjectsLevels[$_project.field] to $farm[$_project.field] or 0>><</if>>
+      <<if $farm.build is $_project.id>>
+        <<set _farmProjectsLevels[$_project.field] to $_project.level or (_farmProjectsLevels[$_project.field] + 1)>>
+      <</if>>
+    <</for>>
+    <<for $_job range $Orchard.projects.queue>>
+      <<set $_project to maplebirch.get('Orchard').projects.find(project => project.id === $_job.id)>>
+      <<if $_project>><<set _farmProjectsLevels[$_project.field] to Math.max(_farmProjectsLevels[$_project.field], $_job.level)>><</if>>
+    <</for>>
+  <</if>>
+<</silently>><</widget>>
+
+<<widget 'deadwood-farm-projects-link'>>
+  <<set $_menu to document.querySelector('#passage-content a[data-passage="Farm Alex Bedroom"]')>>
+  <<if $Orchard?.projects and $farm_stage gte 7 and !$statFreeze and !$replayScene
+    and $_menu>>
+    <<farmicon>><<lanLink ['Arrange further construction', '安排后续工程'] 'Deadwood Farm Projects'>><</lanLink>><br><br>
+  <</if>>
+<</widget>>
+
+<!-- 只由框架跨日通知，或玩家明确安排、恢复施工时调用。刷新与读档均不调用。 -->
+<<widget 'deadwood-farm-projects-day'>><<silently>>
+  <<deadwood-farm-projects-state>>
+  <<set $_today to Math.floor(Time.date.timeStamp / 86400)>>
+  <<if _farmProjectsReady and (_args[0] or $Orchard.projects.day isnot $_today)>>
+    <<set $Orchard.projects.day to $_today>>
+    <<if !$Orchard.projects.paused>>
+      <!-- 手动完成的工程直接从待办移除，不重复付款。 -->
+      <<for $Orchard.projects.queue.length>>
+        <<set $_job to $Orchard.projects.queue[0]>>
+        <<set $_project to maplebirch.get('Orchard').projects.find(project => project.id === $_job.id)>>
+        <<if !$_project or ($farm[$_project.field] or 0) gte $_job.level>>
+          <<run $Orchard.projects.queue.shift()>>
+        <<else>><<break>><</if>>
+      <</for>>
+      <<if !$farm.build and $Orchard.projects.queue.length>>
+        <<set $_job to $Orchard.projects.queue[0]>>
+        <<set $_project to maplebirch.get('Orchard').projects.find(project => project.id === $_job.id)>>
+        <<if ($_project.field is 'wall' or $farm_stage gte 8)
+          and $_job.level is ($farm[$_project.field] or 0) + 1
+          and ($_project.field isnot 'irrigation' or $_job.level lte Math.min(9, $plots.farm.length))
+          and $money + ($Orchard.partnership.agreed ? $Orchard.partnership.treasury : 0) gte $_project.cost>>
+          <<if $Orchard.partnership.agreed>>
+            <<set $_business to maplebirch.get('Orchard').partnership>>
+            <<if $_business.state.treasury lt $_project.cost>><<run $_business.contribute(($_project.cost - $_business.state.treasury) / 100)>><</if>>
+            <<set $_paid to $_business.spend($_project.cost)>>
+          <<else>>
+            <<money `-$_project.cost` 'farmUpgrades'>><<set $_paid to true>>
+          <</if>>
+          <<if $_paid>>
+            <<set $farm.build to $_project.id>><<set $farm.build_timer to $_project.days>>
+            <<run $Orchard.projects.queue.shift()>>
+          <</if>>
+        <</if>>
+      <</if>>
+    <</if>>
+  <</if>>
+<</silently>><</widget>>
+
+<<widget 'deadwood-farm-projects-add'>><<silently>>
+  <<set $_id to _args[0]>><<set $_level to _args[1]>>
+  <<deadwood-farm-projects-state>>
+  <<set $_choice to maplebirch.get('Orchard').projects.find(project => project.id === $_id)>>
+  <<if _farmProjectsReady and $_choice and ($_choice.field is 'wall' or $farm_stage gte 8)
+    and $_level is _farmProjectsLevels[$_choice.field] + 1
+    and ($_choice.level is $_level or ($_choice.field is 'irrigation' and $_level lte Math.min(9, $plots.farm.length)))
+    and !$nextPassage and !$nextPassageCheck and !$combat>>
+    <<pass 20>>
+    <<deadwood-farm-projects-state>>
+    <<if _farmProjectsReady and !$nextPassage and !$nextPassageCheck and !$combat
+      and $_level is _farmProjectsLevels[$_choice.field] + 1>>
+      <<run $Orchard.projects.queue.push({ id: $_id, level: $_level })>>
+      <<deadwood-farm-projects-day true>>
+    <</if>>
+  <</if>>
+<</silently>><</widget>>
+
+:: Deadwood Farm Projects
+<<set $location to 'alex_cottage'>><<set $outside to 0>><<effects>><<deadwood-farm-projects-state>>
+<<if $nextPassage or $nextPassageCheck or $combat>><<exit>><</if>>
+<<if !$Orchard?.projects or !$farm or $farm_stage lt 7>>
+  <<lanSwitch 'There is no construction to arrange here.' '这里还没有工程可供安排。'>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      You spread the plans across the desk, leaving space beside the current work for the jobs that will follow.
+      <<if $farm_work.alex is 'admin'>>Alex holds down a curling corner. "One at a time. No sense tearing up the whole farm."<</if>>
+    <<option 'CN'>>
+      你在桌上摊开图纸，在当前工程旁留出地方，列下后续要做的事。
+      <<if $farm_work.alex is 'admin'>>艾利克斯按住翘起的纸角。“一件一件来。总不能把整个农场都拆开。”<</if>>
+  <</language>><br><br>
+  <<farm_upgrades_current>>
+  <span class='blue'><<lanSwitch 'Each job is paid for when it starts. Work already underway takes priority. Insufficient cash or an attack on the farm will hold up the next job.' '各项工程开工时才付款，已经开工的工程优先。现金不足或农场遭到袭击时，后续工程会等待。'>></span><br><br>
+  <<if $Orchard.partnership.agreed>>
+    <span class='blue'><<lanSwitch 'Farm working money is used first. Any shortfall comes from your cash and is recorded as an advance owed to you.' '优先使用农场周转金，不足部分由你用现金垫付，并记为应归还你的垫款。'>></span><br><br>
+  <</if>>
+  <<if $Orchard.projects.queue.length>>
+    <span class='gold bold'><<lanSwitch 'Planned work' '待办工程'>></span><br>
+    <<set _total to 0>><<set _days to $farm.build ? Math.max(0, $farm.build_timer) : 0>>
+    <<for _index, _job range $Orchard.projects.queue>>
+      <<set _project to maplebirch.get('Orchard').projects.find(project => project.id === _job.id)>>
+      <<if _project>>
+        <<set _total += _project.cost>><<set _days += _project.days>>
+        <<print _index + 1>>. <<lanSwitch _project.name[0] _project.name[1]>><<if _project.field is 'irrigation'>> (<<print _job.level>>)<</if>> — <<printmoney _project.cost>>, <<print _project.days>><<lanSwitch ' days' '天'>><br>
+      <</if>>
+    <</for>>
+    <<lanSwitch 'Remaining payments: ' '待付费用：'>><<printmoney _total>><<lanSwitch '. ' '。'>><<lanSwitch 'Estimated time, including current work: ' '连同当前工程，预计还需'>><<print _days>><<lanSwitch ' days, excluding delays.' '天，不含等待时间。'>><br>
+    <<if $Orchard.projects.paused>>
+      <span class='blue'><<lanSwitch 'Further work is on hold.' '后续工程已暂停。'>></span><br>
+      <<lanLink ['Resume the plans', '恢复施工安排'] 'Deadwood Farm Projects'>><<set $Orchard.projects.paused to false>><<deadwood-farm-projects-day true>><</lanLink>><br>
+    <<else>>
+      <<lanLink ['Put further work on hold', '暂停后续工程'] 'Deadwood Farm Projects'>><<set $Orchard.projects.paused to true>><</lanLink>><br>
+      <<if !$farm.build and _farmProjectsReady>>
+        <<lanLink ['Check whether the next job can start', '检查下一项工程能否开工'] 'Deadwood Farm Projects'>><<deadwood-farm-projects-day true>><</lanLink>><br>
+      <</if>>
+    <</if>>
+    <<lanLink ['Clear the plans', '清空待办工程'] 'Deadwood Farm Projects'>><<set $Orchard.projects.queue to []>><</lanLink>><br>
+    <span class='blue'><<lanSwitch 'Work already underway will continue.' '已经开工的工程会继续进行。'>></span><br><br>
+  <<else>>
+    <<lanSwitch 'You have not arranged any further work.' '你还没有安排后续工程。'>><br><br>
+  <</if>>
+  <<if _farmProjectsReady>>
+    <<for _project range maplebirch.get('Orchard').projects>>
+      <<set _level to _project.level or (_farmProjectsLevels[_project.field] + 1)>>
+      <<if (_project.field is 'wall' or $farm_stage gte 8) and _level is _farmProjectsLevels[_project.field] + 1
+        and (_project.field isnot 'irrigation' or _level lte Math.min(9, $plots.farm.length))>>
+        <<capture _project _level>>
+          <<lanLink [`Plan: ${_project.name[0]} (0:20)`, `安排：${_project.name[1]} (0:20)`] 'Deadwood Farm Projects'>>
+            <<deadwood-farm-projects-add _project.id _level>>
+          <</lanLink>> — <<printmoney _project.cost>>, <<print _project.days>><<lanSwitch ' days' '天'>><br>
+        <</capture>>
+      <</if>>
+    <</for>>
+  <<else>>
+    <span class='red'><<lanSwitch 'Further construction will have to wait.' '后续工程还得再等一等。'>></span><br>
+  <</if>>
+<</if>>
+<br><<getouticon>><<lanLink ['Put away the plans', '收起图纸'] 'Farm Upgrades'>><</lanLink>>

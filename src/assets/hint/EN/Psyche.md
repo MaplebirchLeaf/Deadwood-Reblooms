@@ -44,4 +44,4 @@ Routine activities share a **daily allowance of 30 base recovery points**. Recov
 
 Shrine prayer and offerings share one use per day. Giving more money does not restore extra sanity. Activities with Tsukihan require at least 20 affection. Giving thanks grants recovery once per wish. Interrupted sleep grants no recovery for an unfinished hour, and nightmares can still frighten you.
 
-With **Revelation: The Book of Return** installed, shared work, choir practice, the temple watch, returning the Ivory Wraith's relic and Lost Lamb dreams can also affect sanity or fear. Routine sanity recovery shares the allowance above.
+With **Revelation: The Book of Return** installed, shared work, choir practice, temple fieldwork, returning the Ivory Wraith's relic and Lost Lamb dreams can also affect sanity or fear. Routine sanity recovery shares the allowance above.

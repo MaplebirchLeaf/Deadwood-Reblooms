@@ -42,6 +42,14 @@
           <</if>>
         <</if>>
       <</if>>
+      <<if $MoreTransformations?.harbour?.ship>>
+        <br><span class='gold'><<lanSwitch 'Coldmoon Harbour' '寒月港湾'>></span><br>
+        <span class='green'>✓ <<lanSwitch 'Seen the black ship in the blood-moon fog' '见过血月海雾中的黑船'>></span><br>
+        <<if $MoreTransformations.harbour.voice>><<lanSwitch 'You heard voices calling beneath the pier.' '你听见码头下的水里有人呼唤。'>><br><</if>>
+        <<if $MoreTransformations.harbour.spoke>><<lanSwitch 'A dead pirate told you the curse draws them back to sea at dawn.' '一名亡灵海盗说，诅咒会在天亮时把他们拖回海里。'>><br><</if>>
+        <<if $MoreTransformations.harbour.exchanged>><<lanSwitch 'You traded a recovered keepsake for old coins.' '你用打捞的旧物换过旧硬币。'>><br><</if>>
+        <<if $MoreTransformations.harbour.zephyr.stage is 4>><span class='green'>✓ <<lanSwitch 'Recovered Zephyr’s cargo and collected payment' '找回泽菲尔的货物并领款'>></span><br><</if>>
+      <</if>>
       <<if $MoreTransformations?.harbour?.raid?.encounters gt 0>>
         <br><span class='gold'><<lanSwitch 'Undead boarders' '亡灵船袭'>></span><br>
         <<lanSwitch 'Attacks witnessed: ' '遭遇袭击：'>><<= $MoreTransformations.harbour.raid.encounters>><br>
@@ -91,8 +99,8 @@
         <<lanSwitch "Margin-trading profit / loss after fees: " "保证金交易累计扣费盈亏：">><span class='gold'><<= formatMoney($Finance.brokerage.margin.realised ?? 0)>></span><br>
       <</if>>
       <<if maplebirch.get('Robin') and $RobinExpansion?.investment?.agreed>>
-        <<lanSwitch "Shop partnership contributions: " "店铺合伙累计出资：">><span class='gold'><<= formatMoney($RobinExpansion.investment.invested_total)>></span><br>
-        <<lanSwitch "Partnership dividends / buybacks: " "合伙累计分红／回购所得：">><span class='gold'><<= formatMoney($RobinExpansion.investment.dividends_total)>></span> / <span class='gold'><<= formatMoney($RobinExpansion.investment.returned_total)>></span><br>
+        <<lanSwitch "Shop partnership contributions: " "店铺合伙累计出资：">><span class='gold'><<= formatMoney($RobinExpansion.investment.contributed)>></span><br>
+        <<lanSwitch "Partnership dividends / advances repaid: " "合伙累计分红／垫款收回：">><span class='gold'><<= formatMoney($RobinExpansion.investment.dividends)>></span> / <span class='gold'><<= formatMoney($RobinExpansion.investment.returned)>></span><br>
       <</if>><br>
     <</foldout>>
   <</if>>
@@ -211,7 +219,7 @@
 
   <<if maplebirch.get('StreetLife') and $StreetLife>>
     <<set _deadwoodJobs to $StreetLife.jobs, _deadwoodBounties to $StreetLife.bounties, _deadwoodHeist to $StreetLife.heist, _deadwoodRaces to $StreetLife.races>>
-    <<if _deadwoodJobs?.completed or _deadwoodJobs?.losses or _deadwoodBounties?.completed or _deadwoodBounties?.leads or _deadwoodBounties?.arrested or _deadwoodRaces?.started or (_deadwoodHeist?.stage is 'closed' and _deadwoodHeist.settled) or $smuggler_pub_known is 1>>
+    <<if _deadwoodJobs?.completed or _deadwoodJobs?.losses or _deadwoodBounties?.completed or _deadwoodBounties?.leads or _deadwoodBounties?.arrested or _deadwoodRaces?.started or (_deadwoodHeist?.stage is 'closed' and _deadwoodHeist.settled) or $smuggler_pub_known is 1 or _deadwoodJobs?.report or _deadwoodBounties?.last or _deadwoodRaces?.last>>
       <<foldout false "_deadwoodStreetFoldout">>
         <span class='gold'><<lanSwitch 'Street work and cases' '街头差事与案件'>></span>
         <<deadwood-reblooms-progress-check `$smuggler_pub_known === 1` `["Find the smugglers’ pub", "找到走私者酒馆"]`>>
@@ -257,6 +265,53 @@
             <<lanSwitch 'Bank operation share collected: ' '本次银行行动分账实收：'>><span class='gold'><<= formatMoney(Math.floor(_deadwoodHeist.loot * _deadwoodHeist.shares.pc / 100))>></span><br>
             <<lanSwitch 'Share less recorded preparation expenses: ' '分账扣除已记录筹备支出后：'>><span class='gold'><<= formatMoney(Math.floor(_deadwoodHeist.loot * _deadwoodHeist.shares.pc / 100) - _deadwoodHeist.spent)>></span><br>
             <span class='small-description'><i><<lanSwitch 'Preparation expenses include recorded supplies, recruitment fees and Mickey\'s review. Fuel and vehicle repairs are separate.' '筹备支出包含已记录的用品、招募定金与米奇复核费用。燃油和修车开销另计。'>></i></span><br>
+          <</if>>
+        <</if>>
+        <<if $StreetLife.jobs.report or _deadwoodBounties?.last or _deadwoodRaces?.last>>
+          <br><span class='gold'><<lanSwitch 'Latest settled receipts' '最近结清的回执'>></span><br>
+          <<if $StreetLife.jobs.report>>
+            <<set _streetReport to $StreetLife.jobs.report>>
+            <ul class='journal'><li>
+              <<if _streetReport.outcome is 'paid'>>
+                <<lanSwitch 'Last fee collected: ' '上次领取报酬：'>><<printmoney _streetReport.fee>>
+                <<if _streetReport.late>><span class='blue'><<lanSwitch ' (late delivery)' '（迟到交货）'>></span><</if>>
+                <<if _streetReport.crew>>
+                  <br><<= _streetReport.crew.name>> · <<lanSwitch 'Colleague\'s payment: ' '合作人实领：'>><<printmoney _streetReport.crew.fee>>
+                  <br><span class='blue'><<lanSwitch 'Your recorded fee is after the agreed colleague\'s share.' '你的实收已扣除说好的合作人分成。'>></span>
+                <</if>>
+              <<elseif _streetReport.outcome is 'lost'>>
+                <span class='red'><<lanSwitch 'You reported a lost shipment. Your street reputation suffered.' '你报告了货物丢失，街头口碑受到影响。'>></span>
+              <<else>>
+                <<lanSwitch 'You returned or declined the last job. No fee was paid.' '上一份委托已退回或取消，没有领取报酬。'>>
+              <</if>>
+            </li></ul>
+          <</if>>
+          <<if _deadwoodBounties.last>>
+            <ul class='journal'><li>
+              <<switch _deadwoodBounties.last.outcome>>
+                <<case 'paid'>>
+                  <<lanSwitch 'Last reward collected: ' '上次领取赏金：'>><<printmoney _deadwoodBounties.last.fee>>
+                <<case 'lead'>>
+                  <<lanSwitch 'Last verified lead fee: ' '上次核实线索报酬：'>><<printmoney _deadwoodBounties.last.fee>>
+                  · <<lanSwitch 'Police are handling the pursuit; this was not a completed capture.' '警方接手后续追缉，本次不计抓捕完成。'>>
+                <<case 'released'>>
+                  <<lanSwitch 'You released the target. The case closed without a reward.' '你放走了目标，这份委托已结束，没有赏金。'>>
+                <<case 'interrupted'>>
+                  <<lanSwitch 'Your arrest interrupted the last assignment. No reward was paid.' '你被拘捕，上一份追查委托随之中断，没有领取赏金。'>>
+                <<default>>
+                  <<lanSwitch 'Your last assignment closed without a reward.' '上一份追查委托已结束，没有领取赏金。'>>
+              <</switch>>
+            </li></ul>
+          <</if>>
+          <<if _deadwoodRaces?.last>>
+            <<set _journal_race to _deadwoodRaces.last>>
+            <<if _journal_race.outcome is 'finished'>>
+              <<lanSwitch 'Last finishing position: ' '上次完赛名次：'>><span class='teal'><<= _journal_race.place>></span><br>
+            <<else>>
+              <<lanSwitch 'The last race ended without a finish.' '上一场比赛未能完赛。'>><br>
+            <</if>>
+            <<lanSwitch 'Prize collected: ' '奖金实收：'>><<printmoney _journal_race.payout>><br>
+            <<lanSwitch 'Fuel used: ' '消耗燃油：'>><span class='teal'><<= _journal_race.fuel.toFixed(2)>> L</span> · <<lanSwitch 'Condition lost: ' '车况下降：'>><span class='red'><<= _journal_race.wear.toFixed(1)>></span> <<lanSwitch 'percentage points' '个百分点'>><br>
           <</if>>
         <</if>>
         <span class='small-description'><i><<lanSwitch 'Job rewards are recorded when paid. Bounty income includes capture rewards, paid bonuses and verified lead fees; bank-operation shares and police statement rewards are separate.' '委托报酬在领款时登记。悬赏实收包含抓捕报酬、已支付奖金与核实线索费。银行行动分账与警方笔录奖励另计。'>></i></span><br><br>

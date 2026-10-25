@@ -16,7 +16,7 @@ After upgrading at least one stall, read the tutoring notice at the orphanage an
 
 The trial and later visits are on **Danube Street**. During term, accompany Robin on Tuesdays and Thursdays at 17:30–18:30; Fridays are added after six lessons. Arriving late means helping for the remaining lesson time, still finishing at 18:30. The link shows the actual duration. Completing a lesson gives the PC <span class="gold">£7.50</span> and adds <span class="gold">£8</span> to Robin's business reserves. Robin can also teach alone. Visiting and leaving without teaching does not count.
 
-### Cliff Street drinks shop
+### Setting up and opening the drinks shop
 
 Upgrade both stalls to level two, **check the ledger with Robin**, then discuss a proper shop in the room and follow the journal:
 
@@ -40,7 +40,9 @@ Discuss loans and repayments in person in Robin's room or at the shop. You can s
 
 Enter through **Cliff Street → Robin's drinks shop**, open 09:00–21:00. Opening earns **Honeyhole Ice City**. Robin usually works **18:30–21:00** each day, starting at **09:00 on weekdays during school holidays**. Weekend daytime stalls remain at the beach or park, and bathing, watering the garden, temple duties and existing arrangements still take priority. Staff cover Robin's absence. Spending time and tasting with Robin requires Robin to be at the shop.
 
-### Restocking, employees and side businesses
+### Running the shop
+
+You and Robin own 50% each. Counter receipts and weekly trading surplus enter the joint working funds, which pay for stock, equipment and staff. Personal tutoring and allowances remain separate. Every seven days, cash left after outstanding advances and the working reserve is shared equally. The reserve starts at £1,000 and can be adjusted in the ledger. Additional advances do not change ownership; check and repay them through the shop ledger.
 
 - **Shop work**: once daily, leaving a full hour before Robin's bath, garden watering or closing time. Uses one crate of new-product ingredients. The PC gets <span class="gold">£10</span> and reserves gain <span class="gold">£20</span>. Replace three exhausted crates for <span class="gold">£30,</span> reduced to <span class="gold">£25</span> with enough maths skill.
 - **Employees**: two positions shared by outside staff and orphanage companions. Each costs <span class="gold">£350</span> to train and <span class="gold">£350</span> per week. Applicants and the rota persist and can be checked in the ledger.

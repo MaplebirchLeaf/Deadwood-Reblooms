@@ -48,33 +48,20 @@ class Robin extends Module implements RobinFacade {
     return Math.max(0, Number(V.robinmoney) || 0) + this.state.reserve;
   }
 
-  public get income(): number {
+  /** 罗宾个人的周收入，不把店内留存资金当作可付房租的钱。 */
+  public get personalIncome(): number {
     const state = this.state;
     if (state.asylum.status === 'admitted') return 0;
-    const stall = state.shop ? state.lemonade + state.chocolate : Time.season === 'winter' ? state.chocolate : state.lemonade;
-    // 旧神殿线的周津贴由本模块统一结算，避免两个模组重复给罗宾发收入。
+    const stall = state.shop ? 0 : Time.season === 'winter' ? state.chocolate : state.lemonade;
     const temple = this.core.get('RobinTemple') ? V.RobinTemple : undefined;
-    const templeGrace = Number(temple?.grace);
-    const templeIncome = temple && ['member', 'approved', 'promised'].includes(temple.stage) && Number.isFinite(templeGrace) ? Math.clamp(templeGrace, 0, 100) * 10 : 0;
-    // 基础店铺增收已扣除店租、水电、原料和临时帮工，正式员工的增收与工资单独入账。
-    return (
-      (V.robin.stayup >= 1 ? 250 : 300) +
-      (V.robin.moneyModifier || 0) +
-      stall * 1200 +
-      this.tutoring.income +
-      templeIncome +
-      (state.shop
-        ? 1500 +
-          this.shop.staffSales -
-          this.shop.staffWages +
-          this.flowers.salesEstimate +
-          (this.core.get('Orchard')?.freshSupplySales ?? 0) +
-          (this.core.get('Orchard')?.winery.shopSalesEstimate ?? 0) +
-          (state.shop_popcorn ? 150 : 0) +
-          (state.shop_balloons ? 75 : 0)
-        : 0) +
-      this.balloon.income
-    );
+    const grace = Number(temple?.grace);
+    const allowance = temple && ['member', 'approved', 'promised'].includes(temple.stage) && Number.isFinite(grace) ? Math.clamp(grace, 0, 100) * 10 : 0;
+    return (V.robin.stayup >= 1 ? 250 : 300) + (V.robin.moneyModifier || 0) + stall * 1200 + this.tutoring.income + allowance + this.balloon.income;
+  }
+
+  public get income(): number {
+    if (this.state.asylum.status === 'admitted') return 0;
+    return this.personalIncome + (this.state.shop ? this.shop.partnership.dividend(this.shop.weeklyProfit * 100) / 100 : 0);
   }
 
   /** 罗宾是否可正常互动。门面与子系统共用。 */
@@ -129,6 +116,7 @@ class Robin extends Module implements RobinFacade {
   private sync(): void {
     if (!V.RobinExpansion || C.npc.Robin?.init !== 1 || V.replayScene || V.statFreeze) return;
     const state = this.state;
+    this.shop.partnership.migrate();
     if (state.week < 0) state.week = Math.floor(Time.days / 7);
     if (state.self_rent && !state.rent_separated) {
       if (V.robinpaid === 1) V.rentmoney /= 2;
@@ -239,7 +227,8 @@ class Robin extends Module implements RobinFacade {
     const vanillaIncome = (V.robin.stayup >= 1 ? 250 : 300) + (V.robin.moneyModifier || 0);
     const robinRent = this.rent.due;
     state.week++;
-    state.weekly_income = this.income;
+    const personalIncome = this.personalIncome;
+    state.weekly_income = personalIncome;
     if (state.asylum.status === 'admitted') {
       const cashBefore = V.robinmoney;
       V.robindebt = -1;
@@ -247,12 +236,9 @@ class Robin extends Module implements RobinFacade {
       V.robinmoney = cashBefore;
       return;
     }
-    this.flowers.settle();
-    this.shop.settle();
-    // 酒柜营业款已计入本周收入，这里只扣实际售出库存，不能再入账一次。
-    this.core.get('Orchard')?.winery.settleShop();
-    // 营业增收留在储备金，避免原版每周赠钱把开店积蓄一并送出。有房租要付时再转入现金。
-    state.reserve += Math.max(0, state.weekly_income - vanillaIncome);
+    // 个人增收与实收分红用于房租，店内留存资金不能再经原版每周赠钱送出。
+    state.reserve += Math.max(0, personalIncome - vanillaIncome);
+    state.weekly_income += this.shop.settleWeek();
     if (V.robinpaid !== 1 || state.self_rent) {
       const reserveTransfer = Math.clamp(robinRent - V.robinmoney, 0, state.reserve);
       state.reserve -= reserveTransfer;

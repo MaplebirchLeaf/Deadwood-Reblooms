@@ -226,37 +226,15 @@
 <</widget>>
 
 <<widget 'deadwood-harbour-journal'>>
-  <<if $MoreTransformations?.harbour and ($MoreTransformations.harbour.ship or $MoreTransformations.harbour.relics gt 0)>>
-    <br><b><<lanSwitch 'Coldmoon Harbour' '寒月港湾'>></b><br>
-    <<if $MoreTransformations.harbour.relics gt 0 and !$MoreTransformations.harbour.exchanged>>
-      <<lanSwitch 'Recovered keepsakes: ' '打捞的旧物：'>><<print $MoreTransformations.harbour.relics>><br>
-    <</if>>
-    <<if $MoreTransformations.harbour.ship>><<language>>
-      <<option 'EN'>>
-        A black ship comes into Coldmoon Harbour with the blood moon fog. Its dead crew plunder the quay and withdraw before dawn.
-      <<option 'CN'>>
-        血月时，一艘黑船随雾驶入寒月港湾。死去的船员上岸劫掠，天亮前便会离开。
-    <</language>><</if>>
-    <<if $MoreTransformations.harbour.voice>><br><<lanSwitch 'You heard voices calling from the water beneath the pier.' '你听见码头下的水里有人呼唤。'>><</if>>
-    <<if $MoreTransformations.harbour.spoke>><br><<language>>
-      <<option 'EN'>>
-        One of the dead pirates told you they come ashore with the fog to plunder. At dawn, a curse draws them back to sea.
-      <<option 'CN'>>
-        一名还能交谈的海盗说，他们随雾上岸劫掠，天亮后便会被诅咒拖回海里。
-    <</language>><</if>>
-    <<if $MoreTransformations.harbour.exchanged>><br><<language>>
-      <<option 'EN'>>
-        You traded a recovered keepsake for old coins.
-      <<option 'CN'>>
-        你用打捞的旧物换了几枚旧硬币。
-    <</language>><</if>>
-    <<if $MoreTransformations.harbour.zephyr.stage gt 0>><br>
-      <<switch $MoreTransformations.harbour.zephyr.stage>>
-        <<case 1>><<lanSwitch 'Zephyr offered to pay you to recover a small chest stolen by the dead pirates.' '泽菲尔愿意付钱，请你找回被亡灵海盗抢走的小箱子。'>>
-        <<case 2>><<lanSwitch 'Dive beneath the harbour steps at Coldmoon Harbour during the blood moon to find the chest bound with red cord.' '血月之夜，潜入寒月港湾的石阶水下，搜寻系着红绳的小箱子。'>>
-        <<case 3>><<lanSwitch 'You recovered the chest from the deep. Deliver it to Zephyr at the smuggler\'s pub or aboard ship.' '箱子已经打捞出水。带去走私者酒吧或海盗船上向泽菲尔交差。'>>
-        <<case 4>><<lanSwitch 'Zephyr paid the bounty for the recovered cargo.' '泽菲尔已结清找回货物的赏金。'>>
+  <<set _harbour_job to $MoreTransformations?.harbour?.zephyr>>
+  <<if _harbour_job and _harbour_job.stage gte 1 and _harbour_job.stage lt 4>>
+    <div class='bold'><<lanSwitch 'Zephyr’s missing cargo' '泽菲尔丢失的货物'>></div>
+    <ul class='journal'><li>
+      <<switch _harbour_job.stage>>
+        <<case 1>><<lanSwitch 'Zephyr offered to pay for a chest stolen by the dead pirates. Speak aboard ship or at the smugglers’ pub if you want to accept.' '泽菲尔愿意付钱找回被亡灵海盗抢走的箱子。想接下的话，可以在船上或走私者酒馆找船长谈妥。'>>
+        <<case 2>><<lanSwitch 'During the blood moon, between 21:00 and 06:00, dive beneath the steps at Coldmoon Harbour and search for the chest tied with red cord.' '血月21:00至次日06:00，潜入寒月港湾石阶下的水中，寻找系着红绳的箱子。'>>
+        <<case 3>><<lanSwitch 'The chest is recovered. Take it to Zephyr aboard ship or at the smugglers’ pub to collect payment.' '箱子已打捞上来。带到船上或走私者酒馆交给泽菲尔，领取报酬。'>>
       <</switch>>
-    <</if>>
+    </li></ul><hr>
   <</if>>
 <</widget>>

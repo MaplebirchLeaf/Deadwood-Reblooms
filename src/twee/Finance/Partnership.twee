@@ -1,0 +1,44 @@
+:: Deadwood Partnership Widgets [widget]
+<!-- 跨 widget 的界面参数由调用处明确传入，账务始终按当前存档取值。 -->
+<<widget 'deadwood-partnership-accounts'>>
+  <<set $_kind to _args[0]>>
+  <<set $_business to $_kind is 'farm' ? maplebirch.get('Orchard').partnership : maplebirch.get('Robin').shop.partnership>>
+  <<set $_state to $_business.state>>
+  <span class='gold'><<lanSwitch 'Your share: 50%. Partner: 50%.' '你的份额：50%。合伙人的份额：50%。'>></span><br>
+  <<lanSwitch 'Working money: ' '经营周转金：'>><<printmoney $_state.treasury>><br>
+  <<lanSwitch 'Advances owed to you: ' '尚欠你的垫款：'>><<printmoney $_state.loans.pc>><br>
+  <<if $_state.loans.partner gt 0>><<lanSwitch 'Advances owed to your partner: ' '尚欠合伙人的垫款：'>><<printmoney $_state.loans.partner>><br><</if>>
+  <<lanSwitch 'Dividends received: ' '已领分红：'>><<printmoney $_state.dividends>><br><br>
+  <<language>>
+    <<option 'EN'>>
+      Every seven days, cash left after covering outstanding advances and the working reserve is shared equally. Extra working money is an advance, not a purchase of a larger share.
+    <<option 'CN'>>
+      每七天，先留足尚欠垫款和约定的周转金，再将余款平分。补充周转金记作垫款，不增加持有份额。
+  <</language>><br><br>
+  <<if !$statFreeze and !$replayScene and !$frozenValues and !$combat and !$nextPassage and !$nextPassageCheck>>
+    <!-- 输入框的值须跨越 widget 退出后的点击回调，不能改成宏内变量。 -->
+    <<set _partnershipReserve to $_state.reserve / 100>>
+    <label><<lanSwitch 'Keep as working money (£): ' '保留周转金 (£)：'>><<numberbox '_partnershipReserve' _partnershipReserve>></label><br>
+    <<capture $_kind>>
+      <<lanLink ['Update the working reserve', '更新保留金额']>>
+        <<set $_business to $_kind is 'farm' ? maplebirch.get('Orchard').partnership : maplebirch.get('Robin').shop.partnership>>
+        <<if !$nextPassageCheck and !$combat>><<run $_business.hold(Number(_partnershipReserve))>><</if>>
+        <<run Dynamic.render($_kind === 'farm' ? 'deadwood-farm-partnership' : 'deadwood-shop-partnership')>>
+      <</lanLink>><br><br>
+      <<if $money gte 10000>>
+      <<lanLink ['Put in £100 cash', '垫入£100现金']>>
+        <<set $_business to $_kind is 'farm' ? maplebirch.get('Orchard').partnership : maplebirch.get('Robin').shop.partnership>>
+        <<if !$nextPassageCheck and !$combat>><<run $_business.contribute(100)>><</if>>
+        <<run Dynamic.render($_kind === 'farm' ? 'deadwood-farm-partnership' : 'deadwood-shop-partnership')>>
+      <</lanLink>><br>
+      <<else>><span class='blue'><<lanSwitch 'You need £100 in cash to advance working money.' '垫入周转金需要携带£100现金。'>></span><br><</if>>
+      <<if $_state.loans.pc gt 0 and $_state.treasury gt 0>>
+        <<lanLink ['Take back available advances', '收回能够偿还的垫款']>>
+          <<set $_business to $_kind is 'farm' ? maplebirch.get('Orchard').partnership : maplebirch.get('Robin').shop.partnership>>
+          <<if !$nextPassageCheck and !$combat>><<run $_business.repay()>><</if>>
+          <<run Dynamic.render($_kind === 'farm' ? 'deadwood-farm-partnership' : 'deadwood-shop-partnership')>>
+        <</lanLink>><br>
+      <</if>>
+    <</capture>>
+  <</if>>
+<</widget>>

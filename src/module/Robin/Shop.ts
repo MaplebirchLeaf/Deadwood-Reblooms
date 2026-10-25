@@ -1,13 +1,66 @@
 // ./src/module/Robin/Shop.ts
 
 import Shared from './Shared';
-import Investment from './Investment';
+import Partnership from './Partnership';
 
 /** 两个正式职位由外来店员与孤儿院同伴共用。 */
 const MAX_SHOP_STAFF = 2;
 
 export default class RobinShop extends Shared {
-  public readonly investment = new Investment(this.core, this.facade);
+  public readonly partnership = new Partnership(this.core, this.facade);
+
+  /** 开店后的经营支出只动用店内资金，罗宾个人的钱另行垫入。 */
+  public override canSpend(amount: number, protectNextRent = true): boolean {
+    return this.state.shop && this.partnership.state.agreed
+      ? Number.isFinite(amount) && amount >= 0 && this.partnership.state.treasury >= Math.round(amount * 100)
+      : super.canSpend(amount, protectNextRent);
+  }
+
+  public override spend(amount: number, protectNextRent = true): boolean {
+    return this.state.shop && this.partnership.state.agreed ? this.partnership.spend(Math.round(amount * 100)) : super.spend(amount, protectNextRent);
+  }
+
+  public fundFromRobin(pounds: number): boolean {
+    const amount = Math.round(pounds * 100);
+    if (
+      !this.robinAvailable ||
+      !this.atLedger ||
+      !this.state.shop ||
+      V.statFreeze ||
+      V.replayScene ||
+      V.frozenValues ||
+      V.combat ||
+      V.nextPassage ||
+      V.nextPassageCheck ||
+      !Number.isSafeInteger(amount) ||
+      amount <= 0 ||
+      ![this.partnership.state.treasury + amount, this.partnership.state.loans.partner + amount].every(Number.isSafeInteger) ||
+      !super.canSpend(amount / 100)
+    )
+      return false;
+    // 这是个人垫款，不能再次经过店铺 spend 的营业账分支。
+    const reserve = Math.min(this.state.reserve, amount / 100);
+    this.state.reserve -= reserve;
+    V.robinmoney -= amount / 100 - reserve;
+    this.partnership.state.treasury += amount;
+    this.partnership.state.loans.partner += amount;
+    return true;
+  }
+
+  /** 与周结算共用一笔净营业收入，不含家教、津贴和罗宾的个人收入。 */
+  public get weeklyProfit(): number {
+    return this.state.shop
+      ? 1500 +
+          (this.state.lemonade + this.state.chocolate) * 1200 +
+          this.staffSales -
+          this.staffWages +
+          this.facade.flowers.salesEstimate +
+          (this.core.get('Orchard')?.freshSupplySales ?? 0) +
+          (this.core.get('Orchard')?.winery.shopSalesEstimate ?? 0) +
+          (this.state.shop_popcorn ? 150 : 0) +
+          (this.state.shop_balloons ? 75 : 0)
+      : 0;
+  }
 
   /** 借还款需要当面商量，账本仍可在罗宾不在店时查看。 */
   public get atLedger(): boolean {
@@ -160,6 +213,18 @@ export default class RobinShop extends Shared {
     }
   }
 
+  /** 原版与 DoLX 共用营业结算，必须在售出库存扣除前取得同一份收入快照。 */
+  public settleWeek(): number {
+    const profit = this.weeklyProfit;
+    this.facade.flowers.settle();
+    this.settle();
+    this.core.get('Orchard')?.winery.settleShop();
+    if (profit > 0) this.partnership.receive(Math.round(profit * 100));
+    const before = this.partnership.state.dividends;
+    this.partnership.settle();
+    return (this.partnership.state.dividends - before) / 100;
+  }
+
   public get canTrainStaff(): boolean {
     const key = this.attendantKey;
     const npc = key ? V.per_npc[key] : null;
@@ -266,6 +331,7 @@ export default class RobinShop extends Shared {
     if (!this.robinAvailable || state.shop || state.shop_stage !== 'permitted' || state.lemonade < 2 || state.chocolate < 2 || !this.spend(4000)) return false;
     state.shop = true;
     state.shop_stock = 3;
+    this.partnership.agree();
     return true;
   }
 
@@ -319,7 +385,7 @@ export default class RobinShop extends Shared {
     this.state.shop_day = Time.days;
     this.state.shop_stock--;
     V.money += 1000;
-    this.state.reserve += 20;
+    this.partnership.receive(2000);
     regular.shop_orders = (regular.shop_orders ?? 0) + 1;
     if (special) regular.shop_specials = (regular.shop_specials ?? 0) + 1;
     return true;

@@ -163,7 +163,8 @@ export default class Winery {
     return this.canOperate && this.prepare(recipe, Time.date.timeStamp, Math.floor(Time.days));
   }
 
-  private spareFruit(recipe: WineRecipe, day: number): number {
+  /** 酿造、自动作业与界面共用可用原料，不占用保留量和有效订单。 */
+  public spareFruit(recipe: WineRecipe, day: number): number {
     const data = terms.recipes.find(item => item.id === recipe);
     if (!data) return 0;
     const promised = [this.orchard.state.order, this.orchard.state.farm_contract].reduce(

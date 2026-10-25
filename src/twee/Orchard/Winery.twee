@@ -50,9 +50,23 @@
       <span class='blue'><<lanSwitch 'You need enough money and a quiet spell to fit the equipment.' '得备好费用，也得有工夫把设备装起来。'>></span><br>
     <</if>>
   <<else>>
-    <<lanSwitch 'Each morning at 09:00, mature batches are bottled and empty vessels are filled with the recipe you leave. There are still only three vessels. Fruit reserves, outstanding orders and the usual processing and glass costs come first; no money or fruit means no new batch.' '每天早上09:00，先把成熟的酒装瓶，再按你留下的配方为闲置酒桶投料。仍只有三个发酵桶。水果保留量和未到期订单会先留好，辅料与酒瓶照常付费。原料或钱不够，就先停着。'>><br><br>
-    <<lanSwitch 'A carrier can take six spare bottles per trip to Robin\'s shop, up to twelve a day. Each trip costs ' '送货人可每趟带六瓶多余的酒去罗宾店里，当天最多十二瓶，每趟运费'>><span class='gold'><<printmoney _wineLineModule.terms.automationHaulFee>></span><<lanSwitch ', taken from that delivery’s payment. Robin still pays from real shop funds and keeps rent money; the cabinet holds at most twenty-four bottles. Missed deliveries are not made up.' '，从这趟货款中扣除。罗宾仍按店内现有资金付款，并留够房租。酒柜最多放二十四瓶。错过的配送不补做。'>><br><br>
     <<deadwood-orchard-winery-automation-status>>
+    <div id='deadwood-winery-instructions'>
+      <<lanLink ['Read the equipment and delivery notes', '查看设备与配送说明']>>
+        <<replace '#deadwood-winery-instructions'>>
+          <<language>>
+            <<option 'EN'>>
+              Work starts at 09:00: mature batches are bottled first, then empty vessels are filled with your chosen recipe. Reserved fruit and outstanding orders are kept aside. Supplies and bottles still cost money; without enough fruit or funds, no new batch starts.
+              <br><br>
+              The carrier takes <<print _wineLineModule.terms.shopSupplyQuantity>> spare bottles per trip to Robin's shop, up to <<print _wineLineModule.terms.automationSupplyLimit>> a day. Each trip costs <span class='gold'><<printmoney _wineLineModule.terms.automationHaulFee>></span>, deducted from the delivery payment. Robin keeps enough money for rent, and the cabinet holds <<print _wineLineModule.terms.shopStockLimit>> bottles. Missed deliveries are not made up.
+            <<option 'CN'>>
+              每天09:00开工，先装瓶，再按你选的配方为闲置酒桶投料。保留水果和未完成订单会先留好，辅料与酒瓶照常付费。水果或钱不够，就不开始新的一批。
+              <br><br>
+              送货人每趟带<<print _wineLineModule.terms.shopSupplyQuantity>>瓶多余的酒去罗宾店里，当天最多<<print _wineLineModule.terms.automationSupplyLimit>>瓶。每趟运费<span class='gold'><<printmoney _wineLineModule.terms.automationHaulFee>></span>，从货款中扣除。罗宾会留够房租，酒柜最多放<<print _wineLineModule.terms.shopStockLimit>>瓶。错过的配送不补做。
+          <</language>><br><br>
+        <</replace>>
+      <</lanLink>>
+    </div>
     <<if _wineLineModule.canOperate and _wineLine.ready_at lte Time.date.timeStamp>>
       <<set _winePlan to {bottle: _wineLine.bottle, recipe: _wineLine.recipe ?? '', supply: _wineLine.supply}>>
       <br><label><<checkbox '_winePlan.bottle' false true autocheck>><<lanSwitch 'Bottle mature batches' '将成熟的果酒装瓶'>></label><br>
@@ -118,9 +132,19 @@
       <<else>>
         <<language>>
           <<option 'EN'>>
-            The press stands over a shallow catching tray, with a brush hung beside it. The fermentation vessels are kept away from the stored fruit, their lids marked with dates. Bottled batches go into separate crates beneath the bench. A work lamp lights the labels after dark; wine kept for your own table stays with the rest until you take it.
+            The press stands over a shallow catching tray, with a brush hung beside it. The fermentation vessels stand apart from the stored fruit.
+            <<if _winery.ready.length>>A date on one of the vessels tells you the wine is ready. You leave a space on the bench for the bottles.
+            <<elseif _winery.state.batches.length>>The smell of fruit lingers around the press. You check the dates on the lids; the wine still needs time.
+            <<elseif Object.values(_winery.state.stock).some(amount => amount > 0)>>Crates of labelled bottles stand beneath the bench. The empty vessels have been washed for the next batch.
+            <<else>>The vessels stand empty, their lids propped beside them. There is room on the rack for the next batch of bottles.<</if>>
+            <<if Time.dayState is 'night'>>The work lamp lights the labels, leaving the corners of the room in shadow.<</if>>
           <<option 'CN'>>
-            压榨机下接着浅盘，刷子挂在手边。发酵桶与储存的水果隔开摆放，桶盖上写着日期。装瓶后的酒按批次收进台下的果箱，天黑后，工作灯照着瓶身的标签。留给自家餐桌的酒也收在这里，等你来取。
+            压榨机下接着浅盘，刷子挂在手边。发酵桶与储存的水果隔开摆放。
+            <<if _winery.ready.length>>有只桶盖上写的日期已经到了，该装瓶了。你在台面上腾出一块地方，准备摆酒瓶。
+            <<elseif _winery.state.batches.length>>压榨机旁仍有果香。你看看桶盖上的日期，还得再等一阵。
+            <<elseif Object.values(_winery.state.stock).some(amount => amount > 0)>>贴好标签的酒瓶装在台下的果箱里。腾出来的发酵桶已经洗净，等着酿下一批。
+            <<else>>发酵桶空着，桶盖立在旁边。瓶架上也留着位置，等下一批酒装瓶。<</if>>
+            <<if Time.dayState is 'night'>>工作灯照着标签，屋子的角落隐在暗处。<</if>>
         <</language>><br><br>
         <<lanSwitch 'Vessels in use: ' '使用中的发酵桶：'>><span class='blue'><<= _winery.state.batches.length>> / <<= _winery.terms.barrelCapacity>></span><br>
         <<for _batch range _winery.state.batches>>
@@ -129,8 +153,9 @@
             <<icon _recipe.icon>><<= lanSwitch(_recipe.name[0], _recipe.name[1])>> × <<= _batch.bottles>>
             <<if _batch.ready_at lte Time.date.timeStamp>>
               — <span class='green'><<lanSwitch 'Ready to bottle' '可以装瓶'>></span><br>
-              <<lanSwitch 'Bottles and corks: ' '酒瓶与瓶塞：'>><span class='gold'><<printmoney `_batch.bottles * _winery.terms.bottleCost`>></span><br>
-              <<if _winery.canOperate>>
+              <<set _wineBottleFunds to maplebirch.get('Finance')?.canPay(_batch.bottles * _winery.terms.bottleCost, 'orchard') ?? $money gte _batch.bottles * _winery.terms.bottleCost>>
+              <<lanSwitch 'Bottles and corks: ' '酒瓶与瓶塞：'>><span @class="_wineBottleFunds ? 'gold' : 'red'"><<printmoney `_batch.bottles * _winery.terms.bottleCost`>></span><br>
+              <<if _winery.canOperate and _wineBottleFunds>>
                 <<icon 'orchard/wine-bottling.png'>><<lanLink ['Bottle this batch (0:' + _winery.bottleMinutes + ')', '将这一批装瓶 (0:' + _winery.bottleMinutes + ')']>>
                   <<set _bottleMinutes to maplebirch.get('Orchard').winery.bottleMinutes>>
                   <<if maplebirch.get('Orchard').winery.bottle(_batch.id)>>
@@ -147,13 +172,16 @@
           <</capture>>
         <</for>>
         <br><span class='gold'><<lanSwitch 'Start a batch' '开始酿制'>></span><br>
-        <<lanSwitch 'Each batch uses ' '每批消耗'>><<= _winery.terms.fruitPerBatch>><<lanSwitch ' fruit and yields ' '个水果，酿得'>><<= _winery.terms.bottlesPerBatch>><<lanSwitch ' bottles. Fermentation supplies cost ' '瓶酒。发酵辅料费用'>><span class='gold'><<printmoney _winery.terms.batchCost>></span><<lanSwitch '; bottles are paid for when you fill them.' '，装瓶时再支付酒瓶费用。'>><br>
+        <<set _wineBatchFunds to maplebirch.get('Finance')?.canPay(_winery.terms.batchCost, 'orchard') ?? $money gte _winery.terms.batchCost>>
+        <<lanSwitch 'Each batch uses ' '每批消耗'>><<= _winery.terms.fruitPerBatch>><<lanSwitch ' fruit and yields ' '个水果，酿得'>><<= _winery.terms.bottlesPerBatch>><<lanSwitch ' bottles. Fermentation supplies cost ' '瓶酒。发酵辅料费用'>><span @class="_wineBatchFunds ? 'gold' : 'red'"><<printmoney _winery.terms.batchCost>></span><<lanSwitch '; bottles are paid for when you fill them.' '，装瓶时再支付酒瓶费用。'>><br>
         <<lanSwitch 'Reserved fruit and outstanding fruit deliveries are kept aside.' '保留水果和已答应交付的水果不会拿去酿酒。'>><br>
         <<for _recipe range _winery.terms.recipes>>
           <<capture _recipe>>
             <<foodstufficon _recipe.fruit>><<= lanSwitch(_recipe.name[0], _recipe.name[1])>> — <<= _winery.terms.fruitPerBatch>> <<= lanSwitch(maplebirch.get('Orchard').species[_recipe.fruit].name[0], maplebirch.get('Orchard').species[_recipe.fruit].name[1])>>
-            / <<= _winery.terms.bottlesPerBatch>><<lanSwitch ' bottles / ' '瓶 / '>><<= _recipe.days>><<lanSwitch ' days' '天'>><br>
-            <<if _winery.canOperate and _winery.state.batches.length lt _winery.terms.barrelCapacity>>
+            / <<= _winery.terms.bottlesPerBatch>><<lanSwitch ' bottles / ' '瓶 / '>><<= _recipe.days>><<lanSwitch ' days' '天'>>
+            <<set _wineFruit to _winery.spareFruit(_recipe.id, Math.floor(Time.days))>>
+            (<span @class="_wineFruit gte _winery.terms.fruitPerBatch ? 'green' : 'red'"><<lanSwitch 'available: ' '可用：'>><<= _wineFruit>></span>)<br>
+            <<if _winery.canOperate and _wineBatchFunds and _wineFruit gte _winery.terms.fruitPerBatch and _winery.state.batches.length lt _winery.terms.barrelCapacity>>
               <<icon 'orchard/fermentation.png'>><<lanLink ['Prepare ' + _recipe.name[0] + ' (0:' + _winery.terms.startMinutes + ')', '准备酿制' + _recipe.name[1] + ' (0:' + _winery.terms.startMinutes + ')']>>
                 <<if maplebirch.get('Orchard').winery.begin(_recipe.id)>>
                   <<pass `maplebirch.get('Orchard').winery.terms.startMinutes`>><<updatesidebarmoney>>
@@ -174,8 +202,11 @@
           <span class='blue'><<lanSwitch 'Farm wholesale deliveries are taken during the daytime while Alex handles administration. You can still prepare and bottle wine after dark.' '农场在白天、艾利克斯处理行政事务时收取批发货物。夜里仍能准备发酵和装瓶。'>></span><br>
         <</if>>
         <<set _wineKeep to {}>>
+        <<if !Object.values(_winery.state.stock).some(amount => amount > 0)>>
+          <<lanSwitch 'The bottle crates are empty. A finished batch can be bottled here when it is ready.' '酒箱还是空的。等酒酿好，就能在这里装瓶入库。'>><br>
+        <</if>>
         <<for _recipe range _winery.terms.recipes>>
-          <<capture _recipe>>
+          <<if _winery.state.stock[_recipe.id] gt 0 or _winery.state.reserve[_recipe.id] gt 0>><<capture _recipe>>
             <br><<icon _recipe.icon>><b><<= lanSwitch(_recipe.name[0], _recipe.name[1])>></b> × <<= _winery.state.stock[_recipe.id]>><br>
             <<lanSwitch 'Wholesale price per bottle: ' '每瓶批发价：'>><span class='gold'><<printmoney _recipe.wholesale>></span><br>
             <<set _wineKeep[_recipe.id] to _winery.state.reserve[_recipe.id]>>
@@ -202,7 +233,7 @@
                 <</lanLink>><br>
               <</if>>
             <</capture>>
-          <</capture>>
+          <</capture>><</if>>
         <</for>>
         <<deadwood-orchard-winery-automation>>
         <br><span class='gold'><<lanSwitch 'Winery accounts' '果酒账目'>></span><br>
