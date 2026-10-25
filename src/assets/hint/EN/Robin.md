@@ -2,6 +2,8 @@
 
 Ask Robin about the equipment at the beach lemonade stall or winter hot chocolate stall in the park. Once you have seen the business problem, discuss improvements in **Orphanage → Robin's room**. After each upgrade, ask about the equipment at that stall again to discover the next plan.
 
+The first upgrade at each stall needs **20 affection**, and the second **40**. Robin will put purchases off at **80 trauma** or higher. Friendship is enough to work on the business together.
+
 The first upgrade at each stall costs <span class="gold">£600</span> and the second <span class="gold">£400</span>; fully upgrading both costs <span class="gold">£2,000</span>. Lend PC cash or let Robin pay from funds remaining after rent. PC contributions become a loan owed by Robin.
 
 Upgrades add products and shelter from rain, with tasting and work options. Helping takes 45 minutes once daily and requires Robin to be present and available. Business income goes into reserves for rent and improvements; Robin’s gifts to the PC come from personal cash. The ledger records loans owed to the PC separately, and spending still leaves enough for the next rent.
@@ -16,7 +18,9 @@ The trial and later visits are on **Danube Street**. During term, accompany Robi
 
 ### Cliff Street drinks shop
 
-Upgrade both stalls to level two, discuss a proper shop in the room, then follow the journal:
+Upgrade both stalls to level two, **check the ledger with Robin**, then discuss a proper shop in the room and follow the journal:
+
+Planning the shop together for the first time needs **60 affection**. Existing improvements and shop progress are retained, and later payments follow the agreed plan.
 
 Before handling paperwork together, arrange a same-day meeting while **Robin is free at home on a day without school**. On weekends, ask **07:00–09:00 before the stall opens**, then make your own way to the town hall or vacant Cliff Street shop. Existing commitments take priority. With enough confidence and a free hour before closing, Robin can still apply, inspect the premises or collect the permit alone.
 
@@ -31,6 +35,8 @@ Town hall applications and permit collection are available **09:00–17:00**. Ch
 | 5     | Fit out and stock the shop, then open                      | <span class="gold">£4,000</span> |
 
 Opening costs <span class="gold">£7,400,</span> separate from stall upgrades. With an account, debit card and enough deposits, lend Robin <span class="gold">£2,000</span> from PC savings once during preparations; it remains part of the loan.
+
+Discuss loans and repayments in person in Robin's room or at the shop. You can still read the ledger while Robin is away. Notes beside the accounts also show how the tutoring is going.
 
 Enter through **Cliff Street → Robin's drinks shop**, open 09:00–21:00. Opening earns **Honeyhole Ice City**. Robin usually works **18:30–21:00** each day, starting at **09:00 on weekdays during school holidays**. Weekend daytime stalls remain at the beach or park, and bathing, watering the garden, temple duties and existing arrangements still take priority. Staff cover Robin's absence. Spending time and tasting with Robin requires Robin to be at the shop.
 

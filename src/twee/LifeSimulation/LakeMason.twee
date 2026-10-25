@@ -2,19 +2,21 @@
 
 <<widget 'deadwood-lake-mason-options'>>
   <<swimicon>><<lanLink `["Swim laps together with Mason (0:30)", "和梅森一起游泳 (0:30)"]` "Lake Mason Swim Together">><</lanLink>><<gswimming>><<glove>><br>
-  <<if hasSexStat('promiscuity', 1) or C.npc.Mason.lust gte 10 or C.npc.Mason.love gte 15>>
-    <<loveicon 'hug'>><<lanLink `["Dive and embrace Mason underwater", "潜入水中拥抱梅森"]` "Lake Mason Underwater Touch">><</lanLink>><<glove>><<glust>><<garousal>><br>
+  <<if C.npc.Mason.lust gte 10 or C.npc.Mason.love gte 15>>
+    <<loveicon 'hug'>><<lanLink `["Dive and embrace Mason underwater", "潜入水中拥抱梅森"]` "Lake Mason Underwater Touch">><</lanLink>><<promiscuous1>><<glove>><<glust>><<garousal>><br>
   <</if>>
   <<icon 'lake-rock.png'>><<lanLink `["Rest on the lakeside rocks with Mason (0:30)", "和梅森在湖边岩石上休息 (0:30)"]` "Lake Mason Sunbathe">><</lanLink>><<lstress>><<glove>><br>
-  <<if (C.npc.Mason.love gte 20 or C.npc.Mason.lust gte 20) and hasSexStat('promiscuity', 1)>>
+  <<if C.npc.Mason.love gte 20 or C.npc.Mason.lust gte 20>>
     <<loveicon 'hug'>><<lanLink `["Embrace Mason in the secluded waters", "在僻静的水中拥抱梅森"]` "Lake Mason Intimacy">><</lanLink>><<promiscuous1>><<gglust>><<glove>><br>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-mason-pond-options'>>
-  <<watericon 'waterfall'>><<lanLink `["Wash each other's back in the spring (0:30)", "在泉水中与梅森互相擦背 (0:30)"]` "Mason Pond Wash">><<pass 30>><</lanLink>><<lstress>><<ltiredness>><<glove>><br>
+  <<if C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 10>>
+    <<watericon 'waterfall'>><<lanLink `["Wash each other's back in the spring (0:30)", "在泉水中与梅森互相擦背 (0:30)"]` "Mason Pond Wash">><</lanLink>><<lstress>><<ltiredness>><<glove>><br>
+  <</if>>
   <<if C.npc.Mason.love gte 20 or C.npc.Mason.lust gte 15>>
-    <<socialiseicon 'chat'>><<lanLink `["Cuddle by the waterfall spring (0:30)", "在瀑布泉边与梅森依偎 (0:30)"]` "Mason Pond Cuddle">><<pass 30>><</lanLink>><<llstress>><<glove>><br>
+    <<socialiseicon 'chat'>><<lanLink `["Cuddle by the waterfall spring (0:30)", "在瀑布泉边与梅森依偎 (0:30)"]` "Mason Pond Cuddle">><</lanLink>><<llstress>><<glove>><br>
   <</if>>
   <<if (C.npc.Mason.love gte 25 or C.npc.Mason.lust gte 25) and hasSexStat('promiscuity', 2)>>
     <<loveicon 'hug'>><<lanLink `["Embrace passionately in the warm spring", "在温泉中与梅森热情拥抱"]` "Mason Pond Intimacy">><</lanLink>><<promiscuous2>><<gglust>><<glove>><br>
@@ -49,6 +51,9 @@
 
 :: Lake Mason Underwater Touch
 <<effects>>
+<<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or (C.npc.Mason.lust lt 10 and C.npc.Mason.love lt 15)>>
+  <<getouticon>><<lanLink ['Return to the lake', '回到湖中'] 'Lake Depths'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<npc Mason>><<person1>>
 <<set $outside to 1>><<set $location to 'lake'>>
 <<pass 15>>
@@ -60,7 +65,7 @@
     <br><br>
     Mason gives a surprised jolt in the water, but as <<his>> hands reach down and find your fingers, <<he>> relaxes. In the silent blue world beneath the waves, <<he>> turns in your embrace, gazing into your eyes with breathless wonder.
     <br><br>
-    You kick upward together, breaking the surface into the forest air. Mason laughs softly, <<his>> wet hair pushed back from <<his>> flushed face. "You caught me completely off guard... but being held by you in the water feels wonderful."
+    You surface together. Mason pushes <<his>> wet hair back, still pink around the ears. "You startled me. L-let me see you coming next time."
   <<option 'CN'>>
     你深吸一口气，悄然潜入梅森下方的湖水深处。
     <br><br>
@@ -68,7 +73,7 @@
     <br><br>
     梅森在水里微微一惊，但当<<his>>大手下意识覆上你的手背时，浑身的防备悄然散去。在水底静谧无声的世界里，<<he>>在你怀中转过身来，与你在水中深情相视。
     <br><br>
-    你们一同摆动双腿破水而出，呼吸着清润的空气。梅森抹了一把脸上的水珠，抹开湿发，面颊泛着动人的红晕笑道：“你可真让我措手不及……但在水里被你这样抱住，感觉真好。”
+    你们一同浮出水面。梅森抹开湿发，耳根还有些红。“你吓了我一跳。下、下回，先让我看见你。”
 <</language>><br><br>
 <<takeHandholdingVirginity 'Mason' 'consensual'>>
 <<npcincr Mason love 2>><<npcincr Mason lust 4>><<arousal 300>><<garousal>><br><br>
@@ -94,31 +99,40 @@
     梅森伸展四肢，把双手垫在脑后。发觉你在看，<<he>>红着脸移开了视线。
 <</language>><br><br>
 
-<<lanLink `['Massage Mason\'s shoulders and help dry <<his>> back', '帮梅森按摩肩膀并擦拭后背']` 'Lake Mason Sunbathe Massage'>><<glove>><<glust>><<lstress>><</lanLink>><br>
-<<lanLink `['Ask Mason to gently towel-dry your back', '请梅森用毛巾为你擦拭后背']` 'Lake Mason Sunbathe Towel'>><<glove>><<lstress>><</lanLink>><br>
+<<if C.npc.Mason.love gte 15 or C.npc.Mason.lust gte 10>>
+  <<lanLink `['Massage Mason\'s shoulders and help dry <<his>> back', '帮梅森按摩肩膀并擦拭后背']` 'Lake Mason Sunbathe Massage'>><<glove>><<glust>><<lstress>><</lanLink>><br>
+  <<lanLink `['Ask Mason to gently towel-dry your back', '请梅森用毛巾为你擦拭后背']` 'Lake Mason Sunbathe Towel'>><<glove>><<lstress>><</lanLink>><br>
+<</if>>
 
-<<if hasSexStat('promiscuity', 2)>>
+<<if hasSexStat('promiscuity', 2) and (C.npc.Mason.love gte 20 or C.npc.Mason.lust gte 20)>>
   <<lanLink `['Lean close and tease Mason on the sun-warmed rock', '紧贴在梅森身侧，在岩石上挑逗戏弄']` 'Lake Mason Sunbathe Tease'>><<promiscuous2>><<gglust>><<garousal>><</lanLink>><br>
 <</if>>
+<br><<getouticon>><<lanLink ['Return to the lake', '回到湖中'] 'Lake Depths'>><<endevent>><</lanLink>>
 
 :: Lake Mason Sunbathe Massage
 <<effects>>
+<<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or (C.npc.Mason.love lt 15 and C.npc.Mason.lust lt 10)>>
+  <<getouticon>><<lanLink ['Return to the lake', '回到湖中'] 'Lake Depths'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
     You kneel beside Mason and place your hands on <<his>> broad, swimmer's shoulders. Your fingers work deep into the firm muscles, kneading away the tension built up from endless laps.
     <br><br>
-    Mason groans in sheer bliss, burying <<his>> face in <<his>> folded arms. "Oh... that hits the exact spot... you have amazing hands," <<he>> murmurs, completely succumbing to your touch.
+    Mason braces <<his>> hands against the rock and lowers <<his>> head. After a moment, <<his>> shoulders begin to relax. "There. That's better," <<he>> says. "Too many laps, I suppose."
   <<option 'CN'>>
     你在梅森身旁跪坐下来，将双手覆上<<his>>宽阔结实的双肩。你的指腹用力按揉进紧致的肌肉纹理中，耐心地揉散长距离游泳累积下的酸胀与紧绷。
     <br><br>
-    梅森发出一声极其受用的舒服轻哼，把脸埋进交叉的臂弯里。“唔……按得太准了……你的手法真舒服……”<<he>>完全放松下身心，任由你的双手在<<his>>肩背上游走抚弄。
+    梅森把手撑在岩石上，低下头。过了一会儿，绷紧的肩膀终于放松了些。“嗯……好些了。”<<he>>说，“大概是游得太久了。”
 <</language>><br><br>
 <<npcincr Mason love 2>><<npcincr Mason lust 2>><<stress -10>><<lstress>><<tiredness -5>><br><br>
 <<lanLink `["Next", "继续"]` "Lake Depths">><<endevent>><</lanLink>>
 
 :: Lake Mason Sunbathe Towel
 <<effects>>
+<<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or (C.npc.Mason.love lt 15 and C.npc.Mason.lust lt 10)>>
+  <<getouticon>><<lanLink ['Return to the lake', '回到湖中'] 'Lake Depths'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -139,6 +153,9 @@
 
 :: Lake Mason Sunbathe Tease
 <<effects>>
+<<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or !hasSexStat('promiscuity', 2) or (C.npc.Mason.love lt 20 and C.npc.Mason.lust lt 20)>>
+  <<getouticon>><<lanLink ['Return to the lake', '回到湖中'] 'Lake Depths'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -159,6 +176,9 @@
 
 :: Lake Mason Intimacy
 <<effects>>
+<<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or (C.npc.Mason.love lt 20 and C.npc.Mason.lust lt 20)>>
+  <<getouticon>><<lanLink ['Return to the lake', '回到湖中'] 'Lake Depths'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<npc Mason>><<person1>>
 <<set $outside to 1>><<set $location to 'lake'>>
 <<language>>
@@ -169,7 +189,7 @@
     <br><br>
     Mason's arms wrap instinctively around your waist in the water. Treading water together, <<his>> chest presses flush against yours.
     <br><br>
-    "I've never felt like this with anyone," Mason whispers, <<his>> voice trembling with honest emotion. "Out here in the water... with you... I don't want to hold back anymore."
+    "L-let's stay near the bank," Mason says, looking towards the shore. "The water's deeper here."
   <<option 'CN'>>
     你牵着梅森的手，从开阔的湖心游入一片被茂密水柳与芦苇荡掩映的幽深水湾。
     <br><br>
@@ -177,14 +197,20 @@
     <br><br>
     梅森有力的双臂在水中本能地环抱住你的腰肢。你们在水中并肩踩水，胸膛毫无阻隔地紧紧贴合在一起。
     <br><br>
-    “我从没有对谁有过这样的感觉，”梅森的嗓音因动情而微微发颤，“在这片湖水里……和你在一起……我真的不想再克制自己了。”
+    “还、还是靠岸边些吧。”梅森朝岸边看了一眼。“这里水深。”
 <</language>><br><br>
 
 <<loveicon 'kiss'>><<lanLink `['Kiss Mason passionately in the secluded water', '在幽静的水波中深情拥吻']` 'Lake Mason Intimacy Kiss'>><<glove>><<glust>><<garousal>><</lanLink>><br>
-<<loveicon 'hug'>><<lanLink `['Make love with Mason in the lake', '在湖水的怀抱中与梅森交欢']` 'Lake Mason Sex'>><<set $sexstart to 1>><<promiscuous2>><</lanLink>><br>
+<<if hasSexStat('promiscuity', 2)>>
+  <<loveicon 'hug'>><<lanLink `['Make love with Mason in the lake', '在湖水的怀抱中与梅森交欢']` 'Lake Mason Sex'>><<set $sexstart to 1>><</lanLink>><<promiscuous2>><br>
+<</if>>
+<br><<getouticon>><<lanLink ['Return to the lake', '回到湖中'] 'Lake Depths'>><<endevent>><</lanLink>>
 
 :: Lake Mason Intimacy Kiss
 <<effects>>
+<<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or (C.npc.Mason.love lt 20 and C.npc.Mason.lust lt 20)>>
+  <<getouticon>><<lanLink ['Return to the lake', '回到湖中'] 'Lake Depths'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<npc Mason>><<person1>>
 <<pass 20>>
 <<language>>
@@ -208,6 +234,9 @@
 :: Lake Mason Sex
 <<effects>>
 <<if $sexstart is 1>>
+  <<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or !hasSexStat('promiscuity', 2) or (C.npc.Mason.love lt 20 and C.npc.Mason.lust lt 20)>>
+    <<getouticon>><<lanLink ['Return to the lake', '回到湖中'] 'Lake Depths'>><<endevent>><</lanLink>><<exit>>
+  <</if>>
   <<set $sexstart to 0>>
   <<clearnpc>><<npc Mason>><<person1>>
   <<consensual>><<set $consensual to 1>><<neutral 1>>
@@ -266,8 +295,12 @@
 
 :: Mason Pond Wash
 <<effects>>
+<<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or (C.npc.Mason.love lt 15 and C.npc.Mason.lust lt 10)>>
+  <<getouticon>><<lanLink ['Return to the waterfall', '回到瀑布边'] 'Lake Waterfall'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<npc Mason>><<person1>>
 <<set $outside to 1>><<set $location to 'lake'>>
+<<pass 30>>
 <<language>>
   <<option 'EN'>>
     You wade behind Mason in the bubbling, warm spring pool and offer to wash and massage <<his>> back.
@@ -291,8 +324,12 @@
 
 :: Mason Pond Cuddle
 <<effects>>
+<<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or (C.npc.Mason.love lt 20 and C.npc.Mason.lust lt 15)>>
+  <<getouticon>><<lanLink ['Return to the waterfall', '回到瀑布边'] 'Lake Waterfall'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<npc Mason>><<person1>>
 <<set $outside to 1>><<set $location to 'lake'>>
+<<pass 30>>
 <<language>>
   <<option 'EN'>>
     You sit beside Mason by the pond and lean your head against <<his>> shoulder. Spray from the waterfall settles on your face.
@@ -316,6 +353,9 @@
 
 :: Mason Pond Intimacy
 <<effects>>
+<<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or !hasSexStat('promiscuity', 2) or (C.npc.Mason.love lt 25 and C.npc.Mason.lust lt 25)>>
+  <<getouticon>><<lanLink ['Return to the waterfall', '回到瀑布边'] 'Lake Waterfall'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<npc Mason>><<person1>>
 <<set $outside to 1>><<set $location to 'lake'>>
 <<language>>
@@ -338,10 +378,14 @@
 <</language>><br><br>
 
 <<loveicon 'kiss'>><<lanLink `['Kiss Mason passionately behind the waterfall', '在水幕后与梅森缠绵拥吻']` 'Mason Pond Intimacy Kiss'>><<glove>><<glust>><<garousal>><</lanLink>><br>
-<<loveicon 'hug'>><<lanLink `['Make love with Mason in the thermal spring', '在温泉中与梅森欢愉交欢']` 'Mason Pond Sex'>><<set $sexstart to 1>><<promiscuous2>><</lanLink>><br>
+<<loveicon 'hug'>><<lanLink `['Make love with Mason in the thermal spring', '在温泉中与梅森欢愉交欢']` 'Mason Pond Sex'>><<set $sexstart to 1>><</lanLink>><<promiscuous2>><br>
+<br><<getouticon>><<lanLink ['Return to the waterfall', '回到瀑布边'] 'Lake Waterfall'>><<endevent>><</lanLink>>
 
 :: Mason Pond Intimacy Kiss
 <<effects>>
+<<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or !hasSexStat('promiscuity', 2) or (C.npc.Mason.love lt 25 and C.npc.Mason.lust lt 25)>>
+  <<getouticon>><<lanLink ['Return to the waterfall', '回到瀑布边'] 'Lake Waterfall'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<npc Mason>><<person1>>
 <<pass 20>>
 <<language>>
@@ -361,6 +405,9 @@
 :: Mason Pond Sex
 <<effects>>
 <<if $sexstart is 1>>
+  <<if C.npc.Mason.init isnot 1 or $location isnot 'lake' or !hasSexStat('promiscuity', 2) or (C.npc.Mason.love lt 25 and C.npc.Mason.lust lt 25)>>
+    <<getouticon>><<lanLink ['Return to the waterfall', '回到瀑布边'] 'Lake Waterfall'>><<endevent>><</lanLink>><<exit>>
+  <</if>>
   <<set $sexstart to 0>>
   <<clearnpc>><<npc Mason>><<person1>>
   <<consensual>><<set $consensual to 1>><<neutral 1>>

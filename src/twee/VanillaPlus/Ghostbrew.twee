@@ -1,0 +1,73 @@
+:: Deadwood Ghostbrew Widgets [widget]
+
+<!-- 检查结果供入口、点击回调与结果页共用；不改写原版委托、配方或材料来源。 -->
+<<widget 'deadwood-ghostbrew-check'>>
+  <<set _ghostbrewSafe to !!maplebirch.get('VanillaPlus') and !$combat and !$possessed
+    and !$replayScene and !$statFreeze and !$frozenValues and !$eventforced
+    and !$nextPassage and !$nextPassageCheck and !isPregnancyEnding()>>
+  <<set _ghostbrewTeacher to _ghostbrewSafe and $location is 'forest_shop'
+    and $forest_shop_intro is 1 and C.npc.Gwylan.init is 1 and C.npc.Gwylan.state is 'active'
+    and $npc?.includes('Gwylan') and gwylanSchedule() is 'shop' and !isGwylanAbsent()
+    and !$daily.gwylan.noTalk and !$robin_in_forest_shop and !$gwylan.punishment
+    and !$gwylan.taken and !$gwylan.timer.wrap and !$gwylan.timer.eventShopEnd>>
+<</widget>>
+
+<<widget 'deadwood-ghostbrew-lesson-link'>>
+  <<deadwood-ghostbrew-check>>
+  <<if _ghostbrewTeacher and $foodstuff.ghostshroom?.amount gte 1 and !$foodstuff.ghostbrew?.knows_recipe>>
+    <<foodstufficon 'ghostshroom'>><<lanLink ['Ask about the pale mushrooms (0:10)', '问问这些灰白色的蘑菇 (0:10)'] 'Deadwood Ghostbrew Lesson'>>
+      <<deadwood-ghostbrew-check>>
+      <<if _ghostbrewTeacher and $foodstuff.ghostshroom?.amount gte 1 and !$foodstuff.ghostbrew?.knows_recipe>>
+        <<set $phase to 'deadwood-ghostbrew-lesson'>>
+      <</if>>
+    <</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Ghostbrew Lesson
+<<set _ghostbrewLesson to $phase is 'deadwood-ghostbrew-lesson'>>
+<<if _ghostbrewLesson>><<unset $phase>><</if>>
+<<effects>><<deadwood-ghostbrew-check>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] $passage>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if _ghostbrewLesson and _ghostbrewTeacher
+  and $foodstuff.ghostshroom?.amount gte 1 and !$foodstuff.ghostbrew?.knows_recipe>>
+  <<pass 10>><<deadwood-ghostbrew-check>>
+  <<if $passage isnot 'Deadwood Ghostbrew Lesson'>><<exit>><</if>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <span id='next'><<lanLink ['Next', '继续'] $passage>><</lanLink>></span><<nexttext>><<exit>>
+  <</if>>
+  <<if _ghostbrewTeacher>>
+    <<npc Gwylan>><<person1>>
+    <<language>>
+      <<option 'CN'>>
+        你拿出一朵灰白色的蘑菇。格威岚托住你的手，翻过菌盖，看了看底下的褶皱。
+        <br><br>
+        “幽灵菇。摸起来凉凉的，对不对？”<<He>>把蘑菇放回你手里。“可别见到白蘑菇就往嘴里送。得认准了。”
+        <br><br>
+        <<He>>从柜台下找出纸笔，写下几行字。“用白葡萄酒和这种花来煮，味道会好一些。”<<He>>在花名下画了一道线。“这酒会让人看见些原本没有的东西。找个地方坐稳了再喝，亲爱的。”
+        <br><br>
+        你收好配方。纸上还注明了用量和火候，煮好一瓶大约要一个小时。
+      <<option 'EN'>>
+        You take out a pale mushroom. Gwylan steadies your hand and turns the cap over to inspect its gills.
+        <br><br>
+        "A ghostshroom. Cold to the touch, isn't it?" <<He>> puts it back in your hand. "Don't go eating every white mushroom you find, though. Make sure you know what you're picking."
+        <br><br>
+        <<He>> finds paper and a pen beneath the counter. "Simmer it with white wine and this flower. It tastes a little better that way." <<He>> underlines the flower's name. "It will make you see things that aren't there. Find somewhere to sit before you drink it, dear."
+        <br><br>
+        You put the recipe away. It includes quantities and cooking instructions. A bottle takes about an hour to prepare.
+    <</language>><br><br>
+    <<learn_recipe 'ghostbrew'>>
+  <<else>>
+    <<lanSwitch 'Gwylan has to leave before you can finish. You put the mushroom away.' '还没来得及问完，格威岚便要离开了。你把蘑菇收好。'>>
+  <</if>>
+<<else>>
+  <<lanSwitch 'You put the mushroom away for now.' '你暂且把蘑菇收好。'>>
+<</if>>
+<br><br>
+<<getouticon>><<lanLink [
+  _ghostbrewTeacher ? 'Return to Gwylan' : 'Return to the shop entrance',
+  _ghostbrewTeacher ? '回到格威岚身边' : '返回商店门口'
+] `_ghostbrewTeacher ? 'Gwylan Talk Shop' : 'Forest Shop Entrance'`>><</lanLink>>
+

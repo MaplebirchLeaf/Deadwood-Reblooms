@@ -2,6 +2,7 @@
 
 <<widget 'deadwood-swimming-lesson-check'>>
   <<set _swimmingPoolSafe to Boolean(maplebirch.get('LifeSimulation')) and $location is 'pool'
+    and C.npc.Mason.init is 1 and C.npc.Mason.state is 'active'
     and !$combat and !$statFreeze and !$replayScene and !$possessed
     and !$nextPassage and !$nextPassageCheck and !$eventforced
     and $stress lt $stressmax and !isPregnancyEnding()>>
@@ -128,7 +129,7 @@
   <<swimicon 'back'>><<deadwood-swimming-lesson-choice `['Flaunt your body and swimwear at the poolside', '在池边向梅森展示身材与泳装']` 'Deadwood Reblooms Swimming Flaunt'>><<exhibitionist1>><<glust>><br>
 <</if>>
 
-<<if hasSexStat('promiscuity', 2) or C.npc.Mason.lust gte 10>>
+<<if hasSexStat('promiscuity', 2) and C.npc.Mason.lust gte 10>>
   <<swimmingicon>><<deadwood-swimming-lesson-choice `['Dive underwater to stealthily tease Mason', '潜入水下悄悄对梅森恶作剧']` 'Deadwood Reblooms Swimming Underwater'>><<promiscuous2>><<gglust>><br>
 <</if>>
 
@@ -443,7 +444,7 @@
 :: Deadwood Reblooms Swimming Underwater
 <<schooleffects>><<effects>>
 <<deadwood-swimming-lesson-check>>
-<<if !_swimmingLessonReady>>
+<<if !_swimmingLessonReady or !hasSexStat('promiscuity', 2) or C.npc.Mason.lust lt 10>>
   <<lanSwitch 'The class has moved on. You cannot swim underwater to Mason now.' '课堂正在继续，现在无法潜入水下寻找梅森。'>><br><br>
   <<deadwood-swimming-lesson-return>>
   <<exit>>
@@ -511,7 +512,7 @@
 :: Deadwood Reblooms Swimming Private Request
 <<schooleffects>><<effects>>
 <<deadwood-swimming-lesson-check>>
-<<if !_swimmingLessonReady or $DeadwoodReblooms.daily.swimming.requested or $DeadwoodReblooms.daily.swimming.coached>><<deadwood-swimming-lesson-return>><<exit>><</if>>
+<<if !_swimmingLessonReady or (C.npc.Mason.love lt 15 and C.npc.Mason.lust lt 15) or $DeadwoodReblooms.daily.swimming.requested or $DeadwoodReblooms.daily.swimming.coached>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<language>>
   <<option 'EN'>>
@@ -540,7 +541,7 @@
     <br><br>
     Mason stacks the last flutterboard onto the metal cart, wipes <<his>> hands on a towel, and turns toward the pool where you wait.
     <br><br>
-    "They're all gone," <<he>> says softly, <<his>> voice echoing in the empty hall. <<His>> cheeks carry a warm flush. "It's just the two of us now. What did you want to work on?"
+    "We can practise for a little while," Mason says, glancing at the clock. "I can't stay too long. What would you like to work on?"
   <<option 'CN'>>
     沉重的防火门在身后合上，发出沉闷的回响。其他同学的喧闹与泼水声彻底远去，更衣室的方向渐渐安静下来。
     <br><br>
@@ -548,16 +549,16 @@
     <br><br>
     梅森把最后一块浮板放回收纳车，用毛巾擦了擦手，转过身来看向池中等待的你。
     <br><br>
-    “大家都走了，”<<he>>轻声说道，温润的嗓音在空旷的大厅里带着细微的回响，面颊微热，“现在只剩我们两个人了……你想从哪里开始练？”
+    “还可以再练一会儿。”梅森看了看钟。“我不能留太久。你想先练什么？”
 <</language>><br><br>
 
 <<socialiseicon 'ask'>><<lanLink `['Ask for one-on-one stroke guidance in the quiet pool', '在安静的池水中请梅森近距离辅导泳姿']` 'Deadwood Reblooms Swimming Private Talk'>><</lanLink>><<gswimming>><<lstress>><br>
 
-<<if C.npc.Mason.love gte 20 or C.npc.Mason.lust gte 20 or hasSexStat('promiscuity', 2)>>
+<<if (C.npc.Mason.love gte 20 or C.npc.Mason.lust gte 20) and hasSexStat('promiscuity', 2)>>
   <<loveicon 'kiss'>><<lanLink `['Pull Mason into the water for an embrace and kiss', '将梅森拉入水中拥抱亲吻']` 'Deadwood Reblooms Swimming Private Kiss'>><<promiscuous2>><<glust>><<garousal>><</lanLink>><br>
 <</if>>
 
-<<if (C.npc.Mason.love gte 30 or C.npc.Mason.lust gte 30) and hasSexStat('promiscuity', 2)>>
+<<if (C.npc.Mason.love gte 30 or C.npc.Mason.lust gte 30) and hasSexStat('promiscuity', 3)>>
   <<loveicon 'hug'>><<lanLink `['Seduce Mason into the empty pool waters for intimacy', '在无人的泳池中引诱梅森交欢']` 'Deadwood Reblooms Swimming Private Sex'>><<set $sexstart to 1>><<promiscuous3>><</lanLink>><br>
 <</if>>
 
@@ -593,7 +594,7 @@
 :: Deadwood Reblooms Swimming Private Kiss
 <<schooleffects>><<effects>>
 <<deadwood-swimming-lesson-check>>
-<<if !_swimmingPrivateReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
+<<if !_swimmingPrivateReady or (C.npc.Mason.love lt 20 and C.npc.Mason.lust lt 20) or !hasSexStat('promiscuity', 2)>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<npc Mason>><<person1>>
 <<set _swimmingPrivateSource to $passage, _swimmingPrivateDay to Time.days>>
 <<pass 25>>
@@ -625,7 +626,7 @@
 <<effects>>
 <<if $sexstart is 1>>
   <<schooleffects>><<deadwood-swimming-lesson-check>>
-  <<if !_swimmingPrivateReady>><<deadwood-swimming-lesson-return>><<exit>><</if>>
+  <<if !_swimmingPrivateReady or (C.npc.Mason.love lt 30 and C.npc.Mason.lust lt 30) or !hasSexStat('promiscuity', 3)>><<deadwood-swimming-lesson-return>><<exit>><</if>>
 <<elseif $combat isnot 1 or $enemytype isnot 'man' or !$NPCList.some(npc => npc.fullDescription === 'Mason')>>
   <<deadwood-swimming-lesson-return>><<exit>>
 <</if>>

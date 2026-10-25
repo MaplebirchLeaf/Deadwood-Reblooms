@@ -202,8 +202,9 @@ export default class PropertyLife {
         if (!winery!.take(recipe.id as WineRecipe)) return false;
       } else {
         if (!food || (V.foodstuff[item!]?.amount ?? 0) < (action === 'wine' ? 1 : 2)) return false;
-        if (food.food?.tags?.includes('tainted') || (action === 'tea' && food.food?.tags?.includes('alcohol'))) return false;
-        if (action === 'wine' ? !['red_wine', 'white_wine'].includes(item!) : food.category !== 'dish' || (food.food?.tags?.includes('drink') ?? false) !== (action === 'tea')) {
+        const ghostbrew = action === 'wine' && item === 'ghostbrew' && !!this.core.get('VanillaPlus');
+        if ((food.food?.tags?.includes('tainted') && !ghostbrew) || (action === 'tea' && food.food?.tags?.includes('alcohol'))) return false;
+        if (action === 'wine' ? !['red_wine', 'white_wine'].includes(item!) && !ghostbrew : food.category !== 'dish' || (food.food?.tags?.includes('drink') ?? false) !== (action === 'tea')) {
           return false;
         }
       }

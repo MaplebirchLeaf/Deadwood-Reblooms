@@ -150,6 +150,18 @@
           <</if>>
       <</language>>
   <</switch>>
+  <<if _args[0] is 'affection' and _locket_selected and _locket_formal and _locket_photo is _locket_name
+    and $transformationParts.traits.mateForLife isnot 'disabled'>>
+    <br><br>
+    <<language>>
+      <<option 'EN'>>
+        <<if _locket_familiar>>You know the little photograph by heart. For now, you would rather look at the face in front of you.
+        <<else>>You let the locket settle against your chest. It is good to have <<nnpc_him _locket_name>> here, where you can hear <<nnpc_his _locket_name>> voice.<</if>>
+      <<option 'CN'>>
+        <<if _locket_familiar>>小小的照片，你早已看熟了。此刻，你更想看着眼前的这张脸。
+        <<else>>你让吊坠重新贴在胸前。<<nnpc_He _locket_name>>就在这里，能听见<<nnpc_his _locket_name>>的声音，真好。<</if>>
+    <</language>>
+  <</if>>
 <</widget>>
 
 <<widget 'deadwood-locket-memory'>>
@@ -171,6 +183,9 @@
         The face in the photograph seems very far away. You keep looking, one finger resting against the little frame.
       <<elseif $tiredness gte C.tiredness.max * 0.8>>
         Your eyelids grow heavy. You find yourself staring at the same small detail without remembering what you had meant to look for.
+      <<elseif $transformationParts.traits.mateForLife isnot 'disabled' and isLoveInterest(_locket_memory_name)
+        and (_locket_memory_name isnot 'Remy' or $Orchard?.remy?.romance and !$Orchard.remy.syndrome and !$Orchard.remy.ended)>>
+        You know every little detail of the photograph. You wonder what <<nnpc_he _locket_memory_name>> is doing now, and when you can be together again. Your thumb rests beside the clasp a little longer.
       <<elseif !isLoveInterest(_locket_memory_name)>>
         You have kept the photograph all this time. You study it for a moment, your thumb resting beside the clasp.
       <<else>>
@@ -191,6 +206,9 @@
         照片里的面孔显得很远。你仍看着它，一根手指抵在小相框上。
       <<elseif $tiredness gte C.tiredness.max * 0.8>>
         眼皮沉沉的。你盯着同一个小地方看了半天，才发现自己早忘了要看什么。
+      <<elseif $transformationParts.traits.mateForLife isnot 'disabled' and isLoveInterest(_locket_memory_name)
+        and (_locket_memory_name isnot 'Remy' or $Orchard?.remy?.romance and !$Orchard.remy.syndrome and !$Orchard.remy.ended)>>
+        照片里的每一处细节，你都很熟悉。你想着<<nnpc_he _locket_memory_name>>现在在做什么，什么时候才能再待在一起。拇指停在搭扣旁，迟迟没有合上它。
       <<elseif !isLoveInterest(_locket_memory_name)>>
         照片一直留在盒里。你看了一会儿，拇指停在搭扣旁。
       <<else>>
@@ -223,7 +241,9 @@
           <<else>>"Someone important to you?" Sydney asks. <<He>> leaves you room to answer.<</if>>
         <</if>>
       <<elseif _args[0] is 'affection'>>
-        You say you like having the photograph with you, even when you are apart.
+        <<if $submissive gte 1150>>You lower your eyes to the photograph and quietly admit that you like having Sydney with you, even when you are apart.
+        <<elseif $submissive lte 850>>You meet Sydney's eyes and tell <<him>> that you like having <<him>> with you, even when you are apart.
+        <<else>>You say you like having the photograph with you, even when you are apart.<</if>>
         <<if _locket_sydney_corrupt>>"You could have said so." <<He>> smiles and offers <<his>> hand beside yours. "I'll try not to keep you waiting so long next time."
         <<else>>Sydney looks down, visibly pleased. "I'd like that." <<He>> sets <<his>> hand beside yours, leaving you to close the small clasp.<</if>>
       <<elseif _args[0] is 'reassure'>>
@@ -258,7 +278,9 @@
           <<else>>“对你很重要的人？”悉尼问，等着你回答。<</if>>
         <</if>>
       <<elseif _args[0] is 'affection'>>
-        你说，不在一起的时候，也想把这张照片带在身边。
+        <<if $submissive gte 1150>>你垂眼看向照片，小声承认，不在一起的时候，也想把悉尼带在身边。
+        <<elseif $submissive lte 850>>你迎上悉尼的视线，告诉<<him>>，不在一起的时候，也想把<<him>>带在身边。
+        <<else>>你说，不在一起的时候，也想把这张照片带在身边。<</if>>
         <<if _locket_sydney_corrupt>>“早说嘛。”<<He>>笑着把手递到你手边。“下回尽量不让你等那么久。”
         <<else>>悉尼低下头，藏不住脸上的喜悦。“我很高兴。”<<He>>把手放在你手边，等你合好小小的搭扣。<</if>>
       <<elseif _args[0] is 'reassure'>>
@@ -301,7 +323,7 @@
         You keep the photograph and tell Kylar that you came to spend time with <<him>>.
         "With me?" <<His>> gaze returns to your face. "Then stay a little." <<He>> still glances at the locket, but stops asking you to remove the photograph.
       <<elseif _args[0] is 'private'>>
-        You close the locket before Kylar can look any closer. "I was only asking," <<he>> says. You keep hold of the clasp until <<he>> draws back.
+        You close the locket before Kylar can look any closer. <<if $submissive gte 1150>>You quietly say that you would rather talk about something else.<<elseif $submissive lte 850>>You tell <<him>> that you would rather talk about something else, keeping the clasp firmly in your hand.<</if>> "I was only asking," <<he>> says. You keep hold of the clasp until <<he>> draws back.
       <<else>>
         <<if !_locket_photo>>You explain that you also like it as a necklace. "Oh." Kylar looks down, then asks what sort of photograph would fit.
         <<elseif _locket_photo is 'Kylar' and !_locket_selected>>You explain why you kept the photograph. Kylar listens very carefully. "You still kept it," <<he>> says at last.
@@ -331,7 +353,7 @@
         你留着里面的照片，告诉凯拉尔，自己今天是来陪<<him>>的。
         “陪我？”<<His>>视线回到你的脸上。“那就再待一会儿。”<<He>>仍会瞥向吊坠，但没有继续要求你取出照片。
       <<elseif _args[0] is 'private'>>
-        没等凯拉尔凑得更近，你便合上了吊坠。“我只是问问。”<<he>>说。你一直握着搭扣，直到<<he>>退开一些。
+        没等凯拉尔凑得更近，你便合上了吊坠。<<if $submissive gte 1150>>你小声说，想聊点别的。<<elseif $submissive lte 850>>你握紧搭扣，告诉<<him>>，自己想聊点别的。<</if>>“我只是问问。”<<he>>说。你一直握着搭扣，直到<<he>>退开一些。
       <<else>>
         <<if !_locket_photo>>你解释，自己也喜欢把它当作项链戴着。“噢。”凯拉尔低下头，随后问起什么样的照片才能放进去。
         <<elseif _locket_photo is 'Kylar' and !_locket_selected>>你说起留下照片的原因。凯拉尔听得格外认真。“你还是留着它了。”<<he>>最后说。

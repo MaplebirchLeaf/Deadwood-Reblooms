@@ -9,6 +9,13 @@ Enable **VanillaPlus** and reload. Banking, property and Adrian have their own F
 | Use eerie mirrors          | Mirrors you have touched                                   | Deviancy trait, the right hour and tentacles enabled              |
 | Hospital services          | Hospital foyer                                             | Eligible body state and payment                                   |
 | Gargantuan size            | Body-size settings and existing growth routes              | VanillaPlus enabled                                               |
+| Learn to make ghostbrew    | Show a ghostshroom to Gwylan at the forest shop            | Meet the shopkeeper and find them free to talk                    |
+
+## Ghostbrew
+
+Pick **ghostshrooms** in Kylar's manor grounds once a day, taking one hour. Bring one to Gwylan while they are at the shop to learn the recipe: one **ghostshroom, white wine and strange flower**. Prepare it in a native kitchen that allows these ingredients. Each bottle takes one hour.
+
+Bring a bottle to a purchased home and select it from the wine menu in the sitting room, kitchen or wine cellar. Drinking takes twenty minutes. Each bottle applies **60 alcohol through the native calculation** and adds **120 hallucinogen points**, with the usual decay over time. A resident companion has water; further interaction uses the existing sobriety checks.
 
 ## Six attribute breakthroughs
 

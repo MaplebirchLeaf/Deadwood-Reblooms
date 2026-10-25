@@ -96,7 +96,17 @@ class Robin extends Module implements RobinFacade {
   public upgrade(kind: 'lemonade' | 'chocolate', usePcMoney = false): boolean {
     const state = this.state;
     const introduced = kind === 'lemonade' ? V.robinlemonadeintro === 1 : V.robinchocolateintro === 1;
-    if (!this.available || V.replayScene || V.statFreeze || (!introduced && state[kind] === 0) || state[kind] >= 2 || state.topics[kind] <= state[kind]) return false;
+    if (
+      !this.available ||
+      V.replayScene ||
+      V.statFreeze ||
+      C.npc.Robin.love < (state[kind] === 0 ? 20 : 40) ||
+      C.npc.Robin.trauma >= 80 ||
+      (!introduced && state[kind] === 0) ||
+      state[kind] >= 2 ||
+      state.topics[kind] <= state[kind]
+    )
+      return false;
     const cost = state[kind] === 0 ? 600 : 400;
     if (usePcMoney) {
       if ((Number(V.money) || 0) < cost * 100) return false;
@@ -110,7 +120,7 @@ class Robin extends Module implements RobinFacade {
   /** 把 PC 垫付的钱还给玩家，清空 pc_loan。 */
   public repayPcLoan(): boolean {
     const amount = this.state.pc_loan;
-    if (!this.available || amount <= 0 || !this.flowers.spend(amount)) return false;
+    if (!this.shop.atLedger || V.replayScene || V.statFreeze || amount <= 0 || !this.flowers.spend(amount)) return false;
     V.money += amount * 100;
     this.state.pc_loan = 0;
     return true;

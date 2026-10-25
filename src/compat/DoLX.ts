@@ -62,6 +62,7 @@ function adaptRobin(maplebirch: MaplebirchCore): void {
         if (state.asylum.status !== 'admitted') {
           robin.flowers.settle();
           robin.shop.settle();
+          maplebirch.get('Orchard')?.winery.settleShop();
           state.reserve += extraIncome;
           if (!state.bailey_defeated && (state.self_rent || V.robinpaid !== 1)) {
             const owed = state.self_rent ? window.ensureRobinStand().owed : 0;
@@ -70,7 +71,6 @@ function adaptRobin(maplebirch: MaplebirchCore): void {
             V.robinmoney += reserveTransfer;
           }
         }
-        // 原生 DoLX 负责扣租、摊位采购和咖啡工资，不能再运行原版固定 £400/£300 预结算。
         nativeWeekPassed();
         state.weekly_income = state.asylum.status === 'admitted' ? 0 : window.ensureRobinStand().lastIncome + (V.robinCafe?.lastWage ?? 0) + extraIncome;
         if (state.solidarity && state.reserve >= 10) {

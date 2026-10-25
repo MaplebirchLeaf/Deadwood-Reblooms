@@ -25,7 +25,8 @@ export default function (maplebirch: typeof window.maplebirch) {
 
   maplebirch.tool.inject({
     widgetPassage: {
-      'Widgets Attitudes': [{ src: '<<if $attitudesControl.unlockHypnosis>>', applybefore: '<<deadwood-reblooms-trait-attitudes>>', expected: 1 }]
+      'Widgets Attitudes': [{ src: '<<if $attitudesControl.unlockHypnosis>>', applybefore: '<<deadwood-reblooms-trait-attitudes>>\n\t\t\t', expected: 1 }],
+      'Gwylan Widgets': [{ src: '<<gwylanOptionsService>>', applyafter: '\n\t\t\t<<deadwood-ghostbrew-lesson-link>>', expected: 1 }]
     }
   });
 

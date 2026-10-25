@@ -1074,16 +1074,12 @@
   <<set _journal_bounties to maplebirch.get('StreetLife')?.bounties>>
   <<if !_journal_bounties>><<exit>><</if>>
   <<set _journal_bounty_state to _journal_bounties.state>>
-  <<if C.npc.Grant.init is 0 or C.npc.Grant.state is 'active' or _journal_bounty_state.active or _journal_bounty_state.last or _journal_bounty_state.hunter or _journal_bounties.wanted>>
+  <<if (C.npc.Grant.init is 1 and C.npc.Grant.state is 'active') or _journal_bounty_state.cooperating or _journal_bounty_state.active or _journal_bounty_state.last or _journal_bounty_state.hunter>>
     <<deadwood-card 'Cases and bounties' '案件与悬赏'>>
-      <<if C.npc.Grant.init is 0 or C.npc.Grant.state is 'active'>>
+      <<if C.npc.Grant.init is 1 and C.npc.Grant.state is 'active'>>
         <ul class='journal'>
           <li>
-            <<if C.npc.Grant.init is 1>>
-              <<lanSwitch 'Grant receives visitors beside the noticeboard in the Barb Street police station every day, 08:00–18:00.' '格兰特每天08:00–18:00在倒钩街警察局的告示板旁接待来访。'>>
-            <<else>>
-              <<lanSwitch 'A detective receives visitors beside the noticeboard in the Barb Street police station every day, 08:00–18:00.' '一位警探每天08:00–18:00在倒钩街警察局的告示板旁接待来访。'>>
-            <</if>>
+            <<lanSwitch 'Grant receives visitors beside the noticeboard in the Barb Street police station every day, 08:00–18:00.' '格兰特每天08:00–18:00在倒钩街警察局的告示板旁接待来访。'>>
           </li>
           <<if !_journal_bounty_state.active and !_journal_bounties.wanted>>
             <<if _journal_bounty_state.cooperating>>
@@ -1092,6 +1088,10 @@
               <li><<lanSwitch 'Speak with the detective about helping with enquiries before taking a case.' '先与警探谈谈协助查案，再接取案件。'>></li>
             <</if>>
           <</if>>
+        </ul>
+      <<elseif _journal_bounty_state.cooperating>>
+        <ul class='journal'>
+          <li><<lanSwitch 'You have agreed to help Grant with enquiries.' '你答应了协助格兰特查案。'>></li>
         </ul>
       <</if>>
       <<deadwood-street-bounty-status>>

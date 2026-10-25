@@ -85,8 +85,9 @@
       <<case 'film'>>
         <<stress -4>><<set $_life_duration to 45>>
       <<case 'wine'>>
-        <<if ['red_wine', 'white_wine'].includes(_life_scene.item)>><<tending_give _life_scene.item -1>><</if>>
+        <<if ['red_wine', 'white_wine', 'ghostbrew'].includes(_life_scene.item)>><<tending_give _life_scene.item -1>><</if>>
         <<drunk 60>><<stress -3>>
+        <<if _life_scene.item is 'ghostbrew'>><<hallucinogen 120>><</if>>
     <</switch>>
     <<if _life_scene.partner and _life_scene.first>>
       <<npcincr _life_scene.partner love 1>>
@@ -111,9 +112,11 @@
   <<set _life_scene to maplebirch.get('Finance').realEstate.life.scene>>
   <<if !_life_scene?.partner>><<exit>><</if>>
   <<npc _life_scene.partner>><<person1>>
-  <<if _life_scene.action is 'wine' and knowsAboutPregnancy(_life_scene.partner, 'pc')>>
+  <!-- 特殊酒只给 PC 结算，陪伴者复用已有的饮水反应。 -->
+  <<if _life_scene.action is 'wine' and (_life_scene.item is 'ghostbrew' or knowsAboutPregnancy(_life_scene.partner, 'pc'))>>
     <<language>>
       <<option 'EN'>>
+        <<if _life_scene.item is 'ghostbrew'>>You explain which mushrooms went into the wine and keep the bottle on your side of the table.<</if>>
         You leave a glass of water beside yours.
         <<switch _life_scene.partner>>
           <<case 'Robin'>>Robin takes the water, holding the glass in both hands. "I'll keep you company." <<He>> smiles when you sit down.
@@ -122,6 +125,7 @@
           <<case 'Sydney'>>"Water will do for me." Sydney sets the bottle within your reach and keeps the second chair. <<if _life_wine_recipe>>"You can still tell me how you made it."<</if>>
         <</switch>>
       <<option 'CN'>>
+        <<if _life_scene.item is 'ghostbrew'>>你说起酿酒用的蘑菇，把瓶子留在自己这边。<</if>>
         你在自己的酒杯旁放了一杯水。
         <<switch _life_scene.partner>>
           <<case 'Robin'>>罗宾选了水，两手捧着杯子。“我陪你就好。”你坐下时，<<he>>朝你笑了笑。
@@ -268,7 +272,10 @@
     <<language>>
       <<option 'EN'>>
         <<if _home_scene.followup is 'talk'>>
-          <<if currentSkillValue('english') gte 500>>You find the words for something that has been bothering you.<<else>>You pause a few times, trying to explain the part that has stayed with you.<</if>>
+          <<if $flashbacks gte 1 and $controlled is 0>>You try to explain how things that have already happened keep coming back when you do not want them to.
+          <<elseif $anxiety gte 1 and $controlled is 0>>You talk about the small things you cannot stop worrying about, even after coming home.
+          <<elseif $sleeptrouble is 1 and $controlled is 0 and !$hypnosis_traits.slumber>>You talk about lying awake when all you want is to sleep.
+          <<elseif currentSkillValue('english') gte 500>>You find the words for something that has been bothering you.<<else>>You pause a few times, trying to explain the part that has stayed with you.<</if>>
           <<switch _home_scene.partner>>
             <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>Robin listens with both feet tucked beneath the chair. "I'm glad you told me." <<nnpc_He 'Robin'>> asks you to stay a little longer.<<elseif C.npc.Robin.dom gte 40>>"You could have told me sooner." Robin moves the cups aside and waits for you to finish.<<else>>Robin listens without interrupting. "Want to hear about mine?" <<nnpc_He 'Robin'>> smiles when you nod.<</if>>
             <<case 'Whitney'>>"What a fucking day." Whitney leans back, then looks at you when you stop talking. "Go on. I'm listening." <<nnpc_He 'Whitney'>> lets you finish before telling you about the walk home.
@@ -276,7 +283,10 @@
             <<case 'Sydney'>>Sydney puts the book out of reach. "Which part is still bothering you?" <<nnpc_He 'Sydney'>> leaves you time to answer, then tells you about something that went wrong at the library.
           <</switch>>
         <<else>>
-          You stay where you are, leaving the conversation for another time.
+          <<if $flashbacks gte 1 and $controlled is 0>>You leave the story untold. The seat beneath you and the familiar voice beside you help you keep your attention on this room.
+          <<elseif $anxiety gte 1 and $controlled is 0>>You still glance towards the door now and then, but leave the conversation for another time. There is someone sitting beside you.
+          <<elseif $sleeptrouble is 1 and $controlled is 0 and !$hypnosis_traits.slumber>>You settle back without trying to make yourself sleep. Sitting together will do for now.
+          <<else>>You stay where you are, leaving the conversation for another time.<</if>>
           <<switch _home_scene.partner>>
             <<case 'Robin'>>Robin draws the other chair nearer. <<if C.npc.Robin.trauma gte 20>><<nnpc_His 'Robin'>> eyes follow a sound in the hallway, then return to you.<<else>><<nnpc_He 'Robin'>> smiles when you glance over.<</if>> Neither of you gets up yet.
             <<case 'Whitney'>>"Tired?" Whitney moves <<nnpc_his 'Whitney'>> feet off the spare seat. "Sit, then." <<nnpc_He 'Whitney'>> leans back beside you, letting the conversation drop.
@@ -286,7 +296,10 @@
         <</if>>
       <<option 'CN'>>
         <<if _home_scene.followup is 'talk'>>
-          <<if currentSkillValue('english') gte 500>>你总算想好该怎么说起那件烦心事。<<else>>你停顿了几次，试着说清心里一直惦记的那一段。<</if>>
+          <<if $flashbacks gte 1 and $controlled is 0>>你试着说清，为什么那些已经过去的事，总会在你不愿想起时闯回脑海。
+          <<elseif $anxiety gte 1 and $controlled is 0>>你说起那些放不下的小事。即使回到家，它们也还在脑海里打转。
+          <<elseif $sleeptrouble is 1 and $controlled is 0 and !$hypnosis_traits.slumber>>你说起那些睡不着的时候。明明只想睡一觉，却只能睁着眼睛。
+          <<elseif currentSkillValue('english') gte 500>>你总算想好该怎么说起那件烦心事。<<else>>你停顿了几次，试着说清心里一直惦记的那一段。<</if>>
           <<switch _home_scene.partner>>
             <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>罗宾将双脚收在椅子底下，听着你说。“谢谢你愿意告诉我。”<<nnpc_he 'Robin'>>问你能不能再待一会儿。<<elseif C.npc.Robin.dom gte 40>>“早些告诉我就好了。”罗宾把杯子挪开，等你说完。<<else>>罗宾没有打断你。“想听听我今天的事吗？”你点头时，<<nnpc_he 'Robin'>>便笑了。<</if>>
             <<case 'Whitney'>>“真他妈够呛。”惠特尼往后一靠，见你不说了，又望过来。“接着说。我听着呢。”等你说完，<<nnpc_he 'Whitney'>>才讲起回家路上的事。
@@ -294,7 +307,10 @@
             <<case 'Sydney'>>悉尼把书放到一旁。“哪一件事还让你放不下？”<<nnpc_he 'Sydney'>>等你慢慢说完，随后也提起今天在图书馆犯的一点小错。
           <</switch>>
         <<else>>
-          你没有起身，把想说的话留到稍后。
+          <<if $flashbacks gte 1 and $controlled is 0>>你没有说起那些事。身下的椅子，身旁熟悉的声音，让你能将注意力留在这间屋里。
+          <<elseif $anxiety gte 1 and $controlled is 0>>你仍不时望向门口，把想说的话留到稍后。至少，现在有人坐在你身旁。
+          <<elseif $sleeptrouble is 1 and $controlled is 0 and !$hypnosis_traits.slumber>>你靠回椅背，没有勉强自己睡着。先一起坐着就好。
+          <<else>>你没有起身，把想说的话留到稍后。<</if>>
           <<switch _home_scene.partner>>
             <<case 'Robin'>>罗宾将另一把椅子挪近了些。<<if C.npc.Robin.trauma gte 20>><<nnpc_his 'Robin'>>视线跟着走廊里的声响转了转，又回到你身上。<<else>>你望过去时，<<nnpc_he 'Robin'>>便朝你笑。<</if>>谁也没有急着离开。
             <<case 'Whitney'>>“累了？”惠特尼把脚从空座上挪开。“那就坐着。”<<nnpc_he 'Whitney'>>在你身旁靠回椅背，没有再催你说话。
@@ -340,7 +356,8 @@
         <<if _life_scene.origin is 'Deadwood Reblooms Property Wine Cellar'>>The cellar is cool enough that the bottle feels cold against your fingers.
         <<elseif _life_scene.origin is 'Deadwood Reblooms Property Kitchen'>>You make room on the kitchen table and move the cups away from the edge.
         <<else>>The chairs are close enough that you do not have to raise your voice. <<if ['rain', 'snow'].includes(Weather.precipitation)>>The weather taps against the window.<<else>>The quiet sounds of the house carry through the room.<</if>><</if>>
-        <<if _life_wine_recipe>>The fruit you used has changed since it went into the barrel. You taste it slowly, noticing the familiar flavour beneath the sharper one.<</if>>
+        <<if _life_wine_recipe>>The fruit you used has changed since it went into the barrel. You taste it slowly, noticing the familiar flavour beneath the sharper one.
+        <<elseif _life_scene.item is 'ghostbrew'>>Your tongue stays cold after you swallow. The grain of the table seems to flow beneath your glass. You blink, but it keeps moving.<</if>>
     <</switch>>
   <<option 'CN'>>
     <<switch _life_scene.action>>
@@ -353,9 +370,10 @@
         <<if _life_scene.origin is 'Deadwood Reblooms Property Wine Cellar'>>酒窖里很凉，指尖碰着瓶壁，也觉出一丝冷意。
         <<elseif _life_scene.origin is 'Deadwood Reblooms Property Kitchen'>>你在厨房桌上清出地方，把杯子挪到离桌沿远些的地方。
         <<else>>椅子靠得近，说话不用提高声音。<<if ['rain', 'snow'].includes(Weather.precipitation)>>窗外的雨雪轻敲玻璃。<<else>>屋里静静传来些细小的声响。<</if>><</if>>
-        <<if _life_wine_recipe>>拿来酿酒的水果，进桶后已经变了味道。你慢慢品尝，略带酸涩的酒味底下，仍能尝出熟悉的果香。<</if>>
+        <<if _life_wine_recipe>>拿来酿酒的水果，进桶后已经变了味道。你慢慢品尝，略带酸涩的酒味底下，仍能尝出熟悉的果香。
+        <<elseif _life_scene.item is 'ghostbrew'>>咽下酒后，凉意仍留在舌头上。杯底下的桌纹似乎缓缓流动。你眨了眨眼，它们却还在动。<</if>>
     <</switch>>
-<</language>><br><br>
+<</language>><<if _life_scene.action is 'wine' and _life_scene.item is 'ghostbrew'>><<ghallucinogens>><</if>><br><br>
 <<if _life_scene.partner>>
   <<deadwood-home-life-reaction>>
   <<if _life_scene.first and !_life_scene.followup>><<glove>><</if>><br><br>

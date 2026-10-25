@@ -9,6 +9,12 @@ const MAX_SHOP_STAFF = 2;
 export default class RobinShop extends Shared {
   public readonly investment = new Investment(this.core, this.facade);
 
+  /** 借还款需要当面商量，账本仍可在罗宾不在店时查看。 */
+  public get atLedger(): boolean {
+    const location = window.getRobinLocation();
+    return this.robinAvailable && ((V.location === 'home' && location === 'orphanage') || (V.location === 'deadwood_robin_shop' && location === 'shop'));
+  }
+
   /** 当面约好当天办手续，原版小时覆盖保留到该处营业结束。不挤掉学校和已有约定。 */
   public get canArrangeMeeting(): boolean {
     const outing = this.finance?.realEstate.outings;
@@ -183,7 +189,18 @@ export default class RobinShop extends Shared {
   /** PC 是否能从银行账户垫付开店资金。 */
   public get canBorrowLoan(): boolean {
     const stage = this.state.shop_stage;
-    return !this.state.shop_bank_supported && stage !== 'none' && !this.state.shop && !!V.Finance?.bank?.opened && V.Finance.bank.debit_card && V.Finance.bank.balance >= 200000 && !!this.finance;
+    return (
+      this.atLedger &&
+      !V.replayScene &&
+      !V.statFreeze &&
+      !this.state.shop_bank_supported &&
+      stage !== 'none' &&
+      !this.state.shop &&
+      !!V.Finance?.bank?.opened &&
+      V.Finance.bank.debit_card &&
+      V.Finance.bank.balance >= 200000 &&
+      !!this.finance
+    );
   }
 
   /** 从 PC 存款划出 2000 英镑，同时记入罗宾向 PC 的借款。 */
@@ -197,7 +214,18 @@ export default class RobinShop extends Shared {
 
   /** 进入规划阶段：两个摊位都要升到 2 级，并已拿到店铺线索。 */
   public plan(): boolean {
-    if (!this.robinAvailable || !this.state.topics.shop || this.state.shop_stage !== 'none' || this.state.lemonade < 2 || this.state.chocolate < 2) return false;
+    if (
+      !this.robinAvailable ||
+      V.replayScene ||
+      V.statFreeze ||
+      C.npc.Robin.love < 60 ||
+      C.npc.Robin.trauma >= 80 ||
+      !this.state.topics.shop ||
+      this.state.shop_stage !== 'none' ||
+      this.state.lemonade < 2 ||
+      this.state.chocolate < 2
+    )
+      return false;
     this.state.shop_stage = 'planning';
     return true;
   }
