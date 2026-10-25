@@ -6,6 +6,8 @@ Enable Dynamic Music in the game settings, then choose Music, Ambience, Sound Ef
 
 The pack provides scene music, place, weather and voice loops, and short effects. Rain can accompany waves or traffic. Voice loops play only during encounters and never mix into the music track. The moor and ruined castle have open-country wind in dry weather, storm drains have flowing water, and old sewers have quieter dripping. Short effects do not stop or replace the music track.
 
+The 24 music tracks distinguish daytime and nighttime at home and in the forest, shipboard life and an unfinished undead boarding, underground exploration, active street races, and temple fieldwork. Consensual encounters have their own music. Combat, pursuit and outdoor celestial events retain their higher-priority cues.
+
 Muffled rain and distant thunder can be heard from the orphanage bedroom and bathroom, and the main temple quarters. These window-side sounds do not extend to every indoor scene or underground passage. Thunder follows stormy weather with natural pauses, rather than sounding for every visible flash of lightning.
 
 ## Files and replacement
@@ -71,7 +73,7 @@ Available keys are `scene`, `action`, `location`, `passage`, `bus`, `outside`, `
 - A string ending in `*` matches a prefix. Other strings match exactly. Regular expressions and executable code are not accepted.
 - `{}` always matches. Scene classifiers cannot test `scene` themselves.
 - Locations are lowercase, while passage titles keep their spelling.
-- `action` is `none`, `heist` or `pursuit`, limited to its corresponding active passage.
+- `action` is `none`, `heist`, `pursuit` or `raid`, limited to its corresponding active passage. `raid` identifies an unfinished undead boarding on the pirate deck at night or its dedicated encounter pages.
 - `combat` is a number. Outdoor, consent, weather-event and `rainproof` flags are booleans.
 - `rainproof` reflects the equipped rainproof headwear or handheld capability, including the supported second handheld slot.
 

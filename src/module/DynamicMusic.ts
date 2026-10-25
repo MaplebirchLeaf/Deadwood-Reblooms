@@ -74,7 +74,7 @@ class DynamicMusic {
   private get state(): MusicState {
     const passage = this.core.passage.title;
     const heist = V.StreetLife?.heist?.stage;
-    const action =
+    let action =
       passage.startsWith('Deadwood Street Heist') && ['entry', 'challenge', 'vault', 'escape'].includes(heist ?? '')
         ? heist === 'escape'
           ? 'pursuit'
@@ -82,6 +82,14 @@ class DynamicMusic {
         : passage.startsWith('Deadwood Street Bounty') && V.StreetLife?.bounties?.active?.stage === 'pursuit'
           ? 'pursuit'
           : 'none';
+    if (
+      V.location === 'pirate_ship' &&
+      Weather.dayState === 'night' &&
+      ['Pirate Deck', 'Deadwood Pirate Raid', 'Deadwood Pirate Raid Fight'].includes(passage) &&
+      ['choice', 'fight_pending', 'fight'].includes(V.MoreTransformations?.harbour?.raid?.stage ?? '')
+    ) {
+      action = 'raid';
+    }
     const state: MusicState = {
       combat: Number(V.combat) || 0,
       consensual: V.consensual === 1,
