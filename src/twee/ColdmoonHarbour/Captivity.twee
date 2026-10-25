@@ -1,0 +1,286 @@
+:: Deadwood Ghost Ship Widgets [widget]
+
+<<widget 'deadwood-ghostship-context'>>
+  <<set _ghost_ship to $MoreTransformations?.harbour?.captivity>>
+  <<set _ghost_free to !!maplebirch.get('MoreTransformations') and _ghost_ship?.active and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
+<</widget>>
+
+<<widget 'deadwood-ghostship-release'>>
+  <<set _ghost_ship to $MoreTransformations?.harbour?.captivity>>
+  <<if _ghost_ship?.active and !$replayScene and !$statFreeze and !$frozenValues>>
+    <<set _ghost_ship.active to false, _ghost_ship.action to ''>>
+    <<if $badEndStats.last()?.source is 'Ghost Ship' and !$badEndStats.last().trackedEnd>>
+      <<badEndTrackingEnd 'Ghost Ship' `{ reason: _args[0] }`>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-ghostship-return'>>
+  <<if $nextPassageCheck or $nextPassage>>
+    <<getouticon>><<lanLink ['Continue', '继续'] `$nextPassageCheck || $nextPassage`>><</lanLink>><br>
+  <<elseif $MoreTransformations?.harbour?.captivity?.active>>
+    <<getouticon>><<lanLink ['Back to the hold', '回到底舱'] 'Deadwood Ghost Ship Hold'>><</lanLink>><br>
+  <<else>>
+    <<getouticon>><<lanLink ['Return to the harbour', '返回港湾'] 'Deadwood Coldmoon Harbour'>><<endevent>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-ghostship-action-link'>>
+  <<set _ghost_action to _args[0], _ghost_label to _args[1], _ghost_started to _ghost_ship.started, _ghost_target to _args[2] || 'Deadwood Ghost Ship Action'>>
+  <<capture _ghost_action _ghost_label _ghost_started _ghost_target>>
+    <<lanLink `_ghost_label` `_ghost_target`>>
+      <<deadwood-ghostship-context>>
+      <<if _ghost_free and $location is 'deadwood_ghost_ship' and _ghost_ship.started is _ghost_started and !_ghost_ship.action>>
+        <<set _ghost_ship.action to _ghost_action>>
+      <</if>>
+    <</lanLink>><br>
+  <</capture>>
+<</widget>>
+
+<<widget 'deadwood-ghostship-journal'>>
+  <<set _ghost_ship to $MoreTransformations?.harbour?.captivity>>
+  <<if _ghost_ship?.active>>
+    <div class='bold'><<lanSwitch 'Aboard the dead ship' '困在亡船上'>></div>
+    <ul class='journal'>
+      <li><<lanSwitch 'The ship rises at night and sinks again with the light.' '这艘船夜间浮起，天亮后重新沉下。'>></li>
+      <<if !_ghost_ship.watched>>
+        <li><<lanSwitch 'Listen for the ship to rise, then watch the shore through the hatch at night. You need to find where it passes near the harbour.' '留意船浮起的动静，夜间再从舱口辨认岸线，弄清它从哪里经过港湾。'>></li>
+      <<elseif _ghost_ship.supplies lt 3>>
+        <li><<lanSwitch 'Working on the rigging gives you a chance to keep rope and timber. You need more for a float or a signal.' '替亡灵整理索具时，可以留下绳头和木料。扎浮具或准备信号，还需要再攒一些。'>></li>
+      <<else>>
+        <li><<lanSwitch 'You have enough rope and timber. At night you can try the float; practise swimming or rowing if the crossing is still beyond you. A practised hand could also open the boat lock.' '绳索与木料已经够用。夜间可以尝试用浮具脱身。若还渡不过这段海面，可以继续练习游泳或划桨。熟悉锁具的人也能设法弄开小艇的锁。'>></li>
+        <li><<lanSwitch 'Other ships pass beyond the fog. Raising cargo beside a signal may draw one close enough to help.' '雾外还有别的船经过。把货物吊到舷边再发出信号，或许能让它们靠近接应。'>></li>
+      <</if>>
+    </ul><hr>
+  <</if>>
+<</widget>>
+
+:: Deadwood Ghost Ship Capture
+<<deadwood-ghostship-context>>
+<<if !_ghost_ship?.active>>
+  <<if !maplebirch.get('MoreTransformations') or $combat or $replayScene or $statFreeze or $frozenValues or $possessed or $nextPassage or $nextPassageCheck
+      or !(($MoreTransformations.harbour.raid.stage is 'resolved' and $MoreTransformations.harbour.raid.outcome is 'fight_lost') or $MoreTransformations.harbour.scene is 'captured')>>
+    <<deadwood-ghostship-return>><<exit>>
+  <</if>>
+  <!-- 战斗已结束。只记录囚禁，不脱衣、不替换随身物品，也不改金币诅咒。 -->
+  <<set _ghost_ship.active to true, _ghost_ship.origin to $MoreTransformations.harbour.scene is 'captured' ? 'harbour' : 'ship', _ghost_ship.started to Time.date.timeStamp,
+    _ghost_ship.supplies to 0, _ghost_ship.watched to false, _ghost_ship.action to '', _ghost_ship.scene to ''>>
+  <<set $MoreTransformations.harbour.scene to '', $MoreTransformations.harbour.event to '', $MoreTransformations.harbour.raid.stage to '', $MoreTransformations.harbour.raid.outcome to '', $MoreTransformations.harbour.raid.needsEffects to false>>
+  <<badEndTracking 'Ghost Ship' { reason: 'abducted' }>>
+  <<run maplebirch.get('Psyche')?.change(-40, 250)>>
+<</if>>
+<<location 'deadwood_ghost_ship'>><<effects>>
+<<language>>
+  <<option 'EN'>>
+    <<if _ghost_ship.origin is 'ship'>>A hand closes around the back of your neck. You lose your footing before the sailors can reach you. For a moment there is only black water between the hulls. Then dead hands haul you over the other ship's rail.<<else>>Your heels scrape over the stones. One of the dead catches your legs while another drags you towards the gangway. The harbour lamps disappear behind a wall of wet timber.<</if>>
+    <br><br>
+    They push you through a hatch and drop the cover. A bolt scrapes into place above your head. Your shoulder strikes the wet boards as you struggle upright.
+    <br><br>
+    <<if Weather.dayState is 'night'>>Black water laps beneath the little window. A light flickers through the fog, then disappears.<<else>>Water presses against the little window and climbs over the glass. You draw a breath. There is still air in the hold.<</if>> Beyond the door, someone keeps dragging the same heavy chain across the floor.
+  <<option 'CN'>>
+    <<if _ghost_ship.origin is 'ship'>>一只手扣住你的后颈。船员们还没赶到，你便失去了立足的地方。两船之间只有漆黑的海水。随后，几只死人手将你拖过另一侧的船舷。<<else>>你的脚跟擦过石面。一个亡灵抓住你的双腿，另一个将你拖向跳板。港湾的灯光被湿淋淋的船板挡住了。<</if>>
+    <br><br>
+    它们将你推进舱口，盖上木板。头顶传来门栓滑动的声音。你挣扎着坐起来，肩膀撞上湿漉漉的舱壁。
+    <br><br>
+    <<if Weather.dayState is 'night'>>漆黑的海水拍在小窗下方。雾里有一点灯光，晃了一下，又不见了。<<else>>海水拍上小窗，一点点淹没玻璃。你吸了一口气，舱里仍有空气。<</if>>门外有人拖着沉重的铁链，一遍又一遍，从同一个地方经过。
+<</language>><br><br>
+<<deadwood-ghostship-return>>
+
+:: Deadwood Ghost Ship Hold
+<<location 'deadwood_ghost_ship'>><<effects>><<deadwood-ghostship-context>>
+<<if !_ghost_free>><<deadwood-ghostship-return>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    You are locked in the lower hold. Crates are stacked beneath the beams, their markings almost hidden by weed. A broken oar leans against a crate with a rusted padlock on its clasp. Water washes against a grating beyond a low doorway. A barrel catches the fresh water dripping through a seam. You drink a little before the salt taste reaches you.
+    <br><br>
+    <<if Weather.dayState is 'night'>>The water has fallen away from the window. Above you, boots scrape across the deck. The hatch opens and a dead sailor points towards the ropes. It waits for you to get up.<<else>>Green water covers the window. A fish brushes the glass. The footsteps overhead have stopped, but the door is still bolted. You have room to stretch and work at the loose fittings.<</if>>
+    <<if _ghost_ship.supplies is 1>>A length of rope lies beneath the loose board. You still need sound timber.<<elseif _ghost_ship.supplies is 2>>You have lashed a few planks together. The knots need another length of rope before you would trust them with your weight.<<elseif _ghost_ship.supplies gte 3>>Your bundle holds its shape when you push it into the bilge. The broken oar is tucked alongside it, ready to pull free.<</if>>
+    <<if maplebirch.get('MoreTransformations').Undead.active>>Your cold hands scarcely feel the boards. The crew still shut the door on you.<</if>>
+  <<option 'CN'>>
+    你被关在下层货舱里。横梁下堆着木箱，箱上的字几乎被海草遮住。一根断桨斜靠在箱边，箱扣上挂着一把锈锁。矮门后还有一间积水舱室，水面在铁栅旁晃动。一个木桶接住缝隙里滴下的淡水。你喝了一点，尝到咸味便停了下来。
+    <br><br>
+    <<if Weather.dayState is 'night'>>窗外的海水已经退去。头顶传来靴子擦过甲板的声音。舱盖掀开，一个亡灵水手指向绳索，等着你站起来。<<else>>绿幽幽的海水淹着小窗。一条鱼贴着玻璃游过。头顶的脚步停了，门栓却还插着。舱里勉强能伸展身体，也有几处松动的接头。<</if>>
+    <<if _ghost_ship.supplies is 1>>松木板下面藏着一截绳索，还缺结实的木料。<<elseif _ghost_ship.supplies is 2>>你绑起了几块木板。绳结处还得再加固，才敢把身体的重量压上去。<<elseif _ghost_ship.supplies gte 3>>你把扎好的浮具按进积水里，它没有散开。断桨就夹在旁边，伸手便能抽出来。<</if>>
+    <<if maplebirch.get('MoreTransformations').Undead.active>>冰冷的双手几乎感觉不到木板的触感。船员仍将门锁在你身后。<</if>>
+<</language>><br><br>
+<<if !_ghost_ship.watched>>
+  <<deadwood-ghostship-action-link 'watch' `Weather.dayState is 'night' ? ['Watch the shore through the hatch (0:30)', '从舱口辨认岸线 (0:30)'] : ['Listen to the ship (0:30)', '听听船上的动静 (0:30)']`>>
+<<else>>
+  <<lanSwitch 'At night, the ship passes the old breakwater before turning out to sea again.' '到了夜里，船会经过旧防波堤，再转向外海。'>><br>
+<</if>>
+<<if (pcAreArmsBound('any') and !$worn.upper.type.includes('binding')) or (($leftleg is 'bound' or $rightleg is 'bound') and !$worn.feet.type.includes('shackle')) or $head is 'bound'>>
+  <<deadwood-ghostship-action-link 'unbind' `['Loosen your bindings against the boards (0:30)', '借船板磨松束缚 (0:30)']`>>
+<</if>>
+<<if $tiredness lt 1500 and ($pain lt 80 or $willpowerpain isnot 0)>>
+  <<deadwood-ghostship-action-link 'rigging' `['Sort ropes and salvage timber (0:30)', '整理绳索，收集木料 (0:30)']`>>
+  <<deadwood-ghostship-action-link 'row' `['Practise rowing with a broken oar (0:30)', '用断桨练习划动 (0:30)']`>>
+  <<lockicon 'pick'>><<deadwood-ghostship-action-link 'lock' `['Work at the old lock (0:30)', '摸索旧锁的机关 (0:30)']`>>
+  <<swimicon>><<deadwood-ghostship-action-link 'swim' `['Practise staying afloat in the flooded compartment (0:15)', '在积水舱室练习浮水 (0:15)']`>>
+<<else>>
+  <span class='purple'><<lanSwitch 'You need to rest before working or exercising.' '你得先歇一歇，才有力气干活或练习。'>></span><br>
+<</if>>
+<<relaxicon>><<lanLink ['Lie down on the sacks', '躺到货袋上休息'] 'Deadwood Ghost Ship Bed'>><</lanLink>><br>
+<br>
+<<if Weather.dayState is 'night' and _ghost_ship.watched>>
+  <<if pcAreArmsBound('any') or $leftleg is 'bound' or $rightleg is 'bound'>>
+    <span class='purple'><<lanSwitch 'Your bindings keep you from climbing over the rail.' '身上的束缚让你没法翻过船舷。'>></span><br>
+  <<else>>
+    <<if currentSkillValue('skulduggery') gte 400>>
+      <<lockicon 'pick'>><<deadwood-ghostship-action-link 'escape_lock' `['Pick the boat lock and row ashore (0:20)', '撬开小艇的锁，划向岸边 (0:20)']` 'Deadwood Ghost Ship Escape'>>
+    <</if>>
+    <<if _ghost_ship.supplies gte 3 and currentSkillValue('swimmingskill') gte 200>>
+      <<icon 'coldmoon-harbour/improvised-float.png'>><<deadwood-ghostship-action-link 'escape_swim' `['Swim to the breakwater with your float (0:30)', '扶着浮具游向防波堤 (0:30)']` 'Deadwood Ghost Ship Escape'>>
+    <</if>>
+    <<if _ghost_ship.supplies gte 3 and currentSkillValue('athletics') gte 200>>
+      <<icon 'coldmoon-harbour/improvised-float.png'>><<deadwood-ghostship-action-link 'escape_row' `['Paddle your float towards the breakwater (0:30)', '用断桨划动浮具，靠近防波堤 (0:30)']` 'Deadwood Ghost Ship Escape'>>
+    <</if>>
+    <<if currentSkillValue('skulduggery') lt 400 and (_ghost_ship.supplies lt 3 or (currentSkillValue('swimmingskill') lt 200 and currentSkillValue('athletics') lt 200))>>
+      <span class='purple'><<lanSwitch 'The shore is a long way off. You doubt you could reach the rocks through the swell.' '岸边还很远，浪头不断拍上船身。靠你自己，恐怕还到不了那片礁石。'>></span><br>
+    <</if>>
+  <</if>>
+  <<if _ghost_ship.supplies gte 3>>
+    <<set _ghost_signal to C.npc.Zephyr.init is 1 ? ['Raise cargo and signal Zephyr (0:30)', '吊起货物，向泽菲尔发信号 (0:30)'] : ['Raise cargo and signal the passing ship (0:30)', '吊起货物，向经过的船只发信号 (0:30)']>>
+    <<icon 'coldmoon-harbour/cargo-signal.png'>><<deadwood-ghostship-action-link 'zephyr' `_ghost_signal` 'Deadwood Ghost Ship Escape'>>
+  <</if>>
+<<elseif _ghost_ship.watched>>
+  <<lanSwitch 'The sea covers the little window. The ship has not risen yet.' '海水淹着舱窗，船还没有浮起来。'>><br>
+<</if>>
+
+:: Deadwood Ghost Ship Action
+<<location 'deadwood_ghost_ship'>><<effects>><<deadwood-ghostship-context>>
+<<if _ghost_free and ['watch', 'unbind', 'rigging', 'row', 'lock', 'swim'].includes(_ghost_ship.action)>>
+  <<set _ghost_action to _ghost_ship.action, _ghost_ship.action to '', _ghost_ship.scene to 'interrupted', _ghost_started to _ghost_ship.started, _ghost_night to Weather.dayState is 'night'>>
+  <<if ['watch', 'unbind'].includes(_ghost_action) or ($tiredness lt 1500 and ($pain lt 80 or $willpowerpain isnot 0))>>
+    <<pass `_ghost_action is 'swim' ? 15 : 30`>>
+    <<deadwood-ghostship-context>>
+    <<if _ghost_free and $location is 'deadwood_ghost_ship' and $passage is 'Deadwood Ghost Ship Action' and _ghost_ship.started is _ghost_started>>
+      <<set _ghost_ship.scene to _ghost_action>>
+      <<switch _ghost_action>>
+        <<case 'watch'>>
+          <<if Weather.dayState is 'night'>><<set _ghost_ship.watched to true>><<else>><<set _ghost_ship.scene to 'watch_submerged'>><<stress -2>><</if>>
+        <<case 'unbind'>>
+          <!-- 只解普通绳缚，不调用会毁坏手持物或脚镣的 unbind。 -->
+          <<if !$worn.upper.type.includes('binding')>>
+            <<if $leftarm is 'bound'>><<set $leftarm to 0, $leftboundcarry to 0>><</if>>
+            <<if $rightarm is 'bound'>><<set $rightarm to 0, $rightboundcarry to 0>><</if>>
+          <</if>>
+          <<if !$worn.feet.type.includes('shackle')>>
+            <<if $leftleg is 'bound'>><<set $leftleg to 0>><</if>>
+            <<if $rightleg is 'bound'>><<set $rightleg to 0>><</if>>
+            <<if $feetuse is 'bound'>><<set $feetuse to 0>><</if>>
+          <</if>>
+          <<if $head is 'bound'>><<set $head to 0>><</if>>
+        <<case 'rigging'>>
+          <<set _ghost_ship.scene to _ghost_ship.supplies gte 3 ? 'rigging_full' : (_ghost_night ? 'rigging_night' : 'rigging_day'), _ghost_ship.supplies to Math.min(3, _ghost_ship.supplies + 1)>><<physique 1>><<athletics 2>><<tiredness 5>>
+        <<case 'row'>><<physique 2>><<athletics 4>><<tiredness 5>>
+        <<case 'lock'>><<skulduggery 1>><<tiredness 2>>
+        <<case 'swim'>><<swimmingskilluse>><<tiredness 5>>
+      <</switch>>
+    <</if>>
+  <</if>>
+<</if>>
+<<if _ghost_ship?.active>>
+  <<language>>
+    <<option 'EN'>>
+      <<switch _ghost_ship.scene>>
+        <<case 'watch'>>You count the footsteps and listen for the bell. Through a crack you see the broken lighthouse beyond the rail. The ship follows the same turn past it. A small boat hangs beside the rail, its chain held by a padlock. Farther out, a lighted sail sometimes crosses the fog. You wait until you are sure you would recognise the lighthouse in the dark.
+        <<case 'watch_submerged'>>You sit beside the hatch and count the strokes of the bell. The dragging chain falls silent after the last one. You wait, but the sea still covers the window. Knowing when the footsteps will return makes it a little easier to stay calm. You will have to wait for night to see the shore.
+        <<case 'unbind'>>You press the rope against a rough edge and work it back and forth until the fibres give. The knots loosen. The loosened rope slips from your skin.
+        <<case 'rigging' 'rigging_night' 'rigging_day'>>
+          <<if _ghost_ship.scene is 'rigging_day'>>You work beneath the closed hatch, untying an empty crate and easing its planks apart. You stop whenever something knocks against the other side of the door.<<else>>You coil wet rope beside the hatch. A dead sailor shakes out a tangle you have already sorted and pushes it back at you. You do it again, slipping the sound lengths out of sight when it turns away.<</if>>
+          <<if _ghost_ship.supplies is 1>>You hide the rope beneath a loose board.<<elseif _ghost_ship.supplies is 2>>You set aside enough timber to carry your weight.<<else>>You bind the planks together and tighten the knots. The bundle holds.<</if>>
+        <<case 'rigging_full'>>You tighten the knots and test the planks again, then push an empty crate in front of the loose ends. You have kept enough. You spend the rest of the time shifting boxes away from the hiding place, stopping when your arms begin to ache.
+        <<case 'row'>>You brace your feet against a crate and pull the broken oar through the bilge. Your shoulders begin to ache. <<if currentSkillValue('athletics') lt 200>>The blade keeps catching on the boards. You try again with your back straighter, learning to pull without tipping yourself sideways.<<else>>You settle into a steady rhythm. When the ship tilts, you shift your weight and keep the blade level.<</if>>
+        <<case 'lock'>>You turn a bent nail inside the old padlock, feeling for the pieces that move. <<if currentSkillValue('skulduggery') lt 400>>The metal slips and scrapes your knuckle. You slow down, listening for the small click beneath the chain's rattle.<<else>>The shackle springs open. You close it and try again, this time without looking at your hands.<</if>>
+        <<case 'swim'>>A grating keeps you inside the flooded compartment. <<if currentSkillValue('swimmingskill') lt 200>>You hold its edge, then let go a little at a time, working out how to keep your face above water.<<else>>You push away from the edge and swim across the narrow space, turning before the grating. Your hands no longer reach for it at every splash.<</if>> When your legs tire, you pull yourself back onto the boards.
+        <<default>>A shout or a change in the ship's movement interrupts you. You stop before finishing.
+      <</switch>>
+    <<option 'CN'>>
+      <<switch _ghost_ship.scene>>
+        <<case 'watch'>>你数着脚步，听船钟什么时候响。透过木板缝，能看见船舷外那座破灯塔。船每次都从同一个地方转过去。甲板边吊着一条小艇，艇链上也挂着一把锁。更远处，偶尔有亮着灯的帆船穿过海雾。你一直看到自己确信，夜里也能认出灯塔的影子。
+        <<case 'watch_submerged'>>你坐在舱口边，数着船钟。最后一声响过，拖动铁链的声音也停了。你等了一会儿，海水仍淹着小窗。知道脚步什么时候会回来，让你稍微镇定了一些。想看清岸边，还得等到夜里。
+        <<case 'unbind'>>你将绳索抵在粗糙的木边上，来回磨动，直到绳股松散。绳结一点点松开了。松开的绳索从你身上滑落。
+        <<case 'rigging' 'rigging_night' 'rigging_day'>>
+          <<if _ghost_ship.scene is 'rigging_day'>>你蹲在合拢的舱盖下面，解开空箱上的绳索，慢慢撬松木板。门外每响起一点动静，你便停下手。<<else>>你在舱口盘起湿绳。一个亡灵水手抖散你刚理好的绳圈，又推到面前。你重新整理，趁它转身，将结实的绳头藏起来。<</if>>
+          <<if _ghost_ship.supplies is 1>>你将绳索塞进一块松木板下面。<<elseif _ghost_ship.supplies is 2>>留下的木料，已经足够承住你的重量。<<else>>你将木板绑到一起，逐个收紧绳结。它没有散开。<</if>>
+        <<case 'rigging_full'>>你重新收紧绳结，又试了试木板，再推来一只空箱，遮住露出的绳头。藏好的东西够用了。你又将旁边的箱子搬开几趟，直到胳膊开始发酸。
+        <<case 'row'>>你用脚抵住木箱，把断桨拉过舱底积水。肩膀渐渐酸了。<<if currentSkillValue('athletics') lt 200>>桨叶总是碰上木板。你挺直后背再试，慢慢摸清怎样用力，才不会把自己带得东倒西歪。<<else>>你渐渐掌握了节奏。船身倾斜时，你挪动身体，没让桨叶跟着翻过去。<</if>>
+        <<case 'lock'>>你将弯钉探进旧挂锁，摸索里面会动的零件。<<if currentSkillValue('skulduggery') lt 400>>金属滑了一下，擦过指节。你放慢动作，仔细分辨铁链响声底下那一点轻轻的咔哒声。<<else>>锁环弹开了。你将它扣回去再试一次，这回没有低头看手。<</if>>
+        <<case 'swim'>>铁栅挡着积水舱室的出口。<<if currentSkillValue('swimmingskill') lt 200>>你扶住边缘，一点点松开手，试着让脸留在水面上。<<else>>你蹬开木板，游过狭窄的积水，在铁栅前转过身。水花溅到脸上时，你没有急着去抓扶手。<</if>>双腿累了，便抓住木板，重新爬回干处。
+        <<default>>一声叫喊，或船身突然改变的动静打断了你。事情还没做完，你便停了下来。
+      <</switch>>
+  <</language>><<if _ghost_ship.scene is 'watch_submerged'>><<lstress>><</if>><br><br>
+<</if>>
+<<deadwood-ghostship-return>>
+
+:: Deadwood Ghost Ship Bed
+<<location 'deadwood_ghost_ship'>><<effects>><<deadwood-ghostship-context>>
+<<if !_ghost_free>><<deadwood-ghostship-return>><<exit>><</if>>
+<<lanSwitch 'You spread the driest sacks beneath the beam and lie down. Water taps against the window. The footsteps above never quite fall into time with the waves.' '你把最干的货袋铺在横梁下，躺了下来。海水轻敲小窗，头顶的脚步始终对不上浪声。'>><br><br>
+<<generateSleepLinks 'Deadwood Ghost Ship Sleep'>>
+<<deadwood-ghostship-return>>
+
+:: Deadwood Ghost Ship Sleep
+<<deadwood-ghostship-context>>
+<<if !_ghost_free or $location isnot 'deadwood_ghost_ship' or !Number.isInteger($sleephour) or ($sleephour isnot -1 and ($sleephour lt 1 or $sleephour gt 10))>>
+  <<deadwood-ghostship-return>><<exit>>
+<</if>>
+<<set $bedGuest to ''>><<sleep>>
+<<if !_dreaming and $MoreTransformations.harbour.captivity.active and $location is 'deadwood_ghost_ship'>>
+  <<effects>><<wakingEffects $sleepHoursTotal>><<sleepeffects>><br><br>
+  <<lanSwitch 'You wake on the sacks. For a moment you listen for familiar voices. A chain scrapes beyond the door.' '你在货袋上醒来，恍惚间还等着听见熟悉的人声。门外，铁链擦过了船板。'>><br><br>
+  <<deadwood-ghostship-return>>
+<</if>>
+
+:: Deadwood Ghost Ship Escape
+<<deadwood-ghostship-context>>
+<<if _ghost_free and $location is 'deadwood_ghost_ship' and ['escape', 'escape_lock', 'escape_swim', 'escape_row', 'zephyr'].includes(_ghost_ship.action)>>
+  <<set _ghost_exit to _ghost_ship.action, _ghost_ship.action to '', _ghost_ship.scene to 'late', _ghost_started to _ghost_ship.started>>
+  <!-- 旧存档尚未完成的自逃，沿用当时可用的路线。 -->
+  <<if _ghost_exit is 'escape'>>
+    <<set _ghost_exit to currentSkillValue('skulduggery') gte 400 ? 'escape_lock' : (currentSkillValue('swimmingskill') gte 200 ? 'escape_swim' : 'escape_row')>>
+  <</if>>
+  <<set _ghost_ready to Weather.dayState is 'night' and _ghost_ship.watched>>
+  <<if _ghost_exit is 'zephyr'>>
+    <<set _ghost_ready to _ghost_ready and _ghost_ship.supplies gte 3>>
+  <<else>>
+    <<set _ghost_ready to _ghost_ready and !pcAreArmsBound('any') and $leftleg isnot 'bound' and $rightleg isnot 'bound' and (_ghost_exit is 'escape_lock' ? currentSkillValue('skulduggery') gte 400 : (_ghost_ship.supplies gte 3 and currentSkillValue(_ghost_exit is 'escape_swim' ? 'swimmingskill' : 'athletics') gte 200))>>
+  <</if>>
+  <<if _ghost_ready>>
+    <<pass `_ghost_exit is 'escape_lock' ? 20 : 30`>><<deadwood-ghostship-context>>
+    <<if _ghost_free and $location is 'deadwood_ghost_ship' and $passage is 'Deadwood Ghost Ship Escape' and _ghost_ship.started is _ghost_started and Weather.dayState is 'night'>>
+      <<set _ghost_ship.scene to _ghost_exit>>
+      <<deadwood-ghostship-release _ghost_exit>>
+      <<location 'seadocks'>><<set $underwater to 0, $nooxygen to 0, $eventskip to 1>>
+      <<tiredness `_ghost_exit is 'escape_swim' ? 20 : (_ghost_exit is 'escape_row' ? 15 : 10)`>><<stress -8>><<run maplebirch.get('Psyche')?.change(10, -200)>>
+    <</if>>
+  <</if>>
+<</if>>
+<<if !_ghost_ship?.active and ['escape', 'escape_lock', 'escape_swim', 'escape_row', 'zephyr'].includes(_ghost_ship?.scene)>>
+  <<if _ghost_ship.scene is 'zephyr'>><<set _ghost_known to C.npc.Zephyr.init is 1>><<npc Zephyr>><<person1>><</if>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _ghost_ship.scene is 'zephyr'>>You rig a crate beside the rail and swing the lantern above it. A shot cracks through the fog. A rope lands across your arm.
+        <br><br>
+        "Grab it!" <<if _ghost_known>>Zephyr shouts.<<else>>a voice shouts from the boat.<</if>> <<if $pirate_rank gte 1>>"I'm not losing a hand to that rotten tub."<<else>>"And don't leave that crate behind!"<</if>> A sailor catches your sleeve and pulls you down into the waiting boat while another hooks the cargo. You scarcely have room to sit. <<if !_ghost_known>>"All clear, Captain Zephyr!" the sailor calls over your head.<</if>>
+        <br><br>
+        The boat leaves you at the old breakwater before returning to Zephyr. "Stay out of their hands this time," the captain calls after you.
+      <<else>>You wait for the lighthouse to pass the hatch. <<if _ghost_ship.scene is 'escape_lock' or (_ghost_ship.scene is 'escape' and currentSkillValue('skulduggery') gte 400)>>The old boat lock gives beneath your nail. You lower the boat hand over hand, keeping the chain from striking the hull. Once aboard, you put both oars to work.<<elseif _ghost_ship.scene is 'escape_row'>>You slide your float through the opening and climb onto it. The planks dip at one end. You shift your weight and pull with the broken oar, steering away from the hull.<<else>>You lower your float through the opening and follow it into the water. The timber dips beneath your weight, then holds. You keep one arm over it and kick, taking care not to let the current carry you past the rocks.<</if>>
+        <br><br>
+        A dead sailor turns at the rail. You keep moving towards the dark line of the breakwater. The fog swallows the ship before you reach the rocks. You climb until the next wave cannot pull you back.
+      <</if>>
+    <<option 'CN'>>
+      <<if _ghost_ship.scene is 'zephyr'>>你将木箱吊到船舷旁，在上方晃动提灯。雾外传来一声枪响，一根绳子甩上你的胳膊。
+        <br><br>
+        “抓住！”<<if _ghost_known>>泽菲尔喊道。<<else>>小艇上传来喊声。<</if>><<if $pirate_rank gte 1>>“我可不想把船员丢在那条烂船上。”<<else>>“别把那箱货落下！”<</if>>一个水手抓住你的袖子，将你拖进等在下面的小艇，另一个钩住货箱。艇上几乎没有坐下的地方。<<if !_ghost_known>>“好了，泽菲尔船长！”水手越过你的头顶喊道。<</if>>
+        <br><br>
+        小艇将你放在旧防波堤旁，才掉头返回泽菲尔那边。“这回别再落到他们手里了。”船长朝你喊道。
+      <<else>>你等到灯塔的影子从舱口旁掠过。<<if _ghost_ship.scene is 'escape_lock' or (_ghost_ship.scene is 'escape' and currentSkillValue('skulduggery') gte 400)>>弯钉拨开了小艇的旧锁。你一点点松下绳索，没让铁链撞上船身。坐稳后，你抓起双桨，划了出去。<<elseif _ghost_ship.scene is 'escape_row'>>你将浮具推出缺口，爬了上去。一端的木板沉了下去。你挪动身体，用断桨拨开水，慢慢离开船边。<<else>>你将浮具放出缺口，跟着滑进水里。木料被你的重量压下去，又浮了起来。你用一条胳膊搭住它，蹬动双腿，留心不让水流将自己冲过礁石。<</if>>
+        <br><br>
+        一个亡灵水手在船舷旁转过头。你没有停，继续朝防波堤漆黑的轮廓靠近。还没碰到礁石，船便被雾遮住了。你继续往上爬，直到下一阵浪也没法把你卷回去。
+      <</if>>
+  <</language>><<lstress>><br><br>
+<<elseif _ghost_ship?.active>>
+  <<lanSwitch 'The hull starts to settle before you can get clear. You pull back into the hold. Your preparations are still hidden beneath the boards.' '还没来得及脱身，船便开始往下沉。你退回货舱。准备好的东西仍藏在木板下面。'>><br><br>
+<</if>>
+<<deadwood-ghostship-return>>

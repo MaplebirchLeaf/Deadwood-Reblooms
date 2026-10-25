@@ -89,6 +89,8 @@ From 21:00 until 06:00 on blood moon nights, a ship arrives with the fog. Explor
 
 Afterwards, leave or spend 5 minutes asking Zephyr about the ship or resting by the hatch. Each activity is available once, and you can do both; rest relieves 4 stress and 3 tiredness. The conversation leads to the harbour job, which still needs separate acceptance. Neither raids nor the cargo job directly promote you.
 
+**Ghost-ship captivity**: losing to a boarder at sea or to multiple spirits at Coldmoon Harbour leads to the hold. Watch the route, keep rope and timber, and practise swimming, rowing or lockpicking. Escape at night yourself or use cargo and a signal to draw Zephyr close; no prior meeting is required. Loosen ordinary ropes against the boards. Your clothes and belongings stay with you, sleep restores fatigue and rent pauses while captive. Both exits return to the harbour without triggering the coin curse.
+
 ## Island gold and the undead curse
 
 After discovering the island shore, keep exploring to find an old cavern. Light a torch at the entrance brazier. Movement and investigation consume light; darkness hides hazards. Trail marks help you retreat. Swimming, Athletics and Skulduggery offer routes, with slower paths requiring no skill. Finding the chest opens a shortcut back.

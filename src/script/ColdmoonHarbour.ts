@@ -17,6 +17,8 @@ export default function ColdmoonHarbour(maplebirch: typeof window.maplebirch): v
     { overwrite: true }
   );
   maplebirch.tool.onInit(() => {
+    setup.addlocation('deadwood_ghost_ship').parent('sea').location().inside().build();
+    maplebirch.tool.patch.location.configure('deadwood_ghost_ship', { customMapping: () => 'deadwood_coldmoon_harbour' });
     const originalMapping = setup.Locations.seadocks;
     const originalImage = Object.hasOwn(setup.LocationImages, 'seadocks') ? 'seadocks' : 'home';
     // 仅替换本组港湾页面的侧栏画面，保留原版地点与其他码头页面的映射。
@@ -48,6 +50,14 @@ export default function ColdmoonHarbour(maplebirch: typeof window.maplebirch): v
   });
   maplebirch.tool.addTo('Journal', 'deadwood-harbour-journal');
   maplebirch.tool.addTo('Journal', 'deadwood-pirate-raid-journal');
+  maplebirch.tool.addTo('Journal', 'deadwood-ghostship-journal');
+  // 实际离船时收束囚禁，保留当前页面的剧情与出口。
+  maplebirch.dynamic.regStateEvent('gate', 'deadwood-ghostship-interrupted', {
+    cond: () => V.MoreTransformations?.harbour?.captivity?.active && !maplebirch.passage.title.startsWith('Deadwood Ghost Ship '),
+    action: () => {
+      maplebirch.SugarCube.Wikifier.wikifyEval('<<deadwood-ghostship-release "interrupted">>');
+    }
+  });
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-pirate-raid-link', passage: 'Pirate Deck' });
 
   const ready = (hand: 'left' | 'right') => {

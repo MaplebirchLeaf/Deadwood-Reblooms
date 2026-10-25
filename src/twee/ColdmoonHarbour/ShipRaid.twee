@@ -54,7 +54,7 @@
     <<lanSwitch 'You remember how those dead hands refused to let go. The crew bring a spar to prise them off the rail.' '你记得那些死人手怎么砸都不肯松开。船员们抬来一根长杆，要把它们撬下去。'>><br><br>
   <</if>>
   <<if _shipRaid.approach is 'blood'>>
-    <span class='purple'><<lanSwitch 'One boarder is much larger than the others. It hauls itself aboard with one hand, weed trailing from its clothes. The railing bends under its weight.' '其中一个登船者比其他人高大得多。它单手撑上船舷，衣服上拖着海草，栏杆被它压得弯了下去。'>></span><br><br>
+    <<lanSwitch 'One boarder is much larger than the others. It hauls itself aboard with one hand, weed trailing from its clothes. The railing bends under its weight.' '其中一个登船者比其他人高大得多。它单手撑上船舷，衣服上拖着海草，栏杆被它压得弯了下去。'>><br><br>
   <</if>>
   <<if maplebirch.get('MoreTransformations')?.Undead.active>>
     <<lanSwitch 'The boarder pauses when its eyes meet yours, as though it recognises something. Then it pulls itself closer, fingers tightening around the rail.' '登船者与你对上视线时停了一下，仿佛认出了什么。随后它又往上爬，手指更紧地扣住栏杆。'>><br><br>
@@ -76,7 +76,7 @@
     <</if>>
   <</lanLink>><br>
   <<if maplebirch.get('Psyche')?.active>>
-    <<icon 'coldmoon-harbour/ghost-ship.png'>><<lanLink ['Go closer to hear the dead captain', '走近船舷，听清死者的号令'] 'Deadwood Pirate Raid Fight'>>
+    <<icon 'coldmoon-harbour/ghost-ship.png'>><<lanLink ['Go closer to the other ship', '走近另一艘船'] 'Deadwood Pirate Raid Fight'>>
       <<if $MoreTransformations.harbour.raid.stage is 'choice' and maplebirch.get('Psyche')?.active and !$combat and !$possessed and !$nextPassage and !$nextPassageCheck>>
         <<set $MoreTransformations.harbour.raid.stage to 'fight_pending', $MoreTransformations.harbour.raid.outcome to 'contact'>>
         <<run maplebirch.get('Psyche')?.change(-150, 200)>>
@@ -131,7 +131,7 @@
 <<widget 'deadwood-pirate-raid-end'>>
   <<set _shipRaid to $MoreTransformations?.harbour?.raid>>
   <<if _shipRaid?.stage is 'fight' and $combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead' and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck and (Weather.dayState isnot 'night' or $enemyhealth lte 0 or $enemyarousal gte $enemyarousalmax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0))>>
-    <<set _shipRaid.outcome to $enemyhealth lte 0 ? 'fight_won' : Weather.dayState isnot 'night' ? 'dawn' : $pain gte 100 and $willpowerpain is 0 ? 'fight_lost' : 'escaped', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
+    <<set _shipRaid.outcome to $enemyhealth lte 0 ? 'fight_won' : Weather.dayState isnot 'night' ? 'dawn' : $pain gte 100 and $willpowerpain is 0 and $enemyarousal lt $enemyarousalmax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 ? 'fight_lost' : 'escaped', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
     <<if _shipRaid.outcome is 'fight_won'>>
       <<set _shipRaid.victories += 1>><<pirate_status 3>><<npcincr Zephyr love 1>><<run maplebirch.get('Psyche')?.change(10, -150)>>
     <<elseif _shipRaid.outcome is 'escaped'>>
@@ -250,6 +250,9 @@
 
 :: Deadwood Pirate Raid Finish
 <<set _shipRaid to $MoreTransformations?.harbour?.raid>>
+<<if _shipRaid?.stage is 'resolved' and _shipRaid.outcome is 'fight_lost' and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
+  <<goto 'Deadwood Ghost Ship Capture'>><<exit>>
+<</if>>
 <<if $nextPassage or $nextPassageCheck>>
   <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Pirate Raid Finish'>><</lanLink>></span><<nexttext>><<exit>>
 <</if>>

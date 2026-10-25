@@ -32,6 +32,7 @@ class MoreTransformations extends Module {
         scene: '',
         event: '',
         fighting: false,
+        captivity: { active: false, origin: '', started: 0, supplies: 0, watched: false, action: '', scene: '' },
         zephyr: { stage: 0, fee: 0, origin: '' },
         raid: { day: -7, stage: '', outcome: '', approach: '', talked: false, rested: false, needsEffects: false, victories: 0, rescues: 0, encounters: 0 }
       },
