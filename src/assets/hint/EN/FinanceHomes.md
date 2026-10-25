@@ -95,7 +95,7 @@ Check the living room first, then chat or invite one person upstairs. A double b
 
 - Robin and Kylar refuse to live with Whitney. Reversing the invitation order does not bypass this conflict.
 - Kylar refuses additional residents when jealousy is high. Reduce jealousy or arrange separate homes before asking again.
-- Sydney and Kylar's former friendship does not erase their current distance or guarantee shared intimacy.
+- Kylar and Sydney refuse shared accommodation by default. With vanilla Stockholm Syndrome: Kylar, jealousy below 60, both as your lovers and a separate guest room, discuss the rooms and routine with each of them. Both must agree before moving in. Moving out or changing address requires a new discussion.
 - Resolve tenancy, freezes, insufficient beds, lost love-interest status or registration elsewhere before inviting someone.
 
 ### Time together as three
@@ -103,7 +103,7 @@ Check the living room first, then chat or invite one person upstairs. A double b
 Choose **Invite both lovers to talk (0:20)** in the sitting room while both residents are home. You can then invite them to stay close during the shared conversation.
 
 - Robin and Sydney answer separately. With significant trauma, Robin prefers time alone with you. Sydney has different dialogue for pure and corrupt states. You can cancel after both agree.
-- Kylar’s former friendship with Sydney does not imply agreement to shared intimacy. At lower jealousy, Kylar asks for time alone. At high jealousy, Kylar leaves the conversation for the bedroom.
+- Kylar and Sydney must each agree to the special housing arrangement. Afterwards, daily conversation centres on sharing a home.
 - Sydney can refuse closeness with Whitney. Hostile pairs do not agree simply because they share an address.
 - Once **Robin and Sydney both agree to stay**, the conversation page also offers **Take both of them to the bedroom**, which leads into a full three-way encounter. No other pair gets that entry. Stress relief uses each resident’s existing once-per-day allowance, shared with one-to-one evenings.
 
@@ -158,3 +158,9 @@ Achievements record completed actions.
 ### A drink at home
 
 Open original red or white wine, or your own bottled orchard wine, in the sitting room, lounge, kitchen or cellar. Choose a resident lover who is home before opening a bottle. Each bottle takes 20 minutes. Afterwards, talk, finish, or explicitly agree to spend some time together. If you know you are pregnant or are too drunk to keep sipping, leave the bottle and choose an alcohol-free drink.
+
+### Rehearsing at home
+
+While the school play is ongoing, rehearse for two hours at your property desk. Solo rehearsal uses the vanilla comfortable-chair benefit. Kylar or Sydney can take their school part if you know it and they are at home. Everyone needs enough free time; baths, departures and the official performance take priority.
+
+The home rehearsal option closes after the school performance. It does not change the cast or skip the school’s dedicated rehearsal scenes.

@@ -32,7 +32,7 @@ export interface RealEstateState {
   last_managed_day: number;
   last_auction: AuctionRecord | null;
   residents: Record<PropertyId, string[]>;
-  household_message: { name: string; result: 'joined' | 'full' | 'bed' | 'left' | 'conflict'; refused_by: string | null } | null;
+  household_message: { name: string; result: 'joined' | 'full' | 'bed' | 'left' | 'conflict'; refused_by: string | null; property?: string } | null;
   meeting_resident: string | null;
   daily_evening: string[];
   daily_night_wake: boolean;
@@ -53,6 +53,8 @@ export interface RealEstateState {
 }
 
 interface PropertyManagement {
+  /** 凯拉尔与悉尼分别答应的共同住址，搬离后重新商量。 */
+  sharing?: string[];
   staff?: PropertyStaffState;
   upgrades: string[];
   rest_day: number;
@@ -229,7 +231,11 @@ class RealEstate {
   // 原版 isLoveInterest 读取当前存档的恋人槽位，模组已将扩展列表接入该函数。
   // 同住只关心是否为当前恋人，不用判断角色是否还能被选为恋人。
   private pruneResidents(): void {
-    for (const id of Object.keys(this.state.residents)) this.state.residents[id] = this.residentsAt(id).map(profile => profile.id);
+    for (const id of Object.keys(this.state.residents)) {
+      const residents = this.residentsAt(id).map(profile => profile.id);
+      if (residents.length !== this.state.residents[id].length) this.managementFor(id).sharing = [];
+      this.state.residents[id] = residents;
+    }
   }
 
   public residentsAt(id: PropertyId): ResidentProfile[] {
@@ -301,13 +307,38 @@ class RealEstate {
   }
 
   // 拒绝来自受霸凌的一方，或不愿与别人分享伴侣的凯拉尔。
-  public householdRefusal(names: readonly string[]): string | null {
+  public householdRefusal(names: readonly string[], id?: PropertyId): string | null {
     if (names.length < 2) return null;
     if (names.includes('Whitney')) {
       if (names.includes('Robin')) return 'Robin';
       if (names.includes('Kylar')) return 'Kylar';
     }
+    if (id && names.includes('Kylar') && names.includes('Sydney')) {
+      if (!(V.syndromekylar >= 1)) return 'Kylar';
+      const sharing = this.managementFor(id).sharing ?? [];
+      if (!sharing.includes('Kylar')) return 'Kylar';
+      if (!sharing.includes('Sydney')) return 'Sydney';
+      return null;
+    }
     return names.includes('Kylar') && C.npc.Kylar.rage >= 60 ? 'Kylar' : null;
+  }
+
+  public sharingReady(name: string, id: PropertyId): boolean {
+    if (!['Kylar', 'Sydney'].includes(name) || !(V.syndromekylar >= 1) || C.npc.Kylar.rage >= 60) return false;
+    if (V.combat || V.possessed || V.eventforced || V.statFreeze || V.replayScene || V.frozenValues || V.nextPassage || V.nextPassageCheck) return false;
+    const property = this.properties.find(item => item.id === id);
+    if (!property || !this.owns(id) || this.isFrozen(id) || this.managementFor(id).rented || property.resident_capacity < 2 || !property.rooms.guest || !this.canShareBed(id)) return false;
+    if (!['Kylar', 'Sydney'].every(npc => window.isLoveInterest(npc) && C.npc[npc]?.init === 1 && ['active', 'rescued'].includes(C.npc[npc].state))) return false;
+    const residents = this.residentsAt(id).map(profile => profile.id);
+    return residents.includes(name === 'Kylar' ? 'Sydney' : 'Kylar') || (residents.length === 1 && residents[0] === name);
+  }
+
+  public agreeSharing(name: string, id: PropertyId): boolean {
+    if (!this.sharingReady(name, id)) return false;
+    const sharing = (this.managementFor(id).sharing ??= []);
+    if (sharing.includes(name)) return false;
+    sharing.push(name);
+    return true;
   }
 
   public inviteResident(name: string, id: PropertyId): boolean {
@@ -318,7 +349,7 @@ class RealEstate {
     if (!profile || !window.isLoveInterest(name)) return false;
     const residents = (this.state.residents[id] ??= []);
     if (residents.includes(name)) return false;
-    const refusedBy = this.householdRefusal([...residents, name]);
+    const refusedBy = this.householdRefusal([...residents, name], id);
     let result: 'joined' | 'full' | 'bed' | 'conflict';
     if (residents.length >= property.resident_capacity) result = 'full';
     else if (!this.canShareBed(id)) result = 'bed';
@@ -326,18 +357,22 @@ class RealEstate {
     else {
       // 恋人只在一处住宅登记同住。玩家的其他空置房屋仍可随时自住。
       for (const [home, names] of Object.entries(this.state.residents)) {
-        if (home !== id) this.state.residents[home] = names.filter(resident => resident !== name);
+        if (home !== id && names.includes(name)) {
+          this.state.residents[home] = names.filter(resident => resident !== name);
+          this.managementFor(home).sharing = [];
+        }
       }
       residents.push(name);
       result = 'joined';
     }
-    this.state.household_message = { name, result, refused_by: result === 'conflict' ? refusedBy : null };
+    this.state.household_message = { name, result, refused_by: result === 'conflict' ? refusedBy : null, property: id };
     return result === 'joined';
   }
 
   public endCohabitation(name: string, id: PropertyId): boolean {
     if (!(this.state.residents?.[id] ?? []).includes(name)) return false;
     this.state.residents[id] = this.state.residents[id].filter(resident => resident !== name);
+    this.managementFor(id).sharing = [];
     this.state.household_message = { name, result: 'left', refused_by: null };
     return true;
   }
@@ -938,6 +973,7 @@ class RealEstate {
     this.banquet.cancel(id);
     const management = this.managementFor(id);
     this.state.owned[id] = false;
+    management.sharing = [];
     // 地块沿用原版 $plots。产权拍卖后清掉这处房屋的作物，避免重新购买时接手旧存档的苗圃。
     if (V.plots) delete V.plots[id];
     const displaced = this.state.residents?.[id] ?? [];

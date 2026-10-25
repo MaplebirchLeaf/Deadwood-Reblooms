@@ -167,9 +167,9 @@
               <<case 'Kylar'>>
                 <<language>>
                   <<option 'EN'>>
-                    Kylar's smile falters at the other name. "I thought this was for us." You explain the arrangement again, without calling the guest room a promise of anything more. Kylar checks which room is available, without taking the arrangement as a promise that you belong only to Kylar.
+                    <<if $_otherResidents.some(profile => profile.id === 'Sydney')>>Kylar slips the key into a pocket. "I know which room is mine. You showed me." <<nnpc_He 'Kylar'>> smiles at you, then checks that the key is still there.<<else>>Kylar's smile falters at the other name. "I thought this was for us." You go over the rooms again. Kylar listens, still holding the key.<</if>>
                   <<option 'CN'>>
-                    听到另一个名字，凯拉尔的笑容僵了一下。“我以为这是给我们的。”你又解释了一遍安排，没有把客房说成更多的承诺。凯拉尔确认了能用哪间房，却没有把这份安排当成你只属于凯拉尔的承诺。
+                    <<if $_otherResidents.some(profile => profile.id === 'Sydney')>>凯拉尔把钥匙收进口袋。“我知道住哪间。你给我看过了。”<<nnpc_He 'Kylar'>>朝你笑了，又确认了一下钥匙还在。<<else>>听到另一个名字，凯拉尔的笑容僵了一下。“我以为这是给我们的。”你又说了一遍房间的安排。凯拉尔听着，仍把钥匙攥在手里。<</if>>
                 <</language>><br>
               <<case 'Sydney'>>
                 <<language>>
@@ -189,7 +189,23 @@
           你们需要一张双人床，才能住在一起。
       <</language>></span><br><br>
       <<case 'conflict'>>
-        <<if $_inviteMessage.refused_by isnot $_inviteName>>
+        <<set $_refusedPair to [...maplebirch.get('Finance').realEstate.residentsAt($_inviteMessage.property).map(profile => profile.id), $_inviteName]>>
+        <<if $_refusedPair.includes('Kylar') and $_refusedPair.includes('Sydney')>>
+          <<language>>
+            <<option 'EN'>>
+              <<if !($syndromekylar gte 1) or C.npc.Kylar.rage gte 60>>
+                <<if $_inviteName is 'Kylar'>>Kylar shakes <<nnpc_his 'Kylar'>> head. "I thought we were going to live together. You and me."<<else>>"You should ask Kylar first," Sydney says. "I don't think this is what <<nnpc_he 'Kylar'>> had in mind."<</if>> You put the spare key away.
+              <<else>>
+                You have not settled the arrangement with both of them yet. You leave the spare key where it is.
+              <</if>>
+            <<option 'CN'>>
+              <<if !($syndromekylar gte 1) or C.npc.Kylar.rage gte 60>>
+                <<if $_inviteName is 'Kylar'>>凯拉尔摇了摇头。“我以为是我们一起住。你和我。”<<else>>“你还是先问问凯拉尔吧。”悉尼说。“我想，<<nnpc_he 'Kylar'>>原本不是这样打算的。”<</if>>你收起了备用钥匙。
+              <<else>>
+                这件事还没和两个人都谈妥。你没有把备用钥匙交出去。
+              <</if>>
+          <</language>><br><br>
+        <<elseif $_inviteMessage.refused_by isnot $_inviteName>>
           <<if $_inviteMessage.refused_by is 'Robin'>>
             <<language>>
               <<option 'EN'>>
@@ -290,6 +306,7 @@
         <br><br>
         <span class='blue'><i>你可以和<<= maplebirch.auto($_inviteName)>>商量重新分开住，或是搬去另一处房子。</i></span>
       <</language>><br><br>
+      <<if !$_inLesson>><<deadwood-home-sharing $_inviteName $_currentHome.id $_invitePassage $_inviteReturn>><</if>>
       <<capture $_inviteName $_currentHome>>
         <<lanLink ['Discuss living separately', '商量分开居住'] $_invitePassage>>
           <<run maplebirch.get("Finance").realEstate.endCohabitation($_inviteName, $_currentHome.id)>>
@@ -333,13 +350,14 @@
           and !maplebirch.get("Finance").realEstate.managementFor($_inviteProperty.id).rented
           and !maplebirch.get("Finance").realEstate.isFrozen($_inviteProperty.id)
           and $_currentHome?.id isnot $_inviteProperty.id>>
+          <<if !$_inLesson>><<deadwood-home-sharing $_inviteName $_inviteProperty.id $_invitePassage $_inviteReturn>><</if>>
           <<set $_occupants to maplebirch.get("Finance").realEstate.residentsAt($_inviteProperty.id).length>>
           <<if $_occupants gte $_inviteProperty.resident_capacity>>
             <<deadwood-reblooms-property-icon $_inviteProperty.id>><span class='red'><<= lanSwitch($_inviteProperty.name.EN, $_inviteProperty.name.CN)>> · <<lanSwitch 'No room for another resident' '住不下更多人'>></span><br>
           <<elseif !maplebirch.get("Finance").realEstate.canShareBed($_inviteProperty.id)>>
             <<deadwood-reblooms-property-icon $_inviteProperty.id>><span class='red'><<= lanSwitch($_inviteProperty.name.EN, $_inviteProperty.name.CN)>> · <<lanSwitch 'Needs a double bed' '需要双人床'>></span><br>
           <<else>>
-            <<if $_occupants gt 0 and maplebirch.get("Finance").realEstate.householdRefusal([...maplebirch.get("Finance").realEstate.residentsAt($_inviteProperty.id).map(profile => profile.id), $_inviteName])>>
+            <<if $_occupants gt 0 and maplebirch.get("Finance").realEstate.householdRefusal([...maplebirch.get("Finance").realEstate.residentsAt($_inviteProperty.id).map(profile => profile.id), $_inviteName], $_inviteProperty.id)>>
               <span class='red'><i><<language>>
                 <<option 'EN'>>
                   You cannot assume these two will agree to live together. They can stay in separate homes.
@@ -972,7 +990,9 @@
       <</lanLink>><br><br>
     <</capture>>
   <</for>>
-  <<if maplebirch.get("Finance").realEstate.residentsHome(_property.id).length is 2>>
+  <<set _home_pair to maplebirch.get('Finance').realEstate.residentsHome(_property.id).map(profile => profile.id).sort().join(':')>>
+  <<if maplebirch.get("Finance").realEstate.residentsHome(_property.id).length is 2
+    and (_home_pair isnot 'Kylar:Sydney' or !maplebirch.get('Finance').realEstate.householdRefusal(['Kylar', 'Sydney'], _property.id))>>
     <<socialiseicon>><<lanLink ['Invite both lovers to talk (0:20)', '请两位恋人一起聊聊 (0:20)'] 'Deadwood Reblooms Property Household'>><<pass 20>><</lanLink>><br><br>
   <</if>>
   <<deadwood-company-suite-home>>

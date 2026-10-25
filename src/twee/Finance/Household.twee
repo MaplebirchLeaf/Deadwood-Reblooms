@@ -1,6 +1,8 @@
 :: Deadwood Reblooms Property Household
 <<set _property to maplebirch.get("Finance").realEstate.current>>
-<<if !_property or maplebirch.get("Finance").realEstate.residentsHome(_property.id).length lt 2>>
+<<set _home_pair to _property ? maplebirch.get('Finance').realEstate.residentsHome(_property.id).map(profile => profile.id).sort().join(':') : ''>>
+<<if !_property or maplebirch.get("Finance").realEstate.residentsHome(_property.id).length lt 2
+  or (_home_pair is 'Kylar:Sydney' and maplebirch.get('Finance').realEstate.householdRefusal(['Kylar', 'Sydney'], _property.id))>>
   <<language>>
     <<option 'EN'>>
       The others have already gone to their rooms or left for the day. You leave the conversation for another time.
@@ -113,25 +115,18 @@
       <<case 'Kylar:Sydney'>>
         <<language>>
           <<option 'EN'>>
-            Sydney asks when Kylar plans to leave in the morning. Kylar does not answer, pulling the chair a little closer to yours.
+            <<if Time.days % 2 is 0>>
+              Sydney holds up a book with a scrap of paper between the pages. "See? A perfectly good place to draw." Kylar takes the paper, glances at you, then adds a few careful lines. Sydney leaves the pencil on the table.
+            <<else>>
+              Kylar has set out three cups, one close to yours. Sydney checks the clock. "I'll put the kettle on. Just keep mine away from the books." Kylar moves the third cup over without being asked twice.
+            <</if>>
           <<option 'CN'>>
-            悉尼问起凯拉尔明早的安排。凯拉尔没有回答，只把椅子往你这边拉近了些。
+            <<if Time.days % 2 is 0>>
+              悉尼举起一本书，书页间夹着一张散纸。“看，画在这里不就好了？”凯拉尔接过纸，瞥了你一眼，又认真添了几笔。悉尼把铅笔留在桌上。
+            <<else>>
+              凯拉尔摆好了三只杯子，其中一只挨着你的杯子。悉尼看了眼钟。“我去烧水。我的杯子可别放在书边上。”不用再提醒，凯拉尔便把第三只杯子挪开了。
+            <</if>>
         <</language>><br>
-        <<if C.npc.Kylar.rage gte 60>>
-          <span class='red'><<language>>
-            <<option 'EN'>>
-              "We weren't finished," Kylar says, gripping the back of your chair. Sydney pauses, then pushes your cup across the table to you.
-            <<option 'CN'>>
-              “我们还没说完。”凯拉尔攥住你的椅背。悉尼停下话，把你的杯子从桌子另一边推过来。
-          <</language>></span>
-        <<else>>
-          <<language>>
-            <<option 'EN'>>
-              "Later," Kylar mutters at last. Sydney nods and picks the pencil up again. Kylar watches you, waiting for you to sit.
-            <<option 'CN'>>
-              “晚一点。”凯拉尔终于小声答了一句。悉尼点点头，重新拿起铅笔。凯拉尔看着你，等你坐下。
-          <</language>>
-        <</if>>
       <<case 'Kylar:Whitney'>>
         <<language>>
           <<option 'EN'>>
@@ -146,7 +141,7 @@
             两人都不肯一起度过今晚。你指出各自的房间。惠特尼把脸转向走廊，没再答话。
         <</language>></span>
     <</switch>><br><br>
-    <<if _housemates.some(profile => profile.id === 'Kylar') and C.npc.Kylar.rage gte 60>>
+    <<if _pair isnot 'Kylar:Sydney' and _housemates.some(profile => profile.id === 'Kylar') and C.npc.Kylar.rage gte 60>>
       <span class='red'><<language>>
         <<option 'EN'>>
           Kylar keeps watching whenever you address the other resident, turning the key over and over in <<nnpc_his 'Kylar'>> hand.
@@ -170,7 +165,7 @@
       你问起今晚的安排。<span class='teal'><i>客房仍可以使用，没有谁必须陪你睡在主卧。</i></span>
   <</language>><br><br>
   <!-- 用 _housemates（已经出去的人不算在场），与上面 :3 和 :12 的口径一致。 -->
-  <<set _conflict to maplebirch.get("Finance").realEstate.householdRefusal(_housemates.map(profile => profile.id))>>
+  <<set _conflict to maplebirch.get("Finance").realEstate.householdRefusal(_housemates.map(profile => profile.id), _property.id)>>
   <<if _conflict>>
     <span class='red'><<language>>
       <<option 'EN'>>
@@ -211,7 +206,7 @@
         你指出客房的位置，请大家进门前先敲门。房门关着，就等里面的人回答。你没有替任何人承诺要和谁同床。
     <</language>><br><br>
     <<if maplebirch.get("Finance").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Kylar')>>
-      <<if C.npc.Kylar.rage gte 60>>
+      <<if _pair isnot 'Kylar:Sydney' and C.npc.Kylar.rage gte 60>>
         <span class='red'><<language>>
           <<option 'EN'>>
             "And if you shut the door on me?" Kylar asks. You repeat that knocking comes first. Kylar looks away, still gripping the key.

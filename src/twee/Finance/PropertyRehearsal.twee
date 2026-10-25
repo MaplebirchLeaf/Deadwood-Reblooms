@@ -1,0 +1,106 @@
+:: Deadwood Reblooms Property Rehearsal Widgets [widget]
+<!-- 原版演员分工与两小时排练收益，不推进或跳过学校专属剧情。 -->
+<<widget 'deadwood-home-rehearsal-menu'>>
+  <<set $_estate to maplebirch.get('Finance').realEstate>>
+  <<if !$_estate.life.ready('rehearse')>><<exit>><</if>>
+  <<set $_partner to $Finance.real_estate.room_companion, $_known to $_partner and $englishPlayRoles[$_partner + 'Known'] and ['Cass', 'Taylor', 'Sterling'].includes($englishPlayRoles[$_partner])>>
+  <<icon 'project-english.png'>><<lanLink ['Rehearse your role (2:00)', '排练你的角色 (2:00)'] 'Deadwood Reblooms Property Rehearsal'>>
+    <<deadwood-home-rehearse>>
+  <</lanLink>><<if $_known>><<gggenglish>><<ggreadiness>><<if $Finance.real_estate.life.days[$_partner + ':rehearse'] isnot Time.days>><<gglove $_partner>><</if>><<else>><<genglish>><<greadiness>><</if>><br>
+  <<deadwood-home-rehearsal-check>>
+  <<if _homeRehearsalBoth>>
+    <<icon 'project-english.png'>><<lanLink ['Rehearse with Kylar and Sydney (2:00)', '与凯拉尔、悉尼一起对戏 (2:00)'] 'Deadwood Reblooms Property Rehearsal'>>
+      <<deadwood-home-rehearse true>>
+    <</lanLink>><<gggenglish>><<gggreadiness>><br>
+  <</if>>
+<</widget>>
+
+<!-- 跨 widget 共用判定结果。参与者须在家，并留得出洗澡和出门前的整段时间。 -->
+<<widget 'deadwood-home-rehearsal-check'>><<silently>>
+  <<set $_estate to maplebirch.get('Finance').realEstate>>
+  <<set _homeRehearsalBoth to ['Kylar', 'Sydney'].includes($Finance.real_estate.room_companion)
+    and !$_estate.householdRefusal(['Kylar', 'Sydney'], $_estate.current?.id)
+    and ['Kylar', 'Sydney'].every(name => $_estate.household.home.some(profile => profile.id === name) && $_estate.life.free(name, 120))
+    and $englishPlayRoles?.KylarKnown and $englishPlayRoles?.SydneyKnown
+    and ['Cass', 'Taylor', 'Sterling'].includes($englishPlayRoles.Kylar)
+    and ['Cass', 'Taylor', 'Sterling'].includes($englishPlayRoles.Sydney)>>
+<</silently>><</widget>>
+
+<<widget 'deadwood-home-rehearse'>>
+  <<set $_estate to maplebirch.get('Finance').realEstate>>
+  <<if !$_estate.life.ready('rehearse')>><<exit>><</if>>
+  <<deadwood-home-rehearsal-check>>
+  <<if _args[0] and !_homeRehearsalBoth>><<exit>><</if>>
+  <<set $_role to $englishPlayRoles.Player>>
+  <<set $_names to _args[0] ? ['Kylar', 'Sydney'] : $Finance.real_estate.room_companion ? [$Finance.real_estate.room_companion] : []>>
+  <<set $_cast to $_names.map(name => ({name,
+    role: $englishPlayRoles[name + 'Known'] ? $englishPlayRoles[name] : '',
+    first: $Finance.real_estate.life.days[name + ':rehearse'] !== Time.days}))>>
+  <<if !$_estate.life.begin('rehearse', $_role)>><<exit>><</if>>
+  <<set $_scene to $_estate.life.scene, $_chair to $_estate.furniture($_estate.current.id, 'chair'), $_scene.cast to $_cast>>
+  <<pass 120>>
+  <<if $nextPassage or $nextPassageCheck or $combat or $eventforced or $statFreeze or $replayScene or $frozenValues
+    or $englishPlay isnot 'ongoing' or $englishPlayRoles?.Player isnot $_role
+    or !$_cast.every(actor => $_estate.household.home.some(profile => profile.id === actor.name))>>
+    <<set $Finance.real_estate.life.scene to null>><<exit>>
+  <</if>>
+  <<set $_actors to $_cast.filter(actor => ['Cass', 'Taylor', 'Sterling'].includes(actor.role))>>
+  <<englishskill `$_actors.length ? 18 : 6`>>
+  <<set $englishPlayReadiness to Math.clamp($englishPlayReadiness + ($_actors.length is 2 ? 15 : $_actors.length is 1 ? 10 : $_chair?.type.includes('comfy') ? 6 : 3), 0, 100)>>
+  <<if $_actors.length is 1 and $_actors[0].first>>
+    <<npcincr $_actors[0].name love 5>>
+    <<set $Finance.real_estate.life.days[$_actors[0].name + ':rehearse'] to Time.days>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Property Rehearsal
+<<set _estate to maplebirch.get('Finance').realEstate, _rehearsal to _estate.life.scene>>
+<<if _estate.current>><<run _estate.enter()>><<effects>><</if>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Continue', '继续'] 'Deadwood Reblooms Property Rehearsal'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if !_estate.current or _rehearsal?.action isnot 'rehearse' or _rehearsal.property_id isnot _estate.current.id>>
+  <<getouticon>><<lanLink ['Return to the sitting room', '返回起居室'] 'Deadwood Reblooms Property Home'>><</lanLink>><<exit>>
+<</if>>
+<<if $combat>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    You open your booklet at <<if _rehearsal.item is 'Cass'>>Cass's<<elseif _rehearsal.item is 'Taylor'>>Taylor's<<else>>Sterling's<</if>> first line. You read through the other characters' parts too, learning when to speak. On the second read, you try to keep your eyes off the page.
+  <<option 'CN'>>
+    你翻开剧本，找到<<if _rehearsal.item is 'Cass'>>卡斯<<elseif _rehearsal.item is 'Taylor'>>泰勒<<else>>斯特林<</if>>的第一句台词。你也顺着其他角色的台词往下读，记住该在什么时候接话。再来一遍时，你试着不低头看。
+<</language>><br><br>
+<<if _rehearsal.cast?.length is 2>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _rehearsal.item is 'Taylor'>>
+        Kylar crushes a corner of the booklet while you deliver Taylor's lines to Sydney. "I'm just reading my part, Kylar," Sydney says. Kylar looks back down at the page, then reads Sterling's reply.
+      <<elseif _rehearsal.item is 'Sterling'>>
+        Kylar hesitates over the exchange with Sydney. Sydney points to the next line, and they try it again. You wait until they reach the end before reading Sterling's reply.
+      <<else>>
+        Kylar delivers Taylor's lines to you without looking at the booklet. Sydney nods. "Just like that. Remember it on stage." Then <<nnpc_he 'Sydney'>> raises <<nnpc_his 'Sydney'>> voice for Sterling's interruption.
+      <</if>>
+    <<option 'CN'>>
+      <<if _rehearsal.item is 'Taylor'>>
+        你对着悉尼念泰勒的台词时，凯拉尔攥皱了剧本的一角。“我只是在念自己的台词，凯拉尔。”悉尼说。凯拉尔重新低下头看书，接上了斯特林的回应。
+      <<elseif _rehearsal.item is 'Sterling'>>
+        轮到与悉尼对戏时，凯拉尔迟疑了。悉尼指着下一句，两人又试了一遍。你等两人念完，才接上斯特林的回应。
+      <<else>>
+        凯拉尔看也没看剧本，便对你念出了泰勒的台词。悉尼点点头。“就这样。上台也记得。”随后，<<nnpc_he 'Sydney'>>抬高声音，用斯特林的台词打断你们。
+      <</if>>
+  <</language>><br><br>
+<<elseif _rehearsal.partner>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _rehearsal.partner is 'Kylar'>>Kylar looks up from the booklet whenever you speak. <<if _rehearsal.item is 'Taylor'>>When you reach Taylor's declaration of love, <<nnpc_he 'Kylar'>> frowns at the empty space where Cass would stand, then hastily finds <<nnpc_his 'Kylar'>> next line.<<else>>"That sounded good," <<nnpc_he 'Kylar'>> murmurs. "Could you do it again?"<</if>>
+      <<elseif _rehearsal.partner is 'Sydney'>>Sydney follows along. <<nnpc_He 'Sydney'>> gives a line far too much emphasis, then laughs at <<nnpc_himself 'Sydney'>>. "Sorry. Let me try again." You return to the beginning of the exchange.
+      <<else>><<print maplebirch.auto(_rehearsal.partner)>> holds the booklet open to prompt you. When you lose your place, a finger finds the next line, and you start again.<</if>>
+    <<option 'CN'>>
+      <<if _rehearsal.partner is 'Kylar'>>每当你开口，凯拉尔便从剧本后抬眼看你。<<if _rehearsal.item is 'Taylor'>>念到泰勒表白的那段时，<<nnpc_he 'Kylar'>>皱着眉，看向本该站着卡斯的空处，随后赶忙找到自己的下一句台词。<<else>>“刚才那句很好。”<<nnpc_he 'Kylar'>>小声说。“能再来一遍吗？”<</if>>
+      <<elseif _rehearsal.partner is 'Sydney'>>悉尼跟着你念台词。<<nnpc_He 'Sydney'>>把一句话说得过分夸张，自己先笑了。“抱歉，让我再试一次。”你们重新从这段的开头念起。
+      <<else>><<print maplebirch.auto(_rehearsal.partner)>>摊着剧本，替你提词。你忘记念到哪里时，一根手指便指出下一句，你又重新开始。<</if>>
+  <</language>><br><br>
+<</if>>
+<<if _rehearsal.cast?.some(actor => ['Cass', 'Taylor', 'Sterling'].includes(actor.role))>><<gggenglish>><<else>><<genglish>><</if>><<playReadiness>>
+<br><br><<getouticon>><<lanLink ['Put the booklet away', '收起剧本'] 'Deadwood Reblooms Property Desk'>>
+  <<run maplebirch.get('Finance').realEstate.setFloor(_rehearsal.floor)>>
+<</lanLink>>

@@ -4,7 +4,7 @@ import type RealEstate from './RealEstate';
 import type { StaffRole } from './PropertyStaff';
 import type { WineRecipe } from '../Orchard/Winery';
 
-type Activity = 'meal' | 'tea' | 'tidy' | 'music' | 'film' | 'wine';
+type Activity = 'meal' | 'tea' | 'tidy' | 'music' | 'film' | 'wine' | 'rehearse';
 
 export interface PropertyLifeState {
   days: Record<string, number>;
@@ -33,6 +33,8 @@ export interface PropertyLifeState {
     stage?: number;
     /** 第二层由玩家选的那条路：嘴或手。 */
     tone?: 'mouth' | 'hands';
+    /** 家中对戏的分工与当日陪伴收益，学校演员计数仍由原版维护。 */
+    cast?: { name: string; role: string; first: boolean }[];
   } | null;
   daily_day: number;
   daily: {
@@ -47,7 +49,7 @@ export interface PropertyLifeState {
 }
 
 const rooms = ['Home', 'Landing', 'Lounge', 'Kitchen', 'Reception Room', 'Wine Cellar', 'Screening Room'].map(room => `Deadwood Reblooms Property ${room}`);
-const minutes: Record<Activity, number> = { meal: 20, tea: 15, tidy: 20, music: 20, film: 45, wine: 20 };
+const minutes: Record<Activity, number> = { meal: 20, tea: 15, tidy: 20, music: 20, film: 45, wine: 20, rehearse: 120 };
 
 /** 保存居家活动与当天机会，原版食物、技能与时间由点击回调结算。 */
 export default class PropertyLife {
@@ -160,9 +162,21 @@ export default class PropertyLife {
     return true;
   }
 
-  private free(name: string, duration: number): boolean {
+  public free(name: string, duration: number): boolean {
+    const until = Time.date.timeStamp + duration * 60;
+    const outings = this.estate.outings;
+    const visit = outings.state.visits[name];
+    if (visit?.property === this.estate.current?.id && visit.at === 'deadwood_home' && visit.until > Time.date.timeStamp && visit.until <= until) return false;
+    const plan = outings.plan;
+    if (outings.live && plan?.name === name && plan.stage === 'booked' && (plan.at > Time.date.timeStamp ? plan.at : plan.at + 1800) <= until) return false;
     const end = name === 'Sydney' ? 6 : 7;
-    return Time.hour >= end || Time.hour * 60 + Time.minute + duration <= end * 60;
+    const now = Time.hour * 60 + Time.minute;
+    if (Time.hour < end && now + duration >= end * 60) return false;
+    const bath = this.estate.residentProfiles.find(profile => profile.id === name)?.bath;
+    if (!bath) return true;
+    let start = bath.hour * 60 + bath.minute;
+    if (start + bath.duration <= now) start += 1440;
+    return now + duration <= start || now >= start + bath.duration;
   }
 
   public get scene(): PropertyLifeState['scene'] {
@@ -170,12 +184,21 @@ export default class PropertyLife {
   }
 
   public ready(action: Activity): boolean {
-    if (!this.available || !rooms.includes(this.core.passage.title) || window.pcAreArmsBound('both')) return false;
+    if (!this.available || window.pcAreArmsBound('both')) return false;
+    if (action === 'rehearse' ? this.core.passage.title !== 'Deadwood Reblooms Property Desk' : !rooms.includes(this.core.passage.title)) return false;
     const property = this.estate.current!;
     const partner = V.Finance.real_estate.room_companion;
     if (partner && partner === this.bathing?.partner) return false;
     if (partner && !this.estate.residentsHome(property.id).some(resident => resident.id === partner)) return false;
     if (partner && !this.free(partner, minutes[action])) return false;
+    if (action === 'rehearse') {
+      return (
+        V.englishPlay === 'ongoing' &&
+        !V.englishPlayLate &&
+        ['Cass', 'Taylor', 'Sterling'].includes(V.englishPlayRoles?.Player) &&
+        !(V.englishPlayDays === 0 && Time.hour * 60 + Time.minute + minutes.rehearse >= 17 * 60)
+      );
+    }
     if (['meal', 'tea'].includes(action) && !partner) return false;
     if (action === 'film') return this.estate.facilities.some(room => room.id === 'cinema');
     if (action === 'wine') {
@@ -213,7 +236,8 @@ export default class PropertyLife {
     const partner = V.Finance.real_estate.room_companion;
     const key = `${partner ?? 'pc'}:${action}`;
     const first = this.state.days[key] !== Time.days;
-    this.state.days[key] = Time.days;
+    // 排练只有已知角色的双人分支增加好感，结算成功后再由原有日记录占用次数。
+    if (action !== 'rehearse') this.state.days[key] = Time.days;
     const supported = this.estate.staff.active(action === 'tidy' ? 'housekeeper' : 'cook') && ['meal', 'tea', 'tidy'].includes(action);
     this.state.scene = {
       property_id: property.id,
