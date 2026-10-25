@@ -232,7 +232,7 @@ export default function (maplebirch: typeof window.maplebirch): void {
       'Rent Robin Fight Finish': [
         {
           src: '<<set _robin to statusCheck("Robin")>>',
-          applyafter: "\n<<run maplebirch.get('Robin').rent.combatFinish()>>",
+          applyafter: '\n<<deadwood-robin-combat-finish>>',
           expected: 1
         }
       ]

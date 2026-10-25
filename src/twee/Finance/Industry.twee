@@ -87,7 +87,7 @@
           There is another slip beneath the telephone. The unpaid total has been circled twice. You fold it, but the numbers stay in your head.
         <<option 'CN'>>
           电话下面又压着一张账单，未付的总数被圈了两遍。你把纸折起来，数字仍在脑子里打转。
-      <</language>><br><br>
+      <</language>><<gstress>><br><br>
       <<if _factory_state.wage_arrears gte Math.max(1, _factory_state.workers) * _factory.terms.wage * 30>>
         <<trauma 2>>
         <<language>>
@@ -95,7 +95,7 @@
             A worker's voice carries through the thin wall. "Another month. I can't keep doing this." You sit down without taking your coat off.
           <<option 'CN'>>
             一名工人的声音穿过薄薄的墙壁。“又一个月。我不能一直这样。”你连外套都没脱，就坐了下来。
-        <</language>><br><br>
+        <</language>><<gtrauma>><br><br>
       <</if>>
     <</if>>
   <</if>>
@@ -163,13 +163,13 @@
 <<widget 'deadwood-industry-report'>>
   <<set _industryReportState to maplebirch.get('Finance').industry.state>>
   <<set _industryReports to (_industryReportState.reports ?? []).concat(_industryReportState.report ? [_industryReportState.report] : [])>>
-  <<set $_factory_readable to _factory.available and _factory.open>>
+  <<set $_factory_readable to _factory.available and _factory.open, $_report_stress to false, $_report_trauma to false>>
   <!-- 首次阅读的结算先完成，切换语言只重绘报告正文。 -->
   <<for $_factory_report range _industryReports>>
     <<if !$_factory_report.seen and $_factory_readable>>
       <<set $_factory_report.seen to true>>
-      <<if $_factory_report.event is 'default'>><<stress 12>><<trauma 4>>
-      <<elseif ['late', 'overdue'].includes($_factory_report.event)>><<stress 4>><</if>>
+      <<if $_factory_report.event is 'default'>><<stress 12>><<trauma 4>><<set $_report_stress to true, $_report_trauma to true>>
+      <<elseif ['late', 'overdue'].includes($_factory_report.event)>><<stress 4>><<set $_report_stress to true>><</if>>
     <</if>>
   <</for>>
   <<if $_factory_readable>><<set _industryReportState.reports to []>><</if>>
@@ -265,6 +265,7 @@
         <</if>><br>
       <</for>>
   <</language>>
+  <<if $_report_stress>><<gstress>><</if>><<if $_report_trauma>><<gtrauma>><</if>>
 <</widget>>
 
 <<widget 'deadwood-industry-status'>>
@@ -634,7 +635,7 @@
     <<print maplebirch.get('Finance').donations.customer(_factory_invoice.order.customer)>> · <<if _factory_invoice.order.total lt 0>><span class='red'><<lanSwitch 'Advance to return: ' '应退预付款：'>></span><<deadwood-reblooms-finance-money `-_factory_invoice.order.total` 'red'>><<else>><<deadwood-reblooms-finance-money _factory_invoice.order.total>><</if>> · <<deadwood-reblooms-finance-date _factory_invoice.pay_day>><br>
   <</for>>
   <<if _factory.open and _factory.ready and _factory_state.automatic and _factory_state.manager and !_factory_state.order and !_factory_state.laboratory.job and _factory_state.invoices.some(invoice => invoice.order.total > 0)>>
-    <br><<icon 'industry/management.png'>><<lanLink ['Tell the manager to wait for payment before taking more orders (0:05)', '让经理先等账款结清，别再接新单 (0:05)'] 'Deadwood Reblooms Factory Orders'>>
+    <br><<icon 'industry/management.png'>><<lanLink ['Pause automatic orders (0:05)', '暂停自动接单 (0:05)'] 'Deadwood Reblooms Factory Orders'>>
       <<if maplebirch.get('Finance').industry.configure(_factory_state.workers, _factory_state.rush, false, _factory_state.reserve, _factory_state.maximum_order)>><<pass 5>><</if>>
     <</lanLink>><br>
     <span class='blue'><<lanSwitch 'This pauses automatic ordinary orders until you enable them again in management. Wages and site bills continue.' '普通订单的自动安排会暂停，要到管理页重新开启。工资和厂房费用照付。'>></span><br>
@@ -827,8 +828,8 @@
   <</switch>>
   <<if !_factory_issue.seen>>
     <<set _factory_issue.seen to true>>
-    <<if _factory_issue.type is 'injury'>><<stress 10>><<trauma 8>>
-    <<elseif _factory_issue.type is 'machine' or _factory_issue.type is 'shipment'>><<stress 4>><</if>>
+    <<if _factory_issue.type is 'injury'>><<stress 10>><<trauma 8>><<gstress>><<gtrauma>>
+    <<elseif _factory_issue.type is 'machine' or _factory_issue.type is 'shipment'>><<stress 4>><<gstress>><</if>>
   <</if>>
   <<if _factory.available and ['machine', 'injury', 'shipment'].includes(_factory_issue.type)>>
     <<deadwood-reblooms-finance-money _factory_issue.cost>><br>
@@ -894,7 +895,7 @@
         <<option 'CN'>>
           “一开始，我是装箱的。”<<He 'Rowan'>>说。“后来教我的人走了，我就学着开压机。”<<He 'Rowan'>>望向院子。“上一个厂主，先不来厂里了，后来才不发工资。我早该看出不对。”过了一会儿，<<He 'Rowan'>>又说：“我留下，是因为其他人需要一个知道东西都在哪儿的人。”
       <</language>>
-  <</switch>><br><br>
+  <</switch>><<if !_factory.owned.some(factory => factory.wage_arrears gt 0)>><<glove 'Rowan'>><</if>><br><br>
   <<if $Finance.industry.talk is 'radio'>>
     <<lanSwitch 'Rowan rinses the cups and switches the radio off before locking up.' '罗文洗好杯子，关掉收音机，准备锁门。'>>
   <<else>>
@@ -937,7 +938,7 @@
           车上的人默不作声地把箱子抬走。其中一个把折好的纸条抵在你胸前。“下次照旧。”对方把约好的钱数在你桌上，记进工厂账里。车走后，你仍能听见抓挠声。
         <<case 'sell'>>买家收走钥匙。工资、厂房费用与解约费结清后，余款转入你的银行。未收货款也包含在转让里，之后不会再付给你。
       <</switch>>
-  <</language>><br><br>
+  <</language>><<if ['pay', 'refuse', 'haul', 'sell'].includes($Finance.industry.decision)>><<gstress>><</if>><<if $Finance.industry.decision is 'haul'>><<gtrauma>><</if>><br><br>
 <<elseif !$Finance.industry.result>>
   <<lanSwitch 'There is no new decision to review.' '暂无新的处理结果。'>><br>
 <<else>>

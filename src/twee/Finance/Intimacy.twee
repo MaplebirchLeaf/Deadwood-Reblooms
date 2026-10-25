@@ -131,6 +131,8 @@
       <<if $Finance.real_estate.pool_clothing is 'nude'>><<strip>><</if>>
     <<elseif _place is 'bath'>>
       <span class='lewd'><<lanSwitch 'You strip off and step in together.' '你把衣服脱在缸边，两个人一起沉进水里。'>></span><<strip>><br><br>
+    <<elseif _place is 'cinema'>>
+      <span class='lewd'><<lanSwitch 'In the dim shadows of the screening room, clothes are quickly shed onto the carpeted floor.' '在放映室昏暗的光影中，衣物很快被褪落在地毯上。'>></span><<strip>><br><br>
     <<elseif $exposed lt 2>>
       <span class='lewd'><<lanSwitch 'You slip out of your clothes.' '你脱下衣服。'>></span><<strip>><br><br>
     <</if>>
@@ -162,6 +164,8 @@
     <<elseif _place is 'bath'>>
       <<water>>
       <span class='lewd'><<lanSwitch 'The water comes up over your knees and you sit back against the slope of the tub. <<He>> follows you down, and there is barely room for the two of you to move at all.' '水面没到膝盖，你靠上浴缸的斜面坐下。<<He>>跟着你往下沉，两个人在里面几乎转不开身。'>></span>
+    <<elseif _place is 'cinema'>>
+      <span class='lewd'><<lanSwitch 'The faint glow from the blank screen washes over the plush seats. You pull your lover down onto the wide, padded sofa, the deep cushions sinking under your weight as hands eagerly seek warmth in the dark.' '荧幕暗淡的余光洒在宽大的软椅上。你将恋人拉倒在柔软的沙发深处，两人的重量让软垫深深下陷，双手在幽暗中摸索上彼此温暖的体温。'>></span>
     <<elseif $passagePrev is 'Deadwood Reblooms Property Night Wake'>>
       <<lanSwitch 'You turn toward your lover beneath the covers. Their body is already warm and bare against you, and it only takes one shift of a thigh for both of you to understand what this is going to be.' '你在被子下转过身，面向身边的恋人。对方的身体已经赤裸地贴着你，热得发烫，只消挪一下大腿，你们便都明白接下来会是什么。'>>
     <<else>>
@@ -290,20 +294,37 @@
     <br><br>
     <<if _place is 'pool'>><<lanSwitch 'Sydney keeps one hand on the rail and stays close until your breathing evens out.' '悉尼一只手扶着栏杆，一直贴着你，直到你的呼吸平复。'>>
     <<elseif _place is 'bath'>><<lanSwitch 'Sydney stays where <<he>> is until your breathing settles, letting the water run over the both of you.' '悉尼没有动，任水从你们两人身上漫过，直到你的呼吸平复。'>>
+    <<elseif _place is 'cinema'>><<lanSwitch 'Sydney stays curled against you on the deep cinema sofa, breathing softly against your shoulder as the screen fades to black.' '悉尼蜷在深陷的放映室沙发里依偎着你，屏幕彻底暗去，<<he>>枕着你的肩膀轻声喘息，迟迟没有松手。'>>
     <<else>><<lanSwitch 'Sydney stays beside you and pulls the blanket back over the bed.' '悉尼仍挨着你，把毯子重新拉好。'>><</if>>
   <<elseif $enemyarousal lt $enemyarousalmax and $enemyhealth gt 0>>
     <<if _partner.id is 'Sydney'>>
       <<run statusCheck('Sydney')>>
-      <<npcincr Sydney lust 5>><<npcincr Sydney purity 2>><<gglust>><<gspurity>><br>
+      <<if _sydneyStatus.includes('corrupt')>>
+        <<npcincr Sydney lust 5>><<ggslust>>
+        <<lanSwitch 'Sydney bites <<his>> lower lip with a frustrated breath, eyes lingering with unspent heat. "Stopping now? You certainly know how to test someone..."' '悉尼咬了咬下唇，有些不甘地吐出一口热气，眼角带着未消的燥意。“停下了？……你可真懂得怎么考验人……”'>>
+      <<else>>
+        <<npcincr Sydney lust 5>><<npcincr Sydney purity 2>><<ggslust>><<gspurity>>
+        <<lanSwitch 'Sydney pulls <<his>> garments close with trembling fingers, face burning crimson. <<He>> closes <<his>> eyes and quietly murmurs a prayer to steady <<his>> rapid breathing.' '悉尼指尖发颤地拉拢凌乱的衣物，整张脸烧得通红。<<He>>闭起双眼，低声默念祷文以平复急促的喘息。'>>
+      <</if>>
+    <<elseif _partner.id is 'Robin'>>
+      <<npcincr Robin lust 5>><<glust 'Robin'>>
+      <<lanSwitch 'Robin blushes furiously and clutches the fabric, breath catching in <<his>> throat. "Did... did I do something wrong?" <<he>> stammers softly.' '罗宾面颊通红，手指局促地抓紧身旁的布料，呼吸微乱。“我……是我哪里没做好吗？”<<he>>结结巴巴地小声问。'>>
+    <<elseif _partner.id is 'Whitney'>>
+      <<npcincr Whitney lust 5>><<npcincr Whitney dom 1>><<glust 'Whitney'>><<gdom 'Whitney'>>
+      <<lanSwitch 'Whitney clicks <<his>> tongue, eyes darkening with a rough grin. "Riling me up and then backing off? You like playing games, don\'t you?"' '惠特尼咂了咂舌，带着坏笑磨了磨牙，眼神微沉。“把老子的火撩起来就想撤？你挺会玩嘛。”'>>
+    <<elseif _partner.id is 'Kylar'>>
+      <<npcincr Kylar lust 5>><<glust 'Kylar'>>
+      <<lanSwitch 'Kylar shivers and grips your fingers tightly, eyes dilated. "Don\'t go... please stay close to me..." <<he>> whispers with a trembling voice.' '凯拉尔身体轻颤，紧紧抓着你的手指，双眼蒙着湿意。“别走……求你再多陪陪我……”<<he>>颤声低语。'>>
+    <<else>>
+      <<lanSwitch 'You stop and give your lover some room.' '你停下来，给恋人留出一些空间。'>>
     <</if>>
-    <<lanSwitch 'You stop and give your lover some room.' '你停下来，给恋人留出一些空间。'>>
   <<else>>
     <<if $enemyarousal gte $enemyarousalmax>>
       <<ejaculation>>
-      <<npcincr _partner.id lust -20>><<lllust>><br>
+      <<npcincr _partner.id lust -20>><<lllust _partner.id>><br>
     <</if>>
       <<if $enemyhealth lte 0 and $enemyarousal lt $enemyarousalmax>>
-        <<npcincr _partner.id love -1>><<llove>>
+        <<npcincr _partner.id love -1>><<llove _partner.id>>
         <<language>>
           <<option 'EN'>>
             <<= _partner.id>> <span class='red'>pulls away</span>, breath ragged and skin flushed from too much sensation. You give <<him>> room to recover before reaching for <<him>> again.
@@ -311,7 +332,7 @@
             <<= maplebirch.auto(_partner.id)>><span class='red'>躲开了</span>，呼吸乱得厉害，皮肤也被过量的快感烧得发红。你留出地方，让<<him>>缓一缓，才再次伸手。
         <</language>>
       <<else>>
-      <<npcincr _partner.id love 1>><<glove>>
+      <<npcincr _partner.id love 1>><<glove _partner.id>>
         <<language>>
           <<option 'EN'>>
             <<if _place is 'bath'>>
@@ -335,6 +356,17 @@
                   Kylar holds on to you at the shallow end, <<his>> fingers curled around yours. "<span class='teal'>You really meant it,</span>" <<he>> says, quieter now than the water.
                 <<case 'Sydney'>>
                   Sydney looks toward <<his>> clothes folded by the steps, then leaves them where they are. "<span class='green'>Morning can wait a little longer,</span>" <<he>> says, keeping you between <<him>> and the pool wall.
+              <</switch>>
+            <<elseif _place is 'cinema'>>
+              <<switch _partner.id>>
+                <<case 'Robin'>>
+                  Robin curls against you beneath the cinema blanket, holding your hand in the dark. "<span class='green'>I'm glad we're the only ones here,</span>" <<he>> whispers, resting <<his>> warm forehead against your shoulder.
+                <<case 'Whitney'>>
+                  Whitney lounges back into the padded seat, a heavy arm slung comfortably across your shoulders. "Told you this room was good for more than just movies," <<he>> smirks, breathing slow and warm.
+                <<case 'Kylar'>>
+                  Kylar clings close to you on the dark sofa, fingers interlaced with yours. "<span class='teal'>Stay here with me in the dark,</span>" <<he>> whispers against your ear.
+                <<case 'Sydney'>>
+                  Sydney rests against the padded seat with eyes half-closed, chest slowly settling. "<span class='green'>Don't turn the lights on yet,</span>" <<he>> murmurs softly. "<span class='green'>Just a little longer...</span>"
               <</switch>>
             <<else>>
               <<switch _partner.id>>
@@ -370,6 +402,17 @@
                   凯拉尔在浅水处抓着你，手指扣着你的手。“<span class='teal'>你是认真的。</span>”<<he>>说，比水声还轻。
                 <<case 'Sydney'>>
                   悉尼朝台阶旁叠好的衣服看了一眼，却没有去拿。“<span class='green'>早晨还可以再等一会儿。</span>”<<he>>说着，把你留在<<him>>和池壁之间。
+              <</switch>>
+            <<elseif _place is 'cinema'>>
+              <<switch _partner.id>>
+                <<case 'Robin'>>
+                  罗宾裹着放映室的毛毯紧挨着你，在昏暗中握紧你的手。“<span class='green'>还好这里只有我们两个……</span>”<<he>>轻声低语，把发烫的额头抵在你的肩上。
+                <<case 'Whitney'>>
+                  惠特尼大咧咧地靠在软椅里，手臂大度地搭在你肩头。“早说了这屋子除了看片子还有别的用处，”<<he>>得意地扯了扯嘴角，气息平稳温热。
+                <<case 'Kylar'>>
+                  凯拉尔在幽暗的沙发上依偎着你，手指与你十指交扣。“<span class='teal'>在黑暗里……一直陪着我……</span>”<<he>>贴在你耳边轻声低喃。
+                <<case 'Sydney'>>
+                  悉尼半闭着眼靠在软垫上，胸口起伏渐渐平复。“<span class='green'>先别开灯……</span>”<<he>>轻声说着，“<span class='green'>再多坐一会儿……</span>”
               <</switch>>
             <<else>>
               <<switch _partner.id>>

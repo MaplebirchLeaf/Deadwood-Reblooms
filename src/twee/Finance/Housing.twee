@@ -61,7 +61,7 @@
   <<set _inline_property to _inline_estate.current>>
   <<print lanSwitch(_inline_lounge.description.EN, _inline_lounge.description.CN)>><br><br>
   <<deadwood-home-company>>
-  <<icon _inline_lounge.icon>><<lanLink ['Sit down and rest (0:15)', '坐下休息 (0:15)'] 'Deadwood Reblooms Property Lounge Rest'>><<deadwood-home-activity 'lounge' 'rest'>><</lanLink>><<ltiredness>>
+  <<icon _inline_lounge.icon>><<lanLink ['Sit down and rest (0:15)', '坐下休息 (0:15)'] 'Deadwood Reblooms Property Lounge Rest'>><<deadwood-home-activity 'lounge' 'rest'>><</lanLink>><<deadwood-home-affection 'lounge'>><<ltiredness>>
   <<if _inline_estate.managementFor(_inline_property.id).rest_day isnot Time.days or (_inline_estate.staff.active('guard') and $per_npc[_inline_estate.staff.key('guard')] and $Finance.real_estate.life.days['guard:rest'] isnot Math.floor(Time.days))>><<lstress>><</if>><br><br>
   <<deadwood-home-life-menu 'lounge' true>>
 <</widget>>
@@ -69,11 +69,11 @@
 <<widget 'deadwood-home-study'>>
   <<set _study_facility to maplebirch.get('Finance').realEstate.facilities.find(facility => facility.id === 'study')>>
   <<if !_study_facility>><<exit>><</if>>
-  <<scienceicon>><<lanLink ['Study science (0:15)', '自习科学 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'science'>><</lanLink>><<gscience>><br>
-  <<mathicon>><<lanLink ['Study maths (0:15)', '自习数学 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'maths'>><</lanLink>><<gmaths>><br>
-  <<englishicon>><<lanLink ['Study English (0:15)', '自习语文 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'english'>><</lanLink>><<genglish>><br>
-  <<historyicon>><<lanLink ['Study history (0:15)', '自习历史 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'history'>><</lanLink>><<ghistory>><br>
-  <<icon _study_facility.icon>><<lanLink ['Read for pleasure (0:15)', '读书放松 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'read'>><</lanLink>><<lstress>><br>
+  <<scienceicon>><<lanLink ['Study science (0:15)', '自习科学 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'science'>><</lanLink>><<deadwood-home-affection 'study'>><<gscience>><br>
+  <<mathicon>><<lanLink ['Study maths (0:15)', '自习数学 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'maths'>><</lanLink>><<deadwood-home-affection 'study'>><<gmaths>><br>
+  <<englishicon>><<lanLink ['Study English (0:15)', '自习语文 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'english'>><</lanLink>><<deadwood-home-affection 'study'>><<genglish>><br>
+  <<historyicon>><<lanLink ['Study history (0:15)', '自习历史 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'history'>><</lanLink>><<deadwood-home-affection 'study'>><<ghistory>><br>
+  <<icon _study_facility.icon>><<lanLink ['Read for pleasure (0:15)', '读书放松 (0:15)'] 'Deadwood Reblooms Property Study Finish'>><<deadwood-home-activity 'study' 'read'>><</lanLink>><<deadwood-home-affection 'study'>><<lstress>><br>
 <</widget>>
 
 <<widget 'deadwood-home-study-gain'>>
@@ -82,6 +82,15 @@
   <<set $_study_desk to $_study_estate.furniture($_study_estate.current.id, 'desk')>>
   <<set _studyGain to ({chair: 0.25, stool: 0.5, woodenchair: 0.75, swivelchair: 1, shellchair: 1.25, armchair: 1.5, egg: 1.75})[$_study_chair?.id] ?? 0.25>>
   <<set _studyGain += ({deskGlass: 0.5, deskMidcentury: 1, deskAntique: 1.5})[$_study_desk?.id] ?? 0>>
+<</widget>>
+
+<!-- 共处好感沿用各设施的每日记录，仅预告尚未领取的增长。 -->
+<<widget 'deadwood-home-affection'>>
+  <<set $_estate to maplebirch.get('Finance').realEstate>>
+  <<set $_resident to $_estate.household.home.find(resident => resident.id === $Finance.real_estate.room_companion)>>
+  <<if $_estate.current and $_resident and $_estate.managementFor($_estate.current.id).affection_days[$_resident.id + ':' + _args[0]] isnot Time.days>>
+    <<glove $_resident.id>>
+  <</if>>
 <</widget>>
 
 <<widget 'deadwood-home-activity'>>
@@ -294,7 +303,7 @@
 <<run _estate.enter(_facility.id)>><<effects>>
 <<= lanSwitch(_facility.description.EN, _facility.description.CN)>><br><br>
 <<deadwood-home-company>>
-<<icon _facility.icon>><<lanLink ['Sit down and rest (0:15)', '坐下休息 (0:15)'] 'Deadwood Reblooms Property Lounge Rest'>><<deadwood-home-activity 'lounge' 'rest'>><</lanLink>><<ltiredness>>
+<<icon _facility.icon>><<lanLink ['Sit down and rest (0:15)', '坐下休息 (0:15)'] 'Deadwood Reblooms Property Lounge Rest'>><<deadwood-home-activity 'lounge' 'rest'>><</lanLink>><<deadwood-home-affection 'lounge'>><<ltiredness>>
 <<if _estate.managementFor(_property.id).rest_day isnot Time.days or (_estate.staff.active('guard') and $per_npc[_estate.staff.key('guard')] and $Finance.real_estate.life.days['guard:rest'] isnot Math.floor(Time.days))>><<lstress>><</if>><br>
 <<deadwood-home-life-menu 'lounge' true>>
 <<deadwood-banquet-link>>
@@ -367,10 +376,10 @@
   <div onchange="Dynamic.render('deadwood-home-pool-invitations')">
     <<deadwood-home-company _pool_household.home>>
   </div>
-  <<icon _facility.icon>><<lanLink ['Swim in your clothes (0:20)', '穿着衣服游泳 (0:20)'] 'Deadwood Reblooms Property Swim'>><<set $Finance.real_estate.pool_clothing to 'clothed'>><<deadwood-home-activity 'pool' 'swim'>><</lanLink>><<gswimming>><<gphysique>><<gtiredness>><<lstress>><br>
+  <<icon _facility.icon>><<lanLink ['Swim in your clothes (0:20)', '穿着衣服游泳 (0:20)'] 'Deadwood Reblooms Property Swim'>><<set $Finance.real_estate.pool_clothing to 'clothed'>><<deadwood-home-activity 'pool' 'swim'>><</lanLink>><<deadwood-home-affection 'pool'>><<gswimming>><<gphysique>><<gtiredness>><<lstress>><br>
   <<if setup.clothingLayer.all.every(slot => $worn[slot].cursed isnot 1)>>
     <<icon _facility.icon>><<lanLink ['Change into swimwear', '换上泳衣'] 'Deadwood Reblooms Property Pool Outfits'>><</lanLink>><br>
-    <<icon _facility.icon>><<lanLink ['Undress and swim (0:20)', '脱衣游泳 (0:20)'] 'Deadwood Reblooms Property Swim'>><<set $Finance.real_estate.pool_clothing to 'nude'>><<deadwood-home-activity 'pool' 'swim'>><</lanLink>><<gswimming>><<gphysique>><<gtiredness>><<lstress>><br>
+    <<icon _facility.icon>><<lanLink ['Undress and swim (0:20)', '脱衣游泳 (0:20)'] 'Deadwood Reblooms Property Swim'>><<set $Finance.real_estate.pool_clothing to 'nude'>><<deadwood-home-activity 'pool' 'swim'>><</lanLink>><<deadwood-home-affection 'pool'>><<gswimming>><<gphysique>><<gtiredness>><<lstress>><br>
   <</if>>
   <<deadwood-dynamicblock 'deadwood-home-pool-invitations'>>
     <!-- 泳池同时是亲密场合：同住的恋人可以只身赴约，愿意三人局的两人也可以一起下水。 -->
@@ -408,7 +417,7 @@
 <<if Object.keys(_swim_options).length>>
   <<set $wear_outfit to Object.values(_swim_options)[0]>>
   <label><<lanSwitch 'Swimwear: ' '泳衣：'>><<listbox '$wear_outfit' autoselect>><<optionsfrom _swim_options>><</listbox>></label><br><br>
-  <<icon _facility.icon>><<lanLink ['Put it on and swim (0:20)', '穿上并游泳 (0:20)'] 'Deadwood Reblooms Property Swim'>><<set $Finance.real_estate.pool_clothing to 'swimwear'>><<deadwood-home-activity 'pool' 'swim'>><</lanLink>><<gswimming>><<gphysique>><<gtiredness>><<lstress>><br>
+  <<icon _facility.icon>><<lanLink ['Put it on and swim (0:20)', '穿上并游泳 (0:20)'] 'Deadwood Reblooms Property Swim'>><<set $Finance.real_estate.pool_clothing to 'swimwear'>><<deadwood-home-activity 'pool' 'swim'>><</lanLink>><<deadwood-home-affection 'pool'>><<gswimming>><<gphysique>><<gtiredness>><<lstress>><br>
 <<else>>
   <span class='blue'><<lanSwitch 'There are no swimwear outfits in this wardrobe.' '这个衣柜里还没有泳装套装。'>></span><br>
 <</if>>

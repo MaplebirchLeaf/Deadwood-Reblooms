@@ -32,9 +32,9 @@
         <<if C.npc.Robin.trauma gte 20>>
           <span class='red'><<language>>
             <<option 'EN'>>
-              Robin asks to speak to you outside the room. You do not make Robin stay beside the person causing that fear.
+              Robin asks if you can speak alone later, already backing towards the doorway. You leave the chair nearest the door for <<nnpc_him 'Robin'>>.
             <<option 'CN'>>
-              罗宾小声问，能不能到外面单独和你说话。你没有要求罗宾继续坐在令自己害怕的人旁边。
+              罗宾小声问，待会儿能不能单独和你说话，脚步已经退向门口。你把离门最近的椅子让给了<<nnpc_him 'Robin'>>。
           <</language>></span>
         <<elseif C.npc.Robin.dom gte 80>>
           <<language>>
@@ -152,17 +152,17 @@
     <<if _housemates.some(profile => profile.id === 'Robin') and C.npc.Robin.trauma gte 20>>
       <<language>>
         <<option 'EN'>>
-          Robin sits nearest the door, holding the cup with both hands. You leave the way out clear and let Robin decide when to speak.
+          Robin sits nearest the door, holding the cup with both hands. Whenever footsteps pass outside, <<nnpc_he 'Robin'>> looks up from it.
         <<option 'CN'>>
-          罗宾坐在离门最近的地方，两手捧着杯子。你留着通向门口的空隙，等罗宾自己决定什么时候开口。
+          罗宾坐在离门最近的地方，两手捧着杯子。每当门外传来脚步声，<<nnpc_he 'Robin'>>便抬起头。
       <</language>><br><br>
     <</if>>
   <</if>>
   <<language>>
     <<option 'EN'>>
-      You ask how to arrange tonight. <span class='teal'><i>The guest room remains available, and no one has to share the main bed.</i></span>
+      You ask where everyone will sleep tonight. <span class='teal'><i>The guest room is ready too.</i></span>
     <<option 'CN'>>
-      你问起今晚的安排。<span class='teal'><i>客房仍可以使用，没有谁必须陪你睡在主卧。</i></span>
+      你问起今晚各自睡哪间房。<span class='teal'><i>客房也收拾好了。</i></span>
   <</language>><br><br>
   <!-- 用 _housemates（已经出去的人不算在场），与上面 :3 和 :12 的口径一致。 -->
   <<set _conflict to maplebirch.get("Finance").realEstate.householdRefusal(_housemates.map(profile => profile.id), _property.id)>>
@@ -184,9 +184,13 @@
     <<if maplebirch.get("Finance").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Robin')>>
       <<language>>
         <<option 'EN'>>
-          Robin offers to wash the cups. You remind Robin that everyone can take a turn.
+          <<if C.npc.Robin.trauma gte 20>>Robin asks you to write the time down again, then reads it under <<nnpc_his 'Robin'>> breath. <<nnpc_He 'Robin'>> leaves the paper where it can be seen from the doorway.
+          <<elseif C.npc.Robin.dom gte 60>>"I'll put the kettle on. You can wash up." Robin hands you the pencil before you can volunteer for both.
+          <<else>>Robin offers to wash the cups, then asks you to knock if <<nnpc_he 'Robin'>> sleeps through the alarm.<</if>>
         <<option 'CN'>>
-          罗宾主动说可以洗杯子。你提醒罗宾，大家都可以轮流做。
+          <<if C.npc.Robin.trauma gte 20>>罗宾请你再写一遍时间，低声念了念，把纸留在进门就能看见的地方。
+          <<elseif C.npc.Robin.dom gte 60>>“我来烧水，你洗杯子。”没等你把两样都揽下来，罗宾便把笔塞回你手里。
+          <<else>>罗宾主动说可以洗杯子，又请你在闹钟没能叫醒<<nnpc_him 'Robin'>>时敲敲门。<</if>>
       <</language>><br>
     <</if>>
     <<if maplebirch.get("Finance").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Whitney')>>
@@ -201,9 +205,9 @@
   <<socialiseicon>><<linkreplace `lanSwitch('Discuss privacy and the bedrooms', '说清房间与私人空间')`>>
     <<language>>
       <<option 'EN'>>
-        You point out the guest room and ask everyone to knock. A closed door means waiting for an answer. You make no promise about sharing a bed on someone else's behalf.
+        You point out the guest room and ask everyone to knock before coming in. You try the door to make sure it closes properly, then return to the table.
       <<option 'CN'>>
-        你指出客房的位置，请大家进门前先敲门。房门关着，就等里面的人回答。你没有替任何人承诺要和谁同床。
+        你指出客房的位置，请大家进门前先敲门。试过房门能否关好，你才回到桌旁。
     <</language>><br><br>
     <<if maplebirch.get("Finance").realEstate.residentsHome(_property.id).some(profile => profile.id === 'Kylar')>>
       <<if _pair isnot 'Kylar:Sydney' and C.npc.Kylar.rage gte 60>>
@@ -216,9 +220,9 @@
       <<else>>
         <<language>>
           <<option 'EN'>>
-            Kylar asks whether you will still make time alone together. You say that you can ask each other, without making it a rule for every night.
+            "But you'll still come and see me?" Kylar asks. You point out how close <<nnpc_his 'Kylar'>> room is. <<nnpc_He 'Kylar'>> looks from the door back to you.
           <<option 'CN'>>
-            凯拉尔问，你们还会不会单独相处。你说可以彼此询问，没有把每一晚都说成必须兑现的约定。
+            “可你还是会来找我吧？”凯拉尔问。你指了指<<nnpc_his 'Kylar'>>的房间，就在几步之外。<<nnpc_He 'Kylar'>>望向房门，又转回来看你。
         <</language>><br>
       <</if>>
     <</if>>
@@ -305,7 +309,9 @@
                   <<replace '#deadwood-household-close'>>
                     <<if maplebirch.get("Finance").realEstate.current?.id isnot _property.id
                       or maplebirch.get("Finance").realEstate.residentsHome(_property.id).map(profile => profile.id).sort().join(':') isnot _pair
-                      or C.npc.Robin.trauma gte 20>>
+                      or C.npc.Robin.trauma gte 20
+                      or !['Robin', 'Sydney'].every(name => maplebirch.get('Finance').realEstate.life.free(name, 20))
+                      or $nextPassage or $nextPassageCheck or $eventforced or $combat or $possessed or $replayScene or $statFreeze or $frozenValues>>
                       <<language>>
                         <<option 'EN'>>
                           The moment has passed. You let everyone decide what to do next.
@@ -355,19 +361,25 @@
                           灯光柔和下来，街道上的声音渐渐远了。接下来的片刻，留给你们三个人。
                       <</language>></i><br><br>
                       <<pass 20>>
-                      <<language>>
-                        <<option 'EN'>>
-                          Afterwards, Robin gathers the cups. Sydney folds the blanket, then pauses with it in both hands. "Next time, ask us again." You agree. Robin smiles at you before carrying the cups to the kitchen.
-                        <<option 'CN'>>
-                          过了一会儿，罗宾收起杯子。悉尼叠好毯子，捧在手里停了停。“下次，也先问问我们。”你答应了。罗宾朝你笑笑，把杯子拿去厨房。
-                      <</language>>
-                      <<for _name range ['Robin', 'Sydney']>>
-                        <<set _eveningKey to _property.id + ':' + _name>>
-                        <<if !$Finance.real_estate.daily_evening.includes(_eveningKey)>>
-                          <<run $Finance.real_estate.daily_evening.push(_eveningKey)>>
-                          <<stress -2>><<lstress>>
-                        <</if>>
-                      <</for>><br><br>
+                      <<if $nextPassage or $nextPassageCheck or $eventforced or $combat or $possessed or $replayScene or $statFreeze or $frozenValues
+                        or maplebirch.get('Finance').realEstate.current?.id isnot _property.id
+                        or maplebirch.get('Finance').realEstate.residentsHome(_property.id).map(profile => profile.id).sort().join(':') isnot _pair>>
+                        <<lanSwitch 'Your time together is interrupted.' '你们的相处被打断了。'>>
+                      <<else>>
+                        <<language>>
+                          <<option 'EN'>>
+                            Afterwards, Robin gathers the cups. Sydney folds the blanket, then pauses with it in both hands. "Next time, ask us again." You agree. Robin smiles at you before carrying the cups to the kitchen.
+                          <<option 'CN'>>
+                            过了一会儿，罗宾收起杯子。悉尼叠好毯子，捧在手里停了停。“下次，也先问问我们。”你答应了。罗宾朝你笑笑，把杯子拿去厨房。
+                        <</language>>
+                        <<for _name range ['Robin', 'Sydney']>>
+                          <<set _eveningKey to _property.id + ':' + _name>>
+                          <<if !$Finance.real_estate.daily_evening.includes(_eveningKey)>>
+                            <<run $Finance.real_estate.daily_evening.push(_eveningKey)>>
+                            <<stress -2>><<lstress>>
+                          <</if>>
+                        <</for>>
+                      <</if>><br><br>
                     <</if>>
                   <</replace>>
                 <</lanLink>>
@@ -444,9 +456,19 @@
     <</linkreplace>><br><br>
   <</capture>>
   <<for _resident range maplebirch.get("Finance").realEstate.residentsHome(_property.id)>>
-    <<capture _resident>>
+    <<capture _resident _property>>
       <<socialiseicon>><<lanLink ['Talk privately with ' + (maplebirch.services.translator.get(_resident.id)?.EN ?? _resident.id), '单独和' + (maplebirch.services.translator.get(_resident.id)?.CN ?? _resident.id) + '聊聊'] 'Deadwood Reblooms Property Evening Together'>>
-        <<run maplebirch.get("Finance").realEstate.meetResident(_resident.id, _property.id)>><<pass 20>>
+        <<if !$nextPassageCheck and !$eventforced and !$combat and !$possessed and !$replayScene and !$statFreeze and !$frozenValues
+          and maplebirch.get('Finance').realEstate.current?.id is _property.id
+          and maplebirch.get('Finance').realEstate.life.free(_resident.id, 20)
+          and maplebirch.get('Finance').realEstate.meetResident(_resident.id, _property.id)>>
+          <<pass 20>>
+          <<if $nextPassageCheck or $eventforced or $combat or $possessed or $replayScene or $statFreeze or $frozenValues>>
+            <<set $nextPassage to $nextPassage || $nextPassageCheck || 'Deadwood Reblooms Property Home'>>
+          <</if>>
+        <<else>>
+          <<set $nextPassage to $nextPassage || $nextPassageCheck || 'Deadwood Reblooms Property Home'>>
+        <</if>>
       <</lanLink>><br>
     <</capture>>
   <</for>>

@@ -28,7 +28,6 @@
       <<set $_heistState.entered to true>>
       <<set $_heistState.bankClosedUntil to Math.max($_heistState.bankClosedUntil, Math.floor(Time.days) + _heistWork.terms.bankClosureDays)>>
       <<crimeUp _heistWork.terms.crime.entry 'trespassing'>>
-      <<deadwood-street-heist-bank-incident>>
       <<if $_heistState.fight>>
         <<crimeUp _heistWork.terms.crime.violence 'assault'>><<goto 'Deadwood Street Fight'>>
       <<else>>
@@ -47,7 +46,6 @@
       <<if $_heistState.stage isnot 'challenge' or !$per_npc.deadwood_heist_guard>><<exit>><</if>>
       <<set $_heistState.approach to 'loud', $_heistState.raisedAlarm to true>>
       <<set $_heistState.fight to {key: 'deadwood_heist_guard', combatStarted: false, resume: 'vault'}>>
-      <<deadwood-street-heist-bank-incident>>
       <<crimeUp _heistWork.terms.crime.violence 'assault'>><<endevent>><<goto 'Deadwood Street Fight'>>
     <<case 'take-light' 'take-full'>>
       <<if $_heistState.stage isnot 'vault'>><<exit>><</if>>
@@ -466,7 +464,7 @@
       <<set _heistTransport to maplebirch.get('Transport'), _heistVehicle to _heistWork.vehicle>>
       <<set _heistModel to _heistTransport.catalog.models.find(item => item.id === _heistVehicle.model)>>
       <<if _heistVehicle.fuel gte _heistModel.fuel_use * (_heistWork.terms.escapeMinutes + _heistWork.terms.carefulMinutes)>>
-        <<icon `'transport/' + _heistWork.vehicle.model + '.png'`>><<lanLink ['Leave part behind and depart more carefully by car (0:30)', '留下部分钱，乘车谨慎撤离 (0:30)']>><<deadwood-street-heist-action 'drive-careful'>><</lanLink>> · <<lanSwitch 'Escape: ' '脱身成功率：'>><span class='teal'><<= Math.min(95, _heistWork.chances.escapeByCar + _heistWork.terms.carefulBonus)>>%</span><br>
+        <<icon `'transport/' + _heistWork.vehicle.model + '.png'`>><<lanLink ['Leave part behind and depart more carefully by car (0:30)', '留下部分钱后乘车谨慎撤离 (0:30)']>><<deadwood-street-heist-action 'drive-careful'>><</lanLink>> · <<lanSwitch 'Escape: ' '脱身成功率：'>><span class='teal'><<= Math.min(95, _heistWork.chances.escapeByCar + _heistWork.terms.carefulBonus)>>%</span><br>
       <<else>>
         <span class='grey'><<lanSwitch 'There is not enough fuel for the longer, careful departure.' '车辆的燃油不足以支持更久的谨慎撤离。'>></span><br>
       <</if>>
@@ -475,7 +473,7 @@
     <</if>>
     <<if !$worn.feet.type.includes('shackle')>>
       <<getouticon>><<lanLink ['Try to get away on foot (0:20)', '试着步行脱身 (0:20)']>><<deadwood-street-heist-action 'run'>><</lanLink>> · <<lanSwitch 'Escape: ' '脱身成功率：'>><span class='teal'><<= _heistWork.chances.escapeOnFoot>>%</span><br>
-      <<getouticon>><<lanLink ['Leave part behind and withdraw more carefully on foot (0:30)', '留下部分钱，步行谨慎撤离 (0:30)']>><<deadwood-street-heist-action 'run-careful'>><</lanLink>> · <<lanSwitch 'Escape: ' '脱身成功率：'>><span class='teal'><<= Math.min(95, _heistWork.chances.escapeOnFoot + _heistWork.terms.carefulBonus)>>%</span><br>
+      <<getouticon>><<lanLink ['Leave part behind and withdraw more carefully on foot (0:30)', '留下部分钱后步行谨慎撤离 (0:30)']>><<deadwood-street-heist-action 'run-careful'>><</lanLink>> · <<lanSwitch 'Escape: ' '脱身成功率：'>><span class='teal'><<= Math.min(95, _heistWork.chances.escapeOnFoot + _heistWork.terms.carefulBonus)>>%</span><br>
     <</if>>
     <span class='blue'><<lanSwitch 'A careful departure leaves a fifth of the money behind and takes ten minutes longer. Failure loses the whole haul and can leave the crew injured or the carrier in custody.' '谨慎撤离会留下五分之一的钱，并多花十分钟。脱身失败会丢掉全部赃款，同伙也可能受伤，搬运员甚至会被扣留。'>></span><br>
   <<case 'settlement' 'closed'>>
@@ -487,12 +485,12 @@
     <<exit>>
 <</switch>>
 <<if !_heistWork.state.entered>>
-  <<policeicon>><<lanLink ['Leave the plan and submit the information at the station (0:20)', '退出计划，去警局提交线索 (0:20)']>><<deadwood-street-heist-action 'contact'>><</lanLink>><br>
+  <<policeicon>><<lanLink ['Leave the plan and submit the information at the station (0:20)', '退出计划并去警局提交线索 (0:20)']>><<deadwood-street-heist-action 'contact'>><</lanLink>><br>
 <<elseif _heistWork.state.policePlan>>
   <<policeicon>><<lanLink ['Follow the handover agreed with Grant (0:10)', '执行与格兰特约定的交接 (0:10)']>><<deadwood-street-heist-action 'sting'>><</lanLink>><br>
   <span class='blue'><<lanSwitch 'This openly exposes the arrangement. The hired crew may be taken into custody, and the others will know your part in it.' '这会公开暴露安排。雇员可能被带走，其余人也会知道你参与了交接。'>></span><br>
 <<else>>
-  <<policeicon>><<lanLink ['Stop the job and ask the police to contact Grant (0:10)', '中止行动，请警方联系格兰特 (0:10)']>><<deadwood-street-heist-action 'contact'>><</lanLink>><br>
+  <<policeicon>><<lanLink ['Stop the job and ask the police to contact Grant (0:10)', '中止行动并请警方联系格兰特 (0:10)']>><<deadwood-street-heist-action 'contact'>><</lanLink>><br>
   <span class='red'><<lanSwitch 'There is no prior police arrangement. You will have to explain your own part, and may be detained along with the crew.' '你没有事先与警方约定，需要交代自己参与了什么，也可能与同伙一同被扣留。'>></span><br>
 <</if>>
 <<refuseicon>><<lanLink ['Leave the money and withdraw (0:20)', '放下钱并撤回 (0:20)']>><<deadwood-street-heist-action 'withdraw'>><</lanLink>><br>
@@ -520,7 +518,7 @@
       你按约定出面交接。警员把你与两名雇员分开，其中一人联系警局，请格兰特核对你的说法。
     <</if>><br><br>
     伦恩已经趁乱溜走。兰德里留在酒馆，但消息迟早会传到那里。警员的手停在你的胳膊旁。“去警局做笔录。也包括你自己做过的事。”
-<</language>><br><br>
+<</language>><<if _heistWork.state.betrayed>><<llove 'Landry'>><<llove 'Wren'>><</if>><br><br>
 <<if _heistWork.available>>
   <<policeicon>><<lanLink ['Accompany the officers (1:00)', '跟警员走 (1:00)']>>
     <<if _heistWork.available and _heistWork.state.stage is 'settlement' and _heistWork.state.outcome is 'sting'>>
@@ -631,7 +629,9 @@
   <<lanSwitch 'Police payment after those expenses, if you can collect: ' '能够领款时，警方报酬扣除上述支出后：'>><<printmoney `_heistWork.terms.reward - _heistWork.state.spent`>><br>
 <</if>><br>
 <<if _heistWork.state.settled>>
-  <span class='green'><<lanSwitch 'This operation has been settled.' '这次行动已经结清。'>></span><br><br>
+  <span class='green'><<lanSwitch 'This operation has been settled.' '这次行动已经结清。'>></span>
+  <<if _heistWork.state.outcome is 'success'>><<glove 'Landry'>><<glove 'Wren'>><<elseif _heistPolice>><<glove 'Grant'>><</if>>
+  <<if _heistWork.state.policePlan and _heistWork.state.entered and !_heistPolice>><<llove 'Grant'>><</if>><br><br>
 <<elseif _heistWork.available>>
   <<if _heistPolice>>
     <<if _heistWork.grantAvailable and maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>

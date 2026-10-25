@@ -419,10 +419,11 @@ class RealEstate {
     return pair.every(name => this.canIntimate(name, this.current?.id, place));
   }
 
-  /** 泳池与浴室能否作为本次亲密地点：泳池还要求已扩建且水可用，浴室按房产既有房间判断。 */
+  /** 泳池、浴室与放映室能否作为本次亲密地点：泳池还要求已扩建且水可用，浴室按房产既有房间判断，放映室要求已扩建。 */
   public placeOpen(place: IntimacyPlace): boolean {
     if (place === 'pool') return this.poolOpen;
     if (place === 'bath') return !!this.current && this.floorOf('bathroom') !== undefined;
+    if (place === 'cinema') return this.facilities.some(room => room.id === 'cinema');
     return true;
   }
 

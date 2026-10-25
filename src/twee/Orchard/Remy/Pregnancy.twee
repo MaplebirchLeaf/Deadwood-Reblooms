@@ -120,7 +120,7 @@
             <<deadwood-remy-pregnancy-action _remyAction>>
             <<replace '#deadwood-remy-pregnancy'>><<deadwood-remy-pregnancy-panel _remyAction>><</replace>>
           <</if>>
-        <</lanLink>><br>
+        <</lanLink>><<if _remyAction isnot 'sample' and !_remyPregnancy.captive and !_remyEntry.topics.some(topic => topic !== 'sample')>><<glove 'Remy'>><<lstress>><</if>><br>
       <</capture>>
     <</if>>
   <</for>>
@@ -477,7 +477,7 @@
   <<for _remyTest range $pregnancies.filter(record => ['pc', 'Remy'].includes(record.carrier) && record.deliveredDate === null && knowsPregnancy(record.pregnancyId, 'pc') && !knowsDonor(record.pregnancyId, 'pc') && $Orchard.remy.pregnancy.records[record.pregnancyId]?.sample && !$Orchard.remy.pregnancy.records[record.pregnancyId]?.tested)>>
     <<capture _remyTest>>
       <<if $money gte 500000>>
-        <<procedureicon 'paternity'>><<lanLink `_remyTest.carrier === 'pc' ? ['Test whether Remy is the other parent (£5,000, 1:00)', '鉴定雷米是否为另一位亲生父母 (£5,000, 1:00)'] : ['Test whether you are the other parent (£5,000, 1:00)', '鉴定你是否为另一位亲生父母 (£5,000, 1:00)']` 'Deadwood Remy Paternity Result'>>
+        <<procedureicon 'paternity'>><<lanLink `_remyTest.carrier === 'pc' ? ['Test whether Remy is the other parent (£5,000 1:00)', '鉴定雷米是否为另一位亲生父母 (£5,000 1:00)'] : ['Test whether you are the other parent (£5,000 1:00)', '鉴定你是否为另一位亲生父母 (£5,000 1:00)']` 'Deadwood Remy Paternity Result'>>
           <<set _remyActualTest to $pregnancies[_remyTest.pregnancyId]>>
           <<set _remyActualEntry to $Orchard?.remy?.pregnancy.records[_remyTest.pregnancyId]>>
           <<if maplebirch.get('Orchard') and !$statFreeze and !$replayScene and $money gte 500000 and _remyActualTest.deliveredDate is null and ['pc', 'Remy'].includes(_remyActualTest.carrier) and _remyActualEntry?.sample and !_remyActualEntry.tested and !knowsDonor(_remyTest.pregnancyId, 'pc')>>

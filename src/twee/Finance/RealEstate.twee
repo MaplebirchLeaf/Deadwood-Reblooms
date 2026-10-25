@@ -23,7 +23,7 @@
     <</language>><br>
     <<if $_management.management_report>>
       <<set $_report to $_management.management_report>>
-      <<lanSwitch 'Last statement: ' '上次物业管理账单：'>><<deadwood-reblooms-finance-date $_report.day>> · <<lanSwitch 'Fee / repairs / recovered rent: ' '服务费／维修／追回租金：'>><<printmoney $_report.fee>> / <<printmoney $_report.repairs>> / <<printmoney $_report.recovered>><br>
+      <<lanSwitch 'Last statement: ' '上次物业管理账单：'>><<deadwood-reblooms-finance-date $_report.day 'date'>> · <<lanSwitch 'Fee / repairs / recovered rent: ' '服务费／维修／追回租金：'>><<printmoney $_report.fee>> / <<printmoney $_report.repairs>> / <<printmoney $_report.recovered>><br>
       <<if $_report.blocked>><span class='red'><<lanSwitch 'Some work could not be completed. Check staffing, your debit card and bank balance.' '部分物业管理工作未能完成，请检查雇佣合同、借记卡与银行余额。'>></span><br><</if>>
     <</if>>
   <</if>>
@@ -895,6 +895,7 @@
   <<lanLink ['Speak to Bailey', '与贝利交涉'] 'Deadwood Reblooms Mortgage Bailey'>><</lanLink>><br>
 <<else>>
   <<run maplebirch.get("Finance").realEstate.setFloor(1)>><<run maplebirch.get("Finance").realEstate.enter()>><<home_effects>><<effects>>
+  <<run maplebirch.get("Finance").realEstate.life.arrive()>>
   <<= lanSwitch(_property.floors[0].description.EN, _property.floors[0].description.CN)>><br><br>
   <<if Weather.precipitation is 'rain'>>
     <<lanSwitch 'With the door shut behind you, the rain is a softer sound against the windows.' '关上身后的门，雨声隔在窗外，轻了许多。'>><br><br>
@@ -1418,13 +1419,37 @@
         <<if maplebirch.get("Finance").realEstate.residentsHome(_sleepProperty.id).some(resident => resident.id === _wakingCompanion.id)>>
           <<switch _wakingCompanion.id>>
             <<case 'Robin'>>
-              <<lanSwitch 'Robin is still beside you, one hand curled around yours.' '罗宾仍睡在你身边，一只手还握着你的手。'>>
+              <<language>>
+                <<option 'EN'>>
+                  <<if C.npc.Robin.trauma gte 20>>Robin stirs when you move. <<nnpc_He 'Robin'>> looks at the door, then finds your hand beneath the covers. "Are you getting up?"
+                  <<elseif C.npc.Robin.dom gte 60>>Robin catches your hand as you lift the covers. "Stay a little longer," <<nnpc_he 'Robin'>> mumbles, pulling it back beneath the blanket.
+                  <<else>>Robin is still beside you, one hand curled around yours. <<nnpc_He 'Robin'>> smiles without opening <<nnpc_his 'Robin'>> eyes when you squeeze it.<</if>>
+                <<option 'CN'>>
+                  <<if C.npc.Robin.trauma gte 20>>你一动，罗宾便醒了。<<nnpc_He 'Robin'>>先看向房门，又在被子里找到你的手。“你要起床了吗？”
+                  <<elseif C.npc.Robin.dom gte 60>>你刚掀开被子，罗宾便捉住你的手。“再躺一会儿。”<<nnpc_he 'Robin'>>含糊地说，又把它拉回被子里。
+                  <<else>>罗宾仍睡在你身边，一只手还握着你的手。你轻轻捏了捏，<<nnpc_he 'Robin'>>闭着眼笑了。<</if>>
+              <</language>>
             <<case 'Whitney'>>
               <<lanSwitch 'Whitney is still asleep, an arm draped over you.' '惠特尼还睡着，一只胳膊搭在你身上。'>>
             <<case 'Kylar'>>
-              <<lanSwitch 'Kylar shifts closer in their sleep when you stir.' '你一动，凯拉尔就在睡梦中往你身边靠了靠。'>>
+              <<language>>
+                <<option 'EN'>>
+                  <<if C.npc.Kylar.rage gte 60>>Kylar opens <<nnpc_his 'Kylar'>> eyes as soon as you move. "Where are you going?" <<nnpc_He 'Kylar'>> keeps hold of the edge of your pillow.
+                  <<else>>Kylar shifts closer when you stir. <<nnpc_He 'Kylar'>> murmurs your name, then settles with <<nnpc_his 'Kylar'>> cheek against your shoulder.<</if>>
+                <<option 'CN'>>
+                  <<if C.npc.Kylar.rage gte 60>>你才动了一下，凯拉尔便睁开眼。“你要去哪？”<<nnpc_He 'Kylar'>>的手还抓着你的枕头边。
+                  <<else>>你一动，凯拉尔便往你身边靠了靠。<<nnpc_He 'Kylar'>>含糊地叫了声你的名字，脸颊贴着你的肩膀，又安静下来。<</if>>
+              <</language>>
             <<case 'Sydney'>>
-              <<lanSwitch 'Sydney is still beside you. The temple pendant rests on the bedside table.' '悉尼仍在你身旁。神殿吊坠还放在床头。'>>
+              <<run statusCheck('Sydney')>>
+              <<language>>
+                <<option 'EN'>>
+                  <<if _sydneyStatus.includes('corrupt')>>Sydney has taken most of the blanket. <<nnpc_He 'Sydney'>> opens one eye when you tug it back, then lifts a corner for you with a grin.
+                  <<else>>Sydney is still beside you. <<nnpc_He 'Sydney'>> reaches for the temple pendant on the bedside table, notices you watching and smiles sleepily.<</if>>
+                <<option 'CN'>>
+                  <<if _sydneyStatus.includes('corrupt')>>被子大半裹在悉尼身上。你往回拉了拉，<<nnpc_he 'Sydney'>>睁开一只眼，笑着给你掀起一角。
+                  <<else>>悉尼仍在你身旁。<<nnpc_He 'Sydney'>>伸手去拿床头的神殿吊坠，发觉你在看，便带着睡意朝你笑了笑。<</if>>
+              <</language>>
           <</switch>>
         <<else>>
           <<switch _wakingCompanion.id>>
@@ -1433,9 +1458,9 @@
             <<case 'Whitney'>>
               <<lanSwitch 'Whitney has gone out. The second pillow is still pressed against yours.' '惠特尼出门了，第二只枕头还挨着你的枕头。'>>
             <<case 'Kylar'>>
-              <<lanSwitch 'Kylar has gone out. Their side of the bed is still warm.' '凯拉尔出门了，那侧被窝里还留着一点暖意。'>>
+              <<lanSwitch 'Kylar has gone out. The second pillow has been pulled close to yours.' '凯拉尔出门了，另一只枕头被拉到了你的枕头旁。'>>
             <<case 'Sydney'>>
-              <<lanSwitch 'Sydney has left for the temple. The pendant is gone from the bedside table.' '悉尼去神殿了，床头的吊坠也不见了。'>>
+              <<lanSwitch 'Sydney has gone out. The pendant is gone from the bedside table.' '悉尼已经出门了，床头的吊坠也不见了。'>>
           <</switch>>
         <</if>>
       <</if>>

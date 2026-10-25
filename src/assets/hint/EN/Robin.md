@@ -69,7 +69,7 @@ If Bailey leaves the orphanage, obtain the school form's guardian signature at t
 
 Severe trauma lasting several days brings a warning before possible admission. Care and relief can interrupt deterioration. The related businesses pause during confinement.
 
-- **Inside plan**: the PC must also be admitted and free during the day. Find Robin between 07:00 and before 21:00, plan on two separate dates, obtain Harper's keycard and attempt escape during a suitable sleep phase. Failure loses the card and returns the plan to preparation.
+- **Inside plan**: the PC must also be admitted. Find Robin during the original free periods. Quiet company and exercising together share one daily visit; exercise gives actual Athletics practice. Plan on two separate dates, obtain Harper's keycard and attempt escape during a sleep phase other than 22:00. Failure loses the card and returns the plan to preparation.
 - **Tentacle plains**: obtain Vanilla Enhancement's highest deviancy trait and search for Robin in the tentacle plains once daily. PC admission is unnecessary. Escort Robin across the plains to the forest exit; returning to the asylum door may lead to capture. Encounters remain dangerous, and maximum stress causes failure.
 
 A successful rescue starts recovery. Robin needs trauma to fall below the severe range before ordinary life resumes; rescue does not immediately erase it.

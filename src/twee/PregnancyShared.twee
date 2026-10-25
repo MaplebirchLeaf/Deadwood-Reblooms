@@ -107,6 +107,7 @@
 <</widget>>
 
 <<widget 'deadwood-pregnancy-answer-links'>>
+  <<set $_pregnancyCareGain to ($DeadwoodReblooms.daily.pregnancy[_pregnancy_record.pregnancyId] ?? []).length is 0>>
   <<capture _pregnancy_name>>
     <<loveicon 'hug'>><<lanLink ['Tell them you are here to listen (0:05)', '告诉对方，你会认真听 (0:05)'] _args[0]>>
       <<deadwood-pregnancy-context _pregnancy_name>>
@@ -115,7 +116,7 @@
         <<setTalkedAboutPregnancy _pregnancy_name 'pc' _pregnancy_record.pregnancyId>>
         <<deadwood-pregnancy-care-action _pregnancy_name 'comfort' 5>>
       <</if>>
-    <</lanLink>><br>
+    <</lanLink>><<if $_pregnancyCareGain>><<glove _pregnancy_name>><<lstress>><</if>><br>
     <<socialiseicon 'ask'>><<lanLink ['Ask what needs doing first (0:05)', '询问眼前需要帮什么 (0:05)'] _args[0]>>
       <<deadwood-pregnancy-context _pregnancy_name>>
       <<if _pregnancy_context and _pregnancy_reveal and !_pregnancy_birth>>
@@ -123,7 +124,7 @@
         <<setTalkedAboutPregnancy _pregnancy_name 'pc' _pregnancy_record.pregnancyId>>
         <<deadwood-pregnancy-care-action _pregnancy_name 'practical' 5>>
       <</if>>
-    <</lanLink>><br>
+    <</lanLink>><<if $_pregnancyCareGain>><<glove _pregnancy_name>><<lstress>><</if>><br>
   <</capture>>
   <<deadwood-pregnancy-return _pregnancy_name>>
 <</widget>>
@@ -164,7 +165,7 @@
           <<default>><<socialiseicon>>
         <</switch>><<lanLink _pregnancy_action.label _pregnancy_care_passage>>
           <<deadwood-pregnancy-care-action _pregnancy_name _pregnancy_action.choice _pregnancy_action.minutes>>
-        <</lanLink>><<if _pregnancy_done.length is 0>><<glove>><<lstress>><</if>><br>
+        <</lanLink>><<if _pregnancy_done.length is 0>><<glove _pregnancy_name>><<lstress>><</if>><br>
       <</capture>>
     <</if>>
   <</for>>

@@ -84,6 +84,9 @@
         <<stress -2>>
       <<case 'film'>>
         <<stress -4>><<set $_life_duration to 45>>
+        <<if _life_scene.item is 'erotic'>>
+          <<arousal 1000>>
+        <</if>>
       <<case 'wine'>>
         <<if ['red_wine', 'white_wine', 'ghostbrew'].includes(_life_scene.item)>><<tending_give _life_scene.item -1>><</if>>
         <<drunk 60>><<stress -3>>
@@ -91,6 +94,12 @@
     <</switch>>
     <<if _life_scene.partner and _life_scene.first>>
       <<npcincr _life_scene.partner love 1>>
+    <</if>>
+    <<if _life_scene.action is 'film' and _life_scene.item is 'erotic' and _life_scene.partner>>
+      <<npcincr _life_scene.partner lust 5>>
+      <<if _life_scene.partner is 'Sydney' and C.npc.Sydney.purity gte 900>>
+        <<npcincr Sydney purity -1>>
+      <</if>>
     <</if>>
     <<if _life_scene.first and ['meal', 'tea', 'music', 'film'].includes(_life_scene.action)>>
       <<run maplebirch.get('Psyche')?.rest(2, _life_scene.action is 'film' ? -60 : -40)>>
@@ -141,13 +150,13 @@
         <<language>>
           <<option 'EN'>>
             <<if _life_scene.action is 'meal' or _life_scene.action is 'tea'>>Robin cups <<his>> hands around the dish, taking small tastes while you talk. <<He>> glances towards the hallway when the house creaks, then listens to you again. "Can we take our time?" You leave your seat where it is.
-            <<elseif _life_scene.action is 'film'>>Robin asks you to turn the sound down. You leave a small light on beside the seats. <<He>> follows the story in silence, gradually letting go of the cushion.
+            <<elseif _life_scene.action is 'film'>><<if _life_scene.item is 'erotic'>>Robin gasps softly as the tape begins, pulling a cushion up to hide <<his>> face. <<He>> peeks out between parted fingers with burning red cheeks, staying tucked close against your side.<<else>>Robin asks you to turn the sound down. You leave a small light on beside the seats. <<He>> follows the story in silence, gradually letting go of the cushion.<</if>>
             <<elseif _life_scene.action is 'tidy'>>Robin folds the same blanket twice. You take the next one, leaving <<him>> to finish at <<his>> own pace. "This is all right, isn't it?" <<He>> asks, showing you the folds.
             <<elseif _life_scene.action is 'wine'>>Robin leaves most of <<his>> drink in the glass. <<if _life_wine_recipe>>"You made this?" <<He>> takes a small taste when you explain which fruit you used.<</if>> You talk for a while, and <<he>> draws <<his>> chair closer when you ask whether <<he>> would like to stay.
             <<else>>Robin asks for something quiet. You lower the volume, and <<he>> settles back beside you. Neither of you has to fill the silence.<</if>>
           <<option 'CN'>>
             <<if _life_scene.action is 'meal' or _life_scene.action is 'tea'>>罗宾用双手拢着餐具，一边听你说话，一边小口品尝。房子发出轻响时，<<he>>望向走廊，随后又转回来。“我们可以慢慢来吗？”你没有离开座位。
-            <<elseif _life_scene.action is 'film'>>罗宾请你把声音调低。你留着座椅旁的一盏小灯。<<He>>静静看着故事，抓着靠垫的手渐渐松了些。
+            <<elseif _life_scene.action is 'film'>><<if _life_scene.item is 'erotic'>>录像一开始，罗宾便轻吸了一口气，抱起靠垫挡在脸前。<<He>>从指缝间偷偷望向屏幕，脸颊红得发烫，整个人缩在你的身旁。<<else>>罗宾请你把声音调低。你留着座椅旁的一盏小灯。<<He>>静静看着故事，抓着靠垫的手渐渐松了些。<</if>>
             <<elseif _life_scene.action is 'tidy'>>罗宾把同一条毯子叠了两遍。你拿起下一条，让<<he>>慢慢整理。“这样可以吧？”<<He>>展开叠好的边角给你看。
             <<elseif _life_scene.action is 'wine'>>罗宾的酒几乎没动。<<if _life_wine_recipe>>“这是你酿的？”听你说起用了什么水果，<<he>>才又尝了一小口。<</if>>你们聊了一会儿，你问<<he>>要不要再坐坐，<<he>>便把椅子往近处挪了些。
             <<else>>罗宾想听些轻柔的音乐。你调低音量，<<he>>在你身旁坐稳。谁也不用急着找话说。<</if>>
@@ -162,9 +171,9 @@
       <<elseif _life_scene.action is 'film'>>
         <<language>>
           <<option 'EN'>>
-            <<if _life_scene.item is 'comedy'>>Robin laughs at a joke just after you do, then explains the part that made <<him>> laugh.<<else>>Robin shifts forward whenever the hero gets into trouble. "That was obviously a trap," <<he>> whispers, then laughs when you remind <<him>> to keep watching.<</if>> When the credits start, <<he>> asks which one you would like to watch next time.
+            <<if _life_scene.item is 'comedy'>>Robin laughs at a joke just after you do, then explains the part that made <<him>> laugh.<<elseif _life_scene.item is 'erotic'>>Robin's eyes widen as <<he>> realizes what is playing. <<His>> face turns bright pink and <<he>> nervously clutches your sleeve, resting <<his>> warm forehead against your shoulder. "I didn't know you had a tape like this..." <<he>> stammers, unable to look away from the screen for long.<<else>>Robin shifts forward whenever the hero gets into trouble. "That was obviously a trap," <<he>> whispers, then laughs when you remind <<him>> to keep watching.<</if>> When the credits start, <<he>> asks which one you would like to watch next time.
           <<option 'CN'>>
-            <<if _life_scene.item is 'comedy'>>你刚笑出声，罗宾便也跟着笑了起来，又和你说起是哪一段让<<he>>觉得好笑。<<else>>主角遇到麻烦时，罗宾便往前凑。“明显是陷阱嘛。”<<He>>小声说。你叫<<he>>接着看，<<he>>便笑了。<</if>>字幕滚动时，<<he>>问你下次想看什么。
+            <<if _life_scene.item is 'comedy'>>你刚笑出声，罗宾便也跟着笑了起来，又和你说起是哪一段让<<he>>觉得好笑。<<elseif _life_scene.item is 'erotic'>>罗宾看清屏幕上的画面，眼睛微微睁大，脸蛋一下子通红。<<He>>局促地抓紧你的衣袖，把发烫的额头抵在你的肩上。“我不知道……你还有这种录像……”<<He>>结结巴巴地说着，目光却忍不住又悄悄瞟向屏幕。<<else>>主角遇到麻烦时，罗宾便往前凑。“明显是陷阱嘛。”<<He>>小声说。你叫<<he>>接着看，<<he>>便笑了。<</if>>字幕滚动时，<<he>>问你下次想看什么。
         <</language>>
       <<elseif _life_scene.action is 'tidy'>>
         <<language>>
@@ -188,13 +197,13 @@
         <<option 'EN'>>
           <<if _life_scene.action is 'meal'>>Whitney takes a taste before you finish setting the table. <<if _life_scene.item is 'pizza'>>"Now that's what I'm talking about." <<He>> puts a slice on your plate, then takes a larger one for <<himself>>.<<elseif setup.foodstuff[_life_scene.item].food?.tags?.includes('spicy')>>"Smells like you know what you're doing, slut." <<He>> reaches for the sauce, eyeing your portion with a grin.<<else>>"You made all this?" <<He>> takes another bite. "It's good. Don't let it go to your head."<</if>>
           <<elseif _life_scene.action is 'tea' or _life_scene.action is 'wine'>>Whitney raises <<if _life_scene.action is 'wine'>>the glass<<else>>the cup<</if>> in a mocking toast. "To my talented slut." <<He>> takes a drink, then notices you looking. "What? I'm being nice." <<if _life_scene.action is 'wine'>><<if _life_wine_recipe>>"Your own stuff, huh? Not bad." <<He>> examines the bottle before putting it between you.<<else>><<He>> leaves the bottle between you.<</if>><<else>><<He>> sets the cup down and leans back in the chair.<</if>>
-          <<elseif _life_scene.action is 'film'>>Whitney sprawls in the next seat. <<if _life_scene.item is 'comedy'>>"Fucking idiot." <<He>> points at the screen, laughing loudly.<<else>>"That idiot's going to get killed," <<he>> says, pointing at the screen.<</if>> <<if C.npc.Whitney.dom gte 10>><<He>> claims the armrest, then makes space when you ask.<<else>><<He>> shifts <<his>> elbow aside before yours touches it.<</if>> <<He>> stops talking long enough to see whether <<he>> was right.
+          <<elseif _life_scene.action is 'film'>>Whitney sprawls in the next seat. <<if _life_scene.item is 'comedy'>>"Fucking idiot." <<He>> points at the screen, laughing loudly.<<elseif _life_scene.item is 'erotic'>>Whitney gives a low whistle as the lovers embrace on screen. A smirk spreads across <<his>> face as <<he>> leans across the armrest, resting a warm hand firmly on your thigh. "Didn't know you were in this kind of mood, <<bitch>>... Getting turned on just watching, huh?"<<else>>"That idiot's going to get killed," <<he>> says, pointing at the screen.<</if>> <<if _life_scene.item isnot 'erotic'>><<if C.npc.Whitney.dom gte 10>><<He>> claims the armrest, then makes space when you ask.<<else>><<He>> shifts <<his>> elbow aside before yours touches it.<</if>> <<He>> stops talking long enough to see whether <<he>> was right.<</if>>
           <<elseif _life_scene.action is 'tidy'>>"I've seen worse," Whitney says, looking at the room. You hand <<him>> the pile <<he>> left beside the chair. <<He>> complains, but puts it away while you finish the table.
           <<else>>Whitney turns the volume up, then watches your hand reach for the control. "Fine. Don't want to wake the whole fucking street." <<He>> leaves it lower, tapping <<his>> heel against the chair.<</if>>
         <<option 'CN'>>
           <<if _life_scene.action is 'meal'>>你还没摆好桌子，惠特尼已经尝了一口。<<if _life_scene.item is 'pizza'>>“这才像样。”<<He>>在你的盘子里放了一片，又给自己拿了块更大的。<<elseif setup.foodstuff[_life_scene.item].food?.tags?.includes('spicy')>>“闻着不错，你挺会嘛，骚货。”<<He>>伸手去拿酱汁，笑着瞟了一眼你那份。<<else>>“都是你做的？”<<He>>又咬了一口。“不错。别得意。”<</if>>
           <<elseif _life_scene.action is 'tea' or _life_scene.action is 'wine'>>惠特尼举杯，装模作样地敬了敬你。“敬我能干的小骚货。”<<He>>喝了一口，发现你在看<<him>>。“干什么？我在夸你。”<<if _life_scene.action is 'wine'>><<if _life_wine_recipe>>“自己酿的？还不错。”<<He>>看了看酒瓶，才把它放在你们之间。<<else>><<He>>把酒瓶留在你们之间。<</if>><<else>><<He>>放下杯子，往椅背上一靠。<</if>>
-          <<elseif _life_scene.action is 'film'>>惠特尼摊在旁边的座位里。<<if _life_scene.item is 'comedy'>>“真他妈蠢。”<<He>>指着屏幕，大声笑了起来。<<else>>“那傻子肯定要死。”<<He>>指着屏幕说。<</if>><<if C.npc.Whitney.dom gte 10>><<He>>占了扶手，听见你叫<<he>>让一点，才腾出地方。<<else>>你的手肘还没碰过来，<<he>>便挪开了胳膊。<</if>><<He>>总算安静了会儿，要看看自己说得对不对。
+          <<elseif _life_scene.action is 'film'>>惠特尼摊在旁边的座位里。<<if _life_scene.item is 'comedy'>>“真他妈蠢。”<<He>>指着屏幕，大声笑了起来。<<elseif _life_scene.item is 'erotic'>>屏幕中两人相拥时，惠特尼吹了声口哨，嘴角勾起坏笑。<<He>>越过座椅扶手倾身靠近，温热的手掌按在你的大腿上。“没想到你还有这兴致，骚货……光是看着就受不了了？”<<else>>“那傻子肯定要死。”<<He>>指着屏幕说。<</if>><<if _life_scene.item isnot 'erotic'>><<if C.npc.Whitney.dom gte 10>><<He>>占了扶手，听见你叫<<he>>让一点，才腾出地方。<<else>>你的手肘还没碰过来，<<he>>便挪开了胳膊。<</if>><<He>>总算安静了会儿，要看看自己说得对不对。<</if>>
           <<elseif _life_scene.action is 'tidy'>>“我见过更乱的。”惠特尼看着房间说。你把<<he>>丢在椅子旁的一叠东西递过去。<<He>>嘴上抱怨，还是在你擦完桌子时收好了东西。
           <<else>>惠特尼调高音量，随后看着你的手伸向开关。“行吧。省得把整条街都他妈吵醒。”<<He>>没有再调回去，脚跟轻轻敲着椅子。<</if>>
       <</language>>
@@ -203,14 +212,14 @@
         <<option 'EN'>>
           <<if _life_scene.action is 'meal'>>Kylar waits for you to sit before touching <<his>> portion. <<if _life_scene.item is 'chilli_con_carne'>>"You remembered." <<He>> takes the first spoonful too quickly, then slows down to keep pace with you.<<else>>"You kept some for me?" <<He>> looks from the plate to you, then takes a bite. "Thank you."<</if>>
           <<elseif _life_scene.action is 'tea'>>Kylar holds the cup in both hands. <<He>> watches you over the rim. "We could do this again," <<he>> says quietly, waiting to see whether you agree.
-          <<elseif _life_scene.action is 'film'>>Kylar chooses the seat nearest you, though the rest of the room is empty. <<if C.npc.Kylar.rage gte 60>>Whenever the lead kisses someone on screen, <<he>> looks at you. "You aren't thinking about anyone else, are you?"<<else>>"You can choose next time too." <<He>> smiles, looking at you when the screen lights up.<</if>>
+          <<elseif _life_scene.action is 'film'>>Kylar chooses the seat nearest you, though the rest of the room is empty. <<if _life_scene.item is 'erotic'>><<if C.npc.Kylar.rage gte 60>>Kylar's breath hitches. <<He>> shivers, pressing tight against your side, fingers trembling against your palm. "Are you watching them, or thinking of me? Only look at me, <<kylar_pet_name>>..."<<else>>Kylar's breath catches in <<his>> throat as the scene unfolds. Blushing crimson, <<he>> leans against you, whispering into your ear, "Is this... what you like? We can... do whatever you want..."<</if>><<elseif C.npc.Kylar.rage gte 60>>Whenever the lead kisses someone on screen, <<he>> looks at you. "You aren't thinking about anyone else, are you?"<<else>>"You can choose next time too." <<He>> smiles, looking at you when the screen lights up.<</if>>
           <<elseif _life_scene.action is 'wine'>>Kylar turns the label towards the light, checking it before tasting. <<if _life_wine_recipe>>"You made it yourself?" <<He>> asks how long you had to wait.<<else>>"This one's from a shop?"<</if>> <<He>> sets the bottle back carefully. <<if C.npc.Kylar.rage gte 60>><<if _life_scene.origin is 'Deadwood Reblooms Property Wine Cellar'>>"Who else have you brought down here?"<<else>>"Who else have you brought here?"<</if>> <<He>> studies your face while you answer.<<else>><<if _life_scene.origin is 'Deadwood Reblooms Property Wine Cellar'>>"It's nice down here."<<else>>"It's nice here."<</if>> <<He>> leaves <<his>> chair close to yours.<</if>>
           <<elseif _life_scene.action is 'tidy'>>Kylar puts your things aside carefully, lining up the edges. <<He>> pauses over a scrap of paper. "Do you still want this?" <<He>> waits for your answer before putting it in the bin.
           <<else>>Kylar recognises the melody halfway through. <<if C.npc.Kylar.rage gte 60>>"Does this remind you of someone?" <<He>> falls quiet when you tell <<him>> why you chose it.<<else>><<He>> hums beneath <<his>> breath, only loud enough for you to hear.<</if>><</if>>
         <<option 'CN'>>
           <<if _life_scene.action is 'meal'>>凯拉尔等你坐下，才碰了自己的餐点。<<if _life_scene.item is 'chilli_con_carne'>>“你记得。”<<He>>第一勺吃得太快，又慢下来，跟着你的速度吃。<<else>>“你给我留了？”<<He>>从盘子望向你，尝了一口。“谢谢。”<</if>>
           <<elseif _life_scene.action is 'tea'>>凯拉尔两手捧着杯子，从杯沿上方看着你。“下次还能这样。”<<He>>轻声说，等你答应。
-          <<elseif _life_scene.action is 'film'>>放映室里的其他座位全空着，凯拉尔仍挑了最靠近你的那个。<<if C.npc.Kylar.rage gte 60>>屏幕上的主角吻上谁，<<he>>便转过来看你。“你没在想别人吧？”<<else>>“下次也让你挑。”<<He>>笑着说。屏幕亮起时，<<he>>仍在看你。<</if>>
+          <<elseif _life_scene.action is 'film'>>放映室里的其他座位全空着，凯拉尔仍挑了最靠近你的那个。<<if _life_scene.item is 'erotic'>><<if C.npc.Kylar.rage gte 60>>凯拉尔呼吸一滞，身体轻颤着紧贴住你的身侧，微抖的手指扣进你的掌心。“你在看他们，还是在想我？只能看我，<<kylar_pet_name>>……”<<else>>画面流转间，凯拉尔喉间微哽，整张脸瞬间涨得通红。<<He>>靠在你的肩窝，贴在你耳边轻颤着低语：“你……喜欢这种吗？你想怎么做……我都陪你……”<</if>><<elseif C.npc.Kylar.rage gte 60>>屏幕上的主角吻上谁，<<he>>便转过来看你。“你没在想别人吧？”<<else>>“下次也让你挑。”<<He>>笑着说。屏幕亮起时，<<he>>仍在看你。<</if>>
           <<elseif _life_scene.action is 'wine'>>凯拉尔将标签转向灯光，确认过才尝了一口。<<if _life_wine_recipe>>“你自己酿的？”<<He>>问你等了多久。<<else>>“这瓶是店里买的？”<</if>><<He>>小心放回瓶子。<<if C.npc.Kylar.rage gte 60>><<if _life_scene.origin is 'Deadwood Reblooms Property Wine Cellar'>>“你还带谁下来过？”<<else>>“你还带谁来过这里？”<</if>><<He>>盯着你的脸，听你回答。<<else>>“这里挺好。”<<He>>把椅子留在你的椅子旁。<</if>>
           <<elseif _life_scene.action is 'tidy'>>凯拉尔仔细收好你的东西，将边角排整齐。<<He>>拿起一张碎纸，却没急着扔。“这个你还要吗？”等你回答，<<he>>才把它放进垃圾桶。
           <<else>>曲子播到一半，凯拉尔认出了旋律。<<if C.npc.Kylar.rage gte 60>>“你听这个，会想起谁？”你解释为什么挑这首，<<he>>便安静下来。<<else>><<He>>轻轻哼着，只够你一个人听见。<</if>><</if>>
@@ -221,14 +230,14 @@
         <<option 'EN'>>
           <<if _life_scene.action is 'meal'>>Sydney sets <<his>> napkin neatly beside the plate. <<if _life_scene.item is 'apple_crumble'>>"Oh, you made crumble!" <<He>> catches <<himself>> saying it too loudly, then digs in. Before long, <<he>> has to brush crumbs from <<his>> sleeve.<<elseif setup.foodstuff[_life_scene.item].food?.tags?.includes('spicy')>>Sydney takes a careful bite, then reaches for <<his>> drink with watering eyes. "It's good. I just wasn't ready for that."<<else>>Sydney thanks you before tasting, then asks how you made it. <<He>> listens closely enough to forget the last mouthful on <<his>> fork.<</if>>
           <<elseif _life_scene.action is 'tea'>>Sydney moves the cups away from the books. <<if _sydneyStatus.includes('corrupt')>>"There. Now I can give you all my attention." <<He>> grins, letting the book stay shut.<<else>>"Thank you. I needed a break." <<He>> puts the bookmark in and closes the book.<</if>>
-          <<elseif _life_scene.action is 'film'>>Sydney checks the running time before sitting down. <<if _sydneyStatus.includes('corrupt')>>"If I fall asleep, you can tell me the ending." <<He>> smiles, then spends the next scene pointing out what the characters have missed.<<else>>"Just this one." <<He>> follows the story closely, whispering a question when a familiar line comes up.<</if>>
+          <<elseif _life_scene.action is 'film'>>Sydney checks the running time before sitting down. <<if _life_scene.item is 'erotic'>><<if _sydneyStatus.includes('corrupt')>>Sydney doesn't look away from the screen, leaning in close until <<his>> warm breath brushes your neck. "Did you pick this just to test me? They aren't doing it very well... I could show you better."<<else>>Sydney lets out a soft gasp, blushing deep crimson all the way to <<his>> ears. "Th-this is against all modesty!" <<He>> quickly shields <<his>> eyes with both hands, yet <<his>> fingers slowly part, peeking through with a dry swallow.<</if>><<elseif _sydneyStatus.includes('corrupt')>>"If I fall asleep, you can tell me the ending." <<He>> smiles, then spends the next scene pointing out what the characters have missed.<<else>>"Just this one." <<He>> follows the story closely, whispering a question when a familiar line comes up.<</if>>
           <<elseif _life_scene.action is 'wine'>>Sydney turns the glass by its stem. <<if _life_wine_recipe>>"Does the flavour change while it ferments?" <<He>> listens while you explain.<</if>> <<if _sydneyStatus.includes('corrupt')>>"Am I meant to say something about the bouquet?" <<He>> tries a solemn expression, but cannot keep it.<<else>>Sydney takes a small taste and sets the glass down again. "That's enough for me." <<He>> stays to talk, keeping <<his>> hands folded beside the glass.<</if>>
           <<elseif _life_scene.action is 'tidy'>>Sydney sorts the books while you clear the cups. "This one belongs in the library," <<he>> says, setting it apart for the morning. <<if _sydneyStatus.includes('corrupt')>>"I'll spare you the fine. This time." <<He>> smiles at you.<<else>><<He>> checks that the bookmark is still in place before stacking the others.<</if>>
           <<else>>Sydney recognises a phrase in the song and quietly follows the next line. <<if _sydneyStatus.includes('corrupt')>>"You heard that?" <<He>> laughs, and sings the next bit more clearly.<<else>><<He>> lowers <<his>> eyes when you notice, but keeps the rhythm with a fingertip.<</if>><</if>>
         <<option 'CN'>>
           <<if _life_scene.action is 'meal'>>悉尼将餐巾整齐放在盘子旁。<<if _life_scene.item is 'apple_crumble'>>“啊，你做了苹果酥！”<<He>>发现自己喊得太大声，随后便埋头吃起来。没过多久，<<he>>又得去拍掉袖上的碎屑。<<elseif setup.foodstuff[_life_scene.item].food?.tags?.includes('spicy')>>悉尼小心尝了一口，眼睛一下子湿了，伸手去拿饮品。“很好吃。只是没想到这么辣。”<<else>>悉尼先道谢，再尝了一口，问起你怎么做的。<<He>>听得太认真，忘了叉子上还留着最后一口。<</if>>
           <<elseif _life_scene.action is 'tea'>>悉尼把杯子移到远离书本的地方。<<if _sydneyStatus.includes('corrupt')>>“好了。现在可以好好看着你了。”<<He>>笑着说，没有重新打开书。<<else>>“谢谢。正好想歇一会儿。”<<He>>放好书签，合上了书。<</if>>
-          <<elseif _life_scene.action is 'film'>>悉尼先看了时长，才坐下来。<<if _sydneyStatus.includes('corrupt')>>“我要是睡着了，你得告诉我结局。”<<He>>笑着说，下一幕又指出了角色漏掉的线索。<<else>>“就这一部。”<<He>>认真看着故事，听到熟悉的台词时，小声向你问了一句。<</if>>
+          <<elseif _life_scene.action is 'film'>>悉尼先看了时长，才坐下来。<<if _life_scene.item is 'erotic'>><<if _sydneyStatus.includes('corrupt')>>悉尼没有移开目光，反而凑近到你耳边，温热的气息拂过你的脖颈：“特意选这部来考验我吗？他们做得可不够好……我可以教你更好的。”<<else>>悉尼发出一声短促而羞赧的惊呼，整张脸红到了耳根。“这、这太不知羞耻了！”<<He>>慌忙用双手捂住眼睛，指缝却慢慢张开一条缝，喉咙轻轻吞咽着悄悄张望。<</if>><<elseif _sydneyStatus.includes('corrupt')>>“我要是睡着了，你得告诉我结局。”<<He>>笑着说，下一幕又指出了角色漏掉的线索。<<else>>“就这一部。”<<He>>认真看着故事，听到熟悉的台词时，小声向你问了一句。<</if>>
           <<elseif _life_scene.action is 'wine'>>悉尼捏着杯脚，轻轻转动酒杯。<<if _life_wine_recipe>>“发酵时，味道会慢慢变吗？”<<He>>听你解释其中的过程。<</if>><<if _sydneyStatus.includes('corrupt')>>“是不是该说说酒香？”<<He>>试着摆出一本正经的样子，却没能保持下去。<<else>>悉尼只尝了一小口，便放回杯子。“我这样就够了。”<<He>>留下来聊天，两手叠放在杯旁。<</if>>
           <<elseif _life_scene.action is 'tidy'>>你收杯子，悉尼整理书本。“这本得带回图书馆。”<<He>>把它放到一旁，留着明早拿。<<if _sydneyStatus.includes('corrupt')>>“这次就不罚你了。”<<He>>朝你笑了笑。<<else>><<He>>确认书签还在原处，才叠好其他书。<</if>>
           <<else>>悉尼认出歌里的一句，轻轻跟着哼了下一行。<<if _sydneyStatus.includes('corrupt')>>“你听见了？”<<He>>笑起来，将下一句唱得更清楚。<<else>>见你发现了，<<he>>便垂下目光，指尖却仍跟着节拍轻敲。<</if>><</if>>
@@ -351,7 +360,7 @@
       <<case 'tea'>>You bring two servings of <<recipe_name _life_scene.item>> to the table. You leave the washing-up until later and sit down together.
       <<case 'tidy'>>You gather the cups, clear the table and shake the folds from the blanket. <<if currentSkillValue('housekeeping') gte 500>>You work from one side of the room to the other, leaving nothing to move twice.<<else>>You have to clear a place before putting the next pile away.<</if>><<if _life_scene.quality gte 2>> The housekeeper takes the cleared cups through to the kitchen while you finish the last pile.<</if>> The room feels easier to move through when you finish.
       <<case 'music'>>You find something to listen to and settle into the seat. <<if ['rain', 'snow'].includes(Weather.precipitation)>>The weather taps against the windows beneath the tune.<<else>>The tune fills the pauses between the sounds of the house.<</if>> <span class='teal'>You have a little less on your mind.</span>
-      <<case 'film'>>The lights dim and the short film fills the screen. <<if _life_scene.item is 'comedy'>>A misplaced suitcase starts an argument which follows the characters from one room to the next. By the time the owner arrives, nobody will admit who opened it.<<else>>A visitor arrives at a house which ought to be empty. You follow the clues until a familiar detail finally gives the ending away.<</if>> <<if _estate.current.id is 'cliff'>>Beyond the curtains, the sea keeps moving.<<else>>The town remains beyond the soundproofed window.<</if>> You let the story carry you through to the credits.
+      <<case 'film'>>The lights dim and the film fills the screen. <<if _life_scene.item is 'comedy'>>A misplaced suitcase starts an argument which follows the characters from one room to the next. By the time the owner arrives, nobody will admit who opened it.<<elseif _life_scene.item is 'erotic'>>Two figures embrace in the warm, low light on screen, whispering softly as clothes are cast aside. The hushed sighs and murmurs echo gently off the padded walls, casting warm amber shadows across the darkened room. Your pulse picks up as the intimate scene unfolds until the tape ends with a fading glow.<<else>>A visitor arrives at a house which ought to be empty. You follow the clues until a familiar detail finally gives the ending away.<</if>> <<if $drunk gte 20>>The warmth of the wine lingers in your veins, softening the edges of the dark room and making every breath beside you feel intoxicatingly close.<</if>> <<if _estate.current.id is 'cliff'>>Beyond the curtains, the sea keeps moving.<<else>>The town remains beyond the soundproofed window.<</if>> You let the story carry you through to the credits.
       <<case 'wine'>>You open <<if _life_wine_recipe>><<print _life_wine_recipe.name[0]>><<else>><<recipe_name _life_scene.item>><</if>> and pour a little into the glass.
         <<if _life_scene.origin is 'Deadwood Reblooms Property Wine Cellar'>>The cellar is cool enough that the bottle feels cold against your fingers.
         <<elseif _life_scene.origin is 'Deadwood Reblooms Property Kitchen'>>You make room on the kitchen table and move the cups away from the edge.
@@ -365,7 +374,7 @@
       <<case 'tea'>>你把两份<<recipe_name _life_scene.item>>端到桌上，将洗餐具的事留到稍后，一起坐了下来。
       <<case 'tidy'>>你收起杯子，擦干桌子，抖开毯子上的折痕。<<if currentSkillValue('housekeeping') gte 500>>你从房间一边收拾到另一边，不用把同一叠东西搬两遍。<<else>>你得先清出一块地方，才能放好下一叠东西。<</if>><<if _life_scene.quality gte 2>>你整理最后一叠东西时，保洁员将收好的杯子端去了厨房。<</if>>收拾完后，走动也方便多了。
       <<case 'music'>>你选好音乐，在座位里坐稳。<<if ['rain', 'snow'].includes(Weather.precipitation)>>窗外的雨雪伴着旋律轻敲玻璃。<<else>>曲调填满了屋里声响之间的空隙。<</if>><span class='teal'>心里的杂念少了些。</span>
-      <<case 'film'>>灯光暗下来，短片铺满屏幕。<<if _life_scene.item is 'comedy'>>一只放错地方的箱子，让片中人从这间房吵到那间房。等箱子的主人找过来，谁也不肯承认是自己打开的。<<else>>访客走进一幢本该空着的房子。你跟着线索往下看，终于从熟悉的细节里猜中了结局。<</if>><<if _estate.current.id is 'cliff'>>窗帘之外，海水仍在流动。<<else>>小镇留在隔音窗外。<</if>>你一直看到片尾字幕。
+      <<case 'film'>>灯光暗下来，影片铺满屏幕。<<if _life_scene.item is 'comedy'>>一只放错地方的箱子，让片中人从这间房吵到那间房。等箱子的主人找过来，谁也不肯承认是自己打开的。<<elseif _life_scene.item is 'erotic'>>屏幕在柔和昏暗的暖光中亮起，两道身影在榻间低语拥缠，衣衫渐褪。细碎温存的呢喃在隔音软垫墙板间轻轻回荡，屏幕的微光在幽暗中投下朦胧的剪影。随着亲昵画面渐深，你的脉搏不由自主地加快，直到片尾微弱的光晕渐渐隐去。<<else>>访客走进一幢本该空着的房子。你跟着线索往下看，终于从熟悉的细节里猜中了结局。<</if>><<if $drunk gte 20>>先前的酒意在温暖幽暗的放映室中缓缓发散开来，微醺的晕眩让周遭的一切变得朦胧，身旁伴侣的每一次轻微触碰与呼吸都显得格外灼人。<</if>><<if _estate.current.id is 'cliff'>>窗帘之外，海水仍在流动。<<else>>小镇留在隔音窗外。<</if>>你一直看到片尾字幕。
       <<case 'wine'>>你打开<<if _life_wine_recipe>><<print _life_wine_recipe.name[1]>><<else>><<recipe_name _life_scene.item>><</if>>，在杯中倒了些。
         <<if _life_scene.origin is 'Deadwood Reblooms Property Wine Cellar'>>酒窖里很凉，指尖碰着瓶壁，也觉出一丝冷意。
         <<elseif _life_scene.origin is 'Deadwood Reblooms Property Kitchen'>>你在厨房桌上清出地方，把杯子挪到离桌沿远些的地方。
@@ -373,10 +382,16 @@
         <<if _life_wine_recipe>>拿来酿酒的水果，进桶后已经变了味道。你慢慢品尝，略带酸涩的酒味底下，仍能尝出熟悉的果香。
         <<elseif _life_scene.item is 'ghostbrew'>>咽下酒后，凉意仍留在舌头上。杯底下的桌纹似乎缓缓流动。你眨了眨眼，它们却还在动。<</if>>
     <</switch>>
-<</language>><<if _life_scene.action is 'wine' and _life_scene.item is 'ghostbrew'>><<ghallucinogens>><</if>><br><br>
+<</language>><<if _life_scene.action is 'wine' and _life_scene.item is 'ghostbrew'>><<ghallucinogens>><</if>><<if _life_scene.action is 'film' and _life_scene.item is 'erotic'>><<garousal>><</if>><br><br>
 <<if _life_scene.partner>>
   <<deadwood-home-life-reaction>>
-  <<if _life_scene.first and !_life_scene.followup>><<glove>><</if>><br><br>
+  <<if _life_scene.first and !_life_scene.followup>><<glove _life_scene.partner>><</if>>
+  <<if _life_scene.action is 'film' and _life_scene.item is 'erotic'>>
+    <<glust _life_scene.partner>>
+    <<if _life_scene.partner is 'Sydney' and !_sydneyStatus.includes('corrupt')>>
+      <<lspurity>>
+    <</if>>
+  <</if>><br><br>
 <</if>>
 <</if>>
 <<if _life_scene.partner and _life_scene.action isnot 'wine'>><<deadwood-home-life-followup>><</if>>
@@ -384,7 +399,30 @@
   <<case 'meal' 'tea'>>
     <<getouticon>><<lanLink ['Clear the table', '收好餐桌'] 'Deadwood Reblooms Property Kitchen'>><</lanLink>><br>
   <<case 'film'>>
-    <<getouticon>><<lanLink ['Turn the lights up', '开灯'] 'Deadwood Reblooms Property Screening Room'>><</lanLink>><br>
+    <<if _life_scene.partner and (_life_scene.item is 'erotic' or $drunk gte 20) and _estate.canIntimate(_life_scene.partner, _estate.current.id, 'cinema')>>
+      <<if hasSexStat('promiscuity', 2)>>
+        <<loveicon 'kiss'>>
+        <<lanLink ['Pull them onto the sofa for intimacy', '把恋人拉到放映室沙发上亲热'] 'Deadwood Reblooms Property Intimacy'>>
+          <<run _estate.requestIntimacy(_life_scene.partner, 'cinema')>>
+          <<set $sexstart to 1>>
+          <<set $Finance.real_estate.life.scene to null>>
+        <</lanLink>><<promiscuous2>><<kissvirginitywarning>><<NPCvirginitywarning _life_scene.partner 'kiss'>><br>
+      <</if>>
+      <<if hasSexStat('promiscuity', 1) and _estate.canIntimate(_life_scene.partner, _estate.current.id, 'bedroom')>>
+        <<bedicon>>
+        <<lanLink ['Lead them back to the bedroom for intimacy', '把恋人带回卧室亲密'] 'Deadwood Reblooms Property Intimacy'>>
+          <<run _estate.requestIntimacy(_life_scene.partner, 'bedroom')>>
+          <<set $sexstart to 1>>
+          <<set $Finance.real_estate.life.scene to null>>
+        <</lanLink>><<promiscuous1>><<kissvirginitywarning>><<NPCvirginitywarning _life_scene.partner 'kiss'>><br>
+      <</if>>
+      <<if !hasSexStat('promiscuity', 1)>>
+        <span class="blue"><<lanSwitch 'The lingering heat in the dark room makes your pulse race, but you lack the promiscuity to take things further.' '昏暗放映室里的燥热气氛让你心跳加速，但你的淫乱度不足以主动挑起亲密。'>></span><br>
+      <<elseif !hasSexStat('promiscuity', 2)>>
+        <span class="blue"><<lanSwitch 'You lack the promiscuity to initiate intimacy right here on the sofa.' '你的淫乱度不足以直接在放映室沙发上亲热。'>></span><br>
+      <</if>>
+    <</if>>
+    <<getouticon>><<lanLink ['Turn the lights up', '开灯'] 'Deadwood Reblooms Property Screening Room'>><<set $Finance.real_estate.life.scene to null>><</lanLink>><br>
   <<case 'wine'>>
     <<deadwood-home-wine-followups>>
   <<default>>

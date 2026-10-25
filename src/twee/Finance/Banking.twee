@@ -1,15 +1,17 @@
 :: Deadwood Reblooms Finance Common Widgets [widget]
 
+<!-- 到期日显示提醒，历史记录和开放日期传入 date，只显示日期。 -->
 <<widget 'deadwood-reblooms-finance-date'>>
-  <<set _financeDate to Time.startDate.addDays(_args[0])>>
-  <<set _financeDaysLeft to Math.ceil(_args[0] - Time.days)>>
-  <span @class="_financeDaysLeft gt 0 ? 'gold' : _financeDaysLeft is 0 ? 'pink' : 'red'"><<= lanSwitch(`${_financeDate.day} ${_financeDate.monthName} ${_financeDate.year}`, `${_financeDate.year}年${_financeDate.month}月${_financeDate.day}日`)>></span>
-  <<if _financeDaysLeft gt 0>>
-    <<lanSwitch ' (in ' '（还有 '>> <<= _financeDaysLeft>> <<lanSwitch ' days)' '天）'>>
-  <<elseif _financeDaysLeft is 0>>
-    <<lanSwitch ' (due today)' '（今日到期）'>>
-  <<else>>
-    <span class='red'><<lanSwitch ' (overdue)' '（已到期）'>></span>
+  <<set $_date to Time.startDate.addDays(_args[0]), $_daysLeft to Math.ceil(_args[0] - Time.days)>>
+  <span @class="_args[1] is 'date' or $_daysLeft gt 0 ? 'gold' : $_daysLeft is 0 ? 'pink' : 'red'"><<= lanSwitch(`${$_date.day} ${$_date.monthName} ${$_date.year}`, `${$_date.year}年${$_date.month}月${$_date.day}日`)>></span>
+  <<if _args[1] isnot 'date'>>
+    <<if $_daysLeft gt 0>>
+      <<lanSwitch ' (in ' '(还有 '>> <<= $_daysLeft>> <<lanSwitch ' days)' '天)'>>
+    <<elseif $_daysLeft is 0>>
+      <<lanSwitch ' (due today)' '(今日到期)'>>
+    <<else>>
+      <span class='red'><<lanSwitch ' (overdue)' '(已到期)'>></span>
+    <</if>>
   <</if>>
 <</widget>>
 

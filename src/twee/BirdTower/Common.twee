@@ -115,7 +115,14 @@
   <<if $_ids.length>>
     <<childSelect $_ids[0]>>
     <span class="teal"><<childrenNames $_ids>><<lanSwitch " came back." "回来了。">></span>
-    <<= $_ids.length gt 1 ? lanSwitch("They", "他们") : "<<childHe>>">><<lanSwitch " brought back " "带回了">><<deadwood-birdtower-hunters-loot $_returned>>。
+    <<set $_loot to $_returned.filter(child => child.loot !== 'nothing')>>
+    <<= $_ids.length gt 1 ? lanSwitch("They", "他们") : "<<childHe>>">>
+    <<if $_loot.length>>
+      <<lanSwitch " brought back " "带回了">><<deadwood-birdtower-hunters-loot $_loot>><<lanSwitch "." "。">>
+    <<else>>
+      <<lanSwitch " brought nothing back this time." "这次什么也没带回来。">>
+      <<if $_ids.length is 1>><<lanSwitch " You pat " "你摸了摸">><<childhis>><<lanSwitch " head." "的头。">><</if>>
+    <</if>>
     <br><br>
   <</if>>
 <</widget>>
@@ -126,20 +133,16 @@
   <<for $_i to 0; $_i lt $_total; $_i++>>
     <<set $_loot to $_returned[$_i].loot>>
     <<switch $_loot>>
-      <<case "nothing">>
-        <<if $_total is 1>>
-          <<lanSwitch "……hmm, it seems " "……嗯，好像">><<childhe>><<lanSwitch " brought back nothing at all. You pat " "什么都没有带回来。你摸了摸">><<childhim>><<lanSwitch "'s head to comfort " "的头以示安慰">><<childhim>>
-        <</if>>
       <<case "junk">>
-        <<birdicon "junk">><<lanSwitch "glittering little junk" "闪闪发光的小垃圾">>
+        <<birdicon "junk">><<lanSwitch "some glittering junk" "闪闪发光的小垃圾">>
       <<case "leaves" "sticks" "fabric" "wood">>
         <<birdicon $_loot>><<print lanSwitch($_loot.replace("leaves", "large leaves").replace("sticks", "small branches").replace("fabric", "fabric").replace("wood", "wood"), $_loot.replace("leaves", "大树叶").replace("sticks", "小树枝").replace("fabric", "布料").replace("wood", "木头"))>>
       <<case "watch" "ring" "necklace" "bracelet">>
         <<deadwood-birdtower-hunters-valuable $_loot>>
       <<case "lurkers">>
-        <<birdicon "lurkers">><<lanSwitch "lurker" "潜伏者">>
+        <<birdicon "lurkers">><<lanSwitch "a lurker" "潜伏者">>
     <</switch>>
-    <<if $_i isnot $_total-1 and $_loot isnot "nothing">>
+    <<if $_i isnot $_total-1>>
       <<lanSwitch ", " "、">>
     <</if>>
   <</for>>
