@@ -1,7 +1,12 @@
 // ./src/script/Whitney.ts
 
 export default function (maplebirch: typeof window.maplebirch): void {
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-whitney-pier-link', passage: 'Docks' }, { widget: 'deadwood-whitney-flats-link', passage: 'Whitney Home Knock' });
+  maplebirch.tool.addTo(
+    'BeforeLinkZone',
+    { widget: 'deadwood-whitney-pier-link', passage: 'Docks' },
+    { widget: 'deadwood-whitney-flats-link', passage: 'Whitney Home Knock' },
+    { widget: 'deadwood-whitney-school-link', passage: 'School Rear Courtyard' }
+  );
   // 原版开锁选项按巧手显示，最后一个链接始终是返回牢房。
   maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-whitney-cell-link'], passage: 'Underground Cell Lock' });
 

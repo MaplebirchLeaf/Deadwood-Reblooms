@@ -1,0 +1,94 @@
+:: Deadwood Kylar School Widgets [widget]
+<!-- 只追加到原版闲聊菜单。课间位置、排练和离校时间沿用 getKylarLocation，不另建日程。 -->
+<<widget 'deadwood-kylar-school-ready'>><<silently>>
+  <<set _kylarSchoolReady to !!maplebirch.get('Kylar') and C.npc.Kylar.init is 1
+    and C.npc.Kylar.state is 'active' and Time.schoolDay and $location is 'school'
+    and ((Time.hour is 12 and Time.minute lt (_args[0] ? 60 : 50)) or (Time.hour gte 15 and Time.hour * 60 + Time.minute lt 17 * 60 - (_args[0] ? 0 : 10)))
+    and ['rear_courtyard', 'library'].includes(getKylarLocation().area) and $exposed lte 0
+    and !$daily.kylar.study and !$nextPassage and !$nextPassageCheck and !$combat
+    and !$statFreeze and !$replayScene and !$frozenValues and !$eventforced>>
+<</silently>><</widget>>
+
+<<widget 'deadwood-kylar-school-link'>>
+  <<deadwood-kylar-school-ready>>
+  <<set $_menu to document.querySelector('#passage-content a[data-passage="Kylar Chat"]')>>
+  <<if _kylarSchoolReady and $_menu>>
+    <<schoolicon 'library'>><<lanLink ['Look through your schoolbooks with Kylar', '和凯拉尔一起翻翻课本'] 'Deadwood Kylar School'>><</lanLink>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-kylar-school-study'>><<silently>>
+  <<set $_choice to _args[0]>><<set $_area to getKylarLocation().area>>
+  <<deadwood-kylar-school-ready>>
+  <<if _kylarSchoolReady and ['notes', 'words'].includes($_choice)>>
+    <<pass 10>><<schooleffects>>
+    <<deadwood-kylar-school-ready true>>
+    <<if _kylarSchoolReady and getKylarLocation().area is $_area>>
+      <<set $daily.kylar.study to $_choice>><<npcincr Kylar love 1>>
+      <<if $_choice is 'notes'>><<englishskill 2>><<else>><<stress -2>><</if>>
+    <</if>>
+  <</if>>
+<</silently>><</widget>>
+
+:: Deadwood Kylar School
+<<set $location to 'school'>><<schooleffects>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat>><<exit>><</if>>
+<<set _area to getKylarLocation().area>>
+<<set $outside to _area is 'rear_courtyard' ? 1 : 0>>
+<<set $bus to _area is 'library' ? 'schoollibrary' : 'school'>>
+<<deadwood-kylar-school-ready>>
+<<if $daily.kylar.study and C.npc.Kylar.init is 1 and C.npc.Kylar.state is 'active'>>
+  <<npc Kylar>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $daily.kylar.study is 'notes'>>
+        You compare the notes you took in English. Kylar turns the page whenever you reach the bottom, then hastily turns it back when you point to a line you haven't finished.
+        "Sorry. I thought—" <<He>> stops and lets you read.<br><br>
+        You find something one of you missed, and spend a while putting it right. When you close your book, Kylar carefully copies your correction into <<his>> own.
+      <<else>>
+        You pick a long word from the page and see how many shorter words you can make from its letters.
+        Kylar writes <<his>> answers behind a cupped hand. "No looking."<br><br>
+        <<He>> catches you counting <<his>> list and pulls it closer. There are several words crossed out, and your name, circled twice, in the margin.
+        "That one doesn't count," <<he>> mumbles, covering it with <<his>> sleeve.
+      <</if>>
+      <<if isLoveInterest('Kylar')>><br><br>When you reach for your pencil, <<his>> hand closes over yours. <<He>> holds on until you look at <<him>>.<</if>>
+    <<option 'CN'>>
+      <<if $daily.kylar.study is 'notes'>>
+        你们对照起英语课的笔记。你读到页尾时，凯拉尔便替你翻页；见你指向还没读完的一行，<<he>>又慌忙翻了回来。
+        “对不起。我以为……”<<He>>停住了，等你看完。<br><br>
+        你们找出几处遗漏，花了些时间补全。你合上课本时，凯拉尔还在认真地把你改过的地方抄进<<his>>自己的笔记。
+      <<else>>
+        你从课文里挑了一个长单词，和凯拉尔比赛，看谁能用其中的字母拼出更多短词。
+        凯拉尔用手遮住答案。“不、不许偷看。”<br><br>
+        <<He>>发现你在数<<his>>列了多少词，便把本子往回拉。几处答案被划去了，页边却写着你的名字，还圈了两遍。
+        “这个不算。”<<he>>嘟囔着，用袖口盖住了它。
+      <</if>>
+      <<if isLoveInterest('Kylar')>><br><br>你伸手去拿铅笔时，<<his>>手覆了上来。直到你转头看<<him>>，<<he>>也没松开。<</if>>
+  <</language>><<glove>><<if $daily.kylar.study is 'notes'>><<genglish>><<else>><<lstress>><</if>>
+<<elseif _kylarSchoolReady>>
+  <<npc Kylar>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      You sit beside Kylar and take out your schoolbook. <<He>> moves <<his>> things aside so quickly that a pencil rolls off the edge.
+      <<if $KylarExpansion.notes_repaired>>The corner you mended is still holding. <<He>> smooths it down before opening the book.<</if>>
+      "We could— we could look at it together," <<he>> says, retrieving the pencil.
+    <<option 'CN'>>
+      你在凯拉尔身边坐下，拿出课本。<<He>>急忙把东西往旁边挪，一支铅笔滚落下去。
+      <<if $KylarExpansion.notes_repaired>>你修补过的书角还很牢固。<<He>>把那里抚平，才翻开课本。<</if>>
+      “可以、可以一起看。”<<he>>捡起铅笔，小声说。
+  <</language>><br><br>
+  <<lanLink ['Compare your English notes (0:10)', '对照英语课的笔记 (0:10)'] 'Deadwood Kylar School'>><<deadwood-kylar-school-study 'notes'>><</lanLink>><<genglish>><<glove>><br>
+  <<lanLink ['Play a word game (0:10)', '玩一会儿拼词游戏 (0:10)'] 'Deadwood Kylar School'>><<deadwood-kylar-school-study 'words'>><</lanLink>><<lstress>><<glove>>
+<<else>>
+  <<lanSwitch 'Kylar has put <<his>> books away. It is time to go.' '凯拉尔已经收起课本。该走了。'>>
+<</if>>
+<br><br><<getouticon>>
+<<if _area is 'library' and Time.schoolDay and (Time.hour is 12 or (Time.hour gte 15 and Time.hour lt 17))>>
+  <<lanLink ['Put away your book', '收起课本'] 'Kylar Library'>><</lanLink>>
+<<elseif _area is 'rear_courtyard' and Time.schoolDay and (Time.hour is 12 or (Time.hour gte 15 and Time.hour lt 17))>>
+  <<lanLink ['Put away your book', '收起课本'] 'Kylar Courtyard'>><</lanLink>>
+<<elseif _area is 'library'>>
+  <<lanLink ['Return to the library', '返回图书馆'] 'School Library'>><</lanLink>>
+<<else>>
+  <<lanLink ['Return to the courtyard', '返回后院'] 'School Rear Courtyard'>><</lanLink>>
+<</if>>

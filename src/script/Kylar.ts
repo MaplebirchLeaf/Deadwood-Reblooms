@@ -3,6 +3,7 @@
 export default function Kylar(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo(
     'BeforeLinkZone',
+    { widget: 'deadwood-kylar-school-link', passage: ['Kylar Courtyard', 'Kylar Library'] },
     { widget: 'deadwood-reblooms-kylar-bedroom-links', passage: 'Manor Kylar Room' },
     { widget: 'deadwood-reblooms-kylar-kitchen-link', passage: 'Manor Kitchen' },
     { widget: 'deadwood-reblooms-kylar-bathroom-link', passage: 'Manor Hall' },
@@ -11,8 +12,6 @@ export default function Kylar(maplebirch: typeof window.maplebirch): void {
     { widget: 'deadwood-reblooms-kylar-pregnancy-link', passage: 'Manor Kylar Room' }
   );
 
-  // 原版卧室只看时间决定凯拉尔是否在场，同住后要避开这个冲突。
-  // 衣柜的退出链接按 Passage 选择，在同一次注入中补上新衣柜的回程。
   maplebirch.tool.inject({
     locationPassage: {
       'Manor Kylar Room': [

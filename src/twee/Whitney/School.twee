@@ -1,0 +1,80 @@
+:: Deadwood Whitney School Widgets [widget]
+<!-- 只在原版后院普通菜单开放。每日记录沿用原版 daily.whitney，不添加读档或刷新监听。 -->
+<<widget 'deadwood-whitney-school-ready'>><<silently>>
+  <<set _whitneySchoolReady to !!maplebirch.get('Whitney') and C.npc.Whitney.init is 1
+    and ['active', 'rescued'].includes(C.npc.Whitney.state) and C.npc.Whitney.love gte 20
+    and $whitneyReunionScene is undefined and Time.schoolDay and Time.hour is 12 and Time.minute lt (_args[0] ? 60 : 55)
+    and $location is 'school_rear_courtyard' and $outside is 1 and $exposed lte 0
+    and Weather.precipitation is 'none' and !Weather.isSnow and !pcAreArmsBound('both')
+    and !$daily.whitney.ball and !$nextPassage and !$nextPassageCheck and !$combat
+    and !$statFreeze and !$replayScene and !$frozenValues and !$eventforced>>
+<</silently>><</widget>>
+
+<<widget 'deadwood-whitney-school-link'>>
+  <<deadwood-whitney-school-ready>>
+  <<set $_menu to document.querySelector('#passage-content a[data-passage="Hallways"]')>>
+  <<if _whitneySchoolReady and $_menu>>
+    <<socialiseicon>><<lanLink ["Join Whitney's game", '看看惠特尼在玩什么'] 'Deadwood Whitney School'>><</lanLink>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-whitney-school-play'>><<silently>>
+  <<set $_choice to _args[0]>>
+  <<deadwood-whitney-school-ready>>
+  <<if _whitneySchoolReady and ['play', 'score'].includes($_choice)>>
+    <<pass 5>>
+    <<deadwood-whitney-school-ready true>>
+    <<if _whitneySchoolReady>>
+      <<set $daily.whitney.ball to $_choice>>
+      <<npcincr Whitney love 1>>
+      <<if $_choice is 'play'>><<stress -2>><<tiredness 2>><<else>><<stress -1>><</if>>
+    <</if>>
+  <</if>>
+<</silently>><</widget>>
+
+:: Deadwood Whitney School
+<<set $location to 'school_rear_courtyard'>><<set $outside to 1>><<schooleffects>><<effects>>
+<<if $nextPassage or $nextPassageCheck or $combat>><<exit>><</if>>
+<<deadwood-whitney-school-ready>>
+<<if $daily.whitney.ball and C.npc.Whitney.init is 1 and ['active', 'rescued'].includes(C.npc.Whitney.state)>>
+  <<npc Whitney>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $daily.whitney.ball is 'play'>>
+        You join the game. Whitney kicks the ball straight at you, grinning when you scramble to meet it.
+        <<if currentSkillValue('physique') gte 14000>>You send it back between <<his>> friends. "Lucky shot," <<he>> says, already chasing it.<br><br>
+        <<else>>The ball skips past your foot. Someone laughs, but Whitney sends it back your way. "Try using your feet this time."<br><br><</if>>
+        When you step out, <<he>> wipes <<his>> forehead on <<his>> sleeve. "Not bad. Don't let it go to your head."
+      <<else>>
+        You keep score from the edge of the game. Whitney tries to claim an extra point, then looks at you when the others object.
+        You give the correct score. "Traitor," <<he>> says, kicking the ball back into play. <<He>> keeps checking that you're watching.
+      <</if>>
+      <<if isLoveInterest('Whitney')>><br><br>On <<his>> way past, <<he>> catches your hand for a moment, then lets go before the others turn around.<</if>>
+    <<option 'CN'>>
+      <<if $daily.whitney.ball is 'play'>>
+        你加入了球局。惠特尼迎面把球踢过来，看着你急忙上前接球，咧嘴笑了。
+        <<if currentSkillValue('physique') gte 14000>>你把球从<<his>>朋友之间踢了回去。“运气不错。”<<he>>说着，已经追了上去。<br><br>
+        <<else>>球擦着你的脚边滚过。有人笑出声，惠特尼却又把球传了回来。“这回记得用脚。”<br><br><</if>>
+        你退出球局时，<<he>>用袖口擦了擦额头。“还行。别太得意。”
+      <<else>>
+        你站在边上计分。惠特尼想多算一分，其他人不服，<<he>>便转头看你。
+        你报出了正确的分数。“叛徒。”<<he>>说着，把球踢回场中。之后<<he>>不时朝你这边看，确认你还在看球。
+      <</if>>
+      <<if isLoveInterest('Whitney')>><br><br>从你身旁经过时，<<he>>拉了拉你的手，趁其他人还没回头便松开了。<</if>>
+  <</language>><<lstress>><<glove>><<if $daily.whitney.ball is 'play'>><<gtiredness>><</if>>
+<<elseif _whitneySchoolReady>>
+  <<npc Whitney>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      Whitney and <<his>> friends have set their bags down as goalposts. <<He>> stops the ball under <<his>> shoe when <<he>> sees you.
+      "Oi. We're one short." <<He>> rolls it towards you. "Unless you're scared of losing."
+    <<option 'CN'>>
+      惠特尼和<<his>>朋友把书包摆成了球门。看见你时，<<he>>一脚踩住球。
+      “喂，缺个人。”<<He>>把球拨向你。“还是说，你怕输？”
+  <</language>><br><br>
+  <<lanLink ['Join the game (0:05)', '加入球局 (0:05)'] 'Deadwood Whitney School'>><<deadwood-whitney-school-play 'play'>><</lanLink>><<lstress>><<glove>><<gtiredness>><br>
+  <<lanLink ['Keep score (0:05)', '留在边上计分 (0:05)'] 'Deadwood Whitney School'>><<deadwood-whitney-school-play 'score'>><</lanLink>><<lstress>><<glove>>
+<<else>>
+  <<lanSwitch 'The game has broken up. You hear students making their way back into the school.' '球局已经散了。学生们正陆续往教学楼走。'>>
+<</if>>
+<br><br><<getouticon>><<lanLink ['Return to the courtyard', '返回后院'] 'School Rear Courtyard'>><</lanLink>>
