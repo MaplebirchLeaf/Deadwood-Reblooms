@@ -23,7 +23,7 @@ export default class PartnerMedicine {
       V.statFreeze ||
       V.nextPassageCheck ||
       V.possessed ||
-      V.gag ||
+      V.worn.face.type.includes('gag') ||
       V.exposed > 0 ||
       V.stress >= V.stressmax ||
       V.arousal >= V.arousalmax ||

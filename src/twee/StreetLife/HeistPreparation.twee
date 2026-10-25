@@ -68,11 +68,11 @@
   <<if $_streetFeedback>>
     <<switch $_streetFeedback.outcome>>
       <<case 'too_late'>>
-        <span class='blue'><<lanSwitch 'There is not enough opening time left. The work has not started, and no time or money was spent.' '剩余营业时间不足。尚未开始，没有消耗时间或金钱。'>></span>
+        <span class='blue'><<lanSwitch 'There is not enough opening time left. Come back earlier another day.' '快打烊了，改天早些来吧。'>></span>
       <<case 'interrupted'>>
-        <span class='orange'><<lanSwitch 'The arrangement was interrupted after ' '安排在进行 '>> <<= $_streetFeedback.minutes>> <<lanSwitch 'minutes. Nothing was charged or recorded as completed. Return when the conditions allow another meeting.' '分钟后中断。没有收费，也没有计入完成，条件允许时可以重新安排。'>></span>
+        <span class='orange'><<lanSwitch 'The arrangement was interrupted after ' '安排在进行 '>> <<= $_streetFeedback.minutes>> <<lanSwitch 'minutes. You will have to arrange another meeting.' '分钟后中断了，你得另约时间。'>></span>
       <<case 'unavailable'>>
-        <span class='blue'><<lanSwitch 'The conditions changed before the work could begin. No time or money was spent.' '开始前的条件已改变。这次没有消耗时间或金钱。'>></span>
+        <span class='blue'><<lanSwitch 'You could not begin the preparations.' '你没能开始准备。'>></span>
       <<case 'completed'>>
         <span class='green'><<lanSwitch 'The agreed work is complete.' '约定的安排已经完成。'>></span> <<lanSwitch 'Time spent: ' '实际耗时：'>> <<= $_streetFeedback.minutes>> <<lanSwitch 'minutes.' '分钟。'>><<if $_streetFeedback.cost gt 0>> <<lanSwitch 'Paid: ' '已支付：'>><<printmoney $_streetFeedback.cost>><</if>>
     <</switch>><br><br>
@@ -98,9 +98,9 @@
 <<elseif _streetPrep.place is 'smuggler' and !_streetHeist.meetingAvailable and !_streetHeist.state.preparations.includes(_streetPrep.id)>>
   <<language>>
     <<option 'EN'>>
-      The crew has not arranged to work here tonight. Wren has other business, and the remaining preparations will wait until the daytime meeting. Come back between nine in the morning and six in the evening; completed work will still count.
+      The crew has not arranged to work here tonight. Wren has other business, and the remaining preparations will wait until the daytime meeting. Come back between nine in the morning and six in the evening.
     <<option 'CN'>>
-      今晚没有约好在这里准备。伦恩另有自己的事，剩余安排得等白天碰面时再做。请在上午九点至下午六点之间回来，已经完成的准备仍然有效。
+      今晚没有约好在这里准备。伦恩另有自己的事，剩余安排得等白天碰面时再做。请在上午九点至下午六点之间回来。
   <</language>><br>
 <<elseif _streetPrep.place is 'bank' and (_streetHeist.bankClosed or Time.weekDay lt 2 or Time.weekDay gt 6 or Time.hour lt 9 or Time.hour gte 17) and !_streetHeist.state.preparations.includes(_streetPrep.id)>>
   <<lanSwitch 'The counter is closed. There is no clerk here to help, and your visit must wait for another opening day.' '柜台已经关闭，没有柜员能够接待你。这次查看得等到下次营业时。'>><br>
@@ -148,9 +148,9 @@
     <<case 'factory'>>
       <<language>>
         <<option 'EN'>>
-          Your business supplies have covered part of the expense. The workers dealt with an ordinary packing order; none of this makes them part of your arrangement with Landry. Wren checks the finished kit rather than asking for their names.
+          The workers bring over the packed supplies. Using your own stock has saved you part of the expense. Wren opens the kit and checks its contents.
         <<option 'CN'>>
-          自家经营的物资替你省下了一部分开销。工人处理的只是普通包装订单，这不代表他们参与了你与兰德里的安排。伦恩检查的是收拾好的用品，没有追问工人的名字。
+          工人送来了装好的用品，用自家的库存省下了一部分开销。伦恩打开行装，检查里面的东西。
       <</language>>
     <<case 'lead'>>
       <<language>>

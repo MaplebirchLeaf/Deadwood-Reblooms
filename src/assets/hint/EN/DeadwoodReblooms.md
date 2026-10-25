@@ -1,6 +1,6 @@
 # Getting started
 
-Requires game **0.5.12.13 or later**, maplebirch framework **5.5.4 or later**, and the other dependencies listed by the loader.
+Requires game **0.5.12.13 or later**, maplebirch framework **5.5.6 or later**, and the other dependencies listed by the loader.
 
 Choose modules in the guide contents, save the game and reload. Disabling a parent disables its dependants. Enabling a child enables the modules it needs. Module choices are saved in this browser. Character progress and assets are stored in your save.
 
@@ -14,13 +14,11 @@ Choose modules in the guide contents, save the game and reload. Disabling a pare
 | Statistics → Mod statistics | Review milestones, earnings and cumulative records                |
 | Original cheat panel        | Adjust funds, vehicles, ammunition and stock for enabled modules  |
 
-Use the journal for your next step and statistics to review what you have done. Order and bounty earnings are recorded only after payment. Company-car earnings are recorded after the shift. Heist shares and preparation costs are recorded separately.
-
 ## Common settings
 
-- **Sidebar buttons**: choose desktop, mobile or hidden. Hiding a button does not disable its features.
+- **Sidebar buttons**: choose desktop, mobile or hidden.
 - **Custom bodywriting**: enable it, then use the vanilla mirror to set text and colours.
-- **Mobile status bars and undo**: check attributes or return to the previous passage from the collapsed sidebar. Vanilla undo limits still apply.
+- **Mobile status bars and undo**: check attributes or return to the previous passage from the collapsed sidebar.
 - **Bailey rent accumulation**: unpaid weekly rent carries over to later bills.
 - **Hide ear slimes**: hides their appearance without removing the parasites or their effects.
 - **Wardrobe search**: enter a clothing name in the current language and confirm. Clear the field and confirm again to restore the list.

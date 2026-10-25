@@ -2,8 +2,8 @@
 
 An attendance exemption prevents truancy records. Prefects and presidents can handle school affairs. You can obtain both.
 
-- **Attendance exemption**: reach the highest A\* tier in all four subjects and overall results, then apply to Leighton on a school day. You need at least 10 affection with Leighton or to have already blackmailed the headteacher. Obtain Bailey's signature, then return the form to the headteacher's office. Orphanage signing is at 07:00–09:00 and normally needs three consecutive paid rent weeks; visit the Barb Street flat if Bailey has left. Grades can still change.
-- **Prefect**: reach **ideal student** with teachers and at least **cool** with students in the Social panel, plus 10 affection with Leighton or previous successful blackmail. Apply in the headteacher's office. Noticeboard standing, grades and detention exemption do not replace these conditions. Patrol the front courtyard at 07:00–09:00 on school days, once daily. You may decide whether to attend detention after appointment.
+- **Attendance exemption**: reach the highest A\* tier in all four subjects and overall results, then apply to Leighton on a school day. You need at least 10 affection with Leighton or to have already blackmailed the headteacher. Obtain Bailey's signature, then return the form to the headteacher's office. Orphanage signing is at 07:00–09:00 and normally needs three consecutive paid rent weeks; visit the Barb Street flat if Bailey has left.
+- **Prefect**: reach **ideal student** with teachers and at least **cool** with students in the Social panel, plus 10 affection with Leighton or previous successful blackmail. Apply in the headteacher's office. Patrol the front courtyard at 07:00–09:00 on school days, once daily. You may decide whether to attend detention after appointment.
 - **President**: personally complete morning duty on five different school days, with student reputation and staff trust both at 25, then apply to Leighton.
 
 Duty choices affect standing and relationships. Check progress at the corridor noticeboard and journal; vanilla teacher and student evaluations remain in the Social panel.
@@ -12,7 +12,7 @@ Duty choices affect standing and relationships. Check progress at the corridor n
 
 Enter from the corridor at 07:00–17:00 on school days. Ordinary students can organise affairs for 15 minutes daily; officeholders can rest, study and handle appeals. Presidents may delegate duty before 09:00, using the day's affairs opportunity without adding a personal patrol.
 
-Propose policies in order through the headteacher: uniform, free dress, revealing dress, optional nudity, nude day and mandatory nudity. Both school and town corruption must qualify. Then choose one route: staff trust plus Leighton's affection, a student petition, or leverage against Leighton. The board lists the requirements. Pressure still requires both corruption conditions.
+As student council president, propose policies in order through the headteacher: uniform, free dress, revealing dress, optional nudity, nude day and mandatory nudity. Both school and town corruption must qualify. Then choose one route: staff trust plus Leighton's affection, a student petition, or leverage against Leighton. The board lists the requirements. Pressure still requires both corruption conditions.
 
 Town requirements use vanilla soft corruption, adjusted weekly by hard corruption and by some events. School support cannot replace it.
 
@@ -55,7 +55,7 @@ Choose a second compatible item in the wardrobe's **Handheld** category to retai
 
 Prepare original breast, penis or bottom growth/reduction pills and speak normally to a present, selected love interest to offer medicine. Common entries include Robin's room, Kylar's manor, Whitney's flat, Sydney's temple, Alex's cottage, Avery's home, Remy's riding school and time with residents in your home.
 
-Each person accepts one of your doses daily. Seven net doses change one body part by a tier; opposite doses cancel progress. Size limits prevent further doses, pregnancy pauses gifts, and relationships still follow their existing stories.
+Each person accepts one of your doses daily. Growth and shrinking doses for the same body part cancel each other. Seven doses left in one direction change its size by one tier. Doses stop at the size limit and pause during pregnancy.
 
 ### Hospital pharmacy
 
@@ -63,7 +63,7 @@ The pharmacy adds calming, sleep, stimulant, focus and soothing pills. Buy them 
 
 Calming pills relieve stress but add fatigue; sleep pills help sleep recovery; stimulants temporarily suppress fatigue; focus pills improve actual learning; soothing pills temporarily ease trauma burden. Temporarily suppressed burdens can return when effects end.
 
-Focus pills increase learning gains by 15%, shown on the characteristics page; existing grades do not change directly. Early repeat doses or use over several days can build dependence, without stacking effects. Harper may ask about recent use: disclose or conceal it, but consultation does not immediately clear dependence. See [Psyche](#deadwood-guide-Psyche) for effects on fear.
+Focus pills increase learning gains by 15%, shown on the characteristics page. Early repeat doses or use over several days can build dependence, without stacking effects. Harper may ask about recent use: disclose or conceal it, but consultation does not immediately clear dependence. See [Psyche](#deadwood-guide-Psyche) for effects on fear.
 
 ### Temple weapons
 
@@ -91,7 +91,7 @@ Rest, watch or talk in the lounge. Train as a dealer with Marlow for an hour to 
 
 Cheating can cost that night's seating permission. Ask Marlow privately for another chance with enough trust or work performance: cash only, once nightly. Success does not restore work permission.
 
-Complete training and correctly handle ten table disputes to gain **Practised Dealer**. Later shifts add 3 tiredness instead of 4, with unchanged pay.
+Complete training and correctly handle ten table disputes to gain **Practised Dealer**. Later shifts add 3 tiredness instead of 4.
 
 One casino night runs from the evening until 4 am the next morning. Midnight does not reset bans, requests for another chance or that night's profit record.
 
@@ -99,7 +99,7 @@ One casino night runs from the evening until 4 am the next morning. Midnight doe
 
 **On a Roll** requires five consecutive table profits; draws and losses break it. Slots and Sic Bo do not count. Claim the one-time larger pepper-spray reward at the cashier afterwards. **A Good Night** needs <span class="gold">£10,000</span> net profit in a night; **Steady Hands** needs ten correctly handled shifts. **Giant Killer** is earned in three-card poker: hold a 2, 3 and 5 that are not all the same suit, beat three cards of the same rank in a comparison or showdown, then collect the winnings. An opponent folding does not count.
 
-Invite resident love interests at home to blackjack in the lounge or bedroom, with ordinary or clothing stakes. Clothing stakes go from outer to inner layers, with each loser removing one item; tied winners keep theirs, and leaving restores the clothes. You may explicitly choose **Strip only, nothing more**. Later invitations require separate willingness.
+Invite resident love interests at home to blackjack in the lounge or bedroom, with ordinary or clothing stakes. Clothing wagers start with the outer layers, with each loser removing one item per round. Everyone dresses again when leaving. You may choose **Strip only, nothing more**. Any further intimacy is a separate decision for everyone involved.
 
 ### Pool party
 

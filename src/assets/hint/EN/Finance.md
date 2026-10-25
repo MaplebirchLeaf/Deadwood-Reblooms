@@ -1,6 +1,6 @@
 ## Start here
 
-Enable **Finance** and reload. Enter the financial centre from High Street and select owned-home furniture at the **furniture-shop entrance**. Cohabitation separately requires the relevant love interest.
+Enable **Finance** and reload. Enter the financial centre from High Street and select owned-home furniture at the **furniture-shop entrance**. Select the character as a love interest before inviting them to move in.
 
 | Goal                   | Where                                          | Prepare first                                                         |
 | ---------------------- | ---------------------------------------------- | --------------------------------------------------------------------- |
@@ -21,11 +21,11 @@ Enable **Finance** and reload. Enter the financial centre from High Street and s
 | A place on Avery's board  | Business and governance | Settle three contracts → hold 20% in settled shares → pass a meeting resolution → seek control |
 | A home and cohabitants    | Homes and living        | Choose a property → pay and furnish → invite a lover where they are                            |
 
-Check the **journal** for current accounts and tasks, and **statistics** for cumulative deliveries and payments. Available resource controls appear under native **Cheats → Deadwood Reblooms**. Changing resources does not appoint a director, arrange a loan or settle a case for you.
+Check the **journal** for current accounts and tasks, and **statistics** for cumulative deliveries and payments. Find the cheat options under **Cheats → Deadwood Reblooms**.
 
 ## Time and accounting periods
 
-When days pass, business and staff accounts settle on their billing dates, including orchard and Robin’s shop investments. Each day’s income comes before debts due that day; vehicle upkeep counts whole weeks. Going back in time does not reverse recorded payments, and settled dates are not paid or charged twice.
+When days pass, business and staff accounts settle on their billing dates, including orchard and Robin’s shop investments. Each day’s income comes before debts due that day; vehicle upkeep counts whole weeks.
 
 ## Links to street life
 

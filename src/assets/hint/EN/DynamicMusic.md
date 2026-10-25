@@ -1,13 +1,11 @@
 ### Start listening
 
-Use **Maplebirch Framework 5.4.9 or later** and matching main mod and audio pack versions.
+Use matching main mod and audio pack versions.
 
 1. Load the separate **Deadwood Reblooms Audio Pack** and enable the Dynamic Music module.
 2. Tick **Enable Dynamic Music** under **Mod Settings → Dynamic Music**. The page shows whether the pack is loaded.
 3. Choose **Music**, **Ambience** and **Sound Effects** separately. Default volumes are **50% / 25% / 35%**.
 4. Click the game page to allow browser audio, then play normally.
-
-The audio pack is optional. Without it, dynamic audio stays silent and the game remains playable.
 
 ### Music, ambience and effects
 
@@ -22,9 +20,9 @@ Waves and rain can coexist on a rainy coast. Dry weather brings wind across the 
 
 The orphanage bedroom and bathroom, and the main temple quarters, have muffled rain and occasional distant thunder during storms. Ambience plays continuously and fades between scenes.
 
-Heists, pursuits and dangerous encounters take priority with tense music. Consensual interactions do not automatically use a fighting score. With no matching rule, a layer stays silent.
+Heists, pursuits and dangerous encounters take priority with tense music.
 
-Clothing changes, impacts and gunfire have short effects without vocal recordings. Both mouse and number-key actions can trigger them.
+Clothing changes, impacts and gunfire can trigger short effects through mouse or number-key actions.
 
 ### Volume and music player
 
@@ -32,11 +30,11 @@ Clothing changes, impacts and gunfire have short effects without vocal recording
 
 - Lower ambience and effects to hear the score more clearly.
 - Switch off Music to keep rain and waves.
-- Switching off Dynamic Music stops this module's sounds without clearing imported files.
+- Switching off Dynamic Music stops this module's sounds.
 - **Audio Pack** lists music only. Scenes and actions select ambience and effects automatically.
 - **Imported Audio** plays your own local files. **Clear Imported Audio** deletes the imported library without deleting the bundled pack.
 - Scene changes may replace manually selected music. To keep your own music playing, switch off Music while leaving Ambience and Sound Effects enabled.
 
 ### If there is no sound
 
-Check the matching pack, module, layer switches, individual volumes, master volume, page mute and browser playback permission. Some scenes are intentionally quiet. Not every click or combat turn produces a sound.
+Check the matching pack, module, layer switches, individual volumes, master volume, page mute and browser playback permission. Some scenes are intentionally quiet.

@@ -99,6 +99,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
   });
   maplebirch.dynamic.regStateEvent('gate', 'deadwood-street-fight-interrupted', {
     cond: () => {
+      if (V.replayScene || V.statFreeze || V.frozenValues) return false;
       const street = maplebirch.get('StreetLife');
       if (!street || !V.StreetLife?.bounties || !V.StreetLife.heist || !V.StreetLife.bailey) return false;
       const work = street.bounties;

@@ -52,7 +52,7 @@ export default class StreetLife extends Module {
   }
 
   public get available(): boolean {
-    return !V.combat && !V.replayScene && !V.statFreeze && !V.possessed && V.exposed <= 0;
+    return !V.combat && !V.replayScene && !V.statFreeze && !V.frozenValues && !V.possessed && !V.eventforced && !V.nextPassage && !V.nextPassageCheck && !window.isPregnancyEnding() && V.exposed <= 0;
   }
 
   public canUse(hand: 'left' | 'right'): boolean {

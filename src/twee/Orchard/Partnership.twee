@@ -25,7 +25,7 @@
           <<option 'CN'>>
             艾利克斯放下笔。“说好一起管这地方，我是认真的。农场能重新撑起来，也有你的份。”<<He>>把一张纸推到你面前。“一人一半。先留够干活的钱，拿出来的再平分。”
         <</language>><br><br>
-        <<lanLink ['Agree to run the farm together', '约定共同经营农场'] 'Deadwood Farm Partnership'>>
+        <<socialiseicon 'agree'>><<lanLink ['Agree to run the farm together', '约定共同经营农场'] 'Deadwood Farm Partnership'>>
           <<farm_work_update>>
           <<if C.npc.Alex.state is 'active' and $farm_work.alex is 'admin' and !maplebirch.get('Orchard').farmInterrupted and !$nextPassage and !$nextPassageCheck>>
             <<run maplebirch.get('Orchard').partnership.agree()>>
@@ -44,7 +44,7 @@
       <<deadwood-partnership-accounts 'farm'>>
       <<if $Orchard.partnership.partner_cash gt 0 and C.npc.Alex.state is 'active' and $farm_work.alex is 'admin'>>
         <<lanSwitch "Alex's dividends: " '艾利克斯持有的分红：'>><<printmoney $Orchard.partnership.partner_cash>><br>
-        <<lanLink ["Ask Alex to put the dividends back into the farm", '请艾利克斯把分红垫回农场']>>
+        <<icon 'finance/working-reserve.png'>><<lanLink ["Ask Alex to put the dividends back into the farm", '请艾利克斯把分红垫回农场']>>
           <<farm_work_update>>
           <<if C.npc.Alex.state is 'active' and $farm_work.alex is 'admin' and !$nextPassage and !$nextPassageCheck and !$combat>>
             <<run maplebirch.get('Orchard').partnership.reinvest()>>
@@ -56,7 +56,7 @@
       <<set _value to Object.entries(_stock).reduce((sum, [key, type]) => sum + Math.floor($farm.stock?.[key] || 0) * (setup.foodstuff[type]?.shop?.sell_price || 0), 0)>>
       <<if _value gt 0 and !maplebirch.get('Orchard').farmInterrupted and !$statFreeze and !$replayScene and !$frozenValues>>
         <<lanSwitch 'Available surplus produce: ' '可出售的剩余农产品：'>><<printmoney _value>><br>
-        <<lanLink ['Sell the surplus for the farm (0:10)', '把剩余农产品售出，货款留给农场 (0:10)'] 'Deadwood Farm Partnership'>>
+        <<icon 'pound.png'>><<lanLink ['Sell the surplus for the farm (0:10)', '把剩余农产品售出，货款留给农场 (0:10)'] 'Deadwood Farm Partnership'>>
           <<if !maplebirch.get('Orchard').farmInterrupted and !$statFreeze and !$replayScene and !$frozenValues and !$nextPassage and !$nextPassageCheck>>
             <<pass 10>>
             <<if !maplebirch.get('Orchard').farmInterrupted and !$statFreeze and !$replayScene and !$frozenValues and !$nextPassage and !$nextPassageCheck and !$combat>>

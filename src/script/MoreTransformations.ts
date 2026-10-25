@@ -36,9 +36,9 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
     },
     widgetPassage: {
       Widgets: [
-        // 共用反抗结算在最终多人分流前缩放一次，保留各版本的伤害上限、精通、格挡与过杀处理。
+        // 共用反抗结算在最终多人分流前缩放一次，不依赖其它模组追加的目标参数。
         {
-          srcmatch: /(<<widget "defiance">>(?:(?!<<\/widget>>)[\s\S])*?)(?=<<if \$enemyno gte 2>>\s*<<npcdamage _args\[1\]>>)/,
+          srcmatch: /(<<widget "defiance">>(?:(?!<<\/widget>>)[\s\S])*?)(?=<<if \$enemyno gte 2>>)/,
           applyafter: '<<if maplebirch.get("MoreTransformations")?.Undead.active>><<set _thedamage *= 0.5>><</if>>',
           expected: 1
         },

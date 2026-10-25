@@ -8,7 +8,7 @@ Start by opening an account at the High Street financial centre, then apply for 
 4. Cash-only stalls still require carried cash. Withdraw bank funds if needed. A credit cash advance has a **5% fee**, unlike ordinary card purchases.
 5. Open a separate brokerage account at its counter and transfer funds from the bank. Brokerage cash, bank deposits and stock value are separate. Shares are bought with brokerage cash.
 
-| Account tier | Age and historical net-balance requirements                                               | Credit limit                      | Personal-loan limit               | Weekly ATM limit                  |
+| Account tier | Account age and highest net-balance requirements                                          | Credit limit                      | Personal-loan limit               | Weekly ATM limit                  |
 | ------------ | ----------------------------------------------------------------------------------------- | --------------------------------- | --------------------------------- | --------------------------------- |
 | Current      | Available on opening                                                                      | <span class="gold">£1,000</span>  | <span class="gold">£5,000</span>  | <span class="gold">£2,000</span>  |
 | Preferred    | At least 7 days, peak net balance <span class="gold">£5,000</span>, clean credit record   | <span class="gold">£5,000</span>  | <span class="gold">£20,000</span> | <span class="gold">£5,000</span>  |
@@ -25,7 +25,7 @@ Net balance deducts credit, personal loan, mortgage and collection debts. Eligib
 
 **Furniture payment problems**: check the selected home, issued cards, completed reload, sufficient deposits or available credit, and overdue restrictions. A large bank balance does not mean a debit card was issued. A credit limit is not an equal personal-loan entitlement.
 
-Before borrowing, enter an amount and term and choose **Calculate repayments** to see the first payment date, weekly instalment, final payment and total. The estimate uses the current rate and assumes every instalment is paid on time. Recalculate after changing either input. Checking does not borrow money or advance time. The journal's next payment amount includes the remaining days of a final partial week.
+Before borrowing, enter an amount and term and choose **Calculate repayments** to see the first payment date, weekly instalment, final payment and total. The estimate uses the current rate and assumes every instalment is paid on time. Recalculate after changing either input. The journal's next payment amount includes the remaining days of a final partial week.
 
 Markets respond to farm progress and raids, Ocean Breeze Cafe prices, adverts, expansion, ingredient rumours and police investigations, Avery’s company outcomes, and Robin’s shop opening, improvements, staff and orchard deliveries. Orchard deliveries to the drinks shop move its quote at the first, fifth and tenth completed order.
 
@@ -39,7 +39,7 @@ Ordinary quotes include expected business growth of **0.02%–0.08% per trading 
 
 **RDS: Robin’s Drinks Shop** is a private partnership owned 50/50, with earnings settled under the partnership agreement. Earlier exchange positions can only be sold or closed. The furniture and tailor shops belong to High Street Shopping Centre rather than listing separately.
 
-**CSN: Connudatus Street Casino** becomes available with Life Simulation. **SCB: Strip Club** and **HSF: Harvest Street Pub** are also listed. The casino and club have relatively high day-to-day volatility and weekly distributions of 0.03%. Your gambling results do not directly change their prices; chips and brokerage cash remain separate.
+**CSN: Connudatus Street Casino** becomes available with Life Simulation. **SCB: Strip Club** and **HSF: Harvest Street Pub** are also listed. The casino and club have relatively high day-to-day volatility and weekly distributions of 0.03%. Chips and brokerage cash remain separate.
 
 ### Shares, financing and futures
 
@@ -70,7 +70,7 @@ Set stop-loss and take-profit orders from the positions page. Triggers use a per
 
 The Financial Daily prints closing prices, price movements and local business news from the latest completed trading day. Copies remain available on weekends, using the latest trading close. <span class="blue">The journal records the most recent copy you actually read. Its figures do not update automatically on later days.</span>
 
-- **Street paper seller:** between 06:00 and 12:00, you may encounter a seller on High Street or Danube Street. A copy costs <span class="gold">£1</span> in cash, with ten minutes to buy and read it. Re-entering the streets does not reroll the day's appearance.
+- **Street paper seller:** between 06:00 and 12:00, you may encounter a seller on High Street or Danube Street. A copy costs <span class="gold">£1</span> in cash, with ten minutes to buy and read it.
 - **Securities desk:** a communal copy is available in the waiting area, Monday–Friday, 09:00–17:00. Reading is free and takes ten minutes. Reading the same day's copy again takes no additional time.
 - **Orphanage loft reading nook:** choose the native newspaper action to read its business pages during the existing twenty-minute action.
 
@@ -86,13 +86,13 @@ Recovery debt appears in the finance journal with its deadline. Pay it from bank
 
 Adrian is the financial centre's bank clerk, handling personal accounts and banking enquiries across the desks. Weekday hours are 09:00–17:00: the estate desk at 11:00–12:00, lunch beside the hall entrance at 12:00–13:00, the securities desk at 15:00–16:00, and the bank counter otherwise. Adrian is absent on weekends and after work. Other staff continue to handle ordinary services.
 
-Meeting Adrian does not require a random encounter. With Finance enabled, visit a financial-centre counter on a weekday, or approach the bank clerk beside the hall entrance at lunchtime.
+With Finance enabled, visit a financial-centre counter on a weekday, or approach the bank clerk beside the hall entrance at lunchtime.
 
 Follow up on the current topic: go through a statement, discuss your plans for a house, ask about the forms, or ask how work has been. If you are unwell, you can sit and catch your breath; during an ordinary lunch conversation, you can buy Adrian a cup of tea for <span class="gold">£2</span>. These replies increase familiarity. Resting and sharing tea also reduce stress. Only one reply takes effect in each conversation.
 
-You can chat once per day. Visits on different days build familiarity, and listening improves the relationship. Re-entering the counter or moving money repeatedly does not award affection. Banking conversations respond to overdue payments, distress, your first property and your new account. Estate-desk conversations cover funding and household costs, while securities-desk conversations cover opening accounts and transferring money.
+You can chat once per day. Visits on different days build familiarity, and listening improves the relationship. Banking conversations respond to overdue payments, distress, your first property and your new account. Estate-desk conversations cover funding and household costs, while securities-desk conversations cover opening accounts and transferring money.
 
-The social page calls this relationship **Familiarity**. Adrian gradually recognises you, takes time to explain the paperwork, and enjoys talking once the business is done. Career progress shifts the description towards the business you bring to the bank. Once you help Adrian become manager, a familiar Adrian also expresses gratitude for your support. This reflects business relations and personal friendship rather than romance.
+The social page calls this relationship **Familiarity**. Adrian gradually recognises you, explains the paperwork and becomes more willing to talk once the business is done. After a promotion, Adrian thanks you for your support.
 
 With an open account and visits on at least three different days, ask about work. Promotion depends on actual customer business, rather than familiarity:
 
@@ -128,7 +128,7 @@ The work conversation shows the standard rate, current rate and discount eligibi
 - An actual bank raid affects the High Street shopping centre (HSC) by **−4%** over concerns about nearby trade. Lifting the emergency counter suspension gives **+2%**. Preparation, conversations and a report before entry do not trigger the loss, and deposits are not reduced.
 - The first paid custody settlement for the loading-bay robbery, casino chip case and cafe intimidation case affects **MER +2%, CSN +2% and OBC +1%**, respectively. Leads, released suspects and repeated cases give no further price boost.
 - Legal deliveries count separately for the cafe, docks and casino. The **3rd, 10th and 25th** complete, on-time deliveries each give that customer's quote **+1%**. Illegal, late or still-disputed loads do not count.
-- A workshop's **1st, 5th and 10th** on-time supply orders for each listed customer each give that customer's quote **+1%**. Its first actual refusal to pay for a delivered order gives **−2%**. Selling and repurchasing a workshop does not reset these market milestones.
+- A workshop's **1st, 5th and 10th** on-time supply orders for each listed customer each give that customer's quote **+1%**. Its first actual refusal to pay for a delivered order gives **−2%**.
 - The **25th and 100th** paid taxi trips each give Harvest Street Motors (HSG) **+1%**, reflecting fuel and servicing demand.
 
 Event effects combine with ordinary market movements; favourable news does not guarantee a positive daily return. **Weekend news waits for the next trading day.** The securities desk and financial journal show the latest three notices, their effects and any pending pricing. The Financial Daily keeps the historical copy you read.

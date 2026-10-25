@@ -10,4 +10,4 @@ Open **Framework Content → Cheat Collection**, enter a name and command, then 
 
 Export creates a `.cheat` file. **Import replaces the entire command collection**, so export a backup before importing another file.
 
-The collection is stored in the current browser and shared by your game saves. Import it manually when changing browser or device. A command still affects only the game currently loaded, and you must check that it suits the current story.
+The collection is stored in the current browser and shared by your game saves. Import it manually when changing browser or device. Commands act on the currently loaded game.

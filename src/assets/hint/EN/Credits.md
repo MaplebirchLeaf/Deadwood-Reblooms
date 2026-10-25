@@ -1,7 +1,7 @@
 Thanks to the following creators for their work and help:
 
 - 狐千月: [Longer Encounters](https://github.com/emicoto/DOLMods/), which informed the longer-encounter feature.
-- Eudemonism00: [NPC sidebar portraits](https://github.com/Eudemonism00/DOL-npcicon-mods/), a source for social-sidebar portraits.
+- Eudemonism00: [NPC social portraits](https://github.com/Eudemonism00/DOL-npcicon-mods/), a source for social portraits.
 - 苯环: [More Love Interests](https://github.com/Nephthelana/DoL-More-Love-Interests-Mod), which informed the expanded love-interest options.
 - 零环零幻想: [Dom Robin](https://github.com/ZeroRing233/Degrees-of-Lewdity-RobinMod), which informed Robin’s expansion.
 - 丧心: [DoLSims](https://github.com/MissedHeart/Degrees-of-Lewdity-DolSims), which informed the school gameplay.

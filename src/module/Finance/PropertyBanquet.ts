@@ -75,7 +75,17 @@ export default class PropertyBanquet {
 
   public recall(name: BanquetGuest): BanquetMemory | undefined {
     const memory = this.state.memories[name];
-    if (!memory || memory.seen || Math.floor(Time.days) < memory.day || Time.days - memory.day > 14 || V.nextPassageCheck || V.gag || !this.finance.company.available || !this.present(name)) return;
+    if (
+      !memory ||
+      memory.seen ||
+      Math.floor(Time.days) < memory.day ||
+      Time.days - memory.day > 14 ||
+      V.nextPassageCheck ||
+      V.worn.face.type.includes('gag') ||
+      !this.finance.company.available ||
+      !this.present(name)
+    )
+      return;
     const inReception = V.passage === 'Deadwood Reblooms Property Banquet Reception' && this.valid && this.state.stage === 'reception' && this.state.arrived.includes(name);
     return inReception || (Array.isArray(V.npc) && V.npc.includes(name)) ? memory : undefined;
   }

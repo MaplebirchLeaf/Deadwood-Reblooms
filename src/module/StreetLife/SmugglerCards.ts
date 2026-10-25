@@ -148,7 +148,7 @@ export default class SmugglerCards {
 
   /** 主动离桌或强制转场都清算一次，未完的二十一点作弃局，扑克已下注的钱留在底池。 */
   public close(): boolean {
-    if (!this.state.mode || V.replayScene || V.statFreeze) return false;
+    if (!this.state.mode || V.replayScene || V.statFreeze || V.frozenValues) return false;
     const game = this.state.mode;
     this.state.mode = null;
     this.state.revision++;

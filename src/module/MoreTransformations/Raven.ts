@@ -94,7 +94,7 @@ class Raven extends Transformation {
       [`bird_${part}_type`]: fusion ? `default-${fusion}` : style,
       bird_wing_left: options.bird_wing_left ?? 'idle',
       bird_wing_right: options.bird_wing_right ?? 'idle',
-      bird_wings_layer: V.tfwingslayer ?? 'back',
+      bird_wings_layer: V.wingslayer,
       bird_tail_layer: V.taillayer ?? 'back',
       demon_tail_state: part === 'tail' ? 'idle' : options.demon_tail_state,
       transformations: {

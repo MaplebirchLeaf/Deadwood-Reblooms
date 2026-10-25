@@ -164,18 +164,7 @@ export default class Heist {
   }
 
   public get available(): boolean {
-    return (
-      this.street.available &&
-      !V.nextPassageCheck &&
-      !V.nextPassage &&
-      !V.eventforced &&
-      !V.frozenValues &&
-      !window.isPregnancyEnding() &&
-      !this.street.jobs.state.active &&
-      !this.street.bounties.state.active &&
-      !this.street.bounties.busy &&
-      !window.pcAreArmsBound('both')
-    );
+    return this.street.available && !this.street.jobs.state.active && !this.street.bounties.state.active && !this.street.bounties.busy && !window.pcAreArmsBound('both');
   }
 
   public get crew() {
@@ -308,15 +297,7 @@ export default class Heist {
 
   public get mickeyAvailable(): boolean {
     return (
-      this.atMeeting &&
-      this.meetingAvailable &&
-      this.street.available &&
-      !this.inAction &&
-      !this.street.bounties.busy &&
-      !V.nextPassage &&
-      !V.nextPassageCheck &&
-      V.mickeyPub >= 2 &&
-      !['hiding', 'hidingKnown'].includes(V.pubfame?.status)
+      this.atMeeting && this.meetingAvailable && this.street.available && !this.inAction && !this.street.bounties.busy && V.mickeyPub >= 2 && !['hiding', 'hidingKnown'].includes(V.pubfame?.status)
     );
   }
 
@@ -375,7 +356,7 @@ export default class Heist {
   }
 
   public get grantAvailable(): boolean {
-    return this.street.available && !V.nextPassageCheck && Time.hour >= 8 && Time.hour < 18 && this.street.bounties.state.cooperating && !this.street.bounties.wanted;
+    return this.street.available && Time.hour >= 8 && Time.hour < 18 && this.street.bounties.state.cooperating && !this.street.bounties.wanted;
   }
 
   public get chances() {

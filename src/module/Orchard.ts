@@ -271,7 +271,7 @@ class Orchard extends Module {
       V.exposed <= 0 &&
       V.stress < V.stressmax &&
       V.combat !== 1 &&
-      !V.gag &&
+      !V.worn.face.type.includes('gag') &&
       !window.pcAreArmsBound('both') &&
       (this.available('farm') || this.available('temple') || this.available('shrine'))
     );
@@ -519,7 +519,7 @@ class Orchard extends Module {
       this.state.site === 'farm' &&
       V.location === 'alex_farm' &&
       C.npc.Alex?.init === 1 &&
-      !V.gag &&
+      !V.worn.face.type.includes('gag') &&
       this.available('farm') &&
       this.canWork &&
       !this.farmInterrupted &&

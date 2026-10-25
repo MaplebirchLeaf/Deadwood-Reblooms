@@ -20,20 +20,20 @@
     <<set _partnershipReserve to $_state.reserve / 100>>
     <label><<lanSwitch 'Keep as working money (£): ' '保留周转金 (£)：'>><<numberbox '_partnershipReserve' _partnershipReserve>></label><br>
     <<capture $_kind>>
-      <<lanLink ['Update the working reserve', '更新保留金额']>>
+      <<icon 'finance/working-reserve.png'>><<lanLink ['Update the working reserve', '更新保留金额']>>
         <<set $_business to $_kind is 'farm' ? maplebirch.get('Orchard').partnership : maplebirch.get('Robin').shop.partnership>>
         <<if !$nextPassageCheck and !$combat>><<run $_business.hold(Number(_partnershipReserve))>><</if>>
         <<run Dynamic.render($_kind === 'farm' ? 'deadwood-farm-partnership' : 'deadwood-shop-partnership')>>
       <</lanLink>><br><br>
       <<if $money gte 10000>>
-      <<lanLink ['Put in £100 cash', '垫入£100现金']>>
+      <<icon 'finance/working-reserve.png'>><<lanLink ['Put in £100 cash', '垫入£100现金']>>
         <<set $_business to $_kind is 'farm' ? maplebirch.get('Orchard').partnership : maplebirch.get('Robin').shop.partnership>>
         <<if !$nextPassageCheck and !$combat>><<run $_business.contribute(100)>><</if>>
         <<run Dynamic.render($_kind === 'farm' ? 'deadwood-farm-partnership' : 'deadwood-shop-partnership')>>
       <</lanLink>><br>
       <<else>><span class='blue'><<lanSwitch 'You need £100 in cash to advance working money.' '垫入周转金需要携带£100现金。'>></span><br><</if>>
       <<if $_state.loans.pc gt 0 and $_state.treasury gt 0>>
-        <<lanLink ['Take back available advances', '收回能够偿还的垫款']>>
+        <<icon 'finance/repayment.png'>><<lanLink ['Take back available advances', '收回能够偿还的垫款']>>
           <<set $_business to $_kind is 'farm' ? maplebirch.get('Orchard').partnership : maplebirch.get('Robin').shop.partnership>>
           <<if !$nextPassageCheck and !$combat>><<run $_business.repay()>><</if>>
           <<run Dynamic.render($_kind === 'farm' ? 'deadwood-farm-partnership' : 'deadwood-shop-partnership')>>

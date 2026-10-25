@@ -90,11 +90,11 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
     // DoLX 将兴奋与快感分开，只有原生高潮终局使用快感，保留其它兴奋判定。
     if (maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Actions Man')?.content.includes('$enemypleasure gte $enemypleasuremax')) {
       for (const [title, expected] of [
-        ['Deadwood Pirate Raid Widgets', 2],
+        ['Deadwood Pirate Raid Widgets', 3],
         ['Deadwood Pirate Raid Fight', 1],
         ['Deadwood Coin Cave Combat Widgets', 1],
         ['Deadwood Coin Cave Fight', 1],
-        ['Deadwood Coldmoon Harbour Fight Finish', 2]
+        ['Deadwood Coldmoon Harbour Fight Finish', 3]
       ] as const) {
         const passage = cache?.passageDataItems.map.get(title);
         if (!passage || passage.content.includes('$enemypleasure')) continue;
@@ -135,7 +135,7 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
     src: undefined,
     srcmatch: /<<widget "nightmareEnd">>(?:(?!<<\/widget>>)[\s\S])*?<<unset \$activeNightmare>>/
   }));
-  // 新版 DoLX 在分页前统一搜索衣柜与手提包，移除重复控件及分页后的二次过滤。
+  // DoLX 在分页前统一搜索衣柜与手提包时，移除重复控件及分页后的二次过滤。
   if (maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Wardrobe')?.content.includes('<<textbox "_wardrobeSearch" _wardrobeSearch>>')) {
     zone.widgetPassage['Widgets Wardrobe'] = (zone.widgetPassage['Widgets Wardrobe'] ?? []).filter(
       rule => ![rule.applybefore, rule.applyafter].some(text => text?.includes('$DeadwoodReblooms.wardrobeSearch'))
@@ -145,6 +145,14 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
       to: '<label><<lanSwitch "Search: " "搜索：">><<textbox "_wardrobeSearch" _wardrobeSearch>></label>',
       expected: 1
     });
+  } else {
+    // 未内置搜索的 DoLX 分别遍历衣柜和手提包，两处都在取出衣物资料后筛选。
+    replace('widgetPassage', 'Widgets Wardrobe', '<<set _itemData to setup.clothes[_wardrobe_list][clothesIndex(_wardrobe_list,_item)]>>', rule => ({
+      ...rule,
+      src: undefined,
+      srcmatchgroup: /<<set _itemData to setup\.clothes\[_wardrobe_list\]\[clothesIndex\(_wardrobe_list,_item\)\]>>/g,
+      expected: 2
+    }));
   }
 
   // DoLX 使用自己的言语特质和道歉倍率，容貌加成接在最终公式之后。

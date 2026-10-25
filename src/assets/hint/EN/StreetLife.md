@@ -1,6 +1,6 @@
 ## Where to start
 
-Enable **Street Life** and reload. Street standing covers the town; the smuggler's pub is one base, not the whole street scene. Police crime records remain separate. Start with Landry at the Harvest Street pub, or meet Detective Grant at the police station.
+Enable **Street Life** and reload. Police keep a separate criminal record. Start with Landry at the Harvest Street pub, or meet Detective Grant at the police station.
 
 | Goal                              | Entrance                                                    | What you need                                                                               |
 | --------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -16,7 +16,7 @@ Check the **journal** for active jobs, cargo locations and next steps. **Statist
 
 ## Farm-road races
 
-Visit the first road section outside Harvest Street at night to ask about the races, watch a start or enter your own car. The route follows the road to the farmland, with novice and open classes. Ordinary cars can enter; motorcycles and bicycles do not compete in these classes. Snow cancels racing, while rain makes it easier to lose grip. Deal with any road encounter before approaching the gathering.
+Visit the first road section outside Harvest Street at night to ask about the races, watch a start or enter your own car. The route follows the road to the farmland, with novice and open classes. Ordinary cars can enter. Snow cancels racing, while rain makes it easier to lose grip. Deal with any road encounter before approaching the gathering.
 
 Check the entry fee, prizes and your vehicle before paying. Choose **Road out of town** in your car's travel menu and drive to the start before approaching the racers. A car left on Harvest Street or in a garage cannot enter remotely. Finish passenger and delivery work first. Driving skill, vehicle performance and decisions on the road all matter, so buying a more expensive car does not guarantee a win.
 
@@ -28,7 +28,7 @@ Finishing pays the prize for your position and records your driving progress. En
 
 **Seasoned Driver**: Reach 600 driving experience and finish ten races to reduce baseline condition loss from driving cars by **10%**, both on ordinary trips and in road races. Extra wear from hard driving and accidents is unchanged. Bicycles and motorcycles do not receive this benefit. The journal shows your progress towards the trait.
 
-**First Across**: Finish every section of an open-class race and take first place for the first time. This feat records your result without adding a separate cash reward.
+**First Across**: Finish every section of an open-class race and take first place for the first time.
 
 ## The smuggler's pub
 
@@ -40,7 +40,7 @@ Tea costs <span class="gold">£2</span>, takes five minutes and is limited to th
 
 The weapon shop uses the clothing shop's purchase, durability and equipment controls, with only handheld weapons for sale. Its range includes a small knife, stun device, crowbar, machete, handgun, shotgun, submachine gun and rifle. Manage both held items in the same handheld category; items sharing a functional tag cannot be equipped together.
 
-Weapon actions appear in **combat against human attackers**. The relevant arm must be usable and the target still fighting. Carrying a weapon does not make its action available in every encounter.
+Weapon actions appear in **combat against human attackers**. The relevant arm must be usable and the target still fighting.
 
 | Firearm        | Rounds per action | Ammunition         |
 | -------------- | ----------------- | ------------------ |
@@ -62,7 +62,7 @@ The daily selection aims for three legal jobs and one illegal job. Standing, loc
 3. Unload and deliver during the receiver's opening hours, then return for payment where required. Accepting or delivering a job alone is not recorded as money received.
 4. Return the cargo or cancel if you cannot continue, accepting the consequences shown. Illegal cargo may bring searches, seizure or conflict; ordinary deliveries can also go wrong.
 
-Drinks for the upstairs gambling room, pub uniforms, cafe supplies and dockside tools each have a one-in-four chance of someone causing trouble: a patron blocking the stairs, persistent unwanted attention, or a stranger demanding a handling charge. Wait where staff can see you for ten minutes, or use 400 Skulduggery to slip through the crowd in five. You can still leave or return the shipment. Clearing the obstruction does not reduce your fee, though time lost can make a delivery late. The complication is fixed when you accept the job; revisiting does not reroll it or repeat its settlement.
+Drinks for the upstairs gambling room, pub uniforms, cafe supplies and dockside tools each have a one-in-four chance of someone causing trouble: a patron blocking the stairs, persistent unwanted attention, or a stranger demanding a handling charge. Wait where staff can see you for ten minutes, or use 400 Skulduggery to slip through the crowd in five. You can still leave or return the shipment. Clearing the obstruction does not reduce your fee, though time lost can make a delivery late.
 
 Late delivery normally pays 75%. Unresolved shortages and price disputes also reduce payment, and both reductions can apply. Theft of a loaded vehicle, seized cargo and an expired grace period can prevent completion.
 
@@ -118,7 +118,7 @@ You may take Landry's work and hunt wanted targets, but Landry and Grant are not
 
 Bailey's jobs, confiscations and threats connect with factories and the existing rent relationship. Look for the relevant options at the original office or flats. Negotiation depends on English skill, economic standing or established independence. Pay, refuse, seek help or resist through the choices offered; street standing alone does not remove an old debt.
 
-Mickey helps check information, division of work and risks while retaining the original fame jobs. Two copies of a rumour are not two reliable sources. Mickey does not automatically join an outside operation or agree to Grant's or Landry's terms for you.
+Mickey helps check information, division of work and risks while retaining the original fame jobs. Two copies of a rumour are not two reliable sources.
 
 ## The bank heist
 
@@ -189,6 +189,6 @@ Preparations keep their existing durations: 20 minutes at the bank counter, 20�
 
 After a successful split, the original crew members who remain free and fit for work can introduce ordinary orders at the smuggler's pub. The scout's warehouse supplies order has a <span class="gold">£120</span> base fee; the carrier's harbour delivery has a <span class="gold">£160</span> base fee. Take the actual route to collect and transport the goods, obtain the signed receipt, then collect payment from Landry on Harvest Street.
 
-Your colleague's skill raises the total quote by 0–20%. They receive 25%, and you receive the remaining 75%; the quote is saved when you accept. Each colleague can introduce one order per day, and cancelling still uses that introduction. Late or disputed deliveries reduce both payments as usual. Each successfully paid order gives 10 base experience, adjusted by that colleague's individual growth rate, to the assigned role only, up to 1000. This new income does not clear the criminal record from the bank job.
+Your colleague's skill raises the total quote by 0–20%. They receive 25%, and you receive the remaining 75%; the quote is saved when you accept. Each colleague can introduce one order per day, and cancelling still uses that introduction. Late or disputed deliveries reduce both payments as usual. Each successfully paid order gives 10 base experience, adjusted by that colleague's individual growth rate, to the assigned role only, up to 1000.
 
 A public theft or confrontation in the harbour pay chest records one −2% Mer Street shipping notice. The bank incident and counter reopening affect High Street Shopping Centre. Paid bounties and legal supplies also bring related business notices. See **Finance and business → Banking and investing** for trading rules.

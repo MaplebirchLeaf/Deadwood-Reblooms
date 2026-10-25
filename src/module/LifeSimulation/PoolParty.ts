@@ -35,7 +35,7 @@ class PoolParty {
 
   /** 原版围堵与换衣阶段不追加自愿互动。 */
   public get canInteract(): boolean {
-    return this.stage === 'party' && !V.replayScene && !V.statFreeze && !V.combat && V.exposed <= 0 && V.stress < V.stressmax && !V.gag && !this.kylarRaging;
+    return this.stage === 'party' && !V.replayScene && !V.statFreeze && !V.combat && V.exposed <= 0 && V.stress < V.stressmax && !V.worn.face.type.includes('gag') && !this.kylarRaging;
   }
 
   public canTogether(name: PoolPartyCompanion): boolean {
@@ -92,7 +92,18 @@ class PoolParty {
   }
 
   public canInvite(name: PoolPartyCompanion): boolean {
-    return this.known && !this.has(name) && this.available(name) && !V.combat && !V.statFreeze && !V.replayScene && V.exposed <= 0 && V.stress < V.stressmax && !V.gag && this.present(name);
+    return (
+      this.known &&
+      !this.has(name) &&
+      this.available(name) &&
+      !V.combat &&
+      !V.statFreeze &&
+      !V.replayScene &&
+      V.exposed <= 0 &&
+      V.stress < V.stressmax &&
+      !V.worn.face.type.includes('gag') &&
+      this.present(name)
+    );
   }
 
   public reply(name: PoolPartyCompanion): PoolPartyReply {

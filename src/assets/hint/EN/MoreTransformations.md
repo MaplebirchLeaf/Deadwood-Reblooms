@@ -2,7 +2,7 @@
 
 ## Animal transformations
 
-Horse, whale and raven each have six stages. Check progress on the characteristics page and choose appearances at a mirror. Hidden parts retain their abilities. Identities and abilities appear under **Traits → Transformation Traits**.
+Horse, whale and raven each have six stages. Check progress on the characteristics page and choose appearances at a mirror. Identities and abilities appear under **Traits → Transformation Traits**.
 
 | Transformation | Starting and growing                                                                                                                                                                                                                      |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -12,7 +12,7 @@ Horse, whale and raven each have six stages. Check progress on the characteristi
 
 **Finding ravens**: the forest search is at depth 10–14 above the old churchyard option, with a 75% success rate. The churchyard in daylight and park bench at 07:00–10:00 or 16:00–19:00 guarantee a flock. The first search takes 15 minutes and shares one daily attempt across locations; later searches take 5. Feeding takes 5 minutes, calling and preening 10 each, once daily per activity. Random forest flocks still appear; following takes 15 minutes and leads deeper. You cannot stop at night, during a blood moon or hunt, or near fainting. The park bench also offers a 15-minute rest with possible vanilla park encounters.
 
-Each water activity has a separate daily limit of 2 whale points: floating gives 1 per 10 minutes, swimming 1 per native skill award, and diving 1 per accumulated minute of completed underwater actions. Waiting does not count. River installs the loft kitchen for £10,000 and 3 hours, with at least three portions of rice supplied daily. One bowl takes 10 minutes for 1 point; three take 30 minutes for 3.
+Each water activity has a separate daily limit of 2 whale points: floating gives 1 per 10 minutes, swimming practice gives 1 each time, and diving 1 per accumulated minute of completed underwater actions. Waiting does not count. River installs the loft kitchen for £10,000 and 3 hours, with at least three portions of rice supplied daily. One bowl takes 10 minutes for 1 point; three take 30 minutes for 3.
 
 | Transformation | Abilities by stage                                                                                                                                                                                       |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -43,13 +43,13 @@ Visiting hours are 09:00–12:00, 13:00–16:00 and 17:00–18:00. Tsukihan shop
 | Walk together   | 20 affection, 20 minutes, −4 stress, −1 trauma, +3 affection.                                                                                                     |
 | Ask for a kiss  | 20 affection and chosen as a love interest, 5 minutes; a kiss or hug gives −3 stress and +1 affection.                                                            |
 
-Each activity is available once daily, resetting at 07:00. Leave time to finish before Tsukihan's next commitment. Kisses share one daily opportunity; stepping back does not cost affection. Food and flowers share a separate daily gift, resetting at midnight. Gifts take 5 minutes: ordinary gifts give +1 affection, shortbread and Valentine's chocolates on Valentine's Day give +3. Promised strawberries are handed over separately.
+Each activity is available once daily, resetting at 07:00. Leave time to finish before Tsukihan's next commitment. Kisses share one daily opportunity; stepping back does not cost affection. Food and flowers share a separate daily gift, resetting at midnight. Gifts take 5 minutes: ordinary gifts give +1 affection. Shortbread gives +3 at any time, and Valentine's chocolates give +3 on Valentine's Day. Promised strawberries are handed over separately.
 
-**Wilfulness** starts at 10 and ranges from 0 to 100. Below 30, Tsukihan is reserved; at 30–69, they voice their preferences; at 70 or above, they ask for more company or insist on a favourite treat. Ordinary chats, help, tea and kisses do not raise it. Teasing them with the paper raven adds 1; keeping conversation formally about shrine business removes 2.
+**Wilfulness** starts at 10 and ranges from 0 to 100. Below 30, Tsukihan is reserved; at 30–69, they voice their preferences; at 70 or above, they ask for more company or insist on a favourite treat. Teasing them with the paper raven adds 1; keeping conversation formally about shrine business removes 2.
 
-At 10 affection, See what Tsukihan wants alternates between company and strawberries. Stay for 5 minutes or give one portion for +2 affection and +2 wilfulness. Declining costs no affection and removes 2 wilfulness. Promising strawberries adds 1 wilfulness, with delivery due **before 18:00 the next day**, allowing 5 minutes to hand them over. On-time delivery gives +2 affection, late delivery +1, both with −1 wilfulness. Cancelling early costs no affection; apologising late costs 1, both with −2 wilfulness. There is no repeated daily penalty for lateness.
+At 10 affection, See what Tsukihan wants alternates between company and strawberries. Stay for 5 minutes or give one portion for +2 affection and +2 wilfulness. Declining costs no affection and removes 2 wilfulness. Promising strawberries adds 1 wilfulness, with delivery due **before 18:00 the next day**, allowing 5 minutes to hand them over. On-time delivery gives +2 affection, late delivery +1, both with −1 wilfulness. Cancelling early costs no affection; apologising late costs 1, both with −2 wilfulness.
 
-At 100 affection, the same requests menu opens a confession. Accept, ask for more time or remain friends. Acceptance adds Tsukihan to your love interests only if a slot is free, without replacing anyone. Lovers at 20 affection can flirt for 5 minutes, +1 affection, −2 stress and +3 lust once daily. At 50 affection, ask for time alone on the veranda: 10 minutes, −4 stress and +2 affection once daily. You can be close or simply talk, then decide how far to continue.
+At 100 affection, confession appears under the requests menu. Accept, think it over or remain friends. Acceptance can add Tsukihan as a lover when a slot is free. Lovers at 20 affection can flirt for 5 minutes, +1 affection, −2 stress and +3 lust once daily. At 50 affection, ask for time alone on the veranda: 10 minutes, −4 stress and +2 affection once daily. You can be close or simply talk, then decide how far to continue.
 
 ### Prayer, wishes and fruit trees
 
@@ -71,25 +71,25 @@ Follow the courtyard path and knock at 07:00–09:00, 12:00–13:00 or 18:00–2
 
 There is one broad futon, shared when Tsukihan is home at night; daytime rest is alone. Bathing is normally 20:00–20:30, or 18:00 after work in the rain, followed by dry clothes. Pyjamas are worn at 22:00–07:00. A 20-minute bath cleans the body and gives −4 stress and −3 tiredness. When occupied, wait or open the door. Lovers may stay to wash together, or become closer at 30 lust if the daily intimate opportunity remains. Intruding without permission to stay costs 2 affection and adds 2 wilfulness; non-lovers can apologise to restore 1 affection, once daily.
 
-Without an invitation, try sneaking in while Tsukihan is away, asleep or bathing: 5 minutes, once daily, Skulduggery difficulty 500 during sleep or 300 otherwise. Sneaking grants no invitation, shared bed or free use of the bathroom. Tsukihan asks you to leave on waking or returning.
+Without an invitation, try sneaking in while Tsukihan is away, asleep or bathing: 5 minutes, once daily, Skulduggery difficulty 500 during sleep or 300 otherwise. Tsukihan asks you to leave on waking or returning.
 
 ## Coldmoon Harbour and ghost ships
 
-A five-minute alley walk from Mer Street leads to the harbour. Explore, swim or dive among the wreckage for trading trinkets and the original Copper Compass or Rusted Cutlass. Repeat antiques add value without another museum collection entry. Swimming, oxygen and whale growth follow their existing rules.
+A five-minute alley walk from Mer Street leads to the harbour. Explore, swim or dive among the wreckage for trading trinkets and the original Copper Compass or Rusted Cutlass. Repeat antiques add value without another museum collection entry.
 
 From 21:00 until 06:00 on blood moon nights, a ship arrives with the fog. Exploration may bring one to three plundering spirits, or a voice beneath the water. Leave, evade with Skulduggery or Athletics, or fight; failed evasion also leads to an encounter. Ordinary attacks, angelic Banish and borrowed temple batons or whips can hurt the dead, with Banish consuming its usual charges. A lucid pirate can trade £10 for one trinket, once. The fog and dead leave at dawn; objects and clues remain.
 
 **Zephyr's cargo**: after seeing the ship and meeting Zephyr, ask about the harbour aboard ship or at the smuggler's pub. Recover a chest for £80, or £120 as a mate. Haggle when accepting at Skulduggery 400, reduced to 300 for a mate, for another £40 on success. Search underwater during the blood moon for a one-in-three chance each time. Delivery gives the fee and +2 interest; mates also gain +2 pirate respect. Crew scenes then appear by day.
 
-**Undead boarders** may attack aboard Zephyr's ship at night, more often under a blood moon, with at least three days between raids. They do not interrupt island arrivals or other forced scenes. Blood moon enemies are stronger, with a warning before fighting.
+**Undead boarders** may attack aboard Zephyr's ship at night, more often under a blood moon, with at least three days between raids. Blood moon enemies are stronger, with a warning before fighting.
 
-- Fight using equipped weapons. Banish and borrowed temple weapons work too; selecting one borrowed weapon with both hands still strikes only once.
+- Fight with equipped weapons, Banish or borrowed temple weapons.
 - Cut ropes with Skulduggery and Physique, or rescue a sailor with Swimming and Physique. Success adds respect and interest; crewmates help on failure.
 - Take cover below deck and leave the crew to fight. Daylight drives the dead away.
 
-Afterwards, leave or spend 5 minutes asking Zephyr about the ship or resting by the hatch. Each activity is available once, and you can do both; rest relieves 4 stress and 3 tiredness. The conversation leads to the harbour job, which still needs separate acceptance. Neither raids nor the cargo job directly promote you.
+Afterwards, leave or spend 5 minutes asking Zephyr about the ship or resting by the hatch. Each activity is available once, and you can do both; rest relieves 4 stress and 3 tiredness. The conversation offers the harbour job.
 
-**Ghost-ship captivity**: losing to a boarder at sea or to multiple spirits at Coldmoon Harbour leads to the hold. Watch the route, keep rope and timber, and practise swimming, rowing or lockpicking. Escape at night yourself or use cargo and a signal to draw Zephyr close; no prior meeting is required. Loosen ordinary ropes against the boards. Your clothes and belongings stay with you, sleep restores fatigue and rent pauses while captive. Both exits return to the harbour without triggering the coin curse.
+**Ghost-ship captivity**: losing to a boarder at sea or to multiple spirits at Coldmoon Harbour leads to the hold. Watch the route, keep rope and timber, and practise swimming, rowing or lockpicking. Escape at night yourself or use cargo and a signal to draw Zephyr close; no prior meeting is required. Loosen ordinary ropes against the boards. Your clothes and belongings stay with you, sleep restores fatigue and rent pauses while captive. Both exits return to the harbour.
 
 ## Island gold and the undead curse
 
@@ -98,13 +98,13 @@ After discovering the island shore, keep exploring to find an old cavern. Light 
 Taking gold curses you with undeath:
 
 - Pain and temperature immunity, with positive arousal gains reduced by 75%.
-- Each hour costs 2 Sanity and adds 1 stress, whether awake or asleep. Stress uses the native multipliers and overflow handling.
-- Sleep fatigue recovery ×0.5, with native nightmare stress each hour, without stacking an existing nightmare.
-- Defiance damage −50%, including borrowed melee weapon strikes. Spray and tentacle-health damage are separate; stored Physique and escape checks remain unchanged.
-- Robin's drinks, shrine tea and similar mod scenes lose the comfort of taste, while company still helps. Vanilla meals remain unchanged. Clear moonlight reveals your bones beside the sea or on deck.
+- Each hour costs 2 sanity and adds 1 stress, whether awake or asleep.
+- Sleep fatigue recovery ×0.5, with nightmare stress each hour. An existing nightmare only counts once.
+- Defiance damage −50%, including borrowed melee weapons. Spray and effects that directly remove tentacle health are unaffected.
+- Robin's drinks, shrine tea and similar mod scenes lose the comfort of taste, while company still helps. Clear moonlight reveals your bones beside the sea or on deck.
 
 The notebook, carvings and Winter's appraisal provide leads. Lift the curse by returning **every original coin to its chest**; giving them away is insufficient. You can take them again afterwards. Winter can appraise and borrow them, but you must collect the originals. The museum keeps a cast, with a research fee paid once.
 
 Tell Zephyr about the cavern to arrange the original voyage of about a week, then take a boat ashore together. Back aboard, choose the return journey. Sharing gold before learning the warning curses the captain too, and coins may be given to helpful sailors. Recall every share, using evidence, crew standing, your relationship or compensation in negotiation.
 
-**The gold quest and undead ship raids progress independently.** The journal tracks missing coins and current leads; mod statistics retain exploration and return records.
+The journal tracks missing coins and current leads; mod statistics retain exploration and return records.

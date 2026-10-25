@@ -32,24 +32,24 @@ Voluntary auctions do not pay immediately. They settle after seven days at 75% o
 
 ### Home improvements and rooms
 
-**Home improvements** at the property desk lists each house's existing fittings and available work. Construction uses the merchant payment method selected in the sidebar. Prices include fixed fittings; rented, frozen and auction-listed houses cannot be altered. Additional upkeep enters the existing weekly bill. Property management does not commission extensions automatically.
+**Home improvements** at the property desk lists each house's existing fittings and available work. Construction uses the merchant payment method selected in the sidebar. Prices include fixed fittings; rented, frozen and auction-listed houses cannot be altered. Additional upkeep enters the existing weekly bill.
 
 | Property             | Existing fittings                                   | Available work                                                           |
 | -------------------- | --------------------------------------------------- | ------------------------------------------------------------------------ |
 | Domus Street cottage | Window seat                                         | Foldaway study corner and a bicycle-only garden shed                     |
-| Barb Street flat     | Canal-facing sitting room and bedroom desk          | Soundproof study corner; no private garage or pool                       |
-| High Street loft     | Upper reading alcove and bedroom desk               | Partitioned loft study; no rooftop pool                                  |
+| Barb Street flat     | Canal-facing sitting room and bedroom desk          | Soundproof study corner                                                  |
+| High Street loft     | Upper reading alcove and bedroom desk               | Partitioned loft study                                                   |
 | Cliff Street house   | Sea-view alcove and bedroom desk                    | Sea-view study, open-air cliffside pool, heating and a single-car garage |
 | Danube Street manor  | Conservatory lounge, attic study and two-car garage | Enclosed garden-wing pool                                                |
 
 - **Rest:** fifteen minutes reduces fatigue. The first rest in each house each day also reduces stress. Invite a resident lover who is awake in a common room.
 - **Study:** each of the four subjects takes fifteen minutes and uses the native skill calculation. Reading reduces stress. The property accounts in your journal list expected weekly rent, upkeep, management fees and mortgage instalments for all houses.
 - **Swimming:** twenty minutes improves native swimming and physique while increasing fatigue. Keep your clothes on, choose a swimwear outfit from the property's wardrobe, or undress. Dry off and put your original clothes back on when leaving. Cursed clothes cannot be forcibly removed.
-- **Pool intimacy:** with a cohabiting lover selected in the common-room menu, the pool page offers **Invite your lover into the water** and enters the encounter wearing whatever you would swim in. If both residents would join a three-way, **Invite both lovers into the water** also appears. The pool scene still needs the promiscuity marker and the lovers' consent, and you dress again according to how you entered the water.
-- **Weather:** the cliffside pool closes in rain and snow, and needs heating in winter. The manor's indoor pool is usable all year. No intimacy entry appears while the pool is closed.
+- **Pool intimacy:** with a cohabiting lover selected in the common-room menu, the pool page offers **Invite your lover into the water** and enters the encounter wearing whatever you would swim in. If both residents would join a three-way, **Invite both lovers into the water** also appears. The lovers must agree to join you. Put your original clothes back on when leaving the pool.
+- **Weather:** the cliffside pool closes in rain and snow, and needs heating in winter. The manor's indoor pool is usable all year.
 - **Company:** Robin, Whitney, Kylar and Sydney react differently. Affection increases once per person, room type and day.
 
-Read mortgage balances, rates, payment dates and bank notices in **Journal → Finances**. The property desk retains early repayment and arrears services. Each shed or garage has separate bicycle, motorcycle and motor-vehicle capacities; building one does not add resident beds.
+Read mortgage balances, rates, payment dates and bank notices in **Journal → Finances**. The property desk retains early repayment and arrears services. Each shed or garage has separate bicycle, motorcycle and motor-vehicle capacities.
 
 ### Household staff and daily benefits
 
@@ -85,15 +85,15 @@ New lettings have a tenant-search period. Tenants may pay a week late or report 
 | Kylar     | Library, courtyard or park interactions, or eligible English classroom attendance              |
 | Sydney    | Temple interaction, library rental counter, or eligible science / English classroom attendance |
 
-Meet the character at one of these entrances, choose the residency invitation and select an eligible home. A name on a street, a Social portrait or brief appearance in a vanilla event is not necessarily a page where invitations can be discussed.
+Meet the character at one of these entrances, choose the residency invitation and select an eligible home.
 
 ### Why a resident is absent
 
-Residents still leave for school, work, temple duties and story events. Their belongings in a guest room do not mean they are there.
+Residents still leave for school, work, temple duties and story events.
 
 Check the living room first, then chat or invite one person upstairs. A double bed holds the PC and one partner. The other stays in the living or guest room according to the time. Joint conversation requires both residents currently present.
 
-- Robin and Kylar refuse to live with Whitney. Reversing the invitation order does not bypass this conflict.
+- Robin and Kylar refuse to live with Whitney.
 - Kylar refuses additional residents when jealousy is high. Reduce jealousy or arrange separate homes before asking again.
 - Kylar and Sydney refuse shared accommodation by default. With vanilla Stockholm Syndrome: Kylar, jealousy below 60, both as your lovers and a separate guest room, discuss the rooms and routine with each of them. Both must agree before moving in. Moving out or changing address requires a new discussion.
 - Resolve tenancy, freezes, insufficient beds, lost love-interest status or registration elsewhere before inviting someone.
@@ -105,13 +105,13 @@ Choose **Invite both lovers to talk (0:20)** in the sitting room while both resi
 - Robin and Sydney answer separately. With significant trauma, Robin prefers time alone with you. Sydney has different dialogue for pure and corrupt states. You can cancel after both agree.
 - Kylar and Sydney must each agree to the special housing arrangement. Afterwards, daily conversation centres on sharing a home.
 - Sydney can refuse closeness with Whitney. Hostile pairs do not agree simply because they share an address.
-- Once **Robin and Sydney both agree to stay**, the conversation page also offers **Take both of them to the bedroom**, which leads into a full three-way encounter. No other pair gets that entry. Stress relief uses each resident’s existing once-per-day allowance, shared with one-to-one evenings.
+- Once **Robin and Sydney both agree to stay**, the conversation page also offers **Take both of them to the bedroom**, which leads into a full three-way encounter. Stress relief uses each resident’s existing once-per-day allowance, shared with one-to-one evenings.
 
 ### Outdoor spaces and gliding
 
-**Gliding** begins inside a high home's outside-view page. Suitable heights at Barb, High, Cliff and Danube Street have entrances. Complete harpy form (stage six) can glide directly. Angel or demon stage six and fallen angel stage two require pain low enough to glide and learned flying or gliding. An untrained divine form with sufficient willpower can attempt a descent, but failure blocks another attempt that day and does not immediately unlock town flight. Town destinations and descending to ground level are separate choices, commonly taking ten and two minutes respectively. Exposure and vanilla exposure tolerance still restrict street landings.
+**Gliding** begins inside a high home's outside-view page. Suitable heights at Barb, High, Cliff and Danube Street have entrances. Complete harpy form (stage six) can glide directly. Angel or demon stage six and fallen angel stage two require pain low enough to glide and learned flying or gliding. An untrained divine form with sufficient willpower can attempt a descent, but failure blocks another attempt that day. Town destinations and descending to ground level are separate choices, commonly taking ten and two minutes respectively. Exposure and vanilla exposure tolerance still restrict street landings.
 
-**Planting** varies by property: one plot at the cottage, one loft planter and three manor growing spaces. Barb and Cliff Street homes do not provide equivalent plots. Check actual outdoor options rather than assuming every balcony supports planting.
+**Planting** varies by property: one plot at the cottage, one loft planter and three manor growing spaces.
 
 ### Rent buyouts and the donations desk
 
@@ -121,7 +121,7 @@ Each contract costs at least **<span class="gold">£250,000</span>**, or **260 w
 
 <span class="green">A paid contract ends that person's rent collection. The original room and keys remain available, with the choice to move out.</span> Buying out only one leaves the other paying separately and ends the previous combined-rent arrangement. You can show Robin the receipt for Robin's contract afterwards.
 
-**MSO: Domus Street Orphanage** is also listed at the securities desk. Large rent settlements, collection disputes, donations and repair bills affect its quotes. Share ownership is an investment and does not alter living arrangements.
+**MSO: Domus Street Orphanage** is also listed at the securities desk. Large rent settlements, collection disputes, donations and repair bills affect its quotes.
 
 The **donations desk** is beside the town-hall front desk. Ask after waiting in line, on weekdays between **8:00 and 18:00**. Choose the orphanage, hospital, school or temple and donate with your name or anonymously. Each project displays its target and cumulative contributions. Recent receipts remain at the desk. Cash and debit-card bank funds pay into the selected project, with that record retained for future purchasing and related content.
 
@@ -136,7 +136,7 @@ After signing and following up, the four institutions take turns sending routine
 
 ### Avery's adoption
 
-**Discuss adoption** in Bailey's office lets you state your wishes in advance. Its appearance does not mean Avery has made an offer. Reading or leaving does not refuse adoption. After signing a refusal, you can return to withdraw it.
+**Discuss adoption** in Bailey's office lets you state your wishes in advance. After signing a refusal, you can return to withdraw it.
 
 Buying out your own contract also blocks Avery from acquiring custody through Bailey. Withdrawing a refusal does not undo that buyout. Buying out only Robin's contract does not block your adoption storyline.
 
@@ -146,14 +146,12 @@ The vanilla invitation also requires progress through Avery's or Landry's artefa
 
 ### Property achievement steps
 
-| Achievement      | Required action                                                                                          | What does not count                                                    |
-| ---------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Own Keys         | Complete a property purchase, then enter the property office or home                                     | Browsing or entering a mortgage amount without buying                  |
-| Feels Like Home  | One owned home has a bed, wardrobe, table, chair and decoration, plus a desk if that home has desk space | Only upgrading the bed or spreading furnishings across different homes |
-| Leave a Light On | Finish the home companionship conversation while the registered resident is present                      | Belongings in the guest room while the character is absent             |
-| Ride the Wind    | Glide from an owned home and actually land on a different street from its home street                    | Opening the destination list or descending to your own ground floor    |
-
-Achievements record completed actions.
+| Achievement      | Required action                                                                                          |
+| ---------------- | -------------------------------------------------------------------------------------------------------- |
+| Own Keys         | Complete a property purchase, then enter the property office or home                                     |
+| Feels Like Home  | One owned home has a bed, wardrobe, table, chair and decoration, plus a desk if that home has desk space |
+| Leave a Light On | Finish the home companionship conversation while the registered resident is present                      |
+| Ride the Wind    | Glide from an owned home and actually land on a different street from its home street                    |
 
 ### A drink at home
 
@@ -161,6 +159,4 @@ Open original red or white wine, or your own bottled orchard wine, in the sittin
 
 ### Rehearsing at home
 
-While the school play is ongoing, rehearse for two hours at your property desk. Solo rehearsal uses the vanilla comfortable-chair benefit. Kylar or Sydney can take their school part if you know it and they are at home. Everyone needs enough free time; baths, departures and the official performance take priority.
-
-The home rehearsal option closes after the school performance. It does not change the cast or skip the school’s dedicated rehearsal scenes.
+While preparing for the school play, you can practise for two hours at your desk at home. Once you know Kylar's or Sydney's part, you can rehearse together when they are home and have time.

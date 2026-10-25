@@ -44,12 +44,9 @@ export default class Stories {
       this.street.available &&
       !this.street.heist.busy &&
       ['idle', 'prep'].includes(this.street.heist.state.stage) &&
-      !V.nextPassage &&
-      !V.nextPassageCheck &&
       !this.street.jobs.state.active &&
       !this.street.bounties.state.active &&
       !this.street.bounties.busy &&
-      !V.gag &&
       !V.worn.face.type.includes('gag') &&
       !window.pcAreArmsBound('both')
     );

@@ -10,7 +10,7 @@ Choose a vehicle for the work you want to do. Bicycles suit short trips; motorcy
 | Work as a taxi driver           | Full car licence, ID and registration fee              | Taxi work                                   |
 | Move cargo or arrange an escape | A suitable vehicle with cargo space or passenger seats | [Street Life](#deadwood-guide-StreetLife)   |
 
-The journal shows vehicle locations, arrears and current bookings. Statistics shows existing qualifications, vehicles and taxi pay actually settled. Driving proficiency alone does not grant a licence.
+The journal shows vehicle locations, arrears and current bookings. Statistics shows existing qualifications, vehicles and taxi pay actually settled. Obtain driving qualifications at the school.
 
 ## Buying and using vehicles
 
@@ -36,7 +36,7 @@ Lessons and licence appointments require sobriety. You cannot attend with both a
 - **Motorcycles:** complete basic training and theory, reach those preparation thresholds, then take the off-road test before the road test. You may pass theory before basic training. Basic training costs **£160**, takes **six hours** and must start by **11:00**. The school supplies a helmet and learner motorcycle. The certificate permits practice on a small scooter while wearing a helmet.
 - **At the test centre:** a borderline result caused by minor faults may leave an opportunity to bluff or bribe the examiner. Being caught brings police attention and suspends bookings for **three days**.
 
-**You do not need to buy a vehicle to practise.** Supervised lessons supply one and take **one hour**, costing **£45** for motorcycles or **£50** for cars. Each adds **70** to both category preparation and driving skill; basic motorcycle training adds **150** to each. Riding or driving your own vehicle improves shared driving skill, but does not replace category preparation from lessons. The school displays both requirements and your next step.
+Supervised lessons supply a practice vehicle and take **one hour**, costing **£45** for motorcycles or **£50** for cars. Each adds **70** to both category preparation and driving skill; basic motorcycle training adds **150** to each. Riding or driving your own vehicle improves shared driving skill, but does not replace category preparation from lessons. The school displays both requirements and your next step.
 
 Theory passes, basic training certificates and full driving qualifications are <span class="green">valid for life</span>. You may take only one exam per day; after a failure, book again from the next day. The school closes on Sundays. Falling snow, snow-covered roads and heavy rain suspend practical activities without invalidating theory passes. Bookings need enough time to finish by **17:00**: one-hour lessons start by **16:00**, theory tests by **15:30**, and road tests reserve **fifty minutes**. Reception explains weather, time, fees or waiting dates when the next booking is unavailable.
 
@@ -56,7 +56,7 @@ The “Available vehicles” section appears above the street map and lists each
 
 Each vehicle incurs upkeep every seven days from its purchase, paid automatically from your bank balance if you have an account. An insufficient balance or no account leaves arrears. Pay cash from the vehicle menu or sale page, or pay from an open bank account without needing a debit card. Clear the arrears before driving or selling. Fuel is consumed separately for each journey.
 
-Time skips include every upkeep week passed. Settled weeks are not charged twice; moving backwards does not refund them.
+Time skips include every upkeep week passed.
 
 Bicycle shops, motorcycle showrooms and workshops sell repair kits. Tools can be reused and come with three sets of consumable supplies. A roadside repair takes **15 minutes** for a bicycle or **30 minutes** for a motor vehicle. Housekeeping skill improves the repair, up to **60%** condition. Supplies can be restocked.
 
@@ -102,7 +102,7 @@ When you meet Alex shopping in town, you can offer a lift back towards the farm.
 
 When Avery arrives to pick you up after school, you can mention that you brought your own vehicle. Avery's response varies with anger and your position in the company. If Robin is there too, you can invite Robin to ride home to the orphanage.
 
-You normally need suitable clothing to depart. With Vanilla Enhancement’s exhibitionism ability and comfort at your current exposure level, you may keep your appearance while offering a ride. Taking back school clothes is your choice; rides near the school also offer “Retrieve clothes, then offer the ride”. Departing does not dress you automatically. Bound arms or restrictive shackles still prevent departure; drugs and maximum stress still prevent driving motor vehicles. Private journeys allow driving after drinking, with reduced control and a greater risk of police checks. Arranged lifts, driving lessons and taxi work still require sobriety.
+You normally need suitable clothing to depart. With Vanilla Enhancement’s exhibitionism ability and comfort at your current exposure level, you may keep your appearance while offering a ride. Taking back school clothes is your choice; rides near the school also offer “Retrieve clothes, then offer the ride”. Bound arms or restrictive shackles still prevent departure; drugs and maximum stress still prevent driving motor vehicles. Private journeys allow driving after drinking, with reduced control and a greater risk of police checks. Arranged lifts, driving lessons and taxi work still require sobriety.
 
 ## Taxi work
 

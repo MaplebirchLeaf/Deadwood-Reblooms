@@ -2,7 +2,7 @@
 
 When both the PC and Whitney are confined in the underground brothel, listen by the cell door and wait for a guard to open it. If you reach backstage, choose to undo the fastening or push away the guard according to your skulduggery or physique. Robin can distract a guard if also confined.
 
-The route can fail, adding stress, pain and trauma. Prepare the relevant skills and **escape with Whitney** to complete the rescue and earn **Thanks Won't Come Out**. Escaping alone does not count.
+Failure adds stress, pain and trauma. Prepare the relevant skills and **escape with Whitney** to earn **Thanks Won't Come Out**.
 
 ### Reunion after escape
 

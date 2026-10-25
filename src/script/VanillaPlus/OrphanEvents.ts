@@ -1,12 +1,6 @@
 // ./src/script/VanillaPlus/OrphanEvents.ts
 
 export default function OrphanEvents(maplebirch: typeof window.maplebirch): void {
-  // 读入旧存档时只移除已废弃的镜中印记，保留其它纹身。
-  maplebirch.on(':variable', () => {
-    if (V.skin?.pubic?.key === 'deadwood_mirror_mark') V.skin.pubic = {};
-    delete V.markAcquired;
-  });
-
   maplebirch.dynamic.regStateEvent('gate', 'deadwood-ominous-mirror', {
     extra: { passage: ['Mirror'] },
     output: 'deadwood-ominous-mirror-entry',

@@ -88,7 +88,7 @@ export default class Orphanage {
     if (C.npc.Avery?.init !== 1 || C.npc.Avery.state !== 'active' || V.avery_fate !== undefined || V.avery_mansion !== undefined) {
       return false;
     }
-    const dates = (V.avery_date ?? 0) + (V.dateCount?.Avery ?? 0);
+    const dates = V.dateCount.Avery;
     const score = typeof window.averyMansionScore === 'function' ? window.averyMansionScore() : 0;
     return dates >= 3 || (C.npc.Avery.love ?? 0) >= 30 || V.auriga_artefact !== undefined || score >= 50;
   }

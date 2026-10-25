@@ -66,7 +66,7 @@ export default class Jobs {
   }
 
   public get available(): boolean {
-    return this.street.available && !this.street.stories.busy && !this.street.heist.busy && !this.street.bounties.busy && !window.pcAreArmsBound('both') && !V.nextPassage && !V.nextPassageCheck;
+    return this.street.available && !this.street.stories.busy && !this.street.heist.busy && !this.street.bounties.busy && !window.pcAreArmsBound('both');
   }
 
   public get offers(): Contract[] {

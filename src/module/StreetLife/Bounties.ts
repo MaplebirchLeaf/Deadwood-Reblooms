@@ -143,7 +143,7 @@ export default class Bounties {
   }
 
   public get available(): boolean {
-    return this.street.available && !V.nextPassage && !V.nextPassageCheck;
+    return this.street.available;
   }
 
   public get busy(): boolean {
@@ -309,7 +309,8 @@ export default class Bounties {
     // 原版 endcombat 会清空遭遇槽，在清理之前保存演员并读取结果，刷新不能再结算。
     if (action === 'finish') {
       const fight = this.fight;
-      if (title !== 'Deadwood Street Fight Finish' || !fight || !this.combatComplete || V.replayScene || V.statFreeze) return false;
+      if (title !== 'Deadwood Street Fight Finish' || !fight || !this.combatComplete || V.possessed || V.replayScene || V.statFreeze || V.frozenValues || V.eventforced || window.isPregnancyEnding())
+        return false;
       const hunter = this.fightingHunter;
       const cargo = this.fightingCargo;
       const heist = this.fightingHeist;

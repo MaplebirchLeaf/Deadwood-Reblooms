@@ -57,7 +57,7 @@ export default class Staff {
   }
 
   public get available(): boolean {
-    return this.unlocked && this.orchard.canWork && !V.replayScene && !V.gag && !this.orchard.farmInterrupted && !V.farm_assault;
+    return this.unlocked && this.orchard.canWork && !V.replayScene && !V.worn.face.type.includes('gag') && !this.orchard.farmInterrupted && !V.farm_assault;
   }
 
   public get employed(): boolean {

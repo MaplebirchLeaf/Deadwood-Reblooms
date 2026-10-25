@@ -17,8 +17,6 @@ Earn the Great Hawk's trust, then hatch and raise chicks at the tower. Bird Towe
 - Regular feeding maintains growth; extra meals can help increase their size. Once they hunt independently, they no longer need daily feeding from you.
 - Moulting, first flight and first hunt follow their age. If the weather or the Great Hawk's situation prevents an event, return another day.
 
-After feeding, check how much food was used and how much remains. You can feed hungry children again.
-
 ### Personality and hunting
 
 At 65 days, chicks gain a personality: **clumsy** chicks favour rubbish, **sympathetic** chicks favour other exploration, **clever** chicks favour valuables, and **dominant** chicks favour lurkers. Personality also changes daily dialogue and hunting reactions.
@@ -27,7 +25,7 @@ Once they can hunt, chicks venture onto the moor alone. You may meet them deep i
 
 Solo hunts progress while you are at the tower, on the moor or in the castle. You can spend the wait on several short activities.
 
-Guide your chicks through their first flight and first hunt to gain **Falconer**. When a chick joins your hunt, you can carry one extra piece of loot. Solo hunts keep their usual limit.
+Guide your chicks through their first flight and first hunt to gain **Falconer**. When a chick joins your hunt, you can carry one extra piece of loot.
 
 When the tower offers a new nest, build and improve it through the upgrade menu. You can keep visiting the children there.
 

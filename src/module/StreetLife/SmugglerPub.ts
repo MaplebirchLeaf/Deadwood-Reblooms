@@ -65,8 +65,6 @@ export default class SmugglerPub {
       this.street.available &&
       !this.street.heist.busy &&
       !this.street.bounties.busy &&
-      !V.nextPassage &&
-      !V.nextPassageCheck &&
       !(V.temple_spear_mission >= 1 && !V.smuggler_pub_zephyr) &&
       !(C.npc.Wren.love >= 40 && !V.smuggler_pub_wren)
     );

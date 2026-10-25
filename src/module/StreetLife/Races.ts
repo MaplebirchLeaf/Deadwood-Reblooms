@@ -102,16 +102,7 @@ export default class Races {
   }
 
   private get fit(): boolean {
-    return (
-      !!this.transport?.ready &&
-      !V.nextPassage &&
-      !V.nextPassageCheck &&
-      V.drunk <= 0 &&
-      V.drugged <= 0 &&
-      V.stress < V.stressmax &&
-      !window.pcAreArmsBound('any') &&
-      !V.worn.feet.type.includes('shackle')
-    );
+    return this.street.available && !!this.transport?.ready && V.drunk <= 0 && V.drugged <= 0 && V.stress < V.stressmax && !window.pcAreArmsBound('any') && !V.worn.feet.type.includes('shackle');
   }
 
   public get reason(): Reason {
@@ -163,7 +154,17 @@ export default class Races {
   }
 
   public open(): boolean {
-    if (this.working || this.street.core.passage.title !== 'Farm Road 1' || !this.transport?.ready || !this.nightOpen || Weather.isSnow || V.nextPassage || V.nextPassageCheck) return false;
+    if (
+      this.working ||
+      !this.street.available ||
+      this.street.core.passage.title !== 'Farm Road 1' ||
+      !this.transport?.ready ||
+      !this.nightOpen ||
+      Weather.isSnow ||
+      V.nextPassage ||
+      V.nextPassageCheck
+    )
+      return false;
     this.state.origin = 'farmroad1';
     this.transport.state.origin = 'farmroad1';
     this.transport.state.return_passage = 'Farm Road 1';
@@ -172,6 +173,7 @@ export default class Races {
 
   /** 离开赛事页面不领奖，强制转场时保留最后已经经过的道路节点。 */
   public enterPassage(): void {
+    if (V.replayScene || V.statFreeze || V.frozenValues) return;
     if (['Deadwood Street Races', 'Deadwood Street Race'].includes(this.street.core.passage.title)) return;
     if (this.state.session) this.finish('interrupted');
     this.state.origin = null;
@@ -180,6 +182,7 @@ export default class Races {
   public watch(): boolean {
     if (
       this.working ||
+      !this.street.available ||
       this.street.core.passage.title !== 'Deadwood Street Races' ||
       !this.available ||
       !this.nightOpen ||
@@ -311,7 +314,14 @@ export default class Races {
   }
 
   public withdraw(expectedStep: number): boolean {
-    if (this.working || !['Deadwood Street Races', 'Deadwood Street Race'].includes(this.street.core.passage.title) || !this.state.session || this.state.session.step !== expectedStep) return false;
+    if (
+      this.working ||
+      !this.street.available ||
+      !['Deadwood Street Races', 'Deadwood Street Race'].includes(this.street.core.passage.title) ||
+      !this.state.session ||
+      this.state.session.step !== expectedStep
+    )
+      return false;
     this.finish('withdrawn');
     return true;
   }

@@ -35,7 +35,7 @@ export default class RobinTutoring extends Shared {
       V.combat !== 1 &&
       V.exposed <= 0 &&
       V.stress < V.stressmax &&
-      !V.gag &&
+      !V.worn.face.type.includes('gag') &&
       Time.schoolDay &&
       this.lessonDays.includes(Time.weekDay) &&
       this.state.tutor_day !== Time.days &&

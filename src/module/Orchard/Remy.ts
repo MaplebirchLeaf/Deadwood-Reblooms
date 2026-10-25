@@ -66,11 +66,19 @@ class Remy {
   }
 
   public get available(): boolean {
-    return this.ready && V.location === 'riding_school' && V.remySeen?.includes('riding_school') && Time.dayState !== 'night' && Time.hour !== V.closinghour && V.exposed <= 0 && !V.gag;
+    return (
+      this.ready &&
+      V.location === 'riding_school' &&
+      V.remySeen?.includes('riding_school') &&
+      Time.dayState !== 'night' &&
+      Time.hour !== V.closinghour &&
+      V.exposed <= 0 &&
+      !V.worn.face.type.includes('gag')
+    );
   }
 
   public get captive(): boolean {
-    return this.ready && this.orchard.core.passage.title === 'Livestock Cell Remy' && !!V.livestock && !V.gag;
+    return this.ready && this.orchard.core.passage.title === 'Livestock Cell Remy' && !!V.livestock && !V.worn.face.type.includes('gag');
   }
 
   public get confined(): boolean {

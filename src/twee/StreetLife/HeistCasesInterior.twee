@@ -6,7 +6,7 @@
   <<set _hcHarperPresent to C.npc.Harper?.init is 1 and C.npc.Harper.state is 'active' and $harperSeen?.includes('party') and !(Time.weekDay is 6 and $harper_appointments?.enabled) and !$schoolPsych>>
 <</widget>>
 
-<!-- 分工使用雇员当下的原版技能和健康；熟悉程度只改善本人的贡献。 -->
+<!-- 分工使用雇员当下的原版技能和健康。熟悉程度只改善本人的贡献。 -->
 <<widget 'deadwood-heist-case-roles'>>
   <<set _hcRoleHeist to maplebirch.get('StreetLife')?.heist>>
   <<set _hcScout to _hcRoleHeist?.crew.find(npc => npc.heist.role === 'scout'), _hcCarrier to _hcRoleHeist?.crew.find(npc => npc.heist.role === 'carrier')>>
@@ -81,7 +81,7 @@
     <</deadwood-heist-case-action>> · <span class='teal'><<= _hcChance>>%</span><br>
     <<deadwood-heist-case-action `['Take longer to separate the bank papers with the scout (0:25)', '与侦察员多花时间，把银行文件单独理清 (0:25)']` 25 'reception' 2 'Deadwood Street Heist Reception' false 'vault_copy'>>
       <<run _hcRecord.steps.pushUnique('vault_copy', 'account_verified')>><<tiredness 4>>
-    <</deadwood-heist-case-action>> · <<lanSwitch 'More time and fatigue; a complete copy.' '耗时与疲劳更多；得到完整副本。'>><br>
+    <</deadwood-heist-case-action>> · <<lanSwitch 'More time and fatigue; a complete copy.' '耗时与疲劳更多。得到完整副本。'>><br>
   <<elseif !_hcSteps.includes('briar_interest')>>
     <<language>><<option 'EN'>>
       Briar's voice beyond the doorway makes the carrier turn. "Client pledges. Leave those where they are." The attendant is being sent to check the papers, but has not reached the counting table yet. The case contains a smaller payment packet that can be carried without disturbing them.<br><br>
@@ -92,7 +92,7 @@
     <</language>><br><br>
     <<deadwood-heist-case-action `['Leave the client pledges and take the smaller payment (0:05)', '留下客人的抵押物，只取较小的款子 (0:05)']` 5 'reception' 2 'Deadwood Street Heist Reception' false 'briar_interest'>>
       <<run _hcRecord.steps.pushUnique('briar_interest', 'client_files_spared')>>
-    <</deadwood-heist-case-action>> · <<lanSwitch '35% less money; fewer people pursue you.' '少取35%的钱；追赶的人较少。'>><br>
+    <</deadwood-heist-case-action>> · <<lanSwitch '35% less money; fewer people pursue you.' '少取35%的钱。追赶的人较少。'>><br>
     <<deadwood-heist-case-action `['Keep the whole bundle despite Briar’s warning (0:05)', '不理会布莱尔，仍拿整捆款物 (0:05)']` 5 'reception' 2 'Deadwood Street Heist Reception' false 'briar_interest'>>
       <<run _hcRecord.steps.pushUnique('briar_interest', 'client_files_taken')>><<set _hcRecord.alarm to true>>
     <</deadwood-heist-case-action>> · <span class='red'><<lanSwitch 'The attendants pursue you in force.' '看守会全力追赶。'>></span><br>
@@ -140,7 +140,7 @@
     <</if>>
     <<deadwood-heist-case-action `['Give Quinn your name for the public reception account (0:10)', '向奎恩登记名字，列入招待会公开账目 (0:10)']` 10 'reception' 1 'Deadwood Street Heist Reception' false 'social_settled'>>
       <<if C.npc.Quinn.state is 'active'>><<run _hcRecord.steps.pushUnique('social_settled', 'quinn_registered')>><</if>>
-    <</deadwood-heist-case-action>> · <<lanSwitch 'A place in the public record; easier formal access.' '留下公开记录；正式接洽更容易。'>><br>
+    <</deadwood-heist-case-action>> · <<lanSwitch 'A place in the public record; easier formal access.' '留下公开记录。正式接洽更容易。'>><br>
     <<deadwood-heist-case-action `['Keep your place among the staff (0:05)', '仍留在临时员工那边 (0:05)']` 5 'reception' 1 'Deadwood Street Heist Reception' false 'social_settled'>>
       <<run _hcRecord.steps.pushUnique('social_settled', 'staff_only')>>
     <</deadwood-heist-case-action>><br>
@@ -230,10 +230,10 @@
     <<if _hcSteps.includes('loading_route')>><span class='green'><<lanSwitch 'The loading receipt is consistent with the warehouse record. You keep the checked copy.' '装卸收据与库内记录相符。你收好核对过的副本。'>></span><br><</if>>
     <<deadwood-heist-case-action `['Leave the wage packet and take only the owner’s balance (0:05)', '留下工钱袋，只取货主的尾款 (0:05)']` 5 'dock' 2 'Deadwood Street Heist Dock' false 'dock_interest'>>
       <<run _hcRecord.steps.pushUnique('dock_interest', 'wages_spared')>>
-    <</deadwood-heist-case-action>> · <<lanSwitch '20% less money; the workers keep out of the pursuit.' '少取20%的钱；工人不会加入追赶。'>><br>
+    <</deadwood-heist-case-action>> · <<lanSwitch '20% less money; the workers keep out of the pursuit.' '少取20%的钱。工人不会加入追赶。'>><br>
     <<deadwood-heist-case-action `['Take the whole payment despite the workers’ protest (0:05)', '不顾工人抗议，仍取整笔款子 (0:05)']` 5 'dock' 2 'Deadwood Street Heist Dock' false 'dock_interest'>>
       <<run _hcRecord.steps.pushUnique('dock_interest', 'workers_exposed')>><<set _hcRecord.alarm to true>><<npcincr Wren love -1>>
-    <</deadwood-heist-case-action>> · <span class='red'><<lanSwitch 'A larger pursuit; Wren disapproves.' '追赶的人更多；伦恩不赞同。'>></span><br>
+    <</deadwood-heist-case-action>> · <span class='red'><<lanSwitch 'A larger pursuit; Wren disapproves.' '追赶的人更多。伦恩不赞同。'>></span><br>
   <<else>>
     <<set _hcInteriorReady to true>>
     <<lanSwitch 'The chest is now within reach inside the warehouse. Your decision about the wage packet still stands.' '仓库里的款箱已经近在手边。你刚才对工钱袋作出的决定仍然有效。'>><br><br>

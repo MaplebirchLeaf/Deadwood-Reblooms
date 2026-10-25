@@ -2,7 +2,7 @@
 
 Complete the original first overnight event at the manor and select Kylar as a love interest on the Attitudes page. When Kylar is available, visit the bedroom after 18:00 and ask whether you may stay again. During the day, Kylar must actually be in the bedroom.
 
-Once invited, use the wardrobe, mirror and bed, including sleepwear and sleep duration choices. Original manor events still occur, and night dialogue depends on Kylar's presence rather than happening every night.
+Once invited, use the wardrobe, mirror and bed, including sleepwear and sleep duration choices. Kylar may also talk with you at night when present.
 
 ### Daily time together
 
@@ -14,8 +14,8 @@ Once invited, use the wardrobe, mirror and bed, including sleepwear and sleep du
 | Bathroom | You may meet Kylar between 18:00 and before 23:00; bathe or answer through the door                                                      |
 | Park     | Once the original relationship allows Kylar to draw you openly, ask about the drawing once daily; wait, praise it or stop asking         |
 
-Choices bring different dialogue, affection and stress changes. Notes and helping require usable arms, and the garden also requires suitable clothing. A school role changes some conversations without replacing study skills.
+Choices bring different dialogue, affection and stress changes. Notes and helping require usable arms, and the garden also requires suitable clothing. A school role changes some conversations.
 
 ### Manor visits and living in your home
 
-Use the housing process in Finance to invite Kylar into a purchased home. Some interactions then move to that home. Jealousy still affects time together and invitations to other residents; overnight permission does not remove those relationship limits.
+Use the housing process in Finance to invite Kylar into a purchased home. Some interactions then move to that home. Jealousy affects time together and invitations to other residents.

@@ -203,7 +203,7 @@ export default class PropertyLife {
     if (action === 'wine') {
       return (
         ['Home', 'Lounge', 'Kitchen', 'Wine Cellar'].some(room => this.core.passage.title === `Deadwood Reblooms Property ${room}`) &&
-        !V.gag &&
+        !V.worn.face.type.includes('gag') &&
         (V.drunk ?? 0) < 240 &&
         (V.drugged ?? 0) <= 0 &&
         (V.hallucinogen ?? 0) <= 0
