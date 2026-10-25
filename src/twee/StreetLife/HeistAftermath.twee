@@ -1,0 +1,610 @@
+:: Deadwood Street Heist Aftermath Widgets [widget]
+
+<!-- 便笺与余波只属于已经实际进行的新案。原版犯罪记录和人物日程不在这里改动。 -->
+<<widget 'deadwood-heist-aftermath-check'>>
+  <<set _aftermath_work to maplebirch.get('StreetLife')?.heist, _aftermath_campaign to _aftermath_work?.state.campaign, _aftermath to _aftermath_campaign?.aftermath>>
+  <<set _aftermath_active to Boolean(_aftermath_campaign and _aftermath_work.state.entered and ['settlement', 'closed'].includes(_aftermath_work.state.stage) and ['success', 'sting'].includes(_aftermath_work.state.outcome))>>
+  <<set _aftermath_ok to _aftermath_active and _aftermath_work.available and !$eventforced and !$frozenValues and !isPregnancyEnding() and !$nextPassage and !$nextPassageCheck and !_aftermath_campaign.fight>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-update'>>
+  <<if ['safe', 'rescued', 'left'].includes(_aftermath.wren) and ['safe', 'rescued', 'left'].includes(_aftermath.landry) and _aftermath.leads.includesAll('wren_met', 'landry_met')>><<set _aftermath.stage to Math.max(5, _aftermath.stage)>><<elseif _aftermath.leads.includes('wren_met') or _aftermath.leads.includes('landry_met')>><<set _aftermath.stage to Math.max(4, _aftermath.stage)>><<elseif _aftermath.leads.includes('wren_site') or _aftermath.leads.includes('landry_site')>><<set _aftermath.stage to Math.max(3, _aftermath.stage)>><</if>>
+<</widget>>
+
+<!-- 每份材料只登记一次。耗时前后都核对现场，不用换页绕过营业或强制事件。 -->
+<<widget 'deadwood-heist-aftermath-action'>>
+  <<set $_after_action to _args[0], $_after_minutes to _args[1], $_after_source to $passage, $_after_place to $location>>
+  <<deadwood-heist-aftermath-check>><<set _aftermath_done to false>>
+  <<if !_aftermath_ok>><<exit>><</if>>
+  <<set $_after_record to _aftermath_campaign, $_after_allowed to false, $_after_cost to 0>>
+  <<if ['grant', 'grant_explain'].includes($_after_action)>><<set $_after_minutes to Math.max(5, (_aftermath_work.contacts.grantTier gte 2 ? 5 : 15) - (['warned', 'cleared'].includes(_aftermath_campaign.clerk) ? 5 : 0))>><</if>>
+  <<switch $_after_action>>
+    <<case 'letter'>>
+      <<set $_after_allowed to !_aftermath.letter_read and (($passage is 'Bedroom' and $location is 'home') or ($passage is 'Smuggler Pub' and _aftermath_work.atMeeting))>>
+    <<case 'pub'>>
+      <<set $_after_allowed to _aftermath.letter_read and !_aftermath.leads.includes('pub') and $passage is 'Deadwood Street Heist Aftermath' and _aftermath_work.atMeeting and Time.hour gte 9 and Time.hour * 60 + Time.minute + $_after_minutes lt 18 * 60>>
+    <<case 'grant'>>
+      <<set $_after_allowed to _aftermath.leads.includes('pub') and !_aftermath.leads.includes('grant') and $passage is 'Deadwood Street Heist Aftermath Grant' and $location is 'police_station' and _aftermath_work.grantAvailable and C.npc.Grant?.init is 1 and C.npc.Grant.state is 'active' and maplebirch.npc.Schedule.get('Grant').location is 'police_station' and Time.hour * 60 + Time.minute + $_after_minutes lt 18 * 60>>
+    <<case 'quinn'>>
+      <<set $_after_allowed to _aftermath.leads.includes('pub') and !_aftermath.leads.includes('quinn') and $passage is 'Deadwood Street Heist Aftermath Records' and $location is 'townhall' and Time.hour gte 9 and Time.hour * 60 + Time.minute + $_after_minutes lt 17 * 60>>
+    <<case 'bailey'>>
+      <<set $_after_allowed to _aftermath.leads.includes('pub') and !_aftermath.leads.includes('bailey') and $passage is 'Deadwood Street Heist Aftermath Bailey' and $location is (maplebirch.get('StreetLife').bailey.defeated ? 'flats' : 'home') and maplebirch.get('StreetLife').bailey.atHome and Time.hour * 60 + Time.minute + $_after_minutes lt (maplebirch.get('StreetLife').bailey.defeated ? 21 : 10) * 60>>
+      <<if !maplebirch.get('StreetLife').bailey.canNegotiate>><<set $_after_cost to 10000>><</if>>
+    <<case 'briar'>>
+      <<set $_after_allowed to _aftermath.leads.includes('pub') and !_aftermath.leads.includes('briar') and $passage is 'Deadwood Street Heist Aftermath Briar' and $location is 'brothel' and C.npc.Briar.init is 1 and C.npc.Briar.state is 'active'>>
+      <<set $_after_cost to C.npc.Briar.love gte 30 ? 10000 : 20000>>
+    <<case 'hospital'>>
+      <<set $_after_allowed to _aftermath.leads.includes('pub') and !_aftermath.leads.includes('hospital') and $passage is 'Deadwood Street Heist Aftermath Hospital' and $location is 'hospital' and Time.hour gte 8 and Time.hour * 60 + Time.minute + $_after_minutes lt 18 * 60>>
+    <<case 'docks'>>
+      <<set $_after_allowed to _aftermath.leads.includes('pub') and !_aftermath.leads.includes('docks') and $passage is 'Deadwood Street Heist Aftermath Docks' and $location is 'docks' and Time.hour gte 6 and Time.hour * 60 + Time.minute + $_after_minutes lt 18 * 60>>
+    <<case 'grant_explain'>>
+      <<set $_after_allowed to _aftermath.leads.includes('grant') and _aftermath.leads.includesAny('quinn_private', 'public_record') and !_aftermath.leads.includes('grant_explain') and $passage is 'Deadwood Street Heist Aftermath Grant' and $location is 'police_station' and _aftermath_work.grantAvailable and C.npc.Grant?.init is 1 and C.npc.Grant.state is 'active' and maplebirch.npc.Schedule.get('Grant').location is 'police_station' and Time.hour * 60 + Time.minute + $_after_minutes lt 18 * 60>>
+    <<case 'quinn_public' 'quinn_private'>>
+      <<set $_after_allowed to _aftermath.leads.includes('quinn') and !_aftermath.leads.includesAny('quinn_public', 'quinn_private') and $passage is 'Deadwood Street Heist Aftermath Records' and $location is 'townhall' and Time.hour gte 9 and Time.hour * 60 + Time.minute + $_after_minutes lt 17 * 60>>
+    <<case 'bailey_close'>>
+      <<set $_after_allowed to _aftermath.leads.includes('bailey') and _aftermath.leads.includes('landry:freed') and !_aftermath.leads.includes('bailey_close') and $passage is 'Deadwood Street Heist Aftermath Bailey' and $location is (maplebirch.get('StreetLife').bailey.defeated ? 'flats' : 'home') and maplebirch.get('StreetLife').bailey.atHome and Time.hour * 60 + Time.minute + $_after_minutes lt (maplebirch.get('StreetLife').bailey.defeated ? 21 : 10) * 60>>
+    <<case 'hospital_aid'>>
+      <<set $_after_allowed to _aftermath.leads.includes('hospital') and !_aftermath.leads.includes('hospital_aid') and _aftermath_campaign.team?.injured.includes('Wren') and !_aftermath_campaign.team.aid.includes('Wren') and !_aftermath.leads.includes('wren_met') and $passage is 'Deadwood Street Heist Aftermath Hospital' and $location is 'hospital' and Time.hour gte 8 and Time.hour * 60 + Time.minute + $_after_minutes lt 18 * 60, $_after_cost to 5000>>
+    <<case 'harper_paid' 'medical_record'>>
+      <<set $_after_allowed to !_aftermath.leads.includesAny('harper_paid', 'medical_record') and $passage is 'Deadwood Street Heist Aftermath Hospital' and $location is 'hospital' and $pain gt 0 and $harper_appointments?.enabled and Time.weekDay is 6 and $daily.harperVisit isnot 1 and $trauma lt $traumamax * 0.9 and C.npc.Harper.init is 1 and C.npc.Harper.state is 'active' and Time.hour gte 8 and Time.hour * 60 + Time.minute + $_after_minutes lt 18 * 60, $_after_cost to $_after_action is 'harper_paid' ? 10000 : 0>>
+  <</switch>>
+  <<if !$_after_allowed or $money lt $_after_cost>><<exit>><</if>>
+  <<pass $_after_minutes>><<deadwood-heist-aftermath-check>>
+  <<if !_aftermath_ok or _aftermath_campaign isnot $_after_record or $passage isnot $_after_source or $location isnot $_after_place or $money lt $_after_cost>><<exit>><</if>>
+  <<if ['pub', 'grant', 'grant_explain', 'hospital', 'hospital_aid', 'harper_paid', 'medical_record'].includes($_after_action) and Time.hour gte 18>><<exit>><</if>>
+  <<if ['grant', 'grant_explain'].includes($_after_action) and (!_aftermath_work.grantAvailable or C.npc.Grant.state isnot 'active' or maplebirch.npc.Schedule.get('Grant').location isnot 'police_station')>><<exit>><</if>>
+  <<if ['quinn', 'quinn_public', 'quinn_private'].includes($_after_action) and Time.hour gte 17>><<exit>><</if>>
+  <<if ['bailey', 'bailey_close'].includes($_after_action) and !maplebirch.get('StreetLife').bailey.atHome>><<exit>><</if>>
+  <<if $_after_action is 'briar' and C.npc.Briar.state isnot 'active'>><<exit>><</if>>
+  <<if $_after_action is 'docks' and Time.hour gte 18>><<exit>><</if>>
+  <<if ['harper_paid', 'medical_record'].includes($_after_action) and (Time.weekDay isnot 6 or $daily.harperVisit is 1 or C.npc.Harper.state isnot 'active')>><<exit>><</if>>
+  <<if $_after_action is 'letter'>>
+    <<set _aftermath.letter_read to true, _aftermath.stage to 1>>
+  <<else>>
+    <<if _aftermath.leads.includes($_after_action)>><<exit>><</if>>
+    <<if $_after_cost gt 0>><<money `-$_after_cost` 'pub'>><<set _aftermath_work.state.spent += $_after_cost>><<if $_after_action is 'bailey'>><<run _aftermath.leads.pushUnique('bailey_deposit')>><</if>><</if>>
+    <<run _aftermath.leads.push($_after_action)>>
+    <<switch $_after_action>>
+      <<case 'pub'>>
+        <!-- 安静撤离且彼此信任时，原有接应确实有用，不强行让每个人再被捕一次。 -->
+        <<set _aftermath.wren to _aftermath_campaign.alarm is 0 and !_aftermath_work.state.identified and _aftermath_work.contacts.wrenTier gte 2 and !_aftermath_work.state.betrayed and !(_aftermath_campaign.team?.separated.includes('Wren') and !_aftermath_campaign.team.rejoined.includes('Wren')) and !(_aftermath_campaign.team?.injured.includes('Wren') and !_aftermath_campaign.team.aid.includes('Wren')) ? 'safe' : 'held'>>
+        <<set _aftermath.landry to _aftermath_campaign.alarm is 0 and !_aftermath_work.state.identified and _aftermath_work.contacts.landryTier gte 2 and !_aftermath_work.state.betrayed ? 'safe' : 'held'>>
+        <<set _aftermath.stage to 2>><<run _aftermath.leads.pushUnique('meeting_day:' + (Math.floor(Time.days) + 1))>>
+        <<if _aftermath.wren is 'safe'>><<run _aftermath.leads.pushUnique('wren_site')>><</if>>
+        <<if _aftermath.landry is 'safe'>><<run _aftermath.leads.pushUnique('landry_site')>><</if>>
+      <<case 'grant'>>
+        <<run _aftermath.leads.pushUnique('permit', 'wren_site')>><<set C.npc.Grant.love to Math.clamp(C.npc.Grant.love + 1, 0, 100)>>
+      <<case 'quinn'>>
+        <<run _aftermath.leads.pushUnique('permit', 'wren_site', 'landry_site')>>
+      <<case 'bailey'>>
+        <<run _aftermath.leads.pushUnique('guarantee', 'landry_site')>>
+      <<case 'briar'>>
+        <<run _aftermath.leads.pushUnique('visitors', 'landry_site')>>
+      <<case 'hospital'>>
+        <<run _aftermath.leads.pushUnique('medical', 'wren_site')>>
+      <<case 'docks'>>
+        <<run _aftermath.leads.pushUnique('wren_site', 'landry_site')>>
+      <<case 'grant_explain'>>
+        <<run _aftermath.leads.pushUnique('interpreted')>>
+      <<case 'quinn_public'>>
+        <<run _aftermath.leads.pushUnique('public_record')>><<npcincr 'Quinn' love -2>>
+      <<case 'quinn_private'>>
+        <<run _aftermath.leads.pushUnique('guarantee')>><<npcincr 'Quinn' love 1>>
+      <<case 'bailey_close'>>
+        <<run _aftermath.leads.pushUnique('bailey_closed')>>
+        <<if _aftermath.leads.includes('public_record')>><<npcincr 'Bailey' love -1>><<else>>
+          <<npcincr 'Bailey' love 1>>
+          <<if _aftermath.leads.includes('bailey_deposit')>><<money 10000 'pub'>><<set _aftermath_work.state.spent -= 10000>><</if>>
+        <</if>>
+      <<case 'hospital_aid'>>
+        <<run _aftermath.leads.pushUnique('aid_kit')>>
+      <<case 'harper_paid' 'medical_record'>>
+        <<pain -4>>
+        <<if $_after_action is 'medical_record'>><<npcincr 'Harper' dom 1>><<else>><<npcincr 'Harper' love 1>><</if>>
+    <</switch>>
+    <<deadwood-heist-aftermath-update>>
+  <</if>>
+  <<set _aftermath_done to true>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-open'>>
+  <<set $_after_target to _args[0]>><<deadwood-heist-aftermath-check>>
+  <<if _aftermath_ok>><<endevent>><<goto $_after_target>><</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-entry'>>
+  <<deadwood-heist-gold-entry>>
+  <<deadwood-heist-letters-entry>>
+  <<deadwood-heist-aftermath-check>>
+  <<if _aftermath_active and _aftermath_campaign.fight and !$combat and !$eventforced and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>>
+    <<if ['won', 'lost'].includes(_aftermath_campaign.fight.result) and ['Deadwood Street Heist Wren Fight End', 'Deadwood Street Heist Landry Fight End'].includes(_aftermath_campaign.fight.return_passage)>>
+      <<lanLink ['Find out how the dockside confrontation ended', '查看码头冲突的后续']>>
+        <<deadwood-heist-aftermath-check>>
+        <<if _aftermath_active and _aftermath_campaign.fight and ['won', 'lost'].includes(_aftermath_campaign.fight.result) and !$combat and !$eventforced and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>><<goto `_aftermath_campaign.fight.return_passage`>><</if>>
+      <</lanLink>><br>
+    <</if>>
+    <<exit>>
+  <</if>>
+  <<if !_aftermath_ok or _aftermath.stage gte 6>><<exit>><</if>>
+  <<if !_aftermath.letter_read>><<exit>><</if>>
+  <<if $passage is 'Smuggler Pub' and _aftermath_work.atMeeting>>
+    <<lanLink ['Check the arrangements left after the bank job', '查看银行行动留下的安排']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath'>><</lanLink>><br>
+  <<elseif _aftermath.leads.includes('pub')>>
+    <<if $passage is 'Police Station' and $location is 'police_station' and (!_aftermath.leads.includes('grant') or (_aftermath.leads.includesAny('quinn_private', 'public_record') and !_aftermath.leads.includes('grant_explain'))) and _aftermath_work.grantAvailable and C.npc.Grant?.init is 1 and C.npc.Grant.state is 'active' and maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
+      <<lanLink ['Ask Grant about the private guards', '向格兰特询问那些私人守卫']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Grant'>><</lanLink>><br>
+    <<elseif $passage is 'Town Hall Wait' and $location is 'townhall' and (!_aftermath.leads.includes('quinn') or !_aftermath.leads.includesAny('quinn_public', 'quinn_private')) and Time.hour gte 9 and Time.hour lt 17>>
+      <<lanLink ['Ask to inspect the warehouse permits', '申请查阅仓库许可']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Records'>><</lanLink>><br>
+    <<elseif (($passage is "Bailey's Office" and _options is 1 and !maplebirch.get('StreetLife').bailey.defeated) or ($passage is 'Flats' and maplebirch.get('StreetLife').bailey.defeated)) and $location is (maplebirch.get('StreetLife').bailey.defeated ? 'flats' : 'home') and (!_aftermath.leads.includes('bailey') or (_aftermath.leads.includes('landry:freed') and !_aftermath.leads.includes('bailey_close'))) and maplebirch.get('StreetLife').bailey.atHome>>
+      <<lanLink ['Ask Bailey about the warehouse guarantor', '向贝利打听仓库担保人']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Bailey'>><</lanLink>><br>
+    <<elseif $passage is "Briar's Office" and $phase is 0 and $location is 'brothel' and !_aftermath.leads.includes('briar') and C.npc.Briar.init is 1 and C.npc.Briar.state is 'active'>>
+      <<lanLink ['Ask about a visitor to the private warehouse', '打听去私人仓库的访客']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Briar'>><</lanLink>><br>
+    <<elseif $passage is 'Hospital Foyer' and $location is 'hospital' and (!_aftermath.leads.includes('hospital') or (_aftermath_campaign.team?.injured.includes('Wren') and !_aftermath_campaign.team.aid.includes('Wren') and !_aftermath.leads.includes('wren_met') and !_aftermath.leads.includes('hospital_aid')) or ($pain gt 0 and $harper_appointments?.enabled and Time.weekDay is 6 and $daily.harperVisit isnot 1 and $trauma lt $traumamax * 0.9 and C.npc.Harper.init is 1 and C.npc.Harper.state is 'active' and !_aftermath.leads.includesAny('harper_paid', 'medical_record'))) and Time.hour gte 8 and Time.hour lt 18>>
+      <<lanLink ['Ask about the dockside first-aid collection', '询问码头的急救用品领取单']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Hospital'>><</lanLink>><br>
+    <<elseif $passage is 'Docks' and $location is 'docks' and Time.hour gte 6 and Time.hour lt 22>>
+      <<if !_aftermath.leads.includes('docks') and Time.hour lt 18>>
+        <<lanLink ['Ask the dockers about the private warehouse', '向码头工人打听私人仓库']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Docks'>><</lanLink>><br>
+      <</if>>
+      <<if _aftermath.leads.includes('wren_site') and !_aftermath.leads.includes('wren_met') and C.npc.Wren.init is 1 and C.npc.Wren.state is 'active'>>
+        <<lanLink ['Keep the collection appointment with Wren', '赴伦恩的取货之约']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Wren'>><</lanLink>><br>
+      <</if>>
+      <<if _aftermath.leads.includes('landry_site') and !_aftermath.leads.includes('landry_met') and C.npc.Landry.init is 1 and C.npc.Landry.state is 'active'>>
+        <<lanLink ['Look for Landry by the guarantor’s office', '去担保室附近找兰德里']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Landry'>><</lanLink>><br>
+      <</if>>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-plan'>>
+  <<deadwood-heist-aftermath-check>>
+  <<if !_aftermath_ok or !_aftermath_work.atMeeting>><<exit>><</if>>
+  <<if !_aftermath.letter_read>>
+    <<lanLink ['Collect the folded note from the bar', '去吧台取折叠的便笺']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Letter'>><</lanLink>><br>
+  <<else>>
+    <<lanLink ['Review the remaining arrangements', '查看尚未了结的安排']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-unavailable'>>
+  <<lanSwitch 'The meeting cannot go ahead now. You can return when the way is clear.' '现在无法继续这场会面。等脱开身，再回来处理。'>><br><br>
+  <<deadwood-heist-aftermath-leave>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-leave'>>
+  <<if !$nextPassage and !$nextPassageCheck and !$eventforced and !$combat>>
+    <<getouticon>><<lanLink ['Leave', '离开'] `$location === 'docks' ? 'Docks' : $location === 'police_station' ? 'Police Station' : $location === 'townhall' ? 'Cliff Street' : $location === 'hospital' ? 'Hospital Foyer' : $location === 'brothel' ? 'Brothel' : $location === 'underground' ? 'Smuggler Pub' : $location === 'flats' ? 'Flats' : $location === 'home' ? 'Bedroom' : previous()`>><<endevent>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<!-- 可以明确退出一人的约见，不以本人在场或原版状态恢复作为销金的永久前置。 -->
+<<widget 'deadwood-heist-aftermath-withdraw'>>
+  <<set $_after_name to _args[0]>><<deadwood-heist-aftermath-check>>
+  <<if !_aftermath_ok or $passage isnot 'Deadwood Street Heist Aftermath' or !_aftermath_work.atMeeting or !['wren', 'landry'].includes($_after_name) or !_aftermath.leads.includes('pub') or _aftermath.leads.includes($_after_name + '_met')>><<exit>><</if>>
+  <<set _aftermath[$_after_name] to 'left'>>
+  <<run _aftermath.leads.pushUnique($_after_name + '_met', $_after_name + ':withdrawn')>>
+  <<if !_aftermath.leads.includes($_after_name + ':freed')>><<npcincr `$_after_name === 'wren' ? 'Wren' : 'Landry'` love -2>><</if>>
+  <<deadwood-heist-aftermath-update>><<goto 'Deadwood Street Heist Aftermath'>>
+<</widget>>
+
+<!-- 两人各自的处理只记本人。旁观不冒充营救，战败也不再扣第二遍原版战斗代价。 -->
+
+<<widget 'deadwood-heist-aftermath-sale'>>
+  <<if _aftermath.stage lt 5>><<exit>><</if>>
+  <<if _aftermath.stage gte 6>>
+    <<lanSwitch 'The remaining arrangements have been settled.' '剩下的安排已经了结。'>><br>
+    <<if _aftermath_work.state.outcome is 'success' and !_aftermath_work.state.settled>>
+      <<lanLink ['Take the accounts to the agreed division', '拿账目去按约分账']>>
+        <<deadwood-heist-aftermath-check>>
+        <<if _aftermath_ok and _aftermath_work.atMeeting and Time.hour gte 9 and Time.hour lt 18 and _aftermath.stage is 6 and _aftermath_campaign.gold.trade.stage is 5>><<endevent>><<goto 'Deadwood Street Heist Debrief'>><</if>>
+      <</lanLink>><br>
+    <</if>>
+  <<elseif _aftermath_campaign.gold.bars lte 0>>
+    <<lanSwitch 'No gold remains to sell. Close the outstanding accounts when you are ready.' '没有留下可卖的黄金。准备好了，就了结剩下的账目。'>><br>
+    <<lanLink ['Close these arrangements', '了结这些安排']>>
+      <<deadwood-heist-aftermath-check>>
+      <<if _aftermath_ok and _aftermath_work.atMeeting and $passage is 'Deadwood Street Heist Aftermath' and _aftermath.stage is 5 and _aftermath_campaign.gold.bars lte 0>><<set _aftermath.stage to 6, _aftermath_campaign.gold.trade.stage to 5, _aftermath_campaign.gold.trade.reason to 'empty'>><<goto 'Deadwood Street Heist Aftermath'>><</if>>
+    <</lanLink>><br>
+  <<else>>
+    <<deadwood-heist-gold-menu>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-sell'>>
+  <<deadwood-heist-gold-trade _args[0]>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-journal'>>
+  <<deadwood-heist-aftermath-check>>
+  <<deadwood-heist-letters-journal>>
+  <<if !_aftermath_active or _aftermath.stage gte 6>><<exit>><</if>>
+  <<if !_aftermath.letter_read>><<exit>><</if>>
+  <<if !_aftermath.leads.includes('pub')>>
+    <<lanSwitch 'Check the copies behind the bar at the smugglers’ pub, between 09:00 and 18:00.' '上午九点到下午六点，去走私者酒馆核对吧台后的副本。'>><br>
+  <<else>>
+    <<for _after_person range [{key:'wren',name:['Wren', '伦恩']},{key:'landry',name:['Landry', '兰德里']}]>>
+      <<lanSwitch `_after_person.name`>>：
+      <<switch _aftermath[_after_person.key]>>
+        <<case 'safe'>>
+          <<lanSwitch 'The earlier precautions held. The dockside handover remains available.' '先前的接应奏效，码头交接仍可照常进行。'>>
+        <<case 'held'>>
+          <<lanSwitch 'Under pressure; the disputed meeting is unresolved.' '受到威胁，约见尚未解决。'>>
+        <<case 'rescued'>>
+          <<lanSwitch 'Helped out of the dockside confrontation.' '已经协助脱离码头的冲突。'>>
+        <<case 'left'>>
+          <<if _aftermath.leads.includes(_after_person.key + ':freed')>><<lanSwitch 'The handover was settled, but you did not finish the escort.' '交接已经办妥，你没有完成后续护送。'>><<else>><<lanSwitch 'Will handle the disputed business separately.' '有争议的生意将自行处理。'>><</if>>
+      <</switch>><br>
+      <<if !_aftermath.leads.includes(_after_person.key + '_met') and _aftermath.leads.includes(_after_person.key + '_site')>>
+        <<deadwood-heist-rescue-journal _after_person.key>>
+      <</if>>
+    <</for>>
+    <<if (!_aftermath.leads.includes('wren_site') and _aftermath.wren is 'held') or (!_aftermath.leads.includes('landry_site') and _aftermath.landry is 'held')>>
+      <<lanSwitch 'Dockers can identify both addresses from 06:00 to 18:00. Warehouse permits can also be checked at the town hall from 09:00 to 17:00.' '早上六点到下午六点可向码头工人打听两处地址，也可在上午九点到下午五点去市政厅查仓库许可。'>><br>
+    <</if>>
+    <<if _aftermath.leads.includes('quinn_public')>><<lanSwitch 'You submitted the signed, redacted public account. Private names were withheld.' '你提交了签字的公开账目，隐去了私人姓名。'>><br><<elseif _aftermath.leads.includes('quinn_private')>><<lanSwitch 'You took the numbered private copy and promised not to post it publicly.' '你领取了带编号的私人副本，答应不公开张贴。'>><br><</if>>
+    <<if _aftermath.leads.includes('medical_record')>><<lanSwitch 'Harper retains your signed account of the injury.' '哈伯留有你签过字的受伤记录。'>><br><</if>>
+    <<if _aftermath.leads.includes('bailey_deposit') and !_aftermath.leads.includes('bailey_close')>><<lanSwitch 'Bailey still holds the £100 deposit. Bring back the cancelled guarantee during the usual morning meeting or the established flats visit.' '一百镑押款仍在贝利那里。拿到注销的担保后，可在原有晨间会面或公寓探访时交回。'>><br><</if>>
+    <<if _aftermath.leads.includes('aid_kit') and !_aftermath.leads.includes('aid_used') and !_aftermath.leads.includes('wren_met')>><<lanSwitch 'The paid dressing kit still needs to be applied before moving the injured Wren.' '已经付钱的敷料包还没用上，护送受伤的伦恩前，可以先包扎。'>><br><</if>>
+    <<if _aftermath.stage lt 5>>
+      <<if C.npc.Grant?.init is 1>><<lanSwitch 'If you can speak with Grant normally, the detective can check the guards’ authority at the station, 08:00–18:00.' '能正常与格兰特交谈时，可在上午八点到下午六点去警局请警探核查守卫的身份。'>><br><</if>>
+      <<lanSwitch 'Bailey keeps the guarantee; the hospital has a dockside supply receipt. These offer other leads.' '贝利握着担保单，医院留有送往码头的用品收据，也能从这些地方另找线索。'>><br>
+      <<if C.npc.Briar.init is 1>><<lanSwitch 'Briar also knows a visitor to the rear office.' '布莱尔还认识一位去后方办公室的访客。'>><br><</if>>
+    <<elseif _aftermath_campaign.gold.bars gt _aftermath_campaign.gold.sold>>
+      <<deadwood-heist-gold-journal>>
+    <<else>>
+      <<lanSwitch 'Return to the smugglers’ pub to close the remaining arrangements.' '回走私者酒馆了结剩余的安排。'>><br>
+    <</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-statistics'>>
+  <<deadwood-heist-aftermath-check>>
+  <<if !_aftermath_active>><<exit>><</if>>
+  <<for _after_row range [
+    [_aftermath.letter_read, ['Read the anonymous note', '读过匿名便笺']],
+    [_aftermath.leads.includes('pub'), ['Checked the disputed accounts', '核对有争议的账目']],
+    [_aftermath.leads.includes('wren_met'), ['Resolved Wren’s handover', '了结伦恩的取货会面']],
+    [_aftermath.leads.includes('landry_met'), ['Resolved Landry’s guarantee', '了结兰德里的担保会面']],
+    [_aftermath.stage gte 6, ['Closed the remaining arrangements', '了结行动余波']]
+  ]>>
+    <span @class="_after_row[0] ? 'green' : 'red'"><<= _after_row[0] ? '✓ ' : '○ '>><<lanSwitch `_after_row[1]`>></span><br>
+  <</for>>
+  <<for _after_person range [{key:'wren',name:['Wren', '伦恩']},{key:'landry',name:['Landry', '兰德里']}]>>
+    <<if _aftermath.leads.includes(_after_person.key + '_site') and _aftermath[_after_person.key] isnot 'left'>>
+      <<lanSwitch `_after_person.name`>>：
+      <<for _after_step range [{key:'scouted',name:['Approach', '侦查']},{key:'confirmed',name:['Identity checked', '确认']},{key:'freed',name:['Exit cleared', '放行']},{key:'escorted',name:['Escort', '护送']}]>>
+        <span @class="_aftermath.leads.includes(_after_person.key + ':' + _after_step.key) ? 'green' : 'grey'"><<= _aftermath.leads.includes(_after_person.key + ':' + _after_step.key) ? '✓ ' : '○ '>><<lanSwitch `_after_step.name`>></span>
+      <</for>><br>
+    <</if>>
+  <</for>>
+  <<if _aftermath.wren is 'left' or _aftermath.landry is 'left'>><span class='blue'><<lanSwitch 'A resolved meeting does not necessarily mean a successful rescue.' '会面已经了结，不代表一定成功救援。'>></span><br><</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-inquire'>>
+  <<if !_aftermath.leads.includes(_args[0])>>
+    <<capture _args>>
+      <<lanLink `_args[2]`>>
+        <<deadwood-heist-aftermath-action _args[0] _args[1]>>
+        <<if _aftermath_done>><<goto $passage>><<else>><<deadwood-heist-aftermath-feedback>><</if>>
+      <</lanLink>><br>
+    <</capture>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-feedback'>>
+  <<if !$nextPassage and !$nextPassageCheck and !$eventforced and !$combat>>
+    <<replace '#heist-aftermath-feedback'>><span class='blue'><<lanSwitch 'The arrangement could not be completed. Check the time, the fee and whether the person is still available.' '这件事没能办完。需要看看时间、钱款，以及对方现在是否方便。'>></span><br><</replace>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-extra'>>
+  <<switch _args[0]>>
+    <<case 'grant'>>
+      <<if _aftermath.leads.includes('grant') and ['warned', 'cleared'].includes(_aftermath_campaign.clerk)>>
+        <<language>>
+          <<option 'EN'>>
+            "The counter report mentions someone making room for the customers to leave," Grant says. "That belongs in the account too. It doesn't cancel the rest." The detective has already compared that part of the statement with the building's report, saving you another round of questions.
+          <<option 'CN'>>
+            “柜台的报告提到，有人让客人先离开。”格兰特说。“那一段也得记，不代表别的就算了。”警探已经把这部分口供与楼里的报告对过，省下了一轮重复的问话。
+        <</language>><br><br>
+      <</if>>
+      <<if _aftermath.leads.includes('grant_explain')>>
+        <<lanSwitch 'Grant has marked the discrepancy in your statement. You can now explain which charges were added after the original agreement.' '格兰特在记录里标出了前后不符的地方。哪些费用是后来追加的，你现在能说清楚了。'>><br><br>
+      <<elseif _aftermath.leads.includes('grant') and _aftermath.leads.includesAny('quinn_private', 'public_record')>>
+        <<language>>
+          <<option 'EN'>>
+            "Now there's an account number I can compare," Grant says, looking at the council copy. "If you want to challenge a clause, understand which clause it is. Don't go in there reciting somebody else's threats."
+          <<option 'CN'>>
+            “这回有个能对上的账户编号了。”格兰特看过市政厅副本，说。“想质疑哪条，就弄清楚是哪条。别进去以后，只会照着别人的威胁再念一遍。”
+        <</language>><br><br>
+        <<set _grant_minutes to Math.max(5, (_aftermath_work.contacts.grantTier gte 2 ? 5 : 15) - (['warned', 'cleared'].includes(_aftermath_campaign.clerk) ? 5 : 0))>>
+        <<deadwood-heist-aftermath-inquire 'grant_explain' _grant_minutes `['Clarify the discrepancy for the statement (0:' + String(_grant_minutes).padStart(2, '0') + ')', '向警探说明账目中的出入 (0:' + String(_grant_minutes).padStart(2, '0') + ')']`>>
+      <</if>>
+    <<case 'quinn'>>
+      <<if _aftermath.leads.includes('quinn_public')>>
+        <<language>>
+          <<option 'EN'>>
+            The public copy retains the financial centre's collection account, the warehouse number and the limit of the guarantee. Private names and the next buyer have been covered. Quinn signs a statement confirming those entries, then adds another line denying any council instruction to collect the extra debt.<br><br>
+            The clerk accepts your request to place it on the public record. Quinn's reply is noticeably shorter afterwards. A buyer can read the same paper now, and may use the attention to argue for a lower price.
+          <<option 'CN'>>
+            公开版留下金融中心的受托收款账户、仓库编号与担保范围，经手者和下一个买家的姓名都被遮去了。奎恩签字确认这些条目，又添了一行，声明追加追债并非市政厅指示。<br><br>
+            柜台收下了你主动提交的公开备案。往后奎恩回话，明显简短了些。收货人如今也能读到同一份纸，可能借着受人注意，压低价钱。
+        <</language>><br><br>
+      <<elseif _aftermath.leads.includes('quinn_private')>>
+        <<language>>
+          <<option 'EN'>>
+            The numbered copy comes back in a sealed cover. A note beside Quinn's signature asks you to keep the private account details out of a public notice. You have agreed. The document still shows exactly which delivery was guaranteed, and can be checked with Grant without publishing a list of contacts.
+          <<option 'CN'>>
+            带编号的副本装在封套里送回。奎恩的签名旁留了一句话，要你别把私人账目挂成公开告示。你答应了。文件仍写清担保过哪次交付，可以交给格兰特核对，不必公布一串联络人的名字。
+        <</language>><br><br>
+      <<elseif _aftermath.leads.includes('quinn')>>
+        <<language>>
+          <<option 'EN'>>
+            The account number on the old receipt matches a financial-centre collection account in the lease papers. The clerk offers two forms: a signed public statement about the permitted collection, or a numbered private copy of the guarantee. Quinn has asked that the private papers not be made into a public notice without a decision being recorded.<br><br>
+            Publishing makes the disputed demand easier to challenge, but exposes the account and puts the mayor's signature beneath it. Taking the private copy keeps that promise of discretion and gives you the guarantee itself.
+          <<option 'CN'>>
+            旧收据上的编号，与租约里一项金融中心的受托收款账户相符。柜台给出两种表格：公开确认获准收款范围的声明，或者带编号的私人担保副本。奎恩要求，在有人明确作出决定之前，不要把私人材料挂成公开告示。<br><br>
+            公开后，更容易质疑追加的索偿，但账户会被摆出来，市长的名字也要签在下面。取私人副本，则保留口头答应的谨慎，也能拿到担保本身。
+        <</language>><br><br>
+        <<deadwood-heist-aftermath-inquire 'quinn_public' 10 `['Submit a redacted, signed public record (0:10)', '提交隐去私人姓名的公开签字备案 (0:10)']`>>
+        <<deadwood-heist-aftermath-inquire 'quinn_private' 10 `['Take the private copy and promise discretion (0:10)', '领取私人副本，答应不公开张贴 (0:10)']`>>
+      <</if>>
+    <<case 'bailey'>>
+      <<if _aftermath.leads.includes('bailey_close')>>
+        <<language>>
+          <<option 'EN'>>
+            Bailey checks the cancelled guarantee against the retained copy. <<if _aftermath.leads.includes('public_record')>>"My copy is all over the public record now. You've made your point." The paper is put away with a hard tap. <<if _aftermath.leads.includes('bailey_deposit')>>The deposit stays in the drawer.<</if>><<else>>"Good. Nobody gets to send this bill through me again." The cancelled line is marked in the ledger. <<if _aftermath.leads.includes('bailey_deposit')>>Bailey counts the hundred back out. "The deposit. Don't start calling it a reward."<</if>><</if>>
+          <<option 'CN'>>
+            贝利把注销的担保与留下的副本对过。<<if _aftermath.leads.includes('public_record')>>“我这份副本，如今公开档案里到处都能查。你很能说明问题。”纸被重重收了起来。<<if _aftermath.leads.includes('bailey_deposit')>>押款仍留在抽屉里。<</if>><<else>>“好。这张账单，别想再经我这里收一次。”账簿上相应的一栏被划掉。<<if _aftermath.leads.includes('bailey_deposit')>>贝利数出那一百镑。“押款。别管它叫什么报酬。”<</if>><</if>>
+        <</language>><br><br>
+      <<elseif _aftermath.leads.includes('bailey') and _aftermath.leads.includes('landry:freed')>>
+        <<lanSwitch 'Bailey wants the cancellation brought back before closing the old account. If you made the guarantee public, expect an argument about who was meant to keep it private.' '贝利要你带回注销凭证，才肯关掉旧账。如果已经公开了担保，免不了争论是谁该把它收好。'>><br><br>
+        <<deadwood-heist-aftermath-inquire 'bailey_close' 10 `['Bring back the cancelled guarantee (0:10)', '交回注销的担保凭证 (0:10)']`>>
+      <<elseif _aftermath.leads.includes('bailey')>>
+        <<lanSwitch '“Bring back the cancellation. I want this line closed before somebody bills it through me again.”' '“把注销的凭证带回来。我得先关掉这一栏，省得又有人从我这里过一遍账。”'>><br><br>
+      <</if>>
+    <<case 'hospital'>>
+      <<if _aftermath.leads.includes('hospital') and _aftermath_campaign.team?.injured.includes('Wren') and !_aftermath_campaign.team.aid.includes('Wren') and !_aftermath.leads.includes('wren_met')>>
+        <<if _aftermath.leads.includes('hospital_aid')>>
+          <<lanSwitch 'You have paid for a sealed dressing kit and instructions for supporting the injury. It still needs to be used before the dockside escort.' '你已付钱领取封好的敷料包，以及支撑伤处的说明。去码头护送前，还得实际替伦恩用上。'>><br><br>
+        <<else>>
+          <<lanSwitch 'Reception can supply dressings and a simple support for £50. No name or medical history is needed to buy supplies. The injured person will still need help moving.' '前台能提供敷料和简单的支撑用品，收五十镑。买用品不必交出谁的姓名或病历，受伤的人走动时仍需要帮忙。'>><br><br>
+          <<deadwood-heist-aftermath-inquire 'hospital_aid' 10 `['Pay for dressings and instructions: £50 (0:10)', '付五十镑领取敷料和使用说明 (0:10)']`>>
+        <</if>>
+      <</if>>
+      <<if _aftermath.leads.includes('harper_paid')>>
+        <<lanSwitch 'You paid the fee and described the injured area. Harper checked and dressed it without asking for an account of the job.' '你交了诊费，只说明受伤的部位。哈伯检查、处理了伤处，没有追问整场差事的经过。'>><<lpain>><br><br>
+      <<elseif _aftermath.leads.includes('medical_record')>>
+        <<lanSwitch 'The injury has been treated. Your signed account of how it happened remains in Harper’s file. The doctor did not ask for the buyer’s name, and you did not give it.' '伤处已经处理。你签过字的受伤经过，留在哈伯的档案里。医生没有问买家的名字，你也没有交出去。'>><<lpain>><br><br>
+      <<elseif $pain gt 0 and $harper_appointments?.enabled and Time.weekDay is 6 and $daily.harperVisit isnot 1 and $trauma lt $traumamax * 0.9 and C.npc.Harper.init is 1 and C.npc.Harper.state is 'active'>>
+        <<language>>
+          <<option 'EN'>>
+            Harper notices how you move. "Before you leave, that should be looked at." A blank form is turned towards you. "A hundred for the extra dressing. Or you can tell me how it happened for the record, and I'll include it in today's case notes." The pen is set neatly beside the signature line.<br><br>
+            You can pay and keep the explanation to the injury itself, or let Harper retain your signed account. Neither choice settles anything with the police.
+          <<option 'CN'>>
+            哈伯留意到你走动的姿势。“走之前，那个最好看看。”空白表格转到你面前。“额外处理，一百镑。或者说说怎么弄的，留个记录，我就算进今天的病例。”钢笔整齐地放在签名栏旁。<br><br>
+            你可以付钱，只说明伤处，也可以让哈伯保留你签字的经过。哪种都不会替你解决警局的事情。
+        <</language>><br><br>
+        <<deadwood-heist-aftermath-inquire 'harper_paid' 20 `['Pay £100 and describe only the injury (0:20)', '付一百镑，只说明伤处 (0:20)']`>>
+        <<deadwood-heist-aftermath-inquire 'medical_record' 20 `['Let Harper keep a signed account (0:20)', '让哈伯留下签字的受伤记录 (0:20)']`>>
+      <</if>>
+  <</switch>>
+<</widget>>
+
+:: Deadwood Street Heist Aftermath Grant
+<<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or !_aftermath.leads.includes('pub') or $location isnot 'police_station' or !_aftermath_work.grantAvailable or C.npc.Grant?.init isnot 1 or C.npc.Grant.state isnot 'active' or maplebirch.npc.Schedule.get('Grant').location isnot 'police_station'>><<deadwood-heist-aftermath-unavailable>><<exit>><</if>>
+<<effects>><<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+<!-- 重绘会重新建立此页人物，先结束上一场自由交谈。 -->
+<<endevent>><<npc 'Grant'>><<person1>>
+<div id='heist-aftermath-feedback'></div>
+<<language>>
+  <<option 'EN'>>
+    Grant lays your copy flat without taking the original. "Private security. That doesn't give them a cell, or the right to hold someone until another person pays." The detective looks up. "It doesn't make the goods legal, either."<br><br>
+    <<if _aftermath_work.contacts.grantTier gte 2>>"You've brought me things I could check before. Give me the company and the place. Leave out what you only suspect."<<else>>"Start with what you saw. I won't put a rumour in the custody book."<</if>><br><br>
+    "And if you have something outstanding yourself, it's still outstanding."
+  <<option 'CN'>>
+    格兰特把副本摊平，没有拿走原件。“私人保安。不是挂个牌子，就能设间牢房，扣个人等别人交钱。”警探抬起眼。“也不是说，那批货就一定来路正当。”<br><br>
+    <<if _aftermath_work.contacts.grantTier gte 2>>“你以前拿来的东西，有些能查。把公司和地点说清楚。只是猜的，就先别写进去。”<<else>>“从你看到的说起。我不会把传闻填进羁押记录。”<</if>><br><br>
+    “至于你自己还有什么没处理的，照旧。”
+<</language>><br><br>
+<<if _aftermath.leads.includes('grant')>>
+  <<language>>
+    <<option 'EN'>>
+      The company on the receipt holds a cargo-handling permit. Grant writes the permit number in the notebook, then on your copy. "If somebody's holding a person there, report where and what happened. We'll check it. This number isn't permission to search the place."<br><br>
+      The warehouse can be found from the cargo number. The detective keeps the allegation for checking, not as a promise to escort you inside.
+    <<option 'CN'>>
+      收据上的公司持有的是装卸货物的许可。格兰特把编号写进记事簿，又抄在你的副本上。“有人在那里扣人，就说清地点和经过，我们会查。这个号码，不是让你进去搜查的通行证。”<br><br>
+      顺着货号，能找到那间仓库。警探留下这项指控继续核实，没有答应陪你闯进去。
+  <</language>><br><br>
+<<else>>
+  <<set _grant_minutes to Math.max(5, (_aftermath_work.contacts.grantTier gte 2 ? 5 : 15) - (['warned', 'cleared'].includes(_aftermath_campaign.clerk) ? 5 : 0))>>
+  <<deadwood-heist-aftermath-inquire 'grant' _grant_minutes `['Give the verifiable details (0:' + String(_grant_minutes).padStart(2, '0') + ')', '提供可以查证的细节 (0:' + String(_grant_minutes).padStart(2, '0') + ')']`>>
+<</if>>
+<<deadwood-heist-aftermath-extra 'grant'>>
+<<getouticon>><<lanLink ['Return to reception', '回到前台'] 'Police Station'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Street Heist Aftermath Records
+<<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or !_aftermath.leads.includes('pub') or $location isnot 'townhall' or Time.hour lt 9 or Time.hour gte 17>><<deadwood-heist-aftermath-unavailable>><<exit>><</if>>
+<<effects>><<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+<div id='heist-aftermath-feedback'></div>
+<<language>>
+  <<option 'EN'>>
+    You ask for the permitted uses and entrances of the warehouse named on the copies. The receptionist draws a line under <i>public register</i> on a form. "Not the mayor's private correspondence. Fill this in."<br><br>
+    You can request the property records without explaining the bank job. The guarantor's copy goes upstairs for a signature.
+  <<option 'CN'>>
+    你要查副本上那间仓库获准的用途和出入口。前台在表格的<i>公开登记</i>下面画了一道线。“不是市长的私人信件。把这里填好。”<br><br>
+    调取房产登记不必解释银行的事情。担保单的副本，则被送到楼上，等候签字。
+<</language>><br><br>
+<<if _aftermath.leads.includes('quinn')>>
+  <<language>>
+    <<option 'EN'>>
+      A reply returns bearing Quinn's signature. The warehouse's side passage must remain clear for deliveries. The rear office is leased to a different firm; a cargo guarantee grants no authority to detain its guarantor.<br><br>
+      One sentence is underlined twice: <i>The council has neither instructed nor authorised the collection of private debts on these premises.</i> The reply gives you both addresses. The mayor is careful to promise nothing beyond what is on the register.
+    <<option 'CN'>>
+      回函上签着奎恩的名字。仓库侧面的通道必须留给送货人，后面的办公室则租给了另一家公司。一份货物担保，并不赋予扣留担保人的权力。<br><br>
+      有一句话被划了两道：<i>市政厅并未指示或许可在此处追收私人债务。</i>回函附上了两处地址。市长写得很谨慎，登记簿之外的事，一件也没有答应。
+  <</language>><br><br>
+<<else>>
+  <<deadwood-heist-aftermath-inquire 'quinn' 20 `['Request the public record (0:20)', '申请调阅公开登记 (0:20)']`>>
+<</if>>
+<<deadwood-heist-aftermath-extra 'quinn'>>
+<<getouticon>><<lanLink ['Leave the town hall', '离开市政厅'] 'Cliff Street'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Street Heist Aftermath Bailey
+<<deadwood-heist-aftermath-check>>
+<<set _after_bailey to maplebirch.get('StreetLife').bailey>>
+<<if !_aftermath_ok or !_aftermath.leads.includes('pub') or $location isnot (_after_bailey.defeated ? 'flats' : 'home') or !_after_bailey.atHome>><<deadwood-heist-aftermath-unavailable>><<exit>><</if>>
+<<effects>><<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+<!-- 重绘会重新建立此页人物，先结束上一场自由交谈。 -->
+<<endevent>><<npc 'Bailey'>><<person1>>
+<div id='heist-aftermath-feedback'></div>
+<<language>>
+  <<option 'EN'>>
+    Bailey stops turning a receipt when you mention the warehouse. "Lots of people guarantee things. They're usually less keen when someone comes to collect." A thumb covers the figure at the bottom.<br><br>
+    <<if _after_bailey.defeated>>You tell Bailey to uncover the line. The paper is moved with a sour look. "You wanted to talk business. Talk."<<elseif _after_bailey.peer>>Bailey studies you for a moment before lowering the receipt. "Avery's arrangements don't make this one free. What are you asking for?"<<elseif _after_bailey.free>>"Your old rent isn't on this sheet," Bailey says before you can object. "Neither is a favour."<<else>>"Keep your own payments straight before worrying about someone else's," Bailey says, tapping the guarantor's line.<</if>>
+  <<option 'CN'>>
+    听见仓库，贝利翻收据的手停住了。“替人作担保的多得是。等收账的人上门，通常就没那么热心了。”拇指按住下方的数目。<br><br>
+    <<if _after_bailey.defeated>>你让贝利把那一栏露出来。纸被挪开，对方脸色不太好看。“你要谈生意，那就谈。”<<elseif _after_bailey.peer>>贝利打量你片刻，才放低收据。“艾弗里的安排，不是这一笔免费的理由。你要问什么？”<<elseif _after_bailey.free>>“这张纸上没写你以前的房租。”你还没开口，贝利便说。“也没写我要帮忙。”<<else>>“先把你自己的钱交明白，再操心别人的。”贝利敲了敲担保人那一栏。<</if>>
+<</language>><br><br>
+<<if _aftermath.leads.includes('bailey')>>
+  <<language>>
+    <<option 'EN'>>
+      The duplicate concerns storage charges, not the contents of the vault. Landry guaranteed the old cargo's delivery, not every loss suffered by its owner. You copy the limit of the guarantee and the rear office's address.<br><br>
+      "If they want more, they can ask for more," Bailey says. "That doesn't mean <<nnpc_he 'Landry'>> agreed to it. Don't tell <<nnpc_him 'Landry'>> I sent you."
+    <<option 'CN'>>
+      副本写的是保管费，不是金库里有些什么。兰德里担保的是旧货按约交付，不是替货主承担往后一切损失。你抄下担保的范围，以及后方办公室的地址。<br><br>
+      “想多要，当然可以开口。”贝利说。“不代表<<nnpc_he 'Landry'>>答应过。别跟<<nnpc_him 'Landry'>>说是我让你去的。”
+  <</language>><br><br>
+<<else>>
+  <<if !_after_bailey.canNegotiate>><<lanSwitch 'Bailey asks for a £100 deposit against the copied guarantee, returned when you bring back its cancellation. You can look for another source instead.' '贝利要押一百镑，等你带回注销的担保，才肯退还。你也可以另找线索。'>><br><</if>>
+  <<deadwood-heist-aftermath-inquire 'bailey' 10 `_after_bailey.canNegotiate ? ['Point out the limits written on the guarantee (0:10)', '指出担保单写明的范围 (0:10)'] : ['Leave the deposit and copy the receipt (0:10)', '交押款，抄下收据 (0:10)']`>>
+<</if>>
+<<deadwood-heist-aftermath-extra 'bailey'>>
+<<getouticon>><<lanLink ['Leave', '离开'] `_after_bailey.defeated ? 'Flats' : "Bailey's Office"`>><<endevent>><</lanLink>><br>
+
+:: Deadwood Street Heist Aftermath Briar
+<<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or !_aftermath.leads.includes('pub') or $location isnot 'brothel' or C.npc.Briar.init isnot 1 or C.npc.Briar.state isnot 'active'>><<deadwood-heist-aftermath-unavailable>><<exit>><</if>>
+<<effects>><<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+<!-- 重绘会重新建立此页人物，先结束上一场自由交谈。 -->
+<<endevent>><<npc 'Briar'>><<person1>>
+<div id='heist-aftermath-feedback'></div>
+<<language>>
+  <<option 'EN'>>
+    Briar recognises the firm on the copy. "Likes a private room. Likes to call it an office afterwards." A finger taps the blank space beside the visitor's name. "I'm not handing you a list of my customers."<br><br>
+    <<if C.npc.Briar.love gte 30>>"You know what discretion costs. A hundred for an introduction they won't question."<<else>>"Two hundred. You get a delivery appointment with the right stamp. You don't get to use my name for whatever you do next."<</if>>
+  <<option 'CN'>>
+    布莱尔认出了副本上的公司。“喜欢包间。过后还喜欢管它叫办公室。”手指敲了敲访客名字旁的空白。“我不会把客人的名单交给你。”<br><br>
+    <<if C.npc.Briar.love gte 30>>“你知道嘴严也要花钱。一百，换个他们不会多问的引见。”<<else>>“两百。给你一张盖对印章的送货预约。后面无论做什么，都不许打我的名号。”<</if>>
+<</language>><br><br>
+<<if _aftermath.leads.includes('briar')>>
+  <<language>>
+    <<option 'EN'>>
+      Briar gives you the appointment and the rear office's address. The document identifies a legitimate delivery expected there; it is no warrant, and no new identity. "They'll still ask what you've brought. Have an answer."
+    <<option 'CN'>>
+      布莱尔给了你预约单和后方办公室的地址。单上写着一份对方确实在等的货物，不是搜查令，也不是什么新身份。“他们还是会问，你送来了什么。想好怎么回答。”
+  <</language>><br><br>
+<<else>>
+  <<deadwood-heist-aftermath-inquire 'briar' 10 `['Buy the delivery appointment (0:10)', '买下送货预约 (0:10)']`>>
+<</if>>
+<<getouticon>><<lanLink ['Return downstairs', '回到楼下'] 'Brothel'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Street Heist Aftermath Hospital
+<<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or !_aftermath.leads.includes('pub') or $location isnot 'hospital' or Time.hour lt 8 or Time.hour gte 18>><<deadwood-heist-aftermath-unavailable>><<exit>><</if>>
+<<effects>><<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+<div id='heist-aftermath-feedback'></div>
+<<language>>
+  <<option 'EN'>>
+    The cargo copy lists a first-aid collection. You ask reception which delivery entrance serves the company. "Supply receipts, then," the receptionist says. "You can't look through somebody else's medical notes."<br><br>
+    <<if $harper_appointments?.enabled and Time.weekDay is 6 and $daily.harperVisit isnot 1 and $trauma lt $traumamax * 0.9 and C.npc.Harper.init is 1 and C.npc.Harper.state is 'active' and _aftermath_ok>><<endevent>><<npc 'Harper'>><<person1>>Harper pauses by reception on the way to the consulting room. "A troublesome collection? Be careful around loading doors." The smile does not change when you mention an injured courier. "If they require treatment, reception can arrange it. We can discuss your concerns at your own appointment."<</if>>
+  <<option 'CN'>>
+    货单上列着一批急救用品。你向前台询问，那家公司的货车从哪里领取。“那就查用品收据。”接待员说。“别人的病历，不能给你翻。”<br><br>
+    <<if $harper_appointments?.enabled and Time.weekDay is 6 and $daily.harperVisit isnot 1 and $trauma lt $traumamax * 0.9 and C.npc.Harper.init is 1 and C.npc.Harper.state is 'active' and _aftermath_ok>><<endevent>><<npc 'Harper'>><<person1>>哈伯去诊室前，在前台停了一下。“领货出了问题？装卸门附近可要当心。”你提到受伤的送货人时，那张笑脸没有变化。“需要治疗的话，前台可以安排。至于你担心的事，我们可以在你的预约里慢慢谈。”<</if>>
+<</language>><br><br>
+<<if _aftermath.leads.includes('hospital')>>
+  <<language>>
+    <<option 'EN'>>
+      The supply receipt names the warehouse and its side entrance. The receptionist circles the first-aid collection number so you need not ask for a patient's name. It identifies the consignment, without telling you who may have needed treatment. Dressings can be bought separately if anyone needs them.
+    <<option 'CN'>>
+      用品收据写明仓库和侧门。接待员圈出领取急救用品的编号，你不必再去追问病人的姓名。编号能核实货物，却不能说明谁曾需要治疗。真有人需要敷料，可以另外购买。
+  <</language>><br><br>
+<<else>>
+  <<deadwood-heist-aftermath-inquire 'hospital' 15 `['Check the collection receipt (0:15)', '核对用品领取收据 (0:15)']`>>
+<</if>>
+<<deadwood-heist-aftermath-extra 'hospital'>>
+<<getouticon>><<lanLink ['Return to the foyer', '回到大厅'] 'Hospital Foyer'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Street Heist Aftermath Docks
+<<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or !_aftermath.leads.includes('pub') or $location isnot 'docks' or Time.hour lt 6 or Time.hour gte 18>><<deadwood-heist-aftermath-unavailable>><<exit>><</if>>
+<<effects>><<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+<div id='heist-aftermath-feedback'></div>
+<<language>>
+  <<option 'EN'>>
+    You show the cargo numbers without mentioning the bank. The first docker points you towards another shift; the next sends you back along the quay. Finding someone who actually handled the consignment takes time.
+  <<option 'CN'>>
+    你只出示货号，没有提银行。头一个工人让你找另一班人，下一个又指着码头的来路。找个确实经手过这批货的人，需要花些功夫。
+<</language>><br><br>
+<<if _aftermath.leads.includes('docks')>>
+  <<language>>
+    <<option 'EN'>>
+      A tally clerk identifies the warehouse and the guarantor's rear office. "Both open from six to ten. Those people are waiting for a signature, not doing our work." The clerk shows you the two doors from a distance. "Whatever you say to them, keep my name out of it."
+    <<option 'CN'>>
+      一名理货员认出仓库，以及后面的担保室。“六点到十点。那些人在等人签字，不是替我们干活。”对方远远指出两扇门。“你去说什么都行，别提是我告诉你的。”
+  <</language>><br><br>
+<<else>>
+  <<deadwood-heist-aftermath-inquire 'docks' 40 `['Follow the cargo numbers through the shifts (0:40)', '顺着货号逐班打听 (0:40)']`>>
+<</if>>
+<<getouticon>><<lanLink ['Return to the quay', '回到码头'] 'Docks'>><<endevent>><</lanLink>><br>
+
+:: Deadwood Street Heist Aftermath
+<<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or !_aftermath.letter_read or !_aftermath_work.atMeeting>><<deadwood-heist-aftermath-unavailable>><<exit>><</if>>
+<<effects>><<deadwood-heist-aftermath-check>>
+<<if !_aftermath_ok or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+<<language>>
+  <<option 'EN'>>
+    The bartender puts two folded copies beside your drink, leaving the originals under the counter. One bears a cargo number; the other has a guarantor's line. Neither is a bank withdrawal slip.<br><br>
+    "Someone wants a second payment," comes the quiet explanation. "Not here. And don't bring anything for them to count."
+  <<option 'CN'>>
+    酒保把两份折好的副本放在你的杯子旁，原件仍收在柜台下面。一份写着货号，另一份有担保人的签名栏，都不是银行的提款单。<br><br>
+    “有人想再收一笔。”解释的声音很低。“别在这里谈，也别带东西来给他们数。”
+<</language>><br><br>
+<div id='heist-aftermath-feedback'></div>
+<<if !_aftermath.leads.includes('pub')>>
+  <<lanLink ['Compare the copies with the agreed arrangements (0:20)', '核对副本与先前的约定 (0:20)']>>
+    <<deadwood-heist-aftermath-action 'pub' 20>><<if _aftermath_done>><<goto 'Deadwood Street Heist Aftermath'>><<else>><<deadwood-heist-aftermath-feedback>><</if>>
+  <</lanLink>><br>
+  <<if Time.hour lt 9 or Time.hour * 60 + Time.minute + 20 gte 18 * 60>><span class='blue'><<lanSwitch 'The records can be checked between nine and six. Leave enough time before the evening crowd arrives.' '上午九点到下午六点可以核对记录，须赶在晚间客人到来前办完。'>></span><br><</if>>
+<<else>>
+  <<language>>
+    <<option 'EN'>>
+      Wren's copy concerns a shipment accepted before the bank job. Private collectors now claim the cargo is security for a much larger debt. Landry's copy concerns the warehouse guarantee used to arrange its sale. Someone has put the two accounts together and is demanding the name of the next buyer.<br><br>
+      They can still go about their usual business. It is the collection and the guarantee meeting that have become dangerous. Neither paper is an arrest warrant.
+    <<option 'CN'>>
+      伦恩的那份涉及银行行动前接下的一批货。私人追债人如今声称，那是另一笔大额欠款的抵押物。兰德里的那份，则是为销货安排的仓库担保。有人把两笔账凑到了一起，逼问下一个买家的名字。<br><br>
+      两人仍能照常做自己的生意，危险的是接下来的取货与担保会面。两张纸都不是逮捕令。
+  <</language>><br><br>
+  <<deadwood-heist-aftermath-journal>>
+  <<if _aftermath.stage lt 5>>
+    <<for _after_person range [{key:'wren',name:['Leave Wren to handle the appointment', '不再介入伦恩的约见']},{key:'landry',name:['Leave Landry to handle the appointment', '不再介入兰德里的约见']}]>>
+      <<if !_aftermath.leads.includes(_after_person.key + '_met')>>
+        <<capture _after_person>>
+          <<lanLink _after_person.name>><<deadwood-heist-aftermath-withdraw _after_person.key>><</lanLink>><br>
+        <</capture>>
+      <</if>>
+    <</for>>
+    <span class='blue'><<lanSwitch 'Leaving before they are clear of the dispute will strain the relationship. You can still arrange a buyer for the gold.' '对方尚未脱身时退出，会损伤彼此的关系。黄金仍可另找买家。'>></span><br>
+  <</if>>
+  <<if _aftermath.stage gte 5>>
+    <<deadwood-heist-aftermath-sale>>
+  <</if>>
+<</if>><br>
+<<getouticon>><<lanLink ['Return to the bar', '回到吧台'] 'Smuggler Pub'>><<endevent>><</lanLink>><br>

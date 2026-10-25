@@ -4,9 +4,9 @@
 <<widget 'deadwood-street-heist-bank-incident'>>
   <<set _heistBankWork to maplebirch.get('StreetLife')?.heist>>
   <<if _heistBankWork and _heistBankWork.state.entered and !_heistBankWork.state.bankReaction and _heistBankWork.state.approach is 'loud' and maplebirch.get('Finance')>>
-    <<if maplebirch.npc.Schedule.get('Adrian').location is 'financial_centre' and C.npc.Adrian?.init is 1 and (C.npc.Adrian.love gte 10 or $Finance.adrian.visits gte 3) and $face isnot 'covered' and !$worn.face.type.includes('mask')>>
+    <<if _heistBankWork.state.campaign?.clerk isnot 'loading' and $location is 'financial_centre' and maplebirch.npc.Schedule.get('Adrian').location is 'financial_centre' and C.npc.Adrian?.init is 1 and C.npc.Adrian.state is 'active' and (C.npc.Adrian.love gte 10 or $Finance.adrian.visits gte 3) and $face isnot 'covered' and !$worn.face.type.includes('mask')>>
       <<set _heistBankWork.state.identified to true, _heistBankWork.state.bankReaction to true>>
-      <<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) - 15, 0, 50)>>
+      <<set C.npc.Adrian.love to Math.clamp((C.npc.Adrian.love ?? 0) - (_heistBankWork.state.campaign?.clerk is 'warned' ? 8 : 15), 0, 50)>>
       <<set C.npc.Adrian.rage to Math.clamp((C.npc.Adrian.rage ?? 0) + 10, 0, 30)>>
       <<language>>
         <<option 'EN'>>
@@ -14,6 +14,9 @@
         <<option 'CN'>>
           阿德里安从柜台后抬起头，惊愕的目光里忽然多了认出的神色。“是你？”阿德里安退离玻璃，任由手边的文书散落。<span class='red'>柜员已经认出了这位熟客。</span>
       <</language>><<lllove 'Adrian'>><br><br>
+      <<if _heistBankWork.state.campaign?.clerk is 'warned'>>
+        <<lanSwitch 'The warning got the clerk away from the glass. It did not make this acceptable.' '那声提醒让柜员离开了玻璃前，却没让这件事变得可以接受。'>><br><br>
+      <</if>>
     <</if>>
   <</if>>
 <</widget>>

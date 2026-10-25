@@ -1,0 +1,241 @@
+:: Deadwood Heist Interior Widgets [widget]
+
+<!-- 新场合也让位于原版伤病、命运、离场、约会和周五门诊。 -->
+<<widget 'deadwood-heist-reception-presence'>>
+  <<set _hcAveryPresent to C.npc.Avery?.init is 1 and C.npc.Avery.state is 'active' and !$avery_injury and !['fallen', 'kicked'].includes($avery_fate) and !['away', 'party', 'party_prepare', 'date', 'sleep', 'bath', 'pool', 'dressing'].includes($avery_mansion?.schedule) and !$averydate and !$averydatedone and !$averydatemissed and !($avery_valentines?.invite and !$avery_valentines.done)>>
+  <<set _hcHarperPresent to C.npc.Harper?.init is 1 and C.npc.Harper.state is 'active' and $harperSeen?.includes('party') and !(Time.weekDay is 6 and $harper_appointments?.enabled) and !$schoolPsych>>
+<</widget>>
+
+<!-- 分工使用雇员当下的原版技能和健康；熟悉程度只改善本人的贡献。 -->
+<<widget 'deadwood-heist-case-roles'>>
+  <<set _hcRoleHeist to maplebirch.get('StreetLife')?.heist>>
+  <<set _hcScout to _hcRoleHeist?.crew.find(npc => npc.heist.role === 'scout'), _hcCarrier to _hcRoleHeist?.crew.find(npc => npc.heist.role === 'carrier')>>
+  <<set _hcCoordination to 1 + (_hcRoleHeist?.crewLeader ? (_hcRoleHeist.terms.crewLeader.skillBonus ?? 0) : 0) + (_hcRoleHeist?.familiarity ?? 0) / 100 * (_hcRoleHeist?.terms?.crewLeader?.familiarityBonus ?? 0)>>
+  <<set _hcScoutSkill to _hcScout ? Math.clamp((_hcRoleHeist.roleSkills[_hcScout.per]?.scout ?? 0) * Math.clamp(_hcScout.health / _hcScout.healthmax, 0, 1) * _hcCoordination, 0, 1000) : 0>>
+  <<set _hcCarrierSkill to _hcCarrier ? Math.clamp((_hcRoleHeist.roleSkills[_hcCarrier.per]?.carrier ?? 0) * Math.clamp(_hcCarrier.health / _hcCarrier.healthmax, 0, 1) * _hcCoordination, 0, 1000) : 0>>
+<</widget>>
+
+<<widget 'deadwood-heist-reception-interior'>>
+  <<set _hcInteriorReady to false>><<deadwood-heist-case-roles>>
+  <<if !_hcSteps.includes('gallery_entered')>>
+    <<language>><<option 'EN'>>
+      The reception continues above the stairwell. The private gallery below displays the donors' deposits behind glass. Beyond it is a separate vault room. Briar's case has been carried there for the final count; the chair upstairs no longer holds it.<br><br>
+      Quinn pauses beside the gallery attendant. "We publish the contributions. We don't publish everybody's private business." Your scout watches the people passing between the stairs and the office.
+    <<option 'CN'>>
+      楼梯上方的招待会仍在继续。下面的私人展厅把捐款人的寄存物放在玻璃后，再往里，才是另有一道门的金库。布莱尔的皮箱已被送去作最后清点，楼上的椅边已经空了。<br><br>
+      奎恩在展厅办事员身旁停下。“捐款会公开，客人的私事可不会全抖出去。”侦察员留意着楼梯与账房之间往来的人。
+    <</language>><br><br>
+    <<if !_hcRecord.alarm and (_hcSteps.includes('avery_intro') or _hcSteps.includes('quinn_registered')) and C.npc.Quinn.state is 'active'>>
+      <<set _hcGalleryCost to _hcSteps.includes('avery_intro') ? 0 : C.npc.Quinn.love gte 10 ? 10000 : 25000>>
+      <<if _hcSteps.includes('avery_intro')>><<lanSwitch 'Quinn accepts the £200 receipt already issued beside Avery’s name. There is no second contribution to pay.' '奎恩认可了艾弗里名字旁已经开出的200镑收据，不必再交一份捐款。'>><br><</if>>
+      <<deadwood-heist-case-action `['Accept Quinn’s public receipt and view the gallery (0:10)', '接受奎恩的公开收据安排，进入展厅 (0:10)']` 10 'reception' 2 'Deadwood Street Heist Reception' false 'gallery_entered' `_hcGalleryCost`>>
+        <<if C.npc.Quinn.state is 'active'>>
+          <<if $_hcExtraCost gt 0>><<money `-$_hcExtraCost`>><<set _hcHeist.state.spent += $_hcExtraCost>><</if>><<run _hcRecord.steps.pushUnique('gallery_entered', 'quinn_terms')>>
+        <</if>>
+      <</deadwood-heist-case-action>> · <<printmoney _hcGalleryCost>> · <<lanSwitch 'A signed public receipt.' '留有签字的公开收据。'>><br>
+    <</if>>
+    <<deadwood-heist-case-chance 'skulduggery' 'english' 'scout'>>
+    <<deadwood-heist-case-action `['Follow the scout into the gallery without accepting the offer (0:15)', '不接受条件，跟随侦察员进入展厅 (0:15)']` 15 'reception' 2 'Deadwood Street Heist Reception' false 'gallery_entered'>>
+      <<deadwood-heist-case-chance 'skulduggery' 'english' 'scout'>>
+      <<run _hcRecord.steps.pushUnique('gallery_entered', 'quinn_bypassed')>>
+      <<if (_hcRecord.rolls[4] ?? _hcRecord.rolls[0]) gt _hcChance>><<set _hcRecord.alarm to true>><<deadwood-heist-fight 'Deadwood Street Heist Reception' 2 'townhall' 0 2>><</if>>
+    <</deadwood-heist-case-action>> · <span class='teal'><<= _hcChance>>%</span><br>
+  <<elseif !_hcSteps.includes('vault_opened')>>
+    <<language>><<option 'EN'>>
+      The gallery ends at the vault's counting room. A clerk holds Briar's case beside a table of sealed deposits. The attendant bars your way. "The reception is back upstairs." Permission to look through the gallery has brought you no further.<br><br>
+      The scout and carrier stop beside you. They can help with the work or keep the passage clear. If the attendants stop you, you will have to face them yourself.
+    <<option 'CN'>>
+      展厅尽头是金库的清点室。一名办事员拿着布莱尔的皮箱，桌上还摆着封好的寄存物。看守伸手拦住你。“招待会在楼上。”获准看展厅，可没让你得到更多许可。<br><br>
+      侦察员和搬运员在你身边停下。他们能帮忙做事，或护住通道。真被看守堵住，还得由你自己应付。
+    <</language>><br><br>
+    <<deadwood-heist-case-chance 'science' 'housekeeping' 'scout'>>
+    <<set _hcVaultMinutes to _hcScoutSkill gte 500 ? 10 : 15>>
+    <<deadwood-heist-case-action `['Work towards the counting room with the scout (0:' + String(_hcVaultMinutes).padStart(2, '0') + ')', '与侦察员一道进入清点室 (0:' + String(_hcVaultMinutes).padStart(2, '0') + ')']` `_hcVaultMinutes` 'reception' 2 'Deadwood Street Heist Reception' false 'vault_opened'>>
+      <<deadwood-heist-case-chance 'science' 'housekeeping' 'scout'>>
+      <<run _hcRecord.steps.pushUnique('vault_opened')>><<crimeUp 700 'trespassing'>>
+      <<if (_hcRecord.rolls[3] ?? _hcRecord.rolls[0]) gt _hcChance>>
+        <<set _hcRecord.alarm to true>><<deadwood-heist-fight 'Deadwood Street Heist Reception' `_hcScoutSkill gte 600 ? 2 : 3` 'townhall' 0 2>>
+      <</if>>
+    <</deadwood-heist-case-action>> · <span class='teal'><<= _hcChance>>%</span><br>
+    <<deadwood-heist-case-chance 'physique' 'athletics' 'carrier'>>
+    <<deadwood-heist-case-action `['Hold the heavy door while the carrier brings the empty bags through (0:20)', '撑住沉重的门，让搬运员带着空袋进入清点室 (0:20)']` 20 'reception' 2 'Deadwood Street Heist Reception' false 'vault_opened'>>
+      <<deadwood-heist-case-chance 'physique' 'athletics' 'carrier'>>
+      <<run _hcRecord.steps.pushUnique('vault_opened', 'vault_carried')>><<crimeUp 700 'trespassing'>>
+      <<if (_hcRecord.rolls[5] ?? _hcRecord.rolls[0]) gt _hcChance>>
+        <<pain 6>><<tiredness 8>><<set _hcRecord.alarm to true>><<deadwood-heist-fight 'Deadwood Street Heist Reception' 2 'townhall' 0 2>>
+      <<else>><<tiredness 3>><</if>>
+    <</deadwood-heist-case-action>> · <span class='teal'><<= _hcChance>>%</span><br>
+  <<elseif !_hcSteps.includes('vault_copy')>>
+    <<language>><<option 'EN'>>
+      You are inside the private vault. Numbered deposits fill the shelves, and Briar's open case lies on the counting table. The bundle marked for the financial centre is smaller than expected. Other pages concern clients' pledged property, not the bank's gold account.<br><br>
+      "That one," Wren says, pointing to the account cover. "Landry wants something useful. A list of names isn't the same thing." Your scout compares the receipts while the carrier holds the bag steady.
+    <<option 'CN'>>
+      你已经进入私人金库。架上放满编号寄存物，布莱尔敞开的皮箱留在清点桌上。标着金融中心的文件，比你预想的薄得多。其余几页涉及客人抵押的物品，可不是银行的金条账户。<br><br>
+      “那一份。”伦恩指着账户封皮，“兰德里要的是有用的东西。抄一串名字，可不是一回事。”侦察员比对收据，搬运员扶稳袋口。
+    <</language>><br><br>
+    <<deadwood-heist-case-chance 'maths' 'science' 'scout'>>
+    <<deadwood-heist-case-action `['Copy and check the gold-account terms (0:15)', '抄录并核对金条账户条款 (0:15)']` 15 'reception' 2 'Deadwood Street Heist Reception' false 'vault_copy'>>
+      <<deadwood-heist-case-chance 'maths' 'science' 'scout'>>
+      <<run _hcRecord.steps.pushUnique('vault_copy')>>
+      <<if (_hcRecord.rolls[6] ?? _hcRecord.rolls[1]) lte _hcChance>><<run _hcRecord.steps.pushUnique('account_verified')>><<else>><<run _hcRecord.steps.pushUnique('account_incomplete')>><<stress 4>><</if>>
+    <</deadwood-heist-case-action>> · <span class='teal'><<= _hcChance>>%</span><br>
+    <<deadwood-heist-case-action `['Take longer to separate the bank papers with the scout (0:25)', '与侦察员多花时间，把银行文件单独理清 (0:25)']` 25 'reception' 2 'Deadwood Street Heist Reception' false 'vault_copy'>>
+      <<run _hcRecord.steps.pushUnique('vault_copy', 'account_verified')>><<tiredness 4>>
+    <</deadwood-heist-case-action>> · <<lanSwitch 'More time and fatigue; a complete copy.' '耗时与疲劳更多；得到完整副本。'>><br>
+  <<elseif !_hcSteps.includes('briar_interest')>>
+    <<language>><<option 'EN'>>
+      Briar's voice beyond the doorway makes the carrier turn. "Client pledges. Leave those where they are." The attendant is being sent to check the papers, but has not reached the counting table yet. The case contains a smaller payment packet that can be carried without disturbing them.<br><br>
+      "The account conditions have already been copied," Wren says. "Decide what else you mean to take." The scout can hear more attendants on the stairs.
+    <<option 'CN'>>
+      门外传来布莱尔的声音，让搬运员回过头。“客人的抵押单。放回原处。”看守正被派来核对文件，还没走到清点桌边。箱中有一只较小的款袋，可以单独拿走，不必把那些寄存物也翻出来。<br><br>
+      “账户条件已经抄了。”伦恩说，“再想想，还打算拿什么。”侦察员听见楼梯上又有看守赶来。
+    <</language>><br><br>
+    <<deadwood-heist-case-action `['Leave the client pledges and take the smaller payment (0:05)', '留下客人的抵押物，只取较小的款子 (0:05)']` 5 'reception' 2 'Deadwood Street Heist Reception' false 'briar_interest'>>
+      <<run _hcRecord.steps.pushUnique('briar_interest', 'client_files_spared')>>
+    <</deadwood-heist-case-action>> · <<lanSwitch '35% less money; fewer people pursue you.' '少取35%的钱；追赶的人较少。'>><br>
+    <<deadwood-heist-case-action `['Keep the whole bundle despite Briar’s warning (0:05)', '不理会布莱尔，仍拿整捆款物 (0:05)']` 5 'reception' 2 'Deadwood Street Heist Reception' false 'briar_interest'>>
+      <<run _hcRecord.steps.pushUnique('briar_interest', 'client_files_taken')>><<set _hcRecord.alarm to true>>
+    <</deadwood-heist-case-action>> · <span class='red'><<lanSwitch 'The attendants pursue you in force.' '看守会全力追赶。'>></span><br>
+  <<else>>
+    <<set _hcInteriorReady to true>>
+    <<if _hcSteps.includes('account_verified')>>
+      <<lanSwitch 'Your checked copy is separate from the private pledges.' '核对过的账户副本与私人抵押单已经分开。'>>
+    <<else>>
+      <<lanSwitch 'Your copy is separate from the private pledges. Some pages remain unverified.' '账户副本与私人抵押单已经分开，但仍有几页无法核实。'>>
+    <</if>>
+    <<lanSwitch 'You still have to lift the payment and get it out of the vault.' '你仍得带起款物，把它们搬出金库。'>><br><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-reception-social'>>
+  <<set _hcSocialReady to false>>
+  <<deadwood-heist-reception-presence>>
+  <<if !_hcSteps.includes('social_settled')>>
+    <<language>><<option 'EN'>>
+      The guests have not yet been called into the private gallery. Quinn is collecting names for the reception's public account. A staff place admits you to work here; it does not admit you to the vault downstairs.
+    <<option 'CN'>>
+      宾客还没被请进私人展厅，奎恩正在收集招待会公开账目上的名字。临时员工的位置，让你来这里干活，可没准许你进入楼下的金库。
+    <</language>><br><br>
+    <<if _hcAveryPresent>>
+      <<npc 'Avery' `_hcHarperPresent ? 4 : 3`>>
+      <<language>><<option 'EN'>>
+        The reception's contributor list names Avery, who has come to sign the public account before returning to work. <<if $face isnot 'covered' and !$worn.face.type.includes('mask')>><<nnpc_He 'Avery'>> notices you beside the staff table. <<if maplebirch.get('Finance')?.company.avery.guest>>"I thought you might be among the guests."<<else>>"Working this afternoon?"<</if>> <<nnpc_He 'Avery'>> glances at the list. "A proper introduction is possible. What you do afterwards is your responsibility."<<else>><<nnpc_He 'Avery'>> glances across the staff table before returning to the contributor list. You could step forward and give your name.<</if>>
+      <<option 'CN'>>
+        招待会的赞助者名单上写着艾弗里。<<nnpc_He 'Avery'>>来签公开账目，之后还要回去办事。<<if $face isnot 'covered' and !$worn.face.type.includes('mask')>>注意到工作人员桌边的你，<<nnpc_he 'Avery'>>停了停。<<if maplebirch.get('Finance')?.company.avery.guest>>“我还以为，你会坐在客人那边。”<<else>>“今天下午在这里干活？”<</if>><<nnpc_He 'Avery'>>瞥了眼名单。“正式介绍一下，倒是可以。介绍之后做什么，你自己负责。”<<else>><<nnpc_He 'Avery'>>扫过工作人员的桌边，又低头去看赞助者名单。你可以上前报上名字。<</if>>
+      <</language>><br><br>
+      <<if maplebirch.get('Finance')?.company.avery.guest or C.npc.Avery.love gte 40>>
+        <<deadwood-heist-case-action `['Ask Avery for a lawful introduction and pay the £200 reception contribution (0:10)', '请艾弗里正式引见，并支付200镑招待会捐款 (0:10)']` 10 'reception' 1 'Deadwood Street Heist Reception' false 'social_settled' 20000>>
+          <<deadwood-heist-reception-presence>>
+          <<if _hcAveryPresent and (maplebirch.get('Finance')?.company.avery.guest or C.npc.Avery.love gte 40)>>
+            <<money -20000>><<set _hcHeist.state.spent += 20000>><<run _hcRecord.steps.pushUnique('social_settled', 'avery_intro')>>
+          <</if>>
+        <</deadwood-heist-case-action>><br>
+      <</if>>
+      <<deadwood-heist-case-action `['Ask Avery to cover for you if the case goes missing (0:05)', '问艾弗里能否在皮箱失踪后替你遮掩 (0:05)']` 5 'reception' 1 'Deadwood Street Heist Reception' false 'social_settled'>>
+        <<deadwood-heist-reception-presence>>
+        <<if _hcAveryPresent>>
+          <<run _hcRecord.steps.pushUnique('social_settled', 'avery_refused')>><<npcincr Avery love -1>><<npcincr Avery rage 3>>
+        <</if>>
+      <</deadwood-heist-case-action>> · <span class='red'><<lanSwitch 'Avery will not agree to this.' '艾弗里不会答应这种要求。'>></span><br>
+    <</if>>
+    <<deadwood-heist-case-action `['Give Quinn your name for the public reception account (0:10)', '向奎恩登记名字，列入招待会公开账目 (0:10)']` 10 'reception' 1 'Deadwood Street Heist Reception' false 'social_settled'>>
+      <<if C.npc.Quinn.state is 'active'>><<run _hcRecord.steps.pushUnique('social_settled', 'quinn_registered')>><</if>>
+    <</deadwood-heist-case-action>> · <<lanSwitch 'A place in the public record; easier formal access.' '留下公开记录；正式接洽更容易。'>><br>
+    <<deadwood-heist-case-action `['Keep your place among the staff (0:05)', '仍留在临时员工那边 (0:05)']` 5 'reception' 1 'Deadwood Street Heist Reception' false 'social_settled'>>
+      <<run _hcRecord.steps.pushUnique('social_settled', 'staff_only')>>
+    <</deadwood-heist-case-action>><br>
+  <<elseif !_hcSteps.includes('harper_settled')>>
+    <<language>><<option 'EN'>>
+      <<if _hcHarperPresent>>Harper has been invited to the reception's health-advice table. The doctor remains beside the screened staff room. "You still look tense. We can stop for a moment."<<else>>The reception's first-aid attendant waits beside the screened staff room. "You can stop for a moment if you need to."<</if>> A small case lies on a chair. "A brief check costs fifty. Or just sit and have some water." You can decline.
+    <<option 'CN'>>
+      <<if _hcHarperPresent>>哈珀应邀来招待会的健康咨询台值一会儿班，还在有屏风的员工休息室旁。“看起来还是很紧张。可以停一会儿。”<<else>>招待会的值台医护守在有屏风的员工休息室旁。“需要的话，可以停下来歇一会儿。”<</if>>椅上放着小箱子。“简单检查收五十。或者坐下来，喝点水。”你可以婉拒。
+    <</language>><br><br>
+    <<deadwood-heist-case-action `['Rest with some water and decline an examination (0:10)', '喝水休息，婉拒检查 (0:10)']` 10 'reception' 1 'Deadwood Street Heist Reception' false 'harper_settled'>>
+      <<deadwood-heist-reception-presence>><<run _hcRecord.steps.pushUnique('harper_settled', _hcHarperPresent ? 'harper_rest' : 'first_aid_rest')>><<stress -5>>
+    <</deadwood-heist-case-action>><br>
+    <<deadwood-heist-case-action `['Pay £50 for a brief check in the staff room (0:15)', '付50镑，在休息室接受简短检查 (0:15)']` 15 'reception' 1 'Deadwood Street Heist Reception' false 'harper_settled' 5000>>
+      <<deadwood-heist-reception-presence>>
+      <<money -5000>><<set _hcHeist.state.spent += 5000>><<run _hcRecord.steps.pushUnique('harper_settled', _hcHarperPresent ? 'harper_checked' : 'first_aid_checked')>><<pain -5>><<stress -8>>
+    <</deadwood-heist-case-action>> · <<lanSwitch 'The consultation is separate from your hospital appointments.' '这次咨询不代替医院预约。'>><br>
+    <<deadwood-heist-case-action `['Decline and return to the work (0:02)', '婉拒，回到手头的工作 (0:02)']` 2 'reception' 1 'Deadwood Street Heist Reception' false 'harper_settled'>>
+      <<deadwood-heist-reception-presence>><<run _hcRecord.steps.pushUnique('harper_settled', _hcHarperPresent ? 'harper_declined' : 'first_aid_declined')>>
+    <</deadwood-heist-case-action>><br>
+  <<else>>
+    <<set _hcSocialReady to true>>
+    <<if _hcSteps.includes('avery_intro')>>
+      <<lanSwitch 'Avery introduced you as a contributor. The receipt bears both your names. You remember the warning: "The gallery, yes. My name does not open somebody else’s vault."' '艾弗里把你介绍成捐款人，收据上留着你们的名字。你还记得引见时的提醒：“去展厅可以。别人的金库，可不是报我的名字就能进的。”'>><br><br>
+    <<elseif _hcSteps.includes('avery_refused')>>
+      <<lanSwitch 'You remember Avery’s refusal: "If you put my name to that, you will answer to me as well." That was the end of the conversation.' '你还记得艾弗里的拒绝：“这种事敢挂上我的名字，你还得向我交代。”那场谈话就这样结束了。'>><br><br>
+    <</if>>
+    <<if _hcSteps.includes('quinn_registered')>><<lanSwitch 'Your name is on Quinn’s public list. An openly identified disturbance will leave a clearer record against you.' '你的名字已在奎恩的公开名单上。如果露脸闹事，留下的记录也会更明确。'>><br><br><</if>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-dock-interior'>>
+  <<set _hcInteriorReady to false>><<deadwood-heist-case-roles>>
+  <<if !_hcSteps.includes('warehouse_entered')>>
+    <<language>><<option 'EN'>>
+      The tally is not finished. The chest has been wheeled inside the warehouse, beyond the open loading doors. Your scout returns from the doorway: the office and the loading floor are still working. The carrier watches a loose stack of crates beside the passage.<br><br>
+      Wren looks from the workers to you. "We came for a payment. I'm not having somebody buried under a pile of boxes for it."
+    <<option 'CN'>>
+      清点还没结束，款箱已经被推进仓库，越过敞开的装卸门。侦察员从门边回来：账房和库内仍有人在干活。搬运员留意着通道旁一垛捆扎松动的货箱。<br><br>
+      伦恩看看工人，又看看你。“来拿一笔钱，可不值得把谁埋在箱子底下。”
+    <</language>><br><br>
+    <<deadwood-heist-case-chance 'skulduggery' 'science' 'scout'>>
+    <<deadwood-heist-case-action `['Go inside with the scout (0:15)', '与侦察员进入仓库 (0:15)']` 15 'dock' 2 'Deadwood Street Heist Dock' false 'warehouse_entered'>>
+      <<deadwood-heist-case-chance 'skulduggery' 'science' 'scout'>>
+      <<run _hcRecord.steps.pushUnique('warehouse_entered')>>
+      <<if (_hcRecord.rolls[3] ?? _hcRecord.rolls[0]) gt _hcChance>>
+        <<set _hcRecord.alarm to true>><<deadwood-heist-fight 'Deadwood Street Heist Dock' 2 'docks' 0 2>>
+      <</if>>
+    <</deadwood-heist-case-action>> · <span class='teal'><<= _hcChance>>%</span><br>
+    <<set _hcBraceMinutes to _hcCarrierSkill gte 500 ? 10 : 15>>
+    <<deadwood-heist-case-action `["Help the carrier secure the loose load (0:" + String(_hcBraceMinutes).padStart(2, '0') + ")", '协助搬运员扶稳松动的货垛 (0:' + String(_hcBraceMinutes).padStart(2, '0') + ')']` `_hcBraceMinutes` 'dock' 2 'Deadwood Street Heist Dock' false 'warehouse_entered'>>
+      <<deadwood-heist-case-chance 'physique' 'housekeeping' 'carrier'>>
+      <<run _hcRecord.steps.pushUnique('warehouse_entered', 'load_secured')>>
+      <<if (_hcRecord.rolls[5] ?? _hcRecord.rolls[0]) gt _hcChance>><<pain 4>><<tiredness 6>><<else>><<tiredness 2>><</if>>
+    <</deadwood-heist-case-action>><br>
+  <<elseif !_hcSteps.includes('warehouse_record')>>
+    <<language>><<option 'EN'>>
+      Inside, dust hangs above long rows of stored cargo. An office window looks onto the floor. The chest stands beneath it. A worker holds out an unpaid wage sheet; the clerk points to the payment being counted. The same chest is meant to cover both the owner's balance and the workers' pay.<br><br>
+      Your scout lays two delivery receipts beside one another. One concerns the financial centre's loading entrance. You can check where that cargo actually went, rather than treating a familiar company name as proof.
+    <<option 'CN'>>
+      库内一排排货物上方浮着灰尘。账房的小窗正对装卸地面，款箱就放在窗下。一名工人拿着尚未结清的工钱单，办事员指了指正在清点的钱。这只箱子里，不只有货主的尾款，还有工人的工钱。<br><br>
+      侦察员把两张送货收据并排放下，其中一张涉及金融中心的装卸入口。你可以核对货物究竟送到了哪里，不把眼熟的公司名字当成证据。
+    <</language>><br><br>
+    <<deadwood-heist-case-chance 'maths' 'english' 'scout'>>
+    <<if !_hcRecord.alarm and C.npc.Bailey.state is 'active' and maplebirch.get('StreetLife').bailey.canNegotiate>>
+      <<deadwood-heist-case-action `['Ask Bailey to confirm the guarantee and delivery heading (0:05)', '请贝利核对担保范围和送货抬头 (0:05)']` 5 'dock' 2 'Deadwood Street Heist Dock' false 'warehouse_record'>>
+        <<if !_hcRecord.alarm and C.npc.Bailey.state is 'active' and maplebirch.get('StreetLife').bailey.canNegotiate>>
+          <<run _hcRecord.steps.pushUnique('warehouse_record', 'loading_route', 'bailey_confirmed')>>
+        <</if>>
+      <</deadwood-heist-case-action>> · <<lanSwitch 'Before the alarm, use your established standing or English to have the public receipt checked.' '趁现场尚未惊动，凭既有身份或英语本领，请对方核对公开收据。'>><br>
+    <</if>>
+    <<deadwood-heist-case-action `['Check the warehouse receipts together (0:10)', '一起核对仓库收据 (0:10)']` 10 'dock' 2 'Deadwood Street Heist Dock' false 'warehouse_record'>>
+      <<deadwood-heist-case-chance 'maths' 'english' 'scout'>>
+      <<run _hcRecord.steps.pushUnique('warehouse_record')>>
+      <<if (_hcRecord.rolls[4] ?? _hcRecord.rolls[0]) lte _hcChance>><<run _hcRecord.steps.pushUnique('loading_route')>><<else>><<run _hcRecord.steps.pushUnique('route_incomplete')>><</if>>
+    <</deadwood-heist-case-action>> · <span class='teal'><<= _hcChance>>%</span><br>
+    <<deadwood-heist-case-action `['Leave the uncertain receipts and focus on the chest (0:05)', '放下无法确定的收据，先看款箱 (0:05)']` 5 'dock' 2 'Deadwood Street Heist Dock' false 'warehouse_record'>>
+      <<run _hcRecord.steps.pushUnique('warehouse_record', 'route_incomplete')>>
+    <</deadwood-heist-case-action>><br>
+  <<elseif !_hcSteps.includes('dock_interest')>>
+    <<language>><<option 'EN'>>
+      The clerk separates the wage packet from the owner's balance. A shout comes from the doors: the remaining attendants want the chest returned. The workers stay beside the office, waiting to see which money you reach for.<br><br>
+      <<if maplebirch.get('StreetLife').bailey.defeated>>Bailey keeps a hand on the old account sheet. "The owner wants the balance. I'm here to settle the old guarantee. This isn't my warehouse."<<elseif _hcRecord.method.startsWith('force-seen') and maplebirch.get('StreetLife').bailey.peer>>"You know how an account works," Bailey says. "Avery's introductions don't make this money yours."<<elseif _hcRecord.method.startsWith('force-seen') and maplebirch.get('StreetLife').bailey.free>>"Your old payments have nothing to do with this," Bailey says. "Keep your hands off the balance."<<elseif _hcRecord.method.startsWith('force-seen')>>"Your own payments still come first," Bailey calls from the doorway. "You don't settle them by taking this."<<else>>Bailey turns to the foreman. "Leave the chest by the office. The balance hasn't been counted yet."<</if>>
+    <<option 'CN'>>
+      办事员把工钱袋与货主的尾款分开。门口传来喊声，剩下的看守要你把箱子送回去。工人守在账房旁，等着看你会伸手拿哪一笔。<br><br>
+      <<if maplebirch.get('StreetLife').bailey.defeated>>贝利按住旧账单。“货主要的是尾款。我来结清旧担保，这可不是我的仓库。”<<elseif _hcRecord.method.startsWith('force-seen') and maplebirch.get('StreetLife').bailey.peer>>“你该懂得账是怎么算的。”贝利说，“艾弗里的引见，可没把这笔钱变成你的。”<<elseif _hcRecord.method.startsWith('force-seen') and maplebirch.get('StreetLife').bailey.free>>“你以前交的那些钱，跟这笔没关系。”贝利说，“别碰尾款。”<<elseif _hcRecord.method.startsWith('force-seen')>>“先交清你自己的钱。”贝利在门边喊，“抢走这一笔，可不算交账。”<<else>>贝利转向工头。“箱子留在账房旁边。尾款还没清点完。”<</if>>
+    <</language>><br><br>
+    <<if _hcSteps.includes('loading_route')>><span class='green'><<lanSwitch 'The loading receipt is consistent with the warehouse record. You keep the checked copy.' '装卸收据与库内记录相符。你收好核对过的副本。'>></span><br><</if>>
+    <<deadwood-heist-case-action `['Leave the wage packet and take only the owner’s balance (0:05)', '留下工钱袋，只取货主的尾款 (0:05)']` 5 'dock' 2 'Deadwood Street Heist Dock' false 'dock_interest'>>
+      <<run _hcRecord.steps.pushUnique('dock_interest', 'wages_spared')>>
+    <</deadwood-heist-case-action>> · <<lanSwitch '20% less money; the workers keep out of the pursuit.' '少取20%的钱；工人不会加入追赶。'>><br>
+    <<deadwood-heist-case-action `['Take the whole payment despite the workers’ protest (0:05)', '不顾工人抗议，仍取整笔款子 (0:05)']` 5 'dock' 2 'Deadwood Street Heist Dock' false 'dock_interest'>>
+      <<run _hcRecord.steps.pushUnique('dock_interest', 'workers_exposed')>><<set _hcRecord.alarm to true>><<npcincr Wren love -1>>
+    <</deadwood-heist-case-action>> · <span class='red'><<lanSwitch 'A larger pursuit; Wren disapproves.' '追赶的人更多；伦恩不赞同。'>></span><br>
+  <<else>>
+    <<set _hcInteriorReady to true>>
+    <<lanSwitch 'The chest is now within reach inside the warehouse. Your decision about the wage packet still stands.' '仓库里的款箱已经近在手边。你刚才对工钱袋作出的决定仍然有效。'>><br><br>
+  <</if>>
+<</widget>>

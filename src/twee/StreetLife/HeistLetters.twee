@@ -1,0 +1,150 @@
+:: Deadwood Street Heist Letters Widgets [widget]
+
+<!-- 纸条不署名、不把联络人写进同一张名单。已读历史保存在本案线索里。 -->
+<<widget 'deadwood-heist-letters-check'>>
+  <<deadwood-heist-aftermath-check>><<set _letter_kind to ''>>
+  <<if !_aftermath_active>><<exit>><</if>>
+  <<set _letter_due to Number(_aftermath.leads.find(item => item.startsWith('meeting_day:'))?.split(':')[1] ?? -1)>>
+  <<if !_aftermath.letter_read>>
+    <<set _letter_kind to 'initial'>>
+  <<elseif _letter_due gte 0 and Math.floor(Time.days) gt _letter_due and (!_aftermath.leads.includes('wren_met') or !_aftermath.leads.includes('landry_met')) and !_aftermath.leads.includes('letter:read:missed')>>
+    <<set _letter_kind to 'missed'>>
+  <<elseif _aftermath_campaign.gold.trade?.stage is 4 and _aftermath_campaign.gold.trade.reason is 'missed' and !_aftermath.leads.includes('letter:read:trade_missed')>>
+    <<set _letter_kind to 'trade_missed'>>
+  <<elseif _aftermath_campaign.gold.trade?.stage is 4 and _aftermath_campaign.gold.trade.reason.startsWith('default') and !_aftermath.leads.includes('letter:read:trade_default')>>
+    <<set _letter_kind to 'trade_default'>>
+  <<elseif _aftermath.leads.includes('pub') and !_aftermath.leads.includes('letter:read:inquiry') and !_aftermath.leads.includesAll('wren_met', 'landry_met')>>
+    <<set _letter_kind to 'inquiry'>>
+  <<elseif ((_aftermath.leads.includes('wren:freed') and !_aftermath.leads.includes('wren_met')) or (_aftermath.leads.includes('landry:freed') and !_aftermath.leads.includes('landry_met'))) and !_aftermath.leads.includes('letter:read:escort')>>
+    <<set _letter_kind to 'escort'>>
+  <<elseif _aftermath.stage is 6 and !_aftermath.leads.includes('letter:read:reply')>>
+    <<set _letter_kind to 'reply'>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-letters-entry'>>
+  <<deadwood-heist-letters-check>>
+  <<if !_aftermath_ok or (!_letter_kind and !(_aftermath.stage is 6 and !_aftermath.leads.includes('letter:reply_sent'))) or !(($passage is 'Bedroom' and $location is 'home') or ($passage is 'Smuggler Pub' and _aftermath_work.atMeeting))>><<exit>><</if>>
+  <<lanLink `!_letter_kind ? ['Leave a short reply', '留一句简短的回话'] : _letter_kind === 'initial' ? ['Read the folded note left for you', '读留给你的折叠便笺'] : ['Read the new folded note', '读新留下的折叠便笺']`>>
+    <<deadwood-heist-letters-check>>
+    <<if _aftermath_ok and (_letter_kind or (_aftermath.stage is 6 and !_aftermath.leads.includes('letter:reply_sent'))) and (($passage is 'Bedroom' and $location is 'home') or ($passage is 'Smuggler Pub' and _aftermath_work.atMeeting))>><<endevent>><<goto 'Deadwood Street Heist Letter'>><</if>>
+  <</lanLink>><br>
+<</widget>>
+
+<<widget 'deadwood-heist-letters-read'>>
+  <<set $_letter_kind to _args[0], $_letter_record to maplebirch.get('StreetLife')?.heist.state.campaign>>
+  <<deadwood-heist-letters-check>><<set _letter_done to false>>
+  <<if !_aftermath_ok or $passage isnot 'Deadwood Street Heist Letter' or !['home', 'underground'].includes($location) or $_letter_kind isnot _letter_kind or !['initial', 'inquiry', 'missed', 'escort', 'trade_missed', 'trade_default', 'reply'].includes($_letter_kind) or _aftermath.leads.includes('letter:read:' + $_letter_kind)>><<exit>><</if>>
+  <<pass 1>><<deadwood-heist-letters-check>>
+  <<if !_aftermath_ok or _aftermath_campaign isnot $_letter_record or $passage isnot 'Deadwood Street Heist Letter' or !['home', 'underground'].includes($location) or _aftermath.leads.includes('letter:read:' + $_letter_kind)>><<exit>><</if>>
+  <<run _aftermath.leads.push('letter:read:' + $_letter_kind)>>
+  <<if $_letter_kind is 'initial'>><<set _aftermath.letter_read to true, _aftermath.stage to Math.max(1, _aftermath.stage)>><</if>>
+  <<set _letter_done to true>>
+<</widget>>
+
+<!-- 回信与读信分别提交，避免页面回调跨 widget 时丢失本次记录引用。 -->
+<<widget 'deadwood-heist-letters-reply'>>
+  <<deadwood-heist-aftermath-check>><<set _letter_done to false>>
+  <<if !_aftermath_ok or $passage isnot 'Deadwood Street Heist Letter' or $location isnot 'underground' or _aftermath.stage isnot 6 or _aftermath.leads.includes('letter:reply_sent')>><<exit>><</if>>
+  <<set $_letter_record to _aftermath_campaign>><<pass 5>><<deadwood-heist-aftermath-check>>
+  <<if !_aftermath_ok or _aftermath_campaign isnot $_letter_record or $passage isnot 'Deadwood Street Heist Letter' or $location isnot 'underground' or _aftermath.stage isnot 6 or _aftermath.leads.includes('letter:reply_sent')>><<exit>><</if>>
+  <<run _aftermath.leads.pushUnique('letter:reply_sent')>><<set _letter_done to true>>
+<</widget>>
+
+<<widget 'deadwood-heist-letters-journal'>>
+  <<deadwood-heist-letters-check>>
+  <<if _aftermath_active and _aftermath.stage is 6 and !_aftermath.leads.includes('letter:reply_sent') and !_letter_kind>><<lanSwitch 'A short reply can be left at the smugglers’ pub.' '可以去走私者酒馆留下一句简短的回话。'>><br>
+  <<elseif _aftermath_active and _letter_kind>><span class='blue'><<lanSwitch 'A new folded note can be collected in your orphanage bedroom or at the smugglers’ pub.' '孤儿院卧室或走私者酒馆有新留下的折叠便笺，可以取来看看。'>></span><br><</if>>
+<</widget>>
+
+:: Deadwood Street Heist Letter
+<<deadwood-heist-letters-check>>
+<<if !_aftermath_ok or !['home', 'underground'].includes($location)>><<deadwood-heist-aftermath-unavailable>><<exit>><</if>>
+<<effects>><<deadwood-heist-letters-check>>
+<<if !_aftermath_ok>><<exit>><</if>>
+<<if !_letter_kind>><<set _letter_kind to _aftermath.leads.filter(item => item.startsWith('letter:read:')).at(-1)?.split(':')[2] ?? 'initial'>><</if>>
+<<language>>
+  <<option 'EN'>>
+    The paper is folded inside an old receipt. There is no name on either side. <<if $mickeyPub gte 2 and !['hiding', 'hidingKnown'].includes($pubfame?.status)>>The little squared figures resemble the notes passed beneath Mickey's door. Whoever sent this has been careful to leave nothing worth showing around.<</if>>
+  <<option 'CN'>>
+    纸折在一张旧收据里面，两面都没写名字。<<if $mickeyPub gte 2 and !['hiding', 'hidingKnown'].includes($pubfame?.status)>>那些细小方正的数字，与米奇门缝下递出的笔记有些相像。写信的人很小心，没留下什么值得拿给别人看的东西。<</if>>
+<</language>><br><br>
+<<switch _letter_kind>>
+  <<case 'initial'>>
+    <<language>>
+      <<option 'EN'>>
+        <i>Don't bring the metal to the usual table. Someone has been asking who guarantees the cargo. Check the copies behind the bar before you agree to another meeting.<br><br>The cargo number and the signature are different questions. Don't let somebody sell you the same answer twice.</i><br><br>
+        The total on the receipt is circled twice. A mark on the back identifies the smugglers' pub. There is no address for the gold.
+      <<option 'CN'>>
+        <i>别把金属带到老地方。有人在问，谁替那批货作了担保。答应再见面之前，先看看吧台后留下的副本。<br><br>货号和签名，是两件事。别让人拿同一个答案，收你两次钱。</i><br><br>
+        收据上的合计被圈了两遍。背面的记号指向走私者酒馆，没有写黄金存在哪里。
+    <</language>>
+  <<case 'inquiry'>>
+    <<language>>
+      <<option 'EN'>>
+        <i>The public register will tell you what the building is for. The collection receipt tells you who expected the cargo. Read the dates before asking for a private name.<br><br>If you want an officer to check a fact, bring a fact. Don't take a complete account of the job to the first uniform willing to listen.</i><br><br>
+        Two places are underlined: the council's public counter and the dockside tally office. There is no claim that either owes you a favour.
+      <<option 'CN'>>
+        <i>公开登记能查房子用来做什么，领取单能查谁在等货。问私人姓名之前，先看看日期。<br><br>想让穿制服的人查事实，就带事实过去。别见到头一个肯听的，就把整场差事全说了。</i><br><br>
+        纸上划出了两个地方：市政厅的公开柜台，以及码头的理货室。没有说哪个地方欠你人情。
+    <</language>>
+  <<case 'missed'>>
+    <<language>>
+      <<option 'EN'>>
+        <i>The day on the copy has passed. People with something to lose don't wait by an open door forever.<br><br>Go back to the tally clerk. Find the new handover before walking into the old one. Leave time to get out as well as time to get in.</i><br><br>
+        The old date has a single line through it. No new date has been promised in your name.
+      <<option 'CN'>>
+        <i>副本上的日子过了。有东西怕丢的人，不会一直站在敞开的门旁等。<br><br>回去问理货员。先找到新的交接处，别直接走进旧地方。除了进去的时间，也留些出来的。</i><br><br>
+        旧日期被划了一道，没有替你答应新的日子。
+    <</language>>
+  <<case 'escort'>>
+    <<language>>
+      <<option 'EN'>>
+        <i>An open door isn't the end of a delivery. Get to the second receipt before deciding the first problem is finished.<br><br>If somebody can't put weight on a leg, move the weight. Don't ask them to promise it doesn't hurt.</i>
+      <<option 'CN'>>
+        <i>门打开了，不等于货送到了。拿到第二张收条，再说头一件事已经了结。<br><br>有人一条腿使不上力，就分担些重量。别让人保证自己不疼。</i>
+    <</language>>
+  <<case 'trade_missed'>>
+    <<language>>
+      <<option 'EN'>>
+        <i>The buyer has crossed out the appointment. The gold hasn't changed hands. Ask for another meeting or another buyer before carrying anything to the quay.<br><br>Don't offer the same bars as security for two different promises.</i>
+      <<option 'CN'>>
+        <i>买家把约定划掉了，黄金还没交手。带东西去码头之前，先重约一场，或者另找买家。<br><br>别拿同一批金条，为两份不同的承诺作抵押。</i>
+    <</language>>
+  <<case 'trade_default'>>
+    <<language>>
+      <<option 'EN'>>
+        <i>A receipt for a deposit is not a receipt for the whole price. Keep the weight, the account and the promised payment date together.<br><br>Ask for the balance. If you sell the claim, sell the unpaid part. The bars have already gone.</i>
+      <<option 'CN'>>
+        <i>收到定金的收条，不是收清全款的收条。把重量、账户和答应付款的日子放在一起。<br><br>去要尾款。要转手债权，就转没付的那一部分。金条已经交出去了。</i>
+    <</language>>
+  <<case 'reply'>>
+    <<language>>
+      <<option 'EN'>>
+        <i>The old cargo and the old signature have been taken off the open sheet. Keep your own copy. If somebody adds another charge, ask which agreement it belongs to.<br><br>Don't send names with your answer. "Closed" is enough.</i><br><br>
+        A clean scrap is folded behind the note. There is room for a short reply, not a list of everyone who helped you.
+      <<option 'CN'>>
+        <i>旧货和旧签名，都从未结的那张纸上划去了。留好你自己的副本。再有人添一笔，就问问是哪份约定里的。<br><br>回话别写名字。说一声“了结”，就够了。</i><br><br>
+        便笺后面夹着一小张干净的纸，够写句短话，写不下所有帮过忙的人。
+    <</language>>
+<</switch>><br><br>
+<div id='heist-aftermath-feedback'></div>
+<<if !_aftermath.leads.includes('letter:read:' + _letter_kind)>>
+  <<capture _letter_kind>>
+    <<lanLink ['Put the note away (0:01)', '收好便笺 (0:01)']>>
+      <<deadwood-heist-letters-read _letter_kind>>
+      <<if _letter_done>><<goto 'Deadwood Street Heist Letter'>><<else>><<deadwood-heist-aftermath-feedback>><</if>>
+    <</lanLink>><br>
+  <</capture>>
+<</if>>
+<<if _aftermath.stage is 6 and !_aftermath.leads.includes('letter:reply_sent')>>
+  <<if $location is 'underground'>>
+  <<lanLink ['Write “closed” and leave the reply at the bar (0:05)', '写下“了结”，把回话留在吧台 (0:05)']>>
+    <<deadwood-heist-letters-reply>>
+    <<if _letter_done>><<goto 'Deadwood Street Heist Letter'>><<else>><<deadwood-heist-aftermath-feedback>><</if>>
+  <</lanLink>><br>
+  <<else>><span class='blue'><<lanSwitch 'The reply can be left at the smugglers’ pub.' '回话可以留在走私者酒馆。'>></span><br><</if>>
+<<elseif _aftermath.leads.includes('letter:reply_sent')>>
+  <<lanSwitch 'Your short reply has been left behind the bar. No names were included.' '简短的回话已经留在吧台后，没有写谁的名字。'>><br>
+<</if>><br>
+<<deadwood-heist-aftermath-leave>>

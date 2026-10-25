@@ -128,7 +128,7 @@ export default class Bounties {
       this.state.cooperating &&
       !this.wanted &&
       !this.busy &&
-      !this.street.heist.inAction &&
+      !this.street.heist.busy &&
       this.state.active?.stage === 'identified' &&
       !this.expired &&
       !!this.target &&
@@ -198,7 +198,7 @@ export default class Bounties {
   }
 
   public get offers(): Case[] {
-    if (!this.state.cooperating || this.wanted || this.state.active || this.street.heist.inAction || this.street.stories.busy) return [];
+    if (!this.state.cooperating || this.wanted || this.state.active || this.street.heist.busy || this.street.stories.busy) return [];
     const order = this.state.board.length ? this.state.board : terms.cases.map(item => item.id);
     return order
       .map(id => terms.cases.find(item => item.id === id)!)
@@ -283,7 +283,7 @@ export default class Bounties {
 
   /** append 确认原版普通街道菜单后调用，先记日期，刷新及强制事件不会重抽。 */
   public checkHunter(): void {
-    if (this.state.hunter || this.state.hunterDay === Math.floor(Time.days) || !this.available || !this.point || this.street.heist.inAction) return;
+    if (this.state.hunter || this.state.hunterDay === Math.floor(Time.days) || !this.available || !this.point || this.street.heist.busy) return;
     const offence = window.crimeSumCurrent();
     if (offence < terms.hunter_evidence) return;
     this.state.hunterDay = Math.floor(Time.days);
@@ -390,7 +390,7 @@ export default class Bounties {
       }
       return true;
     }
-    if (this.busy || this.street.heist.inAction) return false;
+    if (this.busy || this.street.heist.busy) return false;
     if (action === 'cooperate' || action === 'quit') {
       if (title !== 'Deadwood Street Detective' || this.wanted || state.active || Time.hour < 8 || Time.hour >= 18) return false;
       state.cooperating = action === 'cooperate';

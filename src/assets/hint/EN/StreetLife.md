@@ -124,19 +124,62 @@ Mickey helps check information, division of work and risks while retaining the o
 
 The target is the **financial centre bank**. Starting a new operation requires all three arrangements above to be completed and settled, Finance enabled and 70 street standing. Meet Landry and Wren; Wren needs at least 20 affection. Landry needs substantial confidence in your work: 60 affection, twenty-five completed original blackbox tasks, or <span class="gold">£8,000</span> actually earned through fencing. Any one qualifies, but a confirmed betrayal still prevents that trust. Arrange a private meeting, then take the normal route to the smuggler's pub and continue preparations between 09:00 and 18:00.
 
-1. Discuss the plan with Landry and Wren, choosing a quiet or openly forceful approach.
-2. Check bank information, prepare equipment and rehearse. English, maths, science, housekeeping, skulduggery and physical condition affect quality. A working factory with a packaging line can help with supplies.
+1. Discuss the plan with Landry and Wren. A newly accepted bank arrangement first opens **the harbour pay chest** and **the civic reception**. Visit each scene and report its actual outcome at the pub.
+2. Choose a quiet or openly forceful approach, check bank information, prepare equipment and rehearse. English, maths, science, housekeeping, skulduggery and physical condition affect quality. A working factory with a packaging line can help with supplies.
 3. Confirm your scout, carrier, roles and shares. Advances and later shares are separate; withdrawing does not refund pay already given. Ability, injuries and the pair's familiarity all matter.
-4. Check preparation, crew and any selected vehicle before starting. Once there, you may still give up, take less or change your escape choice. Stress, fatigue, pain, alcohol and drugs impair performance.
-5. Settle the split after escape to close the operation. Total loot, your share and preparation expenses are different; the recorded share is not net profit.
+4. Once both jobs are reported and preparation and crew are ready, begin at the High Street financial centre bank counter, Tuesday–Saturday, 09:00–17:00. The hall, inner passage, vault, carrying and escape each need actual decisions; confrontations use native combat. Once the operation has begun, the counter closing does not by itself interrupt the scene. Stress, fatigue, pain, alcohol and drugs impair performance.
+5. The haul is gold. After escape, deal with the missing crew and sale arrangements, wait until the agreed date, sell it and settle the split. The gold estimate, sale proceeds, your collected share and recorded expenses are separate amounts.
+
+### The two preceding cases
+
+| Case              | Where to continue after the pub meeting | Hours       | Closing the case                          |
+| ----------------- | --------------------------------------- | ----------- | ----------------------------------------- |
+| Harbour pay chest | Docks                                   | 09:00–18:00 | Report at the smugglers’ pub, 09:00–18:00 |
+| Civic reception   | Town Hall                               | 14:00–17:00 | Report at the smugglers’ pub, 09:00–18:00 |
+
+Both cases need more than two opening hours left when entering. Once started, the withdrawal can continue past closing. Scouting, reaching the objective, taking items and withdrawing offer different choices. Sneaking through and provoking an open confrontation leave different consequences. Return to the pub to report and settle up. After a failed attempt, report the result and pay the preparation fee to try again. Settle a successful or partial dock job before accepting the reception. Both cases need successful or partial reported outcomes before the bank becomes available.
+
+Inside the warehouse, negotiate the stacked cargo or scout a passage, then check the shipping records. An actually inspected loading route carries forward to the bank entrance. Leaving the workers’ wages reduces the take; taking them too attracts more pursuit. The reception requires reaching a private gallery, opening the inner vault, copying the accounts and deciding what to do with clients’ pledges. A verified account copy improves bank recognition and negotiation; hearing the introduction outside does not count as obtaining it.
+
+Relationships, status and previous actions change the available approaches. Grant checks the evidence you provide; you may withhold information or refuse to continue.
+
+### The bank and its gold
 
 Ordinary supplies cost <span class="gold">£1,500</span>, with another <span class="gold">£300</span> for rehearsal. Your own operating packaging factory can reduce supplies to <span class="gold">£750</span>. The three candidates charge advances of <span class="gold">£300 / £900 / £1,800</span>; hire two of them. Each also takes the agreed share after the job. Mickey charges <span class="gold">£600</span> to review one part of the plan. The preparation page keeps recorded expenses, and settlement shows what remains of your share after those costs.
 
 **Crew Leader**: Hire an available scout and carrier, then complete a rehearsal at quality 8 or higher. Their skill contributions to scouting, carrying and escape increase by **10%**. Injuries still reduce their effectiveness; a missing hire or someone in custody cannot provide the bonus. Read the preparation quality and current estimates before deciding who does which job.
 
-A successful operation starts with <span class="gold">£200,000</span> in total loot, or <span class="gold">£240,000</span> for the forceful approach. Landry, Wren and the hires still take their shares. Choosing a lighter load takes 65%; failing to carry everything leaves only 35% and raises the alarm. A careful departure leaves a further 20% of the money behind and takes ten minutes longer, improving the chance of getting clear.
+Work through the hall and inner passage before dealing with the vault guards, carrying gold and regrouping with the crew. Warning the clerk or leading customers clear protects bystanders but gives up an unnoticed entry. A loading route actually inspected during the dock case provides another entrance. Adrian’s presence, familiarity and whether your face is covered affect recognition and relationship consequences. After a setback, you can still talk, resist, abandon the haul or involve the police.
 
-A failed escape loses all the money and can leave you and the hires hurt. A badly failed escape also leaves the carrier in custody. Your expenses, the bank closure and your own criminal evidence remain. Preparation, withdrawal and settlement never open a second bank run; later orders are ordinary deliveries.
+Taking more gold makes escape harder. At the regrouping point, actually check who is injured or missing: search, use packed dressings, or leave some gold to help someone walk. People you explicitly leave behind stop contributing to the escape. Beyond the street exit, find cover or shake the pursuit, then leave on foot or in the prepared car. A careful departure sacrifices part of the gold and takes longer. Walking requires freedom to move; driving also requires the car actually on High Street, enough fuel and passenger seats, and a fit, licensed driver. A failed escape can lose the haul and leave you or the hires hurt or detained. Paid expenses and criminal evidence remain.
+
+### Missing contacts, rescue and the sale
+
+After the bank operation, look for an anonymous note at the smugglers’ pub. Follow the leads in your journal to establish what happened to each contact, then decide whether to help or leave.
+
+| Contact or action                   | Location and time                                                                                   |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Grant                               | Police Station, 08:00–18:00; on duty and only when cooperation permits                              |
+| Public records and Quinn’s response | Town Hall reception, 09:00–17:00                                                                    |
+| Bailey                              | Original office, 07:00–10:00; after leaving the orphanage, use the actual flats meeting arrangement |
+| Hospital and Harper                 | Hospital Foyer, 08:00–18:00; treatment requires the native appointment day, otherwise use reception |
+| Briar                               | Original office during its night-time working hours                                                 |
+| Rescue after locating the contacts  | Docks, 06:00–22:00                                                                                  |
+| Gold sale and the final split       | Smugglers’ pub, 09:00–18:00                                                                         |
+
+Quinn offers a public filing or a numbered private copy, with different promises of discretion. Publishing the account affects whether Bailey returns the deposit. Bring the cancelled guarantee back to Bailey to close that account. Grant checks verifiable details; a private agreement does not clear your own offences. Hospital reception provides records and dressings. When native appointment conditions allow treatment, Harper offers a paid consultation or asks to retain your account of the injury.
+
+The bars can be handed over from the agreed release day, normally the second day after escape. Resolve the contacts’ whereabouts, then arrange a buyer at the smugglers’ pub and attend on the appointed day, 09:00–18:00. A missed appointment needs rearranging and reduces the offer. Before handing over the gold you can still try the other buyer.
+
+An inspection does not automatically pay the estimated value. Science checks the weights and metal, maths checks the accounts and obtains reliable paperwork, and English allows one further price negotiation. A failed negotiation can lower the offer. A confirmed quote stays fixed when the page is reopened. Landry’s introduced buyer pays a thirty-percent deposit, with the balance due two days later. The other dealer offers less but pays in full at handover.
+
+If the balance is withheld, enforce checked papers, negotiate for most of the balance, sell the unpaid claim for partial payment, or resist the attendants in actual combat. Losing the confrontation leaves the debt unresolved; it does not recreate gold already handed over. Paperwork, assigning the claim or explicitly abandoning it remain ways to close the account. Only deposits and money actually recovered count towards the split. Giving up shared proceeds damages Landry’s and Wren’s trust; abandoning gold before handover does not count as a sale. All sale receipts go into the shared account; collect your own agreed share from Landry once at the end.
+
+The journal distinguishes appointments, inspection, handover, waiting for payment, missed meetings and default. Statistics separate recovered and sold bars, estimate, fixed offer, deposit, actual shared receipts and your collected share. Recorded expenses include preparation for the earlier cases and later investigation and rescue costs. The bank share less those expenses is not the whole chain’s net profit: shares from the earlier cases were paid separately.
+
+### Published evidence and prices
+
+An actual public dock incident affects Mer Street Shipping; the bank incident and reopening affect High Street Centre. Actively publishing evidence tied to the financial centre’s entrusted accounts and warehouse guarantee numbers adds news for that identified security. Private inquiries, sealing a copy and ordinary rescues do not move every listed share. Publishing account numbers also makes the gold harder to place, so the buyer discounts it further. The civic reception has no established issuer; unknown papers do not invent corporate misconduct or a price move. Each event is recorded once. Rebooking, rereading news or retrying a failed earlier case cannot keep generating the same market event.
 
 During preparation, you may contact Grant to report the plan or help apprehend the crew, and may change whom you provide information to. **An agreement to help is not immunity**: your own outstanding case may still mean detention and prevent collecting police payment. Reporting the crew at the last minute also leaves your own offences intact. Decisions alter trust and future cooperation. Conflicting demands from the two sides cannot both be completed.
 
@@ -148,4 +191,4 @@ After a successful split, the original crew members who remain free and fit for 
 
 Your colleague's skill raises the total quote by 0–20%. They receive 25%, and you receive the remaining 75%; the quote is saved when you accept. Each colleague can introduce one order per day, and cancelling still uses that introduction. Late or disputed deliveries reduce both payments as usual. Each successfully paid order gives 10 base experience, adjusted by that colleague's individual growth rate, to the assigned role only, up to 1000. This new income does not clear the criminal record from the bank job.
 
-Public cases and supply work also affect related securities: the bank incident and lifting its counter suspension, specific paid bounty settlements, and legal cafe, dock and casino deliveries produce business notices at limited milestones. Ordinary conversations, repeated cases and illicit parcels cannot raise prices indefinitely. See **Finance and business → Banking and investing** for the rules, and the financial journal for recent notices.
+A public theft or confrontation in the harbour pay chest records one −2% Mer Street shipping notice. The bank incident and counter reopening affect High Street Shopping Centre. Paid bounties and legal supplies also bring related business notices. See **Finance and business → Banking and investing** for trading rules.

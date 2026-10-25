@@ -1,0 +1,252 @@
+:: Deadwood Street Heist Rescue Widgets [widget]
+
+<!-- 现场阶段与实际行为沿用本案线索，不把解围等同于已完成护送。 -->
+<<widget 'deadwood-heist-rescue-check'>>
+  <<set _rescue_name to _args[0]>><<deadwood-heist-aftermath-check>>
+  <<set _rescue_npc to _rescue_name is 'wren' ? 'Wren' : 'Landry', _rescue_page to _rescue_name is 'wren' ? 'Deadwood Street Heist Aftermath Wren' : 'Deadwood Street Heist Aftermath Landry'>>
+  <<set _rescue_step to _aftermath?.leads.includes(_rescue_name + '_met') ? 'done' : _aftermath?.leads.includes(_rescue_name + ':freed') ? 'escort' : _aftermath?.leads.includes(_rescue_name + ':confirmed') ? 'break' : _aftermath?.leads.includes(_rescue_name + ':scouted') ? 'confirm' : 'scout'>>
+  <<set _rescue_due to Number(_aftermath?.leads.find(item => item.startsWith('meeting_day:'))?.split(':')[1] ?? -1)>>
+  <<set _rescue_late to _rescue_due gte 0 and Math.floor(Time.days) gt _rescue_due and !_aftermath.leads.includes(_rescue_name + ':rescheduled') and ['scout', 'confirm'].includes(_rescue_step)>>
+  <<set _rescue_injured to _rescue_name is 'wren' and _aftermath_campaign?.team?.injured.includes('Wren') and !_aftermath_campaign.team.aid.includes('Wren')>>
+  <<set _rescue_ok to _aftermath_ok and ['wren', 'landry'].includes(_rescue_name) and $location is 'docks' and $passage is _rescue_page and Time.hour gte 6 and Time.hour lt 22 and (_aftermath[_rescue_name] is 'left' or (C.npc[_rescue_npc].init is 1 and C.npc[_rescue_npc].state is 'active'))>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-person'>>
+  <<set $_rescue_name to _args[0], $_rescue_action to _args[1], $_rescue_source to $passage>>
+  <<deadwood-heist-rescue-check $_rescue_name>><<set _aftermath_done to false>>
+  <<if !_rescue_ok or _rescue_step is 'done'>><<exit>><</if>>
+  <<set $_rescue_record to _aftermath_campaign, $_rescue_step to _rescue_step, $_rescue_minutes to 0, $_rescue_cost to 0, $_rescue_allowed to false>>
+  <<if $_rescue_action is 'leave'>>
+    <<set $_rescue_allowed to true>>
+  <<elseif _rescue_late>>
+    <<if $_rescue_action is 'reschedule'>><<set $_rescue_allowed to true, $_rescue_minutes to 10>><</if>>
+  <<else>>
+    <<switch $_rescue_action>>
+      <<case 'scout'>>
+        <<set $_rescue_allowed to _rescue_step is 'scout', $_rescue_minutes to _aftermath_work.skills.skulduggery gte 400 ? 10 : 20>>
+      <<case 'confirm' 'delivery'>>
+        <<set $_rescue_allowed to _rescue_step is 'confirm' and ($_rescue_action is 'confirm' or _aftermath.leads.includes('visitors')), $_rescue_minutes to _aftermath[$_rescue_name] is 'safe' ? 5 : 10>>
+      <<case 'quiet'>>
+        <<set $_rescue_allowed to _rescue_step is 'break' and $_rescue_name is 'wren' and _aftermath_work.skills.skulduggery gte 400, $_rescue_minutes to 20>>
+      <<case 'papers'>>
+        <<set $_rescue_allowed to _rescue_step is 'break' and _aftermath.leads.includes('permit') and ($_rescue_name is 'wren' or _aftermath.leads.includesAny('guarantee', 'visitors', 'public_record')), $_rescue_minutes to 15>>
+      <<case 'talk'>>
+        <<set $_rescue_allowed to _rescue_step is 'break' and _aftermath_work.skills.english gte (_aftermath.leads.includes('interpreted') ? 400 : 600) and _aftermath.leads.includesAny('guarantee', 'visitors', 'public_record') and !$worn.face.type.includes('gag'), $_rescue_minutes to 20>>
+      <<case 'pay'>>
+        <<set $_rescue_allowed to _rescue_step is 'break', $_rescue_cost to $_rescue_name is 'wren' ? 30000 : 50000, $_rescue_minutes to 10>>
+      <<case 'dress'>>
+        <<set $_rescue_allowed to _rescue_step is 'escort' and _rescue_injured and _aftermath.leads.includes('aid_kit') and !_aftermath.leads.includes('aid_used'), $_rescue_minutes to 10>>
+      <<case 'escort_quiet'>>
+        <<set $_rescue_allowed to _rescue_step is 'escort' and !_rescue_injured and Math.max(_aftermath_work.skills.athletics, _aftermath_work.skills.skulduggery) gte 400, $_rescue_minutes to 15>>
+      <<case 'escort_slow'>>
+        <<set $_rescue_allowed to _rescue_step is 'escort', $_rescue_minutes to _rescue_injured ? 35 : 25>>
+        <<if _rescue_injured and _aftermath_work.skills.physique lt 400>><<set $_rescue_cost to 5000>><</if>>
+    <</switch>>
+  <</if>>
+  <<if !$_rescue_allowed or $money lt $_rescue_cost or Time.hour * 60 + Time.minute + $_rescue_minutes gte 22 * 60>><<exit>><</if>>
+  <<pass $_rescue_minutes>><<deadwood-heist-rescue-check $_rescue_name>>
+  <<if !_rescue_ok or _aftermath_campaign isnot $_rescue_record or $passage isnot $_rescue_source or _rescue_step isnot $_rescue_step or $money lt $_rescue_cost>><<exit>><</if>>
+  <<if $_rescue_cost gt 0>><<money `-$_rescue_cost` 'pub'>><<set _aftermath_work.state.spent += $_rescue_cost>><</if>>
+  <<switch $_rescue_action>>
+    <<case 'reschedule'>>
+      <<run _aftermath.leads.pushUnique($_rescue_name + ':rescheduled')>><<stress 4>>
+    <<case 'scout'>>
+      <<run _aftermath.leads.pushUnique($_rescue_name + ':scouted')>>
+    <<case 'confirm' 'delivery'>>
+      <<run _aftermath.leads.pushUnique($_rescue_name + ':confirmed')>>
+      <<if $_rescue_name is 'wren' and _aftermath.wren is 'held' and ((_aftermath_campaign.team?.separated.includes('Wren') and !_aftermath_campaign.team.rejoined.includes('Wren')) or _aftermath.leads.includes('wren:rescheduled')) and !_aftermath_campaign.team.injured.includes('Wren')>><<run _aftermath_campaign.team.injured.pushUnique('Wren')>><<run _aftermath.leads.pushUnique('wren:injured_at_gate')>><</if>>
+      <<if $_rescue_action is 'delivery'>><<run _aftermath.leads.pushUnique($_rescue_name + ':delivery')>><</if>>
+      <<if _aftermath[$_rescue_name] is 'safe'>><<run _aftermath.leads.pushUnique($_rescue_name + ':freed', $_rescue_name + ':method:meet')>><</if>>
+    <<case 'quiet' 'papers' 'talk' 'pay'>>
+      <<run _aftermath.leads.pushUnique($_rescue_name + ':freed', $_rescue_name + ':method:' + $_rescue_action)>>
+    <<case 'dress'>>
+      <<run _aftermath.leads.pushUnique('aid_used', 'wren:treated')>><<run _aftermath_campaign.team.aid.pushUnique('Wren')>>
+    <<case 'escort_quiet' 'escort_slow'>>
+      <<run _aftermath.leads.pushUnique($_rescue_name + ':escorted', $_rescue_name + '_met', $_rescue_name + ':' + $_rescue_action)>>
+      <<if _aftermath[$_rescue_name] is 'held'>><<set _aftermath[$_rescue_name] to 'rescued'>><<npcincr _rescue_npc love 2>><</if>>
+      <<if $_rescue_action is 'escort_slow'>><<tiredness 5>><</if>>
+      <<if $_rescue_name is 'wren' and _aftermath_campaign.team?.separated.includes('Wren')>><<run _aftermath_campaign.team.rejoined.pushUnique('Wren')>><</if>>
+    <<case 'leave'>>
+      <<if !_aftermath.leads.includes($_rescue_name + ':freed')>><<npcincr _rescue_npc love -2>><</if>>
+      <<set _aftermath[$_rescue_name] to 'left'>><<run _aftermath.leads.pushUnique($_rescue_name + '_met', $_rescue_name + ':withdrawn')>>
+  <</switch>>
+  <<deadwood-heist-aftermath-update>><<set _aftermath_done to true>>
+<</widget>>
+
+<<widget 'deadwood-heist-aftermath-fight-end'>>
+  <<set $_rescue_name to _args[0]>><<deadwood-heist-aftermath-check>>
+  <<if !_aftermath_active or $combat or $possessed or $replayScene or $statFreeze or $frozenValues or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<set $_rescue_fight to _aftermath_campaign.fight, $_rescue_page to $_rescue_name is 'wren' ? 'Deadwood Street Heist Wren Fight End' : 'Deadwood Street Heist Landry Fight End'>>
+  <<if $passage isnot $_rescue_page or !$_rescue_fight or $_rescue_fight.return_passage isnot $_rescue_page or !['won', 'lost'].includes($_rescue_fight.result)>><<exit>><</if>>
+  <<if _aftermath[$_rescue_name] is 'held' and !_aftermath.leads.includes($_rescue_name + '_met') and !_aftermath.leads.includes($_rescue_name + ':freed')>>
+    <<if $_rescue_fight.result is 'won'>>
+      <<run _aftermath.leads.pushUnique($_rescue_name + ':freed', $_rescue_name + ':method:fight')>>
+    <<else>>
+      <<set _aftermath[$_rescue_name] to 'left'>><<run _aftermath.leads.pushUnique($_rescue_name + '_met', $_rescue_name + ':defeat')>>
+    <</if>>
+    <<deadwood-heist-aftermath-update>>
+  <</if>>
+  <<set _aftermath_campaign.fight to null>>
+<</widget>>
+
+<<widget 'deadwood-heist-rescue-button'>>
+  <<capture _args>>
+    <<lanLink `_args[2]`>>
+      <<deadwood-heist-aftermath-person _args[0] _args[1]>>
+      <<if _aftermath_done>><<endevent>><<goto $passage>><<else>><<deadwood-heist-aftermath-feedback>><</if>>
+    <</lanLink>><br>
+  <</capture>>
+<</widget>>
+
+<<widget 'deadwood-heist-rescue-journal'>>
+  <<set $_rescue_name to _args[0]>>
+  <<if _aftermath.leads.includes($_rescue_name + ':freed')>>
+    <<lanSwitch 'The way out is open. Complete the escort at the docks, 06:00–22:00, before treating the meeting as finished.' '退路已经打开。早上六点到晚上十点，回码头完成护送，这场会面才算了结。'>><br>
+  <<elseif _aftermath.leads.includes($_rescue_name + ':confirmed')>>
+    <<lanSwitch 'You have confirmed who is inside. Return to the docks with the documents or a way to get past the guards, 06:00–22:00.' '已经确认了里面的人。带着文件或应付守卫的办法，在早上六点到晚上十点回码头解围。'>><br>
+  <<elseif _aftermath.leads.includes($_rescue_name + ':scouted')>>
+    <<lanSwitch 'You know the approach. Confirm the person and the disputed cargo before intervening, at the docks, 06:00–22:00.' '已经看清进出的路。早上六点到晚上十点，去码头确认本人和有争议的货物，再决定如何介入。'>><br>
+  <<else>>
+    <<lanSwitch 'First watch the meeting place at the docks, 06:00–22:00. Leave time for the return route.' '先在早上六点到晚上十点去码头察看约见处，留出返回的时间。'>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-rescue-scene'>>
+  <<deadwood-heist-rescue-check _args[0]>>
+  <<if !_rescue_ok or !_aftermath.leads.includes(_rescue_name + '_site')>><<deadwood-heist-aftermath-unavailable>><<exit>><</if>>
+  <<effects>><<deadwood-heist-rescue-check _rescue_name>>
+  <<if !_rescue_ok>><<exit>><</if>>
+  <!-- 只有已经接触到本人时才登记人物，离场传话与外围侦查不占本人槽位。 -->
+  <<endevent>><<if _rescue_step isnot 'scout' and _aftermath[_rescue_name] isnot 'left'>><<npc _rescue_npc>><<person1>><</if>>
+  <div id='heist-aftermath-feedback'></div>
+  <<if _rescue_late>>
+    <<language>>
+      <<option 'EN'>>
+        The collection time written on the copy has passed. The tally clerk checks another sheet before answering. "They didn't stand here waiting for you. Give me a few minutes. I'll find out which door they're using now."
+      <<option 'CN'>>
+        副本写的取货日期已经过去。理货员翻过另一张单子，才答话。“人家没站在这里等你。留点时间，我得问问现在从哪扇门走。”
+    <</language>><br><br>
+    <<deadwood-heist-rescue-button _rescue_name 'reschedule' `['Arrange another handover (0:10)', '重新安排交接 (0:10)']`>>
+  <<else>>
+    <<switch _rescue_step>>
+      <<case 'scout'>>
+        <<deadwood-heist-rescue-scout _rescue_name>>
+        <<deadwood-heist-rescue-button _rescue_name 'scout' `_aftermath_work.skills.skulduggery >= 400 ? ['Watch the doors without drawing notice (0:10)', '不动声色地察看出入口 (0:10)'] : ['Work out the loading routine (0:20)', '观察装卸的规律 (0:20)']`>>
+      <<case 'confirm'>>
+        <<deadwood-heist-rescue-confirm _rescue_name>>
+        <<deadwood-heist-rescue-button _rescue_name 'confirm' `_aftermath[_rescue_name] === 'safe' ? ['Compare the seals and the agreed copy (0:05)', '核对封条与说好的副本 (0:05)'] : ['Check the person and the disputed account (0:10)', '确认本人并核对争议的账目 (0:10)']`>>
+        <<if _aftermath.leads.includes('visitors')>>
+          <<deadwood-heist-rescue-button _rescue_name 'delivery' `['Use Briar’s delivery appointment (0:10)', '按布莱尔的送货预约接洽 (0:10)']`>>
+        <</if>>
+      <<case 'break'>>
+        <<deadwood-heist-rescue-break _rescue_name>>
+        <<if _rescue_name is 'wren' and _aftermath_work.skills.skulduggery gte 400>><<deadwood-heist-rescue-button _rescue_name 'quiet' `['Open the side gate while Wren keeps them talking (0:20)', '趁伦恩牵住对方，打开侧门 (0:20)']`>><</if>>
+        <<if _aftermath.leads.includes('permit') and (_rescue_name is 'wren' or _aftermath.leads.includesAny('guarantee', 'visitors', 'public_record'))>><<deadwood-heist-rescue-button _rescue_name 'papers' `['Challenge the demand with the checked documents (0:15)', '拿核实过的文件质疑索偿 (0:15)']`>><</if>>
+        <<if _aftermath_work.skills.english gte (_aftermath.leads.includes('interpreted') ? 400 : 600) and _aftermath.leads.includesAny('guarantee', 'visitors', 'public_record') and !$worn.face.type.includes('gag')>><<deadwood-heist-rescue-button _rescue_name 'talk' `['Keep them to the terms they actually agreed (0:20)', '让他们按真正答应过的条款办事 (0:20)']`>><</if>>
+        <<if $money gte (_rescue_name is 'wren' ? 30000 : 50000)>><<deadwood-heist-rescue-button _rescue_name 'pay' `['Buy out the disputed claim (£' + (_rescue_name === 'wren' ? 300 : 500) + ', 0:10)', '付钱买断这笔争议的索偿（£' + (_rescue_name === 'wren' ? 300 : 500) + '）(0:10)']`>><</if>>
+        <<capture _rescue_name>>
+          <<lanLink ['Hold the guards back while the other person opens the exit', '拦住守卫，让对方打开出口']>>
+            <<deadwood-heist-rescue-check _rescue_name>>
+            <<if _rescue_ok and _rescue_step is 'break'>><<deadwood-heist-fight `_rescue_name === 'wren' ? 'Deadwood Street Heist Wren Fight End' : 'Deadwood Street Heist Landry Fight End'` 3 'docks' 1 2>><</if>>
+          <</lanLink>> <span class='red'><<lanSwitch 'Three guards. You face them yourself.' '三名守卫。需要你独自应付。'>></span><br>
+        <</capture>>
+      <<case 'escort'>>
+        <<deadwood-heist-rescue-escort _rescue_name>>
+        <<if _rescue_injured and _aftermath.leads.includes('aid_kit') and !_aftermath.leads.includes('aid_used')>><<deadwood-heist-rescue-button _rescue_name 'dress' `['Bandage Wren’s injury before moving (0:10)', '先替伦恩包扎，再动身 (0:10)']`>><</if>>
+        <<if !_rescue_injured and Math.max(_aftermath_work.skills.athletics, _aftermath_work.skills.skulduggery) gte 400>><<deadwood-heist-rescue-button _rescue_name 'escort_quiet' `['Take the sheltered way along the quay (0:15)', '沿码头有遮蔽的路离开 (0:15)']`>><</if>>
+        <<deadwood-heist-rescue-button _rescue_name 'escort_slow' `_rescue_injured ? ['Support Wren on the longer way out (0:35)', '扶着伦恩，从远路离开 (0:35)'] : ['Keep together and take the longer way out (0:25)', '一同从远路离开 (0:25)']`>>
+        <<if _rescue_injured and _aftermath_work.skills.physique lt 400>><span class='gold'><<lanSwitch 'A porter will charge £50 to help with the weight.' '需要付五十镑，请搬运工搭把手。'>></span><br><</if>>
+      <<case 'done'>>
+        <<deadwood-heist-rescue-ending _rescue_name>>
+    <</switch>>
+  <</if>><br>
+  <<if _rescue_step is 'done'>>
+    <<getouticon>><<lanLink ['Return to the quay', '回到码头'] 'Docks'>><<endevent>><</lanLink>><br>
+  <<elseif _rescue_step is 'break'>>
+    <<deadwood-heist-rescue-button _rescue_name 'leave' `['Leave the other person to make their own deal', '让对方自行交易，离开这里']`>>
+  <<else>>
+    <<getouticon>><<lanLink ['Return to the quay for now', '先回码头'] 'Docks'>><<endevent>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-heist-rescue-scout'>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _args[0] is 'wren'>>The warehouse stands between two loading bays. A trolley rattles inside each time the side gate opens. You can see the cargo number from your copy chalked on a stack of crates, but not who is collecting it. Watching the workers is safer than walking up to the first person with a badge.<<else>>The rear office has a glazed door overlooking the quay. A delivery hatch opens on the other side. You find the company name from the guarantee on a small brass plate; the larger name painted over the entrance belongs to somebody else. You need to know which account they intend to discuss before you go inside.<</if>>
+    <<option 'CN'>>
+      <<if _args[0] is 'wren'>>仓库夹在两处装卸场之间。侧门每打开一次，里面便传来手推车的响声。你能看见货箱上用粉笔写的编号，与副本相符，却看不见谁在领货。先看看工人怎么走，总比见到挂着牌子的人就凑上去强。<<else>>后方办公室的玻璃门朝着码头，另一侧开着送货口。你在一块小铜牌上找到担保单里的公司名，正门上方漆着的，却是另一个名字。进去之前，得弄清他们究竟打算谈哪笔账。<</if>>
+  <</language>><br><br>
+<</widget>>
+
+<<widget 'deadwood-heist-rescue-confirm'>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _args[0] is 'wren'>>You find Wren by the trolley, checking a damaged seal. <<if _aftermath_campaign.team?.separated.includes('Wren') and !_aftermath_campaign.team.rejoined.includes('Wren')>>The coat is still dirty from the escape. "Took you long enough," Wren says quietly. "They followed the cargo number. I wasn't about to take them to our next meeting."<<else>>"Collecting?" Wren asks. "Then check the number. They've developed a remarkable interest in the wrong account."<</if>> The seal matches the old shipment, not the bank's bars.<<else>>Landry is visible through the door, keeping an unsigned form away from the pen beside it. The old guarantee is on the desk; a second sheet includes charges that were never on the copy you were given. Landry notices you and turns the first page so you can see the limit of the agreement.<</if>>
+      <<if _aftermath.leads.includes('visitors')>><br><br>The appointment from Briar lists packing cases. You have an answer ready if the person at the hatch asks what you are delivering. It gets you to the right desk without naming a customer.<</if>>
+    <<option 'CN'>>
+      <<if _args[0] is 'wren'>>你在手推车旁找到伦恩，对方正检查一处破损的封条。<<if _aftermath_campaign.team?.separated.includes('Wren') and !_aftermath_campaign.team.rejoined.includes('Wren')>>外套上还留着逃离时蹭的污迹。“你可算来了。”伦恩压低声音。“他们顺着货号找过来的。我可不打算把人领到下一场会面。”<<else>>“来领货的？”伦恩问。“那就看看编号。他们突然对一笔不相干的账，很感兴趣。”<</if>>封条与旧货相符，不是银行的金条。<<else>>透过门，你看见兰德里把未签字的表格移离钢笔。旧担保放在桌上，旁边另一张纸却加进了副本上从未有过的费用。兰德里注意到你，翻过第一页，让你看清约定的范围。<</if>>
+      <<if _aftermath.leads.includes('visitors')>><br><br>布莱尔给的预约写着包装箱。送货口的人若问送来了什么，你已经有了答案，不必为了走到正确的桌前，先说出哪个客人的名字。<</if>>
+  <</language>><br><br>
+<</widget>>
+
+<<widget 'deadwood-heist-rescue-break'>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _args[0] is 'wren'>>Three guards move between Wren and the open gate. One points at the added charge, another at the trolley. "The buyer's name, then. We can ask them instead." Wren catches the closing gate with a shoe. "You can ask me about the agreement we actually made."<<else>>The rear door clicks shut. Three guards remain between the desk and the exit. "A guarantor should know where the money went," one says. Landry slides the unsigned sheet towards you. "Then we'd better be very precise about what was guaranteed."<</if>>
+      <<if _args[0] is 'wren' and _aftermath.leads.includes('wren:injured_at_gate')>><br><br>The guard pushes the gate against Wren's leg. Wren jerks free of the edge, leaving a smear of blood on the damaged seal. "That wasn't on the receipt either." The foot stays carefully away from the hinge.<</if>>
+      <<if _aftermath.leads.includes(_args[0] + ':delivery')>><br><br>You put the delivery appointment beside the disputed paper. They expected a routine caller, not someone carrying another copy of their terms. You can challenge the extra claim without giving Briar's name.<</if>>
+      <<if _aftermath.leads.includes('public_record')>><br><br>The council's signed reply identifies the collection account. An accusation of unpaid cargo will now have to match a record that other people can inspect.<</if>>
+    <<option 'CN'>>
+      <<if _args[0] is 'wren'>>三名守卫挡在伦恩与敞开的门之间。一个指着追加的数目，另一个指向手推车。“那就把买家名字说来。我们找人问。”伦恩用鞋顶住将要合上的门。“先问问我，我们到底答应过什么。”<<else>>后门咔嗒一声合上。桌子与出口之间站着三名守卫。“作担保的，总该知道钱去了哪里。”其中一个说。兰德里把未签字的纸推向你。“那就更该说清楚，担保过的究竟是什么。”<</if>>
+      <<if _args[0] is 'wren' and _aftermath.leads.includes('wren:injured_at_gate')>><br><br>守卫把门推向伦恩的腿。伦恩从门沿下挣开，破损的封条上留下了一抹血。“收据上可也没写这个。”那只脚小心地离开了门铰。<</if>>
+      <<if _aftermath.leads.includes(_args[0] + ':delivery')>><br><br>你把送货预约放在争议的纸旁。对方等的是普通来客，不是一个拿着另一份条款的人。你可以质疑多出来的索偿，不必说出布莱尔的名字。<</if>>
+      <<if _aftermath.leads.includes('public_record')>><br><br>市政厅签过字的回函写明了收款账户。欠货款的指控，如今得与别人也能查阅的记录对得上。<</if>>
+  <</language>><br><br>
+<</widget>>
+
+<<widget 'deadwood-heist-rescue-escort'>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _aftermath[_args[0]] is 'safe'>>The seals and the cancelled line agree with your copy. Nobody has tried to change the terms. There is still a load to move and a second receipt to collect at the public quay.<<else>><<if _aftermath.leads.includes(_args[0] + ':method:fight')>>The guards are no longer blocking the door. You cannot afford to wait for their replacements.<<elseif _aftermath.leads.includes(_args[0] + ':method:pay')>>The receipt closes this claim. The money is counted before the door opens.<<elseif _aftermath.leads.includes(_args[0] + ':method:quiet')>>The side gate opens behind the trolley. Wren leaves the argument unfinished and pulls the load towards you.<<else>>Nobody will sign the extra demand. The disputed sheet is pulled back, leaving a way to the door.<</if>> You have opened the exit. You still need to get beyond the warehouses together.<</if>>
+      <<if _args[0] is 'wren'>><br><br><<if _rescue_injured>>Wren tries to put weight on the injured leg, then stops. "Not that way." The joke that follows is shorter than usual. A dressing and support would help; otherwise you will need time and somebody strong enough to share the weight.<<else>>Wren tests the trolley's wheels. "You watch the next turning. I'll make sure this doesn't end up in the water."<</if>><<else>><br><br>Landry pockets the cancelled guarantee. "Not straight to the buyer. First, somewhere nobody needs a name from us." The longer path passes behind the fish stores; the direct one is in full view of the office.<</if>>
+    <<option 'CN'>>
+      <<if _aftermath[_args[0]] is 'safe'>>封条和已经注销的签名栏，都与副本相符。没人试图改口。不过，货还要搬，另一张收条也得去公共码头领取。<<else>><<if _aftermath.leads.includes(_args[0] + ':method:fight')>>守卫不再挡着门，不能留在这里等下一批人。<<elseif _aftermath.leads.includes(_args[0] + ':method:pay')>>收条已经了结本次索偿。钞票数清，门才打开。<<elseif _aftermath.leads.includes(_args[0] + ':method:quiet')>>手推车后方的侧门打开了。伦恩没有把争执说完，便拉着货物朝你走来。<<else>>没人肯在额外的索偿下面签字。争议的纸被收了回去，通往门口的路终于让开。<</if>>出口打开了，还得一起走过这些仓库，才能算脱身。<</if>>
+      <<if _args[0] is 'wren'>><br><br><<if _rescue_injured>>伦恩试着往伤腿上用力，又停住了。“这边不行。”跟着的玩笑也比平时短。敷料和支撑能帮上忙，否则就得多留些时间，再找个能分担重量的人。<<else>>伦恩试了试车轮。“你看着下个拐角。我来保证，这东西不会滚进水里。”<</if>><<else>><br><br>兰德里收起注销的担保单。“别直接去找买家。先去一个没人需要问我们名字的地方。”远路从鱼货仓后绕过，近路则完全落在办公室的视线里。<</if>>
+  <</language>><br><br>
+<</widget>>
+
+<<widget 'deadwood-heist-rescue-ending'>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _aftermath[_args[0]] is 'left'>><<if _aftermath.leads.includes(_args[0] + ':defeat')>>You could not hold the guards back. The other person made a costly agreement while you were forced away.<<elseif _aftermath.leads.includes(_args[0] + ':freed')>>The handover was settled before you left. You took separate routes from there; the rest of the journey was left to the other person.<<else>>You left the disputed business to the other person. A message comes through the tally clerk: the meeting is over, on separate terms.<</if>> There is nothing more for you to arrange at that door.<<elseif _args[0] is 'wren'>>You reach the public quay with Wren and the load. The next receipt matches the first. Wren tears the old collection note across its number. <<if _aftermath.wren is 'safe'>>"A quiet job. Those are worth keeping."<<elseif _aftermath_work.state.betrayed>>"One job at a time. This doesn't put us back where we were."<<elseif C.npc.Wren.love gte 40>>"You do pick interesting ways to keep me company." A familiar smile returns. "Next time, fewer witnesses."<<else>>"I'll remember the help. Don't make it a price we never agreed."<</if>><<else>>Landry stops beyond the last warehouse and checks that nobody has followed. The cancelled guarantee disappears into a coat pocket. <<if _aftermath.landry is 'safe'>>"Getting the terms confirmed early saved us both some trouble."<<elseif _aftermath_work.state.betrayed>>"I won't confuse this with trust. The help still counts."<<elseif C.npc.Landry.love gte 60>>"You understood what mattered. I'll keep the next buyer out of that account."<<else>>"I owe you for the help. The arrangement about the gold still stands."<</if>><</if>>
+    <<option 'CN'>>
+      <<if _aftermath[_args[0]] is 'left'>><<if _aftermath.leads.includes(_args[0] + ':defeat')>>你没能拦住守卫。你被迫离开时，对方付出代价，另作了一份约定。<<elseif _aftermath.leads.includes(_args[0] + ':freed')>>你离开前，交接已经办妥。后来你们各走各的路，剩下的一程由对方自行处理。<<else>>你把有争议的生意留给对方自行处理。理货员捎来了话：会面已经结束，双方另外谈了条件。<</if>>那扇门后的事情，已经不由你插手了。<<elseif _args[0] is 'wren'>>你与伦恩把货带到公共码头，后一张收条与前一张对得上。伦恩沿着货号，撕开旧领取单。<<if _aftermath.wren is 'safe'>>“安静的差事。这种才值得留着。”<<elseif _aftermath_work.state.betrayed>>“一笔归一笔。这不代表回到从前。”<<elseif C.npc.Wren.love gte 40>>“你陪人的办法，还真有意思。”熟悉的笑容回来了。“下次，旁观的人少些吧。”<<else>>“帮过忙，我会记得。别拿来开一个没谈过的价。”<</if>><<else>>走过最后一间仓库，兰德里停下来，确认没人跟着。注销的担保单被折进外套口袋。<<if _aftermath.landry is 'safe'>>“早些把条件核实清楚，给我们都省了些麻烦。”<<elseif _aftermath_work.state.betrayed>>“我不会把这当成信任。不过，帮的忙仍算数。”<<elseif C.npc.Landry.love gte 60>>“你知道要紧的是什么。下一个买家，不会被牵进那笔账。”<<else>>“帮这个忙，我记着。黄金说好的条件，照旧。”<</if>><</if>>
+  <</language>><br><br>
+<</widget>>
+
+:: Deadwood Street Heist Aftermath Wren
+<<deadwood-heist-rescue-scene 'wren'>>
+
+:: Deadwood Street Heist Aftermath Landry
+<<deadwood-heist-rescue-scene 'landry'>>
+
+:: Deadwood Street Heist Wren Fight End
+<<deadwood-heist-aftermath-fight-end 'wren'>>
+<<deadwood-heist-rescue-fight-return 'wren'>>
+
+:: Deadwood Street Heist Landry Fight End
+<<deadwood-heist-aftermath-fight-end 'landry'>>
+<<deadwood-heist-rescue-fight-return 'landry'>>
+
+:: Deadwood Street Heist Rescue Return Widgets [widget]
+<<widget 'deadwood-heist-rescue-fight-return'>>
+  <<set $_rescue_name to _args[0]>><<deadwood-heist-aftermath-check>>
+  <<if !_aftermath_active or $combat or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<if _aftermath.leads.includes($_rescue_name + ':freed')>>
+    <<lanSwitch 'The exit is clear. The escort is not finished.' '出口已经让开，护送还没完成。'>><br><br>
+  <<else>>
+    <<lanSwitch 'The confrontation has ended. The other person had to make a separate agreement.' '冲突已经结束，对方不得不另作约定。'>><br><br>
+  <</if>>
+  <<if $location is 'docks'>><<lanLink ['Continue from the warehouse', '继续处理仓库这边的事'] `$_rescue_name === 'wren' ? 'Deadwood Street Heist Aftermath Wren' : 'Deadwood Street Heist Aftermath Landry'`>><<endevent>><</lanLink>><br><</if>>
+  <<deadwood-heist-aftermath-leave>>
+<</widget>>

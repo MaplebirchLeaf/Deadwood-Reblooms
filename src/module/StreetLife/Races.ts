@@ -124,7 +124,7 @@ export default class Races {
       (transport.state.trip && !transport.state.trip.settled) ||
       transport.state.commute ||
       transport.state.passengers.length ||
-      this.street.heist.inAction ||
+      this.street.heist.busy ||
       this.street.bounties.busy ||
       this.street.bounties.state.active ||
       this.street.jobs.state.active ||

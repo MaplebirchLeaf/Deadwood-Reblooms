@@ -42,6 +42,7 @@ export default class Stories {
   public get available(): boolean {
     return (
       this.street.available &&
+      !this.street.heist.busy &&
       ['idle', 'prep'].includes(this.street.heist.state.stage) &&
       !V.nextPassage &&
       !V.nextPassageCheck &&

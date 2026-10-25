@@ -7,6 +7,38 @@ export interface HeistFight {
   combatStarted: boolean;
   resume: 'vault' | 'escape';
 }
+
+interface HeistCase {
+  stage: number;
+  rolls: number[];
+  alarm: boolean;
+  method: string;
+  result: string;
+  loot: number;
+  steps: string[];
+}
+
+interface HeistCampaign {
+  dock: HeistCase;
+  reception: HeistCase;
+  bank_step: number;
+  bank_rolls: number[];
+  alarm: number;
+  exit_method: string;
+  clerk: string;
+  team: { injured: string[]; separated: string[]; rejoined: string[]; aid: string[] };
+  gold: {
+    bars: number;
+    sold: number;
+    value: number;
+    proceeds: number;
+    ready_day: number;
+    buyer: string;
+    trade: { stage: number; amount: number; deposit: number; day: number; rolls: number[]; secured: boolean; handed_over: boolean; reason: string; reschedules: number };
+  };
+  aftermath: { stage: number; letter_read: boolean; leads: string[]; wren: string; landry: string; choice: string };
+  fight: { keys: string[]; combat_started: boolean; return_passage: string; result: '' | 'won' | 'lost'; location: string; outside: number; tier: number } | null;
+}
 interface HeistState {
   stage: 'idle' | 'prep' | 'entry' | 'challenge' | 'vault' | 'escape' | 'settlement' | 'closed';
   appointment: boolean;
@@ -42,6 +74,7 @@ interface HeistState {
   outcome: '' | 'success' | 'withdrawn' | 'failed' | 'reported' | 'sting' | 'arrested';
   settled: boolean;
   fight: HeistFight | null;
+  campaign: HeistCampaign | null;
   feedback: { action: 'preparation' | 'negotiation' | 'recruitment' | 'meeting' | 'business'; outcome: 'completed' | 'too_late' | 'interrupted' | 'unavailable'; minutes: number; cost: number } | null;
 }
 
@@ -82,6 +115,7 @@ export default class Heist {
     outcome: '',
     settled: false,
     fight: null,
+    campaign: null,
     feedback: null
   };
   public readonly terms = terms;
@@ -123,11 +157,20 @@ export default class Heist {
     return ['entry', 'challenge', 'vault', 'escape'].includes(this.state.stage);
   }
 
+  /** 两桩前案与银行现场共用排他规则，收尾调查允许暂离后继续。 */
+  public get busy(): boolean {
+    const campaign = this.state.campaign;
+    return this.inAction || !!campaign?.fight || [campaign?.dock.stage, campaign?.reception.stage].some(stage => stage !== undefined && stage > 0 && stage < 5);
+  }
+
   public get available(): boolean {
     return (
       this.street.available &&
       !V.nextPassageCheck &&
       !V.nextPassage &&
+      !V.eventforced &&
+      !V.frozenValues &&
+      !window.isPregnancyEnding() &&
       !this.street.jobs.state.active &&
       !this.street.bounties.state.active &&
       !this.street.bounties.busy &&
@@ -146,13 +189,20 @@ export default class Heist {
   /** 成功分账后仍自由、能够工作的原班雇员，接续普通委托，不重开豪劫。 */
   public get businessCrew() {
     if (this.state.stage !== 'closed' || !this.state.settled || this.state.outcome !== 'success') return [];
-    return this.crew.filter(npc => npc.health > 0 && npc.heist.status !== 'arrested' && ['scout', 'carrier'].includes(npc.heist.role));
+    return this.crew.filter(
+      npc =>
+        npc.health > 0 &&
+        npc.heist.status !== 'arrested' &&
+        ['scout', 'carrier'].includes(npc.heist.role) &&
+        (!this.state.campaign?.team.separated.includes(npc.per) || this.state.campaign.team.rejoined.includes(npc.per))
+    );
   }
 
   /** 普通差事开始前便可认识人手，正在进行的安排不能中途换人。 */
   public get recruitmentAvailable(): boolean {
     return (
       this.available &&
+      !this.busy &&
       this.atMeeting &&
       this.meetingAvailable &&
       ['idle', 'prep'].includes(this.state.stage) &&
@@ -174,13 +224,19 @@ export default class Heist {
   }
 
   public get familiarity(): number {
-    if (this.crew.length !== 2) return 0;
+    if (!this.crewReady) return 0;
     const [first, second] = this.crew;
     return Math.clamp(Math.min(first.heist.familiarity?.[second.per] ?? 0, second.heist.familiarity?.[first.per] ?? 0), 0, 100);
   }
 
   public get crewReady(): boolean {
-    return this.crew.length === 2 && ['scout', 'carrier'].every(role => this.crew.some(npc => npc.heist.role === role && npc.health > 0 && npc.heist.status !== 'arrested'));
+    const team = this.state.campaign?.team;
+    return (
+      this.crew.length === 2 &&
+      ['scout', 'carrier'].every(role =>
+        this.crew.some(npc => npc.heist.role === role && npc.health > 0 && npc.heist.status !== 'arrested' && (!team?.separated.includes(npc.per) || team.rejoined.includes(npc.per)))
+      )
+    );
   }
 
   /** 排演已经落实，两种分工仍有人能够参加，才发挥统筹的收益。 */
@@ -307,6 +363,8 @@ export default class Heist {
   public get ready(): boolean {
     return (
       this.state.stage === 'prep' &&
+      (!this.state.campaign ||
+        (this.state.campaign.dock.stage === 6 && this.state.campaign.dock.result !== 'failed' && this.state.campaign.reception.stage === 6 && this.state.campaign.reception.result !== 'failed')) &&
       this.street.stories.ready &&
       ['quiet', 'loud'].includes(this.state.approach) &&
       terms.preparations.every(prep => this.state.preparations.includes(prep.id)) &&
@@ -325,9 +383,16 @@ export default class Heist {
     const scout = this.crew.find(npc => npc.heist.role === 'scout');
     const carrier = this.crew.find(npc => npc.heist.role === 'carrier');
     const story = this.street.stories.modifiers;
+    // 已交齐并核实的账户文件帮助辨认与交涉，前案失败或残缺文件不能冒充成果。
+    const reception = this.state.campaign?.reception;
+    const account = reception?.stage === 6 && reception.result !== 'failed' && reception.method.includes('-verified') ? 5 : 0;
+    const dock = this.state.campaign?.dock;
+    const loading = this.state.campaign?.clerk === 'loading' && dock?.stage === 6 && dock.result !== 'failed' && dock.steps.includes('loading_route') ? 5 : 0;
+    const missing = this.state.campaign?.team.separated.filter(key => !this.state.campaign!.team.rejoined.includes(key)) ?? [];
     const coordination = 1 + (this.crewLeader ? terms.crewLeader.skillBonus : 0) + (this.familiarity / 100) * terms.crewLeader.familiarityBonus;
-    const scoutSkill = scout ? Math.clamp(this.roleSkills[scout.per].scout * coordination, 0, 1000) * Math.clamp(scout.health / scout.healthmax, 0, 1) : 0;
-    const carrierSkill = carrier ? Math.clamp(this.roleSkills[carrier.per].carrier * coordination, 0, 1000) * Math.clamp(carrier.health / carrier.healthmax, 0, 1) : 0;
+    const scoutSkill = scout && !missing.includes(scout.per) ? Math.clamp(this.roleSkills[scout.per].scout * coordination, 0, 1000) * Math.clamp(scout.health / scout.healthmax, 0, 1) : 0;
+    const carrierSkill =
+      carrier && !missing.includes(carrier.per) ? Math.clamp(this.roleSkills[carrier.per].carrier * coordination, 0, 1000) * Math.clamp(carrier.health / carrier.healthmax, 0, 1) : 0;
     const briefing = this.state.preparationChoices.briefing?.quality ?? 0;
     const equipment = this.state.preparationChoices.equipment?.quality ?? 0;
     const rehearsal = this.state.preparationChoices.rehearsal?.quality ?? 0;
@@ -353,12 +418,21 @@ export default class Heist {
     return {
       entry: Math.round(
         Math.clamp(
-          25 + story.entry + skills.skulduggery * 0.03 + skills.willpower * 0.01 + scoutSkill * 0.02 + briefing + (this.state.mickeyReview === 'information' ? terms.mickey.bonus : 0) - penalty,
+          25 +
+            story.entry +
+            account +
+            loading +
+            skills.skulduggery * 0.03 +
+            skills.willpower * 0.01 +
+            scoutSkill * 0.02 +
+            briefing +
+            (this.state.mickeyReview === 'information' ? terms.mickey.bonus : 0) -
+            penalty,
           5,
           95
         )
       ),
-      talk: V.worn.face.type.includes('gag') ? 0 : Math.round(Math.clamp(20 + story.talk + skills.english * 0.04 + skills.willpower * 0.015 + briefing - penalty, 5, 95)),
+      talk: V.worn.face.type.includes('gag') ? 0 : Math.round(Math.clamp(20 + story.talk + account + skills.english * 0.04 + skills.willpower * 0.015 + briefing - penalty, 5, 95)),
       vault: Math.round(
         Math.clamp(25 + story.vault + skills.physique * 0.025 + carrierSkill * 0.025 + equipment + rehearsal * 0.5 + (this.state.mickeyReview === 'crew' ? terms.mickey.bonus : 0) - penalty, 5, 95)
       ),
@@ -377,6 +451,6 @@ export default class Heist {
   }
 
   public get payout(): number {
-    return Math.floor((this.state.loot * this.split.pc) / 100);
+    return Math.floor(((this.state.campaign ? this.state.campaign.gold.proceeds : this.state.loot) * this.split.pc) / 100);
   }
 }

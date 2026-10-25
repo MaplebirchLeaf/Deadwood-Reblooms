@@ -30,6 +30,7 @@ export default class CompanyEvents {
   private static get signals(): Record<string, number> {
     const cafe = Math.max(0, Number(V.chef_state) || 0);
     const street = V.StreetLife;
+    const publicBankIncident = street?.heist?.entered === true && (!street.heist.campaign || street.heist.raisedAlarm || street.heist.campaign.bank_step >= 6);
     const factories = V.Finance?.industry?.factories ?? [];
     return {
       cafe,
@@ -40,8 +41,10 @@ export default class CompanyEvents {
       orphanage_buyout: Number(V.Finance?.orphanage?.pc_bought_out === true || V.Finance?.orphanage?.robin_bought_out === true),
       orphanage_supplies: Number(maplebirch.get('Finance')?.donations.aid.ready('orphanage') ?? false),
       orphanage_dispute: Number(V.RobinExpansion?.bailey_defeated === true),
-      bank_incident: Number(street?.heist?.entered === true),
-      bank_reopened: Number(street?.heist?.entered === true && street.heist.bankClosedUntil >= 0 && Math.floor(Time.days) >= street.heist.bankClosedUntil),
+      bank_incident: Number(publicBankIncident),
+      bank_reopened: Number(publicBankIncident && street.heist.bankClosedUntil >= 0 && Math.floor(Time.days) >= street.heist.bankClosedUntil),
+      heist_account_disclosure: Number(street?.heist?.campaign?.aftermath.leads.includes('public_record') === true),
+      heist_dock_incident: Number(street?.heist?.campaign?.dock.alarm === true && street.heist.campaign.dock.stage >= 3),
       cargo_arrest: Number(street?.bounties?.completedTypes?.includes('cargo_raid') ?? false),
       casino_arrest: Number(street?.bounties?.completedTypes?.includes('chips') ?? false),
       cafe_arrest: Number(street?.bounties?.completedTypes?.includes('intimidation') ?? false),

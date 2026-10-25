@@ -1,0 +1,135 @@
+:: Deadwood Street Heist Journal Widgets [widget]
+
+<!-- 日志与统计只读实际阶段，案件推进、人物关系和款项仍在现场点击时结算。 -->
+<<widget 'deadwood-heist-campaign-journal'>>
+  <<set _heistJournalState to $StreetLife?.heist, _heistJournalCampaign to $StreetLife?.heist?.campaign>>
+  <<if !_heistJournalCampaign>><<exit>><</if>>
+  <<if _heistJournalState.stage is 'closed' and !(_heistJournalCampaign.aftermath.stage lt 6 and ['success', 'sting'].includes(_heistJournalState.outcome))>><<deadwood-heist-letters-journal>><<exit>><</if>>
+  <div class='gold bold'><<lanSwitch 'The bank arrangement' '银行的约定'>></div>
+  <ul class='journal'>
+    <<if _heistJournalCampaign.fight>>
+      <li><<lanSwitch 'A confrontation is still awaiting its outcome. Return to the scene before continuing the arrangement.' '一场冲突尚待收束。先回到现场处理结果，再继续约定。'>></li>
+    <</if>>
+    <<if _heistJournalState.stage is 'prep'>>
+      <<for _heistJournalCaseId range ['dock', 'reception']>>
+        <<set _heistJournalCase to _heistJournalCampaign[_heistJournalCaseId]>>
+        <<if _heistJournalCase.stage lt 6 or _heistJournalCase.result is 'failed'>>
+          <li><strong><<= _heistJournalCaseId is 'dock' ? lanSwitch('The harbour pay chest', '码头押款') : lanSwitch('The civic reception', '市政招待会')>></strong>：
+            <<switch _heistJournalCase.stage>>
+              <<case 0>>
+                <<if _heistJournalCaseId is 'reception' and !(_heistJournalCampaign.dock.stage is 6 and _heistJournalCampaign.dock.result isnot 'failed')>>
+                  <<lanSwitch 'First report a completed or partial dock job at the smugglers’ pub, 09:00–18:00.' '先办妥码头一案，09:00–18:00回走私者酒馆交代完成或有所折损的结果。'>>
+                <<else>>
+                  <<lanSwitch 'Discuss the job at the smugglers’ pub, 09:00–18:00.' '09:00–18:00到走私者酒馆，商量这桩安排。'>>
+                <</if>>
+              <<case 6>>
+                <<lanSwitch 'The failed attempt has been reported. Return to the smugglers’ pub, 09:00–18:00, to agree and pay for a fresh attempt.' '失手的经过已经交代。09:00–18:00回走私者酒馆，重新谈妥并支付下一次安排的开销。'>>
+              <<case 5>>
+                <<lanSwitch 'The field work is over. Report what happened at the smugglers’ pub, 09:00–18:00.' '现场行动已经结束。09:00–18:00回走私者酒馆，如实说明结果。'>>
+              <<default>>
+                <<if _heistJournalCaseId is 'dock'>>
+                  <<lanSwitch 'Continue at the docks, 09:00–18:00.' '09:00–18:00到码头，继续现场行动。'>>
+                <<else>>
+                  <<lanSwitch 'Continue at the town hall, 14:00–17:00.' '14:00–17:00到市政厅，继续招待会的行动。'>>
+                <</if>>
+                <<switch _heistJournalCase.stage>>
+                  <<case 1>>
+                    <<if _heistJournalCaseId is 'reception' and !_heistJournalCase.steps?.includes('social_settled')>><<lanSwitch ' Settle your place at the reception before entering.' ' 入场前，先处理招待会的接洽安排。'>><<elseif _heistJournalCaseId is 'reception' and !_heistJournalCase.steps?.includes('harper_settled')>><<lanSwitch ' Decide whether to rest, accept a check or decline before continuing.' ' 选择休息、接受检查或婉拒，再继续手头的事。'>><<else>><<lanSwitch ' The meeting has been arranged; you have not entered yet.' ' 已经接洽，尚未入场。'>><</if>>
+                    <<lanSwitch ' Starting needs more than two hours before closing.' ' 正式入场需留出超过两小时的营业余量。'>>
+                  <<case 2>>
+                    <<if _heistJournalCaseId is 'dock'>>
+                      <<if !_heistJournalCase.steps?.includes('warehouse_entered')>><<lanSwitch ' First enter the warehouse.' ' 先设法进入仓库。'>><<elseif !_heistJournalCase.steps?.includes('warehouse_record')>><<lanSwitch ' Check the warehouse records before taking the chest.' ' 取款箱前先核对仓库记录。'>><<elseif !_heistJournalCase.steps?.includes('dock_interest')>><<lanSwitch ' Decide whether to leave the workers’ pay untouched.' ' 决定是否留下工人的薪金。'>><<else>><<lanSwitch ' Decide how much to take.' ' 决定实际取走多少。'>><</if>>
+                    <<else>>
+                      <<if !_heistJournalCase.steps?.includes('gallery_entered')>><<lanSwitch ' Reach the private gallery.' ' 先进入私人展廊。'>><<elseif !_heistJournalCase.steps?.includes('vault_opened')>><<lanSwitch ' Deal with the private vault entrance.' ' 处理私人金库的入口。'>><<elseif !_heistJournalCase.steps?.includes('vault_copy')>><<lanSwitch ' Recover the account copy from inside.' ' 从内部取得账户副本。'>><<elseif !_heistJournalCase.steps?.includes('briar_interest')>><<lanSwitch ' Resolve the demands around the case before withdrawing.' ' 撤离前处理围绕皮箱的各方要求。'>><<else>><<lanSwitch ' Decide which actual items to take.' ' 决定实际带走哪些款物。'>><</if>>
+                    <</if>>
+                  <<case 3>><<lanSwitch ' Decide what you can actually take away.' ' 决定实际能够带走什么。'>>
+                  <<case 4>><<lanSwitch ' Get clear with the people and items still in your care.' ' 带着仍在照应的人与物离开。'>>
+                <</switch>>
+            <</switch>>
+          </li>
+        <</if>>
+      <</for>>
+      <<if _heistJournalCampaign.dock.stage is 6 and _heistJournalCampaign.dock.result isnot 'failed' and _heistJournalCampaign.reception.stage is 6 and _heistJournalCampaign.reception.result isnot 'failed'>>
+        <li><<lanSwitch 'Both earlier jobs have been reported. Finish the bank information, supplies and rehearsal at the agreed locations. Private meetings remain at the smugglers’ pub, 09:00–18:00.' '两桩先行安排都已交代结果。继续在约定地点核对银行消息、准备用品和排演。私下会面仍在走私者酒馆，09:00–18:00。'>></li>
+        <li><<lanSwitch 'When the preparations and crew are ready, begin at the financial centre bank counter on High Street, Tuesday–Saturday, 09:00–17:00.' '准备和人手就绪后，周二至周六09:00–17:00到商业街金融中心的银行柜台开始行动。'>></li>
+      <</if>>
+    <<elseif ['entry', 'challenge', 'vault', 'escape'].includes(_heistJournalState.stage)>>
+      <<if _heistJournalCampaign.clerk is 'warned' or _heistJournalCampaign.clerk is 'cleared'>>
+        <li><<lanSwitch 'The counter has been warned or the customers led clear. The entry can no longer remain unnoticed.' '柜台已经得到警告，或顾客已被带开。入场已无法继续瞒过旁人。'>></li>
+      <<elseif _heistJournalCampaign.clerk is 'loading'>>
+        <li><<lanSwitch 'You used the loading access learned at the docks.' '已经使用码头案查明的装卸入口。'>></li>
+      <</if>>
+      <<if _heistJournalCampaign.bank_step is 5 and _heistJournalCampaign.team?.injured.some(key => !_heistJournalCampaign.team.aid.includes(key))>>
+        <li><<lanSwitch 'Crew are injured. At the regrouping point, decide how to support them or reduce the load before proceeding.' '有人受伤。会合时先决定照料、分担或减轻负重，再继续撤离。'>></li>
+      <</if>>
+      <<if _heistJournalCampaign.team?.separated.some(key => !_heistJournalCampaign.team.rejoined.includes(key))>>
+        <li><<if _heistJournalCampaign.bank_step is 5>><<lanSwitch 'Someone is still separated from the group. Look for them from the regrouping point or explicitly leave them behind.' '仍有人与队伍走散。在会合处决定回头找人，或明确留下他们。'>><<else>><<lanSwitch 'You left someone behind at the regrouping point. They cannot help with this escape.' '你在会合处留下了掉队的人，他们无法协助这次撤离。'>><</if>></li>
+      <</if>>
+      <li><<if _heistJournalCampaign.bank_step gte 6>><<lanSwitch 'Continue the escape from High Street.' '回到商业街，接着处理街上的撤离。'>><<else>><<lanSwitch 'Return to the financial centre bank counter on High Street to continue the operation already under way.' '回到商业街金融中心的银行柜台，继续已经开始的行动。'>><</if>>
+        <<switch _heistJournalCampaign.bank_step>>
+          <<case 0>><<lanSwitch ' The crew is approaching the banking hall.' ' 同伙正在接近大厅。'>>
+          <<case 1>><<lanSwitch ' The guard’s questions still need an answer.' ' 守卫的盘问尚待应对。'>>
+          <<case 2>><<lanSwitch ' Find a way through the inner passage.' ' 需要通过内部通道。'>>
+          <<case 3>><<lanSwitch ' Deal with the obstruction at the vault entrance.' ' 需要处理金库入口的阻碍。'>>
+          <<case 4>><<lanSwitch ' Decide how much gold can be carried.' ' 需要决定搬出多少黄金。'>>
+          <<case 5>><<lanSwitch ' Regroup with the crew.' ' 需要与同伙会合。'>>
+          <<case 6>><<lanSwitch ' The street exit is obstructed.' ' 街口的去路受阻。'>>
+          <<case 7>><<lanSwitch ' Find cover or shake the pursuit.' ' 需要躲藏或甩开追踪。'>>
+          <<case 8>><<lanSwitch ' Choose the final way out on foot or in the prepared car.' ' 需要选择徒步或用备好的汽车最终脱身。'>>
+        <</switch>>
+      </li>
+    <<elseif _heistJournalState.stage is 'settlement'>>
+      <<if ['reported', 'sting'].includes(_heistJournalState.outcome)>>
+        <li><<lanSwitch 'Review the verified statement with Grant at the police station, 08:00–18:00, when the detective is on duty and your own record allows payment.' '08:00–18:00到警局找在岗的格兰特核对笔录。仍需先处理会妨碍领款的本人案件。'>></li>
+      <<elseif _heistJournalState.outcome is 'success' and _heistJournalCampaign.aftermath.stage gte 6>>
+        <li><<lanSwitch 'The buyer’s account and remaining arrangements are closed. Take the receipts to the smugglers’ pub, 09:00–18:00, confirm the agreed division and close the operation.' '货款安排与余下事项已经了结。09:00–18:00带着收款记录到走私者酒馆，核对约定的分账，结束行动。'>></li>
+      <<elseif _heistJournalState.outcome isnot 'success'>>
+        <li><<lanSwitch 'Report the outcome and close the operation at the smugglers’ pub, 09:00–18:00.' '09:00–18:00到走私者酒馆说明结果，结束这次行动。'>></li>
+      <</if>>
+    <</if>>
+  </ul>
+  <<deadwood-heist-aftermath-journal>>
+<</widget>>
+
+<<widget 'deadwood-heist-campaign-statistics'>>
+  <<set _heistStatsState to $StreetLife?.heist, _heistStatsCampaign to $StreetLife?.heist?.campaign>>
+  <<if !_heistStatsCampaign>><<exit>><</if>>
+  <br><span class='gold'><<lanSwitch 'The bank arrangement' '银行的约定'>></span><br>
+  <<deadwood-reblooms-progress-check `_heistStatsCampaign.dock.stage === 6` `["Report the outcome of the dock cash transfer", "交代码头押款的结果"]`>>
+  <<deadwood-reblooms-progress-check `_heistStatsCampaign.reception.stage === 6` `["Report the outcome of the town hall reception", "交代市政招待会的结果"]`>>
+  <<for _heistStatsCaseId range ['dock', 'reception']>>
+    <<set _heistStatsCase to _heistStatsCampaign[_heistStatsCaseId]>>
+    <<if _heistStatsCase.stage is 6>>
+      <<= _heistStatsCaseId is 'dock' ? lanSwitch('Dock case: ', '码头案：') : lanSwitch('Reception case: ', '招待会案：')>>
+      <<switch _heistStatsCase.result>>
+        <<case 'success'>><span class='green'><<lanSwitch 'Completed as planned' '按计划完成'>></span>
+        <<case 'partial'>><span class='orange'><<lanSwitch 'Partial result' '有所折损'>></span>
+        <<case 'failed'>><span class='red'><<lanSwitch 'Failed; reported' '失手，已交代结果'>></span>
+        <<default>><<lanSwitch 'Reported' '已交代结果'>>
+      <</switch>><br>
+      <<lanSwitch 'Items and cash brought back, recorded value: ' '案内实际带回的款物估值：'>><span class='gold'><<= formatMoney(_heistStatsCase.loot)>></span><br>
+    <</if>>
+  <</for>>
+  <<deadwood-reblooms-progress-check `_heistStatsCampaign.dock.steps?.includes('loading_route')` `["Inspect the dock loading route", "实地查明装卸通路"]`>>
+  <<deadwood-reblooms-progress-check `_heistStatsCampaign.reception.steps?.includes('vault_copy')` `["Recover the account copy from the private vault", "从私人金库取得账户副本"]`>>
+  <<deadwood-reblooms-progress-check `_heistStatsCampaign.bank_step >= 9 && _heistStatsState.outcome === 'success'` `["Escape from the bank with the gold", "带着黄金从银行脱身"]`>>
+  <<deadwood-reblooms-progress-check `['warned', 'cleared'].includes(_heistStatsCampaign.clerk)` `["Warn the counter or lead the customers clear", "提醒柜台或带开顾客"]`>>
+  <<deadwood-reblooms-progress-check `_heistStatsCampaign.clerk === 'loading'` `["Use the dock loading route to enter the bank", "沿码头案查明的装卸通路进入银行"]`>>
+  <<if _heistStatsCampaign.team>>
+    <<lanSwitch 'Crew injured / separated / rejoined / aided: ' '同伙受伤／走散／找回／照料：'>><<= _heistStatsCampaign.team.injured.length>> / <<= _heistStatsCampaign.team.separated.length>> / <<= _heistStatsCampaign.team.rejoined.length>> / <<= _heistStatsCampaign.team.aid.length>><br>
+    <<deadwood-reblooms-progress-check `_heistStatsCampaign.team.separated.length > 0 && _heistStatsCampaign.team.separated.every(key => _heistStatsCampaign.team.rejoined.includes(key))` `["Reunite with everyone separated during the bank escape", "找回银行撤离时所有走散的同伙"]`>>
+  <</if>>
+  <<deadwood-reblooms-progress-check `_heistStatsState.settled` `["Close the operation and settle the agreed outcome", "结清约定并结束行动"]`>>
+  <<lanSwitch 'Recorded expenses: ' '已记录开销：'>><span class='gold'><<= formatMoney(_heistStatsState.spent)>></span><br>
+  <<lanSwitch 'Gold recovered / sold: ' '实际带回／已售金条：'>><<= _heistStatsCampaign.gold.bars>> / <<= _heistStatsCampaign.gold.sold>><br>
+  <<lanSwitch 'Recovered gold’s recorded estimate: ' '带回黄金的记录估值：'>><span class='gold'><<= formatMoney(_heistStatsCampaign.gold.value)>></span><br>
+  <<lanSwitch 'Actual gold-sale proceeds before shares: ' '销金实际总款，分账前：'>><span class='gold'><<= formatMoney(_heistStatsCampaign.gold.proceeds)>></span><br>
+  <<if _heistStatsState.settled and _heistStatsState.outcome is 'success' and _heistStatsState.shares>>
+    <<set _heistStatsCollected to Math.floor(_heistStatsCampaign.gold.proceeds * _heistStatsState.shares.pc / 100)>>
+    <<lanSwitch 'Your bank-operation share collected: ' '银行行动分账实收：'>><span class='gold'><<= formatMoney(_heistStatsCollected)>></span><br>
+    <<lanSwitch 'Bank share less recorded expenses: ' '银行分账扣除已记录开销后：'>><span class='gold'><<= formatMoney(_heistStatsCollected - _heistStatsState.spent)>></span><br>
+  <</if>>
+  <<if _heistStatsState.settled and _heistStatsState.outcome is 'success'>><span class='grey'><<lanSwitch 'Shares from the two earlier jobs were paid separately.' '前两桩买卖的个人分账已经另行结算。'>></span><br><</if>>
+  <<deadwood-heist-aftermath-statistics>>
+  <<deadwood-heist-gold-statistics>>
+<</widget>>

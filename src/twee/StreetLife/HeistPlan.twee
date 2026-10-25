@@ -105,7 +105,7 @@
         <</for>>
 
       <</if>>
-      <li><<lanSwitch 'Recorded preparation expenses: ' '已记录的筹备支出：'>><<printmoney _streetHeist.state.spent>></li>
+      <li><<lanSwitch 'Recorded expenses: ' '已记录支出：'>><<printmoney _streetHeist.state.spent>></li>
       <<for _streetCrew range _streetHeist.crew>>
         <li><<icon `'street/' + _streetCrew.heist.role + '.png'`>><<= _streetCrew.heist.role is 'scout' ? lanSwitch('Scout: ', '侦察员：') : lanSwitch('Carrier: ', '搬运员：')>><<= _streetCrew.name>> · <<lanSwitch 'Skill: ' '熟练：'>><span class='teal'><<= _streetCrew.skills[_streetCrew.heist.role is 'scout' ? 'security' : 'athletics']>></span> / 1000 · <<lanSwitch 'Share: ' '抽成：'>><span class='gold'><<= _streetCrew.heist.cut>>%</span> · <<lanSwitch 'Health: ' '身体状况：'>><span class='teal'><<= Math.round(_streetCrew.health / _streetCrew.healthmax * 100)>>%</span><<if _streetCrew.heist.status is 'arrested'>> · <span class='red'><<lanSwitch 'in custody' '已被扣留'>></span><</if>></li>
       <</for>>
@@ -179,7 +179,7 @@
   <<if _streetHeist.available and _streetHeist.unlocked and _streetHeist.meetingAvailable>>
     <<icon 'street/heist-plan.png'>><<lanLink ['Agree to prepare the job', '同意筹备这桩买卖'] 'Deadwood Street Heist Plan'>>
       <<if _streetHeist.available and _streetHeist.unlocked and _streetHeist.meetingAvailable and _streetHeist.state.appointment and _streetHeist.state.stage is 'idle'>>
-        <<endevent>><<set _streetHeist.state.stage to 'prep'>>
+        <<endevent>><<set _streetHeist.state.stage to 'prep'>><<deadwood-heist-campaign-init>>
       <</if>>
     <</lanLink>><br>
   <<else>>
@@ -187,6 +187,7 @@
   <</if>>
   <<refuseicon>><<lanLink ['Decline the offer', '拒绝这份提议'] 'Smuggler Pub'>><<endevent>><<if _streetHeist>><<set _streetHeist.state.activity to '', _streetHeist.state.candidate to ''>><</if>><</lanLink>><br>
 <<elseif _streetHeist.state.stage is 'prep'>>
+  <<deadwood-heist-cases-plan>>
   <<language>>
     <<option 'EN'>>
       The folded notes are still at Landry's table. Wren has left a few additions, and a separate figure beside the proposed share. "Everyone gets paid for their part," Landry says. "You decide how to proceed. I'll arrange what we've agreed to."
@@ -309,18 +310,28 @@
     <<else>>
       <span class='blue'><<lanSwitch 'Choose an approach, finish all three preparations, and hire one person for each role before beginning. A selected vehicle must also remain ready on High Street.' '先选择方式，完成三项准备，并分别聘好两个角色。若选了车辆，车也要仍在商业街就绪。'>></span><br>
     <</if>><br>
-    <<refuseicon>><<lanLink ['Withdraw from the job', '退出这桩买卖'] 'Deadwood Street Heist Plan'>>
-      <<if _streetHeist.available and _streetHeist.state.stage is 'prep'>>
-        <<endevent>><<set _streetHeist.state.stage to 'closed', _streetHeist.state.outcome to 'withdrawn', _streetHeist.state.settled to true, _streetHeist.state.activity to '', _streetHeist.state.candidate to ''>>
-      <</if>>
-    <</lanLink>><br>
+    <<if !_streetHeist.state.campaign or [_streetHeist.state.campaign.dock.stage, _streetHeist.state.campaign.reception.stage].every(stage => stage === 0 || stage === 6)>>
+      <<refuseicon>><<lanLink ['Withdraw from the job', '退出这桩买卖'] 'Deadwood Street Heist Plan'>>
+        <<if _streetHeist.available and _streetHeist.state.stage is 'prep' and (!_streetHeist.state.campaign or [_streetHeist.state.campaign.dock.stage, _streetHeist.state.campaign.reception.stage].every(stage => stage === 0 || stage === 6))>>
+          <<endevent>><<set _streetHeist.state.stage to 'closed', _streetHeist.state.outcome to 'withdrawn', _streetHeist.state.settled to true, _streetHeist.state.activity to '', _streetHeist.state.candidate to ''>>
+        <</if>>
+      <</lanLink>><br>
+    <<else>>
+      <span class='blue'><<lanSwitch 'The earlier job is still open. Withdraw from that job at its location and settle the account here before closing the bank arrangement.' '前一桩买卖还没了结。先在现场撤回，再回来把账结清，才能结束银行的安排。'>></span><br>
+    <</if>>
   <<else>>
     <span class='blue'><<lanSwitch 'Finish your current business before changing these arrangements.' '先处理手头的事，再改变这里的安排。'>></span><br>
   <</if>>
 <<else>>
   <<deadwood-street-heist-status>>
   <<if _streetHeist.inAction>>
-    <span class='blue'><<lanSwitch 'The job has begun. Return to the financial centre bank counter on High Street to continue; these preparations can no longer be changed.' '行动已经开始。到商业街金融中心的银行柜台继续。这里的准备事项已经不能更改。'>></span><br>
+    <span class='blue'>
+      <<if _streetHeist.state.campaign?.bank_step gte 6>>
+        <<lanSwitch 'You have reached the street. Return to High Street to continue getting clear; these preparations can no longer be changed.' '你已经到了街上。回商业街继续脱身，这里的准备事项已经不能更改。'>>
+      <<else>>
+        <<lanSwitch 'The job has begun. Return to the financial centre bank counter on High Street to continue; these preparations can no longer be changed.' '行动已经开始。到商业街金融中心的银行柜台继续。这里的准备事项已经不能更改。'>>
+      <</if>>
+    </span><br>
   <<elseif _streetHeist.state.stage is 'settlement'>>
     <<if ['reported', 'sting'].includes(_streetHeist.state.outcome)>>
       <span class='blue'><<lanSwitch 'Speak to Grant at the police station to settle the verified outcome.' '到警局找格兰特，结算核实后的结果。'>></span><br>
@@ -332,4 +343,5 @@
 <<if _streetHeist?.businessCrew.length and _streetHeist.meetingAvailable and maplebirch.get('StreetLife').jobs.available>>
   <<socialiseicon 'ask'>><<lanLink ['Ask the former crew about warehouse and delivery work', '向员工打听仓储差事'] 'Deadwood Street Heist Contacts'>><<endevent>><</lanLink>><br>
 <</if>>
+<<deadwood-heist-aftermath-plan>>
 <<getouticon>><<lanLink ['Return to the smugglers’ pub', '回到走私者酒馆'] 'Smuggler Pub'>><<endevent>><<if _streetHeist>><<set _streetHeist.state.activity to '', _streetHeist.state.candidate to ''>><</if>><</lanLink>><br>

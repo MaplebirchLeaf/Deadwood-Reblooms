@@ -63,7 +63,7 @@ export default class SmugglerPub {
       V.location === 'underground' &&
       V.smuggler_pub_known === 1 &&
       this.street.available &&
-      !this.street.heist.inAction &&
+      !this.street.heist.busy &&
       !this.street.bounties.busy &&
       !V.nextPassage &&
       !V.nextPassageCheck &&

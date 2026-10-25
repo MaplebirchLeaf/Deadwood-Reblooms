@@ -1,0 +1,108 @@
+:: Deadwood Street Bank Regroup Widgets [widget]
+
+<!-- 同伙的伤势在搬运时结算；会合页只读结果，行动才处理伤员与掉队者。 -->
+<<widget 'deadwood-heist-regroup-action'>>
+  <<set _regroup_work to maplebirch.get('StreetLife')?.heist, _regroup_action to _args[0], _regroup_campaign to _regroup_work?.state.campaign>>
+  <<if !_regroup_campaign or !_regroup_work.available or $passage isnot 'Deadwood Street Heist' or _regroup_campaign.bank_step isnot 5 or _regroup_campaign.fight>><<exit>><</if>>
+  <<set _regroup_team to _regroup_campaign.team, _regroup_missing to _regroup_team.separated.filter(key => !_regroup_team.rejoined.includes(key)), _regroup_hurt to _regroup_team.injured.filter(key => !_regroup_team.aid.includes(key))>>
+  <<set _regroup_minutes to ['search', 'treat'].includes(_regroup_action) ? 15 : _regroup_action is 'help' ? 10 : 5>>
+  <<if _regroup_action is 'search' and !_regroup_missing.length>><<exit>><</if>>
+  <<if _regroup_action is 'treat' and (!_regroup_hurt.length or _regroup_work.skills.science lt 400 or (_regroup_work.state.preparationChoices.equipment?.quality ?? 0) lt 6)>><<exit>><</if>>
+  <<if _regroup_action is 'continue' and (_regroup_missing.length or _regroup_hurt.length)>><<exit>><</if>>
+  <<if !['search', 'treat', 'help', 'press', 'continue'].includes(_regroup_action)>><<exit>><</if>>
+  <<set $_regroup_record to _regroup_campaign, $_regroup_target to _regroup_missing[0]>>
+  <<pass _regroup_minutes>>
+  <<if !_regroup_work.available or _regroup_work.state.campaign isnot $_regroup_record or $passage isnot 'Deadwood Street Heist' or _regroup_campaign.bank_step isnot 5>><<exit>><</if>>
+  <<if _regroup_action is 'search'>>
+    <<set _regroup_chance to Math.clamp(25 + Math.max(_regroup_work.skills.athletics, _regroup_work.skills.skulduggery) * 0.06 - _regroup_work.conditionPenalty - _regroup_campaign.alarm * 3, 10, 90)>>
+    <<if _regroup_campaign.bank_rolls[$_regroup_target is 'Wren' ? 7 : 6] lte _regroup_chance>>
+      <<run _regroup_team.rejoined.pushUnique($_regroup_target)>><<tiredness 4>><<athletics 1>>
+      <<if $_regroup_target is 'Wren'>><<npcincr Wren love 1>><</if>>
+    <<else>>
+      <<set _regroup_campaign.alarm += 1>>
+      <<deadwood-heist-fight 'Deadwood Street Bank Regroup Result' 2 'financial_centre' 0 2>><<exit>>
+    <</if>>
+  <<elseif _regroup_action is 'treat'>>
+    <<for _regroup_key range _regroup_hurt>>
+      <<run _regroup_team.aid.pushUnique(_regroup_key)>>
+      <<if $per_npc[_regroup_key]>><<set $per_npc[_regroup_key].health to Math.min($per_npc[_regroup_key].healthmax, $per_npc[_regroup_key].health + Math.ceil($per_npc[_regroup_key].healthmax * 0.02))>><</if>>
+    <</for>>
+    <<scienceskill 5 'no_star'>>
+  <<else>>
+    <<if _regroup_action is 'help'>>
+      <<set _regroup_work.state.loot to Math.floor(_regroup_work.state.loot * 0.95)>>
+      <<for _regroup_key range _regroup_hurt>><<run _regroup_team.aid.pushUnique(_regroup_key)>><</for>><<tiredness 4>><<physique 1 'noMessage'>>
+      <<deadwood-street-crew-gain `_regroup_work.state.crew.filter(key => !_regroup_missing.includes(key))` 10 5>>
+    <</if>>
+    <<if _regroup_missing.length>>
+      <<set _regroup_work.state.loot to Math.floor(_regroup_work.state.loot * (_regroup_missing.some(key => $per_npc[key]?.heist.role === 'carrier') ? 0.5 : 0.9)), _regroup_campaign.alarm += 1>>
+      <<if _regroup_missing.includes('Wren')>><<npcincr Wren love -5>><</if>>
+    <</if>>
+    <<if _regroup_action is 'press' and _regroup_hurt.length>>
+      <<for _regroup_key range _regroup_hurt>>
+        <<if $per_npc[_regroup_key]>><<set $per_npc[_regroup_key].health to Math.max(1, $per_npc[_regroup_key].health - Math.ceil($per_npc[_regroup_key].healthmax * 0.1))>><</if>>
+      <</for>>
+      <<set _regroup_campaign.alarm += 1>>
+    <</if>>
+    <<set _regroup_campaign.bank_step to 6, _regroup_campaign.exit_method to _regroup_action>>
+  <</if>>
+  <<goto 'Deadwood Street Heist'>>
+<</widget>>
+
+<<widget 'deadwood-heist-regroup-scene'>>
+  <<set _regroup_work to maplebirch.get('StreetLife').heist, _regroup_team to _regroup_work.state.campaign.team>>
+  <<set _regroup_missing to _regroup_team.separated.filter(key => !_regroup_team.rejoined.includes(key)), _regroup_hurt to _regroup_team.injured.filter(key => !_regroup_team.aid.includes(key))>>
+  <<language>>
+    <<option 'EN'>>
+      You stop behind a fire door. A strip of daylight shows beneath the exit, but the scout has yet to signal that the way is clear. You count the others before reaching for the handle.
+    <<option 'CN'>>
+      你在一扇防火门后停下。出口下方漏进一线日光，侦察员却还没给出去路安全的信号。伸手碰门把之前，你先数了数人。
+  <</language>><br><br>
+  <<if _regroup_missing.length>>
+    <<for _regroup_key range _regroup_missing>>
+      <span class='orange'><<= _regroup_key is 'Wren' ? lanSwitch('Wren', '伦恩') : $per_npc[_regroup_key].name>><<lanSwitch ' is missing.' '没有跟上。'>></span><br>
+    <</for>><br>
+    <<lanSwitch 'A shout comes from the corridor you left behind. Going back will give the guards more time; leaving now means giving up the people and gold still on that side.' '来路传来一声喊叫。回头会让保安有更多时间赶来；现在就走，掉队的人和他们手里的黄金便只能留在那边。'>><br><br>
+    <<lanLink ['Go back along the corridor and find them (0:15)', '沿通道回去找人 (0:15)']>><<deadwood-heist-regroup-action 'search'>><</lanLink>> · <<lanSwitch 'Athletics / Skulduggery' '运动／诡术'>><br><br>
+  <</if>>
+  <<if _regroup_hurt.length>>
+    <<language>><<option 'EN'>>The carrier cannot put full weight on one leg. Blood has soaked through the fabric above the shoe. Each attempt to lift the bag makes the leg buckle again.<<option 'CN'>>搬运员的一条腿使不上力，鞋口上方的布料已经被血浸透。每次试着提起袋子，那条腿便又软下去。<</language>><br><br>
+    <<if _regroup_work.skills.science gte 400 and (_regroup_work.state.preparationChoices.equipment?.quality ?? 0) gte 6>>
+      <<lanLink ['Use the packed dressings and secure the injured leg (0:15)', '用备好的敷料包扎伤腿 (0:15)']>><<deadwood-heist-regroup-action 'treat'>><</lanLink>> · <<lanSwitch 'Science / prepared supplies' '科学／准备充分的用品'>><br>
+    <</if>>
+    <<lanSwitch 'Leaving some gold makes it possible to help them walk. Pushing on with the full weight will worsen the injury.' '留下部分黄金，就能腾出手扶伤者走。硬催着继续负重，会让伤势加重。'>><br><br>
+  <<elseif _regroup_team.injured.length>>
+    <<lanSwitch 'The dressing is holding. The carrier can move with support, though the injury has not disappeared.' '包扎仍没松开。有人扶着，搬运员便能继续往前走，但伤并没有消失。'>><br><br>
+  <</if>>
+  <<if !_regroup_missing.includes('Wren')>>
+    <<language>><<option 'EN'>><<if C.npc.Wren.love gte 40>>Wren offers one end of a bag. "Split the weight. I still want everyone here when we count it."<<else>>Wren grips a bag's handle. "Pick what you're taking. I'm not carrying everyone."<</if>><<option 'CN'>><<if C.npc.Wren.love gte 40>>伦恩把一边提手递过来。“分着拿。数钱的时候，我还想在场的人都齐。”<<else>>伦恩攥紧袋子的提手。“想好带什么。我可搬不动所有人。”<</if>><</language>><br><br>
+  <</if>>
+  <<lanLink ['Leave a little gold and help with the weight (0:10)', '留下少量黄金，帮忙分担重量 (0:10)']>><<deadwood-heist-regroup-action 'help'>><</lanLink>> · <span class='gold'>−5%</span><br>
+  <<if !_regroup_hurt.length and !_regroup_missing.length>>
+    <<lanLink ['Check everyone is ready and move on (0:05)', '确认大家跟上，继续前进 (0:05)']>><<deadwood-heist-regroup-action 'continue'>><</lanLink>><br>
+  <<else>>
+    <<lanLink ['Keep moving with whoever can follow (0:05)', '带上能跟上的人，立刻离开 (0:05)']>><<deadwood-heist-regroup-action 'press'>><</lanLink>> <span class='red'><<lanSwitch 'People left behind cannot help with the escape.' '掉队的人无法再参与撤离。'>></span><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Street Bank Regroup Result
+<<set _regroup_work to maplebirch.get('StreetLife')?.heist, _regroup_campaign to _regroup_work?.state.campaign, _regroup_fight to _regroup_campaign?.fight>>
+<<if $nextPassage or $nextPassageCheck or $eventforced or $possessed or $replayScene or $statFreeze or $frozenValues>>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if _regroup_fight?.return_passage is 'Deadwood Street Bank Regroup Result' and _regroup_fight.result>>
+  <<set _regroup_won to _regroup_fight.result is 'won', _regroup_campaign.fight to null>>
+  <<if _regroup_won>>
+    <<set _regroup_key to _regroup_campaign.team.separated.find(key => !_regroup_campaign.team.rejoined.includes(key))>>
+    <<if _regroup_key>><<run _regroup_campaign.team.rejoined.pushUnique(_regroup_key)>><<if _regroup_key is 'Wren'>><<npcincr Wren love 1>><</if>><</if>>
+    <<lanSwitch 'You pull the door open. The missing person comes through while the guards are still getting up.' '你拉开门。保安还在爬起，掉队的人便从门口冲了过来。'>><br><br>
+  <<else>>
+    <<set _regroup_work.state.stage to 'settlement', _regroup_work.state.outcome to _regroup_work.state.outcome is 'arrested' ? 'arrested' : 'failed', _regroup_work.state.loot to 0>>
+    <<lanSwitch 'You are forced away from the corridor without the haul.' '你被迫离开通道，没能带走赃物。'>><br><br>
+  <</if>>
+<</if>>
+<<if _regroup_work?.inAction>>
+  <<lanLink ['Return to the others', '回到同伙身边'] 'Deadwood Street Heist'>><</lanLink>><br>
+<<else>>
+  <<highicon>><<lanLink ['Return to High Street', '返回商业街'] 'High Street'>><</lanLink>><br>
+<</if>>

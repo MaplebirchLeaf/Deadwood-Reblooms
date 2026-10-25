@@ -44,6 +44,59 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo('Journal', 'deadwood-street-ammunition-journal');
   maplebirch.tool.addTo('ReputationModify', 'deadwood-street-police-reputation');
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-bailey-link', passage: ["Bailey's Office", 'Flats'] });
+  // 强制转场只收束本案敌人，原版逮捕、昏倒和救援仍先执行。
+  maplebirch.dynamic.regStateEvent('gate', 'deadwood-heist-campaign-interrupted', {
+    cond: () => {
+      if (V.replayScene || V.statFreeze || V.frozenValues) return false;
+      const heist = maplebirch.get('StreetLife')?.heist;
+      const campaign = heist?.state.campaign;
+      return (
+        !!campaign &&
+        ((!!campaign.fight?.combat_started && !V.combat) ||
+          (campaign.bank_step === 8 && heist.state.stage === 'settlement' && campaign.gold.bars > 0 && maplebirch.passage.title !== 'Deadwood Street Heist') ||
+          (maplebirch.passage.title === 'Police Cell' && (heist.inAction || [campaign.dock.stage, campaign.reception.stage].some(stage => stage > 0 && stage < 5))))
+      );
+    },
+    action: () => {
+      const heist = maplebirch.get('StreetLife')!.heist;
+      const campaign = heist.state.campaign!;
+      if (campaign.fight?.combat_started) {
+        const fight = campaign.fight;
+        if (fight.keys.some((key, index) => V.NPCList[index]?.per === key)) maplebirch.SugarCube.Wikifier.wikifyEval('<<endevent>>');
+        for (const key of fight.keys) if (V.per_npc[key]) maplebirch.SugarCube.Wikifier.wikifyEval(`<<clearNPC '${key}'>>`);
+        fight.combat_started = false;
+        fight.result = 'lost';
+      }
+      // 撤离耗时中的逮捕会没收尚未藏妥的黄金，后来再次被捕不追溯已藏好的货。
+      if (campaign.bank_step === 8 && heist.state.stage === 'settlement') {
+        campaign.bank_step = 9;
+        if (maplebirch.passage.title === 'Police Cell') {
+          heist.state.outcome = 'arrested';
+          heist.state.loot = 0;
+          campaign.gold.bars = 0;
+          campaign.gold.value = 0;
+        }
+      }
+      if (maplebirch.passage.title !== 'Police Cell') return;
+      for (const record of [campaign.dock, campaign.reception]) {
+        if (record.stage > 0 && record.stage < 5) {
+          record.stage = 5;
+          record.result = 'failed';
+          record.loot = 0;
+        }
+      }
+      const bankFights = ['Deadwood Street Bank Fight Result', 'Deadwood Street Bank Regroup Result'];
+      if (heist.state.outcome === 'arrested' && campaign.fight && bankFights.includes(campaign.fight.return_passage)) campaign.fight = null;
+      if (heist.inAction) {
+        heist.state.stage = 'settlement';
+        heist.state.outcome = 'arrested';
+        heist.state.loot = 0;
+        campaign.gold.bars = 0;
+        campaign.gold.value = 0;
+        if (campaign.fight && bankFights.includes(campaign.fight.return_passage)) campaign.fight = null;
+      }
+    }
+  });
   maplebirch.dynamic.regStateEvent('gate', 'deadwood-street-fight-interrupted', {
     cond: () => {
       const street = maplebirch.get('StreetLife');
@@ -52,7 +105,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       const heist = street.heist;
       return (
         (!!work.fight?.combatStarted && !V.combat) ||
-        (maplebirch.passage.title === 'Police Cell' && (!!work.state.active || heist.inAction || (heist.state.stage === 'settlement' && heist.state.loot > 0)))
+        (maplebirch.passage.title === 'Police Cell' && (!!work.state.active || (!heist.state.campaign && (heist.inAction || (heist.state.stage === 'settlement' && heist.state.loot > 0)))))
       );
     },
     action: () => {
@@ -61,7 +114,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
       const work = street.bounties;
       const heist = street.heist.state;
       // 原版逮捕或强制转场可能离开自有页面，在这里收束未结束的行动，保留原版判刑。
-      if ((maplebirch.passage.title === 'Police Cell' && (street.heist.inAction || (heist.stage === 'settlement' && heist.loot > 0))) || (work.fightingHeist && !V.combat)) {
+      if ((!heist.campaign && maplebirch.passage.title === 'Police Cell' && (street.heist.inAction || (heist.stage === 'settlement' && heist.loot > 0))) || (work.fightingHeist && !V.combat)) {
         const actor = heist.fight?.key ?? (heist.stage === 'challenge' ? 'deadwood_heist_guard' : undefined);
         if (actor && V.NPCList[0]?.per === actor) maplebirch.SugarCube.Wikifier.wikifyEval('<<endevent>>');
         if (actor && V.per_npc[actor]) maplebirch.SugarCube.Wikifier.wikifyEval(`<<clearNPC '${actor}'>>`);
@@ -134,7 +187,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
         {
           // 原版正常菜单的下水道出口前，不插入 Zephyr 强制事件或 Wren 初遇。
           src: '<<sewericon>>',
-          applybefore: "<<deadwood-street-story-entry 'smuggler'>>\n<<deadwood-street-heist-link>>\n<<deadwood-street-mickey-link>>\n",
+          applybefore: "<<deadwood-street-story-entry 'smuggler'>>\n<<deadwood-street-heist-link>>\n<<deadwood-street-mickey-link>>\n<<deadwood-heist-aftermath-entry>>\n",
           expected: 1
         }
       ],
@@ -150,10 +203,13 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
         {
           // 码头总览的原版衣物检查前，委托入口排除夜间封锁，不进入潜入事件。
           src: '<<storeon "docks" "check">>',
-          applybefore: "<<deadwood-street-cargo-link 'docks'>>\n",
+          applybefore: "<<deadwood-street-cargo-link 'docks'>>\n<<deadwood-heist-case-entry>>\n<<deadwood-heist-aftermath-entry>>\n",
           expected: 1
         }
       ],
+      Bedroom: [{ src: '<<deskText "noicon">>', applybefore: '<<deadwood-heist-aftermath-entry>>\n', expected: 1 }],
+      'Police Station': [{ src: '<<barbicon>>', applybefore: '<<deadwood-heist-aftermath-entry>>\n', expected: 1 }],
+      "Briar's Office": [{ src: '<<if isPubfameTaskAccepted("briar")>>', applybefore: '<<deadwood-heist-aftermath-entry>>\n', expected: 1 }],
       'School Library': [
         {
           // 原版日常自习菜单内，强制争执与昏倒分支不走这里。
@@ -162,11 +218,12 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
+      'Town Hall': [{ src: '<<loitericon>>', applybefore: '<<deadwood-heist-case-entry>>\n', expected: 1 }],
       'Town Hall Wait': [
         {
           // 已按原版排队二十分钟、轮到前台办理，保留随后出现的原版委托。
           src: '<<if $hookah_plot is 1>>',
-          applybefore: "<<deadwood-street-cargo-link 'townhall'>>\n",
+          applybefore: "<<deadwood-street-cargo-link 'townhall'>>\n<<deadwood-heist-aftermath-entry>>\n",
           expected: 1
         }
       ],
@@ -182,7 +239,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
         {
           // 原版药房入口所在的普通菜单，继承压力、裸露与急救分支，不打断医院事件。
           src: '<<pillicon>>',
-          applybefore: "<<deadwood-street-cargo-link 'hospital'>>\n\t\t",
+          applybefore: "<<deadwood-street-cargo-link 'hospital'>>\n<<deadwood-heist-aftermath-entry>>\n\t\t",
           expected: 1
         }
       ],

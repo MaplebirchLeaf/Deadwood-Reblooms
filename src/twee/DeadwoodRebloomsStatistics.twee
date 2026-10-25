@@ -225,6 +225,7 @@
         <<deadwood-reblooms-progress-check `$smuggler_pub_known === 1` `["Find the smugglers’ pub", "找到走私者酒馆"]`>>
         <<deadwood-reblooms-progress-check `(_deadwoodJobs?.completed ?? 0) > 0` `["Collect payment for a street job", "领取一份街头委托的报酬"]`>>
         <<deadwood-street-story-statistics>>
+        <<deadwood-heist-campaign-statistics>>
         <<if _deadwoodRaces?.started>>
           <<lanSwitch 'Road races entered / finished / won: ' '公路赛报名／完赛／冠军：'>><<= _deadwoodRaces.started>> / <<= _deadwoodRaces.completed>> / <<= _deadwoodRaces.wins>><br>
           <<lanSwitch 'Race entry fees paid: ' '赛事报名累计支出：'>><span class='gold'><<= formatMoney(_deadwoodRaces.fees)>></span><br>
@@ -260,8 +261,10 @@
             <<case 'arrested'>><span class='red'><<lanSwitch 'Arrested' '被捕'>></span>
             <<default>><span class='red'><<lanSwitch 'Failed' '行动失败'>></span>
           <</switch>><br>
-          <<lanSwitch 'Recorded heist preparation expenses: ' '已记录的豪劫筹备支出：'>><span class='gold'><<= formatMoney(_deadwoodHeist.spent)>></span><br>
-          <<if _deadwoodHeist.outcome is 'success' and _deadwoodHeist.shares>>
+          <<if !_deadwoodHeist.campaign>>
+            <<lanSwitch 'Recorded heist preparation expenses: ' '已记录的豪劫筹备支出：'>><span class='gold'><<= formatMoney(_deadwoodHeist.spent)>></span><br>
+          <</if>>
+          <<if !_deadwoodHeist.campaign and _deadwoodHeist.outcome is 'success' and _deadwoodHeist.shares>>
             <<lanSwitch 'Bank operation share collected: ' '本次银行行动分账实收：'>><span class='gold'><<= formatMoney(Math.floor(_deadwoodHeist.loot * _deadwoodHeist.shares.pc / 100))>></span><br>
             <<lanSwitch 'Share less recorded preparation expenses: ' '分账扣除已记录筹备支出后：'>><span class='gold'><<= formatMoney(Math.floor(_deadwoodHeist.loot * _deadwoodHeist.shares.pc / 100) - _deadwoodHeist.spent)>></span><br>
             <span class='small-description'><i><<lanSwitch 'Preparation expenses include recorded supplies, recruitment fees and Mickey\'s review. Fuel and vehicle repairs are separate.' '筹备支出包含已记录的用品、招募定金与米奇复核费用。燃油和修车开销另计。'>></i></span><br>

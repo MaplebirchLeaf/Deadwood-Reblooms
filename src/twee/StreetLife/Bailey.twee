@@ -9,9 +9,10 @@
 
 <<widget 'deadwood-street-bailey-link'>>
   <<set _baileyWork to maplebirch.get('StreetLife')?.bailey>>
-  <<if _baileyWork?.available and _baileyWork.atHome and _baileyWork.state.finished>>
+  <<if _baileyWork?.available and _baileyWork.atHome>>
     <<if ($passage is "Bailey's Office" and _options is 1 and !_baileyWork.defeated) or ($passage is 'Flats' and _baileyWork.defeated and Array.isArray($link_table) and $link_table.some(entry => typeof entry === 'string' && entry.includes('|Barb Street]]')))>>
-      <<if !_baileyWork.state.discussed or (!_baileyWork.state.invitation and ['negotiated', 'paid', 'fight'].includes(_baileyWork.state.resolution))>>
+      <<deadwood-heist-aftermath-entry>>
+      <<if _baileyWork.state.finished and (!_baileyWork.state.discussed or (!_baileyWork.state.invitation and ['negotiated', 'paid', 'fight'].includes(_baileyWork.state.resolution)))>>
         <<socialiseicon 'ask'>><<lanLink ['Speak to Bailey about the held delivery (0:05)', '和贝利谈谈那批被扣的货 (0:05)'] 'Deadwood Street Bailey'>>
           <<if _baileyWork.available and _baileyWork.atHome>>
             <<endevent>><<pass 5>>

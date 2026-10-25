@@ -1,0 +1,115 @@
+:: Deadwood Street Campaign Widgets [widget]
+
+<!-- 新接下的银行案才建立长链，已开始和已结清的旧案沿用原结果。 -->
+<<widget 'deadwood-heist-campaign-init'>>
+  <<set _campaign_heist to maplebirch.get('StreetLife')?.heist>>
+  <<if _campaign_heist and !_campaign_heist.state.campaign and _campaign_heist.state.stage is 'prep'>>
+    <<set _campaign_heist.state.campaign to {
+      dock: {stage:0, rolls:[], alarm:false, method:'', result:'', loot:0, steps:[]},
+      reception: {stage:0, rolls:[], alarm:false, method:'', result:'', loot:0, steps:[]},
+      bank_step:0, bank_rolls:[], alarm:0, exit_method:'', clerk:'',
+      team: {injured:[], separated:[], rejoined:[], aid:[]},
+      gold: {bars:0, sold:0, value:0, proceeds:0, ready_day:-1, buyer:'', trade:{stage:0, amount:0, deposit:0, day:-1, rolls:[], secured:false, handed_over:false, reason:'', reschedules:0}},
+      aftermath: {stage:0, letter_read:false, leads:[], wren:'unknown', landry:'unknown', choice:''},
+      fight:null
+    }>>
+  <</if>>
+<</widget>>
+
+<!-- 共用原版人类战斗。同伙不进入敌人表，人物身份和生命只初始化一次。 -->
+<<widget 'deadwood-heist-fight'>>
+  <<set _campaign_heist to maplebirch.get('StreetLife')?.heist, _campaign to _campaign_heist?.state.campaign>>
+  <<if !_campaign or _campaign.fight or !_campaign_heist.available>><<exit>><</if>>
+  <<set _campaign_count to Math.clamp(_args[1], 1, 3), _campaign_keys to []>>
+  <<endevent>>
+  <<for _campaign_index to 0; _campaign_index lt _campaign_count; _campaign_index++>>
+    <<generateNPC `_campaign_index + 1` 'a'>>
+    <<set _campaign_key to 'deadwood_campaign_guard_' + _campaign_index>>
+    <<set $NPCList[_campaign_index].per to _campaign_key>>
+    <<saveNPC _campaign_index _campaign_key>><<set _campaign_keys.push(_campaign_key)>>
+  <</for>>
+  <<endevent>>
+  <<set _campaign.fight to {keys:_campaign_keys, combat_started:false, return_passage:_args[0], result:'', location:_args[2], outside:_args[3], tier:Math.clamp(_args[4], 1, 3)}>>
+  <<goto 'Deadwood Street Campaign Fight'>>
+<</widget>>
+
+<<widget 'deadwood-heist-fight-clear'>>
+  <<set _campaign_fight to $StreetLife.heist.campaign?.fight>>
+  <<if _campaign_fight>>
+    <<for _campaign_key range _campaign_fight.keys>>
+      <<if $per_npc[_campaign_key]>><<clearNPC _campaign_key>><</if>>
+    <</for>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Street Campaign Fight
+<<set _campaign_heist to maplebirch.get('StreetLife')?.heist, _campaign to _campaign_heist?.state.campaign, _campaign_fight to _campaign?.fight>>
+<<if !_campaign_fight>>
+  <<lanSwitch 'The confrontation has ended.' '冲突已经结束。'>><br><br>
+  <<getouticon>><<lanLink ['Return', '返回'] 'High Street'>><</lanLink>><br><<exit>>
+<</if>>
+<<if _campaign_fight.result>>
+  <<lanLink ['Continue', '继续'] `_campaign_fight.return_passage`>><</lanLink>><br><<exit>>
+<</if>>
+<<set $location to _campaign_fight.location, $outside to _campaign_fight.outside>>
+<<if !_campaign_fight.combat_started and _campaign_heist.available>>
+  <<endevent>>
+  <<for _campaign_index, _campaign_key range _campaign_fight.keys>>
+    <<loadNPC _campaign_index _campaign_key>>
+    <<set $NPCList[_campaign_index].health to 160 + _campaign_fight.tier * 60, $NPCList[_campaign_index].healthmax to 160 + _campaign_fight.tier * 60>>
+  <</for>>
+  <<set $consensual to 0>><<neutral 1>><<maninit>><<npcidlegenitals>>
+  <<set $enemystrength to 22000 + _campaign_fight.tier * 4000, $enemyanger to 45 + _campaign_fight.tier * 10, $enemytrust to 0>>
+  <<set _campaign_fight.combat_started to true>>
+  <<language>>
+    <<option 'EN'>>
+      One of them grabs your arm. Another closes in before you can pull away. You turn towards the space between them, trying to keep your feet.
+    <<option 'CN'>>
+      一人抓住你的胳膊。你还没来得及抽回手，另一人已经逼了上来。你朝两人之间的空隙转过身，努力站稳脚步。
+  <</language>><br><br>
+<</if>>
+<<if _campaign_fight.combat_started and $combat is 1 and _campaign_fight.keys.every((key, index) => $NPCList[index]?.per === key)>>
+  <<effects>>
+  <<if $passage isnot 'Deadwood Street Campaign Fight'>><<exit>><</if>>
+  <<effectsman>><<alarmstate>><<man>><<stateman>><br><br><<actionsman>>
+  <<if $passage isnot 'Deadwood Street Campaign Fight'>><<exit>><</if>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>>
+  <<elseif !$possessed and (_combatend or $enemyhealth lte 0 or $enemyarousal gte $enemyarousalmax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0))>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight Finish'>><</lanLink>></span><<nexttext>>
+  <<else>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>>
+  <</if>>
+<<elseif $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>>
+<<else>>
+  <<lanSwitch 'You cannot begin the confrontation in your present condition.' '你现在的状态无法开始这场冲突。'>><br><br>
+  <<getouticon>><<lanLink ['Step back', '退开'] `_campaign_fight.return_passage`>><<if !$combat>><<set _campaign_fight.result to 'lost'>><<deadwood-heist-fight-clear>><</if>><</lanLink>><br>
+<</if>>
+
+:: Deadwood Street Campaign Fight Finish
+<<set _campaign to maplebirch.get('StreetLife')?.heist.state.campaign, _campaign_fight to _campaign?.fight>>
+<<if !_campaign_fight>>
+  <<lanLink ['Return', '返回'] 'High Street'>><</lanLink>><br><<exit>>
+<</if>>
+<<if $nextPassage or $nextPassageCheck or $eventforced or $possessed or $replayScene or $statFreeze or $frozenValues or isPregnancyEnding()>>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if !_campaign_fight.result and _campaign_fight.combat_started and $combat is 1 and _campaign_fight.keys.every((key, index) => $NPCList[index]?.per === key)>>
+  <<if $enemyhealth gt 0 and $enemyarousal lt $enemyarousalmax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 and !($pain gte 100 and $willpowerpain is 0)>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>><<exit>>
+  <</if>>
+  <<set _campaign_fight.result to $enemyhealth lte 0 ? 'won' : 'lost', _campaign_fight.combat_started to false>>
+  <<if $enemyarousal gte $enemyarousalmax>><<ejaculation 'short'>><</if>>
+  <<clotheson>><<endcombat>><<deadwood-heist-fight-clear>>
+<</if>>
+<<if _campaign_fight.result>>
+  <<if _campaign_fight.result is 'won'>>
+    <<lanSwitch 'The way is clear.' '挡路的人退开了。'>>
+  <<else>>
+    <<lanSwitch 'You have lost the chance to continue as planned.' '你已经无法按原来的安排继续。'>>
+  <</if>><br><br>
+  <<lanLink ['Continue', '继续'] `_campaign_fight.return_passage`>><</lanLink>><br>
+<<else>>
+  <<lanLink ['Return to the confrontation', '返回冲突现场'] 'Deadwood Street Campaign Fight'>><</lanLink>><br>
+<</if>>

@@ -1027,14 +1027,20 @@
 <<widget 'deadwood-street-job-journal'>>
   <<if $StreetLife.jobs.active or $StreetLife.bailey.finished and !$StreetLife.bailey.discussed
       or $StreetLife.heist.appointment and $StreetLife.heist.stage is 'idle'
-      or !['idle', 'closed'].includes($StreetLife.heist.stage)>>
+      or !['idle', 'closed'].includes($StreetLife.heist.stage)
+      or $StreetLife.heist.campaign and ['success', 'sting'].includes($StreetLife.heist.outcome)
+        and ($StreetLife.heist.campaign.aftermath.stage lt 6 or !$StreetLife.heist.campaign.aftermath.leads.includes('letter:reply_sent'))>>
     <<deadwood-card 'Street work' '街头委托'>>
       <<deadwood-street-job-status>>
       <<deadwood-street-bailey-journal>>
       <<if $StreetLife.heist.appointment and $StreetLife.heist.stage is 'idle'>>
         <ul class='journal'><li><<lanSwitch 'Landry has arranged a meeting about the bank job. Meet the crew at the smugglers\' pub, 09:00–18:00.' '兰德里约好了商议银行豪劫的会面。去走私者酒馆与同伙碰面，09:00–18:00。'>></li></ul>
       <</if>>
-      <<if $StreetLife.heist.stage isnot 'closed'>><<deadwood-street-heist-status>><</if>>
+      <<if $StreetLife.heist.campaign>>
+        <<deadwood-heist-campaign-journal>>
+      <<elseif $StreetLife.heist.stage isnot 'closed'>>
+        <<deadwood-street-heist-status>>
+      <</if>>
     <</deadwood-card>>
     <hr>
   <</if>>

@@ -56,6 +56,14 @@
       <<if $_heistState.vaultFailed>><<set $_heistState.raisedAlarm to true>><</if>>
       <<set $_heistRatio to $_heistFull ? 1 : ($_heistState.vaultFailed ? _heistWork.terms.vaultFailureRatio : _heistWork.terms.lightRatio)>>
       <<set $_heistState.loot to Math.floor(_heistPotential * $_heistRatio), $_heistState.stage to 'escape'>>
+      <<if $_heistState.campaign>>
+        <<set _bank_team to $_heistState.campaign.team, _bank_carrier to _heistWork.crew.find(npc => npc.heist.role === 'carrier'), _bank_scout to _heistWork.crew.find(npc => npc.heist.role === 'scout')>>
+        <<if _bank_carrier and _heistAction is 'take-full' and ($_heistState.vaultFailed or $_heistState.campaign.alarm gte 2)>>
+          <<run _bank_team.injured.pushUnique(_bank_carrier.per)>><<set _bank_carrier.health to Math.max(1, _bank_carrier.health - Math.ceil(_bank_carrier.healthmax * 0.1))>>
+        <</if>>
+        <<if _bank_scout and $_heistState.campaign.alarm gte 2 and $_heistState.campaign.bank_rolls[4] gt Math.clamp(_bank_scout.skills.security / 10, 20, 85)>><<run _bank_team.separated.pushUnique(_bank_scout.per)>><</if>>
+        <<if $_heistState.campaign.alarm gte 3 and $_heistState.campaign.bank_rolls[5] gt 50>><<run _bank_team.separated.pushUnique('Wren')>><</if>>
+      <</if>>
       <<crimeUp _heistWork.terms.crime.vault 'thievery'>>
       <<if _heistAction is 'take-full'>><<physique 1 'noMessage'>><<tiredness 4>><<else>><<tiredness 1>><</if>>
       <<pass `$_heistState.approach is 'loud' ? 5 : 10`>>
@@ -66,7 +74,7 @@
       <<deadwood-street-heist-clear-guard>><<pass _heistWork.terms.escapeMinutes>><<tiredness 4>>
       <<if _heistWork.available>><<goto 'Deadwood Street Heist Return'>><</if>>
     <<case 'run' 'drive' 'run-careful' 'drive-careful'>>
-      <<if $_heistState.stage isnot 'escape'>><<exit>><</if>>
+      <<if $_heistState.stage isnot 'escape' or ($_heistState.campaign and $_heistState.campaign.bank_step isnot 8)>><<exit>><</if>>
       <<set $_heistDriving to _heistAction.startsWith('drive'), _heistCareful to _heistAction.endsWith('-careful')>>
       <<set $_heistEscapeMinutes to _heistWork.terms.escapeMinutes + (_heistCareful ? _heistWork.terms.carefulMinutes : 0)>>
       <<if $_heistDriving>>
@@ -87,6 +95,7 @@
         <<set _heistVehicle.condition to Math.max(0, _heistVehicle.condition - _heistTransport.journeyWear(_heistModel, $_heistEscapeMinutes))>>
         <<set _heistVehicle.point to 'harvest', _heistTransport.state.driving to Math.min(1000, _heistTransport.state.driving + 4)>>
       <</if>>
+      <<if $_heistState.campaign>><<set $_heistEscapeChance to Math.clamp($_heistEscapeChance - $_heistState.campaign.alarm * 3, 5, 95)>><</if>>
       <<set $_heistState.outcome to $_heistState.rolls.escape lte $_heistEscapeChance ? 'success' : 'failed'>>
       <!-- 判定与人员后果使用开场保存的同一次骰点，先关阶段再记伤势，重绘不会重伤或再扣款。 -->
       <<set $_heistState.stage to 'settlement'>>
@@ -95,14 +104,20 @@
         <<set $_heistLoss to $_heistSevere ? _heistWork.terms.failure.severe : _heistWork.terms.failure.minor>>
         <<set $_heistState.loot to 0, $_heistState.escapeFailure to $_heistSevere ? 'custody' : 'injury'>>
         <<for _heistCrewMember range _heistWork.crew>>
-          <<if _heistCrewMember.health gt 0>>
+          <<if _heistCrewMember.health gt 0 and (!$_heistState.campaign or !$_heistState.campaign.team.separated.includes(_heistCrewMember.per) or $_heistState.campaign.team.rejoined.includes(_heistCrewMember.per))>>
             <<set _heistCrewMember.health to Math.max(1, _heistCrewMember.health - Math.ceil(_heistCrewMember.healthmax * $_heistLoss.crewInjury))>>
             <<if $_heistSevere and _heistCrewMember.heist.role is 'carrier'>><<set _heistCrewMember.heist.status to 'arrested'>><</if>>
           <</if>>
         <</for>>
         <<pain $_heistLoss.pain>><<tiredness $_heistLoss.fatigue>>
       <</if>>
+      <<if $_heistState.campaign>>
+        <<if $_heistState.outcome is 'success'>>
+          <<set $_heistState.campaign.gold.bars to Math.max(1, Math.floor($_heistState.loot / 500000)), $_heistState.campaign.gold.value to $_heistState.loot, $_heistState.campaign.gold.ready_day to Math.floor(Time.days) + 2>>
+        <</if>>
+      <</if>>
       <<endevent>><<pass $_heistEscapeMinutes>>
+      <<if $_heistState.campaign and !$nextPassage and !$nextPassageCheck>><<set $_heistState.campaign.bank_step to 9>><</if>>
       <<if !$_heistDriving>>
         <<tiredness 8>>
         <<if $_heistState.outcome is 'success'>><<athletics 1>><</if>>
@@ -120,7 +135,7 @@
         <<set $_heistState.lateReport to _heistAction is 'contact', $_heistState.informed to true>>
         <<set $_heistState.loot to 0, $_heistState.outcome to 'sting', $_heistState.stage to 'settlement'>>
         <<for _heistCrewKey range $_heistState.crew>>
-          <<if $per_npc[_heistCrewKey]?.heist>><<set $per_npc[_heistCrewKey].heist.status to 'arrested'>><</if>>
+          <<if $per_npc[_heistCrewKey]?.heist and (!$_heistState.campaign or !$_heistState.campaign.team.separated.includes(_heistCrewKey) or $_heistState.campaign.team.rejoined.includes(_heistCrewKey))>><<set $per_npc[_heistCrewKey].heist.status to 'arrested'>><</if>>
         <</for>>
         <<if !$_heistState.betrayed>>
           <<set $_heistState.betrayed to true>>
@@ -221,14 +236,17 @@
     <<exit>>
   <</if>>
   <<if !$_heistOutcome>><<exit>><</if>>
+  <<if $_heistOutcome is 'success' and _heistWork.state.campaign and (_heistWork.state.campaign.aftermath.stage lt 6 or _heistWork.state.campaign.gold.trade.stage isnot 5)>><<exit>><</if>>
   <<set _heistWork.state.settled to true, _heistWork.state.stage to 'closed'>>
   <<switch $_heistOutcome>>
     <<case 'success'>>
       <<money $_heistPayout 'pubStolenGoods'>>
-      <<npcincr Landry love _heistWork.terms.favour.landrySuccess>>
-      <<npcincr Wren love _heistWork.terms.favour.wrenSuccess>>
-      <<set maplebirch.get('StreetLife').reputation += _heistWork.terms.successReputation>>
-      <<deadwood-street-crew-gain _heistWork.state.crew 50 5>>
+      <<if !_heistWork.state.campaign or _heistWork.state.campaign.gold.proceeds gt 0>>
+        <<npcincr Landry love _heistWork.terms.favour.landrySuccess>>
+        <<npcincr Wren love _heistWork.terms.favour.wrenSuccess>>
+        <<set maplebirch.get('StreetLife').reputation += _heistWork.terms.successReputation>>
+        <<deadwood-street-crew-gain `_heistWork.state.crew.filter(key => !_heistWork.state.campaign?.team.separated.includes(key) || _heistWork.state.campaign.team.rejoined.includes(key))` 50 5>>
+      <</if>>
     <<case 'reported' 'sting'>>
       <<money $_heistPayout 'police'>>
       <<set C.npc.Grant.love to Math.clamp(C.npc.Grant.love + _heistWork.terms.favour.grantSuccess, 0, 100)>>
@@ -276,9 +294,9 @@
 <<widget 'deadwood-street-heist-losses'>>
   <<set $_heistLossState to maplebirch.get('StreetLife')?.heist.state>>
   <<if $_heistLossState?.escapeFailure is 'injury'>>
-    <span class='red'><<lanSwitch 'The haul is gone. You and both hires were hurt getting clear.' '赃款已经丢失。你和两名雇员在脱身时都受了伤。'>></span><br>
+    <span class='red'><<lanSwitch 'The haul is gone. You and those still with you were hurt getting clear.' '赃款已经丢失。你和仍在身边的同伙在脱身时受了伤。'>></span><br>
   <<elseif $_heistLossState?.escapeFailure is 'custody'>>
-    <span class='red'><<lanSwitch 'The haul is gone. You and the scout escaped hurt; the carrier was taken into custody.' '赃款已经丢失。你与侦察员带伤脱身，搬运员被警方带走了。'>></span><br>
+    <span class='red'><<lanSwitch 'The haul is gone. You escaped hurt, and the carrier was taken into custody.' '赃款已经丢失。你带伤脱身，搬运员被警方带走了。'>></span><br>
   <</if>>
   <<if $_heistLossState?.entered>>
     <span class='orange'><<lanSwitch 'Leaving the bank does not remove the evidence against you. Counter services remain suspended until the bank reopens.' '离开银行不等于消除了罪证。银行恢复营业前，柜台仍会暂停接待。'>></span><br>
@@ -310,6 +328,9 @@
   <<icon 'street/heist-plan.png'>><<lanLink ['Commit to the operation (0:05)', '确认开始行动 (0:05)']>>
     <<if _heistWork.available and _heistWork.unlocked and _heistWork.ready and _heistWork.state.stage is 'prep'>>
       <<set _heistWork.state.shares to clone(_heistWork.split)>>
+      <<if _heistWork.state.campaign>>
+        <<set _heistWork.state.campaign.bank_rolls to [random(1, 100), random(1, 100), random(1, 100), random(1, 100), random(1, 100), random(1, 100), random(1, 100), random(1, 100)], _heistWork.state.campaign.alarm to Number(_heistWork.state.campaign.dock.alarm) + Number(_heistWork.state.campaign.reception.alarm)>>
+      <</if>>
       <<set _heistWork.state.rolls to {entry: random(1, 100), vault: random(1, 100), escape: random(1, 100), talk: random(1, 100)}, _heistWork.state.stage to 'entry'>>
       <<endevent>><<pass 5>>
       <<if _heistWork.available>><<goto 'Deadwood Street Heist'>><</if>>
@@ -322,6 +343,7 @@
 
 :: Deadwood Street Heist
 <<set _heistWork to maplebirch.get('StreetLife')?.heist>>
+<<if _heistWork?.state.campaign>><<deadwood-heist-bank-scene>><<exit>><</if>>
 <<if !_heistWork>>
   <<lanSwitch 'There is no bank operation to continue.' '当前没有待继续的银行行动。'>><br><br>
   <<highicon>><<lanLink ['Return to High Street', '返回商业街'] 'High Street'>><</lanLink>><br>
@@ -508,16 +530,16 @@
     <<if _heistWork.state.lateReport>>
       You step away from the others and ask to speak to the police. There is no arranged signal and no one waiting to vouch for you. An officer listens, then calls the station when you mention Grant.
     <<else>>
-      You step out at the agreed handover. Officers separate you from the two people you hired. One calls the station to confirm your account with Grant.
+      You step out at the agreed handover. Officers separate you from the hires still with you. One calls the station to confirm your account with Grant.
     <</if>><br><br>
-    Wren has slipped away in the confusion. Landry stayed at the pub, but this will reach Landry soon enough. The officer keeps a hand near your arm. "We'll hear your statement at the station. That includes what you did."
+    <<if _heistWork.state.campaign?.team.separated.includes('Wren') and !_heistWork.state.campaign.team.rejoined.includes('Wren')>>Wren is still out of sight.<<else>>Wren has slipped away in the confusion.<</if>> Landry stayed at the pub, but this will reach Landry soon enough. The officer keeps a hand near your arm. "We'll hear your statement at the station. That includes what you did."
   <<option 'CN'>>
     <<if _heistWork.state.lateReport>>
       你离开同伙，主动要求与警方交谈。没有约好的信号，也没人等着替你担保。一名警员听着你的话，在听到格兰特的名字后联系了警局。
     <<else>>
-      你按约定出面交接。警员把你与两名雇员分开，其中一人联系警局，请格兰特核对你的说法。
+      你按约定出面交接。警员把你与仍在身边的雇员分开，其中一人联系警局，请格兰特核对你的说法。
     <</if>><br><br>
-    伦恩已经趁乱溜走。兰德里留在酒馆，但消息迟早会传到那里。警员的手停在你的胳膊旁。“去警局做笔录。也包括你自己做过的事。”
+    <<if _heistWork.state.campaign?.team.separated.includes('Wren') and !_heistWork.state.campaign.team.rejoined.includes('Wren')>>伦恩仍不见踪影。<<else>>伦恩已经趁乱溜走。<</if>>兰德里留在酒馆，但消息迟早会传到那里。警员的手停在你的胳膊旁。“去警局做笔录。也包括你自己做过的事。”
 <</language>><<if _heistWork.state.betrayed>><<llove 'Landry'>><<llove 'Wren'>><</if>><br><br>
 <<if _heistWork.available>>
   <<policeicon>><<lanLink ['Accompany the officers (1:00)', '跟警员走 (1:00)']>>
@@ -543,10 +565,10 @@
   <<language>>
     <<option 'EN'>>
       You have left the financial centre behind and reached Harvest Street. <<if _heistWork.state.vehicle isnot null>>The car is parked on the street; it cannot follow you into the underground passages.<</if>><br><br>
-      Landry will hear the account at the smugglers' pub. Reach it by the usual route, and meet between nine in the morning and six in the evening to settle the outcome. Nothing has been divided here.
+      <<if _heistWork.state.campaign and _heistWork.state.outcome is 'success'>>The bars are hidden away, but nobody has paid for them yet. Return to the smugglers' pub between nine in the morning and six in the evening to check the arrangements left for you.<<else>>Landry will hear the account at the smugglers' pub. Reach it by the usual route, and meet between nine in the morning and six in the evening to settle the outcome. Nothing has been divided here.<</if>>
     <<option 'CN'>>
       你已经离开金融中心，来到了丰收街。<<if _heistWork.state.vehicle isnot null>>车停在地面街道，不能跟着你进入地下通道。<</if>><br><br>
-      兰德里会在走私者酒馆听你说明结果。请沿熟悉的路线过去，在上午九点至下午六点之间碰面结算。这里还没有分账。
+      <<if _heistWork.state.campaign and _heistWork.state.outcome is 'success'>>金条已经藏好，却还没换成钱。上午九点至下午六点，回走私者酒馆看看留给你的安排。<<else>>兰德里会在走私者酒馆听你说明结果。请沿熟悉的路线过去，在上午九点至下午六点之间碰面结算。这里还没有分账。<</if>>
   <</language>><br><br>
 <</if>>
 <<deadwood-street-heist-losses>>
@@ -559,7 +581,11 @@
   <<highicon>><<lanLink ['Return to High Street', '返回商业街'] 'High Street'>><</lanLink>><br>
   <<exit>>
 <</if>>
-<<set _heistPolice to ['reported', 'sting'].includes(_heistWork.state.outcome)>>
+<<if _heistWork.state.campaign and _heistWork.state.outcome is 'success'>>
+  <<deadwood-heist-gold-debrief>>
+  <<getouticon>><<lanLink ['Return to the smugglers’ pub', '回到走私者酒馆'] 'Smuggler Pub'>><</lanLink>><br><<exit>>
+<</if>>
+<<set _heistPolice to ['reported', 'sting'].includes(_heistWork.state.outcome), _heistArrested to _heistWork.state.crew.filter(key => $per_npc[key]?.heist?.status is 'arrested').length>>
 <<if !_heistPolice and (!_heistWork.atMeeting or !_heistWork.meetingAvailable)>><<deadwood-street-heist-meeting-required>><<exit>><</if>>
 <<set $location to _heistPolice ? 'police_station' : 'underground', $outside to 0>>
 <<if _heistPolice>><<set $bus to 'barb'>><<else>><<unset $bus>><</if>><<effects>>
@@ -579,7 +605,7 @@
           The duty officer files your statement with the preparatory material. Grant is away from the desk; the payment must wait.
         <</if>> The station will check the people and arrangements you named. Landry has received no account of this conversation.
       <<case 'sting'>>
-        The two people you hired have been taken into custody. Wren got clear during the confusion; Landry was never at the bank. Your part in the handover is no longer a private matter.<br><br>
+        <<if _heistArrested gt 0>><<= _heistArrested>> of your hires have been taken into custody.<<else>>None of your hires were with you at the handover.<</if>> <<if _heistWork.state.campaign?.team.separated.includes('Wren') and !_heistWork.state.campaign.team.rejoined.includes('Wren')>>Wren is still unaccounted for;<<else>>Wren got clear during the confusion;<</if>> Landry was never at the bank. Your part in the handover is no longer a private matter.<br><br>
         <<if maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
           Grant turns a page in the notebook. "Now tell me what you actually did. Helping at the end doesn't erase what happened before it."
         <<else>>
@@ -607,7 +633,7 @@
           值班警员把你的笔录与筹备材料归到一起。格兰特不在桌前，领款还得等等。
         <</if>>警局会核验你说的人员与安排，兰德里尚不知道这次谈话的经过。
       <<case 'sting'>>
-        两名雇员已经被带走。伦恩趁乱脱身了，兰德里则从未到过银行。你参与交接的事，已不再是秘密。<br><br>
+        <<if _heistArrested gt 0>><<= _heistArrested>>名雇员已经被带走。<<else>>交接时，没有雇员跟在你身边。<</if>><<if _heistWork.state.campaign?.team.separated.includes('Wren') and !_heistWork.state.campaign.team.rejoined.includes('Wren')>>伦恩仍下落不明，<<else>>伦恩趁乱脱身了，<</if>>兰德里则从未到过银行。你参与交接的事，已不再是秘密。<br><br>
         <<if maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
           格兰特翻过记事簿的一页。“现在，说说你实际上做过什么。最后帮了忙，不等于前面的事就没发生。”
         <<else>>
@@ -622,7 +648,7 @@
     <</switch>>
 <</language>><br><br>
 <<deadwood-street-heist-losses>>
-<<lanSwitch 'Recorded preparation expenses: ' '已记录的筹备支出：'>><<printmoney _heistWork.state.spent>><br>
+<<lanSwitch 'Recorded expenses: ' '已记录支出：'>><<printmoney _heistWork.state.spent>><br>
 <<if _heistWork.state.outcome is 'success'>>
   <<lanSwitch 'Your share after those expenses: ' '分账扣除上述支出后：'>><<printmoney `_heistWork.payout - _heistWork.state.spent`>><br>
 <<elseif ['reported', 'sting'].includes(_heistWork.state.outcome)>>
