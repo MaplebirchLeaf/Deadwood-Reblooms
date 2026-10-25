@@ -293,7 +293,7 @@ export default class PropertyBanquet {
       case 'Kylar':
         return Time.hour >= 18 && !Time.schoolTime && npc.love >= 40 && npc.rage < 60;
       case 'Whitney':
-        return npc.love >= 60 && !Time.schoolTime;
+        return npc.love >= 20 && !Time.schoolTime;
       case 'Sydney': {
         // 晚祷在 21 点，邀请时按整场时长判断，布置后再次核对剩余时间。
         if (Time.hour < 18 || Time.hour * 60 + Time.minute + remaining >= 21 * 60 || ![2, 3, 4, 5].includes(Time.weekDay) || npc.love < 60) return false;

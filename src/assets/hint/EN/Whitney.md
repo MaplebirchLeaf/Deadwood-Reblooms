@@ -15,3 +15,5 @@ Other courtyard events, Whitney's recovery, your exposure or having already spen
 - **Dockside walk**: establish Whitney's romance and visit the docks between 09:00 and before 17:00, suitably dressed, once daily.
 - **At the flat door**: advance the original home relationship and romance, then knock while Whitney is at home for added conversation.
 - **Listen to music**: enter the flat and use the original conversation menu, once daily. Sitting down to listen improves affection and relieves stress.
+
+At school lunchtime, with affection at least 20, you can join Whitney’s game or keep score in the dry rear courtyard, once a day. Hand-holding also requires a love-interest relationship. Vanilla Whitney affection caps at 30; property banquet invitations require 20, and the closer flat interaction requires 25 and a love-interest relationship.
