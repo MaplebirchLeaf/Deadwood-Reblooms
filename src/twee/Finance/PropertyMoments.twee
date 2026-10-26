@@ -1,0 +1,142 @@
+:: Deadwood Reblooms Property Moments Widgets [widget]
+
+<!-- 只在接受或明确拒绝后记下事实，暂时离开不作承诺，也不算拒绝。 -->
+<<widget 'deadwood-home-moment'>>
+  <<set _moment_estate to maplebirch.get('Finance').realEstate>>
+  <<if ['Robin', 'Sydney'].includes(_args[0]) and ['join', 'leave'].includes(_args[1]) and _moment_estate.current>>
+    <<set $Finance.real_estate.life.recollections[_args[0]] to { property_id: _moment_estate.current.id, day: Math.floor(Time.days), choice: _args[1] }>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-home-meal-invitation'>>
+  <<set _meal_estate to maplebirch.get('Finance').realEstate>>
+  <<if $Finance.real_estate.room_companion isnot 'Robin' or !_meal_estate.life.ready('meal')>><<exit>><</if>>
+  <<set _meal_memory to $Finance.real_estate.life.recollections.Robin>>
+  <<if _meal_memory?.day is Math.floor(Time.days) and _meal_memory.property_id is _meal_estate.current.id and _meal_memory.choice is 'join'>><<exit>><</if>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _meal_memory?.day is Math.floor(Time.days) and _meal_memory.property_id is _meal_estate.current.id and _meal_memory.choice is 'leave'>>
+        Robin glances up from the table. "You can sit down if you've finished. I haven't put everything away yet."
+      <<elseif C.npc.Robin.trauma gte 40>>
+        Robin follows you to the table, then stops behind a chair. "Are you eating here?" <<nnpc_He 'Robin'>> looks at the other place. "I could stay."
+      <<elseif C.npc.Robin.trauma gte 20>>
+        Robin sets a fork down beside the second plate. A noise in the hall makes <<nnpc_him 'Robin'>> pause. "Will you eat with me?"
+      <<elseif C.npc.Robin.dom gte 40>>
+        Robin brings the cutlery over. "I'll do these. Can you bring the food?" <<nnpc_He 'Robin'>> pulls out a chair, then waits to see whether you are joining <<nnpc_him 'Robin'>>.
+      <<else>>
+        Robin counts out two forks, then looks at you. "Do you want to eat together?" <<nnpc_He 'Robin'>> smiles. "I can set the table."
+      <</if>>
+    <<option 'CN'>>
+      <<if _meal_memory?.day is Math.floor(Time.days) and _meal_memory.property_id is _meal_estate.current.id and _meal_memory.choice is 'leave'>>
+        罗宾从桌边抬起头。“忙完了就过来坐吧。东西还没全收起来。”
+      <<elseif C.npc.Robin.trauma gte 40>>
+        罗宾跟到桌边，停在椅背后。“你在这里吃吗？”<<nnpc_he 'Robin'>>看了看另一个位置。“我可以留下。”
+      <<elseif C.npc.Robin.trauma gte 20>>
+        罗宾把叉子放在第二只盘子旁。走廊里传来的响动让<<nnpc_him 'Robin'>>停了一下。“你会陪我吃吗？”
+      <<elseif C.npc.Robin.dom gte 40>>
+        罗宾拿来餐具。“这些我来摆，你端吃的好吗？”<<nnpc_he 'Robin'>>拉开椅子，等着看你是否也要坐下。
+      <<else>>
+        罗宾数出两把叉子，又看向你。“一起吃吗？”<<nnpc_he 'Robin'>>笑了笑。“我来摆桌子。”
+      <</if>>
+  <</language>><br><br>
+<</widget>>
+
+<<widget 'deadwood-home-meal-decline'>>
+  <<set _meal_estate to maplebirch.get('Finance').realEstate>>
+  <<if $Finance.real_estate.room_companion is 'Robin' and _meal_estate.life.ready('meal')
+      and Object.keys(setup.foodstuff).some(key => setup.foodstuff[key].category === 'dish' && !setup.foodstuff[key].food?.tags?.some(tag => ['drink', 'tainted'].includes(tag)) && ($foodstuff[key]?.amount ?? 0) >= 2)>>
+    <<deadwood-home-moment 'Robin' 'leave'>>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-home-moment-check'>>
+  <<set _moment_estate to maplebirch.get('Finance').realEstate, _moment_name to _args[0]>>
+  <<set _moment_memory to $Finance.real_estate.life.recollections[_moment_name]>>
+  <<set _moment_ready to $location is 'deadwood_home' and _moment_estate.current
+    and _moment_memory?.property_id is _moment_estate.current.id and _moment_memory.day is Math.floor(Time.days) - 1
+    and _moment_estate.household.common.some(resident => resident.id === _moment_name) and _moment_estate.life.free(_moment_name, 0)
+    and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$eventforced
+    and !$nextPassage and !$nextPassageCheck and !$worn.face.type.includes('gag') and $stress lt $stressmax>>
+<</widget>>
+
+<<widget 'deadwood-home-moment-links'>>
+  <<deadwood-home-moment-check 'Robin'>>
+  <<if _moment_ready>>
+    <<socialiseicon>><<lanLink ['Mention yesterday’s meal to Robin', '跟罗宾提起昨天的餐点'] 'Deadwood Reblooms Property Robin Meal Memory'>><</lanLink>><br>
+  <</if>>
+  <<deadwood-home-moment-check 'Sydney'>>
+  <<if _moment_ready>>
+    <<socialiseicon>><<lanLink ['Ask Sydney about the book from yesterday', '问问悉尼昨天那本书'] 'Deadwood Reblooms Property Sydney Reading Memory'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Property Robin Meal Memory
+<<effects>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Continue', '继续'] 'Deadwood Reblooms Property Robin Meal Memory'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<deadwood-home-moment-check 'Robin'>>
+<<if _moment_ready>>
+  <<language>>
+    <<option 'EN'>>
+      You ask Robin about yesterday's meal.
+      <<if _moment_memory.choice is 'leave'>>
+        "I ate afterwards," <<nnpc_he 'Robin'>> says. <<if C.npc.Robin.trauma gte 20>>Robin looks down at <<nnpc_his 'Robin'>> hands. "I didn't want to disturb you. Tell me if you have time today?"<<elseif C.npc.Robin.dom gte 40>>"Tell me before I set out two places next time." <<nnpc_He 'Robin'>> smiles. "Then I'll know what I'm doing."<<else>>"We can eat together another time. I just thought I'd ask."<</if>>
+      <<elseif C.npc.Robin.trauma gte 40>>
+        Robin takes a moment to answer. "I ate more than I thought I would." <<nnpc_He 'Robin'>> looks towards the kitchen. "It helped, having you there."
+      <<elseif C.npc.Robin.trauma gte 20>>
+        Robin glances towards the hallway, rubbing a thumb along a sleeve. "Could we sit together again today?"
+      <<elseif C.npc.Robin.dom gte 40>>
+        "Next time, I'll bring something too." Robin starts listing what is left in the cupboard, then laughs. "We can decide when we're hungry."
+      <<else>>
+        "It was nice," Robin says. "Usually, one of us has to rush off." <<nnpc_He 'Robin'>> smiles. "Next time, let me help with the dishes."
+      <</if>>
+    <<option 'CN'>>
+      你问罗宾，昨天吃得怎么样。
+      <<if _moment_memory.choice is 'leave'>>
+        “后来我吃过了。”<<nnpc_he 'Robin'>>说。<<if C.npc.Robin.trauma gte 20>>罗宾低头看着双手。“不想打扰你。今天有空的话，告诉我一声好吗？”<<elseif C.npc.Robin.dom gte 40>>“下次在我摆两份餐具之前说一声就好。”<<nnpc_he 'Robin'>>笑了笑。“这样我就知道怎么安排了。”<<else>>“改天也能一起吃。我就是想问问你。”<</if>>
+      <<elseif C.npc.Robin.trauma gte 40>>
+        罗宾过了一会儿才回答。“比我以为的吃得多。”<<nnpc_he 'Robin'>>望向厨房。“你在那里，会好一些。”
+      <<elseif C.npc.Robin.trauma gte 20>>
+        罗宾朝走廊看了一眼，用拇指摩挲着衣袖。“今天也能一起坐会儿吗？”
+      <<elseif C.npc.Robin.dom gte 40>>
+        “下次我也拿点东西来。”罗宾数起柜里还有些什么，说着又笑了。“等饿了再想吧。”
+      <<else>>
+        “挺好的。”罗宾说。“平时总有一个人急着走。”<<nnpc_he 'Robin'>>朝你笑了笑。“下次让我一起洗餐具吧。”
+      <</if>>
+  <</language>>
+<<elseif !$nextPassage and !$nextPassageCheck>>
+  <<lanSwitch 'You leave the conversation for another time.' '你把想说的话留到稍后。'>>
+<</if>><br><br>
+<<getouticon>><<lanLink ['Return to the sitting room', '返回起居室'] 'Deadwood Reblooms Property Home'>><</lanLink>>
+
+:: Deadwood Reblooms Property Sydney Reading Memory
+<<effects>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Continue', '继续'] 'Deadwood Reblooms Property Sydney Reading Memory'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<deadwood-home-moment-check 'Sydney'>>
+<<if _moment_ready>>
+  <<run statusCheck('Sydney')>>
+  <<language>>
+    <<option 'EN'>>
+      Sydney finds the bookmark when you mention yesterday's book.
+      <<if _moment_memory.choice is 'leave'>>
+        "I read a little further." <<nnpc_He 'Sydney'>> starts to turn a page, then stops. <<if _sydneyStatus.includes('corrupt')>>"I'm not telling you what happens. You'll have to read it with me."<<elseif _sydneyStatus.includes('pure')>>"I'd like to hear what you think. I won't give away the ending."<<else>>"I'm still not sure what to make of it. I'd like another opinion."<</if>>
+      <<else>>
+        "I kept thinking about the bit we read." <<if _sydneyStatus.includes('corrupt')>>Sydney grins. "Want to know what happens? Tell me what you think that character is hiding first."<<elseif _sydneyStatus.includes('pure')>><<nnpc_He 'Sydney'>> traces the edge of the bookmark. "I almost went on with the story just now. I should leave some for us to read together."<<else>>"It reads differently when you know what to look for." <<nnpc_He 'Sydney'>> shows you the line again.<</if>>
+      <</if>>
+      <<if Time.hour lt 6>>Sydney tucks the book away with the things <<nnpc_he 'Sydney'>> is taking out. "Another page when we're both back?"<<elseif Time.hour gte 21>>"Not too late tonight," Sydney adds, looking at the clock. "I don't want to lose my place by falling asleep."<<else>>Sydney leaves the bookmark where it is. "I'll keep it here for now."<</if>>
+    <<option 'CN'>>
+      你提起昨天的书，悉尼找到了夹着书签的那页。
+      <<if _moment_memory.choice is 'leave'>>
+        “后来又看了一点。”<<nnpc_he 'Sydney'>>翻动书页，又停住。<<if _sydneyStatus.includes('corrupt')>>“不告诉你后来怎样了。得陪我一起看。”<<elseif _sydneyStatus.includes('pure')>>“还想听听你怎么想。我不会把结局说出来的。”<<else>>“我还没想明白。想再听听别人的看法。”<</if>>
+      <<else>>
+        “昨天一起看的那一段，我后来还在想。”<<if _sydneyStatus.includes('corrupt')>>悉尼笑起来。“这么急着问后面？先说说，你觉得那个人在瞒什么。”<<elseif _sydneyStatus.includes('pure')>><<nnpc_he 'Sydney'>>捻了捻书签边缘。“差点又接着往后讲了。还是留着一起看吧。”<<else>>“知道该留意哪里，再看就不一样了。”<<nnpc_he 'Sydney'>>又指给你看那一行。<</if>>
+      <</if>>
+      <<if Time.hour lt 6>>悉尼将书和要带出门的东西放在一起。“等我们都回来，再看一页好吗？”<<elseif Time.hour gte 21>>“今晚可别太晚。”悉尼看了眼钟，又补上一句。“我可不想睡着了，连看到哪儿都忘了。”<<else>>悉尼留着那页的书签。“先夹在这里吧。”<</if>>
+  <</language>>
+<<elseif !$nextPassage and !$nextPassageCheck>>
+  <<lanSwitch 'You leave the conversation for another time.' '你把想说的话留到稍后。'>>
+<</if>><br><br>
+<<getouticon>><<lanLink ['Return to the sitting room', '返回起居室'] 'Deadwood Reblooms Property Home'>><</lanLink>>

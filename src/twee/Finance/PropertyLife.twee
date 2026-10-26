@@ -18,6 +18,7 @@
     <<set _home_dishes to Object.keys(setup.foodstuff).filter(key => setup.foodstuff[key].category === 'dish' && !setup.foodstuff[key].food?.tags?.includes('drink') && !setup.foodstuff[key].food?.tags?.includes('tainted') && ($foodstuff[key]?.amount ?? 0) >= 2)>>
     <<set _home_drinks to Object.keys(setup.foodstuff).filter(key => setup.foodstuff[key].category === 'dish' && setup.foodstuff[key].food?.tags?.includes('drink') && !setup.foodstuff[key].food?.tags?.some(tag => ['tainted', 'alcohol'].includes(tag)) && ($foodstuff[key]?.amount ?? 0) >= 2)>>
     <<if _home_life.ready('meal') and _home_dishes.length>>
+      <<deadwood-home-meal-invitation>>
       <<set _home_meal_options to {}>>
       <<for _food range _home_dishes>>
         <<set _home_meal_options[setup.foodstuff[_food].name] to _food>>
@@ -26,6 +27,11 @@
       <<icon 'property/shared-meal.png'>><<lanLink ['Share a homemade meal (0:20)', '一起吃做好的餐点 (0:20)'] 'Deadwood Reblooms Property Life Finish'>>
         <<deadwood-home-life-act 'meal' _home_meal>>
       <</lanLink>><<lstress>><span class='blue'> | <<lanSwitch 'Two portions' '两份餐点'>></span><br>
+      <<if $Finance.real_estate.room_companion is 'Robin'
+          and !($Finance.real_estate.life.recollections.Robin?.day is Math.floor(Time.days)
+            and $Finance.real_estate.life.recollections.Robin.property_id is _life_estate.current.id)>>
+        <<lanLink ['Not just now', '现在先不吃'] 'Deadwood Reblooms Property Kitchen'>><<deadwood-home-meal-decline>><</lanLink>><br>
+      <</if>>
     <</if>>
     <<if _home_life.ready('tea') and _home_drinks.length>>
       <<set _home_drink_options to {}>>
@@ -65,54 +71,70 @@
   <<deadwood-home-wine-menu>>
 <</widget>>
 
-<!-- 数值与消耗只在点击时结算，重看结果页不会再次扣食物或增加好感。 -->
+<!-- 开始时消耗食物与酒；完成活动后才结算陪伴收益。 -->
 <<widget 'deadwood-home-life-act'>>
-  <<set _home_life to maplebirch.get('Finance').realEstate.life>>
-  <<if (_args[0] isnot 'wine' or !(playerIsPregnant() and playerAwareTheyArePregnant())) and _home_life.begin(_args[0], _args[1])>>
-    <<set _life_scene to _home_life.scene>>
+  <<set $_life_estate to maplebirch.get('Finance').realEstate>>
+  <<if (_args[0] isnot 'wine' or !(playerIsPregnant() and playerAwareTheyArePregnant())) and $_life_estate.life.begin(_args[0], _args[1])>>
+    <<set $_life_scene to $_life_estate.life.scene, $_life_day to Time.days, $_life_origin to $passage, $_life_location to $location>>
     <<set $_life_duration to 20>>
-    <<switch _life_scene.action>>
-      <<case 'meal'>>
-        <<tending_give _life_scene.item -2>><<stress -3>>
-        <<if _life_scene.first and _life_scene.quality gte 2>><<stress -1>><</if>>
-      <<case 'tea'>>
-        <<tending_give _life_scene.item -2>><<stress -2>><<set $_life_duration to 15>>
-        <<if _life_scene.first and _life_scene.quality gte 2>><<stress -1>><</if>>
+    <<switch $_life_scene.action>>
+      <<case 'meal' 'tea'>>
+        <<tending_give $_life_scene.item -2>>
+        <<if $_life_scene.action is 'tea'>><<set $_life_duration to 15>><</if>>
+      <<case 'film'>>
+        <<set $_life_duration to 45>>
+      <<case 'wine'>>
+        <<if ['red_wine', 'white_wine', 'ghostbrew'].includes($_life_scene.item)>><<tending_give $_life_scene.item -1>><</if>>
+        <<drunk 60>>
+        <<if $_life_scene.item is 'ghostbrew'>><<hallucinogen 120>><</if>>
+    <</switch>>
+    <<pass $_life_duration>>
+    <<if $_life_estate.life.scene isnot $_life_scene or $_life_estate.current?.id isnot $_life_scene.property_id
+        or $passage isnot $_life_origin or maplebirch.passage.title isnot $_life_scene.origin or $location isnot $_life_location
+        or $Finance.real_estate.room_companion isnot $_life_scene.partner or !$_life_estate.life.ready($_life_scene.action, 0)>>
+      <<if $_life_estate.life.scene is $_life_scene>><<set $Finance.real_estate.life.scene to null>><</if>>
+      <<exit>>
+    <</if>>
+    <<set $Finance.real_estate.life.days[($_life_scene.partner ?? 'pc') + ':' + $_life_scene.action] to $_life_day>>
+    <<switch $_life_scene.action>>
+      <<case 'meal' 'tea'>>
+        <<stress `$_life_scene.action is 'meal' ? -3 : -2`>>
+        <<if $_life_scene.first and $_life_scene.quality gte 2>><<stress -1>><</if>>
       <<case 'tidy'>>
-        <<housekeeping 1 600>><<tiredness `_life_scene.quality >= 2 || currentSkillValue('housekeeping') >= 500 ? 1 : 2`>>
+        <<housekeeping 1 600>><<tiredness `$_life_scene.quality >= 2 || currentSkillValue('housekeeping') >= 500 ? 1 : 2`>>
       <<case 'music'>>
         <<stress -2>>
       <<case 'film'>>
-        <<stress -4>><<set $_life_duration to 45>>
-        <<if _life_scene.item is 'erotic'>>
+        <<stress -4>>
+        <<if $_life_scene.item is 'erotic'>>
           <<promiscuity1>>
           <<arousal 1000>>
         <</if>>
       <<case 'wine'>>
-        <<if ['red_wine', 'white_wine', 'ghostbrew'].includes(_life_scene.item)>><<tending_give _life_scene.item -1>><</if>>
-        <<drunk 60>><<stress -3>>
-        <<if _life_scene.item is 'ghostbrew'>><<hallucinogen 120>><</if>>
+        <<stress -3>>
     <</switch>>
-    <<if _life_scene.partner and _life_scene.first>>
-      <<npcincr _life_scene.partner love 1>>
-      <<if _life_scene.partner is 'Robin'>>
+    <<if $_life_scene.partner and $_life_scene.first>>
+      <<npcincr $_life_scene.partner love 1>>
+      <<if $_life_scene.partner is 'Robin'>>
         <<npcincr Robin trauma -1>>
       <</if>>
-      <<if _life_scene.partner is 'Kylar'>>
+      <<if $_life_scene.partner is 'Kylar'>>
         <<npcincr Kylar rage -1>>
       <</if>>
     <</if>>
-    <<if _life_scene.action is 'film' and _life_scene.item is 'erotic' and _life_scene.partner>>
-      <<npcincr _life_scene.partner lust 5>>
-      <<if _life_scene.partner is 'Sydney' and C.npc.Sydney.purity gte 1>>
+    <<if $_life_scene.action is 'film' and $_life_scene.item is 'erotic' and $_life_scene.partner>>
+      <<npcincr $_life_scene.partner lust 5>>
+      <<if $_life_scene.partner is 'Sydney' and C.npc.Sydney.purity gte 1>>
         <<npcincr Sydney purity -1>>
       <</if>>
     <</if>>
-    <<if _life_scene.first and ['meal', 'tea', 'music', 'film'].includes(_life_scene.action)>>
-      <<run maplebirch.get('Psyche')?.rest(2, _life_scene.action is 'film' ? -60 : -40)>>
+    <<if $_life_scene.first and ['meal', 'tea', 'music', 'film'].includes($_life_scene.action)>>
+      <<run maplebirch.get('Psyche')?.rest(2, $_life_scene.action is 'film' ? -60 : -40)>>
     <</if>>
-    <<pass $_life_duration>>
-    <<if $Finance.real_estate.life.scene?.action is 'wine' and $passage is $Finance.real_estate.life.scene.origin and !$nextPassage and !$nextPassageCheck>>
+    <<if $_life_scene.action is 'meal' and $_life_scene.partner is 'Robin'>>
+      <<deadwood-home-moment 'Robin' 'join'>>
+    <</if>>
+    <<if $_life_scene.action is 'wine'>>
       <<goto 'Deadwood Reblooms Property Life Finish'>>
     <</if>>
   <<elseif _args[0] is 'wine'>>
@@ -256,14 +278,15 @@
 <!-- 复用本次活动的时间与回应记录，不延长人物在家日程。 -->
 <<widget 'deadwood-home-life-followup-ready'>>
   <<set _home_estate to maplebirch.get('Finance').realEstate, _home_scene to _home_estate.life.scene>>
-  <<set _home_departure to _home_scene?.partner is 'Sydney' ? 6 : 7>>
+  <<set $_followup_duration to _args[0] ?? 10>>
   <<set _home_followup_ready to maplebirch.passage.title is 'Deadwood Reblooms Property Life Finish'
     and _home_scene?.action isnot 'wine' and _home_scene?.first and !_home_scene.followup
     and _home_estate.current?.id is _home_scene.property_id and _home_scene.partner
-    and Number.isFinite(_home_scene.at) and Time.date.timeStamp gte _home_scene.at and Time.date.timeStamp lte _home_scene.at + 3600
+    and Number.isFinite(_home_scene.at) and Time.date.timeStamp gte _home_scene.at
+    and ($_followup_duration is 0 or Time.date.timeStamp lte _home_scene.at + 3600)
     and isLoveInterest(_home_scene.partner) and _home_estate.life.bathing?.partner isnot _home_scene.partner
     and _home_estate.residentsHome(_home_scene.property_id).some(resident => resident.id === _home_scene.partner)
-    and (Time.hour gte _home_departure or Time.hour * 60 + Time.minute + 10 lte _home_departure * 60)
+    and _home_estate.life.free(_home_scene.partner, $_followup_duration)
     and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$eventforced
     and !$nextPassage and !$nextPassageCheck and $stress lt $stressmax>>
 <</widget>>
@@ -272,23 +295,27 @@
   <<deadwood-home-life-followup-ready>>
   <<if !_home_followup_ready or _home_scene isnot _args[1] or !['talk', 'close'].includes(_args[0])>><<exit>><</if>>
   <<if _args[0] is 'talk' and $worn.face.type.includes('gag')>><<exit>><</if>>
-  <!-- 先记录选择，另一链接、重绘和读档不会再次结算。 -->
-  <<set _home_scene.followup to _args[0]>>
-  <<if _home_scene.partner>>
-    <<npcincr _home_scene.partner love 1>>
-    <<if _home_scene.partner is 'Robin'>>
+  <<set $_followup_scene to _home_scene, $_followup_choice to _args[0], $_followup_origin to $passage, $_followup_location to $location>>
+  <<pass 10>>
+  <!-- 完成后不再预留十分钟，只确认这次交谈仍在原处、对方仍在。 -->
+  <<deadwood-home-life-followup-ready 0>>
+  <<if !_home_followup_ready or _home_scene isnot $_followup_scene or $passage isnot $_followup_origin or $location isnot $_followup_location
+      or ($_followup_choice is 'talk' and $worn.face.type.includes('gag'))>><<exit>><</if>>
+  <<set $_followup_scene.followup to $_followup_choice>>
+  <<if $_followup_scene.partner>>
+    <<npcincr $_followup_scene.partner love 1>>
+    <<if $_followup_scene.partner is 'Robin'>>
       <<npcincr Robin trauma -1>>
     <</if>>
-    <<if _home_scene.partner is 'Kylar'>>
+    <<if $_followup_scene.partner is 'Kylar'>>
       <<npcincr Kylar rage -1>>
     <</if>>
   <</if>>
-  <<if _args[0] is 'talk'>>
+  <<if $_followup_choice is 'talk'>>
     <<stress -2>><<run maplebirch.get('Psyche')?.rest(2, -40)>>
   <<else>>
     <<stress -1>><<tiredness -1>><<run maplebirch.get('Psyche')?.rest(0, -80)>>
   <</if>>
-  <<pass 10>>
 <</widget>>
 
 <<widget 'deadwood-home-life-followup'>>
@@ -364,7 +391,8 @@
 <<set _estate to maplebirch.get('Finance').realEstate>>
 <<set _life_scene to _estate.life.scene>>
 <<if !_estate.current or !_life_scene or _life_scene.property_id isnot _estate.current.id>>
-  <<lanLink ['Return to the agency', '返回房产中介'] 'Deadwood Reblooms Property Office'>><</lanLink>><<exit>>
+  <<lanSwitch 'You had to stop before you could finish.' '还没来得及做完，你就不得不停了下来。'>><br><br>
+  <<getouticon>><<lanLink `_estate.current ? ['Return to the sitting room', '返回起居室'] : ['Return to the agency', '返回房产中介']` `_estate.current ? 'Deadwood Reblooms Property Home' : 'Deadwood Reblooms Property Office'`>><</lanLink>><<exit>>
 <</if>>
 <<effects>>
 <<if $nextPassage or $nextPassageCheck>>

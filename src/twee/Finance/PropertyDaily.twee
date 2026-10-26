@@ -9,6 +9,7 @@
       and maplebirch.get('Finance').realEstate.household.common.some(resident => resident.id === _day_life.daily.partner)>>
     <<socialiseicon>><<lanLink ['Mention your earlier conversation', '提起刚才的事'] 'Deadwood Reblooms Property Daily Recall'>><</lanLink>><br>
   <</if>>
+  <<deadwood-home-moment-links>>
 <</widget>>
 
 <<widget 'deadwood-home-daily-act'>>
@@ -35,6 +36,10 @@
       <<set $NPCList[0].deadwood_work.last to 'handover', $NPCList[0].deadwood_work.day to $_day_event.day>>
       <<set $NPCList[0].deadwood_work.chats += 1>><<saveNPC 0 $_day_key>>
   <</switch>>
+  <<if $_day_event.kind is 'resident' and $_day_event.partner is 'Sydney' and $_day_event.variant is 2
+      and ['join', 'leave'].includes($_day_event.choice)>>
+    <<deadwood-home-moment 'Sydney' $_day_event.choice>>
+  <</if>>
 <</widget>>
 
 :: Deadwood Reblooms Property Daily
@@ -74,23 +79,34 @@
     <</language>><br><br>
     <<icon 'library.png'>><<lanLink ['Read the handover notes (0:05)', '核对交接记录 (0:05)'] 'Deadwood Reblooms Property Daily Finish'>><<deadwood-home-daily-act 'read'>><</lanLink>><br>
   <<case 'resident'>>
+    <<if _day_event.partner is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
     <<language>>
       <<option 'EN'>>
         <<switch _day_event.partner>>
           <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>Robin waits near the doorway, twisting a sleeve. "Can you stay here for a little? I heard something outside."<<elseif _day_event.variant is 2>>Robin squares a little stack of playing cards. "Found these in a drawer. Want to try a hand? Nothing riding on it."<<elseif _day_event.variant is 0>>Robin has set a second cup beside <<nnpc_his 'Robin'>> own. "I saved you a seat."<<else>>Robin catches your eye and smiles. "I've got a bit of time <<if Time.hour gte 21>>before I turn in<<else>>before I need to go<</if>>. Want some company?"<</if>>
           <<case 'Whitney'>><<if _day_event.variant is 2>>Whitney is watching the street from the window. "Come look at this fucking idiot." <<nnpc_He 'Whitney'>> shifts aside enough for you to see.<<else>>Whitney has one boot on and the other lying beside the chair. <<if _day_event.variant is 0>>"Come here. Tell me what you've been up to."<<else>>"You got ten minutes for me, slut?"<</if>> <<nnpc_He 'Whitney'>> nudges the other chair with a foot.<</if>>
           <<case 'Kylar'>>Kylar comes out when <<nnpc_he 'Kylar'>> hears you. <<if C.npc.Kylar.rage gte 60>>"Who were you talking to? I wanted to see you." <<nnpc_He 'Kylar'>> looks past your shoulder before asking whether you can sit together.<<elseif _day_event.variant is 2>>"Could you sit still for a few minutes?" <<nnpc_He 'Kylar'>> holds a half-finished drawing against <<nnpc_his 'Kylar'>> chest. "I haven't got your hands right."<<else>>"I was hoping you'd be here." <<nnpc_He 'Kylar'>> moves a book from the seat nearest <<nnpc_him 'Kylar'>>.<</if>>
-          <<case 'Sydney'>>Sydney leaves a bookmark between the pages. "I have a little time <<if Time.hour gte 21>>before bed<<else>>before I go<</if>>." <<if _day_event.variant is 2>>"How would you read this?" <<nnpc_He 'Sydney'>> points to a sentence, leaving the space beside the book clear for you.<<elseif _day_event.variant is 0>><<nnpc_He 'Sydney'>> asks what you have been reading.<<else>>"Tell me something about your day?" <<nnpc_He 'Sydney'>> glances at the clock, then gives you <<nnpc_his 'Sydney'>> attention.<</if>>
+          <<case 'Sydney'>>Sydney leaves a bookmark between the pages. "I have a little time <<if Time.hour gte 21>>before bed<<else>>before I go<</if>>."
+            <<if _day_event.variant is 2>>
+              <<if _sydneyStatus.includes('pure')>>"Have you read this one? I love the part where the door... Oh. I shouldn't tell you that yet." Sydney moves the book between you. "We could read a little together."
+              <<elseif _sydneyStatus.includes('corrupt')>>"There's a trick in this bit. See if you can spot it." Sydney leaves the space beside the book clear. "If you guess, I'm not admitting anything."
+              <<else>>"This line seemed different when I read it again." <<nnpc_He 'Sydney'>> points back to an earlier paragraph. "What do you think? We could start here."<</if>>
+            <<elseif _day_event.variant is 0>><<nnpc_He 'Sydney'>> asks what you have been reading.<<else>>"Tell me something about your day?" <<nnpc_He 'Sydney'>> glances at the clock, then gives you <<nnpc_his 'Sydney'>> attention.<</if>>
         <</switch>>
       <<option 'CN'>>
         <<switch _day_event.partner>>
           <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>罗宾站在门边，拧着衣袖。“你能在这儿待一会儿吗？我听见外面有声音。”<<elseif _day_event.variant is 2>>罗宾将一小叠纸牌理齐。“在抽屉里找到的。要不要玩一局？不赌钱。”<<elseif _day_event.variant is 0>>罗宾在自己的杯子旁又放了一只。“给你留了座位。”<<else>>罗宾与你对上目光，笑了。“<<if Time.hour gte 21>>睡前<<else>>出门前<</if>>还有一点时间。要不要陪你坐坐？”<</if>>
           <<case 'Whitney'>><<if _day_event.variant is 2>>惠特尼正站在窗边看街上。“过来看看这个傻子。”<<nnpc_he 'Whitney'>>往旁边挪了一点，让你看清。<<else>>惠特尼穿好一只靴子，另一只还丢在椅子旁。<<if _day_event.variant is 0>>“过来。说说你都干什么了。”<<else>>“有十分钟陪我吗，骚货？”<</if>><<nnpc_he 'Whitney'>>用脚推了推另一把椅子。<</if>>
           <<case 'Kylar'>>凯拉尔听见你的声音便走了出来。<<if C.npc.Kylar.rage gte 60>>“你刚才在和谁说话？我一直想见你。”<<nnpc_he 'Kylar'>>朝你身后望了一眼，才问能不能一起坐坐。<<elseif _day_event.variant is 2>>“你能坐着别动几分钟吗？”<<nnpc_he 'Kylar'>>抱着一张没画完的素描。“手还没画好。”<<else>>“我还盼着你在这里。”<<nnpc_he 'Kylar'>>挪开最近的座位上的书。<</if>>
-          <<case 'Sydney'>>悉尼把书签夹进书页。“<<if Time.hour gte 21>>睡前<<else>>出门前<</if>>还有一点时间。”<<if _day_event.variant is 2>>“你觉得这句话该怎么读？”<<nnpc_he 'Sydney'>>指着书上一行字，给你留出一起看的位置。<<elseif _day_event.variant is 0>><<nnpc_he 'Sydney'>>问起你最近在读什么。<<else>>“跟我说说今天的事？”<<nnpc_he 'Sydney'>>看了眼钟，随即认真望向你。<</if>>
+          <<case 'Sydney'>>悉尼把书签夹进书页。“<<if Time.hour gte 21>>睡前<<else>>出门前<</if>>还有一点时间。”
+            <<if _day_event.variant is 2>>
+              <<if _sydneyStatus.includes('pure')>>“你看过这本么？我很喜欢那扇门后面……啊，后面还不能告诉你。”悉尼把书移到你们中间。“可以一起读一小段。”
+              <<elseif _sydneyStatus.includes('corrupt')>>“这里藏了个小把戏。看看你能不能找出来。”悉尼给你留出一起看的位置。“猜中了，我也不会承认的。”
+              <<else>>“这句话，再看就觉得不太一样了。”<<nnpc_he 'Sydney'>>指向前面的一段。“你觉得呢？我们可以从这里读起。”<</if>>
+            <<elseif _day_event.variant is 0>><<nnpc_he 'Sydney'>>问起你最近在读什么。<<else>>“跟我说说今天的事？”<<nnpc_he 'Sydney'>>看了眼钟，随即认真望向你。<</if>>
         <</switch>>
     <</language>><br><br>
-    <<socialiseicon>><<lanLink ['Sit together for a little while (0:10)', '一起坐一会儿 (0:10)'] 'Deadwood Reblooms Property Daily Finish'>><<deadwood-home-daily-act 'join'>><</lanLink>><<glove _day_event.partner>><<lstress>><br>
+    <<socialiseicon>><<lanLink `_day_event.partner is 'Sydney' and _day_event.variant is 2 ? ['Read together for a little while (0:10)', '一起读一会儿 (0:10)'] : ['Sit together for a little while (0:10)', '一起坐一会儿 (0:10)']` 'Deadwood Reblooms Property Daily Finish'>><<deadwood-home-daily-act 'join'>><</lanLink>><<glove _day_event.partner>><<lstress>><br>
   <<case 'house'>>
     <<language>>
       <<option 'EN'>>
@@ -122,6 +138,7 @@
 <<if $nextPassage or $nextPassageCheck>>
   <span id='next'><<lanLink ['Continue', '继续'] 'Deadwood Reblooms Property Daily Finish'>><</lanLink>></span><<nexttext>><<exit>>
 <</if>>
+<<if _day_event.partner is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
 <<language>>
   <<option 'EN'>>
     <<if _day_event.choice is 'leave'>>
@@ -131,7 +148,12 @@
           <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>Robin nods without looking up, still twisting <<nnpc_his 'Robin'>> sleeve.<<else>>"Oh. All right." Robin gives you a small wave.<</if>>
           <<case 'Whitney'>>Whitney snorts. "Your loss." <<nnpc_He 'Whitney'>> turns away.
           <<case 'Kylar'>>"You'll come back, won't you?" Kylar follows you to the doorway.
-          <<case 'Sydney'>>"Another time, then." Sydney opens the book again.
+          <<case 'Sydney'>>
+            <<if _day_event.variant is 2>>
+              <<if _sydneyStatus.includes('pure')>>"Of course. Whenever you have time." Sydney turns back to the book.
+              <<elseif _sydneyStatus.includes('corrupt')>>"Then I'm not waiting for you to turn the page." Sydney smiles, and picks up where <<nnpc_he 'Sydney'>> stopped.
+              <<else>>"All right. I'll keep reading." <<nnpc_He 'Sydney'>> leaves the bookmark in place for a moment before turning the page.<</if>>
+            <<else>>"Another time, then." Sydney opens the book again.<</if>>
         <</switch>>
       <<else>>You leave the matter for another time.<</if>>
     <<elseif _day_event.choice is 'read'>>You check the entry and confirm which rooms may be used. The handover is left in the duty book for the next shift.
@@ -143,7 +165,13 @@
     <<elseif _day_event.partner is 'Whitney' and _day_event.variant is 2>>You watch somebody struggle with a stubborn bicycle lock. Whitney keeps up a running commentary until the cyclist finally rides off. "There. Free entertainment." <<nnpc_He 'Whitney'>> grins at you.
     <<elseif _day_event.partner is 'Whitney'>>Whitney tells you something that happened on the way home, laughing at the least flattering part. "There. Wasn't hard, was it?" <<nnpc_He 'Whitney'>> gets the other boot on before leaving the chair.
     <<elseif _day_event.partner is 'Kylar'>>Kylar keeps your attention on the conversation. <<if C.npc.Kylar.rage gte 60>>"Next time, tell me when you're coming back." You return to the things that happened today. <<nnpc_He 'Kylar'>> listens, still waiting for you to mention a time.<<elseif _day_event.variant is 2>>You rest your hands on your knees while Kylar draws. <<nnpc_He 'Kylar'>> keeps glancing up, then adjusting a line. "Better." <<nnpc_He 'Kylar'>> shows you before carefully folding the paper away.<<else>><<nnpc_He 'Kylar'>> listens closely, then remembers something <<nnpc_he 'Kylar'>> wanted to tell you too.<</if>>
-    <<elseif _day_event.variant is 2>>You read the sentence together. <<if currentSkillValue('english') gte 500>>You suggest another way to phrase it. Sydney tries both aloud, then laughs at how different they sound.<<else>>Sydney goes back a few lines, and you work out the meaning together.<</if>> <<nnpc_He 'Sydney'>> marks the page before closing the book.
+    <<elseif _day_event.variant is 2>>
+      You sit beside Sydney and read from the marked paragraph. <<if currentSkillValue('english') gte 500>>You notice that the same phrase appeared earlier. Sydney turns back with you, then reads both passages aloud. The words have not changed, but now the character seems to be hiding something.<<else>>You stop at a sentence that seems to contradict the last page. Sydney goes back with you. Reading the exchange aloud makes it easier to follow who is speaking.<</if>>
+      <<if _sydneyStatus.includes('pure')>>"I nearly told you what happened next," Sydney admits, laughing. "I'm glad I didn't."
+      <<elseif _sydneyStatus.includes('corrupt')>>"I was watching to see whether you'd notice." Sydney grins. "You can choose which bit we read next time."
+      <<else>>"I wouldn't have read it quite that way by myself." Sydney looks back at the passage once more before marking it.<</if>>
+      <<if Time.hour gte 21>>The bookmark goes between the pages. "The next part can wait," <<nnpc_he 'Sydney'>> says, setting the book on the table before bed.
+      <<else>>Sydney leaves the bookmark at the next paragraph and puts the book beside the things <<nnpc_he 'Sydney'>> has to take. "We can start here next time."<</if>>
     <<else>>Sydney listens, sometimes adding a question. When the clock catches <<nnpc_his 'Sydney'>> eye again, <<nnpc_he 'Sydney'>> gathers the book. "I'd better get ready. Thank you." You let <<nnpc_him 'Sydney'>> go.<</if>>
   <<option 'CN'>>
     <<if _day_event.choice is 'leave'>>
@@ -153,7 +181,12 @@
           <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>罗宾没有抬头，仍拧着衣袖，轻轻点了一下。<<else>>“哦，好吧。”罗宾向你轻轻挥了挥手。<</if>>
           <<case 'Whitney'>>惠特尼哼了一声。“你的损失。”<<nnpc_He 'Whitney'>>转过身去。
           <<case 'Kylar'>>“你还会回来吧？”凯拉尔跟着你走到门边。
-          <<case 'Sydney'>>“那就改天吧。”悉尼重新翻开书。
+          <<case 'Sydney'>>
+            <<if _day_event.variant is 2>>
+              <<if _sydneyStatus.includes('pure')>>“没关系。等你有空吧。”悉尼重新看向书页。
+              <<elseif _sydneyStatus.includes('corrupt')>>“那我可不等你翻页了。”悉尼笑了笑，接着刚才的地方读下去。
+              <<else>>“好吧，我先自己看。”翻页前，<<nnpc_he 'Sydney'>>让书签在原处多留了一会儿。<</if>>
+            <<else>>“那就改天吧。”悉尼重新翻开书。<</if>>
         <</switch>>
       <<else>>你把这件事留到稍后。<</if>>
     <<elseif _day_event.choice is 'read'>>你核对了记录，确认哪些房间可以使用。交接内容留在值班簿里，下一班也能看见。
@@ -165,7 +198,13 @@
     <<elseif _day_event.partner is 'Whitney' and _day_event.variant is 2>>街上的人正和一把打不开的车锁较劲。惠特尼一直在旁边评头论足，直到对方终于骑车离开。“看，免费的乐子。”<<nnpc_he 'Whitney'>>冲你咧嘴笑。
     <<elseif _day_event.partner is 'Whitney'>>惠特尼说起回家路上发生的事，说到最损人的一段便笑了。“看吧。又不难。”离开椅子前，<<nnpc_he 'Whitney'>>才穿好另一只靴子。
     <<elseif _day_event.partner is 'Kylar'>>凯拉尔将你的注意力留在谈话里。<<if C.npc.Kylar.rage gte 60>>“下次，告诉我什么时候回来。”你接着说起今天的事。<<nnpc_he 'Kylar'>>听着，仍在等你提到回来的时间。<<elseif _day_event.variant is 2>>你将双手放在膝上，让凯拉尔接着画。<<nnpc_he 'Kylar'>>不时抬头看你，再改动一条线。“这样好多了。”<<nnpc_he 'Kylar'>>先给你看过，才仔细收好那张纸。<<else>><<nnpc_he 'Kylar'>>听得很认真，随后又想起自己也有件事要告诉你。<</if>>
-    <<elseif _day_event.variant is 2>>你们一起读了那句话。<<if currentSkillValue('english') gte 500>>你提议换个说法。悉尼把两种句子都念了一遍，听见其中的差别，忍不住笑了。<<else>>悉尼往前翻了几行，你们一起理清其中的意思。<</if>><<nnpc_he 'Sydney'>>在那页夹好书签，才合上书。
+    <<elseif _day_event.variant is 2>>
+      你在悉尼身旁坐下，从做了标记的那段读起。<<if currentSkillValue('english') gte 500>>你发现，前面也出现过同一句话。悉尼与你一起翻回去，把两段都念了一遍。字句没有变，可现在听来，说话的人像是藏着什么。<<else>>有一句话似乎与上一页对不上，你停了下来。悉尼陪你往前翻。把那段对话读出声，便能分清每句话是谁说的了。<</if>>
+      <<if _sydneyStatus.includes('pure')>>“刚才差点就把后面说出来了。”悉尼笑着承认。“还好，没说。”
+      <<elseif _sydneyStatus.includes('corrupt')>>“我一直在看，你会不会发现。”悉尼笑了起来。“下回，让你挑读哪一段。”
+      <<else>>“要是自己看，我可能就那么读过去了。”放好书签前，悉尼又看了一遍。<</if>>
+      <<if Time.hour gte 21>>书签夹进页间。“后面那段，留着下次吧。”<<nnpc_he 'Sydney'>>合上书，放回桌边。
+      <<else>>悉尼在下一段夹好书签，将书放到要带走的东西旁。“下次，可以从这里接着看。”<</if>>
     <<else>>悉尼听着，偶尔追问一句。再次看见钟时，<<nnpc_he 'Sydney'>>收起书。“得去准备了。谢谢。”你让<<nnpc_him 'Sydney'>>先走。<</if>>
 <</language>><br><br>
 <<getouticon>><<lanLink ['Return to the sitting room', '返回起居室'] 'Deadwood Reblooms Property Home'>><<endevent>><</lanLink>>
@@ -183,6 +222,7 @@
     <span id='next'><<lanLink ['Continue', '继续'] 'Deadwood Reblooms Property Daily Recall'>><</lanLink>></span><<nexttext>><<exit>>
   <</if>>
   <!-- 只回顾当天实际做过或拒绝的事，读档与重复交谈不再结算陪伴收益。 -->
+  <<if _day_event.partner is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
   <<language>>
     <<option 'EN'>>
       <<switch _day_event.partner>>
@@ -203,8 +243,13 @@
           <<elseif _day_event.variant is 2>>Kylar keeps a hand over the folded drawing. "I might work on it a little more. Your hands looked different when you started talking."
           <<else>>"I kept thinking about what you said." Kylar smiles. "I like knowing the little things too."<</if>>
         <<case 'Sydney'>>
-          <<if _day_event.choice is 'leave'>>Sydney looks up from the book. "Did you get everything done?" <<nnpc_He 'Sydney'>> slips a finger between the pages, keeping the place.
-          <<elseif _day_event.variant is 2>>"I read that sentence again." Sydney shows you the bookmark. "It's much clearer the second time. I'm glad we looked at it together."
+          <<if _day_event.choice is 'leave'>>
+            Sydney looks up from the book. <<if _day_event.variant is 2>><<if _sydneyStatus.includes('pure')>>"Do you have a little time now? I kept the page marked."<<elseif _sydneyStatus.includes('corrupt')>>"Found your way back to the story?" Sydney keeps a finger between the pages. "I haven't told you the answer."<<else>>"I went on a little. We can go back to the part I showed you, if you'd like."<</if>>
+            <<else>>"Did you get everything done?" <<nnpc_He 'Sydney'>> slips a finger between the pages, keeping the place.<</if>>
+          <<elseif _day_event.variant is 2>>
+            Sydney shows you the page you marked together. <<if _sydneyStatus.includes('pure')>>"I'll try not to spoil the next part either." <<nnpc_He 'Sydney'>> smiles. "You'll have to stop me if I start."
+            <<elseif _sydneyStatus.includes('corrupt')>>"I'm not telling you whether your suspicions were right." Sydney closes the book before you can look ahead. "You'll have to read on."
+            <<else>>"I read that part again. I kept thinking about how it sounded when we read it together." <<nnpc_He 'Sydney'>> leaves the bookmark where it is.<</if>>
           <<else>>"I didn't mean to keep looking at the clock." Sydney closes the book halfway. "I wanted to finish listening before I had to go."<</if>>
       <</switch>>
     <<option 'CN'>>
@@ -226,10 +271,35 @@
           <<elseif _day_event.variant is 2>>凯拉尔将手按在折好的素描上。“我可能还要改一改。你开始说话的时候，手又不一样了。”
           <<else>>“刚才你说的那些，我一直记着。”凯拉尔笑了。“小事我也想知道。”<</if>>
         <<case 'Sydney'>>
-          <<if _day_event.choice is 'leave'>>悉尼从书里抬起头。“都忙完了吗？”<<nnpc_He 'Sydney'>>把一根手指夹进书页，留住刚才读到的位置。
-          <<elseif _day_event.variant is 2>>“那句话，我又读了一遍。”悉尼给你看夹着书签的那页。“再看就明白多了。还好刚才和你一起读过。”
+          <<if _day_event.choice is 'leave'>>
+            悉尼从书里抬起头。<<if _day_event.variant is 2>><<if _sydneyStatus.includes('pure')>>“现在有一会儿空吗？那页还夹着书签呢。”<<elseif _sydneyStatus.includes('corrupt')>>“想起回来听故事了？”悉尼把手指留在页间。“谜底可还没告诉你。”<<else>>“我又往后看了一点。想看的话，可以翻回刚才给你看的那段。”<</if>>
+            <<else>>“都忙完了吗？”<<nnpc_He 'Sydney'>>把一根手指夹进书页，留住刚才读到的位置。<</if>>
+          <<elseif _day_event.variant is 2>>
+            悉尼给你看一起做过标记的那页。<<if _sydneyStatus.includes('pure')>>“下回，也尽量不把后面的事说出来。”<<nnpc_he 'Sydney'>>笑了笑。“要是忍不住，你得提醒我。”
+            <<elseif _sydneyStatus.includes('corrupt')>>“你猜得对不对，我可不说。”没等你往后看，悉尼就合上了书。“得接着读才知道。”
+            <<else>>“那段，我又读了一遍。总会想起，刚才一起念的时候是什么感觉。”<<nnpc_he 'Sydney'>>没有挪动那页的书签。<</if>>
           <<else>>“刚才不是故意一直看钟的。”悉尼将书半合起来。“我想走之前，把你的话听完。”<</if>>
       <</switch>>
   <</language>><br><br>
+  <<if _day_event.partner is 'Sydney' and _day_event.variant is 2 and _day_event.choice is 'leave'
+      and _estate.life.free('Sydney', 10) and !$replayScene and !$statFreeze and !$frozenValues
+      and !$combat and !$possessed and !$eventforced and $stress lt $stressmax>>
+    <<capture _estate _day_event>>
+      <<lanLink ['I have time now. Shall we read together?', '现在有空了，一起读一会儿？']>>
+        <<if $passage is 'Deadwood Reblooms Property Daily Recall' and $location is 'deadwood_home'
+            and _estate.life.daily is _day_event and _day_event.choice is 'leave'
+            and _day_event.day is Math.floor(Time.days) and _day_event.property is _estate.current?.id
+            and _estate.household.common.some(resident => resident.id is 'Sydney') and _estate.life.free('Sydney', 10)>>
+          <!-- 先复核原入口全部条件；未能重新赴约时保留婉拒，不耗时也不发收益。 -->
+          <<set _day_event.choice to null>>
+          <<if _estate.life.pending>>
+            <<goto 'Deadwood Reblooms Property Daily'>>
+          <<else>>
+            <<set _day_event.choice to 'leave'>>
+          <</if>>
+        <</if>>
+      <</lanLink>><br>
+    <</capture>>
+  <</if>>
 <</if>>
 <<getouticon>><<lanLink ['Return to the sitting room', '返回起居室'] 'Deadwood Reblooms Property Home'>><</lanLink>><br>

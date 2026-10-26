@@ -46,6 +46,7 @@ export interface PropertyLifeState {
     role: StaffRole | null;
     choice: 'join' | 'help' | 'read' | 'leave' | null;
   } | null;
+  recollections: Partial<Record<'Robin' | 'Sydney', { property_id: string; day: number; choice: 'join' | 'leave' }>>;
 }
 
 const rooms = ['Home', 'Landing', 'Lounge', 'Kitchen', 'Reception Room', 'Wine Cellar', 'Screening Room'].map(room => `Deadwood Reblooms Property ${room}`);
@@ -53,7 +54,7 @@ const minutes: Record<Activity, number> = { meal: 20, tea: 15, tidy: 20, music: 
 
 /** 保存居家活动与当天机会，原版食物、技能与时间由点击回调结算。 */
 export default class PropertyLife {
-  public static readonly defaults: PropertyLifeState = { days: {}, bath: null, scene: null, daily_day: -1, daily: null };
+  public static readonly defaults: PropertyLifeState = { days: {}, bath: null, scene: null, daily_day: -1, daily: null, recollections: {} };
 
   public constructor(
     private readonly estate: RealEstate,
@@ -194,14 +195,14 @@ export default class PropertyLife {
     return this.state.scene;
   }
 
-  public ready(action: Activity): boolean {
+  public ready(action: Activity, duration = minutes[action]): boolean {
     if (!this.available || window.pcAreArmsBound('both')) return false;
     if (action === 'rehearse' ? this.core.passage.title !== 'Deadwood Reblooms Property Desk' : !rooms.includes(this.core.passage.title)) return false;
     const property = this.estate.current!;
     const partner = V.Finance.real_estate.room_companion;
     if (partner && partner === this.bathing?.partner) return false;
     if (partner && !this.estate.residentsHome(property.id).some(resident => resident.id === partner)) return false;
-    if (partner && !this.free(partner, minutes[action])) return false;
+    if (partner && !this.free(partner, duration)) return false;
     if (action === 'rehearse') {
       return (
         V.englishPlay === 'ongoing' &&
@@ -216,9 +217,7 @@ export default class PropertyLife {
       return (
         ['Home', 'Lounge', 'Kitchen', 'Wine Cellar'].some(room => this.core.passage.title === `Deadwood Reblooms Property ${room}`) &&
         !V.worn.face.type.includes('gag') &&
-        (V.drunk ?? 0) < 240 &&
-        (V.drugged ?? 0) <= 0 &&
-        (V.hallucinogen ?? 0) <= 0
+        (duration === 0 || ((V.drunk ?? 0) < 240 && (V.drugged ?? 0) <= 0 && (V.hallucinogen ?? 0) <= 0))
       );
     }
     return ['meal', 'tea', 'tidy', 'music'].includes(action);
@@ -247,8 +246,7 @@ export default class PropertyLife {
     const partner = V.Finance.real_estate.room_companion;
     const key = `${partner ?? 'pc'}:${action}`;
     const first = this.state.days[key] !== Time.days;
-    // 排练只有已知角色的双人分支增加好感，结算成功后再由原有日记录占用次数。
-    if (action !== 'rehearse') this.state.days[key] = Time.days;
+    // 活动完成后再由原有日记录占用首次收益，开始时只保留本次场景。
     const supported = this.estate.staff.active(action === 'tidy' ? 'housekeeper' : 'cook') && ['meal', 'tea', 'tidy'].includes(action);
     this.state.scene = {
       property_id: property.id,

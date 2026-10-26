@@ -37,12 +37,14 @@
     role: $englishPlayRoles[name + 'Known'] ? $englishPlayRoles[name] : '',
     first: $Finance.real_estate.life.days[name + ':rehearse'] !== Time.days}))>>
   <<if !$_estate.life.begin('rehearse', $_role)>><<exit>><</if>>
-  <<set $_scene to $_estate.life.scene, $_chair to $_estate.furniture($_estate.current.id, 'chair'), $_scene.cast to $_cast>>
+  <<set $_scene to $_estate.life.scene, $_chair to $_estate.furniture($_estate.current.id, 'chair'), $_scene.cast to $_cast, $_location to $location>>
   <<pass 120>>
-  <<if $nextPassage or $nextPassageCheck or $combat or $eventforced or $statFreeze or $replayScene or $frozenValues
+  <<if $_estate.life.scene isnot $_scene or $_estate.current?.id isnot $_scene.property_id
+    or $passage isnot $_scene.origin or $location isnot $_location
+    or $nextPassage or $nextPassageCheck or $combat or $eventforced or $statFreeze or $replayScene or $frozenValues
     or $englishPlay isnot 'ongoing' or $englishPlayRoles?.Player isnot $_role
     or !$_cast.every(actor => $_estate.household.home.some(profile => profile.id === actor.name))>>
-    <<set $Finance.real_estate.life.scene to null>><<exit>>
+    <<if $_estate.life.scene is $_scene>><<set $Finance.real_estate.life.scene to null>><</if>><<exit>>
   <</if>>
   <<set $_actors to $_cast.filter(actor => ['Cass', 'Taylor', 'Sterling'].includes(actor.role))>>
   <<englishskill `$_actors.length ? 18 : 6`>>
