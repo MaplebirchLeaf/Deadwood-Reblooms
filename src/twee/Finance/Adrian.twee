@@ -649,17 +649,37 @@
     <<case 1>>
       <<language>>
         <<option 'EN'>>
-          Adrian finds your account in the customer file. "A card and a deposit that stays here. That's a customer relationship, rather than another withdrawal slip." The file is placed beside several others.<br><br><span class='blue'>With a debit card, end each day with at least <<printmoney 500000>> in net deposits for seven days in a row, with no overdue repayments.</span> Adrian's other customers will be included in the internal assessment too.
+          <<if _adrianContext.state.business_days gt 0>>
+            Adrian opens your file to a row of dated statements. "These are what I need. An account that stays in use." <<He>> clips the pages together before returning them to the folder.
+          <<else>>
+            Adrian finds your account in the customer file. "A card and a deposit that stays here. That's a customer relationship, rather than another withdrawal slip." The file is placed beside several others.
+          <</if>>
         <<option 'CN'>>
-          阿德里安在客户档案里找到了你的账户。“办好卡，存款也留在这里。这才是客户业务，不是又一张取款单。”档案被放到另外几份旁边。<br><br><span class='blue'>办好借记卡，连续七天的日终净存款不少于 <<printmoney 500000>>，且没有逾期还款。</span>内部考核也会计入阿德里安服务的其他客户。
+          <<if _adrianContext.state.business_days gt 0>>
+            阿德里安翻开你的档案，里面的账单按日期排好了。“要的就是这些。账户一直在用。”<<He>>把几页纸夹在一起，放回文件夹。
+          <<else>>
+            阿德里安在客户档案里找到了你的账户。“办好卡，存款也留在这里。这才是客户业务，不是又一张取款单。”档案被放到另外几份旁边。
+          <</if>>
       <</language>>
+      <br><br><span class='blue'><<lanSwitch 'With a debit card, end each day with at least ' '办好借记卡，连续七天的日终净存款不少于 '>><<printmoney 500000>><<lanSwitch ' in net deposits for seven days in a row, with no overdue repayments.' '，且没有逾期还款。'>></span>
+      <<note `lanSwitch("Adrian's other customers also count towards the internal assessment.", '内部考核也会计入阿德里安服务的其他客户。')` 'blue'>>
     <<case 2>>
       <<language>>
         <<option 'EN'>>
-          A new badge lies beside Adrian's pen. <span class='gold'>Senior Clerk.</span> "Your account helped. So did the customers who came back rather than moving to another branch." Adrian straightens the badge.<br><br>"There's a management vacancy. They want to see that I can retain larger accounts as well." <span class='blue'>With a debit card, end each day with at least <<printmoney 2500000>> in net deposits for fourteen days in a row, with no overdue repayments.</span> You don't need to take out a loan to help.
+          <<if _adrianContext.state.business_days gt 0>>
+            Adrian wears the <span class='gold'>Senior Clerk</span> badge now. <<He>> adds your latest statement to the application folder. "I'm putting the larger accounts together. When they ask how I've handled them, I want more than a list of balances."
+          <<else>>
+            A new badge lies beside Adrian's pen. <span class='gold'>Senior Clerk.</span> "Your account helped. So did the customers who came back rather than moving to another branch." Adrian straightens the badge.<br><br>"There's a management vacancy. They want to see that I can retain larger accounts as well."
+          <</if>>
         <<option 'CN'>>
-          阿德里安的笔旁放着新的名牌。<span class='gold'>资深柜员。</span>“你的账户帮了忙。其他愿意回来，没有转去别的分行的客户也一样。”阿德里安把名牌摆正。<br><br>“现在有个经理职位空出来了。他们还想看看，我能不能留住更大的客户业务。”<span class='blue'>办好借记卡，连续十四天的日终净存款不少于 <<printmoney 2500000>>，且没有逾期还款。</span>你不必为了帮忙去借贷款。
+          <<if _adrianContext.state.business_days gt 0>>
+            阿德里安已经戴上了<span class='gold'>资深柜员</span>的名牌。<<He>>把你最新的账单放进竞聘文件夹。“我在整理这些大额账户。问起我怎么做客户业务，总不能只给他们一串余额。”
+          <<else>>
+            阿德里安的笔旁放着新的名牌。<span class='gold'>资深柜员。</span>“你的账户帮了忙。其他愿意回来，没有转去别的分行的客户也一样。”阿德里安把名牌摆正。<br><br>“现在有个经理职位空出来了。他们还想看看，我能不能留住更大的客户业务。”
+          <</if>>
       <</language>>
+      <br><br><span class='blue'><<lanSwitch 'With a debit card, end each day with at least ' '办好借记卡，连续十四天的日终净存款不少于 '>><<printmoney 2500000>><<lanSwitch ' in net deposits for fourteen days in a row, with no overdue repayments.' '，且没有逾期还款。'>></span>
+      <<note `lanSwitch("You don't need to take out a loan to help.", '你不必为了帮忙去借贷款。')` 'blue'>>
     <<case 3>>
       <<language>>
         <<option 'EN'>>
@@ -670,17 +690,28 @@
     <<case 4>>
       <<language>>
         <<option 'EN'>>
-          "The interview's arranged. They're checking the portfolio too." Adrian rests a hand on the closed folder. "That takes <span class='blue'>a week</span>. Don't move money around for my sake. A balance that vanishes before the review doesn't help either of us."
+          <<if _adrianContext.businessReady and Time.days gte _adrianContext.state.career_ready_day>>
+            Adrian draws an envelope from the application folder. "The reply's here." <<He>> checks the name on the front before setting it between you.
+          <<else>>
+            "The interview's arranged. They're checking the portfolio too." Adrian rests a hand on the closed folder. "Don't move money around for my sake. A balance that vanishes before the review doesn't help either of us."
+          <</if>>
         <<option 'CN'>>
-          “面试安排好了。他们也在核对客户业务。”阿德里安的手停在合起的文件夹上。“需要<span class='blue'>一周</span>。别为了我来回转钱。审核还没结束，存款就不见了，对我们都没帮助。”
+          <<if _adrianContext.businessReady and Time.days gte _adrianContext.state.career_ready_day>>
+            阿德里安从竞聘文件夹里取出信封。“回信到了。”<<He>>核对了一遍信封上的名字，将它放到你们之间。
+          <<else>>
+            “面试安排好了。他们也在核对客户业务。”阿德里安的手停在合起的文件夹上。“别为了我来回转钱。审核还没结束，存款就不见了，对我们都没帮助。”
+          <</if>>
       <</language>>
+      <br><br><span class='blue'><<lanSwitch 'The review takes one week. Keep your debit card, at least ' '审核为期一周。期间需持有借记卡，净存款不少于 '>><<printmoney 2500000>><<lanSwitch ' in net deposits and no overdue repayments throughout.' '，且没有逾期还款。'>></span><br>
+      <<lanSwitch 'Earliest result: ' '最早可询问结果的日期：'>><<deadwood-reblooms-finance-date _adrianContext.state.career_ready_day 'date'>>
     <<case 5>>
       <<language>>
         <<option 'EN'>>
-          "More forms. A different desk." Adrian shows you the appointment letter. <span class='gold'>Branch Manager.</span> "The accounts got me an interview. They liked my work at it too." The letter is folded away. "Thank you for trusting me with your business."<br><br><span class='green'>You qualify for the branch's preferred personal-loan rate.</span> With no missed-payment records, the weekly interest rate on new personal loans is reduced by <span class='green'>10%</span>. The rate is fixed when you borrow. Existing contracts, late charges and mortgage terms are unchanged.
+          "More forms. A different desk." Adrian shows you the appointment letter. <span class='gold'>Branch Manager.</span> "The accounts got me an interview. They liked my work at it too." The letter is folded away. "Thank you for trusting me with your business."<br><br><span class='green'>You qualify for the branch's preferred personal-loan rate.</span> With no missed-payment records, the weekly interest rate on new personal loans is reduced by <span class='green'>10%</span>. The rate is fixed when you borrow.
         <<option 'CN'>>
-          “更多表格。一张不同的桌子。”阿德里安拿出任命信。<span class='gold'>分行经理。</span>“这些客户业务让我拿到了面试机会。面试里，他们也认可了我的工作。”信被收好。“谢谢你愿意把业务交给我。”<br><br><span class='green'>你可以享受分行的个人贷款优惠利率。</span>没有漏还记录时，新个人贷款的<span class='green'>周利率降低 10%</span>，签约时确定合同利率。已有合同、逾期费用和房贷条款仍按原来的规定执行。
+          “更多表格。一张不同的桌子。”阿德里安拿出任命信。<span class='gold'>分行经理。</span>“这些客户业务让我拿到了面试机会。面试里，他们也认可了我的工作。”信被收好。“谢谢你愿意把业务交给我。”<br><br><span class='green'>你可以享受分行的个人贷款优惠利率。</span>没有漏还记录时，新个人贷款的<span class='green'>周利率降低 10%</span>，签约时确定合同利率。
       <</language>>
+      <<note `lanSwitch('Existing contracts, late charges and mortgage terms are unchanged.', '已有合同、逾期费用和房贷条款仍按原来的规定执行。')` 'blue'>>
   <</switch>>
   <br><br>
   <div id='adrian-career-actions'>
