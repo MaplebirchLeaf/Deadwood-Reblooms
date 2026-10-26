@@ -354,12 +354,15 @@ export default class Laboratory {
     state.invoices = state.invoices.filter(sale => sale.pay_day > day);
     for (const batch of state.batches.filter(batch => batch.expires_day <= day)) state.spoiled += batch.units;
     state.batches = state.batches.filter(batch => batch.expires_day > day);
+    // 截止日当天仍可交货，周刷新保留未到期报价，不因换周撤回首单。
+    state.offers = state.offers.filter(sale => sale.deadline >= day);
     const week = Math.floor(day / 7);
     if (state.offer_week !== week) {
       state.offer_week = week;
-      state.offers = (['compound', 'broker', ...(this.trade.shop_approved ? ['shop'] : [])] as Buyer[]).map(buyer => {
+      for (const buyer of ['compound', 'broker', ...(this.trade.shop_approved ? ['shop'] : [])] as Buyer[]) {
+        if ((this.trade.exclusive && buyer !== 'compound') || state.offers.some(sale => sale.buyer === buyer)) continue;
         const roll = random(1, 100);
-        return {
+        state.offers.push({
           id: factory.next_id++,
           buyer,
           units: random(2, 6) * 20,
@@ -368,9 +371,8 @@ export default class Laboratory {
           pay_day: 0,
           total: 0,
           outcome: buyer === 'compound' || buyer === 'shop' ? 'paid' : roll <= 15 ? 'default' : roll <= 40 ? 'late' : 'paid'
-        };
-      });
-      if (this.trade.exclusive) state.offers = state.offers.filter(sale => sale.buyer === 'compound');
+        });
+      }
     }
     if (capacity <= 0 || !state.technician || (factory.issue && factory.issue.type !== 'haul') || day < factory.ready_day || factory.order) return false;
     if (!state.job && state.automatic && factory.manager) {

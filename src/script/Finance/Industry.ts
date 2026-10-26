@@ -37,7 +37,7 @@ export default function Industry(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.addTo('Journal', 'deadwood-industry-journal');
   maplebirch.tool.addTo('BeforeLinkZone', {
     widget: 'deadwood-laboratory-contact',
-    passage: ['Riding School', "Doctor Harper's Office Exam"]
+    passage: ['Riding School', 'Hospital Foyer']
   });
   maplebirch.tool.addTo('CustomLinkZone', {
     widget: [-1, 'deadwood-laboratory-contact'],

@@ -31,22 +31,23 @@
     <<case 'Riding School'>>
       <<set $_lab_menu to document.querySelector('#passage-content .macro-link[data-passage="Farmland"]')>>
       <<if maplebirch.get('Orchard')?.remy.available and $_lab_menu and maplebirch.get('Finance').industry.owned.some(factory => factory.laboratory.installed)>>
-        <<socialiseicon 'ask'>><<lanLink ['Ask Remy about your new business (0:10)', '与雷米谈谈新生意 (0:10)'] 'Deadwood Remy Laboratory'>><</lanLink>><br>
+        <<socialiseicon 'ask'>><<lanLink ['Ask Remy about your new business', '与雷米谈谈新生意'] 'Deadwood Remy Laboratory'>><</lanLink>><br>
       <</if>>
-    <<case "Doctor Harper's Office Exam">>
-      <<set $_lab_menu to document.querySelector('#passage-content .macro-link[data-passage="Hospital Foyer"]')>>
-      <<if $_lab_menu and maplebirch.get('Finance').industry.owned.some(factory => factory.laboratory.installed)>>
-        <<socialiseicon 'ask'>><<lanLink ['Ask Harper about quality checks (0:10)', '向哈珀询问检验事宜 (0:10)'] 'Deadwood Harper Laboratory'>><<clotheson>><<endevent>><</lanLink>><br>
+    <<case 'Hospital Foyer'>>
+      <<set $_lab_menu to document.querySelector('#passage-content .macro-link[data-passage="Pharmacy"]')>>
+      <<set $_lab_appointment to document.querySelector('#passage-content .macro-link:is([data-passage="Doctor Harper Emergency"], [data-passage="Doctor Harper\'s Office"], [data-passage="Doctor Harper\'s Office School"])')>>
+      <<if $_lab_menu and !$_lab_appointment and $harperSeen?.includes('hospital') and C.npc.Harper.state is 'active' and maplebirch.get('Finance').industry.owned.some(factory => factory.laboratory.installed)>>
+        <<socialiseicon 'ask'>><<lanLink ['Ask Harper about production checks', '向哈珀询问生产检验'] 'Deadwood Harper Laboratory'>><</lanLink>><br>
       <</if>>
     <<case 'Adult Shop Approach Sirris'>>
       <<set $_lab_menu to document.querySelector('#passage-content .macro-link[data-passage="Adult Shop"]')>>
       <<if $_lab_menu and maplebirch.get('Finance').industry.owned.some(factory => factory.laboratory.installed)>>
-        <<socialiseicon 'ask'>><<lanLink ['Discuss supplying the shop (0:10)', '商量给店里供货 (0:10)'] 'Deadwood Sirris Laboratory'>><</lanLink>><br>
+        <<socialiseicon 'ask'>><<lanLink ['Discuss supplying the shop', '商量给店里供货'] 'Deadwood Sirris Laboratory'>><</lanLink>><br>
       <</if>>
     <<case 'Adult Shop Approach Sydney'>>
       <<set $_lab_menu to document.querySelector('#passage-content .macro-link[data-passage="Adult Shop"]')>>
       <<if $_lab_menu and maplebirch.get('Finance').industry.owned.some(factory => factory.laboratory.installed)>>
-        <<socialiseicon 'ask'>><<lanLink ['Tell Sydney about the workshop (0:10)', '告诉悉尼加工间的事 (0:10)'] 'Deadwood Sydney Laboratory'>><</lanLink>><br>
+        <<socialiseicon 'ask'>><<lanLink ['Tell Sydney about the workshop', '告诉悉尼加工间的事'] 'Deadwood Sydney Laboratory'>><</lanLink>><br>
       <</if>>
   <</switch>>
 <</widget>>
@@ -218,15 +219,22 @@
 <br><br>
 <<deadwood-dynamicblock 'deadwood-factory-laboratory'>>
 <<deadwood-laboratory-result>>
-<<if _lab_state.installed and !_factory.ready>>
+<<if !_factory.ready>>
   <span class='blue'>
     <<language>>
       <<option 'EN'>>
-        Installation is still underway. Work can resume on <<deadwood-reblooms-finance-date _factory_state.ready_day>>.
+        Building work is still underway. Work can resume on <<deadwood-reblooms-finance-date _factory_state.ready_day>>.
       <<option 'CN'>>
-        设备仍在安装，预计<<deadwood-reblooms-finance-date _factory_state.ready_day>>恢复生产。
+        厂房仍在施工，预计<<deadwood-reblooms-finance-date _factory_state.ready_day>>恢复生产。
     <</language>>
   </span><br><br>
+<<elseif !_factory.open>>
+  <span class='blue'><<language>>
+    <<option 'EN'>>
+      The factory is closed. Working hours are 08:00–18:00. You can still check stock and orders.
+    <<option 'CN'>>
+      工厂已关门，营业时间为 08:00–18:00。仍可查看库存与订单。
+  <</language>></span><br><br>
 <</if>>
 <<if !_lab_state.installed>>
   <<language>>
@@ -299,12 +307,12 @@
       <span>
         <<language>>
           <<option 'EN'>>
-            Saleable packs
+            Saleable packs / flower-based packs
           <<option 'CN'>>
-            可售成品
+            可售成品／花料成品
         <</language>>
       </span>
-      <span class='teal'><<= _lab.stock>></span>
+      <span class='teal'><<= _lab.stock>> / <<= _lab.shopStock>></span>
     </div>
     <<if _lab_state.job>>
       <div class='dr-finance-summary'>
@@ -328,6 +336,30 @@
       成品保存<span class='blue'>28 天</span>。周末、施工和停工会推迟生产。批量越大，每份耗用的包装材料越少，却也占用更多资金和货架。普通订单和加工间共用工人。
   <</language>>
   <br><br>
+  <span class='blue'>
+    <<if !_lab.trade.inspected>>
+      <<language>>
+        <<option 'EN'>>
+          To supply the adult shop, have Harper inspect your production first. Once you have met at the hospital, ask about production checks in the foyer. Keep one finished pack at this workshop and <<deadwood-reblooms-finance-money _lab.terms.inspection_fee>> in its working funds.
+        <<option 'CN'>>
+          要向成人商店供货，先请哈珀检验生产。与哈珀在医院见过面后，可在门厅询问生产检验。这间厂房需留有一包成品，周转金中备好<<deadwood-reblooms-finance-money _lab.terms.inspection_fee>>。
+      <</language>>
+    <<elseif !_lab.trade.shop_approved>>
+      <<language>>
+        <<option 'EN'>>
+          The inspection record is ready. Visit Sirris while the adult shop is open to discuss supply and offer one flower-based pack from this workshop as a sample.
+        <<option 'CN'>>
+          检验记录已经备好。成人商店营业时，可找西里斯商量供货，并送交这间厂房的一包花料成品作样品。
+      <</language>>
+    <<else>>
+      <<language>>
+        <<option 'EN'>>
+          Sirris has approved your sample. Adult-shop orders are collected from the workshop. Check the orders below and approve collection when enough flower-based packs are ready.
+        <<option 'CN'>>
+          西里斯已认可你的样品。成人商店从厂房取货，查看下方订单，备足花料成品后批准取货。
+      <</language>>
+    <</if>>
+  </span><br><br>
   <<if _lab.trade.harper_site is _factory_state.site>>
     <<deadwood-laboratory-harper-status _factory_state>><br><br>
   <</if>>
@@ -339,12 +371,15 @@
         技术员要求<<deadwood-reblooms-finance-money _lab.terms.technician_fee>>的聘用费用，每天另付<<deadwood-reblooms-finance-money _lab.terms.technician_wage>>。
     <</language>>
     <br>
-    <<icon 'industry/technician.png'>><<lanLink ['Hire the technician (0:15)', '聘请技术员 (0:15)'] 'Deadwood Reblooms Factory Laboratory'>>
-      <<if _lab.act('technician')>>
-        <<pass 15>>
-      <</if>>
-    <</lanLink>><br><br>
+    <<if _lab.available>>
+      <<icon 'industry/technician.png'>><<lanLink ['Hire the technician (0:15)', '聘请技术员 (0:15)'] 'Deadwood Reblooms Factory Laboratory'>>
+        <<if _lab.act('technician')>>
+          <<pass 15>>
+        <</if>>
+      <</lanLink>><br><br>
+    <</if>>
   <</if>>
+  <<if _lab.available>>
   <<language>>
     <<option 'EN'>>
       Lots to move or process (1–10):
@@ -428,6 +463,8 @@
       <</language>>
       <br>
     <</if>>
+  <</capture>>
+  <</if>>
     <<if _lab_state.automatic and !_lab_state.job>>
       <!-- Dynamic 重绘直接执行内容，不再处于初次输出的 widget 局部帧中。 -->
       <<set _laboratoryAutoBatch to _lab.batch(_factory_state)>>
@@ -456,9 +493,8 @@
         <</if>>
       </span><br>
     <</if>>
-  <</capture>>
   <br>
-  <<if _lab.stock gt 0>>
+  <<if _lab.available and _lab.stock gt 0>>
     <<icon 'sex-toys/pill-aphrodisiac.png'>><<lanLink ['Take one pack for yourself', '自用领取一包']>>
       <<run _lab.act('take')>>
       <<run Dynamic.render('deadwood-factory-laboratory')>>
@@ -488,15 +524,19 @@
         你已经答应把新货都交给大院，小买家不再来询价。
     <</language>>
     <br>
-    <<icon 'company/sales.png'>><<lanLink ['Resume independent sales', '恢复独立销售']>>
-      <<deadwood-laboratory-instruction 'independent'>>
-      <<run Dynamic.render('deadwood-factory-laboratory')>>
-    <</lanLink>><br>
+    <<if _lab.available>>
+      <<icon 'company/sales.png'>><<lanLink ['Resume independent sales', '恢复独立销售']>>
+        <<deadwood-laboratory-instruction 'independent'>>
+        <<run Dynamic.render('deadwood-factory-laboratory')>>
+      <</lanLink>><br>
+    <</if>>
   <<else>>
-    <<icon 'company/supply-contract.png'>><<lanLink ['Offer exclusive supply to the compound', '向大院承诺独家供货']>>
-      <<deadwood-laboratory-instruction 'exclusive'>>
-      <<run Dynamic.render('deadwood-factory-laboratory')>>
-    <</lanLink>><br>
+    <<if _lab.available>>
+      <<icon 'company/supply-contract.png'>><<lanLink ['Offer exclusive supply to the compound', '向大院承诺独家供货']>>
+        <<deadwood-laboratory-instruction 'exclusive'>>
+        <<run Dynamic.render('deadwood-factory-laboratory')>>
+      <</lanLink>><br>
+    <</if>>
     <<language>>
       <<option 'EN'>>
         The compound's price is lower. Exclusivity ends the current pressure, but closes the other sales channels until you withdraw it.
@@ -556,6 +596,7 @@
               约定账期：<span class='blue'><<= _lab_offer.buyer is 'compound' ? 2 : 5>></span>天。私人批发商可能延期，甚至不付款。
           <</language>>
           <br>
+          <<if _lab.available>>
           <<if _lab_offer.units lte (_lab_offer.buyer is 'shop' ? _lab.shopStock : _lab.stock) and (_lab_offer.buyer is 'compound' or (!_lab.trade.exclusive and !_lab.competition))>>
             <<icon 'industry/dispatch.png'>><<lanLink ['Approve collection (0:15)', '批准取货 (0:15)'] 'Deadwood Reblooms Factory Laboratory'>>
               <<if _lab.act('dispatch', _lab_offer.id)>>
@@ -572,6 +613,7 @@
               <</language>>
             </span>
           <</if>>
+          <</if>>
         <</deadwood-card>>
         <br>
       <</if>>
@@ -587,7 +629,7 @@
       <</language>>
     </span><br>
   <</if>>
-  <<if _lab.stock gt 0 and !_lab_state.job and !_lab_state.invoices.length>>
+  <<if _lab.available and _lab.stock gt 0 and !_lab_state.job and !_lab_state.invoices.length>>
     <<refuseicon>><<lanLink ['Discard the finished stock', '丢弃成品库存']>>
       <<deadwood-laboratory-instruction 'discard'>>
       <<run Dynamic.render('deadwood-factory-laboratory')>>
@@ -706,11 +748,11 @@
 <<npc 'Harper'>><<person1>>
 <<language>>
   <<option 'EN'>>
-    Harper pauses with one hand on the door. "Your own production?" <<He>> asks. <<His>> eyes move from your face to the batch sheet. "Please, sit. Tell me what you've been using."
+    Harper looks up from <<his>> desk. "Your own production?" <<He>> asks. <<His>> eyes move from your face to the batch sheet. "Please, sit. Tell me what you've been using."
     <br><br>
     <<He>> leaves your medical file shut and pulls a blank sheet towards <<him>>. At the top, <<he>> writes the workshop's address.
   <<option 'CN'>>
-    哈珀扶着门的手停了下来。“自己生产了？”<<He>>问，目光从你的脸移到批次单上。“请坐。说说你用了些什么。”
+    哈珀从办公桌前抬起头。“自己生产了？”<<He>>问，目光从你的脸移到批次单上。“请坐。说说你用了些什么。”
     <br><br>
     <<He>>没有打开你的病历，而是抽来一张空白纸，在顶端写下厂房的地址。
 <</language>>
@@ -785,6 +827,14 @@
       </span><br>
     <</if>>
   <<else>>
+    <<if !_lab.trade.shop_approved>>
+      <span class='blue'><<language>>
+        <<option 'EN'>>
+          Take the inspection record to Sirris at the adult shop. Keep a flower-based pack at the workshop for the shop's sample.
+        <<option 'CN'>>
+          可以带着检验记录去成人商店找西里斯，厂房里还需留一包花料成品作样品。
+      <</language>></span><br><br>
+    <</if>>
     <<language>>
       <<option 'EN'>>
         "I could guide the work," Harper says. "Your technician stays there. I have appointments." <<He>> turns the sheet so you can read the quotation. "<span class='gold'>Ten thousand pounds to begin, including the first seven days. Three thousand five hundred for each further week at the same address.</span> Another workshop would need its own initial review."
@@ -845,13 +895,13 @@
     <</if>>
   <</if>>
 <</if>>
-<br><<getouticon>><<lanLink ['Leave the office', '离开办公室'] 'Hospital Foyer'>><<clotheson>><<endevent>><</lanLink>>
+<br><<getouticon>><<lanLink ['Leave the office', '离开办公室'] 'Hospital Foyer'>><</lanLink>>
 
 :: Deadwood Sirris Laboratory
 <<set $outside to 0>><<set $location to 'adult_shop'>><<effects>>
 <<deadwood-laboratory-client>>
 <<if !_lab?.unlocked>>
-  <<exit>>
+  <<getouticon>><<lanLink ['Return to the shop', '返回店铺'] 'Adult Shop'>><</lanLink>><<exit>>
 <</if>>
 <<language>>
   <<option 'EN'>>
@@ -863,11 +913,18 @@
 <<if _lab.trade.talks.sirris?.day is Math.floor(Time.days) and _lab.trade.talks.sirris?.choice is 'accept'>>
   <<language>>
     <<option 'EN'>>
-      Sirris writes your workshop address on the delivery sheet. "Twenty packs to start. Twenty-six pounds a pack, paid five days after collection. If the dates or contents don't match, don't expect another order." <<nnpc_He 'Sirris'>> puts the sample aside. "Keep the purple stuff out of this shipment. I want the flower-based packs we discussed."
+      Sirris writes your workshop address on the delivery sheet. "Twenty packs to start. Twenty-six pounds a pack, paid five days after collection. Arrange collection at your workshop. If the dates or contents don't match, don't expect another order." <<nnpc_He 'Sirris'>> puts the sample aside. "Keep the purple stuff out of this shipment. I want the flower-based packs we discussed."
     <<option 'CN'>>
-      西里斯把厂房地址写进送货单。“先收二十包。每包二十六镑，取货五天后付款。日期或者内容对不上，就别指望下一张订单。”<<nnpc_He 'Sirris'>>把样品放到一旁。“这批里别混紫色的东西。我要的是刚谈过的花料成品。”
+      西里斯把厂房地址写进送货单。“先收二十包。每包二十六镑，取货五天后付款。你回厂房安排取货。日期或者内容对不上，就别指望下一张订单。”<<nnpc_He 'Sirris'>>把样品放到一旁。“这批里别混紫色的东西。我要的是刚谈过的花料成品。”
   <</language>>
   <br><br>
+<<elseif _lab.trade.shop_approved>>
+  <<language>>
+    <<option 'EN'>>
+      "The orders go to your workshop," Sirris says. "Check the quantities and dates there before you approve collection. Flower-based packs, just like the sample."
+    <<option 'CN'>>
+      “订单会送到你的厂房。”西里斯说。“在那边核对数量和日期，备好再让人取货。要花料成品，和样品一样。”
+  <</language>><br><br>
 <<else>>
   <<if _lab.trade.talks.sirris?.day isnot Math.floor(Time.days)>>
     <<socialiseicon 'ask'>><<lanLink ['Discuss batches and supply (0:10)', '商量批次与供货 (0:10)'] 'Deadwood Sirris Laboratory'>>
@@ -879,9 +936,9 @@
   <<if _lab.trade.sirris_knows>>
     <<language>>
       <<option 'EN'>>
-        "A sample and the production checks first. Flower-based stock, labelled and dated. I'm buying goods, not somebody else's unmarked bottle." <<nnpc_He 'Sirris'>> turns a pack over to show you its label. "And I won't buy more just because you've made more."
+        "I need a sample and the production checks. Flower-based stock, labelled and dated. I'm buying goods, not somebody else's unmarked bottle." <<nnpc_He 'Sirris'>> turns a pack over to show you its label. "And I won't buy more just because you've made more."
       <<option 'CN'>>
-        “先给样品，再给生产检查记录。花料成品，标签和日期都写好。我买的是货，不是别人那瓶什么都没写的东西。”<<nnpc_He 'Sirris'>>翻过一包，给你看背面的标签。“也不会因为你多做了，我就得多买。”
+        “样品和生产检查记录都要。花料成品，标签和日期都写好。我买的是货，不是别人那瓶什么都没写的东西。”<<nnpc_He 'Sirris'>>翻过一包，给你看背面的标签。“也不会因为你多做了，我就得多买。”
     <</language>>
     <br><br>
     <<if !_lab.trade.shop_approved and _lab.trade.inspected and _lab.shopStock gt 0 and (_lab.trade.talks.sirris?.day isnot Math.floor(Time.days) or _lab.trade.talks.sirris?.choice is 'ask')>>
@@ -890,15 +947,22 @@
           <<pass 10>>
         <</if>>
       <</lanLink>><br>
-    <<elseif !_lab.trade.shop_approved>>
+    <<elseif !_lab.trade.inspected>>
       <span class='blue'>
         <<language>>
           <<option 'EN'>>
-            You need inspected production and one flower-based sample.
+            Ask Harper at the hospital to inspect your production first. The inspection needs one finished pack and <<deadwood-reblooms-finance-money _lab.terms.inspection_fee>> from the workshop's funds.
           <<option 'CN'>>
-            需要完成生产检验，并备有一包花料成品样品。
+            先去医院请哈珀检验生产，需要一包厂内成品，以及厂房周转金中的<<deadwood-reblooms-finance-money _lab.terms.inspection_fee>>。
         <</language>>
       </span><br>
+    <<elseif _lab.shopStock is 0>>
+      <span class='blue'><<language>>
+        <<option 'EN'>>
+          Keep one unexpired flower-based pack at the workshop for the sample. Sirris does not accept packs made from purple phials.
+        <<option 'CN'>>
+          厂房里需留有一包未过期的花料成品作样品。西里斯不收紫色药剂制成的货。
+      <</language>></span><br>
     <</if>>
   <</if>>
 <</if>>
