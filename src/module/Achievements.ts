@@ -10,10 +10,10 @@ class Achievements {
         if (entry.module !== module) continue;
         setup.feats[entry.id] ??= {
           get title() {
-            return maplebirch.t(entry.title);
+            return lanSwitch(entry.title[0], entry.title[1]);
           },
           get desc() {
-            return maplebirch.t(entry.description);
+            return lanSwitch(entry.description[0], entry.description[1]);
           },
           difficulty: entry.difficulty,
           series: '',
