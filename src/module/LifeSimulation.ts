@@ -213,6 +213,7 @@ class LifeSimulation extends Module {
       feet: [],
       hands: [],
       handheld: [],
+      handheld_left: [],
       head: [],
       legs: [],
       lower: [],

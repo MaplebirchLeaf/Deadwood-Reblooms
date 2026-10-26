@@ -1029,6 +1029,7 @@ class RealEstate {
       feet: [],
       hands: [],
       handheld: [],
+      handheld_left: [],
       head: [],
       legs: [],
       lower: [],
