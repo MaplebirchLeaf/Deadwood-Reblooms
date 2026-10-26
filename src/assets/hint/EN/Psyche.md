@@ -17,7 +17,7 @@
 
 The multiplier applies to progress in science, maths, English and history earned in class, through reading and similar activities. Full sanity reduces fear gained from a fright by 25%, while minimum sanity increases it by 25%.
 
-A non-consensual encounter with people, beasts or plants that causes trauma leaves you shaken, with a small sanity loss and fear gain based on the actual trauma recorded, capped at 10 sanity and 150 base fear per encounter. Waking from a special nightmare costs 10 sanity. The Ivory Wraith, undead raids and curses can also affect sanity.
+A non-consensual encounter with people, beasts or plants that causes trauma leaves you shaken, adding up to 150 base fear based on the trauma recorded. Sanity loss comes from supernatural experiences, such as the Ivory Wraith, undead raids and curses. Waking from a special nightmare costs 10 sanity.
 
 When investigating the cavern or harbour, you can pursue strange sights and sounds or examine them cautiously. Following them further causes more fear, but can reveal a dry route around the flooded crossing or a gesture the guard recognises. Breaking a curse or dealing with a raid can help you recover.
 

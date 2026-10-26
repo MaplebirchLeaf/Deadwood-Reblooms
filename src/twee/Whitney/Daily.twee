@@ -1,9 +1,9 @@
 :: Deadwood Whitney Aftercare Widgets [widget]
-<!-- 营救后的普通校园日才开放，每日一次。 -->
+<!-- 营救后的普通校园日才开放，每日一次，并为交谈留够十分钟。 -->
 <<widget 'deadwood-whitney-aftercare-link'>>
   <<if $WhitneyExpansion?.rescued and $whitneyReunionScene is undefined
     and ['active', 'rescued'].includes(C.npc.Whitney.state) and Time.schoolDay
-    and Time.hour gte 7 and Time.hour lt 18 and $exposed lte 0
+    and Time.hour gte 7 and Time.hour * 60 + Time.minute lt 18 * 60 - 10 and $exposed lte 0
     and $WhitneyExpansion.aftercare_day isnot Time.days>>
     <<socialiseicon>><<lanLink ['Talk to Whitney (0:10)', '去找惠特尼说话 (0:10)'] 'Deadwood Whitney Aftercare'>><</lanLink>><br><br>
   <</if>>
@@ -126,8 +126,8 @@
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
 <<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze>><<exit>><</if>>
 <<if !$WhitneyExpansion?.rescued or $whitneyReunionScene isnot undefined or !['active', 'rescued'].includes(C.npc.Whitney.state)
-  or !Time.schoolDay or Time.hour lt 7 or Time.hour gte 18 or $exposed gt 0 or $WhitneyExpansion.aftercare_day is Time.days>>
-  <<lanSwitch 'Whitney has already left the school grounds.' '惠特尼已经离开学校。'>><br><br>
+  or !Time.schoolDay or Time.hour lt 7 or Time.hour * 60 + Time.minute gte 18 * 60 - 10 or $exposed gt 0 or $WhitneyExpansion.aftercare_day is Time.days>>
+  <<lanSwitch 'You cannot stop to talk with Whitney now.' '你现在没法留下来和惠特尼说话。'>><br><br>
 <<else>>
   <<pass 10>>
   <<if $nextPassage or $nextPassageCheck or $combat or $replayScene or $statFreeze or $location isnot 'school' or $passage isnot 'Deadwood Whitney Aftercare' or !['active', 'rescued'].includes(C.npc.Whitney.state)>><<exit>><</if>>

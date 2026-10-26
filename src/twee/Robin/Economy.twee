@@ -1656,15 +1656,23 @@
   <<deadwood-robin-shop-regular>>
   <<set _robinRegular to maplebirch.get('Robin').shop.regular>>
   <<if _robinShopShift is 'Robin'>>
-    <<lanSwitch 'Robin writes a small batch on a spare card and asks you to tell the waiting customers the price before they order. The first cup sells; Robin decides to put the recipe in tomorrow\'s ledger, not to promise more than the stock can cover.' '罗宾把小批量特饮写在备用卡片上，请你先向排队的人说明价格。第一杯卖了出去。罗宾决定把配方记进明天的账本，但不承诺卖出超过存货的份量。'>>
+    <<if _robinRegular.shop_specials gt 1>>
+      <<lanSwitch 'Robin finds the recipe card from last time and props it beside the till. "Let\'s try that again. Could you put the price up while I get it ready?"' '罗宾找出上次的配方卡，立在收银机旁。“再试试这个吧。你帮我把价钱写好，我来准备？”'>>
+    <<else>>
+      <<lanSwitch 'Robin writes a drink and its price on a spare card. "Just a little batch to start with," <<he>> says, passing you the card to put beside the till.' '罗宾在备用卡片上写下饮品和价钱。“先少做一点，看看大家喜不喜欢。”<<he>>把卡片递给你，请你放到收银机旁。'>>
+    <</if>>
     <<npcincr Robin dom 2>><<gdom>>
   <<else>>
     <<language>>
       <<option 'EN'>>
         You count change while Robin fills the numbered orders.
         <<if maplebirch.get('Robin').shop.attendantKey and $per_npc[maplebirch.get('Robin').shop.attendantKey].shop_orphan>>
-          Your fellow orphan takes the last tray. Robin points out a spilled drink on the order pad.
-          "Don't charge them twice. I've already made another one."
+          <<if $per_npc[maplebirch.get('Robin').shop.attendantKey].shop_experience gte 4>>
+            Your fellow orphan checks the last order against the tray before taking it out. Robin glances up, then turns back to the next cup. "They've got the hang of it," <<he>> says to you, smiling.
+          <<else>>
+            Your fellow orphan takes the last tray. Robin points out a spilled drink on the order pad.
+            "Don't charge them twice. I've already made another one."
+          <</if>>
         <<elseif maplebirch.get('Robin').shop.attendantKey>>
           The employee takes over the till. Robin counts the remaining coins with you,
           then moves a small pile into the float for tomorrow.
@@ -1675,8 +1683,12 @@
       <<option 'CN'>>
         你核对找零，罗宾按订单号码出杯。
         <<if maplebirch.get('Robin').shop.attendantKey and $per_npc[maplebirch.get('Robin').shop.attendantKey].shop_orphan>>
-          孤儿院的同伴端走最后一盘饮料。罗宾指了指订单本上洒掉的那杯。
-          “别再收一遍钱，我已经补了一杯。”
+          <<if $per_npc[maplebirch.get('Robin').shop.attendantKey].shop_experience gte 4>>
+            孤儿院的同伴把最后一盘饮料与单子核对好，才端出去。罗宾抬头看了一眼，又接着准备下一杯。“已经上手了。”<<he>>朝你笑了笑。
+          <<else>>
+            孤儿院的同伴端走最后一盘饮料。罗宾指了指订单本上洒掉的那杯。
+            “别再收一遍钱，我已经补了一杯。”
+          <</if>>
         <<elseif maplebirch.get('Robin').shop.attendantKey>>
           店员接手收银。罗宾和你数过剩下的硬币，又分出一小堆，留着明天找零。
         <<else>>
@@ -1725,6 +1737,9 @@
         <</if>>
       <</if>>
   <</language>>
+  <<if _robinRegular.shop_orders gte 3 and maplebirch.get('Orchard')?.freshSupplySales gt 0>>
+    <br><br><<lanSwitch 'Robin checks the fruit drinks on the order pad. "The fruit you brought is going down well," <<he>> says, showing you the list before the next customer calls.' '罗宾看了看单子上的果饮。“你送来的水果，客人挺喜欢的。”<<he>>把单子转给你看，下一位客人已经在柜台前招手。'>>
+  <</if>>
   <br><br><span class='green'><<lanSwitch 'You receive £10 for the shift; Robin adds £20 to the business reserve. One crate of special ingredients has been used.' '你拿到 £10 班次报酬。罗宾把 £20 记入营业储备金。一箱新品原料已经用完。'>></span>
   <<pass 60>>
 <<else>>

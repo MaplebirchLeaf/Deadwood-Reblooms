@@ -4,24 +4,36 @@
   <<set _day_life to maplebirch.get('Finance').realEstate.life>>
   <<if _day_life.pending>>
     <<socialiseicon>><<lanLink `_day_life.daily.kind === 'resident' ? ['See what ' + maplebirch.auto(_day_life.daily.partner) + ' wants', '听听' + maplebirch.auto(_day_life.daily.partner) + '想说什么'] : _day_life.daily.kind === 'staff' ? ['Go over the household handover', '看看雇员的交接记录'] : ['Attend to a small matter at home', '处理家里的一件小事']` 'Deadwood Reblooms Property Daily'>><</lanLink>><br>
+  <<elseif _day_life.daily?.kind is 'resident' and ['join', 'leave'].includes(_day_life.daily.choice)
+      and _day_life.daily.day is Math.floor(Time.days) and _day_life.daily.property is maplebirch.get('Finance').realEstate.current?.id
+      and maplebirch.get('Finance').realEstate.household.common.some(resident => resident.id === _day_life.daily.partner)>>
+    <<socialiseicon>><<lanLink ['Mention your earlier conversation', '提起刚才的事'] 'Deadwood Reblooms Property Daily Recall'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-home-daily-act'>>
   <<set $_day_estate to maplebirch.get('Finance').realEstate>>
+  <<set $_day_event to $_day_estate.life.daily, $_day_action to _args[0], $_day_origin to $passage, $_day_location to $location>>
+  <<if !$_day_estate.life.pending or $passage isnot 'Deadwood Reblooms Property Daily'>><<exit>><</if>>
   <<if _args[0] is 'read' and $NPCList[0]?.per isnot $_day_estate.staff.key($_day_estate.life.daily?.role)>><<exit>><</if>>
-  <<if !$_day_estate.life.finish(_args[0])>><<exit>><</if>>
-  <<set _day_event to $_day_estate.life.daily>>
-  <<switch _day_event.choice>>
+  <<if !['join', 'help', 'read', 'leave'].includes($_day_action)
+      or ($_day_action isnot 'leave' and $_day_action isnot ({ resident: 'join', staff: 'read', house: 'help' })[$_day_event.kind])
+      or ($_day_action is 'help' and pcAreArmsBound('both'))>><<exit>><</if>>
+  <!-- 耗时后才登记完成和发放收益。强制转场或日程变化保留已耗时间，不算做完。 -->
+  <<if $_day_action isnot 'leave'>><<pass `$_day_action is 'read' ? 5 : 10`>><</if>>
+  <<if $_day_estate.life.daily isnot $_day_event or $passage isnot $_day_origin or $location isnot $_day_location
+      or ($_day_action is 'read' and $NPCList[0]?.per isnot $_day_estate.staff.key($_day_event.role))
+      or !$_day_estate.life.finish($_day_action)>><<exit>><</if>>
+  <<switch $_day_event.choice>>
     <<case 'join'>>
-      <<npcincr _day_event.partner love 1>><<stress -2>><<run maplebirch.get('Psyche')?.rest(2, -60)>><<pass 10>>
+      <<npcincr $_day_event.partner love 1>><<stress -2>><<run maplebirch.get('Psyche')?.rest(2, -60)>>
     <<case 'help'>>
-      <<housekeeping 1 600>><<tiredness 1>><<pass 10>>
+      <<housekeeping 1 600>><<tiredness 1>>
     <<case 'read'>>
-      <<set $_day_key to $_day_estate.staff.key(_day_event.role)>>
+      <<set $_day_key to $_day_estate.staff.key($_day_event.role)>>
       <<set $NPCList[0].deadwood_work to $NPCList[0].deadwood_work ?? { chats: 0, last: null, day: -1 }>>
-      <<set $NPCList[0].deadwood_work.last to 'handover', $NPCList[0].deadwood_work.day to _day_event.day>>
-      <<set $NPCList[0].deadwood_work.chats += 1>><<saveNPC 0 $_day_key>><<pass 5>>
+      <<set $NPCList[0].deadwood_work.last to 'handover', $NPCList[0].deadwood_work.day to $_day_event.day>>
+      <<set $NPCList[0].deadwood_work.chats += 1>><<saveNPC 0 $_day_key>>
   <</switch>>
 <</widget>>
 
@@ -94,13 +106,17 @@
       <<icon 'broom-dustpan.png'>><<lanLink ['Put it in order (0:10)', '动手整理 (0:10)'] 'Deadwood Reblooms Property Daily Finish'>><<deadwood-home-daily-act 'help'>><</lanLink>><<ghousekeeping>><<gtiredness>><br>
     <</if>>
 <</switch>>
-<<getouticon>><<lanLink `_day_event.kind is 'resident' ? ['Decline the invitation', '婉拒邀请'] : ['Leave it for now', '暂时放着']` 'Deadwood Reblooms Property Daily Finish'>><<deadwood-home-daily-act 'leave'>><</lanLink>>
+<<if _day_event.kind is 'resident'>>
+  <<refuseicon>><<lanLink ['Decline the invitation', '婉拒邀请'] 'Deadwood Reblooms Property Daily Finish'>><<deadwood-home-daily-act 'leave'>><</lanLink>><br>
+<</if>>
+<<getouticon>><<lanLink ['Leave it for now', '稍后再来'] 'Deadwood Reblooms Property Home'>><</lanLink>>
 
 :: Deadwood Reblooms Property Daily Finish
 <<set _estate to maplebirch.get('Finance').realEstate>>
 <<set _day_event to _estate.life.daily>>
 <<if !_estate.current or !_day_event?.choice or _day_event.property isnot _estate.current.id>>
-  <<getouticon>><<lanLink ['Return to the agency', '返回房产中介'] 'Deadwood Reblooms Property Office'>><</lanLink>><<exit>>
+  <<lanSwitch 'You were unable to finish before you had to stop.' '你还没处理完，就不得不停了下来。'>><br><br>
+  <<getouticon>><<lanLink `_estate.current ? ['Return to the sitting room', '返回起居室'] : ['Return to the agency', '返回房产中介']` `_estate.current ? 'Deadwood Reblooms Property Home' : 'Deadwood Reblooms Property Office'`>><</lanLink>><<exit>>
 <</if>>
 <<run _estate.enter()>><<effects>>
 <<if $nextPassage or $nextPassageCheck>>
@@ -153,3 +169,67 @@
     <<else>>悉尼听着，偶尔追问一句。再次看见钟时，<<nnpc_he 'Sydney'>>收起书。“得去准备了。谢谢。”你让<<nnpc_him 'Sydney'>>先走。<</if>>
 <</language>><br><br>
 <<getouticon>><<lanLink ['Return to the sitting room', '返回起居室'] 'Deadwood Reblooms Property Home'>><<endevent>><</lanLink>>
+
+:: Deadwood Reblooms Property Daily Recall
+<<set _estate to maplebirch.get('Finance').realEstate, _day_event to _estate.life.daily>>
+<<if $location isnot 'deadwood_home' or !_estate.current or _day_event?.kind isnot 'resident'
+    or !['join', 'leave'].includes(_day_event.choice) or _day_event.day isnot Math.floor(Time.days)
+    or _day_event.property isnot _estate.current.id
+    or !_estate.household.common.some(resident => resident.id === _day_event.partner)>>
+  <<lanSwitch 'There is no one here to continue that conversation.' '这里没有能接着刚才的话说下去的人。'>><br><br>
+<<else>>
+  <<effects>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <span id='next'><<lanLink ['Continue', '继续'] 'Deadwood Reblooms Property Daily Recall'>><</lanLink>></span><<nexttext>><<exit>>
+  <</if>>
+  <!-- 只回顾当天实际做过或拒绝的事，读档与重复交谈不再结算陪伴收益。 -->
+  <<language>>
+    <<option 'EN'>>
+      <<switch _day_event.partner>>
+        <<case 'Robin'>>
+          Robin looks up when you mention earlier.
+          <<if _day_event.choice is 'leave'>>"Finished what you needed to do?" <<nnpc_He 'Robin'>> moves a sleeve out of the way of the other chair.
+          <<elseif C.npc.Robin.trauma gte 20>>"It stopped after you sat down," <<nnpc_he 'Robin'>> says quietly. "The noise outside. I know you probably heard it too."
+          <<elseif _day_event.variant is 2>>"I nearly had you on that last hand." Robin smiles, then straightens the little stack of cards. "Next time."
+          <<elseif _day_event.variant is 0>>"I've put the cups away." Robin hesitates. "It's nice, having someone to leave one out for."
+          <<else>>"I liked hearing about your day." Robin smiles. "Sometimes I forget how much happens while we're out."<</if>>
+        <<case 'Whitney'>>
+          <<if _day_event.choice is 'leave'>>"Back already?" Whitney looks you up and down. "Run out of better things to do?" <<nnpc_His 'Whitney'>> grin takes some of the edge off it.
+          <<elseif _day_event.variant is 2>>"That lock cost more than the fucking bike." Whitney laughs again when you mention the cyclist. "Should've left it there."
+          <<else>>Whitney catches you looking at the chair. "You can sit down without an invitation, you know." <<nnpc_He 'Whitney'>> nudges it towards you. "Don't get used to being waited on."<</if>>
+        <<case 'Kylar'>>
+          <<if _day_event.choice is 'leave'>>Kylar turns towards you at once. "You're staying this time?" <<nnpc_He 'Kylar'>> leaves the question hanging, watching your face.
+          <<elseif C.npc.Kylar.rage gte 60>>"You still haven't said when you'll be back next time." Kylar remembers exactly where you left the conversation.
+          <<elseif _day_event.variant is 2>>Kylar keeps a hand over the folded drawing. "I might work on it a little more. Your hands looked different when you started talking."
+          <<else>>"I kept thinking about what you said." Kylar smiles. "I like knowing the little things too."<</if>>
+        <<case 'Sydney'>>
+          <<if _day_event.choice is 'leave'>>Sydney looks up from the book. "Did you get everything done?" <<nnpc_He 'Sydney'>> slips a finger between the pages, keeping the place.
+          <<elseif _day_event.variant is 2>>"I read that sentence again." Sydney shows you the bookmark. "It's much clearer the second time. I'm glad we looked at it together."
+          <<else>>"I didn't mean to keep looking at the clock." Sydney closes the book halfway. "I wanted to finish listening before I had to go."<</if>>
+      <</switch>>
+    <<option 'CN'>>
+      <<switch _day_event.partner>>
+        <<case 'Robin'>>
+          你提起刚才的事，罗宾抬起头。
+          <<if _day_event.choice is 'leave'>>“事情忙完了吗？”<<nnpc_He 'Robin'>>把搭在另一把椅子上的衣袖挪开。
+          <<elseif C.npc.Robin.trauma gte 20>>“你坐下来以后，就没声音了。”<<nnpc_he 'Robin'>>轻声说。“外面那个。你应该也听见了吧。”
+          <<elseif _day_event.variant is 2>>“最后一局，我差点就赢了。”罗宾笑着理齐那一小叠牌。“下次再来。”
+          <<elseif _day_event.variant is 0>>“杯子已经收好了。”罗宾迟疑了一下。“能给人留一只，感觉挺好的。”
+          <<else>>“刚才听你说今天的事，我很高兴。”罗宾笑了。“各自出门以后，原来还能碰上那么多事。”<</if>>
+        <<case 'Whitney'>>
+          <<if _day_event.choice is 'leave'>>“这就回来了？”惠特尼上下打量你。“没更有意思的事干了？”<<nnpc_He 'Whitney'>>咧嘴一笑，听起来也没那么刻薄了。
+          <<elseif _day_event.variant is 2>>你提起那个骑车的人，惠特尼又笑起来。“那把破锁比车还贵吧。干脆扔那儿得了。”
+          <<else>>惠特尼发现你在看椅子。“坐下还要我请？”<<nnpc_He 'Whitney'>>用脚将椅子推近了一点。“别习惯了让人伺候。”<</if>>
+        <<case 'Kylar'>>
+          <<if _day_event.choice is 'leave'>>凯拉尔立刻转向你。“这次会留下吗？”<<nnpc_He 'Kylar'>>望着你的脸，等着回答。
+          <<elseif C.npc.Kylar.rage gte 60>>“你还没说，下次什么时候回来。”凯拉尔记得谈话停在了哪里。
+          <<elseif _day_event.variant is 2>>凯拉尔将手按在折好的素描上。“我可能还要改一改。你开始说话的时候，手又不一样了。”
+          <<else>>“刚才你说的那些，我一直记着。”凯拉尔笑了。“小事我也想知道。”<</if>>
+        <<case 'Sydney'>>
+          <<if _day_event.choice is 'leave'>>悉尼从书里抬起头。“都忙完了吗？”<<nnpc_He 'Sydney'>>把一根手指夹进书页，留住刚才读到的位置。
+          <<elseif _day_event.variant is 2>>“那句话，我又读了一遍。”悉尼给你看夹着书签的那页。“再看就明白多了。还好刚才和你一起读过。”
+          <<else>>“刚才不是故意一直看钟的。”悉尼将书半合起来。“我想走之前，把你的话听完。”<</if>>
+      <</switch>>
+  <</language>><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Return to the sitting room', '返回起居室'] 'Deadwood Reblooms Property Home'>><</lanLink>><br>

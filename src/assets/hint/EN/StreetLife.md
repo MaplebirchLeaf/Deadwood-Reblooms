@@ -40,6 +40,8 @@ Tea costs <span class="gold">£2</span>, takes five minutes and is limited to th
 
 The weapon shop uses the clothing shop's purchase, durability and equipment controls, with only handheld weapons for sale. Its range includes a small knife, stun device, crowbar, machete, handgun, shotgun, submachine gun and rifle. Manage both held items in the same handheld category; items sharing a functional tag cannot be equipped together.
 
+The weapon shop also sells pepper spray charges for £2500 each. Each restores one use. You cannot buy a charge while the canister is full.
+
 Weapon actions appear in **combat against human attackers**. The relevant arm must be usable and the target still fighting.
 
 | Firearm        | Rounds per action | Ammunition         |

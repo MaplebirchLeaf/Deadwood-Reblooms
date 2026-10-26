@@ -175,6 +175,7 @@
     <</if>>
   <</if>><br>
   <<deadwood-street-ammunition>><br>
+  <<deadwood-street-spray>><br>
   <<getouticon>><<lanLink ['Return to the pub (0:01)', '返回酒馆 (0:01)'] 'Smuggler Pub'>>
     <<clothingReset>><<set $tryOn.autoReset to true>><<shopClothingFilterReset>><<pass 1>>
   <</lanLink>><br>
@@ -197,6 +198,23 @@
       <</if>> · <<printmoney _streetAmmo.cost>><br>
     <</capture>>
   <</for>>
+<</widget>>
+
+<<widget 'deadwood-street-spray'>>
+  <<peppersprayicon>>
+  <<if $spray lt $spraymax and (maplebirch.get('Finance')?.canPay(250000, 'clothes') ?? $money gte 250000)>>
+    <<lanLink ['Buy a pepper spray charge', '购买防狼喷雾补充剂']>>
+      <<if $passage is 'Deadwood Street Weapon Shop' and maplebirch.get('StreetLife')?.available and $spray lt $spraymax
+        and (maplebirch.get('Finance')?.canPay(250000, 'clothes') ?? $money gte 250000)>>
+        <<money -250000 'clothes'>><<spray 1>><<updatesidebarmoney>>
+        <<run $('#pepper-sprays').replaceWith(maplebirch.SugarCube.Wikifier.wikifyEval('<<peppersprays>>'))>>
+        <<updateclothingshop>>
+      <</if>>
+    <</lanLink>>
+  <<else>>
+    <span class='grey'><<lanSwitch 'Buy a pepper spray charge' '购买防狼喷雾补充剂'>></span>
+  <</if>> · <<printmoney 250000>>
+  <<note `$spray + ' / ' + $spraymax` 'blue'>>
 <</widget>>
 
 :: Deadwood Street Weapon Widgets [widget]

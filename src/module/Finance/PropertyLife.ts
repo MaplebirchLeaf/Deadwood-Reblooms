@@ -154,10 +154,22 @@ export default class PropertyLife {
   }
 
   public finish(choice: NonNullable<PropertyLifeState['daily']>['choice']): boolean {
-    if (!this.pending || !choice || !['join', 'help', 'read', 'leave'].includes(choice)) return false;
-    if (choice !== 'leave' && choice !== ({ resident: 'join', staff: 'read', house: 'help' } as const)[this.daily!.kind]) return false;
+    const daily = this.daily;
+    const property = this.estate.current;
+    if (!daily || daily.choice || !property || daily.property !== property.id || daily.day !== Math.floor(Time.days) || !this.available) return false;
+    const outings = this.estate.outings;
+    if (outings.note || outings.memory || outings.offer || outings.waiting || outings.travelling || this.estate.banquet.active) return false;
+    if (!choice || !['join', 'help', 'read', 'leave'].includes(choice)) return false;
+    if (choice !== 'leave' && choice !== ({ resident: 'join', staff: 'read', house: 'help' } as const)[daily.kind]) return false;
+    // 开始前由 pending 预留完整时间；完成后只确认本人仍在场，不再要求额外空闲十分钟。
+    if (
+      daily.kind === 'resident' &&
+      (!daily.partner || daily.partner === this.bathing?.partner || !this.estate.residentsHome(property.id).some(resident => resident.id === daily.partner) || !this.free(daily.partner, 0))
+    )
+      return false;
+    if (daily.kind === 'staff' && (!daily.role || !this.estate.staff.active(daily.role) || !V.per_npc?.[this.estate.staff.key(daily.role)])) return false;
     if (choice === 'help' && window.pcAreArmsBound('both')) return false;
-    this.daily!.choice = choice;
+    daily.choice = choice;
     return true;
   }
 
