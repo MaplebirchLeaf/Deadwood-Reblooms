@@ -85,6 +85,7 @@
       <<case 'film'>>
         <<stress -4>><<set $_life_duration to 45>>
         <<if _life_scene.item is 'erotic'>>
+          <<promiscuity1>>
           <<arousal 1000>>
         <</if>>
       <<case 'wine'>>
@@ -94,6 +95,12 @@
     <</switch>>
     <<if _life_scene.partner and _life_scene.first>>
       <<npcincr _life_scene.partner love 1>>
+      <<if _life_scene.partner is 'Robin'>>
+        <<npcincr Robin trauma -1>>
+      <</if>>
+      <<if _life_scene.partner is 'Kylar'>>
+        <<npcincr Kylar rage -1>>
+      <</if>>
     <</if>>
     <<if _life_scene.action is 'film' and _life_scene.item is 'erotic' and _life_scene.partner>>
       <<npcincr _life_scene.partner lust 5>>
@@ -267,6 +274,15 @@
   <<if _args[0] is 'talk' and $worn.face.type.includes('gag')>><<exit>><</if>>
   <!-- 先记录选择，另一链接、重绘和读档不会再次结算。 -->
   <<set _home_scene.followup to _args[0]>>
+  <<if _home_scene.partner>>
+    <<npcincr _home_scene.partner love 1>>
+    <<if _home_scene.partner is 'Robin'>>
+      <<npcincr Robin trauma -1>>
+    <</if>>
+    <<if _home_scene.partner is 'Kylar'>>
+      <<npcincr Kylar rage -1>>
+    <</if>>
+  <</if>>
   <<if _args[0] is 'talk'>>
     <<stress -2>><<run maplebirch.get('Psyche')?.rest(2, -40)>>
   <<else>>
@@ -327,7 +343,12 @@
             <<case 'Sydney'>>悉尼没有抽出书签。“不说话也可以。”<<nnpc_he 'Sydney'>>在旁边的椅子里坐稳，放松了肩膀。
           <</switch>>
         <</if>>
-    <</language>><br><br>
+    <</language>>
+    <<if _home_scene.partner>>
+      <br><br><<glove _home_scene.partner>>
+      <<if _home_scene.partner is 'Robin'>><<lrtrauma>><</if>>
+      <<if _home_scene.partner is 'Kylar'>><<lksuspicion>><</if>>
+    <</if>><br><br>
   <<elseif _home_followup_ready>>
     <<capture _home_scene>>
       <<if !$worn.face.type.includes('gag')>>
@@ -385,7 +406,11 @@
 <</language>><<if _life_scene.action is 'wine' and _life_scene.item is 'ghostbrew'>><<ghallucinogens>><</if>><<if _life_scene.action is 'film' and _life_scene.item is 'erotic'>><<garousal>><</if>><br><br>
 <<if _life_scene.partner>>
   <<deadwood-home-life-reaction>>
-  <<if _life_scene.first and !_life_scene.followup>><<glove _life_scene.partner>><</if>>
+  <<if _life_scene.first and !_life_scene.followup>>
+    <<glove _life_scene.partner>>
+    <<if _life_scene.partner is 'Robin'>><<lrtrauma>><</if>>
+    <<if _life_scene.partner is 'Kylar'>><<lksuspicion>><</if>>
+  <</if>>
   <<if _life_scene.action is 'film' and _life_scene.item is 'erotic'>>
     <<glust _life_scene.partner>>
     <<if _life_scene.partner is 'Sydney' and !_sydneyStatus.includes('corrupt')>>

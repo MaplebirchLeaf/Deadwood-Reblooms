@@ -49,8 +49,9 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
     cond: () => {
       if (V.replayScene || V.statFreeze || V.frozenValues) return false;
       const heist = maplebirch.get('StreetLife')?.heist;
-      const campaign = heist?.state.campaign;
+      const campaign = V.StreetLife?.heist?.campaign;
       return (
+        !!heist &&
         !!campaign &&
         ((!!campaign.fight?.combat_started && !V.combat) ||
           (campaign.bank_step === 8 && heist.state.stage === 'settlement' && campaign.gold.bars > 0 && maplebirch.passage.title !== 'Deadwood Street Heist') ||
