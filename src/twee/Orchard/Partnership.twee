@@ -1,7 +1,7 @@
 :: Deadwood Farm Partnership Widgets [widget]
 <<widget 'deadwood-farm-partnership-link'>>
   <<set $_menu to document.querySelector('#passage-content a[data-passage="Farm Alex Bedroom"], #passage-content a[data-passage="Farm Cottage"]')>>
-  <<if $Orchard?.partnership and $farm_fields_intro is 1 and C.npc.Alex.init is 1
+  <<if $Orchard?.partnership and $farm_stage gte 7 and $farm_attack_timer isnot undefined and C.npc.Alex.init is 1
     and !$statFreeze and !$replayScene and !$frozenValues
     and $_menu>>
     <<farmicon 'alexdesk'>><<lanLink ['Look through the farm accounts', '查看农场账目'] 'Deadwood Farm Partnership'>><</lanLink>><br><br>
@@ -11,7 +11,7 @@
 :: Deadwood Farm Partnership
 <<set $location to 'alex_cottage'>><<set $outside to 0>><<effects>><<farm_work_update>>
 <<if $nextPassage or $nextPassageCheck or $combat>><<exit>><</if>>
-<<if !$Orchard?.partnership or $farm_fields_intro isnot 1 or C.npc.Alex.init isnot 1>>
+<<if !$Orchard?.partnership or $farm_stage lt 7 or $farm_attack_timer is undefined or C.npc.Alex.init isnot 1>>
   <<lanSwitch 'There are no joint accounts to look through.' '这里还没有共同经营的账目。'>>
 <<else>>
   <<set _farmPartnership to maplebirch.get('Orchard').partnership>>
@@ -42,14 +42,42 @@
           你与艾利克斯各持有农场的一半。周转金留在农场账里，原有的农活报酬和自行领走的农产品另算。
       <</language>><br><br>
       <<deadwood-partnership-accounts 'farm'>>
+      <<if C.npc.Alex.state is 'active' and $farm_work.alex is 'admin' and !maplebirch.get('Orchard').farmInterrupted>>
+        <<npc Alex>><<person1>>
+        <<set _farmReport to _farmPartnership.state.report>>
+        <<if _farmReport and _farmReport.day lte Time.days and Time.days - _farmReport.day lt 7>>
+          <<language>>
+            <<option 'EN'>>
+              <<if _farmReport.dividend gt 0>>
+                Alex taps the latest entry. "Half each, like we said. What's left here stays with the farm." <<He>> turns the book so you can see.
+              <<else>>
+                Alex looks over the figures. "Nothing to split this time. We'll need what's here for the work ahead."
+              <</if>>
+            <<option 'CN'>>
+              <<if _farmReport.dividend gt 0>>
+                艾利克斯点点最近一笔账。“说好一人一半。剩下这些留在农场。”<<He>>把账本转过来，让你看清。
+              <<else>>
+                艾利克斯看了看账上的数目。“这回没钱分了。接着干活，还得用这些。”
+              <</if>>
+          <</language>><br><br>
+        <<elseif _farmPartnership.state.treasury gt 0 and _farmPartnership.state.treasury lte _farmPartnership.state.reserve>>
+          <<lanSwitch 'Alex checks the money left in the farm accounts. "Best keep this here. We\'ll need it before long."' '艾利克斯核对过农场账上的余款。“这些先留着。过不了多久就得用。”'>><br><br>
+        <</if>>
+      <</if>>
+      <div id='deadwood-farm-partnership-note'></div>
       <<if $Orchard.partnership.partner_cash gt 0 and C.npc.Alex.state is 'active' and $farm_work.alex is 'admin'>>
         <<lanSwitch "Alex's dividends: " '艾利克斯持有的分红：'>><<printmoney $Orchard.partnership.partner_cash>><br>
         <<icon 'finance/working-reserve.png'>><<lanLink ["Ask Alex to put the dividends back into the farm", '请艾利克斯把分红垫回农场']>>
           <<farm_work_update>>
-          <<if C.npc.Alex.state is 'active' and $farm_work.alex is 'admin' and !$nextPassage and !$nextPassageCheck and !$combat>>
-            <<run maplebirch.get('Orchard').partnership.reinvest()>>
+          <<if C.npc.Alex.state is 'active' and $farm_work.alex is 'admin' and !$nextPassage and !$nextPassageCheck and !$combat
+            and maplebirch.get('Orchard').partnership.reinvest()>>
+            <<run Dynamic.render('deadwood-farm-partnership')>>
+            <<replace '#deadwood-farm-partnership-note'>>
+              <<lanSwitch 'Alex takes out the money and adds it to the farm accounts. "Might as well put it to use here."' '艾利克斯拿出钱，将这笔记进农场账里。“放在这里，总能派上用场。”'>><br><br>
+            <</replace>>
+          <<else>>
+            <<run Dynamic.render('deadwood-farm-partnership')>>
           <</if>>
-          <<run Dynamic.render('deadwood-farm-partnership')>>
         <</lanLink>><br><br>
       <</if>>
       <<set _stock to { truffles: 'truffle', eggs: 'chicken_egg', milk: 'bottle_of_milk', cream: 'cream' }>>

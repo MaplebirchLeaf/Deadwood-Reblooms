@@ -30,8 +30,10 @@ export interface HistoryProjectState {
   availableDay: number;
   /** 提交截止的游戏日。 */
   deadline: number;
-  /** 是否有助手协助。 */
+  /** 是否约好由罗宾协助项目。 */
   assistant: boolean;
+  /** 本次调查是否由罗宾同行，跨场景沿用出发时的结果。 */
+  companion: boolean;
   /** 凯拉尔的介入方式，sabotage 表示破坏。 */
   kylar: 'none' | 'help' | 'sabotage';
   /** 凯拉尔是否已在街头出现。 */
@@ -141,6 +143,7 @@ export const DEFAULT_LIFE_SIMULATION_STATE: LifeSimulationState = {
     availableDay: 0,
     deadline: 0,
     assistant: false,
+    companion: false,
     kylar: 'none',
     kylarStreet: false,
     kylarPrepared: false,

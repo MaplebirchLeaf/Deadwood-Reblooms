@@ -216,21 +216,34 @@ class School {
     return !(this.state.attendanceExempt || this.state.leightonApprovalDay < 0 || !this.state.baileySigned);
   }
 
-  /** 项目约定不覆盖缺席、受伤或收容。校园内协助还要求罗宾实际在校。 */
+  /** 同次调查沿用出发时的同行记录，仍排除失踪、受伤与收容。 */
   public get historyAssistantAvailable(): boolean {
-    if (!V.LifeSimulation.historyProject.assistant || C.npc.Robin?.init !== 1 || V.robinmissing || V.robin?.timer?.hurt !== 0 || V.RobinExpansion?.asylum?.status === 'admitted') return false;
-    const location = window.getRobinLocation();
-    return location !== 'asylum' && (V.location !== 'school' || location === 'school');
+    return (
+      !!V.LifeSimulation.historyProject.companion &&
+      C.npc.Robin?.init === 1 &&
+      C.npc.Robin.state === 'active' &&
+      !V.robinmissing &&
+      V.robin?.timer?.hurt === 0 &&
+      V.RobinExpansion?.asylum?.status !== 'admitted'
+    );
   }
 
   public get canSupplyDrinks(): boolean {
-    return this.state.role !== 'student' && V.RobinExpansion?.shop === true && V.RobinExpansion.shop_stock > 0 && V.RobinExpansion.school_drinks_day !== Time.days;
+    return (
+      this.state.role !== 'student' &&
+      V.RobinExpansion?.shop === true &&
+      V.RobinExpansion.shop_stock > 0 &&
+      V.RobinExpansion.school_drinks_day !== Time.days &&
+      !!maplebirch.get('Robin')?.shop.partnership.state.agreed &&
+      !V.statFreeze &&
+      !V.replayScene &&
+      !V.frozenValues
+    );
   }
 
   public organiseSchoolDrinks(): boolean {
-    if (!this.canSupplyDrinks) return false;
+    if (!this.canSupplyDrinks || !maplebirch.get('Robin')?.shop.partnership.receive(2000)) return false;
     V.RobinExpansion.shop_stock -= 1;
-    V.RobinExpansion.reserve += 20;
     V.RobinExpansion.school_drinks_day = Time.days;
     this.adjustStanding(3, 1);
     return true;

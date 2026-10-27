@@ -47,12 +47,41 @@
   <<refuseicon>><<lanLink ['Not yet', '暂时不接'] 'History Lesson'>><<endevent>><</lanLink>><br>
 <</widget>>
 
+<!-- 出发前核对完整活动时段。同行只记本次调查，不改写罗宾的原版日程。 -->
+<<widget 'deadwood-history-companion'>><<silently>>
+  <<set $_start to Time.hour * 60 + Time.minute>>
+  <<set $_end to $_start + _args[0]>>
+  <<set $_robin to maplebirch.get('Robin')>>
+  <<set $_temple to maplebirch.get('RobinTemple')>>
+  <<set $_place to getRobinLocation()>>
+  <<set _historyAssistantReady to $LifeSimulation.historyProject.assistant and C.npc.Robin.init is 1 and C.npc.Robin.state is 'active' and !$robinmissing and $robin.timer.hurt is 0 and C.npc.Robin.trauma lt 80 and $RobinExpansion?.asylum?.status isnot 'admitted' and !$statFreeze and !$replayScene and !$frozenValues and !$nextPassage and !$nextPassageCheck and !$combat and !$possessed and !$eventforced>>
+  <<if _args[1] is 'school'>>
+    <<set _historyAssistantReady to _historyAssistantReady and $_place is 'school' and [[480, 540], [720, 780], [900, 960]].some(([start, end]) => $_start gte start and $_end lte end)>>
+  <<else>>
+    <<set _historyAssistantReady to _historyAssistantReady and (_args[1] is 'home' ? $_place is 'orphanage' : ['orphanage', 'deadwood_home'].includes($_place)) and $_start gte 420 and $_end lte 1260>>
+    <<if Time.schoolDay and $_start lt 960 and $_end gt 480>><<set _historyAssistantReady to false>><</if>>
+    <<if $_robin and $RobinExpansion?.tutor and Time.schoolDay and $_robin.tutoring.lessonDays.includes(Time.weekDay) and $_start lt 1110 and $_end gt 1050>><<set _historyAssistantReady to false>><</if>>
+    <<set $_shopStart to !Time.schoolDay and !Time.isWeekEnd() ? 540 : 1110>>
+    <<if $_robin and $RobinExpansion?.shop and $_end gt $_shopStart>><<set _historyAssistantReady to false>><</if>>
+    <<set $_rainStall to $_robin and (Time.season is 'winter' ? $RobinExpansion?.chocolate gte 1 : $RobinExpansion?.lemonade gte 1)>>
+    <<if Time.isWeekEnd() and $_start lt 1020 and $_end gt 540 and (Weather.precipitation isnot 'rain' or $_rainStall)>><<set _historyAssistantReady to false>><</if>>
+    <<set $_watering to $robin.autoWater and C.npc.Robin.trauma lt 50 and Weather.precipitation isnot 'rain' and (Weather.precipitation isnot 'snow' or $alex_greenhouse gte 3) and orphanagePlotsPlanted()>>
+    <<if $_start lt ($_watering ? 1050 : 1020) and $_end gt 990 and (!$daily.robin.bath or ($_watering and !orphanagePlotsWatered()))>><<set _historyAssistantReady to false>><</if>>
+    <<if $englishPlay is 'ongoing' and $englishPlayDays is 0 and $_end gt 1020>><<set _historyAssistantReady to false>><</if>>
+    <<if $halloween is 1 and Time.monthDay is 31 and $_start lt 1140 and $_end gt 960>><<set _historyAssistantReady to false>><</if>>
+    <<if $_temple?.member>>
+      <<if (!Time.schoolDay and !Time.isWeekEnd() and $_start lt 960 and $_end gt 540) or (Time.weekDay is 1 and $_start lt 780 and $_end gt 660) or (Time.weekDay is 1 and $RobinTemple.vigil_result isnot 'passed' and $_end gt 1200)>><<set _historyAssistantReady to false>><</if>>
+    <</if>>
+  <</if>>
+  <<if maplebirch.get('Finance') and !maplebirch.get('Finance').realEstate.life.free('Robin', _args[0])>><<set _historyAssistantReady to false>><</if>>
+<</silently>><</widget>>
+
 <!-- 家中入口：根据调查进度提供撰写展览稿的选项。 -->
 <<widget 'deadwood-reblooms-history-project-home-option'>>
-  <<if $LifeSimulation.historyProject.status is 'ongoing' and Time.days lt $LifeSimulation.historyProject.deadline >>
+  <<if $location is 'home' and $LifeSimulation.historyProject.status is 'ongoing' and Time.days lt $LifeSimulation.historyProject.deadline >>
     <<if $LifeSimulation.historyProject.draft is 0>>
       <<if $LifeSimulation.historyProject.archive gt 0 and $LifeSimulation.historyProject.museum gt 0 >>
-        <<icon 'history-project/curation.png'>><<lanLink ['Prepare the exhibition (1:00)', '准备展览 (1:00)'] 'Deadwood Reblooms History Project Draft' >><<pass 60>><</lanLink>><br>
+        <<icon 'history-project/curation.png'>><<lanLink ['Prepare the exhibition (1:00)', '准备展览 (1:00)'] 'Deadwood Reblooms History Project Draft' >><<deadwood-history-companion 60 'home'>><<set $LifeSimulation.historyProject.companion to _historyAssistantReady>><<pass 60>><</lanLink>><br>
     <</if>>
     <</if>>
   <</if>>
@@ -61,7 +90,7 @@
 <!-- 图书馆入口：提供画作档案调查选项。 -->
 <<widget 'deadwood-reblooms-history-project-library-option'>>
   <<if $LifeSimulation.historyProject.status is 'ongoing' and Time.days lt $LifeSimulation.historyProject.deadline and $LifeSimulation.historyProject.archive is 0 >>
-    <<historyicon>><<lanLink ['Research the painting (1:00)', '调查画作 (1:00)'] 'Deadwood Reblooms History Project Archive' >><<pass 60>><</lanLink>><br>
+    <<historyicon>><<lanLink ['Research the painting (1:00)', '调查画作 (1:00)'] 'Deadwood Reblooms History Project Archive' >><<deadwood-history-companion 60 'school'>><<set $LifeSimulation.historyProject.companion to _historyAssistantReady>><<pass 60>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -69,7 +98,7 @@
 <<widget 'deadwood-reblooms-history-project-museum-options'>>
   <<if $LifeSimulation.historyProject.status is 'ongoing'>>
     <<if Time.days lt $LifeSimulation.historyProject.deadline and $LifeSimulation.historyProject.archive gt 0 and $LifeSimulation.historyProject.museum is 0 >>
-      <<museumicon>><<lanLink ['Examine the returned painting (1:00)', '考证交还的画作 (1:00)'] 'Deadwood Reblooms History Project Museum' >><<pass 60>><</lanLink>><br>
+      <<museumicon>><<lanLink ['Examine the returned painting (1:00)', '考证交还的画作 (1:00)'] 'Deadwood Reblooms History Project Museum' >><<deadwood-history-companion 60 'away'>><<set $LifeSimulation.historyProject.companion to _historyAssistantReady>><<pass 60>><</lanLink>><br>
     <<elseif $LifeSimulation.historyProject.draft gt 0 or Time.days gte $LifeSimulation.historyProject.deadline>>
       <<icon 'history-project/exhibition.png'>><<lanLink ['Present the exhibition (2:00)', '举办展览 (2:00)'] 'Deadwood Reblooms History Project Exhibition' >><<pass 2 hours>><</lanLink>><br>
     <</if>>
@@ -92,10 +121,11 @@
         <<lanSwitch 'It is too dark to follow your survey notes. Return between 06:00 and 18:00.' '光线太暗，无法依照勘察笔记辨认路线。可以在 06:00 至 18:00 之间再来。'>>
       </span><br><br>
     <<else>>
-      <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>
-        <<antiqueicon 'disc'>><<lanLink ['Survey the ruin with Robin (2:00)', '与罗宾勘察湖底废墟 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation'>><<pass 2 hours>><</lanLink>><br>
+      <<deadwood-history-companion 120 'away'>>
+      <<if _historyAssistantReady>>
+        <<antiqueicon 'disc'>><<lanLink ['Survey the ruin with Robin (2:00)', '与罗宾勘察湖底废墟 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation'>><<deadwood-history-companion 120 'away'>><<set $LifeSimulation.historyProject.companion to _historyAssistantReady>><<pass 2 hours>><</lanLink>><br>
       <<else>>
-        <<antiqueicon 'disc'>><<lanLink ['Survey the lake ruin (2:00)', '勘察湖底废墟 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation'>><<pass 2 hours>><</lanLink>><br>
+        <<antiqueicon 'disc'>><<lanLink ['Survey the lake ruin (2:00)', '勘察湖底废墟 (2:00)'] 'Deadwood Reblooms History Project Lake Preparation'>><<deadwood-history-companion 120 'away'>><<set $LifeSimulation.historyProject.companion to _historyAssistantReady>><<pass 2 hours>><</lanLink>><br>
       <</if>>
     <</if>>
   <</if>>
@@ -220,7 +250,7 @@
 :: Deadwood Reblooms History Project Begin
 <<set $outside to 0>><<set $location to 'school'>><<schooleffects>><<effects>>
 <<set _historySource to $LifeSimulation.historyProject.source>>
-<<set $LifeSimulation.historyProject to { status: 'ongoing', source: _historySource, availableDay: 0, deadline: Time.days + 25, assistant: $phase is 1, kylar: $phase is 1 ? 'sabotage' : 'help', kylarStreet: false, kylarPrepared: false, archive: 0, museum: 0, recovery: 'none', ruin: 0, draft: 0, final: 0 }>>
+<<set $LifeSimulation.historyProject to { status: 'ongoing', source: _historySource, availableDay: 0, deadline: Time.days + 25, assistant: $phase is 1, companion: false, kylar: $phase is 1 ? 'sabotage' : 'help', kylarStreet: false, kylarPrepared: false, archive: 0, museum: 0, recovery: 'none', ruin: 0, draft: 0, final: 0 }>>
 <<language>>
   <<option 'EN'>>
     <<if $phase is 1>>
@@ -431,7 +461,7 @@
       You smooth away the contradictions and turn several versions into one convincing narrative.
       It reads well. That is mostly because you chose the wording.
       <br><br>
-      <span class="teal">You have a clean draft, and a clean conscience is another matter.</span><<delinquency 10>><<gdelinquency>>
+      <span class="teal">You have a clean draft, and a clean conscience is another matter.</span>
     <</if>>
   <<option 'CN'>>
     <<if $phase is 0>>
@@ -459,14 +489,17 @@
       你抹平彼此矛盾的部分，把不同版本拼成了一条颇具说服力的叙述。
       文章读起来很顺畅，大概是因为措辞都出自你手。
       <br><br>
-      <span class="teal">稿子很干净，良心是另一回事。</span><<delinquency 10>><<gdelinquency>>
+      <span class="teal">稿子很干净，良心是另一回事。</span>
     <</if>>
 <</language>>
+<<if $phase is 2 and _historyArchiveNew>>
+  <<delinquency 10>><<gdelinquency>>
+<</if>>
 <<if $phase is 3 and _historyArchiveNew>>
   <<englishskill 1>><<genglish>>
 <</if>>
 <br><br>
-<<schoolicon 'library'>><<lanLink ['Return to the library', '返回图书馆'] 'School Library'>><</lanLink>><br>
+<<schoolicon 'library'>><<lanLink ['Return to the library', '返回图书馆'] 'School Library'>><<set $LifeSimulation.historyProject.companion to false>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Museum
 <<set $outside to 0>><<set $location to 'museum'>><<effects>>
@@ -475,6 +508,7 @@
 <</if>>
 <<language>>
   <<option 'EN'>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>Robin meets you at the museum entrance with <<his>> notes.<br><br><</if>>
     Your project permit gives you access to a study table in the museum store.
     The returned painting rests beneath a conservation lamp beside its frame,
     old catalogue cards and a folder of condition reports.
@@ -492,6 +526,7 @@
         "They changed a few words, but not the mistake."
     <</if>>
   <<option 'CN'>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>罗宾带着笔记，在博物馆门口与你碰面。<br><br><</if>>
     项目许可让你得以使用博物馆库房里的研究桌。
     交还的画作被放在修复灯下，旁边摆着原画框、旧目录卡和一册状况记录。
     <<if $LifeSimulation.historyProject.source is 'paintingward'>>
@@ -604,7 +639,7 @@
       图上画着一尊失踪的金制女祭司像，铅笔批注却只提到一次早年的森林湖勘察。
       这条线索与画作没有明确关系，但或许值得顺路查一查。
 <</language>>
-<br><br><<museumicon>><<lanLink ['Return to the museum', '返回博物馆'] 'Museum'>><</lanLink>><br>
+<br><br><<museumicon>><<lanLink ['Return to the museum', '返回博物馆'] 'Museum'>><<set $LifeSimulation.historyProject.companion to false>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Lake Preparation
 <<set $outside to 1>><<set $location to 'lake'>><<effects>><<lakeeffects>>
@@ -613,6 +648,7 @@
 <</if>>
 <<language>>
   <<option 'EN'>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>Robin joins you at the shore, carrying the project notes.<br><br><</if>>
     At the lake shore, you spread your copied bearings across a dry rock.
     You mark the planned route on a slate, knot the guide rope at measured intervals
     and fasten a padded recovery pouch to your diving suit.
@@ -626,6 +662,7 @@
         The rope holds. From here on, every mark will have to be made by you.
     <</if>>
   <<option 'CN'>>
+    <<if maplebirch.get('LifeSimulation').school.historyAssistantAvailable>>罗宾带着项目笔记，与你在岸边会合。<br><br><</if>>
     你在湖岸找了块干燥的岩石，将抄录的方位数据摊在上面。
     你把预定路线画在记录板上，按固定间距给导向绳打结，
     又将内衬软垫的回收袋系在潜水服外。
@@ -1045,6 +1082,7 @@
 <</language>>
 <br><br>
 <<lakeicon>><<lanLink ['Return to the lake shore', '返回湖岸'] 'Lake Shore'>>
+  <<set $LifeSimulation.historyProject.companion to false>>
   <<endevent>>
 <</lanLink>><br>
 
@@ -1111,6 +1149,7 @@
 <<historyicon>><<lanLink ['Fill the gaps with the best story', '用最精彩的说法补上缺口'] 'Deadwood Reblooms History Project Draft Finish' >><<set $phase to 1>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Draft Finish
+<<set _historyDraftNew to $LifeSimulation.historyProject.draft is 0>>
 <<set $LifeSimulation.historyProject.draft to $phase is 0 ? 25 : 12>>
 <<language>>
   <<option 'EN'>>
@@ -1130,7 +1169,7 @@
       The display flows cleanly, so long as nobody asks which labels describe records
       and which describe your preferred story.
       <br><br>
-      <span class="teal">Your exhibition is ready.</span><<famesocial 1>>
+      <span class="teal">Your exhibition is ready.</span>
     <</if>>
   <<option 'CN'>>
     <<if $phase is 0>>
@@ -1148,10 +1187,11 @@
       整场展览显得十分流畅，前提是没人追问哪些标签来自记录，
       哪些只是你最中意的故事。
       <br><br>
-      <span class="teal">你的展览已经准备完成。</span><<famesocial 1>>
+      <span class="teal">你的展览已经准备完成。</span>
     <</if>>
 <</language>>
-<br><br><<homeicon>><<lanLink ['Put the project away', '收好项目'] 'Bedroom'>><</lanLink>><br>
+<<if $phase is 1 and _historyDraftNew>><<famesocial 1>><</if>>
+<br><br><<homeicon>><<lanLink ['Put the project away', '收好项目'] 'Bedroom'>><<set $LifeSimulation.historyProject.companion to false>><</lanLink>><br>
 
 :: Deadwood Reblooms History Project Exhibition
 <<set $outside to 0>><<set $location to 'museum'>><<effects>><<npc Winter>><<person1>>

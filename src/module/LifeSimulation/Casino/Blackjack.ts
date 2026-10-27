@@ -98,7 +98,7 @@ class Blackjack {
   public get homeOpponents() {
     const estate = this.estate;
     const property = estate?.current;
-    return property && V.location === 'deadwood_home' && V.combat !== 1 && V.stress < V.stressmax
+    return property && V.location === 'deadwood_home' && V.combat !== 1 && V.stress < V.stressmax && !V.nextPassage && !V.nextPassageCheck
       ? estate.residentsHome(property.id).filter(profile => window.isLoveInterest(profile.id) && (profile.id !== 'Robin' || C.npc.Robin.trauma < 50))
       : [];
   }

@@ -58,11 +58,11 @@
             <<option 'EN'>>
               Work starts at 09:00: mature batches are bottled first, then empty vessels are filled with your chosen recipe. Reserved fruit and outstanding orders are kept aside. Supplies and bottles still cost money; without enough fruit or funds, no new batch starts.
               <br><br>
-              The carrier takes <<print _wineLineModule.terms.shopSupplyQuantity>> spare bottles per trip to Robin's shop, up to <<print _wineLineModule.terms.automationSupplyLimit>> a day. Each trip costs <span class='gold'><<printmoney _wineLineModule.terms.automationHaulFee>></span>, deducted from the delivery payment. Robin keeps enough money for rent, and the cabinet holds <<print _wineLineModule.terms.shopStockLimit>> bottles. Missed deliveries are not made up.
+              The carrier takes <<print _wineLineModule.terms.shopSupplyQuantity>> spare bottles per trip to Robin's shop, up to <<print _wineLineModule.terms.automationSupplyLimit>> a day. Each trip costs <span class='gold'><<printmoney _wineLineModule.terms.automationHaulFee>></span>, deducted from the delivery payment. The shop pays from its working funds, and the cabinet holds <<print _wineLineModule.terms.shopStockLimit>> bottles. Missed deliveries are not made up.
             <<option 'CN'>>
               每天09:00开工，先装瓶，再按你选的配方为闲置酒桶投料。保留水果和未完成订单会先留好，辅料与酒瓶照常付费。水果或钱不够，就不开始新的一批。
               <br><br>
-              送货人每趟带<<print _wineLineModule.terms.shopSupplyQuantity>>瓶多余的酒去罗宾店里，当天最多<<print _wineLineModule.terms.automationSupplyLimit>>瓶。每趟运费<span class='gold'><<printmoney _wineLineModule.terms.automationHaulFee>></span>，从货款中扣除。罗宾会留够房租，酒柜最多放<<print _wineLineModule.terms.shopStockLimit>>瓶。错过的配送不补做。
+              送货人每趟带<<print _wineLineModule.terms.shopSupplyQuantity>>瓶多余的酒去罗宾店里，当天最多<<print _wineLineModule.terms.automationSupplyLimit>>瓶。每趟运费<span class='gold'><<printmoney _wineLineModule.terms.automationHaulFee>></span>，从货款中扣除。供货款从店铺周转金支付，酒柜最多放<<print _wineLineModule.terms.shopStockLimit>>瓶。错过的配送不补做。
           <</language>><br><br>
         <</replace>>
       <</lanLink>>
@@ -283,12 +283,15 @@
         <span class='blue'><<lanSwitch 'You cannot afford the cabinet yet.' '你还付不起酒柜费用。'>></span><br>
       <</if>>
     <<else>>
+      <<set _wineDelivery to _winery.state.ledger.slice().reverse().find(sale => sale.source === 'robin')>>
       <<language>>
         <<option 'EN'>>
           <<if _winery.state.supplied is 0>>
             Robin opens the new cabinet and checks that the door clears the counter. "Six bottles to start with? Let's see how they go." <<He>> leaves a space for the delivery on the order pad.
           <<elseif _winery.shopStock is 0>>
             Robin slides open the empty cabinet. "That was the last of them. I've still got the labels here, so I won't forget which is which." <<He>> moves the bottle list beside the order pad.
+          <<elseif _wineDelivery and Time.days - _wineDelivery.day gte 7>>
+            Robin counts the bottles still behind the glass. "These haven't all gone yet. I'll leave some space between them. They might be easier to spot that way."
           <<elseif _winery.state.supplied is _winery.terms.shopSupplyQuantity>>
             Robin straightens the first few bottles behind the glass. "There. Let's give these a chance before filling the whole cabinet." <<He>> checks the label once more before closing the door.
           <<elseif _winery.skilled>>
@@ -301,6 +304,8 @@
             罗宾打开新酒柜，试了试柜门会不会碰到柜台。“先来六瓶？看看卖得怎么样。”<<He>>在订单本上空出一行，等着记下这批货。
           <<elseif _winery.shopStock is 0>>
             罗宾拉开空酒柜。“最后几瓶也卖掉了。标签我还留着，不会把它们弄混。”<<He>>把果酒清单挪到订单本旁。
+          <<elseif _wineDelivery and Time.days - _wineDelivery.day gte 7>>
+            罗宾数了数玻璃后剩下的酒瓶。“这些还没卖完。我把它们摆开一点吧，也许这样容易看见些。”
           <<elseif _winery.state.supplied is _winery.terms.shopSupplyQuantity>>
             罗宾把头一批酒瓶在玻璃后摆正。“好了。先看看这几瓶卖得怎么样，不急着把柜子塞满。”<<He>>又确认了一遍标签，才关好柜门。
           <<elseif _winery.skilled>>
@@ -309,7 +314,6 @@
             罗宾对照酒柜清单数了数瓶子。“一次六瓶就好。收多少我都记下来，上架之前先付你的货款。”<<He>>把瓶装果酒的清单放在日常饮品订单旁。
           <</if>>
       <</language>><br><br>
-      <<set _wineDelivery to _winery.state.ledger.slice().reverse().find(sale => sale.source === 'robin')>>
       <<if _wineDelivery and _winery.state.shop_stock[_wineDelivery.recipe] gt 0>>
         <<set _shopWine to _winery.terms.recipes.find(recipe => recipe.id === _wineDelivery.recipe)>>
         <<language>>

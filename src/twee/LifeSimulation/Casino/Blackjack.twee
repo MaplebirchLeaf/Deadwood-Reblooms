@@ -13,16 +13,20 @@
     <<set _blackjackNames to {Robin: '罗宾', Whitney: '惠特尼', Kylar: '凯拉尔', Sydney: '悉尼'}>>
     <<for _resident range maplebirch.get('LifeSimulation').casino.blackjack.homeOpponents>>
       <<capture _resident _blackjackReturn _blackjackNames>>
-        <<icon 'casino/blackjack.png'>><<lanLink `['Play blackjack with ' + _resident.id, '和' + (_blackjackNames[_resident.id] || _resident.id) + '玩二十一点']` 'Deadwood Reblooms Life Simulation Blackjack'>>
-          <<run maplebirch.get('LifeSimulation').casino.blackjack.prepare('home', _resident.id, _blackjackReturn)>>
+        <<icon 'casino/blackjack.png'>><<lanLink `['Play blackjack with ' + _resident.id, '和' + (_blackjackNames[_resident.id] || _resident.id) + '玩二十一点']`>>
+          <<if maplebirch.get('LifeSimulation').casino.blackjack.prepare('home', _resident.id, _blackjackReturn)>>
+            <<goto 'Deadwood Reblooms Life Simulation Blackjack'>>
+          <</if>>
         <</lanLink>><br>
       <</capture>>
     <</for>>
     <<if maplebirch.get('LifeSimulation').casino.blackjack.homeGroupAvailable>>
       <<set _blackjackGroup to maplebirch.get('LifeSimulation').casino.blackjack.homeOpponents>>
       <<capture _blackjackGroup _blackjackReturn>>
-        <<icon 'casino/blackjack.png'>><<lanLink ['Invite both lovers to play blackjack', '邀两位恋人玩二十一点'] 'Deadwood Reblooms Life Simulation Blackjack'>>
-          <<run maplebirch.get('LifeSimulation').casino.blackjack.prepare('home', _blackjackGroup[0].id, _blackjackReturn, _blackjackGroup[1].id)>>
+        <<icon 'casino/blackjack.png'>><<lanLink ['Invite both lovers to play blackjack', '邀两位恋人玩二十一点']>>
+          <<if maplebirch.get('LifeSimulation').casino.blackjack.prepare('home', _blackjackGroup[0].id, _blackjackReturn, _blackjackGroup[1].id)>>
+            <<goto 'Deadwood Reblooms Life Simulation Blackjack'>>
+          <</if>>
         <</lanLink>><br>
       <</capture>>
     <</if>>

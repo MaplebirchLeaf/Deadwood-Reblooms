@@ -12,9 +12,17 @@
 <<if $Orchard.farm_contract?.status is 'pending'>>
   <<language>>
     <<option 'EN'>>
-      Alex checks your name against the dispatch sheet. "I've left room on the cart. All of it needs to arrive together."
+      <<if $Orchard.contracts_completed gte 3>>
+        Alex points out your name on the dispatch sheet. "Got your usual space. Whole order together, same as before."
+      <<else>>
+        Alex checks your name against the dispatch sheet. "I've left room on the cart. All of it needs to arrive together."
+      <</if>>
     <<option 'CN'>>
-      艾利克斯在发货单上找出你的名字。“车上给你留了位置。这批得一起交齐。”
+      <<if $Orchard.contracts_completed gte 3>>
+        艾利克斯指指发货单上你的名字。“老位置。还是和以前一样，这批得一起交齐。”
+      <<else>>
+        艾利克斯在发货单上找出你的名字。“车上给你留了位置。这批得一起交齐。”
+      <</if>>
   <</language>><br><br>
   <<foodstufficon $Orchard.farm_contract.type>><<= $Orchard.farm_contract.amount>> · <<lanSwitch 'Unit price: ' '单价：'>><<printmoney $Orchard.farm_contract.price>><br>
   <<lanSwitch 'Due: ' '交货期限：'>><<set _contractDate to Time.startDate.addDays($Orchard.farm_contract.deadline)>><<= _contractDate.year>> / <<= _contractDate.month>> / <<= _contractDate.day>><br>
@@ -33,6 +41,13 @@
         Alex folds the old dispatch sheet. "The cart went without yours. I had to fill the space." <<He>> sets it aside. "The deposit covered that. Don't book more than you can bring."
       <<option 'CN'>>
         艾利克斯折起旧发货单。“车走了，没等到你的货。我得找别的补上。”<<He>>把单子放到一旁。“押金抵了这笔。能送多少，再订多少。”
+    <</language>><br><br>
+  <<elseif $Orchard.contracts_completed gte 3>>
+    <<language>>
+      <<option 'EN'>>
+        Alex pulls over the dispatch sheet when you approach. "Another crate? Tell me what you're bringing. I'll see where I can fit it."
+      <<option 'CN'>>
+        你走近时，艾利克斯拉过发货单。“再来一箱？说说你准备送什么，我看看怎么安排。”
     <</language>><br><br>
   <<else>>
     <<language>>
@@ -96,13 +111,29 @@
     <<language>>
       <<option 'EN'>>
         <<if _alexAtDesk>>
-          Alex counts the last crate and signs the dispatch sheet. "That's the lot." <<He>> hands over the payment and your deposit. "I'll put you on the list for the next cart."
+          Alex counts the last crate and signs the dispatch sheet.
+          <<if $Orchard.contracts_completed is 1>>
+            "That's the lot. A good start."
+          <<elseif $Orchard.contracts_completed gte 3>>
+            "All here. You know where the crates go by now."
+          <<else>>
+            "That's the lot. I'll put you on the list for the next cart."
+          <</if>>
+          <<He>> hands over the payment and your deposit.
         <<else>>
           Your fruit has been handed over. You put the payment and returned deposit away with the signed dispatch sheet.
         <</if>>
       <<option 'CN'>>
         <<if _alexAtDesk>>
-          艾利克斯数完最后一箱，在发货单上签了字。“齐了。”<<He>>把货款和押金交给你。“下趟车，我还把你记在名单上。”
+          艾利克斯数完最后一箱，在发货单上签了字。
+          <<if $Orchard.contracts_completed is 1>>
+            “齐了。开头不错。”
+          <<elseif $Orchard.contracts_completed gte 3>>
+            “都到了。箱子放哪儿，你也熟了。”
+          <<else>>
+            “齐了。下趟车，我还把你记在名单上。”
+          <</if>>
+          <<He>>把货款和押金交给你。
         <<else>>
           水果已经交齐。你收好货款和退回的押金，把签好的发货单一并放好。
         <</if>>

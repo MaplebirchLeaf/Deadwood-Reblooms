@@ -162,7 +162,7 @@ export default class PropertyLife {
     if (outings.note || outings.memory || outings.offer || outings.waiting || outings.travelling || this.estate.banquet.active) return false;
     if (!choice || !['join', 'help', 'read', 'leave'].includes(choice)) return false;
     if (choice !== 'leave' && choice !== ({ resident: 'join', staff: 'read', house: 'help' } as const)[daily.kind]) return false;
-    // 开始前由 pending 预留完整时间；完成后只确认本人仍在场，不再要求额外空闲十分钟。
+    // 开始前由 pending 预留完整时间，完成后只确认本人仍在场，不再要求额外空闲十分钟。
     if (
       daily.kind === 'resident' &&
       (!daily.partner || daily.partner === this.bathing?.partner || !this.estate.residentsHome(property.id).some(resident => resident.id === daily.partner) || !this.free(daily.partner, 0))
@@ -178,7 +178,7 @@ export default class PropertyLife {
     const until = Time.date.timeStamp + duration * 60;
     const outings = this.estate.outings;
     const visit = outings.state.visits[name];
-    if (visit?.property === this.estate.current?.id && visit.at === 'deadwood_home' && visit.until > Time.date.timeStamp && visit.until <= until) return false;
+    if (visit && visit.property === this.estate.current?.id && visit.at === 'deadwood_home' && visit.until > Time.date.timeStamp && visit.until <= until) return false;
     const plan = outings.plan;
     if (outings.live && plan?.name === name && plan.stage === 'booked' && (plan.at > Time.date.timeStamp ? plan.at : plan.at + 1800) <= until) return false;
     const end = name === 'Sydney' ? 6 : 7;
