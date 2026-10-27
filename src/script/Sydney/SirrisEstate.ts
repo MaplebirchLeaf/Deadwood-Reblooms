@@ -38,17 +38,13 @@ export default function (maplebirch: typeof window.maplebirch): void {
     { overwrite: true }
   );
 
-  // 邀请由西里斯当面给出，避免玩家刚认识悉尼就知道其家庭住址。
-  maplebirch.tool.addTo('BeforeLinkZone', {
-    widget: 'deadwood-reblooms-sirris-estate-invitation-link',
-    passage: 'Adult Shop Approach Sirris'
-  });
-
-  // 悉尼在神殿宿舍答应当晚回家，原版日程也会在约定时段同步转为 home。
-  maplebirch.tool.addTo('BeforeLinkZone', {
-    widget: 'deadwood-reblooms-sirris-estate-evening-link',
-    passage: 'Temple Quarters'
-  });
+  maplebirch.tool.addTo(
+    'BeforeLinkZone',
+    // 邀请由西里斯当面给出，避免玩家刚认识悉尼就知道其家庭住址。
+    { widget: 'deadwood-reblooms-sirris-estate-invitation-link', passage: 'Adult Shop Approach Sirris' },
+    // 悉尼在神殿宿舍答应当晚回家，原版日程也会在约定时段同步转为 home。
+    { widget: 'deadwood-reblooms-sirris-estate-evening-link', passage: 'Temple Quarters' }
+  );
 
   // 多瑙河街的固定地点列表位于街道事件分支内。复用其首个图标作锚点，
   // 因而危险事件、昏厥和特殊剧情占据页面时不会冒出庄园入口。

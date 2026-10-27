@@ -127,6 +127,10 @@ export default class PropertyOutings {
     return this.plan.hour < 20 ? ['meal', 'shopping', 'walk'] : this.plan.hour < 21 ? ['shopping', 'walk'] : ['walk'];
   }
 
+  public get cafeOpen(): boolean {
+    return V.chef_state !== 8 && !(V.chef_state === 7 && V.chef_rework <= 30);
+  }
+
   public get offer(): PropertyOutingState['plan'] {
     const plan = this.plan;
     return plan?.stage === 'offered' &&
@@ -216,6 +220,7 @@ export default class PropertyOutings {
   }
 
   private indoor(activity: OutingActivity): boolean {
+    if (activity === 'meal' && !this.cafeOpen) return false;
     const property = this.estate.current;
     const transport = this.core.get('Transport');
     const from = property?.street === 'Office Lobby' ? 'high' : property && Catalog.point(property.street);
@@ -314,6 +319,7 @@ export default class PropertyOutings {
     const transport = this.core.get('Transport');
     if (
       !this.due ||
+      (plan!.activity === 'meal' && !this.cafeOpen) ||
       !transport ||
       !this.canLeave(plan!.property) ||
       transport.taxi.active ||
@@ -398,7 +404,7 @@ export default class PropertyOutings {
       transport.vehicle.stolen
     )
       return false;
-    if (enjoyed && !this.canStay) return false;
+    if (enjoyed && (!this.canStay || (this.plan!.activity === 'meal' && !this.cafeOpen))) return false;
     if (this.plan!.stage === 'out' && !transport.state.trip?.settled) return false;
     this.plan!.stage = 'return';
     this.plan!.enjoyed = enjoyed;

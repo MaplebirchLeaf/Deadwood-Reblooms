@@ -29,7 +29,11 @@
               <</if>>
             <<else>>
               <<replace '#deadwood-outing-departure-message'>>
-                <span class='purple'><<lanSwitch 'Check the car, your licence and the time left. Wet weather may also change your plans.' '检查车辆、驾驶资格和剩余时间。雨雪天气也可能影响原来的安排。'>></span><br>
+                <<if _outings.plan.activity is 'meal' and !_outings.cafeOpen>>
+                  <span class='blue'><<lanSwitch 'The cafe is closed for now.' '咖啡馆暂不营业。'>></span><br>
+                <<else>>
+                  <span class='purple'><<lanSwitch 'Check the car, your licence and the time left. Wet weather may also change your plans.' '检查车辆、驾驶资格和剩余时间。雨雪天气也可能影响原来的安排。'>></span><br>
+                <</if>>
               <</replace>>
             <</if>>
           <</lanLink>><br>
@@ -183,6 +187,17 @@
 <<set _estate to maplebirch.get('Finance').realEstate>><<set _outings to _estate.outings>><<set _plan to _outings.plan>>
 <<if !_outings.travelling or _plan.stage isnot 'visit'>>
   <<getouticon>><<lanLink ['Return to your vehicle', '返回载具旁'] 'Deadwood Transport Menu'>><</lanLink>><<exit>>
+<</if>>
+<<if _plan.activity is 'meal' and !_outings.cafeOpen>>
+  <<set $outside to 1, $location to 'town'>><<effects>>
+  <<if $chef_state is 8 or ($chef_state is 7 and $chef_rework lte 0)>>
+    <<lanSwitch 'The cafe is preparing for the grand reopening.' '咖啡馆正在准备重新开张。'>>
+  <<else>>
+    <<lanSwitch 'The cafe is closed for renovations.' '咖啡馆正在翻修，暂不营业。'>>
+  <</if>><br><br>
+  <<getouticon>><<lanLink ['Return to the car and head home', '回到车旁，一起回家']>>
+    <<if _outings.back()>><<goto 'Deadwood Transport Menu'>><</if>>
+  <</lanLink>><<exit>>
 <</if>>
 <<set $outside to _plan.activity is 'walk' ? 1 : 0>><<set $location to {meal: 'cafe', shopping: 'shopping_centre', walk: 'town'}[_plan.activity]>><<effects>><<npc _plan.name>><<person1>>
 <<set _outing_cost to {meal: 1400, shopping: 1200, walk: 0}[_plan.activity]>>

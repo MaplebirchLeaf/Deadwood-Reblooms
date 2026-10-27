@@ -208,6 +208,7 @@ export default class Bounties {
           this.trust >= item.required_trust &&
           (item.requires !== 'casino' || !!this.street.core.get('LifeSimulation')) &&
           (item.requires !== 'finance' || !!this.street.core.get('Finance')) &&
+          (item.site !== 'cafe' || this.street.jobs.cafeOpen) &&
           (item.requires !== 'underground' || V.smuggler_pub_known === 1)
       )
       .slice(0, 4);
@@ -465,6 +466,7 @@ export default class Bounties {
       return true;
     }
     if (!V.per_npc[job.key] || this.expired) return false;
+    if (job.site === 'cafe' && ['search', 'identified'].includes(job.stage) && !this.street.jobs.cafeOpen) return false;
     if (action === 'unload' && title === 'Deadwood Street Bounties') {
       if (job.stage !== 'escort' || job.vehicle === null || !this.here) return false;
       job.vehicle = null;

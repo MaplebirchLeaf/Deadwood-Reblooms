@@ -83,7 +83,12 @@ export default class Stories {
       return chain.stages[record.stage].flatMap(target => {
         const site = terms.sites[target.site as keyof typeof terms.sites];
         const atSite = this.street.core.passage.title === site.passage || (target.site === 'smuggler' && this.street.core.passage.title === 'Deadwood Street Work');
-        return atSite && V.location === site.location && Time.hour >= site.open && Time.hour < site.close && (target.site !== 'police' || this.policeAvailable)
+        return atSite &&
+          V.location === site.location &&
+          Time.hour >= site.open &&
+          Time.hour < site.close &&
+          (target.site !== 'police' || this.policeAvailable) &&
+          (target.site !== 'cafe' || this.street.jobs.cafeOpen)
           ? [{ id, name: chain.name, icon: chain.icon, ...target }]
           : [];
       });

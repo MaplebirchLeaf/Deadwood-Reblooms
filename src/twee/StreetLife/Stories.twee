@@ -27,6 +27,9 @@
   <<if !_storyPageWork.available or $passage isnot $_storyPageTarget.passage or $location isnot _storyPageSite.location>>
     <span class='blue'><<lanSwitch 'You cannot deal with this arrangement just now. Take care of what is happening first.' '眼下顾不上这份约定，先把眼前的事处理好。'>></span><br><<exit>>
   <</if>>
+  <<if _args[2] is 'cafe' and !maplebirch.get('StreetLife').jobs.cafeOpen>>
+    <<lanSwitch 'The cafe has not reopened. Its doors are shut.' '咖啡馆还未重新营业，店门紧闭。'>><br><<exit>>
+  <</if>>
   <<set $_storyPageRecord to _storyPageWork.state[_args[0]]>>
   <<if $_storyPageRecord.paused>>
     <span class='blue'><<lanSwitch 'This arrangement is on hold. Return to the pub to agree on the crew before continuing.' '这份约定暂缓了。先回酒馆约好人手，再继续办事。'>></span><br><<exit>>
@@ -40,7 +43,9 @@
 
 <<widget 'deadwood-street-story-leave'>>
   <<set _storyLeaveSite to maplebirch.get('StreetLife')?.stories.terms.sites[_args[0]]>>
-  <<if _storyLeaveSite and $location is _storyLeaveSite.location and !$nextPassage and !$nextPassageCheck>>
+  <<if _args[0] is 'cafe' and !maplebirch.get('StreetLife')?.jobs.cafeOpen and !$nextPassage and !$nextPassageCheck>>
+    <br><<getouticon>><<lanLink ['Return to Cliff Street', '返回峭壁街'] 'Cliff Street'>><<endevent>><</lanLink>><br>
+  <<elseif _storyLeaveSite and $location is _storyLeaveSite.location and !$nextPassage and !$nextPassageCheck>>
     <br><<getouticon>><<lanLink `['Return to ' + _storyLeaveSite.name[0], '返回' + _storyLeaveSite.name[1]]` _storyLeaveSite.passage>><<endevent>><</lanLink>><br>
   <<elseif !$nextPassage and !$nextPassageCheck>>
     <br><<getouticon>><<back `lanSwitch('Return', '返回')`>><br>
@@ -93,6 +98,7 @@
   <<if !_storyActAction or !_storyActWork.available or !_storyActHeist.crewReady or _storyActRecord.paused or _storyActRecord.stage isnot _storyActAction.stage or (_storyActWork.current isnot null and _storyActWork.current isnot _storyActId)>><<exit>><</if>>
   <<set _storyActSite to _storyActWork.terms.sites[_storyActAction.site], _storyActTarget to _storyActChain.stages[_storyActRecord.stage].find(target => target.site === _storyActAction.site)>>
   <<if $passage isnot _storyActTarget.passage or $location isnot _storyActSite.location or $money lt _storyActAction.cost or Time.hour lt _storyActSite.open>><<exit>><</if>>
+  <<if _storyActAction.site is 'cafe' and !_storyActStreet.jobs.cafeOpen>><<exit>><</if>>
   <<if _storyActRecord.stage is 0 and !_storyActWork.unlocked[_storyActId]>><<exit>><</if>>
   <<if _storyActKey is 'assisted' and !_storyActHeist.mickeyAvailable>><<exit>><</if>>
   <<if _storyActKey is 'police' and !_storyActWork.policeAvailable>><<exit>><</if>>
@@ -103,6 +109,7 @@
   <<endevent>><<pass _storyActAction.minutes>>
   <<set _storyActRecord.result to 'interrupted'>>
   <<if !_storyActWork.available or !_storyActHeist.crewReady or _storyActRecord.paused or $passage isnot _storyActTarget.passage or $location isnot _storyActSite.location or _storyActHeist.roster isnot _storyActRoster or Time.date.timeStamp gte _storyActClosing or _storyActRecord.stage isnot _storyActAction.stage or $money lt _storyActAction.cost>><<exit>><</if>>
+  <<if _storyActAction.site is 'cafe' and !_storyActStreet.jobs.cafeOpen>><<exit>><</if>>
   <<if _storyActKey is 'assisted' and !_storyActHeist.mickeyAvailable>><<exit>><</if>>
   <<if _storyActKey is 'police' and !_storyActWork.policeAvailable>><<exit>><</if>>
   <<if _storyActAction.cost gt 0>><<money `-_storyActAction.cost`>><<set _storyActRecord.spent += _storyActAction.cost>><</if>>

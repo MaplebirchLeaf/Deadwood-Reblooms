@@ -80,6 +80,7 @@ export default class Jobs {
           (item.requires !== 'casino' || (!!this.street.core.get('LifeSimulation') && V.id > 0)) &&
           (item.requires !== 'finance' || !!this.street.core.get('Finance')) &&
           (item.requires !== 'underground' || V.smuggler_pub_known === 1) &&
+          (item.target !== 'cafe' || this.cafeOpen) &&
           item.requires !== 'bailey'
       );
     // 当前条件过滤之后取三项合法、一项非法，当天随机顺序由委托页面保存。
@@ -98,12 +99,17 @@ export default class Jobs {
     });
   }
 
+  /** 翻修结束后仍需完成原版开业剧情，普通夜间打烊不影响接单。 */
+  public get cafeOpen(): boolean {
+    return V.chef_state !== 8 && !(V.chef_state === 7 && V.chef_rework <= 30);
+  }
+
   public get receiving(): boolean {
     switch (this.place) {
       case 'casino':
         return !!this.street.core.get('LifeSimulation')?.casino.open && V.id > 0;
       case 'cafe':
-        return Time.openingHours() && V.chef_state !== 8 && !(V.chef_state === 7 && V.chef_rework <= 30);
+        return Time.openingHours() && this.cafeOpen;
       case 'docks':
       case 'townhall':
         return Time.dayState !== 'night';
@@ -218,6 +224,7 @@ export default class Jobs {
         job.stage !== 'pickup' ||
         this.expired ||
         !this.receiving ||
+        (contract.target === 'cafe' && !this.cafeOpen) ||
         ['label', 'seized'].includes(job.issue) ||
         (job.id === 'recovery' && job.issue === 'queue')
       )

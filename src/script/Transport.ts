@@ -61,11 +61,14 @@ export default function Transport(maplebirch: typeof window.maplebirch): void {
   }
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-transport-places', passage: ['Harvest Street', 'Elk Street', 'Shopping Centre'] });
   maplebirch.tool.addTo('CustomLinkZone', { widget: [1, 'deadwood-transport-places 1'], passage: 'Harvest Street' });
-  maplebirch.tool.addTo('BeforeLinkZone', {
-    widget: 'deadwood-transport-ride-link',
-    match: /^(?:Robin|Whitney Home|Sydney|Temple Sydney|Library Rental Counter|Book Rental|English Play|School Front Courtyard|School Leave Whitney|Kylar Courtyard)| Street$/
-  });
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-transport-avery-link', passage: 'Oxford Street' });
+  maplebirch.tool.addTo(
+    'BeforeLinkZone',
+    {
+      widget: 'deadwood-transport-ride-link',
+      match: /^(?:Robin|Whitney Home|Sydney|Temple Sydney|Library Rental Counter|Book Rental|English Play|School Front Courtyard|School Leave Whitney|Kylar Courtyard)| Street$/
+    },
+    { widget: 'deadwood-transport-avery-link', passage: 'Oxford Street' }
+  );
   maplebirch.tool.addTo('Header', { widget: 'deadwood-transport-header', match: /^Deadwood Transport (?:Menu|Travel|Taxi (?:Dispatch|Pickup))$/ });
   maplebirch.tool.addTo('SkillsBox', 'deadwood-transport-skill');
   maplebirch.tool.addTo('Journal', 'deadwood-transport-journal', 'deadwood-driving-school-journal');

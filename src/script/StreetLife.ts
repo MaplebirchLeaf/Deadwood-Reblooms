@@ -40,8 +40,7 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
   Detective(maplebirch);
   SmugglerPub(maplebirch);
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-detective-link', passage: 'Police Station' });
-  maplebirch.tool.addTo('Journal', 'deadwood-street-bounty-journal');
-  maplebirch.tool.addTo('Journal', 'deadwood-street-ammunition-journal');
+  maplebirch.tool.addTo('Journal', 'deadwood-street-bounty-journal', 'deadwood-street-ammunition-journal');
   maplebirch.tool.addTo('ReputationModify', 'deadwood-street-police-reputation');
   maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-bailey-link', passage: ["Bailey's Office", 'Flats'] });
   // 强制转场只收束本案敌人，原版逮捕、昏倒和救援仍先执行。
@@ -170,11 +169,8 @@ export default function StreetLife(maplebirch: typeof window.maplebirch): void {
   });
   maplebirch.tool.addTo('Reputation', 'deadwood-street-reputation');
   maplebirch.tool.addTo('WeaponBox', 'deadwood-street-firearm-effectiveness');
-  maplebirch.tool.addTo('Journal', 'deadwood-street-job-journal');
-  maplebirch.tool.addTo('Journal', 'deadwood-street-story-journal');
-  maplebirch.tool.addTo('Journal', 'deadwood-street-race-journal');
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-shop-link', passage: 'Smuggler Pub' });
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-unload', match: / Street$/ });
+  maplebirch.tool.addTo('Journal', 'deadwood-street-job-journal', 'deadwood-street-story-journal', 'deadwood-street-race-journal');
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-street-shop-link', passage: 'Smuggler Pub' }, { widget: 'deadwood-street-unload', match: / Street$/ });
   maplebirch.tool.inject({
     locationPassage: {
       'Farm Road 1': [

@@ -51,6 +51,14 @@
         <li class='green'><<lanSwitch 'Delivered. Return to Landry for payment.' '货物已交付。回丰收街酒馆找兰德里领报酬。'>></li>
         <li><<lanSwitch 'Payment due to you: ' '待领报酬：'>><<printmoney _streetJob.fee>></li>
       <<else>>
+        <<if _streetContract.target is 'cafe' and !_streetJobs.cafeOpen and _streetJob.stage isnot 'return'>>
+          <li class='blue'>
+            <<if $chef_state is 8 or $chef_rework lte 0>><<lanSwitch 'The cafe is preparing to reopen.' '咖啡馆正在筹备重新开业。'>>
+            <<else>><<lanSwitch 'The cafe is closed for renovations.' '咖啡馆正在停业翻修。'>><</if>>
+            <<if _streetJob.stage is 'pickup'>><<lanSwitch ' You can cancel this job with Landry.' '你可以向兰德里取消委托。'>>
+            <<else>><<lanSwitch ' You can return the goods to the sender.' '你可以把货物退给发货人。'>><</if>>
+          </li>
+        <</if>>
         <<if _streetJob.stage isnot 'return'>>
           <li><<lanSwitch 'Agreed fee: ' '约定报酬：'>><<printmoney `_streetJob.crew ? _streetJob.crew.gross - Math.floor(_streetJob.crew.gross * _streetJob.crew.share / 100) : _streetContract.fee`>> · <<lanSwitch 'Deliver by ' '交货期限：'>>
             <<set _streetDate to new DateTime(_streetJob.due)>><<= lanSwitch(getFormattedDate(_streetDate), _streetDate.month + '月' + _streetDate.day + '日')>> <<ampm _streetDate.hour _streetDate.minute>>
@@ -208,7 +216,8 @@
   <<deadwood-street-job-environment>>
   <<if _streetJob.stage is 'settlement' and $StreetLife.jobs.site is _streetContract.target>><<deadwood-street-job-receipt>><</if>>
   <<if _streetJobs.available and _streetJobs.cargoHere>>
-    <<if _streetJob.stage is 'pickup' and $StreetLife.jobs.site is _streetContract.source and !_streetJobs.expired and _streetJobs.receiving>>
+    <<if _streetJob.stage is 'pickup' and $StreetLife.jobs.site is _streetContract.source and !_streetJobs.expired and _streetJobs.receiving
+        and (_streetContract.target isnot 'cafe' or _streetJobs.cafeOpen)>>
       <<if _streetJob.id is 'bailey_cargo'>>
         <<deadwood-street-bailey-seizure>>
       <<else>>
@@ -257,7 +266,7 @@
           <</capture>>
         <</for>>
       <</if>>
-      <<if _streetJobs.expired and _streetJob.stage is 'carrying'>>
+      <<if _streetJob.stage is 'carrying' and (_streetJobs.expired or $StreetLife.jobs.site is _streetContract.source)>>
         <<icon 'street/cargo-return.png'>><<lanLink ['Decide to return the goods', '决定退回货物'] 'Deadwood Street Cargo'>><<run _streetJobs.act('return')>><</lanLink>><br>
       <</if>>
     <</if>>

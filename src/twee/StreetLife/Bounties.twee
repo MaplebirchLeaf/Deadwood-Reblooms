@@ -3,7 +3,7 @@
 <!-- 原版地点只提供入口，认人、交接和领款各在自有页面核验一次。 -->
 <<widget 'deadwood-street-bounty-link'>>
   <<set _bountyWork to maplebirch.get('StreetLife')?.bounties, _bountySite to _args[0]>>
-  <<if _bountyWork?.available and _bountyWork.state.active and _bountyWork.terms.sites[_bountySite] and !(_bountySite is 'docks' and Time.dayState is 'night')>>
+  <<if _bountyWork?.available and _bountyWork.state.active and _bountyWork.terms.sites[_bountySite] and !(_bountySite is 'docks' and Time.dayState is 'night') and !(_bountySite is 'cafe' and !maplebirch.get('StreetLife').jobs.cafeOpen)>>
     <<set _bountyCase to _bountyWork.state.active>>
     <<if (_bountyCase.site is _bountySite and ['search', 'identified', 'pursuit', 'fight'].includes(_bountyCase.stage)) or (_bountyCase.stage is 'escort' and _bountyWork.here)>>
       <<capture _bountySite>>
@@ -222,6 +222,10 @@
   <<exit>>
 <</if>>
 <<set _bountyPlace to _bountyWork.terms.sites[_bountyWork.state.site]>>
+<<if _bountyWork.state.site is 'cafe' and ['search', 'identified'].includes(_bountyCase.stage) and !maplebirch.get('StreetLife').jobs.cafeOpen>>
+  <<lanSwitch 'The cafe has not reopened. Its doors are shut.' '咖啡馆还未重新营业，店门紧闭。'>><br><br>
+  <<getouticon>><<lanLink ['Return to Cliff Street', '返回峭壁街'] 'Cliff Street'>><<endevent>><</lanLink>><<exit>>
+<</if>>
 <<set $location to _bountyPlace.location>><<set $outside to _bountyPlace.outside>>
 <<if _bountyPlace.point and (_bountyCase.stage is 'pursuit' or ['run', 'drive'].includes(_bountyCase.outcome))>><<set $location to 'town', $outside to 1>><</if>>
 <<effects>>

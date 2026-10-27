@@ -1,11 +1,11 @@
 // ./src/script/Sydney/SydneyScience.ts
 
 export default function (maplebirch: typeof window.maplebirch) {
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-reblooms-sydney-science-inspection-leave', passage: 'Science Lesson' });
-  maplebirch.tool.addTo('BeforeLinkZone', {
-    widget: 'deadwood-reblooms-sydney-science-anatomy',
-    passage: ['Science Event3', 'Science Undress', 'Science Refusal', 'Science Undress Desk']
-  });
+  maplebirch.tool.addTo(
+    'BeforeLinkZone',
+    { widget: 'deadwood-reblooms-sydney-science-inspection-leave', passage: 'Science Lesson' },
+    { widget: 'deadwood-reblooms-sydney-science-anatomy', passage: ['Science Event3', 'Science Undress', 'Science Refusal', 'Science Undress Desk'] }
+  );
 
   // 接入科学课事件池、首次同桌剧情和悉尼保护分支。
   maplebirch.tool.inject({

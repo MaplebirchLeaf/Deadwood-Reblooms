@@ -113,6 +113,5 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
       ]
     }
   });
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-raven-link', passage: 'Churchyard' });
-  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-undead-moon', passage: ['Pirate Deck', 'Beach'] });
+  maplebirch.tool.addTo('BeforeLinkZone', { widget: 'deadwood-raven-link', passage: 'Churchyard' }, { widget: 'deadwood-undead-moon', passage: ['Pirate Deck', 'Beach'] });
 }

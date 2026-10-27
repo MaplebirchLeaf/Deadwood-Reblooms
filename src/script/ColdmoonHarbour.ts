@@ -48,9 +48,7 @@ export default function ColdmoonHarbour(maplebirch: typeof window.maplebirch): v
       'Pirate Return 2': [{ src: '$spear_vessel is "zephyr"', to: '$spear_vessel is "Zephyr"', expected: 1 }]
     }
   });
-  maplebirch.tool.addTo('Journal', 'deadwood-harbour-journal');
-  maplebirch.tool.addTo('Journal', 'deadwood-pirate-raid-journal');
-  maplebirch.tool.addTo('Journal', 'deadwood-ghostship-journal');
+  maplebirch.tool.addTo('Journal', 'deadwood-harbour-journal', 'deadwood-pirate-raid-journal', 'deadwood-ghostship-journal');
   // 实际离船时收束囚禁，保留当前页面的剧情与出口。
   maplebirch.dynamic.regStateEvent('gate', 'deadwood-ghostship-interrupted', {
     cond: () => V.MoreTransformations?.harbour?.captivity?.active && !maplebirch.passage.title.startsWith('Deadwood Ghost Ship '),
