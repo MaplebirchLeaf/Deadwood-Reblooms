@@ -340,7 +340,31 @@ export default class RobinShop extends Shared {
   }
 
   public get canRestock(): boolean {
-    return this.state.shop && this.state.shop_stock === 0 && this.robinAvailable && window.getRobinLocation() === 'shop' && this.canSpend(this.restockPrice);
+    if (
+      !this.state.shop ||
+      !this.partnership.state.agreed ||
+      this.state.shop_stock !== 0 ||
+      V.location !== 'deadwood_robin_shop' ||
+      V.statFreeze ||
+      V.replayScene ||
+      V.frozenValues ||
+      V.combat ||
+      V.possessed ||
+      V.eventforced ||
+      V.nextPassage ||
+      V.nextPassageCheck ||
+      V.exposed > 0 ||
+      V.stress >= V.stressmax ||
+      V.tiredness >= C.tiredness.max ||
+      window.pcAreArmsBound('both') ||
+      Time.hour < 9 ||
+      Time.hour >= 21
+    )
+      return false;
+    const key = this.attendantKey;
+    const attendant = key ? V.per_npc[key] : null;
+    const assisted = attendant && (attendant.shop_experience ?? 0) >= 4;
+    return ((this.robinAvailable && window.getRobinLocation() === 'shop') || !!assisted) && this.canSpend(this.restockPrice);
   }
 
   /** 补货会扣经营资金、消耗水果抵扣并改变库存，保留显式调用。 */

@@ -6,7 +6,7 @@
     <<socialiseicon>><<lanLink `_day_life.daily.kind === 'resident' ? ['See what ' + maplebirch.auto(_day_life.daily.partner) + ' wants', '听听' + maplebirch.auto(_day_life.daily.partner) + '想说什么'] : _day_life.daily.kind === 'staff' ? ['Go over the household handover', '看看雇员的交接记录'] : ['Attend to a small matter at home', '处理家里的一件小事']` 'Deadwood Reblooms Property Daily'>><</lanLink>><br>
   <<elseif _day_life.daily?.kind is 'resident' and ['join', 'leave'].includes(_day_life.daily.choice)
       and _day_life.daily.day is Math.floor(Time.days) and _day_life.daily.property is maplebirch.get('Finance').realEstate.current?.id
-      and maplebirch.get('Finance').realEstate.household.common.some(resident => resident.id === _day_life.daily.partner)>>
+      and maplebirch.get('Finance').realEstate.household.home.some(resident => resident.id === _day_life.daily.partner)>>
     <<socialiseicon>><<lanLink ['Mention your earlier conversation', '提起刚才的事'] 'Deadwood Reblooms Property Daily Recall'>><</lanLink>><br>
   <</if>>
   <<deadwood-home-moment-links>>
@@ -27,7 +27,7 @@
       or !$_day_estate.life.finish($_day_action)>><<exit>><</if>>
   <<switch $_day_event.choice>>
     <<case 'join'>>
-      <<npcincr $_day_event.partner love 1>><<stress -2>><<run maplebirch.get('Psyche')?.rest(2, -60)>>
+      <<npcincr $_day_event.partner love 1>><<stress -2>><<psyche-rest 2 60>>
     <<case 'help'>>
       <<housekeeping 1 600>><<tiredness 1>>
     <<case 'read'>>
@@ -106,7 +106,16 @@
             <<elseif _day_event.variant is 0>><<nnpc_he 'Sydney'>>问起你最近在读什么。<<else>>“跟我说说今天的事？”<<nnpc_he 'Sydney'>>看了眼钟，随即认真望向你。<</if>>
         <</switch>>
     <</language>><br><br>
-    <<socialiseicon>><<lanLink `_day_event.partner is 'Sydney' and _day_event.variant is 2 ? ['Read together for a little while (0:10)', '一起读一会儿 (0:10)'] : ['Sit together for a little while (0:10)', '一起坐一会儿 (0:10)']` 'Deadwood Reblooms Property Daily Finish'>><<deadwood-home-daily-act 'join'>><</lanLink>><<glove _day_event.partner>><<lstress>><br>
+    <<set $_day_join_label to ['Sit together for a little while (0:10)', '一起坐一会儿 (0:10)']>>
+    <<if _day_event.variant is 2>>
+      <<switch _day_event.partner>>
+        <<case 'Robin'>><<if C.npc.Robin.trauma lt 20>><<set $_day_join_label to ['Play a hand (0:10)', '玩一局牌 (0:10)']>><</if>>
+        <<case 'Whitney'>><<set $_day_join_label to ['Look out of the window together (0:10)', '一起看看窗外 (0:10)']>>
+        <<case 'Kylar'>><<if C.npc.Kylar.rage lt 60>><<set $_day_join_label to ['Sit for the drawing (0:10)', '坐好让凯拉尔画 (0:10)']>><</if>>
+        <<case 'Sydney'>><<set $_day_join_label to ['Read together for a little while (0:10)', '一起读一会儿 (0:10)']>>
+      <</switch>>
+    <</if>>
+    <<socialiseicon>><<lanLink $_day_join_label 'Deadwood Reblooms Property Daily Finish'>><<deadwood-home-daily-act 'join'>><</lanLink>><<glove _day_event.partner>><<lstress>><br>
   <<case 'house'>>
     <<language>>
       <<option 'EN'>>
@@ -145,9 +154,9 @@
       <<if _day_event.kind is 'resident'>>
         You say you cannot stay just now.
         <<switch _day_event.partner>>
-          <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>Robin nods without looking up, still twisting <<nnpc_his 'Robin'>> sleeve.<<else>>"Oh. All right." Robin gives you a small wave.<</if>>
+          <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>Robin nods without looking up, still twisting <<nnpc_his 'Robin'>> sleeve.<<elseif _day_event.variant is 2>>"All right. I'll leave them here." Robin puts the cards on the table and picks up <<nnpc_his 'Robin'>> cup.<<else>>"Oh. All right." Robin gives you a small wave.<</if>>
           <<case 'Whitney'>>Whitney snorts. "Your loss." <<nnpc_He 'Whitney'>> turns away.
-          <<case 'Kylar'>>"You'll come back, won't you?" Kylar follows you to the doorway.
+          <<case 'Kylar'>><<if _day_event.variant is 2 and C.npc.Kylar.rage lt 60>>Kylar lowers the drawing. "I'll do the background, then." <<nnpc_He 'Kylar'>> looks up again before you leave. "You'll come back, won't you?"<<else>>"You'll come back, won't you?" Kylar follows you to the doorway.<</if>>
           <<case 'Sydney'>>
             <<if _day_event.variant is 2>>
               <<if _sydneyStatus.includes('pure')>>"Of course. Whenever you have time." Sydney turns back to the book.
@@ -178,9 +187,9 @@
       <<if _day_event.kind is 'resident'>>
         你说自己现在没法留下。
         <<switch _day_event.partner>>
-          <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>罗宾没有抬头，仍拧着衣袖，轻轻点了一下。<<else>>“哦，好吧。”罗宾向你轻轻挥了挥手。<</if>>
+          <<case 'Robin'>><<if C.npc.Robin.trauma gte 20>>罗宾没有抬头，仍拧着衣袖，轻轻点了一下。<<elseif _day_event.variant is 2>>“好吧。牌先放这儿。”罗宾将纸牌放在桌上，拿起自己的杯子。<<else>>“哦，好吧。”罗宾向你轻轻挥了挥手。<</if>>
           <<case 'Whitney'>>惠特尼哼了一声。“你的损失。”<<nnpc_He 'Whitney'>>转过身去。
-          <<case 'Kylar'>>“你还会回来吧？”凯拉尔跟着你走到门边。
+          <<case 'Kylar'>><<if _day_event.variant is 2 and C.npc.Kylar.rage lt 60>>凯拉尔放低画纸。“那我先画背景。”你走之前，<<nnpc_he 'Kylar'>>又抬起头。“你还会回来吧？”<<else>>“你还会回来吧？”凯拉尔跟着你走到门边。<</if>>
           <<case 'Sydney'>>
             <<if _day_event.variant is 2>>
               <<if _sydneyStatus.includes('pure')>>“没关系。等你有空吧。”悉尼重新看向书页。
@@ -214,7 +223,7 @@
 <<if $location isnot 'deadwood_home' or !_estate.current or _day_event?.kind isnot 'resident'
     or !['join', 'leave'].includes(_day_event.choice) or _day_event.day isnot Math.floor(Time.days)
     or _day_event.property isnot _estate.current.id
-    or !_estate.household.common.some(resident => resident.id === _day_event.partner)>>
+    or !_estate.household.home.some(resident => resident.id === _day_event.partner)>>
   <<lanSwitch 'There is no one here to continue that conversation.' '这里没有能接着刚才的话说下去的人。'>><br><br>
 <<else>>
   <<effects>>
@@ -281,15 +290,15 @@
           <<else>>“刚才不是故意一直看钟的。”悉尼将书半合起来。“我想走之前，把你的话听完。”<</if>>
       <</switch>>
   <</language>><br><br>
-  <<if _day_event.partner is 'Sydney' and _day_event.variant is 2 and _day_event.choice is 'leave'
-      and _estate.life.free('Sydney', 10) and !$replayScene and !$statFreeze and !$frozenValues
+  <<if _day_event.choice is 'leave'
+      and _estate.life.free(_day_event.partner, 10) and !$replayScene and !$statFreeze and !$frozenValues
       and !$combat and !$possessed and !$eventforced and $stress lt $stressmax>>
     <<capture _estate _day_event>>
-      <<lanLink ['I have time now. Shall we read together?', '现在有空了，一起读一会儿？']>>
+      <<lanLink ['Accept the invitation', '应邀留下']>>
         <<if $passage is 'Deadwood Reblooms Property Daily Recall' and $location is 'deadwood_home'
             and _estate.life.daily is _day_event and _day_event.choice is 'leave'
             and _day_event.day is Math.floor(Time.days) and _day_event.property is _estate.current?.id
-            and _estate.household.common.some(resident => resident.id is 'Sydney') and _estate.life.free('Sydney', 10)>>
+            and _estate.household.home.some(resident => resident.id is _day_event.partner) and _estate.life.free(_day_event.partner, 10)>>
           <!-- 先复核原入口全部条件；未能重新赴约时保留婉拒，不耗时也不发收益。 -->
           <<set _day_event.choice to null>>
           <<if _estate.life.pending>>

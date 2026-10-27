@@ -41,9 +41,9 @@
 
 <!-- 签约前按所选厂房估算，复用生产日历与迟交扣款，不写入合同或存档进度。 -->
 <<widget 'deadwood-company-estimate'>>
-  <<if currentSkillValue('maths') lt 400>><<exit>><</if>>
-  <<set $_factory to _args[0], $_quote to _args[1]>>
   <<set $_company to maplebirch.get('Finance').company, $_industry to maplebirch.get('Finance').industry>>
+  <<if currentSkillValue('maths') lt 400 and !($_company.dealing and $_company.staff.accountant)>><<exit>><</if>>
+  <<set $_factory to _args[0], $_quote to _args[1]>>
   <<set $_today to Math.floor(Time.days), $_deadline to $_today + $_company.terms.deliveryDays>>
   <<set $_order to Object.assign({}, $_quote, { progress: 0, deadline: $_deadline })>>
   <<set $_advance to $_industry.estimate($_order, $_factory)>>
@@ -205,11 +205,34 @@
   <</if>>
   <<if _company_state.contract>>
     <<if _company_state.contract.stage is 'production'>>
+      <<set _company_factory to $Finance.industry.factories[_company_state.contract.site]>>
+      <<set _company_order to _company_factory.order>>
+      <<lanSwitch 'Factory responsible: ' '承接厂房：'>><<print maplebirch.t(maplebirch.get('Finance').industry.terms.sites[_company_factory.site].name)>><br>
+      <<if _company_order and _company_order.id is _company_state.contract.id>>
+        <<lanSwitch 'Production: ' '生产进度：'>><span class='teal'><<= _company_order.progress>> / <<= _company_order.batches>></span> <<lanSwitch 'batches completed' '批已完成'>><br>
+        <<lanSwitch 'Delivery deadline: ' '交货期限：'>><<deadwood-reblooms-finance-date _company_order.deadline>><br>
+      <</if>>
       <<language>>
         <<option 'EN'>>
-          The workshop has the order. You need to arrange delivery at the yard once production is complete.
+          <<if _company_order and _company_order.progress gte _company_order.batches>>
+            The completion sheet has arrived from the workshop. The goods still need checking and dispatching at the yard.
+          <<elseif _company_factory.wage_arrears gt 0 or _company_factory.overhead_arrears gt 0>>
+            An unpaid bill is clipped to the production sheet. The line is stopped. Settle the wages and site bills at the yard before work can resume.
+          <<elseif _company_factory.issue and _company_factory.issue.type isnot 'haul'>>
+            A stoppage notice has arrived from the workshop. The crew are waiting for your decision at the yard.
+          <<else>>
+            The order is not finished. Once it is, delivery needs arranging at the yard.
+          <</if>>
         <<option 'CN'>>
-          订单已经交给车间，完工后需要到厂房院落安排发货。
+          <<if _company_order and _company_order.progress gte _company_order.batches>>
+            车间送来了完工单。货物还在院子里，等着验货发出。
+          <<elseif _company_factory.wage_arrears gt 0 or _company_factory.overhead_arrears gt 0>>
+            未付的账单夹在生产记录上。产线停了，需要到厂房院落结清工资与厂房费用，才能恢复生产。
+          <<elseif _company_factory.issue and _company_factory.issue.type isnot 'haul'>>
+            车间送来了停工通知。工人还在厂房院落，等你过去处理。
+          <<else>>
+            这笔订单还没做完，完工后需要到厂房院落安排发货。
+          <</if>>
       <</language>>
       <br>
     <<elseif _company_state.contract.stage is 'invoice' and _company_state.contract.due lt 0>>
@@ -336,8 +359,13 @@
     <</language>>
   </i></span><br>
 <</deadwood-card>>
-<<if currentSkillValue('maths') gte 400>>
-  <<lanSwitch "You compare the payment dates with the factory's bills." '你把回款日期与工厂账单对着算了一遍。'>>
+<<if currentSkillValue('maths') gte 400 or (_company.dealing and _company.staff.accountant)>>
+  <<language>>
+    <<option 'EN'>>
+      <<if currentSkillValue('maths') gte 400>>You compare the payment dates with the factory's bills.<<else>>Your accountant has set out the factory's bills beside the quotation. Together, you work out what must be paid before the invoice clears.<</if>>
+    <<option 'CN'>>
+      <<if currentSkillValue('maths') gte 400>>你把回款日期与工厂账单对着算了一遍。<<else>>会计把工厂账单排在报价旁，陪你逐项算过回款前要付的费用。<</if>>
+  <</language>>
   <<note `lanSwitch('At the current shift pattern, without stoppages. Production starts tomorrow, with dispatch on completion.', '按现有排班且不停工估算，明天开工，完工即交货。')` 'blue'>><br>
   <span class='blue'><i><<lanSwitch 'Factory bills include weekends and the payment day. Office rent and office staff wages are not included. Keep enough factory funds to pay wages before payment arrives.' '工厂费用计入周末与回款当天，不含办公室租金与职员工资。回款前仍须备足工厂周转金。'>></i></span>
   <<note `lanSwitch('Credit assumes the earliest visit to accounts, or the next working day for an authorised accountant. The payment dates include the three-day wait after a reminder.', '赊账按财务处开门后立即催款估算，已授权会计在下个工作日递单。到账日期已计入催款后的三天等待。')` 'blue'>><br><br>

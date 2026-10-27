@@ -162,6 +162,31 @@
 
 <!-- 报价页说明来路、交接对象与退货去处，期限及金额由调用页列出。 -->
 <<widget 'deadwood-street-job-pitch'>>
+  <<set $_lastDelivery to _streetJobs.state.report>>
+  <<if $_lastDelivery?.id is _streetContract.id>>
+    <<language>>
+      <<option 'EN'>>
+        <<if $_lastDelivery.outcome is 'paid'>>
+          Landry takes a fresh delivery slip from the folder. "Same sort of work. <<if $_lastDelivery.late>>Give yourself more time this round. They won't keep waiting.<<else>>You know the route. Check this order before you set off.<</if>>"
+        <<elseif $_lastDelivery.outcome is 'returned'>>
+          "Another delivery," Landry says. "Last time, the goods came back. Check when they can take this lot before you collect it."
+        <<elseif $_lastDelivery.outcome is 'lost'>>
+          Landry keeps a hand on the new slip. "The last shipment never arrived. Make sure you've got a way to get this one there. Signing for a crate doesn't deliver it."
+        <<else>>
+          "Didn't take the last one, did you?" Landry leaves the new slip on the table. "Have a look. Tell me before collecting if you don't want it."
+        <</if>>
+      <<option 'CN'>>
+        <<if $_lastDelivery.outcome is 'paid'>>
+          兰德里从文件夹里抽出新的送货单。“还是这种活。<<if $_lastDelivery.late>>这次多留点时间，他们不会一直等。<<else>>路你熟了。出发前，把这份订单看清楚。<</if>>”
+        <<elseif $_lastDelivery.outcome is 'returned'>>
+          “又有一批要送。”兰德里说。“上次货退回去了。这回先问清楚，他们什么时候能收。”
+        <<elseif $_lastDelivery.outcome is 'lost'>>
+          兰德里用手按着新的送货单。“上次的货没到。这回先想好怎么运。签字接了箱子，可不算送到了。”
+        <<else>>
+          “上次没取，是吧？”兰德里把新的送货单留在桌上。“先看看。不想接，取货之前就告诉我。”
+        <</if>>
+    <</language>><br><br>
+  <</if>>
   <<language>>
     <<option 'EN'>>
       <<switch _streetContract.id>>

@@ -49,6 +49,8 @@ export interface RobinExpansionState {
   pc_loan: number;
   /** 店铺库存量。 */
   shop_stock: number;
+  /** 最近一次补货的协助者与实付英镑，结果页只读取收据。 */
+  shop_receipt: { assistant: string; price: number } | null;
   /** 店铺雇员数。 */
   shop_staff: number;
   /** 当前查看的应聘来源，孤儿院应聘者与外来店员分别保存。 */
@@ -221,6 +223,7 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
   shop_bank_supported: false,
   pc_loan: 0,
   shop_stock: 0,
+  shop_receipt: null,
   shop_staff: 0,
   shop_applicant: 'adult',
   shop_roster: [],

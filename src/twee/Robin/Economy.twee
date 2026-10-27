@@ -292,6 +292,25 @@
     <<saveNPC 1 'deadwood_robin_shop_regular'>>
   <</if>>
 <</widget>>
+
+<!-- 补货只由点击执行。交接结束后复核原班人手与营业时间，再动用经营资金。 -->
+<<widget 'deadwood-robin-restock'>>
+  <<if $statFreeze or $replayScene or $frozenValues>><<exit>><</if>>
+  <<set $_robin to maplebirch.get('Robin'), $_shop to maplebirch.get('Robin').shop>>
+  <<if $_shop.state.shop_receipt and $_shop.state.shop_stock gt 0>><<exit>><</if>>
+  <<set $_shop.state.shop_receipt to null>>
+  <<if $passage isnot 'Deadwood Robin Shop' or !$_shop.canRestock or Time.hour * 60 + Time.minute + 30 gte 21 * 60>><<exit>><</if>>
+  <<set $_day to Time.days, $_started to Time.date.timeStamp>>
+  <<set $_assistant to $_robin.available and getRobinLocation() is 'shop' ? 'Robin' : $_shop.attendantKey>>
+  <<pass 30>>
+  <<if $passage isnot 'Deadwood Robin Shop' or Time.days isnot $_day or Time.date.timeStamp lt $_started + 1800 or !$_shop.canRestock>><<exit>><</if>>
+  <<if ($_assistant is 'Robin' and (!$_robin.available or getRobinLocation() isnot 'shop')) or ($_assistant isnot 'Robin' and $_shop.attendantKey isnot $_assistant)>><<exit>><</if>>
+  <<set $_price to $_shop.restockPrice>>
+  <<if $_shop.restockDrinks()>>
+    <<set $_shop.state.shop_receipt to {assistant: $_assistant is 'Robin' ? 'Robin' : $per_npc[$_assistant].name, price: $_price}>>
+  <</if>>
+<</widget>>
+
 :: Deadwood Robin Trauma Warning
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
 <<if $RobinExpansion.asylum.status is 'home' and C.npc.Robin.trauma gte 95>>
@@ -1005,9 +1024,18 @@
 <<icon 'robin/shop-goods.png'>><<lanLink ['Browse flowers, popcorn and balloons', '查看鲜花、爆米花与气球'] 'Deadwood Robin Shop Other Goods'>><</lanLink>><br>
 <<deadwood-robin-fish-link 'shop'>>
 <span class='blue'><<lanSwitch 'Special ingredient crates remaining: ' '新品原料剩余箱数：'>><<print $RobinExpansion.shop_stock>></span><br><br>
-<<if maplebirch.get('Robin').shop.canRestock>>
-  <<set _robinRestockPrice to maplebirch.get('Robin').shop.restockPrice>>
-  <<icon 'robin/ingredient-crates.png'>><<lanLink ["Buy three crates of special ingredients (£" + _robinRestockPrice + " 0:30)", '采购三箱新品原料 (£' + _robinRestockPrice + ' 0:30)'] 'Deadwood Robin Shop Restock'>><</lanLink>><br>
+<<if maplebirch.get('Robin').shop.canRestock and Time.hour * 60 + Time.minute + 30 lt 21 * 60>>
+  <<icon 'robin/ingredient-crates.png'>><<lanLink ['Restock three ingredient crates (0:30)', '补进三箱新品原料 (0:30)'] 'Deadwood Robin Shop Restock'>>
+    <<deadwood-robin-restock>>
+  <</lanLink>> <span class='gold'><<printmoney `maplebirch.get('Robin').shop.restockPrice * 100`>></span><br>
+  <<if !(maplebirch.get('Robin').available and getRobinLocation() is 'shop')>>
+    <<language>>
+      <<option 'EN'>>
+        <<= maplebirch.get('Robin').shop.attendant>> puts the stock sheet beside the till. "I can check the delivery. Give me a hand with the crates?"
+      <<option 'CN'>>
+        <<= maplebirch.get('Robin').shop.attendant>>把存货单放到收银机旁。“货送来，我能核对。你帮忙搬一下箱子？”
+    <</language>><br>
+  <</if>>
 <</if>>
 <<if maplebirch.get('Robin').shop.canWork>>
   <<shopicon 'register'>><<lanLink ['Work a shift with Robin (1:00)', '和罗宾一起看店 (1:00)'] 'Deadwood Robin Shop Shift'>><</lanLink>><br>
@@ -1472,18 +1500,22 @@
 <br><<getouticon>><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
 
 :: Deadwood Robin Shop Restock
-<<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('Robin').shop.restockDrinks()>>
-  <<lanSwitch 'Robin checks the supplier invoice while you carry three small crates into the back room. Fresh fruit goes into the cold cabinet; cocoa and spices take the dry shelf. Robin dates every label before you put the empty boxes away.' '罗宾核对进货单，你把三只小箱搬进后间。新鲜水果放入冷藏柜，可可和香料摆上干燥的架子。罗宾逐一写好日期，才让你收起空箱。'>>
-  <<if currentSkillValue('maths') gte 300>>
-    <br><br><span class='green'><<lanSwitch 'You spot a duplicate charge on the invoice. The supplier corrects it and takes £5 off.' '你发现进货单重复计了一项费用。供货商改正后，少收了 £5。'>></span>
-  <</if>>
-  <br><br><span class='gold'><<lanSwitch 'Three special ingredient crates are ready for shared shifts.' '三箱新品原料已备好，可供你们一起看店时使用。'>></span>
-  <<pass 30>>
+<<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>
+<<if $RobinExpansion.shop_receipt>>
+  <<language>>
+    <<option 'EN'>>
+      <<if $RobinExpansion.shop_receipt.assistant is 'Robin'>>Robin checks the supplier invoice while you carry three small crates into the back room. Fresh fruit goes into the cold cabinet; cocoa and spices take the dry shelf. Robin dates every label before you put the empty boxes away.
+      <<else>><<= $RobinExpansion.shop_receipt.assistant>> checks each crate against the delivery slip while you carry them inside. The fresh fruit goes into the cold cabinet. Cocoa and spices go on the dry shelf, with the older stock at the front. The signed slip is left with Robin's accounts.<</if>>
+    <<option 'CN'>>
+      <<if $RobinExpansion.shop_receipt.assistant is 'Robin'>>罗宾核对进货单，你把三只小箱搬进后间。新鲜水果放入冷藏柜，可可和香料摆上干燥的架子。罗宾逐一写好日期，才让你收起空箱。
+      <<else>><<= $RobinExpansion.shop_receipt.assistant>>对着送货单逐箱核对，你把箱子搬进后间。新鲜水果放入冷藏柜，可可和香料摆上干燥的架子，先前的存货留在前排。签好的单据被放进罗宾的账本。<</if>>
+  <</language>>
+  <br><br><span class='gold'><<lanSwitch 'Three ingredient crates are ready. Paid from the shop account: ' '三箱新品原料已经备好。从店铺账目支付：'>><<printmoney `$RobinExpansion.shop_receipt.price * 100`>></span><br><br>
 <<else>>
-  <<lanSwitch 'There is no order to place today.' '今天没有需要补的货。'>>
+  <<lanSwitch 'The order could not be completed. No payment was taken and no new ingredients were stocked.' '这次补货没能办成，没有扣款，也没有新原料入库。'>><br><br>
 <</if>>
-<br><br><<getouticon>><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
+
+<<getouticon>><<lanLink ['Return inside the shop', '返回店内'] 'Deadwood Robin Shop'>><</lanLink>>
 
 :: Deadwood Robin Shop Buy Classic Lemonade
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>>

@@ -2,10 +2,10 @@
 <!-- 营救后的课前、午休或放学时开放，原版强制事件先行，交谈留足十分钟。 -->
 <<widget 'deadwood-whitney-aftercare-ready'>><<silently>>
   <<set _whitneyAftercareReady to !!$WhitneyExpansion?.rescued and $whitneyReunionScene is undefined
-    and ['active', 'rescued'].includes(C.npc.Whitney.state) and Time.schoolDay
+    and ['active', 'rescued'].includes(C.npc.Whitney.state) and Time.schoolDay and !isInPark('whitney')
     and ['morning', 'lunch', 'afternoon'].includes($schoolstate) and $location is 'school' and $outside is 1
     and Time.hour * 60 + Time.minute lt ($schoolstate is 'morning' ? 9 * 60 : $schoolstate is 'lunch' ? 13 * 60 : 17 * 60) - (_args[0] ? 0 : 10)
-    and $exposed lte 0 and $WhitneyExpansion.aftercare_day isnot Time.days
+    and $exposed lte 0 and (_args[0] is 'answer' ? $WhitneyExpansion.aftercare_day is Time.days : $WhitneyExpansion.aftercare_day isnot Time.days)
     and !$nextPassage and !$nextPassageCheck and !$combat and !$statFreeze and !$replayScene and !$frozenValues and !$eventforced>>
 <</silently>><</widget>>
 
@@ -139,8 +139,13 @@
   <<set _aftercareReturning to $WhitneyExpansion.aftercare_day gte 0>>
   <<pass 10>><<schooleffects>>
   <<deadwood-whitney-aftercare-ready true>>
-  <<if !_whitneyAftercareReady or $passage isnot 'Deadwood Whitney Aftercare'>><<exit>><</if>>
+  <<if $passage isnot 'Deadwood Whitney Aftercare'>><<exit>><</if>>
+  <<if !_whitneyAftercareReady>>
+    <<lanSwitch 'Whitney heads off before you can finish talking.' '还没聊完，惠特尼便走开了。'>><br><br>
+    <<getouticon>><<lanLink ['Return to the front courtyard', '返回前庭'] 'School Front Courtyard'>><</lanLink>><<exit>>
+  <</if>>
   <<set $WhitneyExpansion.aftercare_day to Time.days>>
+  <<set $phase to 'whitney-aftercare-open'>>
   <<npc Whitney>><<person1>>
   <<language>>
     <<option 'EN'>>
@@ -160,6 +165,11 @@
       <<else>>
         "What're you staring at?" <<He>> looks you up and down.
       <</if>>
+      <<if $schoolstate is 'afternoon' and $daily.whitney.ball is 'play'>>
+        <<He>> nudges your shoe with <<his>>. "You left before the good bit. We won, by the way."
+      <<elseif $schoolstate is 'afternoon' and $daily.whitney.ball is 'score'>>
+        "There's our fucking referee." Whitney grins. "Still owe me a point."
+      <</if>>
     <<option 'CN'>>
       <<if _aftercareReturning>>
         惠特尼和朋友们站在校门边，挤在一部手机前。有人笑出声，<<he>>把手机推开，看向了你。
@@ -177,23 +187,34 @@
       <<else>>
         “看什么看？”<<He>>把你从头到脚打量了一遍。
       <</if>>
+      <<if $schoolstate is 'afternoon' and $daily.whitney.ball is 'play'>>
+        <<He>>用鞋尖碰了碰你的鞋。“走那么早，后面的都没看见。我们赢了。”
+      <<elseif $schoolstate is 'afternoon' and $daily.whitney.ball is 'score'>>
+        “哟，我们的裁判来了。”惠特尼咧嘴笑了。“还欠我一分呢。”
+      <</if>>
   <</language>><br><br>
-  <<socialiseicon>><<lanLink ['Ask Whitney how their day is going', '问惠特尼今天怎么样'] 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'whitney-aftercare-space'>><</lanLink>><br>
+  <<socialiseicon>><<lanLink ['Ask Whitney how their day is going', '问惠特尼今天怎么样'] 'Deadwood Whitney Aftercare Answer'>>
+    <<if $passage is 'Deadwood Whitney Aftercare' and $phase is 'whitney-aftercare-open'>><<set $phase to 'whitney-aftercare-space'>><</if>>
+  <</lanLink>><br>
   <<if isLoveInterest('Whitney')>>
-    <<loveicon>><<lanLink ['Walk with Whitney for a while', '陪惠特尼走一段'] 'Deadwood Whitney Aftercare Answer'>><<set $phase to 'whitney-aftercare-walk'>><</lanLink>><br>
+    <<loveicon>><<lanLink ['Walk with Whitney for a while', '陪惠特尼走一段'] 'Deadwood Whitney Aftercare Answer'>>
+      <<if $passage is 'Deadwood Whitney Aftercare' and $phase is 'whitney-aftercare-open'>><<set $phase to 'whitney-aftercare-walk'>><</if>>
+    <</lanLink>><br>
   <</if>>
 <</if>>
 <br><br><<getouticon>><<lanLink ['Return to the front courtyard', '返回前庭'] 'School Front Courtyard'>><</lanLink>>
 
 :: Deadwood Whitney Aftercare Answer
+<<set $_aftercareChoice to ['whitney-aftercare-space', 'whitney-aftercare-walk'].includes($phase) ? $phase : null>>
+<<if $_aftercareChoice>><<unset $phase>><</if>>
 <<set $outside to 1>><<set $location to 'school'>><<schooleffects>><<effects>>
-<<if !['whitney-aftercare-space', 'whitney-aftercare-walk'].includes($phase)
-  or !$WhitneyExpansion.rescued or !['active', 'rescued'].includes(C.npc.Whitney.state)
-  or ($phase is 'whitney-aftercare-walk' and !isLoveInterest('Whitney'))>>
+<<deadwood-whitney-aftercare-ready 'answer'>>
+<<if !$_aftercareChoice or !_whitneyAftercareReady
+  or ($_aftercareChoice is 'whitney-aftercare-walk' and !isLoveInterest('Whitney'))>>
   <span class='blue'><i><<lanSwitch 'There is nothing more to do here.' '这里已经没有别的事可做。'>></i></span>
 <<else>>
   <<npc Whitney>><<person1>>
-  <<if $phase is 'whitney-aftercare-walk' and isLoveInterest('Whitney')>>
+  <<if $_aftercareChoice is 'whitney-aftercare-walk' and isLoveInterest('Whitney')>>
     <<language>>
       <<option 'EN'>>
         You walk beside Whitney towards the doors. <<He>> hooks an arm around your shoulders, steering you past the other students. "Keep up, <<bitch>>." When someone steps into your path, <<he>> tells them to move.
@@ -204,7 +225,12 @@
   <<else>>
     <<language>>
       <<option 'EN'>>
-        <<if isLoveInterest('Whitney')>>
+        <<if $schoolstate is 'afternoon' and $daily.whitney.ball is 'play'>>
+          You ask how the game finished. "How d'you think? Guess who scored." Whitney taps <<his>> own chest, grinning. "Next time, try to keep up."
+          <<if isLoveInterest('Whitney')>><<He>> hooks a finger into your sleeve as you turn towards the doors.<</if>>
+        <<elseif $schoolstate is 'afternoon' and $daily.whitney.ball is 'score'>>
+          You remind Whitney that the ball went outside the bags. "Thought you were on my side." <<He>> laughs when you refuse to change the score. "Fine. I'll make you play next time."
+        <<elseif isLoveInterest('Whitney')>>
           "Same old shit." Whitney leans against the gate beside you. "You got somewhere to be?" <<He>> catches your sleeve again when you move.
         <<elseif C.npc.Whitney.love gte 20>>
           "I'm here, aren't I?" Whitney kicks a stone away from the gate. "Go on. Don't just stand there." <<He>> waits until you start towards the doors before following.
@@ -212,7 +238,12 @@
           "None of your business, <<bitch>>." Whitney shoves your shoulder, then heads inside without looking back.
         <</if>>
       <<option 'CN'>>
-        <<if isLoveInterest('Whitney')>>
+        <<if $schoolstate is 'afternoon' and $daily.whitney.ball is 'play'>>
+          你问球局后来怎么样了。“还能怎样？猜猜谁进的球？”惠特尼咧嘴笑着，拍了拍自己的胸口。“下次跟紧点。”
+          <<if isLoveInterest('Whitney')>>你转向教学楼时，<<he>>用手指勾住了你的衣袖。<</if>>
+        <<elseif $schoolstate is 'afternoon' and $daily.whitney.ball is 'score'>>
+          你提醒惠特尼，那球是从书包外面滚过去的。“还以为你站我这边。”你不肯改分，<<he>>反倒笑了。“行。下次让你上场踢。”
+        <<elseif isLoveInterest('Whitney')>>
           “还不是那些破事。”惠特尼靠在你身旁的校门上。“你急着去哪儿？”你一动，<<he>>又攥住了你的袖子。
         <<elseif C.npc.Whitney.love gte 20>>
           “这不是好好站着吗？”惠特尼踢开校门边的一颗石子。“走啊。站着干吗？”你开始往教学楼走，<<he>>才跟上。
@@ -222,7 +253,6 @@
     <</language>>
     <<npcincr Whitney love 1>><<glove>>
   <</if>>
-  <<unset $phase>>
 <</if>>
 <br><br>
 <<getinicon>><<lanLink ['Enter the school', '进入学校'] 'Hallways'>><</lanLink>>
