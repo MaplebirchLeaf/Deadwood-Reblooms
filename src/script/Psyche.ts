@@ -87,7 +87,7 @@ export default function Psyche(maplebirch: typeof window.maplebirch): void {
         {
           // 现实状态恢复后只结算一次余悸，普通噩梦不扣超自然理智。
           src: '<<unset $activeNightmare>>',
-          applyafter: '<<dread 120>>',
+          applyafter: '<<dread `maplebirch.get("LostLamb")?.reward ? 90 : 120`>>',
           expected: 1
         }
       ],

@@ -168,24 +168,6 @@ class Achievements {
         break;
       }
       case 'StreetLife': {
-        // 安静进入银行还不算完成，须成功分账结案且从未报警或被认出。
-        maplebirch.dynamic.regStateEvent('append', 'street-life-quiet-heist-feat', {
-          output: 'earnFeat "Deadwood Quiet Heist"',
-          cond: () => {
-            const heist = V.StreetLife?.heist;
-            return (
-              V.feats?.currentSave['Deadwood Quiet Heist'] === undefined &&
-              heist?.stage === 'closed' &&
-              heist.settled &&
-              heist.outcome === 'success' &&
-              heist.entered &&
-              heist.approach === 'quiet' &&
-              !heist.raisedAlarm &&
-              !heist.identified
-            );
-          }
-        });
-
         maplebirch.dynamic.regStateEvent('append', 'street-life-first-bounty-feat', {
           output: 'earnFeat "Deadwood First Bounty"',
           cond: () => V.feats?.currentSave['Deadwood First Bounty'] === undefined && (V.StreetLife?.bounties?.completed ?? 0) >= 1

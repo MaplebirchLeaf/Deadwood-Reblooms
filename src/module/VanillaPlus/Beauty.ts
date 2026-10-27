@@ -11,7 +11,7 @@ class Beauty {
 
   private get unadorned(): boolean {
     const makeup = V.makeup ?? {};
-    return !makeup.lipstick && !makeup.eyeshadow && !makeup.mascara && !makeup.blusher && !makeup.browscolour && !makeup.concealer && !makeup.eyelenses?.left && !makeup.eyelenses?.right;
+    return !makeup.lipstick && !makeup.eyeshadow && !makeup.mascara && !makeup.blusher && !makeup.concealer && !makeup.eyelenses?.left && !makeup.eyelenses?.right;
   }
 
   public get alluring(): boolean {

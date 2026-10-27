@@ -3,6 +3,7 @@
 import Cheats from './DeadwoodReblooms/Cheats';
 import Tips from './DeadwoodReblooms/Tips';
 import Traits from './DeadwoodReblooms/Traits';
+import Science from './DeadwoodReblooms/Science';
 import antiquesData from '../assets/antiques.json';
 import type { MaplebirchCore } from '@scml-dol-maplebirch/types';
 
@@ -12,6 +13,7 @@ export default function (maplebirch: MaplebirchCore) {
   Cheats(maplebirch);
   Tips(maplebirch);
   Traits(maplebirch);
+  Science(maplebirch);
 
   maplebirch.tool.onInit('deadwood-forest-outfits-init');
   maplebirch.tool.addTo('State', 'deadwood-forest-outfits-state');

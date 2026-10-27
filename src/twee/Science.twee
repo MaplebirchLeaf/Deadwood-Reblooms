@@ -1,0 +1,69 @@
+:: Deadwood Science Widgets [widget]
+
+<!-- 已经裸体时改写开场与动作名称，后续阶段及数值结算沿用原版。 -->
+<<widget 'deadwood-science-already-undressed'>>
+  <<if $delinquency lt 400>>
+    <<language>>
+      <<option 'EN'>>
+        Sirris glances at you, then looks back at the board. "Please take your seat. We'll use the diagram for this part."
+      <<option 'CN'>>
+        西里斯看了你一眼，随即转向黑板。“请回座位吧。这一部分我们看示意图。”
+    <</language>><<gstress>><<gtrauma>><br><br>
+    <<lanLink ['Sit back down', '回座位'] 'Science Lesson'>><<stress 1>><<trauma 1>><<endevent>><</lanLink>><br>
+    <<if hasSexStat('exhibitionism', 5)>>
+      <<lanLink ['Stay at the front', '留在讲台前'] 'Deadwood Science Demonstration'>>
+        <<strip>><<schoolrep_naked>><<set $phase to 5, $scienceprogression to 2>><<scienceskill>>
+      <</lanLink>><<gscience>><<exhibitionist5>><br>
+    <</if>>
+  <<else>>
+    <<set _scienceNudePhase to $scienceprogression gte 4 and $delinquency gte 1000 ? 4 : $scienceprogression gte 3 and $delinquency gte 600 ? 3 : 2>>
+    <<language>>
+      <<option 'EN'>>
+        Sirris glances at you, then turns to the class. "Quiet, please. We're ready to continue this part of the lesson."
+      <<option 'CN'>>
+        西里斯看了你一眼，转向全班。“请安静。我们可以继续这一部分的课程了。”
+    <</language>><br><br>
+    <<lanLink ['Refuse', '拒绝'] 'Science Refusal'>><<set $phase to 0>><<detention 1>><</lanLink>><<gdelinquency>><br>
+    <<lanLink ['Continue with the lesson', '继续配合课程'] 'Deadwood Science Demonstration'>>
+      <<strip>><<schoolrep_naked>><<set $phase to _scienceNudePhase>><<npcincr Sirris dom 1>><<scienceskill>>
+      <<if _scienceNudePhase is 3>><<set $scienceprogression to 4>>
+      <<elseif _scienceNudePhase is 2>><<set $scienceprogression to $scienceprogression gte 2 ? 3 : 2>><</if>>
+      <<if $uncomfortable.nude is false>>
+        <<arousal `$scienceprogression is 2 ? 300 : 600`>>
+        <<if $scienceprogression is 2>><<stress 1>><</if>>
+      <<else>>
+        <<stress 1>><<if $scienceprogression is 2>><<trauma 1>><</if>>
+      <</if>>
+    <</lanLink>><<gscience>>
+    <<if $uncomfortable.nude is false>><<garousal>>
+    <<else>><<gstress>><<if $scienceprogression lt 2>><<gtrauma>><</if>><</if>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-science-return'>>
+  <<person1>><<language>>
+    <<option 'EN'>>
+      Sirris finishes <<his>> demonstration. "Thank you for your help. You can take your seat." You return to your classmates.
+    <<option 'CN'>>
+      西里斯结束了<<his>>的演示。“感谢你的协助，你可以回座位上了。”你坐回同学之间。
+  <</language>>
+<</widget>>
+
+<<widget 'deadwood-science-refusal'>>
+  <<language>>
+    <<option 'EN'>>
+      This is going too far. You do your best to ignore the disappointed heckling from the class and walk back to your seat. Sirris doesn't say anything, but refusing a teacher won't reflect well on you.
+    <<option 'CN'>>
+      这太过火了。你尽量不去理会班上失望的起哄声，走回座位。西里斯什么都没说，但是拒绝老师显然不会留下好印象。
+  <</language>>
+<</widget>>
+
+<!-- 页面名保留衣着上下文，刷新和读档时不另存场景标记。 -->
+:: Deadwood Science Demonstration
+<<include 'Science Undress'>>
+
+:: Deadwood Science Desk
+<<include 'Science Undress Desk'>>
+
+:: Deadwood Science Refusal
+<<include 'Science Refusal'>>

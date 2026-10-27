@@ -241,6 +241,11 @@
   <<switch $_heistOutcome>>
     <<case 'success'>>
       <<money $_heistPayout 'pubStolenGoods'>>
+      <<set $_heistCampaign to _heistWork.state.campaign>>
+      <<if $_heistCampaign and $_heistCampaign.dock.stage is 6 and $_heistCampaign.reception.stage is 6 and $_heistCampaign.gold.proceeds gt 0>>
+        <<earnFeat 'Deadwood Heist Closed'>>
+        <<if _heistWork.state.approach is 'quiet' and !_heistWork.state.raisedAlarm and !_heistWork.state.identified>><<earnFeat 'Deadwood Quiet Heist'>><</if>>
+      <</if>>
       <<if !_heistWork.state.campaign or _heistWork.state.campaign.gold.proceeds gt 0>>
         <<npcincr Landry love _heistWork.terms.favour.landrySuccess>>
         <<npcincr Wren love _heistWork.terms.favour.wrenSuccess>>

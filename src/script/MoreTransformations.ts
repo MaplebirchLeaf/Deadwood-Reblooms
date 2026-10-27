@@ -106,7 +106,7 @@ export default function MoreTransformations(maplebirch: typeof window.maplebirch
           expected: 1
         },
         {
-          srcmatch: /<<tentacle_record "banish" [^>\r\n]+ \* _multi>>\s*<<tentacleadvdisable _tentacle>>/,
+          srcmatch: /<<tentacle_record "banish" [^>\r\n]+ \* _multi`?>>\s*<<tentacleadvdisable _tentacle>>/,
           applyafter: '<<if $angelBanish lt _foxfireUses>><<deadwood-foxfire _tentacle `_foxfireHealth - _tentacle.tentaclehealth`>><</if>>',
           expected: 1
         }

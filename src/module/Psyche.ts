@@ -68,15 +68,32 @@ export default class Psyche extends Module {
     return this.free && this.intensity >= 400 && Time.date.timeStamp >= this.state.cooldown_until;
   }
 
-  public get modifier(): number {
+  private get ascended(): boolean {
+    return Boolean(this.core.get('Finance')?.company.ascension.active);
+  }
+
+  /** 三位一体减轻四分之一，飞升减半，取较强一项而不叠加。 */
+  private get resistance(): number {
+    if (this.ascended) return 0.5;
+    return this.core.get('VanillaPlus')?.divineTransformations.trinity ? 0.75 : 1;
+  }
+
+  private get sensitivity(): number {
     return 1.25 - (this.state.sanity + 500) / 3000;
   }
 
-  /** 恐惧为正，入迷为负，事件影响按当时理智缩放后相互抵消。 */
+  public get modifier(): number {
+    return this.sensitivity * this.resistance;
+  }
+
+  /** 先按当时理智抵消已有心绪，抗性只减轻新增负担，不削弱平复与恢复。 */
   public change(sanity = 0, mood = 0): void {
     if (!this.active || !Number.isFinite(sanity) || !Number.isFinite(mood)) return;
-    this.state.mood = Math.clamp(this.state.mood + mood * this.modifier, -1000, 1000);
-    this.state.sanity = Math.clamp(this.state.sanity + sanity, -500, 1000);
+    const resistance = this.resistance;
+    const incoming = mood * this.sensitivity;
+    const cancelled = this.state.mood * incoming < 0 ? Math.min(this.intensity, Math.abs(incoming)) : 0;
+    this.state.mood = Math.clamp(this.state.mood + Math.sign(incoming) * (cancelled + (Math.abs(incoming) - cancelled) * resistance), -1000, 1000);
+    this.state.sanity = Math.clamp(this.state.sanity + sanity * (sanity < 0 ? resistance : 1), -500, 1000);
   }
 
   /** 日限额按基础点计入，高位恢复减半。心绪只向零平复，不占额度。 */
@@ -87,7 +104,7 @@ export default class Psyche extends Module {
     if (recovery.day !== day) Object.assign(recovery, { day, spent: 0 });
     const low = Math.max(0, 600 - this.state.sanity);
     const capacity = Math.max(0, low + 2 * (1000 - Math.max(600, this.state.sanity)));
-    const base = Math.min(sanity, Math.max(0, 30 - recovery.spent), capacity);
+    const base = Math.min(sanity, Math.max(0, (this.ascended ? 60 : 30) - recovery.spent), capacity);
     recovery.spent += base;
     this.change(Math.min(base, low) + Math.max(0, base - low) * 0.5);
     this.state.mood -= Math.sign(this.state.mood) * Math.min(this.intensity, Math.max(0, -mood));

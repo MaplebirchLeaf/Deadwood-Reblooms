@@ -38,8 +38,8 @@ export default function (maplebirch: typeof window.maplebirch) {
           expected: 1
         },
         {
-          srcmatch: /<<set _tentacle\.tentaclehealth -= 10 \* _multi>><<tentacle_record "banish" 10 \* _multi>>/g,
-          to: '<<set _tentacle.tentaclehealth -= _banishDamage * _multi>><<tentacle_record "banish" _banishDamage * _multi>>',
+          srcmatch: /<<set _tentacle\.tentaclehealth -= 10 \* _multi>><<tentacle_record "banish" `?10 \* _multi`?>>/g,
+          to: '<<set _tentacle.tentaclehealth -= _banishDamage * _multi>><<tentacle_record "banish" `_banishDamage * _multi`>>',
           expected: 2
         }
       ]

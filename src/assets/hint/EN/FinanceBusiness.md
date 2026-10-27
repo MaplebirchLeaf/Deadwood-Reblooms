@@ -143,7 +143,8 @@ Speak to Avery and Harper before entering the lift, then settle the terms with R
 With the real stones and a successful ending, you change alongside Avery in **the same ceremony**, receiving the fourth-seat title **Night Raven** and the **Ascended** trait. The counterfeit-stone failure grants neither. There is no second ceremony to obtain them afterwards.
 
 - Ascended prevents the daily trauma increase from the elk scar. The scar remains, and other sources of trauma retain their effects.
-- As time actually passes, stress falls by an additional **60 points per hour** and fatigue by **15 points per hour**. Short actions receive proportional recovery.
+- Each hour, stress falls by an additional **0.5% of its maximum** and fatigue by **1% of its maximum**. Short actions receive recovery in proportion to the time spent.
+- With Psyche enabled, sanity loss and new dread or fascination are halved, and the daily base sanity recovery allowance rises to **60 points**.
 - The scar's effects on awareness and purity remain, as do the native consequences for world corruption and Gwylan.
 
 After recognition, arrange private conversations through the office-building lobby on weekdays. Avery meets in person, while Harper and Remy speak by telephone. One conversation is available per day and takes fifteen minutes. Selling shares does not remove the title or trait. Neither exempts the business from unpaid wages, office rent or supply-agreement conditions. Penthouse accommodation and company voting rights retain their own share requirements. You may also tell Jordan about the tower, or discuss the change during Gwylan's existing scar conversation.

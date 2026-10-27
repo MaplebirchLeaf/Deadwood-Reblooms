@@ -34,9 +34,15 @@ Sleep, rest, company and calming medication bring your current state towards cal
 
 Calming tablets from the hospital pharmacy settle 200 points, halved at higher tolerance. Another dose while the effect is active does not stack. Dr Harper's prescription in the medicine drawer settles 100 points, while the asylum's prescription settles 200. DoLX anti-anxiety tablets settle 150. Watch for the medication's side effects as well.
 
+## Transformations and resolve
+
+Trinity reduces sanity loss and new dread or fascination by 25%, while Ascended reduces them by 50%. Only the strongest reduction applies.
+
+Opposing experiences counteract your current state at their usual strength. Resistance applies to what builds up after crossing calm. Restoring sanity and settling your thoughts retain their usual effects.
+
 ## Restoring sanity
 
-Routine activities share a **daily allowance of 30 base recovery points**. Recovery above 600 sanity is halved, up to a maximum of 1000 sanity. Settling your thoughts does not use the allowance and still works when it runs out.
+Routine activities share a **daily allowance of 30 base recovery points**. Ascended raises this allowance to **60 points**. Recovery above 600 sanity is halved, up to a maximum of 1000 sanity. Settling your thoughts does not use the allowance and still works when it runs out.
 
 | Activity                                         | Base sanity recovery | Points settled |
 | ------------------------------------------------ | -------------------- | -------------- |

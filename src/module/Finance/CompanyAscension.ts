@@ -61,7 +61,8 @@ export default class CompanyAscension {
       cond: data => !!V.Finance?.company && this.active && !V.replayScene && !V.statFreeze && (data.passed ?? 0) > 0,
       action: data => {
         const hours = (data.passed ?? 0) / 3600;
-        core.SugarCube.Wikifier.wikifyEval(`<<stress ${-60 * hours} 1>><<tiredness ${-0.75 * hours}>>`);
+        // 原版疲劳负值每点恢复20，百分比按两项各自上限计算。
+        core.SugarCube.Wikifier.wikifyEval(`<<stress ${-V.stressmax * 0.005 * hours} 1>><<tiredness ${(-C.tiredness.max * 0.01 * hours) / 20}>>`);
       }
     });
   }
