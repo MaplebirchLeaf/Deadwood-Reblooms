@@ -2,17 +2,18 @@
 
 <<widget 'deadwood-psyche-cheats-content'>>
   <<if !maplebirch.get('Psyche') or !$Psyche>><<exit>><</if>>
-  <span class='gold'><<lanSwitch 'Sanity and fear' '理智与恐惧'>></span><br>
+  <span class='gold'><<lanSwitch 'Psyche' '心智'>></span><br>
   <<numberStepper `lanSwitch('Sanity', '理智')` $Psyche.sanity {
     activeButtons:['single', 'double', 'minMax'], step:10, min:-500, max:1000, percentage:false,
     callback:value => {
       if (maplebirch.get('Psyche') && V.Psyche && Number.isFinite(value)) V.Psyche.sanity = Math.clamp(value, -500, 1000);
     }
   }>>
-  <<numberStepper `lanSwitch('Fear', '恐惧')` $Psyche.fear {
-    activeButtons:['single', 'double', 'minMax'], step:10, min:0, max:1000, percentage:false, reverse:true,
+  <<numberStepper `lanSwitch('Dread / Fascination', '恐惧 / 入迷')` $Psyche.mood {
+    activeButtons:['single', 'double', 'minMax'], step:10, min:-1000, max:1000, percentage:false, reverse:true,
     callback:value => {
-      if (maplebirch.get('Psyche') && V.Psyche && Number.isFinite(value)) V.Psyche.fear = Math.clamp(value, 0, 1000);
+      if (maplebirch.get('Psyche') && V.Psyche && Number.isFinite(value)) V.Psyche.mood = Math.clamp(value, -1000, 1000);
     }
   }>>
+  <<note `lanSwitch('Positive values indicate dread, negative values fascination. Zero is calm.', '正数表示恐惧，负数表示入迷，0为平静。')`>>
 <</widget>>

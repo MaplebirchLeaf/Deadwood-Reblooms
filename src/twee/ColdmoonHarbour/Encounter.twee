@@ -56,10 +56,10 @@
           <<pass 10>><<deadwood-harbour-context>>
           <<if _harbourNight and _harbour.event is 'lucid' and !_harbour.spoke and !$nextPassage and !$nextPassageCheck>>
             <<set _harbour.spoke to true, _harbour.scene to 'sailor_deep'>>
-            <<run maplebirch.get('Psyche')?.change(-100, 150)>>
+            <<dread 150>><<sanity -100>>
           <</if>>
         <</if>>
-      <</lanLink>><<llsanity>><<ggfear>><br>
+      <</lanLink>><<llsanity>><<ggdread>><br>
     <</if>>
   <<else>>
     <<set $skulduggerydifficulty to 400>>
@@ -68,17 +68,26 @@
       <<if _harbourNight and !$nextPassage and !$nextPassageCheck>>
         <<set $skulduggerydifficulty to 400>><<skulduggerycheck 'silent'>><<skulduggeryuse>>
         <<set _harbour.scene to $skulduggerysuccess is 1 ? 'evaded' : 'caught'>>
-        <<if $skulduggerysuccess is 1>><<set _harbour.event to ''>><<run maplebirch.get('Psyche')?.change(0, -100)>><</if>>
+        <<if $skulduggerysuccess is 1>><<set _harbour.event to ''>><<psyche-rest 0 100>><</if>>
       <</if>>
     <</lanLink>><<skulduggerydifficulty>><br>
-    <<runicon>><<lanLink ['Run for the harbour steps (0:02)', '跑向港湾石阶 (0:02)'] 'Deadwood Coldmoon Harbour Fight'>>
-      <<pass 2>><<deadwood-harbour-context>>
-      <<if _harbourNight and !$nextPassage and !$nextPassageCheck>>
-        <<athletics 1>>
-        <<set _harbour.scene to currentSkillValue('athletics') gte random(200, 700) ? 'escaped' : 'caught'>>
-        <<if _harbour.scene is 'escaped'>><<set _harbour.event to ''>><<run maplebirch.get('Psyche')?.change(0, -100)>><</if>>
+    <<set _harbourEscapeMinimum to Math.ceil(200 * (maplebirch.get('Psyche')?.escape ?? 1)), _harbourEscapeMaximum to Math.ceil(700 * (maplebirch.get('Psyche')?.escape ?? 1))>>
+    <<set _harbourEscapeOrigin to $passage, _harbourEscapeEvent to _harbour.event>>
+    <<capture _harbourEscapeMinimum _harbourEscapeMaximum _harbourEscapeOrigin _harbourEscapeEvent>>
+    <<runicon>><<lanLink ['Run for the harbour steps (0:02)', '跑向港湾石阶 (0:02)']>>
+      <<if maplebirch.get('MoreTransformations') and Time.isBloodMoon() and $location is 'sea' and $sublocation is 'seadocks' and $passage is _harbourEscapeOrigin and $MoreTransformations.harbour.event is _harbourEscapeEvent
+          and !$combat and !$possessed and !$eventforced and !$replayScene and !$statFreeze and !$frozenValues and !$nextPassage and !$nextPassageCheck>>
+        <<pass 2>><<deadwood-harbour-context>>
+        <<if _harbourNight and $location is 'sea' and $sublocation is 'seadocks' and $passage is _harbourEscapeOrigin and _harbour.event is _harbourEscapeEvent and !$combat and !$possessed and !$eventforced
+            and !$replayScene and !$statFreeze and !$frozenValues and !$nextPassage and !$nextPassageCheck>>
+          <<athletics 1>>
+          <<set _harbour.scene to currentSkillValue('athletics') gte random(_harbourEscapeMinimum, _harbourEscapeMaximum) ? 'escaped' : 'caught'>>
+          <<if _harbour.scene is 'escaped'>><<set _harbour.event to ''>><<psyche-rest 0 100>><</if>>
+          <<goto 'Deadwood Coldmoon Harbour Fight'>>
+        <<elseif $passage is _harbourEscapeOrigin and $location is 'sea' and $sublocation is 'seadocks'>><<goto _harbourEscapeOrigin>><</if>>
       <</if>>
-    <</lanLink>><<athleticsdifficulty 200 700>><br>
+    <</lanLink>><<athleticsdifficulty _harbourEscapeMinimum _harbourEscapeMaximum>><<if _harbourEscapeMinimum lt 200>><<note `lanSwitch('Your fear urges you onwards.', '恐惧催着你迈开脚步。')`>><</if>><br>
+    <</capture>>
     <<icon 'alert.png'>><<lanLink ['Stand your ground', '留下来反抗'] 'Deadwood Coldmoon Harbour Fight'>><</lanLink>><br>
   <</if>>
 <</if>>

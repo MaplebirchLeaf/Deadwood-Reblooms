@@ -1,23 +1,35 @@
 /** 遭遇与噩梦沿用原版结算，完整休息与药柜复用原有入口。 */
 export default function Psyche(maplebirch: typeof window.maplebirch): void {
   const psyche = maplebirch.get('Psyche');
-  if (!psyche) return;
   const { macro } = maplebirch.tool;
+  macro.define('sanity', (amount: number = 0) => psyche?.change(amount));
+  for (const [name, direction] of [
+    ['dread', 1],
+    ['fascination', -1]
+  ] as const) {
+    macro.define(name, (amount: number = 0) => {
+      if (amount > 0) psyche?.change(0, amount * direction);
+      else if (amount < 0 && psyche?.active && psyche.state.mood * direction > 0) psyche.rest(0, amount);
+    });
+  }
+  macro.define('psyche-rest', (sanity: number = 0, relief: number = 0) => psyche?.rest(sanity, -relief));
   // 与原版相同，重复符号只表示提示幅度，不承担属性结算。
-  for (const stat of ['sanity', 'fear'] as const) {
+  for (const stat of ['sanity', 'dread', 'fascination'] as const) {
     for (const amount of [-3, -2, -1, 1, 2, 3]) {
       macro.create(`${(amount < 0 ? 'l' : 'g').repeat(Math.abs(amount))}${stat}`, (show = true) =>
         macro.statChange(
-          stat === 'sanity' ? lanSwitch('Sanity', '理智') : lanSwitch('Fear', '恐惧'),
+          stat === 'sanity' ? lanSwitch('Sanity', '理智') : stat === 'dread' ? lanSwitch('Dread', '恐惧') : lanSwitch('Fascination', '入迷'),
           amount,
           amount > 0 === (stat === 'sanity') ? 'green' : 'red',
-          () => psyche.active && Boolean(show)
+          () => !!psyche?.active && Boolean(show)
         )
       );
     }
   }
+  if (!psyche) return;
   maplebirch.tool.addTo('DegreesBox', 'psyche-attribute');
   maplebirch.tool.addTo('DegreesBonusDisplay', 'psyche-willpower');
+  maplebirch.tool.addTo('SubjectBoxBonusDisplay', 'psyche-subjects');
   maplebirch.tool.addTo('StatusBar', 'psyche-status');
   maplebirch.tool.addTo('MobileStats', 'psyche-mobile-status');
   maplebirch.tool.addTo('Statistics', 'psyche-statistics');
@@ -25,7 +37,7 @@ export default function Psyche(maplebirch: typeof window.maplebirch): void {
   maplebirch.once(':storyready', () => {
     for (const pill of setup.pills) {
       if (!['harper', 'asylum'].includes(pill.type)) continue;
-      pill.effects.push(`<<run maplebirch.get("Psyche")?.change(0, ${pill.type === 'asylum' ? -200 : -100})>>`);
+      pill.effects.push(`<<psyche-rest 0 ${pill.type === 'asylum' ? 200 : 100}>>`);
     }
   });
   const passages = [
@@ -58,24 +70,24 @@ export default function Psyche(maplebirch: typeof window.maplebirch): void {
         {
           // 只有完整睡过一小时才恢复，保留中途惊醒与噩梦结算。
           src: '<<set Weather.BodyTemperature.addActivity("sleep")>>',
-          applyafter: '<<run maplebirch.get("Psyche")?.rest(1, -80)>>',
+          applyafter: '<<psyche-sleep>>',
           expected: 1
         },
-        { src: '<<set $wraith.nightmare to 2>>', applyafter: '<<run maplebirch.get("Psyche")?.change(-30, 200)>>', expected: 1 }
+        { src: '<<set $wraith.nightmare to 2>>', applyafter: '<<dread 200>><<sanity -30>>', expected: 1 }
       ],
       'Widgets Temple': [
         {
           // 只在原版救赎祈祷的一小时实际结束后结算，独自或与悉尼祈祷共用。
           src: '<<pass 60>><<set $phase to 2>>',
-          applyafter: '<<run maplebirch.get("Psyche")?.rest(10, -100)>>',
+          applyafter: '<<psyche-rest 10 100>>',
           expected: 1
         }
       ],
       'Widgets Nightmares': [
         {
-          // 现实状态恢复后只结算一次醒后的余悸，梦中演绎不会改动现实理智。
+          // 现实状态恢复后只结算一次余悸，普通噩梦不扣超自然理智。
           src: '<<unset $activeNightmare>>',
-          applyafter: '<<run maplebirch.get("Psyche")?.change(-10, 120)>>',
+          applyafter: '<<dread 120>>',
           expected: 1
         }
       ],
@@ -93,7 +105,7 @@ export default function Psyche(maplebirch: typeof window.maplebirch): void {
         {
           // 沿用原版每日阅读角次数和二十分钟耗时，手工的原版治疗仍独立结算。
           src: '<<set $phase to "write">><<pass 20>>',
-          applyafter: '<<run maplebirch.get("Psyche")?.rest(5, -60)>>',
+          applyafter: '<<psyche-rest 5 60>>',
           expected: 1
         }
       ]

@@ -7,10 +7,8 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
     if (rule.applybefore?.includes('Math.round($enemyarousal)')) rule.expected = 17;
   }
   if (maplebirch.get('Psyche')) {
-    // DoLX 在天气活动后才推进一小时，恢复移到实际睡满后，跨午夜按新的一天计入额度。
-    const recovery = zone.widgetPassage['Widgets Sleep']?.find(
-      rule => rule.src === '<<set Weather.BodyTemperature.addActivity("sleep")>>' && rule.applyafter?.includes('maplebirch.get("Psyche")?.rest(')
-    );
+    // DoLX 在天气活动后才推进一小时，恢复移到实际睡满后，按完成时所在的游戏日计入额度。
+    const recovery = zone.widgetPassage['Widgets Sleep']?.find(rule => rule.src === '<<set Weather.BodyTemperature.addActivity("sleep")>>' && rule.applyafter === '<<psyche-sleep>>');
     if (recovery && maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Sleep')?.content.includes('<<set $sleepTimePassing to false>>')) {
       recovery.src = '<<set $sleepTimePassing to false>>';
     }

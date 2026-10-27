@@ -51,7 +51,7 @@ export default function Tips(core: typeof maplebirch): void {
     add(
       'general',
       ['A clear head makes studying easier. Some strange encounters can unsettle your mind.', '头脑清醒时，学习也更轻松。有些怪事却会动摇你的理智。'],
-      ['Fear can weaken your willpower. Catch your breath in your bedroom or at the temple.', '害怕时，意志也会动摇。回卧室或去神殿缓一缓。'],
+      ['Dread and fascination can distract you. Take a quiet moment in your bedroom or at the temple.', '恐惧与入迷都会让你分神。回卧室或去神殿定定神。'],
       ['Sleep, prayer and a little writing can help restore your sanity.', '睡上一觉、做些祈祷，或写写东西，都能帮你恢复理智。']
     );
 

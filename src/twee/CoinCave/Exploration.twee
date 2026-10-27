@@ -118,7 +118,8 @@
           <<if maplebirch.get('Psyche').state.sanity gte 600>>
             <<investigateicon>><<lanLink ['Read carefully and compare the camp (0:20)', '对照营地仔细读一遍 (0:20)'] 'Deadwood Coin Cave'>><<deadwood-coin-read 'journal' 'careful'>><</lanLink>><<if maplebirch.get('Psyche').state.sanity lt 900>><<willpowerdifficulty 400 400>><</if>><br>
           <</if>>
-          <<icon 'library.png'>><<lanLink ['Read the last entry aloud (0:10)', '念出最后一篇记载 (0:10)'] 'Deadwood Coin Cave'>><<deadwood-coin-read 'journal' 'deep'>><</lanLink>><<llsanity>><<ggfear>><br>
+          <<set _coinDeepMinutes to Math.ceil(10 * (maplebirch.get('Psyche')?.research ?? 1))>>
+          <<icon 'library.png'>><<lanLink `['Read the last entry aloud (0:' + String(_coinDeepMinutes).padStart(2, '0') + ')', '念出最后一篇记载 (0:' + String(_coinDeepMinutes).padStart(2, '0') + ')']` 'Deadwood Coin Cave'>><<deadwood-coin-read 'journal' 'deep'>><</lanLink>><<llsanity>><<ggfascination>><<if _coinDeepMinutes lt 10>><<note `lanSwitch('You study it intently.', '你看得格外入神。')`>><</if>><br>
         <</if>>
       <</if>>
       <<if !_coinCave.visited.includes('fuel')>><<caveicon 'torch'>><<lanLink ['Feed the torch with the dry waxed cloth (0:05)', '用干蜡布添旺火把 (0:05)'] 'Deadwood Coin Cave'>>
@@ -157,7 +158,8 @@
         <<if maplebirch.get('Psyche').state.sanity gte 600>>
           <<investigateicon>><<lanLink ['Compare the warnings and figures (0:20)', '对照刻字仔细查看 (0:20)'] 'Deadwood Coin Cave'>><<deadwood-coin-read 'inscription' 'careful'>><</lanLink>><<if maplebirch.get('Psyche').state.sanity lt 900>><<willpowerdifficulty 400 400>><</if>><br>
         <</if>>
-        <<icon 'coin-cave/carvings.png'>><<lanLink ['Trace the figures with your hand (0:10)', '伸手沿着人影描下去 (0:10)'] 'Deadwood Coin Cave'>><<deadwood-coin-read 'inscription' 'deep'>><</lanLink>><<llsanity>><<ggfear>><br>
+        <<set _coinDeepMinutes to Math.ceil(10 * (maplebirch.get('Psyche')?.research ?? 1))>>
+        <<icon 'coin-cave/carvings.png'>><<lanLink `['Trace the figures with your hand (0:' + String(_coinDeepMinutes).padStart(2, '0') + ')', '伸手沿着人影描下去 (0:' + String(_coinDeepMinutes).padStart(2, '0') + ')']` 'Deadwood Coin Cave'>><<deadwood-coin-read 'inscription' 'deep'>><</lanLink>><<llsanity>><<ggfascination>><<if _coinDeepMinutes lt 10>><<note `lanSwitch('You study it intently.', '你看得格外入神。')`>><</if>><br>
       <</if>>
     <</if>>
     <<if currentSkillValue('history') gte 500 and _coinCave.inscription>><span class='green'><<lanSwitch 'History: an old delivery mark shows a dry route back to the entrance.' '历史知识：你认出一处旧卸货标记，记下了返回洞口的干燥近路。'>></span><br><</if>>

@@ -63,7 +63,7 @@ The pharmacy adds calming, sleep, stimulant, focus and soothing pills. Buy them 
 
 Calming pills relieve stress but add fatigue; sleep pills help sleep recovery; stimulants temporarily suppress fatigue; focus pills improve actual learning; soothing pills temporarily ease trauma burden. Temporarily suppressed burdens can return when effects end.
 
-Focus pills increase learning gains by 15%, shown on the characteristics page. Early repeat doses or use over several days can build dependence, without stacking effects. Harper may ask about recent use: disclose or conceal it, but consultation does not immediately clear dependence. See [Psyche](#deadwood-guide-Psyche) for effects on fear.
+Focus pills increase learning gains by 15%, shown on the characteristics page. Early repeat doses or use over several days can build dependence, without stacking effects. Harper may ask about recent use: disclose or conceal it, but consultation does not immediately clear dependence. See [Psyche](#deadwood-guide-Psyche) for effects on dread and fascination.
 
 ### Temple weapons
 

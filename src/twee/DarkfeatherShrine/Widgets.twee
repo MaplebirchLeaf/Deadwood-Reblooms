@@ -99,13 +99,13 @@
   <<set _shrine.scene to _shrineChoice, _shrine.step to ''>>
   <<switch _shrineChoice>>
     <<case 'prayer' 'donate'>>
-      <<stress -6>><<trauma -1>><<run maplebirch.get('Psyche')?.rest(5, -100)>>
+      <<stress -6>><<trauma -1>><<psyche-rest 5 100>>
       <<if _shrineChoice is 'donate'>><<money -500>><<set _shrine.donations += 500>><</if>>
       <<if _shrine.donations gte 2500>><<stress -3>><</if>>
       <<if _shrine.wish.count gte 7>><<trauma -1>><</if>>
       <<if _shrine.donations gte 10000>><<tiredness -3>><</if>>
     <<case 'rest'>>
-      <<stress -3>><<tiredness -6>><<run maplebirch.get('Psyche')?.change(0, -100)>>
+      <<stress -3>><<tiredness -6>><<psyche-rest 0 100>>
       <<if _shrine.donations gte 5000>><<tiredness -3>><</if>>
     <<case 'talk'>>
       <<set _shrine.topic to $_shrineTopic>><<stress -2>><<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 1, 0, 100)>>
@@ -121,7 +121,7 @@
     <<case 'close'>>
       <<stress -4>><<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 2, 0, 100)>>
   <</switch>>
-  <<if ['talk', 'tea', 'walk', 'close'].includes(_shrineChoice) and C.npc.Tsukihan.love gte 20>><<run maplebirch.get('Psyche')?.rest(5, -100)>><</if>>
+  <<if ['talk', 'tea', 'walk', 'close'].includes(_shrineChoice) and C.npc.Tsukihan.love gte 20>><<psyche-rest 5 100>><</if>>
 <</widget>>
 
 <<widget 'deadwood-raven-shrine-wish-progress'>>
@@ -172,7 +172,7 @@
     <<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 1, 0, 100)>>
   <<elseif _shrineScene is 'work'>>
     <<stress -2>>
-    <<if C.npc.Tsukihan.love gte 20>><<run maplebirch.get('Psyche')?.rest(5, -100)>><</if>>
+    <<if C.npc.Tsukihan.love gte 20>><<psyche-rest 5 100>><</if>>
     <<if $_shrineReply is 'company'>><<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 1, 0, 100)>>
     <<else>><<set _shrine.helped += 1>><<housekeeping 2>><<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 2, 0, 100)>><</if>>
   <<elseif $_shrineReply is 'hand'>>

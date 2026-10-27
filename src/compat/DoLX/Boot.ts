@@ -27,7 +27,7 @@ export default function adaptBoot(maplebirch: MaplebirchCore): void {
     maplebirch.once(':storyready', () => {
       const pill = setup.pills.find((item: { type: string }) => item.type === 'calmoryl');
       if (!pill) return;
-      pill.effects.push('<<run maplebirch.get("Psyche")?.change(0, -150)>>');
+      pill.effects.push('<<psyche-rest 0 150>>');
     });
   }
   const replacer = plugins.find(plugin => plugin.modName === 'TweeReplacer' && plugin.addonName === 'TweeReplacerAddon');

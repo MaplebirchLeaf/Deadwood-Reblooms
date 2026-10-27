@@ -36,7 +36,7 @@ import StreetLife from './StreetLife';
   if (maplebirch.get('NPCSidebarPortrait')) NPCSidebarPortrait(maplebirch);
   if (maplebirch.get('Finance')) Finance(maplebirch);
   if (maplebirch.get('VanillaPlus')) VanillaPlus(maplebirch);
-  if (maplebirch.get('Psyche')) Psyche(maplebirch);
+  Psyche(maplebirch);
   if (maplebirch.get('Sydney')) Sydney(maplebirch);
   if (maplebirch.get('Robin')) Robin(maplebirch);
   if (maplebirch.get('Whitney')) Whitney(maplebirch);

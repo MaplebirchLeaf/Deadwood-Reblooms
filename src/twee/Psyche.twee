@@ -3,7 +3,15 @@
 <<widget 'psyche-combat-end'>>
   <!-- 普通遭遇只结算余悸，超自然经历在对应剧情结算理智。梦中遭遇留到醒后处理。 -->
   <<if $combat is 1 and ['man', 'beast', 'plant'].includes($enemytype) and !$activeNightmare and $consensual is 0 and $traumagain gt 0>>
-    <<run maplebirch.get('Psyche')?.change(0, Math.min(150, $traumagain * 2))>>
+    <<dread `Math.min(150, $traumagain * 2)`>>
+  <</if>>
+<</widget>>
+
+<!-- 在原版睡满一小时的结算点调用，先处理入迷的浅眠，再平复心绪。 -->
+<<widget 'psyche-sleep'>>
+  <<if maplebirch.get('Psyche')?.active>>
+    <<if $Psyche.mood lt -200>><<tiredness `Math.clamp((-$Psyche.mood - 200) / 800, 0, 1)`>><</if>>
+    <<psyche-rest 1 80>>
   <</if>>
 <</widget>>
 
@@ -22,54 +30,93 @@
   <</if>>
 <</widget>>
 
-<!-- 原版共享配置保留其它修正，恐惧只补当前有效意志倍率。 -->
+<!-- 原版共享配置保留其它修正，恐惧与入迷只补当前有效意志倍率。 -->
 <<widget 'psyche-willpower'>>
   <<set $_psycheWillpower to maplebirch.get('Psyche')?.willpower ?? 1>>
   <<if $_psycheWillpower lt 1 and _willpowerConfig>>
     <<set _willpowerConfig.modifier to Math.floor(_willpowerConfig.modifier * $_psycheWillpower)>>
-    <<run _willpowerConfig.modTypes.bad.pushUnique(lanSwitch('Fear', '恐惧'))>>
+    <<run _willpowerConfig.modTypes.bad.pushUnique($Psyche.mood lt 0 ? lanSwitch('Fascination', '入迷') : lanSwitch('Dread', '恐惧'))>>
+  <</if>>
+<</widget>>
+
+<!-- 四科显示与有效技能共用同一倍率，保留原版的其它加成。 -->
+<<widget 'psyche-subjects'>>
+  <<set $_psyche to maplebirch.get('Psyche')>>
+  <<if $_psyche?.active>>
+    <<for $_subjectConfig range [_scienceConfig, _mathsConfig, _englishConfig, _historyConfig]>>
+      <<if $_subjectConfig>>
+        <<set $_subjectConfig.modifier to Math.floor($_subjectConfig.modifier * $_psyche.knowledge)>>
+        <<if $_psyche.stage.judgement isnot 1>>
+          <<run $_subjectConfig.modTypes[$_psyche.stage.judgement gt 1 ? 'good' : 'bad'].pushUnique(lanSwitch('Sanity', '理智'))>>
+        <</if>>
+        <<if $_psyche.distraction gt 0>>
+          <<run $_subjectConfig.modTypes.bad.pushUnique($Psyche.mood lt 0 ? lanSwitch('Fascination', '入迷') : lanSwitch('Dread', '恐惧'))>>
+        <</if>>
+      <</if>>
+    <</for>>
   <</if>>
 <</widget>>
 
 <<widget 'psyche-status'>>
-  <<if maplebirch.get('Psyche')?.active and $options.sidebarStats isnot 'disabled' and ($options.sidebarStats is 'all' or $Psyche.fear gte 400)>>
-    <div id='psyche-fearcaption'>
+  <<set $_mood to Math.abs($Psyche?.mood ?? 0)>>
+  <<if maplebirch.get('Psyche')?.active and $options.sidebarStats isnot 'disabled' and ($options.sidebarStats is 'all' or $_mood gte 400)>>
+    <div id='psyche-moodcaption'>
       <div @class="$options.showCaptionText ? '' : 'rightMeterText'">
-        <<lanSwitch 'Fear: ' '恐惧：'>>
+        <<lanSwitch `$Psyche.mood lt 0 ? 'Fascination: ' : 'Dread: '` `$Psyche.mood lt 0 ? '入迷：' : '恐惧：'`>>
         <<if $options.showCaptionText>>
           <<language>>
             <<option 'EN'>>
-              <<if $Psyche.fear gte 1000>><span class='red'>You are terrified.</span>
-              <<elseif $Psyche.fear gte 800>><span class='pink'>You can barely keep calm.</span>
-              <<elseif $Psyche.fear gte 600>><span class='purple'>You feel frightened.</span>
-              <<elseif $Psyche.fear gte 400>><span class='blue'>You feel afraid.</span>
-              <<elseif $Psyche.fear gte 200>><span class='lblue'>You feel uneasy.</span>
-              <<else>><span class='green'>You are calm.</span><</if>>
+              <<if $Psyche.mood lt 0>>
+                <<if $_mood gte 1000>><span class='red'>You can think of nothing else.</span>
+                <<elseif $_mood gte 800>><span class='pink'>You struggle to tear yourself away.</span>
+                <<elseif $_mood gte 600>><span class='purple'>Your thoughts keep returning to it.</span>
+                <<elseif $_mood gte 400>><span class='blue'>You find it hard to look away.</span>
+                <<elseif $_mood gte 200>><span class='lblue'>It lingers in your thoughts.</span>
+                <<else>><span class='green'>Your attention drifts back to the world around you.</span><</if>>
+              <<else>>
+                <<if $_mood gte 1000>><span class='red'>You are terrified.</span>
+                <<elseif $_mood gte 800>><span class='pink'>You can barely keep calm.</span>
+                <<elseif $_mood gte 600>><span class='purple'>You feel frightened.</span>
+                <<elseif $_mood gte 400>><span class='blue'>You feel afraid.</span>
+                <<elseif $_mood gte 200>><span class='lblue'>You feel uneasy.</span>
+                <<else>><span class='green'>You are calm.</span><</if>>
+              <</if>>
             <<option 'CN'>>
-              <<if $Psyche.fear gte 1000>><span class='red'>你惊恐万分。</span>
-              <<elseif $Psyche.fear gte 800>><span class='pink'>你几乎无法保持镇定。</span>
-              <<elseif $Psyche.fear gte 600>><span class='purple'>你惶恐不安。</span>
-              <<elseif $Psyche.fear gte 400>><span class='blue'>你感到害怕。</span>
-              <<elseif $Psyche.fear gte 200>><span class='lblue'>你感到不安。</span>
-              <<else>><span class='green'>你很平静。</span><</if>>
+              <<if $Psyche.mood lt 0>>
+                <<if $_mood gte 1000>><span class='red'>你的脑中只剩下那些景象。</span>
+                <<elseif $_mood gte 800>><span class='pink'>你几乎无法移开目光。</span>
+                <<elseif $_mood gte 600>><span class='purple'>那些景象在你脑中挥之不去。</span>
+                <<elseif $_mood gte 400>><span class='blue'>你难以转移注意。</span>
+                <<elseif $_mood gte 200>><span class='lblue'>你仍有些出神。</span>
+                <<else>><span class='green'>你渐渐留意起周围的事物。</span><</if>>
+              <<else>>
+                <<if $_mood gte 1000>><span class='red'>你惊恐万分。</span>
+                <<elseif $_mood gte 800>><span class='pink'>你几乎无法保持镇定。</span>
+                <<elseif $_mood gte 600>><span class='purple'>你惶恐不安。</span>
+                <<elseif $_mood gte 400>><span class='blue'>你感到害怕。</span>
+                <<elseif $_mood gte 200>><span class='lblue'>你感到不安。</span>
+                <<else>><span class='green'>你很平静。</span><</if>>
+              <</if>>
           <</language>>
         <</if>>
       </div>
-      <<statbar 0 $Psyche.fear 1000 `!$options.showCaptionText`>>
+      <<statbar 0 $_mood 1000 `!$options.showCaptionText`>>
     </div>
   <</if>>
 <</widget>>
 
 <<widget 'psyche-mobile-status'>>
-  <<if maplebirch.get('Psyche')?.active and $options.sidebarStats isnot 'disabled' and ($options.sidebarStats is 'all' or $Psyche.fear gte 400)>>
-    <<mobileStatsColorSet $Psyche.fear 1000>>
+  <<set $_mood to Math.abs($Psyche?.mood ?? 0)>>
+  <<if maplebirch.get('Psyche')?.active and $options.sidebarStats isnot 'disabled' and ($options.sidebarStats is 'all' or $_mood gte 400)>>
+    <<mobileStatsColorSet $_mood 1000>>
     <div @class="'stat ' + _mobileColor">
-      <mouse class='tooltip-centertop' data-deadwood-stat='psyche-fear'><<lanSwitch 'Fr' '惧'>><span><<lanSwitch 'Fear' '恐惧'>><<if !$settings.blindStatsEnabled>>: <<= $Psyche.fear.toFixed(1)>><</if>></span></mouse>
+      <mouse class='tooltip-centertop' data-deadwood-stat='psyche-mood'><<lanSwitch `$Psyche.mood lt 0 ? 'Fa' : 'Dr'` `$Psyche.mood lt 0 ? '迷' : '惧'`>><span><<lanSwitch `$Psyche.mood lt 0 ? 'Fascination' : 'Dread'` `$Psyche.mood lt 0 ? '入迷' : '恐惧'`>><<if !$settings.blindStatsEnabled>>: <<= $_mood.toFixed(1)>><</if>></span></mouse>
     </div>
   <</if>>
 <</widget>>
 
 <<widget 'psyche-statistics'>>
+  <<set $_mood to Math.abs($Psyche?.mood ?? 0)>>
   <<set $_psyche to maplebirch.get('Psyche')>>
   <<if $_psyche?.active>>
     <<foldout false '_psyche_foldout'>>
@@ -77,16 +124,22 @@
       <<lanSwitch 'State: ' '心绪：'>><span @class="$_psyche.stage.colour"><<print lanSwitch($_psyche.stage.EN.name, $_psyche.stage.CN.name)>></span><br>
       <<if !$settings.blindStatsEnabled>>
         <<lanSwitch 'Sanity: ' '理智：'>><span class='teal'><<= $Psyche.sanity.toFixed(1)>></span><br>
-        <<lanSwitch 'Fear: ' '恐惧：'>><span class='purple'><<= $Psyche.fear.toFixed(1)>>/1000</span><br>
+        <<lanSwitch `$Psyche.mood lt 0 ? 'Fascination: ' : 'Dread: '` `$Psyche.mood lt 0 ? '入迷：' : '恐惧：'`>><span class='purple'><<= $_mood.toFixed(1)>>/1000</span><br>
         <<lanSwitch 'Study efficiency: ' '学习效率：'>><span @class="$_psyche.learning gte 1 ? 'green' : 'red'"><<= Math.round($_psyche.learning * 100)>>%</span><br>
-        <<lanSwitch 'Fear gained: ' '恐惧增长：'>><span @class="$_psyche.modifier lte 1 ? 'green' : 'red'"><<= Math.round($_psyche.modifier * 100)>>%</span><br>
-        <<lanSwitch 'Willpower while afraid: ' '恐惧下的意志：'>><span @class="$_psyche.willpower lt 1 ? 'red' : 'teal'"><<= Math.round($_psyche.willpower * 100)>>%</span><br>
+        <<lanSwitch 'Knowledge checks: ' '知识判定：'>><span @class="$_psyche.knowledge gte 1 ? 'green' : 'red'"><<= Math.round($_psyche.knowledge * 100)>>%</span><br>
+        <<lanSwitch 'Dread and fascination gained: ' '恐惧与入迷增长：'>><span @class="$_psyche.modifier lte 1 ? 'green' : 'red'"><<= Math.round($_psyche.modifier * 100)>>%</span><br>
+        <<lanSwitch 'Willpower while distracted: ' '心绪干扰下的意志：'>><span @class="$_psyche.willpower lt 1 ? 'red' : 'teal'"><<= Math.round($_psyche.willpower * 100)>>%</span><br>
+        <<if $Psyche.mood gt 200>>
+          <<lanSwitch 'Stress gained: ' '压力增长：'>><span class='red'><<= Math.round($_psyche.stressGain * 100)>>%</span><br>
+        <<elseif $Psyche.mood lt -200>>
+          <<lanSwitch 'Time spent on strange texts: ' '异常记载研读用时：'>><span class='green'><<= Math.round($_psyche.research * 100)>>%</span><br>
+        <</if>>
       <</if>>
       <<language>>
         <<option 'EN'>>
-          Sanity affects how quickly you learn school subjects and how much a fright shakes you. Fear makes it harder to concentrate. Sleeping, praying and writing can help you settle.
+          Sanity affects learning, the use of your knowledge and how strongly strange experiences affect you. Dread and fascination pull you in opposite directions. Either can make it harder to concentrate. Dread makes stress harder to bear. Fascination draws you into strange texts, but leaves you sleeping lightly. Sleep, prayer and writing can help you settle.
         <<option 'CN'>>
-          理智影响四科的学习效率，也影响你有多容易受惊。恐惧会让你难以集中精神。睡一觉、祈祷或写写东西，有助于安定心神。
+          理智影响四科的学习与知识运用，也影响你有多容易受惊或入迷。恐惧与入迷互相抵消，两者都会让你难以集中精神。恐惧让压力更难承受，入迷让你更快地研读异常记载，却也睡得更浅。睡一觉、祈祷或写写东西，有助于安定心神。
       <</language>><br>
     <</foldout>>
     <br>
@@ -94,14 +147,15 @@
 <</widget>>
 
 <<widget 'psyche-journal'>>
-  <<if maplebirch.get('Psyche')?.active and ($Psyche.fear gte 800 or $Psyche.sanity lt 150)>>
+  <<set $_mood to Math.abs($Psyche?.mood ?? 0)>>
+  <<if maplebirch.get('Psyche')?.active and ($_mood gte 800 or $Psyche.sanity lt 150)>>
     <div class='gold bold'><<lanSwitch 'Peace of mind' '心神'>></div>
     <ul class='journal'><li>
       <<language>>
         <<option 'EN'>>
-          You cannot stop thinking about what happened. Try getting some sleep, writing in the loft or praying at the temple. If you are too frightened to concentrate, find somewhere quiet and catch your breath.
+          You cannot stop thinking about what happened. Try getting some sleep, writing in the loft or praying at the temple. Find somewhere quiet to steady yourself if you cannot concentrate.
         <<option 'CN'>>
-          你仍忘不了最近的遭遇。睡一觉、去阁楼写写东西，或到神殿祈祷，也许会好些。如果害怕得难以集中精神，就找个安静的地方，停下来缓口气。
+          你仍忘不了最近的遭遇。睡一觉、去阁楼写写东西，或到神殿祈祷，也许会好些。如果难以集中精神，就找个安静的地方，停下来定定神。
       <</language>>
     </li></ul>
     <hr>
@@ -120,36 +174,32 @@
   <<if maplebirch.get('Psyche')?.canCalm and $_psycheMenu>>
     <<language>>
       <<option 'EN'>>
-        You cannot seem to calm down. You could stop and catch your breath.
+        <<if $Psyche.mood lt 0>>Your thoughts keep wandering. You could stop and take in your surroundings.<<else>>You cannot seem to calm down. You could stop and catch your breath.<</if>>
       <<option 'CN'>>
-        你心神不宁。停下来缓口气，也许会好些。
+        <<if $Psyche.mood lt 0>>你仍有些出神。停下来看看周围，也许能定下心。<<else>>你心神不宁。停下来缓口气，也许会好些。<</if>>
     <</language>><br>
-    <<icon 'actions/relax.png'>><<lanLink ['Stop and steady your breathing (0:05)', '停下来调整呼吸 (0:05)'] 'Deadwood Psyche Recovery'>>
-      <<if maplebirch.get('Psyche')?.canCalm>>
-        <<set _psyche_origin to $passage>>
+    <<set _psycheOrigin to $passage, _psycheLocation to $location>>
+    <<capture _psycheOrigin _psycheLocation>>
+    <<icon 'actions/relax.png'>><<lanLink `$Psyche.mood lt 0 ? ['Take a moment to collect yourself (0:05)', '停下来定定神 (0:05)'] : ['Stop and steady your breathing (0:05)', '停下来调整呼吸 (0:05)']`>>
+      <<if maplebirch.get('Psyche')?.canCalm and $passage is _psycheOrigin and $location is _psycheLocation>>
         <<pass 5>>
-        <<if maplebirch.get('Psyche')?.canCalm and $passage is _psyche_origin>>
-          <<set $Psyche.episode to { passage: _psyche_origin, needsEffects: true }>>
-          <<run maplebirch.get('Psyche').change(0, -200)>><<stress -1>>
+        <<if maplebirch.get('Psyche')?.free and $passage is _psycheOrigin and $location is _psycheLocation
+            and maplebirch.get('Psyche').intensity gt 0 and Time.date.timeStamp gte $Psyche.cooldown_until>>
+          <<set $Psyche.episode to { passage: _psycheOrigin, mood: $Psyche.mood, needsEffects: true }>>
+          <<psyche-rest 0 200>><<stress -1>>
           <<set $Psyche.cooldown_until to Time.date.timeStamp + 1800>>
-        <<else>>
-          <<set $nextPassage to $nextPassage || $nextPassageCheck || _psyche_origin>>
+          <<goto 'Deadwood Psyche Recovery'>>
+        <<elseif $nextPassage or $nextPassageCheck>>
+          <<goto `_psycheOrigin`>>
         <</if>>
       <</if>>
-    <</lanLink>><<llfear>><<lstress>><br><br>
+    <</lanLink>><<if $Psyche.mood lt 0>><<llfascination>><<else>><<lldread>><</if>><<lstress>><br><br>
+    <</capture>>
   <</if>>
 <</widget>>
 
-:: Deadwood Psyche Panic
-<!-- 保留旧存档的 passage 入口，关闭模块或冻结时也能离开。 -->
-<<language>>
-  <<option 'EN'>>You take a moment to catch your breath.
-  <<option 'CN'>>你停下来，缓了口气。
-<</language>><br><br>
-<<getouticon>><<lanLink ['Continue', '继续'] `$Psyche?.episode?.passage and Story.has($Psyche.episode.passage) ? $Psyche.episode.passage : $safePassage || 'Bedroom'`>><<if $Psyche and !$statFreeze and !$replayScene and !$frozenValues>><<set $Psyche.episode to null>><</if>><</lanLink>><br>
-
 :: Deadwood Psyche Recovery
-<!-- 恢复只在点击回调结算，本页和旧入口均可安全重绘。 -->
+<!-- 恢复只在点击回调结算，结果页重绘不重复生效。 -->
 <<set _psycheRecovered to false>>
 <<if $Psyche?.episode?.needsEffects and !$statFreeze and !$replayScene and !$frozenValues>>
   <<set $Psyche.episode.needsEffects to false>><<set _psycheRecovered to true>><<effects>>
@@ -160,10 +210,10 @@
 <<if $Psyche?.episode and Story.has($Psyche.episode.passage)>>
   <<language>>
     <<option 'EN'>>
-      You relax your shoulders and take a few slow breaths. After a while, you are ready to carry on.
+      <<if $Psyche.episode.mood lt 0>>You look away and take in your surroundings. After a while, the sounds around you seem clearer.<<else>>You relax your shoulders and take a few slow breaths. After a while, you are ready to carry on.<</if>>
     <<option 'CN'>>
-      你放松肩膀，慢慢吸气，再呼出来。过了一会儿，你准备继续刚才的事。
-  <</language>><<if _psycheRecovered>><<if maplebirch.get('Psyche')?.active>><<llfear>><</if>><<lstress>><</if>><br><br>
+      <<if $Psyche.episode.mood lt 0>>你移开目光，留意身边的事物。过了一会儿，周围的声音渐渐清晰起来。<<else>>你放松肩膀，慢慢吸气，再呼出来。过了一会儿，你准备继续刚才的事。<</if>>
+  <</language>><<if _psycheRecovered>><<if maplebirch.get('Psyche')?.active>><<if $Psyche.episode.mood lt 0>><<llfascination>><<else>><<lldread>><</if>><</if>><<lstress>><</if>><br><br>
   <<getouticon>><<lanLink ['Continue', '继续'] `$Psyche.episode.passage`>><<if !$statFreeze and !$replayScene and !$frozenValues>><<set $Psyche.episode to null>><</if>><</lanLink>><br>
 <<else>>
   <<language>><<option 'EN'>>You pause, then turn back.<<option 'CN'>>你停了一会儿，转身返回。<</language>><br><br>

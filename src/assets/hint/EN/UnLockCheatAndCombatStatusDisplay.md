@@ -6,7 +6,7 @@ Use Cheat Collection to save and repeatedly execute your own commands.
 
 ### Mod values
 
-Switch to **Mods cheats** to adjust sanity, fear, bank savings, factory working capital and supplies for enabled modules.
+Switch to **Mods cheats** to adjust sanity, dread or fascination, bank savings, factory working capital and supplies for enabled modules.
 
 **Attribute breakthroughs** unlocks each of the six attribute caps separately. Adjust values in the player cheats; the corresponding trait is earned upon reaching the new cap.
 

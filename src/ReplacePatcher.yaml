@@ -216,7 +216,7 @@
   after: |
     if (maplebirch.get('MoreTransformations') && (V.MoreTransformations?.shrine?.harvests ?? 0) >= 3) result = Math.floor(result * 1.07);
 
-- comment: '神圣转化与恐惧共用有效技能入口，保留原值查询与原版修正。'
+- comment: '神圣转化与心智共用有效技能入口，保留原值查询与原版修正。'
   fileName: 'ingame.js'
   from: 'window.currentSkillValue = currentSkillValue;'
   to: |
@@ -224,9 +224,15 @@
       const result = original.call(this, skill, ...args);
       if (args[0] >= 2) return result;
       const value = maplebirch.get('VanillaPlus')?.divineTransformations.skillValue(skill, result) ?? result;
-      const modifier = skill === 'willpower' ? maplebirch.get('Psyche')?.willpower ?? 1 : 1;
+      const psyche = maplebirch.get('Psyche');
+      const modifier = skill === 'willpower' ? psyche?.willpower ?? 1 : ['science', 'maths', 'english', 'history'].includes(skill) ? psyche?.knowledge ?? 1 : 1;
       return modifier === 1 ? value : Math.floor(value * modifier);
     })(currentSkillValue);
+
+- comment: '恐惧只放大正压力，保留酒精、自定义倍率与原版上限。'
+  fileName: 'stat-changes.js'
+  from: 'multiplierOverride = Number(multiplierOverride);'
+  after: "\n\t\tif ((multiplierOverride ? amount * multiplierOverride : amount) > 0) amount *= maplebirch.get('Psyche')?.stressGain ?? 1;"
 
 - comment: '飞升抵消麋鹿疤痕的每日创伤输入。'
   fileName: 'time.js'

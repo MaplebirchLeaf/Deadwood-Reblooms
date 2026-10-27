@@ -16,7 +16,7 @@
   <<set _shipRaid to $MoreTransformations?.harbour?.raid>>
   <<if !_shipRaid or !maplebirch.get('MoreTransformations') or $location isnot 'pirate_ship' or $combat or $replayScene or $statFreeze or $frozenValues or $possessed or $nextPassage or $nextPassageCheck>><<exit>><</if>>
   <<if !_shipRaid.stage>>
-    <<run maplebirch.get('Psyche')?.change(-30, 250)>>
+    <<dread 250>><<sanity -30>>
     <<set _shipRaid.day to Math.floor(Time.days), _shipRaid.stage to 'choice', _shipRaid.outcome to '', _shipRaid.approach to Weather.bloodMoon ? 'blood' : either('bell', 'dark'), _shipRaid.talked to false, _shipRaid.rested to false, _shipRaid.needsEffects to false, _shipRaid.encounters += 1>>
   <</if>>
   <<if _shipRaid.stage isnot 'choice'>><<exit>><</if>>
@@ -79,9 +79,9 @@
     <<icon 'coldmoon-harbour/ghost-ship.png'>><<lanLink ['Go closer to the other ship', '走近另一艘船'] 'Deadwood Pirate Raid Fight'>>
       <<if $MoreTransformations.harbour.raid.stage is 'choice' and maplebirch.get('Psyche')?.active and !$combat and !$possessed and !$nextPassage and !$nextPassageCheck>>
         <<set $MoreTransformations.harbour.raid.stage to 'fight_pending', $MoreTransformations.harbour.raid.outcome to 'contact'>>
-        <<run maplebirch.get('Psyche')?.change(-150, 200)>>
+        <<dread 200>><<sanity -150>>
       <</if>>
-    <</lanLink>><<lllsanity>><<ggfear>><br>
+    <</lanLink>><<lllsanity>><<ggdread>><br>
   <</if>>
   <<if !pcAreArmsBound('any')>>
     <<set $skulduggerydifficulty to 400>>
@@ -92,7 +92,7 @@
         <<set _shipRaid.outcome to $skulduggerysuccess is 1 and currentSkillValue('physique') gte random(Math.ceil($physiquemax * 0.15), Math.ceil($physiquemax * 0.45)) ? 'ropes' : 'ropes_failed', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
         <<skulduggeryuse>><<physique 1 'noMessage'>><<tiredness 5>>
         <<if _shipRaid.outcome is 'ropes'>>
-          <<set _shipRaid.victories += 1>><<pirate_status 2>><<npcincr Zephyr love 1>><<run maplebirch.get('Psyche')?.change(10, -150)>>
+          <<set _shipRaid.victories += 1>><<pirate_status 2>><<npcincr Zephyr love 1>><<sanity 10>><<psyche-rest 0 150>>
         <<else>>
           <<pain 4>><<stress 4>>
         <</if>>
@@ -109,7 +109,7 @@
         <<set _shipRaid.outcome to currentSkillValue('swimmingskill') gte random(200, 600) and currentSkillValue('physique') gte random(Math.ceil($physiquemax * 0.1), Math.ceil($physiquemax * 0.35)) ? 'rescue' : 'rescue_failed', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
         <<swimmingskilluse>><<physique 1 'noMessage'>><<tiredness 10>><<water>>
         <<if _shipRaid.outcome is 'rescue'>>
-          <<set _shipRaid.rescues += 1>><<pirate_status 3>><<npcincr Zephyr love 1>><<run maplebirch.get('Psyche')?.change(10, -150)>>
+          <<set _shipRaid.rescues += 1>><<pirate_status 3>><<npcincr Zephyr love 1>><<sanity 10>><<psyche-rest 0 150>>
         <<else>>
           <<pain 4>><<stress 6>>
         <</if>>
@@ -133,9 +133,9 @@
   <<if _shipRaid?.stage is 'fight' and $combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead' and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck and (Weather.dayState isnot 'night' or $enemyhealth lte 0 or $enemyarousal gte $enemyarousalmax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0))>>
     <<set _shipRaid.outcome to $enemyhealth lte 0 ? 'fight_won' : Weather.dayState isnot 'night' ? 'dawn' : $pain gte 100 and $willpowerpain is 0 and $enemyarousal lt $enemyarousalmax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 ? 'fight_lost' : 'escaped', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
     <<if _shipRaid.outcome is 'fight_won'>>
-      <<set _shipRaid.victories += 1>><<pirate_status 3>><<npcincr Zephyr love 1>><<run maplebirch.get('Psyche')?.change(10, -150)>>
+      <<set _shipRaid.victories += 1>><<pirate_status 3>><<npcincr Zephyr love 1>><<sanity 10>><<psyche-rest 0 150>>
     <<elseif _shipRaid.outcome is 'escaped'>>
-      <<run maplebirch.get('Psyche')?.change(0, -100)>>
+      <<psyche-rest 0 100>>
     <</if>>
     <<if $enemyarousal gte $enemyarousalmax>><<ejaculation 'short'>><</if>>
     <<clotheson>><<endcombat>>
@@ -364,7 +364,7 @@
       <<if $MoreTransformations.harbour.raid.stage is 'resolved' and !$MoreTransformations.harbour.raid.talked and $passage is 'Deadwood Pirate Raid Finish' and $location is 'pirate_ship'
         and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
         <<set $MoreTransformations.harbour.raid.talked to true, $MoreTransformations.harbour.raid.needsEffects to true, $MoreTransformations.harbour.ship to true>>
-        <<run maplebirch.get('Psyche')?.change(0, -100)>>
+        <<psyche-rest 0 100>>
       <</if>>
     <</if>>
   <</lanLink>><br>
@@ -378,10 +378,10 @@
       <<if $MoreTransformations.harbour.raid.stage is 'resolved' and !$MoreTransformations.harbour.raid.rested and $passage is 'Deadwood Pirate Raid Finish' and $location is 'pirate_ship'
         and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
         <<set $MoreTransformations.harbour.raid.rested to true, $MoreTransformations.harbour.raid.needsEffects to true>>
-        <<stress -4>><<tiredness -3>><<run maplebirch.get('Psyche')?.change(0, -200)>>
+        <<stress -4>><<tiredness -3>><<psyche-rest 0 200>>
       <</if>>
     <</if>>
-  <</lanLink>><<lstress>><<ltiredness>><<if maplebirch.get('Psyche')?.active>><<llfear>><</if>><br>
+  <</lanLink>><<lstress>><<ltiredness>><<if maplebirch.get('Psyche')?.active>><<if $Psyche.mood lt 0>><<llfascination>><<elseif $Psyche.mood gt 0>><<lldread>><</if>><</if>><br>
 <</if>>
 <br>
 <<getouticon>><<lanLink ['Return to the deck', '返回甲板'] 'Pirate Deck'>>
