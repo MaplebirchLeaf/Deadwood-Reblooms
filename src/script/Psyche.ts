@@ -91,31 +91,9 @@ export default function Psyche(maplebirch: typeof window.maplebirch): void {
           applyafter: '<<dread `maplebirch.get("LostLamb")?.reward ? 90 : 120`>>',
           expected: 1
         }
-      ],
-      'Widgets Wraith': [
-        {
-          // 沿用原版猎杀从零开始的结算点，伊甸的警告在 Twee 中排除。
-          srcmatch: /<<set \$wraith.hunt to 1>>/g,
-          applybefore: '<<psyche-wraith _args[0]>>',
-          expected: 5
-        },
-        {
-          // 在原版清零前读取旧追猎状态，重复清理不再平复。
-          src: '<<widget "clearWraith">>',
-          applyafter: '<<psyche-wraith "clear">>',
-          expected: 1
-        }
       ]
     },
     locationPassage: {
-      'Tentacle Plains': [
-        {
-          // 红光的原版一次性选择先结算入迷，喷雾容量、补充与次数标记保持原顺序。
-          srcmatch: /(<<link \[\[[^\]]+\|Tentacle Plains Spray\]\]>>)(<<set \$spraymax \+= 1>><<set \$tentspray to 1>><<spray 5>>)(<<\/link>><<gspraymax>>)/,
-          to: '$1<<psyche-redlight>>$2$3<<gfascination>>',
-          expected: 1
-        }
-      ],
       'Asylum Depths Mirror 4 Willpower': [
         {
           // 沿用原版意志结果与选择文字，在离开清醒结局时结算。

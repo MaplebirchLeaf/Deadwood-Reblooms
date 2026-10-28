@@ -28,8 +28,6 @@ Either state begins to weaken your resolve above 200. At 1000, willpower checks 
 
 Staying to hear the pirate out at the harbour, or approaching the other ship during a raid, costs 30 sanity and builds 200 fascination before sanity and transformation modifiers. This can counter dread or be saved for an investigation.
 
-The Ivory Wraith's appearance at the start of a hunt builds 200 dread. Hiding, running or banishing it follow their usual conditions; clearing an existing hunt settles up to 200 dread. Touching the red light on the tentacle plains to increase your spray capacity builds 100 fascination, once per playthrough. Neither costs additional sanity, and gains follow sanity and transformation modifiers.
-
 During the final performance in the asylum mirror room, passing the original willpower check to recognise your surroundings restores 20 sanity and builds 150 dread as you leave the illusion. Continuing to dance costs 30 sanity and builds 200 fascination. This settles once per playthrough; the original awareness and trauma changes still apply.
 
 At 400 dread or fascination, some locations offer **Stop and steady your breathing** or **Take a moment to collect yourself**. Either takes five minutes, settles 200 points and eases a little stress. You can use it again after thirty minutes.
