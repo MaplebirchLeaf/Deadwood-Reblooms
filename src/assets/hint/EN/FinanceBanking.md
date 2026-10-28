@@ -43,7 +43,9 @@ Ordinary quotes include expected business growth of **0.02%–0.08% per trading 
 
 ### Shares, financing and futures
 
-Open a brokerage account and transfer funds at the **securities desk**. The shares page shows quotes, held and sellable quantities, cost basis and profit or loss. Buying and selling charge a fee, and weekly distributions enter brokerage cash.
+Open a bank account, then a brokerage account at the **securities desk**, and transfer money from the bank. The shares page shows quotes, held and sellable quantities, cost basis and profit or loss. Ordinary shares must be paid for in full. Buying and selling charge a fee, and weekly distributions enter brokerage cash.
+
+A long position profits when prices rise; a short position profits when they fall. Financing and futures require a margin deposit, but gains and losses follow the full position value. Choose a security, quantity and leverage, then select **Check the quote** to review the margin, fee and funds required.
 
 Issued and listed quantities change through trading-day company announcements. New issues increase both totals, while repurchases and cancellations reduce them. Shareholders releasing retained shares or taking long-term holdings only change the listed supply. Notices record the quantity changed. They cannot remove your cash holdings, financed shares or outstanding borrowed shares.
 
@@ -58,13 +60,22 @@ Cash purchases, financed shares and short sales share the available supply. Sell
 | Borrowed shares sold short | Choose the sell direction                                      | Sale proceeds remain locked; fees follow current share value and dividends are compensated; fourteen-day expiry |
 | Futures                    | Choose a company security, then open long or short             | Cash settlement after fourteen days; earlier closes allowed from the next trading day                           |
 
-<span class="red">Leverage magnifies losses as well as gains. Positions are closed automatically if equity runs too low.</span> Gap losses exceeding margin first consume idle brokerage cash and bank deposits. Any remaining amount becomes recovery debt. Check the quote before opening a position to see the margin, opening fee and total funds required. Add margin from the positions page; closing records show the reason and profit or loss for voluntary closes, expiry and forced liquidation.
+A position's **equity** is its margin plus its unrealised profit or loss, less accrued charges. <span class="red">It is forcibly closed when equity falls to a quarter of the deposited margin or below.</span>
+
+With a <span class="gold">£100</span> margin, the liquidation threshold is <span class="gold">£25</span> of equity. The opening fee is paid separately, and a closing fee still applies. A price gap can cause losses beyond the margin. The excess first consumes idle brokerage cash and bank deposits. Any remaining amount becomes collection debt.
+
+Add margin from the positions page. Closing records show the reason and profit or loss for voluntary closes, expiry and forced liquidation.
 
 Financed shares offer **2×, 3×, 5×, 10×, 20× or 50×**; futures offer **5×, 10×, 20×, 50×, 100× or 200×**. Fees apply to the full traded value and financing interest accrues on borrowed funds. At 200×, a 1% move equals twice the initial margin; a gap against you can consume that margin and create recovery debt. Futures use the company securities listed at the desk.
 
-Most trading days bring small price changes, with occasional 20%–40% gaps and rare 45%–70% moves in either direction. Business news and story events compound with these moves, so the final change can exceed a single gap’s range. Frequent trading also incurs fees and financing interest. <span class="red">A sharp fall can consume all your margin and leave a debt.</span>
+Most trading days bring small price changes, with occasional 5%–9% gaps and rare 12%–18% moves in either direction. Business news and story events compound with these moves, so the final change can exceed a single gap’s range. Frequent trading also incurs fees and financing interest. <span class="red">A sharp fall can consume all your margin and leave a debt.</span>
 
 Set stop-loss and take-profit orders from the positions page. Triggers use a percentage of the deposit when submitted; zero cancels the selected trigger. Topping up does not alter existing trigger amounts. Stops, forced liquidation and expiry all observe the next-trading-day restriction. Charges continue through weekends, and expiry on a closed day waits until the next trading day. Forced liquidation takes priority. <span class="red">Losses can grow while a position is locked.</span> A gap settles at the actual price, so a stop does not guarantee a maximum loss.
+
+#### Trading achievements
+
+- **Flying Without a Net:** have a losing leveraged position forcibly liquidated. Voluntary closes, stop-loss orders and expiry do not count.
+- **Back on My Feet:** after liquidation leaves collection debt, repay it in full and recover the full loss, including fees, through cumulative net profits from ordinary shares or leveraged trades after that liquidation. Only profits realised by selling or closing count, and later losses reduce your progress. Deposits, loans and dividends do not count. Being taken away to settle the debt ends that recovery attempt.
 
 ### Financial Daily
 

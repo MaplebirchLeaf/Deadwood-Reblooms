@@ -64,12 +64,13 @@ export default class Newspaper {
       if (!this.counterAvailable) return false;
     } else if (source !== 'loft' || V.passage !== 'Orphanage Loft Reading Nook 2' || V.phase !== 'newspaper' || !V.daily.reading_nook) return false;
 
-    const { market } = this.finance.state;
+    const { market, brokerage } = this.finance.state;
     const day = this.day;
     const history = market.history.filter(record => record.day < day);
     const latest = history.at(-1);
     const previous = history.at(-2);
     const quotes = this.finance.securities
+      .filter(item => !['ALF', 'RDS'].includes(item.symbol) || (brokerage.holdings[item.symbol] || 0) > 0 || brokerage.margin.positions.some(position => position.symbol === item.symbol))
       .filter(item => !latest || latest.prices[item.symbol] !== undefined)
       .map(item => {
         const price = latest?.prices[item.symbol] ?? market.previous_prices[item.symbol];

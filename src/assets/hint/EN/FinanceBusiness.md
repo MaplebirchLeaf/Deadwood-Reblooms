@@ -97,6 +97,8 @@ Guidance raises processing progress by **50%**, gives a **2%** batch failure cha
 
 ### Shareholder meetings, subscriptions and control
 
+Avery's company initially has **50,000 issued shares**, with **20,000** listed at the desk and an opening quote of **£84 per share**. At that quote, including the buying fee, a 5% holding costs about **£210,525** and 20% about **£842,100**. Later price and share-count changes alter those amounts.
+
 With **settled AVY shares representing at least 5% of the current total**, enter **Shareholder reception** from the office-building lobby on weekdays, **09:00–17:00**, when Avery is available. Bring identification and an open securities account. Recovery debt, combat or being unable to act normally prevents business. The entrance follows the vanilla relocation to the Elk Street skyscraper.
 
 - **Shareholder meetings:** one meeting every seven days, taking thirty minutes. Propose full dividends, half dividends with half retained, or full retention for expansion. A passed resolution permits one new-share subscription before the next meeting. While an unfinished project needs funds, the other represented votes oppose restoring full dividends. A settled majority lets you pass your proposal yourself.
@@ -107,6 +109,8 @@ With **settled AVY shares representing at least 5% of the current total**, enter
 <span class="blue">Subscribed and transferred shares arrive on the next trading day, when they can be sold or used to vote. Margin positions and borrowed shares carry no votes. Control requires strictly more than 50%. Exactly 50% is not a majority. Once you control the company, random announcements no longer issue or buy back AVY shares without a vote.</span>
 
 **Skyscraper financing:** once the vanilla project exists, directors or controlling shareholders may review its budget at reception. Allocations use company funds from subscriptions and retained profits, without a second charge to personal deposits. Foundation, structure and finishing reserve **<span class="gold">£100,000</span>, <span class="gold">£150,000</span> and <span class="gold">£200,000</span>**. Each following working day pays for one extra point of construction, up to ten per stage. The native story milestones at 25%, 60% and 100% still apply. Unspent money returns to company funds when a stage ends or the project closes. The same stage cannot be funded twice.
+
+Desk purchases and private transfers pay the sellers. To fund construction, subscribe for new shares after a passed shareholder resolution or retain company profits. Market value and available company funds are accounted for separately.
 
 **Identity and fame:** the first Attributes sentence reflects factory ownership, a trading business, shareholding, board membership or control while preserving the native gender and transformation description. Factory deliveries, orchard contracts, subscriptions and share transfers raise business fame. Cancelling factory orders lowers it. Shareholder meetings raise social fame. Routine activities such as deliveries use their own intervals; donations reward cumulative contributions and project outcomes, as shown at the donations desk.
 
@@ -136,15 +140,15 @@ When the original **public reception ends and you wait for the last lift**, an a
 
 ### Night Raven and Ascended
 
-After receiving an invitation, reading the construction files and visiting the site, **ask to share in the ceremony** during a private meeting with Avery. You must control the company, or hold a board seat with an active joint-business agreement and three completed supply contracts. This preparation takes ten minutes. You can raise your terms at the blood-moon gathering **from the following day**.
+After receiving an invitation, reading the construction files and visiting the site, **ask to share in the ceremony** during a private meeting with Avery. You must hold **strictly more than 50% in settled shares**, or hold **at least 20%**, a board seat and an active joint-business agreement, with three completed supply contracts. This preparation takes ten minutes. You can raise your terms at the blood-moon gathering **from the following day**.
 
 Speak to Avery and Harper before entering the lift, then settle the terms with Remy upstairs. Accept joint ascension, or withdraw your request and keep the original role. Leaving the gathering remains a choice before going upstairs.
 
 With the real stones and a successful ending, you change alongside Avery in **the same ceremony**, receiving the fourth-seat title **Night Raven** and the **Ascended** trait. The counterfeit-stone failure grants neither. There is no second ceremony to obtain them afterwards.
 
 - Ascended prevents the daily trauma increase from the elk scar. The scar remains, and other sources of trauma retain their effects.
-- Each hour, stress falls by an additional **0.5% of its maximum** and fatigue by **1% of its maximum**. Short actions receive recovery in proportion to the time spent.
-- With Psyche enabled, sanity loss and new dread or fascination are halved, and the daily base sanity recovery allowance rises to **60 points**.
+- Each hour, stress falls by an additional **2% of its maximum** and fatigue by **4% of its maximum**. Short actions receive recovery in proportion to the time spent.
+- With Psyche enabled, sanity loss and new dread or fascination are halved, and the daily base sanity recovery allowance rises to **60 points**. Existing dread or fascination eases by **40 points per hour**, stopping at calm.
 - The scar's effects on awareness and purity remain, as do the native consequences for world corruption and Gwylan.
 
 After recognition, arrange private conversations through the office-building lobby on weekdays. Avery meets in person, while Harper and Remy speak by telephone. One conversation is available per day and takes fifteen minutes. Selling shares does not remove the title or trait. Neither exempts the business from unpaid wages, office rent or supply-agreement conditions. Penthouse accommodation and company voting rights retain their own share requirements. You may also tell Jordan about the tower, or discuss the change during Gwylan's existing scar conversation.
@@ -157,15 +161,13 @@ The living level has a kitchen, lounge and indoor pool. Upstairs are the main an
 
 The agreement grants **company accommodation**, which cannot be bought, sold, rented out or mortgaged. Weekly upkeep is **<span class="gold">£150</span>**, deducted from your bank account with any shortfall carried as arrears. Losing both board and controlling status, or leaving upkeep unpaid, starts a seven-day notice period. Restoring your position and clearing arrears within that period withdraws the notice. At expiry, the key card stops working. Resident lovers move together to another suitable empty home you hold, or return to their usual arrangements. Clothes remain in storage and can be collected through the accommodation desk. Ending the personal relationship does not itself revoke company accommodation.
 
-### Business and trading achievements
+### Business achievements
 
 - **A Seat at the Table:** receive your first formal board appointment.
 - **In Control:** hold strictly more than 50% of Avery's company in settled shares.
 
 - **Open for Business:** produce and deliver a factory order, then receive payment. An advance alone does not count.
 - **Where's My Money?:** a delivered factory order defaults when its invoice is settled.
-- **Flying Without a Net:** a losing margin position is forcibly liquidated. Voluntary closing, stop losses and expiry do not count.
-- **Back on My Feet:** After a forced liquidation leaves collection debt, repay it in full and recover the entire loss, including fees, through subsequent net profits from ordinary shares or leveraged trades. Later trading losses reduce your progress; deposits, loans and dividends do not count. Being taken away to settle the debt ends that recovery attempt.
 
 ### Private farm and drinks-shop partnerships
 

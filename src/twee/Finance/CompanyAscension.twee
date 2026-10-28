@@ -5,6 +5,16 @@
   <<set _ascension_state to _ascension.state>>
 <</widget>>
 
+<!-- 沿用一次时间回调，压力按原始值恢复，疲劳负值每点恢复20，心绪止于平静。 -->
+<<widget 'deadwood-ascension-recovery'>>
+  <<silently>>
+    <<set $_hours to _args[0] / 3600>>
+    <<stress `-$stressmax * 0.02 * $_hours` 1>>
+    <<tiredness `-C.tiredness.max * 0.04 * $_hours / 20`>>
+    <<psyche-rest 0 `40 * $_hours`>>
+  <</silently>>
+<</widget>>
+
 <<widget 'deadwood-ascension-return'>>
   <br><<getouticon>><<lanLink ['Return to the lobby', '返回大厅'] 'Office Lobby'>><<endevent>><</lanLink>><br>
 <</widget>>
