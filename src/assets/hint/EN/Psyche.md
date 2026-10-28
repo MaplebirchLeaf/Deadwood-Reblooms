@@ -17,42 +17,31 @@
 
 The learning multiplier applies to progress in science, maths, English and history earned in class, through reading and similar activities. Sanity also affects checks using these four subjects. The eight judgement multipliers are 80%, 85%, 90%, 95%, 100%, 102.5%, 105% and 110%. Full sanity reduces dread and fascination gained by 25%, while minimum sanity increases them by 25%.
 
-A non-consensual encounter with people, beasts or plants that causes trauma leaves you shaken, adding up to 150 base dread based on the trauma recorded. Sanity loss comes from supernatural experiences, such as the Ivory Wraith, undead raids and curses. Ordinary nightmares leave dread when you wake.
+Sanity is spent on supernatural experiences involving wraiths, undead ships and curses. Ordinary nightmares leave dread. Completing investigations, breaking curses and dealing with raids can restore sanity and settle your thoughts.
 
-When investigating the cavern or harbour, you can pursue strange sights and sounds or examine them cautiously. Reading the old notes aloud, tracing the carvings or following the underwater voice causes fascination. It can also reveal a dry route around the flooded crossing or a gesture the guard recognises. Breaking a curse or dealing with a raid can help you recover.
+## Dread and fascination
 
-## Settling your thoughts
+Either state begins to weaken your resolve above 200. At 1000, willpower checks use 75% of their usual value.
 
-Dread or fascination above 200 starts to interfere with concentration. At 1000, current learning gains fall to 80%, knowledge checks to 90% and willpower checks to 75%. These effects multiply the bonuses or penalties from sanity itself.
+- **Dread** increases stress gained by up to 25%, but also makes you more alert. It adds up to 25 percentage points to your chance of noticing tripwires in the cavern and lowers the difficulty of running for the steps at Coldmoon Harbour by up to 25%. When someone is stalking you, effective Athletics for escaping increases by up to a third. Chasing someone gets no bonus. High heels and parasites can still prevent your escape.
+- **Fascination** reduces time spent on deep reading in the cavern and studying temple ward patterns or monstrance records by up to 25%. At 400 fascination, you can also spend 200 points during a cavern investigation to follow words or shapes in your mind and uncover a deep-reading clue. With 500 effective history, this choice is available at 200 fascination. These clues reveal a dry route or a gesture the guard recognises. Fascination also leaves you sleeping lightly. Each full hour of sleep restores up to about 15 less fatigue; clothing, temperature and DoLX bed modifiers affect the actual difference.
 
-- **Dread** makes stress harder to bear, increasing positive stress gains by up to 25%. When running for the steps at Coldmoon Harbour, alertness also helps you react, lowering the retreat difficulty by up to 10%.
-- **Fascination** draws you through strange texts more quickly. Deep reading in the cavern and studying temple ward patterns or monstrance records take up to 25% less time, rounded up to whole minutes. It also leaves you sleeping lightly. At maximum fascination, each full hour of sleep normally restores 15 less fatigue. Clothing and temperature affect the actual difference. DoLX bed modifiers also apply. An undead character sleeping in a poor bed while wearing heavy clothes may wake more tired.
+Staying to hear the pirate out at the harbour, or approaching the other ship during a raid, costs 30 sanity and builds 200 fascination before sanity and transformation modifiers. This can counter dread or be saved for an investigation.
 
-At 400 dread, some locations offer **Stop and steady your breathing**. At 400 fascination, you can **Take a moment to collect yourself** instead. Either takes five minutes, settles 200 points and eases a little stress. You must wait thirty minutes before using it again.
+During the final performance in the asylum mirror room, passing the original willpower check to recognise your surroundings restores 20 sanity and builds 150 dread as you leave the illusion. Continuing to dance costs 30 sanity and builds 200 fascination. This settles once per playthrough; the original awareness and trauma changes still apply.
 
-Sleep, rest, company and calming medication bring your current state towards calm, without turning dread into fascination or fascination into dread. After an undead ship raid, resting by the hatch settles 200 points and talking to Zephyr settles 100. Each is available once per raid.
+At 400 dread or fascination, some locations offer **Stop and steady your breathing** or **Take a moment to collect yourself**. Either takes five minutes, settles 200 points and eases a little stress. You can use it again after thirty minutes.
 
-Calming tablets from the hospital pharmacy settle 200 points, halved at higher tolerance. Another dose while the effect is active does not stack. Dr Harper's prescription in the medicine drawer settles 100 points, while the asylum's prescription settles 200. DoLX anti-anxiety tablets settle 150. Watch for the medication's side effects as well.
+Sleep, company and calming medication bring your thoughts towards calm. Hospital calming tablets settle 200 points, halved at higher tolerance; another dose during the same effect does not stack. Dr Harper's prescription settles 100 points, the asylum's prescription 200 and DoLX anti-anxiety tablets 150. Watch for their side effects as well.
 
-## Transformations and resolve
+## Recovery and transformations
 
-Trinity reduces sanity loss and new dread or fascination by 25%, while Ascended reduces them by 50%. Only the strongest reduction applies.
+Routine activities share a **daily sanity recovery allowance of 30 points**, raised to **60 points** by Ascended. Each full hour of sleep restores 5 sanity and settles 80 points. Six hours usually use the normal daily allowance. Settling your thoughts still works after the allowance is spent. Nightmares can frighten you.
 
-Opposing experiences counteract your current state at their usual strength. Resistance applies to what builds up after crossing calm. Restoring sanity and settling your thoughts retain their usual effects.
+An hour of prayer restores 10 sanity and settles 100 points. Twenty minutes of writing in the loft restores 5 and settles 60. Shrine prayers, giving thanks and time with familiar people also help. Sanity restored by resolving supernatural events is counted separately.
 
-## Restoring sanity
+After completing Gwylan's insight hypnosis, returning to the shop settles 300 dread or fascination, stopping at calm. The session retains its original duration, cooldown and hypnotic side effects.
 
-Routine activities share a **daily allowance of 30 base recovery points**. Ascended raises this allowance to **60 points**. Recovery above 600 sanity is halved, up to a maximum of 1000 sanity. Settling your thoughts does not use the allowance and still works when it runs out.
+Trinity reduces sanity loss and new dread or fascination by 25%; Ascended reduces them by 50%. Only the stronger effect applies. Opposing experiences first counteract your current state. Resistance applies to what builds up after crossing calm.
 
-| Activity                                         | Base sanity recovery | Points settled |
-| ------------------------------------------------ | -------------------- | -------------- |
-| One full hour of sleep                           | 1                    | 80             |
-| An hour of prayer for salvation                  | 10                   | 100            |
-| Twenty minutes of writing in the loft            | 5                    | 60             |
-| Prayer or an offering at the shrine              | 5                    | 100            |
-| Talking, tea, a walk or time alone with Tsukihan | 5                    | 100            |
-| Giving thanks at the ema rack                    | 10                   | 150            |
-
-Shrine prayer and offerings share one use per day. Time with Tsukihan grants the recovery listed above at 20 affection or more. Giving thanks grants recovery once per wish. Interrupted sleep grants no recovery for an unfinished hour, and nightmares can still frighten you.
-
-With **Revelation: The Book of Return** installed, shared work, choir practice, temple fieldwork, returning the Ivory Wraith's relic and Lost Lamb dreams can also affect sanity or your state of mind. Routine sanity recovery shares the allowance above.
+With **Revelation: The Book of Return**, shared work, choir practice, temple fieldwork, returning the Ivory Wraith's relic and Lost Lamb dreams also affect sanity or your state of mind. Routine activities share the recovery allowance above.

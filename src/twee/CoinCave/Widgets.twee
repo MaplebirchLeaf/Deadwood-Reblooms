@@ -3,6 +3,7 @@
 <<widget 'deadwood-coin-context'>>
   <<set _coinCave to $MoreTransformations?.treasure>>
   <<set _coinReady to !!maplebirch.get('MoreTransformations') and !!_coinCave and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck>>
+  <<set _coinInsight to maplebirch.get('Psyche')?.active and $Psyche.mood lte -(currentSkillValue('history') gte 500 ? 200 : 400)>>
 <</widget>>
 
 <<widget 'deadwood-coin-cave-discover'>>
@@ -50,7 +51,7 @@
     <<if $_caveRoll is 1>>
       <<set _coinCave.torch to Math.max(0, _coinCave.torch - 10), _coinCave.scene to 'wind'>>
     <<elseif $_caveRoll is 2>>
-      <<if random(1, 100) lte _coinCave.torch + currentSkillValue('skulduggery') / 25>>
+      <<if random(1, 100) lte _coinCave.torch + currentSkillValue('skulduggery') / 25 + 25 * (maplebirch.get('Psyche')?.alertness ?? 0)>>
         <<set _coinCave.scene to 'trap_seen'>>
       <<else>>
         <<set _coinCave.scene to 'trip'>><<pain 4>><<stress 6>>
@@ -102,16 +103,17 @@
   <<deadwood-coin-cave-time 5>>
 <</widget>>
 
-<!-- 三种读法共用证据转换，完成用时后再结算，旧线索不因重新进洞重复生效。 -->
+<!-- 各种读法共用证据转换，完成用时后再结算，同一线索只生效一次。 -->
 <<widget 'deadwood-coin-read'>>
   <<set $_coinEvidence to _args[0], $_coinReading to _args[1]>>
   <<deadwood-coin-context>>
-  <<if !_coinReady or $combat or $location isnot 'island' or !['journal', 'inscription'].includes($_coinEvidence) or !['plain', 'careful', 'deep'].includes($_coinReading)
+  <<if !_coinReady or $combat or $location isnot 'island' or !['journal', 'inscription'].includes($_coinEvidence) or !['plain', 'careful', 'deep', 'recall'].includes($_coinReading)
     or _coinCave[$_coinEvidence] or _coinCave.room isnot ($_coinEvidence is 'journal' ? 'camp' : 'writing') or _coinCave.torch lt 20>><<exit>><</if>>
   <<set $_coinPsyche to maplebirch.get('Psyche'), $_coinRoom to _coinCave.room>>
   <<if $_coinReading isnot 'plain' and !$_coinPsyche?.active>><<exit>><</if>>
   <<if $_coinReading is 'careful' and $_coinPsyche.state.sanity lt 600>><<exit>><</if>>
-  <<set $_coinSanity to $_coinReading is 'deep' ? -100 : -30, $_coinDread to 60>>
+  <<if $_coinReading is 'recall' and !_coinInsight>><<exit>><</if>>
+  <<set $_coinDeep to ['deep', 'recall'].includes($_coinReading), $_coinSanity to $_coinReading is 'recall' ? 0 : $_coinReading is 'deep' ? -100 : -30, $_coinDread to 60>>
   <<if $_coinReading is 'careful'>>
     <<if $_coinPsyche.state.sanity gte 900>>
       <<set $_coinSanity to -15, $_coinDread to 30>>
@@ -120,18 +122,21 @@
       <<if $willpowerSuccess>><<set $_coinSanity to -15, $_coinDread to 30>><</if>>
     <</if>>
   <</if>>
-  <<set $_coinMinutes to $_coinReading is 'deep' ? Math.ceil(10 * ($_coinPsyche?.research ?? 1)) : $_coinReading is 'careful' ? 20 : 10>>
+  <<set $_coinMinutes to $_coinDeep ? Math.ceil(10 * ($_coinPsyche?.research ?? 1)) : $_coinReading is 'careful' ? 20 : 10>>
   <<deadwood-coin-cave-time $_coinMinutes>>
   <<deadwood-coin-context>>
   <<if !_coinReady or $combat or $location isnot 'island' or _coinCave.room isnot $_coinRoom or _coinCave[$_coinEvidence]>><<exit>><</if>>
-  <<set _coinCave[$_coinEvidence] to true, _coinCave.scene to ($_coinEvidence is 'journal' ? 'notes' : 'writing') + ($_coinReading is 'deep' ? '_deep' : $_coinSanity is -15 ? '_careful' : '')>>
+  <<if $_coinReading is 'recall' and !_coinInsight>><<exit>><</if>>
+  <<set _coinCave[$_coinEvidence] to true, _coinCave.scene to ($_coinEvidence is 'journal' ? 'notes' : 'writing') + ($_coinDeep ? '_deep' : $_coinSanity is -15 ? '_careful' : '')>>
   <!-- 异常读法的线索沿用探索记录，普通读法仍可完成整个调查。 -->
-  <<if $_coinReading is 'deep'>>
+  <<if $_coinDeep>>
     <<run _coinCave.visited.pushUnique($_coinEvidence + '_deep')>>
     <<if $_coinEvidence is 'journal'>><<set _coinCave.shortcut to true>><</if>>
   <</if>>
   <<if $_coinEvidence is 'inscription' and currentSkillValue('history') gte 500>><<set _coinCave.shortcut to true>><</if>>
-  <<if $_coinReading is 'deep'>><<fascination 150>><<else>><<dread $_coinDread>><</if>><<sanity $_coinSanity>>
+  <<if $_coinReading is 'recall'>><<fascination -200>>
+  <<elseif $_coinReading is 'deep'>><<fascination 150>>
+  <<else>><<dread $_coinDread>><</if>><<sanity $_coinSanity>>
   <<if _coinCave.journal and _coinCave.inscription and !_coinCave.visited.includes('understood')>>
     <<run _coinCave.visited.pushUnique('understood')>>
     <<sanity 40>><<psyche-rest 0 100>>

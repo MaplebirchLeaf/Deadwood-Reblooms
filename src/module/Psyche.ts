@@ -9,6 +9,8 @@ export default class Psyche extends Module {
       mood: 0,
       recovery: { day: -1, spent: 0 },
       cooldown_until: 0,
+      mirror: false,
+      insight: -1,
       episode: null as null | { passage: string; mood: number; needsEffects?: boolean }
     });
   }
@@ -32,11 +34,11 @@ export default class Psyche extends Module {
   }
 
   public get learning(): number {
-    return this.active ? this.stage.learning * (1 - 0.2 * this.distraction) : 1;
+    return this.active ? this.stage.learning : 1;
   }
 
   public get knowledge(): number {
-    return this.active ? this.stage.judgement * (1 - 0.1 * this.distraction) : 1;
+    return this.active ? this.stage.judgement : 1;
   }
 
   public get intensity(): number {
@@ -51,17 +53,21 @@ export default class Psyche extends Module {
     return 1 - 0.25 * this.distraction;
   }
 
-  public get stressGain(): number {
-    return this.active ? 1 + 0.25 * Math.clamp((this.state.mood - 200) / 800, 0, 1) : 1;
+  public get alertness(): number {
+    return this.active ? Math.clamp((this.state.mood - 200) / 800, 0, 1) : 0;
   }
 
-  /** 入迷只加快明确的异常研究，撤退倍率只用于真正的逃离选择。 */
+  public get stressGain(): number {
+    return 1 + 0.25 * this.alertness;
+  }
+
+  /** 入迷只加快明确的异常研究。 */
   public get research(): number {
     return this.active ? 1 - 0.25 * Math.clamp((-this.state.mood - 200) / 800, 0, 1) : 1;
   }
 
   public get escape(): number {
-    return this.active ? 1 - 0.1 * Math.clamp((this.state.mood - 200) / 800, 0, 1) : 1;
+    return 1 - 0.25 * this.alertness;
   }
 
   public get canCalm(): boolean {
@@ -96,17 +102,15 @@ export default class Psyche extends Module {
     this.state.sanity = Math.clamp(this.state.sanity + sanity * (sanity < 0 ? resistance : 1), -500, 1000);
   }
 
-  /** 日限额按基础点计入，高位恢复减半。心绪只向零平复，不占额度。 */
+  /** 日常恢复共用每日额度，心绪只向零平复，不占额度。 */
   public rest(sanity = 0, mood = 0): void {
     if (!this.active || !Number.isFinite(sanity) || sanity < 0 || !Number.isFinite(mood)) return;
     const day = Math.floor(Time.days);
     const recovery = (this.state.recovery ??= { day, spent: 0 });
     if (recovery.day !== day) Object.assign(recovery, { day, spent: 0 });
-    const low = Math.max(0, 600 - this.state.sanity);
-    const capacity = Math.max(0, low + 2 * (1000 - Math.max(600, this.state.sanity)));
-    const base = Math.min(sanity, Math.max(0, (this.ascended ? 60 : 30) - recovery.spent), capacity);
+    const base = Math.min(sanity, Math.max(0, (this.ascended ? 60 : 30) - recovery.spent), 1000 - this.state.sanity);
     recovery.spent += base;
-    this.change(Math.min(base, low) + Math.max(0, base - low) * 0.5);
+    this.change(base);
     this.state.mood -= Math.sign(this.state.mood) * Math.min(this.intensity, Math.max(0, -mood));
   }
 }

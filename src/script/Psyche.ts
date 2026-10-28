@@ -90,17 +90,32 @@ export default function Psyche(maplebirch: typeof window.maplebirch): void {
           applyafter: '<<dread `maplebirch.get("LostLamb")?.reward ? 90 : 120`>>',
           expected: 1
         }
-      ],
-      'Widgets End Combat': [
-        {
-          // 沿用本场实际创伤记录，清理战斗前结算一次余悸，不影响原版治疗与特质。
-          src: '<<unset $enemytype>>',
-          applybefore: '<<psyche-combat-end>>',
-          expected: 1
-        }
       ]
     },
     locationPassage: {
+      'Asylum Depths Mirror 4 Willpower': [
+        {
+          // 沿用原版意志结果与选择文字，在离开清醒结局时结算。
+          srcmatch: /<<link \[\[[^|]+\|Asylum Depths Mirror 4 3\]\]>><<endevent>><<\/link>>/,
+          to: '<<lanLink ["Next", "继续"] "Asylum Depths Mirror 4 3">><<psyche-mirror>><<endevent>><</lanLink>><<if maplebirch.get("Psyche")?.active and !$Psyche.mirror>><<if $Psyche.sanity lt 1000>><<gsanity>><</if>><<ggdread>><</if>>',
+          expected: 1
+        }
+      ],
+      'Asylum Depths Mirror 4 Dance': [
+        {
+          srcmatch: /<<link \[\[[^|]+\|Asylum Depths Mirror 4 3\]\]>><<endevent>><<\/link>>/,
+          to: '<<lanLink ["Next", "继续"] "Asylum Depths Mirror 4 3">><<psyche-mirror>><<endevent>><</lanLink>><<if maplebirch.get("Psyche")?.active and !$Psyche.mirror>><<lsanity>><<ggfascination>><</if>>',
+          expected: 1
+        }
+      ],
+      'Gwylan Hypnosis Insight Wake': [
+        {
+          // 共用洞察各条支线的实际完成入口，重绘与读档不触发恢复。
+          srcmatch: /<<link \[\[[^|]+\|Gwylan Hypnosis End\]\]>><<endevent>><<\/link>>/,
+          to: '<<lanLink ["Go back in the shop", "回商店里"] "Gwylan Hypnosis End">><<psyche-insight>><<endevent>><</lanLink>><<if maplebirch.get("Psyche")?.active and $Psyche.insight isnot Time.date.timeStamp>><<if $Psyche.mood gt 0>><<llldread>><<elseif $Psyche.mood lt 0>><<lllfascination>><</if>><</if>>',
+          expected: 1
+        }
+      ],
       'Orphanage Loft Reading Nook': [
         {
           // 沿用原版每日阅读角次数和二十分钟耗时，手工的原版治疗仍独立结算。

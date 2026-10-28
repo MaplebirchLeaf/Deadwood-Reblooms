@@ -1,17 +1,30 @@
 :: Deadwood Psyche Widgets [widget]
 
-<<widget 'psyche-combat-end'>>
-  <!-- 普通遭遇只结算余悸，超自然经历在对应剧情结算理智。梦中遭遇留到醒后处理。 -->
-  <<if $combat is 1 and ['man', 'beast', 'plant'].includes($enemytype) and !$activeNightmare and $consensual is 0 and $traumagain gt 0>>
-    <<dread `Math.min(150, $traumagain * 2)`>>
-  <</if>>
+<!-- 镜室的原版进度在结局前已到第五档，只记录结局是否结算。 -->
+<<widget 'psyche-mirror'>>
+  <<if !maplebirch.get('Psyche')?.active or $Psyche.mirror or $asylum_mirror isnot 5 or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<switch $passage>>
+    <<case 'Asylum Depths Mirror 4 Willpower'>>
+      <<if !$willpowerSuccess>><<exit>><</if>>
+      <<set $Psyche.mirror to true>><<sanity 20>><<dread 150>>
+    <<case 'Asylum Depths Mirror 4 Dance'>>
+      <<set $Psyche.mirror to true>><<fascination 200>><<sanity -30>>
+  <</switch>>
+<</widget>>
+
+<!-- 在返回商店的原版链接中结算，完成时刻去重，保留再次接受疗程的原版条件。 -->
+<<widget 'psyche-insight'>>
+  <<if !maplebirch.get('Psyche')?.active or $passage isnot 'Gwylan Hypnosis Insight Wake'
+      or !Number.isFinite($hypnosis_potency) or !($hypnosisTimers.insight?.time gt 0)
+      or $Psyche.insight is Time.date.timeStamp or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<set $Psyche.insight to Time.date.timeStamp>><<psyche-rest 0 300>>
 <</widget>>
 
 <!-- 在原版睡满一小时的结算点调用，先处理入迷的浅眠，再平复心绪。 -->
 <<widget 'psyche-sleep'>>
   <<if maplebirch.get('Psyche')?.active>>
     <<if $Psyche.mood lt -200>><<tiredness `Math.clamp((-$Psyche.mood - 200) / 800, 0, 1)`>><</if>>
-    <<psyche-rest 1 80>>
+    <<psyche-rest 5 80>>
   <</if>>
 <</widget>>
 
@@ -48,9 +61,6 @@
         <<set $_subjectConfig.modifier to Math.floor($_subjectConfig.modifier * $_psyche.knowledge)>>
         <<if $_psyche.stage.judgement isnot 1>>
           <<run $_subjectConfig.modTypes[$_psyche.stage.judgement gt 1 ? 'good' : 'bad'].pushUnique(lanSwitch('Sanity', '理智'))>>
-        <</if>>
-        <<if $_psyche.distraction gt 0>>
-          <<run $_subjectConfig.modTypes.bad.pushUnique($Psyche.mood lt 0 ? lanSwitch('Fascination', '入迷') : lanSwitch('Dread', '恐惧'))>>
         <</if>>
       <</if>>
     <</for>>
@@ -131,15 +141,16 @@
         <<lanSwitch 'Willpower while distracted: ' '心绪干扰下的意志：'>><span @class="$_psyche.willpower lt 1 ? 'red' : 'teal'"><<= Math.round($_psyche.willpower * 100)>>%</span><br>
         <<if $Psyche.mood gt 200>>
           <<lanSwitch 'Stress gained: ' '压力增长：'>><span class='red'><<= Math.round($_psyche.stressGain * 100)>>%</span><br>
+          <<lanSwitch 'Harbour retreat difficulty: ' '港湾撤退难度：'>><span class='green'><<= Math.round($_psyche.escape * 100)>>%</span><br>
         <<elseif $Psyche.mood lt -200>>
           <<lanSwitch 'Time spent on strange texts: ' '异常记载研读用时：'>><span class='green'><<= Math.round($_psyche.research * 100)>>%</span><br>
         <</if>>
       <</if>>
       <<language>>
         <<option 'EN'>>
-          Sanity affects learning, the use of your knowledge and how strongly strange experiences affect you. Dread and fascination pull you in opposite directions. Either can make it harder to concentrate. Dread makes stress harder to bear. Fascination draws you into strange texts, but leaves you sleeping lightly. Sleep, prayer and writing can help you settle.
+          Sanity affects learning, knowledge checks and how strongly strange experiences affect you. Dread and fascination counteract each other. Both weaken your resolve. Dread makes stress harder to bear, but helps you notice danger and flee. Fascination helps you follow strange clues, but leaves you sleeping lightly. Sleep, prayer and writing help you recover.
         <<option 'CN'>>
-          理智影响四科的学习与知识运用，也影响你有多容易受惊或入迷。恐惧与入迷互相抵消，两者都会让你难以集中精神。恐惧让压力更难承受，入迷让你更快地研读异常记载，却也睡得更浅。睡一觉、祈祷或写写东西，有助于安定心神。
+          理智影响四科学习、知识判定，也影响你有多容易受惊或入迷。恐惧与入迷互相抵消，都会削弱意志。恐惧让压力更难承受，却也让你更警觉，更容易逃离危险。入迷有助于追寻异常线索，却也让你睡得更浅。睡一觉、祈祷或写写东西，有助于恢复。
       <</language>><br>
     <</foldout>>
     <br>
