@@ -116,14 +116,6 @@ export default function Psyche(maplebirch: typeof window.maplebirch): void {
           to: '<<lanLink ["Go back in the shop", "回商店里"] "Gwylan Hypnosis End">><<psyche-insight>><<endevent>><</lanLink>><<if maplebirch.get("Psyche")?.active and $Psyche.insight isnot Time.date.timeStamp>><<if $Psyche.mood gt 0>><<llldread>><<elseif $Psyche.mood lt 0>><<lllfascination>><</if>><</if>>',
           expected: 1
         }
-      ],
-      'Orphanage Loft Reading Nook': [
-        {
-          // 沿用原版每日阅读角次数和二十分钟耗时，手工的原版治疗仍独立结算。
-          src: '<<set $phase to "write">><<pass 20>>',
-          applyafter: '<<psyche-rest 5 60>>',
-          expected: 1
-        }
       ]
     }
   });

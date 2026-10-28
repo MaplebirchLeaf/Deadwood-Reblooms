@@ -52,7 +52,7 @@ export default function Tips(core: typeof maplebirch): void {
       'general',
       ['A clear head makes studying easier. Some strange encounters can unsettle your mind.', '头脑清醒时，学习也更轻松。有些怪事却会动摇你的理智。'],
       ['Dread and fascination can distract you. Take a quiet moment in your bedroom or at the temple.', '恐惧与入迷都会让你分神。回卧室或去神殿定定神。'],
-      ['Sleep, prayer and a little writing can help restore your sanity.', '睡上一觉、做些祈祷，或写写东西，都能帮你恢复理智。']
+      ['Sleep and prayer can help restore your sanity.', '睡上一觉或做些祈祷，能帮你恢复理智。']
     );
 
   if (core.get('StreetLife'))

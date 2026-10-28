@@ -123,7 +123,7 @@ export default class Psyche extends Module {
   public rest(sanity = 0, mood = 0): void {
     if (!this.active || !Number.isFinite(sanity) || sanity < 0 || !Number.isFinite(mood)) return;
     const day = Math.floor(Time.days);
-    const recovery = (this.state.recovery ??= { day, spent: 0 });
+    const recovery = this.state.recovery;
     if (recovery.day !== day) Object.assign(recovery, { day, spent: 0 });
     const base = Math.min(sanity, Math.max(0, (this.ascended ? 60 : 30) - recovery.spent), 1000 - this.state.sanity);
     recovery.spent += base;

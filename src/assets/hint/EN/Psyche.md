@@ -38,7 +38,7 @@ Sleep, company and calming medication bring your thoughts towards calm. Hospital
 
 Routine activities share a **daily sanity recovery allowance of 30 points**, raised to **60 points** by Ascended. Each full hour of sleep restores 5 sanity and settles 80 points. Six hours usually use the normal daily allowance. Settling your thoughts still works after the allowance is spent. Nightmares can frighten you.
 
-An hour of prayer restores 10 sanity and settles 100 points. Twenty minutes of writing in the loft restores 5 and settles 60. Shrine prayers, giving thanks and time with familiar people also help. Sanity restored by resolving supernatural events is counted separately.
+An hour of prayer restores 10 sanity and settles 100 points. Shrine prayers, giving thanks and time with familiar people also help. Sanity restored by resolving supernatural events is counted separately.
 
 After completing Gwylan's insight hypnosis, returning to the shop settles 300 dread or fascination, stopping at calm. The session retains its original duration, cooldown and hypnotic side effects.
 
