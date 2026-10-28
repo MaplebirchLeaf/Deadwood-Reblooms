@@ -118,7 +118,7 @@
   <<deadwood-heist-aftermath-check>>
   <<if _aftermath_active and _aftermath_campaign.fight and !$combat and !$eventforced and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>>
     <<if ['won', 'lost'].includes(_aftermath_campaign.fight.result) and ['Deadwood Street Heist Wren Fight End', 'Deadwood Street Heist Landry Fight End'].includes(_aftermath_campaign.fight.return_passage)>>
-      <<lanLink ['Find out how the dockside confrontation ended', '查看码头冲突的后续']>>
+      <<icon 'street/case-board.png'>><<lanLink ['Find out how the dockside confrontation ended', '查看码头冲突的后续']>>
         <<deadwood-heist-aftermath-check>>
         <<if _aftermath_active and _aftermath_campaign.fight and ['won', 'lost'].includes(_aftermath_campaign.fight.result) and !$combat and !$eventforced and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze>><<goto `_aftermath_campaign.fight.return_passage`>><</if>>
       <</lanLink>><br>
@@ -128,27 +128,27 @@
   <<if !_aftermath_ok or _aftermath.stage gte 6>><<exit>><</if>>
   <<if !_aftermath.letter_read>><<exit>><</if>>
   <<if $passage is 'Smuggler Pub' and _aftermath_work.atMeeting>>
-    <<lanLink ['Check the arrangements left after the bank job', '查看银行行动留下的安排']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath'>><</lanLink>><br>
+    <<icon 'street/case-board.png'>><<lanLink ['Check the arrangements left after the bank job', '查看银行行动留下的安排']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath'>><</lanLink>><br>
   <<elseif _aftermath.leads.includes('pub')>>
     <<if $passage is 'Police Station' and $location is 'police_station' and (!_aftermath.leads.includes('grant') or (_aftermath.leads.includesAny('quinn_private', 'public_record') and !_aftermath.leads.includes('grant_explain'))) and _aftermath_work.grantAvailable and C.npc.Grant?.init is 1 and C.npc.Grant.state is 'active' and maplebirch.npc.Schedule.get('Grant').location is 'police_station'>>
-      <<lanLink ['Ask Grant about the private guards', '向格兰特询问那些私人守卫']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Grant'>><</lanLink>><br>
+      <<policeicon>><<lanLink ['Ask Grant about the private guards', '向格兰特询问那些私人守卫']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Grant'>><</lanLink>><br>
     <<elseif $passage is 'Town Hall Wait' and $location is 'townhall' and (!_aftermath.leads.includes('quinn') or !_aftermath.leads.includesAny('quinn_public', 'quinn_private')) and Time.hour gte 9 and Time.hour lt 17>>
-      <<lanLink ['Ask to inspect the warehouse permits', '申请查阅仓库许可']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Records'>><</lanLink>><br>
+      <<icon 'street/source-check.png'>><<lanLink ['Ask to inspect the warehouse permits', '申请查阅仓库许可']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Records'>><</lanLink>><br>
     <<elseif (($passage is "Bailey's Office" and _options is 1 and !maplebirch.get('StreetLife').bailey.defeated) or ($passage is 'Flats' and maplebirch.get('StreetLife').bailey.defeated)) and $location is (maplebirch.get('StreetLife').bailey.defeated ? 'flats' : 'home') and (!_aftermath.leads.includes('bailey') or (_aftermath.leads.includes('landry:freed') and !_aftermath.leads.includes('bailey_close'))) and maplebirch.get('StreetLife').bailey.atHome>>
-      <<lanLink ['Ask Bailey about the warehouse guarantor', '向贝利打听仓库担保人']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Bailey'>><</lanLink>><br>
+      <<socialiseicon 'ask'>><<lanLink ['Ask Bailey about the warehouse guarantor', '向贝利打听仓库担保人']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Bailey'>><</lanLink>><br>
     <<elseif $passage is "Briar's Office" and $phase is 0 and $location is 'brothel' and !_aftermath.leads.includes('briar') and C.npc.Briar.init is 1 and C.npc.Briar.state is 'active'>>
-      <<lanLink ['Ask about a visitor to the private warehouse', '打听去私人仓库的访客']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Briar'>><</lanLink>><br>
+      <<socialiseicon 'ask'>><<lanLink ['Ask about a visitor to the private warehouse', '打听去私人仓库的访客']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Briar'>><</lanLink>><br>
     <<elseif $passage is 'Hospital Foyer' and $location is 'hospital' and (!_aftermath.leads.includes('hospital') or (_aftermath_campaign.team?.injured.includes('Wren') and !_aftermath_campaign.team.aid.includes('Wren') and !_aftermath.leads.includes('wren_met') and !_aftermath.leads.includes('hospital_aid')) or ($pain gt 0 and $harper_appointments?.enabled and Time.weekDay is 6 and $daily.harperVisit isnot 1 and $trauma lt $traumamax * 0.9 and C.npc.Harper.init is 1 and C.npc.Harper.state is 'active' and !_aftermath.leads.includesAny('harper_paid', 'medical_record'))) and Time.hour gte 8 and Time.hour lt 18>>
-      <<lanLink ['Ask about the dockside first-aid collection', '询问码头的急救用品领取单']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Hospital'>><</lanLink>><br>
+      <<icon 'bandages.png'>><<lanLink ['Ask about the dockside first-aid collection', '询问码头的急救用品领取单']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Hospital'>><</lanLink>><br>
     <<elseif $passage is 'Docks' and $location is 'docks' and Time.hour gte 6 and Time.hour lt 22>>
       <<if !_aftermath.leads.includes('docks') and Time.hour lt 18>>
-        <<lanLink ['Ask the dockers about the private warehouse', '向码头工人打听私人仓库']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Docks'>><</lanLink>><br>
+        <<socialiseicon 'ask'>><<lanLink ['Ask the dockers about the private warehouse', '向码头工人打听私人仓库']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Docks'>><</lanLink>><br>
       <</if>>
       <<if _aftermath.leads.includes('wren_site') and !_aftermath.leads.includes('wren_met') and C.npc.Wren.init is 1 and C.npc.Wren.state is 'active'>>
-        <<lanLink ['Keep the collection appointment with Wren', '赴伦恩的取货之约']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Wren'>><</lanLink>><br>
+        <<icon 'street/cargo-handover.png'>><<lanLink ['Keep the collection appointment with Wren', '赴伦恩的取货之约']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Wren'>><</lanLink>><br>
       <</if>>
       <<if _aftermath.leads.includes('landry_site') and !_aftermath.leads.includes('landry_met') and C.npc.Landry.init is 1 and C.npc.Landry.state is 'active'>>
-        <<lanLink ['Look for Landry by the guarantor’s office', '去担保室附近找兰德里']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Landry'>><</lanLink>><br>
+        <<socialiseicon 'ask'>><<lanLink ['Look for Landry by the guarantor’s office', '去担保室附近找兰德里']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath Landry'>><</lanLink>><br>
       <</if>>
     <</if>>
   <</if>>
@@ -158,9 +158,9 @@
   <<deadwood-heist-aftermath-check>>
   <<if !_aftermath_ok or !_aftermath_work.atMeeting>><<exit>><</if>>
   <<if !_aftermath.letter_read>>
-    <<lanLink ['Collect the folded note from the bar', '去吧台取折叠的便笺']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Letter'>><</lanLink>><br>
+    <<icon 'street/document-envelope.png'>><<lanLink ['Collect the folded note from the bar', '去吧台取折叠的便笺']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Letter'>><</lanLink>><br>
   <<else>>
-    <<lanLink ['Review the remaining arrangements', '查看尚未了结的安排']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath'>><</lanLink>><br>
+    <<icon 'street/case-board.png'>><<lanLink ['Review the remaining arrangements', '查看尚未了结的安排']>><<deadwood-heist-aftermath-open 'Deadwood Street Heist Aftermath'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -192,14 +192,14 @@
   <<if _aftermath.stage gte 6>>
     <<lanSwitch 'The remaining arrangements have been settled.' '剩下的安排已经了结。'>><br>
     <<if _aftermath_work.state.outcome is 'success' and !_aftermath_work.state.settled>>
-      <<lanLink ['Take the accounts to the agreed division', '拿账目去按约分账']>>
+      <<icon 'street/job-payment.png'>><<lanLink ['Take the accounts to the agreed division', '拿账目去按约分账']>>
         <<deadwood-heist-aftermath-check>>
         <<if _aftermath_ok and _aftermath_work.atMeeting and Time.hour gte 9 and Time.hour lt 18 and _aftermath.stage is 6 and _aftermath_campaign.gold.trade.stage is 5>><<endevent>><<goto 'Deadwood Street Heist Debrief'>><</if>>
       <</lanLink>><br>
     <</if>>
   <<elseif _aftermath_campaign.gold.bars lte 0>>
     <<lanSwitch 'No gold remains to sell. Close the outstanding accounts when you are ready.' '没有留下可卖的黄金。准备好了，就了结剩下的账目。'>><br>
-    <<lanLink ['Close these arrangements', '了结这些安排']>>
+    <<refuseicon>><<lanLink ['Close these arrangements', '了结这些安排']>>
       <<deadwood-heist-aftermath-check>>
       <<if _aftermath_ok and _aftermath_work.atMeeting and $passage is 'Deadwood Street Heist Aftermath' and _aftermath.stage is 5 and _aftermath_campaign.gold.bars lte 0>><<set _aftermath.stage to 6, _aftermath_campaign.gold.trade.stage to 5, _aftermath_campaign.gold.trade.reason to 'empty'>><<goto 'Deadwood Street Heist Aftermath'>><</if>>
     <</lanLink>><br>
@@ -579,7 +579,7 @@
 <</language>><br><br>
 <div id='heist-aftermath-feedback'></div>
 <<if !_aftermath.leads.includes('pub')>>
-  <<lanLink ['Compare the copies with the agreed arrangements (0:20)', '核对副本与先前的约定 (0:20)']>>
+  <<icon 'street/source-check.png'>><<lanLink ['Compare the copies with the agreed arrangements (0:20)', '核对副本与先前的约定 (0:20)']>>
     <<deadwood-heist-aftermath-action 'pub' 20>><<if _aftermath_done>><<goto 'Deadwood Street Heist Aftermath'>><<else>><<deadwood-heist-aftermath-feedback>><</if>>
   <</lanLink>><br>
   <<if Time.hour lt 9 or Time.hour * 60 + Time.minute + 20 gte 18 * 60>><span class='blue'><<lanSwitch 'The records can be checked between nine and six. Leave enough time before the evening crowd arrives.' '上午九点到下午六点可以核对记录，须赶在晚间客人到来前办完。'>></span><br><</if>>

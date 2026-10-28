@@ -126,24 +126,24 @@
       <<option 'CN'>>
         副本写的取货日期已经过去。理货员翻过另一张单子，才答话。“人家没站在这里等你。留点时间，我得问问现在从哪扇门走。”
     <</language>><br><br>
-    <<deadwood-heist-rescue-button _rescue_name 'reschedule' `['Arrange another handover (0:10)', '重新安排交接 (0:10)']`>>
+    <<socialiseicon 'ask'>><<deadwood-heist-rescue-button _rescue_name 'reschedule' `['Arrange another handover (0:10)', '重新安排交接 (0:10)']`>>
   <<else>>
     <<switch _rescue_step>>
       <<case 'scout'>>
         <<deadwood-heist-rescue-scout _rescue_name>>
-        <<deadwood-heist-rescue-button _rescue_name 'scout' `_aftermath_work.skills.skulduggery >= 400 ? ['Watch the doors without drawing notice (0:10)', '不动声色地察看出入口 (0:10)'] : ['Work out the loading routine (0:20)', '观察装卸的规律 (0:20)']`>>
+        <<icon 'street/scout.png'>><<deadwood-heist-rescue-button _rescue_name 'scout' `_aftermath_work.skills.skulduggery >= 400 ? ['Watch the doors without drawing notice (0:10)', '不动声色地察看出入口 (0:10)'] : ['Work out the loading routine (0:20)', '观察装卸的规律 (0:20)']`>>
       <<case 'confirm'>>
         <<deadwood-heist-rescue-confirm _rescue_name>>
-        <<deadwood-heist-rescue-button _rescue_name 'confirm' `_aftermath[_rescue_name] === 'safe' ? ['Compare the seals and the agreed copy (0:05)', '核对封条与说好的副本 (0:05)'] : ['Check the person and the disputed account (0:10)', '确认本人并核对争议的账目 (0:10)']`>>
+        <<icon 'street/source-check.png'>><<deadwood-heist-rescue-button _rescue_name 'confirm' `_aftermath[_rescue_name] === 'safe' ? ['Compare the seals and the agreed copy (0:05)', '核对封条与说好的副本 (0:05)'] : ['Check the person and the disputed account (0:10)', '确认本人并核对争议的账目 (0:10)']`>>
         <<if _aftermath.leads.includes('visitors')>>
-          <<deadwood-heist-rescue-button _rescue_name 'delivery' `['Use Briar’s delivery appointment (0:10)', '按布莱尔的送货预约接洽 (0:10)']`>>
+          <<icon 'street/cargo-handover.png'>><<deadwood-heist-rescue-button _rescue_name 'delivery' `['Use Briar’s delivery appointment (0:10)', '按布莱尔的送货预约接洽 (0:10)']`>>
         <</if>>
       <<case 'break'>>
         <<deadwood-heist-rescue-break _rescue_name>>
-        <<if _rescue_name is 'wren' and _aftermath_work.skills.skulduggery gte 400>><<deadwood-heist-rescue-button _rescue_name 'quiet' `['Open the side gate while Wren keeps them talking (0:20)', '趁伦恩牵住对方，打开侧门 (0:20)']`>><</if>>
-        <<if _aftermath.leads.includes('permit') and (_rescue_name is 'wren' or _aftermath.leads.includesAny('guarantee', 'visitors', 'public_record'))>><<deadwood-heist-rescue-button _rescue_name 'papers' `['Challenge the demand with the checked documents (0:15)', '拿核实过的文件质疑索偿 (0:15)']`>><</if>>
-        <<if _aftermath_work.skills.english gte (_aftermath.leads.includes('interpreted') ? 400 : 600) and _aftermath.leads.includesAny('guarantee', 'visitors', 'public_record') and !$worn.face.type.includes('gag')>><<deadwood-heist-rescue-button _rescue_name 'talk' `['Keep them to the terms they actually agreed (0:20)', '让他们按真正答应过的条款办事 (0:20)']`>><</if>>
-        <<if $money gte (_rescue_name is 'wren' ? 30000 : 50000)>><<deadwood-heist-rescue-button _rescue_name 'pay' `['Settle the claim (£' + (_rescue_name === 'wren' ? 300 : 500) + ' 0:10)', '付钱了结索偿 (£' + (_rescue_name === 'wren' ? 300 : 500) + ' 0:10)']`>><</if>>
+        <<if _rescue_name is 'wren' and _aftermath_work.skills.skulduggery gte 400>><<icon 'padlock-unlocked.png'>><<deadwood-heist-rescue-button _rescue_name 'quiet' `['Open the side gate while Wren keeps them talking (0:20)', '趁伦恩牵住对方，打开侧门 (0:20)']`>><</if>>
+        <<if _aftermath.leads.includes('permit') and (_rescue_name is 'wren' or _aftermath.leads.includesAny('guarantee', 'visitors', 'public_record'))>><<icon 'street/source-check.png'>><<deadwood-heist-rescue-button _rescue_name 'papers' `['Challenge the demand with the checked documents (0:15)', '拿核实过的文件质疑索偿 (0:15)']`>><</if>>
+        <<if _aftermath_work.skills.english gte (_aftermath.leads.includes('interpreted') ? 400 : 600) and _aftermath.leads.includesAny('guarantee', 'visitors', 'public_record') and !$worn.face.type.includes('gag')>><<socialiseicon 'ask'>><<deadwood-heist-rescue-button _rescue_name 'talk' `['Keep them to the terms they actually agreed (0:20)', '让他们按真正答应过的条款办事 (0:20)']`>><</if>>
+        <<if $money gte (_rescue_name is 'wren' ? 30000 : 50000)>><<icon 'pound.png'>><<deadwood-heist-rescue-button _rescue_name 'pay' `['Settle the claim (£' + (_rescue_name === 'wren' ? 300 : 500) + ' 0:10)', '付钱了结索偿 (£' + (_rescue_name === 'wren' ? 300 : 500) + ' 0:10)']`>><</if>>
         <<capture _rescue_name>>
           <<lanLink ['Hold the guards back while the other person opens the exit', '拦住守卫']>>
             <<deadwood-heist-rescue-check _rescue_name>>
@@ -152,9 +152,9 @@
         <</capture>>
       <<case 'escort'>>
         <<deadwood-heist-rescue-escort _rescue_name>>
-        <<if _rescue_injured and _aftermath.leads.includes('aid_kit') and !_aftermath.leads.includes('aid_used')>><<deadwood-heist-rescue-button _rescue_name 'dress' `['Bandage Wren’s injury before moving (0:10)', '先替伦恩包扎，再动身 (0:10)']`>><</if>>
-        <<if !_rescue_injured and Math.max(_aftermath_work.skills.athletics, _aftermath_work.skills.skulduggery) gte 400>><<deadwood-heist-rescue-button _rescue_name 'escort_quiet' `['Take the sheltered way along the quay (0:15)', '沿码头有遮蔽的路离开 (0:15)']`>><</if>>
-        <<deadwood-heist-rescue-button _rescue_name 'escort_slow' `_rescue_injured ? ['Support Wren on the longer way out (0:35)', '扶着伦恩，从远路离开 (0:35)'] : ['Keep together and take the longer way out (0:25)', '一同从远路离开 (0:25)']`>>
+        <<if _rescue_injured and _aftermath.leads.includes('aid_kit') and !_aftermath.leads.includes('aid_used')>><<icon 'bandages.png'>><<deadwood-heist-rescue-button _rescue_name 'dress' `['Bandage Wren’s injury before moving (0:10)', '先替伦恩包扎，再动身 (0:10)']`>><</if>>
+        <<if !_rescue_injured and Math.max(_aftermath_work.skills.athletics, _aftermath_work.skills.skulduggery) gte 400>><<getouticon>><<deadwood-heist-rescue-button _rescue_name 'escort_quiet' `['Take the sheltered way along the quay (0:15)', '沿码头有遮蔽的路离开 (0:15)']`>><</if>>
+        <<getouticon>><<deadwood-heist-rescue-button _rescue_name 'escort_slow' `_rescue_injured ? ['Support Wren on the longer way out (0:35)', '扶着伦恩，从远路离开 (0:35)'] : ['Keep together and take the longer way out (0:25)', '一同从远路离开 (0:25)']`>>
         <<if _rescue_injured and _aftermath_work.skills.physique lt 400>><span class='gold'><<lanSwitch 'A porter will charge £50 to help with the weight.' '需要付五十镑，请搬运工搭把手。'>></span><br><</if>>
       <<case 'done'>>
         <<deadwood-heist-rescue-ending _rescue_name>>
@@ -163,7 +163,7 @@
   <<if _rescue_step is 'done'>>
     <<getouticon>><<lanLink ['Return to the quay', '回到码头'] 'Docks'>><<endevent>><</lanLink>><br>
   <<elseif _rescue_step is 'break'>>
-    <<deadwood-heist-rescue-button _rescue_name 'leave' `['Leave the other person to make their own deal', '让对方自行交易，离开这里']`>>
+    <<refuseicon>><<deadwood-heist-rescue-button _rescue_name 'leave' `['Leave the other person to make their own deal', '让对方自行交易，离开这里']`>>
   <<else>>
     <<getouticon>><<lanLink ['Return to the quay for now', '先回码头'] 'Docks'>><<endevent>><</lanLink>><br>
   <</if>>

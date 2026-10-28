@@ -13,7 +13,7 @@
   <<if _gold_active and _gold_campaign.fight?.return_passage is 'Deadwood Street Heist Gold Fight Result' and ['won', 'lost'].includes(_gold_campaign.fight.result) and !$combat and _gold_work.available and !$possessed and !$replayScene and !$statFreeze and (($passage is 'Smuggler Pub' and _gold_work.atMeeting) or ($passage is 'Docks' and $location is 'docks'))>>
     <<lanLink ['Return to the disputed gold payment', '处理销金争执的后续'] 'Deadwood Street Heist Gold Fight Result'>><</lanLink>><br>
   <<elseif _gold_here and $passage is 'Smuggler Pub' and _gold_trade.stage lt 5>>
-    <<lanLink ['Check the gold buyer’s appointment and payment', '查看买家的约见与货款'] 'Deadwood Street Heist Gold'>><</lanLink>><br>
+    <<icon 'street/gold-bars.png'>><<lanLink ['Check the gold buyer’s appointment and payment', '查看买家的约见与货款'] 'Deadwood Street Heist Gold'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -112,7 +112,7 @@
   <<if !_gold_active>><<exit>><</if>>
   <<if !_gold_here>><span class='blue'><<lanSwitch 'Keep the next appointment at the smugglers’ pub, 09:00–18:00.' '请在09:00–18:00回走私者酒馆处理约见。'>></span><br><<exit>><</if>>
   <<if !['Deadwood Street Heist Gold', 'Deadwood Street Heist Gold Appointment', 'Deadwood Street Heist Gold Recovery'].includes($passage)>>
-    <<lanLink ['Arrange the gold sale and payment', '商量验货与收款'] 'Deadwood Street Heist Gold'>><</lanLink>><br><<exit>>
+    <<icon 'street/gold-bars.png'>><<lanLink ['Arrange the gold sale and payment', '商量验货与收款'] 'Deadwood Street Heist Gold'>><</lanLink>><br><<exit>>
   <</if>>
   <div id='heist-gold-feedback'></div>
   <<switch _gold_trade.stage>>
@@ -127,22 +127,22 @@
       <<elseif Math.floor(Time.days) lt _gold_trade.day>>
         <<lanSwitch 'The buyer will meet you in' '距离买家约定的日期还有'>><<print ' ' + (_gold_trade.day - Math.floor(Time.days)) + ' '>><<lanSwitch 'day(s), between 09:00 and 18:00. The gold stays with you until you accept a price.' '天，当日09:00–18:00接洽。接受价格前，金条仍由你这边保管。'>><br>
       <<elseif _gold_trade.stage is 1>>
-        <<lanLink ['Bring the bars to the appointment (0:10)', '带上金条赴约 (0:10)']>><<deadwood-heist-gold-trade 'attend'>><</lanLink>><br>
+        <<icon 'street/gold-bars.png'>><<lanLink ['Bring the bars to the appointment (0:10)', '带上金条赴约 (0:10)']>><<deadwood-heist-gold-trade 'attend'>><</lanLink>><br>
       <<elseif _gold_trade.amount is 0>>
         <<if _gold_campaign.aftermath.leads.includes('public_record')>><<lanSwitch 'The published account numbers have made the lot harder to place. The buyer deducts another five percent of its estimated value.' '公开的账户编号让这批货更难出手。买家另外压下相当于估值百分之五的价款。'>><br><</if>>
         <<lanSwitch 'The dealer subtracts a charge for the marks and brings out a scale. The written weight and the figure on the scale do not quite agree.' '收货人先扣去处理记号的费用，又搬出一架秤。纸上的重量，与秤上显示的数目对不上。'>><br><br>
-        <<lanLink ['Check the weights and metal (0:15)', '检查砝码与金料 (0:15)']>><<deadwood-heist-gold-trade 'weigh'>><</lanLink>> · <<lanSwitch 'Science' '科学'>><br>
-        <<lanLink ['Check the accounts and receipt (0:15)', '核对账目与收据 (0:15)']>><<deadwood-heist-gold-trade 'papers'>><</lanLink>> · <<lanSwitch 'Maths' '数学'>><br>
+        <<icon 'street/gold-assay.png'>><<lanLink ['Check the weights and metal (0:15)', '检查砝码与金料 (0:15)']>><<deadwood-heist-gold-trade 'weigh'>><</lanLink>> · <<lanSwitch 'Science' '科学'>><br>
+        <<icon 'street/source-check.png'>><<lanLink ['Check the accounts and receipt (0:15)', '核对账目与收据 (0:15)']>><<deadwood-heist-gold-trade 'papers'>><</lanLink>> · <<lanSwitch 'Maths' '数学'>><br>
       <<else>>
         <<lanSwitch 'The fixed offer for this lot is ' '这批货的固定报价为'>><span class='gold'><<= formatMoney(_gold_trade.amount)>></span>。<<if _gold_trade.secured>><<lanSwitch ' You have a checked receipt for any unpaid balance.' ' 未付尾款有核对过的签收凭据。'>><</if>><br>
-        <<if !_gold_trade.reason.includes('bargained') and !$worn.face.type.includes('gag')>><<lanLink ['Dispute the discount once (0:10)', '再争取一次价格 (0:10)']>><<deadwood-heist-gold-trade 'bargain'>><</lanLink>> · <<lanSwitch 'English' '英语'>><br><</if>>
+        <<if !_gold_trade.reason.includes('bargained') and !$worn.face.type.includes('gag')>><<socialiseicon 'ask'>><<lanLink ['Dispute the discount once (0:10)', '再争取一次价格 (0:10)']>><<deadwood-heist-gold-trade 'bargain'>><</lanLink>> · <<lanSwitch 'English' '英语'>><br><</if>>
         <<if _gold.buyer is 'landry'>><<lanSwitch 'Handing over the bars pays a 30% deposit now; the rest is due two days later. A missed payment may need pursuing.' '交货时先付三成定金，两天后付尾款。对方失约时，仍需亲自追讨。'>><br><</if>>
-        <<lanLink ['Accept the price and hand over the bars (0:10)', '按报价交出金条 (0:10)']>><<deadwood-heist-gold-trade 'accept'>><</lanLink>><br>
+        <<icon 'street/gold-bars.png'>><<lanLink ['Accept the price and hand over the bars (0:10)', '按报价交出金条 (0:10)']>><<deadwood-heist-gold-trade 'accept'>><</lanLink>><br>
       <</if>>
       <<if Math.floor(Time.days) lte _gold_trade.day>><<lanLink ['Try the other buyer on another day (0:05)', '改约另一位买家 (0:05)']>><<deadwood-heist-gold-trade 'switch'>><</lanLink>><br><</if>>
     <<case 3>>
       <<lanSwitch 'The bars have been handed over. The deposit is recorded in the shared account; the unpaid balance is ' '金条已经交出。定金记在公账上，尚未支付的尾款为'>><span class='gold'><<= formatMoney(_gold_trade.amount - _gold_trade.deposit)>></span>。<br>
-      <<if Math.floor(Time.days) gte _gold_trade.day>><<lanLink ['Keep the payment appointment (0:05)', '赴约领取尾款 (0:05)']>><<deadwood-heist-gold-trade 'collect'>><</lanLink>><br><<else>><<lanSwitch 'Days until payment: ' '距付款日还有：'>><<= _gold_trade.day - Math.floor(Time.days)>><br><</if>>
+      <<if Math.floor(Time.days) gte _gold_trade.day>><<icon 'street/job-payment.png'>><<lanLink ['Keep the payment appointment (0:05)', '赴约领取尾款 (0:05)']>><<deadwood-heist-gold-trade 'collect'>><</lanLink>><br><<else>><<lanSwitch 'Days until payment: ' '距付款日还有：'>><<= _gold_trade.day - Math.floor(Time.days)>><br><</if>>
     <<case 4>>
       <<if _gold_trade.reason is 'missed'>>
         <<lanSwitch 'The gold is still yours to bring. The buyer may lower the offer for the delay when you arrange another day.' '金条还在你这边。可以另约日子，不过拖延会让买家压低报价。'>><br>
@@ -150,17 +150,17 @@
         <<lanLink ['Ask the other buyer instead (0:05)', '改约另一位买家 (0:05)']>><<deadwood-heist-gold-trade 'switch'>><</lanLink>><br>
       <<else>>
         <<lanSwitch 'The buyer has kept the bars and failed to pay the balance. The deposit remains in the shared account. Two attendants wait beside the office door.' '买家收了金条，却没付尾款。定金仍记在公账上，两名随从守在办公室门旁。'>><br><br>
-        <<if _gold_trade.secured or (_gold_work.skills.maths gte 400 and _gold_campaign.aftermath.leads.includes('guarantee'))>><<lanLink ['Enforce the checked receipt and accounts (0:20)', '拿核实的收据与账目追讨 (0:20)']>><<deadwood-heist-gold-trade 'documents'>><</lanLink>> · <<lanSwitch 'Maths / evidence' '数学／凭据'>><br><</if>>
-        <<if _gold_trade.reason is 'default' and !$worn.face.type.includes('gag')>><<lanLink ['Negotiate for most of the balance (0:15)', '交涉追讨大部分尾款 (0:15)']>><<deadwood-heist-gold-trade 'talk'>><</lanLink>> · <<lanSwitch 'English' '英语'>><br><</if>>
+        <<if _gold_trade.secured or (_gold_work.skills.maths gte 400 and _gold_campaign.aftermath.leads.includes('guarantee'))>><<icon 'street/source-check.png'>><<lanLink ['Enforce the checked receipt and accounts (0:20)', '拿核实的收据与账目追讨 (0:20)']>><<deadwood-heist-gold-trade 'documents'>><</lanLink>> · <<lanSwitch 'Maths / evidence' '数学／凭据'>><br><</if>>
+        <<if _gold_trade.reason is 'default' and !$worn.face.type.includes('gag')>><<socialiseicon 'ask'>><<lanLink ['Negotiate for most of the balance (0:15)', '交涉追讨大部分尾款 (0:15)']>><<deadwood-heist-gold-trade 'talk'>><</lanLink>> · <<lanSwitch 'English' '英语'>><br><</if>>
         <<if ['default', 'default-talked'].includes(_gold_trade.reason)>><<lanLink ['Resist the attendants blocking the account book (0:05)', '反抗拦住账簿的随从 (0:05)']>><<deadwood-heist-gold-trade 'fight'>><</lanLink>><<dangerousText>><br><</if>>
-        <<lanLink ['Sell the unpaid claim to the other dealer for half (0:15)', '把未付债权折半转给另一位收货人 (0:15)']>><<deadwood-heist-gold-trade 'assign'>><</lanLink>><br>
+        <<icon 'finance/repayment.png'>><<lanLink ['Sell the unpaid claim to the other dealer for half (0:15)', '把未付债权折半转给另一位收货人 (0:15)']>><<deadwood-heist-gold-trade 'assign'>><</lanLink>><br>
       <</if>>
     <<case 5>>
       <<if _gold_trade.reason is 'abandoned'>><<lanSwitch 'You have given up the uncompleted sale or unpaid balance. No further collection is promised.' '你放弃了未完成的交易或未付尾款，不再追讨。'>><<else>><<lanSwitch 'The buyer’s account is closed. The amount actually received is ready for the agreed division.' '买家的账已经收束。现在可以按原先约定分配实际收到的款项。'>><</if>><br>
       <<lanSwitch 'Total actually received before shares: ' '分账前实际收到：'>><span class='gold'><<= formatMoney(_gold.proceeds)>></span><br>
-      <<lanLink ['Bring the actual receipts to the agreed division', '拿实际收款记录去按约分账'] 'Deadwood Street Heist Debrief'>><</lanLink>><br>
+      <<icon 'street/job-payment.png'>><<lanLink ['Bring the actual receipts to the agreed division', '拿实际收款记录去按约分账'] 'Deadwood Street Heist Debrief'>><</lanLink>><br>
   <</switch>>
-  <<if _gold_trade.stage lt 5>><br><<lanLink ['Give up the remaining proceeds (0:05)', '放弃余下金条或尾款 (0:05)']>><<deadwood-heist-gold-trade 'abandon'>><</lanLink>> <span class='red'><<lanSwitch 'Landry and Wren will resent losing the shared proceeds.' '兰德里与伦恩会因共同利益受损而不满。'>></span><br><</if>>
+  <<if _gold_trade.stage lt 5>><br><<refuseicon>><<lanLink ['Give up the remaining proceeds (0:05)', '放弃余下金条或尾款 (0:05)']>><<deadwood-heist-gold-trade 'abandon'>><</lanLink>> <span class='red'><<lanSwitch 'Landry and Wren will resent losing the shared proceeds.' '兰德里与伦恩会因共同利益受损而不满。'>></span><br><</if>>
 <</widget>>
 
 <<widget 'deadwood-heist-gold-journal'>>

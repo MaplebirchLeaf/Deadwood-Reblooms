@@ -116,14 +116,14 @@
     <<lanSwitch 'Remaining payments: ' '待付费用：'>><<printmoney _total>><<lanSwitch '. ' '。'>><<lanSwitch 'Estimated time, including current work: ' '连同当前工程，预计还需'>><<print _days>><<lanSwitch ' days, excluding delays.' '天，不含等待时间。'>><br>
     <<if $Orchard.projects.paused>>
       <span class='blue'><<lanSwitch 'Further work is on hold.' '后续工程已暂停。'>></span><br>
-      <<lanLink ['Resume the plans', '恢复施工安排'] 'Deadwood Farm Projects'>><<set $Orchard.projects.paused to false>><<deadwood-farm-projects-day true>><</lanLink>><br>
+      <<farmicon 'alexdesk'>><<lanLink ['Resume the plans', '恢复施工安排'] 'Deadwood Farm Projects'>><<set $Orchard.projects.paused to false>><<deadwood-farm-projects-day true>><</lanLink>><br>
     <<else>>
-      <<lanLink ['Put further work on hold', '暂停后续工程'] 'Deadwood Farm Projects'>><<set $Orchard.projects.paused to true>><</lanLink>><br>
+      <<refuseicon>><<lanLink ['Put further work on hold', '暂停后续工程'] 'Deadwood Farm Projects'>><<set $Orchard.projects.paused to true>><</lanLink>><br>
       <<if !$farm.build and _farmProjectsReady>>
-        <<lanLink ['Check whether the next job can start', '检查下一项工程能否开工'] 'Deadwood Farm Projects'>><<deadwood-farm-projects-day true>><</lanLink>><br>
+        <<farmicon 'alexdesk'>><<lanLink ['Check whether the next job can start', '检查下一项工程能否开工'] 'Deadwood Farm Projects'>><<deadwood-farm-projects-day true>><</lanLink>><br>
       <</if>>
     <</if>>
-    <<lanLink ['Clear the plans', '清空待办工程'] 'Deadwood Farm Projects'>><<set $Orchard.projects.queue to []>><</lanLink>><br>
+    <<refuseicon>><<lanLink ['Clear the plans', '清空待办工程'] 'Deadwood Farm Projects'>><<set $Orchard.projects.queue to []>><</lanLink>><br>
     <span class='blue'><<lanSwitch 'Work already underway will continue.' '已经开工的工程会继续进行。'>></span><br><br>
   <<else>>
     <<lanSwitch 'You have not arranged any further work.' '你还没有安排后续工程。'>><br><br>
@@ -134,7 +134,7 @@
       <<if (_project.field is 'wall' or $farm_stage gte 8) and _level is _farmProjectsLevels[_project.field] + 1
         and (_project.field isnot 'irrigation' or _level lte Math.min(9, $plots.farm.length))>>
         <<capture _project _level>>
-          <<lanLink [`Plan: ${_project.name[0]} (0:20)`, `安排：${_project.name[1]} (0:20)`] 'Deadwood Farm Projects'>>
+          <<farmicon 'alexdesk'>><<lanLink [`Plan: ${_project.name[0]} (0:20)`, `安排：${_project.name[1]} (0:20)`] 'Deadwood Farm Projects'>>
             <<deadwood-farm-projects-add _project.id _level>>
           <</lanLink>> — <<printmoney _project.cost>>, <<print _project.days>><<lanSwitch ' days' '天'>><br>
         <</capture>>

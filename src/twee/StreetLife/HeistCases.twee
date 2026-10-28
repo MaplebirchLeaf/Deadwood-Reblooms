@@ -94,7 +94,7 @@
   <<for _hcPlanId range ['dock', 'reception']>>
     <<set _hcPlanRecord to _hcPlan.state.campaign[_hcPlanId]>>
     <<capture _hcPlanId>>
-      <strong><<lanSwitch `_hcPlanId is 'dock' ? 'The harbour pay chest' : 'The civic reception'` `_hcPlanId is 'dock' ? '码头押款' : '市政招待会'`>></strong><br>
+      <<if _hcPlanId is 'dock'>><<icon 'street/pay-chest.png'>><<else>><<skinicon 'waiter'>><</if>><strong><<lanSwitch `_hcPlanId is 'dock' ? 'The harbour pay chest' : 'The civic reception'` `_hcPlanId is 'dock' ? '码头押款' : '市政招待会'`>></strong><br>
       <<if _hcPlanRecord.stage is 0 or (_hcPlanRecord.stage is 6 and _hcPlanRecord.result is 'failed')>>
         <<if _hcPlanId is 'reception' and !(_hcPlan.state.campaign.dock.stage is 6 and _hcPlan.state.campaign.dock.result isnot 'failed')>>
           <span class='blue'><<lanSwitch 'Settle the dock job before taking this offer.' '先处理并结清码头那一案，再谈这份提议。'>></span><br>
@@ -158,7 +158,7 @@
     <<lanLink ['Return to the unfinished confrontation', '回去应对未结束的冲突'] `_hcEntryHeist.state.campaign.fight.result ? _hcEntryTarget : 'Deadwood Street Campaign Fight'`>><</lanLink>><br>
   <<elseif _hcEntryRecord.stage gte 1 and _hcEntryRecord.stage lte 4 and !$combat and !$possessed>>
     <<if _hcEntryRecord.stage gt 1 or (_hcEntryId is 'dock' ? Time.hour gte 9 and Time.hour lt 18 : Time.hour gte 14 and Time.hour lt 17)>>
-      <<icon 'street/heist-plan.png'>><<lanLink `[_hcEntryId is 'dock' ? 'Meet Wren by the payment handover' : 'Go to the arranged civic reception', _hcEntryId is 'dock' ? '到款箱交接处与伦恩会合' : '前往约好的市政招待会']` `_hcEntryTarget`>><<endevent>><</lanLink>><br>
+      <<if _hcEntryId is 'dock'>><<icon 'street/pay-chest.png'>><<else>><<skinicon 'waiter'>><</if>><<lanLink `[_hcEntryId is 'dock' ? 'Meet Wren by the payment handover' : 'Go to the arranged civic reception', _hcEntryId is 'dock' ? '到款箱交接处与伦恩会合' : '前往约好的市政招待会']` `_hcEntryTarget`>><<endevent>><</lanLink>><br>
     <</if>>
   <</if>>
 <</widget>>
