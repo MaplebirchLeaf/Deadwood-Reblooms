@@ -82,7 +82,7 @@ export default function BirdTowerScript(maplebirch: typeof window.maplebirch): v
       'Childrens Home': [
         {
           src: '<<childrenEvents $location $passage>>',
-          to: '<<if $location is "tower">><<babyhawkEvents $location $passage>><<else>><<childrenEvents $location $passage>><</if>>',
+          to: '<<if $location is "tower">><<deadwood-birdtower-events $location $passage>><<else>><<childrenEvents $location $passage>><</if>>',
           expected: 1
         }
       ],
@@ -159,7 +159,7 @@ export default function BirdTowerScript(maplebirch: typeof window.maplebirch): v
         {
           // 先让同行鹰崽分食原版战利品，再清空这次队伍。
           src: '<<flight_hunt_loot>>\n<</if>>',
-          applyafter: '\n<<HuntTogetherClean>>',
+          applyafter: '\n<<deadwood-birdtower-hunt-clear>>',
           expected: 1
         }
       ]

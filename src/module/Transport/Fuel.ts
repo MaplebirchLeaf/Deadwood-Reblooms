@@ -28,7 +28,7 @@ export default class Fuel {
     return (this.current && this.transport.state.fuel_stores?.[this.current.id]) || { cans: 0, litres: 0 };
   }
 
-  public get refill_amount(): number {
+  public get refillAmount(): number {
     const vehicle = this.transport.vehicle;
     const model = this.transport.model;
     if (!this.current || !vehicle || !model || vehicle.garage !== this.current.id || !this.transport.nearby.includes(vehicle)) return 0;
@@ -59,7 +59,7 @@ export default class Fuel {
 
   public refill(): boolean {
     if (this.transport.core.passage.title !== 'Deadwood Transport Menu' || !this.transport.ready) return false;
-    const amount = this.refill_amount;
+    const amount = this.refillAmount;
     if (amount <= 0) return false;
     const store = this.transport.state.fuel_stores[this.current!.id];
     this.transport.vehicle!.fuel = Math.round((this.transport.vehicle!.fuel + amount) * 100) / 100;

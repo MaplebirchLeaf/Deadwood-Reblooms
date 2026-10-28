@@ -1,7 +1,7 @@
 :: Deadwood BirdTower Hunt Widgets [widget]
 
 <!-- 同一狩猎步只判定、入账一次。跨日或重绘不重新抽取猎物。 -->
-<<widget "birdtower_hunt_result">>
+<<widget "deadwood-birdtower-hunt-result">>
   <<set _huntResult to null>>
   <<if !$bird.hunts.loot or $combat or $replayScene or $statFreeze>><<exit>><</if>>
   <<set $_huntMark to [$bird.hunts.timer, $bird.hunts.distanceNorth, $bird.hunts.distanceEast].join(':')>>
@@ -29,7 +29,7 @@
   <<if ['single', 'double', 'group'].includes(_args[0])>><<set $danceSuccess to _huntResult.dance, $tendingSuccess to _huntResult.tending>><</if>>
 <</widget>>
 
-<<widget "birdtower_hunt_result_get">>
+<<widget "deadwood-birdtower-hunt-take">>
   <<if !_huntResult or $combat or $replayScene or $statFreeze>><<exit>><</if>>
   <<if !_huntResult.base>>
     <<set _huntResult.base to true>>
@@ -40,8 +40,8 @@
   <<if _huntResult.left gt 0>><<lanSwitch 'You leave behind what you cannot carry.' '你放下了带不走的猎物。'>><</if>>
 <</widget>>
 
-<<widget "birdtower_hunt_companion_loot">>
-  <<birdtower_hunt_result>>
+<<widget "deadwood-birdtower-hunt-companion-loot">>
+  <<deadwood-birdtower-hunt-result>>
   <<if !_huntResult>><<exit>><</if>>
   <<if _huntResult.prey is null>><<set _huntResult.prey to maplebirch.get('BirdTower').prey>><</if>>
   <<set $_prey to _huntResult.prey>>
@@ -104,9 +104,9 @@
   <</if>>
 <</widget>>
 
-<<widget "birdtower_scavenge_options">>
+<<widget "deadwood-birdtower-scavenge-options">>
   <<if $bird.hunts.weight gte maplebirch.get('BirdTower').capacity or $stress gte $stressmax or isPregnancyEnding() or $pain gte 90 or $bird.hunts.timer gte 90>>
-    <<babyhawk_hunt_return>>
+    <<deadwood-birdtower-hunt-return>>
   <<elseif $daily.emptyCampLoot lte 0>>
     <<language>>
       <<option 'EN'>>
@@ -115,7 +115,7 @@
         你再次看了一眼周围。你已经拿走了所有值钱的东西，现在能做到只有离开了。
     <</language>>
     <<endevent>>
-    <<babyhawk_hunt_return>>
+    <<deadwood-birdtower-hunt-return>>
   <<else>>
     <<switch $daily.emptyCampLoot>>
       <<case 3>>
@@ -154,12 +154,12 @@
 
 :: Deadwood BirdTower Widget BabyHawk HuntTogether [widget]
 <!-- 清理随行狩猎状态：交给 TS 模块重置队伍、领队与方向提示。 -->
-<<widget "HuntTogetherClean">>
+<<widget "deadwood-birdtower-hunt-clear">>
   <<unset $BirdTower.hunt.result>>
   <<run maplebirch.get("BirdTower").resetHunt()>>
 <</widget>>
 
-<<widget "babyhawk_loot_select">>
+<<widget "deadwood-birdtower-hunt-loot-select">>
   <<rng>>
   <<if maplebirch.get('BirdTower').leaderTrait is "dominant">>
     <<set $rng += 40>>
@@ -182,9 +182,9 @@
   <</if>>
 <</widget>>
 
-<<widget "babyhawk_hunt_chance">>
+<<widget "deadwood-birdtower-hunt-chance">>
   <<if $bird.hunts.goal is "babyhawk">>
-    <<babyhawk_loot_select>>
+    <<deadwood-birdtower-hunt-loot-select>>
     <<switch _babyhawk_loot_select>>
       <<case "lurker">>
         <<set $_goal to "lurkers">>
@@ -230,7 +230,7 @@
   <</if>>
 <</widget>>
 
-<<widget "babyhawk_hunt_options">>
+<<widget "deadwood-birdtower-hunt-options">>
   <<childSelect $BirdTower.hunt.leader>>
   <<flight_time_check 20 "silent">>
   <<if $bird.hunts.goal is "babyhawk">>
@@ -615,7 +615,7 @@
   <</if>>
 <</widget>>
 
-<<widget "babyhawk_hunt_return">>
+<<widget "deadwood-birdtower-hunt-return">>
   <<childSelect $BirdTower.hunt.leader>>
   <<if $bird.hunts.weight gte maplebirch.get('BirdTower').capacity and $stress lt $stressmax and !isPregnancyEnding()>>
     <<language>>
@@ -716,6 +716,6 @@
       <<set $phase to 2>>
     <</if>>
     <br><br>
-    <<babyhawk_hunt_options>>
+    <<deadwood-birdtower-hunt-options>>
   <</if>>
 <</widget>>

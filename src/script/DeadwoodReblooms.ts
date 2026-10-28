@@ -50,7 +50,7 @@ export default function (maplebirch: MaplebirchCore) {
     }
   });
 
-  maplebirch.tool.addTo('Options', 'Deadwood-Reblooms-Options');
+  maplebirch.tool.addTo('Options', 'deadwood-options');
   maplebirch.tool.addTo('Statistics', 'deadwood-reblooms-statistics');
   maplebirch.char.use(
     'post',
@@ -166,7 +166,7 @@ export default function (maplebirch: MaplebirchCore) {
         // 在镜子设置的下一项控件前插入身体刻字组件，保持原版设置网格的 HTML 层级不变。
         {
           srcmatch: /<div class="settingsToggleItemWide">(?=(?:(?!<\/div>)[\s\S])*<<listbox "\$player\.bodyshape" autoselect>>)/,
-          applybefore: '<<DeadwoodRebloomsBodyWriting>>\n\t\t',
+          applybefore: '<<deadwood-bodywriting>>\n\t\t',
           expected: 1
         }
       ]

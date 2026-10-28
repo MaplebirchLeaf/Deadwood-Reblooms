@@ -23,7 +23,7 @@
 <</widget>>
 
 <!-- 模组设置 -->
-<<widget 'Deadwood-Reblooms-Options'>>
+<<widget 'deadwood-options'>>
   <details open>
     <summary class='settingsHeader options'><span class='gold'><<lanSwitch 'Deadwood Reblooms' '枯木逢春'>></span></summary>
     <div class='settingsGrid'>
@@ -87,11 +87,11 @@
   <</if>>
   <<switch $DeadwoodReblooms.activeTab>>
     <<case 'Hint'>>
-      <<DeadwoodRebloomsContent>>
+      <<deadwood-hint-content>>
     <<case 'Content'>>
       <<= setup.maplebirch.content.play>>
     <<default>>
-      <<DeadwoodRebloomsContent>>
+      <<deadwood-hint-content>>
   <</switch>>
 <</widget>>
 
@@ -123,7 +123,7 @@
 <</widget>>
 
 <!-- 侧边栏提示内容：提供提示搜索与清空操作。 -->
-<<widget 'DeadwoodRebloomsContent'>>
+<<widget 'deadwood-hint-content'>>
   <span class='searchButtons' style='display:flex'>
     <<textbox '_DeadwoodRebloomsHintTextbox' ''>>
     <<lanButton 'search' 'title'>><<run maplebirch.get("DeadwoodReblooms").hint?.search()>><</lanButton>>
@@ -134,7 +134,7 @@
 <</widget>>
 
 <!-- 内建包只展示音乐，导入库保留文件管理，环境音交给动态调度器。 -->
-<<widget 'DeadwoodRebloomsPlayback'>>
+<<widget 'deadwood-audio-playback'>>
   <<set _playbackLibrary to _args[0] is 'deadwood-reblooms-audio' ? 'deadwood-reblooms-audio' : 'deadwood-reblooms'>>
   <<set _playbackTracks to maplebirch.audio.playlist(_playbackLibrary).tracks.filter(track => _playbackLibrary !== 'deadwood-reblooms-audio' || track.audioName.startsWith('music/'))>>
   <div class='deadwood-reblooms-playback-left'>
@@ -185,7 +185,7 @@
       </div>
     <</if>>
   </div>
-  <div id='deadwood-reblooms-playback-controls' class='deadwood-reblooms-playback-right'><<DeadwoodRebloomsPlaybackControls _playbackLibrary>></div>
+  <div id='deadwood-reblooms-playback-controls' class='deadwood-reblooms-playback-right'><<deadwood-audio-controls _playbackLibrary>></div>
 <</widget>>
 
 <!-- 音频包的切歌只在音乐之间移动，防止环境音进入主播放器。 -->
@@ -211,7 +211,7 @@
 <</widget>>
 
 <!-- 控制的是当前主曲目，音乐和环境音的分层开关、音量在模组设置中。 -->
-<<widget 'DeadwoodRebloomsPlaybackControls'>>
+<<widget 'deadwood-audio-controls'>>
   <<set _audioMasterVolume to maplebirch.audio.Volume>>
   <<if maplebirch.audio.CurrentTrack>>
     <<set _snap to maplebirch.audio.snapshot, _builtinMusic to _snap.track.modName is 'deadwood-reblooms-audio'>>
@@ -245,23 +245,23 @@
       <<if _snap.state is 'playing'>>
         <<lanLink ['Pause', '暂停'] 'title'>>
           <<run maplebirch.audio.pause()>>
-          <<replace '#deadwood-reblooms-playback-controls'>><<DeadwoodRebloomsPlaybackControls _args[0]>><</replace>>
+          <<replace '#deadwood-reblooms-playback-controls'>><<deadwood-audio-controls _args[0]>><</replace>>
         <</lanLink>>
       <<else>>
         <<lanLink ['Resume', '恢复'] 'title'>>
           <<run maplebirch.audio.resume()>>
-          <<replace '#deadwood-reblooms-playback-controls'>><<DeadwoodRebloomsPlaybackControls _args[0]>><</replace>>
+          <<replace '#deadwood-reblooms-playback-controls'>><<deadwood-audio-controls _args[0]>><</replace>>
         <</lanLink>>
       <</if>>
       <<lanLink ['Stop', '停止'] 'title'>>
         <<run maplebirch.audio.stop()>>
-        <<replace '#deadwood-reblooms-playback-controls'>><<DeadwoodRebloomsPlaybackControls _args[0]>><</replace>>
+        <<replace '#deadwood-reblooms-playback-controls'>><<deadwood-audio-controls _args[0]>><</replace>>
       <</lanLink>>
       <<lanLink ['Next Track', '下一首'] 'title'>><<deadwood-dynamic-music-skip _args[0] 1>><</lanLink>>
       <<if !_builtinMusic>>
         <<lanLink ['Repeat Mode', '循环模式'] 'title'>>
           <<run maplebirch.audio.cyclePlayMode()>>
-          <<replace '#deadwood-reblooms-playback-controls'>><<DeadwoodRebloomsPlaybackControls _args[0]>><</replace>>
+          <<replace '#deadwood-reblooms-playback-controls'>><<deadwood-audio-controls _args[0]>><</replace>>
         <</lanLink>>
       <</if>>
     </div>
@@ -284,7 +284,7 @@
 <</widget>>
 
 <!-- 定制涂鸦 -->
-<<widget 'DeadwoodRebloomsBodyWriting'>>
+<<widget 'deadwood-bodywriting'>>
   <<if Object.keys(_bodyPartOptions).length gt 0 && $options.maplebirch.bodywriting is true>>
     <div class='settingsToggleItemWide'>
     <<set _bodywriting to {}>>

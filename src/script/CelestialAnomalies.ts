@@ -58,7 +58,7 @@ class SolarEclipse {
 }
 
 export default function (maplebirch: MaplebirchCore) {
-  maplebirch.tool.addTo('Options', 'Celestial-Anomalies-Options');
+  maplebirch.tool.addTo('Options', 'deadwood-celestial-options');
   maplebirch.tool.onInit(() => {
     SolarEclipse.patch();
     SolarEclipse.descriptions();

@@ -28,7 +28,7 @@ import StreetLife from './StreetLife';
 
   if (maplebirch.get('DeadwoodReblooms')) DeadwoodReblooms(maplebirch);
   if (maplebirch.get('MoreLoveInterestsAndNPCAvatars')) MoreLoveInterestsAndNPCAvatars(maplebirch);
-  if (maplebirch.get('LongerCombat')) maplebirch.tool.addTo('Options', 'Deadwood-Reblooms-LongerCombat-Options');
+  if (maplebirch.get('LongerCombat')) maplebirch.tool.addTo('Options', 'deadwood-longer-combat-options');
   if (maplebirch.get('CelestialAnomalies')) CelestialAnomalies(maplebirch);
   if (maplebirch.get('DynamicMusic')) DynamicMusic(maplebirch);
   if (maplebirch.get('MoreTransformations')) MoreTransformations(maplebirch);
