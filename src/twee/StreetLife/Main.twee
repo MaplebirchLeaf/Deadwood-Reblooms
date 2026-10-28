@@ -60,7 +60,7 @@
         <span class='red'>警方已有足够的逮捕证据，你暂时不能接取新案或领取赏金。</span>
     <</language>><br>
   <</if>>
-  <<language>>
+  <<capture $_streetPolice>><<language>>
     <<option 'EN'>>
       <<if $_streetPolice.state.cooperating>>
         You have agreed to assist Grant with enquiries.
@@ -87,7 +87,7 @@
       <<if $_streetPolice.state.completed gt 0>>
         警局已核验你完成的<span class='teal'><<= $_streetPolice.state.completed>></span>件案件。
       <</if>>
-  <</language>>
+  <</language>><</capture>>
   <<if $StreetLife.bailey?.resolution is 'reported'>>
     <br>
     <<language>>
@@ -99,7 +99,7 @@
   <</if>>
   <<if $_streetPolice.state.cooperating or $_streetPolice.state.completed gt 0>>
     <br>
-    <<language>>
+    <<capture $_streetPolice>><<language>>
       <<option 'EN'>>
         <<if $_streetPolice.trust gte 60>>
           Grant <span @class="$_streetPolice.wanted ? 'blue' : 'green'">treats your reports as reliable</span>, while still checking the details.
@@ -116,7 +116,7 @@
         <<else>>
           格兰特等着你<span class='blue'>如实说明差事的经过</span>，再核验你的工作。
         <</if>>
-    <</language>>
+    <</language>><</capture>>
   <</if>>
 <</widget>>
 
@@ -238,12 +238,12 @@
       <<set $_streetFirearm to $_streetWeapon.streetWeapon>>
       <<set $_streetShots to Math.min($_streetFirearm.shots, $StreetLife.ammo[$_streetFirearm.ammo])>>
       <<set $StreetLife.ammo[$_streetFirearm.ammo] -= $_streetShots>>
-      <<language>>
+      <<capture $_streetShots $_streetWeapon>><<language>>
         <<option 'EN'>>
           You fire your <<= $_streetWeapon.name>>. <<if $_streetShots gt 1>>Shots crack in quick succession, cutting through the struggle.<<else>>The shot cracks through the struggle.<</if>> Your attacker staggers, clutching the wound.
         <<option 'CN'>>
           你用<<= $_streetWeapon.cn_name_cap>>开火。<<if $_streetShots gt 1>>枪声接连响起，打断了拉扯。<<else>>枪声骤然响起，打断了拉扯。<</if>>袭击者踉跄了一下，捂住伤处。
-      <</language>>
+      <</language>><</capture>>
       <<set $_streetHealthMax to $enemyno gte 2 ? $NPCList[$_streetTarget].healthmax : $enemyhealthmax>>
       <!-- 练枪统计达到 1000 时熟练，伤害系数保持 60%–100%，疼痛最多扣 10 个百分点。 -->
       <<set _streetAim to Math.clamp(0.6 + Math.clamp($stat_shoot / 1000, 0, 1) * 0.4 - Math.clamp($pain / 100, 0, 1) * 0.1, 0.6, 1)>>

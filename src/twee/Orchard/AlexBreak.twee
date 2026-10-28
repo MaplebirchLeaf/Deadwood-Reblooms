@@ -38,7 +38,7 @@
         <!-- 原版骑行结尾推进二十分钟，邀请不再重复耗时或重复结算休息奖励。 -->
         <<set $daily.alexMeadowDate to true>><<npcincr Alex love 1>><<npc Alex>><<person1>>
       <<elseif !$nextPassage>>
-        <<set $nextPassage to $nextPassageCheck || 'Farm Work'>>
+        <<set $nextPassage to 'Farm Work'>>
       <</if>>
     <</lanLink>><<glove 'Alex'>><br>
   <</if>>
@@ -115,10 +115,10 @@
             <!-- 消耗和日限由原版宏记账，喜好、好感与成就由原版 Alex Gifts 结算一次。 -->
             <<give_gift 'Alex'>><<set $outside to 0, $location to 'alex_cottage'>><<endevent>><<set $phase to 1>>
           <<elseif !$nextPassage>>
-            <<set $nextPassage to $nextPassageCheck || 'Farm Cottage'>>
+            <<set $nextPassage to 'Farm Cottage'>>
           <</if>>
         <<elseif !$nextPassage>>
-          <<set $nextPassage to $nextPassageCheck || 'Farm Cottage'>>
+          <<set $nextPassage to 'Farm Cottage'>>
         <</if>>
       <</lanLink>><br><br>
     <</if>>
@@ -127,7 +127,6 @@
         <<deadwood-alex-available>>
         <<if _alexFree and $Orchard.alex_talk_day isnot Time.days>>
           <<set $Orchard.alex_talk_day to Time.days>><<pass 15>><<deadwood-alex-available>>
-          <<if !$nextPassage and $nextPassageCheck>><<set $nextPassage to $nextPassageCheck>><</if>>
           <<replace '#deadwood-alex-break'>>
             <<if _alexFree>>
               <<npcincr Alex love 1>><<stress -2>>
@@ -187,9 +186,7 @@
   <<lanSwitch 'Alex cannot stop to spend time with you right now.' '艾利克斯现在没空陪你。'>>
 <</if>>
 <br><br><<getouticon>><<lanLink ['Return', '返回'] `$outside ? 'Farm Work' : 'Farm Cottage'`>>
-  <<if $nextPassageCheck>>
-    <<set $nextPassage to $nextPassageCheck>>
-  <<elseif !$eventforced>>
+  <<if !$nextPassage and !$nextPassageCheck and !$eventforced>>
     <<endevent>>
   <</if>>
 <</lanLink>><br>

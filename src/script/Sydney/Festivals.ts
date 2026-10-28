@@ -3,7 +3,7 @@
 export default function (maplebirch: typeof window.maplebirch) {
   // 只在当前剧情的收尾页提供下一站入口，错过后不另设补看入口。
   maplebirch.tool.addTo(
-    'Footer',
+    'BeforeLinkZone',
     { widget: 'deadwood-reblooms-halloween-robin-guide', passage: ['Robin Trick Hug', 'Robin Trick Talk', 'Robin Trick Kiss Finish'] },
     { widget: 'deadwood-reblooms-halloween-kylar-guide', passage: ['Whitney Trick 7', 'Whitney Trick Sex Finish'] },
     {

@@ -164,7 +164,7 @@
 <<widget 'deadwood-street-job-pitch'>>
   <<set $_lastDelivery to _streetJobs.state.report>>
   <<if $_lastDelivery?.id is _streetContract.id>>
-    <<language>>
+    <<capture $_lastDelivery>><<language>>
       <<option 'EN'>>
         <<if $_lastDelivery.outcome is 'paid'>>
           Landry takes a fresh delivery slip from the folder. "Same sort of work. <<if $_lastDelivery.late>>Give yourself more time this round. They won't keep waiting.<<else>>You know the route. Check this order before you set off.<</if>>"
@@ -185,7 +185,7 @@
         <<else>>
           “上次没取，是吧？”兰德里把新的送货单留在桌上。“先看看。不想接，取货之前就告诉我。”
         <</if>>
-    <</language>><br><br>
+    <</language>><</capture>><br><br>
   <</if>>
   <<language>>
     <<option 'EN'>>
@@ -314,6 +314,8 @@
           <<else>>
             "Ocean Breeze," the worker reads from the label. "They'll be glad to see the boxes. Bring this copy back signed."
           <</if>>
+        <<case 'bailey_delivery'>>
+          A worker checks the name on Bailey's note, then brings a sealed wooden crate out of the loading door. "Spare parts. The box number's on your copy." You compare the numbers before taking the handles. They match.
         <<case 'parts' 'crew_delivery'>>
           A tool box waits on the low step beside the loading door. The handle is tied down for transport; a delivery slip bears the name of a moored ship.<br><br>
           <<if _streetJob.issue is 'label'>>
@@ -382,6 +384,8 @@
           <<else>>
             “海风咖啡馆。”工人读出标签。“他们正缺纸盒呢。让人签好，再把这份带回来。”
           <</if>>
+        <<case 'bailey_delivery'>>
+          工人核对贝利单子上的名字，从装卸门里搬出一个封好的木箱。“替换零件。你那联上写了箱号。”你接过提手前先对了对，号码没错。
         <<case 'parts' 'crew_delivery'>>
           装货门边的低台阶上放着一个工具箱，把手为了运输已经绑好，送货单上写着一艘停泊船只的名字。<br><br>
           <<if _streetJob.issue is 'label'>>
@@ -481,7 +485,7 @@
           <<else>>
             A server reads the label, then calls to someone behind the counter. "Boxes and coffee. Here's the order." A dry space is cleared beneath the counter for the carton.
           <</if>>
-        <<case 'parts' 'bailey_cargo' 'crew_delivery'>>
+        <<case 'parts' 'bailey_cargo' 'bailey_delivery' 'crew_delivery'>>
           <<if _streetJob.issue is 'queue'>>
             The manager glances at the ship's name on your note and points along the quay. "They're finishing a load. Wait here and I'll send someone over to sign for it."
           <<else>>
@@ -561,7 +565,7 @@
           <<else>>
             服务员读过标签，朝柜台后招呼一声。“纸盒和咖啡豆，订单在这里。”柜台下清出了一块干燥的地方，用来放货箱。
           <</if>>
-        <<case 'parts' 'bailey_cargo' 'crew_delivery'>>
+        <<case 'parts' 'bailey_cargo' 'bailey_delivery' 'crew_delivery'>>
           <<if _streetJob.issue is 'queue'>>
             管理员看了眼纸条上的船名，往码头另一头指了指。“那边还有一批货没装完。你在这里等着，我叫人过来签收。”
           <<else>>
@@ -627,6 +631,8 @@
             The librarian signs the list and slides your copy back across the desk. The books are stacked beside the basket, ready to be sorted. "Thank you for bringing them back."
           <<case 'cafe'>>
             The server signs the supplier's copy and hands it back. The coffee is taken behind the counter; another member of staff reaches for a stack of the takeaway boxes.
+          <<case 'bailey_delivery'>>
+            The crew member signs beside the box number and passes your copy back. The crate is taken aboard. You fold the receipt along its old crease, with the signature inside.
           <<case 'parts' 'bailey_cargo' 'crew_delivery'>>
             The crew member signs the delivery slip and lifts the box towards the ship. "That's what we needed." The manager checks the name once more before giving you back your copy.
           <<case 'stolen_tools'>>
@@ -654,6 +660,8 @@
             图书管理员在书单上签字，把签给你的那份推回你面前。书已经叠在篮子旁，准备整理。“谢谢你把它们送回来。”
           <<case 'cafe'>>
             服务员在供应商的单据上签好字，递还给你。咖啡豆被搬到柜台后，另一名工作人员已经伸手拿走一摞外带纸盒。
+          <<case 'bailey_delivery'>>
+            船员在箱号旁签名，把你那联递回来。木箱被搬上了船。你沿着旧折痕把凭据折好，将签名收在里面。
           <<case 'parts' 'bailey_cargo' 'crew_delivery'>>
             船员在送货单上签字，提起工具箱往船边走。“正缺这些。”管理员又核对一遍名字，把签好的送货单递还给你。
           <<case 'stolen_tools'>>

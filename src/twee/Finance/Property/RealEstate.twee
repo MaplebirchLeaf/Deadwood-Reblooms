@@ -15,12 +15,12 @@
   <<if $_management.managed>>
     <<if $_estate.manager>><span class='gold'><<print $_estate.manager.name>></span><<lanSwitch ' manages this property.' '负责管理这处房产。'>><br>
     <<else>><span class='red'><<lanSwitch 'No property manager is available. Work is suspended.' '没有在职管理员，物业管理工作暂停。'>></span><br><</if>>
-    <<language>>
+    <<capture $_estate>><<language>>
       <<option 'EN'>>
         The agent charges <span class='gold'><<= ($_estate.rentalTerms.managementFeeRate * 100).toFixed(0)>>% of the assessed weekly rent</span>, at least <<printmoney $_estate.rentalTerms.managementMinimumPennies>>. Repairs are billed separately. They follow up late rent, arrange leak repairs and restore the house when condition falls to <<= $_estate.rentalTerms.repairCondition>>. They cannot spend money you do not have.
       <<option 'CN'>>
         物业管理员每周收取<span class='gold'>当时应收周租金的 <<= ($_estate.rentalTerms.managementFeeRate * 100).toFixed(0)>>%</span>，至少<<printmoney $_estate.rentalTerms.managementMinimumPennies>>，维修费用另计。物业管理员会催收迟付租金、修补漏水，并在房况降至 <<= $_estate.rentalTerms.repairCondition>> 时安排修缮。银行余额不足时，相应工作暂停。
-    <</language>><br>
+    <</language>><</capture>><br>
     <<if $_management.management_report>>
       <<set $_report to $_management.management_report>>
       <<lanSwitch 'Last statement: ' '上次物业管理账单：'>><<deadwood-reblooms-finance-date $_report.day 'date'>> · <<lanSwitch 'Fee / repairs / recovered rent: ' '服务费／维修／追回租金：'>><<printmoney $_report.fee>> / <<printmoney $_report.repairs>> / <<printmoney $_report.recovered>><br>
@@ -165,12 +165,12 @@
                     “别让人乱翻我的东西。”惠特尼说。惠特尼确认了房间的位置，才收起钥匙。
                 <</language>><br>
               <<case 'Kylar'>>
-                <<language>>
+                <<capture $_otherResidents>><<language>>
                   <<option 'EN'>>
                     <<if $_otherResidents.some(profile => profile.id === 'Sydney')>>Kylar slips the key into a pocket. "I know which room is mine. You showed me." <<nnpc_He 'Kylar'>> smiles at you, then checks that the key is still there.<<else>>Kylar's smile falters at the other name. "I thought this was for us." You go over the rooms again. Kylar listens, still holding the key.<</if>>
                   <<option 'CN'>>
                     <<if $_otherResidents.some(profile => profile.id === 'Sydney')>>凯拉尔把钥匙收进口袋。“我知道住哪间。你给我看过了。”<<nnpc_He 'Kylar'>>朝你笑了，又确认了一下钥匙还在。<<else>>听到另一个名字，凯拉尔的笑容僵了一下。“我以为这是给我们的。”你又说了一遍房间的安排。凯拉尔听着，仍把钥匙攥在手里。<</if>>
-                <</language>><br>
+                <</language>><</capture>><br>
               <<case 'Sydney'>>
                 <<language>>
                   <<option 'EN'>>
@@ -191,7 +191,7 @@
       <<case 'conflict'>>
         <<set $_refusedPair to [...maplebirch.get('Finance').realEstate.residentsAt($_inviteMessage.property).map(profile => profile.id), $_inviteName]>>
         <<if $_refusedPair.includes('Kylar') and $_refusedPair.includes('Sydney')>>
-          <<language>>
+          <<capture $_inviteName>><<language>>
             <<option 'EN'>>
               <<if !($syndromekylar gte 1) or C.npc.Kylar.rage gte 60>>
                 <<if $_inviteName is 'Kylar'>>Kylar shakes <<nnpc_his 'Kylar'>> head. "I thought we were going to live together. You and me."<<else>>"You should ask Kylar first," Sydney says. "I don't think this is what <<nnpc_he 'Kylar'>> had in mind."<</if>> You put the spare key away.
@@ -204,7 +204,7 @@
               <<else>>
                 这件事还没和两个人都谈妥。你没有把备用钥匙交出去。
               <</if>>
-          <</language>><br><br>
+          <</language>><</capture>><br><br>
         <<elseif $_inviteMessage.refused_by isnot $_inviteName>>
           <<if $_inviteMessage.refused_by is 'Robin'>>
             <<language>>
@@ -296,7 +296,7 @@
     <</if>>
     <<set $_currentHome to maplebirch.get("Finance").realEstate.properties.find(property => maplebirch.get("Finance").realEstate.residentsAt(property.id).some(resident => resident.id === $_inviteName))>>
     <<if $_currentHome>>
-      <<language>>
+      <<capture $_currentHome $_inviteName>><<language>>
         <<option 'EN'>>
         You mention the keys to <<= $_currentHome.name.EN>>. <<= $_inviteName>> already has one, tucked safely away.
         <br><br>
@@ -305,7 +305,7 @@
         你提起<<= $_currentHome.name.CN>>的钥匙。<<= maplebirch.auto($_inviteName)>>已经收好了一把。
         <br><br>
         <span class='blue'><i>你可以和<<= maplebirch.auto($_inviteName)>>商量重新分开住，或是搬去另一处房子。</i></span>
-      <</language>><br><br>
+      <</language>><</capture>><br><br>
       <<if !$_inLesson>><<deadwood-home-sharing $_inviteName $_currentHome.id $_invitePassage $_inviteReturn>><</if>>
       <<capture $_inviteName $_currentHome>>
         <<lanLink ['Discuss living separately', '商量分开居住'] $_invitePassage>>

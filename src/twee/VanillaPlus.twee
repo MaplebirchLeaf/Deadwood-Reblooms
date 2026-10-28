@@ -264,17 +264,23 @@
 <</widget>>
 
 <<widget 'deadwood-reblooms-deviancy-mirror-enter-link'>>
-  <<set $_mirror to _args[0]>>
-  <<if maplebirch.get("VanillaPlus").deviancy.mirrorOpen and maplebirch.get("VanillaPlus").deviancy.discovered($_mirror, $_mirror is 'property' ? maplebirch.get("Finance").realEstate.current?.id : undefined)>>
+  <<set $_mirror to _args[0], $_mirrorProperty to _args[0] is 'property' ? maplebirch.get('Finance')?.realEstate.current?.id : undefined, $_mirrorSource to $passage, $_mirrorUsed to false>>
+  <<if maplebirch.get('VanillaPlus')?.deviancy.mirrorOpen and maplebirch.get('VanillaPlus').deviancy.discovered($_mirror, $_mirrorProperty)>>
     <br>
-    <<mirroricon 'blood'>><<lanLink ['Step through the eerie mirror', '穿过诡异镜面'] 'Deadwood Reblooms Deviancy Mirror Enter' >>
-      <<set $VanillaPlus.deviancy.mirror to $_mirror is 'property' ? 'property:' + maplebirch.get("Finance").realEstate.current.id : $_mirror>>
-      <<if $_mirror is 'property'>>
-        <<set $VanillaPlus.deviancy.mirror_property to maplebirch.get("Finance").realEstate.current.id>>
-      <</if>>
-      <<run maplebirch.get("VanillaPlus").deviancy.enter()>>
-    <</lanLink>>
-      <<note `lanSwitch('Deviancy', '异种癖')` 'red'>>
+    <<capture $_mirror $_mirrorProperty $_mirrorSource $_mirrorUsed>>
+      <<mirroricon 'blood'>><<lanLink ['Step through the eerie mirror', '穿过诡异镜面']>>
+        <<if !$_mirrorUsed and $passage is $_mirrorSource and maplebirch.get('VanillaPlus')?.deviancy.mirrorOpen
+            and maplebirch.get('VanillaPlus').deviancy.discovered($_mirror, $_mirrorProperty)
+            and ($_mirror isnot 'property' or (maplebirch.get('Finance')?.realEstate.current?.id is $_mirrorProperty and maplebirch.get('Finance').realEstate.owns($_mirrorProperty)))
+            and !$combat and !$possessed and !$eventforced and !$replayScene and !$statFreeze and !$frozenValues and !$nextPassage and !$nextPassageCheck>>
+          <<set $_mirrorUsed to true, $VanillaPlus.deviancy.mirror to $_mirror is 'property' ? 'property:' + $_mirrorProperty : $_mirror>>
+          <<if $_mirror is 'property'>><<set $VanillaPlus.deviancy.mirror_property to $_mirrorProperty>><</if>>
+          <<run maplebirch.get('VanillaPlus').deviancy.enter()>>
+          <<goto 'Deadwood Reblooms Deviancy Mirror Enter'>>
+        <</if>>
+      <</lanLink>>
+    <</capture>>
+    <<note `lanSwitch('Deviancy', '异种癖')` 'red'>>
     <br>
   <</if>>
 <</widget>>
@@ -342,12 +348,12 @@
       ($_eastStep gt 0 ? '东' : $_eastStep lt 0 ? '西' : '') +
       ($_northStep gt 0 ? '北' : $_northStep lt 0 ? '南' : '')>>
     <span class='purple'>
-      <<language>>
+      <<capture $_directionCN $_directionEN $_nearestMirror>><<language>>
         <<option 'EN'>>
           You feel a faint pull from <<= $_nearestMirror.EN>> to the <<= $_directionEN>>.
         <<option 'CN'>>
           你隐约感到<<= $_nearestMirror.CN>>在<<= $_directionCN>>方牵引着你。
-      <</language>>
+      <</language>><</capture>>
     </span><br><br>
   <</if>>
 <</widget>>

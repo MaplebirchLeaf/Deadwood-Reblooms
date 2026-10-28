@@ -24,12 +24,12 @@
 <<widget 'deadwood-banquet-memory-reply'>>
   <<set _memory_name to _args[0], _memory to _args[1]>>
   <<set $_memory_property to maplebirch.get('Finance').realEstate.properties.find(property => property.id === _memory.property)>>
-  <<language>>
+  <<capture $_memory_property>><<language>>
     <<option 'EN'>>
       You mention the evening at <<= $_memory_property?.name.EN ?? 'your home'>>.
     <<option 'CN'>>
       你提起在<<= $_memory_property?.name.CN ?? '家里'>>招待大家的那一晚。
-  <</language>>
+  <</language>><</capture>>
   <<if _memory.result is 'early'>>
     <<language>>
       <<option 'EN'>>
@@ -146,7 +146,7 @@
   <<set $_depart_name to _args[0]>>
   <<set $_depart_memory to maplebirch.get('Finance').realEstate.banquet.state.memories[$_depart_name]>>
   <<if !$_depart_memory or $_depart_memory.day isnot Math.floor(Time.days)>><<exit>><</if>>
-  <<language>>
+  <<capture $_depart_memory $_depart_name>><<language>>
     <<option 'EN'>>
       <<if $_depart_name is 'Robin'>>Robin offers to take a few cups to the kitchen before leaving.
       <<elseif $_depart_name is 'Whitney'>>"See you, host." Whitney flashes you a grin on the way to the door.
@@ -167,5 +167,5 @@
       <<elseif $_depart_name is 'Harper'>>哈珀为你照看宾客道了谢，笑容多停了一会儿。
       <<elseif $_depart_name is 'Leighton'>>礼顿整理好外套，才说了几句正式的感谢。
       <<else>>奎恩特意在其他宾客听得见的地方与你告别。<</if>>
-  <</language>><br><br>
+  <</language>><</capture>><br><br>
 <</widget>>

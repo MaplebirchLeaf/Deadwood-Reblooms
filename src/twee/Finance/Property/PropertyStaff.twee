@@ -63,7 +63,7 @@
     <<if $_presence_estate.staff.active(_presence_role) and $_presence_npc>>
       <<set $_presence_name to $_presence_npc.name_known is 1 ? $_presence_npc.name : ''>>
       <<set $_presence_en to $_presence_name ? $_presence_name + ', your ' + _presence_role + ',' : 'Your ' + _presence_role>>
-      <<language>>
+      <<capture $_presence_case $_presence_en $_presence_name $_presence_property>><<language>>
         <<option 'EN'>>
           <<switch _presence_role>>
             <<case 'housekeeper'>>
@@ -118,7 +118,7 @@
                 <<else>>一束手电光沿着屋外的小径移动。门卫<<print $_presence_name>>检查过侧门，才返回前门。<</if>>
               <</if>>
           <</switch>>
-      <</language>><br><br>
+      <</language>><</capture>><br><br>
     <</if>>
   <</for>>
 <</widget>>
@@ -135,7 +135,7 @@
       <</language>>
       <<set $_cook_housemate to $_cook_estate.household.common.find(profile => profile.id === $Finance.real_estate.room_companion) ?? $_cook_estate.household.common[0]>>
       <<if $_cook_housemate>><br>
-        <<language>>
+        <<capture $_cook_housemate>><<language>>
           <<option 'EN'>>
             <<switch $_cook_housemate.id>>
               <<case 'Robin'>>Robin looks over from the table. "Are we eating now, or saving it for later?"
@@ -150,7 +150,7 @@
               <<case 'Kylar'>>凯拉尔把另一张椅子挪到你的旁边。“要是饿了，可以一起坐。”
               <<case 'Sydney'>>悉尼把书挪到离餐盘远些的地方。“要摆桌子吗？”
             <</switch>>
-        <</language>>
+        <</language>><</capture>>
       <</if>>
     <<elseif _property_cook_result.kind is 'missing'>>
       <span class='purple'><<lanSwitch 'The ingredients have changed. Nothing has been taken from the cupboards.' '食材已经不够了。橱柜里的东西没有被动用。'>></span>

@@ -3,7 +3,7 @@
 import Catalog from '../module/Transport/Catalog';
 
 export default function Transport(maplebirch: typeof window.maplebirch): void {
-  maplebirch.tool.addTo('Footer', {
+  maplebirch.tool.addTo('BeforeLinkZone', {
     widget: "dynamic 'deadwood-transport-entry' 'deadwood-transport-entry'",
     passage: [...Catalog.routes, ...Catalog.roads]
       .filter(route => !route.passage.endsWith(' Street'))

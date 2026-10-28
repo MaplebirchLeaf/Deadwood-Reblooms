@@ -12,7 +12,7 @@
   <<set $_hazard to $Transport.trip.event, _road_events to maplebirch.get('Transport').events>>
   <<set $_road_bicycle to maplebirch.get('Transport').model.kind is 'bicycle'>>
   <<if $_hazard.kind is 'molestation'>><<run maplebirch.get('Transport').taxi.passengerNPC()>><</if>>
-  <<language>>
+  <<capture $_hazard $_road_bicycle>><<language>>
     <<option 'EN'>>
       You reach <<print maplebirch.get('Transport').catalog.name($_hazard.point)>>.
       <<switch $_hazard.kind>>
@@ -79,7 +79,7 @@
       <</switch>>
       <<if $Transport.trip.taxi is 'dropoff' and $_hazard.kind isnot 'molestation'>>乘客安静下来，等着你决定怎么办。
       <<elseif $Transport.trip.passengers.length>>同行的人看了看路面，又看向你。<</if>>
-  <</language>><br><br>
+  <</language>><</capture>><br><br>
   <<deadwood-transport-hazard-advice>>
   <<if $_hazard.kind is 'police'>>
     <<if !$_hazard.checked>>
@@ -209,7 +209,7 @@
 <<widget 'deadwood-transport-hazard-result'>>
   <<set $_road_result to $Transport.trip?.event>>
   <<if $_road_result?.outcome and (!$_road_result.combat or $passage is 'Deadwood Transport Road Fight Finish')>>
-    <<language>>
+    <<capture $_road_result>><<language>>
       <<option 'EN'>>
         <<switch $_road_result.outcome>>
           <<case 'wait'>>
@@ -295,7 +295,7 @@
           <<case 'limped'>>你缓慢挪动，车轮开始摇晃就停一下。每次颠簸都透过坏轮胎，撞在轮圈上。
           <<case 'walk'>>你把载具留在路外，记下附近的地标。之后得回来取，或者去修车厂请人运回。<</switch>>
         <<if $Transport.trip.taxi and $Transport.trip.interrupted>>调度记下你的位置，取消了订单。<<if maplebirch.get('Transport').taxi.fleet?.stolen>>对方让你先顾好自己，丢失的营运车由车行处理。<</if>><</if>>
-    <</language>>
+    <</language>><</capture>>
     <<if ['scraped', 'paid', 'limped', 'stolen'].includes($_road_result.outcome)>><<gstress>><</if>>
     <<if ['fixed_together', 'force_together'].includes($_road_result.outcome)>>
       <<deadwood-transport-work-companion>>
@@ -310,7 +310,7 @@
   <<if $Transport.trip.taxi>><<exit>><</if>>
   <<for $_hazard_npc range maplebirch.get('Transport').companions.aboard>>
     <<npc $_hazard_npc>><<person1>><<if $_hazard_npc is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
-    <<language>>
+    <<capture $_hazard_event $_hazard_npc>><<language>>
       <<option 'EN'>>
         <<switch $_hazard_npc>>
           <<case 'Robin'>>
@@ -367,7 +367,7 @@
             <<elseif $_hazard_event.kind is 'roadblock'>><<if _sydneyStatus.includes('corrupt')>>“他们正等着我们开门。”悉尼望向后方的路。“别让他们如愿。”<<else>>“后面还够退。”悉尼压低了声音。<</if>>
             <<else>>悉尼看着前面的路。“那边宽些。我们可以等等。”<</if>>
         <</switch>>
-    <</language>><br><br>
+    <</language>><</capture>><br><br>
   <</for>>
 <</widget>>
 
@@ -375,7 +375,7 @@
   <<for $_work_name range maplebirch.get('Transport').companions.aboard>>
     <<if $_work_name is 'Robin' and C.npc.Robin.trauma gte 40>><<continue>><</if>>
     <<npc $_work_name>><<person1>><<if $_work_name is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
-    <<language>>
+    <<capture $_work_name>><<language>>
       <<option 'EN'>>
         <<switch $_work_name>>
           <<case 'Robin'>>Robin brushes <<his>> hands together. "That was easier with some help." <<He>> waits until you have checked the road before getting back in.
@@ -390,7 +390,7 @@
           <<case 'Kylar'>>你做最后的检查时，凯拉尔一直留在旁边。“手没伤着吧？”听见你道谢，<<he>>才露出笑容。
           <<case 'Sydney'>>悉尼<<if ['glasses', 'playerbought', 'contacts'].includes($sydney.glasses)>>确认没有东西留在车道上<<else>>扶着你的胳膊，等你检查路上的车<</if>>。<<if _sydneyStatus.includes('corrupt')>>“下回找个不用弄脏手的地方吧。”<<He>>低头看看手，笑了起来。<<else>>“好了，可以走了。”<<He>>等着你，才一起回到车里。<</if>>
         <</switch>>
-    <</language>><br><br>
+    <</language>><</capture>><br><br>
   <</for>>
 <</widget>>
 
@@ -400,7 +400,7 @@
     <<if C.npc[$_hazard_npc]?.init isnot 1 or !['active', 'rescued'].includes(C.npc[$_hazard_npc].state)>><<continue>><</if>>
     <<npc $_hazard_npc>><<person1>><<if $_hazard_npc is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
     <<set $_hazard_bad to ['scraped', 'limped', 'evaded', 'fined', 'arrested'].includes($Transport.trip.event.outcome)>>
-    <<language>>
+    <<capture $_hazard_bad $_hazard_npc>><<language>>
       <<option 'EN'>>
         <<switch $_hazard_npc>>
           <<case 'Robin'>>
@@ -438,13 +438,13 @@
             <<else>>悉尼看着你身旁的公路。“这边没有来车。”等你出发，<<he>>才重新靠回座位。<</if>>
           <<case 'Alex'>>艾利克斯检查着身后的公路。“前面有个田地入口。先离开弯道附近。”
         <</switch>>
-    <</language>><br><br>
+    <</language>><</capture>><br><br>
   <</for>>
 <</widget>>
 
 <<widget 'deadwood-transport-road-scene'>>
   <<set $_road_scene to $Transport.trip.scene ?? 0>>
-  <<language>>
+  <<capture $_road_scene>><<language>>
     <<option 'EN'>>
       <<if [$Transport.trip.from, $Transport.trip.to].includes('farmland')>>
         <<switch $_road_scene>>
@@ -507,7 +507,7 @@
           <<case 2>>有人在人行横道旁犹豫着。你放慢速度，对方朝你点点头，走过了马路。
         <</switch>>
       <</if>>
-  <</language>>
+  <</language>><</capture>>
 <</widget>>
 
 <<widget 'deadwood-transport-roadside-event'>>
@@ -570,7 +570,7 @@
 <<widget 'deadwood-transport-roadside-companion'>>
   <<for $_roadside_name range maplebirch.get('Transport').companions.aboard>>
     <<npc $_roadside_name>><<person1>><<if $_roadside_name is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
-    <<language>>
+    <<capture $_roadside_name>><<language>>
       <<option 'EN'>>
         <<switch $_roadside_name>>
           <<case 'Robin'>> <<if C.npc.Robin.trauma gte 40>>Robin waits in the car until you return. "Everything okay?"<<else>>Robin smiles when you come back. "That was kind of you."<</if>>
@@ -585,6 +585,6 @@
           <<case 'Kylar'>>凯拉尔一直待在你的车旁。“你认识那个人？”你摇头后，<<he>>像是松了口气。
           <<case 'Sydney'>>悉尼看着你收好东西。<<if _sydneyStatus.includes('corrupt')>>“走吧。下一个留给别人帮忙。”<<else>>“还好我们停下了。”<</if>>
         <</switch>>
-    <</language>><br><br>
+    <</language>><</capture>><br><br>
   <</for>>
 <</widget>>
