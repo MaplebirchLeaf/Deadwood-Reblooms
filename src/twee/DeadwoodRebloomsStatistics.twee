@@ -358,9 +358,12 @@
     <</if>>
     <<if $VanillaPlus.traits[$_attribute.id]>> · <span class='green'><<lanSwitch 'Trait obtained' '已获得特质'>></span><</if>><br>
     <<lanSwitch 'Current / normal ceiling / new ceiling: ' '当前值／原版上限／突破上限：'>><<= V[$_attribute.id]>> / <<= $_progressModule.normalCeiling($_attribute.id)>> / <<= $_progressModule.ceiling($_attribute.id)>><br>
-    <<for $_index, $_step range $_attribute.steps>>
-      <<deadwood-reblooms-progress-check $_requirements[$_index] $_step.text>>
-    <</for>>
+    <<foldout false `'_deadwoodBreakthrough_' + $_attribute.id`>>
+      <span class='gold'><<lanSwitch 'Requirements' '突破条件'>></span>
+      <<for $_index, $_step range $_attribute.steps>>
+        <<deadwood-reblooms-progress-check $_requirements[$_index] $_step.text $_step.hint>>
+      <</for>>
+    <</foldout>>
     <<if $_attribute.id is 'willpower' and !$VanillaPlus.lock.willpower and $_requirements.every(Boolean)>>
       <span class='green'><<lanSwitch 'Ready: return to the lake ruins’ underwater prison and dive towards the rune again.' '准备就绪：回到湖底废墟监狱，再次潜向符文。'>></span><br>
     <</if>>

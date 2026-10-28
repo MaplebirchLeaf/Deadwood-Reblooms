@@ -23,6 +23,8 @@ Reach the normal attribute ceiling and complete its challenges to break through.
 
 Willpower, physique and beauty rise to **125%** of their normal ceilings; exhibitionism, deviancy and promiscuity rise to **150%**. Reaching all six new ceilings also earns Master of All.
 
+Once you have earned an attribute’s new-cap feat, you can spend **60 VrelCoins** on its **Feat Booster** when starting a new game. You begin with that trait and the higher cap. The attribute grows from its starting value, with the trait’s own minimum still applying.
+
 ### Willpower
 
 Reach maximum willpower, keep a slime in each ear, finish Schism and complete the full temple vigil.

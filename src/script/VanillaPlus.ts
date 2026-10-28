@@ -23,10 +23,40 @@ export default function (maplebirch: typeof window.maplebirch) {
   macro.create('llwillpower', () => macro.statChange(`${lanSwitch('Willpower', '意志')}`, -2, 'lblue'));
   macro.create('lllwillpower', () => macro.statChange(`${lanSwitch('Willpower', '意志')}`, -3, 'lblue'));
 
+  const boostCases = `<<case ${maplebirch
+    .get('VanillaPlus')!
+    .boosts.map(boost => `'deadwood-${boost.attribute}'`)
+    .join(' ')}>>`;
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Attitudes': [{ src: '<<if $attitudesControl.unlockHypnosis>>', applybefore: '<<deadwood-reblooms-trait-attitudes>>\n\t\t\t', expected: 1 }],
-      'Gwylan Widgets': [{ src: '<<gwylanOptionsService>>', applyafter: '\n\t\t\t<<deadwood-ghostbrew-lesson-link>>', expected: 1 }]
+      'Gwylan Widgets': [{ src: '<<gwylanOptionsService>>', applyafter: '\n\t\t\t<<deadwood-ghostbrew-lesson-link>>', expected: 1 }],
+      'Widgets Settings': [{ src: '<<set _upgradeNames to Object.keys($featsBoosts.upgrades)>>', applybefore: '<<deadwood-feat-boosts>>\n', expected: 1 }],
+      // 只在原版新周目加成结算前赋予特质，购买、退款和币额仍由原版处理。
+      'Widgets variablesStart2': [{ src: '<<applyFeatBoosts>>', applybefore: '<<deadwood-feat-boosts-apply>>', expected: 1 }],
+      FeatsUI: [
+        {
+          src: '<<switch _upgradeName>>',
+          applyafter: `
+            ${boostCases}
+              <span class="gold"><<= $featsBoosts.name[_upgradeName]>></span>`,
+          expected: 1
+        },
+        {
+          srcmatch: /(<<widget "featsMenu">>(?:(?!<<\/widget>>)[\s\S])*?<<switch _name>>)/,
+          to: `$1
+            ${boostCases}
+              <<= maplebirch.t('deadwood-reblooms:VanillaPlus:traits:' + _name.slice(9) + ':text')>>`,
+          expected: 1
+        },
+        {
+          srcmatch: /(<<widget "featsPointsMenuButtons">>(?:(?!<<\/widget>>)[\s\S])*?<<switch _type>>)/,
+          to: `$1
+            ${boostCases}
+              <<lanSwitch 'Start the game with this trait and its attribute limit already broken.' '开局时获得这项特质，并突破对应属性的上限。'>>`,
+          expected: 1
+        }
+      ]
     }
   });
 

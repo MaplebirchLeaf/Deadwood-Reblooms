@@ -1,6 +1,7 @@
 // ./src/module/VanillaPlus.ts
 
 import Achievements from './Achievements';
+import boosts from '../assets/vanilla-plus/boosts.json';
 import progress from '../assets/vanilla-plus/progress.json';
 import Module from './Module';
 import { DEFAULT_VANILLA_PLUS_STATE, type VanillaPlusAttribute, type VanillaPlusTrait } from './constants';
@@ -15,6 +16,7 @@ import Promiscuity from './VanillaPlus/Promiscuity';
 import Willpower from './VanillaPlus/Willpower';
 
 class VanillaPlus extends Module {
+  public readonly boosts = boosts;
   public readonly progress = progress;
   public readonly beauty: Beauty;
   public readonly deviancy: Deviancy;
