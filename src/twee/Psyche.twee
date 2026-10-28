@@ -1,5 +1,22 @@
 :: Deadwood Psyche Widgets [widget]
 
+<!-- 追猎沿用原版零值与清理边界，不把伊甸的警告或结果页重绘重复结算。 -->
+<<widget 'psyche-wraith'>>
+  <<silently>>
+    <<if !maplebirch.get('Psyche')?.active or !$wraith>><<exit>><</if>>
+    <<if _args[0] is 'clear'>>
+      <<if $wraith.hunt and $Psyche.mood gt 0>><<dread -200>><</if>>
+    <<elseif $wraith.hunt is 0 and !$possessed and not (_args[0] is 'forest' and $rng2 is 1 and $edenfreedom gte 1)>>
+      <<dread 200>>
+    <</if>>
+  <</silently>>
+<</widget>>
+
+<!-- 红光只在原版取得额外喷雾的点击回调中调用。 -->
+<<widget 'psyche-redlight'>>
+  <<if $tentspray isnot 1>><<fascination 100>><</if>>
+<</widget>>
+
 <!-- 镜室的原版进度在结局前已到第五档，只记录结局是否结算。 -->
 <<widget 'psyche-mirror'>>
   <<if !maplebirch.get('Psyche')?.active or $Psyche.mirror or $asylum_mirror isnot 5 or $nextPassage or $nextPassageCheck>><<exit>><</if>>
@@ -62,6 +79,20 @@
         <<if $_psyche.stage.judgement isnot 1>>
           <<run $_subjectConfig.modTypes[$_psyche.stage.judgement gt 1 ? 'good' : 'bad'].pushUnique(lanSwitch('Sanity', '理智'))>>
         <</if>>
+      <</if>>
+    <</for>>
+  <</if>>
+<</widget>>
+
+<!-- 尾随中的藏身和逃跑沿用原版技能与动作限制。 -->
+<<widget 'psyche-skills'>>
+  <<set $_psyche to maplebirch.get('Psyche')>>
+  <<if $_psyche?.active>>
+    <<for $_skill, $_skillConfig range { skulduggery: _skulduggeryConfig, athletics: _athleticsConfig }>>
+      <<set $_psycheBonus to $_psyche.skill($_skill)>>
+      <<if $_skillConfig and $_psycheBonus gt 1>>
+        <<set $_skillConfig.modifier to Math.floor($_skillConfig.modifier * $_psycheBonus)>>
+        <<run $_skillConfig.modTypes.good.pushUnique(lanSwitch('Dread', '恐惧'))>>
       <</if>>
     <</for>>
   <</if>>
@@ -141,6 +172,8 @@
         <<lanSwitch 'Willpower while distracted: ' '心绪干扰下的意志：'>><span @class="$_psyche.willpower lt 1 ? 'red' : 'teal'"><<= Math.round($_psyche.willpower * 100)>>%</span><br>
         <<if $Psyche.mood gt 200>>
           <<lanSwitch 'Stress gained: ' '压力增长：'>><span class='red'><<= Math.round($_psyche.stressGain * 100)>>%</span><br>
+          <<lanSwitch 'Control recovery: ' '自控恢复：'>><span class='red'><<= Math.round($_psyche.controlRecovery * 100)>>%</span><br>
+          <<lanSwitch 'Athletics and skulduggery while stalked: ' '被尾随时的运动与诡术：'>><span class='green'><<= Math.round(100 / $_psyche.escape)>>%</span><br>
           <<lanSwitch 'Harbour retreat difficulty: ' '港湾撤退难度：'>><span class='green'><<= Math.round($_psyche.escape * 100)>>%</span><br>
         <<elseif $Psyche.mood lt -200>>
           <<lanSwitch 'Time spent on strange texts: ' '异常记载研读用时：'>><span class='green'><<= Math.round($_psyche.research * 100)>>%</span><br>
@@ -148,9 +181,9 @@
       <</if>>
       <<language>>
         <<option 'EN'>>
-          Sanity affects learning, knowledge checks and how strongly strange experiences affect you. Dread and fascination counteract each other. Both weaken your resolve. Dread makes stress harder to bear, but helps you notice danger and flee. Fascination helps you follow strange clues, but leaves you sleeping lightly. Sleep, prayer and writing help you recover.
+          Sanity affects learning, knowledge checks and how strongly strange experiences affect you. Dread and fascination counteract each other. Both weaken your resolve. Dread makes stress harder to bear and slows control recovery, but sharpens your hearing while you keep control, and helps you run or hide when stalked. Fascination helps you follow strange clues, but leaves you sleeping lightly. Sleep, prayer and writing help you recover.
         <<option 'CN'>>
-          理智影响四科学习、知识判定，也影响你有多容易受惊或入迷。恐惧与入迷互相抵消，都会削弱意志。恐惧让压力更难承受，却也让你更警觉，更容易逃离危险。入迷有助于追寻异常线索，却也让你睡得更浅。睡一觉、祈祷或写写东西，有助于恢复。
+          理智影响四科学习、知识判定，也影响你有多容易受惊或入迷。恐惧与入迷互相抵消，都会削弱意志。恐惧让压力更难承受，自控也恢复得更慢，但保持自控时能让你留意周围的动静，被尾随时也更容易逃跑或藏身。入迷有助于追寻异常线索，却也让你睡得更浅。睡一觉、祈祷或写写东西，有助于恢复。
       <</language>><br>
     <</foldout>>
     <br>

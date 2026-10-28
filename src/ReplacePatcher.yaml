@@ -224,16 +224,24 @@
       const result = original.call(this, skill, ...args);
       if (args[0] >= 2) return result;
       const value = maplebirch.get('VanillaPlus')?.divineTransformations.skillValue(skill, result) ?? result;
-      const psyche = maplebirch.get('Psyche');
-      if (skill === 'athletics' && V.stalk && V.NPCList[0]?.state === 'stalk' && psyche?.alertness) return Math.floor(value / psyche.escape);
-      const modifier = skill === 'willpower' ? psyche?.willpower ?? 1 : ['science', 'maths', 'english', 'history'].includes(skill) ? psyche?.knowledge ?? 1 : 1;
+      const modifier = maplebirch.get('Psyche')?.skill(skill) ?? 1;
       return modifier === 1 ? value : Math.floor(value * modifier);
     })(currentSkillValue);
+
+- comment: '原有感官未生效时补充警觉听觉，使用不受中英文翻译影响的结构锚点。'
+  fileName: 'ingame.js'
+  from: 'if (["instincts"].includes(sense)) {'
+  before: "if (['any', 'hearing'].includes(sense) && maplebirch.get('Psyche')?.vigilant) return lanSwitch('alert senses', '敏锐感官');\n\t"
 
 - comment: '恐惧只放大正压力，保留酒精、自定义倍率与原版上限。'
   fileName: 'stat-changes.js'
   from: 'multiplierOverride = Number(multiplierOverride);'
   after: "\n\t\tif ((multiplierOverride ? amount * multiplierOverride : amount) > 0) amount *= maplebirch.get('Psyche')?.stressGain ?? 1;"
+
+- comment: '恐惧只减慢正向自控恢复，保留原版软模式、战斗上限与分支版本的失控判断。'
+  fileName: 'stat-changes.js'
+  from: 'if (amount > 0 && !V.combat) amount /= 2;'
+  before: "if (amount > 0) amount *= maplebirch.get('Psyche')?.controlRecovery ?? 1;\n\t\t"
 
 - comment: '飞升抵消麋鹿疤痕的每日创伤输入。'
   fileName: 'time.js'

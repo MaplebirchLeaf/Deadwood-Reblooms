@@ -21,6 +21,9 @@ export default function adaptBoot(maplebirch: MaplebirchCore): void {
       'else if (V.sydney_templeWork === "quarters") {\n\t\t\t\t\tif ('
     ]);
     params.js = params.js.filter(rule => !replaced.has(rule.from));
+    // 警觉听觉保留 DoLX 的耳机限制，原有视觉与本能判断仍由原版负责。
+    const hearing = params.js.find(rule => rule.fileName === 'ingame.js' && rule.from === 'if (["instincts"].includes(sense)) {');
+    if (hearing) hearing.to = hearing.to.replace("['any', 'hearing'].includes(sense)", "['any', 'hearing'].includes(sense) && !playerWearsHeadphones()");
   }
   // DoLX 抗焦虑片复用原版服药效果数组，不改写创伤或过量结算。
   if (maplebirch.get('Psyche')) {

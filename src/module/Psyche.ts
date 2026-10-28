@@ -61,6 +61,15 @@ export default class Psyche extends Module {
     return 1 + 0.25 * this.alertness;
   }
 
+  public get controlRecovery(): number {
+    return 1 - 0.25 * this.alertness;
+  }
+
+  /** 保持自控时，恐惧让人留意动静，沿用原版听觉判断。 */
+  public get vigilant(): boolean {
+    return this.active && this.state.mood >= 400 && V.controlled === 1;
+  }
+
   /** 入迷只加快明确的异常研究。 */
   public get research(): number {
     return this.active ? 1 - 0.25 * Math.clamp((-this.state.mood - 200) / 800, 0, 1) : 1;
@@ -68,6 +77,14 @@ export default class Psyche extends Module {
 
   public get escape(): number {
     return 1 - 0.25 * this.alertness;
+  }
+
+  /** 显示与检定共用倍率，不改原始能力，也不在查询时消耗心绪。 */
+  public skill(skill: string): number {
+    if (skill === 'willpower') return this.willpower;
+    if (['science', 'maths', 'english', 'history'].includes(skill)) return this.knowledge;
+    if (['athletics', 'skulduggery'].includes(skill) && V.stalk && V.NPCList[0]?.state === 'stalk') return 1 / this.escape;
+    return 1;
   }
 
   public get canCalm(): boolean {
