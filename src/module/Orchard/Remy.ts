@@ -24,6 +24,7 @@ class Remy {
     syndrome: false,
     last_meeting_day: -1,
     last_daily_day: -1,
+    estate_day: -1,
     last_gift_type: '',
     gift_from_farm: false,
     gift_followup_day: -1,
@@ -259,6 +260,7 @@ class Remy {
       if (!this.state.romance) return false;
       this.orchard.core.SugarCube.Wikifier.wikifyEval('<<loveInterestRemove "Remy">>');
       this.state.romance = false;
+      this.state.estate_day = -1;
       this.state.ended = true;
       this.state.syndrome = false;
       this.state.stockholm = 0;

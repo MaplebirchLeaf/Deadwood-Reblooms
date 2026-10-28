@@ -63,7 +63,7 @@ export default class PropertyBanquet {
 
   public preInit(): void {
     this.core.on(':passagestart', () => {
-      if (!V.Finance?.real_estate || V.replayScene || V.statFreeze || !this.active || passages.includes(this.core.passage.title)) return;
+      if (!V.Finance?.real_estate || V.replayScene || V.statFreeze || V.frozenValues || !this.active || passages.includes(this.core.passage.title)) return;
       this.state.stage = 'finished';
       this.state.interrupted = true;
     });

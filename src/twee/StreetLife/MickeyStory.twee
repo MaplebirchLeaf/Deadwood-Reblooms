@@ -1,6 +1,7 @@
 :: Deadwood Street Mickey Offer
-<<deadwood-street-story-header 'mickey' 0 'smuggler'>>
-<<if !_storyPageUnavailable>>
+<<set _mickeySite to $location is 'pub' ? 'pub' : 'smuggler'>>
+<<deadwood-street-story-header 'mickey' 0 _mickeySite>>
+<<if !_storyPageUnavailable and (_mickeySite isnot 'pub' or maplebirch.get('StreetLife').heist.mickeyAvailable)>>
   <<deadwood-dynamicblock 'deadwood-street-mickey-offer'>>
     <<set _mickeyStory to maplebirch.get('StreetLife').stories.state.mickey>>
     <<if _mickeyStory.stage is 0>>
@@ -19,9 +20,9 @@
       <<if maplebirch.get('StreetLife').heist.mickeyAvailable>>
         <<language>>
           <<option 'EN'>>
-            The narrow door beyond the partition is shut. You can hear a keyboard on the other side. Landry lowers <<nnpc_his 'Landry'>> voice. "Mickey can help untangle who told whom. You'll still have to check the story yourself."
+            The door behind Landry's table is shut. You can hear a keyboard on the other side. Landry lowers <<nnpc_his 'Landry'>> voice. "Mickey can help untangle who told whom. You'll still have to check the story yourself."
           <<option 'CN'>>
-            隔板后的窄门关着，门内传来敲键盘的声音。兰德里压低了声音。“米奇能帮你理清是谁传给谁的。消息是真是假，还得你自己去问。”
+            兰德里桌后的门关着，门内传来敲键盘的声音。兰德里压低了声音。“米奇能帮你理清是谁传给谁的。消息是真是假，还得你自己去问。”
         <</language>><br><br>
         <<deadwood-street-story-choice 'mickey' 'assisted'>>
       <</if>>
@@ -46,7 +47,7 @@
     <</if>>
   <</deadwood-dynamicblock>>
 <</if>>
-<<deadwood-street-story-leave 'smuggler'>>
+<<deadwood-street-story-leave _mickeySite>>
 
 :: Deadwood Street Mickey Cafe
 <<deadwood-street-story-header 'mickey' 1 'cafe'>>

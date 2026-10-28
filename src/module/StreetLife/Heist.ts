@@ -295,9 +295,20 @@ export default class Heist {
     return Math.floor(Time.days) < this.state.bankClosedUntil;
   }
 
+  /** 米奇沿用丰收街酒馆的正式引见与空闲状态，不搬到地下会面。 */
   public get mickeyAvailable(): boolean {
     return (
-      this.atMeeting && this.meetingAvailable && this.street.available && !this.inAction && !this.street.bounties.busy && V.mickeyPub >= 2 && !['hiding', 'hidingKnown'].includes(V.pubfame?.status)
+      this.street.core.get('StreetLife') === this.street &&
+      V.location === 'pub' &&
+      C.npc.Landry?.init === 1 &&
+      C.npc.Landry.state === 'active' &&
+      this.street.available &&
+      !this.inAction &&
+      !this.street.bounties.busy &&
+      !V.worn.face.type.includes('gag') &&
+      V.mickeyPub >= 2 &&
+      !!V.per_npc.hacker &&
+      ['ready', 'accepted', 'done'].includes(V.pubfame?.status)
     );
   }
 

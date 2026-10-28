@@ -22,6 +22,8 @@ interface Journey {
   progress?: number;
   passengers: string[];
   dated: boolean;
+  /** 完成约会后的活动记录，正文重绘与读档不重复结算。 */
+  date_choice?: string;
   /** 本次行程已在路边独处过。 */
   fooled: boolean;
   /** 车厢亲密场景是否尚未初始化战斗。 */

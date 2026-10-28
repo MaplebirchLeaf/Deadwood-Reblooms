@@ -289,8 +289,8 @@
             <</lanLink>><<promiscuous2>><br>
           <</if>>
           <<if _transport.companions.canDate>>
-            <<icon `'transport/' + _transport.model.id + '.png'`>><<lanLink ['Spend some time together (0:20)', '一起逛逛 (0:20)']>>
-              <<if maplebirch.get('Transport').companions.date()>><<goto 'Deadwood Transport Date'>><</if>>
+            <<lanLink ['Spend some time together', '一起逛逛']>>
+              <<if maplebirch.get('Transport').companions.canDate>><<goto 'Deadwood Transport Date'>><</if>>
             <</lanLink>><<lstress>><<for $_date_hint_name range _transport.companions.aboard>><<if $Transport.affection_days[$_date_hint_name + ':date'] isnot Time.days>><<glove $_date_hint_name>><</if>><</for>><br>
           <</if>>
           <<getouticon>><<lanLink ['Continue', '继续'] _transport.arrival>>
@@ -363,50 +363,192 @@
 <<getouticon>><<lanLink ['Continue', '继续'] _transport.arrival>><</lanLink>>
 
 :: Deadwood Transport Date
-<<set _transport to maplebirch.get('Transport')>>
-<<if $Transport.trip?.dated>>
-  <<language>>
-    <<option 'EN'>>
-      <<switch $Transport.trip.to>>
-        <<case 'cliff'>>You park near the cliff and follow the railings above the sea. The wind pulls at your clothes. When a gap opens between the houses, you stop together to watch the water below.
-        <<case 'starfish'>>You leave the car near the promenade. Music spills from the arcade, almost covering the sound of the surf. You walk beside the beach, slowing where the sand has drifted across the paving.
-        <<case 'danube'>>You walk along the dry canal. Footsteps echo beneath a bridge. You pause by the railings, looking down at the weeds that have taken hold between the stones.
-        <<case 'high'>>You wander past the shop windows together. A display changes as you turn the corner, from bright clothes to expensive furniture. You linger over the things you would put in a home.
-      <</switch>>
-    <<option 'CN'>>
-      <<switch $Transport.trip.to>>
-        <<case 'cliff'>>你在峭壁附近停好车，沿着海上方的栏杆走去。风扯动衣角。房屋之间露出空隙时，你们一起停下，望向下方的海水。
-        <<case 'starfish'>>你把车停在海滨栈道附近。游戏厅里的音乐几乎盖住了潮声。你们沿海滩散步，在沙子漫上铺路石的地方放慢脚步。
-        <<case 'danube'>>你们沿着干涸的运河散步。经过桥下时，脚步带出回声。你们靠在栏杆旁，看着从石缝间长出的杂草。
-        <<case 'high'>>你们一起逛过橱窗。转过街角，鲜亮衣服的陈列换成了昂贵家具。你们在那些想带回家的物件前多站了一会儿。
-      <</switch>>
-  <</language>><br><br>
-  <<for _date_name range $Transport.trip.passengers>>
-    <<npc _date_name>><<person1>><<if _date_name is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
-    <<language>>
-      <<option 'EN'>>
-        <<switch _date_name>>
-          <<case 'Robin'>>Robin's hand brushes yours. <<He>> smiles when you take it. "We should do this again."
-          <<case 'Whitney'>>Whitney hooks <<his>> fingers through yours. "What? You're the one who asked me out." <<He>> stays beside you as you walk.
-          <<case 'Kylar'>>Kylar keeps turning towards you whenever you speak. "I like being here with you." <<He>> says it quietly, squeezing your hand when you offer it.
-          <<case 'Sydney'>>Sydney walks close beside you. <<if _sydneyStatus.includes('corrupt')>>"We could take the long way back." <<He>> catches your hand and grins.<<else>>"I needed this." <<He>> asks to hold your hand, smiling when you agree.<</if>>
-        <</switch>>
-      <<option 'CN'>>
-        <<switch _date_name>>
-          <<case 'Robin'>>罗宾的手轻轻擦过你的手。你牵住它时，<<he>>笑了。“下次再一起出来吧。”
-          <<case 'Whitney'>>惠特尼勾住你的手指。“怎么？可是你约我出来的。”走动时，<<he>>一直留在你身旁。
-          <<case 'Kylar'>>你每次开口，凯拉尔都会转头看你。“我喜欢和你待在这里。”<<He>>说得很轻，在你伸出手后把它握紧。
-          <<case 'Sydney'>>悉尼靠近你走着。<<if _sydneyStatus.includes('corrupt')>>“回去可以绕远一点。”<<He>>牵住你的手，笑了起来。<<else>>“我正需要这样出来走走。”<<He>>问能否牵你的手，得到同意后露出笑容。<</if>>
-        <</switch>>
-    <</language>><br><br>
-  <</for>>
-  <<if maplebirch.get('Transport').companions.canFoolAround>>
+<<set _transport to maplebirch.get('Transport'), _date_trip to $Transport.trip>>
+<<if !_date_trip?.settled or _date_trip.interrupted or _date_trip.commute or _date_trip.taxi or _transport.vehicle?.id isnot _date_trip.vehicle or _transport.vehicle?.point isnot _date_trip.to>>
+  <<lanSwitch 'You can no longer spend time here together.' '你们现在没法一起在这里停留。'>><br><br>
+  <<getouticon>><<lanLink ['Return to your vehicle', '返回载具旁'] 'Deadwood Transport Travel'>><</lanLink>><br><<exit>>
+<</if>>
+<<set $location to _date_trip.date_choice is 'arcade' ? 'arcade' : 'town', $outside to _date_trip.date_choice is 'arcade' ? 0 : 1>><<effects>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Transport Date'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if _date_trip.date_choice>>
+  <<deadwood-transport-date-scene>>
+  <<deadwood-transport-date-replies>>
+  <<if _transport.companions.canFoolAround>>
     <<loveicon>><<lanLink ['Find somewhere quiet before going home', '回家前找个没人的地方亲热']>>
-      <<if maplebirch.get('Transport').companions.foolAround()>>
-        <<set $Transport.trip.pullstart to true>><<goto 'Deadwood Transport Pull Over'>>
-      <</if>>
+      <<if maplebirch.get('Transport').companions.foolAround()>><<set $Transport.trip.pullstart to true>><<goto 'Deadwood Transport Pull Over'>><</if>>
     <</lanLink>><<promiscuous2>><br><br>
   <</if>>
   <<lanSwitch 'You return to the vehicle together and decide where to go next.' '你们一起回到车旁，商量接下来去哪儿。'>><br><br>
+  <<if _date_trip.event?.outcome and ['scraped', 'limped', 'escape', 'evaded'].includes(_date_trip.event.outcome)>>
+    <<deadwood-transport-hazard-companion>>
+  <</if>>
+<<elseif _transport.companions.canDate>>
+  <<language>>
+    <<option 'EN'>>
+      <<switch _date_trip.to>>
+        <<case 'cliff'>>You park near the cliff. A path follows the railings above the sea; a bench stands back from the wind.
+        <<case 'starfish'>>You leave the car near the promenade. Music spills from the arcade, and the paving beside the beach is clear enough for a walk.
+        <<case 'danube'>>You stop on Danube Street. Stately houses stand back from the pavement, behind their garden walls. The far side of the street is quiet enough to talk.
+        <<case 'high'>>You park off High Street. A bright advertisement fills one shop window; farther along, the furniture display is arranged like a little sitting room.
+      <</switch>> What would you like to do together?
+    <<option 'CN'>>
+      <<switch _date_trip.to>>
+        <<case 'cliff'>>你在峭壁附近停好车。一条小路沿海上方的栏杆伸过去，背风处放着长凳。
+        <<case 'starfish'>>你把车停在海滨栈道附近。游戏厅里传来音乐，海滩旁的步道也适合走走。
+        <<case 'danube'>>你在多瑙河街停下。宽敞的住宅退在围墙后面，隔着花园正对街道。另一侧人行道比较清静，适合说会儿话。
+        <<case 'high'>>你把车停在商业街旁。一扇橱窗里贴着鲜亮的广告，再往前，家具陈列被布置成小起居室的样子。
+      <</switch>> 接下来，想一起做点什么？
+  <</language>><br><br>
+  <<set _date_choices to {
+    cliff: [['bench', 'Sit on the bench and watch the sea', '坐在长凳上看海'], ['path', 'Follow the path along the cliff', '沿峭壁的小路走一段']],
+    starfish: [['promenade', 'Walk along the promenade', '沿海滨栈道散步'], ['arcade', 'Take turns at an arcade game (£5)', '轮流玩一台街机 (£5)']],
+    danube: [['stonework', 'Compare the old houses from the pavement', '沿街看看旧宅的建筑细节'], ['quiet', 'Talk on the quieter side of the street', '到清静些的街边说说话']],
+    high: [['advert', 'Read the shop-window advertisement together', '一起读读橱窗里的广告'], ['furniture', 'Compare the furniture and prices', '比较家具和价钱']]
+  }[_date_trip.to]>>
+  <div id='deadwood-transport-date-options'>
+  <<for _date_option range _date_choices>><<capture _date_option _date_trip>>
+    <<if _date_option[0] isnot 'arcade' or ($money gte 500 and $exposed lte 0 and !pcAreArmsBound('any') and ['day', 'dusk'].includes(Time.dayState) and Time.hour gte 9 and Time.hour * 60 + Time.minute + 20 lt 21 * 60)>>
+      <<lanLink [_date_option[1] + ' (0:20)', _date_option[2] + ' (0:20)']>><<deadwood-transport-date-action _date_option[0] _date_trip>><</lanLink>>
+      <<switch _date_option[0]>>
+        <<case 'bench'>><<ltiredness>>
+        <<case 'path'>> | <span class='teal'><<lanSwitch 'Athletics' '运动'>></span><<gtiredness>>
+        <<case 'stonework'>> | <span class='teal'><<lanSwitch 'History' '历史'>></span>
+        <<case 'quiet'>><<gwillpower>>
+        <<case 'advert'>> | <span class='teal'><<lanSwitch 'English' '语文'>></span>
+        <<case 'furniture'>> | <span class='teal'><<lanSwitch 'Maths' '数学'>></span>
+      <</switch>><<lstress>><br>
+    <<elseif _date_option[0] is 'arcade'>>
+      <span class='purple'><<lanSwitch 'The game needs £5, free hands and time before the arcade closes.' '玩街机需要£5、双手自由，还得赶在游戏厅关门前。'>></span><br>
+    <</if>>
+  <</capture>><</for>><br>
+  </div>
+<<elseif _date_trip.dated>>
+  <<lanSwitch 'The outing was interrupted before you could finish. You can head back to the vehicle.' '你们还没来得及尽兴，这次相处便被打断了。先回载具旁吧。'>><br><br>
+<<else>>
+  <<lanSwitch 'Your companion is no longer free to stay. You can return to the vehicle.' '同行的人已经没法继续在这里停留。先回载具旁吧。'>><br><br>
 <</if>>
-<<getouticon>><<lanLink ['Continue', '继续'] _transport.arrival>><</lanLink>><br>
+<<getouticon>><<lanLink ['Return to your vehicle', '返回载具旁'] 'Deadwood Transport Travel'>><<set $location to 'town', $outside to 1>><</lanLink>><br>
+
+:: Deadwood Transport Date Widgets [widget]
+
+<!-- 每次行程只选一项；原有耗时与每日好感仍由 companions.date 结算，正文只读结果。 -->
+<<widget 'deadwood-transport-date-action'>>
+  <<set $_date_transport to maplebirch.get('Transport'), $_date_choice to _args[0], $_date_trip to $Transport.trip>>
+  <<if $passage isnot 'Deadwood Transport Date' or !$_date_transport?.companions.canDate or $_date_trip isnot _args[1] or !{
+    cliff: ['bench', 'path'], starfish: ['promenade', 'arcade'], danube: ['stonework', 'quiet'], high: ['advert', 'furniture']
+  }[$_date_trip.to]?.includes($_date_choice)>><<exit>><</if>>
+  <<if $_date_choice is 'arcade'>>
+    <<if $money lt 500 or $exposed gt 0 or pcAreArmsBound('any') or !['day', 'dusk'].includes(Time.dayState) or Time.hour lt 9 or Time.hour * 60 + Time.minute + 20 gte 21 * 60>><<exit>><</if>>
+    <!-- 与原版街机同价，先投币再游玩；原版中断不退已经投入的游戏费。 -->
+    <<money -500 'arcade'>><<set $location to 'arcade', $outside to 0>>
+  <</if>>
+  <<if $_date_transport.companions.date()>>
+    <<set $_date_trip.date_choice to $_date_choice>>
+    <<switch $_date_choice>>
+      <<case 'bench'>><<tiredness -2>>
+      <<case 'path'>><<athletics 1>><<tiredness 2>>
+      <<case 'promenade'>><<stress -1>>
+      <<case 'arcade'>><<stress -2>>
+      <<case 'stonework'>><<historyskill 1 'no_star'>>
+      <<case 'quiet'>><<willpower 1>>
+      <<case 'advert'>><<englishskill 1 'no_star'>>
+      <<case 'furniture'>><<mathsskill 1 'no_star'>>
+    <</switch>>
+  <</if>>
+  <<deadwood-transport-next '#deadwood-transport-date-options'>>
+  <<if $passage is 'Deadwood Transport Date' and !$statFreeze and !$replayScene and !$frozenValues>><<run updateMoment()>><</if>>
+  <<if $passage is 'Deadwood Transport Date' and maplebirch.get('Transport') and !$statFreeze and !$replayScene and !$frozenValues and !$eventforced and !$nextPassage and !$nextPassageCheck>><<goto 'Deadwood Transport Date'>><</if>>
+<</widget>>
+
+<<widget 'deadwood-transport-date-scene'>>
+  <<language>>
+    <<option 'EN'>>
+      <<switch $Transport.trip.date_choice>>
+        <<case 'bench'>>You find a dry patch of the bench and sit down together. <<if Time.dayState is 'night'>>Lights along the shore break across the dark water.<<else>>The sea shifts from grey to silver where the light reaches it.<</if>> For once, neither of you needs to get up as soon as your feet stop aching.
+        <<case 'path'>>You follow the path beside the railings. <<if currentSkillValue('athletics') gte 400>>You keep an easy pace on the rise, leaving enough breath to point out the view.<<else>>The rise leaves you short of breath. You stop at the next flat stretch, and everyone has a chance to look out over the water.<</if>> You turn back before the path takes you out of sight of the houses.
+        <<case 'promenade'>>You walk beside the beach, slowing where sand has drifted across the paving. A gull lands by the railing and watches your empty hands. You leave it disappointed and turn back towards the car.
+        <<case 'arcade'>>You put the coins in and make room at the controls. When one round ends, you change places rather than paying to continue. There is plenty of advice from behind the next player's shoulder, and very little agreement about whose turn went better.
+        <<case 'stonework'>>You compare the gateposts and the houses beyond them, keeping to the public pavement. <<if currentSkillValue('history') gte 400>>You recognise an older style in a doorway, partly hidden by newer stonework, and point out the details left from before the alterations.<<else>>You cannot date the houses, but you can compare the worn gateposts with the newer walls built around them.<</if>> You move on when a car turns towards the next gate.
+        <<case 'quiet'>>You cross to the quieter pavement and stop beyond the garden gates. There is no window display to look at, and neither of you has anything to buy. You leave a little room for people to pass, letting the pauses in your conversation last as long as they need to.
+        <<case 'advert'>>You read the advertisement in the shop window together. <<if currentSkillValue('english') gte 400>>You pick out the small qualification beneath the bold promise. The sentence is doing rather less than the large type suggests.<<else>>You point to the smaller print, then compare it with the promise at the top.<</if>> You cover the large slogan and look at what is left. It makes a rather less impressive advertisement.
+        <<case 'furniture'>>You compare the chairs in the window, then find the small price cards beneath them. <<if currentSkillValue('maths') gte 400>>You work out what the advertised instalments add up to. It is rather more than the number in the largest print.<<else>>You add the smaller figures on a scrap of paper until the real price becomes clear.<</if>> You leave the furniture where it is, having agreed which pieces you would never pay that much for.
+      <</switch>>
+    <<option 'CN'>>
+      <<switch $Transport.trip.date_choice>>
+        <<case 'bench'>>你们找了长凳上干燥的一块坐下。<<if Time.dayState is 'night'>>沿岸的灯光落在黑暗的水面上，一晃一晃的。<<else>>天光照到的地方，灰色海水泛起银光。<</if>>这回，就算脚不酸了，也不用立刻站起来赶路。
+        <<case 'path'>>你们沿栏杆旁的小路走去。<<if currentSkillValue('athletics') gte 400>>走上坡时，你仍能轻松地开口，指给身边的人看远处的景色。<<else>>上坡让你有些气喘。走到下一段平路，你停了停，大家也正好看看下面的海。<</if>>趁小路还没绕出房屋的遮挡，你们便折返了。
+        <<case 'promenade'>>你们沿海边走着，在沙子漫上铺路石的地方放慢脚步。一只海鸥落在栏杆边，盯住你们空着的手。回到车旁之前，你们没有满足它的期待。
+        <<case 'arcade'>>你投下硬币，在操纵杆旁让出位置。一轮结束，你们便换个人玩，没有再往里续钱。下一人肩膀后面一直有人出主意，至于到底是谁玩得好，始终没争出个结果。
+        <<case 'stonework'>>你们沿人行道比较门柱与后方的房屋，没有走进私人院子。<<if currentSkillValue('history') gte 400>>你认出一处被新石料遮住的旧式门楣，指给身边的人看，后来改建时留下了哪些细节。<<else>>你说不准房屋的年代，但磨损的门柱与周围新砌的墙，看着确实不一样。<</if>>有汽车准备驶进下一处大门时，你们便让开了路。
+        <<case 'quiet'>>你们走到清静些的那侧人行道，在远离花园大门的地方停下。这里没有橱窗可看，也没什么急着要买的。你们让出行人经过的位置，慢慢说话，停下来时，也不急着把空当填满。
+        <<case 'advert'>>你们一起读起橱窗里的广告。<<if currentSkillValue('english') gte 400>>你挑出醒目承诺下方的一小句限定词。仔细读来，答应的事可比大字让人以为的少些。<<else>>你指着小字读了一遍，又与最上面的承诺比较。<</if>>你用手挡住那行醒目的大字，再看看剩下的内容，可就没那么吸引人了。
+        <<case 'furniture'>>你们比较过橱窗里的几把椅子，又找到下面小小的价签。<<if currentSkillValue('maths') gte 400>>你算了算广告上的分期付款，加起来可比最大那行数字贵得多。<<else>>你在一小片纸上把数字相加，才弄清到底要付多少。<</if>>最后，家具仍留在橱窗里。倒是哪几件绝不值得花这么多钱，你们意见一致。
+      <</switch>>
+  <</language>><<lstress>><br><br>
+  <<switch $Transport.trip.date_choice>>
+    <<case 'bench'>><<ltiredness>>
+    <<case 'path'>> <span class='teal'><<lanSwitch 'Athletics' '运动'>></span><<gtiredness>>
+    <<case 'stonework'>><<ghistory>>
+    <<case 'quiet'>><<gwillpower>>
+    <<case 'advert'>><<genglish>>
+    <<case 'furniture'>><<gmaths>>
+  <</switch>>
+<</widget>>
+
+<<widget 'deadwood-transport-date-replies'>>
+  <<for $_date_name range $Transport.trip.passengers>>
+    <<npc $_date_name>><<person1>><<if $_date_name is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<switch $_date_name>>
+          <<case 'Robin'>>
+            <<if $Transport.trip.date_choice is 'arcade'>>"Wait, I know this one." Robin leans forward, then catches <<himself>> reaching past your arm. "Sorry. Your turn. I'll tell you afterwards."
+            <<elseif ['bench', 'quiet'].includes($Transport.trip.date_choice)>>Robin stays beside you, <<his>> hand brushing yours. <<if C.npc.Robin.trauma gte 40>>"Can we stay a little away from the road?" <<He>> settles when you make room.<<else>>"This is nice. We don't always have to find something to do."<</if>>
+            <<elseif $Transport.trip.date_choice is 'furniture'>>"That one's too easy to spill a drink on." Robin points to the pale chair, then checks the price. "I'd be frightened to sit in it."
+            <<else>>Robin keeps close enough that your hands brush. "Next time, you can pick again. I like coming out with you."<</if>>
+          <<case 'Whitney'>>
+            <<if $Transport.trip.date_choice is 'arcade'>>"Move over. I'll show you." Whitney takes the controls, then swears when the screen flashes game over. "Machine's fucked."
+            <<elseif $Transport.trip.date_choice is 'bench'>>Whitney takes most of the bench, then shifts enough to let you sit. "What? I can sit still. Stop looking surprised."
+            <<elseif $Transport.trip.date_choice is 'quiet'>>Whitney stays close, shouldering into your space. "What? I can stand still. Stop looking surprised."
+            <<elseif $Transport.trip.date_choice is 'advert'>>Whitney reads the small print over your shoulder. "All that shit just to get your money." <<He>> waits while you point out the rest.
+            <<else>>Whitney hooks <<his>> fingers through yours. <<if C.npc.Whitney.dom gte 10>>"Keep up, slut."<<else>>"Come on. We've got time."<</if>> <<He>> does not let go.<</if>>
+          <<case 'Kylar'>>
+            <<if $Transport.trip.date_choice is 'arcade'>>Kylar loses a life while watching your hands. "I wasn't ready." When you trade places, <<he>> stands close, watching you rather than the score.
+            <<elseif ['advert', 'stonework'].includes($Transport.trip.date_choice)>>Kylar listens until you pause. "I like hearing you explain things." <<He>> flushes when you ask what <<he>> thinks, then points out a detail you missed.
+            <<elseif $Transport.trip.passengers.length gt 1>>Kylar finds a place beside you. <<if C.npc.Kylar.rage gte 40>>"Next time, could it just be us?" <<He>> keeps <<his>> voice low.<<else>>"Can I sit beside you on the way back?"<</if>>
+            <<else>>Kylar offers you <<his>> hand. "We could stay a little longer." <<He>> squeezes your fingers, but follows when it is time to go.<</if>>
+          <<case 'Sydney'>>
+            <<if $Transport.trip.date_choice is 'arcade'>>Sydney checks the controls. <<if _sydneyStatus.includes('corrupt')>>"No helping until I've lost." <<He>> grins. "Then you can tell me everything I did wrong."<<else>>"One game. Then we should get back." After the first round, <<he>> admits that <<he>> would like a turn too.<</if>>
+            <<elseif ['stonework', 'advert', 'furniture'].includes($Transport.trip.date_choice)>>Sydney bends closer to see what you mean. <<if _sydneyStatus.includes('corrupt')>>"You do know how to keep my attention." <<He>> gives you a sidelong smile before adding <<his>> own opinion.<<else>>"I hadn't noticed that." <<He>> checks it again, smiling when the details fit.<</if>>
+            <<elseif ['bench', 'quiet'].includes($Transport.trip.date_choice)>>Sydney stays beside you, keeping <<his>> hand within reach. <<if _sydneyStatus.includes('corrupt')>>"We could come here again. Somewhere away from everyone else." <<He>> looks towards you rather than the view.<<else>>"I should put my book away more often." <<He>> leaves it in <<his>> bag.<</if>>
+            <<else>>Sydney walks beside you, then stops when you do. <<if _sydneyStatus.includes('corrupt')>>"A little longer won't hurt." <<He>> catches your hand.<<else>>"I'm glad we had time for this." <<He>> offers <<his>> hand, glancing at the time before you leave.<</if>><</if>>
+        <</switch>>
+      <<option 'CN'>>
+        <<switch $_date_name>>
+          <<case 'Robin'>>
+            <<if $Transport.trip.date_choice is 'arcade'>>“等等，这个我玩过。”罗宾往前凑，手伸到你胳膊旁，才又收了回去。“对不起。该你玩，等会儿再说。”
+            <<elseif ['bench', 'quiet'].includes($Transport.trip.date_choice)>>罗宾留在你身旁，手背轻轻擦过你的手。<<if C.npc.Robin.trauma gte 40>>“能不能离公路远一点？”你挪出位置后，<<he>>才渐渐放松下来。<<else>>“这样也挺好。不用每次都找事情做。”<</if>>
+            <<elseif $Transport.trip.date_choice is 'furniture'>>“这把可不能洒饮料。”罗宾指了指浅色椅子，又看了一眼价签。“坐上去都害怕。”
+            <<else>>罗宾留在你身旁，手背偶尔擦过你的手。“下回还让你选。我喜欢和你出来。”<</if>>
+          <<case 'Whitney'>>
+            <<if $Transport.trip.date_choice is 'arcade'>>“让开。我教你。”惠特尼接过操纵杆，屏幕一闪，游戏结束。<<He>>骂了一声。“破机器。”
+            <<elseif $Transport.trip.date_choice is 'bench'>>惠特尼占了大半张长凳，才挪出够你坐的位置。“怎么？我又不是坐不住。别大惊小怪。”
+            <<elseif $Transport.trip.date_choice is 'quiet'>>惠特尼留在你身旁，肩膀挤进你的位置。“怎么？我又不是站不住。别大惊小怪。”
+            <<elseif $Transport.trip.date_choice is 'advert'>>惠特尼从你肩后读完小字。“一堆废话，就是想让你掏钱。”你接着指给<<him>>看，<<he>>倒也等着。
+            <<else>>惠特尼勾住你的手指。<<if C.npc.Whitney.dom gte 10>>“跟上，骚货。”<<else>>“走吧。还有时间。”<</if>><<He>>没有松手。<</if>>
+          <<case 'Kylar'>>
+            <<if $Transport.trip.date_choice is 'arcade'>>凯拉尔盯着你的手，丢了一条命。“还没准备好。”轮到你玩，<<he>>便贴在旁边，看你多过看分数。
+            <<elseif ['advert', 'stonework'].includes($Transport.trip.date_choice)>>凯拉尔一直听到你停下来。“喜欢听你讲这些。”你反问<<him>>怎么想，<<he>>红了脸，随后指出你漏过的一处细节。
+            <<elseif $Transport.trip.passengers.length gt 1>>凯拉尔在你身边找了个位置。<<if C.npc.Kylar.rage gte 40>>“下回，能不能只有我们？”<<He>>压低了声音。<<else>>“回去时，我还坐你旁边，好吗？”<</if>>
+            <<else>>凯拉尔把手递给你。“还可以多待会儿。”<<He>>握紧你的手指，不过该走时，还是跟了上来。<</if>>
+          <<case 'Sydney'>>
+            <<if $Transport.trip.date_choice is 'arcade'>>悉尼看了看操纵杆。<<if _sydneyStatus.includes('corrupt')>>“输了之前，不许帮忙。”<<He>>笑了，“等我输完，再说哪里做错了。”<<else>>“就玩一次。然后该回去了。”头一轮结束后，<<he>>承认，也想轮到自己试试。<</if>>
+            <<elseif ['stonework', 'advert', 'furniture'].includes($Transport.trip.date_choice)>>悉尼凑过来，看清你指的地方。<<if _sydneyStatus.includes('corrupt')>>“倒挺会让我专心听。”<<He>>斜眼朝你笑笑，才接着说起自己的看法。<<else>>“先前没注意到。”<<He>>又核对了一遍，发现细节确实对得上，便笑了。<</if>>
+            <<elseif ['bench', 'quiet'].includes($Transport.trip.date_choice)>>悉尼留在你身边，把手放在你够得到的地方。<<if _sydneyStatus.includes('corrupt')>>“下回还来吧。离别人远些的地方。”<<He>>看向你，没有看景色。<<else>>“应该多把书放下一会儿。”这回，<<he>>让它留在了包里。<</if>>
+            <<else>>悉尼陪你走着，也随着你的脚步停下。<<if _sydneyStatus.includes('corrupt')>>“多待一会儿也没什么。”<<He>>牵住你的手。<<else>>“幸好，今天有空一起出来。”<<He>>把手递给你，离开前还是看了一眼时间。<</if>><</if>>
+        <</switch>>
+    <</language>><<glove $_date_name>><br><br>
+  <</for>>
+<</widget>>

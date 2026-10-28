@@ -65,7 +65,14 @@ export default class PrivateCards extends Holdem {
   }
 
   public get present(): boolean {
-    return !V.replayScene && !V.statFreeze && !V.possessed && V.combat !== 1 && ['Avery', 'Bailey', 'Leighton', 'Quinn'].every((name, index) => V.NPCList?.[index]?.fullDescription === name);
+    return (
+      !V.replayScene &&
+      !V.statFreeze &&
+      !V.frozenValues &&
+      !V.possessed &&
+      V.combat !== 1 &&
+      ['Avery', 'Bailey', 'Leighton', 'Quinn'].every((name, index) => V.NPCList?.[index]?.fullDescription === name)
+    );
   }
 
   public override get available(): boolean {
@@ -115,7 +122,7 @@ export default class PrivateCards extends Holdem {
 
   /** 中断与主动离席均只兑回一次，旁观者没有买入，也不会领取桌上的钱。 */
   public close(): boolean {
-    if (!this.session.active || V.replayScene || V.statFreeze) return false;
+    if (!this.session.active || V.replayScene || V.statFreeze || V.frozenValues) return false;
     const amount = this.watching ? 0 : super.cashOut();
     if (amount > 0) {
       if (this.session.bank_payment) this.finance.creditBankPennies(amount);

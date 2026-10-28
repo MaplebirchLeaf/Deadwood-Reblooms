@@ -2,14 +2,18 @@
 
 <!-- 沿用原版 generateMickey / per_npc.hacker，米奇的身份和原版名声委托保持同一份数据。 -->
 <<widget 'deadwood-street-mickey-link'>>
-  <<if $passage is 'Smuggler Pub' and maplebirch.get('StreetLife')?.heist.mickeyAvailable>>
+  <!-- 原版普通会面的离开链接已渲染才显示，避开棕狐与伦恩的强制剧情。 -->
+  <<set $_mickeyPubMenu to document.querySelector('#passage-content a[data-passage="Pub"]')>>
+  <<if $passage is 'Pub Landry' and maplebirch.get('StreetLife')?.heist.mickeyAvailable and $_mickeyPubMenu>>
     <<icon 'street/source-check.png'>><<lanLink ['Ask Mickey to look over your street business (0:05)', '请米奇看看街头的事 (0:05)'] 'Deadwood Street Mickey'>>
       <<endevent>><<pass 5>>
     <</lanLink>><br>
+    <<deadwood-street-story-entry 'pub'>>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-street-mickey-response'>>
+  <<if !maplebirch.get('StreetLife')?.heist.mickeyAvailable>><<exit>><</if>>
   <<switch _args[0]>>
     <<case 'work'>>
       <<language>>
@@ -74,18 +78,20 @@
 
 :: Deadwood Street Mickey
 <<set _mickeyWork to maplebirch.get('StreetLife')?.heist>>
-<<if !_mickeyWork?.atMeeting>><<deadwood-street-heist-meeting-required>><<exit>><</if>>
-<<set $location to 'underground', $outside to 0>><<unset $bus>><<effects>>
+<<if $location isnot 'pub'>>
+  <<getouticon>><<back `lanSwitch('Return', '返回')`>><br><<exit>>
+<</if>>
+<<set $outside to 0, $bus to 'harvest'>><<effects>>
 <<if !_mickeyWork?.mickeyAvailable>>
   <<lanSwitch 'Landry has no meeting to arrange with Mickey here just now.' '兰德里现在无法安排你在这里见米奇。'>><br><br>
 <<else>>
   <<endevent>><<npc 'Landry' 1>><<generateMickey 2>>
   <<language>>
     <<option 'EN'>>
-      Landry has arranged for Mickey to meet you behind the wooden partition in the underground pub. Landry waits until nobody is watching before nodding towards the side door. It opens only a little when you knock. Mickey looks over your shoulder before letting you speak. A screen lights the room behind them; the rest is difficult to make out.<br><br>
+      Landry checks that nobody is watching, then nods towards the door behind the table. It opens only a little when you knock. Mickey looks over your shoulder before letting you speak. A screen lights the room behind them; the rest is difficult to make out.<br><br>
       "Work?" Mickey asks. "Tell me which part. Landry handles the introductions. I don't need another copy of every promise made in the bar."
     <<option 'CN'>>
-      兰德里约好让你与米奇在地下酒馆的木隔墙后碰面。等到没人留意，兰德里才朝侧门点了点头。你敲过门，门只开了一点。米奇先看向你肩膀后方，才让你开口。房间里有屏幕亮着，其余地方看不真切。<br><br>
+      兰德里确认没人留意，才朝桌后的门点了点头。你敲过门，门只开了一点。米奇先看向你肩膀后方，才让你开口。房间里有屏幕亮着，其余地方看不真切。<br><br>
       “差事？”米奇问。“先说是哪一部分。兰德里负责牵线，酒馆里做过的每个承诺，我不需要再听一遍。”
   <</language>><br><br>
   <div id='deadwood-mickey-response'></div>
@@ -115,24 +121,28 @@
           米奇看了看你带回的材料。“可以帮你核对一部分。我的时间也值钱。我不跟你去，也不能替银行里的人做保证。”
       <</language>><br><br>
       <<for _mickeyReview range _mickeyWork.terms.mickey.reviews>>
-        <<capture _mickeyWork _mickeyReview>>
+        <<set _mickeyReviewState to _mickeyWork.state>>
+        <<capture _mickeyWork _mickeyReview _mickeyReviewState>>
           <<icon _mickeyReview.icon>>
-          <<if $money gte _mickeyWork.terms.mickey.cost and 18 * 60 - Time.hour * 60 - Time.minute gt _mickeyWork.terms.mickey.minutes>>
+          <<if _mickeyWork.meetingAvailable and $money gte _mickeyWork.terms.mickey.cost and 18 * 60 - Time.hour * 60 - Time.minute gt _mickeyWork.terms.mickey.minutes>>
             <<lanLink _mickeyReview.name>>
-              <<if _mickeyWork.mickeyAvailable and _mickeyWork.ready and !_mickeyWork.state.mickeyReview and $money gte _mickeyWork.terms.mickey.cost and 18 * 60 - Time.hour * 60 - Time.minute gt _mickeyWork.terms.mickey.minutes>>
+              <<if _mickeyWork.mickeyAvailable and _mickeyWork.meetingAvailable and _mickeyWork.state is _mickeyReviewState and _mickeyWork.ready and !_mickeyWork.state.mickeyReview and $money gte _mickeyWork.terms.mickey.cost and 18 * 60 - Time.hour * 60 - Time.minute gt _mickeyWork.terms.mickey.minutes>>
+                <<set _mickeyReviewEnd to Time.date.timeStamp + _mickeyWork.terms.mickey.minutes * 60>>
                 <<pass _mickeyWork.terms.mickey.minutes>>
-                <<if _mickeyWork.mickeyAvailable and _mickeyWork.ready and !_mickeyWork.state.mickeyReview and $money gte _mickeyWork.terms.mickey.cost and $passage is 'Deadwood Street Mickey' and !$nextPassage and !$nextPassageCheck>>
+                <<deadwood-street-story-next 'deadwood-mickey-plan'>>
+                <<if _mickeyWork.state is _mickeyReviewState and Time.date.timeStamp gte _mickeyReviewEnd and _mickeyWork.meetingAvailable and _mickeyWork.mickeyAvailable and _mickeyWork.ready and !_mickeyWork.state.mickeyReview and $money gte _mickeyWork.terms.mickey.cost and $passage is 'Deadwood Street Mickey' and !$nextPassage and !$nextPassageCheck>>
                   <<money `-_mickeyWork.terms.mickey.cost`>><<set _mickeyWork.state.spent += _mickeyWork.terms.mickey.cost>><<set _mickeyWork.state.mickeyReview to _mickeyReview.id>>
                   <<replace '#deadwood-mickey-response'>><<deadwood-street-mickey-response `_mickeyReview.id === 'crew' ? 'division' : _mickeyReview.id`>><</replace>>
                   <<replace '#deadwood-mickey-plan'>><<lanSwitch 'Mickey has reviewed the agreed part of the plan.' '米奇已经复核过说好的那一部分计划。'>><</replace>>
-                <<elseif $passage is 'Deadwood Street Mickey' and !$nextPassage and !$nextPassageCheck>>
+                <<elseif $passage is 'Deadwood Street Mickey' and maplebirch.passage.title is $passage and !$statFreeze and !$replayScene and !$frozenValues and !$nextPassage and !$nextPassageCheck and !$eventforced>>
                   <<replace '#deadwood-mickey-response'>><span class='blue'><<lanSwitch 'The review was interrupted. No fee was taken and the plan has not changed.' '复核被打断，没有收费，计划也没有改变。'>></span><</replace>>
                 <</if>>
+                <<if $passage is 'Deadwood Street Mickey' and maplebirch.passage.title is $passage and !$statFreeze and !$replayScene and !$frozenValues>><<run updateMoment()>><</if>>
               <</if>>
             <</lanLink>>
           <<else>>
             <span class='grey'><<= lanSwitch(_mickeyReview.name[0], _mickeyReview.name[1])>></span>
-            <<if 18 * 60 - Time.hour * 60 - Time.minute lte _mickeyWork.terms.mickey.minutes>> · <span class='blue'><<lanSwitch 'There is not enough time to finish before closing.' '关门前来不及完成复核。'>></span><</if>>
+            <<if !_mickeyWork.meetingAvailable or 18 * 60 - Time.hour * 60 - Time.minute lte _mickeyWork.terms.mickey.minutes>> · <span class='blue'><<lanSwitch 'There is not enough time to finish the review today.' '今天来不及完成复核了。'>></span><</if>>
           <</if>> · <<printmoney _mickeyWork.terms.mickey.cost>> · <span class='teal'><<= _mickeyWork.terms.mickey.minutes>></span> <<lanSwitch 'minutes' '分钟'>><br>
         <</capture>>
       <</for>>
@@ -140,8 +150,5 @@
       <<lanSwitch 'Bring the checked material and agreed crew arrangements before asking for a review.' '先把核对过的材料和说好的人员安排带来，再请米奇复核。'>><br>
     <</if>>
   <</if>></div><br>
-  <<if ['ready', 'accepted', 'done'].includes($pubfame?.status)>>
-    <span class='blue'><<lanSwitch 'Mickey\'s other favour still goes through Landry at the Harvest Street pub.' '米奇原有的委托仍需回丰收街酒馆，通过兰德里办理。'>></span><br>
-  <</if>>
 <</if>>
-<<getouticon>><<lanLink ['Return to the smugglers’ pub', '回到走私者酒馆'] 'Smuggler Pub'>><<endevent>><</lanLink>><br>
+<<getouticon>><<lanLink ['Return to Landry', '回到兰德里身边'] 'Pub Landry'>><<endevent>><</lanLink>><br>

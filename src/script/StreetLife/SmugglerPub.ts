@@ -42,7 +42,7 @@ export default function SmugglerPub(maplebirch: typeof window.maplebirch): void 
   );
   // 只改变画面映射，保留地下地点标识、出口及通用洞穴图的注册。
   maplebirch.tool.patch.location.configure('underground', {
-    customMapping: () => (maplebirch.get('StreetLife')!.smugglerPub.picture ? 'deadwood_smuggler_pub' : 'underground')
+    customMapping: () => (maplebirch.get('StreetLife')?.smugglerPub.picture ? 'deadwood_smuggler_pub' : 'underground')
   });
   maplebirch.tool.inject({
     locationPassage: {

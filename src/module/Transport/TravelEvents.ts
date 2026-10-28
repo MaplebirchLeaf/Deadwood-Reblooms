@@ -24,6 +24,8 @@ export interface RoadsideEvent {
     | 'paid'
     | 'stolen'
     | 'fixed'
+    | 'fixed_together'
+    | 'force_together'
     | 'limped'
     | 'collected'
     | 'walk'
@@ -39,7 +41,24 @@ export interface RoadsideEvent {
     | 'arrested';
 }
 
-export type RoadAction = 'wait' | 'escape' | 'observe' | 'force' | 'pay' | 'yield' | 'fight' | 'warn' | 'eject' | 'fix' | 'limp' | 'walk' | 'check' | 'fine' | 'surrender';
+export type RoadAction =
+  | 'wait'
+  | 'escape'
+  | 'observe'
+  | 'force'
+  | 'force_together'
+  | 'pay'
+  | 'yield'
+  | 'fight'
+  | 'warn'
+  | 'eject'
+  | 'fix'
+  | 'fix_together'
+  | 'limp'
+  | 'walk'
+  | 'check'
+  | 'fine'
+  | 'surrender';
 
 export default class TravelEvents {
   public constructor(private readonly transport: Transport) {}
@@ -103,6 +122,8 @@ export default class TravelEvents {
       !trip.event.combat &&
       this.transport.core.passage.title === 'Deadwood Transport Travel' &&
       this.transport.ready &&
+      !V.eventforced &&
+      !V.frozenValues &&
       !V.nextPassage &&
       !V.nextPassageCheck &&
       this.transport.vehicle?.id === trip.vehicle
@@ -150,6 +171,7 @@ export default class TravelEvents {
     const event = this.transport.state.trip!.event!;
     const kind = event.kind;
     const twoWheels = this.transport.model!.kind !== 'motor_vehicle';
+    if (['fix_together', 'force_together'].includes(action) && (!this.transport.canDepart || !this.transport.companions.aboard.some(name => name !== 'Robin' || C.npc.Robin.trauma < 40))) return false;
     if (kind === 'police') {
       if (action === 'check') return !event.checked;
       if (action === 'fine') return this.policeFine > 0 && V.money >= this.policeFine;
@@ -163,12 +185,15 @@ export default class TravelEvents {
       return (
         action === 'limp' ||
         (action === 'wait' && V.money >= (repair === 'bicycle' ? 2000 : 5000)) ||
-        (action === 'fix' && this.transport.state.repair_tools[repair] && this.transport.state.repair_parts[repair] > 0 && window.currentSkillValue('housekeeping') >= 300)
+        ((action === 'fix' || (action === 'fix_together' && !twoWheels)) &&
+          this.transport.state.repair_tools[repair] &&
+          this.transport.state.repair_parts[repair] > 0 &&
+          window.currentSkillValue('housekeeping') >= 300)
       );
     }
     if (action === 'wait' || action === 'escape') return true;
     if (action === 'observe') return kind === 'roadblock' && window.currentSkillValue('skulduggery') >= 400;
-    if (action === 'force')
+    if (action === 'force' || (action === 'force_together' && kind === 'load'))
       return (
         (kind === 'load' || (kind === 'roadblock' && twoWheels)) &&
         window.currentSkillValue('physique') >= (V.physiquesize * 4) / 7 &&
@@ -184,6 +209,47 @@ export default class TravelEvents {
     const trip = transport.state.trip!;
     const event = trip.event!;
     const vehicle = transport.vehicle!;
+    if (action === 'fix_together' || action === 'force_together') {
+      const helpers = transport.companions.aboard.filter(name => name !== 'Robin' || C.npc.Robin.trauma < 40);
+      const location = V.location;
+      const point = vehicle.point;
+      const minutes = action === 'fix_together' ? 20 : 3;
+      const end = Time.date.timeStamp + minutes * 60;
+      // 先消耗本次事件和耗材；协作者离场时，补足单人耗时，不保留协作优惠。
+      event.resolved = true;
+      if (action === 'fix_together') transport.state.repair_parts.motor--;
+      transport.core.SugarCube.Wikifier.wikifyEval(`<<pass ${minutes}>>`);
+      const valid = () =>
+        transport.core.get('Transport') === transport &&
+        transport.state.trip === trip &&
+        trip.event === event &&
+        transport.vehicle === vehicle &&
+        vehicle.point === point &&
+        transport.canDepart &&
+        transport.core.passage.title === 'Deadwood Transport Travel' &&
+        V.location === location &&
+        !V.eventforced &&
+        !V.frozenValues &&
+        !V.nextPassage &&
+        !V.nextPassageCheck;
+      if (!valid() || Time.date.timeStamp < end) {
+        if (transport.state.trip === trip && trip.event === event) this.stop(false);
+        return false;
+      }
+      const helped = helpers.some(name => transport.companions.aboard.includes(name) && (name !== 'Robin' || C.npc.Robin.trauma < 40));
+      if (!helped) {
+        const rest = action === 'fix_together' ? 10 : 1;
+        const finish = Time.date.timeStamp + rest * 60;
+        transport.core.SugarCube.Wikifier.wikifyEval(`<<pass ${rest}>>`);
+        if (!valid() || Time.date.timeStamp < finish) {
+          if (transport.state.trip === trip && trip.event === event) this.stop(false);
+          return false;
+        }
+      }
+      event.outcome = action === 'fix_together' ? (helped ? 'fixed_together' : 'fixed') : helped ? 'force_together' : 'force';
+      transport.core.SugarCube.Wikifier.wikifyEval(action === 'fix_together' ? '<<housekeeping 2>>' : `<<physique 1>><<tiredness ${helped ? 1 : 3}>>`);
+      return true;
+    }
     if (event.kind === 'police' && action === 'check') {
       event.checked = true;
       transport.core.SugarCube.Wikifier.wikifyEval('<<pass 3>>');
@@ -386,6 +452,9 @@ export default class TravelEvents {
     return (
       this.transport.core.passage.title === 'Deadwood Transport Travel' &&
       this.transport.ready &&
+      !V.eventforced &&
+      !V.frozenValues &&
+      !V.nextPassage &&
       !!trip?.settled &&
       !trip.interrupted &&
       !V.nextPassageCheck &&
@@ -407,8 +476,27 @@ export default class TravelEvents {
     const event = trip.event!;
     event.resolved = true;
     if (tools) this.transport.state.repair_parts.motor--;
-    this.transport.core.SugarCube.Wikifier.wikifyEval(`<<pass ${event.kind === 'bags' ? 2 : 5}>>`);
-    if (this.transport.core.passage.title !== 'Deadwood Transport Travel' || !this.transport.ready || V.nextPassageCheck || this.transport.state.trip !== trip) return false;
+    const minutes = event.kind === 'bags' ? 2 : tools && window.currentSkillValue('housekeeping') >= 600 ? 3 : 5;
+    const vehicle = this.transport.vehicle;
+    const location = V.location;
+    const end = Time.date.timeStamp + minutes * 60;
+    this.transport.core.SugarCube.Wikifier.wikifyEval(`<<pass ${minutes}>>`);
+    if (
+      this.transport.core.get('Transport') !== this.transport ||
+      this.transport.core.passage.title !== 'Deadwood Transport Travel' ||
+      !this.transport.ready ||
+      V.eventforced ||
+      V.frozenValues ||
+      V.nextPassage ||
+      V.nextPassageCheck ||
+      this.transport.state.trip !== trip ||
+      trip.event !== event ||
+      this.transport.vehicle !== vehicle ||
+      this.transport.vehicle?.point !== trip.to ||
+      V.location !== location ||
+      Time.date.timeStamp < end
+    )
+      return false;
     event.action = tools ? 'tools' : 'help';
     this.transport.core.SugarCube.Wikifier.wikifyEval(`<<stress -${tools ? 2 : 1}>>`);
     return true;

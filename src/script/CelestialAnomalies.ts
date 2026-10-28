@@ -15,7 +15,7 @@ class SolarEclipse {
   }
 
   public static text(weather: WeatherType): string {
-    const index = maplebirch.get('CelestialAnomalies')!.SolarEclipseStageIndex ?? 0;
+    const index = maplebirch.get('CelestialAnomalies')?.SolarEclipseStageIndex ?? 0;
     return maplebirch.t(`deadwood-reblooms:SolarEclipse:${weather === 'storm' ? 'thunderstorm' : weather}:${SolarEclipse.variant(weather)}:${index}`);
   }
 
@@ -33,14 +33,14 @@ class SolarEclipse {
       solarEclipse: {
         configurable: true,
         get(): boolean {
-          return maplebirch.get('CelestialAnomalies')!.SolarEclipseActive;
+          return maplebirch.get('CelestialAnomalies')?.SolarEclipseActive ?? false;
         }
       },
 
       meteorShower: {
         configurable: true,
         get(): boolean {
-          return maplebirch.get('CelestialAnomalies')!.MeteorShowerActive;
+          return maplebirch.get('CelestialAnomalies')?.MeteorShowerActive ?? false;
         }
       },
 

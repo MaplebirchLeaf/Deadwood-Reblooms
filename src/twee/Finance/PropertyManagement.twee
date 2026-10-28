@@ -57,3 +57,133 @@
 <</if>>
 <<deadwood-reblooms-adrian-counter-link>>
 <<getouticon>><<lanLink ['Return to the property desk', '返回房产柜台'] 'Deadwood Reblooms Property Office'>><<endevent>><</lanLink>>
+
+:: Deadwood Reblooms Property Small Repair Widgets [widget]
+<<widget 'deadwood-home-repair-check'>>
+  <<set _home_repair_finance to maplebirch.get('Finance'), _home_repair_estate to _home_repair_finance?.realEstate>>
+  <<set _home_repair_property to _home_repair_estate?.current>>
+  <<set _home_repair_management to _home_repair_property ? _home_repair_estate.managementFor(_home_repair_property.id) : null>>
+  <<set _home_repair_safe to _home_repair_property and !_home_repair_property.tenure
+    and !_home_repair_management.rented and _home_repair_management.auction_day is null
+    and $location is 'deadwood_home' and !$combat and !$possessed and !$eventforced
+    and !$nextPassage and !$nextPassageCheck and !$replayScene and !$statFreeze and !$frozenValues
+    and $stress lt $stressmax and !isPregnancyEnding()>>
+  <<set _home_repair_condition to _home_repair_management?.condition ?? 100>>
+  <<set _home_repair_mode to _args[0] ?? 'seal', _home_repair_minutes to _home_repair_mode is 'frame' ? 30 : 45>>
+  <<set _home_repair_gain to Math.max(0, Math.min(90 - _home_repair_condition, _home_repair_mode is 'frame' ? 5 : 3))>>
+  <!-- 材料按原整修单价估算，只处理门窗小毛病，不代替整体修缮。 -->
+  <<set _home_repair_cost to _home_repair_gain gt 0 and _home_repair_property
+    ? Math.max(500, Math.ceil(_home_repair_estate.repairCost(_home_repair_property.id) / (100 - _home_repair_condition) * _home_repair_gain * 0.4)) : 0>>
+  <<set _home_repair_ready to _home_repair_safe and ['seal', 'frame'].includes(_home_repair_mode)
+    and _home_repair_condition gte 60 and _home_repair_condition lt 90
+    and !pcAreArmsBound('any') and $tiredness lt (_args[1] ? C.tiredness.max : C.tiredness.max / 2)
+    and currentSkillValue('housekeeping') gte (_home_repair_mode is 'frame' ? 600 : 300)
+    and (_home_repair_mode isnot 'frame' or currentSkillValue('physique') gte $physiquesize * 4 / 7)>>
+<</widget>>
+
+<<widget 'deadwood-home-repair-link'>>
+  <<deadwood-home-repair-check>>
+  <<if _home_repair_safe and _home_repair_condition lt 90>>
+    <<icon 'property/repair.png'>><<lanLink ['Inspect the worn fittings', '检查磨损的门窗'] 'Deadwood Reblooms Property Small Repair'>><</lanLink>><br>
+  <</if>>
+<</widget>>
+
+<<widget 'deadwood-home-repair-option'>>
+  <<deadwood-home-repair-check _args[0]>>
+  <<if !_home_repair_ready>><<exit>><</if>>
+  <<capture _home_repair_mode _home_repair_property _home_repair_management _home_repair_condition>>
+    <<if $Finance.bank.opened and $Finance.bank.debit_card and $Finance.bank.balance gte _home_repair_cost>>
+      <<lanLink `[_home_repair_mode is 'frame' ? 'Steady the door (0:30)' : 'Replace the seals (0:45)', _home_repair_mode is 'frame' ? '扶正门扇 (0:30)' : '更换密封条 (0:45)']`>>
+        <<deadwood-home-repair-act _home_repair_mode _home_repair_property _home_repair_management _home_repair_condition>>
+      <</lanLink>>
+    <<else>>
+      <<lanSwitch `_home_repair_mode is 'frame' ? ['Steady the door (0:30)', '扶正门扇 (0:30)'] : ['Replace the seals (0:45)', '更换密封条 (0:45)']`>>
+    <</if>>
+    — <<printmoney _home_repair_cost>> · <span class='green'><<lanSwitch 'Condition +' '房况 +'>><<print _home_repair_gain>></span><<gtiredness>>
+    <<if $Finance.bank.opened and $Finance.bank.debit_card and $Finance.bank.balance lt _home_repair_cost>> · <span class='purple'><<lanSwitch 'Not enough money in the bank' '银行余额不足'>></span><</if>><br>
+  <</capture>>
+<</widget>>
+
+<<widget 'deadwood-home-repair-act'>>
+  <<set $_repair_mode to _args[0], $_repair_property to _args[1], $_repair_management to _args[2], $_repair_condition to _args[3]>>
+  <<deadwood-home-repair-check $_repair_mode>>
+  <<if !_home_repair_ready or $passage isnot 'Deadwood Reblooms Property Small Repair'
+      or _home_repair_property isnot $_repair_property or _home_repair_management isnot $_repair_management
+      or _home_repair_condition isnot $_repair_condition
+      or !$Finance.bank.opened or !$Finance.bank.debit_card or $Finance.bank.balance lt _home_repair_cost>><<exit>><</if>>
+  <<set $_repair_source to $passage, $_repair_cost to _home_repair_cost, $_repair_gain to _home_repair_gain,
+    $_repair_minutes to _home_repair_minutes, $_repair_end to Time.date.timeStamp + _home_repair_minutes * 60>>
+  <<pass $_repair_minutes>>
+  <!-- 开工须精神充足；正常劳作后越过半量疲劳，不因此白做。 -->
+  <<deadwood-home-repair-check $_repair_mode true>>
+  <!-- 完整耗时与现场复核后才付材料费、恢复房况，旧链接不能修另一套房。 -->
+  <<if _home_repair_ready and $passage is $_repair_source and Time.date.timeStamp gte $_repair_end
+      and _home_repair_property is $_repair_property and _home_repair_management is $_repair_management
+      and _home_repair_condition is $_repair_condition
+      and _home_repair_finance.payFromBankPennies($_repair_cost) is 'ok'>>
+    <<set $_repair_management.condition to $_repair_condition + $_repair_gain>>
+    <<tiredness `$_repair_mode is 'frame' ? 8 : 6`>>
+    <<goto 'Deadwood Reblooms Property Small Repair Finish'>>
+  <<elseif $passage is $_repair_source and maplebirch.passage.title is $passage
+      and !$replayScene and !$statFreeze and !$frozenValues and ($nextPassage or $nextPassageCheck or $eventforced)>>
+    <<replace '#deadwood-home-repair-message'>><<lanLink ['Next', '继续'] $_repair_source>><</lanLink>><</replace>>
+    <<run updateMoment()>>
+  <<elseif $passage is $_repair_source and !$eventforced and !$frozenValues and !$nextPassage and !$nextPassageCheck and !$combat and !$possessed and !$replayScene and !$statFreeze>>
+    <<replace '#deadwood-home-repair-message'>>
+      <span class='purple'><<lanSwitch 'You stop before fitting the new materials. The work is unfinished, and no material payment has been taken.' '你没有继续装上新材料。小修还没完成，也没有扣取材料费。'>></span><br>
+    <</replace>>
+    <<run updateMoment()>>
+  <</if>>
+<</widget>>
+
+:: Deadwood Reblooms Property Small Repair
+<<set _home_repair_estate to maplebirch.get('Finance')?.realEstate>>
+<<if !_home_repair_estate?.current>>
+  <<getouticon>><<lanLink ['Return to High Street', '返回商业街'] 'High Street'>><</lanLink>><<exit>>
+<</if>>
+<<run _home_repair_estate.setFloor(1)>><<run _home_repair_estate.enter()>><<home_effects>><<effects>>
+<<deadwood-home-repair-check>>
+<span class='gold'><<lanSwitch 'Small repairs' '门窗小修'>></span><br><br>
+<<lanSwitch 'Condition: ' '房屋状况：'>><<print _home_repair_condition>> / 100<br><br>
+<<language>>
+  <<option 'EN'>>
+    You check the window seals and the way the door sits in its frame. Replacing small worn pieces could keep the draught out. It will not mend a roof or put damaged walls right. Materials must be paid for from your bank account.
+  <<option 'CN'>>
+    你检查窗边的密封条，又试了试房门。换掉磨损的小零件，能让门窗关严些，却修不好屋顶和墙里的毛病。材料费要从银行账户结清。
+<</language>><br><br>
+<<if _home_repair_safe and _home_repair_condition gte 60 and _home_repair_condition lt 90>>
+  <<deadwood-home-repair-option 'seal'>>
+  <<deadwood-home-repair-option 'frame'>>
+  <<if pcAreArmsBound('any')>>
+    <span class='purple'><<lanSwitch 'You need both hands free to work on the fittings.' '得先让双手都能活动，才能动手修理。'>></span><br>
+  <<elseif $tiredness gte C.tiredness.max / 2>>
+    <span class='purple'><<lanSwitch 'You are too tired to steady the pieces safely. Rest first.' '你累得有些扶不稳零件，先歇一歇吧。'>></span><br>
+  <<elseif currentSkillValue('housekeeping') lt 300>>
+    <span class='purple'><<lanSwitch 'You need more practice with household work before attempting the repairs.' '你还需要多练练家务，再试着自己修理。'>></span><br>
+  <</if>>
+  <<lanSwitch 'Replacing seals needs practised housekeeping. Steadying the door needs greater skill and strength. Small repairs can bring the condition up to 90; the rest needs professional work.' '更换密封条需要熟练的家务本领，扶正门扇还得更有经验、也更有力气。小修最多把房况修到90，其余得请维修工。'>><br>
+  <<if !$Finance.bank.opened or !$Finance.bank.debit_card>>
+    <span class='purple'><<lanSwitch 'You need an open bank account and a debit card to pay for materials.' '支付材料费需要已开通的银行账户与借记卡。'>></span><br>
+  <</if>>
+<<elseif _home_repair_condition lt 60>>
+  <span class='purple'><<lanSwitch 'The damage is beyond small repairs. You need a professional to put the house right.' '这里的损坏已经不是换些小零件能解决的了，得找维修工。'>></span><br>
+<<elseif _home_repair_condition gte 90>>
+  <<lanSwitch 'The fittings do not need further small repairs. Restoring the rest of the house is a job for a professional.' '能自己处理的小毛病已经不多了。想把房子完全修好，还是得请维修工。'>><br>
+<</if>>
+<br><span id='deadwood-home-repair-message'></span>
+<<getouticon>><<lanLink ['Return to the sitting room', '返回起居室'] 'Deadwood Reblooms Property Home'>><</lanLink>><br>
+
+:: Deadwood Reblooms Property Small Repair Finish
+<<set _home_repair_estate to maplebirch.get('Finance')?.realEstate>>
+<<if !_home_repair_estate?.current>>
+  <<getouticon>><<lanLink ['Return to High Street', '返回商业街'] 'High Street'>><</lanLink>><<exit>>
+<</if>>
+<<run _home_repair_estate.enter()>><<home_effects>><<effects>>
+<<language>>
+  <<option 'EN'>>
+    You test the fittings you have worked on, then gather the old pieces and put the leftover materials away. The door closes more neatly. The materials are paid for; the worn parts you could not reach still need proper repairs.
+  <<option 'CN'>>
+    你试过刚处理的几处地方，清走换下来的旧零件，收好剩下的材料。房门关得严实了些。材料费已经结清，没能处理的磨损仍得另外修缮。
+<</language>><<gtiredness>><br><br>
+<<lanSwitch 'Condition: ' '房屋状况：'>><<print _home_repair_estate.managementFor(_home_repair_estate.current.id).condition>> / 100<br><br>
+<<getouticon>><<lanLink ['Return to the sitting room', '返回起居室'] 'Deadwood Reblooms Property Home'>><</lanLink>><br>

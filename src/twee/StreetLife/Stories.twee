@@ -69,10 +69,10 @@
   <<if $passage isnot _storyChoiceTarget.passage or $location isnot _storyChoiceSite.location>><<exit>><</if>>
   <<if _storyChoiceKey is 'assisted' and !_storyChoiceHeist.mickeyAvailable>><<exit>><</if>>
   <<if _storyChoiceKey is 'police' and !_storyChoiceWork.policeAvailable>><<exit>><</if>>
-  <<capture _storyChoiceId _storyChoiceKey>>
+  <<capture _storyChoiceId _storyChoiceKey _storyChoiceRecord>>
     <<icon _storyChoiceAction.icon>>
     <<if _storyChoiceWork.available and _storyChoiceHeist.crewReady and (_storyChoiceWork.current is null or _storyChoiceWork.current is _storyChoiceId) and $money gte _storyChoiceAction.cost and Time.hour gte _storyChoiceSite.open and Time.hour * 60 + Time.minute + _storyChoiceAction.minutes lt _storyChoiceSite.close * 60>>
-      <<lanLink _storyChoiceAction.name>><<deadwood-street-story-action _storyChoiceId _storyChoiceKey>><</lanLink>>
+      <<lanLink _storyChoiceAction.name>><<deadwood-street-story-action _storyChoiceId _storyChoiceKey _storyChoiceRecord>><</lanLink>>
     <<else>>
       <span class='grey'><<lanSwitch _storyChoiceAction.name[0] _storyChoiceAction.name[1]>></span>
     <</if>>
@@ -95,7 +95,7 @@
   <<set _storyActId to _args[0], _storyActKey to _args[1], _storyActStreet to maplebirch.get('StreetLife')>>
   <<set _storyActWork to _storyActStreet?.stories, _storyActHeist to _storyActStreet?.heist>>
   <<set _storyActChain to _storyActWork?.terms.chains[_storyActId], _storyActRecord to _storyActWork?.state[_storyActId], _storyActAction to _storyActChain?.actions[_storyActKey]>>
-  <<if !_storyActAction or !_storyActWork.available or !_storyActHeist.crewReady or _storyActRecord.paused or _storyActRecord.stage isnot _storyActAction.stage or (_storyActWork.current isnot null and _storyActWork.current isnot _storyActId)>><<exit>><</if>>
+  <<if _storyActRecord isnot _args[2] or !_storyActAction or !_storyActWork.available or !_storyActHeist.crewReady or _storyActRecord.paused or _storyActRecord.stage isnot _storyActAction.stage or (_storyActWork.current isnot null and _storyActWork.current isnot _storyActId)>><<exit>><</if>>
   <<set _storyActSite to _storyActWork.terms.sites[_storyActAction.site], _storyActTarget to _storyActChain.stages[_storyActRecord.stage].find(target => target.site === _storyActAction.site)>>
   <<if $passage isnot _storyActTarget.passage or $location isnot _storyActSite.location or $money lt _storyActAction.cost or Time.hour lt _storyActSite.open>><<exit>><</if>>
   <<if _storyActAction.site is 'cafe' and !_storyActStreet.jobs.cafeOpen>><<exit>><</if>>
@@ -103,15 +103,22 @@
   <<if _storyActKey is 'assisted' and !_storyActHeist.mickeyAvailable>><<exit>><</if>>
   <<if _storyActKey is 'police' and !_storyActWork.policeAvailable>><<exit>><</if>>
   <<if _storyActRecord.stage gt 0 and _storyActRecord.crew.slice().sort().join('|') isnot _storyActHeist.state.crew.slice().sort().join('|')>><<exit>><</if>>
+  <<set _storyActEnd to Time.date.timeStamp + _storyActAction.minutes * 60>>
   <<set _storyActClosing to Time.date.timeStamp + (_storyActSite.close * 60 - Time.hour * 60 - Time.minute) * 60, _storyActRoster to _storyActHeist.roster>>
   <<if Time.date.timeStamp + _storyActAction.minutes * 60 gte _storyActClosing>><<exit>><</if>>
   <<if _storyActAction.skill>><<deadwood-street-story-chance _storyActId _storyActKey>><<set _storyActSuccess to _storyActRecord.roll lte _storyChance>><<else>><<set _storyActSuccess to true>><</if>>
   <<endevent>><<pass _storyActAction.minutes>>
-  <<set _storyActRecord.result to 'interrupted'>>
-  <<if !_storyActWork.available or !_storyActHeist.crewReady or _storyActRecord.paused or $passage isnot _storyActTarget.passage or $location isnot _storyActSite.location or _storyActHeist.roster isnot _storyActRoster or Time.date.timeStamp gte _storyActClosing or _storyActRecord.stage isnot _storyActAction.stage or $money lt _storyActAction.cost>><<exit>><</if>>
-  <<if _storyActAction.site is 'cafe' and !_storyActStreet.jobs.cafeOpen>><<exit>><</if>>
-  <<if _storyActKey is 'assisted' and !_storyActHeist.mickeyAvailable>><<exit>><</if>>
-  <<if _storyActKey is 'police' and !_storyActWork.policeAvailable>><<exit>><</if>>
+  <<if $statFreeze or $replayScene or $frozenValues or $passage isnot _storyActTarget.passage or maplebirch.passage.title isnot _storyActTarget.passage>><<exit>><</if>>
+  <<deadwood-street-story-next _storyActTarget.block>>
+  <<if maplebirch.get('StreetLife') isnot _storyActStreet or _storyActWork.state[_storyActId] isnot _storyActRecord or _storyActRecord.stage isnot _storyActAction.stage>><<run updateMoment()>><<exit>><</if>>
+  <<if !_storyActWork.available or !_storyActHeist.crewReady or _storyActRecord.paused or $location isnot _storyActSite.location
+      or _storyActHeist.roster isnot _storyActRoster or Time.date.timeStamp lt _storyActEnd or Time.date.timeStamp gte _storyActClosing or $money lt _storyActAction.cost
+      or (_storyActAction.site is 'cafe' and !_storyActStreet.jobs.cafeOpen) or (_storyActKey is 'assisted' and !_storyActHeist.mickeyAvailable)
+      or (_storyActKey is 'police' and !_storyActWork.policeAvailable)>>
+    <<set _storyActRecord.result to 'interrupted'>>
+    <<if !$nextPassage and !$nextPassageCheck and !$eventforced>><<run Dynamic.render(_storyActTarget.block)>><</if>>
+    <<run updateMoment()>><<exit>>
+  <</if>>
   <<if _storyActAction.cost gt 0>><<money `-_storyActAction.cost`>><<set _storyActRecord.spent += _storyActAction.cost>><</if>>
   <<set _storyActRecord.stage += 1, _storyActRecord.result to _storyActSuccess ? 'success' : 'setback'>>
   <<if _storyActAction.kind is 'accept'>>
@@ -143,7 +150,14 @@
   <</if>>
   <<deadwood-street-crew-gain _storyActRecord.crew `Math.round(_storyActAction.gain * (_storyActSuccess ? 1 : 0.5))` `_storyActSuccess ? _storyActAction.bond : Math.floor(_storyActAction.bond / 2)`>>
   <<updatesidebarmoney>>
-  <<if $passage is _storyActTarget.passage and $location is _storyActSite.location and !$nextPassage and !$nextPassageCheck>><<run Dynamic.render(_storyActTarget.block)>><</if>>
+  <<if $passage is _storyActTarget.passage and $location is _storyActSite.location and !$nextPassage and !$nextPassageCheck>><<run Dynamic.render(_storyActTarget.block)>><<run updateMoment()>><</if>>
+<</widget>>
+
+<!-- 无目标选择耗时后仍交给原版有目标链接处理强制转场。 -->
+<<widget 'deadwood-street-story-next'>>
+  <<if maplebirch.passage.title is $passage and !$statFreeze and !$replayScene and !$frozenValues and ($nextPassage or $nextPassageCheck or $eventforced)>>
+    <<replace `'#' + _args[0]`>><span id='next'><<lanLink ['Next', '继续'] $passage>><</lanLink>></span><<nexttext>><</replace>>
+  <</if>>
 <</widget>>
 
 <<widget 'deadwood-street-story-result'>>
@@ -172,29 +186,43 @@
 
 <!-- 暂缓保留进度与取舍。重新约人只更换未完成阶段的参与名单，不重抽、不重领。 -->
 <<widget 'deadwood-street-story-arrangement'>>
-  <<set _storyArrangeWork to maplebirch.get('StreetLife')?.stories, _storyArrangeId to _storyArrangeWork?.current>>
-  <<if !_storyArrangeId or !_storyArrangeWork.available or $passage isnot 'Deadwood Street Work' or $location isnot 'underground'>><<exit>><</if>>
-  <<set _storyArrangeResume to _storyArrangeWork.state[_storyArrangeId].paused, _storyArrangeSite to _storyArrangeWork.terms.sites.smuggler>>
-  <<set _storyArrangeTerms to _storyArrangeWork.terms[_storyArrangeResume ? 'resume' : 'pause']>>
-  <<if Time.hour lt _storyArrangeSite.open or Time.hour * 60 + Time.minute + _storyArrangeTerms.minutes gte _storyArrangeSite.close * 60>><<exit>><</if>>
-  <<if _storyArrangeResume and !maplebirch.get('StreetLife').heist.crewReady>>
+  <<set $_storyArrangeWork to maplebirch.get('StreetLife')?.stories, $_storyArrangeId to $_storyArrangeWork?.current>>
+  <<if !$_storyArrangeId or !$_storyArrangeWork.available or $passage isnot 'Deadwood Street Work' or $location isnot 'underground'>><<exit>><</if>>
+  <<set $_storyArrangeResume to $_storyArrangeWork.state[$_storyArrangeId].paused, $_storyArrangeSite to $_storyArrangeWork.terms.sites.smuggler>>
+  <<set $_storyArrangeTerms to $_storyArrangeWork.terms[$_storyArrangeResume ? 'resume' : 'pause']>>
+  <<if Time.hour lt $_storyArrangeSite.open or Time.hour * 60 + Time.minute + $_storyArrangeTerms.minutes gte $_storyArrangeSite.close * 60>><<exit>><</if>>
+  <<if $_storyArrangeResume and !maplebirch.get('StreetLife').heist.crewReady>>
     <span class='blue'><<lanSwitch 'Choose an available scout and carrier, then agree on the new arrangement.' '先选好能够参加的侦察员与搬运员，再重新约好这份差事。'>></span><br><<exit>>
   <</if>>
-  <<capture _storyArrangeId _storyArrangeResume>>
-    <<socialiseicon 'ask'>><<lanLink _storyArrangeTerms.name>>
-      <<set _storyArrangeWork to maplebirch.get('StreetLife').stories, _storyArrangeHeist to maplebirch.get('StreetLife').heist>>
-      <<set _storyArrangeRecord to _storyArrangeWork.state[_storyArrangeId], _storyArrangeSite to _storyArrangeWork.terms.sites.smuggler, _storyArrangeTerms to _storyArrangeWork.terms[_storyArrangeResume ? 'resume' : 'pause']>>
-      <<if _storyArrangeWork.current isnot _storyArrangeId or !_storyArrangeWork.available or $location isnot 'underground' or $passage isnot 'Deadwood Street Work' or _storyArrangeRecord.paused isnot _storyArrangeResume or (_storyArrangeResume and !_storyArrangeHeist.crewReady) or Time.hour lt _storyArrangeSite.open>><<exit>><</if>>
-      <<set _storyArrangeStage to _storyArrangeRecord.stage, _storyArrangeRoster to _storyArrangeHeist.roster, _storyArrangeClosing to Time.date.timeStamp + (_storyArrangeSite.close * 60 - Time.hour * 60 - Time.minute) * 60>>
-      <<if Time.date.timeStamp + _storyArrangeTerms.minutes * 60 gte _storyArrangeClosing>><<exit>><</if>>
-      <<endevent>><<pass _storyArrangeTerms.minutes>>
-      <<if !_storyArrangeWork.available or _storyArrangeWork.current isnot _storyArrangeId or $location isnot 'underground' or $passage isnot 'Deadwood Street Work' or _storyArrangeRecord.stage isnot _storyArrangeStage or _storyArrangeRecord.paused isnot _storyArrangeResume or Time.date.timeStamp gte _storyArrangeClosing>><<exit>><</if>>
-      <<if _storyArrangeResume and (!_storyArrangeHeist.crewReady or _storyArrangeHeist.roster isnot _storyArrangeRoster)>><<exit>><</if>>
-      <<if _storyArrangeResume>><<set _storyArrangeRecord.crew to _storyArrangeHeist.state.crew.slice()>><</if>>
-      <<set _storyArrangeRecord.paused to !_storyArrangeResume>>
-      <<run Dynamic.render('deadwood-street-work')>>
+  <<set $_storyArrangeRecord to $_storyArrangeWork.state[$_storyArrangeId]>>
+  <<capture $_storyArrangeId $_storyArrangeResume $_storyArrangeWork $_storyArrangeRecord>>
+    <<socialiseicon 'ask'>><<lanLink $_storyArrangeTerms.name>>
+      <<deadwood-street-story-arrange $_storyArrangeId $_storyArrangeResume $_storyArrangeRecord $_storyArrangeWork>>
     <</lanLink>><br>
   <</capture>>
+<</widget>>
+
+<!-- 行动独立于展示帧，旧链接退出与局部重绘互不改写。 -->
+<<widget 'deadwood-street-story-arrange'>>
+  <<set $_storyArrangeId to _args[0], $_storyArrangeResume to _args[1], $_storyArrangeRecord to _args[2], $_storyArrangeWork to _args[3]>>
+  <<set $_storyArrangeStreet to maplebirch.get('StreetLife')>>
+  <<if $_storyArrangeStreet?.stories isnot $_storyArrangeWork or $_storyArrangeWork.state[$_storyArrangeId] isnot $_storyArrangeRecord>><<exit>><</if>>
+  <<set $_storyArrangeHeist to $_storyArrangeStreet.heist, $_storyArrangeSite to $_storyArrangeWork.terms.sites.smuggler, $_storyArrangeTerms to $_storyArrangeWork.terms[$_storyArrangeResume ? 'resume' : 'pause']>>
+  <<if $_storyArrangeWork.current isnot $_storyArrangeId or !$_storyArrangeWork.available or $location isnot 'underground' or $passage isnot 'Deadwood Street Work' or $_storyArrangeRecord.paused isnot $_storyArrangeResume or ($_storyArrangeResume and !$_storyArrangeHeist.crewReady) or Time.hour lt $_storyArrangeSite.open>><<exit>><</if>>
+  <<set $_storyArrangeEnd to Time.date.timeStamp + $_storyArrangeTerms.minutes * 60>>
+  <<set $_storyArrangeStage to $_storyArrangeRecord.stage, $_storyArrangeRoster to $_storyArrangeHeist.roster, $_storyArrangeClosing to Time.date.timeStamp + ($_storyArrangeSite.close * 60 - Time.hour * 60 - Time.minute) * 60>>
+  <<if Time.date.timeStamp + $_storyArrangeTerms.minutes * 60 gte $_storyArrangeClosing>><<exit>><</if>>
+  <<endevent>><<pass $_storyArrangeTerms.minutes>>
+  <<if $statFreeze or $replayScene or $frozenValues or $passage isnot 'Deadwood Street Work' or maplebirch.passage.title isnot $passage>><<exit>><</if>>
+  <<deadwood-street-story-next 'deadwood-street-work'>>
+  <<if maplebirch.get('StreetLife') isnot $_storyArrangeStreet or $_storyArrangeWork.state[$_storyArrangeId] isnot $_storyArrangeRecord
+      or !$_storyArrangeWork.available or $_storyArrangeWork.current isnot $_storyArrangeId or $location isnot 'underground'
+      or $_storyArrangeRecord.stage isnot $_storyArrangeStage or $_storyArrangeRecord.paused isnot $_storyArrangeResume
+      or Time.date.timeStamp lt $_storyArrangeEnd or Time.date.timeStamp gte $_storyArrangeClosing
+      or ($_storyArrangeResume and (!$_storyArrangeHeist.crewReady or $_storyArrangeHeist.roster isnot $_storyArrangeRoster))>><<run updateMoment()>><<exit>><</if>>
+  <<if $_storyArrangeResume>><<set $_storyArrangeRecord.crew to $_storyArrangeHeist.state.crew.slice()>><</if>>
+  <<set $_storyArrangeRecord.paused to !$_storyArrangeResume>>
+  <<run Dynamic.render('deadwood-street-work')>><<run updateMoment()>>
 <</widget>>
 
 <<widget 'deadwood-street-story-journal'>>

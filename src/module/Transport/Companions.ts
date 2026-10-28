@@ -45,10 +45,13 @@ export default class Companions {
     const trip = this.transport.state.trip;
     const aboard = this.aboard;
     return (
-      this.transport.core.passage.title === 'Deadwood Transport Travel' &&
+      ['Deadwood Transport Travel', 'Deadwood Transport Date'].includes(this.transport.core.passage.title) &&
       this.transport.ready &&
       !!trip?.settled &&
       !trip.interrupted &&
+      !V.eventforced &&
+      !V.frozenValues &&
+      this.transport.vehicle?.point === trip.to &&
       !trip.dated &&
       !V.nextPassage &&
       !V.nextPassageCheck &&
@@ -105,14 +108,19 @@ export default class Companions {
     trip.dated = true;
     if (trip.event) trip.event.resolved = true;
     const location = V.location;
+    const passage = this.transport.core.passage.title;
     const end = Time.date.timeStamp + 20 * 60;
     this.transport.core.SugarCube.Wikifier.wikifyEval('<<pass 20>>');
     const passengers = this.aboard;
     // 先消耗本次相处机会，完成后再结算，不覆盖原版中断或因重绘重复获益。
     if (
+      this.transport.core.get('Transport') !== this.transport ||
       this.transport.state.trip !== trip ||
-      this.transport.core.passage.title !== 'Deadwood Transport Travel' ||
+      this.transport.core.passage.title !== passage ||
       V.location !== location ||
+      this.transport.vehicle?.point !== trip.to ||
+      V.eventforced ||
+      V.frozenValues ||
       !this.transport.ready ||
       V.nextPassage ||
       V.nextPassageCheck ||

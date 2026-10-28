@@ -3,6 +3,7 @@
 <<widget 'deadwood-remy-estate-context'>>
   <<set _remyEstate to maplebirch.get('Orchard')?.remy>>
   <<set _remyEstateBanquet to maplebirch.get('Finance') ? $Finance?.real_estate?.banquet : null>>
+  <<set _remyEstatePlanned to _remyEstate?.state.estate_day is Time.days>>
   <<set _remyEstateReady to _remyEstate?.state.romance and !_remyEstate.state.ended and !_remyEstate.state.syndrome and !_remyEstate.confined
     and C.npc.Remy?.init is 1 and C.npc.Remy.state is 'active' and !_remyEstate.inLabour
     and ['moor', 'estate'].includes($location) and !$estate and !$daily.estateDone and !$daily.estateBluffed
@@ -10,40 +11,40 @@
     and !$combat and !$possessed and !$eventforced and !$nextPassage and !$nextPassageCheck and !$statFreeze and !$replayScene and !$frozenValues
     and $stress lt $stressmax and $exposed lte 0 and !$worn.face.type.includes('gag') and !pcAreArmsBound('both')
     and !(['prepared', 'reception', 'dinner', 'farewell'].includes(_remyEstateBanquet?.stage) and _remyEstateBanquet.arrived.includes('Remy') and !_remyEstateBanquet.left.includes('Remy'))>>
-  <<set _remyEstateFree to _remyEstateReady and _remyEstate.state.last_daily_day isnot Time.days and Time.hour * 60 + Time.minute + 20 lt 23 * 60>>
+  <<set _remyEstateFree to _remyEstateReady and (_remyEstate.state.last_daily_day isnot Time.days or _remyEstatePlanned) and Time.hour * 60 + Time.minute + 20 lt 23 * 60>>
 <</widget>>
 
 <<widget 'deadwood-remy-estate-link'>>
   <<deadwood-remy-estate-context>>
   <<set $_estateMenu to document.querySelector('#passage-content .macro-link[data-passage="Moor"]')>>
   <<if $passage is 'Estate Approach' and _remyEstateFree and $_estateMenu>>
-    <<icon 'remy/gate-visit.png'>><<lanLink ['Ask the guard to announce you to Remy', '请门卫向雷米通报'] 'Deadwood Remy Estate'>>
-      <<if !$nextPassage and $nextPassageCheck and typeof $nextPassageCheck is 'string'>><<set $nextPassage to $nextPassageCheck>><</if>>
-    <</lanLink>><br>
+    <<icon 'remy/gate-visit.png'>><<lanLink ['Ask the guard to announce you to Remy', '请门卫向雷米通报'] 'Deadwood Remy Estate'>><</lanLink>><br>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-remy-estate-visit'>>
   <<deadwood-remy-estate-context>>
   <<if $passage is 'Deadwood Remy Estate' and _remyEstateFree and ['lounge', 'work', 'alex'].includes(_args[0]) and (_args[0] isnot 'alex' or _remyEstate.farmConflict)>>
-    <<set $_visit to _args[0]>><<set $_visitDay to Time.days>>
+    <<set $_visit to _args[0], $_visitDay to Time.days, $_visitEnd to Time.date.timeStamp + 20 * 60, $_visitState to _remyEstate.state>>
     <<set $phase to 0>><<pass 20>>
     <<deadwood-remy-estate-context>>
-    <!-- 耗时后的强制剧情优先，相处结算与学校日常共用当天记录。 -->
-    <<if $passage is 'Deadwood Remy Estate' and _remyEstateReady and Time.days is $_visitDay and _remyEstate.state.last_daily_day isnot Time.days
+    <!-- 约定可以在课间相处后兑现，但好感与休息仍只结算当天第一次。 -->
+    <<if $passage is 'Deadwood Remy Estate' and _remyEstateReady and Time.days is $_visitDay and Time.date.timeStamp gte $_visitEnd and _remyEstate.state is $_visitState
+      and (_remyEstate.state.last_daily_day isnot Time.days or _remyEstatePlanned)
       and ($_visit isnot 'alex' or _remyEstate.farmConflict)>>
+      <<if _remyEstate.state.last_daily_day isnot Time.days>>
+        <<npcincr Remy love 1>>
+        <<if $_visit is 'lounge'>><<stress -3>><</if>>
+      <</if>>
       <<set $Orchard.remy.last_daily_day to Time.days>><<set $Orchard.remy.last_meeting_day to Time.days>>
-      <<npcincr Remy love 1>>
-      <<if $_visit is 'lounge'>><<stress -3>><</if>>
+      <<if _remyEstatePlanned>><<set $Orchard.remy.estate_day to -1>><</if>>
       <<set $phase to $_visit>>
     <</if>>
   <</if>>
-  <<if !$nextPassage and $nextPassageCheck and typeof $nextPassageCheck is 'string'>><<set $nextPassage to $nextPassageCheck>><</if>>
 <</widget>>
 
 <<widget 'deadwood-remy-estate-return'>>
   <br><br><<getouticon>><<lanLink ['Return to the gate', '返回庄园门口'] 'Estate Approach'>>
-    <<if !$nextPassage and $nextPassageCheck and typeof $nextPassageCheck is 'string'>><<set $nextPassage to $nextPassageCheck>><</if>>
     <<if !$combat and !$possessed and !$eventforced and !$nextPassage and !$nextPassageCheck and !$statFreeze and !$replayScene and !$frozenValues>><<location 'moor'>><<endevent>><</if>>
   <</lanLink>><br>
 <</widget>>
@@ -61,20 +62,20 @@
     <<option 'EN'>>
       The guard speaks into a radio before opening the gate. You are led up the path to the house, away from the wire-topped fence. Light spills across the hall floor. Remy is pulling off <<his>> gloves.
       <br><br>
-      <<if _remyEstate.stage is 'close'>>"There you are." <<He>> lays the gloves beside <<his>> hat and takes your hand. "I was beginning to think I'd kept the evening free for nothing."<<else>>"You found the house, then." <<He>> puts the gloves down. "Come in. It's quieter here than at the school."<</if>>
+      <<if _remyEstatePlanned>>"On time." Remy glances at the hall clock, then puts <<his>> gloves beside <<his>> hat. "They've been told to leave the papers until morning. Come in."<<elseif _remyEstate.stage is 'close'>>"There you are." <<He>> lays the gloves beside <<his>> hat and takes your hand. "I was beginning to think I'd kept the evening free for nothing."<<else>>"You found the house, then." <<He>> puts the gloves down. "Come in. It's quieter here than at the school."<</if>>
       <br><br>
       The drawing-room door is open. Papers cover a desk in the room opposite. Remy follows your glance. "They'll still be there tomorrow. What would you like to do?"
     <<option 'CN'>>
       门卫对着无线电说了几句，才打开门。你被领上通往宅邸的小路，将顶端缠着铁丝网的围栏留在身后。灯光照在门厅的地板上。雷米正在脱手套。
       <br><br>
-      <<if _remyEstate.stage is 'close'>>“总算来了。”<<He>>把手套搁在帽子旁，牵住你的手。“我还以为，这一晚要白留了。”<<else>>“看来，你找到地方了。”<<He>>放下手套。“进来吧。这里比学校清静些。”<</if>>
+      <<if _remyEstatePlanned>>“倒是准时。”雷米看了看门厅里的钟，把手套搁到帽子旁。“文件让他们明早再送来了。进来吧。”<<elseif _remyEstate.stage is 'close'>>“总算来了。”<<He>>把手套搁在帽子旁，牵住你的手。“我还以为，这一晚要白留了。”<<else>>“看来，你找到地方了。”<<He>>放下手套。“进来吧。这里比学校清静些。”<</if>>
       <br><br>
       起居室的门开着，对面房间的书桌上堆着文件。雷米顺着你的视线看过去。“明天再看也不迟。你想做什么？”
   <</language>><br><br>
-  <<icon 'remy/drawing-room.png'>><<lanLink ['Keep Remy company in the drawing room (0:20)', '在起居室陪雷米一会儿 (0:20)'] 'Deadwood Remy Estate Lounge'>><<deadwood-remy-estate-visit 'lounge'>><</lanLink>><<glove 'Remy'>><<lstress>><br>
-  <<icon 'remy/estate-desk.png'>><<lanLink ['Talk about running the estate (0:20)', '聊聊庄园的事务 (0:20)'] 'Deadwood Remy Estate Study'>><<deadwood-remy-estate-visit 'work'>><</lanLink>><<glove 'Remy'>><br>
+  <<icon 'remy/drawing-room.png'>><<lanLink ['Keep Remy company in the drawing room (0:20)', '在起居室陪雷米一会儿 (0:20)'] 'Deadwood Remy Estate Lounge'>><<deadwood-remy-estate-visit 'lounge'>><</lanLink>><<if _remyEstate.state.last_daily_day isnot Time.days>><<glove 'Remy'>><<lstress>><</if>><br>
+  <<icon 'remy/estate-desk.png'>><<lanLink ['Talk about running the estate (0:20)', '聊聊庄园的事务 (0:20)'] 'Deadwood Remy Estate Study'>><<deadwood-remy-estate-visit 'work'>><</lanLink>><<if _remyEstate.state.last_daily_day isnot Time.days>><<glove 'Remy'>><</if>><br>
   <<if _remyEstate.farmConflict>>
-    <<socialiseicon 'ask'>><<lanLink ['Ask Remy to leave Alex alone (0:20)', '请雷米放过艾利克斯 (0:20)'] 'Deadwood Remy Estate Alex'>><<deadwood-remy-estate-visit 'alex'>><</lanLink>><<glove 'Remy'>><br>
+    <<socialiseicon 'ask'>><<lanLink ['Ask Remy to leave Alex alone (0:20)', '请雷米放过艾利克斯 (0:20)'] 'Deadwood Remy Estate Alex'>><<deadwood-remy-estate-visit 'alex'>><</lanLink>><<if _remyEstate.state.last_daily_day isnot Time.days>><<glove 'Remy'>><</if>><br>
   <</if>>
 <<else>>
   <<deadwood-remy-estate-unavailable>>
@@ -102,7 +103,7 @@
       <<if _remyEstate.stage is 'close'>>你靠上<<his>>肩膀，<<he>>伸手揽住你。“说说你今天过得怎么样。我的事可以等会儿。”<<He>>听你说着，不过，你提起某些地方时，<<he>>还是挑起了眉毛。<<else>>雷米问你今天去了哪里。<<He>>刚想提些意见，看到你的表情，便让你先说完。“你是来找我作伴的。看来，说教可以省了。”<</if>>
       <br><br>
       最后，雷米看向时钟。“别等门卫过来问，我才放你走。”<<He>>陪你回到门厅。
-  <</language>><<glove 'Remy'>><<lstress>>
+  <</language>>
 <<else>>
   <<deadwood-remy-estate-unavailable>>
 <</if>>
@@ -129,7 +130,7 @@
       <<if _remyEstate.stage is 'close'>>“你可以叫我把它放下。”<<He>>敲敲文件。你提醒<<him>>，没人开口，<<he>>也可以自己放下。雷米想了想，折起排班表。<<else>>雷米开始讲明天的安排。你不得不提醒<<him>>，自己只是问问，没说要来上工。“可惜。你刚才听得那么认真。”<</if>>
       <br><br>
       敲门声打断了你们。雷米吩咐工人把剩下的文件留到明早，然后送你回到门厅。
-  <</language>><<glove 'Remy'>>
+  <</language>>
 <<else>>
   <<deadwood-remy-estate-unavailable>>
 <</if>>
@@ -156,7 +157,7 @@
       “派人袭击农场，就是这样给机会的？”你问。<<He>>抬起头。“艾利克斯知道我想要什么。”你告诉<<him>>，你希望袭击停下来。<<if _remyEstate.stage is 'close'>>你们沉默了一会儿。雷米绕过书桌，却没有像刚才那样牵起你的手。“我可不想因为艾利克斯的固执失去你。”<<else>>“你总不能每次开口，都要我改变计划。”<<His>>语气仍很平稳，就像刚才在门厅时一样。<</if>>
       <br><br>
       <<He>>提出送你到门口。<span class='purple'>雷米听完了你的话，却没答应农场的事。</span>
-  <</language>><<glove 'Remy'>>
+  <</language>>
 <<else>>
   <<deadwood-remy-estate-unavailable>>
 <</if>>

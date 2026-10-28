@@ -41,6 +41,7 @@ export default class Stories {
 
   public get available(): boolean {
     return (
+      this.street.core.get('StreetLife') === this.street &&
       this.street.available &&
       !this.street.heist.busy &&
       ['idle', 'prep'].includes(this.street.heist.state.stage) &&
@@ -87,6 +88,7 @@ export default class Stories {
           V.location === site.location &&
           Time.hour >= site.open &&
           Time.hour < site.close &&
+          (target.site !== 'pub' || this.street.heist.mickeyAvailable) &&
           (target.site !== 'police' || this.policeAvailable) &&
           (target.site !== 'cafe' || this.street.jobs.cafeOpen)
           ? [{ id, name: chain.name, icon: chain.icon, ...target }]

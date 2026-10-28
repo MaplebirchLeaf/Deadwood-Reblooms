@@ -4,20 +4,24 @@ export default function School(maplebirch: typeof window.maplebirch): void {
   // 包装原版校服判断，保留原函数与其他模组继续串联包装的空间。
   maplebirch.tool.onInit(() => {
     const wearingSchoolOutfit = window.wearingSchoolOutfit;
-    if (wearingSchoolOutfit) window.wearingSchoolOutfit = () => maplebirch.get('LifeSimulation')!.school.meetsDressCode(wearingSchoolOutfit());
+    if (wearingSchoolOutfit)
+      window.wearingSchoolOutfit = () => {
+        const original = wearingSchoolOutfit();
+        return maplebirch.get('LifeSimulation')?.school.meetsDressCode(original) ?? original;
+      };
 
     // 原版的课程提示由 questmarker 独立生成，免听时只关闭学校提醒。
     const events = (setup as typeof setup & { events?: Array<{ name: string; condition: () => boolean; text: string }> }).events;
     for (const event of events ?? []) {
       if (event.name === 'school day') {
         const condition = event.condition;
-        event.condition = () => !V.LifeSimulation.school.attendanceExempt && condition.call(event);
+        event.condition = () => (!maplebirch.get('LifeSimulation') || !V.LifeSimulation.school.attendanceExempt) && condition.call(event);
       }
       if (event.name === 'tomorrow') {
-        event.text = `<<if $LifeSimulation.school.attendanceExempt>><<lanSwitch 'You may attend school tomorrow.' '明天你可以自愿上课。'>><<else>>${event.text}<</if>>`;
+        event.text = `<<if maplebirch.get('LifeSimulation') and $LifeSimulation.school.attendanceExempt>><<lanSwitch 'You may attend school tomorrow.' '明天你可以自愿上课。'>><<else>>${event.text}<</if>>`;
       }
       if (event.name === 'no school') {
-        event.text = `<<if $LifeSimulation.school.attendanceExempt and Time.schoolDay>><<lanSwitch 'You may attend lessons today.' '今天你可以自愿上课。'>><<else>>${event.text}<</if>>`;
+        event.text = `<<if maplebirch.get('LifeSimulation') and $LifeSimulation.school.attendanceExempt and Time.schoolDay>><<lanSwitch 'You may attend lessons today.' '今天你可以自愿上课。'>><<else>>${event.text}<</if>>`;
       }
     }
   });
@@ -34,21 +38,21 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       title: 'School Traits',
       name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:attendancePass:name'),
       colour: 'green',
-      has: () => V.LifeSimulation.school.attendanceExempt,
+      has: () => !!maplebirch.get('LifeSimulation') && V.LifeSimulation.school.attendanceExempt,
       text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:attendancePass:text')
     },
     {
       title: 'School Traits',
       name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:prefect:name'),
       colour: 'green',
-      has: () => V.LifeSimulation.school.role === 'prefect',
+      has: () => !!maplebirch.get('LifeSimulation') && V.LifeSimulation.school.role === 'prefect',
       text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:prefect:text')
     },
     {
       title: 'School Traits',
       name: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:president:name'),
       colour: 'green',
-      has: () => V.LifeSimulation.school.role === 'president',
+      has: () => !!maplebirch.get('LifeSimulation') && V.LifeSimulation.school.role === 'president',
       text: () => maplebirch.t('deadwood-reblooms:LifeSimulation:school:trait:president:text')
     }
   );

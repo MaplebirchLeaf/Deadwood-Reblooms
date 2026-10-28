@@ -123,6 +123,135 @@
   <</for>>
 <</widget>>
 
+<!-- 厨师沿用原版食材和菜谱，委托不计入玩家亲自烹饪。 -->
+<<widget 'deadwood-property-cook-menu'>>
+  <<set $_cook_estate to maplebirch.get('Finance')?.realEstate, $_cook_property to $_cook_estate?.current>>
+  <<if !$_cook_property or $location isnot 'deadwood_home' or $passage isnot 'Deadwood Reblooms Property Kitchen'>><<exit>><</if>>
+  <<if _property_cook_result>>
+    <<if _property_cook_result.kind is 'done'>>
+      <<language>>
+        <<option 'EN'>>The cook sets aside <<print _property_cook_result.portions>> portions of <<recipe_name _property_cook_result.recipe>> and clears the hob. The dishes are ready to serve or keep with your other prepared food.
+        <<option 'CN'>>厨师盛好<<print _property_cook_result.portions>>份<<recipe_name _property_cook_result.recipe>>，收拾好灶台。餐点可以拿来上桌，也可以与储存的食物放在一起。
+      <</language>>
+      <<set $_cook_housemate to $_cook_estate.household.common.find(profile => profile.id === $Finance.real_estate.room_companion) ?? $_cook_estate.household.common[0]>>
+      <<if $_cook_housemate>><br>
+        <<language>>
+          <<option 'EN'>>
+            <<switch $_cook_housemate.id>>
+              <<case 'Robin'>>Robin looks over from the table. "Are we eating now, or saving it for later?"
+              <<case 'Whitney'>>"Smells decent." Whitney pulls a chair out, then looks at you. "You eating too?"
+              <<case 'Kylar'>>Kylar puts a second chair beside yours. "We could sit together. If you're hungry."
+              <<case 'Sydney'>>Sydney moves <<nnpc_his 'Sydney'>> book away from the plates. "Shall I set the table?"
+            <</switch>>
+          <<option 'CN'>>
+            <<switch $_cook_housemate.id>>
+              <<case 'Robin'>>罗宾从桌边抬起头。“现在吃，还是留到等会儿？”
+              <<case 'Whitney'>>“闻着不错。”惠特尼拉出一张椅子，转头看你。“你也吃？”
+              <<case 'Kylar'>>凯拉尔把另一张椅子挪到你的旁边。“要是饿了，可以一起坐。”
+              <<case 'Sydney'>>悉尼把书挪到离餐盘远些的地方。“要摆桌子吗？”
+            <</switch>>
+        <</language>>
+      <</if>>
+    <<elseif _property_cook_result.kind is 'missing'>>
+      <span class='purple'><<lanSwitch 'The ingredients have changed. Nothing has been taken from the cupboards.' '食材已经不够了。橱柜里的东西没有被动用。'>></span>
+    <<else>>
+      <span class='purple'><<lanSwitch 'The preparation could not be completed before the arrangement changed. The ingredients remain in your cupboards.' '备餐没能在安排变动前完成。食材仍留在橱柜里。'>></span>
+    <</if>><br><br>
+  <</if>>
+  <<set _cook_key to $_cook_estate.staff.key('cook'), _cook_npc to $per_npc[_cook_key]>>
+  <<if !$_cook_estate.staff.state?.contracts.cook?.employed or !_cook_npc>><<exit>><</if>>
+  <span class='gold bold'><<lanSwitch 'Ask the cook to prepare food' '交给厨师备餐'>></span><br>
+  <<if !$_cook_estate.staff.active('cook')>>
+    <span class='blue'><<lanSwitch 'The cook is off duty. Food can be prepared during a paid shift.' '厨师现在不当班。预付工资的工作时段才能交代备餐。'>></span><br><br><<exit>>
+  <</if>>
+  <<if $replayScene or $statFreeze or $frozenValues or $combat or $possessed or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<language>>
+    <<option 'EN'>><<print _cook_npc.name>> checks the food in the cupboards. "Tell me how much you want. I'll use what you have here."
+    <<option 'CN'>>厨师<<print _cook_npc.name>>查看橱柜里的食材。“要多少份，您说。我用这里备好的东西。”
+  <</language>><br><br>
+  <<set _cook_property to $_cook_property.id, _cook_contract to $_cook_estate.staff.state.contracts.cook>>
+  <<set _cook_token to { used: false, turn: State.turns, floor: $_cook_estate.currentFloor }>>
+  <<set $_cook_old_supplied to _ingredientsSupplied, $_cook_old_lewd to _allowLewdIngredients>>
+  <<set _ingredientsSupplied to [], _allowLewdIngredients to false>>
+  <<set $_cook_available to false>>
+  <<for _cook_recipe range ['porridge', 'omelette', 'turnip_soup']>>
+    <<if !setup.foodstuff[_cook_recipe]?.recipe>><<continue>><</if>>
+    <<set $_cook_available to true, _cook_formula to clone(setup.foodstuff[_cook_recipe].recipe), _cook_plan to {}>>
+    <<for $_cook_main range _cook_formula.ingredients>>
+      <<set $_cook_used to ingredientUsed($_cook_main, _cook_recipe)>>
+      <<set _cook_plan[$_cook_used] to (_cook_plan[$_cook_used] ?? 0) + 1>>
+    <</for>>
+    <<foodstufficon _cook_recipe>><<recipe_name _cook_recipe 'cap'>> · <<lanSwitch 'Stored: ' '已有：'>><span class='gold'><<print $foodstuff[_cook_recipe].amount>></span><br>
+    <<lanSwitch 'Per batch: ' '每批用料：'>>
+    <<for $_cook_item, $_cook_units range _cook_plan>>
+      <<recipe_name $_cook_item>><<print ' ×' + $_cook_units + ' (' + ($foodstuff[$_cook_item]?.amount ?? 0) + ') '>>
+    <</for>><br>
+    <<for _cook_count range [1, 2]>>
+      <<set $_cook_minutes to _cook_formula.cook_minutes * _cook_count>>
+      <<set $_cook_time to ' (' + Math.floor($_cook_minutes / 60) + ':' + String($_cook_minutes % 60).padStart(2, '0') + ')'>>
+      <<set $_cook_shift to $_cook_estate.staff.terms.cook.shifts.some(([start, end]) => Time.hour * 60 + Time.minute >= start * 60 && Time.hour * 60 + Time.minute + $_cook_minutes < end * 60)>>
+      <<capture _cook_property _cook_key _cook_npc _cook_contract _cook_recipe _cook_count _cook_formula _cook_plan _cook_token>>
+        <<if Object.entries(_cook_plan).every(([item, units]) => ($foodstuff[item]?.amount ?? 0) >= units * _cook_count) and $_cook_shift>>
+          <<lanLink ['Prepare ' + (_cook_formula.servings * _cook_count) + (_cook_formula.servings * _cook_count === 1 ? ' portion' : ' portions') + $_cook_time, '准备' + (_cook_formula.servings * _cook_count) + '份' + $_cook_time]>>
+            <<deadwood-property-cook-order _cook_property _cook_key _cook_npc _cook_contract _cook_recipe _cook_count _cook_formula _cook_plan _cook_token>>
+          <</lanLink>>
+        <<else>>
+          <span class='grey'><<lanSwitch 'Prepare ' '准备'>><<print _cook_formula.servings * _cook_count>><<lanSwitch `(_cook_formula.servings * _cook_count === 1 ? ' portion' : ' portions')` '份'>></span> · <span class='purple'><<if !$_cook_shift>><<lanSwitch 'Not enough time before the shift ends' '本班剩余时间不够'>><<else>><<lanSwitch 'Not enough ingredients' '食材不足'>><</if>></span>
+        <</if>><br>
+      <</capture>>
+    <</for>><br>
+  <</for>>
+  <<set _ingredientsSupplied to $_cook_old_supplied, _allowLewdIngredients to $_cook_old_lewd>>
+  <<if !$_cook_available>><span class='blue'><<lanSwitch 'There are no suitable recipes to prepare here.' '这里暂时没有合适的菜肴可供准备。'>></span><br><br><</if>>
+<</widget>>
+
+<<widget 'deadwood-property-cook-order'>>
+  <<set $_cook_estate to maplebirch.get('Finance')?.realEstate>>
+  <<if !$_cook_estate>><<exit>><</if>>
+  <<set $_cook_property to _args[0], $_cook_key to _args[1], $_cook_npc to _args[2], $_cook_contract to _args[3], $_cook_recipe to _args[4], $_cook_count to _args[5], $_cook_formula to _args[6], $_cook_plan to _args[7], $_cook_token to _args[8]>>
+  <<if $_cook_token.used or State.turns isnot $_cook_token.turn or $passage isnot 'Deadwood Reblooms Property Kitchen' or maplebirch.passage.title isnot $passage
+      or $_cook_estate.current?.id isnot $_cook_property or $_cook_estate.currentFloor isnot $_cook_token.floor or $location isnot 'deadwood_home'
+      or $_cook_estate.staff.key('cook') isnot $_cook_key or $per_npc[$_cook_key] isnot $_cook_npc or $_cook_estate.staff.state?.contracts.cook isnot $_cook_contract or !$_cook_estate.staff.active('cook')
+      or $replayScene or $statFreeze or $frozenValues or $combat or $possessed or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<if !['porridge', 'omelette', 'turnip_soup'].includes($_cook_recipe) or ![1, 2].includes($_cook_count)
+      or JSON.stringify(setup.foodstuff[$_cook_recipe]?.recipe) isnot JSON.stringify($_cook_formula)>><<exit>><</if>>
+  <<set $_cook_minutes to $_cook_formula.cook_minutes * $_cook_count>>
+  <<if !$_cook_estate.staff.terms.cook.shifts.some(([start, end]) => Time.hour * 60 + Time.minute >= start * 60 && Time.hour * 60 + Time.minute + $_cook_minutes < end * 60)>><<exit>><</if>>
+  <<set $_cook_token.used to true, _property_cook_result to null>>
+  <<if Object.entries($_cook_plan).every(([item, units]) => ($foodstuff[item]?.amount ?? 0) >= units * $_cook_count)>>
+    <<set $_cook_location to $location, $_cook_finish to Time.date.timeStamp + $_cook_minutes * 60>>
+    <<pass $_cook_minutes>>
+    <<if maplebirch.get('Finance')?.realEstate isnot $_cook_estate
+        or $passage isnot 'Deadwood Reblooms Property Kitchen' or maplebirch.passage.title isnot $passage or State.turns isnot $_cook_token.turn
+        or $_cook_estate.current?.id isnot $_cook_property or $_cook_estate.currentFloor isnot $_cook_token.floor or $location isnot $_cook_location
+        or $replayScene or $statFreeze or $frozenValues or $combat or $possessed or $eventforced or $nextPassage or $nextPassageCheck>>
+      <<if $passage is 'Deadwood Reblooms Property Kitchen' and maplebirch.passage.title is $passage
+          and maplebirch.get('Finance') and !$replayScene and !$statFreeze and !$frozenValues
+          and ($nextPassage or $nextPassageCheck or $eventforced)>>
+        <!-- 有目标的原版式链接负责接续强制事件，不动用食材。 -->
+        <<replace '#deadwood-property-cook'>><<lanLink ['Next', '继续'] 'Deadwood Reblooms Property Kitchen'>><</lanLink>><</replace>>
+        <<run updateMoment()>>
+      <</if>>
+      <<exit>>
+    <</if>>
+    <<if $per_npc[$_cook_key] isnot $_cook_npc or $_cook_estate.staff.state?.contracts.cook isnot $_cook_contract or !$_cook_estate.staff.active('cook')
+        or JSON.stringify(setup.foodstuff[$_cook_recipe]?.recipe) isnot JSON.stringify($_cook_formula) or Time.date.timeStamp lt $_cook_finish>>
+      <<set _property_cook_result to { kind: 'stopped' }>>
+    <<elseif !Object.entries($_cook_plan).every(([item, units]) => ($foodstuff[item]?.amount ?? 0) >= units * $_cook_count)>>
+      <<set _property_cook_result to { kind: 'missing' }>>
+    <<else>>
+      <!-- 通过完整复核后一次扣料并入库；不调用 make_recipe 或玩家烹饪结算。 -->
+      <<for $_cook_item, $_cook_units range $_cook_plan>><<tending_give $_cook_item `-$_cook_units * $_cook_count`>><</for>>
+      <<tending_give $_cook_recipe `$_cook_formula.servings * $_cook_count`>>
+      <<set _property_cook_result to { kind: 'done', recipe: $_cook_recipe, portions: $_cook_formula.servings * $_cook_count }>>
+    <</if>>
+  <<else>>
+    <<set _property_cook_result to { kind: 'missing' }>>
+  <</if>>
+  <<run Dynamic.render('deadwood-property-cook', 'deadwood-property-kitchen-company', 'deadwood-property-kitchen-cooking')>>
+  <<if $passage is 'Deadwood Reblooms Property Kitchen' and !$eventforced and !$frozenValues and !$nextPassage and !$nextPassageCheck>><<run updateMoment()>><</if>>
+<</widget>>
+
 <<widget 'deadwood-property-staff-menu'>>
   <<set _staff to maplebirch.get('Finance').realEstate.staff>>
   <<if !_staff.book>><<exit>><</if>>

@@ -147,10 +147,10 @@ export default function Hands(maplebirch: typeof window.maplebirch): void {
 
   maplebirch.dynamic.regStateEvent('gate', 'deadwood-hand-capabilities', {
     cond: () => !!V.worn?.handheld && !!V.worn.handheld_left,
-    action: () => maplebirch.get('LifeSimulation')!.hands.refresh()
+    action: () => maplebirch.get('LifeSimulation')?.hands.refresh()
   });
   maplebirch.dynamic.regTimeEvent('onBefore', ':deadwood-hand-capabilities', {
-    action: () => maplebirch.get('LifeSimulation')!.hands.refresh()
+    action: () => maplebirch.get('LifeSimulation')?.hands.refresh()
   });
 
   maplebirch.once(':storyready', () => {

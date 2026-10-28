@@ -8,21 +8,17 @@
     <<option 'CN'>>
       下一批学员还在拿头盔。雷米把铅笔横放在登记簿上。“你想做什么？”
   <</language>><br><br>
+  <<set _remy_daily_state to _remy.state>>
   <div id='deadwood-remy-daily'>
     <<for _remyActivity range ['rest', 'tack', 'rota', 'relationship']>>
       <<if (_remyActivity isnot 'tack' or !pcAreArmsBound('both')) and (_remyActivity isnot 'relationship' or _remy.state.romance or _remy.state.ended)>>
-        <<capture _remyActivity>>
+        <<capture _remyActivity _remy_daily_state>>
           <<switch _remyActivity>>
             <<case 'tack'>><<icon 'orchard/tack.png'>>
             <<case 'rota'>><<icon 'furniture/calendar.png'>>
             <<default>><<socialiseicon>>
           <</switch>><<lanLink `({ rest: ['Keep Remy company between lessons (0:15)', '课间陪雷米待一会儿 (0:15)'], tack: ['Help check the tack (0:15)', '帮忙检查马具 (0:15)'], rota: ['Look over the lesson rota together (0:15)', '一起看看课程安排 (0:15)'], relationship: _remy.state.ended ? ['Discuss how to meet after the breakup (0:15)', '谈谈分手后如何来往 (0:15)'] : ['Talk about making time for each other (0:15)', '商量怎样给彼此留时间 (0:15)'] })[_remyActivity]`>>
-            <<if maplebirch.get('Orchard')?.remy.daily(_remyActivity)>>
-              <<if _remyActivity isnot 'relationship' or !$Orchard.remy.ended>><<npcincr Remy love 1>><</if>>
-              <<if _remyActivity is 'rest'>><<stress -4>><<tiredness -20>><</if>>
-              <<pass 15>>
-              <<replace '#deadwood-remy-daily'>><<deadwood-remy-daily-response _remyActivity>><</replace>>
-            <</if>>
+            <<deadwood-remy-daily-action _remyActivity _remy_daily_state>>
           <</lanLink>><br>
         <</capture>>
       <</if>>
@@ -36,9 +32,93 @@
       课间休息已经结束。下次课程之间有空时，可以再来相处。
   <</language>>
 <</if>>
+<<deadwood-remy-evening-plan>>
 <<deadwood-remy-return>>
 
 :: Deadwood Remy Daily Widgets [widget]
+
+<<widget 'deadwood-remy-next'>>
+  <<if ['Deadwood Remy Conversation', 'Deadwood Remy Daily'].includes($passage) and maplebirch.passage.title is $passage
+      and !$statFreeze and !$replayScene and !$frozenValues and ($nextPassage or $nextPassageCheck or $eventforced)>>
+    <<replace `_args[0]`>><span id='next'><<lanLink ['Next', '继续'] $passage>><</lanLink>></span><<nexttext>><</replace>>
+  <</if>>
+<</widget>>
+
+<!-- 每日次数先消耗；完整相处后才结算，旧链接不作用于读档后的状态。 -->
+<<widget 'deadwood-remy-daily-action'>>
+  <<set $_daily_remy to maplebirch.get('Orchard')?.remy, $_daily_state to _args[1], $_daily_action to _args[0]>>
+  <<if $_daily_remy?.state isnot $_daily_state or $frozenValues or $possessed or $eventforced or $nextPassage or $nextPassageCheck
+      or !$_daily_remy?.daily($_daily_action)>><<exit>><</if>>
+  <<set $_daily_day to Time.days, $_daily_end to Time.date.timeStamp + 15 * 60>>
+  <<pass 15>>
+  <<deadwood-remy-next '#deadwood-remy-daily'>>
+  <<if $passage is 'Deadwood Remy Daily' and maplebirch.get('Orchard')?.remy is $_daily_remy and $_daily_remy.state is $_daily_state
+      and $_daily_remy.available and Time.days is $_daily_day and Time.date.timeStamp gte $_daily_end
+      and !$frozenValues and !$possessed and !$eventforced and !$nextPassage and !$nextPassageCheck>>
+    <<if $_daily_action isnot 'relationship' or !$_daily_state.ended>><<npcincr Remy love 1>><</if>>
+    <<if $_daily_action is 'rest'>><<stress -4>><<tiredness -20>><</if>>
+    <<replace '#deadwood-remy-daily'>><<deadwood-remy-daily-response $_daily_action>><</replace>>
+  <<elseif $passage is 'Deadwood Remy Daily' and !$statFreeze and !$replayScene and !$frozenValues and !$eventforced and !$nextPassage and !$nextPassageCheck>>
+    <<replace '#deadwood-remy-daily'>><<lanSwitch 'The break is over. Remy returns to the lessons.' '课间休息结束了。雷米回去照看课程。'>><</replace>>
+  <</if>>
+  <<if $passage is 'Deadwood Remy Daily' and !$statFreeze and !$replayScene and !$frozenValues>><<run updateMoment()>><</if>>
+<</widget>>
+<!-- 约定只记日期，不占课间或晚访的每日相处收益。 -->
+<<widget 'deadwood-remy-evening-plan'>>
+  <<set $_plan_remy to maplebirch.get('Orchard')?.remy>>
+  <<if !$_plan_remy?.available or !$_plan_remy.state.romance or $_plan_remy.state.ended or $_plan_remy.state.syndrome or $_plan_remy.inLabour
+    or C.npc.Remy.state isnot 'active' or $possessed or $eventforced or $nextPassage or $nextPassageCheck or $frozenValues
+    or Time.hour * 60 + Time.minute + 5 gte $closinghour * 60>><<exit>><</if>>
+  <br>
+  <<set _remy_plan_token to { state: $_plan_remy.state, source: $passage, used: false }>>
+  <<capture _remy_plan_token>>
+  <div id='deadwood-remy-evening-plan'>
+    <<if $_plan_remy.state.estate_day is Time.days>>
+      <<lanSwitch 'You have agreed to call at the estate after dark, once the school has closed. Remy will expect you before 22:40.' '你们约好，天黑、学校关门后，到庄园见面。雷米会在22:40以前等你过去。'>><br>
+      <<lanLink ['Tell Remy you cannot come tonight', '告诉雷米今晚来不了了']>>
+        <<if !_remy_plan_token.used and $passage is _remy_plan_token.source and $Orchard.remy is _remy_plan_token.state and maplebirch.get('Orchard')?.remy.available and $Orchard.remy.estate_day is Time.days and !$frozenValues and !$possessed and !$eventforced and !$nextPassage and !$nextPassageCheck>>
+          <<set _remy_plan_token.used to true, $Orchard.remy.estate_day to -1>>
+          <<run updateMoment()>>
+          <<replace '#deadwood-remy-evening-plan'>><<lanSwitch '"Then I won’t leave the evening clear," Remy says, making a note beside the lessons. "Let me know another time."' '“那我就安排别的事了。”雷米在课程旁记了一笔。“改天来，先说一声。”'>><</replace>>
+        <</if>>
+      <</lanLink>><br>
+    <<else>>
+      <<if $_plan_remy.state.estate_day gte 0 and $_plan_remy.state.estate_day lt Time.days>>
+        <<lanSwitch '"You didn’t come," Remy says, tapping a crossed-out space in the register. "Tell me if the plans change. I have other things to do."' '“你没来。”雷米敲敲登记簿上一处划掉的空档。“改了主意就告诉我。我也有别的事要做。”'>><br><br>
+      <</if>>
+      <<lanLink ['Arrange to visit the estate tonight (0:05)', '约好今晚去庄园拜访 (0:05)']>>
+        <!-- 回调已离开 widget 局部栈，耗时快照用专属临时变量；完成后同步本页存档。 -->
+        <<set _remy_plan_day to Time.days, _remy_plan_source to $passage>>
+        <<if !_remy_plan_token.used and $passage is _remy_plan_token.source and $Orchard.remy is _remy_plan_token.state and maplebirch.get('Orchard')?.remy.available and $Orchard.remy.romance and !$Orchard.remy.ended and !$Orchard.remy.syndrome
+          and !maplebirch.get('Orchard').remy.inLabour and $Orchard.remy.estate_day isnot Time.days and C.npc.Remy.state is 'active'
+          and !$frozenValues and !$possessed and !$eventforced and !$nextPassage and !$nextPassageCheck
+          and Time.hour * 60 + Time.minute + 5 lt $closinghour * 60>>
+          <<set _remy_plan_token.used to true, _remy_plan_finish to Time.date.timeStamp + 5 * 60>>
+          <<pass 5>>
+          <<deadwood-remy-next '#deadwood-remy-evening-plan'>>
+          <<if Time.days is _remy_plan_day and Time.date.timeStamp gte _remy_plan_finish and $passage is _remy_plan_source and $Orchard.remy is _remy_plan_token.state and maplebirch.get('Orchard')?.remy.available
+            and $Orchard.remy.romance and !$Orchard.remy.ended and !$Orchard.remy.syndrome and !maplebirch.get('Orchard').remy.inLabour
+            and C.npc.Remy.state is 'active' and !$frozenValues and !$possessed and !$eventforced and !$nextPassage and !$nextPassageCheck>>
+            <<set $Orchard.remy.estate_day to _remy_plan_day, $Orchard.remy.last_meeting_day to _remy_plan_day>>
+            <<replace '#deadwood-remy-evening-plan'>>
+              <<language>>
+                <<option 'EN'>>
+                  You agree to come after dark, once the school has closed. Remy writes your name beside a gap in the register. "Before twenty to eleven. I’ll tell the gate staff." <<He>> closes the book. "Then I’ll see you tonight."
+                <<option 'CN'>>
+                  你们约好，天黑、学校关门后再见。雷米把你的名字写在登记簿的一处空档旁。“十点四十以前。我会告诉门卫。”<<He>>合上簿子。“那就晚上见。”
+              <</language>>
+            <</replace>>
+          <<elseif $passage is _remy_plan_source and !$statFreeze and !$replayScene and !$frozenValues and !$eventforced and !$nextPassage and !$nextPassageCheck>>
+            <<replace '#deadwood-remy-evening-plan'>><<lanSwitch 'There is no longer time to make plans. Remy returns to work.' '已经没空商量了。雷米回去处理工作。'>><</replace>>
+          <</if>>
+          <<if $passage is _remy_plan_source and !$statFreeze and !$replayScene and !$frozenValues>><<run updateMoment()>><</if>>
+        <</if>>
+      <</lanLink>><br>
+    <</if>>
+  </div>
+  <</capture>>
+<</widget>>
+
 <<widget 'deadwood-remy-daily-response'>>
   <<set _remy to maplebirch.get('Orchard')?.remy>>
   <<npc Remy>><<person1>>

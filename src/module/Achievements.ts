@@ -91,32 +91,32 @@ class Achievements {
       case 'VanillaPlus': {
         maplebirch.dynamic.regStateEvent('append', 'beauty-max', {
           output: 'earnFeat "Unadorned"',
-          cond: () => V.feats?.currentSave['Unadorned'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.beauty.max
+          cond: () => V.feats?.currentSave['Unadorned'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')?.beauty.max === true
         });
 
         maplebirch.dynamic.regStateEvent('append', 'deviancy-max', {
           output: 'earnFeat "Beyond Nature"',
-          cond: () => V.feats?.currentSave['Beyond Nature'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.deviancy.max
+          cond: () => V.feats?.currentSave['Beyond Nature'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')?.deviancy.max === true
         });
 
         maplebirch.dynamic.regStateEvent('append', 'exhibitionism-max', {
           output: 'earnFeat "Beyond Shame"',
-          cond: () => V.feats?.currentSave['Beyond Shame'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.exhibitionism.max
+          cond: () => V.feats?.currentSave['Beyond Shame'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')?.exhibitionism.max === true
         });
 
         maplebirch.dynamic.regStateEvent('append', 'physique-max', {
           output: 'earnFeat "Unbreakable"',
-          cond: () => V.feats?.currentSave['Unbreakable'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.physique.max
+          cond: () => V.feats?.currentSave['Unbreakable'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')?.physique.max === true
         });
 
         maplebirch.dynamic.regStateEvent('append', 'promiscuity-max', {
           output: 'earnFeat "Every Inch"',
-          cond: () => V.feats?.currentSave['Every Inch'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.promiscuity.max
+          cond: () => V.feats?.currentSave['Every Inch'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')?.promiscuity.max === true
         });
 
         maplebirch.dynamic.regStateEvent('append', 'willpower-max', {
           output: 'earnFeat "Sovereign Will"',
-          cond: () => V.feats?.currentSave['Sovereign Will'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')!.willpower.max
+          cond: () => V.feats?.currentSave['Sovereign Will'] === undefined && V.VanillaPlus != null && maplebirch.get('VanillaPlus')?.willpower.max === true
         });
 
         maplebirch.dynamic.regStateEvent('append', 'vanilla-plus-all-max-feat', {
@@ -135,7 +135,8 @@ class Achievements {
 
         maplebirch.dynamic.regStateEvent('append', 'finance-controlling-stake-feat', {
           output: 'earnFeat "Deadwood Controlling Stake"',
-          cond: () => V.feats?.currentSave['Deadwood Controlling Stake'] === undefined && V.Finance?.company?.shareholders != null && maplebirch.get('Finance')!.company.shareholders.controller
+          cond: () =>
+            V.feats?.currentSave['Deadwood Controlling Stake'] === undefined && V.Finance?.company?.shareholders != null && maplebirch.get('Finance')?.company.shareholders.controller === true
         });
 
         maplebirch.dynamic.regStateEvent('append', 'finance-black-raven-feat', {
@@ -145,25 +146,25 @@ class Achievements {
 
         maplebirch.dynamic.regStateEvent('append', 'finance-comeback-feat', {
           output: 'earnFeat "Deadwood Comeback"',
-          cond: () => V.feats?.currentSave['Deadwood Comeback'] === undefined && V.Finance?.brokerage?.margin != null && maplebirch.get('Finance')!.margin.recovered
+          cond: () => V.feats?.currentSave['Deadwood Comeback'] === undefined && V.Finance?.brokerage?.margin != null && maplebirch.get('Finance')?.margin.recovered === true
         });
 
         maplebirch.dynamic.regStateEvent('append', 'property-keys-feat', {
           output: 'earnFeat "Own Keys"',
           extra: { passage: ['Deadwood Reblooms Property Office', 'Deadwood Reblooms Property Home'] },
-          cond: () =>
-            V.feats?.currentSave['Own Keys'] === undefined &&
-            V.Finance?.real_estate != null &&
-            maplebirch.get('Finance')!.realEstate.properties.some(property => maplebirch.get('Finance')!.realEstate.owns(property.id))
+          cond: () => {
+            const estate = maplebirch.get('Finance')?.realEstate;
+            return V.feats?.currentSave['Own Keys'] === undefined && V.Finance?.real_estate != null && !!estate && estate.properties.some(property => estate.owns(property.id));
+          }
         });
 
         maplebirch.dynamic.regStateEvent('append', 'property-furniture-feat', {
           output: 'earnFeat "Feels Like Home"',
           extra: { passage: ['Deadwood Reblooms Property Furniture Catalogue', 'Deadwood Reblooms Property Home'] },
-          cond: () =>
-            V.feats?.currentSave['Feels Like Home'] === undefined &&
-            V.Finance?.real_estate != null &&
-            maplebirch.get('Finance')!.realEstate.properties.some(property => maplebirch.get('Finance')!.realEstate.furnished(property.id))
+          cond: () => {
+            const estate = maplebirch.get('Finance')?.realEstate;
+            return V.feats?.currentSave['Feels Like Home'] === undefined && V.Finance?.real_estate != null && !!estate && estate.properties.some(property => estate.furnished(property.id));
+          }
         });
         break;
       }

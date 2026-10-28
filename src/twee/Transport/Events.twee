@@ -1,5 +1,13 @@
 :: Deadwood Transport Event Widgets [widget]
 
+<!-- 耗时后用原版有目标链接接续事件，保留检查状态和返回目的地。 -->
+<<widget 'deadwood-transport-next'>>
+  <<if ['Deadwood Transport Travel', 'Deadwood Transport Date'].includes($passage) and maplebirch.passage.title is $passage
+      and !$statFreeze and !$replayScene and !$frozenValues and ($nextPassage or $nextPassageCheck or $eventforced)>>
+    <<replace `_args[0]`>><span id='next'><<lanLink ['Next', '继续'] $passage>><</lanLink>></span><<nexttext>><</replace>>
+  <</if>>
+<</widget>>
+
 <<widget 'deadwood-transport-hazard'>>
   <<set $_hazard to $Transport.trip.event, _road_events to maplebirch.get('Transport').events>>
   <<set $_road_bicycle to maplebirch.get('Transport').model.kind is 'bicycle'>>
@@ -72,6 +80,7 @@
       <<if $Transport.trip.taxi is 'dropoff' and $_hazard.kind isnot 'molestation'>>乘客安静下来，等着你决定怎么办。
       <<elseif $Transport.trip.passengers.length>>同行的人看了看路面，又看向你。<</if>>
   <</language>><br><br>
+  <<deadwood-transport-hazard-advice>>
   <<if $_hazard.kind is 'police'>>
     <<if !$_hazard.checked>>
       <<deadwood-transport-road-action 'check'>>
@@ -96,6 +105,7 @@
     <<if _road_events.can('fix')>>
       <<deadwood-transport-road-action 'fix'>>
     <</if>>
+    <<if _road_events.can('fix_together')>><<deadwood-transport-road-action 'fix_together'>><</if>>
     <<if _road_events.can('wait')>>
       <<deadwood-transport-road-action 'wait'>>
     <</if>>
@@ -105,6 +115,7 @@
     <<deadwood-transport-road-action 'wait'>>
     <<if _road_events.can('observe')>><<deadwood-transport-road-action 'observe'>><</if>>
     <<if _road_events.can('force')>><<deadwood-transport-road-action 'force'>><</if>>
+    <<if _road_events.can('force_together')>><<deadwood-transport-road-action 'force_together'>><</if>>
     <<deadwood-transport-road-action 'escape'>>
     <<if $_hazard.kind is 'roadblock'>>
       <<if _road_events.can('pay')>><<deadwood-transport-road-action 'pay'>><</if>>
@@ -115,8 +126,8 @@
 <</widget>>
 
 <<widget 'deadwood-transport-road-action'>>
-  <<set _road_events to maplebirch.get('Transport').events, _road_action to _args[0], _road_kind to $Transport.trip.event.kind, _road_bike to maplebirch.get('Transport').model.kind is 'bicycle'>>
-  <<capture _road_action>>
+  <<set _road_events to maplebirch.get('Transport').events, _road_action to _args[0], _road_trip to $Transport.trip, _road_event to $Transport.trip.event, _road_kind to $Transport.trip.event.kind, _road_bike to maplebirch.get('Transport').model.kind is 'bicycle'>>
+  <<capture _road_action _road_trip _road_event>>
     <<switch _road_action>>
       <<case 'check'>>
         <<policeicon>><<set _road_label to ['Cooperate with the check (0:03)', '配合检查 (0:03)']>>
@@ -135,6 +146,8 @@
       <<case 'force'>>
         <<icon `_road_kind is 'load' ? 'cargo-stack.png' : 'give-hand.png'`>>
         <<set _road_label to _road_kind is 'load' ? ['Move the crates aside (0:04)', '把货箱搬开 (0:04)'] : ['Shove the grabbing hand away (0:01)', '推开伸来的手，冲过去 (0:01)']>>
+      <<case 'force_together'>>
+        <<icon 'give-hand.png'>><<set _road_label to ['Move the crates with your companion (0:03)', '和同行的人一起搬开货箱 (0:03)']>>
       <<case 'pay'>>
         <<icon 'pound.png'>>
         <<set _road_label to ['Offer £50 for passage (0:02)', '交出 £50，让对方放行 (0:02)']>>
@@ -149,6 +162,8 @@
       <<case 'fix'>>
         <<icon `'transport/' + (_road_bike ? 'bicycle' : 'motor') + '-repair-kit.png'`>>
         <<set _road_label to _road_bike ? ['Patch the tyre with your tools (0:15)', '用工具修补轮胎 (0:15)'] : ['Repair the tyre with your tools (0:30)', '用工具修补轮胎 (0:30)']>>
+      <<case 'fix_together'>>
+        <<icon 'transport/motor-repair-kit.png'>><<set _road_label to ['Share the work of repairing the tyre (0:20)', '和同行的人分工修补轮胎 (0:20)']>>
       <<case 'limp'>>
         <<icon 'transport/flat-tyre.png'>>
         <<set _road_label to ['Continue slowly (+0:15)', '慢慢挪到目的地 (+0:15)']>>
@@ -156,12 +171,17 @@
         <<getouticon>><<set _road_label to ['Leave the vehicle and continue on foot', '留下载具，改为步行']>>
     <</switch>>
     <<lanLink `_road_label`>>
-      <<if maplebirch.get('Transport').events.resolve(_road_action) and $passage is 'Deadwood Transport Travel'>>
-        <<if maplebirch.get('Transport').events.combatPending>>
-          <<goto 'Deadwood Transport Road Fight'>>
-        <<else>>
-          <<updatesidebarmoney>><<run Dynamic.render('deadwood-transport-travel')>>
+      <<if maplebirch.get('Transport') and $Transport.trip is _road_trip and $Transport.trip.event is _road_event>>
+        <<set _road_resolved to maplebirch.get('Transport').events.resolve(_road_action)>>
+        <<deadwood-transport-next '#deadwood-transport-travel'>>
+        <<if maplebirch.get('Transport') and $Transport.trip is _road_trip and $Transport.trip.event is _road_event and $passage is 'Deadwood Transport Travel' and !$statFreeze and !$replayScene and !$eventforced and !$frozenValues and !$nextPassage and !$nextPassageCheck and (_road_resolved or _road_event.resolved)>>
+          <<if maplebirch.get('Transport').events.combatPending>>
+            <<goto 'Deadwood Transport Road Fight'>>
+          <<else>>
+            <<updatesidebarmoney>><<run Dynamic.render('deadwood-transport-travel')>>
+          <</if>>
         <</if>>
+        <<if $passage is 'Deadwood Transport Travel' and !$statFreeze and !$replayScene and !$frozenValues>><<run updateMoment()>><</if>>
       <</if>>
     <</lanLink>>
     <<switch _road_action>>
@@ -170,8 +190,8 @@
         <<if _road_kind is 'police'>><<crime 'resisting'>> | <span class='red'><<lanSwitch 'Failure starts a fight' '失手会被拦下，进入战斗'>></span>
         <<elseif _road_kind is 'roadblock'>> | <span class='red'><<lanSwitch 'Failure starts a fight' '失手会被拦下，进入战斗'>></span><<else>> | <span class='red'><<lanSwitch 'Risk of damage' '可能损伤车况'>></span><</if>>
       <<case 'observe'>> | <span class='teal'><<lanSwitch 'Skulduggery' '诡术'>></span>
-      <<case 'force'>> | <span class='teal'><<lanSwitch 'Physique' '体能'>></span><<gtiredness>>
-      <<case 'fix'>> | <span class='teal'><<lanSwitch 'Repair supplies −1' '维修耗材 −1'>></span>
+      <<case 'force' 'force_together'>> | <span class='teal'><<lanSwitch 'Physique' '体能'>></span><<gtiredness>>
+      <<case 'fix' 'fix_together'>> | <span class='teal'><<lanSwitch 'Housekeeping' '家务'>></span> | <span class='teal'><<lanSwitch 'Repair supplies −1' '维修耗材 −1'>></span>
       <<case 'limp'>> | <span class='red'><<lanSwitch 'Condition −6%' '车况 −6%'>></span>
       <<case 'yield'>> | <span class='red'><<lanSwitch 'Lose the vehicle' '丢失载具'>></span>
       <<case 'fight'>> | <span class='red'><<lanSwitch 'Combat' '战斗'>></span><<if _road_kind is 'police'>><<crime 'assault'>><</if>>
@@ -212,6 +232,7 @@
           <<case 'force'>>
             <<if $_road_result.kind is 'load'>>You haul the crates clear one at a time. The driver catches up, breathless, and helps with the last one.
             <<else>>You knock the hand away from your handlebars. The figure stumbles, giving you room to push off and leave.<</if>>
+          <<case 'force_together'>>You take one end of a crate and your companion takes the other. Together, you shift it onto the verge rather than dragging it along the road. By the time the driver reaches you, there is room to pass.
           <<case 'paid'>>You hold out the notes. One of them counts the money while the other moves aside. You keep watching them until they fall behind you.
           <<case 'defended'>>They can no longer keep you away from your vehicle. You pull free and reach it before either can stop you.
           <<case 'rescued'>>Your alarm draws attention from the road. <<if $_road_result.kind is 'molestation'>>The passenger lets go and scrambles out. You keep watching until the passenger is out of reach.<<else>>The two figures retreat behind their vehicle, then drive off. Yours is still where you left it.<</if>>
@@ -226,6 +247,7 @@
             <<if $Transport.trip.taxi is 'dropoff'>>Your passenger gets out with you and asks dispatch for another car.<</if>>
             <span class='red'>Your vehicle has been stolen.</span> The workshop may be able to trace it through its local contacts.
           <<case 'fixed'>>You find the hole, prepare a patch and work it into place. You test the tyre before packing away the tools.
+          <<case 'fixed_together'>>You lay out your tools and prepare the patch. With someone keeping the wheel steady and passing you what you need, you can work without getting up after every step. You check that the tyre holds before packing away your remaining supplies.
           <<case 'collected'>>A passing driver stops to help. After a call to the workshop, someone arrives with tyre repair equipment. You pay once the tyre holds its pressure.
           <<case 'limped'>>You crawl along, stopping whenever the wheel starts to wobble. Every bump travels through the damaged tyre and into the rim.
           <<case 'walk'>>You leave the vehicle off the road and note the nearest landmark. You will have to come back for it, or arrange collection at the workshop.
@@ -253,6 +275,7 @@
           <<case 'force'>>
             <<if $_road_result.kind is 'load'>>你把货箱一只只搬离车道。司机气喘吁吁地赶来，和你一起挪开最后一只。
             <<else>>你推开伸向车把的手。对方踉跄了一下，你趁机蹬地出发，冲出了包围。<</if>>
+          <<case 'force_together'>>你抬起货箱的一头，同行的人扶住另一头。两人把箱子挪到路肩上，不必再沿着路面拖动。司机赶过来时，车道已经腾出了足够的空隙。
           <<case 'paid'>>你递出钞票。一个人数钱，另一个让开了路。直到把他们甩在身后，你才移开视线。
           <<case 'defended'>>他们已经拦不住你。你挣开束缚，赶在对方再次伸手前回到载具旁。
           <<case 'rescued'>>警报引来了路上的注意。<<if $_road_result.kind is 'molestation'>>乘客松开手，慌忙钻出车门。你一直盯着，直到对方走远。<<else>>那两个人退回横着的车后，很快开走了。你的载具还停在原处。<</if>>
@@ -267,39 +290,156 @@
             <<if $Transport.trip.taxi is 'dropoff'>>乘客和你一起下车，请调度另派一辆车。<</if>>
             <span class='red'>载具被抢走了。</span>修车厂或许能通过当地的门路帮你找回来。
           <<case 'fixed'>>你找到破口，处理好补片，把它压实。确认轮胎撑得住后，你才收起工具。
+          <<case 'fixed_together'>>你摊开自带的工具，处理好补片。有人帮忙扶稳车轮、递来需要的东西，你不用做一步就站起来拿一次。确认轮胎不再漏气后，你收好剩下的耗材。
           <<case 'collected'>>一名过路司机停下帮忙。联系修车厂后，有人带着修补轮胎的工具赶来。确认轮胎不再漏气，你付了钱。
           <<case 'limped'>>你缓慢挪动，车轮开始摇晃就停一下。每次颠簸都透过坏轮胎，撞在轮圈上。
           <<case 'walk'>>你把载具留在路外，记下附近的地标。之后得回来取，或者去修车厂请人运回。<</switch>>
         <<if $Transport.trip.taxi and $Transport.trip.interrupted>>调度记下你的位置，取消了订单。<<if maplebirch.get('Transport').taxi.fleet?.stolen>>对方让你先顾好自己，丢失的营运车由车行处理。<</if>><</if>>
     <</language>>
     <<if ['scraped', 'paid', 'limped', 'stolen'].includes($_road_result.outcome)>><<gstress>><</if>>
-    <<if $_road_result.kind is 'roadblock' and $Transport.trip.interrupted and $Transport.trip.passengers.length>>
+    <<if ['fixed_together', 'force_together'].includes($_road_result.outcome)>>
+      <<deadwood-transport-work-companion>>
+    <<elseif $Transport.trip.passengers.length>>
       <<deadwood-transport-hazard-companion>>
     <</if>><br><br>
   <</if>>
 <</widget>>
 
+<<widget 'deadwood-transport-hazard-advice'>>
+  <<set $_hazard_event to $Transport.trip.event>>
+  <<if $Transport.trip.taxi>><<exit>><</if>>
+  <<for $_hazard_npc range maplebirch.get('Transport').companions.aboard>>
+    <<npc $_hazard_npc>><<person1>><<if $_hazard_npc is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<switch $_hazard_npc>>
+          <<case 'Robin'>>
+            <<if $_hazard_event.kind is 'police'>>Robin checks the seat belt, then stays quiet while you reach for your licence.
+            <<elseif $_hazard_event.kind is 'puncture'>><<if C.npc.Robin.trauma gte 40>>Robin looks at the passing traffic, keeping <<his>> bag on <<his>> knees. "I'll wait here, if that's okay."<<else>>"If you fix it, I can hold the tools." Robin waits until you have stopped, then checks the traffic before opening the door.<</if>>
+            <<elseif $_hazard_event.kind is 'load'>><<if C.npc.Robin.trauma gte 40>>Robin stays in the car, hands tight around <<his>> bag. "I'll wait here."<<else>>"We could lift one together." Robin checks the road before reaching for the door.<</if>>
+            <<elseif $_hazard_event.kind is 'roadblock'>>"The one behind the car keeps looking at us." Robin lowers <<his>> voice. "We can still turn back."
+            <<else>><<if C.npc.Robin.trauma gte 40>>Robin pulls <<his>> bag closer. "Can we slow down?"<<else>>Robin checks the mirror on <<his>> side. "There's room behind us, if we need to stop."<</if>><</if>>
+          <<case 'Whitney'>>
+            <<if $_hazard_event.kind is 'police'>>"Get your licence out." Whitney pushes <<his>> bag into the footwell. "And don't start telling them your fucking life story."
+            <<elseif $_hazard_event.kind is 'puncture'>>Whitney looks at the tyre. "Tell me what you need. I'm not standing here all day."
+            <<elseif $_hazard_event.kind is 'load'>>"That one's blocking us." Whitney points at the nearest crate. "Take the other end."
+            <<elseif $_hazard_event.kind is 'roadblock'>>"Don't open the fucking door." Whitney watches the figure behind the car. "I can see them."
+            <<else>>"Hold up." Whitney points towards the edge of the road. "Let that idiot get out of the way first."<</if>>
+          <<case 'Kylar'>>
+            <<if $_hazard_event.kind is 'police'>>Kylar lets go of your sleeve before the officer reaches the window. <<He>> watches without speaking.
+            <<elseif $_hazard_event.kind is 'puncture'>>"I'll stay with you." Kylar watches for traffic while you look over the tyre.
+            <<elseif $_hazard_event.kind is 'load'>>Kylar looks from the crates to you. "I'll take the other end. Stay beside me."
+            <<elseif $_hazard_event.kind is 'roadblock'>>Kylar looks back the way you came. "Can we go back? We don't need to talk to them."
+            <<else>>Kylar braces one hand against the seat. "I'm here. Just watch the road."<</if>>
+          <<case 'Sydney'>>
+            <<if $_hazard_event.kind is 'police'>><<if _sydneyStatus.includes('corrupt')>>"Let them finish checking." Sydney folds <<his>> hands where the officer can see them.<<else>>"We should do as they ask." Sydney gets <<his>> bag out of the way.<</if>>
+            <<elseif !['glasses', 'playerbought', 'contacts'].includes($sydney.glasses)>>Sydney stays close rather than trying to make out the traffic. "Tell me when it's safe to get out. I can hold something for you."
+            <<elseif $_hazard_event.kind is 'puncture'>>Sydney checks for traffic before opening the door. "I'll watch the road. Decide what you want to do first."
+            <<elseif $_hazard_event.kind is 'load'>>"We shouldn't stand in the road." Sydney looks towards the verge. <<if _sydneyStatus.includes('corrupt')>>"Let's shift those before the idiot drops any more."<<else>>"We could move the nearest ones together."<</if>>
+            <<elseif $_hazard_event.kind is 'roadblock'>><<if _sydneyStatus.includes('corrupt')>>"They're waiting for us to open the doors." Sydney looks towards the road behind. "Let's disappoint them."<<else>>"There's still room to go back." Sydney keeps <<his>> voice low.<</if>>
+            <<else>>Sydney looks ahead rather than at you. "There's a wider place just there. We can wait."<</if>>
+        <</switch>>
+      <<option 'CN'>>
+        <<switch $_hazard_npc>>
+          <<case 'Robin'>>
+            <<if $_hazard_event.kind is 'police'>>罗宾检查了一下安全带，见你伸手取驾驶执照，便安静地等着。
+            <<elseif $_hazard_event.kind is 'puncture'>><<if C.npc.Robin.trauma gte 40>>罗宾望着过路的车辆，把包留在膝上。“我在这里等，好吗？”<<else>>“你要修的话，我帮你拿工具。”等车停稳，罗宾才留意着来车，准备开门。<</if>>
+            <<elseif $_hazard_event.kind is 'load'>><<if C.npc.Robin.trauma gte 40>>罗宾留在车里，双手紧紧攥着包。“我在这里等。”<<else>>“两个人，应该抬得动吧。”罗宾看清路上的车，才伸手去开门。<</if>>
+            <<elseif $_hazard_event.kind is 'roadblock'>>“车后那个人，一直盯着我们。”罗宾压低声音。“还来得及退回去。”
+            <<else>><<if C.npc.Robin.trauma gte 40>>罗宾把包抱近了些。“能开慢一点吗？”<<else>>罗宾看了看自己那边的后视镜。“后面有空位，要停也来得及。”<</if>><</if>>
+          <<case 'Whitney'>>
+            <<if $_hazard_event.kind is 'police'>>“把驾驶执照拿出来。”惠特尼把包塞进脚边。“别他妈的连自己有几根毛都告诉他们。”
+            <<elseif $_hazard_event.kind is 'puncture'>>惠特尼看看轮胎。“要什么就说。我可不想在这儿站一天。”
+            <<elseif $_hazard_event.kind is 'load'>>“就那只挡着路。”惠特尼指向最近的货箱。“你抬另一头。”
+            <<elseif $_hazard_event.kind is 'roadblock'>>“别他妈开门。”惠特尼盯着车后的身影。“我看见了。”
+            <<else>>“先等等。”惠特尼指向路边。“让那个蠢货先滚过去。”<</if>>
+          <<case 'Kylar'>>
+            <<if $_hazard_event.kind is 'police'>>警员走到车窗旁之前，凯拉尔松开了你的袖子，一声不吭地看着。
+            <<elseif $_hazard_event.kind is 'puncture'>>“我陪你。”你检查轮胎时，凯拉尔一直留意着过路的车辆。
+            <<elseif $_hazard_event.kind is 'load'>>凯拉尔看看货箱，又看看你。“我抬另一头。别走远。”
+            <<elseif $_hazard_event.kind is 'roadblock'>>凯拉尔望向来时的路。“回去，好吗？没必要和他们说话。”
+            <<else>>凯拉尔用一只手撑住座位。“我在呢。你看路就好。”<</if>>
+          <<case 'Sydney'>>
+            <<if $_hazard_event.kind is 'police'>><<if _sydneyStatus.includes('corrupt')>>“让他们查完吧。”悉尼把手放在警员看得见的地方。<<else>>“先照他们说的做吧。”悉尼把挡路的包收好。<</if>>
+            <<elseif !['glasses', 'playerbought', 'contacts'].includes($sydney.glasses)>>悉尼留在你身旁，没有勉强去看远处的车辆。“能下车的时候告诉我。我可以帮你扶着东西。”
+            <<elseif $_hazard_event.kind is 'puncture'>>悉尼看清车流才打开门。“我看着路。你先想想怎么办。”
+            <<elseif $_hazard_event.kind is 'load'>>“别一直站在车道上。”悉尼望向路肩。<<if _sydneyStatus.includes('corrupt')>>“趁那蠢货还没掉更多，先挪开吧。”<<else>>“最近的几只，我们可以一起搬。”<</if>>
+            <<elseif $_hazard_event.kind is 'roadblock'>><<if _sydneyStatus.includes('corrupt')>>“他们正等着我们开门。”悉尼望向后方的路。“别让他们如愿。”<<else>>“后面还够退。”悉尼压低了声音。<</if>>
+            <<else>>悉尼看着前面的路。“那边宽些。我们可以等等。”<</if>>
+        <</switch>>
+    <</language>><br><br>
+  <</for>>
+<</widget>>
+
+<<widget 'deadwood-transport-work-companion'>>
+  <<for $_work_name range maplebirch.get('Transport').companions.aboard>>
+    <<if $_work_name is 'Robin' and C.npc.Robin.trauma gte 40>><<continue>><</if>>
+    <<npc $_work_name>><<person1>><<if $_work_name is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
+    <<language>>
+      <<option 'EN'>>
+        <<switch $_work_name>>
+          <<case 'Robin'>>Robin brushes <<his>> hands together. "That was easier with some help." <<He>> waits until you have checked the road before getting back in.
+          <<case 'Whitney'>>"About fucking time." Whitney rubs <<his>> hands on <<his>> trousers. "You're buying me a drink for that."
+          <<case 'Kylar'>>Kylar stays close while you finish checking. "You didn't hurt your hands?" <<He>> looks pleased when you thank <<him>>.
+          <<case 'Sydney'>>Sydney <<if ['glasses', 'playerbought', 'contacts'].includes($sydney.glasses)>>checks that nothing has been left in the road<<else>>waits while you check the road, keeping a hand against your arm<</if>>. <<if _sydneyStatus.includes('corrupt')>>"Next time, somewhere that doesn't get our hands dirty." <<He>> looks at <<his>> hands and laughs.<<else>>"There. We can go now." <<He>> waits for you before returning to the car.<</if>>
+        <</switch>>
+      <<option 'CN'>>
+        <<switch $_work_name>>
+          <<case 'Robin'>>罗宾拍了拍手上的灰。“有人搭手，果然容易些。”等你检查完路上的车，<<he>>才回到车里。
+          <<case 'Whitney'>>“可他妈算完了。”惠特尼把手在裤子上擦了擦。“回头请我喝一杯。”
+          <<case 'Kylar'>>你做最后的检查时，凯拉尔一直留在旁边。“手没伤着吧？”听见你道谢，<<he>>才露出笑容。
+          <<case 'Sydney'>>悉尼<<if ['glasses', 'playerbought', 'contacts'].includes($sydney.glasses)>>确认没有东西留在车道上<<else>>扶着你的胳膊，等你检查路上的车<</if>>。<<if _sydneyStatus.includes('corrupt')>>“下回找个不用弄脏手的地方吧。”<<He>>低头看看手，笑了起来。<<else>>“好了，可以走了。”<<He>>等着你，才一起回到车里。<</if>>
+        <</switch>>
+    <</language>><br><br>
+  <</for>>
+<</widget>>
+
 <<widget 'deadwood-transport-hazard-companion'>>
-  <<set $_hazard_npc to $Transport.trip.passengers[0]>>
-  <<npc $_hazard_npc>><<person1>>
-  <<language>>
-    <<option 'EN'>>
-      <<switch $_hazard_npc>>
-        <<case 'Robin'>> Robin keeps looking back. <<if C.npc.Robin.trauma gte 40>>"They're not following us?" <<He>> stays close to you.<<else>>"Are you hurt?" <<He>> checks your face before looking towards the road again.<</if>>
-        <<case 'Whitney'>> "Bastards," Whitney mutters, watching the bend. "Come on. We'll deal with the car later."
-        <<case 'Kylar'>> Kylar catches your sleeve. "You're okay?" <<His>> fingers tighten until you look at <<him>>.
-        <<case 'Sydney'>> Sydney takes a slow breath. "Let's get somewhere with people." <<He>> looks at you. "Stay with me."
-        <<case 'Alex'>> Alex checks the road behind you. "There's a field gate just ahead. Let's keep away from the bend."
-      <</switch>>
-    <<option 'CN'>>
-      <<switch $_hazard_npc>>
-        <<case 'Robin'>>罗宾不住地往后看。<<if C.npc.Robin.trauma gte 40>>“他们没跟上来吧？”<<He>>紧紧跟在你身旁。<<else>>“你受伤了吗？”<<He>>看了看你的脸，才又望向公路。<</if>>
-        <<case 'Whitney'>>“混蛋。”惠特尼盯着弯道，低声骂了一句。“走吧。车的事之后再说。”
-        <<case 'Kylar'>>凯拉尔抓住你的袖口。“你没事吧？”直到你转头看<<him>>，<<his>>手指才稍微松开。
-        <<case 'Sydney'>>悉尼慢慢呼出一口气。“先去有人的地方吧。”<<He>>看向你。“跟我待在一起。”
-        <<case 'Alex'>>艾利克斯检查着身后的公路。“前面有个田地入口。先离开弯道附近。”
-      <</switch>>
-  <</language>>
+  <<if $Transport.trip.taxi>><<exit>><</if>>
+  <<for $_hazard_npc range $Transport.trip.passengers>>
+    <<if C.npc[$_hazard_npc]?.init isnot 1 or !['active', 'rescued'].includes(C.npc[$_hazard_npc].state)>><<continue>><</if>>
+    <<npc $_hazard_npc>><<person1>><<if $_hazard_npc is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
+    <<set $_hazard_bad to ['scraped', 'limped', 'evaded', 'fined', 'arrested'].includes($Transport.trip.event.outcome)>>
+    <<language>>
+      <<option 'EN'>>
+        <<switch $_hazard_npc>>
+          <<case 'Robin'>>
+            <<if $Transport.trip.interrupted or $_hazard_bad>>Robin keeps close while you check what to do next. <<if C.npc.Robin.trauma gte 40>>"Could we go home now? Somewhere quiet."<<else>>"You're not hurt? We can take our time getting back."<</if>>
+            <<else>>Robin lets go of the seat belt. "I'm glad we didn't stay there." <<He>> watches the road until it is clear behind you.<</if>>
+          <<case 'Whitney'>>
+            <<if $Transport.trip.event.outcome is 'evaded'>>"Watch the fucking road." Whitney looks back, then forward again. "They're not worth wrapping us round a lamp post."
+            <<elseif $Transport.trip.interrupted or $_hazard_bad>>"That's enough of that shit." Whitney checks the road. "Get us somewhere we can stop."
+            <<else>>"Better." Whitney shifts <<his>> bag out of your way. "Keep going."<</if>>
+          <<case 'Kylar'>>
+            <<if $Transport.trip.interrupted or $_hazard_bad>>Kylar reaches for your hand once you have stopped. "We don't have to go anywhere else." <<He>> checks your face before letting you move.
+            <<else>>Kylar looks back once. "They're gone." <<He>> keeps <<his>> hands away from yours until you stop.<</if>>
+          <<case 'Sydney'>>
+            <<if $Transport.trip.event.kind is 'police' and $Transport.trip.event.outcome is 'cleared'>>Sydney puts <<his>> bag back on <<his>> knees. <<if _sydneyStatus.includes('corrupt')>>"There. Nothing else to give them."<<else>>"Thank you for stopping."<</if>>
+            <<elseif $Transport.trip.interrupted or $_hazard_bad>>Sydney takes a slow breath. <<if _sydneyStatus.includes('corrupt')>>"You can take me home without doing that again." <<He>> waits until you look at <<him>>.<<else>>"Let's get somewhere safe. We can decide the rest there."<</if>>
+            <<elseif !['glasses', 'playerbought', 'contacts'].includes($sydney.glasses)>>Sydney waits for you to get back in. "We can go now?" <<He>> settles back when you start the engine.
+            <<else>>Sydney checks the road beside you. "There's nothing coming on this side." <<He>> settles back when you pull away.<</if>>
+          <<case 'Alex'>>Alex checks the road behind you. "There's a field gate just ahead. Let's keep away from the bend."
+        <</switch>>
+      <<option 'CN'>>
+        <<switch $_hazard_npc>>
+          <<case 'Robin'>>
+            <<if $Transport.trip.interrupted or $_hazard_bad>>你查看接下来怎么办，罗宾一直留在你身旁。<<if C.npc.Robin.trauma gte 40>>“现在能回家了吗？找个安静点的地方。”<<else>>“你没伤着吧？回去可以慢慢走。”<</if>>
+            <<else>>罗宾松开攥着安全带的手。“幸好，没继续待在那里。”<<He>>一直留意着身后的路，等那边彻底空下来。<</if>>
+          <<case 'Whitney'>>
+            <<if $Transport.trip.event.outcome is 'evaded'>>“看他妈的路。”惠特尼往后看了看，又转回前面。“不值得为了他们，把咱们撞到灯柱上。”
+            <<elseif $Transport.trip.interrupted or $_hazard_bad>>“折腾够了吧。”惠特尼看看公路。“先找个能停的地方。”
+            <<else>>“这还差不多。”惠特尼把包往边上挪。“走吧。”<</if>>
+          <<case 'Kylar'>>
+            <<if $Transport.trip.interrupted or $_hazard_bad>>等你停下，凯拉尔才来握你的手。“哪儿也不去，也可以。”<<He>>看看你的脸，才让开一点。<<else>>凯拉尔往后看了一眼。“他们走了。”等你停车之前，<<he>>没有再来牵你的手。<</if>>
+          <<case 'Sydney'>>
+            <<if $Transport.trip.event.kind is 'police' and $Transport.trip.event.outcome is 'cleared'>>悉尼把包重新放到膝上。<<if _sydneyStatus.includes('corrupt')>>“好了。没有别的要交代。”<<else>>“谢谢你停了车。”<</if>>
+            <<elseif $Transport.trip.interrupted or $_hazard_bad>>悉尼慢慢呼出一口气。<<if _sydneyStatus.includes('corrupt')>>“回去路上，不用再来一次了吧。”<<He>>等你看向<<him>>。<<else>>“先去安全的地方。其他事，到了再说。”<</if>>
+            <<elseif !['glasses', 'playerbought', 'contacts'].includes($sydney.glasses)>>悉尼等着你回到车里。“可以走了吗？”听见发动机响起，<<he>>才重新靠回座位。
+            <<else>>悉尼看着你身旁的公路。“这边没有来车。”等你出发，<<he>>才重新靠回座位。<</if>>
+          <<case 'Alex'>>艾利克斯检查着身后的公路。“前面有个田地入口。先离开弯道附近。”
+        <</switch>>
+    <</language>><br><br>
+  <</for>>
 <</widget>>
 
 <<widget 'deadwood-transport-road-scene'>>
@@ -372,16 +512,16 @@
 
 <<widget 'deadwood-transport-roadside-event'>>
   <<deadwood-dynamicblock 'deadwood-transport-roadside-event'>>
-    <<set _roadside to $Transport.trip.event>>
+    <<set _roadside_trip to $Transport.trip, _roadside to $Transport.trip.event>>
     <<if _roadside and !$Transport.trip.interrupted and (!_roadside.resolved or _roadside.action)>>
       <<if _roadside.action>>
         <<language>>
           <<option 'EN'>>
-            <<if _roadside.action is 'tools'>>You fetch your tools and use a spare connector to secure the loose cable. The engine catches on the next attempt. The driver thanks you while you put your things away.
+            <<if _roadside.action is 'tools'>>You fetch your tools, tighten the loose terminal and cover the damaged insulation with tape from your kit. The engine catches on the next attempt. The driver thanks you while you put your things away.
             <<elseif _roadside.kind is 'breakdown'>>The driver lends you a phone. You describe the nearest junction to the workshop and arrange for someone to come out. The driver relaxes a little and thanks you.
             <<else>>You gather the spilled shopping while the passer-by holds the torn bag together. They find a spare bag for the last few things and thank you before heading off.<</if>>
           <<option 'CN'>>
-            <<if _roadside.action is 'tools'>>你取出工具，用备用接头固定好松脱的线缆。司机再试了一次，发动机终于响了。你收好东西时，对方连声道谢。
+            <<if _roadside.action is 'tools'>>你取出工具，拧紧松脱的接线端，再用工具包里的胶带裹住破损的绝缘层。司机再试了一次，发动机终于响了。你收好东西时，对方连声道谢。
             <<elseif _roadside.kind is 'breakdown'>>司机借给你一部手机。你向修车厂说清最近的路口，约好让人过来看看。对方松了口气，向你道谢。
             <<else>>你捡起散落的东西，路人则扶住破了的袋子。对方找出一个备用袋子，装好最后几样，向你道谢后离开了。<</if>>
         <</language>>
@@ -396,15 +536,31 @@
             <<else>>你刚停下，路旁一个购物袋就裂开了。路人弯腰去追滚走的罐头，剩下的东西散了一地。<</if>>
         <</language>><br><br>
         <<if maplebirch.get('Transport').events.available>>
-          <<icon `_roadside.kind is 'breakdown' ? 'transport/service.png' : 'give-hand.png'`>><<lanLink `_roadside.kind is 'breakdown' ? ['Help arrange repairs (0:05)', '帮忙联系修车厂 (0:05)'] : ['Help pick things up (0:02)', '帮忙捡起来 (0:02)']`>>
-            <<if maplebirch.get('Transport').events.help()>><<run Dynamic.render('deadwood-transport-roadside-event')>><</if>>
-          <</lanLink>><<lstress>>
-          <<if maplebirch.get('Transport').events.canUseTools>>
-            <br>
-            <<icon 'transport/motor-repair-kit.png'>><<lanLink ['Secure the loose connection (0:05)', '用工具固定接头 (0:05)']>>
-              <<if maplebirch.get('Transport').events.help(true)>><<run Dynamic.render('deadwood-transport-roadside-event')>><</if>>
-            <</lanLink>> | <span class='teal'><<lanSwitch 'Repair supplies −1' '维修耗材 −1'>></span>
-          <</if>>
+          <<capture _roadside_trip _roadside>>
+            <<icon `_roadside.kind is 'breakdown' ? 'transport/service.png' : 'give-hand.png'`>><<lanLink `_roadside.kind is 'breakdown' ? ['Help arrange repairs (0:05)', '帮忙联系修车厂 (0:05)'] : ['Help pick things up (0:02)', '帮忙捡起来 (0:02)']`>>
+              <<if maplebirch.get('Transport') and $Transport.trip is _roadside_trip and $Transport.trip.event is _roadside>>
+                <<set _road_helped to maplebirch.get('Transport').events.help()>>
+                <<deadwood-transport-next '#deadwood-transport-travel'>>
+                <<if maplebirch.get('Transport') and $Transport.trip is _roadside_trip and $Transport.trip.event is _roadside and $passage is 'Deadwood Transport Travel' and !$statFreeze and !$replayScene and !$eventforced and !$frozenValues and !$nextPassage and !$nextPassageCheck and (_road_helped or _roadside.resolved)>>
+                  <<run Dynamic.render('deadwood-transport-roadside-event')>>
+                <</if>>
+                <<if $passage is 'Deadwood Transport Travel' and !$statFreeze and !$replayScene and !$frozenValues>><<run updateMoment()>><</if>>
+              <</if>>
+            <</lanLink>><<lstress>>
+            <<if maplebirch.get('Transport').events.canUseTools>>
+              <br>
+              <<icon 'transport/motor-repair-kit.png'>><<lanLink [currentSkillValue('housekeeping') gte 600 ? 'Secure the loose connection (0:03)' : 'Secure the loose connection (0:05)', currentSkillValue('housekeeping') gte 600 ? '用工具固定接头 (0:03)' : '用工具固定接头 (0:05)']>>
+                <<if maplebirch.get('Transport') and $Transport.trip is _roadside_trip and $Transport.trip.event is _roadside>>
+                  <<set _road_helped to maplebirch.get('Transport').events.help(true)>>
+                  <<deadwood-transport-next '#deadwood-transport-travel'>>
+                  <<if maplebirch.get('Transport') and $Transport.trip is _roadside_trip and $Transport.trip.event is _roadside and $passage is 'Deadwood Transport Travel' and !$statFreeze and !$replayScene and !$eventforced and !$frozenValues and !$nextPassage and !$nextPassageCheck and (_road_helped or _roadside.resolved)>>
+                    <<run Dynamic.render('deadwood-transport-roadside-event')>>
+                  <</if>>
+                  <<if $passage is 'Deadwood Transport Travel' and !$statFreeze and !$replayScene and !$frozenValues>><<run updateMoment()>><</if>>
+                <</if>>
+              <</lanLink>> | <span class='teal'><<lanSwitch 'Housekeeping' '家务'>></span> | <span class='teal'><<lanSwitch 'Repair supplies −1' '维修耗材 −1'>></span>
+            <</if>>
+          <</capture>>
         <</if>>
       <</if>><br><br>
     <</if>>
@@ -412,24 +568,23 @@
 <</widget>>
 
 <<widget 'deadwood-transport-roadside-companion'>>
-  <<set $_roadside_name to $Transport.trip.passengers?.[0]>>
-  <<if $_roadside_name>>
-    <<npc $_roadside_name>><<person1>>
+  <<for $_roadside_name range maplebirch.get('Transport').companions.aboard>>
+    <<npc $_roadside_name>><<person1>><<if $_roadside_name is 'Sydney'>><<run statusCheck('Sydney')>><</if>>
     <<language>>
       <<option 'EN'>>
         <<switch $_roadside_name>>
           <<case 'Robin'>> <<if C.npc.Robin.trauma gte 40>>Robin waits in the car until you return. "Everything okay?"<<else>>Robin smiles when you come back. "That was kind of you."<</if>>
           <<case 'Whitney'>> "Done playing hero?" Whitney asks. <<He>> shifts <<his>> bag out of your way. "Come on, then."
           <<case 'Kylar'>> Kylar has stayed beside your vehicle. "You know them?" <<He>> seems relieved when you shake your head.
-          <<case 'Sydney'>> Sydney watches you put things away. "I'm glad we stopped."
+          <<case 'Sydney'>> Sydney watches you put things away. <<if _sydneyStatus.includes('corrupt')>>"Come on. Someone else can help the next one."<<else>>"I'm glad we stopped."<</if>>
         <</switch>>
       <<option 'CN'>>
         <<switch $_roadside_name>>
           <<case 'Robin'>><<if C.npc.Robin.trauma gte 40>>罗宾待在车里，直到你回来。“都没事吧？”<<else>>你回来时，罗宾笑了笑。“你人真好。”<</if>>
           <<case 'Whitney'>>“英雄当够了？”惠特尼问。<<He>>把挡着你的包挪开。“那就走吧。”
           <<case 'Kylar'>>凯拉尔一直待在你的车旁。“你认识那个人？”你摇头后，<<he>>像是松了口气。
-          <<case 'Sydney'>>悉尼看着你收好东西。“还好我们停下了。”
+          <<case 'Sydney'>>悉尼看着你收好东西。<<if _sydneyStatus.includes('corrupt')>>“走吧。下一个留给别人帮忙。”<<else>>“还好我们停下了。”<</if>>
         <</switch>>
-    <</language>>
-  <</if>>
+    <</language>><br><br>
+  <</for>>
 <</widget>>
