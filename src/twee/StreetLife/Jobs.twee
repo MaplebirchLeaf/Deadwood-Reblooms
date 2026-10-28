@@ -48,7 +48,7 @@
         <li><<= _streetJob.crew.name>> · <<lanSwitch 'Agreed colleague\'s share: ' '合作人约定分成：'>><span class='gold'><<= _streetJob.crew.share>>%</span> · <<lanSwitch 'Quoted total fee: ' '约定总报酬：'>><<printmoney _streetJob.crew.gross>></li>
       <</if>>
       <<if _streetJob.stage is 'settlement'>>
-        <li class='green'><<lanSwitch 'Delivered. Return to Landry for payment.' '货物已交付。回丰收街酒馆找兰德里领报酬。'>></li>
+        <li class='green'><<if _streetJob.id is 'bailey_delivery'>><<lanSwitch 'Delivered. Bring the signed receipt back to Bailey during visiting hours.' '货物已交付。在会面时间把签收凭据带回贝利那里。'>><<else>><<lanSwitch 'Delivered. Return to Landry for payment.' '货物已交付。回丰收街酒馆找兰德里领报酬。'>><</if>></li>
         <li><<lanSwitch 'Payment due to you: ' '待领报酬：'>><<printmoney _streetJob.fee>></li>
       <<else>>
         <<if _streetContract.target is 'cafe' and !_streetJobs.cafeOpen and _streetJob.stage isnot 'return'>>
@@ -66,7 +66,7 @@
           <<if _streetJobs.expired>>
             <li class='red'>
               <<if _streetJob.stage is 'pickup'>>
-                <<lanSwitch 'The delivery window has closed before you collected the goods. Tell Landry you cannot finish.' '你还没取货，交货期限及宽限时间就已经结束。请向兰德里取消委托。'>>
+                <<if _streetJob.id is 'bailey_delivery'>><<lanSwitch 'The deadline has passed. Tell Bailey you cannot finish the delivery.' '交货期限已过。请告诉贝利无法完成运送。'>><<else>><<lanSwitch 'The delivery window has closed before you collected the goods. Tell Landry you cannot finish.' '你还没取货，交货期限及宽限时间就已经结束。请向兰德里取消委托。'>><</if>>
               <<else>>
                 <<lanSwitch 'The delivery window has closed. Return the goods to the sender.' '交货期限及宽限时间都已结束，请把货物退给发货人。'>>
               <</if>>
@@ -78,7 +78,7 @@
         <<if _streetJob.stage is 'pickup'>>
           <li><<lanSwitch 'Awaiting collection.' '尚未取货。'>></li>
         <<elseif _streetJobs.lost>>
-          <li class='red'><<lanSwitch 'The vehicle carrying the goods is missing. Report the loss to Landry, or recover the vehicle first.' '载货车辆已失踪。可以先找回车辆，或向兰德里报告损失。'>></li>
+          <li class='red'><<if _streetJob.id is 'bailey_delivery'>><<lanSwitch 'The vehicle carrying the goods is missing. Recover it, or report the loss to Bailey.' '载货车辆已失踪。请找回车辆，或向贝利报告损失。'>><<else>><<lanSwitch 'The vehicle carrying the goods is missing. Report the loss to Landry, or recover the vehicle first.' '载货车辆已失踪。可以先找回车辆，或向兰德里报告损失。'>><</if>></li>
         <<elseif _streetJob.vehicle isnot null>>
           <li><<lanSwitch 'The goods remain in your vehicle. Bring that vehicle to the destination, or unload at the street where it is parked.' '货物仍在载货车辆里。请把那辆车开到目的地，或在它停放的街道卸货。'>></li>
           <<if maplebirch.get('Transport')>>
@@ -121,7 +121,7 @@
       吧台那边的谈笑声传到桌间。<<if Weather.isSnow>>进门的人跺跺靴子，把雪泥留在门边。<<elseif Weather.precipitation is 'rain'>>湿脚印从门口一路延伸到吧台。<<elseif Time.dayState is 'night'>>每当门打开，路上货车的声音便混进人声里。<<else>>一辆重型货车从外面驶过，吧台后的杯子跟着轻轻震响。<</if>><br><br>
       兰德里把桌沿的杯子往里挪了挪。“找活干？有几个人托我找人办事。挑你能做完的，剩下的我找别人。”
   <</language>><br><br>
-  <<if _streetJobs.state.report and !_streetJobs.state.active>>
+  <<if _streetJobs.state.report and !_streetJobs.state.active and _streetJobs.state.report.id isnot 'bailey_delivery'>>
     <<set _streetReport to _streetJobs.state.report>>
     <<language>>
       <<option 'EN'>>
@@ -154,7 +154,9 @@
   <<if _streetJobs.available>>
     <<if _streetJobs.state.active>>
       <<deadwood-street-cargo-link 'pub'>>
-      <<if _streetJobs.state.active.stage is 'settlement'>>
+      <<if _streetJobs.state.active.id is 'bailey_delivery'>>
+        <<lanSwitch 'Bailey arranged this delivery. Bring the receipt or any problems back to Bailey.' '这份差事由贝利安排。签收凭据或遇到的问题都得交回贝利那里。'>><br>
+      <<elseif _streetJobs.state.active.stage is 'settlement'>>
         <<icon 'street/job-payment.png'>><<lanLink ['Hand over the receipt and collect your fee (0:05)', '交回凭据并领取报酬 (0:05)'] 'Deadwood Street Jobs'>>
           <<if _streetJobs.act('pay')>><<pass 5>><</if>>
         <</lanLink>><br>
@@ -274,11 +276,11 @@
     <span class='blue'><<lanSwitch 'Bring the vehicle carrying this shipment here first. You have not brought the goods with you.' '请先把载货车辆开到这里。货物没有随你一起过来。'>></span><br>
   <</if>>
   <<if _streetJobs.available>>
-    <<if $StreetLife.jobs.site is 'pub' and _streetJob.stage is 'settlement'>>
+    <<if $StreetLife.jobs.site is 'pub' and _streetJob.stage is 'settlement' and _streetJob.id isnot 'bailey_delivery'>>
       <<icon 'street/job-payment.png'>><<lanLink ['Collect your fee (0:05)', '领取报酬 (0:05)'] 'Deadwood Street Jobs'>><<if _streetJobs.act('pay')>><<pass 5>><</if>><</lanLink>><br>
     <<elseif $StreetLife.jobs.site is _streetContract.return_to and _streetJob.stage is 'return' and _streetJobs.cargoHere and _streetJobs.receiving>>
       <<icon 'street/cargo-return.png'>><<lanLink ['Hand the goods back (0:05)', '归还这批货物 (0:05)'] 'Deadwood Street Cargo'>><<if _streetJobs.act('cancel')>><<pass 5>><</if>><</lanLink>><br>
-    <<elseif $StreetLife.jobs.site is 'pub' and (_streetJob.stage is 'pickup' or _streetJobs.lost)>>
+    <<elseif $StreetLife.jobs.site is 'pub' and _streetJob.id isnot 'bailey_delivery' and (_streetJob.stage is 'pickup' or _streetJobs.lost)>>
       <<refuseicon>><<lanLink ['Close the job with Landry (0:05)', '向兰德里交代并结束委托 (0:05)'] 'Deadwood Street Jobs'>><<if _streetJobs.act('cancel')>><<pass 5>><</if>><</lanLink>><br>
     <</if>>
   <</if>>

@@ -183,8 +183,18 @@ export default class Jobs {
     if (action === 'accept') {
       const business = title === 'Deadwood Street Heist Contacts';
       const businessOffer = business ? this.businessOffers.find(item => item.id === value) : undefined;
-      const offer = business ? businessOffer : (this.offers.find(item => item.id === value) ?? (value === 'bailey_cargo' ? this.street.bailey.offer : undefined));
-      if (!['Deadwood Street Job Offer', 'Deadwood Street Bailey Job', 'Deadwood Street Heist Contacts'].includes(title) || !offer || state.offer !== value) return false;
+      const offer = business
+        ? businessOffer
+        : (this.offers.find(item => item.id === value) ?? (value === 'bailey_cargo' ? this.street.bailey.offer : value === 'bailey_delivery' ? this.street.bailey.delivery : undefined));
+      if (!['Deadwood Street Job Offer', 'Deadwood Street Bailey Job', 'Deadwood Street Heist Contacts', 'Deadwood Street Bailey Delivery'].includes(title) || !offer || state.offer !== value)
+        return false;
+      if (offer.id === 'bailey_delivery') {
+        if (title !== 'Deadwood Street Bailey Delivery') return false;
+        const end = Time.date.timeStamp + 5 * 60;
+        this.street.core.SugarCube.Wikifier.wikifyEval('<<pass 5>>');
+        if (this.state !== state || this.street.core.passage.title !== title || !this.available || this.street.bailey.delivery !== offer || Time.date.timeStamp < end) return false;
+        this.street.bailey.state.invitation = 'accepted';
+      }
       if (business && (!this.street.heist.atMeeting || !this.street.heist.meetingAvailable)) return false;
       // 货物问题只在接单时抽取一次，种类与概率留在目录中维护。
       const issue = offer.issues[random(1, offer.issues.length) - 1] as Job['issue'];
@@ -297,17 +307,23 @@ export default class Jobs {
       if (title !== 'Deadwood Street Cargo' || job.stage !== 'carrying' || !this.cargoHere) return false;
       job.stage = 'return';
     } else {
-      if (!['Deadwood Street Jobs', 'Deadwood Street Cargo'].includes(title)) return false;
+      const bailey = job.id === 'bailey_delivery';
+      if (bailey && title === 'Deadwood Street Bailey Delivery') {
+        if (!this.street.bailey.atDesk || this.street.bailey.state.invitation !== 'accepted' || (action === 'pay' ? job.stage !== 'settlement' : job.stage !== 'pickup' && !this.lost)) return false;
+        const end = Time.date.timeStamp + 5 * 60;
+        this.street.core.SugarCube.Wikifier.wikifyEval('<<pass 5>>');
+        if (this.state.active !== job || this.street.core.passage.title !== title || !this.available || !this.street.bailey.atDesk || Time.date.timeStamp < end) return false;
+      } else if (!['Deadwood Street Jobs', 'Deadwood Street Cargo'].includes(title)) return false;
       if (action === 'pay') {
-        if (this.place !== 'pub' || job.stage !== 'settlement') return false;
+        if (job.stage !== 'settlement' || (bailey ? title !== 'Deadwood Street Bailey Delivery' : this.place !== 'pub')) return false;
         state.report = { id: job.id, outcome: 'paid', fee: job.fee, late: job.late, ...(job.crew ? { crew: { ...job.crew } } : {}) };
         state.active = null;
         state.completed++;
         state.earned += job.fee;
         this.street.reputation += job.late ? 1 : contract.reputation;
-        this.street.core.SugarCube.Wikifier.wikifyEval(`<<money ${job.fee} 'pub'>>`);
+        this.street.core.SugarCube.Wikifier.wikifyEval(`<<money ${job.fee} '${bailey ? 'town' : 'pub'}'>>`);
         // 合法委托也建立业务关系，原版宏保留 Landry 的 −100～100 上限。
-        this.street.core.SugarCube.Wikifier.wikifyEval(`<<npcincr Landry love ${job.late ? 0 : contract.illegal ? 2 : 1}>>`);
+        if (!bailey) this.street.core.SugarCube.Wikifier.wikifyEval(`<<npcincr Landry love ${job.late ? 0 : contract.illegal ? 2 : 1}>>`);
         const quote = job.crew;
         const colleague = quote && V.per_npc[quote.key];
         if (quote && colleague?.heist) {
@@ -320,7 +336,7 @@ export default class Jobs {
         }
       } else {
         const returnSite = job.stage === 'pickup' || this.lost ? 'pub' : contract.return_to;
-        if (this.place !== returnSite) return false;
+        if (bailey && (job.stage === 'pickup' || this.lost) ? title !== 'Deadwood Street Bailey Delivery' : this.place !== returnSite) return false;
         if (job.stage === 'return' && !this.lost && !this.receiving) return false;
         if (job.stage === 'settlement' || (!this.lost && job.stage !== 'pickup' && (job.stage !== 'return' || !this.cargoHere))) return false;
         state.report = { id: job.id, outcome: this.lost ? 'lost' : job.stage === 'pickup' ? 'cancelled' : 'returned', fee: 0, late: false };
@@ -328,9 +344,10 @@ export default class Jobs {
         if (state.report.outcome === 'lost') {
           state.losses++;
           this.street.reputation -= contract.reputation;
-          this.street.core.SugarCube.Wikifier.wikifyEval('<<npcincr Landry love -3>>');
+          if (!bailey) this.street.core.SugarCube.Wikifier.wikifyEval('<<npcincr Landry love -3>>');
         }
       }
+      if (bailey) this.street.bailey.state.invitation = action === 'pay' ? 'paid' : 'failed';
       if (job.id === 'bailey_cargo') {
         const bailey = this.street.bailey.state;
         bailey.finished = true;

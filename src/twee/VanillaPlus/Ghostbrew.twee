@@ -21,6 +21,13 @@
         <<set $phase to 'deadwood-ghostbrew-lesson'>>
       <</if>>
     <</lanLink>><br>
+  <<elseif _ghostbrewTeacher and $foodstuff.ghostbrew?.knows_recipe and $foodstuff.ghostbrew.amount gte 1>>
+    <<foodstufficon 'ghostbrew'>><<lanLink ['Show Gwylan your ghostbrew (0:05)', '请格威岚看看幽灵菇酒 (0:05)'] 'Deadwood Ghostbrew Review'>>
+      <<deadwood-ghostbrew-check>>
+      <<if _ghostbrewTeacher and $foodstuff.ghostbrew?.knows_recipe and $foodstuff.ghostbrew.amount gte 1>>
+        <<set $phase to 'deadwood-ghostbrew-review'>>
+      <</if>>
+    <</lanLink>><br>
   <</if>>
 <</widget>>
 
@@ -64,6 +71,54 @@
   <</if>>
 <<else>>
   <<lanSwitch 'You put the mushroom away for now.' '你暂且把蘑菇收好。'>>
+<</if>>
+<br><br>
+<<getouticon>><<lanLink [
+  _ghostbrewTeacher ? 'Return to Gwylan' : 'Return to the shop entrance',
+  _ghostbrewTeacher ? '回到格威岚身边' : '返回商店门口'
+] `_ghostbrewTeacher ? 'Gwylan Talk Shop' : 'Forest Shop Entrance'`>><</lanLink>>
+
+:: Deadwood Ghostbrew Review
+<<set _ghostbrewReview to $phase is 'deadwood-ghostbrew-review'>>
+<<if _ghostbrewReview>><<unset $phase>><</if>>
+<<effects>><<deadwood-ghostbrew-check>>
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] $passage>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if _ghostbrewReview and _ghostbrewTeacher
+  and $foodstuff.ghostbrew?.knows_recipe and $foodstuff.ghostbrew.amount gte 1>>
+  <<pass 5>><<deadwood-ghostbrew-check>>
+  <<if $passage isnot 'Deadwood Ghostbrew Review'>><<exit>><</if>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <span id='next'><<lanLink ['Next', '继续'] $passage>><</lanLink>></span><<nexttext>><<exit>>
+  <</if>>
+  <<if _ghostbrewTeacher and $foodstuff.ghostbrew?.amount gte 1>>
+    <<npc Gwylan>><<person1>>
+    <<language>>
+      <<option 'CN'>>
+        你把幽灵菇酒放到柜台上。格威岚将瓶子举到光下，轻轻晃了晃，拔开瓶塞闻了一下。
+        <br><br>
+        “看来你没把它煮干。”<<He>>笑了笑，将瓶子放回你面前。“颜色也对。花放得太多，就会盖住蘑菇的气味。”
+        <br><br>
+        <<He>>替你塞好瓶口。“别一口喝完，亲爱的。就算看见地板在动，也先别急着站起来。”
+        <br><br>
+        你收起酒瓶。隔着瓶身，指尖还能感觉到那股凉意。
+      <<option 'EN'>>
+        You set your ghostbrew on the counter. Gwylan holds the bottle up to the light, swirls it gently, and removes the cork for a sniff.
+        <br><br>
+        "Well, you haven't boiled it dry." <<He>> smiles and sets it back in front of you. "The colour looks right, too. Too much flower masks the smell of the mushrooms."
+        <br><br>
+        <<He>> replaces the cork. "Don't drink it all at once, dear. If the floor starts moving, give it a moment before you stand up."
+        <br><br>
+        You put the bottle away. You can still feel its chill through the glass.
+    <</language>>
+  <<elseif !_ghostbrewTeacher>>
+    <<lanSwitch 'Gwylan has to leave before you can show the bottle. You put it away.' '还没来得及拿出酒瓶，格威岚便要离开了。你把瓶子收好。'>>
+  <<else>>
+    <<lanSwitch 'You have no bottle to show Gwylan.' '你没有能拿给格威岚看的酒瓶。'>>
+  <</if>>
+<<else>>
+  <<lanSwitch 'You leave the bottle where it is for now.' '你暂且没有拿出酒瓶。'>>
 <</if>>
 <br><br>
 <<getouticon>><<lanLink [

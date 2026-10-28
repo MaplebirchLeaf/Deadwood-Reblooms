@@ -4,8 +4,19 @@ export default function ColdmoonHarbour(maplebirch: typeof window.maplebirch): v
     {
       folder: 'coldmoon-harbour',
       base: {
-        default: { condition: () => !Time.isBloodMoon(), image: 'base.png' },
-        bloodMoon: { condition: () => Time.isBloodMoon(), image: 'blood-moon.png' }
+        default: { condition: () => !Time.isBloodMoon() && !Weather.isSnow, image: 'base.png' },
+        snow: { condition: () => !Time.isBloodMoon() && Weather.isSnow, image: 'snow.png' },
+        bloodMoon: { condition: () => Time.isBloodMoon() && !Weather.isSnow, image: 'blood-moon.png' },
+        bloodMoonSnow: { condition: () => Time.isBloodMoon() && Weather.isSnow, image: 'blood-moon-snow.png' }
+      },
+      emissive: {
+        windows: { image: 'emissive.png', condition: () => Weather.lightsOn, color: '#e6bc70', size: 2, intensity: 0.4 },
+        ship: { image: 'blood-moon-emissive.png', condition: () => Time.isBloodMoon(), color: '#aac7a2', size: 1, intensity: 0.25 }
+      },
+      reflective: {
+        mask: { image: 'reflective.png', verticalFactor: 4, amplitude: 15 },
+        overlay: { image: 'water.png', compositeOperation: 'overlay', alpha: 0.3 },
+        waves: { image: 'waves.png', alpha: 0.4, alwaysDisplay: false, compositeOperation: 'overlay', animation: { frameDelay: 900, cycleDelay: 0 } }
       },
       weather: {
         fogDistributionCurve: 1,

@@ -1,0 +1,99 @@
+:: Deadwood Eden Daily Widgets [widget]
+
+<!-- 框架在当前页原版选项渲染后填充区域，只在已结束练枪的分支提供收靶。 -->
+<<widget 'deadwood-eden-range-link'>>
+  <<set $_edenRangeExit to document.querySelector('#passage-content .macro-link[data-passage="Eden Cabin"]')>>
+  <<if maplebirch.get('LifeSimulation') and ['Eden Shoot', 'Eden Shoot First Focus', 'Eden Shoot Focus'].includes($passage)
+      and maplebirch.passage.title is $passage and $_edenRangeExit and $eden_shoot gte 2
+      and C.npc.Eden.init is 1 and edenFreedomStatus() lt 1 and !$edenCaged and !$edenCagedEscape
+      and Time.hour gte 18 and Time.hour * 60 + Time.minute lt 23 * 60 + 55
+      and !$daily.eden.deadwoodRange and !pcAreArmsBound('any')
+      and !$nextPassage and !$nextPassageCheck and !$eventforced and !$combat and !$possessed
+      and !$statFreeze and !$replayScene and !$frozenValues>>
+    <<set $_edenRange to { day: Math.floor(Time.date.timeStamp / TimeConstants.secondsPerDay), source: $passage, daily: $daily.eden, used: false }>>
+    <<capture $_edenRange>>
+      <<edenicon 'target'>><<lanLink ['Help put the target away (0:05)', '帮忙收起靶子 (0:05)']>>
+        <<deadwood-eden-range-pack $_edenRange>>
+      <</lanLink>><<glove 'Eden'>><br>
+    <</capture>>
+  <</if>>
+<</widget>>
+
+<!-- 每日机会先消耗，完整收拾后才增加好感；保留原版射击成长和中断事件。 -->
+<<widget 'deadwood-eden-range-pack'>>
+  <<set $_range to _args[0]>>
+  <<if !maplebirch.get('LifeSimulation') or !$_range or $_range.used or $_range.source isnot $passage
+      or $_range.daily isnot $daily.eden or $_range.day isnot Math.floor(Time.date.timeStamp / TimeConstants.secondsPerDay) or $daily.eden.deadwoodRange
+      or $eden_shoot lt 2 or C.npc.Eden.init isnot 1 or edenFreedomStatus() gte 1 or $edenCaged or $edenCagedEscape
+      or Time.hour lt 18 or Time.hour * 60 + Time.minute gte 23 * 60 + 55 or pcAreArmsBound('any')
+      or $nextPassage or $nextPassageCheck or $eventforced or $combat or $possessed
+      or $statFreeze or $replayScene or $frozenValues>><<exit>><</if>>
+  <<set $_range.used to true, $daily.eden.deadwoodRange to 'started', $_rangeEnd to Time.date.timeStamp + 5 * 60>>
+  <<pass 5>>
+  <<if $passage is $_range.source and maplebirch.get('LifeSimulation') and $_range.daily is $daily.eden
+      and Math.floor(Time.date.timeStamp / TimeConstants.secondsPerDay) is $_range.day and Time.date.timeStamp gte $_rangeEnd and edenFreedomStatus() lt 1
+      and !$edenCaged and !$edenCagedEscape and !$nextPassage and !$nextPassageCheck and !$eventforced
+      and !$combat and !$possessed and !$statFreeze and !$replayScene and !$frozenValues>>
+    <<set $daily.eden.deadwoodRange to 'done'>><<npcincr Eden love 1>>
+    <<goto 'Deadwood Eden Range'>>
+  <<elseif $passage is $_range.source and ($nextPassage or $nextPassageCheck or $eventforced)>>
+    <<replace '#beforeLinkZone'>><span id='next'><<lanLink ['Next', '继续'] $passage>><</lanLink>></span><<nexttext>><</replace>>
+  <</if>>
+<</widget>>
+
+<!-- 只补原版狩猎归来的状态回应，不重复果篮的好感与两小时路程。 -->
+<<widget 'deadwood-eden-hunt-return'>>
+  <<if maplebirch.get('LifeSimulation') and $passage is 'Eden Hunt 3' and C.npc.Eden.init is 1
+      and [0, 1, 2].includes($phase) and edenFreedomStatus() lt 1 and !$edenCaged and !$edenCagedEscape
+      and !$nextPassage and !$nextPassageCheck and !$eventforced and !$combat and !$possessed
+      and !$statFreeze and !$replayScene and !$frozenValues>>
+    <<npc Eden>><<person1>>
+    <<language>>
+      <<option 'EN'>>
+        <<if $pain gte 10>>
+          Eden slows beside you as the cabin comes into view. <<if C.npc.Eden.love gte 80>>"Where does it hurt?" <<He>> looks you over, then draws you closer. "Stay with me."<<else>>"Watch where you put your feet next time." <<He>> waits for you to catch up before continuing.<</if>>
+        <<elseif $phase is 0 or $phase is 1>>
+          Eden glances at your basket as you approach the cabin. "Put those by the door. I'll sort them." <<He>> looks back along the path, checking that nothing has followed you.
+        <<else>>
+          Eden stops at the edge of the clearing, looking back until you catch up. "Stay close."
+        <</if>>
+      <<option 'CN'>>
+        <<if $pain gte 10>>
+          小屋出现在眼前时，伊甸在你身旁放慢脚步。<<if C.npc.Eden.love gte 80>>“哪里疼？”<<He>>打量了你一遍，把你拉近了些。“跟紧我。”<<else>>“下次看着点脚下。”<<He>>等你跟上，才继续往前走。<</if>>
+        <<elseif $phase is 0 or $phase is 1>>
+          临近小屋时，伊甸看了一眼你的篮子。“放在门旁。我来收拾。”<<He>>回头望向小路，确认没有东西跟着你们。
+        <<else>>
+          伊甸在空地边停下，回头等你跟上。“跟紧。”
+        <</if>>
+    <</language>><br><br>
+  <</if>>
+<</widget>>
+
+:: Deadwood Eden Range
+<<effects>>
+<<if $daily.eden.deadwoodRange is 'done'>>
+  <<npc Eden>><<person1>>
+  <<language>>
+    <<option 'EN'>>
+      Eden opens the gun and checks it before letting you walk out to the target. You carry it back together, brushing the dirt from its wooden feet before setting it against the cabin wall.
+      <br><br>
+      <<if $stat_shoot gte 1000>>
+        <<He>> runs a finger over the cluster of holes. "Good grouping. Don't start getting careless." <<He>> takes the lamp and waits for you by the door.
+      <<else>>
+        Eden taps the target. "Keep your shoulder steady. You're moving before the shot." <<He>> shows you the position again, without the gun this time.
+      <</if>>
+      <br><br>
+      <<if C.npc.Eden.love gte 150>>"Come on. Don't leave the lamp out here." <<He>> puts a hand on your back, steering you towards the door.<<else>>"That'll do. Inside." <<He>> keeps the gun tucked under <<his>> arm as <<he>> follows you.<</if>>
+    <<option 'CN'>>
+      伊甸打开枪膛检查过，才让你走向靶子。你们一起把靶子抬回来，拍掉木脚上的泥土，靠在小屋的墙边。
+      <br><br>
+      <<if $stat_shoot gte 1000>>
+        <<He>>用手指拂过聚在一起的弹孔。“打得不错。别因此大意。”<<He>>提起油灯，在门旁等你。
+      <<else>>
+        伊甸敲了敲靶子。“肩膀稳住。还没开枪，你就先动了。”<<He>>又示范了一次姿势，这回没有拿枪。
+      <</if>>
+      <br><br>
+      <<if C.npc.Eden.love gte 150>>“走吧。别把灯留在外面。”<<He>>把手搭在你的背上，带着你往门口走。<<else>>“行了。进去。”<<He>>把枪夹在胳膊下，跟在你身后。<</if>>
+  <</language>><<glove 'Eden'>><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Go inside', '进去'] 'Eden Cabin'>><<endevent>><</lanLink>>

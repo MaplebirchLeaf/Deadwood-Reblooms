@@ -9,7 +9,7 @@ interface BaileyState {
   finished: boolean;
   witnessed: boolean;
   discussed: boolean;
-  invitation: '' | 'interested' | 'declined';
+  invitation: '' | 'interested' | 'declined' | 'accepted' | 'paid' | 'failed' | 'closed';
   fight: CargoFight | null;
 }
 
@@ -62,6 +62,16 @@ export default class Bailey {
 
   public get atHome(): boolean {
     return Time.hour >= 7 && Time.hour < (this.defeated ? 21 : 10);
+  }
+
+  /** 办公室沿用原版当天拜访限制，战败后的住所沿用既有会面时段。 */
+  public get atDesk(): boolean {
+    return this.atHome && (this.defeated || (V.daily.baileyVisit >= 1 && V.daily.baileyVisit <= 3));
+  }
+
+  public get delivery() {
+    if (!this.available || !this.atDesk || !this.state.finished || this.state.invitation !== 'interested' || this.jobs.state.active) return;
+    return this.jobs.terms.jobs.find(item => item.id === 'bailey_delivery');
   }
 
   public get canNegotiate(): boolean {

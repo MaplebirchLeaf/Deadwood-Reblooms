@@ -12,6 +12,9 @@
   <<if _baileyWork?.available and _baileyWork.atHome>>
     <<if ($passage is "Bailey's Office" and _options is 1 and !_baileyWork.defeated) or ($passage is 'Flats' and _baileyWork.defeated and Array.isArray($link_table) and $link_table.some(entry => typeof entry === 'string' && entry.includes('|Barb Street]]')))>>
       <<deadwood-heist-aftermath-entry>>
+      <<if _baileyWork.atDesk and ['interested', 'accepted', 'failed'].includes(_baileyWork.state.invitation) and (!_baileyWork.jobs.state.active or _baileyWork.jobs.state.active.id is 'bailey_delivery')>>
+        <<icon 'street/tools-case.png'>><<lanLink ['Ask about the delivery', '问问运货的事'] 'Deadwood Street Bailey Delivery'>><<endevent>><</lanLink>><br>
+      <</if>>
       <<if _baileyWork.state.finished and (!_baileyWork.state.discussed or (!_baileyWork.state.invitation and ['negotiated', 'paid', 'fight'].includes(_baileyWork.state.resolution)))>>
         <<socialiseicon 'ask'>><<lanLink ['Speak to Bailey about the held delivery (0:05)', '和贝利谈谈那批被扣的货 (0:05)'] 'Deadwood Street Bailey'>>
           <<if _baileyWork.available and _baileyWork.atHome>>
@@ -334,17 +337,119 @@
         <</if>>
     <</language>><br><br>
     <<if !_baileyWork.state.invitation>>
-      <<socialiseicon 'ask'>><<lanLink ['Agree to hear the terms before deciding', '先听听条件'] 'Deadwood Street Bailey'>>
+      <<socialiseicon 'ask'>><<lanLink ['Agree to hear the terms before deciding', '先听听条件'] 'Deadwood Street Bailey Delivery'>>
         <<if _baileyWork.available and _baileyWork.atHome and _baileyWork.state.finished and !_baileyWork.state.invitation>><<set _baileyWork.state.invitation to 'interested'>><</if>>
       <</lanLink>><br>
       <<refuseicon>><<lanLink ['Decline further deliveries', '拒绝后续运送差事'] 'Deadwood Street Bailey'>>
         <<if _baileyWork.available and _baileyWork.atHome and _baileyWork.state.finished and !_baileyWork.state.invitation>><<set _baileyWork.state.invitation to 'declined'>><</if>>
       <</lanLink>><br>
     <<elseif _baileyWork.state.invitation is 'interested'>>
-      <<lanSwitch '"Then we will talk when there is something to discuss." Bailey puts the note aside. Nothing has been agreed beyond another conversation.' '“有事情可谈的时候，再谈。”贝利把单子搁在一旁。除了愿意再听一听，你们还没有约定别的事。'>><br><br>
+      <<socialiseicon 'ask'>><<lanLink ['Hear the terms', '听听条件'] 'Deadwood Street Bailey Delivery'>><</lanLink>><br>
     <<else>>
       <<lanSwitch 'Bailey folds the note. "Suit yourself." There is no further offer.' '贝利折起单子。“随你。”没有再提别的差事。'>><br><br>
     <</if>>
   <</if>>
 <</if>>
 <<getouticon>><<lanLink ['Leave', '离开'] `_baileyWork.home`>><<endevent>><</lanLink>><br>
+
+
+:: Deadwood Street Bailey Delivery
+<<set _baileyWork to maplebirch.get('StreetLife')?.bailey>>
+<<if !_baileyWork>><<getouticon>><<lanLink ['Leave', '离开'] 'Orphanage'>><</lanLink>><<exit>><</if>>
+<<set $location to _baileyWork.defeated ? 'flats' : 'home', $outside to 0>><<effects>><<npc 'Bailey'>><<person1>>
+<<if !_baileyWork.available or !_baileyWork.atDesk or !_baileyWork.state.finished>>
+  <<lanSwitch 'Bailey has no time to go through the delivery with you now.' '贝利现在没空和你核对运货的事。'>><br><br>
+<<elseif _baileyWork.state.invitation is 'interested' and _baileyWork.delivery>>
+  <<set _baileyOffer to _baileyWork.delivery, $StreetLife.jobs.offer to _baileyOffer.id>>
+  <<language>>
+    <<option 'EN'>>
+      Bailey unfolds a delivery note and turns it towards you. "A box of spare parts. Collect it from the loading door off Harvest Street, then take it to the docks. The addresses are there." A finger comes down beside the receiver's name. "Get that person to sign. Bring the copy back to me."<br><br>
+      <<if _baileyWork.peer>>
+        "One delivery. Do the work, take the money. Don't get ideas." <<He>> slides the note between you.
+      <<elseif _baileyWork.free>>
+        "You asked to hear the price. Here it is."
+      <<else>>
+        "This is work, not a reduction in your rent. Don't get them confused."
+      <</if>> "Lose the box, or leave it sitting around too long, and you get nothing. If you can't finish, take it back to the loading door."
+    <<option 'CN'>>
+      贝利展开一张送货单，转到你面前。“一箱替换零件。从丰收街旁的装卸门取货，送到码头。地址在上面。”<<He>>的手指落在收货人的名字旁。“找这个人签收，再把这联带回来给我。”<br><br>
+      <<if _baileyWork.peer>>
+        “就这一趟。做完拿钱，别想太多。”<<He>>把单子推到你们之间。
+      <<elseif _baileyWork.free>>
+        “你要听价钱。这就是。”
+      <<else>>
+        “这是做事拿钱，不是减房租。别搞混了。”
+      <</if>>“箱子丢了，或者拖得太久，一分钱也没有。送不了，就退回装卸门。”
+  <</language>><br><br>
+  <<lanSwitch 'Fee: ' '报酬：'>><<printmoney _baileyOffer.fee>><br>
+  <<lanSwitch 'Delivery deadline: ' '交货时限：'>><<= _baileyOffer.deadline_hours>> <<lanSwitch 'hours' '小时'>><br>
+  <span class='blue'><<lanSwitch 'The paperwork lists replacement parts. No grace period. Bring the signed receipt back to Bailey during visiting hours to be paid.' '单据注明货物是替换零件，交货没有宽限时间。完成后，在会面时间把签收凭据交给贝利领取报酬。'>></span><br><br>
+  <<icon 'street/tools-case.png'>><<lanLink ['Take the delivery note (0:05)', '拿上送货单 (0:05)'] 'Deadwood Street Bailey Delivery'>>
+    <<run _baileyWork.jobs.act('accept', 'bailey_delivery')>>
+  <</lanLink>><br>
+  <<refuseicon>><<lanLink ['Turn down the job', '不接这份差事'] 'Deadwood Street Bailey Delivery'>>
+    <<if _baileyWork.delivery>><<set _baileyWork.state.invitation to 'declined'>><</if>>
+  <</lanLink>><br>
+<<elseif _baileyWork.state.invitation is 'accepted' and _baileyWork.jobs.state.active?.id is 'bailey_delivery'>>
+  <<set _baileyJob to _baileyWork.jobs.state.active>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _baileyJob.stage is 'settlement'>>
+        Bailey holds your receipt flat against the desk and reads the signature. "They took it, then." <<He>> reaches for the delivery note to compare the two.
+      <<elseif _baileyWork.jobs.lost>>
+        "Where's the box?" Bailey asks. You explain what happened to the vehicle. <<His>> expression does not change. "That's not a signature."
+      <<elseif _baileyWork.jobs.expired>>
+        Bailey looks at the date on the delivery note. "Too late. Take it back if you've collected it."
+      <<else>>
+        Bailey glances at the delivery note. "The docks. Signed for. Then you come back here."
+      <</if>>
+    <<option 'CN'>>
+      <<if _baileyJob.stage is 'settlement'>>
+        贝利把签收凭据按在桌上，看过签名。“他们收下了。”<<He>>伸手拿过送货单，准备核对。
+      <<elseif _baileyWork.jobs.lost>>
+        “箱子呢？”贝利问。你解释了载货车辆的事。<<His>>脸色没有变化。“这可不是签名。”
+      <<elseif _baileyWork.jobs.expired>>
+        贝利看了眼送货单上的日期。“晚了。要是已经拿了货，就退回去。”
+      <<else>>
+        贝利瞥了眼送货单。“码头。签收。然后再回来。”
+      <</if>>
+  <</language>><br><br>
+  <<deadwood-street-job-status>>
+  <<if _baileyJob.stage is 'settlement'>>
+    <<icon 'street/job-payment.png'>><<lanLink ['Hand over the receipt (0:05)', '交回签收凭据 (0:05)'] 'Deadwood Street Bailey Delivery'>>
+      <<run _baileyWork.jobs.act('pay')>>
+    <</lanLink>><br>
+  <<elseif _baileyJob.stage is 'pickup' or _baileyWork.jobs.lost>>
+    <<refuseicon>><<lanLink ['Tell Bailey you cannot finish (0:05)', '告诉贝利无法完成 (0:05)'] 'Deadwood Street Bailey Delivery'>>
+      <<run _baileyWork.jobs.act('cancel')>>
+    <</lanLink>><br>
+  <</if>>
+<<elseif _baileyWork.state.invitation is 'paid'>>
+  <<language>>
+    <<option 'EN'>>
+      Bailey counts out <<printmoney _baileyWork.jobs.terms.jobs.find(item => item.id === 'bailey_delivery').fee>> and puts it beside your hand. "There." <<He>> files the receipt and returns to the figures on the page in front of <<him>>.
+    <<option 'CN'>>
+      贝利数出<<printmoney _baileyWork.jobs.terms.jobs.find(item => item.id === 'bailey_delivery').fee>>，放在你手边。“拿着。”<<He>>收起凭据，低头继续看自己的账目。
+  <</language>><br><br>
+<<elseif _baileyWork.state.invitation is 'failed'>>
+  <<language>>
+    <<option 'EN'>>
+      <<if _baileyWork.jobs.state.report?.id is 'bailey_delivery' and _baileyWork.jobs.state.report.outcome is 'returned'>>
+        "They told me the box came back." Bailey puts the delivery note aside. "I'll find someone else. You can go."
+      <<else>>
+        Bailey draws a line through your name on the delivery note. "I'll have to find someone else. Don't expect to be paid for it."
+      <</if>>
+    <<option 'CN'>>
+      <<if _baileyWork.jobs.state.report?.id is 'bailey_delivery' and _baileyWork.jobs.state.report.outcome is 'returned'>>
+        “他们说箱子退回来了。”贝利把送货单搁到一旁。“我会另找人。你走吧。”
+      <<else>>
+        贝利在送货单上划掉你的名字。“我得另找个人。别指望这样也能拿钱。”
+      <</if>>
+  <</language>><br><br>
+<<else>>
+  <<lanSwitch 'Bailey folds the delivery note. "Suit yourself."' '贝利折起送货单。“随你。”'>><br><br>
+<</if>>
+<<getouticon>><<lanLink ['Leave', '离开'] `_baileyWork.defeated ? 'Flats' : 'Orphanage'`>>
+  <<if _baileyWork.available and _baileyWork.atDesk and _baileyWork.state.invitation is 'failed'>><<set _baileyWork.state.invitation to 'closed'>><</if>>
+  <<endevent>>
+<</lanLink>><br>
