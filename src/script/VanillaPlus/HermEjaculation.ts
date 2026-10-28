@@ -5,7 +5,7 @@ const branch = /([ \t]*)<<(if|elseif)(\s+\$NPCList\[_nn\]\.vagina\s+isnot\s+["']
 
 const patch = (name: string) => ({
   srcmatch: branch,
-  to: `$1<!-- Herm ${name} -->\n$1<<$2 $NPCList[_nn].vagina isnot "none" and $NPCList[_nn].penis isnot "none">>\n\t<<deadwood-reblooms-ejaculation-herm>>\n$1<<elseif$3`,
+  to: `$1<!-- Herm ${name} -->\n$1<<$2 $NPCList[_nn].vagina isnot "none" and $NPCList[_nn].vagina isnot "clothed" and $NPCList[_nn].penis isnot "none">>\n\t<<deadwood-reblooms-ejaculation-herm>>\n$1<<elseif$3`,
   expected: 1
 });
 
