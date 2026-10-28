@@ -18,7 +18,26 @@ export default function ColdmoonHarbour(maplebirch: typeof window.maplebirch): v
   );
   maplebirch.tool.onInit(() => {
     setup.addlocation('deadwood_ghost_ship').parent('sea').location().inside().build();
-    maplebirch.tool.patch.location.configure('deadwood_ghost_ship', { customMapping: () => 'deadwood_coldmoon_harbour' });
+    maplebirch.tool.patch.location.configure(
+      'deadwood_ghost_ship',
+      {
+        folder: 'ghost-ship',
+        customMapping: () => 'deadwood_ghost_ship',
+        // 与囚禁剧情共用昼夜判断，地点图显示原版船形的潜航与浮航外观。
+        base: {
+          submerged: { condition: () => Weather.dayState !== 'night', image: 'base.png' },
+          surfaced: { condition: () => Weather.dayState === 'night', image: 'base-night.png' }
+        },
+        emissive: { image: 'emissive.png', condition: () => Weather.dayState === 'night', color: '#a5b9a2', size: 2, intensity: 0.35, blur: 0.2 },
+        weather: {
+          rainSplashEnabled: false,
+          fogEnabled: true,
+          fogDistributionCurve: 1,
+          groundBounds: { splashes: { top: 0, bottom: 0 }, fog: { top: 20, bottom: 0 } }
+        }
+      },
+      { overwrite: true }
+    );
     const originalMapping = setup.Locations.seadocks;
     const originalImage = Object.hasOwn(setup.LocationImages, 'seadocks') ? 'seadocks' : 'home';
     // 仅替换本组港湾页面的侧栏画面，保留原版地点与其他码头页面的映射。
