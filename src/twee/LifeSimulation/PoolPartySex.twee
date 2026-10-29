@@ -72,15 +72,15 @@
 :: Deadwood Reblooms Pool Party Together
 <<set $outside to 0>><<set $location to 'pool'>><<schooleffects>><<effects>>
 <<set _pool to maplebirch.get('LifeSimulation').pool_party>>
-<<set _name to $LifeSimulation.pool_party.selected>>
-<<if !_name or !_pool.canTogether(_name)>>
+<<set _poolPartner to $LifeSimulation.pool_party.selected>>
+<<if !_poolPartner or !_pool.canTogether(_poolPartner)>>
   <span class='blue'><i><<lanSwitch 'There is no one here with you.' '这里没有人和你在一起。'>></i></span>
-<<elseif !_pool.once('with:' + _name)>>
+<<elseif !_pool.once('with:' + _poolPartner)>>
   <span class='blue'><i><<lanSwitch 'You have already spent time together tonight.' '今晚已经一起待过了。'>></i></span>
 <<else>>
-  <<run statusCheck(_name)>>
-  <<set $pronoun to C.npc[_name].pronoun>>
-  <<switch _name>>
+  <<run statusCheck(_poolPartner)>>
+  <<set $pronoun to C.npc[_poolPartner].pronoun>>
+  <<switch _poolPartner>>
     <<case 'Robin'>>
       <<language>>
         <<option 'EN'>>
@@ -155,11 +155,11 @@
       <<npcincr Sydney purity -5>><<lspurity>>
   <</switch>>
   <br><br>
-  <<clearnpc>><<npc _name -1>><<person1>>
+  <<clearnpc>><<npc _poolPartner -1>><<person1>>
   <<consensual>><<set $consensual to 1>><<neutral 1>>
   <<set $enemyno to 1>><<set $enemynomax to 1>><<maninit>><<npcexpose>>
   <<set $enemytrust += 800>><<set $enemyarousalmax to 600>>
-  <<deadwood-reblooms-pool-party-witness together 'Deadwood Reblooms Pool Party Together Sex' _name>>
+  <<deadwood-reblooms-pool-party-witness together 'Deadwood Reblooms Pool Party Together Sex' _poolPartner>>
 <</if>>
 <br><br>
 <<if !$combat>>
