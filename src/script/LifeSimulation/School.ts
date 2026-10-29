@@ -85,7 +85,7 @@ export default function School(maplebirch: typeof window.maplebirch): void {
     }
   ];
 
-  // 合法着装只解除普通通行限制，暴露相关随机事件仍由原版结算。
+  // 普通导航与事件分流使用同一校规许可，不改写原版暴露值。
   const campusNavigationDress = {
     srcmatchgroup: /(?<=<<if !\["early", "late", "earlynoschool", "latenoschool", "daynoschool"\]\.includes\(\$schoolstate\) and )\$exposed gte 1(?=>>)/,
     applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
@@ -296,6 +296,12 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       Hallways: [
         { ...campusNavigationDress },
         { ...campusHidingDress },
+        // 校规许可时仍抽取普通走廊事件，不再进入以躲藏为前提的违规暴露事件池。
+        {
+          srcmatchgroup: /\$exposed gte 1(?=>>\s*<<eventsschoolhallwaysexposed>>)/,
+          applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
+          expected: 1
+        },
         // 职位免除强制留堂，仍可在原版留堂入口旁主动参加。
         {
           srcmatch: /<<if \$schoolstate is "afternoon"(?=[^\n]*\$pillory\.tenant\.special\.name)/,
@@ -362,6 +368,14 @@ export default function School(maplebirch: typeof window.maplebirch): void {
       ]
     },
     widgetPassage: {
+      'Widgets School Events': [
+        // 中庭的随机事件也须认可已生效校规，避免普通导航放行后又强制躲藏。
+        {
+          srcmatchgroup: /(?<=<<set _whitney to C\.npc\.Whitney>>\s*<<if )\$exposed gte 1(?=>>)/,
+          applyafter: ' and !maplebirch.get("LifeSimulation").school.allowsNudity',
+          expected: 1
+        }
+      ],
       'Widgets School': [
         {
           srcmatchgroup: /(?<=<<widget "schoolperiod">>\s*<<if )\$exposed lte 0(?=>>)/,

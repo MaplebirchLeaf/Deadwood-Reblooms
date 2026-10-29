@@ -42,6 +42,20 @@ export default function (maplebirch: typeof window.maplebirch) {
       ]
     },
     widgetPassage: {
+      Widgets: [
+        {
+          // 原版书桌先检查是否有课题选项，历史课题也须通过此开关才能显示入口。
+          src: '<<set _projectOptions to [$scienceproject, $mathsproject].includes("ongoing")>>',
+          applyafter: `
+	<<if $location is 'home' and $LifeSimulation.historyProject.status is 'ongoing'
+		and Time.days lt $LifeSimulation.historyProject.deadline
+		and $LifeSimulation.historyProject.draft is 0
+		and $LifeSimulation.historyProject.archive gt 0 and $LifeSimulation.historyProject.museum gt 0>>
+		<<set _projectOptions to true>>
+	<</if>>`,
+          expected: 1
+        }
+      ],
       'Widgets School Projects': [
         {
           src: '<<widget "projectoptions">>',

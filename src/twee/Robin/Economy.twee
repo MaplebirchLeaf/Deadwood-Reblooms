@@ -231,12 +231,15 @@
   <</if>>
 <</widget>>
 
-<<widget 'deadwood-robin-shop-main'>>
+<!-- 原版 updateclothingshop 按 $shopName + 'Shop-main' 调用商店主菜单。 -->
+<<widget 'deadwoodRobinShop-main'>>
   <<if $tryOn.autoReset isnot false>>
     <<tryOnReset>>
   <</if>>
   <<unset $tempDisable>>
   <<set $shopName to 'deadwoodRobin'>><<unset $shopListStartCount>><<unset $clothes_choice>><<set $shopPage to 0>>
+  <div id='tryonstats-div'><<tryOnStats>></div>
+  <div id='warmth-description' class='hidden'><<warmthscale>><<warmth_description>></div>
   <<HandheldShop>>
   <<run linkifyDivs('.button-back-to-shop')>>
 <</widget>>
@@ -1318,14 +1321,12 @@
 <<if $RobinExpansion.shop and $RobinExpansion.shop_balloons and Time.hour gte 9 and Time.hour lt 21 and Time.dayState isnot 'night'>>
   <<run setup.clothes.handheld.filter(item => item.shop.includes('stall')).forEach(item => item.shop.pushUnique('deadwoodRobin'))>>
   <<lanSwitch 'The balloon seller supplies this shelf. Robin leaves the original tags on the balloons and small handheld toys so you can choose their colours.' '这些气球由海滩摊主供货。罗宾保留了气球与手持玩具的原标签，方便你挑选颜色。'>>
-  <div id='tryonstats-div'><<tryOnStats>></div>
-  <div id='warmth-description' class='hidden'><<warmthscale>><<warmth_description>></div>
-  <div id='clothingShop-div' class='main-shop-div'><<deadwood-robin-shop-main>></div>
+  <div id='clothingShop-div' class='main-shop-div'><<deadwoodRobinShop-main>></div>
 <<else>>
   <<lanSwitch 'The balloon shelf is unavailable.' '现在无法挑选气球。'>>
 <</if>>
 <br><br>
-<<getouticon>><<lanLink ['Back to the other goods', '返回其他商品'] 'Deadwood Robin Shop Other Goods'>><<shopClothingFilterReset>><<set $tryOn.autoReset to true>><</lanLink>>
+<<getouticon>><<lanLink ['Back to the other goods', '返回其他商品'] 'Deadwood Robin Shop Other Goods'>><<if $tryOn.autoReset is false>><<clothingReset>><</if>><<shopClothingFilterReset>><<set $tryOn.autoReset to true>><</lanLink>>
 
 :: Deadwood Robin Shop Staff
 <<set $outside to 0>><<set $location to 'deadwood_robin_shop'>><<effects>><<npc Robin>><<person1>>
