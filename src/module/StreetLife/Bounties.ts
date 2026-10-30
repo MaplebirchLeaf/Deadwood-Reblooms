@@ -181,7 +181,7 @@ export default class Bounties {
       this.inCombat &&
       !V.nextPassage &&
       !V.nextPassageCheck &&
-      (V.enemyhealth <= 0 || V.enemyarousal >= V.enemyarousalmax || (V.alarm === 1 && V.rescue >= 1) || V.finish === 1 || (V.pain >= 100 && V.willpowerpain === 0))
+      (V.enemyhealth <= 0 || this.street.core.combat.climax || (V.alarm === 1 && V.rescue >= 1) || V.finish === 1 || (V.pain >= 100 && V.willpowerpain === 0))
     );
   }
 
@@ -316,8 +316,8 @@ export default class Bounties {
       const cargo = this.fightingCargo;
       const heist = this.fightingHeist;
       const won = V.enemyhealth <= 0;
-      const escaped = won || (!(V.pain >= 100 && V.willpowerpain === 0) && (V.enemyarousal >= V.enemyarousalmax || (V.alarm === 1 && V.rescue >= 1) || V.finish === 1));
-      if (V.enemyarousal >= V.enemyarousalmax) wiki('<<ejaculation "short">>');
+      const escaped = won || (!(V.pain >= 100 && V.willpowerpain === 0) && (this.street.core.combat.climax || (V.alarm === 1 && V.rescue >= 1) || V.finish === 1));
+      if (this.street.core.combat.climax) wiki('<<ejaculation "short">>');
       wiki(`<<saveNPC 0 '${fight.key}'>><<clotheson>><<endcombat>>`);
       fight.combatStarted = false;
       if (heist) {

@@ -106,7 +106,7 @@ export default class RobinRent extends Shared {
   public combatFinish(): void {
     if (!this.state.rebellion || this.state.fight_resolution_day === Time.days) return;
     this.state.fight_resolution_day = Time.days;
-    if (V.enemyhealth <= 0 || V.enemyarousal >= V.enemyarousalmax) {
+    if (V.enemyhealth <= 0 || this.core.combat.climax) {
       this.state.victories++;
       return;
     }

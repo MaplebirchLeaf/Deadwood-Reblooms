@@ -1,7 +1,5 @@
 // ./src/script/BirdTower.ts
 
-import type { MacroContext, MacroDefinition } from 'twine-sugarcube';
-
 /** 原版段落只注入短 widget 调用，玩法逻辑由高塔模块处理。 */
 export default function BirdTowerScript(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.patch.traits.add({
@@ -166,17 +164,16 @@ export default function BirdTowerScript(maplebirch: typeof window.maplebirch): v
     }
   });
 
-  // 玩法成就由框架初始化。
-  maplebirch.tool.onInit(() => {
-    const original = maplebirch.SugarCube.Macro.get('updateChildActivity') as MacroDefinition | undefined;
-    if (original) {
-      // 鹰崽使用扩展活动，其它孩子仍由原版宏处理。
-      maplebirch.tool.macro.define('updateChildActivity', function (childId: number) {
-        const bird = maplebirch.get('BirdTower');
-        const child = V.childRecords[childId];
-        if (!bird || child?.species !== 'hawk' || !childIsBorn(child)) return original.handler.call(this as unknown as MacroContext);
-        bird.activity(childId);
-      });
-    }
-  });
+  // 鹰崽使用扩展活动，其它孩子仍由原版宏处理。
+  maplebirch.tool.macro.wrap(
+    'updateChildActivity',
+    function (next) {
+      const childId = this.args[0];
+      const bird = maplebirch.get('BirdTower');
+      const child = V.childRecords[childId];
+      if (!bird || child?.species !== 'hawk' || !childIsBorn(child)) return next();
+      bird.activity(childId);
+    },
+    'storyinit'
+  );
 }

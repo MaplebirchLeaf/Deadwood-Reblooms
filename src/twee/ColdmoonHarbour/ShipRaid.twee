@@ -130,14 +130,14 @@
 <!-- 仅由战斗的结束链接调用。先保存结果，原版 endcombat 自行清理事件。 -->
 <<widget 'deadwood-pirate-raid-end'>>
   <<set _shipRaid to $MoreTransformations?.harbour?.raid>>
-  <<if _shipRaid?.stage is 'fight' and $combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead' and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck and (Weather.dayState isnot 'night' or $enemyhealth lte 0 or $enemyarousal gte $enemyarousalmax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0))>>
-    <<set _shipRaid.outcome to $enemyhealth lte 0 ? 'fight_won' : Weather.dayState isnot 'night' ? 'dawn' : $pain gte 100 and $willpowerpain is 0 and $enemyarousal lt $enemyarousalmax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 ? 'fight_lost' : 'escaped', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
+  <<if _shipRaid?.stage is 'fight' and $combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead' and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck and (Weather.dayState isnot 'night' or $enemyhealth lte 0 or maplebirch.combat.climax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0))>>
+    <<set _shipRaid.outcome to $enemyhealth lte 0 ? 'fight_won' : Weather.dayState isnot 'night' ? 'dawn' : $pain gte 100 and $willpowerpain is 0 and !maplebirch.combat.climax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 ? 'fight_lost' : 'escaped', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
     <<if _shipRaid.outcome is 'fight_won'>>
       <<set _shipRaid.victories += 1>><<pirate_status 3>><<npcincr Zephyr love 1>><<sanity 10>><<psyche-rest 0 150>>
     <<elseif _shipRaid.outcome is 'escaped'>>
       <<psyche-rest 0 100>>
     <</if>>
-    <<if $enemyarousal gte $enemyarousalmax>><<ejaculation 'short'>><</if>>
+    <<if maplebirch.combat.climax>><<ejaculation 'short'>><</if>>
     <<clotheson>><<endcombat>>
   <</if>>
 <</widget>>
@@ -223,7 +223,7 @@
     <</language>><br><br>
   <</if>>
   <<endevent>><<generateNPC 1 'a'>>
-  <<set $finish to 0, $consensual to 0, $NPCList[0].per to 'deadwood_ship_undead', $NPCList[0].skincolour to 'ghost', $NPCList[0].health to _shipRaid.approach is 'blood' ? 360 : 300, $NPCList[0].healthmax to $NPCList[0].health, $NPCList[0].role to lanSwitch('undead pirate', '亡灵海盗'), $NPCList[0].fullDescription to lanSwitch('undead pirate', '亡灵海盗')>>
+  <<set $finish to 0, $consensual to 0, $NPCList[0].per to 'deadwood_ship_undead', $NPCList[0].skincolour to 'ghost', $NPCList[0].monster to 'monster', $NPCList[0].health to _shipRaid.approach is 'blood' ? 360 : 300, $NPCList[0].healthmax to $NPCList[0].health, $NPCList[0].role to lanSwitch('undead pirate', '亡灵海盗'), $NPCList[0].fullDescription to lanSwitch('undead pirate', '亡灵海盗')>>
   <<npcClothesType $NPCList[0] 'docker2'>>
   <<person1>><<neutral 1>><<maninit>><<npcidlegenitals>>
   <<set $enemytrust to -30, $enemyanger to 40, $enemystrength to _shipRaid.approach is 'blood' ? 20000 : 18000, _shipRaid.stage to 'fight'>>
@@ -239,7 +239,7 @@
   <</if>>
   <<if $nextPassage or $nextPassageCheck>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Pirate Raid Fight'>><</lanLink>></span><<nexttext>>
-  <<elseif _combatend or Weather.dayState isnot 'night' or $enemyhealth lte 0 or $enemyarousal gte $enemyarousalmax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0)>>
+  <<elseif _combatend or Weather.dayState isnot 'night' or $enemyhealth lte 0 or maplebirch.combat.climax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0)>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Pirate Raid Finish'>><<deadwood-pirate-raid-end>><</lanLink>></span><<nexttext>>
   <<else>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Pirate Raid Fight'>><</lanLink>></span><<nexttext>>

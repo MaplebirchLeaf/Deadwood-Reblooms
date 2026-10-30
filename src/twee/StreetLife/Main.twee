@@ -231,7 +231,7 @@
       <<lanSwitch 'You slash at your attacker with your machete.' '你挥动砍刀，劈向袭击者。'>><<defiance $_streetWeapon.streetMelee $_streetTarget>><<attackstat>>
     <<case 'street_stunner'>>
       <<lanSwitch 'You press the stun device against your attacker.' '你把电击器抵向袭击者。'>>
-      <<set _thedamage to Math.min(6, $enemyno gte 2 ? $NPCList[$_streetTarget].health : $enemyhealth)>>
+      <<set _thedamage to Math.min(maplebirch.combat.companions.damage(6), $enemyno gte 2 ? $NPCList[$_streetTarget].health : $enemyhealth)>>
       <<if $enemyno gte 2>><<npcdamage $_streetTarget>><</if>>
       <<set $enemyhealth -= _thedamage>><<set $enemyanger += 5>><<attackstat>>
     <<case 'street_handgun' 'street_shotgun' 'street_smg' 'street_rifle'>>
@@ -247,11 +247,13 @@
       <<set $_streetHealthMax to $enemyno gte 2 ? $NPCList[$_streetTarget].healthmax : $enemyhealthmax>>
       <!-- 练枪统计达到 1000 时熟练，伤害系数保持 60%–100%，疼痛最多扣 10 个百分点。 -->
       <<set _streetAim to Math.clamp(0.6 + Math.clamp($stat_shoot / 1000, 0, 1) * 0.4 - Math.clamp($pain / 100, 0, 1) * 0.1, 0.6, 1)>>
-      <<set _thedamage to Math.min(($_streetFirearm.damage + $_streetHealthMax * $_streetFirearm.damage_percent / 100) * $_streetShots * _streetAim, $enemyno gte 2 ? $NPCList[$_streetTarget].health : $enemyhealth)>>
+      <<set _thedamage to Math.min(maplebirch.combat.companions.damage(($_streetFirearm.damage + $_streetHealthMax * $_streetFirearm.damage_percent / 100) * $_streetShots * _streetAim), $enemyno gte 2 ? $NPCList[$_streetTarget].health : $enemyhealth)>>
       <<if $enemyno gte 2>><<npcdamage $_streetTarget>><</if>>
       <<set $enemyhealth -= _thedamage, $enemyanger += 30>><<attackstat>>
       <<set $NPCList[$_streetTarget].deadwoodGunshot to true>>
-      <<if !($NPCList[$_streetTarget].per is 'deadwood_ship_undead' and $location is 'pirate_ship' and $MoreTransformations?.harbour?.raid?.stage is 'fight') and !($NPCList[$_streetTarget].per is 'deadwood_coin_guard' and $location is 'island' and $MoreTransformations?.treasure?.guardian is 'fight')>>
+      <<if !($NPCList[$_streetTarget].per is 'deadwood_ship_undead' and $location is 'pirate_ship' and $MoreTransformations?.harbour?.raid?.stage is 'fight')
+          and !($NPCList[$_streetTarget].per is 'deadwood_harbour_ghost' and $location is 'sea' and $sublocation is 'seadocks' and $MoreTransformations?.harbour?.fighting and Time.isBloodMoon())
+          and !($NPCList[$_streetTarget].per is 'deadwood_coin_guard' and $location is 'island' and $MoreTransformations?.treasure?.guardian is 'fight')>>
         <<crimeUp $_streetFirearm.crime 'assault'>>
       <</if>>
   <</switch>><br>

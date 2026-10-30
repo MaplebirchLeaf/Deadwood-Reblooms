@@ -376,6 +376,14 @@ export default function School(maplebirch: typeof window.maplebirch): void {
           expected: 1
         }
       ],
+      'Widgets Events Maths': [
+        {
+          // 裸身无下装可拉，获准裸露时也不抽取以缺少内裤为由处罚的分支。
+          srcmatch: /<<addinlineevent "mathsLowerLiftTease">>[\s\S]*?<<\/addinlineevent>>/,
+          to: '<<if !$worn.lower.type.includes("naked") and (!$worn.under_lower.type.includes("naked") or !maplebirch.get("LifeSimulation").school.allowsNudity)>>$&<</if>>',
+          expected: 1
+        }
+      ],
       'Widgets School': [
         {
           srcmatchgroup: /(?<=<<widget "schoolperiod">>\s*<<if )\$exposed lte 0(?=>>)/,

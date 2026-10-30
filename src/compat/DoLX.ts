@@ -18,6 +18,9 @@ export default function DoLX(maplebirch: MaplebirchCore): void {
     adaptPassages(maplebirch);
     adaptTrinity(maplebirch);
     adaptBike(maplebirch);
+    // DoLX 将兴奋与高潮进度分开，延长遭遇只重置高潮进度。
+    const longerCombat = maplebirch.get('LongerCombat');
+    if (longerCombat) longerCombat.climaxStat = 'enemypleasure';
     const zone = maplebirch.tool.zone;
     // DoLX 在作弊按钮外又包了一层相同判断，两处都需解除，保留跳舞、战斗和起始页限制。
     if (zone.locationPassage.StoryCaption) {

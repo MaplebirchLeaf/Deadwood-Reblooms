@@ -21,8 +21,10 @@ export default function Sydney(maplebirch: MaplebirchCore): void {
         for (const [part, level] of Object.entries(config.parts)) nnpc[`${part}_type`] = visible && state.level >= level ? 'default' : 'disabled';
         if (form === 'fallen' && visible && state.level >= 3) nnpc.fallen_wings_type = 'fallenplus';
         if (form !== 'demon' || !visible) return;
+        const colour = window.Transformations?.defaults?.demon.colour;
+        if (!colour) return;
         const filter = {
-          blend: ColourUtils.toHslString(window.Transformations.defaults.demon.colour),
+          blend: ColourUtils.toHslString(colour),
           blendMode: 'hard-light',
           brightness: 0,
           contrast: 1,
@@ -54,51 +56,42 @@ export default function Sydney(maplebirch: MaplebirchCore): void {
     }
   });
 
-  maplebirch.once(':storyready', () => {
-    const macros = maplebirch.SugarCube.Macro;
-    for (const name of ['takeNPCVirginity', 'combatInseminate', 'npcPregnancyRoll'] as const) {
-      const original = macros.get(name);
-      if (!original) continue;
-      macros.delete(name);
-      macros.add(name, {
-        ...original,
-        handler(this: MacroContext) {
-          if (name === 'takeNPCVirginity') {
-            const npcName = typeof this.args[0] === 'string' ? this.args[0] : V.NPCList[this.args[0]]?.fullDescription;
-            if (npcName !== 'Sydney') return original.handler.call(this);
-            const vow = C.npc.Sydney?.virginity.temple === true;
-            const result = original.handler.call(this);
-            // 原版先判断誓约对象、梦境与身体部位，形态迁移只读取它结算后的悉尼本人状态。
-            maplebirch.SugarCube.Wikifier.wikifyEval(`<<deadwood-sydney-fall ${vow}>>`);
-            return result;
-          }
-          if (V.consensual !== 1) return original.handler.call(this);
-          const npc = name === 'combatInseminate' ? V.NPCList[this.args[0]] : undefined;
-          const applies =
-            name === 'combatInseminate'
-              ? npc?.fullDescription === 'Sydney' && ['vagina', 'vaginadouble', 'anus', 'anusdouble'].includes(npc.penis)
-              : this.args[0] === 'Sydney' && this.args[2] === 'pc' && (this.args[5] ?? 'deep') === 'deep';
-          if (!applies || !maplebirch.get('NPCTransformations') || !V.settings.transformDivineEnabled || V.statFreeze || V.replayScene || C.npc.Sydney?.init !== 1 || C.npc.Sydney.state !== 'active')
-            return original.handler.call(this);
-          const demon = maplebirch.npc.Transformation.get('Sydney', 'demon');
-          if (demon.level < 6 || demon.build < 90) return original.handler.call(this);
-          // 临时复用双方自愿场景的原版标记。防护、开关及受孕资格仍由原处理器判断。
-          const variables = name === 'combatInseminate' ? V : T;
-          const overrides = name === 'combatInseminate' ? { vaginaaction: 'forceImpregnation', anusaction: 'forceImpregnation' } : { npcForceImpregnation: true };
-          const previous = Object.keys(overrides).map(key => [key, Object.getOwnPropertyDescriptor(variables, key)] as const);
-          try {
-            Object.assign(variables, overrides);
-            return original.handler.call(this);
-          } finally {
-            for (const [key, descriptor] of previous) {
-              if (descriptor) Object.defineProperty(variables, key, descriptor);
-              else delete variables[key];
-            }
-          }
+  for (const name of ['takeNPCVirginity', 'combatInseminate', 'npcPregnancyRoll'] as const) {
+    maplebirch.tool.macro.wrap(name, function (this: MacroContext, next) {
+      if (name === 'takeNPCVirginity') {
+        const npcName = typeof this.args[0] === 'string' ? this.args[0] : V.NPCList[this.args[0]]?.fullDescription;
+        if (npcName !== 'Sydney') return next();
+        const vow = C.npc.Sydney?.virginity.temple === true;
+        const result = next();
+        // 原版先判断誓约对象、梦境与身体部位，形态迁移只读取它结算后的悉尼本人状态。
+        maplebirch.SugarCube.Wikifier.wikifyEval(`<<deadwood-sydney-fall ${vow}>>`);
+        return result;
+      }
+      if (V.consensual !== 1) return next();
+      const npc = name === 'combatInseminate' ? V.NPCList[this.args[0]] : undefined;
+      const applies =
+        name === 'combatInseminate'
+          ? npc?.fullDescription === 'Sydney' && ['vagina', 'vaginadouble', 'anus', 'anusdouble'].includes(npc.penis)
+          : this.args[0] === 'Sydney' && this.args[2] === 'pc' && (this.args[5] ?? 'deep') === 'deep';
+      if (!applies || !maplebirch.get('NPCTransformations') || !V.settings.transformDivineEnabled || V.statFreeze || V.replayScene || C.npc.Sydney?.init !== 1 || C.npc.Sydney.state !== 'active')
+        return next();
+      const demon = maplebirch.npc.Transformation.get('Sydney', 'demon');
+      if (demon.level < 6 || demon.build < 90) return next();
+      // 临时复用双方自愿场景的原版标记。防护、开关及受孕资格仍由原处理器判断。
+      const variables = name === 'combatInseminate' ? V : T;
+      const overrides = name === 'combatInseminate' ? { vaginaaction: 'forceImpregnation', anusaction: 'forceImpregnation' } : { npcForceImpregnation: true };
+      const previous = Object.keys(overrides).map(key => [key, Object.getOwnPropertyDescriptor(variables, key)] as const);
+      try {
+        Object.assign(variables, overrides);
+        return next();
+      } finally {
+        for (const [key, descriptor] of previous) {
+          if (descriptor) Object.defineProperty(variables, key, descriptor);
+          else delete variables[key];
         }
-      });
-    }
-  });
+      }
+    });
+  }
 
   maplebirch.dynamic.regTimeEvent('onDay', 'sydney-divine', {
     exact: true,

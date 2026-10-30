@@ -1368,7 +1368,7 @@
   <<set $enemyanger to 200>>
   <<set $timer to 1>>
 <</if>>
-<<if $timer is 1>>
+<<if $enemyhealth gt 0 and $timer is 1>>
   <<language>>
     <<option 'EN'>>
       <span class="blue">You see <<babyhawks>> screech and pounce onto the <<beasttype>>.</span>
@@ -1376,8 +1376,8 @@
       <span class="blue">你看到<<babyhawks>>尖啸着扑到<<beasttype>>的身上。</span>
   <</language>>
   <br><br>
-  <<set $enemyhealth -= maplebirch.get('BirdTower').party.length*10>>
-<<else>>
+  <<if maplebirch.get('BirdTower').huntAssist()>><<set $enemyhealth -= maplebirch.get('BirdTower').party.length*10>><</if>>
+<<elseif $enemyhealth gt 0>>
   <<set _rng to random(0, maplebirch.get('BirdTower').party.length-1)>>
   <<switch random(1,4)>>
     <<case 1>>
@@ -1433,16 +1433,19 @@
       <</language>>
   <</switch>>
   <br><br>
-  <<set $enemyhealth -= maplebirch.get('BirdTower').party.length*20>>
+  <<if maplebirch.get('BirdTower').huntAssist()>><<set $enemyhealth -= maplebirch.get('BirdTower').party.length*20>><</if>>
   <<set $enemytrust to -100>>
   <<set $enemyanger to 200>>
 <</if>>
 <<effects>>
 <<effectsman>>
-<<if $NPCList[0].type.includes("fox")>>
-  <<alarmstate lanSwitch("<span class=\"red\"><<bHe>> shrieks directly at you, drowning out your own scream.</span>","<span class=\"red\"><<bHe>>直接冲着你发出尖叫，将你的尖叫声淹没。</span>")>>
+<!-- 同伴或本回合的动作已击退对手时，不再执行敌方动作。 -->
+<<if $enemyhealth gt 0>>
+  <<if $NPCList[0].type.includes("fox")>>
+    <<alarmstate lanSwitch("<span class=\"red\"><<bHe>> shrieks directly at you, drowning out your own scream.</span>","<span class=\"red\"><<bHe>>直接冲着你发出尖叫，将你的尖叫声淹没。</span>")>>
+  <</if>>
+  <<beast $enemyno>>
 <</if>>
-<<beast $enemyno>>
 <br>
 <<stateman>>
 <br><br>
@@ -1455,7 +1458,7 @@
 
 :: Deadwood BirdTower Hunt Underbrush Fight Finish
 <<effects>>
-<<if $enemyarousal gte $enemyarousalmax>>
+<<if maplebirch.combat.climax>>
   <<beastejaculation>>
   <<language>>
     <<option 'EN'>>

@@ -1,27 +1,9 @@
 :: Deadwood Reblooms Feat Boost Widgets [widget]
 
-<!-- 在原版列表生成前补入六项特质。重开菜单保留选购，导入或重置成就后沿用原版的新预算。 -->
-<<widget 'deadwood-feat-boosts'>>
+<!-- 只在原版新周目加成结算中取得特质，菜单购买与退款不改变当前角色。 -->
+<<widget 'deadwood-feat-boost-apply'>>
   <<silently>>
-    <<for $_boost range maplebirch.get('VanillaPlus').boosts>>
-      <<set $_key to 'deadwood-' + $_boost.attribute>>
-      <<set $_earned to $feats.allSaves[$_boost.feat] isnot undefined>>
-      <<set $featsBoosts.upgrades[$_key] ??= 0>>
-      <<set $featsBoosts.upgradeDetails[$_key] ??= { cost: $_boost.cost, max: $_earned ? 1 : 0, purchased: 0 }>>
-      <<set $featsBoosts.name[$_key] to $_earned ? maplebirch.t('deadwood-reblooms:VanillaPlus:traits:' + $_boost.attribute + ':name') : '?????'>>
-      <<set $featsBoosts.missing[$_key] to lanSwitch('Unlock this boost by obtaining the “{feat}” feat.', '获得“{feat}”成就后解锁这项加成。').replace('{feat}', setup.feats[$_boost.feat].title)>>
-    <</for>>
-  <</silently>>
-<</widget>>
-
-<!-- 直接取得对应特质和突破标记。属性成长与特质自身的保底效果继续使用现有结算。 -->
-<<widget 'deadwood-feat-boosts-apply'>>
-  <<silently>>
-    <<for $_boost range maplebirch.get('VanillaPlus').boosts>>
-      <<if $featsBoosts.upgrades['deadwood-' + $_boost.attribute] is $_boost.cost and $feats.allSaves[$_boost.feat] isnot undefined>>
-        <<set $VanillaPlus.lock[$_boost.attribute] to true>>
-        <<set $VanillaPlus.traits[$_boost.attribute] to true>>
-      <</if>>
-    <</for>>
+    <<set $VanillaPlus.lock[_args[0]] to true>>
+    <<set $VanillaPlus.traits[_args[0]] to true>>
   <</silently>>
 <</widget>>

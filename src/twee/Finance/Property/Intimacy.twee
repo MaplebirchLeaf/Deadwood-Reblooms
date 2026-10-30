@@ -286,7 +286,7 @@
 <<run _estate.enter(_place is 'bath' ? 'bathroom' : _place)>><<set $outside to _estate.intimacyOutside(_place) ? 1 : 0>><<effects>>
 <<if _partner and $combat is 1>>
   <<person1>>
-  <<if _partner.id is 'Sydney' and $enemyarousal gte $enemyarousalmax>>
+  <<if _partner.id is 'Sydney' and maplebirch.combat.climax>>
     <<person1>><<run statusCheck('Sydney')>>
     <<ejaculation>>
     <<if _sydneyChastity and $sydneyChastityKnown>>
@@ -301,7 +301,7 @@
     <<elseif _place is 'bath'>><<lanSwitch 'Sydney stays where <<he>> is until your breathing settles, letting the water run over the both of you.' '悉尼没有动，任水从你们两人身上漫过，直到你的呼吸平复。'>>
     <<elseif _place is 'cinema'>><<lanSwitch 'Sydney stays curled against you on the deep cinema sofa, breathing softly against your shoulder as the screen fades to black.' '悉尼蜷在深陷的放映室沙发里依偎着你，屏幕彻底暗去，<<he>>枕着你的肩膀轻声喘息，迟迟没有松手。'>>
     <<else>><<lanSwitch 'Sydney stays beside you and pulls the blanket back over the bed.' '悉尼仍挨着你，把毯子重新拉好。'>><</if>>
-  <<elseif $enemyarousal lt $enemyarousalmax and $enemyhealth gt 0>>
+  <<elseif !maplebirch.combat.climax and $enemyhealth gt 0>>
     <<if _partner.id is 'Sydney'>>
       <<run statusCheck('Sydney')>>
       <<if _sydneyStatus.includes('corrupt')>>
@@ -324,11 +324,11 @@
       <<lanSwitch 'You stop and give your lover some room.' '你停下来，给恋人留出一些空间。'>>
     <</if>>
   <<else>>
-    <<if $enemyarousal gte $enemyarousalmax>>
+    <<if maplebirch.combat.climax>>
       <<ejaculation>>
       <<npcincr _partner.id lust -20>><<lllust _partner.id>><br>
     <</if>>
-      <<if $enemyhealth lte 0 and $enemyarousal lt $enemyarousalmax>>
+      <<if $enemyhealth lte 0 and !maplebirch.combat.climax>>
         <<npcincr _partner.id love -1>><<llove _partner.id>>
         <<language>>
           <<option 'EN'>>

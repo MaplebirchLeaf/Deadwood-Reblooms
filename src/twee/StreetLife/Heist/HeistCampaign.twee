@@ -75,7 +75,7 @@
   <<if $passage isnot 'Deadwood Street Campaign Fight'>><<exit>><</if>>
   <<if $nextPassage or $nextPassageCheck>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>>
-  <<elseif !$possessed and (_combatend or $enemyhealth lte 0 or $enemyarousal gte $enemyarousalmax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0))>>
+  <<elseif !$possessed and (_combatend or $enemyhealth lte 0 or maplebirch.combat.climax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0))>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight Finish'>><</lanLink>></span><<nexttext>>
   <<else>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>>
@@ -96,11 +96,11 @@
   <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>><<exit>>
 <</if>>
 <<if !_campaign_fight.result and _campaign_fight.combat_started and $combat is 1 and _campaign_fight.keys.every((key, index) => $NPCList[index]?.per === key)>>
-  <<if $enemyhealth gt 0 and $enemyarousal lt $enemyarousalmax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 and !($pain gte 100 and $willpowerpain is 0)>>
+  <<if $enemyhealth gt 0 and !maplebirch.combat.climax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 and !($pain gte 100 and $willpowerpain is 0)>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>><<exit>>
   <</if>>
   <<set _campaign_fight.result to $enemyhealth lte 0 ? 'won' : 'lost', _campaign_fight.combat_started to false>>
-  <<if $enemyarousal gte $enemyarousalmax>><<ejaculation 'short'>><</if>>
+  <<if maplebirch.combat.climax>><<ejaculation 'short'>><</if>>
   <<clotheson>><<endcombat>><<deadwood-heist-fight-clear>>
 <</if>>
 <<if _campaign_fight.result>>

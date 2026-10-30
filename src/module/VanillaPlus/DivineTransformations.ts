@@ -109,7 +109,8 @@ class DivineTransformations {
   }
 
   public canExpunge(encounter: DivineEncounter): boolean {
-    if (!this.fallenAngel || V.combat !== 1 || this.state?.expungeUsed || V.mouthuse) return false;
+    if (!this.fallenAngel || V.combat !== 1 || this.state?.expungeUsed || V.mouthuse || V.replayScene || V.statFreeze || V.frozenValues || V.possessed || V.nextPassage || V.nextPassageCheck)
+      return false;
     if (encounter === 'Default') return V.enemytype !== 'man' && Number(V.enemyhealth) > 0;
     if (encounter === 'Struggle') return this.struggleEnemies.some(enemy => Number(enemy.health) > 0 && Number(enemy.satisfied) < 1);
     return this.tentacles.some(tentacle => Number(tentacle.tentaclehealth) > 0 && tentacle.shaft !== 'finished');

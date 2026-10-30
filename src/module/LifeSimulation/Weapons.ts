@@ -35,6 +35,12 @@ export default class Weapons {
     // 混合遭遇沿用原版每只手的目标分类，选中本体时不能攻击旁边的触手。
     return (
       V.combat === 1 &&
+      !V.replayScene &&
+      !V.statFreeze &&
+      !V.frozenValues &&
+      !V.possessed &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
       (V.enemytype === 'tentacles' || (V.abomination === 1 && ['man', 'plant'].includes(V.enemytype))) &&
       V[`${hand}target`] === 'tentacles' &&
       !V.vorecreature &&

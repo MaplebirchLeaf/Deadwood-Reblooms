@@ -3,7 +3,6 @@
 import OrchardView from './Orchard/View';
 import Remy from './Orchard/Remy';
 import { species, type OrchardSpecies } from '../module/Orchard/Species';
-import type { MacroDefinition } from 'twine-sugarcube';
 
 export default function Orchard(maplebirch: typeof window.maplebirch): void {
   Remy(maplebirch);
@@ -91,32 +90,25 @@ export default function Orchard(maplebirch: typeof window.maplebirch): void {
     }
   });
 
-  maplebirch.once(':storyready', () => {
-    // 保留原版宏的参数、输出和逻辑，只在采摘成功或花园取得酸橙后检查种源。
-    for (const name of ['tending_pick', 'wearProp'] as const) {
-      const original = maplebirch.SugarCube.Macro.get(name) as MacroDefinition | undefined;
-      if (!original) continue;
-      maplebirch.tool.macro.define(
-        name,
-        function (this: any, type: string) {
-          const before = V.foodstuff[type]?.amount ?? 0;
-          original.handler.call(this);
-          const orchard = maplebirch.get('Orchard');
-          if (!orchard || typeof type !== 'string') return;
-          const source = name === 'tending_pick' ? 'pick' : 'garden';
-          if (source === 'pick' ? (V.foodstuff[type]?.amount ?? 0) <= before : type !== 'lime' || !maplebirch.passage.title.startsWith('Temple Garden')) return;
-          if (!orchard.discover(type, source)) return;
-          const data = species[type as OrchardSpecies];
-          const text = document.createElement('span');
-          text.className = 'gold';
-          text.textContent = lanSwitch(` You save some ${data.name[0].toLowerCase()} seeds for the orchard.`, ` 你留下了一些${data.name[1]}种子，可以带去果园播种。`);
-          this.output.append(text);
-        },
-        original.tags,
-        original.skipArgs
-      );
-    }
-  });
+  // 保留原版宏的参数、输出和逻辑，只在采摘成功或花园取得酸橙后检查种源。
+  for (const name of ['tending_pick', 'wearProp'] as const) {
+    maplebirch.tool.macro.wrap(name, function (next) {
+      const type = this.args[0];
+      const before = V.foodstuff[type]?.amount ?? 0;
+      const result = next();
+      const orchard = maplebirch.get('Orchard');
+      if (!orchard || typeof type !== 'string') return result;
+      const source = name === 'tending_pick' ? 'pick' : 'garden';
+      if (source === 'pick' ? (V.foodstuff[type]?.amount ?? 0) <= before : type !== 'lime' || !maplebirch.passage.title.startsWith('Temple Garden')) return result;
+      if (!orchard.discover(type, source)) return result;
+      const data = species[type as OrchardSpecies];
+      const text = document.createElement('span');
+      text.className = 'gold';
+      text.textContent = lanSwitch(` You save some ${data.name[0].toLowerCase()} seeds for the orchard.`, ` 你留下了一些${data.name[1]}种子，可以带去果园播种。`);
+      this.output.append(text);
+      return result;
+    });
+  }
 
   // 由框架安排宏的安装时机，并把返回的地图节点插入输出。
   maplebirch.tool.macro.defineS('deadwood-orchard-map', () => {

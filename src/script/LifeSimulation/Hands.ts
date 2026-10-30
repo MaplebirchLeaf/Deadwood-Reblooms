@@ -1,7 +1,5 @@
 // ./src/script/LifeSimulation/Hands.ts
 
-import type { MacroContext } from 'twine-sugarcube';
-
 export default function Hands(maplebirch: typeof window.maplebirch): void {
   maplebirch.tool.inject({
     widgetPassage: {
@@ -153,109 +151,98 @@ export default function Hands(maplebirch: typeof window.maplebirch): void {
     action: () => maplebirch.get('LifeSimulation')?.hands.refresh()
   });
 
-  maplebirch.once(':storyready', () => {
-    // 保留原版 handler 的上下文，装备前检查，变更后才刷新功能标签。
-    const extend = (name: string, handler: (this: MacroContext, original: () => void) => void) => {
-      const macro = maplebirch.SugarCube.Macro.get(name);
-      if (!macro?.handler) return;
-      const original = macro.handler;
-      macro.handler = function () {
-        return handler.call(this, () => original.call(this));
-      };
-    };
-
-    for (const name of ['generalWear', 'equipClothesItemFromDefault', 'generalWearFromWardrobe', 'generalOn', 'generalStoreon']) {
-      extend(name, function (original) {
-        const hands = maplebirch.get('LifeSimulation')?.hands;
-        let slot = this.args[0];
-        let item: Record<string, any> | undefined;
-        if (name === 'generalWear' || name === 'equipClothesItemFromDefault') {
-          item = typeof this.args[1] === 'string' ? setup.clothes[slot]?.find((held: any) => held.name === this.args[1]) : setup.clothes[slot]?.[this.args[1]];
-        } else if (name === 'generalWearFromWardrobe') item = (window as typeof window & { selectWardrobe(): Record<string, any> }).selectWardrobe()[slot]?.[this.args[1]];
-        else if (name === 'generalOn') item = V.carried[slot];
-        else {
-          slot = this.args[1];
-          const option = this.args[2];
-          if (!['wardrobe', 'delete', 'return', 'check'].includes(option) && !V.wardrobes[option] && T.equipSkip?.[slot] !== true) {
-            item = V.store[slot]?.find((held: any) => held.location === this.args[0]);
-          }
+  // 保留原版宏的上下文，装备前检查，变更后才刷新功能标签。
+  for (const name of ['generalWear', 'equipClothesItemFromDefault', 'generalWearFromWardrobe', 'generalOn', 'generalStoreon']) {
+    maplebirch.tool.macro.wrap(name, function (next) {
+      const hands = maplebirch.get('LifeSimulation')?.hands;
+      let slot = this.args[0];
+      let item: Record<string, any> | undefined;
+      if (name === 'generalWear' || name === 'equipClothesItemFromDefault') {
+        item = typeof this.args[1] === 'string' ? setup.clothes[slot]?.find((held: any) => held.name === this.args[1]) : setup.clothes[slot]?.[this.args[1]];
+      } else if (name === 'generalWearFromWardrobe') item = (window as typeof window & { selectWardrobe(): Record<string, any> }).selectWardrobe()[slot]?.[this.args[1]];
+      else if (name === 'generalOn') item = V.carried[slot];
+      else {
+        slot = this.args[1];
+        const option = this.args[2];
+        if (!['wardrobe', 'delete', 'return', 'check'].includes(option) && !V.wardrobes[option] && T.equipSkip?.[slot] !== true) {
+          item = V.store[slot]?.find((held: any) => held.location === this.args[0]);
         }
-        if (item && hands && !hands.prepare(item, slot)) {
-          new maplebirch.SugarCube.Wikifier(this.output, '<<deadwood-hands-duplicate>>');
-          return;
-        }
-        const result = original();
-        if (['handheld', 'handheld_left'].includes(slot)) hands?.refresh();
-        return result;
-      });
-    }
-
-    for (const [name, slotArg] of [
-      ['generalStrip', 0],
-      ['generalUndress', 1]
-    ] as const) {
-      extend(name, function (original) {
-        const result = original();
-        if (['handheld', 'handheld_left'].includes(this.args[slotArg])) maplebirch.get('LifeSimulation')?.hands.refresh();
-        return result;
-      });
-    }
-
-    extend('generalRuined', function (original) {
-      const slot = this.args[0];
-      const rod = ['handheld', 'handheld_left'].includes(slot) && Array.prototype.includes.call(V.worn[slot]?.type ?? [], 'fishing_rod');
-      const result = original();
-      if (rod && V.worn[slot]?.name === 'naked') delete V.fishing.currentBait;
+      }
+      if (item && hands && !hands.prepare(item, slot)) {
+        new maplebirch.SugarCube.Wikifier(this.output, '<<deadwood-hands-duplicate>>');
+        return;
+      }
+      const result = next();
+      if (['handheld', 'handheld_left'].includes(slot)) hands?.refresh();
       return result;
     });
+  }
 
-    // 快捷宏扩展两个槽，刷新由它们调用的通用宏负责，storeon 无需再次包装。
-    for (const name of ['handheldstrip', 'handheldundress', 'handheldon', 'storeonhandheld']) {
-      extend(name, function (original) {
-        const result = original();
-        if (!maplebirch.get('LifeSimulation')) return result;
-        const args = this.args.map((value: unknown) => JSON.stringify(value) ?? 'undefined');
-        let code: string;
-        switch (name) {
-          case 'handheldstrip':
-            code = '<<generalStrip "handheld_left">>';
-            break;
-          case 'handheldon':
-            code = '<<generalOn "handheld_left">>';
-            break;
-          case 'handheldundress':
-            code = `<<generalUndress ${args[0]} "handheld_left">>`;
-            break;
-          default:
-            code = `<<generalStoreon ${args[0]} "handheld_left" ${args[1] ?? 'undefined'}>>`;
-        }
-        new maplebirch.SugarCube.Wikifier(this.output, code);
-        return result;
-      });
-    }
-
-    for (const name of ['wardrobeList', 'oldWardrobeList']) {
-      extend(name, function (original) {
-        const result = original();
-        if (this.args[0] === 'handheld' && maplebirch.get('LifeSimulation')) new maplebirch.SugarCube.Wikifier(this.output, '<<deadwood-hands-stock>>');
-        return result;
-      });
-    }
-    extend('wardrobewear', function (original) {
-      const result = original();
-      V.wear_handheld_left = 'none';
-      maplebirch.get('LifeSimulation')?.hands.refresh();
+  for (const [name, slotArg] of [
+    ['generalStrip', 0],
+    ['generalUndress', 1]
+  ] as const) {
+    maplebirch.tool.macro.wrap(name, function (next) {
+      const result = next();
+      if (['handheld', 'handheld_left'].includes(this.args[slotArg])) maplebirch.get('LifeSimulation')?.hands.refresh();
       return result;
     });
+  }
 
-    extend('tryOnReset', function (original) {
-      const result = original();
-      maplebirch.get('LifeSimulation')?.hands.snapshot();
+  maplebirch.tool.macro.wrap('generalRuined', function (next) {
+    const slot = this.args[0];
+    const rod = ['handheld', 'handheld_left'].includes(slot) && Array.prototype.includes.call(V.worn[slot]?.type ?? [], 'fishing_rod');
+    const result = next();
+    if (rod && V.worn[slot]?.name === 'naked') delete V.fishing.currentBait;
+    return result;
+  });
+
+  // 快捷宏扩展两个槽，刷新由它们调用的通用宏负责，storeon 无需再次包装。
+  for (const name of ['handheldstrip', 'handheldundress', 'handheldon', 'storeonhandheld']) {
+    maplebirch.tool.macro.wrap(name, function (next) {
+      const result = next();
+      if (!maplebirch.get('LifeSimulation')) return result;
+      const args = this.args.map((value: unknown) => JSON.stringify(value) ?? 'undefined');
+      let code: string;
+      switch (name) {
+        case 'handheldstrip':
+          code = '<<generalStrip "handheld_left">>';
+          break;
+        case 'handheldon':
+          code = '<<generalOn "handheld_left">>';
+          break;
+        case 'handheldundress':
+          code = `<<generalUndress ${args[0]} "handheld_left">>`;
+          break;
+        default:
+          code = `<<generalStoreon ${args[0]} "handheld_left" ${args[1] ?? 'undefined'}>>`;
+      }
+      new maplebirch.SugarCube.Wikifier(this.output, code);
       return result;
     });
-    extend('buyTryOnClothes', function (original) {
-      maplebirch.get('LifeSimulation')?.hands.snapshot();
-      return original();
+  }
+
+  for (const name of ['wardrobeList', 'oldWardrobeList']) {
+    maplebirch.tool.macro.wrap(name, function (next) {
+      const result = next();
+      if (this.args[0] === 'handheld' && maplebirch.get('LifeSimulation')) new maplebirch.SugarCube.Wikifier(this.output, '<<deadwood-hands-stock>>');
+      return result;
     });
+  }
+  maplebirch.tool.macro.wrap('wardrobewear', function (next) {
+    const result = next();
+    V.wear_handheld_left = 'none';
+    maplebirch.get('LifeSimulation')?.hands.refresh();
+    return result;
+  });
+
+  maplebirch.tool.macro.wrap('tryOnReset', function (next) {
+    const result = next();
+    maplebirch.get('LifeSimulation')?.hands.snapshot();
+    return result;
+  });
+  maplebirch.tool.macro.wrap('buyTryOnClothes', function (next) {
+    maplebirch.get('LifeSimulation')?.hands.snapshot();
+    return next();
   });
 }

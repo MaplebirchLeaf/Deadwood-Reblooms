@@ -46,7 +46,9 @@
 <<if _road_events.inCombat and $combat>>
   <<effects>><<effectsman>><<alarmstate>><<man>><<stateman>>
   <br><br><<actionsman>>
-  <<if _combatend or _road_events.combatComplete>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Transport Road Fight'>><</lanLink>></span><<nexttext>>
+  <<elseif !$possessed and (_combatend or _road_events.combatComplete)>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Transport Road Fight Finish'>><</lanLink>></span><<nexttext>>
   <<else>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Transport Road Fight'>><</lanLink>></span><<nexttext>>
@@ -59,7 +61,7 @@
 <<set _road_events to maplebirch.get('Transport').events>>
 <<if _road_events.inCombat and $combat>>
   <<effects>>
-  <<if _road_events.combatComplete and $enemyarousal gte $enemyarousalmax>><<ejaculation "short">><</if>>
+  <<if _road_events.combatComplete and maplebirch.combat.climax>><<ejaculation "short">><</if>>
   <<run _road_events.finishCombat()>>
 <</if>>
 <<if _road_events.policeArrested>>

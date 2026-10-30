@@ -1,7 +1,5 @@
 // ./src/module/LongerCombat.ts
 
-import type { MacroDefinition } from 'twine-sugarcube';
-
 type FluidPart = Parameters<typeof maplebirch.npc.fluids.add>[1];
 type FluidType = NonNullable<Parameters<typeof maplebirch.npc.fluids.add>[3]>;
 type DialogueHistory = Record<string, { line: string; namedLine: string }>;
@@ -10,6 +8,8 @@ class LongerCombat {
   static readonly TEXT_KEY = 'deadwood-reblooms:LongerCombat';
   static readonly NPC_KEY = `${LongerCombat.TEXT_KEY}:npc`;
   static readonly STATE_PARTS = ['lefthand', 'righthand', 'mouth', 'penis', 'vagina'] as const;
+  public climaxStat: 'enemyarousal' | 'enemypleasure' = 'enemyarousal';
+  private continuation?: { moment: typeof maplebirch.SugarCube.State.current; variables: typeof V; nodes: ChildNode[] };
   private readonly lastLines = new Map<number, { name: string; lines: DialogueHistory }>();
 
   static readonly SPLASH_PARTS: Partial<Record<FluidPart, readonly FluidPart[]>> = {
@@ -34,7 +34,7 @@ class LongerCombat {
     return V.options.maplebirch.LongerCombat;
   }
 
-  private get climax(): { name: 'ejaculation' | 'beastejaculation'; short: boolean } | undefined {
+  private get climaxMacro(): { name: 'ejaculation' | 'beastejaculation'; short: boolean } | undefined {
     const title = maplebirch.passage.title;
     const finish = title.endsWith(' Finish') ? title : `${title} Finish`;
     const story = maplebirch.SugarCube.Story;
@@ -49,13 +49,33 @@ class LongerCombat {
 
   private get canExtendCombat(): boolean {
     const train = V.combatTrain;
-    return V.combat === 1 && !V.stalk && !(Number(train?.length) > 0 || Number(train?.total_length) > 0) && !!this.climax && !!this.passageTitle;
+    return (
+      V.combat === 1 &&
+      !V.statFreeze &&
+      !V.frozenValues &&
+      !V.replayScene &&
+      !V.possessed &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
+      !V.stalk &&
+      V.finish !== 1 &&
+      !(V.alarm === 1 && V.rescue >= 1) &&
+      !(Number(train?.length) > 0 || Number(train?.total_length) > 0) &&
+      !!this.climaxMacro &&
+      !!this.passageTitle
+    );
+  }
+
+  private get continuing(): boolean {
+    const previous = this.continuation;
+    return !!previous && previous.moment === this.core.SugarCube.State.current && previous.variables === V;
   }
 
   private reset(): void {
     this.options.rounds = 0;
     this.options.end = null;
     this.lastLines.clear();
+    this.continuation = undefined;
   }
 
   private beastClimax(sWikifier: (text: string) => void, short: boolean): void {
@@ -323,27 +343,36 @@ class LongerCombat {
     };
 
     const source = this.passageTitle;
-    const climax = this.climax;
-    if (!this.canExtendCombat || !source || !climax || V.enemyhealth <= 0 || V.enemyarousal < V.enemyarousalmax) return fragment;
+    const climax = this.climaxMacro;
+    if (!this.canExtendCombat || !source || !climax || V.enemyhealth <= 0) return fragment;
 
-    const options = this.options;
-    if (Number(options.rounds || 0) === 0) this.lastLines.clear();
+    const moment = this.core.SugarCube.State.current;
+    const previous = this.continuation;
+    if (this.continuing && previous) {
+      fragment.append(...previous.nodes);
+    } else {
+      if (!this.core.combat.climax) return fragment;
+      const options = this.options;
+      if (Number(options.rounds || 0) === 0) this.lastLines.clear();
 
-    if (this.shouldEndCombat) {
-      T.combatend = true;
-      this.reset();
-      return fragment;
+      if (this.shouldEndCombat) {
+        T.combatend = true;
+        this.reset();
+        return fragment;
+      }
+
+      if (climax.name === 'beastejaculation') this.beastClimax(sWikifier, climax.short);
+      else this.ejaculation(sWikifier, climax.short);
+
+      const current = this.options;
+      current.rounds = Number(current.rounds || 0) + 1;
+      current.end = null;
+      const stat = this.climaxStat;
+      V[stat] = Math.floor(V[`${stat}max`] * (0.15 + Math.random() * 0.1));
+      if (V.enemytype === 'beast') V[`${stat}${V.active_enemy + 1}`] = V[stat];
+      T.combatend = false;
+      this.continuation = { moment, variables: V, nodes: Array.from(fragment.childNodes) };
     }
-
-    if (climax.name === 'beastejaculation') this.beastClimax(sWikifier, climax.short);
-    else this.ejaculation(sWikifier, climax.short);
-
-    const current = this.options;
-    current.rounds = Number(current.rounds || 0) + 1;
-    current.end = null;
-    V.enemyarousal = Math.floor(V.enemyarousalmax * (0.15 + Math.random() * 0.1));
-    if (V.enemytype === 'beast') V[`enemyarousal${V.active_enemy + 1}`] = V.enemyarousal;
-    T.combatend = false;
 
     sWikifier(`<br><br><<lanLink ['Continue', '继续'] ${JSON.stringify(source)} 'capitalize'>><</lanLink>>`);
 
@@ -352,7 +381,14 @@ class LongerCombat {
 
   public preInit() {
     this.core.var.options.define('LongerCombat', LongerCombat.options);
-    this.core.on(':variable', () => this.lastLines.clear(), 'Longer Combat');
+    this.core.on(
+      ':variable',
+      () => {
+        this.lastLines.clear();
+        this.continuation = undefined;
+      },
+      'Longer Combat'
+    );
     const main = this.main.bind(this);
 
     this.core.tool.macro.define('LongerCombat', function (this: any) {
@@ -363,8 +399,8 @@ class LongerCombat {
     this.core.dynamic.regStateEvent('gate', 'LongerCombat', {
       output: 'LongerCombat',
       priority: 100,
-      cond: () => this.canExtendCombat && maplebirch.passage.title.endsWith(' Finish') && V.enemyhealth > 0 && V.enemyarousal >= V.enemyarousalmax,
-      forceExit: () => V.enemyarousal >= V.enemyarousalmax && !this.shouldEndCombat
+      cond: () => this.canExtendCombat && maplebirch.passage.title.endsWith(' Finish') && V.enemyhealth > 0 && (this.core.combat.climax || this.continuing),
+      forceExit: () => this.continuing || (this.core.combat.climax && !this.shouldEndCombat)
     });
 
     this.core.dynamic.regTimeEvent('onBefore', 'LongerCombat', {
@@ -376,35 +412,28 @@ class LongerCombat {
       }
     });
 
-    this.core.once(
-      ':storyready',
-      () => {
-        const macros = this.core.SugarCube.Macro;
-        const tidyEjaculation = this.tidyEjaculation.bind(this);
-        const reset = (action: () => void): void => {
-          action();
-          this.reset();
-        };
-        for (const [name, action] of [
-          ['combatinit', reset],
-          ['endcombat', reset],
-          ['orgasm', this.orgasm.bind(this)],
-          ['ejaculation', this.npcOrgasm.bind(this)]
-        ] as const) {
-          const macro = macros.get(name) as MacroDefinition | undefined;
-          if (!macro) continue;
-          macros.delete(name);
-          macros.add(name, {
-            ...macro,
-            handler(this: any) {
-              action(() => macro.handler.call(this));
-              if (name === 'ejaculation') tidyEjaculation(this.output);
-            }
-          });
-        }
-      },
-      'LongerCombat Macros'
-    );
+    const tidyEjaculation = this.tidyEjaculation.bind(this);
+    const reset = (action: () => void): void => {
+      action();
+      this.reset();
+    };
+    for (const [name, action] of [
+      ['combatinit', reset],
+      ['endcombat', reset],
+      ['orgasm', this.orgasm.bind(this)],
+      ['ejaculation', this.npcOrgasm.bind(this)]
+    ] as const) {
+      this.core.tool.macro.wrap(name, function (next) {
+        action(next);
+        if (name === 'ejaculation') tidyEjaculation(this.output);
+      });
+    }
+  }
+}
+
+declare module '@scml-dol-maplebirch/types' {
+  interface Extensions {
+    readonly LongerCombat: LongerCombat;
   }
 }
 

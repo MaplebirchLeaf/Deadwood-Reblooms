@@ -16,7 +16,6 @@ import tradingTerms from '../assets/finance/trading.json';
 import bankingTerms from '../assets/finance/banking.json';
 import migration from '../migrations/Finance';
 import securitiesSource from '@/assets/finance/securities.yaml';
-import type { MacroDefinition } from 'twine-sugarcube';
 import type Robin from './Robin';
 
 export type FinanceResult =
@@ -361,7 +360,7 @@ class Finance extends Module {
         return;
       this.advanceMarketThrough(Finance.currentDay, content);
     });
-    this.core.once(':storyready', () => this.moneyMacro());
+    this.moneyMacro();
     // 行情在时间事件里刷新。银行周账务由房地产逐日推进，保持批量跳日时的真实顺序。
     this.core.dynamic.regTimeEvent('onDay', ':deadwood-reblooms-finance-market', {
       action: () => this.updateDay(),
@@ -722,32 +721,30 @@ class Finance extends Module {
 
   // 包装原版 money 宏：银行卡负责扣款，原宏以 recordOnly 保留消费统计。
   private moneyMacro(): void {
-    const original = this.core.SugarCube.Macro.get('money') as MacroDefinition | undefined;
-    if (!original) return;
     const charge = (amount: unknown, source: unknown) => this.charge(amount, source);
     const refresh = () => this.refresh();
-    this.core.tool.macro.define('money', function (this: any, amountArg: unknown, sourceArg: unknown, optionalArg?: unknown) {
+    this.core.tool.macro.wrap('money', function (next) {
+      const [amountArg, sourceArg, optional] = this.args;
+      if (!(typeof sourceArg === 'string' || sourceArg instanceof String || sourceArg === undefined) || !(optional === undefined || (typeof optional === 'object' && optional !== null))) return next();
       const amount = Number(amountArg);
-      const optional = optionalArg;
       const recordOnly = typeof optional === 'object' && optional !== null && 'recordOnly' in optional && optional.recordOnly;
       const cashOnly = typeof optional === 'object' && optional !== null && 'cashOnly' in optional && optional.cashOnly;
       const charged = !recordOnly && !cashOnly && amount < 0 ? charge(-amount, sourceArg) : 0;
-      if (!charged) {
-        original.handler.call(this);
-        return;
-      }
+      if (!charged) return next();
       const argumentCount = this.args.length;
       const originalAmount = this.args[0];
       this.args[0] = -charged;
       this.args[2] = { ...(typeof optional === 'object' && optional !== null ? optional : {}), recordOnly: true };
+      let result;
       try {
-        original.handler.call(this);
+        result = next();
       } finally {
         this.args[0] = originalAmount;
         if (argumentCount > 2) this.args[2] = optional;
         this.args.length = argumentCount;
       }
       refresh();
+      return result;
     });
   }
 

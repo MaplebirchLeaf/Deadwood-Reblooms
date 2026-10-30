@@ -59,18 +59,6 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
     if (zone[group][title]) zone[group][title] = zone[group][title].map(rule => (String(rule.src ?? rule.srcmatch ?? rule.srcmatchgroup) === original ? patch(rule) : rule));
   };
 
-  if (maplebirch.get('VanillaPlus')) {
-    // DoLX 先按类别整理加成，按钮说明也改用 _name。只调整这两个锚点，保留其分类与购买结算。
-    replace('widgetPassage', 'Widgets Settings', '<<set _upgradeNames to Object.keys($featsBoosts.upgrades)>>', rule => ({
-      ...rule,
-      src: '<<set _allUpgradeNames to Object.keys($featsBoosts.upgrades)>>'
-    }));
-    replace('widgetPassage', 'FeatsUI', String(/(<<widget "featsPointsMenuButtons">>(?:(?!<<\/widget>>)[\s\S])*?<<switch _type>>)/), rule => ({
-      ...rule,
-      srcmatch: /(<<widget "featsPointsMenuButtons">>(?:(?!<<\/widget>>)[\s\S])*?<<switch _name>>)/
-    }));
-  }
-
   // DoLX 分开保存航程总天数与剩余天数，仍只在原生开启新航程时取消金币航线。
   replace('locationPassage', 'Pirate Zephyr Island Ask', '<<set $pirate_journey to 7>>', rule => ({ ...rule, src: '<<set $pirate_journey_total to 7>>' }));
   if (maplebirch.get('MoreTransformations')) {
@@ -96,26 +84,6 @@ export default function adaptPassages(maplebirch: MaplebirchCore): void {
         continue;
       }
       passage.content = passage.content.replace(from, () => to);
-    }
-    // DoLX 将兴奋与快感分开，只有原生高潮终局使用快感，保留其它兴奋判定。
-    if (maplebirch.services.addonPlugin.SC2DataManager.getSC2DataInfoAfterPatch().passageDataItems.map.get('Widgets Actions Man')?.content.includes('$enemypleasure gte $enemypleasuremax')) {
-      for (const [title, expected] of [
-        ['Deadwood Pirate Raid Widgets', 3],
-        ['Deadwood Pirate Raid Fight', 1],
-        ['Deadwood Coin Cave Combat Widgets', 1],
-        ['Deadwood Coin Cave Fight', 1],
-        ['Deadwood Coldmoon Harbour Fight Finish', 3]
-      ] as const) {
-        const passage = cache?.passageDataItems.map.get(title);
-        if (!passage || passage.content.includes('$enemypleasure')) continue;
-        const climax = /\$enemyarousal (gte|lt) \$enemyarousalmax/g;
-        const matches = Array.from(passage.content.matchAll(climax)).length;
-        if (matches !== expected) {
-          maplebirch.log(`${title}: 匹配 ${matches}，预期 ${expected} (${climax})`, 'WARN');
-          continue;
-        }
-        passage.content = passage.content.replace(climax, '$enemypleasure $1 $enemypleasuremax');
-      }
     }
     cache?.passageDataItems.back2Array();
   }

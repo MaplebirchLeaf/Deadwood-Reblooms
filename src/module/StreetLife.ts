@@ -68,7 +68,10 @@ export default class StreetLife extends Module {
       V.consensual === 0 &&
       !V.replayScene &&
       !V.statFreeze &&
+      !V.frozenValues &&
       !V.possessed &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
       V[`${hand}arm`] === 0 &&
       V.orgasmdown < 1 &&
       V.dissociation < 2 &&

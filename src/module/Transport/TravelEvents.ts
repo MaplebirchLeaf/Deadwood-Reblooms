@@ -360,8 +360,14 @@ export default class TravelEvents {
     return (
       this.inCombat &&
       !!V.combat &&
+      !V.nextPassage &&
+      !V.nextPassageCheck &&
+      !V.possessed &&
+      !V.replayScene &&
+      !V.statFreeze &&
+      !V.frozenValues &&
       (V.enemyhealth <= 0 ||
-        V.enemyarousal >= V.enemyarousalmax ||
+        this.transport.core.combat.climax ||
         (V.alarm === 1 && V.rescue >= 1) ||
         V.finish === 1 ||
         (['roadblock', 'police'].includes(this.transport.state.trip!.event!.kind) && V.pain >= 100 && V.willpowerpain === 0))
@@ -391,7 +397,7 @@ export default class TravelEvents {
     if (transport.core.passage.title !== 'Deadwood Transport Road Fight Finish' || !this.combatComplete) return false;
     const trip = transport.state.trip!;
     const event = trip.event!;
-    const satisfied = V.enemyarousal >= V.enemyarousalmax;
+    const satisfied = this.transport.core.combat.climax;
     const molestation = event.kind === 'molestation';
     const police = event.kind === 'police';
     if (police) event.outcome = satisfied || V.enemyhealth <= 0 || (V.alarm === 1 && V.rescue >= 1) ? 'evaded' : 'arrested';

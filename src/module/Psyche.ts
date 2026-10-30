@@ -20,7 +20,7 @@ export default class Psyche extends Module {
   }
 
   public get active(): boolean {
-    return Boolean(this.core.get('Psyche') === this && this.state && !V.statFreeze && !V.frozenValues && !V.replayScene);
+    return Boolean(this.core.get('Psyche') === this && this.state && Number.isFinite(this.state.sanity) && Number.isFinite(this.state.mood) && !V.statFreeze && !V.frozenValues && !V.replayScene);
   }
 
   public get free(): boolean {
