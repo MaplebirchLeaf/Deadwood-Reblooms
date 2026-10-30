@@ -234,12 +234,8 @@
 
 :: Deadwood Ghost Ship Escape
 <<deadwood-ghostship-context>>
-<<if _ghost_free and $location is 'deadwood_ghost_ship' and ['escape', 'escape_lock', 'escape_swim', 'escape_row', 'zephyr'].includes(_ghost_ship.action)>>
+<<if _ghost_free and $location is 'deadwood_ghost_ship' and ['escape_lock', 'escape_swim', 'escape_row', 'zephyr'].includes(_ghost_ship.action)>>
   <<set _ghost_exit to _ghost_ship.action, _ghost_ship.action to '', _ghost_ship.scene to 'late', _ghost_started to _ghost_ship.started>>
-  <!-- 旧存档尚未完成的自逃，沿用当时可用的路线。 -->
-  <<if _ghost_exit is 'escape'>>
-    <<set _ghost_exit to currentSkillValue('skulduggery') gte 400 ? 'escape_lock' : (currentSkillValue('swimmingskill') gte 200 ? 'escape_swim' : 'escape_row')>>
-  <</if>>
   <<set _ghost_ready to Weather.dayState is 'night' and _ghost_ship.watched>>
   <<if _ghost_exit is 'zephyr'>>
     <<set _ghost_ready to _ghost_ready and _ghost_ship.supplies gte 3>>
@@ -256,7 +252,7 @@
     <</if>>
   <</if>>
 <</if>>
-<<if !_ghost_ship?.active and ['escape', 'escape_lock', 'escape_swim', 'escape_row', 'zephyr'].includes(_ghost_ship?.scene)>>
+<<if !_ghost_ship?.active and ['escape_lock', 'escape_swim', 'escape_row', 'zephyr'].includes(_ghost_ship?.scene)>>
   <<if _ghost_ship.scene is 'zephyr'>><<set _ghost_known to C.npc.Zephyr.init is 1>><<npc Zephyr>><<person1>><</if>>
   <<language>>
     <<option 'EN'>>
@@ -265,7 +261,7 @@
         "Grab it!" <<if _ghost_known>>Zephyr shouts.<<else>>a voice shouts from the boat.<</if>> <<if $pirate_rank gte 1>>"I'm not losing a hand to that rotten tub."<<else>>"And don't leave that crate behind!"<</if>> A sailor catches your sleeve and pulls you down into the waiting boat while another hooks the cargo. You scarcely have room to sit. <<if !_ghost_known>>"All clear, Captain Zephyr!" the sailor calls over your head.<</if>>
         <br><br>
         The boat leaves you at the old breakwater before returning to Zephyr. "Stay out of their hands this time," the captain calls after you.
-      <<else>>You wait for the lighthouse to pass the hatch. <<if _ghost_ship.scene is 'escape_lock' or (_ghost_ship.scene is 'escape' and currentSkillValue('skulduggery') gte 400)>>The old boat lock gives beneath your nail. You lower the boat hand over hand, keeping the chain from striking the hull. Once aboard, you put both oars to work.<<elseif _ghost_ship.scene is 'escape_row'>>You slide your float through the opening and climb onto it. The planks dip at one end. You shift your weight and pull with the broken oar, steering away from the hull.<<else>>You lower your float through the opening and follow it into the water. The timber dips beneath your weight, then holds. You keep one arm over it and kick, taking care not to let the current carry you past the rocks.<</if>>
+      <<else>>You wait for the lighthouse to pass the hatch. <<if _ghost_ship.scene is 'escape_lock'>>The old boat lock gives beneath your nail. You lower the boat hand over hand, keeping the chain from striking the hull. Once aboard, you put both oars to work.<<elseif _ghost_ship.scene is 'escape_row'>>You slide your float through the opening and climb onto it. The planks dip at one end. You shift your weight and pull with the broken oar, steering away from the hull.<<else>>You lower your float through the opening and follow it into the water. The timber dips beneath your weight, then holds. You keep one arm over it and kick, taking care not to let the current carry you past the rocks.<</if>>
         <br><br>
         A dead sailor turns at the rail. You keep moving towards the dark line of the breakwater. The fog swallows the ship before you reach the rocks. You climb until the next wave cannot pull you back.
       <</if>>
@@ -275,7 +271,7 @@
         “抓住！”<<if _ghost_known>>泽菲尔喊道。<<else>>小艇上传来喊声。<</if>><<if $pirate_rank gte 1>>“我可不想把船员丢在那条烂船上。”<<else>>“别把那箱货落下！”<</if>>一个水手抓住你的袖子，将你拖进等在下面的小艇，另一个钩住货箱。艇上几乎没有坐下的地方。<<if !_ghost_known>>“好了，泽菲尔船长！”水手越过你的头顶喊道。<</if>>
         <br><br>
         小艇将你放在旧防波堤旁，才掉头返回泽菲尔那边。“这回别再落到他们手里了。”船长朝你喊道。
-      <<else>>你等到灯塔的影子从舱口旁掠过。<<if _ghost_ship.scene is 'escape_lock' or (_ghost_ship.scene is 'escape' and currentSkillValue('skulduggery') gte 400)>>弯钉拨开了小艇的旧锁。你一点点松下绳索，没让铁链撞上船身。坐稳后，你抓起双桨，划了出去。<<elseif _ghost_ship.scene is 'escape_row'>>你将浮具推出缺口，爬了上去。一端的木板沉了下去。你挪动身体，用断桨拨开水，慢慢离开船边。<<else>>你将浮具放出缺口，跟着滑进水里。木料被你的重量压下去，又浮了起来。你用一条胳膊搭住它，蹬动双腿，留心不让水流将自己冲过礁石。<</if>>
+      <<else>>你等到灯塔的影子从舱口旁掠过。<<if _ghost_ship.scene is 'escape_lock'>>弯钉拨开了小艇的旧锁。你一点点松下绳索，没让铁链撞上船身。坐稳后，你抓起双桨，划了出去。<<elseif _ghost_ship.scene is 'escape_row'>>你将浮具推出缺口，爬了上去。一端的木板沉了下去。你挪动身体，用断桨拨开水，慢慢离开船边。<<else>>你将浮具放出缺口，跟着滑进水里。木料被你的重量压下去，又浮了起来。你用一条胳膊搭住它，蹬动双腿，留心不让水流将自己冲过礁石。<</if>>
         <br><br>
         一个亡灵水手在船舷旁转过头。你没有停，继续朝防波堤漆黑的轮廓靠近。还没碰到礁石，船便被雾遮住了。你继续往上爬，直到下一阵浪也没法把你卷回去。
       <</if>>

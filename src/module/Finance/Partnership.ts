@@ -3,7 +3,6 @@
 /** 私人合伙账使用便士。双方各占一半，借款和追加周转金不改变股比。 */
 export interface PartnershipState {
   agreed: boolean;
-  migrated: boolean;
   treasury: number;
   reserve: number;
   loans: { pc: number; partner: number };
@@ -21,7 +20,6 @@ export interface PartnershipState {
 export default class Partnership {
   public static readonly defaults: PartnershipState = {
     agreed: false,
-    migrated: false,
     treasury: 0,
     reserve: 100000,
     loans: { pc: 0, partner: 0 },
@@ -53,7 +51,6 @@ export default class Partnership {
   public agree(): boolean {
     if (this.state.agreed || V.statFreeze || V.replayScene || V.frozenValues) return false;
     this.state.agreed = true;
-    this.state.migrated = true;
     this.state.next_settlement = Math.floor(Time.days) + 7;
     return true;
   }

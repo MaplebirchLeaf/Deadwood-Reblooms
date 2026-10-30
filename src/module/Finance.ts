@@ -411,7 +411,7 @@ class Finance extends Module {
     // 每处理完一天的房租和房贷，才处理同一天的存款、个人贷款和信用卡。
     this.advanceMarketThrough(day);
     const bank = this.state.bank;
-    if (!bank.opened || bank.bank_interest_last_day < 0) bank.bank_interest_last_day = day;
+    if (!bank.opened) bank.bank_interest_last_day = day;
     else {
       while (bank.bank_interest_last_day + 7 <= day) {
         if (bank.balance > 0) bank.balance += Math.floor(bank.balance * bankingTerms.depositWeeklyRate);
@@ -961,15 +961,10 @@ class Finance extends Module {
     finance.market.pending_farm_moves ??= {};
     finance.market.cafe_stage ??= Math.max(0, Math.floor(Number(V.chef_state) || 0));
     finance.market.avery_fate ??= String(V.avery_fate ?? '');
-    if (finance.bank.opened && finance.bank.bank_interest_last_day < 0) finance.bank.bank_interest_last_day = Finance.currentDay;
-    if (finance.bank.opened && finance.bank.opened_day < 0) finance.bank.opened_day = Finance.currentDay;
     // 历史账务未结清时不按最终日期升档，正常交易仍即时记录净存款峰值。
     if (!V.replayScene && !V.statFreeze && Finance.currentDay >= finance.market.day) {
       if (finance.real_estate.last_managed_day >= Finance.currentDay) Finance.updateAccountTier(finance.bank);
       Finance.resetAtmLimit(finance.bank);
-    }
-    if (finance.bank.credit_debt > 0 && finance.bank.credit_due_day <= 0) {
-      finance.bank.credit_due_day = Finance.currentDay + bankingTerms.creditBillingDays;
     }
     return finance;
   }
@@ -1106,7 +1101,6 @@ class Finance extends Module {
       if (bank.credit_due_day > 0) Finance.clearCredit(bank);
       return;
     }
-    if (bank.credit_due_day <= 0) bank.credit_due_day = currentDay + bankingTerms.creditBillingDays;
     while (bank.credit_due_day <= currentDay && bank.credit_debt > 0) {
       bank.credit_debt += Math.ceil(bank.credit_debt * bankingTerms.creditWeeklyRate);
       const minimum = Finance.creditMinimumPayment(bank.credit_debt);

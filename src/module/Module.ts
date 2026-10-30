@@ -15,10 +15,11 @@ abstract class Module {
   ) {
     this.version = targetVersion;
     this.migration = core.tool.migration.create();
-    this.migration.add('*', this.version, (data, utils) => utils.fill(data, clone(this.defaults)));
   }
 
   public preInit(): void {
+    // 独立迁移保留自己的版本步骤，通用填充不能跳过尚未执行的数据转换。
+    if (!this.migration.steps.length) this.migration.add('*', this.version, (data, utils) => utils.fill(data, clone(this.defaults)));
     this.core.on(':variable', () => this.variable());
   }
 

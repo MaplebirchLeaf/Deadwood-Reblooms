@@ -1,6 +1,8 @@
 // ./src/migrations/Finance.ts
 
 import type { FinanceState } from '../module/Finance';
+import projects from '../assets/finance/donations.json';
+import bankingTerms from '../assets/finance/banking.json';
 
 type Migration = ReturnType<typeof maplebirch.tool.migration.create>;
 
@@ -103,8 +105,22 @@ function validAdrian(adrian: LegacyState['adrian']): boolean {
   );
 }
 
-/** 将 1.4.4 的金融状态搬到独立模块，由框架 version 保证只执行一次。 */
+/** 金融历史数据由框架 version 迁移一次，运行时不再补写旧账。 */
 export default function migration(runner: Migration, defaults: FinanceState): void {
+  // 已募足的旧采购仍可立即验收，不补发奖励，也不重置已有采购与换货日期。
+  runner.add('*', '2.5.8', (data, utils) => {
+    utils.fill(data, { ...clone(defaults) });
+    const state = data as unknown as FinanceState;
+    for (const project of projects) {
+      const fund = project.id as keyof typeof state.donations.total;
+      const order = fund === 'school' ? state.donations.school : state.donations.aid[fund];
+      if (state.donations.total[fund] >= project.goal && order.ordered_at === null && order.replacement_at === null) order.ordered_at = Time.date.timeStamp - 3 * 86400;
+    }
+    const day = Math.floor(Time.days);
+    if (state.bank.opened && state.bank.bank_interest_last_day < 0) state.bank.bank_interest_last_day = day;
+    if (state.bank.opened && state.bank.opened_day < 0) state.bank.opened_day = day;
+    if (state.bank.credit_debt > 0 && state.bank.credit_due_day <= 0) state.bank.credit_due_day = day + bankingTerms.creditBillingDays;
+  });
   for (const from of ['0.0.0', '2.0.0', '2.0.1', '2.0.2', '2.0.3']) {
     runner.add(from, '2.1.0', (data, utils) => {
       // 包括首次升级，以及已经被 2.0.x 填入空账户的存档。

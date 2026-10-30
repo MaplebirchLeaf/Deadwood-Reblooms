@@ -53,8 +53,8 @@ export default class SchoolDonations {
   }
 
   public get ready(): boolean {
-    // 旧存档已有足额募资时可直接验收，新募足的一笔在付款动作中记录采购时间。
-    return this.funded && (this.due === null || Time.date.timeStamp >= this.due);
+    const due = this.due;
+    return this.funded && due !== null && Time.date.timeStamp >= due;
   }
 
   public get available(): boolean {

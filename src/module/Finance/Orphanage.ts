@@ -33,7 +33,7 @@ export default class Orphanage {
   }
 
   public get robinFree(): boolean {
-    return this.state.robin_bought_out;
+    return V.Finance?.orphanage?.robin_bought_out === true;
   }
 
   public get averyAdoptionRefused(): boolean {

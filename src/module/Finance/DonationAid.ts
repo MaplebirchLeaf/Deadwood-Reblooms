@@ -71,8 +71,7 @@ export default class DonationAid {
 
   public ready(fund: AidFund): boolean {
     const due = this.due(fund);
-    // 旧存档已完成的募资直接保留交付，新采购只在第一次募足时开始计时。
-    return this.funded(fund) && (due === null || Time.date.timeStamp >= due);
+    return this.funded(fund) && due !== null && Time.date.timeStamp >= due;
   }
 
   public available(fund: AidFund): boolean {

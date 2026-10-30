@@ -2,6 +2,7 @@
 
 import Achievements from './Achievements';
 import Module from './Module';
+import migration from '../migrations/Robin';
 import { DEFAULT_ROBIN_EXPANSION_STATE, type RobinExpansionState } from './constants';
 import type { RobinFacade } from './Robin/Shared';
 import RobinAsylum from './Robin/Asylum';
@@ -36,6 +37,7 @@ class Robin extends Module implements RobinFacade {
     this.market = new RobinMarket(core, this);
     this.night = new RobinNight(core, this);
     this.asylum = new RobinAsylum(core, this);
+    migration(this.migration, this);
   }
 
   /** 当前存档的罗宾拓展状态。 */
@@ -116,12 +118,7 @@ class Robin extends Module implements RobinFacade {
   private sync(): void {
     if (!V.RobinExpansion || C.npc.Robin?.init !== 1 || V.replayScene || V.statFreeze) return;
     const state = this.state;
-    this.shop.partnership.migrate();
     if (state.week < 0) state.week = Math.floor(Time.days / 7);
-    if (state.self_rent && !state.rent_separated) {
-      if (V.robinpaid === 1) V.rentmoney /= 2;
-      state.rent_separated = true;
-    }
 
     const asylum = state.asylum;
     if (asylum.checked_day !== Time.days) {
