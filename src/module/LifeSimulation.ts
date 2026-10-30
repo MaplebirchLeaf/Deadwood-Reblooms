@@ -142,9 +142,10 @@ class LifeSimulation extends Module {
     return !this.growthActive && this.nextBodySize !== undefined;
   }
 
-  /** 使用当前游戏的实际档位，包含扩展版的负数和半级体型。 */
   private get nextBodySize(): number | undefined {
-    const calculation = this.core.SugarCube.Story.get('Widgets variablesStart2').text.match(/<<switch \$bodysize>>[\s\S]*?<<\/switch>>/)?.[0];
+    const calculation = this.core.SugarCube.Story.getAllWidget()
+      .find((passage: { title: string; text: string }) => passage.title === 'Widgets variablesStart2')
+      ?.text.match(/<<switch \$bodysize>>[\s\S]*?<<\/switch>>/)?.[0];
     const sizes = [...(calculation?.matchAll(/<<case\s+(-?\d+(?:\.\d+)?)\s*>>/g) ?? [])].map(match => Number(match[1])).sort((a, b) => a - b);
     return sizes.includes(V.bodysize) ? sizes.find(size => size > V.bodysize) : undefined;
   }
@@ -171,7 +172,8 @@ class LifeSimulation extends Module {
   public trainBodyGrowth(activity: string, day: number): void {
     // 入场资格在训练开始前检查，完成时不再用营业时间、到期卡或训练后的压力否定结果。
     if (this.growth.mode !== 'gym' || !['weights', 'run', 'deck-run'].includes(activity) || day <= this.growth.training_day) return;
-    if (day !== Time.days && day !== Time.days - 1) return;
+    const today = Math.floor(Time.date.timeStamp / TimeConstants.secondsPerDay);
+    if (day !== today && day !== today - 1) return;
     this.growth.training_day = day;
     this.advanceBodyGrowth(1);
   }
@@ -194,7 +196,9 @@ class LifeSimulation extends Module {
     this.growth.progress = Math.min(this.growthDuration, this.growth.progress + amount);
     if (this.growth.progress < this.growthDuration) return;
     // 复用原版开局的体型结算，不维护另一份上限表，找不到时保留进度。
-    const calculation = this.core.SugarCube.Story.get('Widgets variablesStart2').text.match(/<<switch \$bodysize>>[\s\S]*?<<\/switch>>/)?.[0];
+    const calculation = this.core.SugarCube.Story.getAllWidget()
+      .find((passage: { title: string; text: string }) => passage.title === 'Widgets variablesStart2')
+      ?.text.match(/<<switch \$bodysize>>[\s\S]*?<<\/switch>>/)?.[0];
     const next = this.nextBodySize;
     if (!calculation || next === undefined) return;
     const oldMaximum = V.physiquesize;

@@ -518,14 +518,16 @@
 <<if !_aftermath_ok or !_aftermath.leads.includes('pub') or $location isnot 'hospital' or Time.hour lt 8 or Time.hour gte 18>><<deadwood-heist-aftermath-unavailable>><<exit>><</if>>
 <<effects>><<deadwood-heist-aftermath-check>>
 <<if !_aftermath_ok or $eventforced or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+<<set _aftermath_harper to $harper_appointments?.enabled and Time.weekDay is 6 and $daily.harperVisit isnot 1 and $trauma lt $traumamax * 0.9 and C.npc.Harper.init is 1 and C.npc.Harper.state is 'active'>>
+<<if _aftermath_harper>><<endevent>><<npc 'Harper'>><<person1>><</if>>
 <div id='heist-aftermath-feedback'></div>
 <<language>>
   <<option 'EN'>>
     The cargo copy lists a first-aid collection. You ask reception which delivery entrance serves the company. "Supply receipts, then," the receptionist says. "You can't look through somebody else's medical notes."<br><br>
-    <<if $harper_appointments?.enabled and Time.weekDay is 6 and $daily.harperVisit isnot 1 and $trauma lt $traumamax * 0.9 and C.npc.Harper.init is 1 and C.npc.Harper.state is 'active' and _aftermath_ok>><<endevent>><<npc 'Harper'>><<person1>>Harper pauses by reception on the way to the consulting room. "A troublesome collection? Be careful around loading doors." The smile does not change when you mention an injured courier. "If they require treatment, reception can arrange it. We can discuss your concerns at your own appointment."<</if>>
+    <<if _aftermath_harper>>Harper pauses by reception on the way to the consulting room. "A troublesome collection? Be careful around loading doors." The smile does not change when you mention an injured courier. "If they require treatment, reception can arrange it. We can discuss your concerns at your own appointment."<</if>>
   <<option 'CN'>>
     货单上列着一批急救用品。你向前台询问，那家公司的货车从哪里领取。“那就查用品收据。”接待员说。“别人的病历，不能给你翻。”<br><br>
-    <<if $harper_appointments?.enabled and Time.weekDay is 6 and $daily.harperVisit isnot 1 and $trauma lt $traumamax * 0.9 and C.npc.Harper.init is 1 and C.npc.Harper.state is 'active' and _aftermath_ok>><<endevent>><<npc 'Harper'>><<person1>>哈伯去诊室前，在前台停了一下。“领货出了问题？装卸门附近可要当心。”你提到受伤的送货人时，那张笑脸没有变化。“需要治疗的话，前台可以安排。至于你担心的事，我们可以在你的预约里慢慢谈。”<</if>>
+    <<if _aftermath_harper>>哈伯去诊室前，在前台停了一下。“领货出了问题？装卸门附近可要当心。”你提到受伤的送货人时，那张笑脸没有变化。“需要治疗的话，前台可以安排。至于你担心的事，我们可以在你的预约里慢慢谈。”<</if>>
 <</language>><br><br>
 <<if _aftermath.leads.includes('hospital')>>
   <<language>>

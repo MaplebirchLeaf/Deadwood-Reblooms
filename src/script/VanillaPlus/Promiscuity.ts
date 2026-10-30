@@ -88,7 +88,7 @@ export default function (maplebirch: typeof window.maplebirch) {
     return maplebirch.get('VanillaPlus')!.promiscuity.canAsk(action, selected) || canGuidePlayerDouble(selected, orifice);
   };
   const canGuideToNPC = (hand: GuideHand, orifice: 'vagina' | 'anus') => {
-    if (!canGuidePenis(hand) || V.enemytype !== 'man') return false;
+    if (!canGuidePenis(hand) || V.enemytype !== 'man' || (orifice === 'anus' && !V.settings.analEnabled)) return false;
     const selected = handTarget(hand);
     const recipient = Number(V.penistarget);
     const enabled = orifice === 'vagina' ? V.settings.vaginalDoubleEnabled : V.settings.analDoubleEnabled;

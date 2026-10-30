@@ -23,32 +23,28 @@ import BirdTower from './BirdTower';
 import Transport from './Transport';
 import StreetLife from './StreetLife';
 
-(function (maplebirch): void {
-  'use strict';
+if (maplebirch.get('DeadwoodReblooms')) DeadwoodReblooms(maplebirch);
+if (maplebirch.get('MoreLoveInterestsAndNPCAvatars')) MoreLoveInterestsAndNPCAvatars(maplebirch);
+if (maplebirch.get('LongerCombat')) maplebirch.tool.addTo('Options', 'deadwood-longer-combat-options');
+if (maplebirch.get('CelestialAnomalies')) CelestialAnomalies(maplebirch);
+if (maplebirch.get('DynamicMusic')) DynamicMusic(maplebirch);
+if (maplebirch.get('MoreTransformations')) MoreTransformations(maplebirch);
+if (maplebirch.get('NPCTransformations')) NPCTransformations(maplebirch);
+if (maplebirch.get('NPCSidebarPortrait')) NPCSidebarPortrait(maplebirch);
+if (maplebirch.get('Finance')) Finance(maplebirch);
+if (maplebirch.get('VanillaPlus')) VanillaPlus(maplebirch);
+Psyche(maplebirch);
+if (maplebirch.get('Sydney')) Sydney(maplebirch);
+if (maplebirch.get('Robin')) Robin(maplebirch);
+if (maplebirch.get('Whitney')) Whitney(maplebirch);
+if (maplebirch.get('Kylar')) Kylar(maplebirch);
+if (maplebirch.get('BirdTower')) BirdTower(maplebirch);
+if (maplebirch.get('LifeSimulation')) LifeSimulation(maplebirch);
+if (maplebirch.get('Orchard')) Orchard(maplebirch);
+if (maplebirch.get('Transport')) Transport(maplebirch);
+StreetLife(maplebirch);
 
-  if (maplebirch.get('DeadwoodReblooms')) DeadwoodReblooms(maplebirch);
-  if (maplebirch.get('MoreLoveInterestsAndNPCAvatars')) MoreLoveInterestsAndNPCAvatars(maplebirch);
-  if (maplebirch.get('LongerCombat')) maplebirch.tool.addTo('Options', 'deadwood-longer-combat-options');
-  if (maplebirch.get('CelestialAnomalies')) CelestialAnomalies(maplebirch);
-  if (maplebirch.get('DynamicMusic')) DynamicMusic(maplebirch);
-  if (maplebirch.get('MoreTransformations')) MoreTransformations(maplebirch);
-  if (maplebirch.get('NPCTransformations')) NPCTransformations(maplebirch);
-  if (maplebirch.get('NPCSidebarPortrait')) NPCSidebarPortrait(maplebirch);
-  if (maplebirch.get('Finance')) Finance(maplebirch);
-  if (maplebirch.get('VanillaPlus')) VanillaPlus(maplebirch);
-  Psyche(maplebirch);
-  if (maplebirch.get('Sydney')) Sydney(maplebirch);
-  if (maplebirch.get('Robin')) Robin(maplebirch);
-  if (maplebirch.get('Whitney')) Whitney(maplebirch);
-  if (maplebirch.get('Kylar')) Kylar(maplebirch);
-  if (maplebirch.get('BirdTower')) BirdTower(maplebirch);
-  if (maplebirch.get('LifeSimulation')) LifeSimulation(maplebirch);
-  if (maplebirch.get('Orchard')) Orchard(maplebirch);
-  if (maplebirch.get('Transport')) Transport(maplebirch);
-  StreetLife(maplebirch);
-
-  // 各模块的普通注入登记完后，再按当前原版源码选择对应兼容规则。
-  DoLP(maplebirch);
-  DoLX(maplebirch);
-  NewWorld(maplebirch);
-})(maplebirch);
+// 各模块的普通注入登记完后，再按当前原版源码选择对应兼容规则。
+DoLP(maplebirch);
+DoLX(maplebirch);
+NewWorld(maplebirch);
