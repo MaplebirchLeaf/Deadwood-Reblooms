@@ -1,5 +1,12 @@
 :: Deadwood BirdTower Hunt Widgets [widget]
 
+<!-- 首轮由初始化调用，之后只随继续动作结算，重绘正文不重复扣血。 -->
+<<widget 'deadwood-birdtower-hunt-strike'>>
+  <<if $combat is 1 and $enemytype is 'beast' and $enemyhealth gt 0 and !$nextPassage and !$nextPassageCheck>>
+    <<set $enemyhealth -= maplebirch.get('BirdTower').party.length * _args[0]>>
+  <</if>>
+<</widget>>
+
 <!-- 同一狩猎步只判定、入账一次。跨日或重绘不重新抽取猎物。 -->
 <<widget "deadwood-birdtower-hunt-result">>
   <<set _huntResult to null>>

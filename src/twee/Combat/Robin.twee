@@ -1,0 +1,190 @@
+:: Deadwood Robin Companion Widgets [widget]
+
+<<widget 'deadwood-robin-reckoning-ready'>><<silently>>
+  <<set _robinReckoningReady to $RobinExpansion?.rebellion and $RobinExpansion.solidarity and !$RobinExpansion.bailey_defeated and $RobinExpansion.victories gte 4 and $baileydefeatedchain gte 3 and maplebirch.get('Robin')?.available and getRobinLocation() is 'orphanage' and C.npc.Robin.dom gte 60 and C.npc.Robin.trauma lt 40>>
+<</silently>><</widget>>
+
+<!-- 与原版口部行动及双臂抓握共用状态，显示和执行时都重新核对。 -->
+<<widget 'deadwood-robin-help-ready'>><<silently>>
+  <<set _deadwoodRobinHelpTarget to -1, _deadwoodRobinHelpMember to maplebirch.combat.companions.get(C.npc.Robin)>>
+  <<if $combat is 1 and $enemytype is 'man' and $consensual isnot 1 and $enemyhealth gt 0 and !maplebirch.combat.climax
+      and ['robin-rent-fight', 'robin-reckoning-fight'].includes($phase) and $NPCList[0]?.fullDescription is 'Bailey'
+      and !$nextPassage and !$nextPassageCheck and !$possessed and $finish isnot 1
+      and !($alarm is 1 and $rescue gte 1) and !($orgasmdown gte 1 or $dissociation gte 2 or ($pain gte 100 and $willpowerpain is 0))
+      and $mouthuse is 0 and $underwater lte 0 and !$combat_silenced
+      and !($neckuse is 'hand' and $oxygen lt $oxygenmax and $settings.asphyxiaLevel gte 2)
+      and !$abomination and !$gloryhole and $position isnot 'wall' and $robinRentEvent isnot 1
+      and maplebirch.get('Robin')?.available and C.npc.Robin.state is 'active' and C.npc.Robin.dom gte 40 and C.npc.Robin.trauma lt 50
+      and _deadwoodRobinHelpMember?.active and _deadwoodRobinHelpMember.health gt 0 and _deadwoodRobinHelpMember.stun is 0
+      and $leftarm is 'grappled' and $rightarm is 'grappled' and $lefttarget is $righttarget
+      and Number.isInteger($lefttarget) and $lefttarget gte 0 and $lefttarget lt $enemynomax
+      and (!$fightTargets or $fightTargets.includes($lefttarget))
+      and $NPCList[$lefttarget]?.active is 'active' and $NPCList[$lefttarget].stance isnot 'defeated' and $NPCList[$lefttarget].health gt 0
+      and ($NPCList[$lefttarget].lefthand is 'arms' or $NPCList[$lefttarget].righthand is 'arms')>>
+    <<set _deadwoodRobinHelpTarget to $lefttarget>>
+  <</if>>
+<</silently>><</widget>>
+
+<<widget 'deadwood-robin-help'>>
+  <<set $mouthactiondefault to 'rest'>>
+  <<if _deadwoodRobinHelped>><<exit>><</if>>
+  <<deadwood-robin-help-ready>>
+  <<if _deadwoodRobinHelpTarget lt 0>><<exit>><</if>>
+  <<set _deadwoodRobinHelped to true, _sound to 1>>
+  <!-- 帮忙挣脱替代本回合的自动掩护，不另外结算伤害或属性成长。 -->
+  <<set _deadwoodRobinHelpChance to Math.clamp(30 + C.npc.Robin.dom / 3 - C.npc.Robin.trauma / 2, 20, 60) * _deadwoodRobinHelpMember.health / _deadwoodRobinHelpMember.healthmax>>
+  <<lanSwitch 'You call to Robin. Robin pushes in beside you and pulls at the hand holding your arms.' '你叫了罗宾一声。罗宾挤到你身旁，试着扳开抓着你双臂的手。'>>
+  <<if random(1, 100) lte _deadwoodRobinHelpChance>>
+    <<set $leftarm to 0, $rightarm to 0>>
+    <<if $NPCList[_deadwoodRobinHelpTarget].lefthand is 'arms'>><<set $NPCList[_deadwoodRobinHelpTarget].lefthand to 0>><</if>>
+    <<if $NPCList[_deadwoodRobinHelpTarget].righthand is 'arms'>><<set $NPCList[_deadwoodRobinHelpTarget].righthand to 0>><</if>>
+    <span class='teal'><<lanSwitch 'The grip loosens, and you pull free.' '钳制一松，你趁机抽出了双臂。'>></span>
+  <<else>>
+    <span class='purple'><<lanSwitch 'The grip holds firm.' '那只手仍死死地抓着你。'>></span>
+  <</if>><br><br>
+<</widget>>
+
+<<widget 'deadwood-robin-support'>>
+  <<if _args[0].npc isnot C.npc.Robin or !['robin-rent-fight', 'robin-reckoning-fight'].includes($phase) or $NPCList[0]?.fullDescription isnot 'Bailey'>><<exit>><</if>>
+  <<switch _args[0].event>>
+    <<case 'effects'>>
+      <<silently>>
+        <<if $mouthaction isnot 'deadwoodRobinHelp' and !_deadwoodRobinHelped and maplebirch.get('Robin')?.available and _args[0].npc.dom gte 40 and _args[0].npc.trauma lt 50>>
+          <<set _args[0].bonus to 0.1 * Math.clamp(_args[0].npc.dom / 100, 0, 1) * (1 - _args[0].npc.trauma / 100) * _args[0].health / _args[0].healthmax>>
+          <<set _args[0].guard to _args[0].bonus + ($RobinExpansion.solidarity ? 0.05 : $RobinExpansion.allies ? 0.025 : 0)>>
+        <</if>>
+      <</silently>>
+    <<case 'assist'>>
+      <<if _deadwoodRobinHelped>><<exit>><</if>>
+      <<if !maplebirch.get('Robin')?.available or _args[0].npc.dom lt 40 or _args[0].npc.trauma gte 50>>
+        <<companions-leave _args[0].npc>>
+      <<elseif $rng gte 60>>
+        <<lanSwitch '"Watch out!" Robin catches your sleeve and pulls you clear of a reaching hand.' '“小心！”罗宾拽住你的衣袖，拉着你避开伸来的手。'>><br>
+      <<else>>
+        <<lanSwitch 'Robin knocks a reaching hand aside. "You can do it," <<nnpc_he "Robin">> says, keeping close to you.' '罗宾拍开一只伸来的手。“你能行的。”<<nnpc_He "Robin">>说着，紧挨在你身旁。'>><br>
+      <</if>>
+    <<case 'leave'>>
+      <<lanSwitch 'Robin backs towards the other orphans, trembling. "I\'m sorry," <<nnpc_he "Robin">> whispers.' '罗宾浑身发抖，退到其他孤儿身旁。“对不起。”<<nnpc_He "Robin">>低声说。'>><br>
+  <</switch>>
+<</widget>>
+
+:: Deadwood Robin Bailey Fight [DefaultCombat]
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Robin Bailey Fight'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if $fightstart is 1>>
+  <<set _robinRentFight to $phase is 'robin-rent-fight'>>
+  <<deadwood-robin-reckoning-ready>>
+  <<if !(_robinRentFight ? maplebirch.get('Robin')?.rent.canFight : _robinReckoningReady) or $combat or $possessed or $replayScene or $statFreeze>>
+    <<getouticon>><<lanLink ['Return to the hall', '返回大厅'] 'Orphanage'>><</lanLink>><<exit>>
+  <</if>>
+  <<set $outside to 0, $location to 'home'>><<endevent>>
+  <<npc Bailey 1>>
+  <<set _robinEnemyCount to _robinRentFight ? ($baileydefeatedchain gte 3 ? 4 : $baileydefeatedchain gte 1 ? 3 : 2) : 3>>
+  <<for _robinEnemyIndex to 1; _robinEnemyIndex lt _robinEnemyCount; _robinEnemyIndex++>><<generateRole _robinEnemyIndex 0 'thug'>><</for>>
+  <<set $enemyno to _robinEnemyCount, $enemynomax to _robinEnemyCount, $fightstart to 0, $consensual to 0>>
+  <<person1>><<neutral 1>><<maninit>><<npcidlegenitals>>
+  <<set $enemyanger += 200, $phase to _robinRentFight ? 'robin-rent-fight' : 'robin-reckoning-fight'>>
+  <<companions-add `C.npc.Robin` 'deadwood-robin-support'>>
+  <<if _robinRentFight>>
+    <<lanSwitch 'You step between Bailey and Robin. Robin takes your hand for a moment, then lets go. "Together," <<nnpc_he "Robin">> whispers. Bailey motions <<if _robinEnemyCount is 2>>the thug<<else>>the thugs<</if>> forward.' '你挡在贝利和罗宾之间。罗宾握了一下你的手，又松开了。“一起。”<<nnpc_He "Robin">>轻声说。贝利招呼打手上前。'>>
+  <<else>>
+  <<language>>
+    <<option 'EN'>>
+      You plant yourself beside Robin. "We're not moving."
+      Bailey's eyes narrow. "Then I'll move you." <<nnpc_He 'Bailey'>> beckons to the two thugs at the door.
+      Robin catches your hand for a moment, then lets go. "Together," <<nnpc_he 'Robin'>> whispers. The other orphans hurry back as the thugs advance.
+    <<option 'CN'>>
+      你在罗宾身旁站稳。“我们不走。”
+      贝利眯起眼睛。“那就让我来帮你。”<<nnpc_He 'Bailey'>>朝门边的两个打手招了招手。
+      罗宾握了一下你的手，又松开了。“一起。”<<nnpc_He 'Robin'>>轻声说。打手向你们逼近，其他孤儿急忙退开。
+  <</language>>
+  <</if>><br><br>
+<</if>>
+<<if $combat is 1 and ['robin-rent-fight', 'robin-reckoning-fight'].includes($phase) and $NPCList[0]?.fullDescription is 'Bailey'>>
+  <<effects>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Robin Bailey Fight'>><</lanLink>></span><<nexttext>><<exit>>
+  <</if>>
+  <<effectsman>><<alarmstate>><<man>>
+  <<stateman>><br><br><<actionsman>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Robin Bailey Fight'>><</lanLink>></span><<nexttext>>
+  <<elseif !$possessed and (_combatend or $enemyhealth lte 0 or maplebirch.combat.climax or $finish is 1 or ($alarm is 1 and $rescue gte 1) or ($pain gte 100 and $willpowerpain is 0))>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Robin Bailey Fight Finish'>><</lanLink>></span><<nexttext>>
+  <<else>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Robin Bailey Fight'>><</lanLink>></span><<nexttext>>
+  <</if>>
+<<else>>
+  <<getouticon>><<lanLink ['Return to the hall', '返回大厅'] 'Orphanage'>><</lanLink>>
+<</if>>
+
+:: Deadwood Robin Bailey Fight Finish
+<<if $nextPassage or $nextPassageCheck>>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Robin Bailey Fight Finish'>><</lanLink>></span><<nexttext>><<exit>>
+<</if>>
+<<if $combat is 1 and ['robin-rent-fight', 'robin-reckoning-fight'].includes($phase) and $NPCList[0]?.fullDescription is 'Bailey'>>
+  <<effects>>
+  <<if $nextPassage or $nextPassageCheck>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Robin Bailey Fight Finish'>><</lanLink>></span><<nexttext>><<exit>>
+  <</if>>
+  <<if $possessed or !($enemyhealth lte 0 or maplebirch.combat.climax or $finish is 1 or ($alarm is 1 and $rescue gte 1) or ($pain gte 100 and $willpowerpain is 0))>>
+    <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Robin Bailey Fight'>><</lanLink>></span><<nexttext>><<exit>>
+  <</if>>
+  <!-- 周租胜败在结束战斗前结算一次；原版交租与双人惩罚仍走各自入口。 -->
+  <<set _robinRentFight to $phase is 'robin-rent-fight'>>
+  <<if $statFreeze or $replayScene or $frozenValues>>
+    <<if maplebirch.combat.climax>><<ejaculation 'short'>><</if>>
+    <<clotheson>><<endcombat>>
+  <<elseif $alarm is 1 and $rescue gte 1>>
+    <<clotheson>><<endcombat>><<set $phase to _robinRentFight ? 'robin-rent-escaped' : 'robin-reckoning-escaped'>>
+  <<elseif $enemyhealth lte 0 or maplebirch.combat.climax>>
+    <<if _robinRentFight>>
+      <<set $RobinExpansion.victories++, $baileydefeatedchain++>>
+      <<if maplebirch.combat.climax>>
+        <<set $baileydefeatedlewd++>><<earnFeat "Bailey's Trouble Maker">>
+      <<else>>
+        <<set $baileydefeated++>>
+      <</if>>
+      <<reb 1>><<hope 1>><<trauma -6>><<stress -12>><<greb>><<ghope>><<ltrauma>><<lstress>><br><br>
+    <</if>>
+    <<if maplebirch.combat.climax>><<ejaculation 'short'>><</if>>
+    <<clotheson>><<endcombat>><<set $phase to _robinRentFight ? 'robin-rent-won' : 'robin-reckoning-won'>>
+  <<else>>
+    <<if _robinRentFight>>
+      <<set _robinSupported to $RobinExpansion.solidarity and $RobinExpansion.care_fund gte 10>>
+      <<if _robinSupported>><<set $RobinExpansion.care_fund -= 10>><</if>>
+      <<npcincr Robin trauma `_robinSupported ? 4 : 8`>><<grtrauma true>>
+      <<set $baileyRefusedToPay to 0>><<unset $bailey_encroach>>
+      <<reb -1>><<lreb>><br><br>
+    <</if>>
+    <<clotheson>><<endcombat>><<set $baileydefeatedchain to 0, $phase to _robinRentFight ? 'robin-rent-lost' : 'robin-reckoning-lost'>>
+  <</if>>
+<</if>>
+<<if $phase is 'robin-rent-won'>>
+  <<lanSwitch 'Bailey backs away, looking past you at the children watching from the hall. "You will pay for this." <<nnpc_He "Bailey">> leaves with the thugs. Robin stays close until the footsteps fade, then lets out a shaky laugh.' '贝利往后退开，越过你看向大厅里围观的孩子们。“你们会付出代价的。”<<nnpc_He "Bailey">>带着打手离开。罗宾紧挨着你，直到脚步声消失，才颤着声音笑了出来。'>><br><br>
+  <<bedicon>><<lanLink ['Return to your bedroom', '返回卧室'] 'Bedroom'>><<endevent>><</lanLink>>
+<<elseif $phase is 'robin-rent-lost'>>
+  <<lanSwitch 'Your legs give way. Robin catches your arm, but Bailey strikes <<nnpc_him "Robin">> and pulls you apart. You hear rope being unwound.' '你的双腿一软。罗宾扶住你的胳膊，贝利却打了<<nnpc_him "Robin">>一下，把你们扯开。你听见绳索被抖开的声音。'>><br><br>
+  <span id='next'><<lanLink ['Next', '继续'] 'Rent Intro'>><<endevent>><<set $phase to 1>><</lanLink>></span><<nexttext>>
+<<elseif $phase is 'robin-rent-escaped'>>
+  <<lanSwitch 'The commotion draws people to the hall. Bailey orders the thugs back. Robin pulls you clear, breathing hard.' '动静把人引到了大厅。贝利叫住打手。罗宾喘着气，拉着你退开。'>><br><br>
+  <<getouticon>><<lanLink ['Return to the hall', '返回大厅'] 'Orphanage'>><<endevent>><</lanLink>>
+<<elseif $phase is 'robin-reckoning-won'>>
+  <<lanSwitch 'Bailey backs away from you. Robin reaches for your hand, breathing hard.' '贝利往后退开。罗宾喘着气，伸手握住了你的手。'>><br><br>
+  <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Robin Bailey Reckoning Finish'>><</lanLink>></span><<nexttext>>
+<<elseif ['robin-reckoning-lost', 'robin-reckoning-escaped'].includes($phase)>>
+  <<language>>
+    <<option 'EN'>>
+      Bailey grabs the ledger, but a door slams before <<nnpc_he 'Bailey'>> can catch anyone else. The children drag you and Robin into a bedroom and hold it shut.
+      "You'll still pay," Bailey calls through the door.
+      Robin sits down hard beside you. Neither of you speaks until the footsteps fade. "We'll have to try something else," <<nnpc_he 'Robin'>> says at last.
+    <<option 'CN'>>
+      贝利夺走账本，还没来得及抓人，房门就在<<nnpc_him 'Bailey'>>面前关上了。孩子们把你和罗宾拖进卧室，合力抵住房门。
+      “房租一分也少不了。”贝利隔着门说。
+      罗宾挨着你，一屁股坐了下来。你们都没吭声，直到脚步声消失。“得想想别的办法了。”<<nnpc_He 'Robin'>>终于开口。
+  <</language>><br><br>
+  <<getouticon>><<lanLink ['Return to the hall', '返回大厅'] 'Orphanage'>><<endevent>><</lanLink>>
+<<else>>
+  <<getouticon>><<lanLink ['Return to the hall', '返回大厅'] 'Orphanage'>><<endevent>><</lanLink>>
+<</if>>

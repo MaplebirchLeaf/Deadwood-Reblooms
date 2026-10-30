@@ -37,7 +37,7 @@
   <<set $enemyarousalmax to 600>>
   <<set $outside to 0>>
 <<elseif !_shrineEncounter or _shrineEncounter.scene isnot 'sex' or _shrineEncounter.step isnot 'encounter'
-  or $combat isnot 1 or !$npc?.includes('Tsukihan') or !['forest_raven_shrine', 'raven_shrine_house'].includes($location) or $nextPassage or $nextPassageCheck or $replayScene or $statFreeze>>
+  or $combat isnot 1 or !$npc?.includes('Tsukihan') or !['forest_raven_shrine', 'raven_shrine_house'].includes($location) or $nextPassage or $nextPassageCheck>>
   <<deadwood-raven-home-return>><<exit>>
 <</if>>
 
@@ -58,16 +58,19 @@
 :: Deadwood Raven Shrine Sex Finish
 <<set _shrineEncounter to $MoreTransformations?.shrine>>
 <<if !_shrineEncounter or _shrineEncounter.scene isnot 'sex' or _shrineEncounter.step isnot 'encounter'
-  or $combat isnot 1 or !$npc?.includes('Tsukihan') or !['forest_raven_shrine', 'raven_shrine_house'].includes($location) or $nextPassage or $nextPassageCheck or $replayScene or $statFreeze>>
+  or $combat isnot 1 or !$npc?.includes('Tsukihan') or !['forest_raven_shrine', 'raven_shrine_house'].includes($location) or $nextPassage or $nextPassageCheck>>
   <<deadwood-raven-home-return>><<exit>>
 <</if>>
 <<set _shrineEncounter.step to 'finished'>>
+<<set _shrineReal to !$statFreeze and !$replayScene and !$frozenValues>>
 <<set $outside to 0>><<effects>><<deadwood-raven-home-context>>
 <<if maplebirch.combat.climax>>
   <<ejaculation>>
-  <<set C.npc.Tsukihan.lust to Math.clamp((C.npc.Tsukihan.lust || 0) - 30, 0, 100)>>
-  <<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 2, 0, 100)>>
-  <<set _shrineEncounter.sex_total to (_shrineEncounter.sex_total || 0) + 1>>
+  <<if _shrineReal>>
+    <<set C.npc.Tsukihan.lust to Math.clamp((C.npc.Tsukihan.lust || 0) - 30, 0, 100)>>
+    <<set C.npc.Tsukihan.love to Math.clamp(C.npc.Tsukihan.love + 2, 0, 100)>>
+    <<set _shrineEncounter.sex_total to (_shrineEncounter.sex_total || 0) + 1>>
+  <</if>>
   <<stress -12>><<trauma -2>>
 
   <<switch true>>
@@ -104,7 +107,7 @@
           片刻后，<<he>>睁开眼，目光里满是缱绻的眷恋，指尖轻轻抚过你的脸颊。
           “神社里从没有像现在这么暖和过。能像这样和你待在一起……我心里再没有别的渴求了。”
       <</language>>
-  <</switch>><<llust 'Tsukihan'>><<glove 'Tsukihan'>><<lstress>><<ltrauma>>
+  <</switch>><<if _shrineReal>><<llust 'Tsukihan'>><<glove 'Tsukihan'>><</if>><<lstress>><<ltrauma>>
   <br><br>
 
 <<elseif $enemyhealth lte 0>>
@@ -143,7 +146,7 @@
 <<clotheson>>
 <<endcombat>>
 <<if $location is 'raven_shrine_house'>>
-  <<set _shrineEncounter.bathed_at to Time.date.timeStamp>>
+  <<if _shrineReal>><<set _shrineEncounter.bathed_at to Time.date.timeStamp>><</if>>
   <<getouticon>><<lanLink ['Return to the bedroom', '回到寝室'] 'Deadwood Raven Shrine Room'>><<set $MoreTransformations.shrine.home_action to '', $MoreTransformations.shrine.scene to '', $MoreTransformations.shrine.step to ''>><<endevent>><</lanLink>><br>
 <<else>>
   <<deadwood-raven-shrine-return>>

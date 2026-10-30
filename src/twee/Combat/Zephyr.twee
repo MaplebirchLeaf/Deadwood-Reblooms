@@ -1,0 +1,23 @@
+:: Deadwood Zephyr Companion Widgets [widget]
+
+<<widget 'deadwood-zephyr-support'>>
+  <<silently>>
+    <<set _zephyrCave to $location is 'island' and $MoreTransformations?.treasure?.together and $MoreTransformations.treasure.guardian is 'fight' and $NPCList[0]?.per is 'deadwood_coin_guard'>>
+    <<set _zephyrRaid to $location is 'pirate_ship' and $MoreTransformations?.harbour?.raid?.stage is 'fight' and $NPCList[0]?.per is 'deadwood_ship_undead'>>
+  <</silently>>
+  <<if !maplebirch.get('MoreTransformations') or _args[0].npc isnot C.npc.Zephyr or C.npc.Zephyr.state isnot 'active'
+      or !(_zephyrCave or _zephyrRaid) or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<switch _args[0].event>>
+    <<case 'effects'>>
+      <<set _args[0].bonus to 0.15 * _args[0].health / _args[0].healthmax>>
+      <<set _args[0].guard to 0.05 * _args[0].health / _args[0].healthmax>>
+    <<case 'assist'>>
+      <span class='green'>
+        <<if _zephyrCave>>
+          <<lanSwitch 'Zephyr knocks the guard\'s wrist aside with the flat of the knife, giving you an opening.' '泽菲尔用刀身磕开守卫的手腕，给你腾出空当。'>>
+        <<else>>
+          <<lanSwitch 'Zephyr keeps a knife between the corpse and the hatch. "Steady! Don\'t give it room."' '泽菲尔提刀挡在尸体与舱口之间。“站稳！别让它挤过来！”'>>
+        <</if>>
+      </span><br><br>
+  <</switch>>
+<</widget>>

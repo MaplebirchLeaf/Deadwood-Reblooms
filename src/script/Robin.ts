@@ -71,6 +71,37 @@ export default function (maplebirch: typeof window.maplebirch): void {
   );
   maplebirch.tool.addTo('CustomLinkZone', { widget: [-1, 'deadwood-robin-asylum-links'], passage: 'Asylum' });
 
+  maplebirch.combat.CombatAction.reg({
+    id: 'robin-help',
+    actionType: 'mouthaction',
+    cond: () => {
+      maplebirch.SugarCube.Wikifier.wikifyEval('<<deadwood-robin-help-ready>>');
+      return T.deadwoodRobinHelpTarget >= 0;
+    },
+    display: () => lanSwitch('Ask for help breaking free', '请同伴帮忙挣脱'),
+    value: () => 'deadwoodRobinHelp',
+    color: 'def',
+    effect: '<<deadwood-robin-help>>'
+  });
+
+  // 谈妥反抗后在收租时并肩迎敌，首次胁迫罗宾的原版剧情仍优先。
+  for (const name of ['rentdue', 'rentduerobin']) {
+    maplebirch.tool.macro.wrap(
+      name,
+      function (next) {
+        if (!maplebirch.get('Robin')?.rent.canFight || (V.robinpaid === 1 && !V.robinfirstrentfight && (V.baileydefeatedchain >= 3 || V.renttime <= -14))) return next();
+        if (name === 'rentduerobin') {
+          new maplebirch.SugarCube.Wikifier(this.output, '<<rentdue 0>>');
+          return;
+        }
+        const result = next();
+        new maplebirch.SugarCube.Wikifier(this.output, '<<deadwood-robin-rent-links true>>');
+        return result;
+      },
+      'storyinit'
+    );
+  }
+
   maplebirch.tool.inject({
     widgetPassage: {
       'Widgets Robin': [
@@ -219,20 +250,6 @@ export default function (maplebirch: typeof window.maplebirch): void {
   <br><br>
   <<main_hall_icon>><<lanLink ['Return to the orphanage', '返回孤儿院'] 'Orphanage'>><<pass 1>><</lanLink>>
 `,
-          expected: 1
-        }
-      ],
-      'Rent Robin Fight': [
-        {
-          src: '<<stateman>>',
-          applybefore: '<<deadwood-robin-combat-turn>>\n',
-          expected: 1
-        }
-      ],
-      'Rent Robin Fight Finish': [
-        {
-          src: '<<set _robin to statusCheck("Robin")>>',
-          applyafter: '\n<<deadwood-robin-combat-finish>>',
           expected: 1
         }
       ]

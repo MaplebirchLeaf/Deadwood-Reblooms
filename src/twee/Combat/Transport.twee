@@ -1,0 +1,60 @@
+:: Deadwood Road Companion Widgets [widget]
+
+<!-- 只由路障战的初始化分支调用，名单沿用本次实际乘车的恋人。 -->
+<<widget 'deadwood-road-companions'>>
+  <<if $Transport.trip?.event?.kind isnot 'roadblock' or !maplebirch.get('Transport').events.inCombat>><<exit>><</if>>
+  <<for _roadName range maplebirch.get('Transport').companions.aboard>>
+    <<if ['Robin', 'Sydney', 'Kylar', 'Whitney'].includes(_roadName)
+        and (_roadName isnot 'Robin' or (C.npc.Robin.dom gte 60 and C.npc.Robin.trauma lt 40))>>
+      <<companions-add `C.npc[_roadName]` 'deadwood-road-support'>>
+      <<if maplebirch.combat.companions.get(C.npc[_roadName])?.active>>
+        <<switch _roadName>>
+          <<case 'Robin'>><<lanSwitch 'Robin steps away from the vehicle, swallowing hard. "I\'m not leaving you here."' '罗宾咽了口唾沫，从车旁走过来。“我不会把你一个人留在这里。”'>>
+          <<case 'Sydney'>><<lanSwitch 'Sydney catches an outstretched hand and pushes it away from you. "Back off!"' '悉尼抓住伸向你的手，将它推开。“离远点！”'>>
+          <<case 'Kylar'>><<lanSwitch 'Kylar slips in beside you. "D-don\'t touch <<pher>>." A knife glints in one hand.' '凯拉尔挤到你身旁。“别、别碰<<pher>>。”刀刃在手中闪了一下。'>>
+          <<case 'Whitney'>><<lanSwitch 'Whitney comes around the vehicle, cracking <<nnpc_his "Whitney">> knuckles. "Picked the wrong fucking car."' '惠特尼绕过车身，捏响指节。“挑错车了，傻逼。”'>>
+        <</switch>><br><br>
+      <</if>>
+    <</if>>
+  <</for>>
+<</widget>>
+
+<<widget 'deadwood-road-support'>>
+  <<if $Transport.trip?.event?.kind isnot 'roadblock' or !maplebirch.get('Transport').events.inCombat
+      or !maplebirch.get('Transport').companions.fighting.includes(_args[0].npc.nam) or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<switch _args[0].event>>
+    <<case 'effects'>>
+      <<set _args[0].bonus to ({ Robin: 0.08, Sydney: 0.05, Kylar: 0.12, Whitney: 0.15 })[_args[0].npc.nam] * _args[0].health / _args[0].healthmax>>
+      <<set _args[0].guard to (_args[0].npc.nam is 'Sydney' ? 0.08 : 0.03) * _args[0].health / _args[0].healthmax>>
+    <<case 'assist'>>
+      <<switch _args[0].npc.nam>>
+        <<case 'Robin'>><<lanSwitch 'Robin shoves a reaching arm aside, then hurries back to your side.' '罗宾用力推开伸来的胳膊，赶紧退回你身旁。'>>
+        <<case 'Sydney'>>
+          <<if C.npc.Sydney.purity gte 50>>
+            <<lanSwitch 'Sydney pushes back an attacker\'s reaching hand. "Leave us alone!"' '悉尼推开袭击者伸来的手。“离我们远点！”'>>
+          <<else>>
+            <<lanSwitch 'Sydney catches an attacker\'s wrist and twists it away. "I said let go."' '悉尼抓住袭击者的手腕，用力拧向一边。“我叫你松手。”'>>
+          <</if>>
+        <<case 'Kylar'>><<lanSwitch 'Kylar keeps the knife low. The person trying to circle you checks their step.' '凯拉尔压低刀尖。想绕过来的人看见刀刃，脚步顿了一下。'>>
+        <<case 'Whitney'>><<lanSwitch 'Whitney drives an attacker back with a shoulder, making room for you to move.' '惠特尼撞开一个袭击者，给你挤出活动的余地。'>>
+      <</switch>><br><br>
+  <</switch>>
+<</widget>>
+
+<!-- 原版结束宏会清除同伴，先把本场结果留给行程的战后页面。 -->
+<<widget 'deadwood-road-support-result'>>
+  <<if !$Transport.trip?.event or !maplebirch.get('Transport').events.combatComplete>><<exit>><</if>>
+  <<set $Transport.trip.event.support to maplebirch.combat.companions.members.filter(member => member.source === 'named' and maplebirch.get('Transport').companions.fighting.includes(member.key)).map(member => member.key)>>
+<</widget>>
+
+<<widget 'deadwood-road-support-after'>>
+  <<for _roadName range $Transport.trip?.event?.support ?? []>>
+    <<switch _roadName>>
+      <<case 'Robin'>><<lanSwitch 'Robin catches your hand. "You okay?"' '罗宾握住你的手。“你没事吧？”'>>
+      <<case 'Sydney'>><<lanSwitch 'Sydney looks you over. "Did they hurt you?"' '悉尼将你仔细看了一遍。“他们伤到你了吗？”'>>
+      <<case 'Kylar'>><<lanSwitch 'Kylar hides the knife and takes your hand, looking back over <<nnpc_his "Kylar">> shoulder.' '凯拉尔收好刀，拉住你的手，还不时回头张望。'>>
+      <<case 'Whitney'>><<lanSwitch 'Whitney spits onto the road and turns back to you. "Come on. We\'re leaving."' '惠特尼朝路上啐了一口，转头看你。“走了。”'>>
+    <</switch>>
+    <br><br>
+  <</for>>
+<</widget>>

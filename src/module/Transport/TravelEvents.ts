@@ -15,6 +15,8 @@ export interface RoadsideEvent {
   drunk?: number;
   checked?: boolean;
   handover?: boolean;
+  /** 本次路障战中实际协助过的乘客，供结束清理后的叙述使用。 */
+  support?: string[];
   outcome?:
     | 'wait'
     | 'escape'
@@ -363,9 +365,6 @@ export default class TravelEvents {
       !V.nextPassage &&
       !V.nextPassageCheck &&
       !V.possessed &&
-      !V.replayScene &&
-      !V.statFreeze &&
-      !V.frozenValues &&
       (V.enemyhealth <= 0 ||
         this.transport.core.combat.climax ||
         (V.alarm === 1 && V.rescue >= 1) ||
@@ -395,6 +394,11 @@ export default class TravelEvents {
   public finishCombat(): boolean {
     const transport = this.transport;
     if (transport.core.passage.title !== 'Deadwood Transport Road Fight Finish' || !this.combatComplete) return false;
+    // 本场战斗照常结束，冻结与回放不结算行程、车辆和犯罪。
+    if (V.statFreeze || V.frozenValues || V.replayScene) {
+      transport.core.SugarCube.Wikifier.wikifyEval('<<clotheson>><<endcombat>>');
+      return true;
+    }
     const trip = transport.state.trip!;
     const event = trip.event!;
     const satisfied = this.transport.core.combat.climax;

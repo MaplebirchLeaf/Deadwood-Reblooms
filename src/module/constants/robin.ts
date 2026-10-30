@@ -108,8 +108,6 @@ export interface RobinExpansionState {
   rebellion: boolean;
   /** 反抗路线累计胜场。 */
   victories: number;
-  /** 与贝利冲突的结算游戏日。 */
-  fight_resolution_day: number;
   /** 是否已结成同盟。 */
   allies: boolean;
   /** 是否已达成团结结局线。 */
@@ -255,7 +253,6 @@ export const DEFAULT_ROBIN_EXPANSION_STATE: RobinExpansionState = {
   both_rent: false,
   rebellion: false,
   victories: 0,
-  fight_resolution_day: -1,
   allies: false,
   solidarity: false,
   bailey_defeated: false,

@@ -17,6 +17,21 @@ export default class Companions {
     });
   }
 
+  /** 开战后沿用本次乘车名单，跨日的新日程不会让已经在场的人突然消失。 */
+  public get fighting(): string[] {
+    const transport = this.transport;
+    const trip = transport.state.trip;
+    if (!trip || trip.interrupted || trip.vehicle !== transport.vehicle?.id || trip.taxi || trip.commute || V.combat !== 1 || trip.event?.kind !== 'roadblock' || trip.event.combat !== 'active')
+      return [];
+    return trip.passengers.filter(name => {
+      const npc = C.npc[name];
+      if (!transport.state.passengers.includes(name) || !window.isLoveInterest(name) || npc?.init !== 1 || !['active', 'rescued'].includes(npc.state)) return false;
+      if (name === 'Robin') return !V.robinmissing && V.robin.timer.hurt === 0 && V.RobinExpansion?.asylum?.status !== 'admitted';
+      if (name === 'Sydney') return V.daily.sydney.punish !== 1;
+      return ['Whitney', 'Kylar'].includes(name);
+    });
+  }
+
   public get available(): string[] {
     const escort = this.transport.core.get('StreetLife')?.bounties.state.active;
     if (escort?.stage === 'escort' && escort.vehicle === this.transport.vehicle?.id) return [];

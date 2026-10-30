@@ -59,7 +59,7 @@ class Undead extends Transformation {
 
     // 按实际耗时结算诅咒代价，短时行动与整夜睡眠共用一次时间回调。
     core.dynamic.regTimeEvent('onSec', 'deadwood-undead-curse', {
-      cond: () => this.active && !V.statFreeze && !V.replayScene && !V.frozenValues,
+      cond: () => this.active,
       action: data => {
         V.pain = 0;
         const hours = (data.passed ?? 0) / 3600;

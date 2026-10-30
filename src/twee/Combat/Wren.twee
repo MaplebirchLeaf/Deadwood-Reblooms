@@ -1,0 +1,23 @@
+:: Deadwood Wren Companion Widgets [widget]
+
+<<widget 'deadwood-wren-support'>>
+  <<set _wrenSupportCampaign to $StreetLife?.heist?.campaign>>
+  <<if !maplebirch.get('StreetLife') or !_wrenSupportCampaign or !_wrenSupportCampaign.fight
+      or !['Deadwood Street Bank Fight Result', 'Deadwood Street Bank Regroup Result'].includes(_wrenSupportCampaign.fight.return_passage)
+      or !_wrenSupportCampaign.fight.combat_started or _wrenSupportCampaign.fight.result
+      or _args[0].npc isnot C.npc.Wren or C.npc.Wren.state isnot 'active'
+      or (_wrenSupportCampaign.team.separated.includes('Wren') and !_wrenSupportCampaign.team.rejoined.includes('Wren'))
+      or (_wrenSupportCampaign.team.injured.includes('Wren') and !_wrenSupportCampaign.team.aid.includes('Wren'))
+      or $nextPassage or $nextPassageCheck>><<exit>><</if>>
+  <<switch _args[0].event>>
+    <<case 'effects'>>
+      <<set _args[0].bonus to 0.1, _args[0].guard to 0.05>>
+    <<case 'assist'>>
+      <span class='green'><<lanSwitch 'Wren catches a reaching wrist and shoves the guard off balance.' '伦恩扣住保安伸来的手腕，将人推得一个踉跄。'>></span>
+      <<if C.npc.Wren.love gte 40>>
+        <<lanSwitch '"I\'ll take this side. Don\'t go wandering off."' '“这边交给我。可别自己溜了。”'>>
+      <<else>>
+        <<lanSwitch '"We get past them, then we leave. Remember that part."' '“过去就走。可别忘了这一步。”'>>
+      <</if>><br><br>
+  <</switch>>
+<</widget>>

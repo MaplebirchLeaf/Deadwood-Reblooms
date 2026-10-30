@@ -95,9 +95,6 @@ export default function ColdmoonHarbour(maplebirch: typeof window.maplebirch): v
       ((target?.per === 'deadwood_harbour_ghost' && V.MoreTransformations?.harbour?.fighting && Time.isBloodMoon()) ||
         (target?.per === 'deadwood_ship_undead' && V.MoreTransformations?.harbour?.raid?.stage === 'fight' && V.location === 'pirate_ship' && Weather.dayState === 'night') ||
         (target?.per === 'deadwood_coin_guard' && V.MoreTransformations?.treasure?.guardian === 'fight' && V.location === 'island')) &&
-      !V.replayScene &&
-      !V.statFreeze &&
-      !V.frozenValues &&
       !V.possessed &&
       !V.nextPassage &&
       !V.nextPassageCheck &&

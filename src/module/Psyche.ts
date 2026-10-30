@@ -20,11 +20,11 @@ export default class Psyche extends Module {
   }
 
   public get active(): boolean {
-    return Boolean(this.core.get('Psyche') === this && this.state && Number.isFinite(this.state.sanity) && Number.isFinite(this.state.mood) && !V.statFreeze && !V.frozenValues && !V.replayScene);
+    return Boolean(this.core.get('Psyche') === this && this.state && Number.isFinite(this.state.sanity) && Number.isFinite(this.state.mood));
   }
 
   public get free(): boolean {
-    return this.active && !V.combat && !V.possessed && !V.eventforced && !V.nextPassage && !V.nextPassageCheck && V.stress < V.stressmax;
+    return this.active && !V.statFreeze && !V.replayScene && !V.combat && !V.possessed && !V.eventforced && !V.nextPassage && !V.nextPassageCheck && V.stress < V.stressmax;
   }
 
   public readonly stages = stages;

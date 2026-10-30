@@ -96,8 +96,7 @@ export default class Securities {
         shares.total += change;
         shares.listed += change;
       } else if (event === 'share_release') {
-        const limit = item.symbol === 'RDS' ? item.listedShares : shares.total;
-        change = Math.max(0, Math.min(amount, limit - shares.listed));
+        change = Math.max(0, Math.min(amount, shares.total - shares.listed));
         shares.listed += change;
       } else {
         change = -Math.min(amount, supply[item.symbol].available);

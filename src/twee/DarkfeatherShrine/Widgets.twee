@@ -23,10 +23,6 @@
 <<widget 'deadwood-raven-shrine-context'>>
   <<set _shrineModule to maplebirch.get('MoreTransformations')>>
   <<set _shrine to _shrineModule ? $MoreTransformations?.shrine : null>>
-  <!-- 补入旧果树记录。独立保留已经采过的次数，换树不丢进度。 -->
-  <<if _shrine and !$statFreeze and !$replayScene>>
-    <<set _shrine.harvests to Math.max(_shrine.harvests, $Orchard?.shrine?.reduce((total, tree) => total + (tree?.harvests ?? 0), 0) ?? 0)>>
-  <</if>>
   <<set _shrineTravel to !!_shrine and !$combat and !$replayScene and !$statFreeze and !$frozenValues and !$nextPassage and !$nextPassageCheck>>
   <<set _shrineSafe to _shrineTravel and !$possessed and $stress lt $stressmax and $foresthunt lt 1>>
   <<set _shrineTsukihanLocation to maplebirch.npc.Schedule.location.Tsukihan>>
@@ -127,7 +123,7 @@
 <<widget 'deadwood-raven-shrine-wish-progress'>>
   <<if !maplebirch.get('MoreTransformations') or $MoreTransformations?.shrine?.stage isnot 3 or $combat or $statFreeze or $replayScene or $nextPassage or $nextPassageCheck>><<exit>><</if>>
   <<if _args[0] is 'harvest'>>
-    <<set $MoreTransformations.shrine.harvests to Math.max($MoreTransformations.shrine.harvests + 1, $Orchard?.shrine?.reduce((total, tree) => total + (tree?.harvests ?? 0), 0) ?? 0)>>
+    <<set $MoreTransformations.shrine.harvests += 1>>
   <</if>>
   <<set $_wishProgress to $MoreTransformations?.shrine?.wish>>
   <<if $_wishProgress and !$_wishProgress.returned and $_wishProgress.kind is _args[0]

@@ -58,7 +58,7 @@ export default class CompanyAscension {
       extra: { passage: ['Skyscraper Ascend 2'] }
     });
     core.dynamic.regTimeEvent('onAfter', ':deadwood-ascension-recovery', {
-      cond: data => core.get('Finance') === this.company.finance && !!V.Finance?.company && this.active && !V.replayScene && !V.statFreeze && !V.frozenValues && (data.passed ?? 0) > 0,
+      cond: data => core.get('Finance') === this.company.finance && !!V.Finance?.company && this.active && (data.passed ?? 0) > 0,
       action: data => core.SugarCube.Wikifier.wikifyEval(`<<deadwood-ascension-recovery ${data.passed}>>`)
     });
   }

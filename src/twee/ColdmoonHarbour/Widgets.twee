@@ -7,11 +7,11 @@
 <</widget>>
 
 <<widget 'deadwood-harbour-attack'>>
-  <<set $_ghostHand to _args[0], $_ghostTarget to Number(maplebirch.SugarCube.State.variables[_args[0] + 'target'])>>
+  <<set $_ghostHand to _args[0], $_ghostTarget to Number(V[_args[0] + 'target'])>>
   <<set $_ghost to $NPCList[$_ghostTarget]>>
   <<set $_ghostEncounter to ($_ghost?.per is 'deadwood_harbour_ghost' and $MoreTransformations?.harbour?.fighting and Time.isBloodMoon()) or ($_ghost?.per is 'deadwood_ship_undead' and $MoreTransformations?.harbour?.raid?.stage is 'fight' and $location is 'pirate_ship' and Weather.dayState is 'night') or ($_ghost?.per is 'deadwood_coin_guard' and $MoreTransformations?.treasure?.guardian is 'fight' and $location is 'island')>>
-  <<if !$_ghostEncounter or !maplebirch.get('MoreTransformations') or $replayScene or $statFreeze or $frozenValues or $possessed or $nextPassage or $nextPassageCheck or $combat isnot 1 or $enemytype isnot 'man' or $enemyhealth lte 0
-    or $consensual isnot 0 or maplebirch.SugarCube.State.variables[$_ghostHand + 'arm'] isnot 0 or $position is 'stalk'
+  <<if !$_ghostEncounter or !maplebirch.get('MoreTransformations') or $possessed or $nextPassage or $nextPassageCheck or $combat isnot 1 or $enemytype isnot 'man' or $enemyhealth lte 0
+    or $consensual isnot 0 or V[$_ghostHand + 'arm'] isnot 0 or $position is 'stalk'
     or $orgasmdown gt 0 or $dissociation gte 2 or $trance gt 0 or $panicparalysis gt 0 or $panicviolence gt 0 or ($pain gte 100 and $willpowerpain is 0)
     or $_ghost.active isnot 'active' or $_ghost.stance is 'defeated' or ($enemyno gte 2 and $_ghost.health lte 0)>><<exit>><</if>>
   <<set $_ghostMaximum to $enemyno gte 2 ? $_ghost.healthmax : $enemyhealthmax>>
@@ -31,8 +31,8 @@
     <<if !$_ghostWeapon>><<exit>><</if>>
     <<set $_ghostDamage to Math.min(9, 2 + Math.floor($_ghostMaximum * (0.05 + Math.clamp($prof[$_ghostWeapon], 0, 1000) / 10000)))>>
     <<set $_ghostOther to $_ghostHand is 'left' ? 'right' : 'left'>>
-    <<if maplebirch.SugarCube.State.variables[$_ghostOther + 'action'] is 'deadwoodHarbourWeapon'>>
-      <<set maplebirch.SugarCube.State.variables[$_ghostOther + 'action'] to 0>>
+    <<if V[$_ghostOther + 'action'] is 'deadwoodHarbourWeapon'>>
+      <<set V[$_ghostOther + 'action'] to 0>>
     <</if>>
     <<tiredness 1>><<prof $_ghostWeapon 0.2>><<gtiredness>>
     <<capture $_ghostWeapon>><<language>>

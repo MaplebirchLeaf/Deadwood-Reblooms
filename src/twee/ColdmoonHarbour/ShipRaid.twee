@@ -130,12 +130,14 @@
 <!-- 仅由战斗的结束链接调用。先保存结果，原版 endcombat 自行清理事件。 -->
 <<widget 'deadwood-pirate-raid-end'>>
   <<set _shipRaid to $MoreTransformations?.harbour?.raid>>
-  <<if _shipRaid?.stage is 'fight' and $combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead' and !$replayScene and !$statFreeze and !$frozenValues and !$possessed and !$nextPassage and !$nextPassageCheck and (Weather.dayState isnot 'night' or $enemyhealth lte 0 or maplebirch.combat.climax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0))>>
-    <<set _shipRaid.outcome to $enemyhealth lte 0 ? 'fight_won' : Weather.dayState isnot 'night' ? 'dawn' : $pain gte 100 and $willpowerpain is 0 and !maplebirch.combat.climax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 ? 'fight_lost' : 'escaped', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
-    <<if _shipRaid.outcome is 'fight_won'>>
-      <<set _shipRaid.victories += 1>><<pirate_status 3>><<npcincr Zephyr love 1>><<sanity 10>><<psyche-rest 0 150>>
-    <<elseif _shipRaid.outcome is 'escaped'>>
-      <<psyche-rest 0 100>>
+  <<if _shipRaid?.stage is 'fight' and $combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead' and !$possessed and !$nextPassage and !$nextPassageCheck and (Weather.dayState isnot 'night' or $enemyhealth lte 0 or maplebirch.combat.climax or ($alarm is 1 and $rescue gte 1) or $finish is 1 or ($pain gte 100 and $willpowerpain is 0))>>
+    <<if !$replayScene and !$statFreeze and !$frozenValues>>
+      <<set _shipRaid.outcome to $enemyhealth lte 0 ? 'fight_won' : Weather.dayState isnot 'night' ? 'dawn' : $pain gte 100 and $willpowerpain is 0 and !maplebirch.combat.climax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 ? 'fight_lost' : 'escaped', _shipRaid.stage to 'resolved', _shipRaid.needsEffects to true>>
+      <<if _shipRaid.outcome is 'fight_won'>>
+        <<set _shipRaid.victories += 1>><<pirate_status 3>><<npcincr Zephyr love 1>><<sanity 10>><<psyche-rest 0 150>>
+      <<elseif _shipRaid.outcome is 'escaped'>>
+        <<psyche-rest 0 100>>
+      <</if>>
     <</if>>
     <<if maplebirch.combat.climax>><<ejaculation 'short'>><</if>>
     <<clotheson>><<endcombat>>
@@ -227,6 +229,7 @@
   <<npcClothesType $NPCList[0] 'docker2'>>
   <<person1>><<neutral 1>><<maninit>><<npcidlegenitals>>
   <<set $enemytrust to -30, $enemyanger to 40, $enemystrength to _shipRaid.approach is 'blood' ? 20000 : 18000, _shipRaid.stage to 'fight'>>
+  <<if C.npc.Zephyr.init is 1 and C.npc.Zephyr.state is 'active'>><<companions-add `C.npc.Zephyr` 'deadwood-zephyr-support'>><</if>>
   <<lanSwitch 'The dead pirate reaches for you, water streaming from its sleeves. You knock its hands aside and brace yourself on the swaying deck.' '亡灵海盗伸手抓向你，袖口不断淌着海水。你架开它的手，在摇晃的甲板上站稳。'>><br><br>
 <</if>>
 <<if _shipRaid.stage is 'fight' and $combat is 1 and $NPCList[0]?.per is 'deadwood_ship_undead'>>
@@ -272,7 +275,7 @@
       <<option 'EN'>>
         You drive the corpse back against the rail. Two sailors catch it with a spar and tip it overboard. It hits the water, but a hand immediately catches one of the trailing ropes.
         <br><br>
-        "Cut every last rope!" Zephyr shouts at the top of <<his 'Zephyr'>> lungs. An axe severs the final line, and the other ship falls back into the fog. The captain checks the cargo hatch, then grins at you. "Good work. Ye've got some fight in ye."
+        "Cut every last rope!" Zephyr shouts at the top of <<nnpc_his 'Zephyr'>> lungs. An axe severs the final line, and the other ship falls back into the fog. The captain checks the cargo hatch, then grins at you. "Good work. Ye've got some fight in ye."
       <<option 'CN'>>
         你将尸体逼退到栏杆旁。两个水手抬起长杆，合力将它掀下船舷。水花刚溅起来，一只手又攀住了拖在海里的绳子。
         <br><br>
@@ -327,7 +330,7 @@
       <<option 'EN'>>
         You close the hatch and bolt it. Boots pound overhead. You hear shouts, blows and something being dragged across the deck, followed by a splash. You wait in the dark until the noise dies down.
         <br><br>
-        "They're gone!" someone calls. You open the hatch. Sailors are pulling a crewmate over the rail, and the unlit ship is fading into the fog. Zephyr stands beside the cargo hold, arms folded, checking the crates with <<his 'Zephyr'>> boot.
+        "They're gone!" someone calls. You open the hatch. Sailors are pulling a crewmate over the rail, and the unlit ship is fading into the fog. Zephyr stands beside the cargo hold, arms folded, checking the crates with <<nnpc_his 'Zephyr'>> boot.
       <<option 'CN'>>
         你关上舱盖，插好门栓。头顶传来奔跑、喊叫与打斗的声音，有什么东西被拖过甲板，随后落进水里。你在黑暗中等着，直到上面的动静平息。
         <br><br>

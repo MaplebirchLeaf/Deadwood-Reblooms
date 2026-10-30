@@ -10,17 +10,21 @@
   <<set $finish to 0, $consensual to 0>>
   <<person1>><<neutral 1>><<maninit>><<npcidlegenitals>>
   <<set $enemytrust to -30, $enemyanger to 40, $enemystrength to 16000, _coinCave.guardian to 'fight'>>
+  <<if _coinCave.together and C.npc.Zephyr.init is 1 and C.npc.Zephyr.state is 'active'>><<companions-add `C.npc.Zephyr` 'deadwood-zephyr-support'>><</if>>
 <</widget>>
 
 <<widget 'deadwood-coin-cave-combat-end'>>
   <<deadwood-coin-context>>
-  <<if !_coinReady or _coinCave.guardian isnot 'fight' or $combat isnot 1 or $NPCList[0]?.per isnot 'deadwood_coin_guard'>><<exit>><</if>>
+  <<if !maplebirch.get('MoreTransformations') or !_coinCave or $possessed or $nextPassage or $nextPassageCheck or $location isnot 'island'
+      or _coinCave.guardian isnot 'fight' or $combat isnot 1 or $NPCList[0]?.per isnot 'deadwood_coin_guard'>><<exit>><</if>>
   <<if $enemyhealth gt 0 and !maplebirch.combat.climax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 and !($pain gte 100 and $willpowerpain is 0)>><<exit>><</if>>
-  <<if $enemyhealth lte 0>>
-    <<set _coinCave.guardian to 'cleared', _coinCave.room to 'vault', _coinCave.scene to 'won', _coinCave.shortcut to true>>
-    <<set _coinCave.visited.pushUnique('vault')>>
-  <<else>>
-    <<set _coinCave.guardian to '', _coinCave.room to 'mouth', _coinCave.torch to 0, _coinCave.scene to 'retreated'>>
+  <<if !$replayScene and !$statFreeze and !$frozenValues>>
+    <<if $enemyhealth lte 0>>
+      <<set _coinCave.guardian to 'cleared', _coinCave.room to 'vault', _coinCave.scene to 'won', _coinCave.shortcut to true>>
+      <<set _coinCave.visited.pushUnique('vault')>>
+    <<else>>
+      <<set _coinCave.guardian to '', _coinCave.room to 'mouth', _coinCave.torch to 0, _coinCave.scene to 'retreated'>>
+    <</if>>
   <</if>>
   <<clotheson>><<endcombat>>
 <</widget>>
@@ -31,14 +35,18 @@
   <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Coin Cave Fight'>><</lanLink>></span><<nexttext>><<exit>>
 <</if>>
 <!-- 进行中的遭遇沿用原版附身与反抗流程，探索和开战仍检查 _coinReady。 -->
-<<if !maplebirch.get('MoreTransformations') or !_coinCave or $replayScene or $statFreeze or $frozenValues or $location isnot 'island' or _coinCave.guardian isnot 'fight' or $combat isnot 1 or $NPCList[0]?.per isnot 'deadwood_coin_guard'>>
+<<if !maplebirch.get('MoreTransformations') or !_coinCave or $location isnot 'island' or _coinCave.guardian isnot 'fight' or $combat isnot 1 or $NPCList[0]?.per isnot 'deadwood_coin_guard'>>
   <<lanSwitch 'The passage is out of reach just now.' '你现在无法进入那条通道。'>><br><br>
   <<getouticon>><<lanLink ['Return', '返回'] 'Deadwood Coin Cave'>><</lanLink>><<exit>>
 <</if>>
 <<set $outside to 0>>
 <<lanSwitch 'The pale guard blocks the archway, staring at you. You plant your feet on the wet stone.' '苍白的守卫挡在拱门下，盯着你。你踩稳湿滑的石面，准备迎击。'>>
 <br><br>
-<<if _coinCave.together>><<lanSwitch 'Zephyr crouches and moves towards the chest. "Keep it busy. Don\'t let it turn on me!"' '泽菲尔弯下腰，绕向石箱。“给老子拖住它，别让它转过来！”'>>
+<<if _coinCave.together and maplebirch.combat.companions.get(C.npc.Zephyr)?.active>>
+<<lanSwitch 'Zephyr draws a knife and moves beside you. "Watch its hands. We get past it together."' '泽菲尔拔出刀，挪到你身旁。“盯住它的手。咱们一起过去。”'>>
+<br><br>
+<<elseif _coinCave.together>>
+<<lanSwitch 'Zephyr waits behind the broken pillar, keeping the way back in sight.' '泽菲尔留在断柱后，盯着来时的通道。'>>
 <br><br><</if>>
 <<effects>><<deadwood-coin-context>>
 <<if $nextPassage or $nextPassageCheck>>

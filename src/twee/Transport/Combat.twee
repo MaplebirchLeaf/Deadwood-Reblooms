@@ -20,7 +20,7 @@
       <</if>>
       <<if !_cab_encounter and !_police_encounter>>You brace yourself against the edge of the road.
       <<if $Transport.trip.taxi is 'dropoff'>>Your passenger scrambles back along the verge, out of reach of the two figures.
-      <<elseif $Transport.trip.passengers.length>>You shout for your companion to stay back. There is barely room between you and the two figures.<</if>>
+      <<elseif $Transport.trip.passengers.length>>Your companion waits beside the vehicle as the two figures close in.<</if>>
       <</if>>
     <<option 'CN'>>
       <<if _cab_encounter>>
@@ -38,10 +38,10 @@
       <</if>>
       <<if !_cab_encounter and !_police_encounter>>你站稳脚步，背后就是路沿。
       <<if $Transport.trip.taxi is 'dropoff'>>乘客慌忙沿路肩往后退，躲开那两个人。
-      <<elseif $Transport.trip.passengers.length>>你喊同行的人先退开。你和那两个人之间，几乎没有容人挤过的空隙。<</if>>
+      <<elseif $Transport.trip.passengers.length>>同行的人留在车旁，那两个人已经逼了过来。<</if>>
       <</if>>
   <</language>><br><br>
-  <<run _road_events.beginCombat()>>
+  <<if _road_events.beginCombat()>><<deadwood-road-companions>><</if>>
 <</if>>
 <<if _road_events.inCombat and $combat>>
   <<effects>><<effectsman>><<alarmstate>><<man>><<stateman>>
@@ -62,15 +62,17 @@
 <<if _road_events.inCombat and $combat>>
   <<effects>>
   <<if _road_events.combatComplete and maplebirch.combat.climax>><<ejaculation "short">><</if>>
+  <<if !$statFreeze and !$frozenValues and !$replayScene>><<deadwood-road-support-result>><</if>>
   <<run _road_events.finishCombat()>>
 <</if>>
 <<if _road_events.policeArrested>>
   <<deadwood-transport-hazard-result>>
   <<skinicon 'manacles'>><<lanLink ['Be taken to the station', '被带往警局'] 'Deadwood Transport Police Handover'>><</lanLink>><br>
-<<elseif _road_events.inCombat>>
+<<elseif _road_events.inCombat and $combat>>
   <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Transport Road Fight'>><</lanLink>></span><<nexttext>>
 <<elseif $Transport.trip?.event?.combat is 'finished'>>
   <<deadwood-transport-hazard-result>>
+  <<deadwood-road-support-after>>
   <<if $Transport.trip.interrupted>>
     <<if maplebirch.get('Transport').taxi.active>>
       <<icon 'transport/dispatch-radio.png'>><<lanLink ['Contact dispatch', '联系调度'] 'Deadwood Transport Taxi Dispatch'>><</lanLink>><br>

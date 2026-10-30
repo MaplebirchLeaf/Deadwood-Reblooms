@@ -14,42 +14,20 @@
 <<widget 'deadwood-robin-rent-links'>>
   <<if !$RobinExpansion.bailey_defeated and !maplebirch.get('Finance')?.orphanage.pcFree and $bus is 'home' and C.npc.Robin.init is 1 and ($robinmissing is 0 or !$robinmissing) and $RobinExpansion.asylum.status isnot 'admitted'>>
     <<if maplebirch.get('Robin').rent.canPayPcRent>>
-      <<icon 'street/cash-bundle.png'>><<lanLink ["Ask Robin to pay this week's rent", '请罗宾按约定付这周房租'] 'Deadwood Robin Pays Rent'>><</lanLink>><br>
+      <<set _robinRentPayPhase to _args[0] ? 'robin-rent-pay' : 'robin-rent-captive-pay'>>
+      <<capture _robinRentPayPhase>><<icon 'street/cash-bundle.png'>><<lanLink ["Ask Robin to pay this week's rent", '请罗宾按约定付这周房租'] 'Deadwood Robin Pays Rent'>><<set $phase to _robinRentPayPhase>><</lanLink>><</capture>><br>
     <</if>>
-    <<if $RobinExpansion.rebellion>>
-      <<icon 'alert.png'>><<lanLink ['Resist with Robin as planned', '与罗宾按约定反抗'] 'Rent Robin Fight'>><<set $fightstart to 1>><</lanLink>><br>
+    <<if _args[0] and maplebirch.get('Robin').rent.canFight>>
+      <<lanSwitch 'Robin steps beside you. <<nnpc_He "Robin">> gives you the signal you agreed on.' '罗宾走到你身旁。<<nnpc_He "Robin">>朝你打了个约好的手势。'>><br><br>
+      <<set _robinRentCouldPay to $money gte $rentmoney + ($babyRent or 0)>>
+      <<capture _robinRentCouldPay>><<icon 'alert.png'>><<lanLink ['Resist with Robin as planned', '与罗宾按约定反抗'] 'Deadwood Robin Bailey Fight'>><<set $fightstart to 1, $phase to 'robin-rent-fight', $baileypaychain to 0>><<if _robinRentCouldPay>><<set $baileyRefusedToPayTotal += $rentmoney + ($babyRent or 0), $baileyRefusedToPayTotalStat += $rentmoney + ($babyRent or 0)>><</if>><</lanLink>><</capture>><br>
     <</if>>
-  <</if>>
-<</widget>>
-
-<<widget 'deadwood-robin-combat-finish'>>
-  <<set $_robinTrauma to C.npc.Robin.trauma>>
-  <<run maplebirch.get('Robin').rent.combatFinish()>>
-  <<if C.npc.Robin.trauma gt $_robinTrauma>>
-    <<lanSwitch 'Robin looks shaken.' '罗宾显然受了惊吓。'>><<grtrauma true>><br><br>
-  <</if>>
-<</widget>>
-
-<<widget 'deadwood-robin-combat-turn'>>
-  <<if $RobinExpansion.rebellion and $fightstart isnot 1 and $enemyhealth gt 0>>
-    <<set $_robinResisted to maplebirch.get('Robin').rent.combatTurn()>>
-    <<if $_robinResisted>>
-      <span class='green'><<lanSwitch 'Robin twists against the thug\'s grip and buys a moment to breathe. "Keep going," Robin calls to you.' '罗宾奋力挣动，让打手的钳制松了一瞬，终于能喘口气。“继续！”罗宾朝你喊。'>></span>
-    <<else>>
-      <span class='red'><<lanSwitch 'The thug tightens the hold when Robin tries to move. Robin looks frightened, but keeps watching for a chance to warn you.' '罗宾刚一挣动，打手就收紧了钳制。罗宾露出惧色，仍留神寻找提醒你的机会。'>></span><<grtrauma true>>
-    <</if>>
-    <<if $RobinExpansion.allies>>
-      <br><span class='green'><<lanSwitch 'The orphans watching from the hall shout warnings when a thug approaches either of you.' '大厅里的孤儿们一看见打手靠近你们，就高声提醒。'>></span>
-    <</if>>
-    <<if $RobinExpansion.solidarity>>
-      <br><span class='blue'><<lanSwitch 'The agreed signal passes through the hall. The others keep a clear path for anyone who needs to retreat.' '约好的信号在大厅里传开。其他孩子留出一条通道，方便受伤的人撤开。'>></span>
-    <</if>>
-    <br><br>
   <</if>>
 <</widget>>
 
 <<widget 'deadwood-robin-rebellion-hall-link'>>
   <<if maplebirch.get('Finance')?.orphanage.boughtOut>><<exit>><</if>>
+  <<if !maplebirch.get('Robin').available or getRobinLocation() isnot 'orphanage'>><<exit>><</if>>
   <<if $RobinExpansion.rebellion and !$RobinExpansion.allies and $RobinExpansion.victories gte 2 and $orphan_hope gte 20 and $RobinExpansion.asylum.status isnot 'admitted'>>
     <<socialiseicon>><<lanLink ['Rally the other orphans with Robin', '与罗宾召集其他孤儿'] 'Deadwood Robin Rally'>><</lanLink>><br>
   <<elseif $RobinExpansion.allies and !$RobinExpansion.solidarity and $RobinExpansion.victories gte 3>>
@@ -103,9 +81,20 @@
 
 :: Deadwood Robin Pays Rent
 <<effects>><<npc Robin>><<person1>>
-<<if maplebirch.get('Robin').rent.payPcRent()>>
-  <<lanSwitch 'You hand Bailey the sum Robin set aside in an envelope. Robin, still held by the thug, confirms the amount. Bailey counts it twice and orders the thug to let go. Afterwards Robin shows you the ledger entry. "That was our choice," Robin says. "Next week we decide again."' '你把罗宾事先封好的钱交给贝利。打手还钳着罗宾，罗宾仍清楚地报出数目。贝利数了两遍，才叫打手松手。事后罗宾给你看账本上的记录。“这是我们一起决定的。”罗宾说，“下周再一起决定。”'>>
-  <br><br><<rentpay>><<endevent>>
+<<if ['robin-rent-pay', 'robin-rent-captive-pay'].includes($phase)>>
+  <<set _robinOwnPayment to $phase is 'robin-rent-pay'>>
+  <<if maplebirch.get('Robin').rent.payPcRent()>>
+    <<rentpay>><<endevent>><<set $phase to _robinOwnPayment ? 'robin-rent-paid' : 'robin-rent-captive-paid'>>
+  <<else>>
+    <<set $phase to 'robin-rent-unpaid'>>
+  <</if>>
+<</if>>
+<<if ['robin-rent-paid', 'robin-rent-captive-paid'].includes($phase)>>
+  <<if $phase is 'robin-rent-paid'>>
+    <<lanSwitch 'Robin lets out a long breath. "Next week, we decide together."' '罗宾长长地松了口气。“下周，我们再一起商量。”'>>
+  <<else>>
+    <<lanSwitch 'The thug lets Robin go. Afterwards Robin shows you the ledger entry. "That was our choice," Robin says. "Next week we decide again."' '打手松开了罗宾。事后罗宾给你看账本上的记录。“这是我们一起决定的。”罗宾说，“下周再一起决定。”'>>
+  <</if>>
 <<else>>
   <<lanSwitch 'The reserve no longer covers the full rent. You will have to face Bailey together.' '储备金已经不足以付清房租。你们只能一起面对贝利。'>>
 <</if>>
@@ -113,10 +102,10 @@
 
 :: Deadwood Robin Rebellion
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
-<<lanSwitch 'Robin has budgeted for both of you, but the weekly collection still leaves the other children frightened. "Money bought us time," Robin says. "It will not stop Bailey from hurting someone else." You study the hall together. Robin knows Bailey may bring thugs and restrain Robin first, so you agree on signals to warn each other and a path for retreat.' '罗宾已经算过你们的开支，可每周收租仍让其他孩子胆战心惊。“钱给我们争取了时间，”罗宾说，“但它阻止不了贝利伤害别人。”你们一起看过大厅。罗宾知道贝利可能带打手来，还会先控制住自己，于是你们约好互相示警的暗号，也留好撤退的路。'>>
+<<lanSwitch 'Robin has budgeted for both of you, but the weekly collection still leaves the other children frightened. "Money bought us time," Robin says. "It will not stop Bailey from hurting someone else." You study the hall together. Robin knows Bailey may bring thugs. You agree to stay together, with signals to warn each other and a path for retreat.' '罗宾已经算过你们的开支，可每周收租仍让其他孩子胆战心惊。“钱给我们争取了时间，”罗宾说，“但它阻止不了贝利伤害别人。”你们一起看过大厅。罗宾知道贝利可能带打手来。你们说好不要分开，约好互相示警的暗号，也留好撤退的路。'>>
 <br><br>
 <<if maplebirch.get('Robin').rent.proposeRebellion()>>
-  <span class='blue'><<lanSwitch 'At the next rent demand, Robin will resist the thug holding Robin and warn you when possible. Robin can still be hurt.' '下次收租时，罗宾会尽力挣开打手的钳制，并在可能时提醒你。罗宾仍可能受伤。'>></span>
+  <span class='blue'><<lanSwitch 'Robin squeezes your hand. "When you're ready, I'll be beside you."' '罗宾握紧了你的手。“等你准备好了，我就站在你身旁。”'>></span>
   <<npcincr Robin dom 3>><<gdom>>
 <<else>>
   <<lanSwitch 'Robin wants to be better prepared before making this promise.' '罗宾还想准备得更充分些。'>>
@@ -153,7 +142,11 @@
   <br><br><span class='red'><<lanSwitch 'Bailey reaches for the ledger. Robin passes it to you before Bailey can take it.' '贝利伸手要夺账本。罗宾先把账本递到你手里。'>></span>
   <br><br>
   <<socialiseicon 'ask'>><<lanLink ['Let Robin speak for everyone', '让罗宾替大家说话'] 'Deadwood Robin Bailey Reckoning Finish'>><<set $phase to 1>><</lanLink>><br>
-  <<socialiseicon>><<lanLink ['Stand beside Robin and speak together', '站到罗宾身旁一起说'] 'Deadwood Robin Bailey Reckoning Finish'>><<set $phase to 2>><</lanLink>>
+  <<socialiseicon>><<lanLink ['Stand beside Robin and speak together', '站到罗宾身旁一起说'] 'Deadwood Robin Bailey Reckoning Finish'>><<set $phase to 2>><</lanLink>><br>
+  <<deadwood-robin-reckoning-ready>>
+  <<if _robinReckoningReady>>
+    <<refuseicon>><<lanLink ['Stand your ground with Robin', '和罗宾一起迎战'] 'Deadwood Robin Bailey Fight'>><<set $fightstart to 1, $phase to 'robin-reckoning-fight'>><</lanLink>>
+  <</if>>
 <<else>>
   <<lanSwitch 'The children have already made their stand.' '孩子们已经作出了选择。'>>
   <br><br><<getouticon>><<lanLink ['Return to the orphanage', '返回孤儿院'] 'Orphanage'>><<endevent>><</lanLink>>
@@ -162,7 +155,16 @@
 :: Deadwood Robin Bailey Reckoning Finish
 <<set $outside to 0>><<set $location to 'home'>><<effects>><<npc Robin>><<person1>>
 <<if $RobinExpansion.solidarity and !$RobinExpansion.bailey_defeated and $RobinExpansion.victories gte 4 and $baileydefeatedchain gte 3>>
-  <<if $phase is 1>>
+  <<if $phase is 'robin-reckoning-won'>>
+    <<language>>
+      <<option 'EN'>>
+        Bailey backs towards the door, holding a bruised arm. Robin is breathing hard beside you. When Bailey reaches for the ledger again, Robin pulls it out of reach.
+        "No. We're keeping this." The words come out shakily, but Robin doesn't step back.
+      <<option 'CN'>>
+        贝利捂着瘀青的手臂，退向门口。罗宾站在你身旁，喘得厉害。贝利又伸手去拿账本，罗宾立即把它收到了身后。
+        “不行。这个留在我们这里。”声音还有些发颤，罗宾却没有后退。
+    <</language>>
+  <<elseif $phase is 1>>
     <<lanSwitch 'Robin draws a deep, steadying breath, fists clenched tight at <<his>> sides until <<his>> knuckles pale. "You cannot keep making us pay just for living here," Robin says. The words tremble slightly at first, then harden into resolve. You stay beside Robin while the others repeat them, one after another.' '罗宾深深吸了一口气，垂在身侧的小手用力攥紧，指节发白。“你不能……你不能因为我们住在这里，就一直向我们要钱。”罗宾的声音最初有些发颤，但很快便坚定下来。你站在一旁，听其他孩子一个接一个地重复这句话。'>>
     <<npcincr Robin dom 4>><<gdom>>
   <<else>>

@@ -34,7 +34,6 @@ interface HawkChild {
 /** 鹰崽成长、性格、喂食与随行狩猎的全部逻辑。 */
 class BirdTower extends Module {
   public returned: { id: number; loot: string }[] = [];
-  private readonly huntAssistance = new WeakSet<object>();
 
   public constructor(core: typeof maplebirch) {
     super(core, 'BirdTower', DEFAULT_BIRD_TOWER_STATE);
@@ -124,14 +123,6 @@ class BirdTower extends Module {
   /** 当前同行的已孵化鹰崽，统一排除缺失记录与其它物种。 */
   public get party(): HawkChild[] {
     return this.hunt.ids.map(id => V.childRecords[id] as HawkChild | undefined).filter((child): child is HawkChild => child?.species === 'hawk' && childIsBorn(child));
-  }
-
-  /** 同一战斗回合只结算一次援助，读档和回退仍从原版入口快照重演。 */
-  public huntAssist(): boolean {
-    const variables = this.core.SugarCube.State.variables;
-    if (V.combat !== 1 || V.enemytype !== 'beast' || V.enemyhealth <= 0 || V.replayScene || V.statFreeze || V.frozenValues || this.huntAssistance.has(variables)) return false;
-    this.huntAssistance.add(variables);
-    return true;
   }
 
   public get capacity(): number {

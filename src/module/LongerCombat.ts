@@ -51,9 +51,6 @@ class LongerCombat {
     const train = V.combatTrain;
     return (
       V.combat === 1 &&
-      !V.statFreeze &&
-      !V.frozenValues &&
-      !V.replayScene &&
       !V.possessed &&
       !V.nextPassage &&
       !V.nextPassageCheck &&
@@ -420,6 +417,7 @@ class LongerCombat {
     for (const [name, action] of [
       ['combatinit', reset],
       ['endcombat', reset],
+      ['endevent', reset],
       ['orgasm', this.orgasm.bind(this)],
       ['ejaculation', this.npcOrgasm.bind(this)]
     ] as const) {

@@ -66,9 +66,6 @@ export default class StreetLife extends Module {
       V.enemytype === 'man' &&
       V.enemyhealth > 0 &&
       V.consensual === 0 &&
-      !V.replayScene &&
-      !V.statFreeze &&
-      !V.frozenValues &&
       !V.possessed &&
       !V.nextPassage &&
       !V.nextPassageCheck &&

@@ -37,7 +37,7 @@ interface HeistCampaign {
     trade: { stage: number; amount: number; deposit: number; day: number; rolls: number[]; secured: boolean; handed_over: boolean; reason: string; reschedules: number };
   };
   aftermath: { stage: number; letter_read: boolean; leads: string[]; wren: string; landry: string; choice: string };
-  fight: { keys: string[]; combat_started: boolean; return_passage: string; result: '' | 'won' | 'lost'; location: string; outside: number; tier: number } | null;
+  fight: { keys: string[]; combat_started: boolean; return_passage: string; result: '' | 'won' | 'lost'; location: string; outside: number; tier: number; wren_support: boolean } | null;
 }
 interface HeistState {
   stage: 'idle' | 'prep' | 'entry' | 'challenge' | 'vault' | 'escape' | 'settlement' | 'closed';

@@ -90,28 +90,18 @@ export default class RobinRent extends Shared {
     return true;
   }
 
-  /** 反抗战每回合：同盟越稳固越容易让罗宾撑住。返回 true 表示本回合顶住。 */
-  public combatTurn(): boolean {
-    if (!this.state.rebellion || V.fightstart === 1 || V.enemyhealth <= 0) return false;
-    const chance = this.state.solidarity ? 90 : this.state.allies ? 80 : 65;
-    if (V.rng <= chance) {
-      V.timer = Math.clamp(V.timer + 2, 2, 4);
-      return true;
-    }
-    C.npc.Robin.trauma = Math.min(100, C.npc.Robin.trauma + 2);
-    return false;
-  }
-
-  /** 反抗战结算：胜场累加，败场按是否动用关怀基金扣创伤。 */
-  public combatFinish(): void {
-    if (!this.state.rebellion || this.state.fight_resolution_day === Time.days) return;
-    this.state.fight_resolution_day = Time.days;
-    if (V.enemyhealth <= 0 || this.core.combat.climax) {
-      this.state.victories++;
-      return;
-    }
-    const supported = this.state.solidarity && this.state.care_fund >= 10;
-    if (supported) this.state.care_fund -= 10;
-    C.npc.Robin.trauma = Math.min(100, C.npc.Robin.trauma + (supported ? 4 : 8));
+  /** 正式反抗仍需罗宾在孤儿院，并有足够自信面对贝利。 */
+  public get canFight(): boolean {
+    return (
+      this.state.rebellion &&
+      !this.free &&
+      !this.finance?.orphanage.pcFree &&
+      this.robinAvailable &&
+      V.bus === 'home' &&
+      !V.combat &&
+      window.getRobinLocation() === 'orphanage' &&
+      C.npc.Robin.dom >= 60 &&
+      C.npc.Robin.trauma < 40
+    );
   }
 }

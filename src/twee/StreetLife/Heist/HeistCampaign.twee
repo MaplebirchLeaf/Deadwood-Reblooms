@@ -29,7 +29,7 @@
     <<saveNPC _campaign_index _campaign_key>><<set _campaign_keys.push(_campaign_key)>>
   <</for>>
   <<endevent>>
-  <<set _campaign.fight to {keys:_campaign_keys, combat_started:false, return_passage:_args[0], result:'', location:_args[2], outside:_args[3], tier:Math.clamp(_args[4], 1, 3)}>>
+  <<set _campaign.fight to {keys:_campaign_keys, combat_started:false, return_passage:_args[0], result:'', location:_args[2], outside:_args[3], tier:Math.clamp(_args[4], 1, 3), wren_support:false}>>
   <<goto 'Deadwood Street Campaign Fight'>>
 <</widget>>
 
@@ -61,6 +61,12 @@
   <<set $consensual to 0>><<neutral 1>><<maninit>><<npcidlegenitals>>
   <<set $enemystrength to 22000 + _campaign_fight.tier * 4000, $enemyanger to 45 + _campaign_fight.tier * 10, $enemytrust to 0>>
   <<set _campaign_fight.combat_started to true>>
+  <<if ['Deadwood Street Bank Fight Result', 'Deadwood Street Bank Regroup Result'].includes(_campaign_fight.return_passage)
+      and C.npc.Wren.init is 1 and C.npc.Wren.state is 'active'
+      and (!_campaign.team.separated.includes('Wren') or _campaign.team.rejoined.includes('Wren'))
+      and (!_campaign.team.injured.includes('Wren') or _campaign.team.aid.includes('Wren'))>>
+    <<companions-add `C.npc.Wren` 'deadwood-wren-support'>>
+  <</if>>
   <<language>>
     <<option 'EN'>>
       One of them grabs your arm. Another closes in before you can pull away. You turn towards the space between them, trying to keep your feet.
@@ -84,7 +90,7 @@
   <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>>
 <<else>>
   <<lanSwitch 'You cannot begin the confrontation in your present condition.' '你现在的状态无法开始这场冲突。'>><br><br>
-  <<getouticon>><<lanLink ['Step back', '退开'] `_campaign_fight.return_passage`>><<if !$combat>><<set _campaign_fight.result to 'lost'>><<deadwood-heist-fight-clear>><</if>><</lanLink>><br>
+  <<getouticon>><<lanLink ['Step back', '退开'] `_campaign_fight.return_passage`>><<if !$combat and !$replayScene and !$statFreeze and !$frozenValues>><<set _campaign_fight.result to 'lost'>><<deadwood-heist-fight-clear>><</if>><</lanLink>><br>
 <</if>>
 
 :: Deadwood Street Campaign Fight Finish
@@ -92,16 +98,22 @@
 <<if !_campaign_fight>>
   <<lanLink ['Return', '返回'] 'High Street'>><</lanLink>><br><<exit>>
 <</if>>
-<<if $nextPassage or $nextPassageCheck or $eventforced or $possessed or $replayScene or $statFreeze or $frozenValues or isPregnancyEnding()>>
+<<if $nextPassage or $nextPassageCheck or $eventforced or $possessed or isPregnancyEnding()>>
   <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>><<exit>>
 <</if>>
 <<if !_campaign_fight.result and _campaign_fight.combat_started and $combat is 1 and _campaign_fight.keys.every((key, index) => $NPCList[index]?.per === key)>>
   <<if $enemyhealth gt 0 and !maplebirch.combat.climax and !($alarm is 1 and $rescue gte 1) and $finish isnot 1 and !($pain gte 100 and $willpowerpain is 0)>>
     <span id='next'><<lanLink ['Next', '继续'] 'Deadwood Street Campaign Fight'>><</lanLink>></span><<nexttext>><<exit>>
   <</if>>
-  <<set _campaign_fight.result to $enemyhealth lte 0 ? 'won' : 'lost', _campaign_fight.combat_started to false>>
-  <<if maplebirch.combat.climax>><<ejaculation 'short'>><</if>>
-  <<clotheson>><<endcombat>><<deadwood-heist-fight-clear>>
+  <<if $replayScene or $statFreeze or $frozenValues>>
+    <<if maplebirch.combat.climax>><<ejaculation 'short'>><</if>>
+    <<clotheson>><<endcombat>>
+  <<else>>
+    <<set _campaign_fight.wren_support to !!maplebirch.combat.companions.get(C.npc.Wren)>>
+    <<set _campaign_fight.result to $enemyhealth lte 0 ? 'won' : 'lost', _campaign_fight.combat_started to false>>
+    <<if maplebirch.combat.climax>><<ejaculation 'short'>><</if>>
+    <<clotheson>><<endcombat>><<deadwood-heist-fight-clear>>
+  <</if>>
 <</if>>
 <<if _campaign_fight.result>>
   <<if _campaign_fight.result is 'won'>>
@@ -109,7 +121,18 @@
   <<else>>
     <<lanSwitch 'You have lost the chance to continue as planned.' '你已经无法按原来的安排继续。'>>
   <</if>><br><br>
+  <<if _campaign_fight.wren_support>>
+    <<if _campaign.team.injured.includes('Wren') and !_campaign.team.aid.includes('Wren')>>
+      <<lanSwitch 'Wren follows slowly. "Find somewhere to stop. Preferably before the next lot notice us."' '伦恩慢慢跟上。“找个地方停一会儿吧。最好赶在下一拨人看见我们之前。”'>>
+    <<elseif _campaign_fight.result is 'lost'>>
+      <<lanSwitch 'Wren catches your sleeve as you turn away. "This way. The gold can wait."' '你转身时，伦恩拉住你的袖子。“这边。黄金的事可以等等。”'>>
+    <<else>>
+      <<lanSwitch 'Wren checks the way out before looking back at you. "There. Now let\'s go before they change their minds."' '伦恩先往出口看了看，才回过头。“好了。趁他们还没改主意，走吧。”'>>
+    <</if>><br><br>
+  <</if>>
   <<lanLink ['Continue', '继续'] `_campaign_fight.return_passage`>><</lanLink>><br>
+<<elseif ($replayScene or $statFreeze or $frozenValues) and !$combat>>
+  <<getouticon>><<lanLink ['Leave', '离开'] 'High Street'>><</lanLink>><br>
 <<else>>
   <<lanLink ['Return to the confrontation', '返回冲突现场'] 'Deadwood Street Campaign Fight'>><</lanLink>><br>
 <</if>>
